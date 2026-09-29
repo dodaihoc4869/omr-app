@@ -1,6 +1,8 @@
 // BI-A PHẢN ỨNG · LỚP GỌI MÁY CHỦ (hợp đồng docs/hop-dong-bi-a.md). Mọi lệnh đi `POST /game-v2/<lệnh>` kèm token của em (goiHoa2).
 // Đọc CHẶT: trường thiếu/sai kiểu thì bỏ, KHÔNG bịa số. Đáp án/lời giải chỉ có trong phản hồi `answer` SAU khi em chốt.
 import { goiHoa2 } from '../../components/hoa2/api'
+import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { laKiHieu, type KiHieu } from './nguyen-to'
 import type { HinhAnh } from '../../data/examContent'
 import type { CauBia } from './dieu-khien'
 
@@ -25,6 +27,9 @@ export interface SanhBia {
   dao: number
   tran: { con: number; tong: number; conDoan: number; conDao: number }
   giaoHuu: { mo: boolean; con: number; toiDa: number }
+  /** Máy chủ có phòng đấu (Durable Object) ⇒ mở "Đấu với bạn"; không ⇒ nút ghi "Sắp mở". */
+  online: boolean
+  diemBan: { diem: number; soVan: number }
 }
 export function docSanhBia(o: Record<string, unknown>): SanhBia {
   const cd = vat(o.chienDich), tl = vat(o.theLuc), tr = vat(o.tran), gh = vat(o.giaoHuu)
@@ -37,6 +42,8 @@ export function docSanhBia(o: Record<string, unknown>): SanhBia {
     doan: so(vat(o.doan)?.con), dao: so(vat(o.dao)?.con),
     tran: { con: so(tr?.con), tong: so(tr?.tong), conDoan: so(tr?.conDoan), conDao: so(tr?.conDao) },
     giaoHuu: { mo: gh?.mo === true, con: so(gh?.con), toiDa: so(gh?.toiDa) || 2 },
+    online: o.online === true,
+    diemBan: { diem: so(vat(o.diemBan)?.diem) || 1000, soVan: so(vat(o.diemBan)?.soVan) },
   }
 }
 export async function taiSanhBia(token: string): Promise<SanhBia> { return docSanhBia(await goi('bia-sanh', token)) }
@@ -82,4 +89,58 @@ export async function ketVanBia(token: string, van: string, ketQua: { doiThang: 
   const o = await goi('bia-ket-van', token, { van, ketQua, ghe, soCu })
   const tl = vat(o.theLuc)
   return { theLuc: tl ? { con: so(tl.con), tong: so(tl.tong) } : null }
+}
+
+// ───────────── ĐẤU VỚI BẠN (GĐ2) — hợp đồng docs/hop-dong-bi-a.md mục "Đấu với bạn" ─────────────
+export type LoaiBanMang = 'ban' | 'giao_huu'
+/** Vé vào bàn online (chủ bàn tạo, nhận lời mời, hay nhập mã). */
+export interface VeVaoBan { van: string; ma: string | null; cheDo: 'don' | 'doi'; loai: LoaiBanMang; ve: string }
+const docVeVao = (o: Record<string, unknown>): VeVaoBan => {
+  if (typeof o.van !== 'string' || typeof o.ve !== 'string') throw new Error(chu(o.message) || 'Chưa vào được bàn. Em thử lại.')
+  return { van: o.van, ma: chu(o.ma) || null, cheDo: o.cheDo === 'doi' ? 'doi' : 'don', loai: o.loai === 'giao_huu' ? 'giao_huu' : 'ban', ve: o.ve }
+}
+export async function taoBanOnline(token: string, cheDo: 'don' | 'doi', loai: LoaiBanMang): Promise<VeVaoBan> { return docVeVao(await goi('bia-tao-ban', token, { cheDo, loai })) }
+export async function vaoBanBangMa(token: string, ma: string): Promise<VeVaoBan> { return docVeVao(await goi('bia-vao-ban', token, { ma })) }
+export async function moiBanVao(token: string, van: string, den: string): Promise<string> { return chu((await goi('bia-moi', token, { van, den })).id) }
+export interface BanCoMat { sbd: string; ten: string; conTran: number }
+export interface LoiMoiDen { id: string; tu: string; cheDo: 'don' | 'doi'; loai: LoaiBanMang; conGiay: number }
+export interface HoiLoiMoi { ban: BanCoMat[]; moi: LoiMoiDen[]; phanHoi: { id: string; ten: string; nhan: boolean }[] }
+/** Mỗi 6 giây khi em ở Sảnh Bi-a / phòng chờ: báo có mặt (kèm số câu Bi-a còn của em), đọc bạn đang ở Sảnh + lời mời. */
+export async function hoiLoiMoi(token: string, con: number): Promise<HoiLoiMoi> {
+  const o = await goi('bia-loi-moi', token, { con })
+  const ds = (x: unknown) => (Array.isArray(x) ? x : []).map(vat).filter((v): v is Record<string, unknown> => !!v)
+  return {
+    ban: ds(o.ban).filter((x) => typeof x.sbd === 'string').map((x) => ({ sbd: x.sbd as string, ten: chu(x.ten) || 'Bạn', conTran: so(x.conTran) })),
+    moi: ds(o.moi).filter((x) => typeof x.id === 'string').map((x) => ({ id: x.id as string, tu: chu(x.tu) || 'Bạn', cheDo: x.cheDo === 'doi' ? 'doi' : 'don', loai: x.loai === 'giao_huu' ? 'giao_huu' : 'ban', conGiay: so(x.conGiay) })),
+    phanHoi: ds(o.phanHoi).filter((x) => typeof x.id === 'string').map((x) => ({ id: x.id as string, ten: chu(x.ten) || 'Bạn', nhan: x.nhan === true })),
+  }
+}
+export async function traLoiLoiMoi(token: string, id: string, nhan: boolean): Promise<VeVaoBan | null> {
+  const o = await goi('bia-tra-loi-moi', token, { id, nhan })
+  return nhan ? docVeVao(o) : null
+}
+/** Phòng đấu Bắt đầu ⇒ xếp câu cho đúng các bi ghế em (máy chủ trả câu công khai + vé trận). */
+export interface XepOnline { van: string; ghe: number; session: string | null; cauTheoBi: Partial<Record<KiHieu, CauBia>>; chot: CauBia | null; veTran: string; trong: number }
+export async function xepBanOnline(token: string, veGhe: string): Promise<XepOnline> {
+  const o = await goi('bia-xep-ban', token, { veGhe })
+  if (typeof o.veTran !== 'string' || typeof o.van !== 'string') throw new Error(chu(o.message) || 'Chưa xếp được câu cho ván này. Em thử lại.')
+  const cauTheoBi: Partial<Record<KiHieu, CauBia>> = {}
+  let trong = 0
+  for (const x of Array.isArray(o.bi) ? o.bi : []) {
+    const v = vat(x)
+    if (!v || !laKiHieu(v.ki)) continue
+    const c = docCau(v.cau)
+    if (c) cauTheoBi[v.ki] = c; else trong++
+  }
+  return { van: o.van, ghe: so(o.ghe), session: typeof o.session === 'string' ? o.session : null, cauTheoBi, chot: docCau(o.chot), veTran: o.veTran, trong }
+}
+/** Đổi câu ở ván online: kèm vé câu để phòng đấu biết câu mới (hoặc bi thành bi trống). */
+export async function doiCauBiaMang(token: string, session: string, qidCu: string, chot: boolean, ki: KiHieu): Promise<{ cau: CauBia | null; ve: string | null }> {
+  const o = await goi('bia-doi-cau', token, { session, qidCu, chot, ki })
+  return { cau: o.trong === true ? null : docCau(o.cau), ve: typeof o.ve === 'string' ? o.ve : null }
+}
+/** Địa chỉ WebSocket phòng đấu của ván (cùng máy chủ với các lệnh game). */
+export async function diaChiPhong(van: string): Promise<string> {
+  const goc = await layDiaChiMayChu('')
+  return `${goc.replace(/^http/, 'ws').replace(/\/+$/, '')}/bi-a/phong/${encodeURIComponent(van)}`
 }

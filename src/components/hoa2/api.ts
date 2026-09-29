@@ -22,6 +22,8 @@ export interface ChienDichSanh {
 export interface SanhHoa2 {
   ngay: string
   chienDich: ChienDichSanh | null
+  /** Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ tên + ngày, không lộ câu. Máy chủ cũ không gửi ⇒ null. */
+  sapBatDau?: { ten: string; batDau: string } | null
   theLuc: { con: number; tong: number }
   huyetChien: boolean
   doan: { con: number }
@@ -45,10 +47,15 @@ export interface ChienDichCau {
   tong: number
 }
 export type TrangThaiCau = 'dang_on' | 'thanh_thao' | 'can_day_lai'
+/** Nơi em làm lần đó (máy chủ gắn): Bi-a Phản Ứng / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra / Lên bảng / Kiểm tra đầu giờ; nguồn khác hoặc bản máy chủ cũ ⇒ vắng. */
+export type NguonLanLam = 'bia' | 'doan' | 'dao' | 'thi' | 'len_bang' | 'dau_gio'
+export const NHAN_NGUON_LAN: Record<NguonLanLam, string> = { bia: 'Bi-a', doan: 'Đoàn Hộ Tống', dao: 'Bát Linh Đảo', thi: 'Ca kiểm tra', len_bang: 'Lên bảng', dau_gio: 'Kiểm tra đầu giờ' }
+const laNguonLan = (x: unknown): x is NguonLanLam => typeof x === 'string' && Object.prototype.hasOwnProperty.call(NHAN_NGUON_LAN, x)
 export interface LanLam {
   ngay: string
   dung: boolean
   coGoiY: boolean
+  nguon?: NguonLanLam
 }
 export interface CauDaLamMuc {
   qid: string
@@ -61,6 +68,8 @@ export interface CauDaLamMuc {
   lanCuoiDung: boolean | null
   henOn: string | null
   lichSu: LanLam[]
+  /** Nhãn nợ máy chủ viết sẵn: "Sai 2 lần · Ca 26/09 · Lên bảng 28/09" (Sổ nợ 29/09; câu đã thành thạo / máy chủ cũ ⇒ vắng). */
+  nhan?: string
 }
 export type KetQuaCauDaLam = { cheDo2: false } | { cheDo2: true; chienDich: ChienDichCau[]; cau: CauDaLamMuc[] }
 
@@ -135,6 +144,12 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
   }
 }
 
+function docSapBatDau(v: unknown): { ten: string; batDau: string } | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  return laNgay(o.batDau) ? { ten: chu(o.ten).trim() || 'Chiến dịch của lớp', batDau: o.batDau } : null
+}
+
 /** Đọc CHẶT phản hồi `hoa2-sanh`. Trả null nếu thiếu phần bắt buộc (coi như lỗi, KHÔNG đoán). */
 export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
   if (o.cheDo2 !== true) return { cheDo2: false }
@@ -163,6 +178,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
     sanh: {
       ngay: laNgay(o.ngay) ? o.ngay : '',
       chienDich,
+      sapBatDau: docSapBatDau(o.sapBatDau),
       theLuc: { con: soKhongAm(tl.con), tong: soKhongAm(tl.tong) },
       huyetChien: o.huyetChien === true,
       doan: { con: soKhongAm((o.doan as Record<string, unknown> | undefined)?.con) },
@@ -217,7 +233,8 @@ export function docCauDaLam(o: Record<string, unknown>): KetQuaCauDaLam {
       henOn: laNgay(c.henOn) ? c.henOn : null,
       lichSu: (Array.isArray(c.lichSu) ? c.lichSu : [])
         .filter((l): l is Record<string, unknown> => !!l && typeof l === 'object' && laNgay(l.ngay))
-        .map((l) => ({ ngay: chu(l.ngay), dung: l.dung === true, coGoiY: l.coGoiY === true })),
+        .map((l) => ({ ngay: chu(l.ngay), dung: l.dung === true, coGoiY: l.coGoiY === true, ...(laNguonLan(l.nguon) ? { nguon: l.nguon } : {}) })),
+      ...(typeof c.nhan === 'string' && c.nhan.trim() ? { nhan: c.nhan.trim() } : {}),
     }))
   return { cheDo2: true, chienDich, cau }
 }
@@ -281,6 +298,13 @@ export async function moRuong(token: string): Promise<KetQuaRuong> {
   const o = await goiHoa2('hoa2-ruong-mo', token)
   const q = (o.qua ?? {}) as Record<string, unknown>
   return { vang: soKhongAm(q.vang), lapLai: o.lapLai === true }
+}
+
+/** Đổi tên thần thú của CHÍNH em (`rename`; máy chủ soát luật tên + tối đa 3 lần/ngày). Trả tên máy chủ đã lưu. */
+export async function doiTenThu(token: string, ten: string): Promise<string> {
+  const o = await goiHoa2('rename', token, { name: ten })
+  const p = (o.profile ?? {}) as Record<string, unknown>
+  return typeof p.nickname === 'string' && p.nickname ? p.nickname : ten
 }
 
 // ─── nhớ chế độ 2.0 theo SBD (để lần mở sau vẽ ngay Sảnh, không nháy Bảng nhiệm vụ cũ) ──────────

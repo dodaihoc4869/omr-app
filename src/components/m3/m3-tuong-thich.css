@@ -1,5 +1,5 @@
 /* TỆP SINH TỰ ĐỘNG — sửa scripts/sinh-m3-tuong-thich.mjs, KHÔNG sửa tay tệp này.
- * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx, BaoCaoCaThiHocSinhModal.tsx, BaoCaoCaThiPhuHuynhModal.tsx, BieuDoTienBoGoogle.tsx, KhoiBaPhan.tsx, DongDemCau.tsx, PhongChoGame.tsx, BangTinPhuHuynh.tsx, src/screens/ParentPortalScreen.tsx, src/screens/ExamHubScreen.tsx, src/screens/ExamSetupScreen.tsx, src/screens/PhanCongScreen.tsx, src/screens/HocSinhScreen.tsx, src/screens/LichSuCaScreen.tsx, src/screens/ExamMonitorScreen.tsx, src/screens/NganHangDeScreen.tsx, src/screens/CauHoiScreen.tsx, src/screens/ClassListScreen.tsx, src/screens/GoiLenBangScreen.tsx, src/screens/CaiDatScreen.tsx, HopChonDe.tsx, KhoiMayChuMoi.tsx, KhoiMatKhauApp.tsx, NutQuayLai.tsx.
+ * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx, BaoCaoCaThiPhuHuynhModal.tsx, BieuDoTienBoGoogle.tsx, KhoiBaPhan.tsx, DongDemCau.tsx, PhongChoGame.tsx, BangTinPhuHuynh.tsx, src/screens/ParentPortalScreen.tsx, src/screens/ExamHubScreen.tsx, src/screens/ExamSetupScreen.tsx, src/screens/PhanCongScreen.tsx, src/screens/HocSinhScreen.tsx, src/screens/LichSuCaScreen.tsx, src/screens/ExamMonitorScreen.tsx, src/screens/NganHangDeScreen.tsx, src/screens/CauHoiScreen.tsx, src/screens/ClassListScreen.tsx, src/screens/GoiLenBangScreen.tsx, src/screens/CaiDatScreen.tsx, HopChonDe.tsx, KhoiMayChuMoi.tsx, KhoiMatKhauApp.tsx, NutQuayLai.tsx.
  * Mọi bộ chọn đều mang tiền tố `.m3 ` (không có luật trần): app giáo viên, game thần thú và Bảng nhiệm vụ (.bnv)
  * không bị chạm. Không phân lớp (@layer) nên thắng lớp tiện ích Tailwind. Màu chỉ là biến --m3-*. */
 
@@ -214,7 +214,6 @@
 .m3 .bg-emerald-500.text-white { color: var(--m3-on-primary); }
 .m3 .bg-amber-500.text-white { color: var(--m3-canh-bao); }
 .m3 .bg-rose-500.text-white { color: var(--m3-on-error); }
-.m3 .bg-amber-400.text-white { color: var(--m3-canh-bao); }
 .m3 .bg-red-500.text-white { color: var(--m3-on-error); }
 .m3 .bg-emerald-400.text-white { color: var(--m3-on-primary); }
 .m3 .bg-green-600.text-white { color: var(--m3-on-primary); }
@@ -222,6 +221,7 @@
 .m3 .bg-purple-600.text-white { color: var(--m3-on-primary); }
 .m3 .bg-orange-600.text-white { color: var(--m3-canh-bao); }
 .m3 .bg-indigo-600.text-white { color: var(--m3-on-primary); }
+.m3 .bg-amber-400.text-white { color: var(--m3-canh-bao); }
 .m3 .border-t-amber-400 { border-top-color: var(--m3-tren-canh-bao); }
 .m3 .border-t-blue-600 { border-top-color: var(--m3-primary); }
 .m3 .border-t-green-500 { border-top-color: var(--m3-tertiary); }

@@ -104,7 +104,8 @@ beforeEach(() => {
 })
 
 const nutXep = (r: ReturnType<typeof render>) => [...r.container.querySelectorAll('button')].find((b) => (b.textContent ?? '').includes('Xếp giờ')) as HTMLButtonElement
-const nutChu = (r: ReturnType<typeof render>, chu: string) => [...r.container.querySelectorAll('button')].find((b) => (b.textContent ?? '').includes(chu)) as HTMLButtonElement | undefined
+// Bỏ thẻ đầu mục Lên bảng (`role=tab`, 28/09 có thẻ "Dạy học" trùng chữ với nút chế độ dạy học của màn theo ca).
+const nutChu = (r: ReturnType<typeof render>, chu: string) => [...r.container.querySelectorAll('button:not([role="tab"])')].find((b) => (b.textContent ?? '').includes(chu)) as HTMLButtonElement | undefined
 const dongBuoi = (r: ReturnType<typeof render>) => [...r.container.querySelectorAll('[data-dong-buoi]')] as HTMLElement[]
 const nutDat = (d: HTMLElement) => [...d.querySelectorAll('button')].find((b) => (b.textContent ?? '').trim() === 'Đạt') as HTMLButtonElement
 const luu = () => m.kho.get(KHOA) as BuoiChuaLuu | undefined

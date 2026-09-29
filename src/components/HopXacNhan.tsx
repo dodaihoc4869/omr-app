@@ -18,6 +18,7 @@ export default function HopXacNhan({
   nhanDangLam,
   yeuCauGo,
   nhap,
+  loi,
   onXacNhan,
   onHuy,
 }: {
@@ -33,7 +34,9 @@ export default function HopXacNhan({
   /** Bắt gõ đúng `giaTri` (so sau khi cắt khoảng trắng) mới bật nút xác nhận. `nhan` là câu dặn trên ô gõ. */
   yeuCauGo?: { nhan: string; giaTri: string }
   /** Ô nhập chữ (thay prompt): `onXacNhan` nhận chữ đã gõ. `batBuoc` = ô trống thì chưa bật nút. */
-  nhap?: { nhan: string; macDinh?: string; goiY?: string; batBuoc?: boolean }
+  nhap?: { nhan: string; macDinh?: string; goiY?: string; batBuoc?: boolean; toiDa?: number; onDoi?: (giaTri: string) => void }
+  /** Lỗi (thường là câu của máy chủ) hiện ngay dưới ô nhập; hộp vẫn mở để em sửa. */
+  loi?: string
   onXacNhan: (giaTri?: string) => void
   onHuy: () => void
 }) {
@@ -43,7 +46,10 @@ export default function HopXacNhan({
   const nutChinh = useRef<HTMLButtonElement>(null)
   const oGo = useRef<HTMLInputElement>(null)
   const [go, setGo] = useState(nhap?.macDinh ?? '')
-  const khop = nhap ? !nhap.batBuoc || go.trim() !== '' : !yeuCauGo || go.trim() === yeuCauGo.giaTri
+  // `toiDa`: đếm ký tự sau khi cắt/gom khoảng trắng (đúng cách máy chủ đếm); vượt ⇒ chưa bật nút.
+  const soKyTu = [...go.trim().replace(/\s+/g, ' ')].length
+  const quaDai = !!nhap?.toiDa && soKyTu > nhap.toiDa
+  const khop = nhap ? (!nhap.batBuoc || go.trim() !== '') && !quaDai : !yeuCauGo || go.trim() === yeuCauGo.giaTri
   const duocBam = khop && !dangLam
   const xacNhan = () => (nhap ? onXacNhan(go) : onXacNhan())
 
@@ -89,19 +95,38 @@ export default function HopXacNhan({
         </div>
         {(yeuCauGo || nhap) && (
           <label className="hxn-go">
-            <span>{nhap ? nhap.nhan : yeuCauGo?.nhan}</span>
+            <span className="hxn-go-nhan">
+              <span>{nhap ? nhap.nhan : yeuCauGo?.nhan}</span>
+              {nhap?.toiDa ? (
+                <span className="hxn-dem" data-qua={quaDai ? 'true' : 'false'} aria-live="polite" aria-label={`Đã gõ ${soKyTu} trên ${nhap.toiDa} ký tự`}>
+                  {soKyTu}/{nhap.toiDa}
+                </span>
+              ) : null}
+            </span>
             <input
               ref={oGo}
               value={go}
               autoComplete="off"
               inputMode={nhap ? 'text' : 'numeric'}
               placeholder={nhap?.goiY}
-              onChange={(e) => setGo(e.target.value)}
+              maxLength={nhap?.toiDa ? nhap.toiDa * 3 : undefined}
+              aria-invalid={loi ? true : undefined}
+              aria-errormessage={loi ? `${id}-l` : undefined}
+              readOnly={dangLam}
+              onChange={(e) => {
+                setGo(e.target.value)
+                nhap?.onDoi?.(e.target.value)
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && duocBam) xacNhan()
               }}
             />
           </label>
+        )}
+        {loi && (
+          <p id={`${id}-l`} className="hxn-loi" role="alert">
+            {loi}
+          </p>
         )}
         <div className="hxn-nut-hang">
           {nhanHuy !== null && (

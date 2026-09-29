@@ -4,8 +4,10 @@
 //   {"bat":true,"lop":["12A1"]}          ⇒ chỉ các lớp này
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import type { Env } from './kieu'
+import { docCauHinhDem } from './cau-hinh-dem'
+import { chayDdlMotLan } from './ddl-mot-lan'
 import {
-  lapKeHoachNgay, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
+  lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   gopThongKeDang, tinhHangTheoDang,
   type CauSrs, type HangEm, type TuyChonKeHoach, type HoSoDangTho, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
@@ -37,8 +39,8 @@ export function docCoHoa2Tu(giaTri: unknown): CoHoa2 {
   }
 }
 export async function docCoHoa2(env: Env): Promise<CoHoa2> {
-  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CO_HOA2).first<{ gia_tri: string }>().catch(() => null)
-  return docCoHoa2Tu(r?.gia_tri)
+  // Đệm 15 s trong isolate (cau-hinh-dem.ts): Sảnh/start/Đoàn/Bi-a đọc cờ này nhiều lần mỗi request.
+  return docCoHoa2Tu(await docCauHinhDem(env, KHOA_CO_HOA2))
 }
 /** Em này đang ở chế độ Game Hóa 2.0? Lỗi đọc ⇒ `false` (đường cũ). */
 export async function cheDo2(env: Env, sbd: string): Promise<boolean> {
@@ -65,18 +67,65 @@ export interface ChienDich {
   maCa: string | null
   taoLuc: string
   trangThai: 'dang_chay' | 'da_dong' | 'da_huy'
+  /** NGÀY BẮT ĐẦU (thầy 28/09, `YYYY-MM-DD` giờ VN). Không đặt ⇒ ngày tạo (hành vi cũ). */
+  batDau: string
+  /**
+   * MỐC BẮT ĐẦU (ISO) = max(`tao_luc`, 00:00 VN của ngày bắt đầu) — thay `taoLuc` ở MỌI chỗ tính (số ngày, sức chứa, lần làm được tính,
+   * nhịp lớp, thống kê). Không đặt ngày bắt đầu ⇒ đúng bằng `taoLuc`.
+   */
+  mocBatDau: string
+}
+/** 00:00 giờ VN của một ngày `YYYY-MM-DD`, dạng ISO (UTC) để so chuỗi với `tao_luc`/`luc`. */
+export const dauNgayVn = (ngay: string): string => new Date(Date.parse(`${ngay}T00:00:00Z`) - GIO_VN_MS).toISOString()
+const NGAY_RE = /^\d{4}-\d{2}-\d{2}$/
+/** Ngày bắt đầu + mốc bắt đầu từ `tao_luc` và `bat_dau` (có thể vắng). */
+export function batDauCua(taoLuc: string, batDau: unknown): { batDau: string; mocBatDau: string } {
+  const ms = Date.parse(taoLuc)
+  const ngayTao = Number.isFinite(ms) ? ngayVnCua(ms) : taoLuc.slice(0, 10)
+  const bd = str(batDau)
+  if (!NGAY_RE.test(bd) || bd <= ngayTao) return { batDau: ngayTao, mocBatDau: taoLuc }
+  const moc = dauNgayVn(bd)
+  return { batDau: bd, mocBatDau: moc > taoLuc ? moc : taoLuc }
 }
 export const docChienDichTuDong = (r: Row): ChienDich => ({
+  ...batDauCua(str(r.tao_luc), r.bat_dau),
   id: str(r.id), ten: str(r.ten), lop: r.lop == null ? null : str(r.lop), sbd: parseMang(r.sbd_json), maDe: parseMang(r.ma_de_json), qids: parseMang(r.qid_json),
   hanNop: str(r.han_nop), theLucNgay: Number(r.the_luc_ngay) || 40, huyetChien: Number(r.huyet_chien ?? 1) !== 0, maCa: r.ma_ca == null ? null : str(r.ma_ca),
   taoLuc: str(r.tao_luc), trangThai: (['dang_chay', 'da_dong', 'da_huy'].includes(str(r.trang_thai)) ? str(r.trang_thai) : 'dang_chay') as ChienDich['trangThai'],
 })
 
+// ---------------------------------------------------------------- ngày bắt đầu (thầy 28/09)
+/** Bảng phụ tạo lúc chạy (CI không chạy migration; KHÔNG ALTER `chien_dich`). Không có dòng ⇒ bắt đầu = ngày tạo. */
+export const LENH_TAO_BANG_BAT_DAU = 'CREATE TABLE IF NOT EXISTS chien_dich_bat_dau (id TEXT PRIMARY KEY, bat_dau TEXT NOT NULL)'
+export async function ghiBatDau(env: Env, id: string, batDau: string): Promise<void> {
+  await chayDdlMotLan(env, 'chien_dich_bat_dau', [LENH_TAO_BANG_BAT_DAU]) // một lần mỗi isolate (ddl-mot-lan.ts)
+  await env.DB.prepare('INSERT INTO chien_dich_bat_dau (id, bat_dau) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET bat_dau = excluded.bat_dau').bind(id, batDau).run()
+}
+/** Ngày bắt đầu đã đặt của các chiến dịch. Bảng chưa có / lỗi đọc ⇒ rỗng (hành vi cũ). */
+export async function docBatDauMap(env: Env, ids: readonly string[]): Promise<Map<string, string>> {
+  if (!ids.length) return new Map()
+  const r = await env.DB.prepare('SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT value FROM json_each(?))').bind(JSON.stringify([...new Set(ids)])).all<Row>().catch(() => ({ results: [] as Row[] }))
+  return new Map((r.results ?? []).map((x) => [str(x.id), str(x.bat_dau)]))
+}
+/** Đọc dòng `chien_dich` kèm ngày bắt đầu (một truy vấn phụ cho cả danh sách). */
+export async function docChienDichKemBatDau(env: Env, rows: readonly Row[]): Promise<ChienDich[]> {
+  const bd = await docBatDauMap(env, rows.map((r) => str(r.id)))
+  return rows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null }))
+}
+/** Chiến dịch chưa tới ngày bắt đầu? */
+export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau > homNay
+
 /** Mọi chiến dịch (chưa huỷ) có em này, mới giao trước. */
 export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDich[]> {
-  const r = await env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' AND EXISTS (SELECT 1 FROM json_each(chien_dich.sbd_json) WHERE value = ?) ORDER BY tao_luc DESC")
-    .bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))
-  return (r.results ?? []).map(docChienDichTuDong)
+  // Tối ưu 28/09: ngày bắt đầu đọc SONG SONG (cùng điều kiện lọc) thay vì nối tiếp sau danh sách — một đợt D1 thay vì hai.
+  // Không JOIN: bảng `chien_dich_bat_dau` tạo lúc chạy, có thể chưa có ⇒ lỗi riêng câu phụ, danh sách vẫn đúng (hành vi cũ).
+  const LOC = "trang_thai <> 'da_huy' AND EXISTS (SELECT 1 FROM json_each(chien_dich.sbd_json) WHERE value = ?)"
+  const [r, bd] = await Promise.all([
+    env.DB.prepare(`SELECT * FROM chien_dich WHERE ${LOC} ORDER BY tao_luc DESC`).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
+    env.DB.prepare(`SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE ${LOC})`).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
+  ])
+  const m = new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)]))
+  return (r.results ?? []).map((x) => docChienDichTuDong({ ...x, bat_dau: m.get(str(x.id)) ?? null }))
 }
 /**
  * SỬA CHIẾN DỊCH (thầy 28/09, `srs2-sua.ts`): em được THÊM vào chiến dịch đang chạy chỉ tính lần làm TỪ LÚC ĐƯỢC THÊM (như em giao từ đầu).
@@ -94,8 +143,11 @@ export async function docMocThemCaLop(env: Env, chienDichId: string): Promise<Ma
 /** Mốc tính lần làm của em với một chiến dịch: lúc giao, hoặc lúc em được thêm nếu muộn hơn. */
 export const mocTinhCua = (taoLuc: string, themLuc: string | undefined): string => (themLuc && themLuc > taoLuc ? themLuc : taoLuc)
 
-/** Chiến dịch đang chạy của em (giao gần nhất, còn hạn). */
-export const chienDichDangChay = (ds: readonly ChienDich[], homNay: string): ChienDich | null => ds.find((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay) ?? null
+/** Chiến dịch đang chạy của em (giao gần nhất, còn hạn, ĐÃ tới ngày bắt đầu). */
+export const chienDichDangChay = (ds: readonly ChienDich[], homNay: string): ChienDich | null => ds.find((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay)) ?? null
+/** Chiến dịch SẮP bắt đầu gần nhất của em (chưa tới ngày bắt đầu) — Sảnh HS báo ngày, KHÔNG phát câu. */
+export const chienDichSapBatDau = (ds: readonly ChienDich[], homNay: string): ChienDich | null =>
+  ds.filter((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && chuaBatDau(c, homNay)).sort((a, b) => (a.batDau < b.batDau ? -1 : a.batDau > b.batDau ? 1 : 0))[0] ?? null
 
 // ---------------------------------------------------------------- câu và sổ
 /** `sao`: số sao "cần chữa" của câu trong kho (`canChua.sao` → `sao` trong json câu game): 2 = vận dụng cao đánh dấu 2 sao. */
@@ -138,14 +190,30 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[]):
   const ds = JSON.stringify([...new Set(qids)])
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`).bind(sbd, ds).all<Row>()).results ?? []
+    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`).bind(sbd, ds).all<Row>()).results ?? []
   } catch {
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`).bind(sbd, ds).all<Row>()).results ?? []
+    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`).bind(sbd, ds).all<Row>()).results ?? []
   }
-  return rows
-    .filter((x) => str(x.visibility) !== 'embargoed')
-    .map((x) => ({ qid: str(x.qid), ngay: str(x.ngay_vn), luc: str(x.luc), dung: Number(x.ket_qua) === 1, coGoiY: str(x.assistance) === 'assisted' }))
+  return rows.filter((x) => str(x.visibility) !== 'embargoed').map(lanLamTuDong)
 }
+/** Một dòng sổ → lần làm (kèm `nguon` — chỉ-thêm 29/09: `dau_gio` Đạt ⇒ thành thạo ngay). */
+export const lanLamTuDong = (x: Row): LanLam => ({
+  qid: str(x.qid), ngay: str(x.ngay_vn), luc: str(x.luc), dung: Number(x.ket_qua) === 1, coGoiY: str(x.assistance) === 'assisted',
+  ...(x.nguon != null && str(x.nguon) ? { nguon: str(x.nguon) } : {}),
+})
+
+/**
+ * HỢP ĐỒNG với Kiểm tra đầu giờ (docs/so-no-2909/HOP-DONG.md): thầy tích "Thầy đã chữa" cho MỘT em + MỘT câu ⇒ ghi một mốc dạy lại
+ * (cùng bảng `srs2_day_lai` của nút "Chữa xong"): đếm sai về 0, bỏ cắt tỉa, câu quay lại kế hoạch NGÀY HÔM SAU. Chỉ-thêm; ghi lại
+ * cùng (em, câu, lúc) không thêm dòng. `luc` ISO — ghi SAU sự kiện sổ của cùng lần chấm (mốc ≥ lúc sự kiện).
+ */
+export async function ghiMocDayLai(env: Env, sbd: string, qid: string, luc: string, chienDichId: string | null = null): Promise<void> {
+  if (!sbd || !qid || !luc) throw new Error('Thiếu em, câu hoặc thời điểm chữa.')
+  await chayDdlMotLan(env, 'srs2_day_lai', [LENH_TAO_BANG_DAY_LAI])
+  await env.DB.prepare('INSERT OR IGNORE INTO srs2_day_lai (sbd, qid, luc, chien_dich_id) VALUES (?,?,?,?)').bind(sbd, qid, luc, chienDichId).run()
+}
+/** Bảng mốc dạy lại (đã có từ migration-2709-game-hoa-2.sql) — tạo lúc chạy nếu thiếu, CHỈ-THÊM. */
+export const LENH_TAO_BANG_DAY_LAI = 'CREATE TABLE IF NOT EXISTS srs2_day_lai (sbd TEXT NOT NULL, qid TEXT NOT NULL, luc TEXT NOT NULL, chien_dich_id TEXT, PRIMARY KEY (sbd, qid, luc))'
 
 /** Thời điểm thầy bấm "Chữa xong" cho từng câu của em. */
 export async function docMocDayLai(env: Env, sbd: string): Promise<Map<string, string[]>> {
@@ -170,6 +238,48 @@ export interface HoSo2 {
   lanLamChienDich?: LanLam[]
   /** Câu vào hàng ôn CHỈ vì em sai/bỏ trống trong ca kiểm tra ĐÃ CÔNG BỐ (nguồn thứ 3 `ca_sai`, chỉ-thêm 28/09). */
   qidCaSai?: Set<string>
+  /** Chiến dịch chưa tới ngày bắt đầu gần nhất (chỉ-thêm 28/09) — câu của nó KHÔNG vào kế hoạch. */
+  sapBatDau?: ChienDich | null
+  /** SỔ NỢ (29/09): câu vào sổ nợ vì em sai khi Lên bảng / Kiểm tra đầu giờ, KHÔNG thuộc chiến dịch hay ca nào. */
+  qidSaiTaiLop?: Set<string>
+  /** SỔ NỢ: câu nợ của chiến dịch ĐÃ ĐÓNG/hết hạn → tên + hạn (nhãn "Chiến dịch 'Tên' · 25/09"). */
+  chienDichCuCuaCau?: Map<string, { ten: string; hanNop: string }>
+  /** SỔ NỢ: trần lượt/ngày khi KHÔNG có chiến dịch = thể lực của chiến dịch vừa đóng gần nhất (mặc định 40). */
+  theLucNoCu?: number
+}
+
+/** Thể lực/ngày của chiến dịch vừa đóng (hoặc hết hạn) gần nhất của em — trần kế hoạch ôn nợ khi không có chiến dịch. Không có ⇒ 40. */
+export function theLucChienDichVuaDong(ds: readonly ChienDich[], homNay: string): number {
+  const xong = ds.filter((c) => c.trangThai === 'da_dong' || (c.trangThai === 'dang_chay' && c.hanNop < homNay))
+  xong.sort((a, b) => (a.hanNop > b.hanNop ? -1 : a.hanNop < b.hanNop ? 1 : a.taoLuc > b.taoLuc ? -1 : 1))
+  return xong[0]?.theLucNgay || TRAN_NGAY
+}
+
+/**
+ * SỔ NỢ (thầy chốt 29/09): câu em làm SAI khi Lên bảng (`len_bang`) hoặc Kiểm tra đầu giờ (`dau_gio`) ⇒ vào sổ nợ NGAY, kể cả câu không
+ * thuộc chiến dịch nào. Trả qid → lúc sai SỚM NHẤT. Chỉ câu có trong kho game, không tự luận. Lỗi đọc ⇒ rỗng.
+ */
+export async function docQidSaiTaiLop(env: Env, sbd: string): Promise<Map<string, string>> {
+  const ra = new Map<string, string>()
+  const rows = (await env.DB.prepare(`SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY qid`)
+    .bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
+  if (!rows.length) return ra
+  const hopLe = await cauKhoKhongTuLuan(env, rows.map((x) => str(x.qid)))
+  for (const x of rows) if (hopLe.has(str(x.qid))) ra.set(str(x.qid), str(x.luc))
+  return ra
+}
+/** Câu có trong kho game và KHÔNG tự luận. */
+async function cauKhoKhongTuLuan(env: Env, qids: readonly string[]): Promise<Set<string>> {
+  const ra = new Set<string>()
+  if (!qids.length) return ra
+  const kho = await env.DB.prepare('SELECT qid, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify([...new Set(qids)])).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const tuLuan = new Set<string>()
+  for (const x of kho.results ?? []) {
+    if (jsonLaTuLuan(x.json)) tuLuan.add(str(x.qid))
+    else ra.add(str(x.qid))
+  }
+  for (const q of tuLuan) ra.delete(q)
+  return ra
 }
 
 /**
@@ -213,24 +323,34 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 
 /** Toàn bộ trạng thái luyện của em: chiến dịch đang chạy + nợ cũ + ôn duy trì của chiến dịch trước. */
 export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<HoSo2> {
-  const [ds, mocThem] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd)])
+  // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
+  const [ds, mocThem, qidSaiCa, qidSaiLop] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd)])
   const dangChay = chienDichDangChay(ds, homNay)
   const hanTheoQid = new Map<string, string>()
   // Thầy 28/09: "khi giao chiến dịch đầu tiên tất cả không có câu ôn, không được lấy câu ôn trước đó" ⇒ câu của một chiến dịch chỉ tính lần làm TỪ LÚC GIAO chiến dịch ấy.
   const tuLucTheoQid = new Map<string, string>()
   const nguonTheoQid = new Map<string, 'chien_dich' | 'cu'>()
-  if (dangChay) for (const q of dangChay.qids) { hanTheoQid.set(q, dangChay.hanNop); nguonTheoQid.set(q, 'chien_dich'); tuLucTheoQid.set(q, mocTinhCua(dangChay.taoLuc, mocThem.get(dangChay.id))) }
+  if (dangChay) for (const q of dangChay.qids) { hanTheoQid.set(q, dangChay.hanNop); nguonTheoQid.set(q, 'chien_dich'); tuLucTheoQid.set(q, mocTinhCua(dangChay.mocBatDau, mocThem.get(dangChay.id))) }
+  const cdCuaQid = new Map<string, ChienDich>()
   for (const c of ds) {
-    if (c === dangChay) continue
-    for (const q of c.qids) if (!nguonTheoQid.has(q)) { hanTheoQid.set(q, c.hanNop); nguonTheoQid.set(q, 'cu'); tuLucTheoQid.set(q, mocTinhCua(c.taoLuc, mocThem.get(c.id))) }
+    if (c === dangChay || chuaBatDau(c, homNay)) continue // chiến dịch chưa bắt đầu: không phát câu nào của nó
+    for (const q of c.qids) if (!nguonTheoQid.has(q)) { hanTheoQid.set(q, c.hanNop); nguonTheoQid.set(q, 'cu'); tuLucTheoQid.set(q, mocTinhCua(c.mocBatDau, mocThem.get(c.id))); cdCuaQid.set(q, c) }
   }
   // Nguồn thứ 3 `ca_sai`: câu sai/bỏ trống trong ca ĐÃ CÔNG BỐ. Câu đã thuộc chiến dịch ⇒ GIỮ nguồn chiến dịch (không nhân đôi).
   const qidCaSai = new Set<string>()
-  for (const [q, luc] of await docQidSaiCaDaCongBo(env, sbd)) {
+  for (const [q, luc] of qidSaiCa) {
     if (nguonTheoQid.has(q)) continue
     nguonTheoQid.set(q, 'cu')
     tuLucTheoQid.set(q, luc)
     qidCaSai.add(q)
+  }
+  // SỔ NỢ (29/09): câu sai khi Lên bảng / Kiểm tra đầu giờ ngoài mọi chiến dịch và ca ⇒ nợ (tính lần làm từ lần sai đầu).
+  const qidSaiTaiLop = new Set<string>()
+  for (const [q, luc] of qidSaiLop) {
+    if (nguonTheoQid.has(q)) continue
+    nguonTheoQid.set(q, 'cu')
+    tuLucTheoQid.set(q, luc)
+    qidSaiTaiLop.add(q)
   }
   const qids = [...nguonTheoQid.keys()]
   const [meta, lanLam, moc] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? []), docLanLam(env, sbd, qids), docMocDayLai(env, sbd)])
@@ -245,10 +365,151 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
     if (!nguon) continue // câu chiến dịch cũ em chưa từng gặp: không kéo sang
-    cau.push({ qid, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon })
+    cau.push({ qid, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon, ...(m.sao ? { sao: m.sao } : {}) })
   }
+  const chienDichCuCuaCau = new Map<string, { ten: string; hanNop: string }>()
+  for (const [q, c] of cdCuaQid) if (c.trangThai === 'da_dong' || c.hanNop < homNay) chienDichCuCuaCau.set(q, { ten: c.ten, hanNop: c.hanNop })
   const lanLamChienDich = dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
-  return { chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai }
+  return { chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay) }
+}
+
+// ---------------------------------------------------------------- SỔ NỢ: lịch sử có nguồn + nhãn nợ (thầy chốt 29/09)
+/** Một lần làm kèm nguồn đã phân loại (game tách Bi-a / Đoàn / Đảo theo phiên). */
+export interface LanLamCoNguon { qid: string; ngay: string; luc: string; dung: boolean; nguon: NguonNhan }
+const phanLoaiNguon = (nguon: string, bia: unknown, doan: unknown): NguonNhan =>
+  nguon === 'thi' ? 'thi' : nguon === 'len_bang' ? 'len_bang' : nguon === 'dau_gio' ? 'dau_gio' : nguon !== 'game' ? 'khac' : Number(bia) === 1 ? 'bia' : doan != null ? 'doan' : 'dao'
+/**
+ * HỢP ĐỒNG (Kiểm tra đầu giờ đọc để hiện "Sai 20/09 (Ca) · Đúng 22/09 (Đoàn)"): TOÀN BỘ lịch sử làm các câu của em, theo giờ, bỏ lần bị che
+ * (ca chưa công bố); bỏ trống tính là sai (như `docLanLam`). Lỗi đọc ⇒ `null`.
+ */
+export async function docLichSuCoNguon(env: Env, sbd: string, qids: readonly string[]): Promise<Map<string, LanLamCoNguon[]> | null> {
+  const ra = new Map<string, LanLamCoNguon[]>()
+  if (!qids.length) return ra
+  const ds = JSON.stringify([...new Set(qids)])
+  const sql = (coVis: boolean) => `SELECT s.qid, s.luc, s.ngay_vn, s.ket_qua, s.nguon, ${coVis ? 's.visibility' : 'NULL AS visibility'},
+      COALESCE(json_extract(g.json, '$.bia'), 0) AS bia, json_extract(g.json, '$.doan') AS doan
+    FROM su_kien_hoc s LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
+    WHERE s.sbd = ? AND s.qid IN (SELECT value FROM json_each(?)) ORDER BY s.luc`
+  const r = await env.DB.prepare(sql(true)).bind(sbd, ds).all<Row>().catch(() => env.DB.prepare(sql(false)).bind(sbd, ds).all<Row>()).catch(() => null)
+  if (!r) return null
+  for (const x of r.results ?? []) {
+    if (str(x.visibility) === 'embargoed') continue
+    const q = str(x.qid)
+    ra.set(q, [...(ra.get(q) ?? []), { qid: q, luc: str(x.luc), ngay: str(x.ngay_vn), dung: Number(x.ket_qua) === 1, nguon: phanLoaiNguon(str(x.nguon), x.bia, x.doan) }])
+  }
+  return ra
+}
+/**
+ * Gắn nguồn vào `lichSu` (phatLaiCau) của một câu: `lichSu` = ĐUÔI của lịch sử đầy đủ (cắt từ mốc chiến dịch) ⇒ ghép theo số lần cuối.
+ * Lịch sử đầy đủ ngắn hơn (lệch dữ liệu) ⇒ `null` (không gắn).
+ */
+export function ganNguonDuoi<T extends object>(lichSu: readonly T[], day: readonly { nguon: NguonNhan }[] | undefined): (T & { nguon: NguonNhan })[] | null {
+  const ns = day ?? []
+  if (ns.length < lichSu.length) return null
+  const duoi = ns.slice(ns.length - lichSu.length)
+  return lichSu.map((l, i) => ({ ...l, nguon: duoi[i]!.nguon }))
+}
+/**
+ * Nhãn nợ của các câu (chỉ câu đã làm mà chưa thành thạo, kể cả "Cần thầy dạy lại"): "Sai 2 lần · Ca 26/09 · Lên bảng 28/09 · …".
+ * Một truy vấn sổ. Lỗi đọc ⇒ nhãn không có nguồn ("Sai 2 lần · Sai 26/09"). Câu không nợ ⇒ không có trong kết quả.
+ */
+export async function docNhanNo(env: Env, sbd: string, hs: HoSo2, qids: readonly string[]): Promise<Map<string, string>> {
+  const ra = new Map<string, string>()
+  const can = [...new Set(qids)].filter((q) => { const t = hs.tt.get(q); return !!t && (laNo(t) || t.catTia) })
+  if (!can.length) return ra
+  const ls = await docLichSuCoNguon(env, sbd, can).catch(() => null)
+  for (const q of can) {
+    const t = hs.tt.get(q)!
+    const lich = (ls && ganNguonDuoi(t.lichSu, ls.get(q))) ?? t.lichSu
+    const n = nhanNo(lich, t.ngayChua ?? null, hs.chienDichCuCuaCau?.get(q) ?? null)
+    if (n) ra.set(q, n)
+  }
+  return ra
+}
+
+// ---------------------------------------------------------------- SỔ NỢ cả lớp: ước lượt nợ cũ (Giao / Sửa chiến dịch, báo thầy)
+/** Nợ cũ của một em: số câu nợ và số lượt tối thiểu còn cần (≈ 2 − cc lượt/câu, `khoiLuongCan`). */
+export interface NoCuEm { soCau: number; luot: number }
+/** Câu sai của NHIỀU em ngoài chiến dịch: ca ĐÃ CÔNG BỐ + Lên bảng / Kiểm tra đầu giờ. sbd → qid → lúc sai sớm nhất. Lỗi đọc ⇒ rỗng. */
+async function docSaiNgoaiCaLop(env: Env, dsSbd: readonly string[]): Promise<Map<string, Map<string, string>>> {
+  const ra = new Map<string, Map<string, string>>()
+  const arr = JSON.stringify([...new Set(dsSbd)])
+  const ca = (coVis: boolean) => `SELECT s.sbd, s.qid, MIN(s.luc) AS luc FROM su_kien_hoc s JOIN ca c ON c.ma_ca = s.ma_nguon
+      WHERE s.sbd IN (SELECT value FROM json_each(?)) AND s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1 AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}
+        ${coVis ? "AND COALESCE(s.visibility, '') <> 'embargoed'" : ''} GROUP BY s.sbd, s.qid`
+  const rCa = await env.DB.prepare(ca(true)).bind(arr).all<Row>().catch(() => env.DB.prepare(ca(false)).bind(arr).all<Row>()).catch(() => ({ results: [] as Row[] }))
+  const rLop = await env.DB.prepare(`SELECT sbd, qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY sbd, qid`)
+    .bind(arr).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const rows = [...(rCa.results ?? []), ...(rLop.results ?? [])]
+  const hopLe = await cauKhoKhongTuLuan(env, rows.map((x) => str(x.qid)))
+  for (const x of rows) {
+    const s = str(x.sbd), q = str(x.qid), luc = str(x.luc)
+    if (!hopLe.has(q)) continue
+    const m = ra.get(s) ?? new Map<string, string>()
+    if (!m.has(q) || luc < m.get(q)!) m.set(q, luc)
+    ra.set(s, m)
+  }
+  return ra
+}
+/**
+ * NỢ CŨ của nhiều em (thầy chốt 29/09): câu đã làm mà chưa thành thạo, chưa cắt tỉa, NGOÀI câu `boQids` và chiến dịch `boChienDichId`
+ * (chiến dịch đang giao/sửa) — từ mọi chiến dịch khác đã bắt đầu + câu sai ở ca đã công bố / lên bảng / đầu giờ. Cùng luật `docHoSo2`
+ * (lần làm tính từ mốc chiến dịch; mốc em được thêm; mốc dạy lại). Dùng để "Tự tính", trần Quá tải, Huyết Chiến, tự nâng khi Sửa
+ * TÍNH CẢ lượt nợ cũ, và để báo thầy "Em X còn N câu nợ cũ — cần ≈ K ngày". Lỗi đọc ⇒ em không có nợ (hành vi cũ).
+ */
+export async function noCuCaLop(env: Env, dsSbd: readonly string[], homNay: string, boQids: Iterable<string>, boChienDichId: string | null = null): Promise<Map<string, NoCuEm>> {
+  const ra = new Map<string, NoCuEm>(dsSbd.map((s) => [s, { soCau: 0, luot: 0 }]))
+  if (!dsSbd.length) return ra
+  const arr = JSON.stringify([...new Set(dsSbd)])
+  const bo = new Set(boQids)
+  const [rCd, rThem, saiNgoai, rMoc] = await Promise.all([
+    env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' AND EXISTS (SELECT 1 FROM json_each(chien_dich.sbd_json) WHERE value IN (SELECT value FROM json_each(?))) ORDER BY tao_luc DESC").bind(arr).all<Row>().catch(() => ({ results: [] as Row[] })),
+    env.DB.prepare('SELECT sbd, chien_dich_id, them_luc FROM chien_dich_em WHERE sbd IN (SELECT value FROM json_each(?)) AND them_luc IS NOT NULL').bind(arr).all<Row>().catch(() => ({ results: [] as Row[] })),
+    docSaiNgoaiCaLop(env, dsSbd).catch(() => new Map<string, Map<string, string>>()),
+    env.DB.prepare('SELECT sbd, qid, luc FROM srs2_day_lai WHERE sbd IN (SELECT value FROM json_each(?))').bind(arr).all<Row>().catch(() => ({ results: [] as Row[] })),
+  ])
+  const dsCd = (await docChienDichKemBatDau(env, rCd.results ?? [])).filter((c) => c.id !== boChienDichId && !chuaBatDau(c, homNay))
+  const them = new Map((rThem.results ?? []).map((x) => [`${str(x.sbd)}|${str(x.chien_dich_id)}`, str(x.them_luc)]))
+  const moc = new Map<string, string[]>()
+  for (const x of rMoc.results ?? []) { const k = `${str(x.sbd)}|${str(x.qid)}`; moc.set(k, [...(moc.get(k) ?? []), str(x.luc)]) }
+  // Phạm vi từng em: qid → (hạn, mốc tính).
+  const phamVi = new Map<string, Map<string, { han: string | null; tu: string }>>()
+  const tatCa = new Set<string>()
+  for (const s of dsSbd) {
+    const m = new Map<string, { han: string | null; tu: string }>()
+    for (const c of dsCd) {
+      if (!c.sbd.includes(s)) continue
+      for (const q of c.qids) if (!bo.has(q) && !m.has(q)) m.set(q, { han: c.hanNop, tu: mocTinhCua(c.mocBatDau, them.get(`${s}|${c.id}`)) })
+    }
+    for (const [q, luc] of saiNgoai.get(s) ?? []) if (!bo.has(q) && !m.has(q)) m.set(q, { han: null, tu: luc })
+    for (const q of m.keys()) tatCa.add(q)
+    phamVi.set(s, m)
+  }
+  if (!tatCa.size) return ra
+  const qs = JSON.stringify([...tatCa])
+  const [rLan, loai] = await Promise.all([
+    env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`).bind(arr, qs).all<Row>()
+      .catch(() => env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`).bind(arr, qs).all<Row>())
+      .catch(() => ({ results: [] as Row[] })),
+    docLoaiCau(env, [...tatCa]),
+  ])
+  const lan = new Map<string, LanLam[]>()
+  for (const x of rLan.results ?? []) {
+    if (str(x.visibility) === 'embargoed') continue
+    const k = `${str(x.sbd)}|${str(x.qid)}`
+    lan.set(k, [...(lan.get(k) ?? []), lanLamTuDong(x)])
+  }
+  for (const s of dsSbd) {
+    const ds: TrangThaiCau[] = []
+    for (const [q, pv] of phamVi.get(s)!) {
+      const l = loai.get(q)
+      if (!l) continue // câu đã rút khỏi kho
+      const t = phatLaiCau(q, (lan.get(`${s}|${q}`) ?? []).filter((x) => x.luc >= pv.tu), pv.han, moc.get(`${s}|${q}`) ?? [], l)
+      if (laNo(t)) ds.push(t)
+    }
+    ra.set(s, { soCau: ds.length, luot: khoiLuongCan(ds) })
+  }
+  return ra
 }
 
 // ---------------------------------------------------------------- hạng theo dạng (bốc câu mới cá nhân hoá, thầy 28/09)
@@ -274,12 +535,13 @@ export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly La
   return tinhHangTheoDang(tk, dangCan)
 }
 
-/** Hạng theo dạng của em cho kế hoạch hôm nay (chỉ khi có chiến dịch đang chạy). */
+/** Hạng theo dạng của em cho kế hoạch hôm nay (không chiến dịch ⇒ chỉ từ hồ sơ dạng). */
 export async function docHangEm(env: Env, sbd: string, hs: HoSo2): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm } | null> {
   const cd = hs.chienDich
-  if (!cd) return null
   const hoSoDang = (await docHoSoDangCaLop(env, [sbd])).get(sbd) ?? []
-  return hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.taoLuc)
+  // Không chiến dịch (Sổ nợ 29/09): vẫn cần hạng CHUNG để đan xen câu nợ theo sức em — chỉ từ hồ sơ dạng.
+  if (!cd) return hangTuHoSo(hoSoDang, [], hs.meta, [], '')
+  return hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.mocBatDau)
 }
 
 // ---------------------------------------------------------------- kế hoạch ngày (chốt một lần)
@@ -341,11 +603,15 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
  */
 export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   const ngay = ngayVnCua(nowMs)
-  const hoSo = hs ?? (await docHoSo2(env, sbd, ngay))
-  const dem = await docDemHomNay(env, sbd, ngay)
+  // Tối ưu 28/09: hồ sơ, số lần làm hôm nay và kế hoạch đã chốt là ba lượt ĐỌC độc lập ⇒ chạy SONG SONG (trước: ba đợt nối tiếp).
+  const [hoSo, dem, cu] = await Promise.all([
+    hs ?? docHoSo2(env, sbd, ngay),
+    docDemHomNay(env, sbd, ngay),
+    env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null),
+  ])
   const cd = hoSo.chienDich
-  const tranNgay = cd?.theLucNgay
-  const cu = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+  // SỔ NỢ (29/09): không chiến dịch ⇒ trần = thể lực của chiến dịch vừa đóng gần nhất (mặc định 40).
+  const tranNgay = cd?.theLucNgay ?? hoSo.theLucNoCu
   const tuyChonGoc = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay } : {}) }
   // Bốc câu mới cá nhân hoá (thầy 28/09): hạng theo dạng CHỈ đọc khi thật sự lập kế hoạch (kế hoạch đã chốt thì khỏi đọc).
   // Lỗi đọc hồ sơ ⇒ không có hạng ⇒ hành vi cũ (dễ trước), không làm hỏng kế hoạch.
@@ -390,15 +656,20 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
 export const LOI_KHOA_DAO = 'Có xe hàng đang bị phục kích, hãy hoàn thành Hộ Tống trước khi ra Đảo nhé!'
 
 export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
-  const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
+  // Tối ưu 28/09: rương hôm nay (khoá theo ngày VN, không phụ thuộc kế hoạch) đọc SONG SONG với kế hoạch.
+  const [{ kh, hs }, ruong] = await Promise.all([
+    layKeHoachHomNay(env, sbd, nowMs),
+    env.DB.prepare('SELECT mo_luc, qua_json FROM ruong_bat_linh WHERE sbd = ? AND ngay = ?').bind(sbd, ngayVnCua(nowMs)).first<Row>().catch(() => null),
+  ])
   const cd = hs.chienDich
   const tl = tiLeChienDich(hs.ttChienDich)
   const conLai = kh.conDao.length + kh.conDoan.length
-  const ruong = await env.DB.prepare('SELECT mo_luc, qua_json FROM ruong_bat_linh WHERE sbd = ? AND ngay = ?').bind(sbd, kh.ngay).first<Row>().catch(() => null)
   return {
     ok: true,
     cheDo2: true,
     ngay: kh.ngay,
+    // Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ báo tên + ngày, KHÔNG lộ câu.
+    sapBatDau: hs.sapBatDau ? { id: hs.sapBatDau.id, ten: hs.sapBatDau.ten, batDau: hs.sapBatDau.batDau, hanNop: hs.sapBatDau.hanNop } : null,
     chienDich: cd ? { id: cd.id, ten: cd.ten, hanNop: cd.hanNop, D: soNgayConLai(kh.ngay, cd.hanNop), tong: tl.tong, coXat: tl.coXat, thanhThao: tl.thanhThao, canDayLai: tl.canDayLai, thanhThaoTangTu: tl.thanhThao ? null : ngayThanhThaoSomNhat(hs.ttChienDich) } : null,
     theLuc: { con: conLai, tong: kh.tong },
     huyetChien: kh.huyetChien,
@@ -420,14 +691,15 @@ export async function chanDoanEm(env: Env, sbd: string, nowMs: number): Promise<
   const cd = hoSo.chienDich
   const dsCd = await docChienDichCuaEm(env, sbd)
   const hang = await docHangEm(env, sbd, hoSo).catch(() => null)
-  const tuyChon = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(cd?.theLucNgay ? { tranNgay: cd.theLucNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay } : {}), ...(hang ?? {}) }
+  const tranNgay = cd?.theLucNgay ?? hoSo.theLucNoCu
+  const tuyChon = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay } : {}), ...(hang ?? {}) }
   const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChon)
   const cu = await env.DB.prepare('SELECT chien_dich_id, tong, tao_luc, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch((e) => ({ loi: String(e) }) as Row)
   const cauCd = hoSo.cau.filter((c) => c.nguon === 'chien_dich')
   return {
     ok: true, ngay, sbd,
     coHoa2: await cheDo2(env, sbd),
-    chienDichCuaEm: dsCd.map((c) => ({ id: c.id, ten: c.ten, trangThai: c.trangThai, hanNop: c.hanNop, soCau: c.qids.length })),
+    chienDichCuaEm: dsCd.map((c) => ({ id: c.id, ten: c.ten, trangThai: c.trangThai, hanNop: c.hanNop, batDau: c.batDau, soCau: c.qids.length })),
     chienDichDangChay: cd ? { id: cd.id, hanNop: cd.hanNop, theLucNgay: cd.theLucNgay, soQid: cd.qids.length } : null,
     soMetaTimThay: hoSo.meta.size,
     soCauTrongHoSo: hoSo.cau.length,

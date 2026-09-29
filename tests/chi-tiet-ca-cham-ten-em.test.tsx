@@ -3,7 +3,8 @@
 import { describe, expect, it } from 'vitest'
 import maChiTietCa from '../src/screens/ExamMonitorScreen.tsx?raw'
 import maHoSoHS from '../src/screens/HocSinhScreen.tsx?raw'
-import maModalBaoCao from '../src/components/BaoCaoCaThiHocSinhModal.tsx?raw'
+// 28/09: modal báo cáo học sinh cũ ĐÃ XOÁ — kiểm luật "không thẻ phụ" trên báo cáo bản mới (BaoCaoChiTiet, dùng cho cả thầy lẫn em).
+import maModalBaoCao from '../src/components/ca-thi/BaoCaoChiTiet.tsx?raw'
 
 describe('Chi tiết ca — chạm tên em', () => {
   it('tên em là NÚT mở hồ sơ', () => {

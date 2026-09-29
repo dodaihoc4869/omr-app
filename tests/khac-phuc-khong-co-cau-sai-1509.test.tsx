@@ -27,6 +27,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import ModalKhacPhucCauSai, { KHONG_CO_KHO } from '../src/components/ModalKhacPhucCauSai'
+import { CA_MAU, CAU_MAU, nguonBaoCaoEmMoi, veBaoCaoEmMoi } from './_bao-cao-em-moi'
 
 afterEach(() => cleanup())
 
@@ -36,7 +37,7 @@ const boChuThich = (ma: string) => ma.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*
 
 const MODAL_DAY_DU = doc('src/components/ModalKhacPhucCauSai.tsx')
 const MODAL = boChuThich(MODAL_DAY_DU)
-const BC_HS = boChuThich(doc('src/components/BaoCaoCaThiHocSinhModal.tsx'))
+const BC_HS = nguonBaoCaoEmMoi() // 28/09: báo cáo em bản mới (modal cũ đã xoá)
 const BC_PH = boChuThich(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx'))
 
 // ---------------------------------------------------------------------------
@@ -117,16 +118,33 @@ describe('Dòng cảnh báo phải nói đúng lý do', () => {
 // ---------------------------------------------------------------------------
 
 describe('Báo cáo ca thi — nút khắc phục đi theo DANH SÁCH THẬT', () => {
-  it('app học sinh: cả nút đầu và nút cuối đều soi `dsCauSai`', () => {
-    expect(BC_HS).toContain('disabled={dsCauSai.length === 0}')
-    expect(BC_HS).toContain('{soKhacPhuc > 0 && dsCauSai.length > 0 && (')
-    // Cổng cũ mở theo số đếm của bảng chấm — đã bỏ.
-    expect(BC_HS).not.toContain('{((soSai ?? 0) > 0 || (soBoTrong ?? 0) > 0) && (')
+  // 28/09: modal học sinh cũ ĐÃ XOÁ (thầy cho phép) — hai luật dưới nay khoá trên báo cáo em BẢN MỚI (BaoCaoChiTiet chế độ em).
+  it('app học sinh: nút "Làm lại … câu cần chữa" đi theo DANH SÁCH CÂU THẬT — ca không sai câu nào thì KHÔNG mời làm phiếu trắng', () => {
+    expect(BC_HS).toContain('p.onKhacPhuc && b.cauXemLai.length > 0 && (')
+    // ca đúng trọn: có bảng chấm, không câu nào cần chữa ⇒ không nút
+    const dungHet = CAU_MAU.map((c) => ({ ...c, dungSai: true, dapAnChon: c.dapAnDung }))
+    const a = veBaoCaoEmMoi({ ...CA_MAU, soCauDung: 4, soCauDungMotPhan: 0 }, dungHet, { onKhacPhuc: () => {} })
+    expect(a.container.textContent).not.toMatch(/Làm lại \d+ câu/)
+    expect(a.container.textContent).toContain('Em đúng trọn mọi câu của ca này.')
+    a.unmount()
+    // có câu sai ⇒ nút ghi đúng số câu trong danh sách
+    const b = veBaoCaoEmMoi(CA_MAU, CAU_MAU, { onKhacPhuc: () => {} })
+    expect(b.container.textContent).toContain('Làm lại 2 câu cần chữa')
+    b.unmount()
   })
 
-  it('app học sinh: lệch nguồn thì nói ra, không im lặng', () => {
-    expect(BC_HS).toContain('Chưa lấy được danh sách câu sai của ca này')
-    expect(BC_HS).toContain('Đang tải danh sách câu sai…')
+  it('app học sinh: lệch nguồn / hỏng tải thì nói ra, không im lặng và không nói "đúng trọn"', () => {
+    // số máy chủ nói có câu sai nhưng chưa tải được câu ⇒ không nút, không "Em đúng trọn", hiện lý do
+    const c = veBaoCaoEmMoi(CA_MAU, null, { onKhacPhuc: () => {}, loiCauEm: 'Chưa tải được từng câu của ca này. Em kiểm tra mạng rồi mở lại báo cáo.' })
+    const chu = c.container.textContent || ''
+    expect(chu).not.toMatch(/Làm lại \d+ câu/)
+    expect(chu).not.toContain('Em đúng trọn')
+    expect(chu).toContain('Chưa tải được từng câu của ca này')
+    c.unmount()
+    // chưa có bảng chấm (không lỗi) ⇒ cũng không được nói "đúng trọn"
+    const d = veBaoCaoEmMoi(CA_MAU, null)
+    expect(d.container.textContent).not.toContain('Em đúng trọn')
+    d.unmount()
   })
 
   it('app phụ huynh: nút "Tạo bài luyện khắc phục" không còn hiện vô điều kiện', () => {

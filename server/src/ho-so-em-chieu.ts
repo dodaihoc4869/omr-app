@@ -49,10 +49,10 @@ export function hangTuTiLeDung(p: number): 'L1' | 'L2' | 'L3' | 'L4' {
   return p < 0.4 ? 'L1' : p < 0.65 ? 'L2' : p <= 0.85 ? 'L3' : 'L4'
 }
 
-/** Tên nguồn cho thầy đọc. Game: Đoàn Hộ Tống nếu lượt thuộc Đoàn, còn lại Đảo. */
-export function tenNguon(nguon: string, laDoan: boolean): string {
-  if (nguon === 'game') return laDoan ? 'Đoàn' : 'Đảo'
-  return ({ thi: 'Ca kiểm tra', len_bang: 'Lên bảng', btvn: 'Bài về nhà', btvn_lo: 'Bài về nhà', on_lai: 'Ôn lại', mom: 'Bài riêng', khac_phuc: 'Khắc phục', luyen: 'Luyện đề', thu_thach_rieng: 'Thử thách' } as Record<string, string>)[nguon] ?? nguon
+/** Tên nguồn cho thầy đọc. Game: Đoàn Hộ Tống nếu lượt thuộc Đoàn, Bi-a nếu phiên Bi-a (29/09), còn lại Đảo. */
+export function tenNguon(nguon: string, loaiGame: boolean | 'doan' | 'bia' | 'dao'): string {
+  if (nguon === 'game') return loaiGame === true || loaiGame === 'doan' ? 'Đoàn' : loaiGame === 'bia' ? 'Bi-a' : 'Đảo'
+  return ({ thi: 'Ca kiểm tra', len_bang: 'Lên bảng', dau_gio: 'Đầu giờ', btvn: 'Bài về nhà', btvn_lo: 'Bài về nhà', on_lai: 'Ôn lại', mom: 'Bài riêng', khac_phuc: 'Khắc phục', luyen: 'Luyện đề', thu_thach_rieng: 'Thử thách' } as Record<string, string>)[nguon] ?? nguon
 }
 
 /** Đáp án em chọn đọc từ `raw_json` (`{chon}` hoặc `{traLoi}`). */
@@ -102,11 +102,11 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
       const idGame = lan.filter((x) => str(x.nguon) === 'game').map((x) => str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`)
       const phien = [...new Set(lan.filter((x) => str(x.nguon) === 'game').map((x) => str(x.ma_nguon)))]
       const rAtt = idGame.length ? await hoi(env, "SELECT id, json_extract(json, '$.traLoi') AS tra_loi FROM game_v2_attempt WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(idGame)) : []
-      const rPhien = phien.length ? await hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : []
+      const rPhien = phien.length ? await hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan, COALESCE(json_extract(json, '$.bia'), 0) AS bia FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : []
       const caThi = [...new Set(lan.filter((x) => str(x.nguon) === 'thi').map((x) => str(x.ma_nguon)))]
       const rCt = caThi.length ? await hoi(env, 'SELECT ma_ca, lan_thu, dap_an_chon FROM chi_tiet_cau WHERE sbd = ? AND qid = ? AND ma_ca IN (SELECT value FROM json_each(?))', sbd, qid, JSON.stringify(caThi)) : []
       const traLoi = new Map((rAtt ?? []).map((x) => [str(x.id), str(x.tra_loi)]))
-      const laDoan = new Map((rPhien ?? []).map((x) => [str(x.id), num(x.doan) === 1]))
+      const laDoan = new Map((rPhien ?? []).map((x) => [str(x.id), num(x.doan) === 1 ? ('doan' as const) : num(x.bia) === 1 ? ('bia' as const) : ('dao' as const)]))
       const chonCa = new Map((rCt ?? []).map((x) => [str(x.ma_ca), str(x.dap_an_chon)]))
       const ds = lan.map((x) => {
         const nguon = str(x.nguon)
@@ -118,7 +118,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
           luc: str(x.luc),
           dung: num(x.ket_qua) === 1,
           coGoiY: str(x.assistance) === 'assisted',
-          nguon: tenNguon(nguon, laDoan.get(str(x.ma_nguon)) === true),
+          nguon: tenNguon(nguon, laDoan.get(str(x.ma_nguon)) ?? 'dao'),
           giay: x.giay === null || x.giay === undefined ? null : num(x.giay),
           chon,
         }

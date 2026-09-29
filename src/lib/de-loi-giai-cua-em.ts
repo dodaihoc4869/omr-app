@@ -12,7 +12,8 @@
 // mất mạng và không bao giờ phụ thuộc cấu hình máy chủ.
 import { cauLuyenTuNguon, type CauLuyen } from './bai-tap-pdf'
 import { taoChiTietCau } from './chi-tiet-cau'
-import { dungPhieu, type ThongTinPhieu } from './html-phieu'
+// Phiếu HTML nạp lười (≈ 52 KB gzip) — chỉ tải khi em mở đề & lời giải.
+import type { ThongTinPhieu } from './html-phieu'
 import { phieuCuaEm, type ChiTietCauRow, type KeyBank } from './exam-api'
 
 /** Chọn đúng dấu vết đề đã làm; chỉ tái dựng cho dữ liệu ca cũ chưa có bảng chấm. */
@@ -29,14 +30,14 @@ export function chiTietDeDaLam(
 }
 
 /** Ghép bộ câu của chính em với lời giải, đánh dấu đúng chỗ em sai. */
-export function dungHtmlDeVaLoiGiai(
+export async function dungHtmlDeVaLoiGiai(
   bank: KeyBank,
   maCa: string,
   sbd: string,
   hoTen: string,
   tenCa: string,
   rows: ChiTietCauRow[],
-): string {
+): Promise<string> {
   const nguon = [{ maDe: maCa, phanI: bank.phanI, phanII: bank.phanII, phanIII: bank.phanIII }] as Parameters<
     typeof cauLuyenTuNguon
   >[0]
@@ -87,6 +88,7 @@ export function dungHtmlDeVaLoiGiai(
     giaoDienHocSinh: true,
     nhanBia: 'ĐỀ VÀ LỜI GIẢI',
   }
+  const { dungPhieu } = await import('./html-phieu')
   return dungPhieu(tt, cau, { anGiai: false })
 }
 
@@ -110,7 +112,7 @@ export async function deVaLoiGiaiCuaEm(
   // hiện tại vì ca đề riêng có thể rút một bộ khác khi quy tắc/kho đã đổi.
   // Ca cũ chưa có bảng chấm mới dùng đường lui từ dấu vết bài làm.
   const rows = chiTietDeDaLam(b.bank, maCa, sbd, b.chiTietCau, dapAn, b.luot?.giayCau, b.boCuaEm)
-  const html = dungHtmlDeVaLoiGiai(b.bank, maCa, sbd, b.hoTen || hoTenDuPhong, b.tenCa || '', rows)
+  const html = await dungHtmlDeVaLoiGiai(b.bank, maCa, sbd, b.hoTen || hoTenDuPhong, b.tenCa || '', rows)
   if (!html) return { html: '', loi: 'Không dựng được đề của em — báo Thầy.' }
   return { html, loi: '' }
 }

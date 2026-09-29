@@ -22,7 +22,7 @@ export function chonMacDinh(ds: DanhSachChienDich['chienDich']): string {
   return (ds.find((c) => c.trangThai === 'dang_chay') ?? ds[0])?.id ?? ''
 }
 
-export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void }) {
+export default function LenBangChienDich() {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
 
@@ -231,14 +231,6 @@ export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void
           }}
           onDaChua={() => void taiDs()}
         />
-      )}
-
-      {onCheDoCu && (
-        <div>
-          <button type="button" className="m3-nut-chu cd-nut-nho" onClick={onCheDoCu}>
-            Gọi lên bảng theo một ca kiểm tra (cách cũ)
-          </button>
-        </div>
       )}
 
       {html && (

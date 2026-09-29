@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { dangGoChu, docPhim, docTiLe, ghiTiLe, kepTiLe, mucDongHo, TI_LE_MAC_DINH, tiLeTheoPhim, type BoCuc } from '../lib/lam-bai-ngang'
 import './lam-bai-ngang.css'
+import { dinhDangDongHo, useGiayConLai, type KhoGio } from '../lib/dong-ho-thi'
 
 // Biểu tượng nét mảnh vẽ tại chỗ (không kéo thêm mảnh lucide dùng chung vào precache — build:cf đếm tệp).
 function Net({ size = 16, children, fill = 'none' }: { size?: number; children: ReactNode; fill?: string }) {
@@ -79,6 +80,10 @@ export interface LamBaiNgangProps {
   dongHo: string | null
   chuThayDongHo: string
   conGiay: number | null
+  /** Kho giờ sống (màn thi): có ⇒ ô giờ TỰ đếm từng giây trong nút lá `OGioSong`,
+   * bỏ qua `dongHo`/`conGiay` (trừ `dongHo === null` = bài tập). Gốc màn thi không
+   * phải vẽ lại cả phiếu + đề mỗi giây. */
+  khoGio?: KhoGio | null
   /** "11:08" — giờ hết bài (theo máy chủ); không có ⇒ không hiện dòng này. */
   hetGioLuc?: string
   daLam: number
@@ -86,7 +91,7 @@ export interface LamBaiNgangProps {
   nhanLuu: string
   mayNgoaiMang: boolean
   dangLuu: boolean
-  nhanNutNop: string
+  nhanNutNop: ReactNode
   khoaNop: boolean
   ghiChuNop?: string
   onNop: () => void
@@ -101,6 +106,27 @@ export interface LamBaiNgangProps {
   /** Công cụ đặt cạnh cụm A−/A+ ở đầu cột đề (nút "Dịu mắt") — luôn thấy, kể cả toàn màn hình. */
   congCu?: ReactNode
   children: ReactNode
+}
+
+/** Ô đồng hồ (trình bày thuần): đổi màu vàng ≤ 10 phút, đỏ ≤ 5 phút. */
+function OGio({ dongHo, conGiay, chuThayDongHo, hetGioLuc }: { dongHo: string | null; conGiay: number | null; chuThayDongHo: string; hetGioLuc?: string }) {
+  const muc = dongHo === null ? '' : mucDongHo(conGiay)
+  return (
+    <div className="lb-gio" data-muc={muc || undefined} role="timer" aria-label={dongHo === null ? chuThayDongHo : `Thời gian còn lại ${dongHo}`}>
+      <div className="lb-gio-nhan">
+        <Timer size={15} />
+        <span>{dongHo === null ? 'Bài tập về nhà' : muc === 'do' ? 'Còn dưới 5 phút' : muc === 'vang' ? 'Còn dưới 10 phút' : 'Thời gian còn lại'}</span>
+      </div>
+      <div className="lb-gio-so">{dongHo ?? chuThayDongHo}</div>
+      {dongHo !== null && hetGioLuc && <div className="lb-gio-phu">Hết giờ lúc {hetGioLuc}</div>}
+    </div>
+  )
+}
+
+/** Nút lá nghe kho giờ — chỉ mình nó vẽ lại mỗi giây. */
+function OGioSong({ kho, chuThayDongHo, hetGioLuc }: { kho: KhoGio; chuThayDongHo: string; hetGioLuc?: string }) {
+  const giay = useGiayConLai(kho)
+  return <OGio dongHo={dinhDangDongHo(giay ?? 0)} conGiay={giay} chuThayDongHo={chuThayDongHo} hetGioLuc={hetGioLuc} />
 }
 
 const TEN_PHAN: Record<PhanCau, string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
@@ -331,7 +357,6 @@ export default function LamBaiNgang(p: LamBaiNgangProps) {
   const theoPhan = (ph: PhanCau) => cau.filter((c) => c.phan === ph)
   const phanCo = (['I', 'II', 'III'] as PhanCau[]).filter((ph) => cau.some((c) => c.phan === ph))
   const soDanhDau = cau.filter((c) => c.danhDau).length
-  const muc = p.dongHo === null ? '' : mucDongHo(p.conGiay)
   const pt = Math.round(tiLe * 100)
   const phanDangXem = cau[dangXem - 1]?.phan
 
@@ -442,14 +467,11 @@ export default function LamBaiNgang(p: LamBaiNgangProps) {
       {/* ===== PHẢI: ĐIỀU KHIỂN + PHIẾU ===== */}
       <aside className="lb-phai" aria-label="Phiếu đáp án">
         <div className="lb-dk">
-          <div className="lb-gio" data-muc={muc || undefined} role="timer" aria-label={p.dongHo === null ? p.chuThayDongHo : `Thời gian còn lại ${p.dongHo}`}>
-            <div className="lb-gio-nhan">
-              <Timer size={15} />
-              <span>{p.dongHo === null ? 'Bài tập về nhà' : muc === 'do' ? 'Còn dưới 5 phút' : muc === 'vang' ? 'Còn dưới 10 phút' : 'Thời gian còn lại'}</span>
-            </div>
-            <div className="lb-gio-so">{p.dongHo ?? p.chuThayDongHo}</div>
-            {p.dongHo !== null && p.hetGioLuc && <div className="lb-gio-phu">Hết giờ lúc {p.hetGioLuc}</div>}
-          </div>
+          {p.dongHo !== null && p.khoGio ? (
+            <OGioSong kho={p.khoGio} chuThayDongHo={p.chuThayDongHo} hetGioLuc={p.hetGioLuc} />
+          ) : (
+            <OGio dongHo={p.dongHo} conGiay={p.conGiay} chuThayDongHo={p.chuThayDongHo} hetGioLuc={p.hetGioLuc} />
+          )}
           <div className="lb-tien">
             <div className="lb-tien-dong">
               <span>Đã làm</span>

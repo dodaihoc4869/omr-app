@@ -36,11 +36,40 @@ export interface R2Bucket {
   put(key: string, value: ArrayBuffer | string | ReadableStream): Promise<unknown>
   delete(keys: string | string[]): Promise<void>
 }
+/** Durable Object (Bi-a Phản Ứng GĐ2 — phòng đấu `BanBiA`): chỉ khai đúng phần dùng tới. */
+export interface DurableObjectId { toString(): string }
+export interface DurableObjectStub { fetch(req: Request): Promise<Response> }
+export interface DurableObjectNamespace { idFromName(ten: string): DurableObjectId; get(id: DurableObjectId): DurableObjectStub }
+/** WebSocket phía máy chủ (Hibernation API): gắn dữ liệu nhỏ vào kết nối, sống qua lúc phòng ngủ. */
+export interface WsMayChu {
+  send(chu: string): void
+  close(ma?: number, lyDo?: string): void
+  serializeAttachment(v: unknown): void
+  deserializeAttachment(): unknown
+}
+export interface DurableObjectStorage {
+  get<T = unknown>(khoa: string): Promise<T | undefined>
+  put(khoa: string, v: unknown): Promise<void>
+  delete(khoa: string): Promise<boolean>
+  setAlarm(luc: number): Promise<void>
+  getAlarm(): Promise<number | null>
+  deleteAlarm(): Promise<void>
+}
+export interface DurableObjectState {
+  storage: DurableObjectStorage
+  acceptWebSocket(ws: WsMayChu, tags?: string[]): void
+  getWebSockets(tag?: string): WsMayChu[]
+  setWebSocketAutoResponse?(cap: unknown): void
+  /** Lần cuối phòng TỰ trả lời gói ping của kết nối này (không cần thức dậy); chưa có ⇒ null. */
+  getWebSocketAutoResponseTimestamp?(ws: WsMayChu): Date | null
+}
 export interface Env {
   PUSH_PUBLIC_KEY?: string
   PUSH_PRIVATE_KEY?: string
   DB: D1Database
   DE: R2Bucket
+  /** Phòng đấu Bi-a online (GĐ2). Vắng ⇒ Worker chưa có Durable Object ⇒ Sảnh Bi-a ghi "Sắp mở" cho chơi với bạn. */
+  BAN_BIA?: DurableObjectNamespace
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */
   MA_BI_MAT: string
 }

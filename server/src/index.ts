@@ -1,3 +1,4 @@
+import { denPhongBiA } from './bi-a-phong'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
@@ -71,13 +72,18 @@ import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
 import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
 import * as VD from './vo-dai'
-import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
+import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
+import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
+import { gvDauGio } from './dau-gio'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
+import { gan } from './cau-hinh-dem'
+import { gvKhoDeGiao } from './gv-kho-de-giao'
+import { damBaoChiMuc } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -119,6 +125,12 @@ async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Reco
 /** Lệnh em GHI (nộp bài, xong chặng…): SAU KHI xong (kể cả lỗi) bỏ đệm kế hoạch ngày của em — thẻ Hôm nay không đứng số sau khi nộp. Token sai ⇒ không có gì để xoá. */
 async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>): Promise<T> {
   try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
+}
+
+/** Lỗi máy chủ ⇒ JSON {ok:false,error[,ma]} 500 KÈM CORS (máy em đọc được lời, không tưởng mất mạng). `ma`: mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời. */
+function raLoi(e: unknown): Response {
+  const ma = (e as { ma?: unknown } | null)?.ma
+  return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
 }
 
 function ra(data: unknown, status = 200): Response {
@@ -245,10 +257,13 @@ export function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: str
 
   const lap = doiTuong(goi.lap)[sbd]
   const dem = doiTuong(goi.dem)[sbd]
+  // Ca "Không rút câu sai" (29/09): nhãn "đã làm ở ca dd/mm" của CHÍNH em — chỉ qid + ngày, không đáp án.
+  const daLam = doiTuong(goi.daLam)[sbd]
   return {
     bo: { [sbd]: cua },
     lap: Array.isArray(lap) ? { [sbd]: lap } : {},
     dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
+    ...(daLam && typeof daLam === 'object' && !Array.isArray(daLam) ? { daLam: { [sbd]: daLam } } : {}),
     // BIÊN BẢN là ghi chép của THẦY về cả lớp — không đi xuống máy em.
     bb: null,
   }
@@ -977,17 +992,16 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
  * Lệch luật ở đây là thầy nhìn màn Ca thi thấy số em khác với sự thật trên
  * Sheet — sai số liệu còn tệ hơn chậm. */
 async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
-  const rCa = await env.DB.prepare(
-    daXoa
-      ? `SELECT * FROM ca WHERE trang_thai = 'da_xoa'`
-      : `SELECT * FROM ca WHERE trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'`,
-  ).all<Record<string, unknown>>()
-
-  const rDem = await env.DB.prepare(
-    `WITH moi AS (
+  // TỐI ƯU 28/09: (1) phần đếm CHỈ quét `luot` của các ca đang liệt kê (trước: GROUP BY TOÀN BỘ `luot`, kể cả ca đã xoá) — lọc bằng
+  // `ma_ca IN (...)` đi theo chỉ mục idx_luot_em(ma_ca, sbd, lan_thu); (2) hai câu chạy trong MỘT `DB.batch` (một vòng D1 thay vì hai nối tiếp).
+  const locCa = daXoa ? `trang_thai = 'da_xoa'` : `trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'`
+  const [rCa, rDem] = await env.DB.batch([
+    env.DB.prepare(`SELECT * FROM ca WHERE ${locCa}`),
+    env.DB.prepare(
+      `WITH moi AS (
        SELECT l.ma_ca, l.trang_thai, l.so_lan_roi_man
        FROM luot l
-       JOIN (SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot GROUP BY ma_ca, sbd) x
+       JOIN (SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot WHERE ma_ca IN (SELECT ma_ca FROM ca WHERE ${locCa}) GROUP BY ma_ca, sbd) x
          ON l.ma_ca = x.ma_ca AND l.sbd = x.sbd AND l.lan_thu = x.m
        WHERE l.trang_thai <> 'duoc_duyet_lai'
      )
@@ -996,7 +1010,8 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
             SUM(CASE WHEN trang_thai IN ('da_nop','khoa') THEN 1 ELSE 0 END) AS da_nop,
             SUM(CASE WHEN trang_thai = 'khoa' OR so_lan_roi_man > 0 THEN 1 ELSE 0 END) AS canh_bao
      FROM moi GROUP BY ma_ca`,
-  ).all<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>()
+    ),
+  ]) as [D1Result<Record<string, unknown>>, D1Result<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>]
 
   const dem: Record<string, { da_vao: number; da_nop: number; canh_bao: number }> = {}
   for (const d of rDem.results ?? []) dem[String(d.ma_ca)] = d
@@ -1248,7 +1263,7 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       // ca này phát đề riêng từng em; thiếu nó là thầy bấm Bắt đầu mà cả lớp
       // nhận chung một đề.
       deRieng: Number(ca.de_rieng ?? 0) === 1,
-      phamViHoiLai: String(ca.pham_vi_hoi_lai ?? '') === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+      phamViHoiLai: ['ba_ca', 'khong'].includes(String(ca.pham_vi_hoi_lai ?? '')) ? String(ca.pham_vi_hoi_lai) : 'gan_nhat',
       danhSachChon: doJson(ca.danh_sach_chon_json),
     },
     luot,
@@ -2578,27 +2593,6 @@ async function tienDoEm(env: Env, sbd: string): Promise<Response> {
   })
 }
 
-/** CÂU SAI CHƯA CHỮA của một em — để rút câu khắc phục. */
-async function cauSaiCuaEm(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const sbd = String(b.sbd ?? '').trim()
-  if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
-  const maCa = String(b.maCa ?? '').trim()
-  const r = maCa
-    ? await env.DB.prepare('SELECT * FROM ban_do_sai WHERE sbd = ? AND ma_ca = ? ORDER BY cap_nhat_luc DESC').bind(sbd, maCa).all<Record<string, unknown>>()
-    : await env.DB.prepare('SELECT * FROM ban_do_sai WHERE sbd = ? AND da_chua = 0 ORDER BY cap_nhat_luc DESC LIMIT 300').bind(sbd).all<Record<string, unknown>>()
-  return ra({
-    ok: true,
-    ds: (r.results ?? []).map((x) => ({
-      maCa: String(x.ma_ca ?? ''),
-      qid: String(x.qid ?? ''),
-      chuyenDe: String(x.chuyen_de ?? ''),
-      mucDo: String(x.muc_do ?? ''),
-      soLanSai: Number(x.so_lan_sai) || 1,
-      daChua: Number(x.da_chua) === 1,
-    })),
-  })
-}
-
 /** GỌI LÊN BẢNG — ghi một câu chữa tại lớp vào bảng mạnh–yếu, KHÔNG tạo lượt
  * thi giả và KHÔNG đụng điểm số. Đúng khuôn `ghiLenBang` bên Apps Script. */
 async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Response> {
@@ -3088,6 +3082,8 @@ const boXuLy = {
     if(dangReset)return
     // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
+    // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts, tối ưu 28/09): MỘT lần mỗi isolate, trong cron (không nằm trên đường lệnh của em/thầy). Lỗi chỉ ghi log.
+    await damBaoChiMuc(env)
     if(event.cron==='1 17 * * *'){
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
@@ -3121,7 +3117,7 @@ const boXuLy = {
     // /ph/* KHÔNG đủ điều kiện dù nhìn tưởng đọc-chỉ). Cloudflare tự chọn bản sao gần nhất thay vì luôn đi primary, giảm tải D1 chính; không
     // đổi kết quả (đọc-chỉ, không cần "đọc ngay sau ghi của chính lượt này"). `withSession` vắng ở D1 giả/local ⇒ dùng nguyên `env`, hành vi cũ.
     // `env.DB?.` (không chỉ `.withSession?`): vài test dựng `env` tối giản KHÔNG có `DB` để kiểm đường từ chối trước khi chạm D1 (vd. chưa xác thực) — phải sống sót cả khi thiếu hẳn `DB`.
-    const envDoc: Env = env.DB?.withSession ? { ...env, DB: env.DB.withSession('first-unconstrained') } : env
+    const envDoc: Env = env.DB?.withSession ? { ...env, DB: gan(env.DB.withSession('first-unconstrained'), env.DB) } : env
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
     // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách
@@ -3286,6 +3282,9 @@ const boXuLy = {
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
 
+      // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
+      if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
+      if (p === '/hs/diem-danh') return ra(await hsDiemDanh(env, b))
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
             if (p === '/teacher-news') return ra(await teacherNews(env,b))
@@ -3366,6 +3365,14 @@ const boXuLy = {
       if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
+      // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
+      if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
+      // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.
+      if (p === '/gv/dau-gio') return ra(await gvDauGio(env, b))
+      // GIAO ĐỀ THEO TUẦN (26/09, gv-kho-de-giao.ts): màn thầy `GiaoDeTheoTuanScreen` gọi lệnh này; dòng định tuyến bị rơi mất sau một lần gộp ⇒ màn báo
+      // "Máy chủ chưa có lệnh". Nối lại (28/09). Có ghi (`luu`) ⇒ dùng `env` (không phải bản đọc-chỉ).
+      if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(env, b))
+      if (p === '/gv/buoi-hoc/suc-hoc') return ra(await gvSucHocBuoi(envDoc, b))
       // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
       if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))
@@ -3393,13 +3400,11 @@ const boXuLy = {
       if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
       if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
       if (p === '/da-day') return danhDauDaDay(env, b)
-      if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''), b.dongBoGio)
       if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
       if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
       if (p === '/ca/nhieu') return dayNhieuCa(env, b)
       if (p === '/ca/danh-sach') return themMocReset(env, await danhSachCaMoi(env, b.daXoa === true)) // đường CHÍNH app thầy (Code 1): phải mang `mocReset` như /goi danhSachCa
       if (p === '/ca/sua') return suaCa(env, b)
-      if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
       if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
       // THÊM PHÚT cho ca đang chạy (docs/hop-dong-them-phut-2109.md): chỉ cộng, trần 30 phút mỗi ca.
       if (p === '/ca/them-phut') return ra(await themPhutCa(env, b))
@@ -3413,7 +3418,6 @@ const boXuLy = {
       // CHẤM LẠI MỘT CA CŨ bằng luật chấm hiện hành rồi ghi lại D1 (thầy chốt 23/09 — việc còn lại của MỤC 3).
       if (p === '/ca/cham-lai') return chamLaiCaRoute(env, b)
       if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
-      if (p === '/em/cau-sai') return cauSaiCuaEm(env, b)
       if (p === '/len-bang') return ghiLenBangMoi(env, b)
       if (p === '/kho/day') return dayDeKho(env, b)
       if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
@@ -3451,19 +3455,23 @@ const boXuLy = {
 
       return ra({ ok: false, error: 'Không có đường này' }, 404)
     } catch (e) {
-      const ma = (e as { ma?: unknown } | null)?.ma // mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời; lỗi thường không có
-      return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
+      return raLoi(e)
     }
   },
 }
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
+export { BanBiA } from './bi-a-phong'
 export default {
   ...boXuLy,
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    // Phòng đấu Bi-a (WebSocket, GĐ2): đi thẳng tới Durable Object, KHÔNG qua lớp bọc dưới (dựng lại Response làm hỏng bắt tay 101).
+    if (new URL(req.url).pathname.startsWith('/bi-a/phong/')) return denPhongBiA(req, env)
     const t0 = Date.now()
     let res: Response
-    try { res = await boXuLy.fetch(req, env, ctx) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
+    // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
+    // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
+    try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
     // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(nhipDeNghi().heSo))

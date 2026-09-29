@@ -11,7 +11,7 @@ import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
-import { demLanSai, docHoSoOnEm, dungDeRieng, dungDeRiengLuotHai, type CaTruocDaCham, type EmThieuLap, type HoSoOnEm, type YeuCauDeRieng } from './de-rieng'
+import { cauDaGapCuaEm, demLanSai, docHoSoOnEm, dungDeRieng, dungDeRiengLuotHai, type CaTruocDaCham, type EmThieuLap, type HoSoOnEm, type YeuCauDeRieng } from './de-rieng'
 import { dungUngVien } from './rut-de'
 import { chuanChuyenDe } from './goi-len-bang'
 import { hashSeed } from './exam-shuffle'
@@ -128,6 +128,10 @@ export function chonCaTheoPhamVi<T extends { maCa: string }>(dsMoiNhatTruoc: T[]
 }
 
 /** Lấy các ca THI trước đó theo phạm vi thầy chọn, mới nhất trước. */
+/** Ngân sách lệnh `chiTietCa` (đường lui chậm, mỗi ca một lệnh) ở chế độ Không rút
+ * câu sai — ca có bản đồ dựng sẵn thì không tốn lệnh nào, không tính vào đây. */
+export const TRAN_DOC_LUI_KHONG_RUT = 8
+
 export async function docCacCaTruoc(
   url: string,
   mat: string,
@@ -216,7 +220,12 @@ export async function docCacCaTruoc(
   // Nên: đi từ ca mới nhất, đếm số ca đã phủ cho từng em; khi MỌI em trong
   // `dsSbd` đã đủ thì thôi gọi đường lui. Ca chưa đọc vẫn nằm trong bản đồ rẻ
   // ở trên, không mất dữ liệu đếm.
-  const canMoiEm = ch.PHAM_VI_HOI_LAI === 'ba_ca' ? SO_CA_BOC_NGAU_NHIEN : 1
+  // KHÔNG RÚT CÂU SAI cần MỌI ca em đã làm (để loại mọi câu em đã gặp) ⇒ không
+  // có "đủ"; đường lui đắt nên chặn ngân sách `TRAN_DOC_LUI_KHONG_RUT` lệnh.
+  const khongRut = ch.PHAM_VI_HOI_LAI === 'khong'
+  const canMoiEm = khongRut ? Number.POSITIVE_INFINITY : ch.PHAM_VI_HOI_LAI === 'ba_ca' ? SO_CA_BOC_NGAU_NHIEN : 1
+  let soDocLui = 0
+  let boQuaNganSach = 0
   const daPhu = new Map<string, number>()
   const conThieuEm = () => dsSbd.length === 0 || dsSbd.some((sbd) => (daPhu.get(sbd) ?? 0) < canMoiEm)
   const ghiPhu = (ca: CaTruocDaCham) => {
@@ -229,7 +238,7 @@ export async function docCacCaTruoc(
   for (const c of ung) {
     const bd = banDo[c.maCa]
     if (bd && Object.keys(bd.lam).length > 0) {
-      const ca = { maCa: c.maCa, daLamCua: bd.lam, saiCua: bd.sai }
+      const ca: CaTruocDaCham = { maCa: c.maCa, daLamCua: bd.lam, saiCua: bd.sai, ngay: String(c.moLuc ?? '') }
       dsCa.push(ca)
       ghiPhu(ca)
       continue
@@ -238,8 +247,14 @@ export async function docCacCaTruoc(
       boQuaVeSau += 1
       continue
     }
+    if (khongRut && soDocLui >= TRAN_DOC_LUI_KHONG_RUT) {
+      boQuaNganSach += 1
+      continue
+    }
+    soDocLui += 1
     try {
       const ca = await docCaTruoc(url, mat, c.maCa, ch)
+      ca.ngay = String(c.moLuc ?? '')
       dsCa.push(ca)
       ghiPhu(ca)
     } catch (e) {
@@ -248,6 +263,7 @@ export async function docCacCaTruoc(
   }
   // Khai ra, không im lặng: thầy phải biết vì sao vài ca cũ không nằm trong
   // danh sách đã dò — đó là chủ ý tiết kiệm lệnh, không phải ca hỏng.
+  if (boQuaNganSach > 0) boQua.push({ maCa: `+${boQuaNganSach} ca cũ chưa có bản đồ`, vi_sao: 'quá ngân sách đọc chậm — câu ở các ca này có thể gặp lại' })
   if (boQuaVeSau > 0) boQua.push({ maCa: `+${boQuaVeSau} ca cũ hơn`, vi_sao: 'mọi em đã đủ ca gần nhất — bỏ qua cho nhanh, không phải lỗi' })
   return { dsCa, boQua, namQuet: namNay, nguonNam, soCaThuMuc: dsGoc.length }
 }
@@ -384,6 +400,9 @@ export interface KetQuaDungDeRieng {
   cauGocTheoEm?: Record<string, string[]>
   /** sbd → danh sách câu song sinh cùng dạng đổi số để chống học vẹt. */
   songSinhTheoEm?: Record<string, string[]>
+  /** CHỈ Không rút câu sai: sbd → (qid → 'dd/mm') câu em phải làm lại vì kho thiếu.
+   * Gồm cả em vắng (lượt hai). Đi lên máy chủ để máy em in nhãn "Đã làm ở ca kiểm tra…". */
+  daLamLaiTheoEm: Record<string, Record<string, string>>
   lapCua: Record<string, Record<string, number>>
   thieu: EmThieuLap[]
   canCua: Record<string, number>
@@ -557,9 +576,11 @@ export async function dungDeRiengChoCa(
   // chọn — câu lặp là câu thứ 3 trong 12, không phải cả đề đổi chuyên đề.
   // Nhớ luôn câu ấy đến TỪ CA NÀO — để còn lấy nguyên văn nó ở bản đề của
   // chính ca đó khi kho hiện tại không còn id ấy nữa (xem `gomCauTuCaCu`).
+  const khongRut = ch.PHAM_VI_HOI_LAI === 'khong'
   const canQid = new Set<string>()
   const canTheoCa = new Map<string, Set<string>>()
-  for (const ca of dsCa) {
+  // KHÔNG RÚT CÂU SAI ⇒ không kéo câu sai nào vào kho ca.
+  for (const ca of khongRut ? [] : dsCa) {
     for (const sbd of dsSbd) {
       for (const q of ca.saiCua[sbd] ?? []) {
         canQid.add(q)
@@ -621,9 +642,21 @@ export async function dungDeRiengChoCa(
   const soMoiCoII = uv.II.filter((q) => !qidHoiLai.has(q.id)).length
   const soMoiCoIII = uv.III.filter((q) => !qidHoiLai.has(q.id)).length
 
-  const thieuI = Math.max(0, sc.I - soMoiCoI)
-  const thieuII = Math.max(0, sc.II - soMoiCoII)
-  const thieuIII = Math.max(0, sc.III - soMoiCoIII)
+  // KHÔNG RÚT CÂU SAI: đủ câu là đủ câu MỚI VỚI TỪNG EM — đếm theo em thiếu nhất
+  // (kho trừ câu em đã gặp ở ca trước), rồi bù bằng câu chưa em nào gặp.
+  const daGapCaLop = new Set<string>()
+  const moiCo = { I: soMoiCoI, II: soMoiCoII, III: soMoiCoIII }
+  if (khongRut) {
+    const gapCua = dsSbd.map((sbd) => cauDaGapCuaEm(dsCa, sbd))
+    for (const g of gapCua) for (const q of g.keys()) daGapCaLop.add(q)
+    for (const p of ['I', 'II', 'III'] as const) {
+      const ids = uv[p].map((q) => q.id)
+      moiCo[p] = gapCua.length === 0 ? ids.length : Math.min(...gapCua.map((g) => ids.filter((q) => !g.has(q)).length))
+    }
+  }
+  const thieuI = Math.max(0, sc.I - moiCo.I)
+  const thieuII = Math.max(0, sc.II - moiCo.II)
+  const thieuIII = Math.max(0, sc.III - moiCo.III)
   if (thieuI > 0 || thieuII > 0 || thieuIII > 0) {
     const khoToanBoGoc = await loadExamSources().catch(() => [] as TeacherExamSource[])
     // Lọc về đúng chuyên đề ca (vá 19/09) TRƯỚC khi bù — xem
@@ -631,7 +664,7 @@ export async function dungDeRiengChoCa(
     // nối câu khắc phục), đúng những chuyên đề thầy đã chọn lúc mở ca.
     // Rồi lọc KHỐI của ca (`lopCa` rỗng ⇒ không rõ khối ⇒ không lọc): ca lớp 11 không được bù câu lớp 12.
     const khoToanBo = locKhoBuTheoKhoi(locKhoToanBoTheoChuyenDeCa(khoToanBoGoc, bank), khoiCuaEm({ lop: lopCa }))
-    const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))])
+    const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id)), ...daGapCaLop])
     const bu: TeacherExamSource = { maDe: `${maCa}-bu-kho`, ...chonCauBuKho(khoToanBo, daCo, { I: thieuI, II: thieuII, III: thieuIII }) }
     if (bu.phanI.length > 0 || bu.phanII.length > 0 || bu.phanIII.length > 0) {
       bankDung = [...bankDung, bu]
@@ -656,6 +689,19 @@ export async function dungDeRiengChoCa(
     const tong = ra.noiCam.reduce((t, x) => t + x.soNoi, 0)
     ghiChu.push({ loai: 'canh_bao', loi: `kho mỏng — ${ra.noiCam.length} em phải nhận lại tổng ${tong} câu vừa làm trong tuần (đã nới câu cũ nhất trước); thêm câu vào kho ca để hết trùng` })
   }
+  const emLamLai = Object.entries(ra.daLamLaiTheoEm)
+  if (khongRut) {
+    ghiChu.push(
+      emLamLai.length === 0
+        ? { loai: 'tin', loi: 'không rút câu sai — mọi em nhận đề không trùng câu nào em đã làm ở các ca kiểm tra trước' }
+        : {
+            loai: 'canh_bao',
+            loi: `kho thiếu câu mới — ${emLamLai.length} em phải làm lại tổng ${emLamLai.reduce((t, [, x]) => t + Object.keys(x).length, 0)} câu đã làm ở ca kiểm tra trước (câu làm lâu nhất trước, đề em có nhãn): ${emLamLai
+              .map(([sbd, x]) => `${sbd} (${[...new Set(Object.values(x))].filter(Boolean).join(', ') || 'ca trước'})`)
+              .join('; ')}`,
+          },
+    )
+  }
   const emDaKhacPhuc = Object.values(ra.daKhacPhucTheoEm)
   if (emDaKhacPhuc.length > 0) {
     ghiChu.push({ loai: 'tin', loi: `${emDaKhacPhuc.length} em đã tự khắc phục tổng ${emDaKhacPhuc.reduce((t, x) => t + x.length, 0)} câu sai ca trước ở bài luyện — không hỏi lại các câu đó` })
@@ -673,7 +719,7 @@ export async function dungDeRiengChoCa(
     try {
       const daCo = new Set(bankDung.flatMap((b) => [...b.phanI, ...b.phanII, ...b.phanIII].map((q) => q.id)))
       const canTheoCaVang = new Map<string, Set<string>>()
-      for (const sbd of dsSbdVang) {
+      for (const sbd of khongRut ? [] : dsSbdVang) {
         for (const ca of caNguonCuaEm(dsCa, sbd, ch)) {
           for (const q of ca.saiCua[sbd] ?? []) {
             if (daCo.has(q)) continue
@@ -742,6 +788,7 @@ export async function dungDeRiengChoCa(
     lapTheoEm: gop(ra.lapTheoEm, boVang?.lapTheoEm),
     cauGocTheoEm: gop(ra.cauGocTheoEm, boVang?.cauGocTheoEm),
     songSinhTheoEm: gop(ra.songSinhTheoEm, boVang?.songSinhTheoEm),
+    daLamLaiTheoEm: { ...ra.daLamLaiTheoEm, ...(boVang?.daLamLaiTheoEm ?? {}) },
     lapCua: lapCuaTungEm(boTheoEm, demLanSai(dsCa)),
     thieu: ra.thieuLap,
     canCua: ra.canCua,

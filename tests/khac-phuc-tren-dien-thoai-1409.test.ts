@@ -52,15 +52,9 @@ const doc = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
 const boChuThich = (s: string) => s.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
 
 describe('LỖI 1 — vòng kín "Bắt đầu làm bài"', () => {
-  const bc = boChuThich(doc('src/components/BaoCaoCaThiHocSinhModal.tsx'))
+  // 28/09: modal báo cáo cũ (BaoCaoCaThiHocSinhModal) ĐÃ XOÁ (thầy cho phép). Phép kiểm "trao tờ phiếu lên qua onTaoPhieuXong" chỉ khoá
+  // dây nối của modal ấy; LUẬT còn giá trị — không vòng kín — nay khoá ở báo cáo bản mới ngay dưới.
   const cong = boChuThich(doc('src/screens/StudentPortalScreen.tsx'))
-
-  it('báo cáo ca thi trao TỜ PHIẾU lên, không vứt đi', () => {
-    expect(bc).toContain('onTaoPhieuXong={(html) => {')
-    expect(bc).toContain('onBatDauKhacPhuc(baiThi.maCa, html)')
-    // Bản cũ gọi không tham số — đó chính là chỗ tờ phiếu bị rơi.
-    expect(bc).not.toContain('onBatDauKhacPhuc(baiThi.maCa)')
-  })
 
   it('cổng học sinh: nút "Làm lại câu cần chữa" của báo cáo BẢN MỚI đóng báo cáo rồi mới dựng phiếu (không vòng kín)', () => {
     // 28/09: hộp báo cáo cũ được thay bằng BaoCaoChiTiet chế độ em; không còn modal nào để "mở lại đúng nó".
@@ -79,13 +73,13 @@ describe('LỖI 2 — máy học sinh không có kho đề', () => {
     expect(thongKe).toHaveLength(10)
   })
 
-  it('chế độ 2 hết ứng viên trả rỗng, không tự chèn câu cũ khi chọn 0', () => {
-    const { dsCau } = rutLuyenThemDangCauSai(DS_CAU_SAI, [], 0, { hoTen: 'Em A', sbd: '12109' })
+  it('chế độ 2 hết ứng viên trả rỗng, không tự chèn câu cũ khi chọn 0', async () => {
+    const { dsCau } = await rutLuyenThemDangCauSai(DS_CAU_SAI, [], 0, { hoTen: 'Em A', sbd: '12109' })
     expect(dsCau).toHaveLength(0)
   })
 
-  it('chế độ 1 ra đủ 10 câu vì nội dung câu sai đi kèm báo cáo', () => {
-    const { dsCau, html } = taoDeLamLaiCauSai(DS_CAU_SAI, { hoTen: 'Em A', sbd: '12109' })
+  it('chế độ 1 ra đủ 10 câu vì nội dung câu sai đi kèm báo cáo', async () => {
+    const { dsCau, html } = await taoDeLamLaiCauSai(DS_CAU_SAI, { hoTen: 'Em A', sbd: '12109' })
     expect(dsCau).toHaveLength(10)
     expect(html).toContain('Nhận định nào sau đây về ester là đúng (mục 1)?')
     expect(html).toContain('Nhận định nào sau đây về ester là đúng (mục 10)?')

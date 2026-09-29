@@ -26,6 +26,32 @@ export interface GoiDeRieng {
   /** BIÊN BẢN lúc rút — thứ trả lời "vì sao em này không có câu hỏi lại".
    * Dạng tự do vì nó chỉ để đọc, không có gì tính toán dựa vào nó. */
   bb: Record<string, unknown> | null
+  /** CHỈ ca "Không rút câu sai" (29/09): sbd → (qid → 'dd/mm') câu em phải làm
+   * lại vì kho thiếu. Máy em in nhãn "Đã làm ở ca kiểm tra dd/mm" — không kèm đáp án. */
+  daLam?: Record<string, Record<string, string>>
+}
+
+/** Nhãn "đã làm ở ca…" của MỘT em, đọc phòng thủ: qid → 'dd/mm' (có thể rỗng). */
+export function daLamLaiCuaEm(v: unknown): Record<string, string> {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+  const ra: Record<string, string> = {}
+  for (const [q, ngay] of Object.entries(v as Record<string, unknown>)) {
+    const qid = String(q ?? '').trim()
+    if (!qid) continue
+    const t = typeof ngay === 'string' ? ngay.trim() : ''
+    ra[qid] = /^\d{2}\/\d{2}$/.test(t) ? t : ''
+  }
+  return ra
+}
+
+function banDoDaLam(v: unknown): Record<string, Record<string, string>> {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+  const ra: Record<string, Record<string, string>> = {}
+  for (const [sbd, gia] of Object.entries(v as Record<string, unknown>)) {
+    const mot = daLamLaiCuaEm(gia)
+    if (Object.keys(mot).length > 0) ra[sbd] = mot
+  }
+  return ra
 }
 
 function banDoSo(v: unknown): Record<string, Record<string, number>> {
@@ -59,8 +85,12 @@ export function dongGoiDeRieng(
   lap: Record<string, string[]>,
   dem: Record<string, Record<string, number>> = {},
   bb: Record<string, unknown> | null = null,
+  daLam: Record<string, Record<string, string>> = {},
 ): GoiDeRieng {
-  return { bo: banDo(bo), lap: banDo(lap), dem: banDoSo(dem), bb: bb && typeof bb === 'object' ? bb : null }
+  const goi: GoiDeRieng = { bo: banDo(bo), lap: banDo(lap), dem: banDoSo(dem), bb: bb && typeof bb === 'object' ? bb : null }
+  const dl = banDoDaLam(daLam)
+  if (Object.keys(dl).length > 0) goi.daLam = dl
+  return goi
 }
 
 /** Mở gói ở cả hai dạng — dạng mới `{bo, lap}` và dạng cũ phẳng `{sbd: [...]}`. */
@@ -71,7 +101,12 @@ export function moGoiDeRieng(goi: unknown): GoiDeRieng {
   // không có em nào tên `bo`, và giá trị của một em là MẢNG chứ không phải đối
   // tượng — hai dấu hiệu độc lập, không nhận nhầm được.
   const co = g.bo && typeof g.bo === 'object' && !Array.isArray(g.bo)
-  if (co) return { bo: banDo(g.bo), lap: banDo(g.lap), dem: banDoSo(g.dem), bb: g.bb && typeof g.bb === 'object' && !Array.isArray(g.bb) ? (g.bb as Record<string, unknown>) : null }
+  if (co) {
+    const ra: GoiDeRieng = { bo: banDo(g.bo), lap: banDo(g.lap), dem: banDoSo(g.dem), bb: g.bb && typeof g.bb === 'object' && !Array.isArray(g.bb) ? (g.bb as Record<string, unknown>) : null }
+    const dl = banDoDaLam(g.daLam)
+    if (Object.keys(dl).length > 0) ra.daLam = dl
+    return ra
+  }
   return { bo: banDo(g), lap: {}, dem: {}, bb: null }
 }
 

@@ -132,6 +132,8 @@ export default defineConfig({
           // Gộp ngang + app thầy 2.0 (28/09): các mảnh nạp LƯỜI chỉ của app thầy (giao/chiếu chiến dịch, bố cục tờ chiếu) và của game
           // (cửa hàng phụ kiện, lọc câu theo khối) ra kho chạy-lúc — giữ precache vỏ ≤ 2850 KB (chừa ≥ 150 KB dưới trần 3000 KB).
           '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau}-*.{js,css}',
+          // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
+          '**/TamPhuChieuMa-*.{js,css}',
           // Màn làm bài NGANG (28/09): mảnh nạp lười chỉ máy ngang/máy tính cần; màn thi tải sẵn khi máy đang ngang, nạp hỏng thì ở lại bố cục dọc.
           '**/LamBaiNgang-*.{js,css}',
           // Tải PDF "Câu đã làm" (28/09): jspdf (+ canvg `index.es`, dompurify `purify.es`, html2canvas mà jspdf kéo theo) và html2canvas-pro
@@ -153,6 +155,10 @@ export default defineConfig({
           // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
           // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/{BiaGame,TrongAi,ngang,chu-het-luot}-*.{js,css}',
+          // CHỐNG TRÙNG (28/09): 14 biểu tượng nhỏ dưới đây đã có trong `includeAssets` (precache đích danh) — để globPatterns bắt lại lần nữa
+          // thì dist/sw.js ghi mỗi tệp HAI lần (178 mục cho 164 tệp). Bỏ ở phía glob, giữ ở phía includeAssets.
+          '{favicon.svg,apple-touch-icon.png,icon-192.png,logo-huy-hieu-96-v3.png}',
+          'logo-{hs,ph}-{v3.svg,nho-v3.svg,64-v3.png,180-v3.png,192-v3.png}',
         ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
@@ -180,6 +186,15 @@ export default defineConfig({
   build: {
     target: ['es2020', 'safari14', 'ios14'],
     cssTarget: ['safari14', 'ios14'],
+    rolldownOptions: {
+      output: {
+        // GOM MẢNH NHỎ (28/09). Tách màn thi + cổng HS khỏi mảnh chính làm Rolldown cắt ra hàng chục mảnh 100–500 byte (mỗi biểu tượng lucide một tệp),
+        // đẩy precache vượt trần 170 tệp của scripts/kiem-sw.mjs. Gom mọi biểu tượng vào MỘT mảnh (≈ 10 KB) — ít tệp, ít vòng mạng, cache một lần.
+        codeSplitting: {
+          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]/ }],
+        },
+      },
+    },
   },
   worker: {
     format: 'es',

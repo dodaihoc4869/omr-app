@@ -20,7 +20,6 @@
 // được nội dung. Gói gửi đi vài trăm byte thay vì vài megabyte, không có đáp án
 // nào đi qua đường truyền của học sinh, và dữ liệu đề không rời máy thầy.
 import type { CauLuyen } from './bai-tap-pdf'
-import { biaHtml, ngayVN, taiLieuHtml, thanhHtml, theCauHtml, thoat, tongQuanHtml } from './html-phieu'
 
 // ---------------------------------------------------------------------------
 // MỘT NGUỒN SỰ THẬT CẤU HÌNH (mục 3). Cấm rải số vào màn hình.
@@ -215,7 +214,7 @@ export interface ThongTinTongHop {
 
 /** Hàng tên em dưới một thẻ câu. Ghi chú của em in nghiêng ngay dưới tên em đó,
  * NGUYÊN VĂN (mục 4D điểm 3) — thầy cần đọc đúng chữ em viết. */
-function hangEmHtml(g: CauDaGop): string {
+function hangEmHtml(g: CauDaGop, thoat: (s: string) => string): string {
   const ten = `<div class="em-hoi"><b>${g.emHoi.length} em hỏi:</b> ${thoat(dongTenEm(g.emHoi))}</div>`
   const chuThich = g.emHoi
     .filter((e) => e.ghiChu.trim())
@@ -226,9 +225,11 @@ function hangEmHtml(g: CauDaGop): string {
 
 /** Dựng trang tổng hợp. Không em nào hỏi → trả CHUỖI RỖNG, chỗ gọi không dựng
  * trang rỗng (phép kiểm 12). */
-export function dungTrangTongHop(t: ThongTinTongHop, dong: CauHoiCuaEm[], deCuaCa: CauLuyen[]): string {
+export async function dungTrangTongHop(t: ThongTinTongHop, dong: CauHoiCuaEm[], deCuaCa: CauLuyen[]): Promise<string> {
   const gop = gopTheoCau(dong, deCuaCa)
   if (!gop.length) return ''
+  // Bộ dựng phiếu (≈ 52 KB gzip) NẠP LƯỜI: màn làm bài nhập tệp này để gửi câu hỏi, không được kéo cả bộ phiếu vào lượt tải đầu.
+  const { biaHtml, ngayVN, taiLieuHtml, thanhHtml, theCauHtml, thoat, tongQuanHtml } = await import('./html-phieu')
 
   const soEm = new Set(dong.filter((d) => d.qids.some((q) => deCuaCa.some((c) => c.id === q))).map((d) => d.sbd)).size
   const cau = gop.map((g) => g.cau)
@@ -237,7 +238,7 @@ export function dungTrangTongHop(t: ThongTinTongHop, dong: CauHoiCuaEm[], deCuaC
   // vào NGAY TRƯỚC thẻ đóng — không đụng vào bên trong thẻ, không sao chép lại
   // mã dựng thẻ.
   const the = gop
-    .map((g, i) => `<div class="cau-hoi-nhom">${theCauHtml(g.cau, i + 1)}${hangEmHtml(g)}</div>`)
+    .map((g, i) => `<div class="cau-hoi-nhom">${theCauHtml(g.cau, i + 1)}${hangEmHtml(g, thoat)}</div>`)
     .join('\n')
 
   const bia = biaHtml(

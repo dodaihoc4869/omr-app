@@ -44,9 +44,11 @@ const dungPH = (onClose = vi.fn()) =>
   render(<BaoCaoCaThiPhuHuynhModal baiThi={BAI as any} hoTenCon="Minh" sbd="12001" lop="12A1" scriptUrl="https://may.test" onClose={onClose} onGiaoBaiChoCon={() => {}} onNhanTinChoThay={() => {}} />)
 
 describe('phạm vi bộ sinh lớp tương thích (nhóm B + C + A2)', () => {
-  it('12 tệp của cổng học sinh/phụ huynh (nhóm B + C + A2 + C8 + C9) + 16 tệp APP GIÁO VIÊN (G1 21/09, đổi có chủ ý so với bản "đúng 12 tệp")', () => {
+  // 28/09: BaoCaoCaThiHocSinhModal ĐÃ XOÁ (thầy cho phép) ⇒ bỏ khỏi phạm vi quét; các lớp màu chỉ nó mang được GIỮ trong `LOP_GIU_LAI`
+  // của bộ sinh nên tệp CSS sinh ra không mất luật nào (các màn khác trong vỏ `.m3` vẫn dùng).
+  it('11 tệp của cổng học sinh/phụ huynh (nhóm B + C + A2 + C8 + C9; bỏ modal học sinh cũ đã xoá) + 15 tệp APP GIÁO VIÊN (G1 21/09)', () => {
     const ten = TEP.map((t: string) => path.basename(t)).sort()
-    const HS_PH = ['BangTinPhuHuynh.tsx', 'BaoCaoCaThiHocSinhModal.tsx', 'BaoCaoCaThiPhuHuynhModal.tsx', 'BieuDoTienBoGoogle.tsx', 'DongDemCau.tsx', 'KhoiBaPhan.tsx', 'KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx', 'ParentPortalScreen.tsx', 'PhongChoGame.tsx']
+    const HS_PH = ['BangTinPhuHuynh.tsx', 'BaoCaoCaThiPhuHuynhModal.tsx', 'BieuDoTienBoGoogle.tsx', 'DongDemCau.tsx', 'KhoiBaPhan.tsx', 'KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx', 'ParentPortalScreen.tsx', 'PhongChoGame.tsx']
     const GIAO_VIEN = ['CaiDatScreen.tsx', 'CauHoiScreen.tsx', 'ClassListScreen.tsx', 'ExamHubScreen.tsx', 'ExamMonitorScreen.tsx', 'ExamSetupScreen.tsx', 'GoiLenBangScreen.tsx', 'HocSinhScreen.tsx', 'HopChonDe.tsx', 'KhoiMatKhauApp.tsx', 'KhoiMayChuMoi.tsx', 'LichSuCaScreen.tsx', 'NganHangDeScreen.tsx', 'NutQuayLai.tsx', 'PhanCongScreen.tsx']
     expect(ten).toEqual([...HS_PH, ...GIAO_VIEN].sort())
   })

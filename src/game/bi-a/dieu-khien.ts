@@ -50,6 +50,8 @@ export class VanBia {
   st: Ban
   ev: SuKienCu | null = null
   pha: Pha = 'aim'
+  /** Ghế của em (ván A.I: luôn ghế 0; ván online: ghế phòng đấu xếp). */
+  em: number = EM
   cur = EM
   aim = { x: 0, y: -1 }
   power = 0
@@ -82,21 +84,21 @@ export class VanBia {
   /** Mỗi lần đổi trạng thái đáng vẽ lại HUD ⇒ tăng. */
   phienBan = 0
   soCu = 0
-  private shotCon = 7
-  private acc = 0
-  private aiGiaiT = 0
-  private tich = 0
-  private ma = 0
-  private van = 0
-  private batDau: number
-  private rand: () => number
-  private now: () => number
-  private nghe = new Set<() => void>()
-  private hen: (fn: () => void, ms: number) => () => void = HEN_MAC_DINH
-  private huyHen: (() => void)[] = []
+  protected shotCon = 7
+  protected acc = 0
+  protected aiGiaiT = 0
+  protected tich = 0
+  protected ma = 0
+  protected van = 0
+  protected batDau: number
+  protected rand: () => number
+  protected now: () => number
+  protected nghe = new Set<() => void>()
+  protected hen: (fn: () => void, ms: number) => () => void = HEN_MAC_DINH
+  protected huyHen: (() => void)[] = []
   nhan = 1
 
-  private sk: SuKienVan
+  protected sk: SuKienVan
   constructor(tc: TuyChonVan, sk: SuKienVan) {
     this.sk = sk
     this.cheDo = tc.cheDo
@@ -107,24 +109,24 @@ export class VanBia {
     this.ghe = taoGhe(tc.cheDo, tc.tenEm)
     this.bi = chiaBi(tc.cheDo)
     this.tk = this.ghe.map(() => ({ dung: 0, sai: 0, an: 0, vang: 0, caiSai: [] }))
-    const cuaEm = biCuaGhe(this.bi, EM)
+    const cuaEm = biCuaGhe(this.bi, this.em)
     cuaEm.forEach((id, i) => { const c = tc.cauEm[i]; if (c) this.cauCua[id] = c; else this.bi[id].trong = true })
     if (tc.loai === 'giao_huu') for (const id of [...KL, ...PK]) this.bi[id].trong = true
     let m = 0
-    for (const id of [...KL, ...PK]) if (this.bi[id].chu !== EM) this.mucAi[id] = MUC_AI[m++ % MUC_AI.length]
+    for (const id of [...KL, ...PK]) if (this.bi[id].chu !== this.em) this.mucAi[id] = MUC_AI[m++ % MUC_AI.length]
     this.chotCau = tc.chot
     this.chotTrong = tc.loai === 'giao_huu' || !tc.chot
     this.batDau = this.now()
     this.goiYNham()
     const doi = this.cheDo === 'doi'
-    this.bao(`${this.ghe[EM]!.ten} phá bàn`, doi ? `Em giữ bi ${cuaEm.join(', ')} · đồng đội ${this.ghe[2]!.ngan} giữ bi ${biCuaGhe(this.bi, 2).join(', ')}` : `${TEN_PHE[0]}: 7 bi trơn ánh kim${this.loai === 'giao_huu' ? ' · Bàn giao hữu, không câu' : ' là câu của em'}`, '', 1900)
+    this.bao(`${this.ghe[this.em]!.ten} phá bàn`, doi ? `Em giữ bi ${cuaEm.join(', ')} · đồng đội ${this.ghe[2]!.ngan} giữ bi ${biCuaGhe(this.bi, 2).join(', ')}` : `${TEN_PHE[0]}: 7 bi trơn ánh kim${this.loai === 'giao_huu' ? ' · Bàn giao hữu, không câu' : ' là câu của em'}`, '', 1900)
   }
 
   // ───────────── đăng ký vẽ lại ─────────────
   dangKy(fn: () => void): () => void { this.nghe.add(fn); return () => { this.nghe.delete(fn) } }
-  private doi(): void { this.phienBan++; for (const f of this.nghe) f() }
+  protected doi(): void { this.phienBan++; for (const f of this.nghe) f() }
   /** Hẹn giờ gắn với ván: huỷ ván là mọi hẹn tự bỏ. */
-  private sau(fn: () => void, ms: number): void {
+  protected sau(fn: () => void, ms: number): void {
     const v = this.van
     const huy = this.hen(() => { if (this.van === v) fn() }, ms)
     this.huyHen.push(huy)
@@ -136,19 +138,19 @@ export class VanBia {
   // ───────────── tiện ích ─────────────
   bi_(id: KiHieu | 'cue'): Bi { return this.st.balls.find((b) => b.id === id)! }
   giayChoi(): number { return Math.max(0, Math.round((this.now() - this.batDau) / 1000)) }
-  laLuotEm(): boolean { return this.cur === EM }
+  laLuotEm(): boolean { return this.cur === this.em }
   nguoiDuocDanh(): boolean { return this.pha === 'aim' && !this.ghe[this.cur]!.ai && !this.sheet && !this.xemMo }
-  coTheGiaiTruoc(): boolean { return this.loai !== 'giao_huu' && this.cur !== EM && this.pha !== 'over' && !this.sheet && !this.xemMo }
+  coTheGiaiTruoc(): boolean { return this.loai !== 'giao_huu' && this.cur !== this.em && this.pha !== 'over' && !this.sheet && !this.xemMo }
   /** Mức độ câu của bi: câu thật (bi của em) hoặc mức giả định của bi A.I (không có câu thật, G5). */
   mucBi(id: KiHieu): string | null { return this.cauCua[id]?.mucDo ?? this.mucAi[id] ?? null }
   diemBi(id: KiHieu): number { return this.bi[id].trong ? DIEM_TRONG : diemMuc(this.mucBi(id)) }
-  private bao(chu: string, phu: string, loai: ThongBao['loai'], ms: number): void {
+  protected bao(chu: string, phu: string, loai: ThongBao['loai'], ms: number): void {
     this.thongBao = { ma: ++this.ma, chu, phu, loai, ms }
     this.nhatKy.unshift({ ma: this.ma, giay: this.giayChoi(), chu: chu + (phu ? ` · ${phu}` : ''), loai })
     if (this.nhatKy.length > 40) this.nhatKy.length = 40
     this.doi()
   }
-  private ptNhanh(chu: string): void {
+  protected ptNhanh(chu: string): void {
     this.ptHop.push({ ma: ++this.ma, chu })
     if (this.ptHop.length > 2) this.ptHop.shift()
     this.nhatKy.unshift({ ma: this.ma, giay: this.giayChoi(), chu, loai: '' })
@@ -201,7 +203,7 @@ export class VanBia {
   /** Em chạm ô ở hàng "Bi của em" để giải trước. */
   giaiTruoc(id: KiHieu): 'mo' | 'da_an' | 'vang' | 'trong' | 'chua_duoc' {
     const s = this.bi[id]
-    if (s.chu !== EM) return 'chua_duoc'
+    if (s.chu !== this.em) return 'chua_duoc'
     if (s.an) return 'da_an'
     if (s.vang) return 'vang'
     if (s.trong || !this.cauCua[id]) return 'trong'
@@ -216,20 +218,7 @@ export class VanBia {
   // ───────────── khung hình ─────────────
   /** Gọi mỗi khung hình với số giây trôi qua. */
   buoc(dt: number): void {
-    if (this.pha === 'moving' && this.ev) {
-      this.acc += dt * this.nhan
-      let n = 0
-      const hook = (k: 'bi' | 'bang' | 'lo', a: Bi, b: Bi | Lo | null, v?: number) => {
-        // Cú phá bàn (thầy 28/09): CHỈ tiếng bi chạm bi, khô (không vang) — không tiếng băng, không tiếng rơi lỗ.
-        const phaBan = this.isBreak
-        if (k === 'bi') this.sk.gomVa('bi', v ?? 0, a.x, a.y, phaBan)
-        else if (k === 'bang') { if (!phaBan) this.sk.gomVa('bang', Math.hypot(a.vx, a.vy), a.x, a.y) }
-        else if (k === 'lo' && b && a.id !== 'cue') { this.roi.push({ id: a.id, x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); this.viTriLo[a.id] = { x: b.x, y: b.y }; if (!phaBan) this.sk.am('lo', 0, b.x, b.y) }
-        else if (k === 'lo' && b) { this.roi.push({ id: 'cue', x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); if (!phaBan) this.sk.am('lo', 0, b.x, b.y) }
-      }
-      while (this.acc >= HS && n < 24 * this.nhan) { step(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
-      if (!dangChay(this.st)) { this.acc = 0; this.pha = 'xet'; this.sau(() => this.ketThucCu(), this.roi.length ? 260 : 120); this.doi() }
-    }
+    this.buocVatLy(dt)
     if (this.pha === 'ai-nham' && this.ai) {
       const a = this.ai
       a.t += dt
@@ -238,11 +227,37 @@ export class VanBia {
       if (a.t > 0.7) this.power = Math.min(a.p, (a.t - 0.7) / 0.45 * a.p)
       if (a.t > 1.25) { this.aim = { x: Math.cos(a.a1), y: Math.sin(a.a1) }; this.power = a.p; this.pha = 'aim'; this.ai = null; this.ban() }
     }
+    this.buocDongHo(dt)
+    this.buocHieuUng(dt)
+  }
+  /** Móc va chạm của vật lý ⇒ tiếng + bi rơi (dùng chung cho ván A.I và ván online). */
+  protected hookVa(): (k: 'bi' | 'bang' | 'lo', a: Bi, b: Bi | Lo | null, v?: number) => void {
+    return (k, a, b, v) => {
+        // Cú phá bàn (thầy 28/09): CHỈ tiếng bi chạm bi, khô (không vang) — không tiếng băng, không tiếng rơi lỗ.
+        const phaBan = this.isBreak
+        if (k === 'bi') this.sk.gomVa('bi', v ?? 0, a.x, a.y, phaBan)
+        else if (k === 'bang') { if (!phaBan) this.sk.gomVa('bang', Math.hypot(a.vx, a.vy), a.x, a.y) }
+        else if (k === 'lo' && b && a.id !== 'cue') { this.roi.push({ id: a.id, x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); this.viTriLo[a.id] = { x: b.x, y: b.y }; if (!phaBan) this.sk.am('lo', 0, b.x, b.y) }
+        else if (k === 'lo' && b) { this.roi.push({ id: 'cue', x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); if (!phaBan) this.sk.am('lo', 0, b.x, b.y) }
+    }
+  }
+  protected buocVatLy(dt: number): void {
+    if (this.pha === 'moving' && this.ev) {
+      this.acc += dt * this.nhan
+      let n = 0
+      const hook = this.hookVa()
+      while (this.acc >= HS && n < 24 * this.nhan) { step(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
+      if (!dangChay(this.st)) { this.acc = 0; this.pha = 'xet'; this.sau(() => this.ketThucCu(), this.roi.length ? 260 : 120); this.doi() }
+    }
+  }
+  protected buocDongHo(dt: number): void {
     if (this.nguoiDuocDanh()) {
       this.time -= dt * this.nhan
       if (this.time <= 5 && this.time > 0) { const s = Math.ceil(this.time); if (s !== this.tich) { this.tich = s; this.sk.am('tich') } }
       if (this.time <= 0) { this.time = 0; this.bao(`Hết ${GIAY_CU} giây`, `Sang lượt ${this.ghe[tiepTheo(this.cur, this.ghe.length)]!.ten}`, '', 1400); this.doiLuot(false, 300) }
     }
+  }
+  protected buocHieuUng(dt: number): void {
     if (this.pha !== 'over' && this.pha !== 'cho' && this.loai !== 'giao_huu') {
       this.aiGiaiT += dt * this.nhan
       if (this.aiGiaiT >= 12) { this.aiGiaiT = 0; this.aiGiaiTruoc() }
@@ -278,7 +293,7 @@ export class VanBia {
     this.xuLyHang([...kq.hang], p, kq, [])
   }
   /** Trả lời lần lượt; một câu sai ⇒ các bi còn chờ về chân bàn (không mở câu), lượt sang ngay (G13). */
-  private xuLyHang(hang: MucHang[], p: number, kq: KetQuaXet, ketQua: { dung: boolean; nguoiTL: number; chot: boolean }[]): void {
+  protected xuLyHang(hang: MucHang[], p: number, kq: KetQuaXet, ketQua: { dung: boolean; nguoiTL: number; chot: boolean }[]): void {
     if (!hang.length) return this.sauHang(p, kq, ketQua)
     const it = hang.shift()!
     const s = it.nguoiTL
@@ -295,19 +310,19 @@ export class VanBia {
     if (this.sheet) { this.pha = 'cau'; this.bao(`${this.ghe[p]!.ngan} đánh bi ${id} của em vào lỗ`, 'Chốt xong câu đang giải thì trả lời bi này', '', 2200) }
     mo()
   }
-  private sauHang(p: number, kq: KetQuaXet, ketQua: { dung: boolean; nguoiTL: number }[]): void {
+  protected sauHang(p: number, kq: KetQuaXet, ketQua: { dung: boolean; nguoiTL: number }[]): void {
     const me = this.ghe[p]!, ke = this.ghe[tiepTheo(p, this.ghe.length)]!
     if (duocDanhTiep(kq, ketQua.map((r) => r.dung))) {
       if (ketQua.length) this.bao(`${me.ten} đánh tiếp`, '', 'tot', 1000)
       this.sau(() => this.batDauLuot(false), ketQua.length ? 300 : 700)
       return
     }
-    const sai = ketQua.some((r) => !r.dung), emSai = ketQua.some((r) => !r.dung && r.nguoiTL === EM)
+    const sai = ketQua.some((r) => !r.dung), emSai = ketQua.some((r) => !r.dung && r.nguoiTL === this.em)
     const ly = sai ? 'Trả lời chưa đúng' : kq.cuaBan.length ? `Bi ${kq.cuaBan.join(', ')} của phe đối thủ rơi, quay lại chân bàn` : 'Không ăn được bi nào'
     this.bao(ly, `Sang lượt ${ke.ten}`, '', 1400)
     this.doiLuot(false, emSai ? 250 : 1400)
   }
-  private anBi(id: KiHieu, s: number): void {
+  protected anBi(id: KiHieu, s: number): void {
     this.bi[id].an = true
     const d = this.diemBi(id)
     this.diem[this.ghe[s]!.doi] += d
@@ -318,7 +333,7 @@ export class VanBia {
     this.fx.push({ k: 'vong', x, y, vx: 0, vy: 0, s: 0, c: '', t: 0, life: 0.6, r: 0 })
     this.sk.am('an')
   }
-  private doiLuot(datBiCai: boolean, tre: number): void {
+  protected doiLuot(datBiCai: boolean, tre: number): void {
     this.pha = 'cho'
     this.doi()
     this.sau(() => {
@@ -326,7 +341,7 @@ export class VanBia {
       this.cur = tiepTheo(this.cur, this.ghe.length); this.ballInHand = datBiCai; this.spin = { x: 0, y: 0 }
       const me = this.ghe[this.cur]!
       if (!me.ai) this.bao('Lượt của em', datBiCai ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Chạm bàn để nhắm', '', 1300)
-      else this.bao(`Lượt của ${me.ten}`, me.doi === this.ghe[EM]!.doi ? 'Đồng đội đang đánh · em giải trước được' : this.loai === 'giao_huu' ? '' : 'Chạm ô ở hàng “Bi của em” để giải trước', '', 1500)
+      else this.bao(`Lượt của ${me.ten}`, me.doi === this.ghe[this.em]!.doi ? 'Đồng đội đang đánh · em giải trước được' : this.loai === 'giao_huu' ? '' : 'Chạm ô ở hàng “Bi của em” để giải trước', '', 1500)
       this.sk.am('luot')
       this.batDauLuot(true)
     }, tre)
@@ -340,7 +355,7 @@ export class VanBia {
     this.pha = 'aim'
     this.doi()
   }
-  private thang(doi: Doi, p: number): void {
+  protected thang(doi: Doi, p: number): void {
     this.pha = 'over'
     this.sk.am('thang')
     for (let i = 0; i < 140; i++) {
@@ -353,8 +368,8 @@ export class VanBia {
   }
 
   // ───────────── tấm câu (em) ─────────────
-  private choCau = new Map<number, (dung: boolean) => void>()
-  private moCau(mode: CheDoCau, id: KiHieu, nguoiDanh: number, xong?: (dung: boolean) => void): void {
+  protected choCau = new Map<number, (dung: boolean) => void>()
+  protected moCau(mode: CheDoCau, id: KiHieu, nguoiDanh: number, xong?: (dung: boolean) => void): void {
     const cau = mode === 'chot' ? this.chotCau : this.cauCua[id]
     if (!cau) { xong?.(true); return } // không có câu (không xảy ra: bi trống đã ăn ngay ở xetCu)
     const y: YeuCauCau = { ma: ++this.ma, mode, id, nguoiDanh, cau }
@@ -371,13 +386,13 @@ export class VanBia {
   xongCau(ma: number, dung: boolean, dong: boolean, tinh = true): void {
     const y = this.sheet
     if (!y || y.ma !== ma) { if (dong && this.sheet?.ma === ma) this.sheet = null; return }
-    const id = y.id, me = this.tk[EM]!
+    const id = y.id, me = this.tk[this.em]!
     if (!this.dachamSet.has(ma)) {
       this.dachamSet.add(ma)
       // `tinh = false`: hết giờ khi chưa chọn đủ (không gửi máy chủ) ⇒ trong ván vẫn như sai, nhưng KHÔNG đếm câu sai, không báo "vào lịch ôn".
       if (dung) { me.dung++; this.sk.am(y.mode === 'giai-truoc' ? 'vang' : 'dung') } else { if (tinh) { me.sai++; me.caiSai.push(y.cau.tenDang || '') } this.sk.am('sai') }
       if (y.mode === 'sau-lo') {
-        if (dung) { this.anBi(id, EM); this.matThan = congMatThan(this.matThan) }
+        if (dung) { this.anBi(id, this.em); this.matThan = congMatThan(this.matThan) }
         else datLaiChan(this.st, this.bi_(id))
       } else if (y.mode === 'chot') {
         if (dung) this.matThan = congMatThan(this.matThan)
@@ -394,7 +409,7 @@ export class VanBia {
     }
     this.doi()
   }
-  private dachamSet = new Set<number>()
+  protected dachamSet = new Set<number>()
   /** Máy chủ đổi câu cho bi sau câu sai (`null` ⇒ bi trống). Câu chốt: `id = 'C'`. */
   doiCau(id: KiHieu, cau: CauBia | null): void {
     if (id === CHOT) { this.chotCau = cau; if (!cau) this.chotTrong = true }
@@ -403,19 +418,19 @@ export class VanBia {
   }
 
   // ───────────── đối thủ máy A.I ─────────────
-  private aiTraLoi(laChot: boolean, id: KiHieu, s: number, tiep: (d: boolean) => void): void {
+  protected aiTraLoi(laChot: boolean, id: KiHieu, s: number, tiep: (d: boolean) => void): void {
     this.pha = 'cau'
     const hang = laChot ? 2 : hangMuc(this.mucBi(id))
     const dung = this.rand() < (laChot ? AI_DUNG_CHOT : AI_DUNG[hang]), ai = this.ghe[s]!
     this.bao(laChot ? `${ai.ten} đang giải Câu chốt` : `${ai.ten} đang giải câu bi ${id}`, ['Nhận biết', 'Thông hiểu', 'Vận dụng'][hang]!, '', 1300)
     this.sau(() => {
       if (dung) { this.tk[s]!.dung++; if (!laChot) { this.anBi(id, s); this.bao(`${ai.ngan} trả lời đúng · ăn bi ${id}`, `+${this.diemBi(id)} điểm`, 'tot', 1200) } }
-      else { this.tk[s]!.sai++; datLaiChan(this.st, this.bi_(id)); if (!laChot && this.bi[id].chu !== EM) this.mucAi[id] = ['NB', 'TH', 'VD'][Math.floor(this.rand() * 3)]!; this.bao(`${ai.ngan} trả lời chưa đúng · bi ${laChot ? 'chốt' : id} quay lại bàn`, '', 'loi', 1200) }
+      else { this.tk[s]!.sai++; datLaiChan(this.st, this.bi_(id)); if (!laChot && this.bi[id].chu !== this.em) this.mucAi[id] = ['NB', 'TH', 'VD'][Math.floor(this.rand() * 3)]!; this.bao(`${ai.ngan} trả lời chưa đúng · bi ${laChot ? 'chốt' : id} quay lại bàn`, '', 'loi', 1200) }
       this.doi()
       this.sau(() => tiep(dung), dung ? 1100 : 700)
     }, 1400)
   }
-  private aiGiaiTruoc(): void {
+  protected aiGiaiTruoc(): void {
     const ds = this.ghe.map((_, i) => i).filter((i) => this.ghe[i]!.ai && i !== this.cur)
     if (!ds.length) return
     const s = ds[Math.floor(this.rand() * ds.length)]!
@@ -426,9 +441,10 @@ export class VanBia {
     if (dung) { this.bi[id].vang = true; this.tk[s]!.dung++; this.tk[s]!.vang++ } else { this.tk[s]!.sai++; this.mucAi[id] = ['NB', 'TH', 'VD'][Math.floor(this.rand() * 3)]! }
     this.ptNhanh(dung ? `${ai.ngan} giải trước bi ${id}: đúng, bi hoá vàng` : `${ai.ngan} giải trước bi ${id}: chưa đúng`)
   }
-  private aiDanh(): void {
+  protected aiDanh(): void {
     if (this.pha !== 'ai') return
     this.sau(() => {
+      if (this.pha !== 'ai') return // trong 80 ms chờ, pha đã đổi (ván online: cú của máy khác tới) ⇒ thôi ngắm, kẻo đè pha đang vẽ
       const doi = this.ghe[this.cur]!.doi
       if (this.ballInHand) { aiDatBi(this.st, doi, this.bi, this.isBreak, this.rand); this.ballInHand = false; this.goiYNham(); const c = this.bi_('cue'); this.sk.am('dat', 0, c.x, c.y) }
       const plan = aiTinh(this.st, doi, this.bi, this.isBreak, this.aim, this.rand)
@@ -446,7 +462,7 @@ export class VanBia {
   hopLe(id: KiHieu): boolean { return hopLeDich(id, this.ghe[this.cur]!.doi, this.bi, this.isBreak) }
   nham() { return nhamInfo(this.st, this.aim) }
   conLai(doi: Doi): number { return conLaiDoi(this.bi, doi) }
-  biEm(): KiHieu[] { return biCuaGhe(this.bi, EM) }
+  biEm(): KiHieu[] { return biCuaGhe(this.bi, this.em) }
   doiCuaBi(id: KiHieu) { return doiCuaBi(id) }
   bangPhe(doi: Doi): readonly KiHieu[] { return NHOM[doi]! }
   /** Tóm tắt ghế cho màn Kết thúc và `bia-ket-van`. */

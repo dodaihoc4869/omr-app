@@ -23,8 +23,9 @@ import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import './styles/tokens.css'
 import './index.css'
 import './styles/the-loc.css'
-import 'katex/dist/katex.min.css'
+// KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 import App from './App.tsx'
+import { napKatex } from './lib/chem-format'
 
 import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
 import { khoaVaiVaoUrl } from './lib/khoa-vai'
@@ -78,6 +79,19 @@ khoaVaiVaoUrl(import.meta.env.BASE_URL)
   else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
   else if (dv.vai === 'hocsinh') nhoVaiDaDung('hs')
   else if (dv.vai === 'phuhuynh') nhoVaiDaDung('ph')
+  // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu) ⇒ tải NGAY, song song với
+  // mảnh màn; đường khác (màn khoá thầy, cổng phụ huynh) ⇒ tải lúc rảnh sau khi trang đã hiện.
+  const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu'
+  if (canCongThucNgay) void napKatex().catch(() => {})
+  else {
+    const khiRanh = () => {
+      const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }
+      if (w.requestIdleCallback) w.requestIdleCallback(() => void napKatex().catch(() => {}), { timeout: 4000 })
+      else setTimeout(() => void napKatex().catch(() => {}), 1500)
+    }
+    if (document.readyState === 'complete') khiRanh()
+    else window.addEventListener('load', khiRanh, { once: true })
+  }
 }
 
 // beforeinstallprompt chỉ bắn MỘT LẦN và bắn trước khi React kịp mount — phải

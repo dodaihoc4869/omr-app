@@ -8,7 +8,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // giãn dòng 1.9 — index.css); mã A/B/C/D dùng .pa-ma cùng cỡ chữ. Chạm cả
 // hàng, mã thẳng hàng với dòng đầu của nội dung. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
-import { Check, RotateCcw, X as XIcon } from 'lucide-react'
+import { Check, History, RotateCcw, X as XIcon } from 'lucide-react'
 import { normalizeNumericAnswer } from '../engine/score'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
@@ -49,6 +49,10 @@ interface BaseProps {
    * `soLanSai` = số lần em đã sai câu này TRƯỚC lần làm này; 0 hoặc thiếu thì
    * dải chỉ nhắc, không nêu con số — cấm bịa số. */
   cauHoiLai?: { soLanSai?: number }
+  /** Ca "Không rút câu sai" (29/09): câu em ĐÃ LÀM ở ca kiểm tra trước, phát lại
+   * vì kho thiếu. `ngay` = 'dd/mm' ('' = không rõ ngày). Chỉ báo đã gặp — không
+   * nói đúng/sai, không kèm đáp án. */
+  daLamO?: { ngay: string }
   onZoom?: (src: string) => void
 }
 
@@ -162,6 +166,28 @@ function DaiHoiLai({ soLanSai }: { soLanSai?: number }) {
     >
       <RotateCcw size={15} aria-hidden />
       <span>{co ? `Câu em đã sai buổi trước (${n} lần) — đọc kỹ lại từ đầu` : 'Câu em đã sai buổi trước — đọc kỹ lại từ đầu'}</span>
+    </div>
+  )
+}
+
+function DaiDaLam({ ngay }: { ngay: string }) {
+  return (
+    <div
+      data-da-lam="1"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--k2)',
+        padding: '8px var(--k5)',
+        background: 'var(--the-2)',
+        color: 'var(--muc)',
+        fontSize: 13,
+        fontWeight: 600,
+        lineHeight: 1.5,
+      }}
+    >
+      <History size={15} aria-hidden />
+      <span>{ngay ? `Đã làm ở ca kiểm tra ${ngay}` : 'Đã làm ở ca kiểm tra trước'}</span>
     </div>
   )
 }
@@ -425,6 +451,7 @@ export default function TheCau(props: TheCauProps) {
           chưa. Sau khi nộp thì dải lại có ích — lúc ấy nó là chỉ dẫn sửa sai,
           không còn ảnh hưởng bài làm. */}
       {props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
+      {props.daLamO && <DaiDaLam ngay={props.daLamO.ngay} />}
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (
           <button type="button" onClick={() => onZoom?.(thanCauImg)} className="block w-full" title="Bấm để phóng to">

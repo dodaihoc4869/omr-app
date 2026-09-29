@@ -6,6 +6,8 @@ import {allowed,advance,THUONG_NAC,chooseSession,grade,newArena,arenaAction,PETS
 import type {PrivateQuestion,Attempt,Evidence} from '../src/game/than-thu-v2/core'
 import type {Env,D1PreparedStatement} from '../server/src/kieu'
 import {gameV2,loadProfile} from '../server/src/game-v2'
+import {normalizePetName,laTenTuc,LOI_TEN_TUC} from '../src/game/than-thu-v2/pet-name'
+import {TEN_GOI_Y} from '../src/game/than-thu-v2/dao/ChonBanDongHanh'
 import {xoaMoiDem} from '../server/src/dem-chung'
 import {gameToken,gameIdentity,parentPass,parentIdentity} from '../server/src/game-v2-auth'
 import {normalizeBank,readScope,syncIndex,protectedQuestions,xoaDemCaBaoVe} from '../server/src/game-v2-bank'
@@ -195,6 +197,41 @@ it('tên riêng lưu đúng hồ sơ, đồng bộ máy chiếu, không đổi �
  expect((await loadProfile(f.env,'2')).profile.nickname).toBeUndefined()
  expect((await adminGame(f.env,{sbd:'1',action:'spirit'})).spirit).toMatchObject({nickname:'Rồng Lam'})
  await expect(gameV2(f.env,'rename',{token,name:'<script>alert(1)</script>'})).rejects.toThrow()
+})
+
+describe('Đổi tên thần thú (luật tên + 3 lần/ngày)',()=>{
+ it('độ dài 1–16 sau khi cắt khoảng trắng, chữ Việt + số + gạch; bỏ ký tự vô hình',()=>{
+  expect(normalizePetName('  Rồng   Lam  ')).toBe('Rồng Lam')
+  expect(normalizePetName('Ưng Đỏ-2_Nhỏ')).toBe('Ưng Đỏ-2_Nhỏ')
+  expect(normalizePetName('Thương Thương Ơi')).toBe('Thương Thương Ơi')
+  expect(normalizePetName('A'.repeat(16))).toBe('A'.repeat(16))
+  expect(()=>normalizePetName('A'.repeat(17))).toThrow(/1–16/)
+  expect(()=>normalizePetName('   ')).toThrow(/1–16/)
+  expect(()=>normalizePetName(42)).toThrow()
+  expect(normalizePetName('Mây\u200b Bông\u0007')).toBe('Mây Bông')
+  for(const x of ['<b>Rồng</b>','Rồng🐉','Rồng!','龍','Rồng.Lam',"O'Neil"])expect(()=>normalizePetName(x),x).toThrow(/1–16/)
+ })
+ it('lọc từ tục / xúc phạm không phân biệt dấu, hoa thường; không bắt nhầm tên hiền',()=>{
+  for(const x of ['Địt','DIT','Lồn Con','Đéo Sợ','Óc Chó','oc cho','Đ M','VCL','Dit Me','Thằng Ngu','Buồi','Cứt'])expect(()=>normalizePetName(x),x).toThrow(LOI_TEN_TUC)
+  for(const x of ['Lợn Con','Long','Bưởi','Đeo Nơ','Ngũ Hành','Con Cá Chép','Cầu Vồng','Đi Tới','Sóng Nhỏ','Lộc Non'])expect(normalizePetName(x),x).toBe(x)
+  for(const nhom of TEN_GOI_Y)for(const x of nhom)expect(laTenTuc(x),x).toBe(false)
+ })
+ it('máy chủ: báo lỗi thân thiện, tối đa 3 lần/ngày, chỉ đổi thần thú của chính em',async()=>{
+  const f=fixture(),token=await gameToken(f.env,'1'),token2=await gameToken(f.env,'2');await gameV2(f.env,'choose',{token,pet:'nuoc_long'});await gameV2(f.env,'choose',{token:token2,pet:'nuoc_long'})
+  await expect(gameV2(f.env,'rename',{token,name:'Óc Chó'})).rejects.toThrow('Tên này chưa phù hợp, em chọn tên khác nhé.')
+  await expect(gameV2(f.env,'rename',{token,name:'Tên Này Dài Quá Mười Sáu'})).rejects.toThrow(/1–16/)
+  const r1=await gameV2(f.env,'rename',{token,name:'Một',sbd:'2'});expect(r1.doiTenConLai).toBe(2)
+  expect((await gameV2(f.env,'rename',{token,name:'Một'})).doiTenConLai).toBe(2) // gửi lại đúng tên cũ: không tính lượt
+  await gameV2(f.env,'rename',{token,name:'Hai'});const r3=await gameV2(f.env,'rename',{token,name:'Ba'});expect(r3.doiTenConLai).toBe(0)
+  await expect(gameV2(f.env,'rename',{token,name:'Bốn'})).rejects.toThrow(/đã đổi tên 3 lần/)
+  expect((await loadProfile(f.env,'1')).profile.nickname).toBe('Ba')
+  expect((await loadProfile(f.env,'2')).profile.nickname).toBeUndefined()
+  expect((await gameV2(f.env,'rename',{token:token2,name:'Bạn Hai'})).doiTenConLai).toBe(2) // lượt đếm riêng từng em
+  // Sang ngày mới (VN) ⇒ đổi lại được.
+  const raw=JSON.parse(String(f.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='1'").get()?.json));raw.doiTen.ngay='2000-01-01'
+  f.sql.prepare("UPDATE game_v2_profile SET json=? WHERE sbd='1'").run(JSON.stringify(raw))
+  await gameV2(f.env,'rename',{token,name:'Bốn'});expect((await loadProfile(f.env,'1')).profile.nickname).toBe('Bốn')
+ })
 })
 
 it('Linh Tâm tải lại đúng câu cùng lượt và từ chối câu của lượt cũ',async()=>{

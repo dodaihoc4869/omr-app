@@ -225,13 +225,6 @@ vi.mock('../src/components/NutDongBoDanhSach', () => ({ default: () => null }))
 vi.mock('../src/components/NutThemHocSinh', () => ({ default: () => null }))
 vi.mock('../src/components/NutBaiTapPdf', () => ({ default: () => null }))
 vi.mock('../src/components/KhoiTienBo', () => ({ default: () => <div>KHOI TIEN BO</div> }))
-vi.mock('../src/components/BaoCaoCaThiHocSinhModal', () => ({
-  default: (p: { onClose: () => void }) => (
-    <div role="dialog" aria-label="Báo cáo thử">
-      <button onClick={p.onClose}>Đóng báo cáo</button>
-    </div>
-  ),
-}))
 const { default: HocSinhScreen } = await import('../src/screens/HocSinhScreen')
 
 describe('HocSinhScreen · hồ sơ tổng quan', () => {

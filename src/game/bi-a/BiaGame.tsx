@@ -1,7 +1,10 @@
 // BI-A PHẢN ỨNG · VÀO GAME (đặc tả 8.2): Sảnh Bi-a → xếp bàn (máy chủ lấy câu từ kế hoạch hôm nay, trần 40%) → Màn chơi.
-// GĐ1: tự chơi với A.I (đấu đơn, đánh đôi) và Bàn giao hữu với A.I. Đấu với bạn / mã bàn là GĐ2 — nút ghi "Sắp mở".
+// GĐ1: tự chơi với A.I (đấu đơn, đánh đôi) và Bàn giao hữu với A.I. GĐ2 (máy chủ có phòng đấu): Đấu đơn / Đánh đôi với bạn, Nhập mã bàn,
+// bạn cùng lớp đang ở Sảnh Bi-a + Mời, lời mời đến (Nhận / Từ chối), Điểm bàn. Máy chủ chưa có phòng đấu ⇒ nút online ghi "Sắp mở".
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { taiSanhBia, xepBanBia, type SanhBia } from './api'
+import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
+import { hoiLoiMoi, moiBanVao, taiSanhBia, taoBanOnline, traLoiLoiMoi, vaoBanBangMa, xepBanBia, type BanCoMat, type LoiMoiDen, type SanhBia, type VeVaoBan } from './api'
+import BanOnline, { KHOA_BAN_DANG } from './BanOnline'
 import ManChoi from './ManChoi'
 import type { CauBia, LoaiVan } from './dieu-khien'
 import type { CheDo } from './luat'
@@ -27,6 +30,14 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
   const [van, setVan] = useState<VanDangChoi | null>(null)
   const [tin, setTin] = useState('')
   const cuoi = useRef<{ loai: LoaiVan; cheDo: CheDo } | null>(null)
+  const [banOnline, setBanOnline] = useState<VeVaoBan | null>(null)
+  const [banDang] = useState<VeVaoBan | null>(() => { try { const x = sessionStorage.getItem(KHOA_BAN_DANG); return x ? (JSON.parse(x) as VeVaoBan) : null } catch { return null } })
+  const [boBanDang, setBoBanDang] = useState(false)
+  const [nhapMa, setNhapMa] = useState(false)
+  const [ma, setMa] = useState('')
+  const [moAi, setMoAi] = useState(false)
+  const [ban, setBan] = useState<BanCoMat[]>([])
+  const [loiMoi, setLoiMoi] = useState<LoiMoiDen[]>([])
   const napSanh = useCallback(async () => {
     setLoi('')
     try { setSanh(await taiSanhBia(token)) } catch (e) { setLoi(e instanceof Error && e.message ? e.message : 'Chưa mở được Sảnh Bi-a. Em thử lại.') }
@@ -43,6 +54,25 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
     } catch (e) { setTin(e instanceof Error && e.message ? e.message : 'Chưa xếp được bàn. Em thử lại.') }
     finally { setDang(false) }
   }
+  const online = !!sanh?.online
+  const conTran = sanh?.tran.con ?? 0
+  // Có mặt ở Sảnh Bi-a + lời mời đến: mỗi 6 giây, CHỈ khi em đang ở Sảnh (vòng trực tiếp nối tiếp, không chồng lượt).
+  useEffect(() => {
+    if (!online || van || banOnline) return
+    let song = true
+    const hoi = async () => { const r = await hoiLoiMoi(token, conTran); if (song) { setBan(r.ban); setLoiMoi(r.moi) } }
+    void hoi().catch(() => {})
+    const vong = batVongTrucTiep(hoi, 6000)
+    return () => { song = false; vong.dung() }
+  }, [online, van, banOnline, token, conTran])
+  const loaiMang = (s: SanhBia | null): 'ban' | 'giao_huu' | null => (!s || !s.bat ? null : !s.lyDoKhoa && s.tran.con > 0 ? 'ban' : s.giaoHuu.mo ? 'giao_huu' : null)
+  const moBanOnline = async (f: () => Promise<VeVaoBan>) => {
+    if (dang) return
+    setDang(true); setTin('')
+    try { setBanOnline(await f()) } catch (e) { setTin(e instanceof Error && e.message ? e.message : 'Chưa vào được bàn. Em thử lại.') } finally { setDang(false) }
+  }
+  const taoVaMoi = (b: BanCoMat) => void moBanOnline(async () => { const lm = loaiMang(sanh); if (!lm) throw new Error(sanh?.message || 'Hôm nay em chưa đấu được.'); const v = await taoBanOnline(token, 'don', lm); await moiBanVao(token, v.van, b.sbd); return v })
+  if (banOnline) return <BanOnline token={token} hoTen={hoTen} vao={banOnline} conTran={conTran} onVe={() => { setBanOnline(null); setBoBanDang(true); void napSanh() }} />
   if (van) return (
     <ManChoi key={van.khoa} token={token} tenEm={hoTen || 'Em'} van={van.van} session={van.session} cheDo={van.cheDo} loai={van.loai} cauEm={van.cauEm} chot={van.chot}
       onVeSanh={() => { setVan(null); void napSanh() }} onChoiLai={() => { setVan(null); const c = cuoi.current; if (c) void vaoBan(c.loai, c.cheDo); else void napSanh() }} />
@@ -73,6 +103,36 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
             </div>}
             {(khoa || !sanh.bat) && <div className="bia-the"><p className="bia-chu-nho" style={{ fontSize: 14 }}>{sanh.message || 'Bi-a chưa mở cho em.'}</p></div>}
             {tin && <p className="bia-loi" role="alert">{tin}</p>}
+            {online ? <>
+              {banDang && !boBanDang && <div className="bia-the"><b>Em đang có một bàn online</b><span className="bia-chu-nho">Mạng rớt hay trang tải lại thì vào lại bàn cũ; quá 60 giây phòng coi như em đã rời.</span>
+                <div className="bia-luoi-2"><button type="button" className="bia-nut-vang" onClick={() => setBanOnline(banDang)}>Vào lại bàn</button><button type="button" className="bia-nut-phu" onClick={() => { try { sessionStorage.removeItem(KHOA_BAN_DANG) } catch { /* bỏ qua */ } setBoBanDang(true) }}>Bỏ bàn đó</button></div></div>}
+              <div className="bia-dong-so bia-diem-ban"><span>Điểm bàn</span><b>{sanh.diemBan.diem}{sanh.diemBan.soVan ? ` · ${sanh.diemBan.soVan} ván` : ''}</b></div>
+              {(() => { const lm = loaiMang(sanh); const gh = lm === 'giao_huu'; return <>
+                <button type="button" className="bia-nut-vang" disabled={!lm || dang} onClick={() => lm && void moBanOnline(() => taoBanOnline(token, 'don', lm))}>{dang ? 'Đang mở bàn…' : gh ? 'Bàn giao hữu với bạn · đấu đơn' : 'Đấu đơn với bạn'}{gh && <small>Không câu, không EXP · còn {sanh.giaoHuu.con}/{sanh.giaoHuu.toiDa} ván</small>}</button>
+                <div className="bia-luoi-2">
+                  <button type="button" className="bia-nut-phu" disabled={!lm || dang} onClick={() => lm && void moBanOnline(() => taoBanOnline(token, 'doi', lm))}>Đánh đôi 2 đấu 2<small>{gh ? 'Bàn giao hữu với bạn' : 'Mời bạn hoặc thêm A.I'}</small></button>
+                  <button type="button" className="bia-nut-phu" aria-expanded={nhapMa} disabled={dang} onClick={() => setNhapMa(!nhapMa)}>Nhập mã bàn<small>Bạn ngồi cạnh đọc mã</small></button>
+                </div>
+              </> })()}
+              {nhapMa && <form className="bia-the bia-nhap-ma" onSubmit={(e) => { e.preventDefault(); void moBanOnline(() => vaoBanBangMa(token, ma)) }}>
+                <label className="bia-chu-nho" htmlFor="bia-ma">Mã bàn (4 chữ số)</label>
+                <input id="bia-ma" inputMode="numeric" autoComplete="off" maxLength={4} value={ma} onChange={(e) => setMa(e.target.value.replace(/\D/g, '').slice(0, 4))} />
+                <button type="submit" className="bia-nut-vang" disabled={ma.length !== 4 || dang}>Vào bàn</button>
+              </form>}
+              <button type="button" className="bia-nut-phu" aria-expanded={moAi} onClick={() => setMoAi(!moAi)}>Tự chơi với A.I<small>{coCau ? 'Đấu đơn hoặc đánh đôi với A.I' : sanh.giaoHuu.mo ? 'Bàn giao hữu với A.I' : 'Hết câu Bi-a hôm nay'}</small></button>
+              {moAi && <div className="bia-luoi-2">
+                {coCau ? <>
+                  <button type="button" className="bia-nut-phu" disabled={dang} onClick={() => void vaoBan('ai', 'don')}>Đấu đơn với A.I</button>
+                  <button type="button" className="bia-nut-phu" disabled={dang} onClick={() => void vaoBan('ai', 'doi')}>Đánh đôi với A.I<small>em giữ 4 bi</small></button>
+                </> : <button type="button" className="bia-nut-phu" disabled={dang || !sanh.giaoHuu.mo || sanh.giaoHuu.con <= 0} onClick={() => void vaoBan('giao_huu', 'don')}>Bàn giao hữu với A.I<small>còn {sanh.giaoHuu.con}/{sanh.giaoHuu.toiDa} ván</small></button>}
+              </div>}
+              <div className="bia-the">
+                <b>Bạn cùng lớp đang ở Sảnh Bi-a</b>
+                {ban.length ? <ul className="bia-ds-ban">{ban.map((b) => <li key={b.sbd}><span><span className="bia-ghe-ten">{b.ten}</span><span className="bia-chu-nho">Bi-a còn {b.conTran} câu</span></span>
+                  <button type="button" className="bia-nut-chu" disabled={dang || !loaiMang(sanh)} onClick={() => taoVaMoi(b)}>Mời</button></li>)}</ul>
+                  : <p className="bia-chu-nho">Chưa có bạn nào đang ở Sảnh Bi-a. Em mở bàn rồi đọc mã cho bạn ngồi cạnh nhé.</p>}
+              </div>
+            </> : <>
             <button type="button" className="bia-nut-vang" disabled={!coCau || dang} onClick={() => void vaoBan('ai', 'don')}>{dang ? 'Đang xếp bàn…' : 'Tự chơi với A.I · đấu đơn'}</button>
             <button type="button" className="bia-nut-phu" disabled={!coCau || dang} onClick={() => void vaoBan('ai', 'doi')}>Đánh đôi 2 đấu 2 với A.I<small>Em + 1 A.I đồng đội đấu 2 A.I · em giữ 4 bi</small></button>
             {sanh.giaoHuu.mo && <button type="button" className="bia-nut-phu" disabled={dang || sanh.giaoHuu.con <= 0} onClick={() => void vaoBan('giao_huu', 'don')}>Bàn giao hữu · còn {sanh.giaoHuu.con}/{sanh.giaoHuu.toiDa} ván<small>Không câu, không EXP · em đã xong kế hoạch hôm nay</small></button>}
@@ -80,6 +140,7 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
               <button type="button" className="bia-nut-phu" disabled>Đấu với bạn<small>Sắp mở</small></button>
               <button type="button" className="bia-nut-phu" disabled>Nhập mã bàn<small>Sắp mở</small></button>
             </div>
+            </>}
             <div className="bia-the">
               <b>Luật nhanh</b>
               <span className="bia-chu-nho">Bi của phe em rơi lỗ thì người giữ bi trả lời câu của bi, đúng mới ăn. Sai là sang lượt người khác ngay, em đọc lời giải. Lúc người khác đánh: giải trước bi của em (đúng thì bi hoá vàng) hoặc xem lại câu sai. Ăn đủ 7 bi rồi hạ Bi chốt carbon và trả lời Câu chốt để thắng.</span>
@@ -87,6 +148,13 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
           </>}
         </div>
       </div>
+      {online && loiMoi[0] && <div className="bia-loi-moi" role="dialog" aria-label="Lời mời đấu Bi-a">
+        <span><b>{loiMoi[0].tu}</b> mời em {loiMoi[0].loai === 'giao_huu' ? 'chơi Bàn giao hữu' : 'đấu Bi-a'} · {loiMoi[0].cheDo === 'doi' ? 'đánh đôi' : 'đấu đơn'}<small>còn {loiMoi[0].conGiay} giây</small></span>
+        <div className="bia-hang-nut">
+          <button type="button" className="bia-nut-chu" onClick={() => { const m = loiMoi[0]!; setLoiMoi((d) => d.filter((x) => x.id !== m.id)); void traLoiLoiMoi(token, m.id, false).catch(() => {}) }}>Từ chối</button>
+          <button type="button" className="bia-nut-vang" disabled={dang} onClick={() => { const m = loiMoi[0]!; setLoiMoi((d) => d.filter((x) => x.id !== m.id)); void moBanOnline(async () => (await traLoiLoiMoi(token, m.id, true))!) }}>Nhận</button>
+        </div>
+      </div>}
     </div>
   )
 }

@@ -22,9 +22,8 @@
 //    $E^\circ_{Ni^{2+}/Ni}$). Render bằng KaTeX (nhẹ, nhanh trên điện thoại
 //    hơn MathJax). Công thức lỗi cú pháp -> hiện nguyên văn kèm dấu cảnh báo,
 //    KHÔNG BAO GIỜ để trắng hay làm sập trang (bọc try/catch).
-import type { JSX } from 'react'
-import katex from 'katex'
-import 'katex/contrib/mhchem'
+import { memo, useEffect, useSyncExternalStore, type JSX } from 'react'
+import type KatexT from 'katex'
 import { goKyTuLa } from './chu-la-pdf'
 import { gomTuCongThuc, laNhanMuiTen, nhanTruocMuiTenVeSau, tachDongSoDo } from './chem-format-so-do'
 
@@ -780,12 +779,92 @@ function ChemTextNoMui({ text }: { text: string }): JSX.Element {
   )
 }
 
-function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
+// KaTeX NẠP LƯỜI (28/09). Bộ dựng công thức (≈ 270 KB thô + CSS) nằm ở mảnh
+// riêng `katex-goi.ts`, chỉ tải khi có công thức cần vẽ. `main.tsx` tải sẵn
+// ngay lúc mở với đường vào có công thức (màn thi, cổng học sinh, phiếu), còn
+// lại tải lúc rảnh sau khi trang đã hiện. Chưa về kịp thì công thức hiện
+// nguyên văn chữ trong một nhịp rồi tự vẽ lại khi KaTeX tới.
+type Katex = typeof KatexT
+let katexSan: Katex | null = null
+let huaKatex: Promise<Katex> | null = null
+const nguoiChoKatex = new Set<() => void>()
+
+/** Tải KaTeX một lần (gọi nhiều lần vẫn một lượt tải). Hỏng thì lần sau thử lại. */
+export function napKatex(): Promise<Katex> {
+  if (!huaKatex) {
+    huaKatex = import('./katex-goi').then(
+      (m) => {
+        katexSan = m.default
+        for (const f of nguoiChoKatex) f()
+        return m.default
+      },
+      (e) => {
+        huaKatex = null
+        throw e
+      },
+    )
+  }
+  return huaKatex
+}
+
+function ngheKatex(f: () => void): () => void {
+  nguoiChoKatex.add(f)
+  return () => nguoiChoKatex.delete(f)
+}
+const docKatex = () => katexSan
+
+/** KaTeX đã sẵn thì trả ngay (không nhịp vẽ thừa); chưa thì xin tải và vẽ lại khi về. */
+function useKatex(): Katex | null {
+  const k = useSyncExternalStore(ngheKatex, docKatex, docKatex)
+  useEffect(() => {
+    if (!k) void napKatex().catch(() => {})
+  }, [k])
+  return k
+}
+
+/** Kết quả dựng một công thức — HÀM THUẦN của (t, latex gốc) nên nhớ lại được. */
+type KetQuaCongThuc = { latex: string; html: string; dai: boolean } | { latex: string; loi: true }
+
+// NHỚ KẾT QUẢ KaTeX (28/09). `katex.renderToString` là phần đắt nhất khi vẽ đề
+// (~260 công thức/đề). Cùng chuỗi nguồn ⇒ cùng HTML, nên giữ lại theo kiểu LRU
+// (Map giữ thứ tự chèn; đọc trúng thì chèn lại xuống cuối; vượt trần thì bỏ
+// mục cũ nhất). Kết quả hiển thị y hệt bản không nhớ.
+const TRAN_NHO_CONG_THUC = 2000
+const nhoCongThuc = new Map<string, KetQuaCongThuc>()
+
+function dungCongThuc(katex: Katex, t: 'ce' | 'math', latexGoc: string): KetQuaCongThuc {
+  const khoa = t + '\u0000' + latexGoc
+  const co = nhoCongThuc.get(khoa)
+  if (co) {
+    nhoCongThuc.delete(khoa)
+    nhoCongThuc.set(khoa, co)
+    return co
+  }
   // Chuẩn hoá TRƯỚC khi đưa cho mhchem
   const latex = chuanHoaCongThucTongQuat(chuanHoaNhanMuiTen(kyHieuToanVeLatex(t === 'ce' ? chuanHoaMuiTenMhchem(latexGoc) : latexGoc)))
+  let kq: KetQuaCongThuc
   try {
     const html = katex.renderToString(t === 'ce' ? `\\ce{${latex}}` : latex, KATEX_OPTS)
-    if (beRongUocTinh(latex) > DAI_PHAI_CUON) {
+    kq = { latex, html, dai: beRongUocTinh(latex) > DAI_PHAI_CUON }
+  } catch {
+    kq = { latex, loi: true }
+  }
+  nhoCongThuc.set(khoa, kq)
+  if (nhoCongThuc.size > TRAN_NHO_CONG_THUC) nhoCongThuc.delete(nhoCongThuc.keys().next().value as string)
+  return kq
+}
+
+/** memo: đồng hồ màn thi / chọn đáp án làm cha vẽ lại, công thức không đổi chuỗi
+ * thì KHÔNG dựng lại (so nông đúng cả hai prop `t` + `latex`, đều là chuỗi). */
+const ChemFormula = memo(function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }): JSX.Element {
+  const katex = useKatex()
+  // KaTeX chưa về (chỉ một nhịp ở lần mở đầu): hiện nguyên văn, không để trống.
+  if (!katex) return <span className="ct-cho-katex">{latexGoc}</span>
+  const kq = dungCongThuc(katex, t, latexGoc)
+  const latex = kq.latex
+  if (!('loi' in kq)) {
+    const html = kq.html
+    if (kq.dai) {
       return (
         <span
           className="ct-dai"
@@ -797,21 +876,23 @@ function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }
     }
     // eslint-disable-next-line react/no-danger
     return <span dangerouslySetInnerHTML={{ __html: html }} />
-  } catch {
-    const goc = t === 'ce' ? `\\ce{${latex}}` : `$${latex}$`
-    return (
-      <span className="underline decoration-wavy decoration-rose-500 text-rose-600" title="Công thức lỗi cú pháp — hiện nguyên văn, thầy tự kiểm tra lại">
-        {goc}
-      </span>
-    )
   }
-}
+  const goc = t === 'ce' ? `\\ce{${latex}}` : `$${latex}$`
+  return (
+    <span className="underline decoration-wavy decoration-rose-500 text-rose-600" title="Công thức lỗi cú pháp — hiện nguyên văn, thầy tự kiểm tra lại">
+      {goc}
+    </span>
+  )
+})
 
 /** Component hiển thị: <ChemText text={item.question.text} /> — nhận cả cú
  * pháp cũ (H2SO4, Na+, SO4^{2-} — tự suy chỉ số dưới/số mũ) LẪN cú pháp mới
  * chuẩn mhchem (\ce{...}, $...$) trong CÙNG một chuỗi, không cần chuyển đổi
  * dữ liệu cũ. */
-export function ChemText({ text }: { text: string }): JSX.Element {
+// memo (28/09): màn thi vẽ ~100 thẻ câu; cha vẽ lại (chọn đáp án, lưu tạm…) mà
+// chuỗi đề không đổi thì bỏ qua cả cây tách sơ đồ/công thức. Prop duy nhất là
+// `text` (chuỗi) ⇒ so nông là đúng.
+export const ChemText = memo(function ChemText({ text }: { text: string }): JSX.Element {
   // Lớp chắn cuối cho ký tự vùng dùng riêng: đề cũ đã nằm trong máy trước khi
   // cửa nạp biết dọn thì vẫn hiện đúng chứ không ra ô vuông rỗng.
   const khucs = tachDongSoDo(goKyTuLa(text ?? ''))
@@ -830,7 +911,7 @@ export function ChemText({ text }: { text: string }): JSX.Element {
       )}
     </>
   )
-}
+})
 
 function laMuiPart(p: ChemPart): boolean {
   return p.t === 'mui' || (p.t === 'text' && /^[→←⇌]$/.test(p.v))

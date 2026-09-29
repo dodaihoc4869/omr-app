@@ -3,18 +3,23 @@
 // (phiên `mode:'bia'`, `hoa2:1`, `bia:1`), nên Thể lực, EXP (trần 120/ngày), lịch ôn, Câu đã làm tự khớp như Đảo và Đoàn.
 // Trần Bi-a (thầy chốt 28/09): tối đa floor(40% phần Đoàn) + floor(40% phần Đảo) của kế hoạch hôm nay.
 import type { Env, DongCa, DongLuot } from './kieu'
+import { docCauHinhDem } from './cau-hinh-dem'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { protectedQuestions } from './game-v2-bank'
 import { HANG_MUC_DO } from './srs2-loi'
-import { cheDo2, docCoHoa2Tu, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type KeHoachDaChot, type MetaCau } from './srs2-d1'
+import { cheDo2, docCoHoa2Tu, docNhanNo, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type KeHoachDaChot, type MetaCau } from './srs2-d1'
 import { cauDangGiu, DK_PHIEN_BIA_MO, DK_PHIEN_DAO_DOAN, goiYCho, napCau, type RefPhien } from './srs2-game'
 import { quyetDinhVaoThi } from './luat-vao-thi'
+import { docVe, kyVe } from './bi-a-ve'
+import { biCuaGhe, chiaBi, giayCau } from '../../src/game/bi-a/luat'
+import { laKiHieu } from '../../src/game/bi-a/nguyen-to'
+import { ELO_DAU, type CauBi } from '../../src/game/bi-a/tran'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
 
-export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van'])
+export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van', 'bia-tao-ban', 'bia-vao-ban', 'bia-moi', 'bia-loi-moi', 'bia-tra-loi-moi'])
 /** Khoá cờ riêng (không nhét vào `game_hoa_2` vì `coLuu` của nó ghi đè đúng 3 trường). Giá trị `{bat, lop[], sbd[]}`. */
 export const KHOA_CO_BIA = 'bi_a'
 export const TI_LE_TRAN_BIA = 0.4
@@ -47,7 +52,7 @@ export const SQL_BANG_BIA: readonly string[] = [
   'CREATE TABLE IF NOT EXISTS bi_a_diem_ban (sbd TEXT PRIMARY KEY, diem INTEGER NOT NULL DEFAULT 1000, so_van INTEGER NOT NULL DEFAULT 0, cap_nhat TEXT)',
   'CREATE TABLE IF NOT EXISTS bi_a_moi (id TEXT PRIMARY KEY, tu_sbd TEXT NOT NULL, den_sbd TEXT NOT NULL, loai TEXT NOT NULL, van TEXT, ghe INTEGER, trang_thai TEXT NOT NULL, tao_luc TEXT NOT NULL)',
   'CREATE INDEX IF NOT EXISTS bi_a_moi_den ON bi_a_moi(den_sbd, trang_thai)',
-  'CREATE TABLE IF NOT EXISTS bi_a_co_mat (sbd TEXT PRIMARY KEY, ten_lop TEXT, last_seen TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS bi_a_co_mat (sbd TEXT PRIMARY KEY, ten_lop TEXT, last_seen TEXT NOT NULL, con_tran INTEGER)',
   'CREATE INDEX IF NOT EXISTS bi_a_co_mat_lop ON bi_a_co_mat(ten_lop, last_seen)',
 ]
 const bangDaDung = new WeakMap<object, Promise<void>>()
@@ -55,7 +60,10 @@ export function damBaoBangBia(env: Env): Promise<void> {
   const db = env.DB as unknown as object
   let p = bangDaDung.get(db)
   if (!p) {
-    p = env.DB.batch(SQL_BANG_BIA.map((s) => env.DB.prepare(s))).then(() => undefined)
+    p = env.DB.batch(SQL_BANG_BIA.map((s) => env.DB.prepare(s)))
+      // GĐ2 thêm cột (CHỈ THÊM): bảng đã dựng ở bản GĐ1 chưa có `con_tran` — ALTER một lần, "đã có cột" thì bỏ qua.
+      .then(() => env.DB.prepare('ALTER TABLE bi_a_co_mat ADD COLUMN con_tran INTEGER').run().catch(() => undefined))
+      .then(() => undefined)
     p.catch(() => bangDaDung.delete(db)) // lỗi ⇒ lượt sau thử lại
     bangDaDung.set(db, p)
   }
@@ -64,8 +72,7 @@ export function damBaoBangBia(env: Env): Promise<void> {
 
 // ---------------------------------------------------------------- cờ + khoá
 export async function docCoBia(env: Env) {
-  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CO_BIA).first<{ gia_tri: string }>().catch(() => null)
-  return docCoHoa2Tu(r?.gia_tri)
+  return docCoHoa2Tu(await docCauHinhDem(env, KHOA_CO_BIA)) // đệm 15 s trong isolate (cau-hinh-dem.ts)
 }
 /** Bi-a mở cho em khi: Game Hóa 2.0 mở cho em (Sảnh Bát Linh) VÀ cờ `bi_a` bật cho em (theo sbd, theo lớp, hoặc cả trường khi không liệt kê). Lỗi đọc ⇒ đóng. */
 export async function biaMoCho(env: Env, sbd: string): Promise<boolean> {
@@ -170,11 +177,9 @@ export function xepUngVienChot(khoa: readonly string[], hs: Pick<HoSo2, 'meta' |
 }
 
 async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>) {
-  for (const k of khoa) {
-    const [x] = await napCau(env, hs, [k], 1, chan)
-    if (x) return x
-  }
-  return null
+  // Tối ưu 28/09: napCau đã nạp theo lô (một truy vấn) và bỏ câu hỏng ⇒ không lặp từng câu (N+1). Kết quả y hệt: câu dùng được ĐẦU TIÊN.
+  const [x] = await napCau(env, hs, khoa, 1, chan)
+  return x ?? null
 }
 
 // ---------------------------------------------------------------- lệnh
@@ -186,6 +191,11 @@ export async function biaAction(env: Env, sbd: string, action: string, b: Row, n
   if (action === 'bia-xep-ban') return xepBan(env, sbd, b, nowMs)
   if (action === 'bia-doi-cau') return doiCau(env, sbd, b, nowMs)
   if (action === 'bia-ket-van') return ketVan(env, sbd, b, nowMs)
+  if (action === 'bia-tao-ban') return taoBanOnline(env, sbd, b, nowMs)
+  if (action === 'bia-vao-ban') return vaoBanMa(env, sbd, b, nowMs)
+  if (action === 'bia-moi') return moiBan(env, sbd, b, nowMs)
+  if (action === 'bia-loi-moi') return loiMoi(env, sbd, b, nowMs)
+  if (action === 'bia-tra-loi-moi') return traLoiMoi(env, sbd, b, nowMs)
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
@@ -213,14 +223,20 @@ async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<str
     doan: { con: kh.conDoan.length }, dao: { con: kh.conDao.length },
     tran: { con: coCau, tong: tran.tong, tranDoan: tran.tranDoan, tranDao: tran.tranDao, conDoan: Math.min(tran.conDoan, c.ungDoan.length), conDao: Math.min(tran.conDao, c.ungDao.length) },
     giaoHuu: { mo: xong && daGiaoHuu < TOI_DA_GIAO_HUU, con: xong ? Math.max(0, TOI_DA_GIAO_HUU - daGiaoHuu) : 0, toiDa: TOI_DA_GIAO_HUU },
+    online: !!env.BAN_BIA,
+    diemBan: await docDiemBan(env, sbd),
   }
+}
+async function docDiemBan(env: Env, sbd: string): Promise<{ diem: number; soVan: number }> {
+  const r = await env.DB.prepare('SELECT diem, so_van FROM bi_a_diem_ban WHERE sbd = ?').bind(sbd).first<Row>().catch(() => null)
+  return { diem: Number(r?.diem) || ELO_DAU, soVan: Number(r?.so_van) || 0 }
 }
 
 /** Đóng mọi ván Bi-a còn mở của em (G8: mỗi em một ván mở; vào ván mới là bỏ ván cũ — câu chưa trả lời tự về kế hoạch). */
-async function dongVanCu(env: Env, sbd: string, nowMs: number): Promise<void> {
+async function dongVanCu(env: Env, sbd: string, nowMs: number, truVan = ''): Promise<void> {
   const luc = new Date(nowMs).toISOString()
-  await env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.dong', 1) WHERE sbd = ? AND json_extract(json,'$.bia') = 1 AND COALESCE(json_extract(json,'$.dong'),0) = 0`).bind(sbd).run()
-  await env.DB.prepare(`UPDATE bi_a_van SET trang_thai = 'bo', xong_luc = ? WHERE chu_ban = ? AND trang_thai = 'mo'`).bind(luc, sbd).run()
+  await env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.dong', 1) WHERE sbd = ? AND json_extract(json,'$.bia') = 1 AND COALESCE(json_extract(json,'$.dong'),0) = 0 AND COALESCE(json_extract(json,'$.van'),'') <> ?`).bind(sbd, truVan).run()
+  await env.DB.prepare(`UPDATE bi_a_van SET trang_thai = 'bo', xong_luc = ? WHERE chu_ban = ? AND trang_thai IN ('mo','cho') AND id <> ?`).bind(luc, sbd, truVan).run()
 }
 
 async function taoVan(env: Env, id: string, loai: 'ai' | 'giao_huu', cheDo: 'don' | 'doi', ngay: string, sbd: string, session: string | null, nowMs: number) {
@@ -231,33 +247,29 @@ async function taoVan(env: Env, id: string, loai: 'ai' | 'giao_huu', cheDo: 'don
   ])
 }
 
-async function xepBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
-  const loai = str(b.loai) === 'giao_huu' ? 'giao_huu' : 'ai'
-  const cheDo = str(b.cheDo) === 'doi' ? 'doi' : 'don'
-  const soBi = SO_BI_HOP_LE.has(Number(b.soBi)) ? Number(b.soBi) : cheDo === 'doi' ? 4 : 7
-  await dongVanCu(env, sbd, nowMs)
+/** Kết quả chọn câu cho các bi của MỘT em (dùng chung cho ván A.I và ván online). */
+type ChonCau =
+  | { ok: false; kq: Record<string, unknown> }
+  | { ok: true; session: string; cau: CauBia[]; qs: PrivateQuestion[]; chot: CauBia | null; chotQ: PrivateQuestion | null; tranCon: number; tranTong: number; kh: KeHoachDaChot }
+/**
+ * Chọn Câu chốt (G1) rồi tối đa `soBi` câu cho bi (phần Đoàn trước tới hết trần phần Đoàn, rồi phần Đảo; giữ thứ tự kế hoạch), tạo phiên
+ * `{mode:'bia', hoa2:1, bia:1, van, cheDo, questions}`. Hết câu / hết trần ⇒ `ok:false` kèm lý do cho em.
+ */
+async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, van: string, cheDo: 'don' | 'doi', them: Record<string, unknown> = {}): Promise<ChonCau> {
   const c = await boiCanh(env, sbd, nowMs)
   const { kh, hs, tran } = c
   const conKeHoach = kh.conDao.length + kh.conDoan.length
-  if (!kh.tong) return { ok: true, lyDo: 'chua_co_chien_dich', message: LOI_BIA.chua_co_chien_dich }
-  const van = crypto.randomUUID()
-  if (loai === 'giao_huu') {
-    if (conKeHoach > 0) return { ok: true, lyDo: 'giao_huu_chua_mo', message: LOI_BIA.giao_huu_chua_mo }
-    const n = await demGiaoHuuHomNay(env, sbd, kh.ngay)
-    if (n >= TOI_DA_GIAO_HUU) return { ok: true, lyDo: 'het_luot_giao_huu', message: LOI_BIA.het_luot_giao_huu }
-    await taoVan(env, van, 'giao_huu', cheDo, kh.ngay, sbd, null, nowMs)
-    return { ok: true, van, loai, cheDo, bi: [], chot: null, giaoHuu: { con: Math.max(0, TOI_DA_GIAO_HUU - n - 1), toiDa: TOI_DA_GIAO_HUU } }
-  }
-  if (conKeHoach === 0) return { ok: true, lyDo: 'xong_ke_hoach', message: LOI_BIA.xong_ke_hoach }
+  if (!kh.tong) return { ok: false, kq: { ok: true, lyDo: 'chua_co_chien_dich', message: LOI_BIA.chua_co_chien_dich } }
+  if (conKeHoach === 0) return { ok: false, kq: { ok: true, lyDo: 'xong_ke_hoach', message: LOI_BIA.xong_ke_hoach } }
   let conDoan = Math.min(tran.conDoan, c.ungDoan.length), conDao = Math.min(tran.conDao, c.ungDao.length)
-  if (conDoan + conDao <= 0) return { ok: true, lyDo: tran.con <= 0 ? 'het_tran' : 'cau_dang_bao_ve', message: tran.con <= 0 ? LOI_BIA.het_tran : LOI_BIA.cau_dang_bao_ve, conDoan: kh.conDoan.length, conDao: kh.conDao.length }
+  if (conDoan + conDao <= 0) return { ok: false, kq: { ok: true, lyDo: tran.con <= 0 ? 'het_tran' : 'cau_dang_bao_ve', message: tran.con <= 0 ? LOI_BIA.het_tran : LOI_BIA.cau_dang_bao_ve, conDoan: kh.conDoan.length, conDao: kh.conDao.length } }
   // Câu chốt trước (G1), trong phần còn trần.
   const phepDoan = conDoan > 0 ? c.ungDoan : []
   const phepDao = conDao > 0 ? c.ungDao : []
   const chon = await napMot(env, hs, xepUngVienChot([...phepDoan, ...phepDao], hs), c.chan)
   const daLay = new Set<string>()
   const refs: RefPhien[] = []
-  const cau: CauBia[] = []
+  const cau: CauBia[] = [], qs: PrivateQuestion[] = []
   let chot: CauBia | null = null
   if (chon) {
     const ref = taoRef(chon.q, chon.m, hs, sbd, kh.ngay, true)
@@ -273,23 +285,47 @@ async function xepBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
   if (bi.length < soBi && conDao > 0) bi.push(...(await napCau(env, hs, c.ungDao, Math.min(conDao, soBi - bi.length), chanThem)))
   for (const x of bi) {
     const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, false)
-    refs.push(ref); cau.push(cauCongKhai(x.q, ref))
+    refs.push(ref); cau.push(cauCongKhai(x.q, ref)); qs.push(x.q)
   }
-  if (!refs.length) return { ok: true, lyDo: 'cau_dang_bao_ve', message: LOI_BIA.cau_dang_bao_ve }
+  if (!refs.length) return { ok: false, kq: { ok: true, lyDo: 'cau_dang_bao_ve', message: LOI_BIA.cau_dang_bao_ve } }
+  // Sổ nợ (29/09): nhãn nợ trên câu ôn ("Sai 2 lần · Ca 26/09 · …") — một truy vấn sổ; lỗi ⇒ không nhãn.
+  const nhan = await docNhanNo(env, sbd, hs, refs.map((r) => r.qid)).catch(() => new Map<string, string>())
+  for (const r of refs) { const n = nhan.get(r.qid); if (n) r.nhanNo = n }
+  for (const x of [...cau, ...(chot ? [chot] : [])]) { const n = nhan.get(str(x.qid)); if (n) x.nhanNo = n }
   const session = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)')
-    .bind(session, sbd, JSON.stringify({ mode: 'bia', created: nowMs, hoa2: 1, bia: 1, van, cheDo, questions: refs }), new Date(nowMs).toISOString()).run()
-  await taoVan(env, van, 'ai', cheDo, kh.ngay, sbd, session, nowMs)
-  const dung = refs.length
+    .bind(session, sbd, JSON.stringify({ mode: 'bia', created: nowMs, hoa2: 1, bia: 1, van, cheDo, ...them, questions: refs }), new Date(nowMs).toISOString()).run()
+  return { ok: true, session, cau, qs, chot, chotQ: chon?.q ?? null, tranCon: Math.max(0, tran.con - refs.length), tranTong: tran.tong, kh }
+}
+
+async function xepBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  if (b.veGhe != null) return xepBanOnline(env, sbd, b, nowMs)
+  const loai = str(b.loai) === 'giao_huu' ? 'giao_huu' : 'ai'
+  const cheDo = str(b.cheDo) === 'doi' ? 'doi' : 'don'
+  const soBi = SO_BI_HOP_LE.has(Number(b.soBi)) ? Number(b.soBi) : cheDo === 'doi' ? 4 : 7
+  await dongVanCu(env, sbd, nowMs)
+  const van = crypto.randomUUID()
+  if (loai === 'giao_huu') {
+    const { kh } = await layKeHoachHomNay(env, sbd, nowMs)
+    if (!kh.tong) return { ok: true, lyDo: 'chua_co_chien_dich', message: LOI_BIA.chua_co_chien_dich }
+    if (kh.conDao.length + kh.conDoan.length > 0) return { ok: true, lyDo: 'giao_huu_chua_mo', message: LOI_BIA.giao_huu_chua_mo }
+    const n = await demGiaoHuuHomNay(env, sbd, kh.ngay)
+    if (n >= TOI_DA_GIAO_HUU) return { ok: true, lyDo: 'het_luot_giao_huu', message: LOI_BIA.het_luot_giao_huu }
+    await taoVan(env, van, 'giao_huu', cheDo, kh.ngay, sbd, null, nowMs)
+    return { ok: true, van, loai, cheDo, bi: [], chot: null, giaoHuu: { con: Math.max(0, TOI_DA_GIAO_HUU - n - 1), toiDa: TOI_DA_GIAO_HUU } }
+  }
+  const r = await chonCauBan(env, sbd, nowMs, soBi, van, cheDo)
+  if (!r.ok) return r.kq
+  await taoVan(env, van, 'ai', cheDo, r.kh.ngay, sbd, r.session, nowMs)
   return {
-    ok: true, van, session, loai, cheDo, soBi,
-    bi: cau, trong: Math.max(0, soBi - cau.length), chot,
-    tran: { con: Math.max(0, tran.con - dung), tong: tran.tong },
-    theLuc: { con: conKeHoach, tong: kh.tong }, conDoan: kh.conDoan.length, conDao: kh.conDao.length,
+    ok: true, van, session: r.session, loai, cheDo, soBi,
+    bi: r.cau, trong: Math.max(0, soBi - r.cau.length), chot: r.chot,
+    tran: { con: r.tranCon, tong: r.tranTong },
+    theLuc: { con: r.kh.conDao.length + r.kh.conDoan.length, tong: r.kh.tong }, conDoan: r.kh.conDoan.length, conDao: r.kh.conDao.length,
   }
 }
 
-interface PhienBia { mode: string; created: number; bia?: number; dong?: number; van?: string; questions: RefPhien[] }
+interface PhienBia { mode: string; created: number; bia?: number; dong?: number; van?: string; online?: number; questions: RefPhien[] }
 async function docPhien(env: Env, sbd: string, id: string, nowMs: number): Promise<PhienBia> {
   const r = await env.DB.prepare('SELECT json FROM game_v2_session WHERE id = ? AND sbd = ?').bind(id, sbd).first<{ json: string }>()
   if (!r) throw new Error('Không tìm thấy ván Bi-a của em.')
@@ -313,16 +349,21 @@ async function doiCau(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
   for (const q of p.questions) c.chan.add(q.qid)
   const conDoan = Math.min(tran.conDoan, c.ungDoan.length), conDao = Math.min(tran.conDao, c.ungDao.length)
   const phep = [...(conDoan > 0 ? c.ungDoan : []), ...(conDao > 0 ? c.ungDao : [])]
-  if (!phep.length) return { ok: true, trong: true }
+  if (!phep.length) return { ok: true, trong: true, ...(await veTrong(env, p, sbd, b, nowMs)) }
   const dang = hs.meta.get(qidCu)?.dang ?? null
   const cungDang = phep.filter((k) => dang && hs.meta.get(qidGoc(k))?.dang === dang)
   const thu = laChot ? xepUngVienChot(phep, hs) : [...cungDang, ...phep.filter((k) => !cungDang.includes(k))]
   const x = await napMot(env, hs, thu, c.chan)
-  if (!x) return { ok: true, trong: true }
+  if (!x) return { ok: true, trong: true, ...(await veTrong(env, p, sbd, b, nowMs)) }
   const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, laChot)
   p.questions.push(ref)
   await env.DB.prepare('UPDATE game_v2_session SET json = ? WHERE id = ? AND sbd = ?').bind(JSON.stringify(p), id, sbd).run()
-  return { ok: true, trong: false, cau: cauCongKhai(x.q, ref) }
+  const cauMoi = cauCongKhai(x.q, ref)
+  if (p.online === 1 && p.van && laKiHieu(b.ki)) {
+    const ve = await kyVe(env, { k: 'cau', van: p.van, sbd, ki: b.ki, cau: cauBiCua(x.q), het: nowMs + HAN_VE_MS })
+    return { ok: true, trong: false, cau: cauMoi, ve }
+  }
+  return { ok: true, trong: false, cau: cauMoi }
 }
 
 interface GheVao { ghe: number; doi: number; ai: boolean; dung: number; sai: number; an: number; vang: number }
@@ -377,3 +418,140 @@ export async function biaChoSanh(env: Env, sbd: string, nowMs: number): Promise<
 
 /** Ngày VN hiện tại — xuất lại cho test. */
 export const ngayBia = (nowMs: number): string => ngayVnCua(nowMs)
+
+// ---------------------------------------------------------------- ĐẤU VỚI BẠN (GĐ2, đặc tả 6.2, 6.3, 8.2)
+// Sảnh chỉ làm việc "giấy tờ" (tạo bàn, mã bàn, mời, có mặt, xếp câu cho ghế) rồi cấp VÉ KÝ; mọi thứ trong ván do phòng đấu `BanBiA` giữ.
+const HAN_VE_MS = 2 * 3_600_000
+const GIAY_CO_MAT = 20
+const GIAY_MOI = 60
+const loaiBan = (x: unknown): 'ban' | 'giao_huu' => (x === 'giao_huu' ? 'giao_huu' : 'ban')
+const cheDoBan = (x: unknown): 'don' | 'doi' => (x === 'doi' ? 'doi' : 'don')
+const cauBiCua = (q: PrivateQuestion): CauBi => ({ qid: q.qid, muc: q.mucDo ?? 'NB', giay: giayCau(q.phan) })
+const truocGiay = (nowMs: number, giay: number) => new Date(nowMs - giay * 1000).toISOString()
+async function emCua(env: Env, sbd: string): Promise<{ ten: string; lop: string }> {
+  const r = await env.DB.prepare(`SELECT COALESCE(NULLIF(h.ho_ten, ''), d.ho_ten, x.sbd) AS ten, COALESCE(NULLIF(h.lop, ''), d.lop, '') AS lop
+      FROM (SELECT ? AS sbd) x LEFT JOIN hoc_sinh h ON h.sbd = x.sbd LEFT JOIN danh_sach d ON d.sbd = x.sbd`).bind(sbd).first<Row>()
+  return { ten: str(r?.ten) || sbd, lop: str(r?.lop).trim() }
+}
+/** Em vào được bàn loại này không: bàn tính câu cần còn trần Bi-a; Bàn giao hữu cần đã xong kế hoạch và còn lượt (G2). */
+async function kiemVaoOnline(env: Env, sbd: string, loai: 'ban' | 'giao_huu', nowMs: number): Promise<void> {
+  if (!env.BAN_BIA) throw new Error('Đấu với bạn chưa mở.')
+  const s = await sanhBia(env, sbd, nowMs)
+  const gh = s.giaoHuu as { mo: boolean }, tran = s.tran as { con: number }
+  if (loai === 'giao_huu') { if (!gh.mo) throw new Error(s.lyDoKhoa === 'xong_ke_hoach' ? LOI_BIA.het_luot_giao_huu : LOI_BIA.giao_huu_chua_mo); return }
+  if (s.lyDoKhoa || !(tran.con > 0)) throw new Error(str(s.message) || LOI_BIA.het_tran)
+}
+async function maBanMoi(env: Env, nowMs: number): Promise<string> {
+  for (let i = 0; i < 30; i++) {
+    const ma = String(1000 + Math.floor(Math.random() * 9000))
+    const trung = await env.DB.prepare("SELECT 1 AS co FROM bi_a_van WHERE trang_thai = 'cho' AND json_extract(json,'$.ma') = ? AND tao_luc >= ?").bind(ma, new Date(nowMs - HAN_VE_MS).toISOString()).first<Row>()
+    if (!trung) return ma
+  }
+  throw new Error('Chưa cấp được mã bàn. Em thử lại.')
+}
+async function veSanh(env: Env, o: { van: string; sbd: string; cheDo: 'don' | 'doi'; loai: 'ban' | 'giao_huu'; chu: boolean; ma: string | null }, nowMs: number): Promise<string> {
+  const em = await emCua(env, o.sbd)
+  return kyVe(env, { k: 'sanh', ...o, ten: em.ten, het: nowMs + HAN_VE_MS })
+}
+/** Tạo bàn (chủ bàn ngồi ghế 1, Phe Kim loại, phá bàn). Trả mã bàn 4 chữ số + vé vào phòng. */
+async function taoBanOnline(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const cheDo = cheDoBan(b.cheDo), loai = loaiBan(b.loai)
+  await kiemVaoOnline(env, sbd, loai, nowMs)
+  await dongVanCu(env, sbd, nowMs)
+  const van = crypto.randomUUID(), ma = await maBanMoi(env, nowMs)
+  await env.DB.prepare(`INSERT INTO bi_a_van (id, loai, che_do, ngay, chu_ban, trang_thai, json, tao_luc) VALUES (?,?,?,?,?, 'cho', ?, ?)`)
+    .bind(van, loai, cheDo, ngayVnCua(nowMs), sbd, JSON.stringify({ ma, online: 1 }), new Date(nowMs).toISOString()).run()
+  return { ok: true, van, ma, cheDo, loai, ve: await veSanh(env, { van, sbd, cheDo, loai, chu: true, ma }, nowMs) }
+}
+/** Nhập mã bàn (bạn ngồi cạnh). */
+async function vaoBanMa(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const ma = str(b.ma).replace(/\D/g, '')
+  if (!/^\d{4}$/.test(ma)) throw new Error('Mã bàn gồm 4 chữ số.')
+  const v = await env.DB.prepare("SELECT id, loai, che_do, chu_ban FROM bi_a_van WHERE trang_thai = 'cho' AND json_extract(json,'$.ma') = ? AND tao_luc >= ? ORDER BY tao_luc DESC LIMIT 1")
+    .bind(ma, new Date(nowMs - HAN_VE_MS).toISOString()).first<Row>()
+  if (!v) throw new Error('Không thấy bàn có mã này. Bàn đã đóng hoặc đã bắt đầu.')
+  const loai = loaiBan(v.loai), cheDo = cheDoBan(v.che_do), laChu = str(v.chu_ban) === sbd
+  if (!laChu) await kiemVaoOnline(env, sbd, loai, nowMs)
+  return { ok: true, van: str(v.id), ma, cheDo, loai, ve: await veSanh(env, { van: str(v.id), sbd, cheDo, loai, chu: laChu, ma }, nowMs) }
+}
+/** Chủ bàn mời một bạn cùng lớp đang ở Sảnh Bi-a (thấy trong 20 giây). Lời mời hết hạn sau 60 giây. */
+async function moiBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const van = str(b.van), den = str(b.den)
+  const v = await env.DB.prepare('SELECT loai, chu_ban, trang_thai FROM bi_a_van WHERE id = ?').bind(van).first<Row>()
+  if (!v || str(v.chu_ban) !== sbd || str(v.trang_thai) !== 'cho') throw new Error('Bàn không còn chờ người.')
+  if (!den || den === sbd) throw new Error('Em chọn một bạn để mời.')
+  const em = await emCua(env, sbd)
+  const co = await env.DB.prepare('SELECT 1 AS co FROM bi_a_co_mat WHERE sbd = ? AND ten_lop = ? AND last_seen >= ?').bind(den, em.lop, truocGiay(nowMs, GIAY_CO_MAT)).first<Row>()
+  if (!co) throw new Error('Bạn này không còn ở Sảnh Bi-a.')
+  const cu = await env.DB.prepare("SELECT id FROM bi_a_moi WHERE van = ? AND den_sbd = ? AND trang_thai = 'cho' AND tao_luc >= ?").bind(van, den, truocGiay(nowMs, GIAY_MOI)).first<Row>()
+  if (cu) return { ok: true, id: str(cu.id) }
+  const id = crypto.randomUUID()
+  await env.DB.prepare("INSERT INTO bi_a_moi (id, tu_sbd, den_sbd, loai, van, ghe, trang_thai, tao_luc) VALUES (?,?,?,?,?, NULL, 'cho', ?)").bind(id, sbd, den, loaiBan(v.loai), van, new Date(nowMs).toISOString()).run()
+  return { ok: true, id }
+}
+/**
+ * Hỏi mỗi 6 giây, CHỈ khi em đang ở Sảnh Bi-a (đặc tả 6.2): ghi "có mặt" (kèm số câu Bi-a còn của em để bạn thấy), trả bạn cùng lớp đang ở Sảnh,
+ * lời mời đang chờ em, và bạn đã trả lời lời mời của em. Một lô D1 (1 ghi + 3 đọc).
+ */
+async function loiMoi(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const em = await emCua(env, sbd)
+  const con = Math.max(0, Math.min(999, Math.floor(Number(b.con) || 0)))
+  const luc = new Date(nowMs).toISOString(), hanMoi = truocGiay(nowMs, GIAY_MOI)
+  const [, ban, moi, phanHoi] = await env.DB.batch<Row>([
+    env.DB.prepare('INSERT INTO bi_a_co_mat (sbd, ten_lop, last_seen, con_tran) VALUES (?,?,?,?) ON CONFLICT(sbd) DO UPDATE SET ten_lop = excluded.ten_lop, last_seen = excluded.last_seen, con_tran = excluded.con_tran').bind(sbd, em.lop, luc, con),
+    env.DB.prepare(`SELECT c.sbd, c.con_tran, COALESCE(NULLIF(h.ho_ten, ''), c.sbd) AS ten FROM bi_a_co_mat c LEFT JOIN hoc_sinh h ON h.sbd = c.sbd
+        WHERE c.ten_lop = ? AND c.ten_lop <> '' AND c.sbd <> ? AND c.last_seen >= ? ORDER BY ten LIMIT 40`).bind(em.lop, sbd, truocGiay(nowMs, GIAY_CO_MAT)),
+    env.DB.prepare(`SELECT m.id, m.loai, m.tao_luc, v.che_do, COALESCE(NULLIF(h.ho_ten, ''), m.tu_sbd) AS ten FROM bi_a_moi m JOIN bi_a_van v ON v.id = m.van LEFT JOIN hoc_sinh h ON h.sbd = m.tu_sbd
+        WHERE m.den_sbd = ? AND m.trang_thai = 'cho' AND m.tao_luc >= ? AND v.trang_thai = 'cho' ORDER BY m.tao_luc DESC LIMIT 3`).bind(sbd, hanMoi),
+    env.DB.prepare(`SELECT m.id, m.trang_thai, COALESCE(NULLIF(h.ho_ten, ''), m.den_sbd) AS ten FROM bi_a_moi m LEFT JOIN hoc_sinh h ON h.sbd = m.den_sbd
+        WHERE m.tu_sbd = ? AND m.trang_thai IN ('tu_choi', 'nhan') AND m.tao_luc >= ?`).bind(sbd, hanMoi),
+  ])
+  return {
+    ok: true,
+    ban: (ban?.results ?? []).map((x) => ({ sbd: str(x.sbd), ten: str(x.ten), conTran: Math.max(0, Number(x.con_tran) || 0) })),
+    moi: (moi?.results ?? []).map((x) => ({ id: str(x.id), tu: str(x.ten), cheDo: cheDoBan(x.che_do), loai: loaiBan(x.loai), conGiay: Math.max(0, Math.round((Date.parse(str(x.tao_luc)) + GIAY_MOI * 1000 - nowMs) / 1000)) })),
+    phanHoi: (phanHoi?.results ?? []).map((x) => ({ id: str(x.id), ten: str(x.ten), nhan: str(x.trang_thai) === 'nhan' })),
+  }
+}
+async function traLoiMoi(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const m = await env.DB.prepare(`SELECT m.id, m.van, m.trang_thai, m.tao_luc, v.loai, v.che_do, v.trang_thai AS vtt, v.json AS vjson FROM bi_a_moi m JOIN bi_a_van v ON v.id = m.van WHERE m.id = ? AND m.den_sbd = ?`)
+    .bind(str(b.id), sbd).first<Row>()
+  if (!m || str(m.trang_thai) !== 'cho' || str(m.tao_luc) < truocGiay(nowMs, GIAY_MOI)) throw new Error('Lời mời đã hết hạn.')
+  if (b.nhan !== true) { await env.DB.prepare("UPDATE bi_a_moi SET trang_thai = 'tu_choi' WHERE id = ?").bind(str(m.id)).run(); return { ok: true, tuChoi: true } }
+  if (str(m.vtt) !== 'cho') throw new Error('Bàn đã bắt đầu hoặc đã đóng.')
+  const loai = loaiBan(m.loai), cheDo = cheDoBan(m.che_do)
+  await kiemVaoOnline(env, sbd, loai, nowMs)
+  await env.DB.prepare("UPDATE bi_a_moi SET trang_thai = 'nhan' WHERE id = ?").bind(str(m.id)).run()
+  let ma: string | null = null
+  try { ma = str((JSON.parse(str(m.vjson)) as Row).ma) || null } catch { ma = null }
+  return { ok: true, van: str(m.van), cheDo, loai, ma, ve: await veSanh(env, { van: str(m.van), sbd, cheDo, loai, chu: false, ma }, nowMs) }
+}
+/**
+ * Phòng đấu đã Bắt đầu và cấp vé ghế ⇒ xếp câu cho ĐÚNG các bi của ghế đó (đấu đơn 7; đánh đôi người 1 của phe 4, người 2 của phe 3 — G11),
+ * trả câu công khai theo kí hiệu bi + vé trận (câu của từng bi, Câu chốt, phiên) để em đưa lại cho phòng.
+ */
+async function xepBanOnline(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const v = await docVe(env, b.veGhe, 'ghe', nowMs)
+  if (v.sbd !== sbd) throw new Error('Vé ghế không phải của em.')
+  const kis = biCuaGhe(chiaBi(v.cheDo), v.ghe)
+  const ve = (bi: Record<string, CauBi>, chot: CauBi | null, session: string | null) => kyVe(env, { k: 'tran', van: v.van, ghe: v.ghe, sbd, session, bi, chot, het: nowMs + HAN_VE_MS })
+  if (v.loai === 'giao_huu') {
+    await kiemVaoOnline(env, sbd, 'giao_huu', nowMs)
+    return { ok: true, van: v.van, ghe: v.ghe, loai: v.loai, cheDo: v.cheDo, session: null, bi: kis.map((ki) => ({ ki, cau: null })), chot: null, veTran: await ve({}, null, null) }
+  }
+  await dongVanCu(env, sbd, nowMs, v.van)
+  const r = await chonCauBan(env, sbd, nowMs, kis.length, v.van, v.cheDo, { online: 1, ghe: v.ghe })
+  if (!r.ok) return r.kq
+  const bi: Record<string, CauBi> = {}
+  r.qs.forEach((q, i) => { if (kis[i]) bi[kis[i]!] = cauBiCua(q) })
+  return {
+    ok: true, van: v.van, ghe: v.ghe, loai: v.loai, cheDo: v.cheDo, session: r.session,
+    bi: kis.map((ki, i) => ({ ki, cau: r.cau[i] ?? null })), chot: r.chot, tran: { con: r.tranCon, tong: r.tranTong },
+    veTran: await ve(bi, r.chotQ ? cauBiCua(r.chotQ) : null, r.session),
+  }
+}
+/** Câu thay trống (hết trần) ở ván online: vẫn cấp vé để phòng biết bi thành bi trống. */
+async function veTrong(env: Env, p: PhienBia, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  if (p.online !== 1 || !p.van || !laKiHieu(b.ki)) return {}
+  return { ve: await kyVe(env, { k: 'cau', van: p.van, sbd, ki: b.ki, cau: null, het: nowMs + HAN_VE_MS }) }
+}

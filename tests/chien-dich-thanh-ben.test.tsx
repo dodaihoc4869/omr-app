@@ -118,6 +118,9 @@ describe('Gọi lên bảng theo cờ', () => {
     render(<GoiLenBangScreen />)
     expect(await screen.findByRole('heading', { name: 'Chưa có chiến dịch nào' })).toBeTruthy()
     expect(goi).toHaveBeenCalledWith('/gv/chien-dich', { action: 'danh-sach' })
-    expect(screen.getByRole('button', { name: 'Gọi lên bảng theo một ca kiểm tra (cách cũ)' })).toBeTruthy()
+    // Thầy lệnh 28/09: xoá khối "Gọi lên bảng theo một ca kiểm tra (cách cũ)"; đầu mục có thẻ Chiến dịch · Dạy học (+ Kiểm tra đầu giờ, 29/09).
+    expect(screen.queryByRole('button', { name: /cách cũ/ })).toBeNull()
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Chiến dịch', 'Dạy học', 'Kiểm tra đầu giờ'])
+    expect(screen.getByRole('tab', { name: 'Chiến dịch' }).getAttribute('aria-selected')).toBe('true')
   })
 })

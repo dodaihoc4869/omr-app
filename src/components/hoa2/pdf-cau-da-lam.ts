@@ -16,6 +16,7 @@
 import { bangHtml, chuHtml, thoat } from '../../lib/html-phieu'
 import { CHUA_CO_LOI_GIAI, chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
 import type { CauDaLamMuc, ChiTietCau, LanLam } from './api'
+import { NHAN_NGUON_LAN } from './api'
 import { NHAN_PHAN, NHAN_TRANG_THAI, chuDS, nhanMucDo, tachDungSai, traLoiNganDung } from './cau-chuyen'
 import { gioThuNgay, ngayThang } from './thoi-gian'
 
@@ -84,9 +85,9 @@ export function chanTrangPdf(tt: ThongTinIn): string {
   return ['Câu đã làm', tt.hoTen.trim() || (tt.sbd ? `SBD ${tt.sbd}` : ''), tt.lop.trim()].filter(Boolean).join(' · ')
 }
 
-/** "Sai 29/09 (có gợi ý)" */
+/** "Sai 29/09 · Bi-a (có gợi ý)" */
 function chuLanIn(l: LanLam): string {
-  return `${l.dung ? 'Đúng' : 'Sai'} ${ngayThang(l.ngay)}${l.coGoiY ? ' (có gợi ý)' : ''}`
+  return `${l.dung ? 'Đúng' : 'Sai'} ${ngayThang(l.ngay)}${l.nguon ? ` · ${NHAN_NGUON_LAN[l.nguon]}` : ''}${l.coGoiY ? ' (có gợi ý)' : ''}`
 }
 
 const CHU_Y = ['a', 'b', 'c', 'd'] as const

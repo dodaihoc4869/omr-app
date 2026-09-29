@@ -15,6 +15,7 @@ import { moRuong, type KetQuaSanh, type SanhHoa2 } from './api'
 import { useBoCucNgang, type BoCucNgang } from './bo-cuc-ngang'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
 import CanhSanh3D from './CanhSanh3D'
+import HopDoiTen from './HopDoiTen'
 import { hat, hatBay, loatPhao, MAU_PHAO, nhanLuotMoMan, timFx, veToaDoFx } from './hieu-ung-sanh'
 import './sanh-ban-do.css'
 import './phong-baloo'
@@ -53,6 +54,8 @@ export interface SanhBanDoProps {
   onTuiDo: () => void
   onCuaHang: () => void
   onMoThanThu: () => void
+  /** Đổi tên thần thú (máy chủ `rename`). Có ⇒ HUD vẽ nút bút chì "Đổi tên" cạnh tên. Ném lỗi ⇒ hộp báo ngay dưới ô. */
+  onDoiTen?: (ten: string) => Promise<void>
   onChonThu: () => void
   onDangXuat: () => void
   onTaiLai: () => void
@@ -65,7 +68,8 @@ export interface SanhBanDoProps {
 const phanTram = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
 
 /** HUD thần thú. Bản ngang: `theLuc` và `chuoiNgay` = null (Thể lực có thẻ riêng ở cột phải, Chuỗi ngày ở hàng trên — một thông tin một chỗ). */
-function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'onMoThanThu'> & { chuoiNgay: number | null; theLuc: { con: number; tong: number } | null }) {
+function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu, onDoiTen }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'onMoThanThu' | 'onDoiTen'> & { chuoiNgay: number | null; theLuc: { con: number; tong: number } | null }) {
+  const [moDoiTen, setMoDoiTen] = useState(false)
   const can = thu ? thanhExp(thu.cap) : 0
   const co = exp && exp.conThieu !== null && can > 0 ? Math.max(0, Math.min(can, can - exp.conThieu)) : null
   const tiLe = co !== null && can > 0 ? co / can : 0
@@ -85,7 +89,7 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
           )}
         </span>
         <span className="h2-hud-giua">
-          <span className="h2-hud-ten">{nhanThu}</span>
+          <span className="h2-hud-ten" data-dai={thu && [...thu.ten].length > 10 ? 'true' : undefined}>{nhanThu}</span>
           {co !== null && (
             <span className="h2-thanh-exp" role="progressbar" aria-label="EXP của thần thú tới cấp sau" aria-valuemin={0} aria-valuemax={can} aria-valuenow={co}>
               <span style={{ width: `${Math.round(tiLe * 100)}%` }} />
@@ -97,6 +101,15 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
           )}
         </span>
       </button>
+      {thu && onDoiTen && (
+        <button type="button" className="h2-hud-doi-ten" onClick={() => setMoDoiTen(true)} aria-label={`Đổi tên thần thú (đang là ${thu.ten})`} title="Đổi tên">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+        </button>
+      )}
+      {moDoiTen && thu && onDoiTen && <HopDoiTen tenHienTai={thu.ten} onLuu={onDoiTen} onDong={() => setMoDoiTen(false)} />}
       {(theLuc || chuoiNgay !== null) && (
       <span className="h2-hud-phai">
         {theLuc && (
@@ -464,13 +477,17 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
   )
 }
 
+/** Chưa có chiến dịch đang chạy: chiến dịch sắp bắt đầu (thầy 28/09) ⇒ báo ngày; không thì câu cũ. */
+const chuChuaCoChienDich = (s: SanhHoa2): string =>
+  s.sapBatDau ? `Chiến dịch ${s.sapBatDau.ten} bắt đầu ${thuNgayThang(s.sapBatDau.batDau)}. Tới ngày đó bản đồ sẽ mở đảo mới ở đây.` : 'Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.'
+
 function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   const xong = s.theLuc.tong > 0 && s.theLuc.con === 0
   const trong = s.theLuc.tong === 0
   return (
     <>
       {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
-        <p className="h2-tam-chu">Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.</p>
+        <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       {xong ? (
         <>
@@ -675,7 +692,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       ) : s.chienDich ? (
         <TheChienDichNgang s={s} now={p.now} />
       ) : (
-        <p className="h2-ng-the h2-tam-chu">Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.</p>
+        <p className="h2-ng-the h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       {!trong && <TheTheLucNgang s={s} />}
       {xong ? (
@@ -775,7 +792,7 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
       <div className="h2-fx" aria-hidden="true" />
       <div className="h2-ng-khung">
         <div className="h2-ng-tren">
-          <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={null} theLuc={null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} />
+          <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={null} theLuc={null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} onDoiTen={chonThu ? undefined : p.onDoiTen} />
           <nav className="h2-ng-tren-phai" aria-label="Lối tắt">
             <span className="h2-kinh h2-ng-chuoi h2-chuoi" aria-label={`Chuỗi ${p.chuoiNgay} ngày`}>
               <IconChuoi />
@@ -872,7 +889,7 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
       <div className="h2-fx" aria-hidden="true" />
       <div className="h2-khung">
         <CanhSanh3D s={s} moMan={moMan} />
-        <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} />
+        <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} onDoiTen={chonThu ? undefined : p.onDoiTen} />
         <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} onVaoThi={p.onVaoThi} caDangMo={p.caDangMo} coThu={!chonThu} />
         <div className="h2-dem" aria-hidden="true" />
         <section className="h2-tam" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>

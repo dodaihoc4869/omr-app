@@ -131,3 +131,28 @@
   background: var(--m3-error);
   color: var(--m3-on-error);
 }
+/* Ô nhập có giới hạn ký tự (vd. Đổi tên thần thú x/16) + lỗi máy chủ ngay dưới ô. */
+.hxn-go-nhan {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.hxn-dem {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+.hxn-dem[data-qua='true'] {
+  color: var(--m3-error);
+}
+.hxn-loi {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--m3-error);
+  overflow-wrap: anywhere;
+}

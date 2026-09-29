@@ -1,7 +1,8 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
-import { useSanhHoa2 } from '../components/hoa2/api'
+import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
+import { doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
 import { PETS } from '../game/than-thu-v2/core'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
@@ -29,7 +30,8 @@ import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
 import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef, type ReactNode } from 'react'
+import { taoKhoGio, useGiayConLai } from '../lib/dong-ho-thi'
 import {
   Award,
   BookOpen,
@@ -202,6 +204,25 @@ function ChoNapGame() {
   )
 }
 
+/** Giây còn lại của bài gia đình giao: 2 tiếng (7200 giây) kể từ lúc bấm làm. */
+function giayConLaiMomTu(mom: { batDauLuc?: string } | null): number {
+  if (!mom?.batDauLuc) return 7200
+  const daTroiQua = Math.floor((Date.now() - new Date(mom.batDauLuc).getTime()) / 1000)
+  return Math.max(0, 7200 - daTroiQua)
+}
+
+/** Đồng hồ bài gia đình giao TỰ ĐẾM trong nút lá (28/09): trước đây `setGiayConLaiMom`
+ * mỗi giây ở gốc làm CẢ cổng học sinh vẽ lại từng giây suốt 2 tiếng làm bài. */
+function DemGioMom({ mom, children }: { mom: { batDauLuc?: string; trangThai?: string } | null; children: (giay: number) => ReactNode }) {
+  const kho = useMemo(
+    () => (mom?.batDauLuc && mom.trangThai !== 'da_nop' ? taoKhoGio(new Date(mom.batDauLuc).getTime() + 7200_000, Date.now) : null),
+    [mom],
+  )
+  const song = useGiayConLai(kho)
+  // 7200 − floor(đã trôi) = ceil(còn lại) — y hệt cách đếm cũ.
+  return <>{children(kho ? Math.max(0, Math.ceil(song ?? 0)) : giayConLaiMomTu(mom))}</>
+}
+
 export default function StudentPortalScreen() {
   const nowHocTap = useGioHocTap()
   // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
@@ -317,7 +338,6 @@ export default function StudentPortalScreen() {
   const [dangLamMom, setDangLamMom] = useState<BaiMomGiao | null>(null)
   // Việc ÔN CÂU (on_lai) đang làm trong sheet 'cauon': đúng các qid máy chủ chọn, nộp về /hs/on-lai/nop.
   const [cauOn, setCauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string; cauSan?: CauOn[]; duongNop?: string } | null>(null)
-  const [giayConLaiMom, setGiayConLaiMom] = useState<number>(7200)
   const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
   const [thongBaoNopMom, setThongBaoNopMom] = useState<string | null>(null)
 
@@ -378,9 +398,8 @@ export default function StudentPortalScreen() {
 
     const capNhatDongHo = () => {
       if (!dangLamMom.batDauLuc) return
-      const daTroiQua = Math.floor((Date.now() - new Date(dangLamMom.batDauLuc).getTime()) / 1000)
-      const conLai = Math.max(0, 7200 - daTroiQua)
-      setGiayConLaiMom(conLai)
+      // Chỉ soi hết giờ để tự nộp — số hiển thị do `DemGioMom` tự đếm, gốc không vẽ lại.
+      const conLai = giayConLaiMomTu(dangLamMom)
       if (conLai === 0 && Date.now() >= retryMomAt.current) {
         void nopBaiCuaMom()
       }
@@ -417,7 +436,7 @@ export default function StudentPortalScreen() {
         await napDsMom()
         try {
           const rev = await momApi('review', { token: auth.token, id: bai.id })
-          if (rev?.item) setPhieuHtml(momReviewHtml(chuanHoaBaiMom(rev.item)))
+          if (rev?.item) setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(rev.item)))
           else setLoiMom('Chưa tải được kết quả. Em thử lại.')
         } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả. Em thử lại.') }
         return
@@ -1002,12 +1021,15 @@ export default function StudentPortalScreen() {
   const dungBanNho = !!banNho && !sanSangBang
   const duLieuBang = useMemo(() => (dungBanNho ? banNho! : duLieuNhiemVu), [dungBanNho, banNho, duLieuNhiemVu]) // thẻ Thử thách riêng (Bộ não A.I) đã gỡ 28/09
   // HUD của Sảnh (Game Hóa 2.0): thần thú / EXP / chuỗi ngày lấy ĐÚNG nguồn Bảng nhiệm vụ đang dùng (/hs/ke-hoach-ngay, kể cả bản nhớ cùng ngày).
+  // Tên vừa đổi (máy chủ đã lưu) phủ lên ngay, không chờ /hs/ke-hoach-ngay tải lại (bản nhớ cùng ngày còn tên cũ). Theo SBD.
+  const [tenThuDaDoi, setTenThuDaDoi] = useState<{ sbd: string; ten: string } | null>(null)
   const thuSanh = useMemo((): ThuTrenHud | null => {
     const t = duLieuBang.thanThu
     if (t.kieu !== 'co') return null
     const index = PETS.findIndex((p) => p.id === t.pet)
-    return index < 0 ? null : { index, cap: t.cap, ten: t.ten || PETS[index].name }
-  }, [duLieuBang.thanThu])
+    const tenMoi = tenThuDaDoi && tenThuDaDoi.sbd === auth?.sbd ? tenThuDaDoi.ten : ''
+    return index < 0 ? null : { index, cap: t.cap, ten: tenMoi || t.ten || PETS[index].name }
+  }, [duLieuBang.thanThu, tenThuDaDoi, auth?.sbd])
   const expSanh = duLieuBang.exp ? { homNay: duLieuBang.exp.homNay, conThieu: duLieuBang.exp.thu?.expConThieu ?? null } : null
 
   // Rút đề khắc phục câu sai
@@ -1324,6 +1346,8 @@ export default function StudentPortalScreen() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {hop}
+      {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
+      {auth.token && !manThi && tab === null && <TheDiemDanhHs token={auth.token} />}
       {auth.token && cheDo2 && !manThi && (
         <SanhBanDo
           ketQua={hoa2.ketQua}
@@ -1346,6 +1370,11 @@ export default function StudentPortalScreen() {
           onTuiDo={() => moGameTai('tui-do')}
           onCuaHang={() => moGameTai('shop')}
           onMoThanThu={() => moGameTai('')}
+          onDoiTen={async (ten) => {
+            const sbd = auth.sbd
+            const daLuu = await doiTenThu(auth.token!, ten)
+            setTenThuDaDoi({ sbd, ten: daLuu })
+          }}
           onChonThu={() => moGameTai('')}
           onDangXuat={hoiDangXuat}
           onTaiLai={hoa2.taiLai}
@@ -1873,6 +1902,7 @@ export default function StudentPortalScreen() {
         {tab === 'mom' && vaoM3 && auth && (
           <>
             {dangLamMom ? (
+              <DemGioMom mom={dangLamMom}>{(giayConLaiMom) => (
               <MomLamBaiM3
                 tieuDe={dangLamMom.tieuDe}
                 giayConLai={giayConLaiMom}
@@ -1888,7 +1918,7 @@ export default function StudentPortalScreen() {
                     localStorage.setItem(`omr_mom_draft_${dangLamMom.id}_${auth.sbd}`, JSON.stringify({
                       cauTraLoi: cauTraLoiMom,
                       luuLuc: new Date().toISOString(),
-                      giayConLai: giayConLaiMom,
+                      giayConLai: giayConLaiMomTu(dangLamMom),
                     }))
                   } catch {}
                   void bao('Bài của em đã được lưu nháp. Em vào làm tiếp bất cứ lúc nào trước Hạn nộp.', 'Đã lưu nháp')
@@ -1896,6 +1926,7 @@ export default function StudentPortalScreen() {
                 }}
                 onNop={nopBaiCuaMom}
               />
+              )}</DemGioMom>
             ) : (
               <MomDanhSachM3
                 ds={dsMomGiao as unknown as BaiMomM3[]}
@@ -1908,7 +1939,7 @@ export default function StudentPortalScreen() {
                 onBatDau={(bai) => void batDauLamBaiMom(bai as unknown as BaiMomGiao)}
                 onXemKetQua={async (bai: any) => {
                   if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
-                  try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                  try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                 }}
               />
@@ -1934,6 +1965,7 @@ export default function StudentPortalScreen() {
 
                   <div className="flex items-center gap-3">
                     {/* Đồng hồ đếm ngược 2 tiếng */}
+                    <DemGioMom mom={dangLamMom}>{(giayConLaiMom) => (
                     <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-xs font-bold border transition-colors ${
                       giayConLaiMom < 900
                         ? 'bg-rose-100 text-rose-700 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800 animate-pulse'
@@ -1942,6 +1974,7 @@ export default function StudentPortalScreen() {
                       <Timer className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                       <span>Thời gian làm còn: {dinhDangThoiGianMom(giayConLaiMom)}</span>
                     </div>
+                    )}</DemGioMom>
 
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                       Đã làm: <strong className="text-slate-800 dark:text-slate-200">{Object.keys(cauTraLoiMom).length}</strong>/{(dangLamMom.dsCau || dangLamMom.cau || []).length}
@@ -1954,7 +1987,7 @@ export default function StudentPortalScreen() {
                           localStorage.setItem(`omr_mom_draft_${dangLamMom.id}_${auth.sbd}`, JSON.stringify({
                             cauTraLoi: cauTraLoiMom,
                             luuLuc: new Date().toISOString(),
-                            giayConLai: giayConLaiMom,
+                            giayConLai: giayConLaiMomTu(dangLamMom),
                           }))
                         } catch {}
                         void bao('Bài của em đã được lưu nháp. Em vào làm tiếp bất cứ lúc nào trước Hạn nộp.', 'Đã lưu nháp')
@@ -2167,7 +2200,7 @@ export default function StudentPortalScreen() {
                               <button
                                 onClick={async () => {
                                   if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
-                                  try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                                  try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                                 }}
                                 className="btn-google-outlined text-xs py-2 px-3.5 rounded-full font-semibold flex items-center gap-1.5 cursor-pointer"

@@ -1,5 +1,5 @@
 // BA VIỆC THẦY GIAO 14/09 LƯỢT 2.
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { dungHtmlDeVaLoiGiai } from '../src/lib/de-loi-giai-cua-em'
@@ -23,7 +23,11 @@ const ROWS: ChiTietCauRow[] = [
 ] as unknown as ChiTietCauRow[]
 
 describe('1. Xem đề và lời giải — là TỜ ĐỀ, không phải phiếu khắc phục', () => {
-  const html = dungHtmlDeVaLoiGiai(BANK, '814335', '12121212', 'Đỗ Đại Học', 'Test4', ROWS)
+  // Bộ dựng phiếu nay nạp lười (import động) nên hàm trả Promise.
+  let html = ''
+  beforeAll(async () => {
+    html = await dungHtmlDeVaLoiGiai(BANK, '814335', '12121212', 'Đỗ Đại Học', 'Test4', ROWS)
+  })
 
   it('dựng được phiếu và có đủ cả hai câu', () => {
     expect(html.length).toBeGreaterThan(200)
@@ -60,16 +64,18 @@ describe('2. Đếm câu — không app nào được tự trừ ngược nữa'
   const nguon = [
     'src/screens/StudentPortalScreen.tsx',
     // ParentPortalScreen: ĐÃ GỠ khỏi danh sách (app PH một màn một nút, 21/09 — màn không còn danh sách ca/đếm câu; báo cáo ca nằm ở BaoCaoCaThiPhuHuynhModal bên dưới).
-    'src/components/BaoCaoCaThiHocSinhModal.tsx',
     'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   ]
+  // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em bản mới (BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em) vẽ số theo bản vẽ thầy chốt,
+  // không qua DongDemCau; luật "không tự trừ ngược" vẫn phủ cả ba tệp của nó.
+  const baoCaoEmMoi = ['src/components/ca-thi/BaoCaoCaCuaEm.tsx', 'src/components/ca-thi/BaoCaoChiTiet.tsx', 'src/lib/bao-cao-cua-em.ts']
 
-  it('cả ba app dùng CHUNG một khuôn DongDemCau', () => {
+  it('cổng học sinh + phụ huynh dùng CHUNG một khuôn DongDemCau', () => {
     for (const f of nguon) expect(doc(f)).toContain('DongDemCau')
   })
 
   it('không còn công thức "tongCau - soCauDung" ở bất kỳ app nào', () => {
-    for (const f of nguon) {
+    for (const f of [...nguon, ...baoCaoEmMoi]) {
       const t = doc(f)
       expect(t, f).not.toMatch(/tongCau\s*-\s*\(?\s*item\.soCauDung/)
       expect(t, f).not.toMatch(/tongSoCau\s*-\s*b\.soCauDung/)
