@@ -1,3 +1,4 @@
+import { nhipCa } from './nhip-ca'
 import { denPhongBiA } from './bi-a-phong'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
@@ -3407,6 +3408,8 @@ const boXuLy = {
       if (p === '/ca/danh-sach') return themMocReset(env, await danhSachCaMoi(env, b.daXoa === true)) // đường CHÍNH app thầy (Code 1): phải mang `mocReset` như /goi danhSachCa
       if (p === '/ca/sua') return suaCa(env, b)
       if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
+      // NHỊP SỐNG của ca đang mở (thầy 29/09 "thời gian thực"): lệnh NHẸ chỉ đọc, 1 batch 4 câu — tiến độ từng em đổi từ mốc `sau` + dấu vết để máy thầy biết khi nào tải lại cả ca. Xem nhip-ca.ts.
+      if (p === '/ca/nhip') return ra(await nhipCa(env, b))
       // THÊM PHÚT cho ca đang chạy (docs/hop-dong-them-phut-2109.md): chỉ cộng, trần 30 phút mỗi ca.
       if (p === '/ca/them-phut') return ra(await themPhutCa(env, b))
       // ĐỔI TÊN một học sinh (docs/hop-dong-doi-ten-hoc-sinh-2109.md): chỉ cột tên, 5 bảng; giữ phieu/chan_vao.
