@@ -12,7 +12,7 @@ const DS_DUNG_SAI = (da: string) => /^[DS]{4}$/.test(da) ? da.split('').map((x, 
 
 function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
   return (
-    <div className="lg-chu">
+    <div className="lg-van">
       <p className="lg-chu-bao">Thầy Đỗ Đại Học đang soạn lời giải từng bước cho câu này. Em xem tạm lời giải ngắn dưới đây.</p>
       {/* `cau.de` do máy chủ dựng từ chữ kho đã thoát HTML (chỉ thêm <p>, <br>, bảng, ảnh data:) */}
       <div className="lg-chu-de" dangerouslySetInnerHTML={{ __html: cau.de }} />
