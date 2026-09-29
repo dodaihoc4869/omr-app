@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// MÔ PHỎNG BẢNG GIÁ EXP HỌC TẬP (Code 1, 21/09/2026; Điều 10) — in bảng "kiếm mỗi ngày → ngày tới cấp 10" cho ba kiểu em, bảng CŨ và MỚI. `npm run mo-phong:bang-gia-exp`.
-// Thuần, không D1, không mạng. Sai bất biến (bảng mới không đưa cả ba kiểu em tới cấp 10 đúng ngày 12) ⇒ thoát mã 1.
+// MÔ PHỎNG KINH TẾ EXP v4 (thầy chốt 29/09/2026, docs/DE-XUAT-EXP-2909.md mục 4) — `npm run mo-phong:bang-gia-exp`.
+// Chạy bằng CHÍNH hàm sản phẩm (src/lib/mo-phong-bang-gia-exp.ts). Thuần, không D1, không mạng.
+// Sai bất biến (em chăm nhất: ngày 20 còn cấp 9, ngày 21 lên cấp 10, khiên đầu ngày 21) ⇒ thoát mã 1.
 import { registerHooks } from 'node:module'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -10,17 +11,17 @@ registerHooks({
   },
 })
 const goc = join(dirname(fileURLToPath(import.meta.url)), '..')
-const { KIEU_EM, BANG_GIA_CU, BANG_GIA_MOI, expMotNgay, ngayToiCap } = await import(pathToFileURL(join(goc, 'src/lib/mo-phong-bang-gia-exp.ts')).href)
-const dong = (t, c) => t.padEnd(32) + c
-/** Trung bình một tuần ổn định (ngày 31…37, chuỗi đã tối đa): chặng đúng nhịp 5/7 số ngày. */
-const tb = (k, b) => Math.round([31, 32, 33, 34, 35, 36, 37].reduce((s, d) => s + expMotNgay(k, b, d), 0) / 7)
-console.log('BẢNG GIÁ EXP HỌC TẬP — em đạt mọi ngày; thú hấp thụ tối đa 200 EXP/ngày; cấp 10 = 2 400 EXP ⇒ sớm nhất ngày 12')
-console.log(dong('Kiểu em', 'Bảng cũ: kiếm/ngày (ổn định) → ngày tới cấp 10      Bảng mới: kiếm/ngày → ngày tới cấp 10'))
-let loi = 0
-for (const k of KIEU_EM) {
-  const cu = ngayToiCap(k, BANG_GIA_CU), moi = ngayToiCap(k, BANG_GIA_MOI)
-  console.log(dong(k.ten, `${String(tb(k, BANG_GIA_CU)).padStart(4)} EXP → ngày ${String(cu).padEnd(3)}                          ${String(tb(k, BANG_GIA_MOI)).padStart(4)} EXP → ngày ${moi}`))
-  if (moi !== 12) loi++
+const { HO_SO_MO_PHONG, chayMoPhong } = await import(pathToFileURL(join(goc, 'src/lib/mo-phong-bang-gia-exp.ts')).href)
+const f = (x) => (x == null ? '>60' : String(x))
+console.log('KINH TẾ EXP v4 — nạp tự do, khoá mốc cấp 10 cần 21 ngày đạt, 1 vàng / 5 EXP, khiên 21 mảnh + 21 ngày đạt + 1 400 vàng (60 ngày, không mua đồ)')
+console.log('Hồ sơ'.padEnd(14) + 'EXP/ngày  cấp 5  cấp 10  khiên đầu  vàng n7/14/21/30')
+for (const k of ['cham', 'tb', 'yeu']) {
+  const r = chayMoPhong(HO_SO_MO_PHONG[k], 60)
+  console.log(HO_SO_MO_PHONG[k].ten.padEnd(14) + `${String(Math.round(r.tbNgay)).padStart(8)}  ${f(r.cap[5]).padStart(5)}  ngày ${f(r.cap[10]).padEnd(3)} ngày ${f(r.khienDau).padEnd(5)} ${[7, 14, 21, 30].map((n) => r.vangTichLuy[n]).join('/')}`)
 }
-if (loi) { console.error(`SAI: bảng MỚI không đưa ${loi} kiểu em tới cấp 10 đúng ngày 12`); process.exit(1) }
-console.log('ĐẠT: bảng mới — chăm là đủ (cả ba kiểu em tới cấp 10 đúng ngày 12).')
+const c = chayMoPhong(HO_SO_MO_PHONG.cham, 60)
+if (!(c.capNgay[20] === 9 && c.cap[10] === 21 && c.khienDau === 21)) {
+  console.error(`SAI: em chăm nhất ngày 20 cấp ${c.capNgay[20]}, cấp 10 ngày ${c.cap[10]}, khiên đầu ngày ${c.khienDau} (cần 9 · 21 · 21)`)
+  process.exit(1)
+}
+console.log('ĐẠT: em chăm nhất ngày 20 cấp 9, ngày 21 lên cấp 10, khiên đầu ngày 21.')

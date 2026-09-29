@@ -8,8 +8,15 @@
 //
 // Hồ sơ dùng ba trường của hồ sơ game v2: `cap` (1…120), `exp` (EXP đã nạp DỞ DANG trong cấp hiện tại, 0 ≤ exp < thanhExp(cap)), `wallet` (ống nghiệm) và `hapThu` = { ngay, da }
 // (số EXP đã hấp thụ trong `ngay`; sang ngày mới `da` coi như 0). Hàm KHÔNG sửa đầu vào, KHÔNG đọc đồng hồ, KHÔNG ngẫu nhiên; chuỗi ngày `YYYY-MM-DD` so sánh bằng `===`.
+//
+// ══ LUẬT v4 (thầy chốt 29/09/2026, `docs/DE-XUAT-EXP-2909.md`): NẠP TỰ DO ══
+// Mọi EXP vào thần thú NGAY lúc ghi sổ qua `nhanTuDo` (không trần nạp, không ống nghiệm, không nút nạp). Lưới an toàn KHOÁ MỐC: muốn lên cấp 10 phải có ≥ 21 ngày đạt nhiệm vụ ngày;
+// phần EXP vượt mốc nằm ở `choMoc` ("chờ mốc"), đủ ngày thì vào thú hết — không mất. Hồ sơ v3 (`luatCap = 3`) chuyển MỘT lần bằng `chuyenV3SangV4` (giữ cấp, giữ tiến độ trong thanh
+// theo tỉ lệ, nạp ống nghiệm cũ vào đường mới, ghi `truocSiet4` để lùi). Các hàm "hấp thụ theo ngày" bên dưới (`hapThu`, `tranHapThu`, chữ ống nghiệm…) là LỊCH SỬ v3,
+// chỉ còn cho chuyển đổi và test cũ — màn và máy chủ không dùng nữa.
 import { CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
-import { BANG_THANH_EXP_V2_DAU, nhanExp, thanhExp, thanhExpCu, tongExpToiCap } from '../game/than-thu-hoa-hoc/kinh-nghiem'
+import { BANG_THANH_EXP_V2_DAU, nhanExp, thanhExp, thanhExpCu, thanhExpV3, tongExpToiCap, tongExpToiCapV3 } from '../game/than-thu-hoa-hoc/kinh-nghiem'
+import { CAP_KHOA_MOC, NGAY_DAT_MO_CAP_10 } from './kinh-te-game'
 
 /** Sức hấp thụ của MỘT ngày em đạt nhiệm vụ ngày. */
 export const HAP_THU_DAT = 200
@@ -19,11 +26,12 @@ export const HAP_THU_CO_HOC = 120
 export const TRAN_EXP_GAME_NGAY = 120
 /** Điều 10: bảng giá EXP học tập mới từ 2026-09-22 nâng thưởng "đạt nhiệm vụ ngày" 20 ⇒ 80; em đã đạt trước mốc được BÙ phần chênh này cho mỗi ngày đạt. */
 export const BU_DAT_NGAY = 60
-/** Mã luật cấp của hồ sơ sau khi chuyển đổi (`luatCap`); hồ sơ chưa có hoặc khác 2 là hồ sơ của đường cũ. */
-export const LUAT_CAP_MOI = 3
-/** Ngày sớm nhất tới cấp 10 / cấp 120 khi em ĐẠT mọi ngày (bất biến của đường mới; test khoá). */
-export const NGAY_SOM_NHAT_CAP_10 = 12
-export const NGAY_SOM_NHAT_CAP_120 = 1191
+/** Mã luật cấp hiện hành (`luatCap`): 4 = nạp tự do (29/09). Hồ sơ khác 4 chuyển MỘT lần khi mở / khi cộng EXP (`chuyenDoiLuatCap`). */
+export const LUAT_CAP_MOI = 4
+/** Luật cấp v3 (21/09, hấp thụ theo ngày) — chỉ để nhận ra hồ sơ cần chuyển. */
+export const LUAT_CAP_V3 = 3
+/** Ngày sớm nhất tới cấp 10 (khoá mốc: cần 21 ngày đạt). */
+export const NGAY_SOM_NHAT_CAP_10 = NGAY_DAT_MO_CAP_10
 
 export type LyDoHapThu = 'no' | 'chua_hoc' | 'het_ong' | 'cap_toi_da' | null
 
@@ -58,12 +66,26 @@ export function tranExpGameNgay(daNhanHomNay: number, xin: number): number {
   return Math.max(0, Math.min(soNguyen(xin), TRAN_EXP_GAME_NGAY - soNguyen(daNhanHomNay)))
 }
 
-/** EXP còn cần để ĐẦY cấp 120 từ trạng thái (cap, exp). 0 khi đã cấp 120. */
+/** EXP còn cần để ĐẦY cấp 120 từ trạng thái (cap, exp) theo đường v3. 0 khi đã cấp 120. */
 function sucChuaDenDinh(cap: number, exp: number): number {
   if (cap >= CAP_TOI_DA) return 0
   let c = -exp
-  for (let l = cap; l < CAP_TOI_DA; l++) c += thanhExp(l)
+  for (let l = cap; l < CAP_TOI_DA; l++) c += thanhExpV3(l)
   return Math.max(0, c)
+}
+
+/** `nhanExp` trên đường v3 (chỉ cho các hàm lịch sử v3 và chuyển đổi cũ). */
+export function nhanExpV3(hienTai: { capDo: number; exp: number }, them: number): { capDo: number; exp: number } {
+  let capDo = Math.max(1, Math.round(hienTai.capDo))
+  let exp = Math.max(0, Math.round(hienTai.exp)) + Math.max(0, Math.round(them))
+  while (capDo < CAP_TOI_DA) {
+    const can = thanhExpV3(capDo)
+    if (can <= 0 || exp < can) break
+    exp -= can
+    capDo += 1
+  }
+  if (capDo >= CAP_TOI_DA) exp = 0
+  return { capDo, exp }
 }
 
 /**
@@ -116,7 +138,7 @@ export function hapThu<H extends HoSoCapExp>(hoSo: H, xin: number, ngayVN: strin
     else lyDo = 'het_ong'
   }
   if (daNap <= 0) return { hoSo, daNap: 0, lyDo, conTran: conTranTruoc }
-  const r = nhanExp({ capDo: cap, exp }, daNap)
+  const r = nhanExpV3({ capDo: cap, exp }, daNap)
   const moi = { ...hoSo, cap: r.capDo, exp: r.exp, wallet: wallet - daNap, hapThu: { ngay: ngayVN, da: da + daNap } }
   return { hoSo: moi, daNap, lyDo, conTran: conTranTruoc - daNap }
 }
@@ -186,19 +208,19 @@ export function chenhDinhGia(mastery: readonly { stage?: number }[] | undefined)
  *   5. `hapThu` của hôm chuyển = phần A rơi vào riêng hôm nay (≤ 200; 0 nếu `tuyChon.coHocHomNay === false`); ghi `truocSiet` (cấp/EXP/ống cũ, `luc`, `dinhGiaLai`) để lùi được.
  * Idempotent: hồ sơ `luatCap === 2` trả lại nguyên. Tổng EXP sau chuyển (`daHapThu + wallet`) = `tongMoi` = max(0, tongCu − chênh) + bù.
  */
-export function chuyenDoiLuatCap<H extends HoSoCu>(hoSoCu: H, soNgayCoHocTrongMua: number, ngayVN: string, tuyChon: { luc?: string; coHocHomNay?: boolean; soNgayDatTruocBangGiaMoi?: number } = {}): KetQuaChuyenDoi<H> {
-  if (hoSoCu.luatCap === LUAT_CAP_MOI) return { hoSo: hoSoCu as KetQuaChuyenDoi<H>['hoSo'], daChuyen: false, tongCu: 0, tongMoi: 0, daHapThu: 0, daTruDinhGia: 0, buDatNgay: 0 }
+export function chuyenDoiSangV3<H extends HoSoCu>(hoSoCu: H, soNgayCoHocTrongMua: number, ngayVN: string, tuyChon: { luc?: string; coHocHomNay?: boolean; soNgayDatTruocBangGiaMoi?: number } = {}): KetQuaChuyenDoi<H> {
+  if (hoSoCu.luatCap === LUAT_CAP_V3 || hoSoCu.luatCap === LUAT_CAP_MOI) return { hoSo: hoSoCu as KetQuaChuyenDoi<H>['hoSo'], daChuyen: false, tongCu: 0, tongMoi: 0, daHapThu: 0, daTruDinhGia: 0, buDatNgay: 0 }
   // V2 -> V3: giữ cấp, trả chênh lệch giá và phần thanh dư về ví.
   // Không tạo EXP, không dùng lại hạn mức hấp thụ của ngày chuyển.
   if (hoSoCu.luatCap === 2) {
     const cap = kepCap(hoSoCu.cap), exp = soNguyen(hoSoCu.exp)
     let chenh = 0
-    for (let c = 1; c < Math.min(cap, 10); c++) chenh += BANG_THANH_EXP_V2_DAU[c - 1]! - thanhExp(c)
-    const expMoi = cap >= CAP_TOI_DA ? 0 : Math.min(exp, thanhExp(cap) - 1)
+    for (let c = 1; c < Math.min(cap, 10); c++) chenh += BANG_THANH_EXP_V2_DAU[c - 1]! - thanhExpV3(c)
+    const expMoi = cap >= CAP_TOI_DA ? 0 : Math.min(exp, thanhExpV3(cap) - 1)
     const traVi = chenh + exp - expMoi
-    const tongCu = tongExpToiCap(cap) + chenh + exp + soNguyen(hoSoCu.wallet)
-    const hoSo = { ...hoSoCu, exp: expMoi, wallet: soNguyen(hoSoCu.wallet) + traVi, luatCap: LUAT_CAP_MOI }
-    return { hoSo: hoSo as KetQuaChuyenDoi<H>['hoSo'], daChuyen: true, tongCu, tongMoi: tongCu, daHapThu: tongExpToiCap(cap) + expMoi, daTruDinhGia: 0, buDatNgay: 0 }
+    const tongCu = tongExpToiCapV3(cap) + chenh + exp + soNguyen(hoSoCu.wallet)
+    const hoSo = { ...hoSoCu, exp: expMoi, wallet: soNguyen(hoSoCu.wallet) + traVi, luatCap: LUAT_CAP_V3 }
+    return { hoSo: hoSo as KetQuaChuyenDoi<H>['hoSo'], daChuyen: true, tongCu, tongMoi: tongCu, daHapThu: tongExpToiCapV3(cap) + expMoi, daTruDinhGia: 0, buDatNgay: 0 }
   }
   const capCu = kepCap(hoSoCu.cap)
   const expCu = soNguyen(hoSoCu.exp)
@@ -209,10 +231,111 @@ export function chuyenDoiLuatCap<H extends HoSoCu>(hoSoCu: H, soNgayCoHocTrongMu
   const tongMoi = Math.max(0, tongCu - chenh) + bu
   const ngay = soNguyen(soNgayCoHocTrongMua)
   let a = Math.min(tongMoi, HAP_THU_DAT * ngay)
-  if (capCu < CAP_TOI_DA) a = Math.min(a, tongExpToiCap(capCu + 1) - 1)
-  const r = nhanExp({ capDo: 1, exp: 0 }, a)
+  if (capCu < CAP_TOI_DA) a = Math.min(a, tongExpToiCapV3(capCu + 1) - 1)
+  const r = nhanExpV3({ capDo: 1, exp: 0 }, a)
   const daHomNay = tuyChon.coHocHomNay === false ? 0 : Math.min(HAP_THU_DAT, Math.max(0, a - HAP_THU_DAT * Math.max(0, ngay - 1)))
   const truocSiet: TruocSiet = { cap: capCu, exp: expCu, wallet, luc: tuyChon.luc ?? ngayVN, dinhGiaLai: { chenh, daTru: Math.min(chenh, tongCu) }, buDatNgay: bu }
-  const hoSo = { ...hoSoCu, cap: r.capDo, exp: r.exp, wallet: tongMoi - a, hapThu: { ngay: ngayVN, da: daHomNay }, luatCap: LUAT_CAP_MOI, truocSiet }
+  const hoSo = { ...hoSoCu, cap: r.capDo, exp: r.exp, wallet: tongMoi - a, hapThu: { ngay: ngayVN, da: daHomNay }, luatCap: LUAT_CAP_V3, truocSiet }
   return { hoSo, daChuyen: true, tongCu, tongMoi, daHapThu: a, daTruDinhGia: Math.min(chenh, tongCu), buDatNgay: bu }
+}
+
+// ══════════════════════════════ LUẬT v4 — NẠP TỰ DO + KHOÁ MỐC (29/09) ══════════════════════════════
+
+export interface HoSoTuDo extends HoSoCapExp {
+  /** EXP chờ mốc: đã kiếm, đã ghi sổ, nhưng thú chưa được lên cấp 10 vì chưa đủ ngày đạt. Vắng = 0. */
+  choMoc?: number
+}
+
+export interface KetQuaNhanTuDo<H extends HoSoTuDo> {
+  /** Hồ sơ sau khi nhận (đầu vào KHÔNG bị sửa). Không có gì để nhận ⇒ CHÍNH đầu vào. */
+  hoSo: H
+  /** EXP vừa vào thú (kể cả phần chờ mốc vừa được mở). */
+  daVao: number
+  /** EXP còn chờ mốc sau lần này. */
+  choMoc: number
+  /** Số cấp vừa lên. */
+  soCapLen: number
+}
+
+/** Khoá mốc còn chặn hồ sơ này không: thú chưa tới cấp 10 và em chưa đủ 21 ngày đạt. Em đã ở cấp ≥ 10 (kể cả theo đường cũ) thì không bị chặn. */
+export const dangKhoaMoc = (cap: number, soNgayDat: number): boolean => kepCap(cap) < CAP_KHOA_MOC && soNguyen(soNgayDat) < NGAY_DAT_MO_CAP_10
+
+/**
+ * NHẬN EXP TỰ DO (luật v4): `them` EXP (cộng phần đang chờ mốc) vào thú ngay. Chưa đủ `NGAY_DAT_MO_CAP_10` ngày đạt ⇒ thú dừng ở CUỐI cấp 9
+ * (tổng tới cấp 10 − 1), phần vượt nằm ở `choMoc`. Đủ ngày ⇒ vào hết (gọi với `them = 0` để mở phần chờ). Cấp 120: EXP chỉ ghi sổ (thú đầy), `choMoc` về 0.
+ */
+export function nhanTuDo<H extends HoSoTuDo>(hoSo: H, them: number, soNgayDat: number): KetQuaNhanTuDo<H> {
+  const cap = kepCap(hoSo.cap)
+  const exp = soNguyen(hoSo.exp)
+  const cho = soNguyen(hoSo.choMoc)
+  const tong = soNguyen(them) + cho
+  if (tong <= 0) return { hoSo, daVao: 0, choMoc: 0, soCapLen: 0 }
+  if (cap >= CAP_TOI_DA) return { hoSo: { ...hoSo, cap, exp: 0, choMoc: 0 }, daVao: 0, choMoc: 0, soCapLen: 0 }
+  let vao = tong
+  if (dangKhoaMoc(cap, soNgayDat)) vao = Math.min(tong, Math.max(0, tongExpToiCap(CAP_KHOA_MOC) - 1 - (tongExpToiCap(cap) + exp)))
+  const conCho = tong - vao
+  const r = nhanExp({ capDo: cap, exp }, vao)
+  return { hoSo: { ...hoSo, cap: r.capDo, exp: r.exp, choMoc: conCho }, daVao: vao, choMoc: conCho, soCapLen: r.soCapLen }
+}
+
+/** Dấu vết trước khi sang v4 (để lùi): cấp, EXP trong thanh, ống nghiệm, EXP đã kiếm lúc chuyển. */
+export interface TruocSiet4 {
+  cap: number
+  exp: number
+  wallet: number
+  earned: number
+  luc: string
+}
+
+export interface HoSoV3 extends HoSoTuDo {
+  luatCap?: number
+  earned?: number
+  truocSiet4?: TruocSiet4
+  mocVang?: number
+}
+
+export interface KetQuaV3SangV4<H extends HoSoV3> {
+  hoSo: H & { luatCap: number }
+  /** `false` ⇒ hồ sơ đã ở v4, trả lại CHÍNH đầu vào (gọi lại không nạp đôi). */
+  daChuyen: boolean
+  /** EXP ống nghiệm cũ đã nạp vào đường mới (gồm cả phần đang chờ mốc). */
+  ongDaNap: number
+}
+
+/**
+ * CHUYỂN hồ sơ v3 → v4 (MỘT lần; chỉ-thêm trường, không ai tụt cấp):
+ *   1. giữ nguyên cấp; tiến độ trong thanh theo tỉ lệ `floor(exp_cũ / thanhV3(cấp) × thanhV4(cấp))` (kẹp < thanh mới);
+ *   2. ống nghiệm cũ (`wallet`) nạp hết vào đường mới qua `nhanTuDo` (không trần; chưa đủ 21 ngày đạt thì phần vượt cấp 10 "chờ mốc"); `wallet` = 0;
+ *   3. KHÔNG đúc vàng cho EXP cũ: `mocVang = earned` lúc chuyển (vàng chỉ tính trên EXP kiếm từ nay);
+ *   4. ghi `truocSiet4` (cấp, EXP, ống, earned, lúc) để lùi được; `hapThu` cũ bỏ đi. Vàng, mảnh, khiên, đồ không đụng.
+ * Idempotent: hồ sơ `luatCap === 4` trả lại nguyên.
+ */
+export function chuyenV3SangV4<H extends HoSoV3>(hoSoCu: H, soNgayDat: number, luc: string): KetQuaV3SangV4<H> {
+  if (hoSoCu.luatCap === LUAT_CAP_MOI) return { hoSo: hoSoCu as KetQuaV3SangV4<H>['hoSo'], daChuyen: false, ongDaNap: 0 }
+  const cap = kepCap(hoSoCu.cap)
+  const expCu = soNguyen(hoSoCu.exp)
+  const wallet = soNguyen(hoSoCu.wallet)
+  const earned = soNguyen(hoSoCu.earned)
+  const thanhCu = thanhExpV3(cap), thanhMoi = thanhExp(cap)
+  const expMoi = cap >= CAP_TOI_DA || thanhCu <= 0 ? 0 : Math.min(thanhMoi - 1, Math.floor((Math.min(expCu, thanhCu) / thanhCu) * thanhMoi))
+  const giu = { ...hoSoCu } as Record<string, unknown>
+  delete giu.hapThu
+  const truoc = { ...giu, cap, exp: expMoi, wallet: 0, choMoc: 0, luatCap: LUAT_CAP_MOI, mocVang: earned, truocSiet4: { cap, exp: expCu, wallet, earned, luc } } as unknown as H
+  const r = nhanTuDo(truoc, wallet, soNgayDat)
+  return { hoSo: r.hoSo as KetQuaV3SangV4<H>['hoSo'], daChuyen: true, ongDaNap: wallet }
+}
+
+/**
+ * CHUYỂN hồ sơ bất kỳ sang luật hiện hành (v4): hồ sơ cũ hơn v3 đi qua `chuyenDoiSangV3` (đường 21/09) rồi `chuyenV3SangV4`.
+ * `tuyChon.soNgayDat` = số ngày đạt nhiệm vụ ngày của em (cho khoá mốc). Idempotent: hồ sơ v4 trả lại nguyên (`daChuyen: false`).
+ */
+export function chuyenDoiLuatCap<H extends HoSoCu & HoSoV3>(hoSoCu: H, soNgayCoHocTrongMua: number, ngayVN: string, tuyChon: { luc?: string; coHocHomNay?: boolean; soNgayDatTruocBangGiaMoi?: number; soNgayDat?: number } = {}): KetQuaChuyenDoi<H> {
+  if (hoSoCu.luatCap === LUAT_CAP_MOI) return { hoSo: hoSoCu as KetQuaChuyenDoi<H>['hoSo'], daChuyen: false, tongCu: 0, tongMoi: 0, daHapThu: 0, daTruDinhGia: 0, buDatNgay: 0 }
+  const v3 = hoSoCu.luatCap === LUAT_CAP_V3 ? null : chuyenDoiSangV3(hoSoCu, soNgayCoHocTrongMua, ngayVN, tuyChon)
+  const goc = (v3 ? v3.hoSo : hoSoCu) as H
+  const r = chuyenV3SangV4(goc, soNguyen(tuyChon.soNgayDat), tuyChon.luc ?? ngayVN)
+  const hoSo = r.hoSo as unknown as KetQuaChuyenDoi<H>['hoSo']
+  if (v3) return { ...v3, hoSo, daChuyen: true }
+  const tong = tongExpToiCapV3(kepCap(hoSoCu.cap)) + soNguyen(hoSoCu.exp) + soNguyen(hoSoCu.wallet)
+  return { hoSo, daChuyen: true, tongCu: tong, tongMoi: tong, daHapThu: tongExpToiCap(hoSo.cap) + soNguyen(hoSo.exp), daTruDinhGia: 0, buDatNgay: 0 }
 }
