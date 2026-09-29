@@ -76,6 +76,7 @@ import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
 import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
+import { gvDauGio } from './dau-gio'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
@@ -3359,6 +3360,8 @@ const boXuLy = {
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
+      // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.
+      if (p === '/gv/dau-gio') return ra(await gvDauGio(env, b))
       // GIAO ĐỀ THEO TUẦN (26/09, gv-kho-de-giao.ts): màn thầy `GiaoDeTheoTuanScreen` gọi lệnh này; dòng định tuyến bị rơi mất sau một lần gộp ⇒ màn báo
       // "Máy chủ chưa có lệnh". Nối lại (28/09). Có ghi (`luu`) ⇒ dùng `env` (không phải bản đọc-chỉ).
       if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(env, b))

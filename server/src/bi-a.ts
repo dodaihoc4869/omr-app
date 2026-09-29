@@ -8,7 +8,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { protectedQuestions } from './game-v2-bank'
 import { HANG_MUC_DO } from './srs2-loi'
-import { cheDo2, docCoHoa2Tu, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type KeHoachDaChot, type MetaCau } from './srs2-d1'
+import { cheDo2, docCoHoa2Tu, docNhanNo, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type KeHoachDaChot, type MetaCau } from './srs2-d1'
 import { cauDangGiu, DK_PHIEN_BIA_MO, DK_PHIEN_DAO_DOAN, goiYCho, napCau, type RefPhien } from './srs2-game'
 import { quyetDinhVaoThi } from './luat-vao-thi'
 import { docVe, kyVe } from './bi-a-ve'
@@ -288,6 +288,10 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
     refs.push(ref); cau.push(cauCongKhai(x.q, ref)); qs.push(x.q)
   }
   if (!refs.length) return { ok: false, kq: { ok: true, lyDo: 'cau_dang_bao_ve', message: LOI_BIA.cau_dang_bao_ve } }
+  // Sổ nợ (29/09): nhãn nợ trên câu ôn ("Sai 2 lần · Ca 26/09 · …") — một truy vấn sổ; lỗi ⇒ không nhãn.
+  const nhan = await docNhanNo(env, sbd, hs, refs.map((r) => r.qid)).catch(() => new Map<string, string>())
+  for (const r of refs) { const n = nhan.get(r.qid); if (n) r.nhanNo = n }
+  for (const x of [...cau, ...(chot ? [chot] : [])]) { const n = nhan.get(str(x.qid)); if (n) x.nhanNo = n }
   const session = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)')
     .bind(session, sbd, JSON.stringify({ mode: 'bia', created: nowMs, hoa2: 1, bia: 1, van, cheDo, ...them, questions: refs }), new Date(nowMs).toISOString()).run()

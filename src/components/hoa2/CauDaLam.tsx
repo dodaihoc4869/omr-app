@@ -468,6 +468,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
         )}
         {c.lichSu.length > 0 && (
           <div className="h2-the-ls">
+            {c.nhan && <p className="h2-the-hen" data-khoi="nhan-no">{c.nhan}</p>}
             <span className="h2-the-ls-nhan">Lịch sử làm câu này</span>
             <ul className="h2-the-ls-ds">
               {c.lichSu.map((l, i) => (

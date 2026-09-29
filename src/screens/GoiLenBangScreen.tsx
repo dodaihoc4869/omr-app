@@ -61,6 +61,7 @@ import { gioDayDu } from '../lib/ngay-gio-24'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import LenBangChienDich from '../components/chien-dich/LenBangChienDich'
 import DayHocLenBang from '../components/day-hoc/DayHocLenBang'
+import KiemTraDauGio from '../components/day-hoc/KiemTraDauGio'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -221,14 +222,16 @@ async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<
  *  · Thẻ thứ nhất: Game Hóa 2.0 BẬT (cờ `/gv/chien-dich` co-doc) ⇒ Chiến dịch (`LenBangChienDich`: Bảng chiến dịch / Buổi chữa); cờ TẮT ⇒ màn Gọi lên
  *    bảng theo ca kiểm tra (`GoiLenBangCu` dưới đây, giữ cho app thầy khi chưa bật 2.0). ĐÃ XOÁ nút "Gọi lên bảng theo một ca kiểm tra (cách cũ)" ở
  *    chế độ Chiến dịch (thầy lệnh 28/09) — cờ bật thì không còn lối vào màn cũ.
- *  · Thẻ DẠY HỌC (thủ công): điểm danh → chọn câu kho Dạy học → chiếu, app chọn em (`src/components/day-hoc/DayHocLenBang.tsx`). */
+ *  · Thẻ DẠY HỌC (thủ công): điểm danh → chọn câu kho Dạy học → chiếu, app chọn em (`src/components/day-hoc/DayHocLenBang.tsx`).
+ *  · Thẻ KIỂM TRA ĐẦU GIỜ (29/09): cùng bước điểm danh → app gọi ≤ 6 em, mỗi em một câu em từng làm đúng → chấm Đạt / Chưa đạt (`KiemTraDauGio.tsx`). */
 export default function GoiLenBangScreen() {
   const hoa2 = useHoa2Bat()
   // Mỗi lần mở mục là thẻ thứ nhất (không nhớ qua lần tải lại — tránh thầy mở ra màn khác với lần trước mà không để ý).
-  const [the, chon] = useState<'chinh' | 'day_hoc'>('chinh')
+  const [the, chon] = useState<'chinh' | 'day_hoc' | 'dau_gio'>('chinh')
   const DS_THE = [
     { id: 'chinh' as const, ten: hoa2 ? 'Chiến dịch' : 'Theo ca kiểm tra' },
     { id: 'day_hoc' as const, ten: 'Dạy học' },
+    { id: 'dau_gio' as const, ten: 'Kiểm tra đầu giờ' },
   ]
   return (
     <>
@@ -240,7 +243,7 @@ export default function GoiLenBangScreen() {
         ))}
       </div>
       <div role="tabpanel" aria-labelledby={`the-len-bang-${the}`}>
-        {the === 'day_hoc' ? <DayHocLenBang /> : hoa2 ? <LenBangChienDich /> : <GoiLenBangCu />}
+        {the === 'dau_gio' ? <KiemTraDauGio /> : the === 'day_hoc' ? <DayHocLenBang /> : hoa2 ? <LenBangChienDich /> : <GoiLenBangCu />}
       </div>
     </>
   )

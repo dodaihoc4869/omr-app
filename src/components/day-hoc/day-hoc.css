@@ -549,3 +549,11 @@
 .dh-them-dong .dh-chip {
   flex: 0 0 auto;
 }
+/* Ba thẻ (Chiến dịch · Dạy học · Kiểm tra đầu giờ, 29/09) trên điện thoại hẹp: thu lề để không tràn (390 px). */
+@media (max-width: 480px) {
+  .dh-the {
+    padding: 0 12px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+}

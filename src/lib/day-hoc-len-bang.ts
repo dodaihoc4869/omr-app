@@ -101,6 +101,8 @@ export interface EmLenCau {
   lop?: string
   /** Lần lên bảng thứ mấy của em trong buổi (đã tính lần này). */
   lanLenBang?: number
+  /** Dòng lịch sử câu này của em trên THẺ TÊN (Kiểm tra đầu giờ 29/09): "Sai 20/09 (Ca) · Đúng 22/09 (Đoàn)". Thiếu ⇒ không in. */
+  lichSu?: string
 }
 /** Một ô Đạt / Chưa đạt trên tờ — khuôn `OGhiToChieu` của luồng ghi sẵn có (`ghiLenBang`). */
 export interface OGhiDayHoc {
@@ -138,6 +140,7 @@ export async function dungToChieuDayHoc(
       ...(coNut ? { qid: c.qid } : {}),
       ...(em?.lop ? { lop: em.lop } : {}),
       ...(em?.lanLenBang ? { lanLenBang: em.lanLenBang } : {}),
+      ...(em?.lichSu ? { lichSuCau: { kieu: 'dung' as const, chu: em.lichSu } } : {}),
       bacUoc: uocLuongBacCauGoc(c.phan, c.q).bac,
       soCau: i + 1,
       sao: cau.sao,
