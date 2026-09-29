@@ -497,7 +497,10 @@ export function chuyenDoiLuatCap<H extends HoSoCu & HoSoV3 & HoSoV4>(hoSoCu: H, 
   const goc3 = (v3 ? v3.hoSo : hoSoCu) as H
   const goc4 = (goc3.luatCap === LUAT_CAP_V4 ? goc3 : chuyenV3SangV4(goc3, soNguyen(tuyChon.soNgayDat), luc).hoSo) as H
   const r = chuyenV4SangV5(goc4, luc)
-  const hoSo = r.hoSo as unknown as KetQuaChuyenDoi<H>['hoSo']
+  // KHÔNG AI TỤT CẤP (thầy chốt v5): bước lịch sử cũ-hơn-v3 (tính lại cấp theo số ngày học của đường 21/09) có thể cho cấp thấp hơn cấp em đang có ⇒ giữ cấp cũ (thanh bắt đầu từ 0).
+  const capCu = kepCap(hoSoCu.cap)
+  const giuCap = r.hoSo.cap < capCu ? { ...r.hoSo, cap: capCu, exp: 0 } : r.hoSo
+  const hoSo = giuCap as unknown as KetQuaChuyenDoi<H>['hoSo']
   if (v3) return { ...v3, hoSo, daChuyen: true }
   const tong = hoSoCu.luatCap === LUAT_CAP_V4
     ? tongExpToiCapV4(kepCap(hoSoCu.cap)) + soNguyen(hoSoCu.exp) + soNguyen(hoSoCu.choMoc)

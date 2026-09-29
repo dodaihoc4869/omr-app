@@ -9,7 +9,7 @@ import { congTongSoVaoHoSo } from '../server/src/exp-ho-so-game'
 import { docExpHomNay } from '../server/src/exp-d1'
 import { docHapThuChoEm } from '../server/src/game-v2-hap-thu'
 import { chenhDinhGia, tongExpTheoDuongCu } from '../src/lib/hap-thu-ngay'
-import { thanhExp, thanhExpV3, tongExpToiCap, tongExpToiCapV3 } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { thanhExp, thanhExpV3, thanhExpV4, tongExpToiCapV3, tongExpToiCapV4 } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { taoD1That, type D1That } from './_d1-that'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
@@ -35,6 +35,8 @@ const lamCau = (d: D1That, n: number, ngay = NGAY, o: { nguon?: string; ketQua?:
     .run(`${o.tienTo ?? 'k'}${ngay}-${i}`, `${o.tienTo ?? 'Q'}-${ngay}-${i}`, o.nguon ?? 'btvn', o.ketQua === undefined ? 1 : o.ketQua, `${ngay}T03:0${i % 10}:00.000Z`, ngay)
 }
 
+// SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): hồ sơ nay chuyển tiếp v4 → v5 (luatCap 5, giữ cấp, tiến độ trong thanh theo tỉ lệ thanh v4 → v5), tin một lần mã `luat-cap-v5`,
+// bỏ trần 120 EXP game/ngày (nấc dạng nhận đủ, không còn `thuongGoc`), `expGameHomNay.tran` = null.
 // SỬA CÓ CHỦ Ý 29/09 (luật v4, docs/DE-XUAT-EXP-2909.md): BỎ cổng hấp thụ 200/120/0 và ống nghiệm. Bảy test cũ của cổng `invest` (trần 200/120/0, "no", "het_ong",
 // siết "có học", sang ngày mới…) khoá luật đã bỏ ⇒ thay bằng hành vi mới: mở hồ sơ v3 chuyển MỘT lần (ống nạp hết vào thú), `invest` không còn gì để nạp.
 describe('lệnh `invest` — luật v4 nạp tự do', () => {
@@ -43,7 +45,8 @@ describe('lệnh `invest` — luật v4 nạp tự do', () => {
     const d = taoD1That(); themHoSo(d)
     const r = await invest(d) as any
     expect(r).toMatchObject({ ok: true, daNap: 0, lyDo: null })
-    expect(docHoSo(d)).toMatchObject({ cap: 3, exp: 140, wallet: 0, luatCap: 4, mocVang: 0, truocSiet4: { cap: 1, exp: 0, wallet: 500, earned: 0 } })
+    // v3 → v4: 500 vào thú (90 + 270 ⇒ cấp 3 dư 140 trên thanh v4 510) → v5: giữ cấp 3, tỉ lệ ⌊140/510 × 1 010⌋ = 277
+    expect(docHoSo(d)).toMatchObject({ cap: 3, exp: 277, wallet: 0, luatCap: 5, mocVang: 0, truocSiet4: { cap: 1, exp: 0, wallet: 500, earned: 0 }, truocV5: { cap: 3, exp: 140, choMoc: 0 } })
     expect(revision(d)).toBe(1)
     expect(r.profile).not.toHaveProperty('hapThuHomNay')
     expect(r.profile).toMatchObject({ ongNghiem: 0, choMoc: 0 })
@@ -85,7 +88,7 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     d.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run(sbd, JSON.stringify(ho), 'x')
   }
   // Luật v4: tin một lần mang mã mới `luat-cap-v4|<sbd>` (em đã nhận tin 21/09 vẫn nhận tin mới).
-  const tin = (d: D1That) => d.sql.prepare("SELECT id, sbd, body FROM student_notice WHERE id LIKE 'luat-cap-v4|%' ORDER BY id").all() as { id: string; sbd: string; body: string }[]
+  const tin = (d: D1That) => d.sql.prepare("SELECT id, sbd, body FROM student_notice WHERE id LIKE 'luat-cap-v5|%' ORDER BY id").all() as { id: string; sbd: string; body: string }[]
 
   it('mở hồ sơ ⇒ chuyển đổi qua v3 rồi v4: luatCap 4, giữ vết `truocSiet` + `truocSiet4`, bước v3 BẢO TOÀN tổng EXP (= tổng cũ − chênh nấc + bù), bước v4 giữ cấp và nạp hết ống; một tin cho em', async () => {
     gio(`${NGAY}T10:00:00`)
@@ -94,37 +97,42 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     const tongCu = tongExpTheoDuongCu(4, 50, 100), chenh = chenhDinhGia([{ stage: 2 }, { stage: 1 }])
     const { profile, revision: rev } = await loadProfile(d.env, 'S1')
     // Luật v4 (29/09): hồ sơ cũ đi qua bước v3 (định giá lại + bù, như cũ) rồi sang v4 — phần ống nạp hết vào thú. Sửa CÓ CHỦ Ý: luatCap 4, không còn "≤ 200 × ngày".
-    expect(rev).toBe(1); expect(profile.luatCap).toBe(4)
+    expect(rev).toBe(1); expect(profile.luatCap).toBe(5)
     const dc = docHoSo(d)
     const tongMoi = tongCu - chenh + 60 // bù 60 cho 1 ngày đạt trước 22/09
     // bước v3 BẢO TOÀN tổng (đọc từ dấu vết truocSiet4 = hồ sơ v3 ngay trước khi sang v4); bước v4 GIỮ CẤP, tiến độ trong thanh theo tỉ lệ, ống nạp hết vào thú
     const t4 = dc.truocSiet4 as { cap: number; exp: number; wallet: number }
     expect(tongExpToiCapV3(t4.cap) + t4.exp + t4.wallet).toBe(tongMoi)
     expect(dc.cap).toBeGreaterThanOrEqual(t4.cap)
-    let da = 0; for (let c = 1; c < dc.cap; c++) da += thanhExp(c); da += dc.exp
-    expect(da + (dc.choMoc ?? 0)).toBe(tongExpToiCap(t4.cap) + Math.floor((t4.exp / thanhExpV3(t4.cap)) * thanhExp(t4.cap)) + t4.wallet)
+    // bước v4 (lịch sử): tổng trên đường v4 (kể cả chờ mốc) = tiến độ v3 theo tỉ lệ + ống; bước v5: giữ cấp, EXP trong thanh theo tỉ lệ, chờ mốc giữ nguyên
+    const t5 = dc.truocV5 as { cap: number; exp: number; choMoc: number }
+    expect(tongExpToiCapV4(t5.cap) + t5.exp + t5.choMoc).toBe(tongExpToiCapV4(t4.cap) + Math.floor((t4.exp / thanhExpV3(t4.cap)) * thanhExpV4(t4.cap)) + t4.wallet)
+    // v5: KHÔNG AI TỤT CẤP — bước v3 lịch sử (tính lại cấp theo ngày học) cho cấp 3 < cấp 4 em đang có ⇒ giữ cấp 4, thanh từ 0; còn lại giữ tiến độ theo tỉ lệ
+    if (t5.cap >= 4) expect(dc.exp).toBe(Math.floor((t5.exp / thanhExpV4(t5.cap)) * thanhExp(t5.cap)))
+    expect(dc.cap).toBe(Math.max(t5.cap, 4))
+    expect(dc.choMoc).toBe(t5.choMoc)
     expect(dc.wallet).toBe(0)
     expect(dc.truocSiet).toMatchObject({ cap: 4, exp: 50, wallet: 100, dinhGiaLai: { chenh } })
     expect(dc.truocSiet4).toBeTruthy()
-    expect(tin(d)).toHaveLength(1); expect(tin(d)[0]).toMatchObject({ id: 'luat-cap-v4|S1', sbd: 'S1' })
-    expect(tin(d)[0]!.body).toContain('vào thần thú ngay')
+    expect(tin(d)).toHaveLength(1); expect(tin(d)[0]).toMatchObject({ id: 'luat-cap-v5|S1', sbd: 'S1' })
+    expect(tin(d)[0]!.body).toContain('đủ số ngày em đạt nhiệm vụ ngày')
     // mở lần hai: không đổi gì, không thêm tin
     const r2 = await loadProfile(d.env, 'S1'); expect(r2.revision).toBe(1); expect(tin(d)).toHaveLength(1)
   })
 
   it('hồ sơ ĐÃ ở luật mới không bị đụng (không ghi, revision giữ)', async () => {
     gio(`${NGAY}T10:00:00`)
-    const d = taoD1That(); themHoSo(d, { luatCap: 4 })
+    const d = taoD1That(); themHoSo(d, { luatCap: 5 })
     const r = await loadProfile(d.env, 'S1'); expect(r.revision).toBe(0); expect(revision(d)).toBe(0)
   })
 
-  it('hồ sơ MÙA MỚI (tạo trắng theo mùa) sinh sẵn luatCap 4 (v4, mọi EXP đều đúc vàng: mocVang 0), không cần chuyển đổi', async () => {
+  it('hồ sơ MÙA MỚI (tạo trắng theo mùa) sinh sẵn luatCap 5 (v5, mọi EXP đều đúc vàng: mocVang 0), không cần chuyển đổi', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That()
     d.sql.exec("CREATE TABLE IF NOT EXISTS game_v2_settings (key TEXT PRIMARY KEY, json TEXT NOT NULL)")
     d.sql.prepare("INSERT INTO game_v2_settings(key,json) VALUES('season',?)").run(JSON.stringify({ id: 's2' }))
     const r = await loadProfile(d.env, 'S1')
-    expect(r.profile).toMatchObject({ cap: 1, exp: 0, wallet: 0, luatCap: 4, mocVang: 0, season: 's2' })
+    expect(r.profile).toMatchObject({ cap: 1, exp: 0, wallet: 0, luatCap: 5, mocVang: 0, season: 's2' })
   })
 
   it('CRON: ≤ toiDa hồ sơ mỗi lượt cho tới hết; thua CAS (em đang chơi) không bị đè; hết việc ⇒ cờ `chuyen_doi_cap_v3 = xong` và lượt sau không làm gì', async () => {
@@ -134,7 +142,7 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     themHoSo(d, {}, 'E6') // luật v3: cron KHÔNG quét hàng loạt v3 → v4 (chuyển lười từng em)
     const t1 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 2 })
     expect(t1).toMatchObject({ soDoc: 2, daDoi: 2, xong: false })
-    expect(docHoSo(d, 'E1').luatCap).toBe(4); expect(docHoSo(d, 'E2').luatCap).toBe(4); expect(docHoSo(d, 'E3').luatCap).toBeUndefined()
+    expect(docHoSo(d, 'E1').luatCap).toBe(5); expect(docHoSo(d, 'E2').luatCap).toBe(5); expect(docHoSo(d, 'E3').luatCap).toBeUndefined()
     // E3 vừa được em khác mở chơi ⇒ revision đổi giữa lúc cron đọc và ghi: mô phỏng bằng tăng revision trước câu UPDATE của cron
     const goc = d.env.DB.prepare.bind(d.env.DB)
     let daPha = false
@@ -145,7 +153,7 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     const t2 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 2 })
     d.env.DB.prepare = goc as never
     expect(t2).toMatchObject({ soDoc: 2, daDoi: 1, thuaCas: 1, xong: false })
-    expect(docHoSo(d, 'E3').luatCap).toBeUndefined(); expect(docHoSo(d, 'E4').luatCap).toBe(4)
+    expect(docHoSo(d, 'E3').luatCap).toBeUndefined(); expect(docHoSo(d, 'E4').luatCap).toBe(5)
     const t3 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 40 })
     expect(t3).toMatchObject({ soDoc: 2, daDoi: 2, xong: false }) // E3 (làm lại) + E5
     const t4 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 40 })
@@ -153,7 +161,7 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     expect((d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='chuyen_doi_cap_v3'").get() as { gia_tri: string }).gia_tri).toBe('xong')
     const truoc = d.chup('game_v2_profile')
     expect(await chuyenDoiLoCron(d.env, Date.now())).toMatchObject({ soDoc: 0, xong: true }); expect(d.chup('game_v2_profile')).toBe(truoc)
-    for (const s of ['E1', 'E2', 'E3', 'E4', 'E5']) expect(docHoSo(d, s).luatCap).toBe(4)
+    for (const s of ['E1', 'E2', 'E3', 'E4', 'E5']) expect(docHoSo(d, s).luatCap).toBe(5)
     expect(revision(d, 'E6')).toBe(0)
   })
 
@@ -166,13 +174,13 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
   })
 })
 
-describe('ĐIỀU 9 — trần 120 EXP/ngày VN cho EXP sinh trong game (MỘT cửa)', () => {
-  it('nhanExpGame: cộng dồn tới 120, quá trần ⇒ 0, sang ngày mới về 0; xin âm/NaN ⇒ 0', () => {
+describe('SỬA CÓ CHỦ Ý 29/09 v5 — BỎ trần 120 EXP/ngày VN cho EXP sinh trong game (bộ đếm ngày vẫn ghi để thống kê)', () => {
+  it('nhanExpGame: nhận ĐỦ, cộng dồn bộ đếm, sang ngày mới đếm lại; xin âm/NaN ⇒ 0', () => {
     const p: any = { expGame: undefined }
     expect(nhanExpGame(p, NGAY, 100)).toBe(100)
-    expect(nhanExpGame(p, NGAY, 30)).toBe(20)
-    expect(p.expGame).toMatchObject({ ngay: NGAY, da: 120 })
-    expect(nhanExpGame(p, NGAY, 10)).toBe(0)
+    expect(nhanExpGame(p, NGAY, 30)).toBe(30)
+    expect(p.expGame).toMatchObject({ ngay: NGAY, da: 130 })
+    expect(nhanExpGame(p, NGAY, 10)).toBe(10)
     expect(nhanExpGame(p, '2026-09-23', 50)).toBe(50)
     expect(p.expGame).toMatchObject({ ngay: '2026-09-23', da: 50 })
     expect(nhanExpGame(p, '2026-09-23', -5)).toBe(0)
@@ -192,20 +200,20 @@ describe('ĐIỀU 9 — trần 120 EXP/ngày VN cho EXP sinh trong game (MỘT c
   }
   const tra = (d: D1That, i: number) => gameV2(d.env, 'answer', { token: 'token-S1', session: 'S', qid: `D-I-${i}`, answer: 'B' })
 
-  it('đã nhận 115: nấc dạng 10 EXP chỉ vào 5 (trần 120); câu kế 0 EXP — nhưng `mastery`, sổ sự kiện học, bản ghi lượt vẫn đủ; phản hồi có `thuongGoc` và `expGameHomNay`', async () => {
+  it('đã nhận 115: nấc dạng 10 EXP vẫn nhận ĐỦ 10 (không còn trần 120, không `thuongGoc`); câu kế cũng đủ; `mastery`, sổ sự kiện học, bản ghi lượt vẫn đủ', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dungTraLoi(115)
     const a = await tra(d, 1)
-    expect(a).toMatchObject({ ok: true, reward: 5, thuongGoc: 10, correct: true })
-    expect((a.profile as any).expGameHomNay).toEqual({ da: 120, tran: 120 })
-    expect(docHoSo(d)).toMatchObject({ exp: 5, wallet: 0, earned: 5, expGame: { ngay: NGAY, da: 120 } }) // luật v4: vào THẲNG thú
+    expect(a).toMatchObject({ ok: true, reward: 10, correct: true }); expect(a).not.toHaveProperty('thuongGoc')
+    expect((a.profile as any).expGameHomNay).toEqual({ da: 125, tran: null })
+    expect(docHoSo(d)).toMatchObject({ exp: 10, wallet: 0, earned: 10, expGame: { ngay: NGAY, da: 125 } })
     const b = await tra(d, 2)
-    expect(b).toMatchObject({ reward: 0, thuongGoc: 10, correct: true })
-    expect(docHoSo(d)).toMatchObject({ exp: 5, earned: 5 })
+    expect(b).toMatchObject({ reward: 10, correct: true }); expect(b).not.toHaveProperty('thuongGoc')
+    expect(docHoSo(d)).toMatchObject({ exp: 20, earned: 20 })
     expect(docHoSo(d).mastery.map((m: any) => [m.key, m.stage])).toEqual([['AA.01', 1], ['AA.02', 1]]) // tiến bộ vẫn ghi đủ
     expect(d.dem('game_v2_attempt')).toBe(2)
     expect(d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE nguon='game'").get()).toEqual({ n: 2 })
-    expect((d.sql.prepare('SELECT amount FROM game_v2_reward ORDER BY id').all() as { amount: number }[]).map((x) => x.amount)).toEqual([5, 0]) // sổ thưởng ghi phần THẬT
+    expect((d.sql.prepare('SELECT amount FROM game_v2_reward ORDER BY id').all() as { amount: number }[]).map((x) => x.amount)).toEqual([10, 10]) // sổ thưởng ghi phần THẬT
   })
 
   it('chưa nhận gì: nấc 1 nhận đủ 10; không quá trần thì KHÔNG có `thuongGoc`; sang ngày mới trần 120 mới', async () => {
@@ -224,20 +232,20 @@ describe('ĐIỀU 9 — trần 120 EXP/ngày VN cho EXP sinh trong game (MỘT c
 
 describe('hồ sơ hiển thị cho máy em (chỉ-thêm)', () => {
   // SỬA CÓ CHỦ Ý 29/09 (luật v4): không còn `hapThuHomNay` / ống nghiệm; thêm choMoc, ngayMoCap10, expMoiVang; không lộ dấu vết chuyển đổi (truocSiet, truocSiet4, mocVang).
-  it('`profile` (v4) trả expGameHomNay {da, tran: 120}, ongNghiem 0, choMoc, ngayMoCap10 21, expMoiVang 5; KHÔNG có hapThuHomNay; KHÔNG lộ truocSiet/truocSiet4/mocVang/legacy', async () => {
+  it('SỬA CÓ CHỦ Ý 29/09 v5 — `profile` trả expGameHomNay {da, tran: null}, ongNghiem 0, choMoc, mốc ngày cấp sau, choNgay, tranHomNay, expMoiVang 5; KHÔNG có hapThuHomNay; KHÔNG lộ truocSiet/truocSiet4/truocV5/tranV5/mocVang/legacy', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themHoSo(d, { wallet: 77, truocSiet: { cap: 9 }, hapThu: { ngay: NGAY, da: 50 }, expGame: { ngay: NGAY, da: 30 } })
     lamCau(d, 4)
     const r = await gameV2(d.env, 'profile', { token: 'token-S1' }) as any
-    expect(r.profile).toMatchObject({ ongNghiem: 0, choMoc: 0, ngayMoCap10: 21, expMoiVang: 5, expGameHomNay: { da: 30, tran: 120 } })
-    expect(r.profile.exp).toBe(77) // ống 77 đã vào thú
-    for (const k of ['hapThuHomNay', 'truocSiet', 'truocSiet4', 'mocVang', 'legacy']) expect(r.profile, k).not.toHaveProperty(k)
+    expect(r.profile).toMatchObject({ ongNghiem: 0, choMoc: 0, ngayMoCap10: 0, ngayCapSau: 0, soNgayCap: 0, choNgay: 0, tranHomNay: { exp: 0, vang: 0, manh: 0 }, expMoiVang: 5, expGameHomNay: { da: 30, tran: null } })
+    expect(r.profile.exp).toBe(85) // ống 77 vào thú (v4, thanh 90) rồi đổi tỉ lệ sang thanh v5 (100): ⌊77/90 × 100⌋
+    for (const k of ['hapThuHomNay', 'truocSiet', 'truocSiet4', 'truocV5', 'tranV5', 'mocVang', 'legacy']) expect(r.profile, k).not.toHaveProperty(k)
   })
   it('sang ngày mới: expGameHomNay.da về 0', async () => {
     gio('2026-09-24T10:00:00')
     const d = taoD1That(); themHoSo(d, { hapThu: { ngay: NGAY, da: 200 }, expGame: { ngay: NGAY, da: 120 } })
     const r = await gameV2(d.env, 'profile', { token: 'token-S1' }) as any
-    expect(r.profile).not.toHaveProperty('hapThuHomNay'); expect(r.profile.expGameHomNay).toEqual({ da: 0, tran: 120 })
+    expect(r.profile).not.toHaveProperty('hapThuHomNay'); expect(r.profile.expGameHomNay).toEqual({ da: 0, tran: null })
   })
 })
 
@@ -265,6 +273,7 @@ describe('ba con số cho Bảng nhiệm vụ (khối `exp`): expConThieu · ong
     themHoSo(d, { choice: true }); expect(await docHapThuChoEm(d.env, 'S1')).toBeNull()
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json_remove(json, '$.luatCap'), '$.choice', 0)").run(); expect(await docHapThuChoEm(d.env, 'S1')).toBeNull()
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.luatCap', 4)").run(); expect(await docHapThuChoEm(d.env, 'S1')).toBeNull() // luật v4
+    d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.luatCap', 5)").run(); expect(await docHapThuChoEm(d.env, 'S1')).toBeNull() // luật v5
     const e = await docExpHomNay(d.env, 'S1', Date.now()); expect(e).not.toHaveProperty('ongNghiem')
   })
 })

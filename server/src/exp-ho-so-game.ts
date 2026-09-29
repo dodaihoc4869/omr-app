@@ -117,7 +117,7 @@ export function congTongSoVaoHoSo(p: HoSoGameExp, tongExp: number, tongManh: num
   const themManh = Math.max(0, Math.floor(tongManh) - manhDaTinh)
   // Số ngày đạt (và ngày nghỉ chung) cập nhật TRƯỚC khi cộng EXP: hôm nay em vừa đạt thêm một ngày thì sức chứa tăng ngay trong CÙNG lần cộng.
   const nghiCu = p.expMoi?.ngayNghi
-  if (ngayDat !== undefined) p.expMoi = { daCong, manhDaTinh, ngayDat: Math.max(0, Math.floor(ngayDat)), ...(ngayNghi !== undefined ? { ngayNghi: Math.max(0, Math.floor(ngayNghi)) } : nghiCu !== undefined ? { ngayNghi: nghiCu } : {}) }
+  if (ngayDat !== undefined) p.expMoi = { daCong, manhDaTinh, ngayDat: Math.max(0, Math.floor(ngayDat)), ...(ngayNghi !== undefined && (ngayNghi > 0 || nghiCu !== undefined) ? { ngayNghi: Math.max(0, Math.floor(ngayNghi)) } : nghiCu !== undefined ? { ngayNghi: nghiCu } : {}) }
   // EXP vào thú (hồ sơ v3/v4 được chuyển trước); cả khi `them = 0` vẫn gọi để đổ ngăn chờ lúc em vừa có thêm ngày.
   const thu = them > 0 || (p.choMoc ?? 0) > 0 || p.luatCap === LUAT_CAP_V3 || p.luatCap === LUAT_CAP_V4 ? congExpVaoHoSo(p, them) : null
   let khienMoi = 0

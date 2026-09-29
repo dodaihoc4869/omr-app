@@ -658,7 +658,7 @@ export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: s
     if (!tu) return khong
     const ngay = ngayVn(nowMs)
     const luc = new Date(nowMs).toISOString()
-    for (let thu = 0; thu < 6; thu++) {
+    for (let thu = 0; thu < 12; thu++) {
       const r = await env.DB.prepare("SELECT khoa, ma_nguon FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'tiepsuc'").bind(sbd, ngay).all<{ khoa: string; ma_nguon: string | null }>()
       const co = r.results ?? []
       if (idLuot && co.some((x) => x.ma_nguon === idLuot)) { await congVaoHoSoGame(env, sbd, await docTuNgayMua(env)); return { bat: true, exp: 0, lanThu: 0, conLai: -1, daGhiTruoc: true } }

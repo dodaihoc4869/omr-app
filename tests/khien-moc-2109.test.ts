@@ -165,7 +165,8 @@ describe('mốc: mảnh chỉ tính từ dòng ngay_vn ≥ mốc; đạt 21/09 �
     expect(doc(d, 'A').khienRen).toEqual({ manh: 1, daRen: 0 })
     expect(doc(d, 'A').expMoi).toMatchObject({ manhDaTinh: 1, ngayDat: 1 })
   })
-  it('20 ngày đạt ⇒ 20/21, chưa khiên; ngày thứ 21 ⇒ rèn khiên đầu tiên (mảnh về 0) VÀ khiên quà đầu (cấp 10) mở', async () => {
+  // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): một khiên rèn = 36 mảnh (trước 21) ⇒ ngày thứ 21 chỉ mở khiên quà đầu (cấp 10), CHƯA rèn khiên.
+  it('20 ngày đạt ⇒ 20 mảnh, chưa khiên; ngày thứ 21 ⇒ khiên quà đầu (cấp 10) mở; khiên rèn đợi đủ 36 mảnh', async () => {
     const d = dungMoc()
     d.sql.exec(SQL_DAT)
     for (let n = 0; n < 20; n++) manhRow(d, 'A', themNgay('2026-09-21', n))
@@ -176,9 +177,9 @@ describe('mốc: mảnh chỉ tính từ dòng ngay_vn ≥ mốc; đạt 21/09 �
     manhRow(d, 'A', themNgay('2026-09-21', 20))
     await congVaoHoSoGame(d.env, 'A', SINCE)
     p = doc(d, 'A')
-    expect(p.khienRen).toEqual({ manh: 0, daRen: 1 })
+    expect(p.khienRen).toEqual({ manh: 21, daRen: 0 })
     expect(p.expMoi.ngayDat).toBe(21)
-    expect(khienConLai(p)).toBe(2) // 1 khiên rèn + 1 khiên quà đầu vừa mở
+    expect(khienConLai(p)).toBe(1) // khiên quà đầu vừa mở (khiên rèn cần 36 mảnh)
   })
   it('mảnh thưởng chuỗi 7 / dạng rời yếu (so = 0) không làm lệch; chỉ dòng loai = dat được đếm là NGÀY ĐẠT', async () => {
     const d = dungMoc()

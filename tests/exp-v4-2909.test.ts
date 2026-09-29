@@ -3,12 +3,12 @@
 //   (1) đường cấp công thức đóng; (2) mô phỏng em chăm nhất: ngày 20 cấp 9, ngày 21 cấp 10, khiên đầu ngày 21; (3) trần KIẾM (câu 3× mục tiêu, khắc phục ≤ 3, lên bậc ≤ 10);
 //   (4) vàng 1 / 5 EXP; (5) khoá mốc 21 ngày đạt (EXP chờ, không mất); (6) chuyển dữ liệu cũ v3 → v4 không tụt cấp, gọi lại không nạp đôi; (7) khiên bằng vàng, không cần cấp 10;
 //   (8) D1 thật: đúc vàng lười chỉ-thêm, không đúc đôi; rèn khiên trừ đúng 1 400 vàng một lần; vang-doi đã bỏ.
+// SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT luật EXP v5, docs/DE-XUAT-EXP-V5-2909.md): đường cấp v4 nay là LỊCH SỬ (`*V4`, chỉ để chuyển v4 → v5); mô phỏng v4 thay bằng v5;
+// bỏ mọi trần kiếm theo ngày; hồ sơ sang luật 5; khiên 36 mảnh + 2 600 vàng + ngày đạt ≥ 36 + 18(k − 1). Nghiệm thu v5 đầy đủ: tests/exp-v5-2909.test.ts.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { BANG_THANH_EXP, BANG_THANH_EXP_V3, THANH_DAU_V4, thanhExp, thanhExpV3, tongExpToiCap, tongExpToiDinh } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { EXP_MOI_VANG, NGAY_DAT_MO_CAP_10, VANG_REN_KHIEN, vangDangDuc } from '../src/lib/kinh-te-game'
-import { LUAT_CAP_MOI, LUAT_CAP_V3, chuyenDoiLuatCap, chuyenV3SangV4, dangKhoaMoc, nhanTuDo } from '../src/lib/hap-thu-ngay'
-import { HO_SO_MO_PHONG, chayMoPhong, expCauNgay } from '../src/lib/mo-phong-bang-gia-exp'
-import { KHAC_PHUC_TOI_DA_NGAY, LEN_BAC_TOI_DA_NGAY, TRAN_CUNG_HE_SO } from '../server/src/exp-cau-hinh'
+import { BANG_THANH_EXP_V4 as BANG_THANH_EXP, BANG_THANH_EXP_V3, THANH_DAU_V4, thanhExpV4 as thanhExp, thanhExpV3, tongExpToiCapV4 as tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { EXP_MOI_VANG, VANG_REN_KHIEN, vangDangDuc } from '../src/lib/kinh-te-game'
+import { LUAT_CAP_MOI, LUAT_CAP_V3, LUAT_CAP_V4, NGAY_DAT_MO_CAP_10_V4 as NGAY_DAT_MO_CAP_10, chuyenDoiLuatCap, chuyenV3SangV4, dangKhoaMoc, nhanTuDo } from '../src/lib/hap-thu-ngay'
 import { tinhExp, type SuKienExp, type VaoTinhExp } from '../server/src/exp-hoc-tap'
 import { congTongSoVaoHoSo, renKhienBangVang, type HoSoGameExp } from '../server/src/exp-ho-so-game'
 import { ducVang, renKhienVang } from '../server/src/vang-duc'
@@ -16,7 +16,7 @@ import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { taoD1That, type D1That } from './_d1-that'
 
-describe('(1) đường cấp v4 — công thức đóng', () => {
+describe('(1) đường cấp v4 (LỊCH SỬ, chỉ để chuyển v4 → v5) — công thức đóng', () => {
   it('9 thanh đầu = làmTròn10(87,49·c^1,6), tổng 11 700 (thanh 9 bù lệch); từ cấp 10 +60 mỗi cấp; tổng các mốc đúng đề xuất', () => {
     expect([...THANH_DAU_V4]).toEqual([90, 270, 510, 800, 1150, 1540, 1970, 2440, 2930])
     const K = 11700 / Array.from({ length: 9 }, (_, i) => (i + 1) ** 1.6).reduce((a, b) => a + b, 0)
@@ -25,7 +25,6 @@ describe('(1) đường cấp v4 — công thức đóng', () => {
     for (let c = 10; c <= 119; c++) expect(thanhExp(c), `cấp ${c}`).toBe(2930 + 60 * (c - 9))
     for (let i = 1; i < 119; i++) expect(BANG_THANH_EXP[i]!).toBeGreaterThan(BANG_THANH_EXP[i - 1]!)
     expect([10, 20, 30, 50, 100, 120].map(tongExpToiCap)).toEqual([11_700, 44_300, 82_900, 178_100, 521_100, 700_300])
-    expect(tongExpToiDinh()).toBe(700_300)
     expect(thanhExp(120)).toBe(0)
     // bảng v3 giữ nguyên cho chuyển đổi và P08
     expect(BANG_THANH_EXP_V3.reduce((a, b) => a + b, 0)).toBe(238_200)
@@ -33,32 +32,7 @@ describe('(1) đường cấp v4 — công thức đóng', () => {
   })
 })
 
-describe('(2) mô phỏng 60 ngày bằng hàm sản phẩm', () => {
-  it('em chăm nhất: ngày 20 cấp 9, ngày 21 cấp 10; khiên đầu ngày 21', () => {
-    const r = chayMoPhong(HO_SO_MO_PHONG.cham, 60)
-    expect(r.capNgay[20]).toBe(9)
-    expect(r.cap[10]).toBe(21)
-    expect(r.khienDau).toBe(21)
-    expect(r.khien2).toBe(42)
-    expect(r.cap[5]).toBe(3)
-    expect(Math.round(r.tbNgay)).toBe(584)
-    expect([7, 14, 21, 30].map((n) => r.vangTichLuy[n])).toEqual([802, 1620, 2440, 3490])
-  })
-  it('không khoá mốc: đường cấp một mình vẫn cho ngày 21; lịch dày hơn (thêm 1 ca thi + 1 lên bảng/tuần): khoá mốc giữ đúng ngày 21', () => {
-    expect(chayMoPhong(HO_SO_MO_PHONG.cham, 60, false).cap[10]).toBe(21)
-    const day = { ...HO_SO_MO_PHONG.cham, ca: (t: number) => (t === 7 || t === 3 ? 10 : null), lenBang: (t: number) => (t === 4 || t === 2 ? 'dat' as const : null) }
-    expect(chayMoPhong(day, 60, false).cap[10]).toBe(20)
-    expect(chayMoPhong(day, 60, true).cap[10]).toBe(21)
-  })
-  it('trung bình và yếu chậm hơn (cấp 10 ngày 38 / 75), không ai sớm hơn ngày 21', () => {
-    expect(chayMoPhong(HO_SO_MO_PHONG.tb, 60).cap[10]).toBe(38)
-    expect(chayMoPhong(HO_SO_MO_PHONG.yeu, 120).cap[10]).toBe(75)
-    expect(chayMoPhong(HO_SO_MO_PHONG.tb, 60).khienDau).toBe(24)
-  })
-  it('cày 200 câu/ngày: EXP câu không đổi (trần cứng 3× mục tiêu)', () => {
-    expect(expCauNgay({ ...HO_SO_MO_PHONG.cham, cauDung: 200 })).toBeCloseTo(expCauNgay(HO_SO_MO_PHONG.cham), 9)
-  })
-})
+// (2) SỬA CÓ CHỦ Ý 29/09 v5: mô phỏng v4 (60 ngày, khoá mốc cấp 10) đã thay bằng mô phỏng v5 (1 300 ngày, 5 hồ sơ) — khoá ở tests/exp-v5-2909.test.ts.
 
 // ── (3) trần KIẾM ─────────────────────────────────────────────────────────────────────────────────
 const NGAY = '2026-09-30'
@@ -67,29 +41,21 @@ const vao = (o: Partial<VaoTinhExp> = {}): VaoTinhExp => ({
 })
 const cauDung = (n: number): SuKienExp[] => Array.from({ length: n }, (_, i) => ({ khoa: `k${String(i).padStart(4, '0')}`, nguon: 'on_lai', maNguon: 'x', qid: `Q-I-${i}`, lan: 1, ketQua: 1, luc: `2026-09-30T01:${String(Math.floor(i / 60)).padStart(2, '0')}:${String(i % 60).padStart(2, '0')}.000Z` }))
 
-describe('(3) trần KIẾM mới', () => {
-  it('câu học tập: mục tiêu 16 ⇒ câu 1–32 đủ, 33–48 tính 25 %, từ câu 49 = 0 (không sinh khoản)', () => {
-    expect(TRAN_CUNG_HE_SO).toBe(3)
+describe('(3) SỬA CÓ CHỦ Ý 29/09 v5: BỎ trần KIẾM theo ngày', () => {
+  it('câu học tập: mục tiêu 16, làm 200 câu ⇒ 200 khoản, mọi câu đủ giá (trước v5: 32 đủ + 16 lấy 25 %, từ câu 49 = 0)', () => {
     const k = tinhExp(vao({ suKien: cauDung(200) })).khoan.filter((x) => x.loai === 'cau')
-    expect(k).toHaveLength(48)
-    expect(k.slice(0, 32).every((x) => x.exp === 2)).toBe(true)
-    expect(k.slice(32).every((x) => x.exp === 1)).toBe(true)
+    expect(k).toHaveLength(200)
+    expect(k.every((x) => x.exp === 2)).toBe(true)
   })
-  it('khắc phục ≤ 3 lần có EXP/ngày; lên bậc ≤ 10 lần có EXP/ngày', () => {
-    expect([KHAC_PHUC_TOI_DA_NGAY, LEN_BAC_TOI_DA_NGAY]).toEqual([3, 10])
+  it('khắc phục và lên bậc: mọi lần đều có EXP (trước v5: ≤ 3 và ≤ 10 mỗi ngày)', () => {
     const r = tinhExp(vao({ lenBac: Array.from({ length: 15 }, (_, i) => `B${i}`), khacPhuc: Array.from({ length: 6 }, (_, i) => ({ qid: `K${i}`, lan: 1, luc: `2026-09-30T02:0${i}:00.000Z` })) }))
-    expect(r.khoan.filter((x) => x.loai === 'len_bac')).toHaveLength(10)
-    expect(r.khoan.filter((x) => x.loai === 'khac_phuc')).toHaveLength(3)
+    expect(r.khoan.filter((x) => x.loai === 'len_bac')).toHaveLength(15)
+    expect(r.khoan.filter((x) => x.loai === 'khac_phuc')).toHaveLength(6)
   })
-  it('trần tính trên CẢ ngày: lần gọi sau chỉ thêm phần còn thiếu (khoá đã ghi + số đã trả trong ngày)', () => {
-    const lan1 = tinhExp(vao({ lenBac: ['B0', 'B1', 'B2', 'B3', 'B4', 'B5'], khacPhuc: [{ qid: 'K0', lan: 1, luc: '2026-09-30T02:00:00.000Z' }, { qid: 'K1', lan: 1, luc: '2026-09-30T02:01:00.000Z' }] }))
-    const daCo = new Set(lan1.khoan.map((x) => x.khoa))
-    const lan2 = tinhExp(vao({
-      daCoKhoa: daCo, daTraTrongNgay: { khacPhuc: 2, lenBac: 6 },
-      lenBac: Array.from({ length: 12 }, (_, i) => `B${i}`), khacPhuc: Array.from({ length: 5 }, (_, i) => ({ qid: `K${i}`, lan: 1, luc: `2026-09-30T02:0${i}:00.000Z` })),
-    }))
-    expect(lan2.khoan.filter((x) => x.loai === 'len_bac')).toHaveLength(4)
-    expect(lan2.khoan.filter((x) => x.loai === 'khac_phuc')).toHaveLength(1)
+  it('gọi lại: khoá đã ghi không sinh lại (chống lặp theo khoá sổ vẫn giữ)', () => {
+    const lan1 = tinhExp(vao({ lenBac: ['B0', 'B1'], khacPhuc: [{ qid: 'K0', lan: 1, luc: '2026-09-30T02:00:00.000Z' }] }))
+    const lan2 = tinhExp(vao({ daCoKhoa: new Set(lan1.khoan.map((x) => x.khoa)), lenBac: ['B0', 'B1', 'B2'], khacPhuc: [{ qid: 'K0', lan: 1, luc: '2026-09-30T02:00:00.000Z' }] }))
+    expect(lan2.khoan.map((x) => x.khoa)).toEqual(['bac|B2|2026-09-30'])
   })
 })
 
@@ -101,19 +67,18 @@ describe('(4) vàng tự động 1 / 5 EXP, thú vẫn nhận đủ', () => {
     expect(vangDangDuc({ earned: 400, mocVang: 500 })).toBe(0)
     expect(vangDangDuc({ earned: 9999 })).toBe(0)
   })
-  it('cộng EXP vào hồ sơ v4: thú nhận ĐỦ số EXP (không chia), earned tăng đúng số đó', () => {
+  it('SỬA CÓ CHỦ Ý 29/09 v5: cộng EXP vào hồ sơ luật hiện hành — dưới sức chứa thì thú nhận ĐỦ số EXP, earned tăng đúng số đó, vàng 1/5', () => {
     const p: HoSoGameExp = { cap: 1, exp: 0, wallet: 0, earned: 0, luatCap: LUAT_CAP_MOI, mocVang: 0, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 0 } }
     const r = congTongSoVaoHoSo(p, 400, 0, 0)
     expect(r.exp).toBe(400)
-    expect(tongExpToiCap(p.cap) + p.exp).toBe(400)
     expect(p.earned).toBe(400)
     expect(p.wallet).toBe(0)
     expect(vangDangDuc(p)).toBe(80)
-    expect(r.thu).toMatchObject({ cap: 3, exp: 40, soCapLen: 2, choMoc: 0 })
+    expect(r.thu).toMatchObject({ cap: 2, exp: 300, soCapLen: 1, choMoc: 0, tran: 0 }) // v5: T(2) = 100, 0 ngày đạt cho tới cấp 2
   })
 })
 
-describe('(5) khoá mốc: cấp 10 cần ≥ 21 ngày đạt; EXP vượt giữ chờ, đủ ngày thì vào thú', () => {
+describe('(5) (LỊCH SỬ v4, còn trong chuỗi chuyển v3 → v4 → v5) khoá mốc: cấp 10 cần ≥ 21 ngày đạt; EXP vượt giữ chờ, đủ ngày thì vào thú', () => {
   it('20 ngày đạt: dừng cuối cấp 9, phần vượt chờ mốc; ngày đạt thứ 21 (them = 0) mở hết, không mất EXP', () => {
     expect(NGAY_DAT_MO_CAP_10).toBe(21)
     const a = nhanTuDo({ cap: 1, exp: 0, wallet: 0 }, 15_000, 20)
@@ -131,16 +96,7 @@ describe('(5) khoá mốc: cấp 10 cần ≥ 21 ngày đạt; EXP vượt giữ
     expect(nhanTuDo({ cap: 12, exp: 0, wallet: 0 }, 5000, 0).hoSo.cap).toBeGreaterThan(12)
     expect(nhanTuDo({ cap: 120, exp: 0, wallet: 0 }, 5000, 0).hoSo).toMatchObject({ cap: 120, exp: 0, choMoc: 0 })
   })
-  it('qua congTongSoVaoHoSo: ngày đạt thứ 21 về cùng lượt cộng thì mở phần chờ ngay; không có EXP mới vẫn mở', () => {
-    const p: HoSoGameExp = { cap: 1, exp: 0, wallet: 0, earned: 0, luatCap: LUAT_CAP_MOI, mocVang: 0, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 20 } }
-    congTongSoVaoHoSo(p, 12_000, 20, 20)
-    expect(p.cap).toBe(9)
-    expect(p.choMoc).toBe(12_000 - (tongExpToiCap(10) - 1))
-    congTongSoVaoHoSo(p, 12_000, 21, 21)
-    expect(p.cap).toBe(10)
-    expect(p.choMoc).toBe(0)
-    expect(tongExpToiCap(p.cap) + p.exp).toBe(12_000)
-  })
+  // SỬA CÓ CHỦ Ý 29/09 v5: `congTongSoVaoHoSo` nay đi luật v5 (cổng ngày + EXP tràn) — khoá ở tests/exp-v5-2909.test.ts.
 })
 
 describe('(6) chuyển dữ liệu cũ v3 → v4: chỉ-thêm, không ai tụt cấp, gọi lại không nạp đôi', () => {
@@ -150,7 +106,7 @@ describe('(6) chuyển dữ liệu cũ v3 → v4: chỉ-thêm, không ai tụt c
       const r = chuyenV3SangV4(cu, ngayDat, '2026-09-30T00:00:00.000Z')
       const nhan = `cấp ${cap} exp ${exp} ống ${wallet} ngày đạt ${ngayDat}`
       expect(r.hoSo.cap, nhan).toBeGreaterThanOrEqual(cap)
-      expect(r.hoSo.luatCap, nhan).toBe(LUAT_CAP_MOI)
+      expect(r.hoSo.luatCap, nhan).toBe(LUAT_CAP_V4) // SỬA CÓ CHỦ Ý 29/09 v5: bước v3 → v4 nay dừng ở luật 4 (bước v4 → v5 riêng)
       expect(r.hoSo.wallet, nhan).toBe(0)
       expect(r.hoSo.mocVang, nhan).toBe(777)
       expect(r.hoSo.truocSiet4, nhan).toEqual({ cap, exp: cu.exp, wallet, earned: 777, luc: '2026-09-30T00:00:00.000Z' })
@@ -169,21 +125,21 @@ describe('(6) chuyển dữ liệu cũ v3 → v4: chỉ-thêm, không ai tụt c
     const r = chuyenV3SangV4({ cap: 5, exp: 130, wallet: 0, earned: 0, luatCap: 3 }, 0, 'x')
     expect(r.hoSo).toMatchObject({ cap: 5, exp: 575, choMoc: 0 })
   })
-  it('chuyenDoiLuatCap: v4 trả nguyên (idempotent); v2 đi qua v3 rồi v4; không đụng vàng/mảnh/khiên/đồ', () => {
+  it('SỬA CÓ CHỦ Ý 29/09 v5 — chuyenDoiLuatCap: hồ sơ luật hiện hành trả nguyên (idempotent); v2 đi qua v3 → v4 → v5; không đụng vàng/mảnh/khiên/đồ', () => {
     const v3 = { cap: 6, exp: 10, wallet: 900, earned: 5000, luatCap: 3, khienRen: { manh: 7, daRen: 1 }, shields: { used: 1 }, pet: 'lua_phuong' }
     const a = chuyenDoiLuatCap(v3, 5, '2026-09-30', { soNgayDat: 3 })
     expect(a.daChuyen).toBe(true)
-    expect(a.hoSo).toMatchObject({ luatCap: 4, khienRen: { manh: 7, daRen: 1 }, shields: { used: 1 }, pet: 'lua_phuong', wallet: 0 })
+    expect(a.hoSo).toMatchObject({ luatCap: 5, khienRen: { manh: 7, daRen: 1 }, shields: { used: 1 }, pet: 'lua_phuong', wallet: 0 })
     expect(chuyenDoiLuatCap(a.hoSo, 5, '2026-09-30').hoSo).toBe(a.hoSo)
     const v2 = chuyenDoiLuatCap({ cap: 4, exp: 0, wallet: 100, earned: 0, luatCap: 2 }, 1, '2026-09-30')
-    expect(v2.hoSo.luatCap).toBe(4)
+    expect(v2.hoSo.luatCap).toBe(5)
     expect(v2.hoSo.cap).toBeGreaterThanOrEqual(4)
   })
-  it('congTongSoVaoHoSo trên hồ sơ v3: chuyển rồi cộng; gọi lại cùng tổng sổ không cộng đôi', () => {
+  it('SỬA CÓ CHỦ Ý 29/09 v5 — congTongSoVaoHoSo trên hồ sơ v3: chuyển (v3 → v4 → v5) rồi cộng; gọi lại cùng tổng sổ không cộng đôi', () => {
     const p = { cap: 3, exp: 20, wallet: 500, earned: 900, luatCap: 3, expMoi: { daCong: 900, manhDaTinh: 0, ngayDat: 2 } } as HoSoGameExp
     const r = congTongSoVaoHoSo(p, 1000, 0, 2)
     expect(r.exp).toBe(100)
-    expect(p.luatCap).toBe(4)
+    expect(p.luatCap).toBe(5)
     expect(p.mocVang).toBe(900)
     expect(p.earned).toBe(1000)
     expect(vangDangDuc(p)).toBe(20)
@@ -193,21 +149,21 @@ describe('(6) chuyển dữ liệu cũ v3 → v4: chỉ-thêm, không ai tụt c
   })
 })
 
-describe('(7) khiên rèn: 21 mảnh + 21 ngày đạt + 1 400 vàng, không cần cấp 10, giữ tối đa 5', () => {
-  const ho = (o: Partial<HoSoGameExp> = {}): HoSoGameExp => ({ cap: 2, exp: 0, earned: 0, luatCap: 4, expMoi: { daCong: 0, manhDaTinh: 21, ngayDat: 21 }, khienRen: { manh: 21, daRen: 0 }, ...o })
-  it('cấp 2 vẫn rèn được khi đủ 1 400 vàng; thiếu vàng / thiếu ngày / thiếu mảnh ⇒ lỗi nói rõ', () => {
-    expect(VANG_REN_KHIEN).toBe(1400)
+describe('(7) SỬA CÓ CHỦ Ý 29/09 v5 — khiên rèn: 36 mảnh + 2 600 vàng + ngày đạt ≥ 36 + 18(k − 1), không cần cấp 10, giữ tối đa 5', () => {
+  const ho = (o: Partial<HoSoGameExp> = {}): HoSoGameExp => ({ cap: 2, exp: 0, earned: 0, luatCap: 5, expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 36 }, khienRen: { manh: 36, daRen: 0 }, ...o })
+  it('cấp 2 vẫn rèn được khi đủ 2 600 vàng; thiếu vàng / thiếu ngày / thiếu mảnh ⇒ lỗi nói rõ', () => {
+    expect(VANG_REN_KHIEN).toBe(2600)
     const p = ho()
-    expect(renKhienBangVang(p, 0, 1400)).toBe(true)
+    expect(renKhienBangVang(p, 0, 2600)).toBe(true)
     expect(p.khienRen).toEqual({ manh: 0, daRen: 1 })
-    expect(() => renKhienBangVang(ho(), 0, 1399)).toThrow(/1\.400 vàng/)
-    expect(() => renKhienBangVang(ho({ expMoi: { daCong: 0, manhDaTinh: 21, ngayDat: 20 } }), 0, 9999)).toThrow(/21 ngày đạt/)
-    expect(() => renKhienBangVang(ho({ khienRen: { manh: 20, daRen: 0 } }), 0, 9999)).toThrow(/21 mảnh/)
+    expect(() => renKhienBangVang(ho(), 0, 2599)).toThrow(/2\.600 vàng/)
+    expect(() => renKhienBangVang(ho({ expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 35 } }), 0, 9999)).toThrow(/36 ngày đạt/)
+    expect(() => renKhienBangVang(ho({ khienRen: { manh: 35, daRen: 0 } }), 0, 9999)).toThrow(/36 mảnh/)
   })
   it('gửi lại cùng số đã rèn ⇒ không rèn thêm; đủ 5 khiên chưa dùng ⇒ ngừng', () => {
-    const p = ho({ khienRen: { manh: 21, daRen: 1 } })
+    const p = ho({ khienRen: { manh: 36, daRen: 1 } })
     expect(renKhienBangVang(p, 0, 9999)).toBe(false)
-    expect(() => renKhienBangVang(ho({ khienRen: { manh: 21, daRen: 5 }, shields: { used: 0 } }), 5, 9999)).toThrow(/đủ khiên/)
+    expect(() => renKhienBangVang(ho({ khienRen: { manh: 36, daRen: 5 }, shields: { used: 0 }, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 200 } }), 5, 9999)).toThrow(/đủ khiên/)
   })
 })
 
@@ -241,19 +197,19 @@ describe('(8) D1: đúc vàng lười, rèn khiên bằng vàng, vang-doi đã b
     expect(await gameV2(d.env, 'vang-doi', { token: tk, soExp: 10, khoaYeuCau: 'khoa-abcdefgh' })).toMatchObject({ ok: false, ma: 'da_bo' })
     expect(vangSo(d)).toBe(400)
   })
-  it('rèn khiên: trừ đúng 1 400 vàng MỘT lần (gửi lại cùng số đã rèn không trừ nữa); thiếu vàng ⇒ lỗi, không trừ', async () => {
-    const d = dung({ earned: 7500, cap: 3, expMoi: { daCong: 0, manhDaTinh: 21, ngayDat: 21 }, khienRen: { manh: 21, daRen: 0 } })
+  it('SỬA CÓ CHỦ Ý 29/09 v5 — rèn khiên: trừ đúng 2 600 vàng MỘT lần (gửi lại cùng số đã rèn không trừ nữa); thiếu vàng ⇒ lỗi, không trừ', async () => {
+    const d = dung({ earned: 13_500, cap: 3, expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 36 }, khienRen: { manh: 36, daRen: 0 } })
     const tk = await gameToken(d.env, 'S1')
     const r = await gameV2(d.env, 'khien-ren', { token: tk, soDaRen: 0 }) as Record<string, any>
     expect(r).toMatchObject({ ok: true, daRen: true })
-    expect(vangSo(d)).toBe(1500 - 1400)
+    expect(vangSo(d)).toBe(2700 - 2600)
     const lai = await gameV2(d.env, 'khien-ren', { token: tk, soDaRen: 0 }) as Record<string, any>
     expect(lai.daRen).toBe(false)
     expect(vangSo(d)).toBe(100)
     const p = JSON.parse((d.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='S1'").get() as { json: string }).json)
     expect(p.khienRen).toEqual({ manh: 0, daRen: 1 })
-    const d2 = dung({ earned: 5000, expMoi: { daCong: 0, manhDaTinh: 21, ngayDat: 21 }, khienRen: { manh: 21, daRen: 0 } })
-    await expect(renKhienVang(d2.env, 'S1', JSON.parse((d2.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='S1'").get() as { json: string }).json), 0, 0)).rejects.toThrow(/1\.400 vàng/)
+    const d2 = dung({ earned: 5000, expMoi: { daCong: 0, manhDaTinh: 36, ngayDat: 36 }, khienRen: { manh: 36, daRen: 0 } })
+    await expect(renKhienVang(d2.env, 'S1', JSON.parse((d2.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='S1'").get() as { json: string }).json), 0, 0)).rejects.toThrow(/2\.600 vàng/)
     expect(vangSo(d2)).toBe(1000)
   })
 })

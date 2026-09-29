@@ -277,7 +277,9 @@ describe('maiCho (màn hết lượt)', () => {
   })
 })
 
-describe('EXP câu THỬ THÁCH / LƯỢT TRÙM làm đúng lần đầu (qua cửa trần 120 EXP game/ngày)', () => {
+// SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT luật EXP v5, docs/DE-XUAT-EXP-V5-2909.md): câu thử thách / câu trùm giữ đủ EXP câu học tập và KHÔNG cộng thêm EXP câu game;
+// câu game thường đúng = ½ câu học tập (Phần I 1 sao = 2), khoản `cau_game|<lượt>|<qid>`; bỏ trần 120 EXP game/ngày (không còn `thuongGoc`).
+describe('EXP câu THỬ THÁCH / LƯỢT TRÙM làm đúng lần đầu', () => {
   const bat = (d: D1That) => d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ tu: '2026-09-01T00:00:00.000Z', dsSbd: ['S1'] }))
   const moLuotCoVai = (d: D1That, vai: Record<string, string>) => {
     const refs = Object.entries(vai).map(([qid, role]) => ({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, novel: true, role }))
@@ -293,16 +295,16 @@ describe('EXP câu THỬ THÁCH / LƯỢT TRÙM làm đúng lần đầu (qua c�
     const a = await tra(d, 'SS', 'A-1')
     expect(a).toMatchObject({ correct: true, reward: 10, expThuThach: 3 }) // nấc 1 = 10 EXP (đường Đảo) + 3 EXP thử thách
     expect(khoan(d)).toEqual([{ khoa: 'S1|thuthach|A-1', loai: 'thu_thach', exp: 3, qid: 'A-1' }])
-    // luật 29/09: + 3 EXP câu game (Phần I, 1 sao) KHÔNG tính vào trần 120 ⇒ expGame.da vẫn 13; `expCau` = 10 + 3 + 3
-    expect(a.expCau).toBe(16)
-    expect(hoSo(d)).toMatchObject({ exp: 16, wallet: 0, earned: 16, expGame: { ngay: NGAY, da: 13 } }) // luật v4 (29/09): EXP vào THẲNG thần thú (trước: vào ống nghiệm)
-    expect((a.profile as any).exp).toBe(16) // phản hồi mang hồ sơ MỚI (luật v4: EXP đã vào thú)
+    // v5: câu thử thách KHÔNG cộng thêm EXP câu game ⇒ `expCau` = 10 (nấc) + 3 (thử thách)
+    expect(a.expCau).toBe(13)
+    expect(hoSo(d)).toMatchObject({ exp: 13, wallet: 0, earned: 13, expGame: { ngay: NGAY, da: 13 } })
+    expect((a.profile as any).exp).toBe(13) // phản hồi mang hồ sơ MỚI (EXP đã vào thú)
     const b = await tra(d, 'SS', 'A-2'); expect(b.expThuThach).toBe(3)
     const c = await tra(d, 'SS', 'A-3'); expect(c).not.toHaveProperty('expThuThach')
     expect(khoan(d).map((x) => x.qid)).toEqual(['A-1', 'A-2'])
-    expect(hoSo(d).exp).toBe(25) // nấc dạng A.1 chỉ MỘT lần (10) + 2 thử thách × 3 + 3 câu game × 3
+    expect(hoSo(d).exp).toBe(18) // nấc dạng A.1 chỉ MỘT lần (10) + 2 thử thách × 3 + 1 câu game thường (Phần I, 1 sao) × 2
     const r = await tra(d, 'SS', 'A-1') // replay
-    expect(khoan(d)).toHaveLength(2); expect(hoSo(d).exp).toBe(25); expect(r.expCau).toBe(16)
+    expect(khoan(d)).toHaveLength(2); expect(hoSo(d).exp).toBe(18); expect(r.expCau).toBe(13)
   })
 
   it('câu thử thách SAI hoặc có trợ giúp ⇒ không có EXP thử thách; EXP mới TẮT cho em ⇒ không ghi sổ', async () => {
@@ -315,50 +317,50 @@ describe('EXP câu THỬ THÁCH / LƯỢT TRÙM làm đúng lần đầu (qua c�
     expect(await tra(e, 'SS', 'A-1')).not.toHaveProperty('expThuThach'); expect(e.dem('exp_so')).toBe(0)
   })
 
-  it('trần 120 EXP game/ngày: đã đủ ⇒ ghi khoản 0 EXP (đã xét), không cộng ống; phản hồi có thuongGoc cho nấc bị cắt', async () => {
+  it('v5: đã 120 EXP game hôm nay ⇒ VẪN nhận đủ nấc + thử thách (bỏ trần ngày), không còn `thuongGoc`', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung(); bat(d)
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.expGame', json(?))").run(JSON.stringify({ ngay: NGAY, da: 120 }))
     moLuotCoVai(d, { 'A-1': 'thu_thach' })
     const a = await tra(d, 'SS', 'A-1')
-    expect(a).toMatchObject({ correct: true, reward: 0, thuongGoc: 10 }); expect(a).not.toHaveProperty('expThuThach')
-    expect(khoan(d)).toEqual([{ khoa: 'S1|thuthach|A-1', loai: 'thu_thach', exp: 0, qid: 'A-1' }])
-    expect(hoSo(d)).toMatchObject({ wallet: 0, earned: 3 }) // chỉ EXP câu game (không trần ngày, luật 29/09)
-    expect(a.expCau).toBe(3)
+    expect(a).toMatchObject({ correct: true, reward: 10, expThuThach: 3 }); expect(a).not.toHaveProperty('thuongGoc')
+    expect(khoan(d)).toEqual([{ khoa: 'S1|thuthach|A-1', loai: 'thu_thach', exp: 3, qid: 'A-1' }])
+    expect(hoSo(d)).toMatchObject({ wallet: 0, earned: 13 })
+    expect(a.expCau).toBe(13)
   })
 })
 
-describe('EXP MỖI câu game tự làm đúng (thầy 29/09 — chờ luật EXP v5): `expCau` cho hiệu ứng "+N EXP bay vào thú"', () => {
+describe('EXP MỖI câu game tự làm đúng (thầy 29/09; v5 = ½ câu học tập): `expCau` cho hiệu ứng "+N EXP bay vào thú"', () => {
   const bat = (d: D1That) => d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ tu: '2026-09-01T00:00:00.000Z', dsSbd: ['S1'] }))
   const moLuot = (d: D1That, id: string, qids: string[]) => {
     const refs = qids.map((qid) => ({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, novel: true, role: 'lap' }))
     d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run(id, 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: refs }), new Date().toISOString())
   }
   const hoSo = (d: D1That) => JSON.parse((d.sql.prepare("SELECT json FROM game_v2_profile WHERE sbd='S1'").get() as { json: string }).json) as Record<string, any>
-  const khoan = (d: D1That) => d.sql.prepare("SELECT khoa, exp FROM exp_so WHERE sbd='S1' AND loai='game_cau' ORDER BY khoa").all() as { khoa: string; exp: number }[]
+  const khoan = (d: D1That) => d.sql.prepare("SELECT khoa, exp FROM exp_so WHERE sbd='S1' AND loai='cau_game' ORDER BY khoa").all() as { khoa: string; exp: number }[]
 
-  it('câu đúng (kể cả KHÔNG lên nấc) ⇒ khoản `gamecau|<lượt>|<qid>` = bảng EXP_CAU, `expCau` thật; gọi lại không cộng đôi; câu sai ⇒ 0', async () => {
+  it('câu đúng (kể cả KHÔNG lên nấc) ⇒ khoản `cau_game|<lượt>|<qid>` = bảng EXP_CAU_GAME (Phần I 1 sao = 2), `expCau` thật; gọi lại không cộng đôi; câu sai ⇒ 0', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung(); bat(d)
     moLuot(d, 'L1', ['A-1', 'A-2', 'A-3'])
-    const a = await tra(d, 'L1', 'A-1'); expect(a).toMatchObject({ correct: true, reward: 10, expCau: 13 }) // nấc 1 + câu Phần I 1 sao
-    const b = await tra(d, 'L1', 'A-2'); expect(b).toMatchObject({ correct: true, reward: 0, expCau: 3 }) // không lên nấc vẫn có EXP câu
+    const a = await tra(d, 'L1', 'A-1'); expect(a).toMatchObject({ correct: true, reward: 10, expCau: 12 }) // nấc 1 + câu game Phần I 1 sao (2)
+    const b = await tra(d, 'L1', 'A-2'); expect(b).toMatchObject({ correct: true, reward: 0, expCau: 2 }) // không lên nấc vẫn có EXP câu
     const c = await tra(d, 'L1', 'A-3', 'A'); expect(c).toMatchObject({ correct: false, expCau: 0 })
-    expect(khoan(d)).toEqual([{ khoa: 'S1|gamecau|L1|A-1', exp: 3 }, { khoa: 'S1|gamecau|L1|A-2', exp: 3 }])
-    expect(hoSo(d).exp).toBe(16)
-    const lai = await tra(d, 'L1', 'A-2'); expect(lai.expCau).toBe(3); expect(khoan(d)).toHaveLength(2); expect(hoSo(d).exp).toBe(16)
+    expect(khoan(d)).toEqual([{ khoa: 'S1|cau_game|L1|A-1', exp: 2 }, { khoa: 'S1|cau_game|L1|A-2', exp: 2 }])
+    expect(hoSo(d).exp).toBe(14)
+    const lai = await tra(d, 'L1', 'A-2'); expect(lai.expCau).toBe(2); expect(khoan(d)).toHaveLength(2); expect(hoSo(d).exp).toBe(14)
     moLuot(d, 'L2', ['A-2']) // cùng câu ở LƯỢT khác ⇒ khoá khác ⇒ được EXP lần nữa
-    expect((await tra(d, 'L2', 'A-2')).expCau).toBe(3)
+    expect((await tra(d, 'L2', 'A-2')).expCau).toBe(2)
   })
 
-  it('không trần ngày: game đã 120 EXP hôm nay vẫn có EXP câu; bộ đếm trần nấc không tăng', async () => {
+  it('không trần ngày: game đã 120 EXP hôm nay vẫn có đủ nấc + EXP câu; bộ đếm ngày chỉ cộng nấc (câu game không đếm)', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung(); bat(d)
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.expGame', json(?))").run(JSON.stringify({ ngay: NGAY, da: 120 }))
     moLuot(d, 'L1', ['A-1'])
     const a = await tra(d, 'L1', 'A-1')
-    expect(a).toMatchObject({ correct: true, reward: 0, thuongGoc: 10, expCau: 3 })
-    expect(hoSo(d).expGame.da).toBe(120)
+    expect(a).toMatchObject({ correct: true, reward: 10, expCau: 12 }); expect(a).not.toHaveProperty('thuongGoc')
+    expect(hoSo(d).expGame.da).toBe(130)
   })
 })
 
