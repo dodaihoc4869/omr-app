@@ -80,12 +80,14 @@ const docSoKhoa = (env: Env, sbd: string, khoa: string) =>
   env.DB.prepare('SELECT loai, so_vang, exp_tru, ma_mon FROM vang_so WHERE sbd = ? AND khoa_yeu_cau = ?').bind(sbd, khoa).first<DongSo>()
 
 /** Điều kiện học của em: chuỗi ngày ĐẠT nhiệm vụ ngày (cả hôm nay nếu đã đạt) + số ấn thạch sáng. */
-async function docEmCo(env: Env, sbd: string, nowMs: number): Promise<{ chuoiNgay: number; anThachSang: number }> {
+async function docEmCo(env: Env, sbd: string, nowMs: number, cap: number = 1): Promise<EmCo> {
   const homNay = ngayVn(nowMs)
   const datHomNay = env.DB.prepare("SELECT 1 AS x FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay' LIMIT 1").bind(sbd, homNay).first().then((x) => !!x, () => false)
   const [truoc, dat, an] = await Promise.all([docChuoiTruoc(env, sbd, homNay, SO_NGAY_CHUOI_SHOP), datHomNay, docAnThach(env, sbd, homNay)])
-  return { chuoiNgay: truoc + (dat ? 1 : 0), anThachSang: an.filter((a) => a.trangThai === 'sang').length }
+  return { chuoiNgay: truoc + (dat ? 1 : 0), anThachSang: an.filter((a) => a.trangThai === 'sang').length, cap: Math.max(1, Math.floor(Number(cap) || 1)) }
 }
+/** Điều kiện học của em để mở món: chuỗi ngày đạt, ấn thạch sáng, và (v5) cấp thần thú. */
+interface EmCo { chuoiNgay: number; anThachSang: number; cap: number }
 
 async function docDangMac(env: Env, sbd: string): Promise<Record<OGanPhuKien, string | null>> {
   const ra = Object.fromEntries(O_GAN.map((o) => [o, null])) as Record<OGanPhuKien, string | null>
@@ -103,15 +105,19 @@ async function docDaBan(env: Env, ds: readonly string[]): Promise<Map<string, nu
 }
 
 /** Chữ ngắn cho trạng thái "chưa đủ điều kiện học" (null = đã đủ). */
-function chuThieu(m: MonPhuKien, co: { chuoiNgay: number; anThachSang: number }): string | null {
+function chuThieu(m: MonPhuKien, co: EmCo): string | null {
   const thieuChuoi = m.canChuoiNgay !== null && co.chuoiNgay < m.canChuoiNgay
   const thieuAn = m.canAnThach !== null && co.anThachSang < m.canAnThach
-  if (!thieuChuoi && !thieuAn) return null
+  const thieuCap = m.canCap !== null && co.cap < m.canCap
+  if (!thieuChuoi && !thieuAn && !thieuCap) return null
+  if (thieuCap && !thieuChuoi && !thieuAn) return `Cần thần thú cấp ${m.canCap}`
+  if (thieuCap) return `Cần thần thú cấp ${m.canCap}${m.canChuoiNgay !== null ? ` + chuỗi ${m.canChuoiNgay} ngày` : ''}${m.canAnThach !== null ? ` + ${m.canAnThach} ấn thạch sáng` : ''}`
   if (m.canChuoiNgay !== null) return `Cần chuỗi ${m.canChuoiNgay} ngày${m.canAnThach !== null ? ` + ${m.canAnThach} ấn thạch sáng` : ''}`
   return `Cần ${m.canAnThach} ấn thạch sáng`
 }
 /** Lời lỗi `chua_mo` (L3): nói điều em đang thiếu, kèm số em đang có. */
-function loiChuaMo(m: MonPhuKien, co: { chuoiNgay: number; anThachSang: number }): string {
+function loiChuaMo(m: MonPhuKien, co: EmCo): string {
+  if (m.canCap !== null && co.cap < m.canCap) return `Món này cần thần thú cấp ${m.canCap}. Thần thú của em đang cấp ${co.cap}.`
   if (m.canChuoiNgay !== null && co.chuoiNgay < m.canChuoiNgay) return `Món này cần chuỗi ${m.canChuoiNgay} ngày. Em đang chuỗi ${co.chuoiNgay} ngày.`
   return `Món này cần ${m.canAnThach} ấn thạch sáng. Em đang có ${co.anThachSang}.`
 }
@@ -127,8 +133,8 @@ export async function shopAction(
     if (action === 'vang-xem') return await vangXem(env, sbd, p, nowMs)
     // Luật v4: bỏ đổi tay EXP → vàng (kể cả nhánh P08). Hàm cũ `vangDoi` giữ lại bên dưới để lùi được.
     if (action === 'vang-doi') return (await moCua(env, sbd)) ? loi('da_bo') : loi('tam_dong')
-    if (action === 'shop-danh-sach') { await ducVang(env, sbd, p, nowMs); return await shopDanhSach(env, sbd, nowMs) }
-    if (action === 'shop-mua') { await ducVang(env, sbd, p, nowMs); return await shopMua(env, sbd, b, nowMs) }
+    if (action === 'shop-danh-sach') { await ducVang(env, sbd, p, nowMs); return await shopDanhSach(env, sbd, nowMs, p.cap) }
+    if (action === 'shop-mua') { await ducVang(env, sbd, p, nowMs); return await shopMua(env, sbd, b, nowMs, p.cap) }
     return await thuMacDo(env, sbd, b)
   } catch (e) {
     // Chưa chạy migration (bảng chưa có) ⇒ coi như cửa hàng đóng, không ném lỗi kỹ thuật ra màn của em.
@@ -142,14 +148,14 @@ async function vangXem(env: Env, sbd: string, p: Profile, nowMs: number): Promis
   // Luật v4: đúc vàng còn thiếu rồi mới đọc số dư. Không còn ống nghiệm / đổi tay ⇒ `ongNghiem`, `doiToiDa`, `ngayAn` = 0 (giữ trường cho máy em bản cũ).
   if (p.luatCap === LUAT_CAP_MOI) {
     await ducVang(env, sbd, p, nowMs)
-    const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs)])
+    const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs, p.cap)])
     return { ok: true, bat: true, vang, ongNghiem: 0, giuLai: 0, doiToiDa: 0, ngayAn: 0, expMoiVang: EXP_MOI_VANG, tuDong: true, chuoiNgay: co.chuoiNgay, anThachSang: co.anThachSang, mua: MUA_BAN }
   }
   // CNH-1.0 P08 (Cline 25/09): cửa P08 MỞ ⇒ "ống nghiệm" hiển thị là ví P08 (`cnh_exp_account`) — CÙNG nguồn với
   // lệnh `doiVangCore`, không thì màn đổi vàng nói một số còn lệnh tiêu một số khác.
   const p08 = await tramP08LenHienThi(env, sbd)
   const ongNghiem = nguyen(p08 ? p08.wallet : p.wallet)
-  const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs)])
+  const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs, p.cap)])
   return { ok: true, bat: true, vang, ongNghiem, giuLai: GIU_LAI_EXP, doiToiDa: Math.max(0, ongNghiem - GIU_LAI_EXP), ngayAn: conNgayAn(ongNghiem), chuoiNgay: co.chuoiNgay, anThachSang: co.anThachSang, mua: MUA_BAN }
 }
 
@@ -200,26 +206,26 @@ async function vangDoi(env: Env, sbd: string, p0: Profile, revision0: number, b:
   throw new Error('Đổi vàng chưa xong vì hồ sơ đang bận. Em bấm lại nhé, số EXP của em chưa bị trừ.')
 }
 
-async function shopDanhSach(env: Env, sbd: string, nowMs: number): Promise<Kq> {
+async function shopDanhSach(env: Env, sbd: string, nowMs: number, cap: number): Promise<Kq> {
   if (!(await moCua(env, sbd))) return loi('tam_dong')
   const ban = monDangBan()
   const gioiHan = ban.filter((m) => m.suatTong !== null).map((m) => m.ma)
   const [vang, dangMac, co, daBan, so] = await Promise.all([
-    docVang(env, sbd), docDangMac(env, sbd), docEmCo(env, sbd, nowMs), docDaBan(env, gioiHan),
+    docVang(env, sbd), docDangMac(env, sbd), docEmCo(env, sbd, nowMs, cap), docDaBan(env, gioiHan),
     env.DB.prepare('SELECT ma_mon FROM phu_kien_so_huu WHERE sbd = ?').bind(sbd).all<{ ma_mon: string }>(),
   ])
   const daCo = new Set((so.results ?? []).map((x) => String(x.ma_mon)))
   const mon = ban.map((m) => {
     const thieu = chuThieu(m, co)
     return {
-      ma: m.ma, gia: m.gia, daCo: daCo.has(m.ma), dangMac: dangMac[m.o] === m.ma, moKhoa: thieu === null, thieu,
+      ma: m.ma, gia: m.gia, daCo: daCo.has(m.ma), dangMac: dangMac[m.o] === m.ma, moKhoa: thieu === null, thieu, canCap: m.canCap,
       suatCon: m.suatTong === null ? null : Math.max(0, m.suatTong - (daBan.get(m.ma) ?? 0)), suatTong: m.suatTong,
     }
   })
   return { ok: true, phienBan: 'm1-v1', vang, mon, dangMac, emCo: co }
 }
 
-async function shopMua(env: Env, sbd: string, b: Record<string, unknown>, nowMs: number): Promise<Kq> {
+async function shopMua(env: Env, sbd: string, b: Record<string, unknown>, nowMs: number, cap: number): Promise<Kq> {
   const khoa = String(b.khoaYeuCau ?? ''), maMon = b.maMon, giaThay = b.giaThay
   if (!KHOA_YEU_CAU.test(khoa) || typeof maMon !== 'string' || typeof giaThay !== 'number' || !Number.isInteger(giaThay)) return loi('sai_dau_vao')
   const ketQua = async (m: MonPhuKien, lapLai: boolean): Promise<Kq> => ({ ok: true, maMon: m.ma, vang: await docVang(env, sbd), daMac: (await docDangMac(env, sbd))[m.o] === m.ma, lapLai })
@@ -233,8 +239,8 @@ async function shopMua(env: Env, sbd: string, b: Record<string, unknown>, nowMs:
   if (await daCoMon()) return loi('da_co')
   const daBan = async (): Promise<number> => (await docDaBan(env, [mon.ma])).get(mon.ma) ?? 0
   if (mon.suatTong !== null && (await daBan()) >= mon.suatTong) return loi('het_suat', `Món này đã hết. Mùa 1 chỉ có ${mon.suatTong} cái.`)
-  if (mon.canChuoiNgay !== null || mon.canAnThach !== null) {
-    const co = await docEmCo(env, sbd, nowMs)
+  if (mon.canChuoiNgay !== null || mon.canAnThach !== null || mon.canCap !== null) {
+    const co = await docEmCo(env, sbd, nowMs, cap)
     if (chuThieu(mon, co) !== null) return loi('chua_mo', loiChuaMo(mon, co))
   }
   if (giaThay !== mon.gia) return loi('gia_doi')

@@ -6,7 +6,7 @@
 // cron ở đây chỉ còn lo các hồ sơ cũ hơn v3 (luatCap < 3), đúng như trước. Phần "hấp thụ theo ngày" dưới đây là lịch sử v3.
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
-import { CO_HOC_TOI_THIEU_CAU, LUAT_CAP_MOI, LUAT_CAP_V3, chuyenDoiLuatCap, tranExpGameNgay, tranHapThu } from '../../src/lib/hap-thu-ngay'
+import { CO_HOC_TOI_THIEU_CAU, LUAT_CAP_MOI, LUAT_CAP_V3, LUAT_CAP_V4, chuyenDoiLuatCap, tranHapThu } from '../../src/lib/hap-thu-ngay'
 import { thanhExpV3 as thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { NGAY_BANG_GIA_MOI } from './exp-cau-hinh'
 import { ngayVn } from './su-kien-hoc'
@@ -15,9 +15,9 @@ export const TOI_DA_HO_SO_MOI_TICK = 40
 export const KHOA_CHUYEN_DOI_XONG = 'chuyen_doi_cap_v3'
 export const TIEU_DE_LUAT_CAP = 'Thầy Đỗ Đại Học · Thần thú của em'
 export const KENH_LUAT_CAP = 'than_thu'
-export const LOI_LUAT_CAP = 'Từ nay EXP em kiếm được vào thần thú ngay, không cần nạp. EXP còn trong ống nghiệm đã vào thần thú, cấp của em giữ nguyên. Cứ 5 EXP em kiếm được thì có thêm 1 vàng.'
-/** Mã tin một lần cho lần chuyển sang luật v4 (khác mã tin 21/09 để em đã nhận tin cũ vẫn nhận tin mới). */
-export const MA_TIN_LUAT_CAP = 'luat-cap-v4'
+export const LOI_LUAT_CAP = 'Từ nay mọi câu em làm đúng đều có EXP, không còn giới hạn mỗi ngày. Thần thú lên cấp khi đủ EXP và đủ số ngày em đạt nhiệm vụ ngày. Thanh EXP đầy mà chưa đủ ngày thì EXP làm thêm đổi thành vàng và mảnh khiên. Cấp của em giữ nguyên.'
+/** Mã tin một lần cho lần chuyển sang luật v5 (khác mã tin v4 để em đã nhận tin cũ vẫn nhận tin mới). */
+export const MA_TIN_LUAT_CAP = 'luat-cap-v5'
 
 const batDauNgay = (ngay: string): string => new Date(`${ngay}T00:00:00+07:00`).toISOString()
 
@@ -51,11 +51,14 @@ export async function docTranHapThu(env: Env, sbd: string, ngay: string): Promis
 export const daExpGameHomNay = (p: Pick<Profile, 'expGame'>, ngay: string): number =>
   Math.max(0, Math.floor(Number(p.expGame?.days?.[ngay] ?? (p.expGame?.ngay === ngay ? p.expGame.da : 0)) || 0))
 
-/** Ngày bù có bộ đếm riêng, không được đặt lại hạn mức của ngày mới. */
+/**
+ * EXP game em NHẬN cho một khoản `xin` và ghi bộ đếm EXP game theo ngày (chỉ để thống kê). v5 (thầy chốt 29/09): BỎ trần 120 EXP game/ngày ⇒ nhận ĐỦ `xin` (âm/NaN ⇒ 0).
+ * Ngày bù có bộ đếm riêng, không được đặt lại bộ đếm của ngày mới.
+ */
 export function nhanExpGame(p: Profile, ngay: string, xin: number): number {
   const days = { ...p.expGame?.days }
   if (p.expGame) days[p.expGame.ngay] = Math.max(days[p.expGame.ngay] ?? 0, p.expGame.da)
-  const nhan = tranExpGameNgay(daExpGameHomNay(p, ngay), xin)
+  const nhan = typeof xin === 'number' && Number.isFinite(xin) ? Math.max(0, Math.floor(xin)) : 0
   days[ngay] = daExpGameHomNay(p, ngay) + nhan
   const moiNhat = p.expGame && p.expGame.ngay > ngay ? p.expGame.ngay : ngay
   p.expGame = { ngay: moiNhat, da: days[moiNhat]!, days }
@@ -105,7 +108,7 @@ export async function chuyenDoiKhiMo(env: Env, sbd: string, p: Profile, revision
   try {
     if (p.luatCap === LUAT_CAP_MOI) return null
     const tuNgay = ngayVn(Number.isFinite(Date.parse(p.cutover)) ? Date.parse(p.cutover) : nowMs)
-    const lieu = p.luatCap === 2 || p.luatCap === LUAT_CAP_V3 ? { ngayCoHoc: new Set<string>(), ngayDat: [] } : (await docLieuChuyenDoi(env, [sbd], tuNgay)).get(sbd)!
+    const lieu = p.luatCap === 2 || p.luatCap === LUAT_CAP_V3 || p.luatCap === LUAT_CAP_V4 ? { ngayCoHoc: new Set<string>(), ngayDat: [] } : (await docLieuChuyenDoi(env, [sbd], tuNgay)).get(sbd)!
     const r = await doiMotHoSo(env, sbd, p, revision, lieu, nowMs)
     return r.daDoi ? { profile: r.profile, revision: r.revision } : null
   } catch (e) {
