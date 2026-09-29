@@ -479,3 +479,7 @@
 .dao2 .dao2-xong-canh .nut-toan-man.dao2-xong-ntm{position:absolute;top:10px;right:10px;z-index:2;color:rgb(220,232,255)}
 .dao2 .dao2-xong-canh:has(.dao2-xong-ntm) h2{margin-left:50px;margin-right:50px}
 @media (max-width:1023px) and (not ((orientation:landscape) and (min-width:700px))){.dao2 .dao2-xong-canh:has(.dao2-xong-ntm) h2{font-size:clamp(20px,6.6vw,32px)}}
+/* Hàng chốt có nút "Hỏi thầy" (29/09): chip Trợ giúp + Hỏi thầy ở hàng trên, nút CHỐT đủ bề ngang hàng dưới — không cắt chữ nút chốt. */
+.dao2-chan-hang{flex-wrap:wrap}
+.dao2-chan-hang .lg-nut-hang{padding:0;flex:0 0 auto;gap:6px}
+.dao.dao2 .dao2-chan-hang button.dao2-nut-chot{flex:1 1 100%}

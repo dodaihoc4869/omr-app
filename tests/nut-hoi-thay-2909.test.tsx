@@ -26,21 +26,18 @@ describe('NutHoiThay', () => {
     expect(screen.queryByRole('button', { name: /Hỏi thầy/ })).toBeNull()
   })
 
-  it('câu chưa có hồ sơ ⇒ mở lời giải chữ của kho; gọi đúng lệnh + qid + nguồn; onHoi được gọi', async () => {
+  it('câu chưa có hồ sơ ⇒ KHÔNG hiện lời giải ngắn, chỉ báo thầy đang soạn; gọi đúng lệnh + qid + nguồn; không tính trợ giúp (thầy chốt 29/09)', async () => {
     tra = { ok: true, coLoiGiai: false, cau: CAU, loiGiaiChu: { dapAn: 'DSSD', chot: 'Chốt thử', tung: [{ id: 'a', dung: true, viSao: 'vì a' }], buoc: [], ketQua: '' } }
     const onHoi = vi.fn()
     render(<NutHoiThay qid="12-A-II-4" nguon="on_lai" onHoi={onHoi} />)
     fireEvent.click(screen.getByRole('button', { name: /Hỏi thầy/ }))
-    await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy())
+    await waitFor(() => expect(screen.getByText(/Thầy đang soạn lời giải từng bước cho câu này/)).toBeTruthy())
     expect(goi[0].url).toBe('https://may.test/hs/hoi-thay')
     expect(goi[0].body).toEqual({ token: 'tok', qid: '12-A-II-4', nguon: 'on_lai' })
-    expect(screen.getByText(/a Đúng · b Sai · c Sai · d Đúng/)).toBeTruthy()
-    expect(screen.getByText('Chốt thử')).toBeTruthy()
-    expect(onHoi).toHaveBeenCalledTimes(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Đóng' }))
     expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.queryByText('Chốt thử')).toBeNull()
+    expect(onHoi).not.toHaveBeenCalled()
   })
-
   it('có hồ sơ ⇒ mở khung lời giải từng bước (iframe sandbox, không allow-same-origin)', async () => {
     tra = { ok: true, coLoiGiai: true, cau: CAU, hoSo: { qid: CAU.qid, bam: 'b', dang: 'ds', ten: 'T', co: [] } }
     render(<NutHoiThay qid="12-A-II-4" nguon="game" />)

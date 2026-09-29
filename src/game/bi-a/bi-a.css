@@ -65,7 +65,9 @@
 .bia-ti-so b{font-family:'Baloo 2',system-ui,sans-serif;font-weight:800;font-size:22px;font-variant-numeric:tabular-nums;display:block}
 .bia-ti-so>span{font-size:11px;color:var(--b-mo);font-weight:600}
 .bia-gia{margin:2px 10px;padding:5px 8px 6px;border-radius:16px;background:var(--b-kinh-2);border:1px solid var(--b-vien)}
-.bia-nhan-gia{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--b-mo);line-height:1.2;margin-bottom:3px}
+.bia-nhan-gia{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--b-mo);line-height:1.2;margin-bottom:3px;min-height:2.4em}
+/* Gợi ý đổi chữ theo lượt: tối đa 2 dòng, hàng giữ cao 2 dòng ⇒ không đẩy hộp bàn. */
+.bia-goi-y{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .bia-nhan-gia b{color:var(--b-chu)}
 .bia-nhan-gia .phai{display:flex;gap:8px;align-items:center}
 .bia-mat-than{flex:none;display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border-radius:999px;background:var(--b-kinh);border:1px solid var(--b-vien);font-weight:800;font-size:12.5px;font-variant-numeric:tabular-nums}
@@ -99,10 +101,12 @@
 .bia-xem-sai{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:5;min-height:44px;padding:0 8px 0 16px;border-radius:999px;border:1.5px solid rgba(255,138,138,.85);background:rgba(8,14,34,.9);color:rgb(255,227,227);font-weight:700;font-size:13.5px;box-shadow:0 8px 20px rgba(0,0,0,.35);cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .bia-xem-sai b{min-width:28px;height:28px;border-radius:14px;background:rgb(255,138,138);color:rgb(58,0,8);display:grid;place-items:center;font-size:13px;padding:0 7px}
 .bia-dk{position:relative;padding:4px 10px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:6px}
-.bia-nham{display:flex;align-items:center;gap:8px;min-height:32px;padding:4px 10px;border-radius:12px;background:var(--b-kinh-2);border:1px solid var(--b-vien);font-size:12.5px;line-height:1.25}
+.bia-nham{display:flex;align-items:center;gap:8px;height:42px;overflow:hidden;padding:4px 10px;border-radius:12px;background:var(--b-kinh-2);border:1px solid var(--b-vien);font-size:12.5px;line-height:1.25}
 .bia-nham .bi-nho{flex:none;width:18px;height:18px;border-radius:50%;background:var(--c,transparent);box-shadow:inset -2px -3px 4px rgba(0,0,0,.25)}
 .bia-nham .bi-nho[data-soc]{background:linear-gradient(180deg,rgb(245,242,234) 0 26%,var(--c) 26% 74%,rgb(245,242,234) 74%)}
 .bia-nham .hl{margin-left:auto;font-weight:700;white-space:nowrap}
+/* Cao CỐ ĐỊNH (2 dòng): chữ "Đang nhắm" đổi liên tục; nếu dòng này cao/thấp theo chữ thì hộp bàn co giãn ⇒ canvas đổi cỡ (xoá trắng, vẽ lại) mỗi lần đổi chữ. */
+.bia-nham .chu{min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .bia-nham .hl[data-xau]{color:var(--b-do)}
 .bia-nham .hl[data-dep]{color:var(--b-dung)}
 .bia-hang-dk{display:grid;grid-template-columns:48px 44px minmax(0,1fr) 44px;gap:6px;align-items:center}
