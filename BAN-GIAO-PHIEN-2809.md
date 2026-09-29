@@ -105,3 +105,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 08:15 · merge PR #60 Sổ nợ + đan xen + Kiểm tra đầu giờ (main 4f9b28d), đang deploy.
 - 08:26 · Deploy #558 THÀNH CÔNG: PR #60 Sổ nợ + đầu giờ · main 4f9b28d · thử /gv/dau-gio + /gv/chien-dich OK · lùi: git revert -m 1 4f9b28d.
 - 08:39 · Deploy #559 THÀNH CÔNG: PR #61 vá lộ đáp án (cauKhacPhuc/deTheoDangBai) · main 005f3ae · 0 ca mở lúc gộp · lùi: git revert -m 1 005f3ae.
+- 10:03 · Gộp PR #63 (Chậm nhịp chung + 3 bảng lời giải GIỮ trong reset) · main cd5a2de · 0 ca mở · lùi: git revert -m 1 cd5a2de. Nạp hàng lời giải khối 12: 149 đề, 4363 câu duy nhất vào hàng.
