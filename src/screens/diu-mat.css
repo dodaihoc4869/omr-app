@@ -96,7 +96,11 @@
 }
 .nut-diu-mat:focus-visible { outline: 3px solid var(--m3-primary, var(--tim)); outline-offset: 2px; }
 .lb-khung .nut-diu-mat { height: 44px; border-radius: 22px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .nut-diu-mat { height: 36px; padding: 0 10px; border-radius: 18px; }
+/* Điện thoại xoay ngang (thầy 29/09 "nút dịu mắt thiết kế nhỏ và thật tinh tế"): chỉ biểu tượng 32 px, tên nằm ở aria/title, vùng chạm 40 px. */
+.lb-gon .nut-diu-mat { width: 40px; height: 32px; padding: 0; border-radius: 16px; background: transparent; box-shadow: none; }
+.lb-gon .nut-diu-mat::after { content: ''; position: absolute; inset: -4px 0; }
+.lb-gon .nut-diu-mat[aria-pressed='true'] { background: var(--m3-secondary-container, var(--vang-diu-nen)); }
+.lb-gon .nut-diu-mat-chu { display: none; }
 /* Thanh trên bố cục dọc (56 px, chật ở 360–440 px): nhãn nằm DƯỚI biểu tượng như nút điều hướng M3 — vẫn đủ biểu tượng + chữ mà chỉ rộng ~52 px,
  * để tên ca và "Đã làm x/y" còn chỗ; "Đã làm" không bao giờ gãy dòng. */
 .thi-tren .nut-diu-mat { flex-direction: column; gap: 2px; width: auto; min-width: 48px; height: 44px; padding: 0 6px; border-radius: 12px; font-size: 10.5px; }

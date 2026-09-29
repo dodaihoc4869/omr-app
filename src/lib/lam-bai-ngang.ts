@@ -62,6 +62,59 @@ export function tiLeTheoPhim(ti: number, key: string, shift: boolean): number | 
   return null
 }
 
+// ---------------------------------------------------------------- CHIA ĐÔI CÂU DÀI (điện thoại xoay ngang, thầy 29/09)
+// "Xoay ngang làm bài thi trên điện thoại bỏ phần điền ô đáp án … câu nào dài quá tự động chia 2 màn hình, một bên là đề
+// một bên là các ý đáp án để chọn, lúc chia cho hs tự điều chỉnh được." Tỉ lệ ở đây là phần của CỘT ĐỀ (trái), 30–70 %.
+export const CHIA_MAC_DINH = 0.55
+export const CHIA_MIN = 0.3
+export const CHIA_MAX = 0.7
+export const KHOA_CHIA = 'ddh.lamBaiNgang.tiLeChia'
+
+export function kepChia(v: number): number {
+  if (!Number.isFinite(v)) return CHIA_MAC_DINH
+  return Math.round(Math.max(CHIA_MIN, Math.min(CHIA_MAX, v)) * 1000) / 1000
+}
+
+export function docChia(kho: Pick<Storage, 'getItem'> | null = typeof localStorage === 'undefined' ? null : localStorage): number {
+  try {
+    const s = kho?.getItem(KHOA_CHIA)
+    return s === null || s === undefined || s === '' ? CHIA_MAC_DINH : kepChia(Number(s))
+  } catch {
+    return CHIA_MAC_DINH
+  }
+}
+
+export function ghiChia(v: number, kho: Pick<Storage, 'setItem'> | null = typeof localStorage === 'undefined' ? null : localStorage): void {
+  try {
+    kho?.setItem(KHOA_CHIA, String(kepChia(v)))
+  } catch {
+    /* trình duyệt chặn lưu — chỉ mất tiện nhớ */
+  }
+}
+
+/** Phím trên thanh chia (có tiêu điểm) ⇒ tỉ lệ mới; không phải phím của thanh ⇒ null. */
+export function chiaTheoPhim(ti: number, key: string, shift: boolean): number | null {
+  const b = shift ? BUOC_PHIM_SHIFT : BUOC_PHIM
+  if (key === 'ArrowLeft') return kepChia(ti - b)
+  if (key === 'ArrowRight') return kepChia(ti + b)
+  if (key === 'Home') return CHIA_MIN
+  if (key === 'End') return CHIA_MAX
+  if (key === 'Enter') return CHIA_MAC_DINH
+  return null
+}
+
+/** Tỉ lệ cột đề theo vị trí ngón tay: `x` tính từ mép trái vùng nội dung, `rong` = bề rộng vùng nội dung, `khe` = khe giữa hai cột. */
+export function chiaTheoViTri(x: number, rong: number, khe: number): number {
+  const conLai = rong - khe
+  if (!(conLai > 0)) return CHIA_MAC_DINH
+  return kepChia((x - khe / 2) / conLai)
+}
+
+/** Câu CẦN chia đôi khi chiều cao THẬT của câu (đo khi xếp một cột) vượt khung nhìn — không đoán theo số ký tự. Chừa 2 px sai số làm tròn. */
+export function canChiaDoi(caoCau: number, caoKhung: number): boolean {
+  return caoKhung > 0 && caoCau > caoKhung + 2
+}
+
 // ---------------------------------------------------------------- ĐỒNG HỒ
 /** '' bình thường · 'vang' còn ≤ 10 phút · 'do' còn ≤ 5 phút (cùng mốc `gapNow` của màn thi). */
 export function mucDongHo(conGiay: number | null | undefined): '' | 'vang' | 'do' {

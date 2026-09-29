@@ -9,6 +9,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNo
 import { dangGoChu, docPhim, docTiLe, ghiTiLe, kepTiLe, mucDongHo, TI_LE_MAC_DINH, tiLeTheoPhim, type BoCuc } from '../lib/lam-bai-ngang'
 import './lam-bai-ngang.css'
 import { dinhDangDongHo, useGiayConLai, type KhoGio } from '../lib/dong-ho-thi'
+import LamBaiNgangGon from './LamBaiNgangGon'
 
 // Biểu tượng nét mảnh vẽ tại chỗ (không kéo thêm mảnh lucide dùng chung vào precache — build:cf đếm tệp).
 function Net({ size = 16, children, fill = 'none' }: { size?: number; children: ReactNode; fill?: string }) {
@@ -143,7 +144,13 @@ const docCo = () => {
 }
 const giamDong = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+/** Điện thoại xoay ngang ('ngang-gon') ⇒ bố cục riêng KHÔNG phiếu đáp án, câu dài tự chia đôi (thầy 29/09 — LamBaiNgangGon.tsx).
+ * Máy tính / máy tính bảng xoay ngang ('ngang') giữ NGUYÊN bố cục đề | thanh kéo | phiếu dưới đây. */
 export default function LamBaiNgang(p: LamBaiNgangProps) {
+  return p.boCuc === 'ngang-gon' ? <LamBaiNgangGon {...p} /> : <LamBaiNgangDu {...p} />
+}
+
+function LamBaiNgangDu(p: LamBaiNgangProps) {
   const { cau, boCuc } = p
   const khungRef = useRef<HTMLDivElement>(null)
   const deRef = useRef<HTMLDivElement>(null)

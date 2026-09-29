@@ -3668,7 +3668,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
             </>
           }
-          congCu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} />}
+          congCu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} chiBieuTuong={boCuc === 'ngang-gon'} />}
           phuDe={<ManGiuDeDoc trongKhung chu={coCamUng() ? undefined : 'Giữ phím cách để đọc tiếp'} />}
         >
           {renderPhan('I')}
