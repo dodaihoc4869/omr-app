@@ -4,7 +4,7 @@ import { chonMangNapTruoc, taoMaNapTruoc } from '../src/lib/nap-truoc-man-em'
 import { docDuongVao } from '../src/lib/vai-tro'
 
 describe('chọn mảnh nạp trước theo đường vào', () => {
-  const ca: [string, string, 'thi' | 'hs' | 'ph' | null][] = [
+  const ca: [string, string, 'thi' | 'hs' | 'ph' | 'phieu' | null][] = [
     ['/t/123456', '', 'thi'],
     ['/t/123456/', '', 'thi'],
     ['/d/1234', '', 'thi'],
@@ -18,8 +18,8 @@ describe('chọn mảnh nạp trước theo đường vào', () => {
     ['/', '?vai=phuhuynh', 'ph'],
     ['/gv', '', null],
     ['/', '', null],
-    ['/p', '', null],
-    ['/', '?vai=phieu', null],
+    ['/p', '', 'phieu'],
+    ['/', '?vai=phieu', 'phieu'],
     ['/', '?vai=gv&examCode=123456', null],
     ['/hs/abcdefgh1234', '', null],
   ]
@@ -30,13 +30,13 @@ describe('chọn mảnh nạp trước theo đường vào', () => {
   it('khớp luật docDuongVao của app (thi = có mã ca hoặc xem điểm; hs = cổng học sinh)', () => {
     for (const [duong, q] of ca) {
       const dv = docDuongVao(q, duong)
-      const app = dv.vai === 'gv' || dv.vai === 'phieu' ? null : dv.vai === 'phuhuynh' ? 'ph' : dv.maCa || dv.vai === 'diem' ? 'thi' : dv.vai === 'hocsinh' ? 'hs' : null
+      const app = dv.vai === 'gv' ? null : dv.vai === 'phieu' ? 'phieu' : dv.vai === 'phuhuynh' ? 'ph' : dv.maCa || dv.vai === 'diem' ? 'thi' : dv.vai === 'hocsinh' ? 'hs' : null
       expect(chonMangNapTruoc(duong, q)).toBe(app)
     }
   })
 
   it('không dùng nhìn lùi (Safari cũ sập)', () => {
-    const ma = taoMaNapTruoc({ thi: [], hs: [], ph: [] })
+    const ma = taoMaNapTruoc({ thi: [], hs: [], ph: [], phieu: [] })
     expect(ma).not.toMatch(/\(\?<[=!]/)
   })
 })
@@ -49,7 +49,7 @@ describe('đoạn mã nội tuyến', () => {
       createElement: () => ({ rel: '', href: '', crossOrigin: null as string | null }) as (typeof them)[number],
     }
     const location = { pathname: duong, search: q }
-    const ma = taoMaNapTruoc({ thi: ['/assets/ExamTakeScreen-a.js', '/assets/ExamTakeScreen-b.css'], hs: ['/assets/StudentPortalScreen-c.js'], ph: ['/assets/ParentPortalScreen-d.js'] })
+    const ma = taoMaNapTruoc({ thi: ['/assets/ExamTakeScreen-a.js', '/assets/ExamTakeScreen-b.css'], hs: ['/assets/StudentPortalScreen-c.js'], ph: ['/assets/ParentPortalScreen-d.js'], phieu: ['/assets/PhieuScreen-e.js'] })
     new Function('document', 'location', ma)(document, location)
     return them
   }
@@ -60,11 +60,11 @@ describe('đoạn mã nội tuyến', () => {
       { rel: 'preload', as: 'style', href: '/assets/ExamTakeScreen-b.css', crossOrigin: '' },
     ])
   })
-  it('mỗi cổng chỉ nạp mảnh của mình; app thầy / phiếu / `/` trần không nạp gì', () => {
+  it('mỗi cổng chỉ nạp mảnh của mình; app thầy / `/` trần không nạp gì', () => {
     expect(chay('/hs', '').map((x) => x.href)).toEqual(['/assets/StudentPortalScreen-c.js'])
     expect(chay('/ph', '').map((x) => x.href)).toEqual(['/assets/ParentPortalScreen-d.js'])
     expect(chay('/gv', '')).toEqual([])
-    expect(chay('/p', '')).toEqual([])
+    expect(chay('/p', '').map((x) => x.href)).toEqual(['/assets/PhieuScreen-e.js'])
     expect(chay('/', '')).toEqual([])
   })
 })

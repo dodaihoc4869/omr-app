@@ -7,7 +7,7 @@
 //
 // `crossorigin` khớp đúng thẻ Vite tự chèn (mảnh JS và tờ CSS đều mang `crossorigin`) — lệch là trình duyệt tải HAI lần.
 // Không đổi mã nào chạy: chỉ là gợi ý tải sớm. Trình duyệt không hiểu `modulepreload` (Safari cũ) thì bỏ qua — y như trước.
-// Đường không khớp (app thầy, phiếu, `/` trần) ⇒ không làm gì. KHÔNG dùng nhìn lùi trong regex (Safari cũ sập).
+// Đường không khớp (app thầy, `/` trần) ⇒ không làm gì. KHÔNG dùng nhìn lùi trong regex (Safari cũ sập).
 
 export interface BangNapTruoc {
   /** Mảnh màn thi (`/t/<mã ca>`, `/d/<mã ca>`, `?examCode=`, `?vai=diem`). */
@@ -16,16 +16,19 @@ export interface BangNapTruoc {
   hs: string[]
   /** Mảnh cổng phụ huynh (`/ph`, `/phu-huynh`, `?vai=phuhuynh`). */
   ph: string[]
+  /** Mảnh phiếu kết quả (`/p`, `?vai=phieu`). */
+  phieu: string[]
 }
 
 /** Đường vào nào cần mảnh nào — CÙNG luật `docDuongVao` (vai-tro.ts), viết lại cho đoạn mã nội tuyến. */
-export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs' | 'ph' | null {
+export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs' | 'ph' | 'phieu' | null {
   const q = truyVan || ''
   const p = duongDan || ''
   // Tham số thắng đường dẫn (docDuongVao đọc tham số trước).
   const vai = /[?&]vai=([^&#]*)/.exec(q)
   const v = vai ? decodeURIComponent(vai[1]).trim().toLowerCase() : ''
-  if (v === 'gv' || v === 'giaovien' || v === 'phieu') return null
+  if (v === 'gv' || v === 'giaovien') return null
+  if (v === 'phieu') return 'phieu'
   if (v === 'phuhuynh') return 'ph'
   if (v === 'diem') return 'thi'
   if (v === 'hocsinh') return 'hs'
@@ -33,6 +36,7 @@ export function chonMangNapTruoc(duongDan: string, truyVan: string): 'thi' | 'hs
   if (/(?:^|\/)[td]\/\d{4,8}\/?$/.test(p)) return 'thi'
   if (/(?:^|\/)(?:hoc-sinh|hocsinh|hs)\/?$/.test(p)) return 'hs'
   if (/(?:^|\/)(?:phu-huynh|phuhuynh|ph)\/?$/.test(p)) return 'ph'
+  if (/(?:^|\/)p\/?$/.test(p)) return 'phieu'
   return null
 }
 

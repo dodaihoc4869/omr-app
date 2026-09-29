@@ -17,7 +17,10 @@ import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
-import PhieuScreen from './screens/PhieuScreen'
+// PHIẾU PHỤ HUYNH (`/p`) — nạp lười từ 29/09 (máy yếu / 3G): cả cụm phiếu (~70 KB thô) trước nằm trong mảnh chính mà cổng
+// phụ huynh, cổng học sinh, app thầy đều tải. Đường `/p` vẫn không chờ thêm vòng mạng: index.html nạp trước mảnh phiếu
+// song song với mảnh chính (src/lib/nap-truoc-man-em.ts), và mảnh vẫn nằm trong precache (mở được khi mất mạng).
+const PhieuScreen = lazy(() => import('./screens/PhieuScreen'))
 
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
@@ -31,8 +34,8 @@ import PhieuScreen from './screens/PhieuScreen'
 // thêm một lượt tải nhỏ lần đầu vào mỗi màn, và service worker cất lại ngay.
 //
 // HAI MÀN GIỮ NGUYÊN NẠP SỚM, và chỉ hai:
-//   · `PhieuScreen` — trang phụ huynh mở. Nạp muộn thì đúng người cần nhanh
-//     nhất lại phải chờ thêm một vòng mạng.
+//   · (`PhieuScreen` từng nạp sớm ở đây; 29/09 chuyển sang mảnh riêng, index.html nạp trước theo
+//     đường `/p` — xem khối "PHIẾU PHỤ HUYNH" trên.)
 //   · (`ExamTakeScreen` từng nạp sớm ở đây; 28/09 chuyển sang mảnh riêng VẪN
 //     precache + tải ngay theo đường vào — xem khối "MÀN LÀM BÀI" dưới.)
 //   · `AppDaChuyenScreen` — tấm biển "link này đã ngừng dùng". Nạp muộn thì em
@@ -308,7 +311,9 @@ function App() {
   if (laPhieu) {
     return (
       <ChanLoi o="Phiếu kết quả">
-        <PhieuScreen />
+        <Suspense fallback={<ChoManEm />}>
+          <PhieuScreen />
+        </Suspense>
       </ChanLoi>
     )
   }
