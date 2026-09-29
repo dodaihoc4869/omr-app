@@ -31,7 +31,6 @@ import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { dongBoGioMayChu, gioMayChu } from '../lib/gio-may-chu'
 import { CACH_TAI_DAY_MS, NHIP_SONG_CA_MS, goiNhipCa, gopTienDoSong, hetLucMuonNhat, phuTienDoSong, type TienDoSong } from '../lib/nhip-song-ca'
 import { soanTinRoiMan } from '../lib/tin-nhan-thay'
-import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
@@ -1438,22 +1437,6 @@ export default function ExamMonitorScreen() {
     </>
   )
 
-  const veCauHoiEm = () => (
-    <>
-      {chiTiet && (
-            <KhoiCauHoiEm
-              scriptUrl={scriptUrl.trim()}
-              secret={secret.trim()}
-              maCa={chiTiet.ca.maCa}
-              tenCa={chiTiet.ca.tenCa || ''}
-              lop={chiTiet.ca.lop || ''}
-              banks={teacherBank}
-              showToast={showToast}
-            />
-          )}
-    </>
-  )
-
   const veHanhDongEm = (e: (typeof dsEm)[number]) => {
     const l = e.moiNhat
     const daNop = l.trangThai === 'da_nop' || l.trangThai === 'khoa'
@@ -1804,7 +1787,6 @@ export default function ExamMonitorScreen() {
                   </button>
                 </>
               }
-              cotPhaiThem={veCauHoiEm()}
             />
             </>
           ) : (
@@ -2077,7 +2059,6 @@ export default function ExamMonitorScreen() {
           {/* CÂU HỎI CỦA EM (HOIBAITHAY.md mục 4C). Không gọi máy chủ cho tới
               khi thầy bấm — Chi tiết ca đã đủ nặng, thêm một lệnh nữa mỗi lần
               mở màn là đi ngược việc giảm tải vừa làm. */}
-          {veCauHoiEm()}
           </div>
           </div>
           )}

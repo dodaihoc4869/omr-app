@@ -42,7 +42,7 @@ export interface TheoDoiCaProps {
   daChepLinkDiem?: boolean
   /** KHU TRÊN LÀ CẢ MÀN (thầy 29/09: "bỏ từ phần 12:17 chỉ để lại phần trên"): các chỗ cắm cho những dòng/nút dời lên từ phía dưới.
    *  `dongPhu` dưới dòng thông tin ca (cửa vào ca, phòng chờ, Mở ca, mất kết nối); `canXuLyThem` đầu "Cần thầy xử lý" (đếm vào số `soCanXuLyThem`);
-   *  `viecNhanhThem` cuối "Việc nhanh" (Thêm 5 phút, Xoá ca); `cotPhaiThem` dưới "Việc nhanh" (Câu hỏi của em). */
+   *  `viecNhanhThem` cuối "Việc nhanh" (Thêm 5 phút, Xoá ca); `cotPhaiThem` dưới "Việc nhanh". */
   dongPhu?: ReactNode
   canXuLyThem?: ReactNode
   soCanXuLyThem?: number
