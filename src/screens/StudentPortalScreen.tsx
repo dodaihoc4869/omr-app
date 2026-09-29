@@ -13,7 +13,6 @@ import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import { mocThoiGian } from '../lib/han-bai-tap'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import ThongBaoHocSinh,{noticeApi} from '../components/ThongBaoHocSinh'
-import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
@@ -87,7 +86,6 @@ const BiaGame = lazy(() => import('../game/bi-a/BiaGame'))
 const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
-import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
 import type { TuCongHocSinh } from './ExamTakeScreen'
 
@@ -95,6 +93,11 @@ import type { TuCongHocSinh } from './ExamTakeScreen'
 const ManLamBai = lazy(() => import('./ExamTakeScreen'))
 const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
+// MÁY YẾU (29/09): Bảng tin + hộp Khắc phục câu sai chỉ hiện khi em BẤM mở — nạp lười (một mảnh chung, xem cong-hs-nap-luoi.ts)
+// để lượt mở /hs đầu tiên không phải tải + dịch ≈ 55 KB mã chưa dùng. Tên biến giữ nguyên để JSX không đổi.
+const napKhoiPhu = () => import('../components/cong-hs-nap-luoi')
+const BangTinPhuHuynh = lazy(() => napKhoiPhu().then((m) => ({ default: m.BangTinPhuHuynh })))
+const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.ModalKhacPhucCauSai })))
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
@@ -1516,6 +1519,7 @@ export default function StudentPortalScreen() {
 
           {/* SHEET BẢNG TIN: nhận bài luyện hôm nay, mở các màn cũ từ bảng tin */}
           {tab === 'bantin' && (
+            <Suspense fallback={<div className="m3-xuong" style={{ height: 160 }} />}>
             <BangTinPhuHuynh
               sbd={auth.sbd}
               hoTen={auth.hoTen}
@@ -1538,6 +1542,7 @@ export default function StudentPortalScreen() {
                 wrongCount: tongSoCauSaiDaChon,
               }}
             />
+            </Suspense>
           )}
 
           {/* TAB 1: XEM ĐIỂM */}
@@ -2473,6 +2478,7 @@ export default function StudentPortalScreen() {
 
       {/* Modal Khắc phục câu sai chuẩn hoá 3 lựa chọn */}
       {dsCauSaiKhacPhucModal && auth && (
+        <Suspense fallback={null}>
         <ModalKhacPhucCauSai
           isOpen={Boolean(dsCauSaiKhacPhucModal)}
           onClose={() => setDsCauSaiKhacPhucModal(null)}
@@ -2487,6 +2493,7 @@ export default function StudentPortalScreen() {
             setPhieuHtml(html)
           }}
         />
+        </Suspense>
       )}
     </div>
   )

@@ -1,4 +1,4 @@
-import {describe,it,expect} from 'vitest'
+import {describe,it,expect,beforeAll} from 'vitest'
 import {renderToStaticMarkup} from 'react-dom/server'
 import {SCENES} from '../src/lib/experiments/catalog'
 import {EXPANDED} from '../src/lib/experiments/expanded'
@@ -7,8 +7,11 @@ import {experimentHtml,experimentOriginal} from '../src/lib/experiments/render'
 import {MomQuestionStem} from '../src/components/MomQuestionMedia'
 import {ThanCauGame} from '../src/components/CauHoiTrongGame'
 import TheCau from '../src/components/TheCau'
+import {napCanhThiNghiem} from '../src/components/ExperimentDemo'
 const text='Khi cho glucose phản ứng với Cu(OH)₂ trong môi trường kiềm đun nóng, hiện tượng nào sau đây sẽ xảy ra?'
 describe('shared experiment catalogue',()=>{
+ // Máy yếu 29/09: catalog cảnh nạp lười — nạp trước (như máy em sau lần gặp câu có cảnh đầu tiên) rồi mới dựng tĩnh.
+ beforeAll(async()=>{await napCanhThiNghiem()})
  it('has no broken references or duplicate scenes per question',()=>{for(const ids of Object.values(EXPANDED)){expect(new Set(ids).size).toBe(ids.length);for(const id of ids)expect(SCENES[id],id).toBeDefined()}})
  it('shows the same observed reaction in exams, Mom exercises and game questions',()=>{
  const variants=[renderToStaticMarkup(<TheCau phan="I" stt={1} text={text} choices={['A','B','C','D']} choicePerm={[0,1,2,3]} selected={null} cheDo="thi"/>),renderToStaticMarkup(<MomQuestionStem q={{text}}/>),renderToStaticMarkup(<ThanCauGame c={{cau:text,phuongAn:[]}}/>)];

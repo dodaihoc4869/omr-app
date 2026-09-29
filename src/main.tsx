@@ -23,6 +23,8 @@ import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import './styles/tokens.css'
 import './index.css'
 import './styles/the-loc.css'
+// Chế độ máy yếu (29/09): quy tắc chỉ có hiệu lực khi <html> mang lớp `may-yeu` (xem src/lib/may-yeu.ts).
+import './styles/may-yeu.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 import App from './App.tsx'
 import { napKatex } from './lib/chem-format'
@@ -35,6 +37,7 @@ import { batBaoHiemBanMoi } from './lib/bao-hiem-ban-moi'
 import { batSuKienCaiApp } from './lib/pwa-install'
 import { batLoiThieuManh } from './lib/nap-manh'
 import { napDiaChiMayChuMoiChoEm } from './lib/may-chu-moi'
+import { batCheDoMayYeu } from './lib/may-yeu'
 
 // Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
 // KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
@@ -79,6 +82,9 @@ khoaVaiVaoUrl(import.meta.env.BASE_URL)
   else if (dv.maCa || dv.vai === 'diem') nhoVaiDaDung('hs')
   else if (dv.vai === 'hocsinh') nhoVaiDaDung('hs')
   else if (dv.vai === 'phuhuynh') nhoVaiDaDung('ph')
+  // CHẾ ĐỘ MÁY YẾU (thầy 29/09): máy em / phụ huynh ít RAM, ít lõi, xin giảm chuyển động hay tiết kiệm dữ liệu ⇒ gắn lớp
+  // `may-yeu` lên <html> TRƯỚC khi React dựng (tắt kính mờ, bớt hoạt ảnh trang trí, bớt hạt/thị sai). Máy thầy không đụng.
+  if (dv.vai === 'hocsinh' || dv.vai === 'phuhuynh' || dv.vai === 'diem' || dv.vai === 'phieu' || !!dv.maCa) batCheDoMayYeu()
   // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu) ⇒ tải NGAY, song song với
   // mảnh màn; đường khác (màn khoá thầy, cổng phụ huynh) ⇒ tải lúc rảnh sau khi trang đã hiện.
   const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu'
