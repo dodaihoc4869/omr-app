@@ -5,6 +5,7 @@
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
+import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import {
   lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
@@ -101,6 +102,7 @@ export const LENH_TAO_BANG_BAT_DAU = 'CREATE TABLE IF NOT EXISTS chien_dich_bat_
 export async function ghiBatDau(env: Env, id: string, batDau: string): Promise<void> {
   await chayDdlMotLan(env, 'chien_dich_bat_dau', [LENH_TAO_BANG_BAT_DAU]) // một lần mỗi isolate (ddl-mot-lan.ts)
   await env.DB.prepare('INSERT INTO chien_dich_bat_dau (id, bat_dau) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET bat_dau = excluded.bat_dau').bind(id, batDau).run()
+  xoaDemChienDich()
 }
 /** Ngày bắt đầu đã đặt của các chiến dịch. Bảng chưa có / lỗi đọc ⇒ rỗng (hành vi cũ). */
 export async function docBatDauMap(env: Env, ids: readonly string[]): Promise<Map<string, string>> {
@@ -117,16 +119,39 @@ export async function docChienDichKemBatDau(env: Env, rows: readonly Row[]): Pro
 export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau > homNay
 
 /** Mọi chiến dịch (chưa huỷ) có em này, mới giao trước. */
-export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDich[]> {
-  // Tối ưu 28/09: ngày bắt đầu đọc SONG SONG (cùng điều kiện lọc) thay vì nối tiếp sau danh sách — một đợt D1 thay vì hai.
+/**
+ * CAO ĐIỂM 20h–24h (29/09): danh sách chiến dịch chưa huỷ + ngày bắt đầu là dữ liệu CHUNG mọi em (bảng nhỏ) nhưng trước đây MỖI lệnh Sảnh / start / Đoàn của
+ * MỖI em quét lại cả bảng và bung `sbd_json` của mọi chiến dịch (json_each) để lọc một em. Nay đọc CẢ danh sách một lần, đệm 15 s trong isolate (lượt đọc đang bay được
+ * chia sẻ), lọc em bằng tập sbd dựng sẵn. Thầy tạo / đóng / huỷ / sửa chiến dịch hay đặt ngày bắt đầu ⇒ `xoaDemChienDich()` ngay (isolate ấy); isolate khác trễ ≤ 15 s.
+ * Lỗi đọc ⇒ rỗng như cũ và KHÔNG đệm.
+ */
+type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; bd: Map<string, string> }
+const demChienDich = new DemTTL<Promise<DsChienDich>>(15_000, 2)
+export function xoaDemChienDich(): void { demChienDich.xoa() }
+function docMoiChienDich(env: Env): Promise<DsChienDich> {
+  const nay = Date.now()
+  const co = demChienDich.doc('ds', nay)
+  if (co) return co
+  let loi = false
   // Không JOIN: bảng `chien_dich_bat_dau` tạo lúc chạy, có thể chưa có ⇒ lỗi riêng câu phụ, danh sách vẫn đúng (hành vi cũ).
-  const LOC = "trang_thai <> 'da_huy' AND EXISTS (SELECT 1 FROM json_each(chien_dich.sbd_json) WHERE value = ?)"
-  const [r, bd] = await Promise.all([
-    env.DB.prepare(`SELECT * FROM chien_dich WHERE ${LOC} ORDER BY tao_luc DESC`).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
-    env.DB.prepare(`SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE ${LOC})`).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] })),
-  ])
-  const m = new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)]))
-  return (r.results ?? []).map((x) => docChienDichTuDong({ ...x, bat_dau: m.get(str(x.id)) ?? null }))
+  const p = Promise.all([
+    env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY tao_luc DESC").all<Row>().catch(() => { loi = true; return { results: [] as Row[] } }),
+    // bảng tạo lúc chạy: chưa có (chưa ai đặt ngày bắt đầu) là BÌNH THƯỜNG ⇒ rỗng, vẫn đệm (`ghiBatDau` xoá đệm khi tạo)
+    env.DB.prepare("SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
+  ]).then(([r, bd]) => {
+    if (loi && demChienDich.doc('ds', Date.now()) === p) demChienDich.xoaKhoa('ds')
+    return {
+      // đúng ngữ nghĩa `json_each(sbd_json) … value = ?`: chỉ phần tử CHUỖI trùng khớp tuyệt đối
+      ds: (r.results ?? []).map((row) => { let a: unknown = []; try { a = JSON.parse(str(row.sbd_json) || '[]') } catch { /* sbd_json hỏng ⇒ không em nào */ } return { row, sbd: new Set((Array.isArray(a) ? a : []).filter((x): x is string => typeof x === 'string')) } }),
+      bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
+    }
+  })
+  demChienDich.ghi('ds', nay, p)
+  return p
+}
+export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDich[]> {
+  const { ds, bd } = await docMoiChienDich(env)
+  return ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null }))
 }
 /**
  * SỬA CHIẾN DỊCH (thầy 28/09, `srs2-sua.ts`): em được THÊM vào chiến dịch đang chạy chỉ tính lần làm TỪ LÚC ĐƯỢC THÊM (như em giao từ đầu).

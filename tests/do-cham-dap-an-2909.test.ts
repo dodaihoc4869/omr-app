@@ -63,7 +63,13 @@ async function dung(): Promise<{ d: D1That; token: string; qs: ReturnType<typeof
 
 /** Ngưỡng của bản SAU tối ưu (main cũ: câu đúng 21 đợt, câu sai 10 đợt). Nới 1–2 đợt cho nhiễu CPU / lượt xác thực token hết đệm. */
 const NGUONG = (ds: (Do & { dung: boolean; k: number })[]) => {
-  for (const x of ds.filter((y) => y.k > 0)) expect(x.dot, `câu ${x.k} ${x.dung ? 'đúng' : 'sai'}`).toBeLessThanOrEqual(x.dung ? 7 : 5)
+  // Đợt đo bằng thời gian (trễ giả 25 ms/lượt) ⇒ lấy TRUNG VỊ cho khỏi chập chờn khi cả bộ test chạy song song; số vòng thì tất định.
+  const tv = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]!
+  for (const dung of [true, false]) {
+    const n = ds.filter((y) => y.k > 0 && y.dung === dung)
+    expect(tv(n.map((x) => x.dot)), dung ? 'đợt câu đúng' : 'đợt câu sai').toBeLessThanOrEqual(dung ? 7 : 5)
+    for (const x of n) expect(x.vong, `vòng câu ${x.k}`).toBeLessThanOrEqual(dung ? 18 : 11)
+  }
 }
 type Do = { vong: number; dot: number; r2: number; ms: number; sql: string[] }
 async function doMotLan(d: D1That, token: string, qid: string, answer: string, treGia: boolean): Promise<{ r: Record<string, unknown>; m: Do }> {

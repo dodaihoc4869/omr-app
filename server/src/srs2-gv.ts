@@ -9,7 +9,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { hangTuTiLe, khoiLuongCan, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
-import { chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
+import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -352,12 +352,14 @@ async function tao(env: Env, b: Row, nowMs: number) {
   await env.DB.prepare(`INSERT INTO chien_dich (id, ten, lop, sbd_json, ma_de_json, qid_json, han_nop, the_luc_ngay, huyet_chien, ma_ca, tao_luc, trang_thai)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,'dang_chay')`)
     .bind(id, dv.ten, dv.lop, JSON.stringify(dv.sbd), JSON.stringify(maGocCuaTo(dv.maDe)), JSON.stringify(qids), dv.hanNop, dv.theLucNgay, dv.huyetChien ? 1 : 0, dv.maCa, new Date(nowMs).toISOString()).run()
+  xoaDemChienDich() // danh sách chiến dịch đệm 15 s (srs2-d1.ts) ⇒ em thấy chiến dịch mới ngay
   if (dv.batDau) await ghiBatDau(env, id, dv.batDau)
   return { ok: true, id, soCau: qids.length, soEm: dv.sbd.length, batDau: dv.batDau ?? ngayVnCua(nowMs) }
 }
 
 async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy', nowMs: number) {
   const r = await env.DB.prepare('UPDATE chien_dich SET trang_thai = ?, dong_luc = ? WHERE id = ?').bind(trangThai, new Date(nowMs).toISOString(), id).run()
+  xoaDemChienDich()
   if (!r.meta.changes) throw new Error('Không tìm thấy chiến dịch.')
   return { ok: true }
 }
