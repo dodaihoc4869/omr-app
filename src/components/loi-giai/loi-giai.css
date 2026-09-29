@@ -46,8 +46,9 @@
 .lg-nut-hang--gon { padding: 8px 0 0; }
 .lg-nut--hoi { background: var(--m3-tertiary-container, var(--m3-secondary-container)); color: var(--m3-on-tertiary-container, var(--m3-on-secondary-container)); border-color: transparent; }
 .lg-cuon { flex: 1; overflow: auto; overscroll-behavior: contain; padding: 16px; }
-.lg-chu { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.6; }
-.lg-chu p { margin: 0; }
+/* `.lg-van` (không phải `.lg-chu`): `.lg-chu` là chữ lý do từng phương án của TheCau (index.css) — trùng tên làm dòng lý do trong game bị căn giữa, thò thụt (29/09). */
+.lg-van { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; font-size: 16px; line-height: 1.6; }
+.lg-van p { margin: 0; }
 .lg-chu-bao { padding: 10px 12px; border-radius: 12px; background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); font-size: 15px; }
 .lg-chu-de img { max-width: 100%; height: auto; }
 .lg-chu-de table { border-collapse: collapse; }
