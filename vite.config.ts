@@ -75,8 +75,8 @@ function napTruocManEm(): Plugin {
           di(dau.fileName)
           return [...thay].filter((t) => !html.includes(t)).map((t) => goc + t)
         }
-        const bang = { thi: dsCua('/src/screens/ExamTakeScreen.tsx'), hs: dsCua('/src/screens/StudentPortalScreen.tsx'), ph: dsCua('/src/screens/ParentPortalScreen.tsx'), phieu: dsCua('/src/screens/PhieuScreen.tsx') }
-        if (bang.thi.length + bang.hs.length + bang.ph.length + bang.phieu.length === 0) return html
+        const bang = { thi: dsCua('/src/screens/ExamTakeScreen.tsx'), hs: dsCua('/src/screens/StudentPortalScreen.tsx'), ph: dsCua('/src/screens/ParentPortalScreen.tsx') }
+        if (bang.thi.length + bang.hs.length + bang.ph.length === 0) return html
         // Đặt TRƯỚC mọi thẻ Vite chèn: script nội tuyến đứng sau <link rel="stylesheet"> phải chờ tờ CSS tải xong mới chạy
         // (đo: mất ~1,5 s trên 3G) — đặt trước thì chạy ngay khi trình duyệt vừa đọc tới.
         const moc = html.indexOf('<script type="module"')
@@ -241,8 +241,8 @@ export default defineConfig({
         codeSplitting: {
           // Máy yếu (29/09): `src/lib/may-yeu.ts` (≈ 1 KB) nay được nhiều mảnh lười cùng nhập ⇒ Rolldown tách thành tệp riêng, đẩy
           // precache lên đúng trần 170. Gom vào CÙNG mảnh biểu tượng (mảnh này index.html luôn tải sẵn) ⇒ không thêm tệp nào.
-          // 29/09 (phiếu phụ huynh tách mảnh lười ⇒ +2 tệp precache): gom thêm ba mô-đun nhỏ (~1 KB mỗi cái) mà index.html VỐN
-          // nạp sẵn ở mọi đường (vai-tro, dia-chi-may-chu, hieu-chinh-giay-thuc) vào cùng mảnh này ⇒ precache về lại ≤ 170 tệp.
+          // 29/09: gom thêm ba mô-đun nhỏ (~1 KB mỗi cái) mà index.html VỐN nạp sẵn ở mọi đường (vai-tro, dia-chi-may-chu,
+          // hieu-chinh-giay-thuc) vào cùng mảnh này ⇒ bớt tệp precache / vòng mạng, chừa chỗ dưới trần 170.
           groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ }],
         },
       },

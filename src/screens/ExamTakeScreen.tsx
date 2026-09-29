@@ -221,7 +221,7 @@ function daTraLoiEntry(attempt: ExamAttempt, assignment: StudentAssignment, ref:
   return !!attempt.answers.phanIII[assignment.phanIII[ref.i].qid]?.trim()
 }
 
-function cuonToiCau(stt: number) {
+function cuonToiCauDom(stt: number) {
   document.getElementById(`cau-${stt}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
@@ -743,7 +743,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // ~2,3 s (script 0,9 s + tính kiểu 0,6 s + bố cục 0,6 s) — em nhìn màn trắng/đứng rồi mới thấy câu 1. Nay bố cục DỌC dựng
   // SO_THE_DAU thẻ đầu ngay, phần còn lại thêm từng BUOC_THE thẻ lúc máy rảnh (startTransition — chạm đáp án vẫn được ưu tiên).
   // Không đổi dữ liệu, đáp án, cách chấm: thẻ chưa dựng chỉ là CHƯA VẼ. Bấm tới một câu chưa dựng (lưới số câu, dải câu chưa
-  // làm, hộp nộp) ⇒ dựng hết ngay rồi mới cuộn (`toiCau`). Bố cục ngang giữ như cũ (dựng hết một lần).
+  // làm, hộp nộp) ⇒ dựng hết ngay rồi mới cuộn (`cuonToiCau` trong màn). Bố cục ngang giữ như cũ (dựng hết một lần).
   const [theDaDung, setTheDaDung] = useState<{ khoa: unknown; n: number }>({ khoa: null, n: 0 })
   const soTheDung = boCuc !== 'doc' ? Infinity : theDaDung.khoa === assignment ? theDaDung.n : SO_THE_DAU
   useEffect(() => {
@@ -3282,9 +3282,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       the
     )
   /** Cuộn tới câu `so`; câu chưa dựng (DỰNG ĐỀ DẦN) ⇒ dựng hết ngay trong cú bấm rồi mới cuộn. */
-  const toiCau = (so: number) => {
+  const cuonToiCau = (so: number) => {
     if (so > soTheDung) flushSync(() => setTheDaDung({ khoa: assignment, n: Infinity }))
-    cuonToiCau(so)
+    cuonToiCauDom(so)
   }
   const gapNow = mocGio === 'gap' || mocGio === 'cuoi' || mocGio === 'het'
   // BÀI TẬP VỀ NHÀ: thay đồng hồ đếm ngược bằng hạn nộp (BA-APP.md mục 6).
@@ -3437,7 +3437,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     key={i}
                     onClick={() => {
                       setShowGrid(false)
-                      toiCau(i + 1)
+                      cuonToiCau(i + 1)
                     }}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
@@ -3497,8 +3497,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               variant="phu"
               onClick={() => {
                 setShowConfirm(false)
-                if (chuaLam.length > 0) toiCau(chuaLam[0])
-                else if (dungM3() && sttDanhDau.length > 0) toiCau(sttDanhDau[0])
+                if (chuaLam.length > 0) cuonToiCau(chuaLam[0])
+                else if (dungM3() && sttDanhDau.length > 0) cuonToiCau(sttDanhDau[0])
               }}
             >
               Xem lại
@@ -3789,7 +3789,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 return (
                   <button
                     key={i}
-                    onClick={() => toiCau(i + 1)}
+                    onClick={() => cuonToiCau(i + 1)}
                     className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-1)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                     title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}${dungM3() && sttDanhDau.includes(i + 1) ? ' — xem lại sau' : ''}`}
@@ -3817,7 +3817,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
         {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
         <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>
-          {dungM3() && <DaiCauChuaLamM3 chuaLam={chuaLam} daDanhDau={sttDanhDau} onToiCau={toiCau} onMoLuoi={() => setShowGrid(true)} />}
+          {dungM3() && <DaiCauChuaLamM3 chuaLam={chuaLam} daDanhDau={sttDanhDau} onToiCau={cuonToiCau} onMoLuoi={() => setShowGrid(true)} />}
           {renderPhan('I')}
           {renderPhan('II')}
           {renderPhan('III')}

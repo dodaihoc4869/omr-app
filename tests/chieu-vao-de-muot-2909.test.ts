@@ -1,4 +1,4 @@
-// Máy yếu đợt 2 (29/09): tờ chiếu chia cột phương án không ép bố cục từng cái; màn thi dựng đề dần; phiếu phụ huynh nạp lười.
+// Máy yếu đợt 2 (29/09): tờ chiếu chia cột phương án không ép bố cục từng cái; màn thi dựng đề dần.
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { taoHtmlMayChieu } from '../src/lib/html-may-chieu'
@@ -35,24 +35,13 @@ describe('màn thi: dựng đề dần ở bố cục dọc', () => {
     expect(m).toContain('startTransition(() => setTheDaDung({ khoa: assignment, n: soTheDung + BUOC_THE }))')
     expect((m.match(/stt \+= 1\n\s+if \(stt > soTheDung\) return null/g) || []).length).toBe(3)
   })
-  it('bấm tới câu chưa dựng ⇒ dựng hết rồi mới cuộn; mọi lối cuộn trong màn làm bài đi qua toiCau', () => {
+  it('bấm tới câu chưa dựng ⇒ dựng hết rồi mới cuộn; hàm cuộn DOM chỉ gọi qua hàm cuộn của màn', () => {
     expect(m).toContain('if (so > soTheDung) flushSync(() => setTheDaDung({ khoa: assignment, n: Infinity }))')
-    const sauToiCau = m.slice(m.indexOf('const toiCau = (so: number)') + 200)
-    expect(sauToiCau).not.toContain('cuonToiCau(')
-    expect(sauToiCau).toContain('onToiCau={toiCau}')
+    expect((m.match(/cuonToiCauDom\(/g) || []).length).toBe(2) // khai báo + đúng một chỗ gọi
+    expect(m).toContain('onToiCau={cuonToiCau}')
   })
   it('thẻ dựng thêm được gắn vào bộ đếm giây từng câu đang chạy (không dựng lại bộ đếm)', () => {
     expect(m).toContain('ioCauRef.current = io')
     expect(m).toMatch(/const io = ioCauRef\.current\s+if \(phase !== 'exam' \|\| !io\) return/)
-  })
-})
-
-describe('phiếu phụ huynh nạp lười + nạp trước từ HTML', () => {
-  it('App không nhập tĩnh PhieuScreen; đường /p có Suspense', () => {
-    const a = doc('src/App.tsx')
-    expect(a).not.toContain("import PhieuScreen from './screens/PhieuScreen'")
-    expect(a).toContain("const PhieuScreen = lazy(() => import('./screens/PhieuScreen'))")
-    expect(a).toMatch(/<Suspense fallback=\{<ChoManEm \/>\}>\s*<PhieuScreen \/>/)
-    expect(doc('vite.config.ts')).toContain("phieu: dsCua('/src/screens/PhieuScreen.tsx')")
   })
 })
