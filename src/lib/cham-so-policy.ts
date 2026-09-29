@@ -14,6 +14,8 @@
 // KHÔNG dùng eval/Function. Mọi phép so chạy trên số hữu tỉ BigInt nên biên thập phân chính xác.
 
 /** Version của bộ chính sách. Đổi luật ⇒ tăng version, sửa đồng bộ THAM-SO.json + MAU-KET-QUA.json. */
+import { docSoPhanIII } from './doc-so-phan-iii'
+
 export const POLICY_VERSION = 'CNH-1.0' as const
 
 /** Mã lỗi chuẩn hoá: chuỗi KHÔNG đọc được thành số theo grammar. Không phải "sai kiến thức". */
@@ -58,6 +60,11 @@ const KHOA_HOC_E = /^([+-]?(?:\d+\.?\d*|\.\d+))e([+-]?\d+)$/
 
 /** Chuỗi đã dọn nhiễu hình thức (chữ thường, dấu thập phân là "."); rỗng nếu không còn gì. Không đổi giá trị số. */
 export function chuanHoaSoNhap(raw: unknown): string {
+  // 29/09/2026: đọc số bằng `docSoPhanIII` (một hàm dùng chung, phiếu HTML nhúng nguyên văn) — hiểu số mũ chữ nhỏ
+  // "×10⁹", "10⁻³", ".10^-3", phân cách nghìn rõ ràng "1.237.500.000". Đọc được ⇒ trả "số chuẩn + đơn vị".
+  // Không đọc được (chữ, Đ/S, dạng lạ) ⇒ giữ NGUYÊN cách dọn cũ bên dưới để so chuỗi như trước.
+  const doc = docSoPhanIII(raw)
+  if (doc) return doc.so + doc.donVi
   let s = String(raw ?? '').normalize('NFKC')
     .replace(KHOANG_TRANG, '').replace(DAU_TRU, '-').replace(/[٫‚،]/g, ',').toLowerCase()
   s = s.replace(/^[+≈~=]+/, '').replace(/[.,;:!?]+$/, '').replace(/,/g, '.')
@@ -75,7 +82,7 @@ const DON_VI_DA_BIET = new Set([
   // độ dài / diện tích / thể tích
   'm', 'dm', 'cm', 'mm', 'km', 'hm', 'dam', 'nm', 'um', 'µm', 'μm', 'met', 'mét',
   'm2', 'm²', 'm3', 'm³', 'cm2', 'cm²', 'cm3', 'cm³', 'dm3', 'dm³', 'mm3', 'mm³',
-  'km2', 'km²', 'km3', 'km³', 'ha', 'cc', 'l', 'ml', 'cl', 'dl', 'lit', 'lít',
+  'km2', 'km²', 'km3', 'km³', 'ha', 'cc', 'l', 'ml', 'cl', 'dl', 'lit', 'lít', 'mililit', 'mililít',
   // khối lượng
   'g', 'kg', 'mg', 'hg', 'dag', 't', 'tan', 'tấn', 'gam', 'kilogam',
   // thời gian
@@ -86,7 +93,7 @@ const DON_VI_DA_BIET = new Set([
   // khối lượng riêng / khối lượng mol
   'g/mol', 'kg/mol', 'g/ml', 'g/cm3', 'g/cm³', 'kg/m3', 'kg/m³', 'kg/l', 'mg/ml', 'g/l',
   // năng lượng / công suất / nhiệt
-  'j', 'kj', 'cal', 'kcal', 'w', 'kw', 'mw', 'wh', 'kwh', 'j/kg', 'j/mol', 'kj/mol', 'j/g', 'j/(mol.k)',
+  'j', 'kj', 'jun', 'kilojun', 'cal', 'kcal', 'w', 'kw', 'mw', 'wh', 'kwh', 'j/kg', 'j/mol', 'kj/mol', 'j/g', 'j/(mol.k)',
   // điện / từ / sóng
   'v', 'mv', 'kv', 'a', 'ma', 'ohm', 'ω', 'f', 'µf', 'uf', 'nf', 'pf', 'mh', 'wb', 'hz', 'khz', 'mhz', 'ghz',
   // áp suất / lực
@@ -141,11 +148,18 @@ function bangNhau(a: SoHuuTy, b: SoHuuTy): boolean {
   return a.tu * b.mau === b.tu * a.mau
 }
 
-/** |a − b| < 1/10000 — đúng quy ước "nhỏ hơn", không phải "≤". */
+/** |a − b| < 1/10000 — đúng quy ước "nhỏ hơn", không phải "≤".
+ *  29/09/2026: đáp án RẤT NHỎ (|khoá| < 0,01, thường viết dạng ×10⁻ⁿ, trước đây không đọc được nên chưa bao giờ được chấm)
+ *  (khác 0) thì biên còn là |a − b| < |khoá|/100 — nếu không, 1e-4 tuyệt đối sẽ coi "2×10⁻¹⁹" bằng "1,6×10⁻¹⁹" (sai thành ĐÚNG).
+ *  Với |khoá| ≥ 0,01 biên y như cũ (1e-4), không nới không siết. `b` là KHOÁ. */
 function lechNhoHon(a: SoHuuTy, b: SoHuuTy): boolean {
   const hieu = a.tu * b.mau - b.tu * a.mau
   const tuyetDoi = hieu < 0n ? -hieu : hieu
-  return tuyetDoi * 10000n < a.mau * b.mau
+  if (!(tuyetDoi * 10000n < a.mau * b.mau)) return false
+  const khoaTuyetDoi = b.tu < 0n ? -b.tu : b.tu
+  // |hieu|/(a.mau·b.mau) < |b.tu|/(b.mau·100)  ⇔  |hieu|·100 < |b.tu|·a.mau ; chỉ xét khi |khoá| < 1/100.
+  if (khoaTuyetDoi === 0n || khoaTuyetDoi * 100n >= b.mau) return true // khoá 0 giữ biên tuyệt đối cũ (test T33 khoá)
+  return tuyetDoi * 100n < khoaTuyetDoi * a.mau
 }
 
 /** Làm tròn nửa-ra-xa-0 theo ĐÚNG `decimals` chữ số thập phân, trên số hữu tỉ. */

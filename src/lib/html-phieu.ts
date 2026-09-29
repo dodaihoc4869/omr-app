@@ -30,6 +30,7 @@ import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { gomTuCongThuc, tachDongSoDo } from './chem-format-so-do'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
+import { docSoPhanIII } from './doc-so-phan-iii'
 import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, nopThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
@@ -2369,19 +2370,23 @@ export const JS_PHIEU = `
           s = chuanIII(s).toLowerCase();
           return s.replace(/^[+~=]+/, '').replace(/[.,;:!?]+$/, '').replace(/,/g, '.');
         };
-        var tachSo = function (s) {
-          var m = /^([+-]?(?:\d+\.?\d*|\.\d+))(.*)$/.exec(s);
-          return m ? { n: m[1], u: m[2] } : null;
-        };
+        // 29/09/2026: đọc số bằng NGUYÊN VĂN hàm dùng chung docSoPhanIII (src/lib/doc-so-phan-iii.ts) — hiểu "×10⁹", "10⁻³",
+        // ".10^-3", "1.237.500.000"; trước đây phiếu (và máy chủ) chấm "1237500000" SAI với đáp án "1,2375×10⁹ kJ".
+        var docSo = (${docSoPhanIII.toString()});
         var khopIII = function (v, d) {
           var a = chuanSoIII(v), b = chuanSoIII(d);
           if (!a || !b) return false;
           if (a === b) return true;
-          var x = tachSo(a), y = tachSo(b);
+          var x = docSo(v), y = docSo(d);
           if (!x || !y) return false;
-          if (x.u && y.u && x.u !== y.u) return false;
-          var na = Number(x.n), nb = Number(y.n);
-          return isFinite(na) && isFinite(nb) && Math.abs(na - nb) < 1e-4;
+          if (x.donVi && y.donVi && x.donVi !== y.donVi) return false;
+          var na = Number(x.so), nb = Number(y.so);
+          if (!isFinite(na) || !isFinite(nb)) return false;
+          if (na === nb) return true;
+          var lech = Math.abs(na - nb);
+          if (!(lech < 1e-4)) return false;
+          // Khoá rất nhỏ (khác 0, |khoá| < 0,01): biên còn |khoá|/100 — y hệt lechNhoHon của cham-so-policy.
+          return nb === 0 || Math.abs(nb) >= 0.01 || lech < Math.abs(nb) / 100;
         };
         var dung = 0;
         var sai = [];

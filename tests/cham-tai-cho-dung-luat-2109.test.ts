@@ -9,6 +9,7 @@ import { normalizeNumericAnswer } from '../src/engine/score'
 import { khopPhanIII } from '../src/lib/cham-so'
 import { dungPhieu } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
+import { docSoPhanIII } from '../src/lib/doc-so-phan-iii'
 
 const NGUON = readFileSync(resolve(__dirname, '..', 'src/lib/html-phieu.ts'), 'utf8')
 const a = NGUON.indexOf('      function chamTaiCho() {')
@@ -16,6 +17,8 @@ const b = NGUON.indexOf('\n      function toKetQua', a)
 expect(a).toBeGreaterThan(0)
 // Trong tệp nguồn `\\s` là hai ký tự (chuỗi mẫu); trang HTML sinh ra nhận `\s`.
 const THAN = NGUON.slice(a, b).replace(/\\\\s/g, '\\s')
+  // 29/09: phiếu nhúng NGUYÊN VĂN docSoPhanIII qua `${docSoPhanIII.toString()}` — đọc từ nguồn thì thay lại như trang thật.
+  .replace('${docSoPhanIII.toString()}', () => docSoPhanIII.toString())
 const chamTaiCho = new Function('du', 'lam', `${THAN}\nreturn chamTaiCho();`) as (du: unknown, lam: unknown) => { dung: number; sai: string[] }
 
 /** Chấm MỘT câu Phần III: đáp án đề `dapAn`, em gõ `chon` → có tính là đúng không. */
@@ -44,6 +47,9 @@ describe('Phần III chấm tại chỗ: KHỚP luật chính thức, không n�
     ['1 234', '1234', true, 'mọi khoảng trắng bị bỏ'],
     ['12', '1.2', false, 'số khác nhau vẫn khác nhau'],
     ['–5', '5', false, 'dấu trừ KHÔNG bị nuốt'],
+    ['1,2375×10⁹ kJ', '1237500000', true, 'thầy báo 29/09: số mũ chữ nhỏ + đơn vị'],
+    ['2,5.10⁻³', '0,0025', true, 'mũ âm, dấu chấm làm dấu nhân'],
+    ['1,2375×10⁹ kJ', '123750000', false, 'lệch một bậc vẫn SAI'],
   ]
   for (const [dapAn, chon, ky, ghi] of CAP) {
     it(`đáp án "${dapAn}" · em gõ "${chon}" ⇒ ${ky ? 'ĐÚNG' : 'SAI'} (${ghi})`, () => {

@@ -186,7 +186,3 @@ describe('T19 — Phần II: lưu kết quả TỪNG Ý, không hạ cả câu v
     expect(kq.total).toBe(10)
   })
 })
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/cnh-exp-p08-2409

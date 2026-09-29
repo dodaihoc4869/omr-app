@@ -10,7 +10,7 @@ import { chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
 import type { CauDaLamMuc, ChiTietCau, LanLam, TrangThaiCau } from './api'
 import { NHAN_NGUON_LAN } from './api'
 import { ngayThang } from './thoi-gian'
-import { normalizeNumericAnswer } from '../../engine/score'
+import { khopPhanIII } from '../../lib/cham-so'
 
 type Chu = 'A' | 'B' | 'C' | 'D'
 type DS = 'D' | 'S'
@@ -182,12 +182,10 @@ export function cauLuyenTuChiTiet(ct: ChiTietCau, muc: CauDaLamMuc | undefined):
 const CHU_Y = ['a', 'b', 'c', 'd'] as const
 /** 'D' → "Đúng", 'S' → "Sai", trống → "bỏ trống". */
 export const chuDS = (v: DS | null | undefined): string => (v === 'D' ? 'Đúng' : v === 'S' ? 'Sai' : 'bỏ trống')
-const soChuan = (s: string | null | undefined): string => normalizeNumericAnswer(String(s ?? ''))
-
-/** Phần III: câu trả lời của em có khớp đáp án không (cùng luật chấm số với TheCau). */
+/** Phần III: câu trả lời của em có khớp đáp án không — ĐÚNG luật chấm dùng chung `khopPhanIII`.
+ *  29/09/2026 (thầy báo ảnh Câu đã làm): trước đây so CHUỖI đã dọn nên "1237500000" ≠ "1,2375×10⁹ kJ" dù cùng giá trị. */
 export function traLoiNganDung(em: string | null | undefined, dapAn: string): boolean {
-  const e = soChuan(em)
-  return !!e && !!soChuan(dapAn) && e === soChuan(dapAn)
+  return khopPhanIII(String(em ?? ''), dapAn)
 }
 
 /** Phần tóm tắt của THẺ ĐANG ĐÓNG (bản vẽ HS-CauDaLam): một dòng đề + "Em chọn: … · Đáp án: …".

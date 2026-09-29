@@ -12,7 +12,7 @@ import {chiGiuCauRutDuoc} from './cam-tu-luan'
 import {readScope, doDayDu, protectedQuestions} from './game-v2-bank'
 import {learnedQuestionFilter} from '../../src/game/than-thu-v2/core'
 import {cauChoMom} from './parent-news-nguon-cau'
-import {chamTheoPolicy, ChamInputError, ChamMaterialError, POLICY_MAC_DINH_PHAN_III} from '../../src/lib/cham-so-policy'
+import {chamTheoPolicy, ChamInputError, ChamMaterialError, POLICY_MAC_DINH_PHAN_III, tachSoVaDonVi} from '../../src/lib/cham-so-policy'
 
 /** Submit validation only: callers map input to 422, server material to 500. */
 export class LoiChamMom extends Error {
@@ -37,7 +37,8 @@ function khoaMom(c:Question):string {
   if(p==='II'&&!/^[DS]{4}$/.test(d))return ''
   if(p==='III'){
     const n=normalizeNumericAnswer(d)
-    if(!SO_HOP_LE.test(n)||!Number.isFinite(Number(n)))return ''
+    // 29/09: khoá có đơn vị/số mũ ("1,2375×10⁹ kJ") đọc bằng CÙNG bộ tách số của policy chấm, không loại oan.
+    if(!(SO_HOP_LE.test(n)&&Number.isFinite(Number(n)))&&!tachSoVaDonVi(n,false).ok)return ''
   }
   return d
 }

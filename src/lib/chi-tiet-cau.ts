@@ -4,7 +4,7 @@
 // thầy (màn Theo dõi) và máy em (khi ca công bố điểm). Không suy diễn: câu
 // thiếu chuyên đề/mức độ để trống.
 import type { TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
-import { normalizeNumericAnswer } from '../engine/score'
+import { khopPhanIII } from './cham-so'
 import { assignStudentQuestions } from './exam-assign'
 import type { BaiGhiDiem, ChiTietCauRow } from './exam-api'
 import type { AnswerRecord } from './exam-db'
@@ -79,9 +79,8 @@ export function taoChiTietCau(
   const kho = bo && bo.length > 0 ? { ...bank, boTheoEm: { [sbd]: bo }, soCau: bank.soCau ?? undefined } : { ...bank, soCau: bank.soCau ?? undefined }
   const asg = assignStudentQuestions(kho, maCa, sbd)
   const rows: ChiTietCauRow[] = []
-  // MỘT NGUỒN SỰ THẬT: luật so đáp án Phần III sống ở `normalizeNumericAnswer`.
+  // MỘT NGUỒN SỰ THẬT: luật so đáp án Phần III là `khopPhanIII` (src/lib/cham-so.ts) — y hệt bộ chấm điểm.
   // Sáu bản sao rời nhau là sáu chỗ để lệch, và lệch ở đây nghĩa là chấm sai.
-  const norm = normalizeNumericAnswer
   asg.phanI.forEach((a, i) => {
     const q = a.question as TeacherMcqQuestion
     const chon = answers.phanI[a.qid] ?? ''
@@ -97,7 +96,7 @@ export function taoChiTietCau(
   asg.phanIII.forEach((a, i) => {
     const q = a.question as TeacherShortAnswerQuestion
     const chon = answers.phanIII[a.qid] ?? ''
-    rows.push({ phan: 'III', soCau: i + 1, qid: a.qid, chuyenDe: q.chuyenDe ?? '', mucDo: q.mucDo ?? '', dapAnChon: chon, dapAnDung: q.correct, dungSai: !!norm(chon) && !!norm(q.correct) && norm(chon) === norm(q.correct), giay: giayCua(giayCau, a.qid) })
+    rows.push({ phan: 'III', soCau: i + 1, qid: a.qid, chuyenDe: q.chuyenDe ?? '', mucDo: q.mucDo ?? '', dapAnChon: chon, dapAnDung: q.correct, dungSai: khopPhanIII(chon, q.correct), giay: giayCua(giayCau, a.qid) })
   })
   return rows
 }

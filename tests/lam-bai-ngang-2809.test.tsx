@@ -492,6 +492,7 @@ describe('KIỂM CHẤM: "12.3" = "12,3", "-0,5" = "−0,5" = "-0.5" (máy chủ
     for (const go of ['12.3', '−0,5', '-0.5', '7.44', '1..5']) expect(normalizeNumericAnswer(chuanDauGo(go))).toBe(normalizeNumericAnswer(go.replace('..', '.')))
   })
   it('máy chủ chấm bằng CHÍNH hàm này (không có hàm chấm riêng)', () => {
-    expect(doc('server/src/luyen-de.ts')).toContain("import { normalizeNumericAnswer } from '../../src/engine/score'")
+    // 29/09/2026: máy chủ luyện đề quyết đúng/sai bằng `khopPhanIII` (cùng luật với normalizeNumericAnswer, so GIÁ TRỊ).
+    expect(doc('server/src/luyen-de.ts')).toContain("import { khopPhanIII } from '../../src/lib/cham-so'")
   })
 })
