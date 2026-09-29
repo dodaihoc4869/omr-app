@@ -48,12 +48,14 @@ export function expTheoCau(
 }
 
 /**
- * EXP hiện cho MỘT câu trả lời trong GAME (Đảo, Đoàn Hộ Tống, Bi-a): số lấy NGUYÊN từ phản hồi máy chủ (`reward` thưởng nấc đã qua trần 120 + `expThuThach`).
- * Câu sai, câu có trợ giúp (ô "Trợ giúp", Bùa Trợ giảng) hoặc câu em đã bấm Hỏi thầy ⇒ 0 (không hiệu ứng), dù máy chủ trả gì.
+ * EXP hiện cho MỘT câu trả lời trong GAME (Đảo, Đảo 2, Đoàn Hộ Tống, Bi-a): số lấy NGUYÊN từ phản hồi máy chủ.
+ * Luật 29/09: máy chủ trả `expCau` = EXP THẬT đã vào thú nhờ câu này (EXP câu game theo bảng + thưởng nấc + thử thách) ⇒ dùng đúng số đó.
+ * Máy chủ cũ chưa có `expCau` ⇒ lùi về `reward` + `expThuThach`. Câu sai, câu có trợ giúp (ô "Trợ giúp", Bùa Trợ giảng) hoặc em đã bấm Hỏi thầy ⇒ 0 (không hiệu ứng), dù máy chủ trả gì.
  */
-export function expCauGame(r: { correct?: boolean; assisted?: boolean; coTroGiup?: boolean; daHoi?: boolean; reward?: number; expThuThach?: number } | null | undefined): number {
+export function expCauGame(r: { correct?: boolean; assisted?: boolean; coTroGiup?: boolean; daHoi?: boolean; reward?: number; expThuThach?: number; expCau?: number } | null | undefined): number {
   if (!r || r.correct !== true || r.assisted === true || r.coTroGiup === true || r.daHoi === true) return 0
   const so = (x: unknown) => (typeof x === 'number' && Number.isFinite(x) && x > 0 ? Math.floor(x) : 0)
+  if (typeof r.expCau === 'number') return so(r.expCau)
   return so(r.reward) + so(r.expThuThach)
 }
 

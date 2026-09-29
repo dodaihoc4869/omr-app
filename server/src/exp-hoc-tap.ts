@@ -111,6 +111,14 @@ export function expMotCau(phan: 'I' | 'II' | 'III', sao: number): number {
   return EXP_CAU[phan][s]!
 }
 
+/**
+ * EXP MỘT câu GAME tự làm ĐÚNG (Đảo, Đảo 2, Đoàn, Bi-a — thầy 29/09: "trả lời đúng mỗi câu trong game đều có +N EXP bay vào thú").
+ * MỘT hàm duy nhất cho mọi game; TẠM dùng bảng `EXP_CAU` (phần + sao), KHÔNG áp trần ngày — chờ luật EXP v5 thì đổi ĐÚNG hàm này.
+ */
+export function expMotCauGame(phan: 'I' | 'II' | 'III', sao: number): number {
+  return expMotCau(phan, sao)
+}
+
 /** Sau ngưỡng trần mềm: 25% làm tròn lên, tối thiểu 1. */
 export const expSauTran = (goc: number): number => Math.max(1, Math.ceil(goc * TRAN_MEM_TY_LE))
 

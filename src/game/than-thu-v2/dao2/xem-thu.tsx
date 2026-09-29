@@ -13,6 +13,8 @@ import '../../../styles/tokens.css'
 import '../../../index.css'
 import '../game.css'
 import '../dao/dao.css'
+import '../../../components/exp-cau/exp-cau.css' // hiệu ứng "+N EXP" (bản thật nạp ở src/main.tsx)
+import {expMotCauGame} from '../../../../server/src/exp-hoc-tap'
 import Dao2 from './Dao2'
 import type {CauDao2} from './dao2-core'
 import type {DaoCall,DaoKetQua,DaoProfile} from '../dao/kieu'
@@ -40,7 +42,7 @@ const call:DaoCall=async(action,data={})=>{await new Promise(r=>setTimeout(r,30)
   const solution=c.phan==='I'?{chot:'C12H22O11 + H2O → C6H12O6 (glucose) + C6H12O6 (fructose). Trong môi trường NH3, cả glucose và fructose đều tráng bạc: 1 mol → 2 mol Ag.',tung_pa:{A:{dung:false,vi_sao:'Chỉ tính glucose, quên fructose cũng tráng bạc.'},B:{dung:true,vi_sao:'n(saccharose) = 0,1 mol → n(Ag) = 0,4 mol → m(Ag) = 43,2 gam.'},C:{dung:false,vi_sao:'Lấy n(Ag) = n(saccharose), bỏ qua thuỷ phân.'},D:{dung:false,vi_sao:'Nhầm mỗi monosaccharide cho 4 mol Ag.'}}}
    :c.phan==='II'?{chot:'Glucose có nhóm –CHO; fructose chuyển thành glucose trong môi trường NH3.',tung_y:{a:{dung:true,vi_sao:'Cùng công thức C6H12O6.'},b:{dung:false,vi_sao:'Ý này thầy chấm Sai trong bộ giả.'},c:{dung:false,vi_sao:'Ý này thầy chấm Sai trong bộ giả.'},d:{dung:true,vi_sao:'Bộ giả chấm Đúng.'}}}
    :{chot:'(C6H10O5)n → n C6H12O6 → 2n C2H5OH; m = 0,1 × 2 × 46 × 0,75 = 6,9 gam.'}
-  return ok({correct:dung,answer:dap,traLoi:String(data.answer),solution,reward:dung?4:0,stage:dung?1:0,solutionImages:[]})}
+  return ok({correct:dung,answer:dap,traLoi:String(data.answer),solution,reward:dung?4:0,expCau:dung?4+expMotCauGame(c.phan as 'I'|'II'|'III',1):0,stage:dung?1:0,solutionImages:[]})} // expCau = nấc 4 + EXP câu game (như máy chủ)
  return ok()}
 createRoot(document.getElementById('root')!).render(<StrictMode><section className="spirit-game spirit-game-dao">
  <Dao2 sbd="12121212" profile={hoSo} call={call} doanMo onMoDoan={()=>{}} onMoSoTay={()=>{}} onDong={()=>{}}/></section></StrictMode>)

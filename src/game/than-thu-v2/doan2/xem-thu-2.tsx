@@ -11,6 +11,7 @@ import '@fontsource/be-vietnam-pro/latin-700.css'
 import '../../../styles/tokens.css'
 import '../../../index.css'
 import '../game.css'
+import '../../../components/exp-cau/exp-cau.css' // hiệu ứng "+N EXP" (bản thật nạp ở src/main.tsx)
 import DoanHoTong from '../DoanHoTong'
 import type { DoanXem } from '../doan-kieu'
 
@@ -37,7 +38,7 @@ const ket = (thang: boolean): DoanXem => ({ ma: 'DH9', revision: 30, laChu: true
 const xem: DoanXem | null =
   man === 'tran' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), hiepVuaXong: vuaXong as never, tiepSuc: { conLuotNhan: 2, daXin: false, theNhan: null, banCan: [], daGiup: false, lienKichSanSang: true }, cau: { qid: 'Q1', nhan: 'toi_han_on', de: deI, goiY: { gach: ['A', 'D'] } } as never }
     : man === 'cot-loi' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), cau: { qid: 'Q2', nhan: 'toi_han_on', de: deII, goiY: { cotLoi: 'Ester thuỷ phân trong kiềm là phản ứng một chiều (xà phòng hoá).' } } as never }
-      : man === 'ket-qua' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), cau: { qid: 'Q1', nhan: 'toi_han_on', de: deI, daChot: true, hanhDong: 'danh', ketQua: { correct: false, answer: 'B', solution: loiGiai } } }
+      : man === 'ket-qua' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), cau: { qid: 'Q1', nhan: 'toi_han_on', de: deI, daChot: true, hanhDong: 'danh', ketQua: new URLSearchParams(location.search).has('dung') ? { correct: true, answer: 'B', solution: loiGiai, reward: 0, expCau: 3 } : { correct: false, answer: 'B', solution: loiGiai } } } // ?dung ⇒ câu đúng có "+3 EXP"
         : man === 'trum' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran({ hiep: 4, laTrum: true, quai: [], giay: 60 }),
           trum: { coCau: true, giaoY: [0, 1, 2, 0], yCuaEm: [0, 3], yDaChot: [false, true, false, false], qid: 'Q2', tenDang: 'Thuỷ phân ester', de: deII } }
         : man === 'tiep-suc' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe: ghe.map(g => g.ghe === 2 ? { ...g, trangThai: 'can_tiep_suc' as const } : g), gioMayChu: 0, tran: tran(),

@@ -674,6 +674,8 @@ export interface KhoanGame {
   ghiChu: string
   maNguon?: string | null
   qid?: string | null
+  /** true ⇒ KHÔNG qua trần 120 EXP game/ngày và không tính vào bộ đếm trần (EXP câu game, luật 29/09 chờ v5). */
+  khongTran?: boolean
 }
 
 /**
@@ -711,7 +713,7 @@ async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame): Promise<{ g
       continue
     }
     const p = JSON.parse(row.json) as Profile
-    const exp = nhanExpGame(p, k.ngay, k.exp)
+    const exp = k.khongTran ? Math.max(0, Math.floor(Number(k.exp) || 0)) : nhanExpGame(p, k.ngay, k.exp)
     const khoa = `${sbd}|${k.khoa}`
     const ketQua = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
@@ -843,7 +845,7 @@ export async function chotExpNgayQuaDayDu(env: Env, nowMs: number, tuyChon: { to
 
 const TEN_LOAI: Record<string, string> = {
   cau: 'câu đúng', lo: 'lô BTVN', btvn: 'nộp bài BTVN đúng hạn', mom: 'bài được giao', len_bac: 'câu ôn lên bậc', khac_phuc: 'câu khắc phục xong',
-  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại', thu_thach: 'câu thử thách đúng', doan_chang: 'chặng Đoàn thắng', doan_giap: 'lần vỡ giáp trùm',
+  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại', thu_thach: 'câu thử thách đúng', game_cau: 'câu đúng trong game', doan_chang: 'chặng Đoàn thắng', doan_giap: 'lần vỡ giáp trùm',
 }
 
 export interface ExpHomNay {

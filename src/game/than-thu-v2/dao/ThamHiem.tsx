@@ -18,7 +18,7 @@ import './dao.css'
 
 export interface PhanHoiAi{correct:boolean;answer:string;solution:unknown;solutionImages:HinhAnh[];lyDo:LyDoThuong
  /** Luật v4 (chỉ-thêm): số máy chủ trả cho hiệu ứng "+N EXP bay vào thú" — `reward` thưởng nấc, `expThuThach`. Vắng ⇒ dùng `lyDo.exp`. */
- reward?:number;expThuThach?:number}
+ reward?:number;expThuThach?:number;/** Luật 29/09: EXP thật máy chủ ghi cho câu này (dùng nguyên số). */expCau?:number}
 export interface TongKetChuyen{dung:number;tong:number;exp:number;sao:number}
 export interface ThamHiemProps{
  profile:DaoProfile;cau:readonly CauDao[];viTri:number
@@ -97,7 +97,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
  return <div className="dao-tham" data-thu={chiSoThu(profile.pet)}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   <div className="dao-tham-dau"><button type="button" className="dao-tham-ve" onClick={onVeDao} aria-label="Về đảo (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><DaiAi cau={cau} viTri={viTri} ketQua={ketQua} xong={xong}/></div>
-  <SanDau profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length} xong={xong} expBay={phanHoi?expCauGame({correct:phanHoi.correct,assisted,reward:phanHoi.reward??phanHoi.lyDo.exp,expThuThach:phanHoi.expThuThach}):0}/>
+  <SanDau profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length} xong={xong} expBay={phanHoi?expCauGame({correct:phanHoi.correct,assisted,reward:phanHoi.reward??phanHoi.lyDo.exp,expThuThach:phanHoi.expThuThach,expCau:phanHoi.expCau}):0}/>
   {thongBao&&<p className="dao-chuyen-bao" role="status">{thongBao}</p>}
   {loi&&(xong||!q)&&<p className="dao-loi" role="alert">{loi}</p>}
   {xong?<section className="dao-kinh dao-tham-xong" aria-live="polite"><h3>Xong chuyến thám hiểm</h3>
