@@ -1,0 +1,71 @@
+{
+ "12-BD7-09-II-2": {
+  "luc": "2026-09-29T07:37:15.989Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "de": "Thí nghiệm về phản ứng màu của protein với nitric acid.\nBước 1: Lấy khoảng 2 mL lòng trắng trứng vào ống nghiệm.\nBước 2: Thêm tiếp 2 mL dung dịch HNO₃, lắc đều hỗn hợp sau đó để yên trong 1 đến 2 phút.",
+   "y": {
+    "a": "Sau bước 1 thấy có kết tủa màu trắng.",
+    "b": "Sau bước 2 thấy xuất hiện chất rắn màu vàng.",
+    "c": "Trong phản ứng trên xảy ra đồng thời phản ứng màu của protein với nitric acid và sự đông tụ protein dưới tác dụng của acid.",
+    "d": "Ngoài tham gia phản ứng màu với nitric acid, protein còn tham gia phản ứng màu với Cu(OH)₂ tương tự peptide."
+   },
+   "dap_an": "SDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Bước 1 mới chỉ lấy lòng trắng trứng vào ống, chưa thêm hoá chất nào nên chưa có hiện tượng.",
+    "bay": "Thấy lòng trắng trứng đục là nghĩ đã có kết tủa.",
+    "y_can_chua": [
+     "a"
+    ]
+   },
+   "loi_giai": {
+    "chot": "Nitric acid nitro hoá vòng benzene trong protein cho kết tủa vàng.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Bước 1 chưa thêm hoá chất nào nên chưa xảy ra phản ứng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "HNO₃ nitro hoá gốc thơm trong protein tạo hợp chất màu vàng."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Acid vừa nitro hoá vừa làm protein đông tụ nên có cả hai hiện tượng."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Protein có nhiều liên kết peptide nên cũng cho phản ứng màu biuret."
+     }
+    },
+    "dap_an_de": "SDDD",
+    "dap_an_tu_giai": "SDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "bai": "Bài 10. Protein và enzyme",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}

@@ -1,0 +1,243 @@
+{
+ "12-C4-B12-II-6": {
+  "luc": "2026-09-29T07:37:57.099Z",
+  "cau": {
+   "phan": "II",
+   "so": 6,
+   "de": "Số 6 trên các vật dụng bằng nhựa cho biết các vật dụng đó được làm từ nhựa polystyrene (PS). Đây là loại nhựa không thể tái chế và thường được sử dụng để sản xuất cốc, chén dùng một lẩn hoặc hộp đựng thức ăn mang về. Ở nhiệt độ cao, nhựa PS bị phấn huỷ và sinh ra các chất có hại cho sức khoẻ.",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_13.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Nhựa PS thuộc loại polymer bán tổng hợp.",
+    "b": "Không nên dùng nhựa PS để đựng đồ ăn nóng hoặc sử dụng trong lò vi sóng.",
+    "c": "Monomer tạo thành nhựa PS có công thức hoá học là CH₂=CH-C₆H₅ (C₆H₅-: phenyl).",
+    "d": "Nhựa PS được tạo ra từ sơ đồ: ethylbenzene → styrene → polystyrene. Để điều chế được 7,8 tấn PS cẩn 10,6 tấn ethylbenzene, biết hiệu suất của cả quá trình điều chế là 80%."
+   },
+   "loi_giai": {
+    "chot": "PS mắt xích C₈H₈ khối lượng 104; 7,8 tấn PS ứng với 0,075 tấn·mol, cần 0,075 × 106 : 0,8 = 9,94 tấn ethylbenzene.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: PS đi từ styrene do con người tổng hợp nên là polymer tổng hợp."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: PS phân huỷ ở nhiệt độ cao, sinh chất có hại."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: monomer là styrene CH₂=CH-C₆H₅."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: tính ra cần khoảng 9,94 tấn ethylbenzene, không phải 10,6 tấn."
+     }
+    },
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "SDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Ba ý lí thuyết cộng một ý tính theo hiệu suất.",
+    "bay": "Phải CHIA hiệu suất chứ không nhân: cần 9,94 tấn ethylbenzene, con số 10,6 của ý d là sai."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "POLYMER.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng và môi trường — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-09",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ },
+ "12-C4-B12-II-7": {
+  "luc": "2026-09-29T07:37:57.099Z",
+  "cau": {
+   "phan": "II",
+   "so": 7,
+   "de": "Trong công nghiệp, Polymer A được sản xuất từ nguyên liệu ban đầu là benzene và ethylene thông qua một chuỗi các quá trình phản ứng được tóm tắt theo sơ đồ sau: Trong một quá trình tổng hợp, từ 22,2 L benzene (khối lượng riêng là 0,878 g mL⁻¹) thu được m kg A. Biết hiệu suất của toàn bộ quá trình tổng hợp (tính chung từ benzene đến polymer) là 80%.",
+   "dap_an": "SDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_24.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Giá trị của m là 20,6 gam (kết quả cuối cùng đã được làm tròn đến hàng phần mười).",
+    "b": "Phản ứng ở giai đoạn (2) là phản ứng tách (dehydrogen hóa), phản ứng ở giai đoạn (3) là phản ứng trùng hợp.",
+    "c": "Trong phân tử chất A, tỉ lệ số nguyên tử carbon và hydrogen tương ứng là 1 : 2.",
+    "d": "Polymer A trong suốt, được dùng làm hộp dựng thực phẩm, để chơi trẻ em, vỏ đĩa CD, DVD...."
+   },
+   "loi_giai": {
+    "chot": "Benzene 22,2 L nặng 19,49 kg, ứng với 249,9 mol; polystyrene mắt xích C₈H₈ khối lượng 104 nên thu được 249,9 × 104 × 80% ≈ 20,8 kg.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: kết quả khoảng 20,8 kilogam, không phải 20,6 gam."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: giai đoạn (2) tách hydrogen, giai đoạn (3) trùng hợp."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: mắt xích C₈H₈ nên tỉ lệ carbon và hydrogen là 1 : 1."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: polystyrene trong suốt, dùng làm hộp thực phẩm, đồ chơi, vỏ đĩa."
+     }
+    },
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "SDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Ba ý lí thuyết cộng một ý tính khối lượng theo hiệu suất chung.",
+    "bay": "Đơn vị của kết quả là KILOGAM chứ không phải gam, và tính đúng ra khoảng 20,8 kg."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.PHAN_LOAI.CHON_PHAT_BIEU",
+    "ten": "Phân loại polymer, tơ — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-09",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ },
+ "12-C4-B12-III-4": {
+  "luc": "2026-09-29T07:37:57.099Z",
+  "cau": {
+   "phan": "III",
+   "so": 4,
+   "de": "Cho các polymer sau: polystyrene, polypropylene, poly(phenol-formaldehyde), poly(methyl metacrylate).\nCó bao nhiêu polymer được tổng hợp bằng phản ứng trùng hợp?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "hieu",
+   "loi_giai": {
+    "chot": "Polystyrene, polypropylene và poly(methyl methacrylate) đều đi từ monomer có liên kết đôi.",
+    "buoc": [
+     "PS, PP, PMMA đều điều chế bằng trùng hợp.",
+     "Poly(phenol-formaldehyde) điều chế bằng trùng ngưng, có tách nước."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phải loại đúng polymer trùng ngưng trong bốn polymer.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "POLYMER.TRUNG_HOP.DEM_DONG_PHAN",
+    "ten": "Trùng hợp — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-09",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ },
+ "12-C4-B12-III-9": {
+  "luc": "2026-09-29T07:37:57.099Z",
+  "cau": {
+   "phan": "III",
+   "so": 9,
+   "de": "Từ methacrylic acid (CH₂=C(CH₃)COOH) và methanol có thể điểu chế được methyl methacrylate.\nĐể tổng hợp được 100 kg poly(methyl methacrylate) cần dùng bao nhiêu kg methacrylic acid?\nBiết hiệu suất phản ứng ester hoá là 60% và phản ứng trùng hợp là 80% (làm tròn kết quả đến hàng đơn vị).",
+   "dap_an": "179",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Mắt xích PMMA khối lượng 100 nên 100 kg ứng với 1 kmol; chia hiệu suất trùng hợp 80% rồi hiệu suất ester hoá 60%.",
+    "buoc": [
+     "n PMMA = 100 : 100 = 1 kmol mắt xích.",
+     "n methyl methacrylate cần = 1 : 0,8 = 1,25 kmol.",
+     "n methacrylic acid cần = 1,25 : 0,6 = 2,0833 kmol.",
+     "m = 2,0833 × 86 ≈ 179 kg."
+    ],
+    "ket_qua": "179",
+    "dap_an_de": "179",
+    "dap_an_tu_giai": "179",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Đi ngược từ polymer về monomer rồi về acid, chia hai hiệu suất.",
+    "bay": "Hai hiệu suất nằm ở HAI giai đoạn nối tiếp nên phải CHIA lần lượt cho cả hai, không nhân gộp một lần."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "POLYMER.TRUNG_HOP.TINH_KHOI_LUONG",
+    "ten": "Trùng hợp — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-09",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ }
+}

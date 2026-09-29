@@ -1,0 +1,234 @@
+{
+ "DB-12-B9-P1-D1-I-1": {
+  "luc": "2026-09-29T07:39:36.102Z",
+  "cau": {
+   "phan": "I",
+   "so": 1,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Amino acid nào sau đây không có trong tự nhiên?",
+   "pa": {
+    "A": "2-aminopropanoic acid.",
+    "B": "3-aminopropanoic acid.",
+    "C": "2,6-diaminohexanoic acid.",
+    "D": "2-aminopentanedioic acid."
+   },
+   "dap_an": "B",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Amino acid thiên nhiên (cấu tạo protein) là α-amino acid: alanine (2-aminopropanoic), lysine (2,6-diaminohexanoic), glutamic acid (2-aminopentanedioic); 3-aminopropanoic acid là β-amino acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Alanine, α-amino acid có trong protein."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "β-alanine, -NH₂ ở C3, không phải α-amino acid cấu tạo protein."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Lysine, α-amino acid thiết yếu."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Glutamic acid, α-amino acid có trong protein."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Amino acid thiên nhiên tạo protein đều là alpha amino acid; 3-aminopropanoic acid là beta nên không có trong tự nhiên.",
+    "bay": "Chọn 2,6-diaminohexanoic acid vì tên lạ, quên đó chính là lysine.",
+    "dk": [
+     "bay",
+     "nen"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.NHAN_DANG",
+    "ten": "Amino acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B11-D2",
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D1",
+    "ten": "Thiết lập CTPT và biện luận CTCT của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-C3-B10-D1",
+   "nguonCau": "I-68"
+  }
+ },
+ "DB-12-B9-P1-D1-I-137": {
+  "luc": "2026-09-29T07:39:36.102Z",
+  "cau": {
+   "phan": "I",
+   "so": 137,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Amino acid nào sau đây không có trong tự nhiên?",
+   "pa": {
+    "A": "2-aminopropanoic acid.",
+    "B": "3-aminopropanoic acid.",
+    "C": "2,6-diaminohexanoic acid.",
+    "D": "2-aminopentanedioic acid."
+   },
+   "dap_an": "B",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Amino acid thiên nhiên (cấu tạo protein) là α-amino acid: alanine (2-aminopropanoic), lysine (2,6-diaminohexanoic), glutamic acid (2-aminopentanedioic); 3-aminopropanoic acid là β-amino acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Alanine, α-amino acid có trong protein."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "β-alanine, -NH₂ ở C3, không phải α-amino acid cấu tạo protein."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Lysine, α-amino acid thiết yếu."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Glutamic acid, α-amino acid có trong protein."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Amino acid thiên nhiên tạo protein đều là alpha amino acid; 3-aminopropanoic acid là beta nên không có trong tự nhiên.",
+    "bay": "Chọn 2,6-diaminohexanoic acid vì tên lạ, quên đó chính là lysine.",
+    "dk": [
+     "bay",
+     "nen"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.NHAN_DANG",
+    "ten": "Amino acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 10. Protein và enzyme",
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D1",
+    "ten": "Thiết lập CTPT và biện luận CTCT của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-C3-B11-D2",
+   "nguonCau": "I-2"
+  }
+ },
+ "DB-12-B9-P1-D1-I-169": {
+  "luc": "2026-09-29T07:39:36.102Z",
+  "cau": {
+   "phan": "I",
+   "so": 169,
+   "de": "Amino acid nào sau đây không có trong tự nhiên?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 11. Ôn tập chương 3 (Đề 2)",
+   "pa": {
+    "A": "2-aminopropanoic acid.",
+    "B": "3-aminopropanoic acid.",
+    "C": "2,6-diaminohexanoic acid.",
+    "D": "2-aminopentanedioic acid."
+   },
+   "loi_giai": {
+    "chot": "3-aminopropanoic acid là β-amino acid nên không nằm trong nhóm amino acid tạo protein.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "2-aminopropanoic acid là alanine."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: đây là β-alanine, không phải α-amino acid tạo protein."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "2,6-diaminohexanoic acid là lysine."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "2-aminopentanedioic acid là glutamic acid."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.NHAN_DANG",
+    "ten": "Amino acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D1",
+    "ten": "Thiết lập CTPT và biện luận CTCT của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "DH-12-C3-B11-D2",
+   "nguonCau": "I-2"
+  }
+ }
+}

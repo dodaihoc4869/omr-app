@@ -1,0 +1,69 @@
+{
+ "12-C4-B13-II-13": {
+  "luc": "2026-09-29T07:37:59.613Z",
+  "cau": {
+   "phan": "II",
+   "so": 13,
+   "de": "Tơ polyamide dùng để dệt vải lót lốp ô tô, máy bay; vải may mặc; bện làm dây cáp, dây dù, lưới đánh cá; làm chỉ khâu vết mổ. Polyamide còn được dùng để đúc những bộ phận máy chạy êm, không gỉ (bách xe răng cưa, chân vịt tàu thuỷ, cánh quạt điện).",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Tơ polyamide là loại tơ có chứa liên kết amide (-NH-CO-).",
+    "b": "Polymer thuộc loại polyamide là polybutadiene, nylon-6,6 và tơ enang.",
+    "c": "Tơ polyamide kém bền dưới tác dụng của acid và kiềm do liên kết (-CO-NH-) phản ứng được với cả acid và kiềm.",
+    "d": "Khối lượng phân tử của 1 loại tơ capron bằng 16 950 amu. số mắt xích trong công thức phân tử của tơ capron trên là 150."
+   },
+   "loi_giai": {
+    "chot": "Tơ polyamide có nhóm -CO-NH- trong mạch. Mắt xích capron là C₆H₁₁NO khối lượng 113 nên 16 950 chia 113 bằng 150.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đó là định nghĩa tơ polyamide."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: polybutadiene là cao su, không có nhóm amide."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -CO-NH- bị cả acid và kiềm thuỷ phân."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: 16 950 : 113 = 150 mắt xích."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Ba ý lí thuyết cộng một ý chia khối lượng ra số mắt xích.",
+    "bay": "Polybutadiene KHÔNG có nhóm -CO-NH- nên không phải polyamide; ý b gài một cái tên lạc loài vào dãy."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "POLYMER.PHAN_LOAI.CHON_PHAT_BIEU",
+    "ten": "Phân loại polymer, tơ — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-09",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ }
+}

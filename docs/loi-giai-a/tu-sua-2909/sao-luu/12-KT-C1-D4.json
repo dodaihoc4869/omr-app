@@ -1,0 +1,200 @@
+{
+ "12-KT-C1-D4-I-16": {
+  "luc": "2026-09-29T07:38:26.330Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "Hợp chất hữu cơ X có công thức cấu tạo như sau: Phát biểu nào sau đây không đúng?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_16.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "X có công thức phân tử là C₁₈H₂₉SO₃Na",
+    "B": "X có đầu ưa nước là nhóm -SO3Na và phần gốc hydrocarbon là phần kị nước",
+    "C": "X thuộc loại muối sodium alkyl benzene sulfonate",
+    "D": "X cho vào nước tạo dung dịch có sức căng bề mặt lớn hơn nước"
+   },
+   "loi_giai": {
+    "chot": "X là sodium dodecylbenzenesulfonate C₁₂H₂₅C₆H₄SO₃Na, tức C₁₈H₂₉SO₃Na — một chất giặt rửa, nên nó LÀM GIẢM sức căng bề mặt của nước.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Phát biểu đúng: gốc dodecyl C₁₂H₂₅ cộng C₆H₄ cộng SO₃Na cho C₁₈H₂₉SO₃Na."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Phát biểu đúng: –SO₃Na là đầu ưa nước, mạch hydrocarbon là đuôi kị nước."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Phát biểu đúng: đúng là muối sodium alkylbenzenesulfonate."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là phát biểu SAI: chất giặt rửa làm GIẢM sức căng bề mặt của nước."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Giảm sức căng bề mặt là cơ chế giặt rửa.",
+    "bay": "Nghĩ chất tan vào nước thì làm tăng sức căng bề mặt."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "12-KT-C1-D4-I-6": {
+  "luc": "2026-09-29T07:38:26.330Z",
+  "cau": {
+   "phan": "I",
+   "so": 6,
+   "de": "Tổng hợp ethyl acetate trong phòng thí nghiệm từ nhóm hóa chất nào sau đây sẽ đạt hiệu quả cao nhất?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H₂SO₄ 98%",
+    "B": "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H₂SO₄ 98%",
+    "C": "Acetic acid nguyên chất; cồn 90o; dung dịch H₂SO₄ 98%",
+    "D": "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"
+   },
+   "loi_giai": {
+    "chot": "Ester hoá là phản ứng thuận nghịch, nước làm cân bằng chuyển theo chiều nghịch; muốn hiệu suất cao phải dùng chất đầu nguyên chất và acid đặc để hút nước.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: cả acid và alcohol nguyên chất, H₂SO₄ 98% vừa xúc tác vừa hút nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Dung dịch CH₃COOH 5% mang quá nhiều nước, đẩy cân bằng về phía nghịch."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Cồn 90° còn 10% nước nên hiệu suất thấp hơn phương án A."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "HCl 36,5% là dung dịch nước, lại không hút nước như H₂SO₄ đặc."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Nước là kẻ thù của phản ứng ester hoá.",
+    "bay": "Chỉ nhìn xúc tác mà bỏ qua lượng nước trong chất đầu."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.NHAN_DANG",
+    "ten": "Ester hoá — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "12-KT-C1-D4-III-6": {
+  "luc": "2026-09-29T07:38:26.330Z",
+  "cau": {
+   "phan": "III",
+   "so": 6,
+   "de": "Xà phòng hóa hoàn toàn m gam triglyceride X trong dung dịch NaOH vừa đủ, thu được glycerol và 35,52 gam hỗn hợp Y gồm ba muối sodium của palmitic acid, oleic acid và stearic acid.\nGiá trị của m bằng bao nhiêu? (kết quả làm tròn đến hàng phần mười) ------------------------- HẾT -------------------------",
+   "dap_an": "34,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Ba muối là C₁₅H₃₁COONa (278), C₁₇H₃₃COONa (304) và C₁₇H₃₅COONa (306), tổng 888 gam cho mỗi mol X.",
+    "buoc": [
+     "Ba muối là C₁₅H₃₁COONa (278), C₁₇H₃₃COONa (304) và C₁₇H₃₅COONa (306), tổng 888 gam cho mỗi mol X.",
+     "n(X) = 35,52 / 888 = 0,04 mol, kéo theo n(NaOH) = 0,12 mol và n(glycerol) = 0,04 mol.",
+     "Bảo toàn khối lượng: m = 35,52 + 0,04 × 92 − 0,12 × 40 = 34,4 gam."
+    ],
+    "ket_qua": "34,4",
+    "dap_an_de": "34,4",
+    "dap_an_tu_giai": "34,4",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Bảo toàn khối lượng cho phản ứng xà phòng hoá.",
+    "bay": "Quên trừ khối lượng NaOH đã tham gia khi bảo toàn khối lượng."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.TINH_KHOI_LUONG",
+    "ten": "Xà phòng hoá — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D1",
+    "ten": "Phản ứng xà phòng hoá",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

@@ -1,0 +1,135 @@
+{
+ "DH-12-C3-B11-D2-I-2": {
+  "luc": "2026-09-29T07:40:04.000Z",
+  "cau": {
+   "phan": "I",
+   "so": 2,
+   "de": "Amino acid nào sau đây không có trong tự nhiên?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 11. Ôn tập chương 3 (Đề 2)",
+   "pa": {
+    "A": "2-aminopropanoic acid.",
+    "B": "3-aminopropanoic acid.",
+    "C": "2,6-diaminohexanoic acid.",
+    "D": "2-aminopentanedioic acid."
+   },
+   "loi_giai": {
+    "chot": "3-aminopropanoic acid là β-amino acid nên không nằm trong nhóm amino acid tạo protein.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "2-aminopropanoic acid là alanine."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: đây là β-alanine, không phải α-amino acid tạo protein."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "2,6-diaminohexanoic acid là lysine."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "2-aminopentanedioic acid là glutamic acid."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.NHAN_DANG",
+    "ten": "Amino acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D1",
+    "ten": "Thiết lập CTPT và biện luận CTCT của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B11-D2-III-1": {
+  "luc": "2026-09-29T07:40:04.000Z",
+  "cau": {
+   "phan": "III",
+   "so": 1,
+   "de": "Cho peptide X có cấu tạo như sau: Khi thủy phân hoàn toàn X thu được bao nhiêu amino acid?.",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 11. Ôn tập chương 3 (Đề 2)",
+   "loi_giai": {
+    "chot": "Peptide trong hình là Gly-Lys-Glu.",
+    "buoc": [
+     "Peptide trong hình là Gly-Lys-Glu.",
+     "Thuỷ phân hoàn toàn cho ba gốc amino acid khác nhau.",
+     "Vậy thu được 3 amino acid."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Tripeptide có ba gốc nhưng chỉ hai liên kết peptide.",
+    "bay": "Đếm số liên kết peptide thay vì số gốc."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.DEM_DONG_PHAN",
+    "ten": "Peptide — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

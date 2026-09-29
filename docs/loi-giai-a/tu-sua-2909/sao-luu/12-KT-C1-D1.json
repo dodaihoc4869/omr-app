@@ -1,0 +1,118 @@
+{
+ "12-KT-C1-D1-III-3": {
+  "luc": "2026-09-29T07:38:20.098Z",
+  "cau": {
+   "phan": "III",
+   "so": 3,
+   "de": "Khi xà phòng hoá triglycerid X bằng dung dịch NaOH dư, đun nóng, thu được xà phòng gồm hỗn hợp ba muối sodium oleate, sodium stearate vả sodium palmitate.\nCó bao nhiêu đồng phân cấu tạo có thể có của X?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Ba gốc khác nhau xếp vào ba vị trí cho 3! = 6 cách, nhưng vị trí 1 và 3 đối xứng nên số đồng phân cấu tạo chỉ còn 6 : 2 = 3.",
+    "buoc": [
+     "Xà phòng hoá cho ba muối khác nhau ⇒ X có ba gốc acid khác nhau: oleate, stearate, palmitate.",
+     "Glycerol có ba vị trí gắn gốc: C1, C2, C3.",
+     "Xếp ba gốc khác nhau vào ba vị trí có 3! = 6 cách.",
+     "Vị trí C1 và C3 đối xứng nhau nên mỗi đồng phân bị đếm hai lần.",
+     "Số đồng phân cấu tạo = 6 : 2 = 3."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải nhận ra tính đối xứng của glycerol rồi mới chia đôi số hoán vị.",
+    "bay": "Vị trí 1 và 3 của glycerol ĐỐI XỨNG nhau, đổi chỗ hai gốc ở đó không cho đồng phân mới — lấy 3! = 6 là đếm dư gấp đôi."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.DEM_DONG_PHAN",
+    "ten": "Xà phòng hoá — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "12-KT-C1-D1-III-6": {
+  "luc": "2026-09-29T07:38:20.098Z",
+  "cau": {
+   "phan": "III",
+   "so": 6,
+   "de": "Một loại mỡ động vật có chứa 30% tristearin, 40% tripalmitin và 30% triolein (về khối lượng). Xà phòng hoá 1 tấn mỡ trên bằng dung dịch NaOH với hiệu suất 85%. Lượng muối thu được dùng để sản xuất xà phòng.\nBiết loại xà phòng này có 72% khối lượng là muối của acid béo.\nTính khối lượng xà phòng thu được là bao nhiêu tấn? (Kết quả làm tròn đến hàng phần trăm). ------------------------- HẾT -------------------------",
+   "dap_an": "1,22",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Muối lí thuyết = 309,4 + 413,9 + 309,5 = 1032,8 kg; nhân 85% được 877,9 kg; chia cho 72% được 1219 kg ⇒ 1,22 tấn.",
+    "buoc": [
+     "Tristearin: 300 : 890 = 0,3371 kmol ⇒ 3 × 0,3371 × 306 = 309,4 kg sodium stearate.",
+     "Tripalmitin: 400 : 806 = 0,4963 kmol ⇒ 3 × 0,4963 × 278 = 413,9 kg sodium palmitate.",
+     "Triolein: 300 : 884 = 0,3394 kmol ⇒ 3 × 0,3394 × 304 = 309,5 kg sodium oleate.",
+     "Tổng muối lí thuyết = 1032,8 kg; hiệu suất 85% ⇒ 877,9 kg.",
+     "Muối chiếm 72% khối lượng xà phòng ⇒ m = 877,9 : 0,72 = 1219 kg = 1,22 tấn."
+    ],
+    "ket_qua": "1,22",
+    "dap_an_de": "1,22",
+    "dap_an_tu_giai": "1,22",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Bài đi qua ba nhóm chất rồi mới gộp lại, cuối cùng còn hai hệ số ngược chiều nhau.",
+    "bay": "Hiệu suất 85% nhân vào lượng MUỐI, còn 72% là chia ra vì muối chỉ chiếm 72% khối lượng xà phòng — một nhân một chia, rất dễ làm ngược."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.TINH_KHOI_LUONG",
+    "ten": "Xà phòng hoá — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D1",
+    "ten": "Phản ứng xà phòng hoá",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

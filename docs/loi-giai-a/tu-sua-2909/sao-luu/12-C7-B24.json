@@ -1,0 +1,69 @@
+{
+ "12-C7-B24-I-48": {
+  "luc": "2026-09-29T07:38:10.015Z",
+  "cau": {
+   "phan": "I",
+   "so": 48,
+   "de": "Cho mỗi mảnh nhỏ kim loại Mg, Ca, Sr và Ba vào mỗi ống nghiệm chứa 5 mL nước.\nQuan sát hiện tượng thí nghiệm để dự đoán phản ưng với nước của kim loại nhóm IIA, nhận xét nào sau đây không đúng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Kim loại nhóm IA, IIA",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "Khí thoát ra trên bề mặt kim loại là khí hydrogen",
+    "B": "Barium có khối lượng riêng nhỏ nhất nên nổi trên mặt nước và tan nhanh",
+    "C": "Khả năng phản ứng với nước xếp theo thứ tự Mg < Ca < Sr < Ba",
+    "D": "Magnesium phản ứng chậm nhất do Mg(OH)₂ có độ tan nhỏ nhất"
+   },
+   "loi_giai": {
+    "chot": "Từ Mg đến Ba khả năng phản ứng với nước tăng dần; Ba phản ứng mãnh liệt nhất nhưng nó nặng hơn nước nên chìm.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nhận xét đúng: kim loại đẩy hydrogen ra khỏi nước."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng là phương án phải chọn: Ba nặng nhất nhóm IIA, chìm trong nước."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Nhận xét đúng: bán kính tăng thì tính khử tăng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nhận xét đúng: Mg(OH)₂ ít tan, phủ lên bề mặt làm phản ứng chậm lại."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "ly_do": "Phải kiểm cả khối lượng riêng lẫn thứ tự phản ứng, không tin câu nghe xuôi tai.",
+    "bay": "Ba là kim loại NẶNG nhất nhóm IIA (D ≈ 3,6 g/cm³), chìm hẳn trong nước chứ không nổi."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI_IA_IIA.TINH_CHAT_KIM_LOAI.CHON_PHAT_BIEU",
+    "ten": "Tính chất kim loại IA, IIA — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-12",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI_IA_IIA"
+  }
+ }
+}

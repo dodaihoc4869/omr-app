@@ -1,0 +1,164 @@
+{
+ "12-C1-B1-D3-II-19": {
+  "luc": "2026-09-29T07:37:24.567Z",
+  "cau": {
+   "phan": "II",
+   "so": 19,
+   "de": "Cho 5 gam hợp chất hữu cơ X có cấu trúc phân tử như hình dưới vào một bát sứ và thêm 15 mL dung dịch KOH 30% (dùng dư), sau đó đun nóng một thời gian để phản ứng xảy ra.",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_18.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Thí nghiệm trên là phản ứng xà phòng hoá X bằng dung dịch KOH.",
+    "b": "Khi chưa đun nóng, trong bát sứ có sự tách lớp giữa các chất.",
+    "c": "Sau thí nghiệm, trong chén sứ chỉ chứa một dung dịch đồng nhất.",
+    "d": "Chất rắn màu trắng thu được sau thí nghiệm có thành phần là muối sodium stearate."
+   },
+   "loi_giai": {
+    "chot": "Xà phòng hoá chất béo bằng KOH cho muối potassium của acid béo và glycerol.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đun chất béo với dung dịch kiềm chính là phản ứng xà phòng hoá."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: chất béo không tan trong dung dịch KOH nên khi chưa đun vẫn tách lớp."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: sau phản ứng còn muối của acid béo ở dạng rắn nên hỗn hợp không đồng nhất."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: kiềm dùng là KOH nên muối thu được là potassium stearate, không phải sodium stearate."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "lech",
+    "ghi_chu": "Đề chấm ý d là Đúng, nhưng thí nghiệm dùng dung dịch KOH nên muối thu được là POTASSIUM stearate, không phải sodium stearate; máy chấm ý d là Sai."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Thí nghiệm xà phòng hoá trong bát sứ; ý cuối bẫy ở tên kim loại của muối.",
+    "bay": "Dùng KOH thì muối là POTASSIUM stearate; ý d ghi sodium stearate là sai."
+   },
+   "kienThuc": [
+    "xà phòng hoá bằng KOH"
+   ],
+   "loiThuongGap": [
+    "gọi tên muối theo NaOH dù đề dùng KOH"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.CHON_PHAT_BIEU",
+    "ten": "Xà phòng hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "12-C1-B1-D3-II-5": {
+  "luc": "2026-09-29T07:37:24.567Z",
+  "cau": {
+   "phan": "II",
+   "so": 5,
+   "de": "Ester có vai trò quan trọng trong nhiều lĩnh vực hoá học và công nghiệp,... Hầu hết các ester được điều chế từ phản ứng ester hoá.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Phản ứng giữa carboxylic acid và alcohol tạo thành ester được gọi là phản ứng ester hoá.",
+    "b": "Các hợp chất hữu cơ trong phân tử có nhóm -COO- đều thuộc loại ester.",
+    "c": "Thành phần của ester no, đơn chức, mạch hở luôn có tỉ lệ số nguyên tử H và C tương ứng là 2 : 1.",
+    "d": "Ở 25°C, độ tan trong nước của ba ester HCOOC₂H₅, CH₃COOC₂H₅ và C₂H₅COOC₂H₅ theo thứ tự sau: HCOOC₂H₅ > CH₃COOC₂H₅ > C₂H₅COOC₂H₅."
+   },
+   "loi_giai": {
+    "chot": "Ester phải có nhóm -COO- mà oxygen nối với một gốc hydrocarbon; ester no đơn chức mạch hở có dạng CnH2nO2.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đó chính là định nghĩa của phản ứng ester hoá."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: muối của carboxylic acid cũng chứa nhóm -COO- nhưng liên kết ion, không phải ester."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: CnH2nO2 cho tỉ lệ H : C = 2n : n = 2 : 1."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: gốc hydrocarbon càng dài thì phần kị nước càng lớn nên độ tan giảm dần."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Bốn ý về ester: định nghĩa, công thức chung và độ tan.",
+    "bay": "Muối carboxylate (CH₃COONa) cũng có nhóm -COO- nhưng KHÔNG phải ester."
+   },
+   "kienThuc": [
+    "định nghĩa ester",
+    "công thức chung ester no đơn chức"
+   ],
+   "loiThuongGap": [
+    "xếp muối carboxylate vào ester"
+   ],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+    "ten": "Ester hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

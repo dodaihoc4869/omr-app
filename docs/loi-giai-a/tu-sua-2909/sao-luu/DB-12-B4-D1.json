@@ -1,0 +1,275 @@
+{
+ "DB-12-B4-D1-II-116": {
+  "luc": "2026-09-29T07:39:13.661Z",
+  "cau": {
+   "phan": "II",
+   "so": 116,
+   "de": "Tiến hành các bước thí nghiệm như sau:\nBước 1: Cho một nhúm bông vào cốc đựng dung dịch H₂SO₄ 70%, đun nóng đồng thời khuấy đều đến khi phản ứng hoàn toàn, thu được dung dịch đồng nhất.\nBước 2: Trung hoà dung dịch thu được bằng dung dịch NaOH 10% để tạo môi trường kiềm.\nBước 3: Lấy dung dịch sau khi trung hoà cho vào ống nghiệm đựng dung dịch AgNO₃ trong NH₃ dư, đun nóng nhẹ trên ngọn lửa đèn cồn.",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Ở bước 1, có xảy ra phản ứng thủy phân tinh bột thành glucose.",
+    "b": "Mục đích của việc cho dung dịch NaOH 10% ở bước 2 là để phản ứng thủy phân diễn ra nhanh hơn.",
+    "c": "Sau bước 3, trên thành ống nghiệm xuất hiện một lớp kim loại sáng bóng như gương.",
+    "d": "Ở bước 3, nếu đun sôi dung dịch thì trong cốc sẽ xuất hiện kết tủa vón cục."
+   },
+   "loi_giai": {
+    "chot": "Nhúm bông là cellulose chứ không phải tinh bột; NaOH dùng để trung hoà acid dư, tạo môi trường kiềm cho phản ứng tráng bạc ở bước 3.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: bông là cellulose, sản phẩm thuỷ phân là glucose nhưng chất ban đầu không phải tinh bột."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: NaOH dùng để trung hoà acid dư, không phải để tăng tốc thuỷ phân."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: glucose khử thuốc thử Tollens tạo lớp bạc sáng như gương."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: đun sôi làm bạc kết tủa vón cục, không bám thành ống."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "buoc"
+    ],
+    "ly_do": "Bông là cellulose gần như tinh khiết.",
+    "bay": "Đọc lướt chữ 'bông' rồi mặc định là tinh bột."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-KT-C2-D3",
+   "nguonCau": "II-4"
+  }
+ },
+ "DB-12-B4-D1-II-141": {
+  "luc": "2026-09-29T07:39:13.661Z",
+  "cau": {
+   "phan": "II",
+   "so": 141,
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho 1 mL dung dịch AgNO₃ 1% vào ống nghiệm sạch.\nBước 2: Thêm từ từ từng giọt dung dịch NH₃, lắc đều cho đến khi kết tủa tan hết.\nBước 3: Thêm tiếp khoảng 1 mL dung dịch glucose 1% vào ống nghiệm, đun nóng nhẹ.",
+   "dap_an": "SDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 4. Glucose và fructose",
+   "y": {
+    "a": "Sản phẩm hữu cơ thu được sau bước 3 là sobitol.",
+    "b": "Thí nghiệm trên chứng minh glucose có tính chất của aldehyde.",
+    "c": "Sau bước 3, có lớp bạc kim loại bám trên thành ống nghiệm.",
+    "d": "Ở bước 3, có thể thay việc đun nóng nhẹ bằng cách ngâm ống nghiệm trong nước nóng."
+   },
+   "loi_giai": {
+    "chot": "Sản phẩm hữu cơ của phản ứng tráng bạc là ammonium gluconate, không phải sorbitol.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: sorbitol là sản phẩm KHỬ glucose bằng H₂."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: phản ứng tráng bạc chứng minh nhóm chức aldehyde."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: bạc kim loại bám lên thành ống nghiệm."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: ngâm trong nước nóng cũng đủ nhiệt cho phản ứng."
+     }
+    },
+    "dap_an_de": "SDDD",
+    "dap_an_tu_giai": "SDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Tráng bạc là OXI HOÁ nhóm -CHO nên cho gốc carboxylate.",
+    "bay": "Lẫn sản phẩm của phản ứng oxi hoá với phản ứng khử."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B4",
+   "nguonCau": "II-21"
+  }
+ },
+ "DB-12-B4-D1-III-188": {
+  "luc": "2026-09-29T07:39:13.661Z",
+  "cau": {
+   "phan": "III",
+   "so": 188,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:\n(1) Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát. Đun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.\n(2) Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)₂ trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan đần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nhiệm, thấy có kết tủa màu nâu đỏ.\n(3) Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.\n(4) Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt acid HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống nghiệm.\nLiệt kê các thí nghiệm mô tả đúng thành dãy số theo thứ tự tăng dần (Ví dụ: 124,23,…)",
+   "dap_an": "124",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "(1) đúng: tinh bột không tan nước lạnh, đun nóng cho hồ tinh bột sệt.",
+    "buoc": [
+     "(1) đúng: tinh bột không tan nước lạnh, đun nóng cho hồ tinh bột sệt.",
+     "(2) đúng: glucose cho phức xanh lam rồi kết tủa Cu₂O đỏ khi đun.",
+     "(3) sai: saccharose không có tính khử nên không tráng bạc.",
+     "(4) đúng: thuỷ phân trước rồi mới tráng bạc được. Liệt kê được 124."
+    ],
+    "ket_qua": "124",
+    "dap_an_de": "124",
+    "dap_an_tu_giai": "124",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Saccharose không còn nhóm -OH anomer nên không mở vòng được.",
+    "bay": "Nhận (3) là đúng vì thấy saccharose cũng là đường."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.DEM_DONG_PHAN",
+    "ten": "Phản ứng tráng bạc — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B6",
+   "nguonCau": "III-21"
+  }
+ },
+ "DB-12-B4-D1-III-192": {
+  "luc": "2026-09-29T07:39:13.661Z",
+  "cau": {
+   "phan": "III",
+   "so": 192,
+   "de": "Thủy phân hoàn toàn m gam cellulose, thu được (m + 1,8) gam glucose Cho toàn bộ lượng glucose tác dụng với lượng dư dung dịch AgNO₃ trong NH₃, thì lượng Ag tối đa thu được là bao nhiêu?",
+   "dap_an": "21,6",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "Δm = 1,8 g = m(H₂O) ⇒ n(H₂O) = n(glucose) = 0,1 mol ⇒ n(Ag) = 0,2 mol.",
+    "buoc": [
+     "Khối lượng tăng = (m + 1,8) − m = 1,8 g, chính là khối lượng nước đã tham gia.",
+     "n(H₂O) = 1,8 : 18 = 0,1 mol ⇒ n(glucose) = 0,1 mol.",
+     "n(Ag) = 2 × 0,1 = 0,2 mol ⇒ m(Ag) = 0,2 × 108 = 21,6 g."
+    ],
+    "ket_qua": "21,6",
+    "dap_an_de": "21,6",
+    "dap_an_tu_giai": "21,6",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Thuỷ phân cellulose làm khối lượng tăng đúng bằng khối lượng nước đã cộng vào.",
+    "bay": "Đi tìm m rồi mới tính — không cần, độ tăng khối lượng đã cho ngay số mol nước."
+   },
+   "kienThuc": [
+    "(C₆H₁₀O₅)ₙ + nH₂O → nC₆H₁₂O₆: mỗi mắt xích cộng 1 phân tử nước (18 g).",
+    "1 mol glucose tráng bạc cho 2 mol Ag.",
+    "M(H₂O) = 18; M(Ag) = 108."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_KHOI_LUONG",
+    "ten": "Phản ứng tráng bạc — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B6",
+   "nguonCau": "III-47"
+  }
+ }
+}

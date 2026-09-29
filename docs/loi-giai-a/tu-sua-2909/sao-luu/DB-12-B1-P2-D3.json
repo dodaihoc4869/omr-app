@@ -1,0 +1,64 @@
+{
+ "DB-12-B1-P2-D3-III-24": {
+  "luc": "2026-09-29T07:39:11.012Z",
+  "cau": {
+   "phan": "III",
+   "so": 24,
+   "de": "Để chuyển đổi dầu thực vật thành bơ nhân tạo (margarine), người ta tiến hành hydrogen hóa hoàn toàn triolein thành tristearin.\nCần thể tích khí hydrogen (ở điều kiện chuẩn 25(°) C, 1 bar) là bao nhiêu m³ để chuyển hóa hoàn toàn 88,4 kg triolein? (Làm tròn kết quả đến hàng phần mười)",
+   "dap_an": "7,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "n(triolein) = 88 400 : 884 = 100 mol ⇒ n(H₂) = 300 mol ⇒ V = 300 × 24,79 L.",
+    "buoc": [
+     "n(triolein) = 88 400 : 884 = 100 mol.",
+     "Mỗi phân tử triolein có 3 liên kết đôi C=C ⇒ n(H₂) = 3 × 100 = 300 mol.",
+     "V(H₂) = 300 × 24,79 = 7437 L = 7,437 m³ ≈ 7,4 m³."
+    ],
+    "ket_qua": "7,4",
+    "dap_an_de": "7,4",
+    "dap_an_tu_giai": "7,4",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Mỗi gốc oleate có một liên kết đôi C=C nên 1 mol triolein cộng đúng 3 mol H₂.",
+    "bay": "Cho rằng chỉ cần 1 mol H₂ cho mỗi mol triolein."
+   },
+   "kienThuc": [
+    "Triolein (C₁₇H₃₃COO)₃C₃H₅ có M = 884, chứa 3 liên kết đôi C=C.",
+    "Tristearin (C₁₇H₃₅COO)₃C₃H₅ là chất béo no, ở thể rắn.",
+    "Ở đkc (25 °C, 1 bar), 1 mol khí chiếm 24,79 L."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.HYDRO_HOA.TINH_THE_TICH",
+    "ten": "Hydrogen hoá — tính thể tích"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D3",
+    "ten": "Phản ứng Hydrogen hóa / Cộng Bromine (Sản xuất bơ nhân tạo)",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "DH-12-C1-B1-P2",
+   "nguonCau": "III-39"
+  }
+ }
+}

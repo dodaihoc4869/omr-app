@@ -1,0 +1,68 @@
+{
+ "12-C6-B19-II-5": {
+  "luc": "2026-09-29T07:38:07.358Z",
+  "cau": {
+   "phan": "II",
+   "so": 5,
+   "de": "Thả một đinh sắt nặng m1 gam đã được đánh sạch bề mặt vào cốc chứa dung dịch copper(II) sulfate màu xanh. Sau một thời gian thấy toàn bộ lượng đồng sinh ra đã bám vào \"đinh sắt\" (thực chất là phần đinh sắt chưa phản ứng). Lấy \"đinh sắt\" ra khỏi cốc dung dịch, sấy khô, đem cân được m₂ gam.",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Phản ứng diễn ra là: 2Fe( s ) + 3Cu²⁺ (aq ) → 2Fe³⁺ (aq ) + 3Cu( s ).",
+    "b": "Màu xanh của dung dịch copper(II) sulfate nhạt dần.",
+    "c": "So sánh, thu được kết quả m 2 < m1 .",
+    "d": "Nếu thay đinh sắt ban đầu bằng thanh kẽm thì màu xanh của dung dịch không thay đổi."
+   },
+   "loi_giai": {
+    "chot": "Fe + Cu²⁺ → Fe²⁺ + Cu, tỉ lệ 1 : 1; mỗi mol phản ứng làm đinh nặng thêm 8 gam nên m₂ > m₁.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: Cu²⁺ chỉ oxi hoá Fe lên Fe²⁺, không lên Fe³⁺."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: Cu²⁺ giảm dần nên màu xanh nhạt dần."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: đinh nặng thêm nên m₂ > m₁."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: Zn cũng khử Cu²⁺ nên màu xanh vẫn nhạt dần."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Ý a bẫy về số oxi hoá, ý c bẫy về chiều thay đổi khối lượng.",
+    "bay": "Cu bám vào đinh làm đinh NẶNG THÊM: 1 mol Fe tan mất 56 g nhưng 1 mol Cu bám vào thêm 64 g."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI.TINH_KHU.CHON_PHAT_BIEU",
+    "ten": "Tính khử, dãy điện hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-11",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
+ }
+}

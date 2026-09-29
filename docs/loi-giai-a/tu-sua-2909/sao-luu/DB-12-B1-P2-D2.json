@@ -1,0 +1,181 @@
+{
+ "DB-12-B1-P2-D2-III-20": {
+  "luc": "2026-09-29T07:39:08.793Z",
+  "cau": {
+   "phan": "III",
+   "so": 20,
+   "de": "Số miligam KOH dùng để xà phòng hoá hết lượng triglyceride có trong 1 g chất béo được gọi là chi số ester hoá của loại chất béo đó.\nTính chỉ số ester của một loại chất béo chứa 65% tristearin và 23% triolein. (Kết quả làm tròn đến hàng đơn vị)",
+   "dap_an": "166",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "1 gam chất béo có 0,65 gam tristearin (M = 890) và 0,23 gam triolein (M = 884).",
+    "buoc": [
+     "1 gam chất béo có 0,65 gam tristearin (M = 890) và 0,23 gam triolein (M = 884).",
+     "n tristearin = 7,303 × 10⁻⁴ mol; n triolein = 2,602 × 10⁻⁴ mol.",
+     "Mỗi mol triglyceride cần 3 mol KOH nên n KOH = 3 × 9,905 × 10⁻⁴ = 2,972 × 10⁻³ mol.",
+     "m KOH = 2,972 × 10⁻³ × 56 = 0,1664 gam, tức 166 mg."
+    ],
+    "ket_qua": "166",
+    "dap_an_de": "166",
+    "dap_an_tu_giai": "166",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "hay_gap"
+    ],
+    "ly_do": "Triglyceride có ba nhóm ester nên cần ba mol kiềm.",
+    "bay": "Quên nhân 3 vì coi triglyceride phản ứng 1 : 1 với KOH."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.CHI_SO_BEO.DEM_DONG_PHAN",
+    "ten": "Chỉ số chất béo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D2",
+    "ten": "Các chỉ số của chất béo",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "DH-12-C1-B1-P2",
+   "nguonCau": "III-24"
+  }
+ },
+ "DB-12-B1-P2-D2-III-3": {
+  "luc": "2026-09-29T07:39:08.793Z",
+  "cau": {
+   "phan": "III",
+   "so": 3,
+   "de": "Số miligam KOH dùng để xà phòng hoá hết lượng triglyceride có trong 1 g chất béo được gọi là chi số ester hoá của loại chất béo đó.\nTính chỉ số ester của một loại chất béo chứa 65% tristearin và 23% triolein. (Kết quả làm tròn đến hàng đơn vị)",
+   "dap_an": "166",
+   "bang": null,
+   "hinh": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Xà phòng hoá: 1 mol triglyceride cần 3 mol KOH; chỉ số ester = mg KOH cho 1 gam chất béo; M tristearin = 890, M triolein = 884.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Trong 1 gam chất béo: 0,65 gam tristearin → n = 0,65/890 = 7,30·10⁻⁴ mol; 0,23 gam triolein → n = 0,23/884 = 2,60·10⁻⁴ mol.",
+     "n KOH = 3·(7,30·10⁻⁴ + 2,60·10⁻⁴) = 2,97·10⁻³ mol.",
+     "m KOH = 2,97·10⁻³·56 = 0,1664 gam ≈ 166 mg. Chỉ số ester là 166."
+    ],
+    "ket_qua": "166",
+    "dap_an_de": "166",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Định nghĩa chỉ số ester; mỗi mol triglyceride cần 3 mol KOH.",
+    "bay": "Quên hệ số 3 nên chỉ số ester ra bằng một phần ba giá trị đúng.",
+    "dk": [
+     "nen"
+    ]
+   },
+   "dang": {
+    "ma": "ESTER.CHI_SO_BEO.DEM_DONG_PHAN",
+    "ten": "Chỉ số chất béo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C1-B1-P2",
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D2",
+    "ten": "Các chỉ số của chất béo",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-C1-B1-D2",
+   "nguonCau": "III-52"
+  }
+ },
+ "DB-12-B1-P2-D2-III-4": {
+  "luc": "2026-09-29T07:39:08.793Z",
+  "cau": {
+   "phan": "III",
+   "so": 4,
+   "de": "Chỉ số xà phòng hoá là số miỉigam KOH dùng để xà phòng hoá hết triglycerid và trung hoà hết lượng acid tự do trong 1 g chất béo. Một chất béo chứa 3,55% stearic acid và 89% tristearin về khối lượng, còn lại là các chất không tham gia phản ứng với KOH. Tinh chỉ số xà phòng hoá của chất béo trên.",
+   "dap_an": "175",
+   "bang": null,
+   "hinh": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Chỉ số xà phòng hoá = mg KOH cho 1 gam chất béo, gồm KOH trung hoà acid tự do (1 mol acid cần 1 mol KOH) và KOH xà phòng hoá triglyceride (1 mol cần 3 mol KOH).",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "1 gam chất béo có 0,0355 gam stearic acid (M = 284): n = 1,25·10⁻⁴ mol → n KOH = 1,25·10⁻⁴ mol.",
+     "0,89 gam tristearin (M = 890): n = 1,0·10⁻³ mol → n KOH = 3,0·10⁻³ mol.",
+     "Tổng n KOH = 3,125·10⁻³ mol → m KOH = 3,125·10⁻³·56 = 0,175 gam = 175 mg."
+    ],
+    "ket_qua": "175",
+    "dap_an_de": "175",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Chỉ số xà phòng hoá gộp cả KOH trung hoà acid tự do (tỉ lệ 1) và KOH xà phòng hoá (tỉ lệ 3).",
+    "bay": "Chỉ tính phần triglyceride, bỏ quên KOH trung hoà acid béo tự do.",
+    "dk": [
+     "buoc",
+     "nen"
+    ]
+   },
+   "dang": {
+    "ma": "ESTER.CHI_SO_BEO.TINH_CHI_SO",
+    "ten": "Chỉ số chất béo — tính chỉ số"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C1-B1-P2",
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D2",
+    "ten": "Các chỉ số của chất béo",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-C1-B1-D2",
+   "nguonCau": "III-53"
+  }
+ }
+}

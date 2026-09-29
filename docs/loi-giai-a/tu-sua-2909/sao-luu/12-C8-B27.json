@@ -1,0 +1,279 @@
+{
+ "12-C8-B27-I-39": {
+  "luc": "2026-09-29T07:38:16.744Z",
+  "cau": {
+   "phan": "I",
+   "so": 39,
+   "de": "Cho sơ đồ chuyển hoá sau:\n(1) CuSO₄(s) + H₂O → [Cu(OH₂)₆]²⁺(aq);\n(2) [Cu(OH₂)₆]²⁺(aq) + dd NaOH → [Cu(OH₂)₄(OH)₂](s);\n(3) [Cu(OH₂)₄(OH)₂](s) + dd NH₃ → [Cu(NH₃)₄(OH₂)]²⁺(aq).\nMàu sắc: CuSO₄ màu trắng, [Cu(OH₂)₆]²⁺ màu xanh, [Cu(OH₂)₄(OH)₂] màu xanh nhạt, [Cu(NH₃)₄(OH₂)]²⁺ màu xanh lam.\nNhững phản ứng có sự tạo thành phức chất là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "(1) và (2)",
+    "B": "(1) và (3)",
+    "C": "(2) và (3)",
+    "D": "Cả (1), (2) và (3)"
+   },
+   "loi_giai": {
+    "chot": "(1) tạo [Cu(OH₂)₆]²⁺, (2) tạo phức trung hoà [Cu(OH₂)₄(OH)₂], (3) tạo [Cu(NH₃)₄(OH₂)₂]²⁺ — cả ba đều là sự tạo thành phức chất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: bỏ sót phản ứng (3)."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: bỏ sót phản ứng (2), vốn tạo phức trung hoà."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: bỏ sót phản ứng (1)."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: cả ba phản ứng đều tạo phức chất."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Phải nhớ phức TRUNG HOÀ vẫn là phức chất, đừng chỉ đếm ion phức.",
+    "bay": "Cả ba mũi tên đều sinh ra phần tử có dấu móc vuông — kể cả (2) tạo [Cu(OH₂)₄(OH)₂] trung hoà."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.MAU_SAC.NHAN_DANG",
+    "ten": "Màu sắc phức chất — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B27-I-51": {
+  "luc": "2026-09-29T07:38:16.744Z",
+  "cau": {
+   "phan": "I",
+   "so": 51,
+   "de": "Trong dung dịch FeCl₃, Fe có thể tồn tại ở nhiều dạng phức chất khác nhau, một trong số đó là phức chất bát diện có điện tích là +1 tạo bởi giữa ion Fe³⁺ với phối tử H₂O và Cl⁻.\nSố phối tử H₂O có trong phức chất là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "4",
+    "B": "6",
+    "C": "5",
+    "D": "3."
+   },
+   "loi_giai": {
+    "chot": "Gọi x là số H₂O, y là số Cl⁻: x + y = 6 và (+3) + y(−1) = +1 ⇒ y = 2 ⇒ x = 4.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: 4 phân tử H₂O."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: 6 nước thì điện tích phức là +3."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: 5 nước thì điện tích phức là +2."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: 3 nước thì điện tích phức bằng 0."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải lập hệ hai phương trình: tổng phối tử và bảo toàn điện tích.",
+    "bay": "Bát diện chốt tổng phối tử là 6; điện tích +1 chốt số Cl⁻ là 2 — phải dùng CẢ HAI dữ kiện."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phương án là số",
+   "dang": {
+    "ma": "PHUC_CHAT.HINH_HOC.DEM_DONG_PHAN",
+    "ten": "Dạng hình học phức chất — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B27-II-15": {
+  "luc": "2026-09-29T07:38:16.744Z",
+  "cau": {
+   "phan": "II",
+   "so": 15,
+   "de": "Hemoglobin (Hb) là một loại protein chiếm khoảng 35% trọng lượng của hồng cầu. Hb có nhiệm vụ nhận oxygen từ phổi và vận chuyển đi khắp cơ thể.\nThành phần cấu tạo nên hemoglobin bao gồm nhân heme và globin: Nhâm heme: Một heme sẽ bao gồm một ion Fe²⁺ ở chính giữa và một vòng porphyrin bao xung quanh. Một phân tử Hb sẽ có chứa bốn nhân heme chiếm 5% trọng lượng hemoglobin.\nGlobin: Được tạo từ các loại amino acid liên kết với nhau bằng các liên kết peptide để tạo thành chuỗi polypeptide.\nPhân tử hemoglobin (a) Nhân heme (b) Mỗi nguyên tử trung tâm trong nhân heme chỉ liên kết tối đa với 1 phân tử O₂.\nĐánh giá mỗi phát biểu sau là đúng hay sai?",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_21.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Dạng hình học của phức chất Fe(II) trong nhân heme là bát diện.",
+    "b": "Mỗi phân tử hemoglobin có thể hấp thụ tối đa bốn phân tử oxygen.",
+    "c": "Trong các nhân heme, nguyên tử trung tâm liên kết với phối tử qua các nguyên tử nitrogen.",
+    "d": "Trong hemoglobin, iron chiếm 5% theo khối lượng."
+   },
+   "loi_giai": {
+    "chot": "Nhân heme là phức Fe(II) VUÔNG PHẲNG với vòng porphyrin, nối với Fe qua bốn nguyên tử nitrogen; mỗi Hb có 4 heme nên hấp thụ tối đa 4 phân tử O₂; iron chỉ chiếm khoảng 0,34% khối lượng Hb.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: Fe(II) trong nhân heme nằm giữa vòng porphyrin phẳng — đó là phức vuông phẳng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: 4 nhân heme, mỗi nhân gắn tối đa 1 phân tử O₂."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: bốn nguyên tử N của vòng porphyrin cho cặp electron vào Fe²⁺."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: 5% là của nhân heme; iron chỉ chiếm khoảng 0,34% khối lượng hemoglobin."
+     }
+    },
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "SDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải đọc kĩ 'heme chiếm 5%' rồi mới quy ra phần trăm của iron.",
+    "bay": "Đề nói NHÂN HEME chiếm 5% khối lượng hemoglobin, không phải riêng nguyên tố iron — iron chỉ chiếm khoảng 0,34%."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "PHUC_CHAT.CAU_TAO_PHUC.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo phức chất — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B27-II-20": {
+  "luc": "2026-09-29T07:38:16.744Z",
+  "cau": {
+   "phan": "II",
+   "so": 20,
+   "de": "Cho sơ đồ chuyển hoá sau: Biết rằng X, Y, Z đều là các phức chất vuông phẳng, đơn nhân.",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_26.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Các phản ứng trên đều có sự thay thế phối tử trong phức chất.",
+    "b": "Trong phức chất Y, có hai phối tử NH₃ và hai phối tử iodo(I).",
+    "c": "Trong nước, dung dịch phức chất Z dẫn điện tốt.",
+    "d": "Các phản ứng trong chuỗi trên đều kèm theo sự thay đổi số oxi hoá của nguyên tử trung tâm."
+   },
+   "loi_giai": {
+    "chot": "[PtCl₄]²⁻ →(+4KI) [PtI₄]²⁻ = X →(+NH₃, −KI) [Pt(NH₃)I₃]⁻ = Y →(+NH₃, −KI) [Pt(NH₃)₂I₂] = Z. Z trung hoà nên dung dịch của nó không dẫn điện tốt.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: mỗi mũi tên là một lần thay phối tử."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: Y là [Pt(NH₃)I₃]⁻ — chỉ một phối tử NH₃ và ba phối tử iodo."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: theo lời giải của đề, Z là [Pt(NH₃)₂I₂] — nhưng chính vì trung hoà nên nó KHÔNG dẫn điện tốt; đề chấm ý này Đúng."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: Pt giữ số oxi hoá +2 suốt chuỗi."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải theo dấu từng phối tử qua bốn mũi tên rồi mới viết được công thức Y và Z.",
+    "bay": "Cả chuỗi giữ nguyên Pt ở +2 — không có mũi tên nào đổi số oxi hoá, nên ý d) sai."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "PHUC_CHAT.HINH_HOC.CHON_PHAT_BIEU",
+    "ten": "Dạng hình học phức chất — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ }
+}

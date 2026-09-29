@@ -1,0 +1,240 @@
+{
+ "DH-12-C1-B1-P2-I-49": {
+  "luc": "2026-09-29T07:39:51.648Z",
+  "cau": {
+   "phan": "I",
+   "so": 49,
+   "de": "Triolein (hình 1) là loại chất béo có nhiều trong dầu thực vật như dầu oliu, dầu lạc, dầu vừng. Triolein giúp làm giảm cholesterol trong máu, giảm nguy cơ mắc các bệnh tim mạch, tăng cường hấp thụ vitamin (A, D, E và K), chống viêm, điều hoà hormone...\nCho các nhận định sau về triolein:\n(a) Chủ yếu tồn tại ở dạng đồng phân trans.\n(b) Có nhiệt độ nóng chảy thấp hơn 25 °C.\n(c) Có 6 liên kết π trong phân tử.\n(d) Dễ hoà tan các vitamin A, D, E và K.\n(e) Ở điều kiện thường, X là chất rắn.\nSố phát biểu không đúng là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I-49.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "pa": {
+    "A": "3.",
+    "B": "2.",
+    "C": "4.",
+    "D": "1."
+   },
+   "loi_giai": {
+    "chot": "Triolein là C₅₇H₁₀₄O₆ với 3 liên kết C=O và 3 liên kết C=C, tổng 6 liên kết π; gốc oleate ở dạng cis nên chất béo ở thể lỏng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "3 là đếm thừa một nhận định."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: chỉ (a) và (e) không đúng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "4 là đếm thừa hai nhận định."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "1 là bỏ sót một nhận định sai."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Tổng liên kết π gồm cả nhóm C=O của ester lẫn C=C của gốc acid béo.",
+    "bay": "Quên ba liên kết π của ba nhóm C=O khi đếm."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "DH-12-C1-B1-P2-III-17": {
+  "luc": "2026-09-29T07:39:51.648Z",
+  "cau": {
+   "phan": "III",
+   "so": 17,
+   "de": "Chất béo là nguồn cung cấp năng lượng đáng kể cho cơ thể người. Theo nhu cầu dinh dưỡng khuyến nghị cho người Việt Nam (Bộ Y tế, 2016): Trung bình 1 gam chất béo cung cấp 9 Kcal và năng lượng từ chất béo đóng góp khoảng 30% tổng năng lượng cần thiết trong ngày, cơ thể người nam 18 tuối cần năng lượng trung bình 2470 Kcal/ngày.\nMột học sinh nam 18 tuổi cần tiêu thụ khoảng bao nhiêu gam chất béo trong thực phẩm trong một ngày để cung cấp đủ năng lượng từ chất béo cho hoạt động của cơ thể? (Làm tròn kết quả đến hàng phần mười).",
+   "dap_an": "82,3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "Năng lượng từ chất béo là 2470 × 30% = 741 Kcal.",
+    "buoc": [
+     "Năng lượng từ chất béo là 2470 × 30% = 741 Kcal.",
+     "Mỗi gam chất béo cho 9 Kcal.",
+     "Khối lượng chất béo là 741 : 9 = 82,33 gam.",
+     "Làm tròn được 82,3 gam."
+    ],
+    "ket_qua": "82,3",
+    "dap_an_de": "82,3",
+    "dap_an_tu_giai": "82,3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Chỉ 30% tổng năng lượng trong ngày đến từ chất béo.",
+    "bay": "Chia thẳng 2470 cho 9 mà quên lấy 30%."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.NANG_LUONG.TINH_KHOI_LUONG",
+    "ten": "Năng lượng — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "DH-12-C1-B1-P2-III-24": {
+  "luc": "2026-09-29T07:39:51.648Z",
+  "cau": {
+   "phan": "III",
+   "so": 24,
+   "de": "Số miligam KOH dùng để xà phòng hoá hết lượng triglyceride có trong 1 g chất béo được gọi là chi số ester hoá của loại chất béo đó.\nTính chỉ số ester của một loại chất béo chứa 65% tristearin và 23% triolein. (Kết quả làm tròn đến hàng đơn vị)",
+   "dap_an": "166",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "1 gam chất béo có 0,65 gam tristearin (M = 890) và 0,23 gam triolein (M = 884).",
+    "buoc": [
+     "1 gam chất béo có 0,65 gam tristearin (M = 890) và 0,23 gam triolein (M = 884).",
+     "n tristearin = 7,303 × 10⁻⁴ mol; n triolein = 2,602 × 10⁻⁴ mol.",
+     "Mỗi mol triglyceride cần 3 mol KOH nên n KOH = 3 × 9,905 × 10⁻⁴ = 2,972 × 10⁻³ mol.",
+     "m KOH = 2,972 × 10⁻³ × 56 = 0,1664 gam, tức 166 mg."
+    ],
+    "ket_qua": "166",
+    "dap_an_de": "166",
+    "dap_an_tu_giai": "166",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "hay_gap"
+    ],
+    "ly_do": "Triglyceride có ba nhóm ester nên cần ba mol kiềm.",
+    "bay": "Quên nhân 3 vì coi triglyceride phản ứng 1 : 1 với KOH."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.CHI_SO_BEO.DEM_DONG_PHAN",
+    "ten": "Chỉ số chất béo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D2",
+    "ten": "Các chỉ số của chất béo",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "DH-12-C1-B1-P2-III-39": {
+  "luc": "2026-09-29T07:39:51.648Z",
+  "cau": {
+   "phan": "III",
+   "so": 39,
+   "de": "Để chuyển đổi dầu thực vật thành bơ nhân tạo (margarine), người ta tiến hành hydrogen hóa hoàn toàn triolein thành tristearin.\nCần thể tích khí hydrogen (ở điều kiện chuẩn 25(°) C, 1 bar) là bao nhiêu m³ để chuyển hóa hoàn toàn 88,4 kg triolein? (Làm tròn kết quả đến hàng phần mười)",
+   "dap_an": "7,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "n(triolein) = 88 400 : 884 = 100 mol ⇒ n(H₂) = 300 mol ⇒ V = 300 × 24,79 L.",
+    "buoc": [
+     "n(triolein) = 88 400 : 884 = 100 mol.",
+     "Mỗi phân tử triolein có 3 liên kết đôi C=C ⇒ n(H₂) = 3 × 100 = 300 mol.",
+     "V(H₂) = 300 × 24,79 = 7437 L = 7,437 m³ ≈ 7,4 m³."
+    ],
+    "ket_qua": "7,4",
+    "dap_an_de": "7,4",
+    "dap_an_tu_giai": "7,4",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Mỗi gốc oleate có một liên kết đôi C=C nên 1 mol triolein cộng đúng 3 mol H₂.",
+    "bay": "Cho rằng chỉ cần 1 mol H₂ cho mỗi mol triolein."
+   },
+   "kienThuc": [
+    "Triolein (C₁₇H₃₃COO)₃C₃H₅ có M = 884, chứa 3 liên kết đôi C=C.",
+    "Tristearin (C₁₇H₃₅COO)₃C₃H₅ là chất béo no, ở thể rắn.",
+    "Ở đkc (25 °C, 1 bar), 1 mol khí chiếm 24,79 L."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.HYDRO_HOA.TINH_THE_TICH",
+    "ten": "Hydrogen hoá — tính thể tích"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D3",
+    "ten": "Phản ứng Hydrogen hóa / Cộng Bromine (Sản xuất bơ nhân tạo)",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

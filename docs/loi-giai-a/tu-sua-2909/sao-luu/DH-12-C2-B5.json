@@ -1,0 +1,64 @@
+{
+ "DH-12-C2-B5-III-35": {
+  "luc": "2026-09-29T07:39:57.622Z",
+  "cau": {
+   "phan": "III",
+   "so": 35,
+   "de": "Mật rỉ đường là chất lỏng màu đen, đặc sánh, thu được sau khi kết tinh đường tinh thể, có chứa nhiều saccharose, fructose và glucose. Tiến hành lên men 1m³ nước rỉ đường trên với xúc tác enzyme để sản xuất cồn công nghiệp theo sơ đồ:\nDisaccharide eⁿzyme→ Monosaccharide Heⁿ₌z₈y₀m%e→ Ethanol (D=0,8kg/L). Chưng cất sản phẩm thu được 60 lít rượu 96.\nTổng hàm lượng monosaccharide theo quá trình chuyển đổi trên là m kg/m³ mật rỉ đường.\nGiá trị của m là bao nhiêu? (Làm tròn kết quả đến phần nguyên)",
+   "dap_an": "113",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Saccharose và maltose",
+   "loi_giai": {
+    "chot": "V(ethanol) = 57,6 L ⇒ n = 1001,7 mol ⇒ n(monosaccharide) = (1001,7 : 2) : 0,8.",
+    "buoc": [
+     "V(ethanol nguyên chất) = 60 × 96% = 57,6 L ⇒ m = 57,6 × 0,8 = 46,08 kg = 46 080 g.",
+     "n(ethanol) = 46 080 : 46 = 1001,74 mol.",
+     "Lên men 1 monosaccharide → 2 ethanol ⇒ n(mono) phản ứng = 500,87 mol.",
+     "Hiệu suất 80% ⇒ n(mono) có trong mật rỉ = 500,87 : 0,8 = 626,09 mol.",
+     "m = 626,09 × 180 = 112 696 g ≈ 113 kg cho mỗi m³ mật rỉ đường."
+    ],
+    "ket_qua": "113",
+    "dap_an_de": "113",
+    "dap_an_tu_giai": "113",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Mọi monosaccharide đều cho 2 ethanol khi lên men, nên quy hết về số mol monosaccharide.",
+    "bay": "Lấy 60 L làm thể tích ethanol nguyên chất, quên độ rượu 96°."
+   },
+   "kienThuc": [
+    "C₆H₁₂O₆ →(enzyme) 2C₂H₅OH + 2CO₂.",
+    "Độ rượu là phần trăm thể tích ethanol nguyên chất.",
+    "M(monosaccharide) = 180; M(C₂H₅OH) = 46."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG",
+    "ten": "Lên men — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D2",
+    "ten": "Phản ứng lên men glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

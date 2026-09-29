@@ -1,0 +1,369 @@
+{
+ "DH-12-C2-B6-III-21": {
+  "luc": "2026-09-29T07:40:00.706Z",
+  "cau": {
+   "phan": "III",
+   "so": 21,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:\n(1) Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát. Đun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.\n(2) Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)₂ trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan đần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nhiệm, thấy có kết tủa màu nâu đỏ.\n(3) Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.\n(4) Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt acid HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống nghiệm.\nLiệt kê các thí nghiệm mô tả đúng thành dãy số theo thứ tự tăng dần (Ví dụ: 124,23,…)",
+   "dap_an": "124",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "(1) đúng: tinh bột không tan nước lạnh, đun nóng cho hồ tinh bột sệt.",
+    "buoc": [
+     "(1) đúng: tinh bột không tan nước lạnh, đun nóng cho hồ tinh bột sệt.",
+     "(2) đúng: glucose cho phức xanh lam rồi kết tủa Cu₂O đỏ khi đun.",
+     "(3) sai: saccharose không có tính khử nên không tráng bạc.",
+     "(4) đúng: thuỷ phân trước rồi mới tráng bạc được. Liệt kê được 124."
+    ],
+    "ket_qua": "124",
+    "dap_an_de": "124",
+    "dap_an_tu_giai": "124",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Saccharose không còn nhóm -OH anomer nên không mở vòng được.",
+    "bay": "Nhận (3) là đúng vì thấy saccharose cũng là đường."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.DEM_DONG_PHAN",
+    "ten": "Phản ứng tráng bạc — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B6-III-41": {
+  "luc": "2026-09-29T07:40:00.706Z",
+  "cau": {
+   "phan": "III",
+   "so": 41,
+   "de": "Cellulose trinitrate được điều chế từ nitric acid và cellulose.\nMuối điều chế 29,7 kg cellulose trinitrate (hiệu suất phản ứng 90%) thì cần V L dung dịch nitric acid 96% (D = 1,51 g/mL).\nGiá trị của V là bao nhiêu? (Kết quả làm tròn đến hàng phần mười).",
+   "dap_an": "14,5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "Từ khối lượng sản phẩm ra mol mắt xích, nhân 3 ra mol HNO₃, rồi quy về thể tích dung dịch.",
+    "buoc": [
+     "n(cellulose trinitrate) = 29 700 : 297 = 100 mol mắt xích.",
+     "n(HNO₃) lý thuyết = 3 × 100 = 300 mol; hiệu suất 90% ⇒ n cần = 300 : 0,9 = 333,33 mol.",
+     "m(HNO₃) = 333,33 × 63 = 21 000 gam ⇒ m(dung dịch) = 21 000 : 0,96 = 21 875 gam.",
+     "V = 21 875 : 1,51 = 14 486 mL ≈ 14,5 L."
+    ],
+    "ket_qua": "14,5",
+    "dap_an_de": "14,5",
+    "dap_an_tu_giai": "14,5",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Mỗi mắt xích cần BA phân tử HNO₃; hiệu suất đặt ở mẫu số vì tính lượng acid CẦN DÙNG.",
+    "bay": "Quên hệ số 3 của HNO₃."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.TINH_THE_TICH",
+    "ten": "Cấu tạo — tính thể tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D2",
+    "ten": "Phản ứng với nitric acid của cellulose",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B6-III-47": {
+  "luc": "2026-09-29T07:40:00.706Z",
+  "cau": {
+   "phan": "III",
+   "so": 47,
+   "de": "Thủy phân hoàn toàn m gam cellulose, thu được (m + 1,8) gam glucose Cho toàn bộ lượng glucose tác dụng với lượng dư dung dịch AgNO₃ trong NH₃, thì lượng Ag tối đa thu được là bao nhiêu?",
+   "dap_an": "21,6",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "Δm = 1,8 g = m(H₂O) ⇒ n(H₂O) = n(glucose) = 0,1 mol ⇒ n(Ag) = 0,2 mol.",
+    "buoc": [
+     "Khối lượng tăng = (m + 1,8) − m = 1,8 g, chính là khối lượng nước đã tham gia.",
+     "n(H₂O) = 1,8 : 18 = 0,1 mol ⇒ n(glucose) = 0,1 mol.",
+     "n(Ag) = 2 × 0,1 = 0,2 mol ⇒ m(Ag) = 0,2 × 108 = 21,6 g."
+    ],
+    "ket_qua": "21,6",
+    "dap_an_de": "21,6",
+    "dap_an_tu_giai": "21,6",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Thuỷ phân cellulose làm khối lượng tăng đúng bằng khối lượng nước đã cộng vào.",
+    "bay": "Đi tìm m rồi mới tính — không cần, độ tăng khối lượng đã cho ngay số mol nước."
+   },
+   "kienThuc": [
+    "(C₆H₁₀O₅)ₙ + nH₂O → nC₆H₁₂O₆: mỗi mắt xích cộng 1 phân tử nước (18 g).",
+    "1 mol glucose tráng bạc cho 2 mol Ag.",
+    "M(H₂O) = 18; M(Ag) = 108."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_KHOI_LUONG",
+    "ten": "Phản ứng tráng bạc — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B6-III-48": {
+  "luc": "2026-09-29T07:40:00.706Z",
+  "cau": {
+   "phan": "III",
+   "so": 48,
+   "de": "Ethanol được điều chế bằng cách lên men tinh bột theo sơ đồ:\n(C₆H₁₀O₅)ₙeⁿzim→C₆H₁₂O₆eⁿzim→C₂H₅OH\nĐể điều chế 10 L ethanol 46o cần m kg gạo (chứa 75% tinh bột, còn lại là tạp chất trơ).\nBiết hiệu suất của cả quá trình là 80% và khối lượng riêng của ethanol nguyên chất là 0,8 g/mL.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "10,8",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "n(C₂H₅OH) = 80 mol ⇒ n(mắt xích) = 40 : 0,8 = 50 mol ⇒ m(tinh bột) = 8100 g.",
+    "buoc": [
+     "V(ethanol nguyên chất) = 10 × 46% = 4,6 L = 4600 mL ⇒ m = 4600 × 0,8 = 3680 g.",
+     "n(C₂H₅OH) = 3680 : 46 = 80 mol ⇒ n(mắt xích tinh bột) phản ứng = 80 : 2 = 40 mol.",
+     "Hiệu suất 80% ⇒ n(mắt xích) cần = 40 : 0,8 = 50 mol ⇒ m(tinh bột) = 50 × 162 = 8100 g.",
+     "Gạo chứa 75% tinh bột ⇒ m(gạo) = 8100 : 0,75 = 10 800 g = 10,8 kg."
+    ],
+    "ket_qua": "10,8",
+    "dap_an_de": "10,8",
+    "dap_an_tu_giai": "10,8",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Mỗi mắt xích tinh bột cho 1 glucose rồi cho 2 ethanol; hiệu suất áp cho cả quá trình.",
+    "bay": "Quên rằng gạo chỉ chứa 75% tinh bột."
+   },
+   "kienThuc": [
+    "(C₆H₁₀O₅)ₙ → nC₆H₁₂O₆ → 2nC₂H₅OH.",
+    "M(mắt xích C₆H₁₀O₅) = 162; M(C₂H₅OH) = 46.",
+    "Độ rượu 46° nghĩa là 46 mL ethanol nguyên chất trong 100 mL dung dịch."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG",
+    "ten": "Lên men — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D2",
+    "ten": "Phản ứng lên men glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B6-III-7": {
+  "luc": "2026-09-29T07:40:00.706Z",
+  "cau": {
+   "phan": "III",
+   "so": 7,
+   "de": "Cho các carbohydrate sau: glucose, saccharose, maltose, tinh bột và cellulose.\nCó bao nhiêu carbohydrate có liên kết α-1,4-glycoside trong phân tử?",
+   "dap_an": "3,45",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "Liên kết α-1,4-glycoside nối hai gốc α-glucose ở vị trí 1 và 4.",
+    "buoc": [
+     "Liên kết α-1,4-glycoside nối hai gốc α-glucose ở vị trí 1 và 4.",
+     "Maltose có đúng liên kết này.",
+     "Tinh bột (amylose và amylopectin) cũng có liên kết α-1,4.",
+     "Saccharose là α-1,2 còn cellulose là β-1,4. Vậy có 2 chất."
+    ],
+    "ket_qua": "3,45",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "3,45",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Đề không ghi đơn vị; đáp án đề 3,45 là kilôgam. Máy đổi kết quả sang kilôgam cho khớp (3451,70 g = 3,45 kg)."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Cellulose nối bằng liên kết β chứ không phải α.",
+    "bay": "Đếm cả cellulose vì cũng nối ở vị trí 1 và 4."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B6-II-7": {
+  "luc": "2026-09-29T07:40:00.706Z",
+  "cau": {
+   "phan": "II",
+   "so": 7,
+   "de": "Cho cellulose tác dụng với lượng dư dung dịch HNO₃ đặc, có mặt H₂SO₄ đặc làm xúc tác và đun nóng.",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "y": {
+    "a": "Phản ứng trên tạo ra sản phẩm chính là cellulose trinitrate.",
+    "b": "Phản ứng hóa học xảy ra trong thí nghiệm này là phản ứng cộng mở vòng đặc trưng của carbohydrate.",
+    "d": "Bản chất của phản ứng là quá trình ester hóa, trong đó mỗi mắt xích [C₆H₇O₂(OH)₃] của cellulose có thể phản ứng tối đa với 3 phân tử HNO₃ để thay thế nguyên tử H của nhóm -OH.",
+    "c": "Cellulose trinitrate là một chất lỏng, màu vàng ươm, tan tốt trong nước."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng với HNO₃ là ester hoá; cellulose trinitrate là chất rắn màu vàng, không tan trong nước.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: HNO₃ dư cho sản phẩm chính là cellulose trinitrate."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: đây là phản ứng ester hoá, không phải cộng mở vòng."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cellulose trinitrate là chất RẮN và không tan trong nước."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: mỗi mắt xích có ba nhóm -OH nên phản ứng tối đa với ba phân tử HNO₃."
+     }
+    },
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Ý b và ý c của đề gốc bị dính liền thành một dòng nên ý c trống; đã tách lại theo đúng bản gốc."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Nhóm -OH của cellulose đóng vai trò alcohol nên phản ứng là ester hoá.",
+    "bay": "Gọi phản ứng nitrate hoá là phản ứng thế ở vòng thơm."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D2",
+    "ten": "Phản ứng với nitric acid của cellulose",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

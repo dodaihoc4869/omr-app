@@ -1,0 +1,62 @@
+{
+ "12-C1-ON-III-4": {
+  "luc": "2026-09-29T07:37:27.774Z",
+  "cau": {
+   "phan": "III",
+   "so": 4,
+   "de": "Aspirin (acetylsalicylic acid) được sử dụng trong y học để sản xuất thuốc chống viêm, hạ sốt. Trong phòng thí nghiệm, khi đun nóng hỗn hợp gồm 13,8 gam salicylic acid với 15,3 gam anhydride acetic (có xúc tác thích hợp) với hiệu suất 55%, thu được acetic acid và m gam aspirin theo phương trình hoá học: Giá trị của m bằng bao nhiêu? (Làm tròn kết quả đến phần mười)",
+   "dap_an": "9,9",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III_25.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Phản ứng theo tỉ lệ mol 1 : 1; hiệu suất tính theo chất có số mol nhỏ hơn.",
+    "buoc": [
+     "n(salicylic acid) = 13,8/138 = 0,1 mol.",
+     "n(anhydride acetic) = 15,3/102 = 0,15 mol nên salicylic acid thiếu.",
+     "n(aspirin) = 0,1 x 55% = 0,055 mol.",
+     "M(aspirin) = 180 nên m = 0,055 x 180 = 9,9 gam."
+    ],
+    "ket_qua": "9,9",
+    "dap_an_de": "9,9",
+    "dap_an_tu_giai": "9,9",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "buoc"
+    ],
+    "ly_do": "Xác định chất thiếu giữa salicylic acid và anhydride acetic rồi mới nhân hiệu suất.",
+    "bay": null
+   },
+   "kienThuc": [
+    "xác định chất thiếu",
+    "hiệu suất tổng hợp aspirin"
+   ],
+   "loiThuongGap": [
+    "tính theo anhydride dư"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.UNG_DUNG.TINH_KHOI_LUONG",
+    "ten": "Ứng dụng — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-06",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ }
+}

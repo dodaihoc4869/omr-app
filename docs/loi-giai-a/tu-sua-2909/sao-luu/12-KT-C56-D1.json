@@ -1,0 +1,100 @@
+{
+ "12-KT-C56-D1-III-5": {
+  "luc": "2026-09-29T07:40:14.692Z",
+  "cau": {
+   "phan": "III",
+   "so": 5,
+   "de": "Tiến hành điện phân dung dịch NaCl bão hoà với điện cực trơ, có màng ngăn xốp, trong 2 giờ với cường độ dòng điện là 2 ampe không đổi, tạo thành m gam NaOH, với hiệu suất chuyển điện năng thành hoá năng đạt 80%.\nCho biết điện lượng q tính bằng coulomb bằng cường độ dòng điện I tính bằng ampe nhân với thời gian t tính bằng giây, và cũng bằng số mol electron nhân với hằng số Faraday F = 96500 C/mol.\nGiá trị của m là bao nhiêu? (Làm tròn kết quả đến hàng phần mười).",
+   "dap_an": "6,0",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Điện lượng đi qua bình là q = 2 × 7200 = 14400 coulomb.",
+    "buoc": [
+     "Điện lượng đi qua bình là q = 2 × 7200 = 14400 coulomb.",
+     "Số mol electron là 14400 : 96500 = 0,149223 mol.",
+     "Ở cathode nước bị khử cho khí hydrogen và ion OH⁻ theo tỉ lệ một electron một OH⁻, nên số mol NaOH bằng số mol electron.",
+     "m = 0,149223 × 40 = 5,97 gam, làm tròn được 6,0 gam."
+    ],
+    "ket_qua": "6,0",
+    "dap_an_de": "6,0",
+    "dap_an_tu_giai": "6,0",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "80% là hiệu suất năng lượng, còn lượng chất chỉ do điện lượng quyết định.",
+    "bay": "Nhân thêm 80% vào khối lượng NaOH nên chỉ còn khoảng 4,8 gam."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_DD.TINH_KHOI_LUONG",
+    "ten": "Điện phân dung dịch — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ },
+ "12-KT-C56-D1-III-4": {
+  "luc": "2026-09-29T07:40:14.692Z",
+  "cau": {
+   "phan": "III",
+   "so": 4,
+   "de": "Cho các phản ứng hoá học sau:\n(a) Ag⁺(aq) + Cl⁻(aq) → AgCl(s);\n(b) [Zn(OH₂)₄]²⁺(aq) + 4NH₃(aq) → [Zn(NH₃)₄]²⁺(aq) + 4H₂O(l);\n(c) H⁺(aq) + OH⁻(aq) → H₂O(l);\n(d) C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(g);\n(e) Al(s) + 3Ag⁺(aq) → Al³⁺(aq) + 3Ag(s);\n(g) 2NH₃(g) → N₂(g) + 3H₂(g).\nSố phản ứng có thể chuyển hoá năng lượng phản ứng thành điện năng thông qua việc lập các pin điện hoá là bao nhiêu?",
+   "dap_an": "5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Muốn lập pin điện hoá thì phản ứng phải tự xảy ra, tức toả năng lượng ra ngoài.",
+    "buoc": [
+     "Muốn lập pin điện hoá thì phản ứng phải tự xảy ra, tức toả năng lượng ra ngoài.",
+     "Các phản ứng (a), (b), (c), (d), (e) đều tự xảy ra ở điều kiện thường nên đều lập pin được.",
+     "Phản ứng (g) là chiều nghịch của phản ứng tổng hợp ammonia vốn toả nhiệt, nên phân huỷ ammonia cần cấp năng lượng, không tự xảy ra.",
+     "Vậy có 5 phản ứng."
+    ],
+    "ket_qua": "5",
+    "dap_an_de": "5",
+    "dap_an_tu_giai": "5",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phản ứng không đổi số oxi hoá vẫn ghép được từ hai nửa phản ứng điện cực.",
+    "bay": "Chỉ đếm những phản ứng có thay đổi số oxi hoá nên bỏ mất (a), (b), (c)."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "DIEN_PHAN.PIN_GALVANI.DEM_DONG_PHAN",
+    "ten": "Pin Galvani, sức điện động — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ }
+}

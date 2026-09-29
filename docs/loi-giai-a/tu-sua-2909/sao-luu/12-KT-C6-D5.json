@@ -1,0 +1,51 @@
+{
+ "12-KT-C6-D5-III-5": {
+  "luc": "2026-09-29T07:38:56.098Z",
+  "cau": {
+   "phan": "III",
+   "so": 5,
+   "de": "Lon caffeine High Brew được sản xuất bởi HeatGen có dung tích 10,3 fl oz (khoảng 304,607 mL) và chứa 305 mg dung dịch loãng nước caffeine. Lon có một bộ \"gia nhiệt\" sử dụng hỗn hợp thermite gồm Al và Fe₂O₃ (kí hiệu là X) để làm nóng dung dịch trong lon.\nKhi sử dụng, người ta chỉ cần vặn đáy lon để phản ứng xảy ra hoàn toàn.\nBiết rằng để nhiệt độ của 1 kg dung dịch trong lon tăng 1 °C thì cần cung cấp cho nó một nhiệt lượng là 4,2 kJ và cứ 2 mmol Al tác dụng vừa đủ với Fe₂O₃ thì giải phóng nhiệt lượng là 852,6 J. Giả thiết không có sự thất thoát nhiệt ra ngoài môi trường.\nKhối lượng X (tính theo mg) tối thiểu cần để làm nóng dung dịch trong lon từ 25 °C lên 46 °C là bao nhiêu? (Làm tròn đến hàng phần trăm).",
+   "dap_an": "6,75",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Nhiệt cần cấp là 0,000305 kg × 4,2 kJ × 21 °C = 0,026901 kJ, tức 26,901 J.",
+    "buoc": [
+     "Nhiệt cần cấp là 0,000305 kg × 4,2 kJ × 21 °C = 0,026901 kJ, tức 26,901 J.",
+     "Mỗi mmol Al toả 852,6 : 2 = 426,3 J nên n(Al) = 26,901 : 426,3 = 0,06310 mmol.",
+     "Theo 2Al + Fe₂O₃ → Al₂O₃ + 2Fe thì n(Fe₂O₃) = 0,03155 mmol.",
+     "m(X) = 0,06310 × 27 + 0,03155 × 160 = 1,70 + 5,05 = 6,75 mg."
+    ],
+    "ket_qua": "6,75",
+    "dap_an_de": "6,75",
+    "dap_an_tu_giai": "6,75",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Hỗn hợp X gồm cả Al lẫn Fe₂O₃ theo tỉ lệ 2 : 1.",
+    "bay": "Chỉ tính khối lượng nhôm mà quên cộng phần Fe₂O₃ của hỗn hợp thermite."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "KIM_LOAI.DIEU_CHE.TINH_KHOI_LUONG",
+    "ten": "Tách và điều chế kim loại — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
+ }
+}

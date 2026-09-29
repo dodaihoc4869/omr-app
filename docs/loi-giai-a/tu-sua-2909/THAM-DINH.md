@@ -1,7 +1,8 @@
 # Tự sửa kho đề — thẩm định đợt 1 (29/09, Code 4b)
 
 Nguồn: `/gv/loi-giai/sua-kho` lúc 14:30 VN — 135 mục `sua` (đề in sai / trình bày) + 14 mục "đáp án kho sai" do phiên chốt kết luận.
-**Trạng thái: CHƯA GHI GÌ VÀO KHO.** Bộ phân loại quyền của phiên đám mây chặn thao tác ghi kho ("Modify Shared Resources"); cần thầy cho phép trực tiếp rồi mới chạy công cụ `scripts/loi-giai/tu-sua-kho.mjs` (mặc định chạy thử; `--that` mới ghi; tự sao lưu từng câu, dừng khi có ca mở/chưa công bố, đọc lại sau khi ghi, có `--lui`).
+**Trạng thái: ĐÃ GHI KHO 29/09 (thầy cho phép trực tiếp).** 142 việc / 56 đề / 121 câu, đề nào cũng đọc lại khớp; không có ca thi nào lúc ghi. Kế hoạch: `ke-hoach-dot-1.json`; danh sách đã sửa: `da-tu-sua.md`; bản gốc từng câu: `sao-luu/<mã đề>.json`. Lùi: `node scripts/loi-giai/tu-sua-kho.mjs --lui <qid,...> --that`. 57 câu đổi băm đã tự vào lại hàng soạn lời giải.
+Không áp: sửa bảng DH-12-C1-B1-P1-II-26 (trường `bang` không phải chữ) và việc xoá "– 2850" đi cặp với nó (tránh mất số).
 
 ## 14 câu "đáp án kho sai" — Code 4b giải lại độc lập
 

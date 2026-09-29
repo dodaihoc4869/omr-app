@@ -1,0 +1,72 @@
+{
+ "12-KT-C1-D3-I-16": {
+  "luc": "2026-09-29T07:38:22.547Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "Acid béo omega-3 thường gặp là eicosapentaenoic acid (EPA) có công thức khung phân tử như sau: Phát biểu nào sau đây không đúng?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_16.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "EPA có 6 liên kết π trong phân tử",
+    "B": "EPA có công thức phân tử là C₂₀H₃₀O₂",
+    "C": "EPA là chất hỗ trợ phòng ngừa và điều trị một số bệnh lý liên quan đến tim mạch, viêm nhiễm,",
+    "D": "EPA được tìm thấy trong hầu hết các sản phẩm động vật, chẳng hạn như cá béo và dầu cá"
+   },
+   "loi_giai": {
+    "chot": "Đếm trên hình: 20 carbon, 5 nối đôi C=C, nối đôi đầu ở carbon số 5 — đúng EPA C₂₀H₃₀O₂ với 6 liên kết π. EPA chỉ giàu trong cá béo và dầu cá.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Phát biểu đúng: 5 liên kết π của C=C cộng 1 của C=O là 6."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Phát biểu đúng: mạch 20 carbon với 5 nối đôi cho đúng C₂₀H₃₀O₂."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Phát biểu đúng: EPA được dùng hỗ trợ tim mạch và kháng viêm."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là phát biểu SAI: EPA tập trung ở cá béo, thịt động vật trên cạn gần như không có."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "lech",
+    "ghi_chu": "Máy tự giải ra D; đề ghi B. Đã đếm trên chính hình vẽ của đề: mạch có 20 carbon và 5 nối đôi C=C, nối đôi đầu ở carbon số 5 — đúng EPA 20:5, công thức C₂₀H₃₀O₂. Vậy B ĐÚNG, không thể là đáp án của câu hỏi 'không đúng'. Phát biểu sai là D: EPA tập trung ở cá béo và dầu cá, không có trong 'hầu hết các sản phẩm động vật'. THẦY KIỂM LẠI."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Đọc công thức khung và đếm cho đủ π.",
+    "bay": "Đếm liên kết π mà bỏ sót nhóm C=O, hoặc tin câu 'hầu hết sản phẩm động vật'."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ }
+}

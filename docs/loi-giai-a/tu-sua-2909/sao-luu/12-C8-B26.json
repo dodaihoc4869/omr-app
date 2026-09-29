@@ -1,0 +1,352 @@
+{
+ "12-C8-B26-I-20": {
+  "luc": "2026-09-29T07:38:13.530Z",
+  "cau": {
+   "phan": "I",
+   "so": 20,
+   "de": "Số hiệu nguyên tử của chromium là 24. Theo các nguyên lý và quy tắc thông thường thì cấu hình electron của nguyên tử được viết dưới ở dạng (I).\nTuy nhiên, dựa vào kết quả thực nghiệm và phổ phát xạ của nguyên tử người ta cho rằng nguyên tử chromium phải có 6 eletron độc thân nên cấu hình electron của nguyên tử này được viết ở dạng (II).\nDạng (I) và dạng (II) lần lượt là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "1s²2s²2p⁶3s²3p⁶3d⁴4s² và 1s²2s²2p⁶3s²3p⁶3d⁵4s¹",
+    "B": "1s²2s²2p⁶3s²3p⁶3d⁶ và 1s²2s²2p⁶3s²3p⁶3d⁴4s²",
+    "C": "1s²2s²2p⁶3s²3p⁶3d⁶ và 1s²2s²2p⁶3s²3p⁶3d⁵4s¹",
+    "D": "1s²2s²2p⁶3s²3p⁶3d⁴4s² và 1s²2s²2p⁶3s²3p⁶4s² 4p²3d²"
+   },
+   "loi_giai": {
+    "chot": "Cr (Z = 24) theo quy tắc là 1s²2s²2p⁶3s²3p⁶3d⁴4s²; thực nghiệm thấy 6 electron độc thân nên phải là 3d⁵4s¹ — bán bão hoà bền hơn.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: dạng (I) là 3d⁴4s², dạng (II) là 3d⁵4s¹."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: dạng (I) viết thiếu electron 4s."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: đảo ngược hai dạng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai cấu hình đều không đúng số electron của Z = 24."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "ly_do": "Phải phân biệt cấu hình viết theo nguyên lí với cấu hình thực nghiệm bán bão hoà.",
+    "bay": "Cấu hình theo QUY TẮC là 3d⁴4s²; cấu hình THỰC NGHIỆM (6 electron độc thân) mới là 3d⁵4s¹."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.NHAN_DANG",
+    "ten": "Kim loại chuyển tiếp dãy 1 — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B26-I-40": {
+  "luc": "2026-09-29T07:38:13.530Z",
+  "cau": {
+   "phan": "I",
+   "so": 40,
+   "de": "Khi làm lạnh dung dịch FeCl₃ thu được tinh thể FeCl₃.6H₂O.\nCho độ tan của FeCl₃.6H₂O trong nước ở một số nhiệt độ như bảng dưới đây.\nDung dịch bão hoà của FeCl₃ ở 0 °C có nồng độ phần trăm là",
+   "dap_an": "D",
+   "bang": [
+    [
+     "Nhiệt độ (°C)",
+     "0",
+     "20",
+     "30"
+    ],
+    [
+     "Độ tan (g/100 g nước)",
+     "74,4",
+     "91,8",
+     "106,8"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "22,2%",
+    "B": "17.4%",
+    "C": "18,2%",
+    "D": "25,6%"
+   },
+   "loi_giai": {
+    "chot": "100 g nước hoà tan 74,4 g FeCl₃.6H₂O ⇒ m(dd) = 174,4 g; m(FeCl₃) = 74,4 × 162,5 : 270,5 = 44,7 g ⇒ C% = 44,7 : 174,4 × 100 = 25,6%.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: quên quy về muối khan nên lấy nhầm tỉ lệ."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: chia cho khối lượng nước thay vì khối lượng dung dịch."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: sai ở bước quy đổi khối lượng mol."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: 25,6%."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải quy khối lượng muối ngậm nước sang muối khan trước khi tính phần trăm.",
+    "bay": "Độ tan cho theo TINH THỂ NGẬM NƯỚC, nhưng nồng độ phần trăm hỏi theo FeCl₃ KHAN."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.TINH_NONG_DO",
+    "ten": "Kim loại chuyển tiếp dãy 1 — tính nồng độ"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B26-II-14": {
+  "luc": "2026-09-29T07:38:13.530Z",
+  "cau": {
+   "phan": "II",
+   "so": 14,
+   "de": "Khi đun nóng nhẹ ở nhiệt độ phù hợp, lượng nước kết tinh thường tách ra khỏi hợp chất.\nĐể xác định hàm lượng nước kết tinh trong muối FeSO₄.xH₂O (hợp chất A, coi như không lẫn tạp chất) bằng phương pháp đun nóng, một nhóm học sinh thực hiện thí nghiệm theo các bước: Bước 1 — cân chén nung và ghi khối lượng (m₁).\nBước 2 — thêm 1,45 đến 1,65 gam chất A (màu xanh nhạt) vào chén nung, cân và ghi khối lượng mới (m₂). Bước 3 — đun nóng nhẹ chén nung khoảng 2 phút, tránh đun mạnh làm FeSO₄ phân huỷ thành Fe₂O₃ màu đỏ nâu. Bước 4 — để nguội rồi cân lại (m₃).\nLặp lại bước 3 và bước 4 cho đến khi khối lượng không đổi. Kết quả ghi ở bảng dưới đây.",
+   "dap_an": "DDSD",
+   "bang": [
+    [
+     "",
+     "Khối lượng (gam)"
+    ],
+    [
+     "m₁",
+     "28,10"
+    ],
+    [
+     "m₂",
+     "29,60"
+    ],
+    [
+     "m₃ sau lần nung thứ nhất",
+     "29,30"
+    ],
+    [
+     "m₃ sau lần nung thứ hai",
+     "29,10"
+    ],
+    [
+     "m₃ sau lần nung thứ ba",
+     "28,90"
+    ],
+    [
+     "m₃ sau lần nung thứ tư",
+     "28,90"
+    ],
+    [
+     "m₃ sau lần nung thứ năm",
+     "28,90"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Giả thiết phù hợp với mục đích và quá trình tiến hành thí nghiệm trên là “Nếu đun nóng nhẹ mẫu rắn FeSO₄.xH2O, thì nước kết tinh sẽ bị tách ra ở dạng hơi làm cho khối lượng mẫu rắn giảm, nhờ đó xác định được hàm lượng nước kết tinh”.",
+    "b": "Chưa có dấu hiệu hình thành iron (III) oxide trong quá trình nung.",
+    "c": "Phần trăm khối lượng (làm tròn đến hàng phần mười) của nước kết tinh trong muối FeSO₄.xH2O xác định được từ số liệu của thí nghiệm trên là 13,3%.",
+    "d": "Sự giảm khối lượng của chén nung chứa A là do nước kết tinh tách ra khỏi A và bay hơi."
+   },
+   "loi_giai": {
+    "chot": "m(A) = 29,60 − 28,10 = 1,50 g; m(FeSO₄ khan) = 28,90 − 28,10 = 0,80 g ⇒ m(H₂O) = 0,70 g ⇒ %H₂O = 0,70 : 1,50 × 100 = 46,67%, không phải 13,3%.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đó chính là giả thuyết mà quy trình đun – cân kiểm chứng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: chất rắn sau nung không có màu đỏ nâu nên chưa tạo Fe₂O₃."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: tính ra 46,67% chứ không phải 13,3%."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: khối lượng giảm đúng bằng lượng nước kết tinh bay hơi."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Bài cân khối lượng nhiều lần, dễ quên trừ bì và dễ lấy nhầm lần nung chưa ổn định.",
+    "bay": "Khối lượng A là m₂ − m₁ chứ không phải m₂; phải trừ khối lượng chén nung ở CẢ HAI đầu."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.MAU_SAC.CHON_PHAT_BIEU",
+    "ten": "Màu sắc phức chất — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B26-II-7": {
+  "luc": "2026-09-29T07:38:13.530Z",
+  "cau": {
+   "phan": "II",
+   "so": 7,
+   "de": "Thực nghiệm cho biết số oxi hoá của các kim loại chuyển tiếp dãy thứ nhất theo bảng sau. Chú ý: các số oxi hoá được gắn dấu * là các số oxi hoá bền và gặp trong các oxide hoặc chloride.",
+   "dap_an": "DSDS",
+   "bang": [
+    [
+     "Nhóm",
+     "IIIB",
+     "IVB",
+     "VB",
+     "VIB",
+     "VIIB",
+     "VIIIB",
+     "VIIIB",
+     "VIIIB",
+     "IB"
+    ],
+    [
+     "Nguyên tố",
+     "₂₁Sc",
+     "₂₂Ti",
+     "₂₃V",
+     "₂₄Cr",
+     "₂₅Mn",
+     "₂₆Fe",
+     "₂₇Co",
+     "₂₈Ni",
+     "₂₉Cu"
+    ],
+    [
+     "Số oxi hoá cao nhất theo bảng",
+     "+3*",
+     "+4*",
+     "+5*",
+     "+6*",
+     "+7*",
+     "+6*",
+     "+5",
+     "+4",
+     "+3"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Các kim loại chuyển tiếp dãy thứ nhất đều có nhiều trạng thái oxi hoá.",
+    "b": "Số oxi hoá cao nhất của các kim loại chuyển tiếp dãy thứ nhất bằng số thư tự của nhóm.",
+    "c": "Oxi hoá hợp chất chứa Mn(VI) có thể thu được hợp chất chứa Mn(VII).",
+    "d": "Khử các hợp chất chứa Cu(II) thu được các hợp chất chứa Cu(III)."
+   },
+   "loi_giai": {
+    "chot": "Số oxi hoá cao nhất bằng số thứ tự nhóm chỉ đúng từ Sc đến Mn; từ Fe trở đi thì thấp hơn. Cu bền nhất ở +2, không có Cu(III) từ phản ứng khử.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: mỗi nguyên tố trong bảng đều có nhiều hàng số oxi hoá."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: Ni và Cu có số oxi hoá cao nhất thấp hơn số thứ tự nhóm."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: MnO₄²⁻ (Mn(VI)) bị oxi hoá cho MnO₄⁻ (Mn(VII))."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: KHỬ Cu(II) thì số oxi hoá giảm xuống, cho Cu(I) hoặc Cu, không thể lên Cu(III)."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Phải đọc bảng cho từng nguyên tố, đừng suy quy luật cho cả dãy.",
+    "bay": "Ni và Cu KHÔNG đạt tới số oxi hoá bằng số thứ tự nhóm (VIIIB và IB) — quy luật đó chỉ đúng tới Mn."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.CHON_PHAT_BIEU",
+    "ten": "Kim loại chuyển tiếp dãy 1 — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ }
+}
