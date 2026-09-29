@@ -114,6 +114,9 @@ export async function docCaSapMo(env:Env,nowIso:string,denCaIso:string):Promise<
 const protectionCache=new Map<string,{fingerprint:string;blocked:Set<string>}>()
 /** qid + nhóm của từng đề đang bảo vệ, khoá `bank_r2|cap_nhat_luc` (xem protectedQuestions). Chỉ đọc (mảng dùng chung, không sửa). */
 const demQidDeBaoVe=new Map<string,readonly string[]>()
+/** Thầy xác nhận 29/09/2026: chỉ khoá đề của ca từ hôm nay trở đi. Ca ĐÃ ĐÓNG có giờ bắt đầu (không có thì mốc cập nhật) TRƯỚC mốc này
+ *  thì bỏ, không khoá câu nữa. Ca trước mốc mà vẫn đang MỞ thì vẫn khoá như cũ (còn em có thể đang làm). */
+export const MOC_KHOA_CA='2026-09-28T17:00:00.000Z'
 export async function protectedQuestions(env:Env):Promise<Set<string>> {
   const now=Date.now()
   const nong=demCaBaoVe.doc('current',now);if(nong)return new Set(nong)
@@ -121,7 +124,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') submitted,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) active
-    FROM ca WHERE ca.trang_thai<>'da_xoa' ORDER BY ca.ma_ca`).bind(new Date(now).toISOString()).all<Row>()
+    FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca`).bind(new Date(now).toISOString(),MOC_KHOA_CA).all<Row>()
   const r={results:all.results.filter(ca=>{
     const released=ca.cong_bo==='ngay'||ca.cong_bo==='ca_lop_xong'&&(ca.trang_thai==='dong'||Number(ca.entered)>0&&Number(ca.submitted)>=Number(ca.entered))
     const entryEnd=Date.parse(str(ca.het_han_vao));const homeworkEnd=Date.parse(str(ca.han_nop))
