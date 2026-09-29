@@ -1,0 +1,78 @@
+{
+ "ma": "NANG_LUONG_HH",
+ "chuong": "Năng lượng hoá học",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Toả nhiệt, thu nhiệt",
+   "rule": "<b>Toả nhiệt:</b> Δ<sub>r</sub>H < 0; sản phẩm có năng lượng thấp hơn chất đầu; môi trường nóng lên.<br><b>Thu nhiệt:</b> Δ<sub>r</sub>H > 0; phải cấp nhiệt liên tục, <b>ngừng đun thì phản ứng dừng</b>.<br><b>Hay gặp:</b> đốt cháy, trung hoà, oxi hoá glucose toả nhiệt; nhiệt phân {CaCO3}, {NaHCO3}, quang hợp thu nhiệt.<br><b>Sơ đồ năng lượng:</b> mũi tên từ chất đầu đi xuống sản phẩm là toả nhiệt, đi lên là thu nhiệt.<br><b>Đun khơi mào:</b> nhiều phản ứng toả nhiệt vẫn cần đun lúc đầu."
+  },
+  "k2": {
+   "ten": "Enthalpy tạo thành chuẩn",
+   "rule": "<b>Định nghĩa:</b> Δ<sub>f</sub>H°<sub>298</sub> là nhiệt kèm theo khi tạo <b>1 mol chất</b> từ các đơn chất bền nhất, ở điều kiện chuẩn (1 bar, 298 K; dung dịch 1 mol/L).<br><b>Bằng 0:</b> đơn chất ở dạng bền nhất: C(graphite), {O2}(g), {Br2}(l), Hg(l), Na(s).<br><b>Khác 0:</b> {O3}, C(kim cương), {Br2}(g), mọi hợp chất.<br><b>Độ bền:</b> Δ<sub>f</sub>H°<sub>298</sub> càng âm, chất càng bền.<br><b>Phương trình nhiệt hoá học:</b> ghi đủ thể (s, l, g, aq); nhân hệ số thì Δ<sub>r</sub>H nhân theo; đảo chiều thì đổi dấu."
+  },
+  "k3": {
+   "ten": "Tính ΔrH từ ΔfH",
+   "rule": "<b>Công thức:</b> Δ<sub>r</sub>H°<sub>298</sub> = ΣΔ<sub>f</sub>H°<sub>298</sub>(sản phẩm) − ΣΔ<sub>f</sub>H°<sub>298</sub>(chất đầu).<br><b>Hệ số:</b> nhân mỗi Δ<sub>f</sub>H với hệ số của chất trong phương trình đã cân bằng.<br><b>Đơn chất bền:</b> lấy bằng 0 ({O2}, {N2}, C(graphite)).<br><b>Thể của nước:</b> {H2O}(l) và {H2O}(g) có Δ<sub>f</sub>H khác nhau, lấy đúng thể đề cho.<br><b>Ví dụ:</b> {CH4} + 2{O2} → {CO2} + 2{H2O}(g): (−393,5 + 2·(−241,8)) − (−74,9) = −802,2 kJ."
+  },
+  "k4": {
+   "ten": "Năng lượng liên kết",
+   "rule": "<b>Công thức:</b> Δ<sub>r</sub>H°<sub>298</sub> = ΣE<sub>b</sub>(chất đầu) − ΣE<sub>b</sub>(sản phẩm) (ngược chiều với cách tính theo Δ<sub>f</sub>H).<br><b>Điều kiện:</b> chỉ áp dụng khi mọi chất ở <b>thể khí</b>.<br><b>Đếm liên kết:</b> số liên kết mỗi phân tử × hệ số: {CH4} 4 C–H; {O2} 1 O=O; {CO2} 2 C=O; {H2O} 2 O–H; {N2} 1 N≡N.<br><b>Ý nghĩa:</b> phá liên kết cần năng lượng, tạo liên kết giải phóng năng lượng."
+  },
+  "k5": {
+   "ten": "Cộng phương trình nhiệt",
+   "rule": "<b>Nguyên tắc:</b> phương trình đích bằng tổng, hiệu các phương trình đã cho ⇒ Δ<sub>r</sub>H cộng, trừ đúng như vậy.<br><b>Đảo chiều:</b> đổi dấu Δ<sub>r</sub>H; <b>nhân hệ số:</b> nhân Δ<sub>r</sub>H.<br><b>Ví dụ:</b> C(kim cương) + {O2} → {CO2} = (1) − (2): −393,5 − 2,87 ≈ −396 kJ.<br><b>So sánh:</b> cùng sản phẩm, chất đầu kém bền (năng lượng cao) thì toả nhiều nhiệt hơn."
+  },
+  "k6": {
+   "ten": "Nhiệt lượng theo lượng chất",
+   "rule": "<b>Nhiệt lượng:</b> Q = n × |Δ<sub>r</sub>H| với Δ<sub>r</sub>H ứng với số mol trong phương trình (chia hệ số nếu cần).<br><b>Đun nước:</b> Q = m·c·Δt, c theo đề (thường 4,18 hoặc 4,2 J/g·K); nước 1 g/mL.<br><b>Hao hụt:</b> Q phải đốt = Q có ích : (1 − % hao); nhiệt thực = lí thuyết × H.<br><b>Hỗn hợp:</b> Q của 1 mol hỗn hợp = Σ(phần mol × Q mỗi chất).<br><b>Đổi đơn vị:</b> 1 cal = 4,184 J; 1 kJ = 1000 J; khí đkc 24,79 L/mol; dung dịch: m = V·D rồi × C%."
+  }
+ },
+ "TRAPS_THEM": {
+  "dauenthalpy": {
+   "ten": "Nhầm dấu ΔrH",
+   "hoi": "Đề hỏi Δ<sub>r</sub>H (âm khi toả nhiệt) hay nhiệt lượng toả ra, năng lượng nhận được (số dương)?"
+  },
+  "trangthai": {
+   "ten": "Sai thể của chất",
+   "hoi": "Nước ở thể lỏng hay khí? Đơn chất có đúng dạng bền nhất không (graphite hay kim cương, {Br2} lỏng hay khí)?"
+  },
+  "daochieueb": {
+   "ten": "Đảo công thức Eb",
+   "hoi": "Tính theo năng lượng liên kết là chất đầu trừ sản phẩm; theo enthalpy tạo thành là sản phẩm trừ chất đầu. Đã dùng đúng chiều chưa?"
+  },
+  "quyvemol": {
+   "ten": "Quên quy về mol",
+   "hoi": "Δ<sub>r</sub>H ghi cho bao nhiêu mol theo phương trình? Lượng chất đề cho đã đổi ra mol, đã nhân C% và khối lượng riêng chưa?"
+  }
+ },
+ "DANG_KEY": {
+  "NANG_LUONG_HH.TOA_THU_NHIET.CHON_PHAT_BIEU": "k1",
+  "NANG_LUONG_HH.TOA_THU_NHIET.NHAN_DANG": "k1",
+  "NANG_LUONG_HH.TOA_THU_NHIET.DEM_DONG_PHAN": "k1",
+  "NANG_LUONG_HH.TOA_THU_NHIET.TINH_NANG_LUONG": "k6",
+  "NANG_LUONG_HH.TOA_THU_NHIET.TINH_KHOI_LUONG": "k6",
+  "NANG_LUONG_HH.TOA_THU_NHIET.TINH_SO_MOL": "k6",
+  "NANG_LUONG_HH.TOA_THU_NHIET.TINH_HIEU_SUAT": "k6",
+  "NANG_LUONG_HH.TOA_THU_NHIET.TINH_THE_TICH": "k6",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.TINH_NANG_LUONG": "k3",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.TINH_TI_SO": "k3",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.TINH_KHOI_LUONG": "k3",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.NHAN_DANG": "k2",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.SO_SANH": "k2",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.CHON_PHAT_BIEU": "k2",
+  "NANG_LUONG_HH.ENTHALPY_TAO_THANH.DEM_DONG_PHAN": "k2",
+  "NANG_LUONG_HH.NANG_LUONG_LIEN_KET.TINH_NANG_LUONG": "k4",
+  "NANG_LUONG_HH.NANG_LUONG_LIEN_KET.DEM_NGUYEN_TU": "k4",
+  "NANG_LUONG_HH.HESS.CHON_PHAT_BIEU": "k5",
+  "NANG_LUONG_HH.HESS.SO_SANH": "k5",
+  "NANG_LUONG_HH.HESS.TINH_NANG_LUONG": "k5"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Câu truyền glucose: năng lượng cơ thể nhận được ghi số dương (+397,09 kJ), khớp đáp án A của kho; Δ<sub>r</sub>H của phản ứng vẫn là số âm.",
+  "Nhiệt dung riêng của nước lấy theo đề (4,2 hoặc 4,18 J/g·K), không tự thay.",
+  "Định luật Hess thuộc chuyên đề lớp 10; ở chìa khoá chỉ dùng tên \"cộng phương trình nhiệt hoá học\" cho dễ hiểu."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}
