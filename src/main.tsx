@@ -28,7 +28,7 @@ import './styles/may-yeu.css'
 // Hiệu ứng "+N EXP" dùng chung (luật v4 29/09): CSS nằm trong gói CSS vỏ để mảnh `ExpCau` (dùng ở bảng nhiệm vụ, BTVN, mọi game) không đẻ thêm một tệp CSS precache.
 import './components/exp-cau/exp-cau.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
-import App from './App.tsx'
+import App, { huaManEmSom } from './App.tsx'
 import { napKatex } from './lib/chem-format'
 
 import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
@@ -90,7 +90,13 @@ khoaVaiVaoUrl(import.meta.env.BASE_URL)
   // KaTeX: đường vào có công thức ngay (màn thi, xem điểm, cổng học sinh, phiếu) ⇒ tải NGAY, song song với
   // mảnh màn; đường khác (màn khoá thầy, cổng phụ huynh) ⇒ tải lúc rảnh sau khi trang đã hiện.
   const canCongThucNgay = !!dv.maCa || dv.vai === 'diem' || dv.vai === 'hocsinh' || dv.vai === 'phieu'
-  if (canCongThucNgay) void napKatex().catch(() => {})
+  // MÁY YẾU / 3G (29/09): vào thi (`/t/<mã ca>`) và cổng học sinh thì màn ĐẦU (ô số báo danh, đăng nhập) không có công thức ⇒
+  // KaTeX (~83 KB gzip) tải NGAY SAU mảnh màn thay vì giành đường truyền với nó (đo Fast 3G: màn đầu hiện sớm hơn). Xem điểm /
+  // phiếu có công thức ngay ⇒ vẫn tải liền như cũ.
+  const noiSauManEm = (!!dv.maCa && dv.vai !== 'diem') || dv.vai === 'hocsinh'
+  const huaMan = noiSauManEm ? huaManEmSom() : null
+  if (huaMan) void huaMan.then(napKatex, napKatex).catch(() => {})
+  else if (canCongThucNgay) void napKatex().catch(() => {})
   else {
     const khiRanh = () => {
       const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }

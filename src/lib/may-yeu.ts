@@ -100,3 +100,26 @@ export function giamHieuUng(): boolean {
   if (typeof window === 'undefined') return false
   return xinGiamChuyenDong(window) || dangCheDoMayYeu()
 }
+
+/** Trần độ phân giải canvas / WebGL: máy yếu vẽ ≤ 1,5 điểm ảnh thật mỗi điểm CSS (màn 3× vẽ ít hơn 4 lần số điểm — mắt khó thấy
+ *  khác), máy thường giữ trần cũ của nơi gọi (`tran`, mặc định 2). */
+export function dprToiDa(tran = 2): number {
+  const goc = typeof window !== 'undefined' ? window.devicePixelRatio : 1
+  const dpr = Number.isFinite(goc) && goc > 0 ? goc : 1
+  return Math.min(dpr, dangCheDoMayYeu() ? Math.min(1.5, tran) : tran)
+}
+
+/** CSS máy yếu cho TRANG NHÚNG (phiếu HTML trong `<iframe srcDoc>`): trang nhúng là tài liệu riêng, không thấy lớp `may-yeu`
+ *  của app ⇒ chèn thẳng quy tắc. Cùng tinh thần src/styles/may-yeu.css: bỏ kính mờ, bỏ bộ lọc mờ/xám của thẻ câu làm mờ (mỗi thẻ
+ *  mang `filter` là một lớp vẽ riêng — vẫn giữ độ mờ `opacity`), hoạt ảnh chạy một lượt rồi đứng. Không ẩn gì, không đổi chữ. */
+export const CSS_MAY_YEU_TRANG_NHUNG =
+  '*,*::before,*::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;animation-iteration-count:1!important}' +
+  '.q-card.q-card-dimmed{filter:none!important}'
+
+/** Chèn CSS máy yếu vào trang HTML nhúng — CHỈ khi app đang ở chế độ máy yếu; máy thường trả nguyên văn. */
+export function themCssMayYeu(html: string): string {
+  if (!html || !dangCheDoMayYeu()) return html
+  const the = `<style data-may-yeu>${CSS_MAY_YEU_TRANG_NHUNG}</style>`
+  const i = html.search(/<\/head>/i)
+  return i >= 0 ? html.slice(0, i) + the + html.slice(i) : the + html
+}

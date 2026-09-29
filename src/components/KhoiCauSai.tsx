@@ -134,7 +134,7 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
       {/* ẢNH ĐỀ BÀI. Câu Hoá hay có sơ đồ và hình thí nghiệm; thiếu ảnh là
           thiếu nửa đề. */}
       {anh.map((src, i) => (
-        <img
+        <img decoding="async"
           key={i}
           src={src}
           alt={`Hình của câu ${c.soCau ?? ''}`}
@@ -206,7 +206,7 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
                     Kho đề ghi chữ "(xem hình phương án A)" ở những câu này, nên
                     in chữ ấy ra là em nhìn bốn dòng trống rỗng. */}
                 {anhPhuongAn(c, 'I', i) ? (
-                  <img
+                  <img decoding="async"
                     src={anhPhuongAn(c, 'I', i)}
                     alt={`Phương án ${k}`}
                     loading="lazy"
@@ -244,7 +244,7 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
                     {CHU_Y[i] ?? i + 1}
                   </span>
                   {anhPhuongAn(c, 'II', i) ? (
-                    <img
+                    <img decoding="async"
                       src={anhPhuongAn(c, 'II', i)}
                       alt={`Ý ${CHU_Y[i] ?? i + 1}`}
                       loading="lazy"

@@ -67,6 +67,11 @@ function napSomTheoDuong() {
   else if (dv.vai === 'hocsinh') huaCongHocSinh ??= napCongHocSinh()
 }
 napSomTheoDuong()
+/** Lượt tải mảnh màn em đã bắt đầu từ đường vào (màn thi / cổng học sinh) — null nếu đường vào không phải của em.
+ *  main.tsx dùng để tải KaTeX NỐI SAU mảnh màn (máy yếu 29/09: trên 3G hai gói tải song song thì cả hai cùng chậm). */
+export function huaManEmSom(): Promise<unknown> | null {
+  return huaManThi ?? huaCongHocSinh
+}
 /** Chỗ giữ màn khi mảnh màn em đang về — đúng nền app, không chữ, không nhấp nháy. */
 const ChoManEm = () => <div className="min-h-screen" style={{ background: 'var(--nen)' }} />
 

@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Component, lazy, memo, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
@@ -55,6 +55,7 @@ import ManChan from '../components/ManChan'
 import ManGiuDeDoc from '../components/ManGiuDeDoc'
 import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
+import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
@@ -162,6 +163,12 @@ async function batToanManHinh(): Promise<void> {
 }
 
 const formatClock = dinhDangDongHo
+
+/** THẺ CÂU LÚC LÀM BÀI — `memo` (máy yếu 29/09). Chạm một phương án chỉ vẽ lại ĐÚNG thẻ đó thay vì cả ~40 thẻ
+ * (đo CPU ×6: 1,1 s ⇒ xem scripts/do-may-yeu.mjs); nhịp lưu tạm 10 giây / chấm "đã lưu" không còn vẽ lại cả đề.
+ * Bỏ qua so HÀM là AN TOÀN ở đây vì mọi hàm màn thi truyền cho thẻ (`setPhanI/II/III` → `updateAndSave`, `setZoomSrc`)
+ * chỉ gọi setState dạng hàm + ref + hàm nhập — hành vi không phụ thuộc lần vẽ. Dữ liệu (đề, `selected`, nhãn) vẫn so đủ. */
+const TheCauThi = memo(TheCau, bangPropsBoQuaHam)
 
 /** Số giờ "mm:ss" — NÚT LÁ duy nhất đổi mỗi giây (gốc màn không vẽ lại). */
 function SoDongHo({ kho }: { kho: KhoGio | null }) {
@@ -3264,7 +3271,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             return bocCau(
               item.qid,
               0,
-              <TheCau
+              <TheCauThi
                 key={item.qid}
                 cheDo="thi"
                 phan="I"
@@ -3294,7 +3301,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             return bocCau(
               item.qid,
               soYDaChon,
-              <TheCau
+              <TheCauThi
                 key={item.qid}
                 cheDo="thi"
                 phan="II"
@@ -3324,7 +3331,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             return bocCau(
               item.qid,
               0,
-              <TheCau
+              <TheCauThi
                 key={item.qid}
                 cheDo="thi"
                 phan="III"

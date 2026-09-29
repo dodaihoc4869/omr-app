@@ -54,6 +54,7 @@ function mauDiem(diem: number): string {
 }
 
 import { CSS_BAO_CAO as CSS } from '../lib/css-bao-cao'
+import { themCssMayYeu } from '../lib/may-yeu'
 
 // ------------------------------------------------------------------ tiện ích
 /** Hiện dần khi cuộn tới. Dùng IntersectionObserver để không phải nghe sự kiện
@@ -333,7 +334,7 @@ export default function PhieuScreen({ duCoSan, laCuaEm = false, xinLink }: { duC
   const [oDau, raDau] = useHienKhiToi<HTMLDivElement>(tat)
 
   if (phieuBt) {
-    return <iframe title="Phiếu bài tập" srcDoc={phieuBt} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
+    return <iframe title="Phiếu bài tập" srcDoc={themCssMayYeu(phieuBt)} style={{ display: 'block', width: '100%', height: '100vh', border: 0 }} />
   }
 
   // VỎ LỖI mặc M3 ở cổng học sinh / phụ huynh (dungM3()): nền surface, chữ theo bảng màu M3 (sáng/tối), nút Thử lại đủ
