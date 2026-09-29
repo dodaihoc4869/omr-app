@@ -23,6 +23,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/game/than-thu-v2/DoanHoTong.tsx': 1, // 250 ms vẽ lại đồng hồ trận (vòng HỎI trận đã chuyển sang batVongTrucTiep)
   'src/game/than-thu-v2/ImmortalShield.tsx': 1,
   'src/game/bi-a/TamCauBia.tsx': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
+  'src/components/tu-luyen/ManTuLuyen.tsx': 2, // Tu luyện (29/09): 1 s đếm giờ làm trong ref + 1 s ô đồng hồ nhỏ tự vẽ lại; chấm qua /hs/tu-luyen/nop một lần, không vòng hỏi
   'src/game/bi-a/ManChoi.tsx': 1, // 45 ms khi GIỮ nút xoay hướng nhắm (chỉ đổi hướng cục bộ)
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,

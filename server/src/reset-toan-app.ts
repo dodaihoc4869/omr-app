@@ -171,6 +171,8 @@ export const BANG_GIU: readonly string[] = [
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
   'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
+  // TU LUYỆN (migration-2909-tu-luyen.sql) — sinh sau lần 21/09: GIỮ cho job ấy = không đụng (job đã xong).
+  'tu_luyen_luot', 'tu_luyen_cau',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */
