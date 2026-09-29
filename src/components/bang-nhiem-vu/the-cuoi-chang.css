@@ -71,3 +71,7 @@
   .lop-the-chang { animation: tcc-vao 180ms ease-out; }
   @keyframes tcc-vao { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 }
+
+/* Luật v4 (29/09): "+N EXP" theo từng câu đúng của chặng. */
+.tcc-exp-cau { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 0.875rem; }
+.tcc-exp-cau li { display: inline-flex; align-items: center; gap: 6px; }

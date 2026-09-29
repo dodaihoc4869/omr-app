@@ -1,0 +1,129 @@
+/* HIỆU ỨNG EXP THEO TỪNG CÂU ĐÚNG (luật v4, 29/09). Màu chỉ đọc biến --m3-* (không mã màu cứng).
+   Ba mức: [data-che-do="day-du"] số bay + hạt · "gon" (máy yếu) chỉ số + thanh · "tinh" (xin giảm chuyển động) đứng yên. */
+.exp-cau-so {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 2px 10px;
+  border-radius: var(--m3-bo-tron, 999px);
+  font-weight: 700;
+  font-size: 0.875rem;
+  background: var(--m3-tertiary-container);
+  color: var(--m3-on-tertiary-container);
+}
+.exp-cau-so[data-che-do='day-du'],
+.exp-cau-so[data-che-do='gon'] {
+  animation: exp-cau-bay 900ms ease-out both;
+}
+.exp-cau-hat {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--m3-tertiary);
+  pointer-events: none;
+  opacity: 0;
+  animation: exp-cau-hat 700ms ease-out both;
+}
+.exp-cau-hat:nth-child(2) { --dx: -22px; --dy: -18px; }
+.exp-cau-hat:nth-child(3) { --dx: 20px; --dy: -22px; animation-delay: 60ms; }
+.exp-cau-hat:nth-child(4) { --dx: 4px; --dy: -30px; animation-delay: 120ms; }
+
+.exp-thanh-nho {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 0;
+}
+.exp-thanh-nho-dong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--m3-on-surface-variant);
+}
+.exp-thanh-nho-ray {
+  position: relative;
+  height: 10px;
+  border-radius: var(--m3-bo-tron, 999px);
+  background: var(--m3-surface-container-high);
+  overflow: hidden;
+}
+.exp-thanh-nho-ray > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--m3-tertiary);
+  transition: width 700ms ease-out;
+}
+.exp-thanh-nho[data-che-do='tinh'] .exp-thanh-nho-ray > i { transition: none; }
+.exp-len-cap {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 10px;
+  border-radius: var(--m3-bo-tron, 999px);
+  font-weight: 700;
+  background: var(--m3-primary);
+  color: var(--m3-surface);
+}
+.exp-thanh-nho[data-che-do='day-du'] .exp-len-cap,
+.exp-thanh-nho[data-che-do='gon'] .exp-len-cap {
+  animation: exp-len-cap 600ms ease-out both;
+}
+
+@keyframes exp-cau-bay {
+  0% { transform: translateY(8px); opacity: 0; }
+  30% { transform: translateY(-4px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes exp-cau-hat {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, -24px))) scale(0.4); opacity: 0; }
+}
+@keyframes exp-len-cap {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* GAME: số bay VÀO thần thú. 'noi' = trong cảnh trận (cha có position), 'dong' = trong dòng kết quả cạnh ảnh thú nhỏ. */
+.exp-cau-so[data-vao-thu='noi'] {
+  position: absolute;
+  z-index: 4;
+  left: 12%;
+  top: 14%;
+  pointer-events: none;
+}
+.exp-cau-so[data-vao-thu='noi'][data-che-do='day-du'],
+.exp-cau-so[data-vao-thu='noi'][data-che-do='gon'] {
+  animation: exp-bay-vao-thu 1400ms ease-out both;
+}
+.exp-cau-so[data-vao-thu='dong'][data-che-do='day-du'],
+.exp-cau-so[data-vao-thu='dong'][data-che-do='gon'] {
+  animation: exp-bay-sang-thu 900ms ease-out both;
+}
+@keyframes exp-bay-vao-thu {
+  0% { transform: translateY(24px) scale(0.8); opacity: 0; }
+  25% { transform: translateY(0) scale(1.08); opacity: 1; }
+  75% { transform: translate(-6px, 36px) scale(0.9); opacity: 1; }
+  100% { transform: translate(-10px, 56px) scale(0.5); opacity: 0; }
+}
+@keyframes exp-bay-sang-thu {
+  0% { transform: translateX(16px); opacity: 0; }
+  40% { transform: translateX(-4px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Máy yếu: không hạt. Xin giảm chuyển động: mọi hoạt ảnh đứng yên. */
+.may-yeu .exp-cau-hat { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .exp-cau-so, .exp-cau-hat, .exp-len-cap { animation: none !important; }
+  .exp-cau-hat { display: none; }
+  .exp-thanh-nho-ray > i { transition: none; }
+}

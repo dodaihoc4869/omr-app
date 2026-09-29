@@ -2,9 +2,11 @@
 import { describe, expect, it } from 'vitest'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
-import { hapThu, chuyenDoiLuatCap, HAP_THU_DAT, LUAT_CAP_MOI, type HoSoCapExp } from '../src/lib/hap-thu-ngay'
-import { BANG_THANH_EXP_V2_DAU, thanhExp, tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { congTongSoVaoHoSo, khienConLai, renKhienBangExp, type HoSoGameExp } from '../server/src/exp-ho-so-game'
+// SỬA CÓ CHỦ Ý 29/09 (luật v4, docs/DE-XUAT-EXP-2909.md): ba test đầu khoá các hàm LỊCH SỬ v3 (hấp thụ theo ngày, chuyển v2 → v3) trên đường cấp v3 — các hàm này vẫn
+// dùng khi chuyển hồ sơ cũ; luật v4 (nạp tự do, khoá mốc, vàng) khoá ở tests/exp-v4-2909.test.ts. Test khiên đổi sang rèn bằng VÀNG.
+import { hapThu, chuyenDoiSangV3 as chuyenDoiLuatCap, HAP_THU_DAT, LUAT_CAP_V3 as LUAT_CAP_MOI, type HoSoCapExp } from '../src/lib/hap-thu-ngay'
+import { BANG_THANH_EXP_V2_DAU, thanhExpV3 as thanhExp, tongExpToiCapV3 as tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { congTongSoVaoHoSo, khienConLai, renKhienBangVang, type HoSoGameExp } from '../server/src/exp-ho-so-game'
 
 describe('Nhịp học và ví EXP', () => {
   it('ví không giới hạn và spam nạp vẫn chỉ đạt cấp 10 từ ngày 12', () => {
@@ -37,23 +39,21 @@ describe('Nhịp học và ví EXP', () => {
       expect(chuyenDoiLuatCap(r.hoSo,100,'2026-09-23').daChuyen).toBe(false)
     }
   })
-  it('khiên mở ngày 21; rèn dùng EXP dư, giữ 400, retry không trừ hai lần',()=>{
-    const p:HoSoGameExp={cap:10,exp:0,wallet:700,earned:700,luatCap:3,expMoi:{daCong:0,manhDaTinh:0,ngayDat:0}}
+  it('khiên mở ngày 21; rèn dùng 1 400 vàng (luật v4), retry không rèn hai lần',()=>{
+    const p:HoSoGameExp={cap:10,exp:0,wallet:0,earned:0,luatCap:4,mocVang:0,expMoi:{daCong:0,manhDaTinh:0,ngayDat:0}}
     for(let d=1;d<=20;d++){
       congTongSoVaoHoSo(p,0,d,d)
       expect(khienConLai(p)).toBe(0)
     }
-    expect(()=>renKhienBangExp(p,0)).toThrow()
+    expect(()=>renKhienBangVang(p,0,9999)).toThrow()
     congTongSoVaoHoSo(p,0,21,21)
     expect(khienConLai(p)).toBe(1)
     expect(p.khienRen?.daRen).toBe(0)
-    expect(renKhienBangExp(p,0)).toBe(true)
-    expect(p.wallet).toBe(400)
+    expect(renKhienBangVang(p,0,1400)).toBe(true)
     expect(p.khienRen).toEqual({manh:0,daRen:1})
-    expect(renKhienBangExp(p,0)).toBe(false)
-    expect(p.wallet).toBe(400)
+    expect(renKhienBangVang(p,0,1400)).toBe(false)
     congTongSoVaoHoSo(p,0,42,42)
-    expect(()=>renKhienBangExp(p,1)).toThrow(/giữ lại/)
+    expect(()=>renKhienBangVang(p,1,1399)).toThrow(/vàng/)
   })
 })
 

@@ -23,6 +23,8 @@ export const chuDonViExp = 'EXP'
 export const chuExp = (n: number): string => `${so(n)} ${chuDonViExp}`
 export const chuDuTruDu = 'Dự trữ đủ'
 export const chuNgayAn = (n: number): string => `${so(n)} ngày ăn`
+/** Luật v4 (29/09): vàng tự vào ví, bỏ đổi tay. */
+export const chuVangTuDongPhu = (expMoiVang: number): string => `Vàng tự vào ví: cứ ${so(expMoiVang)} EXP em kiếm được thì có 1 vàng. Thần thú vẫn nhận đủ EXP.`
 export const chuDoiVang = 'Đổi vàng' // [N6] cũng là nút phụ [B5]
 export const chuDoiVangPhu = 'EXP thừa trong ống nghiệm đổi được thành vàng.' // [N6]
 /** [N7] — số giữ lại do máy chủ trả (`giuLai`, 200). */

@@ -53,4 +53,4 @@ export const tongKhoanExp = (dong: readonly DongKhoanExp[]): number => dong.redu
 export const coKhoanBiCat = (dong: readonly DongKhoanExp[]): boolean => dong.some((d) => d.exp === 0)
 
 /** Câu nói thật khi đủ trần (Điều 9): thưởng 0 nhưng mọi thứ khác vẫn được ghi. */
-export const chuDuTran = (tenThu: string): string => `hôm nay em đã đủ ${TRAN_EXP_GAME_NGAY} EXP từ game. Muốn ${tenThu || 'thần thú'} ăn no thì làm bài tập về nhà hoặc phần ôn lại.`
+export const chuDuTran = (tenThu: string): string => `hôm nay em đã đủ ${TRAN_EXP_GAME_NGAY} EXP từ game. Muốn ${tenThu || 'thần thú'} lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.`

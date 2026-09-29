@@ -52,7 +52,7 @@ describe('Bố cục ngang · Sổ tay, Túi đồ, Cửa hàng', () => {
     await waitFor(() => expect(container.querySelector('.ps-the[data-ma]')).not.toBeNull())
     expect(container.querySelector('.ps[data-ngang]')).not.toBeNull()
     expect(container.querySelector('.ps-ngang-trai .ps-vi')).not.toBeNull()
-    expect(container.querySelector('.ps-ngang-trai .ps-doi')).not.toBeNull()
+    expect(container.querySelector('.ps-ngang-trai .ps-doi')).toBeNull() // luật v4 (29/09): bỏ khối đổi tay EXP → vàng (vàng tự vào ví)
     expect(container.querySelector('.ps-ngang-phai .ps-luoi .ps-the[data-ma]')).not.toBeNull()
   })
 

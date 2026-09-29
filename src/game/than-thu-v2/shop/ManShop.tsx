@@ -213,7 +213,7 @@ export default function ManShop({ api, pet, cap, tenThu, onDong, veThu, veHinhMo
         if (r.daMac) setDangMac((d) => ({ ...d, [m.oGan]: r.maMon }))
         setDangThu((t) => ({ ...t, [m.oGan]: m.ma }))
         setTieuDiem(m.ma)
-        setBao([chuMuaXong(m.ten, r.vang), cauMonKe(ds, r.vang, vi?.doiToiDa ?? 0)].filter(Boolean).join(' '))
+        setBao([chuMuaXong(m.ten, r.vang), cauMonKe(ds, r.vang, 0 /* luật v4: không còn đổi tay */)].filter(Boolean).join(' '))
         setMo(null)
         void taiLai(true)
       } else {

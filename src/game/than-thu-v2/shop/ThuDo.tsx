@@ -13,7 +13,6 @@ import {
   chuChuaThuMon,
   chuDangMacMonNay,
   chuDangThuDanhSach,
-  chuDoiVang,
   chuGia,
   chuKhongCan,
   chuKhongGioiHan,
@@ -76,7 +75,7 @@ interface HanhDong {
   chay?: () => void
 }
 
-function ChiTiet({ m, vang, vi, em, dangGuiMac, onMua, onMac, onToiDoi, onBoThu }: { m: MonShop; vang: number; vi: ViSoMo | null; em: EmCo | null; dangGuiMac: boolean; onMua: (m: MonShop) => void; onMac: (m: MonShop) => void; onToiDoi: () => void; onBoThu: (m: MonShop) => void }) {
+function ChiTiet({ m, vang, em, dangGuiMac, onMua, onMac, onBoThu }: { m: MonShop; vang: number; vi: ViSoMo | null; em: EmCo | null; dangGuiMac: boolean; onMua: (m: MonShop) => void; onMac: (m: MonShop) => void; onToiDoi: () => void; onBoThu: (m: MonShop) => void }) {
   const tt = trangThaiMon(m, vang)
   const sl = conGioiHan(m) ? chuSoLuongChiTiet(m) : chuKhongGioiHan
   let tieu = ''
@@ -102,8 +101,9 @@ function ChiTiet({ m, vang, vi, em, dangGuiMac, onMua, onMac, onToiDoi, onBoThu 
       break
     case 'thieu-vang':
       tieu = chuThieuVang(tt.thieu)
-      goi = chiDuongThieuVang(tt.thieu, vi?.doiToiDa ?? 0)
-      hd = { kieu: 'mo', viec: 'toi-doi', chu: chuDoiVang, bieuTuong: <DongVang c={22} />, khoa: false, chay: onToiDoi }
+      // Luật v4 (29/09): vàng tự vào ví, màn không còn khối đổi tay ⇒ nút khoá, lời chỉ đường nói số ngày học đều (không tính EXP đổi được).
+      goi = chiDuongThieuVang(tt.thieu, 0)
+      hd = { kieu: 'khoa', viec: 'thieu', chu: chuThieuVang(tt.thieu), bieuTuong: <DongVang c={22} />, khoa: true }
       break
     default:
       tieu = chuTrangThai.duVang

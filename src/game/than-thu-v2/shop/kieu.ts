@@ -27,6 +27,10 @@ export interface ViSoMo {
   chuoiNgay: number
   anThachSang: number
   mua: string
+  /** Luật v4 (29/09): số EXP cho 1 vàng tự động (5). Máy chủ cũ không gửi ⇒ màn dùng hằng số `EXP_MOI_VANG`. */
+  expMoiVang?: number
+  /** Luật v4: vàng tự động (không còn đổi tay). */
+  tuDong?: boolean
 }
 /** Đáp `vang-xem` khi cờ tắt: `{ok:true, bat:false}` — màn ẩn cửa hàng, ba lệnh còn lại trả `tam_dong`. */
 export interface ViSoDong {
