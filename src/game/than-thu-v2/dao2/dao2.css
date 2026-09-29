@@ -200,6 +200,7 @@
 .dao2 .dao2-giay .the-cau>div:first-child,.dao2 .dao2-the-giai .the-cau>div:first-child{display:none !important}
 .dao2 .dao2-bua{display:flex;align-items:flex-start;gap:8px;margin:0;font-size:14px;font-weight:600;line-height:1.45;color:var(--d2-bua)}
 .dao2 .dao2-bua>svg{flex:0 0 auto;margin-top:1px;color:var(--d2-bua-icon)}
+.dao2 .dao2-nhan-no{margin:0;font-size:12px;font-weight:600;line-height:1.4;color:var(--d2-bua-phu)}
 .dao2 .dao2-bua small{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--d2-bua-phu)}
 .dao2 .dao2-cot-loi{margin:0;box-shadow:0 0 0 3px rgba(123,63,224,.25),0 0 18px rgba(123,63,224,.3)}
 /* phương án bị Bùa gạch: chữ gạch ngang, ô tối "cháy thành tro", không bấm được */

@@ -91,6 +91,7 @@ export default function TamCauBia({ y, token, session, tenNguoiDanh, laEmDanh, t
         <div className="bia-dong-tt">{ttSau}</div>
         {xong && <div className="bia-kq" data-sai={dung ? undefined : ''} role="status"><b>{tieuDe}</b><span>{phu}</span></div>}
         <div className="bia-dau-cau"><NhanCau y={y} /><span>{moTa(y)}</span>{!xong && <span className="gio" data-gap={con <= 15 ? '' : undefined}>Còn {Math.floor(con / 60)}:{String(con % 60).padStart(2, '0')}</span>}</div>
+        {y.cau.nhanNo && <p className="bia-nhan-no" data-khoi="nhan-no">{y.cau.nhanNo}</p>}
         <div className="dao2 bia-dao2">
           {!phanHoi && !hetGio && <TheCauAi cau={y.cau} stt={1} traLoi={traLoi} khoa={dang} onTraLoi={setTraLoi} />}
           {phanHoi && (dung

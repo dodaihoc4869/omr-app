@@ -116,6 +116,7 @@ export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi}:TheCa
    selected:Array.from({length:4},(_,i)=>(traLoi[i]==='D'||traLoi[i]==='S'?traLoi[i]:null) as 'D'|'S'|null),onSelect:(i,v)=>{if(!khoa){const a=(traLoi||'----').padEnd(4,'-').split('');a[i]=v;onTraLoi(a.join(''))}}}
   :{...chung,phan:'III',selected:traLoi,onChange:v=>{if(!khoa)onTraLoi(v)}}
  return <section className="dao2-giay m3" aria-label={`Ải ${stt}`}>
+  {typeof q.nhanNo==='string'&&q.nhanNo&&<p className="dao2-nhan-no" data-khoi="nhan-no">{q.nhanNo}</p>}
   {goiY&&<p className="dao2-bua">{BUA}<span><b>Bùa Trợ giảng:</b> {goiY.gach?`${chuGach(goiY.gach)} đã cháy thành tro.`:'mở trước Kiến thức cốt lõi của câu này.'}<small>Đúng nhờ Bùa chưa tính Thành thạo — câu sẽ quay lại để em tự làm.</small></span></p>}
   {goiY?.cotLoi&&<div className="loi-giai-chot lg-chot dao2-cot-loi" data-cot-loi=""><div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div><ChemText text={goiY.cotLoi}/></div>}
   <div ref={goc} className="dao2-giay-cau" data-gach={gach.join('')||undefined} onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')onHinhLoi?.()}}><TheCau {...pc}/></div>

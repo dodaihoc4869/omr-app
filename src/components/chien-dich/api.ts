@@ -78,10 +78,12 @@ export interface SucChua {
   /** Số lượt em ở giữa lớp cần. */
   khoiLuongTrungVi: number
   /** Lượt của em ở giữa lớp = câu mới × 2 + lượt ôn (null khi không có em đúng bằng trung vị; máy chủ cũ không có). */
-  tachGiua?: { cauMoi: number; luotOn: number } | null
+  tachGiua?: { cauMoi: number; luotOn: number; /** Lượt nợ cũ của em giữa lớp (Sổ nợ 29/09; máy chủ cũ không có). */ luotNoCu?: number } | null
   tiLe: number
   muc: MucSucChua
   soEmQuaTai: number
+  /** Sổ nợ 29/09: em có nợ cũ cần nhiều ngày để trả hết (máy chủ cũ không có). */
+  noCu?: DongNoCu[]
   goiY: { rutCon: { soCau: number; tiLe: number } | null; luiHan: { hanNop: string; tiLe: number } | null } | null
 }
 
@@ -134,6 +136,9 @@ export interface CauCanDayLai {
   mucDo?: string | null
 }
 
+/** Một dòng báo nợ cũ: "Em X còn N câu nợ cũ — cần ≈ K ngày để trả hết" (máy chủ viết sẵn ở `cau`). */
+export interface DongNoCu { sbd: string; ten: string; soCau: number; luot: number; soNgay: number; cau: string }
+
 export interface BangChienDich {
   chienDich: Omit<ChienDichTom, 'hetHan'>
   homNay: string
@@ -158,6 +163,8 @@ export interface BangChienDich {
   dang: string[]
   em: EmBang[]
   canDayLai: CauCanDayLai[]
+  /** Sổ nợ 29/09 (máy chủ cũ không gửi). */
+  noCu?: DongNoCu[]
 }
 
 export interface EmTen {

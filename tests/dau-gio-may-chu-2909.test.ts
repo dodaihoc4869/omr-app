@@ -12,6 +12,9 @@ import { BANG_XOA, BANG_GIU } from '../server/src/reset-toan-app'
 import { BANG_GIU_HOA2 } from '../server/src/reset-hoa2'
 import { tenNguon } from '../server/src/ho-so-em-chieu'
 import { chonLuotDauGio, chuLichSuCau, diemThanhThaoAo, xepUngVien, type EmUngVien } from '../src/lib/dau-gio'
+import { docHoSo2, layKeHoachHomNay } from '../server/src/srs2-d1'
+import { laNo } from '../server/src/srs2-loi'
+import { gvChienDich } from '../server/src/srs2-gv'
 
 const T0 = Date.parse('2026-09-29T11:00:00.000Z') // 18:00 giờ VN
 const ngayTruoc = (n: number, gio = 3) => new Date(T0 - n * 864e5 - gio * 3600e3).toISOString()
@@ -231,5 +234,67 @@ describe('reset', () => {
     expect(BANG_XOA).toEqual(expect.arrayContaining(['dau_gio_hoi', 'dau_gio_buoi']))
     expect(BANG_GIU).toContain('thay_da_chua')
     expect(BANG_GIU_HOA2).toContain('thay_da_chua')
+  })
+})
+
+// ───────────── ĐẦU CUỐI với Sổ nợ của trợ lý A (docs/so-no-2909/HOP-DONG.md): chấm qua /gv/dau-gio ⇒ trạng thái câu tính lại từ sổ ─────────────
+describe('đầu cuối với Sổ nợ (phatLaiCau / kế hoạch ngày)', () => {
+  const TA = Date.parse('2026-09-30T01:00:00Z') // 08:00 VN 30/09 — đầu giờ
+  const NGAY = 86_400_000
+  const cauJson = (qid: string, sao = 0) =>
+    JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'x', tungPa: {} } })
+  async function fx() {
+    const d = taoD1That()
+    const env = d.env
+    d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Nguyễn An','12A1','x'),('S2','Trần Bảo','12A1','x'),('S3','Lê Chi','12A1','x')")
+    const st = d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
+    for (let i = 1; i <= 6; i++) st.run('DE1', `Q${i}`, 'v1', `g-Q${i}`, 'D1', cauJson(`Q${i}`, i === 1 ? 2 : 0))
+    d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["12A1"]}','x')`)
+    expect((await gvChienDich(env, { action: 'tao', ten: 'CD', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-20', theLucNgay: 40 }, TA - 5 * NGAY)).ok).toBe(true)
+    const mo = (await gvBuoiHoc(env, { action: 'mo', lop: '' }, TA)) as any
+    await gvBuoiHoc(env, { action: 'them-em', id: mo.buoi.id, sbd: ['S1', 'S2', 'S3'] }, TA)
+    return { env, buoiId: mo.buoi.id as string }
+  }
+  const saiNhieu = (sbd: string, qid: string, ks: number[]) => ks.map((k, i) => ({ ...sk(sbd, qid, 0, new Date(TA - k * NGAY).toISOString()), maNguon: `p${i}` }))
+
+  it('Đạt ⇒ thành thạo NGAY (câu 2 sao); Chưa đạt ⇒ nợ, có trong kế hoạch NGÀY MAI; Thầy đã chữa ⇒ câu cắt tỉa quay lại kế hoạch hôm sau', async () => {
+    const { env, buoiId } = await fx()
+    await ghiSuKien(env, [
+      sk('S1', 'Q1', 0, new Date(TA - 4 * NGAY).toISOString()),
+      sk('S1', 'Q1', 1, new Date(TA - 2 * NGAY).toISOString(), 'luyen', 'L0'),
+      sk('S2', 'Q2', 1, new Date(TA - 3 * NGAY).toISOString()),
+      ...saiNhieu('S3', 'Q3', [6, 5, 4, 3]),
+      sk('S3', 'Q3', 1, new Date(TA - NGAY).toISOString(), 'luyen', 'L1'),
+    ])
+    const chot = await g(env, { action: 'chot', buoiId, cap: [{ sbd: 'S1', qid: 'Q1' }, { sbd: 'S2', qid: 'Q2' }, { sbd: 'S3', qid: 'Q3' }] }, TA)
+    expect(chot.nhan).toHaveLength(3)
+    await g(env, { action: 'cham', buoiId, sbd: 'S1', qid: 'Q1', dat: true }, TA + 60_000)
+    await g(env, { action: 'cham', buoiId, sbd: 'S2', qid: 'Q2', dat: false }, TA + 120_000)
+    await g(env, { action: 'cham', buoiId, sbd: 'S3', qid: 'Q3', dat: false }, TA + 180_000)
+    const hs1 = await docHoSo2(env, 'S1', '2026-09-30')
+    expect(hs1.tt.get('Q1')!.thanhThao).toBe(true)
+    const hs2 = await docHoSo2(env, 'S2', '2026-09-30')
+    expect(laNo(hs2.tt.get('Q2')!)).toBe(true)
+    expect(hs2.tt.get('Q2')!.henOn).toBe('2026-10-01')
+    expect((await layKeHoachHomNay(env, 'S2', TA + NGAY)).kh.doan).toContain('Q2')
+    // S3: sai lần thứ 5, lần gần nhất sai ⇒ "Cần thầy dạy lại"; tích "Thầy đã chữa" ⇒ mốc dạy lại ⇒ quay lại kế hoạch hôm sau.
+    expect((await docHoSo2(env, 'S3', '2026-09-30')).tt.get('Q3')!.catTia).toBe(true)
+    await g(env, { action: 'da-chua', buoiId, sbd: 'S3', qid: 'Q3' }, TA + 240_000)
+    const hs3 = await docHoSo2(env, 'S3', '2026-10-01')
+    expect(hs3.tt.get('Q3')!.catTia).toBe(false)
+    expect((await layKeHoachHomNay(env, 'S3', TA + NGAY, hs3)).kh.doan).toContain('Q3')
+  })
+
+  it('tích "Thầy đã chữa" TRƯỚC khi chấm Chưa đạt ⇒ mốc dạy lại đặt lại SAU lần chấm (hợp đồng A: mốc ≥ sự kiện)', async () => {
+    const { env, buoiId } = await fx()
+    await ghiSuKien(env, [...saiNhieu('S3', 'Q3', [6, 5, 4]), sk('S3', 'Q3', 1, new Date(TA - NGAY).toISOString(), 'luyen', 'L1')])
+    await g(env, { action: 'chot', buoiId, cap: [{ sbd: 'S3', qid: 'Q3' }] }, TA)
+    await g(env, { action: 'da-chua', buoiId, sbd: 'S3', qid: 'Q3' }, TA + 60_000)
+    await g(env, { action: 'cham', buoiId, sbd: 'S3', qid: 'Q3', dat: false }, TA + 120_000)
+    const moc = ((await env.DB.prepare("SELECT luc FROM srs2_day_lai WHERE sbd = 'S3' ORDER BY luc").all()).results ?? []).map((x: any) => x.luc)
+    expect(moc).toEqual([new Date(TA + 60_000).toISOString(), new Date(TA + 120_000).toISOString()])
+    const hs = await docHoSo2(env, 'S3', '2026-10-01')
+    expect(hs.tt.get('Q3')!.catTia).toBe(false)
+    expect((await layKeHoachHomNay(env, 'S3', TA + NGAY, hs)).kh.doan).toContain('Q3')
   })
 })

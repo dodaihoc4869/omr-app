@@ -196,7 +196,7 @@ export default function DoanTran(p: Props) {
       <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc">{nhanThe}</b></div><div className="dh-de">{cau?.loiNhan ?? 'Đang tải câu của em…'}</div></section>
     ) : (
       <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={!!p.dangChot || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
-        dau={<><b className="dh-vien-thuoc">{nhanThe}</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span></>}
+        dau={<><b className="dh-vien-thuoc">{nhanThe}</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span>{v2 && cau?.nhanNo ? <small className="dh-nhan-no" data-khoi="nhan-no">{cau.nhanNo}</small> : null}</>}
         gach={gach} bua={bua} xemLaiChuan={v2 ? { stt: tran.hiep } : undefined} />
     )
   }

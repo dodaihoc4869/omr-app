@@ -20,6 +20,8 @@
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { ghiSuKien, ngayVn } from './su-kien-hoc'
+// Mốc dạy lại của Sổ nợ (trợ lý A, docs/so-no-2909/HOP-DONG.md mục 2): ghi `srs2_day_lai` ⇒ đếm sai về 0, câu quay lại kế hoạch hôm sau.
+import { ghiMocDayLai } from './srs2-d1'
 import { chuLichSuCau, tenNguonNgan, xepUngVien, TOI_DA_EM_MOI_LUOT, TOI_DA_UNG_VIEN_MOI_EM, type LanLamNgan, type UngVienCau } from '../../src/lib/dau-gio'
 
 type Row = Record<string, unknown>
@@ -47,15 +49,6 @@ async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | n
   } catch {
     return null
   }
-}
-
-/**
- * MỐC DẠY LẠI — HỢP ĐỒNG VỚI TRỢ LÝ A (sổ nợ, `server/src/srs2-*.ts`): chữ ký `ghiMocDayLai(env, sbd, qid, luc)`.
- * TẠM ở đây (A chưa đẩy hàm của mình): ghi ĐÚNG nơi lưu mốc sẵn có `srs2_day_lai` (cùng chỗ nút "Chữa xong" của Buổi chữa — `srs2-gv.ts`),
- * nên `phatLaiCau(…, mocDayLai)` đếm số lần sai lại từ 0 và câu quay lại kế hoạch hôm sau. KHI GỘP: xoá hàm này, import hàm của A.
- */
-export async function ghiMocDayLai(env: Env, sbd: string, qid: string, luc: string): Promise<void> {
-  await env.DB.prepare('INSERT OR IGNORE INTO srs2_day_lai (sbd, qid, luc, chien_dich_id) VALUES (?,?,?,NULL)').bind(sbd, qid, luc).run()
 }
 
 /** Buổi + danh sách có mặt. */
@@ -268,7 +261,7 @@ export async function gvDauGio(env: Env, b: Row, nowMs: number = Date.now()): Pr
   if (action === 'cham') {
     if (!sbd || !qid) return { ok: false, error: 'Thiếu em hoặc câu.' }
     if (typeof b.dat !== 'boolean') return { ok: false, error: 'Thiếu kết quả Đạt / Chưa đạt.' }
-    const row = (await hoi(env, 'SELECT trang_thai, chuyen_de FROM dau_gio_hoi WHERE sbd = ? AND qid = ? AND buoi_id = ?', sbd, qid, buoiId))?.[0]
+    const row = (await hoi(env, 'SELECT trang_thai, chuyen_de, da_chua_luc FROM dau_gio_hoi WHERE sbd = ? AND qid = ? AND buoi_id = ?', sbd, qid, buoiId))?.[0]
     if (!row) return { ok: false, error: 'Câu này không có trong lượt kiểm tra đầu giờ của buổi.' }
     const tt = str(row.trang_thai)
     if (tt === 'dat' || tt === 'chua_dat') return { ok: true, daCoTruoc: true, ketQua: tt }
@@ -281,6 +274,8 @@ export async function gvDauGio(env: Env, b: Row, nowMs: number = Date.now()): Pr
     }
     // SỔ HỌC: đường ghi sẵn có (`ghiSuKien`, như lên bảng) — khoá `dau_gio|<buổi>|<em>|<câu>|1` ⇒ ghi lại không thêm dòng.
     const ghi = await ghiSuKien(env, [{ nguon: NGUON_DAU_GIO, maNguon: buoiId, sbd, qid, lan: 1, ketQua: b.dat ? 1 : 0, luc: nay, chuyenDe: str(row.chuyen_de), mucDo: '', assistance: 'none', purpose: 'dau_gio' }])
+    // Hợp đồng A: mốc dạy lại phải SAU sự kiện. Thầy tích "Thầy đã chữa" TRƯỚC khi chấm ⇒ đặt lại mốc ngay sau lần chấm này.
+    if (str(row.da_chua_luc)) await ghiMocDayLai(env, sbd, qid, nay).catch(() => undefined)
     return { ok: true, ketQua: moi, soGhi: ghi.soGui, ...(ghi.ok ? {} : { canhBao: 'Đã chấm nhưng chưa ghi được sổ học — máy chủ sẽ báo lỗi trong nhật ký.' }) }
   }
 
