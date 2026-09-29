@@ -20,7 +20,7 @@ import {
   boQuaHiepTrong, banMayDungY, CHAN,
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
-import { protectedQuestions, docKhoiThapNhat } from './game-v2-bank'
+import { protectedQuestions, docKhoiThapNhat, docCauTheoRef } from './game-v2-bank'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { laCauTuLuan } from './cam-tu-luan'
 import { readGameScope } from './game-v2-reports'
@@ -203,11 +203,10 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
 
 // ───────────────────────── Câu hỏi ─────────────────────────
 async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version'>): Promise<PrivateQuestion | null> {
-  const row = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
-    WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(ref.maDe, ref.qid, ref.version).first<{ json: string }>()
+  // 29/09: chỉ mục lệch nguồn ⇒ tự đồng bộ đúng tờ rồi tra lại (version tất định: câu không đổi vẫn khớp); null = câu đổi đề/đáp án hoặc đã rút.
+  const q = await docCauTheoRef(env, ref)
   // CẤM RÚT TỰ LUẬN (21/09): phòng tạo trước lệnh cấm còn ghim câu tự luận ⇒ coi như câu đã rút khỏi kho (đường `rut: true` sẵn có, hiệp không bị tính sai).
-  if (!row) return null
-  const q = JSON.parse(row.json) as PrivateQuestion
+  if (!q) return null
   return laCauTuLuan(q) ? null : q
 }
 

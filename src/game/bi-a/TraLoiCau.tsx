@@ -10,6 +10,7 @@ import NutHoiThay from '../../components/loi-giai/NutHoiThay'
 import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
 import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import { dongTraLoi, layCauTraLoi, traLoiBia, type PhanHoiBia } from './api'
+import { CHU_CAU_DOI, laLoiCauDoi } from '../than-thu-v2/loi-het-tran'
 import { TEN_MUC, hangMuc } from './luat'
 import { dayDu, phanHoiChoLoiGiai } from './TamCauBia'
 import type { CauBia } from './dieu-khien'
@@ -28,6 +29,7 @@ export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
   const [phanHoi, setPhanHoi] = useState<PhanHoiBia | null>(null)
   const [dang, setDang] = useState(false)
   const [loi, setLoi] = useState('')
+  const [baoCau, setBaoCau] = useState('')
   const [soDung, setSoDung] = useState(0)
   const [soDaLam, setSoDaLam] = useState(0)
   const cheDo = useCheDoHieuUng()
@@ -58,10 +60,15 @@ export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
       const p = await traLoiBia(token, luot.session, cau.qid, traLoi, troGiup)
       setPhanHoi(p); setSoDaLam((n) => n + 1); if (p.correct) setSoDung((n) => n + 1)
       goc.current?.scrollTo?.({ top: 0 })
-    } catch (e) { setLoi(e instanceof Error && e.message ? e.message : 'Chưa chấm được. Em thử lại.') } finally { setDang(false) }
+    } catch (e) {
+      // Câu vừa được thầy sửa đề/đáp án (mã `cau_doi`, 29/09) ⇒ tự sang câu kế (không tính sai) thay vì để em kẹt.
+      if (laLoiCauDoi(e)) { tiep(); setBaoCau(CHU_CAU_DOI); return }
+      setLoi(e instanceof Error && e.message ? e.message : 'Chưa chấm được. Em thử lại.')
+    } finally { setDang(false) }
   }
   const tiep = () => {
     if (!luot) return
+    setBaoCau('')
     if (viTri + 1 < luot.cau.length) { setViTri(viTri + 1); setTraLoi(''); setTroGiup(false); setPhanHoi(null); setLoi(''); goc.current?.scrollTo?.({ top: 0 }); return }
     void taiLuot() // hết lượt ⇒ xin lượt sau (máy chủ tự đóng phiên cũ; hết câu thì báo)
   }
@@ -107,6 +114,7 @@ export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
             {!phanHoi && <NutHoiThay key={cau.qid} qid={cau.qid} nguon="bi_a" gon onHoi={() => setTroGiup(true)} />}
             {!phanHoi && troGiup && <small className="bia-chu-nho">Có trợ giúp · câu này không tính EXP và sẽ quay lại để em tự làm.</small>}
             {loi && <p className="bia-loi" role="alert">{loi}</p>}
+            {baoCau && !loi && !phanHoi && <p role="status">{baoCau}</p>}
             {!phanHoi
               ? <button type="button" className="bia-nut-vang" disabled={dang || !dayDu(cau.phan, traLoi)} onClick={() => void nop()}>{dang ? 'Đang chấm…' : dayDu(cau.phan, traLoi) ? 'Chốt đáp án' : cau.phan === 'I' ? 'Chọn một phương án' : cau.phan === 'II' ? 'Chọn đủ 4 ý' : 'Nhập đáp số'}</button>
               : <button type="button" className="bia-nut-vang" onClick={tiep}>{cuoiLuot ? 'Lấy thêm câu' : 'Câu tiếp theo'}</button>}
