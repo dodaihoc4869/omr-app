@@ -1,6 +1,8 @@
 // HẰNG SỐ EXP HỌC TẬP + MẢNH KHIÊN — MỘT NGUỒN (DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt 19/09 "Chốt. Quá thông minh").
 // Cấm rải các con số này ra chỗ khác. Đổi luật thưởng = đổi ĐÚNG tệp này (và test bảng giá trị `tests/exp-hoc-tap-1909.test.ts`).
 import { MANH_REN_KHIEN, KHIEN_REN_GIU_TOI_DA } from '../../src/lib/kinh-te-game'
+// Luật v4 (thầy chốt 29/09, docs/DE-XUAT-EXP-2909.md): vàng tự động, khoá mốc cấp 10, giá rèn khiên — MỘT nguồn ở src/lib/kinh-te-game.ts (máy em cũng đọc).
+export { EXP_MOI_VANG, NGAY_DAT_MO_CAP_10, CAP_KHOA_MOC, VANG_REN_KHIEN } from '../../src/lib/kinh-te-game'
 
 /** EXP MỘT câu ĐÚNG (mọi nguồn trừ game): [phần][số sao 0/1/2]. Phần II tính khi đúng đủ 4 ý (sổ đã chấm bằng `isAnswerCorrect`). Thiếu sao → 0 sao. */
 export const EXP_CAU: Readonly<Record<'I' | 'II' | 'III', readonly [number, number, number]>> = {
@@ -51,6 +53,16 @@ export const EXP_CHUOI_TOI_DA = 10
  */
 export const TRAN_MEM_HE_SO = 2
 export const TRAN_MEM_TY_LE = 0.25
+
+/**
+ * TRẦN NGUỒN (luật v4, thầy chốt 29/09 — thay cho trần NẠP 200/120/0 đã bỏ). Chống cày:
+ *   · câu học tập vượt quá `TRAN_CUNG_HE_SO × mục tiêu ngày` câu (mục tiêu 16 ⇒ câu thứ 49 trở đi) = 0 EXP, không sinh khoản (câu 1…2× đủ, 2×…3× tính 25%);
+ *   · khắc phục: tối đa `KHAC_PHUC_TOI_DA_NGAY` lần có EXP mỗi ngày VN; lên bậc: tối đa `LEN_BAC_TOI_DA_NGAY` lần có EXP mỗi ngày VN.
+ * Game giữ 120/ngày (`TRAN_EXP_GAME_NGAY`). Đạt ngày, chuỗi, lô, BTVN, mẹ giao, lên bảng, ca thi theo lịch của thầy — không trần thêm.
+ */
+export const TRAN_CUNG_HE_SO = 3
+export const KHAC_PHUC_TOI_DA_NGAY = 3
+export const LEN_BAC_TOI_DA_NGAY = 10
 
 /**
  * Mảnh khiên (khiên RÈN, thêm vào khiên quà tiến hoá). THẦY LỆNH 21/09/2026: "ít nhất học đều 21 ngày mới lấy được khiên đầu tiên" ⇒ NGUỒN MẢNH DUY NHẤT là "đạt nhiệm vụ ngày" +1/ngày,

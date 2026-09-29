@@ -23,7 +23,7 @@ import { isAnswerCorrect } from './btvn-grading'
 import { creditAcademic } from './game-v2-academic'
 import { loadProfile } from './game-v2'
 import { gameIdentity } from './game-v2-auth'
-import { capNhatExp, expNhanCuaKetQua, manhNhanCuaKetQua, tongExpCuaKetQua } from './exp-d1'
+import { capNhatExp, expNhanCuaKetQua, manhNhanCuaKetQua, thanThuCuaKetQua, tongExpCuaKetQua } from './exp-d1'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { docCauDaLamHomNay } from './cau-da-lam'
@@ -223,6 +223,6 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
       anhLoiGiai: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
     }
   })
-  return { ok: true, ketQua, khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo, exp, ...(thuHoi.length ? { thuHoi } : {}), ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
+  return { ok: true, ketQua, khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo, exp, ...(thuHoi.length ? { thuHoi } : {}), ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi), ...thanThuCuaKetQua(moi) } : {}) }
 }
 export function trangThaiNop(r: any): number { return r?.ok === false ? 400 : 200; }

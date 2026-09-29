@@ -1,5 +1,7 @@
 // CỬA HÀNG PHỤ KIỆN THẦN THÚ — 5 lệnh dưới /game-v2/… (hợp đồng docs/hop-dong-shop-phu-kien-2109.md; danh mục src/lib/phu-kien-danh-muc.ts). Cờ `cau_hinh.shop_phu_kien` mặc định TẮT.
-//   vang-xem · vang-doi (đổi EXP thừa ở ống nghiệm thành vàng) · shop-danh-sach · shop-mua · thu-mac-do
+//   vang-xem · vang-doi (ĐÃ BỎ từ luật v4 29/09 — trả `da_bo`) · shop-danh-sach · shop-mua · thu-mac-do
+// LUẬT v4 (thầy chốt 29/09, docs/DE-XUAT-EXP-2909.md mục 2.4): VÀNG TỰ ĐỘNG — cứ 5 EXP em kiếm được 1 vàng, thần thú vẫn nhận đủ EXP. Vàng được ĐÚC LƯỜI (`vang-duc.ts`)
+// ngay trước mỗi lần đọc số dư (vang-xem, shop-danh-sach, shop-mua). Không còn đổi tay, không còn mức giữ lại 400 EXP. Vàng cũ giữ nguyên.
 // Vàng KHÔNG nằm ở hồ sơ game: số dư = SUM(vang_so.so_vang) (sổ cái chỉ thêm dòng). Ống nghiệm = `wallet` của hồ sơ; đổi vàng trừ đúng số EXP ấy trong CÙNG MỘT lô với dòng sổ.
 // Không đụng luật EXP, trần 120, thú ăn 200: chỉ trừ `wallet` và luôn giữ lại ≥ 400 EXP. Phụ kiện KHÔNG cộng chỉ số/EXP/vé/thứ hạng. Máy chủ quyết giá (giao diện gửi lại `giaThay`, lệch ⇒ gia_doi).
 //
@@ -8,7 +10,8 @@
 //     Có ai ghi hồ sơ xen vào (revision đổi) ⇒ cả hai không làm gì ⇒ đọc lại, thử tối đa 3 lần. Khác bản phác của đề xuất: dòng sổ KHÔNG dựa vào "hồ sơ đang ở revision+1" (một lượt ghi hồ sơ của việc khác cũng làm revision+1 ⇒ có thể ghi vàng mà không trừ EXP).
 //   shop-mua: (a) INSERT sở hữu NẾU chưa có dòng sổ mang khoá này, đủ vàng, và số cái đã bán < giới hạn; (b) INSERT sổ vàng (−giá) và (c) mặc món NẾU dòng sở hữu của CHÍNH lượt này có mặt. Hai em cùng mua cái cuối ⇒ lô sau thấy đủ số cái ⇒ het_suat.
 // Bấm lặp (cùng khoaYeuCau) ⇒ đọc sổ trước: đã có ⇒ trả kết quả cũ `lapLai:true`, không ghi thêm.
-import { EXP_DU_TRU } from '../../src/lib/kinh-te-game'
+import { EXP_MOI_VANG } from '../../src/lib/kinh-te-game'
+import { ducVang } from './vang-duc'
 import { cuaP08Mo, doiVangQuaP08 } from './cnh-exp-adapter'
 import { tramP08LenHienThi } from './cnh-exp-p08-hien-thi'
 
@@ -19,11 +22,12 @@ import { DOT_MO_BAN, MUA_BAN, O_GAN, docMonPhuKien, monDangBan, type MonPhuKien,
 import { docAnThach } from './game-v2-doan-an'
 import { docChuoiTruoc } from './exp-d1'
 import { ngayVn } from './su-kien-hoc'
+import { LUAT_CAP_MOI } from '../../src/lib/hap-thu-ngay'
 
 type Kq = Record<string, unknown>
 export const LENH_SHOP: ReadonlySet<string> = new Set(['vang-xem', 'vang-doi', 'shop-danh-sach', 'shop-mua', 'thu-mac-do'])
-/** EXP thần thú cần giữ lại ở ống nghiệm để ăn (luật hấp thụ 200/ngày). Đổi vàng không bao giờ xuống dưới mức này. */
-export const GIU_LAI_EXP = EXP_DU_TRU
+/** Luật v4: không còn giữ lại EXP (không còn đổi tay). Giữ trường cho máy em bản cũ. */
+export const GIU_LAI_EXP = 0
 const KHOA_YEU_CAU = /^[A-Za-z0-9_-]{8,64}$/
 /** Cửa sổ nhìn lại của chuỗi ngày cho cửa hàng: cửa sổ 7 ngày của kế hoạch ngày không bao giờ đạt "chuỗi 14 ngày" nên đọc CÙNG định nghĩa (ngày đạt liên tiếp, ngày nghỉ không đứt) với cửa sổ dài; điều kiện lớn nhất của danh mục là 30. */
 export const SO_NGAY_CHUOI_SHOP = 45
@@ -36,6 +40,7 @@ const LOI: Record<string, string> = {
   khong_co_mon: 'Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.',
   sap_mo: 'Món này sắp mở bán. Em ghé lại sau nhé.',
   sai_dau_vao: 'Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.',
+  da_bo: `Vàng nay tự vào ví: cứ ${EXP_MOI_VANG} EXP em kiếm được thì có 1 vàng. Em không cần đổi nữa.`,
 }
 const loi = (ma: string, chu?: string): Kq => ({ ok: false, ma, loi: chu ?? LOI[ma] ?? LOI.sai_dau_vao })
 const thieuBang = (e: unknown): boolean => /no such table/i.test(e instanceof Error ? e.message : String(e))
@@ -111,15 +116,19 @@ function loiChuaMo(m: MonPhuKien, co: { chuoiNgay: number; anThachSang: number }
   return `Món này cần ${m.canAnThach} ấn thạch sáng. Em đang có ${co.anThachSang}.`
 }
 
+/** (LỊCH SỬ v3) Đổi tay EXP → vàng. Luật v4 không gọi nữa (lệnh `vang-doi` trả `da_bo`); giữ để lùi. */
+export const vangDoiCu = (...a: Parameters<typeof vangDoi>) => vangDoi(...a)
+
 export async function shopAction(
-  env: Env, sbd: string, p: Profile, revision: number, action: string, b: Record<string, unknown>,
-  docLai: () => Promise<{ profile: Profile; revision: number }>, nowMs: number = Date.now(),
+  env: Env, sbd: string, p: Profile, _revision: number, action: string, b: Record<string, unknown>,
+  _docLai: () => Promise<{ profile: Profile; revision: number }>, nowMs: number = Date.now(),
 ): Promise<Kq> {
   try {
     if (action === 'vang-xem') return await vangXem(env, sbd, p, nowMs)
-    if (action === 'vang-doi') return await vangDoi(env, sbd, p, revision, b, docLai)
-    if (action === 'shop-danh-sach') return await shopDanhSach(env, sbd, nowMs)
-    if (action === 'shop-mua') return await shopMua(env, sbd, b, nowMs)
+    // Luật v4: bỏ đổi tay EXP → vàng (kể cả nhánh P08). Hàm cũ `vangDoi` giữ lại bên dưới để lùi được.
+    if (action === 'vang-doi') return (await moCua(env, sbd)) ? loi('da_bo') : loi('tam_dong')
+    if (action === 'shop-danh-sach') { await ducVang(env, sbd, p, nowMs); return await shopDanhSach(env, sbd, nowMs) }
+    if (action === 'shop-mua') { await ducVang(env, sbd, p, nowMs); return await shopMua(env, sbd, b, nowMs) }
     return await thuMacDo(env, sbd, b)
   } catch (e) {
     // Chưa chạy migration (bảng chưa có) ⇒ coi như cửa hàng đóng, không ném lỗi kỹ thuật ra màn của em.
@@ -130,6 +139,12 @@ export async function shopAction(
 
 async function vangXem(env: Env, sbd: string, p: Profile, nowMs: number): Promise<Kq> {
   if (!(await moCua(env, sbd))) return { ok: true, bat: false }
+  // Luật v4: đúc vàng còn thiếu rồi mới đọc số dư. Không còn ống nghiệm / đổi tay ⇒ `ongNghiem`, `doiToiDa`, `ngayAn` = 0 (giữ trường cho máy em bản cũ).
+  if (p.luatCap === LUAT_CAP_MOI) {
+    await ducVang(env, sbd, p, nowMs)
+    const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs)])
+    return { ok: true, bat: true, vang, ongNghiem: 0, giuLai: 0, doiToiDa: 0, ngayAn: 0, expMoiVang: EXP_MOI_VANG, tuDong: true, chuoiNgay: co.chuoiNgay, anThachSang: co.anThachSang, mua: MUA_BAN }
+  }
   // CNH-1.0 P08 (Cline 25/09): cửa P08 MỞ ⇒ "ống nghiệm" hiển thị là ví P08 (`cnh_exp_account`) — CÙNG nguồn với
   // lệnh `doiVangCore`, không thì màn đổi vàng nói một số còn lệnh tiêu một số khác.
   const p08 = await tramP08LenHienThi(env, sbd)

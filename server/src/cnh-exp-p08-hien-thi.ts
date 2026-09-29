@@ -9,7 +9,8 @@
 import type { Env } from './kieu'
 import { docCauHinhKichHoat } from './cnh-exp-adapter'
 import { kiemCuaKichHoat } from './cnh-exp-route-gate'
-import { tongExpToiCap } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
+// P08 (cửa đóng) đứng trên đường cấp v3 (21/09) — luật v4 29/09 chưa port sang P08; KHÔNG mở cửa P08 trước khi port.
+import { tongExpToiCapV3 as tongExpToiCap } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { MANH_MOI_KHIEN } from './exp-cau-hinh'
 
 /** Số P08 áp lên bản hiển thị (chỉ các trường em NHÌN THẤY). */
