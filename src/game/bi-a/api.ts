@@ -67,8 +67,8 @@ export async function xepBanBia(token: string, loai: 'ai' | 'giao_huu', cheDo: '
 }
 export interface PhanHoiBia { correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: HinhAnh[]; reward: number; expThuThach: number; /** Luật 29/09: EXP thật đã vào thú nhờ câu này (vắng ⇒ máy chủ cũ). */ expCau?: number }
 /** Chấm một câu qua lệnh `answer` chung (máy chủ ghi sổ, Thể lực, EXP, lịch ôn). */
-export async function traLoiBia(token: string, session: string, qid: string, answer: string): Promise<PhanHoiBia> {
-  const o = await goi('answer', token, { session, qid, answer, assisted: false })
+export async function traLoiBia(token: string, session: string, qid: string, answer: string, assisted = false): Promise<PhanHoiBia> {
+  const o = await goi('answer', token, { session, qid, answer, assisted })
   return {
     correct: o.correct === true,
     answer: chu(o.answer),
@@ -79,6 +79,21 @@ export async function traLoiBia(token: string, session: string, qid: string, ans
     expThuThach: so(o.expThuThach),
     ...(typeof o.expCau === 'number' ? { expCau: so(o.expCau) } : {}),
   }
+}
+/** Chế độ "Trả lời câu hỏi" (không cần chơi): một lượt câu Bi-a hôm nay (câu công khai, không đáp án). Hết câu ⇒ lý do như Sảnh. */
+export type KetQuaTraLoi =
+  | { ok: true; session: string; cau: CauBia[]; tran: { con: number; tong: number } }
+  | { ok: false; lyDo: LyDoBia | null; message: string }
+export async function layCauTraLoi(token: string): Promise<KetQuaTraLoi> {
+  const o = await goi('bia-tra-loi', token, {})
+  const cau = (Array.isArray(o.cau) ? o.cau : []).map(docCau).filter((c): c is CauBia => !!c)
+  if (typeof o.session !== 'string' || !o.session || !cau.length) return { ok: false, lyDo: lyDo(o.lyDo) ?? lyDo(o.lyDoKhoa), message: chu(o.message) || 'Chưa lấy được câu. Em thử lại sau ít phút.' }
+  const tr = vat(o.tran)
+  return { ok: true, session: o.session, cau, tran: { con: so(tr?.con), tong: so(tr?.tong) } }
+}
+/** Em rời màn Trả lời câu hỏi: đóng phiên để câu chưa làm về lại kế hoạch. Lỗi mạng ⇒ bỏ qua (phiên tự hết hạn). */
+export async function dongTraLoi(token: string, session: string): Promise<void> {
+  try { await goi('bia-tra-loi', token, { dong: true, session }) } catch { /* bỏ qua */ }
 }
 /** Đổi câu sau câu sai: câu mới cùng dạng, hoặc null (bi trống / hết trần). */
 export async function doiCauBia(token: string, session: string, qidCu: string, chot: boolean): Promise<CauBia | null> {

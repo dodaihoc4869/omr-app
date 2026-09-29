@@ -6,6 +6,8 @@ import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
 import { hoiLoiMoi, moiBanVao, taiSanhBia, taoBanOnline, traLoiLoiMoi, vaoBanBangMa, xepBanBia, type BanCoMat, type LoiMoiDen, type SanhBia, type VeVaoBan } from './api'
 import BanOnline, { KHOA_BAN_DANG } from './BanOnline'
 import ManChoi from './ManChoi'
+import TraLoiCau from './TraLoiCau'
+import { CongTacMatThan } from './mat-than-luon'
 import type { CauBia, LoaiVan } from './dieu-khien'
 import type { CheDo } from './luat'
 import { CHOT, NT, mauCss } from './nguyen-to'
@@ -38,6 +40,7 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
   const [moAi, setMoAi] = useState(false)
   const [ban, setBan] = useState<BanCoMat[]>([])
   const [loiMoi, setLoiMoi] = useState<LoiMoiDen[]>([])
+  const [chiTraLoi, setChiTraLoi] = useState(false)
   const napSanh = useCallback(async () => {
     setLoi('')
     try { setSanh(await taiSanhBia(token)) } catch (e) { setLoi(e instanceof Error && e.message ? e.message : 'Chưa mở được Sảnh Bi-a. Em thử lại.') }
@@ -58,13 +61,13 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
   const conTran = sanh?.tran.con ?? 0
   // Có mặt ở Sảnh Bi-a + lời mời đến: mỗi 6 giây, CHỈ khi em đang ở Sảnh (vòng trực tiếp nối tiếp, không chồng lượt).
   useEffect(() => {
-    if (!online || van || banOnline) return
+    if (!online || van || banOnline || chiTraLoi) return
     let song = true
     const hoi = async () => { const r = await hoiLoiMoi(token, conTran); if (song) { setBan(r.ban); setLoiMoi(r.moi) } }
     void hoi().catch(() => {})
     const vong = batVongTrucTiep(hoi, 6000)
     return () => { song = false; vong.dung() }
-  }, [online, van, banOnline, token, conTran])
+  }, [online, van, banOnline, chiTraLoi, token, conTran])
   const loaiMang = (s: SanhBia | null): 'ban' | 'giao_huu' | null => (!s || !s.bat ? null : !s.lyDoKhoa && s.tran.con > 0 ? 'ban' : s.giaoHuu.mo ? 'giao_huu' : null)
   const moBanOnline = async (f: () => Promise<VeVaoBan>) => {
     if (dang) return
@@ -73,6 +76,7 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
   }
   const taoVaMoi = (b: BanCoMat) => void moBanOnline(async () => { const lm = loaiMang(sanh); if (!lm) throw new Error(sanh?.message || 'Hôm nay em chưa đấu được.'); const v = await taoBanOnline(token, 'don', lm); await moiBanVao(token, v.van, b.sbd); return v })
   if (banOnline) return <BanOnline token={token} hoTen={hoTen} vao={banOnline} conTran={conTran} onVe={() => { setBanOnline(null); setBoBanDang(true); void napSanh() }} />
+  if (chiTraLoi) return <TraLoiCau token={token} onVe={() => { setChiTraLoi(false); void napSanh() }} />
   if (van) return (
     <ManChoi key={van.khoa} token={token} tenEm={hoTen || 'Em'} van={van.van} session={van.session} cheDo={van.cheDo} loai={van.loai} cauEm={van.cauEm} chot={van.chot}
       onVeSanh={() => { setVan(null); void napSanh() }} onChoiLai={() => { setVan(null); const c = cuoi.current; if (c) void vaoBan(c.loai, c.cheDo); else void napSanh() }} />
@@ -141,6 +145,8 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
               <button type="button" className="bia-nut-phu" disabled>Nhập mã bàn<small>Sắp mở</small></button>
             </div>
             </>}
+            <button type="button" className="bia-nut-phu" disabled={!coCau || dang} onClick={() => { setTin(''); setChiTraLoi(true) }}>Trả lời câu hỏi · không cần chơi<small>{coCau ? `Làm câu Bi-a hôm nay (còn ${sanh.tran.con} câu), không đánh bi · vẫn có EXP` : 'Chưa có câu Bi-a lúc này'}</small></button>
+            <CongTacMatThan />
             <div className="bia-the">
               <b>Luật nhanh</b>
               <span className="bia-chu-nho">Bi của phe em rơi lỗ thì người giữ bi trả lời câu của bi, đúng mới ăn. Sai là sang lượt người khác ngay, em đọc lời giải. Lúc người khác đánh: giải trước bi của em (đúng thì bi hoá vàng) hoặc xem lại câu sai. Ăn đủ 7 bi rồi hạ Bi chốt carbon và trả lời Câu chốt để thắng.</span>

@@ -144,7 +144,7 @@ export class BoVe {
     datTFBan(ctx, k, this.dpr)
     const nguoi = !v.ghe[v.cur]!.ai
     const nhin = ((v.pha === 'aim' && !v.sheet) || v.pha === 'ai-nham') && v.bi_('cue').on
-    const mt = nguoi && v.matThan > 0 && mtBat
+    const mt = nguoi && ((v.matThan > 0 && mtBat) || (v.luonMT && v.cur === v.em)) // luôn bật Mắt thần: chỉ cú của chính em
     const info = nhin ? v.nham() : null
     if (info) {
       ctx.save(); ctx.lineCap = 'round'

@@ -69,6 +69,8 @@ export class VanBia {
   chotTrong: boolean
   matThan = 0
   dungMT = false
+  /** Công tắc "Luôn bật Mắt thần" của máy này (mat-than-luon.tsx): cú của em luôn thấy đường dự đoán, KHÔNG trừ lượt Mắt thần. */
+  luonMT = false
   sheet: YeuCauCau | null = null
   xemMo = false
   tk: TkGhe[]
@@ -197,7 +199,9 @@ export class VanBia {
     this.ev = suKienMoi()
     this.shotCon = conLaiDoi(this.bi, this.ghe[this.cur]!.doi)
     const nguoi = !this.ghe[this.cur]!.ai
-    if (nguoi && this.matThan > 0 && this.loai !== 'giao_huu') { this.matThan--; this.dungMT = true } else this.dungMT = false
+    const luon = nguoi && this.luonMT && this.cur === this.em
+    if (luon) this.dungMT = true // luôn bật: không trừ lượt Mắt thần em kiếm được
+    else if (nguoi && this.matThan > 0 && this.loai !== 'giao_huu') { this.matThan--; this.dungMT = true } else this.dungMT = false
     this.pha = 'moving'; this.ballInHand = false; this.acc = 0; this.soCu++
     if (!this.isBreak) this.sk.am('co', tocDo(p), c.x, c.y) // phá bàn: chỉ tiếng bi chạm bi (thầy 28/09)
     this.power = 0

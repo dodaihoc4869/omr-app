@@ -13,6 +13,7 @@ import TamCauBia from './TamCauBia'
 import XemLaiCauSai, { type CauSai } from './XemLaiCauSai'
 import { R } from './vat-ly'
 import { dangCheDoMayYeu } from '../../lib/may-yeu'
+import { CongTacMatThan, useLuonMatThan } from './mat-than-luon'
 import { BoVe } from './ve-ban'
 import './bi-a.css'
 
@@ -75,6 +76,8 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     return mang ? new VanMang({ cheDo, loaiMang: mang.loaiMang, tenEm, chot, em: mang.em, cauTheoBi: mang.cauTheoBi }, sk, mang.kenh, mang.dau) : new VanBia({ cheDo, loai, tenEm, cauEm, chot }, sk)
   })
   const vm = v instanceof VanMang ? v : null
+  const [luonMT] = useLuonMatThan()
+  v.luonMT = luonMT // công tắc theo máy: đọc mỗi lần vẽ React; vòng khung hình đọc thẳng `v.luonMT`
   useEffect(() => { if (vm && mang) mang.onVan(vm) }, [vm]) // eslint-disable-line react-hooks/exhaustive-deps
   const [moNhan, setMoNhan] = useState(false)
   useSyncExternalStore(useCallback((fn: () => void) => v.dangKy(fn), [v]), () => v.phienBan)
@@ -424,7 +427,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           <div className="bia-nhan-gia">
             <span><b>Bi của em</b><span className="bia-phu-nhan"> · {loai === 'giao_huu' ? 'bi trống, không câu' : 'mỗi bi một câu'}</span></span>
             <span className="phai"><span className="bia-goi-y">{moGiai ? 'Chạm ô để giải trước' : v.pha === 'over' ? 'Hết ván' : loai === 'giao_huu' ? '' : 'Giải trước khi người khác đánh'}</span>
-              {loai !== 'giao_huu' && <span className="bia-mat-than" data-co={v.matThan > 0 ? '' : undefined} aria-label={`Mắt thần: ${v.matThan}. Mỗi cú đánh dùng 1 để thấy trước đường đi thật của bi`} title="Mắt thần">{ICON.mat}<span>{v.matThan}</span></span>}</span>
+              {loai !== 'giao_huu' && <span className="bia-mat-than" data-co={v.matThan > 0 ? '' : undefined} aria-label={`Mắt thần: ${v.matThan}. Mỗi cú đánh dùng 1 để thấy trước đường đi thật của bi`} title="Mắt thần">{ICON.mat}<span>{v.matThan}</span></span>}<CongTacMatThan gon /></span>
           </div>
           <div className="bia-hang-o">
             {biEm.map((id) => {

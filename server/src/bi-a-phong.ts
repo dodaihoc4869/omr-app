@@ -284,7 +284,7 @@ export class BanBiA {
     const dx = so(m.dx), dy = so(m.dy), v = so(m.v), sx = so(m.sx) ?? 0, sy = so(m.sy) ?? 0
     if (dx === null || dy === null || v === null) throw new Error('Cú đánh không hợp lệ.')
     const db = m.datBi && typeof m.datBi === 'object' ? m.datBi as Goi : null
-    const cu: GoiCu = { dx, dy, v, sx, sy, ...(db && so(db.x) !== null && so(db.y) !== null ? { datBi: { x: so(db.x)!, y: so(db.y)! } } : {}) }
+    const cu: GoiCu = { dx, dy, v, sx, sy, ...(db && so(db.x) !== null && so(db.y) !== null ? { datBi: { x: so(db.x)!, y: so(db.y)! } } : {}), ...(m.giuMT === true && !nguoiDanh.ai ? { giuMT: true } : {}) }
     await this.ap((t2) => apCu(t2, t2.cur, cu, this.now()))
   }
   /** Em báo đã trả lời qua `answer`: phòng đọc `game_v2_attempt` (id = phiên|câu) để biết đúng/sai THẬT. Không thấy ⇒ gói giả, từ chối. */

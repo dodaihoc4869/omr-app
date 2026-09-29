@@ -209,7 +209,7 @@ export class VanMang extends VanBia {
     const p = this.power
     if (p < 0.02) return false
     const c = this.bi_('cue')
-    const cu: GoiCu = { dx: this.aim.x, dy: this.aim.y, v: tocDo(p), sx: this.spin.x, sy: this.spin.y, ...(this.S.ballInHand ? { datBi: { x: c.x, y: c.y } } : {}) }
+    const cu: GoiCu = { dx: this.aim.x, dy: this.aim.y, v: tocDo(p), sx: this.spin.x, sy: this.spin.y, ...(this.S.ballInHand ? { datBi: { x: c.x, y: c.y } } : {}), ...(laMinh && this.luonMT ? { giuMT: true } : {}) }
     if (!this.kenh.gui({ t: 'cu', ...cu })) { this.nhac('Mất kết nối', 'Đang nối lại · cú chưa gửi', 1600); this.power = 0; return false }
     this.batDauVe(this.cur, cu, true)
     return true
@@ -222,7 +222,7 @@ export class VanMang extends VanBia {
     this.aim = { x: cu.dx / d, y: cu.dy / d }
     this.ev = suKienMoi(); this.cur = ghe; this.pha = 'moving'; this.acc = 0; this.ballInHand = false
     this.ai = null // A.I đang ngắm dở (máy này vừa thôi làm máy chủ bàn) ⇒ bỏ, kẻo hết 1,25 giây ngắm lại đè pha 'moving'
-    this.dungMT = minh && ghe === this.em && this.matThan > 0 && this.loaiMang === 'ban'
+    this.dungMT = minh && ghe === this.em && ((this.matThan > 0 && this.loaiMang === 'ban') || this.luonMT)
     this.dangVe = true; this.cuMinh = minh; this.choKetQua = false
     this.soCu++
     if (!this.isBreak) this.sk.am('co', cu.v, c.x, c.y)
