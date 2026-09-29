@@ -1,7 +1,8 @@
 /* BỐ CỤC LÀM BÀI NGANG (LamBaiNgang.tsx) — bản vẽ thầy chốt 28/09 docs/ban-ve-lam-bai-ngang-2809/LamBai-Ngang.html.
  * Chỉ đọc vai trò M3 (--m3-*, đặt bởi lớp `m3` ở khung Trang) và rơi về token cũ của tokens.css khi không có — KHÔNG mã màu thô.
  * Luật "chế độ thi": Đúng lẫn Sai khi CHỌN đều tô màu chính (đỏ chỉ dùng ở xem lại — GIAO-DIEN-LAM-BAI.md). */
-.lb-khung {
+.lb-khung,
+.lb-gon {
   --lb-nen: var(--m3-surface-container-low, var(--nen));
   --lb-mat: var(--m3-surface-container-lowest, var(--the));
   --lb-mat-2: var(--m3-surface-container, var(--the-2));
@@ -187,31 +188,115 @@
   color: var(--lb-chu); font-size: 13px; font-weight: 600; cursor: pointer;
 }
 
-/* ---------------------------------------------------------------- NGANG GỌN (điện thoại xoay ngang) */
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-de-dau { padding: 4px 10px 4px 12px; gap: 4px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-ten-ca span,
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-chu-giai,
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-goi-y,
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-keo-ti { display: none; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-co-chu,
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-co-chu button { height: 36px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-phan-tab button { height: 32px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-de { padding: 4px 8px 40vh 12px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-dk { gap: 6px; margin: 6px calc(8px + var(--thi-le-phai, 0px)) 0 4px; padding: 8px; border-radius: 18px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-gio { padding: 4px 10px 6px; border-radius: 14px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-gio-so { font-size: 26px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-gio-phu { display: none; } /* điện thoại ngang: chỗ dọc quý — giữ nhãn + giờ */
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-nop { padding: 0 10px; font-size: 15px; border-radius: 14px; }
-/* Điện thoại ngang, cột đủ chỗ: đồng hồ (không co dưới nội dung) | nút Nộp cạnh nhau, tiến độ dòng dưới. Hẹp hơn ⇒ xếp dọc như trên. */
-@container lb-phai (min-width: 280px) {
-  .lb-khung[data-bo-cuc='ngang-gon'] .lb-dk { grid-template-columns: minmax(max-content, 1fr) minmax(88px, auto); grid-template-areas: 'gio nop' 'tien tien'; }
-  .lb-khung[data-bo-cuc='ngang-gon'] .lb-gio { display: block; min-width: max-content; }
-  .lb-khung[data-bo-cuc='ngang-gon'] .lb-nop { width: 100%; height: 100%; min-height: 52px; }
+/* ---------------------------------------------------------------- NGANG GỌN (điện thoại xoay ngang — LamBaiNgangGon.tsx, thầy 29/09)
+ * Không phiếu đáp án; một câu một lần; câu dài tự chia 2 cột (đề | phương án) có thanh chia kéo 30–70 %.
+ * Thanh trên mỏng 32 px: nút trông nhỏ nhưng vùng chạm vô hình (::after) đủ 40 px. Máy tính / máy tính bảng / dọc KHÔNG dùng khối này. */
+.lb-gon { display: flex; flex-direction: column; }
+.lb-gon button { font-family: var(--sans); touch-action: manipulation; }
+.lb-gon button:focus-visible { outline: 2px solid var(--lb-xd); outline-offset: 1px; }
+.lb-gon[data-dang-keo] { cursor: col-resize; user-select: none; }
+.lb-gon[data-dang-keo] .lb-gon-de { pointer-events: none; }
+
+.lb-gon-thanh {
+  position: relative; z-index: 6; display: flex; flex: none; align-items: center; justify-content: space-between; gap: 8px;
+  height: 32px; padding: 0 max(8px, env(safe-area-inset-right)) 0 max(6px, env(safe-area-inset-left));
+  box-shadow: inset 0 -1px 0 var(--lb-mat-2); font-size: 12px; color: var(--lb-chu-2);
 }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-tien { gap: 3px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-tien-dong b { font-size: 17px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-phieu { padding: 6px calc(8px + var(--thi-le-phai, 0px)) 8px 4px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-p-khoi { padding: 6px; border-radius: 16px; }
+.lb-gon-di, .lb-gon-phai { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.lb-gon-di { flex: 1 1 auto; }
+.lb-gon-phai { flex: none; gap: 6px; }
+/* `.m3 button { min-height: 48px; nút chỉ biểu tượng min-width 48px }` (m3.css) làm thanh 32 px phình ra — ở đây nút rộng 40 px,
+ * vùng chạm cao 40 px do ::after lo (chỉ nới theo chiều dọc để không tràn ngang). */
+.lb-gon-thanh button { min-width: 0 !important; min-height: 0 !important; }
+.lb-gon-nut, .lb-gon-so, .lb-gon-co button, .lb-gon .nut-diu-mat, .lb-gon .lb-nop { position: relative; }
+.lb-gon-nut::after, .lb-gon-so::after, .lb-gon-co button::after, .lb-gon .lb-nop::after { content: ''; position: absolute; inset: -7px 0; }
+.lb-gon-nut {
+  display: grid; flex: none; place-items: center; width: 40px; height: 32px; padding: 0; border: 0; border-radius: 16px;
+  background: transparent; color: var(--lb-chu-2); cursor: pointer;
+}
+.lb-gon-nut:disabled { opacity: 0.35; cursor: default; }
+.lb-gon-so {
+  flex: none; height: 26px; padding: 0 10px; border: 0; border-radius: 13px; background: var(--lb-mat-2); color: var(--lb-chu);
+  font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer;
+}
+.lb-gon-so b { font-weight: 800; }
+.lb-gon-phan { min-width: 0; margin-left: 6px; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 799px) { .lb-gon-phan-dai { display: none; } }
+.lb-gon-tien { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lb-gon-tien b { font-weight: 700; color: var(--lb-chu); }
+.lb-gon-luu { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; white-space: nowrap; }
+.lb-gon .lb-gon-co { height: 32px; border-radius: 16px; background: transparent; box-shadow: none; }
+.lb-gon .lb-gon-co button { width: 40px; height: 32px; border-radius: 16px; font-size: 12px; color: var(--lb-chu-2); }
+.lb-gon .lb-dk { display: flex; align-items: center; gap: 6px; margin: 0; padding: 0; border-radius: 0; background: none; box-shadow: none; }
+.lb-gon .lb-gio {
+  display: inline-flex; align-items: center; gap: 4px; min-width: max-content; height: 24px; padding: 0 8px; border-radius: 12px;
+  background: transparent; color: var(--lb-chu-2); font-size: 12px;
+}
+.lb-gon .lb-gio .lb-gio-so { margin: 0; font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: 0; color: var(--lb-chu); font-variant-numeric: tabular-nums; }
+.lb-gon .lb-gio .lb-gio-nhan { display: inline; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.lb-gon .lb-gio[data-muc='vang'] { background: var(--lb-hp-nen); color: var(--lb-hp-chu); }
+.lb-gon .lb-gio[data-muc='do'] { background: var(--lb-do); color: var(--lb-tren-do); }
+.lb-gon .lb-gio[data-muc] .lb-gio-so { color: inherit; }
+.lb-gon .lb-nop {
+  min-width: 0; min-height: 0; height: 26px; padding: 0 12px; border-radius: 13px; box-shadow: none;
+  font-size: 12.5px; font-weight: 700; white-space: nowrap;
+}
+.lb-gon .lb-nop:disabled { font-size: 12px; }
+
+.lb-gon-than { position: relative; flex: 1; min-height: 0; }
+.lb-gon-de {
+  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; outline: none;
+  padding: 8px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
+}
+/* MỘT câu một lần: mọi khối khác (câu khác, đầu phần) ẩn — tên phần đã có trên thanh. */
+.lb-gon-de > :not([data-gon-hien]) { display: none !important; }
+.lb-gon-de > * { max-width: 1180px; margin-left: auto; margin-right: auto; }
+.lb-gon-de .the-cau > div:first-child { min-height: 40px; padding-top: 10px !important; }
+.lb-gon-de .the-cau > div:last-child { padding: 10px 16px 14px !important; }
+/* Nút "Xem lại sau" của thẻ (KhungCauM3) gọn 36 px để không lấn dòng đầu đề/phương án; vùng chạm vẫn 44 px. */
+.lb-gon .lb-gon-de .thi-cau-goc { top: 6px; }
+.lb-gon .lb-gon-de .thi-cau-dau { position: relative; min-height: 0 !important; height: 36px; }
+.lb-gon-de .thi-cau-dau::after { content: ''; position: absolute; inset: -4px; }
+
+/* CÂU DÀI ⇒ CHIA ĐÔI: trái đề (cuộn cùng thân thẻ), phải phương án / ý / ô đáp số (dính đầu, cuộn riêng khi dài). */
+.lb-gon-de[data-chia] { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 8px; }
+.lb-gon-de[data-chia] > [data-gon-hien] { display: flex; flex: 1 1 auto; flex-direction: column; width: 100%; min-height: 0; }
+.lb-gon-de[data-chia] .the-cau { display: flex !important; flex: 1 1 auto; flex-direction: column; min-height: 0; overflow: hidden; }
+.lb-gon-de[data-chia] .the-cau > * { flex: none; }
+.lb-gon-de[data-chia] .the-cau > div:last-child {
+  display: grid !important; flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  grid-template-columns: minmax(0, var(--lb-chia-de, 1fr)) minmax(0, var(--lb-chia-pa, 1fr));
+  align-items: start; align-content: start; row-gap: 0 !important; column-gap: 28px !important;
+}
+.lb-gon-de[data-chia] .the-cau > div:last-child > * { grid-column: 1; min-width: 0; margin-bottom: 12px; }
+.lb-gon-de[data-chia] .the-cau > div:last-child > [data-lb-pa] {
+  position: sticky; top: 0; grid-column: 2; grid-row: 1 / span 40; max-height: var(--lb-cot-cao, 60vh); margin-bottom: 0;
+  overflow-y: auto; overscroll-behavior: contain; padding: 2px 2px 8px 0;
+}
+
+.lb-gon-keo { position: absolute; z-index: 4; display: grid; place-items: center; width: 32px; margin-left: -16px; cursor: col-resize; touch-action: none; outline: none; }
+.lb-gon-keo::before { content: ''; position: absolute; top: 10px; bottom: 10px; left: 50%; width: 1px; background: var(--lb-vien); opacity: 0.45; }
+.lb-gon-keo-num { position: relative; display: block; width: 6px; height: 44px; border-radius: 3px; background: var(--lb-vien); }
+.lb-gon-keo:focus-visible .lb-gon-keo-num, .lb-gon[data-dang-keo] .lb-gon-keo-num { background: var(--lb-xd); }
+.lb-gon-keo:focus-visible .lb-gon-keo-num { box-shadow: 0 0 0 3px var(--lb-xd-nen); }
+.lb-gon-keo-ti {
+  position: absolute; top: 50%; left: 50%; padding: 3px 8px; border-radius: 8px; background: var(--lb-chu); color: var(--lb-mat);
+  font-size: 11.5px; font-weight: 700; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%, -58px);
+}
+.lb-gon[data-dang-keo] .lb-gon-keo-ti, .lb-gon-keo:focus-visible .lb-gon-keo-ti { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) { .lb-gon-keo-num { transition: background-color 120ms; } .lb-gon-keo-ti { transition: opacity 120ms; } }
+
+.lb-gon-phu {
+  position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-start; justify-content: flex-start;
+  padding: 36px 8px 8px max(8px, env(safe-area-inset-left)); background: var(--phu); overscroll-behavior: contain;
+}
+.lb-gon-bang { width: min(600px, 100%); max-height: 100%; overflow-y: auto; overscroll-behavior: contain; padding: 12px; border-radius: 20px; background: var(--lb-mat); color: var(--lb-chu); box-shadow: var(--bong-2); }
+.lb-gon-bang-ten { margin: 2px 2px 6px; font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--lb-chu-2); }
+.lb-gon-bang-so { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.lb-gon-bang .lb-so { width: 40px; min-height: 0 !important; height: 40px; }
+.lb-gon-bang .lb-so[aria-current='true'] { box-shadow: inset 0 0 0 2.5px var(--lb-xd); }
+.lb-gon-bang-chu { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; font-weight: 600; color: var(--lb-chu-2); }
+.lb-gon-bang-chu span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 
 /* ---------------------------------------------------------------- BẢNG PHÍM TẮT */
 .lb-phu { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: var(--phu); overscroll-behavior: contain; }
