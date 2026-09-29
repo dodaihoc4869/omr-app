@@ -576,37 +576,60 @@ export function demNgayNghiChoCap(cauHinhNghi: string, dsDat: string, moc: strin
  * Cộng phần chênh SUM(sổ) − đã cộng vào hồ sơ game bằng CAS theo `revision` (thử tối đa 3 lần). Em chưa có hồ sơ game → null, khoản nằm chờ.
  * `since` = ngày bắt đầu mùa game (hồ sơ mùa mới không nhận khoản của mùa cũ).
  */
-export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Promise<DaCong | null> {
+/** Tuỳ chọn tăng tốc cho `congVaoHoSoGame` (chốt đáp án 29/09) — KHÔNG đổi kết quả:
+ *  - `moP08`: cờ cửa P08 đã đọc TƯƠI trong cùng request (khỏi đọc lại);
+ *  - `hoSo`: hồ sơ (revision + json) chính request này VỪA ghi — dùng cho vòng đầu thay lượt đọc; mọi ghi vẫn CAS theo revision, thua CAS ⇒ vòng sau đọc tươi.
+ *    Chỉ đưa khi sổ được đọc SAU lần ghi ấy (tổng sổ luôn mới hơn hồ sơ ⇒ phần chênh không âm, như đọc tuần tự cũ);
+ *  - `ra`: nhận hồ sơ SAU CÙNG (đã ghi hoặc không cần ghi) để nơi gọi khỏi đọc lại. */
+export interface TuyChonCong { moP08?: boolean; hoSo?: { revision: number; json: string }; ra?: { revision: number; json: string }
+  /** Tổng sổ đọc TRONG CÙNG giao dịch (batch) đã ghi `hoSo` — chỉ dùng cùng `hoSo` ở vòng đầu. */
+  tong?: DongTongSo }
+type DongTongSo = { e: number; m: number; d: number; ds: string | null; moc: string | null; nn: string | null }
+/** Tổng sổ EXP + mảnh + ngày đạt của em từ `since` — một câu, dùng cho `congVaoHoSoGame` (đọc riêng hoặc gắn cuối batch ghi khoản game). */
+function lenhTongSo(env: Env, sbd: string, since: string): D1PreparedStatement {
+  return env.DB.prepare(
+    `SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e,
+            (SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS m,
+            (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS d,
+            (SELECT group_concat(ngay_vn) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS ds,
+            ${SQL_KHIEN_MOC} AS moc,
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi') AS nn`,
+  ).bind(sbd, since, sbd, since, sbd, since, sbd, since)
+}
+/** Các lượt ĐỌC trước khi ghi một khoản game — nơi gọi có thể bắt đầu SỚM (song song việc khác) rồi đưa vào `ghiKhoanExpGame(…, { docSom })`.
+ *  `khoa` = các khoá (không gồm sbd) cần biết đã có trong sổ chưa. */
+export interface DocTruocKhoanGame { cfg: CauHinhExp; tuNgay: string; moP08: boolean; daCo: Set<string> }
+export async function docTruocKhoanGame(env: Env, sbd: string, khoa: string[]): Promise<DocTruocKhoanGame> {
+  const [cfg, tuNgay, moP08, co] = await Promise.all([
+    docCauHinhExp(env),
+    docTuNgayMua(env),
+    cuaP08Mo(env).then((c) => c.choPhep, () => false),
+    env.DB.prepare('SELECT khoa FROM exp_so WHERE khoa IN (SELECT value FROM json_each(?))').bind(JSON.stringify(khoa.map((k) => `${sbd}|${k}`))).all<{ khoa: string }>(),
+  ])
+  return { cfg, tuNgay, moP08, daCo: new Set((co.results ?? []).map((x) => x.khoa)) }
+}
+export async function congVaoHoSoGame(env: Env, sbd: string, since: string, tuy: TuyChonCong = {}): Promise<DaCong | null> {
   // CNH-1.0 P08 (Cline 25/09): CỔNG P08 MỞ ⇒ phần EXP vừa cộng vào ví hồ sơ cũng phải GƯƠNG sang
   // `cnh_exp_account.wallet_exp`. KHÔNG có bước này thì ví P08 ĐỨNG YÊN ở số của đợt cutover trong khi em
   // kiếm EXP mỗi ngày vào sổ cũ ⇒ bật cờ là màn em đọc ví P08 SAI (EXP em vừa kiếm không hiện ra).
   // Kiểm cờ MỘT lần cho cả vòng (không đệm: tắt cờ là ngừng gương ngay). Cờ TẮT (mặc định) ⇒ không truy vấn thêm.
-  const moP08 = (await cuaP08Mo(env).catch(() => ({ choPhep: false }))).choPhep
+  const moP08 = tuy.moP08 ?? (await cuaP08Mo(env).catch(() => ({ choPhep: false }))).choPhep
   for (let lan = 0; lan < 3; lan++) {
-    const row = await an(() => env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>(), null)
+    const row = lan === 0 && tuy.hoSo ? tuy.hoSo : await an(() => env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>(), null)
     if (!row) return null
     let p: HoSoGameExp & Record<string, unknown>
     try { p = JSON.parse(row.json) as HoSoGameExp & Record<string, unknown> } catch { return null }
-    const t = await an(
-      () => env.DB.prepare(
-        `SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e,
-                (SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS m,
-                (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS d,
-                (SELECT group_concat(ngay_vn) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS ds,
-                ${SQL_KHIEN_MOC} AS moc,
-                (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi') AS nn`,
-      ).bind(sbd, since, sbd, since, sbd, since, sbd, since).first<{ e: number; m: number; d: number; ds: string | null; moc: string | null; nn: string | null }>(),
-      null,
-    )
+    const t = lan === 0 && tuy.hoSo && tuy.tong ? tuy.tong : await an(() => lenhTongSo(env, sbd, since).first<DongTongSo>(), null)
     if (!t) return null
     const tongExp = Number(t.e) || 0
     const tongManh = Number(t.m) || 0
     const ngayDat = Number(t.d) || 0
     const ngayNghi = demNgayNghiChoCap(String(t.nn ?? ''), String(t.ds ?? ''), String(t.moc ?? ''), since, ngayVn(Date.now()))
-    if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0) && ngayNghi === (p.expMoi?.ngayNghi ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
+    if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0) && ngayNghi === (p.expMoi?.ngayNghi ?? 0)) { tuy.ra = { revision: row.revision, json: row.json }; return { exp: 0, manh: 0, khienMoi: 0 } }
     const ra = congTongSoVaoHoSo(p, tongExp, tongManh, ngayDat, ngayNghi)
+    const jsonMoi = json(p)
     const lenh: D1PreparedStatement[] = [
-      env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision),
+      env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(jsonMoi, sbd, row.revision),
     ]
     // GƯƠNG ví P08: `changes() = 1` buộc câu này CHỈ chạy khi câu trên vừa thắng CAS ⇒ hai sổ cùng đổi hoặc
     // cùng không. Hàng ví chưa có (em chưa chuyển đổi) ⇒ 0 dòng, vô hại.
@@ -627,7 +650,7 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
       const r = await lenh[0]!.run()
       daDoi = Number(r.meta.changes ?? 0)
     }
-    if (daDoi) return ra
+    if (daDoi) { tuy.ra = { revision: row.revision + 1, json: jsonMoi }; return ra }
   }
   return null
 }
@@ -698,17 +721,25 @@ export interface KhoanGame {
  * Ghi MỘT khoản EXP sinh trong game (câu game đúng, thử thách/Lượt trùm, kết chặng Đoàn, vỡ giáp…) trong một giao dịch, rồi cộng phần chênh sổ vào thú. Idempotent theo `khoa`.
  * v5: bỏ trần 120 EXP game/ngày (bộ đếm theo ngày vẫn ghi để thống kê). EXP mới TẮT cho em ⇒ không ghi gì. Không ném lỗi.
  */
-export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs: number): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean }> {
+export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs: number, goiY: { hoSo?: { revision: number; json: string }; docSom?: Promise<DocTruocKhoanGame> } = {}): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean; hoSo?: { revision: number; json: string } }> {
   try {
-    if (!mocExpCuaEm(await docCauHinhExp(env), sbd, nowMs)) return { bat: false, exp: 0, daGhiTruoc: false }
+    // CHỐT ĐÁP ÁN (29/09): cấu hình EXP, khoá đã có, ngày mùa, cờ P08 là các lượt ĐỌC độc lập ⇒ MỘT đợt song song (trước: 4–5 đợt nối tiếp), hoặc nơi gọi
+    // đã bắt đầu sớm (`docSom`, phải gồm khoá `k.khoa`). `goiY.hoSo` = hồ sơ nơi gọi VỪA ghi (answer) ⇒ khỏi đọc; ghi vẫn CAS theo revision nên hồ sơ cũ đi thì
+    // vòng sau đọc tươi như trước. Tổng sổ đọc NGAY TRONG batch ghi khoản (cùng giao dịch) ⇒ bớt một đợt nữa.
     const khoa = `${sbd}|${k.khoa}`
-    if (await env.DB.prepare('SELECT 1 AS x FROM exp_so WHERE khoa = ?').bind(khoa).first()) { await congVaoHoSoGame(env, sbd, await docTuNgayMua(env)); return { bat: true, exp: 0, daGhiTruoc: true } }
-    const w = await ghiGameNguyenTu(env, sbd, k)
+    const { cfg, tuNgay, moP08, daCo } = await (goiY.docSom ?? docTruocKhoanGame(env, sbd, [k.khoa]))
+    if (!mocExpCuaEm(cfg, sbd, nowMs)) return { bat: false, exp: 0, daGhiTruoc: false }
+    const hoSo0 = goiY.hoSo ?? null
+    const tuy: TuyChonCong = { moP08 }
+    if (daCo.has(khoa)) { await congVaoHoSoGame(env, sbd, tuNgay, tuy); return { bat: true, exp: 0, daGhiTruoc: true, ...(tuy.ra ? { hoSo: tuy.ra } : {}) } }
+    const w = await ghiGameNguyenTu(env, sbd, k, hoSo0, tuNgay)
     if (!w.ghi) return { bat: true, exp: 0, daGhiTruoc: true }
     const nhan = w.exp
-    await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+    tuy.hoSo = w.hoSo
+    tuy.tong = w.tong
+    await congVaoHoSoGame(env, sbd, tuNgay, tuy)
     emCoGhi(sbd) // EXP game vừa ghi ⇒ đệm kế hoạch ngày của em hết hiệu lực
-    return { bat: true, exp: nhan, daGhiTruoc: false }
+    return { bat: true, exp: nhan, daGhiTruoc: false, ...(tuy.ra ? { hoSo: tuy.ra } : {}) }
   } catch (e) {
     console.error('[exp] ghi khoản game lỗi (bỏ qua):', e instanceof Error ? e.message : e)
     return { bat: false, exp: 0, daGhiTruoc: false }
@@ -718,9 +749,9 @@ export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs
 /** Ledger và hạn mức cùng một giao dịch D1: retry không tiêu thêm hạn mức.
  * Guard revision ngay trên INSERT; changes() nối UPDATE với đúng INSERT vừa thắng.
  */
-async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame): Promise<{ ghi: boolean; exp: number }> {
+async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame, hoSo0: { revision: number; json: string } | null = null, since?: string): Promise<{ ghi: boolean; exp: number; hoSo?: { revision: number; json: string }; tong?: DongTongSo }> {
   for (let lan = 0; lan < 8; lan++) {
-    const row = await env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>()
+    const row = lan === 0 && hoSo0 ? hoSo0 : await env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>()
     if (!row) {
       // Thử thách học tập có thể hoàn tất trước lần đầu em mở thần thú.
       // Khởi tạo cùng đường chuẩn rồi mới ghi, để khoản thưởng không bị mất.
@@ -731,6 +762,7 @@ async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame): Promise<{ g
     const p = JSON.parse(row.json) as Profile
     const exp = k.khongTran ? Math.max(0, Math.floor(Number(k.exp) || 0)) : nhanExpGame(p, k.ngay, k.exp)
     const khoa = `${sbd}|${k.khoa}`
+    const jsonP = json(p)
     const ketQua = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
         SELECT ?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)
@@ -738,9 +770,10 @@ async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame): Promise<{ g
         .bind(khoa,sbd,k.ngay,k.loai,k.qid??null,k.maNguon??null,exp,k.luc,k.ghiChu,sbd,row.revision,
           k.loai,k.maNguon??null,sbd,k.ngay,k.maNguon??null),
       env.DB.prepare('UPDATE game_v2_profile SET json=?, revision=revision+1 WHERE sbd=? AND revision=? AND changes()=1')
-        .bind(json(p),sbd,row.revision),
+        .bind(jsonP,sbd,row.revision),
+      ...(since !== undefined ? [lenhTongSo(env, sbd, since)] : []),
     ])
-    if (ketQua[0]?.meta.changes) return { ghi: true, exp }
+    if (ketQua[0]?.meta.changes) return { ghi: true, exp, hoSo: { revision: row.revision + 1, json: jsonP }, tong: (ketQua[2]?.results as DongTongSo[] | undefined)?.[0] }
     if (await env.DB.prepare('SELECT 1 AS x FROM exp_so WHERE khoa=?').bind(khoa).first()) return { ghi: false, exp: 0 }
     if (k.loai === 'tiepsuc' && k.maNguon && await env.DB.prepare("SELECT 1 AS x FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc' AND ma_nguon=?").bind(sbd,k.ngay,k.maNguon).first()) return { ghi: false, exp: 0 }
   }

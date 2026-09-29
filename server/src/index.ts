@@ -3223,7 +3223,7 @@ const boXuLy = {
       if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
-      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
+      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
