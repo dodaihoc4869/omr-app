@@ -387,3 +387,5 @@
  --ng-kinh-bong:0 10px 26px rgba(0,0,0,.28);--ng-vang-nen:linear-gradient(180deg,rgb(255,224,138) 0%,rgb(255,209,102) 42%,rgb(242,160,32) 100%);--ng-vang-chu:rgb(58,32,0);
  --ng-vang-bong:0 10px 26px rgba(255,170,40,.42),inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(160,90,0,.35);
  --ng-o-nen:rgba(255,255,255,.07);--ng-o-bong:inset 0 0 0 1px rgba(255,255,255,.16),0 4px 12px rgba(0,0,0,.2);--ng-kinh-mo:blur(0px);}
+/* Nút "Hỏi thầy" (29/09): vỏ Đảo đặt lại nút qua biến --nut-* (.dao.dao button, 0,2,1) ⇒ gán biến + khung ở 0,3,1 để hiện đúng dáng nút kính. */
+.dao.dao button.lg-nut--hoi{--nut-nen:var(--dao-kinh);--nut-chu:var(--dao-vang);--nut-bong:inset 0 0 0 1px var(--dao-kinh-vien);display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:22px;font-size:15px;font-weight:800;white-space:nowrap}
