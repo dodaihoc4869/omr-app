@@ -126,8 +126,21 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     return () => vong.dung()
   }, [dangDi, xem?.ma, xem?.cau?.qid, xem?.trum?.qid, call, apDung]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Đồng hồ vẽ lại 4 lần/giây từ mốc máy chủ trả (không tin đồng hồ máy em cho việc chấm — chỉ để vẽ).
-  useEffect(() => { if (!xem?.batDau || xem.tran?.ketThuc) return; const t = setInterval(() => setNhip(n => n + 1), 250); return () => clearInterval(t) }, [xem?.batDau, xem?.tran?.ketThuc])
+  // Đồng hồ soi 4 lần/giây từ mốc máy chủ trả (không tin đồng hồ máy em cho việc chấm — chỉ để vẽ).
+  // MÁY YẾU (29/09): chỉ VẼ LẠI khi số giây hiện trên màn đổi (cùng công thức `moSauGiay`/`conGiay` dưới) — trước đây vẽ lại cả trận
+  // 4 lần/giây dù chữ chỉ đổi 1 lần/giây (đo: 23 lượt commit / 5 giây ngồi yên ⇒ nay ~5). Qua mốc 0 vẫn vẽ lại đúng nhịp như cũ.
+  useEffect(() => {
+    if (!xem?.batDau || xem.tran?.ketThuc) return
+    let cu = ''
+    const t = setInterval(() => {
+      const troiNay = performance.now() - moc.current.luc
+      const hienSo = `${Math.ceil(Math.max(0, moc.current.moSauMs - troiNay) / 1000)}|${Math.ceil(Math.max(0, moc.current.conMs - Math.max(0, troiNay - moc.current.moSauMs)) / 1000)}`
+      if (hienSo === cu) return
+      cu = hienSo
+      setNhip(n => n + 1)
+    }, 250)
+    return () => clearInterval(t)
+  }, [xem?.batDau, xem?.tran?.ketThuc])
   const troi = performance.now() - moc.current.luc
   const moSauGiay = Math.ceil(Math.max(0, moc.current.moSauMs - troi) / 1000)
   const conGiay = Math.ceil(Math.max(0, moc.current.conMs - Math.max(0, troi - moc.current.moSauMs)) / 1000)

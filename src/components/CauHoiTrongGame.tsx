@@ -87,7 +87,7 @@ export function NoiDungPhuongAn({ c, i }: { c: CauCoAnh; i: number }) {
   return (
     <span className="flex-1 min-w-0">
       {anh !== '' && (
-        <img
+        <img decoding="async"
           src={anh}
           alt={`Phương án ${String.fromCharCode(65 + i)} (ảnh cắt từ đề gốc)`}
           className="max-h-24 w-auto mb-1 rounded-md bg-white"

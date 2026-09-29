@@ -5,10 +5,12 @@ import type { ReactNode } from 'react'
 import { BtCanhBao, BtLui } from './bieu-tuong'
 import { TEN_BAC, chuThuLai, so } from './chu-shop'
 import type { Bac, OGan } from './kieu'
+import { dangCheDoMayYeu } from '../../../lib/may-yeu'
 
-/** "Giảm chuyển động" của hệ thống. Không có `matchMedia` (máy chủ dựng, jsdom) ⇒ coi như không giảm. */
+/** "Giảm chuyển động" của hệ thống — hoặc máy đang ở chế độ máy yếu (29/09: số vàng nhảy thẳng tới số cuối, cuộn không trượt mượt).
+ *  Không có `matchMedia` (máy chủ dựng, jsdom) ⇒ coi như không giảm. */
 export function giamChuyenDong(): boolean {
-  return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || dangCheDoMayYeu()
 }
 
 /**

@@ -1,13 +1,15 @@
 // Móc dùng chung cho Bảng tin bản 3: đo chỗ trống để chọn "top-N", số đếm lên, chuyển bố cục theo bề rộng, trang lướt ngang.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import { useNhipThay, type TuyChonNhipThay } from '../../lib/nhip-may-thay'
+import { dangCheDoMayYeu } from '../../lib/may-yeu'
 
 const coTheDo = () => typeof window !== 'undefined'
 
 /** Người dùng tắt chuyển động (hoặc môi trường không có matchMedia, như test) ⇒ đặt thẳng giá trị cuối, không hoạt ảnh. */
 export function giamChuyenDong(): boolean {
   if (!coTheDo() || typeof window.matchMedia !== 'function') return true
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  // Máy yếu (29/09): số đặt thẳng giá trị cuối, không chạy từng khung.
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches || dangCheDoMayYeu()
 }
 
 /** Số ĐẾM LÊN ≤ 600 ms (đề bài); giá trị vắng (null) ⇒ giữ null, KHÔNG vẽ 0 giả. */
