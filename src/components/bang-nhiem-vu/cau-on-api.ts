@@ -4,6 +4,7 @@
 //   (4) gọi lại /hs/ke-hoach-ngay (màn cổng tự gọi khi sheet đóng: useLamMoiKhiDong)
 // Mọi lỗi mạng → null, KHÔNG ném (màn phải sống được khi mất mạng). Khác `goiPost` của may-chu.ts: ở đây cần cả chữ báo lỗi của
 // máy chủ (`ok:false, error`) nên trả kèm mã HTTP và thân JSON.
+import { docAnhThu, type AnhThuNhan, type KhoanExpNhan } from '../../lib/hieu-ung-exp-cau'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { chanCauTuLuan } from '../../lib/cau-tu-luan-may-hs'
 import { docThuThachRieng, type ThuThachRieng } from '../../lib/thu-thach-rieng'
@@ -59,8 +60,10 @@ export interface PhanHoiNopOn {
   /** EXP vừa cộng (0 = không cộng). Chưa có trường thì coi như 0 và không hiện. */
   exp?: number
   /** Khi EXP mới đã bật cho em: từng khoản vừa ghi (`ghiChu` là tiếng Việt máy chủ đã viết sẵn — in nguyên văn) và mảnh khiên mới. */
-  expNhan?: { exp: number; ghiChu: string }[]
+  expNhan?: KhoanExpNhan[]
   manhNhan?: { so: number; ghiChu: string }[]
+  /** Luật v4 (29/09): thần thú sau lượt nộp — cho hiệu ứng "+N EXP" theo câu và thanh EXP nhích. Máy chủ cũ không gửi ⇒ null. */
+  thanThu?: AnhThuNhan | null
 }
 
 interface KetQuaGoi {
@@ -131,7 +134,8 @@ export async function nopOnLai(token: string, traLoi: MucTraLoi[], duong = '/hs/
     chuaLam: Array.isArray(d.chuaLam) ? d.chuaLam.map(String) : [],
     tienBo: d.tienBo && typeof d.tienBo === 'object' ? d.tienBo : null,
     exp: Number.isFinite(Number(d.exp)) ? Number(d.exp) : 0,
-    expNhan: (Array.isArray(d.expNhan) ? d.expNhan : []).map((x: any) => ({ exp: Math.max(0, Math.floor(Number(x?.exp) || 0)), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x: { ghiChu: string }) => x.ghiChu),
+    expNhan: (Array.isArray(d.expNhan) ? d.expNhan : []).map((x: any) => ({ exp: Math.max(0, Math.floor(Number(x?.exp) || 0)), ghiChu: String(x?.ghiChu ?? '').trim(), ...(typeof x?.loai === 'string' ? { loai: x.loai } : {}), ...(typeof x?.qid === 'string' && x.qid ? { qid: x.qid } : {}) })).filter((x: { ghiChu: string }) => x.ghiChu),
+    thanThu: docAnhThu(d.thanThu),
     manhNhan: (Array.isArray(d.manhNhan) ? d.manhNhan : []).map((x: any) => ({ so: Math.max(0, Math.floor(Number(x?.so) || 0)), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x: { ghiChu: string }) => x.ghiChu),
   }
 }

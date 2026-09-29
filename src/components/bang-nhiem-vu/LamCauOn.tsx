@@ -14,6 +14,8 @@ import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
 import NutHoiThay from '../loi-giai/NutHoiThay'
+import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
+import { expTheoCau, type AnhThuNhan, type CheDoHieuUng } from '../../lib/hieu-ung-exp-cau'
 
 const KY_TU = ['A', 'B', 'C', 'D', 'E', 'F']
 const NHAN_PHAN: Record<CauOn['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng / Sai', III: 'Phần III · Trả lời ngắn' }
@@ -73,6 +75,11 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   const [exp, setExp] = useState(0)
   const [expNhan, setExpNhan] = useState<{ exp: number; ghiChu: string }[]>([])
   const [manhNhan, setManhNhan] = useState<{ so: number; ghiChu: string }[]>([])
+  // Luật v4: "+N EXP" theo TỪNG câu đúng + thanh EXP của thần thú (số do máy chủ trả). Câu em bấm Hỏi thầy trước khi nộp ⇒ không hiệu ứng.
+  const [expCau, setExpCau] = useState<Record<string, number>>({})
+  const [thu, setThu] = useState<{ moi: AnhThuNhan; truoc: AnhThuNhan | null } | null>(null)
+  const daHoi = useRef<Set<string>>(new Set())
+  const cheDo = useCheDoHieuUng()
   const [dangNop, setDangNop] = useState(false)
   /** Bài đã lưu ở máy, hàng đợi đang chờ máy chủ rảnh để nộp (em không cần bấm lại). */
   const [choMayChu, setChoMayChu] = useState(false)
@@ -176,6 +183,9 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     setExp((e) => e + (r.exp && r.exp > 0 ? r.exp : 0))
     if (r.expNhan && r.expNhan.length > 0) setExpNhan((t) => [...t, ...r.expNhan!])
     if (r.manhNhan && r.manhNhan.length > 0) setManhNhan((t) => [...t, ...r.manhNhan!])
+    const theoCau = expTheoCau(r.ketQua, r.expNhan, daHoi.current)
+    if (Object.keys(theoCau).length > 0) setExpCau((t) => ({ ...t, ...theoCau }))
+    if (r.thanThu) { const moi = r.thanThu; setThu((t) => ({ moi, truoc: t?.moi ?? null })) }
     setDaNopLan((n) => n + 1)
   }
   const apDungRef = useRef(apDungNop)
@@ -264,6 +274,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
             </p>
           )}
           {exp > 0 && <p className="lco-exp">+{exp} EXP học tập</p>}
+          {thu && <ThanhExpNho key={`${thu.moi.cap}-${thu.moi.exp}`} thu={thu.moi} truoc={thu.truoc} cheDo={cheDo} />}
           {/* EXP mới đã bật: in NGUYÊN VĂN từng khoản máy chủ đã ghi (kèm mảnh khiên); chưa bật thì chỉ có dòng tổng ở trên. */}
           {(expNhan.length > 0 || manhNhan.length > 0) && (
             <ul className="lco-exp-ds" aria-label="EXP và mảnh khiên vừa nhận">
@@ -303,6 +314,9 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
               khoa={dangNop || choMayChu}
               onChon={(g) => chon(c.qid, g)}
               onChonY={(y, v) => chonY(c.qid, y, v)}
+              expCau={expCau[c.qid] ?? 0}
+              cheDo={cheDo}
+              onHoi={() => daHoi.current.add(c.qid)}
             />
           ))}
           {khongCo.map((q, i) => (
@@ -368,6 +382,9 @@ function TheCauOn({
   khoa,
   onChon,
   onChonY,
+  expCau = 0,
+  cheDo = 'tinh',
+  onHoi,
 }: {
   c: CauOn
   so: number
@@ -377,6 +394,11 @@ function TheCauOn({
   khoa: boolean
   onChon: (g: string) => void
   onChonY: (y: number, v: 'D' | 'S') => void
+  /** Luật v4: EXP máy chủ vừa ghi cho CÂU NÀY (0 = không hiệu ứng). */
+  expCau?: number
+  cheDo?: CheDoHieuUng
+  /** Em bấm Hỏi thầy trước khi nộp câu này (màn cha ghi nhớ để không phát hiệu ứng). */
+  onHoi?: () => void
 }) {
   const daCham = !!ketQua
   // Em bấm Hỏi thầy TRƯỚC khi nộp câu này ⇒ máy chủ đã ghi câu là "có trợ giúp"; nói thật cho em biết vì sao câu chưa được tính.
@@ -402,6 +424,7 @@ function TheCauOn({
             {ketQua!.dung ? 'Đúng' : 'Chưa đúng'}
           </span>
         )}
+        {daCham && ketQua!.dung && daHoi !== c.qid && <SoExpCau exp={expCau} cheDo={cheDo} />}
         {!daCham && chuaTraLoi && (
           <span className="m3-chip" data-vai-tro="secondary">
             Chưa trả lời — chưa được tính
@@ -471,7 +494,7 @@ function TheCauOn({
       )}
 
       {/* Nút Hỏi thầy TRƯỚC khi nộp (thầy lệnh 29/09); nộp xong thì nút nằm trong hộp lời giải bên dưới. */}
-      {!daCham && <NutHoiThay qid={c.qid} nguon="on_lai" gon onHoi={() => setDaHoi(c.qid)} />}
+      {!daCham && <NutHoiThay qid={c.qid} nguon="on_lai" gon onHoi={() => { setDaHoi(c.qid); onHoi?.() }} />}
       {daCham && daHoi === c.qid && (
         <p className="lco-da-hoi" role="note">Em đã hỏi thầy trước khi nộp nên câu này chưa tính là tự làm được. Câu sẽ quay lại lịch ôn để em tự làm.</p>
       )}

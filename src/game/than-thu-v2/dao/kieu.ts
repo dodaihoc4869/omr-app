@@ -9,7 +9,11 @@ export interface DaoProfile{nickname?:string;pet:string;choice:boolean;cap:numbe
  khienConLai?:number
  ngayMoKhienQua?:number
  soNgayDat?:number
- renKhien?:{gia:number;duTru:number;manh:number}
+ /** Giá rèn một khiên. Luật v4 (29/09): `donVi:'vang'` ⇒ `gia` là VÀNG (1 400), `duTru` = 0; máy chủ cũ (không có `donVi`) ⇒ `gia` là EXP. */
+ renKhien?:{gia:number;duTru:number;manh:number;donVi?:'vang'}
+ /** Luật v4: EXP chờ mốc cấp 10 (chưa đủ `ngayMoCap10` ngày đạt). Vắng ⇒ 0. */
+ choMoc?:number
+ ngayMoCap10?:number
  khienRen?:{manh:number;daRen?:number;chuaDung?:number;conLai?:number;moiKhien:number}
  /** THẦN THÚ MỖI NGÀY (Điều 1, Đợt 1): hôm nay thú đã hấp thụ `da` EXP; hôm nay được ăn tối đa `tran` (200 khi đạt nhiệm vụ ngày · 120 khi có học · 0 khi chưa học). `lyDo` = vì sao lần nạp gần nhất bị chặn:
   *  'no' (đủ trần) · 'chua_hoc' · 'het_ong' · 'cap_toi_da' · null. Máy chủ cũ KHÔNG có trường này ⇒ màn ẩn thanh. */
