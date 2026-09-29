@@ -24,7 +24,7 @@ import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
-import { CAU_HINH_DE_RIENG_MAC_DINH } from '../lib/cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, docPhamViHoiLai } from '../lib/cau-hinh-de-rieng'
 import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
 import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
@@ -124,7 +124,9 @@ export function BangBienBanLap({ bb, tenCua }: { bb: BienBanDeRieng; tenCua: (sb
             chuyện tìm ca em có nộp; LẤY mấy ca mới là điều thầy chốt. */}
         {bb.caDaQuet.length === 0
           ? 'không quét được ca nào trước đó'
-          : bb.phamVi === 'ba_ca'
+          : bb.phamVi === 'khong'
+            ? `không rút câu sai — bỏ mọi câu em đã làm ở ${bb.caDaQuet.length} ca đã dò: ${bb.caDaQuet.join(' · ')}`
+            : bb.phamVi === 'ba_ca'
             ? `mỗi em lấy tối đa 3 ca gần nhất CHÍNH EM có nộp — đã dò ${bb.caDaQuet.length} ca: ${bb.caDaQuet.join(' · ')}`
             : `lấy ca gần nhất em có nộp — đã dò ${bb.caDaQuet.length} ca: ${bb.caDaQuet.join(' · ')}`}
         {bb.lucRut ? ` · rút lúc ${ngayGio(bb.lucRut)}` : ''}
@@ -852,7 +854,7 @@ export default function ExamMonitorScreen() {
       ? new Set(teacherBank.flatMap((t) => [...t.phanI, ...t.phanII, ...t.phanIII].map((q) => q.id)))
       : null
     return vaBienBanCu(bienBanGoc, {
-      phamViCa: (chiTiet?.ca as { phamViHoiLai?: 'gan_nhat' | 'ba_ca' } | undefined)?.phamViHoiLai ?? null,
+      phamViCa: (chiTiet?.ca as { phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' } | undefined)?.phamViHoiLai ?? null,
       lapTheoEm: deRiengCa?.lapTheoEm ?? chiTiet?.lapTheoEm ?? lapDungLai?.lapTheoEm ?? null,
       qidTrongKho: kho,
     })
@@ -908,6 +910,7 @@ export default function ExamMonitorScreen() {
       // trên máy tính là màn hình trống (thầy chốt 08/09: "máy nào cũng được").
       let bienBan: BienBanDeRieng | undefined
       let demSai: Record<string, Record<string, number>> | undefined
+      let daLamLaiTheoEm: Record<string, Record<string, string>> | undefined
       if (caCanDeRieng) {
         // ĐÚNG NHỮNG EM TRONG PHÒNG CHỜ — không ∪ cả lớp đăng ký (vá 19/09). Bản 17/09
         // gộp thêm mọi em cùng lớp: em vắng cũng chiếm một suất chia vòng tròn, nên
@@ -922,7 +925,7 @@ export default function ExamMonitorScreen() {
         }
         // PHẠM VI thầy chọn lúc mở ca, đọc từ máy chủ nên máy nào bấm Bắt đầu
         // cũng rút đúng thứ thầy đã chốt.
-        const pv = (chiTiet.ca as { phamViHoiLai?: 'gan_nhat' | 'ba_ca' }).phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat'
+        const pv = docPhamViHoiLai((chiTiet.ca as { phamViHoiLai?: unknown }).phamViHoiLai)
         // LƯỢT HAI (19/09): em CÙNG LỚP chưa kịp vào phòng chờ vẫn được chuẩn bị đề
         // riêng, nhưng tính SAU khi mọi em trong `dsCho` đã chốt — không chiếm suất
         // chia của ai, không vào con số nào của biên bản. Ca không ghi lớp thì thôi.
@@ -944,8 +947,10 @@ export default function ExamMonitorScreen() {
           cauGocTheoEm: ra.cauGocTheoEm,
           songSinhTheoEm: ra.songSinhTheoEm,
           ghiChu: ra.ghiChu,
+          ...(Object.keys(ra.daLamLaiTheoEm).length > 0 ? { daLamLaiTheoEm: ra.daLamLaiTheoEm } : {}),
           lucRut: new Date().toISOString(),
         }
+        daLamLaiTheoEm = ra.daLamLaiTheoEm
         demSai = ra.lapCua
         await luuDeRiengCa(chiTiet.ca.maCa, ra.boTheoEm, ra.lapCua, ra.lapTheoEm, bienBan)
         const tongSongSinh = Object.values(ra.songSinhTheoEm ?? {}).reduce((s, a) => s + (a?.length ?? 0), 0)
@@ -988,7 +993,7 @@ export default function ExamMonitorScreen() {
           }
         }
       }
-      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>, gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false)
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>, gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false, daLamLaiTheoEm)
       for (const d of bcTranTrung) showToast(d, d.startsWith('Không dựng được') ? 'error' : 'success')
       if (kq.thieuBoTheoEm) {
         // KHÔNG NUỐT. Ca đã phát đề trước khi có bản đồ ⇒ em làm một bộ câu,

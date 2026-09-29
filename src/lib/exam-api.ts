@@ -9,7 +9,7 @@ import type { DiemMotCa } from './phieu-du-lieu'
 import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
-import { cauLapCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
+import { cauLapCuaEm, daLamLaiCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { taoCaDaXacNhan } from './day-ca-may-chu-moi'
@@ -18,6 +18,7 @@ import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
+import { docPhamViHoiLai } from './cau-hinh-de-rieng'
 import { donTheoMocReset } from './don-moc-reset-giao-vien'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -266,6 +267,9 @@ export type KetQuaVaoThi =
       /** qid → SỐ LẦN em đã sai câu đó TRƯỚC ca này. Nguồn của nhãn "sai lần
        * thứ N" và mục "Đã sửa được" trong báo cáo em xem ngay sau khi nộp. */
       demLap?: Record<string, number>
+      /** Ca "Không rút câu sai": qid → 'dd/mm' câu em đã làm ở ca kiểm tra trước,
+       * phát lại vì kho thiếu. Máy em in nhãn "Đã làm ở ca kiểm tra dd/mm". */
+      daLamLai?: Record<string, string>
     }
   | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
 
@@ -458,6 +462,8 @@ export async function batDauThi(
    * phải đúng cái máy đã bấm Bắt đầu (thầy chốt 08/09: "máy nào cũng được"). */
   bienBan?: Record<string, unknown> | null,
   dongBoGio?: boolean,
+  /** Ca "Không rút câu sai": sbd → (qid → 'dd/mm') câu phải làm lại vì kho thiếu. */
+  daLamLaiTheoEm?: Record<string, Record<string, string>>,
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean; chuaSangMayChuMoi: boolean }> {
   const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan, dongBoGio })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
@@ -482,7 +488,9 @@ export async function batDauThi(
         secret,
         maCa,
         String(r.batDauLuc ?? ''),
-        boTheoEm ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null } : undefined,
+        boTheoEm
+          ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null, ...(daLamLaiTheoEm && Object.keys(daLamLaiTheoEm).length > 0 ? { daLam: daLamLaiTheoEm } : {}) }
+          : undefined,
       )
       chuaSangMayChuMoi = !xong
     }
@@ -566,7 +574,7 @@ async function vaoThiQuaMayChuMoi(
   // Không đoán, vì đoán sai ở đây là em làm bài trên một lượt không tồn tại.
   if (!r.cach) throw new Error('Máy chủ trả lời thiếu trường "cách vào" — báo Thầy.')
 
-  const goi = (r.boTheoEm ?? null) as { bo?: Record<string, string[]>; lap?: Record<string, string[]>; dem?: Record<string, Record<string, number>> } | null
+  const goi = (r.boTheoEm ?? null) as { bo?: Record<string, string[]>; lap?: Record<string, string[]>; dem?: Record<string, Record<string, number>>; daLam?: Record<string, unknown> } | null
   const coBanDo = !!goi && !!goi.bo && Object.keys(goi.bo).length > 0
   const boEm = coBanDo ? goi!.bo![sbd] : undefined
   // CA ĐỀ RIÊNG MÀ BẢN ĐỒ THIẾU PHẦN CỦA EM ⇒ TỪ CHỐI HẲN, không phát đề.
@@ -623,6 +631,7 @@ async function vaoThiQuaMayChuMoi(
     cauLap: cauLapCuaEm(goi?.lap?.[sbd]),
     boCuaEm: cauLapCuaEm(boEm),
     demLap: demLapCuaEm(goi?.dem?.[sbd], cauLapCuaEm(goi?.lap?.[sbd])),
+    daLamLai: daLamLaiCuaEm(goi?.daLam?.[sbd]),
   }
 }
 
@@ -754,7 +763,7 @@ export interface MocThoiGianCa {
    * phải rút bộ câu riêng (thầy bắt được ở ca 933467, 08/09). */
   deRieng?: boolean
   /** Lấy câu sai của ca gần nhất hay gộp 3 ca gần nhất (thầy chốt 08/09). */
-  phamViHoiLai?: 'gan_nhat' | 'ba_ca'
+  phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong'
   matKhau?: string
   chiNop3PhutCuoi?: boolean
 }
@@ -847,7 +856,7 @@ export async function publishSession(
                 : '',
           lenBang: moc.lenBang !== false,
           deRieng: moc.deRieng === true,
-          phamViHoiLai: moc.phamViHoiLai === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+          phamViHoiLai: docPhamViHoiLai(moc.phamViHoiLai),
           matKhau: moc.matKhau?.trim() || undefined,
           chiNop3PhutCuoi: moc.chiNop3PhutCuoi === true,
         },
@@ -2148,8 +2157,8 @@ export interface CaTomTat {
   /** CA ĐỀ RIÊNG TỪNG EM — đọc từ máy chủ, nên máy nào mở ca cũng biết.
    * Ca mở trước 08/09 không có cột này ⇒ false, chạy y như trước. */
   deRieng?: boolean
-  /** Phạm vi lấy câu sai của ca đề riêng: 'gan_nhat' | 'ba_ca'. */
-  phamViHoiLai?: 'gan_nhat' | 'ba_ca'
+  /** Phạm vi lấy câu sai của ca đề riêng: 'gan_nhat' | 'ba_ca' | 'khong'. */
+  phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong'
   daVao: number
   daNop: number
   canhBao: number

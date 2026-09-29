@@ -603,10 +603,13 @@ function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: string): R
 
   const lap = doiTuong(goi.lap)[sbd]
   const dem = doiTuong(goi.dem)[sbd]
+  // Ca "Không rút câu sai" (29/09): nhãn "đã làm ở ca dd/mm" của CHÍNH em — chỉ qid + ngày, không đáp án.
+  const daLam = doiTuong(goi.daLam)[sbd]
   return {
     bo: { [sbd]: cua },
     lap: Array.isArray(lap) ? { [sbd]: lap } : {},
     dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
+    ...(daLam && typeof daLam === 'object' && !Array.isArray(daLam) ? { daLam: { [sbd]: daLam } } : {}),
     bb: null,
   }
 }

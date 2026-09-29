@@ -159,7 +159,7 @@ export default function ExamSetupScreen() {
   // Danh sách em để tích: danh sách lớp trên máy (Google Sheet) — không có thì lấy danh sách lớp đã nạp lên máy chủ.
   const [dsDangKy, setDsDangKy] = useState<{ sbd: string; hoTen: string; lop: string }[] | null>(null)
   // Bộ câu màn Rút đề chốt; null = thầy chọn lấy trọn kho (đường cũ).
-  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: 'gan_nhat' | 'ba_ca' } | null>(null)
+  const [boRut, setBoRut] = useState<{ ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' } | null>(null)
   // Câu đã ra ở các ca trước (đọc từ bản đề CÓ đáp án đã lưu của từng ca) — để
   // rút đề tránh phát lại câu lớp vừa làm tuần trước.
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
