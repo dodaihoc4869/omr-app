@@ -1,0 +1,6 @@
+[
+ {"qid":"12-C3-B8-D2-II-23","maDe":"12-C3-B8-D2","phan":"II","so":23,"viec":"dapAn","truoc":"SSSD","sau":"DSSD","lyDo":"Ý a: đọc đồ thị pH(C2H5NH2) = 11,4 ⇒ [OH⁻] = 10^-2,6 = 2,51·10⁻³ M; Kb = x²/(0,1 − x) = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵, trùng đúng số đề cho ⇒ Đúng (tính gần đúng x²/0,1 ra 6,3, không khớp số in). Hai phiên chốt độc lập cùng kết luận."},
+ {"qid":"DB-12-B8-D2-II-27","maDe":"DB-12-B8-D2","phan":"II","so":27,"viec":"dapAn","truoc":"SSSD","sau":"DSSD","lyDo":"Bản trùng của 12-C3-B8-D2-II-23: Kb = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵ ⇒ ý a Đúng."},
+ {"qid":"12-KT-C3-D2-I-16","maDe":"12-KT-C3-D2","phan":"I","so":16,"viec":"thay","truong":"de","truoc":"(b) Enzyme bất hoạt hoàn toàn ở khoảng 51 °C.","sau":"(b) Enzyme bất hoạt hoàn toàn ở khoảng 50 °C.","lyDo":"Đề lỗi (cả 4 phát biểu đều đúng, không phương án khớp). Sửa tối thiểu giữ đáp án A: đồ thị về 0 đúng ở 50 °C."},
+ {"qid":"12-KT-C3-D2-I-16","maDe":"12-KT-C3-D2","phan":"I","so":16,"viec":"thay","truong":"de","truoc":"(c) Tốc độ phản ứng thấp hơn ở nhiệt độ trên hoặc dưới 37 °C.","sau":"(c) Tốc độ phản ứng ở 45 °C cao hơn ở 37 °C.","lyDo":"Đề lỗi: (c) cũ cũng đúng theo đồ thị ⇒ không có đáp án duy nhất. Đổi (c) thành phát biểu sai rõ theo đồ thị (đỉnh ở 37 °C) để đáp án A = (a), (b), (d) là duy nhất."}
+]
