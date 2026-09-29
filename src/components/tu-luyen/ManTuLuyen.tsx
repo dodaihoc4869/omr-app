@@ -178,21 +178,31 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [khoaXt, token])
 
-  // ---- đồng hồ bài đang làm
+  // ---- đồng hồ bài đang làm. Đếm trong REF (không setState mỗi giây ⇒ danh sách thẻ câu KHÔNG vẽ lại mỗi giây — máy yếu);
+  // chỉ ô đồng hồ nhỏ (`DongHo`) tự vẽ lại. Bài dở ghi xuống máy khi em chọn đáp án và mỗi 15 giây.
   const cauDangNhin = useRef<string>('')
+  const giayRef = useRef(0)
+  const giayCauRef = useRef<Record<string, number>>({})
+  const baiRef = useRef<BaiDangLam | null>(bai)
+  baiRef.current = bai
+  const luuDo = useCallback(() => {
+    const b = baiRef.current
+    if (b) ghiNho(sbd, { ...b, giay: giayRef.current, giayCau: { ...giayCauRef.current } })
+  }, [sbd])
   useEffect(() => {
     if (!bai || ketQua) return
+    giayRef.current = bai.giay
+    giayCauRef.current = { ...bai.giayCau }
+    let dem = 0
     const t = setInterval(() => {
-      setBai((b) => {
-        if (!b) return b
-        const q = cauDangNhin.current
-        const moi = { ...b, giay: b.giay + 1, giayCau: q ? { ...b.giayCau, [q]: (b.giayCau[q] ?? 0) + 1 } : b.giayCau }
-        return moi
-      })
+      giayRef.current++
+      const q = cauDangNhin.current
+      if (q) giayCauRef.current[q] = (giayCauRef.current[q] ?? 0) + 1
+      if (++dem % 15 === 0) luuDo()
     }, 1000)
     return () => clearInterval(t)
   }, [bai?.luotId, ketQua]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (!ketQua) ghiNho(sbd, bai) }, [bai, sbd, ketQua])
+  useEffect(() => { if (!ketQua && bai) luuDo() }, [bai?.traLoi, bai?.coGoiY, bai?.luotId, ketQua, luuDo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const batDau = async (ts: ThamSoRut | null = thamSo) => {
     if (!ts) return
@@ -224,7 +234,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     if (!dongY) return
     setDangNop(true)
     setLoi('')
-    const r = await nopBai(token, bai.luotId, bai.traLoi, bai.giay, bai.giayCau, bai.coGoiY)
+    const r = await nopBai(token, bai.luotId, bai.traLoi, giayRef.current, { ...giayCauRef.current }, bai.coGoiY)
     setDangNop(false)
     if (!r.ok) { setLoi(r.loi); return }
     setKetQua({ nop: r.du, cau: bai.cau })
@@ -280,7 +290,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
           <div className="tlu-thanh-nop-trong">
             <div className="tlu-thanh-so">
               <b className="tlu-so-lon">{daLam}/{bai.cau.length}</b>
-              <span>câu đã làm · <span className="tlu-tab">{dongHo(bai.giay)}</span></span>
+              <span>câu đã làm · <DongHo giayRef={giayRef} /></span>
             </div>
             {loi && <p className="tlu-loi-nho" role="alert">{loi}</p>}
             <button type="button" className="tlu-nut-chinh" onClick={nop} disabled={dangNop}>
@@ -490,6 +500,16 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
       )}
     </div>
   )
+}
+
+/** Ô đồng hồ tự vẽ lại mỗi giây (đọc ref) — phần còn lại của màn không vẽ lại. */
+function DongHo({ giayRef }: { giayRef: { current: number } }) {
+  const [, setNhip] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setNhip((n) => n + 1), 1000)
+    return () => clearInterval(t)
+  }, [])
+  return <span className="tlu-tab" aria-label="Thời gian làm">{dongHo(giayRef.current)}</span>
 }
 
 /** Một câu ở chế độ LÀM: TheCau `thi` — không truyền `correct`/lời giải (máy em không có). */
