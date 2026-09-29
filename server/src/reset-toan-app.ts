@@ -103,6 +103,8 @@ export const BANG_XOA: readonly string[] = [
   'ke_hoach_ngay', 'len_bang',
   // Buổi học + điểm danh (bảng DẠY HỌC của Lên bảng, 28/09 — buoi-hoc.ts): danh sách có mặt từng buổi, cùng họ với `len_bang`.
   'buoi_hoc', 'buoi_hoc_diem_danh',
+  // Kiểm tra đầu giờ (dau-gio.ts, 29/09): lượt hỏi từng buổi + dấu kết thúc — cùng họ với `buoi_hoc`. Kết quả Đạt/Chưa đạt nằm ở sổ `su_kien_hoc` (GIỮ).
+  'dau_gio_hoi', 'dau_gio_buoi',
   // GIỮ CHỖ CÂU THEO LƯỢT (migration-2309-cnh1-giu-cho.sql, CNH-1.0 P05 mục 4): trạng thái ĐANG CHẠY của
   // ngày — lượt mới phải giành lại chỗ, nên reset XOÁ (không phải quyền học/không phải bằng chứng).
   'giu_cho',
@@ -163,6 +165,8 @@ export const BANG_GIU: readonly string[] = [
   // GAME HÓA 2.0 (migration-2709-game-hoa-2.sql) — bảng SINH SAU lần 21/09. Job 21/09 đã `xong` (không bao giờ chạy lại); xếp GIỮ cho job ấy = KHÔNG đụng,
   // y hệt "chưa phân loại" (chỉ khác là không bị báo). Phân loại THẬT cho lần 2 nằm ở `reset-hoa2.ts` (`srs2_ke_hoach`, `ruong_bat_linh` XOÁ; `chien_dich`, `srs2_day_lai` GIỮ).
   'chien_dich', 'srs2_ke_hoach', 'srs2_day_lai', 'ruong_bat_linh',
+  // Nhãn "Thầy đã chữa" (dau-gio.ts, 29/09) — đi cùng mốc dạy lại `srs2_day_lai` ⇒ GIỮ.
+  'thay_da_chua',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
   'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
 ]

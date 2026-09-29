@@ -62,6 +62,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'dong_bo',
   // GAME HÓA 2.0 do thầy chủ động tạo: chiến dịch luyện, mốc "Chữa xong" của buổi chữa.
   'chien_dich', 'srs2_day_lai',
+  // Nhãn "Thầy đã chữa" của Kiểm tra đầu giờ (dau-gio.ts, 29/09) — đi cùng mốc dạy lại.
+  'thay_da_chua',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
 ]
