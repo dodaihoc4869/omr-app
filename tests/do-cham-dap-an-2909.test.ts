@@ -68,13 +68,13 @@ async function doMotLan(d: D1That, token: string, qid: string, answer: string, t
   let r2 = 0
   const getGoc = d.env.DE.get.bind(d.env.DE)
   const env0 = { ...d.env, DE: { ...d.env.DE, get: (k: string) => { r2++; return getGoc(k) } } } as unknown as Env
-  const { env, d: dem } = treGia ? demVongD1(env0) : { env: env0, d: { vong: 0, dot: 0, sql: [] as string[] } }
+  const { env, d: dem } = treGia ? demVongD1(env0) : { env: env0, d: { vong: 0, dot: 0, sql: [] as string[], sqlDot: [] as string[] } }
   // ctx giả như Worker thật: việc phụ (`waitUntil`) KHÔNG tính vào thời gian trả lời em — đo lúc có phản hồi, rồi mới đợi việc phụ xong.
   const cho: Promise<unknown>[] = []
   const ctx = { waitUntil: (p: Promise<unknown>) => { cho.push(p) } }
   const t = performance.now()
   const r = await (gameV2 as (...a: unknown[]) => Promise<Record<string, unknown>>)(env, 'answer', { token, session: 'LUOT1', qid, answer }, ctx)
-  const m = { vong: dem.vong, dot: dem.dot, r2, ms: performance.now() - t, sql: [...dem.sql] }
+  const m = { vong: dem.vong, dot: dem.dot, r2, ms: performance.now() - t, sql: [...dem.sqlDot] }
   await Promise.all(cho)
   return { r, m }
 }
@@ -129,7 +129,7 @@ describe('ĐO đường nóng khác của app HS (qua gameV2, như máy em gọi
       const { env, d: dem } = demVongD1(d.env)
       const r = await gameV2(env, lenh, { token, mode: 'adventure' }).catch((e: Error) => ({ ok: false, error: e.message })) as Record<string, unknown>
       console.log(`DO|${lenh}|ok=${r.ok}|vong=${dem.vong}|dot=${dem.dot}`)
-      writeFileSync(`${process.env.DO_RA ?? '/tmp'}/do-${lenh}-sql.txt`, dem.sql.map((s) => s.replace(/\s+/g, ' ').slice(0, 160)).join('\n'))
+      writeFileSync(`${process.env.DO_RA ?? '/tmp'}/do-${lenh}-sql.txt`, dem.sqlDot.map((s) => s.replace(/\s+/g, ' ').slice(0, 160)).join('\n'))
     }
   }, 60_000)
 })

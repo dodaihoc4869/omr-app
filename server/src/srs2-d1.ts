@@ -613,14 +613,16 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
  * câu bảo vệ vẫn KHÔNG ra máy em. Ca công bố xong ⇒ câu tự quay lại kế hoạch hôm nay (không ghi gì vào `srs2_ke_hoach`).
  */
 export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
+  // 29/09 (cao điểm 20h–24h): tập câu bảo vệ ca thi (dùng chung mọi em, đệm 5 s trong isolate) đọc SONG SONG với kế hoạch — trước: một đợt D1 nối tiếp sau kế hoạch.
+  const chanSom = protectedQuestions(env).catch(() => new Set<string>())
   const r = await layKeHoachChot(env, sbd, nowMs, hs)
-  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs), hs: r.hs }
+  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom), hs: r.hs }
 }
 
 /** Bỏ câu CÒN LẠI đang bị ca khoá / đã rút khỏi kho khỏi kế hoạch (câu đã làm giữ nguyên). Lỗi đọc bảo vệ ⇒ không bỏ gì (nơi phát câu vẫn tự chặn). */
-export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>): Promise<KeHoachDaChot> {
+export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>, chanSom?: Promise<Set<string>>): Promise<KeHoachDaChot> {
   if (!kh.conDao.length && !kh.conDoan.length) return kh
-  const chan = await protectedQuestions(env).catch(() => new Set<string>())
+  const chan = await (chanSom ?? protectedQuestions(env).catch(() => new Set<string>()))
   let ca = 0, kho = 0
   const bo = new Set<string>()
   for (const k of [...kh.conDao, ...kh.conDoan]) {
