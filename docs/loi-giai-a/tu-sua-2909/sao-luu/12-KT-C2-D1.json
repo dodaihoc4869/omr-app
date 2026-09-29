@@ -1,0 +1,73 @@
+{
+ "12-KT-C2-D1-I-6": {
+  "luc": "2026-09-29T11:35:28.449Z",
+  "cau": {
+   "phan": "I",
+   "so": 6,
+   "de": "Nhận xét nào dưới dây là không đúng khi nói về glucose và frucrose?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Đều tạo được dung dịch màu xanh lam khi tác dụng với Cu(OH)2 trong môi trường kiềm",
+    "B": "Đều tạo được kết tủa đỏ gạch Cu₂O khi tác dụng với Cu(OH)₂, đun nóng trong môi trường kiềm",
+    "C": "Đều làm mất màu nước bromine",
+    "D": "Đều xảy ra phản ứng tráng bạc khi tác dụng với thuốc thử Tollens"
+   },
+   "loi_giai": {
+    "chot": "Fructose không có nhóm –CHO nên không làm mất màu nước bromine; glucose thì có. Đây là phép thử phân biệt hai chất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với cả hai: nhiều nhóm –OH kề nhau cho phức xanh lam."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng với cả hai: trong môi trường kiềm fructose chuyển thành glucose rồi khử Cu(II)."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là nhận xét SAI: chỉ glucose làm mất màu nước bromine, fructose thì không."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng với cả hai vì môi trường kiềm của thuốc thử làm fructose chuyển hoá."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

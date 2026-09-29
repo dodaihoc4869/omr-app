@@ -129,5 +129,69 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI_IA_IIA"
   }
+ },
+ "12-C7-B24-I-51": {
+  "luc": "2026-09-29T11:35:11.942Z",
+  "cau": {
+   "phan": "I",
+   "so": 51,
+   "de": "Trong dãy hydroxide của kim loại nhóm IIA từ M g(OH ) 2 đến Ba(OH)₂, hydroxide nào có độ tan lớn nhất?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Kim loại nhóm IA, IIA",
+   "muc_do": "biet",
+   "pa": {
+    "A": "M g(OH ) 2",
+    "B": "Ca(OH)₂",
+    "C": "Ba(OH)₂",
+    "D": "Sr(OH)₂"
+   },
+   "loi_giai": {
+    "chot": "Trong nhóm IIA, độ tan của hydroxide tăng từ Mg(OH)₂ đến Ba(OH)₂ nên Ba(OH)₂ tan nhiều nhất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: Mg(OH)₂ gần như không tan."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: Ca(OH)₂ ít tan (nước vôi trong)."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: Ba(OH)₂ tan tốt, dung dịch có tính base mạnh."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: Sr(OH)₂ tan ít hơn Ba(OH)₂."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI_IA_IIA.DO_TAN.NHAN_DANG",
+    "ten": "Độ tan hợp chất — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-12",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI_IA_IIA"
+  }
  }
 }

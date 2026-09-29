@@ -326,5 +326,78 @@
    "nguonDe": "12-C3-B8-D2",
    "nguonCau": "I-5"
   }
+ },
+ "DB-12-B8-D1-I-287": {
+  "luc": "2026-09-29T11:36:57.873Z",
+  "cau": {
+   "phan": "I",
+   "so": 287,
+   "de": "Các amine CH₃NH₂, CH₃NHCH₃, CH₃CH₂NH₂ tan nhiều trong nước. Nguyên nhân là do các amine này",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "hình thành lực tương tác van der Waals lớn giữa các phân tử",
+    "B": "tạo được liên kết hydrogen với nước",
+    "C": "tạo được liên kết hydrogen liên phân tử với nhau",
+    "D": "đều ở thể khí nên đễ phân tán vào nước"
+   },
+   "loi_giai": {
+    "chot": "Nhóm −NH₂ và −NH− còn nguyên tử hydrogen và cặp electron chưa liên kết nên tạo được liên kết hydrogen với nước.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Lực van der Waals giữa các phân tử amine không giải thích được độ tan trong nước."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: amine tạo liên kết hydrogen với phân tử nước."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Liên kết hydrogen giữa các phân tử amine với nhau không làm chúng tan trong nước."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nhiều amine là chất lỏng nhưng vẫn tan tốt trong nước."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_CAU_TAO.GIAI_THICH",
+    "ten": "Amine — cấu tạo — giải thích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B8-D1",
+    "ten": "Thiết lập công thức phân tử amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-KT-C34-D2",
+   "nguonCau": "I-1"
+  }
  }
 }

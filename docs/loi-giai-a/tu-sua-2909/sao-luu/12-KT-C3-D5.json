@@ -1,0 +1,141 @@
+{
+ "12-KT-C3-D5-I-14": {
+  "luc": "2026-09-29T11:35:42.725Z",
+  "cau": {
+   "phan": "I",
+   "so": 14,
+   "de": "Lysine là một trong các amino acid thiên nhiên thiết yếu cho sự sống, tham gia cấu tạo nên protein và các hormon như insulin.\nPhát biểu nào sau đây không đúng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Phân tử lysine tồn tại ở dạng ion lưỡng cực",
+    "B": "Lysin có thể được tổng hợp tự nhiên trong cơ thể người",
+    "C": "Công thức phân tử của lysine là C₆H₁₄O₂N₂",
+    "D": "Lysine được tìm thấy trong các loại thực phẩm như thịt, cá và đậu"
+   },
+   "loi_giai": {
+    "chot": "Lysine là amino acid thiết yếu, cơ thể người không tự tổng hợp được mà phải nhận qua thức ăn.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Lysine cũng tồn tại ở dạng ion lưỡng cực như các amino acid khác."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng là chỗ sai: lysine là amino acid thiết yếu, cơ thể không tự tổng hợp."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Lysine đúng là C₆H₁₄O₂N₂."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Thịt, cá và đậu đều là nguồn lysine."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ },
+ "12-KT-C3-D5-I-8": {
+  "luc": "2026-09-29T11:35:42.725Z",
+  "cau": {
+   "phan": "I",
+   "so": 8,
+   "de": "Trong cấu trúc phân tử của chất cho ở hình dưới đây, liên kết peptide là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_8.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "liên kết (1)",
+    "B": "liên kết (3)",
+    "C": "liên kết (2)",
+    "D": "liên kết (4). Mã đề thi: 315"
+   },
+   "loi_giai": {
+    "chot": "Liên kết peptide là liên kết giữa nguyên tử carbon của nhóm C=O với nguyên tử nitrogen của nhóm NH, tức liên kết số (2).",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Liên kết (1) là liên kết đôi C=O của nhóm carbonyl."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Liên kết (3) nối carbon alpha với carbon của nhóm C=O."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: liên kết (2) nối carbon của nhóm C=O với nitrogen."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Liên kết (4) nối nitrogen với carbon alpha của gốc tiếp theo."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.NHAN_DANG",
+    "ten": "Peptide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

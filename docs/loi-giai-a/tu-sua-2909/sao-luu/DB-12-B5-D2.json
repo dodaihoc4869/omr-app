@@ -475,5 +475,78 @@
    "nguonDe": "DH-12-C2-B4",
    "nguonCau": "III-2"
   }
+ },
+ "DB-12-B5-D2-I-193": {
+  "luc": "2026-09-29T11:36:48.979Z",
+  "cau": {
+   "phan": "I",
+   "so": 193,
+   "de": "Chế độ ăn uống của Việt Nam chú trọng đến sự cân bằng dinh dưỡng và chú ý đến \"màu sắc, hương vị và hình dạng\".\nCác tuyên bố sau đây không chính xác?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Nấu sườn heo chua ngọt với saccharose xào màu caramel, saccharose thuộc loại disaccharide",
+    "B": "Dầu đậu phộng mới ép có mùi thơm đăc trưng. Dầu đậu phộng thuộc loại ester của ethylene glycol",
+    "C": "Củ hành, củ kiệu kết hợp với đường, giấm tạo vị chua ngọt. Giấm ăn có thể tạo ra từ rượu bằng phản ứng lên men",
+    "D": "Trong ngày Tết, gạo nếp nguyên liệu chính để nấu bánh chưng. Tinh bột trong gạo nếp có thể được thủy phân"
+   },
+   "loi_giai": {
+    "chot": "Chất béo trong dầu đậu phộng là triester của glycerol chứ không phải của ethylene glycol.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: saccharose gồm hai đơn vị monosaccharide."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng là tuyên bố sai: dầu đậu phộng là ester của glycerol."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: lên men giấm biến ethanol thành acetic acid."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: tinh bột trong gạo nếp thuỷ phân được."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.NHAN_DANG",
+    "ten": "Ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-KT-C1234-D2",
+   "nguonCau": "I-11"
+  }
  }
 }

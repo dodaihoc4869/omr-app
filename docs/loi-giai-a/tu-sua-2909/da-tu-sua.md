@@ -213,3 +213,94 @@ Sao lưu bản gốc từng câu: `sao-luu/<mã đề>.json`. Lùi: `node script
 | 08:26:34 | 12-BD7-18-I-2 | pa.D: «Maltose tồn tại dạng mạch vòng và mạch hở trong dung dịch.» → «Maltose chỉ tồn tại ở dạng mạch hở trong dung dịch.» | Bản cũ của D cũng đúng (maltose còn nhóm –OH hemiacetal nên trong dung dịch có cân bằng dạng vòng ⇌ dạng mạch hở, SGK Hoá 12) nên câu có hai đáp án B và D. Sửa D thành phát biểu sai để giữ đáp án kho B duy nhất đúng. |
 | 08:26:37 | 12-KT-C4-D4-I-11 | pa.A: «Vật liệu nền có thể là chất dẻo hoặc cao su» → «Vật liệu nền chỉ có thể là chất dẻo» | A cũ đúng (nền polymer gồm chất dẻo, cao su). SGK Hoá 12: vật liệu nền có thể là polymer, kim loại hoặc gốm nên "chỉ có thể là chất dẻo" sai. Kết hợp với sửa C để D (kho) là đáp án đúng duy nhất. |
 | 08:26:37 | 12-KT-C4-D4-I-11 | pa.C: «để tăng tính chất cơ lí» → «để làm giảm độ bền cơ học của vật liệu» | C cũ đúng (cốt giúp composite có đặc tính cơ học cần thiết). Đổi thành "làm giảm độ bền cơ học" là sai rõ ràng; cùng với sửa A, chỉ còn D (cốt dạng sợi hoặc dạng bột/hạt) đúng — khớp đáp án kho D. B vẫn sai (liên kết các thành phần là vai trò của nền). |
+| 11:34:50 | 12-C1-B1-D1-I-70 | de: «Công thức của cấu tạo của A» → «Công thức cấu tạo của A» | Đề in thừa chữ: "Công thức của cấu tạo của A". |
+| 11:34:54 | 12-C1-B1-D3-I-65 | pa.B: «tripanmitin» → «tripalmitin» | Phương án B in sai chính tả "tripanmitin", đúng là tripalmitin. |
+| 11:34:57 | 12-C2-B6-D1-I-72 | de: «tham giả» → «tham gia» | Đề in lỗi chính tả: "tham giả" (đúng: "tham gia"). |
+| 11:35:02 | 12-C2-B6-D2-I-32 | de: «đơn vị a-glucose, nối với nhau qua liên kết a-1,2-glycoside» → «đơn vị α-glucose, nối với nhau qua liên kết α-1,2-glycoside» | Đề viết chữ Latin "a" thay cho α. |
+| 11:35:02 | 12-C2-B6-D2-II-36 | y.d: «enzyme a-amylase» → «enzyme α-amylase» | Ý d viết chữ Latin "a" thay cho α. |
+| 11:35:02 | 12-C2-B6-D2-II-39 | y.a: «đơn vị b-glucose, nối với nhau qua liên kết b-1,4-glycoside» → «đơn vị β-glucose, nối với nhau qua liên kết β-1,4-glycoside» | Ý a viết chữ Latin "b" thay cho β. |
+| 11:35:02 | 12-C2-B6-D2-II-39 | y.b: «đơn vị a-glucose, nối với nhau qua liên kết a-1,4-glycoside» → «đơn vị α-glucose, nối với nhau qua liên kết α-1,4-glycoside» | Ý b viết chữ Latin "a" thay cho α. |
+| 11:35:05 | 12-C3-B10-D2-I-15 | pa.C: «so với với xúc tác» → «so với xúc tác» | Phương án C, D in "so với với" (lặp chữ "với"). |
+| 11:35:05 | 12-C3-B10-D2-II-22 | y.a: «thịt,.» → «thịt.» | Ý a có dấu phẩy thừa cuối câu: "thịt,.". |
+| 11:35:09 | 12-C5-B16-I-41 | de: «sử dung anode» → «sử dụng anode» | Đề in sai chính tả: "sử dung" thay vì "sử dụng". |
+| 11:35:09 | 12-C5-B16-I-50 | đáp án B → D | Đề ghi rõ điện cực trơ. (a) đúng: cation về cathode (cực âm), anion về anode (cực dương). (b) đúng: anode trơ không tan nên chỉ oxi hoá anion hoặc H₂O (SGK Hoá 12 bài Điện phân). (c) đúng: cathode khử cation (kể cả H⁺ của acid, cũng là cation) hoặc H₂O. (d) đúng: sản phẩm luôn là kim loại bám cathode hoặc khí thoát ra nên khối lượng dung dịch giảm. Có 4 phát biểu đúng → D. Lời giải cũ bác (b), (c) bằng anode tan, trái điều kiện đề. |
+| 11:35:11 | 12-C6-B20-I-9 | de: «khối lớp rắn» → «khối lượng lớp vỏ rắn» | Đề in "khối lớp rắn", thiếu chữ: nên là "khối lượng lớp vỏ rắn". |
+| 11:35:15 | 12-C7-B24-I-51 | de: «M g(OH ) 2» → «Mg(OH)₂» | Đề và phương án A có khoảng trắng trong công thức {Mg(OH)2} ("M g(OH ) 2"); chỉ số ₂ ở các ý khác dùng kí tự dưới. |
+| 11:35:17 | 12-C8-B26-I-13 | pa.D: «eletron» → «electron» | Phương án D in sai chính tả "eletron" (thiếu chữ c). |
+| 11:35:20 | 12-KT-C1-D2-I-9 | de: «Công thức của cấu tạo của A» → «Công thức cấu tạo của A» | Đề in thừa chữ: "Công thức của cấu tạo của A". |
+| 11:35:22 | 12-KT-C1-D4-I-10 | pa.B: «tripanmitin» → «tripalmitin» | Phương án B in sai chính tả "tripanmitin", đúng là tripalmitin. |
+| 11:35:25 | 12-KT-C12-D1-I-17 | pa.B: «Thuý phân» → «Thuỷ phân» | Phương án B viết sai chính tả "Thuý phân". |
+| 11:35:28 | 12-KT-C1234-D2-I-11 | pa.B: «đăc trưng» → «đặc trưng» | Phương án B viết sai chính tả "đăc". |
+| 11:35:31 | 12-KT-C2-D1-I-6 | de: «frucrose» → «fructose» | Đề in sai chính tả: "frucrose". |
+| 11:35:31 | 12-KT-C2-D1-I-6 | de: «dưới dây» → «dưới đây» | Đề in sai chính tả: "dưới dây". |
+| 11:35:33 | 12-KT-C2-D2-I-10 | pa.D: «4. Mã đề thi: 212» → «4» | Phương án D lẫn chữ "Mã đề thi: 212" của trang đề. |
+| 11:35:33 | 12-KT-C2-D2-I-8 | đáp án A → B | Tự giải từ 4 hình Fischer (hình gắn đúng phương án A–D): D-fructose (SGK Hoá 12: fructose tự nhiên là D-fructose) có C2 là C=O, -OH ở C3 bên trái, C4 bên phải, C5 bên phải. Hình A: C3 trái, C4 phải, C5 TRÁI (đó là L-sorbose, sai cấu hình D). Hình B: C3 trái, C4 phải, C5 phải = D-fructose. Hình C: C3 phải, C4 phải, C5 trái (sai). Hình D: C3 phải, C4 trái, C5 phải (D-sorbose, ảnh gương của A). Chỉ B đúng nên đáp án A → B. |
+| 11:35:36 | 12-KT-C2-D3-II-1 | de: «quann trọng» → «quan trọng» | Đề in sai chính tả "quann trọng". |
+| 11:35:38 | 12-KT-C3-D1-I-15 | pa.C: «so với với xúc tác» → «so với xúc tác» | Phương án C, D in "so với với" (lặp chữ "với"). |
+| 11:35:41 | 12-KT-C3-D4-I-14 | pa.C: «3)-b» → «3)-b)» | Phương án C thiếu dấu đóng ngoặc ở "3)-b". |
+| 11:35:50 | 12-KT-C3-D5-I-14 | pa.B: «Lysin có thể» → «Lysine có thể» | Phương án B viết "Lysin", cần thống nhất "Lysine" như các phương án khác. |
+| 11:35:50 | 12-KT-C3-D5-I-8 | pa.D: «liên kết (4). Mã đề thi: 315» → «liên kết (4)» | Phương án D dính chữ "Mã đề thi: 315" lẫn vào nội dung, cần bỏ. |
+| 11:35:54 | 12-KT-C34-D1-I-5 | de: «thuẏ» → «thuỷ» | Đề in sai chính tả: "thuẏ" (dấu chấm lệch), cần "thuỷ". |
+| 11:35:54 | 12-KT-C34-D1-I-5 | de: «truờng» → «trường» | Đề in sai chính tả: "truờng", cần "trường". |
+| 11:35:57 | 12-KT-C34-D2-I-1 | pa.D: «đễ» → «dễ» | Phương án D in sai chính tả: "đễ", cần "dễ". |
+| 11:35:59 | 12-KT-C4-D2-I-12 | de: «Trùng họp» → «Trùng hợp» | Đề in sai chính tả: "Trùng họp" phải là "Trùng hợp". |
+| 11:35:59 | 12-KT-C4-D2-I-4 | pa.C: «Polybutadien» → «Polybutadiene» | Phương án C in "Polybutadien", thiếu chữ e cuối (phải là polybutadiene, như các tên khác). |
+| 11:35:59 | 12-KT-C4-D2-I-5 | pa.C: «bị mà phân hủy» → «bị phân hủy» | Phương án C in "bị mà phân hủy", thừa chữ "mà". |
+| 11:36:01 | 12-KT-C5-D4-I-7 | pa.A: «Platinium» → «platinum» | Phương án A viết "Platinium", chính tả chuẩn là "platinum". |
+| 11:36:05 | 12-KT-C5-D5-I-7 | pa.A: «Platinium» → «platinum» | Phương án A viết "Platinium", chính tả chuẩn là "platinum". |
+| 11:36:08 | 12-KT-C56-D2-II-2 | y.d: «Sức điện động chuẩn của pin là 1,10 V là không thay đổi» → «Sức điện động của pin là 1,10 V và không thay đổi» | Ý d: chữ "chuẩn" thừa và câu có hai chữ "là". Sức điện động chuẩn E° là hằng số nên đọc nguyên văn thì phát biểu đúng, trái đáp án S. Đề nói rõ số chỉ vôn kế 1,10 V lúc bắt đầu (1,00 M), nên ý đề muốn hỏi sức điện động đo được. Bỏ "chuẩn" thì đáp án S đứng đúng. |
+| 11:36:10 | 12-KT-C6-D4-I-16 | pa.D: «. Sử dụng thông tin dưới đây để trả lời các câu 17 - 18: Thực hiện thí nghiệm sau: Buớc 1: Cho dung dịch NaCl 5% vào ống thuỷ tinh hình chữ U như hình bên. Buớc 2: Nhúng một thanh copper và một thanh zinc đã làm sạch vào hai đầu của ống chữ U. Buớc 3: Nối hai thanh kim loại bằng dây dẫn» → «» | Phương án D dính chữ của phần dẫn câu 17–18 (thí nghiệm pin Cu–Zn), không thuộc câu này. |
+| 11:36:10 | 12-KT-C6-D4-I-5 | de: «hơp kim» → «hợp kim» | Đề in sai chính tả: "hơp kim" thay vì "hợp kim". |
+| 11:36:14 | 12-KT-C6-D5-I-11 | pa.A: «Hơp kim» → «Hợp kim» | Phương án A in sai chính tả: "Hơp kim" thay vì "Hợp kim". |
+| 11:36:19 | DB-12-B1-P1-D1-I-102 | de: «Công thức của cấu tạo của A» → «Công thức cấu tạo của A» | Đề in thừa chữ: "Công thức của cấu tạo của A". |
+| 11:36:19 | DB-12-B1-P1-D1-I-13 | de: «Công thức của cấu tạo của A» → «Công thức cấu tạo của A» | Đề in thừa chữ: "Công thức của cấu tạo của A". |
+| 11:36:19 | DB-12-B1-P1-D1-I-133 | de: «Công thức của cấu tạo của A» → «Công thức cấu tạo của A» | Đề in thừa chữ: "Công thức của cấu tạo của A". |
+| 11:36:19 | DB-12-B1-P1-D1-II-159 | de: «thí nghiện» → «thí nghiệm» | Đề in sai chính tả: "thí nghiện". |
+| 11:36:19 | DB-12-B1-P1-D1-II-159 | de: «4 mLdung dịch» → «4 mL dung dịch» | Đề thiếu dấu cách trước "dung dịch". |
+| 11:36:26 | DB-12-B1-P1-D2-II-100 | de: «5mLH₂SO₄» → «5 mL H₂SO₄» | Đề thiếu dấu cách trong "5mLH₂SO₄". |
+| 11:36:26 | DB-12-B1-P1-D2-II-100 | de: «để tách sản phẩm thu được.» → «để tách sản phẩm thu được. Mỗi phát biểu sau đây là đúng hay sai?» | Đề thiếu câu dẫn "Mỗi phát biểu sau đây là đúng hay sai?" ở cuối (câu 99 cùng thí nghiệm có câu này). |
+| 11:36:29 | DB-12-B1-P2-D3-I-15 | pa.B: «tripanmitin» → «tripalmitin» | Phương án B in sai chính tả "tripanmitin", đúng là tripalmitin. |
+| 11:36:29 | DB-12-B1-P2-D3-I-9 | pa.B: «tripanmitin» → «tripalmitin» | Phương án B in sai chính tả "tripanmitin", đúng là tripalmitin. |
+| 11:36:33 | DB-12-B2-D1-I-166 | pa.B: «thân thiên với môi trường.» → «thân thiện với môi trường.» | Phương án B in sai chính tả: "thân thiên" (đúng là "thân thiện"). |
+| 11:36:33 | DB-12-B2-D1-II-200 | de: «mô ta quả hình dưới đây» → «mô tả ở hình dưới đây» | Đề in lỗi chính tả: "mô ta quả hình dưới đây" (đúng: "mô tả ở hình dưới đây"). Nội dung trùng câu 198. |
+| 11:36:36 | DB-12-B4-D1-I-107 | pa.D: «4. Mã đề thi: 212» → «4» | Phương án D lẫn chữ "Mã đề thi: 212" của trang đề. |
+| 11:36:36 | DB-12-B4-D1-I-138 | pa.B: «sobitol» → «sorbitol» | Đáp án B viết sai chính tả: "sobitol", đúng là "sorbitol". |
+| 11:36:41 | DB-12-B4-D2-II-89 | de: «quann trọng» → «quan trọng» | Đề in sai chính tả "quann trọng". |
+| 11:36:48 | DB-12-B4-D3-I-145 | de: «frucrose» → «fructose» | Đề in sai chính tả: "frucrose". |
+| 11:36:48 | DB-12-B4-D3-I-145 | de: «dưới dây» → «dưới đây» | Đề in sai chính tả: "dưới dây". |
+| 11:36:48 | DB-12-B4-D3-II-114 | y.a: «đơn vị b-glucose, nối với nhau qua liên kết b-1,4-glycoside» → «đơn vị β-glucose, nối với nhau qua liên kết β-1,4-glycoside» | Ý a viết chữ Latin "b" thay cho β. |
+| 11:36:48 | DB-12-B4-D3-II-114 | y.b: «đơn vị a-glucose, nối với nhau qua liên kết a-1,4-glycoside» → «đơn vị α-glucose, nối với nhau qua liên kết α-1,4-glycoside» | Ý b viết chữ Latin "a" thay cho α. |
+| 11:36:48 | DB-12-B4-D3-II-260 | de: «chúa nước nóng» → «chứa nước nóng» | Đề bước 4 có lỗi chính tả: "cốc thuỷ tinh chúa nước nóng" (chúa → chứa); "CuSO₄, 5%" thừa dấu phẩy. |
+| 11:36:48 | DB-12-B4-D3-I-152 | đáp án A → B | Tự giải từ 4 hình Fischer (hình gắn đúng phương án A–D): D-fructose (SGK Hoá 12: fructose tự nhiên là D-fructose) có C2 là C=O, -OH ở C3 bên trái, C4 bên phải, C5 bên phải. Hình A: C3 trái, C4 phải, C5 TRÁI (đó là L-sorbose, sai cấu hình D). Hình B: C3 trái, C4 phải, C5 phải = D-fructose. Hình C: C3 phải, C4 phải, C5 trái (sai). Hình D: C3 phải, C4 trái, C5 phải (D-sorbose, ảnh gương của A). Chỉ B đúng nên đáp án A → B. |
+| 11:36:52 | DB-12-B5-D2-I-193 | pa.B: «đăc trưng» → «đặc trưng» | Phương án B viết sai chính tả "đăc". |
+| 11:36:55 | DB-12-B6-D1-I-14 | de: «tham giả» → «tham gia» | Đề in lỗi chính tả: "tham giả" (đúng: "tham gia"). |
+| 11:36:55 | DB-12-B6-D1-I-42 | pa.B: «Thuý phân» → «Thuỷ phân» | Phương án B viết sai chính tả "Thuý phân". |
+| 11:36:57 | DB-12-B6-D3-I-13 | de: «đơn vị a-glucose, nối với nhau qua liên kết a-1,2-glycoside» → «đơn vị α-glucose, nối với nhau qua liên kết α-1,2-glycoside» | Đề viết chữ Latin "a" thay cho α. |
+| 11:37:04 | DB-12-B8-D1-I-287 | pa.D: «đễ» → «dễ» | Phương án D in sai chính tả: "đễ", cần "dễ". |
+| 11:37:08 | DB-12-B9-P1-D2-I-75 | pa.C: «3)-b» → «3)-b)» | Phương án C thiếu dấu đóng ngoặc ở "3)-b". |
+| 11:37:12 | DB-12-B9-P2-D1-I-129 | pa.D: «liên kết (4). Mã đề thi: 315» → «liên kết (4)» | Phương án D dính chữ "Mã đề thi: 315" lẫn vào nội dung, cần bỏ. |
+| 11:37:12 | DB-12-B9-P2-D1-II-194 | de: «Các phát biếu về cấu tạo của peptide.» → «Các phát biểu về cấu tạo của peptide.» | Đề in sai chính tả: "phát biếu". |
+| 11:37:15 | DB-12-B9-P2-D2-I-112 | pa.A: «Trong phân từ pentapeptide» → «Trong phân tử pentapeptide» | Phương án A in sai chính tả: "phân từ" thay vì "phân tử". |
+| 11:37:15 | DB-12-B9-P2-D2-I-92 | de: «thuẏ» → «thuỷ» | Đề in sai chính tả: "thuẏ" (dấu chấm lệch), cần "thuỷ". |
+| 11:37:15 | DB-12-B9-P2-D2-I-92 | de: «truờng» → «trường» | Đề in sai chính tả: "truờng", cần "trường". |
+| 11:37:15 | DB-12-B9-P2-D2-II-130 | de: «phát biếu» → «phát biểu» | Đề in sai chính tả: "phát biếu" (phải là "phát biểu"). |
+| 11:37:15 | DB-12-B9-P2-D2-II-130 | y.a: «thỉ» → «thì» | Ý a in sai chính tả: "thỉ" (phải là "thì"). |
+| 11:37:15 | DB-12-B9-P2-D2-II-130 | y.b: «có thế» → «có thể» | Ý b in sai chính tả: "có thế" (phải là "có thể"). |
+| 11:37:19 | DH-12-C1-B1-P1-I-51 | de: «Công thức của cấu tạo của A» → «Công thức cấu tạo của A» | Đề in thừa chữ: "Công thức của cấu tạo của A". |
+| 11:37:19 | DH-12-C1-B1-P1-II-32 | de: «thí nghiện» → «thí nghiệm» | Đề in sai chính tả: "thí nghiện". |
+| 11:37:19 | DH-12-C1-B1-P1-II-32 | de: «4 mLdung dịch» → «4 mL dung dịch» | Đề thiếu dấu cách trước "dung dịch". |
+| 11:37:19 | DH-12-C1-B1-P1-II-33 | de: «5mLH₂SO₄» → «5 mL H₂SO₄» | Đề thiếu dấu cách trong "5mLH₂SO₄". |
+| 11:37:19 | DH-12-C1-B1-P1-II-33 | de: «để tách sản phẩm thu được.» → «để tách sản phẩm thu được. Mỗi phát biểu sau đây là đúng hay sai?» | Đề thiếu câu dẫn "Mỗi phát biểu sau đây là đúng hay sai?" ở cuối (câu 99 cùng thí nghiệm có câu này). |
+| 11:37:24 | DH-12-C1-B2-I-29 | pa.B: «thân thiên với môi trường.» → «thân thiện với môi trường.» | Phương án B in sai chính tả: "thân thiên" (đúng là "thân thiện"). |
+| 11:37:24 | DH-12-C1-B2-II-23 | de: «mô ta quả hình dưới đây» → «mô tả ở hình dưới đây» | Đề in lỗi chính tả: "mô ta quả hình dưới đây" (đúng: "mô tả ở hình dưới đây"). Nội dung trùng câu 198. |
+| 11:37:28 | DH-12-C2-B4-I-87 | pa.B: «sobitol» → «sorbitol» | Đáp án B viết sai chính tả: "sobitol", đúng là "sorbitol". |
+| 11:37:31 | DH-12-C2-B6-II-35 | de: «chúa nước nóng» → «chứa nước nóng» | Đề bước 4 có lỗi chính tả: "cốc thuỷ tinh chúa nước nóng" (chúa → chứa); "CuSO₄, 5%" thừa dấu phẩy. |
+| 11:37:34 | DH-12-C2-B7-D1-I-1 | pa.A: «Cₙ(H₂O)m» → «Cₙ(H₂O)ₘ» | Chỉ số m trong Cₙ(H₂O)m ở phương án A không được hạ chỉ số (đề ghi ₙ nhưng m thường). |
+| 11:37:34 | DH-12-C2-B7-D1-I-1 | pa.B: «Cₙ(H₂O)m» → «Cₙ(H₂O)ₘ» | Chỉ số m trong Cₙ(H₂O)m ở phương án B không được hạ chỉ số. |
+| 11:37:34 | DH-12-C2-B7-D1-I-1 | pa.C: «Cₙ(H₂O)m» → «Cₙ(H₂O)ₘ» | Chỉ số m trong Cₙ(H₂O)m ở phương án C không được hạ chỉ số. |
+| 11:37:36 | DH-12-C3-B10-I-33 | pa.C: «so với với xúc tác» → «so với xúc tác» | Phương án C, D in "so với với" (lặp chữ "với"). |
+| 11:37:40 | DH-12-C3-B9-P2-I-40 | pa.A: «Trong phân từ pentapeptide» → «Trong phân tử pentapeptide» | Phương án A in sai chính tả: "phân từ" thay vì "phân tử". |
+| 11:37:40 | DH-12-C3-B9-P2-II-3 | de: «Các phát biếu về cấu tạo của peptide.» → «Các phát biểu về cấu tạo của peptide.» | Đề in sai chính tả: "phát biếu". |
+| 11:37:40 | DH-12-C3-B9-P2-II-9 | de: «phát biếu» → «phát biểu» | Đề in sai chính tả: "phát biếu" (phải là "phát biểu"). |
+| 11:37:40 | DH-12-C3-B9-P2-II-9 | y.a: «thỉ» → «thì» | Ý a in sai chính tả: "thỉ" (phải là "thì"). |
+| 11:37:40 | DH-12-C3-B9-P2-II-9 | y.b: «có thế» → «có thể» | Ý b in sai chính tả: "có thế" (phải là "có thể"). |

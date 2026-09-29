@@ -39,3 +39,7 @@ Kế hoạch: `ke-hoach-dot-1b.json` (đã chạy thử: 4 việc / 3 đề áp 
 - **Kb (12-C3-B8-D2-II-23, DB-12-B8-D2-II-27):** đổi đáp án SSSD → **DSSD**. Kb = x²/(0,1 − x) = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵, trùng đúng số in; cách gần đúng ra 6,3 không khớp số nào ⇒ số 6,5 là số tính đủ, ý a Đúng.
 - **Enzyme (12-KT-C3-D2-I-16):** sửa đề tối thiểu, giữ đáp án A: (b) "khoảng 51 °C" → "khoảng 50 °C"; (c) → "Tốc độ phản ứng ở 45 °C cao hơn ở 37 °C." (sai rõ theo đồ thị) ⇒ A = (a), (b), (d) là đáp án duy nhất.
 - **Alanine + Cu(OH)₂ (12-C3-B10-D2-III-27, 12-KT-C3-D2-III-3):** GIỮ đáp án kho 2, không sửa kho. Đây là câu trong bộ ôn thi TN THPT (Bài 7 Peptide, protein, enzyme — VietJack, Lazi), các nguồn đều chấm 2 (protein, ethylamine). Chỉ cần soạn lại hồ sơ lời giải: chuyển cờ `dapAn` sang `daChot` "giữ đáp án kho theo đề thi".
+
+## Đợt 2 — ĐÃ GHI 29/09 ~15:25: 63 việc / 33 đề (xem `tham-dinh-dot-2.md`).
+## Đợt 3 — ĐÃ GHI 29/09 18:40 (sau khi ca 12L2-L1 đóng + công bố): 91 việc / 48 đề — 88 sửa đề, đổi đáp án 12-C5-B16-I-50 B→D, 12-KT-C2-D2-I-8 A→B, DB-12-B4-D3-I-152 A→B (xem `tham-dinh-dot-3.md`).
+Sửa công cụ: kiểm ca khoá theo đúng luật `laSanSangCongBo` (congBo là chế độ, không phải cờ).

@@ -136,5 +136,164 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "12-KT-C2-D2-I-10": {
+  "luc": "2026-09-29T11:35:31.784Z",
+  "cau": {
+   "phan": "I",
+   "so": 10,
+   "de": "Cho các phát biểu sau:\n(1) Glucose và fructose không tham gia phản ứng thuỷ phân.\n(2) Có thể phân biệt glucose và fructose bằng nước bromine.\n(3) Carbohydrate là những hợp chất hữu cơ tạp chức, thường có công thức chung là Cₙ(H₂O)ₘ.\n(4) Chất béo không phải carbohydrate.\nSố phát biểu đúng là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "1",
+    "B": "2",
+    "C": "3",
+    "D": "4. Mã đề thi: 212"
+   },
+   "loi_giai": {
+    "chot": "Cả bốn phát biểu đều đúng: monosaccharide không thuỷ phân, nước bromine chỉ phản ứng với glucose, công thức chung là Cₙ(H₂O)ₘ, và chất béo là ester chứ không phải carbohydrate.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Quá ít, cả bốn phát biểu đều đứng vững."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Vẫn thiếu hai phát biểu đúng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Vẫn thiếu một phát biểu đúng."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: cả bốn phát biểu đều đúng."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-KT-C2-D2-I-8": {
+  "luc": "2026-09-29T11:35:31.784Z",
+  "cau": {
+   "phan": "I",
+   "so": 8,
+   "de": "Công thức nào dưới đây mô tả đúng cấu tạo của fructose ở dạng mạch hở?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_8_A.png",
+     "vi_tri": "sau_pa_A"
+    },
+    {
+     "tep": "I_8_B.png",
+     "vi_tri": "sau_pa_B"
+    },
+    {
+     "tep": "I_8_C.png",
+     "vi_tri": "sau_pa_C"
+    },
+    {
+     "tep": "I_8_D.png",
+     "vi_tri": "sau_pa_D"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "(xem hình phương án A)",
+    "B": "(xem hình phương án B)",
+    "C": "(xem hình phương án C)",
+    "D": "(xem hình phương án D)"
+   },
+   "loi_giai": {
+    "chot": "Fructose mạch hở là ketose sáu carbon: nhóm C=O nằm ở carbon số 2, còn lại là năm nhóm –OH trên khung CH₂OH-CO-CHOH-CHOH-CHOH-CH₂OH.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm carbonyl ở carbon số 2, đúng cấu tạo ketose."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đặt nhóm carbonyl ở đầu mạch, đó là cấu tạo của aldose chứ không phải fructose."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Số nhóm hydroxy không khớp với công thức C₆H₁₂O₆."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Khung carbon sai vị trí nhóm chức so với fructose."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.VIET_CTCT",
+    "ten": "Cấu tạo — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

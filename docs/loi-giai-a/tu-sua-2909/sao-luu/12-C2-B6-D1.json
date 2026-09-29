@@ -1,0 +1,76 @@
+{
+ "12-C2-B6-D1-I-72": {
+  "luc": "2026-09-29T11:34:55.103Z",
+  "cau": {
+   "phan": "I",
+   "so": 72,
+   "de": "Dãy chất nào sau đây có tất cả các chất đều không tham giả phản ứng thủy phân?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Saccharose, tinh bột.",
+    "B": "Cellulose, saccharose.",
+    "C": "Fructose, glucose.",
+    "D": "Tinh bột, maltose."
+   },
+   "loi_giai": {
+    "chot": "Chỉ monosaccharide (glucose, fructose) không tham gia phản ứng thuỷ phân.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Saccharose và tinh bột đều thuỷ phân được."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Cellulose và saccharose đều thuỷ phân được."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Fructose và glucose là monosaccharide, không thuỷ phân."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Tinh bột và maltose đều thuỷ phân cho glucose."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng câu 49, chỉ đảo chiều hỏi sang chất không thuỷ phân.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.NHAN_DANG",
+    "ten": "Thuỷ phân — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B6-D1",
+    "ten": "Phản ứng thủy phân của polysaccharide",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

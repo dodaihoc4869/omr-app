@@ -1,0 +1,154 @@
+{
+ "DB-12-B9-P2-D1-I-129": {
+  "luc": "2026-09-29T11:37:08.823Z",
+  "cau": {
+   "phan": "I",
+   "so": 129,
+   "de": "Trong cấu trúc phân tử của chất cho ở hình dưới đây, liên kết peptide là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_8.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "liên kết (1)",
+    "B": "liên kết (3)",
+    "C": "liên kết (2)",
+    "D": "liên kết (4). Mã đề thi: 315"
+   },
+   "loi_giai": {
+    "chot": "Liên kết peptide là liên kết giữa nguyên tử carbon của nhóm C=O với nguyên tử nitrogen của nhóm NH, tức liên kết số (2).",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Liên kết (1) là liên kết đôi C=O của nhóm carbonyl."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Liên kết (3) nối carbon alpha với carbon của nhóm C=O."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: liên kết (2) nối carbon của nhóm C=O với nitrogen."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Liên kết (4) nối nitrogen với carbon alpha của gốc tiếp theo."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.NHAN_DANG",
+    "ten": "Peptide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-KT-C3-D5",
+   "nguonCau": "I-8"
+  }
+ },
+ "DB-12-B9-P2-D1-II-194": {
+  "luc": "2026-09-29T11:37:08.823Z",
+  "cau": {
+   "phan": "II",
+   "so": 194,
+   "de": "Các phát biếu về cấu tạo của peptide.",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 9. Peptide (P2)",
+   "y": {
+    "a": "Peptide được cấu thành từ các đơn vị α- và β-amino acid.",
+    "b": "Tetrapeptide thường chứa bốn liên kết peptide trong phân tử.",
+    "c": "Trong phân tử Gly-Ala-Val, thì Gly là amino acid đầu N.",
+    "d": "Có thể điều chế bốn dipeptide khác nhau từ Gly và Val."
+   },
+   "loi_giai": {
+    "chot": "Peptide chỉ gồm α-amino acid; tetrapeptide có ba liên kết peptide.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: peptide chỉ tạo từ α-amino acid."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: tetrapeptide có ba liên kết peptide."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: Gly còn nhóm -NH₂ tự do."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: Gly-Gly, Gly-Val, Val-Gly, Val-Val."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "DH-12-C3-B9-P2",
+   "nguonCau": "II-3"
+  }
+ }
+}

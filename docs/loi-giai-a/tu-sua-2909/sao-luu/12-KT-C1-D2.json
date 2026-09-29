@@ -1,0 +1,73 @@
+{
+ "12-KT-C1-D2-I-9": {
+  "luc": "2026-09-29T11:35:18.355Z",
+  "cau": {
+   "phan": "I",
+   "so": 9,
+   "de": "Từ quả đào chín, người ta tách ra được chất A là một ester có công thức phân tử C₃H₆O₂.\nKhi thuỷ phân A trong dung dịch NaOH dư, thu được sodium formate và một alcohol.\nCông thức của cấu tạo của A là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "CH₃COOCH₃",
+    "B": "CH₃COOC₂H₅",
+    "C": "HCOOC₂H₅",
+    "D": "HCOOCH₃"
+   },
+   "loi_giai": {
+    "chot": "Thuỷ phân cho sodium formate HCOONa nên gốc acid là HCOO–; với C₃H₆O₂ phần còn lại là C₂H₅, vậy A là HCOOC₂H₅.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "CH₃COOCH₃ thuỷ phân cho sodium acetate, không phải formate."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "CH₃COOC₂H₅ có công thức C₄H₈O₂, không khớp C₃H₆O₂."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: HCOOC₂H₅ là C₃H₆O₂, thuỷ phân cho HCOONa và ethyl alcohol."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "HCOOCH₃ chỉ là C₂H₄O₂, thiếu một carbon so với đề."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.VIET_CTCT",
+    "ten": "Xà phòng hoá — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

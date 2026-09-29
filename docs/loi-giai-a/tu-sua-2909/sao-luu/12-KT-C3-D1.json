@@ -1,0 +1,65 @@
+{
+ "12-KT-C3-D1-I-15": {
+  "luc": "2026-09-29T11:35:36.898Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Phát biểu nào sau đây sai khi nói về enzyme?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Phần lớn enzyme là những protein xúc tác cho các phản ứng hóa học và sinh hóa",
+    "B": "Enzyme có tính chọn lọc cao, mỗi enzyme chỉ xúc tác cho một hoặc một số phản ứng nhất định",
+    "C": "Tốc độ phản ứng có xúc tác enzyme thường nhanh hơn nhiều lần so với với xúc tác hóa học",
+    "D": "Tốc độ phản ứng có xúc tác enzyme thường chậm hơn nhiều lần so với với xúc tác hóa học"
+   },
+   "loi_giai": {
+    "chot": "Enzyme làm tốc độ phản ứng tăng rất mạnh so với xúc tác hoá học thông thường, nên phát biểu nói chậm hơn là sai.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Phần lớn enzyme là protein có vai trò xúc tác sinh học."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Enzyme có tính chọn lọc rất cao."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Xúc tác enzyme cho tốc độ lớn hơn nhiều xúc tác hoá học."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là chỗ sai: enzyme làm phản ứng nhanh hơn, không chậm hơn."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}

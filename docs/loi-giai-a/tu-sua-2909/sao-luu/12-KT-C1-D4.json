@@ -274,5 +274,76 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-KT-C1-D4-I-10": {
+  "luc": "2026-09-29T11:35:20.658Z",
+  "cau": {
+   "phan": "I",
+   "so": 10,
+   "de": "Bơ thực vật được làm từ dầu thực vật như dầu hướng dương, dầu đậu nành,... thông qua quá trình hydrogen hoá để dầu thực vật chuyển đổi từ dạng lỏng sang dạng rắn.\nĐun nóng triolein trong nồi kín chứa xúc tác Ni rồi sục khí H₂ dư.\nSau khi phản ứng hoàn toàn, đổ sản phẩm ra, để nguội, thu được sản phẩm hữu cơ ở thể rắn là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "sobitol",
+    "B": "tripanmitin",
+    "C": "tristearin",
+    "D": "glycerol"
+   },
+   "loi_giai": {
+    "chot": "Triolein là (C₁₇H₃₃COO)₃C₃H₅; cộng H₂ dư vào cả ba nối đôi cho (C₁₇H₃₅COO)₃C₃H₅, tức tristearin ở thể rắn.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sobitol là sản phẩm khử glucose, không liên quan chất béo."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Tripanmitin có gốc 16 carbon, không thể sinh ra từ gốc oleate 18 carbon."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: hydrogen hoá triolein cho tristearin."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Glycerol chỉ sinh ra khi thuỷ phân, không phải khi cộng hydrogen."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "lech",
+    "ghi_chu": "Máy giải ra C (tristearin): triolein cộng H₂ dư/Ni chỉ no hoá ba nối đôi, cho (C₁₇H₃₅COO)₃C₃H₅ thể rắn. Bảng đáp án của đề ghi D (glycerol) — glycerol chỉ sinh ra khi thuỷ phân, không phải khi hydrogen hoá. Giữ đáp án máy giải."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.HYDRO_HOA.NHAN_DANG",
+    "ten": "Hydrogen hoá — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D3",
+    "ten": "Phản ứng Hydrogen hóa / Cộng Bromine (Sản xuất bơ nhân tạo)",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
  }
 }

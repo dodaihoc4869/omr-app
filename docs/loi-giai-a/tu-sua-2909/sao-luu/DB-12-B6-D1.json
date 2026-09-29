@@ -1,79 +1,85 @@
 {
- "12-KT-C12-D1-II-1": {
-  "luc": "2026-09-29T08:25:38.660Z",
+ "DB-12-B6-D1-I-14": {
+  "luc": "2026-09-29T11:36:53.281Z",
   "cau": {
-   "phan": "II",
-   "so": 1,
-   "de": "Acid béo omega-3 và omega-6 là những acid béo không no, trong phân tử chứa nhóm C=C đầu tiên ở vị trí carbon số 3 và 6 (tính từ nhóm −CH₃).\nCông thức của hai acid béo được cho ở hình dưới.",
-   "dap_an": "DDSD",
+   "phan": "I",
+   "so": 14,
+   "de": "Dãy chất nào sau đây có tất cả các chất đều không tham giả phản ứng thủy phân?",
+   "dap_an": "C",
    "bang": null,
-   "hinh": [
-    {
-     "tep": "II_1.png",
-     "vi_tri": "sau_de"
-    }
-   ],
-   "tieu_de": null,
+   "hinh": [],
    "can_xem": false,
-   "chuyen_de": "Ester – lipid",
+   "chuyen_de": "Carbohydrate",
    "muc_do": "hieu",
-   "y": {
-    "a": "Một số chất béo là nguồn cung cấp acid béo omega-3 và omega-6 cho cơ thể.",
-    "b": "Omega-3 và omega-6 có tác dụng giảm huyết áp, giảm chlolesterol trong máu, gảm nguy cơ gây xơ vữa động mạch.",
-    "c": "Docosahexaenoic acid (DHA) C₂₁H₃₁COOH và arachidonic acid (ARA) C₁₉H₃₁COOH đều thuộc nhóm acid béo omega-3.",
-    "d": "Dầu cá biển chứa nhiều acid béo omega-3, các loại dầu thực vật (dầu đậu nành, dầu hướng dương,…) chứa nhiều acid béo omega-6."
+   "pa": {
+    "A": "Saccharose, tinh bột.",
+    "B": "Cellulose, saccharose.",
+    "C": "Fructose, glucose.",
+    "D": "Tinh bột, maltose."
    },
    "loi_giai": {
-    "chot": "DHA là omega-3 còn ARA là omega-6, hai acid này thuộc hai nhóm khác nhau.",
-    "tung_y": {
-     "a": {
-      "dung": true,
-      "vi_sao": "Đúng: mỡ cá và dầu thực vật là nguồn cung cấp omega-3 và omega-6."
-     },
-     "b": {
-      "dung": true,
-      "vi_sao": "Đúng: hai nhóm acid này giúp giảm huyết áp và cholesterol trong máu."
-     },
-     "c": {
+    "chot": "Chỉ monosaccharide (glucose, fructose) không tham gia phản ứng thuỷ phân.",
+    "tung_pa": {
+     "A": {
       "dung": false,
-      "vi_sao": "Sai: ARA có liên kết đôi đầu tiên ở carbon số 6 nên thuộc nhóm omega-6."
+      "vi_sao": "Saccharose và tinh bột đều thuỷ phân được."
      },
-     "d": {
+     "B": {
+      "dung": false,
+      "vi_sao": "Cellulose và saccharose đều thuỷ phân được."
+     },
+     "C": {
       "dung": true,
-      "vi_sao": "Đúng: dầu cá biển giàu omega-3, dầu thực vật giàu omega-6."
+      "vi_sao": "Fructose và glucose là monosaccharide, không thuỷ phân."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Tinh bột và maltose đều thuỷ phân cho glucose."
      }
     },
-    "dap_an_de": "DDSD",
-    "dap_an_tu_giai": "DDSD",
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "",
     "trang_thai": "khop",
     "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
    },
    "can_chua": {
-    "sao": 1,
-    "dk": [
-     "bay"
-    ],
-    "ly_do": "Tên omega chỉ vị trí liên kết đôi đầu tiên tính từ nhóm methyl.",
-    "bay": "Thấy hai acid cùng nằm trong nhóm không no nên gộp chung vào omega-3."
+    "sao": 0,
+    "ly_do": "Trùng câu 49, chỉ đảo chiều hỏi sang chất không thuỷ phân.",
+    "bay": null,
+    "dk": []
    },
-   "kieu": "ly_thuyet",
-   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
    "dang": {
-    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
-    "ten": "Cấu tạo — chọn phát biểu"
+    "ma": "CARBOHYDRATE.THUY_PHAN.NHAN_DANG",
+    "ten": "Thuỷ phân — nhận dạng"
    },
    "viSaoNull": null,
    "kienThuc": [],
    "loiThuongGap": [],
-   "dangBai": null,
-   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B6-D1",
+    "ten": "Phản ứng thủy phân của polysaccharide",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D1",
+   "nguonCau": "I-72"
   }
  },
- "12-KT-C12-D1-I-17": {
-  "luc": "2026-09-29T11:35:22.884Z",
+ "DB-12-B6-D1-I-42": {
+  "luc": "2026-09-29T11:36:53.281Z",
   "cau": {
    "phan": "I",
-   "so": 17,
+   "so": 42,
    "de": "Phát biểu nào dưới đây không đúng?",
    "dap_an": "C",
    "bang": null,
@@ -137,7 +143,9 @@
     "soBai": 6,
     "phanBai": 0,
     "chuong": "C2 - Carbohidrade"
-   }
+   },
+   "nguonDe": "12-KT-C12-D1",
+   "nguonCau": "I-17"
   }
  }
 }
