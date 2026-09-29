@@ -37,7 +37,7 @@ import {
 import { cauLuyenTuNguon, type CauLuyen } from '../lib/bai-tap-pdf'
 import { hopSao } from '../lib/loc-sao'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
-import { normalizeNumericAnswer } from '../engine/score'
+import { khopPhanIII } from '../lib/cham-so'
 import { loadScriptUrlHoacMacDinh, loadExamSources } from '../lib/exam-db'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import { cacLopHienThi, duocChonLop, khoiEmTuLop, lopEmDuocChon, lopMacDinhCuaEm, nguonHopKhoi } from '../lib/khac-phuc-khoi'
@@ -124,7 +124,7 @@ function chamBai(
       tongDiemToiDa += 1
       const userAns = answers[q.id] || ''
       const daDung = q.dapAn || ''
-      if (userAns && normalizeNumericAnswer(userAns) === normalizeNumericAnswer(daDung)) {
+      if (userAns && khopPhanIII(userAns, daDung)) { // một luật chấm số dùng chung (29/09)
         tongDiemDat += 1
         soCauDung += 1
       }

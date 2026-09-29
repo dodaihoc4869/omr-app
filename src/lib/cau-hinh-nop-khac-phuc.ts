@@ -3,7 +3,7 @@
 // MỘT NGUỒN SỰ THẬT. Bốn cờ này đi THEO TỆP PHIẾU: phiếu mở trên máy em, không
 // đọc được IndexedDB của thầy, nên cờ phải được chốt lúc DỰNG phiếu và nằm luôn
 // trong tệp.
-import { normalizeNumericAnswer } from '../engine/score'
+import { khopPhanIII } from './cham-so'
 
 export interface CauHinhNopKhacPhuc {
   /** Em nộp lại được bao nhiêu lần tuỳ ý. Mỗi lượt ghi một hàng, không đè. */
@@ -45,7 +45,6 @@ export function chamKhacPhuc(
   daChon: Record<string, string>,
 ): { soCau: number; soDung: number; qidSai: string[]; soBoTrong: number } {
   // MỘT NGUỒN SỰ THẬT — phiếu khắc phục phải chấm y hệt bài thi.
-  const chuanIII = (v: unknown) => normalizeNumericAnswer(String(v ?? ''))
   let soDung = 0
   let soBoTrong = 0
   const qidSai: string[] = []
@@ -55,7 +54,7 @@ export function chamKhacPhuc(
     const chon = String(daChon[qid] ?? '').trim()
     if (!chon) soBoTrong += 1
     const dung = String(c.dapAn ?? '').trim()
-    const khop = !chon ? false : c.phan === 'III' ? !!chuanIII(chon) && !!chuanIII(dung) && chuanIII(chon) === chuanIII(dung) : chon.toUpperCase() === dung.toUpperCase()
+    const khop = !chon ? false : c.phan === 'III' ? khopPhanIII(chon, dung) : chon.toUpperCase() === dung.toUpperCase()
     if (khop) soDung += 1
     else qidSai.push(qid)
   }

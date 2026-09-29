@@ -10,6 +10,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, History, RotateCcw, X as XIcon } from 'lucide-react'
 import { normalizeNumericAnswer } from '../engine/score'
+import { khopPhanIII } from '../lib/cham-so'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
@@ -374,7 +375,7 @@ export default function TheCau(props: TheCauProps) {
   } else {
     const { selected, onChange, correct } = props
     const daTraLoi = !!normSo(selected ?? '')
-    const dung = xemLai && daTraLoi && !!normSo(correct ?? '') && normSo(selected ?? '') === normSo(correct ?? '')
+    const dung = xemLai && daTraLoi && khopPhanIII(selected ?? '', correct ?? '') // 29/09: so GIÁ TRỊ như bộ chấm ("1237500000" = "1,2375×10⁹")
     body = xemLai ? (
       <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
         <Hang selected data-trang-thai="dung">

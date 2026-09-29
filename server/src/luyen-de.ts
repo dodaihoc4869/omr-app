@@ -6,7 +6,8 @@ import { expNhanSauNop } from './exp-d1'
 import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from '../../src/lib/exam-kho-de-import'
 import { mergeAndStrip, type TeacherExamSource } from '../../src/data/examContent'
 import { rutDeChuan2026, SO_CAU_CHUAN_2026, laBoDe12, MA_TRAN_HOA_2026 } from '../../src/lib/ma-tran-hoa-2026'
-import { normalizeNumericAnswer } from '../../src/engine/score'
+import { khopPhanIII } from '../../src/lib/cham-so'
+import { docSoPhanIII } from '../../src/lib/doc-so-phan-iii'
 import { laCauTuLuan } from './cam-tu-luan'
 import { docKhoiEm } from './game-v2-bank'
 // QUYỀN DO MÁY CHỦ XÁC NHẬN (CNH-1.0 P02 mục 3): cờ TẮT ⇒ giữ nguyên cổng cũ; cờ BẬT ⇒ máy khách khai vô hiệu.
@@ -22,7 +23,7 @@ export function chamDeChuan(sources:TeacherExamSource[], a:Record<string,string>
   for(const s of sources) {
     for(const q of s.phanI){const p=a[q.id]===q.correct?25:0;cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
     for(const q of s.phanII){const n=q.correct.filter((v,i)=>v===(a[q.id]||'')[i]).length;const p=[0,10,25,50,100][n];cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
-    for(const q of s.phanIII){const val=(a[q.id]||'').trim();const p=val&&normalizeNumericAnswer(val)===normalizeNumericAnswer(q.correct)?25:0;cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
+    for(const q of s.phanIII){const val=(a[q.id]||'').trim();const p=val&&khopPhanIII(val,q.correct)?25:0;cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
   }
   return { score:cents/100, detail }
 }
@@ -31,7 +32,7 @@ function cleanAnswers(b:unknown,sources:TeacherExamSource[]):Record<string,strin
   const a:Record<string,string>={}
   for(const s of sources)for(const phan of ['I','II','III'] as const)for(const q of s[`phan${phan}`]){
     const v=String(raw[q.id]??'').trim().slice(0,32)
-    if(phan==='I'&&/^[ABCD]$/.test(v)||phan==='II'&&/^[DS-]{4}$/.test(v)||phan==='III'&&/^-?\d+(?:[.,]\d+)?$/.test(v))a[q.id]=v
+    if(phan==='I'&&/^[ABCD]$/.test(v)||phan==='II'&&/^[DS-]{4}$/.test(v)||phan==='III'&&(/^-?\d+(?:[.,]\d+)?$/.test(v)||v.length<=40&&docSoPhanIII(v)!==null))a[q.id]=v
   }
   return a
 }
