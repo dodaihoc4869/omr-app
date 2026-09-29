@@ -4,8 +4,8 @@
 // Không tìm thấy đích (hoặc trình duyệt không có `Element.animate`) ⇒ trả null, nơi gọi giữ hành vi cũ (số hiện tại chỗ).
 import type { CheDoHieuUng } from '../../lib/hieu-ung-exp-cau'
 
-/** Đích mặc định, theo thứ tự ưu tiên: đánh dấu riêng · Đảo 2 · Đảo cũ · Đoàn Hộ Tống (thú của em) · thanh EXP nhỏ (ôn câu, BTVN, Bi-a). */
-export const DICH_EXP_MAC_DINH = ['[data-dich-exp]', '.dao2-canh-thu', '.dao-san-thu', '.dh-thu-em', '.exp-thanh-nho-ray'] as const
+/** Đích mặc định, theo thứ tự ưu tiên: cảnh trận Đảo 2 · Đảo cũ · Đoàn Hộ Tống (thú của em) · ảnh thú nhỏ có đánh dấu `data-dich-exp` · thanh EXP nhỏ (ôn câu, BTVN, Bi-a). */
+export const DICH_EXP_MAC_DINH = ['.dao2-canh-thu', '.dao-san-thu', '.dh-thu-em', '[data-dich-exp]', '.exp-thanh-nho-ray'] as const
 export const THOI_GIAN_BAY_MS = 700
 /** Tên sự kiện phát trên `window` khi số tới thú: `detail = { exp }`. */
 export const SU_KIEN_TOI = 'exp-cau-toi'
@@ -59,11 +59,13 @@ const taoVat = (lop: string, x: number, y: number, chu = ''): HTMLElement => {
  * Cho số `chu` bay từ `nguon` vào thú. Trả hàm huỷ (gỡ mọi vật bay) hoặc null khi không bay (tĩnh / không có đích / không có WAAPI).
  * `xong` gọi MỘT lần lúc số tới nơi (kể cả khi bị huỷ sớm thì không gọi).
  */
-export function bayVaoThu(nguon: HTMLElement, chu: string, cheDo: CheDoHieuUng, o: { exp: number; lenCap?: boolean; dich?: readonly string[]; xong?: () => void } = { exp: 0 }): (() => void) | null {
+export function bayVaoThu(nguon: HTMLElement, chu: string, cheDo: CheDoHieuUng, o: { exp: number; lenCap?: boolean; dich?: readonly string[]; tu?: readonly string[]; xong?: () => void } = { exp: 0 }): (() => void) | null {
   if (cheDo === 'tinh' || typeof document === 'undefined' || typeof nguon.animate !== 'function') return null
   const dich = timDich(o.dich ?? DICH_EXP_MAC_DINH)
   if (!dich || dich.contains(nguon)) return null
-  const ra = nguon.getBoundingClientRect(), rb = dich.getBoundingClientRect()
+  // Điểm xuất phát: nút chốt / nút kế tiếp của màn (nếu nơi gọi chỉ ra và đang hiện), không thì chính chỗ số "+N EXP".
+  const tu = (o.tu ? timDich(o.tu) : null) ?? nguon
+  const ra = tu.getBoundingClientRect(), rb = dich.getBoundingClientRect()
   if (!(ra.width > 0) || !(rb.width > 0)) return null
   const a = { x: ra.left + ra.width / 2, y: ra.top + ra.height / 2 }
   const b = { x: rb.left + rb.width / 2, y: rb.top + rb.height * (dich.classList.contains('exp-thanh-nho-ray') ? 0.5 : 0.42) }

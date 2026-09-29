@@ -27,22 +27,23 @@ export function useCheDoHieuUng(): CheDoHieuUng {
  *   · vắng — số nổi lên cạnh câu (mặc định);
  *   · 'noi' — trong cảnh trận (đặt tuyệt đối, cha phải có position);
  *   · 'dong' — nằm trong dòng kết quả.
- * Có ảnh thần thú (hoặc thanh EXP) trên màn và không xin giảm chuyển động ⇒ số BAY vào đó (`bay-exp.ts`); `lenCap` ⇒ vòng sáng lên cấp khi tới nơi. `dich` = danh sách chọn đích riêng.
+ * Có ảnh thần thú (hoặc thanh EXP) trên màn và không xin giảm chuyển động ⇒ số BAY vào đó (`bay-exp.ts`); `lenCap` ⇒ vòng sáng lên cấp khi tới nơi. `dich` = danh sách chọn đích riêng;
+ * `tu` = danh sách chọn điểm xuất phát (nút chốt / nút kế tiếp), vắng ⇒ bay từ chỗ số.
  */
-export function SoExpCau({ exp, cheDo, vaoThu, lenCap, dich }: { exp: number; cheDo: CheDoHieuUng; vaoThu?: 'noi' | 'dong'; lenCap?: boolean; dich?: readonly string[] }) {
+export function SoExpCau({ exp, cheDo, vaoThu, lenCap, dich, tu }: { exp: number; cheDo: CheDoHieuUng; vaoThu?: 'noi' | 'dong'; lenCap?: boolean; dich?: readonly string[]; tu?: readonly string[] }) {
   const ref = useRef<HTMLSpanElement>(null)
   const [bay, setBay] = useState<'cho' | 'dang' | 'xong' | 'khong'>('cho')
   useEffect(() => {
     if (!(exp > 0) || !ref.current) return
     let huy: (() => void) | null = null
     try {
-      huy = bayVaoThu(ref.current, chuExpCau(exp), cheDo, { exp, lenCap, dich, xong: () => setBay('xong') })
+      huy = bayVaoThu(ref.current, chuExpCau(exp), cheDo, { exp, lenCap, dich, tu, xong: () => setBay('xong') })
     } catch {
       huy = null
     }
     setBay(huy ? 'dang' : 'khong')
     return () => { huy?.() }
-  }, [exp, cheDo, lenCap, dich])
+  }, [exp, cheDo, lenCap, dich, tu])
   if (!(exp > 0)) return null
   return (
     <span ref={ref} className="exp-cau-so" data-che-do={cheDo} data-vao-thu={vaoThu} data-bay={bay === 'dang' || bay === 'xong' ? bay : undefined} data-vung="exp-cau" role="status">
