@@ -241,7 +241,9 @@ export default defineConfig({
         codeSplitting: {
           // Máy yếu (29/09): `src/lib/may-yeu.ts` (≈ 1 KB) nay được nhiều mảnh lười cùng nhập ⇒ Rolldown tách thành tệp riêng, đẩy
           // precache lên đúng trần 170. Gom vào CÙNG mảnh biểu tượng (mảnh này index.html luôn tải sẵn) ⇒ không thêm tệp nào.
-          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/]may-yeu\.ts$/ }],
+          // 29/09: gom thêm ba mô-đun nhỏ (~1 KB mỗi cái) mà index.html VỐN nạp sẵn ở mọi đường (vai-tro, dia-chi-may-chu,
+          // hieu-chinh-giay-thuc) vào cùng mảnh này ⇒ bớt tệp precache / vòng mạng, chừa chỗ dưới trần 170.
+          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/](?:may-yeu|vai-tro|dia-chi-may-chu|hieu-chinh-giay-thuc)\.ts$/ }],
         },
       },
     },

@@ -562,18 +562,32 @@ body.mc-timing .mc-ray{box-sizing:border-box;padding-bottom:64px}
 
 const JS_MAY_CHIEU = `
 (function () {
-  function fitOptions(goc){(goc||document).querySelectorAll('.mc-auto-options').forEach(function(grid){
-    var available=grid.clientWidth,maxWidth=0;
-    if(!available)return;
-    Array.prototype.forEach.call(grid.children,function(option){
-      if(option.querySelector('img,table')){maxWidth=available;return;}
-      var copy=option.cloneNode(true);copy.style.cssText='position:absolute;visibility:hidden;width:max-content;max-width:none;grid-template-columns:1.4em max-content;pointer-events:none';
-      grid.appendChild(copy);maxWidth=Math.max(maxWidth,copy.getBoundingClientRect().width);copy.remove();
+  // CHIA CỘT PHƯƠNG ÁN (1/2/4) theo bề rộng thật của phương án dài nhất.
+  // MÁY CHIẾU YẾU (29/09): bản cũ chèn-đo-gỡ TỪNG phương án ⇒ mỗi phương án ép trình duyệt bố cục lại CẢ tờ (tờ 40 em:
+  // ~160 lần bố cục mỗi lượt, mà lượt đo bố cục gọi hàm này nhiều lần ⇒ ~3,5 s ở CPU ×6 trước khi tờ hiện). Nay gom ba nhịp:
+  // ĐỌC bề ngang mọi khung → CHÈN mọi bản sao → ĐỌC mọi bề rộng (MỘT lần bố cục) → GỠ + đặt số cột. Bản sao nằm tuyệt đối,
+  // ẩn, không chiếm chỗ ⇒ số đo y như đo từng cái; luật chọn số cột giữ nguyên.
+  function fitOptions(goc){
+    var viec=[];
+    Array.prototype.forEach.call((goc||document).querySelectorAll('.mc-auto-options'),function(grid){
+      var available=grid.clientWidth;
+      if(!available)return;
+      viec.push({grid:grid,available:available,gap:parseFloat(getComputedStyle(grid).columnGap)||24,maxWidth:0,copies:[]});
     });
-    var gap=parseFloat(getComputedStyle(grid).columnGap)||24;
-    var cols=maxWidth*4+gap*3<=available?4:maxWidth*2+gap<=available?2:1;
-    grid.style.setProperty('--mc-option-cols',String(cols));
-  });}
+    viec.forEach(function(v){
+      Array.prototype.slice.call(v.grid.children).forEach(function(option){
+        if(option.querySelector('img,table')){v.maxWidth=v.available;return;}
+        var copy=option.cloneNode(true);copy.style.cssText='position:absolute;visibility:hidden;width:max-content;max-width:none;grid-template-columns:1.4em max-content;pointer-events:none';
+        v.grid.appendChild(copy);v.copies.push(copy);
+      });
+    });
+    viec.forEach(function(v){v.copies.forEach(function(c){v.maxWidth=Math.max(v.maxWidth,c.getBoundingClientRect().width);});});
+    viec.forEach(function(v){
+      v.copies.forEach(function(c){c.remove();});
+      var cols=v.maxWidth*4+v.gap*3<=v.available?4:v.maxWidth*2+v.gap<=v.available?2:1;
+      v.grid.style.setProperty('--mc-option-cols',String(cols));
+    });
+  }
   window.addEventListener('resize',function(){fitOptions()});
   window.__mcFitOptions=fitOptions; // bộ đo bố cục (bo-cuc-to-chieu.ts) chia lại cột phương án mỗi khi đổi bậc
   if(document.fonts)document.fonts.ready.then(function(){fitOptions()});

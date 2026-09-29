@@ -41,9 +41,33 @@ const CHO_YEN = Number(arg('cho-yen', '8000'))
 const THAC = arg('thac', '') === '1'
 // --hoso=vao|chon: ghi hồ sơ CPU (CDP Profiler) lúc vào đề / lúc chọn đáp án, in 25 hàm tốn thời gian tự thân nhất (dùng với bản build --minify false).
 const HOSO = arg('hoso', '')
+// --vet=vao: ghi vết Chrome (devtools.timeline) lúc vào đề, cộng thời gian theo loại việc (Layout, Paint, Style, script…).
+const VET = arg('vet', '')
+async function batVet(cdp, ten) {
+  if (VET !== ten) return
+  VET_SK.length = 0
+  cdp.on('Tracing.dataCollected', (e) => VET_SK.push(...e.value))
+  await cdp.send('Tracing.start', { categories: 'devtools.timeline,v8.execute', transferMode: 'ReportEvents' })
+}
+const VET_SK = []
+async function inVet(cdp, ten) {
+  if (VET !== ten) return
+  const xong = new Promise((ok) => cdp.once('Tracing.tracingComplete', ok))
+  await cdp.send('Tracing.end')
+  await xong
+  // Chỉ luồng chính của trang: luồng có nhiều sự kiện 'FunctionCall' nhất.
+  const theoLuong = new Map()
+  for (const e of VET_SK) if (e.name === 'FunctionCall' || e.name === 'Layout') theoLuong.set(e.tid, (theoLuong.get(e.tid) || 0) + 1)
+  const chinh = [...theoLuong].sort((a, b) => b[1] - a[1])[0]?.[0]
+  const tong = new Map()
+  for (const e of VET_SK) if (e.tid === chinh && e.ph === 'X' && e.dur && e.name !== 'RunTask') tong.set(e.name, (tong.get(e.name) || 0) + e.dur / 1000)
+  console.error(`(${VET_SK.length} sự kiện)`)
+  console.error(`VẾT ${ten} (luồng chính, ms, có lồng nhau):\n` + [...tong].sort((a, b) => b[1] - a[1]).slice(0, 18).map(([k, v]) => `  ${String(Math.round(v)).padStart(6)}  ${k}`).join('\n'))
+}
 async function batHoSo(cdp, ten) {
   if (HOSO !== ten) return
   await cdp.send('Profiler.enable')
+  if (process.env.DO_NGUON) await cdp.send('Debugger.enable')
   await cdp.send('Profiler.setSamplingInterval', { interval: 200 })
   await cdp.send('Profiler.start')
 }
@@ -60,6 +84,17 @@ async function inHoSo(cdp, ten) {
     tu.set(k, (tu.get(k) || 0) + (dt[i] || 0) / 1000)
   })
   const tong = [...tu.values()].reduce((a, b) => a + b, 0)
+  if (process.env.DO_NGUON) {
+    // In đoạn mã quanh hàm vô danh tốn nhất (trang dựng bằng setContent không có URL).
+    const tuTheoNut = new Map()
+    profile.samples.forEach((id, i) => tuTheoNut.set(id, (tuTheoNut.get(id) || 0) + (dt[i] || 0)))
+    const nut = [...tuTheoNut].sort((a, b) => b[1] - a[1]).map(([id]) => theoId.get(id)).find((n) => n.callFrame.scriptId !== '0' && n.callFrame.url === '' && !n.callFrame.functionName)
+    if (nut) {
+      const { scriptSource } = await cdp.send('Debugger.getScriptSource', { scriptId: nut.callFrame.scriptId })
+      const dong = scriptSource.split('\n')[nut.callFrame.lineNumber] || ''
+      console.error('NGUỒN nóng nhất:', nut.callFrame.functionName || '(vô danh)', 'dòng', nut.callFrame.lineNumber + 1, ':', dong.slice(Math.max(0, nut.callFrame.columnNumber - 100), nut.callFrame.columnNumber + 400))
+    }
+  }
   console.error(`HỒ SƠ ${ten} (tổng ${Math.round(tong)} ms):\n` + [...tu].sort((a, b) => b[1] - a[1]).slice(0, 25).map(([k, v]) => `  ${String(Math.round(v)).padStart(6)} ms  ${k}`).join('\n'))
 }
 const inThac = async (p, nhan) => {
@@ -346,6 +381,7 @@ async function doThi(trinh, goc) {
   const tVao = Date.now()
   const tVaoTrang = await p.evaluate(() => performance.now())
   await batHoSo(cdp, 'vao')
+  await batVet(cdp, 'vao')
   for (let i = 0; i < 40; i++) {
     if (await p.locator('#cau-1').count()) break
     const nut = p.getByRole('button', { name: /Đúng là em|Bắt đầu|Vào thi/ }).last()
@@ -356,6 +392,7 @@ async function doThi(trinh, goc) {
   const vaoDe = Date.now() - tVao
   await p.waitForTimeout(3000)
   await inHoSo(cdp, 'vao')
+  await inVet(cdp, 'vao')
   const d0 = await p.evaluate(() => window.__do)
   // Tác vụ dài từ lúc bấm vào thi tới khi đề hiện (+3 s) — không tính lượt tải trang.
   const tbtVao = tbt(d0.dai, tVaoTrang)
@@ -408,6 +445,7 @@ async function doThi(trinh, goc) {
     lcp: d0.lcp,
     vaoDeMs: vaoDe,
     tbtKhiVaoDe: tbtVao,
+    taiDaiNhatKhiVaoDe: Math.max(0, ...d0.dai.filter(([t]) => t >= tVaoTrang).map((x) => x[1])),
     tbtTaiTrang: tbt(d0.dai, 0, tVaoTrang),
     chonMsTB: Math.round(chon.reduce((a, b) => a + b, 0) / chon.length),
     chonMsMax: Math.max(...chon),
@@ -528,7 +566,7 @@ if (MAY_CHIEU) {
   try {
     const { taoHtmlMayChieu } = await vite.ssrLoadModule('/src/lib/html-may-chieu.ts')
     const pet = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><circle cx="80" cy="80" r="65" fill="rgb(59,130,110)"/></svg>')
-    const ds = Array.from({ length: 12 }, (_, i) => ({ sbd: `MAU-${i}`, hoTen: `Học sinh mẫu ${i + 1}`, soCau: i + 1,
+    const ds = Array.from({ length: Number(process.env.SO_EM || 12) }, (_, i) => ({ sbd: `MAU-${i}`, hoTen: `Học sinh mẫu ${i + 1}`, soCau: i + 1,
       thanThu: { anh: pet, ten: 'Thạch Quy', danhHieu: '', he: 'Đất', capDo: 3, hinhThai: '', tangThapCaoNhat: 1, soCauDaThanhTay: 0 },
       cau: { id: `DE-I-${i + 1}`, maDe: 'DE', phan: 'I', text: `Câu ${i + 1}: ${chu(i, 3)}`, luaChon: [chu(i + 1, 1), chu(i + 2, 1), chu(i + 3, 1), chu(i + 4, 1)], dapAn: 'A', sao: 0, mucDo: 'biet', chuyenDe: 'Ester', dang: 'bai_tap', chot: chu(i + 5, 1), lyDo: null, buoc: [], ketQua: 'A' } }))
     for (const dayHoc of [true, false]) {
@@ -542,19 +580,35 @@ if (MAY_CHIEU) {
         const cdp = await ctx.newCDPSession(p)
         await cdp.send('Emulation.setCPUThrottlingRate', { rate: CPU })
         const t0 = Date.now()
+        await batVet(cdp, 'mo')
+        await batHoSo(cdp, 'mo')
         await p.setContent(html)
         await p.waitForFunction(() => document.body.classList.contains('mc-san-sang'), null, { timeout: 60000 })
         const sanSang = Date.now() - t0
+        await inHoSo(cdp, 'mo')
+        await inVet(cdp, 'mo')
         await p.waitForTimeout(3000)
         await p.evaluate(() => (window.__do.dai = []))
         const yen = await doKhung(p, 5000)
         const dY = await p.evaluate(() => window.__do)
         await p.evaluate(() => (window.__do.dai = []))
         await batHoSo(cdp, 'lenbang')
-        const [goi] = await Promise.all([doKhung(p, 4000), p.getByRole('button', { name: 'Lên bảng', exact: true }).click().catch(() => {})])
+        await batVet(cdp, 'lenbang')
+        // Bấm bằng DOM, KHÔNG dùng p.getByRole(...).click(): Playwright dò cây trợ năng NGAY TRONG TRANG (đang bị hãm CPU ×6)
+        // ⇒ chính phép đo tạo ra một khung ~600 ms (đo nhầm "khung giật 633 ms" ở PR #79).
+        const nutLenBang = await p.evaluateHandle(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Lên bảng') || null)
+        const [goi] = await Promise.all([doKhung(p, 4000), p.evaluate((b) => b && b.click(), nutLenBang)])
         await inHoSo(cdp, 'lenbang')
+        await inVet(cdp, 'lenbang')
         const dG = await p.evaluate(() => window.__do)
-        const kq = { sanSangMs: sanSang, yen5s: { ...yen, tbt: tbt(dY.dai) }, lenBang4s: { ...goi, tbt: tbt(dG.dai) }, heapMB: await heapMb(cdp) }
+        // Đóng màn gọi tên rồi sang ĐỢT TIẾP (trang kế của dải trượt ngang).
+        await p.evaluate(() => document.querySelector('.mc-goi')?.dispatchEvent(new MouseEvent('click', { bubbles: true })))
+        await p.waitForTimeout(1500)
+        await p.evaluate(() => (window.__do.dai = []))
+        const nutTiep = await p.evaluateHandle(() => document.getElementById('mc-sau'))
+        const [tiep] = await Promise.all([doKhung(p, 2500), p.evaluate((b) => b && b.click(), nutTiep)])
+        const dT = await p.evaluate(() => window.__do)
+        const kq = { sanSangMs: sanSang, yen5s: { ...yen, tbt: tbt(dY.dai) }, lenBang4s: { ...goi, tbt: tbt(dG.dai) }, dotTiep: { ...tiep, tbt: tbt(dT.dai) }, heapMB: await heapMb(cdp) }
         await ctx.close()
         return kq
       })

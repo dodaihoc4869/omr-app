@@ -1,4 +1,4 @@
-import { Component, lazy, memo, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Component, lazy, memo, startTransition, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
@@ -56,6 +56,7 @@ import ManGiuDeDoc from '../components/ManGiuDeDoc'
 import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
+import { flushSync } from 'react-dom'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
@@ -169,6 +170,9 @@ const formatClock = dinhDangDongHo
  * Bỏ qua so HÀM là AN TOÀN ở đây vì mọi hàm màn thi truyền cho thẻ (`setPhanI/II/III` → `updateAndSave`, `setZoomSrc`)
  * chỉ gọi setState dạng hàm + ref + hàm nhập — hành vi không phụ thuộc lần vẽ. Dữ liệu (đề, `selected`, nhãn) vẫn so đủ. */
 const TheCauThi = memo(TheCau, bangPropsBoQuaHam)
+/** DỰNG ĐỀ DẦN (bố cục dọc): số thẻ dựng ngay khi vào đề, rồi mỗi lượt máy rảnh thêm bấy nhiêu thẻ. */
+const SO_THE_DAU = 3
+const BUOC_THE = 2
 
 /** Số giờ "mm:ss" — NÚT LÁ duy nhất đổi mỗi giây (gốc màn không vẽ lại). */
 function SoDongHo({ kho }: { kho: KhoGio | null }) {
@@ -217,7 +221,7 @@ function daTraLoiEntry(attempt: ExamAttempt, assignment: StudentAssignment, ref:
   return !!attempt.answers.phanIII[assignment.phanIII[ref.i].qid]?.trim()
 }
 
-function cuonToiCau(stt: number) {
+function cuonToiCauDom(stt: number) {
   document.getElementById(`cau-${stt}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
@@ -734,6 +738,30 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
     assignment.phanIII.forEach((_, i) => out.push({ phan: 'III', i }))
     return out
   }, [assignment])
+
+  // DỰNG ĐỀ DẦN (máy yếu 29/09). Đo CPU ×6 (scripts/do-may-yeu.mjs --vet=vao): dựng cả ~40 thẻ trong MỘT lượt là một tác vụ
+  // ~2,3 s (script 0,9 s + tính kiểu 0,6 s + bố cục 0,6 s) — em nhìn màn trắng/đứng rồi mới thấy câu 1. Nay bố cục DỌC dựng
+  // SO_THE_DAU thẻ đầu ngay, phần còn lại thêm từng BUOC_THE thẻ lúc máy rảnh (startTransition — chạm đáp án vẫn được ưu tiên).
+  // Không đổi dữ liệu, đáp án, cách chấm: thẻ chưa dựng chỉ là CHƯA VẼ. Bấm tới một câu chưa dựng (lưới số câu, dải câu chưa
+  // làm, hộp nộp) ⇒ dựng hết ngay rồi mới cuộn (`cuonToiCau` trong màn). Bố cục ngang giữ như cũ (dựng hết một lần).
+  const [theDaDung, setTheDaDung] = useState<{ khoa: unknown; n: number }>({ khoa: null, n: 0 })
+  const soTheDung = boCuc !== 'doc' ? Infinity : theDaDung.khoa === assignment ? theDaDung.n : SO_THE_DAU
+  useEffect(() => {
+    if (phase !== 'exam' || !assignment) return
+    if (boCuc !== 'doc') {
+      if (theDaDung.khoa !== assignment || theDaDung.n !== Infinity) setTheDaDung({ khoa: assignment, n: Infinity })
+      return
+    }
+    if (soTheDung >= flat.length) return
+    const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void }
+    const them = () => startTransition(() => setTheDaDung({ khoa: assignment, n: soTheDung + BUOC_THE }))
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(them, { timeout: 250 })
+      return () => w.cancelIdleCallback?.(id)
+    }
+    const id = setTimeout(them, 30)
+    return () => clearTimeout(id)
+  }, [phase, assignment, boCuc, soTheDung, flat.length, theDaDung])
 
   // Bộ câu ĐẦY ĐỦ (kèm đáp án đúng + lời giải) dùng riêng cho màn "Xem lại
   // lời giải" — cùng bộ qid với bài em đã làm, chỉ khác nguồn có đáp án
@@ -1551,6 +1579,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // nhiều màn hình nhất (IntersectionObserver trên thẻ câu). Không đếm khi màn
   // bị ẩn. Lưu vào attempt mỗi 10 giây + lúc nộp — mở lại vẫn cộng tiếp.
   const giayCauRef = useRef<Record<string, number>>({})
+  /** Bộ quan sát thẻ câu đang chạy — thẻ dựng dần (xem "DỰNG ĐỀ DẦN") được gắn thêm vào đây, KHÔNG dựng lại bộ đếm giây. */
+  const ioCauRef = useRef<IntersectionObserver | null>(null)
   useEffect(() => {
     if (phase !== 'exam' || !assignment || flat.length === 0) return
     giayCauRef.current = { ...(attemptRef.current?.giayCau ?? {}) }
@@ -1574,6 +1604,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const el = document.getElementById(`cau-${stt}`)
       if (el) io.observe(el)
     }
+    ioCauRef.current = io
     const tick = setInterval(() => {
       if (document.hidden) return
       let best = 0
@@ -1599,11 +1630,21 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     }, 10000)
     return () => {
       io.disconnect()
+      if (ioCauRef.current === io) ioCauRef.current = null
       clearInterval(tick)
       clearInterval(luu)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, assignment])
+  // Thẻ vừa dựng thêm (DỰNG ĐỀ DẦN) ⇒ gắn vào bộ quan sát đang chạy (observe lại thẻ cũ là không làm gì).
+  useEffect(() => {
+    const io = ioCauRef.current
+    if (phase !== 'exam' || !io) return
+    for (let stt = 1; stt <= Math.min(soTheDung, flat.length); stt++) {
+      const el = document.getElementById(`cau-${stt}`)
+      if (el) io.observe(el)
+    }
+  }, [phase, soTheDung, flat.length])
 
   // CHỐNG GIAN LẬN THEO MỨC (QUANLYCATHI mục 6, thay quy định "1 lần là khoá"
   // ngày 2/9): rời màn (chuyển app, tắt màn hình, mất tiêu điểm — bắt được cả
@@ -3240,6 +3281,11 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     ) : (
       the
     )
+  /** Cuộn tới câu `so`; câu chưa dựng (DỰNG ĐỀ DẦN) ⇒ dựng hết ngay trong cú bấm rồi mới cuộn. */
+  const cuonToiCau = (so: number) => {
+    if (so > soTheDung) flushSync(() => setTheDaDung({ khoa: assignment, n: Infinity }))
+    cuonToiCauDom(so)
+  }
   const gapNow = mocGio === 'gap' || mocGio === 'cuoi' || mocGio === 'het'
   // BÀI TẬP VỀ NHÀ: thay đồng hồ đếm ngược bằng hạn nộp (BA-APP.md mục 6).
   const laBaiTap = attempt?.loai === 'baitap'
@@ -3262,12 +3308,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   const renderPhan = (phan: PhanKey) => {
     const items = phan === 'I' ? assignment.phanI : phan === 'II' ? assignment.phanII : assignment.phanIII
     if (items.length === 0) return null
+    // Đầu phần chỉ hiện khi thẻ đầu tiên của phần đã dựng (DỰNG ĐỀ DẦN) — không để "Phần II" treo lơ lửng dưới câu 5.
+    const hienDauPhan = stt + 1 <= soTheDung
     return (
       <>
-        <DauPhan phan={phan} soCauBaPhan={soCauCuaBai} />
+        {hienDauPhan && <DauPhan phan={phan} soCauBaPhan={soCauCuaBai} />}
         {phan === 'I' &&
           assignment.phanI.map((item) => {
             stt += 1
+            if (stt > soTheDung) return null // DỰNG ĐỀ DẦN: thẻ chưa tới lượt dựng
             return bocCau(
               item.qid,
               0,
@@ -3296,6 +3345,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         {phan === 'II' &&
           assignment.phanII.map((item) => {
             stt += 1
+            if (stt > soTheDung) return null // DỰNG ĐỀ DẦN: thẻ chưa tới lượt dựng
             // Nhãn "Mới x/4 ý" (bản vẽ ThiDangLam) khi câu làm dở: chỉ đọc đáp án ĐÃ CÓ. Khung bọc có mặt SUỐT (không mọc/biến theo đáp án) để React không dựng lại thẻ giữa lúc em bấm.
             const soYDaChon = (attempt.answers.phanII[item.qid] ?? []).filter((x) => x !== null && x !== undefined).length
             return bocCau(
@@ -3328,6 +3378,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         {phan === 'III' &&
           assignment.phanIII.map((item) => {
             stt += 1
+            if (stt > soTheDung) return null // DỰNG ĐỀ DẦN: thẻ chưa tới lượt dựng
             return bocCau(
               item.qid,
               0,
