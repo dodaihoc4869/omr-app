@@ -44,3 +44,9 @@ Kế hoạch: `ke-hoach-dot-1b.json` (đã chạy thử: 4 việc / 3 đề áp 
 ## Đợt 3 — ĐÃ GHI 29/09 18:40 (sau khi ca 12L2-L1 đóng + công bố): 91 việc / 48 đề — 88 sửa đề, đổi đáp án 12-C5-B16-I-50 B→D, 12-KT-C2-D2-I-8 A→B, DB-12-B4-D3-I-152 A→B (xem `tham-dinh-dot-3.md`).
 Sửa công cụ: kiểm ca khoá theo đúng luật `laSanSangCongBo` (congBo là chế độ, không phải cờ).
 ## Đợt 4 (khối 10–11 + phần còn lại khối 12) — ĐÃ GHI 29/09 ~20:25: 306 việc / 83 đề — 4a 141 + 4b 138 sửa đề; 4c: đổi đáp án 10-C1-B1-II-10 và DB-10-B1-D1-II-61 DSSS→DSDS (1 : 0,00055 ≈ 1818), 25 việc sửa đề giữ đáp án (xem `tham-dinh-dot-4a/4b/4c.md`). 110 câu vào lại hàng soạn.
+## Đợt 5 — ĐÃ GHI 29/09 ~20:30: 15 việc / 11 đề (sửa trình bày phát sinh khi soạn lại 110 câu).
+
+## TỔNG KẾT 29/09 (~20:30)
+- Lời giải từng bước: 7047 câu (khối 12: 4450 · 11: 1382 · 10: 1071 · chưa ghi lớp: 28 + soạn lại sau sửa). 23 hồ sơ còn cờ đáp án chờ thầy; 18 câu trượt bộ kiểm 3 lần.
+- Tự sửa kho: 621 việc (đợt 1: 142 · 1b: 4 · 2: 63 · 3: 91 · 4: 306 · 5: 15), trong đó 14 câu đổi đáp án kho, còn lại sửa đề / phương án / trình bày. Bản gốc từng câu: `sao-luu/`; danh sách: `da-tu-sua.md`.
+- Hàng soạn sạch, danh sách sửa kho không còn mục mới.

@@ -1,0 +1,167 @@
+[
+ {
+  "qid": "12-C2-B6-D1-II-4",
+  "maDe": "12-C2-B6-D1",
+  "phan": "II",
+  "so": 4,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cũng được được con người",
+  "sau": "cũng được con người",
+  "lyDo": "Đề in lặp chữ \"được được\"."
+ },
+ {
+  "qid": "DB-10-B1-D2-III-10",
+  "maDe": "DB-10-B1-D2",
+  "phan": "III",
+  "so": 10,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "khối lượng riêng của nguyên tử Fe",
+  "sau": "khối lượng riêng của tinh thể Fe",
+  "lyDo": "Đề hỏi \"khối lượng riêng của nguyên tử Fe\" nhưng có cho độ đặc 74%, và đáp số 7,84 g/cm³ là của tinh thể (khớp giá trị thực của sắt, khoảng 7,87). Chữ \"nguyên tử\" phải là \"tinh thể\"; đáp án kho đúng."
+ },
+ {
+  "qid": "DB-10-B5-D1-III-95",
+  "maDe": "DB-10-B5-D1",
+  "phan": "III",
+  "so": 95,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cùng thuộc nhóm A",
+  "sau": "cùng thuộc một nhóm A",
+  "lyDo": "Đề thiếu chữ \"một\": đọc nguyên văn thì cả 4 nguyên tố đều thuộc nhóm A. Ý đồ ra đề là đếm nguyên tố trùng nhóm, đáp số 2 đúng với bản đã sửa."
+ },
+ {
+  "qid": "DB-11-B5-D2-I-26",
+  "maDe": "DB-11-B5-D2",
+  "phan": "I",
+  "so": 26,
+  "viec": "thay",
+  "truong": "pa.D",
+  "truoc": "dinitrogen oxide (NO)",
+  "sau": "dinitrogen oxide (N₂O)",
+  "lyDo": "Phương án D ghi \"dinitrogen oxide (NO)\": tên ứng với {N2O}, công thức ghi là NO."
+ },
+ {
+  "qid": "DB-11-B8-D1-I-47",
+  "maDe": "DB-11-B8-D1",
+  "phan": "I",
+  "so": 47,
+  "viec": "thay",
+  "truong": "pa.D",
+  "truoc": "BaCl₂+SO²₄⁻→BaSO₄+2Cl⁻.",
+  "sau": "BaCl₂+SO₄²⁻→BaSO₄+2Cl⁻.",
+  "lyDo": "Phương án D viết sai chỉ số ion sulfate: \"SO²₄⁻\" thay vì SO₄²⁻."
+ },
+ {
+  "qid": "DB-11-B8-D3-II-37",
+  "maDe": "DB-11-B8-D3",
+  "phan": "II",
+  "so": 37,
+  "viec": "thay",
+  "truong": "y.b",
+  "truoc": "tháp tiếp xúc",
+  "sau": "tháp hấp thụ",
+  "lyDo": "Ý b) đề in 'tháp tiếp xúc', nhưng {SO3} được hấp thụ trong tháp hấp thụ, còn tháp tiếp xúc là nơi oxi hoá {SO2} thành {SO3}. Sửa chữ thành 'tháp hấp thụ'; đáp án Đúng giữ nguyên."
+ },
+ {
+  "qid": "DB-11-B8-D3-II-37",
+  "maDe": "DB-11-B8-D3",
+  "phan": "II",
+  "so": 37,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "V²O⁵",
+  "sau": "V₂O₅",
+  "lyDo": "Đề in chỉ số/điều kiện phản ứng (2) bị vỡ: 'V²O⁵' đáng lẽ là V₂O₅."
+ },
+ {
+  "qid": "DB-12-B5-D2-II-109",
+  "maDe": "DB-12-B5-D2",
+  "phan": "II",
+  "so": 109,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cũng được được con người",
+  "sau": "cũng được con người",
+  "lyDo": "Đề in lặp chữ \"được được\"."
+ },
+ {
+  "qid": "DB-12-B5-D2-II-249",
+  "maDe": "DB-12-B5-D2",
+  "phan": "II",
+  "so": 249,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cũng được được con người",
+  "sau": "cũng được con người",
+  "lyDo": "Đề in lặp chữ \"được được\"."
+ },
+ {
+  "qid": "DH-10-C1-B1-III-34",
+  "maDe": "DH-10-C1-B1",
+  "phan": "III",
+  "so": 34,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "khối lượng riêng của nguyên tử Fe",
+  "sau": "khối lượng riêng của tinh thể Fe",
+  "lyDo": "Đề hỏi \"khối lượng riêng của nguyên tử Fe\" nhưng có cho độ đặc 74%, và đáp số 7,84 g/cm³ là của tinh thể (khớp giá trị thực của sắt, khoảng 7,87). Chữ \"nguyên tử\" phải là \"tinh thể\"; đáp án kho đúng."
+ },
+ {
+  "qid": "DH-11-C2-B5-I-17",
+  "maDe": "DH-11-C2-B5",
+  "phan": "I",
+  "so": 17,
+  "viec": "thay",
+  "truong": "pa.D",
+  "truoc": "dinitrogen oxide (NO)",
+  "sau": "dinitrogen oxide (N₂O)",
+  "lyDo": "Phương án D ghi \"dinitrogen oxide (NO)\": tên ứng với {N2O}, công thức ghi là NO."
+ },
+ {
+  "qid": "DH-11-C2-B8-I-37",
+  "maDe": "DH-11-C2-B8",
+  "phan": "I",
+  "so": 37,
+  "viec": "thay",
+  "truong": "pa.D",
+  "truoc": "BaCl₂+SO²₄⁻→BaSO₄+2Cl⁻.",
+  "sau": "BaCl₂+SO₄²⁻→BaSO₄+2Cl⁻.",
+  "lyDo": "Phương án D viết sai chỉ số ion sulfate: \"SO²₄⁻\" thay vì SO₄²⁻."
+ },
+ {
+  "qid": "DH-11-C2-B8-II-16",
+  "maDe": "DH-11-C2-B8",
+  "phan": "II",
+  "so": 16,
+  "viec": "thay",
+  "truong": "y.b",
+  "truoc": "tháp tiếp xúc",
+  "sau": "tháp hấp thụ",
+  "lyDo": "Ý b) đề in 'tháp tiếp xúc', nhưng {SO3} được hấp thụ trong tháp hấp thụ, còn tháp tiếp xúc là nơi oxi hoá {SO2} thành {SO3}. Sửa chữ thành 'tháp hấp thụ'; đáp án Đúng giữ nguyên."
+ },
+ {
+  "qid": "DH-11-C2-B8-II-16",
+  "maDe": "DH-11-C2-B8",
+  "phan": "II",
+  "so": 16,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "V²O⁵",
+  "sau": "V₂O₅",
+  "lyDo": "Đề in chỉ số/điều kiện phản ứng (2) bị vỡ: 'V²O⁵' đáng lẽ là V₂O₅."
+ },
+ {
+  "qid": "DH-12-C2-B4-II-1",
+  "maDe": "DH-12-C2-B4",
+  "phan": "II",
+  "so": 1,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cũng được được con người",
+  "sau": "cũng được con người",
+  "lyDo": "Đề in lặp chữ \"được được\"."
+ }
+]
