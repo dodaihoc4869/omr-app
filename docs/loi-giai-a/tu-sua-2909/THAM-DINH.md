@@ -34,7 +34,7 @@ Không áp: sửa bảng DH-12-C1-B1-P1-II-26 (trường `bang` không phải ch
 ## Lỗi dây chuyền phát hiện kèm
 `src/lib/loi-giai-kiem.ts:216` ghép chuỗi đáp án Đ/S theo thứ tự khoá của `y`, còn màn thi (`exam-kho-de-import.ts:446`) ghép theo a,b,c,d. Câu lưu ý lệch thứ tự ⇒ hồ sơ lời giải sai Đ/S. Hiện gặp 1/2117 câu. Sửa: xếp `ids` theo a–d (và A–D với `pa`); cần đẩy Worker ⇒ để Boss giao.
 
-## Đợt 1b — quyết 5 câu còn treo (thầy lệnh 15:05 "tự xử lý tối ưu nhất") — CHƯA GHI: bộ phân loại quyền chặn, chờ thầy cho phép trực tiếp
+## Đợt 1b — quyết 5 câu còn treo (thầy lệnh 15:05 "tự xử lý tối ưu nhất") — ĐÃ GHI 29/09 ~15:20 (thầy cho phép tất cả): 4 việc / 3 đề đọc lại khớp; 2 hồ sơ alanine đã nộp lại với daChot "giữ đáp án kho 2"
 Kế hoạch: `ke-hoach-dot-1b.json` (đã chạy thử: 4 việc / 3 đề áp được).
 - **Kb (12-C3-B8-D2-II-23, DB-12-B8-D2-II-27):** đổi đáp án SSSD → **DSSD**. Kb = x²/(0,1 − x) = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵, trùng đúng số in; cách gần đúng ra 6,3 không khớp số nào ⇒ số 6,5 là số tính đủ, ý a Đúng.
 - **Enzyme (12-KT-C3-D2-I-16):** sửa đề tối thiểu, giữ đáp án A: (b) "khoảng 51 °C" → "khoảng 50 °C"; (c) → "Tốc độ phản ứng ở 45 °C cao hơn ở 37 °C." (sai rõ theo đồ thị) ⇒ A = (a), (b), (d) là đáp án duy nhất.

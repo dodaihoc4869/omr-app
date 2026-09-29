@@ -146,3 +146,7 @@ Sao lưu bản gốc từng câu: `sao-luu/<mã đề>.json`. Lùi: `node script
 | 07:40:16 | 12-KT-C56-D1-III-4 | đáp án 5 → 2 | Đã chốt CHOT-2909: pin chỉ lập từ phản ứng oxi hoá – khử tự xảy ra ⇒ (d), (e). |
 | 07:40:20 | DB-12-B5-D2-III-344 | đáp án 3,45 → 2 | 3,45 nhập nhầm: chỉ maltose, tinh bột có α-1,4-glycoside ⇒ 2. |
 | 07:40:27 | 12-KT-C3-D3-I-12 | pa.A: «500» → «50» | n(CH3NH2) = 0,05 mol ⇒ V = 50 mL; sửa A "500" → "50", giữ đáp án A. |
+| 08:14:48 | 12-C3-B8-D2-II-23 | đáp án SSSD → DSSD | Ý a: đọc đồ thị pH(C2H5NH2) = 11,4 ⇒ [OH⁻] = 10^-2,6 = 2,51·10⁻³ M; Kb = x²/(0,1 − x) = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵, trùng đúng số đề cho ⇒ Đúng (tính gần đúng x²/0,1 ra 6,3, không khớp số in). Hai phiên chốt độc lập cùng kết luận. |
+| 08:14:51 | DB-12-B8-D2-II-27 | đáp án SSSD → DSSD | Bản trùng của 12-C3-B8-D2-II-23: Kb = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵ ⇒ ý a Đúng. |
+| 08:14:54 | 12-KT-C3-D2-I-16 | de: «(b) Enzyme bất hoạt hoàn toàn ở khoảng 51 °C.» → «(b) Enzyme bất hoạt hoàn toàn ở khoảng 50 °C.» | Đề lỗi (cả 4 phát biểu đều đúng, không phương án khớp). Sửa tối thiểu giữ đáp án A: đồ thị về 0 đúng ở 50 °C. |
+| 08:14:54 | 12-KT-C3-D2-I-16 | de: «(c) Tốc độ phản ứng thấp hơn ở nhiệt độ trên hoặc dưới 37 °C.» → «(c) Tốc độ phản ứng ở 45 °C cao hơn ở 37 °C.» | Đề lỗi: (c) cũ cũng đúng theo đồ thị ⇒ không có đáp án duy nhất. Đổi (c) thành phát biểu sai rõ theo đồ thị (đỉnh ở 37 °C) để đáp án A = (a), (b), (d) là duy nhất. |
