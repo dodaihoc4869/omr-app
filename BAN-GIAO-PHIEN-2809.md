@@ -114,3 +114,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 12:28 · Deploy #568 THÀNH CÔNG: PR #70 tối ưu máy yếu · main b654155 · lùi: git revert -m 1 b654155. 12:39 gộp PR #71 nút Hỏi thầy trong game (main 5683fc1, 0 ca mở). Chờ: #72.
 - 12:48 · Deploy #569 THÀNH CÔNG: PR #71 nút Hỏi thầy trong game · main 5683fc1 · lùi: git revert -m 1 5683fc1. 12:52 gộp PR #72 Hỏi thầy báo 'đang soạn' (main d51fb06, 0 ca mở).
 - 13:03 · Deploy #570 THÀNH CÔNG: PR #72 Hỏi thầy 'đang soạn' · main d51fb06 · lùi: git revert -m 1 d51fb06. 13:07 gộp PR #73 Bi-a mượt (main b51090f, 0 ca mở).
+- 13:16 · Deploy #571 THÀNH CÔNG: PR #73 Bi-a mượt · main b51090f · lùi: git revert -m 1 b51090f.
