@@ -54,5 +54,6 @@ Bạn soạn lời giải từng bước cho học sinh luyện thi (chương tr
 ## Cách làm cả lô
 1. Đọc `bo.json` và `vi-du-mau.json` một lần. Đọc lướt mọi câu, gom các câu cùng dạng để giọng và cách giải thống nhất.
 2. Từng câu: tự giải trước (dùng `loiGiaiCo` làm điểm xuất phát, giữ lập luận đúng, bổ sung chỗ thiếu), rồi mới viết JSON bằng công cụ Write.
+   Ghi TỪNG tệp `ra/<tên>.json` trực tiếp bằng Write, đường dẫn tương đối trong thư mục lô. KHÔNG viết script sinh tệp (gen.mjs…): Bash chỉ chạy được `node kiem.mjs`, script khác bị chặn và cả lô mất trắng.
 3. Chạy `node kiem.mjs`. Sửa mọi dòng TRƯỢT rồi chạy lại, tối đa 2 vòng sửa cho mỗi tệp. Còn trượt thì để nguyên (máy chủ trả câu về hàng).
 4. Trả lời cuối đúng 1 dòng: số câu ĐẠT / tổng, số cờ `dapAn`.
