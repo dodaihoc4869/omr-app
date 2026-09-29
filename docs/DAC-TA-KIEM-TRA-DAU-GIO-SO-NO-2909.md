@@ -1,6 +1,6 @@
 # ĐẶC TẢ · Kiểm tra đầu giờ + Sổ nợ câu sai + Ca kiểm tra "Không rút câu sai"
 
-Ngày 29/09/2026 · Trạng thái: **CHỜ THẦY CHỐT** (chưa build)
+Ngày 29/09/2026 · Trạng thái: **THẦY ĐÃ CHỐT BUILD (29/09)**
 
 Nền tảng giữ nguyên: mọi lần làm câu (ca kiểm tra, game Đảo/Đoàn/Bi-a, lên bảng) ghi vào **một sổ học chung** (`su_kien_hoc`); trạng thái từng câu (mới · đang ôn · thành thạo · cần thầy dạy lại) luôn **tính lại từ sổ**. Không chế độ nào giữ danh sách câu sai riêng.
 
@@ -27,6 +27,8 @@ Nhãn gộp hiện cho em và thầy: **"Sai 2 lần · Ca 26/09 · Lên bảng 
   1. Sai nhiều lần hơn trước;
   2. Nợ lâu hơn trước (ngày sai đầu tiên cũ nhất);
   3. Câu vừa "Thầy đã chữa" (chữa xong phải làm lại ngay hôm sau).
+- **Câu khó (2 sao) đang nợ** được ưu tiên ngang câu sai 2 lần (câu khó sửa sớm).
+- **Câu 2 sao đã thành thạo** ôn duy trì sau **14 ngày** (câu thường 30 ngày).
 - **Trần nợ: tối đa 50% số lượt trong ngày.** Phần còn lại dành cho câu mới. Nợ vượt trần thì dời sang ngày sau (vẫn giữ thứ tự ưu tiên).
 - **Chia game theo dạng câu:** Phần II (Đúng/Sai) ⇒ Đảo; Phần I, Phần III ⇒ Đoàn và Bi-a. Câu tự luận không vào game, chỉ hiện ở Lên bảng/Dạy học để thầy chữa trên lớp.
 
