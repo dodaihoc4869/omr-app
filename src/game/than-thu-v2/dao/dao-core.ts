@@ -5,7 +5,6 @@ import type {Mastery} from '../core'
 import {BATTLE_SKINS} from '../learning-battle'
 import {EVOLUTION_LEVELS,evolutionStage} from '../evolution'
 import {thanhExp} from '../../than-thu-hoa-hoc/kinh-nghiem'
-import {CAP_KHOA_MOC,NGAY_DAT_MO_CAP_10} from '../../../lib/kinh-te-game'
 import {lyDoThuong} from '../ly-do-thuong'
 import type {DaoExp,DaoProfile,LyDoThuong,VaiAi} from './kieu'
 
@@ -30,13 +29,19 @@ export function vongExp(cap:number,exp:number){const can=thanhExp(cap);if(cap>=C
  const co=Math.max(0,Math.min(can,Math.floor(exp)));return {toiDa:false,can,con:can-co,tiLe:co/can}}
 
 /**
- * KHOÁ MỐC cấp 10 (luật v4, 29/09): EXP của em vẫn vào thú ngay, nhưng thú chỉ lên cấp 10 khi em đạt nhiệm vụ ngày đủ 21 ngày; phần vượt "chờ mốc" (không mất).
- * Trả câu cho màn khi đang chờ (`choMoc > 0`), ngược lại null. Số lấy từ máy chủ (`choMoc`, `soNgayDat`, `ngayMoCap10`).
+ * CHỜ NGÀY ĐẠT (luật v5, thầy chốt 29/09): thú lên cấp khi đủ EXP VÀ đủ số ngày đạt nhiệm vụ ngày. Thanh đã đầy mà chưa đủ ngày ⇒ nói rõ còn mấy ngày,
+ * EXP làm thêm hôm nay đã đổi được bao nhiêu vàng/mảnh; EXP chờ mốc của luật cũ (`choMoc`) được giữ, không mất. Không chờ gì ⇒ null.
+ * Số lấy từ máy chủ (`choNgay`, `tranHomNay`, `choMoc`); máy chủ cũ (v4, không có `choNgay`) ⇒ chỉ nói phần EXP đang giữ.
  */
-export function chuChoMoc(p:Pick<DaoProfile,'choMoc'|'soNgayDat'|'ngayMoCap10'>,ten:string):string|null{
- const cho=Math.max(0,Math.floor(Number(p.choMoc)||0));if(cho<=0)return null
- const can=Math.max(1,Math.floor(Number(p.ngayMoCap10)||NGAY_DAT_MO_CAP_10)),co=Math.max(0,Math.floor(Number(p.soNgayDat)||0))
- return `${ten} đã đủ EXP lên cấp ${CAP_KHOA_MOC}. Em đạt nhiệm vụ ngày đủ ${can} ngày thì ${ten} lên cấp (em đã có ${co} ngày). ${cho.toLocaleString('vi-VN')} EXP đang được giữ, không mất.`}
+export function chuChoMoc(p:Pick<DaoProfile,'cap'|'choMoc'|'choNgay'|'tranHomNay'>,ten:string):string|null{
+ const cho=Math.max(0,Math.floor(Number(p.choMoc)||0)),thieu=Math.max(0,Math.floor(Number(p.choNgay)||0))
+ const giu=cho>0?` ${cho.toLocaleString('vi-VN')} EXP đang được giữ, không mất.`:''
+ if(thieu>0){
+  const t=p.tranHomNay,vang=Math.max(0,Math.floor(Number(t?.vang)||0)),manh=Math.max(0,Math.floor(Number(t?.manh)||0))
+  const doi=Math.max(0,Math.floor(Number(t?.exp)||0))>0?` EXP làm thêm hôm nay đã đổi thành ${vang.toLocaleString('vi-VN')} vàng${manh>0?` và ${manh} mảnh khiên`:''}.`:' EXP làm thêm sẽ đổi thành vàng và mảnh khiên.'
+  return `Thanh EXP đã đầy. Em đạt nhiệm vụ ngày thêm ${thieu} ngày nữa thì ${ten} lên cấp ${Math.min(CAP_TOI_DA,Math.max(1,p.cap)+1)}.${doi}${giu}`}
+ if(cho<=0)return null
+ return `${cho.toLocaleString('vi-VN')} EXP đang được giữ, không mất. EXP này vào ${ten} khi em đạt nhiệm vụ ngày thêm ngày mới.`}
 
 /** (LỊCH SỬ v3) Trần hấp thụ tối đa mỗi ngày (khi đạt nhiệm vụ ngày) = `HAP_THU_DAT` của Code 1. Luật v4 bỏ trần hấp thụ; máy chủ v4 không gửi `hapThuHomNay` nên thanh này tự ẩn. */
 export const HAP_THU_TOI_DA_NGAY=HAP_THU_DAT

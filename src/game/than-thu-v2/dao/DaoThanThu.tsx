@@ -91,7 +91,7 @@ export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,p
   const r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted}),correct=!!r.correct,reward=r.reward??0
   const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted,reward,stage:r.stage??0})
   setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct}]);setThuong(t=>({exp:t.exp+reward,sao:t.sao+(reward>0?1:0)}))
-  setPhanHoi({correct,answer:r.answer??'',solution:r.solution,solutionImages:r.solutionImages??[],lyDo,reward,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0})})
+  setPhanHoi({correct,answer:r.answer??'',solution:r.solution,solutionImages:r.solutionImages??[],lyDo,reward,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0,expCau:typeof r.expCau==='number'?r.expCau:0})})
  const tiep=()=>chay(async()=>{if(!luot)return
   if(viTri+1>=luot.cau.length){await call('complete',{session:luot.id});setXong(true);setPhanHoi(null);napGoiY()}
   else{setViTri(viTri+1);setTraLoi('');setAssisted(false);setPhanHoi(null)}})

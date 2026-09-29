@@ -45,7 +45,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
   const hinh = q.hinhAnh as HinhAnh[]
   // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
   const cheDo = useCheDoHieuUng()
-  const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward }) : 0
+  const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward, expThuThach: ketQua.expThuThach, expCau: ketQua.expCau }) : 0
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>

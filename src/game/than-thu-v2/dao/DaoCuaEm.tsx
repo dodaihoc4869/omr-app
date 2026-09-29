@@ -55,7 +55,7 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
    <div className="dao-hon-vong"><svg viewBox="0 0 260 260" aria-hidden="true"><circle className="dao-vong-nen" cx="130" cy="130" r={BAN_KINH}/><circle className="dao-vong-day" cx="130" cy="130" r={BAN_KINH} strokeDasharray={`${(CHU_VI*vong.tiLe).toFixed(0)} ${CHU_VI.toFixed(0)}`}/></svg>
     <img className="dao-hon-thu" src={anhThu(thu,profile.cap)} alt="" width="288" height="288" decoding="async" draggable={false}/></div>
    <div className="dao-hon-cap"><small>CẤP</small><strong>{profile.cap}</strong></div>
-   <div className="dao-hon-con" role="status">{vong.toiDa?`Cấp cao nhất · ${CAP_TOI_DA}`:choMoc?`Chờ đủ ngày đạt để lên cấp ${profile.cap+1}`:`còn ${vong.con.toLocaleString('vi-VN')} EXP lên cấp ${profile.cap+1}`}</div>
+   <div className="dao-hon-con" role="status">{vong.toiDa?`Cấp cao nhất · ${CAP_TOI_DA}`:(profile.choNgay??0)>0?`Thanh đầy · còn ${profile.choNgay} ngày đạt nữa lên cấp ${profile.cap+1}`:`còn ${vong.con.toLocaleString('vi-VN')} EXP lên cấp ${profile.cap+1}`}</div>
    {choMoc&&<p className="dao-hon-loi" data-vung="cho-moc">{choMoc}</p>}
    {profile.wallet>0&&profile.cap<CAP_TOI_DA&&onNap&&<button type="button" className="dao-hon-nap" disabled={busy} onClick={onNap}>Nạp {profile.wallet.toLocaleString('vi-VN')} EXP cho {ten}</button>}
    <p className="dao-hon-loi">{loiThu(profile,now,chuoiNgay)}</p>

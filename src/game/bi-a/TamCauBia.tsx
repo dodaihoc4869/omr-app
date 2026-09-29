@@ -86,7 +86,7 @@ export default function TamCauBia({ y, token, session, tenNguoiDanh, laEmDanh, t
     else { tieuDe = dung ? `Đúng · bi ${y.id} hoá vàng` : 'Chưa đúng'; phu = dung ? 'Bi vàng vào lỗ là ăn ngay. +1 Mắt thần.' : `Câu này vào lịch ôn. Bi ${y.id} đổi sang câu khác cùng dạng.` }
   }
   // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`reward` + `expThuThach`); câu sai / có Bùa Trợ giảng ⇒ không hiệu ứng.
-  const expBay = phanHoi ? expCauGame({ correct: phanHoi.correct, coTroGiup: !!docGoiY(y.cau.goiY, y.cau.phan), reward: phanHoi.reward, expThuThach: phanHoi.expThuThach }) : 0
+  const expBay = phanHoi ? expCauGame({ correct: phanHoi.correct, coTroGiup: !!docGoiY(y.cau.goiY, y.cau.phan), reward: phanHoi.reward, expThuThach: phanHoi.expThuThach, expCau: phanHoi.expCau }) : 0
   const nutDong = dung ? (y.mode === 'sau-lo' && laEmDanh ? 'Đánh tiếp' : y.mode === 'chot' ? 'Xem kết quả' : 'Về bàn') : hetGio && !phanHoi ? 'Về bàn' : 'Đã đọc lời giải'
   return (
     <div className="bia-che" role="presentation">

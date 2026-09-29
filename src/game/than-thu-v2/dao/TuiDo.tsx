@@ -14,17 +14,17 @@ export interface TuiDoProps{profile:DaoProfile;exp?:DaoExp|null;busy?:boolean;lo
 
 /** Túi đồ: khiên "chống đuổi" + mảnh khiên chuyển từ màn đảo cũ về đây. Phần thưởng chưa có thì để SẮP MỞ, không bịa. */
 export default function TuiDo({profile,exp,busy=false,loi='',onDungKhien,onRenKhien,onMoVoDai,onMoTienBo}:TuiDoProps){
- const k=manhKhien(profile,exp),daRen=profile.khienRen?.daRen,vang=profile.renKhien?.donVi==='vang'
+ const k=manhKhien(profile,exp),daRen=profile.khienRen?.daRen,vang=profile.renKhien?.donVi==='vang',ngayCanKhien=profile.renKhien?.ngayCan??profile.renKhien?.manh??0
  // Bản ngang (cùng điểm ngắt dao2/ngang.ts): cùng các thẻ, xếp LƯỚI nhiều cột (dao-ngang.css). Dọc giữ nguyên.
  const ngang=useNgang()
  return <div className="dao-tui" data-ngang={ngang?'':undefined}>
   <header><small className="dao-nhan">TÚI ĐỒ</small><h2>Đồ của {tenThu(profile)}</h2></header>
   {profile.renKhien&&onRenKhien&&<section className="dao-kinh dao-tui-the">
    <h3>Rèn khiên</h3>
-   {/* Luật v4 (29/09): rèn bằng VÀNG — máy chủ kiểm số vàng và báo lỗi nói rõ nếu thiếu. Máy chủ cũ (gia là EXP) giữ chữ cũ. */}
-   {vang?<p>Một khiên cần <b>{profile.renKhien.manh} mảnh</b>, <b>{profile.renKhien.manh} ngày đạt nhiệm vụ</b> và <b>{soVN(profile.renKhien.gia)} vàng</b>.</p>
+   {/* Rèn bằng VÀNG — máy chủ kiểm và báo lỗi nói rõ nếu thiếu. v5: khiên kế tiếp cần `ngayCan` ngày đạt (36, rồi +18 mỗi khiên). Máy chủ cũ (gia là EXP) giữ chữ cũ. */}
+   {vang?<p>Khiên kế tiếp cần <b>{profile.renKhien.manh} mảnh</b>, <b>{ngayCanKhien} ngày đạt nhiệm vụ</b> và <b>{soVN(profile.renKhien.gia)} vàng</b>.</p>
     :<p>{profile.renKhien.manh} mảnh và {profile.renKhien.gia} EXP cho một khiên. Giữ lại {profile.renKhien.duTru} EXP để thần thú ăn.</p>}
-   <button type="button" className="dao-tui-ren" disabled={busy||(profile.soNgayDat??0)<profile.renKhien.manh||(k?.manh??0)<profile.renKhien.manh||(!vang&&profile.wallet<profile.renKhien.gia+profile.renKhien.duTru)||(profile.khienRen?.chuaDung??0)>=5} onClick={()=>onRenKhien(daRen??0)}>Rèn 1 khiên · {soVN(profile.renKhien.gia)} {vang?'vàng':'EXP'}</button>
+   <button type="button" className="dao-tui-ren" disabled={busy||(profile.soNgayDat??0)<ngayCanKhien||(k?.manh??0)<profile.renKhien.manh||(!vang&&profile.wallet<profile.renKhien.gia+profile.renKhien.duTru)||(profile.khienRen?.chuaDung??0)>=5} onClick={()=>onRenKhien(daRen??0)}>Rèn 1 khiên · {soVN(profile.renKhien.gia)} {vang?'vàng':'EXP'}</button>
   </section>}
   {loi&&<p role="alert" className="dao-loi">{loi}</p>}
   <section className="dao-kinh dao-tui-the" aria-label="Khiên"><ImmortalShield serverRemaining={profile.khienConLai??profile.khienRen?.conLai??exp?.manhKhien?.khienConLai} ngayDat={profile.soNgayDat} ngayMo={profile.ngayMoKhienQua} level={profile.cap} state={profile.shields} busy={busy} onUse={onDungKhien}/></section>
