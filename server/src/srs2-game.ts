@@ -7,8 +7,8 @@ import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
-import { chonPhuongAnGach, moDuocRuong, xepChuyenDao, type TrangThaiCau } from './srs2-loi'
-import { coGoiY, docHoSo2, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
+import { chonPhuongAnGach, moDuocRuong, nhanNo, xepChuyenDao, type NguonNhan, type TrangThaiCau } from './srs2-loi'
+import { coGoiY, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -47,7 +47,7 @@ export async function soCauGameHomNay(env: Env, sbd: string, nowMs: number): Pro
   return Number(r?.n) || 0
 }
 
-export interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3 }
+export interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
 
 /** Cỡ lô một truy vấn nạp câu đầy đủ (chặn cỡ tham số JSON; kế hoạch ngày ≤ vài chục câu nên thường chỉ MỘT lô). */
 export const LO_NAP_CAU = 40
@@ -128,7 +128,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
     if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === r.qid))) {
       const day = await napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set())
-      if (day.length === cu.questions.length) return { ok: true, id: str(dangCho.id), questions: day.map(({ q }, i) => ({ ...publicQuestion(q), vai: cu.questions[i]!.role, ...(cu.questions[i]!.goiY ? { goiY: cu.questions[i]!.goiY } : {}) })), ...tomTat }
+      if (day.length === cu.questions.length) return { ok: true, id: str(dangCho.id), questions: day.map(({ q }, i) => ({ ...publicQuestion(q), vai: cu.questions[i]!.role, ...(cu.questions[i]!.goiY ? { goiY: cu.questions[i]!.goiY } : {}), ...(cu.questions[i]!.nhanNo ? { nhanNo: cu.questions[i]!.nhanNo } : {}) })), ...tomTat }
     }
   }
   const chan = await protectedQuestions(env)
@@ -136,14 +136,16 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   // Thầy 28/09: câu ôn Đúng–sai đi trước như cũ; câu mới dễ → khó ⇒ ải 1–2 dễ nhất, ải 6 (Trùm) khó nhất.
   const chon = xepChuyenDao(await napCau(env, hs, kh.conDao, SO_CAU_CHUYEN, chan), (x) => !!hs.tt.get(x.q.qid)?.laMoi, (x) => x.m.mucDo)
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.', ...tomTat }
+  const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
   const refs: RefPhien[] = chon.map(({ q, m }, i) => {
     const t = hs.tt.get(q.qid)
     const g = goiYCho(q, t, `${sbd}|${q.qid}|${kh.ngay}`)
-    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}) }
+    const n = nhan.get(q.qid)
+    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}) }
   })
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
-  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), vai: refs[i]!.role, ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}) })), ...tomTat }
+  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), vai: refs[i]!.role, ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}) })), ...tomTat }
 }
 
 /** Phiên câu riêng của em cho MỘT chặng Đoàn (gọi nội bộ từ `taoNguoi`). Chặng ít câu ôn thì ngắn lại, không độn câu. */
@@ -161,13 +163,15 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   let chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, chan)
   if (!chon.length) { const lai = await protectedQuestions(env); for (const q of chanBia) lai.add(q); chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, lai) } // phiên cũ bỏ dở: phát lại
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu ôn hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.' }
+  const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
   const refs: RefPhien[] = chon.map(({ q, m }) => {
     const g = goiYCho(q, hs.tt.get(q.qid), `${sbd}|${q.qid}|${kh.ngay}`)
-    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: false, role: 'toi_han', ...(g ? { goiY: g } : {}) }
+    const n = nhan.get(q.qid)
+    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: false, role: 'toi_han', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}) }
   })
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
-  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), role: 'toi_han', ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}) })), soCauThieu: Math.max(0, SO_CAU_CHANG - chon.length) }
+  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), role: 'toi_han', ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}) })), soCauThieu: Math.max(0, SO_CAU_CHANG - chon.length) }
 }
 
 // ---------------------------------------------------------------- lệnh hoa2-* của app học sinh
@@ -183,33 +187,26 @@ export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, 
 
 /** Nhóm "chiến dịch" giả cho câu ôn NGOÀI chiến dịch (câu sai trong ca kiểm tra đã công bố — nguồn `ca_sai` của `docHoSo2`). */
 export const NHOM_CAU_ON_CA = 'cau-sai-ca-kiem-tra'
-/** Nguồn của một lần làm, hiện cạnh lịch sử câu: Bi-a / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra; nguồn khác ⇒ 'khac'. */
-export type NguonLanLam = 'bia' | 'doan' | 'dao' | 'thi' | 'khac'
+/** Nhóm giả cho câu nợ vì sai khi Lên bảng / Kiểm tra đầu giờ ngoài mọi chiến dịch và ca (Sổ nợ 29/09). */
+export const NHOM_CAU_SAI_TAI_LOP = 'cau-sai-tai-lop'
+/** Nguồn của một lần làm, hiện cạnh lịch sử câu: Bi-a / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra / Lên bảng / Kiểm tra đầu giờ; nguồn khác ⇒ 'khac'. */
+export type NguonLanLam = NguonNhan
 /**
- * Gắn nguồn cho từng lần trong `lichSu` của các câu đã liệt kê. `lichSu` (phatLaiCau) = các lần làm (bỏ lần bị giữ kín) xếp theo giờ, CẮT từ
- * mốc chiến dịch ⇒ là ĐUÔI của danh sách đầy đủ ⇒ lấy đúng số lần cuối. Lỗi đọc ⇒ để trống nguồn (không làm hỏng danh sách).
+ * Gắn nguồn cho từng lần trong `lichSu` của các câu đã liệt kê (một truy vấn sổ, `docLichSuCoNguon`) và nhãn nợ `nhan`
+ * ("Sai 2 lần · Ca 26/09 · Lên bảng 28/09") cho câu chưa thành thạo. Lỗi đọc ⇒ để trống nguồn (không làm hỏng danh sách).
  */
-async function ganNguonLanLam(env: Env, sbd: string, cau: Record<string, unknown>[]): Promise<void> {
+async function ganNguonLanLam(env: Env, sbd: string, cau: Record<string, unknown>[], hs: HoSo2): Promise<void> {
   if (!cau.length) return
-  const ds = JSON.stringify(cau.map((c) => str(c.qid)))
-  const sql = (coVis: boolean) => `SELECT s.qid, s.luc, s.nguon, ${coVis ? 's.visibility' : 'NULL AS visibility'},
-      COALESCE(json_extract(g.json, '$.bia'), 0) AS bia, json_extract(g.json, '$.doan') AS doan
-    FROM su_kien_hoc s LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
-    WHERE s.sbd = ? AND s.qid IN (SELECT value FROM json_each(?)) ORDER BY s.luc`
-  const r = await env.DB.prepare(sql(true)).bind(sbd, ds).all<Row>().catch(() => env.DB.prepare(sql(false)).bind(sbd, ds).all<Row>()).catch(() => null)
-  if (!r) return
-  const theoQid = new Map<string, NguonLanLam[]>()
-  for (const x of r.results ?? []) {
-    if (str(x.visibility) === 'embargoed') continue
-    const n: NguonLanLam = str(x.nguon) === 'thi' ? 'thi' : str(x.nguon) !== 'game' ? 'khac' : Number(x.bia) === 1 ? 'bia' : x.doan != null ? 'doan' : 'dao'
-    theoQid.set(str(x.qid), [...(theoQid.get(str(x.qid)) ?? []), n])
-  }
+  const ls = await docLichSuCoNguon(env, sbd, cau.map((c) => str(c.qid))).catch(() => null)
   for (const c of cau) {
-    const ls = c.lichSu as { nguon?: NguonLanLam }[]
-    const ns = theoQid.get(str(c.qid)) ?? []
-    if (ns.length < ls.length) continue
-    const duoi = ns.slice(ns.length - ls.length)
-    c.lichSu = ls.map((l, i) => ({ ...l, nguon: duoi[i] }))
+    const goc = c.lichSu as TrangThaiCau['lichSu']
+    const coNguon = ls ? ganNguonDuoi(goc, ls.get(str(c.qid))) : null
+    if (coNguon) c.lichSu = coNguon
+    const t = hs.tt.get(str(c.qid))
+    if (t && !t.thanhThao) {
+      const n = nhanNo(coNguon ?? goc, t.ngayChua ?? null, hs.chienDichCuCuaCau?.get(str(c.qid)) ?? null)
+      if (n) c.nhan = n
+    }
   }
 }
 
@@ -246,7 +243,20 @@ async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<st
     })
   }
   if (ngoai.length) chienDich.push({ id: NHOM_CAU_ON_CA, ten: 'Câu sai trong ca kiểm tra', hanNop: '', qids: ngoai })
-  await ganNguonLanLam(env, sbd, cau)
+  // SỔ NỢ (29/09): câu sai khi Lên bảng / Kiểm tra đầu giờ ngoài mọi chiến dịch và ca.
+  const taiLop: string[] = []
+  for (const qid of hs.qidSaiTaiLop ?? []) {
+    const t = hs.tt.get(qid), m = hs.meta.get(qid)
+    if (!t || !m || t.laMoi || daCo.has(qid)) continue
+    daCo.add(qid)
+    taiLop.push(qid)
+    cau.push({
+      qid, chienDichId: NHOM_CAU_SAI_TAI_LOP, stt: taiLop.length, phan: m.phan, mucDo: m.mucDo, tenDang: m.tenDang ?? m.dang,
+      trangThai: t.catTia ? 'can_day_lai' : t.thanhThao ? 'thanh_thao' : 'dang_on', lanCuoiDung: t.lanCuoiDung, henOn: t.henOn, lichSu: t.lichSu,
+    })
+  }
+  if (taiLop.length) chienDich.push({ id: NHOM_CAU_SAI_TAI_LOP, ten: 'Câu sai khi lên bảng', hanNop: '', qids: taiLop })
+  await ganNguonLanLam(env, sbd, cau, hs)
   return { ok: true, chienDich: chienDich.map(({ qids, ...c }) => ({ ...c, tong: qids.length })), cau }
 }
 

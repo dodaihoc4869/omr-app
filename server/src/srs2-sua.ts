@@ -20,7 +20,7 @@
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { cauCuaToChiTiet, maGocCuaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
-import { batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, type ChienDich } from './srs2-d1'
+import { batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 import { khoiLuongCan, soNgayConLai } from './srs2-loi'
 import { chuTomTatSua } from '../../src/lib/tom-tat-sua-chien-dich'
 
@@ -91,9 +91,13 @@ async function khoiLuongLonNhat(env: Env, cd: ChienDich, sbd: readonly string[],
   if (!sbd.length || !qids.length) return 0
   const them = new Map(await docMocThemCaLop(env, cd.id))
   for (const s of themSbd) them.set(s, nowLuc)
-  const tt = await trangThaiLop(env, sbd, qids, hanNop, mocBatDau, undefined, them)
+  // SỔ NỢ (thầy chốt 29/09): cộng lượt NỢ CŨ của em (câu ngoài chiến dịch này chưa thành thạo) ⇒ tự nâng số câu/ngày vẫn kịp hạn.
+  const [tt, noCu] = await Promise.all([
+    trangThaiLop(env, sbd, qids, hanNop, mocBatDau, undefined, them),
+    noCuCaLop(env, sbd, ngayVnCua(Date.parse(nowLuc)), qids, cd.id).catch(() => new Map<string, NoCuEm>()),
+  ])
   let lonNhat = 0
-  for (const s of sbd) lonNhat = Math.max(lonNhat, khoiLuongCan(tt.get(s)?.values() ?? []))
+  for (const s of sbd) lonNhat = Math.max(lonNhat, khoiLuongCan(tt.get(s)?.values() ?? []) + (noCu.get(s)?.luot ?? 0))
   return lonNhat
 }
 /**
