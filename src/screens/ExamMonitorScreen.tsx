@@ -28,7 +28,8 @@ import { CAU_HINH_DE_RIENG_MAC_DINH, docPhamViHoiLai } from '../lib/cau-hinh-de-
 import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
 import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
-import { gioMayChu } from '../lib/gio-may-chu'
+import { dongBoGioMayChu, gioMayChu } from '../lib/gio-may-chu'
+import { CACH_TAI_DAY_MS, NHIP_SONG_CA_MS, goiNhipCa, gopTienDoSong, hetLucMuonNhat, phuTienDoSong, type TienDoSong } from '../lib/nhip-song-ca'
 import { soanTinRoiMan } from '../lib/tin-nhan-thay'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
@@ -678,6 +679,49 @@ export default function ExamMonitorScreen() {
   const dangPhongCho = !!chiTiet?.ca.phongCho && !chiTiet?.ca.batDauThiLuc
   useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), NHIP_PHONG_CHO_THAY, dangPhongCho && !chieuMa, TUY_CHON_NHIP_THAY.phongCho)
 
+  // NHỊP SỐNG — THỜI GIAN THỰC (thầy 29/09: "phần trên cho đồng bộ trực tiếp thời gian thực luôn"). Ca ĐANG MỞ đã bấm Bắt đầu (hoặc không phòng chờ) ⇒ hỏi lệnh NHẸ
+  // `/ca/nhip` 3 s/lần (tab ẩn dừng, không chồng, lỗi lùi 10 → 20 s): tiến độ từng em đổi từ mốc `sau` phủ ngay lên thẻ em; dấu vết đổi (em vào / nộp / bị khoá,
+  // thêm phút, đóng cửa) ⇒ tải lại cả ca, cách lần tải đầy trước ≥ 4 s. Vòng 20 s ở trên vẫn chạy làm lưới an toàn. Chi tiết + ước tải: src/lib/nhip-song-ca.ts.
+  const [tienDoSong, setTienDoSong] = useState<Record<string, TienDoSong>>({})
+  const [songOn, setSongOn] = useState(false)
+  const nhipRef = useRef<{ maCa: string; moc: string; dauVet: string | null; taiDayLuc: number }>({ maCa: '', moc: '', dauVet: null, taiDayLuc: 0 })
+  const caDangChay = !!chiTiet && chiTiet.ca.trangThai === 'mo' && !dangPhongCho
+  useEffect(() => {
+    // Đổi ca ⇒ quên tiến độ sống của ca cũ.
+    nhipRef.current = { maCa: maCaTheoDoiNen ?? '', moc: '', dauVet: null, taiDayLuc: Date.now() }
+    setTienDoSong({})
+    setSongOn(false)
+  }, [maCaTheoDoiNen])
+  useNhipThay(
+    async () => {
+      const ma = maCaTheoDoiNen
+      if (!ma) return true
+      const mat = (secret || (await loadTeacherSecret())).trim()
+      const n = nhipRef.current
+      const kq = await goiNhipCa(mat, ma, n.maCa === ma ? n.moc : '')
+      if (!kq) {
+        setSongOn(false)
+        return false
+      }
+      if (kq.gioMayChu) dongBoGioMayChu(kq.gioMayChu)
+      if (nhipRef.current.maCa !== ma || !kq.coCa) return true
+      setSongOn(true)
+      if (kq.tt.length) setTienDoSong((c) => gopTienDoSong(c, kq.tt))
+      nhipRef.current.moc = kq.moc
+      if (nhipRef.current.dauVet === null) {
+        nhipRef.current.dauVet = kq.dauVet
+      } else if (kq.dauVet !== nhipRef.current.dauVet && Date.now() - nhipRef.current.taiDayLuc >= CACH_TAI_DAY_MS) {
+        nhipRef.current.dauVet = kq.dauVet
+        nhipRef.current.taiDayLuc = Date.now()
+        await tai(ma, true)
+      }
+      return true
+    },
+    NHIP_SONG_CA_MS,
+    caDangChay && !chieuMa,
+    TUY_CHON_NHIP_THAY.songCa,
+  )
+
   const handleChoThiLai = async (sbd: string) => {
     if (!chiTiet) return
     setXacNhanSbd(null)
@@ -1299,6 +1343,13 @@ export default function ExamMonitorScreen() {
               link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
               daChepLink={daCopy}
               onChepLink={copyLink}
+              daChepLinkDiem={daCopyDiem}
+              onChepLinkDiem={copyLinkDiem}
+              nhanSong={songOn ? 'Ca đang mở · cập nhật trực tiếp' : undefined}
+              hetLucMs={hetLucMuonNhat(
+                dsEm.map((e) => ({ dangLam: e.moiNhat.trangThai === 'dang_lam', vaoLuc: e.moiNhat.vaoLuc, hetGioLuc: e.moiNhat.hetGioLuc })),
+                chiTiet.ca.thoiGianPhut,
+              )}
               moLuc={ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}
               hetHanVao={chiTiet.ca.hetHanVao ? gio(chiTiet.ca.hetHanVao) : ''}
               thoiGianPhut={chiTiet.ca.thoiGianPhut}
@@ -1309,16 +1360,24 @@ export default function ExamMonitorScreen() {
                 return vao.length ? Math.round((Math.max(...vao) + chiTiet.ca.thoiGianPhut * 60_000 - now) / 1000) : null
               })()}
               em={[
-                ...dsEm.map((e): EmTheoDoi => ({
-                  sbd: e.sbd,
-                  hoTen: e.hoTen,
-                  tt: e.moiNhat.trangThai === 'duoc_duyet_lai' ? 'cho_thi_lai' : (e.moiNhat.trangThai as EmTheoDoi['tt']),
-                  daLam: e.moiNhat.dapAn && tongCauDe ? demCauDaLam(e.moiNhat.dapAn) : null,
-                  tongCau: tongCauDe || null,
-                  soLanRoiMan: e.moiNhat.soLanRoiMan,
-                  tongGiayRoiMan: e.moiNhat.tongGiayRoiMan,
-                  diem: e.diem ?? null,
-                })),
+                ...dsEm.map((e): EmTheoDoi => {
+                  const song = tienDoSong[e.sbd]
+                  const tongCau = tongCauDe || song?.tongCau || null
+                  const phu = phuTienDoSong(
+                    { dangLam: e.moiNhat.trangThai === 'dang_lam', vaoLuc: String(e.moiNhat.vaoLuc || ''), daLam: e.moiNhat.dapAn && tongCau ? demCauDaLam(e.moiNhat.dapAn) : null, soLanRoiMan: e.moiNhat.soLanRoiMan },
+                    song,
+                  )
+                  return {
+                    sbd: e.sbd,
+                    hoTen: e.hoTen,
+                    tt: e.moiNhat.trangThai === 'duoc_duyet_lai' ? 'cho_thi_lai' : (e.moiNhat.trangThai as EmTheoDoi['tt']),
+                    daLam: tongCau ? phu.daLam : null,
+                    tongCau,
+                    soLanRoiMan: phu.soLanRoiMan,
+                    tongGiayRoiMan: e.moiNhat.tongGiayRoiMan,
+                    diem: e.diem ?? null,
+                  }
+                }),
                 ...emChuaVao.map((sbd): EmTheoDoi => ({ sbd, hoTen: classList.find((c) => c.sbd === sbd)?.hoTen || '', tt: 'chua_vao', daLam: null, tongCau: null, soLanRoiMan: 0, tongGiayRoiMan: 0, diem: null })),
               ]}
               soChuaVao={chuaVao}
@@ -1396,28 +1455,18 @@ export default function ExamMonitorScreen() {
                 void tai(chiTiet.ca.maCa, true) // tải lại: giờ hết chung mới (thoiGianPhut đã cộng) hiện ngay ở đồng hồ
               },
             }}
-          />
-          {/* THÔNG TIN CA */}
-          <TheNoiDung className="gv-monitor-overview">
-            <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
-            {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
-                Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — {chiTiet.ca.dongBoGio ? `đồng bộ giờ cả phòng, cùng hết giờ lúc ${gio(new Date(Date.parse(chiTiet.ca.batDauThiLuc) + chiTiet.ca.thoiGianPhut * 60000).toISOString())}.` : 'em vào từ giờ nhận đề ngay, tính giờ riêng từng em.'}
-              </div>
-            )}
-            {/* CỬA VÀO CA — HAI NÚT, LUÔN THẤY CẢ HAI (thầy chốt 05/09).
-                Trước đây chỉ có MỘT nút đổi mặt theo trạng thái: đang mở thì
-                thấy nút khoá, đã khoá thì thấy nút mở. Nhìn một nút
-                không biết ca đang ở trạng thái nào, phải đọc chữ trên nút rồi
-                suy ngược — giữa giờ dễ bấm nhầm.
-
-                Nay hai nút nằm cạnh nhau, nút ứng với trạng thái ĐANG CÓ thì
-                tắt và tô nhạt. Thầy liếc là biết cửa đang mở hay đóng.
-
-                MỞ CA cũng dùng khi QUÁ GIỜ VÀO: nó gỡ luôn hạn vào phòng, nên
-                em đến muộn vào được ngay, không phải mở ca mới. */}
-            <div style={{ marginTop: 'var(--k3)' }}>
-              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }} data-cua-vao={cua.nhan}>
+          >
+            {/* THẺ THÔNG TIN CA CŨ ĐÃ BỎ (thầy 29/09: "bỏ phần phía dưới này của theo dõi ca thi vì trùng chức năng với phần trên"). Kiểm từng dòng:
+                - "● Ca đang mở" + "Kết thúc ca: bấm…" ⇒ BỎ: trùng chấm "Ca đang mở" + nút "Kết thúc ca ngay" (có câu hỏi lại) ở Việc nhanh phía trên.
+                - "Link vào thi" ⇒ BỎ ở ca đang mở: trùng nút "Chép link" đầu màn. "Link xem điểm" ⇒ DỜI lên cạnh "Chép link" (TheoDoiCa).
+                  Ca đã kết thúc (không có đầu màn Theo dõi) ⇒ hai nút nhỏ ở đây.
+                - Cửa vào ca, giờ bắt đầu phòng chờ, nút Mở ca (khi quá giờ vào / đã khoá), câu em sai buổi trước, em bị chặn ở cổng danh sách, Xoá ca này
+                  ⇒ không có chỗ nào khác làm được ⇒ DỜI GỌN vào đáy thẻ Thời gian này (một thẻ thay cho hai). */}
+            <div className="gv-monitor-overview" style={{ display: 'contents' }}>
+              <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
+              {/* CỬA VÀO CA: trạng thái nói bằng chữ. KHOÁ CA cũ đã gỡ 28/09 (trùng "Kết thúc ca ngay"); MỞ CA chỉ hiện khi cửa đang đóng — cũng dùng khi
+                  QUÁ GIỜ VÀO: nó gỡ hạn vào phòng, em đến muộn vào được ngay. */}
+              <p className="ca-gio-dong" data-cua-vao={cua.nhan}>
                 Cửa vào ca: <b style={{ color: cua.moCua ? 'var(--xanh)' : 'var(--do)' }}>{cua.nhan}</b>
                 {cua.daKhoa && chiTiet.ca.khoaLuc ? (
                   <>
@@ -1426,96 +1475,59 @@ export default function ExamMonitorScreen() {
                     {chiTiet.ca.khoaBoi ? ` bởi ${chiTiet.ca.khoaBoi}` : ''}
                   </>
                 ) : null}
-                {cua.quaGioVao && !cua.daKhoa && chiTiet.ca.hetHanVao ? (
+                {!cua.daKhoa && chiTiet.ca.hetHanVao ? (
                   <>
                     {' '}
-                    (hạn <span style={SO}>{gio(chiTiet.ca.hetHanVao)}</span>)
+                    · {cua.quaGioVao ? 'hạn' : 'đến'} <span style={SO}>{gio(chiTiet.ca.hetHanVao)}</span>
                   </>
                 ) : null}
-              </div>
-              {/* HAI NÚT MỞ / KHOÁ CA — vẽ lại 06/09 theo ý thầy.
-                  Luật vẽ: việc BẤM ĐƯỢC thì tô đặc và nổi lên; việc không bấm
-                  được thì chìm hẳn, không viền, không tranh mắt. Trạng thái ca
-                  nói bằng chữ ở nhãn trên, không bắt thầy suy từ màu. */}
-              <div className="flex items-center" style={{ gap: 'var(--k2)', marginBottom: 'var(--k2)' }}>
-                <span
-                  aria-hidden
-                  style={{ width: 8, height: 8, borderRadius: 'var(--bo-tron)', background: cua.moCua ? 'var(--xanh)' : 'var(--do)', display: 'block' }}
-                />
-                <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: cua.moCua ? 'var(--xanh)' : 'var(--do)' }}>
-                  {cua.moCua ? 'Ca đang mở' : 'Ca đang khoá'}
-                </span>
-              </div>
-              {/* BẢN VẼ 28/09: nút "Khoá ca" cũ trùng việc với "Kết thúc ca ngay" ở Việc nhanh ⇒ GỠ; chỉ còn MỘT nút Kết thúc ca (cùng lệnh khoaCa, hỏi lại).
-                  Ở đây chỉ còn Mở ca, hiện khi ca đang khoá. */}
-              {!cua.moCua && (
-              <div className="grid grid-cols-1" style={{ gap: 'var(--k2)' }}>
-                <button
-                  type="button"
-                  onClick={moLaiCa}
-                  disabled={dangKhoa || !cua.moDuoc}
-                  aria-label="Mở ca cho em vào"
-                  className="tap-target flex items-center"
-                  style={{
-                    minHeight: 64,
-                    gap: 'var(--k2)',
-                    padding: '0 var(--k3)',
-                    borderRadius: 'var(--bo-3)',
-                    border: 'none',
-                    textAlign: 'left',
-                    background: cua.moDuoc ? 'var(--xanh)' : 'var(--the-2)',
-                    color: cua.moDuoc ? 'var(--muc-nguoc)' : 'var(--mo)',
-                    boxShadow: cua.moDuoc ? 'var(--bong-2)' : 'none',
-                    transition: 'transform 120ms ease, box-shadow 120ms ease',
-                  }}
-                >
-                  <span
-                    className="flex items-center justify-center shrink-0"
-                    style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the)', color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)' }}
-                  >
-                    <Unlock size={19} />
-                  </span>
-                  <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
-                    <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-                      {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'Mở ca'}
-                    </span>
-                    <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Em vào được ngay</span>
-                  </span>
-                </button>
-              </div>
+              </p>
+              {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
+                <p className="ca-gio-dong">
+                  Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — {chiTiet.ca.dongBoGio ? `đồng bộ giờ cả phòng, cùng hết giờ lúc ${gio(new Date(Date.parse(chiTiet.ca.batDauThiLuc) + chiTiet.ca.thoiGianPhut * 60000).toISOString())}.` : 'em vào từ giờ nhận đề ngay, tính giờ riêng từng em.'}
+                </p>
               )}
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-                {cua.moCua
-                  ? 'Kết thúc ca: bấm "Kết thúc ca ngay" ở Việc nhanh phía trên — máy hỏi lại trước khi làm.'
-                  : 'Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do kết thúc ca phải duyệt thi lại từng em.'}
-              </div>
-            </div>
-            {/* HAI LINK GỬI CHO EM — vẽ lại 07/09 theo ý thầy.
-                Bản cũ là hai thanh chữ xám xếp dọc, chữ dài gần bằng nhau
-                ("Copy link mời vào thi" / "Copy link XEM ĐIỂM cho em") nên giữa
-                giờ phải đọc hết mới biết bấm cái nào.
-
-                Nay đi theo đúng luật vẽ của cặp Mở ca / Khoá ca ngay trên:
-                mỗi việc một thẻ, biểu tượng tròn nói việc, dòng phụ nói em nhận
-                được gì. Hai việc khác nhau nên hai màu khác nhau — tím là VÀO
-                THI, xanh là XEM ĐIỂM — và copy xong thì chính thẻ đó đổi nền,
-                không phải đọc chữ mới biết đã copy. */}
-            {/* EM BỊ CHẶN Ở CỔNG DANH SÁCH (thầy báo 07/09).
-                Cổng so đủ ba: số báo danh, họ tên, năm sinh. Máy chủ CỐ Ý không
-                nói cho em biết sai ô nào — nói ra là cho phép dò tên học sinh
-                từ số báo danh. Nhưng thầy đứng ngay trong phòng thì phải thấy:
-                07/09 hai em bị chặn giữa buổi mà không còn dấu vết nào để lần.
-                Bày thẳng em gõ gì / danh sách ghi gì, thầy sửa trong một phút. */}
-            {/* CÂU HỎI LẠI — CÒN SAI TIẾP.
-                Ca đề riêng lấy ít nhất 30% là câu chính em đã sai; câu hỏi
-                duy nhất đáng giá sau ca là "em nào VẪN sai". Bày ngay ở màn ca
-                thi, không bắt thầy mở phiếu 21 em ra dò. */}
-            {/* HIỆN CẢ KHI KHÔNG RÚT ĐƯỢC CÂU NÀO. Bản trước chỉ hiện khi có em
-                có câu lặp, nên ca rút hụt thì màn hình im lặng hoàn toàn và
-                thầy không biết vì sao (thầy bắt được 08/09: "vẫn chưa có nút
-                xem lại câu đã làm sai buổi trước"). Im lặng là điều cấm. */}
+              {!cua.moCua && (
+                <div className="grid grid-cols-1" style={{ gap: 'var(--k2)' }}>
+                  <button
+                    type="button"
+                    onClick={moLaiCa}
+                    disabled={dangKhoa || !cua.moDuoc}
+                    aria-label="Mở ca cho em vào"
+                    className="tap-target flex items-center"
+                    style={{
+                      minHeight: 64,
+                      gap: 'var(--k2)',
+                      padding: '0 var(--k3)',
+                      borderRadius: 'var(--bo-3)',
+                      border: 'none',
+                      textAlign: 'left',
+                      background: cua.moDuoc ? 'var(--xanh)' : 'var(--the-2)',
+                      color: cua.moDuoc ? 'var(--muc-nguoc)' : 'var(--mo)',
+                      boxShadow: cua.moDuoc ? 'var(--bong-2)' : 'none',
+                      transition: 'transform 120ms ease, box-shadow 120ms ease',
+                    }}
+                  >
+                    <span
+                      className="flex items-center justify-center shrink-0"
+                      style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the)', color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)' }}
+                    >
+                      <Unlock size={19} />
+                    </span>
+                    <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
+                      <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                        {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'Mở ca'}
+                      </span>
+                      <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Em vào được ngay</span>
+                    </span>
+                  </button>
+                </div>
+                )}
+              {!cua.moCua && (
+                <p className="ca-gio-dong">Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do kết thúc ca phải duyệt thi lại từng em.</p>
+              )}
             {laCaDeRieng && (
-              <div style={{ marginTop: 'var(--k3)' }}>
+              <div>
                 <button
                   type="button"
                   onClick={() => setMoSaiLai((v) => !v)}
@@ -1524,13 +1536,13 @@ export default function ExamMonitorScreen() {
                   style={{
                     ...SO,
                     textAlign: 'left',
-                    minHeight: 48,
-                    padding: 'var(--k3)',
+                    minHeight: 44,
+                    padding: 'var(--k2) var(--k3)',
                     borderRadius: 'var(--bo-1)',
                     background: tongKetLap.soEmCoLap === 0 ? 'var(--cam-nen)' : tongKetLap.tongSaiLai > 0 ? 'var(--do-nen)' : 'var(--xanh-nen)',
                     color: tongKetLap.soEmCoLap === 0 ? 'var(--cam)' : tongKetLap.tongSaiLai > 0 ? 'var(--do)' : 'var(--xanh)',
                     border: 'none',
-                    fontSize: 'var(--cx-2)',
+                    fontSize: 'var(--cx-1)',
                   }}
                 >
                   {tongKetLap.soEmCoLap === 0
@@ -1598,7 +1610,7 @@ export default function ExamMonitorScreen() {
             )}
 
             {chiTiet.biChan && chiTiet.biChan.length > 0 && (
-              <div style={{ marginTop: 'var(--k3)' }}>
+              <div>
                 <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
                   Bị chặn ở cổng danh sách (<b style={SO}>{chiTiet.biChan.length}</b> lượt)
                 </div>
@@ -1628,44 +1640,25 @@ export default function ExamMonitorScreen() {
                 </div>
               </div>
             )}
-            <div style={{ marginTop: 'var(--k3)' }}>
-              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>Link gửi cho em</div>
-              <div className="grid grid-cols-2" style={{ gap: 'var(--k2)' }}>
-                <NutLinkCa
-                  icon={daCopy ? <Check size={19} /> : <LogIn size={19} />}
-                  ten={daCopy ? 'Đã copy' : 'Link vào thi'}
-                  phu="Em bấm là vào phòng"
-                  mau="var(--tim)"
-                  nen="var(--tim-nen)"
-                  daCopy={daCopy}
-                  onClick={copyLink}
-                />
-                <NutLinkCa
-                  icon={daCopyDiem ? <Check size={19} /> : <BarChart3 size={19} />}
-                  ten={daCopyDiem ? 'Đã copy' : 'Link xem điểm'}
-                  phu="Em xem điểm và báo cáo"
-                  mau="var(--xanh)"
-                  nen="var(--xanh-nen)"
-                  daCopy={daCopyDiem}
-                  onClick={copyLinkDiem}
-                />
-              </div>
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
-                Link xem điểm: em chỉ nhập số báo danh, có trong danh sách lớp là mở đúng màn hình lúc vừa nộp
-                bài. Gửi được sau khi đã dựng phiếu cho ca.
+              <div className="ca-hang-nut">
+                {chiTiet.ca.trangThai !== 'mo' && (
+                  <>
+                    <button type="button" className="ca-nut-nho" onClick={copyLink}>
+                      {daCopy ? <Check size={16} aria-hidden /> : <LogIn size={16} aria-hidden />}
+                      {daCopy ? 'Đã copy' : 'Link vào thi'}
+                    </button>
+                    <button type="button" className="ca-nut-nho" onClick={copyLinkDiem} title="Em nhập số báo danh là mở đúng màn hình lúc vừa nộp. Gửi được sau khi đã dựng phiếu cho ca.">
+                      {daCopyDiem ? <Check size={16} aria-hidden /> : <BarChart3 size={16} aria-hidden />}
+                      {daCopyDiem ? 'Đã copy' : 'Link xem điểm'}
+                    </button>
+                  </>
+                )}
+                <button type="button" onClick={() => setHoiXoa(true)} className="ca-nut-nho ca-nut-nho--do">
+                  <Trash2 size={14} aria-hidden /> Xoá ca này
+                </button>
               </div>
             </div>
-
-            {/* XOÁ CA — chuyển lên đây 15/09 theo lệnh thầy, sau khi gỡ hai thẻ
-                "Xuất kết quả" và "Tải đề & lời giải". Đặt cuối thẻ thông tin ca
-                là đúng chỗ: mọi việc tác động lên CHÍNH CA này (Bắt đầu thi,
-                Khoá ca, Xoá ca) nằm chung một thẻ. */}
-            <div className="flex justify-end" style={{ marginTop: 'var(--k4)', paddingTop: 'var(--k3)', borderTop: '1px solid var(--vien)' }}>
-              <button type="button" onClick={() => setHoiXoa(true)} className="tap-target inline-flex items-center gap-1" style={{ ...NHAN_NHO, color: 'var(--do)' }}>
-                <Trash2 size={14} /> Xoá ca này
-              </button>
-            </div>
-          </TheNoiDung>
+          </KhoiThoiGianCa>
 
           {/* HỘP XÁC NHẬN KHOÁ — nêu ĐÚNG SỐ ĐẾM THẬT, không nói chung chung.
               Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}
@@ -2082,45 +2075,3 @@ export default function ExamMonitorScreen() {
     </div>
   )
 }
-
-/** Một ô xuất kết quả: biểu tượng trên, tên hai chữ ở giữa, đuôi tệp bên dưới.
- * Ba ô cùng cỡ vì ba việc cùng hạng — thầy dùng cái nào cũng như nhau. */
-/** MỘT THẺ LINK GỬI CHO EM. Cùng khuôn với cặp Mở ca / Khoá ca ngay trên nó:
- * cao 64, biểu tượng tròn bên trái, tên việc và dòng phụ xếp dọc bên phải.
- * Copy xong thì nền thẻ chuyển sang màu của chính việc đó — dấu hiệu nằm ở nơi
- * ngón tay vừa chạm, không phải ở dòng thông báo trôi qua. */
-function NutLinkCa({ icon, ten, phu, mau, nen, daCopy, onClick }: { icon: React.ReactNode; ten: string; phu: string; mau: string; nen: string; daCopy: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={ten}
-      className="tap-target flex items-center"
-      style={{
-        minHeight: 64,
-        gap: 'var(--k2)',
-        padding: '0 var(--k3)',
-        borderRadius: 'var(--bo-3)',
-        border: `1.5px solid ${daCopy ? mau : 'var(--vien)'}`,
-        textAlign: 'left',
-        background: daCopy ? nen : 'var(--the-2)',
-        color: 'var(--muc)',
-        transitionProperty: 'background-color, border-color',
-        transitionDuration: 'var(--nhanh)',
-      }}
-    >
-      <span className="flex items-center justify-center shrink-0" style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: daCopy ? mau : nen, color: daCopy ? 'var(--muc-nguoc)' : mau }}>
-        {icon}
-      </span>
-      <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
-        <span className="font-bold truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-          {ten}
-        </span>
-        <span className="truncate" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', color: 'var(--nhat)' }}>
-          {phu}
-        </span>
-      </span>
-    </button>
-  )
-}
-

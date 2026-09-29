@@ -33,6 +33,8 @@ export interface TuyChonNhipThay {
 export const LUI_MAC_DINH_THAY: readonly number[] = [30_000, 60_000, 120_000]
 /** THEO DÕI CA: thầy đang coi ca thi thật nên KHÔNG lùi quá 40 s (Boss 21/09) — số cũ đã có dòng "Mất kết nối · số lúc HH:MM"; nút Làm mới tay luôn gọi ngay. */
 export const LUI_THEO_DOI_CA_MS: readonly number[] = [30_000, 40_000]
+/** NHỊP SỐNG ca (`/ca/nhip`, 3 s): lỗi thì lùi 10 → 20 s — vẫn nhanh hơn vòng tải đầy 20 s, không dội máy chủ đang hỏng. */
+export const LUI_SONG_CA_MS: readonly number[] = [10_000, 20_000]
 
 /**
  * Giãn theo `nhipDeNghi` của máy chủ, MỖI VÒNG MỘT TRẦN (Boss: Bảng tin sàn mặc định 10 s, máy chủ bận ⇒ 30 s): sàn 10 s → 20 s (bận) → 30 s (nghẽn); bản 3 60 s → 120 s; Theo dõi ca 20 s → 40 s (KHÔNG quá 40 s —
@@ -45,6 +47,9 @@ export const TUY_CHON_NHIP_THAY = {
   sucKhoeMay: { heSoToiDa: 2, tranMs: 20_000 },
   /** PHÒNG CHỜ (Theo dõi ca khi chưa bấm Bắt đầu thi + màn Chiếu mã, thầy 28/09): 5 s → máy chủ bận ×2 = 10 s; lỗi lùi 30 → 40 s như Theo dõi ca. */
   phongCho: { heSoToiDa: 2, tranMs: 10_000, luiDanMs: LUI_THEO_DOI_CA_MS },
+  /** NHỊP SỐNG của ca đang chạy (thầy 29/09 "thời gian thực"): lệnh NHẸ `/ca/nhip` 3 s/lần (src/lib/nhip-song-ca.ts) → máy chủ bận ×2 = 6 s; lỗi lùi 10 → 20 s
+   *  (vòng 20 s tải đầy của Theo dõi ca vẫn chạy song song làm lưới an toàn). */
+  songCa: { heSoToiDa: 2, tranMs: 6_000, luiDanMs: LUI_SONG_CA_MS },
 } as const satisfies Record<string, TuyChonNhipThay>
 
 /**

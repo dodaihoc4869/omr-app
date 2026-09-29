@@ -429,3 +429,48 @@
   font-size: clamp(18px, 2.4vw, 32px);
   font-weight: 800;
 }
+
+/* ĐÁY THẺ THỜI GIAN (thầy 29/09: bỏ thẻ thông tin ca phía dưới vì trùng chức năng) — các dòng còn lại gọn vào đây */
+.ca-gio-duoi {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--vien);
+  font-size: 14px;
+  color: var(--m3-on-surface-variant);
+}
+.ca-gio-dong {
+  margin: 0;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.ca-hang-nut {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ca-nut-nho {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--vien);
+  border-radius: 999px;
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ca-nut-nho--do {
+  background: transparent;
+  color: var(--do);
+}
+.ca-nut-nho:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 2px;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { gioPhutVN } from '../lib/em-toan-canh'
 import { PHUT_MOI_LAN, cauKetQuaThemPhut, type KetQuaThemPhut } from '../lib/them-phut-api'
 import { conLaiCa, dinhDangDongHo } from '../lib/con-lai-ca'
@@ -29,7 +29,9 @@ function gioPhut(iso: string): string {
   return gioPhutVN(iso) // HH:mm 24 giờ GIỜ VIỆT NAM — không lệ thuộc máy đặt 12 giờ
 }
 
-export default function KhoiThoiGianCa({ ca, themPhut }: { ca: CaGioHienThi; themPhut?: ThemPhutProps }) {
+/** `children` (thầy 29/09 "bỏ phần dưới, trùng chức năng"): các dòng GỌN còn lại của thẻ thông tin ca cũ (cửa vào ca, phòng chờ, câu sai buổi trước, Xoá ca…)
+ *  nằm ở đáy thẻ Thời gian, ngăn bằng một vạch — một thẻ thay cho hai. */
+export default function KhoiThoiGianCa({ ca, themPhut, children }: { ca: CaGioHienThi; themPhut?: ThemPhutProps; children?: ReactNode }) {
   const [now, setNow] = useState(() => gioMayChu())
   const [buoc, setBuoc] = useState<'nghi' | 'hoi' | 'dang'>('nghi')
   const [ketQua, setKetQua] = useState<{ ok: boolean; chu: string } | null>(null)
@@ -119,6 +121,7 @@ export default function KhoiThoiGianCa({ ca, themPhut }: { ca: CaGioHienThi; the
           )}
         </div>
       )}
+      {children ? <div className="ca-gio-duoi">{children}</div> : null}
     </section>
   )
 }

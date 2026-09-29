@@ -14,6 +14,7 @@ const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/KhoiKhacPhuc3CheDo.tsx': 1,
   'src/components/KhoiThoiGianCa.tsx': 1,
+  'src/components/ca-thi/TheoDoiCa.tsx': 1, // 1 s đồng hồ vòng "phút còn lại" theo gioMayChu() (29/09) — vòng HỎI là /ca/nhip ở màn cha qua useNhipThay
   'src/components/LuyenDeChuan.tsx': 1,
   'src/components/NutNopBtvn.tsx': 1,
   'src/components/PhongChoGame.tsx': 1,

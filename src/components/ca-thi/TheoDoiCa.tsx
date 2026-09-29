@@ -1,9 +1,10 @@
 // (b) THEO DÕI CA — đầu màn theo bản vẽ thầy chốt 28/09/2026 (docs/ban-ve-ca-thi-2809, màn b): tên ca + link + Chép link + đồng hồ vòng; 4 thẻ số màu theo nghĩa
 // (Đang làm xanh dương · Đã nộp xanh lục · Chưa vào hổ phách · Cảnh báo hồng) + thanh cả lớp; lưới thẻ từng em có lọc; "Cần thầy xử lý" (khoá bài → Mở khoá sẵn có;
 // rời màn; chưa vào); Việc nhanh (Chiếu mã, Đóng cửa vào, Kết thúc ca — cả hai HỎI LẠI ở hộp xác nhận của màn cha). Chỉ VẼ số màn cha đã đếm; mọi lệnh đi qua hàm sẵn có của màn cha.
-import { useMemo, useState } from 'react'
-import { AlertTriangle, Copy, DoorClosed, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { AlertTriangle, BarChart3, Copy, DoorClosed, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
 import { soVn } from '../../lib/ket-qua-sau-nop'
+import { gioMayChu } from '../../lib/gio-may-chu'
 import './ca-thi.css'
 
 export type TrangThaiEmTd = 'dang_lam' | 'da_nop' | 'khoa' | 'cho_thi_lai' | 'chua_vao'
@@ -29,8 +30,16 @@ export interface TheoDoiCaProps {
   thoiGianPhut: number
   congBoChu: string
   phamViChu: string
-  /** Giây còn lại của em vào muộn nhất đang làm (null = chưa em nào làm). */
+  /** Giây còn lại của em vào muộn nhất đang làm (null = chưa em nào làm). Bị `hetLucMs` thay khi màn cha truyền nó. */
   conGiay: number | null
+  /** Mốc hết giờ (ms, giờ máy chủ) của em hết giờ muộn nhất đang làm. Có ⇒ đồng hồ vòng TỰ NHÍCH MỖI GIÂY theo `gioMayChu()` (thầy 29/09 "thời gian thực"),
+   *  không chờ nhịp hỏi máy chủ. null = chưa em nào làm. */
+  hetLucMs?: number | null
+  /** Chữ ở chấm "đang sống" đầu màn (mặc định nói nhịp 20 giây cũ). */
+  nhanSong?: string
+  /** Chép link XEM ĐIỂM (dời lên từ thẻ thông tin ca cũ, 29/09) — cạnh nút Chép link vào thi. */
+  onChepLinkDiem?: () => void
+  daChepLinkDiem?: boolean
   em: EmTheoDoi[]
   /** null = ca không có danh sách mời (không biết sĩ số) ⇒ ẩn số "Chưa vào". */
   soChuaVao: number | null
@@ -55,8 +64,25 @@ const NHAN_TT: Record<TrangThaiEmTd, string> = { dang_lam: 'n-xd', da_nop: 'n-xl
 
 type Loc = 'tat_ca' | 'canh_bao' | 'chua_vao' | 'da_nop' | 'dang_lam'
 
+/** Giây còn lại tới `hetLucMs`, nhích mỗi giây theo giờ máy chủ. `hetLucMs` undefined ⇒ không chạy (dùng `conGiay` của màn cha). */
+function useGiayCon(hetLucMs: number | null | undefined): number | null | undefined {
+  const [bay, setBay] = useState(() => gioMayChu())
+  const chay = typeof hetLucMs === 'number'
+  useEffect(() => {
+    if (!chay) return
+    setBay(gioMayChu())
+    const t = setInterval(() => setBay(gioMayChu()), 1000)
+    return () => clearInterval(t)
+  }, [chay])
+  if (hetLucMs === undefined) return undefined
+  if (hetLucMs === null) return null
+  return Math.floor((hetLucMs - bay) / 1000)
+}
+
 export default function TheoDoiCa(p: TheoDoiCaProps) {
   const [loc, setLoc] = useState<Loc>('tat_ca')
+  const giayTuDem = useGiayCon(p.hetLucMs)
+  const conGiay = giayTuDem === undefined ? p.conGiay : giayTuDem
   const dangLam = p.em.filter((e) => e.tt === 'dang_lam')
   const daNop = p.em.filter((e) => e.tt === 'da_nop' || e.tt === 'khoa')
   const biKhoa = p.em.filter((e) => e.tt === 'khoa')
@@ -71,7 +97,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
   }, [dangLam])
   const tongCau = p.em.find((e) => e.tongCau)?.tongCau ?? null
   const dsLoc = loc === 'canh_bao' ? canhBao : loc === 'chua_vao' ? chuaVao : loc === 'da_nop' ? daNop : loc === 'dang_lam' ? dangLam : p.em
-  const phutCon = p.conGiay === null ? null : Math.max(0, p.conGiay)
+  const phutCon = conGiay === null ? null : Math.max(0, conGiay)
   const vongR = 56
   const cv = 2 * Math.PI * vongR
   const tiLeCon = phutCon === null ? 0 : Math.min(1, phutCon / Math.max(1, p.thoiGianPhut * 60))
@@ -84,7 +110,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
             <span className="ct-song">
               <i />
-              Ca đang mở · tự làm mới mỗi 20 giây
+              {p.nhanSong ?? 'Ca đang mở · tự làm mới mỗi 20 giây'}
             </span>
             <button type="button" className="ct-nut ct-nut-vien ct-nut-nho" onClick={p.onLamMoi} disabled={p.dangTai} aria-label="Làm mới ca kiểm tra">
               <RefreshCw size={16} aria-hidden="true" className={p.dangTai ? 'animate-spin' : ''} />
@@ -110,6 +136,12 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
               <Copy size={16} aria-hidden="true" />
               {p.daChepLink ? 'Đã chép' : 'Chép link'}
             </button>
+            {p.onChepLinkDiem && (
+              <button type="button" className="ct-nut ct-nut-vien ct-nut-nho" onClick={p.onChepLinkDiem} title="Em nhập số báo danh là mở đúng màn hình lúc vừa nộp. Gửi được sau khi đã dựng phiếu cho ca.">
+                <BarChart3 size={16} aria-hidden="true" />
+                {p.daChepLinkDiem ? 'Đã chép link xem điểm' : 'Chép link xem điểm'}
+              </button>
+            )}
           </div>
         </div>
         <div className="ct-vong" role="img" aria-label={phutCon === null ? 'Chưa em nào đang làm' : `Còn ${Math.ceil(phutCon / 60)} phút của em vào muộn nhất`}>

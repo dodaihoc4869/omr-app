@@ -296,7 +296,10 @@ describe('ExamMonitorScreen: khung + tab + bảng (chỉ đổi phần nhìn)', 
   it('thẻ thông tin ca còn nguyên các khối thao tác của luồng thi thật (link · Xoá ca) + đúng MỘT nút Kết thúc ca', async () => {
     const { container } = await mo()
     const phai = container.querySelector('.ca-cot-phai') as HTMLElement
-    for (const ten of [/Link vào thi/, /Link xem điểm/, /Xoá ca này/]) expect(within(phai).getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
+    // SỬA CÓ CHỦ Ý 29/09 (thầy: bỏ thẻ thông tin ca phía dưới vì trùng chức năng): ca đang mở ⇒ hai link ở đầu màn Theo dõi (Chép link · Chép link xem điểm),
+    // Xoá ca này dời vào đáy thẻ Thời gian (cột phải).
+    for (const ten of [/^Chép link$/, /Chép link xem điểm/]) expect(screen.getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
+    expect(within(phai).getAllByRole('button', { name: /Xoá ca này/ }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('button', { name: /Kết thúc ca/ })).toHaveLength(1)
     expect(screen.queryByRole('button', { name: 'Khoá ca' })).toBeNull()
   })
@@ -321,7 +324,7 @@ describe('nguồn màn theo dõi ca', () => {
   })
   it('các câu cảnh báo của luồng thi thật còn nguyên trong nguồn', () => {
     for (const cau of [
-      'Kết thúc ca: bấm "Kết thúc ca ngay" ở Việc nhanh phía trên — máy hỏi lại trước khi làm.', // sửa có chủ ý 28/09: gỡ nút Khoá ca cũ
+      // sửa có chủ ý 29/09: câu 'Kết thúc ca: bấm "Kết thúc ca ngay"…' bỏ cùng thẻ thông tin ca (trùng câu dưới nút Kết thúc ca ở Việc nhanh — TheoDoiCa.tsx)
       'Mở ca lại được, nhưng em đã bị nộp thì phải duyệt thi lại từng em.',
       'rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s',
       'Đồng ý mở khoá',
