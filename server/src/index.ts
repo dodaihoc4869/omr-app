@@ -53,7 +53,7 @@ import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
 import { shopBatCho } from './game-v2-shop'
-import { xoaDemCaBaoVe } from './game-v2-bank'
+import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
@@ -85,7 +85,7 @@ import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
-import { damBaoChiMuc } from './chi-muc-luc-chay'
+import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -2177,6 +2177,7 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
     )
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
+  xoaDemSync() // de_kho vừa đổi ⇒ `sync` của em đếm lại ngay (đệm "đã đủ" 20 s, game-v2-bank.ts)
   // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
   let loiGiai: Record<string, unknown> | null = null
   if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
@@ -2227,6 +2228,7 @@ async function xoaDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   await env.DB.batch([
     env.DB.prepare('UPDATE de_kho SET da_xoa = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(khoiPhuc ? 0 : 1, nay, maDe),
   ])
+  xoaDemSync()
   return ra({ ok: true, maDe, daXoa: !khoiPhuc })
 }
 
@@ -2304,6 +2306,7 @@ async function dungChiMucKho(env: Env, b: Record<string, unknown>): Promise<Resp
     // Số câu THẬT của tờ đề lấy luôn từ gói — cột `so_cau` trước đây đếm theo
     // mảng máy thầy gửi, hai con số phải khớp nhau.
     await env.DB.prepare('UPDATE de_kho SET so_cau = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(cau.length, nay, maDe).run()
+    xoaDemSync()
     xong.push({ maDe, soCau: cau.length })
   }
 
@@ -3084,9 +3087,14 @@ const boXuLy = {
     if(dangReset)return
     // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
+    // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
+    const caoDiem=laGioCaoDiemVn(Date.now())
     // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts, tối ưu 28/09): MỘT lần mỗi isolate, trong cron (không nằm trên đường lệnh của em/thầy). Lỗi chỉ ghi log.
-    await damBaoChiMuc(env)
+    // Cao điểm: KHÔNG chạy (lệnh DDL giữ khoá ghi D1; chỉ mục đã có từ 28/09 — isolate cron ngoài khung làm tiếp).
+    if(!caoDiem)await damBaoChiMuc(env)
     if(event.cron==='1 17 * * *'){
+      // Chỉ mục CHỈ-THÊM (chi-muc-luc-chay.ts, 29/09): dựng lúc 00:01 VN, ngoài cao điểm; IF NOT EXISTS ⇒ các đêm sau là lệnh rỗng. Lỗi chỉ ghi nhật ký máy.
+      await dungChiMucCronDem(env).then(async n=>{if(n)await ghiLoiMay(env,'chi_muc_dem')}).catch(async e=>{console.error('[chi-muc] cron lỗi:',e);await ghiLoiMay(env,'chi_muc_dem')})
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
       // THỨ TỰ: kế hoạch ngày TRƯỚC, tin phụ huynh SAU — tin phụ huynh (GĐ 5) đọc số câu từ kế hoạch vừa lập; chạy song song
@@ -3108,7 +3116,8 @@ const boXuLy = {
       await capNhatSaiNhanhNeuCu(env,Date.now())
       // GAME HÓA 2.0 bật cả trung tâm ⇒ BTVN đã bỏ: không nhắc nộp BTVN.
       if(!await docCoHoa2(env).then(c=>c.bat&&!c.lop.length&&!c.sbd.length).catch(()=>false))await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
-      await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})
+      // Cao điểm: gom tin + đẩy thông báo (quét btvn_em/mom_bai CẢ TRƯỜNG) chỉ chạy phút chia hết cho 10 thay vì mỗi phút — tin bài tập tới trễ tối đa 10 phút.
+      if(!caoDiem||new Date().getUTCMinutes()%10===0)await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})
     }
   },
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
@@ -3224,7 +3233,7 @@ const boXuLy = {
       if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
-      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
+      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
@@ -3467,6 +3476,12 @@ const boXuLy = {
       return raLoi(e)
     }
   },
+}
+
+/** Khung CAO ĐIỂM học sinh làm bài: 20:00–23:59 giờ VN (= 13:00–16:59 UTC). */
+export function laGioCaoDiemVn(nowMs: number): boolean {
+  const gio = new Date(nowMs + 7 * 3_600_000).getUTCHours()
+  return gio >= 20 && gio <= 23
 }
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */

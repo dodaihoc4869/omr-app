@@ -4,11 +4,12 @@
 //    làm tròn ⇒ lượt song song (Promise.all) tính MỘT đợt, lượt nối tiếp cộng dồn (đường găng thật).
 import type { Env } from '../server/src/kieu'
 
-export type DemVong = { vong: number; dot: number; sql: string[] }
+/** `sqlDot`: cùng thứ tự `sql`, kèm ĐỢT lúc lệnh BẮT ĐẦU (`[đ3] SELECT …`) — xem lệnh nào nằm cùng đợt (song song) để tìm chỗ còn nối tiếp. */
+export type DemVong = { vong: number; dot: number; sql: string[]; sqlDot: string[] }
 export const TRE_MS = 25
 
 export function demVongD1<E extends Env>(env: E): { env: E; d: DemVong } {
-  const d: DemVong = { vong: 0, dot: 0, sql: [] }
+  const d: DemVong = { vong: 0, dot: 0, sql: [], sqlDot: [] }
   let dau = -1
   const goc = env.DB as any
   const thatCua = new WeakMap<object, any>()
@@ -17,6 +18,7 @@ export function demVongD1<E extends Env>(env: E): { env: E; d: DemVong } {
     if (dau < 0) dau = performance.now()
     d.vong++
     d.sql.push(sql)
+    d.sqlDot.push(`[đ${Math.round((performance.now() - dau) / TRE_MS)}] ${sql}`)
     return new Promise<void>((r) => setTimeout(r, TRE_MS)).then(f).finally(() => { d.dot = Math.round((performance.now() - dau) / TRE_MS) })
   }
   const bocStmt = (st: any, sql: string): any => {

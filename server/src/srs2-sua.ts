@@ -20,7 +20,7 @@
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { cauCuaToChiTiet, maGocCuaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
-import { batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
+import { xoaDemChienDich, batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 import { khoiLuongCan, soNgayConLai } from './srs2-loi'
 import { chuTomTatSua } from '../../src/lib/tom-tat-sua-chien-dich'
 
@@ -220,6 +220,7 @@ async function luu(env: Env, b: Row, nowMs: number) {
       WHERE id = ? AND trang_thai <> 'da_huy' AND sbd_json = ? AND qid_json = ? AND han_nop = ?`)
     .bind(JSON.stringify(k.sbdSau), JSON.stringify(k.maDeSau), JSON.stringify(k.qidSau), k.hanMoi ?? cd.hanNop, k.theLucSau, k.moLai ? 1 : 0, k.moLai ? 1 : 0,
       cd.id, JSON.stringify(cd.sbd), JSON.stringify(cd.qids), cd.hanNop).run()
+  xoaDemChienDich()
   if (!r.meta.changes) throw new Error('Chiến dịch vừa đổi ở nơi khác — mở lại hộp Chỉnh sửa rồi lưu lại.')
   if (k.batDauMoi) await ghiBatDau(env, cd.id, k.batDauMoi)
 

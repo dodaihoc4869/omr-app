@@ -16,7 +16,7 @@ describe('ghiLoiMay', () => {
     const d = taoD1That()
     expect(await ghiLoiMay(d.env, 'nhac_nop_bai', NAY)).toBe(true)
     expect(dong(d)).toEqual([{ nguon: 'nhac_nop_bai', luc: new Date(NAY).toISOString(), muc: 'loi', chu: 'Nhắc nộp bài lỗi, app sẽ tự thử lại' }])
-    expect(Object.keys(TEN_NGUON_NHAT_KY).sort()).toEqual(['exp_ngay', 'gui_thong_bao', 'ke_hoach_ngay', 'khien_mat', 'nhac_nop_bai', 'tin_phu_huynh']) // 21/09: thêm khien_mat (mất khiên khi vắng)
+    expect(Object.keys(TEN_NGUON_NHAT_KY).sort()).toEqual(['chi_muc_dem', 'exp_ngay', 'gui_thong_bao', 'ke_hoach_ngay', 'khien_mat', 'nhac_nop_bai', 'tin_phu_huynh']) // 21/09: thêm khien_mat (mất khiên khi vắng); 29/09: chi_muc_dem (cron đêm dựng chỉ mục)
     for (const n of Object.keys(TEN_NGUON_NHAT_KY)) expect(chuLoiMay(n)).toMatch(/ lỗi, app sẽ tự thử lại$/)
     expect(chuLoiMay('nguon_la')).toBe('Một việc của máy lỗi, app sẽ tự thử lại')
   })

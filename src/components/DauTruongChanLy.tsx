@@ -152,7 +152,8 @@ export default function DauTruongChanLy({ cong, biDanh, he, raCauHoi }: Props) {
   useEffect(() => {
     if (ma === '') return
     void xemPhong(ma)
-    const t = window.setInterval(() => { void xemPhong(ma) }, 2500)
+    // Màn ẩn (khoá máy / chuyển tab) ⇒ không hỏi phòng (cao điểm 29/09); hiện lại là nhịp kế tiếp hỏi ngay.
+    const t = window.setInterval(() => { if (!document.hidden) void xemPhong(ma) }, 2500)
     return () => window.clearInterval(t)
   }, [ma, xemPhong])
 
@@ -163,7 +164,7 @@ export default function DauTruongChanLy({ cong, biDanh, he, raCauHoi }: Props) {
       if (r.ok && r.ds !== undefined) setDsMoi(r.ds)
     }
     void hoi()
-    const t = window.setInterval(() => { void hoi() }, 6000)
+    const t = window.setInterval(() => { if (!document.hidden) void hoi() }, 6000)
     return () => window.clearInterval(t)
   }, [cong, ma])
 
