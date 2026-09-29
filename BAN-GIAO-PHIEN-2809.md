@@ -121,3 +121,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 14:16 · Deploy #574 THÀNH CÔNG: PR #74 EXP v4 · main 7942012 · thử máy chủ: /khoe 200, chiến dịch + lời giải OK · lùi: git revert -m 1 7942012.
 - 15:03 · Gộp PR #79 tối ưu máy yếu toàn app (màn thi 127→75 ms/chạm, /hs 5,72→4,81 s; precache 170/2930 KB) · main b12ad34 · 0 ca mở · lùi: git revert -m 1 b12ad34. PR #78 nháp (EXP câu game) sẽ thay bằng PR v5.
 - 15:08 · Deploy #575 THÀNH CÔNG: PR #79 máy yếu toàn app · main b12ad34 · lùi: git revert -m 1 b12ad34. 15:15 gộp PR #77 sửa ghép Đ/S bộ kiểm lời giải + tu-sua-kho.mjs + sao lưu đợt 1 (main 4dc991d, 0 ca mở).
+- 15:20 · Deploy #576 THÀNH CÔNG: PR #77 · main 4dc991d · lùi: git revert -m 1 4dc991d. 15:33 gộp PR #80 EXP v5 (bỏ mọi trần ngày; cấp cần EXP + ngày đạt; tràn → vàng/mảnh; khiên ngày 36; EXP câu game; số bay vào thú) · main 6c333f3 · 0 ca mở · 243 test xanh · precache 170/2756 KB · đóng PR nháp #78. Lùi: git revert -m 1 6c333f3.
