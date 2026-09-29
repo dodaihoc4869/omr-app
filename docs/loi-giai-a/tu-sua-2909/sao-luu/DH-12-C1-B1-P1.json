@@ -213,5 +213,200 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "DH-12-C1-B1-P1-II-22": {
+  "luc": "2026-09-29T08:26:17.348Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "de": "Isoamyl acetate có mùi chuối nên được dùng làm hương liệu nhân tạo. Trong ngành sơn, isoamyl acetate được dùng làm dung môi vecni, dung môi sơn mài,... Isoamyl acetate được điều chế theo các bước sau:\nBước 1. Cho vào bình cầu 15 mL isoamyl alcohol (d = 0,81 g/mL), 10 mL acetic acid (d = 1,049 g/mL) và 7,0 mL H₂SO₄ đậm đặc, cho thêm vào bình vài viên đá bọt. Lắp ống sinh hàn hồi lưu thẳng đứng vào miệng bình cầu. Sau đó đun nóng bình cầu trong khoảng 1 giờ.\nBước 2. Sau khi đun, để nguội rồi rót sản phẩm vào phễu chiết, lắc đều rồi để yên 1 khoảng 5 phút, chất lỏng tách thành hai lớp, loại bỏ phần chất lỏng phía dưới, lấy phần chất lỏng phía trên.\nBước 3. Cho từ từ dung dịch Na₂CO₃ 10% vào phần chất lỏng thu lấy ở bước 2 và lắc đều cho đến khi không còn khí thoát ra, thêm tiếp 20 mL dung dịch NaCl bão hoà rồi để yên khi đó chất lỏng tách thành hai lớp. Chiết lấy phần chất lỏng phía trên, làm khan, ta thu được isoamyl acetate (d = 0,876 g/mL).",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "y": {
+    "a": "Ở bước 1, xảy ra phản ứng thế nhóm –OH của CH₃COOH bằng gốc –OCH₂CH₂CH(CH₃)₂.",
+    "b": "Thêm dung dịch Na₂CO₃ ở bước 3 nhằm mục đích làm giảm độ tan của isoamyl acetate trong nước.",
+    "c": "Isoamyl acetate rất ít tan trong nước và có khối lượng riêng nhỏ hơn khối lượng riêng của nước.",
+    "d": "Nếu hiệu suất phản ứng ester hoá là 54% và lượng isoamyl acetate bị hao hụt tối đa 6% thì thể tích isoamyl acetate thu được là 10,8 mL (làm tròn kết quả đến hàng phần mười)."
+   },
+   "loi_giai": {
+    "chot": "Na₂CO₃ dùng để trung hoà acid dư chứ không phải để giảm độ tan. Với H = 54% và hao hụt 6%, thể tích ester thu được khoảng 10,4 mL chứ không phải 10,8 mL.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -OH của acid bị thay bằng gốc -OCH₂CH₂CH(CH₃)₂."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: Na₂CO₃ dùng để trung hoà acid dư."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: ester ít tan và nhẹ hơn nước."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: tính ra khoảng 10,4 mL, không phải 10,8 mL."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "hay_gap"
+    ],
+    "ly_do": "Na₂CO₃ là base yếu nên vai trò chính là trung hoà acid dư.",
+    "bay": "Gán cho Na₂CO₃ vai trò muối kết như NaCl bão hoà."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+    "ten": "Ester hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "DH-12-C1-B1-P1-III-34": {
+  "luc": "2026-09-29T08:26:17.348Z",
+  "cau": {
+   "phan": "III",
+   "so": 34,
+   "de": "Cho các este sau: ethyl ethanoate, phenyl formate, methyl acetate và vinyl acetete.\nCó bao nhiêu ester được điều chế trực tiếp bằng phản ứng ester hóa?",
+   "dap_an": "2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "loi_giai": {
+    "chot": "Chỉ ester tạo từ acid + ALCOHOL mới điều chế trực tiếp bằng ester hoá.",
+    "buoc": [
+     "Ethyl ethanoate CH₃COOC₂H₅: từ acetic acid và ethanol — được.",
+     "Phenyl formate HCOOC₆H₅: phenol không ester hoá trực tiếp — không được.",
+     "Methyl acetate CH₃COOCH₃: từ acetic acid và methanol — được.",
+     "Vinyl acetate CH₃COOCH=CH₂: điều chế từ acetylene và acetic acid — không phải ester hoá.",
+     "Vậy có 2 chất."
+    ],
+    "ket_qua": "2",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "2",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen",
+     "loai"
+    ],
+    "ly_do": "Phenol và enol không tham gia phản ứng ester hoá trực tiếp với carboxylic acid.",
+    "bay": "Cho rằng mọi ester đều điều chế được từ acid và alcohol tương ứng."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.DEM_DONG_PHAN",
+    "ten": "Ester hoá — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "DH-12-C1-B1-P1-III-44": {
+  "luc": "2026-09-29T08:26:17.348Z",
+  "cau": {
+   "phan": "III",
+   "so": 44,
+   "de": "Đun 3,0 gam CH₃COOH với C₂H₅OH dư (xúc tác H₂SO₄ đặc), thu được 2,2 gam CH₃COOC₂H₅.\nHiệu suất của phản ứng ester hoá là là bao nhiêu %?",
+   "dap_an": "50",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "loi_giai": {
+    "chot": "n(CH₃COOH) = 0,05 mol ⇒ m(ester) lí thuyết = 4,4 g ⇒ H = 2,2 : 4,4.",
+    "buoc": [
+     "n(CH₃COOH) = 3,0 : 60 = 0,05 mol.",
+     "Nếu phản ứng hoàn toàn: n(ester) = 0,05 mol ⇒ m = 0,05 × 88 = 4,4 g.",
+     "Thực tế thu 2,2 g ⇒ H = 2,2 : 4,4 × 100% = 50%."
+    ],
+    "ket_qua": "50",
+    "dap_an_de": "50",
+    "dap_an_tu_giai": "50",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc lặp chữ 'là là'; đã bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Alcohol dư nên hiệu suất tính theo acid.",
+    "bay": "Tính hiệu suất theo khối lượng ester chia khối lượng acid."
+   },
+   "kienThuc": [
+    "CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O, tỉ lệ 1 : 1.",
+    "M(CH₃COOH) = 60; M(CH₃COOC₂H₅) = 88.",
+    "Hiệu suất tính theo chất thiếu."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.TINH_HIEU_SUAT",
+    "ten": "Ester hoá — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
  }
 }

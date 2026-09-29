@@ -1,0 +1,67 @@
+{
+ "12-KT-C12-D2-I-8": {
+  "luc": "2026-09-29T08:25:41.205Z",
+  "cau": {
+   "phan": "I",
+   "so": 8,
+   "de": "Cho dãy các chất sau:\n(1) acetic acid,\n(2) propan-1-ol,\n(3) methyl fomate,\n(4) butane.\nSự sắp xếp nào đúng với nhiệt độ sôi của các chất trong dãy là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "(1) > (2) > (3) > (4)",
+    "B": "(1) > (3) > (2) > (4)",
+    "C": "(4) > (2) > (1) > (3)",
+    "D": "(1) > (2) > (4) > (3)"
+   },
+   "loi_giai": {
+    "chot": "Acid tạo liên kết hydrogen mạnh nhất, rồi đến alcohol, sau đó ester, cuối cùng là alkane không phân cực.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: acetic acid rồi propan-1-ol rồi methyl formate rồi butane."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Ester không thể sôi cao hơn alcohol có cùng số carbon."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Butane là alkane nên có nhiệt độ sôi thấp nhất dãy."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Methyl formate vẫn sôi cao hơn butane vì phân tử phân cực hơn."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Ester không tạo được liên kết hydrogen giữa các phân tử với nhau.",
+    "bay": "Xếp methyl formate trên propan-1-ol chỉ vì thấy phân tử khối lớn hơn."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.TINH_CHAT_VAT_LI.SO_SANH",
+    "ten": "Tính chất vật lí — so sánh"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ }
+}

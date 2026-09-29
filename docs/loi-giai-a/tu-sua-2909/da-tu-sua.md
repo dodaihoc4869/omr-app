@@ -150,3 +150,66 @@ Sao lưu bản gốc từng câu: `sao-luu/<mã đề>.json`. Lùi: `node script
 | 08:14:51 | DB-12-B8-D2-II-27 | đáp án SSSD → DSSD | Bản trùng của 12-C3-B8-D2-II-23: Kb = 6,47·10⁻⁵ ≈ 6,5·10⁻⁵ ⇒ ý a Đúng. |
 | 08:14:54 | 12-KT-C3-D2-I-16 | de: «(b) Enzyme bất hoạt hoàn toàn ở khoảng 51 °C.» → «(b) Enzyme bất hoạt hoàn toàn ở khoảng 50 °C.» | Đề lỗi (cả 4 phát biểu đều đúng, không phương án khớp). Sửa tối thiểu giữ đáp án A: đồ thị về 0 đúng ở 50 °C. |
 | 08:14:54 | 12-KT-C3-D2-I-16 | de: «(c) Tốc độ phản ứng thấp hơn ở nhiệt độ trên hoặc dưới 37 °C.» → «(c) Tốc độ phản ứng ở 45 °C cao hơn ở 37 °C.» | Đề lỗi: (c) cũ cũng đúng theo đồ thị ⇒ không có đáp án duy nhất. Đổi (c) thành phát biểu sai rõ theo đồ thị (đỉnh ở 37 °C) để đáp án A = (a), (b), (d) là duy nhất. |
+| 08:24:53 | 12-BD7-14-I-13 | pa.D: «nước Javel, ….» → «nước Javel, …» | Phương án D in dư dấu chấm sau dấu ba chấm: "nước Javel, ….". |
+| 08:24:59 | 12-C1-B1-D2-II-9 | y.d: «hao hụt tối đa 6%» → «hao hụt 6%» | Ý d in 'hao hụt tối đa 6%': chữ 'tối đa' làm V thành một khoảng (10,4–11,1 mL), không còn một giá trị để so với 10,8 mL. Đề tính toán cần hao hụt đúng 6% (V = 10,4 mL); đáp án kho (Sai) đúng với bản đã sửa. |
+| 08:25:04 | 12-C2-B4-D2-III-37 | de: «frutose» → «fructose» | Đề in sai chính tả "frutose", đúng là "fructose". |
+| 08:25:08 | 12-C2-B5-II-20 | y.b: «a-1,2-glycoside» → «α-1,2-glycoside» | Ý b viết "a-1,2-glycoside" (chữ a) thay vì kí hiệu α như trên hình. |
+| 08:25:08 | 12-C2-B5-III-9 | de: «Có bao nhiêu bao nhiêu loại» → «Có bao nhiêu loại» | Đề in lặp chữ "bao nhiêu bao nhiêu". |
+| 08:25:12 | 12-C2-B6-D2-II-42 | y.b: «tan đần» → «tan dần» | Ý b in sai chính tả: "tan đần" phải là "tan dần". |
+| 08:25:12 | 12-C2-B6-D2-II-42 | y.b: «ống nhiệm, thấy» → «ống nghiệm, thấy» | Ý b in sai chính tả: "ống nhiệm" phải là "ống nghiệm". |
+| 08:25:12 | 12-C2-B6-D2-III-41 | de: «a-1,4-glycoside» → «α-1,4-glycoside» | Đề in "a-1,4" thay cho "α-1,4". |
+| 08:25:17 | 12-C3-B8-D2-I-5 | de: «amphetamine mol thu được» → «amphetamine thu được» | Ý (c) của đề thừa chữ "mol" sau tên chất. |
+| 08:25:20 | 12-C3-B9-D2-II-10 | y.b: «2 -aminopentane» → «2-aminopentane» | Ý b in thừa dấu cách trong tên: "2 -aminopentane". |
+| 08:25:25 | 12-C5-B16-II-22 | y.d: «Al₂O₃. 2H₂O» → «Al₂O₃·2H₂O» | Ý d in "Al₂O₃. 2H₂O" thừa dấu chấm và khoảng trắng; nên viết Al₂O₃·2H₂O. |
+| 08:25:27 | 12-C7-B24-I-11 | pa.D: «nước Javel, ….» → «nước Javel, …» | Phương án D in dư dấu chấm sau dấu ba chấm: "nước Javel, ….". |
+| 08:25:30 | 12-C8-B26-I-21 | pa.A: «eletron» → «electron» | Phương án A viết sai chính tả "eletron" (đúng: electron). |
+| 08:25:30 | 12-C8-B26-I-32 | pa.D: «nâu đỏ.» → «nâu đỏ» | Phương án D có dấu chấm cuối thừa, các phương án còn lại không có. |
+| 08:25:33 | 12-C8-B27-I-39 | de: «[Cu(NH₃)₄(OH₂)]²⁺ màu xanh lam» → «[Cu(NH₃)₄(OH₂)₂]²⁺ màu xanh lam» | Đề ghi màu của phức thiếu chỉ số (OH₂)₂: "[Cu(NH₃)₄(OH₂)]²⁺" trong khi sơ đồ (3) viết [Cu(NH₃)₄(OH₂)₂]²⁺. |
+| 08:25:33 | 12-C8-B27-II-17 | y.c: «Dấu hiện nhận biết» → «Dấu hiệu nhận biết» | Ý c in sai chính tả: "Dấu hiện" phải là "Dấu hiệu". |
+| 08:25:35 | 12-KT-C1-D4-II-1 | y.a: «thành phẩn chính» → «thành phần chính» | Ý a viết "thành phẩn chính" (sai chính tả), đúng là "thành phần chính". |
+| 08:25:38 | 12-KT-C1-D5-I-15 | pa.B: «thấp hơn 25 C» → «thấp hơn 25 °C» | Phương án B viết "25 C" thiếu kí hiệu độ. |
+| 08:25:38 | 12-KT-C1-D5-I-17 | pa.D: «2-methybutanol» → «2-methylbutan-1-ol» | Phương án D viết sai tên "2-methybutanol" (thiếu chữ l). |
+| 08:25:40 | 12-KT-C12-D1-II-1 | y.b: «chlolesterol» → «cholesterol» | Ý b viết sai chính tả "chlolesterol". |
+| 08:25:40 | 12-KT-C12-D1-II-1 | y.b: «gảm nguy cơ» → «giảm nguy cơ» | Ý b viết sai chính tả "gảm nguy cơ". |
+| 08:25:42 | 12-KT-C12-D2-I-8 | de: «methyl fomate» → «methyl formate» | Đề viết sai tên "methyl fomate", đúng là "methyl formate". |
+| 08:25:45 | 12-KT-C2-D2-I-18 | pa.A: «Cỏ cấu tạo» → «Có cấu tạo» | Phương án A viết sai chính tả: "Cỏ cấu tạo mạch phân nhánh", phải là "Có". |
+| 08:25:45 | 12-KT-C2-D2-II-4 | y.b: «tan đần» → «tan dần» | Ý b in sai chính tả: "tan đần" phải là "tan dần". |
+| 08:25:45 | 12-KT-C2-D2-II-4 | y.b: «ống nhiệm» → «ống nghiệm» | Ý b in sai chính tả: "ống nhiệm" phải là "ống nghiệm". |
+| 08:25:47 | 12-KT-C2-D3-III-1 | de: «frutose» → «fructose» | Đề in sai chính tả "frutose", đúng là "fructose". |
+| 08:25:49 | 12-KT-C4-D2-I-13 | pa.D: «tơ nilon-6» → «tơ nylon-6» | Phương án D viết "nilon-6", khác cách viết "nylon-6" ở phương án C và bảng từ chuẩn. |
+| 08:25:49 | 12-KT-C4-D2-I-9 | pa.D: «polypropylene. Mã đề thi: 042» → «polypropylene» | Phương án D lẫn chữ "Mã đề thi: 042" của trang đề in vào cuối phương án. |
+| 08:25:51 | 12-KT-C5-D5-I-16 | de: «Pin và acquy chuyển hoá năng thành điện năng» → «Pin và acquy chuyển hoá hoá năng thành điện năng» | Phát biểu (c) viết "chuyển hoá năng thành điện năng", thiếu chữ "hoá": phải là "hoá năng". |
+| 08:25:51 | 12-KT-C5-D5-II-2 | y.b: «ion 4 NH+» → «ion NH₄⁺» | Ý b viết vỡ công thức ion amoni: "ion 4 NH+". |
+| 08:25:51 | 12-KT-C5-D5-II-4 | y.d: «pin nhiên liệu. 0 oxh/kh E» → «pin nhiên liệu.» | Ý d dính chữ thừa "0 oxh/kh E" (ghi chú lạc từ bản gốc). |
+| 08:25:51 | 12-KT-C5-D5-II-4 | y.b: «oxy hóa» → «oxi hoá» | Ý b viết "oxy hóa", chuẩn chương trình 2018 là "oxi hoá". |
+| 08:25:55 | DB-12-B1-P1-D2-II-28 | y.d: «hao hụt tối đa 6%» → «hao hụt 6%» | Ý d in 'hao hụt tối đa 6%': chữ 'tối đa' làm V thành một khoảng (10,4–11,1 mL), không còn một giá trị để so với 10,8 mL. Đề tính toán cần hao hụt đúng 6% (V = 10,4 mL); đáp án kho (Sai) đúng với bản đã sửa. |
+| 08:25:55 | DB-12-B1-P1-D2-II-98 | y.d: «hao hụt tối đa 6%» → «hao hụt 6%» | Ý d in 'hao hụt tối đa 6%': chữ 'tối đa' làm V thành một khoảng (10,4–11,1 mL), không còn một giá trị để so với 10,8 mL. Đề tính toán cần hao hụt đúng 6% (V = 10,4 mL); đáp án kho (Sai) đúng với bản đã sửa. |
+| 08:25:55 | DB-12-B1-P1-D2-III-110 | de: «vinyl acetete» → «vinyl acetate» | Đề in sai chính tả tên chất "vinyl acetete", đúng là "vinyl acetate". |
+| 08:25:55 | DB-12-B1-P1-D2-III-115 | de: «là là bao nhiêu %» → «là bao nhiêu %» | Đề in lặp chữ "là là". |
+| 08:25:59 | DB-12-B2-D1-II-125 | y.a: «thành phẩn chính» → «thành phần chính» | Ý a viết "thành phẩn chính" (sai chính tả), đúng là "thành phần chính". |
+| 08:26:02 | DB-12-B4-D1-II-109 | y.b: «tan đần» → «tan dần» | Ý b in sai chính tả: "tan đần" phải là "tan dần". |
+| 08:26:02 | DB-12-B4-D1-II-109 | y.b: «ống nhiệm» → «ống nghiệm» | Ý b in sai chính tả: "ống nhiệm" phải là "ống nghiệm". |
+| 08:26:02 | DB-12-B4-D1-II-82 | y.b: «tan đần» → «tan dần» | Ý b in sai chính tả: "tan đần" phải là "tan dần". |
+| 08:26:02 | DB-12-B4-D1-II-82 | y.b: «ống nhiệm, thấy» → «ống nghiệm, thấy» | Ý b in sai chính tả: "ống nhiệm" phải là "ống nghiệm". |
+| 08:26:02 | DB-12-B4-D1-III-157 | de: «với0 lượng dư» → «với lượng dư» | Đề có lỗi gõ "với0 lượng dư" (thừa số 0). |
+| 08:26:07 | DB-12-B5-D2-II-297 | y.c: «và và một» → «và một» | Ý c in thừa chữ "và" ở "β-glucose và và một đơn vị α-fructose". |
+| 08:26:07 | DB-12-B5-D2-II-79 | y.b: «a-1,2-glycoside» → «α-1,2-glycoside» | Ý b viết "a-1,2-glycoside" (chữ a) thay vì kí hiệu α như trên hình. |
+| 08:26:07 | DB-12-B5-D2-III-149 | de: «a-1,4-glycoside» → «α-1,4-glycoside» | Đề in "a-1,4" thay cho "α-1,4". |
+| 08:26:07 | DB-12-B5-D2-III-59 | de: «Có bao nhiêu bao nhiêu loại» → «Có bao nhiêu loại» | Đề in lặp chữ "bao nhiêu bao nhiêu". |
+| 08:26:07 | DB-12-B5-D2-I-163 | pa.D: «Maltose tồn tại dạng mạch vòng và mạch hở trong dung dịch.» → «Maltose chỉ tồn tại ở dạng mạch hở trong dung dịch.» | Bản cũ của D cũng đúng (maltose còn nhóm –OH hemiacetal nên trong dung dịch có cân bằng dạng vòng ⇌ dạng mạch hở, SGK Hoá 12) nên câu có hai đáp án B và D. Sửa D thành phát biểu sai để giữ đáp án kho B duy nhất đúng. |
+| 08:26:07 | DB-12-B5-D2-III-255 | đáp án 6,67 → 2 | Đề hỏi số saccharide thuộc loại monosaccharide trong dãy cellulose, glucose, maltose, fructose, tinh bột, saccharose. Monosaccharide: glucose, fructose (2). Maltose, saccharose là disaccharide; tinh bột, cellulose là polysaccharide. Đáp số đếm phải là số nguyên; 6,67 là số lạc (lời giải chữ của kho cũng kết luận 2). |
+| 08:26:11 | DB-12-B8-D1-I-103 | de: «amphetamine mol thu được» → «amphetamine thu được» | Ý (c) của đề thừa chữ "mol" sau tên chất. |
+| 08:26:14 | DB-12-B8-D3-II-9 | de: «C₆H₅NO₂⁺Fe₍⁺₁₎HCl→C₆H₅NH₃Cl⁺N₍a₂O₎H→C₆H₅NH₂» → «C₆H₅NO₂ + Fe/HCl —(1)→ C₆H₅NH₃Cl + NaOH —(2)→ C₆H₅NH₂» | Sơ đồ điều chế trong đề bị vỡ chữ (chỉ số, dấu +, mũi tên, điều kiện lẫn vào nhau). |
+| 08:26:16 | DB-12-B9-P1-D2-II-111 | de: «dạng anion).» → «dạng anion.» | Đề in dư một dấu ngoặc đóng ở cuối câu giải thích pH < pI, pH > pI. |
+| 08:26:16 | DB-12-B9-P1-D2-II-31 | y.b: «2 -aminopentane» → «2-aminopentane» | Ý b in thừa dấu cách trong tên: "2 -aminopentane". |
+| 08:26:20 | DH-12-C1-B1-P1-II-22 | y.d: «hao hụt tối đa 6%» → «hao hụt 6%» | Ý d in 'hao hụt tối đa 6%': chữ 'tối đa' làm V thành một khoảng (10,4–11,1 mL), không còn một giá trị để so với 10,8 mL. Đề tính toán cần hao hụt đúng 6% (V = 10,4 mL); đáp án kho (Sai) đúng với bản đã sửa. |
+| 08:26:20 | DH-12-C1-B1-P1-III-34 | de: «vinyl acetete» → «vinyl acetate» | Đề in sai chính tả tên chất "vinyl acetete", đúng là "vinyl acetate". |
+| 08:26:20 | DH-12-C1-B1-P1-III-44 | de: «là là bao nhiêu %» → «là bao nhiêu %» | Đề in lặp chữ "là là". |
+| 08:26:23 | DH-12-C2-B4-III-46 | de: «với0 lượng dư» → «với lượng dư» | Đề có lỗi gõ "với0 lượng dư" (thừa số 0). |
+| 08:26:23 | DH-12-C2-B4-III-2 | đáp án 6,67 → 2 | Đề hỏi số saccharide thuộc loại monosaccharide trong dãy cellulose, glucose, maltose, fructose, tinh bột, saccharose. Monosaccharide: glucose, fructose (2). Maltose, saccharose là disaccharide; tinh bột, cellulose là polysaccharide. Đáp số đếm phải là số nguyên; 6,67 là số lạc (lời giải chữ của kho cũng kết luận 2). |
+| 08:26:26 | DH-12-C2-B5-II-19 | y.c: «và và một» → «và một» | Ý c in thừa chữ "và" ở "β-glucose và và một đơn vị α-fructose". |
+| 08:26:29 | DH-12-C3-B8-II-29 | de: «C₆H₅NO₂⁺Fe₍⁺₁₎HCl→C₆H₅NH₃Cl⁺N₍a₂O₎H→C₆H₅NH₂» → «C₆H₅NO₂ + Fe/HCl —(1)→ C₆H₅NH₃Cl + NaOH —(2)→ C₆H₅NH₂» | Sơ đồ điều chế trong đề bị vỡ chữ (chỉ số, dấu +, mũi tên, điều kiện lẫn vào nhau). |
+| 08:26:32 | DH-12-C3-B9-P1-II-25 | de: «dạng anion).» → «dạng anion.» | Đề in dư một dấu ngoặc đóng ở cuối câu giải thích pH < pI, pH > pI. |
+| 08:26:34 | 12-BD7-18-I-2 | pa.D: «Maltose tồn tại dạng mạch vòng và mạch hở trong dung dịch.» → «Maltose chỉ tồn tại ở dạng mạch hở trong dung dịch.» | Bản cũ của D cũng đúng (maltose còn nhóm –OH hemiacetal nên trong dung dịch có cân bằng dạng vòng ⇌ dạng mạch hở, SGK Hoá 12) nên câu có hai đáp án B và D. Sửa D thành phát biểu sai để giữ đáp án kho B duy nhất đúng. |
+| 08:26:37 | 12-KT-C4-D4-I-11 | pa.A: «Vật liệu nền có thể là chất dẻo hoặc cao su» → «Vật liệu nền chỉ có thể là chất dẻo» | A cũ đúng (nền polymer gồm chất dẻo, cao su). SGK Hoá 12: vật liệu nền có thể là polymer, kim loại hoặc gốm nên "chỉ có thể là chất dẻo" sai. Kết hợp với sửa C để D (kho) là đáp án đúng duy nhất. |
+| 08:26:37 | 12-KT-C4-D4-I-11 | pa.C: «để tăng tính chất cơ lí» → «để làm giảm độ bền cơ học của vật liệu» | C cũ đúng (cốt giúp composite có đặc tính cơ học cần thiết). Đổi thành "làm giảm độ bền cơ học" là sai rõ ràng; cùng với sửa A, chỉ còn D (cốt dạng sợi hoặc dạng bột/hạt) đúng — khớp đáp án kho D. B vẫn sai (liên kết các thành phần là vai trò của nền). |

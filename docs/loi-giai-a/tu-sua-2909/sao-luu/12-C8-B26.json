@@ -348,5 +348,133 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
   }
+ },
+ "12-C8-B26-I-21": {
+  "luc": "2026-09-29T08:25:28.450Z",
+  "cau": {
+   "phan": "I",
+   "so": 21,
+   "de": "Vì sao kẽm (zinc, Z = 30) không phải là nguyên tố chuyển tiếp?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Vì cấu hình eletron của nguyên tử Zn và cấu hình e của cation Zn²⁺ có phân lớp 3d đã bão hòa",
+    "B": "Vì Zn không thuộc nguyên tố chu kỳ 4",
+    "C": "Vì Zn không phải nguyên tố nhóm B",
+    "D": "Vì cấu hình e của nguyên tử Zn có phân lớp 3d chưa bão hòa"
+   },
+   "loi_giai": {
+    "chot": "Zn có [Ar]3d¹⁰4s² và Zn²⁺ có [Ar]3d¹⁰ — phân lớp 3d bão hoà ở cả nguyên tử lẫn ion nên Zn không phải nguyên tố chuyển tiếp.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: 3d bão hoà ở cả nguyên tử và cation."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: Zn vẫn thuộc chu kì 4."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: Zn nằm ở nhóm IIB."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: nói ngược, 3d của Zn đã bão hoà."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.GIAI_THICH",
+    "ten": "Kim loại chuyển tiếp dãy 1 — giải thích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
+ },
+ "12-C8-B26-I-32": {
+  "luc": "2026-09-29T08:25:28.450Z",
+  "cau": {
+   "phan": "I",
+   "so": 32,
+   "de": "Cho khoảng 2 mL dung dịch NaOH vào ống nghiệm chứa khoảng 1 mL dung dịch CuSO₄.\nHiện tượng quan sát được là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "dung dịch chuyển sang màu vàng",
+    "B": "xuất hiện kết tủa màu xanh nhạt",
+    "C": "xuất hiện kết tủa màu nâu đỏ",
+    "D": "dung dịch chuyển sang màu nâu đỏ."
+   },
+   "loi_giai": {
+    "chot": "NaOH kết tủa Cu²⁺ thành Cu(OH)₂ — kết tủa màu xanh nhạt.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: màu vàng là của Fe³⁺."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: Cu²⁺ + 2OH⁻ → Cu(OH)₂↓ xanh nhạt."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: nâu đỏ là màu của Fe(OH)₃."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: có kết tủa chứ không phải dung dịch đổi màu."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "PHUC_CHAT.MAU_SAC.NEU_HIEN_TUONG",
+    "ten": "Màu sắc phức chất — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
  }
 }

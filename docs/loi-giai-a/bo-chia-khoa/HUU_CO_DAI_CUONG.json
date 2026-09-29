@@ -1,0 +1,70 @@
+{
+ "ma": "HUU_CO_DAI_CUONG",
+ "chuong": "Đại cương hoá học hữu cơ",
+ "lop": "11",
+ "KEYS": {
+  "k1": {
+   "ten": "Nhóm chức & phân loại",
+   "rule": "<b>Hữu cơ:</b> hợp chất của carbon, trừ CO, {CO2}, muối carbonate, cyanide, carbide…<br><b>Hydrocarbon:</b> chỉ có C, H; <b>dẫn xuất:</b> có thêm O, N, halogen…<br><b>Nhóm chức:</b> –OH gắn C no là alcohol, gắn thẳng vòng benzene là phenol; –CHO aldehyde; >C=O giữa hai C là ketone; –COOH (C=O và O–H trên <b>cùng một C</b>) carboxylic acid; –COO– ester; –{NH2} amine; C–O–C ether.<br><b>Đặc điểm chung:</b> liên kết chủ yếu cộng hoá trị, nhiệt độ sôi thấp, dễ cháy, phản ứng chậm và cho hỗn hợp sản phẩm.<br><b>Nguồn gốc:</b> có trong tự nhiên <b>và</b> tổng hợp nhân tạo."
+  },
+  "k2": {
+   "ten": "Đọc phổ IR & phổ khối",
+   "rule": "<b>Phổ IR:</b> cho biết <b>nhóm chức</b> (cấu tạo), không cho phân tử khối.<br><b>Vùng hay gặp (cm<sup>−1</sup>):</b> O–H alcohol, phenol 3650–3200, <b>rộng</b>; O–H acid 3300–2500, rất rộng, luôn kèm C=O; N–H 3500–3300; C=O khoảng 1750–1670.<br><b>Cách làm:</b> soi vùng C=O trước, rồi vùng O–H; có cả hai là –COOH.<br><b>Phổ khối (MS):</b> peak <b>ion phân tử</b> [M]<sup>+</sup> có m/z lớn nhất → phân tử khối; <b>peak cơ bản</b> là peak cao nhất (mảnh bền), không phải M."
+  },
+  "k3": {
+   "ten": "Lập công thức phân tử",
+   "rule": "<b>Biết M và %:</b> số nguyên tử X = <b>%X × M : (100 × A<sub>X</sub>)</b>.<br><b>Chưa biết M:</b> C : H : O = %C/12 : %H/1 : %O/16 → công thức đơn giản nhất, rồi (CTĐGN)<sub>n</sub> = M từ phổ khối.<br><b>Đốt cháy:</b> n<sub>C</sub> = n({CO2}), n<sub>H</sub> = 2n({H2O}), m<sub>O</sub> = m − m<sub>C</sub> − m<sub>H</sub>.<br><b>Kiểm:</b> số liên kết π + vòng = (2C + 2 + N − H − X) : 2 phải nguyên, không âm; %O = 100 − %C − %H."
+  },
+  "k4": {
+   "ten": "Cấu tạo & đồng phân",
+   "rule": "<b>Hoá trị:</b> C 4, O 2, N 3, H và halogen 1; công thức đúng khi mọi nguyên tử đủ hoá trị.<br><b>Công thức khung:</b> mỗi đỉnh, đầu mút là một C; H gắn C được ngầm hiểu.<br><b>Đồng phân:</b> <b>cùng công thức phân tử</b>, khác cấu tạo (mạch C, vị trí nhóm chức, loại nhóm chức) → so công thức phân tử trước.<br><b>Đồng đẳng:</b> hơn kém nhau n nhóm {CH2}, cùng loại nhóm chức, tính chất tương tự."
+  },
+  "k5": {
+   "ten": "Tách & tinh chế",
+   "rule": "<b>Chưng cất:</b> chất lỏng có nhiệt độ sôi khác nhau; chênh ít → chưng cất phân đoạn; tinh dầu không tan trong nước, dễ hỏng ở nhiệt độ cao → <b>lôi cuốn hơi nước</b>.<br><b>Chiết:</b> hai chất lỏng không tan vào nhau, lớp có <b>khối lượng riêng nhỏ nằm trên</b>; chiết lỏng – rắn bằng dung môi.<br><b>Kết tinh:</b> chất rắn, dựa vào <b>độ tan đổi theo nhiệt độ</b>.<br><b>Sắc kí cột:</b> chất bị hấp phụ yếu ra trước.<br><b>Lắp dụng cụ:</b> bầu nhiệt kế ngang nhánh, sinh hàn nước vào thấp ra cao, đá bọt, chất lỏng ≤ 2/3 bình."
+  }
+ },
+ "TRAPS_THEM": {
+  "peakcoban": {
+   "ten": "Nhầm peak phổ khối",
+   "hoi": "Đang đọc peak có m/z lớn nhất (ion phân tử) hay peak cao nhất (peak cơ bản)? Chỉ ion phân tử cho phân tử khối."
+  },
+  "vungir": {
+   "ten": "Nhầm vùng phổ IR",
+   "hoi": "Tín hiệu nằm ở vùng nào? Peak rộng quanh 3300 cm⁻¹ là nhóm –OH, không phải C=O; C=O ở khoảng 1750–1670 cm⁻¹."
+  },
+  "cungctpt": {
+   "ten": "Quên so công thức phân tử",
+   "hoi": "Hai chất đã cùng công thức phân tử chưa? Khác công thức phân tử thì không phải đồng phân, dù cùng nhóm chức."
+  }
+ },
+ "DANG_KEY": {
+  "HUU_CO_DAI_CUONG.CAU_TAO_HH.DEM_NGUYEN_TU": "k4",
+  "HUU_CO_DAI_CUONG.CAU_TAO_HH.NHAN_DANG": "k4",
+  "HUU_CO_DAI_CUONG.CAU_TAO_HH.XAC_DINH_CTPT": "k4",
+  "HUU_CO_DAI_CUONG.LAP_CTPT.NHAN_DANG": "k3",
+  "HUU_CO_DAI_CUONG.LAP_CTPT.XAC_DINH_CTPT": "k3",
+  "HUU_CO_DAI_CUONG.PHAN_LOAI.CHON_PHAT_BIEU": "k1",
+  "HUU_CO_DAI_CUONG.PHAN_LOAI.DEM_DONG_PHAN": "k1",
+  "HUU_CO_DAI_CUONG.PHAN_LOAI.DEM_NGUYEN_TU": "k1",
+  "HUU_CO_DAI_CUONG.PHAN_LOAI.NHAN_DANG": "k1",
+  "HUU_CO_DAI_CUONG.PHO.CHON_PHAT_BIEU": "k2",
+  "HUU_CO_DAI_CUONG.PHO.DEM_DONG_PHAN": "k2",
+  "HUU_CO_DAI_CUONG.PHO.DEM_NGUYEN_TU": "k2",
+  "HUU_CO_DAI_CUONG.PHO.NHAN_DANG": "k2",
+  "HUU_CO_DAI_CUONG.PHO.XAC_DINH_CHAT": "k2",
+  "HUU_CO_DAI_CUONG.PHO.XAC_DINH_CTPT": "k3",
+  "HUU_CO_DAI_CUONG.TACH_CHAT.CHON_PHAT_BIEU": "k5",
+  "HUU_CO_DAI_CUONG.TACH_CHAT.DEM_DONG_PHAN": "k5",
+  "HUU_CO_DAI_CUONG.TACH_CHAT.NHAN_DANG": "k5",
+  "HUU_CO_DAI_CUONG.TACH_CHAT.SO_SANH": "k5",
+  "HUU_CO_DAI_CUONG.TACH_CHAT.TINH_KHOI_LUONG": "k5"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Vùng C=O ghi chung \"khoảng 1750–1670 cm⁻¹\" để khớp cả hai cách ghi trong kho (1750–1680 và 1740–1670); không tách riêng aldehyde/ketone/ester để khỏi bịa số.",
+  "PHO.XAC_DINH_CTPT (vanillin, tinh dầu hương nhu) là câu %khối lượng + M từ phổ khối ⇒ gán k3 (lập công thức), không gán k2.",
+  "Phổ IR \"nghiên cứu cấu tạo hợp chất hữu cơ\" (xác định nhóm chức): GIỮ đáp án C của kho."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

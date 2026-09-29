@@ -1,0 +1,82 @@
+{
+ "DB-12-B2-D1-II-125": {
+  "luc": "2026-09-29T08:25:56.026Z",
+  "cau": {
+   "phan": "II",
+   "so": 125,
+   "de": "Cho các chất sau: sodium palmitate (X) sodium laurylsulfate (Y)",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "y": {
+    "a": "X và Y đều là thành phẩn chính của xà phòng.",
+    "b": "X và Y đều có tính năng giặt rửa.",
+    "c": "X và Y đều có đầu ưa nước gắn với đuôi kị nước.",
+    "d": "X và Y đều tạo muối khó tan trong nước cứng."
+   },
+   "loi_giai": {
+    "chot": "X là sodium palmitate — một xà phòng; Y là sodium laurylsulfate — chất giặt rửa tổng hợp. Cả hai đều giặt rửa được nhưng chỉ X kết tủa với nước cứng.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: chỉ X là xà phòng, còn Y thuộc chất giặt rửa tổng hợp."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: cả hai đều có khả năng nhũ hoá dầu mỡ."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: X có đầu carboxylate, Y có đầu sulfate, đều gắn đuôi mạch dài."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: muối calcium của gốc sulfate tan được nên Y không kết tủa trong nước cứng."
+     }
+    },
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "SDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Gốc ưa nước quyết định ứng xử với nước cứng.",
+    "bay": "Thấy cả hai đều là muối sodium mạch dài là xếp chung vào xà phòng."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B2-D1",
+    "ten": "Phản ứng điều chế xà phòng",
+    "lop": "12",
+    "bai": "DB-12-B2",
+    "tenBai": "Xà phòng và chất giặt rửa tổng hợp",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-KT-C1-D4",
+   "nguonCau": "II-1"
+  }
+ }
+}

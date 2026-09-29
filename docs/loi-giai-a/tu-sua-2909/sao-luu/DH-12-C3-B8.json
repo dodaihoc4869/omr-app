@@ -1,0 +1,83 @@
+{
+ "DH-12-C3-B8-II-29": {
+  "luc": "2026-09-29T08:26:26.572Z",
+  "cau": {
+   "phan": "II",
+   "so": 29,
+   "de": "Trong phòng thí nghiệm, aniline được điều chế từ nitrobenzene theo sơ đồ gồm hai giai đoạn được đánh số (1) và (2) như sau:\nC₆H₅NO₂⁺Fe₍⁺₁₎HCl→C₆H₅NH₃Cl⁺N₍a₂O₎H→C₆H₅NH₂\nTrong một thí nghiệm tổng hợp aniline theo sơ đồ trên, từ 1,23 mL nitrobenzene (khối lượng riêng bằng 1,20 g mL⁻¹) thu được 0,67 gam aniline. Biết các chất tham gia khác được lấy dư. Hiệu suất của quá trình tổng hợp aniline từ nitrobenzene là h%.\nCho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như sau: Liên kết | N-H (amine) | C=C (thơm) | C-N (amine) Số sóng (cm⁻¹) | 3500 – 3300 | 1600 – 1450 | 1360 – 1250",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Amine",
+   "y": {
+    "a": "Trên phổ hồng ngoại của aniline, tín hiệu (peak) ở vùng 3500 – 3300 cm⁻¹ đặc trưng cho liên kết N-H.",
+    "b": "Trong phản ứng ở giai đoạn (1), nitrobenzene đóng vai trò là chất khử.",
+    "c": "Giá trị của h là 61,0. (Kết quả các phép tính trung gian không được làm tròn, chỉ kết quả cuối cùng được làm tròn đến hàng phần mười).",
+    "d": "Trong phản ứng ở giai đoạn (2), cation phenylammonium (C₆H₅NH₃⁺) là một acid theo thuyết Brønsted – Lowry."
+   },
+   "loi_giai": {
+    "chot": "n(nitrobenzene) = 1,476 : 123 = 0,012 mol; n(aniline) = 0,67 : 93 = 0,0072 mol ⇒ h = 60,0%.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: theo bảng số sóng của chính đề, vùng 3500 – 3300 cm⁻¹ đặc trưng cho liên kết N-H của amine."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: nitrogen giảm số oxi hoá từ +3 xuống −3, nitrobenzene BỊ KHỬ nên nó là chất OXI HOÁ; Fe mới là chất khử."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: m(nitrobenzene) = 1,23 × 1,20 = 1,476 g ⇒ n = 1,476 : 123 = 0,012 mol. n(aniline) = 0,67 : 93 = 0,0072043 mol ⇒ h = 0,0072043 : 0,012 × 100% = 60,0% chứ không phải 61,0."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: C₆H₅NH₃⁺ nhường proton cho OH⁻ tạo C₆H₅NH₂ nên là acid theo Bronsted – Lowry."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Sơ đồ hai giai đoạn trong tệp nguồn vỡ ký tự MathType; nội dung phản ứng vẫn đọc được: C₆H₅NO₂ —(Fe + HCl)→ C₆H₅NH₃Cl —(NaOH)→ C₆H₅NH₂."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kienThuc": [
+    "M(nitrobenzene) = 123; M(aniline) = 93.",
+    "Chất bị khử là chất oxi hoá; Fe là chất khử trong giai đoạn (1).",
+    "Cation phenylammonium C₆H₅NH₃⁺ cho proton nên là acid Bronsted."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_DIEU_CHE.CHON_PHAT_BIEU",
+    "ten": "Amine — điều chế — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B8-D3",
+    "ten": "Điều chế amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

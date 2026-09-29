@@ -1,0 +1,72 @@
+{
+ "12-KT-C12-D1-II-1": {
+  "luc": "2026-09-29T08:25:38.660Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Acid béo omega-3 và omega-6 là những acid béo không no, trong phân tử chứa nhóm C=C đầu tiên ở vị trí carbon số 3 và 6 (tính từ nhóm −CH₃).\nCông thức của hai acid béo được cho ở hình dưới.",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Một số chất béo là nguồn cung cấp acid béo omega-3 và omega-6 cho cơ thể.",
+    "b": "Omega-3 và omega-6 có tác dụng giảm huyết áp, giảm chlolesterol trong máu, gảm nguy cơ gây xơ vữa động mạch.",
+    "c": "Docosahexaenoic acid (DHA) C₂₁H₃₁COOH và arachidonic acid (ARA) C₁₉H₃₁COOH đều thuộc nhóm acid béo omega-3.",
+    "d": "Dầu cá biển chứa nhiều acid béo omega-3, các loại dầu thực vật (dầu đậu nành, dầu hướng dương,…) chứa nhiều acid béo omega-6."
+   },
+   "loi_giai": {
+    "chot": "DHA là omega-3 còn ARA là omega-6, hai acid này thuộc hai nhóm khác nhau.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: mỡ cá và dầu thực vật là nguồn cung cấp omega-3 và omega-6."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: hai nhóm acid này giúp giảm huyết áp và cholesterol trong máu."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: ARA có liên kết đôi đầu tiên ở carbon số 6 nên thuộc nhóm omega-6."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: dầu cá biển giàu omega-3, dầu thực vật giàu omega-6."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Tên omega chỉ vị trí liên kết đôi đầu tiên tính từ nhóm methyl.",
+    "bay": "Thấy hai acid cùng nằm trong nhóm không no nên gộp chung vào omega-3."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ }
+}

@@ -1,0 +1,207 @@
+{
+ "12-KT-C5-D5-I-16": {
+  "luc": "2026-09-29T08:25:49.437Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "Cho các phát biểu sau về pin và acquy:\n(a) Pin thường nhẹ, tích trữ nhiều năng lượng nhưng dễ hỏng nếu không được nạp điện sau một thời gian dài.\n(b) Pin lithium ion là loại pin sạc được phổ biến nhất hiện nay, được sử dụng trong các thiết bị di động như điện thoại thông minh, máy tính bảng,...\n(c) Pin và acquy chuyển hoá năng thành điện năng còn pin mặt trời chuyển quang năng thành điện năng.\n(d) Acquy có giá thành thấp, kích thước nhỏ, trọng lượng nhẹ và thời gian nạp điện ngắn, rất bền.\n(đ) Pin mặt trời có thể được sử dụng để cung cấp năng lượng cho các thiết bị điện tử như đèn đường, đèn chiếu sáng công cộng, đèn giao thông, hệ thống lưu trữ năng lượng tái tạo.\nSố phát biểu đúng là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "2",
+    "B": "3",
+    "C": "4",
+    "D": "5"
+   },
+   "loi_giai": {
+    "chot": "Chỉ (d) sai vì acquy nặng, cồng kềnh và nạp lâu; bốn phát biểu còn lại đều đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Hai phát biểu đúng là quá ít, chỉ có (d) sai."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Ba phát biểu đúng vẫn thiếu một ý."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: (a), (b), (c), (đ) đúng, chỉ (d) sai."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Cả năm đều đúng là không thể vì acquy vốn nặng và nạp lâu."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Acquy rẻ nhưng nặng, cồng kềnh và cần nhiều giờ để nạp.",
+    "bay": "Nhận luôn ý (d) vì thấy acquy chì rẻ nên cho là mọi mô tả đều đúng."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.NGUON_DIEN.CHON_PHAT_BIEU",
+    "ten": "Nguồn điện hoá học khác — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ },
+ "12-KT-C5-D5-II-2": {
+  "luc": "2026-09-29T08:25:49.437Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "de": "Hình dưới là minh hoạ cấu tạo của pin khô zinc-manganese. Về cơ bản, pin gồm một điện cực làm từ carbon và MnO₂, một điện cực làm từ kẽm và chất điện li là NH₄Cl dạng sệt, để tránh chảy ra ngoài.",
+   "dap_an": "SDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Than chì đóng vai trò điện cực âm và xảy ra quá trình khử MnO₂.",
+    "b": "Khi pin hoạt động, ion 4 NH+ di chuyển về điện cực dương.",
+    "c": "Trong quá trình pin hoạt động cho đến khi pin hết điện thì suất điện động của pin không thay đổi.",
+    "d": "Kẽm đóng vai trò anode và phản ứng ở điện cực là Zn → Zn²⁺ + 2e."
+   },
+   "loi_giai": {
+    "chot": "Kẽm bị oxi hoá nên là anode cực âm, thanh than chì cùng MnO₂ là cathode cực dương nơi MnO₂ bị khử.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: than chì là điện cực dương, tuy đúng là ở đó MnO₂ bị khử."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: cation NH₄⁺ luôn di chuyển về cực dương, tức cathode."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: chất phản ứng cạn dần nên suất điện động giảm theo thời gian."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: kẽm bị oxi hoá thành Zn²⁺ nên là anode."
+     }
+    },
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "SDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Quá trình khử xảy ra ở cathode, mà cathode của pin là cực dương.",
+    "bay": "Thấy MnO₂ bị khử ở thanh than chì nên gán luôn than chì là cực âm."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.PIN_GALVANI.CHON_PHAT_BIEU",
+    "ten": "Pin Galvani, sức điện động — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ },
+ "12-KT-C5-D5-II-4": {
+  "luc": "2026-09-29T08:25:49.437Z",
+  "cau": {
+   "phan": "II",
+   "so": 4,
+   "de": "Pin Volta được nhà vật lí, hoá học Volta phát minh năm 1800 dựa trên khám phá của Galvani. Volta đã xếp những tấm kẽm (zinc) và đồng (copper) thành từng cặp xen kẽ với nhau, mỗi cặp ngăn cách nhau bởi những tấm bìa da xốp thấm đẫm dung dịch điện li (hình minh hoạ dưới đây). Cuối cùng, Volta nối điểm đầu với điểm cuối bằng một sợi dây dẫn và nhận thấy có một dòng điện chạy qua.",
+   "dap_an": "DSSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_4.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Các tấm kẽm đóng vai trò là điện cực anode (cực âm).",
+    "b": "Tại các tấm đồng xảy ra quá trình oxy hóa.",
+    "c": "Nếu thay các tấm kẽm bằng các tấm sắt, giữ nguyên điều kiện khác thì sức điện động của pin sẽ tăng lên.",
+    "d": "Pin Volta là một loại pin nhiên liệu. 0 oxh/kh E"
+   },
+   "loi_giai": {
+    "chot": "Kẽm có thế nhỏ hơn đồng nên là anode cực âm; thay kẽm bằng sắt thì hiệu thế nhỏ lại nên sức điện động giảm.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: kẽm có thế −0,763 V nên bị oxi hoá, là anode và là cực âm."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: ở tấm đồng là cực dương nên xảy ra quá trình khử."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: Fe có thế −0,44 V, lớn hơn Zn nên hiệu thế nhỏ lại, sức điện động giảm."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: pin Volta là pin Galvani, chất phản ứng nằm sẵn trong pin chứ không nạp liên tục."
+     }
+    },
+    "dap_an_de": "DSSS",
+    "dap_an_tu_giai": "DSSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Sức điện động do hiệu thế điện cực quyết định, không do độ bền.",
+    "bay": "Thấy sắt cứng và bền hơn kẽm nên nghĩ pin sẽ mạnh hơn."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.PIN_GALVANI.CHON_PHAT_BIEU",
+    "ten": "Pin Galvani, sức điện động — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ }
+}

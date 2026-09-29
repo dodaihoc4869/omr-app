@@ -1,0 +1,89 @@
+{
+ "ma": "ALCOHOL_PHENOL",
+ "chuong": "Dẫn xuất halogen – alcohol – phenol",
+ "lop": "11",
+ "KEYS": {
+  "k1": {
+   "ten": "Dẫn xuất halogen",
+   "rule": "<b>Gọi tên:</b> thay thế = vị trí + halo + tên hydrocarbon (2-chloropropane); gốc – chức = tên gốc + halide (ethyl chloride).<br><b>CFC:</b> chỉ có C, Cl, F, <b>không còn H</b> ({CCl2F2}); còn H như {CHClF2} là HCFC.<br><b>Thế:</b> R–X + {NaOH} (đun, trong nước) → R–OH + NaX.<br><b>Tách:</b> R–X + KOH trong <b>ethanol</b>, đun → alkene + HX; theo <b>Zaitsev</b>, H tách ở C bên cạnh có bậc cao hơn.<br><b>Nhận halogen:</b> sau thuỷ phân, acid hoá bằng {HNO3} rồi nhỏ {AgNO3}: AgCl trắng, AgBr vàng nhạt, AgI vàng."
+  },
+  "k2": {
+   "ten": "Nhận loại & đồng phân",
+   "rule": "<b>Alcohol:</b> –OH gắn C no; <b>phenol:</b> –OH gắn <b>trực tiếp</b> vòng benzene; {C6H5CH2OH} là alcohol thơm.<br><b>Bậc alcohol</b> = bậc của C mang –OH.<br><b>Tên:</b> mạch chính chứa C–OH, đánh số gần –OH, đuôi -ol: butan-2-ol, ethane-1,2-diol, propane-1,2,3-triol (glycerol).<br><b>Đếm đồng phân {CnH2n+2O}:</b> alcohol + ether; {C3H8O}: 2 + 1 = 3; {C4H10O}: 4 + 3 = 7.<br><b>{C7H8O} có vòng benzene:</b> 3 cresol + benzyl alcohol + methyl phenyl ether = 5.<br><b>Phổ IR:</b> –OH cho peak rộng 3650–3200 cm<sup>−1</sup>; không có C=O."
+  },
+  "k3": {
+   "ten": "Phản ứng của alcohol",
+   "rule": "<b>Với Na:</b> mọi –OH → {H2}; n({H2}) = số –OH × n(alcohol) : 2; alcohol <b>không</b> tác dụng NaOH.<br><b>Tách nước:</b> {H2SO4} đặc, 170 °C → alkene (Zaitsev); 140 °C → ether.<br><b>Oxi hoá bằng CuO, đun:</b> bậc I → aldehyde; bậc II → ketone; bậc III không phản ứng.<br><b>{Cu(OH)2}:</b> alcohol có <b>hai –OH kề nhau</b> (ethylene glycol, glycerol) → dung dịch xanh lam.<br><b>Khác:</b> ester hoá với acid; cháy toả nhiều nhiệt."
+  },
+  "k4": {
+   "ten": "Tính chất phenol",
+   "rule": "<b>Tính acid yếu:</b> phenol + Na, + NaOH → {C6H5ONa}; không làm đổi màu quỳ; yếu hơn {H2CO3}: {C6H5ONa} + {CO2} + {H2O} → phenol vẩn đục.<br><b>Thế vòng dễ:</b> + nước bromine → 2,4,6-tribromophenol <b>kết tủa trắng</b>; + {HNO3} → picric acid (2,4,6-trinitrophenol).<br><b>Giải thích:</b> vòng benzene hút electron làm O–H phân cực hơn alcohol; –OH đẩy electron vào vòng nên thế ở o, p dễ hơn benzene.<br><b>Vật lí:</b> rắn, ít tan trong nước lạnh, độc, gây bỏng da.<br><b>Cũng mất màu nước bromine:</b> aniline (kết tủa trắng), styrene; benzene, toluene thì không."
+  },
+  "k5": {
+   "ten": "Vật lí, điều chế, ứng dụng",
+   "rule": "<b>Liên kết hydrogen:</b> alcohol sôi cao hơn hydrocarbon, dẫn xuất halogen, ether có phân tử khối tương đương; càng nhiều –OH sôi càng cao; alcohol nhỏ tan tốt trong nước.<br><b>Ethanol:</b> hydrate hoá ethylene, lên men tinh bột, đường; tách khỏi bã, nước bằng <b>chưng cất</b>; xăng sinh học E5.<br><b>Methanol:</b> rất độc; <b>glycerol:</b> mĩ phẩm, dược phẩm.<br><b>Phenol:</b> từ cumene (sản phẩm kèm acetone); làm nhựa phenol formaldehyde, bisphenol A, thuốc nổ, chất sát trùng."
+  },
+  "k6": {
+   "ten": "Tính toán alcohol, phenol",
+   "rule": "<b>Độ rượu:</b> V(ethanol) = V(dung dịch) × độ : 100; m = V × D (ethanol 0,789 g/mL).<br><b>Lên men:</b> {C6H12O6} → 2{C2H5OH} + 2{CO2}; tinh bột qua mắt xích {C6H10O5} 162.<br><b>Nhiệt:</b> Q = n × |Δ<sub>r</sub>H|; đun nước: m(nước) = Q : (4,2 × Δt), Q đổi ra J.<br><b>Phenol từ cumene:</b> 1 cumene → 1 phenol + 1 acetone.<br><b>Hiệu suất:</b> sản phẩm × H, nguyên liệu ÷ H; nhiều giai đoạn nhân các H.<br><b>Công thức:</b> alcohol no, đơn chức, mạch hở {CnH2n+1OH}, M = 14n + 18."
+  }
+ },
+ "TRAPS_THEM": {
+  "phenolthom": {
+   "ten": "Nhầm phenol, alcohol thơm",
+   "hoi": "Nhóm –OH gắn thẳng vào vòng benzene hay qua nhóm –CH₂–? Benzyl alcohol không phải phenol, không tác dụng với NaOH."
+  },
+  "bacalcol": {
+   "ten": "Nhầm bậc alcohol",
+   "hoi": "Bậc alcohol là bậc của C mang –OH. Bậc I oxi hoá ra aldehyde, bậc II ra ketone, bậc III không bị CuO oxi hoá."
+  },
+  "acidhoa": {
+   "ten": "Quên acid hoá trước thử",
+   "hoi": "Đã acid hoá kiềm dư bằng nitric acid trước khi nhỏ silver nitrate chưa? Chưa acid hoá thì OH⁻ cũng tạo kết tủa, không kết luận được halogen."
+  }
+ },
+ "DANG_KEY": {
+  "ALCOHOL_PHENOL.CAU_TAO.CHON_PHAT_BIEU": "k2",
+  "ALCOHOL_PHENOL.CAU_TAO.DEM_DONG_PHAN": "k2",
+  "ALCOHOL_PHENOL.CAU_TAO.DEM_NGUYEN_TU": "k2",
+  "ALCOHOL_PHENOL.CAU_TAO.GOI_TEN": "k2",
+  "ALCOHOL_PHENOL.CAU_TAO.NHAN_DANG": "k2",
+  "ALCOHOL_PHENOL.CAU_TAO.SO_SANH": "k5",
+  "ALCOHOL_PHENOL.CAU_TAO.VIET_CTCT": "k2",
+  "ALCOHOL_PHENOL.CAU_TAO.XAC_DINH_CTPT": "k6",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.CHON_PHAT_BIEU": "k1",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.DEM_DONG_PHAN": "k1",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.GOI_TEN": "k1",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.NHAN_DANG": "k1",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.TINH_KHOI_LUONG": "k6",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.TINH_PHAN_TRAM": "k6",
+  "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.VIET_CTCT": "k1",
+  "ALCOHOL_PHENOL.TINH_CHAT_ALCOHOL.CHON_PHAT_BIEU": "k3",
+  "ALCOHOL_PHENOL.TINH_CHAT_ALCOHOL.NHAN_DANG": "k3",
+  "ALCOHOL_PHENOL.TINH_CHAT_ALCOHOL.XAC_DINH_CHAT": "k3",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.CHON_PHAT_BIEU": "k4",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.DEM_DONG_PHAN": "k4",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.GIAI_THICH": "k4",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.NEU_HIEN_TUONG": "k1",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.NHAN_DANG": "k4",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.SO_SANH": "k4",
+  "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.XAC_DINH_CHAT": "k4",
+  "ALCOHOL_PHENOL.UNG_DUNG.CHON_PHAT_BIEU": "k5",
+  "ALCOHOL_PHENOL.UNG_DUNG.DEM_DONG_PHAN": "k6",
+  "ALCOHOL_PHENOL.UNG_DUNG.NHAN_DANG": "k5",
+  "ALCOHOL_PHENOL.UNG_DUNG.TINH_HIEU_SUAT": "k6",
+  "ALCOHOL_PHENOL.UNG_DUNG.TINH_KHOI_LUONG": "k6",
+  "ALCOHOL_PHENOL.UNG_DUNG.TINH_NANG_LUONG": "k6",
+  "ALCOHOL_PHENOL.UNG_DUNG.TINH_NONG_DO": "k6",
+  "ALCOHOL_PHENOL.UNG_DUNG.TINH_THE_TICH": "k6",
+  "ALCOHOL_PHENOL.UNG_DUNG.XAC_DINH_CHAT": "k5"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "TINH_CHAT_PHENOL.NEU_HIEN_TUONG thực chất là câu thuỷ phân CH₃CH₂CH₂Cl rồi thử AgNO₃ ⇒ DANG_KEY gán k1 theo nội dung, GIỮ mã dạng cũ để không lệch thống kê.",
+  "UNG_DUNG.DEM_DONG_PHAN là câu tính sản lượng phenol từ cumene ⇒ gán k6.",
+  "Ethyl chloride không có đồng phân hình học; đun với KOH/ethanol ra ethylene: GIỮ đáp án DDSD của kho (%Cl = 55,04% đúng).",
+  "Aniline làm mất màu nước bromine (kết tủa trắng): đưa vào k4 vì câu đếm của chương có aniline; đếm benzene, aniline, toluene, phenol, styrene ⇒ 3 chất phản ứng: GIỮ."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

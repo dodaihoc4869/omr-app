@@ -1,0 +1,65 @@
+{
+ "ma": "HALOGEN",
+ "chuong": "Halogen",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Đơn chất halogen",
+   "rule": "<b>Nhóm VIIA:</b> F, Cl, Br, I; lớp ngoài <b>ns<sup>2</sup>np<sup>5</sup></b>, dễ nhận 1 e; phân tử hai nguyên tử {X2}.<br><b>Trạng thái, màu:</b> {F2} khí lục nhạt; {Cl2} khí vàng lục; {Br2} lỏng nâu đỏ; {I2} rắn tím đen, dễ thăng hoa.<br><b>Số oxi hoá:</b> F chỉ có −1; Cl, Br, I có −1, +1, +3, +5, +7.<br><b>Tự nhiên:</b> chỉ tồn tại ở dạng <b>hợp chất</b> (muối halide trong nước biển, mỏ muối; iodine trong rong biển).<br><b>Xu hướng F → I:</b> bán kính, nhiệt độ sôi, nóng chảy tăng; độ âm điện giảm."
+  },
+  "k2": {
+   "ten": "Tính oxi hoá giảm dần",
+   "rule": "<b>Thứ tự:</b> <b>{F2} > {Cl2} > {Br2} > {I2}</b>.<br><b>Với {H2}:</b> {F2} nổ cả trong bóng tối; {Cl2} cần ánh sáng; {Br2} cần đun nóng; {I2} ở nhiệt độ cao, thuận nghịch.<br><b>Đẩy nhau:</b> halogen mạnh đẩy halogen yếu khỏi dung dịch muối: {Cl2} + 2{NaBr} → 2{NaCl} + {Br2}; {Br2} + 2{NaI} → 2{NaBr} + {I2}.<br><b>Ngoại lệ {F2}:</b> oxi hoá nước trước (2{F2} + 2{H2O} → 4{HF} + {O2}), không dùng để đẩy halogen trong dung dịch.<br><b>Với kim loại:</b> tạo muối hoá trị cao (2{Fe} + 3{Cl2} → 2{FeCl3})."
+  },
+  "k3": {
+   "ten": "Chlorine gặp nước, kiềm",
+   "rule": "<b>Với nước:</b> {Cl2} + {H2O} ⇌ {HCl} + {HClO}; {HClO} oxi hoá mạnh → tẩy màu, sát khuẩn.<br><b>Với {NaOH} thường:</b> {Cl2} + 2{NaOH} → {NaCl} + {NaClO} + {H2O} (nước Javel).<br><b>Với kiềm nóng (~70 °C):</b> 3{Cl2} + 6{KOH} → 5{KCl} + {KClO3} + 3{H2O}.<br><b>Vai trò:</b> các phản ứng trên {Cl2} vừa là chất oxi hoá vừa là chất khử (Cl 0 → −1 và +1/+5).<br><b>Quỳ tím ẩm:</b> gặp {Cl2} hoá đỏ rồi mất màu."
+  },
+  "k4": {
+   "ten": "Hydrogen halide",
+   "rule": "<b>Nhiệt độ sôi:</b> {HCl} < {HBr} < {HI} (M tăng, van der Waals tăng); <b>{HF} cao bất thường</b> do liên kết hydrogen.<br><b>Tính acid:</b> {HF} < {HCl} < {HBr} < {HI}; {HF} là <b>acid yếu</b>, còn lại acid mạnh (độ bền liên kết H–X giảm từ HF đến HI).<br><b>{HF} đặc biệt:</b> ăn mòn thuỷ tinh: {SiO2} + 4{HF} → {SiF4} + 2{H2O}.<br><b>Tính khử:</b> {HF} < {HCl} < {HBr} < {HI}.<br><b>Ở thể khí:</b> không làm đổi màu quỳ khô; tan nhiều trong nước tạo dung dịch acid."
+  },
+  "k5": {
+   "ten": "Ion halide & nhận biết",
+   "rule": "<b>Với {AgNO3}:</b> {AgCl} trắng, {AgBr} vàng nhạt, {AgI} vàng; <b>{AgF} tan</b> (không kết tủa).<br><b>Tính khử ion:</b> {F}<sup>−</sup> < {Cl}<sup>−</sup> < {Br}<sup>−</sup> < {I}<sup>−</sup>.<br><b>Với {H2SO4} đặc:</b> {NaCl} → {HCl} (không oxi hoá); {NaBr} → {Br2} + {SO2}; {NaI} → {I2} + {H2S}.<br><b>Nhận {I2}:</b> gặp hồ tinh bột → <b>xanh tím</b>.<br><b>Đếm nhận biết:</b> mỗi ion một dấu hiệu riêng; ion không tạo dấu hiệu thì nhận sau cùng."
+  },
+  "k6": {
+   "ten": "Điều chế, ứng dụng, tính",
+   "rule": "<b>Phòng thí nghiệm:</b> {HCl} đặc + chất oxi hoá: {MnO2} + 4{HCl} → {MnCl2} + {Cl2} + 2{H2O} (đun nóng); 2{KMnO4} + 16{HCl} → 2{KCl} + 2{MnCl2} + 5{Cl2} + 8{H2O}.<br><b>Công nghiệp:</b> điện phân dung dịch {NaCl} có màng ngăn: 2{NaCl} + 2{H2O} → 2{NaOH} + {H2} + {Cl2}.<br><b>Ứng dụng:</b> {Cl2} khử trùng nước, sản xuất PVC, nước Javel; fluoride trong kem đánh răng; iodine bổ sung qua muối iod, rong biển.<br><b>Tính:</b> theo phương trình hoặc <b>bảo toàn electron</b> (mỗi {Cl2} tạo ra nhận/nhường 2 e); nhớ × H nếu có hiệu suất.<br><b>Thể tích khí:</b> 24,79 L/mol ở 25 °C, 1 bar."
+  }
+ },
+ "TRAPS_THEM": {
+  "fluorngoaile": {
+   "ten": "Ngoại lệ của fluorine",
+   "hoi": "F2 phản ứng với nước trước, F chỉ có số oxi hoá −1, HF là acid yếu nhưng sôi cao nhất, AgF tan. Ý này có dính F không?"
+  },
+  "chieuday": {
+   "ten": "Nhầm chiều dãy halogen",
+   "hoi": "Từ F đến I: tính oxi hoá đơn chất giảm, nhưng tính khử ion halide và tính acid HX lại tăng. Đang xét đơn chất hay ion/HX?"
+  }
+ },
+ "DANG_KEY": {
+  "HALOGEN.ION_HALIDE.NHAN_DANG": "k5",
+  "HALOGEN.HYDROGEN_HALIDE.SO_SANH": "k4",
+  "HALOGEN.HYDROGEN_HALIDE.NHAN_DANG": "k4",
+  "HALOGEN.HYDROGEN_HALIDE.CHON_PHAT_BIEU": "k4",
+  "HALOGEN.PHAN_UNG_HALOGEN.NHAN_DANG": "k2",
+  "HALOGEN.ION_HALIDE.DEM_DONG_PHAN": "k5",
+  "HALOGEN.ION_HALIDE.SO_SANH": "k5",
+  "HALOGEN.DON_CHAT_HALOGEN.NHAN_DANG": "k1",
+  "HALOGEN.PHAN_UNG_HALOGEN.NEU_HIEN_TUONG": "k2",
+  "HALOGEN.DON_CHAT_HALOGEN.CHON_PHAT_BIEU": "k1",
+  "HALOGEN.UNG_DUNG_DIEU_CHE.TINH_KHOI_LUONG": "k6",
+  "HALOGEN.UNG_DUNG_DIEU_CHE.CHON_PHAT_BIEU": "k6",
+  "HALOGEN.PHAN_UNG_HALOGEN.DEM_DONG_PHAN": "k2",
+  "HALOGEN.PHAN_UNG_HALOGEN.TINH_KHOI_LUONG": "k6",
+  "HALOGEN.UNG_DUNG_DIEU_CHE.DEM_DONG_PHAN": "k6"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Tính acid HF < HCl < HBr < HI, HF là acid yếu: theo SGK 2018.",
+  "Nhiệt độ sôi HX: HF cao nhất do liên kết hydrogen, sau đó HCl < HBr < HI.",
+  "Ý 'dùng fluorine oxi hoá dung dịch bromide để điều chế bromine' chấm Sai (fluorine oxi hoá nước), khớp đáp án kho."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

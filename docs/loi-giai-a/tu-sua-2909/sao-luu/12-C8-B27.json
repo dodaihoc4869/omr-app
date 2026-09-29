@@ -275,5 +275,69 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
   }
+ },
+ "12-C8-B27-II-17": {
+  "luc": "2026-09-29T08:25:31.042Z",
+  "cau": {
+   "phan": "II",
+   "so": 17,
+   "de": "Muối cobalt(II) chloride có màu xanh lam. Màu xanh được giải thích là do phức tứ diện tạo bởi giữa ion Co²⁺ với phối tử Cl⁻. Khi hoà tan muối cobalt(II) chloride vào nước thu được dung dịch có màu hồng. Màu hồng được giải thích là do sự tạo thành phức chất [Co(OH₂)₆]²⁺.",
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Phức chất trong muối cobalt(II) chloride có công thức là [CoCl₄]²⁻.",
+    "b": "Dạng hình học của phức chất [Co(OH₂)₆]²⁺ là bát diện.",
+    "c": "Dấu hiện nhận biết các phức chất trên là sự thay đổi màu sắc.",
+    "d": "Phản ứng chuyển hoá giữa phức chất [CoCl₄]²⁻ thành [Co(OH₂)₆]²⁺ là phản ứng có sự thay thế phối tử."
+   },
+   "loi_giai": {
+    "chot": "Muối CoCl₂ khan cho phức tứ diện [CoCl₄]²⁻ màu xanh; tan vào nước thì nước thay chỗ Cl⁻ cho phức bát diện [Co(OH₂)₆]²⁺ màu hồng — một phản ứng thế phối tử, nhận ra bằng sự đổi màu.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: Co²⁺ với bốn Cl⁻ cho [CoCl₄]²⁻."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: 6 phối tử nước cho hình bát diện."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: xanh chuyển sang hồng là dấu hiệu."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: nước thay chỗ Cl⁻ quanh Co²⁺ — đúng là thế phối tử."
+     }
+    },
+    "dap_an_de": "DDDD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.MAU_SAC.CHON_PHAT_BIEU",
+    "ten": "Màu sắc phức chất — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
  }
 }

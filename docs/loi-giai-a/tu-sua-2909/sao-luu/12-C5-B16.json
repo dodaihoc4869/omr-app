@@ -1,0 +1,73 @@
+{
+ "12-C5-B16-II-22": {
+  "luc": "2026-09-29T08:25:21.510Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "de": "Cho sơ đồ thùng điện phân của aluminium oxide (Al₂O₃) nóng chảy:",
+   "dap_an": "SSSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_21.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Hỗn hợp aluminium oxide (Al₂O₃) và cryolite (Na₃AlF₆) nóng chảy ở nhiệt độ cao hơn aluminium oxide (Al₂O₃).",
+    "b": "Tại cathode xảy ra quá trình khử O²⁻, tại anode xảy ra quá trình oxi hóa ion Al³⁺.",
+    "c": "Có thể thay aluminium oxide (Al₂O₃) bằng muối aluminium chloride (AlCl₃).",
+    "d": "Trong công nghiệp, nhôm được sản xuất từ quặng bauxite (thành phần chính là Al₂O₃. 2H₂O)."
+   },
+   "loi_giai": {
+    "chot": "Hỗn hợp Al₂O₃ − cryolite nóng chảy ở gần 1000 °C, thấp hơn hẳn 2050 °C của Al₂O₃; cathode khử Al³⁺, anode oxi hoá O²⁻.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: hỗn hợp nóng chảy ở nhiệt độ THẤP hơn Al₂O₃ nguyên chất."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: cathode khử Al³⁺, anode oxi hoá O²⁻ — ý này đảo ngược."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: AlCl₃ thăng hoa, không nóng chảy để điện phân được."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: quặng bauxite là nguyên liệu chính sản xuất nhôm."
+     }
+    },
+    "dap_an_de": "SSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Ba ý đầu đều sai theo ba kiểu khác nhau, phải bắt đủ.",
+    "bay": "Cryolite làm HẠ nhiệt độ nóng chảy; và AlCl₃ thăng hoa nên không dùng để điện phân nóng chảy được."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_DD.CHON_PHAT_BIEU",
+    "ten": "Điện phân dung dịch — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ }
+}

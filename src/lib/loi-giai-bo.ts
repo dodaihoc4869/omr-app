@@ -5,6 +5,287 @@ import type { BoChiaKhoa } from './loi-giai-kiem'
 export interface BoChiaKhoaDu extends BoChiaKhoa { lop: string; DANG_KEY: Record<string, string>; daDuyet: string }
 
 export const BO_CHIA_KHOA: Record<string, BoChiaKhoaDu> = {
+ "ALCOHOL_PHENOL": {
+  "ma": "ALCOHOL_PHENOL",
+  "chuong": "Dẫn xuất halogen – alcohol – phenol",
+  "lop": "11",
+  "KEYS": {
+   "k1": {
+    "ten": "Dẫn xuất halogen",
+    "rule": "<b>Gọi tên:</b> thay thế = vị trí + halo + tên hydrocarbon (2-chloropropane); gốc – chức = tên gốc + halide (ethyl chloride).<br><b>CFC:</b> chỉ có C, Cl, F, <b>không còn H</b> ({CCl2F2}); còn H như {CHClF2} là HCFC.<br><b>Thế:</b> R–X + {NaOH} (đun, trong nước) → R–OH + NaX.<br><b>Tách:</b> R–X + KOH trong <b>ethanol</b>, đun → alkene + HX; theo <b>Zaitsev</b>, H tách ở C bên cạnh có bậc cao hơn.<br><b>Nhận halogen:</b> sau thuỷ phân, acid hoá bằng {HNO3} rồi nhỏ {AgNO3}: AgCl trắng, AgBr vàng nhạt, AgI vàng."
+   },
+   "k2": {
+    "ten": "Nhận loại & đồng phân",
+    "rule": "<b>Alcohol:</b> –OH gắn C no; <b>phenol:</b> –OH gắn <b>trực tiếp</b> vòng benzene; {C6H5CH2OH} là alcohol thơm.<br><b>Bậc alcohol</b> = bậc của C mang –OH.<br><b>Tên:</b> mạch chính chứa C–OH, đánh số gần –OH, đuôi -ol: butan-2-ol, ethane-1,2-diol, propane-1,2,3-triol (glycerol).<br><b>Đếm đồng phân {CnH2n+2O}:</b> alcohol + ether; {C3H8O}: 2 + 1 = 3; {C4H10O}: 4 + 3 = 7.<br><b>{C7H8O} có vòng benzene:</b> 3 cresol + benzyl alcohol + methyl phenyl ether = 5.<br><b>Phổ IR:</b> –OH cho peak rộng 3650–3200 cm<sup>−1</sup>; không có C=O."
+   },
+   "k3": {
+    "ten": "Phản ứng của alcohol",
+    "rule": "<b>Với Na:</b> mọi –OH → {H2}; n({H2}) = số –OH × n(alcohol) : 2; alcohol <b>không</b> tác dụng NaOH.<br><b>Tách nước:</b> {H2SO4} đặc, 170 °C → alkene (Zaitsev); 140 °C → ether.<br><b>Oxi hoá bằng CuO, đun:</b> bậc I → aldehyde; bậc II → ketone; bậc III không phản ứng.<br><b>{Cu(OH)2}:</b> alcohol có <b>hai –OH kề nhau</b> (ethylene glycol, glycerol) → dung dịch xanh lam.<br><b>Khác:</b> ester hoá với acid; cháy toả nhiều nhiệt."
+   },
+   "k4": {
+    "ten": "Tính chất phenol",
+    "rule": "<b>Tính acid yếu:</b> phenol + Na, + NaOH → {C6H5ONa}; không làm đổi màu quỳ; yếu hơn {H2CO3}: {C6H5ONa} + {CO2} + {H2O} → phenol vẩn đục.<br><b>Thế vòng dễ:</b> + nước bromine → 2,4,6-tribromophenol <b>kết tủa trắng</b>; + {HNO3} → picric acid (2,4,6-trinitrophenol).<br><b>Giải thích:</b> vòng benzene hút electron làm O–H phân cực hơn alcohol; –OH đẩy electron vào vòng nên thế ở o, p dễ hơn benzene.<br><b>Vật lí:</b> rắn, ít tan trong nước lạnh, độc, gây bỏng da.<br><b>Cũng mất màu nước bromine:</b> aniline (kết tủa trắng), styrene; benzene, toluene thì không."
+   },
+   "k5": {
+    "ten": "Vật lí, điều chế, ứng dụng",
+    "rule": "<b>Liên kết hydrogen:</b> alcohol sôi cao hơn hydrocarbon, dẫn xuất halogen, ether có phân tử khối tương đương; càng nhiều –OH sôi càng cao; alcohol nhỏ tan tốt trong nước.<br><b>Ethanol:</b> hydrate hoá ethylene, lên men tinh bột, đường; tách khỏi bã, nước bằng <b>chưng cất</b>; xăng sinh học E5.<br><b>Methanol:</b> rất độc; <b>glycerol:</b> mĩ phẩm, dược phẩm.<br><b>Phenol:</b> từ cumene (sản phẩm kèm acetone); làm nhựa phenol formaldehyde, bisphenol A, thuốc nổ, chất sát trùng."
+   },
+   "k6": {
+    "ten": "Tính toán alcohol, phenol",
+    "rule": "<b>Độ rượu:</b> V(ethanol) = V(dung dịch) × độ : 100; m = V × D (ethanol 0,789 g/mL).<br><b>Lên men:</b> {C6H12O6} → 2{C2H5OH} + 2{CO2}; tinh bột qua mắt xích {C6H10O5} 162.<br><b>Nhiệt:</b> Q = n × |Δ<sub>r</sub>H|; đun nước: m(nước) = Q : (4,2 × Δt), Q đổi ra J.<br><b>Phenol từ cumene:</b> 1 cumene → 1 phenol + 1 acetone.<br><b>Hiệu suất:</b> sản phẩm × H, nguyên liệu ÷ H; nhiều giai đoạn nhân các H.<br><b>Công thức:</b> alcohol no, đơn chức, mạch hở {CnH2n+1OH}, M = 14n + 18."
+   }
+  },
+  "TRAPS_THEM": {
+   "phenolthom": {
+    "ten": "Nhầm phenol, alcohol thơm",
+    "hoi": "Nhóm –OH gắn thẳng vào vòng benzene hay qua nhóm –CH₂–? Benzyl alcohol không phải phenol, không tác dụng với NaOH."
+   },
+   "bacalcol": {
+    "ten": "Nhầm bậc alcohol",
+    "hoi": "Bậc alcohol là bậc của C mang –OH. Bậc I oxi hoá ra aldehyde, bậc II ra ketone, bậc III không bị CuO oxi hoá."
+   },
+   "acidhoa": {
+    "ten": "Quên acid hoá trước thử",
+    "hoi": "Đã acid hoá kiềm dư bằng nitric acid trước khi nhỏ silver nitrate chưa? Chưa acid hoá thì OH⁻ cũng tạo kết tủa, không kết luận được halogen."
+   }
+  },
+  "DANG_KEY": {
+   "ALCOHOL_PHENOL.CAU_TAO.CHON_PHAT_BIEU": "k2",
+   "ALCOHOL_PHENOL.CAU_TAO.DEM_DONG_PHAN": "k2",
+   "ALCOHOL_PHENOL.CAU_TAO.DEM_NGUYEN_TU": "k2",
+   "ALCOHOL_PHENOL.CAU_TAO.GOI_TEN": "k2",
+   "ALCOHOL_PHENOL.CAU_TAO.NHAN_DANG": "k2",
+   "ALCOHOL_PHENOL.CAU_TAO.SO_SANH": "k5",
+   "ALCOHOL_PHENOL.CAU_TAO.VIET_CTCT": "k2",
+   "ALCOHOL_PHENOL.CAU_TAO.XAC_DINH_CTPT": "k6",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.CHON_PHAT_BIEU": "k1",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.DEM_DONG_PHAN": "k1",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.GOI_TEN": "k1",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.NHAN_DANG": "k1",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.TINH_KHOI_LUONG": "k6",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.TINH_PHAN_TRAM": "k6",
+   "ALCOHOL_PHENOL.DAN_XUAT_HALOGEN.VIET_CTCT": "k1",
+   "ALCOHOL_PHENOL.TINH_CHAT_ALCOHOL.CHON_PHAT_BIEU": "k3",
+   "ALCOHOL_PHENOL.TINH_CHAT_ALCOHOL.NHAN_DANG": "k3",
+   "ALCOHOL_PHENOL.TINH_CHAT_ALCOHOL.XAC_DINH_CHAT": "k3",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.CHON_PHAT_BIEU": "k4",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.DEM_DONG_PHAN": "k4",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.GIAI_THICH": "k4",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.NEU_HIEN_TUONG": "k1",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.NHAN_DANG": "k4",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.SO_SANH": "k4",
+   "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.XAC_DINH_CHAT": "k4",
+   "ALCOHOL_PHENOL.UNG_DUNG.CHON_PHAT_BIEU": "k5",
+   "ALCOHOL_PHENOL.UNG_DUNG.DEM_DONG_PHAN": "k6",
+   "ALCOHOL_PHENOL.UNG_DUNG.NHAN_DANG": "k5",
+   "ALCOHOL_PHENOL.UNG_DUNG.TINH_HIEU_SUAT": "k6",
+   "ALCOHOL_PHENOL.UNG_DUNG.TINH_KHOI_LUONG": "k6",
+   "ALCOHOL_PHENOL.UNG_DUNG.TINH_NANG_LUONG": "k6",
+   "ALCOHOL_PHENOL.UNG_DUNG.TINH_NONG_DO": "k6",
+   "ALCOHOL_PHENOL.UNG_DUNG.TINH_THE_TICH": "k6",
+   "ALCOHOL_PHENOL.UNG_DUNG.XAC_DINH_CHAT": "k5"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "BANG_TUAN_HOAN": {
+  "ma": "BANG_TUAN_HOAN",
+  "chuong": "Bảng tuần hoàn",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Cấu trúc bảng tuần hoàn",
+    "rule": "<b>Nguyên tắc xếp:</b> theo chiều tăng <b>Z</b>; cùng số lớp e → một hàng (chu kì); cùng số e hoá trị → một cột (nhóm).<br><b>Ô:</b> số thứ tự ô = Z = số p = số e.<br><b>Chu kì:</b> 7 chu kì; chu kì nhỏ 1, 2, 3 có 2, 8, 8 nguyên tố; chu kì lớn 4–7 (18, 18, 32, 32).<br><b>Nhóm:</b> 18 cột = 8 nhóm A (khối s, p) + 8 nhóm B (khối d, f; nhóm VIIIB gồm 3 cột).<br><b>Họ f:</b> lanthanide, actinide đặt riêng hai hàng cuối bảng."
+   },
+   "k2": {
+    "ten": "Cấu hình → vị trí",
+    "rule": "<b>Chu kì</b> = số lớp e (n lớn nhất).<br><b>Nhóm A</b> (e cuối vào s hoặc p): số nhóm = <b>số e lớp ngoài cùng</b> ns<sup>a</sup>np<sup>b</sup> → a + b.<br><b>Nhóm B</b> (e cuối vào d): (n−1)d<sup>x</sup>ns<sup>y</sup>, x + y = 3–7 → nhóm (x + y)B; <b>8, 9, 10 → VIIIB</b>; 11 → IB; 12 → IIB.<br><b>Ngược lại:</b> từ chu kì + nhóm viết cấu hình lớp ngoài → Z.<br><b>Ion:</b> tìm cấu hình nguyên tử trước (cộng/trừ lại e) rồi mới xét vị trí."
+   },
+   "k3": {
+    "ten": "Xu hướng biến đổi",
+    "rule": "<b>Trong chu kì</b> (trái → phải): bán kính <b>giảm</b>, độ âm điện <b>tăng</b>, tính kim loại giảm, tính phi kim tăng.<br><b>Trong nhóm A</b> (trên → dưới): bán kính <b>tăng</b>, độ âm điện <b>giảm</b>, tính kim loại tăng, tính phi kim giảm.<br><b>Sắp dãy:</b> đặt các nguyên tố lên bảng, so cùng chu kì hoặc cùng nhóm, rồi nối qua nguyên tố trung gian.<br><b>Cực trị:</b> F độ âm điện lớn nhất (3,98); Cs kim loại mạnh nhất (bỏ qua nguyên tố phóng xạ); He bán kính nhỏ nhất.<br><b>Biến đổi tuần hoàn:</b> số e lớp ngoài cùng, bán kính, độ âm điện, hoá trị cao nhất; <b>không</b> tuần hoàn: số lớp e, nguyên tử khối, tổng số e."
+   },
+   "k4": {
+    "ten": "Giải thích xu hướng",
+    "rule": "<b>Chu kì:</b> số lớp e <b>không đổi</b>, điện tích hạt nhân tăng → hút e ngoài mạnh hơn → bán kính giảm, khó nhường e, dễ nhận e.<br><b>Nhóm A:</b> số lớp e <b>tăng</b>, bán kính tăng chiếm ưu thế → lực hút e ngoài giảm → dễ nhường e.<br><b>Định nghĩa:</b> tính kim loại = dễ <b>nhường e</b> thành ion dương; tính phi kim = dễ <b>nhận e</b> thành ion âm; độ âm điện = khả năng hút cặp e liên kết.<br><b>Ion cùng số e:</b> Z lớn hơn → bán kính nhỏ hơn ({Na}<sup>+</sup> nhỏ hơn {F}<sup>−</sup>); cation nhỏ hơn nguyên tử, anion lớn hơn nguyên tử.<br><b>Liên kết cộng hoá trị:</b> bán kính = ½ khoảng cách hai hạt nhân ({H2}: 74 pm → 37 pm)."
+   },
+   "k5": {
+    "ten": "Kim loại, phi kim, khí hiếm",
+    "rule": "<b>Theo e lớp ngoài cùng:</b> 1–3 e: kim loại (trừ H, He, B); 5–7 e: phi kim; 8 e (He 2 e): khí hiếm.<br><b>Theo vị trí:</b> kim loại ở <b>dưới – bên trái</b>, phi kim ở <b>trên – bên phải</b>; mọi nguyên tố nhóm B là kim loại.<br><b>Nhóm tiêu biểu:</b> IA kim loại kiềm (ns<sup>1</sup>), IIA kiềm thổ (ns<sup>2</sup>), VIIA halogen (ns<sup>2</sup>np<sup>5</sup>), VIIIA khí hiếm.<br><b>Hoạt động:</b> kim loại kiềm tác dụng mạnh với nước tạo kiềm + {H2}; mạnh dần từ Li đến Cs."
+   },
+   "k6": {
+    "ten": "Oxide & hydroxide",
+    "rule": "<b>Hoá trị cao nhất với O</b> = số thứ tự nhóm A (n): oxide cao nhất R<sub>2</sub>O<sub>n</sub> ({Na2O}, {MgO}, {Al2O3}, {SiO2}, {P2O5}, {SO3}, {Cl2O7}).<br><b>Với H</b> (nhóm IVA–VIIA): {RH}<sub>8−n</sub>; hoá trị với O + với H = 8.<br><b>Chu kì 3:</b> {NaOH} base mạnh, {Mg(OH)2} base yếu, {Al(OH)3} lưỡng tính, {H2SiO3} acid yếu, {H3PO4} trung bình, {H2SO4} mạnh, {HClO4} rất mạnh.<br><b>Quy luật:</b> trong chu kì tính base của oxide, hydroxide <b>giảm</b>, tính acid <b>tăng</b>; trong nhóm A tính base tăng.<br><b>F:</b> không có oxide cao nhất ứng với nhóm VIIA."
+   },
+   "k7": {
+    "ten": "Tính theo công thức",
+    "rule": "<b>Tìm R từ %:</b> oxide cao nhất R<sub>2</sub>O<sub>n</sub>: %R = 2R : (2R + 16n); hợp chất khí với H {RH}<sub>8−n</sub>: %H = (8 − n) : (R + 8 − n); thử n theo nhóm.<br><b>Kim loại + nước/acid:</b> nhóm IA: n<sub>{H2}</sub> = n<sub>M</sub> : 2; nhóm IIA: n<sub>{H2}</sub> = n<sub>M</sub>; M = m : n.<br><b>Hai kim loại kế tiếp trong nhóm:</b> M trung bình nằm giữa hai nguyên tử khối.<br><b>Nồng độ:</b> m<sub>dd</sub> = m<sub>kim loại</sub> + m<sub>nước</sub> − m<sub>{H2}</sub>; C% = m<sub>chất tan</sub> : m<sub>dd</sub> × 100%.<br><b>Kiểm lại:</b> R tìm được phải đúng nhóm đã giả sử."
+   }
+  },
+  "TRAPS_THEM": {
+   "hoatri": {
+    "ten": "Nhầm hoá trị O và H",
+    "hoi": "Nhóm n: hoá trị cao nhất với oxygen là n, với hydrogen là 8 − n. Đề cho hợp chất nào?"
+   },
+   "nhomab": {
+    "ten": "Nhầm nhóm A và B",
+    "hoi": "E cuối điền vào d thì nhóm B, phải cộng cả e (n−1)d và ns; e lớp ngoài cùng chỉ quyết định nhóm A."
+   },
+   "bankinhion": {
+    "ten": "Bán kính ion",
+    "hoi": "Các ion cùng số electron: Z lớn hơn thì bán kính nhỏ hơn. Đang so nguyên tử hay ion?"
+   }
+  },
+  "DANG_KEY": {
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.NHAN_DANG": "k3",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.NHAN_DANG": "k1",
+   "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.NHAN_DANG": "k2",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.XAC_DINH_DIEN_TICH": "k4",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.SO_SANH": "k3",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.CHON_PHAT_BIEU": "k3",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.GIAI_THICH": "k4",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.CHON_PHAT_BIEU": "k5",
+   "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU": "k2",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.CHON_PHAT_BIEU": "k1",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.GIAI_THICH": "k1",
+   "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.DEM_NGUYEN_TU": "k2",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.DEM_NGUYEN_TU": "k3",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.DEM_NGUYEN_TU": "k5",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.DEM_DONG_PHAN": "k3",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.NHAN_DANG": "k5",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.TINH_PHAN_TRAM": "k7",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.XAC_DINH_CHAT": "k7",
+   "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.XAC_DINH_CHAT": "k3",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.DEM_NGUYEN_TU": "k6",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.XAC_DINH_DIEN_TICH": "k2",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_SO_MOL": "k7",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_KHOI_LUONG": "k7",
+   "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.TINH_PHAN_TRAM": "k7",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CHAT": "k7",
+   "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.XAC_DINH_CHAT": "k2",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_NGUYEN_TU": "k1",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.SO_SANH": "k3",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_DONG_PHAN": "k1",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_DIEN_TICH": "k6",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.NHAN_DANG": "k6",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.VIET_CTCT": "k2",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.CHON_PHAT_BIEU": "k6",
+   "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.DEM_DONG_PHAN": "k2",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.XAC_DINH_CTPT": "k7",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.SO_SANH": "k6",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.DEM_DONG_PHAN": "k5",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.VIET_CTCT": "k6",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.DEM_DONG_PHAN": "k6",
+   "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.NEU_HIEN_TUONG": "k5",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CTPT": "k7",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_NONG_DO": "k7",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_PHAN_TRAM": "k7",
+   "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.GIAI_THICH": "k6",
+   "BANG_TUAN_HOAN.CAU_TRUC_BTH.XAC_DINH_CHAT": "k2"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "CAN_BANG": {
+  "ma": "CAN_BANG",
+  "chuong": "Cân bằng hoá học",
+  "lop": "11",
+  "KEYS": {
+   "k1": {
+    "ten": "Cân bằng & biểu thức KC",
+    "rule": "<b>Phản ứng thuận nghịch:</b> xảy ra hai chiều (⇌), không chất nào hết.<br><b>Cân bằng động:</b> v<sub>thuận</sub> = v<sub>nghịch</sub> ≠ 0; nồng độ các chất không đổi nhưng phản ứng vẫn diễn ra.<br><b>Biểu thức:</b> aA + bB ⇌ cC + dD → K<sub>C</sub> = [C]<sup>c</sup>[D]<sup>d</sup> : ([A]<sup>a</sup>[B]<sup>b</sup>); hệ số thành số mũ.<br><b>Không ghi vào K<sub>C</sub>:</b> chất rắn (s), nước là dung môi (l).<br><b>Ý nghĩa:</b> K<sub>C</sub> lớn → cân bằng nghiêng về sản phẩm; K<sub>C</sub> <b>chỉ phụ thuộc nhiệt độ</b>.<br><b>Viết ngược chiều:</b> K<sub>nghịch</sub> = 1 : K<sub>thuận</sub>; nhân đôi hệ số → K<sup>2</sup>."
+   },
+   "k2": {
+    "ten": "Chuyển dịch Le Chatelier",
+    "rule": "<b>Nguyên lí:</b> cân bằng chuyển dịch theo chiều <b>làm giảm</b> tác động bên ngoài.<br><b>Nồng độ:</b> thêm chất nào → dịch chiều tiêu thụ chất đó; thêm chất rắn → không dịch.<br><b>Áp suất:</b> tăng p → dịch về phía <b>ít mol khí</b>; tổng hệ số khí hai vế bằng nhau → không dịch.<br><b>Nhiệt độ:</b> tăng T → dịch chiều <b>thu nhiệt</b> (Δ<sub>r</sub>H > 0); phản ứng thuận toả nhiệt thì tăng T làm K<sub>C</sub> giảm.<br><b>Chất xúc tác:</b> không làm chuyển dịch, chỉ giúp đạt cân bằng nhanh hơn.<br><b>Dấu hiệu màu:</b> {NO2} nâu đỏ, {N2O4} không màu → hỗn hợp nhạt màu là dịch sang {N2O4}."
+   },
+   "k3": {
+    "ten": "Bảng cân bằng tính KC",
+    "rule": "<b>Lập bảng ba dòng:</b> ban đầu – phản ứng – cân bằng; lượng phản ứng tỉ lệ <b>theo hệ số</b>.<br><b>Đổi nồng độ:</b> C = n : V (V bình kín tính bằng lít) trước khi thế vào K<sub>C</sub>.<br><b>Tính K<sub>C</sub>:</b> chỉ dùng nồng độ <b>lúc cân bằng</b>, không dùng nồng độ ban đầu.<br><b>Biết K<sub>C</sub> tìm nồng độ:</b> đặt x, thế vào biểu thức, giải và loại nghiệm âm hoặc vượt lượng ban đầu.<br><b>Hiệu suất:</b> H = lượng đã phản ứng : lượng phản ứng tối đa (tính theo chất thiếu) × 100%.<br><b>Xét chiều:</b> tính Q<sub>C</sub> như K<sub>C</sub>; Q<sub>C</sub> < K<sub>C</sub> → chiều thuận, Q<sub>C</sub> > K<sub>C</sub> → chiều nghịch."
+   },
+   "k4": {
+    "ten": "Sự điện li & ion",
+    "rule": "<b>Điện li mạnh (→):</b> acid mạnh {HCl}, {HBr}, {HI}, {HNO3}, {H2SO4}, {HClO4}; base kiềm {NaOH}, {KOH}, {Ba(OH)2}; hầu hết muối tan.<br><b>Điện li yếu (⇌):</b> {CH3COOH}, {HF}, {H2S}, {H2CO3}, {HNO2}, {HClO}, {H3PO4}; {NH3}; nước.<br><b>Không điện li:</b> glucose, saccharose, ethanol, glycerol; nước cất dẫn điện rất kém.<br><b>Nồng độ ion:</b> nhân <b>chỉ số</b> trong công thức: {Ba(NO3)2} 0,1 M → [{NO3}<sup>−</sup>] = 0,2 M; acid yếu thì [{H}<sup>+</sup>] nhỏ hơn nồng độ acid.<br><b>Bảo toàn điện tích:</b> Σ(mol × điện tích) cation = Σ anion; m muối = Σ m các ion.<br><b>Phương trình ion rút gọn:</b> giữ dạng phân tử chất kết tủa, chất khí, chất điện li yếu."
+   },
+   "k5": {
+    "ten": "Brønsted & môi trường muối",
+    "rule": "<b>Định nghĩa:</b> acid <b>cho</b> {H}<sup>+</sup>, base <b>nhận</b> {H}<sup>+</sup>; cặp acid – base liên hợp chỉ khác nhau một {H}<sup>+</sup>.<br><b>Xét từng chiều:</b> {CO3}<sup>2−</sup> + {H2O} ⇌ {HCO3}<sup>−</sup> + {OH}<sup>−</sup>: acid là {H2O} và {HCO3}<sup>−</sup>.<br><b>Lưỡng tính:</b> {HCO3}<sup>−</sup>, {HS}<sup>−</sup>, {H2PO4}<sup>−</sup>, {HPO4}<sup>2−</sup>, {H2O}; {HSO4}<sup>−</sup> chỉ là acid.<br><b>Ion trung tính:</b> {Na}<sup>+</sup>, {K}<sup>+</sup>, {Ca}<sup>2+</sup>, {Ba}<sup>2+</sup>, {Cl}<sup>−</sup>, {NO3}<sup>−</sup>, {SO4}<sup>2−</sup> (không bị thuỷ phân).<br><b>Ion acid:</b> {NH4}<sup>+</sup>, {Al}<sup>3+</sup>, {Fe}<sup>3+</sup>, {Fe}<sup>2+</sup>, {Cu}<sup>2+</sup>, {Zn}<sup>2+</sup> → pH < 7 (phèn chua: {Al}<sup>3+</sup> + {H2O} ⇌ {Al(OH)}<sup>2+</sup> + {H}<sup>+</sup>).<br><b>Ion base:</b> {CO3}<sup>2−</sup>, {S}<sup>2−</sup>, {CH3COO}<sup>−</sup>, {PO4}<sup>3−</sup>, {NO2}<sup>−</sup> → pH > 7."
+   },
+   "k6": {
+    "ten": "pH và tích số ion nước",
+    "rule": "<b>Tích số ion của nước:</b> K<sub>w</sub> = [{H}<sup>+</sup>][{OH}<sup>−</sup>] = 10<sup>−14</sup> ở 25 °C, <b>chỉ phụ thuộc nhiệt độ</b>.<br><b>Công thức:</b> pH = −lg[{H}<sup>+</sup>]; [{H}<sup>+</sup>] = 10<sup>−pH</sup>; pH + pOH = 14.<br><b>Môi trường:</b> pH < 7 acid, = 7 trung tính, > 7 base; pH giảm 1 đơn vị → [{H}<sup>+</sup>] tăng 10 lần.<br><b>Pha loãng acid mạnh:</b> pha loãng 10<sup>n</sup> lần → pH tăng n (không vượt quá 7).<br><b>Trộn acid với base:</b> n({H}<sup>+</sup>) và n({OH}<sup>−</sup>) trung hoà 1 : 1; phần dư chia <b>tổng thể tích</b>.<br><b>Chất chỉ thị, thực tế:</b> quỳ acid đỏ, base xanh; phenolphthalein không màu → hồng khi pH ≥ 8,3; mưa acid pH < 5,6; đất chua bón vôi."
+   },
+   "k7": {
+    "ten": "Chuẩn độ acid – base",
+    "rule": "<b>Dụng cụ:</b> burette đựng <b>dung dịch chuẩn</b> (biết chính xác nồng độ); pipette lấy dung dịch cần xác định cho vào bình tam giác.<br><b>Chỉ thị:</b> phenolphthalein; chuẩn độ acid bằng {NaOH}, dừng khi xuất hiện màu <b>hồng nhạt bền khoảng 20 giây</b>.<br><b>Điểm tương đương:</b> n({H}<sup>+</sup>) = n({OH}<sup>−</sup>); acid hai nấc nhân 2: 2 C({H2SO4}) · V = C({NaOH}) · V′.<br><b>Thao tác:</b> tráng burette bằng chính dung dịch chuẩn; lặp 3 lần, lấy thể tích trung bình.<br><b>Độ tinh khiết:</b> từ n chất phản ứng → m → % = m tinh khiết : m mẫu × 100%.<br><b>Đọc kết quả:</b> thể tích đã dùng = số đọc sau − số đọc trước."
+   }
+  },
+  "TRAPS_THEM": {
+   "chatran": {
+    "ten": "Đưa chất rắn vào KC",
+    "hoi": "Chất rắn và nước dung môi không có mặt trong K_C, cũng không tính vào số mol khí khi xét áp suất. Đã bỏ chúng ra chưa?"
+   },
+   "xuctac": {
+    "ten": "Xúc tác làm dịch cân bằng",
+    "hoi": "Chất xúc tác tăng tốc cả hai chiều như nhau, không làm cân bằng chuyển dịch và không đổi K_C. Ý này có gán cho xúc tác việc tăng lượng sản phẩm không?"
+   },
+   "chiso": {
+    "ten": "Quên nhân chỉ số ion",
+    "hoi": "Một phân tử phân li ra mấy ion này? Ba(OH)2 cho 2 OH⁻, H2SO4 cho 2 H⁺, Al2(SO4)3 cho 2 Al³⁺ và 3 SO4²⁻."
+   }
+  },
+  "DANG_KEY": {
+   "CAN_BANG.ACID_BASE.CHON_PHAT_BIEU": "k5",
+   "CAN_BANG.ACID_BASE.DEM_NGUYEN_TU": "k5",
+   "CAN_BANG.ACID_BASE.NHAN_DANG": "k5",
+   "CAN_BANG.CAN_BANG.CHON_PHAT_BIEU": "k2",
+   "CAN_BANG.CAN_BANG.DEM_DONG_PHAN": "k2",
+   "CAN_BANG.CAN_BANG.NEU_HIEN_TUONG": "k2",
+   "CAN_BANG.CAN_BANG.NHAN_DANG": "k2",
+   "CAN_BANG.CAN_BANG.SO_SANH": "k2",
+   "CAN_BANG.CAN_BANG.TINH_HIEU_SUAT": "k3",
+   "CAN_BANG.CAN_BANG.TINH_NONG_DO": "k3",
+   "CAN_BANG.CAN_BANG.TINH_SO_MOL": "k3",
+   "CAN_BANG.CAN_BANG.VIET_PTHH": "k1",
+   "CAN_BANG.CAN_BANG.XAC_DINH_CHIEU": "k2",
+   "CAN_BANG.CHUAN_DO.CHON_PHAT_BIEU": "k7",
+   "CAN_BANG.CHUAN_DO.NEU_HIEN_TUONG": "k7",
+   "CAN_BANG.CHUAN_DO.NHAN_DANG": "k7",
+   "CAN_BANG.CHUAN_DO.TINH_KHOI_LUONG": "k7",
+   "CAN_BANG.CHUAN_DO.TINH_NONG_DO": "k7",
+   "CAN_BANG.CHUAN_DO.TINH_PHAN_TRAM": "k7",
+   "CAN_BANG.CHUAN_DO.TINH_THE_TICH": "k7",
+   "CAN_BANG.DIEN_LI.CHON_PHAT_BIEU": "k4",
+   "CAN_BANG.DIEN_LI.DEM_DONG_PHAN": "k4",
+   "CAN_BANG.DIEN_LI.DEM_NGUYEN_TU": "k6",
+   "CAN_BANG.DIEN_LI.GIAI_THICH": "k4",
+   "CAN_BANG.DIEN_LI.NEU_HIEN_TUONG": "k4",
+   "CAN_BANG.DIEN_LI.NHAN_DANG": "k4",
+   "CAN_BANG.DIEN_LI.SO_SANH": "k4",
+   "CAN_BANG.DIEN_LI.TINH_KHOI_LUONG": "k4",
+   "CAN_BANG.DIEN_LI.TINH_NONG_DO": "k4",
+   "CAN_BANG.DIEN_LI.TINH_SO_MOL": "k4",
+   "CAN_BANG.DIEN_LI.VIET_PTHH": "k4",
+   "CAN_BANG.HANG_SO_K.CHON_PHAT_BIEU": "k1",
+   "CAN_BANG.HANG_SO_K.NHAN_DANG": "k1",
+   "CAN_BANG.HANG_SO_K.TINH_HANG_SO": "k3",
+   "CAN_BANG.HANG_SO_K.TINH_HIEU_SUAT": "k3",
+   "CAN_BANG.HANG_SO_K.TINH_KHOI_LUONG": "k3",
+   "CAN_BANG.HANG_SO_K.TINH_NONG_DO": "k3",
+   "CAN_BANG.HANG_SO_K.TINH_SO_MOL": "k3",
+   "CAN_BANG.HANG_SO_K.VIET_PTHH": "k1",
+   "CAN_BANG.PH_DUNG_DICH.CHON_PHAT_BIEU": "k6",
+   "CAN_BANG.PH_DUNG_DICH.DEM_DONG_PHAN": "k5",
+   "CAN_BANG.PH_DUNG_DICH.NEU_HIEN_TUONG": "k6",
+   "CAN_BANG.PH_DUNG_DICH.NHAN_DANG": "k6",
+   "CAN_BANG.PH_DUNG_DICH.SO_SANH": "k6",
+   "CAN_BANG.PH_DUNG_DICH.TINH_KHOI_LUONG": "k6",
+   "CAN_BANG.PH_DUNG_DICH.TINH_NONG_DO": "k6",
+   "CAN_BANG.PH_DUNG_DICH.TINH_THE_TICH": "k6",
+   "CAN_BANG.PH_DUNG_DICH.TINH_TI_SO": "k6",
+   "CAN_BANG.THUY_PHAN_MUOI.TINH_NONG_DO": "k5",
+   "CAN_BANG.THUY_PHAN_MUOI.VIET_PTHH": "k5"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
  "CARBOHYDRATE": {
   "ma": "CARBOHYDRATE",
   "chuong": "Carbohydrate",
@@ -87,6 +368,86 @@ export const BO_CHIA_KHOA: Record<string, BoChiaKhoaDu> = {
    "CARBOHYDRATE.UNG_DUNG.TINH_THE_TICH": "k5"
   },
   "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+ },
+ "CARBONYL_ACID": {
+  "ma": "CARBONYL_ACID",
+  "chuong": "Hợp chất carbonyl – carboxylic acid",
+  "lop": "11",
+  "KEYS": {
+   "k1": {
+    "ten": "Cấu tạo & gọi tên",
+    "rule": "<b>Nhóm chức:</b> aldehyde –CHO; ketone R–CO–R′ (C=O giữa hai C); carboxylic acid –COOH.<br><b>Tên thay thế:</b> C của –CHO, –COOH là C số 1; aldehyde đuôi <b>-al</b> (propanal), ketone <b>-an-x-one</b> (propan-2-one = acetone), acid <b>-oic acid</b> (ethanoic acid = acetic acid).<br><b>Tên thường:</b> formaldehyde {HCHO}, acetaldehyde {CH3CHO}, formic acid {HCOOH}, acrylic acid {CH2=CHCOOH}, oxalic acid {HOOC-COOH}, benzoic acid {C6H5COOH}.<br><b>Công thức chung:</b> aldehyde, ketone no, đơn chức, mạch hở {CnH2nO}; acid no, đơn chức, mạch hở {CnH2nO2}.<br><b>Phổ IR:</b> C=O khoảng 1740–1670 cm<sup>−1</sup>; acid thêm O–H rất rộng 3300–2500."
+   },
+   "k2": {
+    "ten": "Đếm đồng phân",
+    "rule": "<b>Mẹo gốc alkyl:</b> số gốc alkyl có 1, 2, 3, 4 C lần lượt là 1, 1, 2, 4.<br><b>Aldehyde {CnH2nO}:</b> = số gốc alkyl có (n − 1) C: {C4H8O} có 2, {C5H10O} có 4.<br><b>Acid {CnH2nO2}:</b> cũng vậy: {C4H8O2} có 2, {C5H10O2} có 4.<br><b>Ketone:</b> {C3H6O} 1, {C4H8O} 1, {C5H10O} 3.<br><b>Carbonyl {C4H8O}</b> = 2 aldehyde + 1 ketone = 3.<br><b>Cách làm:</b> vẽ mạch C, gắn nhóm chức vào từng vị trí khác nhau; bỏ cách vẽ trùng."
+   },
+   "k3": {
+    "ten": "Khử, oxi hoá & nhận biết",
+    "rule": "<b>Tráng bạc:</b> chất có –CHO + {AgNO3}/{NH3} → Ag; RCHO → 2Ag, <b>HCHO → 4Ag</b>; formic acid, ester của formic acid cũng tráng bạc; ketone không.<br><b>{Cu(OH)2}/{OH}<sup>−</sup> đun nóng:</b> aldehyde → {Cu2O} đỏ gạch; acid hoà tan {Cu(OH)2} → dung dịch xanh; alcohol đơn chức không.<br><b>Nước bromine:</b> aldehyde làm mất màu, ketone không.<br><b>Khử bằng {NaBH4} hoặc {LiAlH4}:</b> aldehyde → alcohol bậc I, ketone → alcohol bậc II.<br><b>Iodoform:</b> có nhóm {CH3CO-} (hoặc {CH3CH(OH)-}) + {I2}/NaOH → {CHI3} kết tủa vàng.<br><b>Cộng HCN:</b> tạo cyanohydrin, mạch tăng 1 C."
+   },
+   "k4": {
+    "ten": "Tính acid",
+    "rule": "<b>Acid yếu:</b> phân li một phần, làm quỳ hoá đỏ.<br><b>Phản ứng:</b> với kim loại trước H → {H2}; base, basic oxide → muối + {H2O}; muối carbonate → {CO2} <b>sủi bọt</b>.<br><b>So sánh:</b> K<sub>a</sub> lớn → acid mạnh; HCOOH > {CH3COOH} > {C2H5COOH} (gốc alkyl đẩy electron); nhóm hút electron như Cl làm tăng tính acid.<br><b>Nồng độ:</b> [{H}<sup>+</sup>] = C × α; pH = −lg[{H}<sup>+</sup>]; trung hoà: n({OH}<sup>−</sup>) = n(–COOH).<br><b>Đời sống:</b> giảm chua bằng base yếu, rẻ như nước vôi {Ca(OH)2}; giấm là acetic acid 2–5%."
+   },
+   "k5": {
+    "ten": "Nhiệt độ sôi & ứng dụng",
+    "rule": "<b>Nhiệt độ sôi (phân tử khối tương đương):</b> acid > alcohol > aldehyde, ketone > hydrocarbon.<br><b>Lí do:</b> acid tạo liên kết hydrogen <b>bền hơn</b> alcohol (tạo dimer); aldehyde, ketone không có liên kết hydrogen giữa các phân tử.<br><b>Tan:</b> chất nhỏ tan tốt nhờ liên kết hydrogen với nước.<br><b>Ứng dụng:</b> formalin (formon) 37–40% ngâm mẫu vật, <b>cấm</b> bảo quản thực phẩm; acetone làm dung môi; acetic acid làm giấm, sản xuất ester, tơ; nước đá khô ({CO2} rắn) bảo quản an toàn."
+   },
+   "k6": {
+    "ten": "Điều chế & chuỗi phản ứng",
+    "rule": "<b>Aldehyde, ketone:</b> oxi hoá alcohol bậc I, bậc II bằng CuO; acetaldehyde từ oxi hoá ethylene; <b>acetone cùng phenol từ cumene</b> (1 : 1 : 1).<br><b>Acetic acid:</b> lên men giấm {C2H5OH} + {O2} → {CH3COOH} + {H2O}; {CH3OH} + CO; oxi hoá butane.<br><b>Ester hoá:</b> RCOOH + R′OH ⇌ RCOOR′ + {H2O} ({H2SO4} đặc, đun); acid mất –OH, alcohol mất H.<br><b>Đọc chuỗi:</b> {C2H4} → {C2H5OH} → {CH3CHO} (M = 44) → {CH3COOH} → ester; đi từ chất cuối ngược lại."
+   },
+   "k7": {
+    "ten": "Tính toán",
+    "rule": "<b>Tìm chất:</b> số O = %O × M : 1600; mỗi –COOH có 2 O, –OH có 1 O.<br><b>Tráng bạc:</b> n(Ag) = 2n(RCHO), 4n(HCHO).<br><b>Ester hoá:</b> so số mol acid, alcohol theo tỉ lệ 1 : 1, <b>H tính theo chất thiếu</b>; H = thực tế : lí thuyết × 100%.<br><b>Nhiều giai đoạn:</b> H chung = H<sub>1</sub> × H<sub>2</sub> × …; sản phẩm × H, nguyên liệu ÷ H.<br><b>Khí:</b> n = V : 24,79 (25 °C, 1 bar); nồng độ trong hơi thở theo mg/L đổi qua số mol ethanol theo phương trình đã cân bằng."
+   }
+  },
+  "TRAPS_THEM": {
+   "trangbac": {
+    "ten": "Nhầm chất tráng bạc",
+    "hoi": "Chất có nhóm –CHO thật không? Ketone không tráng bạc; formic acid và ester của nó lại có; acetylene tạo kết tủa vàng nhạt chứ không tạo bạc."
+   },
+   "bonag": {
+    "ten": "Quên HCHO cho 4 Ag",
+    "hoi": "Aldehyde là formaldehyde hay aldehyde hai chức? Mỗi mol của chúng cho 4 mol Ag, không phải 2."
+   },
+   "chatthieu": {
+    "ten": "Tính theo chất dư",
+    "hoi": "Trong ester hoá, chất nào có số mol nhỏ hơn theo tỉ lệ 1 : 1? Hiệu suất phải tính theo chất thiếu, không theo chất cho nhiều gam hơn."
+   }
+  },
+  "DANG_KEY": {
+   "CARBONYL_ACID.CAU_TAO.CHON_PHAT_BIEU": "k1",
+   "CARBONYL_ACID.CAU_TAO.DEM_DONG_PHAN": "k2",
+   "CARBONYL_ACID.CAU_TAO.DEM_NGUYEN_TU": "k1",
+   "CARBONYL_ACID.CAU_TAO.GOI_TEN": "k1",
+   "CARBONYL_ACID.CAU_TAO.NHAN_DANG": "k1",
+   "CARBONYL_ACID.CAU_TAO.SO_SANH": "k5",
+   "CARBONYL_ACID.CAU_TAO.TINH_HIEU_SUAT": "k7",
+   "CARBONYL_ACID.CAU_TAO.TINH_NONG_DO": "k7",
+   "CARBONYL_ACID.CAU_TAO.VIET_CTCT": "k1",
+   "CARBONYL_ACID.DIEU_CHE.CHON_PHAT_BIEU": "k6",
+   "CARBONYL_ACID.DIEU_CHE.GOI_TEN": "k6",
+   "CARBONYL_ACID.DIEU_CHE.NHAN_DANG": "k6",
+   "CARBONYL_ACID.DIEU_CHE.TINH_HIEU_SUAT": "k7",
+   "CARBONYL_ACID.DIEU_CHE.XAC_DINH_CTPT": "k6",
+   "CARBONYL_ACID.PHAN_UNG_OXH.CHON_PHAT_BIEU": "k3",
+   "CARBONYL_ACID.PHAN_UNG_OXH.DEM_DONG_PHAN": "k3",
+   "CARBONYL_ACID.PHAN_UNG_OXH.NHAN_DANG": "k3",
+   "CARBONYL_ACID.PHAN_UNG_OXH.TINH_HIEU_SUAT": "k7",
+   "CARBONYL_ACID.PHAN_UNG_OXH.VIET_CTCT": "k3",
+   "CARBONYL_ACID.PHAN_UNG_OXH.XAC_DINH_CHAT": "k3",
+   "CARBONYL_ACID.TINH_ACID.CHON_PHAT_BIEU": "k4",
+   "CARBONYL_ACID.TINH_ACID.NEU_HIEN_TUONG": "k4",
+   "CARBONYL_ACID.TINH_ACID.NHAN_DANG": "k4",
+   "CARBONYL_ACID.TINH_ACID.TINH_NONG_DO": "k4",
+   "CARBONYL_ACID.UNG_DUNG.CHON_PHAT_BIEU": "k5",
+   "CARBONYL_ACID.UNG_DUNG.NHAN_DANG": "k5",
+   "CARBONYL_ACID.UNG_DUNG.TINH_KHOI_LUONG": "k7",
+   "CARBONYL_ACID.UNG_DUNG.TINH_THE_TICH": "k7"
+  },
+  "daDuyet": "máy dựng 29/09"
  },
  "DIEN_PHAN": {
   "ma": "DIEN_PHAN",
@@ -240,6 +601,65 @@ export const BO_CHIA_KHOA: Record<string, BoChiaKhoaDu> = {
   "DANG_KEY": {},
   "daDuyet": "thầy dùng từ 28/09 (Phòng thí nghiệm Ester)"
  },
+ "HALOGEN": {
+  "ma": "HALOGEN",
+  "chuong": "Halogen",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Đơn chất halogen",
+    "rule": "<b>Nhóm VIIA:</b> F, Cl, Br, I; lớp ngoài <b>ns<sup>2</sup>np<sup>5</sup></b>, dễ nhận 1 e; phân tử hai nguyên tử {X2}.<br><b>Trạng thái, màu:</b> {F2} khí lục nhạt; {Cl2} khí vàng lục; {Br2} lỏng nâu đỏ; {I2} rắn tím đen, dễ thăng hoa.<br><b>Số oxi hoá:</b> F chỉ có −1; Cl, Br, I có −1, +1, +3, +5, +7.<br><b>Tự nhiên:</b> chỉ tồn tại ở dạng <b>hợp chất</b> (muối halide trong nước biển, mỏ muối; iodine trong rong biển).<br><b>Xu hướng F → I:</b> bán kính, nhiệt độ sôi, nóng chảy tăng; độ âm điện giảm."
+   },
+   "k2": {
+    "ten": "Tính oxi hoá giảm dần",
+    "rule": "<b>Thứ tự:</b> <b>{F2} > {Cl2} > {Br2} > {I2}</b>.<br><b>Với {H2}:</b> {F2} nổ cả trong bóng tối; {Cl2} cần ánh sáng; {Br2} cần đun nóng; {I2} ở nhiệt độ cao, thuận nghịch.<br><b>Đẩy nhau:</b> halogen mạnh đẩy halogen yếu khỏi dung dịch muối: {Cl2} + 2{NaBr} → 2{NaCl} + {Br2}; {Br2} + 2{NaI} → 2{NaBr} + {I2}.<br><b>Ngoại lệ {F2}:</b> oxi hoá nước trước (2{F2} + 2{H2O} → 4{HF} + {O2}), không dùng để đẩy halogen trong dung dịch.<br><b>Với kim loại:</b> tạo muối hoá trị cao (2{Fe} + 3{Cl2} → 2{FeCl3})."
+   },
+   "k3": {
+    "ten": "Chlorine gặp nước, kiềm",
+    "rule": "<b>Với nước:</b> {Cl2} + {H2O} ⇌ {HCl} + {HClO}; {HClO} oxi hoá mạnh → tẩy màu, sát khuẩn.<br><b>Với {NaOH} thường:</b> {Cl2} + 2{NaOH} → {NaCl} + {NaClO} + {H2O} (nước Javel).<br><b>Với kiềm nóng (~70 °C):</b> 3{Cl2} + 6{KOH} → 5{KCl} + {KClO3} + 3{H2O}.<br><b>Vai trò:</b> các phản ứng trên {Cl2} vừa là chất oxi hoá vừa là chất khử (Cl 0 → −1 và +1/+5).<br><b>Quỳ tím ẩm:</b> gặp {Cl2} hoá đỏ rồi mất màu."
+   },
+   "k4": {
+    "ten": "Hydrogen halide",
+    "rule": "<b>Nhiệt độ sôi:</b> {HCl} < {HBr} < {HI} (M tăng, van der Waals tăng); <b>{HF} cao bất thường</b> do liên kết hydrogen.<br><b>Tính acid:</b> {HF} < {HCl} < {HBr} < {HI}; {HF} là <b>acid yếu</b>, còn lại acid mạnh (độ bền liên kết H–X giảm từ HF đến HI).<br><b>{HF} đặc biệt:</b> ăn mòn thuỷ tinh: {SiO2} + 4{HF} → {SiF4} + 2{H2O}.<br><b>Tính khử:</b> {HF} < {HCl} < {HBr} < {HI}.<br><b>Ở thể khí:</b> không làm đổi màu quỳ khô; tan nhiều trong nước tạo dung dịch acid."
+   },
+   "k5": {
+    "ten": "Ion halide & nhận biết",
+    "rule": "<b>Với {AgNO3}:</b> {AgCl} trắng, {AgBr} vàng nhạt, {AgI} vàng; <b>{AgF} tan</b> (không kết tủa).<br><b>Tính khử ion:</b> {F}<sup>−</sup> < {Cl}<sup>−</sup> < {Br}<sup>−</sup> < {I}<sup>−</sup>.<br><b>Với {H2SO4} đặc:</b> {NaCl} → {HCl} (không oxi hoá); {NaBr} → {Br2} + {SO2}; {NaI} → {I2} + {H2S}.<br><b>Nhận {I2}:</b> gặp hồ tinh bột → <b>xanh tím</b>.<br><b>Đếm nhận biết:</b> mỗi ion một dấu hiệu riêng; ion không tạo dấu hiệu thì nhận sau cùng."
+   },
+   "k6": {
+    "ten": "Điều chế, ứng dụng, tính",
+    "rule": "<b>Phòng thí nghiệm:</b> {HCl} đặc + chất oxi hoá: {MnO2} + 4{HCl} → {MnCl2} + {Cl2} + 2{H2O} (đun nóng); 2{KMnO4} + 16{HCl} → 2{KCl} + 2{MnCl2} + 5{Cl2} + 8{H2O}.<br><b>Công nghiệp:</b> điện phân dung dịch {NaCl} có màng ngăn: 2{NaCl} + 2{H2O} → 2{NaOH} + {H2} + {Cl2}.<br><b>Ứng dụng:</b> {Cl2} khử trùng nước, sản xuất PVC, nước Javel; fluoride trong kem đánh răng; iodine bổ sung qua muối iod, rong biển.<br><b>Tính:</b> theo phương trình hoặc <b>bảo toàn electron</b> (mỗi {Cl2} tạo ra nhận/nhường 2 e); nhớ × H nếu có hiệu suất.<br><b>Thể tích khí:</b> 24,79 L/mol ở 25 °C, 1 bar."
+   }
+  },
+  "TRAPS_THEM": {
+   "fluorngoaile": {
+    "ten": "Ngoại lệ của fluorine",
+    "hoi": "F2 phản ứng với nước trước, F chỉ có số oxi hoá −1, HF là acid yếu nhưng sôi cao nhất, AgF tan. Ý này có dính F không?"
+   },
+   "chieuday": {
+    "ten": "Nhầm chiều dãy halogen",
+    "hoi": "Từ F đến I: tính oxi hoá đơn chất giảm, nhưng tính khử ion halide và tính acid HX lại tăng. Đang xét đơn chất hay ion/HX?"
+   }
+  },
+  "DANG_KEY": {
+   "HALOGEN.ION_HALIDE.NHAN_DANG": "k5",
+   "HALOGEN.HYDROGEN_HALIDE.SO_SANH": "k4",
+   "HALOGEN.HYDROGEN_HALIDE.NHAN_DANG": "k4",
+   "HALOGEN.HYDROGEN_HALIDE.CHON_PHAT_BIEU": "k4",
+   "HALOGEN.PHAN_UNG_HALOGEN.NHAN_DANG": "k2",
+   "HALOGEN.ION_HALIDE.DEM_DONG_PHAN": "k5",
+   "HALOGEN.ION_HALIDE.SO_SANH": "k5",
+   "HALOGEN.DON_CHAT_HALOGEN.NHAN_DANG": "k1",
+   "HALOGEN.PHAN_UNG_HALOGEN.NEU_HIEN_TUONG": "k2",
+   "HALOGEN.DON_CHAT_HALOGEN.CHON_PHAT_BIEU": "k1",
+   "HALOGEN.UNG_DUNG_DIEU_CHE.TINH_KHOI_LUONG": "k6",
+   "HALOGEN.UNG_DUNG_DIEU_CHE.CHON_PHAT_BIEU": "k6",
+   "HALOGEN.PHAN_UNG_HALOGEN.DEM_DONG_PHAN": "k2",
+   "HALOGEN.PHAN_UNG_HALOGEN.TINH_KHOI_LUONG": "k6",
+   "HALOGEN.UNG_DUNG_DIEU_CHE.DEM_DONG_PHAN": "k6"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
  "HOP_CHAT_N": {
   "ma": "HOP_CHAT_N",
   "chuong": "Hợp chất chứa nitrogen",
@@ -306,6 +726,146 @@ export const BO_CHIA_KHOA: Record<string, BoChiaKhoaDu> = {
    "HOP_CHAT_N.PROTEIN.SO_SANH": "k7"
   },
   "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+ },
+ "HUU_CO_DAI_CUONG": {
+  "ma": "HUU_CO_DAI_CUONG",
+  "chuong": "Đại cương hoá học hữu cơ",
+  "lop": "11",
+  "KEYS": {
+   "k1": {
+    "ten": "Nhóm chức & phân loại",
+    "rule": "<b>Hữu cơ:</b> hợp chất của carbon, trừ CO, {CO2}, muối carbonate, cyanide, carbide…<br><b>Hydrocarbon:</b> chỉ có C, H; <b>dẫn xuất:</b> có thêm O, N, halogen…<br><b>Nhóm chức:</b> –OH gắn C no là alcohol, gắn thẳng vòng benzene là phenol; –CHO aldehyde; >C=O giữa hai C là ketone; –COOH (C=O và O–H trên <b>cùng một C</b>) carboxylic acid; –COO– ester; –{NH2} amine; C–O–C ether.<br><b>Đặc điểm chung:</b> liên kết chủ yếu cộng hoá trị, nhiệt độ sôi thấp, dễ cháy, phản ứng chậm và cho hỗn hợp sản phẩm.<br><b>Nguồn gốc:</b> có trong tự nhiên <b>và</b> tổng hợp nhân tạo."
+   },
+   "k2": {
+    "ten": "Đọc phổ IR & phổ khối",
+    "rule": "<b>Phổ IR:</b> cho biết <b>nhóm chức</b> (cấu tạo), không cho phân tử khối.<br><b>Vùng hay gặp (cm<sup>−1</sup>):</b> O–H alcohol, phenol 3650–3200, <b>rộng</b>; O–H acid 3300–2500, rất rộng, luôn kèm C=O; N–H 3500–3300; C=O khoảng 1750–1670.<br><b>Cách làm:</b> soi vùng C=O trước, rồi vùng O–H; có cả hai là –COOH.<br><b>Phổ khối (MS):</b> peak <b>ion phân tử</b> [M]<sup>+</sup> có m/z lớn nhất → phân tử khối; <b>peak cơ bản</b> là peak cao nhất (mảnh bền), không phải M."
+   },
+   "k3": {
+    "ten": "Lập công thức phân tử",
+    "rule": "<b>Biết M và %:</b> số nguyên tử X = <b>%X × M : (100 × A<sub>X</sub>)</b>.<br><b>Chưa biết M:</b> C : H : O = %C/12 : %H/1 : %O/16 → công thức đơn giản nhất, rồi (CTĐGN)<sub>n</sub> = M từ phổ khối.<br><b>Đốt cháy:</b> n<sub>C</sub> = n({CO2}), n<sub>H</sub> = 2n({H2O}), m<sub>O</sub> = m − m<sub>C</sub> − m<sub>H</sub>.<br><b>Kiểm:</b> số liên kết π + vòng = (2C + 2 + N − H − X) : 2 phải nguyên, không âm; %O = 100 − %C − %H."
+   },
+   "k4": {
+    "ten": "Cấu tạo & đồng phân",
+    "rule": "<b>Hoá trị:</b> C 4, O 2, N 3, H và halogen 1; công thức đúng khi mọi nguyên tử đủ hoá trị.<br><b>Công thức khung:</b> mỗi đỉnh, đầu mút là một C; H gắn C được ngầm hiểu.<br><b>Đồng phân:</b> <b>cùng công thức phân tử</b>, khác cấu tạo (mạch C, vị trí nhóm chức, loại nhóm chức) → so công thức phân tử trước.<br><b>Đồng đẳng:</b> hơn kém nhau n nhóm {CH2}, cùng loại nhóm chức, tính chất tương tự."
+   },
+   "k5": {
+    "ten": "Tách & tinh chế",
+    "rule": "<b>Chưng cất:</b> chất lỏng có nhiệt độ sôi khác nhau; chênh ít → chưng cất phân đoạn; tinh dầu không tan trong nước, dễ hỏng ở nhiệt độ cao → <b>lôi cuốn hơi nước</b>.<br><b>Chiết:</b> hai chất lỏng không tan vào nhau, lớp có <b>khối lượng riêng nhỏ nằm trên</b>; chiết lỏng – rắn bằng dung môi.<br><b>Kết tinh:</b> chất rắn, dựa vào <b>độ tan đổi theo nhiệt độ</b>.<br><b>Sắc kí cột:</b> chất bị hấp phụ yếu ra trước.<br><b>Lắp dụng cụ:</b> bầu nhiệt kế ngang nhánh, sinh hàn nước vào thấp ra cao, đá bọt, chất lỏng ≤ 2/3 bình."
+   }
+  },
+  "TRAPS_THEM": {
+   "peakcoban": {
+    "ten": "Nhầm peak phổ khối",
+    "hoi": "Đang đọc peak có m/z lớn nhất (ion phân tử) hay peak cao nhất (peak cơ bản)? Chỉ ion phân tử cho phân tử khối."
+   },
+   "vungir": {
+    "ten": "Nhầm vùng phổ IR",
+    "hoi": "Tín hiệu nằm ở vùng nào? Peak rộng quanh 3300 cm⁻¹ là nhóm –OH, không phải C=O; C=O ở khoảng 1750–1670 cm⁻¹."
+   },
+   "cungctpt": {
+    "ten": "Quên so công thức phân tử",
+    "hoi": "Hai chất đã cùng công thức phân tử chưa? Khác công thức phân tử thì không phải đồng phân, dù cùng nhóm chức."
+   }
+  },
+  "DANG_KEY": {
+   "HUU_CO_DAI_CUONG.CAU_TAO_HH.DEM_NGUYEN_TU": "k4",
+   "HUU_CO_DAI_CUONG.CAU_TAO_HH.NHAN_DANG": "k4",
+   "HUU_CO_DAI_CUONG.CAU_TAO_HH.XAC_DINH_CTPT": "k4",
+   "HUU_CO_DAI_CUONG.LAP_CTPT.NHAN_DANG": "k3",
+   "HUU_CO_DAI_CUONG.LAP_CTPT.XAC_DINH_CTPT": "k3",
+   "HUU_CO_DAI_CUONG.PHAN_LOAI.CHON_PHAT_BIEU": "k1",
+   "HUU_CO_DAI_CUONG.PHAN_LOAI.DEM_DONG_PHAN": "k1",
+   "HUU_CO_DAI_CUONG.PHAN_LOAI.DEM_NGUYEN_TU": "k1",
+   "HUU_CO_DAI_CUONG.PHAN_LOAI.NHAN_DANG": "k1",
+   "HUU_CO_DAI_CUONG.PHO.CHON_PHAT_BIEU": "k2",
+   "HUU_CO_DAI_CUONG.PHO.DEM_DONG_PHAN": "k2",
+   "HUU_CO_DAI_CUONG.PHO.DEM_NGUYEN_TU": "k2",
+   "HUU_CO_DAI_CUONG.PHO.NHAN_DANG": "k2",
+   "HUU_CO_DAI_CUONG.PHO.XAC_DINH_CHAT": "k2",
+   "HUU_CO_DAI_CUONG.PHO.XAC_DINH_CTPT": "k3",
+   "HUU_CO_DAI_CUONG.TACH_CHAT.CHON_PHAT_BIEU": "k5",
+   "HUU_CO_DAI_CUONG.TACH_CHAT.DEM_DONG_PHAN": "k5",
+   "HUU_CO_DAI_CUONG.TACH_CHAT.NHAN_DANG": "k5",
+   "HUU_CO_DAI_CUONG.TACH_CHAT.SO_SANH": "k5",
+   "HUU_CO_DAI_CUONG.TACH_CHAT.TINH_KHOI_LUONG": "k5"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "HYDROCARBON": {
+  "ma": "HYDROCARBON",
+  "chuong": "Hydrocarbon",
+  "lop": "11",
+  "KEYS": {
+   "k1": {
+    "ten": "Gọi tên & đồng phân",
+    "rule": "<b>Mạch chính:</b> dài nhất, chứa liên kết bội; đánh số từ đầu <b>gần liên kết bội</b> (alkane: gần nhánh).<br><b>Tên:</b> vị trí nhánh – tên nhánh + tên mạch chính + vị trí liên kết bội + ane/ene/yne: 2-methylbutane, but-2-ene, pent-1-yne.<br><b>Đồng phân hình học:</b> <b>mỗi C</b> của C=C mang hai nhóm khác nhau; cùng phía là cis.<br><b>Tên thường:</b> isopentane = 2-methylbutane; acetylene {C2H2}; methylacetylene = propyne; toluene {C6H5CH3}; styrene {C6H5CH=CH2}; cumene = isopropylbenzene; xylene = dimethylbenzene.<br><b>Đếm đồng phân:</b> vẽ mạch C từ dài đến ngắn, rồi dời vị trí nhánh, liên kết bội; bỏ cách vẽ trùng."
+   },
+   "k2": {
+    "ten": "Liên kết & hình dạng",
+    "rule": "<b>Liên kết:</b> đơn = 1σ; đôi = 1σ + 1π; ba = 1σ + 2π; số σ = tổng số liên kết (kể cả C–H).<br><b>Hình dạng:</b> methane tứ diện; ethylene phẳng, góc 120°; acetylene <b>thẳng</b>, 180°; benzene lục giác đều, phẳng.<br><b>Công thức chung:</b> alkane {CnH2n+2}; alkene {CnH2n}; alkyne {CnH2n-2}; dãy benzene {CnH2n-6}.<br><b>Số π + vòng</b> = (2C + 2 − H) : 2.<br><b>Công thức khung:</b> đếm từng đỉnh là một C; nhóm methyl là đầu mút nhánh."
+   },
+   "k3": {
+    "ten": "Phản ứng đặc trưng",
+    "rule": "<b>Alkane:</b> thế halogen khi chiếu sáng (cho hỗn hợp sản phẩm), cracking, reforming, cháy; <b>không</b> làm mất màu {Br2}, {KMnO4}.<br><b>Alkene, alkyne:</b> cộng {H2}, {Br2} (mất màu), HX, {H2O} theo <b>Markovnikov</b>: H vào C mang nhiều H hơn; trùng hợp; alkene + {KMnO4} → diol, có kết tủa nâu đen {MnO2}.<br><b>Alk-1-yne:</b> C≡C đầu mạch + {AgNO3}/{NH3} → kết tủa vàng nhạt; acetylene cho {AgC≡CAg}.<br><b>Benzene:</b> thế ({Br2}/{FeBr3}, {HNO3}/{H2SO4} đặc); cộng khó ({H2}/Ni, {Cl2} chiếu sáng → {C6H6Cl6}); không mất màu nước bromine.<br><b>Toluene:</b> thế o/p dễ hơn benzene; {KMnO4} đun nóng oxi hoá nhóm –{CH3}."
+   },
+   "k4": {
+    "ten": "Tính chất vật lí",
+    "rule": "<b>Thể:</b> ở điều kiện thường, chất có <b>nhiệt độ sôi dưới 25 °C</b> là khí; alkane C<sub>1</sub>–C<sub>4</sub> là khí.<br><b>Nhiệt độ sôi:</b> tăng theo phân tử khối; cùng số C, <b>nhiều nhánh sôi thấp hơn</b>.<br><b>Tan:</b> hydrocarbon không phân cực, không tan trong nước, nhẹ hơn nước → nổi, tách lớp; tan trong dung môi hữu cơ.<br><b>Arene:</b> benzene, toluene lỏng, mùi thơm; naphthalene rắn, dễ thăng hoa (băng phiến)."
+   },
+   "k5": {
+    "ten": "Dầu mỏ & ứng dụng",
+    "rule": "<b>Cracking:</b> cắt mạch dài → alkane và alkene mạch ngắn.<br><b>Reforming:</b> mạch không nhánh → mạch nhánh, vòng, arene, <b>tăng chỉ số octane</b>, số C giữ nguyên.<br><b>Methane:</b> khí thiên nhiên, biogas, khí gây hiệu ứng nhà kính.<br><b>Ethylene:</b> kích thích quả chín, sản xuất PE; <b>acetylene:</b> đèn xì oxygen – acetylene, điều chế {CaC2} + 2{H2O} → {C2H2} + {Ca(OH)2}.<br><b>Arene:</b> benzene độc, gây ung thư; toluene làm dung môi, sản xuất TNT."
+   },
+   "k6": {
+    "ten": "Tính theo phương trình",
+    "rule": "<b>Khí:</b> n = V : 24,79 (25 °C, 1 bar); ppm = phần triệu thể tích.<br><b>Tìm chất:</b> %C và M từ phổ khối → số C, số H.<br><b>Đốt cháy:</b> alkane n({H2O}) > n({CO2}), n(alkane) = n({H2O}) − n({CO2}); alkene hai số bằng nhau; alkyne n = n({CO2}) − n({H2O}).<br><b>Phần trăm giảm</b> = (trước − sau) : trước × 100%.<br><b>Hiệu suất:</b> sản phẩm × H, nguyên liệu ÷ H; nhiệt toả ra Q = n × |Δ<sub>r</sub>H|."
+   }
+  },
+  "TRAPS_THEM": {
+   "markovnikov": {
+    "ten": "Cộng ngược quy tắc",
+    "hoi": "Nguyên tử H của HX hay H₂O gắn vào C nào của C=C? Theo Markovnikov, H vào C mang nhiều H hơn, X hoặc OH vào C bậc cao hơn."
+   },
+   "benzenbrom": {
+    "ten": "Coi benzene như alkene",
+    "hoi": "Chất có C=C ngoài vòng không? Benzene, toluene không làm mất màu nước bromine ở điều kiện thường; styrene thì có."
+   },
+   "ankindau": {
+    "ten": "Nhầm alkyne đầu mạch",
+    "hoi": "Liên kết ba có nằm ở đầu mạch (còn H gắn C≡C) không? Chỉ alk-1-yne tạo kết tủa với silver nitrate trong ammonia; but-2-yne thì không."
+   }
+  },
+  "DANG_KEY": {
+   "HYDROCARBON.CAU_TAO.CHON_PHAT_BIEU": "k2",
+   "HYDROCARBON.CAU_TAO.DEM_DONG_PHAN": "k1",
+   "HYDROCARBON.CAU_TAO.DEM_NGUYEN_TU": "k2",
+   "HYDROCARBON.CAU_TAO.GOI_TEN": "k1",
+   "HYDROCARBON.CAU_TAO.NHAN_DANG": "k1",
+   "HYDROCARBON.CAU_TAO.SO_SANH": "k4",
+   "HYDROCARBON.CAU_TAO.TINH_PHAN_TRAM": "k6",
+   "HYDROCARBON.CAU_TAO.VIET_CTCT": "k1",
+   "HYDROCARBON.CAU_TAO.XAC_DINH_CTPT": "k6",
+   "HYDROCARBON.LIEN_KET_PHAN_TU.DEM_LIEN_KET_PI": "k2",
+   "HYDROCARBON.LIEN_KET_PHAN_TU.NHAN_DANG": "k2",
+   "HYDROCARBON.PHAN_UNG.CHON_PHAT_BIEU": "k3",
+   "HYDROCARBON.PHAN_UNG.DEM_DONG_PHAN": "k3",
+   "HYDROCARBON.PHAN_UNG.DEM_NGUYEN_TU": "k3",
+   "HYDROCARBON.PHAN_UNG.GOI_TEN": "k3",
+   "HYDROCARBON.PHAN_UNG.NEU_HIEN_TUONG": "k3",
+   "HYDROCARBON.PHAN_UNG.NHAN_DANG": "k3",
+   "HYDROCARBON.PHAN_UNG.TINH_KHOI_LUONG": "k6",
+   "HYDROCARBON.PHAN_UNG.VIET_CTCT": "k3",
+   "HYDROCARBON.TINH_CHAT_VAT_LI.CHON_PHAT_BIEU": "k4",
+   "HYDROCARBON.TINH_CHAT_VAT_LI.DEM_DONG_PHAN": "k4",
+   "HYDROCARBON.TINH_CHAT_VAT_LI.NHAN_DANG": "k4",
+   "HYDROCARBON.UNG_DUNG.CHON_PHAT_BIEU": "k5",
+   "HYDROCARBON.UNG_DUNG.NHAN_DANG": "k5",
+   "HYDROCARBON.UNG_DUNG.TINH_KHOI_LUONG": "k6",
+   "HYDROCARBON.UNG_DUNG.TINH_THE_TICH": "k6",
+   "HYDROCARBON.UNG_DUNG.VIET_PTHH": "k5",
+   "HYDROCARBON.UNG_DUNG.XAC_DINH_CTPT": "k6"
+  },
+  "daDuyet": "máy dựng 29/09"
  },
  "KIM_LOAI": {
   "ma": "KIM_LOAI",
@@ -428,6 +988,481 @@ export const BO_CHIA_KHOA: Record<string, BoChiaKhoaDu> = {
   },
   "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
  },
+ "LIEN_KET": {
+  "ma": "LIEN_KET",
+  "chuong": "Liên kết hoá học",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Quy tắc octet",
+    "rule": "<b>Nội dung:</b> nguyên tử <b>nhường, nhận hoặc góp chung</b> e để đạt cấu hình bền của <b>khí hiếm gần kề</b> (8 e lớp ngoài; H, Li… đạt 2 e như He).<br><b>Kim loại</b> (1–3 e ngoài) có xu hướng nhường e; <b>phi kim</b> (5–7 e) có xu hướng nhận hoặc góp chung.<br><b>Công thức Lewis:</b> vẽ đủ e hoá trị, mỗi nguyên tử (trừ H) đủ 8 e.<br><b>Ngoại lệ:</b> một số chất không theo octet (như {BF3}, {PCl5}, {SF6}, {NO2})."
+   },
+   "k2": {
+    "ten": "Liên kết ion",
+    "rule": "<b>Hình thành:</b> <b>lực hút tĩnh điện</b> giữa ion dương và ion âm; kim loại điển hình nhường e, phi kim điển hình nhận e ({Na} → {Na}<sup>+</sup> + e; {Cl} + e → {Cl}<sup>−</sup>).<br><b>Ion đơn nguyên tử, đa nguyên tử:</b> {Na}<sup>+</sup>, {Cl}<sup>−</sup>; {NH4}<sup>+</sup>, {SO4}<sup>2−</sup>, {NO3}<sup>−</sup>.<br><b>Hợp chất ion:</b> tinh thể, rắn ở điều kiện thường, nóng chảy và sôi cao, khi nóng chảy hoặc tan trong nước thì dẫn điện; ở thể rắn không dẫn điện.<br><b>Cấu hình ion:</b> ion bền thường có cấu hình khí hiếm gần kề."
+   },
+   "k3": {
+    "ten": "Cộng hoá trị & độ âm điện",
+    "rule": "<b>Hình thành:</b> dùng chung cặp e; đơn 1 cặp, đôi 2 cặp, ba 3 cặp ({H2} 1, {O2} 2, {N2} 3, {F2} 1).<br><b>Cho – nhận:</b> cặp e chung do <b>một</b> nguyên tử góp (vẽ mũi tên), như trong {NH4}<sup>+</sup>.<br><b>Theo hiệu độ âm điện Δχ:</b> 0 ≤ Δχ < 0,4 cộng hoá trị không phân cực; 0,4 ≤ Δχ < 1,7 cộng hoá trị phân cực; Δχ ≥ 1,7 thường là ion.<br><b>Không phân cực:</b> hai nguyên tử giống nhau ({Br2}, {Cl2}); phân cực: cặp e lệch về nguyên tử có χ lớn hơn.<br><b>Phân tử:</b> phân cực hay không còn tuỳ hình học ({CO2} thẳng nên không phân cực dù liên kết phân cực)."
+   },
+   "k4": {
+    "ten": "Liên kết σ, π, xen phủ",
+    "rule": "<b>σ:</b> xen phủ <b>trục</b> (s–s, s–p, p–p dọc trục nối hai hạt nhân), bền.<br><b>π:</b> xen phủ <b>bên</b> hai AO p song song, kém bền hơn σ.<br><b>Đếm:</b> liên kết đơn = 1σ; đôi = 1σ + 1π; ba = 1σ + 2π.<br><b>Ví dụ:</b> {H2} s–s; {HCl} s–p; {Cl2} p–p; {N2} có 1σ + 2π.<br><b>Vùng xen phủ</b> càng lớn thì liên kết càng bền."
+   },
+   "k5": {
+    "ten": "Năng lượng liên kết",
+    "rule": "<b>Định nghĩa:</b> E<sub>b</sub> là năng lượng cần để <b>phá</b> 1 mol liên kết ở thể khí (kJ/mol).<br><b>So sánh:</b> E<sub>b</sub> càng lớn → liên kết càng <b>bền</b>, độ dài liên kết thường càng ngắn; ba > đôi > đơn giữa cùng hai nguyên tử.<br><b>Tính biến thiên enthalpy</b> (các chất đều ở thể khí): <b>Δ<sub>r</sub>H = ΣE<sub>b</sub>(chất đầu) − ΣE<sub>b</sub>(sản phẩm)</b>.<br><b>Đếm đủ:</b> nhân E<sub>b</sub> với số liên kết trong phân tử và hệ số phương trình."
+   },
+   "k6": {
+    "ten": "Liên kết hydrogen",
+    "rule": "<b>Điều kiện:</b> nguyên tử H liên kết với <b>F, O hoặc N</b> (độ âm điện lớn) hút tĩnh điện với một nguyên tử F, O, N khác còn <b>cặp e tự do</b>; biểu diễn bằng dấu •••.<br><b>Có:</b> {H2O}, {NH3}, {HF}, alcohol, carboxylic acid; <b>không có</b> giữa các phân tử {CH4}, {H2S}, {HCl}.<br><b>Hệ quả:</b> nhiệt độ sôi, nóng chảy <b>cao bất thường</b> ({H2O} so với {H2S}); tan tốt trong nước; nước đá nhẹ hơn nước lỏng.<br><b>Vai trò sinh học:</b> giữ chuỗi xoắn kép DNA, cấu trúc protein.<br><b>Độ mạnh:</b> yếu hơn liên kết cộng hoá trị và ion, mạnh hơn van der Waals."
+   },
+   "k7": {
+    "ten": "Tương tác van der Waals",
+    "rule": "<b>Bản chất:</b> tương tác tĩnh điện <b>lưỡng cực – lưỡng cực</b> giữa các <b>nguyên tử hay phân tử</b> (lưỡng cực tạm thời hoặc cảm ứng).<br><b>Độ mạnh:</b> tăng khi <b>khối lượng phân tử</b> và <b>kích thước, diện tích tiếp xúc</b> tăng.<br><b>Hệ quả:</b> cùng loại phân tử không có liên kết hydrogen, M lớn hơn → sôi cao hơn ({F2} < {Cl2} < {Br2} < {I2}; khí hiếm He → Rn).<br><b>Phân biệt:</b> sôi, nóng chảy phụ thuộc lực <b>giữa</b> các phân tử, không phá liên kết trong phân tử."
+   }
+  },
+  "TRAPS_THEM": {
+   "trongngoai": {
+    "ten": "Trong hay giữa phân tử",
+    "hoi": "Nhiệt độ sôi do lực giữa các phân tử (hydrogen, van der Waals), không do liên kết cộng hoá trị trong phân tử. Đề đang nói lực nào?"
+   },
+   "dieukienhydro": {
+    "ten": "Sai điều kiện liên kết H",
+    "hoi": "H có gắn trực tiếp vào F, O hoặc N không? Phía nhận có cặp e tự do trên F, O, N không?"
+   },
+   "dempi": {
+    "ten": "Đếm sai σ và π",
+    "hoi": "Mỗi liên kết bội chỉ có đúng một σ; liên kết đôi 1π, ba 2π. Đã đếm từng liên kết chưa?"
+   }
+  },
+  "DANG_KEY": {
+   "LIEN_KET.LIEN_KET_CHT.DEM_NGUYEN_TU": "k3",
+   "LIEN_KET.VAN_DER_WAALS.SO_SANH": "k7",
+   "LIEN_KET.VAN_DER_WAALS.GIAI_THICH": "k7",
+   "LIEN_KET.LIEN_KET_HYDROGEN.NHAN_DANG": "k6",
+   "LIEN_KET.NANG_LUONG_LIEN_KET.CHON_PHAT_BIEU": "k5",
+   "LIEN_KET.LIEN_KET_CHT.CHON_PHAT_BIEU": "k3",
+   "LIEN_KET.LIEN_KET_HYDROGEN.CHON_PHAT_BIEU": "k6",
+   "LIEN_KET.LIEN_KET_HYDROGEN.DEM_DONG_PHAN": "k6",
+   "LIEN_KET.LIEN_KET_CHT.NHAN_DANG": "k3",
+   "LIEN_KET.XEN_PHU_AO.NHAN_DANG": "k4",
+   "LIEN_KET.XEN_PHU_AO.DEM_NGUYEN_TU": "k4",
+   "LIEN_KET.LIEN_KET_CHT.DEM_DONG_PHAN": "k3",
+   "LIEN_KET.NANG_LUONG_LIEN_KET.TINH_NANG_LUONG": "k5",
+   "LIEN_KET.LIEN_KET_ION.CHON_PHAT_BIEU": "k2",
+   "LIEN_KET.QUY_TAC_OCTET.NHAN_DANG": "k1"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "NANG_LUONG_HH": {
+  "ma": "NANG_LUONG_HH",
+  "chuong": "Năng lượng hoá học",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Toả nhiệt, thu nhiệt",
+    "rule": "<b>Toả nhiệt:</b> Δ<sub>r</sub>H < 0; sản phẩm có năng lượng thấp hơn chất đầu; môi trường nóng lên.<br><b>Thu nhiệt:</b> Δ<sub>r</sub>H > 0; phải cấp nhiệt liên tục, <b>ngừng đun thì phản ứng dừng</b>.<br><b>Hay gặp:</b> đốt cháy, trung hoà, oxi hoá glucose toả nhiệt; nhiệt phân {CaCO3}, {NaHCO3}, quang hợp thu nhiệt.<br><b>Sơ đồ năng lượng:</b> mũi tên từ chất đầu đi xuống sản phẩm là toả nhiệt, đi lên là thu nhiệt.<br><b>Đun khơi mào:</b> nhiều phản ứng toả nhiệt vẫn cần đun lúc đầu."
+   },
+   "k2": {
+    "ten": "Enthalpy tạo thành chuẩn",
+    "rule": "<b>Định nghĩa:</b> Δ<sub>f</sub>H°<sub>298</sub> là nhiệt kèm theo khi tạo <b>1 mol chất</b> từ các đơn chất bền nhất, ở điều kiện chuẩn (1 bar, 298 K; dung dịch 1 mol/L).<br><b>Bằng 0:</b> đơn chất ở dạng bền nhất: C(graphite), {O2}(g), {Br2}(l), Hg(l), Na(s).<br><b>Khác 0:</b> {O3}, C(kim cương), {Br2}(g), mọi hợp chất.<br><b>Độ bền:</b> Δ<sub>f</sub>H°<sub>298</sub> càng âm, chất càng bền.<br><b>Phương trình nhiệt hoá học:</b> ghi đủ thể (s, l, g, aq); nhân hệ số thì Δ<sub>r</sub>H nhân theo; đảo chiều thì đổi dấu."
+   },
+   "k3": {
+    "ten": "Tính ΔrH từ ΔfH",
+    "rule": "<b>Công thức:</b> Δ<sub>r</sub>H°<sub>298</sub> = ΣΔ<sub>f</sub>H°<sub>298</sub>(sản phẩm) − ΣΔ<sub>f</sub>H°<sub>298</sub>(chất đầu).<br><b>Hệ số:</b> nhân mỗi Δ<sub>f</sub>H với hệ số của chất trong phương trình đã cân bằng.<br><b>Đơn chất bền:</b> lấy bằng 0 ({O2}, {N2}, C(graphite)).<br><b>Thể của nước:</b> {H2O}(l) và {H2O}(g) có Δ<sub>f</sub>H khác nhau, lấy đúng thể đề cho.<br><b>Ví dụ:</b> {CH4} + 2{O2} → {CO2} + 2{H2O}(g): (−393,5 + 2·(−241,8)) − (−74,9) = −802,2 kJ."
+   },
+   "k4": {
+    "ten": "Năng lượng liên kết",
+    "rule": "<b>Công thức:</b> Δ<sub>r</sub>H°<sub>298</sub> = ΣE<sub>b</sub>(chất đầu) − ΣE<sub>b</sub>(sản phẩm) (ngược chiều với cách tính theo Δ<sub>f</sub>H).<br><b>Điều kiện:</b> chỉ áp dụng khi mọi chất ở <b>thể khí</b>.<br><b>Đếm liên kết:</b> số liên kết mỗi phân tử × hệ số: {CH4} 4 C–H; {O2} 1 O=O; {CO2} 2 C=O; {H2O} 2 O–H; {N2} 1 N≡N.<br><b>Ý nghĩa:</b> phá liên kết cần năng lượng, tạo liên kết giải phóng năng lượng."
+   },
+   "k5": {
+    "ten": "Cộng phương trình nhiệt",
+    "rule": "<b>Nguyên tắc:</b> phương trình đích bằng tổng, hiệu các phương trình đã cho ⇒ Δ<sub>r</sub>H cộng, trừ đúng như vậy.<br><b>Đảo chiều:</b> đổi dấu Δ<sub>r</sub>H; <b>nhân hệ số:</b> nhân Δ<sub>r</sub>H.<br><b>Ví dụ:</b> C(kim cương) + {O2} → {CO2} = (1) − (2): −393,5 − 2,87 ≈ −396 kJ.<br><b>So sánh:</b> cùng sản phẩm, chất đầu kém bền (năng lượng cao) thì toả nhiều nhiệt hơn."
+   },
+   "k6": {
+    "ten": "Nhiệt lượng theo lượng chất",
+    "rule": "<b>Nhiệt lượng:</b> Q = n × |Δ<sub>r</sub>H| với Δ<sub>r</sub>H ứng với số mol trong phương trình (chia hệ số nếu cần).<br><b>Đun nước:</b> Q = m·c·Δt, c theo đề (thường 4,18 hoặc 4,2 J/g·K); nước 1 g/mL.<br><b>Hao hụt:</b> Q phải đốt = Q có ích : (1 − % hao); nhiệt thực = lí thuyết × H.<br><b>Hỗn hợp:</b> Q của 1 mol hỗn hợp = Σ(phần mol × Q mỗi chất).<br><b>Đổi đơn vị:</b> 1 cal = 4,184 J; 1 kJ = 1000 J; khí đkc 24,79 L/mol; dung dịch: m = V·D rồi × C%."
+   }
+  },
+  "TRAPS_THEM": {
+   "dauenthalpy": {
+    "ten": "Nhầm dấu ΔrH",
+    "hoi": "Đề hỏi Δ<sub>r</sub>H (âm khi toả nhiệt) hay nhiệt lượng toả ra, năng lượng nhận được (số dương)?"
+   },
+   "trangthai": {
+    "ten": "Sai thể của chất",
+    "hoi": "Nước ở thể lỏng hay khí? Đơn chất có đúng dạng bền nhất không (graphite hay kim cương, {Br2} lỏng hay khí)?"
+   },
+   "daochieueb": {
+    "ten": "Đảo công thức Eb",
+    "hoi": "Tính theo năng lượng liên kết là chất đầu trừ sản phẩm; theo enthalpy tạo thành là sản phẩm trừ chất đầu. Đã dùng đúng chiều chưa?"
+   },
+   "quyvemol": {
+    "ten": "Quên quy về mol",
+    "hoi": "Δ<sub>r</sub>H ghi cho bao nhiêu mol theo phương trình? Lượng chất đề cho đã đổi ra mol, đã nhân C% và khối lượng riêng chưa?"
+   }
+  },
+  "DANG_KEY": {
+   "NANG_LUONG_HH.TOA_THU_NHIET.CHON_PHAT_BIEU": "k1",
+   "NANG_LUONG_HH.TOA_THU_NHIET.NHAN_DANG": "k1",
+   "NANG_LUONG_HH.TOA_THU_NHIET.DEM_DONG_PHAN": "k1",
+   "NANG_LUONG_HH.TOA_THU_NHIET.TINH_NANG_LUONG": "k6",
+   "NANG_LUONG_HH.TOA_THU_NHIET.TINH_KHOI_LUONG": "k6",
+   "NANG_LUONG_HH.TOA_THU_NHIET.TINH_SO_MOL": "k6",
+   "NANG_LUONG_HH.TOA_THU_NHIET.TINH_HIEU_SUAT": "k6",
+   "NANG_LUONG_HH.TOA_THU_NHIET.TINH_THE_TICH": "k6",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.TINH_NANG_LUONG": "k3",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.TINH_TI_SO": "k3",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.TINH_KHOI_LUONG": "k3",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.NHAN_DANG": "k2",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.SO_SANH": "k2",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.CHON_PHAT_BIEU": "k2",
+   "NANG_LUONG_HH.ENTHALPY_TAO_THANH.DEM_DONG_PHAN": "k2",
+   "NANG_LUONG_HH.NANG_LUONG_LIEN_KET.TINH_NANG_LUONG": "k4",
+   "NANG_LUONG_HH.NANG_LUONG_LIEN_KET.DEM_NGUYEN_TU": "k4",
+   "NANG_LUONG_HH.HESS.CHON_PHAT_BIEU": "k5",
+   "NANG_LUONG_HH.HESS.SO_SANH": "k5",
+   "NANG_LUONG_HH.HESS.TINH_NANG_LUONG": "k5"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "NGUYEN_TU": {
+  "ma": "NGUYEN_TU",
+  "chuong": "Cấu tạo nguyên tử",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Hạt & kí hiệu nguyên tử",
+    "rule": "<b>Ba hạt:</b> proton (+1, ≈ 1 amu), neutron (0, ≈ 1 amu), electron (−1, ≈ 0,00055 amu); 1 amu = 1,6605×10<sup>−27</sup> kg.<br><b>Điện tích:</b> 1 đơn vị = 1,602×10<sup>−19</sup> C; nguyên tử trung hoà nên <b>số p = số e = Z</b>.<br><b>Số khối:</b> <b>A = Z + N</b>; kí hiệu <sup>A</sup><sub>Z</sub>X (A trên, Z dưới).<br><b>Nguyên tố hoá học:</b> tập hợp nguyên tử <b>cùng Z</b>; Z quyết định nguyên tố, không phải A.<br><b>Khối lượng nguyên tử:</b> tập trung ở hạt nhân, khối lượng electron không đáng kể."
+   },
+   "k2": {
+    "ten": "Bài toán tổng số hạt",
+    "rule": "<b>Đặt ẩn:</b> tổng hạt <b>S = 2Z + N</b>; hạt mang điện = <b>2Z</b> (p và e), không mang điện = N.<br><b>Ion:</b> {X}<sup>n+</sup> có e = Z − n; {X}<sup>n−</sup> có e = Z + n; <b>p và N không đổi</b>.<br><b>Một dữ kiện:</b> đồng vị bền (Z ≤ 82) có 1 ≤ N : Z ≤ 1,5 ⇒ <b>S : 3,5 ≤ Z ≤ S : 3</b>, thử từng Z nguyên.<br><b>Hợp chất {MX2}:</b> cộng hạt từng nguyên tử theo chỉ số, lập hệ theo Z<sub>M</sub>, Z<sub>X</sub>.<br><b>Kiểm lại:</b> Z → tên nguyên tố → A = Z + N."
+   },
+   "k3": {
+    "ten": "Mô hình & kích thước",
+    "rule": "<b>Thomson:</b> tia âm cực → phát hiện <b>electron</b>. <b>Rutherford:</b> bắn hạt α vào lá vàng: đa số đi thẳng → nguyên tử <b>rỗng</b>; một ít lệch, bật lại → có <b>hạt nhân nhỏ, mang điện dương</b>. <b>Chadwick:</b> neutron.<br><b>Rutherford – Bohr:</b> electron quay trên <b>quỹ đạo xác định</b>, mỗi quỹ đạo một mức năng lượng không đổi; gần hạt nhân năng lượng thấp.<br><b>Hiện đại:</b> electron chuyển động rất nhanh, không theo quỹ đạo; chỉ nói <b>xác suất tìm thấy</b> (orbital).<br><b>Kích thước:</b> nguyên tử ~10<sup>−10</sup> m, hạt nhân ~10<sup>−14</sup> m (nhỏ hơn ~10<sup>4</sup> lần, thể tích ~10<sup>12</sup> lần); 1 Å = 10<sup>−10</sup> m, 1 pm = 10<sup>−12</sup> m.<br><b>Tính:</b> V = 4/3·π·r<sup>3</sup>; khối lượng riêng = m : V (đổi đơn vị trước)."
+   },
+   "k4": {
+    "ten": "Lớp, phân lớp, orbital",
+    "rule": "<b>Lớp n = 1, 2, 3, 4</b> (K, L, M, N): có <b>n phân lớp</b>, <b>n<sup>2</sup> AO</b>, tối đa <b>2n<sup>2</sup> e</b>.<br><b>Phân lớp:</b> s (1 AO, 2 e), p (3 AO, 6 e), d (5 AO, 10 e), f (7 AO, 14 e); lớp 1 chỉ có 1s, lớp 2 có 2s 2p (không có 1p, 2d).<br><b>Hình dạng:</b> AO s <b>hình cầu</b>, AO p <b>số tám nổi</b> theo trục x, y, z.<br><b>Năng lượng:</b> lớp gần hạt nhân năng lượng thấp, liên kết chặt nhất; e <b>cùng phân lớp</b> năng lượng bằng nhau (cùng lớp thì chưa chắc).<br><b>Orbital:</b> vùng xác suất tìm thấy e lớn nhất (~90%), không phải 100%."
+   },
+   "k5": {
+    "ten": "Viết cấu hình electron",
+    "rule": "<b>Thứ tự điền:</b> 1s 2s 2p 3s 3p <b>4s 3d</b> 4p 5s 4d 5p 6s 4f 5d…; viết lại theo lớp (3d trước 4s).<br><b>Pauli:</b> mỗi AO tối đa 2 e ngược chiều. <b>Hund:</b> điền mỗi AO một e trước (cùng chiều) rồi mới ghép đôi → đếm <b>e độc thân</b>.<br><b>Ngoại lệ:</b> Cr [Ar]3d<sup>5</sup>4s<sup>1</sup>, Cu [Ar]3d<sup>10</sup>4s<sup>1</sup>.<br><b>Ion:</b> bỏ e từ <b>lớp ngoài cùng</b> trước ({Fe}<sup>2+</sup> [Ar]3d<sup>6</sup>, bỏ 4s trước 3d); anion thêm e vào phân lớp đang điền.<br><b>Đếm:</b> Z = tổng số mũ; e lớp ngoài = e của n lớn nhất; e phân lớp p/s cộng theo loại."
+   },
+   "k6": {
+    "ten": "Cấu hình → tính chất",
+    "rule": "<b>E lớp ngoài cùng:</b> 1, 2, 3 → <b>kim loại</b> (trừ H, He, B); 5, 6, 7 → <b>phi kim</b>; 8 (He: 2) → <b>khí hiếm</b>; 4 → kim loại hoặc phi kim.<br><b>Loại nguyên tố:</b> e cuối điền vào s, p, d, f → nguyên tố s, p, d, f.<br><b>E hoá trị:</b> nhóm A là e lớp ngoài; nguyên tố d gồm (n−1)d + ns (V: 3d<sup>3</sup>4s<sup>2</sup> → 5).<br><b>Vị trí:</b> ô = Z; chu kì = số lớp e; nhóm A = số e lớp ngoài cùng.<br><b>Cùng cấu hình khí hiếm:</b> nguyên tử là khí hiếm, cation từ kim loại, anion từ phi kim."
+   },
+   "k7": {
+    "ten": "Đồng vị & nguyên tử khối TB",
+    "rule": "<b>Đồng vị:</b> cùng Z (cùng p, e), <b>khác N</b> nên khác A; tính chất hoá học như nhau.<br><b>NTK trung bình:</b> <b>Ā = Σ(A<sub>i</sub>·x<sub>i</sub>) : 100</b>; hai đồng vị đặt x và 100 − x.<br><b>% khối lượng đồng vị trong hợp chất:</b> = (x<sub>i</sub>/100)·A<sub>i</sub>·(số nguyên tử) : M(hợp chất), M dùng Ā.<br><b>Đếm loại phân tử:</b> {X2} từ n đồng vị có n(n + 1)/2 loại; {XY2}: (số đồng vị X) × (số cặp Y có lặp).<br><b>Phổ khối:</b> mỗi vạch một đồng vị, chiều cao ∝ % số nguyên tử."
+   }
+  },
+  "TRAPS_THEM": {
+   "ionelectron": {
+    "ten": "Quên electron của ion",
+    "hoi": "Đây là nguyên tử hay ion? Ion dương đã mất e, ion âm đã nhận e; số proton và neutron không đổi."
+   },
+   "hatmangdien": {
+    "ten": "Nhầm hạt mang điện",
+    "hoi": "Hạt mang điện gồm proton và electron (2Z); neutron không mang điện. Đề hỏi hạt mang điện hay hạt trong hạt nhân?"
+   },
+   "thutudien": {
+    "ten": "Thứ tự điền và viết",
+    "hoi": "4s điền trước 3d nhưng viết cấu hình theo lớp; ion kim loại chuyển tiếp mất e 4s trước. Có dính Cr, Cu không?"
+   }
+  },
+  "DANG_KEY": {
+   "NGUYEN_TU.CAU_HINH_E.NHAN_DANG": "k4",
+   "NGUYEN_TU.MO_HINH.NHAN_DANG": "k3",
+   "NGUYEN_TU.THANH_PHAN.NHAN_DANG": "k1",
+   "NGUYEN_TU.CAU_HINH_E.DEM_NGUYEN_TU": "k5",
+   "NGUYEN_TU.MO_HINH.DEM_NGUYEN_TU": "k3",
+   "NGUYEN_TU.THANH_PHAN.GOI_TEN": "k1",
+   "NGUYEN_TU.CAU_HINH_E.DEM_DONG_PHAN": "k5",
+   "NGUYEN_TU.CAU_HINH_E.SO_SANH": "k5",
+   "NGUYEN_TU.CAU_HINH_E.CHON_PHAT_BIEU": "k4",
+   "NGUYEN_TU.THANH_PHAN.DEM_NGUYEN_TU": "k2",
+   "NGUYEN_TU.MO_HINH.CHON_PHAT_BIEU": "k3",
+   "NGUYEN_TU.CAU_HINH_E.XAC_DINH_CHAT": "k6",
+   "NGUYEN_TU.CAU_HINH_E.XAC_DINH_DIEN_TICH": "k5",
+   "NGUYEN_TU.VI_TRI_BTH.DEM_NGUYEN_TU": "k6",
+   "NGUYEN_TU.VI_TRI_BTH.NHAN_DANG": "k6",
+   "NGUYEN_TU.THANH_PHAN.CHON_PHAT_BIEU": "k1",
+   "NGUYEN_TU.CAU_HINH_E.TINH_PHAN_TRAM": "k5",
+   "NGUYEN_TU.THANH_PHAN.DEM_DONG_PHAN": "k1",
+   "NGUYEN_TU.THANH_PHAN.TINH_KHOI_LUONG": "k1",
+   "NGUYEN_TU.MO_HINH.TINH_PHAN_TRAM": "k3",
+   "NGUYEN_TU.THANH_PHAN.VIET_CTCT": "k1",
+   "NGUYEN_TU.DONG_VI.GIAI_THICH": "k7",
+   "NGUYEN_TU.DONG_VI.NHAN_DANG": "k7",
+   "NGUYEN_TU.THANH_PHAN.XAC_DINH_CTPT": "k2",
+   "NGUYEN_TU.DONG_VI.XAC_DINH_CTPT": "k7",
+   "NGUYEN_TU.DONG_VI.DEM_NGUYEN_TU": "k7",
+   "NGUYEN_TU.THANH_PHAN.XAC_DINH_CHAT": "k2",
+   "NGUYEN_TU.THANH_PHAN.XAC_DINH_DIEN_TICH": "k2",
+   "NGUYEN_TU.MO_HINH.TINH_KHOI_LUONG": "k3",
+   "NGUYEN_TU.MO_HINH.TINH_THE_TICH": "k3",
+   "NGUYEN_TU.MO_HINH.TINH_TI_SO": "k3",
+   "NGUYEN_TU.CAU_HINH_E.GOI_TEN": "k6",
+   "NGUYEN_TU.DONG_VI.CHON_PHAT_BIEU": "k7",
+   "NGUYEN_TU.DONG_VI.DEM_DONG_PHAN": "k7",
+   "NGUYEN_TU.DONG_VI.TINH_PHAN_TRAM": "k7",
+   "NGUYEN_TU.THANH_PHAN.TINH_TI_SO": "k1",
+   "NGUYEN_TU.VI_TRI_BTH.DEM_DONG_PHAN": "k6",
+   "NGUYEN_TU.DONG_VI.TINH_THE_TICH": "k7",
+   "NGUYEN_TU.MO_HINH.NEU_HIEN_TUONG": "k3",
+   "NGUYEN_TU.THANH_PHAN.TINH_PHAN_TRAM": "k1",
+   "NGUYEN_TU.MO_HINH.DEM_DONG_PHAN": "k3"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "NITROGEN_SULFUR": {
+  "ma": "NITROGEN_SULFUR",
+  "chuong": "Nitrogen – sulfur",
+  "lop": "11",
+  "KEYS": {
+   "k1": {
+    "ten": "Đơn chất nitrogen",
+    "rule": "<b>Cấu tạo:</b> N≡N gồm 1 liên kết σ và <b>2 liên kết π</b>; năng lượng liên kết rất lớn (945 kJ/mol) → khá trơ ở nhiệt độ thường.<br><b>Trạng thái:</b> khí không màu, không mùi, ít tan trong nước; chiếm khoảng <b>78%</b> thể tích không khí.<br><b>Số oxi hoá của N:</b> từ −3 ({NH3}) đến +5 ({HNO3}); {N2} là 0 nên vừa oxi hoá vừa khử.<br><b>Tính oxi hoá:</b> {N2} + 3{H2} ⇌ 2{NH3} (t°, p, xúc tác); với kim loại hoạt động → nitride.<br><b>Tính khử:</b> {N2} + {O2} ⇌ 2{NO} ở khoảng 3000 °C hoặc tia lửa điện (sét), phản ứng thu nhiệt.<br><b>Ứng dụng:</b> khí bảo quản thực phẩm, nitrogen lỏng (−196 °C) làm lạnh, nguyên liệu sản xuất {NH3}."
+   },
+   "k2": {
+    "ten": "Ammonia & muối ammonium",
+    "rule": "<b>Ammonia:</b> chóp tam giác, N còn một cặp electron; khí mùi khai, nhẹ hơn không khí, <b>tan rất nhiều</b> trong nước.<br><b>Tính base yếu:</b> quỳ ẩm hoá xanh; + {HCl} → khói trắng {NH4Cl}; tạo kết tủa hydroxide với {Al}<sup>3+</sup>, {Fe}<sup>3+</sup>.<br><b>Tính khử (N −3):</b> cháy trong {O2} → {N2}; xúc tác Pt → {NO}; + {CuO} nung → Cu đỏ + {N2}.<br><b>Haber:</b> {N2} + 3{H2} ⇌ 2{NH3}, Δ<sub>r</sub>H<sup>o</sup><sub>298</sub> = −91,8 kJ; 400–450 °C, 150–200 bar, xúc tác Fe; tăng p, hạ T → dịch phải.<br><b>Muối ammonium:</b> dễ tan; + kiềm, đun → {NH3} (nhận biết {NH4}<sup>+</sup>); {NH4}<sup>+</sup> là acid Brønsted.<br><b>Nhiệt phân:</b> {NH4Cl} → {NH3} + {HCl}; {NH4HCO3} → {NH3} + {CO2} + {H2O}; {NH4NO3} → {N2O} + 2{H2O}."
+   },
+   "k3": {
+    "ten": "Oxide nitrogen & môi trường",
+    "rule": "<b>{NO}:</b> khí không màu, gặp không khí hoá <b>nâu đỏ</b> ngay (2{NO} + {O2} → 2{NO2}).<br><b>{NO2}:</b> khí nâu đỏ, độc; 2{NO2} ⇌ {N2O4} (không màu); 4{NO2} + {O2} + 2{H2O} → 4{HNO3}.<br><b>Nguồn NO<sub>x</sub>:</b> sét, khí thải động cơ đốt trong, nhà máy nhiệt điện.<br><b>Mưa acid:</b> pH < 5,6 do {SO2}, NO<sub>x</sub> → {H2SO4}, {HNO3}; ăn mòn công trình đá vôi, kim loại, làm chua đất.<br><b>Phú dưỡng:</b> nước dư ion {NO3}<sup>−</sup>, {NH4}<sup>+</sup>, {PO4}<sup>3−</sup> (phân bón, nước thải) → tảo nở hoa, thiếu {O2}, sinh vật chết.<br><b>Giảm thiểu:</b> xử lí khí thải, dùng phân bón hợp lí, xử lí nước thải."
+   },
+   "k4": {
+    "ten": "Nitric acid",
+    "rule": "<b>Cấu tạo:</b> N có số oxi hoá +5; chất lỏng không màu, kém bền, ánh sáng phân huỷ → {NO2} làm dung dịch <b>ngả vàng</b> (đựng chai sẫm màu).<br><b>Tính acid mạnh:</b> phân li hoàn toàn; tác dụng base, oxide base, muối acid yếu.<br><b>Tính oxi hoá mạnh:</b> hầu hết kim loại (trừ Au, Pt) → muối nitrate hoá trị cao + {NO2} (đặc) / {NO} (loãng) / {N2O}, {N2}, {NH4NO3}; <b>không sinh {H2}</b>.<br><b>Thụ động:</b> Al, Fe, Cr không tan trong {HNO3} đặc, nguội; C, S, P → {CO2}, {H2SO4}, {H3PO4}.<br><b>Bảo toàn electron:</b> n<sub>e</sub> = n({NO2}) = 3n({NO}) = 8n({N2O}) = 10n({N2}) = 8n({NH4NO3}); n({HNO3}) = n N trong muối + n N trong sản phẩm khử.<br><b>Ostwald:</b> {NH3} → {NO} → {NO2} → {HNO3}; bảo toàn N: 1 {NH3} → 1 {HNO3}."
+   },
+   "k5": {
+    "ten": "Sulfur & sulfur dioxide",
+    "rule": "<b>Số oxi hoá của S:</b> −2, 0, +4, +6; S (0) và {SO2} (+4) vừa oxi hoá vừa khử.<br><b>Đơn chất S:</b> rắn màu vàng, không tan trong nước; + Hg ở nhiệt độ thường → HgS (thu gom thuỷ ngân rơi vãi); + Fe, {H2} (t°) → S là chất oxi hoá; cháy trong {O2} → {SO2}, S là chất khử.<br><b>{SO2} vật lí:</b> khí không màu, mùi hắc, độc, nặng hơn không khí.<br><b>{SO2} là oxide acid:</b> + {H2O} ⇌ {H2SO3}; + kiềm → muối sulfite.<br><b>{SO2} khử:</b> làm mất màu nước bromine, dung dịch {KMnO4}; + {O2} (xúc tác {V2O5}) → {SO3}. <b>{SO2} oxi hoá:</b> + {H2S} → S vàng.<br><b>Ứng dụng, nguồn:</b> tẩy trắng, chống nấm mốc; sinh ra khi đốt nhiên liệu hoá thạch, núi lửa → mưa acid."
+   },
+   "k6": {
+    "ten": "Sulfuric acid & sulfate",
+    "rule": "<b>{H2SO4} đặc:</b> lỏng sánh, không bay hơi, tan vô hạn và <b>toả rất nhiều nhiệt</b>; pha loãng: rót từ từ acid vào nước, không làm ngược lại.<br><b>Loãng – tính acid mạnh:</b> kim loại đứng trước H → muối + {H2} (Fe → {Fe}<sup>2+</sup>); tác dụng oxide base, base, muối.<br><b>Đặc – háo nước:</b> than hoá đường, giấy, vải (hoá đen). <b>Đặc, nóng – oxi hoá mạnh:</b> kim loại trừ Au, Pt → muối hoá trị cao + {SO2}; C, S, {HBr}, {KI} bị oxi hoá.<br><b>Thụ động:</b> Al, Fe, Cr không tan trong {H2SO4} đặc, nguội; bảo toàn electron: n<sub>e</sub> = 2n({SO2}).<br><b>Sulfate:</b> {BaSO4} trắng, không tan trong acid → nhận biết {SO4}<sup>2−</sup> bằng {Ba}<sup>2+</sup>; {BaSO4} cản quang, thạch cao {CaSO4}, phân đạm {(NH4)2SO4}.<br><b>Sơ cứu bỏng:</b> rửa ngay bằng nhiều nước lạnh, sau đó dùng dung dịch {NaHCO3} loãng."
+   },
+   "k7": {
+    "ten": "Sản xuất H2SO4 & tính",
+    "rule": "<b>Phương pháp tiếp xúc, 3 giai đoạn:</b> tạo {SO2} → oxi hoá {SO2} thành {SO3} → hấp thụ {SO3}.<br><b>Giai đoạn 1:</b> đốt S hoặc quặng pyrite: 4{FeS2} + 11{O2} → 2{Fe2O3} + 8{SO2}.<br><b>Giai đoạn 2:</b> 2{SO2} + {O2} ⇌ 2{SO3}, xúc tác {V2O5}, khoảng 450 °C, phản ứng toả nhiệt.<br><b>Giai đoạn 3:</b> hấp thụ {SO3} bằng {H2SO4} 98% → oleum {H2SO4}·n{SO3}, rồi pha loãng; không hấp thụ bằng nước (tạo sương mù acid).<br><b>Bảo toàn S:</b> 1 {FeS2} → 2 {H2SO4}; 1 S → 1 {H2SO4}; hiệu suất các giai đoạn <b>nhân dồn</b>.<br><b>Năng lượng:</b> Δ<sub>r</sub>H<sup>o</sup><sub>298</sub> = Σ Δ<sub>f</sub>H sản phẩm − Σ Δ<sub>f</sub>H chất đầu (nhân hệ số); m dung dịch = m chất tan : C%."
+   }
+  },
+  "TRAPS_THEM": {
+   "thudong": {
+    "ten": "Quên thụ động đặc nguội",
+    "hoi": "Kim loại là Al, Fe hay Cr và acid là HNO3 hoặc H2SO4 đặc, nguội? Khi đó không có phản ứng."
+   },
+   "dacloang": {
+    "ten": "Nhầm acid đặc với loãng",
+    "hoi": "H2SO4 loãng cho H2 và Fe²⁺; đặc nóng cho SO2 và Fe³⁺. HNO3 không bao giờ cho H2. Đề cho acid đặc hay loãng?"
+   },
+   "sanphamkhu": {
+    "ten": "Sót sản phẩm khử NH4NO3",
+    "hoi": "Kim loại mạnh (Mg, Al, Zn) với HNO3 loãng mà không thấy khí, hoặc số mol electron không khớp khí: đã tính NH4NO3 trong muối chưa?"
+   }
+  },
+  "DANG_KEY": {
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.CHON_PHAT_BIEU": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.DEM_DONG_PHAN": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.DEM_NGUYEN_TU": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.GIAI_THICH": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.NEU_HIEN_TUONG": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.NHAN_DANG": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_HANG_SO": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_HIEU_SUAT": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_KHOI_LUONG": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_NANG_LUONG": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_NONG_DO": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_THE_TICH": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.VIET_CTCT": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.VIET_PTHH": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.XAC_DINH_CHAT": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.XAC_DINH_CHIEU": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.XAC_DINH_CTPT": "k2",
+   "NITROGEN_SULFUR.AMMONIA_AMMONIUM.XAC_DINH_SO_OXI_HOA": "k2",
+   "NITROGEN_SULFUR.DON_CHAT_N2.CHON_PHAT_BIEU": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.DEM_DONG_PHAN": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.DEM_LIEN_KET_PI": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.DEM_NGUYEN_TU": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.GIAI_THICH": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.GOI_TEN": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.NEU_HIEN_TUONG": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.NHAN_DANG": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.SO_SANH": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.TINH_PHAN_TRAM": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.TINH_TI_SO": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.XAC_DINH_CTPT": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_N2.XAC_DINH_SO_OXI_HOA": "k1",
+   "NITROGEN_SULFUR.DON_CHAT_S.CHON_PHAT_BIEU": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.DEM_DONG_PHAN": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.DEM_NGUYEN_TU": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.GOI_TEN": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.NEU_HIEN_TUONG": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.NHAN_DANG": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.SO_SANH": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.TINH_HIEU_SUAT": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.TINH_KHOI_LUONG": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.TINH_NANG_LUONG": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.TINH_PHAN_TRAM": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.TINH_SO_MOL": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.TINH_THE_TICH": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.VIET_PTHH": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.XAC_DINH_CHAT": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.XAC_DINH_CTPT": "k5",
+   "NITROGEN_SULFUR.DON_CHAT_S.XAC_DINH_SO_OXI_HOA": "k5",
+   "NITROGEN_SULFUR.NITRIC_ACID.CHON_PHAT_BIEU": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.DEM_DONG_PHAN": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.DEM_NGUYEN_TU": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.GIAI_THICH": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.GOI_TEN": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.NEU_HIEN_TUONG": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.NHAN_DANG": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_HIEU_SUAT": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_KHOI_LUONG": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_NANG_LUONG": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_PHAN_TRAM": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_SO_MOL": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_THE_TICH": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.TINH_TI_SO": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.VIET_CTCT": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.VIET_PTHH": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.XAC_DINH_CHAT": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.XAC_DINH_CTPT": "k4",
+   "NITROGEN_SULFUR.NITRIC_ACID.XAC_DINH_SO_OXI_HOA": "k4",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.CHON_PHAT_BIEU": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.DEM_DONG_PHAN": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.DEM_NGUYEN_TU": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.GIAI_THICH": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.GOI_TEN": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.NEU_HIEN_TUONG": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.NHAN_DANG": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.TINH_NANG_LUONG": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.TINH_THE_TICH": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.VIET_PTHH": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.XAC_DINH_CTPT": "k3",
+   "NITROGEN_SULFUR.OXIDE_NITROGEN.XAC_DINH_SO_OXI_HOA": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.CHON_PHAT_BIEU": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.DEM_DONG_PHAN": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.GOI_TEN": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.NEU_HIEN_TUONG": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.NHAN_DANG": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.TINH_KHOI_LUONG": "k3",
+   "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.VIET_PTHH": "k3",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.DEM_DONG_PHAN": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.GIAI_THICH": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.SO_SANH": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_HANG_SO": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_HIEU_SUAT": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_KHOI_LUONG": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_NANG_LUONG": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_PHAN_TRAM": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_SO_MOL": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_THE_TICH": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.VIET_CTCT": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.VIET_PTHH": "k7",
+   "NITROGEN_SULFUR.SAN_XUAT_H2SO4.XAC_DINH_SO_OXI_HOA": "k7",
+   "NITROGEN_SULFUR.SULFURIC_ACID.CHON_PHAT_BIEU": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.DEM_DONG_PHAN": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.DEM_NGUYEN_TU": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.GIAI_THICH": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.NEU_HIEN_TUONG": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.SO_SANH": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.TINH_KHOI_LUONG": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.TINH_NONG_DO": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.TINH_PHAN_TRAM": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.TINH_THE_TICH": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.VIET_CTCT": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.VIET_PTHH": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.XAC_DINH_CHAT": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.XAC_DINH_CTPT": "k6",
+   "NITROGEN_SULFUR.SULFURIC_ACID.XAC_DINH_SO_OXI_HOA": "k6"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
+ "OXI_HOA_KHU": {
+  "ma": "OXI_HOA_KHU",
+  "chuong": "Phản ứng oxi hoá – khử",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Tính số oxi hoá",
+    "rule": "<b>Đơn chất:</b> số oxi hoá bằng 0.<br><b>Hay gặp:</b> H là +1 (hydride kim loại như {NaH} là −1); O là −2 (peroxide {H2O2} là −1, {OF2} là +2); kim loại nhóm IA +1, IIA +2, Al +3.<br><b>Tổng:</b> phân tử bằng 0, ion bằng điện tích ion.<br><b>Ví dụ:</b> {K2Cr2O7}: 2(+1) + 2x + 7(−2) = 0 → Cr +6; {Cu3P}: Cu +1 → P −3.<br><b>Số lẻ:</b> {Fe3O4} cho Fe trung bình +8/3 (một Fe<sup>+2</sup>, hai Fe<sup>+3</sup>)."
+   },
+   "k2": {
+    "ten": "Chất khử, chất oxi hoá",
+    "rule": "<b>Chất khử:</b> nhường electron, số oxi hoá <b>tăng</b>, bị oxi hoá (xảy ra quá trình oxi hoá).<br><b>Chất oxi hoá:</b> nhận electron, số oxi hoá <b>giảm</b>, bị khử.<br><b>Cách làm:</b> ghi số oxi hoá nguyên tố đó ở hai vế rồi so.<br><b>Ví dụ:</b> {N2} + {O2} → 2NO: N từ 0 lên +2 → {N2} là chất khử; Ca + {N2} → {Ca3N2}: N xuống −3 → {N2} là chất oxi hoá.<br><b>Đoán tính chất:</b> số oxi hoá cao nhất chỉ có tính oxi hoá, thấp nhất chỉ có tính khử, trung gian có cả hai."
+   },
+   "k3": {
+    "ten": "Nhận phản ứng oxi hoá – khử",
+    "rule": "<b>Dấu hiệu:</b> có <b>ít nhất một nguyên tố đổi số oxi hoá</b>; chất khử và chất oxi hoá xảy ra đồng thời.<br><b>Thường là oxi hoá – khử:</b> có đơn chất tham gia hoặc tạo thành (đốt cháy, kim loại + acid, gỉ sắt).<br><b>Thường không phải:</b> phản ứng trao đổi ion, trung hoà, nhiệt phân muối carbonate, hydrogencarbonate ({Fe(HCO3)2} → {Fe(OH)2} + {CO2}).<br><b>Đếm:</b> xét lần lượt từng phản ứng, ghi số oxi hoá của nguyên tố nghi ngờ ở hai vế."
+   },
+   "k4": {
+    "ten": "Cân bằng thăng bằng electron",
+    "rule": "<b>Bốn bước:</b> ghi số oxi hoá → viết quá trình oxi hoá, quá trình khử → nhân hệ số để <b>tổng e nhường = tổng e nhận</b> → điền hệ số, kiểm H, O.<br><b>Một chất nhiều nguyên tố đổi:</b> cộng e cả phân tử: {Cu3P} nhường 3·1 + 8 = 11 e.<br><b>Tự oxi hoá – khử:</b> 3{Cl2} + 6KOH → 5KCl + {KClO3} + 3{H2O}: 5 nguyên tử Cl nhận e (chất oxi hoá), 1 nguyên tử Cl nhường e (chất khử).<br><b>Môi trường:</b> {H2SO4}, {H}<sup>+</sup> đủ để cân bằng O, H; hệ số tối giản."
+   },
+   "k5": {
+    "ten": "Chuẩn độ bằng KMnO4",
+    "rule": "<b>Dụng cụ:</b> dung dịch {KMnO4} ở burette; dung dịch {Fe}<sup>2+</sup> + {H2SO4} loãng ở bình tam giác.<br><b>Phương trình:</b> {MnO4}<sup>−</sup> + 5{Fe}<sup>2+</sup> + 8{H}<sup>+</sup> → {Mn}<sup>2+</sup> + 5{Fe}<sup>3+</sup> + 4{H2O}; acid <b>tham gia</b> phản ứng.<br><b>Tỉ lệ:</b> Mn +7 → +2 nhận 5e ⇒ <b>n({Fe}<sup>2+</sup>) = 5·n({KMnO4})</b>.<br><b>Điểm cuối:</b> {KMnO4} tự làm chỉ thị; dư 1 giọt → màu hồng nhạt bền khoảng 20 giây.<br><b>Tính %:</b> n = C·V (V đổi ra lít); m(Fe) = 56·n; % = m(Fe) : m(mẫu) × 100."
+   },
+   "k6": {
+    "ten": "Tính theo phương trình",
+    "rule": "<b>Bước 1:</b> cân bằng phương trình (k4) rồi mới lấy tỉ lệ mol: 2ZnS + 3{O2} → 2ZnO + 2{SO2}.<br><b>Bảo toàn electron:</b> tổng mol e nhường = tổng mol e nhận, không cần viết đủ phương trình.<br><b>Thể tích khí:</b> đkc 25 °C, 1 bar: <b>24,79 L/mol</b>; 1 m³ = 1000 L.<br><b>Khối lượng:</b> m = n·M; đổi tấn, kg, mg về cùng đơn vị với đáp số.<br><b>Hiệu suất:</b> tính sản phẩm × H, tìm nguyên liệu ÷ H."
+   },
+   "k7": {
+    "ten": "Hợp chất vô cơ quen",
+    "rule": "<b>Gọi tên:</b> kim loại nhiều hoá trị ghi số La Mã: iron(III) oxide {Fe2O3}, copper(II) sulfate {CuSO4}, iron(II,III) oxide {Fe3O4}.<br><b>{H2SO4} loãng:</b> tính oxi hoá do {H}<sup>+</sup>, không tác dụng với Cu.<br><b>{H2SO4} đặc, nóng:</b> S<sup>+6</sup> oxi hoá mạnh, sinh {SO2} độc → cách sản xuất có {SO2} gây ô nhiễm hơn.<br><b>Pha loãng an toàn:</b> <b>rót từ từ acid đặc vào nước</b>, khuấy đều; không làm ngược lại.<br><b>Hiện tượng:</b> dung dịch {KMnO4} tím mất màu khi bị khử; {Cu}<sup>2+</sup> xanh; {Fe}<sup>3+</sup> vàng nâu."
+   }
+  },
+  "TRAPS_THEM": {
+   "songuyentu": {
+    "ten": "Quên số nguyên tử",
+    "hoi": "Đã nhân số oxi hoá, số electron với chỉ số nguyên tử trong công thức chưa? {Cu3P} có 3 Cu, {Cr2O7}<sup>2−</sup> có 2 Cr."
+   },
+   "moitruong": {
+    "ten": "Bỏ sót môi trường",
+    "hoi": "Acid trong phản ứng chỉ tạo môi trường hay còn góp {H}<sup>+</sup> vào phương trình? Có mặt trong phương trình ion là có tham gia."
+   },
+   "hesonguyentu": {
+    "ten": "Nhầm tỉ lệ nguyên tử",
+    "hoi": "Đề hỏi số nguyên tử đóng vai trò chất oxi hoá hay hệ số phân tử? Trong phản ứng tự oxi hoá – khử, cùng một chất chia làm hai vai."
+   }
+  },
+  "DANG_KEY": {
+   "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.NHAN_DANG": "k2",
+   "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.CHON_PHAT_BIEU": "k2",
+   "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.DEM_DONG_PHAN": "k2",
+   "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.DEM_NGUYEN_TU": "k4",
+   "OXI_HOA_KHU.SO_OXI_HOA.XAC_DINH_SO_OXI_HOA": "k1",
+   "OXI_HOA_KHU.SO_OXI_HOA.NHAN_DANG": "k1",
+   "OXI_HOA_KHU.SO_OXI_HOA.CHON_PHAT_BIEU": "k4",
+   "OXI_HOA_KHU.SO_OXI_HOA.DEM_DONG_PHAN": "k3",
+   "OXI_HOA_KHU.CHUAN_DO.CHON_PHAT_BIEU": "k5",
+   "OXI_HOA_KHU.CHUAN_DO.NHAN_DANG": "k5",
+   "OXI_HOA_KHU.CHUAN_DO.TINH_PHAN_TRAM": "k5",
+   "OXI_HOA_KHU.CHUAN_DO.DEM_DONG_PHAN": "k5",
+   "OXI_HOA_KHU.HIEN_TUONG.CHON_PHAT_BIEU": "k7",
+   "OXI_HOA_KHU.HIEN_TUONG.NEU_HIEN_TUONG": "k7",
+   "OXI_HOA_KHU.HIEN_TUONG.NHAN_DANG": "k7",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.GOI_TEN": "k7",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.CHON_PHAT_BIEU": "k7",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.SO_SANH": "k7",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.DEM_NGUYEN_TU": "k4",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.TINH_SO_MOL": "k6",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.TINH_THE_TICH": "k6",
+   "OXI_HOA_KHU.HOP_CHAT_VO_CO.TINH_KHOI_LUONG": "k6"
+  },
+  "daDuyet": "máy dựng 29/09"
+ },
  "PHUC_CHAT": {
   "ma": "PHUC_CHAT",
   "chuong": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
@@ -536,5 +1571,62 @@ export const BO_CHIA_KHOA: Record<string, BoChiaKhoaDu> = {
    "POLYMER.UNG_DUNG.GOI_TEN": "k4"
   },
   "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+ },
+ "TOC_DO": {
+  "ma": "TOC_DO",
+  "chuong": "Tốc độ phản ứng",
+  "lop": "10",
+  "KEYS": {
+   "k1": {
+    "ten": "Tốc độ trung bình",
+    "rule": "<b>Khái niệm:</b> tốc độ phản ứng là độ biến thiên nồng độ một chất trong một đơn vị thời gian; đơn vị thường là M/s.<br><b>Công thức:</b> aA + bB → mM + nN: v = −(1/a)·ΔC<sub>A</sub>/Δt = (1/m)·ΔC<sub>M</sub>/Δt.<br><b>Chia hệ số:</b> {BrO3}<sup>−</sup> + 5{Br}<sup>−</sup> + …: v = (1/5)·2,0·10<sup>−3</sup> = 0,4·10<sup>−3</sup> M/s.<br><b>Nồng độ sau:</b> chất đầu giảm ΔC = a·v·Δt; sản phẩm tăng tương ứng.<br><b>Theo khí:</b> có thể đo bằng thể tích khí thoát ra (mL/s)."
+   },
+   "k2": {
+    "ten": "Định luật tác dụng khối lượng",
+    "rule": "<b>Biểu thức:</b> với phản ứng đơn giản aA + bB → sản phẩm: <b>v = k·C<sub>A</sub><sup>a</sup>·C<sub>B</sub><sup>b</sup></b>.<br><b>Hằng số k:</b> chỉ phụ thuộc bản chất chất phản ứng và nhiệt độ; <b>không</b> phụ thuộc nồng độ.<br><b>Nghĩa của k:</b> k là tốc độ khi mọi nồng độ bằng 1 M.<br><b>Tính k:</b> k = v : (C<sub>A</sub><sup>a</sup>·C<sub>B</sub><sup>b</sup>).<br><b>Đổi nồng độ:</b> tăng C<sub>A</sub> gấp 2, số mũ a = 2 → v tăng 4 lần."
+   },
+   "k3": {
+    "ten": "Yếu tố ảnh hưởng",
+    "rule": "<b>Nồng độ:</b> tăng nồng độ chất phản ứng → tốc độ tăng; thêm dung dịch <b>cùng nồng độ</b> thì tốc độ không đổi.<br><b>Áp suất:</b> chỉ ảnh hưởng khi có <b>chất khí</b> tham gia; phản ứng chỉ có chất rắn, lỏng thì không.<br><b>Nhiệt độ:</b> tăng nhiệt độ → tốc độ tăng (bảo quản lạnh làm chậm hư hỏng).<br><b>Diện tích bề mặt:</b> chất rắn càng nhỏ, mịn → tốc độ càng lớn: bột > viên > khối.<br><b>Chất xúc tác:</b> xem k5.<br><b>Đời sống:</b> quạt gió vào bếp than (tăng {O2}), đập nhỏ nguyên liệu, nồi áp suất."
+   },
+   "k4": {
+    "ten": "Hệ số nhiệt độ Van't Hoff",
+    "rule": "<b>Công thức:</b> <b>v<sub>2</sub>/v<sub>1</sub> = γ<sup>(t<sub>2</sub> − t<sub>1</sub>)/10</sup></b>, γ thường từ 2 đến 4.<br><b>Thời gian:</b> tỉ lệ nghịch với tốc độ: t<sub>1</sub>/t<sub>2</sub> = v<sub>2</sub>/v<sub>1</sub>.<br><b>Ví dụ:</b> γ = 2, tăng 30 °C → tốc độ gấp 2<sup>3</sup> = 8 lần.<br><b>Tìm γ:</b> lấy căn bậc (Δt : 10) của tỉ số tốc độ.<br><b>Giảm nhiệt độ:</b> số mũ âm → tốc độ giảm."
+   },
+   "k5": {
+    "ten": "Chất xúc tác",
+    "rule": "<b>Định nghĩa:</b> làm <b>tăng</b> tốc độ phản ứng, <b>còn lại sau phản ứng</b> với khối lượng và bản chất hoá học không đổi.<br><b>Cách tác động:</b> làm giảm năng lượng hoạt hoá; không làm tăng lượng sản phẩm tối đa.<br><b>Ví dụ:</b> {MnO2} phân huỷ {H2O2}, {KClO3}; Fe tổng hợp {NH3}; {V2O5} oxi hoá {SO2}; enzyme là xúc tác sinh học.<br><b>Ô tô:</b> bộ chuyển đổi xúc tác biến CO, NO thành {CO2}, {N2}, giảm ô nhiễm."
+   },
+   "k6": {
+    "ten": "Đọc đồ thị động học",
+    "rule": "<b>Độ dốc:</b> độ dốc đường cong = tốc độ tại thời điểm đó; càng dốc càng nhanh.<br><b>Giảm dần:</b> nồng độ chất đầu giảm nên tốc độ giảm theo thời gian; tốc độ trung bình các khoảng bằng nhau <b>không</b> như nhau.<br><b>Đường nằm ngang:</b> phản ứng đã dừng, tốc độ bằng 0.<br><b>Tốc độ trung bình:</b> ΔV : Δt hoặc ΔC : Δt, đọc đúng hai mốc trên trục.<br><b>So hai đường:</b> đường dốc hơn ứng với điều kiện nhanh hơn; cùng lượng chất hết thì mức cuối bằng nhau."
+   }
+  },
+  "TRAPS_THEM": {
+   "chiaheso": {
+    "ten": "Quên chia hệ số",
+    "hoi": "Tốc độ phản ứng hay tốc độ tiêu thụ một chất? Đã chia cho hệ số của chất đó trong phương trình chưa?"
+   },
+   "chatran": {
+    "ten": "Áp suất với chất rắn",
+    "hoi": "Chất tham gia có chất khí không? Áp suất và nồng độ không áp dụng cho chất rắn."
+   },
+   "nhanhnhieu": {
+    "ten": "Nhanh là nhiều",
+    "hoi": "Yếu tố này làm phản ứng nhanh hơn hay làm thu được nhiều sản phẩm hơn? Xúc tác, bột mịn không tăng lượng sản phẩm cuối."
+   }
+  },
+  "DANG_KEY": {
+   "TOC_DO.YEU_TO.NHAN_DANG": "k3",
+   "TOC_DO.YEU_TO.SO_SANH": "k3",
+   "TOC_DO.YEU_TO.CHON_PHAT_BIEU": "k6",
+   "TOC_DO.YEU_TO.TINH_PHAN_TRAM": "k1",
+   "TOC_DO.YEU_TO.TINH_TI_SO": "k4",
+   "TOC_DO.XUC_TAC.CHON_PHAT_BIEU": "k5",
+   "TOC_DO.DUONG_CONG_DONG_HOC.NHAN_DANG": "k6",
+   "TOC_DO.BIEU_THUC.TINH_NONG_DO": "k1",
+   "TOC_DO.BIEU_THUC.TINH_HANG_SO": "k2"
+  },
+  "daDuyet": "máy dựng 29/09"
  }
 }

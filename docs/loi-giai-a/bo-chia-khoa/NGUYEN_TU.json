@@ -1,0 +1,99 @@
+{
+ "ma": "NGUYEN_TU",
+ "chuong": "Cấu tạo nguyên tử",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Hạt & kí hiệu nguyên tử",
+   "rule": "<b>Ba hạt:</b> proton (+1, ≈ 1 amu), neutron (0, ≈ 1 amu), electron (−1, ≈ 0,00055 amu); 1 amu = 1,6605×10<sup>−27</sup> kg.<br><b>Điện tích:</b> 1 đơn vị = 1,602×10<sup>−19</sup> C; nguyên tử trung hoà nên <b>số p = số e = Z</b>.<br><b>Số khối:</b> <b>A = Z + N</b>; kí hiệu <sup>A</sup><sub>Z</sub>X (A trên, Z dưới).<br><b>Nguyên tố hoá học:</b> tập hợp nguyên tử <b>cùng Z</b>; Z quyết định nguyên tố, không phải A.<br><b>Khối lượng nguyên tử:</b> tập trung ở hạt nhân, khối lượng electron không đáng kể."
+  },
+  "k2": {
+   "ten": "Bài toán tổng số hạt",
+   "rule": "<b>Đặt ẩn:</b> tổng hạt <b>S = 2Z + N</b>; hạt mang điện = <b>2Z</b> (p và e), không mang điện = N.<br><b>Ion:</b> {X}<sup>n+</sup> có e = Z − n; {X}<sup>n−</sup> có e = Z + n; <b>p và N không đổi</b>.<br><b>Một dữ kiện:</b> đồng vị bền (Z ≤ 82) có 1 ≤ N : Z ≤ 1,5 ⇒ <b>S : 3,5 ≤ Z ≤ S : 3</b>, thử từng Z nguyên.<br><b>Hợp chất {MX2}:</b> cộng hạt từng nguyên tử theo chỉ số, lập hệ theo Z<sub>M</sub>, Z<sub>X</sub>.<br><b>Kiểm lại:</b> Z → tên nguyên tố → A = Z + N."
+  },
+  "k3": {
+   "ten": "Mô hình & kích thước",
+   "rule": "<b>Thomson:</b> tia âm cực → phát hiện <b>electron</b>. <b>Rutherford:</b> bắn hạt α vào lá vàng: đa số đi thẳng → nguyên tử <b>rỗng</b>; một ít lệch, bật lại → có <b>hạt nhân nhỏ, mang điện dương</b>. <b>Chadwick:</b> neutron.<br><b>Rutherford – Bohr:</b> electron quay trên <b>quỹ đạo xác định</b>, mỗi quỹ đạo một mức năng lượng không đổi; gần hạt nhân năng lượng thấp.<br><b>Hiện đại:</b> electron chuyển động rất nhanh, không theo quỹ đạo; chỉ nói <b>xác suất tìm thấy</b> (orbital).<br><b>Kích thước:</b> nguyên tử ~10<sup>−10</sup> m, hạt nhân ~10<sup>−14</sup> m (nhỏ hơn ~10<sup>4</sup> lần, thể tích ~10<sup>12</sup> lần); 1 Å = 10<sup>−10</sup> m, 1 pm = 10<sup>−12</sup> m.<br><b>Tính:</b> V = 4/3·π·r<sup>3</sup>; khối lượng riêng = m : V (đổi đơn vị trước)."
+  },
+  "k4": {
+   "ten": "Lớp, phân lớp, orbital",
+   "rule": "<b>Lớp n = 1, 2, 3, 4</b> (K, L, M, N): có <b>n phân lớp</b>, <b>n<sup>2</sup> AO</b>, tối đa <b>2n<sup>2</sup> e</b>.<br><b>Phân lớp:</b> s (1 AO, 2 e), p (3 AO, 6 e), d (5 AO, 10 e), f (7 AO, 14 e); lớp 1 chỉ có 1s, lớp 2 có 2s 2p (không có 1p, 2d).<br><b>Hình dạng:</b> AO s <b>hình cầu</b>, AO p <b>số tám nổi</b> theo trục x, y, z.<br><b>Năng lượng:</b> lớp gần hạt nhân năng lượng thấp, liên kết chặt nhất; e <b>cùng phân lớp</b> năng lượng bằng nhau (cùng lớp thì chưa chắc).<br><b>Orbital:</b> vùng xác suất tìm thấy e lớn nhất (~90%), không phải 100%."
+  },
+  "k5": {
+   "ten": "Viết cấu hình electron",
+   "rule": "<b>Thứ tự điền:</b> 1s 2s 2p 3s 3p <b>4s 3d</b> 4p 5s 4d 5p 6s 4f 5d…; viết lại theo lớp (3d trước 4s).<br><b>Pauli:</b> mỗi AO tối đa 2 e ngược chiều. <b>Hund:</b> điền mỗi AO một e trước (cùng chiều) rồi mới ghép đôi → đếm <b>e độc thân</b>.<br><b>Ngoại lệ:</b> Cr [Ar]3d<sup>5</sup>4s<sup>1</sup>, Cu [Ar]3d<sup>10</sup>4s<sup>1</sup>.<br><b>Ion:</b> bỏ e từ <b>lớp ngoài cùng</b> trước ({Fe}<sup>2+</sup> [Ar]3d<sup>6</sup>, bỏ 4s trước 3d); anion thêm e vào phân lớp đang điền.<br><b>Đếm:</b> Z = tổng số mũ; e lớp ngoài = e của n lớn nhất; e phân lớp p/s cộng theo loại."
+  },
+  "k6": {
+   "ten": "Cấu hình → tính chất",
+   "rule": "<b>E lớp ngoài cùng:</b> 1, 2, 3 → <b>kim loại</b> (trừ H, He, B); 5, 6, 7 → <b>phi kim</b>; 8 (He: 2) → <b>khí hiếm</b>; 4 → kim loại hoặc phi kim.<br><b>Loại nguyên tố:</b> e cuối điền vào s, p, d, f → nguyên tố s, p, d, f.<br><b>E hoá trị:</b> nhóm A là e lớp ngoài; nguyên tố d gồm (n−1)d + ns (V: 3d<sup>3</sup>4s<sup>2</sup> → 5).<br><b>Vị trí:</b> ô = Z; chu kì = số lớp e; nhóm A = số e lớp ngoài cùng.<br><b>Cùng cấu hình khí hiếm:</b> nguyên tử là khí hiếm, cation từ kim loại, anion từ phi kim."
+  },
+  "k7": {
+   "ten": "Đồng vị & nguyên tử khối TB",
+   "rule": "<b>Đồng vị:</b> cùng Z (cùng p, e), <b>khác N</b> nên khác A; tính chất hoá học như nhau.<br><b>NTK trung bình:</b> <b>Ā = Σ(A<sub>i</sub>·x<sub>i</sub>) : 100</b>; hai đồng vị đặt x và 100 − x.<br><b>% khối lượng đồng vị trong hợp chất:</b> = (x<sub>i</sub>/100)·A<sub>i</sub>·(số nguyên tử) : M(hợp chất), M dùng Ā.<br><b>Đếm loại phân tử:</b> {X2} từ n đồng vị có n(n + 1)/2 loại; {XY2}: (số đồng vị X) × (số cặp Y có lặp).<br><b>Phổ khối:</b> mỗi vạch một đồng vị, chiều cao ∝ % số nguyên tử."
+  }
+ },
+ "TRAPS_THEM": {
+  "ionelectron": {
+   "ten": "Quên electron của ion",
+   "hoi": "Đây là nguyên tử hay ion? Ion dương đã mất e, ion âm đã nhận e; số proton và neutron không đổi."
+  },
+  "hatmangdien": {
+   "ten": "Nhầm hạt mang điện",
+   "hoi": "Hạt mang điện gồm proton và electron (2Z); neutron không mang điện. Đề hỏi hạt mang điện hay hạt trong hạt nhân?"
+  },
+  "thutudien": {
+   "ten": "Thứ tự điền và viết",
+   "hoi": "4s điền trước 3d nhưng viết cấu hình theo lớp; ion kim loại chuyển tiếp mất e 4s trước. Có dính Cr, Cu không?"
+  }
+ },
+ "DANG_KEY": {
+  "NGUYEN_TU.CAU_HINH_E.NHAN_DANG": "k4",
+  "NGUYEN_TU.MO_HINH.NHAN_DANG": "k3",
+  "NGUYEN_TU.THANH_PHAN.NHAN_DANG": "k1",
+  "NGUYEN_TU.CAU_HINH_E.DEM_NGUYEN_TU": "k5",
+  "NGUYEN_TU.MO_HINH.DEM_NGUYEN_TU": "k3",
+  "NGUYEN_TU.THANH_PHAN.GOI_TEN": "k1",
+  "NGUYEN_TU.CAU_HINH_E.DEM_DONG_PHAN": "k5",
+  "NGUYEN_TU.CAU_HINH_E.SO_SANH": "k5",
+  "NGUYEN_TU.CAU_HINH_E.CHON_PHAT_BIEU": "k4",
+  "NGUYEN_TU.THANH_PHAN.DEM_NGUYEN_TU": "k2",
+  "NGUYEN_TU.MO_HINH.CHON_PHAT_BIEU": "k3",
+  "NGUYEN_TU.CAU_HINH_E.XAC_DINH_CHAT": "k6",
+  "NGUYEN_TU.CAU_HINH_E.XAC_DINH_DIEN_TICH": "k5",
+  "NGUYEN_TU.VI_TRI_BTH.DEM_NGUYEN_TU": "k6",
+  "NGUYEN_TU.VI_TRI_BTH.NHAN_DANG": "k6",
+  "NGUYEN_TU.THANH_PHAN.CHON_PHAT_BIEU": "k1",
+  "NGUYEN_TU.CAU_HINH_E.TINH_PHAN_TRAM": "k5",
+  "NGUYEN_TU.THANH_PHAN.DEM_DONG_PHAN": "k1",
+  "NGUYEN_TU.THANH_PHAN.TINH_KHOI_LUONG": "k1",
+  "NGUYEN_TU.MO_HINH.TINH_PHAN_TRAM": "k3",
+  "NGUYEN_TU.THANH_PHAN.VIET_CTCT": "k1",
+  "NGUYEN_TU.DONG_VI.GIAI_THICH": "k7",
+  "NGUYEN_TU.DONG_VI.NHAN_DANG": "k7",
+  "NGUYEN_TU.THANH_PHAN.XAC_DINH_CTPT": "k2",
+  "NGUYEN_TU.DONG_VI.XAC_DINH_CTPT": "k7",
+  "NGUYEN_TU.DONG_VI.DEM_NGUYEN_TU": "k7",
+  "NGUYEN_TU.THANH_PHAN.XAC_DINH_CHAT": "k2",
+  "NGUYEN_TU.THANH_PHAN.XAC_DINH_DIEN_TICH": "k2",
+  "NGUYEN_TU.MO_HINH.TINH_KHOI_LUONG": "k3",
+  "NGUYEN_TU.MO_HINH.TINH_THE_TICH": "k3",
+  "NGUYEN_TU.MO_HINH.TINH_TI_SO": "k3",
+  "NGUYEN_TU.CAU_HINH_E.GOI_TEN": "k6",
+  "NGUYEN_TU.DONG_VI.CHON_PHAT_BIEU": "k7",
+  "NGUYEN_TU.DONG_VI.DEM_DONG_PHAN": "k7",
+  "NGUYEN_TU.DONG_VI.TINH_PHAN_TRAM": "k7",
+  "NGUYEN_TU.THANH_PHAN.TINH_TI_SO": "k1",
+  "NGUYEN_TU.VI_TRI_BTH.DEM_DONG_PHAN": "k6",
+  "NGUYEN_TU.DONG_VI.TINH_THE_TICH": "k7",
+  "NGUYEN_TU.MO_HINH.NEU_HIEN_TUONG": "k3",
+  "NGUYEN_TU.THANH_PHAN.TINH_PHAN_TRAM": "k1",
+  "NGUYEN_TU.MO_HINH.DEM_DONG_PHAN": "k3"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Điều kiện bền 1 ≤ N/Z ≤ 1,5 (Z ≤ 82) dùng cho bài toán một dữ kiện tổng hạt: đúng cách dạy phổ thông, GIỮ.",
+  "Orbital là vùng xác suất tìm thấy e khoảng 90%; vùng xác suất 100% là toàn bộ không gian quanh hạt nhân (khớp đáp án kho).",
+  "Kích thước hạt nhân ~10⁻¹⁴ m, nguyên tử ~10⁻¹⁰ m theo SGK 2018; đề cho số khác thì dùng số đề."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

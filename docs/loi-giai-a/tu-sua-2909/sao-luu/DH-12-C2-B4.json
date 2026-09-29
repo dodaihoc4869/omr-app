@@ -280,5 +280,128 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "DH-12-C2-B4-III-46": {
+  "luc": "2026-09-29T08:26:20.889Z",
+  "cau": {
+   "phan": "III",
+   "so": 46,
+   "de": "Cho 1,8 gam fructose (C₆H₁₂O₆) tác dụng hết với0 lượng dư dung dịch AgNO₃ trong NH₃, thu được m gam Ag.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "2,16",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "bai": "Bài 4. Glucose và fructose",
+   "loi_giai": {
+    "chot": "n(fructose) = 0,01 mol ⇒ n(Ag) = 0,02 mol ⇒ m = 2,16 g.",
+    "buoc": [
+     "n(fructose) = 1,8 : 180 = 0,01 mol.",
+     "Trong NH₃, fructose chuyển thành glucose rồi tráng bạc ⇒ n(Ag) = 2 × 0,01 = 0,02 mol.",
+     "m(Ag) = 0,02 × 108 = 2,16 g."
+    ],
+    "ket_qua": "2,16",
+    "dap_an_de": "2,16",
+    "dap_an_tu_giai": "2,16",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc lọt chữ số 0 ('tác dụng hết với0 lượng dư'); đã bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Trong môi trường NH₃, fructose chuyển hoá thành glucose nên vẫn tráng bạc, cho 2 mol Ag.",
+    "bay": "Cho rằng fructose không tráng bạc vì không có nhóm −CHO."
+   },
+   "kienThuc": [
+    "M(C₆H₁₂O₆) = 180; M(Ag) = 108.",
+    "Trong môi trường base, fructose chuyển hoá thành glucose nên vẫn tham gia phản ứng tráng bạc.",
+    "1 mol glucose (hoặc fructose) cho 2 mol Ag."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_KHOI_LUONG",
+    "ten": "Phản ứng tráng bạc — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B4-III-2": {
+  "luc": "2026-09-29T08:26:20.889Z",
+  "cau": {
+   "phan": "III",
+   "so": 2,
+   "de": "Cho các saccharide sau: cellulose, glucose, maltose, fructose, tinh bột và saccharose.\nCó bao nhiêu saccharide trong dãy trên thuộc loại monosaccharide?",
+   "dap_an": "6,67",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 4. Glucose và fructose",
+   "loi_giai": {
+    "chot": "Monosaccharide là đường đơn, không bị thuỷ phân.",
+    "buoc": [
+     "Monosaccharide là đường đơn, không bị thuỷ phân.",
+     "Glucose và fructose đạt điều kiện này.",
+     "Maltose, saccharose là disaccharide; tinh bột, cellulose là polysaccharide.",
+     "Vậy có 2 chất."
+    ],
+    "ket_qua": "6,67",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "6,67",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Đáp án đề (6,67) là khối lượng glucose tính theo kg; máy giữ nguyên con số ấy, khối lượng AgNO₃ 12,59 kg nằm trong các bước giải."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Maltose thuỷ phân cho hai phân tử glucose nên là disaccharide.",
+    "bay": "Đếm cả maltose vì thấy cũng gồm các gốc glucose."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

@@ -1,0 +1,87 @@
+{
+ "ma": "CARBONYL_ACID",
+ "chuong": "Hợp chất carbonyl – carboxylic acid",
+ "lop": "11",
+ "KEYS": {
+  "k1": {
+   "ten": "Cấu tạo & gọi tên",
+   "rule": "<b>Nhóm chức:</b> aldehyde –CHO; ketone R–CO–R′ (C=O giữa hai C); carboxylic acid –COOH.<br><b>Tên thay thế:</b> C của –CHO, –COOH là C số 1; aldehyde đuôi <b>-al</b> (propanal), ketone <b>-an-x-one</b> (propan-2-one = acetone), acid <b>-oic acid</b> (ethanoic acid = acetic acid).<br><b>Tên thường:</b> formaldehyde {HCHO}, acetaldehyde {CH3CHO}, formic acid {HCOOH}, acrylic acid {CH2=CHCOOH}, oxalic acid {HOOC-COOH}, benzoic acid {C6H5COOH}.<br><b>Công thức chung:</b> aldehyde, ketone no, đơn chức, mạch hở {CnH2nO}; acid no, đơn chức, mạch hở {CnH2nO2}.<br><b>Phổ IR:</b> C=O khoảng 1740–1670 cm<sup>−1</sup>; acid thêm O–H rất rộng 3300–2500."
+  },
+  "k2": {
+   "ten": "Đếm đồng phân",
+   "rule": "<b>Mẹo gốc alkyl:</b> số gốc alkyl có 1, 2, 3, 4 C lần lượt là 1, 1, 2, 4.<br><b>Aldehyde {CnH2nO}:</b> = số gốc alkyl có (n − 1) C: {C4H8O} có 2, {C5H10O} có 4.<br><b>Acid {CnH2nO2}:</b> cũng vậy: {C4H8O2} có 2, {C5H10O2} có 4.<br><b>Ketone:</b> {C3H6O} 1, {C4H8O} 1, {C5H10O} 3.<br><b>Carbonyl {C4H8O}</b> = 2 aldehyde + 1 ketone = 3.<br><b>Cách làm:</b> vẽ mạch C, gắn nhóm chức vào từng vị trí khác nhau; bỏ cách vẽ trùng."
+  },
+  "k3": {
+   "ten": "Khử, oxi hoá & nhận biết",
+   "rule": "<b>Tráng bạc:</b> chất có –CHO + {AgNO3}/{NH3} → Ag; RCHO → 2Ag, <b>HCHO → 4Ag</b>; formic acid, ester của formic acid cũng tráng bạc; ketone không.<br><b>{Cu(OH)2}/{OH}<sup>−</sup> đun nóng:</b> aldehyde → {Cu2O} đỏ gạch; acid hoà tan {Cu(OH)2} → dung dịch xanh; alcohol đơn chức không.<br><b>Nước bromine:</b> aldehyde làm mất màu, ketone không.<br><b>Khử bằng {NaBH4} hoặc {LiAlH4}:</b> aldehyde → alcohol bậc I, ketone → alcohol bậc II.<br><b>Iodoform:</b> có nhóm {CH3CO-} (hoặc {CH3CH(OH)-}) + {I2}/NaOH → {CHI3} kết tủa vàng.<br><b>Cộng HCN:</b> tạo cyanohydrin, mạch tăng 1 C."
+  },
+  "k4": {
+   "ten": "Tính acid",
+   "rule": "<b>Acid yếu:</b> phân li một phần, làm quỳ hoá đỏ.<br><b>Phản ứng:</b> với kim loại trước H → {H2}; base, basic oxide → muối + {H2O}; muối carbonate → {CO2} <b>sủi bọt</b>.<br><b>So sánh:</b> K<sub>a</sub> lớn → acid mạnh; HCOOH > {CH3COOH} > {C2H5COOH} (gốc alkyl đẩy electron); nhóm hút electron như Cl làm tăng tính acid.<br><b>Nồng độ:</b> [{H}<sup>+</sup>] = C × α; pH = −lg[{H}<sup>+</sup>]; trung hoà: n({OH}<sup>−</sup>) = n(–COOH).<br><b>Đời sống:</b> giảm chua bằng base yếu, rẻ như nước vôi {Ca(OH)2}; giấm là acetic acid 2–5%."
+  },
+  "k5": {
+   "ten": "Nhiệt độ sôi & ứng dụng",
+   "rule": "<b>Nhiệt độ sôi (phân tử khối tương đương):</b> acid > alcohol > aldehyde, ketone > hydrocarbon.<br><b>Lí do:</b> acid tạo liên kết hydrogen <b>bền hơn</b> alcohol (tạo dimer); aldehyde, ketone không có liên kết hydrogen giữa các phân tử.<br><b>Tan:</b> chất nhỏ tan tốt nhờ liên kết hydrogen với nước.<br><b>Ứng dụng:</b> formalin (formon) 37–40% ngâm mẫu vật, <b>cấm</b> bảo quản thực phẩm; acetone làm dung môi; acetic acid làm giấm, sản xuất ester, tơ; nước đá khô ({CO2} rắn) bảo quản an toàn."
+  },
+  "k6": {
+   "ten": "Điều chế & chuỗi phản ứng",
+   "rule": "<b>Aldehyde, ketone:</b> oxi hoá alcohol bậc I, bậc II bằng CuO; acetaldehyde từ oxi hoá ethylene; <b>acetone cùng phenol từ cumene</b> (1 : 1 : 1).<br><b>Acetic acid:</b> lên men giấm {C2H5OH} + {O2} → {CH3COOH} + {H2O}; {CH3OH} + CO; oxi hoá butane.<br><b>Ester hoá:</b> RCOOH + R′OH ⇌ RCOOR′ + {H2O} ({H2SO4} đặc, đun); acid mất –OH, alcohol mất H.<br><b>Đọc chuỗi:</b> {C2H4} → {C2H5OH} → {CH3CHO} (M = 44) → {CH3COOH} → ester; đi từ chất cuối ngược lại."
+  },
+  "k7": {
+   "ten": "Tính toán",
+   "rule": "<b>Tìm chất:</b> số O = %O × M : 1600; mỗi –COOH có 2 O, –OH có 1 O.<br><b>Tráng bạc:</b> n(Ag) = 2n(RCHO), 4n(HCHO).<br><b>Ester hoá:</b> so số mol acid, alcohol theo tỉ lệ 1 : 1, <b>H tính theo chất thiếu</b>; H = thực tế : lí thuyết × 100%.<br><b>Nhiều giai đoạn:</b> H chung = H<sub>1</sub> × H<sub>2</sub> × …; sản phẩm × H, nguyên liệu ÷ H.<br><b>Khí:</b> n = V : 24,79 (25 °C, 1 bar); nồng độ trong hơi thở theo mg/L đổi qua số mol ethanol theo phương trình đã cân bằng."
+  }
+ },
+ "TRAPS_THEM": {
+  "trangbac": {
+   "ten": "Nhầm chất tráng bạc",
+   "hoi": "Chất có nhóm –CHO thật không? Ketone không tráng bạc; formic acid và ester của nó lại có; acetylene tạo kết tủa vàng nhạt chứ không tạo bạc."
+  },
+  "bonag": {
+   "ten": "Quên HCHO cho 4 Ag",
+   "hoi": "Aldehyde là formaldehyde hay aldehyde hai chức? Mỗi mol của chúng cho 4 mol Ag, không phải 2."
+  },
+  "chatthieu": {
+   "ten": "Tính theo chất dư",
+   "hoi": "Trong ester hoá, chất nào có số mol nhỏ hơn theo tỉ lệ 1 : 1? Hiệu suất phải tính theo chất thiếu, không theo chất cho nhiều gam hơn."
+  }
+ },
+ "DANG_KEY": {
+  "CARBONYL_ACID.CAU_TAO.CHON_PHAT_BIEU": "k1",
+  "CARBONYL_ACID.CAU_TAO.DEM_DONG_PHAN": "k2",
+  "CARBONYL_ACID.CAU_TAO.DEM_NGUYEN_TU": "k1",
+  "CARBONYL_ACID.CAU_TAO.GOI_TEN": "k1",
+  "CARBONYL_ACID.CAU_TAO.NHAN_DANG": "k1",
+  "CARBONYL_ACID.CAU_TAO.SO_SANH": "k5",
+  "CARBONYL_ACID.CAU_TAO.TINH_HIEU_SUAT": "k7",
+  "CARBONYL_ACID.CAU_TAO.TINH_NONG_DO": "k7",
+  "CARBONYL_ACID.CAU_TAO.VIET_CTCT": "k1",
+  "CARBONYL_ACID.DIEU_CHE.CHON_PHAT_BIEU": "k6",
+  "CARBONYL_ACID.DIEU_CHE.GOI_TEN": "k6",
+  "CARBONYL_ACID.DIEU_CHE.NHAN_DANG": "k6",
+  "CARBONYL_ACID.DIEU_CHE.TINH_HIEU_SUAT": "k7",
+  "CARBONYL_ACID.DIEU_CHE.XAC_DINH_CTPT": "k6",
+  "CARBONYL_ACID.PHAN_UNG_OXH.CHON_PHAT_BIEU": "k3",
+  "CARBONYL_ACID.PHAN_UNG_OXH.DEM_DONG_PHAN": "k3",
+  "CARBONYL_ACID.PHAN_UNG_OXH.NHAN_DANG": "k3",
+  "CARBONYL_ACID.PHAN_UNG_OXH.TINH_HIEU_SUAT": "k7",
+  "CARBONYL_ACID.PHAN_UNG_OXH.VIET_CTCT": "k3",
+  "CARBONYL_ACID.PHAN_UNG_OXH.XAC_DINH_CHAT": "k3",
+  "CARBONYL_ACID.TINH_ACID.CHON_PHAT_BIEU": "k4",
+  "CARBONYL_ACID.TINH_ACID.NEU_HIEN_TUONG": "k4",
+  "CARBONYL_ACID.TINH_ACID.NHAN_DANG": "k4",
+  "CARBONYL_ACID.TINH_ACID.TINH_NONG_DO": "k4",
+  "CARBONYL_ACID.UNG_DUNG.CHON_PHAT_BIEU": "k5",
+  "CARBONYL_ACID.UNG_DUNG.NHAN_DANG": "k5",
+  "CARBONYL_ACID.UNG_DUNG.TINH_KHOI_LUONG": "k7",
+  "CARBONYL_ACID.UNG_DUNG.TINH_THE_TICH": "k7"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Vùng C=O ghi \"khoảng 1740–1670 cm⁻¹\" theo đúng phương án đề kho (acetone); không tách số riêng cho aldehyde/ketone/acid.",
+  "Câu Cu(OH)₂/OH⁻ đun nóng với ethanol, acetic acid, acetaldehyde: acid hoà tan Cu(OH)₂, aldehyde cho Cu₂O ⇒ ống (2), (3) phản ứng: GIỮ đáp án C.",
+  "DIEU_CHE.NHAN_DANG (cumene → acetone, H 80%) là câu tính: gán k6 vì dạng chủ yếu hỏi nguồn điều chế; phép tính dùng thêm k7.",
+  "Mã CAU_TAO.TINH_HIEU_SUAT (ester hoá 6 g acid + 6 g alcohol → 3,52 g ester, H = 40% theo acid thiếu) lệch nhóm nội dung: GIỮ mã, DANG_KEY gán k7."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

@@ -234,5 +234,80 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-C1-B1-D2-II-9": {
+  "luc": "2026-09-29T08:24:54.554Z",
+  "cau": {
+   "phan": "II",
+   "so": 9,
+   "de": "Isoamyl acetate có mùi chuối nên được dùng làm hương liệu nhân tạo. Trong ngành sơn, isoamyl acetate được dùng làm dung môi vecni, dung môi sơn mài,... Isoamyl acetate được điều chế theo các bước sau:\nBước 1. Cho vào bình cầu 15 mL isoamyl alcohol (d = 0,81 g/mL), 10 mL acetic acid (d = 1,049 g/mL) và 7,0 mL H₂SO₄ đậm đặc, cho thêm vào bình vài viên đá bọt. Lắp ống sinh hàn hồi lưu thẳng đứng vào miệng bình cầu. Sau đó đun nóng bình cầu trong khoảng 1 giờ.\nBước 2. Sau khi đun, để nguội rồi rót sản phẩm vào phễu chiết, lắc đều rồi để yên 1 khoảng 5 phút, chất lỏng tách thành hai lớp, loại bỏ phần chất lỏng phía dưới, lấy phần chất lỏng phía trên.\nBước 3. Cho từ từ dung dịch Na₂CO₃ 10% vào phần chất lỏng thu lấy ở bước 2 và lắc đều cho đến khi không còn khí thoát ra, thêm tiếp 20 mL dung dịch NaCl bão hoà rồi để yên khi đó chất lỏng tách thành hai lớp. Chiết lấy phần chất lỏng phía trên, làm khan, ta thu được isoamyl acetate (d = 0,876 g/mL).",
+   "y": {
+    "a": "Ở bước 1, xảy ra phản ứng thế nhóm –OH của CH₃COOH bằng gốc –OCH₂CH₂CH(CH₃)₂.",
+    "b": "Thêm dung dịch Na₂CO₃ ở bước 3 nhằm mục đích làm giảm độ tan của isoamyl acetate trong nước.",
+    "c": "Isoamyl acetate rất ít tan trong nước và có khối lượng riêng nhỏ hơn khối lượng riêng của nước.",
+    "d": "Nếu hiệu suất phản ứng ester hoá là 54% và lượng isoamyl acetate bị hao hụt tối đa 6% thì thể tích isoamyl acetate thu được là 10,8 mL (làm tròn kết quả đến hàng phần mười)."
+   },
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Ester hoá: nhóm OH của acid được thay bằng nhóm OR' của alcohol; Na₂CO₃ dùng để trung hoà acid dư. Tính theo chất thiếu: m thực tế = m lí thuyết × H × (1 trừ phần hao hụt).",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng. Trong ester hoá, nhóm OH của CH₃COOH bị thay bằng gốc OCH₂CH₂CH(CH₃)₂ của isoamyl alcohol."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai. Na₂CO₃ dùng để trung hoà acetic acid và H₂SO₄ còn dư (có khí CO₂ thoát ra); NaCl bão hoà mới làm giảm độ tan của ester."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng. Isoamyl acetate rất ít tan trong nước, d = 0,876 g/mL nhỏ hơn nước nên nổi lớp trên."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai. n alcohol = 12,15/88 = 0,138 mol < n acid = 10,49/60 = 0,175 mol; m ester = 0,138·130·0,54·0,94 = 9,11 g; V = 9,11/0,876 = 10,4 mL."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng dạng hiệu suất và thí nghiệm điều chế isoamyl acetate ở câu II-9 và II-21.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+    "ten": "Ester hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C1-B1",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
  }
 }

@@ -1,0 +1,141 @@
+{
+ "12-C2-B5-II-20": {
+  "luc": "2026-09-29T08:25:05.772Z",
+  "cau": {
+   "phan": "II",
+   "so": 20,
+   "de": "Cấu trúc phân tử saccharose và maltose được cho trong hình dưới đây:",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_6.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "II_6_2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Saccharose và maltose đều là các disaccharide.",
+    "b": "Liên kết a-1,2-glycoside giữa đơn vị glucose và đơn vị fructose trong phân tử saccharose là nguyên nhân dẫn đến saccharose không có khả năng mở vòng.",
+    "c": "Maltose chỉ có khả năng mở được một vòng.",
+    "d": "Thuỷ phân saccharose và maltose chỉ thu được một monosaccharide duy nhất."
+   },
+   "loi_giai": {
+    "chot": "Saccharose dùng cả hai carbon anomeric để tạo liên kết nên không mở vòng được; maltose còn một carbon anomeric tự do nên mở được một vòng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: cả hai đều gồm hai đơn vị monosaccharide."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: liên kết alpha-1,2-glycoside khoá cả hai carbon anomeric."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: maltose chỉ còn một carbon anomeric tự do."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: thuỷ phân saccharose cho glucose và fructose, tức hai monosaccharide."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Nhìn hình để thấy carbon anomeric nào còn tự do, từ đó suy ra khả năng mở vòng.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-C2-B5-III-9": {
+  "luc": "2026-09-29T08:25:05.772Z",
+  "cau": {
+   "phan": "III",
+   "so": 9,
+   "de": "Cho các loại thực phẩm sau: mật mía, đường phèn, đường cát, mật ong và mạch nha.\nCó bao nhiêu bao nhiêu loại thực phẩm trong dãy trên có chứa nhiều saccharose trong thành phần hóa học?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "loi_giai": {
+    "chot": "Đường cát, đường phèn, mật mía đều là saccharose từ mía. Mật ong chủ yếu là glucose và fructose; mạch nha chủ yếu là maltose.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Chứa nhiều saccharose: mật mía, đường phèn, đường cát.",
+     "Không: mật ong (glucose, fructose), mạch nha (maltose). Có 3 loại."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Mật mía, đường phèn, đường cát đều là saccharose; mật ong là glucose và fructose, mạch nha là maltose.",
+    "bay": "Đếm cả mật ong vì thấy chữ mật giống mật mía.",
+    "dk": [
+     "bay"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.DEM_DONG_PHAN",
+    "ten": "Ứng dụng — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C2-B5",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

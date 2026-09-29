@@ -1,0 +1,82 @@
+{
+ "ma": "HYDROCARBON",
+ "chuong": "Hydrocarbon",
+ "lop": "11",
+ "KEYS": {
+  "k1": {
+   "ten": "Gọi tên & đồng phân",
+   "rule": "<b>Mạch chính:</b> dài nhất, chứa liên kết bội; đánh số từ đầu <b>gần liên kết bội</b> (alkane: gần nhánh).<br><b>Tên:</b> vị trí nhánh – tên nhánh + tên mạch chính + vị trí liên kết bội + ane/ene/yne: 2-methylbutane, but-2-ene, pent-1-yne.<br><b>Đồng phân hình học:</b> <b>mỗi C</b> của C=C mang hai nhóm khác nhau; cùng phía là cis.<br><b>Tên thường:</b> isopentane = 2-methylbutane; acetylene {C2H2}; methylacetylene = propyne; toluene {C6H5CH3}; styrene {C6H5CH=CH2}; cumene = isopropylbenzene; xylene = dimethylbenzene.<br><b>Đếm đồng phân:</b> vẽ mạch C từ dài đến ngắn, rồi dời vị trí nhánh, liên kết bội; bỏ cách vẽ trùng."
+  },
+  "k2": {
+   "ten": "Liên kết & hình dạng",
+   "rule": "<b>Liên kết:</b> đơn = 1σ; đôi = 1σ + 1π; ba = 1σ + 2π; số σ = tổng số liên kết (kể cả C–H).<br><b>Hình dạng:</b> methane tứ diện; ethylene phẳng, góc 120°; acetylene <b>thẳng</b>, 180°; benzene lục giác đều, phẳng.<br><b>Công thức chung:</b> alkane {CnH2n+2}; alkene {CnH2n}; alkyne {CnH2n-2}; dãy benzene {CnH2n-6}.<br><b>Số π + vòng</b> = (2C + 2 − H) : 2.<br><b>Công thức khung:</b> đếm từng đỉnh là một C; nhóm methyl là đầu mút nhánh."
+  },
+  "k3": {
+   "ten": "Phản ứng đặc trưng",
+   "rule": "<b>Alkane:</b> thế halogen khi chiếu sáng (cho hỗn hợp sản phẩm), cracking, reforming, cháy; <b>không</b> làm mất màu {Br2}, {KMnO4}.<br><b>Alkene, alkyne:</b> cộng {H2}, {Br2} (mất màu), HX, {H2O} theo <b>Markovnikov</b>: H vào C mang nhiều H hơn; trùng hợp; alkene + {KMnO4} → diol, có kết tủa nâu đen {MnO2}.<br><b>Alk-1-yne:</b> C≡C đầu mạch + {AgNO3}/{NH3} → kết tủa vàng nhạt; acetylene cho {AgC≡CAg}.<br><b>Benzene:</b> thế ({Br2}/{FeBr3}, {HNO3}/{H2SO4} đặc); cộng khó ({H2}/Ni, {Cl2} chiếu sáng → {C6H6Cl6}); không mất màu nước bromine.<br><b>Toluene:</b> thế o/p dễ hơn benzene; {KMnO4} đun nóng oxi hoá nhóm –{CH3}."
+  },
+  "k4": {
+   "ten": "Tính chất vật lí",
+   "rule": "<b>Thể:</b> ở điều kiện thường, chất có <b>nhiệt độ sôi dưới 25 °C</b> là khí; alkane C<sub>1</sub>–C<sub>4</sub> là khí.<br><b>Nhiệt độ sôi:</b> tăng theo phân tử khối; cùng số C, <b>nhiều nhánh sôi thấp hơn</b>.<br><b>Tan:</b> hydrocarbon không phân cực, không tan trong nước, nhẹ hơn nước → nổi, tách lớp; tan trong dung môi hữu cơ.<br><b>Arene:</b> benzene, toluene lỏng, mùi thơm; naphthalene rắn, dễ thăng hoa (băng phiến)."
+  },
+  "k5": {
+   "ten": "Dầu mỏ & ứng dụng",
+   "rule": "<b>Cracking:</b> cắt mạch dài → alkane và alkene mạch ngắn.<br><b>Reforming:</b> mạch không nhánh → mạch nhánh, vòng, arene, <b>tăng chỉ số octane</b>, số C giữ nguyên.<br><b>Methane:</b> khí thiên nhiên, biogas, khí gây hiệu ứng nhà kính.<br><b>Ethylene:</b> kích thích quả chín, sản xuất PE; <b>acetylene:</b> đèn xì oxygen – acetylene, điều chế {CaC2} + 2{H2O} → {C2H2} + {Ca(OH)2}.<br><b>Arene:</b> benzene độc, gây ung thư; toluene làm dung môi, sản xuất TNT."
+  },
+  "k6": {
+   "ten": "Tính theo phương trình",
+   "rule": "<b>Khí:</b> n = V : 24,79 (25 °C, 1 bar); ppm = phần triệu thể tích.<br><b>Tìm chất:</b> %C và M từ phổ khối → số C, số H.<br><b>Đốt cháy:</b> alkane n({H2O}) > n({CO2}), n(alkane) = n({H2O}) − n({CO2}); alkene hai số bằng nhau; alkyne n = n({CO2}) − n({H2O}).<br><b>Phần trăm giảm</b> = (trước − sau) : trước × 100%.<br><b>Hiệu suất:</b> sản phẩm × H, nguyên liệu ÷ H; nhiệt toả ra Q = n × |Δ<sub>r</sub>H|."
+  }
+ },
+ "TRAPS_THEM": {
+  "markovnikov": {
+   "ten": "Cộng ngược quy tắc",
+   "hoi": "Nguyên tử H của HX hay H₂O gắn vào C nào của C=C? Theo Markovnikov, H vào C mang nhiều H hơn, X hoặc OH vào C bậc cao hơn."
+  },
+  "benzenbrom": {
+   "ten": "Coi benzene như alkene",
+   "hoi": "Chất có C=C ngoài vòng không? Benzene, toluene không làm mất màu nước bromine ở điều kiện thường; styrene thì có."
+  },
+  "ankindau": {
+   "ten": "Nhầm alkyne đầu mạch",
+   "hoi": "Liên kết ba có nằm ở đầu mạch (còn H gắn C≡C) không? Chỉ alk-1-yne tạo kết tủa với silver nitrate trong ammonia; but-2-yne thì không."
+  }
+ },
+ "DANG_KEY": {
+  "HYDROCARBON.CAU_TAO.CHON_PHAT_BIEU": "k2",
+  "HYDROCARBON.CAU_TAO.DEM_DONG_PHAN": "k1",
+  "HYDROCARBON.CAU_TAO.DEM_NGUYEN_TU": "k2",
+  "HYDROCARBON.CAU_TAO.GOI_TEN": "k1",
+  "HYDROCARBON.CAU_TAO.NHAN_DANG": "k1",
+  "HYDROCARBON.CAU_TAO.SO_SANH": "k4",
+  "HYDROCARBON.CAU_TAO.TINH_PHAN_TRAM": "k6",
+  "HYDROCARBON.CAU_TAO.VIET_CTCT": "k1",
+  "HYDROCARBON.CAU_TAO.XAC_DINH_CTPT": "k6",
+  "HYDROCARBON.LIEN_KET_PHAN_TU.DEM_LIEN_KET_PI": "k2",
+  "HYDROCARBON.LIEN_KET_PHAN_TU.NHAN_DANG": "k2",
+  "HYDROCARBON.PHAN_UNG.CHON_PHAT_BIEU": "k3",
+  "HYDROCARBON.PHAN_UNG.DEM_DONG_PHAN": "k3",
+  "HYDROCARBON.PHAN_UNG.DEM_NGUYEN_TU": "k3",
+  "HYDROCARBON.PHAN_UNG.GOI_TEN": "k3",
+  "HYDROCARBON.PHAN_UNG.NEU_HIEN_TUONG": "k3",
+  "HYDROCARBON.PHAN_UNG.NHAN_DANG": "k3",
+  "HYDROCARBON.PHAN_UNG.TINH_KHOI_LUONG": "k6",
+  "HYDROCARBON.PHAN_UNG.VIET_CTCT": "k3",
+  "HYDROCARBON.TINH_CHAT_VAT_LI.CHON_PHAT_BIEU": "k4",
+  "HYDROCARBON.TINH_CHAT_VAT_LI.DEM_DONG_PHAN": "k4",
+  "HYDROCARBON.TINH_CHAT_VAT_LI.NHAN_DANG": "k4",
+  "HYDROCARBON.UNG_DUNG.CHON_PHAT_BIEU": "k5",
+  "HYDROCARBON.UNG_DUNG.NHAN_DANG": "k5",
+  "HYDROCARBON.UNG_DUNG.TINH_KHOI_LUONG": "k6",
+  "HYDROCARBON.UNG_DUNG.TINH_THE_TICH": "k6",
+  "HYDROCARBON.UNG_DUNG.VIET_PTHH": "k5",
+  "HYDROCARBON.UNG_DUNG.XAC_DINH_CTPT": "k6"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Pent-2-ene + KMnO₄ ở nhiệt độ phòng → pentane-2,3-diol (CH₃CH₂CH(OH)CH(OH)CH₃): GIỮ đáp án A.",
+  "Oxi hoá butane bằng O₂ (180 °C, 70 bar) → CH₃COOH là sản phẩm hữu cơ duy nhất theo SGK: GIỮ.",
+  "CAU_TAO.CHON_PHAT_BIEU gồm cả câu tính chất benzene lẫn câu đếm nhóm trên công thức khung (albuterol) ⇒ gán k2; khi câu hỏi về phản ứng, máy soạn dùng thêm k3."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

@@ -50,5 +50,140 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
   }
+ },
+ "12-KT-C1-D5-I-15": {
+  "luc": "2026-09-29T08:25:36.129Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Triolein là loại chất béo có nhiều trong dầu thực vật như dầu oliu, dầu lạc, dầu vừng.\nTriolein giúp làm giảm cholesterol trong máu, giảm nguy cơ mắc các bệnh tim mạch, tăng cường hấp thụ vitamin (A, D, E và K), chống viêm, điều hoà hormone,... Nhận định nào sau đây về triolein không đúng?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Chủ yếu tồn tại ở dạng đồng phân trans",
+    "B": "Có nhiệt độ nóng chảy thấp hơn 25 C",
+    "C": "Có 6 liên kết π trong phân tử",
+    "D": "Dễ hoà tan các vitamin A, D, E và K"
+   },
+   "loi_giai": {
+    "chot": "Nối đôi trong gốc oleate của triolein ở cấu hình cis; chính cấu hình này làm mạch gấp khúc nên triolein ở thể lỏng.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng là nhận định SAI: triolein tồn tại chủ yếu ở dạng cis, không phải trans."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Nhận định đúng: triolein là chất lỏng ở nhiệt độ thường."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Nhận định đúng: ba nối đôi C=C cộng ba nhóm C=O là 6 liên kết π."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nhận định đúng: chất béo hoà tan tốt các vitamin tan trong dầu."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Acid béo tự nhiên luôn ở cấu hình cis.",
+    "bay": "Nhớ nhầm chất béo tự nhiên sang dạng trans."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "12-KT-C1-D5-I-17": {
+  "luc": "2026-09-29T08:25:36.129Z",
+  "cau": {
+   "phan": "I",
+   "so": 17,
+   "de": "Hợp chất 2-methylbutyl ethanoate là một trong các pheromone \"báo động\" được ong tiết ra để cảnh báo các con ong khác trong đàn về mối nguy hiểm và kêu gọi tập trung tấn công kẻ xâm nhập.\nHợp chất này có công thức cấu tạo như sau: Nhận định nào sau đây về 2-methylbutyl ethanoate không đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_17.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Thuộc loại ester no, đơn chức, có công thức phân tử là C₇H₁₄O₂",
+    "B": "Bị thuỷ phân trong môi trường acid và môi trường base",
+    "C": "Tạo được liên kết hydrogen mạnh với nước",
+    "D": "Tổng hợp được trong phòng thí nghiệm từ acetic acid và 2-methybutanol"
+   },
+   "loi_giai": {
+    "chot": "2-methylbutyl ethanoate là ester no đơn chức C₇H₁₄O₂; ester không có H linh động nên chỉ tạo liên kết hydrogen YẾU với nước.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nhận định đúng: phân tử chỉ có liên kết đơn ngoài nhóm C=O, công thức C₇H₁₄O₂."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Nhận định đúng: mọi ester đều thuỷ phân được trong cả acid lẫn base."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là nhận định SAI: ester chỉ nhận liên kết hydrogen nên liên kết ấy yếu."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nhận định đúng: acetic acid ghép 2-methylbutan-1-ol cho đúng ester này."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Ester thiếu H linh động nên chỉ nhận.",
+    "bay": "Thấy phân tử có oxygen là kết luận liên kết hydrogen mạnh."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }

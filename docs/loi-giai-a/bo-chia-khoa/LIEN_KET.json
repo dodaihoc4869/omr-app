@@ -1,0 +1,73 @@
+{
+ "ma": "LIEN_KET",
+ "chuong": "Liên kết hoá học",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Quy tắc octet",
+   "rule": "<b>Nội dung:</b> nguyên tử <b>nhường, nhận hoặc góp chung</b> e để đạt cấu hình bền của <b>khí hiếm gần kề</b> (8 e lớp ngoài; H, Li… đạt 2 e như He).<br><b>Kim loại</b> (1–3 e ngoài) có xu hướng nhường e; <b>phi kim</b> (5–7 e) có xu hướng nhận hoặc góp chung.<br><b>Công thức Lewis:</b> vẽ đủ e hoá trị, mỗi nguyên tử (trừ H) đủ 8 e.<br><b>Ngoại lệ:</b> một số chất không theo octet (như {BF3}, {PCl5}, {SF6}, {NO2})."
+  },
+  "k2": {
+   "ten": "Liên kết ion",
+   "rule": "<b>Hình thành:</b> <b>lực hút tĩnh điện</b> giữa ion dương và ion âm; kim loại điển hình nhường e, phi kim điển hình nhận e ({Na} → {Na}<sup>+</sup> + e; {Cl} + e → {Cl}<sup>−</sup>).<br><b>Ion đơn nguyên tử, đa nguyên tử:</b> {Na}<sup>+</sup>, {Cl}<sup>−</sup>; {NH4}<sup>+</sup>, {SO4}<sup>2−</sup>, {NO3}<sup>−</sup>.<br><b>Hợp chất ion:</b> tinh thể, rắn ở điều kiện thường, nóng chảy và sôi cao, khi nóng chảy hoặc tan trong nước thì dẫn điện; ở thể rắn không dẫn điện.<br><b>Cấu hình ion:</b> ion bền thường có cấu hình khí hiếm gần kề."
+  },
+  "k3": {
+   "ten": "Cộng hoá trị & độ âm điện",
+   "rule": "<b>Hình thành:</b> dùng chung cặp e; đơn 1 cặp, đôi 2 cặp, ba 3 cặp ({H2} 1, {O2} 2, {N2} 3, {F2} 1).<br><b>Cho – nhận:</b> cặp e chung do <b>một</b> nguyên tử góp (vẽ mũi tên), như trong {NH4}<sup>+</sup>.<br><b>Theo hiệu độ âm điện Δχ:</b> 0 ≤ Δχ < 0,4 cộng hoá trị không phân cực; 0,4 ≤ Δχ < 1,7 cộng hoá trị phân cực; Δχ ≥ 1,7 thường là ion.<br><b>Không phân cực:</b> hai nguyên tử giống nhau ({Br2}, {Cl2}); phân cực: cặp e lệch về nguyên tử có χ lớn hơn.<br><b>Phân tử:</b> phân cực hay không còn tuỳ hình học ({CO2} thẳng nên không phân cực dù liên kết phân cực)."
+  },
+  "k4": {
+   "ten": "Liên kết σ, π, xen phủ",
+   "rule": "<b>σ:</b> xen phủ <b>trục</b> (s–s, s–p, p–p dọc trục nối hai hạt nhân), bền.<br><b>π:</b> xen phủ <b>bên</b> hai AO p song song, kém bền hơn σ.<br><b>Đếm:</b> liên kết đơn = 1σ; đôi = 1σ + 1π; ba = 1σ + 2π.<br><b>Ví dụ:</b> {H2} s–s; {HCl} s–p; {Cl2} p–p; {N2} có 1σ + 2π.<br><b>Vùng xen phủ</b> càng lớn thì liên kết càng bền."
+  },
+  "k5": {
+   "ten": "Năng lượng liên kết",
+   "rule": "<b>Định nghĩa:</b> E<sub>b</sub> là năng lượng cần để <b>phá</b> 1 mol liên kết ở thể khí (kJ/mol).<br><b>So sánh:</b> E<sub>b</sub> càng lớn → liên kết càng <b>bền</b>, độ dài liên kết thường càng ngắn; ba > đôi > đơn giữa cùng hai nguyên tử.<br><b>Tính biến thiên enthalpy</b> (các chất đều ở thể khí): <b>Δ<sub>r</sub>H = ΣE<sub>b</sub>(chất đầu) − ΣE<sub>b</sub>(sản phẩm)</b>.<br><b>Đếm đủ:</b> nhân E<sub>b</sub> với số liên kết trong phân tử và hệ số phương trình."
+  },
+  "k6": {
+   "ten": "Liên kết hydrogen",
+   "rule": "<b>Điều kiện:</b> nguyên tử H liên kết với <b>F, O hoặc N</b> (độ âm điện lớn) hút tĩnh điện với một nguyên tử F, O, N khác còn <b>cặp e tự do</b>; biểu diễn bằng dấu •••.<br><b>Có:</b> {H2O}, {NH3}, {HF}, alcohol, carboxylic acid; <b>không có</b> giữa các phân tử {CH4}, {H2S}, {HCl}.<br><b>Hệ quả:</b> nhiệt độ sôi, nóng chảy <b>cao bất thường</b> ({H2O} so với {H2S}); tan tốt trong nước; nước đá nhẹ hơn nước lỏng.<br><b>Vai trò sinh học:</b> giữ chuỗi xoắn kép DNA, cấu trúc protein.<br><b>Độ mạnh:</b> yếu hơn liên kết cộng hoá trị và ion, mạnh hơn van der Waals."
+  },
+  "k7": {
+   "ten": "Tương tác van der Waals",
+   "rule": "<b>Bản chất:</b> tương tác tĩnh điện <b>lưỡng cực – lưỡng cực</b> giữa các <b>nguyên tử hay phân tử</b> (lưỡng cực tạm thời hoặc cảm ứng).<br><b>Độ mạnh:</b> tăng khi <b>khối lượng phân tử</b> và <b>kích thước, diện tích tiếp xúc</b> tăng.<br><b>Hệ quả:</b> cùng loại phân tử không có liên kết hydrogen, M lớn hơn → sôi cao hơn ({F2} < {Cl2} < {Br2} < {I2}; khí hiếm He → Rn).<br><b>Phân biệt:</b> sôi, nóng chảy phụ thuộc lực <b>giữa</b> các phân tử, không phá liên kết trong phân tử."
+  }
+ },
+ "TRAPS_THEM": {
+  "trongngoai": {
+   "ten": "Trong hay giữa phân tử",
+   "hoi": "Nhiệt độ sôi do lực giữa các phân tử (hydrogen, van der Waals), không do liên kết cộng hoá trị trong phân tử. Đề đang nói lực nào?"
+  },
+  "dieukienhydro": {
+   "ten": "Sai điều kiện liên kết H",
+   "hoi": "H có gắn trực tiếp vào F, O hoặc N không? Phía nhận có cặp e tự do trên F, O, N không?"
+  },
+  "dempi": {
+   "ten": "Đếm sai σ và π",
+   "hoi": "Mỗi liên kết bội chỉ có đúng một σ; liên kết đôi 1π, ba 2π. Đã đếm từng liên kết chưa?"
+  }
+ },
+ "DANG_KEY": {
+  "LIEN_KET.LIEN_KET_CHT.DEM_NGUYEN_TU": "k3",
+  "LIEN_KET.VAN_DER_WAALS.SO_SANH": "k7",
+  "LIEN_KET.VAN_DER_WAALS.GIAI_THICH": "k7",
+  "LIEN_KET.LIEN_KET_HYDROGEN.NHAN_DANG": "k6",
+  "LIEN_KET.NANG_LUONG_LIEN_KET.CHON_PHAT_BIEU": "k5",
+  "LIEN_KET.LIEN_KET_CHT.CHON_PHAT_BIEU": "k3",
+  "LIEN_KET.LIEN_KET_HYDROGEN.CHON_PHAT_BIEU": "k6",
+  "LIEN_KET.LIEN_KET_HYDROGEN.DEM_DONG_PHAN": "k6",
+  "LIEN_KET.LIEN_KET_CHT.NHAN_DANG": "k3",
+  "LIEN_KET.XEN_PHU_AO.NHAN_DANG": "k4",
+  "LIEN_KET.XEN_PHU_AO.DEM_NGUYEN_TU": "k4",
+  "LIEN_KET.LIEN_KET_CHT.DEM_DONG_PHAN": "k3",
+  "LIEN_KET.NANG_LUONG_LIEN_KET.TINH_NANG_LUONG": "k5",
+  "LIEN_KET.LIEN_KET_ION.CHON_PHAT_BIEU": "k2",
+  "LIEN_KET.QUY_TAC_OCTET.NHAN_DANG": "k1"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Ngưỡng Δχ (0,4 và 1,7) chỉ để tham khảo theo SGK 2018; đề hỏi loại liên kết thì dùng ngưỡng này, trừ khi đề nêu rõ ngoại lệ.",
+  "Van der Waals: 'giữa các nguyên tử hay phân tử' (khớp đáp án kho), không chỉ giữa phân tử.",
+  "Δ<sub>r</sub>H từ năng lượng liên kết chỉ áp dụng khi mọi chất ở thể khí."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

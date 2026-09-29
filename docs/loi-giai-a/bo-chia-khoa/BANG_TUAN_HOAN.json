@@ -1,0 +1,103 @@
+{
+ "ma": "BANG_TUAN_HOAN",
+ "chuong": "Bảng tuần hoàn",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Cấu trúc bảng tuần hoàn",
+   "rule": "<b>Nguyên tắc xếp:</b> theo chiều tăng <b>Z</b>; cùng số lớp e → một hàng (chu kì); cùng số e hoá trị → một cột (nhóm).<br><b>Ô:</b> số thứ tự ô = Z = số p = số e.<br><b>Chu kì:</b> 7 chu kì; chu kì nhỏ 1, 2, 3 có 2, 8, 8 nguyên tố; chu kì lớn 4–7 (18, 18, 32, 32).<br><b>Nhóm:</b> 18 cột = 8 nhóm A (khối s, p) + 8 nhóm B (khối d, f; nhóm VIIIB gồm 3 cột).<br><b>Họ f:</b> lanthanide, actinide đặt riêng hai hàng cuối bảng."
+  },
+  "k2": {
+   "ten": "Cấu hình → vị trí",
+   "rule": "<b>Chu kì</b> = số lớp e (n lớn nhất).<br><b>Nhóm A</b> (e cuối vào s hoặc p): số nhóm = <b>số e lớp ngoài cùng</b> ns<sup>a</sup>np<sup>b</sup> → a + b.<br><b>Nhóm B</b> (e cuối vào d): (n−1)d<sup>x</sup>ns<sup>y</sup>, x + y = 3–7 → nhóm (x + y)B; <b>8, 9, 10 → VIIIB</b>; 11 → IB; 12 → IIB.<br><b>Ngược lại:</b> từ chu kì + nhóm viết cấu hình lớp ngoài → Z.<br><b>Ion:</b> tìm cấu hình nguyên tử trước (cộng/trừ lại e) rồi mới xét vị trí."
+  },
+  "k3": {
+   "ten": "Xu hướng biến đổi",
+   "rule": "<b>Trong chu kì</b> (trái → phải): bán kính <b>giảm</b>, độ âm điện <b>tăng</b>, tính kim loại giảm, tính phi kim tăng.<br><b>Trong nhóm A</b> (trên → dưới): bán kính <b>tăng</b>, độ âm điện <b>giảm</b>, tính kim loại tăng, tính phi kim giảm.<br><b>Sắp dãy:</b> đặt các nguyên tố lên bảng, so cùng chu kì hoặc cùng nhóm, rồi nối qua nguyên tố trung gian.<br><b>Cực trị:</b> F độ âm điện lớn nhất (3,98); Cs kim loại mạnh nhất (bỏ qua nguyên tố phóng xạ); He bán kính nhỏ nhất.<br><b>Biến đổi tuần hoàn:</b> số e lớp ngoài cùng, bán kính, độ âm điện, hoá trị cao nhất; <b>không</b> tuần hoàn: số lớp e, nguyên tử khối, tổng số e."
+  },
+  "k4": {
+   "ten": "Giải thích xu hướng",
+   "rule": "<b>Chu kì:</b> số lớp e <b>không đổi</b>, điện tích hạt nhân tăng → hút e ngoài mạnh hơn → bán kính giảm, khó nhường e, dễ nhận e.<br><b>Nhóm A:</b> số lớp e <b>tăng</b>, bán kính tăng chiếm ưu thế → lực hút e ngoài giảm → dễ nhường e.<br><b>Định nghĩa:</b> tính kim loại = dễ <b>nhường e</b> thành ion dương; tính phi kim = dễ <b>nhận e</b> thành ion âm; độ âm điện = khả năng hút cặp e liên kết.<br><b>Ion cùng số e:</b> Z lớn hơn → bán kính nhỏ hơn ({Na}<sup>+</sup> nhỏ hơn {F}<sup>−</sup>); cation nhỏ hơn nguyên tử, anion lớn hơn nguyên tử.<br><b>Liên kết cộng hoá trị:</b> bán kính = ½ khoảng cách hai hạt nhân ({H2}: 74 pm → 37 pm)."
+  },
+  "k5": {
+   "ten": "Kim loại, phi kim, khí hiếm",
+   "rule": "<b>Theo e lớp ngoài cùng:</b> 1–3 e: kim loại (trừ H, He, B); 5–7 e: phi kim; 8 e (He 2 e): khí hiếm.<br><b>Theo vị trí:</b> kim loại ở <b>dưới – bên trái</b>, phi kim ở <b>trên – bên phải</b>; mọi nguyên tố nhóm B là kim loại.<br><b>Nhóm tiêu biểu:</b> IA kim loại kiềm (ns<sup>1</sup>), IIA kiềm thổ (ns<sup>2</sup>), VIIA halogen (ns<sup>2</sup>np<sup>5</sup>), VIIIA khí hiếm.<br><b>Hoạt động:</b> kim loại kiềm tác dụng mạnh với nước tạo kiềm + {H2}; mạnh dần từ Li đến Cs."
+  },
+  "k6": {
+   "ten": "Oxide & hydroxide",
+   "rule": "<b>Hoá trị cao nhất với O</b> = số thứ tự nhóm A (n): oxide cao nhất R<sub>2</sub>O<sub>n</sub> ({Na2O}, {MgO}, {Al2O3}, {SiO2}, {P2O5}, {SO3}, {Cl2O7}).<br><b>Với H</b> (nhóm IVA–VIIA): {RH}<sub>8−n</sub>; hoá trị với O + với H = 8.<br><b>Chu kì 3:</b> {NaOH} base mạnh, {Mg(OH)2} base yếu, {Al(OH)3} lưỡng tính, {H2SiO3} acid yếu, {H3PO4} trung bình, {H2SO4} mạnh, {HClO4} rất mạnh.<br><b>Quy luật:</b> trong chu kì tính base của oxide, hydroxide <b>giảm</b>, tính acid <b>tăng</b>; trong nhóm A tính base tăng.<br><b>F:</b> không có oxide cao nhất ứng với nhóm VIIA."
+  },
+  "k7": {
+   "ten": "Tính theo công thức",
+   "rule": "<b>Tìm R từ %:</b> oxide cao nhất R<sub>2</sub>O<sub>n</sub>: %R = 2R : (2R + 16n); hợp chất khí với H {RH}<sub>8−n</sub>: %H = (8 − n) : (R + 8 − n); thử n theo nhóm.<br><b>Kim loại + nước/acid:</b> nhóm IA: n<sub>{H2}</sub> = n<sub>M</sub> : 2; nhóm IIA: n<sub>{H2}</sub> = n<sub>M</sub>; M = m : n.<br><b>Hai kim loại kế tiếp trong nhóm:</b> M trung bình nằm giữa hai nguyên tử khối.<br><b>Nồng độ:</b> m<sub>dd</sub> = m<sub>kim loại</sub> + m<sub>nước</sub> − m<sub>{H2}</sub>; C% = m<sub>chất tan</sub> : m<sub>dd</sub> × 100%.<br><b>Kiểm lại:</b> R tìm được phải đúng nhóm đã giả sử."
+  }
+ },
+ "TRAPS_THEM": {
+  "hoatri": {
+   "ten": "Nhầm hoá trị O và H",
+   "hoi": "Nhóm n: hoá trị cao nhất với oxygen là n, với hydrogen là 8 − n. Đề cho hợp chất nào?"
+  },
+  "nhomab": {
+   "ten": "Nhầm nhóm A và B",
+   "hoi": "E cuối điền vào d thì nhóm B, phải cộng cả e (n−1)d và ns; e lớp ngoài cùng chỉ quyết định nhóm A."
+  },
+  "bankinhion": {
+   "ten": "Bán kính ion",
+   "hoi": "Các ion cùng số electron: Z lớn hơn thì bán kính nhỏ hơn. Đang so nguyên tử hay ion?"
+  }
+ },
+ "DANG_KEY": {
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.NHAN_DANG": "k3",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.NHAN_DANG": "k1",
+  "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.NHAN_DANG": "k2",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.XAC_DINH_DIEN_TICH": "k4",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.SO_SANH": "k3",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.CHON_PHAT_BIEU": "k3",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.GIAI_THICH": "k4",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.CHON_PHAT_BIEU": "k5",
+  "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU": "k2",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.CHON_PHAT_BIEU": "k1",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.GIAI_THICH": "k1",
+  "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.DEM_NGUYEN_TU": "k2",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.DEM_NGUYEN_TU": "k3",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.DEM_NGUYEN_TU": "k5",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.DEM_DONG_PHAN": "k3",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.NHAN_DANG": "k5",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.TINH_PHAN_TRAM": "k7",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.XAC_DINH_CHAT": "k7",
+  "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.XAC_DINH_CHAT": "k3",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.DEM_NGUYEN_TU": "k6",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.XAC_DINH_DIEN_TICH": "k2",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_SO_MOL": "k7",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_KHOI_LUONG": "k7",
+  "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.TINH_PHAN_TRAM": "k7",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CHAT": "k7",
+  "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.XAC_DINH_CHAT": "k2",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_NGUYEN_TU": "k1",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.SO_SANH": "k3",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_DONG_PHAN": "k1",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_DIEN_TICH": "k6",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.NHAN_DANG": "k6",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.VIET_CTCT": "k2",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.CHON_PHAT_BIEU": "k6",
+  "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.DEM_DONG_PHAN": "k2",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.XAC_DINH_CTPT": "k7",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.SO_SANH": "k6",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.DEM_DONG_PHAN": "k5",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.VIET_CTCT": "k6",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.DEM_DONG_PHAN": "k6",
+  "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.NEU_HIEN_TUONG": "k5",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CTPT": "k7",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_NONG_DO": "k7",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_PHAN_TRAM": "k7",
+  "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.GIAI_THICH": "k6",
+  "BANG_TUAN_HOAN.CAU_TRUC_BTH.XAC_DINH_CHAT": "k2"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Nguyên tố bán kính nhỏ nhất: He (Z = 2) theo đáp án kho; GIỮ.",
+  "Tính kim loại mạnh nhất: Cs (bỏ qua nguyên tố phóng xạ như Fr) theo SGK 2018.",
+  "Chu kì 3: H3PO4 xếp acid trung bình, HClO4 acid rất mạnh, theo SGK 2018."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

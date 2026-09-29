@@ -80,5 +80,136 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "12-C2-B6-D2-II-42": {
+  "luc": "2026-09-29T08:25:09.442Z",
+  "cau": {
+   "phan": "II",
+   "so": 42,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát. Đun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.",
+    "b": "Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)₂ trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan đần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nhiệm, thấy có kết tủa màu nâu đỏ.",
+    "c": "Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.",
+    "d": "Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt acid HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống nghiệm."
+   },
+   "loi_giai": {
+    "chot": "Saccharose không còn -OH hemiacetal nên không tráng bạc; phải thuỷ phân bằng acid thành glucose và fructose thì mới có phản ứng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: tinh bột không tan trong nước lạnh, đun nóng mới tạo hồ."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: nhiệt độ thường cho phức xanh lam, đun nóng cho kết tủa Cu₂O nâu đỏ."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: saccharose không có phản ứng tráng bạc."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: sau khi thuỷ phân sinh glucose nên có kết tủa bạc."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Ý c và ý d chỉ khác nhau ở chỗ có thuỷ phân trước hay không.",
+    "bay": "Saccharose KHÔNG tráng bạc; chỉ sau khi thuỷ phân bằng acid mới có kết tủa bạc."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-C2-B6-D2-III-41": {
+  "luc": "2026-09-29T08:25:09.442Z",
+  "cau": {
+   "phan": "III",
+   "so": 41,
+   "de": "Cho các phân tử: tinh bột, cellulose, saccharose, maltose và fructose.\nCó bao nhiêu phân tử có chứa liên kết a-1,4-glycoside?",
+   "dap_an": "2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "loi_giai": {
+    "chot": "Liên kết alpha-1,4-glycoside có ở tinh bột và maltose; cellulose là beta-1,4 còn saccharose là alpha-1,2.",
+    "buoc": [
+     "Tinh bột gồm các gốc alpha-glucose nối alpha-1,4-glycoside.",
+     "Maltose cũng nối bằng alpha-1,4-glycoside.",
+     "Cellulose là beta-1,4, saccharose là alpha-1,2 nên loại.",
+     "Fructose là monosaccharide, không có liên kết glycoside."
+    ],
+    "ket_qua": "2",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "2",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phải nhớ đúng kiểu liên kết của từng chất chứ không chỉ nhớ chất nào có glycoside.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }
