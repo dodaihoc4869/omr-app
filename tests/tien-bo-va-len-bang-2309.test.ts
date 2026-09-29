@@ -39,8 +39,9 @@ describe('Nhịp học và ví EXP', () => {
       expect(chuyenDoiLuatCap(r.hoSo,100,'2026-09-23').daChuyen).toBe(false)
     }
   })
-  it('khiên mở ngày 21; rèn dùng 1 400 vàng (luật v4), retry không rèn hai lần',()=>{
-    const p:HoSoGameExp={cap:10,exp:0,wallet:0,earned:0,luatCap:4,mocVang:0,expMoi:{daCong:0,manhDaTinh:0,ngayDat:0}}
+  // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): khiên quà đầu vẫn mở ngày 21; khiên RÈN cần 36 mảnh + 2 600 vàng + 36 ngày đạt (khiên thứ 2: 54 ngày).
+  it('khiên quà mở ngày 21; rèn ngày 36 bằng 2 600 vàng (v5), retry không rèn hai lần',()=>{
+    const p:HoSoGameExp={cap:10,exp:0,wallet:0,earned:0,luatCap:5,mocVang:0,expMoi:{daCong:0,manhDaTinh:0,ngayDat:0}}
     for(let d=1;d<=20;d++){
       congTongSoVaoHoSo(p,0,d,d)
       expect(khienConLai(p)).toBe(0)
@@ -48,12 +49,14 @@ describe('Nhịp học và ví EXP', () => {
     expect(()=>renKhienBangVang(p,0,9999)).toThrow()
     congTongSoVaoHoSo(p,0,21,21)
     expect(khienConLai(p)).toBe(1)
+    expect(()=>renKhienBangVang(p,0,9999)).toThrow(/36 ngày đạt/)
+    congTongSoVaoHoSo(p,0,36,36)
     expect(p.khienRen?.daRen).toBe(0)
-    expect(renKhienBangVang(p,0,1400)).toBe(true)
+    expect(renKhienBangVang(p,0,2600)).toBe(true)
     expect(p.khienRen).toEqual({manh:0,daRen:1})
-    expect(renKhienBangVang(p,0,1400)).toBe(false)
-    congTongSoVaoHoSo(p,0,42,42)
-    expect(()=>renKhienBangVang(p,1,1399)).toThrow(/vàng/)
+    expect(renKhienBangVang(p,0,2600)).toBe(false)
+    congTongSoVaoHoSo(p,0,72,72)
+    expect(()=>renKhienBangVang(p,1,2599)).toThrow(/vàng/)
   })
 })
 

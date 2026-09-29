@@ -140,7 +140,7 @@ describe('P08 nối route · ĐƯỜNG ĐỌC (trám số P08 lên bản hiển 
     // Luật v4 (29/09): mở hồ sơ cũ ⇒ chuyển MỘT lần, 500 EXP ống nghiệm vào thẳng thú (90 + 270 ⇒ cấp 3, dư 140); không còn ống. Sửa CÓ CHỦ Ý.
     expect(r.profile.wallet).toBe(0)
     expect(r.profile.ongNghiem).toBe(0)
-    expect([r.profile.cap, r.profile.exp]).toEqual([3, 140])
+    expect([r.profile.cap, r.profile.exp]).toEqual([3, 277]) // SỬA CÓ CHỦ Ý 29/09 v5: v4 cấp 3 dư 140/510 ⇒ v5 giữ cấp 3, tỉ lệ ⌊140/510 × 1 010⌋ = 277
     expect(r.profile.khienConLai).toBe(0)
   })
 
@@ -165,6 +165,6 @@ describe('P08 nối route · ĐƯỜNG ĐỌC (trám số P08 lên bản hiển 
     const r = await lay(d1)
     // Luật v4: số sổ cũ = hồ sơ đã chuyển (ống nghiệm 500 đã vào thú). Sửa CÓ CHỦ Ý.
     expect(r.profile.wallet).toBe(0)
-    expect([r.profile.cap, r.profile.exp]).toEqual([3, 140])
+    expect([r.profile.cap, r.profile.exp]).toEqual([3, 277]) // SỬA CÓ CHỦ Ý 29/09 v5: v4 cấp 3 dư 140/510 ⇒ v5 giữ cấp 3, tỉ lệ ⌊140/510 × 1 010⌋ = 277
   })
 })
