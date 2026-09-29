@@ -9,7 +9,7 @@ import { taoD1That, type D1That } from './_d1-that'
 import { demVongD1 } from './_dem-vong-d1'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
-import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
+import { xoaDemCaBaoVe, syncIndex, xoaDemSync } from '../server/src/game-v2-bank'
 import { gvChienDich } from '../server/src/srs2-gv'
 import type { Env } from '../server/src/kieu'
 
@@ -61,8 +61,10 @@ async function dung(): Promise<{ d: D1That; token: string; qs: ReturnType<typeof
   return { d, token, qs }
 }
 
-/** Ngưỡng của bản SAU tối ưu (đặt sau khi đo). */
-const NGUONG = (_x: unknown[]) => {}
+/** Ngưỡng của bản SAU tối ưu (main cũ: câu đúng 21 đợt, câu sai 10 đợt). Nới 1–2 đợt cho nhiễu CPU / lượt xác thực token hết đệm. */
+const NGUONG = (ds: (Do & { dung: boolean; k: number })[]) => {
+  for (const x of ds.filter((y) => y.k > 0)) expect(x.dot, `câu ${x.k} ${x.dung ? 'đúng' : 'sai'}`).toBeLessThanOrEqual(x.dung ? 7 : 5)
+}
 type Do = { vong: number; dot: number; r2: number; ms: number; sql: string[] }
 async function doMotLan(d: D1That, token: string, qid: string, answer: string, treGia: boolean): Promise<{ r: Record<string, unknown>; m: Do }> {
   let r2 = 0
@@ -132,4 +134,22 @@ describe('ĐO đường nóng khác của app HS (qua gameV2, như máy em gọi
       writeFileSync(`${process.env.DO_RA ?? '/tmp'}/do-${lenh}-sql.txt`, dem.sqlDot.map((s) => s.replace(/\s+/g, ' ').slice(0, 160)).join('\n'))
     }
   }, 60_000)
+})
+
+describe('sync (máy em gọi mỗi lần mở Đảo): đệm "đã đủ" + chia sẻ lượt đang chạy', () => {
+  it('đủ rồi ⇒ lượt sau 0 truy vấn; 20 lượt đồng thời ⇒ một lượt quét; thầy đổi de_kho ⇒ quét lại ngay', async () => {
+    const { d } = await dung()
+    const a = demVongD1(d.env)
+    await Promise.all(Array.from({ length: 20 }, () => syncIndex(a.env)))
+    expect(a.d.vong).toBeLessThanOrEqual(2) // một lượt quét (đếm còn lại + danh sách) cho cả 20 máy
+    const b = demVongD1(d.env)
+    expect(await syncIndex(b.env)).toEqual({ remaining: 0, indexed: 0 })
+    expect(b.d.vong).toBe(0)
+    // thầy nạp đề mới (index.ts gọi xoaDemSync sau khi ghi de_kho) ⇒ lượt kế tiếp thấy ngay
+    d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DEMOI','DEMOI','12',0,'kho/DEMOI.json',0,'v1')").run()
+    xoaDemSync()
+    const c = demVongD1(d.env)
+    await syncIndex(c.env).catch(() => null) // tờ mới chưa có gói R2 trong dựng mẫu ⇒ lập chỉ mục báo lỗi; điều cần kiểm: đã đi quét lại, không trả đệm
+    expect(c.d.vong).toBeGreaterThan(0)
+  })
 })

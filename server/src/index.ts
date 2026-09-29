@@ -53,7 +53,7 @@ import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
 import { shopBatCho } from './game-v2-shop'
-import { xoaDemCaBaoVe } from './game-v2-bank'
+import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
@@ -2176,6 +2176,7 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
     )
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
+  xoaDemSync() // de_kho vừa đổi ⇒ `sync` của em đếm lại ngay (đệm "đã đủ" 20 s, game-v2-bank.ts)
   // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
   let loiGiai: Record<string, unknown> | null = null
   if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
@@ -2226,6 +2227,7 @@ async function xoaDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   await env.DB.batch([
     env.DB.prepare('UPDATE de_kho SET da_xoa = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(khoiPhuc ? 0 : 1, nay, maDe),
   ])
+  xoaDemSync()
   return ra({ ok: true, maDe, daXoa: !khoiPhuc })
 }
 
@@ -2303,6 +2305,7 @@ async function dungChiMucKho(env: Env, b: Record<string, unknown>): Promise<Resp
     // Số câu THẬT của tờ đề lấy luôn từ gói — cột `so_cau` trước đây đếm theo
     // mảng máy thầy gửi, hai con số phải khớp nhau.
     await env.DB.prepare('UPDATE de_kho SET so_cau = ?, cap_nhat_luc = ? WHERE ma_de = ?').bind(cau.length, nay, maDe).run()
+    xoaDemSync()
     xong.push({ maDe, soCau: cau.length })
   }
 

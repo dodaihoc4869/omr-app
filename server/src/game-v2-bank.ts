@@ -1,5 +1,6 @@
 import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
 import {DemTTL} from './dem-chung'
+import {dbGoc} from './cau-hinh-dem'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import { docKhoDeGiaoCuaEm, locTheoKhoDeGiao } from './kho-de-giao'
 import type { Env } from './kieu'
@@ -81,8 +82,22 @@ export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:
   if(!row)return null
   try{return JSON.parse(row.json) as PrivateQuestion}catch{return null}
 }
+/** CAO ĐIỂM (29/09): mỗi lần em mở Đảo, máy em gọi `sync` (rồi lặp tới khi `remaining` = 0) ⇒ 300 em = 300+ lượt quét `de_kho` ×2 mỗi phút, và khi thầy vừa nạp đề
+ *  thì MỌI máy cùng lập chỉ mục CÙNG một tờ. Nay: (1) kết quả "đã đủ" (`remaining` = 0) đệm 20 s trong isolate; (2) lượt `sync` đang chạy được chia sẻ (không lập trùng).
+ *  Thầy ghi `de_kho` (nạp / sửa / xoá đề) ⇒ `xoaDemSync()` ngay (isolate đó); isolate khác trễ ≤ 20 s — câu của tờ lệch nguồn vẫn tự đồng bộ khi phục vụ (`docCauTheoRef`). */
+const demSyncDu=new DemTTL<true>(20_000,2)
+const syncDangBay=new WeakMap<object,Promise<{remaining:number;indexed:number}>>()
+export function xoaDemSync():void{demSyncDu.xoa()}
+export function syncIndex(env:Env):Promise<{remaining:number;indexed:number}> {
+  if(demSyncDu.doc('du',Date.now()))return Promise.resolve({remaining:0,indexed:0})
+  const k=dbGoc(env.DB as unknown as object),bay=syncDangBay.get(k)
+  if(bay)return bay
+  const p=syncIndexTho(env).then(r=>{if(r.remaining===0)demSyncDu.ghi('du',Date.now(),true);return r}).finally(()=>{if(syncDangBay.get(k)===p)syncDangBay.delete(k)})
+  syncDangBay.set(k,p)
+  return p
+}
 /** Work is bounded per call; cursor/checkpoints cover the entire bank, not eight sheets. */
-export async function syncIndex(env:Env):Promise<{remaining:number;indexed:number}> {
+async function syncIndexTho(env:Env):Promise<{remaining:number;indexed:number}> {
   const pending=await env.DB.prepare(`SELECT d.ma_de,d.r2_khoa,d.cap_nhat_luc FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 3`).all<Row>()
   let indexed=0
   for(const d of pending.results){await lapChiMucTo(env,d);indexed++}
