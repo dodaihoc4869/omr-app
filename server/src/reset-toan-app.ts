@@ -167,6 +167,8 @@ export const BANG_GIU: readonly string[] = [
   'chien_dich', 'srs2_ke_hoach', 'srs2_day_lai', 'ruong_bat_linh',
   // Nhãn "Thầy đã chữa" (dau-gio.ts, 29/09) — đi cùng mốc dạy lại `srs2_day_lai` ⇒ GIỮ.
   'thay_da_chua',
+  // LỜI GIẢI TỪNG BƯỚC (loi-giai.ts, 29/09): hồ sơ lời giải thầy duyệt + chỉ mục câu + hàng soạn — HỌC LIỆU, không phải tiến độ game ⇒ GIỮ.
+  'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
   'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
 ]
