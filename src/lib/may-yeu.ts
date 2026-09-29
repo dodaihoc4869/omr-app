@@ -1,7 +1,10 @@
 // CHẾ ĐỘ MÁY YẾU (thầy 29/09: "máy cấu hình yếu có vào mượt được không").
 //
-// Tự bật, em KHÔNG phải chọn: máy ít RAM (navigator.deviceMemory ≤ 3 GB), ít lõi (hardwareConcurrency ≤ 4),
-// máy xin giảm chuyển động (prefers-reduced-motion) hoặc bật tiết kiệm dữ liệu (connection.saveData)
+// Tự bật, em KHÔNG phải chọn:
+//   · Chrome/Android (CÓ navigator.deviceMemory): RAM ≤ 3 GB hoặc ≤ 4 luồng CPU;
+//   · Safari/iOS (KHÔNG có deviceMemory): iOS/iPadOS < 16 (đọc "OS 15_…" trong userAgent) hoặc ≤ 2 luồng —
+//     Boss soát 29/09: không dùng "≤ 4 luồng" ở đây vì iPhone đời mới cũng báo ≤ 4 ⇒ mất kính mờ vô lý;
+//   · mọi máy: xin giảm chuyển động (prefers-reduced-motion) hoặc bật tiết kiệm dữ liệu (connection.saveData)
 // ⇒ gắn lớp `may-yeu` lên <html>. `src/styles/may-yeu.css` đọc lớp này để tắt kính mờ (backdrop-filter),
 // giảm bóng đổ lớn, cho hoạt ảnh trang trí chạy một lượt rồi đứng; các công tắc hiệu ứng nặng sẵn có
 // (hạt sáng / thị sai / pháo của Sảnh và Đảo, bản giản lược của chương trận đấu) hỏi `giamHieuUng()`.
@@ -20,14 +23,29 @@ export type DauHieuMay = {
   tietKiemDuLieu?: boolean
   /** matchMedia('(prefers-reduced-motion: reduce)'). */
   giamChuyenDong?: boolean
+  /** Số phiên bản chính iOS/iPadOS đọc từ userAgent (không phải máy Apple di động ⇒ để trống). */
+  phienBanIos?: number
+}
+
+const soHopLe = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n > 0
+
+/** Đọc phiên bản chính iOS/iPadOS từ userAgent: "iPhone; CPU iPhone OS 15_4 like Mac OS X" / "iPad; CPU OS 16_1 …" ⇒ 15 / 16.
+ *  iPadOS giả "Macintosh" thì không đọc được ⇒ undefined. KHÔNG dùng nhìn lùi (Safari cũ sập). */
+export function docPhienBanIos(ua: string | undefined | null): number | undefined {
+  const m = /(?:iPhone|iPad|iPod)[^)]*? OS (\d+)_/.exec(ua || '')
+  if (!m) return undefined
+  const v = Number(m[1])
+  return Number.isFinite(v) && v > 0 ? v : undefined
 }
 
 /** Máy có dấu hiệu yếu? Số không có / không hợp lệ ⇒ bỏ qua vế đó (không đoán). */
 export function laMayYeu(d: DauHieuMay): boolean {
   if (d.giamChuyenDong || d.tietKiemDuLieu) return true
-  if (typeof d.boNhoGb === 'number' && Number.isFinite(d.boNhoGb) && d.boNhoGb > 0 && d.boNhoGb <= 3) return true
-  if (typeof d.soLoi === 'number' && Number.isFinite(d.soLoi) && d.soLoi > 0 && d.soLoi <= 4) return true
-  return false
+  // Trình duyệt CÓ deviceMemory (Chrome/Android): RAM ≤ 3 GB hoặc ≤ 4 luồng.
+  if (soHopLe(d.boNhoGb)) return d.boNhoGb <= 3 || (soHopLe(d.soLoi) && d.soLoi <= 4)
+  // KHÔNG có deviceMemory (Safari/iOS, Firefox): iOS < 16 hoặc ≤ 2 luồng.
+  if (soHopLe(d.phienBanIos) && d.phienBanIos < 16) return true
+  return soHopLe(d.soLoi) && d.soLoi <= 2
 }
 
 type NavigatorMay = Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } }
@@ -48,6 +66,8 @@ export function docDauHieuMay(w: Window = window): DauHieuMay {
     if (n && typeof n.deviceMemory === 'number') d.boNhoGb = n.deviceMemory
     if (n && typeof n.hardwareConcurrency === 'number') d.soLoi = n.hardwareConcurrency
     if (n && n.connection && typeof n.connection.saveData === 'boolean') d.tietKiemDuLieu = n.connection.saveData
+    const ios = docPhienBanIos(n?.userAgent)
+    if (ios !== undefined) d.phienBanIos = ios
   } catch {
     /* trình duyệt chặn đọc — coi như không có dấu hiệu */
   }

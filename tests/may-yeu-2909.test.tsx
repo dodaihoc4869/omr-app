@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { render, waitFor } from '@testing-library/react'
-import { laMayYeu, batCheDoMayYeu, docDauHieuMay, giamHieuUng, dangCheDoMayYeu, LOP_MAY_YEU } from '../src/lib/may-yeu'
+import { laMayYeu, docPhienBanIos, batCheDoMayYeu, docDauHieuMay, giamHieuUng, dangCheDoMayYeu, LOP_MAY_YEU } from '../src/lib/may-yeu'
 import { giamChuyenDong, hat } from '../src/components/hoa2/hieu-ung-sanh'
 import { giamChuyenDong as giamChuong } from '../src/game/than-thu-v2/dao2/ChuongTranDau'
 import ExperimentDemo from '../src/components/ExperimentDemo'
@@ -24,7 +24,8 @@ describe('laMayYeu — bốn dấu hiệu, thiếu số thì không đoán', () 
   it('RAM ≤ 3 GB, ≤ 4 luồng, giảm chuyển động, tiết kiệm dữ liệu ⇒ yếu', () => {
     expect(laMayYeu({ boNhoGb: 2 })).toBe(true)
     expect(laMayYeu({ boNhoGb: 3 })).toBe(true)
-    expect(laMayYeu({ soLoi: 4 })).toBe(true)
+    expect(laMayYeu({ boNhoGb: 8, soLoi: 4 })).toBe(true)
+    expect(laMayYeu({ soLoi: 2 })).toBe(true)
     expect(laMayYeu({ soLoi: 2, boNhoGb: 8 })).toBe(true)
     expect(laMayYeu({ giamChuyenDong: true, boNhoGb: 8, soLoi: 8 })).toBe(true)
     expect(laMayYeu({ tietKiemDuLieu: true, boNhoGb: 8, soLoi: 8 })).toBe(true)
@@ -35,6 +36,30 @@ describe('laMayYeu — bốn dấu hiệu, thiếu số thì không đoán', () 
     expect(laMayYeu({})).toBe(false)
     expect(laMayYeu({ boNhoGb: 0, soLoi: 0 })).toBe(false)
     expect(laMayYeu({ boNhoGb: Number.NaN })).toBe(false)
+    // không có deviceMemory (Safari/Firefox): 4 luồng KHÔNG đủ để coi là yếu
+    expect(laMayYeu({ soLoi: 4 })).toBe(false)
+  })
+  const IOS17 = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
+  const IOS15 = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6 Mobile/15E148 Safari/604.1'
+  const ANDROID = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36'
+  it('Boss soát 29/09 — bốn ca thật', () => {
+    // iPhone iOS 17, 6 lõi, không deviceMemory ⇒ KHÔNG
+    expect(batCheDoMayYeu(cuaSoGia({ userAgent: IOS17, hardwareConcurrency: 6 }))).toBe(false)
+    // iPhone iOS 15 (iPhone 7–8) ⇒ CÓ
+    expect(batCheDoMayYeu(cuaSoGia({ userAgent: IOS15, hardwareConcurrency: 2 }))).toBe(true)
+    expect(laMayYeu({ phienBanIos: 15, soLoi: 6 })).toBe(true)
+    // Android 2 GB ⇒ CÓ
+    expect(batCheDoMayYeu(cuaSoGia({ userAgent: ANDROID, deviceMemory: 2, hardwareConcurrency: 8 }))).toBe(true)
+    // Android 8 GB 8 lõi ⇒ KHÔNG
+    expect(batCheDoMayYeu(cuaSoGia({ userAgent: ANDROID, deviceMemory: 8, hardwareConcurrency: 8 }))).toBe(false)
+  })
+  it('đọc phiên bản iOS/iPadOS từ userAgent; máy khác ⇒ undefined', () => {
+    expect(docPhienBanIos(IOS17)).toBe(17)
+    expect(docPhienBanIos(IOS15)).toBe(15)
+    expect(docPhienBanIos('Mozilla/5.0 (iPad; CPU OS 14_8 like Mac OS X) AppleWebKit/605.1.15')).toBe(14)
+    expect(docPhienBanIos(ANDROID)).toBeUndefined()
+    expect(docPhienBanIos('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15')).toBeUndefined()
+    expect(docPhienBanIos(undefined)).toBeUndefined()
   })
   it('batCheDoMayYeu gắn lớp may-yeu lên <html> chỉ khi máy yếu; đọc được navigator.connection.saveData', () => {
     const yeu = cuaSoGia({ deviceMemory: 2, hardwareConcurrency: 8 })
