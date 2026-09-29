@@ -131,3 +131,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 19:52 · Gộp PR #84 màn thi điện thoại xoay ngang (bỏ phiếu điền ô, câu dài chia 2 cột + thanh kéo, thanh trên 32 px; dọc/máy tính giữ nguyên) · main 1dc3912 · 0 ca mở · 224 test màn thi xanh · lùi: git revert -m 1 1dc3912.
 - 19:50 · Deploy #581 THÀNH CÔNG: PR #84 màn thi ngang · main 1dc3912 · lùi: git revert -m 1 1dc3912.
 - 20:28 · Boss · merge PR #85 Bi-a mắt thần luôn bật + Trả lời câu hỏi (merge 40786b5) · không ca mở · lùi: git revert -m1 40786b5
+- 20:37 · deploy #85 xanh (run 582)
+- 20:41 · Boss · merge PR #86 Theo dõi ca chỉ khu trên + công tắc Giao chiến dịch + bỏ khối Câu hỏi của em (merge afbb205) · không ca mở · lùi: git revert -m1 afbb205
