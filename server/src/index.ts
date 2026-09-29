@@ -255,10 +255,13 @@ export function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: str
 
   const lap = doiTuong(goi.lap)[sbd]
   const dem = doiTuong(goi.dem)[sbd]
+  // Ca "Không rút câu sai" (29/09): nhãn "đã làm ở ca dd/mm" của CHÍNH em — chỉ qid + ngày, không đáp án.
+  const daLam = doiTuong(goi.daLam)[sbd]
   return {
     bo: { [sbd]: cua },
     lap: Array.isArray(lap) ? { [sbd]: lap } : {},
     dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
+    ...(daLam && typeof daLam === 'object' && !Array.isArray(daLam) ? { daLam: { [sbd]: daLam } } : {}),
     // BIÊN BẢN là ghi chép của THẦY về cả lớp — không đi xuống máy em.
     bb: null,
   }
@@ -1258,7 +1261,7 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       // ca này phát đề riêng từng em; thiếu nó là thầy bấm Bắt đầu mà cả lớp
       // nhận chung một đề.
       deRieng: Number(ca.de_rieng ?? 0) === 1,
-      phamViHoiLai: String(ca.pham_vi_hoi_lai ?? '') === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+      phamViHoiLai: ['ba_ca', 'khong'].includes(String(ca.pham_vi_hoi_lai ?? '')) ? String(ca.pham_vi_hoi_lai) : 'gan_nhat',
       danhSachChon: doJson(ca.danh_sach_chon_json),
     },
     luot,

@@ -1430,7 +1430,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // hoặc máy chủ bản cũ) — mất dấu giữa chừng còn khó hiểu hơn không có dấu.
       const cauLap = (kq.cauLap && kq.cauLap.length > 0 ? kq.cauLap : existing?.cauLap) ?? []
       const demLap = (kq.demLap && Object.keys(kq.demLap).length > 0 ? kq.demLap : existing?.demLap) ?? {}
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap }
+      const daLamLai = (kq.daLamLai && Object.keys(kq.daLamLai).length > 0 ? kq.daLamLai : existing?.daLamLai) ?? {}
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap, daLamLai }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -3246,6 +3247,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // CÂU HỎI LẠI — tra bằng Set để 40 câu không thành 40 lần duyệt mảng.
   const boHoiLai = new Set(attempt.cauLap ?? [])
   const nhanHoiLai = (qid: string) => (boHoiLai.has(qid) ? {} : undefined)
+  // CA "KHÔNG RÚT CÂU SAI" (29/09): câu kho thiếu phải phát lại — nói thật là em đã làm.
+  const daLamLai = attempt.daLamLai ?? {}
+  const nhanDaLam = (qid: string) => (qid in daLamLai ? { ngay: daLamLai[qid] ?? '' } : undefined)
 
   let stt = 0
   const renderPhan = (phan: PhanKey) => {
@@ -3267,6 +3271,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 stt={stt}
                 id={`cau-${stt}`}
                 cauHoiLai={nhanHoiLai(item.qid)}
+                daLamO={nhanDaLam(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
@@ -3296,6 +3301,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 stt={stt}
                 id={`cau-${stt}`}
                 cauHoiLai={nhanHoiLai(item.qid)}
+                daLamO={nhanDaLam(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
@@ -3325,6 +3331,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 stt={stt}
                 id={`cau-${stt}`}
                 cauHoiLai={nhanHoiLai(item.qid)}
+                daLamO={nhanDaLam(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}

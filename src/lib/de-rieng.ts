@@ -28,6 +28,64 @@ export interface CaTruocDaCham {
   daLamCua: Record<string, string[]>
   /** sbd → qid em LÀM SAI ở ca đó (đã bỏ hoặc giữ câu trống theo cấu hình). */
   saiCua: Record<string, string[]>
+  /** Mốc mở ca (ISO hoặc 'YYYY-MM-DD'). Chỉ để in nhãn "Đã làm ở ca kiểm tra dd/mm"
+   * ở chế độ Không rút câu sai. Thiếu ⇒ nhãn không có ngày. */
+  ngay?: string
+}
+
+// ---------------------------------------------------------------------------
+// CHẾ ĐỘ "KHÔNG RÚT CÂU SAI" (đặc tả 29/09 mục C)
+// ---------------------------------------------------------------------------
+
+/** 'dd/mm' theo giờ VN của một mốc ca. Hỏng/thiếu ⇒ ''. */
+export function ngayNganCa(ngay: string | undefined): string {
+  const t = String(ngay ?? '').trim()
+  if (!t) return ''
+  const chiNgay = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t)
+  if (chiNgay) return `${chiNgay[3]}/${chiNgay[2]}`
+  const ms = Date.parse(t)
+  if (!Number.isFinite(ms)) return ''
+  const d = new Date(ms + 7 * 3600_000)
+  return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+}
+
+/** MỌI CÂU EM ĐÃ GẶP ở các ca kiểm tra trước (cả đúng lẫn sai), qid → ca GẦN NHẤT
+ * em gặp câu đó. Thứ tự chèn = MỚI NHẤT trước (`dsCa` đã mới nhất trước) — đúng
+ * thứ tự tập cấm cần: kho mỏng thì nới từ CUỐI, tức câu làm lâu nhất trước. */
+export function cauDaGapCuaEm(dsCa: CaTruocDaCham[], sbd: string): Map<string, CaTruocDaCham> {
+  const ra = new Map<string, CaTruocDaCham>()
+  for (const ca of dsCa) {
+    for (const q of ca.daLamCua[sbd] ?? []) if (!ra.has(q)) ra.set(q, ca)
+    // Câu sai chắc chắn là câu đã làm — gộp luôn phòng khi bản đồ `lam` thưa.
+    for (const q of ca.saiCua[sbd] ?? []) if (!ra.has(q)) ra.set(q, ca)
+  }
+  return ra
+}
+
+/** TẬP CẤM CỦA MỘT EM ở chế độ Không rút câu sai, trong kho một phần.
+ * Câu đã gặp ở ca kiểm tra đứng TRƯỚC (mới nhất → cũ nhất), câu vừa làm trong tuần
+ * ở nguồn khác (BTVN, game — `lam` của hồ sơ ôn) đứng SAU: kho mỏng thì nới nhóm
+ * đó trước, rồi mới tới câu ca kiểm tra cũ nhất. */
+function camKhongRutCauSai(daGap: Map<string, CaTruocDaCham>, lamTuan: string[], trongPool: Set<string>, daCo: Set<string>): string[] {
+  const ra: string[] = []
+  for (const q of daGap.keys()) if (trongPool.has(q) && !daCo.has(q)) ra.push(q)
+  for (const q of lamTuan) if (trongPool.has(q) && !daCo.has(q) && !daGap.has(q)) ra.push(q)
+  return ra
+}
+
+/** Câu trong đề em mà em ĐÃ GẶP ở ca kiểm tra trước (chỉ xảy ra khi kho thiếu):
+ * qid → 'dd/mm' của ca gần nhất em gặp. Rỗng = đề mới hoàn toàn. */
+function daLamLaiTrongDe(qids: string[], daGap: Map<string, CaTruocDaCham>): Record<string, string> {
+  const ra: Record<string, string> = {}
+  for (const q of qids) {
+    const ca = daGap.get(q)
+    if (ca) ra[q] = ngayNganCa(ca.ngay)
+  }
+  return ra
+}
+
+function lapRong(sbd: string): CauLapCuaEm {
+  return { sbd, tuCa: '', qids: [], cauGoc: [], songSinh: [], canDayLai: [], soSaiCaTruoc: 0, can: 0, lyDo: '' }
 }
 
 /** MỘT CÂU EM CÒN PHẢI HỎI LẠI, theo hồ sơ nắm kiến thức (`nam_kt_cau`). */
@@ -504,6 +562,9 @@ export interface KetQuaDeRieng {
   noiCam: { sbd: string; soNoi: number }[]
   /** sbd → câu sai ca trước KHÔNG hỏi lại vì hồ sơ nói đã khắc phục. */
   daKhacPhucTheoEm: Record<string, string[]>
+  /** CHỈ chế độ Không rút câu sai: sbd → (qid → 'dd/mm') câu em đã làm ở ca kiểm
+   * tra trước mà vẫn phải phát lại vì kho thiếu. Em không có tên = đề mới hoàn toàn. */
+  daLamLaiTheoEm: Record<string, Record<string, string>>
 }
 
 function tongCauCua(yc: YeuCauRut): number {
@@ -531,6 +592,7 @@ function tongCauCua(yc: YeuCauRut): number {
  * làm bài, không phải chỗ sửa được. */
 export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const ch = y.ch ?? CAU_HINH_DE_RIENG_MAC_DINH
+  const khongRut = ch.PHAM_VI_HOI_LAI === 'khong'
   const tongCau = tongCauCua(y.yc)
   const demSai = demLanSai(y.dsCa)
   // Tra câu theo id MỘT LẦN cho cả lớp: 40 em nhân kho vài trăm câu mà tra
@@ -560,7 +622,8 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     const tuyChonLap: TuyChonHoSoLap | undefined = y.hoSo
       ? { hoSo: y.hoSo[sbd], ngayCa: y.ngayCa, maDangCua, seed: y.yc.seed, demSongSinh }
       : undefined
-    const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet, tuyChonLap)
+    // KHÔNG RÚT CÂU SAI: không có câu khắc phục nào — cả 14 câu là câu mới.
+    const lap = khongRut ? lapRong(sbd) : chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet, tuyChonLap)
     if (lap.daKhacPhuc && lap.daKhacPhuc.length > 0) daKhacPhucTheoEm[sbd] = lap.daKhacPhuc
     lapCuaEm.push(lap)
     canCua[sbd] = lap.can
@@ -584,6 +647,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const thieuTongCuaEm = new Array<number>(m).fill(0)
   const soNoiCuaEm = new Array<number>(m).fill(0)
   const ids = new Set<string>()
+  const daGapCuaEm = khongRut ? y.dsSbd.map((sbd) => cauDaGapCuaEm(y.dsCa, sbd)) : []
 
   for (const p of PHAN_DE) {
     const canP = Math.max(0, Math.floor(Number(y.yc.soCau[p]) || 0))
@@ -604,7 +668,13 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     // chính em (`boSan`) được MIỄN — hỏi lại câu sai là chủ ý, không phải trùng.
     // Không em nào có `lam` dính kho phần này thì `camTheoEm` là `undefined`: đúng lời gọi cũ.
     let camTheoEm: CamTheoEm | undefined
-    if (y.hoSo) {
+    if (khongRut) {
+      // KHÔNG RÚT CÂU SAI: cấm MỌI câu em đã gặp ở ca kiểm tra trước. Kho mỏng
+      // thì `noiTapCam` nới từ cuối mảng — câu làm LÂU NHẤT trước — và đếm lại.
+      const trongPool = new Set(idsPool)
+      const cam = y.dsSbd.map((sbd, e) => camKhongRutCauSai(daGapCuaEm[e]!, y.hoSo?.[sbd]?.lam ?? [], trongPool, boSan[e]!))
+      if (cam.some((c) => c.length > 0)) camTheoEm = { cam }
+    } else if (y.hoSo) {
       const trongPool = new Set(idsPool)
       const cam = y.dsSbd.map((sbd, e) => (y.hoSo?.[sbd]?.lam ?? []).filter((q) => trongPool.has(q) && !boSan[e]!.has(q)))
       if (cam.some((c) => c.length > 0)) camTheoEm = { cam }
@@ -628,6 +698,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
   const thieuLap: EmThieuLap[] = []
   const thieuCau: { sbd: string; thieu: number }[] = []
   const noiCam: { sbd: string; soNoi: number }[] = []
+  const daLamLaiTheoEm: Record<string, Record<string, string>> = {}
 
   for (let idxEm = 0; idxEm < m; idxEm++) {
     const sbd = y.dsSbd[idxEm]!
@@ -635,6 +706,10 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     const can = lap.can
     const qids = qidsCuaEm[idxEm]!
     boTheoEm[sbd] = qids
+    if (khongRut) {
+      const lai = daLamLaiTrongDe(qids, daGapCuaEm[idxEm]!)
+      if (Object.keys(lai).length > 0) daLamLaiTheoEm[sbd] = lai
+    }
     for (const q of qids) ids.add(q)
     // ĐẾM LẠI trên bộ câu THẬT trong đề, không tin con số đếm lúc chọn
     const trongDe = new Set(qids)
@@ -678,6 +753,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
     thieuCau,
     noiCam,
     daKhacPhucTheoEm,
+    daLamLaiTheoEm,
   }
 }
 
@@ -715,6 +791,8 @@ export interface KetQuaLuotHai {
   daKhacPhucTheoEm: Record<string, string[]>
   thieuCau: { sbd: string; thieu: number }[]
   noiCam: { sbd: string; soNoi: number }[]
+  /** Như `KetQuaDeRieng.daLamLaiTheoEm`, cho em vắng. */
+  daLamLaiTheoEm: Record<string, Record<string, string>>
   canDayLai: { qid: string; dsSbd: string[] }[]
   /** Đỉnh trùng (theo TỪNG PHẦN, cùng thước đo với lượt một) giữa một em vắng và
    * bất kỳ em nào khác. Để chỗ gọi và test thấy lượt hai có đẩy trùng lên không. */
@@ -741,6 +819,7 @@ export interface KetQuaLuotHai {
 export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
   const y = h.y
   const ch = y.ch ?? CAU_HINH_DE_RIENG_MAC_DINH
+  const khongRut = ch.PHAM_VI_HOI_LAI === 'khong'
   const tongCau = tongCauCua(y.yc)
   const demSai = demLanSai(y.dsCa)
   const uvTra = h.uvThem ?? y.uv
@@ -753,7 +832,7 @@ export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
   const demSongSinh = new Map<string, number>()
   for (const ds of Object.values(h.luotMot.songSinhTheoEm)) for (const q of ds) demSongSinh.set(q, (demSongSinh.get(q) ?? 0) + 1)
 
-  const ra: KetQuaLuotHai = { boTheoEm: {}, lapTheoEm: {}, cauGocTheoEm: {}, songSinhTheoEm: {}, soLapCua: {}, canCua: {}, daKhacPhucTheoEm: {}, thieuCau: [], noiCam: [], canDayLai: [], dinhTrung: 0 }
+  const ra: KetQuaLuotHai = { boTheoEm: {}, lapTheoEm: {}, cauGocTheoEm: {}, songSinhTheoEm: {}, soLapCua: {}, canCua: {}, daKhacPhucTheoEm: {}, thieuCau: [], noiCam: [], daLamLaiTheoEm: {}, canDayLai: [], dinhTrung: 0 }
   const coMat = new Set(y.dsSbd)
   const dsVang = [...new Set(h.dsSbdVang)].filter((sbd) => sbd && !coMat.has(sbd))
   if (dsVang.length === 0) return ra
@@ -789,7 +868,8 @@ export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
     const tuyChonLap: TuyChonHoSoLap | undefined = h.hoSoVang
       ? { hoSo: h.hoSoVang[sbd], ngayCa: y.ngayCa, maDangCua, seed: y.yc.seed, demSongSinh }
       : undefined
-    const lap = chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet, tuyChonLap)
+    const lap = khongRut ? lapRong(sbd) : chonCauLapChoEm(sbd, y.dsCa, tongCau, demSai, ch, cauCua, daLamSet, tuyChonLap)
+    const daGap = khongRut ? cauDaGapCuaEm(y.dsCa, sbd) : null
     ra.canCua[sbd] = lap.can
     if (lap.daKhacPhuc && lap.daKhacPhuc.length > 0) ra.daKhacPhucTheoEm[sbd] = lap.daKhacPhuc
     for (const q of lap.canDayLai) dayLai.set(q, [...(dayLai.get(q) ?? []), sbd])
@@ -809,7 +889,9 @@ export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
       const ids = poolCua[p]
       const bo = new Set((batBuoc[p] ?? []).slice(0, canP))
       const trongPool = new Set(ids)
-      const lam = (h.hoSoVang?.[sbd]?.lam ?? []).filter((q) => trongPool.has(q) && !bo.has(q))
+      const lam = daGap
+        ? camKhongRutCauSai(daGap, h.hoSoVang?.[sbd]?.lam ?? [], trongPool, bo)
+        : (h.hoSoVang?.[sbd]?.lam ?? []).filter((q) => trongPool.has(q) && !bo.has(q))
       const noi = noiTapCam(ids, canP, 1, [bo], [lam])
       const cam = noi.cam[0]!
       soNoi += noi.soNoi[0]!
@@ -871,6 +953,10 @@ export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
     }
 
     ra.boTheoEm[sbd] = qids
+    if (daGap) {
+      const lai = daLamLaiTrongDe(qids, daGap)
+      if (Object.keys(lai).length > 0) ra.daLamLaiTheoEm[sbd] = lai
+    }
     const trongDe = new Set(qids)
     ra.lapTheoEm[sbd] = lap.qids.filter((q) => trongDe.has(q))
     ra.cauGocTheoEm[sbd] = (lap.cauGoc ?? []).filter((q) => trongDe.has(q))

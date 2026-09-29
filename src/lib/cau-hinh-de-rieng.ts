@@ -37,7 +37,10 @@ export interface CauHinhDeRieng {
    *                  không nhất thiết 3 ca gần nhất (thầy chốt 08/09: "chỗ rút
    *                  3 ca bạn rút ngẫu nhiên 3 ca trước đó bất kì không cần
    *                  gần nhất nhé"). Bắt được lỗi cũ em vẫn chưa sửa. */
-  PHAM_VI_HOI_LAI: 'gan_nhat' | 'ba_ca'
+  /** `khong` — KHÔNG rút câu sai (đặc tả 29/09 mục C): 14 câu mới theo luật cá
+   * nhân hoá, LOẠI mọi câu em đã gặp ở các ca kiểm tra trước (cả đúng lẫn sai).
+   * Kho thiếu mới lấy lại câu em làm lâu nhất, kèm nhãn ngày ca. */
+  PHAM_VI_HOI_LAI: 'gan_nhat' | 'ba_ca' | 'khong'
   /** Có bật cơ chế CÂU SONG SINH (Isomorphic Twin) cùng dạng bài để chống học vẹt không. */
   CO_CAU_SONG_SINH: boolean
   /** Tỷ lệ câu song sinh so với câu gốc trong số câu khắc phục (0..1, mặc định 0.5 = 50%). */
@@ -48,17 +51,29 @@ export interface CauHinhDeRieng {
   UU_TIEN_LO_HONG: boolean
 }
 
+export type PhamViHoiLai = CauHinhDeRieng['PHAM_VI_HOI_LAI']
+
+/** Đọc phòng thủ giá trị phạm vi cất ở cấu hình ca (máy chủ, IndexedDB). Rỗng/lạ ⇒ `gan_nhat` như cũ. */
+export function docPhamViHoiLai(v: unknown): PhamViHoiLai {
+  return v === 'ba_ca' || v === 'khong' ? v : 'gan_nhat'
+}
+
+/** Ba nút theo đúng thứ tự trên màn Mở ca. */
+export const MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'ba_ca', 'khong']
+
 /** Bao nhiêu ca được BỐC khi chọn phạm vi `ba_ca`. */
 export const SO_CA_BOC_NGAU_NHIEN = 3
 
 export const TEN_PHAM_VI_HOI_LAI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
   gan_nhat: 'Ca gần nhất',
   ba_ca: '3 ca ngẫu nhiên',
+  khong: 'Không rút câu sai',
 }
 
 export const GIAI_THICH_PHAM_VI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
   gan_nhat: 'Quét ca gần nhất từng em có nộp: Rút câu theo Cặp đôi Song sinh 50/50 (50% câu sai gốc + 50% câu cùng dạng đổi số) theo chuẩn phân bổ {Phần I: ≤3, Phần II: ≤1, Phần III: ≤1}. 70% còn lại là câu mới nâng đỡ tiến bộ.',
   ba_ca: 'Quét tích lũy các ca trước đó: Truy vết các dạng bài em sai dai dẳng (lặp lại nhiều lần) để ưu tiên bốc cặp song sinh 50/50, củng cố dứt điểm lỗ hổng kiến thức.',
+  khong: 'Không rút câu sai: 14 câu mới theo luật cá nhân hoá (không câu tự luận), bỏ mọi câu em đã gặp ở các ca kiểm tra trước — đề khác hẳn lần trước. Câu song sinh cùng dạng đổi số vẫn được dùng. Kho thiếu mới lấy lại câu em làm lâu nhất, có nhãn "Đã làm ở ca kiểm tra ngày…".',
 }
 
 export const CAU_HINH_DE_RIENG_MAC_DINH: CauHinhDeRieng = {
@@ -89,7 +104,7 @@ export function cauHinhDeRieng(luu?: Partial<CauHinhDeRieng> | null): CauHinhDeR
     TRAN_CA_QUET: soDuong(c.TRAN_CA_QUET, CAU_HINH_DE_RIENG_MAC_DINH.TRAN_CA_QUET),
     TRAN_LAP_MOT_CAU: soDuong(c.TRAN_LAP_MOT_CAU, CAU_HINH_DE_RIENG_MAC_DINH.TRAN_LAP_MOT_CAU),
     CHO_LAP_CAU_BO_TRONG: c.CHO_LAP_CAU_BO_TRONG === true,
-    PHAM_VI_HOI_LAI: c.PHAM_VI_HOI_LAI === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+    PHAM_VI_HOI_LAI: docPhamViHoiLai(c.PHAM_VI_HOI_LAI),
     CO_CAU_SONG_SINH: c.CO_CAU_SONG_SINH !== false,
     TI_LE_SONG_SINH: Number.isFinite(tiSongSinh) && tiSongSinh >= 0 && tiSongSinh <= 1 ? tiSongSinh : CAU_HINH_DE_RIENG_MAC_DINH.TI_LE_SONG_SINH,
     TRAN_PHAN_BO_14_CAU: c.TRAN_PHAN_BO_14_CAU ?? CAU_HINH_DE_RIENG_MAC_DINH.TRAN_PHAN_BO_14_CAU,
