@@ -20,7 +20,8 @@ import {
   xetKhien,
   type TrangThaiNgay,
 } from '../server/src/cnh-exp-p08'
-import { BANG_THANH_EXP, thanhExp, tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+// P08 (cửa đóng) đứng trên đường cấp v3 (21/09) — luật v4 29/09 chưa port sang P08 ⇒ đối chiếu với bảng v3. Sửa CÓ CHỦ Ý.
+import { BANG_THANH_EXP_V3 as BANG_THANH_EXP, thanhExpV3 as thanhExp, tongExpToiCapV3 as tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 
 const THAM_SO = JSON.parse(readFileSync('docs/cline-ca-nhan-hoa-2309/THAM-SO.json', 'utf8')) as {
   economy: Record<string, unknown>

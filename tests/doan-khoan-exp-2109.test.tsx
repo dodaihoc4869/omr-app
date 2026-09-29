@@ -1,4 +1,4 @@
-// ĐỢT 2 THẦN THÚ · MÀN KẾT CHUYẾN ĐOÀN HỘ TỐNG có TỪNG KHOẢN EXP (Điều 9: "Thắng chuyến 3 sao +15 EXP", "Vỡ giáp 2 trùm +6 EXP", "Tiếp sức 2 lần +10 EXP"; đủ trần ⇒ "+0 EXP · hôm nay em đã đủ 120 EXP từ game. Muốn {tên thú} ăn no thì làm bài tập về nhà hoặc phần ôn lại.").
+// ĐỢT 2 THẦN THÚ · MÀN KẾT CHUYẾN ĐOÀN HỘ TỐNG có TỪNG KHOẢN EXP (Điều 9: "Thắng chuyến 3 sao +15 EXP", "Vỡ giáp 2 trùm +6 EXP", "Tiếp sức 2 lần +10 EXP"; đủ trần ⇒ "+0 EXP · hôm nay em đã đủ 120 EXP từ game. Muốn {tên thú} lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.").
 // Máy chủ gửi doan.ketChang.expChang (chỉ-thêm); máy cũ không gửi ⇒ ô "EXP vào ví" cũ. Nhãn dựng từ `loai` + số (không in ghiChu của máy chủ: còn chữ "chặng"). Thuần + màn thật.
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
@@ -39,8 +39,8 @@ describe('dongKhoanExp — hàm thuần', () => {
     expect(dongKhoanExp([{ loai: 'doan_chang', exp: 15 }], 9, 0)[0]!.nhan).toBe('Thắng chuyến 3 sao') // sao kẹp 1–3
   })
   it('câu đủ trần nêu đúng số 120 và tên thú; không tên ⇒ "thần thú"', () => {
-    expect(chuDuTran('Viêm Sư')).toBe('hôm nay em đã đủ 120 EXP từ game. Muốn Viêm Sư ăn no thì làm bài tập về nhà hoặc phần ôn lại.')
-    expect(chuDuTran('')).toContain('Muốn thần thú ăn no')
+    expect(chuDuTran('Viêm Sư')).toBe('hôm nay em đã đủ 120 EXP từ game. Muốn Viêm Sư lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.')
+    expect(chuDuTran('')).toContain('Muốn thần thú lớn thêm')
   })
 })
 
@@ -57,7 +57,7 @@ describe('DoanKetChang — từng khoản EXP', () => {
   it('có khoản bị cắt về 0 (đủ trần 120/ngày): câu nói thật với tên thú của em; tổng 0', () => {
     const { container } = ve(ketChang({ expChang: [{ loai: 'doan_chang', exp: 0, ghiChu: '' }, { loai: 'doan_giap', exp: 0, ghiChu: '' }] }))
     expect(dongCua(container)).toEqual(['Thắng chuyến 3 sao+0 EXP', 'Vỡ giáp 2 trùm+0 EXP'])
-    expect(container.querySelector('[data-vung="khoan-du-tran"]')!.textContent).toBe('+0 EXP · hôm nay em đã đủ 120 EXP từ game. Muốn Thạch Quy ăn no thì làm bài tập về nhà hoặc phần ôn lại.')
+    expect(container.querySelector('[data-vung="khoan-du-tran"]')!.textContent).toBe('+0 EXP · hôm nay em đã đủ 120 EXP từ game. Muốn Thạch Quy lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.')
   })
   it('máy chủ cũ (không expChang) hoặc rỗng/sai dạng ⇒ giữ ô "EXP vào ví thần thú" như trước; không EXP không Liên Kích ⇒ không mục Phần thưởng', () => {
     for (const v of [undefined, [], 'x', [{ loai: 'la', exp: 9 }]]) {

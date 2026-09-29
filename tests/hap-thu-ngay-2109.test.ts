@@ -3,11 +3,17 @@
 // chuyển đổi bảo toàn tổng EXP (sau định giá lại thưởng nấc + bù bảng giá), idempotent, không em nào tăng cấp · ví dụ thật: cấp 7 dư 98 EXP, ống 0, 1 ngày có học ⇒ cấp 2 + 40/200, ống = T − 200.
 import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
+// SỬA CÓ CHỦ Ý 29/09 (luật v4, docs/DE-XUAT-EXP-2909.md): tệp này nay khoá các hàm LỊCH SỬ v3 (hấp thụ theo ngày, đường 238 200, chuyển hồ sơ cũ → v3) — chúng vẫn chạy
+// khi chuyển hồ sơ cũ sang v4. Các tên v3 được nhập dưới bí danh cũ; luật v4 (nạp tự do, khoá mốc, vàng) khoá ở tests/exp-v4-2909.test.ts.
 import {
-  BU_DAT_NGAY, CHENH_THUONG_NAC, HAP_THU_CO_HOC, HAP_THU_DAT, LUAT_CAP_MOI, NGAY_SOM_NHAT_CAP_10, NGAY_SOM_NHAT_CAP_120, TRAN_EXP_GAME_NGAY,
-  CO_HOC_TOI_THIEU_CAU, chenhDinhGia, chuChuaDatNhiemVu, chuHapThu, chuThanhHapThu, chuyenDoiLuatCap, hapThu, laCoHoc, tongExpTheoDuongCu, tranExpGameNgay, tranHapThu, type HoSoCapExp, type HoSoCu,
+  BU_DAT_NGAY, CHENH_THUONG_NAC, HAP_THU_CO_HOC, HAP_THU_DAT, LUAT_CAP_V3 as LUAT_CAP_MOI, TRAN_EXP_GAME_NGAY,
+  CO_HOC_TOI_THIEU_CAU, chenhDinhGia, chuChuaDatNhiemVu, chuHapThu, chuThanhHapThu, chuyenDoiSangV3 as chuyenDoiLuatCap, hapThu, laCoHoc, nhanExpV3 as nhanExp, tongExpTheoDuongCu, tranExpGameNgay, tranHapThu, type HoSoCapExp, type HoSoCu,
 } from '../src/lib/hap-thu-ngay'
-import { BANG_THANH_EXP, nhanExp, thanhExp, thanhExpCu, tongExpToiCap, tongExpToiDinh } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { BANG_THANH_EXP_V3 as BANG_THANH_EXP, thanhExpV3 as thanhExp, thanhExpCu, tongExpToiCapV3 as tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+/** Bất biến của đường v3 (200 EXP/ngày): cấp 10 sớm nhất ngày 12, cấp 120 ngày 1 191. */
+const NGAY_SOM_NHAT_CAP_10 = 12
+const NGAY_SOM_NHAT_CAP_120 = 1191
+const tongExpToiDinh = (): number => tongExpToiCap(120)
 
 const NGAY = '2026-09-21'
 const hs = (o: Partial<HoSoCapExp> = {}): HoSoCapExp => ({ cap: 1, exp: 0, wallet: 0, ...o })
