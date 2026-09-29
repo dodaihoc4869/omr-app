@@ -661,7 +661,10 @@ export function chiaLuot<T extends CauDanXen>(ds: readonly T[], suc: SucEm, co =
   // Trần khó CỨNG cho câu NỢ khó (dồn nhiều ⇒ thêm lượt ngắn, trải cả ngày); câu MỚI khó chỉ rải đều (không làm vụn lượt ngày toàn câu Vận dụng).
   const khoNo = ds.filter((x) => x.kho && x.no)
   const khoMoi = ds.filter((x) => x.kho && !x.no)
-  const L = Math.max(Math.ceil(n / co), Number.isFinite(md.kho) ? Math.ceil(khoNo.length / md.kho) : 0)
+  // Boss chốt 29/09: KHÔNG tách lượt vụn — mỗi lượt tối thiểu 4 câu (trừ lượt cuối); không còn câu dễ để xen (toàn câu khó) ⇒ lượt đầy như thường.
+  const L0 = Math.ceil(n / co)
+  const coDe = ds.some((x) => !x.kho)
+  const L = !coDe || !Number.isFinite(md.kho) ? L0 : Math.max(L0, Math.min(Math.ceil(khoNo.length / md.kho), Math.floor(n / LUOT_TOI_THIEU)))
   // Khá/giỏi: lượt đầy `co` câu (lượt cuối phần dư); yếu/TB: số câu chia đều cho L lượt.
   const coLuot = Array.from({ length: L }, (_, i) => (suc === 'kha' ? Math.min(co, n - i * co) : Math.floor(n / L) + (i < n % L ? 1 : 0)))
   const luot: T[][] = Array.from({ length: L }, () => [])
@@ -689,6 +692,24 @@ export function chiaLuot<T extends CauDanXen>(ds: readonly T[], suc: SucEm, co =
   }
   const viTri = new Map(ds.map((x, i) => [x.qid, i]))
   return luot.filter((l) => l.length).map((l) => l.sort((a, b) => viTri.get(a.qid)! - viTri.get(b.qid)!))
+}
+
+/** Số câu tối thiểu của một lượt (Boss chốt 29/09), trừ lượt cuối. */
+export const LUOT_TOI_THIEU = 4
+
+/**
+ * Lượt TOÀN câu khó của em yếu/TB (không còn câu dễ để xen, Boss chốt 29/09): hai câu khó nhất tách nhau qua hiệp trùm — một câu ở nửa đầu
+ * (hiệp 1–3), một câu ở nửa sau (hiệp 5–7); các câu còn lại xếp khó vừa → khó hơn.
+ */
+function xepLuotToanKho<T extends CauDanXen>(luot: readonly T[]): T[] {
+  const viTri = new Map(luot.map((x, i) => [x.qid, i]))
+  const tang = [...luot].sort((a, b) => a.muc - b.muc || viTri.get(a.qid)! - viTri.get(b.qid)!)
+  const h2 = tang.pop()!, h1 = tang.pop()!
+  const nua = Math.ceil(luot.length / 2)
+  const ra = [...tang]
+  ra.splice(nua - 1, 0, h1)
+  ra.splice(nua + Math.floor((luot.length - nua) / 2), 0, h2)
+  return ra
 }
 
 /** Điểm phạt của một thứ tự trong lượt (thấp = tốt). */
@@ -724,6 +745,7 @@ function* hoanVi<T>(xs: readonly T[]): Generator<T[]> {
  */
 export function danXenLuot<T extends CauDanXen>(luot: readonly T[], suc: SucEm, tuyChon: { trumKho?: boolean } = {}): T[] {
   if (luot.length <= 1 || luot.length > 7) return [...luot]
+  if (suc !== 'kha' && !tuyChon.trumKho && luot.length >= 3 && luot.every((x) => x.kho)) return xepLuotToanKho(luot)
   const viTri = new Map(luot.map((x, i) => [x.qid, i]))
   let tot: T[] = [...luot], diem = phatThuTu(tot, suc, viTri, !!tuyChon.trumKho)
   for (const xs of hoanVi(luot)) {

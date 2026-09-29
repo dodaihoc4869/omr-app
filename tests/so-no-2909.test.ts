@@ -217,6 +217,20 @@ describe('ĐAN XEN câu trong ngày', () => {
     expect(mot).toHaveLength(1) // 3 khó cùng một lượt: không bị tách
     kiemLuot(danXenLuot(mot[0]!, 'kha'), 3)
   })
+  it('Boss 29/09: em yếu, 20 nợ khó, 0 câu dễ ⇒ ≈ ceil(20/6) chặng, không chặng nào < 4 câu; hai câu khó nhất tách qua hiệp trùm', () => {
+    const ds = Array.from({ length: 20 }, (_, i) => mk(`k${i}`, { no: true, kho: true, muc: i % 3 === 0 ? 3 : 2 }))
+    const luot = chiaLuot(ds, 'yeu', 6)
+    expect(luot).toHaveLength(Math.ceil(20 / 6))
+    luot.slice(0, -1).forEach((l) => expect(l.length).toBeGreaterThanOrEqual(4))
+    expect(luot.flat()).toHaveLength(20)
+    const l = danXenLuot(luot[0]!, 'yeu')
+    const nua = Math.ceil(l.length / 2)
+    expect(l.slice(0, nua).some((x) => x.muc === 3)).toBe(true)
+    expect(l.slice(nua).some((x) => x.muc === 3)).toBe(true)
+    // Có ít câu dễ: vẫn không lượt nào < 4 câu (trừ lượt cuối).
+    const it2 = [...Array.from({ length: 12 }, (_, i) => mk(`h${i}`, { no: true, kho: true })), mk('d1', { de: true }), mk('d2', { de: true })]
+    chiaLuot(it2, 'yeu', 6).slice(0, -1).forEach((x) => expect(x.length).toBeGreaterThanOrEqual(4))
+  })
   it('em khá/giỏi ở Đảo (chuyến đủ 6): ải cuối là câu khó nhất (Trùm, thầy 28/09)', () => {
     const l = [mk('a', { de: true, muc: 0 }), mk('b', { de: true, muc: 0 }), mk('c', { muc: 1 }), mk('d', { kho: true, muc: 3 }), mk('e', { muc: 1 }), mk('f', { kho: true, muc: 2 })]
     const x = danXenLuot(l, 'kha', { trumKho: true })

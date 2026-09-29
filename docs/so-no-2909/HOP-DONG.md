@@ -53,3 +53,8 @@ const ls = await docLichSuCoNguon(env, sbd, qids) // Map<qid, { qid, ngay, luc, 
 
 ## 4. Không đổi
 Không sửa/xoá dữ liệu cũ. Không đổi lược đồ ngoài bảng tạo-lúc-chạy chỉ-thêm.
+
+## 5. Đan xen câu trong ngày (Boss chốt 29/09) — thông tin, B không phải gọi gì
+- Chọn câu giữ nguyên (nợ trước, trần 50%, thứ tự ưu tiên); chỉ đổi thứ tự phục vụ: `chiaLuot` + `danXenLuot` (`srs2-loi.ts`), áp cho kế hoạch ngày, chuyến Đảo, chặng Đoàn (từng em).
+- Em yếu ≤ 1 câu nợ khó/lượt, TB ≤ 2; mỗi lượt tối thiểu 4 câu (trừ lượt cuối); toàn câu khó (không còn câu dễ để xen) ⇒ không tách lượt, hai câu khó nhất tách nhau qua hiệp trùm, còn lại khó vừa → khó hơn.
+- Kết chuyến Đảo: em KHÁ/GIỎI giữ Trùm = câu khó nhất cuối chuyến (thầy chốt 28/09); em YẾU/TB mở và kết chuyến bằng câu dễ.
