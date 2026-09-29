@@ -337,3 +337,6 @@
 .bia-tl-tien-do{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--b-mo)}
 .bia-tl-the{border-radius:20px;border:1px solid var(--b-vien);background:var(--b-kinh);padding:12px;display:flex;flex-direction:column;gap:12px}
 .bia-tl .bia-kq{position:relative}
+
+/* ───── gợi ý lần đầu "Cầm gậy kéo để xoay" (29/09) ───── */
+.bia-goi-y-gay{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;pointer-events:none;padding:6px 14px;border-radius:999px;background:var(--b-toi);color:var(--b-toi-chu);font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3)}
