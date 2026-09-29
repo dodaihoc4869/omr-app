@@ -21,3 +21,20 @@ export function damBaoChiMuc(env: Env): Promise<void> {
   }
   return p
 }
+
+/**
+ * CHỈ MỤC CHỈ-THÊM dựng trong cron NGÀY 17:01 UTC (00:01 VN, ngoài cao điểm) — thay cho chạy migration tay (Boss 29/09: CI không chạy migration,
+ * không có quyền D1 remote). `IF NOT EXISTS` ⇒ lần đầu dựng, các đêm sau là lệnh rỗng. Bản sao của server/migration-2909-chi-muc-cao-diem.sql.
+ * KHÔNG gọi trên đường lệnh của em (dựng chỉ mục bảng luot giữ khoá ghi).
+ */
+export const CHI_MUC_CRON_DEM: readonly string[] = [
+  'CREATE INDEX IF NOT EXISTS idx_luot_ca_tt ON luot(ma_ca, trang_thai, het_gio_luc)',
+]
+/** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
+export async function dungChiMucCronDem(env: Env): Promise<number> {
+  let loi = 0
+  for (const s of CHI_MUC_CRON_DEM) {
+    try { await env.DB.prepare(s).run() } catch (e) { loi++; console.error('[chi-muc] cron đêm không dựng được:', s, e instanceof Error ? e.message : e) }
+  }
+  return loi
+}

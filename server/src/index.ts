@@ -84,7 +84,7 @@ import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
-import { damBaoChiMuc } from './chi-muc-luc-chay'
+import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -3092,6 +3092,8 @@ const boXuLy = {
     // Cao điểm: KHÔNG chạy (lệnh DDL giữ khoá ghi D1; chỉ mục đã có từ 28/09 — isolate cron ngoài khung làm tiếp).
     if(!caoDiem)await damBaoChiMuc(env)
     if(event.cron==='1 17 * * *'){
+      // Chỉ mục CHỈ-THÊM (chi-muc-luc-chay.ts, 29/09): dựng lúc 00:01 VN, ngoài cao điểm; IF NOT EXISTS ⇒ các đêm sau là lệnh rỗng. Lỗi chỉ ghi nhật ký máy.
+      await dungChiMucCronDem(env).then(async n=>{if(n)await ghiLoiMay(env,'chi_muc_dem')}).catch(async e=>{console.error('[chi-muc] cron lỗi:',e);await ghiLoiMay(env,'chi_muc_dem')})
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
       // THỨ TỰ: kế hoạch ngày TRƯỚC, tin phụ huynh SAU — tin phụ huynh (GĐ 5) đọc số câu từ kế hoạch vừa lập; chạy song song

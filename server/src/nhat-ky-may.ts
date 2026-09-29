@@ -12,6 +12,7 @@ export const TEN_NGUON_NHAT_KY: Readonly<Record<string, string>> = {
   khien_mat: 'Trừ khiên khi vắng nhiệm vụ ngày',
   tin_phu_huynh: 'Tin phụ huynh và vinh danh',
   gui_thong_bao: 'Gửi thông báo',
+  chi_muc_dem: 'Dựng chỉ mục tăng tốc ban đêm',
 }
 export const tenViec = (nguon: string): string => TEN_NGUON_NHAT_KY[nguon] ?? 'Một việc của máy'
 export const chuLoiMay = (nguon: string): string => `${tenViec(nguon)} lỗi, app sẽ tự thử lại`
