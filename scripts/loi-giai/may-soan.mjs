@@ -106,12 +106,25 @@ const NHAC_CHOT = (n) => `Đọc goi-chot.md trong thư mục hiện tại và l
 /** Còn cờ đáp án chưa chốt (cờ đã chốt "đáp án kho sai" có trường `chot` — giữ nguyên, không chốt lại). */
 const canChot = (h) => Array.isArray(h?.co) && h.co.some((c) => c?.loai === 'dapAn' && !c?.chot)
 
+/**
+ * Môi trường cho mỗi phiên soạn: KHÔNG mang mã bí mật của thầy, và khi máy soạn chạy bên trong một phiên Claude Code
+ * (máy đám mây) thì bỏ các biến gắn với phiên cha — không thì phiên con ghi chung nhật ký / định danh với phiên cha.
+ * Máy thầy không có các biến này ⇒ không đổi gì.
+ */
+function moiTruongPhienSoan() {
+  const env = { ...process.env, OMR_MA_BI_MAT: '' }
+  for (const k of Object.keys(env)) {
+    if (/^(CLAUDECODE|SESSION_INGRESS_URL|CLAUDE_CODE_(SESSION_ID|REMOTE_SESSION_ID|CHILD_SESSION|SYNC_SESSION_REFS|POST_FOR_SESSION_INGRESS_V2|MESSAGING_\w+))$/.test(k)) delete env[k]
+  }
+  return env
+}
+
 function chayClaude(dir, soCau, loiNhac = NHAC_SOAN(soCau)) {
   const thamSo = ['-p', '--output-format', 'json', '--permission-mode', 'dontAsk', '--allowedTools', 'Read,Write,Edit,Glob,Bash(node kiem.mjs),Bash(node kiem.mjs:*)', '--max-turns', String(40 + soCau * 12)]
   if (MODEL) thamSo.push('--model', MODEL)
   return new Promise((xong) => {
     const t0 = Date.now()
-    const p = spawn('claude', thamSo, { cwd: dir, stdio: ['pipe', 'pipe', 'pipe'], env: { ...process.env, OMR_MA_BI_MAT: '' } })
+    const p = spawn('claude', thamSo, { cwd: dir, stdio: ['pipe', 'pipe', 'pipe'], env: moiTruongPhienSoan() })
     let ra = '', loi = ''
     p.stdout.on('data', (d) => { ra += d })
     p.stderr.on('data', (d) => { loi += d })
