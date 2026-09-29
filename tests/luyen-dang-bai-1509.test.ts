@@ -21,7 +21,8 @@ const GOC = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const doc = (p: string) => readFileSync(resolve(GOC, p), 'utf8')
 
 const modal = doc('src/components/ModalKhacPhucCauSai.tsx')
-const thuatToan = doc('src/lib/thuat-toan-rut-cau-sai.ts')
+// Lõi thuần tách sang thuat-toan-rut-cau-sai-loi.ts (29/09, Tu luyện) — đọc CẢ HAI tệp: thuật toán không đổi, chỉ đổi chỗ.
+const thuatToan = doc('src/lib/thuat-toan-rut-cau-sai.ts') + '\n' + doc('src/lib/thuat-toan-rut-cau-sai-loi.ts')
 const api = doc('src/lib/exam-api.ts')
 const mayChu = doc('server/src/goi-cu.ts')
 const congChu = doc('server/src/index.ts')
