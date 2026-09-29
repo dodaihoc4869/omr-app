@@ -35,8 +35,10 @@ node scripts/loi-giai/may-soan.mjs --tong
 
 Nhật ký từng lô nằm ở `.may-soan/nhat-ky.jsonl`.
 
-## Duyệt
+## Duyệt — máy tự duyệt (thầy chốt 29/09: "máy duyệt luôn, tôi không làm gì cả")
 
-Vào app thầy, chọn Kho đề (Ngân hàng đề), rồi chọn **Duyệt lời giải**. Nhập mã đề, rồi bấm **Duyệt N câu sạch**.
-
-Máy đã tự chốt các chỗ tranh luận về đáp án. Câu mà máy kết luận "đáp án kho sai" không được công bố. Danh sách sửa kho lấy từ lệnh `/gv/loi-giai/sua-kho`.
+- Hồ sơ **sạch** (qua đủ 6 khoá, không còn cờ đáp án) ⇒ máy chủ duyệt ngay lúc nộp, ghi giờ duyệt + ghi chú "máy duyệt". Học sinh thấy luôn.
+- Hồ sơ **còn cờ đáp án** (máy kết luận đáp án kho sai, hoặc phiên chốt chưa kết luận) ⇒ không duyệt, không hiện với học sinh.
+  Danh sách lấy từ lệnh `/gv/loi-giai/sua-kho`: `dapAnSai` (đã chốt đáp án đúng), `chuaChot` (chưa kết luận), `sua` (sửa chữ trong đề). Cuối đợt Boss báo thầy.
+- Hồ sơ sạch nộp **trước** khi có máy duyệt: chạy một lần lệnh `/gv/loi-giai/may-duyet-bu` (gửi `{"thu":true}` để đếm trước). Lệnh chỉ đổi trạng thái chờ ⇒ đã duyệt, không xoá gì; chạy lại vô hại.
+- Màn **Duyệt lời giải** (Kho đề ⇒ Duyệt lời giải) vẫn dùng được để xem lại hoặc trả lại một câu cho máy soạn làm lại.

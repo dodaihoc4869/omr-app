@@ -116,6 +116,8 @@ export interface CauChoDuyet {
   bo: string
   trangThai: TrangThaiLoiGiai
   sach: boolean
+  /** Máy tự duyệt lúc nộp (hồ sơ sạch — thầy chốt 29/09). */
+  mayDuyet?: boolean
   co: { loai: string; ghi: string; chot?: string; sua?: { truong: string; truoc: string; sau: string } }[]
   ghiChu: string
   loiMay: string
