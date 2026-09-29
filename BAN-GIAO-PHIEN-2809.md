@@ -100,3 +100,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 00:48 · Deploy #553 THÀNH CÔNG: PR #55 tối ưu máy chủ · main 4570868 · lùi: git revert -m 1 4570868. Đo sau: /ca/danh-sach 1,34–1,64 s (trước ~1,6), /gv/chien-dich thongKe 1,78–1,97 s (trước ~2,1); bia-co-doc ok.
 - 01:04 · Deploy #554 THÀNH CÔNG: PR #56 tối ưu app (gói đầu gv 591→251 KB, WebP 25→5 MB, precache 161, dọn ảnh/mã) · main c1fd22c · lùi: git revert -m 1 c1fd22c. HẾT ĐỢT TỐI ƯU 28/09.
 - 06:36 (29/09) · Deploy #555 THÀNH CÔNG: PR #57 DẠY HỌC Khối 10 + thêm em tay · main 9b88cb3 · lùi: git revert -m 1 9b88cb3.
+- 08:00 (29/09) · Deploy #556 THÀNH CÔNG: PR #58 Ca kiểm tra 'Không rút câu sai' · main 93461ca · lùi: git revert -m 1 93461ca. A so-no-thuat-toan 257562e sẵn sàng; B kiem-tra-dau-gio đang gộp A.
