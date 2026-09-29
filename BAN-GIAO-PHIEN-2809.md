@@ -145,3 +145,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 00:10 30/09 · Boss · merge PR #92 Tu luyện (da77410) + PR #93 tối ưu máy chủ cao điểm (b287087) · test vùng: chỉ đỏ nền (luyen-dang-bai ×5, doan-khoan-exp, doan-rut-cau-moi — đỏ sẵn trên main) · không ca mở · lùi: git revert -m1 b287087 && git revert -m1 da77410
 - 00:22 30/09 · deploy b287087 (#92+#93) xanh (run 590; 589 huỷ do cancel-in-progress, đã gồm)
 - 05:48 30/09 · Boss · merge PR #94 Bi-a xoay ngang toàn màn (cac7c74) · thầy chốt · 156 test bi-a xanh · không ca mở · lùi: git revert -m1 cac7c74
+- 05:59 30/09 · deploy #94 xanh (run 591)
