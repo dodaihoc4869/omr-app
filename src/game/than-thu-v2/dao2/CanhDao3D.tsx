@@ -10,6 +10,7 @@ import {useEffect,useRef,type CSSProperties,type RefObject} from 'react'
 import type {BattleAnswer} from '../learning-battle'
 import {docVai} from './dao2-core'
 import type {CauDao2,Vung} from './dao2-core'
+import {giamHieuUng} from '../../../lib/may-yeu'
 
 type Diem=readonly [number,number]
 /** Hệ toạ độ bản đồ (bản vẽ): khung giữ đúng tỉ lệ này nên vị trí % của ảnh/nhãn khớp SVG. */
@@ -70,7 +71,8 @@ export default function CanhDao3D({vung,coXat,tong,thanhThao,damSuong,cau,ketQua
  const nen=useRef<HTMLDivElement>(null),may=useRef<HTMLDivElement>(null),dao=useRef<HTMLDivElement>(null)
  // thị sai: chỉ khi có chuột / nghiêng máy; rAF dừng khi hội tụ hoặc tab ẩn; tắt khi xin giảm chuyển động
  useEffect(()=>{
-  if(typeof window==='undefined'||!window.matchMedia||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return
+  // chế độ máy yếu (29/09) cũng tắt thị sai
+  if(typeof window==='undefined'||!window.matchMedia||giamHieuUng())return
   let mx=0,my=0,cx=0,cy=0,raf=0
   const lop:[RefObject<HTMLDivElement|null>,number][]=[[nen,.25],[may,.45],[dao,.6]]
   const buoc=()=>{cx+=(mx-cx)*.08;cy+=(my-cy)*.08

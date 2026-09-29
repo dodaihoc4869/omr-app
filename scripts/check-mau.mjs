@@ -22,6 +22,8 @@ const CHO_PHEP = new Set([
   'lib/giao-dien-to-chieu.ts',
   'lib/experiments/catalog.ts',
   'lib/experiments/render.ts',
+  // nhe.ts = phần nhẹ tách từ render.ts (máy yếu 29/09) — hai hình NO₂ / Rutherford dời nguyên văn, cùng lý do.
+  'lib/experiments/nhe.ts',
   'lib/experiments/scene.ts',
   'screens/exam-setup.css',
   // BẢNG MÀU TRANH VẼ / NỀN TỐI CỐ ĐỊNH CỦA GAME (Boss duyệt 21/09): đất, cát, biển, thần thú, khiên, vòng EXP… là TRANH nên KHÔNG đổi theo nền

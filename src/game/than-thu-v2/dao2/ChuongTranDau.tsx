@@ -11,6 +11,7 @@ import {learningBattle,BATTLE_SKINS} from '../learning-battle'
 import type {BattleAnswer} from '../learning-battle'
 import {chanTiengTran,nguCanhTran} from '../battle-audio'
 import './chuong.css'
+import {giamHieuUng} from '../../../lib/may-yeu'
 
 /** Mốc thời gian (giây) — CSS dùng cùng số qua biến `--d2c-phong` / `--d2c-trung`. */
 export const MOC_CHUONG={phong:.28,trung:.68,het:1.25} as const
@@ -28,8 +29,9 @@ export function thuocTinhCanh(ketQua:readonly BattleAnswer[],tong:number,suKien:
  const d=donChuong(ketQua,tong,suKien);if(!d)return {}
  return {'data-chuong':d.dung?'dung':'sai','data-nhip':String(suKien%2),style:{'--d2c-quai-tu':d.quaiTu,'--d2c-thu-tu':d.thuTu} as CSSProperties}
 }
+// Máy xin giảm chuyển động HOẶC chế độ máy yếu (29/09) ⇒ bản giản lược.
 export function giamChuyenDong():boolean{
- try{return typeof window!=='undefined'&&typeof window.matchMedia==='function'&&!!window.matchMedia('(prefers-reduced-motion: reduce)')?.matches}catch{return false}
+ return giamHieuUng()
 }
 
 /** Tiếng chưởng tổng hợp (WebAudio, không tải tệp): "vút" lúc phóng + "bùm" lúc trúng, khớp mốc hoạt cảnh. Tắt tiếng / chưa mở âm ⇒ im. */

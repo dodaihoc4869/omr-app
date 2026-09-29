@@ -1,14 +1,11 @@
 // HIỆU ỨNG SẢNH 3D (bản vẽ docs/ban-ve-sanh-dong-2809/Sanh-Dong.html): hạt sáng, pháo sáng, cảnh mở màn một lần mỗi phiên.
 // Chỉ transform/opacity (keyframes `h2-no`, `h2-phong` trong sanh-ban-do.css). Máy bật "giảm chuyển động" ⇒ không làm gì.
 // Hạt là trang trí thoáng qua (tự xoá khi xong) — không mang số liệu nên dùng Math.random được.
+import { giamHieuUng } from '../../lib/may-yeu'
 
-/** Máy bật prefers-reduced-motion? Không có matchMedia (jsdom, máy chủ) ⇒ coi như KHÔNG giảm. */
+/** Máy bật prefers-reduced-motion HOẶC đang ở chế độ máy yếu (src/lib/may-yeu.ts, 29/09)? Không có matchMedia (jsdom, máy chủ) ⇒ coi như KHÔNG giảm. */
 export function giamChuyenDong(): boolean {
-  try {
-    return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && !!window.matchMedia('(prefers-reduced-motion: reduce)')?.matches
-  } catch {
-    return false
-  }
+  return giamHieuUng()
 }
 
 /** Khoá sessionStorage: cảnh mở màn ~2 giây chỉ chạy LẦN ĐẦU mở Sảnh trong phiên. */

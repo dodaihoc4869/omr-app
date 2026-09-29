@@ -1,0 +1,31 @@
+/* CHẾ ĐỘ MÁY YẾU (thầy 29/09) — lớp `may-yeu` do src/lib/may-yeu.ts gắn lên <html> khi máy ít RAM / ít lõi /
+ * xin giảm chuyển động / tiết kiệm dữ liệu. Chỉ bớt việc VẼ; không ẩn nút, không đổi chữ, không đổi bố cục.
+ *
+ * 1. Kính mờ (backdrop-filter): mỗi khung mờ bắt máy vẽ lại vùng phía sau mỗi lần cuộn — nặng nhất với máy yếu.
+ *    Các khung này vốn đã có nền gần đặc (…/85–/95) nên tắt mờ vẫn đọc rõ.
+ * 2. Hoạt ảnh trang trí lặp vô hạn (thở, lấp lánh, xoay chậm, nhịp sáng): chạy MỘT lượt rồi đứng.
+ *    Giữ nguyên vòng quay chờ tải và khung xương chờ (animate-spin, animate-pulse, *-quay, *-xuong) để em biết app đang tải.
+ * 3. Bóng đổ lớn (shadow-lg/xl/2xl, bóng kính của Sảnh): thu về bóng nhỏ. */
+
+html.may-yeu *,
+html.may-yeu *::before,
+html.may-yeu *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.may-yeu *:not(.animate-spin):not(.animate-pulse):not(.m3-xuong):not(.bnv-xuong):not(.btm-quay):not(.btg-quay),
+html.may-yeu *::before,
+html.may-yeu *::after {
+  animation-iteration-count: 1 !important;
+}
+
+html.may-yeu .shadow-lg,
+html.may-yeu .shadow-xl,
+html.may-yeu .shadow-2xl {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.14) !important;
+}
+
+html.may-yeu .h2-sanh {
+  --h2-kinh-bong: 0 2px 6px rgb(70 40 120 / 0.14);
+}
