@@ -475,5 +475,79 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "DH-12-C2-B4-II-1": {
+  "luc": "2026-09-29T13:13:33.383Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Hằng ngày, cơ thể chúng ta được cung cấp các chất dinh dưỡng như tinh bột, đường saccharose, glucose, fructose,.. Các sản phẩm làm từ giấy, gỗ, sợi cotton,… với thành phần chính là cellulose cũng được được con người sử dụng.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 4. Glucose và fructose",
+   "y": {
+    "a": "Các chất tinh bột, saccharose, glucose, fructose, cellulose có tên gọi là carbohydrate.",
+    "b": "Các chất tinh bột, saccharose, glucose, fructose, cellulose có công thức chung là (CH₂O)ₙ.",
+    "c": "Trong phân tử của tinh bột, saccharose, glucose, fructose, cellulose có nhiều loại nhóm chức.",
+    "d": "Ngoài tinh bột, đường saccharose, glucose, fructose,… Chất béo và protein là một trong những nguồn cung cấp dinh dưỡng cấn thiết cho cơ thể."
+   },
+   "loi_giai": {
+    "chot": "Saccharose là C₁₂H₂₂O₁₁ nên không viết được thành (CH₂O)ₙ.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: cả năm chất đều là carbohydrate."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: saccharose là C₁₂H₂₂O₁₁, không có dạng (CH₂O)ₙ."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: đều là hợp chất tạp chức, có từ hai loại nhóm chức trở lên."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: chất béo và protein cũng là nguồn dinh dưỡng cần thiết."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Dạng (CH₂O)ₙ đòi hỏi số carbon bằng số oxygen, saccharose thì không.",
+    "bay": "Thấy công thức chung Cₙ(H₂O)ₘ là gán luôn thành (CH₂O)ₙ."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

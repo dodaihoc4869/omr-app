@@ -345,5 +345,68 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-KT-C1-D4-I-1": {
+  "luc": "2026-09-29T13:10:28.023Z",
+  "cau": {
+   "phan": "I",
+   "so": 1,
+   "de": "Acid béo omega-3 và omega-6 có tác dụng giảm huyết áp, giảm chlolessterol trong máu và ngăn chặn sự hình thành các mảng triglyceride bám trên động mạch. Nguồn cung cấp acid béo omega-3 và omega-6 cho cơ thể chủ yếu từ",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "chất béo",
+    "B": "tinh bột",
+    "C": "đường mía",
+    "D": "protein"
+   },
+   "loi_giai": {
+    "chot": "Omega-3 và omega-6 là các acid béo, mà acid béo nằm trong gốc acyl của chất béo, nên nguồn cung cấp chính là chất béo.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: chất béo là triester của glycerol với acid béo, gồm cả omega-3 và omega-6."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Tinh bột là polysaccharide, thuỷ phân chỉ cho glucose."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đường mía là saccharose, không chứa gốc acid béo."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Protein thuỷ phân cho amino acid, không phải acid béo."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.NHAN_DANG",
+    "ten": "Cấu tạo — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }

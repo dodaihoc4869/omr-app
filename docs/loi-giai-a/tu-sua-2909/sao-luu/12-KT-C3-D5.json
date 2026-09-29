@@ -137,5 +137,68 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "12-KT-C3-D5-I-10": {
+  "luc": "2026-09-29T13:10:41.261Z",
+  "cau": {
+   "phan": "I",
+   "so": 10,
+   "de": "Phát biểu nào sau đây sai khi nói về enzyme?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Phần lớn enzyme là những protein xúc tác cho các phản ứng hóa học và sinh hóa",
+    "B": "Enzyme có tính chọn lọc cao, có thể xúc tác cho nhiều phản ứng hóa học khác nhau",
+    "C": "Tốc độ phản ứng có xúc tác enzyme thường nhanh hơn nhiều lần so với với xúc tác hóa học",
+    "D": "Enzyme được sử dụng để định lượng, định tính và chuẩn đoán trong xét nghiệm hoặc sản xuất dược phẩm"
+   },
+   "loi_giai": {
+    "chot": "Enzyme có tính chọn lọc rất cao, mỗi enzyme chỉ xúc tác cho một hoặc một số phản ứng nhất định.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Phần lớn enzyme đúng là protein có vai trò xúc tác."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng là chỗ sai: enzyme không xúc tác cho nhiều phản ứng khác nhau."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Xúc tác enzyme cho tốc độ lớn hơn nhiều xúc tác hoá học."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Enzyme đúng là được dùng trong xét nghiệm và sản xuất dược phẩm."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
  }
 }

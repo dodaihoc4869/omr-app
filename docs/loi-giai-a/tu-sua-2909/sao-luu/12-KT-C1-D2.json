@@ -69,5 +69,202 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-KT-C1-D2-I-13": {
+  "luc": "2026-09-29T13:10:25.677Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Chất nào sau đây là thành phần chính của chất giặt rửa tồng hợp?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "C₁₅H₃₁COONa",
+    "B": "(C₁₇H₃₅COO)₂Ca",
+    "C": "CH₃[CH₂]₁₁C₆H₄SO₃Na",
+    "D": "C₁₇H₃₅COOK"
+   },
+   "loi_giai": {
+    "chot": "Chất giặt rửa tổng hợp thường là muối sodium alkylbenzenesulfonate, ở đây là CH₃[CH₂]₁₁C₆H₄SO₃Na.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "C₁₅H₃₁COONa là sodium palmitate, tức xà phòng chứ không phải chất giặt rửa tổng hợp."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "(C₁₇H₃₅COO)₂Ca là muối calcium, kết tủa, chính là cặn xà phòng."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: gốc sulfonate gắn vòng benzene và mạch dodecyl là thành phần chính."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "C₁₇H₃₅COOK là xà phòng kali, vẫn thuộc nhóm xà phòng."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.UNG_DUNG.NHAN_DANG",
+    "ten": "Ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B2-D1",
+    "ten": "Phản ứng điều chế xà phòng",
+    "lop": "12",
+    "bai": "DB-12-B2",
+    "tenBai": "Xà phòng và chất giặt rửa tổng hợp",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "12-KT-C1-D2-I-6": {
+  "luc": "2026-09-29T13:10:25.677Z",
+  "cau": {
+   "phan": "I",
+   "so": 6,
+   "de": "Trong công nghiệp, để chuyển hóa chất béo lỏng thành chất béo rắn, người ta dùng phản ứng nào sau đây?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Phản ứng ester hóa",
+    "B": "Phản ứng hydrogen",
+    "C": "Phản ứng oxi hóa",
+    "D": "Phản ứng xà phòng hóa"
+   },
+   "loi_giai": {
+    "chot": "Chất béo lỏng nhiều gốc acid béo không no; cộng hydrogen vào các nối đôi C=C biến chúng thành gốc no, chất béo hoá rắn.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Ester hoá dùng để tạo ester từ acid và alcohol, không làm rắn chất béo."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: hydrogen hoá no hoá các nối đôi, nâng nhiệt độ nóng chảy."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Oxi hoá làm chất béo ôi thiu chứ không chuyển sang thể rắn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Xà phòng hoá phá vỡ chất béo thành muối và glycerol."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.UNG_DUNG.NHAN_DANG",
+    "ten": "Ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "12-KT-C1-D2-I-7": {
+  "luc": "2026-09-29T13:10:25.677Z",
+  "cau": {
+   "phan": "I",
+   "so": 7,
+   "de": "Tỉnh chất vật lí chung của chất béo là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "ít tan trong nước và nhẹ hơn nước",
+    "B": "dễ tan trong nước và nhẹ hơn nước",
+    "C": "ít tan trong nước và nặng hơn nước",
+    "D": "dễ tan trong nước và nặng hơn nước"
+   },
+   "loi_giai": {
+    "chot": "Chất béo là ester không phân cực nên gần như không tan trong nước, và khối lượng riêng nhỏ hơn nước nên nổi lên trên.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: ít tan trong nước và nhẹ hơn nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai vế đầu: chất béo không phân cực nên không tan được trong nước."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai vế sau: chất béo nhẹ hơn nước nên nổi, không chìm."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai cả hai vế."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.NHAN_DANG",
+    "ten": "Cấu tạo — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }

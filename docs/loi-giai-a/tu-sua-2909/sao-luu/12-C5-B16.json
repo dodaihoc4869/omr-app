@@ -197,5 +197,69 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
   }
+ },
+ "12-C5-B16-I-29": {
+  "luc": "2026-09-29T13:10:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 29,
+   "de": "Khi điện phân nóng chảy MgCl₂ nóng chảy (điện cực trơ), ở anode xảy ra",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "biet",
+   "pa": {
+    "A": "sự khử ion Cl⁻",
+    "B": "sự khử ion Mg²⁺",
+    "C": "sự oxi hóa ion Mg²⁺",
+    "D": "sự oxi hóa ion Cl⁻"
+   },
+   "loi_giai": {
+    "chot": "Anode là nơi oxi hoá; trong MgCl₂ nóng chảy thì Cl⁻ bị oxi hoá thành Cl₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: Cl⁻ bị oxi hoá chứ không bị khử."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: Mg²⁺ bị khử nhưng ở cathode."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: Mg²⁺ đã ở mức oxi hoá cao nhất."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: 2Cl⁻ → Cl₂ + 2e."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_NC.NHAN_DANG",
+    "ten": "Điện phân nóng chảy — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
  }
 }

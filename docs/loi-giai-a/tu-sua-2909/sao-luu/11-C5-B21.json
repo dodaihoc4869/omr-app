@@ -1,0 +1,201 @@
+{
+ "11-C5-B21-I-10": {
+  "luc": "2026-09-29T13:09:57.870Z",
+  "cau": {
+   "phan": "I",
+   "so": 10,
+   "de": "Chỉ ra thứ tự tăng dần mức độ linh động của nguyên tử H trong nhóm –OH của các hợp chất phenol, ethanol và nước?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Dẫn xuất halogen – alcohol – phenol",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Ethanol < nước < phenol",
+    "B": "Nước < phenol < etanol",
+    "C": "Ethanol < phenol < nước",
+    "D": "Phenol < nước < ethanol"
+   },
+   "loi_giai": {
+    "chot": "Nhóm OH gắn vào vòng benzene bị vòng hút electron nên H linh động nhất; gốc alkyl đẩy electron làm H của alcohol kém linh động nhất.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: gốc C₂H₅ đẩy electron nên ethanol yếu nhất, vòng benzene hút electron nên phenol mạnh nhất."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: phenol có tính acid mạnh hơn nước."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: phenol mạnh hơn nước chứ không yếu hơn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: đây là thứ tự ngược hoàn toàn."
+     }
+    },
+    "dap_an_de": "",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "thieu_dap_an",
+    "ghi_chu": "Đề gốc quên tô đáp án cho câu này; đáp án A do máy tự giải, thầy đối chiếu lại."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.SO_SANH",
+    "ten": "Tính chất phenol — so sánh"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-05",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ALCOHOL_PHENOL"
+  }
+ },
+ "11-C5-B21-I-4": {
+  "luc": "2026-09-29T13:09:57.870Z",
+  "cau": {
+   "phan": "I",
+   "so": 4,
+   "de": "Phương trình hoá học của phản ứng thuỷ phân ethyl bromide là:\nCH₃CH₂Br + NaOH → CH₃CH₂OH + NaBr (1).\nMột giai đoạn tạo thành sản phẩm trong cơ chế của phản ứng trên xảy ra như hình (*).\nNhận định nào sau đây đúng?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_14.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Dẫn xuất halogen – alcohol – phenol",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "Trong phản ứng (1), liên kết C - Br phân cực nên dễ bị phân cắt",
+    "B": "Trọng giai đoạn (*), có sự tạo thành liên kết do sự xen phủ các orbital s-p",
+    "C": "Giai đoạn (*) biểu diễn sự chuyển hoá chất phản ứng thành sản phẩm",
+    "D": "Phản ứng (1) thuộc loại phản ứng cộng"
+   },
+   "loi_giai": {
+    "chot": "Liên kết C-Br phân cực về phía Br nên carbon mang một phần điện tích dương, dễ bị tác nhân OH⁻ tấn công.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: chênh lệch độ âm điện làm liên kết C-Br phân cực nên dễ bị phân cắt dị li."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: liên kết C-O mới tạo thành là xen phủ giữa các orbital lai hoá, không phải xen phủ s-p."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: hình (*) mô tả trạng thái chuyển tiếp, không phải toàn bộ quá trình chuyển hoá."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: phản ứng (1) là phản ứng thế nguyên tử halogen bằng nhóm OH."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Đọc sơ đồ trạng thái chuyển tiếp của phản ứng thế; phân biệt trạng thái chuyển tiếp với sản phẩm.",
+    "bay": null
+   },
+   "kienThuc": [
+    "cơ chế phản ứng thế của dẫn xuất halogen"
+   ],
+   "loiThuongGap": [
+    "gọi trạng thái chuyển tiếp là sản phẩm trung gian bền"
+   ],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "ALCOHOL_PHENOL.TINH_CHAT_PHENOL.CHON_PHAT_BIEU",
+    "ten": "Tính chất phenol — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-05",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ALCOHOL_PHENOL"
+  }
+ },
+ "11-C5-B21-III-4": {
+  "luc": "2026-09-29T13:09:57.870Z",
+  "cau": {
+   "phan": "III",
+   "so": 4,
+   "de": "Thị trường tiêu thụ phenol trên thế giới khoảng 11,37 triệu tấn trong năm 2021, dự kiến sẽ tăng lên 14,07 triệu tấn vào năm 2029. Phenol được sử dụng để sản xuất nhiều loại hóa chất như bisphenol A, nhựa phenolfomaldehyde, picric acid và các chất khác.\nKhoảng 90% lượng phenol được sản xuất từ cumene (bằng phương pháp cumene, chu trình cumene,…). Để cung cấp đủ sản lượng tiêu thụ của phenol trong năm 2025, khối lượng cumene đã đùng để sản xuất phenol là bao nhiêu triệu tấn? (Làm tròn đến hàng phần mười).\nChỉ tính trên lượng phenol đã tiêu thụ, không bao gồm lượng cumene thực tế sản xuất phenol chưa tiêu thụ.",
+   "dap_an": "14,6",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III_19.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Dẫn xuất halogen – alcohol – phenol",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Cumene chuyển thành phenol theo tỉ lệ mol 1 : 1 nên khối lượng cumene bằng khối lượng phenol nhân 120/94.",
+    "buoc": [
+     "Đọc biểu đồ: sản lượng phenol tiêu thụ năm 2025 là 12,67 triệu tấn.",
+     "Phần sản xuất từ cumene chiếm 90%: 12,67 x 0,9 = 11,403 triệu tấn.",
+     "Tỉ lệ mol cumene : phenol là 1 : 1 nên m(cumene) = 11,403 x 120/94.",
+     "m(cumene) = 14,6 triệu tấn."
+    ],
+    "ket_qua": "14,6",
+    "dap_an_de": "14,6",
+    "dap_an_tu_giai": "14,6",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "buoc"
+    ],
+    "ly_do": "Đọc biểu đồ lấy sản lượng năm 2025, lấy 90% rồi quy về khối lượng cumene theo tỉ lệ 1 : 1.",
+    "bay": null
+   },
+   "kienThuc": [
+    "đọc biểu đồ cột",
+    "quy đổi khối lượng theo tỉ lệ mol"
+   ],
+   "loiThuongGap": [
+    "quên nhân tỉ lệ 90% sản xuất từ cumene"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ALCOHOL_PHENOL.UNG_DUNG.DEM_DONG_PHAN",
+    "ten": "Điều chế và ứng dụng — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-05",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ALCOHOL_PHENOL"
+  }
+ }
+}

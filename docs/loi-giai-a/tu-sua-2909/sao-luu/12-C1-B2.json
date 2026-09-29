@@ -1,0 +1,76 @@
+{
+ "12-C1-B2-I-16": {
+  "luc": "2026-09-29T13:10:08.333Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "“.(1). là các chất được tổng hợp hóa học, có tác dụng giặt rửa như xà phòng nhưng không phải là muối sodium hoặc potassium của các acid béo”.\nNội dung phù hợp trong chỗ trống (1) là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "chất giặt rửa tổng hợp.",
+    "B": "ester.",
+    "C": "xà phòng.",
+    "D": "chất béo."
+   },
+   "loi_giai": {
+    "chot": "Chất giặt rửa tổng hợp là chất được tổng hợp hóa học, giặt rửa như xà phòng nhưng không phải muối sodium hoặc potassium của acid béo.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng khái niệm chất giặt rửa tổng hợp; chọn."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Ester là hợp chất RCOOR', không có tác dụng giặt rửa; không chọn."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Xà phòng chính là muối sodium hoặc potassium của acid béo, trái với vế sau; không chọn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Chất béo là triester của glycerol, không giặt rửa; không chọn."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng định nghĩa chất giặt rửa tổng hợp ở câu 5, chỉ đổi sang dạng điền khuyết.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "ESTER.UNG_DUNG.NHAN_DANG",
+    "ten": "Ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C1-B2",
+   "dangBai": {
+    "ma": "DB-12-B2-D1",
+    "ten": "Phản ứng điều chế xà phòng",
+    "lop": "12",
+    "bai": "DB-12-B2",
+    "tenBai": "Xà phòng và chất giặt rửa tổng hợp",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

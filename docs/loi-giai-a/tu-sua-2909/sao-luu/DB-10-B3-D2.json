@@ -1,0 +1,79 @@
+{
+ "DB-10-B3-D2-II-83": {
+  "luc": "2026-09-29T13:10:54.610Z",
+  "cau": {
+   "phan": "II",
+   "so": 83,
+   "de": "X được dùng làm chất bán dẫn trong kĩ thuật vô tuyến điện, chế tạo pin mặt trời.\nNguyên tử X có 3 lớp electron, lớp ngoài cùng có 4 electron.\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Cấu trúc lớp vỏ electron nguyên tử",
+   "y": {
+    "a": "X là nguyên tố p.",
+    "b": "Điện tích hạt nhân của nguyên tử X là +12.",
+    "c": "Cấu hình elctron của X là 1s²2s²2p⁶3s²3p⁴.",
+    "d": "Ở trạng thái cơ bản, nguyên tử X có 2 electron độc thân."
+   },
+   "loi_giai": {
+    "chot": "X là silicon: 1s²2s²2p⁶3s²3p², Z = 14, nguyên tố p, có 2 electron độc thân.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: electron cuối cùng điền vào phân lớp 3p nên X là nguyên tố p."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: Z = 2 + 8 + 4 = 14 nên điện tích hạt nhân là +14."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cấu hình đúng là 1s²2s²2p⁶3s²3p², không phải 3p⁴."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: 3p² xếp vào hai ô orbital riêng nên có 2 electron độc thân."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc không in đáp án cho câu này; đáp án và lời giải đều do máy tự giải."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Ba lớp electron và 4 electron lớp ngoài cùng cho đúng Z = 14 (silicon).",
+    "bay": "Đếm nhầm thành 3p⁴ vì nhớ mang máng cấu hình của sulfur."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.CHON_PHAT_BIEU",
+    "ten": "Cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B3-D2",
+    "ten": "Bài toán về các loại hạt của nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B3",
+   "nguonCau": "II-29"
+  }
+ }
+}

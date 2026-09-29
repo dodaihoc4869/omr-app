@@ -1,0 +1,74 @@
+{
+ "11-C1-B2-D2-I-25": {
+  "luc": "2026-09-29T13:09:49.068Z",
+  "cau": {
+   "phan": "I",
+   "so": 25,
+   "de": "Phương trình mô tả sự điện li của Na₂CO₃ trong nước là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Na₂CO₃ (s) → 2Na (aq) + C (aq) + 3O (aq)",
+    "B": "Na₂CO₃ (s) → 2Na⁺ (aq) + C⁴⁺ (aq) + 3O²⁻ (aq)",
+    "C": "Na₂CO₃ (s) → 2Na⁺ (aq) + CO3²⁻ (aq)",
+    "D": "Na₂CO₃ (s) → 2Na⁺ (g) + CO3²⁻ (g)"
+   },
+   "loi_giai": {
+    "chot": "Điện li chỉ tách muối thành cation kim loại và anion gốc acid, không phá gốc acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: sản phẩm phải là ion mang điện, không phải nguyên tử trung hoà."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: gốc carbonate không bị tách thành từng nguyên tố."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: muối tan phân li hoàn toàn thành ion Na⁺ và ion carbonate."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: ion trong dung dịch ở trạng thái aq, không phải trạng thái khí."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CAN_BANG.DIEN_LI.VIET_PTHH",
+    "ten": "Sự điện li — viết phương trình"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-03",
+   "dangBai": {
+    "ma": "DB-11-B2-D2",
+    "ten": "Phản ứng trao đổi ion trong dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ }
+}

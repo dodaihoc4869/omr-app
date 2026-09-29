@@ -1,0 +1,157 @@
+{
+ "DB-10-B8-D2-II-31": {
+  "luc": "2026-09-29T13:11:07.078Z",
+  "cau": {
+   "phan": "II",
+   "so": 31,
+   "de": "Cho vị trí của các nguyên tố E, T, Q, X, Y, Z trong bảng tuần hoàn rút gọn (chỉ biểu diễn các nguyên tố nhóm r A) như sau:",
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-13.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "y": {
+    "a": "Nguyên tử của các nguyên tố T, Z và Q đều có 7 electron ở lớp ngoài cùng.",
+    "b": "Thứ tự giảm dần tính kim loại của các nguyên tố trong cùng một chu kì là Y, E, X.",
+    "c": "Theo chiều tăng của điện tích hạt nhân, bán kính nguyên tử giảm dần theo thứ tự Y, E, X, T.",
+    "d": "Thứ tự tăng dần độ âm điện của các nguyên tố là Y, X, Z, T."
+   },
+   "loi_giai": {
+    "chot": "Bốn ý đều dựa vào vị trí sáu nguyên tố trên bảng rút gọn: cùng nhóm VIIA thì có 7 electron ngoài cùng, cùng chu kì thì bán kính và tính kim loại giảm còn độ âm điện tăng từ trái sang phải.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, T, Z, Q thuộc nhóm VIIA nên có 7 electron lớp ngoài cùng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, Y, E, X xếp từ trái sang phải trong một chu kì nên tính kim loại giảm dần."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, bán kính giảm dần theo chiều tăng điện tích hạt nhân Y, E, X, T."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, độ âm điện tăng dần theo Y, X, Z, T."
+     }
+    },
+    "dap_an_de": "DDDD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "ĐÃ XEM ẢNH 16/09. Bảng rút gọn: chu kì 2 có Y(IA), E(IIA), X(IVA), T(VIIA); Z ở VIIA chu kì 3; Q ở VIIA chu kì 4. a) T, Z, Q cùng nhóm VIIA nên đều 7 e lớp ngoài — Đ. b) cùng chu kì 2, tính kim loại giảm Y > E > X — Đ. c) cùng chu kì 2, bán kính giảm Y > E > X > T — Đ. d) độ âm điện tăng Y(IA,ck2) < X(IVA,ck2) < Z(VIIA,ck3) < T(VIIA,ck2) — Đ. Khớp DDDD."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đọc bảng tuần hoàn rút gọn, bảng minh hoạ bị mất khi chuyển văn bản.",
+    "bay": "Phải đọc đúng ô của sáu nguyên tố trên bảng rút gọn; bảng này không có trong tệp nguồn."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.CHON_PHAT_BIEU",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D2",
+    "ten": "Xác định vị trí của các nguyên tố thuộc cùng chu kì hoặc cùng nhóm",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B6",
+   "nguonCau": "II-13"
+  }
+ },
+ "DB-10-B8-D2-I-52": {
+  "luc": "2026-09-29T13:11:07.078Z",
+  "cau": {
+   "phan": "I",
+   "so": 52,
+   "de": "Nguyên tử của các nguyên tố trong cùng một nhóm A (trừ He) có cùng",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "biet",
+   "bai": "Bài 9. Ôn tập chương 2 (đề 1)",
+   "pa": {
+    "A": "số electron.",
+    "B": "số lớp electron.",
+    "C": "số electron hóa trị.",
+    "D": "số electron ở lớp ngoài cùng."
+   },
+   "loi_giai": {
+    "chot": "Nhóm A xếp theo số electron lớp ngoài cùng; số thứ tự nhóm A bằng chính số electron đó. Helium là ngoại lệ vì chỉ có 2 electron ngoài cùng mà vẫn ở nhóm VIIIA.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Tổng số electron bằng Z, mỗi nguyên tố một khác."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Số lớp electron bằng số thứ tự chu kì, khác nhau theo hàng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Với nhóm A thì đúng, nhưng chính He phá lệ nên đây không phải cách phát biểu của sách."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: cùng nhóm A thì cùng số electron lớp ngoài cùng, trừ He."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.NHAN_DANG",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D2",
+    "ten": "Xác định vị trí của các nguyên tố thuộc cùng chu kì hoặc cùng nhóm",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B9-D1",
+   "nguonCau": "I-3"
+  }
+ }
+}

@@ -1,0 +1,138 @@
+{
+ "DH-11-C2-B4-I-14": {
+  "luc": "2026-09-29T13:13:11.052Z",
+  "cau": {
+   "phan": "I",
+   "so": 14,
+   "de": "Trong hợp chất, nitrogen có các mức oxi hóa nào sau đây?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 4. Nitrogen",
+   "pa": {
+    "A": "−3, +3, +5.",
+    "B": "−3, 0, +3, +5.",
+    "C": "-3, +1, +2, +3, +4, +5.",
+    "D": "−3, 0, +1, +2, +3, +4, +5."
+   },
+   "loi_giai": {
+    "chot": "Trong hợp chất, nitrogen có đủ các mức từ −3 đến +5 trừ mức 0, vì 0 chỉ có ở đơn chất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Thiếu các mức +1, +2, +4 có trong N₂O, NO và NO₂."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Mức 0 chỉ có ở đơn chất N₂, không có trong hợp chất."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: −3, +1, +2, +3, +4, +5."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Thừa mức 0, vốn chỉ thuộc về đơn chất."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_N2.NHAN_DANG",
+    "ten": "Đơn chất nitrogen, cấu tạo và tính trơ — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề NITROGEN_SULFUR"
+  }
+ },
+ "DH-11-C2-B4-I-5": {
+  "luc": "2026-09-29T13:13:11.052Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "de": "Diêu tiêu Chile là tên gọi khác của hợp chất nào sau đây?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 4. Nitrogen",
+   "pa": {
+    "A": "Sodium chloride.",
+    "B": "Potassium sulfate.",
+    "C": "Sodium nitrate.",
+    "D": "Potassium nitrate."
+   },
+   "loi_giai": {
+    "chot": "Diêm tiêu Chile là tên gọi dân gian của sodium nitrate NaNO₃.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sodium chloride là muối ăn."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Potassium sulfate là một loại phân kali."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: sodium nitrate."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Potassium nitrate là diêm tiêu thường, không phải diêm tiêu Chile."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.GOI_TEN",
+    "ten": "Nitric acid và muối nitrate — gọi tên"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ }
+}

@@ -1,0 +1,447 @@
+{
+ "DH-10-C2-B6-I-15": {
+  "luc": "2026-09-29T13:12:49.581Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Phát biểu nào sau đây là đúng về xu hướng biển đổi tính kim loại trong bảng tuần hoàn các nguyên tố hoá học?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "biet",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "pa": {
+    "A": "Tính kim loại của các nguyên tố tăng theo chiều từ trái sang phải trong một chu kì và từ trên xuống dưới trong một nhóm.",
+    "B": "Tính kim loại giảm dần theo chiều từ trái sang phải trong một chu kì và tăng dần từ trên xuống dưới trong một nhóm.",
+    "C": "Tính kim loại giảm dần theo chiều từ trái sang phải trong một chu kì và từ trên xuống dưới trong một nhóm.",
+    "D": "Tính kim loại tăng dần theo chiều từ trái sang phải trong một chu kì và giảm dần từ trên xuống dưới trong một nhóm."
+   },
+   "loi_giai": {
+    "chot": "Tính kim loại giảm từ trái sang phải trong một chu kì và tăng từ trên xuống dưới trong một nhóm A.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Trong chu kì, tính kim loại giảm chứ không tăng."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng theo hai xu hướng chuẩn của bảng tuần hoàn."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Trong nhóm A, tính kim loại tăng chứ không giảm."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Ngược cả hai chiều so với quy luật."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.CHON_PHAT_BIEU",
+    "ten": "Xu hướng biến đổi tính chất — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D1",
+    "ten": "Định luật tuần hoàn và ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B6-I-18": {
+  "luc": "2026-09-29T13:12:49.581Z",
+  "cau": {
+   "phan": "I",
+   "so": 18,
+   "de": "Nguyên tử của nguyên tố nào sau đây có tính kim loại mạnh nhất?\nCho biết nguyên tố này được sử dụng trong đồng hồ nguyên tử, với độ chính xác ở mức giây trong hàng nghìn năm.",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "biet",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "pa": {
+    "A": "Hydrogen.",
+    "B": "Berylium.",
+    "C": "Caesium.",
+    "D": "Phosphorus."
+   },
+   "loi_giai": {
+    "chot": "Caesium là kim loại kiềm có bán kính lớn nhất trong bốn nguyên tố nên nhường electron dễ nhất, tính kim loại mạnh nhất; caesium cũng là nguyên tố dùng trong đồng hồ nguyên tử.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Hydrogen là phi kim, không mang tính kim loại điển hình."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Beryllium thuộc nhóm IIA chu kì 2, bán kính nhỏ, tính kim loại yếu."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: caesium nhóm IA chu kì 6, bán kính rất lớn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Phosphorus là phi kim."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.NHAN_DANG",
+    "ten": "Xu hướng biến đổi tính chất — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D1",
+    "ten": "Định luật tuần hoàn và ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B6-II-13": {
+  "luc": "2026-09-29T13:12:49.581Z",
+  "cau": {
+   "phan": "II",
+   "so": 13,
+   "de": "Cho vị trí của các nguyên tố E, T, Q, X, Y, Z trong bảng tuần hoàn rút gọn (chỉ biểu diễn các nguyên tố nhóm r A) như sau:",
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-13.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "y": {
+    "a": "Nguyên tử của các nguyên tố T, Z và Q đều có 7 electron ở lớp ngoài cùng.",
+    "b": "Thứ tự giảm dần tính kim loại của các nguyên tố trong cùng một chu kì là Y, E, X.",
+    "c": "Theo chiều tăng của điện tích hạt nhân, bán kính nguyên tử giảm dần theo thứ tự Y, E, X, T.",
+    "d": "Thứ tự tăng dần độ âm điện của các nguyên tố là Y, X, Z, T."
+   },
+   "loi_giai": {
+    "chot": "Bốn ý đều dựa vào vị trí sáu nguyên tố trên bảng rút gọn: cùng nhóm VIIA thì có 7 electron ngoài cùng, cùng chu kì thì bán kính và tính kim loại giảm còn độ âm điện tăng từ trái sang phải.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, T, Z, Q thuộc nhóm VIIA nên có 7 electron lớp ngoài cùng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, Y, E, X xếp từ trái sang phải trong một chu kì nên tính kim loại giảm dần."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, bán kính giảm dần theo chiều tăng điện tích hạt nhân Y, E, X, T."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Theo bảng gốc, độ âm điện tăng dần theo Y, X, Z, T."
+     }
+    },
+    "dap_an_de": "DDDD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "ĐÃ XEM ẢNH 16/09. Bảng rút gọn: chu kì 2 có Y(IA), E(IIA), X(IVA), T(VIIA); Z ở VIIA chu kì 3; Q ở VIIA chu kì 4. a) T, Z, Q cùng nhóm VIIA nên đều 7 e lớp ngoài — Đ. b) cùng chu kì 2, tính kim loại giảm Y > E > X — Đ. c) cùng chu kì 2, bán kính giảm Y > E > X > T — Đ. d) độ âm điện tăng Y(IA,ck2) < X(IVA,ck2) < Z(VIIA,ck3) < T(VIIA,ck2) — Đ. Khớp DDDD."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đọc bảng tuần hoàn rút gọn, bảng minh hoạ bị mất khi chuyển văn bản.",
+    "bay": "Phải đọc đúng ô của sáu nguyên tố trên bảng rút gọn; bảng này không có trong tệp nguồn."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.CHON_PHAT_BIEU",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D2",
+    "ten": "Xác định vị trí của các nguyên tố thuộc cùng chu kì hoặc cùng nhóm",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B6-II-14": {
+  "luc": "2026-09-29T13:12:49.581Z",
+  "cau": {
+   "phan": "II",
+   "so": 14,
+   "de": "Nếu cho cùng một lượng magnesium (Z=12) và calcium (Z=20) vào trong một cốc nước có chứa phenolphtalein thì sau 45 phút sẽ quan sát thấy màu hồng trong cả hai cốc.",
+   "dap_an": "SSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "y": {
+    "a": "Hai kim loại này đều thuộc cùng nhóm IIA trong bảng tuần hoàn, do đó tính chất hóa học tương tự nhau nên tốc độ phản ứng là như nhau.",
+    "b": "Phenolphtalein đóng vai trò là chất xúc tác giúp cho phản ứng giữa kim loại và nước xảy ra dễ dàng hơn.",
+    "c": "Thời gian phản ứng ở thí nghiệm trên vẫn chưa đủ để kết luận về mức độ hoạt động hóa học của hai kim loại này.",
+    "d": "Thí nghiệm chứng minh được khả năng phản ứng của calcium mạnh hơn magnesium."
+   },
+   "loi_giai": {
+    "chot": "Ca ở chu kì 4 có bán kính lớn hơn Mg nên nhường electron dễ hơn, phản ứng với nước nhanh hơn và làm phenolphthalein hồng trước; phenolphthalein chỉ là chất chỉ thị.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cùng nhóm IIA nhưng Ca hoạt động mạnh hơn Mg nên tốc độ khác nhau rõ rệt."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: phenolphthalein là chất chỉ thị màu, không phải chất xúc tác."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: quan sát cốc nào hồng trước đã đủ để kết luận Ca hoạt động mạnh hơn."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: thí nghiệm cho thấy calcium phản ứng với nước mạnh hơn magnesium."
+     }
+    },
+    "dap_an_de": "SSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu gắn thí nghiệm thật với xu hướng tính kim loại trong nhóm IIA.",
+    "bay": "Phenolphthalein chỉ là chất chỉ thị, không phải xúc tác; cùng nhóm IIA không có nghĩa tốc độ phản ứng như nhau."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D2",
+    "ten": "Xác định vị trí của các nguyên tố thuộc cùng chu kì hoặc cùng nhóm",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B6-II-16": {
+  "luc": "2026-09-29T13:12:49.581Z",
+  "cau": {
+   "phan": "II",
+   "so": 16,
+   "de": "Cho các nguyên tố X, Y, Z có số hiệu nguyên tử lần lượt là 6,9,14.",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "y": {
+    "a": "Thứ tự bán kính nguyên tử tăng dần của các nguyên tố được sắp xếp là X, Y, Z.",
+    "b": "Thứ tự độ âm điện giảm dần của các nguyên tố được sắp xếp là Y, Z, X.",
+    "c": "Thứ tự tính phi kim tăng dần của các nguyên tố được sắp xếp là là Z, X, Y.",
+    "d": "Trong bảng tuần hoàn, nguyên tố Y có giá trị độ âm điện lớn nhất."
+   },
+   "loi_giai": {
+    "chot": "X là C, Y là F cùng chu kì 2 nên F nhỏ hơn C về bán kính và lớn hơn về độ âm điện; Z là Si ở chu kì 3 nên bán kính lớn nhất, tính phi kim yếu nhất.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: bán kính tăng dần là F, C, Si tức Y, X, Z."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: độ âm điện giảm dần là F, C, Si tức Y, X, Z."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: tính phi kim tăng dần Si < C < F."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: Y là fluorine, có độ âm điện lớn nhất bảng tuần hoàn."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Câu so bán kính, độ âm điện và tính phi kim của ba nguyên tố ở hai chu kì khác nhau.",
+    "bay": "Ba nguyên tố nằm ở hai chu kì khác nhau nên phải tách riêng so sánh trong chu kì 2 rồi mới bắc cầu sang Si."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B6-I-47": {
+  "luc": "2026-09-29T13:12:49.581Z",
+  "cau": {
+   "phan": "I",
+   "so": 47,
+   "de": "Cho các nguyên tố: Li(Z = 3), Be(Z = 4), F(Z = 9), Cl(Z = 17). Thứ tự tăng dần bán kính nguyên tử là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "pa": {
+    "A": "Li, Be, F, Cl.",
+    "B": "Be, Li, F, Cl.",
+    "C": "F, Be, Li, Cl.",
+    "D": "Cl, F, Li, Be."
+   },
+   "loi_giai": {
+    "chot": "Theo số liệu bán kính chuẩn thì F 64 < Cl 99 < Be 112 < Li 152 pm, tức chiều tăng dần là F, Cl, Be, Li, không trùng phương án nào của đề.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Li có bán kính lớn nhất nên không thể đứng đầu."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Be có bán kính nhỏ hơn Li nên không xếp được như vậy cùng phần còn lại."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đáp án đề chọn C, chỉ đúng khi suy luận thô theo chu kì; số liệu thật cho F, Cl, Be, Li."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Cl có bán kính lớn hơn F nên không đứng đầu dãy."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Theo số liệu bán kính nguyên tử chuẩn (Li 152, Be 112, Cl 99, F 64 pm) thì chiều tăng dần phải là F, Cl, Be, Li – không phương án nào khớp. C chỉ đúng nếu suy luận thô rằng mọi nguyên tố chu kì 3 đều lớn hơn chu kì 2. Giữ đáp án đề C và gắn cờ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu so bán kính bắc cầu giữa hai chu kì, số liệu thật không khớp phương án nào.",
+    "bay": "Bốn nguyên tố nằm ở hai chu kì khác nhau nên không xếp được chỉ bằng một quy luật; phải tra số liệu bán kính thật."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.SO_SANH",
+    "ten": "Xu hướng biến đổi tính chất — so sánh"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D1",
+    "ten": "Định luật tuần hoàn và ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ }
+}

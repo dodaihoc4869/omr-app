@@ -1,0 +1,209 @@
+{
+ "DH-10-C1-B3-II-29": {
+  "luc": "2026-09-29T13:12:41.950Z",
+  "cau": {
+   "phan": "II",
+   "so": 29,
+   "de": "X được dùng làm chất bán dẫn trong kĩ thuật vô tuyến điện, chế tạo pin mặt trời.\nNguyên tử X có 3 lớp electron, lớp ngoài cùng có 4 electron.\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Cấu trúc lớp vỏ electron nguyên tử",
+   "y": {
+    "a": "X là nguyên tố p.",
+    "b": "Điện tích hạt nhân của nguyên tử X là +12.",
+    "c": "Cấu hình elctron của X là 1s²2s²2p⁶3s²3p⁴.",
+    "d": "Ở trạng thái cơ bản, nguyên tử X có 2 electron độc thân."
+   },
+   "loi_giai": {
+    "chot": "X là silicon: 1s²2s²2p⁶3s²3p², Z = 14, nguyên tố p, có 2 electron độc thân.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: electron cuối cùng điền vào phân lớp 3p nên X là nguyên tố p."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: Z = 2 + 8 + 4 = 14 nên điện tích hạt nhân là +14."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cấu hình đúng là 1s²2s²2p⁶3s²3p², không phải 3p⁴."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: 3p² xếp vào hai ô orbital riêng nên có 2 electron độc thân."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc không in đáp án cho câu này; đáp án và lời giải đều do máy tự giải."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Ba lớp electron và 4 electron lớp ngoài cùng cho đúng Z = 14 (silicon).",
+    "bay": "Đếm nhầm thành 3p⁴ vì nhớ mang máng cấu hình của sulfur."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.CHON_PHAT_BIEU",
+    "ten": "Cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B3-D2",
+    "ten": "Bài toán về các loại hạt của nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ },
+ "DH-10-C1-B3-II-30": {
+  "luc": "2026-09-29T13:12:41.950Z",
+  "cau": {
+   "phan": "II",
+   "so": 30,
+   "de": "A được dùng để chế tạo đèn có cường độ sáng cao.\nNguyên tử A có electron ở phân lớp 3d chỉ bằng một nửa phân lớp 4s.\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Cấu trúc lớp vỏ electron nguyên tử",
+   "y": {
+    "a": "Cấu hình elctron của A là 1s²2s²2p⁶3s²3p⁶4s²3d¹.",
+    "b": "A là nguyên tố kim loại.",
+    "c": "A là nguyên tố s.",
+    "d": "Ở trạng thái cơ bản, nguyên tử A có 3 electron độc thân."
+   },
+   "loi_giai": {
+    "chot": "A là scandium (Z = 21): 1s²2s²2p⁶3s²3p⁶4s²3d¹, nguyên tố d, có 1 electron độc thân.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: 4s² và 3d¹ cho cấu hình 1s²2s²2p⁶3s²3p⁶4s²3d¹."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: scandium là kim loại chuyển tiếp."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: electron cuối cùng điền vào 3d nên A là nguyên tố d."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: 3d¹ chỉ cho 1 electron độc thân."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc không in đáp án cho câu này; đáp án và lời giải đều do máy tự giải."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Phân lớp 4s chứa tối đa 2 electron nên 'một nửa 4s' chỉ có thể là 3d¹.",
+    "bay": "Cho rằng 4s có thể chứa nhiều hơn 2 electron."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.CHON_PHAT_BIEU",
+    "ten": "Cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ },
+ "DH-10-C1-B3-III-31": {
+  "luc": "2026-09-29T13:12:41.950Z",
+  "cau": {
+   "phan": "III",
+   "so": 31,
+   "de": "Một nguyên tố mà nguyên tử có 4 lớp electron, có phân lớp d, lớp ngoài cùng đã bão hòa electron.\nTổng số electron s và electron p của nguyên tố này là bao nhiêu?",
+   "dap_an": "20",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Cấu trúc lớp vỏ electron nguyên tử",
+   "loi_giai": {
+    "chot": "Bốn lớp electron, có phân lớp d, lớp ngoài cùng bão hoà nên lớp ngoài cùng là 4s².",
+    "buoc": [
+     "Bốn lớp electron, có phân lớp d, lớp ngoài cùng bão hoà nên lớp ngoài cùng là 4s².",
+     "Electron s gồm 1s², 2s², 3s², 4s²: tổng 8.",
+     "Electron p gồm 2p⁶ và 3p⁶: tổng 12. Vậy 8 + 12 = 20."
+    ],
+    "ket_qua": "20",
+    "dap_an_de": "20",
+    "dap_an_tu_giai": "20",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Kết quả không phụ thuộc số electron 3d, nhận ra điều đó là xong bài.",
+    "bay": "Cộng luôn electron 3d vào tổng dù đề chỉ hỏi electron s và p."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.DEM_NGUYEN_TU",
+    "ten": "Cấu hình electron — đếm nguyên tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ }
+}
