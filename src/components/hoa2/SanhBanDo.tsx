@@ -541,7 +541,12 @@ function NutTuLuyen({ p }: { p: SanhBanDoProps }) {
 function NutTuLuyenNgang({ onClick }: { onClick: () => void }) {
   return (
     <button type="button" className="h2-ng-the h2-ng-cdl h2-ng-tu-luyen" onClick={onClick}>
-      <IconSo co={24} />
+      {/* bia tập bắn: luyện trúng đích */}
+      <svg width="24" height="24" {...NET} strokeWidth={2}>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1.5" />
+      </svg>
       <span className="h2-ng-cdl-chu">
         <b>Tu luyện</b>
         <span className="h2-ng-phu"> · Luyện tự do · không tính EXP</span>
