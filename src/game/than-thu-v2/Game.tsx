@@ -6,7 +6,7 @@ import type {BattleAnswer} from './learning-battle'
 import {unlockBattleAudio} from './battle-audio'
 import EscortRoom from './EscortRoom'
 import {chanPhanHoiCau} from '../../lib/cau-tu-luan-may-hs'
-import {CHU_HET_TRAN_GAME,laLoiHetTran,loiCuaKetQua,maCuaLoi} from './loi-het-tran'
+import {CHU_CAU_DOI,CHU_HET_TRAN_GAME,laLoiCauDoi,laLoiHetTran,loiCuaKetQua,maCuaLoi} from './loi-het-tran'
 import {batNhipBenVung} from '../../lib/nhip-ben-vung'
 // Lối chơi chính mới (19/09): nạp riêng để không làm nặng đảo thần thú.
 const DoanHoTong=lazy(()=>import('./DoanHoTong'))
@@ -87,8 +87,10 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
   while((result.remaining??0)>0&&mounted.current){result=await request('sync');setSyncLeft(result.remaining??0)}
   const r=await request('start',{mode:next,dang,guardian});setSyncLeft(null);setBattleAnswers([]);setBattleEvent(0);setMode(next);setSession(r.id??'');setQuestions(r.questions??[]);setPosition(0);setAnswer('');setMediaFailed(false);setFeedback(null);setAssisted(false);setDone(false);setTab('learn');setNotice(r.message||(r.missing?`${r.missing} dòng kết quả chưa nối được với kho, chưa dùng để phân bài.`:''))
  })
- const submit=()=>run(async()=>{const q=questions[position];if(!q)return;const r=await request('answer',{session,qid:q.qid,answer,assisted});setBattleAnswers(previous=>previous.some(a=>a.qid===q.qid)?previous:[...previous,{qid:q.qid,correct:!!r.correct}]);setBattleEvent(e=>e+1);setFeedback({correct:!!r.correct,answer:r.answer??'',solution:r.solution,reward:r.reward??0,stage:r.stage??0,solutionImages:r.solutionImages??[]})})
- const next=()=>run(async()=>{if(position+1>=questions.length){await request('complete',{session});setDone(true)}else{setPosition(position+1);setAnswer('');setMediaFailed(false);setFeedback(null);setAssisted(false)}})
+ // Câu vừa được thầy sửa đề/đáp án (mã `cau_doi`, 29/09) ⇒ tự sang câu kế (không tính sai), hết câu thì kết thúc lượt — em không kẹt.
+ const submit=()=>run(async()=>{const q=questions[position];if(!q)return;let r:Awaited<ReturnType<typeof request>>;try{r=await request('answer',{session,qid:q.qid,answer,assisted})}catch(e){if(!laLoiCauDoi(e))throw e;await sangCauKe();if(mounted.current)setNotice(CHU_CAU_DOI);return};setBattleAnswers(previous=>previous.some(a=>a.qid===q.qid)?previous:[...previous,{qid:q.qid,correct:!!r.correct}]);setBattleEvent(e=>e+1);setFeedback({correct:!!r.correct,answer:r.answer??'',solution:r.solution,reward:r.reward??0,stage:r.stage??0,solutionImages:r.solutionImages??[]})})
+ const next=()=>run(sangCauKe)
+ async function sangCauKe(){if(position+1>=questions.length){await request('complete',{session});setDone(true)}else{setPosition(position+1);setAnswer('');setMediaFailed(false);setFeedback(null);setAssisted(false)}}
  const petIndex=Math.max(0,PETS.findIndex(p=>p.id===profile?.pet))
  const q=questions[position]
  const questionProps=():TheCauProps|null=>{

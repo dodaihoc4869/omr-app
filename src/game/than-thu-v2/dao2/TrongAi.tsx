@@ -177,9 +177,11 @@ function docTi():number{try{const v=Number(localStorage.getItem(KHOA_TI));return
 export interface TrongAiProps{
  profile:DaoProfile;cau:readonly CauDao2[];viTri:number;ketQua:readonly BattleAnswer[]
  traLoi:string;assisted:boolean;phanHoi:PhanHoi2|null;busy?:boolean;loi?:string;maLoi?:string
+ /** Lời báo (không phải lỗi) khi máy vừa tự bỏ qua câu thầy mới sửa (mã `cau_doi`, 29/09). */
+ baoCau?:string
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onRoi:()=>void
 }
-export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
+export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',baoCau='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
  const khung=useRef<HTMLDivElement>(null),[ti,setTi]=useState(docTi)
  // BẮN CHƯỞNG TRƯỚC LỜI GIẢI (thầy 28/09: "cho chưởng chạy ngay lúc em chốt đáp án"): máy chủ vừa trả kết quả (phanHoi null → có) ⇒ GIỮ cảnh trận
  // ~1,1 s (giảm chuyển động: 0,45 s) cho chưởng chạy trọn rồi mới mở lời giải; em bấm vào màn (click, không pointerdown: tránh cú chạm rơi trúng nút SANG ẢI vừa hiện) ⇒ bỏ qua. `chuongSk` = đòn được chiếu —
@@ -228,6 +230,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
    {cho?<button type="button" className="dao2-nut-xanh" onClick={boQua}>XEM LỜI GIẢI</button>
    :hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>
    :<>{loi&&<p className="dao2-loi" role="alert" ref={loiRef}>{loi}</p>}
+    {baoCau&&!loi&&!phanHoi&&<small className="dao2-tro-ghi" role="status">{baoCau}</small>}
     {/* Ô "có trợ giúp" (thầy 28/09 lần 2: thu thành chip mảnh CẠNH nút chốt, không chiếm dòng riêng — nhường chỗ cho đề): bật ⇒ máy chủ ghi `assisted`,
         câu chưa tính Thành thạo và quay lại sớm; lời giải thích nằm ở `title` và hiện một dòng nhỏ khi đã bật. */}
     {!phanHoi?<><div className="dao2-chan-hang">
