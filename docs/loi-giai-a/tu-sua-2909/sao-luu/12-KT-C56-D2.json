@@ -1,0 +1,68 @@
+{
+ "12-KT-C56-D2-II-3": {
+  "luc": "2026-09-29T07:38:47.544Z",
+  "cau": {
+   "phan": "II",
+   "so": 3,
+   "de": "Vàng tây là tên dùng để gọi một loại hợp kim kết hợp giữa vàng nguyên chất với một số kim loại khác như nickel, palladium, silver theo tỉ lệ phù hợp để tạo độ cứng. Vàng tây 18K chứa 75,00% Au, còn lại là Ni và Ag.\nĐể kiểm tra hàm lượng Au trong mẫu vàng tây này bằng phương pháp điện phân, một nhà kim hoàn đã thực hiện thí nghiệm sau: lấy 1 chỉ vàng tây 18K có khối lượng 3,75 gam làm điện cực; điện cực còn lại là than chì tinh khiết có khối lượng 2,00 gam; nối chỉ vàng với điện cực dương và than chì với điện cực âm của nguồn điện một chiều, rồi nhúng hoàn toàn vào bình điện phân chứa 100 mL dung dịch K[Au(CN)₂] 0,2 M; kẹp nối 2 điện cực đều làm bằng than chì tinh khiết trơ, có tiếp xúc với dung dịch; điện phân ở hiệu điện thế phù hợp; sau khi thấy chỉ vàng tan hết thì ngừng điện phân, làm khô, rồi cân thấy khối lượng của thanh than chì là 4,85 gam.\nBiết trong quá trình điện phân nước không bay hơi và thể tích dung dịch không đổi, Au sinh ra do điện phân đều bám trên điện cực âm, không có cặn rắn dưới đáy bình.",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Có thể thay kẹp điện cực than chì bằng dây Cu để thực hiện thí nghiệm phân tích này.",
+    "b": "Tại cathode xảy ra phản ứng Au³⁺ + 3e → Au.",
+    "c": "Mẫu vàng trên vượt tiêu chuẩn, hàm lượng Au hơn 75%.",
+    "d": "Nồng độ dung dịch K[Au(CN)₂] sau điện phân là 0,2 M."
+   },
+   "loi_giai": {
+    "chot": "Cathode nhận thêm 2,85 gam vàng, tức 0,014467 mol; cân bằng electron với phần Au, Ag, Ni tan ở anode cho thấy vàng trong mẫu chỉ dưới 1,5 gam nên không đạt 75%.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: dây đồng nhúng trong dung dịch sẽ tan ở phía cực dương làm sai kết quả phân tích."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: vàng bám vào cathode do ion vàng nhận 3 electron."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cân bằng electron cho khối lượng vàng trong mẫu nhỏ hơn 2,8125 gam nên chưa đạt 75%."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: lượng vàng bám ở cathode lớn hơn lượng vàng tan ở anode nên nồng độ giảm."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Vàng bám ở cathode lấy từ dung dịch, còn anode bù lại cả Au lẫn Ag và Ni.",
+    "bay": "Lấy luôn 2,85 gam vàng bám ở cathode làm lượng vàng có trong chỉ vàng nên ra 76%."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_DD.CHON_PHAT_BIEU",
+    "ten": "Điện phân dung dịch — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ }
+}

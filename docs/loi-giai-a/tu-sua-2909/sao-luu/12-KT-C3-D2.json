@@ -1,0 +1,59 @@
+{
+ "12-KT-C3-D2-III-6": {
+  "luc": "2026-09-29T07:38:37.435Z",
+  "cau": {
+   "phan": "III",
+   "so": 6,
+   "de": "Hỗn hợp X gồm glycine, alanine và glutamic acid (trong đó nguyên tố oxi chiếm 41,2% về khối lượng).\nCho m gam X tác dụng với dung dịch NaOH dư, thu được dung dịch chứa 20,532 gam muối.\nGiá trị của m là bao nhiêu? ------------------------- HẾT -------------------------",
+   "dap_an": "16",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Trong ba chất, mọi nguyên tử oxygen đều nằm trong nhóm COOH nên n(COOH) = n(O) : 2.",
+    "buoc": [
+     "Trong ba chất, mọi nguyên tử oxygen đều nằm trong nhóm COOH nên n(COOH) = n(O) : 2.",
+     "n(O) = 0,412m : 16 ⇒ n(COOH) = 0,412m : 32.",
+     "Mỗi nhóm COOH thành COONa làm khối lượng tăng 22 gam: m(muối) = m + 22 × 0,412m : 32 = 1,28325m.",
+     "1,28325m = 20,532 ⇒ m = 16 gam."
+    ],
+    "ket_qua": "16",
+    "dap_an_de": "16",
+    "dap_an_tu_giai": "16",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "buoc"
+    ],
+    "ly_do": "Glutamic acid có tới hai nhóm COOH.",
+    "bay": "Tính số mol NaOH theo số mol chất thay vì theo số nhóm COOH."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.TINH_KHOI_LUONG",
+    "ten": "Amino acid — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D2",
+    "ten": "Tính chất lưỡng tính của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

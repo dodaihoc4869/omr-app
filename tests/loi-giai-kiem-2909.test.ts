@@ -46,6 +46,18 @@ describe('chuẩn hoá câu kho + loại câu', () => {
     const g = cauTrongGoi('12-X', { phanI: [{ so: 2, text: 'Đề', choices: ['a', 'b', 'c', 'd'], correct: 'B' }], phanII: [{ so: 1, text: 'Đ', ideas: ['1', '2', '3', '4'], correct: [true, false, true, true] }] })
     expect(g.map((c) => [c.qid, loaiCau(c), c.dapAn])).toEqual([['12-X-I-2', 'tn', 'B'], ['12-X-II-1', 'ds', 'DSDD']])
   })
+  it('ghép đáp án theo a–d / A–D như màn thi, không theo thứ tự khoá lưu trong kho (DB-12-B6-D2-II-33 lưu a,b,d,c)', async () => {
+    const ds = cauTrongGoi('12-X', { cau: [{ phan: 'II', so: 1, de: 'Đề', y: { a: 'ý a', b: 'ý b', d: 'ý d', c: 'ý c' }, dap_an: 'DSSD' }] })[0]
+    const v = dauVao(ds, await bamCau(ds))!
+    expect(v.y.map((x) => x.id)).toEqual(['a', 'b', 'c', 'd'])
+    expect(v.y.find((x) => x.id === 'c')!.t).toBe('ý c')
+    expect(v.dapAn).toEqual({ a: 'D', b: 'S', c: 'S', d: 'D' })
+    const tn = cauTrongGoi('12-X', { cau: [{ phan: 'I', so: 2, de: 'Đề', pa: { B: 'b', A: 'a', D: 'd', C: 'c' }, dap_an: 'C' }] })[0]
+    const w = dauVao(tn, await bamCau(tn))!
+    expect(w.y.map((x) => x.id)).toEqual(['A', 'B', 'C', 'D'])
+    expect(w.mc!.o.map((o) => o[0])).toEqual(['A', 'B', 'C', 'D'])
+    expect(w.dapAn).toEqual({ A: 'S', B: 'S', C: 'D', D: 'S' })
+  })
   it('bỏ tự luận: mã đề -TL và phần IV', () => {
     expect(cauTrongGoi('12-TL-1', { cau: [{ phan: 'III', so: 1, de: 'x', dap_an: '3' }] }).map(loaiCau)).toEqual([null])
     expect(cauTrongGoi('12-A', { cau: [{ phan: 'IV', so: 1, de: 'x' }] })).toHaveLength(0)

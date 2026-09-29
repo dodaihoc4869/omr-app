@@ -1,0 +1,54 @@
+{
+ "12-KT-C1-D5-III-6": {
+  "luc": "2026-09-29T07:38:29.189Z",
+  "cau": {
+   "phan": "III",
+   "so": 6,
+   "de": "Geranyl acetate được tìm thấy trong hoa hồng và geranium. Nó có mùi hương hoa hồng đặc trưng và thường được sử dụng trong nước hoa và mỹ phẩm. Khi phân tích thành phần khối lượng nguyên tố thì cho kết quả như sau %C = 73,47%, %O = 16,33%, còn lại là hydrogen.\nNgười ta cũng thực hiện phổ khối lượng để xác định phân tử khối của hợp chất này, kết quả thể hiện như hình ảnh bên dưới: Trong phân tử geranyl acetate có bao nhiêu nguyên tử hydrogen? ------------------------- HẾT -------------------------",
+   "dap_an": "20",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III_6.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Phần trăm hydrogen = 100 − 73,47 − 16,33 = 10,20%; lập tỉ lệ C : H : O = 73,47/12 : 10,20/1 : 16,33/16 ≈ 6 : 10 : 1.",
+    "buoc": [
+     "Phần trăm hydrogen = 100 − 73,47 − 16,33 = 10,20%; lập tỉ lệ C : H : O = 73,47/12 : 10,20/1 : 16,33/16 ≈ 6 : 10 : 1.",
+     "Công thức đơn giản nhất là C₆H₁₀O có khối lượng 98; phổ MS cho peak ion phân tử ở m/z = 196.",
+     "Vì 196 / 98 = 2 nên công thức phân tử là C₁₂H₂₀O₂, trong phân tử có 20 nguyên tử hydrogen."
+    ],
+    "ket_qua": "20",
+    "dap_an_de": "20",
+    "dap_an_tu_giai": "20",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Phổ MS mới chốt được hệ số nhân.",
+    "bay": "Dừng ở công thức đơn giản nhất, trả lời 10 nguyên tử hydrogen."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.TINH_CHAT_VAT_LI.DEM_NGUYEN_TU",
+    "ten": "Tính chất vật lí — đếm nguyên tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ }
+}

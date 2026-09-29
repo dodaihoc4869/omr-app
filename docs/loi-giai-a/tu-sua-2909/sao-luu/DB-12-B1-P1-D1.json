@@ -1,0 +1,286 @@
+{
+ "DB-12-B1-P1-D1-II-157": {
+  "luc": "2026-09-29T07:38:58.622Z",
+  "cau": {
+   "phan": "II",
+   "so": 157,
+   "de": "Phân tích nguyên tố hợp chất hữu cơ E cho kết quả phần trăm khối lượng carbon, hydrogen và oxygen lần lượt là 48,65%; 8,11% và 43,24%. Dựa vào phương pháp phân tích khối phổ (MS) xác định được phân tử khối của E là 74.\nMặt khác, phổ hồng ngoại (IR) cho thấy phân tử E không chứa nhóm -OH (peak có số sóng > 3000 cm⁻¹) nhưng lại chứa nhóm C=O (peak có số sóng 1748 cm⁻¹).\nThuỷ phân hoàn toàn E trong dung dịch NaOH, thu được muối của carboxylic acid X và chất Y. Chất Y có nhiệt độ sôi (64,7 °C) nhỏ hơn nhiệt độ sôi của ethanol (78,3 °C) (nhiệt độ sôi đều đo ở áp suất 1 bar).",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "y": {
+    "a": "Nhiệt độ sôi của E, X và Y được xếp theo thứ tự như sau: X > E > Y.",
+    "b": "Trong công nghiệp, chất Y được phối trộn với xăng RON₉₂ để tạo ra xăng sinh học.",
+    "c": "Dung dịch muối tạo bởi giữa carboxylic acid X và NaOH có môi trường base.",
+    "d": "Chất E có thể được điều chế trực tiếp từ phản ứng ester hoá giữa chất Y với ethanoic acid."
+   },
+   "loi_giai": {
+    "chot": "E là C₃H₆O₂ (M = 74), là CH₃COOCH₃; X là acetic acid, Y là methanol.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: acetic acid 118 °C > methanol 64,7 °C > methyl acetate 57 °C, tức X > Y > E."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: xăng sinh học E5 pha ETHANOL, không phải methanol."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: CH₃COONa thuỷ phân cho môi trường base."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: methanol + acetic acid (xúc tác H₂SO₄ đặc) cho methyl acetate."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Y sôi ở 64,7 °C đúng bằng nhiệt độ sôi của methanol; xăng sinh học dùng ETHANOL chứ không phải methanol.",
+    "bay": "Thấy 'xăng sinh học' liền gật đầu mà không để ý Y là methanol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.CHON_PHAT_BIEU",
+    "ten": "Xà phòng hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "DH-12-C1-B1-P1",
+   "nguonCau": "II-30"
+  }
+ },
+ "DB-12-B1-P1-D1-II-72": {
+  "luc": "2026-09-29T07:38:58.622Z",
+  "cau": {
+   "phan": "II",
+   "so": 72,
+   "de": "Cho 5 gam hợp chất hữu cơ X có cấu trúc phân tử như hình dưới vào một bát sứ và thêm 15 mL dung dịch KOH 30% (dùng dư), sau đó đun nóng một thời gian để phản ứng xảy ra.",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_18.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Thí nghiệm trên là phản ứng xà phòng hoá X bằng dung dịch KOH.",
+    "b": "Khi chưa đun nóng, trong bát sứ có sự tách lớp giữa các chất.",
+    "c": "Sau thí nghiệm, trong chén sứ chỉ chứa một dung dịch đồng nhất.",
+    "d": "Chất rắn màu trắng thu được sau thí nghiệm có thành phần là muối sodium stearate."
+   },
+   "loi_giai": {
+    "chot": "Xà phòng hoá chất béo bằng KOH cho muối potassium của acid béo và glycerol.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đun chất béo với dung dịch kiềm chính là phản ứng xà phòng hoá."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: chất béo không tan trong dung dịch KOH nên khi chưa đun vẫn tách lớp."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: sau phản ứng còn muối của acid béo ở dạng rắn nên hỗn hợp không đồng nhất."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: kiềm dùng là KOH nên muối thu được là potassium stearate, không phải sodium stearate."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "lech",
+    "ghi_chu": "Đề chấm ý d là Đúng, nhưng thí nghiệm dùng dung dịch KOH nên muối thu được là POTASSIUM stearate, không phải sodium stearate; máy chấm ý d là Sai."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Thí nghiệm xà phòng hoá trong bát sứ; ý cuối bẫy ở tên kim loại của muối.",
+    "bay": "Dùng KOH thì muối là POTASSIUM stearate; ý d ghi sodium stearate là sai."
+   },
+   "kienThuc": [
+    "xà phòng hoá bằng KOH"
+   ],
+   "loiThuongGap": [
+    "gọi tên muối theo NaOH dù đề dùng KOH"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.CHON_PHAT_BIEU",
+    "ten": "Xà phòng hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-C1-B1-D3",
+   "nguonCau": "II-19"
+  }
+ },
+ "DB-12-B1-P1-D1-III-173": {
+  "luc": "2026-09-29T07:38:58.622Z",
+  "cau": {
+   "phan": "III",
+   "so": 173,
+   "de": "Thuỷ phân 4,4 gam ethyl acetate bằng 300 mL dung dịch NaOH 0,2M.\nSau khi phản ứng c xảy ra hoàn toàn, cô cạn dung dịch, thu được m gam chất rắn khan.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "4,5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "loi_giai": {
+    "chot": "n(ester) = 0,05; n(NaOH) = 0,06 ⇒ NaOH dư 0,01 ⇒ m = 0,05×82 + 0,01×40.",
+    "buoc": [
+     "n(CH₃COOC₂H₅) = 4,4 : 88 = 0,05 mol; n(NaOH) = 0,3 × 0,2 = 0,06 mol.",
+     "Phản ứng theo tỉ lệ 1 : 1 ⇒ ester hết, NaOH dư 0,01 mol.",
+     "Chất rắn khan: CH₃COONa 0,05 mol (4,1 g) và NaOH dư 0,01 mol (0,4 g).",
+     "m = 4,1 + 0,4 = 4,5 g."
+    ],
+    "ket_qua": "4,5",
+    "dap_an_de": "4,5",
+    "dap_an_tu_giai": "4,5",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc lọt chữ 'c' giữa câu ('phản ứng c xảy ra'); đã bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "NaOH dư nên chất rắn khan gồm CẢ muối lẫn NaOH còn lại.",
+    "bay": "Chỉ cân muối CH₃COONa, quên NaOH dư 0,01 mol."
+   },
+   "kienThuc": [
+    "CH₃COOC₂H₅ + NaOH → CH₃COONa + C₂H₅OH, tỉ lệ 1 : 1.",
+    "M(ethyl acetate) = 88; M(CH₃COONa) = 82.",
+    "Cô cạn thì ethanol bay hơi hết, chất rắn khan gồm muối và kiềm dư."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.TINH_KHOI_LUONG",
+    "ten": "Xà phòng hoá — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "DH-12-C1-B1-P1",
+   "nguonCau": "III-43"
+  }
+ },
+ "DB-12-B1-P1-D1-III-99": {
+  "luc": "2026-09-29T07:38:58.622Z",
+  "cau": {
+   "phan": "III",
+   "so": 99,
+   "de": "Khi xà phòng hoá triglycerid X bằng dung dịch NaOH dư, đun nóng, thu được xà phòng gồm hỗn hợp ba muối sodium oleate, sodium stearate vả sodium palmitate.\nCó bao nhiêu đồng phân cấu tạo có thể có của X?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Ba gốc khác nhau xếp vào ba vị trí cho 3! = 6 cách, nhưng vị trí 1 và 3 đối xứng nên số đồng phân cấu tạo chỉ còn 6 : 2 = 3.",
+    "buoc": [
+     "Xà phòng hoá cho ba muối khác nhau ⇒ X có ba gốc acid khác nhau: oleate, stearate, palmitate.",
+     "Glycerol có ba vị trí gắn gốc: C1, C2, C3.",
+     "Xếp ba gốc khác nhau vào ba vị trí có 3! = 6 cách.",
+     "Vị trí C1 và C3 đối xứng nhau nên mỗi đồng phân bị đếm hai lần.",
+     "Số đồng phân cấu tạo = 6 : 2 = 3."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải nhận ra tính đối xứng của glycerol rồi mới chia đôi số hoán vị.",
+    "bay": "Vị trí 1 và 3 của glycerol ĐỐI XỨNG nhau, đổi chỗ hai gốc ở đó không cho đồng phân mới — lấy 3! = 6 là đếm dư gấp đôi."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.DEM_DONG_PHAN",
+    "ten": "Xà phòng hoá — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-KT-C1-D1",
+   "nguonCau": "III-3"
+  }
+ }
+}

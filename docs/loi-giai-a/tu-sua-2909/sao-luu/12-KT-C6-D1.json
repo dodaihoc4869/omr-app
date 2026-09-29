@@ -1,0 +1,68 @@
+{
+ "12-KT-C6-D1-II-4": {
+  "luc": "2026-09-29T07:38:51.732Z",
+  "cau": {
+   "phan": "II",
+   "so": 4,
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1. Lấy hai ống nghiệm sạch, cho 3 mL dung dịch H₂SO₄ 1 M vào ống (1), cho 3 mL dung dịch H₂SO₄ 1 M và 2 – 3 giọt dung dịch CuSO₄ vào ống (2).\nBước 2. Cho đồng thời vào hai ống, mỗi ống một đinh sắt có kích thước như nhau đã được làm sạch bề mặt rồi để yên một thời gian.",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Ở bước 2, tốc độ thoát khí ở ống (1) và ống (2) là như nhau.",
+    "b": "Ở bước 2, ống (1) xảy ra ăn mòn hoá học, ống (2) xảy ra ăn mòn điện hoá.",
+    "c": "Ở bước 2, trong ống (2) có chất rắn màu đỏ cam bám lên bề mặt đinh sắt.",
+    "d": "Nếu thay dung dịch CuSO4 bằng MgSO4 thì khí thoát ra ở ống (2) sẽ nhanh hơn ống (1)."
+   },
+   "loi_giai": {
+    "chot": "Ống (2) có Cu²⁺ nên Fe đẩy Cu bám lên đinh, tạo cặp Fe-Cu và gây ăn mòn điện hoá làm khí thoát nhanh hơn ống (1).",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: ống (2) có ăn mòn điện hoá nên khí thoát ra nhanh hơn hẳn ống (1)."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: ống (1) chỉ có sắt tiếp xúc acid nên là ăn mòn hoá học."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai theo đề: đồng sinh ra có màu đỏ (đỏ gạch) chứ không phải đỏ cam."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: Mg²⁺ không bị Fe khử nên ống (2) không có cặp điện cực, khí thoát chậm như ống (1)."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Ý c): về bản chất vẫn có lớp đồng bám lên đinh sắt (đúng như ý b) đòi hỏi), chỉ chữ 'đỏ cam' là chỗ bắt bẻ; đề ghi Sai nên máy giữ nguyên và cắm cờ, thầy xem lại."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "ly_do": "Chỉ cần một lớp đồng mỏng là đã hình thành cặp điện cực.",
+    "bay": "Cho rằng hai ống thoát khí như nhau vì lượng CuSO₄ chỉ vài giọt."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI.TINH_KHU.CHON_PHAT_BIEU",
+    "ten": "Tính khử, dãy điện hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
+ }
+}

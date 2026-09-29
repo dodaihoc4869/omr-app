@@ -1,0 +1,78 @@
+{
+ "12-C2-B4-D1-I-60": {
+  "luc": "2026-09-29T07:37:30.856Z",
+  "cau": {
+   "phan": "I",
+   "so": 60,
+   "de": "Khi bệnh nhân bị suy nhược hoặc không thể ăn uống, các bác sĩ thường chỉ định truyền dịch tĩnh mạch để cung cấp dinh dưỡng nhanh chóng. Một bệnh nhân được chỉ định truyền một chai dịch truyền glucose 5% có thể tích 500 mL (có nghĩa là cứ 100 mL dung dịch chứa 5 gam glucose).\nBiết rằng khi oxi hóa hoàn toàn 1 mol glucose trong cơ thể sẽ giải phóng một năng lượng là 2803 kJ.\nNăng lượng tối đa mà bệnh nhân đó nhận được từ chai dịch truyền trên là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "389,30 kJ.",
+    "B": "778,61 kJ.",
+    "C": "140,15 kJ.",
+    "D": "280,30 kJ."
+   },
+   "loi_giai": {
+    "chot": "Tính khối lượng glucose từ nồng độ, đổi ra mol (M = 180 g/mol), nhân với năng lượng 2803 kJ/mol.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Chọn. m glucose = 500/100 × 5 = 25 g; n = 25/180 mol; E = 25/180 × 2803 ≈ 389,31 kJ."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Không chọn. 778,61 kJ gấp đôi kết quả đúng, do nhầm chai 500 mL chứa 50 g glucose."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Không chọn. 140,15 kJ là lấy 2803 × 5/100, tính năng lượng cho 5 g glucose thay vì 25 g."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Không chọn. 280,30 kJ là lấy 2803 × 10/100, nhầm khối lượng glucose là 10 g."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Từ 500 mL dịch 5% ra 25 gam glucose, đổi sang mol rồi nhân 2803 kJ.",
+    "bay": "Lấy 5 gam cho cả chai vì đọc lướt phần giải thích trong ngoặc.",
+    "dk": [
+     "buoc"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.NHAN_DANG",
+    "ten": "Ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B4",
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

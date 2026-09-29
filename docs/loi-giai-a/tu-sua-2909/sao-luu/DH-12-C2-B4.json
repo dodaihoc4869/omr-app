@@ -1,0 +1,284 @@
+{
+ "DH-12-C2-B4-I-82": {
+  "luc": "2026-09-29T07:39:54.600Z",
+  "cau": {
+   "phan": "I",
+   "so": 82,
+   "de": "Trong một thử nghiệm y tế nhằm xác định khả năng dung nạp carbohydrate của cơ thể người, trẻ em được cho uống dung dịch glucose 10%, nhưng người lớn cần cho uống dung dịch glucose 20%.\nCần hoà tan bao nhiêu gam glucose vào 160 gam dung dịch glucose 10% để được dung dịch glucose 20%?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 4. Glucose và fructose",
+   "pa": {
+    "A": "80 gam.",
+    "B": "10 gam.",
+    "C": "20 gam.",
+    "D": "30."
+   },
+   "loi_giai": {
+    "chot": "Gọi x là khối lượng thêm vào: (16 + x) : (160 + x) = 0,2 nên x = 20 gam.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "80 gam cho nồng độ vượt quá 20%."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "10 gam chỉ cho nồng độ khoảng 15,3%."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: 20 gam."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "30 gam cho nồng độ khoảng 24,2%."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Thêm chất tan thì cả tử số và mẫu số của biểu thức nồng độ đều tăng.",
+    "bay": "Quên cộng lượng thêm vào ở mẫu số."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.TINH_KHOI_LUONG",
+    "ten": "Ứng dụng — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B4-I-83": {
+  "luc": "2026-09-29T07:39:54.600Z",
+  "cau": {
+   "phan": "I",
+   "so": 83,
+   "de": "Khi bệnh nhân bị suy nhược hoặc không thể ăn uống, các bác sĩ thường chỉ định truyền dịch tĩnh mạch để cung cấp dinh dưỡng nhanh chóng. Một bệnh nhân được chỉ định truyền một chai dịch truyền glucose 5% có thể tích 500 mL (có nghĩa là cứ 100 mL dung dịch chứa 5 gam glucose).\nBiết rằng khi oxi hóa hoàn toàn 1 mol glucose trong cơ thể sẽ giải phóng một năng lượng là 2803 kJ.\nNăng lượng tối đa mà bệnh nhân đó nhận được từ chai dịch truyền trên là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 4. Glucose và fructose",
+   "pa": {
+    "A": "389,30 kJ.",
+    "B": "778,61 kJ.",
+    "C": "140,15 kJ.",
+    "D": "280,30 kJ."
+   },
+   "loi_giai": {
+    "chot": "Chai chứa 25 gam glucose tức 0,1389 mol, năng lượng = 0,1389 × 2803 = 389,30 kJ.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: 389,30 kJ."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "778,61 kJ ứng với gấp đôi lượng glucose."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "140,15 kJ ứng với 9 gam glucose."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "280,30 kJ ứng với 18 gam glucose."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Đề cho nồng độ theo 100 mL nhưng hỏi năng lượng của cả chai.",
+    "bay": "Chỉ tính cho 100 mL thay vì cả chai 500 mL."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.NHAN_DANG",
+    "ten": "Ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B4-II-21": {
+  "luc": "2026-09-29T07:39:54.600Z",
+  "cau": {
+   "phan": "II",
+   "so": 21,
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho 1 mL dung dịch AgNO₃ 1% vào ống nghiệm sạch.\nBước 2: Thêm từ từ từng giọt dung dịch NH₃, lắc đều cho đến khi kết tủa tan hết.\nBước 3: Thêm tiếp khoảng 1 mL dung dịch glucose 1% vào ống nghiệm, đun nóng nhẹ.",
+   "dap_an": "SDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 4. Glucose và fructose",
+   "y": {
+    "a": "Sản phẩm hữu cơ thu được sau bước 3 là sobitol.",
+    "b": "Thí nghiệm trên chứng minh glucose có tính chất của aldehyde.",
+    "c": "Sau bước 3, có lớp bạc kim loại bám trên thành ống nghiệm.",
+    "d": "Ở bước 3, có thể thay việc đun nóng nhẹ bằng cách ngâm ống nghiệm trong nước nóng."
+   },
+   "loi_giai": {
+    "chot": "Sản phẩm hữu cơ của phản ứng tráng bạc là ammonium gluconate, không phải sorbitol.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: sorbitol là sản phẩm KHỬ glucose bằng H₂."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: phản ứng tráng bạc chứng minh nhóm chức aldehyde."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: bạc kim loại bám lên thành ống nghiệm."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: ngâm trong nước nóng cũng đủ nhiệt cho phản ứng."
+     }
+    },
+    "dap_an_de": "SDDD",
+    "dap_an_tu_giai": "SDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Tráng bạc là OXI HOÁ nhóm -CHO nên cho gốc carboxylate.",
+    "bay": "Lẫn sản phẩm của phản ứng oxi hoá với phản ứng khử."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B4-III-47": {
+  "luc": "2026-09-29T07:39:54.600Z",
+  "cau": {
+   "phan": "III",
+   "so": 47,
+   "de": "Theo Tiêu chuẩn Việt Nam TCVN 7624:2007, khi chế tạo gương, chiều dày lớp bạc phủ trên bề mặt tấm kính (quy ra tổng lượng bạc trên một đơn vị m kính) phải đạt tối thiểu 0,7 gm−2. Một công ty cần sản xuất 10000 m² gương có độ dày lớp bạc phủ ở mức 0,72 gm−2.\nBiết rằng lớp bạc được tạo thành qua phản ứng giữa silver nitrate và glucose trong điều kiện thích hợp vớ hiệu suất phản ứng 90 %.\nTính lượng silver nitrate và lượng glucose cần sử dụng để sản xuất 10000 m² gương trên (làm tròn kết quả đến hàng phần trăm).",
+   "dap_an": "6,67",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 4. Glucose và fructose",
+   "loi_giai": {
+    "chot": "m(Ag) = 7200 g ⇒ n(Ag) = 66,67 mol ⇒ n(AgNO₃) = 74,07 mol, n(glucose) = 37,04 mol.",
+    "buoc": [
+     "m(Ag) cần = 10 000 × 0,72 = 7200 g ⇒ n(Ag) = 7200 : 108 = 66,67 mol.",
+     "Hiệu suất 90% ⇒ n(AgNO₃) = 66,67 : 0,9 = 74,07 mol ⇒ m(AgNO₃) = 74,07 × 170 = 12 592,59 g ≈ 12,59 kg.",
+     "n(glucose) = (66,67 : 2) : 0,9 = 37,04 mol ⇒ m = 37,04 × 180 = 6666,67 g ≈ 6,67 kg."
+    ],
+    "ket_qua": "6,67",
+    "dap_an_de": "6,67",
+    "dap_an_tu_giai": "6,67",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc gõ lỗi 'trên một đơn vị m kính' và 'vớ hiệu suất'; đã sửa thành 'trên một đơn vị diện tích kính' và 'với hiệu suất'. Đáp án đề (6,67) là khối lượng glucose theo kg; máy giữ con số ấy, khối lượng AgNO₃ 12,59 kg nằm trong các bước giải."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Đi ngược từ lượng bạc cần có về nguyên liệu nên phải CHIA cho hiệu suất.",
+    "bay": "Nhân 90% thay vì chia, hoặc quên tỉ lệ 1 glucose : 2 Ag."
+   },
+   "kienThuc": [
+    "1 mol glucose khử được 2 mol Ag⁺ thành 2 mol Ag.",
+    "M(AgNO₃) = 170; M(glucose) = 180; M(Ag) = 108.",
+    "Đi ngược từ sản phẩm về nguyên liệu thì chia cho hiệu suất."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.TINH_HIEU_SUAT",
+    "ten": "Ứng dụng — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

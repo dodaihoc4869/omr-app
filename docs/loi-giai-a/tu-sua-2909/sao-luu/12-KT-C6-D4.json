@@ -1,0 +1,68 @@
+{
+ "12-KT-C6-D4-II-2": {
+  "luc": "2026-09-29T07:38:53.838Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "de": "Trong một thí nghiệm nghiên cứu ảnh hưởng của các yếu tố tới khả năng sử dụng kẽm để bảo vệ chống ăn mòn thép, một khối kẽm có khối lượng 25,0 gam được gắn lên một thiết bị bằng thép đặt trong nước biển. Sau một thời gian, cân lại khối kẽm thấy khối lượng là 28,0 gam.\nGiả thiết rằng trong quá trình làm việc, toàn bộ sản phẩm oxi hoá kẽm là Zn(OH)₂ bám lên khối kẽm.",
+   "dap_an": "SSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Sắt bỉ gỉ nhanh hơn khi tiếp xúc với kẽm và bị gỉ chậm hơn khi tiếp xúc với đồng.",
+    "b": "Những kim loại có thế điện cực chuẩn nhỏ hơn kẽm đều có thể dùng bảo vệ kim loại sắt khỏi bị ăn mòn.",
+    "c": "Có dòng electron di chuyển từ khối kẽm đến thiết bị bằng thép.",
+    "d": "Phần trăm khối lượng kẽm bị oxi hóa trong thí nghiệm trên là 7,88% (kết quả làm tròn đến hàng phần trăm)."
+   },
+   "loi_giai": {
+    "chot": "Mỗi mol Zn thành Zn(OH)₂ thì khối lượng tăng 34 gam, nên 3,0 gam tăng ứng với 0,0882 mol Zn, tức 22,9% khối lượng ban đầu.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: kẽm bảo vệ sắt nên sắt gỉ chậm hơn, còn đồng mới làm sắt gỉ nhanh hơn."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: Na, K, Ca có thế nhỏ hơn kẽm nhưng phản ứng ngay với nước nên không dùng được."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: kẽm là anode nên electron chạy từ kẽm sang thiết bị thép."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: 3,0 : 34 × 65 = 5,74 gam kẽm bị oxi hoá, tức 22,94% chứ không phải 7,88%."
+     }
+    },
+    "dap_an_de": "SSDS",
+    "dap_an_tu_giai": "SSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Zn(OH)₂ nặng hơn Zn 34 gam mỗi mol nên khối tăng ít hơn lượng kẽm phản ứng.",
+    "bay": "Lấy thẳng 3,0 gam làm khối lượng kẽm bị oxi hoá mà quên phần hydroxide bám thêm."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI.AN_MON.CHON_PHAT_BIEU",
+    "ten": "Ăn mòn và chống ăn mòn — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
+ }
+}

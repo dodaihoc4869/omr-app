@@ -1,0 +1,73 @@
+{
+ "12-C3-B8-D2-II-31": {
+  "luc": "2026-09-29T07:37:52.776Z",
+  "cau": {
+   "phan": "II",
+   "so": 31,
+   "de": "Melamine là hợp chất hữu cơ tan ít trong nước, kết dính tốt được dùng trong chế tạo keo dính, nội thất. Một số cơ sở sản xuất sữa thường thêm melamine vào sản phẩm để tạp hàm lượng đạm giả trong sữa, gây nguy hại đến sức khỏe. Melamine có công thức cấu tạo như sau:",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_8.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Một phân tử melamine có công thức đơn giản nhất là CH₂N₂ và có 15 liên kết sigma (ơ).",
+    "b": "Melanine được dùng như một loại keo để sản xuất giấy trang trí phủ melamine (một loại vật liệu quan trọng trong ngành gỗ công nghiệp với ưu điểm màu sắc phong phú, bền màu, chống thấm nước,…).",
+    "c": "Melamine thuộc loại arylamine có tính base.",
+    "d": "Muốn tăng 1 độ đạm (1 gam nitrogen) cho sữa tươi thì phải thêm vào 1 lít sữa khoảng 1452 mg melamine."
+   },
+   "loi_giai": {
+    "chot": "Melamine C₃H₆N₆: công thức đơn giản nhất CH₂N₂, có 6 liên kết vòng, 3 liên kết C-N ngoài vòng, 6 liên kết N-H, tổng 15 sigma. Một gam nitrogen cần 1500 mg melamine.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: CH₂N₂ và đúng 15 liên kết sigma."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: melamine dùng làm keo và phủ bề mặt gỗ công nghiệp."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: vòng triazine không phải vòng benzene nên melamine không phải arylamine."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: 126 gam melamine chứa 84 gam nitrogen, muốn 1 gam nitrogen cần 1500 mg."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Vừa đếm liên kết sigma vừa tính lượng melamine cho một độ đạm.",
+    "bay": "Vòng của melamine là TRIAZINE chứ không phải benzene, nên melamine không phải arylamine."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-08",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}

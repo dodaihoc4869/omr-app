@@ -237,12 +237,12 @@ function dauVao(c, bam) {
   };
   if (dang === "tn") {
     const pa = c.pa;
-    const ids = Object.keys(pa);
+    const ids = Object.keys(pa).sort();
     return { ...base, y: ids.map((k) => ({ id: k, t: pa[k] })), dapAn: Object.fromEntries(ids.map((k) => [k, k === c.dapAn ? "D" : "S"])), mc: { hoi: "Chọn đáp án", o: ids.map((k) => [k, pa[k]]), dapAn: c.dapAn } };
   }
   if (dang === "ds") {
     const y = c.y;
-    const ids = Object.keys(y);
+    const ids = Object.keys(y).sort();
     return { ...base, y: ids.map((k) => ({ id: k, t: y[k] })), dapAn: Object.fromEntries(ids.map((k, i) => [k, c.dapAn[i]])) };
   }
   return { ...base, y: [], dapAn: { kq: c.dapAn } };

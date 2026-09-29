@@ -1,0 +1,217 @@
+{
+ "DH-12-C1-B1-P1-II-26": {
+  "luc": "2026-09-29T07:39:48.040Z",
+  "cau": {
+   "phan": "II",
+   "so": 26,
+   "de": "(M) và (N) là hai hợp chất hữu cơ đơn chức tạo bởi các nguyên tố C, H và O, đều có mạch hở. Tín hiệu ion phân tử trên phổ MS của (M) và (N) đều có giá trị m/z = 60 (với z = 1). (M) có tín hiệu hấp thụ hồng ngoại ở số sóng 1715 cm⁻¹; (N) có tín hiệu hấp thụ hồng ngoại ở số sóng 1740 cm⁻¹; (M) có nhiệt độ sôi cao hơn (N).\nSố sóng của tín hiệu hấp thụ hồng ngoại đặc trưng của một số liên kết được liệt kê trong bảng:\n– 2850",
+   "dap_an": "DDSS",
+   "bang": [
+    [
+     "Liên kết",
+     "O-H",
+     "C=O",
+     "C-H (thuộc CH₃)"
+    ],
+    [
+     "Số sóng hấp thụ (cm⁻¹)",
+     "3650 – 2900",
+     "1750 – 1680",
+     "2960"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "y": {
+    "a": "Trên phổ hồng ngoại của cả (M) và (N) đều có tín hiệu hấp thụ trong vùng 2960 – 2850 cm⁻¹.",
+    "b": "Do(M) tạo được liên kết hydrogen liên phân tử nên có nhiệt độ sôi cao hơn (N).",
+    "c": "(N) tham gia phản ứng ester hoá.",
+    "d": "(M) hoặc (N) là propan-1-ol."
+   },
+   "loi_giai": {
+    "chot": "Cả hai đều có M = 60. Peak 1715 cm⁻¹ là C=O của acid nên M là CH₃COOH; peak 1740 cm⁻¹ là C=O của ester nên N là HCOOCH₃.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: cả hai đều có liên kết C-H no."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: acid tạo liên kết hydrogen liên phân tử nên sôi cao hơn."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: N đã là ester nên không tham gia phản ứng ester hoá."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai đều có nhóm C=O nên không phải propan-1-ol."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "hay_gap"
+    ],
+    "ly_do": "Hai số sóng 1715 và 1740 cm⁻¹ là dấu hiệu tách acid khỏi ester.",
+    "bay": "Bỏ qua số sóng IR nên không phân biệt được acid với ester."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đếm cấu trúc: phải dựng ra rồi đếm",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "DH-12-C1-B1-P1-II-30": {
+  "luc": "2026-09-29T07:39:48.040Z",
+  "cau": {
+   "phan": "II",
+   "so": 30,
+   "de": "Phân tích nguyên tố hợp chất hữu cơ E cho kết quả phần trăm khối lượng carbon, hydrogen và oxygen lần lượt là 48,65%; 8,11% và 43,24%. Dựa vào phương pháp phân tích khối phổ (MS) xác định được phân tử khối của E là 74.\nMặt khác, phổ hồng ngoại (IR) cho thấy phân tử E không chứa nhóm -OH (peak có số sóng > 3000 cm⁻¹) nhưng lại chứa nhóm C=O (peak có số sóng 1748 cm⁻¹).\nThuỷ phân hoàn toàn E trong dung dịch NaOH, thu được muối của carboxylic acid X và chất Y. Chất Y có nhiệt độ sôi (64,7 °C) nhỏ hơn nhiệt độ sôi của ethanol (78,3 °C) (nhiệt độ sôi đều đo ở áp suất 1 bar).",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "y": {
+    "a": "Nhiệt độ sôi của E, X và Y được xếp theo thứ tự như sau: X > E > Y.",
+    "b": "Trong công nghiệp, chất Y được phối trộn với xăng RON₉₂ để tạo ra xăng sinh học.",
+    "c": "Dung dịch muối tạo bởi giữa carboxylic acid X và NaOH có môi trường base.",
+    "d": "Chất E có thể được điều chế trực tiếp từ phản ứng ester hoá giữa chất Y với ethanoic acid."
+   },
+   "loi_giai": {
+    "chot": "E là C₃H₆O₂ (M = 74), là CH₃COOCH₃; X là acetic acid, Y là methanol.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: acetic acid 118 °C > methanol 64,7 °C > methyl acetate 57 °C, tức X > Y > E."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: xăng sinh học E5 pha ETHANOL, không phải methanol."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: CH₃COONa thuỷ phân cho môi trường base."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: methanol + acetic acid (xúc tác H₂SO₄ đặc) cho methyl acetate."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Y sôi ở 64,7 °C đúng bằng nhiệt độ sôi của methanol; xăng sinh học dùng ETHANOL chứ không phải methanol.",
+    "bay": "Thấy 'xăng sinh học' liền gật đầu mà không để ý Y là methanol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.CHON_PHAT_BIEU",
+    "ten": "Xà phòng hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ },
+ "DH-12-C1-B1-P1-III-43": {
+  "luc": "2026-09-29T07:39:48.040Z",
+  "cau": {
+   "phan": "III",
+   "so": 43,
+   "de": "Thuỷ phân 4,4 gam ethyl acetate bằng 300 mL dung dịch NaOH 0,2M.\nSau khi phản ứng c xảy ra hoàn toàn, cô cạn dung dịch, thu được m gam chất rắn khan.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "4,5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "loi_giai": {
+    "chot": "n(ester) = 0,05; n(NaOH) = 0,06 ⇒ NaOH dư 0,01 ⇒ m = 0,05×82 + 0,01×40.",
+    "buoc": [
+     "n(CH₃COOC₂H₅) = 4,4 : 88 = 0,05 mol; n(NaOH) = 0,3 × 0,2 = 0,06 mol.",
+     "Phản ứng theo tỉ lệ 1 : 1 ⇒ ester hết, NaOH dư 0,01 mol.",
+     "Chất rắn khan: CH₃COONa 0,05 mol (4,1 g) và NaOH dư 0,01 mol (0,4 g).",
+     "m = 4,1 + 0,4 = 4,5 g."
+    ],
+    "ket_qua": "4,5",
+    "dap_an_de": "4,5",
+    "dap_an_tu_giai": "4,5",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc lọt chữ 'c' giữa câu ('phản ứng c xảy ra'); đã bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "NaOH dư nên chất rắn khan gồm CẢ muối lẫn NaOH còn lại.",
+    "bay": "Chỉ cân muối CH₃COONa, quên NaOH dư 0,01 mol."
+   },
+   "kienThuc": [
+    "CH₃COOC₂H₅ + NaOH → CH₃COONa + C₂H₅OH, tỉ lệ 1 : 1.",
+    "M(ethyl acetate) = 88; M(CH₃COONa) = 82.",
+    "Cô cạn thì ethanol bay hơi hết, chất rắn khan gồm muối và kiềm dư."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.TINH_KHOI_LUONG",
+    "ten": "Xà phòng hoá — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

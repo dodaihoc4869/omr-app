@@ -1,0 +1,76 @@
+{
+ "12-KT-C2-D3-II-4": {
+  "luc": "2026-09-29T07:38:34.805Z",
+  "cau": {
+   "phan": "II",
+   "so": 4,
+   "de": "Tiến hành các bước thí nghiệm như sau:\nBước 1: Cho một nhúm bông vào cốc đựng dung dịch H₂SO₄ 70%, đun nóng đồng thời khuấy đều đến khi phản ứng hoàn toàn, thu được dung dịch đồng nhất.\nBước 2: Trung hoà dung dịch thu được bằng dung dịch NaOH 10% để tạo môi trường kiềm.\nBước 3: Lấy dung dịch sau khi trung hoà cho vào ống nghiệm đựng dung dịch AgNO₃ trong NH₃ dư, đun nóng nhẹ trên ngọn lửa đèn cồn.",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Ở bước 1, có xảy ra phản ứng thủy phân tinh bột thành glucose.",
+    "b": "Mục đích của việc cho dung dịch NaOH 10% ở bước 2 là để phản ứng thủy phân diễn ra nhanh hơn.",
+    "c": "Sau bước 3, trên thành ống nghiệm xuất hiện một lớp kim loại sáng bóng như gương.",
+    "d": "Ở bước 3, nếu đun sôi dung dịch thì trong cốc sẽ xuất hiện kết tủa vón cục."
+   },
+   "loi_giai": {
+    "chot": "Nhúm bông là cellulose chứ không phải tinh bột; NaOH dùng để trung hoà acid dư, tạo môi trường kiềm cho phản ứng tráng bạc ở bước 3.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: bông là cellulose, sản phẩm thuỷ phân là glucose nhưng chất ban đầu không phải tinh bột."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: NaOH dùng để trung hoà acid dư, không phải để tăng tốc thuỷ phân."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: glucose khử thuốc thử Tollens tạo lớp bạc sáng như gương."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: đun sôi làm bạc kết tủa vón cục, không bám thành ống."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "buoc"
+    ],
+    "ly_do": "Bông là cellulose gần như tinh khiết.",
+    "bay": "Đọc lướt chữ 'bông' rồi mặc định là tinh bột."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

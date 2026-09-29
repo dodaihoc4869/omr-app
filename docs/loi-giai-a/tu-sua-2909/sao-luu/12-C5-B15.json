@@ -1,0 +1,52 @@
+{
+ "12-C5-B15-III-8": {
+  "luc": "2026-09-29T07:38:04.616Z",
+  "cau": {
+   "phan": "III",
+   "so": 8,
+   "de": "Cho các phản ứng hoá học sau:\n(a) Ag⁺(aq) + Cl⁻(aq) → AgCl(s)\n(b) [Zn(OH₂)₄]²⁺(aq) + 4NH₃(aq) → [Zn(NH₃)₄]²⁺(aq) + 4H₂O(l)\n(c) H⁺(aq) + OH⁻(aq) → H₂O(l)\n(d) C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(g) (e) Al(s) + 3Ag⁺(aq) → Al³⁺(aq) + 3Ag(s) (g) 2NH₃(g) → N₂(g) + 3H₂(g)\nSố phản ứng có thể chuyển hoá năng lượng phản ứng thành điện năng thông qua việc lập các pin điện hoá là bao nhiêu?",
+   "dap_an": "2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Chỉ (d) và (e) vừa là phản ứng oxi hoá – khử vừa tự xảy ra nên lập được pin điện hoá.",
+    "buoc": [
+     "(a), (b), (c) không có nguyên tố nào đổi số oxi hoá nên không lập pin được.",
+     "(d) đốt cháy ethanol và (e) Al đẩy Ag⁺ đều là phản ứng oxi hoá – khử tự xảy ra.",
+     "(g) 2NH₃ → N₂ + 3H₂ là oxi hoá – khử nhưng thu nhiệt, không tự xảy ra ở điều kiện thường.",
+     "Vậy có 2 phản ứng."
+    ],
+    "ket_qua": "2",
+    "dap_an_de": "5",
+    "dap_an_tu_giai": "2",
+    "trang_thai": "lech",
+    "ghi_chu": "Tự giải ra 2: pin điện hoá chỉ dựng được từ phản ứng OXI HOÁ – KHỬ tự xảy ra, mà (a) tạo tủa, (b) tạo phức, (c) trung hoà đều không đổi số oxi hoá; (g) tuy là oxi hoá – khử nhưng thu nhiệt, không tự xảy ra. Đáp án đề ghi 5 vì đếm cả (a), (b), (c)."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "ly_do": "Phải kiểm hai điều kiện cùng lúc: có đổi số oxi hoá và có tự xảy ra không.",
+    "bay": "Phản ứng tạo tủa, tạo phức hay trung hoà tuy tự xảy ra nhưng KHÔNG đổi số oxi hoá nên không tách được thành hai nửa phản ứng ở hai điện cực."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "DIEN_PHAN.PIN_GALVANI.DEM_DONG_PHAN",
+    "ten": "Pin Galvani, sức điện động — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ }
+}

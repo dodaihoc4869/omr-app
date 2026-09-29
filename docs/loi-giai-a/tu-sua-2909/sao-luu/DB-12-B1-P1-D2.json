@@ -1,0 +1,158 @@
+{
+ "DB-12-B1-P1-D2-I-67": {
+  "luc": "2026-09-29T07:39:02.375Z",
+  "cau": {
+   "phan": "I",
+   "so": 67,
+   "de": "Tổng hợp ethyl acetate trong phòng thí nghiệm từ nhóm hóa chất nào sau đây sẽ đạt hiệu quả cao nhất?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H₂SO₄ 98%",
+    "B": "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H₂SO₄ 98%",
+    "C": "Acetic acid nguyên chất; cồn 90o; dung dịch H₂SO₄ 98%",
+    "D": "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"
+   },
+   "loi_giai": {
+    "chot": "Ester hoá là phản ứng thuận nghịch, nước làm cân bằng chuyển theo chiều nghịch; muốn hiệu suất cao phải dùng chất đầu nguyên chất và acid đặc để hút nước.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: cả acid và alcohol nguyên chất, H₂SO₄ 98% vừa xúc tác vừa hút nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Dung dịch CH₃COOH 5% mang quá nhiều nước, đẩy cân bằng về phía nghịch."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Cồn 90° còn 10% nước nên hiệu suất thấp hơn phương án A."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "HCl 36,5% là dung dịch nước, lại không hút nước như H₂SO₄ đặc."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Nước là kẻ thù của phản ứng ester hoá.",
+    "bay": "Chỉ nhìn xúc tác mà bỏ qua lượng nước trong chất đầu."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.NHAN_DANG",
+    "ten": "Ester hoá — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-KT-C1-D4",
+   "nguonCau": "I-6"
+  }
+ },
+ "DB-12-B1-P1-D2-II-49": {
+  "luc": "2026-09-29T07:39:02.375Z",
+  "cau": {
+   "phan": "II",
+   "so": 49,
+   "de": "Ester có vai trò quan trọng trong nhiều lĩnh vực hoá học và công nghiệp,... Hầu hết các ester được điều chế từ phản ứng ester hoá.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Phản ứng giữa carboxylic acid và alcohol tạo thành ester được gọi là phản ứng ester hoá.",
+    "b": "Các hợp chất hữu cơ trong phân tử có nhóm -COO- đều thuộc loại ester.",
+    "c": "Thành phần của ester no, đơn chức, mạch hở luôn có tỉ lệ số nguyên tử H và C tương ứng là 2 : 1.",
+    "d": "Ở 25°C, độ tan trong nước của ba ester HCOOC₂H₅, CH₃COOC₂H₅ và C₂H₅COOC₂H₅ theo thứ tự sau: HCOOC₂H₅ > CH₃COOC₂H₅ > C₂H₅COOC₂H₅."
+   },
+   "loi_giai": {
+    "chot": "Ester phải có nhóm -COO- mà oxygen nối với một gốc hydrocarbon; ester no đơn chức mạch hở có dạng CnH2nO2.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đó chính là định nghĩa của phản ứng ester hoá."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: muối của carboxylic acid cũng chứa nhóm -COO- nhưng liên kết ion, không phải ester."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: CnH2nO2 cho tỉ lệ H : C = 2n : n = 2 : 1."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: gốc hydrocarbon càng dài thì phần kị nước càng lớn nên độ tan giảm dần."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Bốn ý về ester: định nghĩa, công thức chung và độ tan.",
+    "bay": "Muối carboxylate (CH₃COONa) cũng có nhóm -COO- nhưng KHÔNG phải ester."
+   },
+   "kienThuc": [
+    "định nghĩa ester",
+    "công thức chung ester no đơn chức"
+   ],
+   "loiThuongGap": [
+    "xếp muối carboxylate vào ester"
+   ],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+    "ten": "Ester hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-C1-B1-D3",
+   "nguonCau": "II-5"
+  }
+ }
+}

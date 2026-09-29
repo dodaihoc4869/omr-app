@@ -1,0 +1,91 @@
+{
+ "12-KT-C123-D2-II-2": {
+  "luc": "2026-09-29T07:38:31.895Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "de": "Paracetamol, còn gọi là acetaminophen, công thức C₈H₉NO₂, là hoạt chất phổ biến trong các loại thuốc giảm đau, hạ sốt không steroid. Trong phòng thí nghiệm, để định lượng paracetamol trong thuốc, người ta chuẩn độ nhóm phenol của nó bằng dung dịch NaOH với chỉ thị phenolphtalein theo tỉ lệ mol 1: 1.\nMột viên thuốc chứa acetaminophen được nghiền nhỏ, lấy chính xác 0,500 gam bột thuốc, sau đó hoà tan và pha loãng định mức thành 100,0 mL dung dịch. Từ dung dịch này, lấy chính xác 25,00 mL để tiến hành chuẩn độ bằng dung dịch NaOH 0,1000 M. Kết quả thể tích dung dịch NaOH tiêu tốn ghi ở bảng dưới.\nBiết có 3 nhóm thuốc paracetamol: viên chuẩn cho người lớn khoảng 500 mg, viên hàm lượng cao khoảng 650 mg, viên cho trẻ em khoảng 80 đến 160 mg paracetamol.",
+   "dap_an": "DDSS",
+   "bang": [
+    [
+     "Lần chuẩn độ",
+     "Lần 1",
+     "Lần 2",
+     "Lần 3",
+     "Lần 4"
+    ],
+    [
+     "Thể tích dung dịch NaOH (mL)",
+     "8",
+     "8,05",
+     "8,1",
+     "8"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Paracetamol là hợp chất hữu cơ tạp chức, chứa đồng thời nhóm chức phenol và nhóm chức amide ở vị trí para với nhau.",
+    "b": "Trong điều kiện chuẩn độ, chỉ có nhóm chức phenol trong paracetamol phản ứng với NaOH.",
+    "c": "Kết quả phân tích cho thấy loại thuốc đang kiểm nghiệm thuộc nhóm hàm lượng cao.",
+    "d": "Nếu thực hiện quá trình chuẩn độ quá lâu, CO2 trong không khí phản ứng với NaOH thì thể tích NaOH tiêu tốn sẽ thấp hơn so với thể tích đúng."
+   },
+   "loi_giai": {
+    "chot": "Thể tích trung bình 8,0375 mL cho 0,80375 mmol trong 25 mL, tức 3,215 mmol trong 100 mL, ứng với 485 mg paracetamol trong 0,500 gam bột thuốc.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: paracetamol có nhóm phenol và nhóm amide ở vị trí para."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm amide không bị thuỷ phân trong điều kiện chuẩn độ nhẹ."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: tính được khoảng 485 mg nên thuộc nhóm viên chuẩn cho người lớn."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: CO₂ làm hao NaOH nên thể tích tiêu tốn phải nhiều hơn thể tích đúng."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "25 mL chỉ là một phần tư của 100 mL dung dịch đã pha.",
+    "bay": "Lấy luôn số mol NaOH trong 25 mL làm số mol paracetamol của cả viên thuốc."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Amine — cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B8-D1",
+    "ten": "Thiết lập công thức phân tử amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

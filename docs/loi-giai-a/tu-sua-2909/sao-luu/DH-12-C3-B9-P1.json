@@ -1,0 +1,160 @@
+{
+ "DH-12-C3-B9-P1-II-22": {
+  "luc": "2026-09-29T07:40:06.318Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính).\nGlutamic acid có cấu trúc như hình vẽ bên dưới và có điểm đẳng điện pI=3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại. Khi pH<pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH>pI thì amino acid đó tồn tại chủ yếu ở dạng anion). HOOC−CH₂−CH₂−CH(NH₂)−COOH.",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-22.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Amino acid (P1)",
+   "y": {
+    "a": "Glutamic acid thuộc loại hợp chất hữu cơ tạp chức, trong phân tử chứa hai loại nhóm chức.",
+    "b": "Tên thay thế của glutamic acid là 2 -aminopentane-1,5-dioic acid.",
+    "c": "Trong dung dịch pH = 3,2, glutamic acid tồn tại chủ yếu ở dạng HOOC−CH₂−CH₂−CH(NH₂)−COO⁻.",
+    "d": "Trong dung dịch pH=6, có thể tách hỗn hợp gồm glutamic acid và lysine (pI=9,7) bằng phương pháp điện di."
+   },
+   "loi_giai": {
+    "chot": "Ở pH = pI, glutamic acid tồn tại dạng ion lưỡng cực HOOC−CH₂CH₂−CH(NH₃⁺)−COO⁻.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: phân tử có nhóm amino và nhóm carboxyl."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: mạch năm carbon, hai nhóm -COOH ở hai đầu."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: dạng này mang điện tích −1, dạng đúng phải có nhóm NH₃⁺."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: ở pH 6 glutamic acid là anion còn lysine là cation."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Ý c của đề gốc bị cắt mất công thức, phần công thức rơi xuống cuối câu dẫn; đã ghép lại."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Ion lưỡng cực phải có tổng điện tích bằng 0.",
+    "bay": "Viết ion lưỡng cực mà quên proton hoá nhóm amino."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.CHON_PHAT_BIEU",
+    "ten": "Amino acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D2",
+    "ten": "Tính chất lưỡng tính của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B9-P1-II-25": {
+  "luc": "2026-09-29T07:40:06.318Z",
+  "cau": {
+   "phan": "II",
+   "so": 25,
+   "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính). Glutamic acid có cấu trúc như hình vẽ bên dưới và có điểm đẳng điện pI=3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại.\nKhi pH<pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH>pI thì amino acid đó tồn tại chủ yếu ở dạng anion).\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Amino acid (P1)",
+   "y": {
+    "a": "Glutamic acid là một α-amino acid.",
+    "b": "1 mol glutamic acid tác dụng tối đa với 2 mol NaOH trong dung dịch.",
+    "c": "Khi đặt glutamic acid được điều chỉnh đến pH = 6,0 trong điện trường thì glutamic acid sẽ di chuyển về cực âm.",
+    "d": "Glutamic acid có tính chất lưỡng tính."
+   },
+   "loi_giai": {
+    "chot": "pI = 3,2; ở pH = 6,0 > pI nên glutamic acid tồn tại chủ yếu ở dạng anion.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -NH₂ nằm ở carbon kề nhóm -COOH (carbon α)."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: glutamic acid có HAI nhóm -COOH nên phản ứng tối đa với 2 mol NaOH."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: pH = 6,0 > pI = 3,2 nên phân tử mang điện tích ÂM, trong điện trường nó di chuyển về cực DƯƠNG chứ không phải cực âm."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: có cả -NH₂ (nhận proton) và -COOH (cho proton) nên glutamic acid lưỡng tính."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Công thức cấu tạo glutamic acid nằm trong ẢNH. Máy đã mở ảnh ra xem: HOOC-CH₂-CH₂-CH(NH₂)-COOH — hai nhóm -COOH, một -NH₂ ở carbon α. Lời giải dựa trên hình đọc được, không phải đoán."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "pH > pI thì amino acid mang điện ÂM nên chạy về cực DƯƠNG, không phải cực âm.",
+    "bay": "Thấy chữ 'anion' là liên tưởng ngay tới cực âm."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.CHON_PHAT_BIEU",
+    "ten": "Amino acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D2",
+    "ten": "Tính chất lưỡng tính của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

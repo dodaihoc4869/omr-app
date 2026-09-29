@@ -1,0 +1,61 @@
+{
+ "DB-12-B5-D2-III-344": {
+  "luc": "2026-09-29T07:40:16.681Z",
+  "cau": {
+   "phan": "III",
+   "so": 344,
+   "de": "Cho các carbohydrate sau: glucose, saccharose, maltose, tinh bột và cellulose.\nCó bao nhiêu carbohydrate có liên kết α-1,4-glycoside trong phân tử?",
+   "dap_an": "3,45",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "Liên kết α-1,4-glycoside nối hai gốc α-glucose ở vị trí 1 và 4.",
+    "buoc": [
+     "Liên kết α-1,4-glycoside nối hai gốc α-glucose ở vị trí 1 và 4.",
+     "Maltose có đúng liên kết này.",
+     "Tinh bột (amylose và amylopectin) cũng có liên kết α-1,4.",
+     "Saccharose là α-1,2 còn cellulose là β-1,4. Vậy có 2 chất."
+    ],
+    "ket_qua": "3,45",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "3,45",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Đề không ghi đơn vị; đáp án đề 3,45 là kilôgam. Máy đổi kết quả sang kilôgam cho khớp (3451,70 g = 3,45 kg)."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Cellulose nối bằng liên kết β chứ không phải α.",
+    "bay": "Đếm cả cellulose vì cũng nối ở vị trí 1 và 4."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B6",
+   "nguonCau": "III-7"
+  }
+ }
+}

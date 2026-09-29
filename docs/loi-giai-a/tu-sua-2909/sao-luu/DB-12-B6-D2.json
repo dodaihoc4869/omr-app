@@ -1,0 +1,138 @@
+{
+ "DB-12-B6-D2-III-38": {
+  "luc": "2026-09-29T07:39:29.725Z",
+  "cau": {
+   "phan": "III",
+   "so": 38,
+   "de": "Cellulose trinitrate được điều chế từ nitric acid và cellulose.\nMuối điều chế 29,7 kg cellulose trinitrate (hiệu suất phản ứng 90%) thì cần V L dung dịch nitric acid 96% (D = 1,51 g/mL).\nGiá trị của V là bao nhiêu? (Kết quả làm tròn đến hàng phần mười).",
+   "dap_an": "14,5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "loi_giai": {
+    "chot": "Từ khối lượng sản phẩm ra mol mắt xích, nhân 3 ra mol HNO₃, rồi quy về thể tích dung dịch.",
+    "buoc": [
+     "n(cellulose trinitrate) = 29 700 : 297 = 100 mol mắt xích.",
+     "n(HNO₃) lý thuyết = 3 × 100 = 300 mol; hiệu suất 90% ⇒ n cần = 300 : 0,9 = 333,33 mol.",
+     "m(HNO₃) = 333,33 × 63 = 21 000 gam ⇒ m(dung dịch) = 21 000 : 0,96 = 21 875 gam.",
+     "V = 21 875 : 1,51 = 14 486 mL ≈ 14,5 L."
+    ],
+    "ket_qua": "14,5",
+    "dap_an_de": "14,5",
+    "dap_an_tu_giai": "14,5",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Mỗi mắt xích cần BA phân tử HNO₃; hiệu suất đặt ở mẫu số vì tính lượng acid CẦN DÙNG.",
+    "bay": "Quên hệ số 3 của HNO₃."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.TINH_THE_TICH",
+    "ten": "Cấu tạo — tính thể tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D2",
+    "ten": "Phản ứng với nitric acid của cellulose",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B6",
+   "nguonCau": "III-41"
+  }
+ },
+ "DB-12-B6-D2-II-33": {
+  "luc": "2026-09-29T07:39:29.725Z",
+  "cau": {
+   "phan": "II",
+   "so": 33,
+   "de": "Cho cellulose tác dụng với lượng dư dung dịch HNO₃ đặc, có mặt H₂SO₄ đặc làm xúc tác và đun nóng.",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "y": {
+    "a": "Phản ứng trên tạo ra sản phẩm chính là cellulose trinitrate.",
+    "b": "Phản ứng hóa học xảy ra trong thí nghiệm này là phản ứng cộng mở vòng đặc trưng của carbohydrate.",
+    "d": "Bản chất của phản ứng là quá trình ester hóa, trong đó mỗi mắt xích [C₆H₇O₂(OH)₃] của cellulose có thể phản ứng tối đa với 3 phân tử HNO₃ để thay thế nguyên tử H của nhóm -OH.",
+    "c": "Cellulose trinitrate là một chất lỏng, màu vàng ươm, tan tốt trong nước."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng với HNO₃ là ester hoá; cellulose trinitrate là chất rắn màu vàng, không tan trong nước.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: HNO₃ dư cho sản phẩm chính là cellulose trinitrate."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: đây là phản ứng ester hoá, không phải cộng mở vòng."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cellulose trinitrate là chất RẮN và không tan trong nước."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: mỗi mắt xích có ba nhóm -OH nên phản ứng tối đa với ba phân tử HNO₃."
+     }
+    },
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Ý b và ý c của đề gốc bị dính liền thành một dòng nên ý c trống; đã tách lại theo đúng bản gốc."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Nhóm -OH của cellulose đóng vai trò alcohol nên phản ứng là ester hoá.",
+    "bay": "Gọi phản ứng nitrate hoá là phản ứng thế ở vòng thơm."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D2",
+    "ten": "Phản ứng với nitric acid của cellulose",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B6",
+   "nguonCau": "II-7"
+  }
+ }
+}

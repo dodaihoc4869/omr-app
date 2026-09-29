@@ -1,0 +1,72 @@
+{
+ "12-KT-C4-D4-I-17": {
+  "luc": "2026-09-29T07:38:40.171Z",
+  "cau": {
+   "phan": "I",
+   "so": 17,
+   "de": "Qiana là tên thương mại của một loại tơ nylon được sử dụng để sản xuất vải lụa chống nhăn cao cấp.\nQiana có công thức cấu tạo và các công thức ở phương án A được cho trong hình dưới đây.\nNhận xét nào sau đây đúng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_17.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "Các monomer dùng để tổng hợp Qiana có cấu tạo như hai công thức trong hình",
+    "B": "Tơ này kém bền trong môi trường acid hoặc base mạnh",
+    "C": "Tơ nylon làm từ tơ Qiana thuộc loại tơ nhân tạo",
+    "D": "Qiana thuộc loại loại polyamide được điều chế từ phản ứng trùng hợp các monomer đa chức tương ứng"
+   },
+   "loi_giai": {
+    "chot": "Qiana là polyamide nên liên kết CO−NH bị acid và base mạnh thuỷ phân; mạch của nó dùng vòng cyclohexane no chứ không phải vòng benzene như hình ở phương án A.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Hình vẽ là diamine thơm, còn Qiana dùng diamine có hai vòng cyclohexane no."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: liên kết amide bị acid và base mạnh thuỷ phân."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Qiana hoàn toàn do tổng hợp nên là tơ tổng hợp."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Polyamide đi từ hai monomer đa chức nên là trùng ngưng, không phải trùng hợp."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Vòng cyclohexane no không vẽ các liên kết đôi bên trong.",
+    "bay": "Nhìn lướt thấy vòng sáu cạnh là kết luận ngay vòng benzene."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "POLYMER.PHAN_LOAI.CHON_PHAT_BIEU",
+    "ten": "Phân loại polymer, tơ — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ }
+}

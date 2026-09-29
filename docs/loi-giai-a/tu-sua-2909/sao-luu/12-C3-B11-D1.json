@@ -1,0 +1,80 @@
+{
+ "12-C3-B11-D1-II-2": {
+  "luc": "2026-09-29T07:37:47.898Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu canxi, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+   "y": {
+    "a": "Tên bán hệ thống của lysine là α,ε-diaminocaproic acid.",
+    "b": "1 mol lysine có thể phản ứng tối đa với 2 mol HCl.",
+    "c": "Dung dịch lysine không làm đổi màu quỳ tím.",
+    "d": "Điểm đẳng điện của lysine pl = 9,74 (hay tại pH = 9,74 lysine tồn tại dạng ion lưỡng cực có tổng điện tích bằng 0). Đặt lysine ở pH = 6,0 vào trong một điện trường, lysine sẽ dịch chuyển về phía cực dương."
+   },
+   "dap_an": "DDSS",
+   "hinh": [
+    {
+     "tep": "II-2-0.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Lysine H₂N-[CH₂]₄-CH(NH₂)-COOH có 2 nhóm -NH₂ (α và ε) nên phản ứng 2 HCl, làm quỳ hoá xanh; ở pH < pI lysine mang điện dương, di chuyển về cực âm (cathode).",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: mạch 6 C (caproic), -NH₂ ở C α và C ε."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: 2 nhóm -NH₂ nhận 2 H⁺ từ HCl."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: số -NH₂ (2) > số -COOH (1), dung dịch có tính base, quỳ hoá xanh."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: pH 6,0 < pI 9,74 nên lysine tích điện dương, dịch chuyển về cực âm."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Lysine có hai nhóm NH₂ nên phản ứng tối đa 2 HCl, làm quỳ hoá xanh; ở pH nhỏ hơn pI thì mang điện dương và chạy về cực âm.",
+    "bay": "Cho rằng ở pH 6,0 lysine trung hoà điện nên đứng yên, vì nhầm điểm đẳng điện với pH trung tính.",
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 10. Protein và enzyme",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}

@@ -1,0 +1,139 @@
+{
+ "12-KT-C5-D4-I-16": {
+  "luc": "2026-09-29T07:38:42.960Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "Một pin điện hoá Ni − H₂ được thiết lập ở điều kiện chuẩn như hình dưới. Cho thế điện cực chuẩn của cặp Ni²⁺/Ni bằng −0,257 V.\nCho các nhận định sau khi pin hoạt động:\n(a) Số chỉ hiển thị trên vôn kế là −0,257 V.\n(b) Ở anode xảy ra quá trình oxi hoá Ni, ở cathode xảy ra quá trình khử H⁺.\n(c) Ở cầu muối có sự di chuyển của ion K⁺ đi vào dung dịch HCl và ion Cl⁻ đi vào dung dịch NiSO₄.\n(d) Khối lượng thanh Ni giảm dần, khối lượng thanh Pt không đổi.\nSố nhận định đúng là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_16.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "3",
+    "B": "4",
+    "C": "1",
+    "D": "2. Sử dụng thông tin ở bảng dưới đây để trả lời các câu 17 – 18: Một bình điện phân chứa dung dịch NaOH(pH = 14) và một bình điện phân khác chứa dung dịch H₂SO₄(pH = 0) ở 298 K. Khi tăng hiệu điện thế từ từ ở hai cực mỗi bình người ta thấy có khí giống nhau thoát ra ở cả hai bình tại cùng điện thế"
+   },
+   "loi_giai": {
+    "chot": "Vôn kế chỉ sức điện động dương 0,257 V; ba nhận định còn lại về điện cực, cầu muối và khối lượng đều đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: ba nhận định (b), (c), (d) đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Bốn nhận định đúng là không thể vì (a) sai dấu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Chỉ một nhận định đúng là quá ít."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Hai nhận định đúng vẫn thiếu, cả (b), (c), (d) đều đúng."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Vôn kế đo sức điện động của pin nên luôn là số dương.",
+    "bay": "Chép thẳng giá trị −0,257 V của cặp Ni²⁺/Ni thành số chỉ vôn kế."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "đếm mệnh đề đúng, không phải tính",
+   "dang": {
+    "ma": "DIEN_PHAN.PIN_GALVANI.CHON_PHAT_BIEU",
+    "ten": "Pin Galvani, sức điện động — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ },
+ "12-KT-C5-D4-II-4": {
+  "luc": "2026-09-29T07:38:42.960Z",
+  "cau": {
+   "phan": "II",
+   "so": 4,
+   "de": "Để mạ nickel (Ni) lên iron (sắt – Fe), ta có thể tiến hành theo một trong hai cách sau:\n- Cách 1: Nhúng thanh Fe vào dung dịch chứa NiSO₄ có nồng độ thích hợp, sau một thời gian sẽ xuất hiện một lớp Ni phủ lên bề mặt Fe.\n- Cách 2: Sử dụng kĩ thuật mạ điện bằng cách điện phân dung dịch chứa NiSO₄ và H₂SO₄ với một điện cực là thanh Fe cần mạ và điện cực còn lại là một thanh Ni. Cho E°(Fe²⁺/Fe) = −0,440 V; E°(Ni²⁺/Ni) = −0,236 V.",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Trong khoảng thời gian như nhau, cả 2 cách đều xuất hiện lớp Ni phủ trên bề mặt thanh sắt với lượng bằng nhau.",
+    "b": "Sử dụng cách 1 chỉ mạ được một lớp nickel rất mỏng lên bề mặt thanh sắt và tốc độ của phản ứng giảm nhanh theo thời gian.",
+    "c": "Cả 2 cách Ni đều đóng vai trò cực âm và xảy ra quá trình oxi hoá.",
+    "d": "Để mạ lớp Ni(dày 0,2 mm) lên thanh sắt hình trụ có đường kính 5 cm, chiều dài 12 cm theo cách 2 với cường độ dòng điện 8,0 A, cần thời gian là 3,83 giờ. Biết khối lượng riêng của Ni bằng 8,91 g/cm³ (kết quả làm tròn đến hàng phần trăm)."
+   },
+   "loi_giai": {
+    "chot": "Cách 1 dừng lại khi lớp Ni che kín sắt nên rất mỏng; cách 2 thì Ni là anode tan, còn thanh sắt là cathode nhận Ni.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cách 1 tự dừng khi lớp Ni che kín sắt, còn cách 2 mạ được dày tuỳ thời gian."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: sắt bị lớp Ni che phủ nên không tiếp xúc dung dịch được nữa."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cách 1 không dùng điện cực, còn cách 2 thì Ni là anode tức cực dương."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai theo đề: tính cả hai mặt đáy thì thể tích Ni là 4,56 cm³ và thời gian khoảng 4,61 giờ."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "CẦN THẦY XEM — ý d) phụ thuộc cách hiểu \"diện tích cần mạ\". Máy tính lại: trụ d = 5 cm, l = 12 cm, lớp Ni dày 0,02 cm, D = 8,91 g/cm³, M(Ni) = 58,7. Nếu chỉ mạ mặt xung quanh: V = 2π·2,5·12·0,02 = 3,770 cm³ ⇒ m = 33,59 g ⇒ n = 0,5723 mol ⇒ Q = 110 459 C ⇒ t = 13 807 s = 3,84 giờ (đúng như đề nêu 3,83 ⇒ ý d ĐÚNG). Nếu mạ cả hai mặt đáy: V = 2π·2,5·(2,5+12)·0,02 = 4,555 cm³ ⇒ m = 40,59 g ⇒ n = 0,6915 mol ⇒ Q = 133 450 C ⇒ t = 16 681 s = 4,63 giờ (⇒ ý d SAI như đáp án đề). Ba ý a, b, c đã chắc: a S, b Đ, c S. Giữ đáp án đề SDSS."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Thanh nhúng chìm trong dung dịch thì cả hai đáy đều được mạ.",
+    "bay": "Chỉ tính diện tích mặt xung quanh mà bỏ hai mặt đáy của thanh trụ."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "DIEN_PHAN.MA_TINH_LUYEN.CHON_PHAT_BIEU",
+    "ten": "Mạ điện, tinh luyện — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ }
+}

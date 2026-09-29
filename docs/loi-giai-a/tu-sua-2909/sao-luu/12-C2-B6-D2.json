@@ -1,0 +1,84 @@
+{
+ "12-C2-B6-D2-II-40": {
+  "luc": "2026-09-29T07:37:38.727Z",
+  "cau": {
+   "phan": "II",
+   "so": 40,
+   "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp lên men tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_9.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Phân tử maltose có 7 nhóm -OH (alcohol).",
+    "b": "Có thể sử dụng nước bromine để phân biệt saccharose và maltose.",
+    "c": "Liên kết giữa hai đơn vị glucose trong phân tử maltose là liên kết b -1,4 glycoside.",
+    "d": "Dung dịch maltose hoà tan được Cu(OH)₂ ở nhiệt độ thường, tạo dung dịch xanh lam."
+   },
+   "loi_giai": {
+    "chot": "Maltose có tổng 8 nhóm -OH, trong đó một nhóm là hemiacetal nên còn 7 nhóm alcohol; liên kết giữa hai đơn vị là alpha-1,4-glycoside.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hai gốc glucose có 10 nhóm -OH, tạo liên kết mất 2, còn 8; trừ 1 nhóm hemiacetal còn 7 nhóm alcohol."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: maltose có tính khử nên làm mất màu nước bromine, saccharose thì không."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: liên kết trong maltose là alpha-1,4-glycoside."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: maltose có nhiều -OH kề nhau nên tạo phức xanh lam với Cu(OH)₂."
+     }
+    },
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "lech",
+    "ghi_chu": "Ý a: tự đếm được 7 nhóm -OH alcohol (maltose có 8 nhóm -OH, trừ 1 nhóm hemiacetal) nên ý a ĐÚNG; đáp án đề ghi Sai. Kho lưu đáp án tự giải, thầy soi lại."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "ly_do": "Ý a phải đếm được số nhóm -OH alcohol, tách riêng nhóm hemiacetal.",
+    "bay": "Liên kết trong maltose là alpha-1,4-glycoside, KHÔNG phải beta-1,4 như trong cellulose."
+   },
+   "loiThuongGap": [
+    "Gộp nhầm nhóm -OH hemiacetal vào nhóm alcohol nên đếm thành 8."
+   ],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.LEN_MEN.CHON_PHAT_BIEU",
+    "ten": "Lên men — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D2",
+    "ten": "Phản ứng lên men glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

@@ -207,12 +207,14 @@ export function dauVao(c: CauKho, bam: string): DauVao | null {
   }
   if (dang === 'tn') {
     const pa = c.pa as Record<string, string>
-    const ids = Object.keys(pa)
+    // Xếp A–D như màn thi (exam-kho-de-import), KHÔNG theo thứ tự khoá lưu trong kho.
+    const ids = Object.keys(pa).sort()
     return { ...base, y: ids.map((k) => ({ id: k, t: pa[k] })), dapAn: Object.fromEntries(ids.map((k) => [k, k === c.dapAn ? 'D' : 'S'])), mc: { hoi: 'Chọn đáp án', o: ids.map((k) => [k, pa[k]] as [string, string]), dapAn: c.dapAn } }
   }
   if (dang === 'ds') {
     const y = c.y as Record<string, string>
-    const ids = Object.keys(y)
+    // Chuỗi đáp án "DSSD" là theo a, b, c, d (màn thi ghép y.a…y.d). Kho có câu lưu khoá lệch (a,b,d,c) ⇒ phải xếp lại.
+    const ids = Object.keys(y).sort()
     return { ...base, y: ids.map((k) => ({ id: k, t: y[k] })), dapAn: Object.fromEntries(ids.map((k, i) => [k, c.dapAn[i]])) }
   }
   return { ...base, y: [], dapAn: { kq: c.dapAn } }

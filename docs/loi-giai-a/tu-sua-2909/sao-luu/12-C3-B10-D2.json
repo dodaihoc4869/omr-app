@@ -1,0 +1,74 @@
+{
+ "12-C3-B10-D2-II-31": {
+  "luc": "2026-09-29T07:37:45.137Z",
+  "cau": {
+   "phan": "II",
+   "so": 31,
+   "de": "Lysine là một thành phần quan trọng của tất cả các protein trong cơ thể. Nó đóng vai trò quan trọng trong việc hấp thu canxi, tạo cơ bắp, phục hồi sau chấn thương hay sau phẫu thuật, sự tổng hợp các hormone, enzyme, và các kháng thể. Lysine có công thức cấu tạo như sau:",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_14.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Lysine là hợp chất hữu cơ đa chức và có công thức phân tử là C₆H₁₄O₂N₂.",
+    "b": "1 mol lysine có thể phản ứng tối đa với 2 mol HCl.",
+    "c": "Dung dịch lysine không làm đổi màu quỳ tím.",
+    "d": "Điểm đẳng điện của lysine pl = 9,74 (hay tại pH = 9,74 lysine tồn tại dạng ion lưỡng cực có tổng điện tích bằng 0). Đặt lysine ở pH = 6,0 vào trong một điện trường, lysine sẽ dịch chuyển về phía cực dương."
+   },
+   "loi_giai": {
+    "chot": "Lysine có hai nhóm -NH₂ và một nhóm -COOH nên là hợp chất tạp chức, làm quỳ hoá xanh, phản ứng tối đa 2 mol HCl.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: có hai loại nhóm chức khác nhau nên là hợp chất tạp chức, không phải đa chức."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: hai nhóm amino nhận tối đa 2 mol HCl."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: dư một nhóm amino nên dung dịch làm quỳ hoá xanh."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: pH 6 nhỏ hơn pI nên lysine là cation, chạy về cực âm."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay",
+     "nen"
+    ],
+    "ly_do": "Phải so pH với điểm đẳng điện rồi mới suy dấu điện tích và chiều chạy.",
+    "bay": "pH 6 NHỎ HƠN pI 9,74 nên lysine là CATION, chạy về cực ÂM; ý d) nói cực dương là ngược."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-08",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}
