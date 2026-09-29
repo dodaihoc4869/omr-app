@@ -110,13 +110,16 @@ export function expMotCau(phan: 'I' | 'II' | 'III', sao: number): number {
   return EXP_CAU[phan][s]!
 }
 
-/** v5: EXP một câu game THƯỜNG đúng (½ câu học tập, làm tròn lên — bảng `EXP_CAU_GAME`); phần lạ ⇒ Phần I, sao lạ ⇒ 0. */
-export function expCauGameMot(phan: string, sao: number): number {
+/**
+ * EXP MỘT câu GAME tự làm ĐÚNG (Đảo, Đảo 2, Đoàn, Bi-a — thầy 29/09: "trả lời đúng mỗi câu trong game đều có +N EXP bay vào thú"). MỘT hàm duy nhất cho mọi game.
+ * v5 (THẦY ĐÃ CHỐT 29/09, điểm 5): = ½ câu học tập làm tròn lên (bảng `EXP_CAU_GAME`: I 1/2/3 · II 2/3/4 · III 2/3/5), KHÔNG trần ngày; phần lạ ⇒ Phần I, sao lạ ⇒ 0.
+ * Câu thử thách / câu trùm KHÔNG dùng hàm này (giữ đủ `expMotCau`, không cộng thêm).
+ */
+export function expMotCauGame(phan: string, sao: number): number {
   const ph = phan === 'II' || phan === 'III' ? phan : 'I'
   const s = sao === 1 || sao === 2 ? sao : 0
   return EXP_CAU_GAME[ph][s]!
 }
-
 
 export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] } {
   const khoan: KhoanExp[] = []

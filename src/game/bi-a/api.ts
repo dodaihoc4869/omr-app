@@ -65,7 +65,7 @@ export async function xepBanBia(token: string, loai: 'ai' | 'giao_huu', cheDo: '
   const tr = vat(o.tran)
   return { ok: true, van: o.van, session: typeof o.session === 'string' && o.session ? o.session : null, cau, chot: docCau(o.chot), tran: { con: so(tr?.con), tong: so(tr?.tong) } }
 }
-export interface PhanHoiBia { correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: HinhAnh[]; reward: number; expThuThach: number; /** v5: EXP câu game thường đúng. */ expCau: number }
+export interface PhanHoiBia { correct: boolean; answer: string; traLoi: string; solution: unknown; solutionImages: HinhAnh[]; reward: number; expThuThach: number; /** Luật 29/09: EXP thật đã vào thú nhờ câu này (vắng ⇒ máy chủ cũ). */ expCau?: number }
 /** Chấm một câu qua lệnh `answer` chung (máy chủ ghi sổ, Thể lực, EXP, lịch ôn). */
 export async function traLoiBia(token: string, session: string, qid: string, answer: string): Promise<PhanHoiBia> {
   const o = await goi('answer', token, { session, qid, answer, assisted: false })
@@ -77,7 +77,7 @@ export async function traLoiBia(token: string, session: string, qid: string, ans
     solutionImages: Array.isArray(o.solutionImages) ? (o.solutionImages as HinhAnh[]) : [],
     reward: so(o.reward),
     expThuThach: so(o.expThuThach),
-    expCau: so(o.expCau),
+    ...(typeof o.expCau === 'number' ? { expCau: so(o.expCau) } : {}),
   }
 }
 /** Đổi câu sau câu sai: câu mới cùng dạng, hoặc null (bi trống / hết trần). */

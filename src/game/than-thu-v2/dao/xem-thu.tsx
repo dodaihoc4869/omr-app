@@ -12,6 +12,8 @@ import '@fontsource/be-vietnam-pro/latin-700.css'
 import '../../../styles/tokens.css'
 import '../../../index.css'
 import '../game.css'
+import '../../../components/exp-cau/exp-cau.css' // hiệu ứng "+N EXP" (bản thật nạp ở src/main.tsx)
+import {expMotCauGame} from '../../../../server/src/exp-hoc-tap'
 import ChonBanDongHanh,{theMoDau} from './ChonBanDongHanh'
 import DaoCuaEm from './DaoCuaEm'
 import TuiDo from './TuiDo'
@@ -60,7 +62,7 @@ function ManVo(){const [p,setP]=useState<DaoProfile>(()=>({...hoSo(),choice:q.ha
   if(action==='start')return ok({id:'s1',mode:'adventure',questions:CAU_GIA})
   if(action==='answer'){const c=CAU_GIA.find(x=>x.qid===data.qid)!,dung=String(data.answer)===(c.phan==='I'?'B':c.phan==='II'?'DSSD':'8,2'),reward=dung&&!data.assisted?(c.qid==='q0'?20:c.qid==='q3'?40:0):0
    if(reward)setP(x=>({...x,wallet:x.wallet+reward}))
-   return ok({correct:dung,answer:c.phan==='I'?'B':c.phan==='II'?'DSSD':'8,2',solution:'Lời giải mẫu của câu này.',reward,stage:reward===40?2:1,solutionImages:[],...(c.qid==='q3'?{lyDoThuong:{moc:2,exp:40,chu:'+40 · đúng lại ở một câu khác sau 1 ngày — sao thứ 2 của dạng này'}}:{})})}
+   return ok({correct:dung,answer:c.phan==='I'?'B':c.phan==='II'?'DSSD':'8,2',solution:'Lời giải mẫu của câu này.',reward,expCau:dung&&!data.assisted?reward+expMotCauGame(c.phan as 'I'|'II'|'III',1):0,stage:reward===40?2:1,solutionImages:[],...(c.qid==='q3'?{lyDoThuong:{moc:2,exp:40,chu:'+40 · đúng lại ở một câu khác sau 1 ngày — sao thứ 2 của dạng này'}}:{})})}
   return ok()}
  return <><DaoThanThu sbd="12121212" profile={p} doanMo={q.has('doan')} call={call} exp={q.has('khongexp')?null:{homNay:46,manhKhien:{manh:8,moiKhien:12}}} moiDoan={q.has('doan')&&p.choice} onMoDoan={()=>setNhat(n=>[...n,'MO-DOAN'])} onMoVoDai={()=>{}} onMoTienBo={()=>{}} onDong={()=>setNhat(n=>[...n,'DONG'])}/><pre data-nhat hidden>{nhat.join(',')}</pre></>}
 createRoot(document.getElementById('root')!).render(<StrictMode><section className="spirit-game" style={{padding:0,borderRadius:0}}>{man==='chon'&&<ManChon/>}{man==='dao'&&<ManDao/>}{man==='tham'&&<ManTham/>}{man==='vo'&&<ManVo/>}{man==='so-tay'&&<div className="dao dao-vo"><SoTay profile={hoSo()} tenDang={TEN_DANG} danhMuc={q.has('khongdanhmuc')?null:[{key:'ES-TEN',ten:'Tên gọi ester',chuong:'ES'},{key:'ES-TP',ten:'Thuỷ phân ester',chuong:'ES'},{key:'ES-DOT',ten:'Đốt cháy ester',chuong:'ES'},{key:'ES-XP',ten:'Xà phòng hoá',chuong:'ES'},{key:'ES-CB',ten:'Chất béo',chuong:'ES'},{key:'CB-LM',ten:'Lên men',chuong:'CB'},{key:'CB-TB',ten:'Glucose tráng bạc',chuong:'CB'},{key:'CB-TBOT',ten:'Tinh bột',chuong:'CB'}]} tenChuong={{ES:'Ester – Lipid',CB:'Carbohydrate'}}/></div>}{man==='tui'&&<div className="dao dao-vo"><TuiDo profile={hoSo()} exp={{homNay:46,manhKhien:{manh:8,moiKhien:12}}} onDungKhien={async()=>{}} onMoVoDai={()=>{}} onMoTienBo={()=>{}}/></div>}</section></StrictMode>)

@@ -32,7 +32,9 @@ export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
 export interface PhanHoi2{correct:boolean;answer:string;traLoi:string;solution:unknown;solutionImages:HinhAnh[];reward:number;lyDo:LyDoThuong
  /** Luật v4 (chỉ-thêm): EXP câu thử thách máy chủ trả; `coTroGiup` = câu có trợ giúp / Bùa / Hỏi thầy ⇒ không hiệu ứng. */
- expThuThach?:number;/** v5: EXP câu game thường đúng. */expCau?:number;coTroGiup?:boolean}
+ expThuThach?:number;coTroGiup?:boolean
+ /** Luật 29/09: EXP thật máy chủ ghi cho câu này (dùng nguyên số). */
+ expCau?:number}
 
 // ───────────── thanh 6 nút của chuyến ─────────────
 /** Nút đã qua: xanh (đúng) / hồng (chưa đúng); nút đang làm sáng; nút Trùm ải là ô trám tím viền vàng. */

@@ -81,6 +81,12 @@ describe('expCauGame — game chỉ hiệu ứng câu TỰ LÀM ĐÚNG', () => {
     expect(expCauGame({ correct: true, daHoi: true, reward: 10 })).toBe(0)
     expect(expCauGame({ correct: true, reward: 0 })).toBe(0)
     expect(expCauGame(null)).toBe(0)
+    // luật 29/09: máy chủ trả `expCau` (EXP thật của câu) ⇒ dùng NGUYÊN số đó, không cộng lại reward/expThuThach
+    expect(expCauGame({ correct: true, reward: 10, expThuThach: 3, expCau: 16 })).toBe(16)
+    expect(expCauGame({ correct: true, reward: 0, expCau: 3 })).toBe(3)
+    expect(expCauGame({ correct: true, reward: 10, expCau: 0 })).toBe(0)
+    expect(expCauGame({ correct: true, assisted: true, expCau: 3 })).toBe(0)
+    expect(expCauGame({ correct: false, expCau: 3 })).toBe(0)
   })
 })
 

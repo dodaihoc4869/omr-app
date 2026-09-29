@@ -10,8 +10,9 @@
   border-radius: var(--m3-bo-tron, 999px);
   font-weight: 700;
   font-size: 0.875rem;
-  background: var(--m3-tertiary-container);
-  color: var(--m3-on-tertiary-container);
+  /* Màn GAME không nằm trong `.m3` (StudentPortal: vaoM3 = … && tab !== 'thanthu') ⇒ biến --m3-* vắng: dùng màu dự phòng = bảng sáng m3-theme để số luôn hiện rõ. */
+  background: var(--m3-tertiary-container, rgb(196 238 208));
+  color: var(--m3-on-tertiary-container, rgb(7 33 0));
 }
 .exp-cau-so[data-che-do='day-du'],
 .exp-cau-so[data-che-do='gon'] {
@@ -24,7 +25,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--m3-tertiary);
+  background: var(--m3-tertiary, rgb(20 108 46));
   pointer-events: none;
   opacity: 0;
   animation: exp-cau-hat 700ms ease-out both;

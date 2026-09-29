@@ -38,7 +38,7 @@ export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:num
  tranNgay?:number
  suggestions?:{title:string;source:string;part:string}[]
  id?:string;mode?:Mode;questions?:CauDao[];answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[]
- correct?:boolean;answer?:string;solution?:unknown;reward?:number;/** EXP câu thử thách / Lượt trùm máy chủ trả (chỉ-thêm). */expThuThach?:number;/** v5: EXP câu game thường đúng (chỉ-thêm). */expCau?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
+ correct?:boolean;answer?:string;solution?:unknown;reward?:number;/** EXP câu thử thách / Lượt trùm máy chủ trả (chỉ-thêm). */expThuThach?:number;/** Luật 29/09: EXP thật đã vào thú nhờ câu này (máy chủ tính). */expCau?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
  /** Đợt 2 (chỉ-thêm): tóm tắt lượt trong ngày · màn hết lượt (`het`) + "Mai thú chờ em" (`maiCho`) — đọc chặt bằng `docLuotNgay`/`docMaiCho`. */
  luot?:unknown;maiCho?:unknown;het?:boolean
  /** Thưởng ĐÁNG LẼ của câu — chỉ có khi trần 120 EXP/ngày từ game đã CẮT `reward` (máy chủ Đợt 1). */

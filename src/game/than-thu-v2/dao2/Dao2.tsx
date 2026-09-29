@@ -94,8 +94,8 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
   const r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted}),correct=!!r.correct,reward=r.reward??0,coBua=!!docGoiY(q.goiY,q.phan)
   const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted:assisted||coBua,reward,stage:r.stage??0})
   const emGui=(r as {traLoi?:unknown}).traLoi
-  setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct}]);setExp(t=>t+reward)
-  setPhanHoi({correct,answer:r.answer??'',traLoi:typeof emGui==='string'?emGui:traLoi,solution:r.solution,solutionImages:r.solutionImages??[],reward,lyDo,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0,expCau:typeof r.expCau==='number'?r.expCau:0,coTroGiup:assisted||coBua})})
+  setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct}]);setExp(t=>t+(typeof r.expCau==='number'?Math.max(0,r.expCau):reward))
+  setPhanHoi({correct,answer:r.answer??'',traLoi:typeof emGui==='string'?emGui:traLoi,solution:r.solution,solutionImages:r.solutionImages??[],reward,lyDo,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0,...(typeof r.expCau==='number'?{expCau:r.expCau}:{}),coTroGiup:assisted||coBua})})
  const tiep=()=>chay(async()=>{if(!luot)return
   if(viTri+1<luot.cau.length){setViTri(viTri+1);setTraLoi('');setAssisted(false);setPhanHoi(null);return}
   await call('complete',{session:luot.id})

@@ -18,7 +18,7 @@ import './dao.css'
 
 export interface PhanHoiAi{correct:boolean;answer:string;solution:unknown;solutionImages:HinhAnh[];lyDo:LyDoThuong
  /** Luật v4 (chỉ-thêm): số máy chủ trả cho hiệu ứng "+N EXP bay vào thú" — `reward` thưởng nấc, `expThuThach`. Vắng ⇒ dùng `lyDo.exp`. */
- reward?:number;expThuThach?:number;/** v5: EXP câu game thường đúng (½ câu học tập). */expCau?:number}
+ reward?:number;expThuThach?:number;/** Luật 29/09: EXP thật máy chủ ghi cho câu này (dùng nguyên số). */expCau?:number}
 export interface TongKetChuyen{dung:number;tong:number;exp:number;sao:number}
 export interface ThamHiemProps{
  profile:DaoProfile;cau:readonly CauDao[];viTri:number

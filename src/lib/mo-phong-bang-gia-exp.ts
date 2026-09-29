@@ -1,13 +1,13 @@
 // MÔ PHỎNG KINH TẾ EXP v5 (THẦY ĐÃ CHỐT 29/09/2026, `docs/DE-XUAT-EXP-V5-2909.md` mục 7) — THUẦN, chỉ dùng cho test/khoá lý do. Không app nào gọi.
 //
-// Bản TS của `mo-phong.mjs` (đề xuất), chạy bằng CHÍNH hằng số và hàm sản phẩm: giá câu/việc (`server/src/exp-cau-hinh.ts`, `expMotCau`, `expCauGameMot`),
+// Bản TS của `mo-phong.mjs` (đề xuất), chạy bằng CHÍNH hằng số và hàm sản phẩm: giá câu/việc (`server/src/exp-cau-hinh.ts`, `expMotCau`, `expMotCauGame`),
 // KHÔNG trần ngày, nhận EXP qua cổng ngày đạt + EXP tràn (`nhanV5`), bảng D/T (`BANG_NGAY_CAP`, `tongExpToiCap`), vàng (`vangDangDuc`: 1/5 EXP vào thú + vàng tràn),
 // mảnh tràn (`manhTranNgay` bên trong `nhanV5`), khiên 36 mảnh + 2 600 vàng + ngày đạt ≥ `ngayDatKhien(k)`.
 // Bất biến thầy chốt (test khoá): em chăm và em cày vô hạn đều lên cấp 10 ngày 21, cấp 120 ngày 1 200, khiên đầu ngày 36; em chăm lên cấp 2 ngày 1, cấp 3 ngày 2.
 import {
   BANG_GIA_MOI, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_DIEM_CA_HE_SO, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT, EXP_LEN_BANG_DAT, EXP_MOM_XONG,
 } from '../../server/src/exp-cau-hinh'
-import { expCauGameMot, expMotCau } from '../../server/src/exp-hoc-tap'
+import { expMotCauGame, expMotCau } from '../../server/src/exp-hoc-tap'
 import { KHIEN_REN_GIU_TOI_DA, MANH_REN_KHIEN, VANG_REN_KHIEN, ngayDatKhien, vangDangDuc } from './kinh-te-game'
 import { nhanV5, type HoSoV5 } from './hap-thu-ngay'
 
@@ -88,7 +88,7 @@ export function expNgayMoPhong(h: HoSoMoPhong, n: number, chuoi: number): number
     + (h.btvn(t, n) ? BANG_GIA_MOI.btvnDungHan : 0) + (h.mom(t, n) ? EXP_MOM_XONG : 0)
     + (lb === 'dat' ? EXP_LEN_BANG_DAT : lb === 'chua' ? EXP_LEN_BANG_CHUA_DAT : 0)
     + (ca == null ? 0 : Math.round(ca) * EXP_DIEM_CA_HE_SO)
-    + h.cauGame * tbCau(h, expCauGameMot) + h.gameKhac
+    + h.cauGame * tbCau(h, expMotCauGame) + h.gameKhac
   return Math.round(k)
 }
 
