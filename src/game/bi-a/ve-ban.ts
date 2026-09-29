@@ -66,26 +66,49 @@ export class BoVe {
   private nen: HTMLCanvasElement | null = null
   private duDoanCu: { key: string; t: number; kq: DuDoan } = { key: '', t: 0, kq: { cue: [], obj: [] } }
   private nhip = 0
+  /** Ảnh bóng đổ dưới bi (vẽ sẵn một lần mỗi cỡ, mỗi khung chỉ drawImage — không tạo gradient mỗi khung). */
+  private bongDo: HTMLCanvasElement | null = null
+  /** Dải màu cây cơ (tạo một lần, dịch bằng translate). */
+  private gCo: CanvasGradient | null = null
+  /** Toạ độ vẽ tạm (dùng lại, không cấp phát mỗi khung). */
+  private readonly vt = { x: 0, y: 0 }
   k: KhungBan | null = null
   dpr = 1
+  /** Máy yếu: bỏ quầng sáng (shadowBlur), bớt hạt hiệu ứng, giới hạn số ảnh bi tô lại mỗi khung. */
+  nhe = false
   private doc: Document
   constructor(doc: Document = document) { this.doc = doc }
   /** Đổi cỡ: tính lại nền và bảng chiếu sáng. */
-  datCo(k: KhungBan, dpr: number): void {
-    this.k = k; this.dpr = dpr
+  datCo(k: KhungBan, dpr: number, nhe = this.nhe): void {
+    this.k = k; this.dpr = dpr; this.nhe = nhe
     const Dr = Math.min(2, dpr), N = Math.max(16, Math.ceil(2 * R * k.S * Dr) + 2)
     this.bong = taoBong(N); (this.bong as Bong & { du: number }).du = N / (k.S * Dr)
     if (!this.chu) this.chu = taoChu(this.doc)
     this.cache.clear()
     this.nen = veNen(k, dpr, this.doc)
+    this.bongDo = this.veBongDo(k.S * dpr)
+  }
+  /** Bóng đổ một bi: gradient tròn mờ, bán kính R·1,15 (điểm ảnh canvas). */
+  private veBongDo(s: number): HTMLCanvasElement | null {
+    const rr = R * 1.15 * s, n = Math.max(4, Math.ceil(2 * rr)), cv = this.doc.createElement('canvas')
+    cv.width = cv.height = n
+    const x = cv.getContext('2d')
+    if (!x) return null
+    const g = x.createRadialGradient(n / 2, n / 2, R * 0.2 * s, n / 2, n / 2, rr); g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)')
+    x.fillStyle = g; x.beginPath(); x.arc(n / 2, n / 2, rr, 0, 7); x.fill()
+    return cv
   }
   /** Nạp lại chữ trên ô nhãn (sau khi phông tải xong). */
   napLaiChu(): void { this.chu = taoChu(this.doc); this.cache.clear(); if (this.k) this.nen = veNen(this.k, this.dpr, this.doc) }
+  /** Số ảnh bi còn được tô lại trong khung này (máy yếu: tối đa 4, bi khác giữ ảnh cũ thêm một khung). */
+  private conTo = Infinity
   private anhBi(b: Bi): HTMLCanvasElement | null {
     const B = this.bong
     if (!B || !this.chu || !this.k) return null
     let c = this.cache.get(b.id)
     if (c && c.N === B.N && c.ver === b.ver && c.xoay === this.k.xoay) return c.cv
+    if (c && c.N === B.N && c.xoay === this.k.xoay && c.ver >= 0 && this.conTo <= 0) return c.cv
+    this.conTo--
     if (!c || c.N !== B.N) {
       const cv = this.doc.createElement('canvas'); cv.width = cv.height = B.N
       const x = cv.getContext('2d')
@@ -103,13 +126,14 @@ export class BoVe {
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     if (!k || !B || !this.nen) return
-    const s = k.S * this.dpr
+    const s = k.S * this.dpr, balls = v.st.balls, vt = this.vt, nhe = this.nhe
+    this.conTo = nhe ? 4 : Infinity
     ctx.drawImage(this.nen, 0, 0)
-    for (const b of v.st.balls) {
-      if (!b.on) continue
-      const [p, q] = raMan(k, this.dpr, b.x, b.y), bx = p + 3 * s, by = q + 5 * s, rr = R * 1.15 * s
-      const g = ctx.createRadialGradient(bx, by, R * 0.2 * s, bx, by, rr); g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)')
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(bx, by, rr, 0, 7); ctx.fill()
+    const bd = this.bongDo
+    if (bd) for (let i = 0; i < balls.length; i++) {
+      if (!balls[i]!.on) continue
+      v.viTriVe(i, vt); this.man(vt.x, vt.y)
+      ctx.drawImage(bd, vt.x + 3 * s - bd.width / 2, vt.y + 5 * s - bd.height / 2)
     }
     for (const r of v.roi) {
       const kk = Math.min(1, r.t / 0.28), rb = v.bi_(r.id), sp = this.anhBi(rb)
@@ -143,15 +167,18 @@ export class BoVe {
       }
       ctx.restore()
     }
-    if (chi) { const b = v.bi_(chi.id); if (b.on) { ctx.save(); ctx.strokeStyle = MAU_QH[chi.qh]; ctx.lineWidth = 3.2; ctx.shadowColor = MAU_QH[chi.qh]; ctx.shadowBlur = 8; ctx.beginPath(); ctx.arc(b.x, b.y, R + 6, 0, 7); ctx.stroke(); ctx.restore() } }
+    if (chi) { const i = balls.findIndex((b) => b.id === chi.id), b = balls[i]; if (b && b.on) { v.viTriVe(i, vt); ctx.save(); ctx.strokeStyle = MAU_QH[chi.qh]; ctx.lineWidth = 3.2; if (!nhe) { ctx.shadowColor = MAU_QH[chi.qh]; ctx.shadowBlur = 8 } ctx.beginPath(); ctx.arc(vt.x, vt.y, R + 6, 0, 7); ctx.stroke(); ctx.restore() } }
     this.nhip += 0.05
-    for (const b of v.st.balls) {
+    const sz = B.du * s
+    for (let i = 0; i < balls.length; i++) {
+      const b = balls[i]!
       if (!b.on) continue
-      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang) { datTFBan(ctx, k, this.dpr); ctx.save(); ctx.shadowColor = 'rgba(255,200,60,.95)'; ctx.shadowBlur = 10 + 4 * Math.sin(this.nhip * 3); ctx.strokeStyle = 'rgb(255,214,107)'; ctx.lineWidth = 3.2; ctx.beginPath(); ctx.arc(b.x, b.y, R + 3, 0, 7); ctx.stroke(); ctx.restore() }
+      v.viTriVe(i, vt)
+      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang) { datTFBan(ctx, k, this.dpr); ctx.save(); if (!nhe) { ctx.shadowColor = 'rgba(255,200,60,.95)'; ctx.shadowBlur = 10 + 4 * Math.sin(this.nhip * 3) } ctx.strokeStyle = 'rgb(255,214,107)'; ctx.lineWidth = 3.2; ctx.beginPath(); ctx.arc(vt.x, vt.y, R + 3, 0, 7); ctx.stroke(); ctx.restore() }
       const sp = this.anhBi(b)
       if (!sp) continue
-      const [p, q] = raMan(k, this.dpr, b.x, b.y), sz = B.du * s
-      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sp, p - sz / 2, q - sz / 2, sz, sz)
+      this.man(vt.x, vt.y)
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sp, vt.x - sz / 2, vt.y - sz / 2, sz, sz)
     }
     datTFBan(ctx, k, this.dpr)
     if (v.ballInHand && v.pha === 'aim' && nguoi && !v.sheet) {
@@ -163,13 +190,14 @@ export class BoVe {
     if (info) {
       const c = info.c, an = Math.atan2(v.aim.y, v.aim.x), keo = 6 + v.power * 80
       ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(an + Math.PI)
-      ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 6
-      const a0 = R + keo, L = 400, g = ctx.createLinearGradient(a0, 0, a0 + L, 0)
-      g.addColorStop(0, 'rgb(46,123,214)'); g.addColorStop(0.012, 'rgb(244,238,220)'); g.addColorStop(0.04, 'rgb(244,238,220)'); g.addColorStop(0.041, 'rgb(232,201,143)'); g.addColorStop(0.62, 'rgb(200,153,90)'); g.addColorStop(0.63, 'rgb(255,214,107)'); g.addColorStop(0.645, 'rgb(58,33,18)'); g.addColorStop(1, 'rgb(30,18,10)')
-      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(a0, -3); ctx.lineTo(a0 + L, -6.5); ctx.arcTo(a0 + L + 6, -6.5, a0 + L + 6, 0, 6); ctx.arcTo(a0 + L + 6, 6.5, a0 + L, 6.5, 6); ctx.lineTo(a0, 3); ctx.closePath(); ctx.fill(); ctx.restore()
+      if (!nhe) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 6 }
+      const a0 = R + keo, L = 400
+      ctx.translate(a0, 0)
+      ctx.fillStyle = this.dayCo(ctx, L); ctx.beginPath(); ctx.moveTo(0, -3); ctx.lineTo(L, -6.5); ctx.arcTo(L + 6, -6.5, L + 6, 0, 6); ctx.arcTo(L + 6, 6.5, L, 6.5, 6); ctx.lineTo(0, 3); ctx.closePath(); ctx.fill(); ctx.restore()
     }
-    for (const f of v.fx) {
-      if (f.t < 0) continue
+    for (let i = 0; i < v.fx.length; i++) {
+      const f = v.fx[i]!
+      if (f.t < 0 || (nhe && f.k !== 'vong' && i % 2)) continue // máy yếu: vẽ nửa số hạt
       const kk = f.t / f.life
       if (f.k === 'vong') { ctx.strokeStyle = `rgba(255,214,107,${1 - kk})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(f.x, f.y, 8 + 60 * kk, 0, 7); ctx.stroke() }
       else if (f.k === 'hat') { ctx.globalAlpha = kk < 0.6 ? 1 : (1 - kk) / 0.4; ctx.fillStyle = f.c; ctx.beginPath(); ctx.arc(f.x, f.y, f.s, 0, 7); ctx.fill(); ctx.globalAlpha = 1 }
@@ -181,6 +209,18 @@ export class BoVe {
       ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(40,20,0,.8)'; ctx.strokeText(n.chu, 0, -34 * kk); ctx.fillStyle = 'rgb(255,214,107)'; ctx.fillText(n.chu, 0, -34 * kk); ctx.globalAlpha = 1
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0)
+  }
+  /** Toạ độ bàn → điểm ảnh canvas, ghi vào this.vt (không tạo mảng mới mỗi bi mỗi khung). */
+  private man(x: number, y: number): void {
+    const k = this.k!, s = k.S * this.dpr
+    if (k.xoay) { this.vt.x = s * (H + T - y); this.vt.y = s * (x + T) } else { this.vt.x = s * (x + T); this.vt.y = s * (y + T) }
+  }
+  private dayCo(ctx: CanvasRenderingContext2D, L: number): CanvasGradient {
+    if (this.gCo) return this.gCo
+    const g = ctx.createLinearGradient(0, 0, L, 0)
+    g.addColorStop(0, 'rgb(46,123,214)'); g.addColorStop(0.012, 'rgb(244,238,220)'); g.addColorStop(0.04, 'rgb(244,238,220)'); g.addColorStop(0.041, 'rgb(232,201,143)'); g.addColorStop(0.62, 'rgb(200,153,90)'); g.addColorStop(0.63, 'rgb(255,214,107)'); g.addColorStop(0.645, 'rgb(58,33,18)'); g.addColorStop(1, 'rgb(30,18,10)')
+    this.gCo = g
+    return g
   }
   /** Mắt thần: tính lại tối đa ~16 lần/giây khi đổi hướng/lực/xoáy. */
   private duDoan(v: VanBia): DuDoan {
