@@ -509,6 +509,9 @@ export function xepChuyenDao<T>(ds: readonly T[], laMoi: (x: T) => boolean, mucD
 /**
  * Lập kế hoạch MỘT ngày cho một em. `trangThai` phải có đủ mọi câu trong `cau` (câu chưa làm ⇒ trạng thái mới).
  * `daLamHomNay`: số câu của kế hoạch hôm nay em đã làm (trừ vào trần).
+ * SỔ NỢ (thầy chốt 29/09): câu NỢ (mọi nguồn) tới lịch lấy TRƯỚC, trần 50% lượt khi chiến dịch còn câu mới (không chiến dịch ⇒ 100%),
+ * xếp `soSanhNo`; câu mới lấy phần còn lại theo quota; rồi câu chiến dịch đã thành thạo tới lịch ôn chốt; ôn duy trì ≤ 20% và sau cùng;
+ * còn chỗ ⇒ thêm câu mới, hết câu mới ⇒ thêm nợ. Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
  */
 export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<string, TrangThaiCau>, tc: TuyChonKeHoach, daLamHomNay = 0): KeHoachNgay {
   const tranNgay = tc.tranNgay ?? TRAN_NGAY
