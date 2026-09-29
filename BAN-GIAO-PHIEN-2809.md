@@ -107,3 +107,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 08:39 · Deploy #559 THÀNH CÔNG: PR #61 vá lộ đáp án (cauKhacPhuc/deTheoDangBai) · main 005f3ae · 0 ca mở lúc gộp · lùi: git revert -m 1 005f3ae.
 - 10:03 · Gộp PR #63 (Chậm nhịp chung + 3 bảng lời giải GIỮ trong reset) · main cd5a2de · 0 ca mở · lùi: git revert -m 1 cd5a2de. Nạp hàng lời giải khối 12: 149 đề, 4363 câu duy nhất vào hàng.
 - 10:12 · Deploy #562 THÀNH CÔNG: PR #63 · main cd5a2de · máy chủ thật: 4 chiến dịch ngày 1 đều Đúng nhịp. 10:14 mở phiên Code 4b soạn lời giải khối 12 (4363 câu).
+- 11:10 · Deploy #563 THÀNH CÔNG: PR #65 nút Điểm danh gọn · main 4546a97 · lùi: git revert -m 1 4546a97. 11:13 gộp PR #66 máy tự duyệt lời giải (main 8c84047, 0 ca mở) — chờ deploy rồi chạy may-duyet-bu.
