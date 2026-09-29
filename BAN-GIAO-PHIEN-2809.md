@@ -101,3 +101,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 01:04 · Deploy #554 THÀNH CÔNG: PR #56 tối ưu app (gói đầu gv 591→251 KB, WebP 25→5 MB, precache 161, dọn ảnh/mã) · main c1fd22c · lùi: git revert -m 1 c1fd22c. HẾT ĐỢT TỐI ƯU 28/09.
 - 06:36 (29/09) · Deploy #555 THÀNH CÔNG: PR #57 DẠY HỌC Khối 10 + thêm em tay · main 9b88cb3 · lùi: git revert -m 1 9b88cb3.
 - 08:00 (29/09) · Deploy #556 THÀNH CÔNG: PR #58 Ca kiểm tra 'Không rút câu sai' · main 93461ca · lùi: git revert -m 1 93461ca. A so-no-thuat-toan 257562e sẵn sàng; B kiem-tra-dau-gio đang gộp A.
+- 08:00 · Deploy #557 THÀNH CÔNG: PR #59 màu chữ nút Bi-a · main 5accee3 · lùi: git revert -m 1 5accee3.
+- 08:15 · merge PR #60 Sổ nợ + đan xen + Kiểm tra đầu giờ (main 4f9b28d), đang deploy.
