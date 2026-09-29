@@ -50,3 +50,25 @@ export function panTheoMan(k: Pick<KhungBan, 'xoay'>, x: number, y: number): num
   const fx = k.xoay ? (H - y) / H : x / W
   return (fx * 2 - 1) * 0.7
 }
+
+// ───── ĐIỆN THOẠI XOAY NGANG · BÀN TOÀN MÀN (thầy lệnh 29/09: "khi xoay ngang màn hình cả bàn bi a full ngang giống điện thoại") ─────
+// Bàn chiếm cả khung trừ: lề an toàn (tai thỏ / thanh home: env(safe-area-inset-*), tối thiểu LE_NGANG) và MỘT cột nút mảnh mỗi bên
+// (COT_NGANG: nút 44 px bên trái, thanh lực dọc bên phải). Mọi thứ khác là lớp phủ. CSS `bi-a.css` (khối "xoay ngang") dùng ĐÚNG hai số này.
+export const COT_NGANG = 48
+export const LE_NGANG = 4
+export interface VienAn { tren: number; phai: number; duoi: number; trai: number }
+export interface HopBanNgang extends KhungBan {
+  /** Góc trên-trái canvas trong khung (điểm ảnh CSS). */
+  x: number
+  y: number
+  /** Hộp dành cho bàn (sau lề an toàn + hai cột nút). */
+  hop: { x: number; y: number; w: number; h: number }
+}
+/** Hộp bàn khi điện thoại xoay ngang (khung `vw × vh`, lề an toàn `an`): bàn nằm ngang, đúng tỉ lệ, to nhất, canh giữa. */
+export function hopBanNgang(vw: number, vh: number, an: Partial<VienAn> = {}): HopBanNgang {
+  const trai = Math.max(LE_NGANG, an.trai ?? 0) + COT_NGANG, phai = Math.max(LE_NGANG, an.phai ?? 0) + COT_NGANG
+  const tren = Math.max(LE_NGANG, an.tren ?? 0), duoi = Math.max(LE_NGANG, an.duoi ?? 0)
+  const w = Math.max(1, vw - trai - phai), h = Math.max(1, vh - tren - duoi)
+  const k = tinhKhungBan(w, h, { xoayCu: true })
+  return { ...k, x: trai + (w - k.cw) / 2, y: tren + (h - k.ch) / 2, hop: { x: trai, y: tren, w, h } }
+}
