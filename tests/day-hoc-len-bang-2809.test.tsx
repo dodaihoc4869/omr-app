@@ -258,3 +258,12 @@ describe('app học sinh — Điểm danh buổi học', () => {
     window.history.replaceState(null, '', '/')
   })
 })
+
+describe('viên điểm danh gọn (29/09)', () => {
+  it('rút tên buổi mặc định về ngày ngắn, tên thầy tự đặt giữ nguyên', async () => {
+    const { ngayGon } = await import('../src/components/diem-danh/TheDiemDanhHs')
+    expect(ngayGon('Buổi học 29/09/2026')).toBe('29/09')
+    expect(ngayGon('Buổi học 3/10/2026')).toBe('03/10')
+    expect(ngayGon('Ôn tập Ester')).toBe('Ôn tập Ester')
+  })
+})
