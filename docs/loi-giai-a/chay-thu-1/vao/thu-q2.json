@@ -1,0 +1,32 @@
+{
+ "qid": "thu-q2",
+ "so": "Câu 34",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 34:</b> Isoamyl acetate (D = 0,876 g/mL) có mùi chuối nên được dùng làm hương liệu nhân tạo. Trong ngành sơn, isoamyl acetate được dùng làm dung môi sơn mài. Isoamyl acetate được điều chế theo các bước sau:</p>\n<p>– <b>Bước 1:</b> Cho vào bình cầu 15 mL isoamyl alcohol (D = 0,810 g/mL), 10 mL acetic acid (D = 1,049 g/mL) và 7,0 mL {H2SO4} đậm đặc, cho thêm vào bình vài viên đá bọt. Lắp ống sinh hàn hồi lưu thẳng đứng vào miệng bình cầu. Sau đó đun nóng bình cầu trong khoảng 1 giờ.</p>\n<p>– <b>Bước 2:</b> Sau khi đun, để nguội rồi rót sản phẩm vào phễu chiết, lắc đều rồi để yên khoảng 5 phút, chất lỏng tách thành hai lớp, loại bỏ phần chất lỏng phía dưới, lấy phần chất lỏng phía trên.</p>\n<p>– <b>Bước 3:</b> Cho từ từ dung dịch {Na2CO3} 10% vào phần chất lỏng thu lấy ở bước 2 và lắc đều cho đến khi không còn khí thoát ra, thêm tiếp 20 mL dung dịch NaCl bão hoà rồi để yên khi đó chất lỏng tách thành hai lớp. Chiết lấy phần chất lỏng phía trên, làm khan, ta thu được isoamyl acetate.</p>",
+ "y": [
+  {
+   "id": "a",
+   "t": "Isoamyl acetate rất ít tan trong nước vì có khối lượng riêng nhỏ hơn khối lượng riêng của nước."
+  },
+  {
+   "id": "b",
+   "t": "Ở bước 3, không thể thay dung dịch {Na2CO3} bằng dung dịch NaOH dư."
+  },
+  {
+   "id": "c",
+   "t": "Ở bước 1, xảy ra phản ứng thế nhóm –OH của alcohol bằng gốc {CH3COO}–."
+  },
+  {
+   "id": "d",
+   "t": "Nếu hiệu suất phản ứng ester hoá là 54% và lượng isoamyl acetate bị hao hụt tối đa 6% thì thể tích isoamyl acetate thu được là 10,4 mL. <i>(Làm tròn kết quả đến hàng phần mười.)</i>"
+  }
+ ],
+ "dapAn": {
+  "a": "S",
+  "b": "D",
+  "c": "S",
+  "d": "D"
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "qid": "12-BD7-09-III-3",
+ "bam": "e5c86e9d7586c1bd",
+ "dang": "tln",
+ "ten": "Chất phản ứng với {Cu(OH)2}/kiềm: glycerol, albumin, chất béo, đường",
+ "keys": ["k1", "k2"],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Soi nhóm chức từng chất",
+   "p": "Tìm chất có nhiều –OH kề nhau hoặc có nhiều liên kết peptide.",
+   "io": []
+  },
+  {
+   "ic": "i-flask",
+   "t": "Nhỏ {Cu(OH)2}/kiềm, lắc",
+   "p": "Glycerol, saccharose, glucose: dung dịch xanh lam. Albumin: màu tím (biuret).",
+   "io": [["in", "(1)"], ["in", "(2)"], ["in", "(4)"], ["in", "(5)"]]
+  },
+  {
+   "ic": "i-filter",
+   "t": "Loại chất không phản ứng",
+   "p": "Tripalmitin là triester: ba –OH của glycerol đã thành ester, không còn –OH tự do.",
+   "io": [["out", "(3) tripalmitin"]]
+  },
+  {
+   "ic": "i-chain",
+   "t": "Ghép bộ số",
+   "p": "Xếp các số thứ tự tăng dần: 1245.",
+   "io": []
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "1245",
+  "donVi": "",
+  "k": "k2",
+  "bay": "tengoi",
+  "soi": "\"phản ứng với {Cu(OH)2}\" gồm cả tạo xanh lam lẫn màu tím biuret; soi từng chất có –OH kề nhau hay liên kết peptide.",
+  "g": [
+   "Chìa khoá <b>Bảng thuốc thử</b>: {Cu(OH)2}/kiềm cho dung dịch xanh lam với chất có nhiều –OH kề nhau, cho màu tím với protein.",
+   "Glycerol, saccharose, glucose có –OH kề nhau; albumin là protein; tripalmitin là triester của glycerol.",
+   "Tripalmitin còn nhóm –OH tự do nào không?"
+  ],
+  "giai": "Đáp số: 1245. (1), (4), (5) có nhiều –OH kề nhau → dung dịch xanh lam. (2) albumin là protein → màu tím (biuret). (3) tripalmitin: ba –OH của glycerol đã thành ester nên không phản ứng."
+ },
+ "ket": "Đáp số: 1245",
+ "nho": "{Cu(OH)2}/kiềm: –OH kề nhau → xanh lam; protein → tím; chất béo (triester) không phản ứng.",
+ "phepTinh": [
+  { "ten": "Bộ số (ghép số thứ tự tăng dần)", "bieuThuc": "1245", "ketQua": 1245, "lamTron": 0, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Trong các dung dịch: glucose, fructose, ethanol, Gly-Ala-Gly, có 3 dung dịch phản ứng với {Cu(OH)2} trong môi trường kiềm.",
+   "d": "D",
+   "giai": "Đúng. Glucose, fructose có –OH kề nhau → xanh lam; Gly-Ala-Gly là tripeptide → màu tím. Ethanol chỉ có một –OH, không phản ứng.",
+   "phepTinh": [
+    { "ten": "Số dung dịch phản ứng", "bieuThuc": "1+1+1", "ketQua": 3, "lamTron": 0 }
+   ]
+  },
+  {
+   "t": "Cho các chất: (1) ethanol, (2) fructose, (3) ethylene glycol, (4) tinh bột. Bộ số các chất hoà tan được {Cu(OH)2} ở nhiệt độ thường là 234.",
+   "d": "S",
+   "giai": "Sai. Fructose và ethylene glycol có –OH kề nhau → xanh lam. Ethanol chỉ có một –OH; tinh bột không hoà tan {Cu(OH)2}. Bộ số đúng là 23."
+  }
+ ],
+ "co": []
+}

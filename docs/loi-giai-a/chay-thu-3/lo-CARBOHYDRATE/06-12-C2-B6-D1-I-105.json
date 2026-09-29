@@ -1,0 +1,120 @@
+{
+ "qid": "12-C2-B6-D1-I-105",
+ "bam": "1810143ae49ff476",
+ "dang": "tn",
+ "ten": "Dung dịch {HNO3} 60% cần để sản xuất cellulose trinitrate (H = 80%)",
+ "keys": ["k7", "k5"],
+ "dung": [
+  {
+   "ic": "i-chain",
+   "t": "Nitrate hoá cellulose",
+   "p": "{[C6H7O2(OH)3]n} + 3n{HNO3} → {[C6H7O2(ONO2)3]n} + 3n{H2O}; sản phẩm dùng làm thuốc súng không khói.",
+   "io": [["in", "3{HNO3}/mắt xích"], ["out", "{H2O}"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Quy về mắt xích",
+   "p": "29,7 : 297 = 0,1 kmol trinitrate → 0,3 kmol {HNO3}, tức 18,9 kg theo lí thuyết.",
+   "io": [["in", "18,9 kg {HNO3}"]]
+  },
+  {
+   "ic": "i-chart",
+   "t": "Tìm nguyên liệu: chia H",
+   "p": "18,9 : 0,8 = 23,625 kg {HNO3} nguyên chất cần dùng.",
+   "io": [["in", "23,625 kg {HNO3}"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Đổi ra dung dịch 60%",
+   "p": "23,625 : 0,6 = 39,375 kg dung dịch, gần 39,4 kg nhất.",
+   "io": [["in", "39,4 kg dung dịch"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "\"hiệu suất 80%\" + \"dung dịch 60%\" → tìm nguyên liệu nên chia cho cả hai số.",
+   "g": [
+    "Chìa khoá <b>Dây chuyền mol</b>: 1 mắt xích → trinitrate 297 cần 3{HNO3}; tìm nguyên liệu thì <b>÷ H</b>.",
+    "n trinitrate = 29,7 : 297 = 0,1 kmol → m{HNO3} lí thuyết = 0,1 × 3 × 63 = 18,9 kg.",
+    "Chia 0,8 cho hiệu suất rồi chia 0,6 cho nồng độ. Kết quả gần giá trị nào?"
+   ],
+   "giai": "Chọn. m = 18,9 : 0,8 : 0,6 = 39,375 kg ≈ 39,4 kg dung dịch {HNO3} 60%.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k5",
+   "bay": "hieusuat",
+   "soi": "31,5 = 18,9 : 0,6 → quên chia hiệu suất.",
+   "g": [
+    "Chìa khoá <b>Dây chuyền mol</b>: tìm nguyên liệu thì chia H; H = 80% nên lượng cần dùng phải lớn hơn lí thuyết.",
+    "18,9 : 0,6 = 31,5: chưa chia 0,8."
+   ],
+   "giai": "Loại. 31,5 kg là lượng dung dịch khi coi hiệu suất 100%, quên chia 0,8.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k5",
+   "bay": "conso",
+   "soi": "23,6 ≈ 23,625 → đó là {HNO3} nguyên chất, chưa đổi ra dung dịch 60%.",
+   "g": [
+    "Chìa khoá <b>Dây chuyền mol</b>: đề hỏi khối lượng <b>dung dịch</b> 60%, không phải {HNO3} nguyên chất.",
+    "18,9 : 0,8 = 23,625 kg mới là {HNO3} nguyên chất; còn phải chia 0,6."
+   ],
+   "giai": "Loại. 23,6 kg là khối lượng {HNO3} nguyên chất; dung dịch 60% phải là 23,625 : 0,6 = 39,375 kg.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k5",
+   "bay": "hieusuat",
+   "soi": "49,2 ≈ 39,375 : 0,8 → chia hiệu suất hai lần.",
+   "g": [
+    "Chìa khoá <b>Dây chuyền mol</b>: quá trình có một hiệu suất thì chỉ chia H một lần.",
+    "39,375 : 0,8 ≈ 49,2: đã chia 0,8 hai lần."
+   ],
+   "giai": "Loại. 49,2 kg là do chia hiệu suất hai lần; quá trình chỉ có một hiệu suất 80%.",
+   "lab": null
+  }
+ ],
+ "mc": { "d": "A" },
+ "ket": "Đáp án A",
+ "nho": "Tìm nguyên liệu: chia H một lần, rồi chia C% để ra khối lượng dung dịch.",
+ "phepTinh": [
+  { "ten": "n cellulose trinitrate (kmol)", "bieuThuc": "29.7/297", "ketQua": 0.1, "lamTron": 4 },
+  { "ten": "m {HNO3} lí thuyết (kg)", "bieuThuc": "0.1*3*63", "ketQua": 18.9, "lamTron": 2 },
+  { "ten": "m {HNO3} cần dùng (kg)", "bieuThuc": "18.9/0.8", "ketQua": 23.625, "lamTron": 3 },
+  { "ten": "m dung dịch {HNO3} 60% (kg)", "bieuThuc": "23.625/0.6", "ketQua": 39.375, "lamTron": 3 },
+  { "ten": "Phương án B: quên chia H (kg)", "bieuThuc": "18.9/0.6", "ketQua": 31.5, "lamTron": 2 },
+  { "ten": "Phương án D: chia H hai lần (kg)", "bieuThuc": "39.375/0.8", "ketQua": 49.22, "lamTron": 2 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Để sản xuất 59,4 kg cellulose trinitrate với hiệu suất 90% cần 70 kg dung dịch {HNO3} 60%.",
+   "d": "D",
+   "giai": "Đúng. n = 59,4 : 297 = 0,2 kmol; m{HNO3} cần = 0,2 × 3 × 63 : 0,9 = 42 kg; dung dịch = 42 : 0,6 = 70 kg.",
+   "phepTinh": [
+    { "ten": "n trinitrate (kmol)", "bieuThuc": "59.4/297", "ketQua": 0.2, "lamTron": 4 },
+    { "ten": "m {HNO3} cần dùng (kg)", "bieuThuc": "0.2*3*63/0.9", "ketQua": 42, "lamTron": 2 },
+    { "ten": "m dung dịch 60% (kg)", "bieuThuc": "42/0.6", "ketQua": 70, "lamTron": 2 }
+   ]
+  },
+  {
+   "t": "Từ 16,2 kg cellulose và {HNO3} dư, hiệu suất 80%, thu được 29,7 kg cellulose trinitrate.",
+   "d": "S",
+   "giai": "Sai. Tính sản phẩm thì nhân H: 16,2 : 162 × 297 × 0,8 = 23,76 kg. 29,7 kg là khi hiệu suất 100%.",
+   "phepTinh": [
+    { "ten": "m trinitrate thu được (kg)", "bieuThuc": "16.2/162*297*0.8", "ketQua": 23.76, "lamTron": 2 }
+   ]
+  }
+ ],
+ "co": []
+}

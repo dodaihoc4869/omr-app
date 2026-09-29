@@ -1,0 +1,81 @@
+{
+ "qid": "12-KT-C1-D3-I-4",
+ "so": "Câu 4",
+ "nguon": "12-KT-C1-D3",
+ "chuong": "Ester – lipid",
+ "mucDo": "hieu",
+ "dangBai": "ESTER.TINH_CHAT_VAT_LI.SO_SANH",
+ "de": "<p>Dãy các chất nào sau đây được sắp xếp theo chiều tăng dần nhiệt độ sôi?</p>",
+ "hinh": [],
+ "loiGiaiCo": {
+  "chot": "Ester không tạo liên kết hydrogen nên sôi thấp nhất; alcohol tạo được liên kết hydrogen; carboxylic acid tạo liên kết hydrogen kép nên sôi cao nhất.",
+  "tung": {
+   "A": {
+    "dung": true,
+    "vi_sao": "Đúng: ester < alcohol < acid, đúng chiều tăng dần nhiệt độ sôi."
+   },
+   "B": {
+    "dung": false,
+    "vi_sao": "Đặt acid đứng đầu là ngược, acid có nhiệt độ sôi cao nhất."
+   },
+   "C": {
+    "dung": false,
+    "vi_sao": "Cũng đặt acid đầu dãy nên sai chiều."
+   },
+   "D": {
+    "dung": false,
+    "vi_sao": "Đặt ester cuối dãy, trong khi ester sôi thấp nhất."
+   }
+  },
+  "buoc": [],
+  "ket_qua": "",
+  "trang_thai": "khop"
+ },
+ "dang": "tn",
+ "y": [
+  {
+   "id": "A",
+   "t": "HCOOCH3, CH3CH2OH, CH3COOH"
+  },
+  {
+   "id": "B",
+   "t": "CH3COOH, HCOOCH3, CH3CH2OH"
+  },
+  {
+   "id": "C",
+   "t": "CH3COOH, CH3CH2OH, HCOOCH3"
+  },
+  {
+   "id": "D",
+   "t": "CH3CH2OH, CH3COOH, HCOOCH3"
+  }
+ ],
+ "dapAn": {
+  "A": "D",
+  "B": "S",
+  "C": "S",
+  "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "HCOOCH3, CH3CH2OH, CH3COOH"
+   ],
+   [
+    "B",
+    "CH3COOH, HCOOCH3, CH3CH2OH"
+   ],
+   [
+    "C",
+    "CH3COOH, CH3CH2OH, HCOOCH3"
+   ],
+   [
+    "D",
+    "CH3CH2OH, CH3COOH, HCOOCH3"
+   ]
+  ],
+  "dapAn": "A"
+ }
+}

@@ -1,0 +1,26 @@
+{
+ "qid": "DB-12-B1-P1-D2-III-108",
+ "so": "Câu 108",
+ "nguon": "DB-12-B1-P1-D2",
+ "chuong": "Ester – lipid",
+ "mucDo": "van_dung",
+ "dangBai": "ESTER.ESTER_HOA.TINH_HIEU_SUAT",
+ "de": "<p>Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau:<br>HOC₆H₄COOH+CH₃OH ⇌(H₂SO₄ đặc, t°) HOC₆H₄COOCH₃+H₂O salicylic acid methanol methyl salicylate Từ 18,63 tấn salicylic acid có thể sản xuất được tối đa x triệu tuýp thuốc xoa bóp giảm đau.<br>Biết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.<br>Giá trị của x là bao nhiêu?</p>",
+ "hinh": [],
+ "loiGiaiCo": {
+  "chot": "Salicylic acid M = 138, methyl salicylate M = 152.",
+  "tung": null,
+  "buoc": [
+   "Salicylic acid M = 138, methyl salicylate M = 152.",
+   "m(ester) = 18,63 × 152/138 × 0,75 = 15,39 tấn.",
+   "Số tuýp = 15,39.10⁶ g / 2,7 g = 5,7.10⁶ tuýp, tức 5,7 triệu."
+  ],
+  "ket_qua": "5,7",
+  "trang_thai": "khop"
+ },
+ "dang": "tln",
+ "y": [],
+ "dapAn": {
+  "kq": "5,7"
+ }
+}

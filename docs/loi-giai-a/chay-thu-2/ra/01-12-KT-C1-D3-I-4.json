@@ -1,0 +1,126 @@
+{
+ "qid": "12-KT-C1-D3-I-4",
+ "so": "Câu 4",
+ "nguon": "12-KT-C1-D3",
+ "dang": "tn",
+ "chuong": "Ester – lipid",
+ "de": "<p>Dãy các chất nào sau đây được sắp xếp theo chiều tăng dần nhiệt độ sôi?</p>",
+ "ten": "Xếp nhiệt độ sôi: ester, alcohol, carboxylic acid",
+ "keys": ["k6"],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Gọi tên loại chất",
+   "p": "{HCOOCH3} là ester, {CH3CH2OH} là alcohol, {CH3COOH} là carboxylic acid.",
+   "io": [["in", "ester"], ["in", "alcohol"], ["in", "acid"]]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Soi liên kết hydrogen",
+   "p": "Ester không có –OH nên không tạo liên kết hydrogen giữa các phân tử. Alcohol có –OH; acid có –COOH, liên kết hydrogen bền hơn.",
+   "io": []
+  },
+  {
+   "ic": "i-thermo",
+   "t": "Xếp từ thấp lên cao",
+   "p": "Liên kết hydrogen càng bền thì sôi càng cao: ester < alcohol < acid.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "t": "HCOOCH3, CH3CH2OH, CH3COOH",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "Kiểm thứ tự ba loại chất: ester, rồi alcohol, rồi acid có đúng chiều tăng không.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: ester không có liên kết hydrogen giữa các phân tử nên sôi thấp hơn alcohol và acid.",
+    "Xếp loại: {HCOOCH3} là ester, {CH3CH2OH} là alcohol, {CH3COOH} là carboxylic acid.",
+    "Ester không có liên kết hydrogen, alcohol có, acid có và bền hơn. Dãy nào đi đúng thứ tự thấp → cao đó?"
+   ],
+   "giai": "Chọn. Ester không tạo liên kết hydrogen nên sôi thấp nhất; alcohol có liên kết hydrogen qua –OH; acid tạo liên kết hydrogen bền hơn nên sôi cao nhất.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "t": "CH3COOH, HCOOCH3, CH3CH2OH",
+   "d": "S",
+   "k": "k6",
+   "bay": "doivai",
+   "soi": "Chất đứng đầu dãy tăng dần phải sôi thấp nhất; ở đây lại là acid.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: chất có liên kết hydrogen bền nhất sôi cao nhất, phải đứng cuối dãy tăng dần.",
+    "Đầu dãy B là {CH3COOH}, chất có liên kết hydrogen bền nhất."
+   ],
+   "giai": "Loại. {CH3COOH} sôi cao nhất nhưng bị đặt đầu dãy; acid và ester bị đổi chỗ so với thứ tự đúng.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "t": "CH3COOH, CH3CH2OH, HCOOCH3",
+   "d": "S",
+   "k": "k6",
+   "bay": "doivai",
+   "soi": "Thứ tự acid → alcohol → ester đúng, nhưng là chiều giảm, không phải tăng.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: đề hỏi chiều <b>tăng dần</b>, chất sôi thấp nhất phải đứng đầu.",
+    "So dãy C với dãy A: hai dãy ngược chiều nhau."
+   ],
+   "giai": "Loại. Dãy C xếp acid > alcohol > ester, tức là giảm dần nhiệt độ sôi.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "t": "CH3CH2OH, CH3COOH, HCOOCH3",
+   "d": "S",
+   "k": "k6",
+   "bay": "nguyennhan",
+   "soi": "Đặt ester cuối dãy là xếp theo cỡ phân tử, bỏ qua liên kết hydrogen.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: {HCOOCH3} và {CH3COOH} cùng phân tử khối 60, nhưng chỉ acid có liên kết hydrogen.",
+    "Chất không có liên kết hydrogen có thể đứng cuối dãy tăng dần không?"
+   ],
+   "giai": "Loại. {HCOOCH3} không tạo liên kết hydrogen giữa các phân tử nên sôi thấp nhất, không thể đứng cuối dãy.",
+   "lab": null
+  }
+ ],
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   ["A", "HCOOCH3, CH3CH2OH, CH3COOH"],
+   ["B", "CH3COOH, HCOOCH3, CH3CH2OH"],
+   ["C", "CH3COOH, CH3CH2OH, HCOOCH3"],
+   ["D", "CH3CH2OH, CH3COOH, HCOOCH3"]
+  ],
+  "d": "A"
+ },
+ "ket": "Đáp án A",
+ "nho": "Cùng cỡ phân tử, nhiệt độ sôi: ester < alcohol < carboxylic acid, vì liên kết hydrogen.",
+ "phepTinh": [
+  {"ten": "M HCOOCH3", "bieuThuc": "2*12+4*1+2*16", "ketQua": 60, "lamTron": 0},
+  {"ten": "M CH3COOH", "bieuThuc": "2*12+4*1+2*16", "ketQua": 60, "lamTron": 0},
+  {"ten": "M CH3CH2OH", "bieuThuc": "2*12+6*1+16", "ketQua": 46, "lamTron": 0}
+ ],
+ "tuongTu": [
+  {
+   "t": "Nhiệt độ sôi tăng dần theo dãy: {CH3COOC2H5}, {CH3CH2CH2OH}, {CH3CH2COOH}.",
+   "d": "D",
+   "giai": "Đúng. Ethyl acetate nặng nhất (M = 88) nhưng không tạo liên kết hydrogen nên vẫn sôi thấp nhất; propan-1-ol có liên kết hydrogen; propanoic acid có liên kết hydrogen bền hơn nên sôi cao nhất.",
+   "phepTinh": [
+    {"ten": "M CH3COOC2H5", "bieuThuc": "4*12+8*1+2*16", "ketQua": 88, "lamTron": 0},
+    {"ten": "M CH3CH2CH2OH", "bieuThuc": "3*12+8*1+16", "ketQua": 60, "lamTron": 0}
+   ]
+  },
+  {
+   "t": "{HCOOCH3} và {CH3COOH} có cùng phân tử khối nên nhiệt độ sôi xấp xỉ nhau.",
+   "d": "S",
+   "giai": "Sai. Hai chất cùng M = 60, nhưng acetic acid tạo liên kết hydrogen giữa các phân tử còn methyl formate thì không, nên acid sôi cao hơn nhiều.",
+   "phepTinh": [
+    {"ten": "M HCOOCH3 = M CH3COOH", "bieuThuc": "2*12+4*1+2*16", "ketQua": 60, "lamTron": 0}
+   ]
+  }
+ ],
+ "canThayChot": []
+}

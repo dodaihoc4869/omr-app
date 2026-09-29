@@ -95,7 +95,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
           <b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>
           <details open={!ketQua.correct}>
             <summary>Lời giải</summary>
-            <LoiGiaiCauSai hoaHoc c={{ text: q.text, phan: q.phan, dapAnDung: ketQua.answer, loiGiai: ketQua.solution }} />
+            <LoiGiaiCauSai hoaHoc c={{ text: q.text, phan: q.phan, dapAnDung: ketQua.answer, loiGiai: ketQua.solution }} qid={q.qid} nguon="doan" />
             <HinhTaiViTri hinhAnh={ketQua.solutionImages ?? []} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom} />
           </details>
         </div>

@@ -381,6 +381,10 @@ export default function NganHangDeScreen() {
             )}
           </div>
         </div>
+        {/* Lời giải từng bước (29/09): duyệt hồ sơ lời giải theo đề trước khi giao — màn riêng, không thêm mục thanh bên. */}
+        <NutChinh variant="phu" onClick={() => setScreen('duyetloigiai')}>
+          Duyệt lời giải
+        </NutChinh>
       </div>
 
       {daDocKetNoi && (!scriptUrl.trim() || !secret.trim()) && (

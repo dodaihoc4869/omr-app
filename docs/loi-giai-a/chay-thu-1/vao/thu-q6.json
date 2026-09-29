@@ -1,0 +1,32 @@
+{
+ "qid": "thu-q6",
+ "so": "Câu 31",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 31:</b> Isoamyl acetate được dùng để tạo mùi chuối trong thực phẩm. Chất này cũng được dùng làm dung môi vecni và sơn mài cũng như dùng làm chất dẫn dụ các đàn ong mật đến một địa điểm nhỏ. Trong phòng thí nghiệm, isoamyl acetate được điều chế từ acetic acid và isoamyl alcohol với xúc tác {H2SO4} đặc, ở nhiệt độ khoảng 145 °C theo mô hình thí nghiệm sau:</p>\n<div class=\"fig\"><b>Hình 1:</b> đèn cồn đun bình cầu có nhánh cắm nhiệt kế; ống sinh hàn nằm nghiêng nối từ nhánh xuống bình hứng; nước làm lạnh vào ở <b>(1)</b> – đầu thấp gần bình hứng, ra ở <b>(2)</b> – đầu cao gần bình cầu.<br><b>Hình 2:</b> phễu chiết có khoá, bên trong hai lớp: \"lớp chất lỏng nhẹ hơn\" ở trên, \"lớp chất lỏng nặng hơn\" ở dưới.</div>\n<p>Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, isoamyl alcohol và isoamyl acetate. Cho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như sau:</p>\n<div class=\"tbl\"><table><tr><th>Liên kết</th><th>O–H (alcohol)</th><th>O–H (carboxylic acid)</th><th>C=O (ester, carboxylic acid)</th><th>C–O (ester)</th></tr><tr><td>Số sóng (cm<sup>−1</sup>)</td><td>3 650 – 3 200</td><td>3 300 – 2 500</td><td>1 780 – 1 650</td><td>1 300 – 1 000</td></tr></table></div>\n<p>Biết nhiệt độ sôi của các chất acetic acid, isoamyl alcohol và isoamyl acetate lần lượt là 117,9 °C; 131,1 °C và 142 °C.</p>",
+ "y": [
+  {
+   "id": "a",
+   "t": "Không thể dùng phương pháp chưng cất phân đoạn để tách các chất lỏng trong hỗn hợp sau phản ứng."
+  },
+  {
+   "id": "b",
+   "t": "Dựa vào phổ hồng ngoại, có thể phân biệt được acetic acid, isoamyl alcohol và isoamyl acetate."
+  },
+  {
+   "id": "c",
+   "t": "Chất lỏng trong bình hứng chỉ có isoamyl acetate."
+  },
+  {
+   "id": "d",
+   "t": "Vai trò của ống sinh hàn để ngưng tụ chất lỏng, nước vào ở (1) và nước ra ở (2)."
+  }
+ ],
+ "dapAn": {
+  "a": "S",
+  "b": "D",
+  "c": "S",
+  "d": "D"
+ }
+}

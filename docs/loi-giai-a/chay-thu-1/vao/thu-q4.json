@@ -1,0 +1,32 @@
+{
+ "qid": "thu-q4",
+ "so": "Câu 8",
+ "nguon": "Sở Tuyên Quang lần 1 – 2026",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 8:</b> Aspirin (hay acetylsalicylic acid), là một dẫn xuất của salicylic acid được sử dụng để hạ sốt và giảm đau. Cho quy trình tổng hợp Aspirin trong phòng thí nghiệm như sau:</p>\n<p>– <b>Bước 1:</b> Cho 69 gam salicylic acid khan và 70,0 mL acetic anhydride (d = 1,08 g/mL) vào bình cầu 250 mL; thêm 3,0 mL sulfuric acid 98% vào và lắc kĩ. Sau đó, khuấy hỗn hợp phản ứng ở 50 – 60 °C trong khoảng 45 phút cho đến khi tan hết phần chất rắn.</p>\n<p>– <b>Bước 2:</b> Dùng nước đá để làm lạnh hỗn hợp phản ứng đến nhiệt độ nhỏ hơn 10 °C. Thêm từ từ 750 mL nước cất và khuấy kỹ, aspirin sẽ kết tủa. Lọc lấy sản phẩm bằng phễu lọc Buchner.</p>\n<p>– <b>Bước 3:</b> Hoà tan aspirin thô trong 150 mL ethanol 90° (cần đun nóng để tan hoàn toàn), sau đó đổ dung dịch này từ từ vào 375 mL nước nóng khoảng 50 °C. Nếu aspirin kết tủa lại thì cần đun nóng cho tan hết. Để nguội dung dịch thu được đến nhiệt độ phòng. Aspirin sẽ kết tinh dưới dạng tinh thể. Lọc và hút kiệt rồi sấy khô ở 50 °C.</p>\n<p>– <b>Bước 4:</b> Cân sản phẩm thu được 50,4 gam aspirin.</p>\n<div class=\"eq\">{HOC6H4COOH} + {(CH3CO)2O} → {CH3COOC6H4COOH} + {CH3COOH}</div>",
+ "y": [
+  {
+   "id": "a",
+   "t": "Hiệu suất của phản ứng tổng hợp aspirin ở thí nghiệm trên là 56%."
+  },
+  {
+   "id": "b",
+   "t": "Ở bước 2, chất rắn thu được chưa tinh khiết; bước 3 có vai trò loại bỏ acetic acid."
+  },
+  {
+   "id": "c",
+   "t": "Có thể thay {H2SO4} 98% bằng dung dịch {H3PO4} 98%."
+  },
+  {
+   "id": "d",
+   "t": "Phương pháp tinh chế được sử dụng ở thí nghiệm trên là phương pháp kết tinh lại."
+  }
+ ],
+ "dapAn": {
+  "a": "D",
+  "b": "S",
+  "c": "D",
+  "d": "D"
+ }
+}

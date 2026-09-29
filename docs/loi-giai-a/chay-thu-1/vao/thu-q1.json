@@ -1,0 +1,32 @@
+{
+ "qid": "thu-q1",
+ "so": "Câu 33",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 33:</b> Một nhóm học sinh đã thực hiện phản ứng điều chế ethyl acetate từ nguyên liệu ban đầu là acetic acid và ethanol trong phòng thí nghiệm. Khi phản ứng kết thúc, nhóm đã thu được hỗn hợp sản phẩm gồm ethyl acetate và acetic acid, ethanol còn dư theo phương trình hoá học:</p>\n<div class=\"eq\">{CH3COOH} + {C2H5OH} ⇌ {CH3COOC2H5} + {H2O} &nbsp;<small>(H<sup>+</sup>, t°)</small></div>\n<p>Vì ethyl acetate không phân cực, còn acetic acid và ethanol đều phân cực nên nhóm đã dùng dung môi hữu cơ không phân cực diethyl ether ({C2H5OC2H5}) để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng.</p>",
+ "y": [
+  {
+   "id": "a",
+   "t": "Diethyl ether là dung môi chiết lí tưởng trong thí nghiệm trên vì ethyl acetate tan tốt trong dung môi này, còn acetic acid và ethanol lại tan tốt trong nước."
+  },
+  {
+   "id": "b",
+   "t": "Bằng phương pháp chưng cất đơn giản, ta có thể tách ethyl acetate ra khỏi dung môi diethyl ether sau khi chiết."
+  },
+  {
+   "id": "c",
+   "t": "Do diethyl ether có nhiệt độ sôi thấp hơn nhiều so với ethyl acetate (34,6 °C so với 77,1 °C) nên có thể thu được ethyl acetate sau khi chiết bằng cách dùng đèn cồn đun nhẹ cho dung môi diethyl ether bay hơi."
+  },
+  {
+   "id": "d",
+   "t": "Để an toàn, ta có thể dùng nước nóng liên tục tưới lên bình cầu trong phương pháp chưng cất đơn giản để tách ethyl acetate ra khỏi dung môi diethyl ether sau khi chiết."
+  }
+ ],
+ "dapAn": {
+  "a": "D",
+  "b": "D",
+  "c": "S",
+  "d": "D"
+ }
+}

@@ -1,0 +1,125 @@
+{
+ "qid": "12-C3-B9-D3-II-5",
+ "bam": "d58ecef17d286df0",
+ "dang": "ds",
+ "ten": "Tetrapeptide T (5 O) tạo từ Gly và Ala tỉ lệ 3 : 1",
+ "keys": ["k6", "k7"],
+ "dung": [
+  {
+   "ic": "i-atom",
+   "t": "Đếm O ra số gốc",
+   "p": "Gốc kiểu Gly, Ala: n gốc có n + 1 nguyên tử O. T có 5 O nên có 4 gốc: tetrapeptide.",
+   "io": [["in", "5 O"], ["in", "4 gốc"]]
+  },
+  {
+   "ic": "i-chain",
+   "t": "Dựng mạch 3 Gly + 1 Ala",
+   "p": "Tỉ lệ 3 : 1 trên 4 gốc: ba Gly, một Ala, nối bằng 3 liên kết peptide.",
+   "io": [["in", "3 Gly"], ["in", "1 Ala"], ["out", "3 {H2O}"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Cộng công thức",
+   "p": "3 {C2H5NO2} + {C3H7NO2} − 3 {H2O} cho {C9H16O5N4}, M = 260.",
+   "io": [["in", "{C9H16O5N4}"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Thử {NaOH} và {Cu(OH)2}/kiềm",
+   "p": "Mỗi gốc cho một –{COONa} nên cần 4 {NaOH}. Có 3 liên kết peptide nên cho màu tím biuret.",
+   "io": [["in", "4 {NaOH}"], ["in", "màu tím"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "\"{C9H16O5N4}\": cộng 3 Gly với 1 Ala rồi trừ 3 {H2O}, so từng nguyên tố.",
+   "g": [
+    "Chìa khoá <b>Peptide: đếm &amp; tính</b>: n gốc nối với nhau mất n − 1 {H2O}; gốc kiểu Gly, Ala cho n nguyên tử N và n + 1 nguyên tử O.",
+    "5 O nên có 4 gốc; tỉ lệ 3 : 1 nên có 3 Gly ({C2H5NO2}) và 1 Ala ({C3H7NO2}).",
+    "Cộng C, H, O, N của bốn gốc rồi trừ 3 {H2O}: được bao nhiêu C, bao nhiêu H?"
+   ],
+   "giai": "Đúng. C: 3 × 2 + 3 = 9; H: 3 × 5 + 7 − 3 × 2 = 16; O: 3 × 2 + 2 − 3 = 5; N: 4. Vậy T là {C9H16O5N4}.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "S",
+   "k": "k6",
+   "bay": "conso",
+   "soi": "\"3 công thức cấu tạo\": số 3 trùng số Gly và số liên kết peptide; phải đếm chỗ đặt gốc Ala.",
+   "g": [
+    "Chìa khoá <b>Peptide: đếm &amp; tính</b>: số trật tự bằng số hoán vị các gốc; 3 Gly + 1 Ala thì đếm chỗ đặt Ala.",
+    "Mạch có 4 vị trí; ba Gly giống nhau nên chỉ cần chọn chỗ cho Ala.",
+    "Viết thử: Ala-Gly-Gly-Gly, Gly-Ala-Gly-Gly, … Có mấy cách?"
+   ],
+   "giai": "Sai. Ala đứng được ở 4 vị trí: Ala-Gly-Gly-Gly, Gly-Ala-Gly-Gly, Gly-Gly-Ala-Gly, Gly-Gly-Gly-Ala. Có 4 công thức cấu tạo, không phải 3.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "\"tối đa 4 mol {NaOH}\": mỗi gốc amino acid cho một –{COONa}.",
+   "g": [
+    "Chìa khoá <b>Peptide: đếm &amp; tính</b>: trong {NaOH}, n({NaOH}) bằng tổng số nhóm –{COOH} của các gốc (Glu tính 2).",
+    "T gồm 4 gốc Gly, Ala; mỗi gốc chỉ có một nhóm –{COOH}.",
+    "1 mol T thuỷ phân cho 4 mol muối {H2NRCOONa}. Cần bao nhiêu mol {NaOH}?"
+   ],
+   "giai": "Đúng. 1 mol T + 4 mol {NaOH} → 3 mol {H2NCH2COONa} + 1 mol {H2NCH(CH3)COONa} + 1 mol {H2O}. Mỗi gốc lấy một {NaOH}, tổng 4 mol.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k7",
+   "bay": null,
+   "soi": "\"màu tím\" với {Cu(OH)2} trong kiềm: xem T có từ 2 liên kết peptide trở lên không.",
+   "g": [
+    "Chìa khoá <b>Protein &amp; tên phản ứng</b>: {Cu(OH)2} trong kiềm cho màu tím là phản ứng màu biuret, có từ tripeptide trở lên.",
+    "T là tetrapeptide, có 3 liên kết peptide.",
+    "Dipeptide không cho màu biuret. T nhiều gốc hơn hay ít gốc hơn tripeptide?"
+   ],
+   "giai": "Đúng. T là tetrapeptide (3 liên kết peptide) nên có phản ứng màu biuret, tạo dung dịch màu tím.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b S – c Đ – d Đ",
+ "nho": "Gốc kiểu Gly, Ala: n gốc có n + 1 O, mất n − 1 {H2O}, cần n {NaOH}; từ tripeptide mới có màu biuret.",
+ "phepTinh": [
+  { "ten": "Số gốc (số O = n + 1)", "bieuThuc": "5-1", "ketQua": 4, "lamTron": 0 },
+  { "ten": "Số C", "bieuThuc": "3*2+3", "ketQua": 9, "lamTron": 0 },
+  { "ten": "Số H", "bieuThuc": "3*5+7-3*2", "ketQua": 16, "lamTron": 0 },
+  { "ten": "Số O", "bieuThuc": "3*2+2-3", "ketQua": 5, "lamTron": 0 },
+  { "ten": "M(T)", "bieuThuc": "3*75+89-3*18", "ketQua": 260, "lamTron": 0 },
+  { "ten": "n NaOH cho 1 mol T", "bieuThuc": "3+1", "ketQua": 4, "lamTron": 0 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Peptide mạch hở có 6 nguyên tử oxygen, thuỷ phân hoàn toàn chỉ thu được glycine và alanine theo tỉ lệ mol 4 : 1. Có 5 công thức cấu tạo phù hợp.",
+   "d": "D",
+   "giai": "Đúng. 6 O nên có 5 gốc: 4 Gly và 1 Ala. Ala đứng được ở 5 vị trí nên có 5 công thức cấu tạo.",
+   "phepTinh": [
+    { "ten": "Số gốc", "bieuThuc": "6-1", "ketQua": 5, "lamTron": 0 }
+   ]
+  },
+  {
+   "t": "Thuỷ phân hoàn toàn 1 mol tripeptide Gly-Glu-Ala trong dung dịch {NaOH} dư, có tối đa 3 mol {NaOH} phản ứng.",
+   "d": "S",
+   "giai": "Sai. Glu có hai nhóm –{COOH} nên n({NaOH}) = 1 + 2 + 1 = 4 mol, không phải 3 mol.",
+   "phepTinh": [
+    { "ten": "n NaOH (mol)", "bieuThuc": "1+2+1", "ketQua": 4, "lamTron": 0 }
+   ]
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Ý a: khoảng trắng thừa trước dấu chấm (\"C₉H₁₆O₅N₄ .\")."
+  }
+ ]
+}

@@ -1,0 +1,184 @@
+{
+ "qid": "12-KT-C1-D2-III-6",
+ "so": "Câu 6",
+ "nguon": "12-KT-C1-D2",
+ "dang": "tln",
+ "chuong": "Ester – lipid",
+ "de": "<p>Để điều chế isoamyl acetate trong phòng thí nghiệm, một học sinh đã đun nóng 4,00 mL acetic acid (D = 1,05 g/mL) với 8,00 mL isoamyl alcohol (CH3)2CHCH2CH2OH(D = 0,81 g/mL), có dung dịch H2SO4 đặc làm xúc tác, thu được 6,00 mL isoamyl acetate (D = 0,88 g/mL).<br>Tính hiệu suất của phản ứng trên. (Kết quả làm tròn đến hàng đơn vị). ------------------------- HẾT ------------------------- - Thí sinh không sử dụng tài liệu. - Giám thị không giải thích gì thêm.</p>",
+ "ten": "Hiệu suất điều chế isoamyl acetate từ thể tích và khối lượng riêng",
+ "keys": [
+  "k4"
+ ],
+ "dung": [
+  {
+   "ic": "i-scale",
+   "t": "Đổi mL → gam → mol",
+   "p": "Acetic acid 4,00 × 1,05 = 4,2 g → 0,07 mol. Isoamyl alcohol 8,00 × 0,81 = 6,48 g → khoảng 0,0736 mol.",
+   "io": [
+    [
+     "in",
+     "0,07 mol acid"
+    ],
+    [
+     "in",
+     "0,0736 mol alcohol"
+    ]
+   ]
+  },
+  {
+   "ic": "i-reflux",
+   "t": "Ester hoá, tỉ lệ 1 : 1",
+   "p": "{CH3COOH} + {C5H11OH} ⇌ {CH3COOC5H11} + {H2O}, xúc tác {H2SO4} đặc.",
+   "io": [
+    [
+     "out",
+     "{H2O}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Chọn chất thiếu",
+   "p": "0,07 < 0,0736 nên acid thiếu. Ester lí thuyết 0,07 mol, tức 0,07 × 130 = 9,1 g.",
+   "io": []
+  },
+  {
+   "ic": "i-chart",
+   "t": "So thực tế với lí thuyết",
+   "p": "Thực tế 6,00 × 0,88 = 5,28 g. H = 5,28 ÷ 9,1 × 100 ≈ 58%.",
+   "io": [
+    [
+     "in",
+     "5,28 g ester"
+    ]
+   ]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "58",
+  "donVi": "%",
+  "k": "k4",
+  "bay": "conso",
+  "soi": "Cả ba chất cho bằng mL: phải nhân D ra gam rồi mới ra mol, và tính theo chất thiếu.",
+  "g": [
+   "Chìa khoá <b>Con số</b>: V → m → n → chất thiếu → lí thuyết → so với thực tế.",
+   "n(acetic acid) = 4,00 × 1,05 ÷ 60 = 0,07 mol; n(isoamyl alcohol) = 8,00 × 0,81 ÷ 88 ≈ 0,0736 mol. Chất nào thiếu?",
+   "Lí thuyết 0,07 × 130 = 9,1 g ester; thực tế 6,00 × 0,88 = 5,28 g. Lấy thực tế chia lí thuyết, làm tròn hàng đơn vị."
+  ],
+  "giai": "Đáp số: 58. n(acid) = 0,07 mol < n(alcohol) ≈ 0,0736 mol nên tính theo acid. Lí thuyết: 0,07 × 130 = 9,1 g isoamyl acetate. Thực tế: 6,00 × 0,88 = 5,28 g. H = 5,28 ÷ 9,1 × 100 ≈ 58,02% → 58%."
+ },
+ "ket": "Đáp số: 58",
+ "nho": "Hiệu suất ester: V × D → m → n, chọn chất thiếu, rồi lấy thực tế chia lí thuyết.",
+ "phepTinh": [
+  {
+   "ten": "m acetic acid (g)",
+   "bieuThuc": "4.00*1.05",
+   "ketQua": 4.2,
+   "lamTron": 2
+  },
+  {
+   "ten": "n acetic acid (mol)",
+   "bieuThuc": "4.00*1.05/60",
+   "ketQua": 0.07,
+   "lamTron": 4
+  },
+  {
+   "ten": "M isoamyl alcohol C5H12O",
+   "bieuThuc": "5*12+12*1+16",
+   "ketQua": 88,
+   "lamTron": 0
+  },
+  {
+   "ten": "m isoamyl alcohol (g)",
+   "bieuThuc": "8.00*0.81",
+   "ketQua": 6.48,
+   "lamTron": 2
+  },
+  {
+   "ten": "n isoamyl alcohol (mol)",
+   "bieuThuc": "8.00*0.81/88",
+   "ketQua": 0.0736,
+   "lamTron": 4
+  },
+  {
+   "ten": "M isoamyl acetate C7H14O2",
+   "bieuThuc": "7*12+14*1+2*16",
+   "ketQua": 130,
+   "lamTron": 0
+  },
+  {
+   "ten": "m ester lí thuyết (g)",
+   "bieuThuc": "0.07*130",
+   "ketQua": 9.1,
+   "lamTron": 2
+  },
+  {
+   "ten": "m ester thực tế (g)",
+   "bieuThuc": "6.00*0.88",
+   "ketQua": 5.28,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất (%)",
+   "bieuThuc": "5.28/9.1*100",
+   "ketQua": 58,
+   "lamTron": 0,
+   "laDapSo": true
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Giữ nguyên các dữ kiện, chỉ thay 8,00 mL bằng 5,00 mL isoamyl alcohol (D = 0,81 g/mL) thì hiệu suất tính được vẫn là 58%.",
+   "d": "S",
+   "giai": "Sai. n(alcohol) = 5,00 × 0,81 ÷ 88 ≈ 0,0460 mol < 0,07 mol nên alcohol thành chất thiếu. Lí thuyết ≈ 0,0460 × 130 ≈ 5,98 g; H = 5,28 ÷ 5,98 × 100 ≈ 88%.",
+   "phepTinh": [
+    {
+     "ten": "n isoamyl alcohol (mol)",
+     "bieuThuc": "5.00*0.81/88",
+     "ketQua": 0.046,
+     "lamTron": 4
+    },
+    {
+     "ten": "m ester lí thuyết (g)",
+     "bieuThuc": "5.00*0.81/88*130",
+     "ketQua": 5.98,
+     "lamTron": 2
+    },
+    {
+     "ten": "Hiệu suất (%)",
+     "bieuThuc": "5.28/(5.00*0.81/88*130)*100",
+     "ketQua": 88,
+     "lamTron": 0
+    }
+   ]
+  },
+  {
+   "t": "Nếu chỉ thu được 4,50 mL isoamyl acetate (D = 0,88 g/mL), các dữ kiện khác như đề, thì hiệu suất làm tròn hàng đơn vị là 44%.",
+   "d": "D",
+   "giai": "Đúng. m(ester) = 4,50 × 0,88 = 3,96 g; acid vẫn thiếu nên lí thuyết vẫn là 9,1 g; H = 3,96 ÷ 9,1 × 100 ≈ 43,5% → 44%.",
+   "phepTinh": [
+    {
+     "ten": "m ester thực tế (g)",
+     "bieuThuc": "4.50*0.88",
+     "ketQua": 3.96,
+     "lamTron": 2
+    },
+    {
+     "ten": "Hiệu suất (%)",
+     "bieuThuc": "3.96/9.1*100",
+     "ketQua": 43.5,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Trường đề còn lẫn phần cuối đề thi (\"HẾT – Thí sinh không sử dụng tài liệu – Giám thị không giải thích gì thêm\"); nên cắt khỏi kho.",
+   "loai": "hienThi",
+   "chot": "Sửa kho: cắt dòng \"HẾT – Thí sinh không sử dụng tài liệu…\"."
+  }
+ ]
+}

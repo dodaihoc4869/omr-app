@@ -1,0 +1,109 @@
+{
+ "qid": "12-C6-B19-II-12",
+ "bam": "b04277c5a02f5d0f",
+ "dang": "ds",
+ "ten": "Bốn cốc đinh sắt: NaCl, quấn Zn, quấn Cu, ngâm dầu nhờn",
+ "keys": ["k4"],
+ "dung": [
+  {
+   "ic": "i-lens",
+   "t": "Cốc 4: đinh trong dầu nhờn",
+   "p": "Dầu nhờn không phải dung dịch điện li và cách li đinh với nước, không khí ẩm.",
+   "io": [["out", "nước, chất điện li"], ["in", "đinh không gỉ"]]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Cốc 2: cặp Zn – Fe",
+   "p": "Zn có E° nhỏ hơn Fe nên Zn là anode, bị ăn mòn. Ở cathode (Fe), dung dịch trung tính nên {O2} bị khử: {O2} + 2{H2O} + 4e → 4{OH}<sup>−</sup>.",
+   "io": [["out", "Zn tan dần"], ["in", "Fe được bảo vệ"]]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Cốc 3: cặp Fe – Cu",
+   "p": "Fe có E° nhỏ hơn Cu nên Fe là anode, bị ăn mòn điện hoá nhanh nhất; Cu là cathode, không bị ăn mòn.",
+   "io": [["out", "Fe gỉ mạnh"], ["in", "Cu giữ nguyên"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Cốc 1: chỉ đinh sắt trong NaCl",
+   "p": "Đinh sắt vẫn gỉ trong NaCl có hoà tan {O2}. Gỉ là {Fe2O3}·n{H2O} màu nâu đỏ.",
+   "io": [["in", "gỉ nâu đỏ"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "\"dầu nhờn\": kiểm xem môi trường này có còn chất điện li, hơi ẩm hay không.",
+   "g": [
+    "Chìa khoá <b>Ăn mòn điện hoá</b>: cần hai điện cực, tiếp xúc nhau, cùng chạm hơi ẩm hay chất điện li. Phủ dầu, sơn là cách chống ăn mòn.",
+    "Cốc 4 chỉ có dầu nhờn, không có dung dịch NaCl.",
+    "Dầu nhờn có cung cấp nước, chất điện li cho bề mặt đinh không?"
+   ],
+   "giai": "Đúng. Dầu nhờn không dẫn điện và cách li đinh sắt khỏi nước, không khí ẩm, nên đinh sắt gần như không bị gỉ.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "S",
+   "k": "k4",
+   "bay": "xuhuong",
+   "soi": "\"có khí thoát ra\": vế Zn bị ăn mòn đúng, nhưng dung dịch NaCl trung tính thì cathode sinh gì?",
+   "g": [
+    "Chìa khoá <b>Ăn mòn điện hoá</b>: kim loại E° nhỏ hơn là anode. Ở cathode, môi trường acid thì ra {H2}, trung tính thì chỉ {O2} bị khử.",
+    "Cốc 2: Zn quấn quanh Fe, cùng ngâm dung dịch NaCl bão hoà (trung tính).",
+    "Viết quá trình ở cathode trong môi trường trung tính: có sản phẩm khí nào không?"
+   ],
+   "giai": "Sai. Zn là anode nên bị ăn mòn, đinh sắt được bảo vệ. Nhưng dung dịch NaCl trung tính: ở cathode {O2} + 2{H2O} + 4e → 4{OH}<sup>−</sup>, không sinh {H2}, nên không có khí thoát ra.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "\"gỉ nhiều nhất\" và \"dây đồng không bị ăn mòn\": xác định kim loại nào là anode trong cặp Fe – Cu.",
+   "g": [
+    "Chìa khoá <b>Ăn mòn điện hoá</b>: đủ ba điều kiện thì ăn mòn nhanh hơn hẳn ăn mòn hoá học; kim loại E° nhỏ hơn là anode.",
+    "Cốc 3: Fe tiếp xúc Cu, cùng ngâm NaCl. Cốc 1 chỉ có Fe; cốc 2 Fe được Zn bảo vệ.",
+    "Trong cặp Fe – Cu, kim loại nào nhường electron? So tốc độ gỉ của Fe ở cốc 3 với cốc 1."
+   ],
+   "giai": "Đúng. Fe đứng trước Cu trong dãy thế nên Fe là anode, bị ăn mòn điện hoá, gỉ nhanh hơn cốc 1. Cu là cathode, chỉ là nơi {O2} nhận electron nên không bị ăn mòn.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "S",
+   "k": "k4",
+   "bay": "tengoi",
+   "soi": "\"màu vàng của {FeCl2}\": nhầm sản phẩm gỉ và nhầm cả màu của muối sắt(II).",
+   "g": [
+    "Chìa khoá <b>Ăn mòn điện hoá</b>: gỉ sắt là {Fe2O3}·n{H2O}.",
+    "Cốc 1: đinh sắt trong NaCl để ngoài không khí; ion {Cl}<sup>−</sup> không phải chất oxi hoá.",
+    "Sản phẩm cuối là muối sắt tan hay oxide ngậm nước? Muối sắt(II) có màu gì?"
+   ],
+   "giai": "Sai. Đinh sắt bị gỉ, nhưng gỉ là {Fe2O3}·n{H2O} màu nâu đỏ bám trên đinh và lắng xuống, không phải {FeCl2}. Hơn nữa dung dịch {FeCl2} có màu lục nhạt, không phải màu vàng.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b S – c Đ – d S",
+ "nho": "Cặp kim loại trong dung dịch điện li: E° nhỏ là anode, bị ăn mòn; môi trường trung tính không sinh {H2}.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Nếu thay dây đồng ở cốc 3 bằng dây magnesium thì đinh sắt không bị gỉ, dây magnesium bị ăn mòn.",
+   "d": "D",
+   "giai": "Đúng. Mg có E° nhỏ hơn Fe nên Mg là anode, bị ăn mòn thay Fe (bảo vệ bằng kim loại hi sinh), đinh sắt là cathode.",
+   "phepTinh": []
+  },
+  {
+   "t": "Nếu thay dây đồng ở cốc 3 bằng dây thiếc (Sn) thì đinh sắt được bảo vệ, không bị gỉ.",
+   "d": "S",
+   "giai": "Sai. Sn đứng sau Fe trong dãy thế, E° lớn hơn Fe, nên Fe vẫn là anode và bị ăn mòn điện hoá; Sn chỉ bảo vệ được khi phủ kín, không hở.",
+   "phepTinh": []
+  }
+ ],
+ "co": []
+}

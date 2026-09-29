@@ -1,0 +1,238 @@
+{
+ "qid": "thu-q7",
+ "so": "Câu 40",
+ "nguon": "Sở Vĩnh Long lần 1 – 2025",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "ten": "Tổng hợp ethyl acrylate: hiệu suất theo nhiệt độ và cách tách ester",
+ "keys": [
+  "k5",
+  "k4",
+  "k1"
+ ],
+ "de": "<p><b>Câu 40:</b> Để khảo sát ảnh hưởng của nhiệt độ đến quá trình tổng hợp ethyl acrylate, một loạt thí nghiệm được tiến hành với hỗn hợp phản ứng gồm acrylic acid và ethanol theo tỉ lệ mol 1 : 1 và {H2SO4} đặc được sử dụng làm chất xúc tác với nồng độ cố định. Quá trình phản ứng được thực hiện dưới điều kiện đun hồi lưu liên tục trong thời gian 6 giờ ở các mức nhiệt độ khác nhau (50 °C – 80 °C). Sau khi kết thúc phản ứng, hỗn hợp được làm nguội và xử lý nhằm tách sản phẩm, sau đó tiến hành phân tích để đánh giá hiệu suất tạo thành ethyl acrylate ở từng điều kiện nhiệt độ. Kết quả thí nghiệm được thể hiện như bảng dưới đây.</p>\n<div class=\"tbl\"><table><tr><th>Nhiệt độ (°C)*</th><th>50</th><th>55</th><th>60</th><th>65</th><th>70</th><th>75</th><th>80</th></tr><tr><td>Hàm lượng ethyl acrylate</td><td>78,65</td><td>80,60</td><td>82,59</td><td>85,05</td><td>86,48</td><td>85,08</td><td>82,15</td></tr></table></div>\n<p class=\"note\">*Đề in \"Nhiệt độ sôi\"; thực chất là nhiệt độ tiến hành phản ứng.</p>\n<div class=\"tbl\"><table><tr><th>Chất</th><th>Khối lượng riêng (g.mL<sup>−1</sup>)</th><th>Độ tan trong 100 g nước (g)</th><th>Nhiệt độ sôi (°C)</th></tr>\n<tr><td>{H2O}</td><td>1,00</td><td>–</td><td>100</td></tr><tr><td>{CH2=CHCOOH}</td><td>1,05</td><td>Vô hạn</td><td>141</td></tr><tr><td>{C2H5OH}</td><td>0,79</td><td>Vô hạn</td><td>78,4</td></tr><tr><td>{CH2=CHCOOC2H5}</td><td>0,92</td><td>2,00</td><td>99,0</td></tr></table></div>",
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Hồi lưu 6 giờ, 50–80 °C",
+   "p": "Acrylic acid và ethanol tỉ lệ mol 1 : 1, xúc tác {H2SO4} đặc. Mỗi mẻ giữ một nhiệt độ.",
+   "io": [
+    [
+     "in",
+     "acrylic acid"
+    ],
+    [
+     "in",
+     "ethanol"
+    ]
+   ]
+  },
+  {
+   "ic": "i-funnel",
+   "t": "Làm nguội, tách ester",
+   "p": "Ethyl acrylate ít tan (2,00 g/100 g nước), nhẹ hơn nước (0,92 g/mL) nên nổi thành lớp trên.",
+   "io": [
+    [
+     "in",
+     "lớp ester (trên)"
+    ],
+    [
+     "out",
+     "lớp nước"
+    ]
+   ]
+  },
+  {
+   "ic": "i-chart",
+   "t": "Hiệu suất theo nhiệt độ",
+   "p": "Tăng từ 78,65 lên đỉnh 86,48 ở 70 °C, rồi giảm còn 82,15 ở 80 °C.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Phản ứng tổng hợp trong thí nghiệm này là phản ứng thuỷ phân ester.",
+   "d": "S",
+   "k": "k5",
+   "bay": "tengoi",
+   "soi": "\"thuỷ phân ester\" → chất đầu là acid + alcohol, chất thu được là ester: phản ứng đi theo chiều nào?",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: ester hoá là acid mất –OH, alcohol mất H, tạo ester và nước. Thuỷ phân ester là chiều nào?",
+    "Chất đầu: acrylic acid {CH2=CHCOOH} và ethanol {C2H5OH}. Chất cần thu: ethyl acrylate.",
+    "{CH2=CHCOOH} + {C2H5OH} ⇌ {CH2=CHCOOC2H5} + {H2O}: ester được tạo ra, không phải bị nước phân cắt."
+   ],
+   "giai": "Sai. Acid + alcohol → ester + nước, xúc tác {H2SO4} đặc, là phản ứng ester hoá. Thuỷ phân ester là chiều ngược lại: ester + nước → acid + alcohol.",
+   "lab": [
+    "k5",
+    "builder-acr"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Với các giá trị nhiệt độ khảo sát, hiệu suất tổng hợp ethyl acrylate tăng nhiều nhất trong khoảng nhiệt độ từ 60 °C đến 65 °C.",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "\"tăng nhiều nhất\" → so hiệu số giữa hai mốc liền nhau, không so giá trị lớn nhất.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: \"tăng nhiều nhất\" là hiệu số lớn nhất giữa hai mốc liền nhau.",
+    "Hàng hiệu suất: 78,65 – 80,60 – 82,59 – 85,05 – 86,48 – 85,08 – 82,15.",
+    "Hiệu số từng khoảng: 50→55: 1,95; 55→60: 1,99; 60→65: 2,46; 65→70: 1,43; 70→75: −1,40; 75→80: −2,93."
+   ],
+   "giai": "Đúng. Từ 60 °C lên 65 °C hiệu suất tăng 85,05 − 82,59 = 2,46, lớn hơn mọi khoảng khác (1,95; 1,99; 1,43). Sau 70 °C hiệu suất còn giảm.",
+   "lab": [
+    "k4",
+    "bang-q7"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Để tách ester ra khỏi hỗn hợp, sử dụng phương pháp chưng cất sẽ phù hợp hơn phương pháp chiết.",
+   "d": "S",
+   "k": "k1",
+   "bay": "doivai",
+   "soi": "\"chưng cất phù hợp hơn\" → so nhiệt độ sôi của ester với nước, và xem ester có tách lớp với nước không.",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: hai lớp thì chiết; một lớp mới so nhiệt độ sôi, gần trùng thì chưng cất không tách được.",
+    "Bảng 2: ethyl acrylate sôi 99,0 °C, nước sôi 100 °C; ester chỉ tan 2,00 g trong 100 g nước, D = 0,92 g/mL.",
+    "Nhiệt độ sôi chỉ chênh 1,0 °C → hơi ester và hơi nước cùng bay. Ít tan, nhẹ hơn nước → ester nổi thành lớp riêng ở trên."
+   ],
+   "giai": "Sai. Ethyl acrylate sôi 99,0 °C, gần trùng nước 100 °C nên chưng cất không tách được ester khỏi nước. Ester ít tan và nhẹ hơn nước (0,92 g/mL) nên tách thành lớp trên; chiết lấy lớp này mới phù hợp.",
+   "lab": [
+    "k1",
+    "q7"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Từ kết quả thí nghiệm trên, phản ứng có nhiệt độ tối ưu ở 70 °C và kết luận được khi nhiệt độ tăng thì hiệu suất phản ứng càng tăng.",
+   "d": "S",
+   "k": "k4",
+   "bay": "xuhuong",
+   "soi": "Hai vế: \"tối ưu ở 70 °C\" và \"nhiệt độ tăng thì hiệu suất càng tăng\"; vế sau phải đúng trên cả dãy.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: \"tối ưu\" là đỉnh; \"càng… càng\" phải đúng trên cả dãy số.",
+    "Nhìn đoạn sau 70 °C: 86,48 (70 °C) → 85,08 (75 °C) → 82,15 (80 °C).",
+    "Đỉnh 86,48 ở 70 °C là giá trị lớn nhất. Từ 70 °C lên 80 °C, hiệu suất đổi 86,48 → 82,15, tức giảm 4,33."
+   ],
+   "giai": "Sai. Vế đầu đúng: hiệu suất đạt đỉnh 86,48 ở 70 °C. Vế sau sai: trên 70 °C hiệu suất giảm (85,08 ở 75 °C; 82,15 ở 80 °C), nên không kết luận được nhiệt độ càng tăng thì hiệu suất càng tăng.",
+   "lab": [
+    "k4",
+    "bang-q7"
+   ]
+  }
+ ],
+ "ket": "a S – b Đ – c S – d S",
+ "nho": "Tăng nhiều nhất là hiệu số lớn nhất, tối ưu là đỉnh; ester ít tan và sôi sát nước thì tách bằng chiết.",
+ "phepTinh": [
+  {
+   "ten": "Hiệu suất tăng 50 → 55 °C",
+   "bieuThuc": "80.60-78.65",
+   "ketQua": 1.95,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất tăng 55 → 60 °C",
+   "bieuThuc": "82.59-80.60",
+   "ketQua": 1.99,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất tăng 60 → 65 °C",
+   "bieuThuc": "85.05-82.59",
+   "ketQua": 2.46,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất tăng 65 → 70 °C",
+   "bieuThuc": "86.48-85.05",
+   "ketQua": 1.43,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất đổi 70 → 75 °C",
+   "bieuThuc": "85.08-86.48",
+   "ketQua": -1.4,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất đổi 75 → 80 °C",
+   "bieuThuc": "82.15-85.08",
+   "ketQua": -2.93,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất giảm từ đỉnh 70 °C đến 80 °C",
+   "bieuThuc": "86.48-82.15",
+   "ketQua": 4.33,
+   "lamTron": 2
+  },
+  {
+   "ten": "Chênh nhiệt độ sôi nước – ethyl acrylate (°C)",
+   "bieuThuc": "100-99.0",
+   "ketQua": 1,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Giả sử khi tổng hợp ethyl acetate, hiệu suất đo được ở 40 °C, 50 °C, 60 °C, 70 °C lần lượt là 60,2%; 66,8%; 71,5%; 74,0%. Hiệu suất tăng nhiều nhất trong khoảng từ 60 °C đến 70 °C.",
+   "d": "S",
+   "giai": "Sai. Hiệu số: 40→50 °C tăng 6,6; 50→60 °C tăng 4,7; 60→70 °C chỉ tăng 2,5. Tăng nhiều nhất ở khoảng 40–50 °C; 70 °C chỉ là mốc có hiệu suất cao nhất.",
+   "phepTinh": [
+    {
+     "ten": "Tăng 40 → 50 °C",
+     "bieuThuc": "66.8-60.2",
+     "ketQua": 6.6,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 50 → 60 °C",
+     "bieuThuc": "71.5-66.8",
+     "ketQua": 4.7,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 60 → 70 °C",
+     "bieuThuc": "74.0-71.5",
+     "ketQua": 2.5,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Giả sử khi tổng hợp methyl acrylate, hiệu suất đo được ở 50 °C, 60 °C, 70 °C, 80 °C lần lượt là 70,1%; 75,4%; 78,0%; 79,2%. Trong khoảng khảo sát, nhiệt độ càng tăng thì hiệu suất càng tăng.",
+   "d": "D",
+   "giai": "Đúng. Mỗi lần tăng 10 °C hiệu suất đều tăng (5,3; 2,6; 1,2), dù mức tăng nhỏ dần. Chỉ kết luận trong 50–80 °C, không ngoại suy ra ngoài khoảng này.",
+   "phepTinh": [
+    {
+     "ten": "Tăng 50 → 60 °C",
+     "bieuThuc": "75.4-70.1",
+     "ketQua": 5.3,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 60 → 70 °C",
+     "bieuThuc": "78.0-75.4",
+     "ketQua": 2.6,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 70 → 80 °C",
+     "bieuThuc": "79.2-78.0",
+     "ketQua": 1.2,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề gốc in tiêu đề bảng 1 là \"Nhiệt độ sôi\"; hồ sơ hiểu là nhiệt độ tiến hành phản ứng (đã chú thích trong đề). Hàng \"Hàm lượng ethyl acrylate\" không ghi đơn vị; lời giải coi đó là hiệu suất (%), đúng như cách ý b và d gọi.",
+   "loai": "loiDe",
+   "chot": "Sửa đề: tiêu đề bảng 1 \"Nhiệt độ sôi\" → \"Nhiệt độ phản ứng (°C)\"; hàng hàm lượng ghi thêm \"(%)\"."
+  }
+ ]
+}

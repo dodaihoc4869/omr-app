@@ -1,0 +1,105 @@
+{
+ "qid": "12-C3-B9-D1-I-90",
+ "bam": "6377ef1cf103a675",
+ "dang": "tn",
+ "ten": "Glycine qua {NaOH} rồi {HCl} dư, qua {HCl} rồi {NaOH} dư: tìm Y, T",
+ "keys": ["k5"],
+ "dung": [
+  {
+   "ic": "i-atom",
+   "t": "Dựng glycine {H2NCH2COOH}",
+   "p": "Một –{NH2} nhận H<sup>+</sup>, một –{COOH} cho H<sup>+</sup>: glycine lưỡng tính.",
+   "io": [["in", "–{NH2}"], ["in", "–{COOH}"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Nhánh 1: {NaOH} rồi {HCl} dư",
+   "p": "X là {H2NCH2COONa}. {HCl} dư đổi –{COONa} về –{COOH} và –{NH2} thành –{NH3Cl}.",
+   "io": [["in", "Y: {ClH3NCH2COOH}"], ["out", "{NaCl}"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Nhánh 2: {HCl} rồi {NaOH} dư",
+   "p": "Z là {ClH3NCH2COOH}. {NaOH} dư đổi –{NH3Cl} về –{NH2} và –{COOH} thành –{COONa}.",
+   "io": [["in", "T: {H2NCH2COONa}"], ["out", "{NaCl}, {H2O}"]]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Chốt cặp Y, T",
+   "p": "Thuốc thử dùng dư ở bước cuối quyết định: acid dư thì hết –{COONa}, base dư thì hết –{NH3Cl}.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "\"{ClH3N-CH2-COOH} và {H2N-CH2-COONa}\": kiểm dạng của cả hai nhóm chức sau bước dùng thuốc thử dư.",
+   "g": [
+    "Chìa khoá <b>Amino acid lưỡng tính</b>: {HCl} dư: –{NH2} → –{NH3Cl}, –{COONa} → –{COOH}; {NaOH} dư: –{NH3Cl} → –{NH2}, –{COOH} → –{COONa}.",
+    "Y sinh ra khi {HCl} dư; T sinh ra khi {NaOH} dư. Thuốc thử ở bước đầu không quyết định.",
+    "Trong {HCl} dư còn giữ được –{COONa} không? Trong {NaOH} dư còn giữ được –{NH3Cl} không?"
+   ],
+   "giai": "Chọn. {HCl} dư đưa cả hai nhóm về dạng acid: Y là {ClH3NCH2COOH}. {NaOH} dư đưa cả hai nhóm về dạng base: T là {H2NCH2COONa}.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k5",
+   "bay": "tengoi",
+   "soi": "\"{ClH3N-CH2-COONa}\" ở vị trí Y: vẫn còn –{COONa} dù {HCl} dư.",
+   "g": [
+    "Chìa khoá <b>Amino acid lưỡng tính</b>: {HCl} dư đổi cả –{COONa} về –{COOH}, không chỉ tác dụng với –{NH2}.",
+    "Y của phương án B còn –{COONa} trong {HCl} dư: muối của acid yếu có đứng được trước acid mạnh dư không?"
+   ],
+   "giai": "Loại. Trong {HCl} dư, –{COONa} bị chuyển thành –{COOH} (tách {NaCl}), nên Y không thể là {ClH3NCH2COONa}.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k5",
+   "bay": "tengoi",
+   "soi": "\"{ClH3N-CH2-COONa}\" ở vị trí T: vẫn còn –{NH3Cl} dù {NaOH} dư.",
+   "g": [
+    "Chìa khoá <b>Amino acid lưỡng tính</b>: {NaOH} dư đổi –{NH3Cl} về –{NH2}, không chỉ tác dụng với –{COOH}.",
+    "T của phương án C còn –{NH3Cl}: ion {RNH3}<sup>+</sup> có tồn tại được trong kiềm dư không?"
+   ],
+   "giai": "Loại. Y đúng nhưng T sai: {NaOH} dư lấy H<sup>+</sup> của –{NH3}<sup>+</sup>, nên T phải là {H2NCH2COONa}.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k5",
+   "bay": "tengoi",
+   "soi": "Cả Y và T đều còn giữ một nhóm chưa chịu tác dụng của thuốc thử dư.",
+   "g": [
+    "Chìa khoá <b>Amino acid lưỡng tính</b>: thuốc thử dùng dư chuyển cả hai nhóm chức, không chỉ một.",
+    "Y của phương án D còn –{COONa} trong {HCl} dư; T còn –{COOH} trong {NaOH} dư."
+   ],
+   "giai": "Loại. Cả Y và T đều sai: {HCl} dư không để lại –{COONa}, {NaOH} dư không để lại –{COOH}.",
+   "lab": null
+  }
+ ],
+ "mc": { "d": "A" },
+ "ket": "Đáp án A",
+ "nho": "Thuốc thử dư ở bước cuối quyết định: {HCl} dư ra {ClH3N-R-COOH}, {NaOH} dư ra {H2N-R-COONa}.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Cho alanine tác dụng với {HCl} thu được X; cho X tác dụng với {NaOH} dư thu được {H2NCH(CH3)COONa}.",
+   "d": "D",
+   "giai": "Đúng. X là {ClH3NCH(CH3)COOH}; {NaOH} dư đổi –{NH3Cl} về –{NH2} và –{COOH} thành –{COONa}."
+  },
+  {
+   "t": "Cho glutamic acid tác dụng với {NaOH} dư, rồi thêm {HCl} dư vào dung dịch thu được, chất hữu cơ cuối cùng là {ClH3NC3H5(COONa)2}.",
+   "d": "S",
+   "giai": "Sai. {HCl} dư đổi cả hai –{COONa} về –{COOH} và –{NH2} thành –{NH3Cl}: chất cuối là {ClH3NC3H5(COOH)2}."
+  }
+ ],
+ "co": []
+}

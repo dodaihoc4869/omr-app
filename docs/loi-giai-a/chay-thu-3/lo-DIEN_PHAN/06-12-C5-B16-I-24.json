@@ -1,0 +1,112 @@
+{
+ "qid": "12-C5-B16-I-24",
+ "bam": "5cdf558309dd8ad2",
+ "dang": "tn",
+ "ten": "Pin Ni – {H2}: số chỉ vôn kế, điện cực, cầu muối",
+ "keys": ["k3"],
+ "dung": [
+  {
+   "ic": "i-chart",
+   "t": "So hai cặp E°",
+   "p": "{Ni}<sup>2+</sup>/Ni −0,257 V < 2H<sup>+</sup>/{H2} 0 V: Ni là anode (cực âm), điện cực hydrogen (Pt) là cathode.",
+   "io": []
+  },
+  {
+   "ic": "i-bolt",
+   "t": "Hai bán phản ứng",
+   "p": "Anode: Ni → {Ni}<sup>2+</sup> + 2e, Ni tan dần. Cathode: 2H<sup>+</sup> + 2e → {H2} trên bề mặt Pt, Pt không đổi.",
+   "io": [["out", "Ni tan vào dung dịch"], ["in", "Pt giữ nguyên"]]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Vôn kế và cầu muối",
+   "p": "E°pin = 0 − (−0,257) = 0,257 V. K<sup>+</sup> đi về ngăn {HCl} (cathode), Cl<sup>−</sup> đi về ngăn {NiSO4} (anode).",
+   "io": [["in", "K<sup>+</sup> → {HCl}"], ["in", "Cl<sup>−</sup> → {NiSO4}"]]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Đếm nhận định đúng",
+   "p": "(2), (4) đúng; (1) sai dấu, (3) nói ngược chiều ion.",
+   "io": [["in", "(2)"], ["in", "(4)"], ["out", "(1)"], ["out", "(3)"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "Đếm nhận định đúng: soi dấu số chỉ vôn kế, chiều ion trong cầu muối và khối lượng hai điện cực.",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: cặp E° nhỏ là anode (cực âm), kim loại tan; cặp E° lớn là cathode, ion bị khử. Cầu muối: cation về cathode, anion về anode.",
+    "E°({Ni}<sup>2+</sup>/Ni) là −0,257 V, nhỏ hơn E°(2H<sup>+</sup>/{H2}) là 0 V.",
+    "Xét lần lượt: vôn kế chỉ số dương hay âm, K<sup>+</sup> về ngăn nào, điện cực nào tan. Mấy nhận định đứng vững?"
+   ],
+   "giai": "Chọn. Chỉ (2) và (4) đúng. E°pin = 0 − (−0,257) = 0,257 V nên vôn kế chỉ số dương, (1) sai. K<sup>+</sup> phải về ngăn cathode ({HCl}), Cl<sup>−</sup> về ngăn anode ({NiSO4}), (3) nói ngược.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k3",
+   "bay": null,
+   "soi": "“1” là bỏ sót một trong hai nhận định đúng (2), (4).",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: anode Ni bị oxi hoá thành {Ni}<sup>2+</sup> tan vào dung dịch; Pt chỉ là chỗ H<sup>+</sup> nhận electron nên không đổi khối lượng."
+   ],
+   "giai": "Loại. Cả (2) và (4) đều đúng nên có 2 nhận định đúng.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k3",
+   "bay": "conso",
+   "soi": "“4” nghĩa là tin cả (1): con số −0,257 V chép thẳng từ đề.",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: vôn kế đo E°pin = E°(cathode) − E°(anode), luôn dương khi pin làm việc.",
+    "Tính 0 − (−0,257): ra số âm hay dương?"
+   ],
+   "giai": "Loại. Vôn kế chỉ 0,257 V chứ không phải −0,257 V; (3) cũng nói ngược chiều ion trong cầu muối.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k3",
+   "bay": "doivai",
+   "soi": "“3” thường do tin (3): nhầm cation, anion đi về ngăn nào.",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: cầu muối bù điện tích, cation về cathode, anion về anode.",
+    "Ngăn {HCl} mất H<sup>+</sup> nên thiếu điện tích dương; ngăn {NiSO4} thêm {Ni}<sup>2+</sup> nên thừa điện tích dương. Ion nào phải vào ngăn nào?"
+   ],
+   "giai": "Loại. K<sup>+</sup> đi vào ngăn {HCl} (cathode), Cl<sup>−</sup> đi vào ngăn {NiSO4} (anode); (3) nói ngược nên chỉ có 2 nhận định đúng.",
+   "lab": null
+  }
+ ],
+ "mc": { "d": "A" },
+ "ket": "Đáp án A",
+ "nho": "Pin: cặp E° nhỏ là anode (cực âm) tan dần; vôn kế chỉ E°pin dương; cầu muối đưa cation về cathode.",
+ "phepTinh": [
+  { "ten": "E°pin (V)", "bieuThuc": "0+0.257", "ketQua": 0.257, "lamTron": 3 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Thay điện cực Ni/{NiSO4} bằng Zn/{ZnSO4} (E°({Zn}<sup>2+</sup>/Zn) = −0,763 V), vôn kế chỉ 0,763 V và Zn là cực âm.",
+   "d": "D",
+   "giai": "Đúng. Cặp {Zn}<sup>2+</sup>/Zn có E° nhỏ hơn nên Zn là anode, cực âm. E°pin = 0 − (−0,763) = 0,763 V.",
+   "phepTinh": [
+    { "ten": "E°pin (V)", "bieuThuc": "0+0.763", "ketQua": 0.763, "lamTron": 3 }
+   ]
+  },
+  {
+   "t": "Thay điện cực Ni/{NiSO4} bằng Cu/{CuSO4} (E°({Cu}<sup>2+</sup>/Cu) = 0,340 V), điện cực Cu vẫn là anode và khối lượng giảm dần.",
+   "d": "S",
+   "giai": "Sai. 0,340 V lớn hơn 0 V nên Cu thành cathode: {Cu}<sup>2+</sup> bị khử bám vào, điện cực Cu nặng thêm; điện cực hydrogen thành anode. E°pin = 0,340 − 0 = 0,340 V.",
+   "phepTinh": [
+    { "ten": "E°pin (V)", "bieuThuc": "0.340-0", "ketQua": 0.34, "lamTron": 3 }
+   ]
+  }
+ ],
+ "co": []
+}

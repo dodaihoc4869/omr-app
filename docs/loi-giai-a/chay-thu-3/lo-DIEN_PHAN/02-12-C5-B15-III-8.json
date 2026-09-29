@@ -1,0 +1,122 @@
+{
+ "qid": "12-C5-B15-III-8",
+ "bam": "1cd116442d34da15",
+ "dang": "tln",
+ "ten": "Đếm phản ứng lập được pin điện hoá",
+ "keys": [
+  "k3"
+ ],
+ "dung": [
+  {
+   "ic": "i-lens",
+   "t": "Lọc 1: có đổi số oxi hoá không?",
+   "p": "(a) tạo kết tủa, (b) đổi phối tử, (c) trung hoà: không nguyên tố nào đổi số oxi hoá, không có electron để dẫn qua mạch ngoài.",
+   "io": [
+    [
+     "out",
+     "(a)"
+    ],
+    [
+     "out",
+     "(b)"
+    ],
+    [
+     "out",
+     "(c)"
+    ]
+   ]
+  },
+  {
+   "ic": "i-thermo",
+   "t": "Lọc 2: có tự xảy ra không?",
+   "p": "(d) đốt ethanol và (e) Al khử {Ag}<sup>+</sup> tự xảy ra. (g) phân huỷ {NH3} phải cấp năng lượng liên tục mới xảy ra.",
+   "io": [
+    [
+     "in",
+     "(d)"
+    ],
+    [
+     "in",
+     "(e)"
+    ],
+    [
+     "out",
+     "(g)"
+    ]
+   ]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Tách hai nửa thành pin",
+   "p": "Chất khử ở một cực, chất oxi hoá ở cực kia, electron đi qua mạch ngoài: (d) là pin nhiên liệu ethanol, (e) là pin Al – Ag.",
+   "io": [
+    [
+     "in",
+     "2 phản ứng"
+    ]
+   ]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "2",
+  "donVi": "phản ứng",
+  "k": "k3",
+  "bay": "tuyetdoi",
+  "soi": "“lập các pin điện hoá” → cần đủ hai điều kiện: có trao đổi electron và phản ứng tự xảy ra.",
+  "g": [
+   "Chìa khoá <b>Pin Galvani</b>: chỉ phản ứng oxi hoá – khử <b>tự xảy ra</b> mới lập được pin; không tự xảy ra thì phải điện phân.",
+   "Vòng 1: phản ứng nào có nguyên tố đổi số oxi hoá? (a) tạo kết tủa, (b) đổi phối tử, (c) trung hoà có không?",
+   "Vòng 2: trong các phản ứng oxi hoá – khử còn lại, phản ứng nào phải cấp năng lượng mới xảy ra?"
+  ],
+  "giai": "Đáp số: 2. (a), (b), (c) không có nguyên tố nào đổi số oxi hoá nên loại. (d) đốt ethanol và (e) Al khử {Ag}<sup>+</sup> là phản ứng oxi hoá – khử tự xảy ra nên lập được pin. (g) cũng là oxi hoá – khử nhưng là chiều ngược của phản ứng tổng hợp {NH3}, không tự xảy ra ở điều kiện thường nên loại. Chỉ là phản ứng oxi hoá – khử thì chưa đủ: phản ứng không tự xảy ra phải được cấp điện (điện phân) chứ không sinh ra điện. Còn (d) và (e)."
+ },
+ "ket": "Đáp số: 2",
+ "nho": "Lập được pin khi phản ứng vừa là oxi hoá – khử vừa tự xảy ra; thiếu một trong hai điều kiện thì không.",
+ "phepTinh": [
+  {
+   "ten": "Số phản ứng lập được pin: (d) và (e)",
+   "bieuThuc": "1+1",
+   "ketQua": 2,
+   "lamTron": 0,
+   "laDapSo": true
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Cho E°({Zn}<sup>2+</sup>/Zn) = −0,763 V và E°({Cu}<sup>2+</sup>/Cu) = 0,340 V. Phản ứng Zn(s) + {Cu}<sup>2+</sup>(aq) → {Zn}<sup>2+</sup>(aq) + Cu(s) lập được pin điện hoá có sức điện động chuẩn 1,103 V.",
+   "d": "D",
+   "giai": "Đúng. Đây là phản ứng oxi hoá – khử tự xảy ra: E°pin = 0,340 − (−0,763) = 1,103 V > 0. Đó là pin Zn – Cu.",
+   "phepTinh": [
+    {
+     "ten": "E°pin (V)",
+     "bieuThuc": "0.340+0.763",
+     "ketQua": 1.103,
+     "lamTron": 3
+    }
+   ]
+  },
+  {
+   "t": "Phản ứng {Ba}<sup>2+</sup>(aq) + {SO4}<sup>2−</sup>(aq) → {BaSO4}(s) xảy ra tức thì nên lập được pin điện hoá.",
+   "d": "S",
+   "giai": "Sai. Không nguyên tố nào đổi số oxi hoá, không có electron chuyển từ chất này sang chất khác nên không tạo được dòng điện qua mạch ngoài."
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Sáu phản ứng (a) đến (g) in liền một dòng, không xuống dòng giữa các phản ứng.",
+   "sua": {
+    "truong": "de",
+    "truoc": "AgCl(s) (b) [Zn(OH₂)₄]²⁺(aq) + 4NH₃(aq) → [Zn(NH₃)₄]²⁺(aq) + 4H₂O(l) (c) H⁺(aq) + OH⁻(aq) → H₂O(l) (d) C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(g) (e) Al(s) + 3Ag⁺(aq) → Al³⁺(aq) + 3Ag(s) (g) 2NH₃(g) → N₂(g) + 3H₂(g) Số",
+    "sau": "AgCl(s)\n(b) [Zn(OH₂)₄]²⁺(aq) + 4NH₃(aq) → [Zn(NH₃)₄]²⁺(aq) + 4H₂O(l)\n(c) H⁺(aq) + OH⁻(aq) → H₂O(l)\n(d) C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(g)\n(e) Al(s) + 3Ag⁺(aq) → Al³⁺(aq) + 3Ag(s)\n(g) 2NH₃(g) → N₂(g) + 3H₂(g)\nSố"
+   }
+  }
+ ],
+ "daChot": [
+  {
+   "ghi": "Đáp án 2 có thể bị cãi thành 3 vì (g) cũng là phản ứng oxi hoá – khử.",
+   "chot": "Giữ đáp án kho (2): pin chỉ lập được từ phản ứng oxi hoá – khử TỰ XẢY RA; (g) là chiều ngược của tổng hợp NH3, không tự xảy ra."
+  }
+ ]
+}

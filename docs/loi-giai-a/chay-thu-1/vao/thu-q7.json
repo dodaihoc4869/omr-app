@@ -1,0 +1,32 @@
+{
+ "qid": "thu-q7",
+ "so": "Câu 40",
+ "nguon": "Sở Vĩnh Long lần 1 – 2025",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 40:</b> Để khảo sát ảnh hưởng của nhiệt độ đến quá trình tổng hợp ethyl acrylate, một loạt thí nghiệm được tiến hành với hỗn hợp phản ứng gồm acrylic acid và ethanol theo tỉ lệ mol 1 : 1 và {H2SO4} đặc được sử dụng làm chất xúc tác với nồng độ cố định. Quá trình phản ứng được thực hiện dưới điều kiện đun hồi lưu liên tục trong thời gian 6 giờ ở các mức nhiệt độ khác nhau (50 °C – 80 °C). Sau khi kết thúc phản ứng, hỗn hợp được làm nguội và xử lý nhằm tách sản phẩm, sau đó tiến hành phân tích để đánh giá hiệu suất tạo thành ethyl acrylate ở từng điều kiện nhiệt độ. Kết quả thí nghiệm được thể hiện như bảng dưới đây.</p>\n<div class=\"tbl\"><table><tr><th>Nhiệt độ (°C)*</th><th>50</th><th>55</th><th>60</th><th>65</th><th>70</th><th>75</th><th>80</th></tr><tr><td>Hàm lượng ethyl acrylate</td><td>78,65</td><td>80,60</td><td>82,59</td><td>85,05</td><td>86,48</td><td>85,08</td><td>82,15</td></tr></table></div>\n<p class=\"note\">*Đề in \"Nhiệt độ sôi\"; thực chất là nhiệt độ tiến hành phản ứng.</p>\n<div class=\"tbl\"><table><tr><th>Chất</th><th>Khối lượng riêng (g.mL<sup>−1</sup>)</th><th>Độ tan trong 100 g nước (g)</th><th>Nhiệt độ sôi (°C)</th></tr>\n<tr><td>{H2O}</td><td>1,00</td><td>–</td><td>100</td></tr><tr><td>{CH2=CHCOOH}</td><td>1,05</td><td>Vô hạn</td><td>141</td></tr><tr><td>{C2H5OH}</td><td>0,79</td><td>Vô hạn</td><td>78,4</td></tr><tr><td>{CH2=CHCOOC2H5}</td><td>0,92</td><td>2,00</td><td>99,0</td></tr></table></div>",
+ "y": [
+  {
+   "id": "a",
+   "t": "Phản ứng tổng hợp trong thí nghiệm này là phản ứng thuỷ phân ester."
+  },
+  {
+   "id": "b",
+   "t": "Với các giá trị nhiệt độ khảo sát, hiệu suất tổng hợp ethyl acrylate tăng nhiều nhất trong khoảng nhiệt độ từ 60 °C đến 65 °C."
+  },
+  {
+   "id": "c",
+   "t": "Để tách ester ra khỏi hỗn hợp, sử dụng phương pháp chưng cất sẽ phù hợp hơn phương pháp chiết."
+  },
+  {
+   "id": "d",
+   "t": "Từ kết quả thí nghiệm trên, phản ứng có nhiệt độ tối ưu ở 70 °C và kết luận được khi nhiệt độ tăng thì hiệu suất phản ứng càng tăng."
+  }
+ ],
+ "dapAn": {
+  "a": "S",
+  "b": "D",
+  "c": "S",
+  "d": "S"
+ }
+}

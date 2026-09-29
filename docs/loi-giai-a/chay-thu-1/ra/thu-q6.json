@@ -1,0 +1,183 @@
+{
+ "qid": "thu-q6",
+ "so": "Câu 31",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "ten": "Điều chế isoamyl acetate: chưng cất, sinh hàn, phổ hồng ngoại",
+ "keys": [
+  "k1",
+  "k5",
+  "k2"
+ ],
+ "de": "<p><b>Câu 31:</b> Isoamyl acetate được dùng để tạo mùi chuối trong thực phẩm. Chất này cũng được dùng làm dung môi vecni và sơn mài cũng như dùng làm chất dẫn dụ các đàn ong mật đến một địa điểm nhỏ. Trong phòng thí nghiệm, isoamyl acetate được điều chế từ acetic acid và isoamyl alcohol với xúc tác {H2SO4} đặc, ở nhiệt độ khoảng 145 °C theo mô hình thí nghiệm sau:</p>\n<div class=\"fig\"><b>Hình 1:</b> đèn cồn đun bình cầu có nhánh cắm nhiệt kế; ống sinh hàn nằm nghiêng nối từ nhánh xuống bình hứng; nước làm lạnh vào ở <b>(1)</b> – đầu thấp gần bình hứng, ra ở <b>(2)</b> – đầu cao gần bình cầu.<br><b>Hình 2:</b> phễu chiết có khoá, bên trong hai lớp: \"lớp chất lỏng nhẹ hơn\" ở trên, \"lớp chất lỏng nặng hơn\" ở dưới.</div>\n<p>Sau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, isoamyl alcohol và isoamyl acetate. Cho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như sau:</p>\n<div class=\"tbl\"><table><tr><th>Liên kết</th><th>O–H (alcohol)</th><th>O–H (carboxylic acid)</th><th>C=O (ester, carboxylic acid)</th><th>C–O (ester)</th></tr><tr><td>Số sóng (cm<sup>−1</sup>)</td><td>3 650 – 3 200</td><td>3 300 – 2 500</td><td>1 780 – 1 650</td><td>1 300 – 1 000</td></tr></table></div>\n<p>Biết nhiệt độ sôi của các chất acetic acid, isoamyl alcohol và isoamyl acetate lần lượt là 117,9 °C; 131,1 °C và 142 °C.</p>",
+ "dung": [
+  {
+   "ic": "i-heat",
+   "t": "Đun khoảng 145 °C",
+   "p": "Acetic acid + isoamyl alcohol, xúc tác {H2SO4} đặc. Ester hoá tạo isoamyl acetate và nước.",
+   "io": [
+    [
+     "in",
+     "acetic acid"
+    ],
+    [
+     "in",
+     "isoamyl alcohol"
+    ],
+    [
+     "in",
+     "{H2SO4} đặc"
+    ]
+   ]
+  },
+  {
+   "ic": "i-distill",
+   "t": "Hơi qua sinh hàn xuống bình hứng",
+   "p": "145 °C cao hơn nhiệt độ sôi của cả ba chất nên ester, acid, alcohol và nước cùng bay. Nước lạnh vào (1) ở đầu thấp, ra (2) ở đầu cao.",
+   "io": [
+    [
+     "out",
+     "hơi"
+    ],
+    [
+     "in",
+     "bình hứng: hỗn hợp"
+    ]
+   ]
+  },
+  {
+   "ic": "i-funnel",
+   "t": "Chiết hai lớp",
+   "p": "Lớp nhẹ hơn ở trên chứa ester; lớp nặng hơn (nước) ở dưới được tháo ra.",
+   "io": [
+    [
+     "in",
+     "lớp trên: ester"
+    ],
+    [
+     "out",
+     "lớp dưới: nước"
+    ]
+   ]
+  },
+  {
+   "ic": "i-ir",
+   "t": "Ghi phổ hồng ngoại",
+   "p": "Soi vùng O–H và C=O để nhận ra acid, alcohol, ester.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Không thể dùng phương pháp chưng cất phân đoạn để tách các chất lỏng trong hỗn hợp sau phản ứng.",
+   "d": "S",
+   "k": "k1",
+   "bay": "tengoi",
+   "soi": "\"Không thể\" + \"chưng cất phân đoạn\" → so hiệu nhiệt độ sôi với phạm vi dùng của đúng phương pháp này.",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: một lớp chất lỏng thì so nhiệt độ sôi. Chênh nhiều → chưng cất thường, chênh ít → chưng cất phân đoạn, gần trùng → đổi cách.",
+    "Nhiệt độ sôi: acetic acid 117,9 °C; isoamyl alcohol 131,1 °C; isoamyl acetate 142 °C.",
+    "131,1 − 117,9 = 13,2 °C; 142 − 131,1 = 10,9 °C. Chênh ít nhưng không gần trùng: mức này thuộc ô nào của quy tắc?"
+   ],
+   "giai": "Sai. Ba chất sôi lệch nhau 10,9–13,2 °C: quá gần cho chưng cất thường nhưng chưa gần trùng. Chưng cất phân đoạn dùng đúng cho trường hợp này.",
+   "lab": [
+    "k1",
+    "q6"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Dựa vào phổ hồng ngoại, có thể phân biệt được acetic acid, isoamyl alcohol và isoamyl acetate.",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "\"phân biệt được\" cả ba chất → mỗi chất phải có một bộ vân hấp thụ riêng.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: liệt kê nhóm chức của từng chất, mỗi liên kết cho một vùng hấp thụ trong bảng.",
+    "Acetic acid có –COOH; isoamyl alcohol có –OH; isoamyl acetate có –COO–. Nhìn hai vùng O–H và C=O.",
+    "Acid: O–H 3 300 – 2 500 cm<sup>−1</sup> và C=O. Alcohol: O–H 3 650 – 3 200 cm<sup>−1</sup>, không có C=O. Ester: C=O và C–O, không có O–H. Ba bộ vân có trùng nhau không?"
+   ],
+   "giai": "Đúng. Acid có cả O–H (3 300 – 2 500 cm<sup>−1</sup>) và C=O; alcohol chỉ có O–H (3 650 – 3 200 cm<sup>−1</sup>), không có C=O; ester có C=O và C–O nhưng không có O–H. Ba bộ vân khác nhau nên phân biệt được.",
+   "lab": [
+    "k5",
+    "ir"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Chất lỏng trong bình hứng chỉ có isoamyl acetate.",
+   "d": "S",
+   "k": "k1",
+   "bay": "tuyetdoi",
+   "soi": "\"chỉ có\" → ở 145 °C còn chất nào khác cũng bay sang bình hứng?",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: chất nào sôi thấp hơn nhiệt độ đun thì đều bay hơi, không riêng sản phẩm.",
+    "Đun khoảng 145 °C; acetic acid sôi 117,9 °C, isoamyl alcohol 131,1 °C, isoamyl acetate 142 °C; phản ứng còn sinh ra nước.",
+    "145 °C cao hơn nhiệt độ sôi của cả acid, alcohol, ester và nước. Vậy sau thí nghiệm dùng phễu chiết tách hai lớp để làm gì?"
+   ],
+   "giai": "Sai. Nhiệt độ đun khoảng 145 °C cao hơn nhiệt độ sôi của acetic acid, isoamyl alcohol và nước, nên chúng bay theo ester sang bình hứng. Vì vậy sau thí nghiệm mới phải dùng phễu chiết để phân tách sản phẩm.",
+   "lab": [
+    "k1",
+    "q6"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Vai trò của ống sinh hàn để ngưng tụ chất lỏng, nước vào ở (1) và nước ra ở (2).",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"nước vào ở (1), ra ở (2)\" → đối chiếu (1), (2) với đầu thấp, đầu cao của ống sinh hàn.",
+   "g": [
+    "Chìa khoá <b>An toàn &amp; dụng cụ</b>: sinh hàn làm hơi ngưng tụ thành chất lỏng; nước lạnh phải <b>vào thấp, ra cao</b>.",
+    "Hình 1: (1) là đầu thấp gần bình hứng, (2) là đầu cao gần bình cầu.",
+    "Vào từ đầu thấp thì nước đầy kín ống và chảy ngược chiều hơi nóng. Vào (1) ra (2) có khớp thấp → cao không?"
+   ],
+   "giai": "Đúng. Ống sinh hàn làm lạnh hơi để hơi ngưng tụ thành chất lỏng chảy xuống bình hứng. Nước vào ở đầu thấp (1), ra ở đầu cao (2) thì đầy kín ống và đi ngược chiều hơi, làm lạnh tốt nhất.",
+   "lab": [
+    "k2",
+    "q6d"
+   ]
+  }
+ ],
+ "ket": "a S – b Đ – c S – d Đ",
+ "nho": "Sôi gần nhau thì chưng cất phân đoạn; đun cao hơn nhiệt độ sôi chất nào thì chất đó sang bình hứng.",
+ "phepTinh": [
+  {
+   "ten": "Chênh nhiệt độ sôi isoamyl alcohol − acetic acid (°C)",
+   "bieuThuc": "131.1-117.9",
+   "ketQua": 13.2,
+   "lamTron": 1
+  },
+  {
+   "ten": "Chênh nhiệt độ sôi isoamyl acetate − isoamyl alcohol (°C)",
+   "bieuThuc": "142-131.1",
+   "ketQua": 10.9,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Khi điều chế ethyl acetate (sôi 77,1 °C) từ acetic acid (sôi 117,9 °C) và ethanol (sôi 78,4 °C), có thể tách hết ethanol khỏi ethyl acetate bằng chưng cất phân đoạn.",
+   "d": "S",
+   "giai": "Sai. Ethanol và ethyl acetate chỉ chênh 78,4 − 77,1 = 1,3 °C, gần trùng nên ethanol luôn bay theo ester. Phải đổi cách: rửa, chiết rồi làm khan.",
+   "phepTinh": [
+    {
+     "ten": "Chênh nhiệt độ sôi ethanol − ethyl acetate (°C)",
+     "bieuThuc": "78.4-77.1",
+     "ketQua": 1.3,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Chỉ cần xem có vân hấp thụ trong vùng 1 780 – 1 650 cm<sup>−1</sup> hay không là phân biệt được acetic acid với ethyl acetate.",
+   "d": "S",
+   "giai": "Sai. Cả hai đều có liên kết C=O nên đều hấp thụ ở vùng này. Phải nhìn thêm vùng O–H 3 300 – 2 500 cm<sup>−1</sup>: chỉ acetic acid có.",
+   "phepTinh": []
+  }
+ ],
+ "canThayChot": []
+}

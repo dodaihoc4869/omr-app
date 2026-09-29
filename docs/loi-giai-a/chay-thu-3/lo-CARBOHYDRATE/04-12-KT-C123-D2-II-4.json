@@ -1,0 +1,127 @@
+{
+ "qid": "12-KT-C123-D2-II-4",
+ "bam": "63a25c01d802c9b1",
+ "dang": "ds",
+ "ten": "Cellulose trinitrate: công thức, phản ứng nổ, ΔrH và số mol khí",
+ "keys": ["k1", "k6"],
+ "dung": [
+  {
+   "ic": "i-chain",
+   "t": "Nitrate hoá cellulose",
+   "p": "Mỗi mắt xích còn 3 –OH, cả 3 thành –{ONO2}: {[C6H7O2(ONO2)3]n}, tức {C6H7N3O11}.",
+   "io": [["in", "3 –{ONO2}"], ["out", "{H2O}"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Cân bằng (1) và (2)",
+   "p": "Bảo toàn C, H, N trước, O sau. (1): 6{CO2} + 3,5{H2O} + 1,5{N2}; (2): 4,5CO + 3,5{H2O} + 1,5{N2} + 1,5{CO2}.",
+   "io": [["out", "11 mol khí"]]
+  },
+  {
+   "ic": "i-thermo",
+   "t": "Tính ΔrH theo ΔfH",
+   "p": "ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu). (2): −1434,7 kJ; (1): −2708,2 kJ.",
+   "io": []
+  },
+  {
+   "ic": "i-bolt",
+   "t": "So sánh lượng khí",
+   "p": "Cả hai cùng sinh 11 mol khí trên 1 mol chất nổ; (1) còn phải lấy 2,25 mol {O2}.",
+   "io": [["in", "11 mol khí"], ["out", "2,25 mol {O2}"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "\"{[C6H7O2(NO3)3]n}\" → mỗi mắt xích còn mấy –OH để ester hoá, thành phần có khớp {C6H7N3O11} không?",
+   "g": [
+    "Chìa khoá <b>Soi cấu tạo</b>: mắt xích cellulose {[C6H7O2(OH)3]n} còn 3 –OH.",
+    "Nitrate hoá hoàn toàn: cả 3 –OH thành –{ONO2}, ra {C6H7N3O11}.",
+    "So thành phần: {C6H7O2(NO3)3} có đủ 6 C, 7 H, 3 N, 11 O không?"
+   ],
+   "giai": "Đúng. Mắt xích {C6H7O2(OH)3} có 3 –OH, cả 3 bị nitrate hoá thành {[C6H7O2(ONO2)3]n}, đúng thành phần {C6H7N3O11}. Viết (ONO2)3 rõ hơn vì nhóm nitrate gắn vào mạch qua O.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "\"11 mol sản phẩm\" → cân bằng (1) rồi cộng hệ số các sản phẩm.",
+   "g": [
+    "Chìa khoá <b>Năng lượng &amp; quang hợp</b>: cháy, nổ thì cân bằng C, H, N trước, {O2} sau cùng.",
+    "1 {C6H7N3O11}: 6 C → 6{CO2}; 7 H → 3,5{H2O}; 3 N → 1,5{N2}.",
+    "Cộng hệ số ba sản phẩm."
+   ],
+   "giai": "Đúng. {C6H7N3O11} + 2,25{O2} → 6{CO2} + 3,5{H2O} + 1,5{N2}. Tổng sản phẩm = 6 + 3,5 + 1,5 = 11 mol.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k6",
+   "bay": "doivai",
+   "soi": "\"nổ theo (2)\" + \"2708,2 kJ\" → phải cân bằng (2) rồi mới thay ΔfH.",
+   "g": [
+    "Chìa khoá <b>Năng lượng &amp; quang hợp</b>: ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu), nhân hệ số.",
+    "Cân bằng (2) theo C và O: 4,5CO + 3,5{H2O} + 1,5{N2} + 1,5{CO2}.",
+    "Thay số: 4,5(−110,5) + 3,5(−285,8) + 1,5(−393,5) − (−653,1). So với 2708,2."
+   ],
+   "giai": "Sai. ΔrH(2) = −2087,8 + 653,1 = −1434,7 kJ, tức toả 1434,7 kJ. Con số 2708,2 kJ là nhiệt toả ra của phản ứng (1): 6(−393,5) + 3,5(−285,8) + 653,1 = −2708,2 kJ.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "S",
+   "k": "k6",
+   "bay": "xuhuong",
+   "soi": "\"sinh khí nhiều hơn\" → đếm mol khí của (1) và (2) trên cùng 1 mol chất nổ.",
+   "g": [
+    "Chìa khoá <b>Năng lượng &amp; quang hợp</b>: so lượng khí thì cân bằng cả hai phương trình rồi cộng mol khí sản phẩm.",
+    "(1): 6 + 3,5 + 1,5; (2): 4,5 + 3,5 + 1,5 + 1,5.",
+    "Hai tổng có khác nhau không? (1) còn phải lấy thêm {O2} từ ngoài."
+   ],
+   "giai": "Sai. Mỗi mol {C6H7N3O11} ở cả (1) và (2) đều sinh 11 mol khí. (1) còn tiêu tốn 2,25 mol {O2}, nên không thể nói (1) sinh khí nhiều hơn (2).",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b Đ – c S – d S",
+ "nho": "Cháy, nổ: cân bằng C, H, N trước, O sau; ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu), nhân hệ số.",
+ "phepTinh": [
+  { "ten": "{O2} cần cho (1) (mol)", "bieuThuc": "(6*2+3.5-11)/2", "ketQua": 2.25, "lamTron": 2 },
+  { "ten": "Mol sản phẩm của (1)", "bieuThuc": "6+3.5+1.5", "ketQua": 11, "lamTron": 1 },
+  { "ten": "Mol {CO2} ở (2) (bảo toàn O rồi C)", "bieuThuc": "(11-3.5)-6", "ketQua": 1.5, "lamTron": 1 },
+  { "ten": "Mol CO ở (2)", "bieuThuc": "6-1.5", "ketQua": 4.5, "lamTron": 1 },
+  { "ten": "Mol khí của (2)", "bieuThuc": "4.5+3.5+1.5+1.5", "ketQua": 11, "lamTron": 1 },
+  { "ten": "Σ ΔfH sản phẩm (2) (kJ)", "bieuThuc": "4.5*(-110.5)+3.5*(-285.8)+1.5*(-393.5)", "ketQua": -2087.8, "lamTron": 1 },
+  { "ten": "ΔrH (2) (kJ)", "bieuThuc": "-2087.8-(-653.1)", "ketQua": -1434.7, "lamTron": 1 },
+  { "ten": "ΔrH (1) (kJ)", "bieuThuc": "6*(-393.5)+3.5*(-285.8)-(-653.1)", "ketQua": -2708.2, "lamTron": 1 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Khi 0,5 mol {C6H7N3O11} nổ theo (2), lượng khí sinh ra là 5,5 mol.",
+   "d": "D",
+   "giai": "Đúng. 1 mol sinh 11 mol khí nên 0,5 mol sinh 0,5 × 11 = 5,5 mol khí.",
+   "phepTinh": [
+    { "ten": "Mol khí", "bieuThuc": "0.5*11", "ketQua": 5.5, "lamTron": 2 }
+   ]
+  },
+  {
+   "t": "Ở điều kiện chuẩn, 1 mol {C6H7N3O11} cháy hoàn toàn theo (1) toả ra 1434,7 kJ.",
+   "d": "S",
+   "giai": "Sai. ΔrH(1) = 6(−393,5) + 3,5(−285,8) − (−653,1) = −2708,2 kJ, toả 2708,2 kJ. Con số 1434,7 kJ là của (2).",
+   "phepTinh": [
+    { "ten": "ΔrH (1) (kJ)", "bieuThuc": "6*(-393.5)+3.5*(-285.8)-(-653.1)", "ketQua": -2708.2, "lamTron": 1 }
+   ]
+  }
+ ],
+ "co": [
+  {
+   "loai": "loiDe",
+   "ghi": "Bảng ghi ΔfH của {H2O}(g) là −285,8 kJ/mol; đây là giá trị của nước lỏng, nước ở thể khí có ΔfH khác. Đáp án các ý không đổi vì lời giải dùng đúng số của đề."
+  }
+ ]
+}

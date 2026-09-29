@@ -1,0 +1,115 @@
+{
+ "qid": "12-C5-B16-II-14",
+ "bam": "97ae4184e0e15dd9",
+ "dang": "ds",
+ "ten": "Acquy chì xả điện: quá trình ở hai cực và nồng độ {H2SO4}",
+ "keys": ["k3", "k4"],
+ "dung": [
+  {
+   "ic": "i-battery",
+   "t": "Hai cực của acquy chì",
+   "p": "Cực âm là tấm Pb; cực dương là than chì phủ {PbO2}; cùng nhúng trong {H2SO4} 28%.",
+   "io": [["in", "Pb (cực âm)"], ["in", "{PbO2} (cực dương)"]]
+  },
+  {
+   "ic": "i-bolt",
+   "t": "Cực âm (anode): Pb bị oxi hoá",
+   "p": "Pb + {SO4}<sup>2−</sup> → {PbSO4} + 2e. Pb nhường electron ra mạch ngoài.",
+   "io": [["in", "{PbSO4} bám cực âm"]]
+  },
+  {
+   "ic": "i-atom",
+   "t": "Cực dương (cathode): {PbO2} bị khử",
+   "p": "{PbO2} + 4H<sup>+</sup> + {SO4}<sup>2−</sup> + 2e → {PbSO4} + 2{H2O}.",
+   "io": [["in", "{PbSO4} bám cực dương"], ["in", "{H2O}"]]
+  },
+  {
+   "ic": "i-chart",
+   "t": "Tổng kết khi xả điện",
+   "p": "Hai cực cùng nặng thêm vì {PbSO4} bám lại. {H2SO4} bị tiêu thụ, nước sinh thêm nên dung dịch loãng dần.",
+   "io": [["out", "{H2SO4} giảm"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "S",
+   "k": "k3",
+   "bay": "doicuc",
+   "soi": "“bị khử” gắn với anode: soi lại ở anode xảy ra quá trình gì.",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: anode là cực âm, nơi chất khử bị oxi hoá và nhường electron ra mạch ngoài.",
+    "Ở cực âm, Pb (số oxi hoá 0) chuyển thành {PbSO4} (Pb có số oxi hoá +2).",
+    "Số oxi hoá của Pb tăng hay giảm? Tăng là oxi hoá hay khử?"
+   ],
+   "giai": "Sai. Tại anode: Pb + {SO4}<sup>2−</sup> → {PbSO4} + 2e. Pb nhường electron, số oxi hoá tăng từ 0 lên +2, tức là bị oxi hoá.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "S",
+   "k": "k3",
+   "bay": "doivai",
+   "soi": "“bị oxi hoá” gắn với cathode: soi số oxi hoá của Pb trong {PbO2}.",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: cathode là cực dương, nơi chất oxi hoá nhận electron và bị khử.",
+    "Pb trong {PbO2} có số oxi hoá +4; trong {PbSO4} là +2.",
+    "Từ +4 xuống +2 thì Pb nhận hay nhường electron?"
+   ],
+   "giai": "Sai. Tại cathode: {PbO2} + 4H<sup>+</sup> + {SO4}<sup>2−</sup> + 2e → {PbSO4} + 2{H2O}. Pb giảm từ +4 xuống +2 nên {PbO2} bị khử, đóng vai chất oxi hoá.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "“các điện cực” → xét cả hai cực, không chỉ cực Pb.",
+   "g": [
+    "Chìa khoá <b>Phóng điện – nạp điện</b>: khi phóng điện, chất rắn ở mỗi cực biến thành gì và có bám lại không?",
+    "Đề cho: {PbSO4} sinh ra ở cực nào bám hết vào cực đó.",
+    "So khối lượng mol: Pb 207 → {PbSO4} 303; {PbO2} 239 → {PbSO4} 303."
+   ],
+   "giai": "Đúng. Cực âm: Pb (207) → {PbSO4} (303), nặng thêm 96 g mỗi mol. Cực dương: {PbO2} (239) → {PbSO4} (303), nặng thêm 64 g mỗi mol. Hai cực cùng tăng khối lượng.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "“giảm xuống” → đếm {H2SO4} và {H2O} ở hai vế phương trình xả điện.",
+   "g": [
+    "Chìa khoá <b>Phóng điện – nạp điện</b>: khi acquy chì phóng điện, {H2SO4} là chất phản ứng hay sản phẩm?",
+    "Phương trình: Pb + {PbO2} + 2{H2SO4} → 2{PbSO4} + 2{H2O}.",
+    "Mỗi lần phản ứng mất 2 {H2SO4}, thêm 2 {H2O}: chất tan và dung môi thay đổi thế nào?"
+   ],
+   "giai": "Đúng. {H2SO4} bị tiêu thụ, lại sinh thêm nước nên dung dịch loãng dần. Khi nạp điện, quá trình đảo lại và {H2SO4} được tái tạo.",
+   "lab": null
+  }
+ ],
+ "ket": "a S – b S – c Đ – d Đ",
+ "nho": "Acquy chì xả điện: Pb và {PbO2} đều thành {PbSO4} bám cực, hai cực cùng nặng thêm, {H2SO4} loãng dần.",
+ "phepTinh": [
+  { "ten": "M PbSO4 (g/mol)", "bieuThuc": "207+32+4*16", "ketQua": 303, "lamTron": 0 },
+  { "ten": "M PbO2 (g/mol)", "bieuThuc": "207+2*16", "ketQua": 239, "lamTron": 0 },
+  { "ten": "Cực âm nặng thêm mỗi mol Pb (g)", "bieuThuc": "303-207", "ketQua": 96, "lamTron": 0 },
+  { "ten": "Cực dương nặng thêm mỗi mol PbO2 (g)", "bieuThuc": "303-239", "ketQua": 64, "lamTron": 0 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Khi acquy chì xả điện, cứ 1 mol Pb phản ứng thì tổng khối lượng hai điện cực tăng 160 g.",
+   "d": "D",
+   "giai": "Đúng. 1 mol Pb → 1 mol {PbSO4}: cực âm nặng thêm 96 g; đồng thời 1 mol {PbO2} → 1 mol {PbSO4}: cực dương nặng thêm 64 g. Tổng 96 + 64 = 160 g.",
+   "phepTinh": [
+    { "ten": "Tổng khối lượng hai cực tăng (g)", "bieuThuc": "(303-207)+(303-239)", "ketQua": 160, "lamTron": 0 }
+   ]
+  },
+  {
+   "t": "Khi nạp điện cho acquy chì, tại điện cực nối với cực âm của nguồn, {PbSO4} bị oxi hoá thành Pb.",
+   "d": "S",
+   "giai": "Sai. Nạp điện là điện phân: cực nối với cực âm của nguồn là cathode, xảy ra sự khử {PbSO4} + 2e → Pb + {SO4}<sup>2−</sup>."
+  }
+ ],
+ "co": []
+}

@@ -1,0 +1,158 @@
+{
+ "qid": "12-C6-B19-II-10",
+ "bam": "be0ae331bedc39df",
+ "dang": "ds",
+ "ten": "Lá đồng dư trong dung dịch {Fe2(SO4)3} và {H2SO4}: Fe³⁺ chỉ về Fe²⁺",
+ "keys": [
+  "k4",
+  "k2",
+  "k3"
+ ],
+ "dung": [
+  {
+   "ic": "i-battery",
+   "t": "So hai cặp với Cu",
+   "p": "E°({Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>) +0,771 V lớn hơn E°({Cu}<sup>2+</sup>/Cu) +0,340 V nên Cu khử được {Fe}<sup>3+</sup>.",
+   "io": [
+    [
+     "in",
+     "Cu là chất khử"
+    ],
+    [
+     "in",
+     "{Fe}<sup>3+</sup> là chất oxi hoá"
+    ]
+   ]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Cu tan, {Fe2(SO4)3} thành {FeSO4}",
+   "p": "Cu + {Fe2(SO4)3} → {CuSO4} + 2{FeSO4}. Cu dư nên {Fe}<sup>3+</sup> hết.",
+   "io": [
+    [
+     "out",
+     "{Fe}<sup>3+</sup> hết"
+    ],
+    [
+     "in",
+     "{CuSO4}, {FeSO4}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-lens",
+   "t": "{Fe}<sup>2+</sup> dừng lại",
+   "p": "E°({Fe}<sup>2+</sup>/Fe) −0,44 V nhỏ hơn +0,340 V nên Cu không khử được {Fe}<sup>2+</sup> thành Fe; Cu cũng không tan trong {H2SO4} loãng.",
+   "io": [
+    [
+     "out",
+     "không có Fe bám"
+    ]
+   ]
+  },
+  {
+   "ic": "i-funnel",
+   "t": "Nhấc lá đồng, lấy dung dịch X",
+   "p": "X gồm {H2SO4} còn nguyên, {CuSO4} và {FeSO4}.",
+   "io": [
+    [
+     "in",
+     "1 acid"
+    ],
+    [
+     "in",
+     "2 muối"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "S",
+   "k": "k4",
+   "bay": "haidiencuc",
+   "soi": "\"ăn mòn điện hoá\": phải kiểm đủ ba điều kiện, đặc biệt có hai điện cực khác chất hay không.",
+   "g": [
+    "Chìa khoá <b>Ăn mòn điện hoá</b>: đủ ba điều kiện là hai điện cực khác chất, tiếp xúc nhau, cùng chạm dung dịch điện li; thiếu một là ăn mòn hoá học.",
+    "Trong cốc chỉ có lá Cu. Phản ứng có đẩy kim loại nào ra bám lên lá đồng không?",
+    "Sản phẩm là {Fe}<sup>2+</sup> tan trong dung dịch, không phải Fe. Lá đồng có kim loại thứ hai tiếp xúc không?"
+   ],
+   "giai": "Sai. Cu chỉ khử {Fe}<sup>3+</sup> về {Fe}<sup>2+</sup>, không sinh kim loại mới bám lên lá đồng, nên không có cặp hai điện cực khác chất. Cu nhường electron trực tiếp cho {Fe}<sup>3+</sup>: đó là ăn mòn hoá học.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"khử được\": so thế của cặp chứa chất khử (Cu) với cặp chứa chất oxi hoá ({Fe}<sup>3+</sup>).",
+   "g": [
+    "Chìa khoá <b>Dãy thế điện cực</b>: chất khử của cặp có E° nhỏ phản ứng với chất oxi hoá của cặp có E° lớn.",
+    "E°({Cu}<sup>2+</sup>/Cu) = +0,340 V; E°({Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>) = +0,771 V.",
+    "Lấy E° cặp chứa chất oxi hoá trừ E° cặp chứa chất khử. Hiệu dương hay âm?"
+   ],
+   "giai": "Đúng. 0,771 − 0,340 = 0,431 V &gt; 0 nên phản ứng Cu + 2{Fe}<sup>3+</sup> → {Cu}<sup>2+</sup> + 2{Fe}<sup>2+</sup> xảy ra.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k3",
+   "bay": "nacoxihoa",
+   "soi": "\"lớp kim loại sắt\": {Fe}<sup>3+</sup> gặp Cu dừng ở nấc nào, {Fe}<sup>2+</sup> hay Fe?",
+   "g": [
+    "Chìa khoá <b>Sản phẩm kim loại</b>: {Fe}<sup>3+</sup> gặp Cu chỉ về {Fe}<sup>2+</sup>, không ra Fe.",
+    "Muốn ra Fe, Cu phải khử tiếp {Fe}<sup>2+</sup>; đề cho E°({Fe}<sup>2+</sup>/Fe) = −0,44 V.",
+    "So −0,44 V với +0,340 V: Cu có khử được {Fe}<sup>2+</sup> không?"
+   ],
+   "giai": "Sai. E°({Fe}<sup>2+</sup>/Fe) nhỏ hơn E°({Cu}<sup>2+</sup>/Cu) nên Cu không khử được {Fe}<sup>2+</sup>; phản ứng dừng ở {Fe}<sup>2+</sup>, không có sắt bám lên lá đồng.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "\"một acid và hai muối\": liệt kê đủ chất tan trong X khi Cu dư.",
+   "g": [
+    "Chìa khoá <b>Sản phẩm kim loại</b>: Cu không tan trong {H2SO4} loãng; {Fe}<sup>3+</sup> gặp Cu về {Fe}<sup>2+</sup>.",
+    "Cu dư nên {Fe2(SO4)3} phản ứng hết; {H2SO4} không bị Cu tác dụng.",
+    "Viết phương trình, rồi kể chất tan còn lại: acid nào, muối nào?"
+   ],
+   "giai": "Đúng. Cu + {Fe2(SO4)3} → {CuSO4} + 2{FeSO4}; {Fe2(SO4)3} hết vì Cu dư, {H2SO4} còn nguyên. X gồm acid {H2SO4} và hai muối {CuSO4}, {FeSO4}.",
+   "lab": null
+  }
+ ],
+ "ket": "a S – b Đ – c S – d Đ",
+ "nho": "{Fe}<sup>3+</sup> gặp Cu chỉ về {Fe}<sup>2+</sup>, không ra Fe; không có kim loại bám thì là ăn mòn hoá học.",
+ "phepTinh": [
+  {
+   "ten": "E° pin Cu – Fe3+ (V)",
+   "bieuThuc": "0.771-0.340",
+   "ketQua": 0.431,
+   "lamTron": 3
+  },
+  {
+   "ten": "E° pin Cu – Fe2+ (V)",
+   "bieuThuc": "-0.44-0.340",
+   "ketQua": -0.78,
+   "lamTron": 2
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Cho lá sắt (dư) vào dung dịch {Fe2(SO4)3}. Sau phản ứng, dung dịch chỉ còn một muối là {FeSO4}.",
+   "d": "D",
+   "giai": "Đúng. Fe + {Fe2(SO4)3} → 3{FeSO4}; sắt dư nên {Fe}<sup>3+</sup> hết, dung dịch chỉ còn {FeSO4}.",
+   "phepTinh": []
+  },
+  {
+   "t": "Cho lá đồng (dư) vào dung dịch {AgNO3}. Lá đồng chỉ bị ăn mòn hoá học.",
+   "d": "S",
+   "giai": "Sai. Cu đẩy Ag ra, Ag bám lên lá đồng. Có hai điện cực Cu – Ag tiếp xúc nhau trong dung dịch điện li nên xảy ra cả ăn mòn điện hoá, Cu là anode.",
+   "phepTinh": []
+  }
+ ],
+ "co": []
+}

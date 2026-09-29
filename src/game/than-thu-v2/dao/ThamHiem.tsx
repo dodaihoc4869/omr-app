@@ -105,7 +105,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
     <p className="dao-cau-nhan"><b data-vai={q.role??'lap'}>ẢI {viTri+1} · {tenNhomAi(q.roleV2??q.role).toLocaleUpperCase('vi')}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
     <div onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')setHinhLoi(true)}}><TheCau {...pc}/></div>
     {hinhLoi&&<p role="alert" className="dao-cau-loi">Hình của câu chưa tải được. Em về đảo rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
-    {phanHoi&&<div className="dao-cau-giai"><LoiGiaiCauSai hoaHoc c={{text:q.text,phan:q.phan,dapAnDung:phanHoi.answer,loiGiai:phanHoi.solution}}/><HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={setZoom}/></div>}
+    {phanHoi&&<div className="dao-cau-giai"><LoiGiaiCauSai hoaHoc c={{text:q.text,phan:q.phan,dapAnDung:phanHoi.answer,loiGiai:phanHoi.solution}} qid={q.qid} nguon="dao"/><HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={setZoom}/></div>}
    </section>
    {!phanHoi&&<label className="dao-tham-tro"><input type="checkbox" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/> Em có dùng tài liệu hoặc được trợ giúp ở câu này</label>}
    {/* Nút nổi ở đáy màn hình CHỈ khi em đã chọn xong (chưa chọn thì nằm cuối trang, không che phương án); không tự cuộn trang. */}

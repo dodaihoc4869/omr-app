@@ -1,0 +1,264 @@
+{
+ "qid": "thu-q3",
+ "so": "Câu 80",
+ "nguon": "Đề thi thử",
+ "dang": "dem",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 80:</b> Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng giữa salicylic acid (<i>o</i>-hydroxybenzoic acid) và methanol. Cho các nhận định sau (xem ở dưới). Số nhận định đúng là</p>\n<p class=\"st\"><b>A.</b> 4. &nbsp;&nbsp; <b>B.</b> 1. &nbsp;&nbsp; <b>C.</b> 3. &nbsp;&nbsp; <b>D.</b> 2.</p>",
+ "ten": "Methyl salicylate: đếm {NaOH}, {Br2}, {H2}, liên kết π và loại chức",
+ "keys": [
+  "k5"
+ ],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Khung vòng benzene",
+   "p": "Vòng 6 cạnh có 3 liên kết π, cộng tối đa 3 {H2}.",
+   "io": [
+    [
+     "in",
+     "vòng benzene"
+    ]
+   ]
+  },
+  {
+   "ic": "i-hex",
+   "t": "Gắn –OH và –COOH ở vị trí ortho",
+   "p": "Được salicylic acid {HOC6H4COOH}: –OH ở C1, –COOH ở C2. Vị trí <i>o</i>/<i>p</i> của –OH còn trống chỉ là C4 và C6.",
+   "io": [
+    [
+     "in",
+     "–OH phenol"
+    ],
+    [
+     "in",
+     "–COOH"
+    ]
+   ]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Ester hoá với methanol",
+   "p": "–COOH mất –OH, methanol mất H, tạo nhóm –{COOCH3}. Nhóm –OH phenol giữ nguyên.",
+   "io": [
+    [
+     "in",
+     "{CH3OH}"
+    ],
+    [
+     "out",
+     "{H2O}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Soi nhóm trong methyl salicylate",
+   "p": "{HOC6H4COOCH3} có 1 vòng benzene, 1 nhóm ester thường và 1 nhóm –OH phenol.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "1",
+   "t": "Methyl salicylate tác dụng tối đa với NaOH trong dung dịch theo tỉ lệ mol 1 : 2.",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "\"tối đa\" → phải đếm mọi nhóm phản ứng với {NaOH}, không chỉ nhóm ester.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: đếm từng nhóm phản ứng với {NaOH} rồi cộng. Ester thường 1, ester của phenol 2, –OH phenol 1.",
+    "{HOC6H4COOCH3}: gốc alcohol của ester là {CH3}– (từ methanol); nhóm –OH gắn thẳng vào vòng benzene.",
+    "Ester của methanol là ester thường: 1 {NaOH}. –OH phenol: 1 {NaOH}. Cộng 1 + 1 = 2, đối chiếu với tỉ lệ 1 : 2."
+   ],
+   "giai": "Đúng. Nhóm –{COOCH3} là ester thường nên cần 1 {NaOH}; nhóm –OH phenol cần thêm 1 {NaOH}. Sản phẩm là {NaOC6H4COONa}, {CH3OH} và {H2O}.",
+   "lab": [
+    "k5",
+    "msal-naoh"
+   ]
+  },
+  {
+   "id": "2",
+   "t": "Salicylic acid tác dụng tối đa với nước bromine theo tỉ lệ mol 1 : 3.",
+   "d": "S",
+   "k": "k5",
+   "bay": "conso",
+   "soi": "\"1 : 3\" là con số của phenol; ở salicylic acid một vị trí ortho đã bị –COOH chiếm.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: với {Br2}, vòng phenol thế vào các vị trí <i>o</i>/<i>p</i> so với –OH <b>còn trống</b>.",
+    "Trong salicylic acid, –OH ở C1, –COOH ở C2. Các vị trí <i>o</i>/<i>p</i> của –OH là C2, C4, C6.",
+    "C2 đã có –COOH, chỉ còn C4 và C6 trống: 1 + 1 = 2 {Br2}. Đối chiếu với tỉ lệ 1 : 3."
+   ],
+   "giai": "Sai. Vòng chỉ còn hai vị trí <i>o</i>/<i>p</i> trống (C4, C6) nên salicylic acid phản ứng tối đa với 2 {Br2}, tỉ lệ 1 : 2. Tỉ lệ 1 : 3 là của phenol, nơi cả ba vị trí 2, 4, 6 đều trống.",
+   "lab": [
+    "k5",
+    "sal-br"
+   ]
+  },
+  {
+   "id": "3",
+   "t": "Methyl salicylate tác dụng tối đa với {H2} (xt Ni, t°) theo tỉ lệ mol 1 : 3.",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "\"{H2}\" → vòng benzene cộng được, còn C=O trong nhóm –COO– thì không.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: với {H2} (Ni, t°), C=C cộng 1, vòng benzene cộng 3, C=O của –COO– không cộng.",
+    "Methyl salicylate có 1 vòng benzene, 1 nhóm –{COOCH3}, không có C=C ngoài vòng.",
+    "Vòng: 3 {H2}; C=O của ester: 0. Cộng 3 + 0 = 3, đối chiếu với tỉ lệ 1 : 3."
+   ],
+   "giai": "Đúng. Chỉ vòng benzene cộng {H2}, tối đa 3 phân tử, tạo vòng no 6 cạnh. C=O trong nhóm ester không cộng {H2} ở điều kiện này.",
+   "lab": [
+    "k5",
+    "msal-h2"
+   ]
+  },
+  {
+   "id": "4",
+   "t": "Số liên kết π trong salicylic acid là 5.",
+   "d": "S",
+   "k": "k5",
+   "bay": "conso",
+   "soi": "\"5\" → dễ lấy nhầm độ bất bão hoà (π + vòng) làm số liên kết π.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: đếm liên kết π theo từng nhóm rồi cộng; vòng không phải liên kết π.",
+    "Salicylic acid {HOC6H4COOH}: vòng benzene có 3 liên kết π, nhóm –COOH có 1 C=O, nhóm –OH không có π.",
+    "Cộng 3 + 1 = 4. Kiểm bằng công thức {C7H6O3}: độ bất bão hoà (2 × 7 + 2 − 6) ÷ 2 = 5, gồm π và 1 vòng."
+   ],
+   "giai": "Sai. Salicylic acid có 4 liên kết π: 3 trong vòng benzene và 1 trong C=O của –COOH. Số 5 là độ bất bão hoà, gồm 4 π cộng 1 vòng.",
+   "lab": [
+    "k5",
+    "sal-pi"
+   ]
+  },
+  {
+   "id": "5",
+   "t": "Methyl salicylate là hợp chất hữu cơ đa chức.",
+   "d": "S",
+   "k": "k5",
+   "bay": "tengoi",
+   "soi": "\"đa chức\" → phải xem các nhóm chức cùng loại hay khác loại.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: liệt kê từng nhóm chức. Nhiều nhóm <b>cùng loại</b> là đa chức; có nhóm <b>khác loại</b> là tạp chức.",
+    "Methyl salicylate {HOC6H4COOCH3} có hai nhóm: –OH gắn vòng benzene và –{COOCH3}.",
+    "Một nhóm –OH phenol, một nhóm ester: hai loại khác nhau. Đối chiếu với định nghĩa đa chức."
+   ],
+   "giai": "Sai. Methyl salicylate có một nhóm –OH phenol và một nhóm ester, hai nhóm chức khác loại nên là hợp chất <b>tạp chức</b>. Đa chức phải có từ hai nhóm chức cùng loại trở lên.",
+   "lab": [
+    "k5",
+    "msal-chuc"
+   ]
+  }
+ ],
+ "mc": {
+  "hoi": "Số nhận định đúng là",
+  "o": [
+   [
+    "A",
+    "4"
+   ],
+   [
+    "B",
+    "1"
+   ],
+   [
+    "C",
+    "3"
+   ],
+   [
+    "D",
+    "2"
+   ]
+  ],
+  "d": "D"
+ },
+ "ket": "Nhận định 1 và 3 đúng, còn 2, 4, 5 sai nên có 2 nhận định đúng, chọn <b>D</b>.",
+ "nho": "Đếm từng nhóm rồi cộng: vòng benzene có 3 π, cộng 3 {H2}; ester thường và –OH phenol mỗi nhóm cần 1 {NaOH}.",
+ "phepTinh": [
+  {
+   "ten": "n NaOH tối đa / n methyl salicylate (ester thường 1 + OH phenol 1)",
+   "bieuThuc": "1+1",
+   "ketQua": 2,
+   "lamTron": 0
+  },
+  {
+   "ten": "n Br2 tối đa / n salicylic acid (vị trí C4 + C6)",
+   "bieuThuc": "1+1",
+   "ketQua": 2,
+   "lamTron": 0
+  },
+  {
+   "ten": "n H2 tối đa / n methyl salicylate (vòng 3 + C=O ester 0)",
+   "bieuThuc": "3+0",
+   "ketQua": 3,
+   "lamTron": 0
+  },
+  {
+   "ten": "Số liên kết π trong salicylic acid (vòng 3 + C=O 1)",
+   "bieuThuc": "3+1",
+   "ketQua": 4,
+   "lamTron": 0
+  },
+  {
+   "ten": "Độ bất bão hoà của C7H6O3",
+   "bieuThuc": "(2*7+2-6)/2",
+   "ketQua": 5,
+   "lamTron": 0
+  },
+  {
+   "ten": "Số liên kết π = độ bất bão hoà − số vòng",
+   "bieuThuc": "5-1",
+   "ketQua": 4,
+   "lamTron": 0
+  },
+  {
+   "ten": "Số nhận định đúng (1 và 3)",
+   "bieuThuc": "1+1",
+   "ketQua": 2,
+   "lamTron": 0
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Aspirin (acetylsalicylic acid, {CH3COOC6H4COOH}) tác dụng tối đa với {NaOH} trong dung dịch theo tỉ lệ mol 1 : 3.",
+   "d": "D",
+   "giai": "Đúng. Nhóm –COOH cần 1 {NaOH}. Nhóm {CH3COO}– gắn thẳng vào vòng là ester của phenol nên cần 2 {NaOH}. Tổng 1 + 2 = 3.",
+   "phepTinh": [
+    {
+     "ten": "n NaOH tối đa / n aspirin (COOH 1 + ester của phenol 2)",
+     "bieuThuc": "1+2",
+     "ketQua": 3,
+     "lamTron": 0
+    }
+   ]
+  },
+  {
+   "t": "Số liên kết π trong phân tử aspirin ({C9H8O4}) là 6.",
+   "d": "S",
+   "giai": "Sai. Vòng benzene có 3 π, C=O của –COOH 1 π, C=O của nhóm ester 1 π: tổng 3 + 1 + 1 = 5. Số 6 là độ bất bão hoà (2 × 9 + 2 − 8) ÷ 2, đã tính cả 1 vòng.",
+   "phepTinh": [
+    {
+     "ten": "Số liên kết π trong aspirin",
+     "bieuThuc": "3+1+1",
+     "ketQua": 5,
+     "lamTron": 0
+    },
+    {
+     "ten": "Độ bất bão hoà của C9H8O4",
+     "bieuThuc": "(2*9+2-8)/2",
+     "ketQua": 6,
+     "lamTron": 0
+    }
+   ]
+  }
+ ],
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Ý 2: đáp án chính thức S dựa trên quy tắc phổ thông (thế vào vị trí o/p còn trống → 2 {Br2}). Thực tế, salicylic acid với nước bromine dư có thể vừa thế vừa tách {CO2} (bromo-decarboxyl hoá) tạo 2,4,6-tribromophenol, tiêu tốn 3 {Br2}; khi đó tỉ lệ 1 : 3 cũng bảo vệ được. Lời giải giữ S theo quy tắc chìa khoá k5; thầy xem có cần chú thích cho học sinh không.",
+   "loai": "dapAn",
+   "chot": "Giữ đáp án kho (chỗ tranh luận chỉ là cách hiểu).",
+   "daXoa": true
+  }
+ ]
+}

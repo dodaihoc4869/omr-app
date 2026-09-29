@@ -1,0 +1,81 @@
+{
+ "qid": "12-KT-C1-D4-I-6",
+ "so": "Câu 6",
+ "nguon": "12-KT-C1-D4",
+ "chuong": "Ester – lipid",
+ "mucDo": "van_dung",
+ "dangBai": "ESTER.ESTER_HOA.NHAN_DANG",
+ "de": "<p>Tổng hợp ethyl acetate trong phòng thí nghiệm từ nhóm hóa chất nào sau đây sẽ đạt hiệu quả cao nhất?</p>",
+ "hinh": [],
+ "loiGiaiCo": {
+  "chot": "Ester hoá là phản ứng thuận nghịch, nước làm cân bằng chuyển theo chiều nghịch; muốn hiệu suất cao phải dùng chất đầu nguyên chất và acid đặc để hút nước.",
+  "tung": {
+   "A": {
+    "dung": true,
+    "vi_sao": "Đúng: cả acid và alcohol nguyên chất, H₂SO₄ 98% vừa xúc tác vừa hút nước."
+   },
+   "B": {
+    "dung": false,
+    "vi_sao": "Dung dịch CH₃COOH 5% mang quá nhiều nước, đẩy cân bằng về phía nghịch."
+   },
+   "C": {
+    "dung": false,
+    "vi_sao": "Cồn 90° còn 10% nước nên hiệu suất thấp hơn phương án A."
+   },
+   "D": {
+    "dung": false,
+    "vi_sao": "HCl 36,5% là dung dịch nước, lại không hút nước như H₂SO₄ đặc."
+   }
+  },
+  "buoc": [],
+  "ket_qua": "",
+  "trang_thai": "khop"
+ },
+ "dang": "tn",
+ "y": [
+  {
+   "id": "A",
+   "t": "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H2SO4 98%"
+  },
+  {
+   "id": "B",
+   "t": "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H2SO4 98%"
+  },
+  {
+   "id": "C",
+   "t": "Acetic acid nguyên chất; cồn 90o; dung dịch H2SO4 98%"
+  },
+  {
+   "id": "D",
+   "t": "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"
+  }
+ ],
+ "dapAn": {
+  "A": "D",
+  "B": "S",
+  "C": "S",
+  "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H2SO4 98%"
+   ],
+   [
+    "B",
+    "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H2SO4 98%"
+   ],
+   [
+    "C",
+    "Acetic acid nguyên chất; cồn 90o; dung dịch H2SO4 98%"
+   ],
+   [
+    "D",
+    "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"
+   ]
+  ],
+  "dapAn": "A"
+ }
+}

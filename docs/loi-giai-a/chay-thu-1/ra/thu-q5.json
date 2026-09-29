@@ -1,0 +1,233 @@
+{
+ "qid": "thu-q5",
+ "so": "Câu 24",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "ten": "Methyl cinnamate: cấu tạo, cis – trans, phản ứng {NaOH}, hiệu suất",
+ "keys": [
+  "k5",
+  "k4"
+ ],
+ "de": "<p><b>Câu 24:</b> Methyl cinnamate là một ester có công thức phân tử {C10H10O2} và có mùi thơm của dâu tây (strawberry) được sử dụng trong ngành công nghiệp hương liệu và nước hoa. Để điều chế 16,2 gam ester methyl cinnamate người ta cho 29,6 gam cinnamic acid phản ứng với lượng dư methyl alcohol ({CH3OH}).</p>\n<div class=\"fig\">Hình trong đề: vòng benzene – CH=CH – C(=O) – O – CH<sub>3</sub> &nbsp;({C6H5}–CH=CH–{COOCH3})</div>\n<p class=\"note\">Đề in \"cinnmate\"; tên đúng là \"cinnamate\".</p>",
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Dựng cinnamic acid",
+   "p": "{C6H5}–CH=CH–COOH, M = 148. Nối đôi C=C nằm giữa vòng benzene và nhóm –COOH.",
+   "io": [
+    [
+     "in",
+     "{C6H5}–CH=CH–"
+    ],
+    [
+     "in",
+     "–COOH"
+    ]
+   ]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Ester hoá với {CH3OH} dư",
+   "p": "Acid mất –OH, alcohol mất H, tạo nhóm –{COOCH3} và nước.",
+   "io": [
+    [
+     "in",
+     "{CH3OH} dư"
+    ],
+    [
+     "out",
+     "{H2O}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Soi methyl cinnamate",
+   "p": "{C6H5}–CH=CH–{COOCH3}, M = 162. O của –COO– nối vào {CH3}, không nối vào vòng benzene.",
+   "io": [
+    [
+     "in",
+     "C=C"
+    ],
+    [
+     "in",
+     "ester thường"
+    ]
+   ]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Cân: 16,2 g ester",
+   "p": "29,6 g acid cho 16,2 g ester; đem so với lượng lí thuyết.",
+   "io": [
+    [
+     "in",
+     "16,2 g"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Methyl cinnamate có đồng phân hình học.",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "\"đồng phân hình học\" → soi hai C của nối đôi C=C, mỗi C có mang hai nhóm khác nhau không.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: có đồng phân hình học khi phân tử có C=C và mỗi C của nối đôi mang hai nhóm khác nhau.",
+    "Nhìn đoạn –CH=CH– nằm giữa vòng benzene và nhóm –{COOCH3}.",
+    "C bên trái mang H và {C6H5}; C bên phải mang H và –{COOCH3}. Cả hai đầu đều có hai nhóm khác nhau."
+   ],
+   "giai": "Đúng. Mỗi C của nối đôi mang hai nhóm khác nhau (H và {C6H5}; H và –{COOCH3}) nên có hai dạng cis và trans.",
+   "lab": [
+    "k5",
+    "cin-geo"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Methyl cinnamate có công thức cấu tạo là {CH3COO}–CH=CH–{C6H5}.",
+   "d": "S",
+   "k": "k5",
+   "bay": "doivai",
+   "soi": "\"{CH3COO}–\" đứng đầu → kiểm xem gốc acid và gốc alcohol có khớp với tên methyl cinnamate không.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: ester hoá thì acid mất –OH, alcohol mất H; tên ester gồm gốc alcohol (methyl) và gốc acid (cinnamate).",
+    "Methyl cinnamate tạo từ cinnamic acid {C6H5}–CH=CH–COOH và {CH3OH}. Nhóm {CH3} phải gắn vào đâu?",
+    "Trong công thức của ý, gốc acid là {CH3COO}– (của acetic acid), còn –CH=CH–{C6H5} gắn vào O: hai phần đã đổi chỗ, dù vẫn là {C10H10O2}."
+   ],
+   "giai": "Sai. Methyl cinnamate là {C6H5}–CH=CH–{COOCH3}: gốc acid là cinnamate, {CH3} gắn vào O. Công thức {CH3COO}–CH=CH–{C6H5} cũng là {C10H10O2} nhưng gốc acid là acetate, đó là một chất khác.",
+   "lab": [
+    "k5",
+    "builder-cin"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Methyl cinnamate phản ứng với NaOH với tỉ lệ 1 : 2.",
+   "d": "S",
+   "k": "k5",
+   "bay": "conso",
+   "soi": "\"1 : 2\" → đếm lại nhóm phản ứng với {NaOH}; vòng benzene có gắn vào O của –COO– không.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: với {NaOH}, ester thường 1, ester của phenol 2, –COOH 1, –OH phenol 1.",
+    "Trong {C6H5}–CH=CH–{COOCH3}, O của –COO– nối vào {CH3} hay vào vòng benzene?",
+    "O nối vào {CH3}: một nhóm ester thường, không có –COOH, không có –OH phenol. Cộng lại: 1 {NaOH} cho 1 phân tử ester."
+   ],
+   "giai": "Sai. Methyl cinnamate là ester thường của methyl alcohol; vòng benzene nằm ở gốc acid, không gắn vào O. {C6H5}–CH=CH–{COOCH3} + {NaOH} → {C6H5}–CH=CH–{COONa} + {CH3OH}, tỉ lệ 1 : 1.",
+   "lab": [
+    "k5",
+    "cin-naoh"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Hiệu suất phản ứng ester hoá trong trường hợp này là 50%.",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "\"50%\" → tự tính lại theo chất thiếu; methyl alcohol dư nên lấy cinnamic acid làm chuẩn.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: tính số mol chất thiếu → lượng ester lí thuyết → H = thực tế ÷ lí thuyết.",
+    "Methyl alcohol dư nên tính theo cinnamic acid {C9H8O2} (M = 148); ester {C10H10O2} có M = 162.",
+    "n(acid) = 29,6 ÷ 148 = 0,2 mol; lí thuyết 0,2 × 162 = 32,4 g ester; so với 16,2 g thu được."
+   ],
+   "giai": "Đúng. n(cinnamic acid) = 29,6 ÷ 148 = 0,2 mol → lí thuyết 0,2 mol ester = 32,4 g. Thực tế 16,2 g (0,1 mol) → H = 16,2 ÷ 32,4 = 50%.",
+   "lab": [
+    "k4",
+    "cin"
+   ]
+  }
+ ],
+ "ket": "a Đ – b S – c S – d Đ",
+ "nho": "Methyl cinnamate là {C6H5}–CH=CH–{COOCH3}: có cis – trans; ester thường nên phản ứng {NaOH} tỉ lệ 1 : 1.",
+ "phepTinh": [
+  {
+   "ten": "M cinnamic acid ({C9H8O2})",
+   "bieuThuc": "9*12+8*1+2*16",
+   "ketQua": 148,
+   "lamTron": 0
+  },
+  {
+   "ten": "M methyl cinnamate ({C10H10O2})",
+   "bieuThuc": "10*12+10*1+2*16",
+   "ketQua": 162,
+   "lamTron": 0
+  },
+  {
+   "ten": "n cinnamic acid",
+   "bieuThuc": "29.6/148",
+   "ketQua": 0.2,
+   "lamTron": 4
+  },
+  {
+   "ten": "n methyl cinnamate thu được",
+   "bieuThuc": "16.2/162",
+   "ketQua": 0.1,
+   "lamTron": 4
+  },
+  {
+   "ten": "m ester lí thuyết",
+   "bieuThuc": "0.2*162",
+   "ketQua": 32.4,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất (%)",
+   "bieuThuc": "16.2/32.4*100",
+   "ketQua": 50,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Cho 14,8 gam cinnamic acid phản ứng với lượng dư methyl alcohol, thu được 11,34 gam methyl cinnamate. Hiệu suất phản ứng ester hoá là 70%.",
+   "d": "D",
+   "giai": "Đúng. n(cinnamic acid) = 14,8 ÷ 148 = 0,1 mol → lí thuyết 0,1 × 162 = 16,2 g ester; H = 11,34 ÷ 16,2 = 70%.",
+   "phepTinh": [
+    {
+     "ten": "n cinnamic acid",
+     "bieuThuc": "14.8/148",
+     "ketQua": 0.1,
+     "lamTron": 4
+    },
+    {
+     "ten": "m ester lí thuyết",
+     "bieuThuc": "0.1*162",
+     "ketQua": 16.2,
+     "lamTron": 2
+    },
+    {
+     "ten": "H (%)",
+     "bieuThuc": "11.34/16.2*100",
+     "ketQua": 70,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Phenyl acetate ({CH3COOC6H5}) phản ứng với {NaOH} theo tỉ lệ mol 1 : 1.",
+   "d": "S",
+   "giai": "Sai. Phenyl acetate là ester của phenol: O của –COO– gắn thẳng vào vòng benzene. Thuỷ phân tạo {CH3COONa} và phenol, phenol phản ứng tiếp với {NaOH} thành {C6H5ONa}, nên tỉ lệ 1 : 2.",
+   "phepTinh": [
+    {
+     "ten": "mol {NaOH} cho 1 mol phenyl acetate (ester phenol 1 + phenol 1)",
+     "bieuThuc": "1+1",
+     "ketQua": 2,
+     "lamTron": 0
+    }
+   ]
+  }
+ ],
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề gốc in \"cinnmate\", tên đúng là \"cinnamate\" (đã có ghi chú trong đề); lỗi chính tả, không ảnh hưởng đáp án.",
+   "loai": "hienThi",
+   "chot": "Sửa đề: \"cinnmate\" → \"cinnamate\"."
+  }
+ ]
+}

@@ -22,7 +22,7 @@ export default function XemLaiCauSai({ ds, dongTt, onDong, batDau }: { ds: reado
         </div>
         <div className="bia-dong-tt">{dongTt}</div>
         <div className="bia-dau-cau"><NhanCau y={e.y} /><span>{e.y.cau.tenDang}</span></div>
-        <div className="dao2 bia-dao2" key={e.y.ma}><KhoiLoiGiai cau={e.y.cau} stt={i + 1} phanHoi={phanHoiChoLoiGiai(e.phanHoi)} traLoiMay={e.traLoi} /></div>
+        <div className="dao2 bia-dao2" key={e.y.ma}><KhoiLoiGiai nguon="bi_a" cau={e.y.cau} stt={i + 1} phanHoi={phanHoiChoLoiGiai(e.phanHoi)} traLoiMay={e.traLoi} /></div>
         <button type="button" className="bia-nut-xanh" onClick={onDong}>Đóng · về bàn</button>
       </div>
     </div>

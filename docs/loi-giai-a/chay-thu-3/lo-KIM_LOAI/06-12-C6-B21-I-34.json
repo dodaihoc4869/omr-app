@@ -1,0 +1,188 @@
+{
+ "qid": "12-C6-B21-I-34",
+ "bam": "ba7adb23b020883b",
+ "dang": "tn",
+ "ten": "Thanh Mg hi sinh bảo vệ ống thép: tính thời gian bảo vệ",
+ "keys": [
+  "k4",
+  "k6"
+ ],
+ "dung": [
+  {
+   "ic": "i-battery",
+   "t": "Mg là anode hi sinh",
+   "p": "Mg có E° nhỏ hơn Fe nên Mg bị oxi hoá thay ống thép: Mg → {Mg}<sup>2+</sup> + 2e.",
+   "io": [
+    [
+     "out",
+     "Mg tan dần"
+    ],
+    [
+     "in",
+     "ống thép được giữ"
+    ]
+   ]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Mol Mg dùng được",
+   "p": "n(Mg) = 6000 : 24 = 250 mol; hiệu suất bảo vệ 50% nên chỉ 125 mol Mg tạo dòng bảo vệ.",
+   "io": [
+    [
+     "in",
+     "125 mol Mg"
+    ],
+    [
+     "out",
+     "125 mol hao"
+    ]
+   ]
+  },
+  {
+   "ic": "i-bolt",
+   "t": "Mol electron và điện lượng",
+   "p": "Mỗi Mg nhường 2e: n(e) = 250 mol; q = 250 × 96 485 ≈ 2,41·10⁷ C.",
+   "io": [
+    [
+     "in",
+     "n(e) = 250 mol"
+    ]
+   ]
+  },
+  {
+   "ic": "i-chart",
+   "t": "Đổi thời gian ra năm",
+   "p": "t = q : I = q : 0,03 ≈ 8,04·10⁸ s; chia 365 × 24 × 3600 được khoảng 25,5 năm.",
+   "io": [
+    [
+     "in",
+     "≈ 25,5 năm"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "Ba chỗ dễ sót: \"6,0 kg\" đổi ra gam, \"50%\" chỉ lấy một nửa Mg, mỗi Mg nhường 2 electron.",
+   "g": [
+    "Chìa khoá <b>Tính theo chuỗi</b>: có dòng điện thì It : F = n(e) = z·n(kim loại); với Mg, z = 2.",
+    "n(Mg) = 6000 : 24 mol, chỉ 50% dùng cho bảo vệ; I = 0,03 A; F = 96485 C/mol.",
+    "Tính n(e), nhân F ra q, chia I ra giây, rồi chia số giây của một năm (365 ngày)."
+   ],
+   "giai": "Chọn. n(Mg) hữu ích = 6000 : 24 × 0,5 = 125 mol; n(e) = 250 mol; t = 250 × 96 485 : 0,03 ≈ 8,04·10⁸ s. Chia 365 × 24 × 3600 s được khoảng 25,5 năm.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k6",
+   "bay": null,
+   "soi": "24,5 năm thấp hơn kết quả đúng 1 năm, không ứng với bước tính hợp lí nào.",
+   "g": [
+    "Chìa khoá <b>Tính theo chuỗi</b>: tính thẳng t = z·n(Mg)·F : I rồi đổi ra năm, so với phương án."
+   ],
+   "giai": "Loại. Phép tính đúng cho khoảng 25,5 năm, không phải 24,5 năm.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k6",
+   "bay": null,
+   "soi": "20,6 năm lệch xa kết quả; kiểm lại số mol Mg và số electron mỗi Mg.",
+   "g": [
+    "Chìa khoá <b>Tính theo chuỗi</b>: n(e) = 2 × n(Mg) hữu ích; hiệu suất 50% áp lên lượng Mg."
+   ],
+   "giai": "Loại. Với 125 mol Mg hữu ích, n(e) = 250 mol, thời gian bảo vệ khoảng 25,5 năm, không phải 20,6 năm.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k6",
+   "bay": null,
+   "soi": "26,8 năm cao hơn kết quả tính; kiểm lại bước đổi giây ra năm.",
+   "g": [
+    "Chìa khoá <b>Tính theo chuỗi</b>: một năm có 365 × 24 × 3600 giây; chia tổng số giây cho số này."
+   ],
+   "giai": "Loại. 8,04·10⁸ s chia số giây của một năm được khoảng 25,5 năm, không phải 26,8 năm.",
+   "lab": null
+  }
+ ],
+ "mc": {
+  "d": "A"
+ },
+ "ket": "Đáp án A",
+ "nho": "Anode hi sinh: t = z·n(kim loại hữu ích)·F : I; Mg nhường 2e, nhớ nhân hiệu suất vào lượng Mg.",
+ "phepTinh": [
+  {
+   "ten": "n Mg (mol)",
+   "bieuThuc": "6000/24",
+   "ketQua": 250,
+   "lamTron": 0
+  },
+  {
+   "ten": "n Mg hữu ích (mol)",
+   "bieuThuc": "6000/24*0.5",
+   "ketQua": 125,
+   "lamTron": 0
+  },
+  {
+   "ten": "n e (mol)",
+   "bieuThuc": "6000/24*0.5*2",
+   "ketQua": 250,
+   "lamTron": 0
+  },
+  {
+   "ten": "q (C)",
+   "bieuThuc": "250*96485",
+   "ketQua": 24121250,
+   "lamTron": 0
+  },
+  {
+   "ten": "t (s)",
+   "bieuThuc": "250*96485/0.03",
+   "ketQua": 804041666.67,
+   "lamTron": 2
+  },
+  {
+   "ten": "t (năm)",
+   "bieuThuc": "250*96485/0.03/(365*24*3600)",
+   "ketQua": 25.5,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu thay bằng thanh Mg 3,0 kg (các dữ kiện khác giữ nguyên) thì đường ống được bảo vệ khoảng 12,7 năm.",
+   "d": "D",
+   "giai": "Đúng. Thời gian tỉ lệ thuận với khối lượng Mg: t = 3000 : 24 × 0,5 × 2 × 96 485 : 0,03 ≈ 4,02·10⁸ s ≈ 12,7 năm.",
+   "phepTinh": [
+    {
+     "ten": "t (năm)",
+     "bieuThuc": "3000/24*0.5*2*96485/0.03/(365*24*3600)",
+     "ketQua": 12.7,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Nếu dòng điện bảo vệ tăng lên 0,06 A (vẫn thanh Mg 6,0 kg) thì thời gian bảo vệ tăng gấp đôi, khoảng 51 năm.",
+   "d": "S",
+   "giai": "Sai. t = q : I, điện lượng không đổi nên I tăng gấp đôi thì t giảm một nửa: khoảng 12,7 năm.",
+   "phepTinh": [
+    {
+     "ten": "t (năm)",
+     "bieuThuc": "250*96485/0.06/(365*24*3600)",
+     "ketQua": 12.7,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "co": []
+}

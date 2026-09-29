@@ -36,6 +36,7 @@ import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
+import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvSoanGap,gvSuaKho,gvXemHoSo,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -2174,7 +2175,10 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
     )
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
-  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de })
+  // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
+  let loiGiai: Record<string, unknown> | null = null
+  if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
+  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai })
 }
 
 /** DANH SÁCH ĐỀ TRONG KHO — chỉ mục, không kéo gói. */
@@ -3266,6 +3270,10 @@ const boXuLy = {
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
+      // LỜI GIẢI TỪNG BƯỚC (phương án A, 29/09): cổng công bố + hồ sơ đã duyệt + băm khớp đề hiện tại — xem server/src/loi-giai.ts
+      if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))
+      if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
+      if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
@@ -3418,6 +3426,16 @@ const boXuLy = {
       if (p === '/kho/xoa') return xoaDeKho(env, b)
       if (p === '/kho/rut-cau') return rutCau(env, b)
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
+      // LỜI GIẢI TỪNG BƯỚC: máy soạn của thầy (lấp kho, nhận lô, nộp hồ sơ) + màn Duyệt lời giải.
+      if (p === '/kho/loi-giai/nap-hang') return ra(await napHangTuKho(env, b))
+      if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
+      if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
+      if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
+      if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
+      if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))
+      if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
+      if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))
+      if (p === '/gv/loi-giai/sua-kho') return ra(await gvSuaKho(env, b))
       // CHỈ ĐỌC chỉ mục câu của MỘT tờ (28/09): để công cụ sửa trình bày kho đề đẩy lại gói mà GIỮ NGUYÊN chuyên đề/mức độ/lớp đang có.
       if (p === '/kho/chi-muc-lay') {
         const maDe = String(b.maDe ?? '').trim()
