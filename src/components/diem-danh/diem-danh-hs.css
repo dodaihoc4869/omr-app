@@ -226,15 +226,38 @@
 
 /* ---- VIÊN GỌN (29/09): trạng thái chưa mở — nhỏ, giữa mép trên, không che nội dung phía dưới ---- */
 .dd-hs--gon {
+  /* DỌC MÉP TRÁI (29/09, thầy: "để dọc mép bên trái chỗ khoảng trống"): tab đứng sát mép trái, giữa chiều cao màn — không che nội dung. */
+  left: env(safe-area-inset-left, 0px);
+  top: 50%;
+  transform: translateY(-50%);
   width: auto;
-  max-width: calc(100vw - 24px);
-  border-radius: 999px;
+  max-width: none;
+  max-height: calc(100vh - 160px);
+  border-left: 0;
+  border-radius: 0 16px 16px 0;
+  animation: dd-hs-vao-trai 0.22s ease-out;
 }
 .dd-hs--gon .dd-hs-mo {
   gap: 8px;
-  min-height: 44px;
-  padding: 6px 14px 6px 14px;
+  min-height: 0;
+  min-width: 40px;
+  padding: 14px 8px;
   white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg); /* chữ đọc từ dưới lên, như gáy sách */
+}
+.dd-hs--gon .dd-hs-gon-mui {
+  display: none;
+}
+@keyframes dd-hs-vao-trai {
+  from {
+    opacity: 0;
+    transform: translate(-100%, -50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
 }
 .dd-hs--gon .dd-hs-cham {
   width: 8px;
