@@ -1,0 +1,59 @@
+{
+ "qid": "12-KT-C1-D5-II-4",
+ "so": "Câu 4",
+ "nguon": "12-KT-C1-D5",
+ "chuong": "Ester – lipid",
+ "mucDo": "van_dung",
+ "dangBai": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+ "de": "<p>Khi nghiên cứu đặc điểm của phản ứng ester hoá để tổng hợp ethyl acetate, một nhóm học sinh dự đoán “nhiệt độ càng cao, hiệu suất phản ứng ester hoá càng cao”. Từ đó nhóm học sinh tiến hành thí nghiệm tổng hợp ethyl acetate với nồng độ ethyl alcohol và acetic acid không đổi nhưng thay đổi nhiệt độ phản ứng để kiểm tra dự đoán trên như sau:<br>Bước 1: Cho 32,5 mL ethyl alcohol, 30,0 mL acetic acid và 10,5 mL H2SO4 đặc vào bình cầu, lắc đều.<br>Bước 2: Lắp ống sinh hàn hồi lưu vào bình phản ứng và đun trên bếp cách thuỷ có điều chỉnh nhiệt độ ở nhiệt độ 60°C trong 60 phút. Tắt bếp và để nguội bình phản ứng.<br>Bước 3: Chưng cất tách hỗn hợp sản phẩm, tách ethyl acetate bằng phễu chiết, rửa sạch, làm khô bằng CaCl2 khan.<br>Bước 4: Tiến hành chưng cất lại ethyl acetate bằng hệ sinh hàn ở khoảng nhiệt độ 77°C, thu ethyl acetate và đong thể tích ethyl acetate thu được bằng ống đong. Lặp lại thí nghiệm trên, chỉ thay đổi nhiệt độ ở bước 2 lần lượt là 65; 70; 75; 80; 85.<br>Nhóm học sinh ghi lại thể tích ethyl acetate thu được với thời gian thí nghiệm tương ứng và kết quả ở bảng sau: Nhiệt độ (°C) 60 65 70 75 80 85 Thể tích ethyl acetate (mL) 25,8 30,5 35,1 39,8 36,6 32,9</p><div class=\"tbl\"><table><tr><th>Nhiệt độ (°C)</th><th>60</th><th>65</th><th>70</th><th>75</th><th>80</th><th>85</th></tr><tr><td>Thể tích ethyl acetate (mL)</td><td>25,8</td><td>30,5</td><td>35,1</td><td>39,8</td><td>36,6</td><td>32,9</td></tr></table></div>",
+ "hinh": [],
+ "loiGiaiCo": {
+  "chot": "Số liệu tăng tới 75 °C rồi giảm: 39,8 mL là cực đại. Vậy phản ứng có nhiệt độ tối ưu, không phải càng nóng càng tốt.",
+  "tung": {
+   "a": {
+    "dung": false,
+    "vi_sao": "Sai: ở 70 °C chỉ thu 35,1 mL, còn ở 75 °C thu tới 39,8 mL."
+   },
+   "b": {
+    "dung": true,
+    "vi_sao": "Đúng: ở 80 °C thu 36,6 mL, nhiều hơn 25,8 mL ở 60 °C."
+   },
+   "c": {
+    "dung": true,
+    "vi_sao": "Đúng: cực đại ở 75 °C, sau đó 80 và 85 °C đều giảm dần."
+   },
+   "d": {
+    "dung": false,
+    "vi_sao": "Sai: dự đoán của nhóm bị chính số liệu bác bỏ ở khoảng trên 75 °C."
+   }
+  },
+  "buoc": [],
+  "ket_qua": "",
+  "trang_thai": "khop"
+ },
+ "dang": "ds",
+ "y": [
+  {
+   "id": "a",
+   "t": "Theo kết quả thí nghiệm trên, thể tích ethyl acetate thu được ở 70°C là nhiều nhất."
+  },
+  {
+   "id": "b",
+   "t": "Với các giá trị nhiệt độ khảo sát, phản ứng ester hoá tạo ethyl acetate ở 80°C có hiệu suất cao hơn ở 60°C."
+  },
+  {
+   "id": "c",
+   "t": "Số liệu cho thấy phản ứng có nhiệt độ tối ưu ở 75°C, sau đó hiệu suất tổng hợp ethyl acetate giảm."
+  },
+  {
+   "id": "d",
+   "t": "Từ kết quả thí nghiệm, kết luận được khi nhiệt độ tăng thì hiệu suất phản ứng ester hoá càng tăng."
+  }
+ ],
+ "dapAn": {
+  "a": "S",
+  "b": "D",
+  "c": "D",
+  "d": "S"
+ }
+}

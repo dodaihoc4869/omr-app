@@ -427,6 +427,8 @@ select.sel{width:100%;appearance:none;-webkit-appearance:none;border:1px solid v
 .dsbtn button:hover{border-color:var(--ink)}
 .dsbtn button.pick{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .dsbtn button[disabled]{cursor:default;opacity:.9}
+.dsbtn.wide button{width:auto;padding:0 12px;font-size:14px}
+.paper img{max-width:100%;height:auto;border-radius:8px;background:#fff}
 @media (max-width:560px){.srow{grid-template-columns:30px minmax(0,1fr);}.srow .dsbtn{grid-column:1/-1;justify-content:flex-end}.srow .sl{width:30px;height:30px}}
 .sx{padding:0 14px 14px 60px;display:grid;gap:8px}
 @media (max-width:560px){.sx{padding-left:14px}}
@@ -2436,13 +2438,14 @@ LABS.k6 = function (el, pid) {
 const SETS = { q: { list: QUESTIONS, bar: '#qbar', card: '#qcard' }, p: { list: PRACTICE, bar: '#pbar', card: '#pcard' } };
 const curQ = { q: 'q1', p: 'p1' };
 const timers = {};
-const DANG = { ds: 'Đúng/Sai', dem: 'Đếm số nhận định đúng', sai: 'Tìm phát biểu sai' };
+const DANG = { ds: 'Đúng/Sai', dem: 'Đếm số nhận định đúng', sai: 'Tìm phát biểu sai', tn: 'Trắc nghiệm', tln: 'Trả lời ngắn' };
 const HB = ['Bậc 1 · Gắn', 'Bậc 2 · Soi', 'Bậc 3 · Chốt'];
 const ak = (q, y) => q.id + '_' + y.id;
-const qDone = q => q.y.every(y => S.ans[ak(q, y)]);
+const qDone = q => q.dang === 'tln' ? S.ans[q.id + '_tl'] != null : q.y.every(y => S.ans[ak(q, y)]);
 
 function renderBar(set) {
   const { list, bar } = SETS[set];
+  if (!list.some(x => x.id === curQ[set])) curQ[set] = list[0].id;
   $(bar).innerHTML = list.map((q, i) => `<button class="qchip ${curQ[set] === q.id ? 'on' : ''} ${qDone(q) ? 'done' : ''}" role="tab" aria-selected="${curQ[set] === q.id}" data-q="${q.id}" type="button"><span class="qn">${set === 'q' ? i + 1 : 'L' + (i + 1)}</span><b>${q.so}</b><small>${q.keys.slice(0, 2).map(k => KEYS[k].ten).join(' · ')}</small></button>`).join('');
   $$(bar + ' .qchip').forEach(b => b.addEventListener('click', () => { curQ[set] = b.dataset.q; renderBar(set); renderQ(set); }));
 }
@@ -2452,40 +2455,80 @@ function flowHTML(q) {
 function ganHTML(y, gan) {
   return `<div class="gan"><span>Nhịp GẮN: ý này dùng chìa khoá nào?</span>${Object.keys(KEYS).map(kk => `<button class="kchip ${gan && kk === y.k ? '' : 'ghost'}" type="button" data-gan="${kk}" style="--kc:var(${KEYS[kk].cv})" ${gan ? 'disabled' : ''}>${icon(KEYS[kk].ic)}${KEYS[kk].ten}</button>`).join('')}${gan ? (gan === y.k ? '<b style="color:var(--ok)">✓ Gắn đúng</b>' : `<b style="color:var(--warn)">Chìa khoá hợp nhất: ${KEYS[y.k].ten}</b>`) : ''}</div>`;
 }
-function resHTML(y, picked) {
+function resHTML(y, picked, dang) {
   const ok = picked === y.d, trap = y.bay ? TRAPS[y.bay] : null;
-  return `<div class="res ${ok ? 'ok' : 'no'}"><div class="rv">${ok ? '✓ Chính xác' : '✕ Chưa đúng'} · Đáp án: ${y.d === 'D' ? 'Đúng' : 'Sai'}${trap ? ` <span class="tchip" style="--mc:var(${trap.cv})">Bẫy: ${trap.ten}</span>` : ''}</div>
+  return `<div class="res ${ok ? 'ok' : 'no'}"><div class="rv">${ok ? '✓ Chính xác' : '✕ Chưa đúng'} · ${dang === 'tn' ? (y.d === 'D' ? 'Phương án này: CHỌN' : 'Phương án này: LOẠI') : 'Đáp án: ' + (y.d === 'D' ? 'Đúng' : 'Sai')}${trap ? ` <span class="tchip" style="--mc:var(${trap.cv})">Bẫy: ${trap.ten}</span>` : ''}</div>
   <div><b>Soi:</b> ${fx(y.soi)}</div><div style="margin-top:4px"><b>Chốt:</b> ${fx(y.giai)}</div>
-  <div class="labl"><button class="btn sec sm" type="button" data-lab="${y.lab[0]}" data-p="${y.lab[1]}">Kiểm trong phòng thí nghiệm "${KEYS[y.lab[0]].ten}" →</button></div></div>`;
+  ${y.lab ? `<div class="labl"><button class="btn sec sm" type="button" data-lab="${y.lab[0]}" data-p="${y.lab[1]}">Kiểm trong phòng thí nghiệm "${KEYS[y.lab[0]].ten}" →</button></div>` : ''}</div>`;
 }
 function stmtHTML(q, y) {
   const k = ak(q, y), picked = S.ans[k], lv = S.lv, gan = S.gan[k], needGan = lv === 'but' && !gan;
   const hints = S.hint[k] != null ? S.hint[k] : (lv === 'nen' ? 1 : 0);
   return `<div class="sitem ${picked ? (picked === y.d ? 'ok' : 'no') : ''}" data-y="${y.id}">
   <div class="srow"><span class="sl">${y.id}</span><div class="stx">${fx(y.t)}${lv !== 'but' ? `<div>${keyChip(y.k)}</div>` : ''}</div>
-  <div class="dsbtn">${['D', 'S'].map(v => `<button type="button" data-v="${v}" class="${picked === v ? 'pick' : ''}" ${picked || needGan ? 'disabled' : ''} aria-label="${v === 'D' ? 'Đúng' : 'Sai'}" title="${needGan ? 'Gắn chìa khoá trước' : ''}">${v === 'D' ? 'Đ' : 'S'}</button>`).join('')}</div></div>
+  <div class="dsbtn ${q.dang === 'tn' ? 'wide' : ''}">${['D', 'S'].map(v => `<button type="button" data-v="${v}" class="${picked === v ? 'pick' : ''}" ${picked || needGan ? 'disabled' : ''} aria-label="${q.dang === 'tn' ? (v === 'D' ? 'Chọn' : 'Loại') : (v === 'D' ? 'Đúng' : 'Sai')}" title="${needGan ? 'Gắn chìa khoá trước' : ''}">${q.dang === 'tn' ? (v === 'D' ? 'Chọn' : 'Loại') : (v === 'D' ? 'Đ' : 'S')}</button>`).join('')}</div></div>
   <div class="sx">${lv === 'but' ? ganHTML(y, gan) : ''}
   ${!picked ? `<div class="hintbar"><button class="hintbtn" type="button" data-hint ${hints >= 3 ? 'disabled' : ''}>${hints >= 3 ? 'Đã mở hết gợi ý' : 'Mở gợi ý ' + (hints + 1) + '/3'}</button></div>` : ''}
   ${picked ? '' : y.g.slice(0, hints).map((g, i) => `<div class="hint"><b>${HB[i]}:</b> ${fx(g)}</div>`).join('')}
-  ${picked ? resHTML(y, picked) : ''}</div></div>`;
+  ${picked ? resHTML(y, picked, q.dang) : ''}</div></div>`;
+}
+const soVN = x => { const n = parseFloat(String(x).trim().replace(/\s/g, '').replace(',', '.')); return isNaN(n) ? null : n; };
+function tlHTML(q) {
+  const t = q.tl, k = q.id + '_tl', val = S.ans[k], lv = S.lv;
+  const hints = S.hint[k] != null ? S.hint[k] : (lv === 'nen' ? 1 : 0);
+  const ok = val != null && soVN(val) !== null && Math.abs(soVN(val) - soVN(t.dapAn)) < 1e-9;
+  const steps = (q.phepTinh || []).map(p => `<div><span>${fx(p.ten)}</span><b class="mono">${vnt(p.ketQua)}</b></div>`).join('');
+  return `<div class="sitem tl ${val != null ? (ok ? 'ok' : 'no') : ''}"><div class="srow"><span class="sl">?</span><div class="stx">Nhập đáp số của em${t.donVi ? ' (' + fx(t.donVi) + ')' : ''}${lv !== 'but' ? `<div>${keyChip(t.k)}</div>` : ''}</div>
+  <div class="gin"><input type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp số" value="${val != null ? esc(val) : ''}" ${val != null ? 'disabled' : ''} style="width:110px"><button class="btn pri sm" type="button" data-tlcheck ${val != null ? 'disabled' : ''}>Kiểm tra</button></div></div>
+  <div class="sx">${val == null ? `<div class="hintbar"><button class="hintbtn" type="button" data-tlhint ${hints >= 3 ? 'disabled' : ''}>${hints >= 3 ? 'Đã mở hết gợi ý' : 'Mở gợi ý ' + (hints + 1) + '/3'}</button></div>${t.g.slice(0, hints).map((g, i) => `<div class="hint"><b>${HB[i]}:</b> ${fx(g)}</div>`).join('')}` : ''}
+  ${val != null ? `<div class="res ${ok ? 'ok' : 'no'}"><div class="rv">${ok ? '✓ Chính xác' : '✕ Chưa đúng'} · Đáp số: ${esc(t.dapAn)}${t.donVi ? ' ' + fx(t.donVi) : ''}${t.bay ? ` <span class="tchip" style="--mc:var(${TRAPS[t.bay].cv})">Bẫy hay gặp: ${TRAPS[t.bay].ten}</span>` : ''}</div>
+    <div><b>Soi:</b> ${fx(t.soi)}</div><div style="margin-top:4px"><b>Chốt:</b> ${fx(t.giai)}</div>${steps ? `<div class="contrib" style="margin-top:8px">${steps}</div>` : ''}</div>` : ''}</div></div>`;
+}
+function bindTL(set, q, el) {
+  const k = q.id + '_tl', w = $('.tlwrap', el);
+  const again = () => { w.innerHTML = tlHTML(q); bindTL(set, q, el); $('.sc', el).textContent = scoreText(q); renderBar(set); };
+  const btn = $('[data-tlcheck]', w), inp = $('input', w);
+  const go = () => { if (S.ans[k] != null) return; const v = inp.value.trim(); if (!v || soVN(v) === null) { inp.focus(); return; } S.ans[k] = v; save(); if (Math.abs(soVN(v) - soVN(q.tl.dapAn)) < 1e-9) { addXP(q.tl.k); const r = btn.getBoundingClientRect(); burst(r.left + r.width / 2, r.top); } again(); };
+  if (btn) btn.addEventListener('click', go);
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+  const h = $('[data-tlhint]', w); if (h) h.addEventListener('click', () => { const cur = S.hint[k] != null ? S.hint[k] : (S.lv === 'nen' ? 1 : 0); S.hint[k] = Math.min(3, cur + 1); save(); again(); });
+}
+function ttHTML(q, t, i) {
+  const k = q.id + '_tt' + i, picked = S.ans[k];
+  return `<div class="sitem tt ${picked ? (picked === t.d ? 'ok' : 'no') : ''}" data-tt="${i}"><div class="srow"><span class="sl">${i + 1}</span><div class="stx">${fx(t.t)}</div>
+  <div class="dsbtn">${['D', 'S'].map(v => `<button type="button" data-v="${v}" class="${picked === v ? 'pick' : ''}" ${picked ? 'disabled' : ''} aria-label="${v === 'D' ? 'Đúng' : 'Sai'}">${v === 'D' ? 'Đ' : 'S'}</button>`).join('')}</div></div>
+  ${picked ? `<div class="sx"><div class="res ${picked === t.d ? 'ok' : 'no'}"><div class="rv">${picked === t.d ? '✓ Chính xác' : '✕ Chưa đúng'} · Đáp án: ${t.d === 'D' ? 'Đúng' : 'Sai'}</div>${fx(t.giai)}</div></div>` : ''}</div>`;
+}
+function bindTT(q, it) {
+  const i = +it.dataset.tt, t = q.tuongTu[i], k = q.id + '_tt' + i;
+  $$('.dsbtn button', it).forEach(b => b.addEventListener('click', () => {
+    if (S.ans[k]) return; S.ans[k] = b.dataset.v; save();
+    if (b.dataset.v === t.d) { const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top); }
+    const tmp = document.createElement('div'); tmp.innerHTML = ttHTML(q, t, i); const nu = tmp.firstElementChild; it.replaceWith(nu); bindTT(q, nu);
+  }));
 }
 function mcHTML(q) {
   const picked = S.mc[q.id], all = qDone(q);
   const nD = q.y.filter(y => S.ans[ak(q, y)] === 'D').length, sS = q.y.filter(y => S.ans[ak(q, y)] === 'S').map(y => y.id);
-  const note = !all ? 'Làm hết từng nhận định ở trên rồi chốt đáp án.' : q.dang === 'dem' ? `Theo lựa chọn của em: ${nD} nhận định đúng.` : `Em đã chọn S cho: ${sS.join(', ') || 'không ý nào'}.`;
+  const sD = q.y.filter(y => S.ans[ak(q, y)] === 'D').map(y => y.id);
+  const note = !all ? (q.dang === 'tn' ? 'Soi hết 4 phương án ở trên rồi chốt.' : 'Làm hết từng nhận định ở trên rồi chốt đáp án.') : q.dang === 'dem' ? `Theo lựa chọn của em: ${nD} nhận định đúng.` : q.dang === 'tn' ? `Em đã để CHỌN: ${sD.join(', ') || 'chưa phương án nào'}.` : `Em đã chọn S cho: ${sS.join(', ') || 'không ý nào'}.`;
   return `<div class="mcfinal"><div class="h4" style="--bc:var(--ok)"><i>✓</i>${q.mc.hoi}</div><p class="muted" style="margin:0 0 10px;font-size:14px">${note}</p>
   <div class="opts">${q.mc.o.map(([L, t]) => `<button class="opt ${picked ? (L === q.mc.d ? 'right' : L === picked ? 'wrong' : '') : ''}" data-mc="${L}" type="button" ${picked ? 'disabled' : ''}><b>${L}.</b> ${fx(t)}</button>`).join('')}</div>
   ${picked ? `<div class="fb-line">${picked === q.mc.d ? '<b style="color:var(--ok)">Chính xác.</b>' : '<b style="color:var(--bad)">Chưa đúng.</b>'} ${fx(q.ket)}.</div>` : ''}</div>`;
 }
 function scoreText(q) {
+  if (q.dang === 'tln') { const v = S.ans[q.id + '_tl']; return v == null ? 'Chờ em nhập đáp số' : (soVN(v) !== null && Math.abs(soVN(v) - soVN(q.tl.dapAn)) < 1e-9 ? 'Đúng đáp số · xong câu' : 'Chưa đúng đáp số · xem lời giải'); }
   const ans = q.y.filter(y => S.ans[ak(q, y)]), ok = ans.filter(y => S.ans[ak(q, y)] === y.d).length;
   return ans.length ? `${ok}/${ans.length} ý đúng${ans.length < q.y.length ? ` · còn ${q.y.length - ans.length} ý` : ' · xong câu'}` : `${q.y.length} ${q.dang === 'ds' ? 'ý' : 'nhận định'} chờ em chọn`;
 }
 function renderQ(set) {
-  const { list, card } = SETS[set], q = list.find(x => x.id === curQ[set]), el = $(card), lv = S.lv;
+  const { list, card } = SETS[set], el = $(card), lv = S.lv;
+  if (!list.some(x => x.id === curQ[set])) curQ[set] = list[0].id;
+  const q = list.find(x => x.id === curQ[set]);
   clearInterval(timers[set]);
   const idx = list.indexOf(q), last = idx === list.length - 1;
-  el.innerHTML = `<div class="qtop"><h3>${q.so} · ${fx(q.ten)}<small>${q.nguon} · ${DANG[q.dang]}</small></h3>
+  const flag = window.XEM_THU && q.canThayChot && q.canThayChot.length ? `<div class="res no" style="margin:14px 20px 0"><div class="rv">⚑ Máy soạn ghi chú: cần thầy chốt</div><ul style="margin:4px 0 0;padding-left:18px">${q.canThayChot.map(c => `<li>${fx(c)}</li>`).join('')}</ul></div>` : '';
+  el.innerHTML = flag + `<div class="qtop"><h3>${q.so} · ${fx(q.ten)}<small>${q.nguon} · ${DANG[q.dang]}</small></h3>
     <div class="kchips">${lv === 'but' ? '<span class="kchip ghost">Chìa khoá: em tự gắn</span>' : q.keys.map(k => keyChip(k)).join('')}</div>
     ${lv === 'but' ? `<span class="timer" id="${set}timer" aria-label="Thời gian làm câu">0:00</span>` : ''}</div>
   <div class="qgrid">
@@ -2494,14 +2537,18 @@ function renderQ(set) {
     ${lv === 'but' ? `<div class="flowhide"><p class="muted" style="font-size:14px;margin:0 0 10px">Tự dựng dòng chảy ra nháp trước: cho gì vào → xảy ra gì → lấy ra gì → bỏ đi gì. Xong mới mở để so.</p><button class="btn sec sm" type="button" data-showflow>Mở dòng chảy để so</button></div><div class="flow hide">${flowHTML(q)}</div>`
       : `<div class="flow">${flowHTML(q)}</div><button class="btn sec sm" type="button" data-replay>↻ Chạy lại dòng chảy</button>`}
     </div></div>
-  <div class="stmts"><div class="h4" style="--bc:var(--k5)"><i>2–4</i>GẮN · SOI · CHỐT từng ${q.dang === 'ds' ? 'ý' : q.dang === 'dem' ? 'nhận định' : 'phát biểu'}</div>${q.y.map(y => stmtHTML(q, y)).join('')}</div>
+  ${q.dang === 'tln' ? `<div class="stmts"><div class="h4" style="--bc:var(--k5)"><i>2–4</i>GẮN · SOI · CHỐT</div><div class="tlwrap">${tlHTML(q)}</div></div>`
+    : `<div class="stmts"><div class="h4" style="--bc:var(--k5)"><i>2–4</i>GẮN · SOI · CHỐT từng ${q.dang === 'ds' ? 'ý' : q.dang === 'dem' ? 'nhận định' : q.dang === 'tn' ? 'phương án' : 'phát biểu'}</div>${q.y.map(y => stmtHTML(q, y)).join('')}</div>`}
+  ${q.tuongTu && q.tuongTu.length ? `<div class="stmts tuong"><div class="h4" style="--bc:var(--k4)"><i>+</i>Tự thử câu tương tự</div>${q.tuongTu.map((t, i) => ttHTML(q, t, i)).join('')}</div>` : ''}
   ${q.mc ? `<div class="mcwrap">${mcHTML(q)}</div>` : ''}
   <div class="qfoot"><span class="sc">${scoreText(q)}</span><button class="btn sec sm" type="button" data-reset>Làm lại câu này</button><button class="btn pri sm" type="button" data-next>${last ? (set === 'q' ? 'Sang đề luyện mới' : 'Về câu đầu') : 'Câu tiếp'} →</button></div>`;
-  $$('.sitem', el).forEach(it => bindStmt(set, q, it));
+  $$('.sitem:not(.tt)', el).forEach(it => bindStmt(set, q, it));
+  $$('.sitem.tt', el).forEach(it => bindTT(q, it));
+  if (q.dang === 'tln') bindTL(set, q, el);
   bindMC(set, q, el);
   const rp = $('[data-replay]', el); if (rp) rp.addEventListener('click', () => { const f = $('.flow', el); f.innerHTML = flowHTML(q); });
   const sf = $('[data-showflow]', el); if (sf) sf.addEventListener('click', () => { $('.flowhide', el).classList.add('hide'); $('.flow', el).classList.remove('hide'); });
-  $('[data-reset]', el).addEventListener('click', () => { q.y.forEach(y => { const k = ak(q, y); delete S.ans[k]; delete S.gan[k]; delete S.hint[k]; }); delete S.mc[q.id]; save(); renderBar(set); renderQ(set); });
+  $('[data-reset]', el).addEventListener('click', () => { q.y.forEach(y => { const k = ak(q, y); delete S.ans[k]; delete S.gan[k]; delete S.hint[k]; }); (q.tuongTu || []).forEach((t, i) => delete S.ans[q.id + '_tt' + i]); delete S.ans[q.id + '_tl']; delete S.hint[q.id + '_tl']; delete S.mc[q.id]; save(); renderBar(set); renderQ(set); });
   $('[data-next]', el).addEventListener('click', () => {
     if (last && set === 'q') { $('#luyen').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); return; }
     curQ[set] = list[last ? 0 : idx + 1].id; renderBar(set); renderQ(set);
@@ -2536,7 +2583,7 @@ function bindMC(set, q, el) {
     $('.mcwrap', el).innerHTML = mcHTML(q); bindMC(set, q, el);
   }));
 }
-function rerenderQuestions() { ['q', 'p'].forEach(s => { renderBar(s); renderQ(s); }); renderGen(); }
+function rerenderQuestions() { ['q', 'p'].forEach(s => { if ($(SETS[s].bar)) { renderBar(s); renderQ(s); } }); if ($('#gcard')) renderGen(); }
 
 /* ============================================================
    MÁY RA ĐỀ
@@ -2687,12 +2734,12 @@ function init() {
   $('#lvlPill').addEventListener('click', () => { const o = ['nen', 'vung', 'but']; setLevel(o[(o.indexOf(S.lv) + 1) % 3]); });
   setLevel(S.lv, false);
   document.addEventListener('click', e => { const o = e.target.closest('[data-open]'); if (o) openLab(o.dataset.open, null, true); });
-  renderBeats(); renderRadar(); renderKeys();
+  if ($('#beats')) renderBeats(); if ($('#radarIn')) renderRadar(); renderKeys();
   const h = (location.hash || '').slice(1);
   openLab(KEYS[h] ? h : 'k1', null, !!KEYS[h]);
-  ['q', 'p'].forEach(s => { renderBar(s); renderQ(s); });
-  renderGenTabs(); renderCheat(); paintXP();
-  heroCanvas(); navSpy();
+  ['q', 'p'].forEach(s => { if ($(SETS[s].bar)) { renderBar(s); renderQ(s); } });
+  if ($('#gtabs')) renderGenTabs(); if ($('#cheat')) renderCheat(); paintXP();
+  if ($('#heroCanvas')) heroCanvas(); navSpy();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>

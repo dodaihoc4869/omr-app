@@ -1,0 +1,190 @@
+{
+ "id": "p1",
+ "so": "Bài luyện 1",
+ "nguon": "Đề mới",
+ "dang": "ds",
+ "ten": "Điều chế ethyl acetate: hồi lưu, chưng cất, rửa, làm khan",
+ "keys": [
+  "k3",
+  "k2",
+  "k1",
+  "k4"
+ ],
+ "de": "<p><b>Bài luyện 1:</b> Một nhóm học sinh điều chế ethyl acetate theo các bước sau:</p>\n<p>– <b>Bước 1:</b> Cho vào bình cầu 12,0 gam acetic acid, 23,0 mL ethanol (D = 0,79 g/mL), 2 mL {H2SO4} đặc và vài viên đá bọt. Lắp ống sinh hàn hồi lưu thẳng đứng, đun sôi nhẹ trong 30 phút.</p>\n<p>– <b>Bước 2:</b> Để nguội, lắp lại thành bộ chưng cất, đun và thu lấy phần chất lỏng ngưng tụ khi nhiệt độ hơi dưới 80 °C.</p>\n<p>– <b>Bước 3:</b> Lắc chất lỏng ở bình hứng với dung dịch {Na2CO3} bão hoà đến khi không còn khí thoát ra, chiết lấy lớp trên, làm khan bằng {Na2SO4} khan, thu được 10,56 gam ethyl acetate.</p>\n<p>Cho nhiệt độ sôi: ethyl acetate 77,1 °C; ethanol 78,4 °C; nước 100 °C; acetic acid 117,9 °C.</p>",
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Hồi lưu 30 phút",
+   "p": "Acid + ethanol + {H2SO4} đặc + đá bọt.",
+   "io": [
+    [
+     "in",
+     "acid"
+    ],
+    [
+     "in",
+     "ethanol"
+    ]
+   ]
+  },
+  {
+   "ic": "i-distill",
+   "t": "Chưng cất, lấy phần dưới 80 °C",
+   "p": "Ethyl acetate 77,1 °C và ethanol 78,4 °C cùng bay.",
+   "io": [
+    [
+     "in",
+     "bình hứng"
+    ]
+   ]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Rửa {Na2CO3}, chiết",
+   "p": "Trung hoà acid, lấy lớp ester ở trên.",
+   "io": [
+    [
+     "out",
+     "{CO2}↑"
+    ]
+   ]
+  },
+  {
+   "ic": "i-dry",
+   "t": "Làm khan, cân",
+   "p": "10,56 g ethyl acetate.",
+   "io": [
+    [
+     "in",
+     "10,56 g"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Đá bọt được thêm vào để làm xúc tác cho phản ứng ester hoá.",
+   "d": "S",
+   "k": "k3",
+   "bay": "tengoi",
+   "soi": "\"xúc tác\" → trong bình có hai thứ \"phụ\", thứ nào mới là xúc tác?",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: trong bình có {H2SO4} đặc và đá bọt. Mỗi thứ làm gì?",
+    "Chất nào ở đây là xúc tác acid?",
+    "{H2SO4} đặc là xúc tác; đá bọt chỉ giúp sôi êm."
+   ],
+   "giai": "Sai. Xúc tác là {H2SO4} đặc. Đá bọt tạo tâm sôi để chất lỏng sôi êm, không bị sôi bùng.",
+   "lab": [
+    "k3",
+    "naoh"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Ở bước 1, ống sinh hàn đặt thẳng đứng để hơi ngưng tụ chảy ngược về bình cầu, không làm hao hụt chất khi đun lâu.",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "Kiểm đúng mục đích của kiểu lắp.",
+   "g": [
+    "Chìa khoá <b>An toàn &amp; dụng cụ</b>: sinh hàn đứng (hồi lưu) khác sinh hàn nghiêng (chưng cất) ở đâu?",
+    "Hơi đi lên, gặp ống lạnh, ngưng lại thì chảy về đâu?",
+    "Chảy ngược về bình → đun lâu mà không mất chất."
+   ],
+   "giai": "Đúng. Đó là đun hồi lưu: hơi ngưng tụ quay lại bình nên đun lâu được mà không mất chất.",
+   "lab": [
+    "k2",
+    "hoiluu"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Chất lỏng thu được ở bình hứng trong bước 2 chỉ có ethyl acetate vì ethyl acetate có nhiệt độ sôi thấp nhất trong hỗn hợp.",
+   "d": "S",
+   "k": "k1",
+   "bay": "tuyetdoi",
+   "soi": "\"chỉ có\" + \"vì\": vế lí do đúng, nhưng kết luận \"chỉ có\" phải kiểm.",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: thu chất lỏng khi hơi dưới 80 °C. Chất nào sôi sát mốc này?",
+    "Ethyl acetate 77,1 °C, ethanol 78,4 °C: chênh 1,3 °C.",
+    "Gần trùng → ethanol bay theo; hơi nước, acid cũng lẫn vào."
+   ],
+   "giai": "Sai. Ethanol sôi 78,4 °C, chỉ cao hơn ethyl acetate 1,3 °C nên bay theo; hơi nước và acid cũng lẫn vào. Vì vậy bước 3 mới phải rửa và làm khan.",
+   "lab": [
+    "k1",
+    "etoh"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Hiệu suất phản ứng ester hoá là 60%.",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "Con số → tự tính theo chất thiếu.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: tính số mol hai chất, chọn chất thiếu.",
+    "n(acetic acid) = 12,0 ÷ 60 = 0,2 mol; n(ethanol) = 23,0 × 0,79 ÷ 46 = 0,395 mol → acid thiếu.",
+    "Lí thuyết 0,2 × 88 = 17,6 g; H = 10,56 ÷ 17,6 = 60%."
+   ],
+   "giai": "Đúng. Acid thiếu (0,2 mol) → lí thuyết 17,6 g ethyl acetate; 10,56 ÷ 17,6 = 0,60 → 60%.",
+   "lab": [
+    "k4",
+    "etac"
+   ]
+  }
+ ],
+ "ket": "a S – b Đ – c S – d Đ",
+ "nho": "",
+ "qid": "mau-p1",
+ "chuong": "ester-lipid",
+ "phepTinh": [
+  {
+   "ten": "n acetic acid",
+   "bieuThuc": "12.0/60",
+   "ketQua": 0.2,
+   "lamTron": 4
+  },
+  {
+   "ten": "n ethanol",
+   "bieuThuc": "23.0*0.79/46",
+   "ketQua": 0.395,
+   "lamTron": 4
+  },
+  {
+   "ten": "m ester lí thuyết",
+   "bieuThuc": "0.2*88",
+   "ketQua": 17.6,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất (%)",
+   "bieuThuc": "10.56/17.6*100",
+   "ketQua": 60,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu thay 23,0 mL ethanol bằng 11,5 mL ethanol (D = 0,79 g/mL), các dữ kiện khác giữ nguyên, thì hiệu suất tính được vẫn là 60%.",
+   "d": "S",
+   "giai": "Sai. n(ethanol) = 11,5 × 0,79 ÷ 46 = 0,1975 mol < 0,2 mol nên ethanol thành chất thiếu. Lí thuyết 0,1975 × 88 = 17,38 g; H = 10,56 ÷ 17,38 = 60,8%.",
+   "phepTinh": [
+    {
+     "ten": "n ethanol",
+     "bieuThuc": "11.5*0.79/46",
+     "ketQua": 0.1975,
+     "lamTron": 4
+    },
+    {
+     "ten": "H (%)",
+     "bieuThuc": "10.56/(0.1975*88)*100",
+     "ketQua": 60.8,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "canThayChot": []
+}

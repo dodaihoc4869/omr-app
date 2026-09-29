@@ -1,0 +1,177 @@
+{
+ "qid": "12-KT-C1-D4-I-16",
+ "so": "Câu 16",
+ "nguon": "12-KT-C1-D4",
+ "dang": "tn",
+ "chuong": "Ester – lipid",
+ "de": "<p>Hợp chất hữu cơ X có công thức cấu tạo như sau: Phát biểu nào sau đây không đúng?</p><p><img alt=\"Hình trong đề\" src=\"data:image/png;base64,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\"></p>",
+ "ten": "Chất giặt rửa sodium dodecylbenzenesulfonate: cấu tạo và tính chất",
+ "keys": [
+  "k5",
+  "k6"
+ ],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Đuôi: gốc dodecyl {C12H25}–",
+   "p": "Mạch carbon thẳng 12 C, không phân cực.",
+   "io": [
+    [
+     "in",
+     "đuôi kị nước"
+    ]
+   ]
+  },
+  {
+   "ic": "i-hex",
+   "t": "Giữa: vòng benzene {C6H4}",
+   "p": "Vòng benzene bị thế ở hai vị trí đối nhau, nối đuôi với đầu.",
+   "io": []
+  },
+  {
+   "ic": "i-hex",
+   "t": "Đầu: nhóm –{SO3Na}",
+   "p": "Nhóm sulfonate dạng muối sodium, phân li thành ion trong nước.",
+   "io": [
+    [
+     "in",
+     "đầu ưa nước"
+    ]
+   ]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Thả vào nước",
+   "p": "Phân tử X dồn lên bề mặt, đuôi quay ra khỏi nước, làm giảm sức căng bề mặt.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "t": "X có công thức phân tử là C18H29SO3Na",
+   "d": "S",
+   "k": "k5",
+   "bay": "conso",
+   "soi": "Con số 18 và 29 phải tự đếm lại theo từng phần của phân tử.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: đếm từng phần rồi cộng: gốc {C12H25}–, vòng {C6H4}, nhóm –{SO3Na}.",
+    "Số C: 12 + 6 = 18; số H: 25 + 4 = 29. Có khớp {C18H29SO3Na} không?"
+   ],
+   "giai": "Loại. Đếm đủ: 12 + 6 = 18 C, 25 + 4 = 29 H, thêm nhóm {SO3Na} → {C18H29SO3Na}. Phát biểu A đúng.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "t": "X có đầu ưa nước là nhóm -SO3Na và phần gốc hydrocarbon là phần kị nước",
+   "d": "S",
+   "k": "k6",
+   "bay": "doivai",
+   "soi": "Kiểm vai của hai đầu: phần nào tích điện, phần nào không phân cực.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: tan hay không do phân cực. Phần nào của X phân li thành ion, phần nào là mạch carbon dài?",
+    "–{SO3Na} tạo ion nên hút nước; mạch {C12H25}– và vòng benzene không phân cực."
+   ],
+   "giai": "Loại. Nhóm –{SO3Na} phân li thành ion nên ưa nước; gốc hydrocarbon dài không phân cực nên kị nước. Phát biểu B đúng.",
+   "lab": [
+    "k6",
+    "tan"
+   ]
+  },
+  {
+   "id": "C",
+   "t": "X thuộc loại muối sodium alkyl benzene sulfonate",
+   "d": "S",
+   "k": "k5",
+   "bay": "tengoi",
+   "soi": "Đối chiếu tên loại với ba phần của phân tử: alkyl, benzene, sulfonate.",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: gọi tên từng phần: {C12H25}– là gốc alkyl, {C6H4} là vòng benzene, –{SO3Na} là sulfonate của sodium.",
+    "Ghép ba phần lại ra tên loại gì?"
+   ],
+   "giai": "Loại. X gồm gốc alkyl gắn vòng benzene mang nhóm sulfonate dạng muối sodium, nên đúng là sodium alkylbenzene sulfonate. Phát biểu C đúng.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "t": "X cho vào nước tạo dung dịch có sức căng bề mặt lớn hơn nước",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "Chữ \"lớn hơn\": chất giặt rửa làm sức căng bề mặt của nước tăng hay giảm?",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: X có đầu ưa nước và đuôi kị nước, tức là chất giặt rửa.",
+    "Soi chữ \"lớn hơn nước\" trong phát biểu D.",
+    "Phân tử X dồn lên bề mặt, đuôi kị nước quay ra ngoài, làm yếu lực hút giữa các phân tử nước ở bề mặt. Sức căng bề mặt đi theo chiều nào?"
+   ],
+   "giai": "Chọn. X là chất giặt rửa: khi tan, nó dồn lên bề mặt và làm <b>giảm</b> sức căng bề mặt của nước, nhờ vậy nước thấm vào vải và vết bẩn dễ hơn. Nói \"lớn hơn nước\" là không đúng.",
+   "lab": null
+  }
+ ],
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "X có công thức phân tử là C18H29SO3Na"
+   ],
+   [
+    "B",
+    "X có đầu ưa nước là nhóm -SO3Na và phần gốc hydrocarbon là phần kị nước"
+   ],
+   [
+    "C",
+    "X thuộc loại muối sodium alkyl benzene sulfonate"
+   ],
+   [
+    "D",
+    "X cho vào nước tạo dung dịch có sức căng bề mặt lớn hơn nước"
+   ]
+  ],
+  "d": "D"
+ },
+ "ket": "Đáp án D",
+ "nho": "Chất giặt rửa có đầu ưa nước và đuôi kị nước, luôn làm giảm sức căng bề mặt của nước.",
+ "phepTinh": [
+  {
+   "ten": "Số H gốc dodecyl C12H25",
+   "bieuThuc": "2*12+1",
+   "ketQua": 25,
+   "lamTron": 0
+  },
+  {
+   "ten": "Số C của X",
+   "bieuThuc": "12+6",
+   "ketQua": 18,
+   "lamTron": 0
+  },
+  {
+   "ten": "Số H của X",
+   "bieuThuc": "25+4",
+   "ketQua": 29,
+   "lamTron": 0
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Sodium stearate ({C17H35COONa}) có công thức phân tử {C18H35O2Na}.",
+   "d": "D",
+   "giai": "Đúng. Gốc {C17H35}– có 17 C, cộng 1 C của nhóm –COO– được 18 C; H là 35, O là 2.",
+   "phepTinh": [
+    {
+     "ten": "Số C của sodium stearate",
+     "bieuThuc": "17+1",
+     "ketQua": 18,
+     "lamTron": 0
+    }
+   ]
+  },
+  {
+   "t": "Cho sodium dodecyl sulfate ({C12H25OSO3Na}) vào nước làm tăng sức căng bề mặt của nước.",
+   "d": "S",
+   "giai": "Sai. Chất này có đầu ưa nước –{OSO3Na} và đuôi kị nước {C12H25}–, là chất giặt rửa nên làm giảm sức căng bề mặt của nước.",
+   "phepTinh": []
+  }
+ ],
+ "canThayChot": []
+}

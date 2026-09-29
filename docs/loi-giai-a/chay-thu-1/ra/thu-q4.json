@@ -1,0 +1,263 @@
+{
+ "qid": "thu-q4",
+ "so": "Câu 8",
+ "nguon": "Sở Tuyên Quang lần 1 – 2026",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 8:</b> Aspirin (hay acetylsalicylic acid), là một dẫn xuất của salicylic acid được sử dụng để hạ sốt và giảm đau. Cho quy trình tổng hợp Aspirin trong phòng thí nghiệm như sau:</p>\n<p>– <b>Bước 1:</b> Cho 69 gam salicylic acid khan và 70,0 mL acetic anhydride (d = 1,08 g/mL) vào bình cầu 250 mL; thêm 3,0 mL sulfuric acid 98% vào và lắc kĩ. Sau đó, khuấy hỗn hợp phản ứng ở 50 – 60 °C trong khoảng 45 phút cho đến khi tan hết phần chất rắn.</p>\n<p>– <b>Bước 2:</b> Dùng nước đá để làm lạnh hỗn hợp phản ứng đến nhiệt độ nhỏ hơn 10 °C. Thêm từ từ 750 mL nước cất và khuấy kỹ, aspirin sẽ kết tủa. Lọc lấy sản phẩm bằng phễu lọc Buchner.</p>\n<p>– <b>Bước 3:</b> Hoà tan aspirin thô trong 150 mL ethanol 90° (cần đun nóng để tan hoàn toàn), sau đó đổ dung dịch này từ từ vào 375 mL nước nóng khoảng 50 °C. Nếu aspirin kết tủa lại thì cần đun nóng cho tan hết. Để nguội dung dịch thu được đến nhiệt độ phòng. Aspirin sẽ kết tinh dưới dạng tinh thể. Lọc và hút kiệt rồi sấy khô ở 50 °C.</p>\n<p>– <b>Bước 4:</b> Cân sản phẩm thu được 50,4 gam aspirin.</p>\n<div class=\"eq\">{HOC6H4COOH} + {(CH3CO)2O} → {CH3COOC6H4COOH} + {CH3COOH}</div>",
+ "ten": "Tổng hợp aspirin: hiệu suất, xúc tác acid, kết tinh lại",
+ "keys": [
+  "k4",
+  "k1",
+  "k3"
+ ],
+ "dung": [
+  {
+   "ic": "i-heat",
+   "t": "Phản ứng ở 50 – 60 °C",
+   "p": "69 g salicylic acid + 70,0 mL acetic anhydride + 3,0 mL {H2SO4} 98%, khuấy 45 phút đến khi tan hết chất rắn.",
+   "io": [
+    [
+     "in",
+     "salicylic acid"
+    ],
+    [
+     "in",
+     "acetic anhydride"
+    ],
+    [
+     "in",
+     "{H2SO4} xúc tác"
+    ]
+   ]
+  },
+  {
+   "ic": "i-ice",
+   "t": "Làm lạnh, thêm nước, lọc Buchner",
+   "p": "Hạ dưới 10 °C, thêm 750 mL nước: aspirin kết tủa; acetic acid và {H2SO4} tan, theo nước lọc ra ngoài.",
+   "io": [
+    [
+     "in",
+     "aspirin thô"
+    ],
+    [
+     "out",
+     "acetic acid, {H2SO4}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-crystal",
+   "t": "Kết tinh lại trong ethanol – nước",
+   "p": "Hoà tan aspirin thô trong ethanol nóng, đổ vào nước nóng rồi để nguội. Aspirin kết tinh, tạp chất ở lại dung dịch.",
+   "io": [
+    [
+     "in",
+     "tinh thể aspirin"
+    ],
+    [
+     "out",
+     "salicylic acid còn lại"
+    ]
+   ]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Sấy khô, cân",
+   "p": "Lọc, sấy ở 50 °C, cân được 50,4 g aspirin.",
+   "io": [
+    [
+     "in",
+     "50,4 g"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Hiệu suất của phản ứng tổng hợp aspirin ở thí nghiệm trên là 56%.",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "\"56%\" là con số cho sẵn → tự tính lại, nhớ chọn chất thiếu giữa salicylic acid và acetic anhydride.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: V → m → n của từng chất đầu, chọn chất thiếu, rồi mới tính lượng aspirin lí thuyết.",
+    "n(salicylic acid) = 69 ÷ 138 = 0,5 mol; n(acetic anhydride) = 70,0 × 1,08 ÷ 102 ≈ 0,741 mol → salicylic acid thiếu.",
+    "Lí thuyết 0,5 × 180 = 90 g aspirin; H = 50,4 ÷ 90 = 56%."
+   ],
+   "giai": "Đúng. Salicylic acid thiếu (0,5 mol) → lí thuyết 0,5 mol aspirin = 90 g; 50,4 ÷ 90 = 0,56 → 56%.",
+   "lab": [
+    "k4",
+    "aspirin"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Ở bước 2, chất rắn thu được chưa tinh khiết; bước 3 có vai trò loại bỏ acetic acid.",
+   "d": "S",
+   "k": "k1",
+   "bay": "tengoi",
+   "soi": "\"loại bỏ acetic acid\" → acetic acid đã đi đâu ở bước 2, và bước 3 thật ra nhắm vào tạp chất nào?",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: chất rắn lẫn tạp thì làm sạch bằng kết tinh lại. Hỏi từng tạp chất bị loại ở bước nào.",
+    "Bước 2 thêm 750 mL nước rồi lọc. Acetic acid (cả acetic anhydride dư gặp nước cũng thành acetic acid) nằm trong nước lọc hay đọng trên phễu?",
+    "Acetic acid tan vô hạn trong nước nên theo nước lọc ra ngay ở bước 2. Thứ còn lẫn trong chất rắn là salicylic acid chưa phản ứng; bước 3 nhắm vào nó."
+   ],
+   "giai": "Sai. Vế đầu đúng: aspirin thô còn lẫn tạp. Nhưng acetic acid tan tốt trong nước, đã theo nước lọc ra ở bước 2; bước 3 là kết tinh lại, chủ yếu để loại salicylic acid chưa phản ứng và các tạp chất khác.",
+   "lab": [
+    "k1",
+    "aspirin"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Có thể thay {H2SO4} 98% bằng dung dịch {H3PO4} 98%.",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "\"thay\" → phải biết {H2SO4} ở phản ứng này làm nhiệm vụ gì thì mới biết {H3PO4} làm thay được không.",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: {H2SO4} đặc thêm vào để làm gì? Thay bằng {H3PO4} có mất vai trò đó, có phá sản phẩm không?",
+    "Nhìn phương trình: sản phẩm phụ là {CH3COOH}, phản ứng không sinh ra nước.",
+    "Không có nước để hút, chỉ cần một xúc tác acid. {H3PO4} là acid, không có tính oxi hoá mạnh, không phá aspirin."
+   ],
+   "giai": "Đúng. Với acetic anhydride, phản ứng không sinh ra nước nên {H2SO4} ở đây chỉ làm xúc tác acid. {H3PO4} đặc cũng là acid, làm xúc tác được và ít gây phản ứng phụ hơn; nhiều quy trình điều chế aspirin dùng chính {H3PO4}.",
+   "lab": [
+    "k3",
+    "h3po4"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Phương pháp tinh chế được sử dụng ở thí nghiệm trên là phương pháp kết tinh lại.",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "\"kết tinh lại\" → đối chiếu cách làm ở bước 3 với đúng định nghĩa của phương pháp.",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: chất rắn lẫn tạp thì làm sạch bằng kết tinh lại. Bước nào ở đây làm sạch aspirin?",
+    "Bước 3: hoà tan aspirin thô trong dung môi nóng (ethanol, nước nóng), rồi để nguội đến nhiệt độ phòng.",
+    "Hoà tan nóng → để nguội → tinh thể tách ra, tạp chất ở lại dung dịch → lọc. Đó là các bước của phương pháp nào?"
+   ],
+   "giai": "Đúng. Bước 3 hoà tan chất rắn trong dung môi nóng rồi để nguội cho aspirin kết tinh, tạp chất ở lại dung dịch. Đó chính là kết tinh lại.",
+   "lab": [
+    "k1",
+    "aspirin"
+   ]
+  }
+ ],
+ "ket": "a Đ – b S – c Đ – d Đ",
+ "nho": "Hiệu suất tính theo chất thiếu; nước ở bước lọc cuốn đi acid tan, kết tinh lại loại tạp chất rắn.",
+ "phepTinh": [
+  {
+   "ten": "M salicylic acid (C7H6O3)",
+   "bieuThuc": "7*12+6*1+3*16",
+   "ketQua": 138,
+   "lamTron": 0
+  },
+  {
+   "ten": "M acetic anhydride (C4H6O3)",
+   "bieuThuc": "4*12+6*1+3*16",
+   "ketQua": 102,
+   "lamTron": 0
+  },
+  {
+   "ten": "M aspirin (C9H8O4)",
+   "bieuThuc": "9*12+8*1+4*16",
+   "ketQua": 180,
+   "lamTron": 0
+  },
+  {
+   "ten": "n salicylic acid",
+   "bieuThuc": "69/138",
+   "ketQua": 0.5,
+   "lamTron": 4
+  },
+  {
+   "ten": "m acetic anhydride",
+   "bieuThuc": "70.0*1.08",
+   "ketQua": 75.6,
+   "lamTron": 2
+  },
+  {
+   "ten": "n acetic anhydride",
+   "bieuThuc": "70.0*1.08/102",
+   "ketQua": 0.741,
+   "lamTron": 3
+  },
+  {
+   "ten": "m aspirin lí thuyết",
+   "bieuThuc": "0.5*180",
+   "ketQua": 90,
+   "lamTron": 2
+  },
+  {
+   "ten": "Hiệu suất (%)",
+   "bieuThuc": "50.4/90*100",
+   "ketQua": 56,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu dùng 55,2 gam salicylic acid khan (các dữ kiện khác giữ nguyên) và vẫn thu được 50,4 gam aspirin thì hiệu suất là 70%.",
+   "d": "D",
+   "giai": "Đúng. n(salicylic acid) = 55,2 ÷ 138 = 0,4 mol, vẫn thiếu so với 0,741 mol acetic anhydride. Lí thuyết 0,4 × 180 = 72 g; H = 50,4 ÷ 72 = 70%.",
+   "phepTinh": [
+    {
+     "ten": "n salicylic acid",
+     "bieuThuc": "55.2/138",
+     "ketQua": 0.4,
+     "lamTron": 4
+    },
+    {
+     "ten": "n acetic anhydride",
+     "bieuThuc": "70.0*1.08/102",
+     "ketQua": 0.741,
+     "lamTron": 3
+    },
+    {
+     "ten": "m aspirin lí thuyết",
+     "bieuThuc": "0.4*180",
+     "ketQua": 72,
+     "lamTron": 2
+    },
+    {
+     "ten": "H (%)",
+     "bieuThuc": "50.4/72*100",
+     "ketQua": 70,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Nếu chỉ dùng 42,5 mL acetic anhydride (d = 1,08 g/mL) với 69 gam salicylic acid và vẫn thu được 50,4 gam aspirin thì hiệu suất vẫn là 56%.",
+   "d": "S",
+   "giai": "Sai. n(acetic anhydride) = 42,5 × 1,08 ÷ 102 = 0,45 mol < 0,5 mol nên acetic anhydride thành chất thiếu. Lí thuyết 0,45 × 180 = 81 g; H = 50,4 ÷ 81 ≈ 62,2%.",
+   "phepTinh": [
+    {
+     "ten": "n acetic anhydride",
+     "bieuThuc": "42.5*1.08/102",
+     "ketQua": 0.45,
+     "lamTron": 4
+    },
+    {
+     "ten": "m aspirin lí thuyết",
+     "bieuThuc": "0.45*180",
+     "ketQua": 81,
+     "lamTron": 2
+    },
+    {
+     "ten": "H (%)",
+     "bieuThuc": "50.4/81*100",
+     "ketQua": 62.2,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "canThayChot": [
+  "Ý b: đáp án S dựa trên lập luận acetic acid tan trong nước, đã theo nước lọc ra ở bước 2, còn bước 3 nhắm vào salicylic acid chưa phản ứng. Nhưng ý chỉ nói bước 3 \"có vai trò\" loại acetic acid (không nói \"chỉ\"); kết tinh lại cũng cuốn đi phần acetic acid còn bám trên chất rắn, nên học sinh có thể cãi. Lời giải vẫn giữ S."
+ ]
+}

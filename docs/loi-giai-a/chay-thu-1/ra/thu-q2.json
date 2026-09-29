@@ -1,0 +1,220 @@
+{
+ "qid": "thu-q2",
+ "so": "Câu 34",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 34:</b> Isoamyl acetate (D = 0,876 g/mL) có mùi chuối nên được dùng làm hương liệu nhân tạo. Trong ngành sơn, isoamyl acetate được dùng làm dung môi sơn mài. Isoamyl acetate được điều chế theo các bước sau:</p>\n<p>– <b>Bước 1:</b> Cho vào bình cầu 15 mL isoamyl alcohol (D = 0,810 g/mL), 10 mL acetic acid (D = 1,049 g/mL) và 7,0 mL {H2SO4} đậm đặc, cho thêm vào bình vài viên đá bọt. Lắp ống sinh hàn hồi lưu thẳng đứng vào miệng bình cầu. Sau đó đun nóng bình cầu trong khoảng 1 giờ.</p>\n<p>– <b>Bước 2:</b> Sau khi đun, để nguội rồi rót sản phẩm vào phễu chiết, lắc đều rồi để yên khoảng 5 phút, chất lỏng tách thành hai lớp, loại bỏ phần chất lỏng phía dưới, lấy phần chất lỏng phía trên.</p>\n<p>– <b>Bước 3:</b> Cho từ từ dung dịch {Na2CO3} 10% vào phần chất lỏng thu lấy ở bước 2 và lắc đều cho đến khi không còn khí thoát ra, thêm tiếp 20 mL dung dịch NaCl bão hoà rồi để yên khi đó chất lỏng tách thành hai lớp. Chiết lấy phần chất lỏng phía trên, làm khan, ta thu được isoamyl acetate.</p>",
+ "ten": "Điều chế isoamyl acetate: hồi lưu, chiết, rửa, làm khan",
+ "keys": [
+  "k6",
+  "k3",
+  "k5",
+  "k4"
+ ],
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Đun hồi lưu 1 giờ",
+   "p": "Isoamyl alcohol + acetic acid + {H2SO4} đặc + đá bọt.",
+   "io": [
+    [
+     "in",
+     "isoamyl alcohol"
+    ],
+    [
+     "in",
+     "acetic acid"
+    ]
+   ]
+  },
+  {
+   "ic": "i-funnel",
+   "t": "Chiết, bỏ lớp dưới",
+   "p": "Lớp dưới nặng chứa nước và {H2SO4}; lớp trên chứa ester.",
+   "io": [
+    [
+     "out",
+     "lớp dưới"
+    ],
+    [
+     "in",
+     "lớp trên"
+    ]
+   ]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Rửa {Na2CO3}, thêm NaCl, chiết",
+   "p": "{Na2CO3} trung hoà acid còn lẫn; {NaCl} bão hoà giúp hai lớp tách gọn.",
+   "io": [
+    [
+     "out",
+     "{CO2}↑"
+    ],
+    [
+     "out",
+     "lớp nước"
+    ]
+   ]
+  },
+  {
+   "ic": "i-dry",
+   "t": "Làm khan",
+   "p": "Thu isoamyl acetate (D = 0,876 g/mL).",
+   "io": [
+    [
+     "in",
+     "isoamyl acetate"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Isoamyl acetate rất ít tan trong nước vì có khối lượng riêng nhỏ hơn khối lượng riêng của nước.",
+   "d": "S",
+   "k": "k6",
+   "bay": "nguyennhan",
+   "soi": "\"vì có khối lượng riêng nhỏ hơn\" → khối lượng riêng quyết định nổi hay chìm, không quyết định tan hay không.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: nổi hay chìm do khối lượng riêng; tan hay không do phân cực, liên kết hydrogen.",
+    "Tách hai vế: \"rất ít tan\" đúng chưa? D = 0,876 g/mL nhỏ hơn nước thì giải thích được điều gì?",
+    "D nhỏ chỉ cho biết lớp ester nằm trên. Hỏi tiếp: phân tử có nhóm –OH để tạo liên kết hydrogen với nước không, gốc hydrocarbon lớn hay nhỏ?"
+   ],
+   "giai": "Sai. Hiện tượng đúng nhưng nguyên nhân sai. Isoamyl acetate không có nhóm –OH nên liên kết hydrogen với nước yếu, lại có gốc hydrocarbon lớn kị nước, vì vậy rất ít tan. Khối lượng riêng nhỏ chỉ làm lớp ester nổi lên trên.",
+   "lab": [
+    "k6",
+    "tan"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Ở bước 3, không thể thay dung dịch {Na2CO3} bằng dung dịch NaOH dư.",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "\"NaOH dư\" → base mạnh, lại dư: ester trong phễu có còn nguyên không?",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: {Na2CO3} thêm vào để làm gì, thay bằng {NaOH} dư có phá sản phẩm không?",
+    "{Na2CO3} chỉ để trung hoà acid còn lẫn. Nhìn phản ứng của ester với dung dịch kiềm mạnh.",
+    "{CH3COOC5H11} + {NaOH} → {CH3COONa} + {C5H11OH}: {NaOH} dư xà phòng hoá luôn ester."
+   ],
+   "giai": "Đúng. {NaOH} dư thuỷ phân (xà phòng hoá) isoamyl acetate thành {CH3COONa} và isoamyl alcohol, làm mất sản phẩm. {Na2CO3} là base yếu, chỉ trung hoà acid mà không phá ester.",
+   "lab": [
+    "k3",
+    "naoh"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Ở bước 1, xảy ra phản ứng thế nhóm –OH của alcohol bằng gốc {CH3COO}–.",
+   "d": "S",
+   "k": "k5",
+   "bay": "doivai",
+   "soi": "\"–OH của alcohol\" → trong ester hoá, chất nào mất nhóm –OH: acid hay alcohol?",
+   "g": [
+    "Chìa khoá <b>Soi phân tử</b>: ester hoá thì acid mất –OH, alcohol mất H.",
+    "Viết phản ứng: {CH3COOH} + {C5H11OH} ⇌ {CH3COOC5H11} + {H2O}. Nhóm –OH tạo ra {H2O} lấy từ phân tử nào?",
+    "Acid nhường –OH, alcohol nhường H để tạo {H2O}. Đối chiếu với ý: nhóm –OH bị thế là của chất nào?"
+   ],
+   "giai": "Sai. Ester hoá là phản ứng thế nhóm –OH của <b>acid</b> bằng gốc {C5H11O}– của alcohol; alcohol chỉ mất nguyên tử H của nhóm –OH. Ý đã đổi vai hai chất.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "t": "Nếu hiệu suất phản ứng ester hoá là 54% và lượng isoamyl acetate bị hao hụt tối đa 6% thì thể tích isoamyl acetate thu được là 10,4 mL. <i>(Làm tròn kết quả đến hàng phần mười.)</i>",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "Con số 10,4 mL → tự tính theo chất thiếu, nhân hiệu suất, trừ hao hụt rồi đổi ra thể tích.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: V → m → n → chất thiếu → lí thuyết → × H → × (1 − hao hụt).",
+    "n(isoamyl alcohol) = 15 × 0,810 ÷ 88 ≈ 0,1381 mol; n(acetic acid) = 10 × 1,049 ÷ 60 ≈ 0,1748 mol → alcohol thiếu.",
+    "Lí thuyết 0,1381 × 130 ≈ 17,95 g; × 0,54 × 0,94 ≈ 9,11 g; V = 9,11 ÷ 0,876 ≈ 10,40 mL."
+   ],
+   "giai": "Đúng. Alcohol thiếu (≈ 0,1381 mol) → lí thuyết ≈ 17,95 g isoamyl acetate; thực tế 17,95 × 0,54 × 0,94 ≈ 9,11 g; V = 9,11 ÷ 0,876 ≈ 10,4 mL.",
+   "lab": [
+    "k4",
+    "iaac"
+   ]
+  }
+ ],
+ "ket": "a S – b Đ – c S – d Đ",
+ "nho": "Khối lượng riêng quyết định nổi hay chìm, không quyết định tan; ester hoá thì acid mất –OH, alcohol mất H.",
+ "phepTinh": [
+  {
+   "ten": "n isoamyl alcohol",
+   "bieuThuc": "15*0.810/88",
+   "ketQua": 0.1381,
+   "lamTron": 4
+  },
+  {
+   "ten": "n acetic acid",
+   "bieuThuc": "10*1.049/60",
+   "ketQua": 0.1748,
+   "lamTron": 4
+  },
+  {
+   "ten": "m ester lí thuyết",
+   "bieuThuc": "15*0.810/88*130",
+   "ketQua": 17.95,
+   "lamTron": 2
+  },
+  {
+   "ten": "m ester thu được",
+   "bieuThuc": "15*0.810/88*130*0.54*0.94",
+   "ketQua": 9.11,
+   "lamTron": 2
+  },
+  {
+   "ten": "V ester (mL)",
+   "bieuThuc": "15*0.810/88*130*0.54*0.94/0.876",
+   "ketQua": 10.4,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu thay 15 mL isoamyl alcohol bằng 20 mL isoamyl alcohol (D = 0,810 g/mL), các dữ kiện khác giữ nguyên (hiệu suất 54%, hao hụt 6%), thì thể tích isoamyl acetate thu được là 13,9 mL.",
+   "d": "S",
+   "giai": "Sai. n(isoamyl alcohol) = 20 × 0,810 ÷ 88 ≈ 0,1841 mol > n(acetic acid) ≈ 0,1748 mol nên acid thành chất thiếu. V = 0,1748 × 130 × 0,54 × 0,94 ÷ 0,876 ≈ 13,2 mL; số 13,9 mL là tính nhầm theo alcohol.",
+   "phepTinh": [
+    {
+     "ten": "n isoamyl alcohol",
+     "bieuThuc": "20*0.810/88",
+     "ketQua": 0.1841,
+     "lamTron": 4
+    },
+    {
+     "ten": "n acetic acid",
+     "bieuThuc": "10*1.049/60",
+     "ketQua": 0.1748,
+     "lamTron": 4
+    },
+    {
+     "ten": "V ester theo acid (mL)",
+     "bieuThuc": "10*1.049/60*130*0.54*0.94/0.876",
+     "ketQua": 13.2,
+     "lamTron": 1
+    },
+    {
+     "ten": "V ester nếu tính nhầm theo alcohol (mL)",
+     "bieuThuc": "20*0.810/88*130*0.54*0.94/0.876",
+     "ketQua": 13.9,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Trong phễu chiết, lớp ethyl acetate nằm trên lớp nước vì ethyl acetate ít tan trong nước.",
+   "d": "S",
+   "giai": "Sai. Ít tan chỉ giải thích vì sao có hai lớp. Lớp nào nằm trên do khối lượng riêng: ethyl acetate nhẹ hơn nước nên nổi lên.",
+   "phepTinh": []
+  }
+ ],
+ "canThayChot": [
+  "Ý d: đề ghi hao hụt \"tối đa\" 6% nên nói chặt thì thể tích thu được là \"ít nhất\" 10,4 mL, không phải đúng bằng 10,4 mL. Giữ đáp án Đ vì 10,4 mL chính là giá trị tính với hao hụt 6%; thầy xem có cần sửa chữ \"tối đa\" trong đề không."
+ ]
+}

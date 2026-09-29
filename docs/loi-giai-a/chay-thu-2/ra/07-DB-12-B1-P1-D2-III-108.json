@@ -1,0 +1,167 @@
+{
+ "qid": "DB-12-B1-P1-D2-III-108",
+ "so": "Câu 108",
+ "nguon": "DB-12-B1-P1-D2",
+ "dang": "tln",
+ "chuong": "Ester – lipid",
+ "de": "<p>Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau:<br>HOC₆H₄COOH+CH₃OH ⇌(H₂SO₄ đặc, t°) HOC₆H₄COOCH₃+H₂O salicylic acid methanol methyl salicylate Từ 18,63 tấn salicylic acid có thể sản xuất được tối đa x triệu tuýp thuốc xoa bóp giảm đau.<br>Biết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.<br>Giá trị của x là bao nhiêu?</p>",
+ "ten": "Sản xuất methyl salicylate: từ tấn nguyên liệu ra số tuýp thuốc",
+ "keys": [
+  "k5",
+  "k4"
+ ],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Soi phản ứng ester hoá",
+   "p": "Nhóm –COOH của salicylic acid mất –OH, methanol mất H; nhóm –OH gắn vòng giữ nguyên. Tỉ lệ mol 1 : 1.",
+   "io": [
+    [
+     "in",
+     "salicylic acid"
+    ],
+    [
+     "in",
+     "methanol"
+    ],
+    [
+     "out",
+     "{H2O}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Tính phân tử khối",
+   "p": "Salicylic acid {C7H6O3}: 138. Methyl salicylate {C8H8O3}: 152.",
+   "io": []
+  },
+  {
+   "ic": "i-chart",
+   "t": "Nhân hiệu suất 75%",
+   "p": "Lí thuyết 18,63 × 152 ÷ 138 = 20,52 tấn; thực tế 20,52 × 0,75 = 15,39 tấn.",
+   "io": [
+    [
+     "in",
+     "15,39 tấn ester"
+    ]
+   ]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Chia vào từng tuýp 2,7 g",
+   "p": "15,39 × 10<sup>6</sup> g ÷ 2,7 g = 5,7 × 10<sup>6</sup> tuýp, tức 5,7 triệu tuýp.",
+   "io": []
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "5,7",
+  "donVi": "triệu tuýp",
+  "k": "k4",
+  "bay": "conso",
+  "soi": "Ba chỗ dễ sót: tỉ lệ M 152 ÷ 138, nhân hiệu suất 75%, và đổi tấn ra gam rồi ra \"triệu\".",
+  "g": [
+   "Chìa khoá <b>Con số</b>: khối lượng chất đầu → khối lượng ester lí thuyết (tỉ lệ mol 1 : 1) → × H → chia cho khối lượng mỗi tuýp.",
+   "M(salicylic acid) = 138; M(methyl salicylate) = 152. Giữ đơn vị tấn, dùng tỉ lệ 152 ÷ 138, khỏi đổi ra mol.",
+   "m(ester) = 18,63 × 152 ÷ 138 × 0,75 = 15,39 tấn = 15,39 × 10<sup>6</sup> g. Chia cho 2,7 g mỗi tuýp, rồi đổi ra triệu."
+  ],
+  "giai": "Đáp số: 5,7. Tỉ lệ 1 : 1 nên m(ester lí thuyết) = 18,63 × 152 ÷ 138 = 20,52 tấn. Hiệu suất 75%: 20,52 × 0,75 = 15,39 tấn = 15,39 × 10<sup>6</sup> g. Số tuýp = 15,39 × 10<sup>6</sup> ÷ 2,7 = 5,7 × 10<sup>6</sup>, tức x = 5,7."
+ },
+ "ket": "Đáp số: 5,7",
+ "nho": "m(sản phẩm) = m(chất đầu) × M(sản phẩm) ÷ M(chất đầu) × H; giữ cùng đơn vị tấn rồi mới đổi ra gam.",
+ "phepTinh": [
+  {
+   "ten": "M salicylic acid C7H6O3",
+   "bieuThuc": "7*12+6*1+3*16",
+   "ketQua": 138,
+   "lamTron": 0
+  },
+  {
+   "ten": "M methyl salicylate C8H8O3",
+   "bieuThuc": "8*12+8*1+3*16",
+   "ketQua": 152,
+   "lamTron": 0
+  },
+  {
+   "ten": "n salicylic acid (triệu mol)",
+   "bieuThuc": "18.63/138",
+   "ketQua": 0.135,
+   "lamTron": 4
+  },
+  {
+   "ten": "m ester lí thuyết (tấn)",
+   "bieuThuc": "18.63*152/138",
+   "ketQua": 20.52,
+   "lamTron": 2
+  },
+  {
+   "ten": "m ester thực tế (tấn)",
+   "bieuThuc": "18.63*152/138*0.75",
+   "ketQua": 15.39,
+   "lamTron": 2
+  },
+  {
+   "ten": "x (triệu tuýp)",
+   "bieuThuc": "15.39*1000000/2.7/1000000",
+   "ketQua": 5.7,
+   "lamTron": 1,
+   "laDapSo": true
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu hiệu suất chỉ là 60%, các dữ kiện khác như đề, thì sản xuất được tối đa 4,56 triệu tuýp.",
+   "d": "D",
+   "giai": "Đúng. m(ester) = 20,52 × 0,60 = 12,312 tấn; 12,312 × 10<sup>6</sup> ÷ 2,7 = 4,56 × 10<sup>6</sup> tuýp.",
+   "phepTinh": [
+    {
+     "ten": "m ester thực tế (tấn)",
+     "bieuThuc": "18.63*152/138*0.60",
+     "ketQua": 12.312,
+     "lamTron": 3
+    },
+    {
+     "ten": "Số tuýp (triệu)",
+     "bieuThuc": "12.312/2.7",
+     "ketQua": 4.56,
+     "lamTron": 2
+    }
+   ]
+  },
+  {
+   "t": "Từ 27,6 tấn salicylic acid (hiệu suất 75%, mỗi tuýp 2,7 g methyl salicylate) sản xuất được tối đa khoảng 11,3 triệu tuýp.",
+   "d": "S",
+   "giai": "Sai. 11,3 triệu là kết quả khi quên nhân hiệu suất. Tính đúng: 27,6 × 152 ÷ 138 = 30,4 tấn; × 0,75 = 22,8 tấn; 22,8 × 10<sup>6</sup> ÷ 2,7 ≈ 8,44 × 10<sup>6</sup> tuýp, khoảng 8,4 triệu.",
+   "phepTinh": [
+    {
+     "ten": "m ester lí thuyết (tấn)",
+     "bieuThuc": "27.6*152/138",
+     "ketQua": 30.4,
+     "lamTron": 2
+    },
+    {
+     "ten": "Quên hiệu suất: số tuýp (triệu)",
+     "bieuThuc": "30.4/2.7",
+     "ketQua": 11.26,
+     "lamTron": 2
+    },
+    {
+     "ten": "m ester thực tế (tấn)",
+     "bieuThuc": "30.4*0.75",
+     "ketQua": 22.8,
+     "lamTron": 2
+    },
+    {
+     "ten": "Số tuýp đúng (triệu)",
+     "bieuThuc": "22.8/2.7",
+     "ketQua": 8.44,
+     "lamTron": 2
+    }
+   ]
+  }
+ ],
+ "canThayChot": [
+  "Trong đề, các nhãn \"salicylic acid methanol methyl salicylate\" bị dính liền sau phương trình (mất định dạng chú thích dưới từng chất); nên tách dòng hoặc bỏ."
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "qid": "12-KT-C1-D2-III-6",
+ "so": "Câu 6",
+ "nguon": "12-KT-C1-D2",
+ "chuong": "Ester – lipid",
+ "mucDo": "van_dung",
+ "dangBai": "ESTER.ESTER_HOA.TINH_HIEU_SUAT",
+ "de": "<p>Để điều chế isoamyl acetate trong phòng thí nghiệm, một học sinh đã đun nóng 4,00 mL acetic acid (D = 1,05 g/mL) với 8,00 mL isoamyl alcohol (CH3)2CHCH2CH2OH(D = 0,81 g/mL), có dung dịch H2SO4 đặc làm xúc tác, thu được 6,00 mL isoamyl acetate (D = 0,88 g/mL).<br>Tính hiệu suất của phản ứng trên. (Kết quả làm tròn đến hàng đơn vị). ------------------------- HẾT ------------------------- - Thí sinh không sử dụng tài liệu. - Giám thị không giải thích gì thêm.</p>",
+ "hinh": [],
+ "loiGiaiCo": {
+  "chot": "n(acetic acid) = 4,00 × 1,05 / 60 = 0,07 mol; n(isoamyl alcohol) = 8,00 × 0,81 / 88 ≈ 0,0736 mol.",
+  "tung": null,
+  "buoc": [
+   "n(acetic acid) = 4,00 × 1,05 / 60 = 0,07 mol; n(isoamyl alcohol) = 8,00 × 0,81 / 88 ≈ 0,0736 mol.",
+   "Acid thiếu hơn nên hiệu suất tính theo acid: lượng ester lí thuyết là 0,07 mol.",
+   "n(ester thực tế) = 6,00 × 0,88 / 130 ≈ 0,0406 mol, vậy H = 0,0406 / 0,07 ≈ 58%."
+  ],
+  "ket_qua": "58",
+  "trang_thai": "khop"
+ },
+ "dang": "tln",
+ "y": [],
+ "dapAn": {
+  "kq": "58"
+ }
+}

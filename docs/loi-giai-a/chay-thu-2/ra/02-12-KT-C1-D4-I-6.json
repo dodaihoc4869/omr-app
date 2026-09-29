@@ -1,0 +1,126 @@
+{
+ "qid": "12-KT-C1-D4-I-6",
+ "so": "Câu 6",
+ "nguon": "12-KT-C1-D4",
+ "dang": "tn",
+ "chuong": "Ester – lipid",
+ "de": "<p>Tổng hợp ethyl acetate trong phòng thí nghiệm từ nhóm hóa chất nào sau đây sẽ đạt hiệu quả cao nhất?</p>",
+ "ten": "Chọn hoá chất điều chế ethyl acetate cho hiệu suất cao nhất",
+ "keys": ["k3"],
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Ester hoá là thuận nghịch",
+   "p": "{CH3COOH} + {C2H5OH} ⇌ {CH3COOC2H5} + {H2O}. Nước sinh ra cùng phía với ester.",
+   "io": [["in", "acid"], ["in", "ethanol"], ["out", "{H2O}"]]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Soi lượng nước mang vào",
+   "p": "Dung dịch acid 5%, cồn 90°, cồn 96°, {HCl} 36,5% đều chứa nước. Nước càng nhiều, cân bằng càng lùi về chiều nghịch.",
+   "io": [["out", "nước lẫn trong chất đầu"]]
+  },
+  {
+   "ic": "i-dry",
+   "t": "{H2SO4} đặc: xúc tác + hút nước",
+   "p": "{H2SO4} 98% vừa tăng tốc phản ứng vừa giữ nước lại, kéo cân bằng về phía tạo ester.",
+   "io": [["in", "{H2SO4} 98%"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "t": "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H2SO4 98%",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "Kiểm từng chất: có mang nước vào không, và chất nào hút được nước.",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: ester hoá thuận nghịch, sinh ra {H2O}. Nước có sẵn trong bình làm cân bằng chuyển về phía nào?",
+    "Soi nồng độ trong từng nhóm: acid 5%, cồn 90°, cồn 96°, {HCl} 36,5% đều là dung dịch có nước.",
+    "Nhóm nào vừa không mang nước vào, vừa có chất hút nước làm xúc tác?"
+   ],
+   "giai": "Chọn. Acid và ethanol đều nguyên chất nên không mang nước vào; {H2SO4} 98% vừa xúc tác vừa hút nước, kéo cân bằng về phía tạo ester.",
+   "lab": ["k3", "h3po4"]
+  },
+  {
+   "id": "B",
+   "t": "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H2SO4 98%",
+   "d": "S",
+   "k": "k3",
+   "bay": "tengoi",
+   "soi": "\"Dung dịch 5%\" là giấm, không phải acetic acid nguyên chất.",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: dung dịch {CH3COOH} 5% có 95% là nước.",
+    "Lượng nước lớn như vậy đẩy cân bằng ester hoá về chiều nào?"
+   ],
+   "giai": "Loại. Dung dịch {CH3COOH} 5% có 95% là nước; nước dư đẩy cân bằng về chiều nghịch, hiệu suất rất thấp.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "t": "Acetic acid nguyên chất; cồn 90o; dung dịch H2SO4 98%",
+   "d": "S",
+   "k": "k3",
+   "bay": "conso",
+   "soi": "\"Cồn 90°\" nghe gần nguyên chất nhưng vẫn còn 10% nước.",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: cồn 90° nghĩa là 100 mL cồn có 90 mL ethanol, còn 10 mL nước.",
+    "So với ethanol nguyên chất ở nhóm A, nước thêm vào làm hiệu suất tăng hay giảm?"
+   ],
+   "giai": "Loại. Cồn 90° còn 10% nước theo thể tích; nước này làm cân bằng lùi về chiều nghịch nên kém nhóm A.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "t": "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%",
+   "d": "S",
+   "k": "k3",
+   "bay": "tengoi",
+   "soi": "{HCl} cũng là acid mạnh, nhưng dung dịch 36,5% mang nhiều nước và không hút nước.",
+   "g": [
+    "Chìa khoá <b>Vai trò hoá chất</b>: {H2SO4} đặc làm hai việc, xúc tác và hút nước. {HCl} 36,5% làm được việc nào?",
+    "Dung dịch {HCl} 36,5% có 63,5% là nước, cồn 96° còn 4% nước."
+   ],
+   "giai": "Loại. Dung dịch {HCl} 36,5% có 63,5% là nước, cồn 96° cũng còn nước, và {HCl} không hút nước như {H2SO4} đặc.",
+   "lab": ["k3", "h3po4"]
+  }
+ ],
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   ["A", "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H2SO4 98%"],
+   ["B", "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H2SO4 98%"],
+   ["C", "Acetic acid nguyên chất; cồn 90o; dung dịch H2SO4 98%"],
+   ["D", "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"]
+  ],
+  "d": "A"
+ },
+ "ket": "Đáp án A",
+ "nho": "Ester hoá thuận nghịch: chất đầu phải khan, {H2SO4} đặc vừa xúc tác vừa hút nước.",
+ "phepTinh": [
+  {"ten": "% nước trong dung dịch CH3COOH 5%", "bieuThuc": "100-5", "ketQua": 95, "lamTron": 0},
+  {"ten": "% nước (thể tích) trong cồn 90°", "bieuThuc": "100-90", "ketQua": 10, "lamTron": 0},
+  {"ten": "% nước (thể tích) trong cồn 96°", "bieuThuc": "100-96", "ketQua": 4, "lamTron": 0},
+  {"ten": "% nước trong dung dịch HCl 36,5%", "bieuThuc": "100-36.5", "ketQua": 63.5, "lamTron": 1}
+ ],
+ "tuongTu": [
+  {
+   "t": "Thay ethanol nguyên chất bằng cồn 70° (các chất khác như nhóm A) thì hiệu suất tạo ethyl acetate không đổi, vì {H2SO4} 98% đã có mặt.",
+   "d": "S",
+   "giai": "Sai. Cồn 70° mang vào 30% nước theo thể tích; lượng nước này đẩy cân bằng về chiều nghịch, {H2SO4} đặc không hút hết được nên hiệu suất giảm.",
+   "phepTinh": [
+    {"ten": "% nước (thể tích) trong cồn 70°", "bieuThuc": "100-70", "ketQua": 30, "lamTron": 0}
+   ]
+  },
+  {
+   "t": "Khi điều chế ethyl acetate, {H2SO4} đặc vừa làm xúc tác vừa hút nước, giúp cân bằng chuyển theo chiều tạo ester.",
+   "d": "D",
+   "giai": "Đúng. {H2SO4} đặc tăng tốc độ phản ứng và giữ lại nước sinh ra, nên cân bằng ester hoá chuyển sang phải.",
+   "phepTinh": []
+  }
+ ],
+ "canThayChot": [
+  "Đề và phương án ghi \"cồn 90o\", \"cồn 96o\": chữ o đang thay cho dấu độ (90°, 96°). Nên sửa hiển thị trong kho."
+ ]
+}

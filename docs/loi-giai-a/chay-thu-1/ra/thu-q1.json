@@ -1,0 +1,176 @@
+{
+ "qid": "thu-q1",
+ "so": "Câu 33",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "ten": "Chiết ethyl acetate bằng diethyl ether rồi chưng cất đuổi dung môi",
+ "keys": [
+  "k6",
+  "k1",
+  "k2"
+ ],
+ "de": "<p><b>Câu 33:</b> Một nhóm học sinh đã thực hiện phản ứng điều chế ethyl acetate từ nguyên liệu ban đầu là acetic acid và ethanol trong phòng thí nghiệm. Khi phản ứng kết thúc, nhóm đã thu được hỗn hợp sản phẩm gồm ethyl acetate và acetic acid, ethanol còn dư theo phương trình hoá học:</p>\n<div class=\"eq\">{CH3COOH} + {C2H5OH} ⇌ {CH3COOC2H5} + {H2O} &nbsp;<small>(H<sup>+</sup>, t°)</small></div>\n<p>Vì ethyl acetate không phân cực, còn acetic acid và ethanol đều phân cực nên nhóm đã dùng dung môi hữu cơ không phân cực diethyl ether ({C2H5OC2H5}) để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng.</p>",
+ "dung": [
+  {
+   "ic": "i-flask",
+   "t": "Ester hoá dừng ở cân bằng",
+   "p": "Bình chứa {CH3COOC2H5}, {H2O} cùng acetic acid và ethanol còn dư.",
+   "io": [
+    [
+     "in",
+     "ethyl acetate"
+    ],
+    [
+     "in",
+     "acid, ethanol dư"
+    ]
+   ]
+  },
+  {
+   "ic": "i-funnel",
+   "t": "Chiết bằng diethyl ether",
+   "p": "Ethyl acetate sang lớp ether; acid và ethanol ở lại lớp nước.",
+   "io": [
+    [
+     "in",
+     "lớp ether + ester"
+    ],
+    [
+     "out",
+     "lớp nước"
+    ]
+   ]
+  },
+  {
+   "ic": "i-distill",
+   "t": "Chưng cất đuổi ether",
+   "p": "Ether sôi 34,6 °C bay trước; ethyl acetate sôi 77,1 °C còn lại trong bình.",
+   "io": [
+    [
+     "out",
+     "ether"
+    ],
+    [
+     "in",
+     "ethyl acetate"
+    ]
+   ]
+  },
+  {
+   "ic": "i-heat",
+   "t": "Đun bằng nước nóng, không lửa",
+   "p": "Ether rất dễ cháy nên không dùng đèn cồn.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Diethyl ether là dung môi chiết lí tưởng trong thí nghiệm trên vì ethyl acetate tan tốt trong dung môi này, còn acetic acid và ethanol lại tan tốt trong nước.",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "\"tan tốt trong dung môi này\" và \"tan tốt trong nước\" → kiểm xem mỗi chất có tạo liên kết hydrogen với nước không.",
+   "g": [
+    "Chìa khoá <b>Tính chất vật lí</b>: tan hay không do phân cực và liên kết hydrogen. Mỗi chất ưa lớp nào?",
+    "Nhìn nhóm chức: acetic acid có –COOH, ethanol có –OH; ethyl acetate có –COO–, diethyl ether có –O–.",
+    "Acid và ethanol tạo liên kết hydrogen với nước nên ưa lớp nước; ester ít phân cực, sang lớp ether vốn không trộn với nước."
+   ],
+   "giai": "Đúng. Diethyl ether không trộn với nước nên tạo được hai lớp; ethyl acetate ít phân cực, tan tốt trong ether. Acetic acid và ethanol tạo liên kết hydrogen với nước nên ưu tiên ở lại lớp nước.",
+   "lab": [
+    "k6",
+    "tan"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Bằng phương pháp chưng cất đơn giản, ta có thể tách ethyl acetate ra khỏi dung môi diethyl ether sau khi chiết.",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "\"chưng cất đơn giản\" → phải kiểm nhiệt độ sôi của ether và ester chênh nhau nhiều hay ít.",
+   "g": [
+    "Chìa khoá <b>Tách chất</b>: sau khi chiết, ether và ester tan vào nhau thành một lớp. Một lớp thì so nhiệt độ sôi.",
+    "Ý c cho số: diethyl ether sôi 34,6 °C, ethyl acetate sôi 77,1 °C.",
+    "Hiệu số 77,1 − 34,6 = 42,5 °C: chênh nhiều thì dùng chưng cất thường."
+   ],
+   "giai": "Đúng. Ether và ester tạo một lớp, sôi cách nhau 42,5 °C. Chênh nhiều nên chưng cất thường là đủ: ether bay trước, ethyl acetate ở lại bình.",
+   "lab": [
+    "k1",
+    "q1"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Do diethyl ether có nhiệt độ sôi thấp hơn nhiều so với ethyl acetate (34,6 °C so với 77,1 °C) nên có thể thu được ethyl acetate sau khi chiết bằng cách dùng đèn cồn đun nhẹ cho dung môi diethyl ether bay hơi.",
+   "d": "S",
+   "k": "k2",
+   "bay": "antoan",
+   "soi": "\"dùng đèn cồn\": vế nhiệt độ sôi đúng, nhưng phải hỏi lửa trần gặp hơi ether thì sao.",
+   "g": [
+    "Chìa khoá <b>An toàn &amp; dụng cụ</b>: chất dễ cháy, sôi thấp thì không dùng lửa trần.",
+    "Diethyl ether sôi 34,6 °C, bay hơi rất mạnh và rất dễ cháy. Đèn cồn là nguồn nhiệt loại gì?",
+    "Hơi ether bay ra, lan tới ngọn lửa đèn cồn → bắt cháy, có thể gây nổ."
+   ],
+   "giai": "Sai. Vế nhiệt độ sôi đúng, nhưng diethyl ether rất dễ cháy; hơi ether bay ra gặp ngọn lửa đèn cồn sẽ bắt cháy. Phải đun bằng nguồn nhiệt không có lửa, như nước nóng.",
+   "lab": [
+    "k2",
+    "q1c"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Để an toàn, ta có thể dùng nước nóng liên tục tưới lên bình cầu trong phương pháp chưng cất đơn giản để tách ethyl acetate ra khỏi dung môi diethyl ether sau khi chiết.",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"nước nóng\" → kiểm hai điều: có lửa trần không, và có đủ nóng để ether sôi không.",
+   "g": [
+    "Chìa khoá <b>An toàn &amp; dụng cụ</b>: chất dễ cháy, sôi thấp thì dùng nước nóng; nguồn nhiệt phải nóng hơn nhiệt độ sôi.",
+    "Chất cần đuổi khỏi bình là diethyl ether, sôi 34,6 °C.",
+    "Nước nóng cao hơn 34,6 °C nên ether sôi được, mà không có ngọn lửa nào để hơi ether bắt cháy."
+   ],
+   "giai": "Đúng. Nước nóng không có lửa trần nên hơi ether không bắt cháy, lại nóng hơn 34,6 °C nên ether vẫn sôi và bay sang ống sinh hàn. Ethyl acetate sôi cao hơn nhiều nên còn lại trong bình.",
+   "lab": [
+    "k2",
+    "q1d"
+   ]
+  }
+ ],
+ "ket": "a Đ – b Đ – c S – d Đ",
+ "nho": "Chiết theo độ tan (phân cực, liên kết hydrogen); đuổi dung môi dễ cháy, sôi thấp bằng nước nóng, không dùng lửa trần.",
+ "phepTinh": [
+  {
+   "ten": "Hiệu nhiệt độ sôi ethyl acetate − diethyl ether (°C)",
+   "bieuThuc": "77.1-34.6",
+   "ketQua": 42.5,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Có thể dùng ethanol thay cho diethyl ether làm dung môi để chiết ethyl acetate ra khỏi hỗn hợp sau phản ứng.",
+   "d": "S",
+   "giai": "Sai. Ethanol tạo liên kết hydrogen với nước nên tan vô hạn trong nước, không tạo được hai lớp để chiết. Hơn nữa ethanol chính là chất cần loại khỏi sản phẩm.",
+   "phepTinh": []
+  },
+  {
+   "t": "Nếu dung môi chiết là một chất X sôi ở 70,0 °C thì vẫn tách tốt ethyl acetate (77,1 °C) ra khỏi X bằng chưng cất đơn giản.",
+   "d": "S",
+   "giai": "Sai. Hai chất chỉ chênh 77,1 − 70,0 = 7,1 °C nên khi X bay, hơi ethyl acetate bay theo nhiều. Chênh ít thì phải dùng chưng cất phân đoạn.",
+   "phepTinh": [
+    {
+     "ten": "Hiệu nhiệt độ sôi (°C)",
+     "bieuThuc": "77.1-70.0",
+     "ketQua": 7.1,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "canThayChot": [
+  "Đề viết \"ethyl acetate không phân cực\" là chưa chính xác: phân tử ethyl acetate có phân cực, chỉ kém acid và ethanol vì không tạo liên kết hydrogen giữa các phân tử. Lời giải dùng chữ \"ít phân cực\".",
+  "Ý a (đáp án Đ) có thể tranh luận ở chữ \"lí tưởng\": acetic acid và ethanol cũng tan tốt trong diethyl ether, còn ethyl acetate vẫn tan một phần trong nước, nên sự chia lớp không hoàn toàn. Lời giải giữ Đ theo lập luận phân cực của đề."
+ ]
+}

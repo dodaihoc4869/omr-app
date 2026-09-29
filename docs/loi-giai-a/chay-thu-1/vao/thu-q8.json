@@ -1,0 +1,54 @@
+{
+ "qid": "thu-q8",
+ "so": "Câu 50",
+ "nguon": "Đề thi thử",
+ "dang": "sai",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 50:</b> Khi các acid béo không no có nhiều liên kết đôi (C=C) thì nhiệt độ nóng chảy của nó sẽ bé hơn các acid béo có cùng số nguyên tử carbon nhưng ít liên kết đôi hơn. Phát biểu nào sau đây là <b>sai</b>?</p>\n<p class=\"note\">Đề in palmitic acid là {C15H29COOH}; công thức đúng của palmitic acid là {C15H31COOH} (acid béo no).</p>",
+ "y": [
+  {
+   "id": "A",
+   "t": "Khi trong phân tử acid béo có nhiều liên kết đôi thì mức độ cồng kềnh càng lớn và do đó sự sắp xếp giữa các phân tử trở nên kém đặc khít."
+  },
+  {
+   "id": "B",
+   "t": "Nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) sẽ cao hơn nhiệt độ nóng chảy của linoleic acid ({C17H31COOH})."
+  },
+  {
+   "id": "C",
+   "t": "Các phân tử acid béo no và không no đều có tương tác Van der Waals mạnh hơn so với các carboxylic acid có số nguyên tử carbon thấp."
+  },
+  {
+   "id": "D",
+   "t": "Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H29COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử."
+  }
+ ],
+ "dapAn": {
+  "A": "D",
+  "B": "D",
+  "C": "D",
+  "D": "S"
+ },
+ "mc": {
+  "hoi": "Phát biểu sai là",
+  "o": [
+   [
+    "A",
+    "Nhiều C=C → cồng kềnh, xếp kém khít"
+   ],
+   [
+    "B",
+    "Oleic nóng chảy cao hơn linoleic"
+   ],
+   [
+    "C",
+    "Van der Waals mạnh hơn acid ít carbon"
+   ],
+   [
+    "D",
+    "\"Chưa có cơ sở\" so sánh oleic với palmitic"
+   ]
+  ],
+  "dapAn": "D"
+ }
+}

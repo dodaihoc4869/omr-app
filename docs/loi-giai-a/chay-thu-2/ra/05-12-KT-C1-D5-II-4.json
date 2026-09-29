@@ -1,0 +1,225 @@
+{
+ "qid": "12-KT-C1-D5-II-4",
+ "so": "Câu 4",
+ "nguon": "12-KT-C1-D5",
+ "dang": "ds",
+ "chuong": "Ester – lipid",
+ "de": "<p>Khi nghiên cứu đặc điểm của phản ứng ester hoá để tổng hợp ethyl acetate, một nhóm học sinh dự đoán “nhiệt độ càng cao, hiệu suất phản ứng ester hoá càng cao”. Từ đó nhóm học sinh tiến hành thí nghiệm tổng hợp ethyl acetate với nồng độ ethyl alcohol và acetic acid không đổi nhưng thay đổi nhiệt độ phản ứng để kiểm tra dự đoán trên như sau:<br>Bước 1: Cho 32,5 mL ethyl alcohol, 30,0 mL acetic acid và 10,5 mL H2SO4 đặc vào bình cầu, lắc đều.<br>Bước 2: Lắp ống sinh hàn hồi lưu vào bình phản ứng và đun trên bếp cách thuỷ có điều chỉnh nhiệt độ ở nhiệt độ 60°C trong 60 phút. Tắt bếp và để nguội bình phản ứng.<br>Bước 3: Chưng cất tách hỗn hợp sản phẩm, tách ethyl acetate bằng phễu chiết, rửa sạch, làm khô bằng CaCl2 khan.<br>Bước 4: Tiến hành chưng cất lại ethyl acetate bằng hệ sinh hàn ở khoảng nhiệt độ 77°C, thu ethyl acetate và đong thể tích ethyl acetate thu được bằng ống đong. Lặp lại thí nghiệm trên, chỉ thay đổi nhiệt độ ở bước 2 lần lượt là 65; 70; 75; 80; 85.<br>Nhóm học sinh ghi lại thể tích ethyl acetate thu được với thời gian thí nghiệm tương ứng và kết quả ở bảng sau: Nhiệt độ (°C) 60 65 70 75 80 85 Thể tích ethyl acetate (mL) 25,8 30,5 35,1 39,8 36,6 32,9</p><div class=\"tbl\"><table><tr><th>Nhiệt độ (°C)</th><th>60</th><th>65</th><th>70</th><th>75</th><th>80</th><th>85</th></tr><tr><td>Thể tích ethyl acetate (mL)</td><td>25,8</td><td>30,5</td><td>35,1</td><td>39,8</td><td>36,6</td><td>32,9</td></tr></table></div>",
+ "ten": "Ảnh hưởng của nhiệt độ đến hiệu suất tổng hợp ethyl acetate",
+ "keys": [
+  "k4"
+ ],
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Hồi lưu 60 phút, cách thuỷ",
+   "p": "32,5 mL ethanol + 30,0 mL acetic acid + 10,5 mL {H2SO4} đặc, giữ ở một nhiệt độ cố định.",
+   "io": [
+    [
+     "in",
+     "ethanol"
+    ],
+    [
+     "in",
+     "acetic acid"
+    ]
+   ]
+  },
+  {
+   "ic": "i-distill",
+   "t": "Tách, làm khô, chưng cất lại",
+   "p": "Chưng cất, chiết, rửa, làm khô bằng {CaCl2} khan, rồi lấy phần sôi khoảng 77 °C và đong thể tích.",
+   "io": [
+    [
+     "out",
+     "nước, acid, alcohol"
+    ],
+    [
+     "in",
+     "ethyl acetate"
+    ]
+   ]
+  },
+  {
+   "ic": "i-thermo",
+   "t": "Chỉ đổi nhiệt độ ở bước 2",
+   "p": "60 → 85 °C, mỗi lần tăng 5 °C. Lượng chất đầu giữ nguyên nên thể tích ester phản ánh hiệu suất.",
+   "io": []
+  },
+  {
+   "ic": "i-chart",
+   "t": "Đọc bảng: đỉnh ở 75 °C",
+   "p": "Thể tích tăng đến 39,8 mL ở 75 °C rồi giảm còn 36,6 mL và 32,9 mL.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "t": "Theo kết quả thí nghiệm trên, thể tích ethyl acetate thu được ở 70°C là nhiều nhất.",
+   "d": "S",
+   "k": "k4",
+   "bay": "conso",
+   "soi": "\"nhiều nhất\" → phải so cả 6 giá trị, không dừng ở 70 °C.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: \"nhiều nhất\" là giá trị lớn nhất trên cả dãy, tức là đỉnh.",
+    "Đọc hết hàng thể tích: 25,8; 30,5; 35,1; 39,8; 36,6; 32,9 mL.",
+    "So 70 °C với 75 °C: 39,8 − 35,1 = 4,7 mL. Đỉnh nằm ở cột nào?"
+   ],
+   "giai": "Sai. Ở 70 °C thu 35,1 mL, còn ở 75 °C thu 39,8 mL, nhiều hơn 4,7 mL. Nhiều nhất là ở 75 °C.",
+   "lab": [
+    "k4",
+    "bang-q7"
+   ]
+  },
+  {
+   "id": "b",
+   "t": "Với các giá trị nhiệt độ khảo sát, phản ứng ester hoá tạo ethyl acetate ở 80°C có hiệu suất cao hơn ở 60°C.",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "Cùng lượng chất đầu, thể tích ester nhiều hơn thì hiệu suất cao hơn; chỉ cần so hai cột 80 °C và 60 °C.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: lượng acid và alcohol giữ nguyên, nên thể tích ester thu được đi cùng chiều với hiệu suất.",
+    "Đọc hai cột: 60 °C được 25,8 mL; 80 °C được 36,6 mL.",
+    "36,6 − 25,8 = 10,8 mL. Cột nào nhiều hơn?"
+   ],
+   "giai": "Đúng. Cùng lượng chất đầu, ở 80 °C thu 36,6 mL, nhiều hơn 10,8 mL so với 25,8 mL ở 60 °C, nên hiệu suất cao hơn.",
+   "lab": [
+    "k4",
+    "bang-q7"
+   ]
+  },
+  {
+   "id": "c",
+   "t": "Số liệu cho thấy phản ứng có nhiệt độ tối ưu ở 75°C, sau đó hiệu suất tổng hợp ethyl acetate giảm.",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "\"tối ưu\" là đỉnh; kiểm cả hai phía của 75 °C.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: \"tối ưu\" là <b>đỉnh</b> của dãy, hai bên đỉnh đều thấp hơn.",
+    "Trước 75 °C: 25,8 → 30,5 → 35,1 → 39,8 mL. Sau 75 °C: 36,6 → 32,9 mL.",
+    "39,8 − 36,6 = 3,2 mL; 36,6 − 32,9 = 3,7 mL. Sau 75 °C thể tích đi theo chiều nào?"
+   ],
+   "giai": "Đúng. Thể tích tăng đến 39,8 mL ở 75 °C rồi giảm còn 36,6 mL (80 °C) và 32,9 mL (85 °C). Trong các mức khảo sát, 75 °C là nhiệt độ tối ưu.",
+   "lab": [
+    "k4",
+    "bang-q7"
+   ]
+  },
+  {
+   "id": "d",
+   "t": "Từ kết quả thí nghiệm, kết luận được khi nhiệt độ tăng thì hiệu suất phản ứng ester hoá càng tăng.",
+   "d": "S",
+   "k": "k4",
+   "bay": "xuhuong",
+   "soi": "\"càng … càng\" phải đúng trên cả dãy; tìm chỗ đổi chiều.",
+   "g": [
+    "Chìa khoá <b>Con số</b>: kết luận \"càng… càng\" phải đúng trên <b>cả dãy</b>; chỉ một đoạn ngược là không kết luận được.",
+    "Nhìn đoạn 75 → 80 → 85 °C.",
+    "Nhiệt độ tăng từ 75 lên 85 °C mà thể tích đi từ 39,8 xuống 32,9 mL (giảm 6,9 mL)."
+   ],
+   "giai": "Sai. Hiệu suất chỉ tăng từ 60 đến 75 °C; từ 75 lên 85 °C thể tích giảm từ 39,8 còn 32,9 mL. Dự đoán của nhóm bị chính số liệu bác bỏ.",
+   "lab": [
+    "k4",
+    "bang-q7"
+   ]
+  }
+ ],
+ "ket": "a S – b Đ – c Đ – d S",
+ "nho": "\"Tối ưu\" là đỉnh của dãy; \"càng… càng\" phải đúng trên cả dãy, một đoạn ngược là sai.",
+ "phepTinh": [
+  {
+   "ten": "Tăng 60 → 65 °C (mL)",
+   "bieuThuc": "30.5-25.8",
+   "ketQua": 4.7,
+   "lamTron": 1
+  },
+  {
+   "ten": "Tăng 65 → 70 °C (mL)",
+   "bieuThuc": "35.1-30.5",
+   "ketQua": 4.6,
+   "lamTron": 1
+  },
+  {
+   "ten": "Tăng 70 → 75 °C (mL)",
+   "bieuThuc": "39.8-35.1",
+   "ketQua": 4.7,
+   "lamTron": 1
+  },
+  {
+   "ten": "Giảm 75 → 80 °C (mL)",
+   "bieuThuc": "39.8-36.6",
+   "ketQua": 3.2,
+   "lamTron": 1
+  },
+  {
+   "ten": "Giảm 80 → 85 °C (mL)",
+   "bieuThuc": "36.6-32.9",
+   "ketQua": 3.7,
+   "lamTron": 1
+  },
+  {
+   "ten": "Giảm 75 → 85 °C (mL)",
+   "bieuThuc": "39.8-32.9",
+   "ketQua": 6.9,
+   "lamTron": 1
+  },
+  {
+   "ten": "Hơn kém 80 °C so với 60 °C (mL)",
+   "bieuThuc": "36.6-25.8",
+   "ketQua": 10.8,
+   "lamTron": 1
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Theo bảng trong đề, khi tăng từ 60 °C lên 65 °C, thể tích ethyl acetate tăng nhiều hơn khi tăng từ 65 °C lên 70 °C.",
+   "d": "D",
+   "giai": "Đúng. Từ 60 lên 65 °C tăng 30,5 − 25,8 = 4,7 mL; từ 65 lên 70 °C tăng 35,1 − 30,5 = 4,6 mL. 4,7 mL lớn hơn 4,6 mL.",
+   "phepTinh": [
+    {
+     "ten": "Tăng 60 → 65 °C (mL)",
+     "bieuThuc": "30.5-25.8",
+     "ketQua": 4.7,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 65 → 70 °C (mL)",
+     "bieuThuc": "35.1-30.5",
+     "ketQua": 4.6,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Một nhóm khác thu được 20,4; 24,9; 27,6; 28,1 mL ethyl acetate ở 60; 65; 70; 75 °C. Nhóm kết luận: nhiệt độ càng cao thì thể tích tăng thêm càng nhiều.",
+   "d": "S",
+   "giai": "Sai. Mức tăng lần lượt là 4,5; 2,7; 0,5 mL: thể tích vẫn tăng nhưng tăng chậm dần, không phải tăng thêm càng nhiều.",
+   "phepTinh": [
+    {
+     "ten": "Tăng 60 → 65 °C (mL)",
+     "bieuThuc": "24.9-20.4",
+     "ketQua": 4.5,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 65 → 70 °C (mL)",
+     "bieuThuc": "27.6-24.9",
+     "ketQua": 2.7,
+     "lamTron": 1
+    },
+    {
+     "ten": "Tăng 70 → 75 °C (mL)",
+     "bieuThuc": "28.1-27.6",
+     "ketQua": 0.5,
+     "lamTron": 1
+    }
+   ]
+  }
+ ],
+ "canThayChot": [
+  "Đề lặp bảng số liệu dưới dạng chữ ngay trước bảng; câu dẫn nói ghi \"thể tích … với thời gian thí nghiệm tương ứng\" nhưng bảng chỉ có nhiệt độ và thể tích."
+ ]
+}
