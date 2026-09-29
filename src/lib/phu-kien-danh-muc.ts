@@ -1,6 +1,7 @@
 // DANH MỤC PHỤ KIỆN THẦN THÚ — 40 món, nguồn DUY NHẤT cho máy chủ và giao diện (hợp đồng docs/hop-dong-shop-phu-kien-2109.md mục 1; bảng giá + chữ đã chốt: DE-XUAT-SHOP-PHU-KIEN-2109.md mục 3, chữ commit 7655c2c).
 // Giá và điều kiện học ĐI QUA SOÁT COMMIT + test khoá (tests/phu-kien-danh-muc-2109.test.ts); máy chủ luôn là nơi quyết giá (giao diện gửi lại `giaThay`, lệch ⇒ `gia_doi`). KHÔNG dùng API riêng của trình duyệt (máy chủ nhập tệp này).
 // Mã = tiền tố chỗ đeo + số thứ tự trong chỗ đeo (đúng sổ hình của Code 4: src/game/than-thu-v2/phu-kien/phu-kien-mon.ts): HQ Vòng sáng · VD Đuôi sáng · KT Khung tên · DA Trên đầu · CL Trên lưng.
+import { CAP_MO_BAC_PHU_KIEN } from './kinh-te-game'
 export const PHIEN_BAN = 'm1-v1'
 /** Mùa bán hiện tại (chữ "Mùa 1" hiện trên màn). */
 export const MUA_BAN = 'm1'
@@ -29,8 +30,10 @@ export interface MonPhuKien {
   suatTong: number | null
   /** 1 = đợt 1 (24 món); 2 = đợt 2 (16 món, chờ bảng điểm đặt theo loài). */
   moBan: 1 | 2
+  /** v5 (thầy chốt 29/09, điểm 3 — chỉ thêm): cần thần thú cấp ≥ N; null = không khoá cấp. Theo bậc: `CAP_MO_BAC_PHU_KIEN` (bậc 4 = 10, bậc 5 = 20). */
+  canCap: number | null
 }
-const m = (ma: string, o: OGanPhuKien, bac: BacPhuKien, gia: number, ten: string, batMi: string, canChuoiNgay: number | null, canAnThach: number | null, suatTong: number | null, moBan: 1 | 2): MonPhuKien => ({ ma, o, bac, gia, ten, batMi, canChuoiNgay, canAnThach, suatTong, moBan })
+const m = (ma: string, o: OGanPhuKien, bac: BacPhuKien, gia: number, ten: string, batMi: string, canChuoiNgay: number | null, canAnThach: number | null, suatTong: number | null, moBan: 1 | 2): MonPhuKien => ({ ma, o, bac, gia, ten, batMi, canChuoiNgay, canAnThach, suatTong, moBan, canCap: CAP_MO_BAC_PHU_KIEN[bac] })
 
 /**
  * BẢNG GIÁ v4 (thầy chốt 29/09, docs/DE-XUAT-EXP-2909.md mục 2.6): giá = làmTròn10(63 × số ngày), 63 = vàng/ngày của em trung bình (vàng tự động 1 / 5 EXP).

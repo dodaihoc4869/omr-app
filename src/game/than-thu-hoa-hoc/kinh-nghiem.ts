@@ -35,6 +35,7 @@
  * Chú thích "ĐƯỜNG EXP 120 CẤP — BA ĐOẠN" bên dưới là lịch sử của đường cũ.
  */
 import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
+import { BANG_TONG_EXP_V5 } from '../../lib/kinh-te-game'
 
 /**
  * (LỊCH SỬ — ĐƯỜNG CŨ, nay chỉ còn ở `thanhExpCu`.) ĐƯỜNG EXP 120 CẤP — BA ĐOẠN, khớp đúng hai mốc thầy chốt 15-09:
@@ -62,17 +63,23 @@ export const CAP_DOC = 10
 export const CAP_DAI = 13
 
 /**
- * ĐƯỜNG CẤP v4 (thầy chốt 29/09/2026, `docs/DE-XUAT-EXP-2909.md` mục 2.2) — NẠP TỰ DO, cấp 10 đúng ngày 21 của em chăm nhất.
- *   cấp 1–9 : thanh(c) = làmTròn10(K · c^1,6), K = 87,49 để tổng 9 thanh = 11 700 (thanh 9 bù phần lệch làm tròn) ⇒ 9 SỐ VIẾT THẲNG dưới đây;
- *   cấp ≥ 10: thanh(c) = thanh(9) + 60·(c − 9) — tính bằng số nguyên, không có mũ, máy chủ và máy em ra CÙNG số.
- * Tổng tới cấp: 10 = 11 700 · 20 = 44 300 · 30 = 82 900 · 50 = 178 100 · 100 = 521 100 · 120 = 700 300. Thanh không bao giờ ngắn lại.
- * `BANG_THANH_EXP_V3` (đường 21/09, tổng 238 200) GIỮ NGUYÊN chỉ để chuyển hồ sơ v3 → v4 (giữ tiến độ trong thanh theo tỉ lệ) và cho lớp P08 (cửa đóng) còn đứng trên luật cũ.
+ * ĐƯỜNG CẤP v5 (THẦY ĐÃ CHỐT 29/09/2026, `docs/DE-XUAT-EXP-V5-2909.md`): cấp c cần ĐỦ tổng EXP T(c) VÀ đủ D(c) ngày đạt (cổng ngày ở `src/lib/hap-thu-ngay.ts` `nhanV5`).
+ * Thanh = T(c + 1) − T(c), T lấy từ bảng số nguyên viết thẳng `BANG_TONG_EXP_V5` (một nguồn: `src/lib/kinh-te-game.ts`). Thanh: 100 · 750 · 1 010 · 1 210 · 1 410 · …;
+ * tổng tới cấp 10 = 11 690 · 20 = 38 310 · 120 = 683 720. Thanh không bao giờ ngắn lại.
+ * `BANG_THANH_EXP_V4` và `BANG_THANH_EXP_V3` GIỮ NGUYÊN chỉ để chuyển hồ sơ cũ (giữ tiến độ trong thanh theo tỉ lệ) và cho lớp P08 (cửa đóng).
+ */
+/** `BANG_THANH_EXP[c − 1]` là EXP để đi từ cấp `c` lên cấp `c + 1` (c = 1…119), đường v5. */
+export const BANG_THANH_EXP: readonly number[] = Object.freeze(
+  Array.from({ length: CAP_TOI_DA - 1 }, (_, i) => BANG_TONG_EXP_V5[i + 2]! - BANG_TONG_EXP_V5[i + 1]!),
+)
+
+/**
+ * (LỊCH SỬ v4, 29/09 sáng) cấp 1–9: làmTròn10(87,49·c^1,6) viết thẳng; từ cấp 10: thanh(9) + 60·(c − 9). Tổng tới cấp 10 = 11 700, tới 120 = 700 300. Chỉ để chuyển v4 → v5.
  */
 export const THANH_DAU_V4 = [90, 270, 510, 800, 1150, 1540, 1970, 2440, 2930] as const
-/** Mỗi cấp từ cấp 10 dài hơn cấp trước chừng này EXP. */
+/** (v4) Mỗi cấp từ cấp 10 dài hơn cấp trước chừng này EXP. */
 export const BUOC_THANH_V4 = 60
-/** `BANG_THANH_EXP[c − 1]` là EXP để đi từ cấp `c` lên cấp `c + 1` (c = 1…119). */
-export const BANG_THANH_EXP: readonly number[] = Object.freeze(
+export const BANG_THANH_EXP_V4: readonly number[] = Object.freeze(
   Array.from({ length: CAP_TOI_DA - 1 }, (_, i) => (i < 9 ? THANH_DAU_V4[i]! : THANH_DAU_V4[8] + BUOC_THANH_V4 * (i + 1 - 9))),
 )
 
@@ -96,7 +103,7 @@ export const BANG_THANH_EXP_V3: readonly number[] = [
 ]
 
 /**
- * Thanh EXP của một cấp (đường MỚI v4, tra bảng). Cấp 120 là tối đa nên trả 0 — hết đường lên. Cấp lẻ được làm tròn, cấp < 1 tính như cấp 1.
+ * Thanh EXP của một cấp (đường v5, tra bảng). Cấp 120 là tối đa nên trả 0 — hết đường lên. Cấp lẻ được làm tròn, cấp < 1 tính như cấp 1.
  */
 export function thanhExp(cap: number): number {
   if (cap >= CAP_TOI_DA) return 0
@@ -105,11 +112,25 @@ export function thanhExp(cap: number): number {
   return BANG_THANH_EXP[c - 1] ?? 0
 }
 
-/** Tổng EXP phải có để ĐẠT tới cấp `cap` từ cấp 1 (cấp 1 = 0; cấp 10 = 11 700; cấp 120 = 700 300). */
+/** Tổng EXP phải có để ĐẠT tới cấp `cap` từ cấp 1 (v5: cấp 1 = 0; cấp 10 = 11 690; cấp 120 = 683 720) — tra thẳng `BANG_TONG_EXP_V5`. */
 export function tongExpToiCap(cap: number): number {
   const c = Math.min(CAP_TOI_DA, Math.max(1, Math.round(cap)))
+  return BANG_TONG_EXP_V5[c] ?? 0
+}
+
+/** Thanh EXP theo đường v4 (29/09 sáng). CHỈ để chuyển hồ sơ v4 → v5. */
+export function thanhExpV4(cap: number): number {
+  if (cap >= CAP_TOI_DA) return 0
+  const c = Math.max(1, Math.round(cap))
+  if (c >= CAP_TOI_DA) return 0
+  return BANG_THANH_EXP_V4[c - 1] ?? 0
+}
+
+/** Tổng EXP tới cấp theo đường v4 (cấp 10 = 11 700; cấp 120 = 700 300). CHỈ để chuyển đổi. */
+export function tongExpToiCapV4(cap: number): number {
+  const c = Math.min(CAP_TOI_DA, Math.max(1, Math.round(cap)))
   let t = 0
-  for (let i = 1; i < c; i++) t += thanhExp(i)
+  for (let i = 1; i < c; i++) t += thanhExpV4(i)
   return t
 }
 
@@ -160,7 +181,7 @@ export function thanhExpCu(cap: number): number {
  */
 export const SUC_CHUA_ONG = 50000
 
-/** Tổng EXP phải kiếm để đi từ cấp 1 tới cấp 120 (đường v4: 700 300). */
+/** Tổng EXP phải kiếm để đi từ cấp 1 tới cấp 120 (đường v5: 683 720). */
 export function tongExpToiDinh(): number {
   let t = 0
   for (let c = 1; c < CAP_TOI_DA; c++) t += thanhExp(c)
