@@ -139,7 +139,7 @@ export class VanMang extends VanBia {
       if (su.ghe !== this.em) this.ptNhanh(su.dung ? `${this.ten(su.ghe)} giải trước bi ${su.ki}: đúng, bi hoá vàng` : `${this.ten(su.ghe)} giải trước bi ${su.ki}: chưa đúng`)
     } else if (su.k === 'het_gio') this.bao(`Hết ${GIAY_CU} giây`, `Sang lượt ${this.ghe[S.cur]!.ten}`, '', 1400)
     else if (su.k === 'ghe_ai') this.bao(`${this.ghe[su.ghe]!.ten} ${su.lyDo === 'bo' ? 'đã rời ván' : 'mất kết nối quá 60 giây'}`, 'A.I đánh thay ghế này · ván không tính Điểm bàn', '', 2200)
-    if (S.cur === this.em && curCu !== this.em && !S.over && !S.cho.length) { this.sk.am('luot'); this.bao('Lượt của em', this.ballInHand ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Chạm bàn để nhắm', '', 1300) }
+    if (S.cur === this.em && curCu !== this.em && !S.over && !S.cho.length) { this.sk.am('luot'); this.bao('Lượt của em', this.ballInHand ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Cầm gậy kéo để xoay', '', 1300) }
   }
   private hieuUngAn(id: KiHieu): void {
     const v = this.viTriLo[id] ?? { x: W / 2, y: H / 2 }, x = Math.max(30, Math.min(W - 30, v.x)), y = Math.max(40, Math.min(H - 20, v.y))

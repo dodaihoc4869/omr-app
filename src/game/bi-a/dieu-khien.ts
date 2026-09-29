@@ -179,6 +179,11 @@ export class VanBia {
     const c = this.bi_('cue'), dx = p.x - c.x, dy = p.y - c.y, d = Math.hypot(dx, dy)
     if (d > 4) this.aim = { x: dx / d, y: dy / d }
   }
+  /** Đặt hướng bắn (vector bất kỳ ≠ 0, tự chuẩn hoá) — dùng khi em cầm gậy xoay (gay.ts). */
+  datHuong(a: { x: number; y: number }): void {
+    const d = Math.hypot(a.x, a.y)
+    if (d > 1e-6 && Number.isFinite(d)) this.aim = { x: a.x / d, y: a.y / d }
+  }
   xoayNham(doDo: number): void {
     const a = doDo * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a), x = this.aim.x
     this.aim = { x: x * cs - this.aim.y * sn, y: x * sn + this.aim.y * cs }
@@ -362,7 +367,7 @@ export class VanBia {
       if (this.pha === 'over') return
       this.cur = tiepTheo(this.cur, this.ghe.length); this.ballInHand = datBiCai; this.spin = { x: 0, y: 0 }
       const me = this.ghe[this.cur]!
-      if (!me.ai) this.bao('Lượt của em', datBiCai ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Chạm bàn để nhắm', '', 1300)
+      if (!me.ai) this.bao('Lượt của em', datBiCai ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Cầm gậy kéo để xoay', '', 1300)
       else this.bao(`Lượt của ${me.ten}`, me.doi === this.ghe[this.em]!.doi ? 'Đồng đội đang đánh · em giải trước được' : this.loai === 'giao_huu' ? '' : 'Chạm ô ở hàng “Bi của em” để giải trước', '', 1500)
       this.sk.am('luot')
       this.batDauLuot(true)
