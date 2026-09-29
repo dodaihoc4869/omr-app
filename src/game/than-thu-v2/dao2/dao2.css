@@ -483,3 +483,8 @@
 .dao2-chan-hang{flex-wrap:wrap}
 .dao2-chan-hang .lg-nut-hang{padding:0;flex:0 0 auto;gap:6px}
 .dao.dao2 .dao2-chan-hang button.dao2-nut-chot{flex:1 1 100%}
+/* CẢNH TRẬN DÍNH ĐẦU MÀN (29/09, thầy: "phần bài tập trượt xuống dưới chỗ thú tung chưởng, lúc nào cũng nhìn được thú"): điện thoại dọc ⇒ cảnh trận
+ * position:sticky ở mép trên, thẻ câu cuộn trượt BÊN DƯỚI cảnh; cảnh thấp lại một chút để đề còn đủ chỗ. Máy ngang/máy tính đã có bố cục hai cột riêng. */
+@media (max-width:1023px) and (orientation:portrait){
+ .dao2 .dao2-canh{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;height:clamp(130px,22vh,190px);box-shadow:0 10px 18px -8px rgba(0,0,0,.55)}
+}
