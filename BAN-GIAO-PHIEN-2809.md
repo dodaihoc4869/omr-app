@@ -117,3 +117,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 13:16 · Deploy #571 THÀNH CÔNG: PR #73 Bi-a mượt · main b51090f · lùi: git revert -m 1 b51090f.
 - 13:16 · Deploy #571 PR #73 Bi-a xong. 13:31 gộp PR #75 Đảo 2 cảnh trận dính đầu màn (main acef1e2, 0 ca mở) · lùi: git revert -m 1 acef1e2. PR #74 EXP v4 đang bổ sung hiệu ứng game.
 - 13:47 · Deploy #572 THÀNH CÔNG: PR #75 Đảo 2 cảnh trận dính · main acef1e2 · lùi: git revert -m 1 acef1e2. 13:51 gộp PR #76 lời giải thẳng dòng (đổi .lg-chu→.lg-van, main 35ac8ee, 0 ca mở).
+- 14:02 · Deploy #573 THÀNH CÔNG: PR #76 lời giải thẳng dòng · main 35ac8ee · lùi: git revert -m 1 35ac8ee. 14:08 gộp PR #74 EXP v4 (nạp tự do, cấp 10 ngày 21, vàng 1/5, khiên 21 ngày, trần kiếm, hiệu ứng +EXP) · main 7942012 · 0 ca mở · 221 test EXP/reset xanh, precache 170/170 · chuyển dữ liệu lười từng em (có truocSiet4 để lùi) · P08 vẫn đóng. Lùi: git revert -m 1 7942012.
