@@ -21,7 +21,8 @@
  --b-do:rgb(255,180,171);--b-dung:rgb(91,240,165);--b-p0:rgb(255,201,64);--b-p1:rgb(55,226,213)}
 .bia *{box-sizing:border-box}
 .bia [hidden]{display:none!important}
-.bia button{font:inherit;color:inherit}
+/* :where() ⇒ độ ưu tiên 0: lớp riêng của từng nút (vd .bia-xem-sai chữ sáng trên nền tối) thắng; trước đây `.bia button` đè màu ⇒ chữ tối trên nền tối (thầy 29/09). */
+.bia :where(button){font:inherit;color:inherit}
 .bia :focus-visible{outline:3px solid rgb(11,87,208);outline-offset:2px}
 .bia-tron{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
 
