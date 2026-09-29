@@ -4,6 +4,7 @@
 import type { CaTomTat } from './exam-api'
 import type { BangChienDich, ChienDichTom } from '../components/chien-dich/api'
 import { mocHetHan, ngayVn } from '../components/chien-dich/ngay'
+import { laChamNhip } from './nhip-chien-dich'
 
 const NGAY_MS = 86_400_000
 
@@ -39,9 +40,6 @@ export function soNgayCon(hanNop: string, nowMs: number): number {
   return Math.ceil((het - nowMs) / NGAY_MS)
 }
 
-/** Khoảng hụt so với mức cần hôm nay mới tính là Chậm nhịp (10 điểm %). */
-export const NGUONG_CHAM_NHIP = 0.1
-
 export type NhipChienDich = 'dung' | 'cham' | 'cho_chua'
 export const CHU_NHIP: Record<NhipChienDich, string> = { dung: 'Đúng nhịp', cham: 'Chậm nhịp', cho_chua: 'Chờ buổi chữa' }
 
@@ -73,9 +71,14 @@ export function dongChienDich(cd: ChienDichTom, bang: BangChienDich | null, nowM
     const tb = ds.reduce((a, b) => a + b, 0) / ds.length
     if (!dangYeu || tb < dangYeu.tiLe) dangYeu = { ten: d, tiLe: tb }
   }
-  // CHẬM NHỊP = thấp hơn mức cần hôm nay TỪ 10 điểm % — CÙNG luật trang Chiến dịch (`trangThaiHien`, DsChienDichDaGiao.tsx).
-  // Trước 29/09 so sát nút ⇒ chiến dịch vừa giao (0% thành thạo, mức cần 0,3% hiện "cần 0%") đã bị báo Chậm nhịp.
-  const nhip: NhipChienDich = cd.hetHan ? 'cho_chua' : thanhThao !== null && thanhThao < mucCan - NGUONG_CHAM_NHIP ? 'cham' : 'dung'
+  // Nhịp: CÙNG luật với trang Chiến dịch (src/lib/nhip-chien-dich.ts, 29/09) — đo trên phần lớp ĐÃ LÀM QUA, so mức cần tới hết hôm qua.
+  // Máy chủ cũ không gửi ngày thứ ⇒ lùi về so thành thạo với mức cần theo giờ, vẫn chừa 10 điểm %.
+  const lop = bang?.lop
+  const nhip: NhipChienDich = cd.hetHan
+    ? 'cho_chua'
+    : lop && typeof lop.ngayThu === 'number'
+      ? laChamNhip(lop.coXat, lop) ? 'cham' : 'dung'
+      : thanhThao !== null && laChamNhip(thanhThao, { mucCanHomNay: mucCan }) ? 'cham' : 'dung'
   return {
     cd,
     thanhThao,

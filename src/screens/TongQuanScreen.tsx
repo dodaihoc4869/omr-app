@@ -12,6 +12,7 @@ import { useAppStore } from '../store/appStore'
 import { useSoDemGv } from '../lib/so-dem-gv'
 import { danhSach, docBang, type BangChienDich, type ChienDichTom } from '../components/chien-dich/api'
 import { KHOA_CHON_CHIEN_DICH } from '../components/chien-dich/LenBangChienDich'
+import { chuHan } from '../components/chien-dich/DsChienDichDaGiao'
 import { hienNgay, ngayVn } from '../components/chien-dich/ngay'
 import { caConEmDangLam } from './LichSuCaScreen'
 import {
@@ -185,7 +186,7 @@ export default function TongQuanScreen() {
               so={kpi.thanhThaoTb === null ? '—' : String(phanTramSo(kpi.thanhThaoTb))}
               donVi="% câu"
               phu={kpi.mucCanTb === null ? 'chưa có chiến dịch đang chạy' : `mức cần hôm nay ${phanTramSo(kpi.mucCanTb)}%`}
-              tone={kpi.thanhThaoTb !== null && kpi.mucCanTb !== null ? (kpi.thanhThaoTb + 1e-9 < kpi.mucCanTb ? 'do' : 'la') : undefined}
+              tone={kpi.thanhThaoTb !== null && kpi.mucCanTb !== null ? (dong.some((d) => d.nhip === 'cham') ? 'do' : 'la') : undefined}
             />
             <TheSo mau="hp" icon={Clock} nhan="Em trễ nhịp từ 2 ngày" so={soVi(kpi.treNhip)} donVi="em" phu={`trên ${soVi(kpi.emDuocGiao)} em được giao`} tone={kpi.treNhip > 0 ? 'do' : undefined} />
             <TheSo mau="ho" icon={BookOpen} nhan="Câu cần thầy dạy lại" so={soVi(kpi.canDayLaiCau)} donVi="câu" phu={`${soVi(kpi.canDayLaiLuot)} lượt em cần chữa`} />
@@ -242,7 +243,7 @@ export default function TongQuanScreen() {
                         </div>
                         <div>
                           <div className="gvm-nho">Hạn nộp</div>
-                          <div className="gv2-dam">{d.conNgay > 0 ? `còn ${d.conNgay} ngày` : 'hết hạn'}</div>
+                          <div className="gv2-dam">{chuHan(d.cd.hanNop, ngayVn(now))}</div>
                           <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
                         </div>
                       </li>

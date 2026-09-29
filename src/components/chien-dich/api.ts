@@ -53,6 +53,9 @@ export interface ThongKeChienDich {
   canDayLaiLuot: number
   /** Mức "đã làm qua" lớp cần đạt hết hôm nay (0–1). */
   mucCanHomNay: number
+  /** Chỉ-thêm 29/09: ngày thứ mấy / tổng ngày của chiến dịch (luật Chậm nhịp chung). */
+  ngayThu?: number
+  tongNgay?: number
 }
 
 export interface DanhSachChienDich {
