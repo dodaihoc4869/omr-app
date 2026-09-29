@@ -103,3 +103,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 08:00 (29/09) · Deploy #556 THÀNH CÔNG: PR #58 Ca kiểm tra 'Không rút câu sai' · main 93461ca · lùi: git revert -m 1 93461ca. A so-no-thuat-toan 257562e sẵn sàng; B kiem-tra-dau-gio đang gộp A.
 - 08:00 · Deploy #557 THÀNH CÔNG: PR #59 màu chữ nút Bi-a · main 5accee3 · lùi: git revert -m 1 5accee3.
 - 08:15 · merge PR #60 Sổ nợ + đan xen + Kiểm tra đầu giờ (main 4f9b28d), đang deploy.
+- 08:26 · Deploy #558 THÀNH CÔNG: PR #60 Sổ nợ + đầu giờ · main 4f9b28d · thử /gv/dau-gio + /gv/chien-dich OK · lùi: git revert -m 1 4f9b28d.
+- 08:39 · Deploy #559 THÀNH CÔNG: PR #61 vá lộ đáp án (cauKhacPhuc/deTheoDangBai) · main 005f3ae · 0 ca mở lúc gộp · lùi: git revert -m 1 005f3ae.
