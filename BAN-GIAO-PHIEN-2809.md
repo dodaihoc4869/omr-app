@@ -143,3 +143,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 22:36 · Boss · merge PR #90 Đảo báo nhầm ca (9b37f2e) + PR #91 mốc khoá ca 29/09 thầy xác nhận (6721255) · không ca mở · lùi: git revert -m1 6721255 && git revert -m1 9b37f2e
 - 22:43 · deploy 6721255 (#90+#91) xanh (run 588; run 587 bị huỷ do cancel-in-progress, đã gồm trong 588)
 - 00:10 30/09 · Boss · merge PR #92 Tu luyện (da77410) + PR #93 tối ưu máy chủ cao điểm (b287087) · test vùng: chỉ đỏ nền (luyen-dang-bai ×5, doan-khoan-exp, doan-rut-cau-moi — đỏ sẵn trên main) · không ca mở · lùi: git revert -m1 b287087 && git revert -m1 da77410
+- 00:22 30/09 · deploy b287087 (#92+#93) xanh (run 590; 589 huỷ do cancel-in-progress, đã gồm)
