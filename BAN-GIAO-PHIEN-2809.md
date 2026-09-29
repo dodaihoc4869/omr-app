@@ -128,3 +128,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 16:49 · Deploy #579 THÀNH CÔNG: PR #82 máy yếu đợt 2 · main a72d513 · /khoe 200 · lùi: git revert -m 1 a72d513. NGỪNG đưa lên tới khi ca 12L2-L1 (147227, 17:30, 15 phút) đóng + công bố. Code 4b hoãn ghi kho đợt 3 (88 sửa đề + 3 đổi đáp án) tới lúc đó.
 - 19:25 · Gộp PR #83 màn theo dõi ca gọn + nhịp 3 s (/ca/nhip, ~80 truy vấn D1/phút/100 em) · main 59abb58 · 0 ca mở · lùi: git revert -m 1 59abb58.
 - 19:29 · Deploy #580 THÀNH CÔNG: PR #83 · main 59abb58 · /ca/nhip thử OK · lùi: git revert -m 1 59abb58. Thầy đổi ý: bỏ cả thẻ Thời gian trở xuống — đang làm PR mới.
+- 19:52 · Gộp PR #84 màn thi điện thoại xoay ngang (bỏ phiếu điền ô, câu dài chia 2 cột + thanh kéo, thanh trên 32 px; dọc/máy tính giữ nguyên) · main 1dc3912 · 0 ca mở · 224 test màn thi xanh · lùi: git revert -m 1 1dc3912.
