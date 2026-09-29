@@ -68,6 +68,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
+import { tuLuyen } from './tu-luyen'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
@@ -3275,6 +3276,9 @@ const boXuLy = {
       if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
       if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
+      // TU LUYỆN (29/09, server/src/tu-luyen.ts): 4 chế độ luyện tự do ở Sảnh — máy chủ rút bằng thuật toán cũ, gửi câu KHÔNG đáp án, chấm khi nộp.
+      // Độc lập: chỉ ghi `tu_luyen_luot`/`tu_luyen_cau`; không EXP, không su_kien_hoc, không kế hoạch ngày.
+      if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.

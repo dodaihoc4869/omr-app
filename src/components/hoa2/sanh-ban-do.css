@@ -2201,3 +2201,9 @@
 .h2-nut-bia:disabled {
   border-color: rgb(106 47 168 / 0.35);
 }
+
+/* Cửa Tu luyện (29/09): cùng khuôn nút Đảo, viền vàng — luyện tự do, không tính EXP. */
+.h2-nut-tu-luyen {
+  border-color: rgb(214 140 20 / 0.55);
+  margin-top: 8px;
+}
