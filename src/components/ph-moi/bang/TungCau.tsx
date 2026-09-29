@@ -13,6 +13,7 @@ import { CHU_CHE, NHAN_NGUON } from '../nhan'
 import { BtCheo, BtDongHo, BtKhoa, BtMui, BtMuiXuong, BtTich } from './bieu-tuong'
 import { Chip } from './dung-chung'
 import { GOP_ID, SO_CAU_XEM_TRUOC, chuKetQuaChe, chuNguongLamLau, laChe, laLamLau, laLamLauThuong, laNhomChe, gopNhomThua, laSai, lyDoCheNhom, soOChe, tachChuCai, type NhomCau } from './nhom-cau'
+import { dangCheDoMayYeu } from '../../../lib/may-yeu'
 
 /** Có câu nào để vẽ mục "Từng câu con đã làm"? */
 export function coTungCau(pm: PhMoi): boolean {
@@ -49,7 +50,8 @@ function hienTheoLoc(n: NhomCau, loc: LocCau): boolean {
   return n.cau.some(KHOP[loc])
 }
 
-const giamChuyenDong = (): boolean => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+// Máy yếu (29/09): cuộn tới câu bằng nhảy thẳng thay vì trượt mượt (trượt = vẽ lại cả trang mỗi khung).
+const giamChuyenDong = (): boolean => (typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) || dangCheDoMayYeu()
 type Kho = MutableRefObject<Map<string, ChiTietCau>>
 
 export interface TungCauProps {

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import LogoHocSinh from './LogoHocSinh'
 import { laManThi } from './m3'
 import './m3/vao-thi.css'
+import { dprToiDa } from '../lib/may-yeu'
 
 interface PhongChoGameProps {
   cho?: {
@@ -76,9 +77,11 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
     const handleResize = () => {
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width * (window.devicePixelRatio || 1)
-      canvas.height = rect.height * (window.devicePixelRatio || 1)
-      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1)
+      // Máy yếu (29/09): vẽ ≤ 1,5 điểm ảnh thật / điểm CSS (máy thường giữ nguyên độ nét của màn).
+      const dpr = dprToiDa(99)
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
+      ctx.scale(dpr, dpr)
     }
 
     handleResize()

@@ -2,8 +2,9 @@ import { execSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { taoMaNapTruoc } from './src/lib/nap-truoc-man-em.ts'
 
 // Repo name dùng làm base path khi deploy GitHub Pages (project page, không phải user page).
 // Đổi giá trị này đúng bằng tên repo GitHub của thầy trước khi deploy.
@@ -40,6 +41,52 @@ function ghiSwVersion() {
 }
 ghiSwVersion()
 
+// NẠP TRƯỚC MẢNH MÀN EM TỪ HTML (máy yếu 29/09) — xem src/lib/nap-truoc-man-em.ts. Lúc build, tra trong gói ra tên tệp THẬT
+// (có mã băm) của mảnh ExamTakeScreen / StudentPortalScreen / ParentPortalScreen + mọi mảnh con tĩnh + CSS của chúng, bỏ những tệp index.html đã
+// tự nạp, rồi chèn đoạn mã chọn-theo-đường-dẫn lên TRƯỚC các thẻ Vite chèn. Chỉ thêm gợi ý tải sớm — không đổi mảnh nào, không đổi precache.
+function napTruocManEm(): Plugin {
+  let goc = '/'
+  return {
+    name: 'nap-truoc-man-em',
+    apply: 'build',
+    configResolved(c) {
+      goc = c.base
+    },
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        const goi = ctx.bundle
+        if (!goi) return html
+        type Manh = { type: 'chunk'; fileName: string; imports: string[]; facadeModuleId: string | null; isDynamicEntry: boolean; viteMetadata?: { importedCss: Set<string> } }
+        const manh = Object.values(goi).filter((x) => x.type === 'chunk') as unknown as Manh[]
+        const theoTen = new Map(manh.map((m) => [m.fileName, m]))
+        const dsCua = (duoi: string): string[] => {
+          const dau = manh.find((m) => m.isDynamicEntry && (m.facadeModuleId || '').split('\\').join('/').endsWith(duoi))
+          if (!dau) return []
+          const thay = new Set<string>()
+          const di = (ten: string) => {
+            if (thay.has(ten)) return
+            thay.add(ten)
+            const m = theoTen.get(ten)
+            if (!m) return
+            for (const c of m.viteMetadata?.importedCss ?? []) thay.add(c)
+            for (const con of m.imports) di(con)
+          }
+          di(dau.fileName)
+          return [...thay].filter((t) => !html.includes(t)).map((t) => goc + t)
+        }
+        const bang = { thi: dsCua('/src/screens/ExamTakeScreen.tsx'), hs: dsCua('/src/screens/StudentPortalScreen.tsx'), ph: dsCua('/src/screens/ParentPortalScreen.tsx') }
+        if (bang.thi.length + bang.hs.length + bang.ph.length === 0) return html
+        // Đặt TRƯỚC mọi thẻ Vite chèn: script nội tuyến đứng sau <link rel="stylesheet"> phải chờ tờ CSS tải xong mới chạy
+        // (đo: mất ~1,5 s trên 3G) — đặt trước thì chạy ngay khi trình duyệt vừa đọc tới.
+        const moc = html.indexOf('<script type="module"')
+        if (moc < 0) return html
+        return html.slice(0, moc) + `<script>${taoMaNapTruoc(bang)}</script>\n` + html.slice(moc)
+      },
+    },
+  }
+}
+
 export default defineConfig({
   base: process.env.GITHUB_PAGES === 'true' ? REPO_BASE : '/',
   define: {
@@ -49,6 +96,7 @@ export default defineConfig({
 
   plugins: [
     react(),
+    napTruocManEm(),
     VitePWA({
       // SERVICE WORKER VIẾT TAY (`src/sw.ts`), KHÔNG dùng bản tự sinh nữa.
       //
@@ -191,7 +239,9 @@ export default defineConfig({
         // GOM MẢNH NHỎ (28/09). Tách màn thi + cổng HS khỏi mảnh chính làm Rolldown cắt ra hàng chục mảnh 100–500 byte (mỗi biểu tượng lucide một tệp),
         // đẩy precache vượt trần 170 tệp của scripts/kiem-sw.mjs. Gom mọi biểu tượng vào MỘT mảnh (≈ 10 KB) — ít tệp, ít vòng mạng, cache một lần.
         codeSplitting: {
-          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]/ }],
+          // Máy yếu (29/09): `src/lib/may-yeu.ts` (≈ 1 KB) nay được nhiều mảnh lười cùng nhập ⇒ Rolldown tách thành tệp riêng, đẩy
+          // precache lên đúng trần 170. Gom vào CÙNG mảnh biểu tượng (mảnh này index.html luôn tải sẵn) ⇒ không thêm tệp nào.
+          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]|src[\\/]lib[\\/]may-yeu\.ts$/ }],
         },
       },
     },

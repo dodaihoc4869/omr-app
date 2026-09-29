@@ -17,7 +17,7 @@ export function ZoomableImage({ src, alt, className = '' }: { src: string; alt: 
   return (
     <>
       <button type="button" onClick={() => setPhongTo(true)} className={`tap-target block w-full ${className}`} title="Bấm để phóng to toàn màn hình">
-        <img src={src} alt={alt} className="w-full" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }} />
+        <img decoding="async" src={src} alt={alt} className="w-full" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }} />
       </button>
       {phongTo && <ManHinhAnh src={src} alt={alt} onClose={() => setPhongTo(false)} />}
     </>
@@ -28,7 +28,7 @@ export function ZoomableImage({ src, alt, className = '' }: { src: string; alt: 
 export function ManHinhAnh({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 overflow-auto" style={{ background: 'var(--phu-dam)' }} onClick={onClose}>
-      <img src={src} alt={alt} className="max-w-full max-h-full" style={{ borderRadius: 'var(--bo-1)', background: 'var(--giay)' }} />
+      <img decoding="async" src={src} alt={alt} className="max-w-full max-h-full" style={{ borderRadius: 'var(--bo-1)', background: 'var(--giay)' }} />
     </div>
   )
 }
@@ -48,7 +48,7 @@ export function StemOrText({ img, text }: { img?: string; text: string }) {
 
 /** Phương án A/B/C/D hoặc ý a/b/c/d — có ảnh thì hiện ảnh, không có thì hiện chữ. */
 export function ChoiceOrText({ img, text }: { img?: string; text: string }) {
-  if (img) return <img src={img} alt="Phương án (ảnh cắt từ file gốc)" className="max-h-14 w-auto" />
+  if (img) return <img decoding="async" src={img} alt="Phương án (ảnh cắt từ file gốc)" className="max-h-14 w-auto" />
   return (
     <span className="flex-1 pa-noi-dung">
       <ChemText text={text} />
@@ -97,7 +97,7 @@ export function CauHinh({ src, alt, onZoom }: { src: string; alt: string; onZoom
   const mo = () => (onZoom ? onZoom(src) : setPhongTo(true))
   return (
     <div className="cau-hinh">
-      <img src={src} alt={alt} loading="lazy" onClick={mo} />
+      <img decoding="async" src={src} alt={alt} loading="lazy" onClick={mo} />
       {phongTo && <ManHinhAnh src={src} alt={alt} onClose={() => setPhongTo(false)} />}
     </div>
   )

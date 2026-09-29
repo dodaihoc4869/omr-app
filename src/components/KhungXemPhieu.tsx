@@ -33,6 +33,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
+import { themCssMayYeu } from '../lib/may-yeu'
 import './m3/khung-xem-phieu.css'
 import type { TinNopChang } from '../lib/btvn-nop-chang-em'
 import { hoiThay, type CauChoKhung, type HoSoLoiGiai, type LoiGiaiChu } from '../lib/loi-giai-api'
@@ -231,7 +232,8 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
       <iframe
         ref={iframeRef}
         title={ten || 'Phiếu bài tập'}
-        {...(html ? { srcDoc: html } : { src })}
+        // Máy yếu (29/09): phiếu là trang riêng, không thấy lớp `may-yeu` của app ⇒ chèn CSS bỏ kính mờ / bộ lọc (máy thường: nguyên văn).
+        {...(html ? { srcDoc: themCssMayYeu(html) } : { src })}
         // TỜ CHIẾU LÊN BẢNG CÓ NÚT TOÀN MÀN HÌNH. Trang trong iframe chỉ gọi
         // được `requestFullscreen` khi khung cha CHO PHÉP; thiếu dòng này thì
         // nút bấm không ăn mà cũng không báo lỗi gì.

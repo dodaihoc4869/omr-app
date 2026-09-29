@@ -291,7 +291,7 @@ export default function TheCau(props: TheCauProps) {
               >
                 <span className="pa-ma" style={{ color: trangThai === 'trong' ? 'var(--nhat)' : chonSai ? 'var(--do)' : 'var(--xanh)' }}>{letter}.</span>
                 <span className="min-w-0 pa-noi-dung" style={{ overflowWrap: 'break-word' }}>
-                  {img ? <img src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" /> : <ChemText text={choices[origIdx]} />}
+                  {img ? <img decoding="async" src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" /> : <ChemText text={choices[origIdx]} />}
                 </span>
                 {laDung && <DauDung />}
                 {chonSai && <DauSai />}
@@ -355,7 +355,7 @@ export default function TheCau(props: TheCauProps) {
                 <div className="y-noi-dung grid" style={{ gridTemplateColumns: '24px minmax(0, 1fr)', alignItems: 'baseline', gap: 'var(--k2)' }}>
                   <span className="y-ma" style={{ color: 'var(--nhat)' }}>{chu})</span>
                   <span className="min-w-0" style={{ overflowWrap: 'break-word' }}>
-                    {img ? <img src={img} alt={`Ý ${chu}`} className="max-h-14 w-auto" /> : <ChemText text={idea} />}
+                    {img ? <img decoding="async" src={img} alt={`Ý ${chu}`} className="max-h-14 w-auto" /> : <ChemText text={idea} />}
                   </span>
                 </div>
                 <div className="y-nut">
@@ -455,7 +455,7 @@ export default function TheCau(props: TheCauProps) {
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (
           <button type="button" onClick={() => onZoom?.(thanCauImg)} className="block w-full" title="Bấm để phóng to">
-            <img src={thanCauImg} alt="Đề bài" className="w-full" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }} />
+            <img decoding="async" src={thanCauImg} alt="Đề bài" className="w-full" style={{ borderRadius: 'var(--bo-1)', border: '1px solid var(--vien)' }} />
           </button>
         ) : (
           <div className="cau-de" style={{ overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>
