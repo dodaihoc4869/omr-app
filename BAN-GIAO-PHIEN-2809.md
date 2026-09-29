@@ -115,3 +115,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 12:48 · Deploy #569 THÀNH CÔNG: PR #71 nút Hỏi thầy trong game · main 5683fc1 · lùi: git revert -m 1 5683fc1. 12:52 gộp PR #72 Hỏi thầy báo 'đang soạn' (main d51fb06, 0 ca mở).
 - 13:03 · Deploy #570 THÀNH CÔNG: PR #72 Hỏi thầy 'đang soạn' · main d51fb06 · lùi: git revert -m 1 d51fb06. 13:07 gộp PR #73 Bi-a mượt (main b51090f, 0 ca mở).
 - 13:16 · Deploy #571 THÀNH CÔNG: PR #73 Bi-a mượt · main b51090f · lùi: git revert -m 1 b51090f.
+- 13:16 · Deploy #571 PR #73 Bi-a xong. 13:31 gộp PR #75 Đảo 2 cảnh trận dính đầu màn (main acef1e2, 0 ca mở) · lùi: git revert -m 1 acef1e2. PR #74 EXP v4 đang bổ sung hiệu ứng game.
