@@ -127,3 +127,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 16:42 · Gộp PR #82 máy yếu đợt 2 (vào đề 1,33→0,32 s; tờ chiếu 5,4→3,6 s; precache 163/2925 KB) · main a72d513 · thầy cho đẩy trước ca 12L2-L1 bắt đầu 17:30 · lùi: git revert -m 1 a72d513.
 - 16:49 · Deploy #579 THÀNH CÔNG: PR #82 máy yếu đợt 2 · main a72d513 · /khoe 200 · lùi: git revert -m 1 a72d513. NGỪNG đưa lên tới khi ca 12L2-L1 (147227, 17:30, 15 phút) đóng + công bố. Code 4b hoãn ghi kho đợt 3 (88 sửa đề + 3 đổi đáp án) tới lúc đó.
 - 19:25 · Gộp PR #83 màn theo dõi ca gọn + nhịp 3 s (/ca/nhip, ~80 truy vấn D1/phút/100 em) · main 59abb58 · 0 ca mở · lùi: git revert -m 1 59abb58.
+- 19:29 · Deploy #580 THÀNH CÔNG: PR #83 · main 59abb58 · /ca/nhip thử OK · lùi: git revert -m 1 59abb58. Thầy đổi ý: bỏ cả thẻ Thời gian trở xuống — đang làm PR mới.
