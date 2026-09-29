@@ -4,6 +4,7 @@
 // việc với từng em (Cho thi lại, Cho vào bằng máy khác, Mở khoá) trong hồ sơ em. Các hộp hỏi lại Đóng cửa / Kết thúc ca thành tấm phủ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import fs from 'node:fs'
 import ExamMonitorScreen from '../src/screens/ExamMonitorScreen'
 
 const m = vi.hoisted(() => ({ detail: vi.fn(), moKhoa: vi.fn(), toast: vi.fn() }))
@@ -111,5 +112,20 @@ describe('ca đang mở: chỉ còn khu trên', () => {
     const khoi = await screen.findByLabelText('Việc với em này')
     fireEvent.click(within(khoi).getByRole('button', { name: 'Cho thi lại' }))
     expect(within(khoi).getByRole('button', { name: 'Xoá lượt cũ và cho thi lại' })).toBeTruthy()
+  })
+})
+
+// Thầy 29/09: "phần này [BƯỚC TIẾP THEO · Giao chiến dịch luyện] có một nút bật lên thì mới giao chiến dịch, còn mặc định là tắt".
+describe('công tắc Giao chiến dịch luyện', () => {
+  const src = fs.readFileSync('src/screens/ExamMonitorScreen.tsx', 'utf8')
+  it('mặc định TẮT, đổi ca thì tắt lại; tắt ⇒ không vẽ khối GiaoChienDich', () => {
+    expect(src).toContain('const [moGiao, setMoGiao] = useState(false)')
+    expect(src).toContain('setMoGiao(false) // công tắc Giao chiến dịch: mỗi lần mở ca đều TẮT')
+    expect(src).toContain('return !moGiao ? null : (')
+    expect(src).not.toContain('thuGonGiao')
+  })
+  it('là MỘT công tắc (role switch, aria-checked) ở thanh đầu màn, chỉ khi ca đủ điều kiện giao', () => {
+    expect(src).toMatch(/\{coGiaoChienDich && \(\s*<button type="button" role="switch" aria-checked=\{moGiao\}/)
+    expect(src.match(/Giao chiến dịch luyện từ ca này/g)).toHaveLength(1)
   })
 })

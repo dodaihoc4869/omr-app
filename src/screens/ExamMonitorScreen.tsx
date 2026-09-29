@@ -215,8 +215,10 @@ export default function ExamMonitorScreen() {
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
   // GAME HÓA 2.0: ca đã kết thúc ⇒ thẻ "BƯỚC TIẾP THEO · Giao chiến dịch luyện" (chỉ khi cờ bật; tắt thì màn như cũ).
+  // Thầy 29/09: "phần này có một nút bật lên thì mới giao chiến dịch, còn mặc định là tắt để theo dõi ca thi bình thường" ⇒ MẶC ĐỊNH TẮT (ẩn cả khối),
+  // một công tắc ở thanh đầu màn bật khối lên; KHÔNG nhớ giữa các lần mở ca (đổi ca ⇒ tắt lại).
   const hoa2 = useHoa2Bat()
-  const [thuGonGiao, setThuGonGiao] = useState(false)
+  const [moGiao, setMoGiao] = useState(false)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
@@ -690,6 +692,7 @@ export default function ExamMonitorScreen() {
   useEffect(() => {
     // Đổi ca ⇒ quên tiến độ sống của ca cũ.
     nhipRef.current = { maCa: maCaTheoDoiNen ?? '', moc: '', dauVet: null, taiDayLuc: Date.now() }
+    setMoGiao(false) // công tắc Giao chiến dịch: mỗi lần mở ca đều TẮT (thầy 29/09)
     setTienDoSong({})
     setSongOn(false)
   }, [maCaTheoDoiNen])
@@ -1090,6 +1093,7 @@ export default function ExamMonitorScreen() {
       }
     : null
   const tt = chiTiet && tk ? trangThaiCa({ ...chiTiet.ca, ...tk }, now) : null
+  const coGiaoChienDich = !!(hoa2 && chiTiet && tt && chiTiet.ca.loai !== 'baitap' && (chiTiet.ca.trangThai === 'dong' || tt.ten === 'Xong' || tt.ten === 'Hết giờ vào'))
 
   // ---------------------------------------------------------- KHOÁ / MỞ CA
   // Hai con số này đi thẳng vào hộp xác nhận. Nói "một số em" thì thầy không
@@ -1527,7 +1531,7 @@ export default function ExamMonitorScreen() {
 
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+      <div className="gv-page-header flex flex-wrap items-center justify-between" style={{ gap: 'var(--k3)' }}>
         {/* TÊN CA SỬA ĐƯỢC TẠI CHỖ (thầy báo 07/09).
             Chạm vào tên là mở ô nhập ngay tại chỗ nó đang đứng, không nhảy sang
             màn khác: thầy sửa tên giữa lúc coi thi, mất bảng lượt thi một nhịp
@@ -1581,7 +1585,15 @@ export default function ExamMonitorScreen() {
               </h1>
               {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
             </button>
-            <span className="flex items-center shrink-0" style={{ gap: 'var(--k2)' }}>
+            <span className="flex items-center flex-wrap justify-end min-w-0" style={{ gap: 'var(--k2)' }}>
+            {coGiaoChienDich && (
+              <button type="button" role="switch" aria-checked={moGiao} className="ca-nut-chieu ca-cong-tac" data-bat={moGiao ? 'bat' : 'tat'} onClick={() => setMoGiao((v) => !v)}>
+                <span className="ca-cong-tac-ray" aria-hidden="true">
+                  <i />
+                </span>
+                Giao chiến dịch luyện từ ca này
+              </button>
+            )}
             {chiTiet && (
               <button type="button" className="ca-nut-chieu" onClick={() => setChieuMa(true)}>
                 Chiếu mã vào thi
@@ -1670,23 +1682,16 @@ export default function ExamMonitorScreen() {
 
       {chiTiet && tk && tt && (
         <>
-          {hoa2 && chiTiet.ca.loai !== 'baitap' && (chiTiet.ca.trangThai === 'dong' || tt.ten === 'Xong' || tt.ten === 'Hết giờ vào') && (() => {
+          {coGiaoChienDich && (() => {
             const maDeCa = maDeTuBoCau((teacherBank ?? []).flatMap((b) => [...(b.phanI ?? []), ...(b.phanII ?? []), ...(b.phanIII ?? [])].map((q) => q.id)))
-            return thuGonGiao ? (
-              <section className="cd-the" data-khoi="giao-chien-dich-thu-gon" style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span className="cd-nhan-buoc">BƯỚC TIẾP THEO · Giao chiến dịch luyện</span>
-                <button type="button" className="m3-nut-vien" onClick={() => setThuGonGiao(false)}>
-                  Giao chiến dịch luyện từ ca này
-                </button>
-              </section>
-            ) : (
+            return !moGiao ? null : (
               <GiaoChienDich
                 key={`${chiTiet.ca.maCa}|${maDeCa.join(',')}`}
                 maCa={chiTiet.ca.maCa}
                 lop={chiTiet.ca.lop}
                 maDeCa={maDeCa}
                 tenGoiY={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
-                onDeSau={() => setThuGonGiao(true)}
+                onDeSau={() => setMoGiao(false)}
               />
             )
           })()}

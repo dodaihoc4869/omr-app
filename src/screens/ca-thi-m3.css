@@ -474,3 +474,45 @@
   outline: 2px solid var(--m3-primary);
   outline-offset: 2px;
 }
+
+/* CÔNG TẮC "Giao chiến dịch luyện từ ca này" (thầy 29/09: mặc định tắt, bật lên mới hiện khối giao chiến dịch) */
+.ca-cong-tac {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface);
+}
+.ca-cong-tac[data-bat='bat'] {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+}
+.ca-cong-tac-ray {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--m3-on-surface-variant);
+  flex: none;
+}
+.ca-cong-tac-ray i {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--m3-surface);
+  transition: transform 150ms ease;
+}
+.ca-cong-tac[data-bat='bat'] .ca-cong-tac-ray {
+  background: var(--m3-primary);
+}
+.ca-cong-tac[data-bat='bat'] .ca-cong-tac-ray i {
+  transform: translateX(16px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ca-cong-tac-ray i {
+    transition: none;
+  }
+}
