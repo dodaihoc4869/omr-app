@@ -223,3 +223,53 @@
   outline: 3px solid var(--dd-nhan);
   outline-offset: 2px;
 }
+
+/* ---- VIÊN GỌN (29/09): trạng thái chưa mở — nhỏ, giữa mép trên, không che nội dung phía dưới ---- */
+.dd-hs--gon {
+  width: auto;
+  max-width: calc(100vw - 24px);
+  border-radius: 999px;
+}
+.dd-hs--gon .dd-hs-mo {
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 14px 6px 14px;
+  white-space: nowrap;
+}
+.dd-hs--gon .dd-hs-cham {
+  width: 8px;
+  height: 8px;
+  box-shadow: 0 0 0 4px var(--dd-nhan-nhat);
+  animation: dd-hs-nhip 1.8s ease-in-out infinite;
+}
+.dd-hs-gon-chu {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dd-nhan);
+}
+.dd-hs-gon-phu {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dd-chu-phu);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40vw;
+}
+.dd-hs-gon-mui {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--dd-chu-phu);
+}
+.dd-hs--gon .dd-hs-mo:focus-visible {
+  outline-width: 2px;
+}
+@keyframes dd-hs-nhip {
+  50% {
+    box-shadow: 0 0 0 7px var(--dd-nhan-nhat);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dd-hs--gon .dd-hs-cham {
+    animation: none;
+  }
+}

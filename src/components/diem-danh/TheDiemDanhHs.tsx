@@ -20,6 +20,12 @@ function xoaMaKhoiDuongDan() {
   }
 }
 
+/** "Buổi học 29/09/2026" ⇒ "29/09"; tên thầy tự đặt thì giữ nguyên. */
+export function ngayGon(ten: string): string {
+  const m = /(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?/.exec(ten)
+  return m && /^Buổi học\s/.test(ten) ? `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}` : ten
+}
+
 export default function TheDiemDanhHs({ token }: { token: string }) {
   const [tt, setTt] = useState<TrangThai>({ loai: 'an' })
   const [mo, setMo] = useState(false)
@@ -100,15 +106,14 @@ export default function TheDiemDanhHs({ token }: { token: string }) {
     )
 
   return (
-    <section className={`dd-hs${mo ? ' dd-hs--mo' : ''}`} aria-label="Điểm danh buổi học" data-khoi="diem-danh-hs">
+    <section className={`dd-hs${mo ? ' dd-hs--mo' : ' dd-hs--gon'}`} aria-label="Điểm danh buổi học" data-khoi="diem-danh-hs">
       {!mo ? (
-        <button type="button" className="dd-hs-mo" onClick={() => setMo(true)}>
+        // GỌN (29/09, thầy: "gọn và tinh tế"): một viên thuốc nhỏ giữa mép trên — chấm nhịp + "Điểm danh" + ngày buổi; bấm mở ô nhập mã.
+        <button type="button" className="dd-hs-mo" onClick={() => setMo(true)} aria-label={`Điểm danh buổi học${tt.buoi ? ` · ${tt.buoi.ten}` : ''}`}>
           <span className="dd-hs-cham" aria-hidden="true" />
-          <span className="dd-hs-chu">
-            <b>Điểm danh buổi học</b>
-            <span>{tt.buoi ? tt.buoi.ten : 'Nhập mã trên máy chiếu'}</span>
-          </span>
-          <span className="dd-hs-nut">Điểm danh</span>
+          <b className="dd-hs-gon-chu">Điểm danh</b>
+          {tt.buoi && <span className="dd-hs-gon-phu">{ngayGon(tt.buoi.ten)}</span>}
+          <span className="dd-hs-gon-mui" aria-hidden="true">›</span>
         </button>
       ) : (
         <form
