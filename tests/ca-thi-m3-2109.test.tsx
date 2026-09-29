@@ -179,7 +179,8 @@ const CA = {
   batDauThiLuc: ISO(BAY_GIO - 19 * 60000),
   dongBoGio: true,
   thoiGianPhut: 50,
-  trangThai: 'mo',
+  // SỬA CÓ CHỦ Ý 29/09 (thầy: màn Theo dõi ca đang mở chỉ còn khu trên): bảng + tab lọc nay chỉ ở ca ĐÃ ĐÓNG ⇒ kiểm bảng trên ca đã đóng.
+  trangThai: 'dong',
   phamVi: 'tu_do',
   congBo: 'khong',
   hetHanVao: ISO(BAY_GIO + 30 * 60000),
@@ -207,11 +208,11 @@ describe('ExamMonitorScreen: khung + tab + bảng (chỉ đổi phần nhìn)', 
   }
   const hang = (c: HTMLElement) => Array.from(c.querySelectorAll('.ca-hang')).map((h) => h.getAttribute('data-trang-thai'))
 
-  it('hai cột: cột phải có thẻ Thời gian ĐẾM NGƯỢC, cột trái có bảng học sinh', async () => {
+  it('ca ĐÃ ĐÓNG: hai cột — cột phải thẻ Thời gian + thông tin ca, cột trái bảng học sinh', async () => {
     const { container } = await mo()
     const phai = container.querySelector('.ca-cot-phai') as HTMLElement
     const trai = container.querySelector('.ca-cot-trai') as HTMLElement
-    expect(within(phai).getByRole('timer').textContent).toBe('31:00')
+    expect(within(phai).getByRole('timer').textContent).toBe('50 phút')
     expect(phai.querySelector('.gv-monitor-overview')).toBeTruthy()
     expect(trai.querySelector('.gv-monitor-students')).toBeTruthy()
     expect(trai.querySelector('#ca-bang-em')).toBeTruthy()
@@ -293,14 +294,10 @@ describe('ExamMonitorScreen: khung + tab + bảng (chỉ đổi phần nhìn)', 
 
   // SỬA CÓ CHỦ Ý 28/09 (hoàn thiện bản vẽ ca thi): nút "Khoá ca" cũ trùng việc với "Kết thúc ca ngay" (Việc nhanh) ⇒ GỠ; ca đang mở chỉ còn MỘT nút Kết thúc ca
   // (cùng lệnh khoaCa, hỏi lại). Nút Mở ca chỉ hiện khi ca đang khoá.
-  it('thẻ thông tin ca còn nguyên các khối thao tác của luồng thi thật (link · Xoá ca) + đúng MỘT nút Kết thúc ca', async () => {
+  it('ca đã đóng: còn hai link nhỏ + Xoá ca ở cột phải; không có nút Khoá ca cũ', async () => {
     const { container } = await mo()
     const phai = container.querySelector('.ca-cot-phai') as HTMLElement
-    // SỬA CÓ CHỦ Ý 29/09 (thầy: bỏ thẻ thông tin ca phía dưới vì trùng chức năng): ca đang mở ⇒ hai link ở đầu màn Theo dõi (Chép link · Chép link xem điểm),
-    // Xoá ca này dời vào đáy thẻ Thời gian (cột phải).
-    for (const ten of [/^Chép link$/, /Chép link xem điểm/]) expect(screen.getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
-    expect(within(phai).getAllByRole('button', { name: /Xoá ca này/ }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('button', { name: /Kết thúc ca/ })).toHaveLength(1)
+    for (const ten of [/Link vào thi/, /Link xem điểm/, /Xoá ca này/]) expect(within(phai).getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
     expect(screen.queryByRole('button', { name: 'Khoá ca' })).toBeNull()
   })
 
