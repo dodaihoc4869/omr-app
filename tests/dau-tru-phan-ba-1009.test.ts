@@ -100,9 +100,10 @@ describe('MỘT NGUỒN SỰ THẬT — sáu chỗ so đáp án Phần III khôn
     'src/lib/cau-hinh-nop-khac-phuc.ts', // chấm phiếu khắc phục
   ]
   for (const p of PHAI_DUNG_CHUNG) {
-    it(`${p} gọi normalizeNumericAnswer, không tự viết luật riêng`, () => {
+    it(`${p} gọi luật dùng chung (normalizeNumericAnswer/khopPhanIII), không tự viết luật riêng`, () => {
       const ma = doc(p)
-      expect(ma).toContain('normalizeNumericAnswer')
+      // 29/09/2026: chỗ QUYẾT đúng/sai nay gọi `khopPhanIII` (so GIÁ TRỊ: "1237500000" = "1,2375×10⁹ kJ").
+      expect(/normalizeNumericAnswer|khopPhanIII/.test(ma)).toBe(true)
       // Không còn bản sao trần nào.
       expect(ma).not.toMatch(/\.trim\(\)\.replace\(',', '\.'\)/)
     })
