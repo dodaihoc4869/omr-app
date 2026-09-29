@@ -86,6 +86,10 @@ export class VanBia {
   soCu = 0
   protected shotCon = 7
   protected acc = 0
+  /** Vị trí từng bi (theo thứ tự st.balls) TRƯỚC bước vật lý cuối ⇒ vẽ nội suy giữa hai bước (bi trôi đều, không giật theo nhịp 240 Hz). */
+  private viTruoc = new Float64Array(0)
+  /** Có đang nội suy (đã có ít nhất một bước trong cú đang lăn). */
+  protected noiSuy = false
   protected aiGiaiT = 0
   protected tich = 0
   protected ma = 0
@@ -246,9 +250,23 @@ export class VanBia {
       this.acc += dt * this.nhan
       let n = 0
       const hook = this.hookVa()
-      while (this.acc >= HS && n < 24 * this.nhan) { step(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
-      if (!dangChay(this.st)) { this.acc = 0; this.pha = 'xet'; this.sau(() => this.ketThucCu(), this.roi.length ? 260 : 120); this.doi() }
+      while (this.acc >= HS && n < 24 * this.nhan) { this.ghiTruoc(); step(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
+      if (n) this.noiSuy = true
+      if (!dangChay(this.st)) { this.acc = 0; this.noiSuy = false; this.pha = 'xet'; this.sau(() => this.ketThucCu(), this.roi.length ? 260 : 120); this.doi() }
     }
+  }
+  /** Chép vị trí bi trước một bước vật lý (không cấp phát mỗi khung). */
+  protected ghiTruoc(): void {
+    const B = this.st.balls
+    if (this.viTruoc.length !== B.length * 2) this.viTruoc = new Float64Array(B.length * 2)
+    for (let i = 0; i < B.length; i++) { this.viTruoc[2 * i] = B[i]!.x; this.viTruoc[2 * i + 1] = B[i]!.y }
+  }
+  /** Vị trí VẼ của bi thứ i (nội suy giữa bước trước và bước hiện tại theo phần dư của bộ tích luỹ). Ghi vào `ra` để khỏi tạo đối tượng. */
+  viTriVe(i: number, ra: { x: number; y: number }): void {
+    const b = this.st.balls[i]!
+    if (!this.noiSuy || this.pha !== 'moving' || this.viTruoc.length !== this.st.balls.length * 2) { ra.x = b.x; ra.y = b.y; return }
+    const a = Math.max(0, Math.min(1, this.acc / HS)), x0 = this.viTruoc[2 * i]!, y0 = this.viTruoc[2 * i + 1]!
+    ra.x = x0 + (b.x - x0) * a; ra.y = y0 + (b.y - y0) * a
   }
   protected buocDongHo(dt: number): void {
     if (this.nguoiDuocDanh()) {

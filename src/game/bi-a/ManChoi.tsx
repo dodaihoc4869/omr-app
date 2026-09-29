@@ -12,6 +12,7 @@ import { CHOT, KL, MAU_QH, NHOM, NT, PK, TEN_PHE, mauCss, type KiHieu } from './
 import TamCauBia from './TamCauBia'
 import XemLaiCauSai, { type CauSai } from './XemLaiCauSai'
 import { R } from './vat-ly'
+import { dangCheDoMayYeu } from '../../lib/may-yeu'
 import { BoVe } from './ve-ban'
 import './bi-a.css'
 
@@ -93,19 +94,30 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const lucKeo = useRef<{ x: number; y: number } | null>(null)
   const spaceRef = useRef<number | null>(null)
   const [luc, setLucHien] = useState(0)
+  /** Vẽ ngay một khung (gọi đồng bộ sau khi đổi cỡ canvas: đặt width/height xoá trắng canvas, không vẽ lại ngay ⇒ trình duyệt kịp hiện một khung trống). */
+  const veNgayRef = useRef<() => void>(() => {})
 
   // ───────── vòng khung hình ─────────
   useEffect(() => {
-    let raf = 0, truoc = performance.now(), nhamCu = '', chipCu = ''
-    const khung = (now: number) => {
-      const dt = Math.min(0.05, (now - truoc) / 1000); truoc = now
-      if (spaceRef.current !== null && v.pha === 'aim') { const p = Math.min(1, (now - spaceRef.current) / 1400); v.datLuc(p); setLucHien(p) }
-      v.buoc(dt)
-      am.xa()
-      const cv = cvRef.current, ctx = cv?.getContext('2d'), k = khungRef.current, bv = boVeRef.current
+    // MỘT requestAnimationFrame duy nhất: vật lý bước cố định (bộ tích luỹ trong VanBia, dt kẹp 50 ms khi tab chậm),
+    // vẽ nội suy giữa hai bước; không setState mỗi khung (trừ thanh lực khi giữ Space).
+    let raf = 0, truoc = performance.now(), nhamCu = '', chipCu = '', ctx: CanvasRenderingContext2D | null = null
+    const veBan = (now: number) => {
+      const cv = cvRef.current, k = khungRef.current, bv = boVeRef.current
+      if (cv && (!ctx || ctx.canvas !== cv)) ctx = cv.getContext('2d')
       const c = chiRef.current, conChi = c && (!c.den || now < c.den) ? c : null
       if (c && c.den && now >= c.den) chiRef.current = null
       if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, loai !== 'giao_huu', keoRef.current.bi)
+      return conChi
+    }
+    veNgayRef.current = () => { veBan(performance.now()) }
+    const khung = (now: number) => {
+      const dt = Math.min(0.05, Math.max(0, now - truoc) / 1000); truoc = now
+      if (spaceRef.current !== null && v.pha === 'aim') { const p = Math.min(1, (now - spaceRef.current) / 1400); v.datLuc(p); setLucHien(p) }
+      v.buoc(dt)
+      am.xa()
+      const cv = cvRef.current, k = khungRef.current
+      const conChi = veBan(now)
       // vòng đồng hồ quanh ảnh ghế đang đánh
       const goc = rootRef.current
       if (goc) {
@@ -176,7 +188,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       raf = requestAnimationFrame(khung)
     }
     raf = requestAnimationFrame(khung)
-    return () => cancelAnimationFrame(raf)
+    return () => { cancelAnimationFrame(raf); veNgayRef.current = () => {} }
   }, [v, am, loai])
   useEffect(() => () => { v.huy(); am.dong() }, [v, am])
   // Trang xem thử / kiểm tự động (chỉ bản dev, không vào bản build): điều khiển ván từ bên ngoài.
@@ -194,12 +206,20 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       const bw = ban.clientWidth - parseFloat(cs.paddingLeft || '0') - parseFloat(cs.paddingRight || '0')
       const bh = ban.clientHeight - parseFloat(cs.paddingTop || '0') - parseFloat(cs.paddingBottom || '0')
       if (bw <= 0 || bh <= 0) return
-      const k = tinhKhungBan(bw, bh), dpr = Math.min(3, window.devicePixelRatio || 1), cu = khungRef.current
-      if (cu && cu.xoay === k.xoay && Math.abs(cu.S - k.S) < 1e-4 && dpr === dprRef.current) return
+      // Hướng bàn chốt theo KHUNG NHÌN (máy dọc ⇒ bàn dọc), không theo phần dư của hộp bàn (dao động khi chữ quanh bàn xuống dòng).
+      const r = goc.getBoundingClientRect(), cu = khungRef.current
+      const nhe = dangCheDoMayYeu()
+      const k = tinhKhungBan(bw, bh, { khungDoc: r.width <= r.height, xoayCu: cu?.xoay })
+      const dpr = Math.min(nhe ? 1.5 : 2, window.devicePixelRatio || 1)
+      const w = Math.round(k.cw * dpr), h = Math.round(k.ch * dpr)
+      // Chỉ đặt lại width/height khi cỡ THẬT đổi (đặt lại là xoá canvas + vẽ lại nền, ảnh bi).
+      if (cu && cu.xoay === k.xoay && cv.width === w && cv.height === h && dpr === dprRef.current && nhe === boVeRef.current!.nhe) return
       khungRef.current = k; dprRef.current = dpr
       cv.style.width = `${k.cw}px`; cv.style.height = `${k.ch}px`; cv.style.borderRadius = `${22 * k.S}px`
-      cv.width = Math.round(k.cw * dpr); cv.height = Math.round(k.ch * dpr)
-      boVeRef.current!.datCo(k, dpr)
+      if (cv.width !== w) cv.width = w
+      if (cv.height !== h) cv.height = h
+      boVeRef.current!.datCo(k, dpr, nhe)
+      veNgayRef.current() // vẽ lại NGAY trong cùng khung ⇒ không lộ canvas trắng
     }
     doBoCuc(); doBan()
     const ro1 = new ResizeObserver(doBoCuc), ro2 = new ResizeObserver(doBan)

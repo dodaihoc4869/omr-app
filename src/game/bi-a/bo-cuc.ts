@@ -19,10 +19,14 @@ export interface KhungBan {
   cw: number
   ch: number
 }
-/** Khung bàn vừa hộp (bw × bh điểm ảnh CSS), chọn chiều cho bàn to nhất (lệch < 2% thì giữ dọc). */
-export function tinhKhungBan(bw: number, bh: number): KhungBan {
+/** Khung bàn vừa hộp (bw × bh điểm ảnh CSS).
+ *  · `khungDoc` (khung nhìn dọc: rộng ≤ cao) ⇒ bàn LUÔN dọc — máy cầm dọc không bao giờ thấy bàn nằm ngang, dù hộp bàn tạm thấp.
+ *  · Còn lại chọn chiều cho bàn to nhất; có `xoayCu` thì chỉ đổi chiều khi chiều kia to hơn ≥ 8% (trễ, không lật qua lại).
+ *    Không có `xoayCu`: lệch < 2% thì giữ dọc. */
+export function tinhKhungBan(bw: number, bh: number, o: { khungDoc?: boolean; xoayCu?: boolean } = {}): KhungBan {
   const s1 = Math.min(bw / (W + 2 * T), bh / (H + 2 * T)), s2 = Math.min(bw / (H + 2 * T), bh / (W + 2 * T))
-  const xoay = s2 > s1 * 1.02, S = Math.max(0.05, xoay ? s2 : s1)
+  const xoay = o.khungDoc ? false : o.xoayCu === undefined ? s2 > s1 * 1.02 : o.xoayCu ? !(s1 > s2 * 1.08) : s2 > s1 * 1.08
+  const S = Math.max(0.05, xoay ? s2 : s1)
   return { xoay, S, cw: ((xoay ? H : W) + 2 * T) * S, ch: ((xoay ? W : H) + 2 * T) * S }
 }
 /** Toạ độ bàn → điểm ảnh canvas (đã nhân dpr). */

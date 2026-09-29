@@ -234,8 +234,9 @@ export class VanMang extends VanBia {
     this.acc += dt * this.nhan
     const hook = this.hookVa()
     let n = 0, xong = false
-    while (this.acc >= HS && n < 24 * this.nhan && !xong) { xong = buocChuan(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
-    if (xong) { this.acc = 0; this.pha = 'xet'; this.sau(() => this.xongVe(), this.roi.length ? 260 : 120); this.doi() }
+    while (this.acc >= HS && n < 24 * this.nhan && !xong) { this.ghiTruoc(); xong = buocChuan(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
+    if (n) this.noiSuy = true
+    if (xong) { this.acc = 0; this.noiSuy = false; this.pha = 'xet'; this.sau(() => this.xongVe(), this.roi.length ? 260 : 120); this.doi() }
   }
   private xongVe(): void {
     const g = this.ketQuaCu
