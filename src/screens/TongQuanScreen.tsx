@@ -29,7 +29,6 @@ import {
 } from '../lib/tong-quan-gv'
 import './gv-hoa2.css'
 
-const SO_CHIEN_DICH_HIEN = 5
 
 interface DuLieu {
   ca: CaTomTat[]
@@ -206,8 +205,8 @@ export default function TongQuanScreen() {
                 {dong.length === 0 ? (
                   <p className="gv2-nhat">{du.loiCd ? 'Chưa đọc được danh sách chiến dịch.' : 'Chưa có chiến dịch nào đang chạy. Giao chiến dịch ở mục Chiến dịch luyện.'}</p>
                 ) : (
-                  <ul className="gvm-cd-ds">
-                    {dong.slice(0, SO_CHIEN_DICH_HIEN).map((d) => (
+                  <ul className="gvm-cd-ds" tabIndex={0} aria-label={`Chiến dịch luyện đang chạy · ${dong.length} chiến dịch, kéo để xem thêm`}>
+                    {dong.map((d) => (
                       <li key={d.cd.id} className="gvm-cd">
                         <div className="gvm-cd-ten">
                           <button type="button" className="gv2-ten-nut" onClick={() => moBang(d.cd.id)} title="Mở bảng chiến dịch ở Chữa trên lớp">

@@ -491,6 +491,22 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* HỘP KÉO (29/09, thầy: "cho vào box kéo cho gọn"): cao tối đa ~2 thẻ, kéo trong hộp xem các chiến dịch còn lại. */
+  max-height: min(58vh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y proximity;
+  scrollbar-gutter: stable;
+  padding-right: 4px;
+}
+.gvm-cd-ds > .gvm-cd {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+.gvm-cd-ds:focus-visible {
+  outline: 2px solid var(--gvm-vien);
+  outline-offset: 4px;
+  border-radius: 20px;
 }
 .gvm-cd {
   display: grid;
