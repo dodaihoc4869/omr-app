@@ -123,3 +123,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 15:08 · Deploy #575 THÀNH CÔNG: PR #79 máy yếu toàn app · main b12ad34 · lùi: git revert -m 1 b12ad34. 15:15 gộp PR #77 sửa ghép Đ/S bộ kiểm lời giải + tu-sua-kho.mjs + sao lưu đợt 1 (main 4dc991d, 0 ca mở).
 - 15:20 · Deploy #576 THÀNH CÔNG: PR #77 · main 4dc991d · lùi: git revert -m 1 4dc991d. 15:33 gộp PR #80 EXP v5 (bỏ mọi trần ngày; cấp cần EXP + ngày đạt; tràn → vàng/mảnh; khiên ngày 36; EXP câu game; số bay vào thú) · main 6c333f3 · 0 ca mở · 243 test xanh · precache 170/2756 KB · đóng PR nháp #78. Lùi: git revert -m 1 6c333f3.
 - 15:41 · Deploy #577 THÀNH CÔNG: PR #80 EXP v5 · main 6c333f3 · /khoe 200, chiến dịch OK · lùi: git revert -m 1 6c333f3.
+- 15:50 · Gộp PR #81 13 bộ chìa khoá lớp 10–11 + chương thiếu lớp 12 + nhật ký tự sửa đợt 1b/2 (main 179505e, 0 ca mở) · lùi: git revert -m 1 179505e.
