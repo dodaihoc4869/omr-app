@@ -537,6 +537,50 @@ async function cacMan() {
   return kq
 }
 
+/** Kịch bản NGẮN (máy đang tải nặng): mở đầu + mở lại, rồi khung/tác vụ dài khi đứng yên ở Sảnh, Đảo (bản đồ + trận), Đoàn (trận),
+ *  Câu đã làm (vuốt cuộn) — đúng những chỗ có hoạt ảnh chạy liên tục. Ghi từng phần vào `ra` ngay khi có (chạy dở vẫn còn số). */
+async function nhanh(ghiDo) {
+  const kq = await moDauVaMoLai()
+  ghiDo(kq)
+  const { ctx, p, cdp, loi } = await moMay(trinh, goc, { sw: true })
+  try {
+    await p.goto(goc + '/hs', { waitUntil: 'commit' })
+    await dangNhap(p)
+    await choThay(p, SANH)
+    await p.evaluate(() => navigator.serviceWorker && navigator.serviceWorker.ready)
+    const m = (kq.man = {})
+    const lam = async (ten, f) => {
+      m[ten] = await f().catch((e) => ({ loi: String(e.message).slice(0, 80) }))
+      ghiDo(kq)
+    }
+    GIA.datLai()
+    await veSanh(p)
+    await lam('sanhYen', () => khung(p, 5000))
+    await lam('vaoDao', () => buoc(p, 'text=Khám phá Bát Linh Đảo', '.dao2-bd', 3000))
+    await lam('daoYen', () => khung(p, 5000))
+    await lam('daoLenDuong', () => buoc(p, 'text=LÊN ĐƯỜNG', '.dao2-canh', 3000))
+    await lam('daoTranYen', () => khung(p, 5000))
+    await lam('daoChon', () => buoc(p, 'text=A.', null, 1000))
+    GIA.kichBan.doanTran = true
+    await veSanh(p)
+    await lam('vaoTranDoan', () => buoc(p, 'text=PHÁ 4 Ổ PHỤC KÍCH', '.dh-nut-lam', 3000))
+    await lam('doanTranYen', () => khung(p, 6000))
+    await lam('doanChon', () => buoc(p, 'text=phương án hai', null, 1000))
+    GIA.kichBan.doanTran = false
+    await veSanh(p)
+    await lam('vaoCauDaLam', () => buoc(p, 'text=Câu đã làm', '.h2-cdl-loc', 4000))
+    await lam('cdlCuon', () => khungCuon(p, 4000, cdp))
+    await lam('cdlLocTatCa', () => buoc(p, 'text=Tất cả', null, 2500))
+    kq.heapMB = await heapMb(cdp)
+    kq.dom = await domCounters(cdp)
+    kq.loiMan = loi.slice(0, 5)
+    ghiDo(kq)
+  } finally {
+    await ctx.close()
+  }
+  return kq
+}
+
 /** Dùng liên tục `phut` phút KHÔNG tải lại trang (Sảnh → Đảo trận → Sảnh → Đoàn trận 8 s → Sảnh → Câu đã làm → Sảnh → Tu luyện → Sảnh): heap + nút DOM theo thời gian. */
 async function heapDai(phut) {
   const { ctx, p, cdp, loi } = await moMay(trinh, goc, { sw: true })
@@ -589,7 +633,8 @@ const trinh = await chromium.launch({ headless: true, executablePath: timChromiu
 const { s, goc } = await mayChuTinh(DIST)
 const ket = { dist: DIST, cpu: CPU, mang: 'slow4g', khung: MAN, luc: new Date().toISOString(), man: {} }
 try {
-  if (!KHAM && muon('mo-dau')) ket.man.moDau = await moDauVaMoLai()
+  if (!KHAM && KICH === 'nhanh') ket.man.nhanh = await nhanh((kq) => RA && writeFileSync(RA, JSON.stringify({ ...ket, man: { nhanh: kq } }, null, 1)))
+  else if (!KHAM && muon('mo-dau')) ket.man.moDau = await moDauVaMoLai()
   if (!KHAM && muon('man')) ket.man.cacMan = await cacMan()
   if (!KHAM && muon('heap')) ket.man.heap = await heapDai(PHUT_HEAP)
   if (KHAM) {
