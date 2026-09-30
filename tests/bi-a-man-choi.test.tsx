@@ -37,39 +37,51 @@ beforeEach(() => {
 afterEach(() => { cleanup(); datBoGoiBia(null); vi.unstubAllGlobals() })
 
 describe('Sảnh Bi-a', () => {
-  it('đọc bia-sanh: Thể lực, "Bi-a hôm nay còn 15/15 câu", hai nút A.I bật, hai nút chơi với bạn "Sắp mở" bị khoá', async () => {
+  it('đọc bia-sanh: Thể lực, "Bi-a hôm nay còn 15/15 câu", hai nút A.I bật, hai nút chơi với bạn "Sắp mở" bị khoá; 3 nhóm chế độ, không nút trùng', async () => {
     render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
     expect(await screen.findByText('còn 15/15 câu')).toBeTruthy()
     expect(screen.getByText('còn 26/40 câu')).toBeTruthy()
-    expect((screen.getByRole('button', { name: 'Tự chơi với A.I · đấu đơn' }) as HTMLButtonElement).disabled).toBe(false)
-    expect((screen.getByRole('button', { name: /Đánh đôi 2 đấu 2 với A\.I/ }) as HTMLButtonElement).disabled).toBe(false)
+    expect((screen.getByRole('button', { name: 'Đấu đơn với A.I' }) as HTMLButtonElement).disabled).toBe(false)
+    expect((screen.getByRole('button', { name: /^Đánh đôi với A\.I/ }) as HTMLButtonElement).disabled).toBe(false)
     expect((screen.getByRole('button', { name: /Đấu với bạn.*Sắp mở/ }) as HTMLButtonElement).disabled).toBe(true)
     expect((screen.getByRole('button', { name: /Nhập mã bàn.*Sắp mở/ }) as HTMLButtonElement).disabled).toBe(true)
     expect(screen.queryByRole('button', { name: /Bàn giao hữu/ })).toBeNull()
+    // Sảnh chia 3 nhóm rõ ràng; bỏ nút trùng "Tự chơi với A.I"; mỗi chế độ đúng MỘT nút; một nút chính (vàng) duy nhất.
+    for (const nhom of ['Chơi với bạn', 'Chơi với A.I']) expect(screen.getByRole('region', { name: nhom })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /Tự chơi với A\.I/ })).toBeNull()
+    for (const ten of [/^Đấu đơn với A\.I/, /^Đánh đôi với A\.I/, /Trả lời câu hỏi · không cần chơi/]) expect(screen.getAllByRole('button', { name: ten })).toHaveLength(1)
+    expect(document.querySelectorAll('.bia-sanh .bia-nut-vang')).toHaveLength(1)
+    expect(document.querySelector('.bia-sanh .bia-nut-vang')!.textContent).toBe('Đấu đơn với A.I')
+    expect(screen.getByText('Luật nhanh').closest('details')).toBeTruthy()
     expect(lenh('bia-sanh')).toHaveLength(1)
   })
   it('xong kế hoạch ⇒ nút A.I khoá, hiện lời máy chủ và Bàn giao hữu (còn 2/2 ván)', async () => {
     mayChu({ 'bia-sanh': () => ({ ...SANH, lyDoKhoa: 'xong_ke_hoach', message: 'Hôm nay em xong kế hoạch rồi.', tran: { con: 0, tong: 15 }, giaoHuu: { mo: true, con: 2, toiDa: 2 } }) })
     render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
     expect(await screen.findByText('Hôm nay em xong kế hoạch rồi.')).toBeTruthy()
-    expect((screen.getByRole('button', { name: 'Tự chơi với A.I · đấu đơn' }) as HTMLButtonElement).disabled).toBe(true)
-    const gh = screen.getByRole('button', { name: /Bàn giao hữu · còn 2\/2 ván/ }) as HTMLButtonElement
+    expect((screen.getByRole('button', { name: 'Đấu đơn với A.I' }) as HTMLButtonElement).disabled).toBe(true)
+    const gh = screen.getByRole('button', { name: /^Bàn giao hữu với A\.I.*còn 2\/2 ván/ }) as HTMLButtonElement
     expect(gh.disabled).toBe(false)
     fireEvent.click(gh)
     await waitFor(() => expect(lenh('bia-xep-ban')[0]).toEqual({ loai: 'giao_huu', cheDo: 'don', soBi: 7 }))
   })
-  it('bấm "Tự chơi với A.I" ⇒ bia-xep-ban đơn 7 bi rồi vào màn chơi; đánh đôi xin 4 bi', async () => {
+  it('bấm "Đấu đơn với A.I" ⇒ bia-xep-ban đơn 7 bi rồi vào màn chơi; đánh đôi xin 4 bi', async () => {
     render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Tự chơi với A.I · đấu đơn' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Đấu đơn với A.I' }))
     await screen.findByRole('region', { name: 'Hai phe' })
     expect(lenh('bia-xep-ban')[0]).toEqual({ loai: 'ai', cheDo: 'don', soBi: 7 })
     expect(screen.getByText('Đấu với A.I')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: /^Bi (Na|Mg|Al|Fe|Cu|Ag|Au) / })).toHaveLength(7)
   })
+  it('bấm "Đánh đôi với A.I" (thẻ Chơi với A.I) ⇒ bia-xep-ban đánh đôi 4 bi', async () => {
+    render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Đánh đôi với A\.I/ }))
+    await waitFor(() => expect(lenh('bia-xep-ban')[0]).toEqual({ loai: 'ai', cheDo: 'doi', soBi: 4 }))
+  })
   it('máy chủ từ chối xếp bàn ⇒ ở lại Sảnh, hiện lời máy chủ', async () => {
     mayChu({ 'bia-xep-ban': () => ({ lyDo: 'dang_co_ca', message: 'Đang có ca kiểm tra.' }) })
     render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Tự chơi với A.I · đấu đơn' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Đấu đơn với A.I' }))
     expect(await screen.findByText('Đang có ca kiểm tra.')).toBeTruthy()
     expect(screen.queryByRole('region', { name: 'Hai phe' })).toBeNull()
   })
