@@ -153,3 +153,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 09:38 30/09 · Boss · merge PR #97 Luyện đề cấu trúc trong Tu luyện (d6715a6) · 191 test xanh · precache 164/2991KB (sát trần 3000) · không ca mở · lùi: git revert -m1 d6715a6
 - 09:46 30/09 · deploy #97 xanh (run 594)
 - 10:33 30/09 · Boss · merge PR #98 Tu luyện ngang/máy tính + chế độ 1 luật mới + luyện đề không EXP (65d9ef9) · 229 test vùng xanh · precache 162/2934KB · không ca mở · lùi: git revert -m1 65d9ef9
+- 10:41 30/09 · deploy #98 xanh (run 595)
