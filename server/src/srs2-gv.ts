@@ -329,7 +329,8 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   return {
     ok: true, batDau: dv.batDau ?? homNay, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soCauTheoMucDo: theoMucDo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     // Rải đều (thầy 30/09, chỉ-thêm): tổng lượt so với D × thể lực KHÔNG đổi; chỉ báo thêm ≈ số câu mới/ngày của em giữa lớp khi bật (3 ngày cuối để ôn).
-    raiDeu: dv.raiDeu, cauMoiMoiNgay: tachGiua ? Math.ceil(tachGiua.cauMoi / Math.max(1, D - NGAY_DEM)) : null,
+    // Đúng luật `lapKeHoachNgay`: D ≤ NGAY_DEM ⇒ giao hết câu mới ngay ngày đầu. Có thể VƯỢT lượt/ngày — màn thầy tự so và cảnh báo.
+    raiDeu: dv.raiDeu, cauMoiMoiNgay: tachGiua ? (D > NGAY_DEM ? Math.ceil(tachGiua.cauMoi / (D - NGAY_DEM)) : tachGiua.cauMoi) : null,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     noCu: await dongNoCu(env, noCu, dv.theLucNgay),
     goiY: sc.muc === 'xanh' ? null : {
@@ -357,7 +358,10 @@ async function tao(env: Env, b: Row, nowMs: number) {
     .bind(id, dv.ten, dv.lop, JSON.stringify(dv.sbd), JSON.stringify(maGocCuaTo(dv.maDe)), JSON.stringify(qids), dv.hanNop, dv.theLucNgay, dv.huyetChien ? 1 : 0, dv.maCa, new Date(nowMs).toISOString()).run()
   xoaDemChienDich() // danh sách chiến dịch đệm 15 s (srs2-d1.ts) ⇒ em thấy chiến dịch mới ngay
   if (dv.batDau) await ghiBatDau(env, id, dv.batDau)
-  if (!dv.raiDeu) await ghiRaiDeu(env, id, false, nowMs) // bật = mặc định, không cần dòng phụ
+  // Luôn ghi dòng (phản biện vòng 2 #110): "không có dòng" chỉ còn nghĩa là chiến dịch giao TRƯỚC khi có công tắc ⇒ màn thầy hiện "Bật (mặc định)".
+  // Ghi dòng BẬT lỗi thì thôi (không dòng vẫn là bật — chỉ mang nhãn "mặc định"); dòng TẮT phải ghi được.
+  if (dv.raiDeu) await ghiRaiDeu(env, id, true, nowMs).catch(() => undefined)
+  else await ghiRaiDeu(env, id, false, nowMs)
   return { ok: true, id, soCau: qids.length, soEm: dv.sbd.length, batDau: dv.batDau ?? ngayVnCua(nowMs), raiDeu: dv.raiDeu }
 }
 
@@ -371,7 +375,7 @@ async function doiRaiDeu(env: Env, id: string, bat: boolean, nowMs: number, nguo
   await ghiRaiDeu(env, id, bat, nowMs)
   const ai = nguoi.trim().slice(0, 60) || 'thầy'
   await env.DB.prepare("INSERT INTO nhat_ky_may (luc, nguon, muc, chu) VALUES (?, 'sua_chien_dich', 'tin', ?)")
-    .bind(new Date(nowMs).toISOString(), `${ai} ${bat ? 'bật' : 'tắt'} rải đều câu mới cho chiến dịch "${cd.ten}" (${cd.id}) — áp dụng từ kế hoạch ngày kế tiếp`).run().catch(() => null)
+    .bind(new Date(nowMs).toISOString(), `${ai} ${bat ? 'bật' : 'tắt'} rải đều câu mới cho chiến dịch "${cd.ten}" (${cd.id}) — em đã mở app hôm nay: áp dụng từ ngày mai; em chưa mở: áp dụng ngay hôm nay`).run().catch(() => null)
   return { ok: true, id, raiDeu: bat }
 }
 

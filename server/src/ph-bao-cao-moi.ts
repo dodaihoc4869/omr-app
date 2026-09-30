@@ -14,7 +14,7 @@ import { docNhanXet } from './ca-thi-them'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { CHI_NHAN_TOKEN } from './ph-tat-ca-ve-con'
 import { sbdCuaPhuHuynh } from './ph-truy-cap'
-import { cheDo2, docHoSo2, docKeHoachDaChot, ngayVnCua } from './srs2-d1'
+import { cheDo2, docHoSo2, docKeHoachDaChot, ngayVnCua, tamHoanCauKhoa } from './srs2-d1'
 import { soNgayConLai, tiLeChienDich } from './srs2-loi'
 
 type Row = Record<string, unknown>
@@ -68,7 +68,9 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-hoc-2', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
   if (!(await cheDo2(envDoc, sbd))) return { ok: true, cheDo2: false }
   const ngay = ngayVnCua(nowMs)
-  const [hs, kh] = await Promise.all([docHoSo2(envDoc, sbd, ngay), docKeHoachDaChot(envDoc, sbd, nowMs)])
+  const [hs, khTho] = await Promise.all([docHoSo2(envDoc, sbd, ngay), docKeHoachDaChot(envDoc, sbd, nowMs)])
+  // Phản biện #108: cùng một con số với Sảnh/rương của con — câu còn lại đang dùng cho ca kiểm tra / đã rút khỏi kho / tự luận bị bỏ khỏi "hôm nay" (CHỈ ĐỌC, không ghi).
+  const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hs) : null
   const ra: Row = { ok: true, cheDo2: true, ngay }
   const cd = hs.chienDich
   if (cd) {

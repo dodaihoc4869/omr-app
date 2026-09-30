@@ -88,6 +88,14 @@ export interface BoQuaNap { tuLuan: Set<string>; vang: Set<string>; loiLo: boole
 export const boQuaMoi = (): BoQuaNap => ({ tuLuan: new Set(), vang: new Set(), loiLo: false })
 /** Tên nguồn nhật ký máy khi nạp lô câu cho Đảo/Đoàn lỗi (nhat-ky-may.ts). */
 export const NGUON_LOI_NAP_CAU = 'nap_cau_game'
+/**
+ * Log chi tiết khi trả `chua_nap_duoc` (phản biện vòng 2 #110 — Boss tra "em nào, câu nào"): SBD + tối đa 20 câu còn lại dạng `mãĐề|qid`
+ * (đánh dấu câu vắng khi nạp). Không tên em, không nội dung/đáp án. Xem bằng `wrangler tail`; nhật ký máy chỉ giữ câu chung cho thầy.
+ */
+export function logChuaNap(kenh: 'dao' | 'doan', sbd: string, khoa: readonly string[], hs: Pick<HoSo2, 'meta'>, boQua: BoQuaNap): void {
+  const cau = [...new Set(khoa.map(qidGoc))].slice(0, 20).map((q) => `${hs.meta.get(q)?.maDe ?? '?'}|${q}${boQua.vang.has(q) ? ' (vắng khi nạp)' : ''}`)
+  console.error(`[nap-cau-game] ${kenh}: chua_nap_duoc`, JSON.stringify({ sbd, loiLo: boQua.loiLo, cau }))
+}
 export async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa: number, chan: ReadonlySet<string>, boQua?: BoQuaNap): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
   const ra: { q: PrivateQuestion; m: MetaCau }[] = []
   // Ứng viên theo thứ tự, mỗi qid một lần, đã lọc meta/chặn (không tốn truy vấn).
@@ -106,8 +114,10 @@ export async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa
     const lo = ung.slice(i, i + Math.min(LO_NAP_CAU, Math.max(toiDa - ra.length + 2, 8)))
     i += lo.length
     let day: Map<string, PrivateQuestion>
-    try { day = await napDayDuMem(env, lo.map((x) => ({ maDe: x.m.maDe, qid: x.qid, version: x.m.version }))) } catch {
+    try { day = await napDayDuMem(env, lo.map((x) => ({ maDe: x.m.maDe, qid: x.qid, version: x.m.version }))) } catch (e) {
       // lỗi đọc lô: bỏ lô như bỏ câu (hành vi cũ) — 30/09: ghi nhật ký máy để Boss tra được vì sao "Chưa tải được câu hôm nay"
+      // (phản biện vòng 2 #110: dòng nhật ký máy chỉ có câu chung ⇒ chi tiết mã đề|qid|version + lỗi ra log `wrangler tail`)
+      console.error('[nap-cau-game] lỗi đọc lô câu', JSON.stringify({ cau: lo.map((x) => `${x.m.maDe}|${x.qid}|${x.m.version}`), loi: e instanceof Error ? e.message : String(e) }))
       if (boQua) boQua.loiLo = true
       await ghiLoiMay(env, NGUON_LOI_NAP_CAU)
       continue
@@ -192,14 +202,17 @@ export const LOI_LUOT_RONG = {
 } as const
 /**
  * Chẩn đoán vì sao `napLuot` rỗng trên các khoá còn lại: ca khoá > bàn Bi-a giữ > lỗi tải thật (D1 ném) > mọi câu còn lại đều tự luận / không còn trong kho
- * (⇒ `xong`: coi như hết câu hôm nay, KHÔNG lộ lý do — kế hoạch bình thường đã bỏ chúng ở `tamHoanCauKhoa`) > không rõ (⇒ `chua_nap_duoc` + nhật ký máy).
+ * (⇒ `xong`: coi như hết câu hôm nay, KHÔNG lộ lý do — kế hoạch bình thường đã bỏ chúng ở `tamHoanCauKhoa`) > câu vắng khi nạp mà meta còn / không rõ
+ * (⇒ `chua_nap_duoc` + nhật ký máy).
  */
 export function lyDoLuotRong(khoa: readonly string[], hs: Pick<HoSo2, 'meta'>, chanCa: ReadonlySet<string>, giuBia: ReadonlySet<string>, boQua?: BoQuaNap): keyof typeof LOI_LUOT_RONG | 'xong' {
   const qs = khoa.map(qidGoc)
   if (qs.some((q) => chanCa.has(q) || chanCa.has(hs.meta.get(q)?.group ?? '\u0000'))) return 'cau_dang_bao_ve'
   if (qs.some((q) => giuBia.has(q))) return 'cau_dang_o_bia'
   if (boQua?.loiLo) return 'chua_nap_duoc'
-  if (qs.every((q) => lyDoKhongPhucVu(hs.meta.get(q)) !== null || boQua?.tuLuan.has(q) || boQua?.vang.has(q))) return 'xong'
+  // Phản biện #108: câu VẮNG khi nạp mà meta vẫn còn (chỉ mục đang lập lại / lệch trong khoảnh khắc) KHÔNG phải "xong" — Sảnh vẫn đếm nó ⇒ báo lỗi tạm
+  // (`chua_nap_duoc`, thử lại được) kèm nhật ký máy. Chỉ "xong" khi câu thật sự không phục vụ được (meta mất / tự luận).
+  if (qs.every((q) => lyDoKhongPhucVu(hs.meta.get(q)) !== null || boQua?.tuLuan.has(q))) return 'xong'
   return 'chua_nap_duoc'
 }
 /** Lời báo hết câu có nhắc câu tạm hoãn vì ca (không lộ câu nào). */
@@ -242,7 +255,10 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.`, ...tomTat }
-    if (lyDo === 'chua_nap_duoc' && !boQua.loiLo) await ghiLoiMay(env, NGUON_LOI_NAP_CAU, nowMs)
+    if (lyDo === 'chua_nap_duoc') {
+      logChuaNap('dao', sbd, kh.conDao, hs, boQua)
+      if (!boQua.loiLo) await ghiLoiMay(env, NGUON_LOI_NAP_CAU, nowMs)
+    }
     return { ok: true, questions: [], lyDo, message: LOI_LUOT_RONG[lyDo], ...tomTat }
   }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
@@ -281,7 +297,10 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDoan, hs, chanCa, chanBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_on_hom_nay', message: kh.conDao.length ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : `Hôm nay em không còn câu ôn nào.${loiTamHoan(kh.tamHoan?.ca ?? 0)} Mai quay lại hộ tống nhé.` }
-    if (lyDo === 'chua_nap_duoc' && !boQua.loiLo) await ghiLoiMay(env, NGUON_LOI_NAP_CAU, nowMs)
+    if (lyDo === 'chua_nap_duoc') {
+      logChuaNap('doan', sbd, kh.conDoan, hs, boQua)
+      if (!boQua.loiLo) await ghiLoiMay(env, NGUON_LOI_NAP_CAU, nowMs)
+    }
     return { ok: true, questions: [], lyDo, message: LOI_LUOT_RONG[lyDo] }
   }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())

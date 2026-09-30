@@ -148,6 +148,12 @@ export default function BangChienDich({
           </p>
         </div>
         <span className="cd-chip-muc cd-chip-muc--xanh">Đang chạy</span>
+        {/* Rải đều câu mới (thầy 30/09): chip RIÊNG cạnh trạng thái, đúng chữ chuẩn — không nối vào ô Quá tải (phản biện PR 108). Máy chủ cũ không gửi ⇒ Bật. */}
+        {/* Phản biện vòng 2 PR 110: chiến dịch giao trước khi có công tắc (thầy chưa đặt) ⇒ "Bật (mặc định)" để thầy biết máy tự bật. */}
+        <span className={`cd-chip-muc cd-chip-muc--${cd.raiDeu === false ? 'xam' : 'xanh'}`} data-khoi="rai-deu"
+          title={cd.raiDeu !== false && cd.raiDeuMacDinh ? 'Chiến dịch giao trước khi có công tắc này: app tự bật. Tắt được ở danh sách chiến dịch.' : undefined}>
+          Rải đều câu mới: {cd.raiDeu === false ? 'Tắt' : cd.raiDeuMacDinh ? 'Bật (mặc định)' : 'Bật'}
+        </span>
       </div>
 
       <div className="cd-kpi-hang" data-khoi="o-so-chien-dich">
@@ -193,9 +199,7 @@ export default function BangChienDich({
             {lop.huyetChien}
             <small>em</small>
           </strong>
-          <span className="cd-kpi-phu cd-so">
-            {cd.raiDeu === false ? 'Câu mới đổ theo sức · ' : 'Câu mới rải đều theo ngày · '}phải làm quá {cd.theLucNgay} lượt/ngày để kịp hạn
-          </span>
+          <span className="cd-kpi-phu cd-so">phải làm quá {cd.theLucNgay} lượt/ngày để kịp hạn</span>
         </div>
         <div className="cd-kpi" data-mau="ho">
           <span className="cd-kpi-nhan">Cần thầy dạy lại</span>

@@ -226,7 +226,7 @@ export interface TuyChonKeHoach {
   hangChung?: HangEm
   /**
    * RẢI ĐỀU CÂU MỚI THEO NGÀY (thầy chốt 30/09): bật ⇒ số câu MỚI mỗi ngày dừng đúng quota `ceil(số mới còn / (D − NGAY_DEM))`, KHÔNG đổ thêm câu mới
-   * cho đủ thể lực; lượt dư dồn cho nợ / củng cố / duy trì (tỉ lệ cũ), vẫn dư thì thôi. VẮNG ⇒ TẮT = hành vi cũ (đổ câu mới cho đầy thể lực);
+   * cho đủ thể lực; lượt dư dồn cho nợ / củng cố / duy trì (tỉ lệ cũ), đủ quota câu mới thì nợ tới lịch lấp nốt lượt dư (vượt trần 50 %), vẫn dư thì thôi. VẮNG ⇒ TẮT = hành vi cũ (đổ câu mới cho đầy thể lực);
    * tầng đọc chiến dịch (`srs2-d1.ts`) quy chiến dịch không đặt (null) ⇒ BẬT.
    */
   raiDeu?: boolean
@@ -524,7 +524,7 @@ export function xepChuyenDao<T>(ds: readonly T[], laMoi: (x: T) => boolean, mucD
  * `daLamHomNay`: số câu của kế hoạch hôm nay em đã làm (trừ vào trần).
  * SỔ NỢ (thầy chốt 29/09): câu NỢ (mọi nguồn) tới lịch lấy TRƯỚC, trần 50% lượt khi chiến dịch còn câu mới (không chiến dịch ⇒ 100%),
  * xếp `soSanhNo`; câu mới lấy phần còn lại theo quota; rồi câu chiến dịch đã thành thạo tới lịch ôn chốt; ôn duy trì ≤ 20% và sau cùng;
- * còn chỗ ⇒ thêm câu mới (trừ khi `raiDeu`: câu mới dừng đúng quota, thầy 30/09), hết câu mới ⇒ thêm nợ. Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
+ * còn chỗ ⇒ thêm câu mới, hết câu mới ⇒ thêm nợ (`raiDeu`: câu mới dừng đúng quota, đủ quota thì nợ lấp lượt dư — thầy 30/09). Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
  */
 export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<string, TrangThaiCau>, tc: TuyChonKeHoach, daLamHomNay = 0): KeHoachNgay {
   const tranNgay = tc.tranNgay ?? TRAN_NGAY
@@ -566,8 +566,10 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const layCungCo = Math.min(cungCo.length, tran - layNo - layMoi)
   const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layNo - layMoi - layCungCo)
   let conDu = tran - layNo - layMoi - layCungCo - layDuyTri
-  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm) — TRỪ khi rải đều (câu mới dừng đúng quota, lượt dư để ôn);
-  // đã giao HẾT câu mới hôm nay (rải đều: đủ quota) mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
+  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm); đã giao HẾT câu mới hôm nay mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
+  // RẢI ĐỀU (thầy 30/09, chữ màn Giao "lượt dư trong ngày dùng để ôn"): KHÔNG thêm câu mới — câu mới dừng đúng quota; đã xếp ĐỦ quota câu mới hôm nay
+  // (kể cả ngày ôn cuối D ≤ 3: quota = mọi câu mới còn lại) ⇒ lượt dư cho NỢ tới lịch lấp (vượt trần 50 %). Hết cả nợ ⇒ ngày ngắn hơn là bình thường.
+  // (Phản biện vòng 2 #110: trước đây rải đều giữ nợ ở 50 % ⇒ ngày ôn cuối còn sót 1 câu mới thì em mất nửa lượt ôn; em yếu thiệt nhất.)
   const themMoi = raiDeu ? 0 : Math.min(Math.max(0, conDu), moi.length - layMoi)
   conDu -= themMoi
   const duMoiHomNay = layMoi + themMoi >= (raiDeu ? Math.min(moi.length, quota) : moi.length)

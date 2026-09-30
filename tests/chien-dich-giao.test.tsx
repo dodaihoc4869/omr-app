@@ -59,7 +59,7 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
     expect((screen.getByLabelText(/Hạn nộp \(hết lúc/) as HTMLInputElement).value).toBe('2026-10-04')
     expect(screen.getAllByText('23:59 · Chủ Nhật 04/10/2026')).toHaveLength(2) // bước 3 + cột tóm tắt
     expect((screen.getByLabelText(/Số lượt câu mỗi ngày/) as HTMLInputElement).value).toBe('40')
-    expect((screen.getByRole('checkbox', { name: /làm tới 80 câu\/ngày \(Quá tải hôm nay/ }) as HTMLInputElement).checked).toBe(true)
+    expect((screen.getByRole('checkbox', { name: /làm tới 80 lượt\/ngày \(Quá tải hôm nay/ }) as HTMLInputElement).checked).toBe(true)
 
     await waitFor(() => expect(lenh('suc-chua').length).toBeGreaterThan(0))
     expect(lenh('suc-chua').at(-1)).toMatchObject({ action: 'suc-chua', lop: '12A1', maDe: ['DE-A'], hanNop: '2026-10-04', theLucNgay: 40 })
@@ -75,7 +75,7 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
     expect(o.disabled).toBe(true)
     await waitFor(() => expect(lenh('suc-chua').some((b) => b.theLucNgay === 47)).toBe(true))
     expect(screen.getByText(/App đề xuất 47 lượt\/ngày/)).toBeTruthy()
-    expect(screen.getByRole('checkbox', { name: /làm tới 94 câu\/ngày/ })).toBeTruthy()
+    expect(screen.getByRole('checkbox', { name: /làm tới 94 lượt\/ngày/ })).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Rút còn|Lùi hạn nộp/ })).toBeNull()
 
     fireEvent.click(screen.getByRole('switch', { name: /Tự tính/ }))

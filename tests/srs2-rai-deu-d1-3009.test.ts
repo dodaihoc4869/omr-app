@@ -1,7 +1,7 @@
 // @vitest-environment node
 // RẢI ĐỀU CÂU MỚI THEO NGÀY (thầy chốt 30/09) — lớp D1 + lệnh thầy `/gv/chien-dich`:
 // cờ lưu ở bảng phụ chỉ-thêm `chien_dich_tuy_chon` (tạo lúc chạy, không ALTER `chien_dich`); KHÔNG có dòng ⇒ BẬT (chiến dịch cũ đang chạy cũng bật);
-// `tao` mặc định bật (không ghi dòng), `tao {raiDeu:false}` ghi dòng; action `rai-deu {id, bat}` đổi cờ trên chiến dịch đang chạy mà KHÔNG đụng kế hoạch
+// `tao` LUÔN ghi dòng (bật/tắt — phản biện vòng 2 #110: không dòng = chiến dịch giao trước công tắc ⇒ "Bật (mặc định)"); action `rai-deu {id, bat}` đổi cờ trên chiến dịch đang chạy mà KHÔNG đụng kế hoạch
 // đã chốt hôm nay ⇒ hiệu lực từ kế hoạch ngày kế tiếp; `suc-chua` giữ nguyên tiLe/muc/sucChua, chỉ thêm `cauMoiMoiNgay`.
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
@@ -33,20 +33,20 @@ async function tao(env: Env, them: Record<string, unknown> = {}) {
   expect(r.ok).toBe(true)
   return String(r.id)
 }
-const cdTrong = (r: Record<string, unknown>, id: string) => (r.chienDich as { id: string; raiDeu?: boolean }[]).find((c) => c.id === id)!
+const cdTrong = (r: Record<string, unknown>, id: string) => (r.chienDich as { id: string; raiDeu?: boolean; raiDeuMacDinh?: boolean }[]).find((c) => c.id === id)!
 
 describe('rải đều — lưu cờ, mặc định bật', () => {
-  it('(a) `tao` mặc định ⇒ không có dòng chien_dich_tuy_chon, danh-sach/bang/chan-doan-em trả raiDeu=true; `tao {raiDeu:false}` ⇒ có dòng, trả false', async () => {
+  it('(a) `tao` mặc định ⇒ dòng rai_deu = 1, danh-sach/bang trả raiDeu=true (KHÔNG "mặc định"); `tao {raiDeu:false}` ⇒ dòng rai_deu = 0, trả false', async () => {
     const { d, env } = dung()
     const id1 = await tao(env)
-    expect(coBangTuyChon(d).n).toBe(0) // bật = không cần bảng/dòng phụ
     const id2 = await tao(env, { ten: 'Đổ theo sức', raiDeu: false })
     expect(coBangTuyChon(d).n).toBe(1)
-    expect(d.dem('chien_dich_tuy_chon')).toBe(1)
+    expect(d.dem('chien_dich_tuy_chon')).toBe(2)
+    expect(d.dem('chien_dich_tuy_chon', `id = '${id1}' AND rai_deu = 1`)).toBe(1)
     expect(d.dem('chien_dich_tuy_chon', `id = '${id2}' AND rai_deu = 0`)).toBe(1)
     const ds = await gvChienDich(env, { action: 'danh-sach' }, T0)
-    expect(cdTrong(ds, id1).raiDeu).toBe(true)
-    expect(cdTrong(ds, id2).raiDeu).toBe(false)
+    expect(cdTrong(ds, id1)).toMatchObject({ raiDeu: true, raiDeuMacDinh: false })
+    expect(cdTrong(ds, id2)).toMatchObject({ raiDeu: false, raiDeuMacDinh: false })
     const bang1 = await gvChienDich(env, { action: 'bang', id: id1 }, T0)
     expect((bang1.chienDich as { raiDeu: boolean }).raiDeu).toBe(true)
     const bang2 = await gvChienDich(env, { action: 'bang', id: id2 }, T0)
@@ -59,6 +59,9 @@ describe('rải đều — lưu cờ, mặc định bật', () => {
     expect(coBangTuyChon(d).n).toBe(0)
     const cd = (await docChienDichCuaEm(env, 'S1')).find((c) => c.id === 'cd-cu')!
     expect(cd.raiDeu).toBe(true)
+    expect(cd.raiDeuMacDinh).toBe(true) // màn thầy hiện "Bật (mặc định)" — thầy chưa tự đặt
+    const ds = await gvChienDich(env, { action: 'danh-sach' }, T0)
+    expect(cdTrong(ds, 'cd-cu')).toMatchObject({ raiDeu: true, raiDeuMacDinh: true })
     const kh = await layKeHoachHomNay(env, 'S1', T0)
     expect(kh.kh.tong).toBe(30) // 120 câu / (7 − 3) = 30 câu mới, không 49
   })

@@ -6,6 +6,23 @@ import { phanTram } from './ngay'
 import { CHU_MUC } from './tinh'
 
 const CHU_MUC_HOA = { xanh: 'Vừa sức', vang: 'Sát', do: 'Quá tải' } as const
+/** Số ngày cuối dành để ôn khi rải đều (= `NGAY_DEM` của máy chủ, srs2-loi.ts). */
+export const NGAY_ON_CUOI = 3
+
+/**
+ * Dòng giải thích rải đều câu mới trên đồng hồ (phản biện vòng 2 PR 110): máy chủ xếp NỢ trước (tối đa nửa số lượt), câu mới lấy phần còn lại
+ * ⇒ câu mới chắc chắn có `theLuc − ⌊theLuc/2⌋` lượt/ngày. Vượt ngưỡng ấy ⇒ cảnh báo "khi em còn nợ"; vượt cả số lượt ⇒ cảnh báo dồn ngày cuối.
+ * Áp cho CẢ chiến dịch ngắn (D ≤ 3: câu mới giao ngay từ ngày đầu, nhưng vẫn chỉ trong số lượt của ngày).
+ */
+export function chuRaiDeu(D: number, cauMoi: number, theLuc: number): string {
+  const choMoi = theLuc - Math.floor(theLuc / 2)
+  const dau = D <= NGAY_ON_CUOI
+    ? `Chiến dịch ngắn (không quá 3 ngày): câu mới giao ngay từ ngày đầu (${cauMoi} câu mới).`
+    : `Rải đều: khoảng ${cauMoi} câu mới mỗi ngày trong ${D - NGAY_ON_CUOI} ngày đầu, 3 ngày cuối để ôn.`
+  if (cauMoi > theLuc) return `${dau} Mỗi ngày chỉ có ${theLuc} lượt — câu mới sẽ dồn sang những ngày cuối. Nên tăng lượt mỗi ngày hoặc lùi hạn.`
+  if (cauMoi > choMoi) return `${dau} Khi em còn nợ, câu nợ được xếp trước nên mỗi ngày chỉ chắc chắn có ${choMoi} lượt cho câu mới — em còn nợ nhiều thì câu mới có thể dồn sang những ngày cuối.`
+  return dau
+}
 
 export default function DongHoSucChua({
   sc,
@@ -73,7 +90,7 @@ export default function DongHoSucChua({
       </p>
       {sc.raiDeu && sc.cauMoiMoiNgay != null && (
         <p className="cd-phu cd-so" data-khoi="rai-deu">
-          Rải đều: khoảng {sc.cauMoiMoiNgay} câu mới mỗi ngày trong {Math.max(1, sc.D - 3)} ngày đầu, 3 ngày cuối để ôn.
+          {chuRaiDeu(sc.D, sc.cauMoiMoiNgay, theLuc)}
         </p>
       )}
       {noCu.length > 0 && (

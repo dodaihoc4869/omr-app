@@ -111,7 +111,8 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
     void tai()
   }
 
-  // Công tắc rải đều câu mới (thầy 30/09) trên chiến dịch đang chạy: chỉ ghi cờ, có hiệu lực từ kế hoạch ngày mai (kế hoạch đã chốt hôm nay không đổi).
+  // Công tắc rải đều câu mới (thầy 30/09) trên chiến dịch đang chạy: chỉ ghi cờ. Kế hoạch đã chốt hôm nay không đổi ⇒ em đã mở app hôm nay: từ ngày mai;
+  // em chưa mở app hôm nay: kế hoạch lập lúc em mở theo cờ mới (phản biện vòng 2 PR 110 — chữ cũ "từ ngày mai" chưa đúng hết).
   const doiRai = async (c: ChienDichTom, bat: boolean) => {
     setDangLam(c.id)
     const r = await doiRaiDeu(c.id, bat)
@@ -120,7 +121,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
       showToast(r.chu, 'warn')
       return
     }
-    showToast(bat ? 'Đã bật rải đều câu mới — áp dụng từ kế hoạch ngày mai' : 'Đã tắt rải đều câu mới — áp dụng từ kế hoạch ngày mai', 'success')
+    showToast(`Đã ${bat ? 'bật' : 'tắt'} rải đều câu mới — em đã mở app hôm nay: áp dụng từ ngày mai; em chưa mở: áp dụng ngay hôm nay`, 'success')
     void tai()
   }
 
@@ -308,10 +309,10 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                         {c.trangThai === 'dang_chay' && !c.hetHan ? (
                           <label className="cd-tich cd-phu" data-khoi="rai-deu">
                             <input type="checkbox" role="switch" aria-label={`Rải đều câu mới · ${c.ten}`} aria-checked={c.raiDeu !== false} checked={c.raiDeu !== false} disabled={dangLam === c.id} onChange={(e) => void doiRai(c, e.target.checked)} />
-                            <span>Rải đều câu mới: {c.raiDeu !== false ? 'Bật' : 'Tắt'}</span>
+                            <span>Rải đều câu mới: {c.raiDeu === false ? 'Tắt' : c.raiDeuMacDinh ? 'Bật (mặc định)' : 'Bật'}</span>
                           </label>
                         ) : (
-                          c.raiDeu === false && <small className="cd-phu">Câu mới đổ theo sức</small>
+                          c.raiDeu === false && <small className="cd-phu">Rải đều câu mới: Tắt</small>
                         )}
                       </td>
                       <td>
