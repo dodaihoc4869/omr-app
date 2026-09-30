@@ -1,0 +1,51 @@
+{
+ "dist": "/home/user/omr-app/.claude/worktrees/agent-a4381b23dfd201a00/dist",
+ "mang": "slow4g",
+ "cpu": 6,
+ "mayYeu": true,
+ "luc": "2026-09-30T14:32:43.839Z",
+ "man": {
+  "thi": {
+   "sanSangMs": 4537,
+   "fcp": 4264,
+   "lcp": 4264,
+   "vaoDeMs": 4438,
+   "tbtKhiVaoDe": 1755,
+   "taiDaiNhatKhiVaoDe": 472,
+   "tbtTaiTrang": 648,
+   "chonMsTB": 101,
+   "chonMsMax": 129,
+   "veLaiMoiLanChon": 243,
+   "commitKhiChon8": 21,
+   "inpChonMs": 80,
+   "taiDaiMaxKhiChon": 150,
+   "soTaiDaiTren100KhiChon": 3,
+   "inpGoMs": 160,
+   "taiDaiMaxKhiGo": 69,
+   "tbtKhiChon8": 504,
+   "cuon": {
+    "khung": 287,
+    "cham33": 21,
+    "p95": 33,
+    "max": 83,
+    "fps": 48,
+    "tbt": 57,
+    "commit": 6
+   },
+   "ngoi12s": {
+    "commit": 14,
+    "taiDai": 2,
+    "tbt": 18,
+    "cham33": 4,
+    "veLai12s": 156
+   },
+   "heapMB": 8.7,
+   "jsKB": 347,
+   "jsThoKB": 1027,
+   "soJs": 38,
+   "cssKB": 61,
+   "tepJs": "index:130 rolldown-runtime:1 bieu-tuong:23 react-dom:2 defineProperty:1 cham-so-policy:4 cham-so:1 score:2 jsx-runtime:1 goi-lenh-thay:1 m3:1 browser:4 exam-api:16 cau-tu-luan:3 exam-shuffle:1 goi-len-bang:3 chi-tiet-cau:2 bai-tap-pdf:2 cau-hinh-chua:1 nap-manh:1 KhungLoiGiai:2 KhungXemPhieu:3 ExamTakeScreen:35 TheCau:5 tach-dong-cau:1 ket-qua-sau-nop:1 ngay-gio-24:2 dong-ho-thi:1 btvn-cho-em:4 lich-lo-btvn:1 btvn-ca-nhan-kieu:6 han-bai-tap:1 btvn-ca-nhan-em:1 btvn-may-chu-moi:1 hoi-bai:2 giu-de-doc:1 workbox-window.prod.es5:2 katex-goi:83",
+   "loi": 0
+  }
+ }
+}
