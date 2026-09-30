@@ -219,6 +219,8 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     return () => { cancelAnimationFrame(raf); veNgayRef.current = () => {} }
   }, [v, am, loai, dkc])
   useEffect(() => () => { v.huy(); am.dong() }, [v, am])
+  // Dựng sẵn âm thanh ngay sau khi bàn hiện (không trong lần chạm đầu — đo máy yếu 30/09: long task 150–350 ms lúc chạm bàn đầu tiên).
+  useEffect(() => { const h = setTimeout(() => am.chuanBi(), 700); return () => clearTimeout(h) }, [am])
   // Đang ở màn chơi (kể cả bảng kết quả) ⇒ app KHÔNG tự tải lại vì bản mới (nguyên nhân gốc "đang chơi thoát luôn" 30/09); rời màn ⇒ bản mới vào.
   useEffect(() => giuTrangKhongTaiLai(), [])
   // Giữ bàn ở máy chủ (30/09): ván A.I có phiên câu ⇒ báo "còn chơi" mỗi 3 phút khi màn đang hiện, để máy chủ chỉ nhả câu của bàn THẬT SỰ bỏ dở
