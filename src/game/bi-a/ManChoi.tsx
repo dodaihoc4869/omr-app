@@ -19,6 +19,7 @@ import { R } from './vat-ly'
 import { dangCheDoMayYeu } from '../../lib/may-yeu'
 import { useLuonMatThan } from './mat-than-luon'
 import { BoVe } from './ve-ban'
+import { datHuongKhoiTao } from './ve-bi'
 import { BanhXe, BoDieuKhien, CaiDatDieuKhien, HangCham, HuongDan, ThanhLuc, biTai, daXemHuongDan, ghiDaXemHuongDan } from './DieuKhienBia'
 import { KHO_BIET_GIAI_TRUOC, KHO_TAY } from './cai-dat-bia'
 import './bi-a.css'
@@ -85,7 +86,10 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       gomVa: (k: 'bi' | 'bang', sp: number, x: number, y: number, kho?: boolean) => am.gom(k, sp, pan(x, y), kho),
       ketThuc: (k: KetThucVan) => setKet(k),
     }
-    return mang ? new VanMang({ cheDo, loaiMang: mang.loaiMang, tenEm, chot, em: mang.em, cauTheoBi: mang.cauTheoBi }, sk, mang.kenh, mang.dau) : new VanBia({ cheDo, loai, tenEm, cauEm, chot }, sk)
+    const moi = mang ? new VanMang({ cheDo, loaiMang: mang.loaiMang, tenEm, chot, em: mang.em, cauTheoBi: mang.cauTheoBi }, sk, mang.kenh, mang.dau) : new VanBia({ cheDo, loai, tenEm, cauEm, chot }, sk)
+    // Bi đầu ván trông như bi thật (thầy 30/09): hướng quay 3D ngẫu nhiên ỔN ĐỊNH theo mã ván + kí hiệu bi (chỉ để vẽ, không băm, không gửi mạng).
+    datHuongKhoiTao(moi.st.balls, van)
+    return moi
   })
   const vm = v instanceof VanMang ? v : null
   const [luonMT, setLuonMT] = useLuonMatThan()

@@ -3,7 +3,7 @@
 import { datTFBan, raMan, type KhungBan } from './bo-cuc'
 import { duongMatThan } from './du-doan'
 import { KL, MAU_QH, PK, kieuBi, type KieuBi, type KiHieu, type QuanHe } from './nguyen-to'
-import { KHUNG_ANH, MAU_BI_VANG, taoAnhBi, taoBong, taoMatNa, toBiLan, veMotBi, type Bong, type MatNa } from './ve-bi'
+import { KHUNG_ANH, MAU_BI_VANG, huongKhoiTao, taoAnhBi, taoBong, taoMatNa, toBiLan, type Bong, type MatNa } from './ve-bi'
 import { DIEM_CHAN, H, LO, R, T, W, type Bi } from './vat-ly'
 import type { Pha, VanBia } from './dieu-khien'
 
@@ -88,10 +88,9 @@ export class BoVe {
   private lan = new Map<string, { cv: HTMLCanvasElement; x: CanvasRenderingContext2D; img: ImageData; ver: number; so: number }>()
   /** Số ảnh bi lăn còn được tô lại trong khung này (máy yếu: tối đa 4, bi khác giữ ảnh cũ thêm một khung). */
   private conTo = Infinity
-  /** Bi ĐÃ LĂN ít nhất một lần trong ván (thầy 30/09 "muốn bi lăn thật"): từ đó luôn vẽ theo hướng quay 3D bền `b.q` (tích luỹ theo quãng lăn,
-   *  chỉ là hình ảnh cục bộ — không vào băm, không gửi qua mạng) — dừng thì kí hiệu nằm đâu GIỮ NGUYÊN đó. Bi đứng yên: ảnh đệm riêng của bi
-   *  chỉ tô lại khi hướng đổi (`b.ver`), mỗi khung chỉ drawImage. Bi chưa lăn lần nào (đầu ván) dùng ảnh dáng gốc vẽ sẵn. */
-  private daLan = new Set<string>()
+  // LĂN THẬT (thầy 30/09): mọi bi (kể cả đầu ván — hướng khởi tạo `huongKhoiTao`) vẽ theo hướng quay 3D bền `b.q` (tích luỹ theo quãng lăn,
+  // chỉ là hình ảnh cục bộ — không vào băm, không gửi qua mạng) — dừng thì kí hiệu nằm đâu GIỮ NGUYÊN đó. Bi đứng yên: ảnh đệm riêng của bi
+  // chỉ tô lại khi hướng đổi (`b.ver`), mỗi khung chỉ drawImage. Không có canvas (test) ⇒ ảnh vẽ sẵn phẳng.
   private nen: HTMLCanvasElement | null = null
   /** Ảnh bóng đổ dưới bi (vẽ sẵn một lần mỗi cỡ, mỗi khung chỉ drawImage — không tạo gradient mỗi khung). */
   private bongDo: HTMLCanvasElement | null = null
@@ -159,11 +158,10 @@ export class BoVe {
   }
   private vanDangVe: VanBia | null = null
   private vangCua(b: Bi): boolean { const v = this.vanDangVe; return !!v && b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang }
-  /** Bi đang chạy (có vận tốc) ⇒ vẽ lăn. */
-  private dangLan(b: Bi): boolean {
-    if (!this.bong) return false
-    if (b.vx !== 0 || b.vy !== 0) this.daLan.add(b.id)
-    return this.daLan.has(b.id)
+  /** Có bảng chiếu sáng (máy vẽ được) ⇒ mọi bi vẽ 3D theo hướng quay bền. */
+  private dangLan(_b: Bi): boolean {
+    // Thầy 30/09: bi đầu ván cũng vẽ 3D thật (hướng khởi tạo ngẫu nhiên ổn định — huongKhoiTao), không còn dáng gốc phẳng.
+    return !!this.bong
   }
   /** Số nhận dạng ảnh đang vẽ của bi (đổi ⇒ ô bi là vùng bẩn): bi lăn theo bản hướng quay, bi đứng yên theo kiểu + viền vàng. */
   private soAnhVe(b: Bi, doiEm: 0 | 1): number {
@@ -387,7 +385,7 @@ export class BoVe {
       if (!sp) continue
       ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sp, this.viTri[4 * i + 2]! - sp.width / 2, this.viTri[4 * i + 3]! - sp.height / 2)
       // bi lăn đã giải trước: viền vàng mảnh vẽ thẳng (ảnh lăn không kèm viền)
-      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang && this.daLan.has(b.id) && this.bong) { ctx.strokeStyle = MAU_BI_VANG; ctx.lineWidth = this.rAnh * 0.16; ctx.beginPath(); ctx.arc(this.viTri[4 * i + 2]!, this.viTri[4 * i + 3]!, this.rAnh * 1.12, 0, 7); ctx.stroke() }
+      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang && this.bong) { ctx.strokeStyle = MAU_BI_VANG; ctx.lineWidth = this.rAnh * 0.16; ctx.beginPath(); ctx.arc(this.viTri[4 * i + 2]!, this.viTri[4 * i + 3]!, this.rAnh * 1.12, 0, 7); ctx.stroke() }
     }
     datTFBan(ctx, k, this.dpr)
     if (datBi) {
@@ -442,10 +440,12 @@ export class BoVe {
   }
 }
 /** Vẽ một bi mẫu (Sảnh Bi-a: chú giải "Bi của em · Bi đối thủ · Bi chốt"), đúng hàm vẽ bi của bàn. */
-export function veBiMau(canvas: HTMLCanvasElement, kieu: KieuBi, kiHieu: string, vang = false): void {
+export function veBiMau(canvas: HTMLCanvasElement, kieu: KieuBi, kiHieu: string, doc: Document = document): void {
   const dpr = Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1), N = Math.round(44 * dpr), x = canvas.getContext('2d')
   if (!x) return
   canvas.width = canvas.height = N
-  x.setTransform(1, 0, 0, 1, N / 2, N / 2)
-  veMotBi(x, kieu, kiHieu, N / KHUNG_ANH * 1.1, vang)
+  // Bi 3D thật như trên bàn (thầy 30/09): hướng ngẫu nhiên ổn định theo kí hiệu, vẽ bằng đúng đường vẽ lăn.
+  const B = taoBong(N), img = x.createImageData(N, N)
+  toBiLan(B, kieu, kieu === 'cai' ? null : taoMatNa(doc, kiHieu), huongKhoiTao(`sanh|${kiHieu}`), false, img.data)
+  x.putImageData(img, 0, 0)
 }

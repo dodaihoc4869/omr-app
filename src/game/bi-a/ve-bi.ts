@@ -3,6 +3,7 @@
 // Bi của em: lam đặc. Bi đối thủ: nền trắng, dải đỏ cam giữa 60 % chiều cao (bi sọc). Bi chốt: đen, vòng trắng giữa, chữ tối.
 // Kí hiệu nguyên tố: chữ trắng đậm viền tối, cỡ 1,08 R (một chữ) / 0,92 R (hai chữ). Viền vàng mảnh ngoài thân bi, thân bi giữ nguyên.
 import { MAU_BI, rgbCss, type KieuBi } from './nguyen-to'
+import { qMul, qTruc, type Bi } from './vat-ly'
 
 const C = { ta: rgbCss(MAU_BI.ta), dich: rgbCss(MAU_BI.dich), trang: rgbCss(MAU_BI.trang), den: rgbCss(MAU_BI.den), vang: rgbCss(MAU_BI.vang) }
 export const MAU_BI_VANG = C.vang
@@ -67,6 +68,27 @@ export function taoBong(N: number): Bong {
     B.sp[k] = Math.pow(h, 60) * 0.95 + Math.pow(h, 8) * 0.1
   }
   return B
+}
+/** Góc nghiêng tối đa của ô kí hiệu so với hướng nhìn lúc xếp bàn (thầy 30/09: bi đầu ván trông như bi thật nhưng em vẫn nhận ra kí hiệu). */
+export const NGHIENG_TOI_DA = 55 * Math.PI / 180
+/**
+ * HƯỚNG QUAY KHỞI TẠO của một bi lúc xếp bàn (thầy 30/09 "màn xếp bi cho hiển thị bi thật luôn"): ngẫu nhiên tự nhiên nhưng ỔN ĐỊNH theo hạt giống
+ * (mã ván + kí hiệu bi) — vẽ lại bao nhiêu lần cũng vậy. Ô kí hiệu (+x cục bộ) quay về phía người xem rồi xoay trong mặt phẳng màn một góc bất kỳ
+ * và nghiêng khỏi hướng nhìn ≤ NGHIENG_TOI_DA ⇒ kí hiệu có thể lệch / nghiêng / khuất một phần nhưng luôn thấy được; dải sọc nghiêng theo.
+ * Chỉ là hình ảnh cục bộ (không vào băm, không gửi mạng).
+ */
+export function huongKhoiTao(hatGiong: string): [number, number, number, number] {
+  let h = 2166136261 >>> 0
+  for (let i = 0; i < hatGiong.length; i++) { h ^= hatGiong.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0 }
+  const rand = () => { h = (h + 0x6d2b79f5) >>> 0; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
+  const xoayMan = (rand() * 2 - 1) * Math.PI, phi = rand() * 2 * Math.PI, nghieng = Math.sqrt(rand()) * NGHIENG_TOI_DA
+  const goc: [number, number, number, number] = [Math.SQRT1_2, 0, Math.SQRT1_2, 0] // ô kí hiệu nhìn thẳng người xem
+  const z = qTruc(0, 0, 1, xoayMan), t = qTruc(Math.cos(phi), Math.sin(phi), 0, nghieng)
+  return qMul(t, qMul(z, goc))
+}
+/** Đặt hướng khởi tạo cho mọi bi của bàn theo mã ván (gọi một lần lúc tạo ván). */
+export function datHuongKhoiTao(balls: readonly Bi[], maVan: string): void {
+  for (const b of balls) { const q = huongKhoiTao(`${maVan}|${b.id}`); b.q[0] = q[0]; b.q[1] = q[1]; b.q[2] = q[2]; b.q[3] = q[3]; b.ver++ }
 }
 export const CHU_T = 64
 /** Mặt nạ kí hiệu (tô + viền) CHU_T × CHU_T. Không có canvas (test) ⇒ rỗng (bi trơn). */

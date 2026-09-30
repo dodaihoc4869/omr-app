@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { BoVe } from '../src/game/bi-a/ve-ban'
 import { VanBia } from '../src/game/bi-a/dieu-khien'
 import { tinhKhungBan } from '../src/game/bi-a/bo-cuc'
-import { taoBong, toBiLan, type MatNa } from '../src/game/bi-a/ve-bi'
+import { NGHIENG_TOI_DA, datHuongKhoiTao, huongKhoiTao, taoBong, taoMatNa, toBiLan, type MatNa } from '../src/game/bi-a/ve-bi'
 import { kieuBi } from '../src/game/bi-a/nguyen-to'
 import { DAI_DICH, DAI_DICH_MT, DAI_TIEP_MT, duongMatThan, nhamInfo } from '../src/game/bi-a/du-doan'
 import { R, type Ban } from '../src/game/bi-a/vat-ly'
@@ -40,6 +40,24 @@ function vanMoi() {
   v.datHen(() => () => {})
   return v
 }
+
+describe('huongKhoiTao: ngẫu nhiên tự nhiên nhưng ổn định, kí hiệu vẫn nhìn thấy', () => {
+  it('cùng hạt giống ⇒ cùng hướng; khác bi/ván ⇒ khác; ô kí hiệu nghiêng khỏi hướng nhìn ≤ 55°; quaternion đơn vị', () => {
+    expect(huongKhoiTao('V1|Na')).toEqual(huongKhoiTao('V1|Na'))
+    expect(huongKhoiTao('V1|Na')).not.toEqual(huongKhoiTao('V1|Mg'))
+    expect(huongKhoiTao('V1|Na')).not.toEqual(huongKhoiTao('V2|Na'))
+    let khac = 0
+    for (let i = 0; i < 300; i++) {
+      const [w, x, y, z] = huongKhoiTao(`V${i}|Cl`)
+      expect(Math.hypot(w, x, y, z)).toBeCloseTo(1, 9)
+      // hướng màn của ô kí hiệu = R(q)·(1,0,0); người xem ở −z
+      const nz = 2 * (x * z - w * y)
+      expect(-nz).toBeGreaterThanOrEqual(Math.cos(NGHIENG_TOI_DA) - 1e-9)
+      if (-nz < 0.99) khac++
+    }
+    expect(khac).toBeGreaterThan(200) // đa số bi nghiêng thật, không thẳng mặt
+  })
+})
 
 describe('Mắt thần đơn giản (bản vẽ thử): hình học thuần, không mô phỏng', () => {
   const st = { balls: [{ id: 'cue', x: 250, y: 700, vx: 0, vy: 0, wx: 0, wy: 0, wz: 0, on: true, q: [1, 0, 0, 0], ver: 0 }, { id: 'Na', x: 262, y: 400, vx: 0, vy: 0, wx: 0, wy: 0, wz: 0, on: true, q: [1, 0, 0, 0], ver: 0 }] } as unknown as Ban
@@ -87,11 +105,23 @@ describe('bi lăn thật: dừng thì giữ hướng quay', () => {
     for (let i = 0; i < 30; i++) { v.buoc(1 / 60); (bv as unknown as { phaiVe: boolean }).phaiVe = true; bv.ve(ctx, v, null, true, false) }
     expect(tô.length).toBe(n)
   })
-  it('bi chưa lăn lần nào (đầu ván) dùng ảnh gốc, không tô ảnh lăn', () => {
+  // Sửa 30/09 (thầy: "màn xếp bi cho hiển thị bi thật luôn, kiểu cũ nhìn bị giả"): bi đầu ván KHÔNG còn dáng gốc phẳng.
+  it('bi đầu ván: vẽ 3D theo hướng khởi tạo theo hạt giống (mã ván + kí hiệu), ổn định khi vẽ lại, không về dáng gốc', () => {
     const { doc, tô } = taiLieuGia(), v = vanMoi(), bv = new BoVe(doc)
-    bv.datCo(tinhKhungBan(600, 1100, { khungDoc: true }), 1, false)
-    const truoc = tô.length
-    bv.canVe(v, null, true, false); bv.ve(doc.createElement('canvas').getContext('2d') as CanvasRenderingContext2D, v, null, true, false)
-    expect(tô.length).toBe(truoc)
+    const k = tinhKhungBan(600, 1100, { khungDoc: true })
+    datHuongKhoiTao(v.st.balls, 'VAN-7')
+    bv.datCo(k, 1, false)
+    const ctx = doc.createElement('canvas').getContext('2d') as CanvasRenderingContext2D
+    bv.canVe(v, null, true, false); bv.ve(ctx, v, null, true, false)
+    const cl = v.bi_('Cl'), B = taoBong(Math.max(12, Math.ceil(2 * 21 * k.S) + 2)), mong = new Uint8ClampedArray(B.N * B.N * 4) // bi sọc: thấy được hướng
+    expect([...cl.q]).toEqual(huongKhoiTao('VAN-7|Cl'))
+    toBiLan(B, kieuBi('Cl', 0), taoMatNa(doc, 'Cl'), huongKhoiTao('VAN-7|Cl'), false, mong)
+    expect(tô.some((x) => x.data.length === mong.length && x.data.every((c, i) => c === mong[i]))).toBe(true)
+    const goc = new Uint8ClampedArray(mong.length); toBiLan(B, kieuBi('Cl', 0), taoMatNa(doc, 'Cl'), [Math.SQRT1_2, 0, Math.SQRT1_2, 0], false, goc)
+    expect(goc.every((c, i) => c === mong[i])).toBe(false) // không phải dáng gốc phẳng
+    const n = tô.length
+    for (let i = 0; i < 20; i++) { (bv as unknown as { phaiVe: boolean }).phaiVe = true; bv.ve(ctx, v, null, true, false) }
+    expect(tô.length).toBe(n) // đứng yên: không tô lại
   })
+
 })
