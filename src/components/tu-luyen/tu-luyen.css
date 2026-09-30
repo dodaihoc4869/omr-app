@@ -906,6 +906,52 @@
   gap: 16px;
 }
 
+/* ---------------------------------------------------------------- chế độ 1 (luật 30/09) + khung cài đặt hai khối */
+/* Hai khối của bảng cài đặt: màn dọc "tan" vào khung (y như cũ); màn ngang/máy tính thành hai cột (tu-luyen-rong.css). */
+.tlu-ch-trai,
+.tlu-ch-phai {
+  display: contents;
+}
+.tlu-kho-sai {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--tlu-nen-3);
+}
+.tlu-kho-sai b {
+  font-size: 44px;
+  line-height: 1;
+  color: var(--tlu-vang);
+}
+.tlu-kho-sai-chu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--tlu-chu);
+}
+.tlu-kho-sai-chu span + span {
+  font-size: 13px;
+  color: var(--tlu-chu-phu);
+}
+.tlu-ghi[data-kieu='lap'] {
+  color: var(--tlu-vang);
+}
+/* Nhãn lần luyện + dòng "Sai gốc" trên thẻ câu (chữ máy chủ gửi, không mã nội bộ). */
+.tlu-nhan[data-kieu='luyen'] {
+  background: var(--m3-secondary-container, var(--m3-surface-container-high));
+  color: var(--m3-on-secondary-container, var(--m3-on-surface-variant));
+}
+.tlu-sai-goc {
+  flex-basis: 100%;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--m3-on-surface-variant);
+}
+
 /* ---------------------------------------------------------------- màn rộng */
 @media (min-width: 720px) {
   .tlu-luoi-che-do {

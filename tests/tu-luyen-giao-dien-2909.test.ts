@@ -24,7 +24,8 @@ describe('Tu luyện — nối vào app', () => {
     expect(man).not.toMatch(/chamCauTuLuyen|khopPhanIII|napKhoChoMayEm|hsCauSaiApi|deTheoDangBai|cauKhacPhuc/)
     expect(man).toContain("cheDo: 'thi' as const")
     expect(man).toContain("cheDo: 'xem_lai' as const")
-    expect(man).toContain('<NutHoiThay qid={c.qid} nguon="tu_luyen"')
+    // SỬA CÓ CHỦ Ý 30/09: chế độ 1 có bản lặp `<qid>~2` ⇒ Hỏi thầy đi theo câu GỐC.
+    expect(man).toContain('<NutHoiThay qid={qidGoc(c.qid)} nguon="tu_luyen"')
   })
   it('máy chủ định tuyến /hs/tu-luyen/*', () => {
     expect(may).toContain("if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))")

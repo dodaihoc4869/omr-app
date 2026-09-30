@@ -183,7 +183,9 @@ export default defineConfig({
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
           // Thẻ "Luyện đề cấu trúc" trong Tu luyện (30/09): mảnh nạp LƯỜI khi em bấm thẻ (luyện đề cần mạng để rút/chấm ở máy chủ) — kho chạy-lúc.
-          '**/LuyenDeCauTruc-*.{js,css}',
+          // Màn Tu luyện (30/09, bố cục ngang + máy tính): cả mảnh ManTuLuyen nạp LƯỜI khi em bấm cửa Tu luyện ở Sảnh — mọi việc của nó đều cần máy chủ
+          // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
+          '**/{ManTuLuyen,LuyenDeCauTruc}-*.{js,css}',
           // Màn làm bài NGANG (28/09): mảnh nạp lười chỉ máy ngang/máy tính cần; màn thi tải sẵn khi máy đang ngang, nạp hỏng thì ở lại bố cục dọc.
           '**/LamBaiNgang-*.{js,css}',
           // Tải PDF "Câu đã làm" (28/09): jspdf (+ canvg `index.es`, dompurify `purify.es`, html2canvas mà jspdf kéo theo) và html2canvas-pro

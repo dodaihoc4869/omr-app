@@ -378,3 +378,75 @@
     font-size: 16px;
   }
 }
+
+/* ================================================================ NGANG + MÁY TÍNH (30/09) — khung chung ở tu-luyen-rong.css (KhungLamRong, kết quả hai cột).
+ * Ở đây: trang giới thiệu hai cột, khung toàn màn của đề (cố định) cuộn đúng chỗ. Màn dọc không đổi. */
+.ldct-gioi-thieu[data-bo-cuc='rong'],
+.ldct-gioi-thieu[data-bo-cuc='ngang'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-areas:
+    'the the'
+    'batdau cautruc'
+    'luot cautruc';
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  gap: 16px 20px;
+  animation: tlu-hien 0.22s ease-out;
+}
+.ldct-gioi-thieu[data-bo-cuc] > .ldct-the { grid-area: the; }
+.ldct-gioi-thieu[data-bo-cuc] > .ldct-bat-dau { grid-area: batdau; }
+.ldct-gioi-thieu[data-bo-cuc] > .ldct-o-cau-truc { grid-area: cautruc; }
+.ldct-gioi-thieu[data-bo-cuc] > .ldct-o-luot { grid-area: luot; }
+.ldct-gioi-thieu[data-bo-cuc='doc'] {
+  display: flex;
+}
+.ldct-gioi-thieu[data-bo-cuc='rong'] .ldct-the,
+.ldct-gioi-thieu[data-bo-cuc='ngang'] .ldct-the {
+  grid-template-columns: auto 1fr auto;
+}
+.ldct-gioi-thieu[data-bo-cuc='rong'] .ldct-the {
+  padding: 24px 28px;
+}
+.ldct-gioi-thieu[data-bo-cuc='rong'] .ldct-the-ten {
+  font-size: 28px;
+}
+.ldct-gioi-thieu[data-bo-cuc] .ldct-trang-thai {
+  grid-column: auto;
+  justify-self: end;
+}
+.ldct-gioi-thieu[data-bo-cuc='rong'] .ldct-cau-truc,
+.ldct-gioi-thieu[data-bo-cuc='ngang'] .ldct-cau-truc {
+  grid-template-columns: 1fr;
+}
+.ldct-gioi-thieu[data-bo-cuc='rong'] .ldct-kpi,
+.ldct-gioi-thieu[data-bo-cuc='ngang'] .ldct-kpi {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ldct-gioi-thieu[data-bo-cuc='ngang'] {
+  gap: 12px;
+}
+.ldct-gioi-thieu[data-bo-cuc='ngang'] .ldct-the {
+  padding: 12px 16px;
+}
+.ldct-gioi-thieu[data-bo-cuc='ngang'] .ldct-the-icon {
+  width: 44px;
+  height: 44px;
+}
+.ldct-gioi-thieu[data-bo-cuc='ngang'] .ldct-the-ten {
+  font-size: 20px;
+}
+/* Khung đề toàn màn: máy tính cuộn cả khung (cột phải dính trong khung); ngang hai cột tự cuộn. */
+.tlu-rong.ldct-toan[data-bo-cuc='rong'] .tlu-dau-rong .tlu-tieu.tlu-tieu-nho {
+  font-size: 20px;
+}
+.tlu-rong.ldct-toan[data-bo-cuc='ngang'][data-chang='lam'],
+.tlu-rong.ldct-toan[data-bo-cuc='ngang'][data-chang='ket-qua'] {
+  overflow: hidden;
+}
+.tlu-lam-luoi .ldct-phan-ten {
+  margin-top: 4px;
+}
+.tlu-lam-luoi .ldct-phan + .ldct-phan {
+  margin-top: 8px;
+}

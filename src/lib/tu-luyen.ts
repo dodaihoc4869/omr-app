@@ -42,6 +42,10 @@ export interface CauCongKhai {
   tenDang: string
   sao: 0 | 1 | 2
   loai: 'ly_thuyet' | 'bai_tap' | 'chua_ro'
+  /** Chế độ 1 (luật 30/09): "Luyện lần đầu" / "Luyện lại lần K". */
+  nhanLuyen?: string
+  /** Chế độ 1: "Sai gốc: Ca kiểm tra Ester · 29/09" / "Sai gốc: Chiến dịch … · Đoàn Hộ Tống · 30/09 và 2 lần khác". */
+  saiGoc?: string
 }
 
 /** Phần RIÊNG của câu — chỉ nằm trên máy chủ tới lúc em nộp. */

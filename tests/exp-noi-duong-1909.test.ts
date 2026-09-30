@@ -106,14 +106,20 @@ describe('khắc phục, bài Mẹ giao, luyện đề', () => {
     const trong = await mom(d.env, 'submit', { token, id: 'M2', answers: {} })
     expect(trong.expNhan).toEqual([])
   })
-  it('luyện đề (submit): câu đúng có EXP', async () => {
+  // SỬA CÓ CHỦ Ý 30/09 (Boss chốt): Luyện đề cấu trúc nằm trong Tu luyện ⇒ KHÔNG cộng EXP; sổ su_kien_hoc vẫn ghi như cũ.
+  it('luyện đề (submit): KHÔNG có EXP (kể cả khi cờ EXP mới bật), sổ sự kiện vẫn ghi', async () => {
     const d = dung(true)
     const token = await gameToken(d.env, 'S1')
     const nguon = [{ maDe: 'L', phanI: [{ id: 'L-I-1', text: 'a', choices: ['A', 'B', 'C', 'D'], correct: 'A', dang: { ma: 'AA.BB' } }], phanII: [], phanIII: [{ id: 'L-III-1', text: 'd', correct: '0.5' }] }]
     d.objects.set('luyen-de-2026/S1/LD1.json', nguon)
     const now = Date.now()
     d.sql.prepare('INSERT INTO luyen_de_2026(id,sbd,created_at,deadline,bank_key,updated_at) VALUES(?,?,?,?,?,?)').run('LD1', 'S1', now, now + 3_000_000, 'luyen-de-2026/S1/LD1.json', now)
+    const truoc = d.dem('exp_so')
     const r = await luyenDe(d.env, 'submit', { token, id: 'LD1', answers: { 'L-I-1': 'A', 'L-III-1': '0,5' } })
-    expect(loai(r)).toEqual(['cau', 'cau'])
+    expect(r.status).toBe('submitted')
+    expect(r.expNhan).toBeUndefined()
+    expect(r.manhNhan).toBeUndefined()
+    expect(d.dem('exp_so')).toBe(truoc)
+    expect(d.dem('su_kien_hoc')).toBe(2)
   })
 })
