@@ -58,7 +58,7 @@ describe('chỉ mục game_v2_attempt(session, sbd)', () => {
     const cau: string[] = []
     const prepGoc = d1.env.DB.prepare.bind(d1.env.DB)
     const env: any = { ...d1.env, DB: { ...d1.env.DB, batch: d1.env.DB.batch.bind(d1.env.DB), prepare: (q: string) => { cau.push(q); return prepGoc(q) } } }
-    expect(CHI_MUC_CRON_DEM).toEqual(['CREATE INDEX IF NOT EXISTS idx_luot_ca_tt ON luot(ma_ca, trang_thai, het_gio_luc)'])
+    expect(CHI_MUC_CRON_DEM[0]).toBe('CREATE INDEX IF NOT EXISTS idx_luot_ca_tt ON luot(ma_ca, trang_thai, het_gio_luc)') // 30/09 thêm 3 chỉ mục sau (do-quet-cuoi-3009)
     await worker.fetch(new Request('https://x.dev/khoe'), env)
     await worker.scheduled({ cron: '* * * * *' } as any, env).catch(() => undefined)
     expect(cau.filter((q) => q.includes('idx_luot_ca_tt'))).toEqual([])

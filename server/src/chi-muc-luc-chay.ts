@@ -29,6 +29,13 @@ export function damBaoChiMuc(env: Env): Promise<void> {
  */
 export const CHI_MUC_CRON_DEM: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS idx_luot_ca_tt ON luot(ma_ca, trang_thai, het_gio_luc)',
+  // Quét tối ưu 30/09 (bản sao server/migration-3009-chi-muc-quet-cuoi.sql; EXPLAIN trước = "SCAN <bảng>"):
+  //  · EXP hôm nay (`docExpHomNay`, mỗi lần em mở app qua /hs/ke-hoach-ngay) lọc game_v2_reward theo sbd + ngày — bảng ≈ một dòng mỗi câu game.
+  'CREATE INDEX IF NOT EXISTS idx_game_v2_reward_sbd ON game_v2_reward(sbd, created_at)',
+  //  · Sảnh Bi-a hỏi 6 s/lần: lời mời em ĐÃ GỬI (tu_sbd) — chỉ mục cũ chỉ theo người nhận.
+  'CREATE INDEX IF NOT EXISTS bi_a_moi_tu ON bi_a_moi(tu_sbd, tao_luc)',
+  //  · Vào bàn bằng mã / cấp mã bàn mới: bàn đang chờ trong hạn vé.
+  'CREATE INDEX IF NOT EXISTS bi_a_van_cho ON bi_a_van(trang_thai, tao_luc)',
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {
