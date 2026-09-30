@@ -129,8 +129,7 @@ async function goi(lenh, duong, than, laLoi = (j) => j?.ok === false) {
       : { method: 'POST', headers: { 'content-type': 'application/json', 'x-do-lenh': encodeURIComponent(lenh), ...(than.__thay ? { 'x-ma-bi-mat': MAT } : {}) }, body: JSON.stringify(than), signal: AbortSignal.timeout(30000) })
     const txt = await r.text()
     try { j = JSON.parse(txt) } catch { j = null }
-    if (r.status >= 500) loi = `http ${r.status}`
-    else if (r.status >= 400) loi = `http ${r.status}`
+    if (r.status >= 400) loi = `http ${r.status} ${String(j?.error ?? j?.lyDo ?? txt).slice(0, 120)}`
     else if (j && laLoi(j)) loi = `ok:false ${j.lyDo ?? j.error ?? ''}`.slice(0, 80)
   } catch (e) {
     loi = `mạng: ${e?.name ?? e}`

@@ -30,6 +30,8 @@ const CHI = arg('chi', '')
 const RA = arg('ra', '')
 const GAME = arg('game', '')
 const LAN = Number(arg('lan', '1'))
+// --cao=740: chiều cao khổ màn (mặc định 800) — tối ưu ca 30/09 đo khổ 360×740.
+const CAO = Number(arg('cao', '800'))
 // --may-chieu=1: đo TỜ CHIẾU lên bảng (html-may-chieu.ts, trang độc lập của máy chiếu) — khổ 1280×720, dữ liệu mẫu.
 const MAY_CHIEU = arg('may-chieu', '') === '1'
 // --goc=<URL> đo một máy chủ đang chạy sẵn (vd `npm run dev` để chẩn đoán có tên component) thay cho thư mục --dist.
@@ -154,6 +156,8 @@ function mayChuTinh(thuMuc, trangMacDinh = 'index.html') {
 const MANG_GIA = {
   fast3g: { offline: false, latency: 562.5, downloadThroughput: (1474.56 * 1024) / 8, uploadThroughput: (675 * 1024) / 8 },
   slow3g: { offline: false, latency: 2000, downloadThroughput: (400 * 1024) / 8, uploadThroughput: (400 * 1024) / 8 },
+  // "Slow 4G" của DevTools (Chrome ≥ 119 đổi tên từ "Fast 3G", cùng số) — tối ưu ca 30/09 đo bằng tên này.
+  slow4g: { offline: false, latency: 562.5, downloadThroughput: (1474.56 * 1024) / 8, uploadThroughput: (675 * 1024) / 8 },
   khong: null,
 }
 
@@ -328,7 +332,7 @@ async function mayChuGia(ctx, goc) {
 
 // ── các màn ───────────────────────────────────────────────────────────────────────────────────────
 async function moMay(trinh, goc, { mang = MANG, cpu = CPU, truocKhiMo = null } = {}) {
-  const ctx = await trinh.newContext({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
+  const ctx = await trinh.newContext({ viewport: { width: 360, height: CAO }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block', ignoreHTTPSErrors: true, locale: 'vi-VN', userAgent: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36' })
   await ctx.addInitScript(DO_TRONG_TRANG)
   // Máy Android yếu thật: RAM 2 GB, 4 luồng ⇒ app tự bật chế độ `may-yeu` (src/lib/may-yeu.ts) như trên máy em.
   if (MAY_YEU) await ctx.addInitScript(() => {
@@ -411,17 +415,36 @@ async function doThi(trinh, goc) {
         }),
       i,
     )
-  await p.evaluate(() => ((window.__do.commit = 0), (window.__do.dai = [])))
+  await p.evaluate(() => ((window.__do.commit = 0), (window.__do.dai = []), (window.__do.sk = [])))
   await batHoSo(cdp, 'chon')
   const chon = []
   for (let i = 1; i <= 8; i++) chon.push(await bamCau(i))
   await inHoSo(cdp, 'chon')
   const dChon = await p.evaluate(() => window.__do)
+  // INP khi CHẠM CHỌN (Event Timing, ngưỡng 16 ms): thời lượng tương tác lâu nhất trong 8 lượt chọn; tác vụ dài lâu nhất lúc chọn.
+  const suKienChon = dChon.sk.filter((e) => /pointer|click|touch|mouse/.test(e[0]))
+  const inpChonMs = Math.max(0, ...suKienChon.map((e) => e[2]))
+  const taiDaiMaxKhiChon = Math.max(0, ...dChon.dai.map((x) => x[1]))
+  const soTaiDaiTren100KhiChon = dChon.dai.filter((x) => x[1] > 100).length
   await p.evaluate((c) => (window.__batDem(c), (window.__do.commit = 0)), CHAN_DOAN)
   for (let i = 9; i <= 12; i++) await bamCau(i)
   const d1 = await p.evaluate(() => ((window.__do.ghiVe = false), window.__do))
   const veMoiLanChon = Math.round(d1.veLai / 4)
   const commitChon = dChon.commit
+  // GÕ SỐ ở ô trả lời Phần III (câu đầu tiên có ô nhập): INP bàn phím + tác vụ dài.
+  let inpGoMs = null
+  let taiDaiMaxKhiGo = null
+  const oSo = await p.evaluateHandle(() => document.querySelector('[id^="cau-"] input[inputmode="decimal"], [id^="cau-"] input[type="text"]'))
+  if (await oSo.evaluate((x) => !!x)) {
+    await oSo.evaluate((x) => (x.scrollIntoView({ block: 'center' }), x.focus()))
+    await p.waitForTimeout(400)
+    await p.evaluate(() => ((window.__do.sk = []), (window.__do.dai = [])))
+    for (const k of ['2', ',', '5']) { await p.keyboard.press(k); await p.waitForTimeout(250) }
+    await p.waitForTimeout(400)
+    const dGo = await p.evaluate(() => window.__do)
+    inpGoMs = Math.max(0, ...dGo.sk.filter((e) => /key|input|beforeinput/.test(e[0])).map((e) => e[2]))
+    taiDaiMaxKhiGo = Math.max(0, ...dGo.dai.map((x) => x[1]))
+  }
   // CUỘN cả đề 6 giây (bước 14 px/khung như vuốt đều).
   await p.evaluate(() => window.scrollTo(0, 0))
   await p.waitForTimeout(500)
@@ -451,6 +474,11 @@ async function doThi(trinh, goc) {
     chonMsMax: Math.max(...chon),
     veLaiMoiLanChon: veMoiLanChon,
     commitKhiChon8: commitChon,
+    inpChonMs,
+    taiDaiMaxKhiChon,
+    soTaiDaiTren100KhiChon,
+    inpGoMs,
+    taiDaiMaxKhiGo,
     tbtKhiChon8: tbt(dChon.dai),
     cuon: { ...cuon, tbt: tbt(d2.dai), commit: d2.commit },
     ngoi12s: { commit: d3.commit, taiDai: d3.dai.length, tbt: tbt(d3.dai), cham33: ngoi.cham33, veLai12s: d4.veLai },
