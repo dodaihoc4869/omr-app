@@ -18,7 +18,8 @@ Vào: —. Ra:
   chienDich: { id, ten, hanNop, tong } | null,
   theLuc: { con, tong },            // câu kế hoạch hôm nay còn / tổng
   doan: { con }, dao: { con },
-  tran: { con, tong, tranDoan, tranDao, conDoan, conDao },   // trần Bi-a 40% mỗi phần
+  tran: { con, tong, tranMoi, tranOn, conMoi, conOn },   // trần Bi-a (thầy 30/09): floor(40% CẢ kế hoạch), chia mới : ôn theo tỉ lệ kế hoạch
+  thongBao?,                        // trần còn 1..7 câu (< bàn đủ 7 bi + Câu chốt): "Hôm nay Bi-a còn N câu. Bàn chỉ có N câu, các bi còn lại là bi trống…"
   giaoHuu: { mo, con, toiDa: 2 } }
 ```
 `lyDoKhoa`: `chua_co_chien_dich` · `xong_ke_hoach` (giaoHuu.mo = true nếu còn lượt) · `het_tran` · `cau_dang_bao_ve`.
@@ -27,7 +28,12 @@ Vào: —. Ra:
 Vào: `{ loai: 'ai'|'giao_huu', cheDo: 'don'|'doi', soBi: 7|4|3 }` (sai ⇒ đơn 7 / đôi 4).
 Luôn đóng ván Bi-a còn mở của em trước (một em một ván mở).
 - Giao hữu (chỉ khi xong kế hoạch, tối đa 2 ván/ngày): `{ ok, van, loai, cheDo, bi:[], chot:null, giaoHuu:{ con, toiDa } }` — không phiên, không câu.
-- Ván với A.I: `{ ok, van, session, loai, cheDo, soBi, bi: CauCongKhai[], trong, chot: CauCongKhai|null, tran:{ con, tong }, theLuc, conDoan, conDao }`.
+- Ván với A.I: `{ ok, van, session, loai, cheDo, soBi, bi: CauCongKhai[], trong, chot: CauCongKhai|null, tran:{ con, tong }, theLuc, conDoan, conDao, thongBao? }`.
+- Luật chọn câu (thầy 30/09 "Bi a cũng rải luôn câu ôn lại đúng theo tỷ lệ trần của bi a"): trần = floor(40% toàn bộ kế hoạch ngày — câu mới + câu ôn: nợ,
+  củng cố, duy trì); phần câu mới = làm tròn(trần × mới / tổng kế hoạch), hoà ⇒ xuống; phần ôn = còn lại. Câu "mới" = lần làm đầu (`qid`, không `#2`) của
+  câu chưa làm hoặc làm lần đầu hôm nay. Trên bàn: số bi câu mới : câu ôn theo tỉ lệ phần còn trần hai nhóm, câu ôn trước; trong nhóm giữ thứ tự cũ
+  (phần Đoàn trước rồi phần Đảo, thứ tự kế hoạch). Trần còn ít hơn số bi: bàn vẫn mở, bi thiếu câu là bi trống (`trong`), kèm `thongBao`; Câu chốt chỉ khi
+  còn ≥ 2 câu. `bia-tra-loi` (Trả lời câu hỏi) dùng cùng luật.
   - `bi` là danh sách câu theo thứ tự; máy khách gán lần lượt cho bi em giữ. `trong` = số bi em giữ không có câu (bi trống). **Khác đặc tả 4.2 mục 8** (đặc tả ghi `[{ki, trong, cau}]`): máy chủ không biết kí hiệu bi, việc gán do máy khách.
   - Câu chốt chọn trước (Vận dụng, ưu tiên câu ôn đang sai), rồi phần Đoàn tới hết trần, rồi phần Đảo.
   - Không có `correct` / `solution` / `answer` (test quét sâu).

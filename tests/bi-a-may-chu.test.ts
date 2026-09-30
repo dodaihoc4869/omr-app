@@ -6,7 +6,7 @@ import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay } from '../server/src/srs2-d1'
 import { startDao2, startDoan2 } from '../server/src/srs2-game'
 import { readFileSync } from 'node:fs'
-import { biaAction, SQL_BANG_BIA, tinhTranBia, xepUngVienChot } from '../server/src/bi-a'
+import { biaAction, chiaTiLe, laCauMoiKeHoach, SQL_BANG_BIA, tinhTranBia, xepUngVienChot } from '../server/src/bi-a'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { dieuKienLoaiPhien } from '../server/src/game-v2-luot'
@@ -64,12 +64,36 @@ function khongLoDapAn(o: unknown) {
 }
 
 describe('Bi-a — trần 40% (thuần)', () => {
-  it('14 + 26 → 5 + 10 = 15; 1 + 1 → 0; 80 câu Huyết Chiến ≈ 32; đã dùng trừ đúng phần', () => {
-    expect(tinhTranBia(14, 26, 0, 0)).toMatchObject({ tranDoan: 5, tranDao: 10, tong: 15, con: 15 })
+  // Thầy 30/09 "Bi a cũng rải luôn câu ôn lại đúng theo tỷ lệ trần của bi a": trần = floor(40% CẢ kế hoạch), chia theo tỉ lệ mới : ôn của kế hoạch.
+  it('14 mới + 26 ôn → trần 16 = 6 mới + 10 ôn; 1 + 1 → 0; 80 câu Huyết Chiến → 32; đã dùng trừ đúng nhóm', () => {
+    expect(tinhTranBia(14, 26, 0, 0)).toMatchObject({ tranMoi: 6, tranOn: 10, tong: 16, con: 16 })
     expect(tinhTranBia(1, 1, 0, 0).tong).toBe(0)
     expect(tinhTranBia(30, 50, 0, 0).tong).toBe(32)
-    expect(tinhTranBia(14, 26, 5, 3)).toMatchObject({ conDoan: 0, conDao: 7, con: 7 })
-    expect(tinhTranBia(14, 26, 9, 0).conDoan).toBe(0) // không âm
+    expect(tinhTranBia(14, 26, 5, 3)).toMatchObject({ conMoi: 1, conOn: 7, con: 8 })
+    expect(tinhTranBia(14, 26, 9, 0).conMoi).toBe(0) // không âm
+  })
+  it('kế hoạch rải đều nhỏ: 10 câu mới ⇒ Bi-a 4 (không ăn hết câu mới của Đảo); 2 mới + 8 ôn ⇒ 1 mới + 3 ôn; 1 mới + 9 ôn ⇒ 0 + 4', () => {
+    expect(tinhTranBia(10, 0, 0, 0)).toMatchObject({ tong: 4, tranMoi: 4, tranOn: 0 })
+    expect(tinhTranBia(2, 8, 0, 0)).toMatchObject({ tong: 4, tranMoi: 1, tranOn: 3 })
+    expect(tinhTranBia(1, 9, 0, 0)).toMatchObject({ tong: 4, tranMoi: 0, tranOn: 4 })
+    expect(tinhTranBia(5, 5, 0, 0)).toMatchObject({ tong: 4, tranMoi: 2, tranOn: 2 })
+    expect(tinhTranBia(0, 10, 0, 0)).toMatchObject({ tong: 4, tranMoi: 0, tranOn: 4 })
+    // làm tròn: gần nhất, hoà (,5) ⇒ xuống (nhường câu mới cho Đảo)
+    expect(chiaTiLe(1, 1, 2)).toBe(0)
+    expect(chiaTiLe(3, 1, 2)).toBe(1)
+    expect(chiaTiLe(1, 2, 3)).toBe(1)
+    expect(chiaTiLe(4, 10, 10)).toBe(4)
+  })
+  it('bất biến trên mọi cỡ kế hoạch: đúng 40% tổng, mới ≤ 40% mới + ½, không bao giờ lấy hết câu mới, lệch tỉ lệ ≤ ½ câu', () => {
+    for (let moi = 0; moi <= 45; moi++) for (let on = 0; on <= 45; on++) {
+      const T = moi + on, t = tinhTranBia(moi, on, 0, 0)
+      expect(t.tong).toBe(Math.floor(0.4 * T + 1e-9))
+      expect(t.tranMoi + t.tranOn).toBe(t.tong)
+      expect(t.tranMoi).toBeLessThanOrEqual(moi)
+      expect(t.tranOn).toBeLessThanOrEqual(on)
+      if (moi > 0) expect(t.tranMoi).toBeLessThan(moi)
+      if (T > 0) expect(Math.abs(t.tranMoi - (t.tong * moi) / T)).toBeLessThanOrEqual(0.5)
+    }
   })
   it('Câu chốt: Vận dụng trước, trong đó câu ôn đang sai (cc = 0) trước', () => {
     const meta = new Map([['A', { mucDo: 'NB' }], ['B', { mucDo: 'VD' }], ['C', { mucDo: 'VD' }], ['D', { mucDo: 'TH' }]]) as never
@@ -88,17 +112,22 @@ describe('Bi-a — máy chủ trên D1 thật', () => {
     expect(await biaAction(f2.env, 'S1', 'bia-sanh', {}, T0)).toMatchObject({ bat: false })
   })
 
-  it('Sảnh: trần = floor(40% Đoàn) + floor(40% Đảo) của kế hoạch chốt; hoa2-sanh có phần bia', async () => {
+  it('Sảnh: trần = floor(40% CẢ kế hoạch chốt), chia mới : ôn theo tỉ lệ kế hoạch; hoa2-sanh có phần bia', async () => {
     const { env } = fixture()
     await giao(env)
     await taoCauOn(env, ['Q1', 'Q2', 'Q3', 'Q5', 'Q6'])
     const nay = Date.now() // hoa2-sanh đọc giờ thật ⇒ cùng một ngày cho cả hai phía
     const { kh } = await layKeHoachHomNay(env, 'S1', nay)
     const s = await biaAction(env, 'S1', 'bia-sanh', {}, nay)
-    const tran = s.tran as { tong: number; tranDoan: number; tranDao: number; con: number }
-    expect(tran.tranDoan).toBe(Math.floor(0.4 * kh.doan.length))
-    expect(tran.tranDao).toBe(Math.floor(0.4 * kh.dao.length))
-    expect(tran.tong).toBe(tran.tranDoan + tran.tranDao)
+    const tran = s.tran as { tong: number; tranMoi: number; tranOn: number; con: number }
+    const tatCa = [...kh.doan, ...kh.dao]
+    const { hs } = await layKeHoachHomNay(env, 'S1', nay)
+    const soMoi = tatCa.filter((k) => laCauMoiKeHoach(k, hs, kh.ngay)).length
+    expect(soMoi).toBeGreaterThan(0)
+    expect(tatCa.length - soMoi).toBeGreaterThan(0)
+    expect(tran.tong).toBe(Math.floor(0.4 * tatCa.length))
+    expect(tran).toMatchObject({ tranMoi: tinhTranBia(soMoi, tatCa.length - soMoi, 0, 0).tranMoi, tranOn: tinhTranBia(soMoi, tatCa.length - soMoi, 0, 0).tranOn })
+    expect(tran.tranMoi + tran.tranOn).toBe(tran.tong)
     expect(s.theLuc).toEqual({ con: kh.conDao.length + kh.conDoan.length, tong: kh.tong })
     const token = await gameToken(env, 'S1')
     await gameV2(env, 'choose', { token, pet: 'dat_quy' })
@@ -106,7 +135,7 @@ describe('Bi-a — máy chủ trên D1 thật', () => {
     expect(h.bia).toMatchObject({ bat: true, tong: tran.tong })
   })
 
-  it('xếp bàn: câu đều thuộc kế hoạch hôm nay, câu ôn Đoàn trước, có Câu chốt vai trùm, không tự luận, không lộ đáp án', async () => {
+  it('xếp bàn: câu đều thuộc kế hoạch hôm nay, câu ôn trước câu mới, số câu mới trong trần nhóm mới, có Câu chốt vai trùm, không tự luận, không lộ đáp án', async () => {
     const { env } = fixture()
     await giao(env)
     await taoCauOn(env, ['Q1', 'Q2', 'Q3', 'Q5', 'Q6', 'Q7', 'Q9', 'Q10', 'Q11', 'Q13'])
@@ -119,13 +148,17 @@ describe('Bi-a — máy chủ trên D1 thật', () => {
     for (const q of [...bi, chot]) expect(keHoach.has(q.qid)).toBe(true)
     expect(chot.vai).toBe('trum')
     expect(JSON.stringify(r)).not.toContain('QTL')
-    const tran = tinhTranBia(kh.doan.length, kh.dao.length, 0, 0)
+    const { hs } = await layKeHoachHomNay(env, 'S1', T0)
+    const tatCa = [...kh.doan, ...kh.dao]
+    const laMoi = (q: string) => laCauMoiKeHoach(q, hs, kh.ngay)
+    const soMoi = tatCa.filter(laMoi).length
+    const tran = tinhTranBia(soMoi, tatCa.length - soMoi, 0, 0)
     expect(bi.length + 1).toBeLessThanOrEqual(tran.tong)
-    // Câu ôn phần Đoàn đi trước câu phần Đảo
-    const doan = new Set(kh.doan)
-    const viTriDao = bi.findIndex((q) => !doan.has(q.qid))
-    if (viTriDao >= 0) expect(bi.slice(viTriDao).every((q) => !doan.has(q.qid))).toBe(true)
-    expect(bi.filter((q) => doan.has(q.qid)).length).toBeLessThanOrEqual(tran.tranDoan)
+    // Câu ôn đi trước câu mới trên bàn; câu mới (kể cả Câu chốt) không vượt trần nhóm mới, câu ôn không vượt trần nhóm ôn
+    const viTriMoi = bi.findIndex((q) => laMoi(q.qid))
+    if (viTriMoi >= 0) expect(bi.slice(viTriMoi).every((q) => laMoi(q.qid))).toBe(true)
+    expect([...bi, chot].filter((q) => laMoi(q.qid)).length).toBeLessThanOrEqual(tran.tranMoi)
+    expect([...bi, chot].filter((q) => !laMoi(q.qid)).length).toBeLessThanOrEqual(tran.tranOn)
   })
 
   it('trả lời qua answer chung: ghi su_kien_hoc nguon game, Thể lực giảm; Câu chốt đúng không Bùa có EXP câu trùm; phiên không lẫn Đảo', async () => {

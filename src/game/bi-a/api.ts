@@ -25,7 +25,10 @@ export interface SanhBia {
   theLuc: { con: number; tong: number }
   doan: number
   dao: number
-  tran: { con: number; tong: number; conDoan: number; conDao: number }
+  /** Trần Bi-a (thầy 30/09): 40% CẢ kế hoạch ngày, chia câu mới : câu ôn theo tỉ lệ kế hoạch. */
+  tran: { con: number; tong: number; conMoi: number; conOn: number }
+  /** Trần còn ít hơn một bàn đủ ⇒ lời báo "Hôm nay Bi-a còn N câu…" (bàn vẫn mở, bi thiếu câu là bi trống). Rỗng ⇒ không báo. */
+  thongBao: string
   giaoHuu: { mo: boolean; con: number; toiDa: number }
   /** Máy chủ có phòng đấu (Durable Object) ⇒ mở "Đấu với bạn"; không ⇒ nút ghi "Sắp mở". */
   online: boolean
@@ -40,7 +43,8 @@ export function docSanhBia(o: Record<string, unknown>): SanhBia {
     chienDich: cd ? { ten: chu(cd.ten) || 'Chiến dịch của lớp', hanNop: chu(cd.hanNop), tong: so(cd.tong) } : null,
     theLuc: { con: so(tl?.con), tong: so(tl?.tong) },
     doan: so(vat(o.doan)?.con), dao: so(vat(o.dao)?.con),
-    tran: { con: so(tr?.con), tong: so(tr?.tong), conDoan: so(tr?.conDoan), conDao: so(tr?.conDao) },
+    tran: { con: so(tr?.con), tong: so(tr?.tong), conMoi: so(tr?.conMoi), conOn: so(tr?.conOn) },
+    thongBao: chu(o.thongBao),
     giaoHuu: { mo: gh?.mo === true, con: so(gh?.con), toiDa: so(gh?.toiDa) || 2 },
     online: o.online === true,
     diemBan: { diem: so(vat(o.diemBan)?.diem) || 1000, soVan: so(vat(o.diemBan)?.soVan) },

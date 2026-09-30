@@ -1,7 +1,8 @@
 // BI-A PHẢN ỨNG — lệnh máy chủ `bia-*` (đặc tả DAC-TA-BI-A-PHAN-UNG-2809.md mục 4, 5, 9; hợp đồng docs/hop-dong-bi-a.md).
 // Không có bộ chấm/EXP/kế hoạch thứ hai: câu lấy từ đúng kế hoạch ngày đã chốt (`layKeHoachHomNay`), trả lời qua `answer` chung
 // (phiên `mode:'bia'`, `hoa2:1`, `bia:1`), nên Thể lực, EXP (trần 120/ngày), lịch ôn, Câu đã làm tự khớp như Đảo và Đoàn.
-// Trần Bi-a (thầy chốt 28/09): tối đa floor(40% phần Đoàn) + floor(40% phần Đảo) của kế hoạch hôm nay.
+// Trần Bi-a (thầy 30/09 "Bi a cũng rải luôn câu ôn lại đúng theo tỷ lệ trần của bi a"): floor(40% CẢ kế hoạch hôm nay), chia theo tỉ lệ câu mới : câu ôn
+// của kế hoạch (trước 30/09: 40% phần Đoàn + 40% phần Đảo). Xem `tinhTranBia`.
 import type { Env, DongCa, DongLuot } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -109,19 +110,31 @@ export async function coCaDangMo(env: Env, sbd: string, nowMs: number): Promise<
   } catch { return false }
 }
 
-// ---------------------------------------------------------------- trần 40%
-export interface TranBia { tranDoan: number; tranDao: number; tong: number; daDungDoan: number; daDungDao: number; conDoan: number; conDao: number; con: number }
-/** Thuần: trần của từng phần theo kế hoạch đã chốt và số câu Bi-a đã dùng (đã trả lời hôm nay + đang giữ trên bàn). */
-export function tinhTranBia(soKhoaDoan: number, soKhoaDao: number, daDungDoan: number, daDungDao: number): TranBia {
-  const tranDoan = Math.floor(TI_LE_TRAN_BIA * soKhoaDoan)
-  const tranDao = Math.floor(TI_LE_TRAN_BIA * soKhoaDao)
-  const conDoan = Math.max(0, tranDoan - daDungDoan)
-  const conDao = Math.max(0, tranDao - daDungDao)
-  return { tranDoan, tranDao, tong: tranDoan + tranDao, daDungDoan, daDungDao, conDoan, conDao, con: conDoan + conDao }
+// ---------------------------------------------------------------- trần 40% (rải tỉ lệ mới : ôn — thầy 30/09)
+export interface TranBia { tong: number; tranMoi: number; tranOn: number; daDungMoi: number; daDungOn: number; conMoi: number; conOn: number; con: number }
+/** Làm tròn `tong × phan / toan` về số nguyên gần nhất; hoà (,5) ⇒ làm tròn XUỐNG (nhường câu mới cho Đảo). Số nguyên thuần, không sai số dấu phẩy. */
+export const chiaTiLe = (tong: number, phan: number, toan: number): number => (toan > 0 && tong > 0 && phan > 0 ? Math.max(0, Math.ceil((2 * tong * phan - toan) / (2 * toan))) : 0)
+/**
+ * Thuần (thầy 30/09): trần Bi-a = floor(40% × TOÀN BỘ kế hoạch ngày) — cả câu MỚI lẫn câu ÔN LẠI (nợ, củng cố, duy trì) — rồi RẢI TỈ LỆ:
+ * phần câu mới = làm tròn(trần × mới / tổng) (hoà ⇒ xuống), phần ôn = phần còn lại. Hệ quả: Bi-a lấy ≤ 40% câu mới (+ ½ khi làm tròn) nên không bao giờ
+ * "ăn" hết câu mới của Đảo; câu Bi-a chỉ lấy TRONG kế hoạch nên không vượt quota câu mới rải đều. `daDung*`: câu Bi-a đã dùng hôm nay theo nhóm.
+ */
+export function tinhTranBia(soMoi: number, soOn: number, daDungMoi: number, daDungOn: number): TranBia {
+  const moi = Math.max(0, Math.floor(soMoi)), on = Math.max(0, Math.floor(soOn)), T = moi + on
+  const tong = Math.floor((T * 2) / 5) // = floor(TI_LE_TRAN_BIA × T), số nguyên
+  const tranMoi = Math.min(moi, chiaTiLe(tong, moi, T))
+  const tranOn = Math.min(on, tong - tranMoi)
+  const conMoi = Math.max(0, tranMoi - daDungMoi), conOn = Math.max(0, tranOn - daDungOn)
+  return { tong: tranMoi + tranOn, tranMoi, tranOn, daDungMoi, daDungOn, conMoi, conOn, con: conMoi + conOn }
 }
-const phanCua = (kh: KeHoachDaChot) => {
-  const doan = new Set(kh.doan.map(qidGoc)), dao = new Set(kh.dao.map(qidGoc))
-  return (qid: string): 'doan' | 'dao' | null => (doan.has(qid) ? 'doan' : dao.has(qid) ? 'dao' : null)
+/**
+ * Khoá kế hoạch là câu MỚI của hôm nay: lần làm đầu tiên (`qid`, không phải `qid#2`) của câu chưa làm, hoặc câu có lần làm đầu tiên rơi đúng hôm nay
+ * (cùng mốc với quota rải đều `moiDaLamHomNay` ở srs2-d1) ⇒ phân nhóm ỔN ĐỊNH suốt ngày dù em đã làm câu ấy ở Đảo/Đoàn/Bi-a.
+ */
+export function laCauMoiKeHoach(k: string, hs: Pick<HoSo2, 'tt'>, ngay: string): boolean {
+  if (/#\d+$/.test(k)) return false
+  const t = hs.tt.get(qidGoc(k))
+  return !!t && (t.laMoi || t.lichSu[0]?.ngay === ngay)
 }
 const dauNgayVn = (ngay: string): string => new Date(`${ngay}T00:00:00+07:00`).toISOString()
 
@@ -133,9 +146,12 @@ interface BoiCanh {
   chan: Set<string>
   /** Chỉ phần đang bảo vệ cho ca (để báo đúng lý do khi hết câu). */
   chanCa: ReadonlySet<string>
-  /** Khoá kế hoạch còn chưa làm, theo phần, đã lọc `chan`. */
-  ungDoan: string[]
-  ungDao: string[]
+  /** Khoá kế hoạch còn chưa làm, đã lọc `chan`, theo thứ tự ưu tiên hiện có (phần Đoàn trước rồi phần Đảo, trong mỗi phần giữ thứ tự kế hoạch). */
+  ung: string[]
+  /** `ung` tách theo nhóm (giữ thứ tự): câu mới / câu ôn lại. */
+  ungMoi: string[]
+  ungOn: string[]
+  laMoi: (k: string) => boolean
 }
 /**
  * `chiDaTraLoi` (Sảnh Bi-a, cửa trên Sảnh Bát Linh — sửa lỗi 30/09 "vào bàn, chưa trả lời câu nào, thoát ra ⇒ 18 thành 10"): số "còn" CHỈ trừ câu ĐÃ
@@ -144,24 +160,37 @@ interface BoiCanh {
  */
 async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: boolean } = {}): Promise<BoiCanh> {
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
-  const phan = phanCua(kh)
+  const laMoi = (k: string) => laCauMoiKeHoach(k, hs, kh.ngay)
+  const tatCa = [...kh.doan, ...kh.dao]
+  const trongKh = new Set(tatCa.map(qidGoc))
+  const moiKh = new Set(tatCa.filter(laMoi).map(qidGoc))
+  const soMoi = tatCa.filter(laMoi).length
   // Câu trả lời trong phiên Bi-a hôm nay (mỗi câu tính một lần).
   const da = await env.DB.prepare(`SELECT DISTINCT a.qid AS qid FROM game_v2_attempt a JOIN game_v2_session s ON s.id = a.session AND s.sbd = a.sbd
       WHERE a.sbd = ? AND a.created_at >= ? AND json_extract(s.json,'$.bia') = 1`).bind(sbd, dauNgayVn(kh.ngay)).all<Row>().catch(() => ({ results: [] as Row[] }))
   // Câu đang nằm trên bàn Bi-a còn mở (kể cả bàn đang chơi) mà chưa trả lời: đã giữ chỗ trong trần (trừ khi chỉ đếm câu đã trả lời).
   const giuBia = o.chiDaTraLoi ? new Set<string>() : await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
-  let dDoan = 0, dDao = 0
-  const dem = (qid: string) => { const p = phan(qid); if (p === 'doan') dDoan++; else if (p === 'dao') dDao++ }
+  let dMoi = 0, dOn = 0
+  const dem = (qid: string) => { if (!trongKh.has(qid)) return; if (moiKh.has(qid)) dMoi++; else dOn++ }
   for (const x of da.results ?? []) dem(str(x.qid))
   for (const q of giuBia) dem(q)
-  const tran = tinhTranBia(kh.doan.length, kh.dao.length, dDoan, dDao)
+  const tran = tinhTranBia(soMoi, tatCa.length - soMoi, dMoi, dOn)
   const chanCa = await protectedQuestions(env)
   const chan = new Set(chanCa)
   for (const q of await cauDangGiu(env, sbd, nowMs, DK_PHIEN_DAO_DOAN)) chan.add(q)
   for (const q of giuBia) chan.add(q)
   const loc = (ds: readonly string[]) => ds.filter((k) => !chan.has(qidGoc(k)))
-  return { kh, hs, tran, chan, chanCa, ungDoan: loc(kh.conDoan), ungDao: loc(kh.conDao) }
+  const ung = loc([...kh.conDoan, ...kh.conDao])
+  return { kh, hs, tran, chan, chanCa, ung, ungMoi: ung.filter(laMoi), ungOn: ung.filter((k) => !laMoi(k)), laMoi }
 }
+/** Số câu còn lên được theo nhóm: trần còn của nhóm, không quá số câu kế hoạch còn chưa làm (đã lọc câu bị chặn) của nhóm. */
+const conTheoNhom = (c: BoiCanh) => ({ moi: Math.min(c.tran.conMoi, c.ungMoi.length), on: Math.min(c.tran.conOn, c.ungOn.length) })
+/** Khoá được phép lên bàn (nhóm còn trần), giữ thứ tự ưu tiên. */
+const khoaPhep = (c: BoiCanh, con: { moi: number; on: number }) => c.ung.filter((k) => (c.laMoi(k) ? con.moi : con.on) > 0)
+/** Số câu một bàn đủ (7 bi + Câu chốt): trần còn ít hơn ⇒ bàn vẫn mở, bi thiếu câu là bi trống (thầy 30/09). */
+export const SO_CAU_BAN_DAY = 8
+/** Lời báo khi trần Bi-a còn ít hơn một bàn đủ. */
+export const thongBaoItCau = (n: number): string => `Hôm nay Bi-a còn ${n} câu. Bàn chỉ có ${n} câu, các bi còn lại là bi trống (vào lỗ là ăn ngay).`
 /** Còn trần mà không có câu lên bàn: do ca khoá thật, hay do câu đang nằm ở Đảo/Đoàn (sửa lỗi 29/09: trước báo "ca kiểm tra" cho mọi trường hợp). */
 const lyDoHetCau = (c: BoiCanh): LyDoKhoaBia => ([...c.kh.conDoan, ...c.kh.conDao].some((k) => c.chanCa.has(qidGoc(k))) ? 'cau_dang_bao_ve' : 'cau_dang_o_dao')
 
@@ -223,7 +252,8 @@ async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<str
   const c = await boiCanh(env, sbd, nowMs, { chiDaTraLoi: true })
   const { kh, hs, tran } = c
   const conKeHoach = kh.conDao.length + kh.conDoan.length
-  const coCau = Math.min(tran.conDoan, c.ungDoan.length) + Math.min(tran.conDao, c.ungDao.length)
+  const con = conTheoNhom(c)
+  const coCau = con.moi + con.on
   const xong = kh.tong > 0 && conKeHoach === 0
   const daGiaoHuu = xong ? await demGiaoHuuHomNay(env, sbd, kh.ngay) : 0
   const lyDoKhoa: LyDoKhoaBia | null = !kh.tong ? 'chua_co_chien_dich' : xong ? 'xong_ke_hoach' : coCau <= 0 ? (tran.con <= 0 ? 'het_tran' : lyDoHetCau(c)) : null
@@ -234,7 +264,9 @@ async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<str
     chienDich: cd ? { id: cd.id, ten: cd.ten, hanNop: cd.hanNop, tong: cd.qids.length } : null,
     theLuc: { con: conKeHoach, tong: kh.tong },
     doan: { con: kh.conDoan.length }, dao: { con: kh.conDao.length },
-    tran: { con: coCau, tong: tran.tong, tranDoan: tran.tranDoan, tranDao: tran.tranDao, conDoan: Math.min(tran.conDoan, c.ungDoan.length), conDao: Math.min(tran.conDao, c.ungDao.length) },
+    tran: { con: coCau, tong: tran.tong, tranMoi: tran.tranMoi, tranOn: tran.tranOn, conMoi: con.moi, conOn: con.on },
+    // Trần còn ít hơn một bàn đủ (7 bi + Câu chốt): vẫn mở bàn với đúng số câu còn, bi thiếu câu là bi trống — báo rõ ở Sảnh.
+    ...(!lyDoKhoa && coCau > 0 && coCau < SO_CAU_BAN_DAY ? { thongBao: thongBaoItCau(coCau) } : {}),
     giaoHuu: { mo: xong && daGiaoHuu < TOI_DA_GIAO_HUU, con: xong ? Math.max(0, TOI_DA_GIAO_HUU - daGiaoHuu) : 0, toiDa: TOI_DA_GIAO_HUU },
     online: !!env.BAN_BIA,
     diemBan: await docDiemBan(env, sbd),
@@ -265,8 +297,11 @@ type ChonCau =
   | { ok: false; kq: Record<string, unknown> }
   | { ok: true; session: string; cau: CauBia[]; qs: PrivateQuestion[]; chot: CauBia | null; chotQ: PrivateQuestion | null; tranCon: number; tranTong: number; kh: KeHoachDaChot }
 /**
- * Chọn Câu chốt (G1) rồi tối đa `soBi` câu cho bi (phần Đoàn trước tới hết trần phần Đoàn, rồi phần Đảo; giữ thứ tự kế hoạch), tạo phiên
- * `{mode:'bia', hoa2:1, bia:1, van, cheDo, questions}`. Hết câu / hết trần ⇒ `ok:false` kèm lý do cho em.
+ * Chọn Câu chốt (G1) rồi tối đa `soBi` câu cho bi, tạo phiên `{mode:'bia', hoa2:1, bia:1, van, cheDo, questions}`. Hết câu / hết trần ⇒ `ok:false` kèm lý do.
+ * Thầy 30/09 (rải tỉ lệ): câu lấy trong trần từng nhóm (mới / ôn — `tinhTranBia`); số bi mang câu mới : câu ôn trên bàn theo đúng tỉ lệ phần còn trần
+ * của hai nhóm (hoà ⇒ nghiêng về ôn); trong mỗi nhóm giữ thứ tự ưu tiên hiện có (phần Đoàn trước rồi phần Đảo, thứ tự kế hoạch). Nhóm thiếu câu nạp
+ * được (câu hỏng / bị chặn) ⇒ bù bằng nhóm kia TRONG trần của nhóm kia. Trần còn ít: bàn vẫn mở với đúng số câu còn (bi thiếu câu là bi trống);
+ * Câu chốt chỉ lấy khi còn ≥ 2 câu (ít nhất 1 bi mang câu + Câu chốt), còn 1 câu ⇒ 1 bi mang câu, Bi chốt trống.
  */
 async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, van: string, cheDo: 'don' | 'doi', them: Record<string, unknown> = {}, coChot = true): Promise<ChonCau> {
   const c = await boiCanh(env, sbd, nowMs)
@@ -274,12 +309,10 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   const conKeHoach = kh.conDao.length + kh.conDoan.length
   if (!kh.tong) return { ok: false, kq: { ok: true, lyDo: 'chua_co_chien_dich', message: LOI_BIA.chua_co_chien_dich } }
   if (conKeHoach === 0) return { ok: false, kq: { ok: true, lyDo: 'xong_ke_hoach', message: LOI_BIA.xong_ke_hoach } }
-  let conDoan = Math.min(tran.conDoan, c.ungDoan.length), conDao = Math.min(tran.conDao, c.ungDao.length)
-  if (conDoan + conDao <= 0) { const lyDo: LyDoKhoaBia = tran.con <= 0 ? 'het_tran' : lyDoHetCau(c); return { ok: false, kq: { ok: true, lyDo, message: LOI_BIA[lyDo], conDoan: kh.conDoan.length, conDao: kh.conDao.length } } }
-  // Câu chốt trước (G1), trong phần còn trần.
-  const phepDoan = conDoan > 0 ? c.ungDoan : []
-  const phepDao = conDao > 0 ? c.ungDao : []
-  const chon = coChot ? await napMot(env, hs, xepUngVienChot([...phepDoan, ...phepDao], hs), c.chan) : null
+  const con = conTheoNhom(c)
+  if (con.moi + con.on <= 0) { const lyDo: LyDoKhoaBia = tran.con <= 0 ? 'het_tran' : lyDoHetCau(c); return { ok: false, kq: { ok: true, lyDo, message: LOI_BIA[lyDo], conDoan: kh.conDoan.length, conDao: kh.conDao.length } } }
+  // Câu chốt trước (G1), trong nhóm còn trần — chỉ khi còn ≥ 2 câu.
+  const chon = coChot && con.moi + con.on >= 2 ? await napMot(env, hs, xepUngVienChot(khoaPhep(c, con), hs), c.chan) : null
   const daLay = new Set<string>()
   const refs: RefPhien[] = []
   const cau: CauBia[] = [], qs: PrivateQuestion[] = []
@@ -287,15 +320,26 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   if (chon) {
     const ref = taoRef(chon.q, chon.m, hs, sbd, kh.ngay, true)
     refs.push(ref); chot = cauCongKhai(chon.q, ref); daLay.add(chon.q.qid)
-    if (c.ungDoan.some((k) => qidGoc(k) === chon.q.qid)) conDoan--; else conDao--
+    const k = c.ung.find((x) => qidGoc(x) === chon.q.qid)
+    if (k && c.laMoi(k)) con.moi = Math.max(0, con.moi - 1); else con.on = Math.max(0, con.on - 1)
   }
-  // Bi thường: câu ôn phần Đoàn trước (tới hết trần phần Đoàn), rồi phần Đảo; giữ thứ tự kế hoạch.
+  // Bi thường: chia số bi theo tỉ lệ phần còn trần mới : ôn; câu ôn đứng trước trên bàn (ưu tiên nợ như kế hoạch).
   const chanThem = new Set([...c.chan, ...daLay])
-  const bi = [
-    ...(conDoan > 0 ? await napCau(env, hs, c.ungDoan, Math.min(conDoan, soBi), chanThem) : []),
-  ]
-  for (const x of bi) chanThem.add(x.q.qid)
-  if (bi.length < soBi && conDao > 0) bi.push(...(await napCau(env, hs, c.ungDao, Math.min(conDao, soBi - bi.length), chanThem)))
+  const nBi = Math.max(0, Math.min(soBi, con.moi + con.on))
+  let nMoi = Math.min(con.moi, chiaTiLe(nBi, con.moi, con.moi + con.on))
+  const nOn = Math.min(con.on, nBi - nMoi)
+  nMoi = Math.min(con.moi, nBi - nOn)
+  const nap = async (khoa: readonly string[], n: number) => {
+    const ra = n > 0 ? await napCau(env, hs, khoa, n, chanThem) : []
+    for (const x of ra) chanThem.add(x.q.qid)
+    return ra
+  }
+  const biOn = await nap(c.ungOn, nOn)
+  const biMoi = await nap(c.ungMoi, nMoi)
+  // Bù chỗ thiếu bằng nhóm kia, trong trần còn của nhóm đó.
+  if (biOn.length + biMoi.length < nBi) biOn.push(...(await nap(c.ungOn, Math.min(con.on - biOn.length, nBi - biOn.length - biMoi.length))))
+  if (biOn.length + biMoi.length < nBi) biMoi.push(...(await nap(c.ungMoi, Math.min(con.moi - biMoi.length, nBi - biOn.length - biMoi.length))))
+  const bi = [...biOn, ...biMoi]
   for (const x of bi) {
     const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, false)
     refs.push(ref); cau.push(cauCongKhai(x.q, ref)); qs.push(x.q)
@@ -333,6 +377,7 @@ async function xepBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
   return {
     ok: true, van, session: r.session, loai, cheDo, soBi,
     bi: r.cau, trong: Math.max(0, soBi - r.cau.length), chot: r.chot,
+    ...(r.cau.length + (r.chot ? 1 : 0) < soBi + 1 ? { thongBao: thongBaoItCau(r.cau.length + (r.chot ? 1 : 0)) } : {}),
     tran: { con: r.tranCon, tong: r.tranTong },
     theLuc: { con: r.kh.conDao.length + r.kh.conDoan.length, tong: r.kh.tong }, conDoan: r.kh.conDoan.length, conDao: r.kh.conDao.length,
   }
@@ -358,10 +403,9 @@ async function doiCau(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
   const daTl = await env.DB.prepare('SELECT 1 AS co FROM game_v2_attempt WHERE id = ? AND sbd = ?').bind(`${id}|${qidCu}`, sbd).first<Row>()
   if (!daTl) throw new Error('Em trả lời câu này trước rồi mới đổi câu.')
   const c = await boiCanh(env, sbd, nowMs)
-  const { kh, hs, tran } = c
+  const { kh, hs } = c
   for (const q of p.questions) c.chan.add(q.qid)
-  const conDoan = Math.min(tran.conDoan, c.ungDoan.length), conDao = Math.min(tran.conDao, c.ungDao.length)
-  const phep = [...(conDoan > 0 ? c.ungDoan : []), ...(conDao > 0 ? c.ungDao : [])]
+  const phep = khoaPhep(c, conTheoNhom(c))
   if (!phep.length) return { ok: true, trong: true, ...(await veTrong(env, p, sbd, b, nowMs)) }
   const dang = hs.meta.get(qidCu)?.dang ?? null
   const cungDang = phep.filter((k) => dang && hs.meta.get(qidGoc(k))?.dang === dang)

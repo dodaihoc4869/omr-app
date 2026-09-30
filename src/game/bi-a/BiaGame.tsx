@@ -125,6 +125,8 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
           {loi && <div className="bia-the"><p className="bia-loi" role="alert">{loi}</p><button type="button" className="bia-nut-phu" onClick={() => void napSanh()}>Thử lại</button></div>}
           {sanh && <>
             {(khoa || !sanh.bat) && <div className="bia-the"><p className="bia-chu-nho" style={{ fontSize: 14 }}>{sanh.message || 'Bi-a chưa mở cho em.'}</p></div>}
+            {/* Thầy 30/09: trần Bi-a còn ít hơn một bàn đủ ⇒ bàn vẫn mở với đúng số câu còn — báo rõ trước khi em vào bàn. */}
+            {coCau && sanh.thongBao && <div className="bia-the"><p className="bia-chu-nho" role="status" style={{ fontSize: 14 }}>{sanh.thongBao}</p></div>}
             {tin && <p className="bia-loi" role="alert">{tin}</p>}
             {/* Bố cục: dọc = một cột (số liệu → chế độ chơi → phụ); ngang / máy tính = chế độ chơi bên trái, cột phụ bên phải (bi-a.css). */}
             <div className="bia-sanh-luoi">
