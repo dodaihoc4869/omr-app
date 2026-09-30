@@ -1,0 +1,88 @@
+[
+ {
+  "qid": "DH-12-C3-B9-P2-III-29",
+  "maDe": "DH-12-C3-B9-P2",
+  "phan": "III",
+  "so": 29,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "(chứa gốc Gly)",
+  "sau": "(chứa gốc Gly, không kể X)",
+  "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+ },
+ {
+  "qid": "DB-12-B9-P2-D2-III-57",
+  "maDe": "DB-12-B9-P2-D2",
+  "phan": "III",
+  "so": 57,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "(chứa gốc Gly)",
+  "sau": "(chứa gốc Gly, không kể X)",
+  "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+ },
+ {
+  "qid": "DB-12-B9-P2-D2-III-148",
+  "maDe": "DB-12-B9-P2-D2",
+  "phan": "III",
+  "so": 148,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "(chứa gốc Gly)",
+  "sau": "(chứa gốc Gly, không kể X)",
+  "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+ },
+ {
+  "qid": "12-C3-B9-D3-III-41",
+  "maDe": "12-C3-B9-D3",
+  "phan": "III",
+  "so": 41,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "(chứa gốc Gly)",
+  "sau": "(chứa gốc Gly, không kể X)",
+  "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+ },
+ {
+  "qid": "DH-11-C1-B2-DT-III-12",
+  "maDe": "DH-11-C1-B2-DT",
+  "phan": "III",
+  "so": 12,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "pihòng",
+  "sau": "phòng",
+  "lyDo": "Lỗi chính tả trong đề; đáp án kho 34,4 đúng (Ca = 8,6 mmol × 40 = 0,344 g / 1,0 g)."
+ },
+ {
+  "qid": "DH-11-C1-B2-DT-III-12",
+  "maDe": "DH-11-C1-B2-DT",
+  "phan": "III",
+  "so": 12,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cacium",
+  "sau": "calcium",
+  "lyDo": "Lỗi chính tả trong đề; giữ đáp án 34,4."
+ },
+ {
+  "qid": "DB-12-B2-D1-I-47",
+  "maDe": "DB-12-B2-D1",
+  "phan": "I",
+  "so": 47,
+  "viec": "dapAn",
+  "truoc": "B",
+  "sau": "C",
+  "lyDo": "Xà phòng (muối carboxylate) và chất giặt rửa tổng hợp (muối sodium alkylbenzenesulfonate / alkyl sulfate — muối của acid hữu cơ R-SO₃H / R-OSO₃H) đều: (2) là muối của acid hữu cơ, (3) dễ điện li, (4) có đuôi hydrocarbon dài kị nước; chỉ (1) gốc carboxylate là riêng của xà phòng ⇒ 3 nhận định ⇒ C (trùng đáp án đề gốc và tự giải)."
+ },
+ {
+  "qid": "12-C1-B2-I-75",
+  "maDe": "12-C1-B2",
+  "phan": "I",
+  "so": 75,
+  "viec": "dapAn",
+  "truoc": "B",
+  "sau": "C",
+  "lyDo": "Xà phòng (muối carboxylate) và chất giặt rửa tổng hợp (muối sodium alkylbenzenesulfonate / alkyl sulfate — muối của acid hữu cơ R-SO₃H / R-OSO₃H) đều: (2) là muối của acid hữu cơ, (3) dễ điện li, (4) có đuôi hydrocarbon dài kị nước; chỉ (1) gốc carboxylate là riêng của xà phòng ⇒ 3 nhận định ⇒ C (trùng đáp án đề gốc và tự giải)."
+ }
+]

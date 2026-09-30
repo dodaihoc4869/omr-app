@@ -1,0 +1,86 @@
+{
+ "11-C2-B5-II-1": {
+  "luc": "2026-09-29T13:09:52.815Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber – Bosch. Phản ứng tổng hợp ammonia:\nN₂ (g) + 3H₂ (g) ⇌ 2NH₃ (g), ΔrH°298 = -91,8 kJ. Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây.",
+   "dap_an": "SSSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_6.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Ở nhiệt độ 400°C, hiệu suất phản ứng đạt khoảng 50% ở 200 atm.",
+    "b": "Nếu thực hiện phản ứng ở nhiệt độ càng thấp thì sẽ càng đạt hiệu quả kinh tế cao.",
+    "c": "Trong khoảng từ 350°C đến 550°C, hiệu suất thu ammonia tăng dần.",
+    "d": "Để tăng hiệu suất tổng hợp ammonia có thể đồng thời tăng áp suất và giảm nhiệt độ."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng toả nhiệt và giảm số mol khí nên hiệu suất tăng khi tăng áp suất, giảm nhiệt độ.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: trên giản đồ, ở 400 độ C và 200 atm hiệu suất chỉ khoảng 42%."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: nhiệt độ quá thấp làm tốc độ phản ứng rất chậm nên không có lợi về kinh tế."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: giản đồ cho thấy hiệu suất giảm dần khi nhiệt độ tăng từ 350 lên 550 độ C."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: tăng áp suất và giảm nhiệt độ đều đẩy cân bằng theo chiều thuận."
+     }
+    },
+    "dap_an_de": "SSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Đọc giản đồ hiệu suất: áp suất cao và nhiệt độ thấp cho hiệu suất cao, nhưng tốc độ chậm.",
+    "bay": null
+   },
+   "kienThuc": [
+    "cân bằng tổng hợp ammonia",
+    "đọc giản đồ hiệu suất"
+   ],
+   "loiThuongGap": [
+    "cho rằng nhiệt độ càng thấp càng có lợi"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.CHON_PHAT_BIEU",
+    "ten": "Ammonia và muối ammonium — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-03",
+   "dangBai": {
+    "ma": "DB-11-B5-D1",
+    "ten": "Phản ứng điều chế ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ }
+}

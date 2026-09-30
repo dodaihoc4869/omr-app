@@ -1,0 +1,73 @@
+{
+ "12-KT-C34-D1-I-5": {
+  "luc": "2026-09-29T11:35:51.132Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "de": "Các enzyme đóng vai trò quan trọng đối với cơ thể sinh vật, như xúc tác cho các quá trình sinh hoá và hoá học. Ví dụ, lipase là enzyme xúc tác cho quá trình thuỷ phân các chất béo chuỗi dài; protease là enzyme xúc tác cho quá trình thuẏ phân các liên kết peptide có trong protein và polypeptide.\nCác enzyme chỉ tồn tại và phát triển ở môi truờng gần trung tính và nhiệt độ tương đối thấp (gần với nhiệt độ của cơ thể sinh vật).\nKhi đóng vai trò là chất xúc tác trong các quá trình sinh hoá, các enzyme không có đặc điểm nào sau đây?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Có tính chọn lọc cao",
+    "B": "Làm tăng tốc độ của các quá trình sinh hoá",
+    "C": "Có tác dụng tốt ở nhiệt độ cao hoặc môi trường acid mạnh",
+    "D": "Chỉ hoạt động trong điều kiện nhiệt độ phù hợp"
+   },
+   "loi_giai": {
+    "chot": "Enzyme chỉ hoạt động tốt ở nhiệt độ gần nhiệt độ cơ thể và môi trường gần trung tính.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với enzyme: mỗi enzyme chỉ xúc tác cho một cơ chất xác định."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng với enzyme: enzyme làm phản ứng sinh hoá nhanh hơn rất nhiều."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là đặc điểm enzyme không có: nhiệt cao hoặc acid mạnh làm enzyme mất hoạt tính."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng với enzyme: ngoài khoảng nhiệt độ phù hợp enzyme bị biến tính."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.NHAN_DANG",
+    "ten": "Peptide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

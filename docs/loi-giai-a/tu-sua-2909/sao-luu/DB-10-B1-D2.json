@@ -1,0 +1,67 @@
+{
+ "DB-10-B1-D2-III-10": {
+  "luc": "2026-09-29T13:10:43.981Z",
+  "cau": {
+   "phan": "III",
+   "so": 10,
+   "de": "Bán kính nguyên tử và khối lượng mol nguyên tử của iron (Fe) lần lượt là 1,28Aovà 56 g/mol. biết rằng trong tinh thể, các nguyên tử Fe chỉ chiếm 74% thể tích, còn lại là khe trống.\nTính khối lượng riêng của nguyên tử Fe.\nCho biết 1Ao= 10⁻¹⁰m.",
+   "dap_an": "7,84",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "D = M : V(tinh thể 1 mol), với V(tinh thể) = Nₐ·(4/3)πr³ : 0,74.",
+    "buoc": [
+     "r = 1,28 Å = 1,28×10⁻⁸ cm.",
+     "V một nguyên tử = (4/3)π(1,28×10⁻⁸)³ = 8,78×10⁻²⁴ cm³.",
+     "V phần đặc của 1 mol = 6,022×10²³ × 8,78×10⁻²⁴ = 5,29 cm³.",
+     "V tinh thể 1 mol = 5,29 : 0,74 = 7,15 cm³.",
+     "D = 56 : 7,15 = 7,84 g/cm³."
+    ],
+    "ket_qua": "7,84",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "7,84",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề hỏi khối lượng riêng; đáp án tính theo g/cm³."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Thể tích 1 mol tinh thể lớn hơn thể tích phần đặc vì chỉ 74% thể tích là nguyên tử.",
+    "bay": "Lấy luôn thể tích phần đặc làm thể tích tinh thể, quên chia cho 74%."
+   },
+   "kienThuc": [
+    "Thể tích hình cầu V = (4/3)πr³.",
+    "1 Å = 10⁻⁸ cm.",
+    "Trong tinh thể kim loại, các nguyên tử chỉ chiếm một phần thể tích, phần còn lại là khe rỗng."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.MO_HINH.TINH_KHOI_LUONG",
+    "ten": "Mô hình nguyên tử — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D2",
+    "ten": "Bài toán về bán kính và thể tích của nguyên tử",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-34"
+  }
+ }
+}

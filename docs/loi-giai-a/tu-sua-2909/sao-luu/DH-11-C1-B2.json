@@ -1,0 +1,259 @@
+{
+ "DH-11-C1-B2-II-31": {
+  "luc": "2026-09-29T13:13:01.574Z",
+  "cau": {
+   "phan": "II",
+   "so": 31,
+   "de": "Tiến i hành chuẩn độ dung dịch NaOH chưa biết nồng độ bằng dung dịch chuẩn HCl 0,1 M với chất chỉ thị phenolphtalein như sau:\nBước 1: Dùng pipette lấy 10 mL dung dịch HCl 0,1 M cho vào bình tam giác, thêm 1 - 2 giọt phenolphtalein.\nBước 2: Cho dung dịch NaOH vào burette, điều chỉnh dung dịch trong burette về mức 0..-\nBước 3: Mở khóa burette, nhỏ từng giọt dung dịch NaOH xuống bình tam giác (lắc đều trong quá trình chuẩn độ) cho đến khi dung dịch xuất hiện màu hồng nhạt (bền trong khoảng 10 giây) thì dừng chuẩn độ.\nBước 4: Ghi lại thể tích dung dịch NaOH đã dùng.",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "hieu",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "y": {
+    "a": "Thí nghiệm cần lặp lại ít nhất 2 lần và lấy giá trị trung bình của 2 lần chuẩn độ.",
+    "b": "Khi kết thúc chuẩn độ, thể tích dung dịch NaOH đã sử dụng là 12,5 mL thì nồng độ sodium hydroxide ban đầu là 0,08 M.",
+    "c": "Ở bước 3, có thể mở khóa burette, để dung dịch NaOH chảy nhanh xuống bình tam giác để quá trình chuẩn độ nhanh hơn.",
+    "d": "Ở bước 4, đọc thể tích dung dịch NaOH trên vạch burette mắt nhìn hướng từ trên xuống."
+   },
+   "loi_giai": {
+    "chot": "n(HCl) = n(NaOH) tại điểm tương đương ⇒ C(NaOH) = (0,1 × 10) : 12,5 = 0,08 M.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: phải lặp lại ít nhất BA lần rồi mới lấy giá trị trung bình; hai lần chưa đủ tin cậy."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: n(HCl) = 0,01 × 0,1 = 10⁻³ mol = n(NaOH) ⇒ C(NaOH) = 10⁻³ : 0,0125 = 0,08 M."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: chảy nhanh sẽ vọt quá điểm tương đương, kết quả sai; phải nhỏ từng giọt khi gần điểm cuối."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: mắt phải NGANG TẦM vạch; nhìn từ trên xuống gây sai số thị sai."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc gõ lỗi 'Tiến i hành' ⇒ 'Tiến hành'."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kienThuc": [
+    "Phản ứng chuẩn độ: NaOH + HCl → NaCl + H₂O, tỉ lệ mol 1 : 1.",
+    "Phép chuẩn độ phải lặp lại ít nhất ba lần rồi lấy trung bình.",
+    "Đọc mức chất lỏng trên burette với mắt ngang tầm vạch, đọc theo đáy mặt khum."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đề cho dữ kiện định lượng phải giải ra",
+   "dang": {
+    "ma": "CAN_BANG.CHUAN_DO.CHON_PHAT_BIEU",
+    "ten": "Chuẩn độ — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D5",
+    "ten": "Phương pháp chuẩn độ acid - base",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ },
+ "DH-11-C1-B2-III-53": {
+  "luc": "2026-09-29T13:13:01.574Z",
+  "cau": {
+   "phan": "III",
+   "so": 53,
+   "de": "Trộn lẫn 3 dung dịch H₂SO₄ 0,1 M, HNO₃ 0,2 M và HCl 0,3 M với những thể tích bằng nhau, thu được dung dịch X. Lấy 300 mL dung dịch X cho phản ứng với V lít dung dịch Y gồm NaOH 0,2 M và KOH 0,27 M, thu được dung dịch Z có pH = 2.\nGiá trị của V là bao nhiêu? (Kết quả làm tròn đến hàng phần mười).",
+   "dap_an": "0,14",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "van_dung",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "loi_giai": {
+    "chot": "pH = 2 sau phản ứng nghĩa là H⁺ còn dư.",
+    "buoc": [
+     "[H⁺] trong X = (2×0,1 + 0,2 + 0,3) : 3 = 0,7 : 3 = 0,23333 M.",
+     "300 mL X ⇒ n(H⁺) = 0,3 × 0,23333 = 0,07 mol.",
+     "n(OH⁻) = (0,2 + 0,27)V = 0,47V mol.",
+     "pH(Z) = 2 ⇒ 0,07 − 0,47V = 0,01(0,3 + V) ⇒ 0,067 = 0,48V ⇒ V = 0,1396 ≈ 0,14 L."
+    ],
+    "ket_qua": "0,14",
+    "dap_an_de": "0,14",
+    "dap_an_tu_giai": "0,14",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Trộn thể tích bằng nhau nên mỗi acid bị pha loãng ba lần; H₂SO₄ cho hai H⁺.",
+    "bay": "Quên hệ số 2 của H₂SO₄ hoặc quên chia ba khi trộn."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.PH_DUNG_DICH.TINH_THE_TICH",
+    "ten": "pH dung dịch — tính thể tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D3",
+    "ten": "pH - Pha loãng dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ },
+ "DH-11-C1-B2-III-59": {
+  "luc": "2026-09-29T13:13:01.574Z",
+  "cau": {
+   "phan": "III",
+   "so": 59,
+   "de": "Cho các chất sau: glucose (C₆H₁₂O₆), NaCl, KOH, Ba(OH)₂, AlCl₃, CuSO₄, N₂, O₂, H₂SO₄, saccharose (C₁₂H₂₂O₁₁).\nCó bao nhiêu chất chất điện li trong các chất trên?",
+   "dap_an": "6",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "biet",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "loi_giai": {
+    "chot": "Acid, base, muối là chất điện li; đường và khí N₂, O₂ thì không.",
+    "buoc": [
+     "Chất điện li: NaCl, KOH, Ba(OH)₂, AlCl₃, CuSO₄, H₂SO₄ — 6 chất.",
+     "Không phải chất điện li: glucose, saccharose (phân tử đường), N₂ và O₂ (khí không phân li).",
+     "Vậy có 6 chất điện li."
+    ],
+    "ket_qua": "6",
+    "dap_an_de": "6",
+    "dap_an_tu_giai": "6",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Chất điện li là chất khi tan trong nước phân li ra ion: acid, base và muối.",
+    "bay": "Tính cả glucose và saccharose vì chúng tan tốt trong nước."
+   },
+   "kienThuc": [
+    "Chất điện li khi tan trong nước phân li ra ion, dung dịch dẫn điện.",
+    "Acid, base và muối là chất điện li.",
+    "Đường, rượu, khí trơ tan trong nước nhưng không phân li ra ion."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.DIEN_LI.DEM_DONG_PHAN",
+    "ten": "Sự điện li — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D2",
+    "ten": "Phản ứng trao đổi ion trong dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ },
+ "DH-11-C1-B2-III-65": {
+  "luc": "2026-09-29T13:13:01.574Z",
+  "cau": {
+   "phan": "III",
+   "so": 65,
+   "de": "Vỏ trứng có chứa calcium ở dạng CaCO₃. Để xác định hàm lượng CaCO₃ trong vỏ trứng, trong pihòng thí nghiệm người ta có thể làm như sau: Lấy 1,0 g vỏ trứng khô, đã được làm sạch, hòa tan hoàn toàn trong 50 mL dung dịch HCl 0,4 M. Lọc dung dịch sau phản ứng thu được 50 mL dung dịch A. Lấy 10 mL dung dịch A chuẩn độ với dung dịch NaOH 0,1 M thấy hết 5,6 mL.\nHàm lượng cacium trong vỏ trứng (giả thiết các tạp chất khác trong vỏ trứng không phản ứng với HCl) là bao nhiêu?",
+   "dap_an": "34,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "van_dung",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "loi_giai": {
+    "chot": "HCl dư (50 mL) = 2,8×10⁻³ mol ⇒ HCl phản ứng = 0,0172 mol ⇒ n(CaCO₃) = 8,6×10⁻³ mol.",
+    "buoc": [
+     "n(HCl) ban đầu = 0,05 × 0,4 = 0,02 mol.",
+     "Chuẩn độ 10 mL dung dịch A: n(NaOH) = 0,0056 × 0,1 = 5,6×10⁻⁴ mol = n(HCl dư trong 10 mL).",
+     "Trong cả 50 mL: n(HCl dư) = 5,6×10⁻⁴ × 5 = 2,8×10⁻³ mol.",
+     "n(HCl) phản ứng với CaCO₃ = 0,02 − 0,0028 = 0,0172 mol ⇒ n(CaCO₃) = 8,6×10⁻³ mol.",
+     "n(Ca) = 8,6×10⁻³ mol ⇒ m(Ca) = 0,344 g ⇒ hàm lượng calcium = 34,4% (tương ứng 0,86 g CaCO₃, chiếm 86% khối lượng vỏ trứng)."
+    ],
+    "ket_qua": "34,4",
+    "dap_an_de": "86",
+    "dap_an_tu_giai": "34,4",
+    "trang_thai": "lech",
+    "ghi_chu": "Đề gốc gõ lỗi 'pihòng thí nghiệm' ⇒ 'phòng thí nghiệm'. Đề ghi 86 là phần trăm CaCO₃, trong khi câu hỏi hỏi \"hàm lượng calcium\". Máy tính ra %Ca = 34,4% (ứng với 86% CaCO₃). Giữ bản máy giải theo đúng câu chữ của đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Chuẩn độ chỉ đo được HCl CÒN DƯ; phần HCl đã phản ứng mới dùng để tính CaCO₃.",
+    "bay": "Lấy luôn số mol NaOH làm số mol HCl phản ứng với vỏ trứng."
+   },
+   "kienThuc": [
+    "CaCO₃ + 2HCl → CaCl₂ + CO₂ + H₂O.",
+    "Chuẩn độ ngược: đo lượng acid còn dư để suy ra lượng acid đã phản ứng.",
+    "Phải nhân hệ số pha loãng khi chỉ lấy một phần dung dịch đi chuẩn độ."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.CHUAN_DO.TINH_PHAN_TRAM",
+    "ten": "Chuẩn độ — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D5",
+    "ten": "Phương pháp chuẩn độ acid - base",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ }
+}

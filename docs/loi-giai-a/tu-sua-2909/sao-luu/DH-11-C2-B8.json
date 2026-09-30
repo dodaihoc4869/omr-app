@@ -1,0 +1,1497 @@
+{
+ "DH-11-C2-B8-I-15": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Trong công nghiệp, hydrogen fluoride được điều chế từ quặng fluorite theo phản ứng:\nCaF₂+H₂SO₄²⁵⁰°C→CaSO₄+2HF Vai trò của sulfuric acid trong phản ứng là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "base.",
+    "B": "chất oxi hóa.",
+    "C": "acid.",
+    "D": "chất khử."
+   },
+   "loi_giai": {
+    "chot": "Trong phản ứng CaF₂ + H₂SO₄ → CaSO₄ + 2HF không có nguyên tố nào đổi số oxi hoá, H₂SO₄ chỉ cho proton nên đóng vai trò acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ cho proton nên là acid, không phải base."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Số oxi hoá của sulfur không đổi nên không phải chất oxi hoá."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ đóng vai trò acid."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sulfur đã ở mức cao nhất nên H₂SO₄ không thể là chất khử."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-26": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 26,
+   "de": "Trong công nghiệm sản xuất sulfuric acid, hai nguồn nguyên liệu được khai thác từ mỏ để cung cấp nguyên tố sulfur là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "ZnS, PbS.",
+    "B": "H₂S, SO₂.",
+    "C": "CaSO₄, BaSO₄.",
+    "D": "S, FeS₂."
+   },
+   "loi_giai": {
+    "chot": "Hai nguồn nguyên liệu khai thác từ mỏ để cung cấp nguyên tố sulfur là đơn chất sulfur và quặng pyrite FeS₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "ZnS, PbS là quặng kim loại màu, không phải nguyên liệu chính."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "H₂S và SO₂ là chất khí, không khai thác trực tiếp từ mỏ."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "CaSO₄ và BaSO₄ là muối sulfate, không dùng làm nguyên liệu."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur đơn chất và quặng pyrite FeS₂."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-31": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 31,
+   "de": "Trong công nghiệp sản suất sulfuric acid, sulfur trioxide được hấp thụ vào dung dịch sulfuric acid đặc tạo thành những chất có công thức chung là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "H₂S₂O₇.",
+    "B": "H₂SO₄.",
+    "C": "H₂SO₄.nSO₃.",
+    "D": "(SO₃)ₙ."
+   },
+   "loi_giai": {
+    "chot": "SO₃ hấp thụ vào H₂SO₄ đặc tạo oleum có công thức chung H₂SO₄·nSO₃.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂S₂O₇ chỉ là một trường hợp riêng ứng với n = 1."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ là sản phẩm sau khi pha loãng oleum."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: công thức chung là H₂SO₄·nSO₃."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "(SO₃)ₙ là dạng polymer của SO₃, không phải oleum."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-33": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 33,
+   "de": "Sơ đồ phản ứng nào sau đây dùng để sản xuất sulfuric acid H₂SO4 trong công nghiệp?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "Cu→SO₃→SO₃→H₂SO₄.",
+    "B": "Fe→SO₃→SO₃→H₂SO₄.",
+    "C": "FeO→SO₃→SO₃→H₂SO₄.",
+    "D": "FeS₂→SO₃→SO₃→H₂SO₄."
+   },
+   "loi_giai": {
+    "chot": "Sản xuất công nghiệp đi từ nguyên liệu chứa sulfur là FeS₂ (hoặc S), qua SO₂ rồi SO₃ và cuối cùng là H₂SO₄.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Cu không chứa sulfur nên không phải nguyên liệu."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Fe không chứa sulfur nên không phải nguyên liệu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "FeO không chứa sulfur nên không phải nguyên liệu."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: đi từ quặng pyrite FeS₂."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.VIET_PTHH",
+    "ten": "Sản xuất sulfuric acid — viết phương trình"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-37": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 37,
+   "de": "Khi trộn dung dịch Na₂SO₄ với dung dịch BaCl₂, phản ứng thực chất xảy ra trong dung dịch là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "Ba²⁺+SO²₄⁻→BaSO₄.",
+    "B": "Na⁺+Cl⁻→NaCl.",
+    "C": "Ba²⁺+Na₂SO₄→BaSO₄+2Na⁺.",
+    "D": "BaCl₂+SO²₄⁻→BaSO₄+2Cl⁻."
+   },
+   "loi_giai": {
+    "chot": "Phương trình ion rút gọn chỉ giữ lại các ion thực sự tham gia: Ba²⁺ + SO₄²⁻ → BaSO₄↓.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: Ba²⁺ + SO₄²⁻ → BaSO₄↓."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Na⁺ và Cl⁻ là ion khán giả, không phản ứng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Na₂SO₄ tan và điện li hoàn toàn nên phải viết dạng ion."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "BaCl₂ tan và điện li hoàn toàn nên phải viết dạng ion."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-43": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 43,
+   "de": "Ở thể lỏng, chất nào sau đây có dạng sách như dầu do tồn tại liên kết hydrogen rất mạnh giữa các phân tử?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "HF.",
+    "B": "H₂SO₄.",
+    "C": "H₂O.",
+    "D": "CH₃COOH."
+   },
+   "loi_giai": {
+    "chot": "Phân tử H₂SO₄ có hai nhóm O-H và nhiều nguyên tử oxygen nên tạo được mạng liên kết hydrogen rất mạnh, làm chất lỏng sánh như dầu.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "HF có liên kết hydrogen nhưng phân tử nhỏ nên không sánh như dầu."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ ở thể lỏng sánh như dầu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Nước có liên kết hydrogen nhưng độ nhớt thấp."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "CH₃COOH có liên kết hydrogen nhưng không sánh như dầu."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-49": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 49,
+   "de": "Phản ứng nào sau đây là đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "2Fe + 3H₂SO4 (loãng) → Fe₂(SO₄)₃ + 3H₂.",
+    "B": "Cu + H₂SO₄ (đặc) → CuSO₄ + H₂.",
+    "C": "2Al + 3H₂SO4 (loãng) → Al₂(SO₄)₃ + 3H₂.",
+    "D": "Fe + H₂SO4 (đặc) → FeSO₄ + H₂."
+   },
+   "loi_giai": {
+    "chot": "Acid loãng chỉ đưa Fe lên +2 nên A sai; Cu với acid đặc cho SO₂ chứ không cho H₂ nên B sai; Fe với acid đặc cho Fe₂(SO₄)₃ và SO₂ nên D sai. Chỉ C đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ loãng chỉ oxi hoá Fe lên mức +2 tạo FeSO₄."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Cu với acid đặc cho SO₂ chứ không cho H₂."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: 2Al + 3H₂SO₄ loãng → Al₂(SO₄)₃ + 3H₂."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Fe với acid đặc, nóng cho Fe₂(SO₄)₃ và SO₂."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.NHAN_DANG",
+    "ten": "Sulfur và hợp chất sulfur dioxide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-6": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 6,
+   "de": "Dung dịch acid nào sau đây có khả năng gây bỏng nếu rơi vào da ?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "HCl 36%.",
+    "B": "HNO₃ 63%.",
+    "C": "H₂SO₄ 98%.",
+    "D": "H₃PO₄85%."
+   },
+   "loi_giai": {
+    "chot": "H₂SO₄ 98% vừa có tính acid mạnh vừa háo nước, hút nước từ da và toả nhiệt nên gây bỏng nặng nhất trong bốn acid đã cho.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "HCl 36% gây kích ứng nhưng không háo nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "HNO₃ 63% gây vàng da nhưng không háo nước mạnh như H₂SO₄ đặc."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ 98% háo nước nên gây bỏng nặng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "H₃PO₄ 85% là acid trung bình, ít nguy hiểm hơn."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-69": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 69,
+   "de": "Cho nhiệt tạo thành chuẩn của SO₂ (g) và SO₃ (g) lần lượt là -296,8 kJ/mol và -395,7 kJ/mol. Biến thiên anthalpy chuẩn của phản ứng: 2SO₂+O₂V²tOo⁵2SO₃là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "-98,9kJ.",
+    "B": "-197,8 kJ",
+    "C": "98,9 kJ",
+    "D": "197,8 kJ"
+   },
+   "loi_giai": {
+    "chot": "ΔrH = 2·(−395,7) − 2·(−296,8) = −791,4 + 593,6 = −197,8 kJ.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "−98,9 kJ chỉ ứng với 1 mol SO₃, chưa nhân hệ số 2."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: ΔrH = −197,8 kJ."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Dấu phải là âm vì phản ứng toả nhiệt."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Dấu phải là âm vì phản ứng toả nhiệt."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "ΔrH = 2·(−395,7) − 2·(−296,8) = −791,4 + 593,6 = −197,8 kJ."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phương án là số, đề có đơn vị đo",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-70": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 70,
+   "de": "Hòa tan 11,2 gam Fe vào dung dịch H₂SO₄ loãng dư thu được V L khí H₂ (đkc). Giá trị của V là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "5,376.",
+    "B": "6,197.",
+    "C": "4,958.",
+    "D": "2,4790."
+   },
+   "loi_giai": {
+    "chot": "n(Fe) = 11,2 : 56 = 0,2 mol; Fe + H₂SO₄ loãng → FeSO₄ + H₂ nên n(H₂) = 0,2 mol, V = 0,2 × 24,79 = 4,958 L.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "5,376 L ứng với thể tích mol 22,4 L, không đúng điều kiện chuẩn mới."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "6,197 L ứng với 0,25 mol khí."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: V = 0,2 × 24,79 = 4,958 L."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "2,479 L ứng với 0,1 mol khí."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "n(Fe) = 11,2 : 56 = 0,2 mol; Fe + H₂SO₄ loãng → FeSO₄ + H₂ nên n(H₂) = 0,2 mol, V = 0,2 × 24,79 = 4,958 L."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_THE_TICH",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính thể tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-83": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 83,
+   "de": "Hòa tan hết m gam oxide của kim loại M(hóa trị II) vào dung dịch H₂SO₄loãng, thu được 3m gam muối sulfate.\nCông thức của oxide kim loại là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "ZnO.",
+    "B": "CuO.",
+    "C": "CaO.",
+    "D": "MgO."
+   },
+   "loi_giai": {
+    "chot": "Vì n(MO) = n(MSO₄) nên (M + 96) : (M + 16) = 3, suy ra M + 96 = 3M + 48 và M = 24. Oxide là MgO.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "ZnO cho tỉ số (65+96):(65+16) ≈ 1,99."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "CuO cho tỉ số (64+96):(64+16) = 2,0."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "CaO cho tỉ số (40+96):(40+16) ≈ 2,43."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: MgO cho tỉ số 120 : 40 = 3."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu xác định oxide kim loại từ tỉ lệ khối lượng muối sulfate thu được.",
+    "bay": "Tỉ số khối lượng muối trên oxide đúng bằng tỉ số khối lượng mol vì số mol không đổi."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.VIET_CTCT",
+    "ten": "Sulfuric acid, muối sulfate và oleum — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D6",
+    "ten": "Bài toán về muối sulfate",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-84": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 84,
+   "de": "Hòa tan 3,38 gam oleum (X) vào nước thu được dung dịch (Y).\nĐể trung hòa (Y) cần dùng vừa đủ 800 mL dung dịch KOH 0,1M.\nCông thức của (x) là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "h₂so₄.so₃.",
+    "B": "h₂so₄.2so₃.",
+    "C": "h₂so₄.3so₃.",
+    "D": "h₂so₄.4so₃."
+   },
+   "loi_giai": {
+    "chot": "n(KOH) = 0,08 mol nên n(H₂SO₄) = 0,04 mol. Từ 3,38·(1 + n) : (98 + 80n) = 0,04 suy ra 0,18n = 0,54 và n = 3, tức H₂SO₄·3SO₃.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "n = 1 cho khối lượng mol 178, không khớp dữ kiện."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "n = 2 cho khối lượng mol 258, không khớp dữ kiện."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: n = 3, công thức H₂SO₄·3SO₃."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "n = 4 cho khối lượng mol 418, không khớp dữ kiện."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu xác định công thức oleum từ lượng kiềm cần để trung hoà.",
+    "bay": "Mỗi mol oleum H₂SO₄·nSO₃ khi tan vào nước cho (1 + n) mol H₂SO₄, không phải 1 mol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.VIET_CTCT",
+    "ten": "Sản xuất sulfuric acid — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-I-99": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "I",
+   "so": 99,
+   "de": "Cho 6,76 gam oleum H₂SO4.nSO₃ vào nước thành 200 mL dung dịch X. Để trung hòa 10 mL dung dịch X cần dùng vừa đủ với 16 mL dung dịch NaOH 0,5 M. Công thức oleum là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "H₂SO₄.SO₃.",
+    "B": "H₂SO₄.4SO₃.",
+    "C": "H₂SO₄.3SO₃.",
+    "D": "H₂SO₄.2SO₃."
+   },
+   "loi_giai": {
+    "chot": "1 mol H₂SO₄·nSO₃ vào nước cho (n + 1) mol H₂SO₄.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: n = 1 cho M = 178, không khớp khối lượng 6,76 g."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: n = 4 cho M = 418, không khớp."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: trong 10 mL, n(NaOH) = 0,008 mol ⇒ n(H₂SO₄) = 0,004 mol ⇒ cả 200 mL có 0,08 mol. n(oleum) = 0,08/(n + 1); (98 + 80n) × 0,08/(n + 1) = 6,76 ⇒ 1,08 = 0,36n ⇒ n = 3."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: n = 2 cho M = 258, không khớp."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Phải quy phần trung hoà ở 10 mL lên cả 200 mL trước khi lập phương trình theo n.",
+    "bay": "Dùng luôn số mol đo ở 10 mL cho cả 6,76 gam oleum."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-II-10": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "II",
+   "so": 10,
+   "de": "Thí nghiệm về tính chất của dung dịch sulfuric acid loãng và dung dịch sulfuric acid đặc:\n- Chuẩn bị: Kim loại đồng (Cu, copper) dạng mảnh hoặc sợi, dung dịch sulfuric acid loãng và dung dịch sulfuric acid đặc, ống nghiệm, bông tầm kiềm, đèn cồn.\n- Tiến hành: Cho mảnh đồng nhỏ vào ống nghiệm thứ nhất, cho tiếp vào ống nghiệm khoảng 3 mL dung dịch sulfuric acid loãng, sau đó đun nóng nhẹ ống nghiệm trên ngọn lửa đèn cồn.\nCho mảnh đồng nhỏ vào ống nghiệm thứ hai, cho tiếp vào ống nghiệm khoảng 3 mL dung dịch sulfuric acid đặc, rồi nút bông tẩm dung dịch NaOH đặc vào miệng ống nghiệm, sau đó đun nóng nhẹ ống nghiệm trên ngọn lửa đèn cồn.",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Hiện tượng quan sát được trong ống nghiệm thứ nhất: mảnh đồng tan dần và có khí không màu thoát ra.",
+    "b": "Hiện tượng quan sát được trong ống nghiệm thứ hai: mảnh đồng tan dần, có khí không màu thoát ra và dung dịch thu được có màu xanh.",
+    "c": "Bông tẩm dung dịch NaOH đặc ở ống nghiệm thứ hai hạn chế khí độc thoát ra ngoài môi trường.",
+    "d": "Dung dịch sulfuric acid loãng hoặc đặc đều có tính oxi hóa mạnh, có thể oxi hóa được các kim loại kém hoạt động như đồng."
+   },
+   "loi_giai": {
+    "chot": "Cu đứng sau hydrogen nên không phản ứng với acid loãng; với acid đặc nóng thì Cu tan tạo dung dịch CuSO₄ màu xanh và khí SO₂ không màu, mùi hắc. Chỉ acid đặc mới có tính oxi hoá mạnh.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: với acid loãng, mảnh đồng không tan và không có khí thoát ra."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: Cu tan trong acid đặc, sinh SO₂ không màu và dung dịch xanh."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: bông tẩm NaOH giữ lại khí SO₂ độc."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: chỉ acid đặc mới có tính oxi hoá mạnh, acid loãng thì không."
+     }
+    },
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "SDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu so sánh hiện tượng của đồng với sulfuric acid loãng và sulfuric acid đặc.",
+    "bay": "Ống nghiệm thứ nhất dùng acid LOÃNG nên Cu hoàn toàn không phản ứng, không có hiện tượng gì."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.CHON_PHAT_BIEU",
+    "ten": "Sulfuric acid, muối sulfate và oleum — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D2",
+    "ten": "Tính oxi hóa của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-II-16": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "II",
+   "so": 16,
+   "de": "Sulfuric acid là một trong những hoá chất quan trọng nhất được sử dụng trong công nghiệp; được sản xuất hàng trăm triệu tấn mỗi năm, chiếm nhiều nhất trong ngành công nghiệp hoá chất. Phương pháp sản xuất sulfuric acid phổ biến nhất là phương pháp tiếp xúc, theo đó acid có thể được điều chế qua các giai đoạn sau:\n(1) FeS₂(s) + O₂(g) →(t°) Fe₂O₃(s) + SO₂(g)\n(2) SO₂(g) + O₂(s) ⁴⁵⁰°C,V²O⁵ SO₃(g); ΔrHo₂₉₈ = –196 kJ\n(3) H₂SO₄(aq) + SO₃(g) → H₂SO₄.nSO₃(l)\n(4) H₂SO₄.nSO₃(l) + H₂O(l) → H₂SO₄(aq)",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Trong quá trình sản xuất H₂SO₄, giai đoạn (1) có nguy cơ cao gây ô nhiễm môi trường.",
+    "b": "Người ta dùng sulfuric acid 98% H₂SO₄(aq) hấp thụ SO₃(g) trong phản ứng (3), quá trình này được thực hiện trong tháp tiếp xúc.",
+    "c": "Để làm tăng hiệu suất của phản ứng (2), người ta hạ nhiệt độ của phản ứng xuống thấp.",
+    "d": "Ở giai đoạn 3 (phản ứng 3) có thể dùng nước hấp thụ SO₃ để sản xuất sulfuric acid đặc có nồng độ cao và thuận tiện hơn cho việc vận chuyển."
+   },
+   "loi_giai": {
+    "chot": "Đốt pyrite phát thải SO₂ gây ô nhiễm; SO₃ được hấp thụ vào H₂SO₄ 98% trong tháp hấp thụ. Không hạ nhiệt độ xuống quá thấp vì tốc độ chậm, và không dùng nước hấp thụ SO₃ vì tạo sương mù acid.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đốt pyrite sinh SO₂ nên giai đoạn (1) dễ gây ô nhiễm."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: dùng H₂SO₄ 98% hấp thụ SO₃ tạo oleum."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: hạ nhiệt độ quá thấp làm tốc độ phản ứng rất chậm, thực tế giữ 450 °C."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: dùng nước hấp thụ SO₃ sẽ tạo sương mù acid rất khó ngưng tụ."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu phân tích bốn giai đoạn của phương pháp tiếp xúc sản xuất sulfuric acid.",
+    "bay": "Hạ nhiệt độ tuy làm tăng hiệu suất cân bằng nhưng tốc độ quá chậm nên thực tế phải giữ 450 °C."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-II-17": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "II",
+   "so": 17,
+   "de": "Tại một nhà máy, quá trình sản xuất sulfuric acid từ quặng pyrite được thực hiện qua ba giai đoạn.\nGiai đoạn 1: Sản xuất sulfur dioxide 4FeS₂(s)+11O₂(g)t→2Fe₂O₃(s)+8SO₂(g) ΔrH₂₉₈=−3313,8kJ\nGiai đoạn 2: Sản xuất sulfur trioxide:\n2SO₂(g)+O₂(g)←V₂tOo₅→2SO₃(g) ΔrH₂₉₈=−197,78kJ\nGiai đoạn 3: Sản xuất oleum:\nH₂SO₄+nSO₃→H₂SO₄.nSO₃",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Tại nhà máy, sulfuric acid được sản xuất theo phương pháp tiếp xúc.",
+    "b": "Phản ứng ở hai giai đoạn đầu kèm theo sự hấp thụ năng lượng nhiệt từ môi trường.",
+    "c": "Ở giai đoạn 2 cần làm mát buồng phản ứng để ổn định nhiệt độ.",
+    "d": "Để sản xuất được 100 tấn dung dịch H₂SO₄ 98%, nhà máy cần sử dụng ít nhất 78,8 tấn quặng pyrite (chứa 80% FeS₂ về khối lượng), giả thiết hiệu suất chung của toàn bộ quá trình là 90%."
+   },
+   "loi_giai": {
+    "chot": "Cả hai giai đoạn đầu đều có ΔrH âm nên toả nhiệt, phải làm mát buồng phản ứng. Với 98 tấn H₂SO₄ cần 0,5 phần FeS₂; chia hiệu suất 90% và độ tinh khiết 80% được khoảng 83,3 tấn quặng, không phải 78,8 tấn.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đó chính là phương pháp tiếp xúc."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai giai đoạn đều toả nhiệt, không hấp thụ nhiệt."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: phản ứng toả nhiệt nên phải làm mát để giữ nhiệt độ ổn định."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: tính ra cần khoảng 83,3 tấn quặng chứ không phải 78,8 tấn."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu phân tích ba giai đoạn sản xuất sulfuric acid và tính khối lượng quặng cần dùng.",
+    "bay": "Ý d phải chia cho cả hiệu suất 90% và độ tinh khiết 80% của quặng, kết quả lớn hơn con số đề đưa ra."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-II-18": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "II",
+   "so": 18,
+   "de": "Sơ đồ quy trình dưới đây mô tả các bước trong quá trình sản xuất phân bón (Z):",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-18.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Phân bón (Z) có công thức hóa học là (NH₄)₂SO₄.",
+    "b": "Hợp chất (Q) sinh ra khi cho khí A hấp thụ vào dung dịch H₂SO₄ có tên gọi là oleum.",
+    "c": "Có 3 phản ứng oxi hóa khử trong sơ đồ trên.",
+    "d": "Hợp chất (X) được mệnh danh là “máu” của các nghành công nghiệp."
+   },
+   "loi_giai": {
+    "chot": "Phân bón Z là (NH₄)₂SO₄, tạo từ khí ammonia và sulfuric acid; hợp chất X là H₂SO₄, được mệnh danh là máu của các ngành công nghiệp. Số phản ứng oxi hoá – khử phải đếm trực tiếp trên sơ đồ.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: phân bón Z là ammonium sulfate (NH₄)₂SO₄."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng theo sơ đồ gốc: khí A hấp thụ vào H₂SO₄ cho hợp chất Q gọi là oleum."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Đáp án đề chấm ý này là sai; cần đối chiếu sơ đồ gốc để đếm lại số phản ứng oxi hoá – khử."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ được mệnh danh là máu của các ngành công nghiệp."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "ĐÃ XEM SƠ ĐỒ 16/09. SO₂ + O₂ →(t°, V₂O₅) A(SO₃); A + H₂SO₄ → Q(oleum); Q + H₂O → X(H₂SO₄); N₂ + H₂ → Y(NH₃); X + Y → Z((NH₄)₂SO₄). a) Đ. b) Đ (SO₃ hấp thụ vào H₂SO₄ đặc cho oleum). c) chỉ 2 phản ứng oxi hoá – khử (SO₂ → SO₃ và N₂ + H₂ → NH₃), không phải 3 — S. d) H₂SO₄ được gọi là \"máu\" của các ngành công nghiệp — Đ. Khớp DDSD."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đọc sơ đồ quy trình sản xuất phân bón từ ammonia và sulfuric acid.",
+    "bay": "Phải đọc sơ đồ để biết A, Q, X, Z là chất nào rồi mới đếm được số phản ứng oxi hoá – khử."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.CHON_PHAT_BIEU",
+    "ten": "Sulfuric acid, muối sulfate và oleum — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-II-9": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "II",
+   "so": 9,
+   "de": "Trong công nghiệp, sulfuric acid được sản xuất bằng phương pháp tiếp xúc theo ba giai đoạn chính.",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Nguyên liệu ban đầu thường dùng để cung cấp nguyên tố sulfur là quặng pyrite (FeS₂) hoặc sulfur (S).",
+    "b": "Giai đoạn đầu tiên của quá trình sản xuất là đốt cháy sulfur hoặc quặng pyrite để tạo ra khí SO₂.",
+    "c": "Giai đoạn thứ hai là oxi hóa SO₂ thành SO₃ với xúc tác V₂O₅ ở nhiệt độ khoảng 450(°) C.",
+    "d": "Ở giai đoạn cuối, người ta dùng nước cất để hấp thụ trực tiếp khí SO₃ nhằm thu được dung dịch H₂SO₄ tinh khiết."
+   },
+   "loi_giai": {
+    "chot": "Ba giai đoạn của phương pháp tiếp xúc đều đúng, riêng giai đoạn cuối phải hấp thụ SO₃ vào H₂SO₄ đặc tạo oleum rồi mới pha loãng, không dùng nước cất.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: nguyên liệu là quặng pyrite hoặc sulfur đơn chất."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: giai đoạn đầu là đốt tạo SO₂."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: oxi hoá SO₂ thành SO₃ với xúc tác V₂O₅ ở khoảng 450 °C."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: hấp thụ SO₃ vào nước tạo sương mù acid, phải dùng H₂SO₄ đặc."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Ba giai đoạn của phương pháp tiếp xúc đều đúng, riêng giai đoạn cuối phải hấp thụ SO₃ vào H₂SO₄ đặc tạo oleum rồi mới pha loãng, không dùng nước cất."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-III-10": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "III",
+   "so": 10,
+   "de": "Tiến hành các thí nghiệm cho các c dung dịch H₂SO₄ loãng lần lượt tác dụng với: Ag, Mg, NaHSO₃, BaCl₂, Ca(OH)₂.\nCó bao nhiêu thí nghiệm có xảy ra phản ứng?",
+   "dap_an": "4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "Mg, NaHSO₃, BaCl₂ và Ca(OH)₂ đều phản ứng với H₂SO₄ loãng; Ag đứng sau hydrogen nên không phản ứng. Vậy có 4 thí nghiệm.",
+    "buoc": [
+     "Ag đứng sau hydrogen nên không phản ứng với acid loãng.",
+     "Mg đứng trước hydrogen nên giải phóng H₂.",
+     "NaHSO₃ là muối của acid yếu nên giải phóng SO₂.",
+     "BaCl₂ tạo kết tủa BaSO₄; Ca(OH)₂ bị trung hoà.",
+     "Vậy có 4 thí nghiệm xảy ra phản ứng."
+    ],
+    "ket_qua": "4",
+    "dap_an_de": "4",
+    "dap_an_tu_giai": "4",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Mg, NaHSO₃, BaCl₂ và Ca(OH)₂ đều phản ứng với H₂SO₄ loãng; Ag đứng sau hydrogen nên không phản ứng. Vậy có 4 thí nghiệm."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.DEM_DONG_PHAN",
+    "ten": "Sulfuric acid, muối sulfate và oleum — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-III-20": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "III",
+   "so": 20,
+   "de": "Hòa tan m gam Fe vào dung dịch H₂SO₄ loãng, thoát ra 3,7185 L khí H₂ ở đkc.\nNếu hòa tan m gam Fe vào dung dịch H₂SO₄ đặc nóng, dư thoát ra m gam khí SO₂.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "14,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "n(H₂) = 3,7185 : 24,79 = 0,15 mol nên n(Fe) = 0,15 mol. Với acid đặc, Fe nhường 3 electron nên n(SO₂) = 0,15 × 3 : 2 = 0,225 mol, m(SO₂) = 14,4 gam.",
+    "buoc": [
+     "n(H₂) = 3,7185 : 24,79 = 0,15 mol, mà Fe + H₂SO₄ loãng cho tỉ lệ 1 : 1.",
+     "Vậy n(Fe) = 0,15 mol, tức 8,4 gam.",
+     "Với acid đặc: Fe → Fe³⁺ + 3e nên số electron nhường là 0,45 mol.",
+     "S⁺⁶ + 2e → SO₂ nên n(SO₂) = 0,225 mol.",
+     "m(SO₂) = 0,225 × 64 = 14,4 gam."
+    ],
+    "ket_qua": "14,4",
+    "dap_an_de": "14,4",
+    "dap_an_tu_giai": "14,4",
+    "trang_thai": "khop",
+    "ghi_chu": "Tệp nguồn dùng cùng ký hiệu m cho cả khối lượng Fe và khối lượng SO₂. Hiểu theo cách đề chấm: từ 3,7185 L H₂ suy ra 0,15 mol Fe tức 8,4 gam; với acid đặc thì thu 0,225 mol SO₂ tức 14,4 gam, khớp đáp án đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính khối lượng SO₂ từ lượng sắt suy ra qua thí nghiệm với acid loãng.",
+    "bay": "Với acid loãng Fe chỉ lên +2 nhưng với acid đặc Fe lên +3, số electron nhường khác nhau."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_KHOI_LUONG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D2",
+    "ten": "Tính oxi hóa của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B8-III-22": {
+  "luc": "2026-09-29T13:13:25.455Z",
+  "cau": {
+   "phan": "III",
+   "so": 22,
+   "de": "Sulfuric acid có thể được điều chế từ quặng pyrite theo sơ đồ:\nFeS₂⁺O², →(t°) SO₂⁺O², →(t°) SO₃⁺H²O→H₂SO₄\nTính khối lượng dung dịch H₂SO₄ 98% thu được từ 1 tấn quặng pyrite chứa 75% FeS₂.\nBiết hiệu suất của cả quá trình là 80%, các tạp chất trong quặng không chứa sulfur.",
+   "dap_an": "1000",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "m(FeS₂) = 750 kg, tức 6250 mol, cho tối đa 12 500 mol H₂SO₄. Hiệu suất 80% cho 10 000 mol, tức 980 kg; dung dịch 98% có khối lượng 980 : 0,98 = 1000 kg.",
+    "buoc": [
+     "m(FeS₂) = 1 tấn × 75% = 750 kg = 750 000 gam.",
+     "n(FeS₂) = 750 000 : 120 = 6250 mol, cho 12 500 mol H₂SO₄ theo lí thuyết.",
+     "Hiệu suất 80% nên n thực tế = 10 000 mol, m = 980 000 gam = 980 kg.",
+     "m(dd 98%) = 980 : 0,98 = 1000 kg."
+    ],
+    "ket_qua": "1000",
+    "dap_an_de": "1000",
+    "dap_an_tu_giai": "1000",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính khối lượng dung dịch sulfuric acid sản xuất được từ quặng pyrite.",
+    "bay": "Mỗi FeS₂ cho 2 H₂SO₄; hiệu suất nhân vào, còn nồng độ 98% thì chia."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_HIEU_SUAT",
+    "ten": "Sản xuất sulfuric acid — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ }
+}

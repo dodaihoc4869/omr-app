@@ -403,5 +403,151 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "DH-12-C2-B4-I-87": {
+  "luc": "2026-09-29T11:37:24.892Z",
+  "cau": {
+   "phan": "I",
+   "so": 87,
+   "de": "Tiến hành phản ứng của glucose với nước bromine theo các bước sau:\nBước 1: Cho khoảng 1 mL nước bromine loãng vào ống nghiệm.\nBước 2: Thêm tiếp từ từ 2 mL dung dịch glucose 2%, lắc đều.\nPhát biểu nào sau đây đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 4. Glucose và fructose",
+   "pa": {
+    "A": "Sau bước 2, nước bromine nhạt dần và xuất hiện kết tủa trắng.",
+    "B": "Sản phẩm hữu cơ thu được sau bước 2 là sobitol.",
+    "C": "Thí nghiệm trên chứng tỏ glucose có tính chất aldehyde.",
+    "D": "Nếu thay glucose bằng fructose thì hiện tượng của thí nghiệm vẫn không thay đổi."
+   },
+   "loi_giai": {
+    "chot": "Glucose làm mất màu nước bromine, tạo gluconic acid — đó là tính chất của nhóm aldehyde.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: nước bromine nhạt màu nhưng KHÔNG có kết tủa trắng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: sorbitol là sản phẩm KHỬ glucose bằng H₂, không phải sản phẩm với Br₂."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: Br₂ oxi hoá -CHO thành -COOH, chứng tỏ glucose có tính chất aldehyde."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: fructose là ketose, không làm mất màu nước bromine."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "DH-12-C2-B4-II-1": {
+  "luc": "2026-09-29T13:13:33.383Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Hằng ngày, cơ thể chúng ta được cung cấp các chất dinh dưỡng như tinh bột, đường saccharose, glucose, fructose,.. Các sản phẩm làm từ giấy, gỗ, sợi cotton,… với thành phần chính là cellulose cũng được được con người sử dụng.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 4. Glucose và fructose",
+   "y": {
+    "a": "Các chất tinh bột, saccharose, glucose, fructose, cellulose có tên gọi là carbohydrate.",
+    "b": "Các chất tinh bột, saccharose, glucose, fructose, cellulose có công thức chung là (CH₂O)ₙ.",
+    "c": "Trong phân tử của tinh bột, saccharose, glucose, fructose, cellulose có nhiều loại nhóm chức.",
+    "d": "Ngoài tinh bột, đường saccharose, glucose, fructose,… Chất béo và protein là một trong những nguồn cung cấp dinh dưỡng cấn thiết cho cơ thể."
+   },
+   "loi_giai": {
+    "chot": "Saccharose là C₁₂H₂₂O₁₁ nên không viết được thành (CH₂O)ₙ.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: cả năm chất đều là carbohydrate."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: saccharose là C₁₂H₂₂O₁₁, không có dạng (CH₂O)ₙ."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: đều là hợp chất tạp chức, có từ hai loại nhóm chức trở lên."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: chất béo và protein cũng là nguồn dinh dưỡng cần thiết."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Dạng (CH₂O)ₙ đòi hỏi số carbon bằng số oxygen, saccharose thì không.",
+    "bay": "Thấy công thức chung Cₙ(H₂O)ₘ là gán luôn thành (CH₂O)ₙ."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

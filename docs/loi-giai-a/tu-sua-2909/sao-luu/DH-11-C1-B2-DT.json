@@ -1,0 +1,67 @@
+{
+ "DH-11-C1-B2-DT-III-12": {
+  "luc": "2026-09-30T03:46:58.203Z",
+  "cau": {
+   "phan": "III",
+   "so": 12,
+   "de": "Vỏ trứng có chứa calcium ở dạng CaCO₃. Để xác định hàm lượng CaCO₃ trong vỏ trứng, trong pihòng thí nghiệm người ta có thể làm như sau: Lấy 1,0 g vỏ trứng khô, đã được làm sạch, hòa tan hoàn toàn trong 50 mL dung dịch HCl 0,4 M. Lọc dung dịch sau phản ứng thu được 50 mL dung dịch A. Lấy 10 mL dung dịch A chuẩn độ với dung dịch NaOH 0,1 M thấy hết 5,6 mL.\nHàm lượng cacium trong vỏ trứng (giả thiết các tạp chất khác trong vỏ trứng không phản ứng với HCl) là bao nhiêu?",
+   "dap_an": "34,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "van_dung",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "loi_giai": {
+    "chot": "HCl dư (50 mL) = 2,8×10⁻³ mol ⇒ HCl phản ứng = 0,0172 mol ⇒ n(CaCO₃) = 8,6×10⁻³ mol.",
+    "buoc": [
+     "n(HCl) ban đầu = 0,05 × 0,4 = 0,02 mol.",
+     "Chuẩn độ 10 mL dung dịch A: n(NaOH) = 0,0056 × 0,1 = 5,6×10⁻⁴ mol = n(HCl dư trong 10 mL).",
+     "Trong cả 50 mL: n(HCl dư) = 5,6×10⁻⁴ × 5 = 2,8×10⁻³ mol.",
+     "n(HCl) phản ứng với CaCO₃ = 0,02 − 0,0028 = 0,0172 mol ⇒ n(CaCO₃) = 8,6×10⁻³ mol.",
+     "n(Ca) = 8,6×10⁻³ mol ⇒ m(Ca) = 0,344 g ⇒ hàm lượng calcium = 34,4% (tương ứng 0,86 g CaCO₃, chiếm 86% khối lượng vỏ trứng)."
+    ],
+    "ket_qua": "34,4",
+    "dap_an_de": "86",
+    "dap_an_tu_giai": "34,4",
+    "trang_thai": "lech",
+    "ghi_chu": "Đề gốc gõ lỗi 'pihòng thí nghiệm' ⇒ 'phòng thí nghiệm'. Đề ghi 86 là phần trăm CaCO₃, trong khi câu hỏi hỏi \"hàm lượng calcium\". Máy tính ra %Ca = 34,4% (ứng với 86% CaCO₃). Giữ bản máy giải theo đúng câu chữ của đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Chuẩn độ chỉ đo được HCl CÒN DƯ; phần HCl đã phản ứng mới dùng để tính CaCO₃.",
+    "bay": "Lấy luôn số mol NaOH làm số mol HCl phản ứng với vỏ trứng."
+   },
+   "kienThuc": [
+    "CaCO₃ + 2HCl → CaCl₂ + CO₂ + H₂O.",
+    "Chuẩn độ ngược: đo lượng acid còn dư để suy ra lượng acid đã phản ứng.",
+    "Phải nhân hệ số pha loãng khi chỉ lấy một phần dung dịch đi chuẩn độ."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.CHUAN_DO.TINH_PHAN_TRAM",
+    "ten": "Chuẩn độ — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D5",
+    "ten": "Phương pháp chuẩn độ acid - base",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B2",
+   "nguonCau": "III-65"
+  }
+ }
+}

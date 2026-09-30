@@ -1,0 +1,74 @@
+{
+ "DH-11-C1-B3-D2-I-6": {
+  "luc": "2026-09-29T13:13:08.493Z",
+  "cau": {
+   "phan": "I",
+   "so": 6,
+   "de": "Chất nào sau đây là chất không điện li?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "biet",
+   "bai": "Bài 3. Ôn tập chương 1 (Đề 2)",
+   "pa": {
+    "A": "H₃PO₄ (phosphoric acid).",
+    "B": "C₂H₅OH (ethanol).",
+    "C": "NaCl(sodium chloride).",
+    "D": "NaOH(sodium hydroxide)."
+   },
+   "loi_giai": {
+    "chot": "Ethanol tan trong nước ở dạng phân tử, không phân li ra ion nên là chất không điện li.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₃PO₄ là acid yếu nhưng vẫn điện li."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: ethanol không phân li ra ion."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "NaCl là muối, điện li mạnh."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "NaOH là base mạnh, điện li mạnh."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CAN_BANG.DIEN_LI.NHAN_DANG",
+    "ten": "Sự điện li — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D2",
+    "ten": "Phản ứng trao đổi ion trong dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ }
+}

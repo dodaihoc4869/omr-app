@@ -365,5 +365,77 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "DH-12-C2-B6-II-35": {
+  "luc": "2026-09-29T11:37:28.784Z",
+  "cau": {
+   "phan": "II",
+   "so": 35,
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho khoảng 5 mL dung dịch hồ tinh bột 1% vào ống nghiệm. Sau đó thêm khoảng 1 mL dung dịch HCl 1M vào, lắc đều.\nBước 2: Đặt ống nghiệm trong một cốc thuỷ tinh chứa nước nóng, đun cách thuỷ trong 10 phút. Sau đó để nguội.\nBước 3: Thêm từ từ NaHCO₃ vào ống nghiệm đến khi ngừng sủi bọt khí.\nBước 4: Cho khoảng 2 mL dung dịch thu được vào ống nghiệm chứa Cu(OH)₂ (được điều chế bằng cách cho 0,5 mL dung dịch CuSO₄, 5% vào 2 mL dung dịch NaOH 10%, lắc nhẹ).\nSau đó đặt ống nghiệm trong cốc thuỷ tinh chúa nước nóng khoảng 5 phút.\nMỗi phát biểu sau là đúng hay sai?",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "y": {
+    "a": "Sau bước 1, thu được dung dịch đồng nhất.",
+    "b": "Trong bước 2, đã xảy ra phản ứng thủy phân tinh bột tạo thành glucose.",
+    "c": "Trong bước 3, NaHCO₃ được thêm vào nhằm mục đích làm tăng tốc độ phản ứng thủy phân ở bước 2.",
+    "d": "Sau bước 4, thu được dung dịch màu xanh lam."
+   },
+   "loi_giai": {
+    "chot": "Sau bước 4 đun nóng, glucose khử Cu(II) thành Cu₂O đỏ gạch, không còn màu xanh lam.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hồ tinh bột 1% là dung dịch keo, trộn HCl vẫn đồng nhất."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: đun cách thuỷ có acid xúc tác, tinh bột thuỷ phân thành glucose."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: NaHCO₃ thêm ở bước 3 để TRUNG HOÀ HCl dư, không liên quan tốc độ phản ứng bước 2."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: bước 4 đun nóng nên thu được KẾT TỦA ĐỎ GẠCH Cu₂O."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU",
+    "ten": "Phản ứng màu — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

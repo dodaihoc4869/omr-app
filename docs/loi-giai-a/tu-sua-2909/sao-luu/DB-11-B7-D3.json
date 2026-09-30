@@ -1,0 +1,141 @@
+{
+ "DB-11-B7-D3-I-1": {
+  "luc": "2026-09-29T13:11:44.316Z",
+  "cau": {
+   "phan": "I",
+   "so": 1,
+   "de": "Xét phản ứng giữa sulfur và hydrogen ở điều kiện chuẩn:\nH₂(g) + 1/8S₈ (s) → H₂S (g)ΔrHo₂₉₈= -20,6 kJ Nhiệt tạo thành của H₂S (s) là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "-20,6 kJ/mol.",
+    "B": "-41,2 kJ/mol.",
+    "C": "41,2 kJ/mol.",
+    "D": "20,6 kJ/mol."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng tạo đúng 1 mol H₂S từ các đơn chất bền nên ΔrH chính là nhiệt tạo thành chuẩn của H₂S, bằng −20,6 kJ/mol.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: nhiệt tạo thành của H₂S là −20,6 kJ/mol."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Phương trình đã ứng với 1 mol H₂S nên không nhân đôi."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Dấu phải là âm vì phản ứng toả nhiệt."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Dấu phải là âm vì phản ứng toả nhiệt."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Phản ứng tạo đúng 1 mol H₂S từ các đơn chất bền nên ΔrH chính là nhiệt tạo thành chuẩn của H₂S, bằng −20,6 kJ/mol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phương án là số, đề có đơn vị đo",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.TINH_NANG_LUONG",
+    "ten": "Sulfur và hợp chất sulfur dioxide — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D3",
+    "ten": "Bài toán nhiệt và cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-53"
+  }
+ },
+ "DB-11-B7-D3-III-3": {
+  "luc": "2026-09-29T13:11:44.316Z",
+  "cau": {
+   "phan": "III",
+   "so": 3,
+   "de": "Hydrogen sulfide phân hủy theo phản ứng sau đây:\n2H₂S (g) ⇌ 2H₂ + S₂(g) KC = 9,30.10⁻⁸ ở 427 °C.\na) Viết biểu thức hằng số cân bằng KC của phản ứng.\nb) Xác định biến thiên enthanpy chuẩn của phản ứng, biết nhệt tạo thành chuẩn của H₂S(g) và S₂(g) lần lượt là -20,6 kJ/mol và 128,6kJ/mol.\nCho biết phản ứng thuận là tỏa nhiệt hay thu nhiệt.\nc) Ở 427 °C, tính hằng số cân bằng K’C của phản ứng 2H₂S (g) ⇌ 2H₂ + S₂(g).",
+   "dap_an": "169,8",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "ΔrH⁰ = 128,6 − 2×(−20,6) = +169,8 kJ ⇒ phản ứng thuận THU NHIỆT.",
+    "buoc": [
+     "a) Kc = ([H₂]² × [S₂]) : [H₂S]².",
+     "b) ΔrH⁰ = [2×0 + 128,6] − [2×(−20,6)] = 128,6 + 41,2 = +169,8 kJ ⇒ phản ứng thuận THU NHIỆT.",
+     "c) Đề chép lặp đúng phương trình ở đầu bài nên không có phản ứng mới để tính K'C; nếu viết lại phản ứng dưới dạng H₂S ⇌ H₂ + ½S₂ thì K'C = √Kc = 3,05×10⁻⁴."
+    ],
+    "ket_qua": "169,8",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "169,8",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Ý c) của đề gốc chép lặp đúng phương trình của phần đầu nên không xác định được phản ứng mới cần tính K'C; đáp án lấy theo ý b), ý c) được nêu rõ trong lời giải là đề lặp."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "ΔrH⁰ = Σ ΔfH⁰(sản phẩm) − Σ ΔfH⁰(chất đầu); H₂ là đơn chất nên ΔfH⁰ = 0.",
+    "bay": "Quên hệ số 2 của H₂S khi nhân ΔfH⁰."
+   },
+   "kienThuc": [
+    "Kc = [H₂]²[S₂] : [H₂S]².",
+    "ΔfH⁰ của đơn chất bền bằng 0.",
+    "ΔrH⁰ > 0 ⇒ phản ứng thu nhiệt."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.TINH_NANG_LUONG",
+    "ten": "Sulfur và hợp chất sulfur dioxide — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D3",
+    "ten": "Bài toán nhiệt và cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "III-39"
+  }
+ }
+}

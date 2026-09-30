@@ -1,0 +1,76 @@
+{
+ "12-C1-B1-D1-I-70": {
+  "luc": "2026-09-29T11:34:34.040Z",
+  "cau": {
+   "phan": "I",
+   "so": 70,
+   "de": "Từ quả đào chín, người ta tách ra được chất A là một ester có công thức phân tử C₃H₆O₂.\nKhi thuỷ phân A trong dung dịch NaOH dư, thu được sodium formate và một alcohol.\nCông thức của cấu tạo của A là",
+   "pa": {
+    "A": "CH₃COOCH₃.",
+    "B": "CH₃COOC₂H₅.",
+    "C": "HCOOC₂H₅.",
+    "D": "HCOOCH₃."
+   },
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Ester cho sodium formate khi thuỷ phân phải là ester của formic acid HCOOR'; gốc R' suy từ công thức phân tử.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Không chọn: CH₃COOCH₃ có C₃H₆O₂ nhưng thuỷ phân cho sodium acetate, không phải sodium formate."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Không chọn: CH₃COOC₂H₅ là C₄H₈O₂, không đúng công thức phân tử C₃H₆O₂."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Chọn: HCOOC₂H₅ là C₃H₆O₂, thuỷ phân cho HCOONa (sodium formate) và C₂H₅OH."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Không chọn: HCOOCH₃ chỉ có C₂H₄O₂, không đúng công thức phân tử C₃H₆O₂."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng dạng suy ester từ muối và công thức phân tử ở câu 55.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.VIET_CTCT",
+    "ten": "Xà phòng hoá — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C1-B1",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D1",
+    "ten": "Phản ứng thủy phân ester trong môi trường base (phản ứng xà phòng hóa)",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
+ }
+}

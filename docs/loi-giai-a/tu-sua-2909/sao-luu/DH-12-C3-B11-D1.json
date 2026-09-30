@@ -1,0 +1,68 @@
+{
+ "DH-12-C3-B11-D1-I-13": {
+  "luc": "2026-09-29T13:14:09.084Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Phát biểu nào sau đây không đúng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 11. Ôn tập chương 3 (Đề 1)",
+   "pa": {
+    "A": "Alanine và glycine là các amino acid thiên nhiên.",
+    "B": "Khi thay nguyên tử H trong phân tử hydrocarbon bằng nhóm amino và nhóm carboxyl, thu được hợp chất amino acid.",
+    "C": "Dung dịch glutamic acid có tính chất lưỡng tính.",
+    "D": "Trùng ngưng ε-aminocaproic acid, thu được polycaproamide."
+   },
+   "loi_giai": {
+    "chot": "Nhóm carboxyl mang thêm carbon nên không phải phép thay thế hydrogen thuần tuý.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng: alanine và glycine đều là amino acid thiên nhiên."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng là phát biểu cần chọn vì cách diễn đạt không chặt chẽ."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đúng: glutamic acid có tính lưỡng tính."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng: trùng ngưng ε-aminocaproic acid cho nylon-6."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Ba phương án A, C, D đều đúng chắc chắn nên B là lựa chọn duy nhất. Lưu ý: chính bộ đề này ở bài Amino acid (P1) câu I-56 lại coi phát biểu B là ĐÚNG — cách diễn đạt 'thay H bằng nhóm carboxyl' thiếu chặt vì nhóm -COOH mang thêm một carbon. Thầy nên thống nhất lại một cách hiểu."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Polycaproamide chính là tên khác của nylon-6.",
+    "bay": "Chọn phương án D vì chưa nhớ tên polycaproamide."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.POLYMER_N.CHON_PHAT_BIEU",
+    "ten": "Polymer chứa N — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}

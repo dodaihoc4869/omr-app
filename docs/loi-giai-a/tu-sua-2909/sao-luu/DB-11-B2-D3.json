@@ -1,0 +1,62 @@
+{
+ "DB-11-B2-D3-III-173": {
+  "luc": "2026-09-29T13:11:20.020Z",
+  "cau": {
+   "phan": "III",
+   "so": 173,
+   "de": "Trộn lẫn 3 dung dịch H₂SO₄ 0,1 M, HNO₃ 0,2 M và HCl 0,3 M với những thể tích bằng nhau, thu được dung dịch X. Lấy 300 mL dung dịch X cho phản ứng với V lít dung dịch Y gồm NaOH 0,2 M và KOH 0,27 M, thu được dung dịch Z có pH = 2.\nGiá trị của V là bao nhiêu? (Kết quả làm tròn đến hàng phần mười).",
+   "dap_an": "0,14",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "van_dung",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "loi_giai": {
+    "chot": "pH = 2 sau phản ứng nghĩa là H⁺ còn dư.",
+    "buoc": [
+     "[H⁺] trong X = (2×0,1 + 0,2 + 0,3) : 3 = 0,7 : 3 = 0,23333 M.",
+     "300 mL X ⇒ n(H⁺) = 0,3 × 0,23333 = 0,07 mol.",
+     "n(OH⁻) = (0,2 + 0,27)V = 0,47V mol.",
+     "pH(Z) = 2 ⇒ 0,07 − 0,47V = 0,01(0,3 + V) ⇒ 0,067 = 0,48V ⇒ V = 0,1396 ≈ 0,14 L."
+    ],
+    "ket_qua": "0,14",
+    "dap_an_de": "0,14",
+    "dap_an_tu_giai": "0,14",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Trộn thể tích bằng nhau nên mỗi acid bị pha loãng ba lần; H₂SO₄ cho hai H⁺.",
+    "bay": "Quên hệ số 2 của H₂SO₄ hoặc quên chia ba khi trộn."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.PH_DUNG_DICH.TINH_THE_TICH",
+    "ten": "pH dung dịch — tính thể tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D3",
+    "ten": "pH - Pha loãng dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B2",
+   "nguonCau": "III-53"
+  }
+ }
+}

@@ -249,6 +249,17 @@ describe('nút Hỏi thầy (/hs/hoi-thay) — mọi câu luyện tập, trừ l
     expect(await em(d, '/hs/hoi-thay', { token, qid: QA.ds })).toMatchObject({ ok: true })
   })
 
+  it('bản chép CÙNG NỘI DUNG ở tờ khác (qid khác) của câu đang bảo vệ ⇒ cũng khoá (rà 30/09: trước chỉ so qid)', async () => {
+    const { d, token } = await coDe()
+    await napDe(d, '12-THU-B', { cau: [cauThat(Q_TN, 1)] }) // cùng nội dung QA.tn, qid 12-THU-B-I-1
+    d.objects.set('ca/BT1.json', JSON.stringify({ phanI: [{ id: QA.tn, text: 'x', choices: ['a', 'b', 'c', 'd'], correct: 'A' }] }))
+    d.sql.prepare('INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,bat_dau,han_nop,cong_bo,bank_r2,pham_vi,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+      .run('BT1', 'Bài tập', 'mo', 'baitap', '11', iso(-1), iso(48), 'khong', 'ca/BT1.json', 'tu_do', 'x')
+    expect(await em(d, '/hs/hoi-thay', { token, qid: '12-THU-B-I-1' })).toMatchObject({ ok: false, khoa: 'ca_chua_cong_bo' })
+    expect(d.dem('loi_giai_hoi')).toBe(0)
+    expect(await em(d, '/hs/hoi-thay', { token, qid: QA.ds })).toMatchObject({ ok: true })
+  })
+
   it('ôn lại: hỏi thầy trước khi nộp ⇒ lần làm đầu trong ngày ghi "có trợ giúp" (không EXP, câu quay lại lịch ôn)', async () => {
     const { d, token } = await coDe()
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'on_lai' })

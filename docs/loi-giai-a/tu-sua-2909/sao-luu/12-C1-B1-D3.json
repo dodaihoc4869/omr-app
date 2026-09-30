@@ -160,5 +160,77 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-C1-B1-D3-I-65": {
+  "luc": "2026-09-29T11:34:51.282Z",
+  "cau": {
+   "phan": "I",
+   "so": 65,
+   "de": "Bơ thực vật được làm từ dầu thực vật như dầu hướng dương, dầu đậu nành,... thông qua quá trình hydrogen hoá để dầu thực vật chuyển đổi từ dạng lỏng sang dạng rắn.\nĐun nóng triolein trong nồi kín chứa xúc tác Ni rồi sục khí H₂ dư.\nSau khi phản ứng hoàn toàn, đổ sản phẩm ra, để nguội, thu được sản phẩm hữu cơ ở thể rắn là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "sobitol",
+    "B": "tripanmitin",
+    "C": "tristearin",
+    "D": "glycerol"
+   },
+   "loi_giai": {
+    "chot": "Hydrogen hoá triolein làm no ba gốc oleate thành ba gốc stearate.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: sobitol là sản phẩm khử glucose."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: tripalmitin có gốc 16 carbon, không sinh ra từ triolein."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: ba gốc C₁₇H₃₃COO⁻ cộng H₂ thành ba gốc C₁₇H₃₅COO⁻, cho tristearin ở thể rắn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: glycerol là sản phẩm thuỷ phân chứ không phải hydrogen hoá."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.HYDRO_HOA.NHAN_DANG",
+    "ten": "Hydrogen hoá — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D3",
+    "ten": "Phản ứng Hydrogen hóa / Cộng Bromine (Sản xuất bơ nhân tạo)",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
  }
 }

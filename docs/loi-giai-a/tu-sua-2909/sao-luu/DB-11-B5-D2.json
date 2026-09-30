@@ -1,0 +1,381 @@
+{
+ "DB-11-B5-D2-I-26": {
+  "luc": "2026-09-29T13:11:29.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 26,
+   "de": "Khi đốt cháy khí ammonia trong khí oxygen (không có chất xúc tác), phản ứng tỏa nhiều nhiệt và sinh ra ngọn lửa màu vàng.\nSản phẩm của phản ứng này là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "pa": {
+    "A": "nitrogen (N₂) và nước (H₂O).",
+    "B": "nitrogen monoxide (NO) và (H₂O).",
+    "C": "nitrogen dioxide (NO₂) và nước (H₂O).",
+    "D": "dinitrogen oxide (NO) và nước (H₂O)."
+   },
+   "loi_giai": {
+    "chot": "Khi không có xúc tác, ammonia cháy trong oxygen theo 4NH₃ + 3O₂ → 2N₂ + 6H₂O, sản phẩm là nitrogen và nước.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: sản phẩm là N₂ và H₂O."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "NO chỉ tạo thành khi có xúc tác Pt."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "NO₂ không phải sản phẩm của phản ứng cháy này."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Dinitrogen oxide là N₂O, và công thức viết trong phương án cũng sai."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.NHAN_DANG",
+    "ten": "Ammonia và muối ammonium — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "I-17"
+  }
+ },
+ "DB-11-B5-D2-I-42": {
+  "luc": "2026-09-29T13:11:29.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 42,
+   "de": "Trong khí thải của quy trình sản xuất thuốc trừ sâu, phân bón hoá học có lẫn khí NH₃. Khí này rất độc đối với sức khoẻ của con người và gây ô nhiễm môi trường.\nCon người hít phải khí này với lượng lớn sẽ gây ngộ độc: ho, đau ngực (nặng), đau thắt ngực, khó thở, thở nhanh, thở khò khè; chảy nước mẳt và bỏng mắt, mù mắt, đau họng nặng, đau miệng; mạch nhanh, yếu, sốc; lẫn lộn, đi lại khó khăn, chóng mặt, thiếu sự phối hợp, bồn chồn, ngẩn ngơ (,).\nĐể xử lí NH₃ lẫn trong khí thải, người ta có thể dẫn khí thải qua một bể lọc chứa hoá chất nào sau đây?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "pa": {
+    "A": "Dung dịch Ca(OH)₂.",
+    "B": "Dung dịch HCl.",
+    "C": "Dung dịch NaOH.",
+    "D": "Nước."
+   },
+   "loi_giai": {
+    "chot": "NH₃ là base nên phải dùng acid để giữ lại; dẫn khí thải qua dung dịch HCl sẽ tạo NH₄Cl tan, loại bỏ được NH₃.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Ca(OH)₂ là base nên không giữ được NH₃."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: HCl trung hoà NH₃ tạo muối tan."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "NaOH là base nên không giữ được NH₃."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nước chỉ hoà tan tạm thời, không xử lí triệt để."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.NHAN_DANG",
+    "ten": "Ammonia và muối ammonium — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "I-45"
+  }
+ },
+ "DB-11-B5-D2-I-46": {
+  "luc": "2026-09-29T13:11:29.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 46,
+   "de": "Ammonium chloride (NH₄Cl) là chất rắn, màu trắng là nguyên liệu sản xuất phân bón (90%) cung cấp nguyên tố nitrogen (đạm) cho cây trồng.\nLoại liên kết nào không có trong phân tử NH₄Cl là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "pa": {
+    "A": "liên kết cộng hóa trị phân cực.",
+    "B": "liên kết ion.",
+    "C": "liên kết cho – nhận.",
+    "D": "liên kết cộng hóa trị không phân cực."
+   },
+   "loi_giai": {
+    "chot": "NH₄Cl gồm ion NH₄⁺ và Cl⁻ nên có liên kết ion; trong NH₄⁺ có liên kết N-H cộng hoá trị phân cực và một liên kết cho – nhận, không có liên kết cộng hoá trị không phân cực.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Liên kết N-H là cộng hoá trị phân cực, có trong phân tử."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "NH₄⁺ và Cl⁻ hút nhau bằng liên kết ion."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Liên kết thứ tư trong NH₄⁺ là liên kết cho – nhận."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là chọn D: không có liên kết cộng hoá trị không phân cực."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.NHAN_DANG",
+    "ten": "Ammonia và muối ammonium — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "I-52"
+  }
+ },
+ "DB-11-B5-D2-I-54": {
+  "luc": "2026-09-29T13:11:29.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 54,
+   "de": "Quá trình sản xuất ammonia trong công nghiệp dựa trên phản ứng thuận nghịch sau: N₂(g) + 3H₂(g) xt,t°,p2NH₃(g) ΔrHo₂₉₈ = - 92 kJ Khi phản ứng đạt tới trạng thái cân bằng, cho các tác động: (1) tăng nhiệt độ, (2) tăng áp suất, (3) thêm chất xúc tác, (4) giảm nhiệt độ, (5) lấy NH₃ ra khỏi hệ.\nNhững tác động nào làm cho cân bằng chuyển dịch theo chiều thuận?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "pa": {
+    "A": "(2), (3), (4).",
+    "B": "(1), (2), (3), (5).",
+    "C": "(2), (4), (5).",
+    "D": "(2), (3), (4), (5)."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng toả nhiệt và giảm số mol khí nên tăng áp suất (2), giảm nhiệt độ (4) và lấy NH₃ ra khỏi hệ (5) đều đẩy cân bằng theo chiều thuận; tăng nhiệt độ đẩy theo chiều nghịch, xúc tác không làm chuyển dịch.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Chất xúc tác (3) không làm cân bằng chuyển dịch."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Tăng nhiệt độ (1) đẩy cân bằng theo chiều nghịch."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: chỉ (2), (4) và (5)."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Chất xúc tác (3) không làm cân bằng chuyển dịch."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu chọn các tác động làm cân bằng tổng hợp ammonia chuyển dịch theo chiều thuận.",
+    "bay": "Chất xúc tác chỉ làm cân bằng đến nhanh hơn, không làm cân bằng chuyển dịch."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.XAC_DINH_CHIEU",
+    "ten": "Ammonia và muối ammonium — xác định chiều"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "I-66"
+  }
+ },
+ "DB-11-B5-D2-II-66": {
+  "luc": "2026-09-29T13:11:29.190Z",
+  "cau": {
+   "phan": "II",
+   "so": 66,
+   "de": "Cho thí nghiệm được thiết kế như hình bên. Nạp đầy khí ammonia vào bình thuỷ tinh trong suốt, đậy bình bằng nút cao su có ống thuỷ tinh vuốt nhọn xuyên qua. Nhúng đầu ống thuỷ tinh vào một chậu thuỷ tinh chứa nước có pha thêm dung dịch phenolphtalein. Một lát sau, nước trong chậu phun vào bình thành những tia màu hồng. |",
+   "dap_an": "SDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-14.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "y": {
+    "a": "Khí ammonia tan nhiều trong nước làm áp suất trong bình tăng dẫn đến nước bị hút vào bình.",
+    "b": "Dung dịch phenolphtalein có màu hồng chứng tỏ ammonia có tính base.",
+    "c": "Nếu thay khí ammonia bằng khí hydrogen chloride thì hiện tượng thí nghiệm vẫn không thay đổi.",
+    "d": "Ammonia tan tốt trong nước là do ammonia tạo được liên kết hydrogen với nước."
+   },
+   "loi_giai": {
+    "chot": "NH₃ tan rất nhanh làm áp suất trong bình giảm mạnh, áp suất khí quyển đẩy nước phun vào; dung dịch có tính base nên phenolphthalein hoá hồng. Thay bằng HCl thì nước vẫn phun vào nhưng không có màu hồng.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: khí tan làm áp suất trong bình giảm nên nước mới bị đẩy vào."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: phenolphthalein hoá hồng chứng tỏ dung dịch có tính base."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: với HCl nước vẫn phun vào nhưng dung dịch có tính acid nên không hoá hồng."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: NH₃ tạo liên kết hydrogen với nước nên tan rất tốt."
+     }
+    },
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "SDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu giải thích thí nghiệm phun nước vào bình chứa khí ammonia.",
+    "bay": "Khí tan vào nước làm áp suất trong bình GIẢM chứ không tăng; đó là lí do nước bị đẩy phun vào."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.CHON_PHAT_BIEU",
+    "ten": "Ammonia và muối ammonium — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "II-14"
+  }
+ }
+}

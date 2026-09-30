@@ -68,5 +68,76 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
   }
+ },
+ "12-KT-C12-D1-I-17": {
+  "luc": "2026-09-29T11:35:22.884Z",
+  "cau": {
+   "phan": "I",
+   "so": 17,
+   "de": "Phát biểu nào dưới đây không đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Không thể thuỷ phân monosaccharide",
+    "B": "Thuý phân disaccharide sinh ra hai phân tử monosaccharide",
+    "C": "Thuỷ phân polysaccharide tạo ra nhiều loại monosaccharide",
+    "D": "Tinh bột, maltose và glucose lần lượt là poly-, di- và monosaccharide"
+   },
+   "loi_giai": {
+    "chot": "Tinh bột và cellulose đều chỉ cho một loại monosaccharide là glucose khi thuỷ phân.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: monosaccharide là đơn vị nhỏ nhất, không thuỷ phân được nữa."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: mỗi disaccharide cho hai monosaccharide."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là phát biểu sai: tinh bột và cellulose chỉ cho glucose."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: đó là ba mức poly-, di- và monosaccharide."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.CHON_PHAT_BIEU",
+    "ten": "Thuỷ phân — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D1",
+    "ten": "Phản ứng thủy phân của polysaccharide",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

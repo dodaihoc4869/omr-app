@@ -1,0 +1,524 @@
+{
+ "DB-11-B7-D2-I-15": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Các số oxi hoá đặc trưng của sulfur trong hợp chất là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "-2; 0; +4.",
+    "B": "0; +2; +4;+6.",
+    "C": "0; +4; +6.",
+    "D": "-2; +4: +6."
+   },
+   "loi_giai": {
+    "chot": "Trong hợp chất, sulfur có các số oxi hoá đặc trưng −2, +4 và +6.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Số 0 là của đơn chất, không phải hợp chất, và thiếu mức +6."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "+2 không phải số oxi hoá đặc trưng của sulfur."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Thiếu mức −2 và có lẫn mức 0 của đơn chất."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: −2, +4 và +6."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.XAC_DINH_SO_OXI_HOA",
+    "ten": "Sulfur và hợp chất sulfur dioxide — xác định số oxi hoá"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-13"
+  }
+ },
+ "DB-11-B7-D2-I-18": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "I",
+   "so": 18,
+   "de": "Kim loại nào sau đây phản ứng với sulfur ngay ở điều kiện thường?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "Al.",
+    "B": "Fe..",
+    "C": "Hg.",
+    "D": "Zn."
+   },
+   "loi_giai": {
+    "chot": "Thuỷ ngân phản ứng với sulfur ngay ở nhiệt độ thường tạo HgS; các kim loại còn lại cần đun nóng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Al phải đun nóng mới phản ứng với sulfur."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Fe phải đun nóng mới phản ứng với sulfur."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: Hg + S → HgS xảy ra ở nhiệt độ thường."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Zn phải đun nóng mới phản ứng với sulfur."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.NHAN_DANG",
+    "ten": "Sulfur và hợp chất sulfur dioxide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-17"
+  }
+ },
+ "DB-11-B7-D2-I-33": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "I",
+   "so": 33,
+   "de": "Sulfur thể hiện tính oxi hóa trong phản ứng hóa học nào sau đây?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "S + O₂ t⁰→ SO₂.",
+    "B": "S + 3F₂ → SF₆.",
+    "C": "S + 6HNO₃ t⁰→ H₂SO4 + 6NO₂ + 2H₂O.",
+    "D": "S + H₂ t⁰→H₂S."
+   },
+   "loi_giai": {
+    "chot": "Trong S + H₂ → H₂S, sulfur giảm từ 0 xuống −2 nên đóng vai trò chất oxi hoá; ba phản ứng còn lại sulfur đều bị oxi hoá.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sulfur tăng lên +4 nên là chất khử."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sulfur tăng lên +6 nên là chất khử."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sulfur tăng lên +6 nên là chất khử."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur giảm xuống −2 nên là chất oxi hoá."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.NHAN_DANG",
+    "ten": "Sulfur và hợp chất sulfur dioxide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-38"
+  }
+ },
+ "DB-11-B7-D2-I-38": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "I",
+   "so": 38,
+   "de": "Trong các phản ứng dưới đây, SO₂ đóng vai trò là chất oxi hoá?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "SO₂ + Na₂O → Na₂SO₃.",
+    "B": "SO₂ + 2H₂S → 3S + 2H₂O.",
+    "C": "SO₂ + H₂O + Br₂ → 2HBr + H₂SO₄.",
+    "D": "5SO₂ + 2KMnO₄ + 2H₂O → K₂SO₄ + 2MnSO₄ + 2H₂SO₄."
+   },
+   "loi_giai": {
+    "chot": "SO₂ là chất oxi hoá khi sulfur giảm số oxi hoá; ở phản ứng với H₂S, sulfur trong SO₂ giảm từ +4 xuống 0.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Phản ứng với Na₂O không đổi số oxi hoá."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur giảm từ +4 xuống 0 nên SO₂ là chất oxi hoá."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Với Br₂, sulfur tăng lên +6 nên SO₂ là chất khử."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Với KMnO₄, sulfur tăng lên +6 nên SO₂ là chất khử."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.XAC_DINH_SO_OXI_HOA",
+    "ten": "Sulfur và hợp chất sulfur dioxide — xác định số oxi hoá"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-44"
+  }
+ },
+ "DB-11-B7-D2-I-75": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "I",
+   "so": 75,
+   "de": "Phản ứng nào sau đây là đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "2Fe + 3H₂SO4 (loãng) → Fe₂(SO₄)₃ + 3H₂.",
+    "B": "Cu + H₂SO₄ (đặc) → CuSO₄ + H₂.",
+    "C": "2Al + 3H₂SO4 (loãng) → Al₂(SO₄)₃ + 3H₂.",
+    "D": "Fe + H₂SO4 (đặc) → FeSO₄ + H₂."
+   },
+   "loi_giai": {
+    "chot": "Acid loãng chỉ đưa Fe lên +2 nên A sai; Cu với acid đặc cho SO₂ chứ không cho H₂ nên B sai; Fe với acid đặc cho Fe₂(SO₄)₃ và SO₂ nên D sai. Chỉ C đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ loãng chỉ oxi hoá Fe lên mức +2 tạo FeSO₄."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Cu với acid đặc cho SO₂ chứ không cho H₂."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: 2Al + 3H₂SO₄ loãng → Al₂(SO₄)₃ + 3H₂."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Fe với acid đặc, nóng cho Fe₂(SO₄)₃ và SO₂."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.NHAN_DANG",
+    "ten": "Sulfur và hợp chất sulfur dioxide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-49"
+  }
+ },
+ "DB-11-B7-D2-II-52": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "II",
+   "so": 52,
+   "de": "Sulfur còn được gọi là lưu hoàng, sinh diêm vàng, diêm sinh đã được biết đến từ thời cổ đại.",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Nuyên tố sulur ở ô số 16, chu kì 3, nhóm VIA trong bảng tuần hoàn.",
+    "b": "Ở dạng phân tử, sulfur gồm 6 nguyên tử liên kết với nhau tạo thành mạch vòng.",
+    "c": "Sulfur không tan trong nước và các dung môi hữu cơ như: benzene, carbon disulfide (CS₂),…",
+    "d": "Sulfur được dân gian sử dụng để pha chế vào thuốc trị các bệnh ngoài da."
+   },
+   "loi_giai": {
+    "chot": "Sulfur ở ô 16, chu kì 3, nhóm VIA; phân tử sulfur có 8 nguyên tử chứ không phải 6; sulfur không tan trong nước nhưng TAN trong benzene và CS₂.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur ở ô 16, chu kì 3, nhóm VIA."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: phân tử sulfur là vòng 8 nguyên tử S₈."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: sulfur tan tốt trong benzene và carbon disulfide."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: dân gian dùng sulfur pha chế thuốc trị bệnh ngoài da."
+     }
+    },
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Sulfur ở ô 16, chu kì 3, nhóm VIA; phân tử sulfur có 8 nguyên tử chứ không phải 6; sulfur không tan trong nước nhưng TAN trong benzene và CS₂."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.CHON_PHAT_BIEU",
+    "ten": "Sulfur và hợp chất sulfur dioxide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-8"
+  }
+ },
+ "DB-11-B7-D2-II-54": {
+  "luc": "2026-09-29T13:11:40.157Z",
+  "cau": {
+   "phan": "II",
+   "so": 54,
+   "de": "Phân tử sulfur dioxide (SO₂) có tính chất hoá học đa dạng.",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Sulfur dioxide đóng vai trò là chất khử khi tác dụng với NO₂.",
+    "b": "Trong các phản ứng hóa học, SO₂ chỉ thể hiện tính khử, không thể hiện tính oxi hóa.",
+    "c": "SO₂ phản ứng với oxygen (xúc tác V₂O₅, đun nóng) tạo ra sulfur trioxide (SO₃).",
+    "d": "Khi dẫn khí SO₂ vào dung dịch o hydrogen sulfide (H₂S), dung dịch xuất hiện kết tủa màu đen."
+   },
+   "loi_giai": {
+    "chot": "SO₂ có sulfur ở mức trung gian +4 nên vừa có tính khử vừa có tính oxi hoá; với H₂S, SO₂ tạo kết tủa sulfur màu VÀNG chứ không phải màu đen.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: với NO₂, sulfur tăng lên +6 nên SO₂ là chất khử."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: SO₂ còn thể hiện tính oxi hoá khi gặp H₂S."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: 2SO₂ + O₂ →(V₂O₅, t°) 2SO₃."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: sản phẩm là sulfur đơn chất màu vàng, không phải kết tủa đen."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "SO₂ có sulfur ở mức trung gian +4 nên vừa có tính khử vừa có tính oxi hoá; với H₂S, SO₂ tạo kết tủa sulfur màu VÀNG chứ không phải màu đen."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.CHON_PHAT_BIEU",
+    "ten": "Sulfur và hợp chất sulfur dioxide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-11"
+  }
+ }
+}

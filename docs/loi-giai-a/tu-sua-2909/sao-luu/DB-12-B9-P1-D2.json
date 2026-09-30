@@ -301,5 +301,95 @@
    "nguonDe": "12-C3-B9-D2",
    "nguonCau": "II-10"
   }
+ },
+ "DB-12-B9-P1-D2-I-75": {
+  "luc": "2026-09-29T11:37:04.635Z",
+  "cau": {
+   "phan": "I",
+   "so": 75,
+   "de": "Cho các amino acid ở cột bên trái và các giá trị pH của dung dịch chứa các amino acid ở cột bên phải trong bảng dưới đây.\nHãy ghép các amino acid ở cột bên trái để phù hợp với các giá trị pH của amino acid đó ở cột bên phải.",
+   "dap_an": "C",
+   "bang": [
+    [
+     "Amino acid",
+     "pH"
+    ],
+    [
+     "1) Glycine",
+     "a) 6,02"
+    ],
+    [
+     "2) Lysine",
+     "b) 2,33"
+    ],
+    [
+     "3) Glutamic acid",
+     "c) 10,24"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "1)-a); 2)-b); 3)-c)",
+    "B": "1)-b); 2)-a); 3)-c)",
+    "C": "1)-a); 2)-c); 3)-b",
+    "D": "1)-c); 2)-a); 3)-b)"
+   },
+   "loi_giai": {
+    "chot": "Glycine có số nhóm amino bằng số nhóm carboxyl nên gần trung tính; lysine dư nhóm amino nên pH cao; glutamic acid dư nhóm carboxyl nên pH thấp.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Lysine có tính base nên pH phải lớn hơn 7."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Glycine gần trung tính nên không thể ứng với pH 2,33."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: glycine với 6,02; lysine với 10,24; glutamic acid với 2,33."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Glycine không phải chất có pH cao nhất trong ba chất."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.TINH_NONG_DO",
+    "ten": "Amino acid — tính nồng độ"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D2",
+    "ten": "Tính chất lưỡng tính của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-KT-C3-D4",
+   "nguonCau": "I-14"
+  }
  }
 }

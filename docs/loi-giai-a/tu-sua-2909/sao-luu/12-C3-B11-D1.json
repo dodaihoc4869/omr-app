@@ -76,5 +76,71 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
   }
+ },
+ "12-C3-B11-D1-I-13": {
+  "luc": "2026-09-29T13:14:03.361Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Phát biểu nào sau đây không đúng?",
+   "pa": {
+    "A": "Alanine và glycine là các amino acid thiên nhiên.",
+    "B": "Khi thay nguyên tử H trong phân tử hydrocarbon bằng nhóm amino và nhóm carboxyl, thu được hợp chất amino acid.",
+    "C": "Dung dịch glutamic acid có tính chất lưỡng tính.",
+    "D": "Trùng ngưng ε-aminocaproic acid, thu được polycaproamide."
+   },
+   "dap_an": "B",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Amino acid là hợp chất hữu cơ tạp chức chứa đồng thời nhóm amino và carboxyl; alanine, glycine là α-amino acid thiên nhiên; amino acid lưỡng tính; ε-aminocaproic acid trùng ngưng cho polycaproamide (nylon-6).",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng: glycine, alanine là α-amino acid có trong protein thiên nhiên."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Không chuẩn: amino acid được định nghĩa qua sự có mặt đồng thời -NH₂ và -COOH, không phải qua phép thế H của hydrocarbon."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đúng: glutamic acid có cả -NH₂ (base) và -COOH (acid), lưỡng tính."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng: nH₂N-[CH₂]₅-COOH → (-NH-[CH₂]₅-CO-)ₙ + nH₂O, polycaproamide."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng định nghĩa amino acid và vị trí nhóm chức đã gắn hai sao ở câu 12.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.POLYMER_N.CHON_PHAT_BIEU",
+    "ten": "Polymer chứa N — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 9. Amino acid và peptide",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
  }
 }

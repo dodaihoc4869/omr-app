@@ -1,0 +1,66 @@
+{
+ "DH-12-C3-B10-I-33": {
+  "luc": "2026-09-29T11:37:34.402Z",
+  "cau": {
+   "phan": "I",
+   "so": 33,
+   "de": "Phát biểu nào sau đây sai khi nói về enzyme?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 10. Protein và enzyme",
+   "pa": {
+    "A": "Phần lớn enzyme là những protein xúc tác cho các phản ứng hóa học và sinh hóa.",
+    "B": "Enzyme có tính chọn lọc cao, mỗi enzyme chỉ xúc tác cho một hoặc một số phản ứng nhất định.",
+    "C": "Tốc độ phản ứng có xúc tác enzyme thường nhanh hơn nhiều lần so với với xúc tác hóa học.",
+    "D": "Tốc độ phản ứng có xúc tác enzyme thường chậm hơn nhiều lần so với với xúc tác hóa học."
+   },
+   "loi_giai": {
+    "chot": "Xúc tác enzyme làm phản ứng nhanh hơn hẳn xúc tác hoá học thông thường.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng: phần lớn enzyme là protein."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng: enzyme có tính chọn lọc cao."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đúng: enzyme làm phản ứng nhanh hơn nhiều lần."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là phát biểu sai vì nó ngược với phương án C."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Phương án B đề gốc bị chèn dãy số chống sao chép."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ }
+}

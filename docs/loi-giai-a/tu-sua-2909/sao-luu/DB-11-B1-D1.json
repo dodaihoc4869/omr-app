@@ -1,0 +1,300 @@
+{
+ "DB-11-B1-D1-I-119": {
+  "luc": "2026-09-29T13:11:12.614Z",
+  "cau": {
+   "phan": "I",
+   "so": 119,
+   "de": "Cho 5 mol H₂ và 5 mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau: Nồng độ của HI ở trạng thái cân bằng là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I-5.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "hieu",
+   "bai": "Bài 1. Khái niệm về cân bằng hoá học (vip)",
+   "pa": {
+    "A": "0,68 M.",
+    "B": "8,64.10⁻³ M.",
+    "C": "0,68.10⁻³ M.",
+    "D": "8,64 M."
+   },
+   "loi_giai": {
+    "chot": "Trục tung của đồ thị ghi đơn vị 10⁻³ M. Đường HI đi lên rồi nằm ngang ở mức 8,64 nên nồng độ cân bằng là 8,64.10⁻³ M.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "0,68 là mức của H₂ và I₂, lại bỏ mất bậc 10⁻³."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: 8,64.10⁻³ M."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "0,68.10⁻³ M là nồng độ cân bằng của H₂ và I₂."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Bỏ quên bậc 10⁻³ ghi trên trục tung."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CAN_BANG.CAN_BANG.TINH_NONG_DO",
+    "ten": "Chuyển dịch cân bằng — tính nồng độ"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B1-D1",
+    "ten": "Hằng số cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B1",
+    "tenBai": "Khái niệm về cân bằng hoá học (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B1",
+   "nguonCau": "I-5"
+  }
+ },
+ "DB-11-B1-D1-I-130": {
+  "luc": "2026-09-29T13:11:12.614Z",
+  "cau": {
+   "phan": "I",
+   "so": 130,
+   "de": "Điền vào khoảng trống bằng cụm từ thích hợp: “Cân bằng hóa học là cân bằng …(1)… vì tại cân bằng phản ứng …(2)…”",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "biet",
+   "bai": "Bài 1. Khái niệm về cân bằng hoá học (vip)",
+   "pa": {
+    "A": "(1) tĩnh; (2) dừng lại.",
+    "B": "(1) động; (2) dừng lại.",
+    "C": "(1) tính; (2) tiếp tục xảy ra.",
+    "D": "(1) động; (2) tiếp tục xảy ra."
+   },
+   "loi_giai": {
+    "chot": "Cân bằng hoá học là cân bằng động: hai chiều vẫn tiếp tục xảy ra với tốc độ bằng nhau.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Cân bằng tĩnh và dừng lại đều sai."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Phản ứng không dừng lại."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Cân bằng là động, không phải tính."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: cân bằng động, phản ứng tiếp tục xảy ra."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CAN_BANG.CAN_BANG.NHAN_DANG",
+    "ten": "Chuyển dịch cân bằng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B1-D1",
+    "ten": "Hằng số cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B1",
+    "tenBai": "Khái niệm về cân bằng hoá học (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B1",
+   "nguonCau": "I-16"
+  }
+ },
+ "DB-11-B1-D1-I-5": {
+  "luc": "2026-09-29T13:11:12.614Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "de": "Cho 5 mol H₂ và 5 mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C. Đồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau:\nNồng độ của HI ở trạng thái cân bằng là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I-5-0.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "biet",
+   "pa": {
+    "A": "0,68 M.",
+    "B": "8,64.10⁻³ M.",
+    "C": "0,68.10⁻³ M.",
+    "D": "8,64 M."
+   },
+   "loi_giai": {
+    "chot": "Đọc đồ thị: đường nồng độ hydrogen iodide đi lên rồi nằm ngang ở mức 8,64 trên trục đơn vị 10⁻³ M, vậy [HI] = 8,64.10⁻³ M.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "0,68 là mức của đường H₂, I₂ và còn thiếu hệ số 10⁻³ của trục tung."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng, đường HI đạt giá trị không đổi 8,64 trên trục có đơn vị 10⁻³ M."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "0,68.10⁻³ M là nồng độ cân bằng của H₂ và I₂, không phải của HI."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "8,64 M bỏ quên đơn vị trục tung là 10⁻³ M."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Đọc một giá trị trên đồ thị, trùng dạng đọc đồ thị ở câu 8.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "CAN_BANG.CAN_BANG.TINH_NONG_DO",
+    "ten": "Chuyển dịch cân bằng — tính nồng độ"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "11-C1-B1",
+   "dangBai": {
+    "ma": "DB-11-B1-D1",
+    "ten": "Hằng số cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B1",
+    "tenBai": "Khái niệm về cân bằng hoá học (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "11-C1-B1",
+   "nguonCau": "I-5"
+  }
+ },
+ "DB-11-B1-D1-III-217": {
+  "luc": "2026-09-29T13:11:12.614Z",
+  "cau": {
+   "phan": "III",
+   "so": 217,
+   "de": "Cho 5 mol H₂ và 5 mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau.\nNồng độ của HI ở trạng thái cân bằng là bao nhiêu (tính theo đơn vị 10⁻³ mol/L)?",
+   "dap_an": "8,64",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Ôn tập chương 1 (Đề 1)",
+   "loi_giai": {
+    "chot": "Đọc đồ thị: đường HI đi lên rồi nằm ngang.",
+    "buoc": [
+     "Đọc đồ thị: đường HI đi lên rồi nằm ngang.",
+     "Mức nằm ngang của HI là 8,64 theo trục tung.",
+     "Trục tung ghi đơn vị 10⁻³ M nên đáp số là 8,64."
+    ],
+    "ket_qua": "8,64",
+    "dap_an_de": "8,64",
+    "dap_an_tu_giai": "8,64",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "bay"
+    ],
+    "ly_do": "Đọc đồ thị phải bám đúng đường và đúng đơn vị của trục.",
+    "bay": "Đọc nhầm sang mức 0,68 của H₂ và I₂."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.CAN_BANG.TINH_NONG_DO",
+    "ten": "Chuyển dịch cân bằng — tính nồng độ"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B1-D1",
+    "ten": "Hằng số cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B1",
+    "tenBai": "Khái niệm về cân bằng hoá học (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B3-D1",
+   "nguonCau": "III-1"
+  }
+ }
+}

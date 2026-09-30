@@ -70,5 +70,141 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
   }
+ },
+ "12-C3-B10-D2-I-15": {
+  "luc": "2026-09-29T11:35:03.409Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Phát biểu nào sau đây sai khi nói về enzyme?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Phần lớn enzyme là những protein xúc tác cho các phản ứng hóa học và sinh hóa",
+    "B": "Enzyme có tính chọn lọc cao, mỗi enzyme chỉ xúc tác cho một hoặc một số phản ứng nhất định",
+    "C": "Tốc độ phản ứng có xúc tác enzyme thường nhanh hơn nhiều lần so với với xúc tác hóa học",
+    "D": "Tốc độ phản ứng có xúc tác enzyme thường chậm hơn nhiều lần so với với xúc tác hóa học"
+   },
+   "loi_giai": {
+    "chot": "Enzyme là chất xúc tác sinh học, làm phản ứng xảy ra nhanh hơn nhiều so với xúc tác hoá học thường.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng nên không chọn: phần lớn enzyme là protein."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng nên không chọn: enzyme có tính chọn lọc rất cao."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đúng nên không chọn: xúc tác enzyme nhanh hơn nhiều lần."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Sai nên chọn: nói ngược, enzyme làm phản ứng nhanh hơn chứ không chậm hơn."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-08",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ },
+ "12-C3-B10-D2-II-22": {
+  "luc": "2026-09-29T11:35:03.409Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Methionine là một amino acid thiết yếu (cơ thể không thể tự tổng hợp), được tìm thấy trong nhiều protein của thức ăn, mô và cơ quan của cơ thể con người. Ngoài vai trò cấu thành nên protein, nó còn giữ một số nhiệm vụ khác, đặc biệt trong đó là khả năng chuyển thành phân tử chứa sulfur.\nNhững phân tử chứa sulfur này đảm nhiệm nhiều vai trò khác nhau, bao gồm bảo vệ các mô, chỉnh sửa DNA và duy trì hoạt động của tế bào. Methionine có công thức cấu tạo: CH₃-S-CH₂-CH₂-CH(NH₂)-COOH.\nBiết nhóm CH₃-S- có tên là methylthio.",
+   "y": {
+    "a": "Thức ăn giàu methionine có thể tìm thấy ở trứng, cá, thịt,.",
+    "b": "Methionine có tên thay thế là 3-amino-4-(methylthio)butanoic acid.",
+    "c": "Phân tử methionine có 11 nguyên tử hydrogen.",
+    "d": "Methionine là α-amino acid."
+   },
+   "dap_an": "DSDD",
+   "hinh": [
+    {
+     "tep": "II-15-0.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Methionine C₅H₁₁NO₂S: -NH₂ ở C2 (α), nhóm methylthio ở C4 → 2-amino-4-(methylthio)butanoic acid; 11 H; amino acid thiết yếu có trong trứng, cá, thịt.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: thực phẩm giàu protein động vật giàu methionine."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: đánh số từ -COOH, -NH₂ ở C2, CH₃S- ở C4 → 2-amino-4-(methylthio)butanoic acid."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: 3 (CH₃) + 4 (2 CH₂) + 1 (CH) + 2 (NH₂) + 1 (COOH) = 11 H."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: -NH₂ gắn C kề -COOH."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng cách đánh số mạch chính khi gọi tên đã gắn hai sao ở câu 12 và sao ở câu 11 phần II.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B9-P1",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
  }
 }

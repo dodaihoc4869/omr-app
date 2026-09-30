@@ -1,0 +1,74 @@
+{
+ "DH-10-C2-B9-D1-I-3": {
+  "luc": "2026-09-29T13:14:11.370Z",
+  "cau": {
+   "phan": "I",
+   "so": 3,
+   "de": "Nguyên tử của các nguyên tố trong cùng một nhóm A (trừ He) có cùng",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "biet",
+   "bai": "Bài 9. Ôn tập chương 2 (đề 1)",
+   "pa": {
+    "A": "số electron.",
+    "B": "số lớp electron.",
+    "C": "số electron hóa trị.",
+    "D": "số electron ở lớp ngoài cùng."
+   },
+   "loi_giai": {
+    "chot": "Nhóm A xếp theo số electron lớp ngoài cùng; số thứ tự nhóm A bằng chính số electron đó. Helium là ngoại lệ vì chỉ có 2 electron ngoài cùng mà vẫn ở nhóm VIIIA.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Tổng số electron bằng Z, mỗi nguyên tố một khác."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Số lớp electron bằng số thứ tự chu kì, khác nhau theo hàng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Với nhóm A thì đúng, nhưng chính He phá lệ nên đây không phải cách phát biểu của sách."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: cùng nhóm A thì cùng số electron lớp ngoài cùng, trừ He."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.NHAN_DANG",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D2",
+    "ten": "Xác định vị trí của các nguyên tố thuộc cùng chu kì hoặc cùng nhóm",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ }
+}
