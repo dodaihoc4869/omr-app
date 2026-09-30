@@ -188,3 +188,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 30/09 22:53 VN · gộp #118 bi đầu ván vẽ 3D thật (3fabae4) · kiểm: 242 test chỉ đỏ G11 nền, tsc, build 165 tệp/2818 KiB, check:mau · không ca mở · lùi: git revert -m1 3fabae4
 - 30/09 23:15 VN · deploy 615 (#118) XANH 23:02 · gộp #119 Hỏi thầy chỉ hiện trong khối lời giải (444ea72), 13 chỗ · kiểm: tsc, 270 test chỉ đỏ nền cau-da-lam-2109 · không ca mở · lùi: git revert -m1 444ea72
 - 30/09 23:25 VN · deploy 616 (#119 Hỏi thầy sau lời giải) XANH 23:23 · hết việc đêm 30/09
+- 01/10 06:36 VN · gộp #120 Chuỗi ngày Hoá 2.0 đếm từ su_kien_hoc (f562dd5) · Sảnh, cửa hàng, phụ huynh · 270 test xanh, tsc sạch · không ca mở · còn: gv-hom-nay-v2.ts, thu-thach-rieng.ts vẫn demChuoiDat · lùi: git revert -m1 f562dd5
