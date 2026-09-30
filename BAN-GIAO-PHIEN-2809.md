@@ -167,3 +167,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 12:45 30/09 · Boss · merge PR #105 ô số ± , (3b41d13) + PR #106 Sửa câu sai chọn nguồn (c32acaf) · 181 test vùng xanh, tsc sạch · không ca mở · lùi: git revert -m1 c32acaf && git revert -m1 3b41d13
 - 12:54 30/09 · deploy c32acaf (#105+#106) xanh (run 603; 602 huỷ, đã gồm)
 - 13:00 30/09 · Boss · merge PR #107 lọc tự luận chặt (9eeb0d5) · không ca mở · lùi: git revert -m1 9eeb0d5
+- 13:12 30/09 · deploy #107 xanh (run 604)
