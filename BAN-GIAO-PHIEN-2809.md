@@ -146,3 +146,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 00:22 30/09 · deploy b287087 (#92+#93) xanh (run 590; 589 huỷ do cancel-in-progress, đã gồm)
 - 05:48 30/09 · Boss · merge PR #94 Bi-a xoay ngang toàn màn (cac7c74) · thầy chốt · 156 test bi-a xanh · không ca mở · lùi: git revert -m1 cac7c74
 - 05:59 30/09 · deploy #94 xanh (run 591)
+- 07:33 30/09 · Boss · merge PR #95 Bi-a thoát giữa ván + mất 8 câu (a8c8233) · 552/553 test vùng (1 chập chờn, chạy riêng xanh) · không ca mở · lùi: git revert -m1 a8c8233
