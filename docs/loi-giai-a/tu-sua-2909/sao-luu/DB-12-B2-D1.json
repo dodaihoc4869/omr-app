@@ -458,5 +458,79 @@
    "nguonDe": "DH-12-C1-B2",
    "nguonCau": "I-4"
   }
+ },
+ "DB-12-B2-D1-I-47": {
+  "luc": "2026-09-30T03:47:01.807Z",
+  "cau": {
+   "phan": "I",
+   "so": 47,
+   "de": "Cho các nhận định:\n(1) có đầu ưa nước là gốc carboxylate;\n(2) là muối của acid hữu cơ;\n(3) dễ điện li trong nước;\n(4) có đuôi kị nước là gốc hydrocarbon mạch dài.\nSố nhận định đúng với cả phân tử xà phòng và chất giặt rửa tổng hợp là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "1",
+    "B": "2",
+    "C": "3",
+    "D": "4"
+   },
+   "loi_giai": {
+    "chot": "Chất giặt rửa tổng hợp là muối sulfate hoặc sulfonate nên không mang gốc carboxylate và cũng không phải muối của acid hữu cơ; chỉ (3) và (4) đúng cho cả hai loại.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: có tới hai nhận định (3) và (4) đúng cho cả hai loại, không phải một."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Chọn: đúng hai nhận định (3) và (4). (3) cả xà phòng và chất giặt rửa tổng hợp đều là muối tan, điện li mạnh trong nước; (4) cả hai đều có đuôi kị nước là gốc hydrocarbon mạch dài."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: 3 là do tính cả nhận định (2). Chất giặt rửa tổng hợp có thành phần chính là sodium alkylsulfate R-OSO₃Na hoặc sodium alkylbenzenesulfonate, tức muối của gốc acid sulfuric hoặc acid sulfonic, không phải muối của acid hữu cơ như xà phòng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: 4 là tính cả nhận định (1), nhưng đầu ưa nước là gốc carboxylate -COO⁻ chỉ có ở xà phòng; chất giặt rửa tổng hợp có đầu ưa nước là -OSO₃⁻ hoặc -SO₃⁻."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B2-D1",
+    "ten": "Phản ứng điều chế xà phòng",
+    "lop": "12",
+    "bai": "DB-12-B2",
+    "tenBai": "Xà phòng và chất giặt rửa tổng hợp",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-C1-B2",
+   "nguonCau": "I-75"
+  }
  }
 }

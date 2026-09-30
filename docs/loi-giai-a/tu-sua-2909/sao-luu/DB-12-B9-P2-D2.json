@@ -582,5 +582,125 @@
    "nguonDe": "DH-12-C3-B9-P2",
    "nguonCau": "II-9"
   }
+ },
+ "DB-12-B9-P2-D2-III-57": {
+  "luc": "2026-09-30T03:46:49.784Z",
+  "cau": {
+   "phan": "III",
+   "so": 57,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "de": "Khi thủy phân không hoàn toàn pentapeptide X (Gly-Ala-Val-Ala-Gly) thu được tối đa bao nhiêu peptide (chứa gốc Gly) có phản ứng màu biuret?",
+   "dap_an": "4",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Peptide cho màu biuret phải có ≥ 2 liên kết peptide (từ tripeptide trở lên); các sản phẩm thuỷ phân là những đoạn liên tiếp của Gly-Ala-Val-Ala-Gly.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Tripeptide: Gly-Ala-Val, Ala-Val-Ala, Val-Ala-Gly",
+     "Tetrapeptide: Gly-Ala-Val-Ala, Ala-Val-Ala-Gly",
+     "Chứa gốc Gly: Gly-Ala-Val, Val-Ala-Gly, Gly-Ala-Val-Ala, Ala-Val-Ala-Gly (loại Ala-Val-Ala)",
+     "Thay số: Số peptide thoả mãn = 4"
+    ],
+    "ket_qua": "4",
+    "dap_an_de": "5",
+    "dap_an_tu_giai": "4",
+    "trang_thai": "lech",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi 5, thầy quyết bỏ. Máy đếm 4 peptide chứa Gly có biuret (2 tripeptide + 2 tetrapeptide) vì coi pentapeptide X là chất đầu, không phải sản phẩm. Đề ghi 5, tức tính cả X còn dư sau thuỷ phân không hoàn toàn. Thầy chốt cách đếm."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Chỉ lấy các đoạn từ ba gốc trở lên vì cần hai liên kết peptide, rồi giữ lại những đoạn có chứa gốc Gly.",
+    "bay": "Đếm cả dipeptide dù chúng không cho phản ứng biuret, hoặc giữ đoạn Ala-Val-Ala không có Gly.",
+    "dk": [
+     "bay",
+     "buoc"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.DEM_DONG_PHAN",
+    "ten": "Peptide — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C3-B9-P2",
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-C3-B9-D3",
+   "nguonCau": "III-41"
+  }
+ },
+ "DB-12-B9-P2-D2-III-148": {
+  "luc": "2026-09-30T03:46:49.784Z",
+  "cau": {
+   "phan": "III",
+   "so": 148,
+   "de": "Khi thủy phân không hoàn toàn pentapeptide X (Gly-Ala-Val-Ala-Gly) thu được tối đa bao nhiêu peptide (chứa gốc Gly) có phản ứng màu biuret?",
+   "dap_an": "4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Peptide (P2)",
+   "loi_giai": {
+    "chot": "Chỉ peptide từ ba gốc trở lên mới cho màu biuret, và sản phẩm thuỷ phân không tính chính X.",
+    "buoc": [
+     "Màu biuret cần từ hai liên kết peptide trở lên, tức mảnh cắt ra phải có từ ba gốc amino acid.",
+     "Mảnh ba gốc liên tiếp của Gly-Ala-Val-Ala-Gly gồm Gly-Ala-Val, Ala-Val-Ala, Val-Ala-Gly; chứa gốc Gly chỉ có Gly-Ala-Val và Val-Ala-Gly, được 2 chất.",
+     "Mảnh bốn gốc gồm Gly-Ala-Val-Ala và Ala-Val-Ala-Gly, cả hai đều chứa gốc Gly, được 2 chất.",
+     "X nguyên vẹn không phải sản phẩm thuỷ phân nên không kể, tổng 2 + 2 = 4 peptide."
+    ],
+    "ket_qua": "4",
+    "dap_an_de": "5",
+    "dap_an_tu_giai": "5",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Đề hỏi số peptide TỐI ĐA có trong hỗn hợp sản phẩm.",
+    "bay": "Quên rằng thuỷ phân không hoàn toàn thì X vẫn còn dư."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.DEM_DONG_PHAN",
+    "ten": "Peptide — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "DH-12-C3-B9-P2",
+   "nguonCau": "III-29"
+  }
  }
 }
