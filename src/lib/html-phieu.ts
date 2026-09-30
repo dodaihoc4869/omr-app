@@ -1356,9 +1356,11 @@ export function theCauHtml(
   const txtDinhDang = tachDongTheoY(c.text)
   const deBai = (c.anhThanCau ? anhHtml(c.anhThanCau, 'than', 'Đề bài') : `<div class="q-text" style="white-space: pre-line;">${chuHtml(txtDinhDang)}</div>`) + experimentHtml(txtDinhDang)
   const giai = anGiai ? '' : oGiaiHtml(c)
+  // Nút Hỏi thầy nằm TRONG khối lời giải (thầy lệnh 30/09): lời giải thu gọn / không có lời giải ⇒ không thấy nút.
+  const nutHoi = giai && hoiThay && c.id ? `<div class="q-hoi-thay"><button type="button" class="nut-hoi-thay" data-hoi-thay="${thoat(c.id)}">Hỏi thầy</button></div>` : ''
   const nut = giai
     ? `<button class="q-nut-giai" type="button" aria-expanded="${moSan ? 'true' : 'false'}" aria-controls="giai-${stt}">${MUI_TEN}<span class="chu-mo">Xem lời giải</span><span class="chu-dong">Ẩn lời giải</span></button>
-  <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}</div></div>`
+  <div class="sol-wrap" id="giai-${stt}"><div class="sol-inner">${giai}${nutHoi}</div></div>`
     : ''
 
   const oLamLai =
@@ -1401,7 +1403,7 @@ export function theCauHtml(
     ${than}
     ${hinhTaiViTri(c, 'cuoi_cau')}${cn?.daCham ? `<div class="lam-ket">${cn.daCham.dung ? 'Đúng' : 'Sai'}</div>` : ''}
   </div>
-  ${nut}${hoiThay && c.id ? `\n  <div class="q-hoi-thay"><button type="button" class="nut-hoi-thay" data-hoi-thay="${thoat(c.id)}">Hỏi thầy</button></div>` : ''}
+  ${nut}
 </article>`
 }
 
@@ -3407,6 +3409,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
 /** Kiểu + mã nút Hỏi thầy trên phiếu học sinh: bắt trước mọi trình nghe khác của thẻ câu (không mở/đóng lời giải cũ), nhắn app đúng qid. */
 const HOI_THAY_PHIEU = `<style>
 .q-hoi-thay{display:flex;justify-content:flex-end;padding:0 16px 14px}
+.q-card:not(.mo) .q-hoi-thay{display:none}
 .nut-hoi-thay{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer;touch-action:manipulation}
 .nut-hoi-thay:focus-visible{outline:3px solid currentColor;outline-offset:2px}
 @media print{.q-hoi-thay{display:none}}

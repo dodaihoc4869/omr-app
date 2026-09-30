@@ -7,7 +7,6 @@ import { demDaLam, useLuyenDe } from './luyen-de/dung-luyen-de'
 import ModalXacNhanNop from './ModalXacNhanNop'
 import './m3'
 import './m3/luyen-khac-phuc.css'
-import NutHoiThay from './loi-giai/NutHoiThay'
 
 /** Giây nguyên còn lại như bản cũ: làm tròn LÊN, không âm. */
 const giayNguyen = (giay: number | null) => Math.max(0, Math.ceil(giay ?? 0))
@@ -157,7 +156,6 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   const boc = (qid: string, the: ReactNode) => (
     <div key={qid}>
       {the}
-      {done && <NutHoiThay qid={qid} nguon="luyen_de" gon />}
     </div>
   )
 
@@ -218,6 +216,8 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                 stt: i + 1,
                 explanation: sol?.explanation,
                 loiGiai: sol?.loiGiai,
+                // Hỏi thầy nằm trong khối lời giải của TheCau ⇒ chỉ hiện khi đã nộp và lời giải đang hiện (thầy lệnh 30/09).
+                hoiThay: { qid: q.id, nguon: 'luyen_de', gon: true },
               }
               if ('choices' in q)
                 return boc(q.id, (

@@ -10,7 +10,6 @@
 import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
-import NutHoiThay from '../loi-giai/NutHoiThay'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
 import '../m3'
@@ -476,9 +475,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
           </div>
         ) : (
           <div className="m3 h2-the-cau">
-            <TheCau {...propsTheCau(tt.ct, c.stt)} />
-            {/* Hỏi thầy ngay dưới câu (thầy lệnh 30/09): máy chủ tự khoá câu đang thi / chưa có hồ sơ sạch. */}
-            <NutHoiThay qid={c.qid} nguon="cau_da_lam" />
+            {/* Hỏi thầy nằm trong khối lời giải (thầy lệnh 30/09): chỉ hiện khi lời giải đã tải và đang hiện. Máy chủ tự khoá câu đang thi. */}
+            <TheCau {...propsTheCau(tt.ct, c.stt)} hoiThay={{ qid: c.qid, nguon: 'cau_da_lam' }} />
           </div>
         )}
         {c.lichSu.length > 0 && (

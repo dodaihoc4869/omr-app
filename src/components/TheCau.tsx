@@ -17,6 +17,7 @@ import { tachDongTheoY } from '../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
 import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
 import OSoTraLoi from './OSoTraLoi'
+import NutHoiThay from './loi-giai/NutHoiThay'
 import './m3/the-cau.css' // chỉ có hiệu lực dưới tổ tiên `.m3` (luyện đề / khắc phục / báo cáo…); game và app giáo viên không đổi
 
 export type CheDo = 'thi' | 'xem_lai'
@@ -55,6 +56,9 @@ interface BaseProps {
    * nói đúng/sai, không kèm đáp án. */
   daLamO?: { ngay: string }
   onZoom?: (src: string) => void
+  /** Nút "Hỏi thầy" (thầy lệnh 30/09: CHỈ hiện khi lời giải đang hiện). Vẽ BÊN TRONG khối lời giải ⇒ chế độ `thi`
+   * (chưa có lời giải) hoặc câu không có lời giải thì không có nút. KHÔNG truyền trong màn thi. */
+  hoiThay?: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean }
 }
 
 interface McqProps extends BaseProps {
@@ -263,6 +267,7 @@ function LoiGiai({ props, nhan }: { props: TheCauProps; nhan?: TrangThaiLoiGiai 
           </>
         )}
       </div>
+      {coGi && props.hoiThay && <NutHoiThay qid={props.hoiThay.qid} nguon={props.hoiThay.nguon} onHoi={props.hoiThay.onHoi} gon={props.hoiThay.gon} />}
     </div>
   )
 }

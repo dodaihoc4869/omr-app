@@ -6,7 +6,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { KhoiLoiGiai, TheCauAi } from '../than-thu-v2/dao2/TrongAi'
 import { docGoiY, docVai } from '../than-thu-v2/dao2/dao2-core'
-import NutHoiThay from '../../components/loi-giai/NutHoiThay'
 import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
 import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import { dongTraLoi, layCauTraLoi, traLoiBia, type PhanHoiBia } from './api'
@@ -113,7 +112,6 @@ export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
                 ? <TheCauAi cau={cau} stt={viTri + 1} traLoi={traLoi} khoa={dang} onTraLoi={setTraLoi} />
                 : <KhoiLoiGiai nguon="bi_a" cau={cau} stt={viTri + 1} phanHoi={phanHoiChoLoiGiai(phanHoi)} traLoiMay={traLoi} />}
             </div>
-            {!phanHoi && <NutHoiThay key={cau.qid} qid={cau.qid} nguon="bi_a" gon onHoi={() => setTroGiup(true)} />}
             {!phanHoi && troGiup && <small className="bia-chu-nho">Có trợ giúp · câu này không tính EXP và sẽ quay lại để em tự làm.</small>}
             {loi && <p className="bia-loi" role="alert">{loi}</p>}
             {baoCau && !loi && !phanHoi && <p role="status">{baoCau}</p>}
