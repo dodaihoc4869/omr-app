@@ -118,22 +118,27 @@ export const DK_PHIEN_DAO_DOAN = "json_extract(s.json,'$.hoa2') = 1 AND COALESCE
  * Câu đang GIỮ trong các phiên còn hạn (< 2 giờ) thoả `dieuKien` mà em CHƯA trả lời — để Đảo/Đoàn và Bi-a không phát trùng câu của nhau
  * (Bi-a Phản Ứng, đặc tả mục 4.7). Lỗi đọc ⇒ tập rỗng (không chặn thêm, hành vi cũ).
  */
-export async function cauDangGiu(env: Env, sbd: string, nowMs: number, dieuKien: string): Promise<Set<string>> {
+/** Câu các phiên khớp `dieuKien` còn giữ (chưa trả lời). Quét tối ưu 30/09: MỘT truy vấn (lượt đã trả lời gom bằng truy vấn con theo chỉ mục
+ * game_v2_attempt_session) thay cho hai lượt nối tiếp (phiên → lượt trả lời). Kết quả y hệt. */
+const sqlCauDangGiu = (dieuKien: string) => `SELECT s.id AS id, s.json AS json,
+    (SELECT json_group_array(a2.qid) FROM game_v2_attempt a2 WHERE a2.session = s.id AND a2.sbd = s.sbd) AS da
+    FROM game_v2_session s WHERE s.sbd = ? AND s.created_at >= ? AND ${dieuKien}`
+function cauGiuTuPhien(phien: readonly Row[]): Set<string> {
   const ra = new Set<string>()
-  try {
-    const r = await env.DB.prepare(`SELECT s.id AS id, s.json AS json FROM game_v2_session s WHERE s.sbd = ? AND s.created_at >= ? AND ${dieuKien}`)
-      .bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).all<Row>()
-    const phien = r.results ?? []
-    if (!phien.length) return ra
-    const da = await env.DB.prepare('SELECT session, qid FROM game_v2_attempt WHERE sbd = ? AND session IN (SELECT value FROM json_each(?))')
-      .bind(sbd, JSON.stringify(phien.map((x) => str(x.id)))).all<Row>()
-    const daTraLoi = new Set((da.results ?? []).map((x) => `${str(x.session)}|${str(x.qid)}`))
-    for (const x of phien) {
-      const qs = (JSON.parse(str(x.json)) as { questions?: RefPhien[] }).questions ?? []
-      for (const q of qs) if (!daTraLoi.has(`${str(x.id)}|${q.qid}`)) ra.add(q.qid)
-    }
-  } catch { /* lỗi đọc: không chặn thêm */ }
+  for (const x of phien) {
+    let da: unknown = []
+    try { da = JSON.parse(str(x.da) || '[]') } catch { da = [] }
+    const daTraLoi = new Set((Array.isArray(da) ? da : []).map((q) => str(q)))
+    const qs = (JSON.parse(str(x.json)) as { questions?: RefPhien[] }).questions ?? []
+    for (const q of qs) if (!daTraLoi.has(q.qid)) ra.add(q.qid)
+  }
   return ra
+}
+export async function cauDangGiu(env: Env, sbd: string, nowMs: number, dieuKien: string): Promise<Set<string>> {
+  try {
+    const r = await env.DB.prepare(sqlCauDangGiu(dieuKien)).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).all<Row>()
+    return cauGiuTuPhien(r.results ?? [])
+  } catch { return new Set() } // lỗi đọc: không chặn thêm
 }
 
 /**
@@ -154,9 +159,16 @@ export const SQL_HOAT_DONG_BIA = `MAX(s.created_at,
  * (câu chưa trả lời về lại kế hoạch; `bi_a_van` để nguyên cho `bia-ket-van`). Trả câu còn giữ ở bàn đang chơi thật (còn hoạt động).
  */
 export async function nhaCauBiaChoDaoDoan(env: Env, sbd: string, nowMs: number): Promise<Set<string>> {
-  await env.DB.prepare(`UPDATE game_v2_session AS s SET json = json_set(s.json, '$.dong', 1) WHERE s.sbd = ? AND json_extract(s.json,'$.bia') = 1 AND COALESCE(json_extract(s.json,'$.dong'),0) = 0
-      AND (COALESCE(json_extract(s.json,'$.chiCau'),0) = 1 OR ${SQL_HOAT_DONG_BIA} < ?)`).bind(sbd, new Date(nowMs - HAN_GIU_BAN_BIA_MS).toISOString()).run().catch(() => null)
-  return cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
+  // Quét tối ưu 30/09: đóng phiên + đọc câu còn giữ trong MỘT lô D1 (chạy tuần tự trong một giao dịch ⇒ lượt đọc thấy phiên vừa đóng) — trước: 3 lượt nối tiếp.
+  const dong = env.DB.prepare(`UPDATE game_v2_session AS s SET json = json_set(s.json, '$.dong', 1) WHERE s.sbd = ? AND json_extract(s.json,'$.bia') = 1 AND COALESCE(json_extract(s.json,'$.dong'),0) = 0
+      AND (COALESCE(json_extract(s.json,'$.chiCau'),0) = 1 OR ${SQL_HOAT_DONG_BIA} < ?)`).bind(sbd, new Date(nowMs - HAN_GIU_BAN_BIA_MS).toISOString())
+  try {
+    const [, r] = await env.DB.batch<Row>([dong, env.DB.prepare(sqlCauDangGiu(DK_PHIEN_BIA_MO)).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString())])
+    return cauGiuTuPhien(r?.results ?? [])
+  } catch {
+    // Lô lỗi (vd. câu đóng phiên hỏng) ⇒ như cũ: bỏ qua việc đóng, vẫn đọc câu đang giữ.
+    return cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
+  }
 }
 
 /** Lời báo khi lượt Đảo/Đoàn RỖNG — nói ĐÚNG lý do (trước 29/09 mọi trường hợp đều báo "ca kiểm tra"). */
