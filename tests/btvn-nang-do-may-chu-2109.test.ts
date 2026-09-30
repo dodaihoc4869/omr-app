@@ -256,7 +256,7 @@ describe('NỘP CHẶNG (/btvn/xong-lo của bài cá nhân hoá)', () => {
     const truoc = d.soLenh.prepare
     const r = await nopChang(d, 0, dapAn)
     expect(r.ok).toBe(true)
-    expect(d.soLenh.prepare - truoc).toBe(30) // thêm một lần đọc chuỗi đủ 10 ngày, không cắt ở 7 // đo tại chỗ (git stash bản chưa gộp): 30 — gộp còn 29
+    expect(d.soLenh.prepare - truoc).toBe(31) // thêm một lần đọc chuỗi đủ 10 ngày, không cắt ở 7 // đo tại chỗ (git stash bản chưa gộp): 30 — gộp còn 29 // +1 (rà 30/09): đọc phạm vi ca đang bảo vệ để giấu đáp án/lời giải câu đang thi (qidDangBaoVe, đệm 5 giây)
   })
   it('ĐÁP ÁN ĐẦU KHOÁ: nộp lại với đáp án khác giữ kết quả lần đầu; không ghi đôi sổ', async () => {
     gio(BAY_GIO)
