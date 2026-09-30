@@ -56,12 +56,21 @@ export interface NguonTuLuyen {
   /** Dạng nên luyện khi chưa có câu sai (gợi ý ở chế độ 1). */
   dangNenLuyen: { ma: string; ten: string } | null
 }
-export interface KhoCauSaiEm { tong: number; tuCa: number; tuChienDich: number; tuLuyenDe: number; tuTuLuyen: number; loi: string; tongTuMoc: number; daKhacPhuc: number; toiHan: number; choHen: number }
+export interface KhoCauSaiEm { tong: number; tuCa: number; tuChienDich: number; tuLuyenDe: number; tuTuLuyen: number; loi: string; tongTuMoc: number; daKhacPhuc: number; toiHan: number; choHen: number
+  /** Chọn nguồn (30/09): số câu theo nguồn + theo mặt nạ nguồn. null = máy chủ bản cũ (không hiện khối chọn nguồn). */
+  theoNguon: Record<string, number> | null; theoMat: Record<string, number> }
 export interface NguonDangEm { kieu: string; nhan: string; loi: string }
 const docNguonDang = (v: unknown): NguonDangEm | null => {
   if (!v || typeof v !== 'object') return null
   const o = v as Obj
   return { kieu: chu(o.kieu), nhan: chu(o.nhan), loi: chu(o.loi) }
+}
+/** Bảng { khoá: số } từ máy chủ (bỏ giá trị không phải số). Không phải đối tượng ⇒ null. */
+const bangSo = (v: unknown): Record<string, number> | null => {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null
+  const ra: Record<string, number> = {}
+  for (const [k, x] of Object.entries(v as Obj)) if (Number.isFinite(Number(x))) ra[k] = Number(x)
+  return ra
 }
 export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
   const j = await goi('nguon', token)
@@ -80,6 +89,7 @@ export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
         tong: so(k.tong), tuCa: so(k.tuCa), tuChienDich: so(k.tuChienDich), tuLuyenDe: so(k.tuLuyenDe), tuTuLuyen: so(k.tuTuLuyen), loi: chu(k.loi),
         // Máy chủ bản cũ không có bộ đếm ⇒ coi mọi câu còn trong kho là tổng, chưa khắc phục câu nào.
         tongTuMoc: k.tongTuMoc === undefined ? so(k.tong) : so(k.tongTuMoc), daKhacPhuc: so(k.daKhacPhuc), toiHan: so(k.toiHan), choHen: so(k.choHen),
+        theoNguon: bangSo(k.theoNguon), theoMat: bangSo(k.theoMat) ?? {},
       }
     : null
   const nl = j.dangNenLuyen && typeof j.dangNenLuyen === 'object' ? (j.dangNenLuyen as Obj) : null
@@ -92,7 +102,7 @@ export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
   }
 }
 
-export interface ThamSoRut { cheDo: CheDoTuLuyen; soCau?: number; dsMaCa?: string[]; dsDang?: string[]; mucDo?: string[] }
+export interface ThamSoRut { cheDo: CheDoTuLuyen; soCau?: number; dsMaCa?: string[]; dsDang?: string[]; mucDo?: string[]; nguon?: string[] }
 export interface XemTruoc { tongToiDa: number; loi: string; thongKe: { tenDang: string; soCauSai: number; soUngVien: number }[]; nguonDang: NguonDangEm | null }
 export async function xemTruoc(token: string, t: ThamSoRut): Promise<KetQua<XemTruoc>> {
   const j = await goi('xem-truoc', token, { ...t })

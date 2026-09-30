@@ -74,7 +74,12 @@ function tongHopGia() {
 const MAY_CHU: Record<string, (b: Record<string, unknown>) => unknown> = {
   nguon: () => ({
     ok: true, khoi: 12, soCauSai: 17, loiCauSai: '', loiDanhMuc: '', dangThi: false,
-    khoCauSai: { tong: 23, tuCa: 15, tuChienDich: 8, loi: '' },
+    khoCauSai: {
+      tong: 23, tuCa: 15, tuChienDich: 8, loi: '', tongTuMoc: 29, daKhacPhuc: 6, toiHan: 3, choHen: 2,
+      // Chọn nguồn (30/09): 23 câu duy nhất; bit 1 ca · 2 Đảo · 4 Đoàn · 8 Bi-a · 16 Tu luyện · 32 Luyện đề (0 câu).
+      theoNguon: { ca: 15, dao: 4, doan: 3, bia: 2, tu_luyen: 2, luyen_de: 0 },
+      theoMat: { 1: 12, 3: 2, 17: 1, 2: 2, 4: 3, 8: 2, 16: 1 },
+    },
     cacCa: [{ maCa: 'C1', tenCa: 'Ca kiểm tra Ester – Lipid · 21/09', soCauSai: 9 }, { maCa: 'C2', tenCa: 'Ca kiểm tra Carbohydrate · 26/09', soCauSai: 8 }],
     danhMuc: [
       { lop: '11', bais: [{ tenBai: 'Bài 12. Alkane', dangs: [{ ma: 'DB-11-B12-D1', ten: 'Danh pháp alkane', soCau: 40 }] }] },

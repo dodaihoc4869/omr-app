@@ -51,6 +51,7 @@ import {
   type KhoCauSai,
   type TrangThaiKhacPhuc,
 } from './tu-luyen-cau-sai'
+import { LOI_CHUA_CHON_NGUON, demTheoNguon, docDsNguon, locTheoNguon, type LoaiNguonSai } from './tu-luyen-cau-sai'
 import {
   phanTichTyLeDang,
   rutDsDangBai,
@@ -334,6 +335,8 @@ interface ThamSo {
   dsMaCa: string[]
   dsDang: string[]
   mucDo: string[]
+  /** Chế độ 1: nguồn câu sai em tick (null = máy bản cũ không gửi ⇒ mọi nguồn). */
+  nguon: Set<LoaiNguonSai> | null
 }
 function docThamSo(b: Obj): ThamSo | null {
   const cheDo = Number(b.cheDo)
@@ -346,6 +349,7 @@ function docThamSo(b: Obj): ThamSo | null {
     dsMaCa: mang(b.dsMaCa, 40),
     dsDang: mang(b.dsDang, 30).filter((m) => /^DB-[A-Za-z0-9-]+$/.test(m)),
     mucDo: mang(b.mucDo, 5).filter((m) => LUA_CHON_TU_DO.has(m)),
+    nguon: cheDo === 1 ? docDsNguon(b.nguon) : null,
   }
 }
 
@@ -405,6 +409,8 @@ export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
     khoCauSai: {
       tong: kcs.ds.length, tuCa: kcs.tuCa, tuChienDich: kcs.tuChienDich, tuLuyenDe: kcs.tuLuyenDe, tuTuLuyen: kcs.tuTuLuyen, loi: kcs.loi,
       tongTuMoc: kcs.tong, daKhacPhuc: kcs.daKhacPhuc,
+      // Chọn nguồn (30/09): đếm theo từng nguồn + theo mặt nạ nguồn ⇒ máy em tính ngay tổng câu duy nhất khi em tick.
+      ...demTheoNguon(kcs.ds),
       toiHan: kcs.ds.filter((c) => c.khacPhuc?.soDungLien === 1 && (c.khacPhuc.henLai ?? 0) <= now).length,
       choHen: kcs.ds.filter((c) => c.khacPhuc?.soDungLien === 1 && (c.khacPhuc.henLai ?? 0) > now).length,
     },
@@ -446,14 +452,18 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
     // chưa luyện → luyện ít → lâu; câu đang chờ hẹn chỉ lấy khi kho cạn; thiếu thì lặp; trộn dễ/khó.
     const lanP = rut ? docLanLuyen(env, sbd) : null
     lanP?.catch(() => undefined) // lỗi đọc ⇒ ném đúng chỗ `await` dưới như cũ, không thành lỗi "chưa bắt"
+    // Chọn nguồn (30/09): em tick 0 nguồn ⇒ không rút gì; chỉ lấy câu có ít nhất một lần sai thuộc nguồn đã tick.
+    if (t.nguon && t.nguon.size === 0) return rong(LOI_CHUA_CHON_NGUON)
     const kho = await docKhoCauSai(env, sbd)
     if (kho.ds.length === 0) return rong(kho.loi)
-    if (!rut || !lanP) return { dsCau: [], tongToiDa: kho.ds.length, tieuDe: '', meta, loi: '' }
+    const dsKho = locTheoNguon(kho.ds, t.nguon)
+    if (dsKho.length === 0) return rong('Nguồn em chọn không còn câu sai nào. Em chọn thêm nguồn khác.')
+    if (!rut || !lanP) return { dsCau: [], tongToiDa: dsKho.length, tieuDe: '', meta, loi: '' }
     const lan = await lanP
-    const theo = new Map(kho.ds.map((c) => [c.qid, c]))
+    const theo = new Map(dsKho.map((c) => [c.qid, c]))
     const now = Date.now()
     const chon = chonCauSai(
-      kho.ds.map((c) => {
+      dsKho.map((c) => {
         const kp = c.khacPhuc
         const cho = !!kp && kp.soDungLien === 1 && !kp.daKhacPhucLuc
         return {
@@ -461,7 +471,7 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
           toiHan: cho && (kp!.henLai ?? 0) <= now, choHen: cho && (kp!.henLai ?? 0) > now,
         }
       }),
-      Math.min(t.soCau, tranSoCauCheDo1(kho.ds.length, TRAN_CAU_TU_LUYEN)),
+      Math.min(t.soCau, tranSoCauCheDo1(dsKho.length, TRAN_CAU_TU_LUYEN)),
       Math.random,
     )
     const nhan = new Map<string, { nhanLuyen: string; saiGoc: string; conMotLan: string; saiCuoi: number }>()
@@ -472,9 +482,9 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
       const cl = { ...cauLuyenTuCauGame(c.q), id }
       dsCau.push(cl)
       meta.set(id, { dangMa: str(c.q.dang), dangTen: str(c.q.tenDang), bai: '', lop: lopCua({ ...cl, id: c.qid }) })
-      nhan.set(id, { nhanLuyen: nhanLanLuyen(x.soLanLuyen + 1 + x.lap), saiGoc: nhanSaiGoc(c.lanSai), conMotLan: nhanConMotLan(c.khacPhuc), saiCuoi: saiCuoiMs(c.lanSai) })
+      nhan.set(id, { nhanLuyen: nhanLanLuyen(x.soLanLuyen + 1 + x.lap), saiGoc: nhanSaiGoc(c.lanSai, t.nguon), conMotLan: nhanConMotLan(c.khacPhuc), saiCuoi: saiCuoiMs(c.lanSai) })
     }
-    return { dsCau, tongToiDa: kho.ds.length, tieuDe: `Sửa câu sai · ${dsCau.length} câu`, meta, loi: '', nhan }
+    return { dsCau, tongToiDa: dsKho.length, tieuDe: `Sửa câu sai · ${dsCau.length} câu`, meta, loi: '', nhan }
   }
 
   if (t.cheDo === 2 || t.cheDo === 4) {
@@ -611,7 +621,7 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
   try {
     await env.DB.prepare(
       `INSERT INTO tu_luyen_luot (id, sbd, che_do, tieu_de, tham_so_json, de_rieng_json, de_cong_khai_json, so_cau, trang_thai, tao_luc) VALUES (?,?,?,?,?,?,?,?, 'dang_lam', ?)`,
-    ).bind(id, sbd, t.cheDo, tieuDe, JSON.stringify({ soCau: t.soCau, dsMaCa: t.dsMaCa, dsDang: t.dsDang, mucDo: t.mucDo }), JSON.stringify(rieng), congKhaiDeLuu(congKhai), rieng.length, nay).run()
+    ).bind(id, sbd, t.cheDo, tieuDe, JSON.stringify({ soCau: t.soCau, dsMaCa: t.dsMaCa, dsDang: t.dsDang, mucDo: t.mucDo, ...(t.nguon ? { nguon: [...t.nguon] } : {}) }), JSON.stringify(rieng), congKhaiDeLuu(congKhai), rieng.length, nay).run()
   } catch (e) {
     if (/no such table/i.test(String(e))) return { ok: false, error: LOI_CHUA_BAT }
     throw e
