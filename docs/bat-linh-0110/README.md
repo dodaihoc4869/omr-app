@@ -34,4 +34,6 @@ Hồi quy đầy đủ: 13.115 test, 12.954 đạt, 133 đỏ, 28 bỏ qua. Đ�
 
 ## Phát hành
 
-Đang kiểm hồi quy trước phát hành. Mốc lùi: main 36ee817f, Pages dfb4593e, Worker c3cdceeb-c987-4d01-b468-e52beae812c5, Actions 36749269228. Mạng workspace chặn CONNECT tới pages.dev; kiểm UI bằng trình duyệt cục bộ và xác nhận phát hành bằng log GitHub Actions/Cloudflare, không tuyên bố đã kiểm HTTP trên bản sống.
+Đã phát hành **11f1c69098ab58a22f259df42c1a71fecb89193a**: [Actions 36788925085](https://github.com/dodaihoc4869/omr-app/actions/runs/36788925085), job110136900226 SUCCESS; Pages **76d40382** (23:11:24 UTC 30/09 =06:11:24 VN 01/10), Worker **0de23543-fece-4ce2-9879-6e5af1875275** (23:11:29 UTC). Log Cloudflare xác nhận cả hai từ checkout bản mới. Mốc lùi: main 36ee817f, Pages dfb4593e, Worker c3cdceeb-c987-4d01-b468-e52beae812c5, Actions 36749269228. Mạng workspace chặn CONNECT tới pages.dev; kiểm UI bằng trình duyệt cục bộ và xác nhận phát hành bằng log GitHub Actions/Cloudflare, không tuyên bố đã kiểm HTTP trên bản sống.
+
+Sau push, bản biên dịch độc lập cùng nguồn đạt 74 ca trình duyệt: 52 trường hợp HS/PH/game và hai luồng tương tác học/nộp/đọc kết quả +6 cửa hàng/thử đồ +16 GV. Chọn Sáng/Tối/Theo máy ở GV kiểm thêm dưới OS sáng/tối đều đúng. Bản build production sạch: tsc app/Worker, màu và SW13/13 đạt; precache165tệp/2807,39KiB, không tăng hạn ngân sách. Gói code tăng ~3,3KB JS thô và ~5,2KB CSS thô, không thêm dịch vụ trả phí hoặc ảnh raster. Sổ sau phát hành là tài liệu cục bộ, không cần phát hành lại code.

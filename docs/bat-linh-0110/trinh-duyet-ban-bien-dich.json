@@ -1,0 +1,608 @@
+[
+  {
+    "name": "sanh",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "xong",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "tl",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "hs-login",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph-login",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "dao",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "shop",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "doan",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "bia",
+    "width": 360,
+    "height": 740,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "sanh",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "xong",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "tl",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "hs-login",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph-login",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "dao",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "shop",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "doan",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "bia",
+    "width": 390,
+    "height": 844,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "sanh",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "xong",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "tl",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "hs-login",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph-login",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "dao",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "shop",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "doan",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "bia",
+    "width": 844,
+    "height": 390,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "sanh",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "xong",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "tl",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "hs-login",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph-login",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "dao",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "shop",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "doan",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "bia",
+    "width": 1440,
+    "height": 900,
+    "dark": false,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "sanh",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "xong",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "tl",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "hs-login",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "ph-login",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "dao",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "shop",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "doan",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "name": "bia",
+    "width": 390,
+    "height": 844,
+    "dark": true,
+    "overflow": 0,
+    "brokenImages": [],
+    "errors": []
+  },
+  {
+    "flow": "Home map toggle → practice → submit → feedback → progress",
+    "passed": true
+  },
+  {
+    "flow": "Parent all tabs → published exam report",
+    "passed": true
+  },
+  {
+    "w": 390,
+    "h": 844,
+    "scheme": "light",
+    "ok": true
+  },
+  {
+    "w": 390,
+    "h": 844,
+    "scheme": "dark",
+    "ok": true
+  },
+  {
+    "w": 844,
+    "h": 390,
+    "scheme": "light",
+    "ok": true
+  },
+  {
+    "w": 844,
+    "h": 390,
+    "scheme": "dark",
+    "ok": true
+  },
+  {
+    "w": 1440,
+    "h": 900,
+    "scheme": "light",
+    "ok": true
+  },
+  {
+    "w": 1440,
+    "h": 900,
+    "scheme": "dark",
+    "ok": true
+  },
+  {
+    "man": "tongquan",
+    "w": 390,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "chiendich",
+    "w": 390,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "hocsinh",
+    "w": 390,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "caidat",
+    "w": 390,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "tongquan",
+    "w": 390,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "chiendich",
+    "w": 390,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "hocsinh",
+    "w": 390,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "caidat",
+    "w": 390,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "tongquan",
+    "w": 1440,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "chiendich",
+    "w": 1440,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "hocsinh",
+    "w": 1440,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "caidat",
+    "w": 1440,
+    "scheme": "light",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "tongquan",
+    "w": 1440,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "chiendich",
+    "w": 1440,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "hocsinh",
+    "w": 1440,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  },
+  {
+    "man": "caidat",
+    "w": 1440,
+    "scheme": "dark",
+    "overflow": 0,
+    "errors": []
+  }
+]
