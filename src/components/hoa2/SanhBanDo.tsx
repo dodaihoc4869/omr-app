@@ -8,7 +8,7 @@
 //   · hết kế hoạch                     → "Hôm nay em xong rồi" + nút Rương Bát Linh (khi mở được và chưa mở).
 // Mọi con số lấy từ máy chủ (`hoa2-sanh`, thần thú/EXP/chuỗi ngày từ /hs/ke-hoach-ngay) — không tự tính, không bịa.
 // Dải "Vào thi" chỉ hiện khi có ca kiểm tra đang mở; bấm là vào đúng luồng PhongVaoThi → ExamTakeScreen có sẵn.
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro, type ReactNode } from 'react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
 import { moRuong, type KetQuaSanh, type SanhHoa2 } from './api'
@@ -526,35 +526,63 @@ function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   )
 }
 
-/** Cửa TU LUYỆN (thầy chốt 29/09): luyện tự do 4 chế độ, KHÔNG tính EXP, không đụng câu game — luôn mở (máy chủ tự chặn khi em có ca kiểm tra mở). */
+/** Cửa TU LUYỆN (thầy chốt 29/09; 30/09 thầy lệnh "đẹp như một MÓN QUÀ cho học sinh chăm chỉ", phụ đề "Chỉ dành cho học sinh Nỗ lực"):
+ * thẻ quà nền đêm + ánh kim đúng bảng màu màn Tu luyện (`tu-luyen.css`), biểu tượng hộp quà gắn bia tập bắn (biểu tượng cũ của Tu luyện).
+ * Không đổi logic: bấm ⇒ `onTuLuyen` (máy chủ tự chặn khi em có ca kiểm tra mở). Không số liệu (muốn có phải thêm lệnh máy chủ). */
 function NutTuLuyen({ p }: { p: SanhBanDoProps }) {
   if (!p.onTuLuyen) return null
+  return <CuaQuaTuLuyen onClick={p.onTuLuyen} lop="h2-nut-tu-luyen" />
+}
+function NutTuLuyenNgang({ onClick }: { onClick: () => void }) {
+  return <CuaQuaTuLuyen onClick={onClick} lop="h2-ng-tu-luyen h2-qua-tl-ngang" />
+}
+function CuaQuaTuLuyen({ onClick, lop }: { onClick: () => void; lop: string }) {
+  const id = useId().replace(/:/g, '')
   return (
-    <button type="button" className="h2-nut-dao h2-nut-tu-luyen" onClick={p.onTuLuyen}>
-      <span className="h2-nut-dao-chu">
-        <span className="h2-nut-dao-lon">Tu luyện</span>
-        <span className="h2-nut-dao-khoa">Luyện tự do · không tính EXP</span>
+    <button type="button" className={`h2-qua-tl ${lop}`} onClick={onClick}>
+      <span className="h2-qua-tl-lap" aria-hidden="true" />
+      <span className="h2-qua-tl-bieu" aria-hidden="true">
+        <HopQuaTuLuyen id={id} />
+      </span>
+      <span className="h2-qua-tl-chu">
+        <span className="h2-qua-tl-ten baloo">Tu luyện</span>
+        <span className="h2-qua-tl-phu">Chỉ dành cho học sinh Nỗ lực</span>
+      </span>
+      <span className="h2-qua-tl-mui" aria-hidden="true">
+        <svg width="20" height="20" {...NET} strokeWidth={2.6}>
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
       </span>
     </button>
   )
 }
-function NutTuLuyenNgang({ onClick }: { onClick: () => void }) {
+/** Hộp quà vàng buộc nơ ngọc, mặt hộp gắn bia tập bắn (luyện trúng đích) + hai đốm sao lấp lánh. Màu qua lớp CSS (token `--qtl-*`). */
+function HopQuaTuLuyen({ id }: { id: string }) {
   return (
-    <button type="button" className="h2-ng-the h2-ng-cdl h2-ng-tu-luyen" onClick={onClick}>
-      {/* bia tập bắn: luyện trúng đích */}
-      <svg width="24" height="24" {...NET} strokeWidth={2}>
-        <circle cx="12" cy="12" r="9" />
-        <circle cx="12" cy="12" r="5" />
-        <circle cx="12" cy="12" r="1.5" />
-      </svg>
-      <span className="h2-ng-cdl-chu">
-        <b>Tu luyện</b>
-        <span className="h2-ng-phu"> · Luyện tự do · không tính EXP</span>
-      </span>
-      <svg width="22" height="22" {...NET} strokeWidth={2.4}>
-        <path d="M5 12h14M13 6l6 6-6 6" />
-      </svg>
-    </button>
+    <svg width="52" height="52" viewBox="0 0 48 48" focusable="false">
+      <defs>
+        <linearGradient id={`${id}-nap`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" className="h2-qtl-s-vang-sang" />
+          <stop offset="1" className="h2-qtl-s-vang-dam" />
+        </linearGradient>
+        <linearGradient id={`${id}-than`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" className="h2-qtl-s-nen-3" />
+          <stop offset="1" className="h2-qtl-s-nen" />
+        </linearGradient>
+      </defs>
+      <rect x="8.5" y="22" width="31" height="20" rx="3.5" fill={`url(#${id}-than)`} className="h2-qtl-vien" />
+      <rect x="21" y="22" width="6" height="20" className="h2-qtl-ngoc" />
+      <rect x="6" y="15.5" width="36" height="8" rx="2.5" fill={`url(#${id}-nap)`} />
+      <rect x="21" y="15.5" width="6" height="8" className="h2-qtl-ngoc-dam" />
+      <path d="M24 15.5c-3-6.5-10.5-8-11-3.4-.4 3.3 5.8 3.8 11 3.4z" className="h2-qtl-ngoc" />
+      <path d="M24 15.5c3-6.5 10.5-8 11-3.4.4 3.3-5.8 3.8-11 3.4z" className="h2-qtl-ngoc" />
+      <circle cx="24" cy="15" r="2.4" className="h2-qtl-ngoc-dam" />
+      <circle cx="24" cy="32" r="6.6" className="h2-qtl-bia" />
+      <circle cx="24" cy="32" r="3.8" className="h2-qtl-bia-vong" />
+      <circle cx="24" cy="32" r="1.4" className="h2-qtl-bia-tam" />
+      <path d="M41 4.5l1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1z" className="h2-qtl-sao h2-qtl-sao-1" />
+      <path d="M5.5 5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" className="h2-qtl-sao h2-qtl-sao-2" />
+    </svg>
   )
 }
 
