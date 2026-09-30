@@ -19,6 +19,8 @@ import { ELO_DAU, type CauBi } from '../../src/game/bi-a/tran'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
+/** Lượt đọc bắt đầu sớm (song song) — lỗi "đã bắt" để không thành lỗi treo; nơi `await` vẫn nhận đúng lỗi. */
+const som = <T>(p: Promise<T>): Promise<T> => { p.catch(() => undefined); return p }
 
 export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van', 'bia-tao-ban', 'bia-vao-ban', 'bia-moi', 'bia-loi-moi', 'bia-tra-loi-moi', 'bia-tra-loi', 'bia-giu-ban'])
 /** Khoá cờ riêng (không nhét vào `game_hoa_2` vì `coLuu` của nó ghi đè đúng 3 trường). Giá trị `{bat, lop[], sbd[]}`. */
@@ -159,6 +161,16 @@ interface BoiCanh {
  * (`dongVanCu`, G8) nên các câu ấy về lại đúng thứ tự kế hoạch. Mặc định (trong ván: `doiCau`) vẫn tính câu đang giữ để không vượt trần.
  */
 async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: boolean } = {}): Promise<BoiCanh> {
+  // TỐI ƯU 30/09 (đo docs/do-toi-uu-bia-3009.md): bốn lượt đọc KHÔNG phụ thuộc kế hoạch (câu đã trả lời trong phiên Bi-a hôm nay — ngày kế hoạch luôn là
+  // ngayVnCua(nowMs); câu đang giữ ở bàn Bi-a / ở Đảo-Đoàn; câu bảo vệ ca) bắt đầu CÙNG đợt với kế hoạch ngày thay vì nối tiếp sau nó. Kết quả y hệt;
+  // `layKeHoachHomNay` không ghi các bảng này. Lỗi đọc giữ đúng cách cũ (đã trả lời / đang giữ lỗi ⇒ rỗng; câu bảo vệ ca lỗi ⇒ ném).
+  const docDa = (ngay: string) => env.DB.prepare(`SELECT DISTINCT a.qid AS qid FROM game_v2_attempt a JOIN game_v2_session s ON s.id = a.session AND s.sbd = a.sbd
+      WHERE a.sbd = ? AND a.created_at >= ? AND json_extract(s.json,'$.bia') = 1`).bind(sbd, dauNgayVn(ngay)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const ngaySom = ngayVnCua(nowMs)
+  const daSom = docDa(ngaySom)
+  const giuBiaSom = o.chiDaTraLoi ? Promise.resolve(new Set<string>()) : cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
+  const chanCaSom = som(protectedQuestions(env))
+  const giuDaoSom = cauDangGiu(env, sbd, nowMs, DK_PHIEN_DAO_DOAN)
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   const laMoi = (k: string) => laCauMoiKeHoach(k, hs, kh.ngay)
   const tatCa = [...kh.doan, ...kh.dao]
@@ -166,18 +178,17 @@ async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: 
   const moiKh = new Set(tatCa.filter(laMoi).map(qidGoc))
   const soMoi = tatCa.filter(laMoi).length
   // Câu trả lời trong phiên Bi-a hôm nay (mỗi câu tính một lần).
-  const da = await env.DB.prepare(`SELECT DISTINCT a.qid AS qid FROM game_v2_attempt a JOIN game_v2_session s ON s.id = a.session AND s.sbd = a.sbd
-      WHERE a.sbd = ? AND a.created_at >= ? AND json_extract(s.json,'$.bia') = 1`).bind(sbd, dauNgayVn(kh.ngay)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const da = kh.ngay === ngaySom ? await daSom : await docDa(kh.ngay)
   // Câu đang nằm trên bàn Bi-a còn mở (kể cả bàn đang chơi) mà chưa trả lời: đã giữ chỗ trong trần (trừ khi chỉ đếm câu đã trả lời).
-  const giuBia = o.chiDaTraLoi ? new Set<string>() : await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
+  const giuBia = await giuBiaSom
   let dMoi = 0, dOn = 0
   const dem = (qid: string) => { if (!trongKh.has(qid)) return; if (moiKh.has(qid)) dMoi++; else dOn++ }
   for (const x of da.results ?? []) dem(str(x.qid))
   for (const q of giuBia) dem(q)
   const tran = tinhTranBia(soMoi, tatCa.length - soMoi, dMoi, dOn)
-  const chanCa = await protectedQuestions(env)
+  const chanCa = await chanCaSom
   const chan = new Set(chanCa)
-  for (const q of await cauDangGiu(env, sbd, nowMs, DK_PHIEN_DAO_DOAN)) chan.add(q)
+  for (const q of await giuDaoSom) chan.add(q)
   for (const q of giuBia) chan.add(q)
   const loc = (ds: readonly string[]) => ds.filter((k) => !chan.has(qidGoc(k)))
   const ung = loc([...kh.conDoan, ...kh.conDao])
@@ -224,8 +235,11 @@ async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: Readon
 
 // ---------------------------------------------------------------- lệnh
 export async function biaAction(env: Env, sbd: string, action: string, b: Row, nowMs = Date.now()): Promise<Record<string, unknown>> {
-  if (!(await biaMoCho(env, sbd))) return { ok: true, bat: false, lyDoKhoa: 'chua_bat', message: LOI_BIA.chua_bat }
-  if (await coCaDangMo(env, sbd, nowMs)) return { ok: true, bat: true, lyDoKhoa: 'dang_co_ca', message: LOI_BIA.dang_co_ca }
+  // Song song (30/09): cờ Bi-a và "đang có ca kiểm tra" đọc cùng một đợt (trước: hai đợt nối tiếp). Thứ tự quyết định giữ nguyên:
+  // cờ tắt ⇒ chua_bat; rồi ca mở ⇒ dang_co_ca. Cả hai tự bắt lỗi (lỗi ⇒ false) nên không ném.
+  const [mo, coCa] = await Promise.all([biaMoCho(env, sbd), coCaDangMo(env, sbd, nowMs)])
+  if (!mo) return { ok: true, bat: false, lyDoKhoa: 'chua_bat', message: LOI_BIA.chua_bat }
+  if (coCa) return { ok: true, bat: true, lyDoKhoa: 'dang_co_ca', message: LOI_BIA.dang_co_ca }
   await damBaoBangBia(env)
   if (action === 'bia-sanh') return sanhBia(env, sbd, nowMs)
   if (action === 'bia-xep-ban') return xepBan(env, sbd, b, nowMs)
@@ -249,6 +263,7 @@ async function demGiaoHuuHomNay(env: Env, sbd: string, ngay: string): Promise<nu
 
 /** Tóm tắt cho màn Sảnh Bi-a (và cửa trên Sảnh Bát Linh). */
 async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
+  const diemSom = docDiemBan(env, sbd) // song song với bối cảnh (tự bắt lỗi ⇒ điểm đầu)
   const c = await boiCanh(env, sbd, nowMs, { chiDaTraLoi: true })
   const { kh, hs, tran } = c
   const conKeHoach = kh.conDao.length + kh.conDoan.length
@@ -269,7 +284,7 @@ async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<str
     ...(!lyDoKhoa && coCau > 0 && coCau < SO_CAU_BAN_DAY ? { thongBao: thongBaoItCau(coCau) } : {}),
     giaoHuu: { mo: xong && daGiaoHuu < TOI_DA_GIAO_HUU, con: xong ? Math.max(0, TOI_DA_GIAO_HUU - daGiaoHuu) : 0, toiDa: TOI_DA_GIAO_HUU },
     online: !!env.BAN_BIA,
-    diemBan: await docDiemBan(env, sbd),
+    diemBan: await diemSom,
   }
 }
 async function docDiemBan(env: Env, sbd: string): Promise<{ diem: number; soVan: number }> {
@@ -280,8 +295,11 @@ async function docDiemBan(env: Env, sbd: string): Promise<{ diem: number; soVan:
 /** Đóng mọi ván Bi-a còn mở của em (G8: mỗi em một ván mở; vào ván mới là bỏ ván cũ — câu chưa trả lời tự về kế hoạch). */
 async function dongVanCu(env: Env, sbd: string, nowMs: number, truVan = ''): Promise<void> {
   const luc = new Date(nowMs).toISOString()
-  await env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.dong', 1) WHERE sbd = ? AND json_extract(json,'$.bia') = 1 AND COALESCE(json_extract(json,'$.dong'),0) = 0 AND COALESCE(json_extract(json,'$.van'),'') <> ?`).bind(sbd, truVan).run()
-  await env.DB.prepare(`UPDATE bi_a_van SET trang_thai = 'bo', xong_luc = ? WHERE chu_ban = ? AND trang_thai IN ('mo','cho') AND id <> ?`).bind(luc, sbd, truVan).run()
+  // Một lô (30/09): hai lệnh ghi cùng một lượt D1 (trước: hai lượt nối tiếp), cùng thứ tự.
+  await env.DB.batch([
+    env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.dong', 1) WHERE sbd = ? AND json_extract(json,'$.bia') = 1 AND COALESCE(json_extract(json,'$.dong'),0) = 0 AND COALESCE(json_extract(json,'$.van'),'') <> ?`).bind(sbd, truVan),
+    env.DB.prepare(`UPDATE bi_a_van SET trang_thai = 'bo', xong_luc = ? WHERE chu_ban = ? AND trang_thai IN ('mo','cho') AND id <> ?`).bind(luc, sbd, truVan),
+  ])
 }
 
 async function taoVan(env: Env, id: string, loai: 'ai' | 'giao_huu', cheDo: 'don' | 'doi', ngay: string, sbd: string, session: string | null, nowMs: number) {
@@ -441,6 +459,8 @@ async function giuBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
 /** Kết thúc ván: ghi `bi_a_van` + `bi_a_ghe`, đóng phiên (câu chưa trả lời tự về kế hoạch). Số câu đúng/sai của em lấy từ `game_v2_attempt` (máy chủ), không tin máy. */
 async function ketVan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
   const van = str(b.van)
+  // Song song (30/09): ván + phiên của ghế em đọc cùng một đợt.
+  const phienSom = som(env.DB.prepare('SELECT session FROM bi_a_ghe WHERE van = ? AND ghe = 1').bind(van).first<Row>())
   const v = await env.DB.prepare('SELECT * FROM bi_a_van WHERE id = ? AND chu_ban = ?').bind(van, sbd).first<Row>()
   if (!v) throw new Error('Không tìm thấy ván Bi-a của em.')
   const kq = (b.ketQua && typeof b.ketQua === 'object' ? b.ketQua : {}) as Row
@@ -454,7 +474,7 @@ async function ketVan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
     dung: soNguyen(g.dung, 0, 99), sai: soNguyen(g.sai, 0, 99), an: soNguyen(g.an, 0, 7), vang: soNguyen(g.vang, 0, 7),
   }))
   if (str(v.trang_thai) !== 'mo') return { ok: true, daGhiTruoc: true }
-  const session = await env.DB.prepare('SELECT session FROM bi_a_ghe WHERE van = ? AND ghe = 1').bind(van).first<Row>()
+  const session = await phienSom
   let dung = 0, sai = 0
   if (session?.session) {
     const r = await env.DB.prepare("SELECT json_extract(json,'$.attempt.correct') AS c FROM game_v2_attempt WHERE session = ? AND sbd = ?").bind(str(session.session), sbd).all<Row>()
@@ -499,8 +519,9 @@ async function chiTraLoi(env: Env, sbd: string, b: Row, nowMs: number): Promise<
 /** Phần `bia` trả kèm `hoa2-sanh` để Sảnh Bát Linh vẽ cửa thứ ba. Cờ tắt ⇒ `{ bat:false }` (không vẽ cửa). Lỗi ⇒ `{ bat:false }`. */
 export async function biaChoSanh(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   try {
-    if (!(await biaMoCho(env, sbd))) return { bat: false }
-    if (await coCaDangMo(env, sbd, nowMs)) return { bat: true, lyDoKhoa: 'dang_co_ca', con: 0, tong: 0, giaoHuu: { mo: false, con: 0 } }
+    const [mo, coCa] = await Promise.all([biaMoCho(env, sbd), coCaDangMo(env, sbd, nowMs)])
+    if (!mo) return { bat: false }
+    if (coCa) return { bat: true, lyDoKhoa: 'dang_co_ca', con: 0, tong: 0, giaoHuu: { mo: false, con: 0 } }
     const s = await sanhBia(env, sbd, nowMs)
     const t = s.tran as { con: number; tong: number }, g = s.giaoHuu as { mo: boolean; con: number }
     return { bat: true, con: t.con, tong: t.tong, giaoHuu: { mo: g.mo, con: g.con }, ...(s.lyDoKhoa ? { lyDoKhoa: s.lyDoKhoa } : {}) }
