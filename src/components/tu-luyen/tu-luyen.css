@@ -148,6 +148,34 @@
   background: var(--tlu-nhan);
   color: var(--tlu-nhan-chu);
 }
+/* Ba thẻ (30/09): Luyện · Tổng hợp · Luyện đề cấu trúc — thẻ thứ ba chữ dài hơn nên rộng hơn; khoá thì có ổ khoá + chữ (không chỉ màu). */
+.tlu-the-phu[data-so='3'] {
+  grid-template-columns: 0.8fr 1fr 1.7fr;
+}
+.tlu-the-phu-ldct {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 8px;
+  line-height: 1.15;
+}
+.tlu-the-phu-ldct svg {
+  flex-shrink: 0;
+}
+.tlu-an {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (max-width: 400px) {
+  .tlu-the-phu[data-so='3'] .tlu-the-phu-nut {
+    font-size: 14px;
+  }
+}
 
 .tlu-than {
   flex: 1 0 auto;

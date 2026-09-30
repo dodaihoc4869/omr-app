@@ -36,11 +36,30 @@ function cleanAnswers(b:unknown,sources:TeacherExamSource[]):Record<string,strin
   }
   return a
 }
+// LỜI CỔNG — dùng CHUNG cho `start` (chặn) và `dieu-kien` (chỉ báo, không mở đề): một luật, một câu chữ.
+export const LOI_CAN_QUYEN_THAY='Mục này cần quyền do thầy mở cho em. Em hỏi thầy nhé.'
+export const LOI_CHUA_HOC_XONG='Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.'
+export const LOI_KHOI_12='Mục này chỉ dành cho học sinh khối 12.'
+export type TrangThaiLuyenDe='mo'|'can_xac_nhan'|'khoa'
+/** HÀM THUẦN — cùng thứ tự với cổng `start`: cờ BẬT ⇒ phải có quyền thầy mở; cờ TẮT ⇒ em tự xác nhận; rồi luật khối 12 (không rõ khối ⇒ không chặn). */
+export function dieuKienLuyenDe(o:{coBat:boolean;coQuyen:boolean;khoi:number|null}):{trangThai:TrangThaiLuyenDe;lyDo:string}{
+  if(o.coBat&&!choPhepToanChuongTrinh(o.coQuyen))return {trangThai:'khoa',lyDo:LOI_CAN_QUYEN_THAY}
+  if(o.khoi!==null&&o.khoi<12)return {trangThai:'khoa',lyDo:LOI_KHOI_12}
+  return o.coBat?{trangThai:'mo',lyDo:''}:{trangThai:'can_xac_nhan',lyDo:LOI_CHUA_HOC_XONG}
+}
+const lichSu=async(env:Env,sbd:string)=>{
+  const r=await env.DB.prepare('SELECT id,created_at,deadline,status,result FROM luyen_de_2026 WHERE sbd=? ORDER BY created_at DESC LIMIT 30').bind(sbd).all<Row>()
+  return r.results.map(r=>({id:r.id,createdAt:r.created_at,status:r.status,score:r.result?JSON.parse(r.result).score:null}))
+}
 export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):Promise<Record<string,unknown>>{
   const sbd=await gameIdentity(env,b)
-  if(action==='history'){
-    const r=await env.DB.prepare('SELECT id,created_at,deadline,status,result FROM luyen_de_2026 WHERE sbd=? ORDER BY created_at DESC LIMIT 30').bind(sbd).all<Row>()
-    return {ok:true,items:r.results.map(r=>({id:r.id,createdAt:r.created_at,status:r.status,score:r.result?JSON.parse(r.result).score:null}))}
+  if(action==='history')return {ok:true,items:await lichSu(env,sbd)}
+  // THẺ "Luyện đề cấu trúc" trong Tu luyện (30/09): CHỈ ĐỌC — trạng thái cổng + lý do do máy chủ tính (máy em không đoán) + lịch sử lượt.
+  // Không rút đề, không ghi gì. Cổng thật vẫn là `start`.
+  if(action==='dieu-kien'){
+    const coBat=await quyenMayChuBat(env)
+    const dk=dieuKienLuyenDe({coBat,coQuyen:coBat?await coQuyen(env,sbd,QUYEN_TOAN_CHUONG_TRINH):false,khoi:await docKhoiEm(env,sbd)})
+    return {ok:true,...dk,items:await lichSu(env,sbd)}
   }
   let row:Row|null=null
   if(action==='start') {
@@ -49,10 +68,10 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
     const doiQuyenMayChu=await quyenMayChuBat(env)
     if(doiQuyenMayChu){
       const co=await coQuyen(env,sbd,QUYEN_TOAN_CHUONG_TRINH)
-      if(!choPhepToanChuongTrinh(co,b.daHocXong))throw new Error('Mục này cần quyền do thầy mở cho em. Em hỏi thầy nhé.')
-    }else if(b.daHocXong!==true)throw new Error('Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.')
+      if(!choPhepToanChuongTrinh(co,b.daHocXong))throw new Error(LOI_CAN_QUYEN_THAY)
+    }else if(b.daHocXong!==true)throw new Error(LOI_CHUA_HOC_XONG)
     // LUẬT KHỐI (Boss 21/09): Bộ đề là đề khối 12; cờ `daHocXong` do MÁY EM tự gửi nên máy chủ tự kiểm khối — em khối 10/11 không mở được. Không rõ khối ⇒ giữ cổng cũ.
-    const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==null&&khoiEm<12)throw new Error('Mục này chỉ dành cho học sinh khối 12.')
+    const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==null&&khoiEm<12)throw new Error(LOI_KHOI_12)
     row=await env.DB.prepare("SELECT * FROM luyen_de_2026 WHERE sbd=? AND status='active'").bind(sbd).first<Row>()
     if(!row){
       const r=await env.DB.prepare("SELECT ma_de,r2_khoa FROM de_kho WHERE da_xoa=0 AND lop='12' AND (lower(ten_de) LIKE '%bộ đề%' OR ten_de LIKE '%BỘ ĐỀ%' OR ten_de LIKE '%Bộ đề%') ORDER BY ma_de").all<{ma_de:string;r2_khoa:string}>()
