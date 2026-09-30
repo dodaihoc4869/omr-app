@@ -184,3 +184,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 30/09 22:12 VN · deploy 611 (#112 #115 #116) XANH 22:06; sức khoẻ máy chủ "tot" · gộp #114 Bi-a mới (gồm #113 tối ưu Bi-a) d658f46 — đã kiểm trên main mới: 242 test bi-a + iOS14 + nhịp: chỉ đỏ G11 nền; tsc, build 163 tệp/2766 KiB, check:mau · không ca mở · lùi: git revert -m1 d658f46
 - 30/09 22:27 VN · deploy 612 (#114 Bi-a mới + #113) XANH 22:21 · làn tiếp: claude/bia-lan-that-3009 (lăn thật giữ hướng + Mắt thần đơn giản) hạn 23:25, đẩy trước 23:59 theo lệnh thầy
 - 30/09 22:33 VN · gộp #117 Bi-a lăn thật (giữ hướng khi dừng) + Mắt thần đơn giản · 4ee968a · đã kiểm trên main mới: 241 test chỉ đỏ G11 nền, tsc, build 163 tệp, check:mau · không ca mở · lùi: git revert -m1 4ee968a
+- 30/09 22:48 VN · deploy 613 (#117 lăn thật + Mắt thần) XANH 22:39 · làn tiếp claude/bia-xep-that-3009 (bi đầu ván thật) hạn 23:25
