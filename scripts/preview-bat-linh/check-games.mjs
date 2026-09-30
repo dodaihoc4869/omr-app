@@ -23,7 +23,7 @@ async function ready(p) {
 try {
   for (const [width, height] of [[390, 844], [844, 390], [1440, 900]]) {
     for (const [name, query, selector] of cases) {
-      const p = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce' })
+      const p = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce', colorScheme: process.env.BL_SCHEME === 'dark' ? 'dark' : 'light' })
       const errors = []
       p.on('pageerror', e => errors.push(e.message))
       await p.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort())
@@ -42,7 +42,7 @@ try {
       await p.close()
     }
   }
-  const p = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' })
+  const p = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', colorScheme: process.env.BL_SCHEME === 'dark' ? 'dark' : 'light' })
   await p.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort())
   await p.goto(base + 'game=dao&thu=1&cap=50')
   await p.getByRole('button', { name: /LÊN ĐƯỜNG/ }).click()

@@ -76,7 +76,7 @@ describe('Sảnh 3D — ba trạng thái giữ đúng nút và chữ', () => {
     expect(container.querySelector('.h2-ban-do')!.getAttribute('data-tt')).toBe('a')
     expect(container.querySelector('[data-ve="o-phuc-kich"]')!.getAttribute('data-so')).toBe('3')
     expect(container.querySelector('[data-ve="cau-keo-len"]')).not.toBeNull()
-    expect(container.textContent).toContain('3 ổ phục kích chặn cầu')
+    expect(container.textContent).toContain('3 câu ôn còn lại')
     expect(container.textContent).toContain('Đảo Carbohydrate · 8% đã khai phá')
     const dao = screen.getByRole('button', { name: /Khám phá Bát Linh Đảo · 44 câu/ }) as HTMLButtonElement
     expect(dao.disabled).toBe(true)
@@ -147,11 +147,11 @@ describe('Sảnh 3D — chuyển động', () => {
     expect(sessionStorage.getItem(KHOA_MO_MAN)).toBeNull()
   })
 
-  it('máy bình thường: thị sai bật; mở màn chạy LẦN ĐẦU trong phiên rồi tắt, lần mở sau không chạy lại', () => {
+  it('bản đồ sơn thủy không thị sai; mở màn sảnh chạy LẦN ĐẦU trong phiên rồi tắt', () => {
     vi.useFakeTimers()
     datGiam(false)
     const { container, unmount } = ve(A)
-    expect(container.querySelector('.h2-ban-do')!.getAttribute('data-thi-sai')).toBe('bat')
+    expect(container.querySelector('.h2-ban-do')!.getAttribute('data-thi-sai')).toBe('tat')
     expect(container.querySelector('.h2-sanh')!.getAttribute('data-mo-man')).toBe('true')
     expect(sessionStorage.getItem(KHOA_MO_MAN)).toBe('1')
     act(() => {

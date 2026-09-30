@@ -3,6 +3,7 @@ import '../../src/components/bat-linh/bat-linh.css'
 import '../../src/components/bat-linh/hoc-sinh.css'
 import '../../src/components/bat-linh/phu-huynh.css'
 import '../../src/components/bat-linh/game-toan-bo.css'
+import '../../src/components/bat-linh/che-do-toi.css'
 import '@fontsource/noto-serif/vietnamese-700.css'
 import '@fontsource/noto-serif/latin-700.css'
 document.body.setAttribute('data-bat-linh', 'hs')

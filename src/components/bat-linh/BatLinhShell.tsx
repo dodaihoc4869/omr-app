@@ -3,6 +3,7 @@ import './bat-linh.css'
 import './hoc-sinh.css'
 import './phu-huynh.css'
 import './game-toan-bo.css'
+import './che-do-toi.css'
 
 /** Visual scope only. No account, routing, scoring or server configuration changes.
  * The body marker also themes dialogs rendered through a React portal. */

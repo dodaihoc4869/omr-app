@@ -16,7 +16,7 @@ import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
 import { moRuong, thuSucThem, type KetQuaSanh, type SanhHoa2 } from './api'
 import { useBoCucNgang, type BoCucNgang } from './bo-cuc-ngang'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
-import CanhSanh3D from './CanhSanh3D'
+import BanDoHanhTrinh from '../bat-linh/BanDoHanhTrinh'
 import HopDoiTen from './HopDoiTen'
 import { hat, hatBay, loatPhao, MAU_PHAO, nhanLuotMoMan, timFx, veToaDoFx } from './hieu-ung-sanh'
 import './sanh-ban-do.css'
@@ -842,32 +842,6 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   )
 }
 
-function TieuDeBanDo({ s }: { s: SanhHoa2 | null }) {
-  const cd = s?.chienDich ?? null
-  return (
-    <div className="h2-ng-bd-dau">
-      <p className="h2-ng-nho">Bản đồ Bát Linh</p>
-      <h1 className="h2-ng-bd-ten baloo">{cd ? `Đảo ${cd.ten}` : 'Quần đảo Bát Linh'}</h1>
-      <p className="h2-ng-phu h2-ng-an-thap">Hộ tống xe hàng qua cầu, rồi xua sương mù trên đảo</p>
-    </div>
-  )
-}
-
-function ChuGiai() {
-  return (
-    <ul className="h2-ng-chu-giai h2-kinh" aria-label="Chú giải bản đồ">
-      <li>
-        <span className="h2-ng-cham" data-mau="hong" aria-hidden="true" />
-        Ổ phục kích = câu ôn hôm nay
-      </li>
-      <li>
-        <span className="h2-ng-cham" data-mau="suong" aria-hidden="true" />
-        Sương mù = câu mới chưa làm
-      </li>
-    </ul>
-  )
-}
-
 /** Cảnh mở màn ~2 giây: chỉ LẦN ĐẦU Sảnh có dữ liệu trong phiên (sessionStorage), không chạy ở máy giảm chuyển động. */
 function useMoMan(coDuLieu: boolean): boolean {
   const [dang, setDang] = useState(false)
@@ -948,7 +922,7 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
           ) : (
             <>
               <DongHanh thu={chonThu ? null : p.thu} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
-              <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><CanhSanh3D s={s} ngang moMan={moMan} /><TieuDeBanDo s={s} />{s && <ChuGiai />}</div></details>
+              <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><BanDoHanhTrinh s={s} /></div></details>
             </>
           )}
         </section>
@@ -1050,7 +1024,7 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
             </p>
           )}
         </section>
-        <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><CanhSanh3D s={s} moMan={moMan} /></div></details>
+        <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><BanDoHanhTrinh s={s} /></div></details>
         <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} onVaoThi={p.onVaoThi} caDangMo={p.caDangMo} coThu={!chonThu} />
       </div>
     </div>

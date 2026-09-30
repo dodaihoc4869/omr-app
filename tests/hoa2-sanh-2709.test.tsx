@@ -123,7 +123,7 @@ describe('SanhBanDo — theo bản vẽ Moi-SanhBanDo', () => {
     expect(props.onPhaPhucKich).toHaveBeenCalledTimes(1)
     expect(container.querySelector('[data-ve="o-phuc-kich"]')!.getAttribute('data-so')).toBe('4')
     expect(container.querySelector('[data-ve="cau-keo-len"]')).not.toBeNull()
-    expect(container.textContent).toContain('4 ổ phục kích chặn cầu')
+    expect(container.textContent).toContain('4 câu ôn còn lại')
     const dao = screen.getByRole('button', { name: /Khám phá Bát Linh Đảo · 28 câu/ }) as HTMLButtonElement
     expect(dao.disabled).toBe(true)
     expect(dao.textContent).toContain(SANH.loiKhoaDao)

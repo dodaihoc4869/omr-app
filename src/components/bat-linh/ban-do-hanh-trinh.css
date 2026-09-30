@@ -1,0 +1,30 @@
+/* Bản đồ gọn, chữ tách khỏi tranh, cùng cảnh và vật liệu với Đảo / Đoàn. */
+html:root body[data-bat-linh] .bl-ban-do__canh { height: auto; overflow: visible; }
+html:root body[data-bat-linh] .bl-ban-do .h2-ban-do.bl-hanh-trinh { position: relative; inset: auto; width: 100%; height: auto; overflow: hidden; background: var(--bl-paper); color: var(--bl-ink); }
+.bl-hanh-trinh__dau { padding: 20px 20px 14px; }
+.bl-hanh-trinh__dau h2 { margin: 8px 0; font: 700 clamp(24px, 4vw, 32px)/1.3 var(--serif); overflow-wrap: anywhere; }
+.bl-hanh-trinh__dau p { color: var(--bl-muted); font-size: 12px; margin: 0; }
+.bl-hanh-trinh__tranh { position: relative; width: 100%; aspect-ratio: 424 / 522; background: rgb(38 101 86); }
+.bl-hanh-trinh__tranh > svg { display: block; width: 100%; height: 100%; }
+.bl-hanh-trinh__duong { fill: none; stroke: rgb(248 217 136); stroke-width: 3; stroke-dasharray: 3 8; stroke-linecap: round; }
+.bl-hanh-trinh__suong { fill: rgb(233 243 227 / .7); }
+.bl-hanh-trinh__ben, .bl-hanh-trinh__tien-do { position: absolute; left: 12px; right: 12px; padding: 10px 12px; border: 1px solid var(--bl-line); border-radius: 14px; background: var(--bl-paper); color: var(--bl-ink); font-size: 12px; font-weight: 600; text-align: center; box-shadow: var(--bl-shadow); overflow-wrap: anywhere; }
+.bl-hanh-trinh__tien-do { top: 12px; }
+.bl-hanh-trinh__ben { bottom: 12px; }
+.bl-hanh-trinh__thong-tin { padding: 16px; }
+.bl-hanh-trinh__cau { margin: 0 0 14px; border: 1px solid var(--bl-line); border-radius: 14px; background: var(--bl-teal-soft); color: var(--bl-teal); padding: 12px; text-align: center; font-size: 13px; font-weight: 600; }
+.bl-hanh-trinh__cau[data-khoa=true] { background: rgb(251 238 211); color: rgb(111 72 24); }
+.bl-hanh-trinh dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; }
+.bl-hanh-trinh dl > div { min-width: 0; }
+.bl-hanh-trinh dt { display: flex; align-items: center; gap: 6px; color: var(--bl-muted); font-size: 11px; }
+.bl-hanh-trinh dd { margin: 6px 0 0; font-size: 13px; font-weight: 600; }
+.bl-hanh-trinh__cham { width: 10px; height: 10px; border-radius: 50%; background: rgb(177 92 130); flex-shrink: 0; }
+.bl-hanh-trinh__cham--suong { background: rgb(132 160 162); }
+@media (min-width: 1100px) {
+  .bl-hanh-trinh__tranh { max-height: 550px; aspect-ratio: auto; }
+}
+@media (prefers-color-scheme: dark) {
+  .bl-hanh-trinh__nen { filter: brightness(.57) saturate(.8); }
+  .bl-hanh-trinh__suong { fill: rgb(22 43 45 / .78); }
+  .bl-hanh-trinh__cau[data-khoa=true] { background: var(--bl-warm); color: var(--bl-warm-ink); }
+}

@@ -1,6 +1,6 @@
 # Bát Linh — giao diện học sinh và phụ huynh
 
-Triển khai tại workspace ngày 30/09/2026. **Chưa push, chưa triển khai máy chủ.**
+Giao diện Bát Linh đã phát hành ngày 30/09/2026 qua Actions 36739884487: mã 3fabae4a, Pages 329f0a53, Worker f4c33ff1-624b-4d71-ac30-92031087e9a0. Đang bổ sung chế độ tối tự động và Bản đồ hành trình theo yêu cầu tiếp theo.
 
 ## Phạm vi
 
@@ -34,7 +34,7 @@ Xem `scripts/preview-bat-linh/README.md`. Bộ chụp ảnh chạy component th�
 
 Lint các tệp thay đổi còn cảnh báo có sẵn về hook và Fast Refresh trong các màn cũ; không mở rộng sửa logic ngoài phạm vi thiết kế. Kiểm thử trình duyệt hiện dùng Chromium; chưa xác minh trên Safari/iPhone thật. Không có phép đo chứng minh tốc độ tăng 5 lần hoặc doanh thu/giữ chân học sinh.
 
-## Trước khi phát hành sau này
+## Quy trình phát hành
 
 Chỉ triển khai khi người dùng yêu cầu. Cần chạy lại build/check service worker tại thời điểm đó và kiểm tra đăng nhập, làm bài, đồng bộ trên môi trường thật theo quy trình phát hành hiện có. Không dùng trang dữ liệu mẫu làm bản ứng dụng phát hành.
 
@@ -52,7 +52,7 @@ Chỉ triển khai khi người dùng yêu cầu. Cần chạy lại build/check
 - Bộ 6 tệp liên quan đảo/hộ tống: 56 test đạt. Build + kiểm service worker 13/13 đạt.
 - Bản xem thử tương tác: `/workspace/bat-linh-review-site/dist`, mở bằng HTTP, có 30 mục; các bước làm bài và tab phụ huynh mở tiếp trong từng mục. Dữ liệu hoàn toàn minh hoạ; một số nút phụ trong fixture chưa giả lập đầy đủ nghiệp vụ.
 - Site riêng đã đăng ký, chưa triển khai: `appgprj_6abd28f189988191afd2c4bdd4887d27`. Không đăng ký lại Site. Manifest ở `/workspace/bat-linh-review-site/.openai/hosting.json`. Git push tới nguồn của Site bị proxy chặn `CONNECT tunnel failed, response 403` tại `git.chatgpt-team.site`. Cần mở miền này qua cấu hình mạng được hỗ trợ rồi cấp lại credential ngắn hạn, push nguồn chính xác, đóng gói và gọi save/deploy private. Không có deployment ID hay URL đã xác nhận.
-- Repo app gốc chưa commit/push/deploy; không sửa cấu hình máy chủ thật. Checkout Site riêng chỉ chứa bản minh hoạ đóng gói.
+- Tại thời điểm bàn giao bản xem thử (trước lệnh phát hành): repo app gốc chưa commit/push/deploy; không sửa cấu hình máy chủ thật. Checkout Site riêng chỉ chứa bản minh hoạ đóng gói.
 
 ### Bản HTML một tệp
 
@@ -63,3 +63,10 @@ Thử gửi tệp qua Google Drive cũng bị từ chối: `ACCESS_TOKEN_SCOPE_I
 ## Lệnh phát hành 2026-09-30 15:49 UTC
 
 Người dùng đã yêu cầu đẩy lên máy chủ app thật. Đã ghép lên main 4ee968a1 trong worktree riêng; mã giao diện 74bd9ec5. Kiểm tra bản ghép: build và SW 13/13 đạt, 104 kiểm tra trình duyệt đạt, các cổng biên dịch /hs /ph /?vai=gv mở đúng. Full suite 13.093 test có 129 lỗi; 127 lỗi tái hiện trên main, hai kiểm tra còn ràng buộc thiết kế cũ đã được cập nhật và chạy lại đạt. Các bản xem thử không nằm trong entry build phát hành. Dùng workflow hiện có `.github/workflows/deploy.yml`; giữ nguyên server/schema/dữ liệu. Mốc khôi phục: Pages a6fedac0 / main 4ee968a1.
+
+## Bổ sung sáng/tối và hành trình
+
+- Bảng màu tối theo `prefers-color-scheme`, gồm body portal, học sinh, phụ huynh, học tập và game. Đổi hệ thống khi đang mở không tải lại trang, không ghi localStorage; giữ màu ảnh câu hỏi và vật phẩm.
+- Bản đồ hành trình dùng tranh sơn thủy, xe Linh Tâm mới, nhãn và chú giải tách khỏi tranh. Tiến độ, số câu và khóa cầu lấy dữ liệu thật; tên chiến dịch dạng mã được thay bằng “Quần đảo Bát Linh”. Không thêm luật mở đảo hoặc EXP. Bỏ thị sai/vòng vẽ ở bản đồ này.
+- `check-theme.mjs`: kiểm chuyển sáng → tối → sáng trên 15 màn × 2 kích thước, giữ ô nhập khi đổi màu và bản đồ mở có chiều cao thật. `BL_SCHEME=dark node scripts/preview-bat-linh/check-games.mjs` kiểm các luồng game tối.
+- Trước phát hành bổ sung: 33 kiểm thử sảnh/bản đồ đạt, TypeScript và màu đạt. Sắp chạy lại full suite, build và service worker từ mã đã commit.
