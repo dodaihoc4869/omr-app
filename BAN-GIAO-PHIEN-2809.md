@@ -154,3 +154,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 09:46 30/09 · deploy #97 xanh (run 594)
 - 10:33 30/09 · Boss · merge PR #98 Tu luyện ngang/máy tính + chế độ 1 luật mới + luyện đề không EXP (65d9ef9) · 229 test vùng xanh · precache 162/2934KB · không ca mở · lùi: git revert -m1 65d9ef9
 - 10:41 30/09 · deploy #98 xanh (run 595)
+- 10:52 30/09 · Boss · merge PR #99 Code 4b rà thêm đề: khoá lời giải theo nội dung DB-/DH-, kiểm Đ/S + cảnh báo phần III lúc nạp, thẩm định (89cf66d) + PR #100 cửa Tu luyện món quà (6a5da45) · 193 test vùng xanh · không ca mở · lùi: git revert -m1 6a5da45 && git revert -m1 89cf66d
