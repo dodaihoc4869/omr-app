@@ -438,6 +438,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
             </span>
           )}
         </div>
+        {s.tamGiuCa > 0 && <p className="h2-ng-phu" data-khoi="tam-giu-ca">{chuTamGiu(s.tamGiuCa)}</p>}
         {tinRuong}
         {tinLoi}
         {nutMo}
@@ -470,6 +471,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
           {r.tong > 0 ? `${r.daLam}/${r.tong} câu` : `${s.theLuc.tong - s.theLuc.con}/${s.theLuc.tong} câu`}
           {exp ? ` · +${exp.homNay} EXP hôm nay` : ''}
         </p>
+        {s.tamGiuCa > 0 && <p className="h2-xong-phu" data-khoi="tam-giu-ca">{chuTamGiu(s.tamGiuCa)}</p>}
         {mai && <p className="h2-xong-phu">Kế hoạch ngày mai sẵn lúc 00:00 {thuNgayThang(mai)}: câu đến lịch ôn lại và câu mới.</p>}
         {tinRuong}
         {tinLoi}
@@ -478,6 +480,12 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
     </>
   )
 }
+
+/** Kế hoạch hôm nay không còn câu: câu tạm giữ vì ca kiểm tra (30/09) ⇒ nói rõ, khỏi tưởng lỗi. */
+const chuKhongConCau = (s: SanhHoa2): string =>
+  s.tamGiuCa > 0 ? `Có ${s.tamGiuCa} câu hôm nay đang tạm giữ vì lớp đang có ca kiểm tra. Câu sẽ tự mở lại sau khi ca kết thúc.` : 'Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.'
+/** Dòng nhỏ dưới số câu kế hoạch ở màn xong: câu tạm giữ vì ca kiểm tra. */
+const chuTamGiu = (n: number): string => `+${n} câu tạm giữ vì ca kiểm tra, mở lại sau ca`
 
 /** Chưa có chiến dịch đang chạy: chiến dịch sắp bắt đầu (thầy 28/09) ⇒ báo ngày; không thì câu cũ. */
 const chuChuaCoChienDich = (s: SanhHoa2): string =>
@@ -497,7 +505,7 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <NutBia p={p} s={s} />
         </>
       ) : trong ? (
-        s.chienDich ? <p className="h2-tam-chu">Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.</p> : null
+        s.chienDich ? <p className="h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p> : null
       ) : (
         <NutViec p={p} s={s} />
       )}
@@ -769,7 +777,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <NutBia p={p} s={s} />
         </>
       ) : trong ? (
-        s.chienDich ? <p className="h2-ng-the h2-tam-chu">Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.</p> : null
+        s.chienDich ? <p className="h2-ng-the h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p> : null
       ) : (
         <NutViec p={p} s={s} />
       )}

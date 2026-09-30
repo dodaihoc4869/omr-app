@@ -800,6 +800,8 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
     khoaDao: kh.conDoan.length > 0,
     ...(kh.conDoan.length > 0 ? { loiKhoaDao: LOI_KHOA_DAO } : {}),
     ruong: { daLam: kh.tong - conLai, tong: kh.tong, moDuoc: moDuocRuong(kh.tong, kh.tong - conLai), daMo: !!ruong, ...(ruong ? { qua: JSON.parse(str(ruong.qua_json) || '{}') } : {}) },
+    // 30/09: số câu CÒN LẠI đang tạm giữ vì ca kiểm tra mở — CHỈ số, không qid/mã ca (Sảnh báo rõ thay vì "chưa có câu").
+    ...((kh.tamHoan?.ca ?? 0) > 0 ? { tamGiu: { ca: kh.tamHoan!.ca } } : {}),
   }
 }
 
