@@ -312,7 +312,7 @@
 @media (max-width:560px){.bia[data-toan] .bia-chip{max-width:calc(100% - 236px);padding:5px 10px;font-size:11.5px;line-height:1.25;white-space:normal;text-align:center;border-radius:14px}.bia[data-toan] .bia-toan-tren .bia-chu-nut{display:none}}
 
 /* ───── Sảnh Bi-a ───── */
-.bia-sanh{position:absolute;inset:0;overflow:auto;padding:max(10px,env(safe-area-inset-top,0px)) 14px calc(20px + env(safe-area-inset-bottom,0px))}
+.bia-sanh{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain;padding:max(10px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
 .bia-sanh-trong{max-width:560px;margin:0 auto;display:grid;gap:12px}
 .bia-the{padding:14px;border-radius:22px;background:var(--b-kinh);border:1px solid var(--b-vien);display:grid;gap:8px}
 .bia-the h2{margin:0;font-family:'Baloo 2',system-ui,sans-serif;font-weight:800;font-size:20px;line-height:1.2}
@@ -341,8 +341,7 @@
 .bia[data-bo-cuc='pc'] .bia-pop-nhan{bottom:auto;top:50%;right:calc(100% + 6px);transform:translateY(-50%)}
 .bia-pop-nhan{position:absolute;right:0;bottom:calc(100% + 6px);display:grid;gap:6px;padding:8px;border-radius:16px;background:var(--b-dac);border:1px solid var(--b-vien);box-shadow:0 12px 30px rgba(0,0,0,.28);min-width:170px}
 .bia-pop-nhan .bia-nut-chu{justify-content:flex-start;text-align:left}
-.bia-diem-ban{padding:8px 14px;border-radius:16px;background:var(--b-kinh);border:1px solid var(--b-vien)}
-.bia-nhap-ma{grid-template-columns:1fr auto;align-items:end}
+.bia-nhap-ma{display:grid;gap:8px;grid-template-columns:1fr auto;align-items:end}
 .bia-nhap-ma label{grid-column:1 / -1}
 .bia-nhap-ma input{min-height:48px;border-radius:14px;border:1px solid var(--b-vien);background:var(--b-dac);color:var(--b-chu);font-size:24px;font-weight:800;letter-spacing:.3em;text-align:center;padding:0 12px;width:100%}
 .bia-ds-ban,.bia-ds-ghe{list-style:none;margin:0;padding:0;display:grid;gap:8px}
@@ -386,3 +385,97 @@
 
 /* ───── gợi ý lần đầu "Cầm gậy kéo để xoay" (29/09) ───── */
 .bia-goi-y-gay{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;pointer-events:none;padding:6px 14px;border-radius:999px;background:var(--b-toi);color:var(--b-toi-chu);font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+
+/* ───── Sảnh Bi-a · thẻ chế độ + cột phụ (thầy lệnh 30/09: "tối ưu cho màn quay ngang và máy tính … các chế độ chọn rõ ràng dễ thấy") ─────
+   Dọc: một cột như cũ (số liệu → Chơi với bạn → Chơi với A.I → Trả lời câu hỏi → bạn cùng lớp, Mắt thần, Luật nhanh).
+   Ngang / máy tính: tối đa 1100px, chế độ chơi 2 cột bên trái, cột phụ bên phải. */
+.bia-sanh-luoi,.bia-sanh-chinh,.bia-sanh-phu{display:grid;gap:12px;align-content:start;min-width:0}
+.bia-chi-so-dau{display:grid;gap:2px}
+.bia-o-so-luoi{display:grid;gap:6px}
+.bia-o-so{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:8px;padding:6px 12px;border-radius:14px;background:var(--b-kinh-2);border:1px solid var(--b-vien);min-width:0}
+.bia-o-so>span{font-size:12px;font-weight:600;color:var(--b-mo)}
+.bia-o-so>b{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif;font-weight:800;font-size:17px;line-height:1.2;font-variant-numeric:tabular-nums}
+.bia-o-so .bia-vach{flex-basis:100%;margin:4px 0 2px}
+.bia-che-do{padding:14px;border-radius:22px;background:var(--b-kinh);border:1px solid var(--b-vien);display:grid;gap:10px;align-content:start;min-width:0}
+.bia-che-do-dau{display:flex;align-items:center;gap:12px;min-width:0}
+.bia-che-do-dau>div{min-width:0}
+.bia-che-do-dau h2{margin:0;font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif;font-weight:800;font-size:18px;line-height:1.2}
+.bia-che-do-dau p{margin:2px 0 0;font-size:12.5px;font-weight:600;line-height:1.3;color:var(--b-mo)}
+.bia-bieu-tuong{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center}
+.bia-bieu-tuong svg{width:24px;height:24px}
+.bia-bieu-tuong[data-loai='ban']{background:linear-gradient(160deg,var(--b-vang-1),var(--b-vang-2));color:var(--b-vang-chu)}
+.bia-bieu-tuong[data-loai='ai']{background:linear-gradient(160deg,var(--b-xanh-1),var(--b-xanh-2));color:rgb(255,255,255)}
+.bia-bieu-tuong[data-loai='cau']{background:linear-gradient(160deg,rgb(159,243,236),rgb(31,181,170));color:rgb(3,48,44)}
+.bia-cot-nut{display:grid;gap:8px}
+/* Chưa mở đấu với bạn ⇒ thẻ A.I (có nút chính) đứng trước. */
+.bia-sanh-chinh[data-ai-truoc]>[aria-labelledby='bia-cd-ai']{order:-1}
+/* Thẻ nổi bật riêng "Trả lời câu hỏi · không cần chơi": cả thẻ là một nút. */
+.bia-the-cau{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:22px;text-align:left;cursor:pointer;border:1.5px solid color-mix(in srgb,var(--b-p1) 60%,transparent);background:linear-gradient(120deg,color-mix(in srgb,var(--b-p1) 18%,var(--b-kinh)),var(--b-kinh));box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.bia-the-cau-chu{flex:1;min-width:0;display:grid;gap:2px;line-height:1.3}
+.bia-the-cau-chu b{font-size:15.5px;font-weight:800}
+.bia-the-cau-chu small{font-size:12.5px;font-weight:600;color:var(--b-mo)}
+.bia-the-cau .bia-mui{flex:none;width:22px;height:22px;color:var(--b-mo)}
+.bia-the-cau:disabled{opacity:.55;cursor:default}
+.bia-luat{display:block}
+.bia-luat summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:24px;cursor:pointer;font-weight:700;list-style:none}
+.bia-luat summary::-webkit-details-marker{display:none}
+.bia-luat summary::after{content:'';flex:none;width:8px;height:8px;margin-right:4px;border-right:2px solid var(--b-mo);border-bottom:2px solid var(--b-mo);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.bia-luat[open] summary::after{transform:translateY(2px) rotate(225deg)}
+.bia-luat p{margin-top:8px;line-height:1.45}
+.bia-sanh :where(.bia-nut-vang,.bia-nut-phu,.bia-nut-chu,.bia-the-cau,.bia-cong-tac,summary){touch-action:manipulation}
+.bia-sanh .bia-nut-vang:not(:disabled):active{transform:translateY(2px);box-shadow:0 3px 0 var(--b-vang-bo)}
+@media (hover:hover){
+ .bia-sanh .bia-nut-vang:not(:disabled):hover{filter:brightness(1.06)}
+ .bia-sanh .bia-nut-phu:not(:disabled):hover,.bia-sanh .bia-nut-chu:not(:disabled):hover,.bia-sanh .bia-cong-tac:hover,.bia-luat summary:hover{background:var(--b-dac);border-color:var(--b-mo)}
+ .bia-the-cau:not(:disabled):hover{border-color:var(--b-p1);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+}
+.bia-sanh .bia-nut-vang,.bia-sanh .bia-nut-phu,.bia-the-cau{transition:filter .15s,background-color .15s,border-color .15s,box-shadow .15s,transform .1s}
+@media (min-width:900px),(orientation:landscape) and (min-width:640px){
+ .bia-sanh-rong{max-width:1100px}
+ .bia-sanh-luoi{grid-template-columns:minmax(0,1fr) minmax(260px,340px);grid-template-rows:auto 1fr;grid-template-areas:'chinh so' 'chinh phu';align-items:start}
+ .bia-chi-so{grid-area:so}
+ .bia-sanh-chinh{grid-area:chinh;grid-template-columns:1fr 1fr}
+ .bia-sanh-phu{grid-area:phu}
+ .bia-sanh-chinh>.bia-che-do{align-self:stretch;grid-template-rows:auto 1fr;align-content:stretch}
+ .bia-sanh-chinh>.bia-che-do>:last-child{align-self:end}
+ .bia-sanh-chinh>.bia-the-cau,.bia-sanh-chinh>.bia-the-rong{grid-column:1 / -1}
+ .bia-che-do .bia-luoi-2{grid-template-columns:1fr}
+}
+/* Máy tính màn cao: đặt cả Sảnh vào giữa theo chiều dọc. */
+@media (min-width:900px) and (min-height:700px){
+ .bia-sanh-rong{min-height:100%;align-content:center}
+}
+@media (min-width:1200px){
+ .bia-sanh-rong{gap:16px}
+ .bia-sanh-luoi,.bia-sanh-chinh{gap:16px}
+ .bia-che-do{padding:18px;gap:14px}
+ .bia-bieu-tuong{width:52px;height:52px;border-radius:16px}
+ .bia-bieu-tuong svg{width:28px;height:28px}
+ .bia-che-do-dau h2{font-size:20px}
+ .bia-the-cau{padding:16px 18px;min-height:76px}
+ .bia-bi-mau canvas{width:52px;height:52px}
+}
+/* Điện thoại xoay ngang (thấp): gọn để vừa màn, bỏ ba bi mẫu trang trí. */
+@media (orientation:landscape) and (max-height:520px){
+ .bia-sanh-rong{gap:8px}
+ .bia-sanh-rong .bia-dau{min-height:0}
+ .bia-sanh-rong .bia-bi-mau{display:none}
+ .bia-sanh-rong .bia-ten b{font-size:17px}
+ .bia-sanh-luoi,.bia-sanh-chinh,.bia-sanh-phu{gap:8px}
+ .bia-sanh-luoi{grid-template-columns:minmax(0,1fr) minmax(240px,280px)}
+ .bia-o-so-luoi{gap:4px}
+ .bia-o-so{padding:4px 10px}
+ .bia-chi-so h2{font-size:16px}
+ .bia-sanh-rong .bia-the,.bia-che-do{padding:10px 12px;border-radius:18px;gap:8px}
+ .bia-bieu-tuong{width:36px;height:36px;border-radius:12px}
+ .bia-bieu-tuong svg{width:20px;height:20px}
+ .bia-che-do-dau{gap:10px}
+ .bia-che-do-dau h2{font-size:16.5px}
+ .bia-sanh-rong .bia-nut-vang{min-height:46px;font-size:15.5px}
+ .bia-sanh-rong .bia-nut-phu{min-height:44px;font-size:13.5px;padding:4px 10px}
+ .bia-the-cau{min-height:56px;padding:8px 12px}
+ .bia-o-so>b{font-size:15px}
+ .bia-sanh-rong .bia-cong-tac{min-height:44px;padding:6px 10px}
+ .bia-sanh-rong .bia-cong-tac-chu small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
+}
+@media (prefers-reduced-motion:reduce){.bia-luat summary::after,.bia-sanh .bia-nut-vang,.bia-sanh .bia-nut-phu,.bia-the-cau{transition:none}}

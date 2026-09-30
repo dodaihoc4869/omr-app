@@ -76,13 +76,18 @@ describe('Sảnh Bi-a khi đã mở đấu với bạn (online)', () => {
   it('Điểm bàn, ba nút chơi với bạn bật (không còn "Sắp mở"), bạn đang ở Sảnh + Mời; báo có mặt kèm số câu còn', async () => {
     render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
     expect(await screen.findByText('1012 · 3 ván')).toBeTruthy()
-    for (const ten of [/^Đấu đơn với bạn$/, /^Đánh đôi 2 đấu 2/, /^Nhập mã bàn/, /^Tự chơi với A\.I/]) expect((screen.getByRole('button', { name: ten }) as HTMLButtonElement).disabled).toBe(false)
+    for (const ten of [/^Đấu đơn với bạn$/, /^Đánh đôi 2 đấu 2/, /^Nhập mã bàn/, /^Đấu đơn với A\.I$/, /^Đánh đôi với A\.I/]) expect((screen.getByRole('button', { name: ten }) as HTMLButtonElement).disabled).toBe(false)
     expect(screen.queryByText('Sắp mở')).toBeNull()
     expect(await screen.findByText('Minh Châu')).toBeTruthy()
     expect(screen.getByText('Bi-a còn 9 câu')).toBeTruthy()
     expect(lenh('bia-loi-moi')[0]).toEqual({ con: 15 })
-    fireEvent.click(screen.getByRole('button', { name: /^Tự chơi với A\.I/ }))
-    expect(screen.getByRole('button', { name: 'Đấu đơn với A.I' })).toBeTruthy()
+    // Bỏ nút trùng "Tự chơi với A.I": nút A.I hiện thẳng trong thẻ "Chơi với A.I"; nút chính (vàng) duy nhất là "Đấu đơn với bạn".
+    expect(screen.queryByRole('button', { name: /Tự chơi với A\.I/ })).toBeNull()
+    expect(screen.getByRole('region', { name: 'Chơi với A.I' })).toBeTruthy()
+    expect(Array.from(document.querySelectorAll('.bia-sanh .bia-nut-vang')).map((n) => n.textContent)).toEqual(['Đấu đơn với bạn'])
+    expect(screen.getByText('1012 · 3 ván').previousElementSibling?.textContent).toBe('Điểm bàn')
+    fireEvent.click(screen.getByRole('button', { name: /^Đánh đôi với A\.I/ }))
+    await waitFor(() => expect(lenh('bia-xep-ban')[0]).toEqual({ loai: 'ai', cheDo: 'doi', soBi: 4 }))
   })
 
   it('hết câu Bi-a nhưng đã xong kế hoạch ⇒ nút thành "Bàn giao hữu với bạn", tạo bàn loai giao_huu', async () => {

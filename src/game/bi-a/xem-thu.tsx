@@ -1,4 +1,4 @@
-// TRANG XEM THỬ (chỉ `npm run dev`, KHÔNG vào bản build): /src/game/bi-a/xem-thu.html[?xong=1][&ca=1]
+// TRANG XEM THỬ (chỉ `npm run dev`, KHÔNG vào bản build): /src/game/bi-a/xem-thu.html[?xong=1][&ca=1][&online=1]
 // Dựng Bi-a Phản Ứng THẬT (BiaGame) với máy chủ GIẢ trong trang: câu mẫu chiến dịch Ester – Lipid, chấm như máy chủ, lời giải đúng mẫu.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -39,10 +39,12 @@ const loiGiai = (c: CauThu) => c.phan === 'I' ? { chot: c.chot, tung_pa: Object.
 const chuan = (t: string) => t.replace(',', '.').replace('−', '-').trim()
 let du = CAU.slice(8)
 const xong = q.get('xong') === '1'
+const online = q.get('online') === '1' // Sảnh khi máy chủ đã mở đấu với bạn
 datBoGoiBia(async (lenh, _token, d = {}) => {
   await new Promise((r) => setTimeout(r, 60))
   if (q.get('ca') === '1') return { ok: true, bat: true, lyDoKhoa: 'dang_co_ca', message: 'Đang có ca kiểm tra. Bi-a mở lại khi ca kết thúc.' }
-  if (lenh === 'bia-sanh') return { ok: true, bat: true, ...(xong ? { lyDoKhoa: 'xong_ke_hoach', message: 'Hôm nay em xong kế hoạch rồi. Em chơi Bàn giao hữu được (không câu, không EXP).' } : {}), chienDich: { ten: 'Ester – Lipid', hanNop: '2026-10-01', tong: 120 }, theLuc: { con: xong ? 0 : 26, tong: 40 }, doan: { con: 6 }, dao: { con: 20 }, tran: { con: xong ? 0 : 15, tong: 15, conDoan: 5, conDao: 10 }, giaoHuu: { mo: xong, con: 2, toiDa: 2 } }
+  if (lenh === 'bia-sanh') return { ok: true, bat: true, ...(xong ? { lyDoKhoa: 'xong_ke_hoach', message: 'Hôm nay em xong kế hoạch rồi. Em chơi Bàn giao hữu được (không câu, không EXP).' } : {}), chienDich: { ten: 'Ester – Lipid', hanNop: '2026-10-01', tong: 120 }, theLuc: { con: xong ? 0 : 26, tong: 40 }, doan: { con: 6 }, dao: { con: 20 }, tran: { con: xong ? 0 : 15, tong: 15, conDoan: 5, conDao: 10 }, giaoHuu: { mo: xong, con: 2, toiDa: 2 }, ...(online ? { online: true, diemBan: { diem: 1000, soVan: 0 } } : {}) }
+  if (lenh === 'bia-loi-moi') return { ok: true, ban: online ? [{ sbd: 'S2', ten: 'Minh Châu', conTran: 9 }] : [], moi: [] }
   if (lenh === 'bia-xep-ban') {
     if (d.loai === 'giao_huu') return { ok: true, van: 'v-gh', loai: 'giao_huu', bi: [], chot: null }
     const soBi = Number(d.soBi) || 7

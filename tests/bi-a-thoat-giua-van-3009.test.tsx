@@ -39,7 +39,7 @@ function dayTaiLai() {
 }
 const vaoVan = async () => {
   render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
-  fireEvent.click(await screen.findByRole('button', { name: 'Tự chơi với A.I · đấu đơn' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Đấu đơn với A.I' }))
   await screen.findByRole('img', { name: /Bàn bi-a/ })
 }
 
@@ -74,7 +74,7 @@ describe('Xoay máy / đổi cỡ / toàn màn hình không gỡ màn chơi', ()
       act(() => { window.dispatchEvent(new Event('resize')); window.dispatchEvent(new Event('orientationchange')); document.dispatchEvent(new Event('fullscreenchange')); document.dispatchEvent(new Event('visibilitychange')); window.dispatchEvent(new Event('pagehide')) })
     }
     expect(screen.getByRole('img', { name: /Bàn bi-a/ })).toBe(ban)
-    expect(screen.queryByRole('button', { name: 'Tự chơi với A.I · đấu đơn' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Đấu đơn với A.I' })).toBeNull()
     expect(lenh('bia-ket-van')).toHaveLength(0)
   })
 })
@@ -98,7 +98,7 @@ describe('Lỗi không đóng game', () => {
     act(() => { v.ghe = []; (v as unknown as { doi: () => void }).doi?.() })
     expect(await screen.findByText('Bàn bi-a vừa gặp lỗi')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Về Sảnh Bi-a' }))
-    expect(await screen.findByRole('button', { name: 'Tự chơi với A.I · đấu đơn' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Đấu đơn với A.I' })).toBeTruthy()
   })
 })
 
