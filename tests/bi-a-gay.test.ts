@@ -1,69 +1,37 @@
-// BI-A · CẦM GẬY ĐỂ XOAY (thầy lệnh 29/09): bắt trúng gậy, góc theo ngón, không giật khi chạm ngoài gậy, chỉnh tinh.
+// BI-A · HÌNH HỌC GẬY. Sửa 30/09 (thầy duyệt "Bàn Bi-a mới"): bỏ phân nhánh "cầm trúng gậy / kéo ngoài gậy chỉnh tinh × 0,25" —
+// kéo ở BẤT KỲ đâu trên bàn là xoay gậy theo góc quét 1 : 1 (test đầy đủ ở bi-a-dieu-khien-3009.test.tsx). Ở đây giữ phần hình học còn dùng.
 import { describe, expect, it } from 'vitest'
-import { batDauCam, chinhTinh, chuanGoc, dauGay, DAI_GAY, huongKhiKeo, nuaBeRongBat, trungGay } from '../src/game/bi-a/gay'
+import { banKinhBatBiCai, chuanGoc, dauGay, gocToi } from '../src/game/bi-a/gay'
+import { KeoXoay } from '../src/game/bi-a/dieu-khien-cham'
 import { R } from '../src/game/bi-a/vat-ly'
 
 const c = { x: 250, y: 700 }
-const len = { x: 0, y: -1 } // bắn lên ⇒ gậy nằm phía dưới bi cái
-const gan = (a: { x: number; y: number }, b: { x: number; y: number }) => { expect(a.x).toBeCloseTo(b.x, 6); expect(a.y).toBeCloseTo(b.y, 6) }
 
-describe('trungGay', () => {
-  it('chạm trên thân gậy (phía ngược hướng bắn) ⇒ trúng; phía trước bi cái hay lệch xa ⇒ không', () => {
-    const nua = 12
-    expect(trungGay(c, len, 0, { x: 250, y: 700 + dauGay(0) + 50 }, nua)).toBe(true)
-    expect(trungGay(c, len, 0, { x: 250 + 10, y: 700 + 200 }, nua)).toBe(true)
-    expect(trungGay(c, len, 0, { x: 250 + 30, y: 700 + 200 }, nua)).toBe(false)
-    expect(trungGay(c, len, 0, { x: 250, y: 700 - 80 }, nua)).toBe(false) // phía hướng bắn
-    expect(trungGay(c, len, 0, { x: 250, y: 700 + dauGay(0) + DAI_GAY + 40 }, nua)).toBe(false) // quá đuôi gậy
-  })
+describe('hình học gậy', () => {
   it('gậy lùi theo lực: đầu gậy lúc lực 1 xa hơn lúc lực 0 đúng 80', () => {
     expect(dauGay(1) - dauGay(0)).toBe(80)
-    expect(trungGay(c, len, 1, { x: 250, y: 700 + dauGay(1) + DAI_GAY - 5 }, 12)).toBe(true)
+    expect(dauGay(0)).toBe(R + 6)
   })
-  it('vùng bắt ≥ 44 px CSS (22 px mỗi bên) ở mọi cỡ bàn, tối thiểu 10 đơn vị', () => {
-    for (const S of [0.3, 0.5, 0.8, 1.2]) expect(nuaBeRongBat(S) * S).toBeGreaterThanOrEqual(22 - 1e-9)
-    expect(nuaBeRongBat(10)).toBe(10)
-  })
-  it('gậy xoay theo hướng nhắm (bắn sang phải ⇒ gậy nằm bên trái)', () => {
-    expect(trungGay(c, { x: 1, y: 0 }, 0, { x: 250 - 100, y: 700 }, 12)).toBe(true)
-    expect(trungGay(c, { x: 1, y: 0 }, 0, { x: 250 + 100, y: 700 }, 12)).toBe(false)
-  })
-})
-
-describe('xoay khi cầm gậy', () => {
-  it('cầm đúng trục gậy rồi kéo ngón sang trái bi cái ⇒ bắn sang phải (gậy theo ngón, hướng bắn đối diện)', () => {
-    const cam = batDauCam(c, len, { x: 250, y: 900 })
-    expect(cam.lech).toBeCloseTo(0, 9)
-    gan(huongKhiKeo(c, cam, { x: 100, y: 700 }, len), { x: 1, y: 0 })
-    gan(huongKhiKeo(c, cam, { x: 250, y: 500 }, len), { x: 0, y: 1 })
-  })
-  it('cầm lệch mép gậy ⇒ không giật: ngay lúc cầm hướng giữ nguyên', () => {
-    const p = { x: 262, y: 900 }
-    const cam = batDauCam(c, len, p)
-    gan(huongKhiKeo(c, cam, p, len), len)
-  })
-  it('ngón quá sát tâm bi cái ⇒ giữ hướng cũ', () => {
-    const cam = batDauCam(c, len, { x: 250, y: 900 })
-    expect(huongKhiKeo(c, cam, { x: 251, y: 701 }, len)).toBe(len)
-    expect(R).toBeGreaterThan(2)
-  })
-})
-
-describe('kéo ngoài gậy: chỉnh tinh, không nhảy', () => {
-  it('quét ngón 40° quanh bi cái ⇒ hướng chỉ xoay 10° (× 0,25), cùng chiều', () => {
-    const a = (d: number) => ({ x: c.x + 200 * Math.cos(d * Math.PI / 180), y: c.y + 200 * Math.sin(d * Math.PI / 180) })
-    const moi = chinhTinh(c, len, a(0), a(40))
-    const doi = chuanGoc(Math.atan2(moi.y, moi.x) - Math.atan2(len.y, len.x)) * 180 / Math.PI
-    expect(doi).toBeCloseTo(10, 6)
-    expect(Math.hypot(moi.x, moi.y)).toBeCloseTo(1, 9)
-  })
-  it('chạm một điểm (không kéo) ⇒ hướng y nguyên', () => {
-    const p = { x: 100, y: 200 }
-    gan(chinhTinh(c, len, p, p), len)
+  it('gocToi: góc từ bi cái tới ngón', () => {
+    expect(gocToi(c, { x: 350, y: 700 })).toBeCloseTo(0, 9)
+    expect(gocToi(c, { x: 250, y: 800 })).toBeCloseTo(Math.PI / 2, 9)
   })
   it('chuanGoc đưa về (−π, π]', () => {
     expect(chuanGoc(3 * Math.PI)).toBeCloseTo(Math.PI, 9)
     expect(chuanGoc(-Math.PI)).toBeCloseTo(Math.PI, 9)
     expect(chuanGoc(0.5)).toBe(0.5)
+  })
+  it('vùng kéo bi cái ≥ 2,4 R và ≥ 30 px CSS', () => {
+    for (const S of [0.3, 0.5, 0.8, 1.2]) { expect(banKinhBatBiCai(S) * S).toBeGreaterThanOrEqual(30 - 1e-9); expect(banKinhBatBiCai(S)).toBeGreaterThanOrEqual(R * 2.4) }
+  })
+})
+
+describe('kéo ngoài thân gậy KHÔNG còn bị chia 0,25 (thầy duyệt 30/09)', () => {
+  it('quét ngón 40° quanh bi cái ở phía trước bi cái ⇒ gậy xoay đúng 40°, cùng chiều', () => {
+    const a = (d: number) => ({ x: c.x + 200 * Math.cos(d * Math.PI / 180), y: c.y + 200 * Math.sin(d * Math.PI / 180) })
+    const k = new KeoXoay()
+    k.bat(0, 0, 0, a(0), c, 0)
+    const g = k.keo(16, 50, 0, a(40), c, 0, 1)!
+    expect(g * 180 / Math.PI).toBeCloseTo(40, 6)
   })
 })

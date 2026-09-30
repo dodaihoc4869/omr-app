@@ -1,17 +1,78 @@
-// BI-A PHẢN ỨNG · VẼ BI NGUYÊN TỐ 3D (đặc tả 7.3). Vẽ từng điểm ảnh: pháp tuyến mặt cầu × ma trận quay (quaternion).
-// Đèn cố định theo MÀN (góc trên trái). Kim loại: phản chiếu môi trường cố định (đèn trần sáng, vạch chân trời tối, nỉ tối) ⇒ ánh kim.
-// Phi kim: nền trắng, sọc màu |lz| < 0,5. Bi chốt: đen. Hai ô nhãn ở ±x cục bộ: Z (nhỏ, trên) + kí hiệu (lớn, dưới), lăn theo bi.
-// Bi cái trắng, 6 chấm đỏ để thấy xoáy. Bàn nằm ngang: pháp tuyến màn quay (nx, ny) → (ny, −nx) trước khi nhân ma trận quay.
-import { NT, type KiHieu } from './nguyen-to'
-import type { MaBi, Quat } from './vat-ly'
+// BI-A PHẢN ỨNG · VẼ BI (thầy chốt bản vẽ "Bàn Bi-a mới" 30/09). Mỗi KIỂU bi (theo góc nhìn: của em / đối thủ / chốt / bi cái) + kí hiệu
+// + trạng thái viền vàng (đã giải trước) vẽ MỘT lần vào canvas đệm; mỗi khung chỉ drawImage — không dựng gradient/chữ mỗi khung (máy yếu).
+// Bi của em: lam đặc. Bi đối thủ: nền trắng, dải đỏ cam giữa 60 % chiều cao (bi sọc). Bi chốt: đen, vòng trắng giữa, chữ tối.
+// Kí hiệu nguyên tố: chữ trắng đậm viền tối, cỡ 1,08 R (một chữ) / 0,92 R (hai chữ). Viền vàng mảnh ngoài thân bi, thân bi giữ nguyên.
+import { MAU_BI, rgbCss, type KieuBi } from './nguyen-to'
 
-const TRANG = [246, 243, 236] as const, MUC_SO = [22, 22, 26] as const, DO_CHAM = [206, 32, 44] as const
-export const CHU_T = 64
-export interface Bong { N: number; nx: Float32Array; ny: Float32Array; nz: Float32Array; sh: Float32Array; sp: Float32Array; al: Float32Array; km: Float32Array; ks: Float32Array }
-/** Bảng chiếu sáng cho ảnh bi cạnh N điểm ảnh (tính một lần mỗi cỡ). */
+const C = { ta: rgbCss(MAU_BI.ta), dich: rgbCss(MAU_BI.dich), trang: rgbCss(MAU_BI.trang), den: rgbCss(MAU_BI.den), vang: rgbCss(MAU_BI.vang) }
+export const MAU_BI_VANG = C.vang
+/** Tỉ lệ cạnh ảnh đệm / bán kính bi: chừa chỗ cho viền vàng (r × 1,12 + nét). */
+export const KHUNG_ANH = 2.6
+
+/** Vẽ một bi tâm (0, 0) bán kính `r` lên `g` (đơn vị điểm ảnh của `g`). */
+export function veMotBi(g: CanvasRenderingContext2D, kieu: KieuBi, kiHieu: string, r: number, vang: boolean): void {
+  g.save()
+  g.beginPath(); g.arc(0, 0, r, 0, 7); g.clip()
+  if (kieu === 'ta') { g.fillStyle = C.ta; g.fillRect(-r, -r, 2 * r, 2 * r) }
+  else if (kieu === 'dich') { g.fillStyle = C.trang; g.fillRect(-r, -r, 2 * r, 2 * r); g.fillStyle = C.dich; g.fillRect(-r, -r * 0.6, 2 * r, r * 1.2) }
+  else if (kieu === 'chot') { g.fillStyle = C.den; g.fillRect(-r, -r, 2 * r, 2 * r); g.fillStyle = C.trang; g.beginPath(); g.arc(0, 0, r * 0.55, 0, 7); g.fill() }
+  else { g.fillStyle = C.trang; g.fillRect(-r, -r, 2 * r, 2 * r) }
+  const hl = g.createRadialGradient(-r * 0.38, -r * 0.42, 1, -r * 0.2, -r * 0.2, r * 1.25)
+  hl.addColorStop(0, 'rgba(255,255,255,.75)'); hl.addColorStop(0.28, 'rgba(255,255,255,.12)'); hl.addColorStop(1, 'rgba(0,0,0,.32)')
+  g.fillStyle = hl; g.fillRect(-r, -r, 2 * r, 2 * r)
+  g.restore()
+  if (kieu !== 'cai' && kiHieu) {
+    g.font = `800 ${Math.round(r * (kiHieu.length > 1 ? 0.92 : 1.08))}px 'Be Vietnam Pro',system-ui,sans-serif`
+    g.textAlign = 'center'; g.textBaseline = 'middle'
+    if (kieu === 'chot') { g.fillStyle = C.den; g.fillText(kiHieu, 0, r * 0.05) }
+    else { g.lineJoin = 'round'; g.lineWidth = r * 0.16; g.strokeStyle = 'rgba(0,0,0,.6)'; g.strokeText(kiHieu, 0, r * 0.05); g.fillStyle = 'rgb(255,255,255)'; g.fillText(kiHieu, 0, r * 0.05) }
+  }
+  if (vang) { g.strokeStyle = C.vang; g.lineWidth = r * 0.16; g.beginPath(); g.arc(0, 0, r * 1.12, 0, 7); g.stroke() }
+}
+
+/** Ảnh đệm một bi, bán kính `r` điểm ảnh; cạnh = ⌈r × KHUNG_ANH⌉. Không có canvas (test) ⇒ null. */
+export function taoAnhBi(doc: Document, kieu: KieuBi, kiHieu: string, r: number, vang: boolean): HTMLCanvasElement | null {
+  const n = Math.max(8, Math.ceil(r * KHUNG_ANH)), cv = doc.createElement('canvas')
+  cv.width = cv.height = n
+  let g: CanvasRenderingContext2D | null = null
+  try { g = cv.getContext('2d') } catch { g = null }
+  if (!g) return null
+  g.translate(n / 2, n / 2)
+  veMotBi(g, kieu, kiHieu, r, vang)
+  return cv
+}
+
+/** DÁNG GỐC của bi (quaternion) — ô kí hiệu (+x cục bộ) quay thẳng về người xem, chữ đứng, dải sọc nằm ngang: đúng như ảnh vẽ sẵn.
+ *  Bàn dọc: quay 90° quanh trục y. Bàn nằm ngang (pháp tuyến màn đã quay 90°): dáng tương ứng. */
+export const Q_GOC_DOC: readonly [number, number, number, number] = [Math.SQRT1_2, 0, Math.SQRT1_2, 0]
+export const Q_GOC_NGANG: readonly [number, number, number, number] = [0.5, 0.5, 0.5, -0.5]
+/** Thời gian bi vừa dừng trượt êm về dáng gốc rồi mới chuyển sang ảnh vẽ sẵn (không nhảy). */
+export const MS_VE_GOC = 200
+/**
+ * Nội suy hướng quay từ `a` về `b` theo t ∈ [0, 1], chậm dần cuối (ease-out 1 − (1 − t)³), đi đường NGẮN NHẤT (đổi dấu b nếu tích vô hướng âm),
+ * slerp giữ độ dài 1. Ghi vào `ra` (không cấp phát).
+ */
+export function noiQuay(a: readonly number[], b: readonly number[], t: number, ra: number[]): number[] {
+  const k = 1 - Math.pow(1 - Math.max(0, Math.min(1, t)), 3)
+  let bw = b[0]!, bx = b[1]!, by = b[2]!, bz = b[3]!
+  let cos = a[0]! * bw + a[1]! * bx + a[2]! * by + a[3]! * bz
+  if (cos < 0) { cos = -cos; bw = -bw; bx = -bx; by = -by; bz = -bz }
+  let s0 = 1 - k, s1 = k
+  if (cos < 0.9995) { const th = Math.acos(Math.min(1, cos)), sn = Math.sin(th); s0 = Math.sin((1 - k) * th) / sn; s1 = Math.sin(k * th) / sn }
+  ra[0] = a[0]! * s0 + bw * s1; ra[1] = a[1]! * s0 + bx * s1; ra[2] = a[2]! * s0 + by * s1; ra[3] = a[3]! * s0 + bz * s1
+  const n = Math.hypot(ra[0]!, ra[1]!, ra[2]!, ra[3]!) || 1
+  ra[0] = ra[0]! / n; ra[1] = ra[1]! / n; ra[2] = ra[2]! / n; ra[3] = ra[3]! / n
+  return ra
+}
+
+// ───────────── BI ĐANG LĂN (thầy hỏi 30/09 "hiệu ứng lăn bi mượt mà vẫn giữ nguyên chứ") ─────────────
+// Bi ĐANG CHẠY vẽ lăn như bản cũ: từng điểm ảnh = pháp tuyến mặt cầu × ma trận quay (quaternion trong vật lý, chỉ để vẽ) ⇒ kí hiệu và dải sọc
+// chạy theo hướng lăn; màu theo góc nhìn (em lam đặc, đối thủ nền trắng dải đỏ cam |lz| < 0,5, chốt đen có ô trắng). Bi đứng yên dùng ảnh vẽ sẵn.
+// Bảng chiếu sáng tính một lần mỗi cỡ; chữ là mặt nạ (tô + viền) vẽ một lần. Bàn nằm ngang: pháp tuyến màn quay (nx, ny) → (ny, −nx).
+export interface Bong { N: number; nx: Float32Array; ny: Float32Array; nz: Float32Array; sh: Float32Array; sp: Float32Array; al: Float32Array }
 export function taoBong(N: number): Bong {
   const rp = (N - 2) / 2, n = N * N
-  const B: Bong = { N, nx: new Float32Array(n), ny: new Float32Array(n), nz: new Float32Array(n), sh: new Float32Array(n), sp: new Float32Array(n), al: new Float32Array(n), km: new Float32Array(n), ks: new Float32Array(n) }
+  const B: Bong = { N, nx: new Float32Array(n), ny: new Float32Array(n), nz: new Float32Array(n), sh: new Float32Array(n), sp: new Float32Array(n), al: new Float32Array(n) }
   let Lx = -0.42, Ly = -0.55, Lz = -0.72
   const lL = Math.sqrt(Lx * Lx + Ly * Ly + Lz * Lz); Lx /= lL; Ly /= lL; Lz /= lL
   let Hx = Lx, Hy = Ly, Hz = Lz - 1
@@ -27,41 +88,37 @@ export function taoBong(N: number): Bong {
     const dif = Math.max(0, nx * Lx + ny * Ly + nz * Lz), h = Math.max(0, nx * Hx + ny * Hy + nz * Hz), mat = -nz
     B.sh[k] = (0.3 + 0.78 * dif) * (0.7 + 0.3 * mat)
     B.sp[k] = Math.pow(h, 60) * 0.95 + Math.pow(h, 8) * 0.1
-    const tren = -ny, env = tren > 0 ? 0.72 + 0.5 * tren : 0.46 + 0.2 * tren, chan = Math.abs(ny - 0.06) < 0.07 ? 0.55 : 1
-    B.km[k] = env * chan * (0.55 + 0.55 * dif) * (0.75 + 0.25 * mat)
-    B.ks[k] = Math.pow(h, 120) * 1.25 + Math.pow(h, 16) * 0.32 + Math.pow(1 - mat, 3) * 0.28
   }
   return B
 }
-export type BangChu = Partial<Record<KiHieu, Uint8Array>>
-/** Mặt nạ chữ (Z + kí hiệu) cho ô nhãn, CHU_T × CHU_T. Không có canvas (test) ⇒ mặt nạ rỗng (ô trắng trơn). */
-export function taoChu(doc?: Document): BangChu {
-  const ra: BangChu = {}
-  const d = doc ?? (typeof document !== 'undefined' ? document : undefined)
-  for (const id of Object.keys(NT) as KiHieu[]) {
-    const a = new Uint8Array(CHU_T * CHU_T)
-    try {
-      const c = d?.createElement('canvas')
-      const x = c?.getContext('2d')
-      if (c && x) {
-        c.width = c.height = CHU_T
-        x.fillStyle = 'rgb(0,0,0)'; x.textAlign = 'center'; x.textBaseline = 'middle'
-        x.font = `700 ${Math.round(CHU_T * 0.22)}px 'Be Vietnam Pro',sans-serif`; x.fillText(String(NT[id].z), CHU_T / 2, CHU_T * 0.27)
-        x.font = `800 ${Math.round(CHU_T * (id.length > 1 ? 0.43 : 0.5))}px 'Baloo 2','Be Vietnam Pro',sans-serif`; x.fillText(id, CHU_T / 2, CHU_T * 0.65)
-        const px = x.getImageData(0, 0, CHU_T, CHU_T).data
-        for (let k = 0; k < CHU_T * CHU_T; k++) a[k] = px[k * 4 + 3]!
-      }
-    } catch { /* máy không vẽ chữ được: ô nhãn trắng trơn */ }
-    ra[id] = a
-  }
-  return ra
+export const CHU_T = 64
+/** Mặt nạ kí hiệu (tô + viền) CHU_T × CHU_T. Không có canvas (test) ⇒ rỗng (bi trơn). */
+export interface MatNa { to: Uint8Array; vien: Uint8Array }
+export function taoMatNa(doc: Document | undefined, kiHieu: string): MatNa {
+  const to = new Uint8Array(CHU_T * CHU_T), vien = new Uint8Array(CHU_T * CHU_T)
+  try {
+    const c = doc?.createElement('canvas'), x = c?.getContext('2d')
+    if (c && x) {
+      c.width = c.height = CHU_T
+      x.textAlign = 'center'; x.textBaseline = 'middle'; x.lineJoin = 'round'
+      x.font = `800 ${Math.round(CHU_T * (kiHieu.length > 1 ? 0.6 : 0.74))}px 'Be Vietnam Pro',system-ui,sans-serif`
+      x.lineWidth = CHU_T * 0.12; x.strokeStyle = 'rgb(0,0,0)'; x.strokeText(kiHieu, CHU_T / 2, CHU_T * 0.54)
+      const a = x.getImageData(0, 0, CHU_T, CHU_T).data
+      for (let k = 0; k < CHU_T * CHU_T; k++) vien[k] = a[k * 4 + 3]!
+      x.clearRect(0, 0, CHU_T, CHU_T); x.fillStyle = 'rgb(0,0,0)'; x.fillText(kiHieu, CHU_T / 2, CHU_T * 0.54)
+      const b = x.getImageData(0, 0, CHU_T, CHU_T).data
+      for (let k = 0; k < CHU_T * CHU_T; k++) to[k] = b[k * 4 + 3]!
+    }
+  } catch { /* máy không vẽ chữ được: bi trơn */ }
+  return { to, vien }
 }
-/** Tô ảnh một bi vào `d` (RGBA, N × N). */
-export function toBi(B: Bong, chu: BangChu, id: MaBi, q: Quat, xoay: boolean, d: Uint8ClampedArray): void {
-  const w = q[0], qx = q[1], qy = q[2], qz = q[3]
+const DO_CHAM = [206, 32, 44] as const
+/** Tô ảnh một bi ĐANG LĂN vào `d` (RGBA, N × N). `q`: hướng quay (quaternion); `chu`: mặt nạ kí hiệu (bi cái: null). */
+export function toBiLan(B: Bong, kieu: KieuBi, chu: MatNa | null, q: readonly [number, number, number, number], xoay: boolean, d: Uint8ClampedArray): void {
+  const w = q[0], qx = q[1], qy = q[2], qz = q[3], TR = MAU_BI.trang
   const m00 = 1 - 2 * (qy * qy + qz * qz), m01 = 2 * (qx * qy - w * qz), m02 = 2 * (qx * qz + w * qy), m10 = 2 * (qx * qy + w * qz), m11 = 1 - 2 * (qx * qx + qz * qz), m12 = 2 * (qy * qz - w * qx), m20 = 2 * (qx * qz - w * qy), m21 = 2 * (qy * qz + w * qx), m22 = 1 - 2 * (qx * qx + qy * qy)
-  const la = id === 'cue', n = la ? null : NT[id], kl = !!n && n.nhom === 'kl', soc = !!n && n.nhom === 'pk', base = la ? TRANG : n!.rgb
-  const tx = la ? null : chu[id as KiHieu] ?? null, Tt = CHU_T, SD = 0.5103, N = B.N
+  const la = kieu === 'cai', base = kieu === 'ta' ? MAU_BI.ta : kieu === 'dich' ? MAU_BI.dich : kieu === 'chot' ? MAU_BI.den : TR
+  const Tt = CHU_T, SD = 0.5103, N = B.N
   for (let k = 0; k < N * N; k++) {
     const al = B.al[k]!, o = k * 4
     if (al <= 0) { d[o + 3] = 0; continue }
@@ -69,22 +126,26 @@ export function toBi(B: Bong, chu: BangChu, id: MaBi, q: Quat, xoay: boolean, d:
     const nz = B.nz[k]!
     if (xoay) { const t = nx; nx = ny; ny = -t }
     const lx = m00 * nx + m10 * ny + m20 * nz, ly = m01 * nx + m11 * ny + m21 * nz, lz = m02 * nx + m12 * ny + m22 * nz
-    let r: number = base[0], g: number = base[1], bl: number = base[2], kim = kl
+    let r: number = base[0], g: number = base[1], bl: number = base[2]
     if (la) { if (lx > 0.972 || lx < -0.972 || ly > 0.972 || ly < -0.972 || lz > 0.972 || lz < -0.972) { r = DO_CHAM[0]; g = DO_CHAM[1]; bl = DO_CHAM[2] } }
     else {
       const ax = lx < 0 ? -lx : lx
-      if (ax > 0.874) {
+      if (kieu === 'dich' && (ly > 0.6 || ly < -0.6)) { r = TR[0]; g = TR[1]; bl = TR[2] } // dải đỏ cam quanh xích đạo chứa hai ô kí hiệu (±x) — lúc nằm yên ở dáng gốc là dải NGANG như ảnh vẽ sẵn
+      if (ax > 0.874 && chu) {
+        if (kieu === 'chot') { r = TR[0]; g = TR[1]; bl = TR[2] }
         let u = lz / SD
         const v = ly / SD
         if (lx < 0) u = -u
         const tu = ((u * 0.5 + 0.5) * (Tt - 1)) | 0, tv = ((v * 0.5 + 0.5) * (Tt - 1)) | 0
-        const a = tx && tu >= 0 && tv >= 0 && tu < Tt && tv < Tt ? tx[tv * Tt + tu]! / 255 : 0
-        r = TRANG[0] + (MUC_SO[0] - TRANG[0]) * a; g = TRANG[1] + (MUC_SO[1] - TRANG[1]) * a; bl = TRANG[2] + (MUC_SO[2] - TRANG[2]) * a; kim = false
-      } else if (ax > 0.86) { r = g = bl = 60; kim = false }
-      else if (soc && (lz > 0.5 || lz < -0.5)) { r = TRANG[0]; g = TRANG[1]; bl = TRANG[2] }
+        if (tu >= 0 && tv >= 0 && tu < Tt && tv < Tt) {
+          const vi = chu.vien[tv * Tt + tu]! / 255 * 0.7, to = chu.to[tv * Tt + tu]! / 255
+          if (kieu === 'chot') { r += (23 - r) * to; g += (23 - g) * to; bl += (26 - bl) * to }
+          else { r -= r * vi; g -= g * vi; bl -= bl * vi; r += (255 - r) * to; g += (255 - g) * to; bl += (255 - bl) * to }
+        }
+      }
     }
-    if (kim) { const km = B.km[k]!, ks = B.ks[k]!; d[o] = r * km + ks * (150 + 0.42 * r); d[o + 1] = g * km + ks * (150 + 0.42 * g); d[o + 2] = bl * km + ks * (150 + 0.42 * bl) }
-    else { const sh = B.sh[k]!, sp = B.sp[k]! * 255; d[o] = r * sh + sp; d[o + 1] = g * sh + sp; d[o + 2] = bl * sh + sp }
+    const sh = B.sh[k]!, sp = B.sp[k]! * 255
+    d[o] = r * sh + sp; d[o + 1] = g * sh + sp; d[o + 2] = bl * sh + sp
     d[o + 3] = al * 255
   }
 }

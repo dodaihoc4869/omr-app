@@ -11,19 +11,20 @@ import TraLoiCau from './TraLoiCau'
 import { CongTacMatThan } from './mat-than-luon'
 import type { CauBia, LoaiVan } from './dieu-khien'
 import type { CheDo } from './luat'
-import { CHOT, NT, mauCss } from './nguyen-to'
-import { qMul, qTruc } from './vat-ly'
+import { CHOT } from './nguyen-to'
 import { veBiMau } from './ve-ban'
+import { CaiDatDieuKhien } from './DieuKhienBia'
+import type { KieuBi } from './nguyen-to'
 import './bi-a.css'
 
 export interface BiaGameProps { token: string; hoTen: string; onVe: () => void }
 interface VanDangChoi { van: string; session: string | null; cheDo: CheDo; loai: LoaiVan; cauEm: CauBia[]; chot: CauBia | null; khoa: number }
-const Q_MAU = qMul(qTruc(1, 0, 0, -0.35), qMul(qTruc(0, 0, 1, 0.25), qTruc(0, 1, 0, Math.PI / 2 + 0.3)))
 
-function BiMau({ id }: { id: 'Na' | 'Cl' | 'C' }) {
+/** Chú giải kiểu bi (thầy chốt 30/09): vẽ bằng ĐÚNG hàm vẽ bi của bàn — bi của em lam đặc, bi đối thủ sọc đỏ cam, Bi chốt đen vòng trắng. */
+function BiMau({ id, kieu, chu }: { id: 'Fe' | 'O' | 'C'; kieu: KieuBi; chu: string }) {
   const ref = useRef<HTMLCanvasElement>(null)
-  useEffect(() => { if (ref.current) try { veBiMau(ref.current, id, Q_MAU) } catch { /* máy không vẽ được: bỏ qua */ } }, [id])
-  return <canvas ref={ref} width={64} height={64} role="img" aria-label={`Bi ${id} (${NT[id].ten})`} style={{ background: 'transparent', borderRadius: '50%', boxShadow: `0 0 0 2px ${mauCss(id)}` }} />
+  useEffect(() => { if (ref.current) try { veBiMau(ref.current, kieu, id) } catch { /* máy không vẽ được: bỏ qua */ } }, [id, kieu])
+  return <span className="bia-bi-mau-o"><canvas ref={ref} width={44} height={44} aria-hidden="true" /><span>{chu}</span></span>
 }
 
 // Biểu tượng 3 nhóm chế độ ở Sảnh (nét vẽ, theo màu chữ của ô biểu tượng).
@@ -120,7 +121,7 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
             <div className="bia-ten"><b>Bi-a Phản Ứng</b><span>Kim loại đấu Phi kim · mỗi bi một câu</span></div>
             <span style={{ width: 44 }} />
           </header>
-          <div className="bia-bi-mau" aria-hidden="true"><BiMau id="Na" /><BiMau id="Cl" /><BiMau id={CHOT as 'C'} /></div>
+          <div className="bia-bi-mau"><BiMau id="Fe" kieu="ta" chu="Bi của em" /><BiMau id="O" kieu="dich" chu="Bi đối thủ" /><BiMau id={CHOT as 'C'} kieu="chot" chu="Bi chốt" /></div>
           {!sanh && !loi && <p className="bia-chu-nho" role="status" style={{ textAlign: 'center' }}>Đang mở bàn…</p>}
           {loi && <div className="bia-the"><p className="bia-loi" role="alert">{loi}</p><button type="button" className="bia-nut-phu" onClick={() => void napSanh()}>Thử lại</button></div>}
           {sanh && <>
@@ -189,6 +190,7 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
                     : <p className="bia-chu-nho">Chưa có bạn nào đang ở Sảnh Bi-a. Em mở bàn rồi đọc mã cho bạn ngồi cạnh nhé.</p>}
                 </div>}
                 <CongTacMatThan />
+                <div className="bia-the bia-cai-dat" aria-label="Điều khiển"><CaiDatDieuKhien /></div>
                 <details className="bia-the bia-luat">
                   <summary>Luật nhanh</summary>
                   <p className="bia-chu-nho">Bi của phe em rơi lỗ thì người giữ bi trả lời câu của bi, đúng mới ăn. Sai là sang lượt người khác ngay, em đọc lời giải. Lúc người khác đánh: giải trước bi của em (đúng thì bi hoá vàng) hoặc xem lại câu sai. Ăn đủ 7 bi rồi hạ Bi chốt carbon và trả lời Câu chốt để thắng.</p>

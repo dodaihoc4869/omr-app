@@ -139,7 +139,7 @@ export class VanMang extends VanBia {
       if (su.ghe !== this.em) this.ptNhanh(su.dung ? `${this.ten(su.ghe)} giải trước bi ${su.ki}: đúng, bi hoá vàng` : `${this.ten(su.ghe)} giải trước bi ${su.ki}: chưa đúng`)
     } else if (su.k === 'het_gio') this.bao(`Hết ${GIAY_CU} giây`, `Sang lượt ${this.ghe[S.cur]!.ten}`, '', 1400)
     else if (su.k === 'ghe_ai') this.bao(`${this.ghe[su.ghe]!.ten} ${su.lyDo === 'bo' ? 'đã rời ván' : 'mất kết nối quá 60 giây'}`, 'A.I đánh thay ghế này · ván không tính Điểm bàn', '', 2200)
-    if (S.cur === this.em && curCu !== this.em && !S.over && !S.cho.length) { this.sk.am('luot'); this.bao('Lượt của em', this.ballInHand ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Cầm gậy kéo để xoay', '', 1300) }
+    if (S.cur === this.em && curCu !== this.em && !S.over && !S.cho.length) { this.sk.am('luot'); this.bao('Lượt của em', this.ballInHand ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Kéo trên bàn để xoay gậy', '', 1300) }
   }
   private hieuUngAn(id: KiHieu): void {
     const v = this.viTriLo[id] ?? { x: W / 2, y: H / 2 }, x = Math.max(30, Math.min(W - 30, v.x)), y = Math.max(40, Math.min(H - 20, v.y))
@@ -246,6 +246,8 @@ export class VanMang extends VanBia {
     this.dongBo(g)
     while (this.hangCho.length && !this.dangVe) this.apTT(this.hangCho.shift()!)
   }
+  /** Đấu online giữ đồng hồ 30 giây mỗi cú (phòng đấu giữ giờ thật; màn chơi chỉ HIỆN khi còn ≤ 10 giây). */
+  override coDongHo(): boolean { return true }
   /** Đồng hồ chỉ để HIỆN (phòng giữ giờ thật, hết giờ phòng tự sang lượt). */
   protected override buocDongHo(dt: number): void {
     if (this.pha === 'over' || this.pha === 'moving' || this.pha === 'xet' || this.pha === 'cau') return

@@ -1,12 +1,14 @@
 // BI-A · ĐIỆN THOẠI XOAY NGANG, BÀN TOÀN MÀN (thầy lệnh 29/09: "khi xoay ngang màn hình cả bàn bi a full ngang giống điện thoại để hs bắn cho dễ").
 // Hàm thuần `hopBanNgang`: bàn nằm ngang, đúng tỉ lệ, to nhất, KHÔNG tràn lề an toàn (tai thỏ / thanh home) và chừa đúng một cột nút mỗi bên;
-// vùng bắt gậy / bi cái đủ to cho ngón tay theo cỡ bàn MỚI; CSS dùng đúng hai số COT_NGANG / LE_NGANG; màn chơi ở khung ngang có
-// ngăn kéo "Bi của em", nút Mắt thần, nút Toàn màn hình (gợi ý "Thêm vào màn hình chính" khi trình duyệt không cho).
+// vùng bắt bi cái đủ to cho ngón tay theo cỡ bàn MỚI; CSS dùng đúng hai số COT_NGANG / LE_NGANG; màn chơi ở khung ngang có
+// nút Mắt thần, Toàn màn hình trong "Tuỳ chỉnh" (gợi ý "Thêm vào màn hình chính" khi trình duyệt không cho).
+// Sửa 30/09 (thầy chốt "Bàn Bi-a mới"): bỏ vùng bắt THÂN GẬY (kéo đâu trên bàn cũng xoay gậy), bỏ ngăn kéo "Bi của em" (thay bằng hàng chấm),
+// nút Toàn màn hình chuyển vào "Tuỳ chỉnh" (cột trái theo bản vẽ: Sảnh · Mắt thần · Âm thanh · Tuỳ chỉnh · bánh xe).
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
 import { COT_NGANG, LE_NGANG, hopBanNgang, raMan, toaDoBan, chonBoCuc } from '../src/game/bi-a/bo-cuc'
-import { banKinhBatBiCai, nuaBeRongBat, trungGay } from '../src/game/bi-a/gay'
+import { banKinhBatBiCai } from '../src/game/bi-a/gay'
 import { H, R, T, W } from '../src/game/bi-a/vat-ly'
 import ManChoi from '../src/game/bi-a/ManChoi'
 import { datBoGoiBia } from '../src/game/bi-a/api'
@@ -52,21 +54,12 @@ describe('hopBanNgang: bàn nằm ngang, to nhất, không tràn lề an toàn',
   })
 })
 
-describe('vùng bắt gậy / bi cái theo cỡ bàn mới', () => {
+describe('vùng bắt bi cái theo cỡ bàn mới', () => {
   for (const [vw, vh, an] of CO) {
-    it(`${vw}×${vh}: nửa bề rộng bắt gậy ≥ 22 px, bán kính bắt bi cái ≥ 30 px; chạm cách trục gậy 20 px vẫn cầm được`, () => {
+    it(`${vw}×${vh}: bán kính bắt bi cái ≥ 30 px`, () => {
       const k = hopBanNgang(vw, vh, an)
-      expect(nuaBeRongBat(k.S) * k.S).toBeGreaterThanOrEqual(22 - 1e-9)
       expect(banKinhBatBiCai(k.S) * k.S).toBeGreaterThanOrEqual(30 - 1e-9)
       expect(banKinhBatBiCai(k.S)).toBeGreaterThanOrEqual(R * 2.4)
-      // bi cái giữa bàn, nhắm lên (y âm) ⇒ thân gậy nằm phía dưới; chạm lệch trục 20 px CSS trên màn ngang
-      const c = { x: 250, y: 600 }, aim = { x: 0, y: -1 }
-      const [sx, sy] = raMan(k, 1, c.x, c.y + 150) // một điểm trên thân gậy, ra toạ độ màn
-      // bàn ngang: trục y bàn ↦ trục x màn ⇒ lệch trục gậy là lệch theo y màn
-      const p = toaDoBan(k, sx, sy + 20)
-      expect(trungGay(c, aim, 0, p, nuaBeRongBat(k.S))).toBe(true)
-      const xa = toaDoBan(k, sx, sy + 40)
-      expect(trungGay(c, aim, 0, xa, nuaBeRongBat(k.S))).toBe(false)
     })
   }
   it('đổi toạ độ màn ⇄ bàn khớp nhau ở khung ngang', () => {
@@ -90,9 +83,9 @@ describe('CSS xoay ngang dùng đúng số của bo-cuc.ts', () => {
     for (const phia of ['top', 'right', 'bottom', 'left']) expect(khoi).toContain(`max(${LE_NGANG}px,env(safe-area-inset-${phia},0px))`)
     expect(khoi).toContain(".bia[data-bo-cuc='ngang'] .bia-ban{position:absolute;inset:0;padding:var(--an-t) calc(var(--an-p) + var(--cot)) var(--an-d) calc(var(--an-tr) + var(--cot));touch-action:none}")
   })
-  it('ngăn kéo cuộn được và không kéo cả trang; tôn trọng giảm chuyển động', () => {
-    expect(khoi).toMatch(/\.bia-ngan\{[^}]*overscroll-behavior:contain/)
-    expect(khoi).toMatch(/prefers-reduced-motion:reduce\)\{\.bia\[data-bo-cuc='ngang'\] \.bia-ngan/)
+  it('tấm Tuỳ chỉnh cuộn được và không kéo cả trang; hướng dẫn tôn trọng giảm chuyển động', () => {
+    expect(css).toMatch(/\.bia-pop-tuy\{[^}]*overscroll-behavior:contain/)
+    expect(css).toMatch(/prefers-reduced-motion:reduce\)\{\.bia-huong-dan \.ngon\{animation:none/)
   })
 })
 
@@ -118,18 +111,13 @@ describe('Màn chơi khi điện thoại xoay ngang', () => {
     expect(goc.hasAttribute('data-toan')).toBe(false)
     expect(screen.getByRole('slider', { name: /Lực đánh/ })).toBeTruthy()
   })
-  it('"Bi của em" mở/đóng ngăn kéo; bắn (bi lăn) thì ngăn kéo tự đóng', async () => {
+  it('không còn nút/ngăn kéo "Bi của em": thay bằng hàng chấm (bi em trái, đối thủ phải)', () => {
     const { container } = ve()
-    const nut = screen.getByRole('button', { name: 'Bi của em' })
-    const ngan = container.querySelector('#bia-ngan')!
-    expect(nut.getAttribute('aria-controls')).toBe('bia-ngan')
-    expect(ngan.hasAttribute('data-mo')).toBe(false)
-    fireEvent.click(nut)
-    expect(ngan.hasAttribute('data-mo')).toBe(true)
-    expect(nut.getAttribute('aria-expanded')).toBe('true')
-    const v = van()
-    await act(async () => { v.pha = 'moving'; (v as unknown as { doi: () => void }).doi() })
-    expect(ngan.hasAttribute('data-mo')).toBe(false)
+    expect(screen.queryByRole('button', { name: 'Bi của em' })).toBeNull()
+    expect(container.querySelector('#bia-ngan')).toBeNull()
+    const hai = screen.getByRole('region', { name: 'Hai phe' })
+    expect(hai.querySelectorAll('i[data-kieu="ta"]')).toHaveLength(7)
+    expect(hai.querySelectorAll('i[data-kieu="dich"]')).toHaveLength(7)
   })
   it('nút Mắt thần bật/tắt "Luôn bật Mắt thần"', () => {
     ve()
@@ -143,6 +131,7 @@ describe('Màn chơi khi điện thoại xoay ngang', () => {
     const { container } = ve()
     const goc = container.querySelector('.bia') as HTMLElement & { requestFullscreen?: unknown }
     Object.defineProperty(goc, 'requestFullscreen', { value: undefined, configurable: true })
+    fireEvent.click(screen.getByRole('button', { name: 'Tuỳ chỉnh' }))
     fireEvent.click(screen.getByRole('button', { name: 'Toàn màn hình' }))
     expect(van().thongBao?.phu).toBe('Thêm vào màn hình chính để chơi toàn màn hình')
     expect(container.querySelector('.bia')!.hasAttribute('data-toan')).toBe(false)
@@ -154,6 +143,7 @@ describe('Màn chơi khi điện thoại xoay ngang', () => {
     Object.defineProperty(goc, 'requestFullscreen', { value: xin, configurable: true })
     const khoa = vi.fn(() => Promise.resolve())
     Object.defineProperty(screen0(), 'orientation', { value: { lock: khoa }, configurable: true })
+    fireEvent.click(screen.getByRole('button', { name: 'Tuỳ chỉnh' }))
     fireEvent.click(screen.getByRole('button', { name: 'Toàn màn hình' }))
     await act(async () => { await Promise.resolve(); await Promise.resolve() })
     expect(xin).toHaveBeenCalledWith({ navigationUI: 'hide' })

@@ -38,3 +38,18 @@ export const laKiHieu = (x: unknown): x is KiHieu => typeof x === 'string' && Ob
 /** Màu nhãn chỉ bi theo quan hệ với em (đặc tả 3.11). */
 export type QuanHe = 'em' | 'dong-doi' | 'doi-thu' | 'chot'
 export const MAU_QH: Readonly<Record<QuanHe, string>> = { em: 'rgb(91,240,165)', 'dong-doi': 'rgb(127,200,255)', 'doi-thu': 'rgb(255,138,138)', chot: 'rgb(255,214,107)' }
+
+/**
+ * KIỂU BI THEO GÓC NHÌN (thầy chốt bản vẽ "Bàn Bi-a mới" 30/09: "nhìn là biết bi của mình"). Mỗi máy tự vẽ theo người đang xem:
+ * bi phe MÌNH (kể cả đồng đội khi đánh đôi) luôn kiểu `ta` — lam, thân đặc; bi phe ĐỐI THỦ luôn kiểu `dich` — nền trắng, dải đỏ cam giữa
+ * (bi sọc) — bất kể phe Kim loại hay Phi kim. Khác cả màu lẫn hoa văn để mắt mù màu đỏ–lục vẫn phân biệt. Bi chốt đen vòng trắng; bi cái trắng.
+ */
+export type KieuBi = 'ta' | 'dich' | 'chot' | 'cai'
+export function kieuBi(id: KiHieu | 'cue', doiEm: 0 | 1): KieuBi {
+  if (id === 'cue') return 'cai'
+  if (id === CHOT) return 'chot'
+  return doiCuaBi(id) === doiEm ? 'ta' : 'dich'
+}
+/** Bảng màu vẽ bi (canvas; số rgb, KHÔNG mã hex — check:mau). CSS dùng đúng các số này qua biến `--b-bi-*` ở bi-a.css (test khoá). */
+export const MAU_BI = { ta: [46, 140, 255], taSang: [159, 208, 255], dich: [255, 106, 58], trang: [251, 247, 238], den: [23, 23, 26], vang: [255, 200, 58] } as const
+export const rgbCss = (c: readonly number[]): string => `rgb(${c.join(',')})`

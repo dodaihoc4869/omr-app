@@ -277,13 +277,11 @@ export class VanBia {
     const a = Math.max(0, Math.min(1, this.acc / HS)), x0 = this.viTruoc[2 * i]!, y0 = this.viTruoc[2 * i + 1]!
     ra.x = x0 + (b.x - x0) * a; ra.y = y0 + (b.y - y0) * a
   }
-  protected buocDongHo(dt: number): void {
-    if (this.nguoiDuocDanh()) {
-      this.time -= dt * this.nhan
-      if (this.time <= 5 && this.time > 0) { const s = Math.ceil(this.time); if (s !== this.tich) { this.tich = s; this.sk.am('tich') } }
-      if (this.time <= 0) { this.time = 0; this.bao(`Hết ${GIAY_CU} giây`, `Sang lượt ${this.ghe[tiepTheo(this.cur, this.ghe.length)]!.ten}`, '', 1400); this.doiLuot(false, 300) }
-    }
-  }
+  /** Có đồng hồ 30 giây mỗi cú không. Thầy duyệt 30/09: ván với A.I (đấu đơn, đánh đôi) và Bàn giao hữu KHÔNG giới hạn giờ mỗi cú;
+   *  chỉ đấu online (VanMang — phòng đấu giữ giờ thật, luật không đổi) còn 30 giây. */
+  coDongHo(): boolean { return false }
+  /** Ván A.I / giao hữu: không đếm giờ cú (đồng hồ bỏ). Máy chủ không kiểm hạn giờ cú của ván A.I (chỉ ghi số cú ở `bia-ket-van`). */
+  protected buocDongHo(_dt: number): void {}
   protected buocHieuUng(dt: number): void {
     if (this.pha !== 'over' && this.pha !== 'cho' && this.loai !== 'giao_huu') {
       this.aiGiaiT += dt * this.nhan
@@ -367,7 +365,7 @@ export class VanBia {
       if (this.pha === 'over') return
       this.cur = tiepTheo(this.cur, this.ghe.length); this.ballInHand = datBiCai; this.spin = { x: 0, y: 0 }
       const me = this.ghe[this.cur]!
-      if (!me.ai) this.bao('Lượt của em', datBiCai ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Cầm gậy kéo để xoay', '', 1300)
+      if (!me.ai) this.bao('Lượt của em', datBiCai ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Kéo trên bàn để xoay gậy', '', 1300)
       else this.bao(`Lượt của ${me.ten}`, me.doi === this.ghe[this.em]!.doi ? 'Đồng đội đang đánh · em giải trước được' : this.loai === 'giao_huu' ? '' : 'Chạm ô ở hàng “Bi của em” để giải trước', '', 1500)
       this.sk.am('luot')
       this.batDauLuot(true)

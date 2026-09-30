@@ -20,28 +20,47 @@ export class AmThanhBia {
     this.taoCtx = taoCtx
     this.tat = battleMuted()
   }
-  /** Tạo/mở khoá ngữ cảnh — gọi trong thao tác chạm/phím. */
+  /** Tạo/mở khoá ngữ cảnh — gọi trong thao tác chạm/phím. Đã `chuanBi` từ trước ⇒ chỉ còn `resume` (nhẹ). */
   mo(): void {
     try {
-      if (!this.ctx) {
-        const c = this.taoCtx()
-        if (!c) return
-        this.ctx = c
-        const len = c.sampleRate, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0)
-        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1
-        this.noise = buf
-        const nen = c.createDynamicsCompressor()
-        nen.threshold.value = -14; nen.knee.value = 12; nen.ratio.value = 4; nen.attack.value = 0.003; nen.release.value = 0.15
-        nen.connect(c.destination)
-        this.master = c.createGain(); this.master.gain.value = this.tat ? 0 : 0.9; this.master.connect(nen)
-        const rl = Math.floor(c.sampleRate * 0.9), ir = c.createBuffer(2, rl, c.sampleRate)
-        for (let ch = 0; ch < 2; ch++) { const x = ir.getChannelData(ch); for (let i = 0; i < rl; i++) { const t = i / c.sampleRate; x[i] = (Math.random() * 2 - 1) * Math.exp(-t * 6.5) * (t < 0.012 ? t / 0.012 : 1) } }
-        this.rv = c.createConvolver(); this.rv.buffer = ir
-        const rg = c.createGain(); rg.gain.value = 0.16; this.rv.connect(rg); rg.connect(this.master)
-        // Không có tiếng lăn trên nỉ (thầy bỏ hẳn 28/09): bi đang lăn thì im, chỉ phát tiếng va chạm / rơi lỗ / tín hiệu.
-      }
-      if (this.ctx.state === 'suspended') void this.ctx.resume().catch(() => {})
+      if (!this.ctx && !this.taoNen()) return
+      if (!this.rv) this.taoVang()
+      if (this.ctx!.state === 'suspended') void this.ctx!.resume().catch(() => {})
     } catch { /* âm thanh không bao giờ chặn ván */ }
+  }
+  /**
+   * Dựng sẵn ngữ cảnh + tiếng ồn + vang phòng NGOÀI thao tác chạm (máy yếu 30/09): đo CPU chậm 6× thấy lần chạm bàn ĐẦU TIÊN có long task
+   * 150–350 ms do dựng phần này trong `mo()` (có sẵn từ trước). Ngữ cảnh tạo lúc chưa chạm thì ở trạng thái "suspended" — chạm đầu chỉ `resume`.
+   * Chia hai lượt (nền, rồi vang) để mỗi lượt ngắn hơn.
+   */
+  chuanBi(): void {
+    try {
+      if (this.ctx || !this.taoNen()) return
+      const c = this.ctx
+      setTimeout(() => { try { if (this.ctx === c && !this.rv) this.taoVang() } catch { /* bỏ qua */ } }, 250)
+    } catch { /* âm thanh không bao giờ chặn ván */ }
+  }
+  private taoNen(): boolean {
+    const c = this.taoCtx()
+    if (!c) return false
+    this.ctx = c
+    const len = c.sampleRate, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0)
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1
+    this.noise = buf
+    const nen = c.createDynamicsCompressor()
+    nen.threshold.value = -14; nen.knee.value = 12; nen.ratio.value = 4; nen.attack.value = 0.003; nen.release.value = 0.15
+    nen.connect(c.destination)
+    this.master = c.createGain(); this.master.gain.value = this.tat ? 0 : 0.9; this.master.connect(nen)
+    return true
+  }
+  private taoVang(): void {
+    const c = this.ctx
+    if (!c || !this.master || this.rv) return
+    const rl = Math.floor(c.sampleRate * 0.9), ir = c.createBuffer(2, rl, c.sampleRate)
+    for (let ch = 0; ch < 2; ch++) { const x = ir.getChannelData(ch); for (let i = 0; i < rl; i++) { const t = i / c.sampleRate; x[i] = (Math.random() * 2 - 1) * Math.exp(-t * 6.5) * (t < 0.012 ? t / 0.012 : 1) } }
+    this.rv = c.createConvolver(); this.rv.buffer = ir
+    const rg = c.createGain(); rg.gain.value = 0.16; this.rv.connect(rg); rg.connect(this.master)
+    // Không có tiếng lăn trên nỉ (thầy bỏ hẳn 28/09): bi đang lăn thì im, chỉ phát tiếng va chạm / rơi lỗ / tín hiệu.
   }
   datTat(tat: boolean): void {
     this.tat = tat
@@ -124,5 +143,5 @@ export class AmThanhBia {
     }
     return nb + nc
   }
-  dong(): void { try { void this.ctx?.close() } catch { /* bỏ qua */ } this.ctx = null; this.master = null }
+  dong(): void { try { void this.ctx?.close() } catch { /* bỏ qua */ } this.ctx = null; this.master = null; this.rv = null }
 }
