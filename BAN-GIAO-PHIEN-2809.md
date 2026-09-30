@@ -171,3 +171,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 13:12 30/09 · deploy #107 đã xanh (ghi bù)
 - 16:43 30/09 · Boss · merge PR #108 câu kẹt + rải đều (d0b58c0) + PR #109 Bi-a rải theo trần (8f6facf) · main+#108+#109: 656/657 test vùng (1 đỏ nền bi-a-sanh-online), tsc 2 phía sạch · phản biện workflow chưa xong lúc merge (hạn thầy 17:30) · không ca mở · lùi: git revert -m1 8f6facf && git revert -m1 d0b58c0
 - 16:55 30/09 · deploy 8f6facf (#108+#109) xanh (run 606; 605 huỷ, đã gồm)
+
+- 30/09 18:02 VN · phiên chính · gộp PR #111 (Sảnh báo "câu tạm giữ vì ca kiểm tra", sanh2 trả tamGiu) · merge 197c7fb · ca 507646 đã đóng · lùi: git revert -m1 197c7fb
