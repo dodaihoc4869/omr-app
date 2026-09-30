@@ -146,17 +146,14 @@ describe('Tu luyện — câu công khai, chấm ở máy chủ', () => {
     expect(r.ok).toBe(false)
   })
 
-  it('chế độ 1 (Sửa câu sai): gọi dsCauLamLaiCauSai, chỉ câu sai của ca đã chọn, không lộ "đáp án đúng là"', async () => {
+  // SỬA CÓ CHỦ Ý 30/09 (lệnh thầy qua Boss): chế độ 1 đổi luật — kho câu sai từ 29/09 (ca kiểm tra + chiến dịch) trong sổ su_kien_hoc,
+  // không còn đi đường hsCauSai/dsCauLamLaiCauSai. Luật mới khoá ở tests/tu-luyen-sua-cau-sai-3009.test.ts.
+  it('chế độ 1 (Sửa câu sai): không còn gọi dsCauLamLaiCauSai; chưa có câu sai từ 29/09 ⇒ báo rõ, không rút', async () => {
     const d = dung()
-    const r = await tuLuyenRut(d.env, 'HS1', { cheDo: 1, dsMaCa: ['CA-1'] })
-    expect(r.ok).toBe(true)
-    expect(goi.lamLai).toBe(1)
-    expect((r.cau as { qid: string }[]).map((c) => c.qid)).toEqual([`${MA}-I-2`])
-    expect(coDapAnTrongChu(r)).toBe(false)
-    const n = await tuLuyenNop(d.env, 'HS1', { luotId: r.luotId, traLoi: { [`${MA}-I-2`]: 'c' } })
-    expect(n.soDung).toBe(1)
-    const r2 = await tuLuyenRut(d.env, 'HS1', { cheDo: 1, dsMaCa: [] })
-    expect(r2.ok).toBe(false)
+    const r = await tuLuyenRut(d.env, 'HS1', { cheDo: 1, soCau: 5 })
+    expect(r.ok).toBe(false)
+    expect(String(r.error)).toContain('29/09')
+    expect(goi.lamLai).toBe(0)
   })
 
   it('chế độ 2 (Dạng câu sai): xem trước đếm tối đa; rút gọi rutDsThemDangCauSai; không có câu tự luận', async () => {
