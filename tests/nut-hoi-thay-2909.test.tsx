@@ -61,9 +61,15 @@ describe('NutHoiThay', () => {
 describe('KHÔNG có nút Hỏi thầy trong lúc kiểm tra (khoá nguồn)', () => {
   it('màn thi và thẻ câu dùng chung của màn thi không gắn nút / không gọi /hs/hoi-thay', async () => {
     const fs = await import('node:fs')
-    for (const tep of ['src/screens/ExamTakeScreen.tsx', 'src/components/TheCau.tsx']) {
-      const ma = fs.readFileSync(tep, 'utf8')
-      expect(ma, tep).not.toMatch(/NutHoiThay|hoi-thay|hoiThay/)
-    }
+    const ma = fs.readFileSync('src/screens/ExamTakeScreen.tsx', 'utf8')
+    expect(ma).not.toMatch(/NutHoiThay|hoi-thay|hoiThay/)
+    // SỬA CÓ CHỦ Ý 30/09 (thầy: nút chỉ hiện khi lời giải đang hiện): TheCau vẽ nút TRONG khối LỜI GIẢI (chỉ chế độ xem_lai)
+    // và chỉ khi nơi gọi truyền `hoiThay` — màn thi không truyền (kiểm ở trên). Không gọi /hs/hoi-thay trực tiếp.
+    const the = fs.readFileSync('src/components/TheCau.tsx', 'utf8')
+    expect(the).not.toMatch(/hoi-thay/)
+    expect(the).toContain('{xemLai && <LoiGiai props={props}')
+    const lg = the.slice(the.indexOf('function LoiGiai('), the.indexOf('export default function TheCau'))
+    expect(lg).toContain('<NutHoiThay')
+    expect(the.split('<NutHoiThay').length).toBe(2)
   })
 })

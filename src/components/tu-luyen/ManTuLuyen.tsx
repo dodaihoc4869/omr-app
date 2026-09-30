@@ -7,7 +7,6 @@
 // "Chấm từng câu" (nhớ theo máy) ⇒ mỗi câu bấm Kiểm tra, máy chủ chấm + khoá câu, hiện đúng/sai + lời giải + nút Câu tiếp.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import TheCau from '../TheCau'
-import NutHoiThay from '../loi-giai/NutHoiThay'
 import { hoiXacNhan } from '../hop-thoai'
 import '../m3'
 import '../hoa2/phong-baloo'
@@ -416,7 +415,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             <NhanLuyen c={kq ? { ...c, conMotLan: undefined } : c} />
           </div>
           {kq ? (
-            kq.anDapAn ? <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p> : <TheCauXem cau={c} kq={kq} stt={i + 1} />
+            kq.anDapAn ? <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p> : <TheCauXem cau={c} kq={kq} stt={i + 1} onHoi={() => setBai((b) => (b && !b.coGoiY.includes(c.qid) ? { ...b, coGoiY: [...b.coGoiY, c.qid] } : b))} />
           ) : (
             <TheCauLam cau={c} stt={i + 1} giaTri={bai.traLoi[c.qid]} onDoi={(v) => traLoi(c.qid, v)} />
           )}
@@ -432,7 +431,6 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
               )}
             </div>
           )}
-          <NutHoiThay qid={qidGoc(c.qid)} nguon="tu_luyen" gon onHoi={() => setBai((b) => (b && !b.coGoiY.includes(c.qid) ? { ...b, coGoiY: [...b.coGoiY, c.qid] } : b))} />
         </article>
       )
     })
@@ -964,9 +962,11 @@ function TheCauLam({ cau: c, stt, giaTri, onDoi }: { cau: CauCongKhai; stt: numb
 }
 
 /** Một câu SAU NỘP: TheCau `xem_lai` — đáp án đúng (máy chủ chấm) + lời giải chuẩn. */
-function TheCauXem({ cau: c, kq, stt }: { cau: CauCongKhai; kq: KetQuaCau | undefined; stt: number }) {
+function TheCauXem({ cau: c, kq, stt, onHoi }: { cau: CauCongKhai; kq: KetQuaCau | undefined; stt: number; onHoi?: () => void }) {
   const chung = {
     cheDo: 'xem_lai' as const,
+    // Hỏi thầy nằm trong khối lời giải của TheCau (thầy lệnh 30/09: chỉ hiện khi lời giải đang hiện).
+    hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen', onHoi, gon: true },
     stt,
     text: chiSoDuoiRo(c.text),
     thanCauImg: c.anhThanCau,
@@ -1065,7 +1065,6 @@ function ManKetQua({ boCuc, kq, cau, onVe, onLuyenTiep, onTongHop }: { boCuc: Bo
             <TheCauXem cau={c} kq={k} stt={i + 1} />
           )}
           {k?.khacPhuc && <p className="tlu-khac-phuc" data-dung={k.dung ? 'true' : 'false'}>{k.khacPhuc}</p>}
-          <NutHoiThay qid={qidGoc(c.qid)} nguon="tu_luyen" gon />
         </article>
       ))}
     </div>
