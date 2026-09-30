@@ -33,7 +33,8 @@ async function dung(o: { caSai?: boolean } = {}) {
     const sk = d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES (?,?,?,'thi','C1',1,0,30,?,?)")
     for (let i = 1; i <= 5; i++) sk.run(`thi|C1|S1|X${i}`, 'S1', `X${i}`, hqua, hqua.slice(0, 10))
   }
-  expect((await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: '2026-12-30' }, Date.now() - 3 * NGAY)).ok).toBe(true)
+  // raiDeu:false (30/09): test này kiểm Bi-a với kế hoạch đổ đầy thể lực (hạn xa ⇒ rải đều chỉ 1 câu/ngày, bàn không đủ bi)
+  expect((await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: '2026-12-30', raiDeu: false }, Date.now() - 3 * NGAY)).ok).toBe(true)
   const token = await gameToken(env, 'S1')
   await gameV2(env, 'choose', { token, pet: 'dat_quy' })
   const ban = await biaAction(env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, Date.now())

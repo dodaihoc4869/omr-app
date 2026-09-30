@@ -20,6 +20,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Thời điểm cuối được nộp | **Hạn nộp** | deadline, mốc, hạn chót |
 | Buổi kiểm tra trên app | **Ca kiểm tra** ở CẢ BA APP (cập nhật 21/09: màn Mở ca + Theo dõi ca của thầy cũng đã đổi, vì app thầy vốn dùng "ca kiểm tra" nhiều hơn "ca thi" — một khái niệm một từ). GIỮ NGUYÊN các chữ thầy đã chốt ở luồng thi: "Bắt đầu thi", "Cho thi lại", "Vào thi", và mọi câu cảnh báo của màn thi thật (test khoá) | ca thi (chữ hiển thị), đợt thi, bài thi |
 | Câu cả lớp cùng làm | **Câu cốt lõi** | lõi, core |
+| Công tắc chia câu mới theo số ngày của chiến dịch (app thầy, 30/09) | **Rải đều câu mới** ("Rải đều câu mới theo ngày", trạng thái Bật/Tắt; tắt = "Câu mới đổ theo sức") | quota, rai_deu, phân bổ, spread |
 | Câu chọn riêng cho em | **Câu dành riêng cho em** | riêng, cá nhân hoá |
 | Câu cao hơn bậc của em | **Câu thử thách (sai không sao)** · **Thử sức thêm (không bắt buộc)** | loi_cao, bonus |
 | Ba mức của một dạng | Bậc thang của em (BTVN nâng đỡ): **bậc Biết · Hiểu · Vận dụng**. Nhãn mức độ của CÂU trên phiếu/đề: **Nhận biết · Thông hiểu · Vận dụng** (chữ quen của chương trình) | NB/TH/VD, bậc 0/1/2 |

@@ -36,6 +36,8 @@ export interface ChienDichTom {
   sapBatDau?: boolean
   /** Số liệu lớp (chỉ khi xin `thongKe`; máy chủ cũ / quá 20 chiến dịch mới nhất ⇒ vắng hoặc null). */
   thongKe?: ThongKeChienDich | null
+  /** Rải đều câu mới theo ngày (thầy 30/09): câu mới/ngày dừng đúng quota, lượt dư để ôn. Máy chủ cũ vắng ⇒ coi là BẬT. */
+  raiDeu?: boolean
 }
 
 /** Số liệu lớp gọn của một chiến dịch — bảng "Chiến dịch đã giao" (bản vẽ GV-ChienDichDaGiao 28/09). */
@@ -87,6 +89,9 @@ export interface SucChua {
   soEmQuaTai: number
   /** Sổ nợ 29/09: em có nợ cũ cần nhiều ngày để trả hết (máy chủ cũ không có). */
   noCu?: DongNoCu[]
+  /** Rải đều câu mới (30/09): cờ đã gửi lên + ≈ số câu mới mỗi ngày của em giữa lớp = ceil(câu mới / (D − 3)); máy chủ cũ không có. */
+  raiDeu?: boolean
+  cauMoiMoiNgay?: number | null
   goiY: { rutCon: { soCau: number; tiLe: number } | null; luiHan: { hanNop: string; tiLe: number } | null } | null
 }
 
@@ -101,6 +106,8 @@ export interface DauVaoGiao {
   batDau?: string
   theLucNgay?: number
   huyetChien?: boolean
+  /** Rải đều câu mới theo ngày (thầy 30/09). Vắng ⇒ máy chủ coi là BẬT. */
+  raiDeu?: boolean
   maCa?: string
   /** Trường cũ của máy chủ (rút bớt số câu) — giao diện KHÔNG còn nút này (thầy 28/09); giữ kiểu để khớp hợp đồng API. */
   rutCon?: number
@@ -227,6 +234,8 @@ export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lo
 export const tinhSucChua = (dv: DauVaoGiao) => goiChienDich<SucChua>('suc-chua', { ...dv })
 export const taoChienDich = (dv: DauVaoGiao & { ten: string }) => goiChienDich<{ id: string; soCau: number; soEm: number }>('tao', { ...dv })
 export const huyChienDich = (id: string) => goiChienDich<{ ok: true }>('huy', { id })
+/** Công tắc rải đều câu mới trên chiến dịch đang chạy (thầy 30/09) — có hiệu lực từ kế hoạch ngày kế tiếp. */
+export const doiRaiDeu = (id: string, bat: boolean) => goiChienDich<{ id: string; raiDeu: boolean }>('rai-deu', { id, bat })
 export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', { id })
 export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
 export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', coMat && coMat.length ? { id, coMat } : { id })

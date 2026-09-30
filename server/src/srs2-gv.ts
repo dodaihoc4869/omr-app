@@ -7,9 +7,9 @@ import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
-import { hangTuTiLe, khoiLuongCan, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
+import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
-import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
+import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -29,6 +29,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
     if (action === 'chan-doan-em') return chanDoanEm(env, str(b.sbd).trim(), nowMs)
     if (action === 'tao') return tao(env, b, nowMs)
     if (action === 'dong' || action === 'huy') return doiTrangThai(env, str(b.id), action === 'dong' ? 'da_dong' : 'da_huy', nowMs)
+    if (action === 'rai-deu') return await doiRaiDeu(env, str(b.id), b.bat !== false, nowMs, str(b.nguoi)) // await để lỗi "không tìm thấy" về { ok:false }
     if (action === 'bang') return bang(env, str(b.id), nowMs)
     if (action === 'buoi-chua') return buoiChua(env, str(b.id), nowMs, mangChuoi(b.coMat))
     if (action === 'chua-xong') return chuaXong(env, str(b.id), mangChuoi(b.qids), nowMs)
@@ -270,7 +271,7 @@ export function theLucDeXuat(klGiua: number, klNangNhat: number, D: number): num
   return Math.min(THE_LUC_TOI_DA, Math.max(10, Math.ceil(klGiua / (0.7 * D)), Math.ceil(klNangNhat / D)))
 }
 
-interface DauVaoGiao { ten: string; lop: string | null; sbd: string[]; maDe: string[]; hanNop: string; theLucNgay: number; huyetChien: boolean; maCa: string | null; batDau: string | null }
+interface DauVaoGiao { ten: string; lop: string | null; sbd: string[]; maDe: string[]; hanNop: string; theLucNgay: number; huyetChien: boolean; maCa: string | null; batDau: string | null; /** Rải đều câu mới theo ngày (thầy 30/09): vắng ⇒ BẬT. */ raiDeu: boolean }
 /**
  * NGÀY BẮT ĐẦU (thầy 28/09): vắng / trống ⇒ `null` (bắt đầu ngay lúc giao, như cũ). Không trước hôm nay, không sau hạn nộp.
  * Trả `null` khi đúng hôm nay (không cần lưu dòng phụ).
@@ -297,7 +298,7 @@ async function docDauVao(env: Env, b: Row, nowMs: number): Promise<DauVaoGiao> {
   const theLucNgay = Math.max(1, Math.min(THE_LUC_TOI_DA, Math.floor(Number(b.theLucNgay) || TRAN_NGAY)))
   const homNay = ngayVnCua(nowMs)
   const batDau = hanNop < homNay ? null : kiemBatDau(b.batDau, homNay, hanNop)
-  return { ten: str(b.ten).trim() || 'Chiến dịch luyện', lop, sbd, maDe, hanNop, theLucNgay, huyetChien: b.huyetChien !== false, maCa: str(b.maCa).trim() || null, batDau }
+  return { ten: str(b.ten).trim() || 'Chiến dịch luyện', lop, sbd, maDe, hanNop, theLucNgay, huyetChien: b.huyetChien !== false, maCa: str(b.maCa).trim() || null, batDau, raiDeu: b.raiDeu !== false }
 }
 
 /** Đồng hồ sức chứa: khối lượng lượt cần của em ở giữa lớp so với D × thể lực/ngày; kèm hai gợi ý đưa về ≤ 70%. */
@@ -327,6 +328,8 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const Dmoi = Math.ceil(kl / (0.7 * dv.theLucNgay))
   return {
     ok: true, batDau: dv.batDau ?? homNay, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soCauTheoMucDo: theoMucDo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
+    // Rải đều (thầy 30/09, chỉ-thêm): tổng lượt so với D × thể lực KHÔNG đổi; chỉ báo thêm ≈ số câu mới/ngày của em giữa lớp khi bật (3 ngày cuối để ôn).
+    raiDeu: dv.raiDeu, cauMoiMoiNgay: tachGiua ? Math.ceil(tachGiua.cauMoi / Math.max(1, D - NGAY_DEM)) : null,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     noCu: await dongNoCu(env, noCu, dv.theLucNgay),
     goiY: sc.muc === 'xanh' ? null : {
@@ -354,7 +357,22 @@ async function tao(env: Env, b: Row, nowMs: number) {
     .bind(id, dv.ten, dv.lop, JSON.stringify(dv.sbd), JSON.stringify(maGocCuaTo(dv.maDe)), JSON.stringify(qids), dv.hanNop, dv.theLucNgay, dv.huyetChien ? 1 : 0, dv.maCa, new Date(nowMs).toISOString()).run()
   xoaDemChienDich() // danh sách chiến dịch đệm 15 s (srs2-d1.ts) ⇒ em thấy chiến dịch mới ngay
   if (dv.batDau) await ghiBatDau(env, id, dv.batDau)
-  return { ok: true, id, soCau: qids.length, soEm: dv.sbd.length, batDau: dv.batDau ?? ngayVnCua(nowMs) }
+  if (!dv.raiDeu) await ghiRaiDeu(env, id, false, nowMs) // bật = mặc định, không cần dòng phụ
+  return { ok: true, id, soCau: qids.length, soEm: dv.sbd.length, batDau: dv.batDau ?? ngayVnCua(nowMs), raiDeu: dv.raiDeu }
+}
+
+/**
+ * CÔNG TẮC RẢI ĐỀU trên chiến dịch đang chạy (thầy 30/09): chỉ ghi cờ + xoá đệm. KHÔNG đụng `srs2_ke_hoach` (kế hoạch đã chốt hôm nay giữ nguyên) ⇒ có hiệu lực
+ * từ kế hoạch ngày kế tiếp (hoặc lần lập lại kế hoạch hôm nay nếu có — sửa chiến dịch / câu không phục vụ được). Ghi một dòng nhật ký máy để thầy tra.
+ */
+async function doiRaiDeu(env: Env, id: string, bat: boolean, nowMs: number, nguoi = '') {
+  const cd = await docMot(env, id)
+  if (cd.trangThai === 'da_huy') throw new Error('Chiến dịch đã huỷ.')
+  await ghiRaiDeu(env, id, bat, nowMs)
+  const ai = nguoi.trim().slice(0, 60) || 'thầy'
+  await env.DB.prepare("INSERT INTO nhat_ky_may (luc, nguon, muc, chu) VALUES (?, 'sua_chien_dich', 'tin', ?)")
+    .bind(new Date(nowMs).toISOString(), `${ai} ${bat ? 'bật' : 'tắt'} rải đều câu mới cho chiến dịch "${cd.ten}" (${cd.id}) — áp dụng từ kế hoạch ngày kế tiếp`).run().catch(() => null)
+  return { ok: true, id, raiDeu: bat }
 }
 
 async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy', nowMs: number) {

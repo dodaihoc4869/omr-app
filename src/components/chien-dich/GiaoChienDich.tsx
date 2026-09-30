@@ -65,6 +65,8 @@ export default function GiaoChienDich({
   const [theLucChu, setTheLucChu] = useState(String(THE_LUC_MAC_DINH))
   const [tuDong, setTuDong] = useState(true)
   const [huyetChien, setHuyetChien] = useState(true)
+  // Rải đều câu mới theo ngày (thầy 30/09): mặc định BẬT — câu mới chia đều theo số ngày, lượt dư để ôn.
+  const [raiDeu, setRaiDeu] = useState(true)
 
   const [sc, setSc] = useState<SucChua | null>(null)
   const [dangTinh, setDangTinh] = useState(false)
@@ -115,7 +117,7 @@ export default function GiaoChienDich({
   // Chỉ gửi ngày bắt đầu khi khác hôm nay ⇒ bắt đầu ngay như cũ.
   const guiBatDau = batDauHopLe && batDau > homNay ? { batDau } : {}
   const duDauVao = maDeChon.length > 0 && (coDanhSach ? sbdChon.length > 0 : lop.trim() !== '') && hanHopLe && batDauHopLe
-  const khoaDauVao = JSON.stringify([maDeChon, doiTuong, hanNop, theLuc, batDau])
+  const khoaDauVao = JSON.stringify([maDeChon, doiTuong, hanNop, theLuc, batDau, raiDeu])
 
   // ĐỒNG HỒ SỨC CHỨA: gọi lại mỗi khi đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const luotTinh = useRef(0)
@@ -130,7 +132,7 @@ export default function GiaoChienDich({
     const luot = ++luotTinh.current
     setDangTinh(true)
     const hen = setTimeout(() => {
-      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, ...guiBatDau, theLucNgay: theLuc }).then((r) => {
+      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, ...guiBatDau, theLucNgay: theLuc, raiDeu }).then((r) => {
         if (luot !== luotTinh.current) return
         setDangTinh(false)
         if (r.ok) {
@@ -165,6 +167,7 @@ export default function GiaoChienDich({
       ...guiBatDau,
       theLucNgay: theLuc,
       huyetChien,
+      raiDeu,
       ...(maCa ? { maCa } : {}),
     })
     setDangGiao(false)
@@ -404,6 +407,11 @@ export default function GiaoChienDich({
                   <input type="checkbox" checked={huyetChien} onChange={(e) => setHuyetChien(e.target.checked)} />
                   <span>Em chậm nhịp được làm tới {2 * theLuc} câu/ngày (Quá tải hôm nay · tự tính gấp đôi)</span>
                 </label>
+                <label className="cd-tich">
+                  <input type="checkbox" role="switch" aria-checked={raiDeu} checked={raiDeu} onChange={(e) => setRaiDeu(e.target.checked)} />
+                  <span>Rải đều câu mới theo ngày</span>
+                </label>
+                <small className="cd-phu">Câu mới chia đều theo số ngày (trừ 3 ngày cuối để ôn); lượt dư trong ngày dùng để ôn. Tắt thì đổ câu mới cho đủ số lượt mỗi ngày.</small>
               </div>
               <DongHoSucChua sc={sc} dangTinh={dangTinh} loi={loiTinh} theLuc={theLuc} onTinhLai={() => setLanTinh((x) => x + 1)} />
             </div>

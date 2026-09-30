@@ -40,7 +40,8 @@ const suKien = (sbd: string, qid: string, msLuc: number, dung: boolean, extra: P
 })
 
 async function giao(env: Env, hanNop = '2026-10-04', nowMs = T0 - NGAY) {
-  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop }, nowMs)
+  // raiDeu:false (30/09): các test này viết theo luật cũ "chỗ thừa trả câu mới"; luật rải đều có test riêng (srs2-rai-deu-*.test.ts)
+  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop, raiDeu: false }, nowMs)
   expect(r.ok).toBe(true)
   return String(r.id)
 }

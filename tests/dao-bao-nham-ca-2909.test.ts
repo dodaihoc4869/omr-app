@@ -184,7 +184,7 @@ describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (a): ca đóng ch
 })
 
 describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (c): câu rút khỏi kho', () => {
-  it('câu còn lại đã rút khỏi kho ⇒ không báo ca, rương không kẹt', async () => {
+  it('câu còn lại đã rút khỏi kho ⇒ không báo ca, rương không kẹt (30/09: còn câu mới hợp lệ ⇒ THAY câu khác theo quota, làm nốt là rương mở)', async () => {
     const { d, env } = fixture()
     await giao(env)
     const nay = Date.now()
@@ -192,7 +192,13 @@ describe('Đảo báo nhầm "ca kiểm tra" — nguyên nhân (c): câu rút kh
     for (const q of bon) d.sql.prepare('DELETE FROM game_v2_question WHERE qid=?').run(q)
     const dao = await startDao2(env, 'S1', nay)
     expect(String(dao.message ?? '')).not.toContain(LOI_CA)
+    const thay = qidsCua(dao)
+    expect(thay.length).toBeGreaterThan(0)
+    for (const q of thay) expect(bon).not.toContain(q)
     const s = await sanh2(env, 'S1', nay)
-    expect((s.ruong as { moDuoc: boolean }).moDuoc).toBe(true)
+    expect((s.theLuc as { con: number }).con).toBe(thay.length)
+    await lamXong(env, thay, nay)
+    const s2 = await sanh2(env, 'S1', nay)
+    expect((s2.ruong as { moDuoc: boolean }).moDuoc).toBe(true)
   })
 })

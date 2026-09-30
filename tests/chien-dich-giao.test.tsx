@@ -92,7 +92,7 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
     await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
     fireEvent.click(nut)
     await waitFor(() => expect(lenh('tao')).toHaveLength(1))
-    expect(lenh('tao')[0]).toEqual({ action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE-A'], hanNop: '2026-10-04', theLucNgay: 47, huyetChien: true, maCa: 'CA-1' })
+    expect(lenh('tao')[0]).toEqual({ action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE-A'], hanNop: '2026-10-04', theLucNgay: 47, huyetChien: true, raiDeu: true, maCa: 'CA-1' })
     expect(await screen.findByText('ĐÃ GIAO CHIẾN DỊCH')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Huỷ giao' }))
     await waitFor(() => expect(lenh('huy')).toEqual([{ action: 'huy', id: 'cd-1' }]))

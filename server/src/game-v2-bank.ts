@@ -41,7 +41,8 @@ export async function normalizeBank(raw:Row,maDe:string):Promise<PrivateQuestion
         reviewed:!c.canXem&&(!c.loiGiaiTrangThai||c.loiGiaiTrangThai==='khop') && (phan==='I'?/^[ABCD]$/.test(correct):phan==='II'?/^[DS]{4}$/.test(correct):correct.trim().length>0)}
       // 30/09 luật tự luận chặt: nhãn tự luận của kho (`kieu: 'tu_luan'` ⇒ `tuLuan`) đi theo câu vào chỉ mục/pool; `laCauTuLuan(q)` đọc cờ này
       // (câu phần III đáp án không phải một số thì hàm dùng chung tự nhận ra từ `correct`). Không đổi version/nhóm nội dung.
-      if(c.tuLuan===true)(q as PrivateQuestion&{tuLuan?:boolean}).tuLuan=true
+      // 30/09: chỉ mục TỰ MANG cờ khi luật dùng chung cũng xem câu là tự luận (vd. phần III đáp án là công thức) ⇒ kế hoạch ngày (`docMetaCau`) đọc một cột, không cần đoán lại.
+      if(c.tuLuan===true||laCauTuLuan(q))(q as PrivateQuestion&{tuLuan?:boolean}).tuLuan=true
       q.group=await contentGroup(q);q.version=await versionCau(q);result.push(q)
     }
   }

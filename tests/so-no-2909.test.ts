@@ -278,7 +278,8 @@ const sk = (sbd: string, qid: string, msLuc: number, dung: boolean, nguon: SuKie
   nguon, maNguon, sbd, qid, lan: 1, ketQua: dung ? 1 : 0, luc: new Date(msLuc).toISOString(),
 })
 const giao = async (env: Env, maDe: string, hanNop: string, nowMs: number, theLucNgay = 40) => {
-  const r = await gvChienDich(env, { action: 'tao', ten: `CD ${maDe}`, lop: '12A1', maDe: [maDe], hanNop, theLucNgay }, nowMs)
+  // raiDeu:false (30/09): kiểm trần nợ 50 % theo luật đổ đầy thể lực; rải đều (nợ lấp chỗ dư sau quota) có test riêng
+  const r = await gvChienDich(env, { action: 'tao', ten: `CD ${maDe}`, lop: '12A1', maDe: [maDe], hanNop, theLucNgay, raiDeu: false }, nowMs)
   expect(r.ok).toBe(true)
   return String(r.id)
 }
