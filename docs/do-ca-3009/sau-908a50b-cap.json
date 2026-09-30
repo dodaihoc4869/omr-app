@@ -1,0 +1,226 @@
+{
+ "nhan": "sau-908a50b-cap",
+ "luc": "2026-09-30T14:14:54.122Z",
+ "cauHinh": {
+  "soEm": 300,
+  "treD1": 40,
+  "treR2": 30,
+  "lamGiay": 180,
+  "deRieng": true,
+  "congBo": "ngay"
+ },
+ "tong": {
+  "luot": 9993,
+  "loi": 1231,
+  "cauD1": 40494,
+  "vongD1": 11095,
+  "docD1": 106880,
+  "r2Doc": 208,
+  "r2MB": 0.2,
+  "giay": 321
+ },
+ "bang": [
+  {
+   "lenh": "thầy: nhịp ca (/ca/nhip)",
+   "n": 41,
+   "loi": 3,
+   "mauLoi": [
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/"
+   ],
+   "p50": 2217,
+   "p95": 15033,
+   "max": 16875,
+   "cauTb": 4.08,
+   "vongTb": 1.08,
+   "vongMax": 2,
+   "docTb": 717,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "thầy: chi tiết ca (/ca/chi-tiet)",
+   "n": 16,
+   "loi": 1,
+   "mauLoi": [
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/"
+   ],
+   "p50": 358,
+   "p95": 11022,
+   "max": 11022,
+   "cauTb": 4.07,
+   "vongTb": 1.07,
+   "vongMax": 2,
+   "docTb": 985,
+   "r2DocTb": 1,
+   "r2KBTb": 8
+  },
+  {
+   "lenh": "tra tên (/goi tenTheoSbd)",
+   "n": 300,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 2409,
+   "p95": 7614,
+   "max": 9738,
+   "cauTb": 1.06,
+   "vongTb": 1.06,
+   "vongMax": 2,
+   "docTb": 2,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "vào thi — phòng chờ (/vao-thi)",
+   "n": 300,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 3583,
+   "p95": 6764,
+   "max": 6784,
+   "cauTb": 5.08,
+   "vongTb": 2.08,
+   "vongMax": 3,
+   "docTb": 3,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "hỏi phòng chờ (GET /phong-cho)",
+   "n": 1106,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 3928,
+   "p95": 8320,
+   "max": 9794,
+   "cauTb": 1.07,
+   "vongTb": 1.07,
+   "vongMax": 2,
+   "docTb": 1,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "thầy: bắt đầu thi (/goi batDauThi)",
+   "n": 1,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 6174,
+   "p95": 6174,
+   "max": 6174,
+   "cauTb": 3,
+   "vongTb": 3,
+   "vongMax": 3,
+   "docTb": 3,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "vào thi — nhận lượt (/vao-thi)",
+   "n": 300,
+   "loi": 36,
+   "mauLoi": [
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/"
+   ],
+   "p50": 5481,
+   "p95": 7943,
+   "max": 7956,
+   "cauTb": 5,
+   "vongTb": 2,
+   "vongMax": 2,
+   "docTb": 3,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "tải đề (GET /de/:ca)",
+   "n": 264,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 7268,
+   "p95": 7793,
+   "max": 7990,
+   "cauTb": 1.3,
+   "vongTb": 1.3,
+   "vongMax": 2,
+   "docTb": 3,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "lưu đáp án (/luu-tam)",
+   "n": 3309,
+   "loi": 489,
+   "mauLoi": [
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/"
+   ],
+   "p50": 8012,
+   "p95": 20750,
+   "max": 26168,
+   "cauTb": 1.18,
+   "vongTb": 1.18,
+   "vongMax": 2,
+   "docTb": 6,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "báo trạng thái (/trang-thai)",
+   "n": 4054,
+   "loi": 626,
+   "mauLoi": [
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/"
+   ],
+   "p50": 8115,
+   "p95": 20499,
+   "max": 26221,
+   "cauTb": 2.18,
+   "vongTb": 1.18,
+   "vongMax": 2,
+   "docTb": 3,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "nộp bài (/nop)",
+   "n": 264,
+   "loi": 76,
+   "mauLoi": [
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/",
+    "http 500 Error: Network connection lost.\n    at async Object.fetch (file:///home/user/omr-app/node_modules/wrangler/node_modules/"
+   ],
+   "p50": 17219,
+   "p95": 29011,
+   "max": 30117,
+   "cauTb": 3.39,
+   "vongTb": 1.39,
+   "vongMax": 2,
+   "docTb": 12,
+   "r2DocTb": 1,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "thầy: chấm lô 8 em (/cham-diem)",
+   "n": 38,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 680,
+   "p95": 1056,
+   "max": 1078,
+   "cauTb": 634.58,
+   "vongTb": 9.95,
+   "vongMax": 11,
+   "docTb": 792,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  }
+ ]
+}
