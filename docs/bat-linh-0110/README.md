@@ -16,7 +16,7 @@
 
 Chromium CPU chậm sáu lần; riêng tô pixel bi, 3.000 lượt/lần, năm lần xen kẽ cũ/mới, lấy trung vị. Tệp tham chiếu `scripts/preview-bat-linh/ve-bi-baseline.ts` lấy nguyên bản 36ee817f. Kết quả nhanh **1,27–1,87 lần** ở cỡ 20/32/48 và bốn loại bi, không phải toàn game. Test đối chiếu byte RGBA bao phủ 576 tổ hợp, thêm đổi kiểu/chữ trên cùng bóng.
 
-Đo build toàn màn bằng script máy yếu sẵn có, ba lượt lấy trung vị: vào sảnh và mở đấu A.I. Bản cũ 39 FPS thao tác, bản mới 41 FPS; TBT 976→605 ms. **Chạy cùng lúc với hồi quy nên đây chỉ là số quan sát có nhiễu**, chưa dùng để kết luận mức cải thiện toàn game. Script chưa mô phỏng cả ván/thiết bị Android thật. Không cam kết tốc độ, mượt hay ổn định toàn app gấp năm lần.
+Đo build toàn màn bằng script máy yếu sẵn có, ba lượt lấy trung vị, CPU chậm sáu lần, vào sảnh và mở đấu A.I. Lần đo lại sau khi full suite xong: bản cũ/mới đều khoảng **54 FPS** thao tác và 60 FPS trạng thái chờ; TBT 214→201 ms, sẵn sàng 847→816 ms. Mức chênh nhỏ, chưa đủ để khẳng định cải thiện toàn game. Lượt quan sát cũ chạy cùng lúc hồi quy có nhiễu được lưu riêng, không dùng để kết luận. Script chưa mô phỏng cả ván/thiết bị Android thật. Không cam kết tốc độ, mượt hay ổn định toàn app gấp năm lần.
 
 SQLite cục bộ: 300 yêu cầu đồng thời cùng ca/isolate dùng một SELECT; 5.000 yêu cầu chia mười isolate dùng mười SELECT. Đã kiểm route Worker trả đúng trạng thái, không đề/đáp án, nhịp sau thấy lúc bắt đầu. Đây là đếm truy vấn khi chồng thời gian; không phải 5.000 học sinh thi thật, không phải đo độ trễ D1/Cloudflare hay năng lực nộp bài ở production.
 
