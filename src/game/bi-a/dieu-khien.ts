@@ -213,7 +213,7 @@ export class VanBia {
     this.doi()
     return true
   }
-  /** Em chạm ô ở hàng "Bi của em" để giải trước. */
+  /** Em chạm bi của em trên bàn (lượt người khác) để giải trước. */
   giaiTruoc(id: KiHieu): 'mo' | 'da_an' | 'vang' | 'trong' | 'chua_duoc' {
     const s = this.bi[id]
     if (s.chu !== this.em) return 'chua_duoc'
@@ -366,7 +366,7 @@ export class VanBia {
       this.cur = tiepTheo(this.cur, this.ghe.length); this.ballInHand = datBiCai; this.spin = { x: 0, y: 0 }
       const me = this.ghe[this.cur]!
       if (!me.ai) this.bao('Lượt của em', datBiCai ? 'Kéo bi cái tới chỗ muốn đặt rồi đánh' : this.matThan ? `Có ${this.matThan} Mắt thần` : 'Kéo trên bàn để xoay gậy', '', 1300)
-      else this.bao(`Lượt của ${me.ten}`, me.doi === this.ghe[this.em]!.doi ? 'Đồng đội đang đánh · em giải trước được' : this.loai === 'giao_huu' ? '' : 'Chạm ô ở hàng “Bi của em” để giải trước', '', 1500)
+      else this.bao(`Lượt của ${me.ten}`, me.doi === this.ghe[this.em]!.doi ? 'Đồng đội đang đánh · em giải trước được' : this.loai === 'giao_huu' ? '' : 'Chạm bi của em trên bàn để giải trước', '', 1500)
       this.sk.am('luot')
       this.batDauLuot(true)
     }, tre)

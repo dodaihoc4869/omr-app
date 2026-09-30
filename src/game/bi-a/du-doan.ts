@@ -1,5 +1,5 @@
-// BI-A PHẢN ỨNG · NHẮM + MẮT THẦN (đặc tả 3.7). Mắt thần mô phỏng trước bằng CHÍNH lõi vật lý (lực, xoáy đang chọn) ⇒ đường đi thật của
-// bi cái (tới lần va thứ 2 hoặc 1,1 giây sau va đầu) và bi mục tiêu (0,9 giây). Không có Mắt thần: chỉ đường thẳng tới điểm va + bóng bi ma.
+// BI-A PHẢN ỨNG · NHẮM + MẮT THẦN (đặc tả 3.7). Từ 30/09 (thầy chốt bản vẽ thử) màn vẽ dùng Mắt thần ĐƠN GIẢN `duongMatThan` (hình học thuần);
+// `duDoan` (mô phỏng bằng lõi vật lý) giữ lại cho công cụ đo, màn chơi không gọi.
 import type { KiHieu } from './nguyen-to'
 import { D2, H, R, W, danhBi, dangChay, step, suKienMoi, type Ban, type Bi } from './vat-ly'
 
@@ -29,6 +29,24 @@ export function nhamInfo(st: Ban, aim: { x: number; y: number }): NhamInfo | nul
     return { loai: 'bi', c, gx, gy, b: hb as Bi & { id: KiHieu }, nx, ny, cut: dx * nx + dy * ny }
   }
   return { loai: 'bang', c, gx: c.x + dx * tr, gy: c.y + dy * tr }
+}
+/**
+ * ĐƯỜNG MẮT THẦN ĐƠN GIẢN (thầy 30/09, đúng bản vẽ thử — màn vẽ KHÔNG còn mô phỏng vật lý): hình học thuần từ điểm va, rẻ cho máy yếu.
+ * `dich`: đoạn LIỀN từ mép bi đích theo hướng bi đích sẽ chạy (tâm bi ma → tâm bi đích), dài 190 khi có Mắt thần, 55 khi không.
+ * `tiep`: đoạn đứt theo hướng bi cái đi tiếp sau va (tiếp tuyến, vuông góc hướng bi đích), dài 120 — chỉ khi có Mắt thần và va không thẳng tâm.
+ */
+export interface DuongMatThan { dich: { x0: number; y0: number; x1: number; y1: number }; tiep: { x0: number; y0: number; x1: number; y1: number } | null }
+export const DAI_DICH_MT = 190, DAI_DICH = 55, DAI_TIEP_MT = 120
+export function duongMatThan(info: NhamInfo | null, aim: { x: number; y: number }, coMatThan: boolean): DuongMatThan | null {
+  if (!info || info.loai !== 'bi') return null
+  const ux = info.nx, uy = info.ny, L = coMatThan ? DAI_DICH_MT : DAI_DICH, b = info.b
+  const dich = { x0: b.x + ux * R, y0: b.y + uy * R, x1: b.x + ux * (R + L), y1: b.y + uy * (R + L) }
+  let tiep: DuongMatThan['tiep'] = null
+  if (coMatThan) {
+    const dot = aim.x * ux + aim.y * uy, tx = aim.x - dot * ux, ty = aim.y - dot * uy, tl = Math.hypot(tx, ty)
+    if (tl > 0.05) tiep = { x0: info.gx, y0: info.gy, x1: info.gx + tx / tl * DAI_TIEP_MT, y1: info.gy + ty / tl * DAI_TIEP_MT }
+  }
+  return { dich, tiep }
 }
 export interface DuDoan { cue: [number, number][]; obj: [number, number][] }
 /** Mô phỏng trước (không đụng `st`). Chưa kéo lực thì mô phỏng ở lực 50%. */
