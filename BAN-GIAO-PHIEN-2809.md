@@ -150,3 +150,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 07:41 30/09 · deploy #95 xanh (run 592)
 - 09:15 30/09 · Boss · merge PR #96 Sảnh Bi-a ngang/máy tính (2202f80; tự giải xung đột BiaGame.tsx với #95, 167 test bi-a xanh) · không ca mở · lùi: git revert -m1 2202f80
 - 09:19 30/09 · deploy #96 xanh (run 593)
+- 09:38 30/09 · Boss · merge PR #97 Luyện đề cấu trúc trong Tu luyện (d6715a6) · 191 test xanh · precache 164/2991KB (sát trần 3000) · không ca mở · lùi: git revert -m1 d6715a6
