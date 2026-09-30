@@ -1,0 +1,1083 @@
+{
+ "DB-11-B8-D3-I-10": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 10,
+   "de": "Cho các ứng dụng sau:\n(1) sản xuất sulfuric acid;\n(2) tẩy trắng bột giấy;\n(3) diệt nấm mốc, thuốc đông y;\n(4) diệt trùng nước sinh hoạt.\nSố ứng dụng của khí sulfur dioxide trong đời sống, sản suất là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "1.",
+    "B": "2.",
+    "C": "3.",
+    "D": "4."
+   },
+   "loi_giai": {
+    "chot": "SO₂ dùng sản xuất sulfuric acid, tẩy trắng bột giấy và diệt nấm mốc; diệt trùng nước sinh hoạt là ứng dụng của chlorine. Vậy có 3 ứng dụng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Có tới ba ứng dụng đúng, không phải một."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Có tới ba ứng dụng đúng, không phải hai."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: các ứng dụng (1), (2), (3)."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Diệt trùng nước sinh hoạt dùng chlorine, không phải SO₂."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-50"
+  }
+ },
+ "DB-11-B8-D3-I-11": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 11,
+   "de": "Cho các phát biểu sau:\n(a) Trong tự nhiên, sulfur tồn tại chủ yếu ở dạng muối sulfide và muối sulfate của một số kim loại.\n(b) Là một phi kim khá hoạt động nên trong tự nhiên không tìm thấy sulfur đơn chất.\n(c) Trứng gà ung có mùi thối đặc trưng một phần là do các hợp chất của sulfur có trong trứng phân hủy gây ra.\n(d) Nguyên tố sulfur có mặt trong một số loại thực vật, đặc biệt là các loại rau quả có mùi mạnh như hành tây, sầu riêng, … (e) Thành phần chính của quặng pyrite là hợp chất của sulfur và chì (lead, Pb).\nSố phát biểu đúng là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "2.",
+    "B": "3.",
+    "C": "4.",
+    "D": "5."
+   },
+   "loi_giai": {
+    "chot": "(a), (c), (d) đúng; (b) sai vì có mỏ sulfur đơn chất ở vùng núi lửa; (e) sai vì pyrite là FeS₂, hợp chất của sulfur với iron. Vậy có 3 phát biểu đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Có tới ba phát biểu đúng, không phải hai."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: các phát biểu (a), (c), (d) đúng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Phát biểu (b) và (e) đều sai nên không thể là bốn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Có hai phát biểu sai nên không thể là năm."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đếm số phát biểu đúng về sự tồn tại của sulfur trong tự nhiên.",
+    "bay": "Ý (b) và (e) đều sai: sulfur đơn chất có trong tự nhiên và pyrite là hợp chất của sulfur với SẮT chứ không phải chì."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "đếm mệnh đề đúng, không phải tính",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-55"
+  }
+ },
+ "DB-11-B8-D3-I-25": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 25,
+   "de": "Trong công nghiệm sản xuất sulfuric acid, hai nguồn nguyên liệu được khai thác từ mỏ để cung cấp nguyên tố sulfur là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "ZnS, PbS.",
+    "B": "H₂S, SO₂.",
+    "C": "CaSO₄, BaSO₄.",
+    "D": "S, FeS₂."
+   },
+   "loi_giai": {
+    "chot": "Hai nguồn nguyên liệu khai thác từ mỏ để cung cấp nguyên tố sulfur là đơn chất sulfur và quặng pyrite FeS₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "ZnS, PbS là quặng kim loại màu, không phải nguyên liệu chính."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "H₂S và SO₂ là chất khí, không khai thác trực tiếp từ mỏ."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "CaSO₄ và BaSO₄ là muối sulfate, không dùng làm nguyên liệu."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur đơn chất và quặng pyrite FeS₂."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-26"
+  }
+ },
+ "DB-11-B8-D3-I-30": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 30,
+   "de": "Trong công nghiệp sản suất sulfuric acid, sulfur trioxide được hấp thụ vào dung dịch sulfuric acid đặc tạo thành những chất có công thức chung là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "H₂S₂O₇.",
+    "B": "H₂SO₄.",
+    "C": "H₂SO₄.nSO₃.",
+    "D": "(SO₃)ₙ."
+   },
+   "loi_giai": {
+    "chot": "SO₃ hấp thụ vào H₂SO₄ đặc tạo oleum có công thức chung H₂SO₄·nSO₃.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂S₂O₇ chỉ là một trường hợp riêng ứng với n = 1."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ là sản phẩm sau khi pha loãng oleum."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: công thức chung là H₂SO₄·nSO₃."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "(SO₃)ₙ là dạng polymer của SO₃, không phải oleum."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-31"
+  }
+ },
+ "DB-11-B8-D3-I-31": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 31,
+   "de": "Sơ đồ phản ứng nào sau đây dùng để sản xuất sulfuric acid H₂SO4 trong công nghiệp?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "Cu→SO₃→SO₃→H₂SO₄.",
+    "B": "Fe→SO₃→SO₃→H₂SO₄.",
+    "C": "FeO→SO₃→SO₃→H₂SO₄.",
+    "D": "FeS₂→SO₃→SO₃→H₂SO₄."
+   },
+   "loi_giai": {
+    "chot": "Sản xuất công nghiệp đi từ nguyên liệu chứa sulfur là FeS₂ (hoặc S), qua SO₂ rồi SO₃ và cuối cùng là H₂SO₄.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Cu không chứa sulfur nên không phải nguyên liệu."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Fe không chứa sulfur nên không phải nguyên liệu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "FeO không chứa sulfur nên không phải nguyên liệu."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: đi từ quặng pyrite FeS₂."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.VIET_PTHH",
+    "ten": "Sản xuất sulfuric acid — viết phương trình"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-33"
+  }
+ },
+ "DB-11-B8-D3-I-33": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 33,
+   "de": "Cho nhiệt tạo thành chuẩn của SO₂ (g) và SO₃ (g) lần lượt là -296,8 kJ/mol và -395,7 kJ/mol. Biến thiên anthalpy chuẩn của phản ứng: 2SO₂+O₂V²tOo⁵2SO₃là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "-98,9kJ.",
+    "B": "-197,8 kJ",
+    "C": "98,9 kJ",
+    "D": "197,8 kJ"
+   },
+   "loi_giai": {
+    "chot": "ΔrH = 2·(−395,7) − 2·(−296,8) = −791,4 + 593,6 = −197,8 kJ.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "−98,9 kJ chỉ ứng với 1 mol SO₃, chưa nhân hệ số 2."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: ΔrH = −197,8 kJ."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Dấu phải là âm vì phản ứng toả nhiệt."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Dấu phải là âm vì phản ứng toả nhiệt."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "ΔrH = 2·(−395,7) − 2·(−296,8) = −791,4 + 593,6 = −197,8 kJ."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phương án là số, đề có đơn vị đo",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-69"
+  }
+ },
+ "DB-11-B8-D3-I-9": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "I",
+   "so": 9,
+   "de": "Cho cân bằng hóa học sau:\n2SO₂ g) + O₂ (g) ⇌ 2SO₃(g) ΔrH< 0.\nKhi tăng nhiệt độ thì",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "tổng số mol khí trong hệ giảm.",
+    "B": "hiệu suất phản ứng tăng.",
+    "C": "cân bằng chuyển dịch theo chiều nghịch.",
+    "D": "nồng độ khí sản phẩm tăng."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng toả nhiệt nên tăng nhiệt độ làm cân bằng chuyển dịch theo chiều nghịch, hiệu suất giảm, nồng độ SO₃ giảm và tổng số mol khí tăng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Chiều nghịch làm tăng số mol khí chứ không giảm."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Hiệu suất giảm khi tăng nhiệt độ."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: phản ứng toả nhiệt nên cân bằng chuyển theo chiều nghịch."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nồng độ SO₃ giảm khi cân bằng chuyển theo chiều nghịch."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-48"
+  }
+ },
+ "DB-11-B8-D3-II-13": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "II",
+   "so": 13,
+   "de": "Phản ứng oxi hóa SO₂ là giai đoạn then chốt trong quá trình sản xuất H₂SO₄: 2SO₂ + O₂ V²O⁵,to2SO₃ ΔrHo₂₉₈=−99,2kJ",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Phản ứng trên là phản ứng tỏa nhiệt.",
+    "b": "Phản ứng này được dùng để giải thích quá trình hình thành mưa acid.",
+    "c": "Trong phản ứng trên, SO₂ đóng vai trò chất khử.",
+    "d": "Trong thực tế, để tăng hiệu suất của phản ứng trên cần phải tăng nhiệt độ lên đến 600 °C."
+   },
+   "loi_giai": {
+    "chot": "ΔrH âm nên phản ứng toả nhiệt; SO₂ tăng từ +4 lên +6 nên là chất khử; phản ứng SO₂ → SO₃ cũng chính là bước giải thích mưa acid. Tăng nhiệt độ lên 600 °C sẽ làm hiệu suất giảm.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: ΔrH = −99,2 kJ nên phản ứng toả nhiệt."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: SO₂ bị oxi hoá thành SO₃ rồi tan vào nước mưa tạo H₂SO₄."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur tăng từ +4 lên +6 nên SO₂ là chất khử."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: phản ứng toả nhiệt nên tăng nhiệt độ làm hiệu suất giảm."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu xét chiều nhiệt, vai trò chất khử và ảnh hưởng nhiệt độ trong phản ứng oxi hoá SO₂.",
+    "bay": "Phản ứng toả nhiệt nên tăng nhiệt độ làm giảm hiệu suất; thực tế chỉ dùng khoảng 450 °C để cân bằng giữa tốc độ và hiệu suất."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-14"
+  }
+ },
+ "DB-11-B8-D3-II-14": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "II",
+   "so": 14,
+   "de": "Sulfur dioxide tác dụng vớinitrogen dioxide (NO₂) khi có xúc tác để chuyển hoá thành sulfur trioxide theo phản ứng có phương trình hoá học sau:\nSO₂(g)+NO₂(g)←xúctác→SO₃(g)+NO(g) ΔrHo₂₉₈=−41,8kJmol⁻¹ Chất | NO₂(g) | NO(g) | SO₃(g) Nhiệt tạo thành (kJmol⁻¹) | 33,2 | 91,3 | -329 Ở 298 K, hệ đạt trạng thái cân bằng chứa SO₂4,0M;NO₂0,50M;SO₃3M và NO 2 M.",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Phản ứng trên là phản ứng toả nhiệt.",
+    "b": "Các chất SO₃ và NO sinh ra có thể hấp thụ bởi CaO tạo thành sản phẩm có ích.",
+    "c": "Nhiệt tạo thành của SO₂ theo tính toán là 229,1kJmol⁻¹.",
+    "d": "Nếu thêm vào hệ 1,50molNO₂ thì nồng độ NO ở trạng thái cân bằng mới là 2,84M. Giả sử hệ được đặt trong bình dung tích 1,0 lít."
+   },
+   "loi_giai": {
+    "chot": "ΔrH âm nên toả nhiệt. Từ ΔrH = (−329 + 91,3) − (x + 33,2) = −41,8 suy ra x = −229,1 kJ/mol, mang dấu âm. Kc = (3·2)/(4·0,5) = 3; thêm 1,5 mol NO₂ thì x ≈ 0,84 nên [NO] mới ≈ 2,84 M.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: ΔrH = −41,8 kJ/mol nên phản ứng toả nhiệt."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: SO₃ bị CaO hấp thụ nhưng NO là oxide trung tính, không phản ứng với CaO."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: tính ra ΔfH(SO₂) = −229,1 kJ/mol, mang dấu âm."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: giải lại cân bằng với Kc = 3 cho [NO] mới ≈ 2,84 M."
+     }
+    },
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính nhiệt tạo thành và nồng độ cân bằng mới cho phản ứng SO₂ với NO₂.",
+    "bay": "Ý c phải suy ngược ΔfH(SO₂) từ ΔrH và giữ đúng dấu ÂM; ý d phải lập lại hằng số cân bằng."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-17"
+  }
+ },
+ "DB-11-B8-D3-II-36": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "II",
+   "so": 36,
+   "de": "Trong công nghiệp, sulfuric acid được sản xuất bằng phương pháp tiếp xúc theo ba giai đoạn chính.",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Nguyên liệu ban đầu thường dùng để cung cấp nguyên tố sulfur là quặng pyrite (FeS₂) hoặc sulfur (S).",
+    "b": "Giai đoạn đầu tiên của quá trình sản xuất là đốt cháy sulfur hoặc quặng pyrite để tạo ra khí SO₂.",
+    "c": "Giai đoạn thứ hai là oxi hóa SO₂ thành SO₃ với xúc tác V₂O₅ ở nhiệt độ khoảng 450(°) C.",
+    "d": "Ở giai đoạn cuối, người ta dùng nước cất để hấp thụ trực tiếp khí SO₃ nhằm thu được dung dịch H₂SO₄ tinh khiết."
+   },
+   "loi_giai": {
+    "chot": "Ba giai đoạn của phương pháp tiếp xúc đều đúng, riêng giai đoạn cuối phải hấp thụ SO₃ vào H₂SO₄ đặc tạo oleum rồi mới pha loãng, không dùng nước cất.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: nguyên liệu là quặng pyrite hoặc sulfur đơn chất."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: giai đoạn đầu là đốt tạo SO₂."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: oxi hoá SO₂ thành SO₃ với xúc tác V₂O₅ ở khoảng 450 °C."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: hấp thụ SO₃ vào nước tạo sương mù acid, phải dùng H₂SO₄ đặc."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Ba giai đoạn của phương pháp tiếp xúc đều đúng, riêng giai đoạn cuối phải hấp thụ SO₃ vào H₂SO₄ đặc tạo oleum rồi mới pha loãng, không dùng nước cất."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "II-9"
+  }
+ },
+ "DB-11-B8-D3-II-37": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "II",
+   "so": 37,
+   "de": "Sulfuric acid là một trong những hoá chất quan trọng nhất được sử dụng trong công nghiệp; được sản xuất hàng trăm triệu tấn mỗi năm, chiếm nhiều nhất trong ngành công nghiệp hoá chất. Phương pháp sản xuất sulfuric acid phổ biến nhất là phương pháp tiếp xúc, theo đó acid có thể được điều chế qua các giai đoạn sau:\n(1) FeS₂(s) + O₂(g) →(t°) Fe₂O₃(s) + SO₂(g)\n(2) SO₂(g) + O₂(s) ⁴⁵⁰°C,V²O⁵ SO₃(g); ΔrHo₂₉₈ = –196 kJ\n(3) H₂SO₄(aq) + SO₃(g) → H₂SO₄.nSO₃(l)\n(4) H₂SO₄.nSO₃(l) + H₂O(l) → H₂SO₄(aq)",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Trong quá trình sản xuất H₂SO₄, giai đoạn (1) có nguy cơ cao gây ô nhiễm môi trường.",
+    "b": "Người ta dùng sulfuric acid 98% H₂SO₄(aq) hấp thụ SO₃(g) trong phản ứng (3), quá trình này được thực hiện trong tháp tiếp xúc.",
+    "c": "Để làm tăng hiệu suất của phản ứng (2), người ta hạ nhiệt độ của phản ứng xuống thấp.",
+    "d": "Ở giai đoạn 3 (phản ứng 3) có thể dùng nước hấp thụ SO₃ để sản xuất sulfuric acid đặc có nồng độ cao và thuận tiện hơn cho việc vận chuyển."
+   },
+   "loi_giai": {
+    "chot": "Đốt pyrite phát thải SO₂ gây ô nhiễm; SO₃ được hấp thụ vào H₂SO₄ 98% trong tháp hấp thụ. Không hạ nhiệt độ xuống quá thấp vì tốc độ chậm, và không dùng nước hấp thụ SO₃ vì tạo sương mù acid.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đốt pyrite sinh SO₂ nên giai đoạn (1) dễ gây ô nhiễm."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: dùng H₂SO₄ 98% hấp thụ SO₃ tạo oleum."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: hạ nhiệt độ quá thấp làm tốc độ phản ứng rất chậm, thực tế giữ 450 °C."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: dùng nước hấp thụ SO₃ sẽ tạo sương mù acid rất khó ngưng tụ."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu phân tích bốn giai đoạn của phương pháp tiếp xúc sản xuất sulfuric acid.",
+    "bay": "Hạ nhiệt độ tuy làm tăng hiệu suất cân bằng nhưng tốc độ quá chậm nên thực tế phải giữ 450 °C."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "II-16"
+  }
+ },
+ "DB-11-B8-D3-III-18": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "III",
+   "so": 18,
+   "de": "Trong công nghiệp sản xuất sulfuric acid, phản ứng chuyển hoá SO₂ thành SO₃ được thực hiện bởi oxygen không khí ở nhiệt độ khoảng 700 K và có chất xúc tác: 2SO₂(g)+O₂(g)2SO₃(g) KC Khi cân bằng được thiết lập thì thu được hỗn hợp khí có thành phần cho ở bảng sau:\nTỉ lệ chuyển hoá của SO₂ thành SO₃ là α%.\nGiá trị của α bằng bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+   "dap_an": "98",
+   "bang": [
+    [
+     "Chất",
+     "SO₂",
+     "O₂",
+     "SO₃",
+     "N₂"
+    ],
+    [
+     "Số mol",
+     "0,21",
+     "5,37",
+     "10,30",
+     "84,12"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "SO₂ ban đầu bằng SO₂ còn lại cộng SO₃: 0,21 + 10,30 = 10,51 mol. Tỉ lệ chuyển hoá α = 10,30 : 10,51 = 0,980, tức 98%.",
+    "buoc": [
+     "Số mol SO₂ ban đầu = SO₂ còn lại + SO₃ tạo thành = 0,21 + 10,30 = 10,51 mol.",
+     "SO₂ đã chuyển hoá chính là 10,30 mol.",
+     "α = 10,30 : 10,51 × 100% = 98,0%.",
+     "Làm tròn đến phần nguyên được 98."
+    ],
+    "ket_qua": "98",
+    "dap_an_de": "98",
+    "dap_an_tu_giai": "98",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính tỉ lệ chuyển hoá SO₂ thành SO₃ từ thành phần hỗn hợp lúc cân bằng.",
+    "bay": "Tỉ lệ chuyển hoá tính theo SO₃ chia cho tổng SO₂ ban đầu, tức SO₂ còn lại cộng SO₃; N₂ và O₂ không tham gia phép tính."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_HANG_SO",
+    "ten": "Sản xuất sulfuric acid — tính hằng số"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "III-20"
+  }
+ },
+ "DB-11-B8-D3-III-24": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "III",
+   "so": 24,
+   "de": "Cho giá trị enthalpy tạo thành phần chuẩn của SO₂ và khi SO₃ lần lượt là -298,8 kJ mol⁻¹ và -395,7 kJ mol⁻¹.\nTính giá trị biến thiên enthalpy chuẩn của phản ứng sau:\nSO₂(g) + 1/2O₂(g) → SO₃(g)\nTừ đó, hãy cho biết phản ứng trên có thuận lợi về năng lượng không.",
+   "dap_an": "-96,9",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "ΔrH⁰ = ΔfH⁰(SO₃) − ΔfH⁰(SO₂) = −395,7 − (−298,8) = −96,9 kJ.",
+    "buoc": [
+     "Phương trình: SO₂(g) + ½O₂(g) → SO₃(g).",
+     "ΔrH⁰ = ΔfH⁰(SO₃) − [ΔfH⁰(SO₂) + ½ΔfH⁰(O₂)] = −395,7 − (−298,8 + 0).",
+     "ΔrH⁰ = −96,9 kJ < 0 ⇒ phản ứng TOẢ NHIỆT, thuận lợi về mặt năng lượng."
+    ],
+    "ket_qua": "-96,9",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "-96,9",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "O₂ là đơn chất nên ΔfH⁰ = 0, chỉ cần lấy hiệu hai giá trị đã cho.",
+    "bay": "Cộng thay vì trừ, hoặc nhân đôi vì nhớ phương trình 2SO₂ + O₂ → 2SO₃."
+   },
+   "kienThuc": [
+    "ΔfH⁰ của đơn chất bền ở trạng thái chuẩn bằng 0.",
+    "ΔrH⁰ < 0 ⇒ phản ứng toả nhiệt, thuận lợi về mặt năng lượng."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_NANG_LUONG",
+    "ten": "Sản xuất sulfuric acid — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "III-40"
+  }
+ },
+ "DB-11-B8-D3-III-39": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "III",
+   "so": 39,
+   "de": "Quá trình sản xuất sulfuric acid trong công nghiệp được thực hiện dựa trên các phản ứng sau:\n(1) S+O₂ →(t°) SO₂\n(2) 4FeS₂+11O₂ →(t°) 2Fe₂O₃+8SO₂\n(3) 2SO₂+O₂V²tOo⁵2SO₃ (d) H₂SO₄+SO₃→H₂S₂O₇\nLiệt kê đáp án thành một dãy số theo thứ tự tăng dần các phản ứng xảy ra đồng thời quá trình oxi hóa và quá trình khử.",
+   "dap_an": "123",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "Phản ứng có đồng thời quá trình oxi hoá và quá trình khử chính là phản ứng oxi hoá – khử: (1), (2), (3); còn (4) chỉ là phản ứng kết hợp. Đáp án 123.",
+    "buoc": [
+     "(1) S tăng từ 0 lên +4, O giảm từ 0 xuống −2: là phản ứng oxi hoá – khử.",
+     "(2) S và Fe đều bị oxi hoá, O bị khử: là phản ứng oxi hoá – khử.",
+     "(3) S tăng từ +4 lên +6, O bị khử: là phản ứng oxi hoá – khử.",
+     "(4) Không nguyên tố nào đổi số oxi hoá.",
+     "Vậy các phản ứng là 1, 2, 3."
+    ],
+    "ket_qua": "123",
+    "dap_an_de": "123",
+    "dap_an_tu_giai": "123",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Phản ứng có đồng thời quá trình oxi hoá và quá trình khử chính là phản ứng oxi hoá – khử: (1), (2), (3); còn (4) chỉ là phản ứng kết hợp. Đáp án 123."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.SO_SANH",
+    "ten": "Sản xuất sulfuric acid — so sánh"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "III-5"
+  }
+ },
+ "DB-11-B8-D3-III-41": {
+  "luc": "2026-09-29T13:11:52.852Z",
+  "cau": {
+   "phan": "III",
+   "so": 41,
+   "de": "Sulfuric acid có thể được điều chế từ quặng pyrite theo sơ đồ:\nFeS₂⁺O², →(t°) SO₂⁺O², →(t°) SO₃⁺H²O→H₂SO₄\nTính khối lượng dung dịch H₂SO₄ 98% thu được từ 1 tấn quặng pyrite chứa 75% FeS₂.\nBiết hiệu suất của cả quá trình là 80%, các tạp chất trong quặng không chứa sulfur.",
+   "dap_an": "1000",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "m(FeS₂) = 750 kg, tức 6250 mol, cho tối đa 12 500 mol H₂SO₄. Hiệu suất 80% cho 10 000 mol, tức 980 kg; dung dịch 98% có khối lượng 980 : 0,98 = 1000 kg.",
+    "buoc": [
+     "m(FeS₂) = 1 tấn × 75% = 750 kg = 750 000 gam.",
+     "n(FeS₂) = 750 000 : 120 = 6250 mol, cho 12 500 mol H₂SO₄ theo lí thuyết.",
+     "Hiệu suất 80% nên n thực tế = 10 000 mol, m = 980 000 gam = 980 kg.",
+     "m(dd 98%) = 980 : 0,98 = 1000 kg."
+    ],
+    "ket_qua": "1000",
+    "dap_an_de": "1000",
+    "dap_an_tu_giai": "1000",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính khối lượng dung dịch sulfuric acid sản xuất được từ quặng pyrite.",
+    "bay": "Mỗi FeS₂ cho 2 H₂SO₄; hiệu suất nhân vào, còn nồng độ 98% thì chia."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_HIEU_SUAT",
+    "ten": "Sản xuất sulfuric acid — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "III-22"
+  }
+ }
+}

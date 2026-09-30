@@ -1,0 +1,76 @@
+{
+ "DB-12-B6-D3-I-13": {
+  "luc": "2026-09-29T11:36:55.517Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Cho các phát biểu sau về cellulose:\n(a) Tạo bởi nhiều đơn vị a-glucose, nối với nhau qua liên kết a-1,2-glycoside.\n(b) Có mạch không phân nhánh.\n(c) Do không có enzyme thích hợp, cơ thể người không thể chuyển hoá cellulose thành glucose.\n(d) Thực vật tạo tinh bột và cellulose nhờ quá trình quang hợp.\nSố phát biểu đúng là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "1",
+    "B": "4",
+    "C": "2",
+    "D": "3"
+   },
+   "loi_giai": {
+    "chot": "Cellulose gồm các đơn vị beta-glucose nối bằng liên kết beta-1,4-glycoside nên phát biểu (a) sai; ba phát biểu còn lại đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thiếu hai phát biểu đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: phát biểu (a) sai."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thiếu một phát biểu đúng."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: ba phát biểu (b), (c), (d) đúng."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.CHON_PHAT_BIEU",
+    "ten": "Thuỷ phân — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D3",
+    "ten": "Phản ứng quang hợp",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D2",
+   "nguonCau": "I-32"
+  }
+ }
+}

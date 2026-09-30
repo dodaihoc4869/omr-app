@@ -369,5 +369,278 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "DH-12-C3-B9-P2-I-40": {
+  "luc": "2026-09-29T11:37:37.351Z",
+  "cau": {
+   "phan": "I",
+   "so": 40,
+   "de": "Phát biểu nào sau đây đúng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 9. Peptide (P2)",
+   "pa": {
+    "A": "Trong phân từ pentapeptide mạch hở có năm liên kết peptide.",
+    "B": "Tất cả các peptide đều có khả năng tham gia phản ứng thủy phân.",
+    "C": "Tripeptide không có phản ứng màu biuret.",
+    "D": "Khi thủy phân không hoàn toàn peptide chỉ thu được hỗn hợp các amino acid."
+   },
+   "loi_giai": {
+    "chot": "Mọi peptide đều có liên kết peptide nên đều bị thuỷ phân.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Pentapeptide chỉ có bốn liên kết peptide."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: peptide nào cũng thuỷ phân được."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Tripeptide có hai liên kết peptide nên vẫn cho màu biuret."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Thuỷ phân không hoàn toàn còn cho cả các peptide ngắn hơn."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B9-P2-II-3": {
+  "luc": "2026-09-29T11:37:37.351Z",
+  "cau": {
+   "phan": "II",
+   "so": 3,
+   "de": "Các phát biếu về cấu tạo của peptide.",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 9. Peptide (P2)",
+   "y": {
+    "a": "Peptide được cấu thành từ các đơn vị α- và β-amino acid.",
+    "b": "Tetrapeptide thường chứa bốn liên kết peptide trong phân tử.",
+    "c": "Trong phân tử Gly-Ala-Val, thì Gly là amino acid đầu N.",
+    "d": "Có thể điều chế bốn dipeptide khác nhau từ Gly và Val."
+   },
+   "loi_giai": {
+    "chot": "Peptide chỉ gồm α-amino acid; tetrapeptide có ba liên kết peptide.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: peptide chỉ tạo từ α-amino acid."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: tetrapeptide có ba liên kết peptide."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: Gly còn nhóm -NH₂ tự do."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: Gly-Gly, Gly-Val, Val-Gly, Val-Val."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B9-P2-II-9": {
+  "luc": "2026-09-29T11:37:37.351Z",
+  "cau": {
+   "phan": "II",
+   "so": 9,
+   "de": "Các phát biếu về tính chất của peptide:",
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 9. Peptide (P2)",
+   "y": {
+    "a": "Thủy phân hoàn toàn Gly-Ala-Val thỉ thu được Gly, Ala và Val.",
+    "b": "Thuỷ phân không hoàn toàn Gly-Ala-Val có thế thu được Gly-Ala và Ala-Val.",
+    "c": "Gly-Ala-Val phản ứng với Cu(OH)₂ trong môi trường kiềm tạo thành dung dịch màu tím.",
+    "d": "Gly-Gly phản ứng hoàn toàn với dung dịch NaOH thu được H₂NCH₂COONa."
+   },
+   "loi_giai": {
+    "chot": "Gly-Ala-Val là tripeptide nên thuỷ phân cho ba amino acid và có phản ứng màu biuret.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: thuỷ phân hoàn toàn cho Gly, Ala và Val."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: hai đoạn liền kề là Gly-Ala và Ala-Val."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: tripeptide cho dung dịch màu tím."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: NaOH chuyển Gly-Gly thành muối H₂NCH₂COONa."
+     }
+    },
+    "dap_an_de": "DDDD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B9-P2-III-29": {
+  "luc": "2026-09-30T03:46:45.284Z",
+  "cau": {
+   "phan": "III",
+   "so": 29,
+   "de": "Khi thủy phân không hoàn toàn pentapeptide X (Gly-Ala-Val-Ala-Gly) thu được tối đa bao nhiêu peptide (chứa gốc Gly) có phản ứng màu biuret?",
+   "dap_an": "4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Peptide (P2)",
+   "loi_giai": {
+    "chot": "Chỉ peptide từ ba gốc trở lên mới cho màu biuret, và sản phẩm thuỷ phân không tính chính X.",
+    "buoc": [
+     "Màu biuret cần từ hai liên kết peptide trở lên, tức mảnh cắt ra phải có từ ba gốc amino acid.",
+     "Mảnh ba gốc liên tiếp của Gly-Ala-Val-Ala-Gly gồm Gly-Ala-Val, Ala-Val-Ala, Val-Ala-Gly; chứa gốc Gly chỉ có Gly-Ala-Val và Val-Ala-Gly, được 2 chất.",
+     "Mảnh bốn gốc gồm Gly-Ala-Val-Ala và Ala-Val-Ala-Gly, cả hai đều chứa gốc Gly, được 2 chất.",
+     "X nguyên vẹn không phải sản phẩm thuỷ phân nên không kể, tổng 2 + 2 = 4 peptide."
+    ],
+    "ket_qua": "4",
+    "dap_an_de": "5",
+    "dap_an_tu_giai": "5",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Đề hỏi số peptide TỐI ĐA có trong hỗn hợp sản phẩm.",
+    "bay": "Quên rằng thuỷ phân không hoàn toàn thì X vẫn còn dư."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.DEM_DONG_PHAN",
+    "ten": "Peptide — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }

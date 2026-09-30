@@ -1,0 +1,508 @@
+{
+ "DB-11-B8-D1-I-19": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 19,
+   "de": "Dung dịch nào sau đây tác đụng được với kim loại Cu?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "HC₁.",
+    "B": "HNO₃ loãng.",
+    "C": "H₂SO₄ loãng.",
+    "D": "KOH."
+   },
+   "loi_giai": {
+    "chot": "Cu đứng sau hydrogen nên không tan trong HCl hay H₂SO₄ loãng; chỉ HNO₃ có tính oxi hoá mạnh mới hoà tan được Cu.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "HCl chỉ oxi hoá được kim loại đứng trước hydrogen."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: HNO₃ loãng hoà tan Cu tạo Cu(NO₃)₂ và NO."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ loãng không tác dụng với Cu."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "KOH không phản ứng với Cu."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B6",
+   "nguonCau": "I-23"
+  }
+ },
+ "DB-11-B8-D1-I-30": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 30,
+   "de": "Dung dịch acid nào sau đây có khả năng gây bỏng nếu rơi vào da ?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "HCl 36%.",
+    "B": "HNO₃ 63%.",
+    "C": "H₂SO₄ 98%.",
+    "D": "H₃PO₄85%."
+   },
+   "loi_giai": {
+    "chot": "H₂SO₄ 98% vừa có tính acid mạnh vừa háo nước, hút nước từ da và toả nhiệt nên gây bỏng nặng nhất trong bốn acid đã cho.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "HCl 36% gây kích ứng nhưng không háo nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "HNO₃ 63% gây vàng da nhưng không háo nước mạnh như H₂SO₄ đặc."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ 98% háo nước nên gây bỏng nặng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "H₃PO₄ 85% là acid trung bình, ít nguy hiểm hơn."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-6"
+  }
+ },
+ "DB-11-B8-D1-I-39": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 39,
+   "de": "Trong công nghiệp, hydrogen fluoride được điều chế từ quặng fluorite theo phản ứng:\nCaF₂+H₂SO₄²⁵⁰°C→CaSO₄+2HF Vai trò của sulfuric acid trong phản ứng là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "base.",
+    "B": "chất oxi hóa.",
+    "C": "acid.",
+    "D": "chất khử."
+   },
+   "loi_giai": {
+    "chot": "Trong phản ứng CaF₂ + H₂SO₄ → CaSO₄ + 2HF không có nguyên tố nào đổi số oxi hoá, H₂SO₄ chỉ cho proton nên đóng vai trò acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ cho proton nên là acid, không phải base."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Số oxi hoá của sulfur không đổi nên không phải chất oxi hoá."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ đóng vai trò acid."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sulfur đã ở mức cao nhất nên H₂SO₄ không thể là chất khử."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-15"
+  }
+ },
+ "DB-11-B8-D1-I-47": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 47,
+   "de": "Khi trộn dung dịch Na₂SO₄ với dung dịch BaCl₂, phản ứng thực chất xảy ra trong dung dịch là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "Ba²⁺+SO²₄⁻→BaSO₄.",
+    "B": "Na⁺+Cl⁻→NaCl.",
+    "C": "Ba²⁺+Na₂SO₄→BaSO₄+2Na⁺.",
+    "D": "BaCl₂+SO²₄⁻→BaSO₄+2Cl⁻."
+   },
+   "loi_giai": {
+    "chot": "Phương trình ion rút gọn chỉ giữ lại các ion thực sự tham gia: Ba²⁺ + SO₄²⁻ → BaSO₄↓.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: Ba²⁺ + SO₄²⁻ → BaSO₄↓."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Na⁺ và Cl⁻ là ion khán giả, không phản ứng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Na₂SO₄ tan và điện li hoàn toàn nên phải viết dạng ion."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "BaCl₂ tan và điện li hoàn toàn nên phải viết dạng ion."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-37"
+  }
+ },
+ "DB-11-B8-D1-I-53": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 53,
+   "de": "Ở thể lỏng, chất nào sau đây có dạng sách như dầu do tồn tại liên kết hydrogen rất mạnh giữa các phân tử?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "HF.",
+    "B": "H₂SO₄.",
+    "C": "H₂O.",
+    "D": "CH₃COOH."
+   },
+   "loi_giai": {
+    "chot": "Phân tử H₂SO₄ có hai nhóm O-H và nhiều nguyên tử oxygen nên tạo được mạng liên kết hydrogen rất mạnh, làm chất lỏng sánh như dầu.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "HF có liên kết hydrogen nhưng phân tử nhỏ nên không sánh như dầu."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ ở thể lỏng sánh như dầu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Nước có liên kết hydrogen nhưng độ nhớt thấp."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "CH₃COOH có liên kết hydrogen nhưng không sánh như dầu."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-43"
+  }
+ },
+ "DB-11-B8-D1-I-68": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 68,
+   "de": "Hòa tan 11,2 gam Fe vào dung dịch H₂SO₄ loãng dư thu được V L khí H₂ (đkc). Giá trị của V là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "5,376.",
+    "B": "6,197.",
+    "C": "4,958.",
+    "D": "2,4790."
+   },
+   "loi_giai": {
+    "chot": "n(Fe) = 11,2 : 56 = 0,2 mol; Fe + H₂SO₄ loãng → FeSO₄ + H₂ nên n(H₂) = 0,2 mol, V = 0,2 × 24,79 = 4,958 L.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "5,376 L ứng với thể tích mol 22,4 L, không đúng điều kiện chuẩn mới."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "6,197 L ứng với 0,25 mol khí."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: V = 0,2 × 24,79 = 4,958 L."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "2,479 L ứng với 0,1 mol khí."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "n(Fe) = 11,2 : 56 = 0,2 mol; Fe + H₂SO₄ loãng → FeSO₄ + H₂ nên n(H₂) = 0,2 mol, V = 0,2 × 24,79 = 4,958 L."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_THE_TICH",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính thể tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-70"
+  }
+ },
+ "DB-11-B8-D1-III-99": {
+  "luc": "2026-09-29T13:11:47.523Z",
+  "cau": {
+   "phan": "III",
+   "so": 99,
+   "de": "Tiến hành các thí nghiệm cho các c dung dịch H₂SO₄ loãng lần lượt tác dụng với: Ag, Mg, NaHSO₃, BaCl₂, Ca(OH)₂.\nCó bao nhiêu thí nghiệm có xảy ra phản ứng?",
+   "dap_an": "4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "Mg, NaHSO₃, BaCl₂ và Ca(OH)₂ đều phản ứng với H₂SO₄ loãng; Ag đứng sau hydrogen nên không phản ứng. Vậy có 4 thí nghiệm.",
+    "buoc": [
+     "Ag đứng sau hydrogen nên không phản ứng với acid loãng.",
+     "Mg đứng trước hydrogen nên giải phóng H₂.",
+     "NaHSO₃ là muối của acid yếu nên giải phóng SO₂.",
+     "BaCl₂ tạo kết tủa BaSO₄; Ca(OH)₂ bị trung hoà.",
+     "Vậy có 4 thí nghiệm xảy ra phản ứng."
+    ],
+    "ket_qua": "4",
+    "dap_an_de": "4",
+    "dap_an_tu_giai": "4",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Mg, NaHSO₃, BaCl₂ và Ca(OH)₂ đều phản ứng với H₂SO₄ loãng; Ag đứng sau hydrogen nên không phản ứng. Vậy có 4 thí nghiệm."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.DEM_DONG_PHAN",
+    "ten": "Sulfuric acid, muối sulfate và oleum — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "III-10"
+  }
+ }
+}

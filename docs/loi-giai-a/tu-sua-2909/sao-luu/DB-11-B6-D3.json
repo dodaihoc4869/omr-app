@@ -1,0 +1,60 @@
+{
+ "DB-11-B6-D3-III-8": {
+  "luc": "2026-09-29T13:11:35.048Z",
+  "cau": {
+   "phan": "III",
+   "so": 8,
+   "de": "Xét phản ứng trong quá trình tạo ra NOx nhiệt:\nN₂(g) + O₂(g) → 2NO(g) DrH⁰₂₉₈=180,6 kJ Nhiệt tạo thành chuẩn của NO(g) là bao nhiêu kJ/mol?",
+   "dap_an": "90,3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "Phản ứng tạo 2 mol NO từ các đơn chất bền có ΔrH = 180,6 kJ nên nhiệt tạo thành chuẩn của NO là 180,6 : 2 = 90,3 kJ/mol.",
+    "buoc": [
+     "N₂ và O₂ là các đơn chất bền nên nhiệt tạo thành bằng 0.",
+     "ΔrH = 2·ΔfH(NO) = 180,6 kJ.",
+     "ΔfH(NO) = 180,6 : 2 = 90,3 kJ/mol."
+    ],
+    "ket_qua": "90,3",
+    "dap_an_de": "90,3",
+    "dap_an_tu_giai": "90,3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Phản ứng tạo 2 mol NO từ các đơn chất bền có ΔrH = 180,6 kJ nên nhiệt tạo thành chuẩn của NO là 180,6 : 2 = 90,3 kJ/mol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.OXIDE_NITROGEN.TINH_NANG_LUONG",
+    "ten": "Các oxide của nitrogen và mưa acid — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D3",
+    "ten": "Tính biến thiên enthalpy của phản ứng",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B6",
+   "nguonCau": "III-15"
+  }
+ }
+}

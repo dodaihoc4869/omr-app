@@ -309,5 +309,79 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-C1-B1-D2-I-24": {
+  "luc": "2026-09-29T13:10:03.821Z",
+  "cau": {
+   "phan": "I",
+   "so": 24,
+   "de": "Để biến một số dầu thành mỡ rắn hoặc bơ nhân tạo người ta thực hiện quá trình này sau đây?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Cô cạn ở nhiệt độ cao.",
+    "B": "Hydrogen hóa (xt, to, p).",
+    "C": "Làm lạnh.",
+    "D": "Phản ứng xà phòng hóa."
+   },
+   "loi_giai": {
+    "chot": "Hydrogen hoá (H₂, Ni, t°, p) chuyển gốc acid béo không no thành no, biến dầu lỏng thành mỡ rắn, bơ nhân tạo (margarine).",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Không chọn: cô cạn ở nhiệt độ cao làm dầu bị phân huỷ, không làm gốc acid béo no hơn."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Chọn: cộng H₂ vào C=C của gốc acid béo không no, tạo chất béo no ở thể rắn."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Không chọn: làm lạnh chỉ đông đặc tạm thời, đưa về nhiệt độ thường lại chảy lỏng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Không chọn: xà phòng hoá phá vỡ chất béo thành xà phòng và glycerol, không tạo mỡ."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng phản ứng hydrogen hoá ở câu 24.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "ESTER.HYDRO_HOA.NHAN_DANG",
+    "ten": "Hydrogen hoá — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C1-B1-P2",
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D3",
+    "ten": "Phản ứng Hydrogen hóa / Cộng Bromine (Sản xuất bơ nhân tạo)",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   }
+  }
  }
 }

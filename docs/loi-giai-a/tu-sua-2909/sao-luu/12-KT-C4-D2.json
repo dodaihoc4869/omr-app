@@ -129,5 +129,194 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
   }
+ },
+ "12-KT-C4-D2-I-12": {
+  "luc": "2026-09-29T11:35:58.312Z",
+  "cau": {
+   "phan": "I",
+   "so": 12,
+   "de": "Trùng họp chất nào sau đây thu được cao su isoprene?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "biet",
+   "pa": {
+    "A": "CH₂=C(CH₃)−CH=CH₂",
+    "B": "CH₃−CH=C=CH₂",
+    "C": "CH₃−CH(Cl)−CH=CH₂",
+    "D": "CH₂=CH−CH=CH₂"
+   },
+   "loi_giai": {
+    "chot": "Cao su isoprene là sản phẩm trùng hợp isoprene, tức 2-methylbuta-1,3-diene.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: đây chính là isoprene."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Buta-1,2-diene không cho cao su isoprene."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Chất này chỉ có một liên kết đôi, không trùng hợp thành cao su diene."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Buta-1,3-diene cho cao su buna."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.PHAN_LOAI.NHAN_DANG",
+    "ten": "Phân loại polymer, tơ — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ },
+ "12-KT-C4-D2-I-4": {
+  "luc": "2026-09-29T11:35:58.312Z",
+  "cau": {
+   "phan": "I",
+   "so": 4,
+   "de": "Polymer nào sau đây có chứa nguyên tố chlorine?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Poly(methyl methacrylate)",
+    "B": "Polyethylene",
+    "C": "Polybutadien",
+    "D": "Poly(vinyl chloride)"
+   },
+   "loi_giai": {
+    "chot": "Poly(vinyl chloride) có mắt xích −CH₂−CHCl− nên chứa nguyên tố chlorine.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Poly(methyl methacrylate) chỉ có carbon, hydrogen và oxygen."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Polyethylene chỉ có carbon và hydrogen."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Polybutadiene chỉ có carbon và hydrogen."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: PVC chứa chlorine."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.CAU_TAO.NHAN_DANG",
+    "ten": "Cấu tạo, mắt xích — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ },
+ "12-KT-C4-D2-I-5": {
+  "luc": "2026-09-29T11:35:58.312Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "de": "Nhận xét về tính chất vật lí chung của polymer nào dưới đây không đúng?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Hầu hết là những chất rắn, không bay hơi, không có nhiệt độ nóng chảy xác định",
+    "B": "Khi nóng chảy, đa số polymer cho chất lỏng nhớt, để nguội sẽ rắn lại gọi là chất nhiệt dẻo",
+    "C": "Một số polymer không nóng chảy khi đun mà bị mà phân hủy, gọi là chất nhiệt rắn",
+    "D": "Polymer không tan trong nước và trong bất kỳ dung môi nào"
+   },
+   "loi_giai": {
+    "chot": "Một số polymer vẫn tan được trong dung môi thích hợp, nên nói không tan trong bất kì dung môi nào là sai.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Polymer đúng là chất rắn, không bay hơi, không có nhiệt độ nóng chảy xác định."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Polymer nóng chảy rồi rắn lại được gọi là chất nhiệt dẻo."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Polymer đun nóng bị phân huỷ gọi là chất nhiệt rắn."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là chỗ sai: vẫn có dung môi hoà tan được polymer."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.CAU_TAO.NHAN_DANG",
+    "ten": "Cấu tạo, mắt xích — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
  }
 }

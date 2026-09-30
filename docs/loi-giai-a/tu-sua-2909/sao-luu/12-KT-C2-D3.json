@@ -118,5 +118,76 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBOHYDRATE"
   }
+ },
+ "12-KT-C2-D3-II-1": {
+  "luc": "2026-09-29T11:35:34.274Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Tinh bột là loại lương thực quann trọng và là nguyên liệu chủ yếu để sản xuất bánh, kẹo, rượu, bia,…. Cellulose là loại vật liệu xây dựng, nguyên liệu sản xuất tơ visco.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Dung dịch hồ tinh bột tạo với iodine hợp chất màu xanh tím. Cellulose không có tính chất này.",
+    "b": "Tinh bột và cellulose có khả năng tham gia phản ứng tráng bạc.",
+    "c": "Tinh bột và cellulose cùng có công thức phân tử dạng (C₆H₁₀O₅)ₙ nhưng không phải là đồng phân của nhau.",
+    "d": "Thủy phân hoàn toàn tinh bột, cellulose đều thu được sản phẩm là glucose."
+   },
+   "loi_giai": {
+    "chot": "Tinh bột và cellulose đều thuỷ phân cho glucose nhưng khác nhau về cấu trúc; cả hai đều không có nhóm CHO tự do nên không tráng bạc.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: chỉ tinh bột có cấu trúc xoắn nên mới cho màu xanh tím với iodine."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai là polysaccharide, không còn nhóm OH hemiacetal tự do nên không tráng bạc."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: giá trị n của hai chất khác nhau nên không phải đồng phân."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: thuỷ phân hoàn toàn cả hai đều chỉ cho glucose."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.LEN_MEN.CHON_PHAT_BIEU",
+    "ten": "Lên men — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D2",
+    "ten": "Phản ứng lên men glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

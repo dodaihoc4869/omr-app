@@ -79,5 +79,77 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "DH-12-C3-B8-I-89": {
+  "luc": "2026-09-29T13:13:44.971Z",
+  "cau": {
+   "phan": "I",
+   "so": 89,
+   "de": "Công thức tổng quát của amin no, đơn chức, mạch hở là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "bai": "Bài 8. Amine",
+   "pa": {
+    "A": "CₙH₂ₙ₊₃N (n ≥ 1).",
+    "B": "CₙH₂ₙ₊₂N₂ (n ≥ 1).",
+    "C": "CₙH₂ₙ₊₁N (n ≥ 1).",
+    "D": "CₙH₂ₙN (n ≥ 1)."
+   },
+   "loi_giai": {
+    "chot": "Amine no, đơn chức, mạch hở có công thức CₙH₂ₙ₊₃N (n ≥ 1).",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: ví dụ n = 1 cho CH₅N, n = 2 cho C₂H₇N."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: công thức này có hai nguyên tử N nên không đơn chức."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: CₙH₂ₙ₊₁N thiếu hai hydrogen, ứng với amine không no."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: CₙH₂ₙN càng thiếu hydrogen hơn nữa."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_CAU_TAO.NHAN_DANG",
+    "ten": "Amine — cấu tạo — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B8-D1",
+    "ten": "Thiết lập công thức phân tử amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }

@@ -1,0 +1,71 @@
+{
+ "11-C6-B23-I-9": {
+  "luc": "2026-09-29T13:10:00.359Z",
+  "cau": {
+   "phan": "I",
+   "so": 9,
+   "de": "Cho hợp chất carbonyl có công thức cấu tạo (CH₃)₂CH-CO-CH₃.\nTên theo danh pháp thay thế của hợp chất carbonyl đó là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_58.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất carbonyl – carboxylic acid",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "2-methylbutan -3-one",
+    "B": "3-methylbutan-2-one",
+    "C": "3-methylbutan-2-ol",
+    "D": "1,1-dimethypropan-2-one"
+   },
+   "loi_giai": {
+    "chot": "Đánh số mạch chính sao cho carbon của nhóm C=O có chỉ số nhỏ nhất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: đánh số từ đầu kia làm nhóm C=O mang số 3, trái quy tắc."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: mạch 4 carbon, nhóm C=O ở carbon số 2, methyl ở carbon số 3 nên là 3-methylbutan-2-one."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: đuôi -ol dành cho alcohol, chất này là ketone."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: cách gọi này không chọn mạch chính dài nhất."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBONYL_ACID.CAU_TAO.GOI_TEN",
+    "ten": "Cấu tạo, đồng phân, danh pháp — gọi tên"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-05",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBONYL_ACID"
+  }
+ }
+}

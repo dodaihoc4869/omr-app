@@ -432,5 +432,88 @@
    "nguonDe": "DH-12-C1-B1-P1",
    "nguonCau": "III-44"
   }
+ },
+ "DB-12-B1-P1-D2-II-100": {
+  "luc": "2026-09-29T11:36:20.657Z",
+  "cau": {
+   "phan": "II",
+   "so": 100,
+   "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5mLH₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7−8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "y": {
+    "a": "Việc thêm dung dịch NaCl bão hoà giúp tách isoamyl acetate dễ dàng hơn.",
+    "b": "Trong phễu chiết, lớp chất lỏng phía dưới có thành phần chính là isoamyl acetate.",
+    "c": "Phản ứng điều chế isoamyl acetate trong thí nghiệm trên là phản ứng ester hoá.",
+    "d": "Vai trò của H₂SO₄ đặc là chất xúc tác để phản ứng xảy ra nhanh hơn."
+   },
+   "loi_giai": {
+    "chot": "Isoamyl acetate (D ≈ 0,87 g/mL) nhẹ hơn dung dịch NaCl bão hoà nên nổi lên trên.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: NaCl bão hoà làm tăng khối lượng riêng của pha nước và giảm độ tan của ester nên hai lớp tách rõ ràng hơn."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: isoamyl acetate nhẹ hơn nước nên nằm ở lớp TRÊN, không phải lớp dưới."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: acid + alcohol có xúc tác H₂SO₄ đặc chính là phản ứng ester hoá."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ đặc vừa là xúc tác vừa hút nước, đẩy cân bằng theo chiều tạo ester."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kienThuc": [
+    "Phản ứng ester hoá cần H₂SO₄ đặc vừa làm xúc tác vừa hút nước.",
+    "Dung dịch NaCl bão hoà làm giảm độ tan của ester trong nước, giúp phân lớp rõ.",
+    "Hầu hết ester đơn giản nhẹ hơn nước."
+   ],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+    "ten": "Ester hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "DH-12-C1-B1-P1",
+   "nguonCau": "II-33"
+  }
  }
 }

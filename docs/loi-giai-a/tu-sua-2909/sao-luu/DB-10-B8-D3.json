@@ -1,0 +1,76 @@
+{
+ "DB-10-B8-D3-I-1": {
+  "luc": "2026-09-29T13:11:09.849Z",
+  "cau": {
+   "phan": "I",
+   "so": 1,
+   "de": "Ở tất cả các chu kì (trừ chu kì 1), nguyên tố đầu chu kì luôn là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "biet",
+   "bai": "Bài 5. Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+   "pa": {
+    "A": "kim loại kiềm thổ.",
+    "B": "kim loại kiềm.",
+    "C": "nguyên tố halogen.",
+    "D": "nguyên tố khi hiếm."
+   },
+   "loi_giai": {
+    "chot": "Trừ chu kì 1, mỗi chu kì đều mở đầu bằng một kim loại kiềm nhóm IA và kết thúc bằng một khí hiếm.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Kim loại kiềm thổ nhóm IIA đứng thứ hai trong chu kì."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: nguyên tố đầu chu kì thuộc nhóm IA."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Halogen đứng gần cuối chu kì."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Khí hiếm đứng cuối chu kì."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.NHAN_DANG",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D3",
+    "ten": "Xác định kim loại dựa vào tính chất",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B5",
+   "nguonCau": "I-10"
+  }
+ }
+}

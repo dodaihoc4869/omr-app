@@ -64,5 +64,73 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
   }
+ },
+ "12-KT-C56-D2-II-2": {
+  "luc": "2026-09-29T11:36:05.983Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "de": "Một pin điện hoá được thiết lập và hoạt động ở 25°C như mô tả ở hình dưới. Cầu muối làm bằng cách trộn KCl với gel tạo thành hỗn hợp gel đặc; thể tích mỗi dung dịch là 200,0 mL và nồng độ các muối trong dung dịch ban đầu là 1,00 M. Khi bắt đầu hoạt động, số chỉ của vôn kế là 1,10 V.",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Tại anode, các ion Zn²⁺ tách ra từ điện cực Zn(s) và di chuyển vào dung dịch.",
+    "b": "Tại cathode, các ion Cu²⁺(aq) từ dung dịch di chuyển vào điện cực Cu và bị khử thành Cu.",
+    "c": "Lượng ion SO₄²⁻ trong dung dịch ở cathode giảm đúng bằng lượng ion SO₄²⁻ tăng lên ở anode.",
+    "d": "Sức điện động chuẩn của pin là 1,10 V là không thay đổi trong suốt quá trình pin hoạt động."
+   },
+   "loi_giai": {
+    "chot": "Cầu muối ở đây là KCl nên ion Cl⁻ mới chuyển sang ngăn anode, lượng ion sulfate trong từng ngăn gần như không đổi.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: kẽm bị oxi hoá thành ion Zn²⁺ rồi tan vào dung dịch."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: ion Cu²⁺ nhận electron ở cathode và bám lên điện cực đồng."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cầu muối chứa KCl nên anion di chuyển là Cl⁻, không phải SO₄²⁻."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: nồng độ ion thay đổi khi pin chạy nên sức điện động giảm dần."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đề cho dữ kiện định lượng phải giải ra",
+   "dang": {
+    "ma": "DIEN_PHAN.PIN_GALVANI.CHON_PHAT_BIEU",
+    "ten": "Pin Galvani, sức điện động — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
  }
 }

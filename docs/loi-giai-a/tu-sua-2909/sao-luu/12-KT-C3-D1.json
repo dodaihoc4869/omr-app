@@ -1,0 +1,136 @@
+{
+ "12-KT-C3-D1-I-15": {
+  "luc": "2026-09-29T11:35:36.898Z",
+  "cau": {
+   "phan": "I",
+   "so": 15,
+   "de": "Phát biểu nào sau đây sai khi nói về enzyme?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Phần lớn enzyme là những protein xúc tác cho các phản ứng hóa học và sinh hóa",
+    "B": "Enzyme có tính chọn lọc cao, mỗi enzyme chỉ xúc tác cho một hoặc một số phản ứng nhất định",
+    "C": "Tốc độ phản ứng có xúc tác enzyme thường nhanh hơn nhiều lần so với với xúc tác hóa học",
+    "D": "Tốc độ phản ứng có xúc tác enzyme thường chậm hơn nhiều lần so với với xúc tác hóa học"
+   },
+   "loi_giai": {
+    "chot": "Enzyme làm tốc độ phản ứng tăng rất mạnh so với xúc tác hoá học thông thường, nên phát biểu nói chậm hơn là sai.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Phần lớn enzyme là protein có vai trò xúc tác sinh học."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Enzyme có tính chọn lọc rất cao."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Xúc tác enzyme cho tốc độ lớn hơn nhiều xúc tác hoá học."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là chỗ sai: enzyme làm phản ứng nhanh hơn, không chậm hơn."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
+ },
+ "12-KT-C3-D1-I-14": {
+  "luc": "2026-09-29T13:10:35.950Z",
+  "cau": {
+   "phan": "I",
+   "so": 14,
+   "de": "Mỗi chuỗi polypetide được tạo thành từ nhiều đơn vị",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "pa": {
+    "A": "α-amino acid",
+    "B": "β-amino acid",
+    "C": "γ-amino acid",
+    "D": "δ-amino acid"
+   },
+   "loi_giai": {
+    "chot": "Chuỗi polypeptide trong cơ thể sống chỉ được tạo từ các đơn vị α-amino acid.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: đơn vị cấu tạo là α-amino acid."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "β-amino acid dùng để tổng hợp polymer nhân tạo, không tạo polypeptide."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "γ-amino acid không tham gia tạo chuỗi polypeptide."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "δ-amino acid cũng không tham gia tạo chuỗi polypeptide."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.NHAN_DANG",
+    "ten": "Peptide — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

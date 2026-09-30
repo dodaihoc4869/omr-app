@@ -1,0 +1,79 @@
+{
+ "DB-10-B2-D2-II-99": {
+  "luc": "2026-09-29T13:10:46.197Z",
+  "cau": {
+   "phan": "II",
+   "so": 99,
+   "de": "Chlorine là một chất khí màu vàng lục, có tính oxy hóa mạnh, được sử dụng rộng rãi để khử trùng nước máy sinh hoạt và xử lí nước bể bơi. Trong tự nhiên, chlorine không tồn tại đồng vị duy nhất mà là hỗn hợp của hai đồng vị bền: ₁₇³⁵Cl (chiếm khoảng 75,77% số nguyên tử) và ₁₇³⁷Cl (chiếm khoảng 24,23% số nguyên tử).",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 2. Nguyên tố hóa học",
+   "y": {
+    "a": "Nguyên tử khối trung bình của một nguyên tố phụ thuộc vào nguyên tử khối và phần trăm số nguyên tử của các đồng vị.",
+    "b": "Hai đồng vị ₁₇³⁵Cl và ₁₇³⁷Cl chiếm các vị trí ô khác nhau trong bảng tuần hoàn.",
+    "c": "Giá trị nguyên tử khối trung bình của chlorine trong tự nhiên là một số thập phân xấp xỉ bằng 35,5.",
+    "d": "Thành phần phần trăm về khối lượng của đồng vị ₁₇³⁷Cl có trong phân tử muối magnesium chloride (MgCl₂) là khoảng 18% (cho biết nguyên tử khối trung bình của Mg là 24,30)."
+   },
+   "loi_giai": {
+    "chot": "Ā(Cl) = 35 × 0,7577 + 37 × 0,2423 = 35,48. Trong MgCl₂: M = 24,30 + 2 × 35,48 = 95,27; %m(³⁷Cl) = 2 × 0,2423 × 37 / 95,27 ≈ 18,8%.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: trung bình có trọng số theo phần trăm số nguyên tử."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: hai đồng vị cùng Z = 17 nên chung một ô trong bảng tuần hoàn."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: giá trị tính được là 35,48, xấp xỉ 35,5."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: tính ra 18,8%, tức khoảng 18%."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "hay_gap"
+    ],
+    "ly_do": "Từ phần trăm SỐ NGUYÊN TỬ sang phần trăm KHỐI LƯỢNG trong hợp chất, ba bước.",
+    "bay": "Lấy 24,23% làm luôn phần trăm khối lượng mà không quy về phân tử MgCl₂."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đếm cấu trúc: phải dựng ra rồi đếm",
+   "dang": {
+    "ma": "NGUYEN_TU.DONG_VI.CHON_PHAT_BIEU",
+    "ten": "Đồng vị — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B2-D2",
+    "ten": "Nguyên tử khối trung bình",
+    "lop": "10",
+    "bai": "DB-10-B2",
+    "tenBai": "Nguyên tố hóa học",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B2",
+   "nguonCau": "II-13"
+  }
+ }
+}

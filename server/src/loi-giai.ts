@@ -436,10 +436,11 @@ export async function hsLoiGiai(env: Env, b: Obj) {
     duoc = !!luyen
   }
   if (!duoc) return { ok: false, error: 'Lời giải mở sau khi Thầy công bố kết quả, hoặc sau khi em tự làm câu này.' }
-  // Câu từng luyện nay nằm trong một ca đang thi / chưa công bố ⇒ khoá (em đã làm ca ấy và ca đã công bố thì nhánh thi ở trên cho qua).
-  if (!thi && (await cauDangBaoVe(env, qid))) return { ok: false, error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em xem lại nhé.' }
   const dong = await env.DB.prepare(`SELECT q.bam FROM loi_giai_cau q JOIN loi_giai l ON l.bam = q.bam AND ${SQL_XEM_DUOC('l')} WHERE q.qid = ?`).bind(qid).first<Obj>()
   if (!dong) return { ok: true, coLoiGiai: false }
+  // Câu (hoặc bản cùng nội dung ở tờ khác) đang nằm trong một ca còn làm được / chưa công bố ⇒ khoá, KỂ CẢ nhánh thi:
+  // câu cũ được dùng lại trong ca mới, hoặc ca "công bố ngay" còn bạn đang làm — em nộp sớm không được chuyền lời giải.
+  if (await cauDangBaoVe(env, qid, str(dong.bam))) return { ok: false, error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em xem lại nhé.' }
   const ht = await cauHienTai(env, qid)
   if (!ht || ht.bam !== str(dong.bam)) return { ok: true, coLoiGiai: false }
   const hoSo = await docHoSo(env, ht.bam)
@@ -451,10 +452,15 @@ export async function hsLoiGiai(env: Env, b: Obj) {
  * Câu thuộc đề của một ca CHƯA công bố hoặc còn làm được (kể cả bài tập) — đúng tập game dùng để KHÔNG chấm câu ấy (`protectedQuestions`).
  * Lỗi đọc phạm vi ⇒ coi như ĐANG bảo vệ (thà khoá nhầm một lúc còn hơn lộ lời giải câu đang thi).
  */
-async function cauDangBaoVe(env: Env, qid: string): Promise<boolean> {
+async function cauDangBaoVe(env: Env, qid: string, bam?: string): Promise<boolean> {
   try {
     const tap = await protectedQuestions(env)
-    return tap.has(qid) || tap.has(qidGoc(qid))
+    if (tap.has(qid) || tap.has(qidGoc(qid))) return true
+    // CÙNG NỘI DUNG, KHÁC MÃ: câu chép sang tờ DB-/DH- mang qid khác nhưng dùng CHUNG hồ sơ lời giải (cùng băm).
+    // Chỉ so qid thì em mở bản chép là thấy lời giải câu đang nằm trong ca chưa công bố ⇒ so thêm mọi qid cùng băm.
+    if (!bam) return false
+    const cungNoiDung = await env.DB.prepare('SELECT qid FROM loi_giai_cau WHERE bam = ?').bind(bam).all<Obj>()
+    return (cungNoiDung.results ?? []).some((r) => tap.has(str(r.qid)))
   } catch {
     return true
   }
@@ -492,6 +498,8 @@ export async function hsHoiThay(env: Env, b: Obj) {
   if (await cauDangBaoVe(env, qid)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
   const ht = await cauHienTai(env, qid).catch(() => null)
   if (!ht) return { ok: false, error: 'Không tìm thấy câu này trong kho đề.' }
+  // Bản chép cùng nội dung ở tờ khác đang bảo vệ ⇒ khoá như chính câu ấy (dùng chung hồ sơ lời giải và đáp án).
+  if (await cauDangBaoVe(env, qid, ht.bam)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
   const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>()
   const hoSo = dong ? await docHoSo(env, ht.bam) : null
   const luc = new Date(nay).toISOString()

@@ -1,0 +1,138 @@
+{
+ "DB-11-B8-D2-II-26": {
+  "luc": "2026-09-29T13:11:50.566Z",
+  "cau": {
+   "phan": "II",
+   "so": 26,
+   "de": "Thí nghiệm về tính chất của dung dịch sulfuric acid loãng và dung dịch sulfuric acid đặc:\n- Chuẩn bị: Kim loại đồng (Cu, copper) dạng mảnh hoặc sợi, dung dịch sulfuric acid loãng và dung dịch sulfuric acid đặc, ống nghiệm, bông tầm kiềm, đèn cồn.\n- Tiến hành: Cho mảnh đồng nhỏ vào ống nghiệm thứ nhất, cho tiếp vào ống nghiệm khoảng 3 mL dung dịch sulfuric acid loãng, sau đó đun nóng nhẹ ống nghiệm trên ngọn lửa đèn cồn.\nCho mảnh đồng nhỏ vào ống nghiệm thứ hai, cho tiếp vào ống nghiệm khoảng 3 mL dung dịch sulfuric acid đặc, rồi nút bông tẩm dung dịch NaOH đặc vào miệng ống nghiệm, sau đó đun nóng nhẹ ống nghiệm trên ngọn lửa đèn cồn.",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Hiện tượng quan sát được trong ống nghiệm thứ nhất: mảnh đồng tan dần và có khí không màu thoát ra.",
+    "b": "Hiện tượng quan sát được trong ống nghiệm thứ hai: mảnh đồng tan dần, có khí không màu thoát ra và dung dịch thu được có màu xanh.",
+    "c": "Bông tẩm dung dịch NaOH đặc ở ống nghiệm thứ hai hạn chế khí độc thoát ra ngoài môi trường.",
+    "d": "Dung dịch sulfuric acid loãng hoặc đặc đều có tính oxi hóa mạnh, có thể oxi hóa được các kim loại kém hoạt động như đồng."
+   },
+   "loi_giai": {
+    "chot": "Cu đứng sau hydrogen nên không phản ứng với acid loãng; với acid đặc nóng thì Cu tan tạo dung dịch CuSO₄ màu xanh và khí SO₂ không màu, mùi hắc. Chỉ acid đặc mới có tính oxi hoá mạnh.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: với acid loãng, mảnh đồng không tan và không có khí thoát ra."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: Cu tan trong acid đặc, sinh SO₂ không màu và dung dịch xanh."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: bông tẩm NaOH giữ lại khí SO₂ độc."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: chỉ acid đặc mới có tính oxi hoá mạnh, acid loãng thì không."
+     }
+    },
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "SDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu so sánh hiện tượng của đồng với sulfuric acid loãng và sulfuric acid đặc.",
+    "bay": "Ống nghiệm thứ nhất dùng acid LOÃNG nên Cu hoàn toàn không phản ứng, không có hiện tượng gì."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.CHON_PHAT_BIEU",
+    "ten": "Sulfuric acid, muối sulfate và oleum — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D2",
+    "ten": "Tính oxi hóa của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "II-10"
+  }
+ },
+ "DB-11-B8-D2-III-30": {
+  "luc": "2026-09-29T13:11:50.566Z",
+  "cau": {
+   "phan": "III",
+   "so": 30,
+   "de": "Hòa tan m gam Fe vào dung dịch H₂SO₄ loãng, thoát ra 3,7185 L khí H₂ ở đkc.\nNếu hòa tan m gam Fe vào dung dịch H₂SO₄ đặc nóng, dư thoát ra m gam khí SO₂.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "14,4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "n(H₂) = 3,7185 : 24,79 = 0,15 mol nên n(Fe) = 0,15 mol. Với acid đặc, Fe nhường 3 electron nên n(SO₂) = 0,15 × 3 : 2 = 0,225 mol, m(SO₂) = 14,4 gam.",
+    "buoc": [
+     "n(H₂) = 3,7185 : 24,79 = 0,15 mol, mà Fe + H₂SO₄ loãng cho tỉ lệ 1 : 1.",
+     "Vậy n(Fe) = 0,15 mol, tức 8,4 gam.",
+     "Với acid đặc: Fe → Fe³⁺ + 3e nên số electron nhường là 0,45 mol.",
+     "S⁺⁶ + 2e → SO₂ nên n(SO₂) = 0,225 mol.",
+     "m(SO₂) = 0,225 × 64 = 14,4 gam."
+    ],
+    "ket_qua": "14,4",
+    "dap_an_de": "14,4",
+    "dap_an_tu_giai": "14,4",
+    "trang_thai": "khop",
+    "ghi_chu": "Tệp nguồn dùng cùng ký hiệu m cho cả khối lượng Fe và khối lượng SO₂. Hiểu theo cách đề chấm: từ 3,7185 L H₂ suy ra 0,15 mol Fe tức 8,4 gam; với acid đặc thì thu 0,225 mol SO₂ tức 14,4 gam, khớp đáp án đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính khối lượng SO₂ từ lượng sắt suy ra qua thí nghiệm với acid loãng.",
+    "bay": "Với acid loãng Fe chỉ lên +2 nhưng với acid đặc Fe lên +3, số electron nhường khác nhau."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_KHOI_LUONG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D2",
+    "ten": "Tính oxi hóa của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "III-20"
+  }
+ }
+}

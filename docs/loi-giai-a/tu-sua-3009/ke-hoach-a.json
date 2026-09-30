@@ -1,0 +1,46 @@
+[
+  {
+    "qid": "DH-12-C3-B9-P2-III-29",
+    "maDe": "DH-12-C3-B9-P2",
+    "phan": "III",
+    "so": 29,
+    "viec": "thay",
+    "truong": "de",
+    "truoc": "(chứa gốc Gly)",
+    "sau": "(chứa gốc Gly, không kể X)",
+    "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+  },
+  {
+    "qid": "DB-12-B9-P2-D2-III-57",
+    "maDe": "DB-12-B9-P2-D2",
+    "phan": "III",
+    "so": 57,
+    "viec": "thay",
+    "truong": "de",
+    "truoc": "(chứa gốc Gly)",
+    "sau": "(chứa gốc Gly, không kể X)",
+    "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+  },
+  {
+    "qid": "DB-12-B9-P2-D2-III-148",
+    "maDe": "DB-12-B9-P2-D2",
+    "phan": "III",
+    "so": 148,
+    "viec": "thay",
+    "truong": "de",
+    "truoc": "(chứa gốc Gly)",
+    "sau": "(chứa gốc Gly, không kể X)",
+    "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+  },
+  {
+    "qid": "12-C3-B9-D3-III-41",
+    "maDe": "12-C3-B9-D3",
+    "phan": "III",
+    "so": 41,
+    "viec": "thay",
+    "truong": "de",
+    "truoc": "(chứa gốc Gly)",
+    "sau": "(chứa gốc Gly, không kể X)",
+    "lyDo": "Quy ước thông thường: sản phẩm thuỷ phân không kể X. Peptide ≥3 gốc có Gly: GAV, VAG, GAVA, AVAG = 4 (tính cả X là 5, đề gốc ghi 5). Thêm 'không kể X' để hết tranh cãi, giữ đáp án 4."
+  }
+]

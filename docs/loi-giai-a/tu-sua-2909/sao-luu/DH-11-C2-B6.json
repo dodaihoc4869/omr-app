@@ -1,0 +1,904 @@
+{
+ "DH-11-C2-B6-I-13": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Xét cân bằng tạo ra nitrogen dioxide ở nhiệt độ 2000 °C:\nN₂(g) + O₂(g) ⇌ 2NO(g);\nKC = 4,10.10⁻⁴ Ở trạng thái cân bằng, biểu thức nào sau đây có giá trị bằng Kc?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "[NO]²/[N²].[O²].",
+    "B": "[NO]/[N²].[O²].",
+    "C": "[N²].[O²]/[NO]².",
+    "D": "[NO]/[N²]."
+   },
+   "loi_giai": {
+    "chot": "Hằng số cân bằng bằng tích nồng độ sản phẩm chia tích nồng độ chất đầu, mỗi nồng độ luỹ thừa theo hệ số: Kc = [NO]² / ([N₂]·[O₂]).",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: Kc = [NO]² / ([N₂]·[O₂])."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Thiếu số mũ 2 của NO."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đảo ngược tử số và mẫu số."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Thiếu nồng độ O₂ ở mẫu số và số mũ của NO."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.OXIDE_NITROGEN.NHAN_DANG",
+    "ten": "Các oxide của nitrogen và mưa acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-18": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 18,
+   "de": "Các tính chất hoá học của HNO₃ là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "tính acid mạnh, tính oxi hóa mạnh và tính khử mạnh.",
+    "B": "tính acid acid mạnh, tính oxi hóa mạnh và bị phân huỷ.",
+    "C": "tính oxi hóa mạnh, tính acid mạnh và tính base mạnh.",
+    "D": "tính oxi hóa mạnh, tính acid yếu và bị phân huỷ."
+   },
+   "loi_giai": {
+    "chot": "HNO₃ có tính acid mạnh, tính oxi hoá mạnh và kém bền, dễ bị phân huỷ bởi ánh sáng hoặc nhiệt.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nitrogen đã ở mức oxi hoá cao nhất +5 nên HNO₃ không có tính khử."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: acid mạnh, oxi hoá mạnh và dễ bị phân huỷ."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "HNO₃ là acid nên không có tính base."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "HNO₃ là acid mạnh chứ không phải acid yếu."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.NHAN_DANG",
+    "ten": "Nitric acid và muối nitrate — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-23": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 23,
+   "de": "Dung dịch nào sau đây tác đụng được với kim loại Cu?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "HC₁.",
+    "B": "HNO₃ loãng.",
+    "C": "H₂SO₄ loãng.",
+    "D": "KOH."
+   },
+   "loi_giai": {
+    "chot": "Cu đứng sau hydrogen nên không tan trong HCl hay H₂SO₄ loãng; chỉ HNO₃ có tính oxi hoá mạnh mới hoà tan được Cu.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "HCl chỉ oxi hoá được kim loại đứng trước hydrogen."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: HNO₃ loãng hoà tan Cu tạo Cu(NO₃)₂ và NO."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "H₂SO₄ loãng không tác dụng với Cu."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "KOH không phản ứng với Cu."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.NHAN_DANG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-25": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 25,
+   "de": "Các kim loại đều tác dụng được với dung dịch HCl nhưng không tác dụng với dung dịch HNO₃ đặc, nguội",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Fe, Al, Cr.",
+    "B": "Cu, Fe, Al.",
+    "C": "Fe, Mg, Al.",
+    "D": "Cu, Pb, Ag."
+   },
+   "loi_giai": {
+    "chot": "Fe, Al, Cr đều tan trong HCl nhưng bị thụ động hoá trong HNO₃ đặc, nguội.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: cả ba kim loại đều bị thụ động trong HNO₃ đặc, nguội."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Cu không tác dụng với dung dịch HCl."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Mg tan trong cả HCl lẫn HNO₃ đặc, nguội."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Cu, Pb, Ag không thoả mãn vì Cu và Ag không tan trong HCl."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.NHAN_DANG",
+    "ten": "Nitric acid và muối nitrate — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-36": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 36,
+   "de": "Nguyên nhân chính dẫn đến hiện tượng phú dưỡng tại các dòng sông, ao hồ là gì?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Do lượng nước mưa quá lớn trong mùa mưa bão mang theo đất cát.",
+    "B": "Do nước thải sinh hoạt và nước chảy tràn từ đồng ruộng chứa nhiều phân bón (nitrate, phosphate) chưa qua xử lý.",
+    "C": "Do sự quang hợp của các thực vật thủy sinh tạo ra quá nhiều oxygen.",
+    "D": "Do sự rò rỉ dầu từ các phương tiện giao thông đường thủy."
+   },
+   "loi_giai": {
+    "chot": "Phú dưỡng chủ yếu do nước thải sinh hoạt và nước chảy tràn từ đồng ruộng mang theo nitrate, phosphate chưa qua xử lí.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nước mưa mang đất cát chỉ làm đục nước, không gây phú dưỡng."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: nguồn dinh dưỡng từ nước thải và phân bón."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Quang hợp là hệ quả chứ không phải nguyên nhân."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Rò rỉ dầu gây ô nhiễm dầu, không gây phú dưỡng."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.NEU_HIEN_TUONG",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-38": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 38,
+   "de": "Mưa acid gây ảnh hưởng nghiêm trọng đến các công trình kiến trúc, đặc biệt là việc làm bức tượng, công trình làm bằng đá vôi (thành phần chính là CaCO₃) bị ăn mòn.\nPhương trình hoá học nào sau đây giải thích đúng nhất cho hiện tượng ăn mòn này bởi thành phần acid có trong mưa acid?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "CaCO₃ xrightarrowtᵒ CaO + CO₂",
+    "B": "CaCO₃ + H₂SO₄ → CaSO₄ + CO₂ + H₂O.",
+    "C": "CaCO₃ + 2NaOH → Na₂CO₃ + Ca(OH)₂.",
+    "D": "CaCO₃ + 2H₂O → Ca(OH)₂ + H₂CO₃."
+   },
+   "loi_giai": {
+    "chot": "Acid trong mưa acid (H₂SO₄, HNO₃) phản ứng với CaCO₃ tạo muối tan và khí CO₂ nên đá vôi bị ăn mòn.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đây là phản ứng nhiệt phân, không liên quan mưa acid."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: CaCO₃ bị H₂SO₄ trong mưa acid hoà tan."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "CaCO₃ không phản ứng với NaOH."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "CaCO₃ không tan và không phản ứng với nước."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.OXIDE_NITROGEN.NEU_HIEN_TUONG",
+    "ten": "Các oxide của nitrogen và mưa acid — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-41": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 41,
+   "de": "Khi cho dung HNO₃ phản ứng với các chất sau, trường hợp nào HNO₃ chỉ thể hiện tính acid?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Cho mảnh kim loại copper (Cu) vào dung dịch loãng.",
+    "B": "Cho bột iron(II) oxide (FeO) vào dung dịch HNO₃ loãng.",
+    "C": "Cho tinh thể calcium carbonate (CaCO₃) vào dung dịch HNO₃ loãng.",
+    "D": "Cho bột carbon (C) đun nóng với HNO₃ đặc."
+   },
+   "loi_giai": {
+    "chot": "HNO₃ chỉ thể hiện tính acid khi không có sự thay đổi số oxi hoá. Với CaCO₃ chỉ xảy ra trao đổi tạo muối, CO₂ và H₂O; ba trường hợp còn lại HNO₃ đều bị khử.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Cu bị oxi hoá nên HNO₃ thể hiện tính oxi hoá."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "FeO có Fe ở mức +2 nên bị HNO₃ oxi hoá lên +3."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: phản ứng với CaCO₃ chỉ là trao đổi, số oxi hoá không đổi."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Carbon bị HNO₃ đặc oxi hoá thành CO₂."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Tệp nguồn gõ dính phần cuối phương án D vào phương án C và cắt cụt phương án D. Đã tách lại hai phương án; đáp án giữ nguyên là C."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.NHAN_DANG",
+    "ten": "Nitric acid và muối nitrate — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-47": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 47,
+   "de": "Biện pháp nào trong chăn nuôi có thể áp dụng để ngăn chặn hiện tượng phú dưỡng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Thải chất thải vật nuôi xuống cống thoát nước.",
+    "B": "Thường xuyên rữa chuồng trại.",
+    "C": "Xây dựng bể chứa biogas.",
+    "D": "Xây các hầm rút."
+   },
+   "loi_giai": {
+    "chot": "Bể biogas thu gom và xử lí chất thải chăn nuôi, ngăn nitrogen và phosphorus chảy xuống ao hồ nên hạn chế phú dưỡng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Thải xuống cống làm chất dinh dưỡng đổ thẳng ra nguồn nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Rửa chuồng thường xuyên càng đưa nhiều chất thải ra ngoài."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: bể biogas xử lí chất thải tại chỗ."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Hầm rút vẫn để chất dinh dưỡng thấm vào nguồn nước."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Bể biogas thu gom và xử lí chất thải chăn nuôi, ngăn nitrogen và phosphorus chảy xuống ao hồ nên hạn chế phú dưỡng."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.NEU_HIEN_TUONG",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-I-49": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 49,
+   "de": "Một nhóm học sinh tiến hành lấy mẫu nước tại hai khu vực: Hồ A(nằm xen kẽ trong khu vực thâm canh nông nghiệp, sử dụng nhiều phân bón) và Hồ B(nằm sâu trong khu bảo tồn sinh thái tự nhiên) để phân tích hàm lượng các ion dinh dưỡng.\nKết quả phân tích trung bình trong một tháng được thể hiện ở bảng sau: Thông số (mg/L) | Hồ A(Khu nông nghiệp) | Hồ B(Khu sinh thái) | Tiêu chuẩn nước mặt (Loại A) Ion nitrate (NO₃⁻) | 12,5 | 1,2 | le 2,0 Ion phosphate (PO₄³⁻) | 0,85 | 0,05 | le 0,1 Mật độ vi tảo (tế bào/mL) | 5 × 10⁵ | 1 × 10³ | - Nồng độ oxygen hoà tan (DO) | 2,1 | 6,8 | ge 6,0 Dựa vào bảng số liệu và kiến thức hoá học, phát biểu nào sau đây là chưa chính xác?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Hồ A đang gặp phải tình trạng ô nhiễm dinh dưỡng trầm trọng, dẫn đến hiện tượng phú dưỡng.",
+    "B": "Sự gia tăng đột biến mật độ vi tảo ở Hồ A là hệ quả trực tiếp của việc dư thừa các ion NO₃⁻ và PO₄³⁻ từ phân bón trôi dạt xuống.",
+    "C": "Nồng độ oxygen hoà tan (DO) ở Hồ A rất thấp (2,1 mg/L) chứng tỏ quá trình quang hợp của lượng lớn vi tảo đã cung cấp lượng oxygen dồi dào cho thuỷ sinh vật.",
+    "D": "Để cải thiện chất lượng nước Hồ A, cần kiểm soát chặt chẽ lượng phân đạm và phân lân sử dụng trong vùng thâm canh lân cận."
+   },
+   "loi_giai": {
+    "chot": "DO ở hồ A chỉ 2,1 mg/L, thấp hơn tiêu chuẩn 6,0 mg/L. Tảo chết bị phân huỷ tiêu thụ oxygen nên DO giảm chứ không dồi dào, vậy phát biểu C chưa chính xác.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nitrate và phosphate đều vượt xa tiêu chuẩn nên hồ A bị phú dưỡng, phát biểu đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Tảo bùng phát là hệ quả trực tiếp của dư thừa dinh dưỡng, phát biểu đúng."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là chọn C: DO chỉ 2,1 mg/L, thấp hơn tiêu chuẩn, không hề dồi dào."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Kiểm soát phân đạm và phân lân là giải pháp đúng."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "DO ở hồ A chỉ 2,1 mg/L, thấp hơn tiêu chuẩn 6,0 mg/L. Tảo chết bị phân huỷ tiêu thụ oxygen nên DO giảm chứ không dồi dào, vậy phát biểu C chưa chính x"
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.CHON_PHAT_BIEU",
+    "ten": "Nitric acid và muối nitrate — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-II-1": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Oxide của nitrogen (kí hiệu chung là NOx) được hình thành trong tự nhiên và từ các hoạt động của con người. Chúng là một trong những nguyên nhân chính gây ra ô nhiễm môi trường không khí.",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "y": {
+    "a": "NO và NO₂ là hai oxide của nitrogen phổ biến nhất trong không khí.",
+    "b": "Khí NO₂ là chất khí có màu nâu đỏ, có mùi hắc và độc.",
+    "c": "Sấm sét là một trong những nguyên nhân tự nhiên tạo ra khí NO u từ sự kết hợp giữa N₂ và O₂ trong khí quyển.",
+    "d": "Các khí NOx hòa tan trong nước mưa luôn làm cho nước mưa có độ pH lớn hơn 7."
+   },
+   "loi_giai": {
+    "chot": "NO và NO₂ là hai oxide phổ biến nhất; NO₂ màu nâu đỏ, mùi hắc và độc; sấm sét tạo NO từ N₂ và O₂. NOₓ tan vào nước mưa tạo acid nên pH giảm xuống dưới 7.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: NO và NO₂ là hai oxide nitrogen phổ biến nhất trong không khí."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: NO₂ là khí màu nâu đỏ, mùi hắc và độc."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: sấm sét làm N₂ và O₂ kết hợp tạo NO."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: NOₓ tan vào nước mưa tạo HNO₃ nên pH giảm xuống dưới 5,6."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "NO và NO₂ là hai oxide phổ biến nhất; NO₂ màu nâu đỏ, mùi hắc và độc; sấm sét tạo NO từ N₂ và O₂. NOₓ tan vào nước mưa tạo acid nên pH giảm xuống dưới"
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.CHON_PHAT_BIEU",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-III-15": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "III",
+   "so": 15,
+   "de": "Xét phản ứng trong quá trình tạo ra NOx nhiệt:\nN₂(g) + O₂(g) → 2NO(g) DrH⁰₂₉₈=180,6 kJ Nhiệt tạo thành chuẩn của NO(g) là bao nhiêu kJ/mol?",
+   "dap_an": "90,3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "Phản ứng tạo 2 mol NO từ các đơn chất bền có ΔrH = 180,6 kJ nên nhiệt tạo thành chuẩn của NO là 180,6 : 2 = 90,3 kJ/mol.",
+    "buoc": [
+     "N₂ và O₂ là các đơn chất bền nên nhiệt tạo thành bằng 0.",
+     "ΔrH = 2·ΔfH(NO) = 180,6 kJ.",
+     "ΔfH(NO) = 180,6 : 2 = 90,3 kJ/mol."
+    ],
+    "ket_qua": "90,3",
+    "dap_an_de": "90,3",
+    "dap_an_tu_giai": "90,3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Phản ứng tạo 2 mol NO từ các đơn chất bền có ΔrH = 180,6 kJ nên nhiệt tạo thành chuẩn của NO là 180,6 : 2 = 90,3 kJ/mol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.OXIDE_NITROGEN.TINH_NANG_LUONG",
+    "ten": "Các oxide của nitrogen và mưa acid — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D3",
+    "ten": "Tính biến thiên enthalpy của phản ứng",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-III-6": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "III",
+   "so": 6,
+   "de": "Trong các công thức dưới đây: Có bao nhiêu công thức không thỏa mãn quy tắc octec?",
+   "dap_an": "1",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III-6.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "Đếm electron lớp ngoài cùng quanh nguyên tử trung tâm của từng công thức Lewis: N₂ đạt 8 e; NO₂ chỉ 7 e (còn 1 electron độc thân) nên phạm octet; NH₃ đạt 8 e; HNO₃ vẽ bằng liên kết cho - nhận nên N cũng đạt 8 e. Chỉ 1 công thức phạm octet.",
+    "buoc": [
+     "(1) :N≡N: — mỗi N có 3 liên kết (6 e) + 1 cặp electron riêng (2 e) = 8 e, ĐẠT octet.",
+     "(2) O=N-O (NO₂) — N có 1 liên kết đôi (4 e) + 1 liên kết đơn (2 e) + 1 electron độc thân = 7 e, PHẠM octet.",
+     "(3) NH₃ — N có 3 liên kết (6 e) + 1 cặp electron riêng (2 e) = 8 e, ĐẠT octet.",
+     "(4) HNO₃ vẽ O=N(-O⁻)(-O-H) — N có 4 liên kết = 8 e, ĐẠT octet (hydrogen theo quy tắc duet, không tính).",
+     "Vậy số công thức KHÔNG thoả mãn quy tắc octet là 1."
+    ],
+    "ket_qua": "1",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "1",
+    "trang_thai": "lech",
+    "ghi_chu": "ĐÃ XEM HÌNH 16/09. Bốn công thức Lewis: (1) :N≡N: — mỗi N có 3 liên kết + 1 cặp riêng = 8 e, ĐẠT octet. (2) Ö=Ṅ-Ö: (NO₂) — N có 1 liên kết đôi + 1 liên kết đơn + 1 electron độc thân = 7 e, KHÔNG đạt octet. (3) NH₃ vẽ có 1 cặp electron riêng trên N = 8 e, ĐẠT. (4) HNO₃ vẽ kiểu O=N(-O⁻)(-O-H): N có 4 liên kết = 8 e, ĐẠT (liên kết cho - nhận, không phải 2 liên kết đôi). Vậy chỉ 1 công thức phạm octet. Đề ghi 2 — nhiều khả năng tác giả đếm thêm HNO₃ theo cách vẽ 2 liên kết đôi, nhưng hình trong đề KHÔNG vẽ như vậy. Máy giữ đáp án tự giải là 1."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Quy tắc octet đòi hỏi mỗi nguyên tử (trừ hydrogen) đạt 8 electron lớp ngoài cùng; phải đếm electron quanh từng nguyên tử trong các công thức đã cho, h"
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.DEM_DONG_PHAN",
+    "ten": "Nitric acid và muối nitrate — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-III-8": {
+  "luc": "2026-09-29T13:13:18.315Z",
+  "cau": {
+   "phan": "III",
+   "so": 8,
+   "de": "Cho dung dịch HNO₃ tác dụng với các chất sau: NH₃, CuO, CaCO₃, Ag và NaOH.\nCó bao nhiêu phản ứng trong đó HNO₃ đóng vai trò acid Bronsted?",
+   "dap_an": "4",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "HNO₃ là acid Bronsted khi chỉ cho proton mà số oxi hoá không đổi: với NH₃, CuO, CaCO₃ và NaOH. Với Ag thì HNO₃ đóng vai trò chất oxi hoá.",
+    "buoc": [
+     "Với NH₃: phản ứng acid – base tạo NH₄NO₃.",
+     "Với CuO và CaCO₃: phản ứng trao đổi, số oxi hoá không đổi.",
+     "Với NaOH: phản ứng trung hoà.",
+     "Với Ag: Ag bị oxi hoá nên HNO₃ là chất oxi hoá. Vậy có 4 phản ứng."
+    ],
+    "ket_qua": "4",
+    "dap_an_de": "4",
+    "dap_an_tu_giai": "4",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "HNO₃ là acid Bronsted khi chỉ cho proton mà số oxi hoá không đổi: với NH₃, CuO, CaCO₃ và NaOH. Với Ag thì HNO₃ đóng vai trò chất oxi hoá."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.DEM_DONG_PHAN",
+    "ten": "Nitric acid và muối nitrate — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ }
+}

@@ -139,7 +139,7 @@ export default function NganHangDeScreen() {
       const raw = await file.text()
       const parsed = parseKhoDeJsonText(raw)
       if (!parsed.ok || !parsed.json) throw new Error(parsed.errors[0])
-      const { source, errors, canXemList } = buildTeacherSourceFromKhoDe(parsed.json)
+      const { source, errors, warnings, canXemList } = buildTeacherSourceFromKhoDe(parsed.json)
       if (errors.length > 0) throw new Error(errors[0])
       const v = validateTeacherSource(source)
       if (v.length > 0) throw new Error(v[0])
@@ -153,7 +153,9 @@ export default function NganHangDeScreen() {
       // thì em ĐẦU TIÊN bấm "tạo câu khắc phục" sau buổi thi phải đứng chờ máy
       // chủ mở cả kho để dò chuyên đề. Hỏng cũng không sao: lần gọi sau tự dựng.
       await dungChiMuc(scriptUrl.trim(), secret.trim()).catch(() => 0)
-      showToast(`Đã đẩy đề ${r.maDe} lên kho (${r.soCau} câu${r.soNghi ? `, ${r.soNghi} câu nghi` : ''}) và lưu vào máy này${canXemList.length ? ` — cần xem: ${canXemList.join(', ')}` : ''}`, r.soNghi ? 'warn' : 'success')
+      // Cảnh báo (hình thiếu dữ liệu, đáp án Phần III máy chấm không đọc được…) KHÔNG chặn lưu nhưng phải hiện cho thầy.
+      const canhBao = warnings.length ? ` — ${warnings.length} điểm cần kiểm, đầu tiên: ${warnings[0]}` : ''
+      showToast(`Đã đẩy đề ${r.maDe} lên kho (${r.soCau} câu${r.soNghi ? `, ${r.soNghi} câu nghi` : ''}) và lưu vào máy này${canXemList.length ? ` — cần xem: ${canXemList.join(', ')}` : ''}${canhBao}`, r.soNghi || warnings.length ? 'warn' : 'success')
     } catch (e) {
       showToast(`Đẩy đề lỗi: ${e instanceof Error ? e.message : 'không rõ'}`, 'error')
     } finally {

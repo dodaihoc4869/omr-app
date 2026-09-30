@@ -47,5 +47,68 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
   }
+ },
+ "12-KT-C6-D5-I-11": {
+  "luc": "2026-09-29T11:36:10.893Z",
+  "cau": {
+   "phan": "I",
+   "so": 11,
+   "de": "Hợp kim là vật liệu kim loại có chứa một kim loại cơ bản và một số kim loại khác hoặc phi kim.\nNhận định nào sau đây về hợp kim là không đúng?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Hơp kim được sử dụng phổ biến của sắt là gang và thép",
+    "B": "Tính chất của hợp kim phụ thuộc vào thành phần các đơn chất tham gia cấu tạo mạng tinh thể hợp kim",
+    "C": "Hợp kim có nhiều tính chất cơ học, tính chất vật lí vượt trội so với kim loại",
+    "D": "Hợp kim có tính chất hóa học khác xa so với tính chất hóa học của các kim loại thành phần"
+   },
+   "loi_giai": {
+    "chot": "Hợp kim đổi nhiều về tính chất vật lí và cơ học nhưng tính chất hoá học vẫn tương tự các kim loại thành phần.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: gang và thép là hợp kim phổ biến của sắt."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: tính chất hợp kim phụ thuộc thành phần."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: hợp kim vượt trội về cơ học và vật lí."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng là nhận định sai: tính chất hoá học của hợp kim gần như không đổi."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI.HOP_KIM.CHON_PHAT_BIEU",
+    "ten": "Hợp kim — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
  }
 }

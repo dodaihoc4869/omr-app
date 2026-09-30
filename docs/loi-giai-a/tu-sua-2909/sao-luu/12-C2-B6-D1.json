@@ -1,0 +1,151 @@
+{
+ "12-C2-B6-D1-I-72": {
+  "luc": "2026-09-29T11:34:55.103Z",
+  "cau": {
+   "phan": "I",
+   "so": 72,
+   "de": "Dãy chất nào sau đây có tất cả các chất đều không tham giả phản ứng thủy phân?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Saccharose, tinh bột.",
+    "B": "Cellulose, saccharose.",
+    "C": "Fructose, glucose.",
+    "D": "Tinh bột, maltose."
+   },
+   "loi_giai": {
+    "chot": "Chỉ monosaccharide (glucose, fructose) không tham gia phản ứng thuỷ phân.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Saccharose và tinh bột đều thuỷ phân được."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Cellulose và saccharose đều thuỷ phân được."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Fructose và glucose là monosaccharide, không thuỷ phân."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Tinh bột và maltose đều thuỷ phân cho glucose."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng câu 49, chỉ đảo chiều hỏi sang chất không thuỷ phân.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.NHAN_DANG",
+    "ten": "Thuỷ phân — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B6-D1",
+    "ten": "Phản ứng thủy phân của polysaccharide",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-C2-B6-D1-II-4": {
+  "luc": "2026-09-29T13:10:12.245Z",
+  "cau": {
+   "phan": "II",
+   "so": 4,
+   "de": "Hằng ngày, cơ thể chúng ta được cung cấp các chất dinh dưỡng như tinh bột, đường saccharose, glucose, fructose,.. Các sản phẩm làm từ giấy, gỗ, sợi cotton,… với thành phần chính là cellulose cũng được được con người sử dụng.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "y": {
+    "a": "Các chất tinh bột, saccharose, glucose, fructose, cellulose có tên gọi là carbohydrate.",
+    "b": "Các chất tinh bột, saccharose, glucose, fructose, cellulose có công thức chung là (CH₂O)ₙ.",
+    "c": "Trong phân tử của tinh bột, saccharose, glucose, fructose, cellulose có nhiều loại nhóm chức.",
+    "d": "Ngoài tinh bột, đường saccharose, glucose, fructose,… Chất béo và protein là một trong những nguồn cung cấp dinh dưỡng cấn thiết cho cơ thể."
+   },
+   "loi_giai": {
+    "chot": "Carbohydrate là hợp chất hữu cơ tạp chức, thường có công thức chung Cn(H₂O)m, gồm monosaccharide, disaccharide, polysaccharide.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng. Tinh bột, saccharose, glucose, fructose, cellulose đều là carbohydrate (saccharide)."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai. Saccharose C₁₂H₂₂O₁₁ và tinh bột (C₆H₁₀O₅)ₙ không có dạng (CH₂O)ₙ; chỉ glucose, fructose C₆H₁₂O₆ thoả."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng. Chúng là hợp chất tạp chức: có nhóm -OH cùng nhóm -CHO, C=O hoặc liên kết glycoside (acetal)."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng. Chất béo và protein cùng carbohydrate là ba nhóm chất dinh dưỡng chính của cơ thể."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng định nghĩa carbohydrate và công thức chung đã gắn hai sao ở câu 8.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B4",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

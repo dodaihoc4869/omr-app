@@ -1,0 +1,312 @@
+{
+ "DB-11-B8-D5-I-5": {
+  "luc": "2026-09-29T13:11:57.773Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "de": "Hòa tan 3,38 gam oleum (X) vào nước thu được dung dịch (Y).\nĐể trung hòa (Y) cần dùng vừa đủ 800 mL dung dịch KOH 0,1M.\nCông thức của (x) là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "h₂so₄.so₃.",
+    "B": "h₂so₄.2so₃.",
+    "C": "h₂so₄.3so₃.",
+    "D": "h₂so₄.4so₃."
+   },
+   "loi_giai": {
+    "chot": "n(KOH) = 0,08 mol nên n(H₂SO₄) = 0,04 mol. Từ 3,38·(1 + n) : (98 + 80n) = 0,04 suy ra 0,18n = 0,54 và n = 3, tức H₂SO₄·3SO₃.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "n = 1 cho khối lượng mol 178, không khớp dữ kiện."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "n = 2 cho khối lượng mol 258, không khớp dữ kiện."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: n = 3, công thức H₂SO₄·3SO₃."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "n = 4 cho khối lượng mol 418, không khớp dữ kiện."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu xác định công thức oleum từ lượng kiềm cần để trung hoà.",
+    "bay": "Mỗi mol oleum H₂SO₄·nSO₃ khi tan vào nước cho (1 + n) mol H₂SO₄, không phải 1 mol."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.VIET_CTCT",
+    "ten": "Sản xuất sulfuric acid — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-84"
+  }
+ },
+ "DB-11-B8-D5-I-7": {
+  "luc": "2026-09-29T13:11:57.773Z",
+  "cau": {
+   "phan": "I",
+   "so": 7,
+   "de": "Cho 6,76 gam oleum H₂SO4.nSO₃ vào nước thành 200 mL dung dịch X. Để trung hòa 10 mL dung dịch X cần dùng vừa đủ với 16 mL dung dịch NaOH 0,5 M. Công thức oleum là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "pa": {
+    "A": "H₂SO₄.SO₃.",
+    "B": "H₂SO₄.4SO₃.",
+    "C": "H₂SO₄.3SO₃.",
+    "D": "H₂SO₄.2SO₃."
+   },
+   "loi_giai": {
+    "chot": "1 mol H₂SO₄·nSO₃ vào nước cho (n + 1) mol H₂SO₄.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: n = 1 cho M = 178, không khớp khối lượng 6,76 g."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: n = 4 cho M = 418, không khớp."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: trong 10 mL, n(NaOH) = 0,008 mol ⇒ n(H₂SO₄) = 0,004 mol ⇒ cả 200 mL có 0,08 mol. n(oleum) = 0,08/(n + 1); (98 + 80n) × 0,08/(n + 1) = 6,76 ⇒ 1,08 = 0,36n ⇒ n = 3."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: n = 2 cho M = 258, không khớp."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Phải quy phần trung hoà ở 10 mL lên cả 200 mL trước khi lập phương trình theo n.",
+    "bay": "Dùng luôn số mol đo ở 10 mL cho cả 6,76 gam oleum."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.NHAN_DANG",
+    "ten": "Sản xuất sulfuric acid — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "I-99"
+  }
+ },
+ "DB-11-B8-D5-II-8": {
+  "luc": "2026-09-29T13:11:57.773Z",
+  "cau": {
+   "phan": "II",
+   "so": 8,
+   "de": "Tại một nhà máy, quá trình sản xuất sulfuric acid từ quặng pyrite được thực hiện qua ba giai đoạn.\nGiai đoạn 1: Sản xuất sulfur dioxide 4FeS₂(s)+11O₂(g)t→2Fe₂O₃(s)+8SO₂(g) ΔrH₂₉₈=−3313,8kJ\nGiai đoạn 2: Sản xuất sulfur trioxide:\n2SO₂(g)+O₂(g)←V₂tOo₅→2SO₃(g) ΔrH₂₉₈=−197,78kJ\nGiai đoạn 3: Sản xuất oleum:\nH₂SO₄+nSO₃→H₂SO₄.nSO₃",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Tại nhà máy, sulfuric acid được sản xuất theo phương pháp tiếp xúc.",
+    "b": "Phản ứng ở hai giai đoạn đầu kèm theo sự hấp thụ năng lượng nhiệt từ môi trường.",
+    "c": "Ở giai đoạn 2 cần làm mát buồng phản ứng để ổn định nhiệt độ.",
+    "d": "Để sản xuất được 100 tấn dung dịch H₂SO₄ 98%, nhà máy cần sử dụng ít nhất 78,8 tấn quặng pyrite (chứa 80% FeS₂ về khối lượng), giả thiết hiệu suất chung của toàn bộ quá trình là 90%."
+   },
+   "loi_giai": {
+    "chot": "Cả hai giai đoạn đầu đều có ΔrH âm nên toả nhiệt, phải làm mát buồng phản ứng. Với 98 tấn H₂SO₄ cần 0,5 phần FeS₂; chia hiệu suất 90% và độ tinh khiết 80% được khoảng 83,3 tấn quặng, không phải 78,8 tấn.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đó chính là phương pháp tiếp xúc."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai giai đoạn đều toả nhiệt, không hấp thụ nhiệt."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: phản ứng toả nhiệt nên phải làm mát để giữ nhiệt độ ổn định."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: tính ra cần khoảng 83,3 tấn quặng chứ không phải 78,8 tấn."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu phân tích ba giai đoạn sản xuất sulfuric acid và tính khối lượng quặng cần dùng.",
+    "bay": "Ý d phải chia cho cả hiệu suất 90% và độ tinh khiết 80% của quặng, kết quả lớn hơn con số đề đưa ra."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "II-17"
+  }
+ },
+ "DB-11-B8-D5-II-9": {
+  "luc": "2026-09-29T13:11:57.773Z",
+  "cau": {
+   "phan": "II",
+   "so": 9,
+   "de": "Sơ đồ quy trình dưới đây mô tả các bước trong quá trình sản xuất phân bón (Z):",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-18.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "y": {
+    "a": "Phân bón (Z) có công thức hóa học là (NH₄)₂SO₄.",
+    "b": "Hợp chất (Q) sinh ra khi cho khí A hấp thụ vào dung dịch H₂SO₄ có tên gọi là oleum.",
+    "c": "Có 3 phản ứng oxi hóa khử trong sơ đồ trên.",
+    "d": "Hợp chất (X) được mệnh danh là “máu” của các nghành công nghiệp."
+   },
+   "loi_giai": {
+    "chot": "Phân bón Z là (NH₄)₂SO₄, tạo từ khí ammonia và sulfuric acid; hợp chất X là H₂SO₄, được mệnh danh là máu của các ngành công nghiệp. Số phản ứng oxi hoá – khử phải đếm trực tiếp trên sơ đồ.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: phân bón Z là ammonium sulfate (NH₄)₂SO₄."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng theo sơ đồ gốc: khí A hấp thụ vào H₂SO₄ cho hợp chất Q gọi là oleum."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Đáp án đề chấm ý này là sai; cần đối chiếu sơ đồ gốc để đếm lại số phản ứng oxi hoá – khử."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂SO₄ được mệnh danh là máu của các ngành công nghiệp."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "ĐÃ XEM SƠ ĐỒ 16/09. SO₂ + O₂ →(t°, V₂O₅) A(SO₃); A + H₂SO₄ → Q(oleum); Q + H₂O → X(H₂SO₄); N₂ + H₂ → Y(NH₃); X + Y → Z((NH₄)₂SO₄). a) Đ. b) Đ (SO₃ hấp thụ vào H₂SO₄ đặc cho oleum). c) chỉ 2 phản ứng oxi hoá – khử (SO₂ → SO₃ và N₂ + H₂ → NH₃), không phải 3 — S. d) H₂SO₄ được gọi là \"máu\" của các ngành công nghiệp — Đ. Khớp DDSD."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đọc sơ đồ quy trình sản xuất phân bón từ ammonia và sulfuric acid.",
+    "bay": "Phải đọc sơ đồ để biết A, Q, X, Z là chất nào rồi mới đếm được số phản ứng oxi hoá – khử."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.CHON_PHAT_BIEU",
+    "ten": "Sulfuric acid, muối sulfate và oleum — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D5",
+    "ten": "Bài toán về oleum",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "II-18"
+  }
+ }
+}

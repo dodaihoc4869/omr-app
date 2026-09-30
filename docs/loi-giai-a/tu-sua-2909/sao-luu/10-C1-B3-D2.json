@@ -1,0 +1,61 @@
+{
+ "10-C1-B3-D2-III-25": {
+  "luc": "2026-09-29T13:13:56.132Z",
+  "cau": {
+   "phan": "III",
+   "so": 25,
+   "de": "Một nguyên tố mà nguyên tử có 4 lớp electron, có phân lớp d, lớp ngoài cùng đã bão hòa electron.\nTổng số electron s và electron p của nguyên tố này là bao nhiêu?",
+   "dap_an": "20",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Nguyên tử có 4 lớp và đang điền 3d thì lớp ngoài cùng chỉ gồm 4s, bão hoà là 4s². Phân lớp s chứa tối đa 2 electron, phân lớp p tối đa 6 electron.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Nguyên tử có 4 lớp và có phân lớp d nên electron đang điền vào 3d; lớp ngoài cùng khi đó chỉ có phân lớp 4s, bão hoà là 4s².",
+     "Cấu hình dạng 1s² 2s² 2p⁶ 3s² 3p⁶ 3d(1 đến 10) 4s², ví dụ Zn: [Ar]3d¹⁰ 4s².",
+     "Electron s: 2 + 2 + 2 + 2 = 8. Electron p: 6 + 6 = 12.",
+     "Tổng electron s và p: 8 + 12 = 20.",
+     "Kết quả: 20."
+    ],
+    "ket_qua": "20",
+    "dap_an_de": "20",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Suy ra lớp ngoài cùng chỉ có 4s² rồi mới cộng riêng electron s và electron p.",
+    "bay": "Hiểu lớp ngoài cùng bão hoà là 8 electron nên thêm cả 4p⁶.",
+    "dk": [
+     "buoc"
+    ]
+   },
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.DEM_NGUYEN_TU",
+    "ten": "Cấu hình electron — đếm nguyên tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "10-C1-B3",
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ }
+}

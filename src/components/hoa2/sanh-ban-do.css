@@ -2202,8 +2202,205 @@
   border-color: rgb(106 47 168 / 0.35);
 }
 
-/* Cửa Tu luyện (29/09): cùng khuôn nút Đảo, viền vàng — luyện tự do, không tính EXP. */
-.h2-nut-tu-luyen {
-  border-color: rgb(214 140 20 / 0.55);
-  margin-top: 8px;
+/* Cửa Tu luyện = MÓN QUÀ cho em chăm chỉ (thầy lệnh 30/09). Đồng bộ màn trong Tu luyện (`tu-luyen.css`): cùng nền đêm tlu-nen/-2/-3,
+ * vàng tlu-vang/-vang-dam, ngọc tlu-ngoc, tiêu đề Baloo 2 vàng, bo 22 px. Token khai MỘT chỗ ở `.h2-qua-tl` (rgb(), không mã thập lục phân).
+ * Viền ánh kim = nền hai lớp (padding-box / border-box). Ánh lấp lánh chạy qua mỗi 6 giây (chỉ transform/opacity);
+ * tắt hẳn khi `prefers-reduced-motion` (khối chung của .h2-sanh + khối dưới) và khi `html.may-yeu`. Giữ nguyên màu ở cả Sảnh sáng lẫn Sảnh tối. */
+.h2-qua-tl {
+  --qtl-nen: rgb(13 24 56);
+  --qtl-nen-2: rgb(23 38 74);
+  --qtl-nen-3: rgb(34 52 98);
+  --qtl-chu: rgb(238 242 250);
+  --qtl-chu-phu: rgb(214 224 244);
+  --qtl-vang: rgb(255 214 107);
+  --qtl-vang-sang: rgb(255 240 190);
+  --qtl-vang-dam: rgb(245 165 36);
+  --qtl-nau: rgb(58 36 0);
+  --qtl-ngoc: rgb(94 224 200);
+  --qtl-ngoc-dam: rgb(38 170 150);
+  --qtl-tim: rgb(214 170 255);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  min-height: 84px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 10px;
+  border-radius: 22px;
+  border: 1.5px solid transparent;
+  background:
+    radial-gradient(90% 120% at 100% 0%, rgb(214 170 255 / 0.3), transparent 60%) padding-box,
+    radial-gradient(70% 130% at 0% 100%, rgb(94 224 200 / 0.24), transparent 62%) padding-box,
+    linear-gradient(135deg, var(--qtl-nen-3), var(--qtl-nen-2) 45%, var(--qtl-nen)) padding-box,
+    linear-gradient(120deg, var(--qtl-vang-dam), var(--qtl-vang-sang) 30%, var(--qtl-vang) 55%, var(--qtl-vang-dam) 80%, var(--qtl-vang-sang)) border-box;
+  box-shadow: inset 0 1px 0 rgb(255 240 190 / 0.35), 0 0 0 3px rgb(255 214 107 / 0.16), 0 10px 24px rgb(13 24 56 / 0.32);
+  color: var(--qtl-chu);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.h2-qua-tl:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 rgb(255 240 190 / 0.45), 0 0 0 4px rgb(255 214 107 / 0.32), 0 14px 30px rgb(13 24 56 / 0.4);
+}
+.h2-qua-tl:active {
+  transform: translateY(0) scale(0.98);
+}
+.h2-qua-tl:focus-visible {
+  outline: 3px solid var(--qtl-vang);
+  outline-offset: 3px;
+}
+/* ánh lấp lánh chạy chéo qua thẻ */
+.h2-qua-tl-lap {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgb(255 240 190 / 0.26) 46%, rgb(255 255 255 / 0.4) 50%, rgb(255 240 190 / 0.26) 54%, transparent 70%);
+  transform: translateX(-110%);
+  animation: h2-qtl-lap 6s ease-in-out 1.2s infinite;
+}
+@keyframes h2-qtl-lap {
+  0% { transform: translateX(-110%); }
+  24%, 100% { transform: translateX(110%); }
+}
+.h2-qua-tl-bieu {
+  flex-shrink: 0;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 40%, rgb(255 214 107 / 0.28), rgb(255 214 107 / 0.08) 70%);
+  box-shadow: inset 0 0 0 1px rgb(255 214 107 / 0.35);
+}
+.h2-qua-tl-bieu > svg {
+  display: block;
+  filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.35));
+}
+.h2-qtl-s-vang-sang { stop-color: var(--qtl-vang-sang); }
+.h2-qtl-s-vang-dam { stop-color: var(--qtl-vang-dam); }
+.h2-qtl-s-nen-3 { stop-color: var(--qtl-nen-3); }
+.h2-qtl-s-nen { stop-color: var(--qtl-nen); }
+.h2-qtl-vien { stroke: var(--qtl-vang); stroke-width: 1.5; }
+.h2-qtl-ngoc { fill: var(--qtl-ngoc); }
+.h2-qtl-ngoc-dam { fill: var(--qtl-ngoc-dam); }
+.h2-qtl-bia { fill: var(--qtl-nen); stroke: var(--qtl-vang); stroke-width: 1.6; }
+.h2-qtl-bia-vong { fill: none; stroke: var(--qtl-vang); stroke-width: 1.4; }
+.h2-qtl-bia-tam { fill: var(--qtl-vang); }
+.h2-qtl-sao {
+  fill: var(--qtl-vang-sang);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: h2-qtl-sao 2.4s ease-in-out infinite;
+}
+.h2-qtl-sao-2 {
+  animation-delay: 1.2s;
+}
+@keyframes h2-qtl-sao {
+  0%, 100% { opacity: 0.35; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.h2-qua-tl-chu {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.h2-qua-tl-ten {
+  font-family: 'Baloo 2', var(--sans, system-ui), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: var(--qtl-vang);
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.3);
+}
+.h2-qua-tl-phu {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--qtl-chu-phu);
+  text-wrap: balance;
+}
+.h2-qua-tl-mui {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--qtl-vang-sang);
+  background: linear-gradient(180deg, rgb(255 224 110), rgb(255 192 44) 52%, rgb(244 148 16));
+  color: var(--qtl-nau);
+  box-shadow: inset 0 2px 0 rgb(255 255 240 / 0.9), 0 3px 0 rgb(150 80 0);
+  transition: transform 0.2s ease;
+}
+.h2-qua-tl:hover .h2-qua-tl-mui {
+  transform: translateX(3px);
+}
+/* bản ngang (điện thoại ngang / máy tính): cột phải, cùng bo 24 px của thẻ kính */
+.h2-qua-tl-ngang {
+  margin-top: 0;
+  min-height: 76px;
+  border-radius: 24px;
+  padding: 10px 16px 10px 12px;
+}
+.h2-ngang[data-thap='true'] .h2-qua-tl-ngang {
+  min-height: 68px;
+  padding: 8px 12px 8px 8px;
+  gap: 10px;
+}
+.h2-ngang[data-thap='true'] .h2-qua-tl-bieu {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+.h2-ngang[data-thap='true'] .h2-qua-tl-bieu > svg {
+  width: 40px;
+  height: 40px;
+}
+.h2-ngang[data-thap='true'] .h2-qua-tl-ten {
+  font-size: 19px;
+}
+.h2-ngang[data-thap='true'] .h2-qua-tl-phu {
+  font-size: 13px;
+}
+.h2-sanh[data-mo-man='true'] .h2-qua-tl {
+  animation: h2-bung 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.45s both;
+}
+/* máy yếu + giảm chuyển động: đứng yên, không lấp lánh */
+html.may-yeu .h2-qua-tl,
+html.may-yeu .h2-qua-tl *,
+html.may-yeu .h2-qua-tl::before {
+  animation: none !important;
+  transition: none !important;
+}
+html.may-yeu .h2-qua-tl-lap {
+  display: none;
+}
+html.may-yeu .h2-qua-tl-bieu > svg {
+  filter: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .h2-qua-tl,
+  .h2-qua-tl * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .h2-qua-tl-lap {
+    display: none;
+  }
+  .h2-qua-tl:hover,
+  .h2-qua-tl:hover .h2-qua-tl-mui {
+    transform: none;
+  }
 }

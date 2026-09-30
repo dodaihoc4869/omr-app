@@ -1,0 +1,208 @@
+{
+ "DH-10-C2-B7-II-11": {
+  "luc": "2026-09-29T13:12:52.811Z",
+  "cau": {
+   "phan": "II",
+   "so": 11,
+   "de": "Nguyên tố X là nguyên tố thuộc chu kì 3, nhóm VIIA trong bảng tuần hoàn các nguyên tố hóa học.",
+   "dap_an": "SDSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "y": {
+    "a": "X là nguyên tố phi kim mạnh nhất trong bảng tuần hoàn hóa học.",
+    "b": "Oxide cao nhất của X có công thức X₂O₇ và là một acidic oxide.",
+    "c": "Hydroxide của X có công thức H₂XO3 và là một acid mạnh.",
+    "d": "Công thức hợp chất khí của nguyên tố X với hydrogen là HX."
+   },
+   "loi_giai": {
+    "chot": "Chu kì 3 nhóm VIIA là chlorine: oxide cao nhất Cl₂O₇, hydroxide HClO₄ và hợp chất khí HCl; phi kim mạnh nhất bảng tuần hoàn là fluorine.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: phi kim mạnh nhất bảng tuần hoàn là fluorine, không phải chlorine."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm VIIA nên oxide cao nhất X₂O₇ và là acidic oxide."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: hydroxide của X là HXO₄, tức HClO₄, không phải H₂XO₃."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: hoá trị với hydrogen bằng 8 − 7 = 1 nên hợp chất khí là HX."
+     }
+    },
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "SDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Phi kim mạnh nhất là fluorine ở chu kì 2, vì bán kính nhỏ nhất trong nhóm VIIA.",
+    "bay": "Coi chlorine là phi kim mạnh nhất vì nó ở cuối chu kì 3."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-II-18": {
+  "luc": "2026-09-29T13:12:52.811Z",
+  "cau": {
+   "phan": "II",
+   "so": 18,
+   "de": "X, Y, Z là ba nguyên tố liên tiếp nhau trong cùng chu kì 3. Hợp chất oxide cao nhất của X, Y, Z lần lượt là X₂O, YO, Z₂O₃.",
+   "dap_an": "DSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "y": {
+    "a": "Hoá trị của Y trong hợp chất oxide cao nhất là 2.",
+    "b": "Tính base tăng dần của các oxide theo tứ tự là X₂O, YO, Z₂O₃.",
+    "c": "Tính base giảm dần của các hydroxide ứng với các nguyên tố X, Y, Z là Z(OH)3, Y(OH)₂, XOH.",
+    "d": "Có một oxide lưỡng tính trong các oxide trên."
+   },
+   "loi_giai": {
+    "chot": "X₂O, YO và Z₂O₃ ứng với nhóm IA, IIA và IIIA; ba nguyên tố liên tiếp ở chu kì 3 nên là Na, Mg, Al, trong đó Al₂O₃ lưỡng tính.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: YO ứng với hoá trị 2 của Y."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: theo thứ tự X₂O, YO, Z₂O₃ thì tính base GIẢM dần chứ không tăng."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: thứ tự giảm dần đúng là XOH > Y(OH)₂ > Z(OH)₃."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: Z₂O₃ chính là Al₂O₃, một oxide lưỡng tính."
+     }
+    },
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "DSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Từ IA sang IIIA là đi sang PHẢI trong chu kì nên tính base giảm, tính acid tăng.",
+    "bay": "Đọc thứ tự trong đề rồi gán luôn cho chiều tăng mà không kiểm tra."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.CHON_PHAT_BIEU",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-11": {
+  "luc": "2026-09-29T13:12:52.811Z",
+  "cau": {
+   "phan": "III",
+   "so": 11,
+   "de": "Cho các oxide sau: Na₂O, MgO, P₂O₅, SO₃, K₂O và CO₂.\nCó bao nhiêu oxide trong dãy khi hòa tan vào nước thu được dung dịch làm quỳ tím chuyển thành màu xanh?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Quỳ hoá xanh nghĩa là dung dịch có tính base, tức oxide phải là basic oxide của kim loại.",
+    "buoc": [
+     "Na₂O cho NaOH và K₂O cho KOH, đều là base mạnh.",
+     "MgO tan một phần cho Mg(OH)₂ có tính base nên vẫn làm quỳ hoá xanh.",
+     "P₂O₅, SO₃ và CO₂ đều là acidic oxide, cho dung dịch acid.",
+     "Thay số: có 3 oxide."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Oxide của kim loại cho base, oxide của phi kim cho acid — chia đôi dãy là xong.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.NEU_HIEN_TUONG",
+    "ten": "Phân loại kim loại, phi kim, khí hiếm — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ }
+}

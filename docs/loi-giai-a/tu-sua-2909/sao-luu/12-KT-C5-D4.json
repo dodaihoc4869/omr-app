@@ -135,5 +135,68 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
   }
+ },
+ "12-KT-C5-D4-I-7": {
+  "luc": "2026-09-29T11:36:00.159Z",
+  "cau": {
+   "phan": "I",
+   "so": 7,
+   "de": "Copper (Cu) có độ tinh khiết cao có khả năng dẫn điện tốt, bền về mặt hoá học nên được sử dụng rộng rãi trong các thiết bị điện tử. Copper có độ tinh khiết cao có thể thu được từ Copper có độ tinh khiết thấp qua quá trình tinh luyện bằng phương pháp:",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "điện phân dung dịch CuSO4 với anode làm bằng Platinium (Pt) và cathode là vật bằng Cu với độ tinh khiết cao",
+    "B": "điện phân dung dịch CuSO4 với cathode làm bằng than chì và anode là vật bằng Cu với độ tinh khiết cao",
+    "C": "điện phân dung dịch CuSO4 với cathode làm bằng Cu có độ tinh khiết thấp và anode là vật bằng Cu với độ tinh khiết cao",
+    "D": "điện phân dung dịch CuSO4 với cathode làm bằng Cu có độ tinh khiết cao và anode là vật bằng Cu với độ tinh khiết thấp"
+   },
+   "loi_giai": {
+    "chot": "Tinh luyện đồng dùng anode tan: anode là đồng thô, cathode là đồng tinh khiết để đồng kết tinh lại.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Anode platinum không tan nên không chuyển được đồng sang cathode."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đặt đồng tinh khiết ở anode là làm ngược quá trình cần có."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Đảo ngược vai trò hai điện cực so với thực tế."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: anode là đồng thô, cathode là đồng tinh khiết."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.MA_TINH_LUYEN.NHAN_DANG",
+    "ten": "Mạ điện, tinh luyện — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
  }
 }

@@ -1,0 +1,128 @@
+{
+ "DH-11-C1-B3-D1-I-8": {
+  "luc": "2026-09-29T13:13:06.136Z",
+  "cau": {
+   "phan": "I",
+   "so": 8,
+   "de": "Trong phản ứng sau đây:\nH₂S(aq) + H₂O(l) ⇌ HS⁻(aq) + H₃O⁺(aq).\nChất nào đóng vai trò là acid theo thuyết Bronsted – lowry?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "hieu",
+   "bai": "Bài 3. Ôn tập chương 1 (Đề 1)",
+   "pa": {
+    "A": "H₂S và H₂O.",
+    "B": "H₂S và H₃O⁺.",
+    "C": "H₂S và HS⁻.",
+    "D": "H₂O và H₃O⁺."
+   },
+   "loi_giai": {
+    "chot": "Chiều thuận: H₂S cho proton nên là acid. Chiều nghịch: H₃O⁺ cho proton nên cũng là acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₂O nhận proton nên là base."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: H₂S ở chiều thuận và H₃O⁺ ở chiều nghịch."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "HS⁻ nhận lại proton nên là base liên hợp."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "H₂O là base của chiều thuận."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CAN_BANG.ACID_BASE.NHAN_DANG",
+    "ten": "Thuyết acid-base — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CAN_BANG"
+  }
+ },
+ "DH-11-C1-B3-D1-III-1": {
+  "luc": "2026-09-29T13:13:06.136Z",
+  "cau": {
+   "phan": "III",
+   "so": 1,
+   "de": "Cho 5 mol H₂ và 5 mol I₂ vào bình kín dung tích 1 lít và nung nóng đến 227 °C.\nĐồ thị biểu diễn sự thay đổi nồng độ các chất theo thời gian được cho trong hình sau.\nNồng độ của HI ở trạng thái cân bằng là bao nhiêu (tính theo đơn vị 10⁻³ mol/L)?",
+   "dap_an": "8,64",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Ôn tập chương 1 (Đề 1)",
+   "loi_giai": {
+    "chot": "Đọc đồ thị: đường HI đi lên rồi nằm ngang.",
+    "buoc": [
+     "Đọc đồ thị: đường HI đi lên rồi nằm ngang.",
+     "Mức nằm ngang của HI là 8,64 theo trục tung.",
+     "Trục tung ghi đơn vị 10⁻³ M nên đáp số là 8,64."
+    ],
+    "ket_qua": "8,64",
+    "dap_an_de": "8,64",
+    "dap_an_tu_giai": "8,64",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "bay"
+    ],
+    "ly_do": "Đọc đồ thị phải bám đúng đường và đúng đơn vị của trục.",
+    "bay": "Đọc nhầm sang mức 0,68 của H₂ và I₂."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.CAN_BANG.TINH_NONG_DO",
+    "ten": "Chuyển dịch cân bằng — tính nồng độ"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B1-D1",
+    "ten": "Hằng số cân bằng KC",
+    "lop": "11",
+    "bai": "DB-11-B1",
+    "tenBai": "Khái niệm về cân bằng hoá học (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   }
+  }
+ }
+}
