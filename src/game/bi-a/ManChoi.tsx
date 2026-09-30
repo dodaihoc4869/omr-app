@@ -1,6 +1,8 @@
 // BI-A PHẢN ỨNG · MÀN CHƠI (đặc tả 8.3–8.8; bản vẽ docs/ban-ve-bi-a-2809). Ba bố cục theo kích thước khung (dọc · ngang · máy tính),
 // nút Toàn màn hình (chỉ còn bàn), nhãn chỉ bi,
-// XOAY NGANG (29/09): bàn toàn màn, nút/thanh lực là lớp phủ mảnh hai mép, "Bi của em" là ngăn kéo, câu hỏi là tấm phủ giữa màn; âm thanh mô phỏng, tấm câu chấm ở máy chủ, sai là sang lượt ngay, Xem lại câu sai lúc chờ lượt.
+// XOAY NGANG (29/09): bàn toàn màn, nút/thanh lực là lớp phủ mảnh hai mép, câu hỏi là tấm phủ giữa màn; âm thanh mô phỏng, tấm câu chấm ở máy chủ, sai là sang lượt ngay, Xem lại câu sai lúc chờ lượt.
+// BÀN BI-A MỚI (thầy chốt bản vẽ 30/09): bỏ bảng "Bi của em" + bảng bi đối thủ ⇒ hàng chấm nhỏ trên cùng; bi vẽ theo góc nhìn (em lam đặc,
+// đối thủ sọc đỏ cam); giải trước = chạm bi của em trên bàn trong lượt người khác; kéo bàn xoay gậy + bánh xe + thanh lực dọc có Huỷ (DieuKhienBia.tsx).
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { KeyboardEvent as KE, PointerEvent as PE } from 'react'
 import { AmThanhBia } from './am-thanh'
@@ -9,15 +11,16 @@ import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { chonBoCuc, panTheoMan, raMan, tinhKhungBan, toaDoBan, type BoCuc, type KhungBan } from './bo-cuc'
 import { VanBia, type CauBia, type KetThucVan, type LoaiVan, type YeuCauCau } from './dieu-khien'
 import { CAU_NHAN, VanMang, type GoiTT, type KenhVan, type LoaiMang } from './dieu-khien-mang'
-import { GIAY_CU, TEN_MUC, hangMuc, quanHe, tiepTheo, type CheDo } from './luat'
-import { CHOT, KL, MAU_QH, NHOM, NT, PK, TEN_PHE, mauCss, type KiHieu } from './nguyen-to'
+import { TEN_MUC, hangMuc, quanHe, tiepTheo, type CheDo } from './luat'
+import { CHOT, KL, MAU_QH, NT, PK, TEN_PHE, type KiHieu } from './nguyen-to'
 import TamCauBia from './TamCauBia'
 import XemLaiCauSai, { type CauSai } from './XemLaiCauSai'
 import { R } from './vat-ly'
 import { dangCheDoMayYeu } from '../../lib/may-yeu'
-import { CongTacMatThan, useLuonMatThan } from './mat-than-luon'
-import { banKinhBatBiCai, batDauCam, chinhTinh, huongKhiKeo, nuaBeRongBat, trungGay, type CamGay, type Diem } from './gay'
+import { useLuonMatThan } from './mat-than-luon'
 import { BoVe } from './ve-ban'
+import { BanhXe, BoDieuKhien, CaiDatDieuKhien, HangCham, HuongDan, ThanhLuc, biTai, daXemHuongDan, ghiDaXemHuongDan } from './DieuKhienBia'
+import { KHO_BIET_GIAI_TRUOC, KHO_TAY } from './cai-dat-bia'
 import './bi-a.css'
 
 export interface ManChoiProps {
@@ -41,11 +44,11 @@ const ICON = {
   toan: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></svg>,
   thoat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /></svg>,
   mat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>,
+  them: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle cx="19" cy="12" r="1.3" /></svg>,
 }
 function IconAm({ tat }: { tat: boolean }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z" />{tat ? <path d="M16 9l5 6M21 9l-5 6" /> : <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />}</svg>
 }
-const DK_TOA = 2 * Math.PI * 21
 
 /** Nhãn chỉ bi (đặc tả 3.11): kí hiệu, tên, Z; quan hệ với em; một dòng phụ. Bi người khác KHÔNG lộ dạng câu. */
 export function noiDungNhan(v: VanBia, id: KiHieu): { qh: ReturnType<typeof quanHe>; tieuDe: string; chinh: string; nho: string } {
@@ -58,17 +61,15 @@ export function noiDungNhan(v: VanBia, id: KiHieu): { qh: ReturnType<typeof quan
   return { qh, tieuDe: `${n.ten} · Z = ${n.z}`, chinh, nho }
 }
 
-const CHU_CAM_GAY = 'Cầm gậy kéo để xoay · kéo nơi khác để chỉnh tinh'
 const GOI_Y_IOS = 'Thêm vào màn hình chính để chơi toàn màn hình'
 type DocWebkit = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void }
 /** Khoá màn hình NGANG khi đang toàn màn hình (Android Chrome cho; trình duyệt khác từ chối ⇒ bỏ qua êm). */
 function khoaNgang(): void {
   try { const o = (typeof screen !== 'undefined' ? screen.orientation : undefined) as (ScreenOrientation & { lock?: (h: string) => Promise<void> }) | undefined; void o?.lock?.('landscape')?.catch(() => {}) } catch { /* không hỗ trợ */ }
 }
-const KHOA_DA_BIET_CAM_GAY = 'bia_da_biet_cam_gay'
 export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm, chot, onVeSanh, onChoiLai, mang }: ManChoiProps) {
   const rootRef = useRef<HTMLDivElement>(null), banRef = useRef<HTMLDivElement>(null), cvRef = useRef<HTMLCanvasElement>(null)
-  const nhanRef = useRef<HTMLDivElement>(null), nhamRef = useRef<HTMLDivElement>(null), chipRef = useRef<HTMLSpanElement>(null), lucRef = useRef<HTMLDivElement>(null)
+  const nhanRef = useRef<HTMLDivElement>(null), chipRef = useRef<HTMLSpanElement>(null)
   const amRef = useRef<AmThanhBia | null>(null)
   if (!amRef.current) amRef.current = new AmThanhBia()
   const am = amRef.current
@@ -95,7 +96,6 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const [boCuc, setBoCuc] = useState<BoCuc>('doc')
   const [toan, setToan] = useState(false)
   const [huong, setHuong] = useState<'ngang' | 'doc'>('doc')
-  const [moGia, setMoGia] = useState(false)
   const [popXoay, setPopXoay] = useState(false)
   const [cauSai, setCauSai] = useState<CauSai[]>([])
   const [xem, setXem] = useState(false)
@@ -104,31 +104,38 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const [tin, setTin] = useState<{ ma: number; hien: boolean }>({ ma: 0, hien: false })
   const [theLucSau, setTheLucSau] = useState<{ con: number; tong: number } | null>(null)
   const chiRef = useRef<{ id: KiHieu; den: number; tro?: boolean } | null>(null)
-  /** Kéo trên bàn: `gay` = đang cầm gậy (xoay theo ngón); `tinh` = kéo ngoài gậy (chỉnh tinh, không nhảy hướng); `bi` = kéo bi cái. */
-  const keoRef = useRef<{ gay: CamGay | null; tinh: Diem | null; bi: boolean }>({ gay: null, tinh: null, bi: false })
-  /** Vị trí ngón mới nhất chưa áp — áp một lần mỗi khung hình (rAF), không xử lý mỗi pointermove. */
-  const choRef = useRef<Diem | null>(null)
-  const lucKeo = useRef<{ x: number; y: number } | null>(null)
-  const spaceRef = useRef<number | null>(null)
-  const [luc, setLucHien] = useState(0)
+  const [moTuyChinh, setMoTuyChinh] = useState(false)
+  const [huongDan, setHuongDan] = useState(false)
+  const tay = KHO_TAY.use()
+  const bietGiai = KHO_BIET_GIAI_TRUOC.use() === '1'
   /** Vẽ ngay một khung (gọi đồng bộ sau khi đổi cỡ canvas: đặt width/height xoá trắng canvas, không vẽ lại ngay ⇒ trình duyệt kịp hiện một khung trống). */
   const veNgayRef = useRef<() => void>(() => {})
   /** Cờ bố cục cho vòng khung hình (đọc ref, không đọc DOM mỗi khung). */
-  const hepRef = useRef(false), gonNgangRef = useRef(false), ngangRef = useRef(false), anNhamRef = useRef(false)
+  const hepRef = useRef(false)
+  const datKeo = (co: boolean) => { rootRef.current?.toggleAttribute('data-keo', co) }
+  const chiDich = () => { const info = v.nham(); if (info && info.loai === 'bi') chiRef.current = { id: info.b.id, den: performance.now() + 1200 } }
+  // Bộ điều khiển chạm: sống ngoài React (ref), vòng khung hình gọi `dk.khung()` một lần mỗi khung.
+  const [dkc] = useState(() => new BoDieuKhien({
+    v, khung: () => khungRef.current, canvas: () => cvRef.current, mo: () => am.mo(), datKeo: (co) => datKeoRef.current(co), chiDich: () => chiDichRef.current(),
+    chiBi: (id, ms) => { chiRef.current = { id, den: performance.now() + ms } }, giaiTruoc: (id) => giaiTruocRef.current(id),
+    datBiXong: () => { const c = v.bi_('cue'); am.phat('dat', 0, pan(c.x, c.y)) },
+  }))
+  const datKeoRef = useRef(datKeo); datKeoRef.current = datKeo
+  const chiDichRef = useRef(chiDich); chiDichRef.current = chiDich
+  const giaiTruocRef = useRef<(id: KiHieu) => void>(() => {})
 
   // ───────── vòng khung hình ─────────
   useEffect(() => {
     // MỘT requestAnimationFrame duy nhất: vật lý bước cố định (bộ tích luỹ trong VanBia, dt kẹp 50 ms khi tab chậm),
     // vẽ nội suy giữa hai bước; không setState mỗi khung (trừ thanh lực khi giữ Space).
     // Không cấp phát mỗi khung: vòng đồng hồ + chip chỉ ghi DOM khi số (đã lượng tử hoá) đổi; dòng "Đang nhắm" bỏ qua khi bị ẩn (bố cục có cột điều khiển).
-    let raf = 0, truoc = performance.now(), nhamCu = '', chipCu = -1, ctx: CanvasRenderingContext2D | null = null
-    const vongCu: number[] = []
+    let raf = 0, truoc = performance.now(), chipCu = -1, gioCu = -2, ctx: CanvasRenderingContext2D | null = null
     const veBan = (now: number) => {
       const cv = cvRef.current, k = khungRef.current, bv = boVeRef.current
       if (cv && (!ctx || ctx.canvas !== cv)) ctx = cv.getContext('2d')
       const c = chiRef.current, conChi = c && (!c.den || now < c.den) ? c : null
       if (c && c.den && now >= c.den) chiRef.current = null
-      if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, loai !== 'giao_huu', keoRef.current.bi)
+      if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, loai !== 'giao_huu', dkc.dangKeoBi(), dkc.trongHuy())
       return conChi
     }
     veNgayRef.current = () => { try { veBan(performance.now()) } catch (e) { baoLoiVe(e) } }
@@ -142,25 +149,18 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     }
     const motKhung = (now: number) => {
       const dt = Math.min(0.05, Math.max(0, now - truoc) / 1000); truoc = now
-      if (spaceRef.current !== null && v.pha === 'aim') { const p = Math.min(1, (now - spaceRef.current) / 1400); v.datLuc(p); setLucHien(p) }
-      apNgon()
+      dkc.khung(now) // áp thao tác chạm đang chờ (bàn, thanh lực, bánh xe, Space) + ghi DOM thanh lực
       v.buoc(dt)
       am.xa()
       const cv = cvRef.current, k = khungRef.current
       const conChi = veBan(now)
-      // vòng đồng hồ quanh ảnh ghế đang đánh
+      // đồng hồ: chỉ đấu online (30 giây mỗi cú, phòng giữ giờ) và chỉ HIỆN khi còn ≤ 10 giây
       const goc = rootRef.current
-      if (goc) {
-        for (let i = 0; i < v.ghe.length; i++) {
-          const g = v.ghe[i]!
-          const kk = i === v.cur && v.pha === 'aim' && !g.ai && !v.sheet ? v.time / GIAY_CU : (i === v.cur && v.pha !== 'over' ? 1 : 0)
-          const q = Math.round(Math.max(0, Math.min(1, kk)) * 240)
-          if (vongCu[i] === q) continue
-          const el = goc.querySelector<SVGCircleElement>(`[data-ghe="${i}"] .vong`)
-          if (!el) continue
-          vongCu[i] = q
-          el.style.strokeDasharray = String(DK_TOA); el.style.strokeDashoffset = String(DK_TOA * (1 - q / 240))
-        }
+      const giayCon = v.coDongHo() && v.pha === 'aim' && !v.sheet && v.time <= 10 ? Math.max(0, Math.ceil(v.time)) : -1
+      if (giayCon !== gioCu && goc) {
+        gioCu = giayCon
+        const dh = goc.querySelector<HTMLElement>('.bia-dong-ho')
+        if (dh) { dh.hidden = giayCon < 0; dh.textContent = giayCon < 0 ? '' : `còn ${giayCon} giây` }
       }
       // nhãn chỉ bi
       const nh = nhanRef.current
@@ -187,46 +187,21 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           nh.style.left = `${Math.max(w / 2 + 4, Math.min(W0 - w / 2 - 4, x0))}px`; nh.style.top = `${top}px`
         }
       }
-      // dòng "Đang nhắm" (màn dọc) — chỉ ghi khi đổi
-      const nm = anNhamRef.current ? null : nhamRef.current
-      if (nm) {
-        const nguoi = v.pha === 'aim' && !v.ghe[v.cur]!.ai && !v.sheet
-        const info = nguoi ? v.nham() : null
-        let key = '', chu = '', hl = '', dep = false, mau = '', soc = false
-        if (nguoi && info && info.loai === 'bi') {
-          const id = info.b.id, ok = v.hopLe(id), qh = quanHe(id, v.em, v.ghe, v.bi)
-          key = `${id}|${ok}|${v.matThan}|${v.bi[id].vang}`; mau = mauCss(id); soc = NT[id].nhom === 'pk'; dep = ok
-          if (id === CHOT) { chu = 'Đang nhắm: Bi chốt C · carbon'; hl = ok ? 'đánh được' : 'chưa được chạm' }
-          else if (qh === 'em') { const q = v.cauCua[id]; chu = q ? `${id} · ${q.tenDang} · ${TEN_MUC[hangMuc(q.mucDo)]} · ${v.diemBi(id)} điểm` : `${id} · ${NT[id].ten} · bi trống`; hl = v.bi[id].vang ? 'bi vàng của em' : 'bi của em' }
-          else if (qh === 'dong-doi') { chu = `${id} · ${NT[id].ten} · của đồng đội ${v.ghe[v.bi[id].chu]!.ngan}`; hl = 'cùng phe' }
-          else { chu = `${id} · ${NT[id].ten} · của đối thủ`; hl = v.isBreak ? 'phá bàn' : 'chạm trước là phạm luật' }
-          if (v.matThan > 0 && loai !== 'giao_huu') hl += ' · Mắt thần'
-        } else if (nguoi) { key = 'none' + v.ballInHand; chu = v.ballInHand ? 'Kéo bi cái để đặt, cầm gậy kéo để xoay' : CHU_CAM_GAY }
-        else { key = `cho-${v.pha}${v.cur}${!!v.sheet}`; chu = v.sheet ? 'Em đang trả lời câu hỏi' : v.pha === 'moving' ? 'Bi đang lăn…' : v.pha === 'over' ? 'Hết ván' : v.ghe[v.cur]!.ai ? `${v.ghe[v.cur]!.ten} đang đánh${loai !== 'giao_huu' ? ' · em giải trước được' : ''}` : 'Chờ lượt' }
-        if (key !== nhamCu) {
-          nhamCu = key
-          const bn = nm.querySelector<HTMLElement>('.bi-nho'), cc = nm.querySelector<HTMLElement>('.chu'), hh = nm.querySelector<HTMLElement>('.hl')
-          if (bn) { bn.style.setProperty('--c', mau || 'transparent'); if (soc) bn.setAttribute('data-soc', ''); else bn.removeAttribute('data-soc') }
-          if (cc) cc.textContent = chu
-          if (hh) { hh.textContent = hl; hh.toggleAttribute('data-dep', !!hl && dep); hh.toggleAttribute('data-xau', !!hl && !dep) }
-        }
-      }
       // chip toàn màn hình
       const ch = chipRef.current
       if (ch) {
-        const me = v.ghe[v.cur]!, giay = Math.max(0, Math.ceil(v.time)), hep = hepRef.current, ngang = ngangRef.current // màn dọc hẹp: rút gọn để không cắt chữ
-        const mt = v.matThan && loai !== 'giao_huu' && !ngang ? v.matThan : 0 // xoay ngang: số Mắt thần nằm trên nút Mắt thần
-        const gon = ngang && gonNgangRef.current // điện thoại ngang nhỏ: chip nằm giữa hai lỗ băng trên ⇒ bản ngắn
-        const kc = ((((((v.pha === 'over' ? 1 : 0) * 2 + (me.ai ? 1 : 0)) * 8 + v.cur) * 1000 + giay) * 1000 + v.diem[0]) * 1000 + v.diem[1]) * 1000 * 8 + mt * 8 + (hep ? 4 : 0) + (ngang ? 2 : 0) + (gon ? 1 : 0)
+        // chip (chế độ "chỉ còn bàn"): lượt · điểm; đồng hồ chỉ khi đấu online còn ≤ 10 giây
+        const me = v.ghe[v.cur]!, hep = hepRef.current, de = v.ghe[v.em]!.doi, a = v.diem[de], b = v.diem[1 - de]!
+        const kc = ((((((v.pha === 'over' ? 1 : 0) * 2 + (me.ai ? 1 : 0)) * 8 + v.cur) * 1000 + (giayCon + 1)) * 1000 + a) * 1000 + b) * 2 + (hep ? 1 : 0)
         if (kc !== chipCu) {
           chipCu = kc
-          ch.textContent = (v.pha === 'over' ? 'Hết ván' : me.ai ? `Lượt ${me.ngan}` : `Lượt em · ${giay} giây`) + (gon ? ` · Điểm ${v.diem[0]} : ${v.diem[1]}` : hep ? ` · ${v.diem[0]} : ${v.diem[1]}` : ` · Kim loại ${v.diem[0]} : ${v.diem[1]} Phi kim`) + (mt ? ` · Mắt thần ${mt}` : '')
+          ch.textContent = (v.pha === 'over' ? 'Hết ván' : v.cur === v.em ? 'Lượt em' : `Lượt ${me.ngan}`) + (giayCon >= 0 ? ` · còn ${giayCon} giây` : '') + (hep ? ` · Điểm ${a} : ${b}` : ` · Điểm phe em ${a} : ${b} phe đối thủ`)
         }
       }
     }
     raf = requestAnimationFrame(khung)
     return () => { cancelAnimationFrame(raf); veNgayRef.current = () => {} }
-  }, [v, am, loai])
+  }, [v, am, loai, dkc])
   useEffect(() => () => { v.huy(); am.dong() }, [v, am])
   // Đang ở màn chơi (kể cả bảng kết quả) ⇒ app KHÔNG tự tải lại vì bản mới (nguyên nhân gốc "đang chơi thoát luôn" 30/09); rời màn ⇒ bản mới vào.
   useEffect(() => giuTrangKhongTaiLai(), [])
@@ -250,7 +225,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     if (!boVeRef.current) boVeRef.current = new BoVe(document)
     const doBoCuc = () => {
       const r = goc.getBoundingClientRect(), bc = chonBoCuc(r.width, r.height)
-      hepRef.current = r.width < 480; gonNgangRef.current = r.width < 800; ngangRef.current = bc === 'ngang'
+      hepRef.current = r.width < 480
       setBoCuc(bc); setHuong(r.width > r.height ? 'ngang' : 'doc')
     }
     const doBan = () => {
@@ -295,12 +270,14 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const ngang = boCuc === 'ngang'
   /** Chế độ "chỉ còn bàn" cũ (dọc, máy tính). Xoay ngang đã là bàn toàn màn ⇒ nút Toàn màn hình chỉ bật toàn màn hình THẬT. */
   const toanCu = toan && !ngang
-  const dk = toanCu ? (huong === 'ngang' ? 'trai' : undefined) : boCuc === 'pc' ? 'trai' : ngang ? 'phai' : undefined
-  anNhamRef.current = dk !== undefined
+  /** Phía của thanh lực: xoay ngang theo tay cầm (mặc định phải); máy tính ở cột điều khiển trái; màn dọc theo tay cầm (mép bàn). */
+  const dk = toanCu ? (huong === 'ngang' ? 'trai' : undefined) : boCuc === 'pc' ? 'trai' : ngang ? (tay === 'trai' ? 'trai' : 'phai') : undefined
+  /** Thanh lực nằm cạnh bàn (trong hộp bàn) ở màn dọc / xoay ngang; máy tính ở cột điều khiển. */
+  const lucTrongBan = boCuc !== 'pc'
 
   // ───────── toàn màn hình ─────────
   const datToan = (bat: boolean) => {
-    setToan(bat); if (!bat) setMoGia(false)
+    setToan(bat)
     const goc = rootRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null
     try {
       if (bat && goc && !document.fullscreenElement) { const r = goc.requestFullscreen ? goc.requestFullscreen({ navigationUI: 'hide' }) : (goc.webkitRequestFullscreen?.(), undefined); r?.catch?.(() => {}) }
@@ -328,9 +305,25 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     } catch { v.nhac('Máy này chưa mở được toàn màn hình', GOI_Y_IOS, 3500) }
   }
 
-  // ───────── ngăn kéo "Bi của em" (xoay ngang): tự đóng khi bắn hoặc khi mở câu hỏi ─────────
-  useEffect(() => { if (v.pha === 'moving' || sheet) setMoGia(false) }, [v.pha, sheet])
-  const datKeo = (co: boolean) => { rootRef.current?.toggleAttribute('data-keo', co) }
+  // ───────── hướng dẫn lần đầu (một lần theo máy; xem lại ở Tuỳ chỉnh) ─────────
+  const nguoiDanh = v.nguoiDuocDanh()
+  useEffect(() => { if (nguoiDanh && !daXemHuongDan()) setHuongDan(true) }, [nguoiDanh])
+  const xongHuongDan = () => { setHuongDan(false); ghiDaXemHuongDan() }
+  // Gợi ý một lần: lượt người khác, chạm bi của em trên bàn để giải trước. Hiện suốt lượt đầu gặp, qua lượt đó là nhớ đã biết.
+  const moGiai = v.coTheGiaiTruoc()
+  const [goiYGiai, setGoiYGiai] = useState(false)
+  useEffect(() => {
+    if (moGiai && !bietGiai && v.biEm().some((id) => !v.bi[id].an && !v.bi[id].vang && !v.bi[id].trong)) setGoiYGiai(true)
+    else if (!moGiai && goiYGiai) { setGoiYGiai(false); KHO_BIET_GIAI_TRUOC.dat('1') }
+  }, [moGiai]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Lăn chuột trên bàn = tinh chỉnh (máy tính). Gắn gốc với passive: false để chặn cuộn trang.
+  useEffect(() => {
+    const cv = cvRef.current
+    if (!cv) return
+    const f = (e: WheelEvent) => dkc.banLan(e)
+    cv.addEventListener('wheel', f, { passive: false })
+    return () => cv.removeEventListener('wheel', f)
+  }, [dkc])
 
   // ───────── thông báo trên bàn ─────────
   const tb = v.thongBao
@@ -361,101 +354,40 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     onVeSanh()
   }
 
-  // ───────── nhập liệu trên bàn ─────────
-  const toaDo = (e: { clientX: number; clientY: number }) => {
-    const cv = cvRef.current!, k = khungRef.current!
-    const r = cv.getBoundingClientRect(), f = r.width ? cv.clientWidth / r.width : 1
-    return toaDoBan(k, (e.clientX - r.left) * f, (e.clientY - r.top) * f)
-  }
-  const biTai = (p: { x: number; y: number }): KiHieu | null => {
-    let best: KiHieu | null = null, bd = (R + 6) * (R + 6)
-    for (const b of v.st.balls) { if (!b.on || b.id === 'cue') continue; const d = (b.x - p.x) ** 2 + (b.y - p.y) ** 2; if (d < bd) { bd = d; best = b.id } }
-    return best
-  }
-  // Gợi ý một dòng LẦN ĐẦU (tới khi em cầm gậy lần đầu; nhớ theo máy).
-  const [daBietGay, setDaBietGay] = useState(() => { try { return localStorage.getItem(KHOA_DA_BIET_CAM_GAY) === '1' } catch { return false } })
-  const daCamGay = () => { if (daBietGay) return; setDaBietGay(true); try { localStorage.setItem(KHOA_DA_BIET_CAM_GAY, '1') } catch { /* máy chặn lưu */ } }
-  const chiDich = () => { const info = v.nham(); if (info && info.loai === 'bi') chiRef.current = { id: info.b.id, den: performance.now() + 1200 } }
+  // ───────── nhập liệu trên bàn (DieuKhienBia.tsx: kéo = xoay gậy, chạm bi = nhắm / giải trước, kéo bi cái khi được đặt) ─────────
   const onDown = (e: PE<HTMLCanvasElement>) => {
-    am.mo(); rootRef.current?.focus({ preventScroll: true })
-    if (moGia && ngang) setMoGia(false)
-    if (!khungRef.current) return
-    const p = toaDo(e), b = biTai(p)
-    if (b) chiRef.current = { id: b, den: performance.now() + 1800 }
-    if (!v.nguoiDuocDanh()) return
-    const c = v.bi_('cue')
-    if (v.ballInHand && Math.hypot(p.x - c.x, p.y - c.y) < banKinhBatBiCai(khungRef.current.S)) keoRef.current.bi = true
-    else if (trungGay(c, v.aim, v.power, p, nuaBeRongBat(khungRef.current.S))) { keoRef.current.gay = batDauCam(c, v.aim, p); daCamGay() } // cầm gậy: xoay theo ngón
-    else keoRef.current.tinh = p // chạm ngoài gậy: KHÔNG giật hướng; kéo thì chỉnh tinh
-    datKeo(true)
-    e.currentTarget.setPointerCapture(e.pointerId); e.preventDefault()
+    rootRef.current?.focus({ preventScroll: true })
+    setMoTuyChinh(false)
+    dkc.banDown(e)
   }
   const onMove = (e: PE<HTMLCanvasElement>) => {
-    if (!khungRef.current) return
-    const p = toaDo(e)
-    const k = keoRef.current
-    if (e.pointerType === 'mouse' && !e.buttons && !k.gay && !k.tinh && !k.bi) {
-      const b = biTai(p)
-      if (b) chiRef.current = { id: b, den: 0, tro: true }
-      else if (chiRef.current?.tro) chiRef.current = null
-      const tren = v.nguoiDuocDanh() && trungGay(v.bi_('cue'), v.aim, v.power, p, nuaBeRongBat(khungRef.current.S))
-      e.currentTarget.style.cursor = tren ? 'grab' : ''
-    }
-    if (!v.nguoiDuocDanh()) return
-    if (k.bi) v.keoBiCai(p.x, p.y)
-    else if (k.gay || k.tinh) choRef.current = p
-  }
-  /** Áp vị trí ngón mới nhất (gọi trong vòng khung hình). */
-  const apNgon = () => {
-    const p = choRef.current, k = keoRef.current
-    if (!p) return
-    choRef.current = null
-    if (!v.nguoiDuocDanh()) return
-    const c = v.bi_('cue')
-    if (k.gay) v.datHuong(huongKhiKeo(c, k.gay, p, v.aim))
-    else if (k.tinh) { v.datHuong(chinhTinh(c, v.aim, k.tinh, p)); k.tinh = p }
-    else return
-    chiDich()
-  }
-  const onUp = (e?: PE<HTMLCanvasElement>) => {
-    apNgon()
-    if (keoRef.current.bi) { const c = v.bi_('cue'); am.phat('dat', 0, pan(c.x, c.y)) }
-    keoRef.current = { gay: null, tinh: null, bi: false }
-    datKeo(false)
-    if (e?.currentTarget) e.currentTarget.style.cursor = ''
+    if (dkc.banMove(e)) return
+    // di chuột (không bấm) ⇒ chỉ bi dưới con trỏ
+    const k = khungRef.current, cv = cvRef.current
+    if (e.pointerType !== 'mouse' || e.buttons || !k || !cv) return
+    const r = cv.getBoundingClientRect(), f = r.width ? cv.clientWidth / r.width : 1, p = toaDoBan(k, (e.clientX - r.left) * f, (e.clientY - r.top) * f), b = biTai(v, p.x, p.y)
+    if (b) chiRef.current = { id: b, den: 0, tro: true }
+    else if (chiRef.current?.tro) chiRef.current = null
   }
   const onLeave = () => { if (chiRef.current?.tro) chiRef.current = null }
-
-  // ───────── thanh lực ─────────
-  const datLuc = (p: number) => { v.datLuc(p); setLucHien(p) }
-  const lucDown = (e: PE<HTMLDivElement>) => { am.mo(); if (!v.nguoiDuocDanh()) return; lucKeo.current = { x: e.clientX, y: e.clientY }; datKeo(true); e.currentTarget.setPointerCapture(e.pointerId); e.preventDefault() }
-  const lucMove = (e: PE<HTMLDivElement>) => {
-    if (!lucKeo.current) return
-    const el = e.currentTarget, r = el.getBoundingClientRect(), doc = r.height > r.width * 1.3, ty = el.clientWidth ? r.width / el.clientWidth : 1
-    const d = doc ? e.clientY - lucKeo.current.y : Math.max(e.clientX - lucKeo.current.x, (e.clientY - lucKeo.current.y) * 1.2)
-    const L = doc ? r.height * 0.85 : Math.min(240 * ty, r.width * 0.9)
-    datLuc(Math.max(0, Math.min(1, d / L)))
-  }
-  const lucUp = () => { if (!lucKeo.current) return; lucKeo.current = null; datKeo(false); if (v.power >= 0.02) v.ban(); datLuc(0) }
-  const giuNut = (fn: () => void) => {
-    let t: ReturnType<typeof setTimeout> | null = null, h: ReturnType<typeof setInterval> | null = null
-    const dung = () => { if (t) clearTimeout(t); if (h) clearInterval(h); t = h = null }
-    return {
-      onPointerDown: (e: PE<HTMLButtonElement>) => { am.mo(); if (!v.nguoiDuocDanh()) return; fn(); t = setTimeout(() => { h = setInterval(fn, 45) }, 320); e.preventDefault() },
-      onPointerUp: dung, onPointerLeave: dung, onPointerCancel: dung,
-      onKeyDown: (e: KE<HTMLButtonElement>) => { if ((e.key === 'Enter' || e.key === ' ') && v.nguoiDuocDanh()) { fn(); e.preventDefault() } },
-    }
-  }
-  const nutTrai = giuNut(() => { v.xoayNham(-0.3); chiDich() }), nutPhai = giuNut(() => { v.xoayNham(0.3); chiDich() })
   const chonXoay = (e: PE<HTMLButtonElement>) => {
     const r = e.currentTarget.getBoundingClientRect()
     v.datXoay((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height * 2 - 1))
+  }
+  /** Chạm đúp mặt bi lớn ⇒ xoáy về tâm. */
+  const chamXoayRef = useRef(0)
+  const xoayDown = (e: PE<HTMLButtonElement>) => {
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    const t = performance.now()
+    if (t - chamXoayRef.current < 320) { chamXoayRef.current = 0; v.datXoay(0, 0); return }
+    chamXoayRef.current = t
+    chonXoay(e)
   }
 
   // ───────── bàn phím (máy tính) ─────────
   const onKey = (e: KE<HTMLDivElement>) => {
     am.mo()
-    if (e.key === 'Escape') { if (popXoay) { setPopXoay(false); return } if (moGia && ngang) { setMoGia(false); return } if (xem) { setXem(false); v.datXemMo(false); return } if (toan) { datToan(false); return } }
+    if (e.key === 'Escape') { if (huongDan) { xongHuongDan(); return } if (moTuyChinh) { setMoTuyChinh(false); return } if (popXoay) { setPopXoay(false); return } if (xem) { setXem(false); v.datXemMo(false); return } if (toan) { datToan(false); return } }
     const t = e.target as HTMLElement
     if (t.closest('.bia-tam,.bia-ket,input,textarea')) return
     if (e.key === 'f' || e.key === 'F') { if (ngang) datToanNgang(); else datToan(!toan); e.preventDefault(); return }
@@ -463,9 +395,9 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     if (!v.nguoiDuocDanh()) return
     if (e.key === 'ArrowLeft') { v.xoayNham(e.shiftKey ? -0.1 : -0.6); chiDich(); e.preventDefault() }
     else if (e.key === 'ArrowRight') { v.xoayNham(e.shiftKey ? 0.1 : 0.6); chiDich(); e.preventDefault() }
-    else if (e.key === ' ' && !t.closest('button')) { e.preventDefault(); if (spaceRef.current === null) spaceRef.current = performance.now() }
+    else if (e.key === ' ' && !t.closest('button')) { e.preventDefault(); dkc.spaceDown() }
   }
-  const onKeyUp = (e: KE<HTMLDivElement>) => { if (e.key === ' ' && spaceRef.current !== null) { spaceRef.current = null; if (v.power >= 0.02) v.ban(); datLuc(0) } }
+  const onKeyUp = (e: KE<HTMLDivElement>) => { if (e.key === ' ') dkc.spaceUp() }
 
   // ───────── tấm câu ─────────
   const onCham = (y: YeuCauCau, dung: boolean, ph: CauSai['phanHoi'] | null, traLoi: string) => {
@@ -481,84 +413,53 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const moXem = () => { setXem(true); v.datXemMo(true); am.phat('mo') }
   const giaiTruoc = (id: KiHieu) => {
     am.mo()
+    if (goiYGiai) setGoiYGiai(false)
+    KHO_BIET_GIAI_TRUOC.dat('1')
     const r = v.giaiTruoc(id)
-    if (r === 'mo') { setMoGia(false); return }
+    if (r === 'mo') return
     const q = v.cauCua[id]
     v.nhac(r === 'da_an' ? `Bi ${id} đã ăn` : r === 'vang' ? `Bi ${id} là bi vàng` : r === 'trong' ? `Bi ${id} là bi trống` : `Bi ${id}${q ? ` · ${q.tenDang}` : ''}`, r === 'vang' ? 'Vào lỗ là ăn ngay' : r === 'trong' ? 'Không có câu · vào lỗ là ăn' : r === 'chua_duoc' ? 'Giải trước được khi tới lượt người khác' : '')
   }
 
+  giaiTruocRef.current = giaiTruoc
+
   // ───────── dữ liệu vẽ HUD ─────────
-  const biEm = v.biEm()
-  const moGiai = v.coTheGiaiTruoc()
   const hienXemSai = cauSai.length > 0 && !sheet && !xem && v.pha !== 'over' && (v.cur !== v.em || v.pha === 'cho')
   const doi = cheDo === 'doi'
-  const theGhe = (t: 0 | 1) => {
-    const ds = v.ghe.map((g, i) => ({ g, i })).filter((o) => o.g.doi === t)
-    return (
-      <div className="bia-phe" data-phai={t ? '' : undefined} data-dang={v.pha !== 'over' && v.ghe[v.cur]!.doi === t ? '' : undefined} data-doi={doi ? '' : undefined}>
-        {doi && <span className="bia-ten-phe">{TEN_PHE[t]}</span>}
-        <div className="bia-ghe-hang">
-          {ds.map((o) => (
-            <div className="bia-ghe" key={o.i} data-ghe={o.i} data-roi={vm?.roiGhe[o.i] ? '' : undefined}>
-              {vm && vm.nhanDen.filter((n) => n.tu === o.i).slice(-1).map((n) => <span key={n.ma} className="bia-bong-nhan" role="status">{CAU_NHAN[n.id - 1]}</span>)}
-              <span className="bia-anh"><svg viewBox="0 0 46 46" aria-hidden="true"><circle className="nen-vong" cx="23" cy="23" r="21" /><circle className="vong" cx="23" cy="23" r="21" /></svg><span>{o.g.tat}</span></span>
-              {doi ? <span className="bia-ghe-ten">{o.g.ngan}{vm?.roiGhe[o.i] ? ' · đang nối lại' : ''}</span> : <span className="bia-ghe-chu"><span className="bia-ghe-ten">{o.g.ten}</span><span className="bia-ten-phe">{vm?.roiGhe[o.i] ? 'Đang nối lại…' : TEN_PHE[t]}</span></span>}
-            </div>
-          ))}
-        </div>
-        <div className="bia-cham" aria-label={`${TEN_PHE[t]} còn ${v.conLai(t)} bi`}>
-          {NHOM[t]!.map((id) => { const s = v.bi[id]; return <i key={id} title={id} style={{ ['--c' as string]: mauCss(id) }} data-kl={t ? undefined : ''} data-soc={t ? '' : undefined} data-an={s.an ? '' : undefined} data-vang={s.vang && !s.an ? '' : undefined} /> })}
-        </div>
-      </div>
-    )
-  }
   const tenLuot = v.ghe[v.cur]!.ten
   const tbHien = tb && tin.ma === tb.ma && tin.hien
   const tk = v.tomTatGhe()
+  const doiEm = v.ghe[v.em]!.doi
+  const doiThu = v.ghe.find((g) => g.doi !== doiEm)
+  const tenTrai = doi ? 'Phe em' : 'Em', tenPhai = (doi ? 'Đối thủ' : (doiThu?.ngan ?? 'Đối thủ')) + (vm && v.ghe.some((g, i) => g.doi !== doiEm && vm.roiGhe[i]) ? ' · đang nối lại' : '')
+  const nhanMoi = vm?.nhanDen.at(-1)
+  const choDanh = !v.nguoiDuocDanh() // lượt người khác / bi lăn / tấm câu: thanh lực + bánh xe mờ
+  const thanhLuc = <ThanhLuc dk={dkc} tat={choDanh} />
+  const nutMat = <button type="button" className="bia-nut-kinh bia-nut-tron bia-nut-mat" aria-pressed={luonMT} onClick={() => setLuonMT(!luonMT)}
+    aria-label={`Luôn bật Mắt thần: ${luonMT ? 'đang bật' : 'đang tắt'}${loai !== 'giao_huu' ? `. Mắt thần em có: ${v.matThan}` : ''}`} title="Luôn bật Mắt thần · nhắm dễ hơn">{ICON.mat}{loai !== 'giao_huu' && v.matThan > 0 && <b className="bia-so-mat">{v.matThan}</b>}</button>
   return (
-    <div ref={rootRef} className="bia" data-bo-cuc={boCuc} data-dk={dk} data-toan={toanCu ? '' : undefined} data-mo-gia={moGia ? '' : undefined} tabIndex={-1} onKeyDown={onKey} onKeyUp={onKeyUp} onPointerDownCapture={() => am.mo()}>
+    <div ref={rootRef} className="bia" data-bo-cuc={boCuc} data-dk={dk} data-tay={tay} data-nhe={dangCheDoMayYeu() ? '' : undefined} data-toan={toanCu ? '' : undefined} tabIndex={-1} onKeyDown={onKey} onKeyUp={onKeyUp} onPointerDownCapture={() => am.mo()}>
       <div className="bia-man">
         <header className="bia-dau">
-          <button type="button" className="bia-nut-kinh" onClick={() => (ket ? onVeSanh() : setHoiRoi(true))} aria-label="Về Sảnh Bi-a">{ICON.sau}<span className="bia-chu-nut">Sảnh</span></button>
+          <button type="button" className="bia-nut-kinh bia-nut-tron bia-nut-sanh" onClick={() => (ket ? onVeSanh() : setHoiRoi(true))} aria-label="Về Sảnh Bi-a">{ICON.sau}</button>
           <div className="bia-ten"><b>Bi-a Phản Ứng</b><span>{vm ? (vm.loaiMang === 'giao_huu' ? 'Bàn giao hữu với bạn · không câu' : doi ? 'Đánh đôi với bạn' : 'Đấu với bạn') : loai === 'giao_huu' ? 'Bàn giao hữu · không câu' : doi ? 'Đánh đôi với A.I' : 'Đấu với A.I'}</span></div>
-          {ngang
-            ? <button type="button" className="bia-nut-kinh bia-nut-toan" onClick={datToanNgang} aria-pressed={toanThat} aria-label={toanThat ? 'Thoát toàn màn hình' : 'Toàn màn hình'} title="Toàn màn hình (phím F)">{toanThat ? ICON.thoat : ICON.toan}</button>
-            : <button type="button" className="bia-nut-kinh bia-nut-toan" onClick={() => datToan(true)} aria-label="Toàn màn hình: chỉ hiện bàn bi-a" title="Toàn màn hình (phím F)">{ICON.toan}</button>}
-          {ngang && <button type="button" className="bia-nut-kinh bia-nut-mat" aria-pressed={luonMT} onClick={() => setLuonMT(!luonMT)}
-            aria-label={`Luôn bật Mắt thần: ${luonMT ? 'đang bật' : 'đang tắt'}${loai !== 'giao_huu' ? `. Mắt thần em có: ${v.matThan}` : ''}`} title="Luôn bật Mắt thần · nhắm dễ hơn">{ICON.mat}{loai !== 'giao_huu' && v.matThan > 0 && <b className="bia-so-mat">{v.matThan}</b>}</button>}
-          <button type="button" className="bia-nut-kinh" aria-pressed={!tat} aria-label={tat ? 'Bật âm thanh' : 'Tắt âm thanh'} title="Âm thanh (phím M)" onClick={() => { am.datTat(!tat); setTat(!tat) }}><IconAm tat={tat} /></button>
+          <HangCham v={v} tenTrai={tenTrai} tenPhai={tenPhai} />
+          {nutMat}
+          <button type="button" className="bia-nut-kinh bia-nut-tron bia-nut-am" aria-pressed={!tat} aria-label={tat ? 'Bật âm thanh' : 'Tắt âm thanh'} title="Âm thanh (phím M)" onClick={() => { am.datTat(!tat); setTat(!tat) }}><IconAm tat={tat} /></button>
         </header>
         <div className="bia-toan-tren">
-          {loai !== 'giao_huu' && <button type="button" className="bia-nut-kinh bia-nut-bi-em" aria-expanded={moGia} aria-controls="bia-ngan" onClick={() => setMoGia(!moGia)}>Bi của em</button>}
           <span className="bia-chip" ref={chipRef} />
           <button type="button" className="bia-nut-kinh bia-nut-thoat" aria-label="Thoát toàn màn hình" onClick={() => datToan(false)}>{ICON.thoat}<span className="bia-chu-nut">Thoát</span></button>
         </div>
-        <div className="bia-ngan" id="bia-ngan" data-mo={moGia ? '' : undefined}>
-        <section className="bia-nguoi" aria-label="Hai phe">
-          {theGhe(0)}
-          <div className="bia-ti-so"><b><span>{v.diem[0]}</span> : <span>{v.diem[1]}</span></b><span>điểm ván</span></div>
-          {theGhe(1)}
-        </section>
-        <section className="bia-gia" aria-label="Bi của em">
-          <div className="bia-nhan-gia">
-            <span><b>Bi của em</b><span className="bia-phu-nhan"> · {loai === 'giao_huu' ? 'bi trống, không câu' : 'mỗi bi một câu'}</span></span>
-            <span className="phai"><span className="bia-goi-y">{moGiai ? 'Chạm ô để giải trước' : v.pha === 'over' ? 'Hết ván' : loai === 'giao_huu' ? '' : 'Giải trước khi người khác đánh'}</span>
-              {loai !== 'giao_huu' && <span className="bia-mat-than" data-co={v.matThan > 0 ? '' : undefined} aria-label={`Mắt thần: ${v.matThan}. Mỗi cú đánh dùng 1 để thấy trước đường đi thật của bi`} title="Mắt thần">{ICON.mat}<span>{v.matThan}</span></span>}<CongTacMatThan gon /></span>
-          </div>
-          <div className="bia-hang-o">
-            {biEm.map((id) => {
-              const s = v.bi[id], q = v.cauCua[id], tt = s.an ? 'đã ăn' : s.vang ? 'bi vàng' : s.trong ? 'bi trống' : moGiai ? 'chạm để giải trước' : 'chưa giải'
-              return <button key={id} type="button" className="bia-o" style={{ ['--c' as string]: mauCss(id) }} data-an={s.an ? '' : undefined} data-vang={s.vang && !s.an ? '' : undefined} data-trong={s.trong && !s.an ? '' : undefined} data-moi={moGiai && !s.an && !s.vang && !s.trong ? '' : undefined}
-                aria-label={`Bi ${id} ${NT[id].ten}${q ? `: ${q.tenDang}, ${TEN_MUC[hangMuc(q.mucDo)]}` : ''}, ${tt}`} onClick={() => giaiTruoc(id)}><span className="z">{NT[id].z}</span><span className="kh">{id}</span></button>
-            })}
-          </div>
+        {boCuc === 'pc' && <section className="bia-cot-phai" aria-label="Diễn biến ván">
           <div className="bia-nhat-ky"><b>Diễn biến ván</b><ol>{v.nhatKy.map((d) => <li key={d.ma} data-loai={d.loai || undefined}><time>{Math.floor(d.giay / 60)}:{String(d.giay % 60).padStart(2, '0')}</time><span>{d.chu}</span></li>)}</ol></div>
-          <div className="bia-phim-tat"><b>Phím tắt</b><span><kbd>←</kbd><kbd>→</kbd> nhắm · giữ <kbd>Shift</kbd> để nhắm tinh</span><span>Giữ <kbd>Space</kbd> lấy lực, thả để đánh</span><span><kbd>F</kbd> toàn màn hình · <kbd>M</kbd> âm thanh</span></div>
-        </section>
-        </div>
+          <div className="bia-phim-tat"><b>Phím tắt</b><span>Kéo hoặc lăn chuột trên bàn để xoay gậy · giữ <kbd>Shift</kbd> khi lăn để chỉnh rất nhỏ</span><span><kbd>←</kbd><kbd>→</kbd> chỉnh nhỏ · giữ <kbd>Shift</kbd> để chỉnh rất nhỏ</span><span>Giữ <kbd>Space</kbd> lấy lực, thả để đánh</span><span><kbd>F</kbd> toàn màn hình · <kbd>M</kbd> âm thanh</span></div>
+        </section>}
         <section className="bia-ban" ref={banRef}>
-          <canvas ref={cvRef} role="img" aria-label={`Bàn bi-a: 7 bi Kim loại (${KL.join(', ')}), 7 bi Phi kim (${PK.join(', ')}), Bi chốt carbon và bi cái`} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onPointerLeave={onLeave} />
-          {!daBietGay && v.nguoiDuocDanh() && <div className="bia-goi-y-gay" role="note">Cầm gậy kéo để xoay</div>}
+          <canvas ref={cvRef} role="img" aria-label={`Bàn bi-a: 7 bi Kim loại (${KL.join(', ')}), 7 bi Phi kim (${PK.join(', ')}), Bi chốt carbon và bi cái. Bi của em màu lam, bi đối thủ sọc đỏ cam`} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={(e) => dkc.banUp(e)} onPointerCancel={(e) => dkc.banUp(e, true)} onPointerLeave={onLeave} />
+          {lucTrongBan && thanhLuc}
+          {vm && nhanMoi && <span key={nhanMoi.ma} className="bia-bong-nhan" role="status"><small>{v.ghe[nhanMoi.tu]?.ngan ?? ''}</small><span>{CAU_NHAN[nhanMoi.id - 1]}</span></span>}
+          {goiYGiai && moGiai && <div className="bia-goi-y-gay" role="note">Trong lượt đối thủ, chạm bi của em để giải trước</div>}
           <div className="bia-pt" aria-live="polite">{v.ptHop.map((p) => <div key={p.ma}>{p.chu}</div>)}</div>
           <div className="bia-tin" role="status" data-hien={tbHien ? '' : undefined} data-loai={tb?.loai || undefined}>{tb?.chu}{tb?.phu && <small>{tb.phu}</small>}</div>
           <div className="bia-nhan" ref={nhanRef} hidden />
@@ -570,21 +471,22 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           </div>}
         </section>
         <section className="bia-dk" aria-label="Điều khiển cú đánh">
-          <div className="bia-nham" ref={nhamRef}><span className="bi-nho" /><span className="chu">{CHU_CAM_GAY}</span><span className="hl" /></div>
-          <div className="bia-hang-dk">
-            <button type="button" className="bia-nut-tron bia-nut-xoay" aria-label="Chọn điểm xoáy bi cái" aria-expanded={popXoay} onClick={() => { const mo = !popXoay; setPopXoay(mo); if (mo) am.phat('phan') }}><span className="bia-mat-bi" style={{ ['--sx' as string]: v.spin.x, ['--sy' as string]: -v.spin.y }}><i /></span></button>
-            <button type="button" className="bia-nut-tron bia-trai" aria-label="Xoay hướng nhắm sang trái một chút" {...nutTrai}>{ICON.sau}</button>
-            <div className="bia-luc" ref={lucRef} role="slider" tabIndex={0} aria-label="Lực đánh: kéo rồi thả tay để đánh" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(luc * 100)} data-keo={luc > 0 ? '' : undefined} style={{ ['--p' as string]: luc }}
-              onPointerDown={lucDown} onPointerMove={lucMove} onPointerUp={lucUp} onPointerCancel={() => { lucKeo.current = null; datKeo(false); datLuc(0) }}>
-              <div className="day" />
-              <div className="chu-luc">{luc > 0 ? <><span className="so-luc">{Math.round(luc * 100)}%</span><span className="dai">thả tay để đánh</span><span className="ngan">thả tay</span></> : <><span className="dai">Kéo sang phải để lấy lực, thả tay để đánh</span><span className="ngan">Kéo<br />xuống</span></>}</div>
-            </div>
-            <button type="button" className="bia-nut-tron bia-phai" aria-label="Xoay hướng nhắm sang phải một chút" {...nutPhai}>{ICON.truoc}</button>
-          </div>
+          <button type="button" className="bia-nut-tron bia-nut-xoay" aria-label="Chọn điểm xoáy bi cái" aria-expanded={popXoay} onClick={() => { const mo = !popXoay; setPopXoay(mo); if (mo) am.phat('phan') }}><span className="bia-mat-bi" style={{ ['--sx' as string]: v.spin.x, ['--sy' as string]: -v.spin.y }}><i /></span></button>
+          <BanhXe dk={dkc} doc={boCuc !== 'ngang'} tat={choDanh} />
+          {!lucTrongBan && thanhLuc}
+          <button type="button" className="bia-nut-kinh bia-nut-tron bia-nut-them" aria-label="Tuỳ chỉnh" aria-expanded={moTuyChinh} onClick={() => setMoTuyChinh(!moTuyChinh)}>{ICON.them}</button>
           {popXoay && <div className="bia-pop-xoay">
-            <p>Chạm vào bi để chọn điểm đánh. Cao: bi cái chạy theo. Thấp: lùi lại. Trái, phải: dội băng lệch.</p>
-            <button type="button" className="bia-bi-lon" aria-label="Điểm xoáy trên bi cái" style={{ ['--sx' as string]: v.spin.x, ['--sy' as string]: -v.spin.y }} onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); chonXoay(e) }} onPointerMove={(e) => { if (e.buttons) chonXoay(e) }}><i /></button>
+            <p>Chạm vào bi để chọn điểm đánh. Cao: bi cái chạy theo. Thấp: lùi lại. Trái, phải: dội băng lệch. Chạm đúp để về tâm.</p>
+            <button type="button" className="bia-bi-lon" aria-label="Điểm xoáy trên bi cái" style={{ ['--sx' as string]: v.spin.x, ['--sy' as string]: -v.spin.y }} onPointerDown={xoayDown} onPointerMove={(e) => { if (e.buttons) chonXoay(e) }}><i /></button>
             <button type="button" className="bia-nut-chu" onClick={() => v.datXoay(0, 0)}>Bỏ xoáy</button>
+          </div>}
+          {moTuyChinh && <div className="bia-pop-tuy" role="dialog" aria-label="Tuỳ chỉnh">
+            <CaiDatDieuKhien />
+            <button type="button" className="bia-nut-chu" aria-pressed={!tat} onClick={() => { am.datTat(!tat); setTat(!tat) }}>{tat ? 'Bật âm thanh' : 'Tắt âm thanh'}</button>
+            {ngang
+              ? <button type="button" className="bia-nut-chu" onClick={() => { setMoTuyChinh(false); datToanNgang() }} aria-pressed={toanThat}>{toanThat ? 'Thoát toàn màn hình' : 'Toàn màn hình'}</button>
+              : <button type="button" className="bia-nut-chu" onClick={() => { setMoTuyChinh(false); datToan(true) }}>Toàn màn hình</button>}
+            <button type="button" className="bia-nut-chu" onClick={() => { setMoTuyChinh(false); setHuongDan(true) }}>Xem lại hướng dẫn</button>
           </div>}
         </section>
         {sheet && session && <TamCauBia key={sheet.ma} y={sheet} token={token} session={session} laEmDanh={sheet.nguoiDanh === v.em} tenNguoiDanh={v.ghe[sheet.nguoiDanh]!.ngan} tenLuotNay={tenLuot} tenKeTiep={v.ghe[tiepTheo(sheet.nguoiDanh, v.ghe.length)]!.ten}
@@ -609,6 +511,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           {vm && vm.loaiMang === 'ban' && <p className="bia-chu-nho">{vm.S.khongElo ? 'Ván có A.I nên không tính Điểm bàn.' : 'Ván này tính Điểm bàn; điểm mới hiện ở Sảnh Bi-a.'}</p>}
           <div className="bia-hang-nut"><button type="button" className={vm ? 'bia-nut-vang' : 'bia-nut-chu'} onClick={onVeSanh}>Về Sảnh</button>{!vm && <button type="button" className="bia-nut-vang" onClick={onChoiLai}>Chơi ván mới</button>}</div>
         </div></div>}
+        {huongDan && !sheet && !ket && !hoiRoi && <HuongDan goc={rootRef.current} onXong={xongHuongDan} />}
       </div>
     </div>
   )

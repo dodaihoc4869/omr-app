@@ -2,8 +2,8 @@
 // Khi bàn nằm ngang: hình học vẽ theo toạ độ bàn (ma trận quay), còn BI, BÓNG BI, CHỮ vẽ theo toạ độ màn để đèn luôn góc trên trái.
 import { datTFBan, raMan, type KhungBan } from './bo-cuc'
 import { duDoan, type DuDoan } from './du-doan'
-import { MAU_QH, type KiHieu, type QuanHe } from './nguyen-to'
-import { taoBong, taoChu, toBi, type BangChu, type Bong } from './ve-bi'
+import { MAU_QH, kieuBi, type KieuBi, type KiHieu, type QuanHe } from './nguyen-to'
+import { KHUNG_ANH, taoAnhBi, veMotBi } from './ve-bi'
 import { DIEM_CHAN, H, LO, R, T, W, type Bi } from './vat-ly'
 import type { VanBia } from './dieu-khien'
 
@@ -60,12 +60,12 @@ export function veNen(k: KhungBan, dpr: number, doc: Document = document): HTMLC
 
 /** Bộ vẽ một bàn: giữ ảnh đệm từng bi, bảng chiếu sáng, nền. */
 export class BoVe {
-  private bong: Bong | null = null
-  private chu: BangChu | null = null
-  private cache = new Map<string, { cv: HTMLCanvasElement; x: CanvasRenderingContext2D; img: ImageData; N: number; ver: number; xoay: boolean }>()
+  /** Ảnh đệm từng kiểu bi (kiểu theo góc nhìn + kí hiệu + viền vàng), vẽ MỘT lần mỗi cỡ bàn — mỗi khung chỉ drawImage. */
+  private anh = new Map<string, (HTMLCanvasElement | null | undefined)[]>()
+  private rAnh = 0
   private nen: HTMLCanvasElement | null = null
   private duDoanCu: { key: string; t: number; kq: DuDoan } = { key: '', t: 0, kq: { cue: [], obj: [] } }
-  private nhip = 0
+
   /** Ảnh bóng đổ dưới bi (vẽ sẵn một lần mỗi cỡ, mỗi khung chỉ drawImage — không tạo gradient mỗi khung). */
   private bongDo: HTMLCanvasElement | null = null
   /** Dải màu cây cơ (tạo một lần, dịch bằng translate). */
@@ -81,10 +81,8 @@ export class BoVe {
   /** Đổi cỡ: tính lại nền và bảng chiếu sáng. */
   datCo(k: KhungBan, dpr: number, nhe = this.nhe): void {
     this.k = k; this.dpr = dpr; this.nhe = nhe
-    const Dr = Math.min(2, dpr), N = Math.max(16, Math.ceil(2 * R * k.S * Dr) + 2)
-    this.bong = taoBong(N); (this.bong as Bong & { du: number }).du = N / (k.S * Dr)
-    if (!this.chu) this.chu = taoChu(this.doc)
-    this.cache.clear()
+    this.rAnh = R * k.S * dpr
+    this.anh.clear()
     this.nen = veNen(k, dpr, this.doc)
     this.bongDo = this.veBongDo(k.S * dpr)
   }
@@ -98,36 +96,25 @@ export class BoVe {
     x.fillStyle = g; x.beginPath(); x.arc(n / 2, n / 2, rr, 0, 7); x.fill()
     return cv
   }
-  /** Nạp lại chữ trên ô nhãn (sau khi phông tải xong). */
-  napLaiChu(): void { this.chu = taoChu(this.doc); this.cache.clear(); if (this.k) this.nen = veNen(this.k, this.dpr, this.doc) }
-  /** Số ảnh bi còn được tô lại trong khung này (máy yếu: tối đa 4, bi khác giữ ảnh cũ thêm một khung). */
-  private conTo = Infinity
-  private anhBi(b: Bi): HTMLCanvasElement | null {
-    const B = this.bong
-    if (!B || !this.chu || !this.k) return null
-    let c = this.cache.get(b.id)
-    if (c && c.N === B.N && c.ver === b.ver && c.xoay === this.k.xoay) return c.cv
-    if (c && c.N === B.N && c.xoay === this.k.xoay && c.ver >= 0 && this.conTo <= 0) return c.cv
-    this.conTo--
-    if (!c || c.N !== B.N) {
-      const cv = this.doc.createElement('canvas'); cv.width = cv.height = B.N
-      const x = cv.getContext('2d')
-      if (!x) return null
-      c = { cv, x, img: x.createImageData(B.N, B.N), N: B.N, ver: -1, xoay: this.k.xoay }
-      this.cache.set(b.id, c)
-    }
-    toBi(B, this.chu, b.id, b.q, this.k.xoay, c.img.data)
-    c.x.putImageData(c.img, 0, 0); c.ver = b.ver; c.xoay = this.k.xoay
-    return c.cv
+  /** Nạp lại chữ trên bi và nền (sau khi phông tải xong). */
+  napLaiChu(): void { this.anh.clear(); if (this.k) this.nen = veNen(this.k, this.dpr, this.doc) }
+  /** Ảnh đệm của bi `b` theo góc nhìn phe `doiEm`. */
+  private anhBi(b: Bi, v: VanBia, doiEm: 0 | 1): HTMLCanvasElement | null {
+    const kieu: KieuBi = kieuBi(b.id, doiEm), vang = b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang
+    let ds = this.anh.get(b.id)
+    if (!ds) { ds = []; this.anh.set(b.id, ds) }
+    const i = (kieu === 'ta' ? 0 : kieu === 'dich' ? 2 : 4) + (vang ? 1 : 0) // không cấp phát chuỗi khoá mỗi khung
+    let a = ds[i]
+    if (a === undefined) { a = taoAnhBi(this.doc, kieu, b.id === 'cue' ? '' : b.id, this.rAnh, vang); ds[i] = a }
+    return a
   }
-  /** Vẽ một khung hình của ván. `chi`: bi đang được chỉ (nhãn) và quan hệ. */
-  ve(ctx: CanvasRenderingContext2D, v: VanBia, chi: { id: KiHieu; qh: QuanHe } | null, mtBat: boolean, keoBiCai: boolean): void {
-    const k = this.k, B = this.bong as (Bong & { du: number }) | null
+  /** Vẽ một khung hình của ván. `chi`: bi đang được chỉ (nhãn) và quan hệ. `mo`: ngón đang ở vùng "Huỷ" của thanh lực ⇒ gậy + đường ngắm mờ đi (em biết thả là không đánh). */
+  ve(ctx: CanvasRenderingContext2D, v: VanBia, chi: { id: KiHieu; qh: QuanHe } | null, mtBat: boolean, keoBiCai: boolean, mo = false): void {
+    const k = this.k
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    if (!k || !B || !this.nen) return
-    const s = k.S * this.dpr, balls = v.st.balls, vt = this.vt, nhe = this.nhe
-    this.conTo = nhe ? 4 : Infinity
+    if (!k || !this.nen) return
+    const s = k.S * this.dpr, balls = v.st.balls, vt = this.vt, nhe = this.nhe, doiEm = v.ghe[v.em]!.doi
     ctx.drawImage(this.nen, 0, 0)
     const bd = this.bongDo
     if (bd) for (let i = 0; i < balls.length; i++) {
@@ -136,9 +123,9 @@ export class BoVe {
       ctx.drawImage(bd, vt.x + 3 * s - bd.width / 2, vt.y + 5 * s - bd.height / 2)
     }
     for (const r of v.roi) {
-      const kk = Math.min(1, r.t / 0.28), rb = v.bi_(r.id), sp = this.anhBi(rb)
+      const kk = Math.min(1, r.t / 0.28), rb = v.bi_(r.id), sp = this.anhBi(rb, v, doiEm)
       if (!sp) continue
-      const [p, q] = raMan(k, this.dpr, r.x + (r.px - r.x) * kk, r.y + (r.py - r.y) * kk), sz = B.du * (1 - 0.55 * kk) * s
+      const [p, q] = raMan(k, this.dpr, r.x + (r.px - r.x) * kk, r.y + (r.py - r.y) * kk), sz = sp.width * (1 - 0.55 * kk)
       ctx.globalAlpha = 1 - kk; ctx.drawImage(sp, p - sz / 2, q - sz / 2, sz, sz); ctx.globalAlpha = 1
     }
     datTFBan(ctx, k, this.dpr)
@@ -147,7 +134,7 @@ export class BoVe {
     const mt = nguoi && ((v.matThan > 0 && mtBat) || (v.luonMT && v.cur === v.em)) // luôn bật Mắt thần: chỉ cú của chính em
     const info = nhin ? v.nham() : null
     if (info) {
-      ctx.save(); ctx.lineCap = 'round'
+      ctx.save(); ctx.lineCap = 'round'; if (mo) ctx.globalAlpha = 0.3
       const sx = info.c.x + v.aim.x * R, sy = info.c.y + v.aim.y * R
       ctx.setLineDash([7, 7]); ctx.strokeStyle = mt ? 'rgba(255,224,130,.95)' : 'rgba(255,255,255,.85)'; ctx.lineWidth = 2
       ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(info.gx, info.gy); ctx.stroke(); ctx.setLineDash([])
@@ -168,17 +155,14 @@ export class BoVe {
       ctx.restore()
     }
     if (chi) { const i = balls.findIndex((b) => b.id === chi.id), b = balls[i]; if (b && b.on) { v.viTriVe(i, vt); ctx.save(); ctx.strokeStyle = MAU_QH[chi.qh]; ctx.lineWidth = 3.2; if (!nhe) { ctx.shadowColor = MAU_QH[chi.qh]; ctx.shadowBlur = 8 } ctx.beginPath(); ctx.arc(vt.x, vt.y, R + 6, 0, 7); ctx.stroke(); ctx.restore() } }
-    this.nhip += 0.05
-    const sz = B.du * s
     for (let i = 0; i < balls.length; i++) {
       const b = balls[i]!
       if (!b.on) continue
       v.viTriVe(i, vt)
-      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang) { datTFBan(ctx, k, this.dpr); ctx.save(); if (!nhe) { ctx.shadowColor = 'rgba(255,200,60,.95)'; ctx.shadowBlur = 10 + 4 * Math.sin(this.nhip * 3) } ctx.strokeStyle = 'rgb(255,214,107)'; ctx.lineWidth = 3.2; ctx.beginPath(); ctx.arc(vt.x, vt.y, R + 3, 0, 7); ctx.stroke(); ctx.restore() }
-      const sp = this.anhBi(b)
+      const sp = this.anhBi(b, v, doiEm)
       if (!sp) continue
       this.man(vt.x, vt.y)
-      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sp, vt.x - sz / 2, vt.y - sz / 2, sz, sz)
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sp, vt.x - sp.width / 2, vt.y - sp.height / 2)
     }
     datTFBan(ctx, k, this.dpr)
     if (v.ballInHand && v.pha === 'aim' && nguoi && !v.sheet) {
@@ -189,7 +173,7 @@ export class BoVe {
     }
     if (info) {
       const c = info.c, an = Math.atan2(v.aim.y, v.aim.x), keo = 6 + v.power * 80
-      ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(an + Math.PI)
+      ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(an + Math.PI); if (mo) ctx.globalAlpha = 0.3
       if (!nhe) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 6 }
       const a0 = R + keo, L = 400
       ctx.translate(a0, 0)
@@ -238,12 +222,11 @@ function veDuong(x: CanvasRenderingContext2D, pts: readonly [number, number][]):
   for (let i = 1; i < pts.length; i++) x.lineTo(pts[i]![0], pts[i]![1])
   x.stroke()
 }
-/** Vẽ một bi mẫu (Sảnh Bi-a, bảng nguyên tố). */
-export function veBiMau(canvas: HTMLCanvasElement, id: KiHieu, q: [number, number, number, number], doc: Document = document): void {
-  const dpr = Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1), N = Math.round(64 * dpr), x = canvas.getContext('2d')
+/** Vẽ một bi mẫu (Sảnh Bi-a: chú giải "Bi của em · Bi đối thủ · Bi chốt"), đúng hàm vẽ bi của bàn. */
+export function veBiMau(canvas: HTMLCanvasElement, kieu: KieuBi, kiHieu: string, vang = false): void {
+  const dpr = Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1), N = Math.round(44 * dpr), x = canvas.getContext('2d')
   if (!x) return
   canvas.width = canvas.height = N
-  const img = x.createImageData(N, N)
-  toBi(taoBong(N), taoChu(doc), id, q, false, img.data)
-  x.putImageData(img, 0, 0)
+  x.setTransform(1, 0, 0, 1, N / 2, N / 2)
+  veMotBi(x, kieu, kiHieu, N / KHUNG_ANH * 1.1, vang)
 }

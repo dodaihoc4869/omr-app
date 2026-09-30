@@ -6,7 +6,9 @@
 import { XEP, type KiHieu } from './nguyen-to'
 
 export const W = 500, H = 900, R = 21, T = 26, D2 = (2 * R) * (2 * R), HS = 1 / 240, VMAX = 2600
-const G0 = 3862, A_TRUOT = 0.2 * G0, A_LAN = 0.02 * G0, MU_BI = 0.06, MU_BANG = 0.2, GIAM_WZ = 24, E_BI = 0.95, KW = 5 / (2 * R)
+/** Gia tốc trọng trường (đv/s²), giảm tốc khi TRƯỢT và khi LĂN — xuất ra để tính vạch "đủ tới bi" (dieu-khien-cham.ts); số không đổi. */
+export const G0 = 3862, A_TRUOT = 0.2 * G0, A_LAN = 0.02 * G0
+const MU_BI = 0.06, MU_BANG = 0.2, GIAM_WZ = 24, E_BI = 0.95, KW = 5 / (2 * R)
 const CM = 50, SM = 37, JR = 5
 export interface Lo { x: number; y: number; r: number; v: number }
 export const LO: readonly Lo[] = [{ x: -4, y: -4, r: 36, v: 31 }, { x: W + 4, y: -4, r: 36, v: 31 }, { x: -14, y: H / 2, r: 30, v: 27 }, { x: W + 14, y: H / 2, r: 30, v: 27 }, { x: -4, y: H + 4, r: 36, v: 31 }, { x: W + 4, y: H + 4, r: 36, v: 31 }]

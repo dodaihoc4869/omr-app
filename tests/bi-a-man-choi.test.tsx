@@ -9,6 +9,7 @@ import { datBoGoiBia } from '../src/game/bi-a/api'
 import { suKienMoi } from '../src/game/bi-a/vat-ly'
 import type { CauBia, VanBia } from '../src/game/bi-a/dieu-khien'
 import type { KiHieu } from '../src/game/bi-a/nguyen-to'
+import { KHO_HUONG_DAN } from '../src/game/bi-a/cai-dat-bia'
 
 configure({ asyncUtilTimeout: 6000 })
 vi.setConfig({ testTimeout: 20000 })
@@ -71,7 +72,9 @@ describe('Sảnh Bi-a', () => {
     await screen.findByRole('region', { name: 'Hai phe' })
     expect(lenh('bia-xep-ban')[0]).toEqual({ loai: 'ai', cheDo: 'don', soBi: 7 })
     expect(screen.getByText('Đấu với A.I')).toBeTruthy()
-    expect(screen.getAllByRole('button', { name: /^Bi (Na|Mg|Al|Fe|Cu|Ag|Au) / })).toHaveLength(7)
+    // Sửa 30/09 (thầy chốt "Bàn Bi-a mới"): bỏ hàng ô "Bi của em" ⇒ hàng chấm 7 bi của em (lam) + 7 bi đối thủ.
+    expect(screen.queryAllByRole('button', { name: /^Bi (Na|Mg|Al|Fe|Cu|Ag|Au) / })).toHaveLength(0)
+    expect(screen.getByRole('region', { name: 'Hai phe' }).querySelectorAll('i[data-kieu="ta"]')).toHaveLength(7)
   })
   it('bấm "Đánh đôi với A.I" (thẻ Chơi với A.I) ⇒ bia-xep-ban đánh đôi 4 bi', async () => {
     render(<BiaGame token="tk" hoTen="Khánh Linh" onVe={() => {}} />)
@@ -170,21 +173,30 @@ describe('Màn chơi: tấm câu, câu sai sang lượt ngay, Xem lại câu sai
     expect(tam.textContent).toContain('Câu hỏi số')
   })
 
-  it('giải trước: lượt em ⇒ không mở; lượt A.I ⇒ mở tấm, đúng thì bi hoá vàng', async () => {
+  // Sửa 30/09 (thầy chốt "Bàn Bi-a mới"): giải trước = CHẠM BI CỦA EM TRÊN BÀN (bỏ ô "Bi của em"); lượt em thì chạm bi là nhắm.
+  it('giải trước: lượt em ⇒ chạm bi trên bàn không mở; lượt A.I ⇒ mở tấm, đúng thì bi hoá vàng', async () => {
+    const hop = (w: number, h: number) => ({ x: 0, y: 0, left: 0, top: 0, right: w, bottom: h, width: w, height: h, toJSON: () => ({}) }) as DOMRect
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(() => hop(360, 740))
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(360)
+    vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(740)
+    KHO_HUONG_DAN.dat('1') // đã xem hướng dẫn lần đầu
     veVan()
     const v = van()
+    const S = Math.min(360 / 552, 740 / 952), cv = document.querySelector('.bia-ban canvas')!
+    const chamBi = (id: KiHieu) => { const b = v.st.balls.find((x) => x.id === id)!; const o = { clientX: (b.x + 26) * S, clientY: (b.y + 26) * S, pointerId: 1 }; fireEvent.pointerDown(cv, o); fireEvent.pointerUp(cv, o) }
     act(() => { v.pha = 'aim'; v.cur = 0 })
-    fireEvent.click(screen.getByRole('button', { name: /^Bi Al / }))
+    chamBi('Al')
     expect(screen.queryByRole('dialog')).toBeNull()
     act(() => { v.cur = 1; v.pha = 'ai' })
-    fireEvent.click(screen.getByRole('button', { name: /^Bi Al / }))
+    chamBi('Al')
     const tam = await screen.findByRole('dialog', { name: /em giải trước/ })
     expect(tam.textContent).toContain('Câu hỏi số 3')
     fireEvent.click(screen.getByRole('button', { name: /Đáp án đúng 3/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Về bàn' }))
     await waitFor(() => expect(v.bi.Al.vang).toBe(true))
-    expect(screen.getByRole('button', { name: /^Bi Al .*bi vàng/ })).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'Hai phe' }).querySelectorAll('i[data-vang]')).toHaveLength(1)
+    vi.restoreAllMocks()
   })
 
   it('hết giờ khi chưa chọn đủ (không gửi máy chủ) ⇒ trong ván như sai (bi về bàn, sang lượt) nhưng KHÔNG đếm câu sai, không đổi câu', async () => {
