@@ -41,12 +41,20 @@ export interface SanhHoa2 {
    * Máy chủ cũ / thiếu / rác ⇒ `{ duoc: false, soCau: 0 }`.
    */
   thuSucThem: { duoc: boolean; soCau: number }
+  /** 01/10: chuỗi ngày học (số ngày VN liên tiếp em có làm ≥ 1 câu; hôm nay chưa làm ⇒ giữ tới hôm qua). Máy chủ cũ không gửi ⇒ null (dùng số cũ). */
+  chuoiNgay?: number | null
 }
 /** Tóm tắt Bi-a cho cửa trên Sảnh: số câu Bi-a còn / trần hôm nay; Bàn giao hữu; lý do khoá. */
 export interface BiaTrenSanh { con: number; tong: number; giaoHuu: { mo: boolean; con: number }; lyDoKhoa: string | null }
 
 /** Kết quả đọc `hoa2-sanh`: cờ tắt · em chưa chọn thần thú · có dữ liệu Sảnh. */
 export type KetQuaSanh = { cheDo2: false } | { cheDo2: true; canChonThu: true } | { cheDo2: true; canChonThu?: false; sanh: SanhHoa2 }
+
+/** Số "Chuỗi N ngày" trên Sảnh: ưu tiên số máy chủ tính từ sổ học (`sanh.chuoiNgay`); máy chủ cũ / chưa có Sảnh ⇒ `duPhong` (số kế hoạch ngày cũ). */
+export function chuoiNgaySanh(kq: KetQuaSanh | null | undefined, duPhong: number): number {
+  const n = kq && kq.cheDo2 && 'sanh' in kq ? kq.sanh.chuoiNgay : null
+  return typeof n === 'number' ? n : duPhong
+}
 
 export interface ChienDichCau {
   id: string
@@ -200,6 +208,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       bia: docBiaTrenSanh(o.bia),
       tamGiuCa: soKhongAm((o.tamGiu as Record<string, unknown> | undefined)?.ca),
       thuSucThem: docThuSucThem(o.thuSucThem),
+      chuoiNgay: typeof o.chuoiNgay === 'number' && Number.isFinite(o.chuoiNgay) ? Math.max(0, Math.floor(o.chuoiNgay)) : null,
       ruong: {
         daLam: soKhongAm(r.daLam),
         tong: soKhongAm(r.tong),
