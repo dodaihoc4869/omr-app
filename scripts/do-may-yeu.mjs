@@ -650,6 +650,7 @@ if (MAY_CHIEU) {
   if (muon('dao')) ket.man.dao = await lap(() => g('/src/game/than-thu-v2/dao/xem-thu.html?man=vo', 'button', cuon))
   if (muon('dao2')) ket.man.dao2 = await lap(() => g('/src/game/than-thu-v2/dao2/xem-thu.html', 'button', cham('button')))
   if (muon('doan2')) ket.man.doan2 = await lap(() => g('/src/game/than-thu-v2/doan2/xem-thu-2.html', 'button', cham('button')))
+  if (muon('bia')) ket.man.bia = await lap(() => g('/src/game/bi-a/xem-thu.html', 'button', cham('button:has-text("Đấu đơn với A.I")')))
   for (const m of ['sanh', 'hs', 'ph', 'phbang']) if (muon(m)) ket.man[m] = await lap(() => g(`/scripts/do-may-yeu/trang-do.html?man=${m}`, '#xong', cuon))
   s.close()
 } else {

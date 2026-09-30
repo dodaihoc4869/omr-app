@@ -22,6 +22,7 @@ export default defineConfig({
         dao2: resolve(goc, 'src/game/than-thu-v2/dao2/xem-thu.html'),
         doan2: resolve(goc, 'src/game/than-thu-v2/doan2/xem-thu-2.html'),
         man: resolve(goc, 'scripts/do-may-yeu/trang-do.html'),
+        bia: resolve(goc, 'src/game/bi-a/xem-thu.html'), // quét 30/09: đo Bi-a trên máy yếu
       },
     },
   },
