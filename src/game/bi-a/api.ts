@@ -95,6 +95,12 @@ export async function layCauTraLoi(token: string): Promise<KetQuaTraLoi> {
 export async function dongTraLoi(token: string, session: string): Promise<void> {
   try { await goi('bia-tra-loi', token, { dong: true, session }) } catch { /* bỏ qua */ }
 }
+/** Nhịp báo "em còn ở bàn" (máy chủ tính bàn bỏ dở theo HOẠT ĐỘNG GẦN NHẤT, hạn `HAN_GIU_BAN_BIA_MS` = 15 phút ở server/src/srs2-game.ts). */
+export const NHIP_GIU_BAN_MS = 3 * 60_000
+/** Báo máy chủ bàn A.I này còn đang chơi (một lệnh ghi nhẹ). Trả `false` khi phiên đã đóng. */
+export async function giuBanBia(token: string, session: string): Promise<boolean> {
+  return (await goi('bia-giu-ban', token, { session })).conMo === true
+}
 /** Đổi câu sau câu sai: câu mới cùng dạng, hoặc null (bi trống / hết trần). */
 export async function doiCauBia(token: string, session: string, qidCu: string, chot: boolean): Promise<CauBia | null> {
   const o = await goi('bia-doi-cau', token, { session, qidCu, chot })

@@ -2,7 +2,7 @@
 // Sảnh chia 3 nhóm chế độ: Chơi với bạn · Chơi với A.I · Trả lời câu hỏi (không cần chơi); ngang / máy tính có cột phụ bên phải.
 // GĐ1: tự chơi với A.I (đấu đơn, đánh đôi) và Bàn giao hữu với A.I. GĐ2 (máy chủ có phòng đấu): Đấu đơn / Đánh đôi với bạn, Nhập mã bàn,
 // bạn cùng lớp đang ở Sảnh Bi-a + Mời, lời mời đến (Nhận / Từ chối), Điểm bàn. Máy chủ chưa có phòng đấu ⇒ nút online ghi "Sắp mở".
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
 import { hoiLoiMoi, moiBanVao, taiSanhBia, taoBanOnline, traLoiLoiMoi, vaoBanBangMa, xepBanBia, type BanCoMat, type LoiMoiDen, type SanhBia, type VeVaoBan } from './api'
 import BanOnline, { KHOA_BAN_DANG } from './BanOnline'
@@ -32,6 +32,23 @@ const BIEU_TUONG = {
   ban: <svg {...NET}><circle cx="9" cy="8" r="3.2" /><path d="M3 19.5c.6-3.3 3-5.2 6-5.2s5.4 1.9 6 5.2" /><circle cx="17" cy="9" r="2.6" /><path d="M16.2 14.3c2.5.2 4.3 1.9 4.8 5" /></svg>,
   ai: <svg {...NET}><rect x="5" y="8" width="14" height="11" rx="3.2" /><path d="M12 4.5V8M2.8 12.5v3M21.2 12.5v3" /><circle cx="12" cy="3.6" r="1" /><circle cx="9.5" cy="13.2" r="1.3" fill="currentColor" stroke="none" /><circle cx="14.5" cy="13.2" r="1.3" fill="currentColor" stroke="none" /></svg>,
   cau: <svg {...NET}><path d="M4 5h16v11.5H9.5L4 20.5z" /><path d="M9.8 9.2a2.2 2.2 0 1 1 3 2c-.6.3-.8.7-.8 1.3" /><circle cx="12" cy="14.3" r=".7" fill="currentColor" /></svg>,
+}
+
+/** Lớp chắn RIÊNG của Bi-a (30/09): lỗi lúc vẽ React ở màn chơi chỉ đóng bàn, KHÔNG gỡ cả cổng học sinh (trước: lớp chắn chung của app thay cả màn). */
+class ChanLoiBia extends Component<{ children: ReactNode; onVe: () => void }, { loi: boolean }> {
+  state = { loi: false }
+  static getDerivedStateFromError() { return { loi: true } }
+  componentDidCatch(e: unknown) { console.error('[Bi-a] màn chơi gặp lỗi', e) }
+  render() {
+    if (!this.state.loi) return this.props.children
+    return (
+      <div className="bia" data-bo-cuc="doc"><div className="bia-sanh"><div className="bia-sanh-trong"><div className="bia-the" role="alert">
+        <b>Bàn bi-a vừa gặp lỗi</b>
+        <span className="bia-chu-nho">Câu em đã trả lời vẫn được tính. Em về Sảnh Bi-a rồi vào bàn mới nhé.</span>
+        <button type="button" className="bia-nut-vang" onClick={this.props.onVe}>Về Sảnh Bi-a</button>
+      </div></div></div></div>
+    )
+  }
 }
 
 export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
@@ -83,11 +100,13 @@ export default function BiaGame({ token, hoTen, onVe }: BiaGameProps) {
     try { setBanOnline(await f()) } catch (e) { setTin(e instanceof Error && e.message ? e.message : 'Chưa vào được bàn. Em thử lại.') } finally { setDang(false) }
   }
   const taoVaMoi = (b: BanCoMat) => void moBanOnline(async () => { const lm = loaiMang(sanh); if (!lm) throw new Error(sanh?.message || 'Hôm nay em chưa đấu được.'); const v = await taoBanOnline(token, 'don', lm); await moiBanVao(token, v.van, b.sbd); return v })
-  if (banOnline) return <BanOnline token={token} hoTen={hoTen} vao={banOnline} conTran={conTran} onVe={() => { setBanOnline(null); setBoBanDang(true); void napSanh() }} />
-  if (chiTraLoi) return <TraLoiCau token={token} onVe={() => { setChiTraLoi(false); void napSanh() }} />
+  if (banOnline) { const ve = () => { setBanOnline(null); setBoBanDang(true); void napSanh() }; return <ChanLoiBia onVe={ve}><BanOnline token={token} hoTen={hoTen} vao={banOnline} conTran={conTran} onVe={ve} /></ChanLoiBia> }
+  if (chiTraLoi) { const ve = () => { setChiTraLoi(false); void napSanh() }; return <ChanLoiBia onVe={ve}><TraLoiCau token={token} onVe={ve} /></ChanLoiBia> }
   if (van) return (
-    <ManChoi key={van.khoa} token={token} tenEm={hoTen || 'Em'} van={van.van} session={van.session} cheDo={van.cheDo} loai={van.loai} cauEm={van.cauEm} chot={van.chot}
-      onVeSanh={() => { setVan(null); void napSanh() }} onChoiLai={() => { setVan(null); const c = cuoi.current; if (c) void vaoBan(c.loai, c.cheDo); else void napSanh() }} />
+    <ChanLoiBia key={van.khoa} onVe={() => { setVan(null); void napSanh() }}>
+      <ManChoi key={van.khoa} token={token} tenEm={hoTen || 'Em'} van={van.van} session={van.session} cheDo={van.cheDo} loai={van.loai} cauEm={van.cauEm} chot={van.chot}
+        onVeSanh={() => { setVan(null); void napSanh() }} onChoiLai={() => { setVan(null); const c = cuoi.current; if (c) void vaoBan(c.loai, c.cheDo); else void napSanh() }} />
+    </ChanLoiBia>
   )
   const khoa = sanh?.lyDoKhoa ?? null
   const coCau = !!sanh && sanh.bat && !khoa && sanh.tran.con > 0

@@ -32,9 +32,28 @@ const khiXongBai: Array<() => void> = []
 
 /** ExamTakeScreen gọi khi vào/ra màn làm bài. */
 export function datDangLamBai(v: boolean): void {
-  const truoc = dangLamBai
+  const truoc = dangLamBaiKhong()
   dangLamBai = v
-  if (truoc && !v) for (const f of khiXongBai.slice()) f()
+  if (truoc && !dangLamBaiKhong()) for (const f of khiXongBai.slice()) f()
+}
+
+// ĐANG CHƠI GAME CÓ VÁN (Bi-a) THÌ CŨNG KHÔNG TỰ TẢI LẠI (thầy báo 30/09 "Bi a đang chơi thoát luôn").
+// Nguyên nhân gốc: mỗi lần đẩy Pages, máy em đang giữa ván Bi-a nhận bản mới (quay lại app / có mạng / nhịp 30 phút / lớp bảo hiểm 10 phút)
+// ⇒ `controllerchange` ⇒ `location.reload()` ⇒ trang nạp lại về Bảng nhiệm vụ: mất ván, 8 câu trên bàn bị giữ (Sảnh 18 → 10).
+// Mỗi màn cần giữ gọi `giuTrangKhongTaiLai()` lúc vào và gọi hàm trả về lúc ra; đếm theo số người giữ (lồng nhau được).
+// Hết người giữ (và không làm bài) ⇒ chạy `khiXongBai` y như lúc nộp bài: bản mới chờ đúng lúc em rời ván.
+let soNguoiGiu = 0
+/** Giữ trang không tự tải lại vì bản mới. Trả hàm thả (gọi nhiều lần vô hại). */
+export function giuTrangKhongTaiLai(): () => void {
+  soNguoiGiu++
+  let daTha = false
+  return () => {
+    if (daTha) return
+    daTha = true
+    const truoc = dangLamBaiKhong()
+    soNguoiGiu = Math.max(0, soNguoiGiu - 1)
+    if (truoc && !dangLamBaiKhong()) for (const f of khiXongBai.slice()) f()
+  }
 }
 
 /** Đăng ký một việc chạy NGAY khi em rời màn làm bài (lớp bảo hiểm bản mới dùng: bản mới chờ đúng lúc này). Trả hàm gỡ. */
@@ -84,8 +103,9 @@ export function phaiHoanBanMoi(dangLamBaiNay: boolean, dangMoKhoaNay: boolean, c
   return dangMoKhoaNay && !coPhien
 }
 
+/** Đang làm bài HOẶC có màn đang giữ trang (ván game) ⇒ mọi đường tự tải lại/ép bản mới đều hoãn. */
 export function dangLamBaiKhong(): boolean {
-  return dangLamBai
+  return dangLamBai || soNguoiGiu > 0
 }
 
 /** Khoảng cách tối thiểu giữa hai lần hỏi — chặn hỏi dồn khi người dùng bật
