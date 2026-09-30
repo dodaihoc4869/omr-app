@@ -1,3 +1,4 @@
+import { S_EXP_NGAY, vangTranNgay } from '../../../lib/kinh-te-game'
 import {HAP_THU_DAT} from '../../../lib/hap-thu-ngay'
 // CỬA HÀNG PHỤ KIỆN — hàm THUẦN của lớp màn (không React, không mạng). Mọi số ở đây là số MÁY CHỦ đã trả đưa vào;
 // hàm chỉ chọn trạng thái / viết lời chỉ đường / ghép danh mục / dựng "đang mặc + đang thử". KHÔNG có hàm nào cộng trừ SỐ DƯ vàng.
@@ -27,11 +28,11 @@ import {
   chuTrangThai,
 } from './chu-shop'
 
-/** Vàng mỗi ngày của em TRUNG BÌNH theo luật v4 (docs/DE-XUAT-EXP-2909.md mục 2.4/2.6: ≈ 314 EXP/ngày ÷ 5). CHỈ dùng để ước lượng lời "khoảng N ngày nữa là đủ vàng"; bảng giá cũng định theo số này. */
-export const DU_MOI_NGAY = 63
+/** Mốc ước lượng thận trọng theo vàng v5: toàn bộ S_EXP_NGAY là EXP tràn. Không phải thu nhập/số dư đo của em. */
+export const DU_MOI_NGAY = vangTranNgay(S_EXP_NGAY)
 
 /**
- * [D2] số ngày ước lượng = làm tròn lên của (vàng còn thiếu − EXP thừa đang đổi được) ÷ 80.
+ * [D2] số ngày ước lượng = làm tròn lên của (vàng còn thiếu − EXP thừa đang đổi được) ÷ DU_MOI_NGAY.
  * Trả 0 khi EXP thừa hiện có ĐÃ đủ (⇒ nói [D1]). Tính từ số máy chủ đã trả (`vang`, `doiToiDa`, `gia`), không phải số dư tự tính.
  */
 export function ngayConThieuVang(thieuVang: number, doiToiDa: number, duMoiNgay: number = DU_MOI_NGAY): number {

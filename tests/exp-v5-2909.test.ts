@@ -184,11 +184,11 @@ describe('(6) khiên 36 mảnh + 2 600 vàng + ngày ≥ 36 + 18(k − 1); khoá
     expect(() => renKhienBangVang(ho(53, 1), 1, 9999)).toThrow(/khiên thứ 2 cần 54 ngày đạt/)
     expect(renKhienBangVang(ho(54, 1), 1, 9999)).toBe(true)
   })
-  it('bậc 4 cần cấp 10, bậc 5 cần cấp 20, bậc 1–3 không khoá (trường chỉ-thêm `canCap`); giá v4 giữ nguyên', () => {
+  it('bậc 4 cần cấp 10, bậc 5 cần cấp 20, bậc 1–3 không khoá (trường chỉ-thêm `canCap`); giá m1-v2 theo yêu cầu 30/09', () => {
     expect(CAP_MO_BAC_PHU_KIEN).toEqual({ 1: null, 2: null, 3: null, 4: 10, 5: 20 })
     for (const m of DANH_MUC_PHU_KIEN) expect(m.canCap, m.ma).toBe(m.bac === 4 ? 10 : m.bac === 5 ? 20 : null)
-    expect(DANH_MUC_PHU_KIEN.find((m) => m.ma === 'HQ-07')!.gia).toBe(1320)
-    expect(DANH_MUC_PHU_KIEN.reduce((t, m) => t + m.gia, 0)).toBe(32_260)
+    expect(DANH_MUC_PHU_KIEN.find((m) => m.ma === 'HQ-07')!.gia).toBe(1200)
+    expect(DANH_MUC_PHU_KIEN.reduce((t, m) => t + m.gia, 0)).toBe(26_270)
   })
 })
 

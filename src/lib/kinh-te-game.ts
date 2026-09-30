@@ -7,7 +7,7 @@
 // · Thú đầy thanh mà chưa đủ ngày ⇒ phần EXP vượt là "EXP tràn", tự đổi thành vàng + mảnh khiên theo lợi suất giảm dần trong NGÀY VN (`vangTranNgay`, `manhTranNgay`).
 // · Vàng thường: 1 vàng / `EXP_MOI_VANG` EXP VÀO THÚ (EXP tràn không tính vàng thường — nó đã có vàng tràn).
 // · Khiên rèn: `MANH_REN_KHIEN` mảnh + `VANG_REN_KHIEN` vàng + số ngày đạt ≥ `ngayDatKhien(k)` cho khiên thứ k. Giữ tối đa 5 khiên chưa dùng.
-// · Shop: giữ giá v4; bậc 4 cần thú cấp ≥ `CAP_MO_BAC_PHU_KIEN[4]`, bậc 5 cần cấp ≥ `CAP_MO_BAC_PHU_KIEN[5]`.
+// · Shop: bảng giá chung `phu-kien-danh-muc.ts`; bậc 4 cần thú cấp ≥ `CAP_MO_BAC_PHU_KIEN[4]`, bậc 5 cần cấp ≥ `CAP_MO_BAC_PHU_KIEN[5]`.
 //
 // Hai bảng số nguyên dưới đây VIẾT THẲNG (sinh từ công thức đóng, có test khoá `tests/exp-v5-2909.test.ts`), KHÔNG tính mũ lúc chạy:
 //   p = ln(1200/21) / ln(119/9) ≈ 1,5669;  D(c) = ⌊21·((c−1)/9)^p⌋ (D(1) = 0);  T(c) = làmTròn10(S·(21·((c−1)/9)^p − ½)), S = `S_EXP_NGAY` (T(1) = 0).

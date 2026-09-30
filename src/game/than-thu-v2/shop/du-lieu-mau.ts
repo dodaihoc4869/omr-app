@@ -6,7 +6,7 @@
 //   · `vang-doi`: soExp nguyên 1..doiToiDa, luôn giữ lại 200 EXP (duoi_nguong), khoá lặp ⇒ daDoi của lần gốc + số HIỆN TẠI, lapLai:true;
 //   · số dư luôn do máy chủ giả trả (có công tắc `vangSauGhi` để thử "số lạ": màn phải hiện đúng số ấy, không tự trừ).
 // Chữ lời máy chủ mẫu nằm ở chu-shop.ts (`loiMayChu`); tệp này không có chữ tiếng Việt.
-import { DANH_MUC_PHU_KIEN, DOT_MO_BAN } from '../../../lib/phu-kien-danh-muc'
+import { DANH_MUC_PHU_KIEN, DOT_MO_BAN, PHIEN_BAN } from '../../../lib/phu-kien-danh-muc'
 import type { MonPhuKien } from '../../../lib/phu-kien-danh-muc'
 import { CAC_O, LoiShopApi, MA_MAT_MANG, MA_TAM_DONG } from './kieu'
 import type { DangMac, DapDanhSach, DapDoi, DapMacDo, DapMua, MonMayChu, OGan, ShopApi, ViSo } from './kieu'
@@ -193,7 +193,7 @@ export class ShopApiGia implements ShopApi {
           suatTong: m.suatTong,
         }
       })
-    return { ok: true, phienBan: 'm1-v1', vang: this.vang, mon, dangMac: { ...this.dangMac }, emCo: { chuoiNgay: this.chuoiNgay, anThachSang: this.anThachSang } }
+    return { ok: true, phienBan: PHIEN_BAN, vang: this.vang, mon, dangMac: { ...this.dangMac }, emCo: { chuoiNgay: this.chuoiNgay, anThachSang: this.anThachSang } }
   }
 
   async vangDoi(soExp: number, khoaYeuCau: string): Promise<DapDoi> {

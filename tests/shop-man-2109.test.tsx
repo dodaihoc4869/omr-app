@@ -1,7 +1,7 @@
 // CỬA HÀNG PHỤ KIỆN · B1 — LOGIC MÀN (React Testing Library + máy chủ giả đúng hợp đồng). Bố cục Chromium: shop-bo-cuc-2109; khoá nguồn: shop-khoa-nguon-2109.
 // (a) luồng đủ · (b) số dư CHỈ đổi theo đáp máy chủ · (c) bấm đúp ⇒ MỘT lần ghi cùng khoá · (d) mọi lỗi hợp đồng hiện lời máy chủ + "Thử lại"
 // (e) luật v4 (29/09): không còn đổi tay EXP → vàng · (f) cờ tắt / mất mạng / trống / đang tải / tấm chào · điểm cắm `veThu`.
-// SỬA CÓ CHỦ Ý 29/09 (docs/DE-XUAT-EXP-2909.md): giá theo bảng v4 (VD-04 250, HQ-03 300, HQ-05 590, HQ-07 1 320); bỏ các test của khối Đổi vàng (thanh kéo, ô nhập, hộp đổi, duoi_nguong).
+// SỬA CÓ CHỦ Ý 30/09: giá m1-v2 (VD-04 150, HQ-03 180, HQ-05 420, HQ-07 1 200); xác nhận và ví phải khớp giá máy chủ mới.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ReactNode } from 'react'
@@ -56,18 +56,18 @@ describe('(a) luồng đủ: Cửa hàng → chạm món → Thử đồ → Mua
     expect(chu(c)).toContain('Đang thử 1 phụ kiện')
     expect(chu(c)).toContain('Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.')
     expect(chu(c)).toContain('Đủ vàng rồi')
-    expect(nut(c, 'mua').textContent).toBe('Mua · 250 vàng')
+    expect(nut(c, 'mua').textContent).toBe('Mua · 150 vàng')
     expect(api.ghi.mua).toBe(0) // thử thì không mất vàng, không ghi gì
 
     fireEvent.click(nut(c, 'mua'))
-    expect(within(hop()).getByText('Em trả 250 vàng, còn lại 90 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.')).toBeTruthy()
+    expect(within(hop()).getByText('Em trả 150 vàng, còn lại 190 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.')).toBeTruthy()
     expect(api.ghi.mua).toBe(0) // một bước xác nhận: chưa ghi
-    fireEvent.click(within(hop()).getByRole('button', { name: 'Mua · 250 vàng' }))
+    fireEvent.click(within(hop()).getByRole('button', { name: 'Mua · 150 vàng' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 
     expect(api.ghi.mua).toBe(1)
-    expect(vangHien(c)).toBe('90')
-    expect(chu(c)).toContain('Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 90 vàng.')
+    expect(vangHien(c)).toBe('190')
+    expect(chu(c)).toContain('Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 190 vàng.')
     expect(c.querySelector('.ps-gc-vet[data-mon="VD-04"]')).not.toBeNull() // món tự mặc lên thú
     expect(nut(c, 'dang-mac').disabled).toBe(true)
     expect(nut(c, 'dang-mac').textContent).toBe('Thần thú đang mặc món này')
@@ -134,15 +134,15 @@ describe('(a) luồng đủ: Cửa hàng → chạm món → Thử đồ → Mua
       return kq
     }
     const dv = await xem('HQ-03')
-    expect(dv.nut.textContent).toBe('Mua · 300 vàng')
+    expect(dv.nut.textContent).toBe('Mua · 180 vàng')
     expect(dv.tt).toBe('Đủ vàng rồi')
     const tv = await xem('HQ-05')
-    expect(tv.tt).toContain('Chưa đủ vàng — còn thiếu 250 vàng')
-    expect(tv.tt).toContain('Học đều khoảng 4 ngày nữa là đủ vàng.') // luật v4: 250 / 63 ⇒ 4 (không còn đổi tay)
+    expect(tv.tt).toContain('Chưa đủ vàng — còn thiếu 80 vàng')
+    expect(tv.tt).toContain('Học đều khoảng 2 ngày nữa là đủ vàng.') // m1-v2: 80 / 63 ⇒ 2
     expect(tv.nut.disabled).toBe(true)
     const xa = await xem('HQ-07')
-    expect(xa.tt).toContain('Chưa đủ vàng — còn thiếu 980 vàng')
-    expect(xa.tt).toContain('Học đều khoảng 16 ngày nữa là đủ vàng.') // 980 / 63 = 15,6 ⇒ 16
+    expect(xa.tt).toContain('Chưa đủ vàng — còn thiếu 860 vàng')
+    expect(xa.tt).toContain('Học đều khoảng 14 ngày nữa là đủ vàng.') // m1-v2: 860 / 63 ⇒ 14
     const kh = await xem('KT-08')
     expect(kh.tt).toContain('Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày)')
     expect(kh.tt).toContain('Giữ chuỗi thêm 5 ngày nữa là mở.')
@@ -194,7 +194,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     const t = the(c, 'VD-04').textContent!
     expect(t).toContain('Đẹp')
     expect(t).toContain('Chỗ đeo: Đuôi sáng')
-    expect(t).toContain('Giá 250 vàng')
+    expect(t).toContain('Giá 150 vàng')
     expect(the(c, 'KT-08').textContent).toContain('Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)')
     expect(the(c, 'KT-08').textContent).toContain('Chỉ còn 12 cái')
     expect(the(c, 'HQ-08').textContent).toContain('Mùa 1 chỉ có 20 cái')
@@ -202,7 +202,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     expect(the(c, 'VD-08').textContent).toContain('Đã hết')
     expect(the(c, 'VD-01').textContent).toContain('Đã có')
     expect(the(c, 'KT-03').textContent).toContain('Đang mặc')
-    expect(the(c, 'VD-04').getAttribute('aria-label')).toBe('Thử Đuôi Lửa Tím. Bậc Đẹp. Giá 250 vàng. Đủ vàng rồi')
+    expect(the(c, 'VD-04').getAttribute('aria-label')).toBe('Thử Đuôi Lửa Tím. Bậc Đẹp. Giá 150 vàng. Đủ vàng rồi')
   })
 
   it('thanh lọc theo chỗ đeo; Trên đầu / Trên lưng là chip "Sắp mở" (vô hiệu); đợt 2 mở ⇒ chip mở và đủ 40 món', async () => {
@@ -249,7 +249,7 @@ describe('(b) số dư CHỈ đổi theo đáp máy chủ (máy chủ giả tr�
     fireEvent.click(nut(c, 'mua-that'))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(vangHien(c)).toBe('777')
-    expect(vangHien(c)).not.toBe('90')
+    expect(vangHien(c)).not.toBe('190')
     expect(chu(c)).toContain('Em còn 777 vàng.')
     // số chạy nhìn thấy được (300 ms) dừng đúng ở số máy chủ trả
     await act(async () => {
@@ -283,8 +283,8 @@ describe('(c) chống bấm đúp: MỘT lần ghi, cùng khoá', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(api.khoaMua).toHaveLength(1)
     expect(api.ghi.mua).toBe(1)
-    expect(api.vang).toBe(90)
-    expect(vangHien(c)).toBe('90')
+    expect(api.vang).toBe(190)
+    expect(vangHien(c)).toBe('190')
   })
 
   it('mất mạng giữa lúc gửi: "Thử lại" DÙNG LẠI khoá cũ (không mua hai lần); lỗi máy chủ rõ ràng thì khoá MỚI', async () => {
@@ -382,12 +382,12 @@ describe('(d) mọi lỗi hợp đồng hiện lời máy chủ + "Thử lại"'
       const lai = within(hop()).getByRole('button', { name: 'Thử lại' })
       if (ma === 'gia_doi') {
         // máy chủ đổi giá 250 → 260: màn làm mới và nói giá mới trước khi em bấm lại
-        await waitFor(() => expect(within(hop()).getByText(/Em trả 260 vàng, còn lại 80 vàng/)).toBeTruthy())
+        await waitFor(() => expect(within(hop()).getByText(/Em trả 160 vàng, còn lại 180 vàng/)).toBeTruthy())
       }
       fireEvent.click(lai)
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
       expect(api.ghi.mua).toBe(1)
-      expect(vangHien(c)).toBe(ma === 'gia_doi' ? '80' : '90')
+      expect(vangHien(c)).toBe(ma === 'gia_doi' ? '180' : '190')
     })
 
   it('tải hỏng: lời RIÊNG của máy chủ hiện nguyên văn + "Thử lại" (bấm lại gọi lại máy chủ); lỗi không rõ ⇒ lời chung', async () => {

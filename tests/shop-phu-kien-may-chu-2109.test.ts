@@ -43,7 +43,7 @@ describe('cờ shop_phu_kien', () => {
   it('vắng cờ hoặc bat:false ⇒ vang-xem {bat:false}; vang-doi / shop-danh-sach / shop-mua ⇒ tam_dong; KHÔNG ghi gì', async () => {
     for (const d of [dung({ khongCo: true }), dung({ co: { bat: false } })]) {
       expect(await goi(d, 'S1', 'vang-xem')).toEqual({ ok: true, bat: false })
-      for (const [a, b] of [['vang-doi', { soExp: 10, khoaYeuCau: K('1') }], ['shop-danh-sach', {}], ['shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('2') }]] as const) {
+      for (const [a, b] of [['vang-doi', { soExp: 10, khoaYeuCau: K('1') }], ['shop-danh-sach', {}], ['shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('2') }]] as const) {
         const r = await goi(d, 'S1', a, b); expect(r).toMatchObject({ ok: false, ma: 'tam_dong' }); expect(r.loi).toBe('Cửa hàng đang tạm đóng. Đồ em đã mua vẫn còn nguyên.')
       }
       expect(dem(d, 'vang_so')).toBe(0); expect(hoSo(d, 'S1').p.wallet).toBe(620)
@@ -116,11 +116,11 @@ describe('shop-danh-sach', () => {
     d.sql.prepare("INSERT INTO phu_kien_dang_mac(sbd,o_gan,ma_mon,luc) VALUES('S1','vet','VD-04','x')").run()
     d.sql.prepare("INSERT INTO phu_kien_so_huu(sbd,ma_mon,mua,gia,khoa_yeu_cau,luc) VALUES('S2','KT-08','m1',6000,'k2','x')").run()
     const r = await goi(d, 'S1', 'shop-danh-sach')
-    expect(r).toMatchObject({ ok: true, phienBan: 'm1-v1', vang: 340, emCo: { chuoiNgay: 9, anThachSang: 0 }, dangMac: { vet: 'VD-04', 'hao-quang': null, khung: null, dau: null, 'co-lung': null } })
+    expect(r).toMatchObject({ ok: true, phienBan: 'm1-v2', vang: 340, emCo: { chuoiNgay: 9, anThachSang: 0 }, dangMac: { vet: 'VD-04', 'hao-quang': null, khung: null, dau: null, 'co-lung': null } })
     expect(r.mon).toHaveLength(24); expect(r.mon.map((m: any) => m.ma)).toEqual(DANH_MUC_PHU_KIEN.filter((m) => m.moBan === 1).map((m) => m.ma))
     const mon = (ma: string) => r.mon.find((m: any) => m.ma === ma)
-    expect(mon('VD-04')).toEqual({ ma: 'VD-04', gia: 250, daCo: true, dangMac: true, moKhoa: true, thieu: null, canCap: null, suatCon: null, suatTong: null })
-    expect(mon('KT-08')).toEqual({ ma: 'KT-08', gia: 2210, daCo: false, dangMac: false, moKhoa: false, thieu: 'Cần chuỗi 14 ngày', canCap: 20, suatCon: 29, suatTong: 30 }) // S2 đã mua 1 cái
+    expect(mon('VD-04')).toEqual({ ma: 'VD-04', gia: 150, daCo: true, dangMac: true, moKhoa: true, thieu: null, canCap: null, suatCon: null, suatTong: null })
+    expect(mon('KT-08')).toEqual({ ma: 'KT-08', gia: 2000, daCo: false, dangMac: false, moKhoa: false, thieu: 'Cần chuỗi 14 ngày', canCap: 20, suatCon: 29, suatTong: 30 }) // S2 đã mua 1 cái
     expect(mon('HQ-08')).toMatchObject({ moKhoa: false, thieu: 'Cần chuỗi 14 ngày + 5 ấn thạch sáng', suatCon: 20, suatTong: 20 })
     expect(mon('HQ-07')).toMatchObject({ moKhoa: true, thieu: null }); expect(mon('VD-08')).toMatchObject({ moKhoa: false, thieu: 'Cần chuỗi 21 ngày', suatCon: 25 }); expect(mon('HQ-01')).toMatchObject({ moKhoa: true, thieu: null }) // chuỗi 9 ≥ 7 ⇒ Sử thi mở; Huyền thoại 21 ngày còn khoá
     expect(r.mon.some((m: any) => /^(DA|CL)-/.test(m.ma))).toBe(false)                    // đợt 2 chưa bán
@@ -147,70 +147,83 @@ describe('shop-danh-sach', () => {
 })
 
 describe('shop-mua', () => {
-  it('mua VD-04 (250, giá v4) khi có 340 vàng: −250, sở hữu, sổ −250, TỰ MẶC; số vàng tính từ sổ', async () => {
+  it('mua VD-04 (150, m1-v2) khi có 340 vàng: −150, sở hữu, sổ −150, TỰ MẶC; số vàng tính từ sổ', async () => {
     const d = dung(); cap(d, 'S1', 340)
-    const r = await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('m1') })
-    expect(r).toEqual({ ok: true, maMon: 'VD-04', vang: 90, daMac: true, lapLai: false })
-    expect(d.sql.prepare("SELECT ma_mon, gia, mua FROM phu_kien_so_huu WHERE sbd='S1'").all()).toEqual([{ ma_mon: 'VD-04', gia: 250, mua: 'm1' }])
-    expect(d.sql.prepare("SELECT loai, so_vang, ma_mon FROM vang_so WHERE sbd='S1' AND loai='mua'").all()).toEqual([{ loai: 'mua', so_vang: -250, ma_mon: 'VD-04' }])
+    const r = await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('m1') })
+    expect(r).toEqual({ ok: true, maMon: 'VD-04', vang: 190, daMac: true, lapLai: false })
+    expect(d.sql.prepare("SELECT ma_mon, gia, mua FROM phu_kien_so_huu WHERE sbd='S1'").all()).toEqual([{ ma_mon: 'VD-04', gia: 150, mua: 'm1' }])
+    expect(d.sql.prepare("SELECT loai, so_vang, ma_mon FROM vang_so WHERE sbd='S1' AND loai='mua'").all()).toEqual([{ loai: 'mua', so_vang: -150, ma_mon: 'VD-04' }])
     expect(d.sql.prepare("SELECT o_gan, ma_mon FROM phu_kien_dang_mac WHERE sbd='S1'").all()).toEqual([{ o_gan: 'vet', ma_mon: 'VD-04' }])
     expect(hoSo(d, 'S1').p.wallet).toBe(620); expect(dem(d, 'exp_so')).toBe(0)             // phụ kiện KHÔNG đụng EXP
   })
+  it('màn cũ gửi giá 250 ⇒ gia_doi không trừ tiền; tải giá mới 150 rồi mua, giữ nguyên giá lịch sử của món cũ', async () => {
+    const d = dung(); cap(d, 'S1', 340)
+    d.sql.prepare("INSERT INTO phu_kien_so_huu(sbd,ma_mon,mua,gia,khoa_yeu_cau,luc) VALUES('S1','HQ-01','m1',130,'cu','x')").run()
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('gia-cu') })).toMatchObject({ ok: false, ma: 'gia_doi' })
+    expect(vangSo(d, 'S1')).toBe(340)
+    const ds = await goi(d, 'S1', 'shop-danh-sach')
+    expect(ds).toMatchObject({ phienBan: 'm1-v2', vang: 340 })
+    expect(ds.mon.find((m: any) => m.ma === 'VD-04')?.gia).toBe(150)
+    expect(ds.mon.find((m: any) => m.ma === 'HQ-01')?.daCo).toBe(true)
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('gia-moi') })).toMatchObject({ ok: true, vang: 190 })
+    expect(d.sql.prepare("SELECT gia FROM phu_kien_so_huu WHERE sbd='S1' AND ma_mon='HQ-01'").get()).toEqual({ gia: 130 })
+    expect(d.sql.prepare("SELECT COUNT(*) n FROM vang_so WHERE sbd='S1' AND loai='mua'").get()).toEqual({ n: 1 })
+  })
   it('món mới thay món đang mặc ở CÙNG chỗ đeo, giữ món cũ trong Tủ đồ', async () => {
     const d = dung(); cap(d, 'S1', 1000)
-    await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('m1') }); await goi(d, 'S1', 'shop-mua', { maMon: 'VD-05', giaThay: 370, khoaYeuCau: K('m2') })
-    expect(d.sql.prepare("SELECT ma_mon FROM phu_kien_dang_mac WHERE sbd='S1' AND o_gan='vet'").all()).toEqual([{ ma_mon: 'VD-05' }]); expect(dem(d, 'phu_kien_so_huu', 'S1')).toBe(2); expect(vangSo(d, 'S1')).toBe(380)
+    await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('m1') }); await goi(d, 'S1', 'shop-mua', { maMon: 'VD-05', giaThay: 220, khoaYeuCau: K('m2') })
+    expect(d.sql.prepare("SELECT ma_mon FROM phu_kien_dang_mac WHERE sbd='S1' AND o_gan='vet'").all()).toEqual([{ ma_mon: 'VD-05' }]); expect(dem(d, 'phu_kien_so_huu', 'S1')).toBe(2); expect(vangSo(d, 'S1')).toBe(630)
   })
   it('bấm đúp tuần tự và SONG SONG (cùng khoá): một lần trừ, lần kia lapLai:true', async () => {
     const d = dung(); cap(d, 'S1', 340)
-    const tuan = await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('t') }); expect(tuan.lapLai).toBe(false)
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('t') })).toMatchObject({ ok: true, vang: 90, lapLai: true })
+    const tuan = await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('t') }); expect(tuan.lapLai).toBe(false)
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('t') })).toMatchObject({ ok: true, vang: 190, lapLai: true })
     const d2 = dung(); cap(d2, 'S1', 340)
-    const [a, b] = await Promise.all([goi(d2, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('s') }), goi(d2, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('s') })])
+    const [a, b] = await Promise.all([goi(d2, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('s') }), goi(d2, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('s') })])
     expect([a.ok, b.ok]).toEqual([true, true]); expect([a.lapLai, b.lapLai].sort()).toEqual([false, true])
-    expect(dem(d2, 'phu_kien_so_huu')).toBe(1); expect(vangSo(d2, 'S1')).toBe(90); expect(dem(d2, 'vang_so')).toBe(2)   // 1 cấp + 1 mua
+    expect(dem(d2, 'phu_kien_so_huu')).toBe(1); expect(vangSo(d2, 'S1')).toBe(190); expect(dem(d2, 'vang_so')).toBe(2)   // 1 cấp + 1 mua
   })
   it('hai lệnh song song KHÁC khoá cùng món ⇒ một được, một da_co; vàng chỉ trừ một lần', async () => {
     const d = dung(); cap(d, 'S1', 500)
-    const rs = await Promise.all([goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') }), goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('b') })])
-    expect(rs.filter((r) => r.ok)).toHaveLength(1); expect(rs.find((r) => !r.ok)).toMatchObject({ ma: 'da_co' }); expect(vangSo(d, 'S1')).toBe(250); expect(dem(d, 'phu_kien_so_huu')).toBe(1)
+    const rs = await Promise.all([goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') }), goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('b') })])
+    expect(rs.filter((r) => r.ok)).toHaveLength(1); expect(rs.find((r) => !r.ok)).toMatchObject({ ma: 'da_co' }); expect(vangSo(d, 'S1')).toBe(350); expect(dem(d, 'phu_kien_so_huu')).toBe(1)
   })
-  it('vàng KHÔNG BAO GIỜ âm: 300 vàng, hai món song song (VD-04 250 + HQ-03 300) ⇒ đúng một món; số dư ≥ 0', async () => {
-    const d = dung(); cap(d, 'S1', 300)
-    const rs = await Promise.all([goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') }), goi(d, 'S1', 'shop-mua', { maMon: 'HQ-03', giaThay: 300, khoaYeuCau: K('b') })])
+  it('vàng KHÔNG BAO GIỜ âm: 200 vàng, hai món song song (VD-04 150 + HQ-03 180) ⇒ đúng một món; số dư ≥ 0', async () => {
+    const d = dung(); cap(d, 'S1', 200)
+    const rs = await Promise.all([goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') }), goi(d, 'S1', 'shop-mua', { maMon: 'HQ-03', giaThay: 180, khoaYeuCau: K('b') })])
     expect(rs.filter((r) => r.ok)).toHaveLength(1); expect(rs.find((r) => !r.ok)).toMatchObject({ ma: 'thieu_vang' })
     expect(vangSo(d, 'S1')).toBeGreaterThanOrEqual(0); expect(dem(d, 'phu_kien_so_huu')).toBe(1)
   })
   it('giaThay lệch giá máy chủ ⇒ gia_doi, không ghi; thiếu vàng nói số thiếu; đã có ⇒ da_co', async () => {
     const d = dung(); cap(d, 'S1', 100)
     expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 100, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'gia_doi', loi: 'Giá vừa thay đổi, em xem lại rồi mua nhé.' })
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('b') })).toMatchObject({ ok: false, ma: 'thieu_vang', loi: 'Chưa đủ vàng — còn thiếu 150 vàng.' })
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('b') })).toMatchObject({ ok: false, ma: 'thieu_vang', loi: 'Chưa đủ vàng — còn thiếu 50 vàng.' })
     expect(dem(d, 'phu_kien_so_huu')).toBe(0); expect(dem(d, 'vang_so')).toBe(1)
-    cap(d, 'S1', 500); await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('c') })
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('d') })).toMatchObject({ ok: false, ma: 'da_co', loi: 'Em đã có món này rồi. Vào Tủ đồ để mặc.' })
+    cap(d, 'S1', 500); await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('c') })
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('d') })).toMatchObject({ ok: false, ma: 'da_co', loi: 'Em đã có món này rồi. Vào Tủ đồ để mặc.' })
   })
   it('mã lạ ⇒ khong_co_mon; món đợt 2 ⇒ sap_mo; đầu vào sai ⇒ sai_dau_vao; lời đúng chữ Boss chốt', async () => {
     const d = dung(); cap(d, 'S1', 5000)
     expect(await goi(d, 'S1', 'shop-mua', { maMon: 'ZZ-99', giaThay: 10, khoaYeuCau: K('a') })).toMatchObject({ ma: 'khong_co_mon', loi: 'Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.' })
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'DA-01', giaThay: 30, khoaYeuCau: K('b') })).toMatchObject({ ma: 'sap_mo', loi: 'Món này sắp mở bán. Em ghé lại sau nhé.' })
-    for (const b of [{ giaThay: 1, khoaYeuCau: K('c') }, { maMon: 'VD-04', khoaYeuCau: K('c') }, { maMon: 'VD-04', giaThay: 120.5, khoaYeuCau: K('c') }, { maMon: 'VD-04', giaThay: 250 }, { maMon: 'VD-04', giaThay: 250, khoaYeuCau: 'x' }]) {
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'DA-01', giaThay: 50, khoaYeuCau: K('b') })).toMatchObject({ ma: 'sap_mo', loi: 'Món này sắp mở bán. Em ghé lại sau nhé.' })
+    for (const b of [{ giaThay: 1, khoaYeuCau: K('c') }, { maMon: 'VD-04', khoaYeuCau: K('c') }, { maMon: 'VD-04', giaThay: 120.5, khoaYeuCau: K('c') }, { maMon: 'VD-04', giaThay: 150 }, { maMon: 'VD-04', giaThay: 150, khoaYeuCau: 'x' }]) {
       const r = await goi(d, 'S1', 'shop-mua', b); expect(r, JSON.stringify(b)).toMatchObject({ ok: false, ma: 'sai_dau_vao', loi: 'Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.' })
     }
     expect(dem(d, 'phu_kien_so_huu')).toBe(0)
   })
   it('điều kiện học: thiếu chuỗi ⇒ chua_mo (nói số em đang có); đủ chuỗi thiếu ấn thạch ⇒ chua_mo ấn thạch; đủ cả hai ⇒ mua được', async () => {
     const d = dung(); cap(d, 'S1', 20000); chuoi(d, 'S1', 3)
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2210, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần chuỗi 14 ngày. Em đang chuỗi 3 ngày.' })
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2000, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần chuỗi 14 ngày. Em đang chuỗi 3 ngày.' })
     d.sql.prepare("DELETE FROM ke_hoach_ngay WHERE sbd='S1'").run(); chuoi(d, 'S1', 14)
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-08', giaThay: 2990, khoaYeuCau: K('b') })).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần 5 ấn thạch sáng. Em đang có 0.' })
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-08', giaThay: 2800, khoaYeuCau: K('b') })).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần 5 ấn thạch sáng. Em đang có 0.' })
     anSang(d, 'S1', 5)
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-08', giaThay: 2990, khoaYeuCau: K('c') })).toMatchObject({ ok: true, maMon: 'HQ-08', vang: 17010, daMac: true })
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-08', giaThay: 2800, khoaYeuCau: K('c') })).toMatchObject({ ok: true, maMon: 'HQ-08', vang: 17200, daMac: true })
   })
   it('món giới hạn số cái: hết ⇒ het_suat (lời có số cái của mùa); HAI EM cùng mua CÁI CUỐI ⇒ đúng một em được, tổng đã bán không vượt 30', async () => {
     const d = dung({ em: ['S1', 'S2', 'S3'] }); for (const s of ['S1', 'S2']) { cap(d, s, 6000); chuoi(d, s, 14) }
     const them = d.sql.prepare("INSERT INTO phu_kien_so_huu(sbd,ma_mon,mua,gia,khoa_yeu_cau,luc) VALUES(?,'KT-08','m1',6000,?,'x')")
     for (let i = 0; i < 29; i++) them.run(`X${i}`, `kx${i}`)                                // đã bán 29/30
-    const rs = await Promise.all([goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2210, khoaYeuCau: K('a') }), goi(d, 'S2', 'shop-mua', { maMon: 'KT-08', giaThay: 2210, khoaYeuCau: K('b') })])
+    const rs = await Promise.all([goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2000, khoaYeuCau: K('a') }), goi(d, 'S2', 'shop-mua', { maMon: 'KT-08', giaThay: 2000, khoaYeuCau: K('b') })])
     expect(rs.filter((r) => r.ok)).toHaveLength(1)
     expect(rs.find((r) => !r.ok)).toMatchObject({ ma: 'het_suat', loi: 'Món này đã hết. Mùa 1 chỉ có 30 cái.' })
     expect((d.sql.prepare("SELECT COUNT(*) n FROM phu_kien_so_huu WHERE ma_mon='KT-08'").get() as { n: number }).n).toBe(30)
@@ -222,7 +235,7 @@ describe('shop-mua', () => {
     const d = dung(); cap(d, 'S1', 340); const truoc = hoSo(d, 'S1')
     const ghi: string[] = []; const goc = d.env.DB.prepare.bind(d.env.DB)
     d.env.DB.prepare = ((q: string) => { if (/^\s*(INSERT|UPDATE|DELETE|REPLACE)/i.test(q)) ghi.push(q.replace(/\s+/g, ' ')); return goc(q) }) as typeof d.env.DB.prepare
-    await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') })
+    await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') })
     expect(ghi).toHaveLength(3); expect(ghi[0]).toMatch(/INTO phu_kien_so_huu/); expect(ghi[1]).toMatch(/INTO vang_so/); expect(ghi[2]).toMatch(/INTO phu_kien_dang_mac/)   // sở hữu ⇒ sổ ⇒ mặc
     expect(hoSo(d, 'S1')).toEqual(truoc)
   })
@@ -236,32 +249,32 @@ function truocLo(d: D1That, viecKia: () => void): void {
 describe('shop-mua · đua tất định: lượt khác xong NGAY TRƯỚC lô ghi', () => {
   it('lượt khác vừa tiêu vàng ⇒ số dư không còn đủ: lô KHÔNG ghi (không có dòng sở hữu, sổ không âm) và em nhận thieu_vang', async () => {
     const d = dung(); cap(d, 'S1', 300)
-    truocLo(d, () => cap(d, 'S1', -100))                                                     // còn 200 vàng (giá v4 VD-04 = 250)
-    const r = await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') })
+    truocLo(d, () => cap(d, 'S1', -200))                                                     // còn 100 vàng, thiếu 50 so với giá mới 150
+    const r = await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') })
     expect(r).toMatchObject({ ok: false, ma: 'thieu_vang', loi: 'Chưa đủ vàng — còn thiếu 50 vàng.' })
-    expect(dem(d, 'phu_kien_so_huu')).toBe(0); expect(vangSo(d, 'S1')).toBe(200); expect(dem(d, 'phu_kien_dang_mac')).toBe(0)
+    expect(dem(d, 'phu_kien_so_huu')).toBe(0); expect(vangSo(d, 'S1')).toBe(100); expect(dem(d, 'phu_kien_dang_mac')).toBe(0)
   })
   it('lượt khác vừa bán cái cuối (29 → 30) ⇒ lô KHÔNG ghi, em nhận het_suat; số cái đã bán KHÔNG vượt 30; vàng còn nguyên', async () => {
     const d = dung({ em: ['S1', 'S2'] }); cap(d, 'S1', 6000); chuoi(d, 'S1', 14)
     const them = d.sql.prepare("INSERT INTO phu_kien_so_huu(sbd,ma_mon,mua,gia,khoa_yeu_cau,luc) VALUES(?,'KT-08','m1',6000,?,'x')")
     for (let i = 0; i < 29; i++) them.run(`X${i}`, `kx${i}`)
     truocLo(d, () => { them.run('S2', 'kcuoi') })                                            // em khác mua nốt cái thứ 30
-    const r = await goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2210, khoaYeuCau: K('a') })
+    const r = await goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2000, khoaYeuCau: K('a') })
     expect(r).toMatchObject({ ok: false, ma: 'het_suat', loi: 'Món này đã hết. Mùa 1 chỉ có 30 cái.' })
     expect((d.sql.prepare("SELECT COUNT(*) n FROM phu_kien_so_huu WHERE ma_mon='KT-08'").get() as { n: number }).n).toBe(30); expect(vangSo(d, 'S1')).toBe(6000)
   })
   it('lượt khác (cùng em, khác khoá) vừa mua đúng món này ⇒ da_co, vàng chỉ trừ một lần', async () => {
     const d = dung(); cap(d, 'S1', 500)
     truocLo(d, () => {
-      d.sql.prepare("INSERT INTO phu_kien_so_huu(sbd,ma_mon,mua,gia,khoa_yeu_cau,luc) VALUES('S1','VD-04','m1',250,'kkia','t')").run(); cap(d, 'S1', -250, 'kkia')
+      d.sql.prepare("INSERT INTO phu_kien_so_huu(sbd,ma_mon,mua,gia,khoa_yeu_cau,luc) VALUES('S1','VD-04','m1',150,'kkia','t')").run(); cap(d, 'S1', -150, 'kkia')
     })
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'da_co' })
-    expect(vangSo(d, 'S1')).toBe(250); expect(dem(d, 'phu_kien_so_huu', 'S1')).toBe(1)
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'da_co' })
+    expect(vangSo(d, 'S1')).toBe(350); expect(dem(d, 'phu_kien_so_huu', 'S1')).toBe(1)
   })
   it('khoá yêu cầu này đã được dùng cho một lệnh ĐỔI (cùng em) ngay trước lô ⇒ KHÔNG cho món miễn phí: không có dòng sở hữu', async () => {
     const d = dung(); cap(d, 'S1', 500)
     truocLo(d, () => { d.sql.prepare("INSERT INTO vang_so(sbd,loai,so_vang,exp_tru,ma_mon,khoa_yeu_cau,luc) VALUES('S1','doi',10,10,NULL,?,'t')").run(K('a')) })
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'sai_dau_vao' })
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'sai_dau_vao' })
     expect(dem(d, 'phu_kien_so_huu')).toBe(0); expect(vangSo(d, 'S1')).toBe(510)
   })
 })
@@ -269,7 +282,7 @@ describe('shop-mua · đua tất định: lượt khác xong NGAY TRƯỚC lô g
 describe('thu-mac-do', () => {
   it('mặc món đã có; món chưa có / sai chỗ đeo ⇒ chua_co; cởi bằng maMon:null; oGan lạ ⇒ sai_dau_vao; trả đủ 5 chỗ đeo', async () => {
     const d = dung(); cap(d, 'S1', 1000)
-    await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('a') }); await goi(d, 'S1', 'shop-mua', { maMon: 'KT-03', giaThay: 170, khoaYeuCau: K('b') })
+    await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('a') }); await goi(d, 'S1', 'shop-mua', { maMon: 'KT-03', giaThay: 65, khoaYeuCau: K('b') })
     await goi(d, 'S1', 'thu-mac-do', { oGan: 'vet', maMon: null })
     expect(await goi(d, 'S1', 'thu-mac-do', { oGan: 'khung', maMon: 'KT-03' })).toEqual({ ok: true, dangMac: { 'hao-quang': null, vet: null, khung: 'KT-03', dau: null, 'co-lung': null } })
     expect(await goi(d, 'S1', 'thu-mac-do', { oGan: 'vet', maMon: 'VD-04' })).toMatchObject({ ok: true, dangMac: { vet: 'VD-04', khung: 'KT-03' } })
@@ -304,7 +317,7 @@ describe('shopBat — cửa vào cửa hàng không tốn lượt gọi thêm (C
     expect(await shopBatCho(d.env, 'S1')).toBe(true); expect(await shopBatCho(d.env, 'S2')).toBe(true); expect(n).toBe(1)
     d.sql.prepare("UPDATE cau_hinh SET gia_tri = ? WHERE khoa = 'shop_phu_kien'").run(JSON.stringify({ bat: false }))
     expect(await shopBatCho(d.env, 'S1')).toBe(true)                                            // còn đệm
-    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 250, khoaYeuCau: K('t') })).toMatchObject({ ok: false, ma: 'tam_dong' })   // mua: cờ tươi
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 150, khoaYeuCau: K('t') })).toMatchObject({ ok: false, ma: 'tam_dong' })   // mua: cờ tươi
     vi.setSystemTime(T0 + 30_000); expect(await shopBatCho(d.env, 'S1')).toBe(false)
     const thieu = dung({ co: { bat: true } }); for (const b of ['phu_kien_dang_mac', 'phu_kien_so_huu', 'vang_so']) thieu.sql.exec(`DROP TABLE ${b}`)
     expect(await shopBatCho(thieu.env, 'S1')).toBe(true)                                        // cờ đọc được ⇒ hiện; mua sẽ báo tam_dong khi chưa có bảng

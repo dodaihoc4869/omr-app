@@ -204,15 +204,15 @@ describe('MÁY CHỦ GIẢ · khớp hợp đồng', () => {
     const d = await new ShopApiGia().shopDanhSach()
     expect(d.mon).toHaveLength(24)
     expect(d.mon.every((m) => /^(HQ|VD|KT)-/.test(m.ma))).toBe(true)
-    expect(d.phienBan).toBe('m1-v1')
+    expect(d.phienBan).toBe('m1-v2')
     expect(d.vang).toBe(340)
     expect(d.dangMac).toEqual({ 'hao-quang': null, vet: null, khung: 'KT-03', dau: null, 'co-lung': null })
     expect(d.emCo).toEqual({ chuoiNgay: 9, anThachSang: 3 })
     const theo = (ma: string) => d.mon.find((m) => m.ma === ma)!
-    expect(theo('KT-08')).toEqual({ ma: 'KT-08', gia: 2210, daCo: false, dangMac: false, moKhoa: false, thieu: 'Cần chuỗi 14 ngày', suatCon: 12, suatTong: 30 })
+    expect(theo('KT-08')).toEqual({ ma: 'KT-08', gia: 2000, daCo: false, dangMac: false, moKhoa: false, thieu: 'Cần chuỗi 14 ngày', suatCon: 12, suatTong: 30 })
     expect(theo('HQ-08')).toMatchObject({ moKhoa: false, thieu: 'Cần chuỗi 14 ngày + 5 ấn thạch sáng', suatCon: 20, suatTong: 20 })
     expect(theo('VD-08')).toMatchObject({ suatCon: 0, suatTong: 25 })
-    expect(theo('HQ-01')).toEqual({ ma: 'HQ-01', gia: 130, daCo: false, dangMac: false, moKhoa: true, thieu: null, suatCon: null, suatTong: null })
+    expect(theo('HQ-01')).toEqual({ ma: 'HQ-01', gia: 40, daCo: false, dangMac: false, moKhoa: true, thieu: null, suatCon: null, suatTong: null })
     expect(theo('KT-03')).toMatchObject({ daCo: true, dangMac: true })
     expect(theo('VD-01')).toMatchObject({ daCo: true, dangMac: false })
     // đợt 2 mở ⇒ đủ 40
@@ -252,12 +252,12 @@ describe('MÁY CHỦ GIẢ · khớp hợp đồng', () => {
 
   it('shop-mua: đúng ví dụ hợp đồng, TỰ MẶC; cùng khoá ⇒ lapLai:true, không ghi thêm, kể cả khi cờ đã tắt (khoá đã ghi trả TRƯỚC mọi kiểm khác)', async () => {
     const api = new ShopApiGia()
-    expect(await api.shopMua('VD-04', 250, 'mua-91c2-aaaa')).toEqual({ ok: true, maMon: 'VD-04', vang: 90, daMac: true, lapLai: false }) // giá v4
+    expect(await api.shopMua('VD-04', 150, 'mua-91c2-aaaa')).toEqual({ ok: true, maMon: 'VD-04', vang: 190, daMac: true, lapLai: false }) // giá m1-v2
     expect(api.dangMac.vet).toBe('VD-04')
     api.congTac.batShop = false
-    expect(await api.shopMua('VD-04', 250, 'mua-91c2-aaaa')).toEqual({ ok: true, maMon: 'VD-04', vang: 90, daMac: true, lapLai: true })
+    expect(await api.shopMua('VD-04', 150, 'mua-91c2-aaaa')).toEqual({ ok: true, maMon: 'VD-04', vang: 190, daMac: true, lapLai: true })
     expect(api.ghi.mua).toBe(1)
-    expect(api.vang).toBe(90)
+    expect(api.vang).toBe(190)
     api.congTac.batShop = true
     const d = await api.shopDanhSach()
     expect(d.mon.find((m) => m.ma === 'VD-04')).toMatchObject({ daCo: true, dangMac: true })
@@ -280,18 +280,18 @@ describe('MÁY CHỦ GIẢ · khớp hợp đồng', () => {
     expect(chuaMo?.message).toBe('Món này cần chuỗi 14 ngày. Em đang chuỗi 9 ngày.')
     expect((await mua(api, 'HQ-05', 599))?.ma).toBe('gia_doi') // giá lệch kiểm TRƯỚC thiếu vàng
     expect((await mua(api, 'HQ-05', 599))?.message).toBe('Giá vừa thay đổi, em xem lại rồi mua nhé.')
-    const thieu = await mua(api, 'HQ-05', 590) // giá v4
+    const thieu = await mua(api, 'HQ-05', 420) // giá m1-v2
     expect(thieu?.ma).toBe('thieu_vang')
-    expect(thieu?.message).toBe('Chưa đủ vàng — còn thiếu 250 vàng.')
+    expect(thieu?.message).toBe('Chưa đủ vàng — còn thiếu 80 vàng.')
     expect(api.ghi.mua).toBe(0)
     expect(api.vang).toBe(340)
   })
   it('shop-mua: món có số cái ⇒ suatCon giảm khi mua; hết cái ⇒ het_suat', async () => {
     const api = new ShopApiGia({ vang: 99999, chuoiNgay: 30, anThachSang: 9, daBan: { 'HQ-08': 19 } })
-    await api.shopMua('HQ-08', 2990, 'mua-cai-cuoi-1')
+    await api.shopMua('HQ-08', 2800, 'mua-cai-cuoi-1')
     expect((await api.shopDanhSach()).mon.find((m) => m.ma === 'HQ-08')).toMatchObject({ suatCon: 0, daCo: true })
     const khac = new ShopApiGia({ vang: 99999, chuoiNgay: 30, anThachSang: 9, daBan: { 'HQ-08': 20 } })
-    expect((await loi(khac.shopMua('HQ-08', 2990, 'mua-cai-cuoi-2')))?.ma).toBe('het_suat')
+    expect((await loi(khac.shopMua('HQ-08', 2800, 'mua-cai-cuoi-2')))?.ma).toBe('het_suat')
   })
 
   it('thu-mac-do: chua_co (chưa có / sai chỗ đeo), sai_dau_vao (chỗ đeo lạ), cởi bằng null, vẫn chạy khi cờ tắt', async () => {
@@ -323,17 +323,17 @@ describe('MÁY CHỦ GIẢ · khớp hợp đồng', () => {
   it('công tắc lỗi giả bắn MỘT lần rồi tự tắt; số dư "lạ" của lần ghi kế tiếp được dùng đúng một lần', async () => {
     const api = new ShopApiGia()
     api.congTac.epLoi = 'thieu_vang'
-    expect((await loi(api.shopMua('VD-04', 250, 'mua-ep-abcdef1')))?.ma).toBe('thieu_vang')
+    expect((await loi(api.shopMua('VD-04', 150, 'mua-ep-abcdef1')))?.ma).toBe('thieu_vang')
     expect(api.congTac.epLoi).toBeNull()
     api.congTac.vangSauGhi = 777
-    expect((await api.shopMua('VD-04', 250, 'mua-ep-abcdef2')).vang).toBe(777)
+    expect((await api.shopMua('VD-04', 150, 'mua-ep-abcdef2')).vang).toBe(777)
     expect(api.vang).toBe(777)
     expect(api.congTac.vangSauGhi).toBeNull()
-    expect((await api.shopMua('HQ-01', 130, 'mua-ep-abcdef3')).vang).toBe(647)
+    expect((await api.shopMua('HQ-01', 40, 'mua-ep-abcdef3')).vang).toBe(737)
     // gia_doi thật sự làm giá đổi: lần sau có giá mới
     api.congTac.epLoi = 'gia_doi'
-    expect((await loi(api.shopMua('HQ-03', 300, 'mua-ep-abcdef4')))?.ma).toBe('gia_doi')
-    expect((await api.shopDanhSach()).mon.find((m) => m.ma === 'HQ-03')!.gia).toBe(310)
+    expect((await loi(api.shopMua('HQ-03', 180, 'mua-ep-abcdef4')))?.ma).toBe('gia_doi')
+    expect((await api.shopDanhSach()).mon.find((m) => m.ma === 'HQ-03')!.gia).toBe(190)
   })
   it('độ chậm: mỗi lệnh chờ đúng `tre` ms (tối đa 1500)', async () => {
     const api = new ShopApiGia({ tre: 60 })

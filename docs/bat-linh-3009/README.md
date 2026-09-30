@@ -70,3 +70,7 @@ Người dùng đã yêu cầu đẩy lên máy chủ app thật. Đã ghép lê
 - Bản đồ hành trình dùng tranh sơn thủy, xe Linh Tâm mới, nhãn và chú giải tách khỏi tranh. Tiến độ, số câu và khóa cầu lấy dữ liệu thật; tên chiến dịch dạng mã được thay bằng “Quần đảo Bát Linh”. Không thêm luật mở đảo hoặc EXP. Bỏ thị sai/vòng vẽ ở bản đồ này.
 - `check-theme.mjs`: kiểm chuyển sáng → tối → sáng trên 15 màn × 2 kích thước, giữ ô nhập khi đổi màu và bản đồ mở có chiều cao thật. `BL_SCHEME=dark node scripts/preview-bat-linh/check-games.mjs` kiểm các luồng game tối.
 - Trước phát hành bổ sung: 33 kiểm thử sảnh/bản đồ đạt, TypeScript và màu đạt. Sắp chạy lại full suite, build và service worker từ mã đã commit.
+
+## Bảng giá theo vàng v5 · 30/09
+
+Bảng giá m1-v2 cho 40 phụ kiện và lý do cân giá ở [gia-phu-kien.md](gia-phu-kien.md). Giá mới dùng chung cho Worker, màn bán và mẫu thử. Giữ nguyên đồ/số dư/giao dịch cũ; không thay điều kiện học hoặc đợt mở bán.

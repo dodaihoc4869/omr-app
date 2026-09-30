@@ -18,7 +18,7 @@ import { tramP08LenHienThi } from './cnh-exp-p08-hien-thi'
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
 import { DemTTL } from './dem-chung'
-import { DOT_MO_BAN, MUA_BAN, O_GAN, docMonPhuKien, monDangBan, type MonPhuKien, type OGanPhuKien } from '../../src/lib/phu-kien-danh-muc'
+import { DOT_MO_BAN, MUA_BAN, PHIEN_BAN, O_GAN, docMonPhuKien, monDangBan, type MonPhuKien, type OGanPhuKien } from '../../src/lib/phu-kien-danh-muc'
 import { docAnThach } from './game-v2-doan-an'
 import { docChuoiTruoc } from './exp-d1'
 import { ngayVn } from './su-kien-hoc'
@@ -222,7 +222,7 @@ async function shopDanhSach(env: Env, sbd: string, nowMs: number, cap: number): 
       suatCon: m.suatTong === null ? null : Math.max(0, m.suatTong - (daBan.get(m.ma) ?? 0)), suatTong: m.suatTong,
     }
   })
-  return { ok: true, phienBan: 'm1-v1', vang, mon, dangMac, emCo: co }
+  return { ok: true, phienBan: PHIEN_BAN, vang, mon, dangMac, emCo: co }
 }
 
 async function shopMua(env: Env, sbd: string, b: Record<string, unknown>, nowMs: number, cap: number): Promise<Kq> {
