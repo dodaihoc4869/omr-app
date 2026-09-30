@@ -204,5 +204,418 @@
     "chuong": "C2 - Bảng tuần hoàn"
    }
   }
+ },
+ "DH-10-C2-B7-III-22": {
+  "luc": "2026-09-30T04:04:59.199Z",
+  "cau": {
+   "phan": "III",
+   "so": 22,
+   "de": "Nguyên tử của nguyên tố R có cấu hình electron lớp ngoài cùng là ns²np⁴. Trong hợp chất hydride (hợp chất của R với hydrogen), nguyên tố R chiếm 94,12% khối lượng.\nXác định nguyên tố R (trả lời bằng kí hiệu hoá học).",
+   "dap_an": "S",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Nhóm VIA ⇒ hoá trị với hydrogen là 8 − 6 = 2 ⇒ hydride RH₂.",
+    "buoc": [
+     "ns²np⁴ ⇒ 6 electron lớp ngoài cùng ⇒ R thuộc nhóm VIA.",
+     "Hoá trị với hydrogen = 8 − 6 = 2 ⇒ hydride là RH₂, khối lượng mol R + 2.",
+     "%R = R/(R + 2) = 0,9412 ⇒ R = 0,9412R + 1,8824 ⇒ 0,0588R = 1,8824.",
+     "R = 32,0 ⇒ R là sulfur (S), hydride là H₂S."
+    ],
+    "ket_qua": "S",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "S",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc hỏi 'xác định TÊN nguyên tố'; đã thêm một câu nhắc trả lời bằng KÍ HIỆU HOÁ HỌC để câu trả lời ngắn có đúng một đáp số. Nội dung hỏi không đổi."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "ns²np⁴ cho 6 electron lớp ngoài cùng ⇒ nhóm VIA ⇒ hydride là RH₂.",
+    "bay": "Viết hydride thành RH₄ hoặc RH₆ vì nhớ nhầm hoá trị."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.TINH_PHAN_TRAM",
+    "ten": "Suy vị trí từ cấu hình electron — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-28": {
+  "luc": "2026-09-30T04:04:59.199Z",
+  "cau": {
+   "phan": "III",
+   "so": 28,
+   "de": "Nguyên tử của nguyên tố R có cấu hình electron lớp ngoài cùng là ns²np⁴. Trong hợp chất hydride (hợp chất của R với hydrogen), nguyên tố R chiếm 94,12% khối lượng.\nXác định tên nguyên tố R.",
+   "dap_an": "Sulfur (S)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "%R = R : (R + 2) = 94,12% ⇒ R = 32 ⇒ sulfur.",
+    "buoc": [
+     "Lớp ngoài cùng ns²np⁴ ⇒ 6 electron ⇒ R thuộc nhóm VIA ⇒ hydride là H₂R.",
+     "%R = R : (R + 2×1) = 94,12% ⇒ R = 0,9412R + 1,8824.",
+     "⇒ 0,0588R = 1,8824 ⇒ R = 32.",
+     "R = 32 ⇒ nguyên tố sulfur (S), hydride là H₂S."
+    ],
+    "ket_qua": "Sulfur (S)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Sulfur (S)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "ns²np⁴ ⇒ 6 electron lớp ngoài cùng ⇒ nhóm VIA ⇒ hydride dạng H₂R.",
+    "bay": "Viết hydride là RH₂ rồi vẫn tính đúng, nhưng nếu viết RH₄ thì sai hẳn."
+   },
+   "kienThuc": [
+    "Cấu hình ns²np⁴ ứng với nhóm VIA.",
+    "Nhóm VIA tạo hợp chất với hydrogen dạng H₂R."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.TINH_PHAN_TRAM",
+    "ten": "Suy vị trí từ cấu hình electron — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-21": {
+  "luc": "2026-09-30T04:04:59.199Z",
+  "cau": {
+   "phan": "III",
+   "so": 21,
+   "de": "Một nguyên tố tạo hợp chất khí với hydrogen có công thức RH₃, được sử dụng để trung hoà các thành phần acid của dầu thô, bảo vệ thiết bị không bị ăn mòn trong ngành công nghiệp dầu khí. Nguyên tố này chiếm 25,93% về khối lượng trong oxide cao nhất.\nXác định nguyên tố R (trả lời bằng kí hiệu hoá học).",
+   "dap_an": "N",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "RH₃ ⇒ nhóm VA ⇒ oxide cao nhất R₂O₅.",
+    "buoc": [
+     "Hợp chất khí với hydrogen là RH₃ ⇒ hoá trị với hydrogen là 3 ⇒ R thuộc nhóm VA.",
+     "Oxide cao nhất của nhóm VA là R₂O₅, khối lượng mol 2R + 80.",
+     "%R = 2R/(2R + 80) = 0,2593 ⇒ 2R = 0,5186R + 20,744 ⇒ 1,4814R = 20,744.",
+     "R = 14,0 ⇒ R là nitrogen (N); hợp chất khí RH₃ chính là ammonia NH₃, đúng với mô tả dùng trung hoà acid trong dầu thô."
+    ],
+    "ket_qua": "N",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "N",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc hỏi 'xác định TÊN nguyên tố'; đã thêm một câu nhắc trả lời bằng KÍ HIỆU HOÁ HỌC để câu trả lời ngắn có đúng một đáp số. Nội dung hỏi không đổi."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "RH₃ cho biết nhóm VA, từ đó oxide cao nhất là R₂O₅ rồi mới lập được phương trình phần trăm.",
+    "bay": "Lấy công thức oxide là RO₃ vì thấy hydride có ba hydrogen."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_KHOI_LUONG",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-23": {
+  "luc": "2026-09-30T04:04:59.199Z",
+  "cau": {
+   "phan": "III",
+   "so": 23,
+   "de": "X là nguyên tố có hóa trị cao nhất đối với oxygen bằng hóa trị của X trong hợp chất với hydrogen. Trong oxide cao nhất của X, oxygen chiếm 53,33% về khối lượng.\nXác định nguyên tố X (trả lời bằng kí hiệu hoá học).",
+   "dap_an": "Si",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "n = 8 − n ⇒ n = 4 ⇒ oxide cao nhất là XO₂.",
+    "buoc": [
+     "Gọi n là số thứ tự nhóm A; hoá trị cao nhất với oxygen là n, hoá trị với hydrogen là 8 − n.",
+     "Hai hoá trị bằng nhau: n = 8 − n ⇒ n = 4 ⇒ X thuộc nhóm IVA, oxide cao nhất XO₂.",
+     "%O = 32/(X + 32) = 0,5333 ⇒ X + 32 = 32 : 0,5333 = 60,0.",
+     "X = 28,0 ⇒ X là silicon (Si), oxide cao nhất là SiO₂."
+    ],
+    "ket_qua": "Si",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Si",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc hỏi 'xác định TÊN nguyên tố'; đã thêm một câu nhắc trả lời bằng KÍ HIỆU HOÁ HỌC để câu trả lời ngắn có đúng một đáp số. Nội dung hỏi không đổi."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Hai hoá trị bằng nhau: n = 8 − n ⇒ n = 4, chốt ngay nhóm IVA trước khi tính phần trăm.",
+    "bay": "Bỏ qua điều kiện hai hoá trị bằng nhau, thử mò từng nhóm."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CHAT",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — xác định chất"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-27": {
+  "luc": "2026-09-30T04:04:59.199Z",
+  "cau": {
+   "phan": "III",
+   "so": 27,
+   "de": "Một nguyên tố tạo hợp chất khí với hydrogen có công thức RH₃, được sử dụng để trung hoà các thành phần acid của dầu thô, bảo vệ thiết bị không bị ăn mòn trong ngành công nghiệp dầu khí. Nguyên tố này chiếm 25,93% về khối lượng trong oxide cao nhất.\nXác định tên nguyên tố R.",
+   "dap_an": "Nitrogen (N)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "%R = 2R : (2R + 80) = 25,93% ⇒ R = 14 ⇒ nitrogen.",
+    "buoc": [
+     "RH₃ ⇒ hoá trị với hydrogen là III ⇒ hoá trị cao nhất với oxygen là V ⇒ oxide R₂O₅.",
+     "%R = 2R : (2R + 5×16) = 25,93%.",
+     "⇒ 2R = 0,2593(2R + 80) ⇒ 1,4814R = 20,744 ⇒ R = 14.",
+     "R = 14 ⇒ nguyên tố nitrogen (N), hợp chất khí là NH₃."
+    ],
+    "ket_qua": "Nitrogen (N)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Nitrogen (N)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Hợp chất khí với hydrogen dạng RH₃ ⇒ R thuộc nhóm VA ⇒ oxide cao nhất là R₂O₅.",
+    "bay": "Lấy công thức oxide là RO₃ vì nhớ nhầm hoá trị."
+   },
+   "kienThuc": [
+    "Tổng hoá trị với hydrogen và hoá trị cao nhất với oxygen bằng 8.",
+    "RH₃ ⇒ nhóm VA ⇒ oxide cao nhất R₂O₅.",
+    "NH₃ dùng trung hoà acid trong chế biến dầu thô."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_KHOI_LUONG",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-29": {
+  "luc": "2026-09-30T04:04:59.199Z",
+  "cau": {
+   "phan": "III",
+   "so": 29,
+   "de": "X là nguyên tố có hóa trị cao nhất đối với oxygen bằng hóa trị của X trong hợp chất với hydrogen. Trong oxide cao nhất của X, oxygen chiếm 53,33% về khối lượng.\nXác định tên nguyên tố X.",
+   "dap_an": "Silicon (Si)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Hoá trị IV ⇒ oxide cao nhất XO₂; %O = 32 : (X + 32) = 53,33% ⇒ X = 28 ⇒ silicon.",
+    "buoc": [
+     "Gọi hoá trị cao nhất với oxygen là a, hoá trị với hydrogen là b: a + b = 8 và a = b ⇒ a = b = 4.",
+     "⇒ X thuộc nhóm IVA, oxide cao nhất là XO₂.",
+     "%O = 2×16 : (X + 32) = 53,33% ⇒ X + 32 = 32 : 0,5333 = 60 ⇒ X = 28.",
+     "X = 28 ⇒ nguyên tố silicon (Si), oxide cao nhất là SiO₂."
+    ],
+    "ket_qua": "Silicon (Si)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Silicon (Si)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Hoá trị cao nhất với oxygen bằng hoá trị với hydrogen mà tổng hai hoá trị bằng 8 ⇒ mỗi bên bằng 4.",
+    "bay": "Quên rằng tổng hai hoá trị luôn bằng 8 nên không tìm ra nhóm IVA."
+   },
+   "kienThuc": [
+    "Hoá trị cao nhất với oxygen + hoá trị với hydrogen = 8.",
+    "Hai hoá trị bằng nhau ⇒ mỗi hoá trị bằng 4 ⇒ nguyên tố thuộc nhóm IVA."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CHAT",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — xác định chất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ },
+ "DH-10-C2-B7-III-26": {
+  "luc": "2026-09-30T04:14:05.116Z",
+  "cau": {
+   "phan": "III",
+   "so": 26,
+   "de": "Sắp xếp các chất Mg(OH)₂, Al(OH)₃, NaOH theo chiều tính base TĂNG DẦN.",
+   "dap_an": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Cùng chu kì 3: Na > Mg > Al về tính kim loại ⇒ NaOH > Mg(OH)₂ > Al(OH)₃ về tính base.",
+    "buoc": [
+     "Na (Z = 11), Mg (Z = 12), Al (Z = 13) cùng thuộc chu kì 3.",
+     "Theo chiều tăng Z trong chu kì, tính kim loại giảm ⇒ tính base của hydroxide giảm.",
+     "⇒ Tính base tăng dần: Al(OH)₃ < Mg(OH)₂ < NaOH."
+    ],
+    "ket_qua": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc vỡ, chỉ còn lại hai phương án C và D dính liền nhau, mất cả câu dẫn lẫn phương án A, B. Đã dựng lại thành câu trả lời ngắn trên chính ba chất mà đề nêu; không thêm chất nào. Đề gốc là câu trắc nghiệm nhưng bốn phương án đã vỡ khi bóc; máy dựng lại thành câu trả lời ngắn nên đáp án là chính dãy sắp xếp, không còn là chữ cái."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Na, Mg, Al cùng chu kì 3; đi từ trái sang phải tính kim loại giảm nên tính base của hydroxide cũng giảm.",
+    "bay": "Xếp theo thứ tự chữ cái hoặc theo hoá trị tăng dần."
+   },
+   "kienThuc": [
+    "Trong một chu kì, theo chiều tăng Z, tính base của hydroxide giảm, tính acid tăng.",
+    "NaOH là base mạnh, Mg(OH)₂ là base yếu, Al(OH)₃ là hydroxide lưỡng tính."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.SO_SANH",
+    "ten": "Xu hướng biến đổi tính chất — so sánh"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D1",
+    "ten": "Định luật tuần hoàn và ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
  }
 }

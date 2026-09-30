@@ -642,5 +642,120 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "DH-12-C3-B9-P2-III-34": {
+  "luc": "2026-09-30T04:05:38.125Z",
+  "cau": {
+   "phan": "III",
+   "so": 34,
+   "de": "Tetrapeptide X được cấu tạo từ một α-amino acid (phân tử chứa một nhóm amino và một nhóm carboxyl). Khi phân tích nguyên tố của một tetrapeptide X thu được phần trăm khối lượng của nguyên tố nitrogen là 18,543%.\nXác định công thức cấu tạo của X.",
+   "dap_an": "(Ala)₄",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Peptide (P2)",
+   "loi_giai": {
+    "chot": "%N = 4 × 14 : (4M − 54) = 18,543%.",
+    "buoc": [
+     "Gọi M là phân tử khối của α-amino acid tạo nên X; tetrapeptide có M(X) = 4M − 3 × 18 = 4M − 54.",
+     "Phân tử X có 4 nguyên tử N ⇒ %N = 56 : (4M − 54) = 0,18543.",
+     "4M − 54 = 56 : 0,18543 = 302 ⇒ 4M = 356 ⇒ M = 89.",
+     "M = 89 ứng với alanine CH₃CH(NH₂)COOH ⇒ X là (Ala)₄, tức Ala-Ala-Ala-Ala."
+    ],
+    "ket_qua": "(Ala)₄",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "(Ala)₄",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Tetrapeptide từ MỘT amino acid có M = 4M(A) − 3 × 18 và chứa đúng 4 nguyên tử N.",
+    "bay": "Quên trừ ba phân tử nước khi ghép bốn gốc lại."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.VIET_CTCT",
+    "ten": "Peptide — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B9-P2-III-31": {
+  "luc": "2026-09-30T04:05:38.125Z",
+  "cau": {
+   "phan": "III",
+   "so": 31,
+   "de": "Enkephalin (A) là các cấu tử pentapeptide của các endorphin.\nXác định trật tự các amino acid trong A từ các dữ kiện sau: Thuỷ phân hoàn toàn A thu được Gly, Phe, Leu và Tyr; thuỷ phân không hoàn toàn A thu được Gly-Gly-Phe và Tyr-Gly.\nBiết Tyr (tyrosine) là amino acid đầu N.",
+   "dap_an": "Tyr-Gly-Gly-Phe-Leu",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Peptide (P2)",
+   "loi_giai": {
+    "chot": "A là pentapeptide; Tyr đầu N; hai mảnh Tyr-Gly và Gly-Gly-Phe chồng nhau ở một gốc Gly.",
+    "buoc": [
+     "Thuỷ phân hoàn toàn cho Gly, Phe, Leu, Tyr mà A là pentapeptide ⇒ có một amino acid lặp lại; mảnh Gly-Gly-Phe cho thấy đó là Gly (hai gốc).",
+     "Tyr là amino acid đầu N ⇒ chuỗi bắt đầu bằng Tyr-Gly.",
+     "Ghép Tyr-Gly với Gly-Gly-Phe qua gốc Gly chung: Tyr-Gly-Gly-Phe.",
+     "Gốc còn lại là Leu, phải nằm ở cuối ⇒ A là Tyr-Gly-Gly-Phe-Leu."
+    ],
+    "ket_qua": "Tyr-Gly-Gly-Phe-Leu",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Tyr-Gly-Gly-Phe-Leu",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Ghép các mảnh thuỷ phân không hoàn toàn theo phần CHỒNG LẤN, rồi neo bằng amino acid đầu N.",
+    "bay": "Ghép Tyr-Gly rồi nối thẳng Gly-Gly-Phe thành sáu gốc, quên rằng hai mảnh dùng chung một Gly."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.XAC_DINH_CHAT",
+    "ten": "Peptide — xác định chất"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }
