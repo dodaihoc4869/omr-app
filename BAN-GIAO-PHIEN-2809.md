@@ -168,3 +168,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 12:54 30/09 · deploy c32acaf (#105+#106) xanh (run 603; 602 huỷ, đã gồm)
 - 13:00 30/09 · Boss · merge PR #107 lọc tự luận chặt (9eeb0d5) · không ca mở · lùi: git revert -m1 9eeb0d5
 - 13:12 30/09 · deploy #107 xanh (run 604)
+- 13:12 30/09 · deploy #107 đã xanh (ghi bù)
+- 16:43 30/09 · Boss · merge PR #108 câu kẹt + rải đều (d0b58c0) + PR #109 Bi-a rải theo trần (8f6facf) · main+#108+#109: 656/657 test vùng (1 đỏ nền bi-a-sanh-online), tsc 2 phía sạch · phản biện workflow chưa xong lúc merge (hạn thầy 17:30) · không ca mở · lùi: git revert -m1 8f6facf && git revert -m1 d0b58c0
