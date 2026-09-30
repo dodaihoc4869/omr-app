@@ -558,5 +558,64 @@
     "chuong": "C2 - Bảng tuần hoàn"
    }
   }
+ },
+ "DH-10-C2-B7-III-26": {
+  "luc": "2026-09-30T04:14:05.116Z",
+  "cau": {
+   "phan": "III",
+   "so": 26,
+   "de": "Sắp xếp các chất Mg(OH)₂, Al(OH)₃, NaOH theo chiều tính base TĂNG DẦN.",
+   "dap_an": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Cùng chu kì 3: Na > Mg > Al về tính kim loại ⇒ NaOH > Mg(OH)₂ > Al(OH)₃ về tính base.",
+    "buoc": [
+     "Na (Z = 11), Mg (Z = 12), Al (Z = 13) cùng thuộc chu kì 3.",
+     "Theo chiều tăng Z trong chu kì, tính kim loại giảm ⇒ tính base của hydroxide giảm.",
+     "⇒ Tính base tăng dần: Al(OH)₃ < Mg(OH)₂ < NaOH."
+    ],
+    "ket_qua": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "Al(OH)₃ < Mg(OH)₂ < NaOH",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc vỡ, chỉ còn lại hai phương án C và D dính liền nhau, mất cả câu dẫn lẫn phương án A, B. Đã dựng lại thành câu trả lời ngắn trên chính ba chất mà đề nêu; không thêm chất nào. Đề gốc là câu trắc nghiệm nhưng bốn phương án đã vỡ khi bóc; máy dựng lại thành câu trả lời ngắn nên đáp án là chính dãy sắp xếp, không còn là chữ cái."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Na, Mg, Al cùng chu kì 3; đi từ trái sang phải tính kim loại giảm nên tính base của hydroxide cũng giảm.",
+    "bay": "Xếp theo thứ tự chữ cái hoặc theo hoá trị tăng dần."
+   },
+   "kienThuc": [
+    "Trong một chu kì, theo chiều tăng Z, tính base của hydroxide giảm, tính acid tăng.",
+    "NaOH là base mạnh, Mg(OH)₂ là base yếu, Al(OH)₃ là hydroxide lưỡng tính."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.XU_HUONG_BIEN_DOI.SO_SANH",
+    "ten": "Xu hướng biến đổi tính chất — so sánh"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D1",
+    "ten": "Định luật tuần hoàn và ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
  }
 }

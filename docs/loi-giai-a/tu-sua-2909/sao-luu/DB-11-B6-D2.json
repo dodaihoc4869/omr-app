@@ -916,5 +916,68 @@
    "nguonDe": "DH-11-C2-B6",
    "nguonCau": "III-34"
   }
+ },
+ "DB-11-B6-D2-III-87": {
+  "luc": "2026-09-30T04:14:16.209Z",
+  "cau": {
+   "phan": "III",
+   "so": 87,
+   "de": "Nitric acid thường được sử dụng để phá mẫu quặng trong việc nghiên cứu, xác định hàm lượng các kim loại trong quặng.\nCho biết tính chất nào của nitric acid quyết định ứng dụng này.",
+   "dap_an": "tính oxi hoá mạnh",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "HNO₃ có N ở mức +5 nên oxi hoá được hầu hết kim loại, kể cả Cu, Ag, đưa chúng vào dung dịch.",
+    "buoc": [
+     "Muốn xác định hàm lượng kim loại, phải hoà tan hoàn toàn kim loại trong quặng vào dung dịch.",
+     "Acid thường (HCl, H₂SO₄ loãng) không hoà tan được kim loại đứng sau hydrogen.",
+     "HNO₃ có nitrogen ở số oxi hoá +5 nên oxi hoá được cả Cu, Ag, Pb… thành ion trong dung dịch.",
+     "⇒ Ứng dụng phá mẫu quặng dựa trên TÍNH OXI HOÁ MẠNH của nitric acid."
+    ],
+    "ket_qua": "tính oxi hoá mạnh",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "tính oxi hoá mạnh",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc vỡ, chỉ còn hai phương án C và D dính vào câu dẫn; đã chuyển thành câu hỏi trả lời ngắn trên đúng nội dung ấy. Đề gốc là câu trắc nghiệm, phương án C chính là \"tính oxi hoá mạnh\" — khớp."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phá mẫu quặng nghĩa là hoà tan hết kim loại kể cả kim loại kém hoạt động, chỉ tính oxi hoá mạnh mới làm được.",
+    "bay": "Chọn 'tính acid mạnh' — acid mạnh thường không hoà tan được Cu, Ag."
+   },
+   "kienThuc": [
+    "HNO₃ oxi hoá được hầu hết kim loại (trừ Au, Pt).",
+    "Kim loại đứng sau hydrogen như Cu, Ag không tan trong HCl nhưng tan trong HNO₃.",
+    "Phá mẫu là đưa toàn bộ kim loại trong quặng vào dung dịch để đo."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.NHAN_DANG",
+    "ten": "Nitric acid và muối nitrate — nhận dạng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B6",
+   "nguonCau": "III-32"
+  }
  }
 }

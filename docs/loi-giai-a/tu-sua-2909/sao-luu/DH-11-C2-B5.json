@@ -798,5 +798,67 @@
     "chuong": "C2 - Nitrogen và Surful"
    }
   }
+ },
+ "DH-11-C2-B5-III-35": {
+  "luc": "2026-09-30T04:13:55.813Z",
+  "cau": {
+   "phan": "III",
+   "so": 35,
+   "de": "Cho hỗn hợp gồm N₂, H₂ và NH₃ có tỉ khối so với hydrogen là 8. Dẫn hỗn hợp đi qua dung dịch H₂SO₄ đặc, dư thì thể tích khí còn lại một nửa.\nTính thành phần phần trăm theo thể tích của mỗi khí trong hỗn hợp.",
+   "dap_an": "25% N₂; 25% H₂; 50% NH₃",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "loi_giai": {
+    "chot": "%NH₃ = 50%; M̄ = 16 ⇒ 28a + 2b = 750 với a + b = 50 ⇒ a = b = 25.",
+    "buoc": [
+     "M̄ = 8 × 2 = 16. Thể tích giảm một nửa ⇒ %NH₃ = 50%.",
+     "Gọi %N₂ = a, %H₂ = b ⇒ a + b = 50.",
+     "28a + 2b + 17 × 50 = 16 × 100 ⇒ 28a + 2b = 750.",
+     "Thay b = 50 − a: 26a = 650 ⇒ a = 25, b = 25.",
+     "Vậy hỗn hợp gồm 25% N₂, 25% H₂ và 50% NH₃."
+    ],
+    "ket_qua": "25% N₂; 25% H₂; 50% NH₃",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "25% N₂; 25% H₂; 50% NH₃",
+    "trang_thai": "khop",
+    "ghi_chu": "Ví dụ này bị bóc dính vào câu trước; đã tách lại, giữ nguyên dữ kiện. Đề gốc là câu trắc nghiệm, phương án A chính là \"25% N₂, 25% H₂ và 50% NH₃\" — khớp."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "H₂SO₄ đặc chỉ giữ lại NH₃, nên phần thể tích mất đi chính là phần trăm NH₃.",
+    "bay": "Quên rằng thể tích còn lại MỘT NỬA nghĩa là NH₃ chiếm đúng 50%."
+   },
+   "kienThuc": [
+    "d(X/H₂) = 8 ⇒ M̄ = 16.",
+    "H₂SO₄ đặc hấp thụ NH₃: 2NH₃ + H₂SO₄ → (NH₄)₂SO₄.",
+    "Phần trăm thể tích của khí bằng phần trăm số mol."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_PHAN_TRAM",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
  }
 }

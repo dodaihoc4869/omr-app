@@ -1079,5 +1079,63 @@
    "nguonDe": "DH-11-C2-B8",
    "nguonCau": "III-22"
   }
+ },
+ "DB-11-B8-D3-III-21": {
+  "luc": "2026-09-30T04:13:19.799Z",
+  "cau": {
+   "phan": "III",
+   "so": 21,
+   "de": "Cho giá trị enthalpy tạo thành chuẩn của SO₂(g) và SO₃(g) lần lượt là −298,8 kJ·mol⁻¹ và −395,7 kJ·mol⁻¹.\nTính giá trị biến thiên enthalpy chuẩn của phản ứng sau:\nSO₂(g) + ½O₂(g) → SO₃(g)\n(trả lời giá trị ΔrH⁰₂₉₈ theo kJ).",
+   "dap_an": "−96,9",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "ΔrH⁰₂₉₈ = ΔfH⁰(SO₃) − ΔfH⁰(SO₂) − ½ΔfH⁰(O₂).",
+    "buoc": [
+     "ΔfH⁰(O₂, g) = 0 vì O₂ là đơn chất bền ở điều kiện chuẩn.",
+     "ΔrH⁰₂₉₈ = (−395,7) − (−298,8) − ½ × 0 = −395,7 + 298,8.",
+     "ΔrH⁰₂₉₈ = −96,9 kJ. Giá trị âm ⇒ phản ứng toả nhiệt, thuận lợi về mặt năng lượng."
+    ],
+    "ket_qua": "−96,9",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "−96,9",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc gõ lỗi 'enthalpy tạo thành PHẦN chuẩn của SO₂ và KHI SO₃'; đã sửa. Vế hỏi thêm 'phản ứng có thuận lợi về năng lượng không' đã nằm trong lời giải nên câu hỏi được rút về đúng một đáp số."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "ΔrH⁰ = tổng ΔfH⁰ sản phẩm trừ tổng ΔfH⁰ chất đầu; đơn chất O₂ có ΔfH⁰ = 0.",
+    "bay": "Cộng hai giá trị thay vì trừ, hoặc gán cho O₂ một giá trị khác 0."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_NANG_LUONG",
+    "ten": "Sản xuất sulfuric acid — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "III-27"
+  }
  }
 }

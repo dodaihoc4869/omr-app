@@ -383,5 +383,55 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "12-C1-B1-D2-III-36": {
+  "luc": "2026-09-30T04:13:41.620Z",
+  "cau": {
+   "phan": "III",
+   "so": 36,
+   "de": "Acid béo là thành phần quan trọng của một chế độ ăn uống lành mạnh. Cho biết các acid béo là stearic acid, oleic acid và linoleic acid và nhiệt độ nóng chảy của các acid béo trên theo thứ tự ngẫu nhiên lần lượt là –5 °C, 13 °C và 69 °C.\nCho biết giá trị nhiệt độ nóng chảy của linoleic acid là bao nhiêu độ C?",
+   "dap_an": "–5",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "loi_giai": {
+    "chot": "Cùng số carbon, acid béo càng nhiều liên kết C=C dạng cis thì mạch càng gấp khúc, xếp khít kém, nhiệt độ nóng chảy càng thấp.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Stearic acid C₁₇H₃₅COOH không có C=C, nóng chảy cao nhất: 69 °C.",
+     "Oleic acid C₁₇H₃₃COOH có 1 C=C: 13 °C.",
+     "Linoleic acid C₁₇H₃₁COOH có 2 C=C, nóng chảy thấp nhất: −5 °C."
+    ],
+    "ket_qua": "–5",
+    "dap_an_de": "–5",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Nối số liên kết C=C với nhiệt độ nóng chảy: càng nhiều C=C cis thì mạch càng gấp, nóng chảy càng thấp.",
+    "bay": "Ghép ngược, cho acid nhiều liên kết đôi có nhiệt độ nóng chảy cao nhất.",
+    "dk": [
+     "bay",
+     "nen"
+    ]
+   },
+   "dang": {
+    "ma": "ESTER.TINH_CHAT_VAT_LI.DEM_DONG_PHAN",
+    "ten": "Tính chất vật lí — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C1-B1-P2",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }

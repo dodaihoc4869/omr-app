@@ -236,5 +236,54 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "DH-12-C1-B1-P2-III-7": {
+  "luc": "2026-09-30T04:13:50.127Z",
+  "cau": {
+   "phan": "III",
+   "so": 7,
+   "de": "Acid béo là thành phần quan trọng của một chế độ ăn uống lành mạnh. Cho biết các acid béo là stearic acid, oleic acid và linoleic acid và nhiệt độ nóng chảy của các acid béo trên theo thứ tự ngẫu nhiên lần lượt là –5 °C, 13 °C và 69 °C.\nCho biết giá trị nhiệt độ nóng chảy của linoleic acid là bao nhiêu độ C?",
+   "dap_an": "–5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "Càng nhiều liên kết đôi cis, mạch càng gấp khúc và nhiệt độ nóng chảy càng thấp.",
+    "buoc": [
+     "Càng nhiều liên kết đôi cis, mạch càng gấp khúc và nhiệt độ nóng chảy càng thấp.",
+     "Stearic acid no nên cao nhất là 69 °C.",
+     "Oleic acid một liên kết đôi nên 13 °C.",
+     "Linoleic acid hai liên kết đôi nên thấp nhất là –5 °C."
+    ],
+    "ket_qua": "–5",
+    "dap_an_de": "–5",
+    "dap_an_tu_giai": "–5",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Với acid béo, số liên kết đôi cis quyết định mạnh hơn phân tử khối.",
+    "bay": "Suy phân tử khối lớn hơn thì nhiệt độ nóng chảy cao hơn."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.TINH_CHAT_VAT_LI.DEM_DONG_PHAN",
+    "ten": "Tính chất vật lí — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }
