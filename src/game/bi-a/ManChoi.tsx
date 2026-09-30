@@ -130,6 +130,8 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     // vẽ nội suy giữa hai bước; không setState mỗi khung (trừ thanh lực khi giữ Space).
     // Không cấp phát mỗi khung: vòng đồng hồ + chip chỉ ghi DOM khi số (đã lượng tử hoá) đổi; dòng "Đang nhắm" bỏ qua khi bị ẩn (bố cục có cột điều khiển).
     let raf = 0, truoc = performance.now(), chipCu = -1, gioCu = -2, ctx: CanvasRenderingContext2D | null = null
+    // Cỡ nhãn chỉ bi + bề rộng hộp bàn: chỉ đo khi nội dung nhãn đổi (không đọc bố cục mỗi khung khi đang kéo — tránh ép bố cục đồng bộ).
+    let nhW = 0, nhH = 0, banW = 0, cvL = 0, cvT = 0
     const veBan = (now: number) => {
       const cv = cvRef.current, k = khungRef.current, bv = boVeRef.current
       if (cv && (!ctx || ctx.canvas !== cv)) ctx = cv.getContext('2d')
@@ -170,7 +172,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
         else {
           const nd = noiDungNhan(v, conChi.id), key = `${conChi.id}|${nd.chinh}|${nd.nho}`
           if (nh.dataset.k !== key) {
-            nh.dataset.k = key
+            nh.dataset.k = key; nhW = 0
             nh.style.setProperty('--vien', MAU_QH[nd.qh])
             nh.replaceChildren()
             const tb = document.createElement('b'); tb.textContent = conChi.id
@@ -178,9 +180,10 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
             const sm = document.createElement('small'); sm.textContent = nd.nho
             nh.append(tb, document.createTextNode(nd.tieuDe), em, sm)
           }
-          const [px, py] = raMan(k, dprRef.current, b.x, b.y), x0 = cv.offsetLeft + px / dprRef.current, y0 = cv.offsetTop + py / dprRef.current, rr = R * k.S
-          nh.hidden = false
-          const w = nh.offsetWidth, h = nh.offsetHeight, W0 = banRef.current?.clientWidth ?? 0
+          if (nh.hidden || !nhW) { nh.hidden = false; nhW = 0 }
+          if (!nhW) { nhW = nh.offsetWidth; nhH = nh.offsetHeight; banW = banRef.current?.clientWidth ?? 0; cvL = cv.offsetLeft; cvT = cv.offsetTop }
+          const [px, py] = raMan(k, dprRef.current, b.x, b.y), x0 = cvL + px / dprRef.current, y0 = cvT + py / dprRef.current, rr = R * k.S
+          const w = nhW, h = nhH, W0 = banW
           let top = y0 - rr - 8, duoi = false
           if (top - h < 4) { top = y0 + rr + 8; duoi = true }
           if (duoi) nh.setAttribute('data-duoi', ''); else nh.removeAttribute('data-duoi')

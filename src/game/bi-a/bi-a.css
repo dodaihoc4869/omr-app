@@ -102,7 +102,7 @@
 .bia{--b-bi-ta:rgb(46,140,255);--b-bi-ta-sang:rgb(159,208,255);--b-bi-dich:rgb(255,106,58);--b-bi-trang:rgb(251,247,238);--b-bi-vang:rgb(255,200,58);--b-canh-bao:rgb(255,93,93);
  --b-ranh-1:rgb(20,17,38);--b-ranh-2:rgb(42,36,80);--b-ranh-3:rgb(26,22,51);--b-ranh-vien:rgb(59,52,102);--b-ranh-chu:rgb(239,234,255);--b-ranh-mo:rgb(169,159,208)}
 .bia-toan-tren{display:none}
-.bia-dau{padding:6px 8px 4px}
+.bia-dau{padding:6px 6px 4px;gap:6px}
 .bia-nut-tron{flex:none;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:50%;border:1px solid var(--b-vien);background:var(--b-kinh);display:grid;place-items:center;cursor:pointer;position:relative;touch-action:manipulation}
 .bia-nut-tron svg{width:20px;height:20px}
 .bia-nut-mat[aria-pressed='true']{background:linear-gradient(180deg,rgb(255,243,196),rgb(255,214,107));color:rgb(58,32,0);border-color:rgb(224,168,0)}
@@ -113,10 +113,10 @@
 /* hàng chấm: bi còn lại của em (trái) · điểm ván · bi đối thủ (phải); bi đã ăn mờ đi */
 .bia-thanh-tren{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:6px}
 .bia-ben{display:flex;align-items:center;gap:5px;min-width:0}
-.bia-ben-ten{font-weight:700;font-size:11px;color:var(--b-mo);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
+.bia-ben-ten{flex:none;font-weight:700;font-size:11px;color:var(--b-mo);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
 .bia-ben[data-dang] .bia-ben-ten{color:var(--b-chu);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
 .bia-cham{display:flex;gap:2px;flex:none;height:16px;align-items:center}
-.bia-cham i{width:10px;height:10px;border-radius:50%}
+.bia-cham i{width:9px;height:9px;border-radius:50%}
 .bia-cham i[data-kieu='ta']{background:radial-gradient(circle at 35% 30%,var(--b-bi-ta-sang) 0 18%,var(--b-bi-ta) 45%)}
 .bia-cham i[data-kieu='dich']{background:linear-gradient(var(--b-bi-trang) 0 22%,var(--b-bi-dich) 22% 78%,var(--b-bi-trang) 78%)}
 .bia-cham i[data-vang]{box-shadow:0 0 0 1.5px var(--b-bi-vang)}
@@ -452,3 +452,5 @@
  .bia-sanh-rong .bia-cong-tac-chu small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
 }
 @media (prefers-reduced-motion:reduce){.bia-luat summary::after,.bia-sanh .bia-nut-vang,.bia-sanh .bia-nut-phu,.bia-the-cau{transition:none}}
+.bia[data-bo-cuc='doc'] .bia-pt{right:56px}
+.bia[data-bo-cuc='doc'][data-tay='trai'] .bia-pt{right:16px;left:56px}
