@@ -151,5 +151,121 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "DH-12-C3-B8-III-34": {
+  "luc": "2026-09-30T04:05:02.352Z",
+  "cau": {
+   "phan": "III",
+   "so": 34,
+   "de": "Kết quả phân tích nguyên tố của hợp chất amine thơm X có phần trăm khối lượng các nguyên tố như sau: % C=78,51 %; % H=8,41 %; % N=13,08 %. Từ phổ khối lượng (MS) xác định được phân tử khối của X bằng 107.\nXác định công thức phân tử của X.",
+   "dap_an": "C₇H₉N",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Amine",
+   "loi_giai": {
+    "chot": "Số nguyên tử của mỗi nguyên tố = M × %nguyên tố : nguyên tử khối.",
+    "buoc": [
+     "Số nguyên tử C = 107 × 78,51% : 12 = 84,01 : 12 = 7.",
+     "Số nguyên tử H = 107 × 8,41% : 1 = 9,00 : 1 = 9.",
+     "Số nguyên tử N = 107 × 13,08% : 14 = 14,00 : 14 = 1.",
+     "Vậy công thức phân tử của X là C₇H₉N (đúng là một amine thơm, ví dụ methylaniline)."
+    ],
+    "ket_qua": "C₇H₉N",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "C₇H₉N",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Nhân phân tử khối với phần trăm rồi chia cho nguyên tử khối để ra số nguyên tử.",
+    "bay": "Lập công thức đơn giản nhất rồi quên nhân lên cho khớp M = 107."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_CAU_TAO.XAC_DINH_CTPT",
+    "ten": "Amine — cấu tạo — xác định công thức phân tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B8-D1",
+    "ten": "Thiết lập công thức phân tử amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "DH-12-C3-B8-III-35": {
+  "luc": "2026-09-30T04:05:02.352Z",
+  "cau": {
+   "phan": "III",
+   "so": 35,
+   "de": "Vị tanh của cá, đặc biệt là cá mè, là do các amine gây ra, trong đó có amine X. Phân tích nguyên tố đối với X thu được kết quả: % C=61,02 %; % H=15,25 %; % N=23,73 % (về khối lượng). Từ phổ khối lượng, xác định được phân tử khối của X bằng 59. Bằng các phương pháp khác, thấy phân tử X có cấu trúc đối xứng cao.\nViết công thức cấu tạo của X.",
+   "dap_an": "(CH₃)₃N",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Amine",
+   "loi_giai": {
+    "chot": "Từ phần trăm và M = 59 ra C₃H₉N; đồng phân đối xứng nhất là trimethylamine.",
+    "buoc": [
+     "Số nguyên tử C = 59 × 61,02% : 12 = 36,00 : 12 = 3.",
+     "Số nguyên tử H = 59 × 15,25% : 1 = 9,00 : 1 = 9.",
+     "Số nguyên tử N = 59 × 23,73% : 14 = 14,00 : 14 = 1 ⇒ công thức phân tử C₃H₉N.",
+     "C₃H₉N có ba đồng phân: CH₃CH₂CH₂NH₂, CH₃CH(NH₂)CH₃ và (CH₃)₃N.",
+     "Phân tử đối xứng cao nhất là (CH₃)₃N — ba nhóm CH₃ giống hệt nhau quanh N. Đây cũng là amine gây mùi tanh của cá."
+    ],
+    "ket_qua": "(CH₃)₃N",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "(CH₃)₃N",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "loai"
+    ],
+    "ly_do": "Dữ kiện 'cấu trúc đối xứng cao' là thứ chốt công thức cấu tạo trong ba đồng phân của C₃H₉N.",
+    "bay": "Chọn propylamine CH₃CH₂CH₂NH₂ vì quen thuộc, bỏ qua yêu cầu đối xứng."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_CAU_TAO.XAC_DINH_CTPT",
+    "ten": "Amine — cấu tạo — xác định công thức phân tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B8-D1",
+    "ten": "Thiết lập công thức phân tử amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }

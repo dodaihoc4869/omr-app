@@ -79,5 +79,317 @@
    "nguonDe": "10-C1-B1",
    "nguonCau": "II-10"
   }
+ },
+ "DB-10-B1-D1-III-165": {
+  "luc": "2026-09-30T04:04:49.652Z",
+  "cau": {
+   "phan": "III",
+   "so": 165,
+   "de": "Oxide của kim loại M (M₂O) được dùng nhiều trong ngành hoá chất và sản xuất phân bón. Tổng số hạt cơ bản trong phân tử M₂O là 140; trong phân tử này số hạt mang điện nhiều hơn số hạt không mang điện là 44.\nXác định công thức phân tử của M₂O.\nBiết nguyên tử O có 8 proton và 8 neutron.",
+   "dap_an": "K₂O",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "2(2Z + N) + 24 = 140 và 4Z + 16 − (2N + 8) = 44.",
+    "buoc": [
+     "Nguyên tử O góp 8 + 8 + 8 = 24 hạt; mang điện 16, không mang điện 8.",
+     "Tổng hạt: 2(2Z + N) + 24 = 140 ⇒ 2Z + N = 58.",
+     "Chênh lệch: (4Z + 16) − (2N + 8) = 44 ⇒ 2Z − N = 18.",
+     "Cộng hai phương trình: 4Z = 76 ⇒ Z = 19 (potassium), N = 20.",
+     "Vậy công thức là K₂O."
+    ],
+    "ket_qua": "K₂O",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "K₂O",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc gõ 'cây trông' và dài dòng phần dẫn; đã rút gọn phần dẫn, giữ nguyên số liệu. Đề không in đáp án; đáp án do máy tự giải."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Phải tách riêng phần đóng góp của nguyên tử O trước khi lập hệ cho M.",
+    "bay": "Quên rằng phân tử có HAI nguyên tử M."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.XAC_DINH_CTPT",
+    "ten": "Thành phần nguyên tử — xác định công thức phân tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-22"
+  }
+ },
+ "DB-10-B1-D1-III-166": {
+  "luc": "2026-09-30T04:04:49.652Z",
+  "cau": {
+   "phan": "III",
+   "so": 166,
+   "de": "Hợp chất XY₂ có biệt danh là \"vàng của kẻ ngốc\" vì có ánh kim và sắc vàng đồng, nhìn khá giống vàng. Mỗi phân tử XY₂ có tổng số hạt proton, neutron, electron bằng 178, trong đó số hạt mang điện nhiều hơn số hạt không mang điện là 54. Mặt khác, số hạt mang điện trong nguyên tử X nhiều hơn trong nguyên tử Y là 20.\nXác định công thức hoá học của XY₂.",
+   "dap_an": "FeS₂",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "Cộng hai phương trình cho 4Z(X) + 8Z(Y) = 232.",
+    "buoc": [
+     "Tổng hạt: (2Z(X) + N(X)) + 2(2Z(Y) + N(Y)) = 178.",
+     "Chênh lệch: (2Z(X) + 4Z(Y)) − (N(X) + 2N(Y)) = 54.",
+     "Cộng hai phương trình: 4Z(X) + 8Z(Y) = 232 ⇒ Z(X) + 2Z(Y) = 58.",
+     "Mang điện X hơn Y là 20: 2Z(X) − 2Z(Y) = 20 ⇒ Z(X) − Z(Y) = 10.",
+     "Giải hệ: Z(Y) = 16 (sulfur), Z(X) = 26 (iron) ⇒ công thức là FeS₂ (quặng pyrite)."
+    ],
+    "ket_qua": "FeS₂",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "FeS₂",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc gõ thừa một chữ ('vì có m ánh kim') và hỏi cả số proton lẫn công thức — Phần III chỉ nhận MỘT đáp số nên câu hỏi được rút về công thức hoá học. Đề không in đáp án; đáp án do máy tự giải. | 15/09: viết Z(X), N(X) thay cho Z_X, N_X — gạch dưới bị cổng hiển thị bắt là chỉ số."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Cộng hai phương trình tổng hạt và chênh lệch để khử hết số neutron.",
+    "bay": "Quên rằng phân tử có HAI nguyên tử Y."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.XAC_DINH_CTPT",
+    "ten": "Thành phần nguyên tử — xác định công thức phân tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-23"
+  }
+ },
+ "DB-10-B1-D1-III-172": {
+  "luc": "2026-09-30T04:04:49.652Z",
+  "cau": {
+   "phan": "III",
+   "so": 172,
+   "de": "Oxide của kim loại M(M₂O) được ứng dụng rất nhiều trong ngành hóa chất như sản xuất xi măng, sản xuất phân bón, … Trong sản xuất phân bón, chúng ta thường thấy M₂O có màu trắng, tan nhiều trong nước và là thành phần không thể thiếu cho mọi loại cây trông.\nTổng số hạt cơ bản trong phân tử X có công thức M₂O là 140, trong phân tử X có tổng số hạt mang điện nhiều hơn số hạt không mang điện là 44.\nXác định công thức phân tử của M₂O.\nBiết nguyên tử O có 8 proton và 8 neutron.",
+   "dap_an": "K₂O",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "Tổng hạt = 2(2p + n) + 24 = 140 và (4p + 16) − (2n + 8) = 44.",
+    "buoc": [
+     "Gọi M có p proton, n neutron.",
+     "Tổng hạt: 2(2p + n) + (2×8 + 8) = 140 ⇒ 2p + n = 58.",
+     "Hiệu hạt: (2×2p + 16) − (2n + 8) = 44 ⇒ 2p − n = 18.",
+     "Cộng hai vế: 4p = 76 ⇒ p = 19, n = 20.",
+     "p = 19 là potassium (K) ⇒ công thức phân tử là K₂O."
+    ],
+    "ket_qua": "K₂O",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "K₂O",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phân tử M₂O có 2 nguyên tử M và 1 nguyên tử O; O đã biết 8p, 8n nên trừ ra trước.",
+    "bay": "Quên rằng có HAI nguyên tử M nên chia sai hệ số."
+   },
+   "kienThuc": [
+    "Trong một nguyên tử: tổng hạt = 2p + n; hạt mang điện = 2p; hạt không mang điện = n.",
+    "Oxygen có 8 proton và 8 neutron nên đóng góp 24 hạt, trong đó 16 hạt mang điện."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.XAC_DINH_CTPT",
+    "ten": "Thành phần nguyên tử — xác định công thức phân tử"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-31"
+  }
+ },
+ "DB-10-B1-D1-III-173": {
+  "luc": "2026-09-30T04:04:49.652Z",
+  "cau": {
+   "phan": "III",
+   "so": 173,
+   "de": "Hợp chất MX₃ có tổng số p, n, e là 196; trong đó tổng số hạt mang điện nhiều hơn số hạt không mang điện là 60.\nSố hạt mang điện trong M nhỏ hơn số hạt mang điện trong X là 8.\nXác định số hiệu nguyên tử của M và X từ đó suy ra công thức của MX₃.",
+   "dap_an": "AlCl₃",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "Tổng + hiệu ⇒ 2(2pM + 6pX) = 256 ⇒ pM + 3pX = 64; kèm 2pM = 2pX − 8.",
+    "buoc": [
+     "Tổng hạt: (2pM + nM) + 3(2pX + nX) = 196.",
+     "Hiệu: (2pM + 6pX) − (nM + 3nX) = 60.",
+     "Cộng hai phương trình: 2(2pM + 6pX) = 256 ⇒ pM + 3pX = 64.",
+     "Hạt mang điện của M ít hơn của X là 8: 2pM = 2pX − 8 ⇒ pM = pX − 4.",
+     "Thay vào: (pX − 4) + 3pX = 64 ⇒ pX = 17 (chlorine), pM = 13 (aluminium).",
+     "Vậy công thức hợp chất là AlCl₃."
+    ],
+    "ket_qua": "AlCl₃",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "AlCl₃",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Cộng phương trình tổng hạt với phương trình hiệu hạt sẽ khử hết neutron, chỉ còn proton.",
+    "bay": "Chia đôi nhầm khi đổi từ 'hạt mang điện' sang 'số proton' (2pM = 2pX − 8 cho pM = pX − 4, không phải pX − 8)."
+   },
+   "kienThuc": [
+    "Hợp chất MXₙ: tổng hạt = (2pM + nM) + n(2pX + nX).",
+    "Cộng 'tổng hạt' với 'hiệu hạt mang điện – không mang điện' sẽ khử neutron."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.DEM_NGUYEN_TU",
+    "ten": "Thành phần nguyên tử — đếm nguyên tử"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-32"
+  }
+ },
+ "DB-10-B1-D1-III-174": {
+  "luc": "2026-09-30T04:04:49.652Z",
+  "cau": {
+   "phan": "III",
+   "so": 174,
+   "de": "Hợp chất XY₂ có tên hiệu là \"vàng của kẻ ngốc\" vì có m ánh kim và sắc vàng đồng nên nhìn khá giống vàng, nhiều người hay lầm đó là vàng. Mỗi phân tử XY₂ có tổng các hạt proton, neutron, electron bằng 178, trong đó số hạt mang điện nhiều hơn số hạt không mang điện là 54. Mặt khác, số hạt mang điện trong nguyên tử X nhiều hơn số hạt mang điện trong nguyên tử Y là 20.\nXác định số proton của nguyên tố X và nguyên tố Y, công thức hóa học của XY₂.",
+   "dap_an": "FeS₂",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "Tổng + hiệu ⇒ số hạt mang điện = 116 ⇒ pX + 2pY = 58; kèm pX − pY = 10.",
+    "buoc": [
+     "Tổng hạt 178, hiệu 54 ⇒ số hạt mang điện = (178 + 54) : 2 = 116.",
+     "2pX + 4pY = 116 ⇒ pX + 2pY = 58.",
+     "Hạt mang điện của X hơn của Y là 20: 2pX − 2pY = 20 ⇒ pX − pY = 10.",
+     "Giải hệ: pY = 16 (sulfur), pX = 26 (iron).",
+     "Vậy XY₂ là FeS₂ — chính là khoáng pyrite, 'vàng của kẻ ngốc'."
+    ],
+    "ket_qua": "FeS₂",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "FeS₂",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "'Vàng của kẻ ngốc' là pyrite; bài toán hạt cho đúng Z(Fe) = 26 và Z(S) = 16.",
+    "bay": "Quên hệ số 2 của Y khi viết tổng số hạt mang điện."
+   },
+   "kienThuc": [
+    "Số hạt mang điện của phân tử XY₂ là 2pX + 2·2pY.",
+    "Cộng tổng hạt với hiệu hạt cho ngay hai lần số hạt mang điện."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.DEM_NGUYEN_TU",
+    "ten": "Thành phần nguyên tử — đếm nguyên tử"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-33"
+  }
  }
 }
