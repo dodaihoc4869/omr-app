@@ -42,6 +42,29 @@ export function taoAnhBi(doc: Document, kieu: KieuBi, kiHieu: string, r: number,
   return cv
 }
 
+/** DÁNG GỐC của bi (quaternion) — ô kí hiệu (+x cục bộ) quay thẳng về người xem, chữ đứng, dải sọc nằm ngang: đúng như ảnh vẽ sẵn.
+ *  Bàn dọc: quay 90° quanh trục y. Bàn nằm ngang (pháp tuyến màn đã quay 90°): dáng tương ứng. */
+export const Q_GOC_DOC: readonly [number, number, number, number] = [Math.SQRT1_2, 0, Math.SQRT1_2, 0]
+export const Q_GOC_NGANG: readonly [number, number, number, number] = [0.5, 0.5, 0.5, -0.5]
+/** Thời gian bi vừa dừng trượt êm về dáng gốc rồi mới chuyển sang ảnh vẽ sẵn (không nhảy). */
+export const MS_VE_GOC = 200
+/**
+ * Nội suy hướng quay từ `a` về `b` theo t ∈ [0, 1], chậm dần cuối (ease-out 1 − (1 − t)³), đi đường NGẮN NHẤT (đổi dấu b nếu tích vô hướng âm),
+ * slerp giữ độ dài 1. Ghi vào `ra` (không cấp phát).
+ */
+export function noiQuay(a: readonly number[], b: readonly number[], t: number, ra: number[]): number[] {
+  const k = 1 - Math.pow(1 - Math.max(0, Math.min(1, t)), 3)
+  let bw = b[0]!, bx = b[1]!, by = b[2]!, bz = b[3]!
+  let cos = a[0]! * bw + a[1]! * bx + a[2]! * by + a[3]! * bz
+  if (cos < 0) { cos = -cos; bw = -bw; bx = -bx; by = -by; bz = -bz }
+  let s0 = 1 - k, s1 = k
+  if (cos < 0.9995) { const th = Math.acos(Math.min(1, cos)), sn = Math.sin(th); s0 = Math.sin((1 - k) * th) / sn; s1 = Math.sin(k * th) / sn }
+  ra[0] = a[0]! * s0 + bw * s1; ra[1] = a[1]! * s0 + bx * s1; ra[2] = a[2]! * s0 + by * s1; ra[3] = a[3]! * s0 + bz * s1
+  const n = Math.hypot(ra[0]!, ra[1]!, ra[2]!, ra[3]!) || 1
+  ra[0] = ra[0]! / n; ra[1] = ra[1]! / n; ra[2] = ra[2]! / n; ra[3] = ra[3]! / n
+  return ra
+}
+
 // ───────────── BI ĐANG LĂN (thầy hỏi 30/09 "hiệu ứng lăn bi mượt mà vẫn giữ nguyên chứ") ─────────────
 // Bi ĐANG CHẠY vẽ lăn như bản cũ: từng điểm ảnh = pháp tuyến mặt cầu × ma trận quay (quaternion trong vật lý, chỉ để vẽ) ⇒ kí hiệu và dải sọc
 // chạy theo hướng lăn; màu theo góc nhìn (em lam đặc, đối thủ nền trắng dải đỏ cam |lz| < 0,5, chốt đen có ô trắng). Bi đứng yên dùng ảnh vẽ sẵn.
@@ -107,7 +130,7 @@ export function toBiLan(B: Bong, kieu: KieuBi, chu: MatNa | null, q: readonly [n
     if (la) { if (lx > 0.972 || lx < -0.972 || ly > 0.972 || ly < -0.972 || lz > 0.972 || lz < -0.972) { r = DO_CHAM[0]; g = DO_CHAM[1]; bl = DO_CHAM[2] } }
     else {
       const ax = lx < 0 ? -lx : lx
-      if (kieu === 'dich' && (lz > 0.5 || lz < -0.5)) { r = TR[0]; g = TR[1]; bl = TR[2] }
+      if (kieu === 'dich' && (ly > 0.6 || ly < -0.6)) { r = TR[0]; g = TR[1]; bl = TR[2] } // dải đỏ cam quanh xích đạo chứa hai ô kí hiệu (±x) — lúc nằm yên ở dáng gốc là dải NGANG như ảnh vẽ sẵn
       if (ax > 0.874 && chu) {
         if (kieu === 'chot') { r = TR[0]; g = TR[1]; bl = TR[2] }
         let u = lz / SD

@@ -3,7 +3,7 @@
 import { datTFBan, raMan, type KhungBan } from './bo-cuc'
 import { duDoan, type DuDoan } from './du-doan'
 import { KL, MAU_QH, PK, kieuBi, type KieuBi, type KiHieu, type QuanHe } from './nguyen-to'
-import { KHUNG_ANH, MAU_BI_VANG, taoAnhBi, taoBong, taoMatNa, toBiLan, veMotBi, type Bong, type MatNa } from './ve-bi'
+import { KHUNG_ANH, MAU_BI_VANG, MS_VE_GOC, Q_GOC_DOC, Q_GOC_NGANG, noiQuay, taoAnhBi, taoBong, taoMatNa, toBiLan, veMotBi, type Bong, type MatNa } from './ve-bi'
 import { DIEM_CHAN, H, LO, R, T, W, type Bi } from './vat-ly'
 import type { Pha, VanBia } from './dieu-khien'
 
@@ -88,6 +88,12 @@ export class BoVe {
   private lan = new Map<string, { cv: HTMLCanvasElement; x: CanvasRenderingContext2D; img: ImageData; ver: number; so: number }>()
   /** Số ảnh bi lăn còn được tô lại trong khung này (máy yếu: tối đa 4, bi khác giữ ảnh cũ thêm một khung). */
   private conTo = Infinity
+  /** Bi VỪA DỪNG: trượt êm (MS_VE_GOC) từ hướng lúc dừng về dáng gốc rồi mới chuyển sang ảnh vẽ sẵn — kí hiệu không nhảy. */
+  private veGoc = new Map<string, { t0: number; q: [number, number, number, number] }>()
+  private lanTruoc = new Set<string>()
+  private readonly qTam: number[] = [1, 0, 0, 0]
+  private nhipVe = 0
+  private bayGio = 0
   private nen: HTMLCanvasElement | null = null
   private duDoanCu: { key: string; t: number; kq: DuDoan } = { key: '', t: 0, kq: { cue: [], obj: [] } }
   /** Ảnh bóng đổ dưới bi (vẽ sẵn một lần mỗi cỡ, mỗi khung chỉ drawImage — không tạo gradient mỗi khung). */
@@ -126,7 +132,7 @@ export class BoVe {
   datCo(k: KhungBan, dpr: number, nhe = this.nhe): void {
     this.k = k; this.dpr = dpr; this.nhe = nhe
     this.rAnh = R * k.S * dpr
-    this.anh.clear(); this.lan.clear()
+    this.anh.clear(); this.lan.clear(); this.veGoc.clear(); this.lanTruoc.clear()
     this.bong = taoBong(Math.max(12, Math.ceil(2 * this.rAnh) + 2))
     this.ganMatNa()
     this.nen = veNen(k, dpr, this.doc)
@@ -157,9 +163,20 @@ export class BoVe {
   private vanDangVe: VanBia | null = null
   private vangCua(b: Bi): boolean { const v = this.vanDangVe; return !!v && b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang }
   /** Bi đang chạy (có vận tốc) ⇒ vẽ lăn. */
-  private dangLan(b: Bi): boolean { return !!this.bong && (b.vx !== 0 || b.vy !== 0) }
+  private dangLan(b: Bi): boolean { return !!this.bong && (b.vx !== 0 || b.vy !== 0 || this.veGoc.has(b.id)) }
+  /** Cập nhật danh sách bi vừa dừng (gọi đầu mỗi khung vẽ). */
+  private capNhatVeGoc(balls: readonly Bi[], now: number): void {
+    if (!this.bong) return
+    for (const b of balls) {
+      const chay = b.on && (b.vx !== 0 || b.vy !== 0)
+      if (chay) { if (this.lan.has(b.id)) this.lanTruoc.add(b.id); this.veGoc.delete(b.id) } // chỉ bi đã có ảnh lăn (máy vẽ được canvas) mới cần trượt về dáng gốc
+      else if (this.lanTruoc.has(b.id)) { this.lanTruoc.delete(b.id); if (b.on) this.veGoc.set(b.id, { t0: now, q: [b.q[0], b.q[1], b.q[2], b.q[3]] }) }
+    }
+    for (const [id, e] of this.veGoc) if (now - e.t0 > MS_VE_GOC) { this.veGoc.delete(id); const c = this.lan.get(id); if (c) c.ver = -1 }
+  }
   /** Số nhận dạng ảnh đang vẽ của bi (đổi ⇒ ô bi là vùng bẩn): bi lăn theo bản hướng quay, bi đứng yên theo kiểu + viền vàng. */
   private soAnhVe(b: Bi, doiEm: 0 | 1): number {
+    if (this.veGoc.has(b.id)) return 1e7 + this.nhipVe // đang trượt về dáng gốc: khung nào cũng đổi
     if (this.dangLan(b)) { const e = this.lan.get(b.id); return 100 + (e ? e.ver : -1) }
     return this.soAnh(b, doiEm) + 1
   }
@@ -174,6 +191,15 @@ export class BoVe {
       if (!x) return null
       e = { cv, x, img: x.createImageData(B.N, B.N), ver: -1, so: -1 }
       this.lan.set(b.id, e)
+    }
+    const goc = this.veGoc.get(b.id)
+    if (goc) { // vừa dừng: nội suy về dáng gốc (ease-out, đường ngắn nhất), tô mỗi khung
+      let m: MatNa | null = null
+      if (b.id !== 'cue') m = this.matNa.get(b.id) ?? null
+      const q = noiQuay(goc.q, this.k?.xoay ? Q_GOC_NGANG : Q_GOC_DOC, (this.bayGio - goc.t0) / MS_VE_GOC, this.qTam) as unknown as [number, number, number, number]
+      toBiLan(B, kieu, m, q, !!this.k?.xoay, e.img.data)
+      e.x.putImageData(e.img, 0, 0); e.ver = -3; e.so = so
+      return e.cv
     }
     if ((e.ver !== b.ver || e.so !== so) && (this.conTo > 0 || e.ver < 0)) {
       this.conTo--
@@ -200,7 +226,7 @@ export class BoVe {
    * Luôn ghi lại dấu trạng thái (gọi đúng một lần mỗi khung, rồi `ve` nếu true).
    */
   canVe(v: VanBia, chi: ChiBi | null, mtBat: boolean, keoBiCai: boolean, mo = false): boolean {
-    let ve = this.phaiVe || v.pha === 'moving' || v.pha === 'ai-nham' || v.fx.length > 0 || v.roi.length > 0 || v.noi.length > 0
+    let ve = this.phaiVe || v.pha === 'moving' || v.pha === 'ai-nham' || v.fx.length > 0 || v.roi.length > 0 || v.noi.length > 0 || this.veGoc.size > 0 || this.lanTruoc.size > 0
     const d = this.dauMoi, balls = v.st.balls
     let i = 0
     d[i++] = PHA_SO[v.pha]; d[i++] = v.cur; d[i++] = v.em; d[i++] = v.sheet ? v.sheet.ma : -1; d[i++] = v.phienBan
@@ -251,6 +277,8 @@ export class BoVe {
     const s = k.S * this.dpr, balls = v.st.balls, vt = this.vt, nhe = this.nhe, cw = ctx.canvas.width, ch = ctx.canvas.height, n = balls.length
     const doiEm = v.ghe[v.em]!.doi
     this.conTo = nhe ? 4 : Infinity
+    this.nhipVe++; this.bayGio = typeof performance !== 'undefined' ? performance.now() : Date.now()
+    this.capNhatVeGoc(balls, this.bayGio)
     const nguoi = !v.ghe[v.cur]!.ai
     const nhin = ((v.pha === 'aim' && !v.sheet) || v.pha === 'ai-nham') && v.bi_('cue').on
     const mt = nguoi && ((v.matThan > 0 && mtBat) || (v.luonMT && v.cur === v.em)) // luôn bật Mắt thần: chỉ cú của chính em
