@@ -1109,3 +1109,5 @@
 @media (prefers-reduced-motion: reduce) {
   .tlu-cong-tac input::after { transition: none; }
 }
+/* Khối Luyện đề trong bảng điều khiển: ô số KHÔNG kéo cao theo flex của hàng tổng quan. */
+.tlu-tong-hop[data-rong] .tlu-khoi .tlu-kpi { flex: none; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }

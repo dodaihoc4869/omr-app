@@ -401,7 +401,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             {kq ? <span className="tlu-nhan" data-kieu={kq.dung ? 'dung' : 'sai'}>{kq.dung ? 'Đúng' : c.phan === 'II' && kq.yDung ? `Đúng ${kq.yDung}/4 ý` : 'Sai'}</span> : <span className="tlu-nhan">{NHAN_PHAN_TU_LUYEN[c.phan]}</span>}
             {c.sao > 0 && <span className="tlu-nhan" data-kieu="sao">{c.sao} sao</span>}
             {c.tenDang && <span className="tlu-nhan tlu-nhan-dang">{c.tenDang}</span>}
-            <NhanLuyen c={c} />
+            <NhanLuyen c={kq ? { ...c, conMotLan: undefined } : c} />
           </div>
           {kq ? (
             kq.anDapAn ? <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p> : <TheCauXem cau={c} kq={kq} stt={i + 1} />
