@@ -1016,3 +1016,96 @@
     transition: none !important;
   }
 }
+
+/* ---------------- v3 (30/09): khắc phục câu sai · chấm từng câu · nguồn dự phòng ---------------- */
+.tlu-dem-kp {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--tlu-nen-3);
+  color: var(--tlu-chu);
+  font-size: 14px;
+  text-align: left;
+}
+.tlu-dem-kp b { color: var(--tlu-ngoc); font-size: 16px; }
+.tlu-dem-kp .tlu-thanh > span { background: var(--tlu-ngoc); }
+.tlu-dem-kp[data-gon='true'] { padding: 8px 10px; font-size: 13px; }
+.tlu-dem-kp-lon b { font-size: 26px; }
+.tlu-the-che-do .tlu-dem-kp { grid-column: 1 / -1; width: 100%; }
+.tlu-chuc-mung {
+  display: grid;
+  gap: 12px;
+  padding: 18px 16px;
+  border-radius: 18px;
+  background: var(--tlu-nen-3);
+  border: 1px solid var(--tlu-vien);
+}
+.tlu-chuc-mung > b { font-size: 20px; color: var(--tlu-ngoc); line-height: 1.3; }
+.tlu-chuc-mung > p { margin: 0; color: var(--tlu-chu-phu); font-size: 15px; line-height: 1.5; }
+.tlu-chuc-mung .tlu-nut-chinh { justify-self: start; }
+.tlu-nguon { display: grid; gap: 6px; justify-items: start; }
+.tlu-nhan[data-kieu='du-phong'] { background: var(--tlu-vang); color: var(--tlu-nau); }
+.tlu-nhan[data-kieu='con-mot'] { background: var(--tlu-ngoc); color: var(--tlu-nhan-chu); }
+.tlu-cong-tac {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--tlu-nen-2);
+  border: 1px solid var(--tlu-vien);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.tlu-cong-tac input {
+  appearance: none;
+  flex: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--tlu-nen-3);
+  border: 2px solid var(--tlu-chu-phu);
+  cursor: pointer;
+}
+.tlu-cong-tac input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--tlu-chu-phu);
+  transition: transform 0.15s ease;
+}
+.tlu-cong-tac input:checked { background: var(--tlu-ngoc); border-color: var(--tlu-ngoc); }
+.tlu-cong-tac input:checked::after { transform: translateX(18px); background: var(--tlu-nhan-chu); }
+.tlu-cong-tac input:focus-visible { outline: 3px solid var(--tlu-vang); outline-offset: 2px; }
+.tlu-cong-tac-chu { display: grid; gap: 2px; min-width: 0; font-size: 13px; color: var(--tlu-chu-phu); line-height: 1.4; }
+.tlu-cong-tac-chu b { font-size: 15px; color: var(--tlu-chu); }
+.tlu-kiem-tra { display: flex; justify-content: flex-end; margin-top: 10px; }
+.tlu-kiem-tra .tlu-nut-phu { min-height: 44px; min-width: 150px; }
+.tlu-nut-kiem:not(:disabled) { background: var(--tlu-nhan); color: var(--tlu-nhan-chu); border-color: var(--tlu-nhan); }
+.tlu-khac-phuc {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--m3-error-container);
+  color: var(--m3-on-error-container);
+}
+.tlu-khac-phuc[data-dung='true'] {
+  background: var(--m3-tertiary-container, var(--m3-primary-container));
+  color: var(--m3-on-tertiary-container, var(--m3-on-primary-container));
+}
+.tlu-muc-nho { font-size: 14px; margin-top: 12px; }
+.tlu-tong-hop.tlu-th-it { display: grid; gap: 16px; }
+@media (prefers-reduced-motion: reduce) {
+  .tlu-cong-tac input::after { transition: none; }
+}

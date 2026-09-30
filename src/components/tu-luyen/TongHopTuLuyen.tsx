@@ -1,20 +1,25 @@
 // TỔNG HỢP ĐÁNH GIÁ của Tu luyện (29/09): em thấy tiến bộ của mình — tỉ lệ đúng theo tuần, theo dạng (mạnh nhất / yếu nhất / tiến bộ nhiều
 // nhất so với lần đầu), theo sao, theo phần I/II/III, chuỗi ngày, gợi ý dạng nên luyện tiếp (bấm ⇒ rút ngay chế độ Dạng bài).
 // Số liệu tính bằng `tongHopTuLuyen` (src/lib/tu-luyen.ts, hàm thuần có test). Biểu đồ SVG tự vẽ, một màu, con số nào cũng có nhãn.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+// v3 (30/09): tính cả LUYỆN ĐỀ CẤU TRÚC (số đề, điểm gần nhất, theo phần — `tongHopLuyenDe`) và TỈ LỆ KHẮC PHỤC câu sai theo tuần
+// (`khacPhucTheoTuan`); chỉ báo "chưa có" khi cả ba nguồn đều trống.
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   NHAN_PHAN_TU_LUYEN,
   TEN_CHE_DO,
+  SO_CAU_MAC_DINH,
   chuThoiGian,
+  khacPhucTheoTuan,
   timDangTrongDanhMuc,
+  tongHopLuyenDe,
   tongHopTuLuyen,
-  type DongCauTuLuyen,
-  type DongLuotTuLuyen,
   type LopDangBaiTL,
+  type TongHopLuyenDe,
+  type TuanKhacPhuc,
   type TongHopDang,
   type TuanTuLuyen,
 } from '../../lib/tu-luyen'
-import { taiTongHop } from './api'
+import { taiTongHop, type DuTongHop } from './api'
 
 export interface TongHopTuLuyenProps {
   token: string
@@ -27,8 +32,10 @@ export interface TongHopTuLuyenProps {
   dangMoLuot?: string
   /** Màn ngang / máy tính (30/09): bảng điều khiển nhiều cột, biểu đồ vẽ theo đúng bề rộng thật. Màn dọc: như cũ. */
   rong?: boolean
-  /** Khối "Luyện đề cấu trúc" đặt vào lưới bảng điều khiển (chỉ khi `rong`). */
-  luyenDe?: ReactNode
+  /** Mở thẻ Luyện đề cấu trúc. */
+  onMoLuyenDe?: () => void
+  /** Lịch sử Luyện đề từ `/luyen-de/dieu-kien` — chỉ dùng khi máy chủ Tu luyện bản cũ chưa gửi `luyenDe`. */
+  luyenDeCu?: { id: string; createdAt: number; status: string; score: number | null }[]
 }
 
 /** Phần trăm kiểu Việt: dấu phẩy thập phân (60,7%). */
@@ -130,8 +137,68 @@ function TheNoiBat({ nhan, d, chu }: { nhan: string; d: TongHopDang | null; chu:
   )
 }
 
-export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, onXemLuot, dangMoLuot, rong = false, luyenDe }: TongHopTuLuyenProps) {
-  const [du, setDu] = useState<{ luot: DongLuotTuLuyen[]; cau: DongCauTuLuyen[] } | null>(null)
+/** Luyện đề cấu trúc trong Tổng hợp (v3): số đề, điểm gần nhất / cao nhất / trung bình, tỉ lệ đúng theo phần, điểm các đề gần đây. */
+function KhoiLuyenDe({ ld, onMo }: { ld: TongHopLuyenDe; onMo?: () => void }) {
+  const so = (n: number) => n.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
+  return (
+    <section className="tlu-khoi tlu-o-ld" aria-labelledby="tlu-h-luyen-de">
+      <h2 id="tlu-h-luyen-de" className="tlu-muc">Luyện đề cấu trúc</h2>
+      <dl className="tlu-kpi">
+        <div><dt>Đề đã nộp</dt><dd className="tlu-tab">{ld.soDe} đề</dd></div>
+        <div><dt>Điểm gần nhất</dt><dd className="tlu-tab">{so(ld.diemGanNhat)} / 10</dd></div>
+        <div><dt>Điểm cao nhất</dt><dd className="tlu-tab">{so(ld.diemCaoNhat)} / 10</dd></div>
+        <div><dt>Điểm trung bình</dt><dd className="tlu-tab">{so(ld.diemTrungBinh)} / 10</dd></div>
+      </dl>
+      <h3 className="tlu-muc tlu-muc-nho">Theo phần · cộng các đề đã nộp</h3>
+      <ul className="tlu-ds-thanh">
+        {(['I', 'II', 'III'] as const).map((p) => <HangThanh key={p} nhan={`Phần ${p} · ${NHAN_PHAN_TU_LUYEN[p]}`} {...ld.theoPhan[p]} />)}
+      </ul>
+      <h3 className="tlu-muc tlu-muc-nho">Điểm các đề gần đây</h3>
+      <ul className="tlu-ds-thanh" aria-label="Điểm các đề gần đây">
+        {ld.ganDay.map((x) => (
+          <li key={x.id} className="tlu-hang-thanh">
+            <div className="tlu-hang-thanh-dau">
+              <span className="tlu-hang-thanh-nhan tlu-tab">{ngayGio(x.luc)}</span>
+              <span className="tlu-hang-thanh-so tlu-tab">{so(x.diem)} / 10 điểm</span>
+            </div>
+            <span className="tlu-thanh" aria-hidden="true"><span style={{ transform: `scaleX(${Math.max(0, Math.min(1, x.diem / 10))})` }} /></span>
+          </li>
+        ))}
+      </ul>
+      {onMo && <button type="button" className="tlu-nut-chu" onClick={onMo}>Mở Luyện đề cấu trúc</button>}
+    </section>
+  )
+}
+
+/** Khắc phục câu sai (v3): bộ đếm nổi bật + tỉ lệ khắc phục lũy kế theo tuần (8 tuần). */
+function KhoiKhacPhuc({ tong, da, tuan }: { tong: number; da: number; tuan: TuanKhacPhuc[] }) {
+  const coTuan = tuan.filter((t) => t.tongLuyKe > 0)
+  return (
+    <section className="tlu-khoi tlu-o-kp" aria-labelledby="tlu-h-kp">
+      <h2 id="tlu-h-kp" className="tlu-muc">Khắc phục câu sai từ 29/09</h2>
+      <div className="tlu-dem-kp tlu-dem-kp-lon">
+        <span className="tlu-dem-kp-chu">Đã khắc phục <b className="baloo tlu-tab">{da}/{tong}</b> câu sai</span>
+        <span className="tlu-thanh" role="progressbar" aria-label="Số câu sai đã khắc phục" aria-valuemin={0} aria-valuemax={tong} aria-valuenow={da}>
+          <span style={{ transform: `scaleX(${tong ? Math.min(1, da / tong) : 0})` }} />
+        </span>
+      </div>
+      <p className="tlu-ghi">Một câu được khắc phục khi em làm đúng hai lần liên tiếp ở hai ngày khác nhau.</p>
+      {coTuan.length > 0 && (
+        <>
+          <h3 className="tlu-muc tlu-muc-nho">Tỉ lệ khắc phục theo tuần</h3>
+          <ul className="tlu-ds-thanh" aria-label="Tỉ lệ khắc phục theo tuần">
+            {coTuan.map((t) => (
+              <HangThanh key={t.batDau} nhan={`Tuần từ ${t.nhan}`} phu={`thêm ${t.moi} câu sai · khắc phục ${t.khacPhuc} câu`} soDung={t.daKhacPhucLuyKe} soCau={t.tongLuyKe} tiLe={t.tiLe ?? 0} />
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  )
+}
+
+export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, onXemLuot, dangMoLuot, rong = false, onMoLuyenDe, luyenDeCu = [] }: TongHopTuLuyenProps) {
+  const [du, setDu] = useState<DuTongHop | null>(null)
   const [loi, setLoi] = useState('')
   const [lan, setLan] = useState(0)
   const [xemHet, setXemHet] = useState(false)
@@ -146,6 +213,13 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
     return () => { song = false }
   }, [token, lamMoi, lan])
   const t = useMemo(() => (du ? tongHopTuLuyen(du.luot, du.cau, Date.now()) : null), [du])
+  const ld = useMemo(() => (du ? tongHopLuyenDe(du.luyenDe) : null), [du])
+  const tuanKp = useMemo(() => khacPhucTheoTuan(du?.khacPhuc ?? null, Date.now()), [du])
+  const kp = du?.khacPhuc && du.khacPhuc.tong > 0 ? du.khacPhuc : null
+  // Máy chủ Tu luyện bản cũ chưa gửi `luyenDe` ⇒ dùng lịch sử điểm của /luyen-de/dieu-kien (chỉ điểm, không theo phần).
+  const oLuyenDe = ld ? <KhoiLuyenDe ld={ld} onMo={onMoLuyenDe} /> : onMoLuyenDe ? <DiemLuyenDeTongHop items={luyenDeCu} onMo={onMoLuyenDe} /> : null
+  const coLdCu = !ld && luyenDeCu.some((x) => x.status === 'submitted' && typeof x.score === 'number')
+  const oKhacPhuc = kp ? <KhoiKhacPhuc tong={kp.tong} da={kp.daKhacPhuc} tuan={tuanKp} /> : null
 
   if (!du && loi) {
     return (
@@ -157,14 +231,16 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
   }
   if (!t) return <div className="tlu-luoi-che-do" role="status" aria-label="Đang tải tổng hợp">{[1, 2, 3].map((i) => <div key={i} className="tlu-xuong" />)}</div>
   if (t.soCau === 0) {
+    const coGi = !!ld || coLdCu || !!kp
     return (
-      <>
+      <div className={rong ? 'tlu-tong-hop tlu-th-it' : 'tlu-tong-hop'} data-rong={rong ? 'true' : undefined}>
         <div className="tlu-bao tlu-bao-trong">
-          <b>Chưa có lượt tu luyện nào</b>
-          <p>Làm một lượt ở thẻ Luyện — nộp xong, tổng hợp tiến bộ của em hiện ở đây: tỉ lệ đúng theo tuần, dạng mạnh nhất, dạng cần luyện thêm.</p>
+          <b>{coGi ? 'Chưa có lượt tu luyện 4 chế độ nào' : 'Chưa có lượt nào'}</b>
+          <p>Làm một lượt ở thẻ Luyện — nộp xong, tỉ lệ đúng theo tuần, dạng mạnh nhất, dạng cần luyện thêm hiện ở đây.{coGi ? ' Dưới đây là phần em đã có.' : ''}</p>
         </div>
-        {rong && luyenDe}
-      </>
+        {oKhacPhuc}
+        {oLuyenDe}
+      </div>
     )
   }
   const goiYBam = t.goiY.map((d) => ({ d, o: timDangTrongDanhMuc(danhMuc, d.ma, d.ten) }))
@@ -209,7 +285,7 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
                   <span className="tlu-tab">{pt(d.tiLe)} đúng · {d.soCau} câu đã làm{o ? ` · ${o.tenBai}` : ''}</span>
                 </div>
                 {o ? (
-                  <button type="button" className="tlu-nut-phu" onClick={() => onLuyenDang(o.lop, o.tenBai, o.dang.ma)}>Luyện 20 câu dạng này</button>
+                  <button type="button" className="tlu-nut-phu" onClick={() => onLuyenDang(o.lop, o.tenBai, o.dang.ma)}>Luyện {SO_CAU_MAC_DINH} câu dạng này</button>
                 ) : (
                   <span className="tlu-goi-y-ghi">Luyện bằng chế độ Dạng câu sai</span>
                 )}
@@ -281,9 +357,10 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
             {oTuan}
             {oDang}
             {oSaoPhan}
-            {luyenDe && <div className="tlu-o-ld">{luyenDe}</div>}
+            {oLuyenDe}
           </div>
           <div className="tlu-th-phai">
+            {oKhacPhuc}
             {oNoiBat}
             {oGoiY}
             {oGan}
@@ -296,6 +373,8 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
     <div className="tlu-tong-hop">
       {oHero}
 
+      {oKhacPhuc}
+
       {oTuan}
 
       {oNoiBat}
@@ -305,6 +384,8 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
       {oDang}
 
       {oSaoPhan}
+
+      {oLuyenDe}
 
       {oGan}
     </div>

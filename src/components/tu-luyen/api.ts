@@ -6,6 +6,8 @@ import type {
   CheDoTuLuyen,
   DongCauTuLuyen,
   DongLuotTuLuyen,
+  DongLuyenDeTongHop,
+  DuKhacPhuc,
   KetQuaCau,
   LopDangBaiTL,
 } from '../../lib/tu-luyen'
@@ -45,8 +47,21 @@ export interface NguonTuLuyen {
   danhMuc: LopDangBaiTL[]
   loiDanhMuc: string
   dangThi: boolean
-  /** Chế độ 1 (luật 30/09): kho câu sai từ 29/09 — ca kiểm tra + chiến dịch. Máy chủ cũ không gửi ⇒ null. */
-  khoCauSai: { tong: number; tuCa: number; tuChienDich: number; loi: string } | null
+  /** KHO CÂU SAI CHUNG từ 29/09 (chế độ 1, 2, 4): `tong` = câu còn trong kho; `tongTuMoc` / `daKhacPhuc` = bộ đếm khắc phục. Máy chủ cũ không gửi ⇒ null. */
+  khoCauSai: KhoCauSaiEm | null
+  /** Chế độ 2: nguồn dạng đang dùng ("Theo câu sai của em" / "Theo dạng em còn yếu" / …); `loi` ⇒ thật sự không luyện được (có lý do). */
+  dangCauSai: NguonDangEm | null
+  /** Chế độ 4: nguồn câu (kho câu sai / toàn kho). */
+  tuDo: NguonDangEm | null
+  /** Dạng nên luyện khi chưa có câu sai (gợi ý ở chế độ 1). */
+  dangNenLuyen: { ma: string; ten: string } | null
+}
+export interface KhoCauSaiEm { tong: number; tuCa: number; tuChienDich: number; tuLuyenDe: number; tuTuLuyen: number; loi: string; tongTuMoc: number; daKhacPhuc: number; toiHan: number; choHen: number }
+export interface NguonDangEm { kieu: string; nhan: string; loi: string }
+const docNguonDang = (v: unknown): NguonDangEm | null => {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Obj
+  return { kieu: chu(o.kieu), nhan: chu(o.nhan), loi: chu(o.loi) }
 }
 export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
   const j = await goi('nguon', token)
@@ -60,17 +75,30 @@ export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
     })),
   }))
   const k = j.khoCauSai && typeof j.khoCauSai === 'object' ? (j.khoCauSai as Obj) : null
-  const khoCauSai = k ? { tong: so(k.tong), tuCa: so(k.tuCa), tuChienDich: so(k.tuChienDich), loi: chu(k.loi) } : null
-  return { ok: true, du: { cacCa, soCauSai: so(j.soCauSai), loiCauSai: chu(j.loiCauSai), danhMuc, loiDanhMuc: chu(j.loiDanhMuc), dangThi: j.dangThi === true, khoCauSai } }
+  const khoCauSai = k
+    ? {
+        tong: so(k.tong), tuCa: so(k.tuCa), tuChienDich: so(k.tuChienDich), tuLuyenDe: so(k.tuLuyenDe), tuTuLuyen: so(k.tuTuLuyen), loi: chu(k.loi),
+        // Máy chủ bản cũ không có bộ đếm ⇒ coi mọi câu còn trong kho là tổng, chưa khắc phục câu nào.
+        tongTuMoc: k.tongTuMoc === undefined ? so(k.tong) : so(k.tongTuMoc), daKhacPhuc: so(k.daKhacPhuc), toiHan: so(k.toiHan), choHen: so(k.choHen),
+      }
+    : null
+  const nl = j.dangNenLuyen && typeof j.dangNenLuyen === 'object' ? (j.dangNenLuyen as Obj) : null
+  return {
+    ok: true,
+    du: {
+      cacCa, soCauSai: so(j.soCauSai), loiCauSai: chu(j.loiCauSai), danhMuc, loiDanhMuc: chu(j.loiDanhMuc), dangThi: j.dangThi === true, khoCauSai,
+      dangCauSai: docNguonDang(j.dangCauSai), tuDo: docNguonDang(j.tuDo), dangNenLuyen: nl && chu(nl.ma) ? { ma: chu(nl.ma), ten: chu(nl.ten) || chu(nl.ma) } : null,
+    },
+  }
 }
 
 export interface ThamSoRut { cheDo: CheDoTuLuyen; soCau?: number; dsMaCa?: string[]; dsDang?: string[]; mucDo?: string[] }
-export interface XemTruoc { tongToiDa: number; loi: string; thongKe: { tenDang: string; soCauSai: number; soUngVien: number }[] }
+export interface XemTruoc { tongToiDa: number; loi: string; thongKe: { tenDang: string; soCauSai: number; soUngVien: number }[]; nguonDang: NguonDangEm | null }
 export async function xemTruoc(token: string, t: ThamSoRut): Promise<KetQua<XemTruoc>> {
   const j = await goi('xem-truoc', token, { ...t })
   if (!j || j.ok !== true) return { ok: false, loi: loiCua(j) }
   const thongKe = (Array.isArray(j.thongKe) ? j.thongKe : []).map((x: Obj) => ({ tenDang: chu(x.tenDang), soCauSai: so(x.soCauSai), soUngVien: so(x.soUngVien) }))
-  return { ok: true, du: { tongToiDa: so(j.tongToiDa), loi: chu(j.loi), thongKe } }
+  return { ok: true, du: { tongToiDa: so(j.tongToiDa), loi: chu(j.loi), thongKe, nguonDang: docNguonDang(j.nguonDang) } }
 }
 
 export interface LuotDangLam { luotId: string; cheDo: CheDoTuLuyen; tieuDe: string; taoLuc: number; cau: CauCongKhai[] }
@@ -102,10 +130,27 @@ export async function nopBai(
   }
 }
 
-export async function taiTongHop(token: string): Promise<KetQua<{ luot: DongLuotTuLuyen[]; cau: DongCauTuLuyen[] }>> {
+export interface DuTongHop { luot: DongLuotTuLuyen[]; cau: DongCauTuLuyen[]; luyenDe: DongLuyenDeTongHop[]; khacPhuc: DuKhacPhuc | null }
+export async function taiTongHop(token: string): Promise<KetQua<DuTongHop>> {
   const j = await goi('tong-hop', token)
   if (!j || j.ok !== true) return { ok: false, loi: loiCua(j) }
-  return { ok: true, du: { luot: (Array.isArray(j.luot) ? j.luot : []) as DongLuotTuLuyen[], cau: (Array.isArray(j.cau) ? j.cau : []) as DongCauTuLuyen[] } }
+  const phan = (v: unknown) => { const o = (v && typeof v === 'object' ? v : {}) as Obj; return { soCau: so(o.soCau), soDung: so(o.soDung) } }
+  const luyenDe = (Array.isArray(j.luyenDe) ? j.luyenDe : []).map((x: Obj) => {
+    const tp = (x.theoPhan && typeof x.theoPhan === 'object' ? x.theoPhan : {}) as Obj
+    return { id: chu(x.id), luc: so(x.luc), diem: so(x.diem), theoPhan: { I: phan(tp.I), II: phan(tp.II), III: phan(tp.III) } }
+  }).filter((x) => x.id)
+  const kp = j.khacPhuc && typeof j.khacPhuc === 'object' ? (j.khacPhuc as Obj) : null
+  const khacPhuc = kp
+    ? { tong: so(kp.tong), daKhacPhuc: so(kp.daKhacPhuc), lichSu: (Array.isArray(kp.lichSu) ? kp.lichSu : []).map((x: Obj) => ({ vao: so(x.vao), khacPhucLuc: x.khacPhucLuc == null ? null : so(x.khacPhucLuc) })) }
+    : null
+  return { ok: true, du: { luot: (Array.isArray(j.luot) ? j.luot : []) as DongLuotTuLuyen[], cau: (Array.isArray(j.cau) ? j.cau : []) as DongCauTuLuyen[], luyenDe, khacPhuc } }
+}
+
+/** CHẤM TỪNG CÂU: máy chủ chấm đúng một câu của lượt đang làm, khoá câu, trả đáp án + lời giải của RIÊNG câu đó. */
+export async function chamCau(token: string, luotId: string, qid: string, traLoi: string): Promise<KetQua<KetQuaCau>> {
+  const j = await goi('cham-cau', token, { luotId, qid, traLoi }, 30)
+  if (!j || j.ok !== true || !j.ketQua || typeof j.ketQua !== 'object') return { ok: false, loi: loiCua(j) }
+  return { ok: true, du: j.ketQua as KetQuaCau }
 }
 
 /** Xem lại một lượt ĐÃ NỘP: câu công khai đã cất + kết quả đã chốt (máy chủ không chấm lại). */

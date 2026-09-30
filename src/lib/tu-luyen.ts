@@ -170,10 +170,10 @@ export function kepSoCauCheDo3(truoc: number, tongToiDa: number): number {
   if (tongToiDa <= 0) return truoc
   return Math.min(tongToiDa, Math.max(5, Math.min(truoc, 50)))
 }
-/** Chế độ 4: `min(tối đa, max(1, min(trước > 0 ? trước : 20, 50)))`; tối đa 0 ⇒ 0. */
+/** Chế độ 4: `min(tối đa, max(1, min(trước > 0 ? trước : SO_CAU_MAC_DINH, 50)))`; tối đa 0 ⇒ 0. */
 export function kepSoCauCheDo4(truoc: number, tongToiDa: number): number {
   if (tongToiDa <= 0) return 0
-  return Math.min(tongToiDa, Math.max(1, Math.min(truoc > 0 ? truoc : 20, 50)))
+  return Math.min(tongToiDa, Math.max(1, Math.min(truoc > 0 ? truoc : SO_CAU_MAC_DINH, 50)))
 }
 
 // ------------------------------------------------------------------ TỔNG HỢP ĐÁNH GIÁ
@@ -366,6 +366,69 @@ export function tongHopTuLuyen(luot: readonly DongLuotTuLuyen[], cau: readonly D
     goiY,
     ganDay,
   }
+}
+
+// ------------------------------------------------------------------ TỔNG HỢP v3: Luyện đề cấu trúc + khắc phục câu sai theo tuần
+
+/** Một đề Luyện đề cấu trúc ĐÃ NỘP (máy chủ `docLuyenDeTongHop`): lúc nộp (ms), điểm /10, số câu đúng theo phần. */
+export interface DongLuyenDeTongHop { id: string; luc: number; diem: number; theoPhan: Record<PhanCau, { soCau: number; soDung: number }> }
+export interface TongHopLuyenDe {
+  soDe: number
+  diemGanNhat: number
+  diemCaoNhat: number
+  diemTrungBinh: number
+  /** Cộng dồn mọi đề đã nộp. */
+  theoPhan: Record<PhanCau, TiLe>
+  /** Mới → cũ, tối đa 5. */
+  ganDay: DongLuyenDeTongHop[]
+}
+/** Tổng hợp Luyện đề cấu trúc (hàm thuần). Chưa nộp đề nào ⇒ null. */
+export function tongHopLuyenDe(ds: readonly DongLuyenDeTongHop[]): TongHopLuyenDe | null {
+  if (!ds.length) return null
+  const xep = [...ds].sort((a, b) => b.luc - a.luc)
+  const theoPhan: TongHopLuyenDe['theoPhan'] = { I: tiLeRong(), II: tiLeRong(), III: tiLeRong() }
+  for (const d of xep) for (const p of ['I', 'II', 'III'] as const) {
+    const t = theoPhan[p]
+    t.soCau += d.theoPhan[p]?.soCau ?? 0
+    t.soDung += d.theoPhan[p]?.soDung ?? 0
+    t.tiLe = phanTram(t.soDung, t.soCau)
+  }
+  const tron2 = (x: number) => Math.round(x * 100) / 100
+  return {
+    soDe: xep.length,
+    diemGanNhat: xep[0]!.diem,
+    diemCaoNhat: Math.max(...xep.map((d) => d.diem)),
+    diemTrungBinh: tron2(xep.reduce((n, d) => n + d.diem, 0) / xep.length),
+    theoPhan,
+    ganDay: xep.slice(0, 5),
+  }
+}
+
+/** Dữ liệu khắc phục từ máy chủ: tổng câu sai từ 29/09, số đã khắc phục, lịch sử từng câu (ms vào kho, ms khắc phục | null). */
+export interface DuKhacPhuc { tong: number; daKhacPhuc: number; lichSu: { vao: number; khacPhucLuc: number | null }[] }
+export interface TuanKhacPhuc { batDau: string; nhan: string; moi: number; khacPhuc: number; tongLuyKe: number; daKhacPhucLuyKe: number; tiLe: number | null }
+/** TỈ LỆ KHẮC PHỤC theo tuần (8 tuần gần nhất, tuần bắt đầu Thứ Hai giờ VN): lũy kế tới cuối mỗi tuần = đã khắc phục / câu sai đã vào kho. */
+export function khacPhucTheoTuan(du: DuKhacPhuc | null, now: number): TuanKhacPhuc[] {
+  const homNay = ngaySoVn(now)
+  const dauTuanNay = homNay - ((new Date(homNay * NGAY).getUTCDay() + 6) % 7)
+  const ls = du?.lichSu ?? []
+  return Array.from({ length: 8 }, (_, i) => {
+    const bd = dauTuanNay - (7 - i) * 7
+    const kt = bd + 7
+    const trong = (ms: number | null) => ms !== null && ms > 0 && ngaySoVn(ms) >= bd && ngaySoVn(ms) < kt
+    const truocHet = (ms: number | null) => ms !== null && ms > 0 && ngaySoVn(ms) < kt
+    const tongLuyKe = ls.filter((x) => truocHet(x.vao)).length
+    const daKhacPhucLuyKe = ls.filter((x) => truocHet(x.khacPhucLuc)).length
+    return {
+      batDau: String(bd),
+      nhan: ddmm(bd),
+      moi: ls.filter((x) => trong(x.vao)).length,
+      khacPhuc: ls.filter((x) => trong(x.khacPhucLuc)).length,
+      tongLuyKe,
+      daKhacPhucLuyKe,
+      tiLe: tongLuyKe ? phanTram(daKhacPhucLuyKe, tongLuyKe) : null,
+    }
+  })
 }
 
 /** Mục dạng bài trong danh mục Lớp → Bài → Dạng (máy chủ `danhMucDangBai`). */
