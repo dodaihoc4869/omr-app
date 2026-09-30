@@ -66,7 +66,7 @@ describe('thanh chọn số câu — luật kẹp của khối cũ', () => {
     expect(kepSoCauCheDo3(2, 100)).toBe(5)
     expect(kepSoCauCheDo3(80, 100)).toBe(50)
     expect(kepSoCauCheDo3(20, 3)).toBe(3)
-    expect(kepSoCauCheDo4(0, 100)).toBe(20)
+    expect(kepSoCauCheDo4(0, 100)).toBe(10) // v3: mặc định 10 câu/lượt
     expect(kepSoCauCheDo4(70, 100)).toBe(50)
     expect(kepSoCauCheDo4(20, 0)).toBe(0)
   })

@@ -25,8 +25,8 @@ export const NHAN_PHAN_TU_LUYEN: Record<PhanCau, string> = { I: 'Trắc nghiệm
 
 /** Trần số câu một lượt Tu luyện (máy chủ kẹp lại, không tin máy em). */
 export const TRAN_CAU_TU_LUYEN = 100
-/** Số câu mặc định của thanh chọn (chế độ 2, 3, 4) — đúng như khối cũ. */
-export const SO_CAU_MAC_DINH = 20
+/** Số câu mặc định của thanh chọn mọi chế độ (v3, thầy 30/09: "mặc định 10 câu/lượt"; thanh chọn vẫn kéo được). */
+export const SO_CAU_MAC_DINH = 10
 
 /** Một câu gửi xuống máy em KHI ĐANG LÀM: TUYỆT ĐỐI không có đáp án, lời giải, "em đã chọn … đáp án đúng là …". */
 export interface CauCongKhai {
@@ -46,6 +46,8 @@ export interface CauCongKhai {
   nhanLuyen?: string
   /** Chế độ 1: "Sai gốc: Ca kiểm tra Ester · 29/09" / "Sai gốc: Chiến dịch … · Đoàn Hộ Tống · 30/09 và 2 lần khác". */
   saiGoc?: string
+  /** Chế độ 1 (ôn cách quãng v3): "Còn 1 lần đúng nữa là khắc phục" khi câu đã đúng lần 1. */
+  conMotLan?: string
 }
 
 /** Phần RIÊNG của câu — chỉ nằm trên máy chủ tới lúc em nộp. */
@@ -62,9 +64,12 @@ export interface CauRieng {
   bai: string
   lop: string
   sao: 0 | 1 | 2
+  /** Câu thuộc KHO CÂU SAI (chế độ 1) ⇒ chấm xong cập nhật ôn cách quãng. `saiCuoi` = lần sai gần nhất (ms) lúc rút. */
+  khoSai?: true
+  saiCuoi?: number
 }
 
-/** Kết quả chấm một câu (trả về SAU khi nộp). */
+/** Kết quả chấm một câu (trả về SAU khi nộp, hoặc khi "Chấm từng câu"). */
 export interface KetQuaCau {
   qid: string
   phan: PhanCau
@@ -78,6 +83,8 @@ export interface KetQuaCau {
   loiGiai?: LoiGiaiCauTruc
   /** Câu vừa thuộc một ca kiểm tra đang bảo vệ ⇒ máy chủ chấm nhưng GIỮ đáp án + lời giải lại. */
   anDapAn?: true
+  /** Câu của kho câu sai: "Đúng lần 1 — hẹn gặp lại câu này sau 1 ngày" / "Đã khắc phục câu này — rời kho câu sai" / … */
+  khacPhuc?: string
 }
 
 const chuHoa = (v: unknown) => String(v ?? '').trim().toUpperCase()
@@ -163,10 +170,10 @@ export function kepSoCauCheDo3(truoc: number, tongToiDa: number): number {
   if (tongToiDa <= 0) return truoc
   return Math.min(tongToiDa, Math.max(5, Math.min(truoc, 50)))
 }
-/** Chế độ 4: `min(tối đa, max(1, min(trước > 0 ? trước : 20, 50)))`; tối đa 0 ⇒ 0. */
+/** Chế độ 4: `min(tối đa, max(1, min(trước > 0 ? trước : SO_CAU_MAC_DINH, 50)))`; tối đa 0 ⇒ 0. */
 export function kepSoCauCheDo4(truoc: number, tongToiDa: number): number {
   if (tongToiDa <= 0) return 0
-  return Math.min(tongToiDa, Math.max(1, Math.min(truoc > 0 ? truoc : 20, 50)))
+  return Math.min(tongToiDa, Math.max(1, Math.min(truoc > 0 ? truoc : SO_CAU_MAC_DINH, 50)))
 }
 
 // ------------------------------------------------------------------ TỔNG HỢP ĐÁNH GIÁ
@@ -359,6 +366,69 @@ export function tongHopTuLuyen(luot: readonly DongLuotTuLuyen[], cau: readonly D
     goiY,
     ganDay,
   }
+}
+
+// ------------------------------------------------------------------ TỔNG HỢP v3: Luyện đề cấu trúc + khắc phục câu sai theo tuần
+
+/** Một đề Luyện đề cấu trúc ĐÃ NỘP (máy chủ `docLuyenDeTongHop`): lúc nộp (ms), điểm /10, số câu đúng theo phần. */
+export interface DongLuyenDeTongHop { id: string; luc: number; diem: number; theoPhan: Record<PhanCau, { soCau: number; soDung: number }> }
+export interface TongHopLuyenDe {
+  soDe: number
+  diemGanNhat: number
+  diemCaoNhat: number
+  diemTrungBinh: number
+  /** Cộng dồn mọi đề đã nộp. */
+  theoPhan: Record<PhanCau, TiLe>
+  /** Mới → cũ, tối đa 5. */
+  ganDay: DongLuyenDeTongHop[]
+}
+/** Tổng hợp Luyện đề cấu trúc (hàm thuần). Chưa nộp đề nào ⇒ null. */
+export function tongHopLuyenDe(ds: readonly DongLuyenDeTongHop[]): TongHopLuyenDe | null {
+  if (!ds.length) return null
+  const xep = [...ds].sort((a, b) => b.luc - a.luc)
+  const theoPhan: TongHopLuyenDe['theoPhan'] = { I: tiLeRong(), II: tiLeRong(), III: tiLeRong() }
+  for (const d of xep) for (const p of ['I', 'II', 'III'] as const) {
+    const t = theoPhan[p]
+    t.soCau += d.theoPhan[p]?.soCau ?? 0
+    t.soDung += d.theoPhan[p]?.soDung ?? 0
+    t.tiLe = phanTram(t.soDung, t.soCau)
+  }
+  const tron2 = (x: number) => Math.round(x * 100) / 100
+  return {
+    soDe: xep.length,
+    diemGanNhat: xep[0]!.diem,
+    diemCaoNhat: Math.max(...xep.map((d) => d.diem)),
+    diemTrungBinh: tron2(xep.reduce((n, d) => n + d.diem, 0) / xep.length),
+    theoPhan,
+    ganDay: xep.slice(0, 5),
+  }
+}
+
+/** Dữ liệu khắc phục từ máy chủ: tổng câu sai từ 29/09, số đã khắc phục, lịch sử từng câu (ms vào kho, ms khắc phục | null). */
+export interface DuKhacPhuc { tong: number; daKhacPhuc: number; lichSu: { vao: number; khacPhucLuc: number | null }[] }
+export interface TuanKhacPhuc { batDau: string; nhan: string; moi: number; khacPhuc: number; tongLuyKe: number; daKhacPhucLuyKe: number; tiLe: number | null }
+/** TỈ LỆ KHẮC PHỤC theo tuần (8 tuần gần nhất, tuần bắt đầu Thứ Hai giờ VN): lũy kế tới cuối mỗi tuần = đã khắc phục / câu sai đã vào kho. */
+export function khacPhucTheoTuan(du: DuKhacPhuc | null, now: number): TuanKhacPhuc[] {
+  const homNay = ngaySoVn(now)
+  const dauTuanNay = homNay - ((new Date(homNay * NGAY).getUTCDay() + 6) % 7)
+  const ls = du?.lichSu ?? []
+  return Array.from({ length: 8 }, (_, i) => {
+    const bd = dauTuanNay - (7 - i) * 7
+    const kt = bd + 7
+    const trong = (ms: number | null) => ms !== null && ms > 0 && ngaySoVn(ms) >= bd && ngaySoVn(ms) < kt
+    const truocHet = (ms: number | null) => ms !== null && ms > 0 && ngaySoVn(ms) < kt
+    const tongLuyKe = ls.filter((x) => truocHet(x.vao)).length
+    const daKhacPhucLuyKe = ls.filter((x) => truocHet(x.khacPhucLuc)).length
+    return {
+      batDau: String(bd),
+      nhan: ddmm(bd),
+      moi: ls.filter((x) => trong(x.vao)).length,
+      khacPhuc: ls.filter((x) => trong(x.khacPhucLuc)).length,
+      tongLuyKe,
+      daKhacPhucLuyKe,
+      tiLe: tongLuyKe ? phanTram(daKhacPhucLuyKe, tongLuyKe) : null,
+    }
+  })
 }
 
 /** Mục dạng bài trong danh mục Lớp → Bài → Dạng (máy chủ `danhMucDangBai`). */

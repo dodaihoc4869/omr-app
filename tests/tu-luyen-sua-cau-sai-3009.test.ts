@@ -88,7 +88,7 @@ describe('Chế độ 1 — nguồn câu sai từ 29/09 (ca kiểm tra + chiến
     const d = await dung()
     const r = await tuLuyenNguon(d.env, 'HS1')
     // Câu 1 (ca + Bi-a), câu 2 (ca, + bản chép ở Đảo), II-1 (Đoàn), câu 5 (Đảo) ⇒ 4 câu; gốc ca: câu 1, câu 2 · gốc chiến dịch: II-1, câu 5.
-    expect(r.khoCauSai).toEqual({ tong: 4, tuCa: 2, tuChienDich: 2, loi: '' })
+    expect(r.khoCauSai).toMatchObject({ tong: 4, tuCa: 2, tuChienDich: 2, loi: '', tongTuMoc: 4, daKhacPhuc: 0 })
     const x = await tuLuyenXemTruoc(d.env, 'HS1', { cheDo: 1 })
     expect(x.tongToiDa).toBe(4)
   })

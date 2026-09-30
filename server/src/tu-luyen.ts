@@ -8,8 +8,12 @@
 // riêng CHẾ ĐỘ 1 đổi luật theo lệnh thầy 30/09 (tu-luyen-cau-sai.ts: kho câu sai từ 29/09 ở ca kiểm tra + chiến dịch, chọn câu chưa/ít luyện, trộn dễ/khó), gửi máy em CÂU CÔNG KHAI (không đáp án, không lời giải), cất phần riêng trong `tu_luyen_luot`,
 // và CHẤM khi em nộp bằng luật chung (`chamCauTuLuyen` → `khopPhanIII`). Sau nộp mới trả đáp án + lời giải.
 //
-// ĐỘC LẬP: chỉ đọc (hsCauSai · cauKhacPhucGoi · deTheoDangBai · danhMucDangBai — mấy lệnh ấy đã gỡ câu của ca đang bảo vệ và câu tự luận)
-// và chỉ ghi HAI bảng riêng `tu_luyen_luot` / `tu_luyen_cau`. KHÔNG EXP/vàng/mảnh, KHÔNG su_kien_hoc, KHÔNG kế hoạch ngày,
+// v3 (30/09, thầy duyệt "LÀM LUÔN"): KHO CÂU SAI CHUNG (tu-luyen-cau-sai.ts `docKhoCauSai`: ca đã công bố + chiến dịch/game + Luyện đề cấu trúc
+// + Tu luyện, từ 29/09) là nguồn của chế độ 1, 2, 4; KHÔNG chế độ nào còn "Đang khoá" vì kho trống (dự phòng 3 tầng ở chế độ 2, toàn kho ở chế độ 4);
+// "Chấm từng câu" (`cham-cau`) và ÔN CÁCH QUÃNG cho câu trong kho (bảng `tu_luyen_khac_phuc`).
+//
+// ĐỘC LẬP: chỉ đọc (su_kien_hoc · cauKhacPhucGoi · deTheoDangBai · danhMucDangBai — mấy lệnh ấy đã gỡ câu của ca đang bảo vệ và câu tự luận)
+// và chỉ ghi bảng riêng `tu_luyen_*` (lượt, câu, chấm từng câu, khắc phục). KHÔNG EXP/vàng/mảnh, KHÔNG su_kien_hoc, KHÔNG kế hoạch ngày,
 // KHÔNG qid_da_lam, KHÔNG trần game — nên không ảnh hưởng chọn câu của Đảo / Đoàn / Bi-a hay chiến dịch.
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
@@ -17,21 +21,43 @@ import { docKhoiEm } from './game-v2-bank'
 import { dbGoc } from './cau-hinh-dem'
 import { coCaDangMo } from './bi-a'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
-import { cauKhacPhucGoi, danhMucDangBai, deTheoDangBai, hsCauSai } from './goi-cu'
+import { cauKhacPhucGoi, danhMucDangBai, deTheoDangBai } from './goi-cu'
 import type { TeacherExamSource } from '../../src/data/examContent'
 import type { CauLuyen } from '../../src/lib/bai-tap-pdf'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
 import { duocChonLop, lopEmDuocChon, nguonHopKhoi } from '../../src/lib/khac-phuc-khoi'
-import { khoiCuaCau, type Khoi } from '../../src/lib/khoi-cau'
+import { khoiCuaCau, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'
 import { hopLeDeRut } from '../../src/lib/loc-cau-rut'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
-import { cauLuyenTuCauGame, chonCauSai, docKhoCauSai, docLanLuyen, nhanLanLuyen, nhanSaiGoc, qidGoc, tranSoCauCheDo1 } from './tu-luyen-cau-sai'
+import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import {
+  SQL_BANG_KHAC_PHUC,
+  capNhatKhacPhuc,
+  cauLuyenTuCauGame,
+  chonCauSai,
+  chuSauCham,
+  docKhacPhuc,
+  docKhoCauSai,
+  docLanLuyen,
+  docNoiDung,
+  lenhGhiKhacPhuc,
+  nhanConMotLan,
+  nhanLanLuyen,
+  nhanSaiGoc,
+  qidGoc,
+  saiCuoiMs,
+  tranSoCauCheDo1,
+  tron,
+  type KhoCauSai,
+  type TrangThaiKhacPhuc,
+} from './tu-luyen-cau-sai'
 import {
   phanTichTyLeDang,
   rutDsDangBai,
   rutDsThemDangCauSai,
   rutDsTuDo,
   ungVienTuDo,
+  khopBoLocTuDo,
   demCauDangBai,
   type CauSaiDauVao,
 } from '../../src/lib/thuat-toan-rut-cau-sai-loi'
@@ -73,7 +99,7 @@ export function damBaoBangTuLuyen(env: Env): Promise<void> {
   const db = dbGoc(env.DB as unknown as object) // bản session/bộ đếm bọc D1 ⇒ vẫn MỘT lần mỗi isolate
   let p = bangDaDung.get(db)
   if (!p) {
-    p = env.DB.batch(SQL_BANG_TU_LUYEN.map((s) => env.DB.prepare(s))).then(() => undefined)
+    p = env.DB.batch([...SQL_BANG_TU_LUYEN, ...SQL_BANG_KHAC_PHUC].map((s) => env.DB.prepare(s))).then(() => undefined)
     p.catch(() => bangDaDung.delete(db))
     bangDaDung.set(db, p)
   }
@@ -87,13 +113,175 @@ async function emCua(env: Env, b: Obj): Promise<string> {
 
 // ------------------------------------------------------------------ nạp nguồn (y hệt đường của máy em cũ, nhưng chạy ở máy chủ)
 
-/** Câu sai của em (hsCauSai, CHỈ ca đã công bố) đã qua cửa `hopLeDeRut` — đúng bộ lọc khối cũ áp trước khi xin kho. */
-async function cauSaiRutDuoc(env: Env, sbd: string, dsMaCa: string[] = []): Promise<{ ds: CauSaiDauVao[]; loi: string }> {
-  const res = await hsCauSai(env, { sbd, dsMaCa })
-  const items = Array.isArray(res.items) ? (res.items as CauSaiDauVao[]) : []
-  if (res.ok === false || items.length === 0) return { ds: [], loi: str(res.error) || 'Em không có câu sai nào trong lịch sử.' }
-  const ds = items.filter((c) => hopLeDeRut({ phan: c.phan, maDe: c.maCa, dapAnDung: c.dapAnDung, text: c.text, choices: c.choices || c.ideas }))
-  return { ds, loi: ds.length ? '' : 'Em không có câu sai nào rút lại được.' }
+/** Chuyên đề của từng câu (bảng `cau_hoi`; thiếu thì lấy cột chuyen_de của sổ). Cần cho `cauKhacPhucGoi` (xin kho theo chuyên đề). */
+async function docChuyenDe(env: Env, qids: string[]): Promise<Map<string, string>> {
+  const ra = new Map<string, string>()
+  if (!qids.length) return ra
+  const j = JSON.stringify(qids.slice(0, 800))
+  const r = await env.DB.prepare('SELECT qid, chuyen_de FROM cau_hoi WHERE qid IN (SELECT value FROM json_each(?))').bind(j).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  for (const x of r.results ?? []) if (str(x.chuyen_de).trim()) ra.set(str(x.qid), str(x.chuyen_de).trim())
+  if (ra.size < qids.length) {
+    const s = await env.DB.prepare("SELECT qid, MAX(chuyen_de) AS chuyen_de FROM su_kien_hoc WHERE qid IN (SELECT value FROM json_each(?)) AND COALESCE(chuyen_de, '') <> '' GROUP BY qid")
+      .bind(j).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+    for (const x of s.results ?? []) if (!ra.has(str(x.qid))) ra.set(str(x.qid), str(x.chuyen_de).trim())
+  }
+  return ra
+}
+
+/** Câu (chỉ mục game, CÓ đáp án) → đầu vào `CauSaiDauVao` của thuật toán cũ (phanTichTyLeDang / rutDsThemDangCauSai / khoTheoCauSai). */
+function cauSaiDauVaoTu(ds: readonly PrivateQuestion[], chuyenDe: Map<string, string>): CauSaiDauVao[] {
+  return ds.map((q, i) => ({
+    qid: q.qid,
+    soCau: i + 1,
+    phan: q.phan,
+    chuyenDe: chuyenDe.get(q.qid) ?? '',
+    mucDo: q.mucDo ?? undefined,
+    dapAnDung: str(q.correct),
+    text: q.text,
+    ...(q.phan === 'I' ? { choices: q.choices, choiceImgs: q.choiceImgs } : q.phan === 'II' ? { ideas: q.ideas, ideaImgs: q.ideaImgs } : {}),
+    table: q.table,
+    thanCauImg: q.thanCauImg,
+    imageDataUrl: q.imageDataUrl,
+    hinhAnh: q.hinhAnh,
+    dangMa: q.dang ?? undefined,
+    dang: q.tenDang || q.dang || undefined,
+    kienThuc: q.kienThuc,
+    maCa: q.maDe,
+  }))
+}
+
+/** Kho câu sai (kho chung) ⇒ `CauSaiDauVao` — đã qua cửa `hopLeDeRut` như khối cũ. */
+async function cauSaiTuKho(env: Env, kho: KhoCauSai): Promise<CauSaiDauVao[]> {
+  const cd = await docChuyenDe(env, kho.ds.map((c) => c.qid))
+  return cauSaiDauVaoTu(kho.ds.map((c) => c.q), cd).filter((c) => hopLeDeRut({ phan: c.phan, maDe: c.maCa, dapAnDung: c.dapAnDung, text: c.text, choices: c.choices || c.ideas }))
+}
+
+// ------------------------------------------------------------------ DỰ PHÒNG khi kho câu sai trống (thầy 30/09: "không bao giờ khoá")
+
+export type KieuNguonDang = 'cau_sai' | 'yeu' | 'chuong' | 'pho_bien'
+export const NHAN_NGUON_DANG: Record<KieuNguonDang, string> = {
+  cau_sai: 'Theo câu sai của em',
+  yeu: 'Theo dạng em còn yếu',
+  chuong: 'Theo chương đang học',
+  pho_bien: 'Theo dạng phổ biến của lớp em',
+}
+export const LOI_KHONG_LOP = 'Tài khoản của em chưa có lớp nên chưa chọn được câu để luyện. Em báo thầy thêm lớp nhé.'
+/** Số dạng tối đa mỗi tầng dự phòng, số câu đại diện tối đa mỗi dạng. */
+const SO_DANG_DU_PHONG = 5
+const SO_DAI_DIEN = 6
+const qidsTuJson = (v: unknown): string[] => {
+  try { const a = JSON.parse(str(v) || '[]'); return Array.isArray(a) ? [...new Set(a.map(str).filter(Boolean))] : [] } catch { return [] }
+}
+
+/** Tầng 1 — DẠNG EM ĐÚNG ÍT NHẤT theo hồ sơ (sổ su_kien_hoc, cả game), mỗi dạng ≥ 3 lần làm. Trả mã dạng + câu em đã làm ở dạng ấy. */
+async function dangYeuTheoHoSo(env: Env, sbd: string): Promise<{ ma: string; qids: string[] }[]> {
+  const r = await env.DB.prepare(`SELECT ma_dang, json_group_array(qid) AS qids FROM su_kien_hoc
+      WHERE sbd = ? AND COALESCE(ma_dang, '') <> '' AND ket_qua IS NOT NULL AND COALESCE(qid, '') <> ''
+      GROUP BY ma_dang HAVING COUNT(*) >= 3
+      ORDER BY (1.0 * SUM(CASE WHEN ket_qua = 1 THEN 1 ELSE 0 END) / COUNT(*)) ASC, COUNT(*) DESC LIMIT ?`).bind(sbd, SO_DANG_DU_PHONG).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  return (r.results ?? []).map((x) => ({ ma: str(x.ma_dang), qids: qidsTuJson(x.qids).slice(-SO_DAI_DIEN) }))
+}
+
+/** Tầng 2 — dạng của CHƯƠNG ĐANG HỌC: câu của chiến dịch đang chạy mới nhất có em, gom theo dạng (nhiều câu trước). */
+async function dangTheoChienDich(env: Env, sbd: string): Promise<{ ma: string; qids: string[] }[]> {
+  const cd = await env.DB.prepare("SELECT qid_json FROM chien_dich WHERE trang_thai = 'dang_chay' AND EXISTS (SELECT 1 FROM json_each(chien_dich.sbd_json) WHERE value = ?) ORDER BY tao_luc DESC LIMIT 1")
+    .bind(sbd).first<Obj>().catch(() => null)
+  const qids = cd ? qidsTuJson(cd.qid_json) : []
+  if (!qids.length) return []
+  const r = await env.DB.prepare(`SELECT dang, json_group_array(qid) AS qids FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND COALESCE(dang, '') <> ''
+      GROUP BY dang ORDER BY COUNT(*) DESC LIMIT ?`).bind(JSON.stringify(qids.slice(0, 1500)), SO_DANG_DU_PHONG).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  return (r.results ?? []).map((x) => ({ ma: str(x.dang), qids: qidsTuJson(x.qids).slice(0, SO_DAI_DIEN) }))
+}
+
+/** Tầng 3 — DẠNG PHỔ BIẾN của lớp em: dạng nhiều câu nhất trong các tờ ĐÚNG khối em (không có thì khối thấp hơn). Không rõ khối ⇒ rỗng. */
+async function dangPhoBienCuaLop(env: Env, khoiEm: Khoi | null): Promise<{ ma: string; qids: string[] }[]> {
+  if (khoiEm === null) return []
+  const r = await env.DB.prepare(`SELECT q.ma_de, q.dang, COUNT(*) AS n FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+      JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+     WHERE COALESCE(d.da_xoa, 0) = 0 AND COALESCE(q.dang, '') <> '' GROUP BY q.ma_de, q.dang`).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const dong = (r.results ?? []).map((x) => ({ maDe: str(x.ma_de), dang: str(x.dang), n: Number(x.n) || 0, k: khoiCuaMaDe(str(x.ma_de)) }))
+  const dungKhoi = dong.filter((x) => x.k === khoiEm)
+  const chon = dungKhoi.length ? dungKhoi : dong.filter((x) => x.k !== null && x.k <= khoiEm)
+  const tong = new Map<string, { n: number; maDe: Set<string> }>()
+  for (const x of chon) {
+    const t = tong.get(x.dang) ?? { n: 0, maDe: new Set<string>() }
+    t.n += x.n
+    t.maDe.add(x.maDe)
+    tong.set(x.dang, t)
+  }
+  const top = [...tong.entries()].sort((a, b) => b[1].n - a[1].n || a[0].localeCompare(b[0])).slice(0, SO_DANG_DU_PHONG)
+  const ra: { ma: string; qids: string[] }[] = []
+  for (const [ma, t] of top) {
+    const q = await env.DB.prepare('SELECT qid FROM game_v2_question WHERE dang = ? AND ma_de IN (SELECT value FROM json_each(?)) LIMIT ?')
+      .bind(ma, JSON.stringify([...t.maDe]), SO_DAI_DIEN).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+    ra.push({ ma, qids: (q.results ?? []).map((x) => str(x.qid)) })
+  }
+  return ra
+}
+
+/** Câu ĐẠI DIỆN của các dạng dự phòng ⇒ đầu vào của thuật toán cũ (mỗi dạng một nhóm câu thật, không bịa câu). */
+async function daiDienDang(env: Env, dsDang: { ma: string; qids: string[] }[]): Promise<CauSaiDauVao[]> {
+  const nd = await docNoiDung(env, [...new Set(dsDang.flatMap((d) => d.qids))])
+  const cau: PrivateQuestion[] = []
+  for (const d of dsDang) for (const qid of d.qids) {
+    const x = nd.get(qid)
+    if (x && !laCauTuLuan(x.q) && (x.q.dang ?? '') === d.ma) cau.push(x.q)
+  }
+  const cd = await docChuyenDe(env, cau.map((q) => q.qid))
+  return cauSaiDauVaoTu(cau, cd).filter((c) => c.chuyenDe && hopLeDeRut({ phan: c.phan, maDe: c.maCa, dapAnDung: c.dapAnDung, text: c.text, choices: c.choices || c.ideas }))
+}
+
+/**
+ * CHẾ ĐỘ 2 — nguồn "câu sai" cho thuật toán CŨ theo thứ tự: kho câu sai chung → dạng em còn yếu → chương đang học → dạng phổ biến của lớp.
+ * Mỗi tầng chạy ĐÚNG `phanTichTyLeDang` trên kho cùng chuyên đề; tầng nào rút được câu (tongToiDa > 0) thì dùng tầng ấy.
+ */
+async function nguonCheDo2(env: Env, sbd: string, khoiEm: Khoi | null, kho: KhoCauSai): Promise<{ kieu: KieuNguonDang; dsCauSai: CauSaiDauVao[]; khoDe: TeacherExamSource[] } | { loi: string }> {
+  let loi = ''
+  const tang: [KieuNguonDang, () => Promise<CauSaiDauVao[]>][] = [
+    ['cau_sai', () => (kho.ds.length ? cauSaiTuKho(env, kho) : Promise.resolve([]))],
+    ['yeu', async () => daiDienDang(env, await dangYeuTheoHoSo(env, sbd))],
+    ['chuong', async () => daiDienDang(env, await dangTheoChienDich(env, sbd))],
+    ['pho_bien', async () => daiDienDang(env, await dangPhoBienCuaLop(env, khoiEm))],
+  ]
+  for (const [kieu, lay] of tang) {
+    const dsCauSai = await lay()
+    if (!dsCauSai.length) continue
+    const k = await khoTheoCauSai(env, sbd, dsCauSai, khoiEm)
+    if (!k.kho.length) { loi = loi || k.loi; continue }
+    if (phanTichTyLeDang(dsCauSai, k.kho).tongToiDa > 0) return { kieu, dsCauSai, khoDe: k.kho }
+  }
+  return { loi: khoiEm === null ? LOI_KHONG_LOP : loi || 'Kho đề chưa có câu nào hợp với em. Em thử chế độ Dạng bài nhé.' }
+}
+
+/**
+ * CHẾ ĐỘ 4 dự phòng — TOÀN KHO theo lớp ≤ khối em (giữ bộ lọc sao / lý thuyết–bài tập / ngẫu nhiên của `khopBoLocTuDo`, bỏ tự luận,
+ * bỏ câu đang bảo vệ, khử trùng nhóm nội dung). Đọc một mẫu NGẪU NHIÊN của chỉ mục (không tải cả kho).
+ */
+const MAU_TOAN_KHO = 400
+async function ungVienToanKho(env: Env, khoiEm: Khoi | null, loc: ReadonlySet<string>): Promise<{ ds: CauLuyen[]; dang: Map<string, { ma: string; ten: string }>; loi: string }> {
+  const dang = new Map<string, { ma: string; ten: string }>()
+  if (khoiEm === null) return { ds: [], dang, loi: LOI_KHONG_LOP }
+  const baoVe = await docBaoVeKho(env)
+  if (!baoVe) return { ds: [], dang, loi: LOI_CHUA_KIEM_BAO_VE }
+  const r = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+      JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+     WHERE COALESCE(d.da_xoa, 0) = 0 ORDER BY RANDOM() LIMIT ?`).bind(MAU_TOAN_KHO).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const nhom = new Set<string>()
+  const ds: CauLuyen[] = []
+  for (const x of r.results ?? []) {
+    let q: PrivateQuestion
+    try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
+    const k = khoiCuaCau({ qid: q.qid, maDe: q.maDe })
+    const g = str(x.content_group)
+    if ((k !== null && k > khoiEm) || laCauTuLuan(q) || baoVe.has(q.qid) || (g && baoVe.has(g)) || (g && nhom.has(g))) continue
+    if (!hopLeDeRut({ phan: q.phan, maDe: q.maDe, dapAnDung: q.correct, text: q.text, choices: q.phan === 'II' ? q.ideas : q.choices })) continue
+    const c = cauLuyenTuCauGame(q)
+    if (!khopBoLocTuDo(loc, c)) continue
+    if (g) nhom.add(g)
+    ds.push(c)
+    dang.set(c.id, { ma: str(q.dang), ten: str(q.tenDang) })
+  }
+  return { ds, dang, loi: ds.length ? '' : 'Không tìm thấy câu hợp với lựa chọn của em.' }
 }
 
 /** Kho câu cùng chuyên đề/dạng với câu sai — `napKhoChoMayEm` chuyển sang máy chủ (gọi thẳng `cauKhacPhucGoi`). */
@@ -180,34 +368,51 @@ function nhanDangKho(kho: TeacherExamSource[]): Map<string, { ma: string; ten: s
 
 // ------------------------------------------------------------------ /hs/tu-luyen/nguon — thứ em cần để chọn chế độ (KHÔNG đáp án)
 
+/** Dạng nên luyện (cho nút gợi ý ở trạng thái chúc mừng của chế độ 1): dạng em còn yếu, không có thì dạng của chương đang học. */
+async function dangNenLuyen(env: Env, ds: readonly { ma: string }[]): Promise<{ ma: string; ten: string } | null> {
+  const d = ds[0]
+  if (!d) return null
+  const r = await env.DB.prepare("SELECT json_extract(json, '$.tenDang') AS ten FROM game_v2_question WHERE dang = ? AND COALESCE(json_extract(json, '$.tenDang'), '') <> '' LIMIT 1")
+    .bind(d.ma).first<Obj>().catch(() => null)
+  return { ma: d.ma, ten: str(r?.ten) || d.ma }
+}
+
 export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
-  // MỌI lượt đọc chạy SONG SONG (quét tối ưu 30/09: trước đây khối em → [câu sai ‖ danh mục ‖ kho] → ca đang mở = 5 đợt nối tiếp ≈ 1,5–2 s trên D1 thật;
-  // nay 2–3 đợt). Danh mục chỉ cần khối em ở bước LỌC cuối (lopEmDuocChon) nên đọc thô trước, lọc sau — kết quả y hệt.
-  const [khoiEm, cs, dmTho, kcs, dangThi] = await Promise.all([
+  // MỌI lượt đọc chạy SONG SONG (quét tối ưu 30/09): khối em ‖ danh mục thô ‖ kho câu sai chung ‖ ca đang mở; danh mục lọc theo khối ở bước cuối.
+  // Hai tầng dự phòng đầu (dạng yếu, chương đang học) đọc CÙNG đợt để thẻ ghi đúng nguồn mà không thêm đợt D1.
+  const [khoiEm, dmTho, kcs, dangThi, yeu, chuong] = await Promise.all([
     docKhoiEm(env, sbd).catch(() => null),
-    cauSaiRutDuoc(env, sbd),
     danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj),
-    docKhoCauSai(env, sbd).catch((e) => ({ ds: [], tuCa: 0, tuChienDich: 0, loi: e instanceof Error ? 'Chưa đọc được kho câu sai. Em thử lại sau.' : '' })),
+    docKhoCauSai(env, sbd).catch((e): KhoCauSai => ({ ds: [], tuCa: 0, tuChienDich: 0, tuLuyenDe: 0, tuTuLuyen: 0, tong: 0, daKhacPhuc: 0, lichSu: [], loi: e instanceof Error ? 'Chưa đọc được kho câu sai. Em thử lại sau.' : '' })),
     coCaDangMo(env, sbd, Date.now()).catch(() => false),
+    dangYeuTheoHoSo(env, sbd).catch(() => []),
+    dangTheoChienDich(env, sbd).catch(() => []),
   ])
   const dm = locDanhMuc(dmTho, khoiEm)
-  const theoCa = new Map<string, { maCa: string; tenCa: string; soCauSai: number }>()
-  for (const c of cs.ds) {
-    const ma = c.maCa || 'mac_dinh'
-    const x = theoCa.get(ma)
-    if (x) x.soCauSai++
-    else theoCa.set(ma, { maCa: ma, tenCa: c.tenCa || (c.maCa ? `Ca kiểm tra ${c.maCa}` : 'Ca kiểm tra'), soCauSai: 1 })
-  }
+  const kieu2: KieuNguonDang | null = kcs.ds.length ? 'cau_sai' : yeu.length ? 'yeu' : chuong.length ? 'chuong' : khoiEm === null ? null : 'pho_bien'
+  const nenLuyen = kcs.ds.length ? null : await dangNenLuyen(env, [...yeu, ...chuong]).catch(() => null)
+  const now = Date.now()
   return {
     ok: true,
     khoi: khoiEm,
-    cacCa: [...theoCa.values()],
-    soCauSai: cs.ds.length,
-    loiCauSai: cs.loi,
+    // Trường cũ (máy em bản trước): nay tính từ KHO CÂU SAI CHUNG, không còn tick theo ca.
+    cacCa: [],
+    soCauSai: kcs.ds.length,
+    loiCauSai: kcs.loi,
     danhMuc: dm.lops,
     loiDanhMuc: dm.loi,
-    // Chế độ 1 (luật 30/09): kho câu sai từ mốc 29/09 — ca kiểm tra + chiến dịch, đã khử trùng (tu-luyen-cau-sai.ts).
-    khoCauSai: { tong: kcs.ds.length, tuCa: kcs.tuCa, tuChienDich: kcs.tuChienDich, loi: kcs.loi },
+    // KHO CÂU SAI CHUNG từ 29/09 (chế độ 1, 2, 4): còn trong kho + bộ đếm khắc phục.
+    khoCauSai: {
+      tong: kcs.ds.length, tuCa: kcs.tuCa, tuChienDich: kcs.tuChienDich, tuLuyenDe: kcs.tuLuyenDe, tuTuLuyen: kcs.tuTuLuyen, loi: kcs.loi,
+      tongTuMoc: kcs.tong, daKhacPhuc: kcs.daKhacPhuc,
+      toiHan: kcs.ds.filter((c) => c.khacPhuc?.soDungLien === 1 && (c.khacPhuc.henLai ?? 0) <= now).length,
+      choHen: kcs.ds.filter((c) => c.khacPhuc?.soDungLien === 1 && (c.khacPhuc.henLai ?? 0) > now).length,
+    },
+    // Chế độ 2: nguồn dạng đang dùng (thẻ ghi rõ). null ⇒ thật sự không thể (tài khoản chưa có lớp).
+    dangCauSai: kieu2 ? { kieu: kieu2, nhan: NHAN_NGUON_DANG[kieu2] } : { kieu: '', nhan: '', loi: LOI_KHONG_LOP },
+    // Chế độ 4: kho trống ⇒ rút từ toàn kho lớp ≤ khối em; không rõ khối ⇒ khoá có lý do.
+    tuDo: kcs.ds.length ? { kieu: 'cau_sai', nhan: 'Theo câu sai của em' } : khoiEm !== null ? { kieu: 'toan_kho', nhan: `Toàn kho lớp ${khoiEm} trở xuống` } : { kieu: '', nhan: '', loi: LOI_KHONG_LOP },
+    dangNenLuyen: nenLuyen,
     dangThi,
   }
 }
@@ -222,8 +427,10 @@ interface KetQuaRutTho {
   loi: string
   /** Chế độ 2: thống kê theo dạng câu sai (để màn chọn nói rõ). */
   thongKe?: { tenDang: string; soCauSai: number; soUngVien: number }[]
-  /** Chế độ 1: nhãn từng câu (theo mã câu trong lượt) — "Luyện lại lần K" + "Sai gốc: …". */
-  nhan?: Map<string, { nhanLuyen: string; saiGoc: string }>
+  /** Chế độ 1: nhãn từng câu (theo mã câu trong lượt) — "Luyện lại lần K" + "Sai gốc: …" (+ "Còn 1 lần đúng nữa là khắc phục"). */
+  nhan?: Map<string, { nhanLuyen: string; saiGoc: string; conMotLan: string; saiCuoi: number }>
+  /** Chế độ 2: nguồn dạng đang dùng (câu sai / dạng còn yếu / chương đang học / dạng phổ biến). Chế độ 4: nguồn câu. */
+  nguonDang?: { kieu: string; nhan: string }
 }
 
 /** Chạy ĐÚNG thuật toán của chế độ. `rut = false` ⇒ chỉ đếm (xem trước), không rút. */
@@ -235,7 +442,8 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
   const lopCua = (c: CauLuyen) => { const k = khoiCuaCau({ qid: c.id, maDe: c.maDe }); return k ? String(k) : '' }
 
   if (t.cheDo === 1) {
-    // LUẬT 30/09 (thầy): cộng dồn câu sai từ 29/09 ở mọi ca kiểm tra + chiến dịch; chọn câu chưa/ít luyện trước; thiếu thì lặp; trộn dễ/khó.
+    // LUẬT 30/09 + v3: KHO CÂU SAI CHUNG từ 29/09 (ca đã công bố + chiến dịch/game + Luyện đề + Tu luyện); ưu tiên câu TỚI HẠN hẹn lại →
+    // chưa luyện → luyện ít → lâu; câu đang chờ hẹn chỉ lấy khi kho cạn; thiếu thì lặp; trộn dễ/khó.
     const lanP = rut ? docLanLuyen(env, sbd) : null
     lanP?.catch(() => undefined) // lỗi đọc ⇒ ném đúng chỗ `await` dưới như cũ, không thành lỗi "chưa bắt"
     const kho = await docKhoCauSai(env, sbd)
@@ -243,12 +451,20 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
     if (!rut || !lanP) return { dsCau: [], tongToiDa: kho.ds.length, tieuDe: '', meta, loi: '' }
     const lan = await lanP
     const theo = new Map(kho.ds.map((c) => [c.qid, c]))
+    const now = Date.now()
     const chon = chonCauSai(
-      kho.ds.map((c) => ({ qid: c.qid, kho: c.kho, soLanLuyen: lan.get(c.qid)?.n ?? 0, lanCuoi: lan.get(c.qid)?.cuoi ?? 0 })),
+      kho.ds.map((c) => {
+        const kp = c.khacPhuc
+        const cho = !!kp && kp.soDungLien === 1 && !kp.daKhacPhucLuc
+        return {
+          qid: c.qid, kho: c.kho, soLanLuyen: lan.get(c.qid)?.n ?? 0, lanCuoi: lan.get(c.qid)?.cuoi ?? 0,
+          toiHan: cho && (kp!.henLai ?? 0) <= now, choHen: cho && (kp!.henLai ?? 0) > now,
+        }
+      }),
       Math.min(t.soCau, tranSoCauCheDo1(kho.ds.length, TRAN_CAU_TU_LUYEN)),
       Math.random,
     )
-    const nhan = new Map<string, { nhanLuyen: string; saiGoc: string }>()
+    const nhan = new Map<string, { nhanLuyen: string; saiGoc: string; conMotLan: string; saiCuoi: number }>()
     const dsCau: CauLuyen[] = []
     for (const x of chon) {
       const c = theo.get(x.qid)!
@@ -256,27 +472,20 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
       const cl = { ...cauLuyenTuCauGame(c.q), id }
       dsCau.push(cl)
       meta.set(id, { dangMa: str(c.q.dang), dangTen: str(c.q.tenDang), bai: '', lop: lopCua({ ...cl, id: c.qid }) })
-      nhan.set(id, { nhanLuyen: nhanLanLuyen(x.soLanLuyen + 1 + x.lap), saiGoc: nhanSaiGoc(c.lanSai) })
+      nhan.set(id, { nhanLuyen: nhanLanLuyen(x.soLanLuyen + 1 + x.lap), saiGoc: nhanSaiGoc(c.lanSai), conMotLan: nhanConMotLan(c.khacPhuc), saiCuoi: saiCuoiMs(c.lanSai) })
     }
     return { dsCau, tongToiDa: kho.ds.length, tieuDe: `Sửa câu sai · ${dsCau.length} câu`, meta, loi: '', nhan }
   }
 
   if (t.cheDo === 2 || t.cheDo === 4) {
-    const [csTatCa, khoiEm] = await Promise.all([cauSaiRutDuoc(env, sbd), khoiP])
-    if (csTatCa.ds.length === 0) return rong(csTatCa.loi)
-    const { kho, loi } = await khoTheoCauSai(env, sbd, csTatCa.ds, khoiEm)
-    if (kho.length === 0) return rong(loi)
-    const nhan = nhanDangKho(kho)
-    const ganMeta = (c: CauLuyen) => {
-      const n = nhan.get(`${c.maDe}|${c.id}`)
-      meta.set(c.id, { dangMa: n?.ma || str(c.chuaCho?.maDang), dangTen: n?.ten || str(c.chuaCho?.tenDang), bai: '', lop: lopCua(c) })
-    }
+    const [khoSai, khoiEm] = await Promise.all([docKhoCauSai(env, sbd), khoiP])
     if (t.cheDo === 2) {
-      // Chế độ 2 lọc câu sai theo CA em tick (mặc định mọi ca) — đúng như khối cũ.
-      const chon = new Set(t.dsMaCa)
-      const dsCauSai = chon.size ? csTatCa.ds.filter((c) => chon.has(c.maCa || 'mac_dinh')) : csTatCa.ds
-      if (dsCauSai.length === 0) return rong('Em tick chọn ít nhất một ca kiểm tra có câu sai.')
-      const pt = phanTichTyLeDang(dsCauSai, kho)
+      // Chế độ 2 GIỮ thuật toán cũ (phanTichTyLeDang → rutDsThemDangCauSai), chỉ đổi NGUỒN: kho câu sai chung; kho trống ⇒ dự phòng 3 tầng.
+      const ng = await nguonCheDo2(env, sbd, khoiEm, khoSai)
+      if ('loi' in ng) return rong(ng.loi)
+      const nguonDang = { kieu: ng.kieu, nhan: NHAN_NGUON_DANG[ng.kieu] }
+      const nhan = nhanDangKho(ng.khoDe)
+      const pt = phanTichTyLeDang(ng.dsCauSai, ng.khoDe)
       const gom = new Map<string, { tenDang: string; soCauSai: number; soUngVien: number }>()
       for (const x of pt.thongKe) {
         const g = gom.get(x.nhanDan) ?? { tenDang: x.tenDang, soCauSai: 0, soUngVien: 0 }
@@ -285,17 +494,40 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
         gom.set(x.nhanDan, g)
       }
       const thongKe = [...gom.values()].sort((a, b) => b.soCauSai - a.soCauSai)
-      if (!rut) return { dsCau: [], tongToiDa: pt.tongToiDa, tieuDe: '', meta, loi: '', thongKe }
-      const { dsCau, tongToiDa } = rutDsThemDangCauSai(dsCauSai, kho, t.soCau)
-      dsCau.forEach(ganMeta)
-      return { dsCau, tongToiDa, tieuDe: `Dạng câu sai · ${dsCau.length} câu cùng dạng`, meta, loi: dsCau.length ? '' : 'Kho đề chưa có câu nào cùng dạng câu sai của em.', thongKe }
+      if (!rut) return { dsCau: [], tongToiDa: pt.tongToiDa, tieuDe: '', meta, loi: '', thongKe, nguonDang }
+      const { dsCau, tongToiDa } = rutDsThemDangCauSai(ng.dsCauSai, ng.khoDe, t.soCau)
+      for (const c of dsCau) {
+        const n = nhan.get(`${c.maDe}|${c.id}`)
+        meta.set(c.id, { dangMa: n?.ma || str(c.chuaCho?.maDang), dangTen: n?.ten || str(c.chuaCho?.tenDang), bai: '', lop: lopCua(c) })
+      }
+      const tieuDe = ng.kieu === 'cau_sai' ? `Dạng câu sai · ${dsCau.length} câu cùng dạng` : `Dạng câu sai · ${NHAN_NGUON_DANG[ng.kieu].toLowerCase()} · ${dsCau.length} câu`
+      return { dsCau, tongToiDa, tieuDe, meta, loi: dsCau.length ? '' : 'Kho đề chưa có câu nào cùng dạng câu sai của em.', thongKe, nguonDang }
     }
+    // Chế độ 4 — bộ lọc cũ (sao / lý thuyết–bài tập / ngẫu nhiên) trên kho cùng chuyên đề với KHO CÂU SAI CHUNG; kho trống ⇒ TOÀN KHO lớp ≤ khối em.
     const loc = new Set(t.mucDo.length ? t.mucDo : ['ngau_nhien'])
-    if (!rut) return { dsCau: [], tongToiDa: ungVienTuDo(kho, loc).length, tieuDe: '', meta, loi: '' }
-    const { dsCau, tong } = rutDsTuDo(kho, loc, t.soCau)
-    dsCau.forEach(ganMeta)
     const nhanLoc = loc.has('ngau_nhien') ? ['Ngẫu nhiên'] : [loc.has('sao_2') && '2 sao', loc.has('sao_1') && '1 sao', loc.has('ly_thuyet') && 'Lý thuyết', loc.has('bai_tap') && 'Bài tập'].filter(Boolean)
-    return { dsCau, tongToiDa: tong, tieuDe: `Tự do · ${nhanLoc.join(' + ')}`, meta, loi: dsCau.length ? '' : 'Không tìm thấy câu hợp với lựa chọn của em.' }
+    if (khoSai.ds.length) {
+      const dsCauSai = await cauSaiTuKho(env, khoSai)
+      const { kho } = dsCauSai.length ? await khoTheoCauSai(env, sbd, dsCauSai, khoiEm) : { kho: [] as TeacherExamSource[] }
+      if (kho.length && ungVienTuDo(kho, loc).length) {
+        const nguonDang = { kieu: 'cau_sai', nhan: 'Theo câu sai của em' }
+        if (!rut) return { dsCau: [], tongToiDa: ungVienTuDo(kho, loc).length, tieuDe: '', meta, loi: '', nguonDang }
+        const nhan = nhanDangKho(kho)
+        const { dsCau, tong } = rutDsTuDo(kho, loc, t.soCau)
+        for (const c of dsCau) {
+          const n = nhan.get(`${c.maDe}|${c.id}`)
+          meta.set(c.id, { dangMa: n?.ma || str(c.chuaCho?.maDang), dangTen: n?.ten || str(c.chuaCho?.tenDang), bai: '', lop: lopCua(c) })
+        }
+        return { dsCau, tongToiDa: tong, tieuDe: `Tự do · ${nhanLoc.join(' + ')}`, meta, loi: dsCau.length ? '' : 'Không tìm thấy câu hợp với lựa chọn của em.', nguonDang }
+      }
+    }
+    const tk = await ungVienToanKho(env, khoiEm, loc)
+    const nguonDang = { kieu: 'toan_kho', nhan: khoiEm !== null ? `Toàn kho lớp ${khoiEm} trở xuống` : '' }
+    if (!tk.ds.length) return { ...rong(tk.loi), nguonDang }
+    if (!rut) return { dsCau: [], tongToiDa: tk.ds.length, tieuDe: '', meta, loi: '', nguonDang }
+    const dsCau = tron(tk.ds, Math.random).slice(0, Math.min(t.soCau, tk.ds.length))
+    for (const c of dsCau) meta.set(c.id, { dangMa: tk.dang.get(c.id)?.ma ?? '', dangTen: tk.dang.get(c.id)?.ten ?? '', bai: '', lop: lopCua(c) })
+    return { dsCau, tongToiDa: tk.ds.length, tieuDe: `Tự do · ${nhanLoc.join(' + ')} · toàn kho`, meta, loi: '', nguonDang }
   }
 
   // Chế độ 3: Dạng bài — chỉ mã trong danh mục CỦA EM (không vượt khối).
@@ -322,8 +554,9 @@ export async function tuLuyenXemTruoc(env: Env, sbd: string, b: Obj): Promise<Ob
   const t = docThamSo(b)
   if (!t) return { ok: false, error: 'Chế độ luyện không hợp lệ.' }
   const r = await chayCheDo(env, sbd, t, false)
-  if (r.loi && r.tongToiDa === 0) return { ok: true, tongToiDa: 0, loi: r.loi, ...(r.thongKe ? { thongKe: r.thongKe } : {}) }
-  return { ok: true, tongToiDa: r.tongToiDa, ...(r.thongKe ? { thongKe: r.thongKe } : {}) }
+  const them = { ...(r.thongKe ? { thongKe: r.thongKe } : {}), ...(r.nguonDang ? { nguonDang: r.nguonDang } : {}) }
+  if (r.loi && r.tongToiDa === 0) return { ok: true, tongToiDa: 0, loi: r.loi, ...them }
+  return { ok: true, tongToiDa: r.tongToiDa, ...them }
 }
 
 /** Bản câu công khai cất để XEM LẠI lượt cũ. Dòng D1 ≤ 2 MB ⇒ quá 1,5 triệu ký tự thì bỏ ẢNH nhúng data: (chữ đề vẫn đủ). */
@@ -365,10 +598,11 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
     daCo.add(c.id)
     const m = r.meta.get(c.id) ?? { dangMa: '', dangTen: '', bai: '', lop: '' }
     const nh = r.nhan?.get(c.id)
-    congKhai.push({ ...cauCongKhaiTu(c, m.dangTen), ...(nh ? { nhanLuyen: nh.nhanLuyen, saiGoc: nh.saiGoc } : {}) })
+    congKhai.push({ ...cauCongKhaiTu(c, m.dangTen), ...(nh ? { nhanLuyen: nh.nhanLuyen, saiGoc: nh.saiGoc, ...(nh.conMotLan ? { conMotLan: nh.conMotLan } : {}) } : {}) })
     rieng.push({
       qid: c.id, phan: c.phan, dapAn: c.dapAn, chot: c.chot, lyDo: c.lyDo, buoc: c.buoc, ketQua: c.ketQua,
       dangMa: m.dangMa, dangTen: m.dangTen, bai: m.bai, lop: m.lop, sao: c.sao === 2 || c.sao === 1 ? c.sao : 0,
+      ...(nh ? { khoSai: true as const, saiCuoi: nh.saiCuoi } : {}),
     })
   }
   const id = maLuot()
@@ -382,7 +616,7 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
     if (/no such table/i.test(String(e))) return { ok: false, error: LOI_CHUA_BAT }
     throw e
   }
-  return { ok: true, luotId: id, cheDo: t.cheDo, tieuDe, taoLuc: nay, tongToiDa: r.tongToiDa, cau: congKhai }
+  return { ok: true, luotId: id, cheDo: t.cheDo, tieuDe, taoLuc: nay, tongToiDa: r.tongToiDa, cau: congKhai, ...(r.nguonDang ? { nguonDang: r.nguonDang } : {}) }
 }
 
 // ------------------------------------------------------------------ nộp: CHẤM ở máy chủ, rồi mới trả đáp án + lời giải
@@ -420,16 +654,32 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
     const r = await env.DB.prepare('SELECT qid, tra_loi, dung, diem FROM tu_luyen_cau WHERE luot_id = ?').bind(luotId).all<Obj>()
     daChot = new Map((r.results ?? []).map((x) => [str(x.qid), { traLoi: str(x.tra_loi), dung: Number(x.dung) === 1, diem: Number(x.diem) || 0 }]))
   }
+  // "Chấm từng câu": câu đã chấm trong lượt là KHOÁ — lúc nộp dùng đúng câu trả lời + kết quả đã chấm (máy em gửi khác cũng không đổi).
+  const daChamCau = daNop ? new Map<string, { traLoi: string; dung: boolean; diem: number }>() : await docChamCau(env, luotId)
+  const khacPhuc = !daNop && rieng.some((c) => c.khoSai) ? await docKhacPhuc(env, sbd) : new Map<string, TrangThaiKhacPhuc>()
   const nay = daNop ? Number(dong.nop_luc) || Date.now() : Date.now()
   const giay = daNop ? Number(dong.giay) || 0 : Math.max(0, Math.min(6 * 3600, Math.round(Number(b.giay) || 0)))
   const ketQua: KetQuaCau[] = []
   const ghi = []
   let soDung = 0, tongDiem = 0
   for (const c of rieng) {
-    const traLoi = daNop ? daChot.get(c.qid)?.traLoi ?? '' : str(traLoiVao[c.qid]).slice(0, 40)
+    const daCham = daChamCau.get(c.qid)
+    const traLoi = daNop ? daChot.get(c.qid)?.traLoi ?? '' : daCham ? daCham.traLoi : str(traLoiVao[c.qid]).slice(0, 40)
     const cham = chamCauTuLuyen(c.phan, c.dapAn, traLoi)
-    const dung = daNop ? daChot.get(c.qid)?.dung ?? cham.dung : cham.dung
-    const diem = daNop ? daChot.get(c.qid)?.diem ?? cham.diem : cham.diem
+    const dung = daNop ? daChot.get(c.qid)?.dung ?? cham.dung : daCham ? daCham.dung : cham.dung
+    const diem = daNop ? daChot.get(c.qid)?.diem ?? cham.diem : daCham ? daCham.diem : cham.diem
+    // ÔN CÁCH QUÃNG: câu của kho câu sai chưa chấm từng câu ⇒ cập nhật trạng thái ngay trong batch nộp (câu đã chấm từng câu đã cập nhật lúc chấm).
+    let chuKhacPhuc = ''
+    if (!daNop && c.khoSai) {
+      const goc = qidGoc(c.qid)
+      if (!daCham) {
+        const moi = capNhatKhacPhuc(khacPhuc.get(goc), dung, nay, Number(c.saiCuoi) || 0)
+        khacPhuc.set(goc, moi)
+        ghi.push(lenhGhiKhacPhuc(env, sbd, goc, moi))
+      }
+      const tt = khacPhuc.get(goc)
+      if (tt) chuKhacPhuc = chuSauCham(tt, dung)
+    }
     if (dung) soDung++
     tongDiem += diem
     const an = !!baoVe && baoVe.has(qidGoc(c.qid))
@@ -438,6 +688,7 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
       dapAn: an ? '' : c.dapAn,
       ...(c.phan === 'II' ? { yDung: cham.yDung } : {}),
       ...(an ? { anDapAn: true as const } : { loiGiai: loiGiaiTuCauRieng(c) }),
+      ...(chuKhacPhuc ? { khacPhuc: chuKhacPhuc } : {}),
     })
     if (!daNop) {
       ghi.push(env.DB.prepare(
@@ -469,6 +720,61 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
   }
 }
 
+/** Câu đã "chấm từng câu" trong một lượt (bảng chưa có ⇒ rỗng). */
+async function docChamCau(env: Env, luotId: string): Promise<Map<string, { traLoi: string; dung: boolean; diem: number }>> {
+  const r = await env.DB.prepare('SELECT qid, tra_loi, dung, diem FROM tu_luyen_cham_cau WHERE luot_id = ?').bind(luotId).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  return new Map((r.results ?? []).map((x) => [str(x.qid), { traLoi: str(x.tra_loi), dung: Number(x.dung) === 1, diem: Number(x.diem) || 0 }]))
+}
+
+/**
+ * CHẤM TỪNG CÂU (v3): em bấm "Kiểm tra" một câu ⇒ máy chủ chấm ĐÚNG câu ấy của lượt ĐANG LÀM (của chính em), KHOÁ câu (ghi `tu_luyen_cham_cau`,
+ * chấm lại / gửi đáp án khác ⇒ trả đúng kết quả đã khoá), trả đáp án + lời giải của RIÊNG câu đó. Câu chưa chấm không lộ gì.
+ * Câu của kho câu sai ⇒ cập nhật ôn cách quãng ngay.
+ */
+export async function tuLuyenChamCau(env: Env, sbd: string, b: Obj): Promise<Obj> {
+  const luotId = str(b.luotId).trim()
+  const qid = str(b.qid).trim()
+  if (!/^tl_[a-z0-9]{6,20}$/.test(luotId) || !qid) return { ok: false, error: 'Không tìm thấy câu này trong lượt của em.' }
+  const dong = await env.DB.prepare('SELECT trang_thai, de_rieng_json FROM tu_luyen_luot WHERE id = ? AND sbd = ?').bind(luotId, sbd).first<Obj>().catch(() => null)
+  if (!dong) return { ok: false, error: 'Không tìm thấy lượt luyện này.' }
+  if (str(dong.trang_thai) !== 'dang_lam') return { ok: false, error: 'Lượt này đã nộp rồi. Em xem kết quả ở màn kết quả nhé.' }
+  const c = docRieng(dong.de_rieng_json).find((x) => x.qid === qid)
+  if (!c) return { ok: false, error: 'Không tìm thấy câu này trong lượt của em.' }
+  const nay = Date.now()
+  let chot = (await docChamCau(env, luotId)).get(qid)
+  let khoaMoi = false
+  if (!chot) {
+    const traLoi = str(b.traLoi).slice(0, 40)
+    if (!traLoi.replace(/-/g, '').trim()) return { ok: false, error: 'Em chọn đáp án rồi mới bấm Kiểm tra nhé.' }
+    const cham = chamCauTuLuyen(c.phan, c.dapAn, traLoi)
+    const r = await env.DB.prepare('INSERT OR IGNORE INTO tu_luyen_cham_cau (luot_id, sbd, qid, tra_loi, dung, diem, luc) VALUES (?,?,?,?,?,?,?)')
+      .bind(luotId, sbd, qid, traLoi, cham.dung ? 1 : 0, cham.diem, nay).run()
+    khoaMoi = Number(r.meta?.changes ?? 0) > 0
+    chot = khoaMoi ? { traLoi, dung: cham.dung, diem: cham.diem } : (await docChamCau(env, luotId)).get(qid)
+    if (!chot) return { ok: false, error: 'Chưa chấm được câu này. Em thử lại.' }
+  }
+  let chuKhacPhuc = ''
+  if (c.khoSai) {
+    const goc = qidGoc(qid)
+    const cu = (await docKhacPhuc(env, sbd)).get(goc)
+    // Chỉ lần chấm ĐẦU ghi trạng thái; bấm lại chỉ đọc (không cộng hai lần).
+    const tt = khoaMoi ? capNhatKhacPhuc(cu, chot.dung, nay, Number(c.saiCuoi) || 0) : cu
+    if (khoaMoi && tt) await lenhGhiKhacPhuc(env, sbd, goc, tt).run()
+    if (tt) chuKhacPhuc = chuSauCham(tt, chot.dung)
+  }
+  const baoVe = await docBaoVeKho(env)
+  const an = !baoVe || baoVe.has(qidGoc(qid))
+  const cham = chamCauTuLuyen(c.phan, c.dapAn, chot.traLoi)
+  const ketQua: KetQuaCau = {
+    qid, phan: c.phan, dung: chot.dung, diem: chot.diem, traLoi: chot.traLoi,
+    dapAn: an ? '' : c.dapAn,
+    ...(c.phan === 'II' ? { yDung: cham.yDung } : {}),
+    ...(an ? { anDapAn: true as const } : { loiGiai: loiGiaiTuCauRieng(c) }),
+    ...(chuKhacPhuc ? { khacPhuc: chuKhacPhuc } : {}),
+  }
+  return { ok: true, khoa: true, ketQua }
+}
+
 /** XEM LẠI một lượt ĐÃ NỘP (bấm trong "Lượt gần đây"): câu công khai đã cất + kết quả đã chốt (đi đúng nhánh "đã nộp" của `tuLuyenNop`,
  * không chấm lại, không ghi gì). Lượt chưa nộp ⇒ từ chối (không trả đáp án khi em chưa nộp). */
 export async function tuLuyenXemLuot(env: Env, sbd: string, b: Obj): Promise<Obj> {
@@ -495,8 +801,11 @@ export async function tuLuyenTongHop(env: Env, sbd: string): Promise<Obj> {
       env.DB.prepare(`SELECT luot_id, che_do, nop_luc, qid, phan, dung, dang_ma, dang_ten, bai, lop, sao, giay FROM tu_luyen_cau
         WHERE sbd = ? ORDER BY nop_luc DESC LIMIT 6000`).bind(sbd).all<Obj>(),
     ])
+    const [luyenDe, kho] = await Promise.all([docLuyenDeTongHop(env, sbd), docKhoCauSai(env, sbd).catch(() => null)])
     return {
       ok: true,
+      luyenDe,
+      khacPhuc: kho ? { tong: kho.tong, daKhacPhuc: kho.daKhacPhuc, lichSu: kho.lichSu.map((x) => ({ vao: x.vao, khacPhucLuc: x.khacPhucLuc })) } : null,
       luot: (l.results ?? []).map((x) => ({ id: str(x.id), cheDo: Number(x.che_do), tieuDe: str(x.tieu_de), taoLuc: Number(x.tao_luc), nopLuc: Number(x.nop_luc), soCau: Number(x.so_cau), soDung: Number(x.so_dung), giay: Number(x.giay) })),
       cau: (c.results ?? []).map((x) => ({
         luotId: str(x.luot_id), cheDo: Number(x.che_do), luc: Number(x.nop_luc), qid: str(x.qid), phan: str(x.phan), dung: Number(x.dung) === 1,
@@ -504,9 +813,32 @@ export async function tuLuyenTongHop(env: Env, sbd: string): Promise<Obj> {
       })),
     }
   } catch (e) {
-    if (/no such table/i.test(String(e))) return { ok: true, luot: [], cau: [], chuaBat: true }
+    if (/no such table/i.test(String(e))) return { ok: true, luot: [], cau: [], luyenDe: await docLuyenDeTongHop(env, sbd), khacPhuc: null, chuaBat: true }
     throw e
   }
+}
+
+/**
+ * LUYỆN ĐỀ CẤU TRÚC trong Tổng hợp (v3): các đề ĐÃ NỘP (bảng luyen_de_2026, chỉ đọc) — lúc nộp, điểm, và số câu đúng THEO PHẦN.
+ * Phần suy từ kết quả chấm đã lưu (`result.detail`: đáp án dạng mảng ⇒ Phần II; chữ A–D ⇒ Phần I; còn lại ⇒ Phần III), đúng khi đủ điểm câu.
+ */
+export async function docLuyenDeTongHop(env: Env, sbd: string): Promise<Obj[]> {
+  const r = await env.DB.prepare("SELECT id, created_at, updated_at, result FROM luyen_de_2026 WHERE sbd = ? AND status = 'submitted' AND result IS NOT NULL ORDER BY created_at DESC LIMIT 60")
+    .bind(sbd).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const ra: Obj[] = []
+  for (const x of r.results ?? []) {
+    let kq: { score?: unknown; detail?: Record<string, { correct?: unknown; points?: unknown }> }
+    try { kq = JSON.parse(str(x.result)) } catch { continue }
+    const theoPhan = { I: { soCau: 0, soDung: 0 }, II: { soCau: 0, soDung: 0 }, III: { soCau: 0, soDung: 0 } }
+    for (const d of Object.values(kq.detail ?? {})) {
+      const phan = Array.isArray(d?.correct) ? 'II' : /^[A-D]$/.test(str(d?.correct).trim()) ? 'I' : 'III'
+      const du = phan === 'II' ? 1 : 0.25
+      theoPhan[phan].soCau++
+      if ((Number(d?.points) || 0) >= du - 1e-9) theoPhan[phan].soDung++
+    }
+    ra.push({ id: str(x.id), luc: Number(x.updated_at) || Number(x.created_at) || 0, diem: Number(kq.score) || 0, theoPhan })
+  }
+  return ra
 }
 
 /** Định tuyến `/hs/tu-luyen/<lệnh>` (index.ts). Lỗi xác thực ⇒ trả lời có chữ, không ném ra ngoài. */
@@ -523,6 +855,7 @@ export async function tuLuyen(env: Env, lenh: string, b: Obj): Promise<Obj> {
   if (lenh === 'xem-truoc') return tuLuyenXemTruoc(env, sbd, b)
   if (lenh === 'rut') return tuLuyenRut(env, sbd, b)
   if (lenh === 'nop') return tuLuyenNop(env, sbd, b)
+  if (lenh === 'cham-cau') return tuLuyenChamCau(env, sbd, b)
   if (lenh === 'tong-hop') return tuLuyenTongHop(env, sbd)
   return { ok: false, error: 'Lệnh Tu luyện không có.' }
 }
