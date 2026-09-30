@@ -375,7 +375,9 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     const r = await nopBai(token, bai.luotId, bai.traLoi, giayRef.current, { ...giayCauRef.current }, bai.coGoiY)
     setDangNop(false)
     if (!r.ok) { setLoi(r.loi); return }
-    setKetQua({ nop: r.du, cau: bai.cau })
+    // 30/09: máy chủ bỏ câu tự luận khỏi kết quả (không chấm, không tính sai) ⇒ màn kết quả chỉ hiện câu được chấm.
+    const coKq = new Set(r.du.cau.map((k) => k.qid))
+    setKetQua({ nop: r.du, cau: r.du.cau.length ? bai.cau.filter((c) => coKq.has(c.qid)) : bai.cau })
     ghiNho(sbd, null)
     setLamMoiTongHop((n) => n + 1)
     window.scrollTo?.({ top: 0 })

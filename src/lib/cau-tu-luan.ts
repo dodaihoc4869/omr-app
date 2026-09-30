@@ -14,6 +14,18 @@
 // NGUYÊN TẮC "KHÔNG BIẾT ⇒ KHÔNG KẾT TỘI": một luật chỉ áp khi TRƯỜNG nó cần CÓ MẶT trong câu. Khuôn công khai (không có trường đáp án — máy học sinh chưa nhận `dap_an` của bài cá nhân hoá)
 // KHÔNG bị coi là tự luận chỉ vì thiếu đáp án; nhưng trường đáp án CÓ mặt mà rỗng ⇒ không chấm tự động được ⇒ tự luận. Luật theo chữ đề (phần III hỏi mở) áp được cả khi thiếu đáp án.
 // Đầu vào không phải đối tượng ⇒ `true` (không có gì để rút).
+//
+// LUẬT CHẶT 30/09/2026 (thầy lệnh "Lọc cẩn thận những câu tự luận này", ảnh câu muối Mohr "Xác định công thức của X", đáp án "(NH₄)₂Fe(SO₄)₂·6H₂O"):
+//   • Phần III có đáp án mà máy KHÔNG đọc được thành MỘT số chấm được — `docSoPhanIII` (src/lib/doc-so-phan-iii.ts) không đọc được, hoặc đọc được nhưng phần
+//     đuôi không phải đơn vị trong danh mục đóng của máy chấm (`tachSoVaDonVi`, cham-so-policy.ts) — ⇒ TỰ LUẬN. Vd công thức, tên chất, chữ, nhiều số, khoảng.
+//     Đáp án như vậy máy chấm LUÔN tính sai (khoá không đọc được ⇒ ChamMaterialError), nên câu không thể là trả lời ngắn chấm tự động.
+//     Số có đơn vị / ×10ⁿ / phân cách nghìn ("1,2375×10⁹ kJ", "25%", "1.237.500") vẫn là trả lời ngắn.
+//   • Phần III thiếu đáp án (khuôn công khai) mà đề RA LỆNH viết/vẽ/xác định công thức/viết phương trình/chứng minh/sắp xếp… và KHÔNG hỏi một đại lượng
+//     ("bao nhiêu", "giá trị", "tổng hệ số", "tính …") ⇒ TỰ LUẬN. Có đáp án số thì chữ đề không kết tội.
+// Hai tệp nhập vào đều THUẦN (không IO, không đồng hồ) nên tệp này vẫn chạy chung được ở máy chủ và mọi máy.
+
+import { docSoPhanIII } from './doc-so-phan-iii'
+import { chuanHoaSoNhap, tachSoVaDonVi } from './cham-so-policy'
 
 export type PhanCau = 'I' | 'II' | 'III'
 
@@ -70,13 +82,25 @@ const CO_ANH = (x: unknown): boolean => (Array.isArray(x) ? x.some(Boolean) : Bo
  * ("được mô tả theo phương trình", "Cho các mô tả về…") KHÔNG dính. Phần III đúng nghĩa hỏi ra MỘT SỐ hay một mã ngắn. */
 const CUM_HOI_MO = ['theo em', 'vì sao', 'tại sao', 'phương pháp nào', 'cách nào', 'cách gì', 'như thế nào']
 const DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?:^|[^\p{L}])hãy\s+)(?:giải thích|trình bày|mô tả|nêu|so sánh|nhận xét|đề xuất)(?![\p{L}])/iu
+/** 30/09: lệnh LÀM RA CHỮ (công thức, phương trình, hình vẽ, lập luận) — đứng đầu câu / sau "hãy" / sau dấu phẩy. Chỉ kết tội khi đề KHÔNG hỏi một đại lượng
+ * (`HOI_DAI_LUONG`), vì phần III hay có "Viết phương trình … Tổng hệ số là bao nhiêu?" — đó vẫn là trả lời ngắn. */
+const DONG_TU_LAM_CHU = /(?:^|[.?!:;,]\s*|(?:^|[^\p{L}])hãy\s+)(?:xác định (?:công thức|cấu tạo|tên)|viết (?:công thức|phương trình|các phương trình|cấu tạo|sơ đồ|tên)|lập (?:công thức|phương trình|sơ đồ)|vẽ|chứng minh)(?![\p{L}])/iu
+const HOI_DAI_LUONG = /bao nhiêu|số thứ tự|dãy số|bộ số|liệt kê|giá trị|tổng (?:hệ số|số)|là mấy|làm tròn|phần trăm|hiệu suất|khối lượng|thể tích|nồng độ|số mol|(?:^|[^\p{L}])tính(?![\p{L}])/iu
 const hoiMo = (text: string): boolean => {
   const t = text.toLowerCase()
-  return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t)
+  return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t) || (DONG_TU_LAM_CHU.test(t) && !HOI_DAI_LUONG.test(t))
 }
 
-/** Đáp án phần III là MỘT SỐ THUẦN (chữ số, dấu , . -, ≤ 12 ký tự): "7,5", "53,3", "124", "-285,8". Đã là số thì là trả lời ngắn hợp lệ — KHÔNG xét chữ đề hỏi mở. */
-const laSoThuan = (da: string): boolean => da.length <= 12 && /^[+\-−–]?\d+(?:[.,]\d+)*$/.test(da)
+/**
+ * 30/09: Đáp án phần III đọc được thành MỘT SỐ mà máy chấm dùng được: `docSoPhanIII` đọc ra số, và phần đuôi rỗng hoặc là đơn vị trong danh mục đóng
+ * của máy chấm (`tachSoVaDonVi(chuanHoaSoNhap(da))` — đúng đường `docKhoaSo` của cham-so-policy.ts đọc khoá). "(NH₄)₂Fe(SO₄)₂·6H₂O", "Fe₃O₄", "Na mạnh hơn Mg",
+ * "2 và 3", "1-2", "25% N₂; 25% H₂" ⇒ false; "7,5", "-285,8", "1,2375×10⁹ kJ", "25%", "1.237.500", "0,1 mol" ⇒ true.
+ */
+export function laMotSoPhanIII(da: unknown): boolean {
+  const s = chuoiDapAn(da).trim()
+  if (!s || !docSoPhanIII(s)) return false
+  return tachSoVaDonVi(chuanHoaSoNhap(s), false).ok
+}
 
 /** Đáp án phần III là CHỮ NHIỀU TỪ (≥ 2 từ toàn chữ, không chứa chữ số): "kết tinh lại", "chưng cất phân đoạn". Số, công thức (C2H5OH), số kèm một đơn vị (1,5 mol) không dính. */
 const laChuNhieuTu = (da: string): boolean => da.split(/\s+/).filter((t) => t.length > 0 && !/\d/.test(t) && /^\p{L}{2,}[.,;:!?]*$/u.test(t)).length >= 2
@@ -115,6 +139,7 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
   if (!laDoiTuong(c)) return 'không phải câu hỏi'
   const kieu = chuoi(lay(c, 'kieu', 'loai', 'type', 'loaiCau'))
   if (kieu && KIEU_TU_LUAN.test(kieu)) return 'câu gắn nhãn tự luận'
+  if (c.tuLuan === true || c.tu_luan === true) return 'câu gắn cờ tự luận (kho)'
   if (laMaDeTuLuan(chuoi(lay(c, 'maDe', 'ma_de'))) || laMaDeTuLuan(chuoi(lay(c, 'qid', 'id')))) return 'mã đề thuộc mục dạy học / tự luận (-VD, -DT, -TL)'
 
   const phan = phanCua(c, phanMacDinh)
@@ -141,8 +166,9 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
       if (!da) return 'phần III không có đáp án để chấm tự động'
       if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài / nhiều dòng (tự luận)'
       if (laChuNhieuTu(da)) return 'phần III đáp án là chữ nhiều từ (không phải số hay mã ngắn)'
+      if (!laMotSoPhanIII(da)) return 'phần III đáp án không phải một số (công thức / chữ / nhiều số) — không chấm tự động'
     }
-    if (text && !(coDapAn && laSoThuan(da)) && hoiMo(text)) return 'phần III hỏi mở (theo em / phương pháp nào / giải thích …)'
+    if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return 'phần III hỏi mở (theo em / phương pháp nào / giải thích / viết công thức …)'
   }
   return null
 }

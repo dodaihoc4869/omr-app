@@ -346,6 +346,11 @@
   background: rgb(249 222 220);
   color: rgb(140 29 24);
 }
+.h2-the-ls-chip[data-dung='tu-luan'],
+.h2-the-tt[data-tt='tu_luan'] {
+  background: var(--h2c-nen-3);
+  color: rgb(207 224 255);
+}
 .h2-the-ls-chip[data-dung='true'] {
   background: rgb(196 238 208);
   color: rgb(15 82 35);

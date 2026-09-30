@@ -15,7 +15,7 @@ import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
 import '../m3'
 import { taiCauDaLam, taiChiTiet, type CauDaLamMuc, type ChiTietCau, type KetQuaCauDaLam } from './api'
-import { NHAN_TRANG_THAI, cauLuyenTuChiTiet, chiSoDuoiRo, chuLanLam, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
+import { NHAN_TRANG_THAI, NHAN_TU_LUAN, cauLuyenTuChiTiet, chiSoDuoiRo, chuLanLam, chuLanLamTuLuan, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
 import { gioThuNgay, thuNgayThang } from './thoi-gian'
 import { useBoCucNgang } from './bo-cuc-ngang'
 import './cau-da-lam.css'
@@ -23,10 +23,11 @@ import './cau-da-lam.css'
 export type BoLoc = 'tat_ca' | 'sai_gan' | 'dang_on' | 'thanh_thao' | 'can_day_lai'
 export const BO_LOC: { id: BoLoc; nhan: string; hop: (c: CauDaLamMuc) => boolean }[] = [
   { id: 'tat_ca', nhan: 'Tất cả', hop: () => true },
-  { id: 'sai_gan', nhan: 'Sai lần gần nhất', hop: (c) => c.lanCuoiDung === false },
-  { id: 'dang_on', nhan: 'Đang ôn', hop: (c) => c.trangThai === 'dang_on' },
-  { id: 'thanh_thao', nhan: 'Thành thạo', hop: (c) => c.trangThai === 'thanh_thao' },
-  { id: 'can_day_lai', nhan: 'Cần thầy dạy lại', hop: (c) => c.trangThai === 'can_day_lai' },
+  // 30/09: câu tự luận chỉ ở "Tất cả" — không sai/đúng, không ôn cách quãng.
+  { id: 'sai_gan', nhan: 'Sai lần gần nhất', hop: (c) => !c.tuLuan && c.lanCuoiDung === false },
+  { id: 'dang_on', nhan: 'Đang ôn', hop: (c) => !c.tuLuan && c.trangThai === 'dang_on' },
+  { id: 'thanh_thao', nhan: 'Thành thạo', hop: (c) => !c.tuLuan && c.trangThai === 'thanh_thao' },
+  { id: 'can_day_lai', nhan: 'Cần thầy dạy lại', hop: (c) => !c.tuLuan && c.trangThai === 'can_day_lai' },
 ]
 
 /** Xếp theo lần làm gần nhất (mới trước), cùng ngày thì theo số câu. */
@@ -46,6 +47,7 @@ export function themInTuDong(html: string): string {
 }
 
 function dongHenOn(c: CauDaLamMuc): string {
+  if (c.tuLuan) return ''
   if (c.trangThai === 'can_day_lai') return 'Thầy chữa câu này trên lớp. Chữa xong, câu quay lại Đoàn Hộ Tống từ hôm sau.'
   if (c.henOn) return `Đến lịch ôn lại: ${thuNgayThang(c.henOn)}`
   if (c.trangThai === 'thanh_thao') return 'Em đã thành thạo câu này.'
@@ -397,7 +399,11 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
     const hen = dongHenOn(c)
     const idMo = `h2-cdl-mo-${c.qid.replace(/[^a-zA-Z0-9_-]/g, '_')}`
     const dau = `${dauCau(c)}${tom?.phuDau ? ` · ${tom.phuDau}` : ''}`
-    const nhanTt = (
+    const nhanTt = c.tuLuan ? (
+      <span className="h2-the-tt" data-tt="tu_luan">
+        Tự luận
+      </span>
+    ) : (
       <span className="h2-the-tt" data-tt={c.trangThai}>
         {NHAN_TRANG_THAI[c.trangThai]}
       </span>
@@ -417,7 +423,13 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
         ) : (
           c.tenDang && <span className="h2-the-de">{c.tenDang}</span>
         )}
-        {tom ? (
+        {tom?.tuLuan ? (
+          <span className="h2-the-em" data-khoi="tu-luan">
+            <b>{NHAN_TU_LUAN}</b>
+            {' · '}
+            {tom.nhanEm}: <ChemText text={chiSoDuoiRo(tom.em)} />
+          </span>
+        ) : tom ? (
           <span className="h2-the-em">
             {tom.nhanEm}:{' '}
             <b className={tom.dung ? 'h2-the-dung' : 'h2-the-sai'}>
@@ -438,7 +450,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
           cuoi && <span className="h2-the-em">Lần gần nhất: {chuLanLam(cuoi)}</span>
         )}
         <span className="h2-the-duoi">
-          <span>{c.trangThai === 'can_day_lai' ? 'Thầy chữa câu này trên lớp' : hen}</span>
+          <span>{!c.tuLuan && c.trangThai === 'can_day_lai' ? 'Thầy chữa câu này trên lớp' : hen}</span>
           {!ngang && <span className="h2-the-xem">Xem lời giải</span>}
         </span>
       </>
@@ -475,8 +487,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
             <span className="h2-the-ls-nhan">Lịch sử làm câu này</span>
             <ul className="h2-the-ls-ds">
               {c.lichSu.map((l, i) => (
-                <li key={i} className="h2-the-ls-chip" data-dung={l.dung ? 'true' : 'false'}>
-                  {chuLanLam(l)}
+                <li key={i} className="h2-the-ls-chip" data-dung={c.tuLuan ? 'tu-luan' : l.dung ? 'true' : 'false'}>
+                  {c.tuLuan ? chuLanLamTuLuan(l) : chuLanLam(l)}
                 </li>
               ))}
             </ul>

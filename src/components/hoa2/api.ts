@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
+import { laCauTuLuan } from '../../lib/cau-tu-luan'
 
 export interface ChienDichSanh {
   id: string
@@ -70,6 +71,8 @@ export interface CauDaLamMuc {
   lichSu: LanLam[]
   /** Nhãn nợ máy chủ viết sẵn: "Sai 2 lần · Ca 26/09 · Lên bảng 28/09" (Sổ nợ 29/09; câu đã thành thạo / máy chủ cũ ⇒ vắng). */
   nhan?: string
+  /** 30/09: câu TỰ LUẬN em đã trả lời (lịch sử cũ) — hiện nhãn "Câu tự luận — không chấm tự động", không đỏ/xanh, không tính sai. */
+  tuLuan?: boolean
 }
 export type KetQuaCauDaLam = { cheDo2: false } | { cheDo2: true; chienDich: ChienDichCau[]; cau: CauDaLamMuc[] }
 
@@ -96,6 +99,8 @@ export interface ChiTietCau {
   dapAn: string
   loiGiai: unknown
   emTraLoi: string | null
+  /** 30/09: câu TỰ LUẬN (máy chủ gắn, hoặc máy em tự nhận ra bằng luật chung `laCauTuLuan` khi có đáp án) — không chấm đúng/sai. */
+  tuLuan?: boolean
 }
 
 const laSo = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x)
@@ -235,6 +240,7 @@ export function docCauDaLam(o: Record<string, unknown>): KetQuaCauDaLam {
         .filter((l): l is Record<string, unknown> => !!l && typeof l === 'object' && laNgay(l.ngay))
         .map((l) => ({ ngay: chu(l.ngay), dung: l.dung === true, coGoiY: l.coGoiY === true, ...(laNguonLan(l.nguon) ? { nguon: l.nguon } : {}) })),
       ...(typeof c.nhan === 'string' && c.nhan.trim() ? { nhan: c.nhan.trim() } : {}),
+      ...(c.tuLuan === true ? { tuLuan: true, lanCuoiDung: null } : {}),
     }))
   return { cheDo2: true, chienDich, cau }
 }
@@ -269,7 +275,10 @@ export function docChiTiet(x: unknown): ChiTietCau | null {
     maDe: chu(d.maDe),
     sao: laSo(d.sao) ? d.sao : null,
   }
-  return { de, dapAn: chu(o.dapAn).trim(), loiGiai: o.loiGiai, emTraLoi: o.emTraLoi == null ? null : chu(o.emTraLoi).trim() || null }
+  const dapAn = chu(o.dapAn).trim()
+  // Máy chủ cũ chưa gắn `tuLuan` ⇒ máy em tự xét bằng ĐÚNG luật chung (câu đã làm nên có đáp án).
+  const tuLuan = o.tuLuan === true || laCauTuLuan({ phan: de.phan, qid: de.qid, text: de.text, dapAn, tuLuan: d.tuLuan === true })
+  return { de, dapAn, loiGiai: o.loiGiai, emTraLoi: o.emTraLoi == null ? null : chu(o.emTraLoi).trim() || null, ...(tuLuan ? { tuLuan: true } : {}) }
 }
 
 /** Máy chủ nhận tối đa 60 câu một lượt (`hoa2-cau-chi-tiet`). */

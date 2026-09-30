@@ -17,7 +17,7 @@ import { bangHtml, chuHtml, thoat } from '../../lib/html-phieu'
 import { CHUA_CO_LOI_GIAI, chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
 import type { CauDaLamMuc, ChiTietCau, LanLam } from './api'
 import { NHAN_NGUON_LAN } from './api'
-import { NHAN_PHAN, NHAN_TRANG_THAI, chuDS, nhanMucDo, tachDungSai, traLoiNganDung } from './cau-chuyen'
+import { NHAN_PHAN, NHAN_TRANG_THAI, NHAN_TU_LUAN, chuDS, nhanMucDo, tachDungSai, traLoiNganDung, chuLanLamTuLuan } from './cau-chuyen'
 import { gioThuNgay, ngayThang } from './thoi-gian'
 
 export interface MucIn {
@@ -118,7 +118,8 @@ export function dauCauPdf(m: MucIn): string {
     muc.stt > 0 ? `Câu ${muc.stt}` : 'Câu',
     NHAN_PHAN[phan],
     nhanMucDo(ct.de.mucDo ?? muc.mucDo),
-    NHAN_TRANG_THAI[muc.trangThai],
+    // 30/09: câu tự luận — nhãn "Câu tự luận — không chấm tự động" thay trạng thái ôn / đúng-sai.
+    ct.tuLuan || muc.tuLuan ? NHAN_TU_LUAN : NHAN_TRANG_THAI[muc.trangThai],
     ...phu,
   ]
     .filter(Boolean)
@@ -162,7 +163,10 @@ export function cauPdfHtml(m: MucIn): string {
 
   // ĐỀ ĐẦY ĐỦ (Phần III: câu trả lời của em nối ngay sau đề, như bản vẽ).
   let emIII = ''
-  if (de.phan === 'III') {
+  if (de.phan === 'III' && (ct.tuLuan || muc.tuLuan)) {
+    const em = String(ct.emTraLoi ?? '').trim()
+    emIII = ` <b>Em trả lời: ${em ? chuHtml(em) : 'bỏ trống'}</b>`
+  } else if (de.phan === 'III') {
     const em = String(ct.emTraLoi ?? '').trim()
     const dung = traLoiNganDung(em, ct.dapAn)
     emIII = ` <b class="${dung ? 'pdfc-xanh' : 'pdfc-do'}">Em trả lời: ${em ? chuHtml(em) : 'bỏ trống'} ${dung ? '✓' : '✗'}</b>`
@@ -232,7 +236,7 @@ export function cauPdfHtml(m: MucIn): string {
     if (anhGiai) lgh.push(`<div class="pdfc-phu">${anhGiai}</div>`)
   }
   phan.push(`<div class="pdfc-lg">${lgh.join('')}</div>`)
-  if (muc.lichSu.length) phan.push(`<div class="pdfc-ls">Lịch sử: ${thoat(muc.lichSu.map(chuLanIn).join(' · '))}</div>`)
+  if (muc.lichSu.length) phan.push(`<div class="pdfc-ls">Lịch sử: ${thoat(muc.lichSu.map(ct.tuLuan || muc.tuLuan ? chuLanLamTuLuan : chuLanIn).join(' · '))}</div>`)
   return `<section class="pdfc-cau">${phan.join('')}</section>`
 }
 

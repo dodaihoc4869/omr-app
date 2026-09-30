@@ -621,6 +621,10 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
 
 // ------------------------------------------------------------------ nộp: CHẤM ở máy chủ, rồi mới trả đáp án + lời giải
 
+/** 30/09 luật tự luận chặt: câu của lượt ĐANG LÀM mà nay là tự luận (đáp án không phải một số, mã -TL…) ⇒ bỏ qua: không chấm, không tính sai,
+ *  không vào sổ, không cập nhật ôn cách quãng. Câu cất trong lượt không mang chữ đề ⇒ xét theo phần + qid + đáp án (đủ cho luật đáp án). */
+export const cauRiengTuLuan = (c: Pick<CauRieng, 'phan' | 'qid' | 'dapAn'>): boolean => laCauTuLuan({ phan: c.phan, qid: qidGoc(c.qid), dapAn: c.dapAn })
+
 function docRieng(json: unknown): CauRieng[] {
   try {
     const a = JSON.parse(str(json))
@@ -641,7 +645,9 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
     throw e
   }
   if (!dong) return { ok: false, error: 'Không tìm thấy lượt luyện này.' }
-  const rieng = docRieng(dong.de_rieng_json)
+  const daNopTruoc = str(dong.trang_thai) === 'da_nop'
+  // Lượt đã nộp: trả đúng kết quả đã chốt (kể cả câu cũ). Lượt đang làm: bỏ câu tự luận (không chấm, không tính sai).
+  const rieng = docRieng(dong.de_rieng_json).filter((c) => daNopTruoc || !cauRiengTuLuan(c))
   const traLoiVao = (b.traLoi && typeof b.traLoi === 'object' ? b.traLoi : {}) as Obj
   const giayCauVao = (b.giayCau && typeof b.giayCau === 'object' ? b.giayCau : {}) as Obj
   const coGoiY = new Set((Array.isArray(b.coGoiY) ? b.coGoiY : []).map(str))
@@ -740,6 +746,7 @@ export async function tuLuyenChamCau(env: Env, sbd: string, b: Obj): Promise<Obj
   if (str(dong.trang_thai) !== 'dang_lam') return { ok: false, error: 'Lượt này đã nộp rồi. Em xem kết quả ở màn kết quả nhé.' }
   const c = docRieng(dong.de_rieng_json).find((x) => x.qid === qid)
   if (!c) return { ok: false, error: 'Không tìm thấy câu này trong lượt của em.' }
+  if (cauRiengTuLuan(c)) return { ok: false, tuLuan: true, error: 'Câu tự luận — không chấm tự động. Em bỏ qua câu này, máy không tính sai.' }
   const nay = Date.now()
   let chot = (await docChamCau(env, luotId)).get(qid)
   let khoaMoi = false

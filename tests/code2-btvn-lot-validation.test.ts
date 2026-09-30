@@ -61,17 +61,17 @@ describe('Code2 delta B: normal homework validates before final/progress/events/
     expect(s.effects()).toEqual(after)
   })
 
-  it.each(routes)('%s invalid numeric key rejects even identical or blank answers; repair then retry', async path => {
+  // 30/09 LUẬT TỰ LUẬN CHẶT (src/lib/cau-tu-luan.ts): khoá phần III máy chấm không đọc được thành MỘT số ⇒ câu là TỰ LUẬN ⇒ BTVN bỏ qua câu đó
+  // (không chấm, không tính sai, không ghi sổ) thay vì từ chối cả bài; các câu khác vẫn chấm, lời giải riêng không lộ.
+  it.each(routes)('%s invalid numeric key ⇒ câu tự luận: bỏ qua câu đó, các câu khác vẫn chấm', async path => {
     const s = setup()
     s.setKey('sqrt(4)')
-    const before = s.effects()
-    for (const answer of ['sqrt(4)', '']) {
-      reject(await s.post(path, { ...answers, [Q]: answer }), 500)
-      expect(s.effects()).toEqual(before)
-    }
-    s.setKey('12')
-    expect((await s.post(path, answers)).body.ok).toBe(true)
-    expect(s.d.dem('su_kien_hoc')).toBe(3)
+    const r = await s.post(path, { ...answers, [Q]: 'sqrt(4)' })
+    expect(r.body.ok).toBe(true)
+    expect(JSON.stringify(r.body)).not.toContain('PRIVATE-SOLUTION')
+    const qids = (s.d.sql.prepare('SELECT qid FROM su_kien_hoc').all() as { qid: string }[]).map((x) => x.qid)
+    expect(qids).not.toContain(Q)
+    expect(qids.length).toBe(2)
   })
 
   it.each([undefined, {}])('no-answer lot payload %j keeps legacy progress-only behavior without reading R2', async payload => {

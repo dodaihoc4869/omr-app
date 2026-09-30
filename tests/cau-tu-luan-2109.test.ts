@@ -33,7 +33,6 @@ const CAU_RUT_DUOC: [string, unknown, PhanCau?][] = [
   ['kho thô · phần III đáp án số thập phân dấu phẩy', kho({ phan: 'III', de: 'Tính khối lượng este thu được (gam).', dap_an: '12,5' })],
   ['kho thô · phần III đáp án số âm', kho({ phan: 'III', de: 'Tính biến thiên enthalpy (kJ).', dap_an: '-285,8' })],
   ['kho thô · phần III đáp án số kèm một đơn vị', kho({ phan: 'III', de: 'Tính thể tích khí.', dap_an: '1,5 mol' })],
-  ['kho thô · phần III đáp án là công thức', kho({ phan: 'III', de: 'Cho biết công thức phân tử của X.', dap_an: 'C2H5OH' })],
   ['kho thô · phần III đáp án luỹ thừa', kho({ phan: 'III', de: 'Tính hằng số cân bằng.', dap_an: '2.10^3' })],
   ['kho thô · phần III đáp án là số nguyên viết bằng kiểu số', kho({ phan: 'III', de: 'Tính số đồng phân.', dap_an: 4 })],
   ['kho thô · phần III hỏi "Tính…" đáp án ngắn có chữ "mol" đơn', kho({ phan: 'III', de: 'Giá trị của x là bao nhiêu?', dap_an: '0,25 mol' })],
@@ -72,7 +71,9 @@ const CAU_TU_LUAN: [string, unknown, PhanCau?, RegExp?][] = [
   ['CÂU TRONG ẢNH THẦY · CauLuyen (bài thường có đáp án)', { phan: 'III', id: 'DH-12-C3-B2-TLN-III-5', maDe: 'DH-12-C3-B2-TLN', text: SACCHAROSE, luaChon: null, dapAn: 'Kết tinh' }],
   ['CÂU TRONG ẢNH THẦY · CauLuyen bài cá nhân hoá chưa có đáp án — vẫn bị bắt bằng chữ đề', { phan: 'III', id: 'DH-12-C3-B2-TLN-III-5', text: SACCHAROSE, luaChon: null, dapAn: '', caNhan: { chuaCoDapAn: true } }, undefined, /hỏi mở/],
   ['CÂU TRONG ẢNH THẦY · đề thầy (không có `phan`, phần III)', { id: 'DH-12-C3-B2-TLN-III-5', text: SACCHAROSE, correct: 'Kết tinh' }, 'III'],
-  ['kho thô · chữ đề hỏi mở nằm ở trường `de`, đáp án chữ 1 từ + số? (không phải số thuần)', kho({ phan: 'III', de: SACCHAROSE, dap_an: '3 lần' }), undefined, /hỏi mở/],
+  ['kho thô · chữ đề hỏi mở nằm ở trường `de`, đáp án chữ 1 từ + số? (không phải số thuần)', kho({ phan: 'III', de: SACCHAROSE, dap_an: '3 lần' }), undefined, /hỏi mở|không phải một số/],
+  // 30/09 luật chặt: phần III đáp án là CÔNG THỨC (không đọc được thành một số) ⇒ tự luận — trước 30/09 câu này còn được rút.
+  ['kho thô · phần III đáp án là công thức (30/09: tự luận)', kho({ phan: 'III', de: 'Cho biết công thức phân tử của X.', dap_an: 'C2H5OH' }), undefined, /không phải một số/],
   ['phần III đáp án dài > 20 ký tự có khoảng trắng (luật sẵn có của BTVN)', kho({ phan: 'III', de: 'Nêu cách nhận biết.', dap_an: 'Cho tác dụng với dung dịch brom rồi quan sát' }), undefined, /dài/],
   ['phần III đáp án nhiều dòng', kho({ phan: 'III', de: 'Viết các sản phẩm.', dap_an: 'X\nY' }), undefined, /dài/],
   ['phần III đáp án có dấu chấm phẩy', kho({ phan: 'III', de: 'Viết các sản phẩm.', dap_an: 'CH3COOH; C2H5OH' }), undefined, /dài/],
@@ -91,7 +92,7 @@ const CAU_TU_LUAN: [string, unknown, PhanCau?, RegExp?][] = [
   ['KHO THÔ THẬT · phần I, ô D rỗng và ảnh hinh KHÔNG có src (ảnh hỏng) ⇒ vẫn thiếu phương án', thoKho({ phan: 'I', de: 'Chất nào?', pa: { A: 'a', B: 'b', C: 'c', D: '' }, hinh: [{ viTri: 'sau_pa_D' }], dap_an: 'A' }), undefined, /thiếu phương án/],
   ['KHO THÔ THẬT · phần I, pa đối tượng rỗng {}', thoKho({ phan: 'I', de: 'Nêu khái niệm.', pa: {}, dap_an: 'A' }), undefined, /thiếu phương án/],
   ['KHO THÔ THẬT · phần II, y đối tượng chỉ 3 ý', thoKho({ phan: 'II', de: 'Cho este X.', y: { a: 'a', b: 'b', c: 'c' }, dap_an: 'DSS' }), undefined, /thiếu ý/],
-  ['KHO THÔ THẬT · phần III hỏi mở (saccharose) khuôn thô đủ trường, đáp án chữ 1 từ + số', thoKho({ phan: 'III', de: SACCHAROSE, dap_an: '3 lần' }), undefined, /hỏi mở/],
+  ['KHO THÔ THẬT · phần III hỏi mở (saccharose) khuôn thô đủ trường, đáp án chữ 1 từ + số', thoKho({ phan: 'III', de: SACCHAROSE, dap_an: '3 lần' }), undefined, /hỏi mở|không phải một số/],
   ['phần I có 4 ô nhưng một ô trống, không ảnh', kho({ phan: 'I', de: 'Chất nào?', pa: ['A', 'B', '', 'D'], dap_an: 'A' }), undefined, /thiếu phương án/],
   ['phần I đáp án không phải A–D', kho({ phan: 'I', de: 'Chất nào?', pa: PA, dap_an: 'AB' }), undefined, /A–D/],
   ['phần I đáp án rỗng (có trường)', kho({ phan: 'I', de: 'Chất nào?', pa: PA, dap_an: '' }), undefined, /A–D/],
@@ -156,7 +157,7 @@ describe('phần III hỏi MỞ: từng cụm / động từ ra lệnh đều b�
   it('đáp án SỐ THUẦN (≤ 12 ký tự) ⇒ trả lời ngắn hợp lệ dù chữ đề nghe như hỏi mở; đáp án số quá dài hoặc số kèm chữ thì không được miễn', () => {
     const c = (dap_an: string) => ({ phan: 'III', text: SACCHAROSE, dap_an })
     for (const da of ['7,5', '53,3', '124', '-285,8', '+3', '1.000,5', '2−', '12345678901']) expect(laCauTuLuan(c(da)), da).toBe(da === '2−')
-    expect(laCauTuLuan(c('1234567890123'))).toBe(true) // 13 ký tự
+    expect(laCauTuLuan(c('1234567890123'))).toBe(false) // 30/09: số dài vẫn là MỘT số docSoPhanIII đọc được ⇒ trả lời ngắn (luật ≤ 12 ký tự cũ bỏ)
     expect(laCauTuLuan(c('3 lần'))).toBe(true)
     expect(laCauTuLuan({ phan: 'III', text: SACCHAROSE, dap_an: '' })).toBe(true) // rỗng: không chấm được
   })
@@ -287,12 +288,18 @@ describe('locCauRutDuoc + chữ báo thầy', () => {
 })
 
 describe('khoá nguồn: thuần', () => {
-  it('cau-tu-luan.ts không import, không đồng hồ, không ngẫu nhiên, không IO', () => {
+  it('cau-tu-luan.ts chỉ import hai tệp thuần đọc số (doc-so-phan-iii, cham-so-policy), không đồng hồ, không ngẫu nhiên, không IO', () => {
     const ma = readFileSync('src/lib/cau-tu-luan.ts', 'utf8')
       .split('\n')
       .filter((l) => !l.trimStart().startsWith('//') && !l.trimStart().startsWith('*') && !l.trimStart().startsWith('/**'))
       .join('\n')
-    expect(ma).not.toMatch(/^import /m)
+    const nhap = [...ma.matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1])
+    expect(nhap.sort()).toEqual(['./cham-so-policy', './doc-so-phan-iii'])
+    for (const t of ['src/lib/doc-so-phan-iii.ts', 'src/lib/cham-so-policy.ts']) {
+      const m2 = readFileSync(t, 'utf8')
+      expect(m2, t).not.toMatch(/Date\.now|new Date|Math\.random|process\.|fetch\(|localStorage|console\./)
+      expect([...m2.matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]).every((x) => x === './doc-so-phan-iii'), t).toBe(true)
+    }
     expect(ma).not.toMatch(/Date\.now|new Date|Math\.random|process\.|fetch\(|localStorage|console\./)
   })
 })

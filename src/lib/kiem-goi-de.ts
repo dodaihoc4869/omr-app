@@ -88,8 +88,11 @@ export function kiemGoiDe(maDe: string, de: unknown): KetQuaKiemGoi {
       const da = chu(c.dap_an)
       const tuLuan = laCauTuLuan(c, 'III')
       if (!da && !tuLuan) loi.push(`${nhan}: thiếu đáp án.`)
-      else if (da && !tuLuan && !khopPhanIII(da, da)) {
-        canhBao.push(`${nhan}: đáp án "${da.slice(0, 40)}" máy chấm không đọc được như một số — đã gắn cờ cần xem (không phát vào game, rút đề cho tới khi sửa).`)
+      else if (da && !khopPhanIII(da, da)) {
+        // 30/09 luật tự luận chặt: đáp án không đọc được thành MỘT số ⇒ `laCauTuLuan` đã xếp TỰ LUẬN (mọi kênh tự động bỏ qua). Vẫn báo thầy + gắn cờ cần xem.
+        canhBao.push(tuLuan
+          ? `${nhan}: đáp án "${da.slice(0, 40)}" không phải một số — câu được xếp TỰ LUẬN (không rút tự động, máy không chấm); đã gắn cờ cần xem.`
+          : `${nhan}: đáp án "${da.slice(0, 40)}" máy chấm không đọc được như một số — đã gắn cờ cần xem (không phát vào game, rút đề cho tới khi sửa).`)
         c.can_xem = true
       }
     }

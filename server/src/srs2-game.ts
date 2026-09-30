@@ -5,7 +5,7 @@
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
-import { laCauTuLuan } from './cam-tu-luan'
+import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
@@ -347,8 +347,53 @@ async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<st
     })
   }
   if (taiLop.length) chienDich.push({ id: NHOM_CAU_SAI_TAI_LOP, ten: 'Câu sai khi lên bảng', hanNop: '', qids: taiLop })
-  await ganNguonLanLam(env, sbd, cau, hs)
-  return { ok: true, chienDich: chienDich.map(({ qids, ...c }) => ({ ...c, tong: qids.length })), cau }
+  // 30/09 LUẬT TỰ LUẬN CHẶT (thầy: "Lọc cẩn thận những câu tự luận này"): câu tự luận em CHƯA trả lời ⇒ ẨN; em đã trả lời (lịch sử cũ) ⇒ vẫn hiện
+  // nhưng mang `tuLuan: true` (máy em ghi "Câu tự luận — không chấm tự động" thay đúng/sai), KHÔNG tính sai, không hẹn ôn, không nhãn nợ.
+  const tl = await phanLoaiTuLuanDaLam(env, sbd, cau.map((c) => ({ qid: str(c.qid), m: hs.meta.get(str(c.qid)) })))
+  const hienThi = cau.filter((c) => !tl.tuLuan.has(str(c.qid)) || tl.daTraLoi.has(str(c.qid)))
+  await ganNguonLanLam(env, sbd, hienThi, hs)
+  for (const c of hienThi) {
+    if (!tl.tuLuan.has(str(c.qid))) continue
+    c.tuLuan = true
+    c.lanCuoiDung = null
+    c.henOn = null
+    delete c.nhan
+  }
+  return { ok: true, chienDich: chienDich.map(({ qids, ...c }) => ({ ...c, tong: qids.length })), cau: hienThi }
+}
+
+/**
+ * Câu nào trong danh sách là TỰ LUẬN (định nghĩa chung `laCauTuLuan`, đọc JSON chỉ mục đúng tờ + phiên bản em đã làm; không thấy dòng khớp ⇒ xét
+ * mọi dòng cùng qid) và câu tự luận nào em ĐÃ TRẢ LỜI (sổ `su_kien_hoc` có kết quả khác NULL — NULL là bỏ trống/chưa làm). Lỗi đọc ⇒ coi như
+ * không có câu tự luận (không làm hỏng danh sách).
+ */
+export async function phanLoaiTuLuanDaLam(env: Env, sbd: string, ds: readonly { qid: string; m?: MetaCau }[]): Promise<{ tuLuan: Set<string>; daTraLoi: Set<string> }> {
+  const tuLuan = new Set<string>(), daTraLoi = new Set<string>()
+  const qids = [...new Set(ds.map((x) => x.qid).filter(Boolean))]
+  if (!qids.length) return { tuLuan, daTraLoi }
+  try {
+    const khop = new Map(ds.map((x) => [x.qid, x.m ? `${x.m.maDe}|${x.m.version}` : '']))
+    const tatCa = new Map<string, boolean[]>(), dung = new Map<string, boolean>()
+    for (let i = 0; i < qids.length; i += 400) {
+      const r = await env.DB.prepare('SELECT qid, ma_de, version, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qids.slice(i, i + 400))).all<Row>()
+      for (const x of r.results ?? []) {
+        const q = str(x.qid), la = jsonLaTuLuan(x.json)
+        tatCa.set(q, [...(tatCa.get(q) ?? []), la])
+        if (khop.get(q) === `${str(x.ma_de)}|${str(x.version)}`) dung.set(q, la)
+      }
+    }
+    for (const q of qids) {
+      const la = dung.has(q) ? dung.get(q)! : (tatCa.get(q) ?? []).some(Boolean)
+      if (la) tuLuan.add(q)
+    }
+    if (tuLuan.size) {
+      const r = await env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND ket_qua IS NOT NULL AND qid IN (SELECT value FROM json_each(?))').bind(sbd, JSON.stringify([...tuLuan])).all<Row>()
+      for (const x of r.results ?? []) daTraLoi.add(str(x.qid))
+    }
+  } catch (e) {
+    console.error('[cau-da-lam] chưa phân loại được câu tự luận:', e instanceof Error ? e.message : e)
+  }
+  return { tuLuan, daTraLoi }
 }
 
 /** Đề + đáp án + lời giải của câu em ĐÃ làm (đáp án không bao giờ xuống máy trước khi em làm câu đó). Tối đa 60 câu/lượt (tải PDF). */
@@ -373,7 +418,8 @@ async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string,
       if (!q) continue
       if (!tapBaoVe || tapBaoVe.has(qid) || tapBaoVe.has(q.group)) { khoa.push(qid); continue }
       const tl = await env.DB.prepare("SELECT json_extract(json,'$.traLoi') AS t FROM game_v2_attempt WHERE sbd = ? AND qid = ? ORDER BY created_at DESC LIMIT 1").bind(sbd, qid).first<Row>().catch(() => null)
-      ra.push({ de: publicQuestionDayDu(q), dapAn: q.correct, loiGiai: q.solution, emTraLoi: tl?.t == null ? null : str(tl.t) })
+      // 30/09: câu tự luận ⇒ `tuLuan: true` — máy em hiện "Câu tự luận — không chấm tự động" thay đỏ/xanh (PDF cũng vậy).
+      ra.push({ de: publicQuestionDayDu(q), dapAn: q.correct, loiGiai: q.solution, emTraLoi: tl?.t == null ? null : str(tl.t), ...(laCauTuLuan(q) ? { tuLuan: true } : {}) })
     } catch { /* câu đã rút khỏi kho */ }
   }
   return { ok: true, cau: ra, ...(khoa.length ? { khoa } : {}) }

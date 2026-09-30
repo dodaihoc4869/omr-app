@@ -43,6 +43,11 @@ export function chuLanLam(l: LanLam): string {
   return `${l.dung ? 'Đúng' : 'Sai'} ${ngayThang(l.ngay)}${l.nguon ? ` · ${NHAN_NGUON_LAN[l.nguon]}` : ''}${l.coGoiY ? ' · có gợi ý' : ''}`
 }
 
+/** Chip lịch sử của câu TỰ LUẬN (30/09): không đúng/sai — "Đã làm 29/09 · Bi-a". */
+export function chuLanLamTuLuan(l: LanLam): string {
+  return `Đã làm ${ngayThang(l.ngay)}${l.nguon ? ` · ${NHAN_NGUON_LAN[l.nguon]}` : ''}`
+}
+
 /** Ngày làm gần nhất (để xếp danh sách): lần cuối trong lịch sử; không có ⇒ ''. */
 export function ngayGanNhat(c: CauDaLamMuc): string {
   return c.lichSu.reduce((m, l) => (l.ngay > m ? l.ngay : m), '')
@@ -132,7 +137,7 @@ export function propsTheCau(ct: ChiTietCau, stt: number): TheCauProps {
       correct: dung && dung.every((x) => x !== null) ? (dung as [DS, DS, DS, DS]) : undefined,
     }
   }
-  return { ...chung, phan: 'III', selected: ct.emTraLoi, correct: ct.dapAn || undefined }
+  return { ...chung, phan: 'III', selected: ct.emTraLoi, correct: ct.dapAn || undefined, ...(ct.tuLuan ? { tuLuan: true } : {}) }
 }
 
 /** Một câu cho phiếu in (`dungPhieu`): lời giải đọc qua `chuanHoaLoiGiaiCau`; câu em sai lần gần nhất mang nhãn "Em làm sai câu N". */
@@ -201,9 +206,17 @@ export interface TomTatThe {
   /** Rỗng khi em đúng (khỏi nhắc lại). */
   dapAn: string
   dung: boolean
+  /** 30/09: câu tự luận — không tô đúng/sai; `dapAn` là đáp án tham khảo. */
+  tuLuan?: boolean
 }
+/** Nhãn một câu tự luận trên thẻ / PDF (thay đúng/sai). */
+export const NHAN_TU_LUAN = 'Câu tự luận — không chấm tự động'
 export function tomTatThe(ct: ChiTietCau): TomTatThe {
   const { de } = ct
+  if (ct.tuLuan) {
+    const em = String(ct.emTraLoi ?? '').trim()
+    return { phuDau: '', de: de.text, nhanEm: 'Em trả lời', em: em || 'bỏ trống', dapAn: ct.dapAn, dung: false, tuLuan: true }
+  }
   if (de.phan === 'I') {
     const chon = String(ct.emTraLoi ?? '').trim().toUpperCase()
     const dung = ct.dapAn.trim().toUpperCase()

@@ -18,11 +18,13 @@ const read = async(env:Env,key:string):Promise<TeacherExamSource[]> => {
 }
 export function chamDeChuan(sources:TeacherExamSource[], a:Record<string,string>) {
   let cents=0
-  const detail:Record<string,{correct:unknown;points:number}>={}
+  const detail:Record<string,{correct:unknown;points:number;tuLuan?:true}>={}
   for(const s of sources) {
     for(const q of s.phanI){const p=a[q.id]===q.correct?25:0;cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
     for(const q of s.phanII){const n=q.correct.filter((v,i)=>v===(a[q.id]||'')[i]).length;const p=[0,10,25,50,100][n];cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
-    for(const q of s.phanIII){const val=(a[q.id]||'').trim();const p=val&&khopPhanIII(val,q.correct)?25:0;cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
+    // 30/09 luật tự luận chặt: câu phần III nay là TỰ LUẬN (đề soạn trước luật: đáp án công thức/chữ) ⇒ KHÔNG chấm, KHÔNG trừ điểm em (tính trọn câu),
+    // gắn `tuLuan` để màn kết quả và sổ học bỏ qua (không vào kho câu sai).
+    for(const q of s.phanIII){if(laCauTuLuan(q,'III')){cents+=25;detail[q.id]={correct:q.correct,points:0.25,tuLuan:true};continue};const val=(a[q.id]||'').trim();const p=val&&khopPhanIII(val,q.correct)?25:0;cents+=p;detail[q.id]={correct:q.correct,points:p/100}}
   }
   return { score:cents/100, detail }
 }
@@ -115,7 +117,12 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
     const nop=await env.DB.prepare("UPDATE luyen_de_2026 SET answers=?,result=?,status='submitted',updated_at=? WHERE id=? AND sbd=? AND status='active'").bind(JSON.stringify(answers),JSON.stringify(result),now,row.id,sbd).run()
     // SỔ SỰ KIỆN HỌC (GĐ 0): kết quả từng câu lấy đúng từ `chamDeChuan` vừa chấm.
     // KHÔNG CỘNG EXP (Boss chốt 30/09): Luyện đề cấu trúc nằm trong Tu luyện — đúng tinh thần Tu luyện, nộp xong không gọi `expNhanSauNop`; sổ vẫn ghi như cũ.
-    if(nop?.meta?.changes)await ghiSuKien(env,suKienLuyenDe(sbd,row.id,new Date(now).toISOString(),sources,answers,result.detail))
+    if(nop?.meta?.changes){
+      // Câu tự luận (không chấm) KHÔNG ghi sổ ⇒ không vào kho câu sai / ôn cách quãng.
+      const tuLuan=new Set(Object.entries(result.detail).filter(([,d])=>d.tuLuan).map(([k])=>k))
+      const nguonSo=tuLuan.size?sources.map(s=>({...s,phanIII:s.phanIII.filter(q=>!tuLuan.has(q.id))})):sources
+      await ghiSuKien(env,suKienLuyenDe(sbd,row.id,new Date(now).toISOString(),nguonSo,answers,result.detail))
+    }
     row=(await env.DB.prepare('SELECT * FROM luyen_de_2026 WHERE id=? AND sbd=?').bind(row.id,sbd).first<Row>())!
   }
   const bank=mergeAndStrip(sources,SO_CAU_CHUAN_2026)

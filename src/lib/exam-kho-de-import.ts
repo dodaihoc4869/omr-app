@@ -108,6 +108,8 @@ export interface KhoDeCau {
   kieu?: 'ly_thuyet' | 'bai_tap'
   /** Câu rơi vào dải giữa, máy phải gỡ hoà. Hiện ra để thầy soi lại. */
   kieu_chua_chac?: boolean
+  /** 30/09: tờ kho ghi `kieu: 'tu_luan'` (công cụ tu-sua-kho) ⇒ cờ riêng, KHÔNG nhét vào `kieu` (chỉ nhận lý thuyết/bài tập). */
+  tu_luan?: boolean
 }
 
 export type DangKho = { ma: string; ten: string }
@@ -351,6 +353,7 @@ export function parseKhoDeJson(data: unknown): KhoDeParseResult {
       loiThuongGap: chuoiMang(c.loiThuongGap),
       kieu: c.kieu === 'ly_thuyet' || c.kieu === 'bai_tap' ? c.kieu : undefined,
       kieu_chua_chac: c.kieu_chua_chac === true ? true : undefined,
+      tu_luan: typeof c.kieu === 'string' && /^(?:tu[\s_-]?luan|tự[\s_-]?luận|essay)$/i.test(c.kieu.trim()) ? true : undefined,
     })
   })
   if (errors.length > 0) return { ok: false, errors }
@@ -427,6 +430,8 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       // dừng ở cổng nhập là kho ghi xong vẫn như chưa ghi.
       kieu: c.kieu,
       kieuChuaChac: c.kieu_chua_chac,
+      // 30/09: nhãn tự luận của kho đi theo câu (game, rút đề, Tu luyện…) — `laCauTuLuan` đọc `tuLuan`.
+      tuLuan: c.tu_luan,
     }
 
     if (c.phan === 'I') {
