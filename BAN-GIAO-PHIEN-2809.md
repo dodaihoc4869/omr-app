@@ -157,3 +157,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 10:52 30/09 · Boss · merge PR #99 Code 4b rà thêm đề: khoá lời giải theo nội dung DB-/DH-, kiểm Đ/S + cảnh báo phần III lúc nạp, thẩm định (89cf66d) + PR #100 cửa Tu luyện món quà (6a5da45) · 193 test vùng xanh · không ca mở · lùi: git revert -m1 6a5da45 && git revert -m1 89cf66d
 - 11:02 30/09 · deploy 6a5da45 (#99+#100) xanh (run 597)
 - 11:20 30/09 · Boss · merge PR #101 Code 4b cổng kiểm gói dayDeKho + khoá câu bảo vệ ở Câu đã làm/BTVN (1f41390) · đỏ vùng btvn/cau-da-lam = y hệt main (11/11) · không ca mở · lùi: git revert -m1 1f41390
+- 11:27 30/09 · deploy #101 xanh (run 598)
+- 11:30 30/09 · Boss · merge PR #103 Câu đã làm nút Hỏi thầy (b8ae6d0) · không ca mở · lùi: git revert -m1 b8ae6d0
