@@ -225,13 +225,14 @@
 .bia[data-bo-cuc='ngang'] .bia-nut-tron{background:rgba(8,14,34,.55);color:rgb(242,245,255);border-color:rgba(255,255,255,.2)}
 .bia[data-bo-cuc='ngang'] .bia-nut-mat[aria-pressed='true']{background:linear-gradient(180deg,rgb(255,243,196),rgb(255,214,107));color:rgb(58,32,0);border-color:rgb(224,168,0)}
 .bia[data-bo-cuc='ngang'] .bia-mat-bi{width:30px;height:30px}
-.bia[data-bo-cuc='ngang'] .bia-thanh-tren{position:absolute;z-index:5;top:calc(var(--an-t) + 1px);left:calc(var(--an-tr) + var(--cot) + 20px);right:calc(var(--an-p) + var(--cot) + 20px);height:20px;pointer-events:none;padding:0 8px;color-scheme:dark}
+.bia[data-bo-cuc='ngang'] .bia-thanh-tren{position:absolute;z-index:5;top:calc(var(--an-t) + 1px);left:calc(var(--an-tr) + var(--cot) + 64px);right:calc(var(--an-p) + var(--cot) + 64px);height:20px;pointer-events:none;padding:0;color-scheme:dark}
+/* ô điểm đi sát nhóm chấm của em (nửa trái băng trên), chừa trống giữa băng — không che lỗ giữa và hoạt ảnh bi rơi; lề 64 px tránh hai lỗ góc */
 .bia[data-bo-cuc='ngang'] .bia-ben-ten{color:rgb(201,214,242)}
 .bia[data-bo-cuc='ngang'] .bia-ben[data-dang] .bia-ben-ten{color:rgb(242,245,255)}
-.bia[data-bo-cuc='ngang'] .bia-ti-so{padding:0 10px;border-radius:999px;background:rgba(8,14,34,.62);color:rgb(242,245,255)}
+.bia[data-bo-cuc='ngang'] .bia-ti-so{margin:0 auto 0 10px;padding:0 8px;line-height:18px;border-radius:999px;background:rgba(8,14,34,.62);color:rgb(242,245,255)}
 .bia[data-bo-cuc='ngang'] .bia-dong-ho{color:rgb(255,180,171)}
-.bia[data-bo-cuc='ngang'] .bia-thanh-tren,.bia[data-bo-cuc='ngang'] .bia-nut-sanh,.bia[data-bo-cuc='ngang'] .bia-nut-mat,.bia[data-bo-cuc='ngang'] .bia-nut-am,.bia[data-bo-cuc='ngang'] .bia-nut-them,.bia[data-bo-cuc='ngang'] .bia-nut-xoay{transition:opacity .15s}
-.bia[data-bo-cuc='ngang'][data-keo] .bia-thanh-tren,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-sanh,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-mat,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-am,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-them,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-xoay{opacity:.28}
+.bia[data-bo-cuc='ngang'] .bia-nut-sanh,.bia[data-bo-cuc='ngang'] .bia-nut-mat,.bia[data-bo-cuc='ngang'] .bia-nut-am,.bia[data-bo-cuc='ngang'] .bia-nut-them,.bia[data-bo-cuc='ngang'] .bia-nut-xoay{transition:opacity .15s}
+.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-sanh,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-mat,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-am,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-them,.bia[data-bo-cuc='ngang'][data-keo] .bia-nut-xoay{opacity:.28}
 .bia[data-bo-cuc='ngang'] .bia-pop-xoay{left:auto;bottom:auto;right:calc(var(--an-p) + var(--cot) + 8px);top:var(--an-t)}
 .bia[data-bo-cuc='ngang'] .bia-pop-tuy{right:auto;bottom:auto;left:calc(var(--an-tr) + var(--cot) + 8px);top:var(--an-t);max-height:calc(100% - 8px)}
 .bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-pop-xoay{right:auto;left:calc(var(--an-tr) + var(--cot) + 8px)}

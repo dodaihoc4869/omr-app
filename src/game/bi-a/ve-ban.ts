@@ -324,7 +324,7 @@ export class BoVe {
         const ok = v.hopLe(info.b.id)
         if (v.pha === 'ai-nham') { ctx.strokeStyle = 'rgba(255,224,130,.9)'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.moveTo(info.b.x, info.b.y); ctx.lineTo(info.b.x + info.nx * (60 + 140 * info.cut), info.b.y + info.ny * (60 + 140 * info.cut)); ctx.stroke() }
         if (!ok) { ctx.strokeStyle = 'rgba(255,107,107,.95)'; ctx.lineWidth = 2.4; const d = 8; ctx.beginPath(); ctx.moveTo(info.gx - d, info.gy - d); ctx.lineTo(info.gx + d, info.gy + d); ctx.moveTo(info.gx + d, info.gy - d); ctx.lineTo(info.gx - d, info.gy + d); ctx.stroke() }
-        ctx.strokeStyle = ok ? 'rgba(255,214,107,.9)' : 'rgba(255,107,107,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(info.b.x, info.b.y, R + 4, 0, 7); ctx.stroke()
+        ctx.strokeStyle = ok ? 'rgba(255,255,255,.95)' : 'rgba(255,107,107,.9)'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.arc(info.b.x, info.b.y, R + 4, 0, 7); ctx.stroke() // bi đích hợp lệ: vòng TRẮNG (vàng chỉ dành cho bi đã giải trước)
       }
       if (dd) {
         ctx.setLineDash([2, 7]); ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 2.4; veDuong(ctx, dd.cue); ctx.setLineDash([])
