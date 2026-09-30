@@ -29,6 +29,8 @@ import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
 import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
 import '../components/bang-nhiem-vu/sheet-m3.css'
+// Tạm dừng hoạt ảnh Sảnh khi bị màn toàn màn hình che (lớp `sanh-bi-che`, xem hiệu ứng ngay dưới `cheDo2`).
+import '../styles/sanh-bi-che.css'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef, type ReactNode } from 'react'
 import { taoKhoGio, useGiayConLai } from '../lib/dong-ho-thi'
 import {
@@ -996,6 +998,15 @@ export default function StudentPortalScreen() {
   // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
   const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
+  // MÁY YẾU (30/09, số đo docs/do-toi-uu-app-hs-3009.md): màn toàn màn hình (game, Câu đã làm, Tu luyện…) che kín Sảnh nhưng ~55 hoạt ảnh
+  // SVG của cảnh Sảnh vẫn chạy ở LUỒNG CHÍNH mỗi khung (tính kiểu + vẽ lại phần bị che). Gắn lớp `sanh-bi-che` lên <html> ⇒ may-yeu.css TẠM
+  // DỪNG các hoạt ảnh ấy (animation-play-state) — không gỡ Sảnh, không đổi trạng thái/chữ; đóng màn là chạy tiếp đúng chỗ cũ.
+  useEffect(() => {
+    if (!cheDo2 || tab === null) return
+    const goc = document.documentElement
+    goc.classList.add('sanh-bi-che')
+    return () => goc.classList.remove('sanh-bi-che')
+  }, [cheDo2, tab])
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null && !cheDo2)
