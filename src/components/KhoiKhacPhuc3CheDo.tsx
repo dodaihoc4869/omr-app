@@ -48,7 +48,6 @@ import { hoiXacNhan } from './hop-thoai'
 import './m3'
 import './m3/luyen-khac-phuc.css'
 import NhomCaThuGon from './NhomCaThuGon'
-import NutHoiThay from './loi-giai/NutHoiThay'
 
 export interface BaiLuyenKhacPhuc {
   id: string
@@ -844,7 +843,6 @@ export default function KhoiKhacPhuc3CheDo({
               const boc = (qid: string, the: ReactNode) => (
                 <div key={qid}>
                   {the}
-                  <NutHoiThay qid={qid} nguon="khac_phuc" gon />
                 </div>
               )
               const common = {
@@ -856,6 +854,8 @@ export default function KhoiKhacPhuc3CheDo({
                 thanCauImg: q.anhThanCau,
                 table: q.bang || undefined,
                 explanation: q.chot || (q.buoc && q.buoc.length > 0 ? q.buoc.join('\n') : undefined),
+                // Hỏi thầy trong khối lời giải của TheCau ⇒ chỉ hiện sau khi nộp, khi lời giải đang hiện (thầy lệnh 30/09).
+                hoiThay: { qid: q.id, nguon: 'khac_phuc', gon: true },
               }
 
               if (q.phan === 'I') {

@@ -28,7 +28,6 @@ import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
 import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
-import NutHoiThay from '../../../components/loi-giai/NutHoiThay'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -137,9 +136,9 @@ export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao'}:Kho
   :{...chung,phan:'III',selected:em||null,correct:dap}
  return <section ref={goc} className="dao2-the-giai m3" aria-label={`Lời giải ải ${stt}`}>
   <p className="dao2-giai-dau"><b data-vai={vai??undefined}>ẢI {stt}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
-  <TheCau {...pc}/>
+  {/* Hỏi thầy nằm trong khối LỜI GIẢI của TheCau (thầy lệnh 30/09: chỉ hiện khi lời giải đang hiện). */}
+  <TheCau {...pc} hoiThay={{qid:q.qid,nguon,gon:true}}/>
   <HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom}/>
-  <NutHoiThay qid={q.qid} nguon={nguon} gon/>
  </section>
 }
 /** "+N EXP" bay từ nút dưới (chỗ vừa bấm CHỐT, nay là nút đọc xong lời giải) lên ảnh thần thú. Hằng ngoài component để không đổi mỗi lần vẽ. */
@@ -229,8 +228,6 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
       <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label="Câu này em có trợ giúp" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/>
       <span className="dao2-tro-chu" aria-hidden="true">Trợ giúp</span>
      </label>}
-     {/* Hỏi thầy trước khi chốt (thầy lệnh 29/09) ⇒ bật "Trợ giúp": câu chưa tính Thành thạo, quay lại sớm cho em tự làm. */}
-     <NutHoiThay qid={q?.qid} nguon="dao" gon onHoi={()=>{if(!goiY)onAssisted(true)}}/>
      <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
     </div>
     {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}</>

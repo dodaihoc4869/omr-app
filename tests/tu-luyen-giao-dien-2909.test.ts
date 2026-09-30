@@ -37,7 +37,8 @@ describe('Tu luyện — nối vào app', () => {
     expect(man).toContain("cheDo: 'thi' as const")
     expect(man).toContain("cheDo: 'xem_lai' as const")
     // SỬA CÓ CHỦ Ý 30/09: chế độ 1 có bản lặp `<qid>~2` ⇒ Hỏi thầy đi theo câu GỐC.
-    expect(man).toContain('<NutHoiThay qid={qidGoc(c.qid)} nguon="tu_luyen"')
+    // SỬA CÓ CHỦ Ý 30/09 (thầy: Hỏi thầy chỉ hiện khi lời giải đang hiện) ⇒ nút đi qua TheCau `hoiThay` trong khối lời giải.
+    expect(man).toContain("hoiThay: { qid: qidGoc(c.qid), nguon: 'tu_luyen'")
   })
   it('máy chủ định tuyến /hs/tu-luyen/*', () => {
     expect(may).toContain("if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))")

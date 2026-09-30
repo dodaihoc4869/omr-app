@@ -13,7 +13,6 @@ import OSoTraLoi from '../OSoTraLoi'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
-import NutHoiThay from '../loi-giai/NutHoiThay'
 import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
 import { expTheoCau, type AnhThuNhan, type CheDoHieuUng } from '../../lib/hieu-ung-exp-cau'
 
@@ -316,7 +315,6 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
               onChonY={(y, v) => chonY(c.qid, y, v)}
               expCau={expCau[c.qid] ?? 0}
               cheDo={cheDo}
-              onHoi={() => daHoi.current.add(c.qid)}
             />
           ))}
           {khongCo.map((q, i) => (
@@ -384,7 +382,6 @@ function TheCauOn({
   onChonY,
   expCau = 0,
   cheDo = 'tinh',
-  onHoi,
 }: {
   c: CauOn
   so: number
@@ -397,12 +394,8 @@ function TheCauOn({
   /** Luật v4: EXP máy chủ vừa ghi cho CÂU NÀY (0 = không hiệu ứng). */
   expCau?: number
   cheDo?: CheDoHieuUng
-  /** Em bấm Hỏi thầy trước khi nộp câu này (màn cha ghi nhớ để không phát hiệu ứng). */
-  onHoi?: () => void
 }) {
   const daCham = !!ketQua
-  // Em bấm Hỏi thầy TRƯỚC khi nộp câu này ⇒ máy chủ đã ghi câu là "có trợ giúp"; nói thật cho em biết vì sao câu chưa được tính.
-  const [daHoi, setDaHoi] = useState<string | null>(null)
   const khoaO = daCham || khoa
   const idTen = `lco-c-${c.qid}`
   const dungChuoi = ketQua ? (c.phan === 'II' ? chuanDS(String(ketQua.dapAnDung || '')) : String(ketQua.dapAnDung || '').trim().toUpperCase()) : ''
@@ -424,7 +417,7 @@ function TheCauOn({
             {ketQua!.dung ? 'Đúng' : 'Chưa đúng'}
           </span>
         )}
-        {daCham && ketQua!.dung && daHoi !== c.qid && <SoExpCau exp={expCau} cheDo={cheDo} />}
+        {daCham && ketQua!.dung && <SoExpCau exp={expCau} cheDo={cheDo} />}
         {!daCham && chuaTraLoi && (
           <span className="m3-chip" data-vai-tro="secondary">
             Chưa trả lời — chưa được tính
@@ -493,11 +486,7 @@ function TheCauOn({
         </div>
       )}
 
-      {/* Nút Hỏi thầy TRƯỚC khi nộp (thầy lệnh 29/09); nộp xong thì nút nằm trong hộp lời giải bên dưới. */}
-      {!daCham && <NutHoiThay qid={c.qid} nguon="on_lai" gon onHoi={() => { setDaHoi(c.qid); onHoi?.() }} />}
-      {daCham && daHoi === c.qid && (
-        <p className="lco-da-hoi" role="note">Em đã hỏi thầy trước khi nộp nên câu này chưa tính là tự làm được. Câu sẽ quay lại lịch ôn để em tự làm.</p>
-      )}
+      {/* Nút Hỏi thầy CHỈ nằm trong hộp lời giải (hiện sau khi nộp) — thầy lệnh 30/09: chưa hiện lời giải thì chưa có nút. */}
 
       {daCham && (
         <div className="lco-loi-giai">

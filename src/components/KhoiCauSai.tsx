@@ -328,7 +328,8 @@ export function LoiGiaiCauSai({ c, hoaHoc = false, qid, nguon }: { c: Omit<CauSa
           </div>
         </div>
       )}
-      {qid && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon />}
+      {/* Hỏi thầy chỉ khi hộp lời giải có nội dung (thầy lệnh 30/09). */}
+      {qid && !lg.thieu && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon />}
     </div>
   )
 }
