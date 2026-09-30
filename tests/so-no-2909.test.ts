@@ -278,8 +278,7 @@ const sk = (sbd: string, qid: string, msLuc: number, dung: boolean, nguon: SuKie
   nguon, maNguon, sbd, qid, lan: 1, ketQua: dung ? 1 : 0, luc: new Date(msLuc).toISOString(),
 })
 const giao = async (env: Env, maDe: string, hanNop: string, nowMs: number, theLucNgay = 40) => {
-  // raiDeu:false (30/09): kiểm trần nợ 50 % theo luật đổ đầy thể lực; rải đều (nợ lấp chỗ dư sau quota) có test riêng
-  const r = await gvChienDich(env, { action: 'tao', ten: `CD ${maDe}`, lop: '12A1', maDe: [maDe], hanNop, theLucNgay, raiDeu: false }, nowMs)
+  const r = await gvChienDich(env, { action: 'tao', ten: `CD ${maDe}`, lop: '12A1', maDe: [maDe], hanNop, theLucNgay }, nowMs)
   expect(r.ok).toBe(true)
   return String(r.id)
 }
@@ -340,7 +339,8 @@ describe('Sổ nợ trên D1 thật', () => {
     // Kế hoạch em: 80 lượt (có 20 lượt nợ cũ) > 0,9 × 10 × 6 ⇒ Quá tải (trần 12); nợ ≤ 50%.
     const { kh } = await layKeHoachHomNay(env, 'S1', T0)
     expect(kh.huyetChien).toBe(true)
-    expect(kh.tong).toBe(12)
+    // 30/09: chiến dịch mới mặc định RẢI ĐỀU câu mới ⇒ 6 nợ (50 %) + 5 câu mới (quota ⌈30 / (10 − 3)⌉), lượt thứ 12 bỏ trống (không đổ thêm nợ/câu mới).
+    expect(kh.tong).toBe(11)
     expect([...kh.dao, ...kh.doan].filter((q) => q.startsWith('Q')).length).toBe(6)
   })
 })

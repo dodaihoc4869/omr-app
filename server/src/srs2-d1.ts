@@ -14,7 +14,7 @@ import {
 } from './srs2-loi'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { protectedQuestions } from './game-v2-bank'
-import { jsonLaTuLuan, lyDoTuLuan } from './cam-tu-luan'
+import { docCauTuJson, jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -205,23 +205,33 @@ export const chienDichSapBatDau = (ds: readonly ChienDich[], homNay: string): Ch
 export interface MetaCau {
   qid: string; maDe: string; version: string; group: string; phan: Phan; mucDo: string | null; dang: string | null; tenDang: string | null; sao: number
   /**
-   * CÂU TỰ LUẬN (luật chặt #107, 30/09) — MỘT chỗ dùng chung cho kế hoạch ngày / rương / Sảnh / Bi-a: cờ `tuLuan` của chỉ mục (kho gắn nhãn `kieu: tu_luan`)
-   * HOẶC luật `lyDoTuLuan` tính trên phần rút gọn (phần, đáp án, đề, số phương án/ý) cho chỉ mục cũ chưa mang cờ. Câu tự luận KHÔNG vào kế hoạch,
+   * CÂU TỰ LUẬN (luật chặt #107, 30/09) — MỘT chỗ dùng chung cho kế hoạch ngày / rương / Sảnh / Bi-a: ĐÚNG phép `laCauTuLuan` mà `napCau` dùng khi phát câu,
+   * chạy trên CHÍNH câu trong chỉ mục (bỏ ảnh/lời giải, ảnh phương án thay bằng cờ có/không — `tuLuanTuMeta`). Câu tự luận KHÔNG vào kế hoạch,
    * không đếm vào thể lực/rương (sửa lỗi 30/09 "Chưa tải được câu hôm nay" + rương kẹt 48/49).
    */
   tuLuan: boolean
 }
-/** Cờ tự luận từ các cột rút gọn của chỉ mục (không đọc cả JSON — tránh ảnh). Phương án/ý độn theo số lượng: chỉ cần "đủ 4" là rút được. */
-export function tuLuanTuMeta(x: Row, qid: string, phan: Phan): boolean {
-  if (x.tu_luan === 1 || x.tu_luan === true || x.tu_luan === '1') return true
-  const nPa = x.n_pa == null ? null : Number(x.n_pa), nY = x.n_y == null ? null : Number(x.n_y)
-  return lyDoTuLuan({
-    qid, maDe: str(x.ma_de), phan,
-    ...(x.correct == null ? {} : { correct: typeof x.correct === 'string' ? x.correct : String(x.correct) }),
-    ...(x.text_cau == null ? {} : { text: str(x.text_cau) }),
-    ...(nPa == null ? {} : { choices: Array.from({ length: Math.max(0, nPa) }, () => 'x') }),
-    ...(nY == null ? {} : { ideas: Array.from({ length: Math.max(0, nY) }, () => 'x') }),
-  }) !== null
+/**
+ * Phần SQL đọc câu RÚT GỌN cho `tuLuanTuMeta` (bảng `game_v2_question`, cột `json`): câu bỏ trường nặng (ảnh, lời giải, bảng), ảnh phương án/ý thay bằng
+ * mảng 0/1 cùng thứ tự, hình kèm câu thay bằng `{viTri, src: 'x'|''}`. Đủ MỌI trường `lyDoTuLuan` đọc ⇒ kết quả trùng `laCauTuLuan(câu đầy đủ)`
+ * (phản biện #108: trước đây độn phương án bằng 'x' theo số lượng ⇒ phương án rỗng chữ lọt, kế hoạch đếm mà Đảo bỏ ⇒ rương vẫn kẹt).
+ * CHÚ Ý: trong `json_each(...)` phải ghi `game_v2_question.json` — tên trần `json` bị hiểu là cột ẩn `json` của chính `json_each` (ra mảng rỗng).
+ */
+const SQL_CAU_GON = `json_remove(json,'$.imageDataUrl','$.thanCauImg','$.solution','$.table','$.choiceImgs','$.ideaImgs','$.hinhAnh','$.hinh','$.kienThuc','$.anhLuaChon','$.anhY') AS gon,
+        (SELECT json_group_array(CASE WHEN e.type IN ('null','false') OR (e.type = 'text' AND e.value = '') OR (e.type IN ('integer','real') AND e.value = 0) OR (e.type = 'array' AND json_array_length(e.value) = 0) THEN 0 ELSE 1 END) FROM json_each(game_v2_question.json,'$.choiceImgs') e) AS anh_pa,
+        (SELECT json_group_array(CASE WHEN e.type IN ('null','false') OR (e.type = 'text' AND e.value = '') OR (e.type IN ('integer','real') AND e.value = 0) OR (e.type = 'array' AND json_array_length(e.value) = 0) THEN 0 ELSE 1 END) FROM json_each(game_v2_question.json,'$.ideaImgs') e) AS anh_y,
+        (SELECT json_group_array(json_object('viTri', COALESCE(json_extract(e.value,'$.viTri'), json_extract(e.value,'$.vi_tri')),
+            'src', CASE WHEN COALESCE(json_extract(e.value,'$.src'), json_extract(e.value,'$.url'), json_extract(e.value,'$.data'), '') <> '' THEN 'x' ELSE '' END))
+          FROM json_each(game_v2_question.json,'$.hinhAnh') e WHERE e.type = 'object') AS hinh_gon`
+const mangJson = (v: unknown): unknown[] => {
+  try { const a = JSON.parse(typeof v === 'string' ? v : '[]') as unknown; return Array.isArray(a) ? a : [] } catch { return [] }
+}
+/** Cờ tự luận của một dòng đọc bằng `SQL_CAU_GON`: dựng lại câu (ảnh = cờ) rồi hỏi ĐÚNG `laCauTuLuan` như lúc phát câu. JSON không đọc được ⇒ tự luận (không phục vụ). */
+export function tuLuanTuMeta(x: Row): boolean {
+  const c = docCauTuJson(x.gon)
+  if (!c) return true
+  const anhPa = mangJson(x.anh_pa), anhY = mangJson(x.anh_y), hinh = mangJson(x.hinh_gon)
+  return laCauTuLuan({ ...c, ...(anhPa.length ? { choiceImgs: anhPa } : {}), ...(anhY.length ? { ideaImgs: anhY } : {}), ...(hinh.length ? { hinhAnh: hinh } : {}) })
 }
 /**
  * Siêu dữ liệu câu (không đáp án xuống máy em, không lời giải). Câu có ở nhiều tờ: ưu tiên tờ thuộc `uuTienMaDe`.
@@ -232,8 +242,7 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
   const ra = new Map<string, MetaCau>()
   if (!qids.length) return ra
   const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao,
-        json_extract(json,'$.tuLuan') AS tu_luan, json_extract(json,'$.correct') AS correct, json_extract(json,'$.text') AS text_cau, json_array_length(json,'$.choices') AS n_pa, json_array_length(json,'$.ideas') AS n_y,
-        json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version
+        ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version
       FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)`).bind(JSON.stringify([...new Set(qids)])).all<Row>()
   const uuTien = new Set(uuTienMaDe)
   for (const x of r.results ?? []) {
@@ -242,7 +251,7 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
     const cu = ra.get(qid)
     if (cu && (uuTien.has(cu.maDe) || !uuTien.has(str(x.ma_de)))) continue
     const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
-    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x, qid, phan) })
+    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x) })
   }
   return ra
 }
@@ -324,6 +333,11 @@ export interface HoSo2 {
   chienDichCuCuaCau?: Map<string, { ten: string; hanNop: string }>
   /** SỔ NỢ: trần lượt/ngày khi KHÔNG có chiến dịch = thể lực của chiến dịch vừa đóng gần nhất (mặc định 40). */
   theLucNoCu?: number
+  /**
+   * Câu KHÔNG phục vụ được (rút khỏi kho / tự luận — không có trong `cau`/`tt`) mà em CHƯA làm lần nào (tính từ mốc như `tt`) — chỉ-thêm 30/09:
+   * lúc thay câu hỏng trong kế hoạch đã chốt biết câu hỏng là câu MỚI (thay bằng câu mới) hay câu ÔN (thay bằng câu ôn).
+   */
+  laMoiBo?: Set<string>
 }
 
 /** Thể lực/ngày của chiến dịch vừa đóng (hoặc hết hạn) gần nhất của em — trần kế hoạch ôn nợ khi không có chiến dịch. Không có ⇒ 40. */
@@ -436,9 +450,10 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
   for (const x of lanLam) if (x.luc >= (tuLucTheoQid.get(x.qid) ?? '')) theoQid.set(x.qid, [...(theoQid.get(x.qid) ?? []), x])
   const tt = new Map<string, TrangThaiCau>()
   const cau: CauSrs[] = []
+  const laMoiBo = new Set<string>()
   for (const qid of qids) {
     const m = meta.get(qid)
-    if (!m || m.tuLuan) continue // câu đã rút khỏi kho / câu tự luận (30/09: không vào kế hoạch, không đếm thể lực; meta vẫn giữ để tra)
+    if (!m || m.tuLuan) { if (!theoQid.get(qid)?.length) laMoiBo.add(qid); continue } // câu đã rút khỏi kho / câu tự luận (30/09: không vào kế hoạch, không đếm thể lực; meta vẫn giữ để tra)
     const t = phatLaiCau(qid, theoQid.get(qid) ?? [], hanTheoQid.get(qid) ?? null, moc.get(qid) ?? [], { sao: m.sao, phan: m.phan, mucDo: m.mucDo })
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
@@ -448,7 +463,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
   const chienDichCuCuaCau = new Map<string, { ten: string; hanNop: string }>()
   for (const [q, c] of cdCuaQid) if (c.trangThai === 'da_dong' || c.hanNop < homNay) chienDichCuCuaCau.set(q, { ten: c.ten, hanNop: c.hanNop })
   const lanLamChienDich = dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
-  return { chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay) }
+  return { chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo }
 }
 
 // ---------------------------------------------------------------- SỔ NỢ: lịch sử có nguồn + nhãn nợ (thầy chốt 29/09)
@@ -718,6 +733,45 @@ export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2
   return { ...kh, dao, doan, tong: dao.length + doan.length, conDao: kh.conDao.filter((k) => !bo.has(k)), conDoan: kh.conDoan.filter((k) => !bo.has(k)), tamHoan: { ca, kho, ...(tuLuan ? { tuLuan } : {}) } }
 }
 
+/**
+ * Ghi đè kế hoạch đã chốt CHỈ KHI bản ghi còn đúng bản đã đọc (`cu`: so `dao_json`/`doan_json`) — phản biện #108: em mở hai máy, máy đọc sớm không được
+ * ghi đè kế hoạch máy kia vừa sửa. Trả `true` khi đã ghi.
+ */
+async function ghiKeHoachNeuChuaDoi(env: Env, sbd: string, ngay: string, cu: Row, cot: string, giaTri: unknown[]): Promise<boolean> {
+  const r = await env.DB.prepare(`UPDATE srs2_ke_hoach SET ${cot} WHERE sbd = ? AND ngay = ? AND dao_json = ? AND doan_json = ?`)
+    .bind(...giaTri, sbd, ngay, str(cu.dao_json), str(cu.doan_json)).run()
+  return Number(r.meta?.changes ?? 0) > 0
+}
+/** Máy khác vừa ghi kế hoạch hôm nay ⇒ dùng bản ĐÃ CHỐT ấy (không có ⇒ bản đang cầm). */
+async function docLaiKeHoach(env: Env, sbd: string, ngay: string, dem: ReadonlyMap<string, number>, duPhong: KeHoachDaChot): Promise<KeHoachDaChot> {
+  const r = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+  return r ? tuDong(r, ngay, dem) : duPhong
+}
+/**
+ * THAY câu hỏng (tự luận / rút khỏi kho) của kế hoạch đã chốt — tại chỗ, cùng loại: câu MỚI thay bằng câu mới chưa có trong kế hoạch (quota ngày không đổi),
+ * câu ÔN thay bằng câu ôn tới lịch chưa có trong kế hoạch (Đảo: ôn Đúng–sai; Đoàn: ôn phần I/III). Ứng viên theo thứ tự của `lapKeHoachNgay` (không trần,
+ * đổ đầy — chỉ để xếp hàng ứng viên, KHÔNG dùng cờ rải đều hiện tại). Câu sai của ca vừa công bố KHÔNG kéo vào giữa ngày. Không thay được câu nào ⇒ `null`.
+ */
+export function thayCauHong(kh: KeHoachDaChot, hong: ReadonlySet<string>, hoSo: Pick<HoSo2, 'cau' | 'tt' | 'laMoiBo' | 'qidCaSai'>, tuyChon: TuyChonKeHoach): { dao: string[]; doan: string[] } | null {
+  const VO_HAN = 1_000_000
+  const lap = lapKeHoachNgay(hoSo.cau.filter((c) => !hoSo.qidCaSai?.has(c.qid)), hoSo.tt, { ...tuyChon, raiDeu: false, tranNgay: VO_HAN, tranHuyetChien: VO_HAN })
+  const daCo = new Set([...kh.dao, ...kh.doan].map(qidGoc))
+  const laMoi = (q: string) => hoSo.tt.get(q)?.laMoi ?? hoSo.laMoiBo?.has(q) ?? false
+  const hang = (ds: readonly string[], moi: boolean) => ds.filter((q) => !daCo.has(q) && (hoSo.tt.get(q)?.laMoi ?? false) === moi)
+  const ung = { daoMoi: hang(lap.dao, true), daoOn: hang(lap.dao, false), doanOn: hang(lap.doan, false) }
+  let doi = 0
+  const lay = (ds: string[]): string | null => {
+    while (ds.length && daCo.has(ds[0]!)) ds.shift() // ứng viên đã được lấy cho câu hỏng trước (một câu có thể nằm ở hai hàng)
+    const q = ds.shift() ?? null
+    if (q) { daCo.add(q); doi++ }
+    return q
+  }
+  const thayTrong = (ds: readonly string[], cuaDoan: boolean) =>
+    ds.map((k) => (!hong.has(k) ? k : (cuaDoan ? lay(ung.doanOn) : laMoi(qidGoc(k)) ? lay(ung.daoMoi) : lay(ung.daoOn)) ?? k))
+  const dao = thayTrong(kh.dao, false), doan = thayTrong(kh.doan, true)
+  return doi ? { dao, doan } : null
+}
+
 async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   const ngay = ngayVnCua(nowMs)
   // Tối ưu 28/09: hồ sơ, số lần làm hôm nay và kế hoạch đã chốt là ba lượt ĐỌC độc lập ⇒ chạy SONG SONG (trước: ba đợt nối tiếp).
@@ -739,10 +793,7 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2):
     // thì LẬP LẠI theo chiến dịch hiện tại — giữ các câu đã làm hôm nay (vẫn trừ vào thể lực), thêm câu mới của kế hoạch.
     // Kế hoạch đã chốt có câu ÔN (Đoàn) mà theo luật hiện tại là câu MỚI (thầy 28/09: bỏ câu ôn lấy từ lịch sử trước chiến dịch) ⇒ cũng lập lại.
     const onSaiLuat = kh.conDoan.some((k) => hoSo.tt.get(qidGoc(k))?.laMoi)
-    // 30/09 (sửa lỗi "Chưa tải được câu hôm nay", rương kẹt 48/49): kế hoạch chốt còn câu KHÔNG PHỤC VỤ ĐƯỢC (chỉ mục nay xem là tự luận / đã rút khỏi kho)
-    // ⇒ cũng lập lại bằng đúng cơ chế này: giữ câu đã làm, câu hỏng bị thay bằng câu hợp lệ theo luật ngày (quota rải đều trừ phần câu mới đã làm).
-    const coCauKhongPhucVu = [...kh.conDao, ...kh.conDoan].some((k) => lyDoKhongPhucVu(hoSo.meta.get(qidGoc(k))) !== null)
-    if ((kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat || coCauKhongPhucVu) {
+    if ((kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat) {
       const xongDao = kh.dao.filter((k) => !kh.conDao.includes(k))
       const xongDoan = kh.doan.filter((k) => !kh.conDoan.includes(k))
       // Câu MỚI của kế hoạch hôm nay em đã làm: lần làm đầu tiên (từ mốc chiến dịch) rơi đúng hôm nay ⇒ quota rải đều hôm nay trừ đi phần này.
@@ -750,9 +801,20 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2):
       const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, { ...(await tuyChonLap()), moiDaLamHomNay }, xongDao.length + xongDoan.length)
       const dao = [...xongDao, ...themLanLam([...xongDao, ...xongDoan], lap.dao)]
       const doan = [...xongDoan, ...themLanLam([...dao, ...xongDoan], lap.doan)]
-      await env.DB.prepare('UPDATE srs2_ke_hoach SET chien_dich_id = ?, dao_json = ?, doan_json = ?, huyet_chien = ?, tong = ? WHERE sbd = ? AND ngay = ?')
-        .bind(cd?.id ?? null, JSON.stringify(dao), JSON.stringify(doan), lap.huyetChien ? 1 : 0, dao.length + doan.length, sbd, ngay).run()
-      return { kh: hoanThien(ngay, cd?.id ?? null, dao, doan, lap.huyetChien, dem), hs: hoSo }
+      const ghi = await ghiKeHoachNeuChuaDoi(env, sbd, ngay, cu, 'chien_dich_id = ?, dao_json = ?, doan_json = ?, huyet_chien = ?, tong = ?',
+        [cd?.id ?? null, JSON.stringify(dao), JSON.stringify(doan), lap.huyetChien ? 1 : 0, dao.length + doan.length])
+      return { kh: ghi ? hoanThien(ngay, cd?.id ?? null, dao, doan, lap.huyetChien, dem) : await docLaiKeHoach(env, sbd, ngay, dem, kh), hs: hoSo }
+    }
+    // 30/09 (sửa lỗi "Chưa tải được câu hôm nay", rương kẹt 48/49) — phản biện #108: kế hoạch chốt còn câu KHÔNG PHỤC VỤ ĐƯỢC (chỉ mục nay xem là tự luận /
+    // đã rút khỏi kho) ⇒ CHỈ thay đúng các câu ấy (mới thay mới, ôn thay ôn, tối đa bằng số câu hỏng), giữ nguyên phần còn lại, thứ tự và Huyết Chiến đã chốt
+    // — KHÔNG lập lại cả ngày theo cờ rải đều hiện tại. Không có câu thay ⇒ để nguyên bản ghi (`tamHoanCauKhoa` bỏ câu hỏng khỏi `tong` trong bộ nhớ).
+    const hong = new Set([...kh.conDao, ...kh.conDoan].filter((k) => lyDoKhongPhucVu(hoSo.meta.get(qidGoc(k))) !== null))
+    if (hong.size) {
+      const thay = thayCauHong(kh, hong, hoSo, tuyChonGoc)
+      if (thay) {
+        const ghi = await ghiKeHoachNeuChuaDoi(env, sbd, ngay, cu, 'dao_json = ?, doan_json = ?, tong = ?', [JSON.stringify(thay.dao), JSON.stringify(thay.doan), thay.dao.length + thay.doan.length])
+        kh = ghi ? hoanThien(ngay, kh.chienDichId, thay.dao, thay.doan, kh.huyetChien, dem) : await docLaiKeHoach(env, sbd, ngay, dem, kh)
+      }
     }
     if (cd && cd.hanNop === ngay && kh.conDao.length + kh.conDoan.length === 0) {
       // Bổ sung ngày cuối KHÔNG kéo câu `ca_sai` vào kế hoạch đã chốt: câu sai của ca vào từ lần lập kế hoạch kế tiếp (thầy 28/09).
@@ -760,8 +822,8 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2):
       if (them.dao.length + them.doan.length) {
         const dao = [...kh.dao, ...themLanLam([...kh.dao, ...kh.doan], them.dao)]
         const doan = [...kh.doan, ...themLanLam([...dao, ...kh.doan], them.doan)]
-        await env.DB.prepare('UPDATE srs2_ke_hoach SET dao_json = ?, doan_json = ?, tong = ? WHERE sbd = ? AND ngay = ?').bind(JSON.stringify(dao), JSON.stringify(doan), dao.length + doan.length, sbd, ngay).run()
-        kh = hoanThien(ngay, kh.chienDichId, dao, doan, kh.huyetChien, dem)
+        const ghi = await ghiKeHoachNeuChuaDoi(env, sbd, ngay, cu, 'dao_json = ?, doan_json = ?, tong = ?', [JSON.stringify(dao), JSON.stringify(doan), dao.length + doan.length])
+        kh = ghi ? hoanThien(ngay, kh.chienDichId, dao, doan, kh.huyetChien, dem) : await docLaiKeHoach(env, sbd, ngay, dem, kh)
       }
     }
     return { kh, hs: hoSo }

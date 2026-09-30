@@ -329,7 +329,8 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   return {
     ok: true, batDau: dv.batDau ?? homNay, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soCauTheoMucDo: theoMucDo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     // Rải đều (thầy 30/09, chỉ-thêm): tổng lượt so với D × thể lực KHÔNG đổi; chỉ báo thêm ≈ số câu mới/ngày của em giữa lớp khi bật (3 ngày cuối để ôn).
-    raiDeu: dv.raiDeu, cauMoiMoiNgay: tachGiua ? Math.ceil(tachGiua.cauMoi / Math.max(1, D - NGAY_DEM)) : null,
+    // Đúng luật `lapKeHoachNgay`: D ≤ NGAY_DEM ⇒ giao hết câu mới ngay ngày đầu. Có thể VƯỢT lượt/ngày — màn thầy tự so và cảnh báo.
+    raiDeu: dv.raiDeu, cauMoiMoiNgay: tachGiua ? (D > NGAY_DEM ? Math.ceil(tachGiua.cauMoi / (D - NGAY_DEM)) : tachGiua.cauMoi) : null,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     noCu: await dongNoCu(env, noCu, dv.theLucNgay),
     goiY: sc.muc === 'xanh' ? null : {

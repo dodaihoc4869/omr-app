@@ -51,12 +51,12 @@ describe('rải đều câu mới theo ngày (thầy 30/09)', () => {
     expect(demNo(ds)).toBe(10)
     expect(ds).toHaveLength(19)
   })
-  it('(c2) BẬT: đủ quota câu mới ⇒ lượt dư dồn cho nợ vượt trần 50% (như luật "hết câu mới ⇒ thêm nợ"); TẮT ⇒ nợ đứng ở 50%, câu mới lấp đầy', () => {
+  it('(c2) BẬT: đủ quota câu mới ⇒ nợ vẫn giữ trần 50 %, lượt dư bỏ trống (thầy "giữ các tỉ lệ hiện có; nếu vẫn dư thì thôi"); TẮT ⇒ nợ 50 %, câu mới lấp đầy', () => {
     const { cs, tt } = bo(25, 30, '2026-09-30')
     const bat = lapKeHoachNgay(cs, tt, { homNay: '2026-09-30', hanNop: HAN, tranNgay: 49, raiDeu: true })
     expect(demMoi(tatCa(bat))).toBe(9)
-    expect(demNo(tatCa(bat))).toBe(30) // 24 (50 %) + 6 lấp chỗ dư
-    expect(tatCa(bat)).toHaveLength(39)
+    expect(demNo(tatCa(bat))).toBe(24) // floor(49 × 50 %) — KHÔNG lấp chỗ dư bằng nợ
+    expect(tatCa(bat)).toHaveLength(33)
     const tat = lapKeHoachNgay(cs, tt, { homNay: '2026-09-30', hanNop: HAN, tranNgay: 49 })
     expect(demNo(tatCa(tat))).toBe(24)
     expect(demMoi(tatCa(tat))).toBe(25)

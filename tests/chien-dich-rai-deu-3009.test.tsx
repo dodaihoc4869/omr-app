@@ -14,7 +14,8 @@ vi.mock('../src/lib/exam-db', () => ({
 import GiaoChienDich from '../src/components/chien-dich/GiaoChienDich'
 import DsChienDichDaGiao from '../src/components/chien-dich/DsChienDichDaGiao'
 import DongHoSucChua from '../src/components/chien-dich/DongHoSucChua'
-import type { SucChua } from '../src/components/chien-dich/api'
+import BangChienDich from '../src/components/chien-dich/BangChienDich'
+import type { BangChienDich as DuBang, SucChua } from '../src/components/chien-dich/api'
 
 const NOW = Date.UTC(2026, 8, 27, 3, 0, 0)
 const lenh = (action: string) => goi.mock.calls.filter(([, b]) => b.action === action).map(([, b]) => b as Record<string, unknown>)
@@ -101,5 +102,45 @@ describe('Đồng hồ sức chứa — dòng rải đều', () => {
     expect(screen.queryByText(/Rải đều: khoảng/)).toBeNull()
     rerender(<DongHoSucChua sc={sc} dangTinh={false} loi="" theLuc={40} onTinhLai={vi.fn()} />)
     expect(screen.queryByText(/Rải đều: khoảng/)).toBeNull()
+  })
+})
+
+// PHẢN BIỆN #108 (vòng 1): câu chữ đồng hồ khi D ≤ 3 / quota vượt lượt mỗi ngày; dòng "Dự kiến" theo luật rải đều; chip riêng trên Bảng chiến dịch.
+describe('Phản biện #108 — chữ rải đều ở màn thầy', () => {
+  const sc: SucChua = { ...SC, muc: 'vang', goiY: null } as SucChua
+  it('Đồng hồ: chiến dịch ≤ 3 ngày ⇒ "câu mới giao ngay từ ngày đầu" (không "1 ngày đầu, 3 ngày cuối"); quota vượt lượt/ngày ⇒ cảnh báo dồn cuối', () => {
+    const { rerender, container } = render(<DongHoSucChua sc={{ ...sc, D: 3, raiDeu: true, cauMoiMoiNgay: 40 }} dangTinh={false} loi="" theLuc={40} onTinhLai={vi.fn()} />)
+    const dong = () => container.querySelector('[data-khoi="rai-deu"]')?.textContent ?? ''
+    expect(dong()).toBe('Chiến dịch ngắn (không quá 3 ngày): câu mới giao ngay từ ngày đầu.')
+    expect(dong()).not.toMatch(/ngày cuối để ôn/)
+    rerender(<DongHoSucChua sc={{ ...sc, D: 5, raiDeu: true, cauMoiMoiNgay: 150 }} dangTinh={false} loi="" theLuc={40} onTinhLai={vi.fn()} />)
+    expect(dong()).toBe('Rải đều: cần khoảng 150 câu mới mỗi ngày nhưng mỗi ngày chỉ có 40 lượt — câu mới sẽ dồn sang những ngày cuối. Nên tăng lượt mỗi ngày hoặc lùi hạn.')
+    rerender(<DongHoSucChua sc={{ ...sc, D: 5, raiDeu: true, cauMoiMoiNgay: 40 }} dangTinh={false} loi="" theLuc={40} onTinhLai={vi.fn()} />)
+    expect(dong()).toBe('Rải đều: khoảng 40 câu mới mỗi ngày trong 2 ngày đầu, 3 ngày cuối để ôn.')
+  })
+  it('Giao: dòng "Dự kiến" khi BẬT không sớm hơn ngày D − 3 (câu mới chia tới đó); TẮT ⇒ theo khối lượng như cũ', async () => {
+    goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
+      // Khối lượng nhỏ: đổ đầy thì 3 ngày xong; rải đều câu mới tới ngày 5 (D = 8).
+      if (b.action === 'suc-chua') return { ok: true, du: { ...SC, khoiLuongTrungVi: 100, theLucDeXuat: 47, raiDeu: b.raiDeu !== false, cauMoiMoiNgay: 24 } }
+      return { ok: false, loai: 'tu_choi', chu: 'lệnh lạ' }
+    })
+    render(<GiaoChienDich maCa="CA-1" lop="12A1" maDeCa={['DE-A']} tenGoiY="Ester – Lipid" nowMs={NOW} />)
+    expect(await screen.findByText(/Rải đều: em ở giữa lớp làm hết câu mới trước 23:59 · .*01\/10.*, 3 ngày cuối để ôn/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('switch', { name: 'Rải đều câu mới theo ngày' }))
+    expect(await screen.findByText(/^Em ở giữa lớp làm đủ lượt trước 23:59 · .*29\/09/)).toBeTruthy()
+    expect(screen.queryByText(/làm hết câu mới/)).toBeNull()
+  })
+  it('Bảng chiến dịch: chip riêng "Rải đều câu mới: Bật/Tắt" cạnh trạng thái; ô Quá tải hôm nay trả dòng phụ như cũ', () => {
+    const du = (raiDeu?: boolean): DuBang => ({
+      chienDich: { id: 'cd-1', ten: 'Ester', lop: '12A1', maDe: ['DE-A'], hanNop: '2026-10-04', theLucNgay: 40, huyetChien: true, maCa: null, taoLuc: '', trangThai: 'dang_chay', soCau: 40, soEm: 0, ...(raiDeu === undefined ? {} : { raiDeu }) },
+      homNay: '2026-10-01', hetHan: false, lop: { coXat: 0.5, thanhThao: 0.3, huyetChien: 1, canDayLaiCau: 0, canDayLaiLuot: 0 }, dang: [], em: [], canDayLai: [],
+    }) as DuBang
+    const { container, rerender } = render(<BangChienDich du={du()} nowMs={Date.UTC(2026, 9, 1, 3)} dangChieu={false} onChieu={vi.fn(async () => true)} onDaChua={vi.fn()} />)
+    const chip = () => container.querySelector('[data-khoi="rai-deu"]')?.textContent ?? ''
+    expect(chip()).toBe('Rải đều câu mới: Bật')
+    const quaTai = container.querySelector('[data-so="qua-tai"]')!.parentElement!
+    expect(quaTai.querySelector('.cd-kpi-phu')!.textContent).toBe('phải làm quá 40 lượt/ngày để kịp hạn')
+    rerender(<BangChienDich du={du(false)} nowMs={Date.UTC(2026, 9, 1, 3)} dangChieu={false} onChieu={vi.fn(async () => true)} onDaChua={vi.fn()} />)
+    expect(chip()).toBe('Rải đều câu mới: Tắt')
   })
 })

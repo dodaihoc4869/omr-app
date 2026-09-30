@@ -6,6 +6,8 @@ import { phanTram } from './ngay'
 import { CHU_MUC } from './tinh'
 
 const CHU_MUC_HOA = { xanh: 'Vừa sức', vang: 'Sát', do: 'Quá tải' } as const
+/** Số ngày cuối dành để ôn khi rải đều (= `NGAY_DEM` của máy chủ, srs2-loi.ts). */
+export const NGAY_ON_CUOI = 3
 
 export default function DongHoSucChua({
   sc,
@@ -73,7 +75,11 @@ export default function DongHoSucChua({
       </p>
       {sc.raiDeu && sc.cauMoiMoiNgay != null && (
         <p className="cd-phu cd-so" data-khoi="rai-deu">
-          Rải đều: khoảng {sc.cauMoiMoiNgay} câu mới mỗi ngày trong {Math.max(1, sc.D - 3)} ngày đầu, 3 ngày cuối để ôn.
+          {sc.D <= NGAY_ON_CUOI
+            ? 'Chiến dịch ngắn (không quá 3 ngày): câu mới giao ngay từ ngày đầu.'
+            : sc.cauMoiMoiNgay > theLuc
+              ? `Rải đều: cần khoảng ${sc.cauMoiMoiNgay} câu mới mỗi ngày nhưng mỗi ngày chỉ có ${theLuc} lượt — câu mới sẽ dồn sang những ngày cuối. Nên tăng lượt mỗi ngày hoặc lùi hạn.`
+              : `Rải đều: khoảng ${sc.cauMoiMoiNgay} câu mới mỗi ngày trong ${sc.D - NGAY_ON_CUOI} ngày đầu, 3 ngày cuối để ôn.`}
         </p>
       )}
       {noCu.length > 0 && (

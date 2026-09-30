@@ -85,14 +85,15 @@ Lỗi: `{ ok:false, error:"<tiếng Việt>" }`.
 ## Rải đều câu mới theo ngày (thầy chốt 30/09/2026)
 
 - Trường `raiDeu` (boolean) trả kèm ở `danh-sach`, `bang.chienDich`, `/gv/chien-dich/sua doc`, `chan-doan-em.chienDichDangChay`; nhận ở `tao` và `suc-chua` (vắng ⇒ `true`).
-- BẬT: số câu MỚI mỗi ngày dừng đúng quota = ceil(số câu mới còn / (D − 3)); KHÔNG đổ thêm câu mới cho đủ số lượt mỗi ngày; lượt dư dồn nợ / củng cố / duy trì (tỉ lệ cũ), vẫn dư thì thôi — ngày ngắn hơn là bình thường (Rương theo `tong` của ngày). D ≤ 3 vẫn đổ hết câu mới. Quá tải hôm nay (trần gấp đôi) chỉ nới nợ/ôn.
+- BẬT: số câu MỚI mỗi ngày dừng đúng quota = ceil(số câu mới còn / (D − 3)); KHÔNG đổ thêm câu mới cho đủ số lượt mỗi ngày; lượt dư dùng cho nợ (vẫn trần 50 %) / củng cố / duy trì (≤ 20 %), vẫn dư thì thôi (phản biện #108: không đổ thêm nợ vượt trần) — ngày ngắn hơn là bình thường (Rương theo `tong` của ngày). D ≤ 3 vẫn đổ hết câu mới. Quá tải hôm nay (trần gấp đôi) chỉ nới nợ/ôn.
 - TẮT: y hệt trước 30/09 (đổ câu mới cho đầy số lượt).
-- `suc-chua` thêm `raiDeu` + `cauMoiMoiNgay` = ceil(câu mới của em giữa lớp / max(1, D − 3)) (chỉ để hiện; `tiLe/muc/sucChua` không đổi).
-- Lập lại kế hoạch giữa ngày (sửa chiến dịch / câu không phục vụ được): quota hôm nay trừ số câu mới đã làm (`TuyChonKeHoach.moiDaLamHomNay`), không cộng dồn.
+- `suc-chua` thêm `raiDeu` + `cauMoiMoiNgay` = ceil(câu mới của em giữa lớp / (D − 3)), D ≤ 3 ⇒ toàn bộ câu mới (chỉ để hiện; `tiLe/muc/sucChua` không đổi). Màn thầy: D ≤ 3 ⇒ "câu mới giao ngay từ ngày đầu"; `cauMoiMoiNgay` > lượt/ngày ⇒ cảnh báo dồn cuối; dòng "Dự kiến" không sớm hơn ngày D − 3.
+- Lập lại kế hoạch giữa ngày (đổi chiến dịch / câu ôn sai luật): quota hôm nay trừ số câu mới đã làm (`TuyChonKeHoach.moiDaLamHomNay`), không cộng dồn. Câu không phục vụ được KHÔNG lập lại cả ngày (xem dưới).
 
 ## Câu không phục vụ được trong kế hoạch đã chốt (sửa lỗi 30/09 "Chưa tải được câu hôm nay", rương kẹt 48/49)
 
-- `MetaCau.tuLuan` (một chỗ dùng chung, `docMetaCau`): cờ `tuLuan` của chỉ mục HOẶC luật `lyDoTuLuan` trên phần rút gọn. Câu tự luận không vào `hoSo.cau` ⇒ không vào kế hoạch, không đếm thể lực/rương/trần Bi-a. Dòng JSON hỏng hoặc không mang đúng `qid`/`version` ⇒ coi như đã rút khỏi kho.
-- Kế hoạch đã chốt còn câu tự luận / rút khỏi kho ⇒ LẬP LẠI bằng cơ chế sẵn có (giữ câu đã làm; thay bằng câu hợp lệ theo luật ngày & quota rải đều); `tamHoan` thêm `tuLuan` cho trường hợp không lập lại.
-- Lượt Đảo/Đoàn rỗng: ca ⇒ `cau_dang_bao_ve`; bàn Bi-a ⇒ `cau_dang_o_bia`; toàn bộ câu còn lại tự luận/vắng ⇒ `xong_ke_hoach` / `xong_on_hom_nay` (không lộ lý do); D1 ném khi nạp lô ⇒ `chua_nap_duoc` + một dòng `nhat_ky_may` nguồn `nap_cau_game`.
+- `MetaCau.tuLuan` (một chỗ dùng chung, `docMetaCau`): ĐÚNG `laCauTuLuan` như lúc phát câu, chạy trên câu của chỉ mục đã bỏ ảnh/lời giải (ảnh phương án/ý = cờ 0/1, hình kèm = `{viTri, src}`) — phản biện #108: không còn độn phương án theo số lượng. Câu tự luận không vào `hoSo.cau` ⇒ không vào kế hoạch, không đếm thể lực/rương/trần Bi-a. Dòng JSON hỏng hoặc không mang đúng `qid`/`version` ⇒ coi như đã rút khỏi kho.
+- Kế hoạch đã chốt còn câu tự luận / rút khỏi kho ⇒ CHỈ THAY đúng các câu ấy tại chỗ (`thayCauHong`): câu mới thay bằng câu mới chưa có trong kế hoạch, câu ôn thay bằng câu ôn tới lịch (Đảo: ôn Đúng–sai; Đoàn: ôn phần I/III); phần còn lại, thứ tự và `huyet_chien` đã chốt giữ nguyên, KHÔNG dùng cờ rải đều hiện tại (kế hoạch đã chốt hôm nay không đổi). Không có câu thay ⇒ không ghi DB, `tamHoan.tuLuan/kho` bỏ câu khỏi `tong` trong bộ nhớ. Mọi lần ghi kế hoạch giữa ngày chỉ ghi khi bản ghi còn đúng bản đã đọc (so `dao_json`/`doan_json`), máy khác vừa ghi ⇒ dùng bản của máy ấy.
+- App phụ huynh (`/ph/hoc-2`) đọc kế hoạch đã chốt qua `tamHoanCauKhoa` (chỉ đọc) ⇒ cùng con số với Sảnh/rương của con.
+- Lượt Đảo/Đoàn rỗng: ca ⇒ `cau_dang_bao_ve`; bàn Bi-a ⇒ `cau_dang_o_bia`; toàn bộ câu còn lại tự luận / mất khỏi kho ⇒ `xong_ke_hoach` / `xong_on_hom_nay` (không lộ lý do); câu vắng khi nạp mà meta còn, hoặc D1 ném khi nạp lô ⇒ `chua_nap_duoc` (lỗi tạm) + một dòng `nhat_ky_may` nguồn `nap_cau_game`.
 

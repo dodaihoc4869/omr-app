@@ -11,7 +11,7 @@ import HopChonDe from '../HopChonDe'
 import { huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
 import ChonEmGiao from './ChonEmGiao'
 import { useDsEmGiao, useKhoDe } from './nguon-giao'
-import DongHoSucChua from './DongHoSucChua'
+import DongHoSucChua, { NGAY_ON_CUOI } from './DongHoSucChua'
 import { congNgay, conLai, hienHanNop, hienNgay, laNgay, ngayVn, phanTram } from './ngay'
 import { CHU_MUC } from './tinh'
 import './chien-dich.css'
@@ -244,7 +244,9 @@ export default function GiaoChienDich({
   const soEmChon = coDanhSach ? sbdChon.length : soEm
   const now = nowMs ?? Date.now()
   // Dự kiến: em ở giữa lớp làm đủ lượt cần sau ⌈khối lượng / lượt mỗi ngày⌉ ngày (tính cả hôm nay).
-  const soNgayCan = sc && theLuc > 0 ? Math.max(1, Math.ceil(sc.khoiLuongTrungVi / theLuc)) : 0
+  // Rải đều BẬT (phản biện PR 108): câu mới chia tới ngày D − 3 ⇒ em không thể xong sớm hơn ngày ấy (chiến dịch > 3 ngày, còn câu mới).
+  const ngayRaiDeu = sc && raiDeu && sc.D > NGAY_ON_CUOI && (sc.tachGiua?.cauMoi ?? 1) > 0 ? sc.D - NGAY_ON_CUOI : 0
+  const soNgayCan = sc && theLuc > 0 ? Math.max(1, Math.ceil(sc.khoiLuongTrungVi / theLuc), ngayRaiDeu) : 0
   const ngayXong = soNgayCan ? congNgay(batDau > homNay ? batDau : homNay, soNgayCan - 1) : ''
   const tenTo = to.filter((t) => chon.has(t.maDe)).map((t) => (t.tuCa ? `Đề vừa kiểm tra · ${t.maDe}` : t.maDe))
 
@@ -466,7 +468,9 @@ export default function GiaoChienDich({
               <dd className="cd-so">
                 {!sc
                   ? '—'
-                  : soNgayCan <= sc.D
+                  : soNgayCan <= sc.D && ngayRaiDeu && soNgayCan === ngayRaiDeu
+                    ? `Rải đều: em ở giữa lớp làm hết câu mới trước 23:59 · ${hienNgay(ngayXong, false)}, 3 ngày cuối để ôn`
+                    : soNgayCan <= sc.D
                     ? `Em ở giữa lớp làm đủ lượt trước 23:59 · ${hienNgay(ngayXong, false)}`
                     : `Em ở giữa lớp cần ${soNgayCan} ngày, còn ${sc.D} ngày — chưa kịp hạn`}
               </dd>

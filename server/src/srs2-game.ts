@@ -192,14 +192,17 @@ export const LOI_LUOT_RONG = {
 } as const
 /**
  * Chẩn đoán vì sao `napLuot` rỗng trên các khoá còn lại: ca khoá > bàn Bi-a giữ > lỗi tải thật (D1 ném) > mọi câu còn lại đều tự luận / không còn trong kho
- * (⇒ `xong`: coi như hết câu hôm nay, KHÔNG lộ lý do — kế hoạch bình thường đã bỏ chúng ở `tamHoanCauKhoa`) > không rõ (⇒ `chua_nap_duoc` + nhật ký máy).
+ * (⇒ `xong`: coi như hết câu hôm nay, KHÔNG lộ lý do — kế hoạch bình thường đã bỏ chúng ở `tamHoanCauKhoa`) > câu vắng khi nạp mà meta còn / không rõ
+ * (⇒ `chua_nap_duoc` + nhật ký máy).
  */
 export function lyDoLuotRong(khoa: readonly string[], hs: Pick<HoSo2, 'meta'>, chanCa: ReadonlySet<string>, giuBia: ReadonlySet<string>, boQua?: BoQuaNap): keyof typeof LOI_LUOT_RONG | 'xong' {
   const qs = khoa.map(qidGoc)
   if (qs.some((q) => chanCa.has(q) || chanCa.has(hs.meta.get(q)?.group ?? '\u0000'))) return 'cau_dang_bao_ve'
   if (qs.some((q) => giuBia.has(q))) return 'cau_dang_o_bia'
   if (boQua?.loiLo) return 'chua_nap_duoc'
-  if (qs.every((q) => lyDoKhongPhucVu(hs.meta.get(q)) !== null || boQua?.tuLuan.has(q) || boQua?.vang.has(q))) return 'xong'
+  // Phản biện #108: câu VẮNG khi nạp mà meta vẫn còn (chỉ mục đang lập lại / lệch trong khoảnh khắc) KHÔNG phải "xong" — Sảnh vẫn đếm nó ⇒ báo lỗi tạm
+  // (`chua_nap_duoc`, thử lại được) kèm nhật ký máy. Chỉ "xong" khi câu thật sự không phục vụ được (meta mất / tự luận).
+  if (qs.every((q) => lyDoKhongPhucVu(hs.meta.get(q)) !== null || boQua?.tuLuan.has(q))) return 'xong'
   return 'chua_nap_duoc'
 }
 /** Lời báo hết câu có nhắc câu tạm hoãn vì ca (không lộ câu nào). */

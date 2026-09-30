@@ -524,7 +524,7 @@ export function xepChuyenDao<T>(ds: readonly T[], laMoi: (x: T) => boolean, mucD
  * `daLamHomNay`: số câu của kế hoạch hôm nay em đã làm (trừ vào trần).
  * SỔ NỢ (thầy chốt 29/09): câu NỢ (mọi nguồn) tới lịch lấy TRƯỚC, trần 50% lượt khi chiến dịch còn câu mới (không chiến dịch ⇒ 100%),
  * xếp `soSanhNo`; câu mới lấy phần còn lại theo quota; rồi câu chiến dịch đã thành thạo tới lịch ôn chốt; ôn duy trì ≤ 20% và sau cùng;
- * còn chỗ ⇒ thêm câu mới (trừ khi `raiDeu`: câu mới dừng đúng quota, thầy 30/09), hết câu mới ⇒ thêm nợ. Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
+ * còn chỗ ⇒ thêm câu mới, hết câu mới ⇒ thêm nợ (trừ khi `raiDeu`: câu mới dừng đúng quota, nợ giữ trần 50%, dư thì thôi — thầy 30/09). Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
  */
 export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<string, TrangThaiCau>, tc: TuyChonKeHoach, daLamHomNay = 0): KeHoachNgay {
   const tranNgay = tc.tranNgay ?? TRAN_NGAY
@@ -566,12 +566,12 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const layCungCo = Math.min(cungCo.length, tran - layNo - layMoi)
   const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layNo - layMoi - layCungCo)
   let conDu = tran - layNo - layMoi - layCungCo - layDuyTri
-  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm) — TRỪ khi rải đều (câu mới dừng đúng quota, lượt dư để ôn);
-  // đã giao HẾT câu mới hôm nay (rải đều: đủ quota) mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
+  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm); đã giao HẾT câu mới mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
+  // RẢI ĐỀU (thầy 30/09 "giữ các tỉ lệ hiện có; nếu vẫn dư thì thôi"): KHÔNG thêm câu mới, KHÔNG thêm nợ vượt trần 50% — ngày ngắn hơn là bình thường.
+  // (Hết SẠCH câu mới ⇒ `tranNo` đã là 100% ở trên, nợ vẫn lấp chỗ như cũ.)
   const themMoi = raiDeu ? 0 : Math.min(Math.max(0, conDu), moi.length - layMoi)
   conDu -= themMoi
-  const duMoiHomNay = layMoi + themMoi >= (raiDeu ? Math.min(moi.length, quota) : moi.length)
-  const themNo = duMoiHomNay ? Math.min(Math.max(0, conDu), no.length - layNo) : 0
+  const themNo = !raiDeu && layMoi + themMoi >= moi.length ? Math.min(Math.max(0, conDu), no.length - layNo) : 0
   // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang`; số câu mới/ngày giữ nguyên quota.
   const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
   const thuTuMoi = tc.hangTheoDang ? bocCauMoiCaNhan(moi, layMoi, D > NGAY_DEM ? D - NGAY_DEM : 1, hangCua, cauChienDich) : moi
