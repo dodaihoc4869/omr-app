@@ -36,6 +36,11 @@ export interface SanhHoa2 {
   bia: BiaTrenSanh | null
   /** 30/09: số câu còn lại hôm nay đang tạm giữ vì lớp có ca kiểm tra (chỉ số, không qid). 0 ⇒ không có / máy chủ cũ. */
   tamGiuCa: number
+  /**
+   * THỬ SỨC THÊM (thầy 30/09): xong kế hoạch hôm nay ⇒ được lấy trước `soCau` câu mới của ngày mai (không bắt buộc). Chỉ vẽ nút khi `duoc` và `soCau > 0`.
+   * Máy chủ cũ / thiếu / rác ⇒ `{ duoc: false, soCau: 0 }`.
+   */
+  thuSucThem: { duoc: boolean; soCau: number }
 }
 /** Tóm tắt Bi-a cho cửa trên Sảnh: số câu Bi-a còn / trần hôm nay; Bàn giao hữu; lý do khoá. */
 export interface BiaTrenSanh { con: number; tong: number; giaoHuu: { mo: boolean; con: number }; lyDoKhoa: string | null }
@@ -194,6 +199,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       loiKhoaDao: chu(o.loiKhoaDao).trim(),
       bia: docBiaTrenSanh(o.bia),
       tamGiuCa: soKhongAm((o.tamGiu as Record<string, unknown> | undefined)?.ca),
+      thuSucThem: docThuSucThem(o.thuSucThem),
       ruong: {
         daLam: soKhongAm(r.daLam),
         tong: soKhongAm(r.tong),
@@ -203,6 +209,13 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       },
     },
   }
+}
+
+/** Đọc chặt `thuSucThem` của `hoa2-sanh`: chỉ `duoc === true` với số câu dương mới là được. */
+function docThuSucThem(x: unknown): { duoc: boolean; soCau: number } {
+  const o = x && typeof x === 'object' ? (x as Record<string, unknown>) : null
+  const soCau = soKhongAm(o?.soCau)
+  return o?.duoc === true && soCau > 0 ? { duoc: true, soCau } : { duoc: false, soCau: 0 }
 }
 
 /** Đọc chặt phần `bia` của `hoa2-sanh`: chỉ khi `bat === true` mới vẽ cửa. */
@@ -310,6 +323,12 @@ export async function moRuong(token: string): Promise<KetQuaRuong> {
   const o = await goiHoa2('hoa2-ruong-mo', token)
   const q = (o.qua ?? {}) as Record<string, unknown>
   return { vang: soKhongAm(q.vang), lapLai: o.lapLai === true }
+}
+
+/** Thử sức thêm (không bắt buộc): máy chủ thêm một lô câu mới của ngày mai vào kế hoạch hôm nay. `them` = số câu vừa thêm (0 ⇒ máy khác vừa thêm, tải lại Sảnh). */
+export async function thuSucThem(token: string): Promise<{ them: number }> {
+  const o = await goiHoa2('hoa2-thu-suc-them', token)
+  return { them: soKhongAm(o.them) }
 }
 
 /** Đổi tên thần thú của CHÍNH em (`rename`; máy chủ soát luật tên + tối đa 3 lần/ngày). Trả tên máy chủ đã lưu. */

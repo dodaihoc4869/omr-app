@@ -8,7 +8,7 @@ import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
-import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
+import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidGoc, sanh2, thuSucThem, type HoSo2, type MetaCau } from './srs2-d1'
 import { ghiLoiMay } from './nhat-ky-may'
 
 type Row = Record<string, unknown>
@@ -315,13 +315,15 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
 }
 
 // ---------------------------------------------------------------- lệnh hoa2-* của app học sinh
-export const LENH_HOA2: ReadonlySet<string> = new Set(['hoa2-sanh', 'hoa2-cau-da-lam', 'hoa2-cau-chi-tiet', 'hoa2-ruong-mo'])
+export const LENH_HOA2: ReadonlySet<string> = new Set(['hoa2-sanh', 'hoa2-cau-da-lam', 'hoa2-cau-chi-tiet', 'hoa2-ruong-mo', 'hoa2-thu-suc-them'])
 
 export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, nowMs = Date.now()): Promise<Record<string, unknown>> {
   if (action === 'hoa2-sanh') return sanh2(env, sbd, nowMs)
   if (action === 'hoa2-cau-da-lam') return cauDaLam(env, sbd, nowMs)
   if (action === 'hoa2-cau-chi-tiet') return cauChiTiet(env, sbd, b)
   if (action === 'hoa2-ruong-mo') return moRuong(env, sbd, nowMs)
+  // THỬ SỨC THÊM (thầy 30/09): xong kế hoạch hôm nay ⇒ lấy trước một lô câu mới của ngày mai (srs2-d1 `thuSucThem`).
+  if (action === 'hoa2-thu-suc-them') return thuSucThem(env, sbd, nowMs)
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
@@ -484,6 +486,9 @@ async function moRuong(env: Env, sbd: string, nowMs: number): Promise<Record<str
   const { kh } = await layKeHoachHomNay(env, sbd, nowMs)
   const daLam = kh.tong - kh.conDao.length - kh.conDoan.length
   if (!moDuocRuong(kh.tong, daLam)) {
+    // Thử sức thêm (30/09): rương hôm nay ĐÃ MỞ rồi em mới lấy thêm lô câu mới ⇒ `tong` tăng nhưng rương KHÔNG khoá lại — trả như mở lần hai.
+    const daMo = await env.DB.prepare('SELECT 1 AS co FROM ruong_bat_linh WHERE sbd = ? AND ngay = ?').bind(sbd, kh.ngay).first<Row>().catch(() => null)
+    if (daMo) return { ok: true, qua: { vang: VANG_RUONG }, lapLai: true }
     // Trả CẢ `loi` (hợp đồng gốc) lẫn `error` (lớp gọi game-v2 chung của app học sinh đọc `error`) — cùng một lời, chỉ-thêm.
     const loi = `Em làm xong ${kh.tong}/${kh.tong} câu hôm nay thì rương mở. Hiện em đã làm ${daLam} câu.`
     return { ok: false, ma: 'chua_du', loi, error: loi }

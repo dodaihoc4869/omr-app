@@ -805,6 +805,19 @@
   line-height: 1.4;
   color: var(--h2-khoa);
 }
+/* Thử sức thêm (thầy 30/09): nút PHỤ cùng dáng nút Đảo; dòng phụ nói rõ lấy trước câu mới của ngày mai */
+.h2-nut-thu-suc {
+  touch-action: manipulation;
+}
+.h2-nut-thu-suc[aria-busy='true'] {
+  opacity: 0.7;
+  cursor: progress;
+}
+.h2-nut-thu-suc-phu {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--h2-chu-phu);
+}
 
 .h2-nut-phu {
   align-self: flex-start;
@@ -1599,6 +1612,16 @@
   border-radius: 24px;
   padding: 12px 24px;
   margin-top: 6px;
+}
+.h2-ng-xong .h2-nut-thu-suc {
+  width: min(100%, 520px);
+  min-height: 64px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+.h2-ng-phai .h2-nut-thu-suc-phu,
+.h2-ng-xong .h2-nut-thu-suc-phu {
+  font-size: 14px;
 }
 
 /* Chỉ số dưới trong tên chiến dịch/công thức: cùng phông, đủ to, không đẩy dòng. */

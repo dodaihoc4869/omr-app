@@ -18,7 +18,8 @@ Ngày = ngày giờ Việt Nam `YYYY-MM-DD`. Hạn nộp hết lúc 23:59 ngày 
   "doan": { "con": 4 },                                       // câu ôn còn lại ở Đoàn = số "ổ phục kích"
   "dao":  { "con": 28 },
   "khoaDao": true, "loiKhoaDao": "Có xe hàng đang bị phục kích, hãy hoàn thành Hộ Tống trước khi ra Đảo nhé!",
-  "ruong": { "daLam": 8, "tong": 40, "moDuoc": false, "daMo": false, "qua": { "vang": 20 } } }
+  "ruong": { "daLam": 8, "tong": 40, "moDuoc": false, "daMo": false, "qua": { "vang": 20 } },
+  "thuSucThem": { "duoc": false, "soCau": 0 } }                // 30/09: nút "Thử sức thêm (không bắt buộc)" — xem `hoa2-thu-suc-them`; không lộ qid
 ```
 Em chưa chọn thần thú (sau reset): `{ ok:true, cheDo2:true, canChonThu:true }` → hiện màn chọn thần thú có sẵn.
 Ca kiểm tra đang mở: dùng lệnh sẵn có `POST /hs/ca-dang-mo` (dải "Vào thi" chỉ hiện khi có ca).
@@ -53,6 +54,14 @@ Hiển thị lời giải: **bắt buộc dùng khối LỜI GIẢI chuẩn củ
 
 ### `hoa2-ruong-mo` → mở Rương Bát Linh (xong trọn kế hoạch hôm nay, mỗi ngày 1 lần)
 `{ ok:true, qua:{ vang:20 }, lapLai:false }` · chưa đủ: `{ ok:false, ma:"chua_du", loi:"Em làm xong 40/40 câu hôm nay thì rương mở…", error:<cùng lời với loi> }` (28/09: thêm `error` cho lớp gọi game-v2 chung đọc được; client đọc `error` rồi `loi`). Vàng dùng ở Cửa hàng phụ kiện; không phải EXP.
+
+### `hoa2-thu-suc-them` → Thử sức thêm (không bắt buộc) — thầy chốt 30/09
+Em làm xong kế hoạch hôm nay ⇒ lấy TRƯỚC một lô câu MỚI của ngày mai vào Đảo (kế hoạch hôm nay, `dao_json` + `tong`; không đổi lược đồ). Bấm nhiều lần được, mỗi lần một lô.
+- Được khi (MỌI điều): chiến dịch đang chạy và hôm nay chưa phải hạn nộp; kế hoạch hôm nay còn lại 0, không câu nào tạm giữ vì ca; **Rương Bát Linh hôm nay ĐÃ MỞ** (hoặc kế hoạch rỗng — không có rương) ⇒ `tong` tăng không khoá lại rương, không mở rương lần hai; còn câu mới lấy được.
+- Cỡ lô = min(quota câu mới NGÀY MAI theo rải đều = ceil(mới còn / (D_mai − 3)), D_mai ≤ 3 ⇒ mọi câu mới; trần hôm nay − `tong`; số câu lấy được ngay). Trần = thể lực/ngày, ngày Huyết Chiến = trần Huyết Chiến hiện hành.
+- Chọn câu bằng `lapKeHoachNgay` nhìn từ ngày mai (dễ → khó / hạng cá nhân theo dạng). Bỏ câu tự luận, đã rút khỏi kho, đang bảo vệ cho ca, câu sai của ca, câu đã có hôm nay.
+- `{ ok:true, them:19 }` · thua so khớp (máy khác vừa ghi kế hoạch) ⇒ `{ ok:true, them:0, lapLai:true }` (tải lại Sảnh, không nhân đôi) · không được ⇒ `{ ok:false, ma, error }`, `ma` ∈ `chua_co_chien_dich | het_ngay | chua_xong | tam_giu_ca | chua_mo_ruong | du_tran | het_cau_moi`.
+- `hoa2-ruong-mo` khi rương hôm nay đã mở mà `tong` vừa tăng ⇒ `{ ok:true, qua:{ vang:20 }, lapLai:true }` (không báo `chua_du`).
 
 ## B. Giáo viên — `POST /gv/chien-dich` (sau cổng mã thầy), `action`:
 

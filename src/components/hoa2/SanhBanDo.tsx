@@ -5,13 +5,14 @@
 // Màn chính DUY NHẤT của app học sinh khi máy chủ bật `cheDo2`. Trả lời một câu: "hôm nay em làm gì?" — đúng MỘT nút chính (vàng):
 //   · còn ổ phục kích (câu ôn ở Đoàn)  → "PHÁ N Ổ PHỤC KÍCH" (mở Đoàn Hộ Tống); nút Đảo khoá kèm đúng câu `loiKhoaDao` của máy chủ;
 //   · hết ổ phục kích, còn câu ở Đảo   → "KHÁM PHÁ BÁT LINH ĐẢO · N câu";
-//   · hết kế hoạch                     → "Hôm nay em xong rồi" + nút Rương Bát Linh (khi mở được và chưa mở).
+//   · hết kế hoạch                     → "Hôm nay em xong rồi" + nút Rương Bát Linh (khi mở được và chưa mở);
+//                                        rương đã mở (hoặc kế hoạch rỗng) + máy chủ cho ⇒ nút phụ "Thử sức thêm (không bắt buộc)" (thầy 30/09).
 // Mọi con số lấy từ máy chủ (`hoa2-sanh`, thần thú/EXP/chuỗi ngày từ /hs/ke-hoach-ngay) — không tự tính, không bịa.
 // Dải "Vào thi" chỉ hiện khi có ca kiểm tra đang mở; bấm là vào đúng luồng PhongVaoThi → ExamTakeScreen có sẵn.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro, type ReactNode } from 'react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
-import { moRuong, type KetQuaSanh, type SanhHoa2 } from './api'
+import { moRuong, thuSucThem, type KetQuaSanh, type SanhHoa2 } from './api'
 import { useBoCucNgang, type BoCucNgang } from './bo-cuc-ngang'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
 import CanhSanh3D from './CanhSanh3D'
@@ -346,6 +347,45 @@ function IconKhoa() {
   )
 }
 
+/**
+ * THỬ SỨC THÊM (thầy chốt 30/09): nút PHỤ (không phải nút chính vàng) — em xong kế hoạch hôm nay thì lấy trước một lô câu mới của ngày mai.
+ * Chỉ vẽ khi máy chủ cho (`thuSucThem.duoc`, số câu dương); bấm ⇒ máy chủ thêm lô ⇒ tải lại Sảnh ⇒ nút Đảo có câu. Lỗi ⇒ câu của máy chủ ngay dưới nút.
+ */
+function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onTaiLai: () => void }) {
+  const [dangGoi, setDangGoi] = useState(false)
+  const [loi, setLoi] = useState('')
+  const t = s.thuSucThem
+  if (!t?.duoc || t.soCau <= 0) return null
+  const bam = async () => {
+    if (dangGoi) return
+    setDangGoi(true)
+    setLoi('')
+    try {
+      await thuSucThem(token)
+      onTaiLai()
+    } catch (e) {
+      setLoi(e instanceof Error ? e.message : 'Chưa lấy thêm được câu. Em thử lại.')
+    } finally {
+      setDangGoi(false)
+    }
+  }
+  return (
+    <>
+      <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="thu-suc-them" onClick={() => void bam()} aria-disabled={dangGoi} aria-busy={dangGoi}>
+        <span className="h2-nut-dao-chu">
+          <span className="h2-nut-dao-lon">{dangGoi ? 'Đang lấy câu…' : 'Thử sức thêm (không bắt buộc)'}</span>
+          <span className="h2-nut-thu-suc-phu">Lấy trước {t.soCau} câu mới của ngày mai</span>
+        </span>
+      </button>
+      {loi && (
+        <p className="h2-loi" role="alert">
+          {loi}
+        </p>
+      )}
+    </>
+  )
+}
+
 /** Hết kế hoạch hôm nay: lời mừng + Rương Bát Linh (HS-XongHomNay.dc.html). */
 function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null }) {
   const [dangMo, setDangMo] = useState(false)
@@ -442,6 +482,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
         {tinRuong}
         {tinLoi}
         {nutMo}
+        <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
       </section>
     )
   }
@@ -477,6 +518,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
         {tinLoi}
       </section>
       {nutMo}
+      <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
     </>
   )
 }
@@ -505,7 +547,12 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <NutBia p={p} s={s} />
         </>
       ) : trong ? (
-        s.chienDich ? <p className="h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p> : null
+        s.chienDich ? (
+          <>
+            <p className="h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p>
+            <NutThuSucThem s={s} token={p.token} onTaiLai={p.onTaiLai} />
+          </>
+        ) : null
       ) : (
         <NutViec p={p} s={s} />
       )}
@@ -777,7 +824,12 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <NutBia p={p} s={s} />
         </>
       ) : trong ? (
-        s.chienDich ? <p className="h2-ng-the h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p> : null
+        s.chienDich ? (
+          <>
+            <p className="h2-ng-the h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p>
+            <NutThuSucThem s={s} token={p.token} onTaiLai={p.onTaiLai} />
+          </>
+        ) : null
       ) : (
         <NutViec p={p} s={s} />
       )}
