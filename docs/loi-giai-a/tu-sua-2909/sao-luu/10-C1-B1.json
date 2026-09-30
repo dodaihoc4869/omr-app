@@ -77,5 +77,60 @@
     "chuong": "C1 - Nguyên Tử"
    }
   }
+ },
+ "10-C1-B1-III-2": {
+  "luc": "2026-09-30T04:13:37.602Z",
+  "cau": {
+   "phan": "III",
+   "so": 2,
+   "de": "Điện tích tương đối của hạt electron là bao nhiêu?",
+   "dap_an": "–1",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "biet",
+   "loi_giai": {
+    "chot": "Điện tích tương đối là điện tích tính theo đơn vị điện tích cơ bản e₀ = 1,602.10⁻¹⁹ C: proton +1, electron −1, neutron 0.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Electron có điện tích −1,602.10⁻¹⁹ C, đúng bằng một điện tích cơ bản nhưng âm.",
+     "Điện tích tương đối của electron là −1."
+    ],
+    "ket_qua": "–1",
+    "dap_an_de": "–1",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Phải tự viết dấu âm, không có phương án gợi ý.",
+    "bay": "Ghi −1,602.10⁻¹⁹ thay vì điện tích tương đối −1.",
+    "dk": [],
+    "thong_hieu": true
+   },
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.XAC_DINH_DIEN_TICH",
+    "ten": "Thành phần nguyên tử — xác định điện tích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "10-C1-B1",
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
  }
 }

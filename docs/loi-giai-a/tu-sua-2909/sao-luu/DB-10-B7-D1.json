@@ -75,5 +75,250 @@
    "nguonDe": "DH-10-C2-B7",
    "nguonCau": "II-18"
   }
+ },
+ "DB-10-B7-D1-III-60": {
+  "luc": "2026-09-30T04:05:24.547Z",
+  "cau": {
+   "phan": "III",
+   "so": 60,
+   "de": "Một nguyên tố tạo hợp chất khí với hydrogen có công thức RH₃, được sử dụng để trung hoà các thành phần acid của dầu thô, bảo vệ thiết bị không bị ăn mòn trong ngành công nghiệp dầu khí. Nguyên tố này chiếm 25,93% về khối lượng trong oxide cao nhất.\nXác định nguyên tố R (trả lời bằng kí hiệu hoá học).",
+   "dap_an": "N",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "RH₃ ⇒ nhóm VA ⇒ oxide cao nhất R₂O₅.",
+    "buoc": [
+     "Hợp chất khí với hydrogen là RH₃ ⇒ hoá trị với hydrogen là 3 ⇒ R thuộc nhóm VA.",
+     "Oxide cao nhất của nhóm VA là R₂O₅, khối lượng mol 2R + 80.",
+     "%R = 2R/(2R + 80) = 0,2593 ⇒ 2R = 0,5186R + 20,744 ⇒ 1,4814R = 20,744.",
+     "R = 14,0 ⇒ R là nitrogen (N); hợp chất khí RH₃ chính là ammonia NH₃, đúng với mô tả dùng trung hoà acid trong dầu thô."
+    ],
+    "ket_qua": "N",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "N",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc hỏi 'xác định TÊN nguyên tố'; đã thêm một câu nhắc trả lời bằng KÍ HIỆU HOÁ HỌC để câu trả lời ngắn có đúng một đáp số. Nội dung hỏi không đổi."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "RH₃ cho biết nhóm VA, từ đó oxide cao nhất là R₂O₅ rồi mới lập được phương trình phần trăm.",
+    "bay": "Lấy công thức oxide là RO₃ vì thấy hydride có ba hydrogen."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_KHOI_LUONG",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-21"
+  }
+ },
+ "DB-10-B7-D1-III-61": {
+  "luc": "2026-09-30T04:05:24.547Z",
+  "cau": {
+   "phan": "III",
+   "so": 61,
+   "de": "X là nguyên tố có hóa trị cao nhất đối với oxygen bằng hóa trị của X trong hợp chất với hydrogen. Trong oxide cao nhất của X, oxygen chiếm 53,33% về khối lượng.\nXác định nguyên tố X (trả lời bằng kí hiệu hoá học).",
+   "dap_an": "Si",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "n = 8 − n ⇒ n = 4 ⇒ oxide cao nhất là XO₂.",
+    "buoc": [
+     "Gọi n là số thứ tự nhóm A; hoá trị cao nhất với oxygen là n, hoá trị với hydrogen là 8 − n.",
+     "Hai hoá trị bằng nhau: n = 8 − n ⇒ n = 4 ⇒ X thuộc nhóm IVA, oxide cao nhất XO₂.",
+     "%O = 32/(X + 32) = 0,5333 ⇒ X + 32 = 32 : 0,5333 = 60,0.",
+     "X = 28,0 ⇒ X là silicon (Si), oxide cao nhất là SiO₂."
+    ],
+    "ket_qua": "Si",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Si",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc hỏi 'xác định TÊN nguyên tố'; đã thêm một câu nhắc trả lời bằng KÍ HIỆU HOÁ HỌC để câu trả lời ngắn có đúng một đáp số. Nội dung hỏi không đổi."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Hai hoá trị bằng nhau: n = 8 − n ⇒ n = 4, chốt ngay nhóm IVA trước khi tính phần trăm.",
+    "bay": "Bỏ qua điều kiện hai hoá trị bằng nhau, thử mò từng nhóm."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CHAT",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — xác định chất"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-23"
+  }
+ },
+ "DB-10-B7-D1-III-64": {
+  "luc": "2026-09-30T04:05:24.547Z",
+  "cau": {
+   "phan": "III",
+   "so": 64,
+   "de": "Một nguyên tố tạo hợp chất khí với hydrogen có công thức RH₃, được sử dụng để trung hoà các thành phần acid của dầu thô, bảo vệ thiết bị không bị ăn mòn trong ngành công nghiệp dầu khí. Nguyên tố này chiếm 25,93% về khối lượng trong oxide cao nhất.\nXác định tên nguyên tố R.",
+   "dap_an": "Nitrogen (N)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "%R = 2R : (2R + 80) = 25,93% ⇒ R = 14 ⇒ nitrogen.",
+    "buoc": [
+     "RH₃ ⇒ hoá trị với hydrogen là III ⇒ hoá trị cao nhất với oxygen là V ⇒ oxide R₂O₅.",
+     "%R = 2R : (2R + 5×16) = 25,93%.",
+     "⇒ 2R = 0,2593(2R + 80) ⇒ 1,4814R = 20,744 ⇒ R = 14.",
+     "R = 14 ⇒ nguyên tố nitrogen (N), hợp chất khí là NH₃."
+    ],
+    "ket_qua": "Nitrogen (N)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Nitrogen (N)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Hợp chất khí với hydrogen dạng RH₃ ⇒ R thuộc nhóm VA ⇒ oxide cao nhất là R₂O₅.",
+    "bay": "Lấy công thức oxide là RO₃ vì nhớ nhầm hoá trị."
+   },
+   "kienThuc": [
+    "Tổng hoá trị với hydrogen và hoá trị cao nhất với oxygen bằng 8.",
+    "RH₃ ⇒ nhóm VA ⇒ oxide cao nhất R₂O₅.",
+    "NH₃ dùng trung hoà acid trong chế biến dầu thô."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.TINH_KHOI_LUONG",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-27"
+  }
+ },
+ "DB-10-B7-D1-III-65": {
+  "luc": "2026-09-30T04:05:24.547Z",
+  "cau": {
+   "phan": "III",
+   "so": 65,
+   "de": "X là nguyên tố có hóa trị cao nhất đối với oxygen bằng hóa trị của X trong hợp chất với hydrogen. Trong oxide cao nhất của X, oxygen chiếm 53,33% về khối lượng.\nXác định tên nguyên tố X.",
+   "dap_an": "Silicon (Si)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Hoá trị IV ⇒ oxide cao nhất XO₂; %O = 32 : (X + 32) = 53,33% ⇒ X = 28 ⇒ silicon.",
+    "buoc": [
+     "Gọi hoá trị cao nhất với oxygen là a, hoá trị với hydrogen là b: a + b = 8 và a = b ⇒ a = b = 4.",
+     "⇒ X thuộc nhóm IVA, oxide cao nhất là XO₂.",
+     "%O = 2×16 : (X + 32) = 53,33% ⇒ X + 32 = 32 : 0,5333 = 60 ⇒ X = 28.",
+     "X = 28 ⇒ nguyên tố silicon (Si), oxide cao nhất là SiO₂."
+    ],
+    "ket_qua": "Silicon (Si)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Silicon (Si)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Hoá trị cao nhất với oxygen bằng hoá trị với hydrogen mà tổng hai hoá trị bằng 8 ⇒ mỗi bên bằng 4.",
+    "bay": "Quên rằng tổng hai hoá trị luôn bằng 8 nên không tìm ra nhóm IVA."
+   },
+   "kienThuc": [
+    "Hoá trị cao nhất với oxygen + hoá trị với hydrogen = 8.",
+    "Hai hoá trị bằng nhau ⇒ mỗi hoá trị bằng 4 ⇒ nguyên tố thuộc nhóm IVA."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.OXIDE_HYDROXIDE.XAC_DINH_CHAT",
+    "ten": "Oxide cao nhất, hydroxide, hợp chất với hydrogen — xác định chất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B7-D1",
+    "ten": "Tìm nguyên tố hóa học trong hợp chất oxide và hydride",
+    "lop": "10",
+    "bai": "DB-10-B7",
+    "tenBai": "Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-29"
+  }
  }
 }

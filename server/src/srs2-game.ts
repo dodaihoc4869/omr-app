@@ -347,7 +347,11 @@ async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string,
     .catch(() => env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))').bind(sbd, JSON.stringify(qids)).all<Row>())
   const duoc = new Set((daLam.results ?? []).map((x) => str(x.qid)))
   const hs = await docHoSo2(env, sbd, ngayVnCua(Date.now()))
+  // Câu đang bảo vệ cho ca chưa công bố / còn làm được (theo qid HOẶC nhóm nội dung — bản chép ở tờ khác) ⇒ KHÔNG trả đáp án, lời giải.
+  // Lỗi đọc phạm vi ⇒ giấu hết (thà giấu nhầm một lúc còn hơn lộ). Trả `khoa` để app báo "đang khoá tới khi Thầy công bố".
+  const tapBaoVe = await protectedQuestions(env).catch(() => null)
   const ra: Record<string, unknown>[] = []
+  const khoa: string[] = []
   for (const qid of qids) {
     if (!duoc.has(qid)) continue
     const m = hs.meta.get(qid)
@@ -355,11 +359,12 @@ async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string,
     try {
       const [q] = await doDayDu(env, [{ qid, maDe: m.maDe, version: m.version, nhe: true } as unknown as CauPool])
       if (!q) continue
+      if (!tapBaoVe || tapBaoVe.has(qid) || tapBaoVe.has(q.group)) { khoa.push(qid); continue }
       const tl = await env.DB.prepare("SELECT json_extract(json,'$.traLoi') AS t FROM game_v2_attempt WHERE sbd = ? AND qid = ? ORDER BY created_at DESC LIMIT 1").bind(sbd, qid).first<Row>().catch(() => null)
       ra.push({ de: publicQuestionDayDu(q), dapAn: q.correct, loiGiai: q.solution, emTraLoi: tl?.t == null ? null : str(tl.t) })
     } catch { /* câu đã rút khỏi kho */ }
   }
-  return { ok: true, cau: ra }
+  return { ok: true, cau: ra, ...(khoa.length ? { khoa } : {}) }
 }
 /** Bản đề để XEM LẠI: như bản công khai nhưng giữ cả hình sau lời giải. */
 const publicQuestionDayDu = (q: PrivateQuestion): Question => {

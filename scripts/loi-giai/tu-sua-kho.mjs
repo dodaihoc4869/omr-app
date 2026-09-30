@@ -9,6 +9,7 @@
 //   viec 'thay'     — thay đoạn `truoc` (phải có ĐÚNG 1 lần) bằng `sau` trong trường `de` | `pa.X` | `y.x` | `bang`;
 //   viec 'dapAn'    — đổi `dap_an` từ `truoc` sang `sau` (chỉ khi kho đang đúng bằng `truoc`);
 //   viec 'xepY'     — xếp lại khoá `y` về a, b, c, d (dây chuyền lời giải ghép đáp án theo thứ tự khoá).
+//   viec 'tuLuan'   — đánh dấu câu là tự luận (`kieu: 'tu_luan'` + cờ `can_xem`): kênh tự động không rút, không chấm máy (câu Phần III đáp án là công thức).
 // AN TOÀN: sao lưu nguyên câu (trừ dữ liệu ảnh, không bao giờ bị sửa) vào docs/loi-giai-a/tu-sua-2909/sao-luu/<mã đề>.json
 // TRƯỚC khi ghi, không bao giờ ghi đè bản sao lưu đầu tiên của một câu; có ca thi mở / chưa công bố ⇒ DỪNG; đọc lại sau khi ghi.
 // Chỉ mục câu dựng lại đúng như /kho/chi-muc-lay trả (giữ lớp, chuyên đề, mức độ; tờ DB- vẫn rỗng). Băm câu đổi ⇒ máy chủ
@@ -76,6 +77,15 @@ function apViec(c, v) {
     c.dap_an = v.sau
     return `đáp án ${v.truoc} → ${v.sau}`
   }
+  if (v.viec === 'tuLuan') {
+    // Đánh dấu TỰ LUẬN đúng cách kho đang dùng: nhãn `kieu` khớp "tu_luan" (định nghĩa chung cau-tu-luan.ts ⇒ rút đề, BTVN, Tu luyện, lời giải bỏ)
+    // + cờ `can_xem` (đường game chuẩn hoá lại câu, bỏ nhãn `kieu` lạ ⇒ dựa vào cờ này để loại). Câu vẫn còn trong kho, không đổi qid.
+    if (c.kieu === 'tu_luan' && c.can_xem === true) return null
+    const cu = c.kieu ?? '—'
+    c.kieu = 'tu_luan'
+    c.can_xem = true
+    return `chuyển tự luận (nhãn ${cu} → tu_luan, cờ cần xem)`
+  }
   if (v.viec === 'xepY') {
     const k = Object.keys(c.y || {})
     const dung = [...k].sort()
@@ -135,7 +145,7 @@ async function main() {
       const g = (await goi('/kho/lay', { maDe })).j
       for (const [q, goc] of cs) {
         const c = timCau(g, goc.phan, goc.so)
-        for (const k of ['de', 'pa', 'y', 'dap_an', 'bang']) if (k in goc) c[k] = goc[k]
+        for (const k of ['de', 'pa', 'y', 'dap_an', 'bang', 'kieu', 'can_xem']) { if (k in goc) c[k] = goc[k]; else if (k === 'kieu' || k === 'can_xem') delete c[k] }
         console.log(`${THAT ? '' : '[thử] '}lùi ${q}`)
         if (THAT) ghiNhatKy(`| ${new Date().toISOString().slice(11, 19)} | ${q} | LÙI về bản sao lưu | yêu cầu lùi |`)
       }
@@ -172,7 +182,7 @@ async function main() {
     const kq = await dayLai(maDe, g)
     // Đọc lại: mọi việc phải thấy đúng bản mới.
     const moi = (await goi('/kho/lay', { maDe })).j
-    const noiDung = (c) => JSON.stringify([c?.de, c?.pa, c?.y, c?.dap_an, c?.bang])
+    const noiDung = (c) => JSON.stringify([c?.de, c?.pa, c?.y, c?.dap_an, c?.bang, c?.kieu, c?.can_xem])
     for (const { v } of daDoi) {
       if (noiDung(timCau(moi, v.phan, v.so)) !== noiDung(timCau(g, v.phan, v.so))) { console.log(`LỆCH sau khi ghi: ${v.qid} — DỪNG`); process.exit(4) }
     }

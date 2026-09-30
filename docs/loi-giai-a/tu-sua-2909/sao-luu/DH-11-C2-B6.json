@@ -900,5 +900,186 @@
     "chuong": "C2 - Nitrogen và Surful"
    }
   }
+ },
+ "DH-11-C2-B6-III-25": {
+  "luc": "2026-09-30T04:05:17.698Z",
+  "cau": {
+   "phan": "III",
+   "so": 25,
+   "de": "Nitric acid (HNO₃) là hợp chất vô cơ, trong tự nhiên được hình thành trong những cơn mưa giông kèm sấm chớp. Nitric acid là một acid độc, ăn mòn và dễ gây cháy, là một trong những tác nhân gây ra mưa acid.\nThực hiện thí nghiệm hoà tan hoàn toàn một oxide của iron bằng nitric acid đặc, nóng, thu được 2,479 lít (đkc) khí màu nâu là nitrogen dioxide. Phần dung dịch đem cô cạn thu được 72,6 gam Fe(NO₃)₃.\nGiả sử phản ứng không tạo thành các sản phẩm khác.\nXác định công thức của oxide đó (biết 1 mol khí chiếm 24,79 lít ở đkc 25 °C, 1 bar).",
+   "dap_an": "Fe₃O₄",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "n(NO₂) = 0,1 mol; n(Fe) = 72,6 : 242 = 0,3 mol.",
+    "buoc": [
+     "n(NO₂) = 2,479 : 24,79 = 0,1 mol; N⁺⁵ + 1e → N⁺⁴ ⇒ số mol electron nhận = 0,1 mol.",
+     "n(Fe(NO₃)₃) = 72,6 : 242 = 0,3 mol ⇒ n(Fe) trong oxide = 0,3 mol.",
+     "Gọi oxide là FeₓOᵧ, số oxi hoá của Fe là +2y/x; mỗi nguyên tử Fe nhường (3 − 2y/x) electron.",
+     "Bảo toàn electron: 0,3 × (3 − 2y/x) = 0,1 ⇒ 3 − 2y/x = 1/3 ⇒ 2y/x = 8/3 ⇒ x : y = 3 : 4.",
+     "Vậy oxide là Fe₃O₄."
+    ],
+    "ket_qua": "Fe₃O₄",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Fe₃O₄",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc bỏ lửng, không có câu hỏi ở cuối; yêu cầu 'xác định công thức oxide' nằm lẫn trong câu dẫn đầu. Đã chuyển yêu cầu ấy xuống cuối thành câu hỏi rõ ràng, nội dung không đổi."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Bảo toàn electron: số electron Fe nhường đúng bằng số electron N⁺⁵ nhận để thành NO₂.",
+    "bay": "Coi oxide là Fe₂O₃ vì sản phẩm là Fe(NO₃)₃ — nhưng Fe₂O₃ thì Fe đã ở +3, không nhường electron nào nên không thể sinh NO₂."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.VIET_CTCT",
+    "ten": "Nitric acid và muối nitrate — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-III-34": {
+  "luc": "2026-09-30T04:05:17.698Z",
+  "cau": {
+   "phan": "III",
+   "so": 34,
+   "de": "Nitric acid (HNO₃) là hợp chất vô cơ, trong tự nhiên được hình thành trong những cơn mưa giông kèm sấm chớp. Nitric acid là một acid độc, ăn mòn và dễ gây cháy, là một trong những tác nhân gây ra mưa acid.\nThực hiện thí nghiệm xác định công thức của một oxide của kim loại iron bằng nitric acid đặc, nóng thu được 2,479 lít (đkc) khí màu nâu là nitrogen dioxide. Phần dung dịch đem cô cạn thu được 72,6 gam Fe(NO₃)₃.\nGiả sử phản ứng không tạo thành các sản phẩm khác (biết 1 mol khí chiếm 24,79 lít đo ở đkc 25 °C, 1 bar).",
+   "dap_an": "Fe₃O₄",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "n(NO₂) = 0,1 mol; n(Fe) = 0,3 mol ⇒ mỗi công thức chứa 3 Fe và nhường 1 electron ⇒ Fe₃O₄.",
+    "buoc": [
+     "n(NO₂) = 2,479 : 24,79 = 0,1 mol ⇒ số mol electron nhường = 0,1 mol.",
+     "n(Fe(NO₃)₃) = 72,6 : 242 = 0,3 mol ⇒ n(Fe) trong oxide = 0,3 mol.",
+     "Gọi oxide là FeₓOᵧ, Fe có số oxi hoá trung bình 2y/x, lên +3 ⇒ mỗi mol Fe nhường (3 − 2y/x) electron.",
+     "0,3 × (3 − 2y/x) = 0,1 ⇒ 3 − 2y/x = 1/3 ⇒ 2y/x = 8/3 ⇒ x : y = 3 : 4.",
+     "Vậy oxide là Fe₃O₄."
+    ],
+    "ket_qua": "Fe₃O₄",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Fe₃O₄",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Bảo toàn electron: số mol electron mà oxide nhường đúng bằng số mol NO₂ sinh ra.",
+    "bay": "Cho rằng oxide là Fe₂O₃ — Fe đã ở +3 nên không nhường electron, không thể sinh NO₂."
+   },
+   "kienThuc": [
+    "HNO₃ đặc nóng oxi hoá Fe²⁺ thành Fe³⁺, sản phẩm khử là NO₂.",
+    "Bảo toàn electron: n(e nhường) = n(NO₂).",
+    "Ở đkc (25 °C, 1 bar), 1 mol khí chiếm 24,79 L."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.NEU_HIEN_TUONG",
+    "ten": "Nitric acid và muối nitrate — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B6-III-32": {
+  "luc": "2026-09-30T04:14:12.350Z",
+  "cau": {
+   "phan": "III",
+   "so": 32,
+   "de": "Nitric acid thường được sử dụng để phá mẫu quặng trong việc nghiên cứu, xác định hàm lượng các kim loại trong quặng.\nCho biết tính chất nào của nitric acid quyết định ứng dụng này.",
+   "dap_an": "tính oxi hoá mạnh",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "biet",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "loi_giai": {
+    "chot": "HNO₃ có N ở mức +5 nên oxi hoá được hầu hết kim loại, kể cả Cu, Ag, đưa chúng vào dung dịch.",
+    "buoc": [
+     "Muốn xác định hàm lượng kim loại, phải hoà tan hoàn toàn kim loại trong quặng vào dung dịch.",
+     "Acid thường (HCl, H₂SO₄ loãng) không hoà tan được kim loại đứng sau hydrogen.",
+     "HNO₃ có nitrogen ở số oxi hoá +5 nên oxi hoá được cả Cu, Ag, Pb… thành ion trong dung dịch.",
+     "⇒ Ứng dụng phá mẫu quặng dựa trên TÍNH OXI HOÁ MẠNH của nitric acid."
+    ],
+    "ket_qua": "tính oxi hoá mạnh",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "tính oxi hoá mạnh",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc vỡ, chỉ còn hai phương án C và D dính vào câu dẫn; đã chuyển thành câu hỏi trả lời ngắn trên đúng nội dung ấy. Đề gốc là câu trắc nghiệm, phương án C chính là \"tính oxi hoá mạnh\" — khớp."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phá mẫu quặng nghĩa là hoà tan hết kim loại kể cả kim loại kém hoạt động, chỉ tính oxi hoá mạnh mới làm được.",
+    "bay": "Chọn 'tính acid mạnh' — acid mạnh thường không hoà tan được Cu, Ag."
+   },
+   "kienThuc": [
+    "HNO₃ oxi hoá được hầu hết kim loại (trừ Au, Pt).",
+    "Kim loại đứng sau hydrogen như Cu, Ag không tan trong HCl nhưng tan trong HNO₃.",
+    "Phá mẫu là đưa toàn bộ kim loại trong quặng vào dung dịch để đo."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.NITRIC_ACID.NHAN_DANG",
+    "ten": "Nitric acid và muối nitrate — nhận dạng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B6-D2",
+    "ten": "Tính chất hóa học của nitric acid",
+    "lop": "11",
+    "bai": "DB-11-B6",
+    "tenBai": "Một số hợp chất của nitrogen với oxygen",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
  }
 }

@@ -17,6 +17,7 @@ import {
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { capNhatExp, capNhatExpSauNopLo, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua, thanThuCuaKetQua } from './exp-d1'
 import { docHapThuChoEm } from './game-v2-hap-thu'
+import { qidDangBaoVe } from './game-v2-bank'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU, TY_LE_ON_TOI_DA } from './ho-so-cau-hinh'
 import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
 import { tinhNganSach, tinhVanToc, type DauVaoKeHoach } from './ke-hoach-ngay'
@@ -848,15 +849,19 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     moSom = await moSomChangKe(env, khoa, soChang, chiSo, loMoi, dungChang, dsQid.length, now)
   }
   const moiExp = await capNhatExpSauNopLo(env, sbd, now) // lập lại kế hoạch ngày trước: treNhip đã lưu là bản cũ (sau nộp bù phải được gỡ)
+  // Câu đang bảo vệ cho một ca chưa công bố (theo qid hoặc nhóm nội dung) ⇒ vẫn chấm, nhưng KHÔNG trả đáp án / lời giải (rà 30/09).
+  const baoVe = await qidDangBaoVe(env, daLam)
   const ketQua = daLam.map((c) => {
     const q = chuoi(c.qid)
     const dungDapAn = answerText(c.dap_an ?? c.dapAn)
+    const an = baoVe.has(q)
     return {
       qid: q,
       dung: isAnswerCorrect(gop[q], dungDapAn, phanTuQid(q, phanCua(c))),
-      dapAnDung: dungDapAn,
-      loiGiai: c.loi_giai ?? c.loiGiai ?? null,
-      anhLoiGiai: (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri === 'sau_loi_giai'),
+      dapAnDung: an ? '' : dungDapAn,
+      loiGiai: an ? null : c.loi_giai ?? c.loiGiai ?? null,
+      anhLoiGiai: an ? [] : (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri === 'sau_loi_giai'),
+      ...(an ? { khoa: true } : {}),
     }
   })
   const homNay = await docExpHomNay(env, sbd, now)
@@ -959,15 +964,18 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
   }
   const moiExp = await capNhatExp(env, sbd, now)
   const homNay = await docExpHomNay(env, sbd, now)
+  const baoVe = await qidDangBaoVe(env, daLam) // như chặng thường: câu đang bảo vệ không trả đáp án / lời giải
   const ketQua = daLam.map((c) => {
     const q = chuoi(c.qid)
     const dungDapAn = answerText(c.dap_an ?? c.dapAn)
+    const an = baoVe.has(q)
     return {
       qid: q,
       dung: dungCua(c, gop[q]!),
-      dapAnDung: dungDapAn,
-      loiGiai: c.loi_giai ?? c.loiGiai ?? null,
-      anhLoiGiai: (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri === 'sau_loi_giai'),
+      dapAnDung: an ? '' : dungDapAn,
+      loiGiai: an ? null : c.loi_giai ?? c.loiGiai ?? null,
+      anhLoiGiai: an ? [] : (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri === 'sau_loi_giai'),
+      ...(an ? { khoa: true } : {}),
     }
   })
   const bai = await env.DB.prepare('SELECT nop_luc, so_dung, so_cau FROM btvn_em WHERE khoa = ?').bind(khoa).first<Hang>()

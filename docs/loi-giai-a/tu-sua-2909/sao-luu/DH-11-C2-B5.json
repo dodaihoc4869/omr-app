@@ -738,5 +738,127 @@
     "chuong": "C2 - Nitrogen và Surful"
    }
   }
+ },
+ "DH-11-C2-B5-III-30": {
+  "luc": "2026-09-30T04:04:35.491Z",
+  "cau": {
+   "phan": "III",
+   "so": 30,
+   "de": "Hòa tan 3,92 gam một muối X ngậm nước vào cốc nước, thu được 100 mL dung dịch X gồm các ion: Fe²⁺, NH₄⁺ và SO₄²⁻. Cho dung dịch NaOH dư vào 10 mL dung dịch X, đun nóng, thu được 49,58 mL khí (đkc). Cho dung dịch BaCl₂ dư vào 10 mL dung dịch X, thu được 0,466 gam kết tủa.\nXác định công thức của X.",
+   "dap_an": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "loi_giai": {
+    "chot": "Trong 10 mL: NH₄⁺ 0,002 mol, SO₄²⁻ 0,002 mol ⇒ Fe²⁺ 0,001 mol.",
+    "buoc": [
+     "Trong 10 mL X: n(NH₃) = 0,04958 : 24,79 = 0,002 mol ⇒ n(NH₄⁺) = 0,002 mol.",
+     "n(BaSO₄) = 0,466 : 233 = 0,002 mol ⇒ n(SO₄²⁻) = 0,002 mol.",
+     "Bảo toàn điện tích: 2n(Fe²⁺) + 0,002 = 2 × 0,002 ⇒ n(Fe²⁺) = 0,001 mol.",
+     "Cả 100 mL: Fe²⁺ 0,01 mol; NH₄⁺ 0,02 mol; SO₄²⁻ 0,02 mol ⇒ tỉ lệ 1 : 2 : 2 ⇒ muối khan là (NH₄)₂Fe(SO₄)₂, M = 284.",
+     "m(muối khan) = 0,01 × 284 = 2,84 g ⇒ m(H₂O) = 3,92 − 2,84 = 1,08 g ⇒ n(H₂O) = 0,06 mol.",
+     "n(H₂O) : n(muối) = 0,06 : 0,01 = 6 ⇒ X là (NH₄)₂Fe(SO₄)₂·6H₂O (muối Mohr)."
+    ],
+    "ket_qua": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Dùng bảo toàn điện tích để tìm ion còn lại, rồi lấy hiệu khối lượng để ra số phân tử nước.",
+    "bay": "Quên nhân 10 khi quy từ 10 mL lên 100 mL dung dịch."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.VIET_CTCT",
+    "ten": "Ammonia và muối ammonium — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B5-III-35": {
+  "luc": "2026-09-30T04:13:55.813Z",
+  "cau": {
+   "phan": "III",
+   "so": 35,
+   "de": "Cho hỗn hợp gồm N₂, H₂ và NH₃ có tỉ khối so với hydrogen là 8. Dẫn hỗn hợp đi qua dung dịch H₂SO₄ đặc, dư thì thể tích khí còn lại một nửa.\nTính thành phần phần trăm theo thể tích của mỗi khí trong hỗn hợp.",
+   "dap_an": "25% N₂; 25% H₂; 50% NH₃",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "loi_giai": {
+    "chot": "%NH₃ = 50%; M̄ = 16 ⇒ 28a + 2b = 750 với a + b = 50 ⇒ a = b = 25.",
+    "buoc": [
+     "M̄ = 8 × 2 = 16. Thể tích giảm một nửa ⇒ %NH₃ = 50%.",
+     "Gọi %N₂ = a, %H₂ = b ⇒ a + b = 50.",
+     "28a + 2b + 17 × 50 = 16 × 100 ⇒ 28a + 2b = 750.",
+     "Thay b = 50 − a: 26a = 650 ⇒ a = 25, b = 25.",
+     "Vậy hỗn hợp gồm 25% N₂, 25% H₂ và 50% NH₃."
+    ],
+    "ket_qua": "25% N₂; 25% H₂; 50% NH₃",
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "25% N₂; 25% H₂; 50% NH₃",
+    "trang_thai": "khop",
+    "ghi_chu": "Ví dụ này bị bóc dính vào câu trước; đã tách lại, giữ nguyên dữ kiện. Đề gốc là câu trắc nghiệm, phương án A chính là \"25% N₂, 25% H₂ và 50% NH₃\" — khớp."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "H₂SO₄ đặc chỉ giữ lại NH₃, nên phần thể tích mất đi chính là phần trăm NH₃.",
+    "bay": "Quên rằng thể tích còn lại MỘT NỬA nghĩa là NH₃ chiếm đúng 50%."
+   },
+   "kienThuc": [
+    "d(X/H₂) = 8 ⇒ M̄ = 16.",
+    "H₂SO₄ đặc hấp thụ NH₃: 2NH₃ + H₂SO₄ → (NH₄)₂SO₄.",
+    "Phần trăm thể tích của khí bằng phần trăm số mol."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_PHAN_TRAM",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
  }
 }
