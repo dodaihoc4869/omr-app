@@ -37,6 +37,8 @@ export interface QuestionMedia {
    * — set true qua luồng "Nhập đề đã xử lý sẵn (JSON)". Vẫn lưu vào ngân
    * hàng bình thường (không chặn), chỉ để đánh dấu thầy nên xem lại. */
   canXem?: boolean
+  /** 30/09: kho gắn nhãn TỰ LUẬN (`kieu: 'tu_luan'` trên tờ kho) — cờ đi theo câu tới mọi kênh; `laCauTuLuan` (src/lib/cau-tu-luan.ts) đọc cờ này. */
+  tuLuan?: boolean
 }
 
 /** `text`/`choices` là chữ đề (mhchem). `thanCauImg`/`choiceImgs` (cũ) là ảnh

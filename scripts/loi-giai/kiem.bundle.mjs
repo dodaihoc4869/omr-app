@@ -1,5 +1,369 @@
 // TỆP SINH TỰ ĐỘNG — đừng sửa tay. Dựng: node scripts/loi-giai/dung-kiem.mjs (nguồn src/lib/loi-giai-kiem.ts + loi-giai-bo.ts)
 
+// src/lib/doc-so-phan-iii.ts
+function docSoPhanIII(raw) {
+  var s = String(raw == null ? "" : raw);
+  var MU = {
+    "⁰": "0",
+    "¹": "1",
+    "²": "2",
+    "³": "3",
+    "⁴": "4",
+    "⁵": "5",
+    "⁶": "6",
+    "⁷": "7",
+    "⁸": "8",
+    "⁹": "9",
+    "⁻": "-",
+    "⁺": "+"
+  };
+  s = s.replace(/10([\s\u00a0\u202f]*)([\u2070\u00b9\u00b2\u00b3\u2074-\u2079\u207a\u207b]+)/g, function(_t, _k, m2) {
+    var r = "10^";
+    for (var i = 0; i < m2.length; i++) r += MU[m2.charAt(i)];
+    return r;
+  });
+  if (s.normalize) s = s.normalize("NFKC");
+  s = s.replace(/\\times/g, "×").replace(/\\cdot/g, "·");
+  s = s.replace(/[\s\u00a0\u1680\u180e\u2000-\u200f\u2028\u2029\u202f\u205f\u2060\u3000\ufeff]+/g, "");
+  s = s.replace(/[\u2010-\u2015\u2212\ufe63\uff0d]/g, "-").replace(/[\u066b\u201a\u060c]/g, ",").toLowerCase();
+  s = s.replace(/^[+\u2248~=]+/, "").replace(/[.,;:!?]+$/, "");
+  s = s.replace(/\^+/g, "^");
+  if (!s) return null;
+  var dinhTri = "";
+  var mu = 0;
+  var coMu = false;
+  var duoi = "";
+  var SO = "([+-]?(?:\\d[\\d.,]*|[.,]\\d+))";
+  var MU10 = "10(?:\\^|\\*\\*)?[({]?([+-]?\\d+)[)}]?";
+  var m = new RegExp("^" + SO + "[x×*·⋅∙]" + MU10 + "(.*)$").exec(s) || new RegExp("^" + SO + "\\.10(?:\\^|\\*\\*)[({]?([+-]?\\d+)[)}]?(.*)$").exec(s) || new RegExp("^" + SO + "e([+-]?\\d+)(.*)$").exec(s);
+  if (m) {
+    dinhTri = m[1];
+    mu = parseInt(m[2], 10);
+    coMu = true;
+    duoi = m[3];
+  } else {
+    var m10 = /^([+-]?)10(?:\^|\*\*)[({]?([+-]?\d+)[)}]?(.*)$/.exec(s);
+    if (m10) {
+      dinhTri = m10[1] + "1";
+      mu = parseInt(m10[2], 10);
+      coMu = true;
+      duoi = m10[3];
+    } else {
+      var mp = new RegExp("^" + SO + "(.*)$").exec(s);
+      if (!mp) return null;
+      dinhTri = mp[1];
+      duoi = mp[2];
+    }
+  }
+  if (!isFinite(mu) || Math.abs(mu) > 400) return null;
+  var dau = "";
+  if (dinhTri.charAt(0) === "-" || dinhTri.charAt(0) === "+") {
+    dau = dinhTri.charAt(0) === "-" ? "-" : "";
+    dinhTri = dinhTri.slice(1);
+  }
+  var soCham = dinhTri.split(".").length - 1;
+  var soPhay = dinhTri.split(",").length - 1;
+  var nghin = "";
+  var thapPhan = "";
+  if (soCham && soPhay) {
+    var cuoiCham = dinhTri.lastIndexOf(".");
+    var cuoiPhay = dinhTri.lastIndexOf(",");
+    thapPhan = cuoiCham > cuoiPhay ? "." : ",";
+    nghin = thapPhan === "." ? "," : ".";
+    if ((thapPhan === "." ? soCham : soPhay) !== 1) return null;
+  } else if (soCham > 1) nghin = ".";
+  else if (soPhay > 1) nghin = ",";
+  else thapPhan = soCham ? "." : soPhay ? "," : "";
+  var nguyen = dinhTri;
+  var le = "";
+  var coDauThapPhan = false;
+  if (thapPhan) {
+    var k = dinhTri.lastIndexOf(thapPhan);
+    nguyen = dinhTri.slice(0, k);
+    le = dinhTri.slice(k + 1);
+    coDauThapPhan = true;
+  }
+  if (nghin) {
+    var nhom = nguyen.split(nghin);
+    if (!/^\d{1,3}$/.test(nhom[0])) return null;
+    for (var j = 1; j < nhom.length; j++) if (!/^\d{3}$/.test(nhom[j])) return null;
+    nguyen = nhom.join("");
+  }
+  if (!/^\d*$/.test(nguyen) || !/^\d*$/.test(le) || !nguyen && !le) return null;
+  if (!coMu) {
+    return { so: dau + nguyen + (coDauThapPhan ? "." + le : ""), donVi: duoi };
+  }
+  var chuSo = (nguyen || "0") + le;
+  var viTri = (nguyen || "0").length + mu;
+  if (viTri <= 0) {
+    chuSo = new Array(1 - viTri + 1).join("0") + chuSo;
+    viTri = 1;
+  }
+  if (viTri > chuSo.length) chuSo = chuSo + new Array(viTri - chuSo.length + 1).join("0");
+  var phanNguyen = chuSo.slice(0, viTri).replace(/^0+(?=\d)/, "");
+  var phanLe = chuSo.slice(viTri).replace(/0+$/, "");
+  var ketQua = phanNguyen + (phanLe ? "." + phanLe : "");
+  if (/^0(?:\.0*)?$/.test(ketQua)) dau = "";
+  return { so: dau + ketQua, donVi: duoi };
+}
+
+// src/lib/cham-so-policy.ts
+var POLICY_VERSION = "CNH-1.0";
+var THAM_SO_CHAM_CNH_1_0 = Object.freeze({
+  policyVersion: POLICY_VERSION,
+  /** Sai số tuyệt đối phải NHỎ HƠN giá trị này mới là bằng nhau (1e-4, không phải ≤). */
+  saiSoTuyetDoiLoaiTru: 1e-4,
+  /** Số chữ số thập phân tối đa cho phép ở `numeric-rounded-v1`. */
+  soChuSoThapPhanToiDa: 12,
+  policies: Object.freeze(["numeric-value-v1", "numeric-rounded-v1", "numeric-unit-v1", "literal-v1"])
+});
+var KHOANG_TRANG = new RegExp("[\\s\\u00a0\\u1680\\u180e\\u2000-\\u200f\\u2028\\u2029\\u202f\\u205f\\u2060\\u3000\\ufeff]+", "g");
+var DAU_TRU = new RegExp("[\\u2010-\\u2015\\u2212\\ufe63\\uff0d\\u207b]", "g");
+var SO_THUAN = /^[+-]?(?:\d+\.?\d*|\.\d+)$/;
+var PHAN_SO = /^([+-]?(?:\d+\.?\d*|\.\d+))\/([+-]?(?:\d+\.?\d*|\.\d+))$/;
+var SO_ROI_DUOI = /^([+-]?(?:\d+\.?\d*|\.\d+))(.*)$/;
+var KHOA_HOC_X10 = /^([+-]?(?:\d+\.?\d*|\.\d+))[x×*·]10\^?\(?([+-]?\d+)\)?$/;
+var KHOA_HOC_E = /^([+-]?(?:\d+\.?\d*|\.\d+))e([+-]?\d+)$/;
+function chuanHoaSoNhap(raw) {
+  const doc = docSoPhanIII(raw);
+  if (doc) return doc.so + doc.donVi;
+  let s = String(raw ?? "").normalize("NFKC").replace(KHOANG_TRANG, "").replace(DAU_TRU, "-").replace(/[٫‚،]/g, ",").toLowerCase();
+  s = s.replace(/^[+≈~=]+/, "").replace(/[.,;:!?]+$/, "").replace(/,/g, ".");
+  const x10 = KHOA_HOC_X10.exec(s) ?? KHOA_HOC_E.exec(s);
+  if (x10) {
+    const n = Number(`${x10[1]}e${x10[2]}`);
+    if (Number.isFinite(n)) return String(n);
+  }
+  return s;
+}
+var DON_VI_DA_BIET = /* @__PURE__ */ new Set([
+  // độ dài / diện tích / thể tích
+  "m",
+  "dm",
+  "cm",
+  "mm",
+  "km",
+  "hm",
+  "dam",
+  "nm",
+  "um",
+  "µm",
+  "μm",
+  "met",
+  "mét",
+  "m2",
+  "m²",
+  "m3",
+  "m³",
+  "cm2",
+  "cm²",
+  "cm3",
+  "cm³",
+  "dm3",
+  "dm³",
+  "mm3",
+  "mm³",
+  "km2",
+  "km²",
+  "km3",
+  "km³",
+  "ha",
+  "cc",
+  "l",
+  "ml",
+  "cl",
+  "dl",
+  "lit",
+  "lít",
+  "mililit",
+  "mililít",
+  // khối lượng
+  "g",
+  "kg",
+  "mg",
+  "hg",
+  "dag",
+  "t",
+  "tan",
+  "tấn",
+  "gam",
+  "kilogam",
+  // thời gian
+  "s",
+  "giay",
+  "giây",
+  "phut",
+  "phút",
+  "h",
+  "gio",
+  "giờ",
+  "ms",
+  "min",
+  // lượng chất / nồng độ
+  "mol",
+  "mmol",
+  "kmol",
+  "umol",
+  "µmol",
+  "mol/l",
+  "mol/lit",
+  "mol/lít",
+  "n",
+  "kmol/m3",
+  "kmol/m³",
+  "mol/kg",
+  "m/mol",
+  // khối lượng riêng / khối lượng mol
+  "g/mol",
+  "kg/mol",
+  "g/ml",
+  "g/cm3",
+  "g/cm³",
+  "kg/m3",
+  "kg/m³",
+  "kg/l",
+  "mg/ml",
+  "g/l",
+  // năng lượng / công suất / nhiệt
+  "j",
+  "kj",
+  "jun",
+  "kilojun",
+  "cal",
+  "kcal",
+  "w",
+  "kw",
+  "mw",
+  "wh",
+  "kwh",
+  "j/kg",
+  "j/mol",
+  "kj/mol",
+  "j/g",
+  "j/(mol.k)",
+  // điện / từ / sóng
+  "v",
+  "mv",
+  "kv",
+  "a",
+  "ma",
+  "ohm",
+  "ω",
+  "f",
+  "µf",
+  "uf",
+  "nf",
+  "pf",
+  "mh",
+  "wb",
+  "hz",
+  "khz",
+  "mhz",
+  "ghz",
+  // áp suất / lực
+  "pa",
+  "kpa",
+  "mpa",
+  "atm",
+  "mmhg",
+  "bar",
+  "mbar",
+  "psi",
+  "n/m2",
+  "n/m²",
+  "n.m",
+  // phần trăm / nhiệt độ / góc
+  "%",
+  "‰",
+  "°c",
+  "°k",
+  "°f",
+  "do",
+  "độ",
+  "rad",
+  "sr",
+  // vận tốc / tốc độ biến thiên
+  "m/s",
+  "km/h",
+  "m/s2",
+  "m/s²",
+  "cm/s",
+  "km/s",
+  "g/s",
+  "mol/s",
+  "m3/s",
+  "l/s",
+  "l/min",
+  // khác dùng trong đề
+  "cd",
+  "lm",
+  "lux",
+  "lx",
+  "db",
+  "eq",
+  "dv",
+  "đvc",
+  "u",
+  "amu"
+]);
+function chuanHoaDonVi(u) {
+  const s = u.normalize("NFKC").toLowerCase().replace(KHOANG_TRANG, "");
+  const trongNgoac = /^\((.*)\)$/.exec(s) ?? /^\[(.*)\]$/.exec(s);
+  return trongNgoac ? trongNgoac[1] : s;
+}
+function rutGon(x) {
+  let tu = x.tu;
+  let mau = x.mau;
+  if (mau < 0n) {
+    tu = -tu;
+    mau = -mau;
+  }
+  let a = tu < 0n ? -tu : tu;
+  let b = mau;
+  while (b) {
+    const t = a % b;
+    a = b;
+    b = t;
+  }
+  const g = a === 0n ? 1n : a;
+  return { tu: tu / g, mau: mau / g };
+}
+function phanSoTuChuoiSo(s) {
+  const m = /^([+-]?)(\d*)(?:\.(\d*))?$/.exec(s);
+  if (!m) return null;
+  const dau = m[1] ?? "";
+  const nguyen = m[2] ?? "";
+  const le = m[3] ?? "";
+  if (!nguyen && !le) return null;
+  const chuSo = (nguyen || "0") + le;
+  if (!/^\d+$/.test(chuSo)) return null;
+  const so = BigInt(chuSo);
+  return rutGon({ tu: dau === "-" ? -so : so, mau: 10n ** BigInt(le.length) });
+}
+function tachSoVaDonVi(s, allowFraction) {
+  if (!s) return { ok: false, loi: "unsupported-format" };
+  if (allowFraction) {
+    const m2 = PHAN_SO.exec(s);
+    if (m2) {
+      const tu = phanSoTuChuoiSo(m2[1]);
+      const mau = phanSoTuChuoiSo(m2[2]);
+      if (!tu || !mau || mau.tu === 0n) return { ok: false, loi: "unsupported-format" };
+      return { ok: true, so: { numText: s, unit: null, gia: rutGon({ tu: tu.tu * mau.mau, mau: tu.mau * mau.tu }) } };
+    }
+  }
+  if (SO_THUAN.test(s)) {
+    const gia2 = phanSoTuChuoiSo(s);
+    return gia2 ? { ok: true, so: { numText: s, unit: null, gia: gia2 } } : { ok: false, loi: "unsupported-format" };
+  }
+  const m = SO_ROI_DUOI.exec(s);
+  if (!m) return { ok: false, loi: "unsupported-format" };
+  const gia = phanSoTuChuoiSo(m[1]);
+  if (!gia) return { ok: false, loi: "unsupported-format" };
+  const don = chuanHoaDonVi(m[2]);
+  if (!don || !DON_VI_DA_BIET.has(don)) return { ok: false, loi: "unsupported-format" };
+  return { ok: true, so: { numText: m[1], unit: don, gia } };
+}
+
 // src/lib/cau-tu-luan.ts
 var laDoiTuong = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 var lay = (c, ...khoa) => {
@@ -40,11 +404,17 @@ var KIEU_TU_LUAN = /(?:^|[^a-z])(?:tu[\s_-]?luan|tự[\s_-]?luận|essay|open[\s
 var CO_ANH = (x) => Array.isArray(x) ? x.some(Boolean) : Boolean(x);
 var CUM_HOI_MO = ["theo em", "vì sao", "tại sao", "phương pháp nào", "cách nào", "cách gì", "như thế nào"];
 var DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?:^|[^\p{L}])hãy\s+)(?:giải thích|trình bày|mô tả|nêu|so sánh|nhận xét|đề xuất)(?![\p{L}])/iu;
+var DONG_TU_LAM_CHU = /(?:^|[.?!:;,]\s*|(?:^|[^\p{L}])hãy\s+)(?:xác định (?:công thức|cấu tạo|tên)|viết (?:công thức|phương trình|các phương trình|cấu tạo|sơ đồ|tên)|lập (?:công thức|phương trình|sơ đồ)|vẽ|chứng minh)(?![\p{L}])/iu;
+var HOI_DAI_LUONG = /bao nhiêu|số thứ tự|dãy số|bộ số|liệt kê|giá trị|tổng (?:hệ số|số)|là mấy|làm tròn|phần trăm|hiệu suất|khối lượng|thể tích|nồng độ|số mol|(?:^|[^\p{L}])tính(?![\p{L}])/iu;
 var hoiMo = (text) => {
   const t = text.toLowerCase();
-  return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t);
+  return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t) || DONG_TU_LAM_CHU.test(t) && !HOI_DAI_LUONG.test(t);
 };
-var laSoThuan = (da) => da.length <= 12 && /^[+\-−–]?\d+(?:[.,]\d+)*$/.test(da);
+function laMotSoPhanIII(da) {
+  const s = chuoiDapAn(da).trim();
+  if (!s || !docSoPhanIII(s)) return false;
+  return tachSoVaDonVi(chuanHoaSoNhap(s), false).ok;
+}
 var laChuNhieuTu = (da) => da.split(/\s+/).filter((t) => t.length > 0 && !/\d/.test(t) && new RegExp("^\\p{L}{2,}[.,;:!?]*$", "u").test(t)).length >= 2;
 var chuPhuongAn = (x) => typeof x === "string" ? x.trim() : laDoiTuong(x) ? chuoi(lay(x, "text", "noiDung", "noi_dung", "de")) : typeof x === "number" ? String(x) : "";
 function demCoNoiDung(ds, anh, hinh, tienTo) {
@@ -68,6 +438,7 @@ function lyDoTuLuan(c, phanMacDinh) {
   if (!laDoiTuong(c)) return "không phải câu hỏi";
   const kieu = chuoi(lay(c, "kieu", "loai", "type", "loaiCau"));
   if (kieu && KIEU_TU_LUAN.test(kieu)) return "câu gắn nhãn tự luận";
+  if (c.tuLuan === true || c.tu_luan === true) return "câu gắn cờ tự luận (kho)";
   if (laMaDeTuLuan(chuoi(lay(c, "maDe", "ma_de"))) || laMaDeTuLuan(chuoi(lay(c, "qid", "id")))) return "mã đề thuộc mục dạy học / tự luận (-VD, -DT, -TL)";
   const phan = phanCua(c, phanMacDinh);
   if (phan === "khac") return "phần của câu không phải I, II, III (tự luận)";
@@ -91,8 +462,9 @@ function lyDoTuLuan(c, phanMacDinh) {
       if (!da) return "phần III không có đáp án để chấm tự động";
       if (da.length > 20 && /\s/.test(da) || /[\n;→⇌:]/.test(da)) return "phần III đáp án dài / nhiều dòng (tự luận)";
       if (laChuNhieuTu(da)) return "phần III đáp án là chữ nhiều từ (không phải số hay mã ngắn)";
+      if (!laMotSoPhanIII(da)) return "phần III đáp án không phải một số (công thức / chữ / nhiều số) — không chấm tự động";
     }
-    if (text && !(coDapAn && laSoThuan(da)) && hoiMo(text)) return "phần III hỏi mở (theo em / phương pháp nào / giải thích …)";
+    if (text && !(coDapAn && laMotSoPhanIII(da)) && hoiMo(text)) return "phần III hỏi mở (theo em / phương pháp nào / giải thích / viết công thức …)";
   }
   return null;
 }
@@ -155,7 +527,8 @@ function mot(c, maDe, phanMacDinh) {
       mucDo: chuoi2(c.muc_do ?? c.mucDo).trim(),
       dangMa: chuoi2(laObj(dangO) ? dangO.ma : dangO).trim(),
       sao: Number(cc.sao ?? 0) || 0,
-      loiGiai: laObj(c.loi_giai) ? c.loi_giai : laObj(c.loiGiai) ? c.loiGiai : null
+      loiGiai: laObj(c.loi_giai) ? c.loi_giai : laObj(c.loiGiai) ? c.loiGiai : null,
+      ...chuoi2(c.kieu).trim() ? { kieu: chuoi2(c.kieu).trim() } : {}
     }
   };
 }
@@ -178,7 +551,7 @@ function cauTrongGoi(maDe, goi) {
 }
 function loaiCau(c) {
   if (laMaDeTuLuan(c.maDe)) return null;
-  const tho = { phan: c.phan, de: c.de, pa: c.pa ? Object.values(c.pa) : void 0, y: c.y ? Object.values(c.y) : void 0, dap_an: c.dapAn, hinh: c.hinh.map((h) => ({ viTri: h.viTri, src: h.duLieu })) };
+  const tho = { kieu: c.kieu, phan: c.phan, de: c.de, pa: c.pa ? Object.values(c.pa) : void 0, y: c.y ? Object.values(c.y) : void 0, dap_an: c.dapAn, hinh: c.hinh.map((h) => ({ viTri: h.viTri, src: h.duLieu })) };
   if (laCauTuLuan(tho, c.phan)) return null;
   if (c.phan === "I") return c.pa && Object.keys(c.pa).length === 4 && /^[A-D]$/.test(c.dapAn) ? "tn" : null;
   if (c.phan === "II") return c.y && Object.keys(c.y).length === 4 && /^[DS]{4}$/.test(c.dapAn) ? "ds" : null;

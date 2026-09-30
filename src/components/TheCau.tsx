@@ -86,6 +86,8 @@ interface SaProps extends BaseProps {
   selected: string | null
   onChange?: (text: string) => void
   correct?: string
+  /** 30/09: câu TỰ LUẬN (xem lại lịch sử cũ) — không tô đúng/sai, ghi "Câu tự luận — không chấm tự động"; đáp án kho chỉ để tham khảo. */
+  tuLuan?: boolean
   /** Ô đáp số đang khoá (đang gửi / đã chốt) ⇒ khoá cả ô lẫn hai nút "±" ",". */
   khoaO?: boolean
 }
@@ -375,10 +377,28 @@ export default function TheCau(props: TheCauProps) {
       </div>
     )
   } else {
-    const { selected, onChange, correct, khoaO } = props
+    const { selected, onChange, correct, tuLuan, khoaO } = props
     const daTraLoi = !!normSo(selected ?? '')
     const dung = xemLai && daTraLoi && khopPhanIII(selected ?? '', correct ?? '') // 29/09: so GIÁ TRỊ như bộ chấm ("1237500000" = "1,2375×10⁹")
-    body = xemLai ? (
+    body = xemLai && tuLuan ? (
+      <div className="flex flex-col" style={{ gap: 'var(--k2)' }} data-khoi="tu-luan">
+        <div style={NHAN_NHO} data-trang-thai="tu-luan">Câu tự luận — không chấm tự động</div>
+        {daTraLoi && (
+          <Hang data-trang-thai="tu-luan">
+            <span style={NHAN_NHO}>Em đã trả lời</span>
+            <span className="flex-1 font-bold cau-de">{selected}</span>
+          </Hang>
+        )}
+        {correct && (
+          <Hang data-trang-thai="tu-luan">
+            <span style={NHAN_NHO}>Đáp án tham khảo</span>
+            <span className="flex-1 cau-de">
+              <ChemText text={correct} />
+            </span>
+          </Hang>
+        )}
+      </div>
+    ) : xemLai ? (
       <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
         <Hang selected data-trang-thai="dung">
           <span style={NHAN_NHO}>Đáp án</span>

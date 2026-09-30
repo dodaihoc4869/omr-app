@@ -48,6 +48,8 @@ export interface CauKho {
   dangMa: string
   sao: number
   loiGiai: Obj | null
+  /** 30/09: nhãn kiểu của kho (`tu_luan` do công cụ tu-sua-kho ghi) — `loaiCau` bỏ câu tự luận theo nhãn này. Không vào dấu vân tay `chuoiBam`. */
+  kieu?: string
 }
 
 function banDo(v: unknown, nhan: readonly string[]): Record<string, string> | null {
@@ -102,6 +104,7 @@ function mot(c: Obj, maDe: string, phanMacDinh?: PhanCau): { qid: string; cau: C
       dangMa: chuoi(laObj(dangO) ? dangO.ma : dangO).trim(),
       sao: Number(cc.sao ?? 0) || 0,
       loiGiai: laObj(c.loi_giai) ? c.loi_giai : laObj(c.loiGiai) ? c.loiGiai : null,
+      ...(chuoi(c.kieu).trim() ? { kieu: chuoi(c.kieu).trim() } : {}),
     },
   }
 }
@@ -120,7 +123,7 @@ export function cauTrongGoi(maDe: string, goi: unknown): CauKho[] {
 /** Dạng lời giải của câu, hoặc `null` nếu KHÔNG soạn (tự luận, thiếu đáp án, thiếu phương án/ý). */
 export function loaiCau(c: CauKho): DangLoiGiai | null {
   if (laMaDeTuLuan(c.maDe)) return null
-  const tho = { phan: c.phan, de: c.de, pa: c.pa ? Object.values(c.pa) : undefined, y: c.y ? Object.values(c.y) : undefined, dap_an: c.dapAn, hinh: c.hinh.map((h) => ({ viTri: h.viTri, src: h.duLieu })) }
+  const tho = { kieu: c.kieu, phan: c.phan, de: c.de, pa: c.pa ? Object.values(c.pa) : undefined, y: c.y ? Object.values(c.y) : undefined, dap_an: c.dapAn, hinh: c.hinh.map((h) => ({ viTri: h.viTri, src: h.duLieu })) }
   if (laCauTuLuan(tho, c.phan)) return null
   if (c.phan === 'I') return c.pa && Object.keys(c.pa).length === 4 && /^[A-D]$/.test(c.dapAn) ? 'tn' : null
   if (c.phan === 'II') return c.y && Object.keys(c.y).length === 4 && /^[DS]{4}$/.test(c.dapAn) ? 'ds' : null
