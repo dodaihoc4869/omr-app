@@ -149,3 +149,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 07:33 30/09 · Boss · merge PR #95 Bi-a thoát giữa ván + mất 8 câu (a8c8233) · 552/553 test vùng (1 chập chờn, chạy riêng xanh) · không ca mở · lùi: git revert -m1 a8c8233
 - 07:41 30/09 · deploy #95 xanh (run 592)
 - 09:15 30/09 · Boss · merge PR #96 Sảnh Bi-a ngang/máy tính (2202f80; tự giải xung đột BiaGame.tsx với #95, 167 test bi-a xanh) · không ca mở · lùi: git revert -m1 2202f80
+- 09:19 30/09 · deploy #96 xanh (run 593)
