@@ -1,0 +1,69 @@
+{
+ "12-C2-ON-II-1": {
+  "luc": "2026-09-29T13:10:15.937Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Carbohydrate được chia thành 3 loại: monosacchride, disaccharide, polysaccharide.",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "y": {
+    "a": "Nguyên tắc phân loại carbohydrate dựa trên nhóm chức của carbohydrate.",
+    "b": "Monosacchride là những carbohydrate không bị thủy phân thành các phân tử nhỏ hơn.",
+    "c": "Disaccharide là những carbohydrate bị thủy phân hoàn toàn mỗi phân tử tạo thành hai phân tử monosaccharide.",
+    "d": "Polysaccharide là những carbohydrate bị thủy phân hoàn toàn mỗi phân tử tạo thành nhiều phân tử disaccharide."
+   },
+   "loi_giai": {
+    "chot": "Phân loại carbohydrate theo khả năng thuỷ phân: monosaccharide không thuỷ phân, disaccharide cho 2 monosaccharide, polysaccharide cho nhiều monosaccharide.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai. Phân loại dựa trên khả năng thuỷ phân (số đơn vị monosaccharide tạo thành), không dựa trên nhóm chức."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng. Monosaccharide (glucose, fructose) là đơn vị nhỏ nhất, không bị thuỷ phân thành carbohydrate nhỏ hơn."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng. Saccharose, maltose thuỷ phân mỗi phân tử cho hai phân tử monosaccharide."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai. Polysaccharide thuỷ phân hoàn toàn cho nhiều phân tử monosaccharide, không phải disaccharide."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng bảng phân loại theo khả năng thuỷ phân đã gắn hai sao ở câu 4.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B4",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBOHYDRATE"
+  }
+ }
+}

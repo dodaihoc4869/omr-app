@@ -69,5 +69,197 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
   }
+ },
+ "12-C5-B16-I-41": {
+  "luc": "2026-09-29T11:35:06.142Z",
+  "cau": {
+   "phan": "I",
+   "so": 41,
+   "de": "Tiến hành điện phân dung dịch CuSO₄ trong môi trường H₂SO₄, sử dung anode bằng đồng và dòng điện một chiều có cường độ không đổi.\nNhận xét nào sau đây không đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Ở cathode xảy ra quá trình khử ion Cu²⁺",
+    "B": "Khối lượng anode giảm dần, khối lượng cathode tăng dần",
+    "C": "Ở anode xảy ra quá trình oxi hoá nước",
+    "D": "Thứ tự điện phân ở cathode là Cu²⁺; H₂O"
+   },
+   "loi_giai": {
+    "chot": "Anode Cu bị oxi hoá thành Cu²⁺ nên khối lượng anode giảm, cathode nhận Cu nên tăng; nước không bị oxi hoá.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng nên không chọn: cathode khử Cu²⁺."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng nên không chọn: đó là hiện tượng cực dương tan."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Sai nên chọn: Cu bị oxi hoá trước nước."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng nên không chọn: Cu²⁺ khử trước, hết mới đến nước."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_DD.CHON_PHAT_BIEU",
+    "ten": "Điện phân dung dịch — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ },
+ "12-C5-B16-I-50": {
+  "luc": "2026-09-29T11:35:06.142Z",
+  "cau": {
+   "phan": "I",
+   "so": 50,
+   "de": "Điện phân các dung dịch chất điện li trong nước với các điện cực trơ.\nCho các phát biểu sau:\n(a) Khi có dòng điện chạy qua, các ion sẽ di chuyển về các điện cực trái dấu.\n(b) Tại anode chỉ xảy ra quá trình oxi hoá các anion hoặc H₂O.\n(c) Tại cathode chỉ xảy ra quá trình khử các cation hoặc H₂O.\n(d) Khối lượng dung dịch điện phân giảm trong quá trình điện phân.\nSố phát biểu đúng là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "1",
+    "B": "2",
+    "C": "3",
+    "D": "4"
+   },
+   "loi_giai": {
+    "chot": "Chỉ (a) và (d) đúng; (b) và (c) sai vì còn có trường hợp anode tan, và cathode có thể khử cả ion H⁺ của acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thiếu."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: hai phát biểu (a) và (d)."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thừa."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: (b) và (c) đều sai."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_DD.CHON_PHAT_BIEU",
+    "ten": "Điện phân dung dịch — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
+ },
+ "12-C5-B16-I-29": {
+  "luc": "2026-09-29T13:10:18.315Z",
+  "cau": {
+   "phan": "I",
+   "so": 29,
+   "de": "Khi điện phân nóng chảy MgCl₂ nóng chảy (điện cực trơ), ở anode xảy ra",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Pin điện và điện phân",
+   "muc_do": "biet",
+   "pa": {
+    "A": "sự khử ion Cl⁻",
+    "B": "sự khử ion Mg²⁺",
+    "C": "sự oxi hóa ion Mg²⁺",
+    "D": "sự oxi hóa ion Cl⁻"
+   },
+   "loi_giai": {
+    "chot": "Anode là nơi oxi hoá; trong MgCl₂ nóng chảy thì Cl⁻ bị oxi hoá thành Cl₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: Cl⁻ bị oxi hoá chứ không bị khử."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: Mg²⁺ bị khử nhưng ở cathode."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: Mg²⁺ đã ở mức oxi hoá cao nhất."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: 2Cl⁻ → Cl₂ + 2e."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "DIEN_PHAN.DIEN_PHAN_NC.NHAN_DANG",
+    "ten": "Điện phân nóng chảy — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề DIEN_PHAN"
+  }
  }
 }

@@ -1,0 +1,59 @@
+{
+ "DH-10-C1-B4-D1-III-2": {
+  "luc": "2026-09-29T13:13:59.637Z",
+  "cau": {
+   "phan": "III",
+   "so": 2,
+   "de": "Một nguyên tố mà nguyên tử có 4 lớp electron, có phân lớp d, lớp ngoài cùng đã bão hòa electron.\nTổng số electron s và electron p của nguyên tố này là bao nhiêu?",
+   "dap_an": "20",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 4. Đề kiểm tra ôn tập chương số 1",
+   "loi_giai": {
+    "chot": "Bốn lớp electron, có phân lớp d, lớp ngoài cùng bão hoà nên lớp ngoài cùng là 4s².",
+    "buoc": [
+     "Bốn lớp electron, có phân lớp d, lớp ngoài cùng bão hoà nên lớp ngoài cùng là 4s².",
+     "Electron s gồm 1s², 2s², 3s², 4s²: tổng 8.",
+     "Electron p gồm 2p⁶ và 3p⁶: tổng 12. Vậy 8 + 12 = 20."
+    ],
+    "ket_qua": "20",
+    "dap_an_de": "20",
+    "dap_an_tu_giai": "20",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Kết quả không phụ thuộc số electron 3d, nhận ra điều đó là xong bài.",
+    "bay": "Cộng luôn electron 3d dù đề chỉ hỏi electron s và p."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.DEM_NGUYEN_TU",
+    "ten": "Cấu hình electron — đếm nguyên tử"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ }
+}

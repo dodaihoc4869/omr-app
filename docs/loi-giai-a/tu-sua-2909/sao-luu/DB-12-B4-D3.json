@@ -368,5 +368,325 @@
    "nguonDe": "DH-12-C2-B4",
    "nguonCau": "III-47"
   }
+ },
+ "DB-12-B4-D3-I-145": {
+  "luc": "2026-09-29T11:36:41.744Z",
+  "cau": {
+   "phan": "I",
+   "so": 145,
+   "de": "Nhận xét nào dưới dây là không đúng khi nói về glucose và frucrose?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Đều tạo được dung dịch màu xanh lam khi tác dụng với Cu(OH)2 trong môi trường kiềm",
+    "B": "Đều tạo được kết tủa đỏ gạch Cu₂O khi tác dụng với Cu(OH)₂, đun nóng trong môi trường kiềm",
+    "C": "Đều làm mất màu nước bromine",
+    "D": "Đều xảy ra phản ứng tráng bạc khi tác dụng với thuốc thử Tollens"
+   },
+   "loi_giai": {
+    "chot": "Fructose không có nhóm –CHO nên không làm mất màu nước bromine; glucose thì có. Đây là phép thử phân biệt hai chất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với cả hai: nhiều nhóm –OH kề nhau cho phức xanh lam."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng với cả hai: trong môi trường kiềm fructose chuyển thành glucose rồi khử Cu(II)."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là nhận xét SAI: chỉ glucose làm mất màu nước bromine, fructose thì không."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng với cả hai vì môi trường kiềm của thuốc thử làm fructose chuyển hoá."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-KT-C2-D1",
+   "nguonCau": "I-6"
+  }
+ },
+ "DB-12-B4-D3-II-114": {
+  "luc": "2026-09-29T11:36:41.744Z",
+  "cau": {
+   "phan": "II",
+   "so": 114,
+   "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_8.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "II_8_2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Phân tử amylose tạo bởi nhiều đơn vị b-glucose, nối với nhau qua liên kết b-1,4-glycoside.",
+    "b": "Phân tử cellulose tạo bởi nhiều đơn vị a-glucose, nối với nhau qua liên kết a-1,4-glycoside.",
+    "c": "Amylose và cellulose đều là những polymer mạch không phân nhánh.",
+    "d": "Thuỷ phân amylose hoặc cellulose đều thu được glucose."
+   },
+   "loi_giai": {
+    "chot": "Amylose gồm các đơn vị alpha-glucose nối alpha-1,4; cellulose gồm các đơn vị beta-glucose nối beta-1,4; cả hai đều mạch thẳng và thuỷ phân cho glucose.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: amylose gồm các đơn vị alpha-glucose, liên kết alpha-1,4-glycoside."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: cellulose gồm các đơn vị beta-glucose, liên kết beta-1,4-glycoside."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: cả hai đều là polymer mạch không phân nhánh."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: thuỷ phân hoàn toàn đều cho glucose."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D2",
+   "nguonCau": "II-39"
+  }
+ },
+ "DB-12-B4-D3-II-260": {
+  "luc": "2026-09-29T11:36:41.744Z",
+  "cau": {
+   "phan": "II",
+   "so": 260,
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho khoảng 5 mL dung dịch hồ tinh bột 1% vào ống nghiệm. Sau đó thêm khoảng 1 mL dung dịch HCl 1M vào, lắc đều.\nBước 2: Đặt ống nghiệm trong một cốc thuỷ tinh chứa nước nóng, đun cách thuỷ trong 10 phút. Sau đó để nguội.\nBước 3: Thêm từ từ NaHCO₃ vào ống nghiệm đến khi ngừng sủi bọt khí.\nBước 4: Cho khoảng 2 mL dung dịch thu được vào ống nghiệm chứa Cu(OH)₂ (được điều chế bằng cách cho 0,5 mL dung dịch CuSO₄, 5% vào 2 mL dung dịch NaOH 10%, lắc nhẹ).\nSau đó đặt ống nghiệm trong cốc thuỷ tinh chúa nước nóng khoảng 5 phút.\nMỗi phát biểu sau là đúng hay sai?",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "y": {
+    "a": "Sau bước 1, thu được dung dịch đồng nhất.",
+    "b": "Trong bước 2, đã xảy ra phản ứng thủy phân tinh bột tạo thành glucose.",
+    "c": "Trong bước 3, NaHCO₃ được thêm vào nhằm mục đích làm tăng tốc độ phản ứng thủy phân ở bước 2.",
+    "d": "Sau bước 4, thu được dung dịch màu xanh lam."
+   },
+   "loi_giai": {
+    "chot": "Sau bước 4 đun nóng, glucose khử Cu(II) thành Cu₂O đỏ gạch, không còn màu xanh lam.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hồ tinh bột 1% là dung dịch keo, trộn HCl vẫn đồng nhất."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: đun cách thuỷ có acid xúc tác, tinh bột thuỷ phân thành glucose."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: NaHCO₃ thêm ở bước 3 để TRUNG HOÀ HCl dư, không liên quan tốc độ phản ứng bước 2."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: bước 4 đun nóng nên thu được KẾT TỦA ĐỎ GẠCH Cu₂O."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU",
+    "ten": "Phản ứng màu — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B6",
+   "nguonCau": "II-35"
+  }
+ },
+ "DB-12-B4-D3-I-152": {
+  "luc": "2026-09-29T11:36:41.744Z",
+  "cau": {
+   "phan": "I",
+   "so": 152,
+   "de": "Công thức nào dưới đây mô tả đúng cấu tạo của fructose ở dạng mạch hở?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_8_A.png",
+     "vi_tri": "sau_pa_A"
+    },
+    {
+     "tep": "I_8_B.png",
+     "vi_tri": "sau_pa_B"
+    },
+    {
+     "tep": "I_8_C.png",
+     "vi_tri": "sau_pa_C"
+    },
+    {
+     "tep": "I_8_D.png",
+     "vi_tri": "sau_pa_D"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "(xem hình phương án A)",
+    "B": "(xem hình phương án B)",
+    "C": "(xem hình phương án C)",
+    "D": "(xem hình phương án D)"
+   },
+   "loi_giai": {
+    "chot": "Fructose mạch hở là ketose sáu carbon: nhóm C=O nằm ở carbon số 2, còn lại là năm nhóm –OH trên khung CH₂OH-CO-CHOH-CHOH-CHOH-CH₂OH.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm carbonyl ở carbon số 2, đúng cấu tạo ketose."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đặt nhóm carbonyl ở đầu mạch, đó là cấu tạo của aldose chứ không phải fructose."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Số nhóm hydroxy không khớp với công thức C₆H₁₂O₆."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Khung carbon sai vị trí nhóm chức so với fructose."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.VIET_CTCT",
+    "ten": "Cấu tạo — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-KT-C2-D2",
+   "nguonCau": "I-8"
+  }
  }
 }

@@ -211,5 +211,222 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "12-C2-B6-D2-I-32": {
+  "luc": "2026-09-29T11:34:58.124Z",
+  "cau": {
+   "phan": "I",
+   "so": 32,
+   "de": "Cho các phát biểu sau về cellulose:\n(a) Tạo bởi nhiều đơn vị a-glucose, nối với nhau qua liên kết a-1,2-glycoside.\n(b) Có mạch không phân nhánh.\n(c) Do không có enzyme thích hợp, cơ thể người không thể chuyển hoá cellulose thành glucose.\n(d) Thực vật tạo tinh bột và cellulose nhờ quá trình quang hợp.\nSố phát biểu đúng là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "1",
+    "B": "4",
+    "C": "2",
+    "D": "3"
+   },
+   "loi_giai": {
+    "chot": "Cellulose gồm các đơn vị beta-glucose nối bằng liên kết beta-1,4-glycoside nên phát biểu (a) sai; ba phát biểu còn lại đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thiếu hai phát biểu đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: phát biểu (a) sai."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thiếu một phát biểu đúng."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: ba phát biểu (b), (c), (d) đúng."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.CHON_PHAT_BIEU",
+    "ten": "Thuỷ phân — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D3",
+    "ten": "Phản ứng quang hợp",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-C2-B6-D2-II-36": {
+  "luc": "2026-09-29T11:34:58.124Z",
+  "cau": {
+   "phan": "II",
+   "so": 36,
+   "de": "Cho các phát biểu sau về tinh bột và cellulose:",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Tinh bột được sử dụng làm chất kết dính trong công nghiệp giấy.",
+    "b": "Cellulose là nguồn lương thực chính của con người và một số loài động vật.",
+    "c": "Cellulose có thể được sử dụng làm nguyên liệu trong sản xuất ethanol.",
+    "d": "Tinh bột được tiêu hóa bởi enzyme a-amylase trong nước bọt."
+   },
+   "loi_giai": {
+    "chot": "Cellulose không tiêu hoá được ở người nên không phải lương thực chính; ba ý còn lại đều đúng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hồ tinh bột dùng làm chất kết dính trong công nghiệp giấy."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: người không tiêu hoá được cellulose nên nó không phải lương thực chính."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: cellulose thuỷ phân cho glucose rồi lên men thành ethanol."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: enzyme alpha-amylase trong nước bọt thuỷ phân tinh bột."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBOHYDRATE"
+  }
+ },
+ "12-C2-B6-D2-II-39": {
+  "luc": "2026-09-29T11:34:58.124Z",
+  "cau": {
+   "phan": "II",
+   "so": 39,
+   "de": "Quan sát cấu trúc phân tử amylose và phân tử cellulose dưới đây:",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_8.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "II_8_2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Phân tử amylose tạo bởi nhiều đơn vị b-glucose, nối với nhau qua liên kết b-1,4-glycoside.",
+    "b": "Phân tử cellulose tạo bởi nhiều đơn vị a-glucose, nối với nhau qua liên kết a-1,4-glycoside.",
+    "c": "Amylose và cellulose đều là những polymer mạch không phân nhánh.",
+    "d": "Thuỷ phân amylose hoặc cellulose đều thu được glucose."
+   },
+   "loi_giai": {
+    "chot": "Amylose gồm các đơn vị alpha-glucose nối alpha-1,4; cellulose gồm các đơn vị beta-glucose nối beta-1,4; cả hai đều mạch thẳng và thuỷ phân cho glucose.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: amylose gồm các đơn vị alpha-glucose, liên kết alpha-1,4-glycoside."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: cellulose gồm các đơn vị beta-glucose, liên kết beta-1,4-glycoside."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: cả hai đều là polymer mạch không phân nhánh."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: thuỷ phân hoàn toàn đều cho glucose."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

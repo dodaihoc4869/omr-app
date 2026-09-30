@@ -1,0 +1,66 @@
+{
+ "DH-12-C2-B7-D1-I-1": {
+  "luc": "2026-09-29T11:37:32.523Z",
+  "cau": {
+   "phan": "I",
+   "so": 1,
+   "de": "Trong các nhận xét dưới đây, nhận xét nào đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Ôn tập chương 2 (đề 1)",
+   "pa": {
+    "A": "Tất cả các chất có công thức Cₙ(H₂O)m đều là carbohydrate.",
+    "B": "Tất cả các carbohydrate đều có công thức chung Cₙ(H₂O)m.",
+    "C": "Đa số các carbohydrate có công thức chung Cₙ(H₂O)m.",
+    "D": "Phân tử các carbohydrate đều có ít nhất 6 nguyên tử carbon."
+   },
+   "loi_giai": {
+    "chot": "Đa số carbohydrate có công thức Cₙ(H₂O)ₘ nhưng không phải chất nào có công thức ấy cũng là carbohydrate.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "CH₃COOH là C₂(H₂O)₂ nhưng không phải carbohydrate."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Một số carbohydrate như deoxyribose không khớp công thức này."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: chỉ ĐA SỐ carbohydrate có công thức đó."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Pentose chỉ có 5 nguyên tử carbon."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBOHYDRATE"
+  }
+ }
+}

@@ -199,3 +199,26 @@ describe('chuyen_de + muc_do (QUANLYCATHI mục 5)', () => {
     expect(chuanHoaMucDo(3)).toBeUndefined()
   })
 })
+
+describe('rà thêm đề 30/09 — bộ lọc đáp án lúc nạp', () => {
+  const goi = (cau: unknown[]) => ({ ma_de: '12-THU', nguon: 'x', cau }) as never
+  it('Phần II dạng object: từng ý phải đúng là D/S (trước {a:"x"} vẫn lọt)', () => {
+    const y = { a: 'ý a', b: 'ý b', c: 'ý c', d: 'ý d' }
+    expect(buildTeacherSourceFromKhoDe(goi([{ phan: 'II', so: 1, de: 'Đề', y, dap_an: { a: 'x', b: 'D', c: 'S', d: 'D' } }])).errors).toHaveLength(1)
+    const ok = buildTeacherSourceFromKhoDe(goi([{ phan: 'II', so: 1, de: 'Đề', y, dap_an: { a: 'd', b: 'S', c: 's', d: 'D' } }]))
+    expect(ok.errors).toEqual([])
+    expect(ok.source.phanII[0].correct).toEqual(['D', 'S', 'S', 'D'])
+  })
+  it('Phần III: đáp án máy chấm không đọc được như một số ⇒ cảnh báo (không chặn); số, đơn vị, ×10ⁿ thì không', () => {
+    const r = buildTeacherSourceFromKhoDe(goi([
+      { phan: 'III', so: 1, de: 'Đề', dap_an: 'khoảng 5' },
+      { phan: 'III', so: 2, de: 'Đề', dap_an: '12,5' },
+      { phan: 'III', so: 3, de: 'Đề', dap_an: '2,5x10^-3' },
+      { phan: 'III', so: 4, de: 'Đề', dap_an: '5 mol' },
+    ]))
+    expect(r.errors).toEqual([])
+    expect(r.source.phanIII).toHaveLength(4)
+    expect(r.warnings.filter((w) => w.includes('máy chấm không đọc được'))).toHaveLength(1)
+    expect(r.warnings.join('\n')).toContain('khoảng 5')
+  })
+})

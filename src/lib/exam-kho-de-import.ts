@@ -10,6 +10,7 @@
 // kho-de/.gitignore) hay tải lên bất kỳ server nào.
 import type { CanChua, HinhAnh, LoiGiaiCauTruc, LyDoY, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion, TrangThaiLoiGiai, ViTriHinh } from '../data/examContent'
 import { donCau } from './chu-la-pdf'
+import { khopPhanIII } from './cham-so'
 import { maDangHopLe } from './cau-hinh-chua'
 
 /** Lời giải do pipeline "giải mù" rồi đối chiếu đáp án đề (NAPDETUDONG.md
@@ -452,8 +453,10 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       if (typeof c.dap_an === 'string' && /^[DS]{4}$/i.test(c.dap_an)) {
         correct = c.dap_an.toUpperCase().split('') as ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
       } else if (typeof c.dap_an === 'object' && c.dap_an !== null) {
-        const o = c.dap_an as Partial<Record<'a' | 'b' | 'c' | 'd', 'D' | 'S'>>
-        if (o.a && o.b && o.c && o.d) correct = [o.a, o.b, o.c, o.d]
+        const o = c.dap_an as Partial<Record<'a' | 'b' | 'c' | 'd', unknown>>
+        // Giá trị từng ý phải đúng là D/S (trước chỉ cần "có mặt" ⇒ {a:'x'} lọt vào kho và chấm sai mọi em).
+        const ds = (['a', 'b', 'c', 'd'] as const).map((k) => String(o[k] ?? '').trim().toUpperCase())
+        if (ds.every((x) => x === 'D' || x === 'S')) correct = ds as ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
       }
       if (!correct) {
         errors.push(`${nhan}: "dap_an" phải là chuỗi 4 ký tự D/S (vd "DSDS") hoặc object {a,b,c,d}`)
@@ -466,6 +469,9 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
         errors.push(`${nhan}: thiếu "dap_an"`)
         continue
       }
+      // Đáp án máy chấm không đọc được như một số (chữ, nhiều số, hậu tố lạ…) ⇒ mọi em bị chấm SAI. Không chặn (câu có thể là tự luận,
+      // bị loại ở chặng rút) nhưng phải báo thầy: câu tự luận thì dùng mã đề -TL, câu số thì sửa lại đáp án.
+      if (!khopPhanIII(correct, correct)) warnings.push(`${nhan}: đáp án "${correct.slice(0, 40)}" máy chấm không đọc được như một số — em trả lời đúng vẫn bị chấm sai`)
       phanIII.push({ id: c.qid || `${json.ma_de}-III-${c.so}`, ...chung, correct })
     }
   }

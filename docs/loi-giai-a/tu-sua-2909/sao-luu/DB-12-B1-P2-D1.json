@@ -115,5 +115,78 @@
    "nguonDe": "12-KT-C1-D4",
    "nguonCau": "III-6"
   }
+ },
+ "DB-12-B1-P2-D1-I-70": {
+  "luc": "2026-09-29T13:12:03.683Z",
+  "cau": {
+   "phan": "I",
+   "so": 70,
+   "de": "Để làm xà phòng thủ công, người ta đun dầu thực vật hoặc mỡ động vật với dung dịch kiềm. Khi đó muối của kim loại kiềm với acid béo được tạo thành ở dạng keo. Các muối này được tách ra, sau đó trộn với các chất phụ gia, hương liệu, chất tạo màu, rồi ép thành bánh xà phòng mà chúng ta vẫn dang sử dụng hàng ngày.\nTrong quá trình làm xà phòng thủ công, phản ứng hóa học nào đóng vai trò quan trọng nhất?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "biet",
+   "pa": {
+    "A": "Phản ứng ester hóa giữa glycerol và acid béo",
+    "B": "Phản ứng phân hủy các hợp chất hữu cơ trong dầu thực vật",
+    "C": "Phản ứng thủy phân chất béo bằng dung dịch kiềm",
+    "D": "Phản ứng oxi hóa - khử giữa dầu thực vật và oxygen trong không khí"
+   },
+   "loi_giai": {
+    "chot": "Đun dầu mỡ với dung dịch kiềm chính là thuỷ phân chất béo trong môi trường base, tức phản ứng xà phòng hoá.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Ester hoá đi theo chiều ngược lại, tạo ra chất béo chứ không phá vỡ nó."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Không có phản ứng phân huỷ nào ở đây, bộ khung ester bị thuỷ phân có trật tự."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: thuỷ phân chất béo bằng dung dịch kiềm cho muối của acid béo."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Oxi hoá với oxygen không khí là nguyên nhân gây ôi mỡ, không tạo xà phòng."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.THUY_PHAN_BASE.NHAN_DANG",
+    "ten": "Xà phòng hoá — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P2-D1",
+    "ten": "Phản ứng xà phòng hoá",
+    "lop": "12",
+    "bai": "DB-12-B1-P2",
+    "tenBai": "Ester - Lipid (Phần 2)",
+    "soBai": 1,
+    "phanBai": 2,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-KT-C1-D5",
+   "nguonCau": "I-6"
+  }
  }
 }

@@ -1,0 +1,154 @@
+{
+ "DB-11-B7-D1-I-3": {
+  "luc": "2026-09-29T13:11:37.285Z",
+  "cau": {
+   "phan": "I",
+   "so": 3,
+   "de": "Cho các phát biểu sau về sulfur dioxide (SO₂):\n(a) Có độc tính đối với con người.\n(b) Phản ứng được với đá vôi.\n(c) Khí này được tạo thành từ hoạt động của núi lửa trong tự nhiên, từ quá tình đốt cháy nhiên liệu hóa thạch của con người, … (d) Là oxide lưỡng tính.\nSố phát biểu đúng là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "1.",
+    "B": "2.",
+    "C": "3.",
+    "D": "4."
+   },
+   "loi_giai": {
+    "chot": "(a) đúng vì SO₂ độc; (b) đúng vì SO₂ phản ứng với CaCO₃ tạo CaSO₃ và CO₂; (c) đúng về nguồn phát thải; (d) sai vì SO₂ là acidic oxide chứ không lưỡng tính. Vậy có 3 phát biểu đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Có tới ba phát biểu đúng, không phải một."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đáp án đề chọn B nhưng (b) cũng đúng nên phải là ba."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: các phát biểu (a), (b), (c) đều đúng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Phát biểu (d) sai vì SO₂ là acidic oxide."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "lech",
+    "ghi_chu": "Đáp án đề ghi B (2 phát biểu đúng) nhưng cả (a), (b), (c) đều đúng: SO₂ độc, phản ứng được với đá vôi (nguyên lí xử lí khí thải bằng CaCO₃) và sinh ra từ núi lửa lẫn đốt nhiên liệu. Chỉ (d) sai vì SO₂ là acidic oxide. Máy tự giải cho 3, tức phương án C."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đếm số phát biểu đúng về tính chất, nguồn phát thải và phân loại oxide của SO₂.",
+    "bay": "Ý (b) đúng: SO₂ phản ứng với đá vôi, đó chính là nguyên lí của công nghệ xử lí khí thải bằng bột đá vôi."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.CHON_PHAT_BIEU",
+    "ten": "Sulfur và hợp chất sulfur dioxide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D1",
+    "ten": "Bài toán điều chế SO2",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "I-51"
+  }
+ },
+ "DB-11-B7-D1-II-7": {
+  "luc": "2026-09-29T13:11:37.285Z",
+  "cau": {
+   "phan": "II",
+   "so": 7,
+   "de": "Trong tự nhiên sulfur tồn tại ở cả dạng đơn chất và hợp chất.",
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Trong tự nhiên, sulfur tồn tại ở dạng hợp chất như: quặng pyrite, thạch cao, sphalerite,…",
+    "b": "Ở dạng đơn chất, sulfur thường được tìm thấy tại các vùng có hoạt động núi lửa, suối nước nóng hoặc các mỏ khoáng ngầm.",
+    "c": "Sulfur có trong thành phần của thành phần của một số protein động vật, thực vật.",
+    "d": "Các hoạt động địa chất như núi lửa phun trào giải phóng sulfur vào môi trường dưới cả dạng đơn chất và các hợp chất khí (như SO₂, H₂S)."
+   },
+   "loi_giai": {
+    "chot": "Cả bốn ý đều đúng: sulfur có ở dạng hợp chất (pyrite, thạch cao, sphalerite), ở dạng đơn chất vùng núi lửa, trong protein và được núi lửa giải phóng dưới cả hai dạng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: pyrite, thạch cao, sphalerite đều là hợp chất của sulfur."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur đơn chất có ở vùng núi lửa, suối nước nóng, mỏ ngầm."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: sulfur có trong một số protein động vật và thực vật."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: núi lửa giải phóng cả sulfur đơn chất lẫn SO₂, H₂S."
+     }
+    },
+    "dap_an_de": "DDDD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Cả bốn ý đều đúng: sulfur có ở dạng hợp chất (pyrite, thạch cao, sphalerite), ở dạng đơn chất vùng núi lửa, trong protein và được núi lửa giải phóng d"
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.CHON_PHAT_BIEU",
+    "ten": "Sulfur và hợp chất sulfur dioxide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D1",
+    "ten": "Bài toán điều chế SO2",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-1"
+  }
+ }
+}

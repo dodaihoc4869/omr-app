@@ -1,0 +1,226 @@
+{
+ "10-C1-B3-D1-I-27": {
+  "luc": "2026-09-29T13:09:42.348Z",
+  "cau": {
+   "phan": "I",
+   "so": 27,
+   "de": "Lớp nào dưới đây có tối đa 18 eletron?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "biet",
+   "pa": {
+    "A": "n = 3.",
+    "B": "n = 1.",
+    "C": "n = 4.",
+    "D": "n = 2."
+   },
+   "loi_giai": {
+    "chot": "Số electron tối đa của lớp n là 2n². Lớp n = 3: 2·3² = 18.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "n = 3: 2·3² = 18 electron, đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "n = 1: 2·1² = 2 electron."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "n = 4: 2·4² = 32 electron."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "n = 2: 2·2² = 8 electron."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Thay n bằng 3 vào công thức ở câu 28.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.NHAN_DANG",
+    "ten": "Cấu hình electron — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "10-C1-B3",
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ },
+ "10-C1-B3-D1-I-68": {
+  "luc": "2026-09-29T13:09:42.348Z",
+  "cau": {
+   "phan": "I",
+   "so": 68,
+   "de": "Phát biểu nào sau đây đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Phân lớp 4s có mức năng lượng cao hơn phân lớp 3d.",
+    "B": "Lớp thứ 4 có tối đa 18 eletron.",
+    "C": "Lớp electron thứ 3 (lớp M) có 3 phân lớp.",
+    "D": "Số electron tối đa trong phân lớp 3d là 18."
+   },
+   "loi_giai": {
+    "chot": "Lớp thứ n có n phân lớp và tối đa 2n² electron; thứ tự năng lượng 4s < 3d; phân lớp d chứa tối đa 10 electron.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Theo thứ tự mức năng lượng, 4s thấp hơn 3d nên electron điền 4s trước 3d."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Lớp thứ 4 có tối đa 2 · 4² = 32 electron; 18 là của lớp thứ 3."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Lớp M (n = 3) có 3 phân lớp 3s, 3p, 3d."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Phân lớp 3d có 5 orbital, chứa tối đa 10 electron."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Bốn ý đều đã gặp ở câu 41, 28, 17 và 21.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.CHON_PHAT_BIEU",
+    "ten": "Cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "10-C1-B3",
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ },
+ "10-C1-B3-D1-I-96": {
+  "luc": "2026-09-29T13:09:42.348Z",
+  "cau": {
+   "phan": "I",
+   "so": 96,
+   "de": "Cho nguyên tử R có tổng số hạt cơ bản là 46, số hạt mang điện nhiều hơn số hạt không mang điện là 14.\nCấu hình electron nguyên tử của R là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "[Ne]3s²3p³.",
+    "B": "[Ne]₃s23p5.",
+    "C": "[Ar]₃d14s2.",
+    "D": "[Ar]₄s2."
+   },
+   "loi_giai": {
+    "chot": "2p + n = 46 và 2p - n = 14 nên 4p = 60, p = 15, n = 16; 15 electron xếp thành 1s²2s²2p⁶3s²3p³, viết gọn [Ne]3s²3p³.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Z = 15 có cấu hình 1s²2s²2p⁶3s²3p³, viết gọn là [Ne]3s²3p³."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "[Ne]3s²3p⁵ có 17 electron, khi đó n = 46 - 34 = 12, không thoả 2p - n = 14."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "[Ar]3d¹4s² có 21 electron, riêng hạt mang điện đã là 42, không thoả tổng hạt 46."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "[Ar]4s² có 20 electron, khi đó 2p = 40 và n = 6, trái với 2p - n = 14."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Giải hệ tổng hạt rồi viết cấu hình rút gọn, dạng ra đều trong đề thi.",
+    "bay": "Viết cấu hình đầy đủ mà không rút gọn được về dạng [Ne] hay [Ar].",
+    "dk": [
+     "hay_gap"
+    ]
+   },
+   "dang": {
+    "ma": "NGUYEN_TU.CAU_HINH_E.NHAN_DANG",
+    "ten": "Cấu hình electron — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đề cho dữ kiện định lượng phải giải ra",
+   "de_goc": "10-C1-B3",
+   "dangBai": {
+    "ma": "DB-10-B3-D1",
+    "ten": "Biện luận cấu hình electron nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ }
+}

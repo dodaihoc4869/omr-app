@@ -4,6 +4,7 @@ import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
+import { lopCua } from '../../src/lib/loi-giai-kiem'
 import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
@@ -2171,8 +2172,11 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
            phan=excluded.phan, lop=excluded.lop, co_loi_giai=excluded.co_loi_giai,
            cap_nhat_luc=excluded.cap_nhat_luc`,
       ).bind(
-        qid, maDe, String(c.chuyenDe ?? ''), String(c.mucDo ?? ''), String(c.phan ?? ''),
-        String(c.lop ?? b.lop ?? ''), c.loiGiai || c.giai ? 1 : 0, nay,
+        // Nhận cả khoá camelCase (app mới) lẫn snake_case (đường luuDe / chuyển kho gửi CÂU THÔ của gói) — trước chỉ đọc camelCase
+        // nên câu nạp qua luuDe mất chuyên đề/mức độ/cờ lời giải trong chỉ mục ⇒ không rút được theo chuyên đề.
+        // Lớp rỗng ('') cũng rơi về lớp của cả tờ, rồi về lớp đọc từ mã đề (cùng luật hàng lời giải `lopCua`).
+        qid, maDe, String(c.chuyenDe ?? c.chuyen_de ?? ''), String(c.mucDo ?? c.muc_do ?? ''), String(c.phan ?? ''),
+        String(c.lop || b.lop || lopCua(maDe)), c.loiGiai || c.giai || c.loi_giai ? 1 : 0, nay,
       ),
     )
   }

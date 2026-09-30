@@ -1,0 +1,74 @@
+{
+ "11-C4-B16-II-1": {
+  "luc": "2026-09-29T13:09:55.107Z",
+  "cau": {
+   "phan": "II",
+   "so": 1,
+   "de": "Cho alkene X có tỉ khối hơi so với nitrogen là 2,0.",
+   "dap_an": "DSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hydrocarbon",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Trong các đồng phân cấu tạo mạch hở của X có một công thức có đồng phân hình học.",
+    "b": "Có 2 đồng phân cấu tạo ứng với công thức phân tử của X.",
+    "c": "Y là đồng phân cấu tạo của X, trong phân tử Y có hai nhóm methyl nhưng không chứa nhóm -CH₂-. Y tham gia phản ứng cộng với HBr cho sản phẩm hữu cơ có chứa nhóm -CH₂-.",
+    "d": "Phần trăm nguyên tử hydrogen trong X là 14,28%."
+   },
+   "loi_giai": {
+    "chot": "Tỉ khối 2,0 so với N₂ cho phân tử khối 56, tức X là C₄H₈.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: trong ba đồng phân cấu tạo của C₄H₈ thì but-2-ene có cis và trans."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: C₄H₈ mạch hở có ba đồng phân cấu tạo là but-1-ene, but-2-ene và 2-methylpropene."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: Y là but-2-ene (hai nhóm methyl, không có CH₂); cộng HBr cho CH₃CH₂CHBrCH₃ có nhóm CH₂."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: phần trăm khối lượng hydrogen trong C₄H₈ bằng 8/56 = 14,28%."
+     }
+    },
+    "dap_an_de": "DSDD",
+    "dap_an_tu_giai": "DSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Alkene C₄H₈: bốn chất kể cả hình học, hai đồng phân cấu tạo có nhóm methyl.",
+    "bay": "Đếm đồng phân cấu tạo mà quên xét riêng cis và trans ở ý a."
+   },
+   "kienThuc": [
+    "đồng phân alkene",
+    "tỉ khối hơi"
+   ],
+   "loiThuongGap": [
+    "nhầm số đồng phân cấu tạo với tổng số đồng phân"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đề cho dữ kiện định lượng phải giải ra",
+   "dang": {
+    "ma": "HYDROCARBON.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo, đồng phân — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-04",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HYDROCARBON"
+  }
+ }
+}

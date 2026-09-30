@@ -1,0 +1,151 @@
+{
+ "DB-12-B6-D1-I-14": {
+  "luc": "2026-09-29T11:36:53.281Z",
+  "cau": {
+   "phan": "I",
+   "so": 14,
+   "de": "Dãy chất nào sau đây có tất cả các chất đều không tham giả phản ứng thủy phân?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Saccharose, tinh bột.",
+    "B": "Cellulose, saccharose.",
+    "C": "Fructose, glucose.",
+    "D": "Tinh bột, maltose."
+   },
+   "loi_giai": {
+    "chot": "Chỉ monosaccharide (glucose, fructose) không tham gia phản ứng thuỷ phân.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Saccharose và tinh bột đều thuỷ phân được."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Cellulose và saccharose đều thuỷ phân được."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Fructose và glucose là monosaccharide, không thuỷ phân."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Tinh bột và maltose đều thuỷ phân cho glucose."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng câu 49, chỉ đảo chiều hỏi sang chất không thuỷ phân.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.NHAN_DANG",
+    "ten": "Thuỷ phân — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B6-D1",
+    "ten": "Phản ứng thủy phân của polysaccharide",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D1",
+   "nguonCau": "I-72"
+  }
+ },
+ "DB-12-B6-D1-I-42": {
+  "luc": "2026-09-29T11:36:53.281Z",
+  "cau": {
+   "phan": "I",
+   "so": 42,
+   "de": "Phát biểu nào dưới đây không đúng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Không thể thuỷ phân monosaccharide",
+    "B": "Thuý phân disaccharide sinh ra hai phân tử monosaccharide",
+    "C": "Thuỷ phân polysaccharide tạo ra nhiều loại monosaccharide",
+    "D": "Tinh bột, maltose và glucose lần lượt là poly-, di- và monosaccharide"
+   },
+   "loi_giai": {
+    "chot": "Tinh bột và cellulose đều chỉ cho một loại monosaccharide là glucose khi thuỷ phân.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: monosaccharide là đơn vị nhỏ nhất, không thuỷ phân được nữa."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: mỗi disaccharide cho hai monosaccharide."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng là phát biểu sai: tinh bột và cellulose chỉ cho glucose."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Đúng với thực tế: đó là ba mức poly-, di- và monosaccharide."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.THUY_PHAN.CHON_PHAT_BIEU",
+    "ten": "Thuỷ phân — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B6-D1",
+    "ten": "Phản ứng thủy phân của polysaccharide",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-KT-C12-D1",
+   "nguonCau": "I-17"
+  }
+ }
+}

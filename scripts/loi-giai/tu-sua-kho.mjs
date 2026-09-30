@@ -47,7 +47,10 @@ async function goi(duong, body) {
 async function caDangKhoa() {
   const { ma, j } = await goi('/ca/danh-sach', {})
   if (ma !== 200 || !Array.isArray(j.items)) throw new Error(`không hỏi được danh sách ca (${ma}) — dừng cho an toàn`)
-  return j.items.filter((c) => c.trangThai !== 'da_xoa' && (c.trangThai === 'mo' || !c.congBo))
+  // Đúng luật máy chủ (cong-bo-diem.ts laSanSangCongBo + game-v2-bank.ts protectedQuestions): `congBo` là CHẾ ĐỘ công bố
+  // ('ngay' | 'ca_lop_xong' | 'khong'), không phải cờ đã công bố.
+  const daCongBo = (c) => c.congBo === 'ngay' || (c.congBo === 'ca_lop_xong' && (c.trangThai === 'dong' || (Number(c.daVao) > 0 && Number(c.daNop) >= Number(c.daVao))))
+  return j.items.filter((c) => c.trangThai !== 'da_xoa' && (c.trangThai === 'mo' || !daCongBo(c)))
 }
 
 const timCau = (g, phan, so) => g.cau.find((c) => String(c.phan) === String(phan) && String(c.so) === String(so))

@@ -1,0 +1,77 @@
+{
+ "DH-11-C2-B9-D1-I-10": {
+  "luc": "2026-09-29T13:14:13.690Z",
+  "cau": {
+   "phan": "I",
+   "so": 10,
+   "de": "Một phương pháp được đề xuất để loại bỏ SO₂ khỏi khí thải của nhà máy điện bằng cách dẫn khí thải qua dung dịch H₂S.\nCần tối đa bao nhiêu m³ H₂S (ở đkc) để loại bỏ SO₂ sinh ra khi đốt cháy 2,0 tấn than chứa sulfur chiếm 3% theo khối lượng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Ôn tập chương 2 (Đề 1)",
+   "pa": {
+    "A": "23,24 m³.",
+    "B": "30,99 m³.",
+    "C": "46,48 m³.",
+    "D": "34,86 m³."
+   },
+   "loi_giai": {
+    "chot": "Đốt than sinh SO₂ rồi khử bằng H₂S theo SO₂ + 2H₂S → 3S + 2H₂O, nên số mol H₂S gấp đôi số mol SO₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Ứng với tỉ lệ H₂S : SO₂ = 1 : 2, ngược chiều hệ số phản ứng."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đáp án đề chọn; máy tính lại ra 92,96 m³ nên cần thầy soát số liệu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Ứng với tỉ lệ 1 : 1, quên hệ số 2 trước H₂S."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Ứng với tỉ lệ 3 : 4, không khớp phương trình nào."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "lech_co_hd",
+    "ghi_chu": "Máy tính ra 92,96 m³ nhưng con số này KHÔNG có trong bốn phương án. 2,0 tấn than chứa 3% sulfur cho 60 kg S tức 1875 mol SO₂; theo SO₂ + 2H₂S → 3S + 2H₂O cần 3750 mol H₂S, nhân 24,79 L ra 92,96 m³. Bốn phương án ứng với tỉ lệ 1 : 2, 2 : 3, 1 : 1 và 3 : 4 — không phương án nào theo đúng tỉ lệ 2 : 1. Giữ đáp án B của đề và CỜ can_xem để thầy soát lại số liệu gốc (có thể đề định ghi 1% hoặc 1,0 tấn)."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Toàn bộ sulfur trong than chuyển hết thành SO₂ nên số mol SO₂ bằng số mol S.",
+    "bay": "Lấy khối lượng than nhân 3% rồi chia cho 64 của SO₂ thay vì 32 của S."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phương án là số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.TINH_KHOI_LUONG",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ }
+}

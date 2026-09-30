@@ -1,0 +1,573 @@
+{
+ "DB-10-B5-D1-I-36": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "I",
+   "so": 36,
+   "de": "Nguyên tố phổ biến nhất Trái Đất nằm ở ô số bao nhiêu trong bảng tuần hoàn?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "biet",
+   "bai": "Bài 5. Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+   "pa": {
+    "A": "8.",
+    "B": "6.",
+    "C": "14.",
+    "D": "1."
+   },
+   "loi_giai": {
+    "chot": "Nguyên tố phổ biến nhất trong vỏ Trái Đất là oxygen, nằm ở ô số 8.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: oxygen ở ô số 8."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Ô số 6 là carbon."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Ô số 14 là silicon, nguyên tố phổ biến thứ hai."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Ô số 1 là hydrogen."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.DEM_DONG_PHAN",
+    "ten": "Suy vị trí từ cấu hình electron — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B5",
+   "nguonCau": "I-30"
+  }
+ },
+ "DB-10-B5-D1-I-40": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "I",
+   "so": 40,
+   "de": "Ví trí của nguyên tố có Z = 15 trong bảng tuần hoàn là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+   "pa": {
+    "A": "Chu kì 4, nhóm VIB.",
+    "B": "Chu kì 3, nhóm VA.",
+    "C": "Chu kì 4, nhóm IIA.",
+    "D": "Chu kì 3, nhóm IIB."
+   },
+   "loi_giai": {
+    "chot": "Z = 15 có cấu hình 1s²2s²2p⁶3s²3p³: 3 lớp electron nên chu kì 3, 5 electron lớp ngoài cùng và là nguyên tố p nên nhóm VA.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nguyên tử chỉ có 3 lớp electron nên không thuộc chu kì 4."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: chu kì 3, nhóm VA."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Nhóm IIA ứng với 2 electron lớp ngoài cùng."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nguyên tố p không thuộc nhóm B."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.NHAN_DANG",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B5",
+   "nguonCau": "I-37"
+  }
+ },
+ "DB-10-B5-D1-I-58": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "I",
+   "so": 58,
+   "de": "Nguyên tử của nguyên tố X có tổng số electron trên các phân lớp p là 7.\nNguyên tử của nguyên tố Y có tổng số hạt mang điện nhiều hơn tổng số hạt mang điện của nguyên tử X là 8.\nNhận định nào sau đây sai?",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+   "pa": {
+    "A": "X và Y đều thuộc chu kì 3.",
+    "B": "X là một kim loại, Y là một phi kim.",
+    "C": "Cả X và Y đều thuộc khối nguyên tố p.",
+    "D": "Y nằm ở nhóm VIIA trong bảng tuần hoàn."
+   },
+   "loi_giai": {
+    "chot": "X có 7 electron trên các phân lớp p nên Z = 13 là Al; Y có 2Z = 34 nên Z = 17 là Cl. Với cặp Al – Cl thì cả bốn nhận định đều đúng, đề thiếu phương án sai.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đáp án đề chọn A, nhưng Al và Cl đều ở chu kì 3 nên nhận định này vẫn đúng; đề cần sửa dữ kiện."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Al là kim loại, Cl là phi kim nên nhận định đúng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Al và Cl đều có electron cuối điền vào phân lớp p nên đều thuộc khối p."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Cl có 7 electron lớp ngoài cùng nên thuộc nhóm VIIA, nhận định đúng."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Với X có tổng 7 electron trên các phân lớp p thì X là Al (Z = 13); Y có tổng số hạt mang điện hơn X 8 hạt nên 2Z(Y) = 34, Z(Y) = 17 là Cl. Khi đó cả bốn nhận định đều ĐÚNG, câu không có phương án sai. Giữ nguyên đáp án đề A và gắn cờ để thầy sửa lại dữ kiện."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu suy hai nguyên tố từ số electron phân lớp p và hiệu tổng số hạt mang điện.",
+    "bay": "Cụm 'tổng số hạt mang điện nhiều hơn 8' nghĩa là 2Z chênh nhau 8, tức Z chênh nhau 4 chứ không phải 8."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đếm cấu trúc: phải dựng ra rồi đếm",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.CHON_PHAT_BIEU",
+    "ten": "Phân loại kim loại, phi kim, khí hiếm — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B5",
+   "nguonCau": "I-56"
+  }
+ },
+ "DB-10-B5-D1-II-116": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "II",
+   "so": 116,
+   "de": "Cho các nguyên tố X, Y, Z có số hiệu nguyên tử lần lượt là 6,9,14.",
+   "dap_an": "SSDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "y": {
+    "a": "Thứ tự bán kính nguyên tử tăng dần của các nguyên tố được sắp xếp là X, Y, Z.",
+    "b": "Thứ tự độ âm điện giảm dần của các nguyên tố được sắp xếp là Y, Z, X.",
+    "c": "Thứ tự tính phi kim tăng dần của các nguyên tố được sắp xếp là là Z, X, Y.",
+    "d": "Trong bảng tuần hoàn, nguyên tố Y có giá trị độ âm điện lớn nhất."
+   },
+   "loi_giai": {
+    "chot": "X là C, Y là F cùng chu kì 2 nên F nhỏ hơn C về bán kính và lớn hơn về độ âm điện; Z là Si ở chu kì 3 nên bán kính lớn nhất, tính phi kim yếu nhất.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: bán kính tăng dần là F, C, Si tức Y, X, Z."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: độ âm điện giảm dần là F, C, Si tức Y, X, Z."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: tính phi kim tăng dần Si < C < F."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: Y là fluorine, có độ âm điện lớn nhất bảng tuần hoàn."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Câu so bán kính, độ âm điện và tính phi kim của ba nguyên tố ở hai chu kì khác nhau.",
+    "bay": "Ba nguyên tố nằm ở hai chu kì khác nhau nên phải tách riêng so sánh trong chu kì 2 rồi mới bắc cầu sang Si."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B6",
+   "nguonCau": "II-16"
+  }
+ },
+ "DB-10-B5-D1-II-132": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "II",
+   "so": 132,
+   "de": "Nguyên tố X là nguyên tố thuộc chu kì 3, nhóm VIIA trong bảng tuần hoàn các nguyên tố hóa học.",
+   "dap_an": "SDSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "y": {
+    "a": "X là nguyên tố phi kim mạnh nhất trong bảng tuần hoàn hóa học.",
+    "b": "Oxide cao nhất của X có công thức X₂O₇ và là một acidic oxide.",
+    "c": "Hydroxide của X có công thức H₂XO3 và là một acid mạnh.",
+    "d": "Công thức hợp chất khí của nguyên tố X với hydrogen là HX."
+   },
+   "loi_giai": {
+    "chot": "Chu kì 3 nhóm VIIA là chlorine: oxide cao nhất Cl₂O₇, hydroxide HClO₄ và hợp chất khí HCl; phi kim mạnh nhất bảng tuần hoàn là fluorine.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: phi kim mạnh nhất bảng tuần hoàn là fluorine, không phải chlorine."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm VIIA nên oxide cao nhất X₂O₇ và là acidic oxide."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: hydroxide của X là HXO₄, tức HClO₄, không phải H₂XO₃."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: hoá trị với hydrogen bằng 8 − 7 = 1 nên hợp chất khí là HX."
+     }
+    },
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "SDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Phi kim mạnh nhất là fluorine ở chu kì 2, vì bán kính nhỏ nhất trong nhóm VIIA.",
+    "bay": "Coi chlorine là phi kim mạnh nhất vì nó ở cuối chu kì 3."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "II-11"
+  }
+ },
+ "DB-10-B5-D1-II-170": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "II",
+   "so": 170,
+   "de": "Nguyên tố X nằm ở chu kì 3 của bảng tuần hoàn và M là nguyên tố s có electron lớp ngoài cùng là ns¹. X có công thức oxide ứng với hóa trị cao nhất là XO₃. Một hợp chất của M và X, trong đó M chiếm 58,97% về khối lượng, là một hóa chất công nghiệp quan trọng, được sử dụng trong sản xuất giấy Kraft, thuốc nhuộm, thuộc da, dầu mỏ, xử lý ô nhiễm kim loại nặng…",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+   "y": {
+    "a": "X là nguyên tố sulfur (₁₆S).",
+    "b": "M là nguyên tố magnesium (₁₂Mg).",
+    "c": "Hợp chất của M và X là M₂X.",
+    "d": "Công thức hydroxide cao nhất của X là HXO₃,"
+   },
+   "loi_giai": {
+    "chot": "XO₃ là oxide cao nhất nên X ở nhóm VIA, chu kì 3, đó là sulfur. M có ns¹ nên là kim loại kiềm; từ %M = 58,97% trong M₂X tính ra M = 23, là sodium.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: chu kì 3 và oxide cao nhất XO₃ chỉ đúng với sulfur."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: magnesium có cấu hình ns² chứ không phải ns¹, và tính ra M = 23 là sodium."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: sodium hoá trị I và sulfur hoá trị II nên hợp chất là Na₂S."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: hydroxide cao nhất của sulfur là H₂SO₄, không phải HXO₃."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Cấu hình ns¹ chỉ ứng với nhóm IA, còn nhóm IIA có cấu hình ns².",
+    "bay": "Thấy chữ nguyên tố s liền nghĩ tới cả nhóm IIA."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B8",
+   "nguonCau": "II-19"
+  }
+ },
+ "DB-10-B5-D1-III-95": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "III",
+   "so": 95,
+   "de": "Cho: Zₐ = 6, ZB = 14, ZC = 19, ZD = 20. Có mấy nguyên tố cùng thuộc nhóm A?",
+   "dap_an": "2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+   "loi_giai": {
+    "chot": "A là C (nhóm IVA), B là Si (nhóm IVA), C là K (nhóm IA), D là Ca (nhóm IIA). Chỉ carbon và silicon cùng nhóm IVA nên có 2 nguyên tố.",
+    "buoc": [
+     "Z = 6 là C, cấu hình 2s²2p² nên thuộc nhóm IVA.",
+     "Z = 14 là Si, cấu hình 3s²3p² nên thuộc nhóm IVA.",
+     "Z = 19 là K thuộc nhóm IA; Z = 20 là Ca thuộc nhóm IIA.",
+     "Chỉ có C và Si cùng một nhóm, tức 2 nguyên tố."
+    ],
+    "ket_qua": "2",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "2",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Câu xác định nhóm của bốn nguyên tố rồi đếm số nguyên tố cùng một nhóm.",
+    "bay": "Câu hỏi là mấy nguyên tố cùng chung một nhóm A với nhau, không phải đếm số nguyên tố thuộc nhóm A."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_DONG_PHAN",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B5",
+   "nguonCau": "III-21"
+  }
+ },
+ "DB-10-B5-D1-III-139": {
+  "luc": "2026-09-29T13:10:57.753Z",
+  "cau": {
+   "phan": "III",
+   "so": 139,
+   "de": "Cho các oxide sau: Na₂O, MgO, P₂O₅, SO₃, K₂O và CO₂.\nCó bao nhiêu oxide trong dãy khi hòa tan vào nước thu được dung dịch làm quỳ tím chuyển thành màu xanh?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Quỳ hoá xanh nghĩa là dung dịch có tính base, tức oxide phải là basic oxide của kim loại.",
+    "buoc": [
+     "Na₂O cho NaOH và K₂O cho KOH, đều là base mạnh.",
+     "MgO tan một phần cho Mg(OH)₂ có tính base nên vẫn làm quỳ hoá xanh.",
+     "P₂O₅, SO₃ và CO₂ đều là acidic oxide, cho dung dịch acid.",
+     "Thay số: có 3 oxide."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "3",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Oxide của kim loại cho base, oxide của phi kim cho acid — chia đôi dãy là xong.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.PHAN_LOAI_NGUYEN_TO.NEU_HIEN_TUONG",
+    "ten": "Phân loại kim loại, phi kim, khí hiếm — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-11"
+  }
+ }
+}

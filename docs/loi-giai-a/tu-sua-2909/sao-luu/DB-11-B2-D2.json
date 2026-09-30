@@ -1,0 +1,212 @@
+{
+ "DB-11-B2-D2-I-169": {
+  "luc": "2026-09-29T13:11:16.708Z",
+  "cau": {
+   "phan": "I",
+   "so": 169,
+   "de": "Chất nào sau đây là chất không điện li?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "biet",
+   "bai": "Bài 3. Ôn tập chương 1 (Đề 2)",
+   "pa": {
+    "A": "H₃PO₄ (phosphoric acid).",
+    "B": "C₂H₅OH (ethanol).",
+    "C": "NaCl(sodium chloride).",
+    "D": "NaOH(sodium hydroxide)."
+   },
+   "loi_giai": {
+    "chot": "Ethanol tan trong nước ở dạng phân tử, không phân li ra ion nên là chất không điện li.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "H₃PO₄ là acid yếu nhưng vẫn điện li."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: ethanol không phân li ra ion."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "NaCl là muối, điện li mạnh."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "NaOH là base mạnh, điện li mạnh."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CAN_BANG.DIEN_LI.NHAN_DANG",
+    "ten": "Sự điện li — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D2",
+    "ten": "Phản ứng trao đổi ion trong dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B3-D2",
+   "nguonCau": "I-6"
+  }
+ },
+ "DB-11-B2-D2-I-66": {
+  "luc": "2026-09-29T13:11:16.708Z",
+  "cau": {
+   "phan": "I",
+   "so": 66,
+   "de": "Phương trình mô tả sự điện li của Na₂CO₃ trong nước là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Na₂CO₃ (s) → 2Na (aq) + C (aq) + 3O (aq)",
+    "B": "Na₂CO₃ (s) → 2Na⁺ (aq) + C⁴⁺ (aq) + 3O²⁻ (aq)",
+    "C": "Na₂CO₃ (s) → 2Na⁺ (aq) + CO3²⁻ (aq)",
+    "D": "Na₂CO₃ (s) → 2Na⁺ (g) + CO3²⁻ (g)"
+   },
+   "loi_giai": {
+    "chot": "Điện li chỉ tách muối thành cation kim loại và anion gốc acid, không phá gốc acid.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: sản phẩm phải là ion mang điện, không phải nguyên tử trung hoà."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: gốc carbonate không bị tách thành từng nguyên tố."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: muối tan phân li hoàn toàn thành ion Na⁺ và ion carbonate."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: ion trong dung dịch ở trạng thái aq, không phải trạng thái khí."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CAN_BANG.DIEN_LI.VIET_PTHH",
+    "ten": "Sự điện li — viết phương trình"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-03",
+   "dangBai": {
+    "ma": "DB-11-B2-D2",
+    "ten": "Phản ứng trao đổi ion trong dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "11-C1-B2-D2",
+   "nguonCau": "I-25"
+  }
+ },
+ "DB-11-B2-D2-III-164": {
+  "luc": "2026-09-29T13:11:16.708Z",
+  "cau": {
+   "phan": "III",
+   "so": 164,
+   "de": "Cho các chất sau: glucose (C₆H₁₂O₆), NaCl, KOH, Ba(OH)₂, AlCl₃, CuSO₄, N₂, O₂, H₂SO₄, saccharose (C₁₂H₂₂O₁₁).\nCó bao nhiêu chất chất điện li trong các chất trên?",
+   "dap_an": "6",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cân bằng hoá học",
+   "muc_do": "biet",
+   "bai": "Bài 2. Cân bằng trong dung dịch nước",
+   "loi_giai": {
+    "chot": "Acid, base, muối là chất điện li; đường và khí N₂, O₂ thì không.",
+    "buoc": [
+     "Chất điện li: NaCl, KOH, Ba(OH)₂, AlCl₃, CuSO₄, H₂SO₄ — 6 chất.",
+     "Không phải chất điện li: glucose, saccharose (phân tử đường), N₂ và O₂ (khí không phân li).",
+     "Vậy có 6 chất điện li."
+    ],
+    "ket_qua": "6",
+    "dap_an_de": "6",
+    "dap_an_tu_giai": "6",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Chất điện li là chất khi tan trong nước phân li ra ion: acid, base và muối.",
+    "bay": "Tính cả glucose và saccharose vì chúng tan tốt trong nước."
+   },
+   "kienThuc": [
+    "Chất điện li khi tan trong nước phân li ra ion, dung dịch dẫn điện.",
+    "Acid, base và muối là chất điện li.",
+    "Đường, rượu, khí trơ tan trong nước nhưng không phân li ra ion."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CAN_BANG.DIEN_LI.DEM_DONG_PHAN",
+    "ten": "Sự điện li — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B2-D2",
+    "ten": "Phản ứng trao đổi ion trong dung dịch",
+    "lop": "11",
+    "bai": "DB-11-B2",
+    "tenBai": "Cân bằng trong dung dịch nước",
+    "soBai": 2,
+    "phanBai": 0,
+    "chuong": "C1 - Cân bằng hoá học"
+   },
+   "nguonDe": "DH-11-C1-B2",
+   "nguonCau": "III-59"
+  }
+ }
+}

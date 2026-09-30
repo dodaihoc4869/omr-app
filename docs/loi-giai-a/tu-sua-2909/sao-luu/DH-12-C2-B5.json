@@ -141,5 +141,81 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "DH-12-C2-B5-II-24": {
+  "luc": "2026-09-29T13:13:37.651Z",
+  "cau": {
+   "phan": "II",
+   "so": 24,
+   "de": "Đường ăn (saccharose) là chất làm ngọt phổ b biến trong sản xuất thực phẩm, còn đường mạch nha (maltose) chủ yếu sử dụng để sản xuất bia.\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "SDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "bai": "Bài 5. Saccharose và maltose",
+   "y": {
+    "a": "Saccharose và maltose đều là đường đơn.",
+    "b": "Maltose có trong ngũ cốc nảy mầm, các loại thực vật, rau quả,...",
+    "c": "Saccharose và maltose là đồng phân cấu tạo của nhau.",
+    "d": "Saccharose có nhiều trong cây mía, hoa thốt nốt, củ cải."
+   },
+   "loi_giai": {
+    "chot": "Cả hai là disaccharide, đồng phân cấu tạo của nhau.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai đều là đường ĐÔI (disaccharide), không phải đường đơn."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: maltose có trong ngũ cốc nảy mầm, mạch nha và nhiều loại thực vật."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: cùng công thức phân tử C₁₂H₂₂O₁₁ nhưng khác cấu tạo ⇒ đồng phân cấu tạo."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: saccharose có nhiều trong cây mía, hoa thốt nốt và củ cải đường."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "SDDD",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc lọt chữ 'b' ('chất làm ngọt phổ b biến'); đã bỏ."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kienThuc": [
+    "Đường đơn (monosaccharide): glucose, fructose. Đường đôi (disaccharide): saccharose, maltose.",
+    "Maltose có nhiều trong ngũ cốc nảy mầm (mạch nha).",
+    "Saccharose có nhiều trong mía, củ cải đường, hoa thốt nốt."
+   ],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

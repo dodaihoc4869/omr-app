@@ -476,5 +476,69 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
   }
+ },
+ "12-C8-B26-I-13": {
+  "luc": "2026-09-29T11:35:15.757Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Trong cấu hình electron nguyên tử hoặc cấu hình electron của cation nguyên tố chuyển tiếp dãy thứ nhất phải có",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "biet",
+   "pa": {
+    "A": "phân lớp 4s chưa bão hòa electron",
+    "B": "phân lớp 3d chưa bão hòa electron",
+    "C": "phân lớp 3d và 4s đều chưa bão hòa electron",
+    "D": "sự điền eletron vào phân lớp 3d"
+   },
+   "loi_giai": {
+    "chot": "Định nghĩa IUPAC: nguyên tố chuyển tiếp là nguyên tố có phân lớp d chưa bão hoà ở nguyên tử hoặc ở ion của nó.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: 4s có thể đầy (như Fe) mà vẫn là chuyển tiếp."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: 3d chưa bão hoà là tiêu chí."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai: đó là mô tả của Zn, nguyên tố KHÔNG chuyển tiếp."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: thứ tự điền electron không phải tiêu chí phân loại."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.NHAN_DANG",
+    "ten": "Kim loại chuyển tiếp dãy 1 — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
  }
 }

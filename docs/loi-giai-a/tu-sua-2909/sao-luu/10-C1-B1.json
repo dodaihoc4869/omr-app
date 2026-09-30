@@ -1,0 +1,81 @@
+{
+ "10-C1-B1-II-10": {
+  "luc": "2026-09-29T13:13:49.249Z",
+  "cau": {
+   "phan": "II",
+   "so": 10,
+   "de": "Một loại nguyên tử hydrogen có cấu tạo đơn giản nhất, chỉ tạo nên từ 1 electron và 1 proton.",
+   "dap_an": "DSSS",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "biet",
+   "y": {
+    "a": "Đây là nguyên tử nhẹ nhất trong số các nguyên tử được biết cho đến nay.",
+    "b": "Khối lượng nguyên tử xấp xỉ 2 amu.",
+    "c": "Hạt nhân nguyên tử có khối lượng lớn gấp khoảng 1818 lần khối lượng lớp vỏ.",
+    "d": "Kích thước của nguyên tử bằng kích thước của hạt nhân."
+   },
+   "loi_giai": {
+    "chot": "Khối lượng nguyên tử ≈ mₚ + mₙ + mₑ với mₚ ≈ mₙ ≈ 1 amu, mₑ ≈ 0,00055 amu (nhẹ hơn proton khoảng 1837 lần); đường kính nguyên tử lớn hơn hạt nhân hàng vạn lần.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng vì nguyên tử này chỉ có 1 proton và 1 electron, khối lượng khoảng 1 amu, nhẹ nhất trong các nguyên tử."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai vì khối lượng bằng mₚ + mₑ ≈ 1 + 0,00055 ≈ 1 amu, không có neutron nên không tới 2 amu."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai vì mₚ : mₑ = 1,673.10⁻²⁷ : 9,109.10⁻³¹ ≈ 1837, không phải 1818."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai vì đường kính nguyên tử cỡ 10⁻¹⁰ m, lớn hơn đường kính hạt nhân (cỡ 10⁻¹⁴ m) hàng vạn lần."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DSSS",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Ý b cộng thêm một neutron cho hydrogen nên ra 2 amu.",
+    "bay": "Mặc định nguyên tử nào cũng có neutron nên cho hydrogen khối lượng 2 amu.",
+    "dk": [
+     "bay"
+    ],
+    "y_can_chua": [
+     "b"
+    ]
+   },
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.CHON_PHAT_BIEU",
+    "ten": "Thành phần nguyên tử — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "10-C1-B1",
+   "dangBai": {
+    "ma": "DB-10-B1-D1",
+    "ten": "Bài toán về các loại hạt cơ bản (p, n, e)",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   }
+  }
+ }
+}

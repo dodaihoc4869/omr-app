@@ -1,0 +1,77 @@
+{
+ "DH-10-C2-B8-II-19": {
+  "luc": "2026-09-29T13:12:55.886Z",
+  "cau": {
+   "phan": "II",
+   "so": 19,
+   "de": "Nguyên tố X nằm ở chu kì 3 của bảng tuần hoàn và M là nguyên tố s có electron lớp ngoài cùng là ns¹. X có công thức oxide ứng với hóa trị cao nhất là XO₃. Một hợp chất của M và X, trong đó M chiếm 58,97% về khối lượng, là một hóa chất công nghiệp quan trọng, được sử dụng trong sản xuất giấy Kraft, thuốc nhuộm, thuộc da, dầu mỏ, xử lý ô nhiễm kim loại nặng…",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+   "y": {
+    "a": "X là nguyên tố sulfur (₁₆S).",
+    "b": "M là nguyên tố magnesium (₁₂Mg).",
+    "c": "Hợp chất của M và X là M₂X.",
+    "d": "Công thức hydroxide cao nhất của X là HXO₃,"
+   },
+   "loi_giai": {
+    "chot": "XO₃ là oxide cao nhất nên X ở nhóm VIA, chu kì 3, đó là sulfur. M có ns¹ nên là kim loại kiềm; từ %M = 58,97% trong M₂X tính ra M = 23, là sodium.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: chu kì 3 và oxide cao nhất XO₃ chỉ đúng với sulfur."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: magnesium có cấu hình ns² chứ không phải ns¹, và tính ra M = 23 là sodium."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: sodium hoá trị I và sulfur hoá trị II nên hợp chất là Na₂S."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: hydroxide cao nhất của sulfur là H₂SO₄, không phải HXO₃."
+     }
+    },
+    "dap_an_de": "DSDS",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Cấu hình ns¹ chỉ ứng với nhóm IA, còn nhóm IIA có cấu hình ns².",
+    "bay": "Thấy chữ nguyên tố s liền nghĩ tới cả nhóm IIA."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
+ }
+}

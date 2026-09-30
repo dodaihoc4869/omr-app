@@ -64,5 +64,131 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
   }
+ },
+ "12-KT-C6-D4-I-16": {
+  "luc": "2026-09-29T11:36:08.691Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "Cho các phát biểu về tái chế đồng:\n(a) Phế liệu đồng có nhiều trong dây điện, động cơ, máy biến áp,… (b) Đồng phế liệu được nung chảy ở nhiệt độ cao khoảng 1100 °C trong lò nung thích hợp.\n(c) Phế liệu đồng nóng chảy được loại bỏ oxygen trong tạp chất oxide bằng khí thiên nhiên.\n(d) Để thu được đồng có độ tinh khiết cao cần tinh chế đồng bằng phương pháp thuỷ luyện.\nPhát biểu đúng là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "(a), (b), (c)",
+    "B": "(b), (c)",
+    "C": "(a), (c), (d)",
+    "D": "(c), (d). Sử dụng thông tin dưới đây để trả lời các câu 17 - 18: Thực hiện thí nghiệm sau: Buớc 1: Cho dung dịch NaCl 5% vào ống thuỷ tinh hình chữ U như hình bên. Buớc 2: Nhúng một thanh copper và một thanh zinc đã làm sạch vào hai đầu của ống chữ U. Buớc 3: Nối hai thanh kim loại bằng dây dẫn"
+   },
+   "loi_giai": {
+    "chot": "Muốn đồng tinh khiết cao phải điện phân dung dịch với anode tan chứ không dùng thuỷ luyện, nên (d) sai.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: (a), (b), (c) đều đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Bỏ mất (a) vốn là mô tả đúng về nguồn phế liệu đồng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Có (d) nên loại."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Có (d) nên loại và còn bỏ mất hai ý đúng."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "KIM_LOAI.DIEU_CHE.NHAN_DANG",
+    "ten": "Tách và điều chế kim loại — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
+ },
+ "12-KT-C6-D4-I-5": {
+  "luc": "2026-09-29T11:36:08.691Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "de": "Nguyên nhân chủ yếu làm cho hơp kim cứng hơn các kim loại thành phần là do",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Đại cương kim loại",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "hợp kim chứa các nguyên tử của các nguyên tố khác nhau làm cho các lớp tinh thể kim loại trong hợp kim khó trượt lên nhau",
+    "B": "hợp kim chứa các kim loại pha trộn cứng hơn kim loại cơ bản",
+    "C": "trong hợp kim, các nguyên tố khác nhau tạo nên hợp chất hoá học",
+    "D": "hợp kim được chế tạo ở nhiệt độ cao làm cho hợp kim cứng hơn kim loại nguyên chất"
+   },
+   "loi_giai": {
+    "chot": "Nguyên tử lạ chen vào làm mạng tinh thể mất đều đặn nên các lớp khó trượt lên nhau, hợp kim cứng hơn.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng: mạng bị xáo trộn nên các lớp khó trượt."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Không phải kim loại pha thêm nào cũng cứng hơn kim loại cơ bản."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Hợp kim không nhất thiết chứa hợp chất hoá học."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Nhiệt độ chế tạo không quyết định độ cứng của hợp kim."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "KIM_LOAI.TINH_KHU.GIAI_THICH",
+    "ten": "Tính khử, dãy điện hoá — giải thích"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI"
+  }
  }
 }

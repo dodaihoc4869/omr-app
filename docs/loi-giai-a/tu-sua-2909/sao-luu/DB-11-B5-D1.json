@@ -1,0 +1,319 @@
+{
+ "DB-11-B5-D1-I-13": {
+  "luc": "2026-09-29T13:11:26.332Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Trong phản ứng tổng hợp ammonia: N₂(g) + 3H₂(g) xt,t°,p2NH₃(g) ΔrHo₂₉₈ = - 92 kJ Để tăng hiệu suất phản ứng tổng hợp phải",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "pa": {
+    "A": "giảm nhiệt độ và áp suất.",
+    "B": "tăng nhiệt độ và áp suất.",
+    "C": "tăng nhiệt độ và giảm áp suất.",
+    "D": "giảm nhiệt độ vừa phải và tăng áp suất."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng toả nhiệt và giảm số mol khí nên giảm nhiệt độ và tăng áp suất đều đẩy cân bằng theo chiều thuận; tuy vậy chỉ giảm nhiệt độ vừa phải để tốc độ phản ứng không quá chậm.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Giảm áp suất làm cân bằng chuyển theo chiều nghịch."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Tăng nhiệt độ làm cân bằng chuyển theo chiều nghịch vì phản ứng toả nhiệt."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Sai cả hai yếu tố so với nguyên lí Le Chatelier."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: giảm nhiệt độ vừa phải và tăng áp suất."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_HIEU_SUAT",
+    "ten": "Ammonia và muối ammonium — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D1",
+    "ten": "Phản ứng điều chế ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "I-39"
+  }
+ },
+ "DB-11-B5-D1-II-2": {
+  "luc": "2026-09-29T13:11:26.332Z",
+  "cau": {
+   "phan": "II",
+   "so": 2,
+   "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber – Bosch. Phản ứng tổng hợp ammonia:\nN₂ (g) + 3H₂ (g) ⇌ 2NH₃ (g), ΔrH°298 = -91,8 kJ. Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây.",
+   "dap_an": "SSSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_6.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Ở nhiệt độ 400°C, hiệu suất phản ứng đạt khoảng 50% ở 200 atm.",
+    "b": "Nếu thực hiện phản ứng ở nhiệt độ càng thấp thì sẽ càng đạt hiệu quả kinh tế cao.",
+    "c": "Trong khoảng từ 350°C đến 550°C, hiệu suất thu ammonia tăng dần.",
+    "d": "Để tăng hiệu suất tổng hợp ammonia có thể đồng thời tăng áp suất và giảm nhiệt độ."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng toả nhiệt và giảm số mol khí nên hiệu suất tăng khi tăng áp suất, giảm nhiệt độ.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: trên giản đồ, ở 400 độ C và 200 atm hiệu suất chỉ khoảng 42%."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: nhiệt độ quá thấp làm tốc độ phản ứng rất chậm nên không có lợi về kinh tế."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: giản đồ cho thấy hiệu suất giảm dần khi nhiệt độ tăng từ 350 lên 550 độ C."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: tăng áp suất và giảm nhiệt độ đều đẩy cân bằng theo chiều thuận."
+     }
+    },
+    "dap_an_de": "SSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Đọc giản đồ hiệu suất: áp suất cao và nhiệt độ thấp cho hiệu suất cao, nhưng tốc độ chậm.",
+    "bay": null
+   },
+   "kienThuc": [
+    "cân bằng tổng hợp ammonia",
+    "đọc giản đồ hiệu suất"
+   ],
+   "loiThuongGap": [
+    "cho rằng nhiệt độ càng thấp càng có lợi"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.CHON_PHAT_BIEU",
+    "ten": "Ammonia và muối ammonium — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-03",
+   "dangBai": {
+    "ma": "DB-11-B5-D1",
+    "ten": "Phản ứng điều chế ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "11-C2-B5",
+   "nguonCau": "II-1"
+  }
+ },
+ "DB-11-B5-D1-II-22": {
+  "luc": "2026-09-29T13:11:26.332Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+   "dap_an": "SSSD",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-18.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "y": {
+    "a": "Ở nhiệt độ 400°C, hiệu suất phản ứng đạt khoảng 50% ở 200 atm.",
+    "b": "Nếu thực hiện phản ứng ở nhiệt độ càng thấp thì sẽ càng đạt hiệu quả kinh tế cao.",
+    "c": "Trong khoảng từ 350°C đến 550°C, hiệu suất thu ammonia tăng dần.",
+    "d": "Để tăng hiệu suất tổng hợp ammonia có thể đồng thời tăng áp suất và giảm nhiệt độ."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng toả nhiệt và giảm số mol khí nên hiệu suất tăng khi tăng áp suất và giảm nhiệt độ; nhưng nhiệt độ quá thấp làm tốc độ rất chậm nên không kinh tế.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: ở 400 °C và 200 atm hiệu suất chỉ khoảng 35 – 40%, chưa tới 50%."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: nhiệt độ càng thấp thì tốc độ càng chậm nên không hiệu quả kinh tế."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: phản ứng toả nhiệt nên trong khoảng đó hiệu suất giảm dần."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: tăng áp suất và giảm nhiệt độ đều đẩy cân bằng theo chiều thuận."
+     }
+    },
+    "dap_an_de": "SSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "ĐÃ XEM GIẢN ĐỒ 16/09 (5 đường 350–550 °C). Đọc đường 400 °C: 100 atm ≈ 40%, 200 atm ≈ 47%, chạm 50% quanh 250 atm, bão hoà ≈ 53% ở 450 atm. b) SAI — nhiệt độ càng thấp tốc độ càng chậm, không kinh tế. c) SAI — từ 350 đến 550 °C hiệu suất GIẢM (64% → 22%). d) ĐÚNG. Riêng a) \"ở 400 °C đạt khoảng 50% tại 200 atm\": số đọc được là 47%, dưới 50% nhưng chữ \"khoảng\" làm ý này ở ranh giới — đề chấm S. CẦN THẦY CHỐT ý a; ba ý còn lại đã chắc."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đọc giản đồ hiệu suất tổng hợp ammonia theo áp suất và nhiệt độ.",
+    "bay": "Nhiệt độ thấp cho hiệu suất cao nhưng tốc độ quá chậm nên không đạt hiệu quả kinh tế."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.CHON_PHAT_BIEU",
+    "ten": "Ammonia và muối ammonium — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D1",
+    "ten": "Phản ứng điều chế ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "II-18"
+  }
+ },
+ "DB-11-B5-D1-III-24": {
+  "luc": "2026-09-29T13:11:26.332Z",
+  "cau": {
+   "phan": "III",
+   "so": 24,
+   "de": "Trong một nhà máy sản xuất ammonia theo quy trình Haber, giai đoạn sản xuất khí hydrogen bằng phản ứng của methane và nước được thực hiện theo phương trình hóa học (1) như sau:\n(1) CH₄(g)+H₂O(g) →(xt) CO(g)+3H₂(g)\nPhản ứng (1) là phản ứng thu nhiệt mạnh. Lượng nhiệt này được cung cấp từ quá trình đốt cháy hoàn toàn khí methane theo phương trình hóa học (2):\n(2) CH₄(g)+2O₂(g)→CO₂(g)+2H₂O(g)\nXét các phản ứng ở điều kiện chuẩn và hiệu suất chuyển hóa của methane là 100%. Tính khối lượng khí methane (theo tấn, làm tròn đến hàng phần trăm) cần thiết để sản xuất 0,30 tấn H₂(g) trong giai đoạn trên.\nBiết 90% lượng nhiệt tỏa ra từ phản ứng (2) được cung cấp cho phản ứng (1) và các giá trị nhiệt tạo thành (ÄfH₂₉₈) của các chất ở điều kiện chuẩn được cho trong bảng sau:",
+   "dap_an": "1,03",
+   "bang": [
+    [
+     "Chất",
+     "CH₄(g)",
+     "CO₂(g)",
+     "CO(g)",
+     "H₂O(g)"
+    ],
+    [
+     "ΔfH°₂₉₈ (kJ/mol)",
+     "−74,6",
+     "−393,5",
+     "−110,5",
+     "−241,8"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "loi_giai": {
+    "chot": "ΔrH(1) = +205,9 kJ; ΔrH(2) = −802,5 kJ. CH₄ nguyên liệu 50 000 mol, nhiệt cần 10 295 000 kJ; mỗi mol CH₄ đốt cấp 722,25 kJ nên cần thêm 14 253 mol. Tổng 64 253 mol, tức 1,03 tấn.",
+    "buoc": [
+     "ΔrH(1) = (−110,5) − (−74,6 − 241,8) = +205,9 kJ/mol.",
+     "ΔrH(2) = (−393,5 − 483,6) − (−74,6) = −802,5 kJ/mol.",
+     "n(H₂) = 300 000 g : 2 = 150 000 mol nên CH₄ cho phản ứng (1) là 50 000 mol.",
+     "Nhiệt cần cho (1): 50 000 × 205,9 = 10 295 000 kJ.",
+     "Mỗi mol CH₄ đốt cung cấp 802,5 × 90% = 722,25 kJ nên CH₄ cho (2) là 10 295 000 : 722,25 ≈ 14 253 mol.",
+     "Tổng CH₄ = 64 253 mol, m = 64 253 × 16 = 1 028 054 g ≈ 1,03 tấn."
+    ],
+    "ket_qua": "1,03",
+    "dap_an_de": "1,03",
+    "dap_an_tu_giai": "1,03",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu tính khối lượng methane cần cho cả nguyên liệu và nhiên liệu của quy trình sản xuất hydrogen.",
+    "bay": "Methane dùng cho hai việc: làm nguyên liệu ở (1) và làm nhiên liệu ở (2), phải cộng cả hai phần."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.TINH_KHOI_LUONG",
+    "ten": "Ammonia và muối ammonium — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D1",
+    "ten": "Phản ứng điều chế ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "III-24"
+  }
+ }
+}

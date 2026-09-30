@@ -1,0 +1,457 @@
+{
+ "DB-11-B8-D4-I-7": {
+  "luc": "2026-09-29T13:11:55.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 7,
+   "de": "Nguyên nhân chính dẫn đến hiện tượng phú dưỡng tại các dòng sông, ao hồ là gì?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Do lượng nước mưa quá lớn trong mùa mưa bão mang theo đất cát.",
+    "B": "Do nước thải sinh hoạt và nước chảy tràn từ đồng ruộng chứa nhiều phân bón (nitrate, phosphate) chưa qua xử lý.",
+    "C": "Do sự quang hợp của các thực vật thủy sinh tạo ra quá nhiều oxygen.",
+    "D": "Do sự rò rỉ dầu từ các phương tiện giao thông đường thủy."
+   },
+   "loi_giai": {
+    "chot": "Phú dưỡng chủ yếu do nước thải sinh hoạt và nước chảy tràn từ đồng ruộng mang theo nitrate, phosphate chưa qua xử lí.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Nước mưa mang đất cát chỉ làm đục nước, không gây phú dưỡng."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: nguồn dinh dưỡng từ nước thải và phân bón."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Quang hợp là hệ quả chứ không phải nguyên nhân."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Rò rỉ dầu gây ô nhiễm dầu, không gây phú dưỡng."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "bay": null,
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.NEU_HIEN_TUONG",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B6",
+   "nguonCau": "I-36"
+  }
+ },
+ "DB-11-B8-D4-I-8": {
+  "luc": "2026-09-29T13:11:55.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 8,
+   "de": "Biện pháp nào trong chăn nuôi có thể áp dụng để ngăn chặn hiện tượng phú dưỡng?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "pa": {
+    "A": "Thải chất thải vật nuôi xuống cống thoát nước.",
+    "B": "Thường xuyên rữa chuồng trại.",
+    "C": "Xây dựng bể chứa biogas.",
+    "D": "Xây các hầm rút."
+   },
+   "loi_giai": {
+    "chot": "Bể biogas thu gom và xử lí chất thải chăn nuôi, ngăn nitrogen và phosphorus chảy xuống ao hồ nên hạn chế phú dưỡng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Thải xuống cống làm chất dinh dưỡng đổ thẳng ra nguồn nước."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Rửa chuồng thường xuyên càng đưa nhiều chất thải ra ngoài."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: bể biogas xử lí chất thải tại chỗ."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Hầm rút vẫn để chất dinh dưỡng thấm vào nguồn nước."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Bể biogas thu gom và xử lí chất thải chăn nuôi, ngăn nitrogen và phosphorus chảy xuống ao hồ nên hạn chế phú dưỡng."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.NEU_HIEN_TUONG",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — nêu hiện tượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B6",
+   "nguonCau": "I-47"
+  }
+ },
+ "DB-11-B8-D4-II-19": {
+  "luc": "2026-09-29T13:11:55.190Z",
+  "cau": {
+   "phan": "II",
+   "so": 19,
+   "de": "Khí SO₂ do các nhà máy thải ra là nguyên nhân chính trong việc gây ô nhiễm môi trường.\nTheo quy chuẩn kĩ thuật quốc gia về chất lượng không khí xung quanh (QCVN 05:2013/BTNMT) thì nếu lượng SO₂ vượt quá 350 ́g/m³ không khí đo trong 1 giờ ở thành phố thì coi như không khí bị ô nhiễm.",
+   "dap_an": "SDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Số oxi hóa của sulfur trong phân tử SO₂ là +2.",
+    "b": "SO₂ là nguyên nhân chính gây ra hiện tượng mưa acid.",
+    "c": "Nồng độ SO₂ cao gây viêm và kích ứng hệ hô hấp.",
+    "d": "Nếu lấy 50 lít không khí trong 1 giờ ở một thành phố và phân tích thấy có 0,012 mg SO₂ thì có thể kết luận rằng không khí ở thành phố đó bị ô nhiễm."
+   },
+   "loi_giai": {
+    "chot": "Sulfur trong SO₂ ở mức +4. Mẫu 50 L chứa 0,012 mg SO₂ tức 0,012 : 0,05 = 0,24 mg/m³ = 240 µg/m³, thấp hơn ngưỡng 350 µg/m³ nên chưa kết luận là ô nhiễm.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: sulfur trong SO₂ có số oxi hoá +4."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: SO₂ là một trong hai tác nhân chính gây mưa acid."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: SO₂ nồng độ cao gây viêm và kích ứng hệ hô hấp."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: nồng độ tính ra là 240 µg/m³, thấp hơn ngưỡng 350 µg/m³."
+     }
+    },
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "SDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu đối chiếu nồng độ SO₂ đo được với quy chuẩn chất lượng không khí.",
+    "bay": "Ý d phải quy 0,012 mg trong 50 lít về đơn vị µg/m³ rồi mới so với ngưỡng 350 µg/m³."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.CHON_PHAT_BIEU",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-18"
+  }
+ },
+ "DB-11-B8-D4-II-20": {
+  "luc": "2026-09-29T13:11:55.190Z",
+  "cau": {
+   "phan": "II",
+   "so": 20,
+   "de": "Khí SO₂ do các nhà máy thải ra là nguyên nhân chính trong việc gây ô nhiễm môi trường. Theo quy chuẩn kĩ thuật quốc gia về chất lượng không khí xung quanh (QCVN 05:2013/BTNMT) thì nếu lượng SO₂ vượt quá 350 µg/m³ không khí đo trong 1 giờ ở thành phố thì coi như không khí bị ô nhiễm. Người ta lấy 50lít không khí trong 1 giờ ở một thành phố và phân tích thấy có 0,012 mg SO₂.",
+   "dap_an": "DDSS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "y": {
+    "a": "Khí SO₂ thải ra từ các nhà máy là một trong những tác nhân chính gây ra hiện tượng mưa acid.",
+    "b": "Theo quy chuẩn QCVN 05:2013/BTNMT, nồng độ SO₂ đo trong 1 giờ vượt quá 0,35 mg/m³ thì không khí bị coi là ô nhiễm.",
+    "c": "Nồng độ SO₂ có trong mẫu không khí được phân tích ở thành phố trên là 240 mg/m³.",
+    "d": "Căn cứ vào quy chuẩn và kết quả phân tích, có thể kết luận không khí ở thành phố này đã bị ô nhiễm khí SO₂."
+   },
+   "loi_giai": {
+    "chot": "Nồng độ đo được là 0,24 mg/m³ = 240 µg/m³, NHỎ hơn ngưỡng 350 µg/m³.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: SO₂ gặp hơi nước và oxygen trong khí quyển tạo H₂SO₄ — một tác nhân chính của mưa acid."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: 350 µg/m³ đổi ra chính là 0,35 mg/m³."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai ở ĐƠN VỊ: 0,012 mg trong 50 L = 0,012 : 0,05 = 0,24 mg/m³, tức 240 µg/m³ chứ không phải 240 mg/m³ (lớn hơn một nghìn lần)."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: 240 µg/m³ < 350 µg/m³ nên theo quy chuẩn, không khí ở đây CHƯA bị coi là ô nhiễm SO₂."
+     }
+    },
+    "dap_an_de": null,
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phải đổi ĐỒNG BỘ đơn vị trước khi so với ngưỡng: 350 µg/m³ = 0,35 mg/m³.",
+    "bay": "Đọc con số 240 rồi so thẳng với 350 mà không để ý một bên là mg/m³, một bên là µg/m³."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.CHON_PHAT_BIEU",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "II-20"
+  }
+ },
+ "DB-11-B8-D4-II-9": {
+  "luc": "2026-09-29T13:11:55.190Z",
+  "cau": {
+   "phan": "II",
+   "so": 9,
+   "de": "Oxide của nitrogen (kí hiệu chung là NOx) được hình thành trong tự nhiên và từ các hoạt động của con người. Chúng là một trong những nguyên nhân chính gây ra ô nhiễm môi trường không khí.",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 6. Một số hợp chất của nitrogen với oxygen",
+   "y": {
+    "a": "NO và NO₂ là hai oxide của nitrogen phổ biến nhất trong không khí.",
+    "b": "Khí NO₂ là chất khí có màu nâu đỏ, có mùi hắc và độc.",
+    "c": "Sấm sét là một trong những nguyên nhân tự nhiên tạo ra khí NO u từ sự kết hợp giữa N₂ và O₂ trong khí quyển.",
+    "d": "Các khí NOx hòa tan trong nước mưa luôn làm cho nước mưa có độ pH lớn hơn 7."
+   },
+   "loi_giai": {
+    "chot": "NO và NO₂ là hai oxide phổ biến nhất; NO₂ màu nâu đỏ, mùi hắc và độc; sấm sét tạo NO từ N₂ và O₂. NOₓ tan vào nước mưa tạo acid nên pH giảm xuống dưới 7.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: NO và NO₂ là hai oxide nitrogen phổ biến nhất trong không khí."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: NO₂ là khí màu nâu đỏ, mùi hắc và độc."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: sấm sét làm N₂ và O₂ kết hợp tạo NO."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: NOₓ tan vào nước mưa tạo HNO₃ nên pH giảm xuống dưới 5,6."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "NO và NO₂ là hai oxide phổ biến nhất; NO₂ màu nâu đỏ, mùi hắc và độc; sấm sét tạo NO từ N₂ và O₂. NOₓ tan vào nước mưa tạo acid nên pH giảm xuống dưới"
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.CHON_PHAT_BIEU",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B6",
+   "nguonCau": "II-1"
+  }
+ },
+ "DB-11-B8-D4-I-24": {
+  "luc": "2026-09-29T13:11:55.190Z",
+  "cau": {
+   "phan": "I",
+   "so": 24,
+   "de": "Một phương pháp được đề xuất để loại bỏ SO₂ khỏi khí thải của nhà máy điện bằng cách dẫn khí thải qua dung dịch H₂S.\nCần tối đa bao nhiêu m³ H₂S (ở đkc) để loại bỏ SO₂ sinh ra khi đốt cháy 2,0 tấn than chứa sulfur chiếm 3% theo khối lượng?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Ôn tập chương 2 (Đề 1)",
+   "pa": {
+    "A": "23,24 m³.",
+    "B": "30,99 m³.",
+    "C": "46,48 m³.",
+    "D": "34,86 m³."
+   },
+   "loi_giai": {
+    "chot": "Đốt than sinh SO₂ rồi khử bằng H₂S theo SO₂ + 2H₂S → 3S + 2H₂O, nên số mol H₂S gấp đôi số mol SO₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Ứng với tỉ lệ H₂S : SO₂ = 1 : 2, ngược chiều hệ số phản ứng."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đáp án đề chọn; máy tính lại ra 92,96 m³ nên cần thầy soát số liệu."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Ứng với tỉ lệ 1 : 1, quên hệ số 2 trước H₂S."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Ứng với tỉ lệ 3 : 4, không khớp phương trình nào."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "lech_co_hd",
+    "ghi_chu": "Máy tính ra 92,96 m³ nhưng con số này KHÔNG có trong bốn phương án. 2,0 tấn than chứa 3% sulfur cho 60 kg S tức 1875 mol SO₂; theo SO₂ + 2H₂S → 3S + 2H₂O cần 3750 mol H₂S, nhân 24,79 L ra 92,96 m³. Bốn phương án ứng với tỉ lệ 1 : 2, 2 : 3, 1 : 1 và 3 : 4 — không phương án nào theo đúng tỉ lệ 2 : 1. Giữ đáp án B của đề và CỜ can_xem để thầy soát lại số liệu gốc (có thể đề định ghi 1% hoặc 1,0 tấn)."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Toàn bộ sulfur trong than chuyển hết thành SO₂ nên số mol SO₂ bằng số mol S.",
+    "bay": "Lấy khối lượng than nhân 3% rồi chia cho 64 của SO₂ thay vì 32 của S."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phương án là số",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.O_NHIEM_PHU_DUONG.TINH_KHOI_LUONG",
+    "ten": "Ô nhiễm môi trường và phú dưỡng — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D4",
+    "ten": "Bài toán thực tiễn về khí thải công nghiệp và mưa acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B9-D1",
+   "nguonCau": "I-10"
+  }
+ }
+}
