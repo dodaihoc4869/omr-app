@@ -1,0 +1,17 @@
+# ĐO CA KIỂM TRA 300 EM (tối ưu ca 30/09) — cấu hình CHỈ CỤC BỘ. KHÔNG bắn vào omr.ttadodaihoc.workers.dev.
+# `database_id` giả: `wrangler dev --local` chỉ dùng SQLite trong thư mục --persist-to. R2 cũng cục bộ, trống lúc đầu.
+# Không [triggers] ⇒ không cron. MA_BI_MAT giả truyền bằng `--var` lúc chạy.
+name = "omr-do-ca-3009"
+main = "vo-do.ts"
+compatibility_date = "2026-09-11"
+workers_dev = true
+compatibility_flags = ["nodejs_als"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "omr-do-ca-3009"
+database_id = "00000000-0000-0000-0000-000000003009"
+
+[[r2_buckets]]
+binding = "DE"
+bucket_name = "omr-de-do-ca-3009"

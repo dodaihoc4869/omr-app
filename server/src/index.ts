@@ -89,6 +89,7 @@ import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
+import { docGoiDeDem, docKeyBankDem, doanCongBoNgay, nhoCongBo } from './dem-ca-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -156,13 +157,6 @@ function laThay(req: Request, env: Env, body: Record<string, unknown>): boolean 
 
 async function docCa(env: Env, maCa: string): Promise<DongCa | null> {
   return await env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa).first<DongCa>()
-}
-
-/** Lượt MỚI NHẤT của một em trong ca — một câu, có chỉ mục, không quét bảng. */
-async function docLuotMoiNhat(env: Env, maCa: string, sbd: string): Promise<DongLuot | null> {
-  return await env.DB.prepare('SELECT * FROM luot WHERE ma_ca = ? AND sbd = ? ORDER BY lan_thu DESC LIMIT 1')
-    .bind(maCa, sbd)
-    .first<DongLuot>()
 }
 
 /**
@@ -273,13 +267,99 @@ export function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: str
   }
 }
 
+/** `env.DB.batch` (một vòng D1, một giao dịch). D1 GIẢ tối giản ở vài phép kiểm cũ không có `batch` ⇒ chạy lần lượt cùng thứ tự,
+ * câu đọc bằng `all()`, câu ghi (`ghi[i]`) bằng `run()` — cùng dáng kết quả. D1 thật luôn có `batch`. */
+async function batchGop(env: Env, cau: D1PreparedStatement[], ghi: boolean[] = []): Promise<D1Result[]> {
+  if (typeof (env.DB as { batch?: unknown }).batch === 'function') return env.DB.batch(cau)
+  const kq: D1Result[] = []
+  for (let i = 0; i < cau.length; i++) kq.push(ghi[i] ? await cau[i]!.run() : await cau[i]!.all())
+  return kq
+}
+
+/** Cột `ca` mà đường nóng của EM cần (vào thi · phòng chờ · nộp): mọi cột `vaoThi`/`quyetDinhVaoThi`/`mocHetGio`/`hopPhamVi` đọc — TRỪ
+ * `bo_theo_em_json`. Bản đồ đề riêng của CẢ LỚP nằm ở cột ấy (300 em ≈ 150–300 KB): `SELECT *` kéo nguyên khối qua mạng D1 rồi
+ * JSON.parse ở MỖI lượt vào thi, dù em chỉ cần phần của mình (tối ưu ca 30/09). Tên cột ⊂ cột `dayCa` đang ghi ⇒ chắc chắn có trên D1 thật. */
+const COT_CA_EM = 'ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop, cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, mat_khau, chi_nop_3_phut_cuoi, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, pham_vi, de_rieng, danh_sach_chon_json, dong_bo_gio'
+/** SBD đi thẳng vào đường dẫn JSON `$."<sbd>"` được — chỉ chữ/số/gạch; khoá đặc biệt của đối tượng JS thì đi đường đọc trọn (như cũ). */
+const SBD_DUONG_JSON = /^[A-Za-z0-9_-]{1,64}$/
+const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'bb', '__proto__', 'constructor', 'prototype'])
+
+export interface DocVaoThi {
+  ca: DongCa | null
+  coDanhSach: boolean
+  em: Record<string, unknown> | null
+  luot: DongLuot | null
+  /** Gói đề riêng GỐC như bản cũ `JSON.parse(ca.bo_theo_em_json)` nhìn thấy từ phía MỘT em: cùng kết quả qua `locGoiDeRiengChoEm`. */
+  goiGoc(): Promise<Record<string, unknown> | null>
+}
+
+/** ĐỌC CHO `/vao-thi` — MỘT vòng D1 (batch 4 câu). Phần bản đồ đề riêng của em được CẮT NGAY TRONG D1 bằng toán tử JSON `->`
+ * (chỉ khi cột là đối tượng JSON hợp lệ); dạng lạ (mảng, null, hỏng…) ⇒ đọc trọn cột ở vòng thứ hai và xử y hệt bản cũ, kể cả ném lỗi. */
+export async function docCaVaoThi(env: Env, maCa: string, sbd: string): Promise<DocVaoThi> {
+  const cat = SBD_DUONG_JSON.test(sbd) && !KHOA_KHONG_CAT.has(sbd)
+  const laDoiTuong = "json_valid(bo_theo_em_json) AND json_type(bo_theo_em_json) = 'object'"
+  const q = `"${sbd}"`
+  const cauCa = cat
+    ? env.DB.prepare(
+        `SELECT ${COT_CA_EM},
+                CASE WHEN bo_theo_em_json IS NULL OR bo_theo_em_json = '' THEN 0 WHEN ${laDoiTuong} THEN 1 ELSE 2 END AS goi_kieu,
+                CASE WHEN ${laDoiTuong} THEN json_type(bo_theo_em_json, '$.bo') END AS goi_kieu_bo,
+                CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_bo,
+                CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_lap,
+                CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_dem,
+                CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_da_lam,
+                CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_phang
+           FROM ca WHERE ma_ca = ?`,
+      ).bind(`$.bo.${q}`, `$.lap.${q}`, `$.dem.${q}`, `$.daLam.${q}`, `$.${q}`, maCa)
+    : env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa)
+  const [rCa, rCo, rEm, rLuot] = await batchGop(env, [
+    cauCa,
+    env.DB.prepare('SELECT 1 AS co FROM danh_sach LIMIT 1'),
+    env.DB.prepare('SELECT * FROM danh_sach WHERE sbd = ?').bind(sbd),
+    env.DB.prepare('SELECT * FROM luot WHERE ma_ca = ? AND sbd = ? ORDER BY lan_thu DESC LIMIT 1').bind(maCa, sbd),
+  ])
+  const dong = ((rCa?.results ?? [])[0] ?? null) as Record<string, unknown> | null
+  const ca = dong as unknown as DongCa | null
+  if (ca) nhoCongBo(maCa, ca.cong_bo)
+  const goiGoc = async (): Promise<Record<string, unknown> | null> => {
+    if (!dong) return null
+    const tuCot = (v: unknown): Record<string, unknown> | null => (v ? (JSON.parse(String(v)) as Record<string, unknown>) : null)
+    if (!('goi_kieu' in dong)) return tuCot(dong.bo_theo_em_json)
+    const kieu = Number(dong.goi_kieu)
+    if (kieu === 0) return null
+    if (kieu !== 1) {
+      const r = await env.DB.prepare('SELECT bo_theo_em_json FROM ca WHERE ma_ca = ?').bind(maCa).first<{ bo_theo_em_json: unknown }>()
+      return tuCot(r?.bo_theo_em_json)
+    }
+    const g = (v: unknown): unknown => (v === null || v === undefined ? undefined : JSON.parse(String(v)))
+    const dat = (o: Record<string, unknown>, v: unknown) => { if (v !== undefined) o[sbd] = v; return o }
+    if (dong.goi_kieu_bo === 'object') {
+      return { bo: dat({}, g(dong.goi_bo)), lap: dat({}, g(dong.goi_lap)), dem: dat({}, g(dong.goi_dem)), daLam: dat({}, g(dong.goi_da_lam)) }
+    }
+    return dat({}, g(dong.goi_phang))
+  }
+  return {
+    ca,
+    coDanhSach: (rCo?.results ?? []).length > 0,
+    em: ((rEm?.results ?? [])[0] ?? null) as Record<string, unknown> | null,
+    luot: ((rLuot?.results ?? [])[0] ?? null) as DongLuot | null,
+    goiGoc,
+  }
+}
+
 async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
   const sbd = String(b.sbd ?? '').trim()
   const idThietBi = String(b.idThietBi ?? '').trim()
   if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu', error: 'Thiếu mã ca hoặc số báo danh' })
 
-  const ca = await docCa(env, maCa)
+  // TỐI ƯU CA 30/09: BỐN lần đọc (ca · bảng danh sách có dữ liệu chưa · dòng danh sách của em · lượt mới nhất) đi CHUNG một vòng D1
+  // thay vì bốn–năm vòng nối tiếp; `ca` không kéo bản đồ đề riêng cả lớp (xem docCaVaoThi). Luật từng cổng bên dưới GIỮ NGUYÊN.
+  const doc = await docCaVaoThi(env, maCa, sbd)
+  const ca = doc.ca
+  // Hai hàm đọc danh sách của cổng dưới trả NGAY kết quả đã đọc chung vòng D1 ở trên (câu cổng giữ nguyên từng chữ).
+  const coDanhSach = async (_e: Env): Promise<boolean> => doc.coDanhSach
+  const docDanhSach = async (_e: Env, _s: string): Promise<Record<string, unknown> | null> => doc.em
 
   // CỔNG DANH SÁCH LỚP, trước mọi thứ khác. Thiếu cổng này thì ai có mã ca cũng
   // gõ một số báo danh bất kỳ rồi vào thi được.
@@ -317,7 +397,7 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     }
   }
 
-  const cu = await docLuotMoiNhat(env, maCa, sbd)
+  const cu = doc.luot
   const now = Date.now()
   const qd = quyetDinhVaoThi(ca, cu, idThietBi, now)
   if (!qd.ok || !ca) {
@@ -366,7 +446,7 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   //     hash, còn máy thầy chấm theo bản đồ ⇒ điểm sai LẶNG LẼ (em 12124 tụt
   //     5,69 xuống 2,56 hôm 10/09). Trước 12/09 chỗ này lùi về Apps Script;
   //     Apps Script đã cắt, nên nay phải TỪ CHỐI hẳn thay vì phát đề sai.
-  const goiGoc = ca.bo_theo_em_json ? (JSON.parse(String(ca.bo_theo_em_json)) as Record<string, unknown>) : null
+  const goiGoc = await doc.goiGoc()
   const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
   if (Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng) {
     await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), 'thieu_bo_cau').catch(() => {})
@@ -444,29 +524,20 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
   const trangThai = integrity.blocked ? 'khoa' : 'da_nop'
 
   const maCa = String(b.maCa ?? '').trim()
-  if (maCa && !integrity.blocked) {
-    const ca = await docCa(env, maCa)
-    if (ca && Number((ca as any).chi_nop_3_phut_cuoi ?? 0) === 1) {
-      const luot = await env.DB.prepare(`SELECT het_gio_luc FROM luot WHERE ${dk.sql}`).bind(...dk.tham).first<{ het_gio_luc?: string }>()
-      if (luot?.het_gio_luc) {
-        const hetGio = new Date(luot.het_gio_luc).getTime()
-        const conLaiGiay = Math.round((hetGio - Date.now()) / 1000)
-        // Chỉ nộp trong 1 phút cuối (60 giây), cộng 10 giây độ trễ mạng
-        if (conLaiGiay > 70) {
-          return ra({ ok: false, lyDo: 'chua_den_1_phut_cuoi', error: 'Chỉ được nộp bài trong 1 phút cuối của ca thi' }, 400)
-        }
-      }
-    }
-  }
+  const kiemGio = !!maCa && !integrity.blocked
 
   // KHOÁ CHỐNG TRÙNG nằm ngay trong mệnh đề WHERE: lượt đã nộp thì câu này
   // không đổi dòng nào, nên máy em thử lại bao nhiêu lần cũng an toàn.
-  const r = await env.DB.prepare(
-    `UPDATE luot SET nop_luc = ?, trang_thai = ?, dap_an_json = ?, giay_cau_json = ?,
-            integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?, cap_nhat_luc = ?, da_day_sheet = 0
-     WHERE ${dk.sql} AND trang_thai = 'dang_lam'`,
-  )
-    .bind(
+  //
+  // TỐI ƯU CA 30/09 — MỘT vòng D1 thay cho ba–bốn: đọc `ca` + GHI + đọc lại lượt đi chung một batch (một giao dịch). Luật "chỉ nộp
+  // trong 1 phút cuối" (`chi_nop_3_phut_cuoi`) vẫn xét Y NHƯ CŨ bằng JS: câu GHI trong batch tự đứng yên khi ca bật luật ấy
+  // (`NOT EXISTS …`), rồi mới xét hạn và ghi ở vòng thứ hai — ca không bật luật (gần như mọi ca) xong trong một vòng.
+  const capNhat = (chan: boolean): D1PreparedStatement =>
+    env.DB.prepare(
+      `UPDATE luot SET nop_luc = ?, trang_thai = ?, dap_an_json = ?, giay_cau_json = ?,
+              integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?, cap_nhat_luc = ?, da_day_sheet = 0
+       WHERE ${dk.sql} AND trang_thai = 'dang_lam'${chan ? ' AND NOT EXISTS (SELECT 1 FROM ca WHERE ma_ca = ? AND chi_nop_3_phut_cuoi = 1)' : ''}`,
+    ).bind(
       nopLuc,
       trangThai,
       JSON.stringify(b.dapAn ?? {}),
@@ -476,21 +547,60 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       Math.round(Number(integrity.totalHiddenMs ?? 0) / 1000),
       nopLuc,
       ...dk.tham,
+      ...(chan ? [maCa] : []),
     )
-    .run()
+  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
+  // Tờ đáp án (ca công bố ngay) tải SONG SONG với vòng D1 khi isolate đã biết ca này công bố ngay; quyết định trả hay không vẫn theo
+  // `cong_bo` đọc trong chính batch dưới đây.
+  const keySom = maCa && env.DE && doanCongBoNgay(maCa) ? docKeyBankDem(env, maCa).catch(() => null) : null
+  const kq = await batchGop(env, [
+    ...(maCa ? [env.DB.prepare('SELECT cong_bo, chi_nop_3_phut_cuoi FROM ca WHERE ma_ca = ?').bind(maCa)] : []),
+    capNhat(kiemGio),
+    docLuot(),
+  ], maCa ? [false, true, false] : [true, false])
+  const ca = maCa ? ((kq[0]?.results ?? [])[0] as { cong_bo?: unknown; chi_nop_3_phut_cuoi?: unknown } | undefined) ?? null : null
+  if (maCa) nhoCongBo(maCa, ca?.cong_bo)
+  let doi = Number(kq[maCa ? 1 : 0]?.meta?.changes ?? 0)
+  let sau = ((kq[maCa ? 2 : 1]?.results ?? [])[0] ?? null) as DongLuot | null
 
-  if (r.meta.changes === 0) {
+  if (kiemGio && ca && Number(ca.chi_nop_3_phut_cuoi ?? 0) === 1) {
+    // Câu ghi trong batch đã đứng yên ⇒ `sau` chính là lượt TRƯỚC khi ghi (như lần đọc riêng của bản cũ).
+    if (sau?.het_gio_luc) {
+      const hetGio = new Date(sau.het_gio_luc).getTime()
+      const conLaiGiay = Math.round((hetGio - Date.now()) / 1000)
+      // Chỉ nộp trong 1 phút cuối (60 giây), cộng 10 giây độ trễ mạng
+      if (conLaiGiay > 70) {
+        return ra({ ok: false, lyDo: 'chua_den_1_phut_cuoi', error: 'Chỉ được nộp bài trong 1 phút cuối của ca thi' }, 400)
+      }
+    }
+    const r = await capNhat(false).run()
+    doi = Number(r.meta.changes ?? 0)
+    if (doi === 0) sau = await docLuot().first<DongLuot>()
+  }
+
+  const congBo = async (): Promise<Record<string, unknown>> => (maCa ? congBoSauNop(env, maCa, ca, keySom) : {})
+  if (doi === 0) {
     // Đã nộp rồi thì TRẢ OK, không báo lỗi: máy em mất sóng rồi gửi lại là
     // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
-    const da = await env.DB.prepare(`SELECT trang_thai, nop_luc FROM luot WHERE ${dk.sql}`)
-      .bind(...dk.tham)
-      .first<DongLuot>()
+    const da = sau
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
-      return ra({ ok: true, daNhan: true, nopLuc: da.nop_luc, ...(await congBoSauNop(env, b)) })
+      return raCoKeyBank({ ok: true, daNhan: true, nopLuc: da.nop_luc }, await congBo())
     }
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
   }
-  return ra({ ok: true, nopLuc, ...(await congBoSauNop(env, b)) })
+  return raCoKeyBank({ ok: true, nopLuc }, await congBo())
+}
+
+/** Phản hồi `/nop` có tờ đáp án: ghép THẲNG nguyên văn JSON tờ đáp án (đã kiểm hợp lệ lúc đệm) thay vì parse rồi stringify lại ~100 KB
+ * mỗi lượt nộp. Cùng thứ tự khoá, cùng nội dung JSON với `ra({...dau, ...cb})` cũ. */
+function raCoKeyBank(dau: Record<string, unknown>, cb: Record<string, unknown> & { __keyTho?: string | null }): Response {
+  const { __keyTho, ...conLai } = cb
+  if (typeof __keyTho !== 'string' || !('keyBank' in conLai)) return ra({ ...dau, ...conLai })
+  const { keyBank: _bo, ...khongKey } = conLai
+  const dauJson = JSON.stringify({ ...dau, ...khongKey })
+  const duoi = JSON.stringify({ serverNow: Date.now(), nhipDeNghi: nhipDeNghi() })
+  const than = `${dauJson.slice(0, -1)}${dauJson.length > 2 ? ',' : ''}"keyBank":${__keyTho},${duoi.slice(1)}`
+  return new Response(than, { status: 200, headers: JSON_HEADERS })
 }
 
 /** ĐÁP ÁN TRẢ NGAY SAU KHI EM NỘP — chỗ CUỐI CÙNG buộc máy em phải gọi Apps
@@ -510,20 +620,19 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
  *   3. Chưa cất được ngân hàng ⇒ trả `congBo` nhưng `keyBank: null`. Chỗ gọi
  *      thấy thiếu thì tự đi đường cũ — thà chậm còn hơn em nộp xong nhìn màn
  *      trắng. */
-async function congBoSauNop(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const maCa = String(b.maCa ?? '').trim()
-  if (!maCa) return {}
-  const ca = await docCa(env, maCa)
+async function congBoSauNop(
+  env: Env,
+  maCa: string,
+  ca: { cong_bo?: unknown } | null,
+  keySom: Promise<{ giaTri: unknown; tho: string | null } | null> | null,
+): Promise<Record<string, unknown> & { __keyTho?: string | null }> {
   const congBo = String(ca?.cong_bo ?? 'khong')
   if (congBo !== 'ngay') return { congBo }
   if (!env.DE) return { congBo, keyBank: null }
-  const o = await env.DE.get(`key/${maCa}.json`)
-  if (!o?.body) return { congBo, keyBank: null }
-  try {
-    return { congBo, keyBank: await new Response(o.body).json() }
-  } catch {
-    return { congBo, keyBank: null }
-  }
+  // Đệm isolate + hỏi R2 CÓ ĐIỀU KIỆN mỗi lần (dem-ca-thi.ts): tươi như đọc thẳng, không tải lại thân khi tờ đáp án không đổi.
+  const k = (await keySom) ?? (await docKeyBankDem(env, maCa).catch(() => null))
+  if (!k || k.giaTri === null) return { congBo, keyBank: null }
+  return { congBo, keyBank: k.giaTri, __keyTho: k.tho }
 }
 
 /**
@@ -582,7 +691,8 @@ async function xemTrangThai(env: Env, sbd: string): Promise<Response> {
  * máy em một giây nào. Đây là lúc ĐÔNG NHẤT của cả ca — cả lớp hỏi lại mỗi ba
  * giây — nên nó phải là câu nhẹ nhất trong toàn bộ máy chủ. */
 async function hoiPhongCho(env: Env, maCa: string): Promise<Response> {
-  const ca = await docCa(env, maCa)
+  // Chỉ BA cột (tối ưu ca 30/09): `SELECT *` kéo cả bản đồ đề riêng của lớp (hàng trăm KB) cho MỖI nhịp hỏi 3 giây của MỖI em.
+  const ca = await env.DB.prepare('SELECT trang_thai, phong_cho, bat_dau_thi_luc FROM ca WHERE ma_ca = ?').bind(maCa).first<Pick<DongCa, 'trang_thai' | 'phong_cho' | 'bat_dau_thi_luc'>>()
   if (!ca) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
   return ra({
     ok: true,
@@ -606,16 +716,20 @@ async function ghiPhongCho(env: Env, b: Record<string, unknown>): Promise<Respon
   return ra({ ok: true })
 }
 
-async function layDe(env: Env, maCa: string): Promise<Response> {
-  const ca = await docCa(env, maCa)
+async function layDe(env: Env, maCa: string, req?: Request): Promise<Response> {
+  // TỐI ƯU CA 30/09: thầy bấm Bắt đầu ⇒ cả lớp tải đề trong vài giây. Chỉ đọc hai cột `ca` (không kéo bản đồ đề riêng), gói đề lấy
+  // từ ĐỆM ISOLATE khoá theo (bank_r2, cap_nhat_luc) — mọi đường ghi gói đề đều đổi `cap_nhat_luc` (dem-ca-thi.ts) — nên 300 em
+  // chung MỘT lượt đọc R2 thay vì 300. Gói đề công khai, KHÔNG có đáp án (tờ đáp án ở khoá riêng, không bao giờ qua đường này).
+  const ca = await env.DB.prepare('SELECT bank_r2, cap_nhat_luc FROM ca WHERE ma_ca = ?').bind(maCa).first<{ bank_r2: string | null; cap_nhat_luc: string | null }>()
   if (!ca?.bank_r2) return ra({ ok: false, lyDo: 'chua_co_de' }, 404)
   if (!env.DE) return ra({ ok: false, lyDo: 'chua_noi_r2' }, 500)
-  const o = await env.DE.get(ca.bank_r2)
+  const o = await docGoiDeDem(env, ca.bank_r2, String(ca.cap_nhat_luc ?? ''))
   if (!o) return ra({ ok: false, lyDo: 'mat_goi_de' }, 404)
-  // Gói đề có thể được nối thêm câu khi mở ca đề riêng ⇒ revalidate với etag
-  return new Response(o.body, {
-    headers: { ...JSON_HEADERS, 'cache-control': 'no-cache, must-revalidate', etag: o.httpEtag },
-  })
+  // Gói đề có thể được nối thêm câu khi mở ca đề riêng ⇒ revalidate với etag. Máy em (trình duyệt) đã có bản trùng etag ⇒ 304, khỏi tải lại.
+  const dau = { ...JSON_HEADERS, 'cache-control': 'no-cache, must-revalidate', etag: o.httpEtag }
+  const hoi = req?.headers.get('if-none-match')
+  if (hoi && o.httpEtag && hoi.split(',').some((x) => x.trim() === o.httpEtag)) return new Response(null, { status: 304, headers: dau })
+  return new Response(o.than.slice(0), { headers: dau })
 }
 
 // ------------------------------------------------------------------- THẦY
@@ -1173,19 +1287,13 @@ async function ghiChanVao(
  * thì tên riêng thắng. */
 async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
-  const ca = await env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa).first<Record<string, unknown>>()
+  const { ca, rLuot, rCho, rChan, keyHua } = await docChiTietCa(env, maCa)
   if (!ca) return ra({ ok: true, coCa: false, dayDu: false })
+  const dongCua = (r: D1Result | undefined) => (r?.results ?? []) as Record<string, unknown>[]
 
   const dayDu = Number(ca.sinh_tai_d1 ?? 0) === 1
-  const rLuot = await env.DB.prepare(
-    `SELECT l.*, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten_hien
-       FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
-      WHERE l.ma_ca = ? ORDER BY l.sbd, l.lan_thu`,
-  )
-    .bind(maCa)
-    .all<Record<string, unknown>>()
 
-  const luot = (rLuot.results ?? []).map((l) => ({
+  const luot = dongCua(rLuot).map((l) => ({
     sbd: String(l.sbd ?? ''),
     hoTen: String(l.ten_hien ?? ''),
     lanThu: Number(l.lan_thu) || 1,
@@ -1209,31 +1317,9 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
     giayCau: doJson(l.giay_cau_json),
   }))
 
-  const rCho = await env.DB.prepare(
-    `SELECT p.sbd, COALESCE(NULLIF(p.ho_ten,''), d.ho_ten, '') AS ho_ten, p.ghi_luc
-       FROM phong_cho p LEFT JOIN danh_sach d ON d.sbd = p.sbd
-      WHERE p.ma_ca = ? ORDER BY p.ghi_luc`,
-  )
-    .bind(maCa)
-    .all<Record<string, unknown>>()
-
-  const rChan = await env.DB.prepare('SELECT * FROM chan_vao WHERE ma_ca = ? ORDER BY luc DESC LIMIT 200')
-    .bind(maCa)
-    .all<Record<string, unknown>>()
-
   // NGÂN HÀNG CÓ ĐÁP ÁN của ca, nếu lượt chữa lành đã cất. Đường này ĐÒI mã bí
   // mật (xem bảng định tuyến), khác hẳn `GET /de/:maCa` công khai.
-  let keyBank: unknown = null
-  if (env.DE) {
-    const o = await env.DE.get(`key/${maCa}.json`)
-    if (o?.body) {
-      try {
-        keyBank = await new Response(o.body).json()
-      } catch {
-        keyBank = null
-      }
-    }
-  }
+  const keyBank: unknown = keyHua ? (await keyHua).giaTri : null
 
   return ra({
     ok: true,
@@ -1271,8 +1357,8 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       danhSachChon: doJson(ca.danh_sach_chon_json),
     },
     luot,
-    dsCho: (rCho.results ?? []).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? ''), vaoLuc: String(x.ghi_luc ?? '') })),
-    biChan: (rChan.results ?? []).map((x) => ({
+    dsCho: dongCua(rCho).map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.ho_ten ?? ''), vaoLuc: String(x.ghi_luc ?? '') })),
+    biChan: dongCua(rChan).map((x) => ({
       luc: String(x.luc ?? ''),
       sbd: String(x.sbd ?? ''),
       hoTenGoi: String(x.ho_ten_goi ?? ''),
@@ -1283,6 +1369,28 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
     })),
     boTheoEmCa: doJson(ca.bo_theo_em_json),
   })
+}
+
+/** ĐỌC CHO CHI TIẾT CA (tối ưu ca 30/09): bốn câu đọc chung MỘT vòng D1 (trước: bốn vòng nối tiếp); tờ đáp án đọc SONG SONG qua đệm
+ * có điều kiện (dem-ca-thi.ts — tươi như đọc thẳng). Hình dạng phản hồi của `chiTietCaMoi` giữ nguyên từng trường. */
+async function docChiTietCa(env: Env, maCa: string) {
+  const keyHua = env.DE ? docKeyBankDem(env, maCa).catch(() => ({ giaTri: null, tho: null })) : null
+  const [rCa, rLuot, rCho, rChan] = await batchGop(env, [
+    env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa),
+    env.DB.prepare(
+      `SELECT l.*, COALESCE(NULLIF(l.ho_ten,''), d.ho_ten, '') AS ten_hien
+         FROM luot l LEFT JOIN danh_sach d ON d.sbd = l.sbd
+        WHERE l.ma_ca = ? ORDER BY l.sbd, l.lan_thu`,
+    ).bind(maCa),
+    env.DB.prepare(
+      `SELECT p.sbd, COALESCE(NULLIF(p.ho_ten,''), d.ho_ten, '') AS ho_ten, p.ghi_luc
+         FROM phong_cho p LEFT JOIN danh_sach d ON d.sbd = p.sbd
+        WHERE p.ma_ca = ? ORDER BY p.ghi_luc`,
+    ).bind(maCa),
+    env.DB.prepare('SELECT * FROM chan_vao WHERE ma_ca = ? ORDER BY luc DESC LIMIT 200').bind(maCa),
+  ])
+  const ca = ((rCa?.results ?? [])[0] ?? null) as Record<string, unknown> | null
+  return { ca, rLuot, rCho, rChan, keyHua }
 }
 
 /** GHI ĐIỂM VỀ D1 — soi đúng lượt `ghiDiem` máy thầy vừa ghi lên Sheet.
@@ -2530,8 +2638,11 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
   // Chạy SAU khi mọi câu trên đã ghi xong, vì nó đọc chính `tien_do_ca` vừa
   // dựng. Và nó KHÔNG cộng dồn: cộng dồn thì chấm lại một ca là cộng hai lần.
   const rieng = [...new Set(dsSbd)]
+  // TỐI ƯU CA 30/09: cặp (về 0, tính lại) của MỌI em trong lô đi chung batch (≤ 100 câu/batch) thay vì mỗi em một vòng D1 —
+  // từng cặp chỉ đọc/ghi dòng của đúng em ấy và batch chạy tuần tự trong một giao dịch ⇒ kết quả y hệt vòng lặp cũ.
+  const tinhLai: D1PreparedStatement[] = []
   for (const sbd of rieng) {
-    await env.DB.batch([
+    tinhLai.push(
       env.DB.prepare('UPDATE tien_do_hs SET so_cau = 0, so_sai = 0, cap_nhat_luc = ? WHERE sbd = ?').bind(nay, sbd),
       env.DB.prepare(
         `INSERT INTO tien_do_hs (khoa, sbd, chuyen_de, so_cau, so_sai, cap_nhat_luc)
@@ -2540,8 +2651,9 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
          ON CONFLICT(khoa) DO UPDATE SET
            so_cau=excluded.so_cau, so_sai=excluded.so_sai, cap_nhat_luc=excluded.cap_nhat_luc`,
       ).bind(sbd, sbd, nay, sbd),
-    ])
+    )
   }
+  for (let i = 0; i < tinhLai.length; i += 100) await env.DB.batch(tinhLai.slice(i, i + 100))
 
   return ra({ ok: true, soBai: rieng.length, soCau: cau.length })
 }
@@ -2758,12 +2870,6 @@ async function docDanhSach(env: Env, sbd: string): Promise<Record<string, unknow
   return await env.DB.prepare('SELECT * FROM danh_sach WHERE sbd = ?').bind(sbd).first<Record<string, unknown>>()
 }
 
-/** Bảng danh sách có dữ liệu chưa. Rỗng ⇒ KHÔNG chặn ai. */
-async function coDanhSach(env: Env): Promise<boolean> {
-  const r = await env.DB.prepare('SELECT 1 AS co FROM danh_sach LIMIT 1').first<{ co: number }>()
-  return !!r
-}
-
 /** TRA TÊN THEO SỐ BÁO DANH — để em nhìn đúng tên mình rồi mới bấm Bắt đầu.
  *
  * Cùng đánh đổi đã chốt 07/09 bên Apps Script: ai cầm mã ca cũng dò được "số
@@ -2771,10 +2877,15 @@ async function coDanhSach(env: Env): Promise<boolean> {
  * của việc em không vào thi được lớn hơn. KHÔNG trả năm sinh, KHÔNG trả SĐT. */
 async function tenTheoSbd(env: Env, maCa: string, sbd: string): Promise<Response> {
   if (!maCa || !sbd) return ra({ ok: false, lyDo: 'thieu' })
-  const ca = await docCa(env, maCa)
-  if (!ca) return ra({ ok: false, lyDo: 'khong_co_ca' })
-  if (!(await coDanhSach(env))) return ra({ ok: true, hoTen: '' })
-  const d = await docDanhSach(env, sbd)
+  // Ba lần đọc chung MỘT vòng D1 (tối ưu ca 30/09); thứ tự xét giữ nguyên.
+  const [rCa, rCo, rEm] = await batchGop(env, [
+    env.DB.prepare('SELECT 1 AS co FROM ca WHERE ma_ca = ?').bind(maCa),
+    env.DB.prepare('SELECT 1 AS co FROM danh_sach LIMIT 1'),
+    env.DB.prepare('SELECT ho_ten FROM danh_sach WHERE sbd = ?').bind(sbd),
+  ])
+  if (!(rCa?.results ?? []).length) return ra({ ok: false, lyDo: 'khong_co_ca' })
+  if (!(rCo?.results ?? []).length) return ra({ ok: true, hoTen: '' })
+  const d = ((rEm?.results ?? [])[0] ?? null) as Record<string, unknown> | null
   if (!d) return ra({ ok: false, lyDo: 'khong_co_sbd' })
   return ra({ ok: true, hoTen: String(d.ho_ten ?? '') })
 }
@@ -3155,7 +3266,7 @@ const boXuLy = {
     if (req.method === 'GET' && p === '/khoe') {
       return ra({ ok: true, ten: 'may-chu-moi', coDB: !!env.DB, coR2: !!env.DE, coMat: !!env.MA_BI_MAT })
     }
-    if (req.method === 'GET' && p.startsWith('/de/')) return layDe(env, decodeURIComponent(p.slice(4)))
+    if (req.method === 'GET' && p.startsWith('/de/')) return layDe(env, decodeURIComponent(p.slice(4)), req)
     if (req.method === 'GET' && p === '/do-tai') {
       await moCaDoTai(env)
       return new Response(TRANG_DO_TAI, { headers: { 'content-type': 'text/html;charset=utf-8', ...CORS } })
