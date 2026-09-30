@@ -3,6 +3,7 @@
 //   {"bat":true}                         ⇒ toàn trung tâm
 //   {"bat":true,"lop":["12A1"]}          ⇒ chỉ các lớp này
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
+import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
@@ -870,9 +871,11 @@ export const LOI_KHOA_DAO = 'Có xe hàng đang bị phục kích, hãy hoàn th
 export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   // Tối ưu 28/09: rương hôm nay (khoá theo ngày VN, không phụ thuộc kế hoạch) đọc SONG SONG với kế hoạch.
   const chanSom = protectedQuestions(env).catch(() => new Set<string>())
-  const [{ kh, hs }, ruong] = await Promise.all([
+  // 01/10: chuỗi ngày học (sổ `su_kien_hoc`) đọc SONG SONG — kế hoạch ngày cũ không còn chốt 'dat' khi Hoá 2.0 bật.
+  const [{ kh, hs }, ruong, chuoiNgay] = await Promise.all([
     layKeHoachHomNay(env, sbd, nowMs, undefined, chanSom),
     docRuongHomNay(env, sbd, ngayVnCua(nowMs)),
+    docChuoiNgayHoc(env, sbd, nowMs),
   ])
   const cd = hs.chienDich
   const tl = tiLeChienDich(hs.ttChienDich)
@@ -896,6 +899,8 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
     ...((kh.tamHoan?.ca ?? 0) > 0 ? { tamGiu: { ca: kh.tamHoan!.ca } } : {}),
     // THỬ SỨC THÊM (thầy 30/09): nút "Thử sức thêm (không bắt buộc)" — CHỈ cờ + cỡ lô sẽ thêm, không lộ qid.
     thuSucThem: { duoc: thuSuc.duoc, soCau: thuSuc.duoc ? thuSuc.soCau : 0 },
+    // Chuỗi N ngày trên Sảnh: số ngày VN liên tiếp em có làm ≥ 1 câu (hôm nay chưa làm ⇒ giữ tới hôm qua).
+    chuoiNgay,
   }
 }
 

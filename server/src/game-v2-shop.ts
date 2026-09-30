@@ -20,7 +20,7 @@ import type { Profile } from './game-v2'
 import { DemTTL } from './dem-chung'
 import { DOT_MO_BAN, MUA_BAN, PHIEN_BAN, O_GAN, docMonPhuKien, monDangBan, type MonPhuKien, type OGanPhuKien } from '../../src/lib/phu-kien-danh-muc'
 import { docAnThach } from './game-v2-doan-an'
-import { docChuoiTruoc } from './exp-d1'
+import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import { ngayVn } from './su-kien-hoc'
 import { LUAT_CAP_MOI } from '../../src/lib/hap-thu-ngay'
 
@@ -79,12 +79,15 @@ interface DongSo { loai: string; so_vang: number; exp_tru: number; ma_mon: strin
 const docSoKhoa = (env: Env, sbd: string, khoa: string) =>
   env.DB.prepare('SELECT loai, so_vang, exp_tru, ma_mon FROM vang_so WHERE sbd = ? AND khoa_yeu_cau = ?').bind(sbd, khoa).first<DongSo>()
 
-/** Điều kiện học của em: chuỗi ngày ĐẠT nhiệm vụ ngày (cả hôm nay nếu đã đạt) + số ấn thạch sáng. */
+/**
+ * Điều kiện học của em: chuỗi ngày học + số ấn thạch sáng.
+ * 01/10: chuỗi = số ngày VN liên tiếp có làm ≥ 1 câu (`docChuoiNgayHoc`, cùng số Sảnh). Chuỗi cũ theo `ke_hoach_ngay.ket_qua='dat'`
+ * đã chết khi Hoá 2.0 bật cả trung tâm (cron không còn chốt ngày) ⇒ món cần chuỗi không bao giờ mở được.
+ */
 async function docEmCo(env: Env, sbd: string, nowMs: number, cap: number = 1): Promise<EmCo> {
   const homNay = ngayVn(nowMs)
-  const datHomNay = env.DB.prepare("SELECT 1 AS x FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay' LIMIT 1").bind(sbd, homNay).first().then((x) => !!x, () => false)
-  const [truoc, dat, an] = await Promise.all([docChuoiTruoc(env, sbd, homNay, SO_NGAY_CHUOI_SHOP), datHomNay, docAnThach(env, sbd, homNay)])
-  return { chuoiNgay: truoc + (dat ? 1 : 0), anThachSang: an.filter((a) => a.trangThai === 'sang').length, cap: Math.max(1, Math.floor(Number(cap) || 1)) }
+  const [chuoiNgay, an] = await Promise.all([docChuoiNgayHoc(env, sbd, nowMs), docAnThach(env, sbd, homNay)])
+  return { chuoiNgay, anThachSang: an.filter((a) => a.trangThai === 'sang').length, cap: Math.max(1, Math.floor(Number(cap) || 1)) }
 }
 /** Điều kiện học của em để mở món: chuỗi ngày đạt, ấn thạch sáng, và (v5) cấp thần thú. */
 interface EmCo { chuoiNgay: number; anThachSang: number; cap: number }

@@ -9,6 +9,7 @@
 // KHÔNG rơi xuống SBD trần. Đếm lỗi (thiếu bảng, D1 lỗi tạm) không bao giờ làm hỏng lệnh chính.
 import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
 import type { Env, ExecutionContext } from './kieu'
+import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import { parentIdentity, parentPass } from './game-v2-auth'
 import { PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
 import { datPhutMoiNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
@@ -89,7 +90,8 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: En
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-ke-hoach', { chiToken: true, envGhi: env, ctx })
   const em = await envDoc.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
-  const canhBao = await canhBaoChoPh(env, sbd)
+  // 01/10: chuỗi ngày học đọc từ sổ `su_kien_hoc` (song song cảnh báo) — `kh.chuoiDat` luôn 0 khi Hoá 2.0 bật (không còn chốt 'dat').
+  const [canhBao, chuoiDat] = await Promise.all([canhBaoChoPh(env, sbd), docChuoiNgayHoc(envDoc, sbd)])
   return {
     ok: true,
     hoTen: em?.ho_ten ?? '',
@@ -105,7 +107,7 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: En
     viec: kh.viec.filter((v) => v.hien).map((v) => ({ loai: v.loai, soCau: v.soCau, batBuoc: v.batBuoc, khan: v.khan, hanCung: v.hanCung, hanMem: v.hanMem })),
     quaHan: kh.quaHan.map((q) => ({ loai: q.loai, hanNop: q.hanNop, conLai: q.conLai })),
     tienBo: kh.tienBo,
-    chuoiDat: kh.chuoiDat,
+    chuoiDat,
     canhBao: kh.canhBao.map((c) => c.loai),
     tonCuTong: kh.tonCuTong,
     // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): lời cho PHỤ HUYNH, ≤ 3, bài của con chưa nộp, gửi trong 72 giờ. Không có ⇒ KHÔNG có khoá.

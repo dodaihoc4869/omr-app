@@ -30,12 +30,14 @@ const vangSo = (d: D1That, sbd: string): number => (d.sql.prepare('SELECT COALES
 const cap = (d: D1That, sbd: string, v: number, khoa = `hoan-${sbd}-${v}-${Math.random()}`) => d.sql.prepare("INSERT INTO vang_so(sbd,loai,so_vang,exp_tru,ma_mon,khoa_yeu_cau,luc) VALUES(?,'hoan',?,0,NULL,?,'x')").run(sbd, v, khoa) // cấp vàng để thử mua
 const hoSo = (d: D1That, sbd: string) => { const r = d.sql.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd=?').get(sbd) as { revision: number; json: string }; return { revision: r.revision, p: JSON.parse(r.json) as Record<string, unknown> } }
 const dem = (d: D1That, bang: string, sbd?: string): number => (d.sql.prepare(`SELECT COUNT(*) n FROM ${bang}${sbd ? ' WHERE sbd=?' : ''}`).get(...(sbd ? [sbd] : [])) as { n: number }).n
-/** Cho em đủ chuỗi `n` ngày đạt liền trước hôm nay (22/09). */
+/** Cho em đủ chuỗi `n` ngày HỌC liền trước hôm nay (22/09).
+ * SỬA CÓ CHỦ Ý 01/10: chuỗi shop đếm từ sổ `su_kien_hoc` (ngày có làm ≥ 1 câu, `server/src/chuoi-ngay-hoc.ts`) — `ke_hoach_ngay.ket_qua='dat'` đã chết khi Hoá 2.0 bật. */
+function lamCau(d: D1That, sbd: string, ngay: string): void {
+  d.sql.prepare("INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES(?,?,'Q1','game','s',1,1,?,?)").run(`sk-${sbd}-${ngay}`, sbd, `${ngay}T05:00:00.000Z`, ngay)
+}
+const ngayLui = (i: number) => new Date(Date.parse('2026-09-22T00:00:00+07:00') - i * 86_400_000 + 7 * 3_600_000).toISOString().slice(0, 10)
 function chuoi(d: D1That, sbd: string, n: number): void {
-  for (let i = 1; i <= n; i++) {
-    const ngay = new Date(Date.parse('2026-09-22T00:00:00+07:00') - i * 86_400_000 + 7 * 3_600_000).toISOString().slice(0, 10)
-    d.sql.prepare("INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,ket_qua,cap_nhat_luc) VALUES(?,?,?,1,1,'{}','[]','[]','dat','x')").run(`kh-${sbd}-${ngay}`, sbd, ngay)
-  }
+  for (let i = 1; i <= n; i++) lamCau(d, sbd, ngayLui(i))
 }
 const anSang = (d: D1That, sbd: string, n: number) => { for (let i = 0; i < n; i++) d.sql.prepare("INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,moc_on_ke,moc_moi_sai,cap_nhat_luc) VALUES(?,?,?,20,0,20,0,0,1,NULL,NULL,'x')").run(`nk-${sbd}-${i}`, sbd, `A.${i}`) }
 
@@ -73,9 +75,10 @@ describe('vang-xem', () => {
     const d = dung(); cap(d, 'S1', 340); chuoi(d, 'S1', 9); anSang(d, 'S1', 3)
     expect(await goi(d, 'S1', 'vang-xem')).toEqual({ ok: true, bat: true, vang: 340, ongNghiem: 0, giuLai: 0, doiToiDa: 0, ngayAn: 0, expMoiVang: 5, tuDong: true, chuoiNgay: 9, anThachSang: 3, mua: 'm1' })
   })
-  it('chuỗi tính cả hôm nay nếu đã đạt nhiệm vụ ngày (exp_so dat_ngay)', async () => {
+  // SỬA CÓ CHỦ Ý 01/10: "hôm nay" tính khi em đã làm ≥ 1 câu hôm nay (sổ học), không còn theo exp_so dat_ngay.
+  it('chuỗi tính cả hôm nay nếu hôm nay đã làm ≥ 1 câu', async () => {
     const d = dung({ wallet: 150 }); chuoi(d, 'S1', 4)
-    d.sql.prepare("INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,exp,luc) VALUES('e1','S1','2026-09-22','dat_ngay',10,'x')").run()
+    lamCau(d, 'S1', '2026-09-22')
     expect(await goi(d, 'S1', 'vang-xem')).toMatchObject({ chuoiNgay: 5, ongNghiem: 0, doiToiDa: 0, ngayAn: 0, vang: 0 })
   })
   it('vàng TỰ ĐỘNG (v4): hồ sơ có mốc vàng ⇒ vang-xem đúc floor((earned − mocVang)/5) trước khi đọc; đọc lại không đúc đôi', async () => {
@@ -84,13 +87,12 @@ describe('vang-xem', () => {
     expect(await goi(d, 'S1', 'vang-xem')).toMatchObject({ vang: 340 + 201 })
     expect(await goi(d, 'S1', 'vang-xem')).toMatchObject({ vang: 541 }); expect(dem(d, 'vang_so')).toBe(2)
   })
-  it('chuỗi đọc được TRÊN 7 ngày (cửa sổ dài, không bị cắt như kế hoạch ngày): 30 ngày đạt liền ⇒ 30; một ngày không đạt làm đứt; ngày nghỉ không đứt', async () => {
+  // SỬA CÓ CHỦ Ý 01/10: chuỗi theo sổ học — một ngày không làm câu nào làm đứt (không còn khái niệm ngày nghỉ của kế hoạch cũ).
+  it('chuỗi đọc được TRÊN 7 ngày: 30 ngày có học liền ⇒ 30; một ngày không làm câu nào làm đứt', async () => {
     const d = dung(); chuoi(d, 'S1', 30)
     expect((await goi(d, 'S1', 'vang-xem')).chuoiNgay).toBe(30)
-    d.sql.prepare("UPDATE ke_hoach_ngay SET ket_qua='khong' WHERE sbd='S1' AND ngay='2026-09-15'").run()          // đứt ở ngày thứ 7 lùi
+    d.sql.prepare("DELETE FROM su_kien_hoc WHERE sbd='S1' AND ngay_vn='2026-09-15'").run()          // đứt ở ngày thứ 7 lùi
     expect((await goi(d, 'S1', 'vang-xem')).chuoiNgay).toBe(6)
-    d.sql.prepare("UPDATE ke_hoach_ngay SET ket_qua=NULL,la_ngay_nghi=1 WHERE sbd='S1' AND ngay='2026-09-15'").run()             // ngày nghỉ (không kết quả): bỏ qua, không đứt
-    expect((await goi(d, 'S1', 'vang-xem')).chuoiNgay).toBe(29)
   })
   it('em chưa chọn thần thú ⇒ lời báo như các lệnh game khác (không ghi)', async () => {
     const d = dung(); d.sql.prepare("UPDATE game_v2_profile SET json=json_set(json,'$.choice',1) WHERE sbd='S1'").run()
@@ -214,7 +216,7 @@ describe('shop-mua', () => {
   it('điều kiện học: thiếu chuỗi ⇒ chua_mo (nói số em đang có); đủ chuỗi thiếu ấn thạch ⇒ chua_mo ấn thạch; đủ cả hai ⇒ mua được', async () => {
     const d = dung(); cap(d, 'S1', 20000); chuoi(d, 'S1', 3)
     expect(await goi(d, 'S1', 'shop-mua', { maMon: 'KT-08', giaThay: 2000, khoaYeuCau: K('a') })).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần chuỗi 14 ngày. Em đang chuỗi 3 ngày.' })
-    d.sql.prepare("DELETE FROM ke_hoach_ngay WHERE sbd='S1'").run(); chuoi(d, 'S1', 14)
+    d.sql.prepare("DELETE FROM su_kien_hoc WHERE sbd='S1'").run(); chuoi(d, 'S1', 14)
     expect(await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-08', giaThay: 2800, khoaYeuCau: K('b') })).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần 5 ấn thạch sáng. Em đang có 0.' })
     anSang(d, 'S1', 5)
     expect(await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-08', giaThay: 2800, khoaYeuCau: K('c') })).toMatchObject({ ok: true, maMon: 'HQ-08', vang: 17200, daMac: true })
