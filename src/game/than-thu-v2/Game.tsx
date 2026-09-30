@@ -65,7 +65,14 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const mounted=useRef(true);const running=useRef(false)
  useEffect(()=>()=>{mounted.current=false},[])
  const request=useCallback(async(action:string,data:Record<string,unknown>={},sessionToken=token):Promise<Result>=>{
-  const base=await layDiaChiMayChu('');const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken})});const r=chanPhanHoiCau(await response.json() as Result,`game-v2/${action}`) // chốt chặn cuối: bỏ câu tự luận (thầy lệnh 21/09)
+  // HẠN 25 GIÂY (quét ổn định 30/09): trước đây fetch không hạn ⇒ mạng treo là nút bận MÃI (`running` khoá mọi lệnh sau) tới khi em tải lại trang.
+  // Lệnh answer/complete có biên nhận (session|qid) ở máy chủ nên bấm lại sau khi hết hạn không chấm hai lần.
+  const base=await layDiaChiMayChu('');const hetHan=new AbortController();const hen=setTimeout(()=>hetHan.abort(),25_000)
+  let tho:Result
+  try{const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken}),signal:hetHan.signal});tho=await response.json() as Result}
+  catch{throw new Error(hetHan.signal.aborted?'Máy chủ trả lời chậm. Em bấm lại nhé.':'Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.')}
+  finally{clearTimeout(hen)}
+  const r=chanPhanHoiCau(tho,`game-v2/${action}`) // chốt chặn cuối: bỏ câu tự luận (thầy lệnh 21/09)
   if(!r.ok){const loi=loiCuaKetQua(r) // `error` hoặc `loi` (lệnh Game Hóa 2.0) ⇒ hiện đúng lời máy chủ
    if(/Phiên game|Mật khẩu đã đổi|nhập lại mật khẩu/.test(loi)){setToken('');setProfile(null);try{sessionStorage.removeItem(`game-v2:${sbd}`)}catch{/* Storage may be disabled. */}}throw Object.assign(new Error(loi||'Chưa kết nối được game. Em thử lại.'),{ma:String((r as {ma?:unknown}).ma??'')})}
   if(mounted.current){if(typeof r.doanMo==='boolean')setDoanMo(r.doanMo);if(r.tasks)setTasks(r.tasks);if(r.profile&&(r.revision??0)>=latestRevision.current){setProfile(r.profile);latestRevision.current=r.revision??0;if(r.revision!==undefined)setRevision(r.revision)}}return r

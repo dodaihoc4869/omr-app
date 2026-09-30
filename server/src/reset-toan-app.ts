@@ -29,6 +29,7 @@
 // Lần 21/09 = `RESET_2109`, mọi export cũ giữ NGUYÊN tên, chữ ký và hành vi (test `tests/reset-toan-app-1909.test.ts`). Cổng đóng băng `dangLamMoi` và `docMocReset`
 // xét MỌI job trong `CAC_JOB_RESET` bằng MỘT truy vấn (như cũ); job 21/09 đã `xong` nên không bao giờ đóng băng lại.
 import type { D1PreparedStatement, Env } from './kieu'
+import { dbGoc } from './cau-hinh-dem'
 
 export const MA_RESET = 'reset_toan_app'
 export const KHOA_HUY = 'reset_toan_app_huy'
@@ -315,10 +316,12 @@ const boNhoChung = new WeakMap<object, { at: number; v: TrangThaiChung[] }>()
 async function docTrangThaiChungDem(env: Env, nowMs: number): Promise<TrangThaiChung[]> {
   // `env.DB` có thể là đối tượng D1 giả thô trong test (không phải object): chỉ đệm khi làm khoá WeakMap được.
   const dungDem = !!env.DB && (typeof env.DB === 'object' || typeof env.DB === 'function')
-  const c = dungDem ? boNhoChung.get(env.DB) : undefined
+  // Khoá theo D1 GỐC (bản session / bộ đếm bọc D1 dùng chung đệm của isolate — như cau-hinh-dem.ts).
+  const goc = dungDem ? dbGoc(env.DB as unknown as object) : null
+  const c = goc ? boNhoChung.get(goc) : undefined
   if (c && nowMs >= c.at && nowMs - c.at < HAN_DEM_MS) return c.v
   const v = await docTrangThaiNhieu(env, CAC_JOB_RESET)
-  if (dungDem) boNhoChung.set(env.DB, { at: nowMs, v })
+  if (goc) boNhoChung.set(goc, { at: nowMs, v })
   return v
 }
 

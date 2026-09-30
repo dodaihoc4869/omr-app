@@ -1,5 +1,6 @@
 import type {Env} from './kieu'
 import {newsDay} from './parent-news'
+import {DemTTL} from './dem-chung'
 type Row=Record<string,any>
 export function honorDay(now=Date.now()){return new Date(Date.parse(newsDay(now)+'T00:00:00Z')-86400000).toISOString().slice(0,10)}
 export function rankHonors(rows:Row[],withRefs=false){
@@ -11,17 +12,31 @@ export function rankHonors(rows:Row[],withRefs=false){
  }
  return [...best.values()].sort(cmp).slice(0,3).map(({key,submitted,...r},i)=>({...r,rank:i+1,...(withRefs?{studentRef:key}:{})}))
 }
-export async function dailyHonors(env:Env,live=true){
+// ĐỆM 60 GIÂY DÙNG CHUNG (quét tối ưu 30/09): Bảng nhiệm vụ của MỌI em gọi `/daily-honors` mỗi lần mở app; kết quả không riêng em nào
+// nhưng trước đây mỗi lượt đều quét `luot` của cả ngày (2–6 truy vấn, 2–4 đợt). Nay một isolate tính MỘT lần mỗi 60 giây (lượt đang bay dùng chung);
+// lỗi thì không đệm. Cron 00:01 (live=false) đi thẳng đường cũ rồi xoá đệm để bảng mới hiện ngay.
+const demVinhDanh=new DemTTL<Promise<Row>>(60_000,4)
+export async function dailyHonors(env:Env,live=true):Promise<Row>{
+ if(!live){const r=await dungVinhDanh(env,false);demVinhDanh.xoa();return r}
+ const khoa=newsDay(),now=Date.now()
+ const co=demVinhDanh.doc(khoa,now)
+ if(co)return co
+ const p=dungVinhDanh(env,true)
+ demVinhDanh.ghi(khoa,now,p)
+ p.catch(()=>demVinhDanh.xoaKhoa(khoa))
+ return p
+}
+async function dungVinhDanh(env:Env,live:boolean):Promise<Row>{
  const day=live?newsDay():honorDay()
- const cached=await env.DB.prepare('SELECT body FROM daily_honors WHERE day=?').bind(day).first<{body:string}>()
- if(!live&&cached&&JSON.parse(cached.body).version===4)return publicHonors(env,JSON.parse(cached.body))
+ if(!live){const cached=await env.DB.prepare('SELECT body FROM daily_honors WHERE day=?').bind(day).first<{body:string}>()
+ if(cached&&JSON.parse(cached.body).version===4)return publicHonors(env,JSON.parse(cached.body))}
  const start=new Date(`${day}T00:00:00+07:00`).toISOString(),end=new Date(Date.parse(start)+86400000).toISOString()
  const rows=await env.DB.prepare(`SELECT l.sbd,COALESCE(h.ho_ten,l.ho_ten) ho_ten,l.tong,l.nop_luc,l.vao_luc,c.ten_ca,
  json_extract(g.json,'$.nickname') nickname,json_extract(g.json,'$.pet') pet,json_extract(g.json,'$.cap') level
  FROM luot l JOIN ca c ON c.ma_ca=l.ma_ca LEFT JOIN hoc_sinh h ON h.sbd=l.sbd LEFT JOIN game_v2_profile g ON g.sbd=l.sbd
  WHERE l.sbd<>'12121212' AND l.nop_luc>=? AND l.nop_luc<? AND l.tong IS NOT NULL AND l.lan_thu=1
  AND c.loai='thi' AND c.trang_thai<>'da_xoa' AND (c.cong_bo='ngay' OR (c.cong_bo='ca_lop_xong' AND NOT EXISTS(SELECT 1 FROM luot z WHERE z.ma_ca=c.ma_ca AND z.nop_luc IS NULL)))`).bind(start,end).all<Row>()
- if(live&&!rows.results.length)return dailyHonors(env,false)
+ if(live&&!rows.results.length)return dungVinhDanh(env,false)
  const report={version:4,live,day,publishedAt:new Date().toISOString(),winners:rankHonors(rows.results,!live)}
  if(live)return {ok:true,...report}
  await env.DB.prepare('INSERT INTO daily_honors(day,created_at,body) VALUES(?,?,?) ON CONFLICT(day) DO UPDATE SET created_at=excluded.created_at,body=excluded.body').bind(day,report.publishedAt,JSON.stringify(report)).run()

@@ -18,6 +18,7 @@
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { docKhoiEm } from './game-v2-bank'
+import { dbGoc } from './cau-hinh-dem'
 import { coCaDangMo } from './bi-a'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
 import { cauKhacPhucGoi, danhMucDangBai, deTheoDangBai } from './goi-cu'
@@ -95,7 +96,7 @@ export const SQL_BANG_TU_LUYEN: readonly string[] = [
 ]
 const bangDaDung = new WeakMap<object, Promise<void>>()
 export function damBaoBangTuLuyen(env: Env): Promise<void> {
-  const db = env.DB as unknown as object
+  const db = dbGoc(env.DB as unknown as object) // bản session/bộ đếm bọc D1 ⇒ vẫn MỘT lần mỗi isolate
   let p = bangDaDung.get(db)
   if (!p) {
     p = env.DB.batch([...SQL_BANG_TU_LUYEN, ...SQL_BANG_KHAC_PHUC].map((s) => env.DB.prepare(s))).then(() => undefined)
@@ -230,14 +231,6 @@ async function daiDienDang(env: Env, dsDang: { ma: string; qids: string[] }[]): 
   return cauSaiDauVaoTu(cau, cd).filter((c) => c.chuyenDe && hopLeDeRut({ phan: c.phan, maDe: c.maCa, dapAnDung: c.dapAnDung, text: c.text, choices: c.choices || c.ideas }))
 }
 
-/** Tầng dự phòng CÓ SỐ LIỆU (chỉ đọc SQL, rẻ — cho nhãn trên thẻ ở màn chọn). */
-async function kieuNguonDangNhanh(env: Env, sbd: string, khoiEm: Khoi | null, coKho: boolean): Promise<KieuNguonDang | null> {
-  if (coKho) return 'cau_sai'
-  if ((await dangYeuTheoHoSo(env, sbd)).length) return 'yeu'
-  if ((await dangTheoChienDich(env, sbd)).length) return 'chuong'
-  return khoiEm === null ? null : 'pho_bien'
-}
-
 /**
  * CHẾ ĐỘ 2 — nguồn "câu sai" cho thuật toán CŨ theo thứ tự: kho câu sai chung → dạng em còn yếu → chương đang học → dạng phổ biến của lớp.
  * Mỗi tầng chạy ĐÚNG `phanTichTyLeDang` trên kho cùng chuyên đề; tầng nào rút được câu (tongToiDa > 0) thì dùng tầng ấy.
@@ -312,8 +305,7 @@ async function khoTheoCauSai(env: Env, sbd: string, dsCauSai: CauSaiDauVao[], kh
 }
 
 /** Danh mục Lớp → Bài → Dạng, CHỈ lớp em được chọn (không vượt khối em — luật Boss 21/09). */
-async function danhMucCuaEm(env: Env, khoiEm: Khoi | null): Promise<{ lops: LopDangBaiTL[]; loi: string }> {
-  const kq = await danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj)
+function locDanhMuc(kq: Obj, khoiEm: Khoi | null): { lops: LopDangBaiTL[]; loi: string } {
   if (kq.ok === false) return { lops: [], loi: str(kq.error) || 'Chưa đọc được danh mục dạng bài.' }
   return { lops: lopEmDuocChon(khoiEm, (Array.isArray(kq.lops) ? kq.lops : []) as LopDangBaiTL[]), loi: '' }
 }
@@ -377,8 +369,7 @@ function nhanDangKho(kho: TeacherExamSource[]): Map<string, { ma: string; ten: s
 // ------------------------------------------------------------------ /hs/tu-luyen/nguon — thứ em cần để chọn chế độ (KHÔNG đáp án)
 
 /** Dạng nên luyện (cho nút gợi ý ở trạng thái chúc mừng của chế độ 1): dạng em còn yếu, không có thì dạng của chương đang học. */
-async function dangNenLuyen(env: Env, sbd: string): Promise<{ ma: string; ten: string } | null> {
-  const ds = [...(await dangYeuTheoHoSo(env, sbd)), ...(await dangTheoChienDich(env, sbd))]
+async function dangNenLuyen(env: Env, ds: readonly { ma: string }[]): Promise<{ ma: string; ten: string } | null> {
   const d = ds[0]
   if (!d) return null
   const r = await env.DB.prepare("SELECT json_extract(json, '$.tenDang') AS ten FROM game_v2_question WHERE dang = ? AND COALESCE(json_extract(json, '$.tenDang'), '') <> '' LIMIT 1")
@@ -387,13 +378,19 @@ async function dangNenLuyen(env: Env, sbd: string): Promise<{ ma: string; ten: s
 }
 
 export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
-  const khoiEm = await docKhoiEm(env, sbd).catch(() => null)
-  const [dm, kcs] = await Promise.all([
-    danhMucCuaEm(env, khoiEm),
+  // MỌI lượt đọc chạy SONG SONG (quét tối ưu 30/09): khối em ‖ danh mục thô ‖ kho câu sai chung ‖ ca đang mở; danh mục lọc theo khối ở bước cuối.
+  // Hai tầng dự phòng đầu (dạng yếu, chương đang học) đọc CÙNG đợt để thẻ ghi đúng nguồn mà không thêm đợt D1.
+  const [khoiEm, dmTho, kcs, dangThi, yeu, chuong] = await Promise.all([
+    docKhoiEm(env, sbd).catch(() => null),
+    danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj),
     docKhoCauSai(env, sbd).catch((e): KhoCauSai => ({ ds: [], tuCa: 0, tuChienDich: 0, tuLuyenDe: 0, tuTuLuyen: 0, tong: 0, daKhacPhuc: 0, lichSu: [], loi: e instanceof Error ? 'Chưa đọc được kho câu sai. Em thử lại sau.' : '' })),
+    coCaDangMo(env, sbd, Date.now()).catch(() => false),
+    dangYeuTheoHoSo(env, sbd).catch(() => []),
+    dangTheoChienDich(env, sbd).catch(() => []),
   ])
-  const kieu2 = await kieuNguonDangNhanh(env, sbd, khoiEm, kcs.ds.length > 0).catch(() => null)
-  const nenLuyen = kcs.ds.length ? null : await dangNenLuyen(env, sbd).catch(() => null)
+  const dm = locDanhMuc(dmTho, khoiEm)
+  const kieu2: KieuNguonDang | null = kcs.ds.length ? 'cau_sai' : yeu.length ? 'yeu' : chuong.length ? 'chuong' : khoiEm === null ? null : 'pho_bien'
+  const nenLuyen = kcs.ds.length ? null : await dangNenLuyen(env, [...yeu, ...chuong]).catch(() => null)
   const now = Date.now()
   return {
     ok: true,
@@ -416,7 +413,7 @@ export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
     // Chế độ 4: kho trống ⇒ rút từ toàn kho lớp ≤ khối em; không rõ khối ⇒ khoá có lý do.
     tuDo: kcs.ds.length ? { kieu: 'cau_sai', nhan: 'Theo câu sai của em' } : khoiEm !== null ? { kieu: 'toan_kho', nhan: `Toàn kho lớp ${khoiEm} trở xuống` } : { kieu: '', nhan: '', loi: LOI_KHONG_LOP },
     dangNenLuyen: nenLuyen,
-    dangThi: await coCaDangMo(env, sbd, now).catch(() => false),
+    dangThi,
   }
 }
 
@@ -438,7 +435,8 @@ interface KetQuaRutTho {
 
 /** Chạy ĐÚNG thuật toán của chế độ. `rut = false` ⇒ chỉ đếm (xem trước), không rút. */
 async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promise<KetQuaRutTho> {
-  const khoiEm = await docKhoiEm(env, sbd).catch(() => null)
+  // Khối em đọc SONG SONG với nguồn của từng chế độ (quét tối ưu 30/09) — chế độ 1 không cần khối nên không phải chờ thêm một đợt D1.
+  const khoiP = docKhoiEm(env, sbd).catch(() => null)
   const meta = new Map<string, { dangMa: string; dangTen: string; bai: string; lop: string }>()
   const rong = (loi: string): KetQuaRutTho => ({ dsCau: [], tongToiDa: 0, tieuDe: '', meta, loi })
   const lopCua = (c: CauLuyen) => { const k = khoiCuaCau({ qid: c.id, maDe: c.maDe }); return k ? String(k) : '' }
@@ -446,10 +444,12 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
   if (t.cheDo === 1) {
     // LUẬT 30/09 + v3: KHO CÂU SAI CHUNG từ 29/09 (ca đã công bố + chiến dịch/game + Luyện đề + Tu luyện); ưu tiên câu TỚI HẠN hẹn lại →
     // chưa luyện → luyện ít → lâu; câu đang chờ hẹn chỉ lấy khi kho cạn; thiếu thì lặp; trộn dễ/khó.
+    const lanP = rut ? docLanLuyen(env, sbd) : null
+    lanP?.catch(() => undefined) // lỗi đọc ⇒ ném đúng chỗ `await` dưới như cũ, không thành lỗi "chưa bắt"
     const kho = await docKhoCauSai(env, sbd)
     if (kho.ds.length === 0) return rong(kho.loi)
-    if (!rut) return { dsCau: [], tongToiDa: kho.ds.length, tieuDe: '', meta, loi: '' }
-    const lan = await docLanLuyen(env, sbd)
+    if (!rut || !lanP) return { dsCau: [], tongToiDa: kho.ds.length, tieuDe: '', meta, loi: '' }
+    const lan = await lanP
     const theo = new Map(kho.ds.map((c) => [c.qid, c]))
     const now = Date.now()
     const chon = chonCauSai(
@@ -478,7 +478,7 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
   }
 
   if (t.cheDo === 2 || t.cheDo === 4) {
-    const khoSai = await docKhoCauSai(env, sbd)
+    const [khoSai, khoiEm] = await Promise.all([docKhoCauSai(env, sbd), khoiP])
     if (t.cheDo === 2) {
       // Chế độ 2 GIỮ thuật toán cũ (phanTichTyLeDang → rutDsThemDangCauSai), chỉ đổi NGUỒN: kho câu sai chung; kho trống ⇒ dự phòng 3 tầng.
       const ng = await nguonCheDo2(env, sbd, khoiEm, khoSai)
@@ -532,7 +532,8 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
 
   // Chế độ 3: Dạng bài — chỉ mã trong danh mục CỦA EM (không vượt khối).
   if (t.dsDang.length === 0) return rong('Em chọn ít nhất 1 dạng bài.')
-  const dm = await danhMucCuaEm(env, khoiEm)
+  const [dmTho, khoiEm] = await Promise.all([danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj), khoiP])
+  const dm = locDanhMuc(dmTho, khoiEm)
   const banDo = banDoDanhMuc(dm.lops)
   const hopLe = t.dsDang.filter((m) => banDo.has(m) && duocChonLop(khoiEm, banDo.get(m)!.lop))
   if (hopLe.length === 0) return rong(dm.loi || 'Dạng bài em chọn không có trong danh mục lớp của em.')

@@ -269,8 +269,13 @@ async function docLanSai(env: Env, sbd: string): Promise<LanSai[]> {
     LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
     WHERE s.sbd = ? AND s.ngay_vn >= ? AND s.luc >= ? AND s.nguon IN ('thi', 'game', 'luyen') AND COALESCE(s.qid, '') <> ''
       AND ((s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1) OR (s.nguon IN ('game', 'luyen') AND s.ket_qua = 0))`
-  const r = await env.DB.prepare(sql(true)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>()
-    .catch(() => env.DB.prepare(sql(false)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>())
+  // Hai nguồn đọc SONG SONG (một đợt D1).
+  const [r, tl] = await Promise.all([
+    env.DB.prepare(sql(true)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>()
+      .catch(() => env.DB.prepare(sql(false)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>()),
+    env.DB.prepare('SELECT qid, nop_luc FROM tu_luyen_cau WHERE sbd = ? AND dung = 0 AND che_do <> 1 AND nop_luc >= ?').bind(sbd, MOC_CAU_SAI_MS).all<Row>()
+      .catch(() => ({ results: [] as Row[] })),
+  ])
   const ra: LanSai[] = []
   for (const x of r.results ?? []) {
     if (str(x.visibility) === 'embargoed' || Number(x.hop_le) !== 1) continue
@@ -278,8 +283,6 @@ async function docLanSai(env: Env, sbd: string): Promise<LanSai[]> {
     const loai: LoaiNguonSai = nguon === 'thi' ? 'ca' : nguon === 'luyen' ? 'luyen_de' : Number(x.bia) === 1 ? 'bia' : x.doan != null ? 'doan' : 'dao'
     ra.push({ qid: str(x.qid), loai, tenCa: loai === 'ca' ? str(x.ten_ca) : '', tenChienDich: '', luc: str(x.luc), ngay: str(x.ngay_vn) })
   }
-  const tl = await env.DB.prepare('SELECT qid, nop_luc FROM tu_luyen_cau WHERE sbd = ? AND dung = 0 AND che_do <> 1 AND nop_luc >= ?').bind(sbd, MOC_CAU_SAI_MS).all<Row>()
-    .catch(() => ({ results: [] as Row[] }))
   for (const x of tl.results ?? []) {
     const ms = Number(x.nop_luc) || 0
     ra.push({ qid: qidGoc(str(x.qid)), loai: 'tu_luyen', tenCa: '', tenChienDich: '', luc: isoTuMs(ms), ngay: ngayVnChu(ms) })

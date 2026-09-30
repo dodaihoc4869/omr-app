@@ -45,7 +45,9 @@ export function docCauHinhDem(env: Env, khoa: string, nowMs: number = Date.now()
 
 /** Gắn khoá D1_GOC lên bản session (để đệm cờ dùng chung với D1 gốc). Trả lại chính `phien`. */
 export function gan<T>(phien: T, goc: unknown): T {
-  try { (phien as Record<symbol, unknown>)[D1_GOC] = goc } catch { /* đối tượng đóng băng ⇒ chỉ mất đệm dùng chung */ }
+  // `withSession` trả CHÍNH nó (D1 giả/bộ đếm trong test) ⇒ không tự trỏ vào mình (mất đường về D1 gốc thật); trỏ thẳng về gốc cuối chuỗi.
+  if ((phien as unknown) === goc || !goc || typeof goc !== 'object') return phien
+  try { (phien as Record<symbol, unknown>)[D1_GOC] = dbGoc(goc) } catch { /* đối tượng đóng băng ⇒ chỉ mất đệm dùng chung */ }
   return phien
 }
 
