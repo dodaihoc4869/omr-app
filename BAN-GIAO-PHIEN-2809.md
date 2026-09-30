@@ -173,3 +173,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 16:55 30/09 · deploy 8f6facf (#108+#109) xanh (run 606; 605 huỷ, đã gồm)
 
 - 30/09 18:02 VN · phiên chính · gộp PR #111 (Sảnh báo "câu tạm giữ vì ca kiểm tra", sanh2 trả tamGiu) · merge 197c7fb · ca 507646 đã đóng · lùi: git revert -m1 197c7fb
+- 30/09 18:31 VN · phiên chính · gộp PR #110 (rải đều vòng 2: nợ lấp lượt dư khi đủ quota câu mới, ngày cuối bỏ qua câu hỏng, SQL cờ tự luận khớp JS, thayCauHong tránh câu ca) · merge 834475c · không ca mở · lùi: git revert -m1 834475c
