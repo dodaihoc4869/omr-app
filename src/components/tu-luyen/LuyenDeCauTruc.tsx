@@ -13,6 +13,7 @@ import { useGiayConLai, type KhoGio } from '../../lib/dong-ho-thi'
 import { demDaLam, useLuyenDe, type DieuKienLuyenDe, type LuotLuyenDe, type PaperLuyenDe } from '../luyen-de/dung-luyen-de'
 import type { PublicExamBank } from '../../data/examContent'
 import './luyen-de-cau-truc.css'
+import { BanDoKetQua, KhungLamRong, cuonToiCau, useBoCuc, type LocXem } from './bo-cuc'
 
 type Phan = 'I' | 'II' | 'III'
 type Chu = 'A' | 'B' | 'C' | 'D'
@@ -131,6 +132,7 @@ type Props = {
 export default function LuyenDeCauTruc({ token, sbd, dieuKien, dangTaiDieuKien, onDoi }: Props) {
   const ld = useLuyenDe(sbd, token)
   const { paper, history, busy, error, ready, setReady, open } = ld
+  const boCuc = useBoCuc()
 
   // Nộp xong ⇒ thẻ Tổng hợp + trạng thái thẻ ở ManTuLuyen tải lại.
   const daNop = paper?.status === 'submitted' ? paper.id : ''
@@ -150,7 +152,7 @@ export default function LuyenDeCauTruc({ token, sbd, dieuKien, dangTaiDieuKien, 
   const chuTrangThai = khoa ? 'Đang khoá' : trangThai === 'mo' ? 'Đã mở cho em' : trangThai === 'can_xac_nhan' ? 'Cần em xác nhận' : ''
 
   return (
-    <div className="ldct-gioi-thieu">
+    <div className="ldct-gioi-thieu" data-bo-cuc={boCuc}>
       <section className="ldct-the" data-khoa={khoa ? 'true' : 'false'} aria-labelledby="ldct-ten">
         <span className="ldct-the-icon"><IconLuyenDe size={30} /></span>
         <div className="ldct-the-chu">
@@ -195,7 +197,7 @@ export default function LuyenDeCauTruc({ token, sbd, dieuKien, dangTaiDieuKien, 
         </section>
       )}
 
-      <section className="tlu-khoi" aria-labelledby="ldct-h-cau-truc">
+      <section className="tlu-khoi ldct-o-cau-truc" aria-labelledby="ldct-h-cau-truc">
         <h2 id="ldct-h-cau-truc" className="tlu-muc">Cấu trúc đề</h2>
         <ul className="ldct-cau-truc">
           {CAU_TRUC_DE.map((p) => (
@@ -226,7 +228,7 @@ function LuotGanDay({ history, busy, onMo, khoa }: { history: LuotLuyenDe[]; bus
   const [het, setHet] = useState(false)
   const ds = het ? history : history.slice(0, 5)
   return (
-    <section className="tlu-khoi" aria-labelledby="ldct-h-luot">
+    <section className="tlu-khoi ldct-o-luot" aria-labelledby="ldct-h-luot">
       <h2 id="ldct-h-luot" className="tlu-muc">Lượt luyện đề gần đây</h2>
       {history.length === 0 ? (
         <p className="tlu-ghi">{khoa ? 'Chưa có lượt luyện đề nào.' : 'Chưa có lượt luyện đề nào. Làm đề đầu tiên — nộp xong điểm hiện ở đây và ở thẻ Tổng hợp.'}</p>
@@ -274,7 +276,10 @@ function ManDe({ ld }: { ld: LD }) {
 
 function ManLam({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
   const { answers, busy, error, saved, khoGio, seconds, submit, setPaper } = ld
-  const cuonRef = useRef<HTMLDivElement>(null)
+  const boCuc = useBoCuc()
+  const cuonRef = useRef<HTMLDivElement | null>(null)
+  const [cuonEl, setCuonEl] = useState<HTMLDivElement | null>(null)
+  const datCuon = useCallback((el: HTMLDivElement | null) => { cuonRef.current = el; setCuonEl(el) }, [])
   const dauRef = useRef<HTMLElement>(null)
   // `change` của lõi đổi mỗi lần vẽ ⇒ giữ qua ref để CauLam (memo) không vẽ lại cả đề khi em chọn một câu.
   const changeRef = useRef(ld.change)
@@ -284,6 +289,9 @@ function ManLam({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
   const phans = useMemo(() => theoPhan(paper.bank), [paper.bank])
   const tong = phans.reduce((n, p) => n + p.cau.length, 0)
   const daLam = demDaLam(answers)
+  // Mã thẻ câu trên màn (đề Bộ đánh số lại từng phần) — cho bảng câu ngang / máy tính.
+  const theDom = useMemo(() => new Map(phans.flatMap((p) => p.cau.map((q, i) => [q.id, `ldct-cau-${p.phan}-${i + 1}`] as const))), [phans])
+  const domId = useCallback((id: string) => theDom.get(id) ?? id, [theDom])
 
   const nhayToi = (phan: Phan, stt: number) => {
     const el = document.getElementById(`ldct-cau-${phan}-${stt}`)
@@ -307,9 +315,61 @@ function ManLam({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
     })
     if (dongY) void submit()
   }
+  const nutNop = (
+    <button type="button" className="tlu-nut-chinh" disabled={busy} onClick={() => void nop()}>
+      {busy ? 'Đang nộp…' : 'Nộp bài'}
+    </button>
+  )
+  const deCacPhan = phans.map((p) => (
+    <section key={p.phan} className="ldct-phan" aria-labelledby={`ldct-h-phan-${p.phan}`}>
+      <h2 id={`ldct-h-phan-${p.phan}`} className="tlu-muc ldct-phan-ten">
+        Phần {p.phan} · {TEN_PHAN[p.phan]} <span className="tlu-muc-phu tlu-tab">{p.cau.length} câu</span>
+      </h2>
+      {p.cau.map((q, i) => (
+        <CauLam key={q.id} q={q} phan={p.phan} stt={i + 1} giaTri={answers[q.id] || ''} onDoi={doi} />
+      ))}
+    </section>
+  ))
+
+  if (boCuc !== 'doc') {
+    const nhom = phans.map((p) => ({
+      phan: p.phan,
+      ten: TEN_PHAN[p.phan],
+      cau: p.cau.map((q, i) => ({ id: q.id, so: i + 1, phan: p.phan, giaTri: answers[q.id] || '', daLam: daLamCau(answers[q.id]) })),
+    }))
+    return (
+      <div ref={datCuon} className="tlu tlu-rong ldct-toan" data-chang="lam" data-bo-cuc={boCuc}>
+        <KhungLamRong
+          boCuc={boCuc}
+          dau={(
+            <div className="tlu-hang">
+              <button type="button" className="tlu-ve" aria-label="Về giới thiệu đề (bài vẫn giữ, giờ vẫn chạy)" onClick={() => setPaper(null)}><IconVe /></button>
+              <div className="tlu-tieu-khoi ldct-dau-chu">
+                <h1 className="tlu-tieu tlu-tieu-nho">Luyện đề cấu trúc</h1>
+                <p className="tlu-phu">Đề 28 câu · 50 phút · tự nộp khi hết giờ</p>
+              </div>
+            </div>
+          )}
+          nhom={nhom}
+          domId={domId}
+          gocCuon={boCuc === 'rong' ? cuonEl : null}
+          dongHo={<DongHoGon kho={khoGio} giayDau={seconds} />}
+          nhanDongHo="Còn lại"
+          daLam={daLam}
+          tong={tong}
+          trangThai={saved ? <p className="tlu-ben-luu" role="status">{saved}</p> : null}
+          loi={error ? <p className="tlu-loi-nho" role="alert">{error}</p> : null}
+          nutNop={nutNop}
+          onChon={doi}
+        >
+          <div className="tlu-ds-cau">{deCacPhan}</div>
+        </KhungLamRong>
+      </div>
+    )
+  }
 
   return (
-    <div ref={cuonRef} className="tlu ldct-toan" data-chang="lam">
+    <div ref={datCuon} className="tlu ldct-toan" data-chang="lam">
       <header ref={dauRef} className="tlu-dau tlu-dau-lam ldct-dau">
         <div className="tlu-hang">
           <button type="button" className="tlu-ve" aria-label="Về giới thiệu đề (bài vẫn giữ, giờ vẫn chạy)" onClick={() => setPaper(null)}><IconVe /></button>
@@ -344,16 +404,7 @@ function ManLam({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
       </header>
       <main className="tlu-than tlu-ds-cau">
         {error && <p className="tlu-bao" data-kieu="loi" role="alert">{error}</p>}
-        {phans.map((p) => (
-          <section key={p.phan} className="ldct-phan" aria-labelledby={`ldct-h-phan-${p.phan}`}>
-            <h2 id={`ldct-h-phan-${p.phan}`} className="tlu-muc ldct-phan-ten">
-              Phần {p.phan} · {TEN_PHAN[p.phan]} <span className="tlu-muc-phu tlu-tab">{p.cau.length} câu</span>
-            </h2>
-            {p.cau.map((q, i) => (
-              <CauLam key={q.id} q={q} phan={p.phan} stt={i + 1} giaTri={answers[q.id] || ''} onDoi={doi} />
-            ))}
-          </section>
-        ))}
+        {deCacPhan}
       </main>
       <footer className="tlu-thanh-nop">
         <div className="tlu-thanh-nop-trong">
@@ -361,9 +412,7 @@ function ManLam({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
             <b className="tlu-so-lon">{daLam}/{tong}</b>
             <span role="status" className="ldct-luu">câu đã làm{saved ? ` · ${saved}` : ''}</span>
           </div>
-          <button type="button" className="tlu-nut-chinh" disabled={busy} onClick={() => void nop()}>
-            {busy ? 'Đang nộp…' : 'Nộp bài'}
-          </button>
+          {nutNop}
         </div>
       </footer>
     </div>
@@ -395,86 +444,145 @@ export function tinhTheoPhan(paper: PaperLuyenDe) {
 
 function ManKetQua({ ld, paper }: { ld: LD; paper: PaperLuyenDe }) {
   const { setPaper, getSolution, error } = ld
-  const [chiSai, setChiSai] = useState(false)
+  const boCuc = useBoCuc()
+  const [loc, setLoc] = useState<LocXem>('tat')
   const diem = paper.result?.score ?? 0
   const phans = useMemo(() => theoPhan(paper.bank), [paper.bank])
   const cacPhan = useMemo(() => tinhTheoPhan(paper), [paper])
   const coDetail = cacPhan.some((p) => p.coDiem)
   const tong = phans.reduce((n, p) => n + p.cau.length, 0)
-  const soSai = phans.reduce((n, p) => n + p.cau.filter((q) => { const d = diemCau(paper, q.id); return d !== null && d < (p.phan === 'II' ? 1 : 0.25) }).length, 0)
+  const chuaDung = (p: Phan, d: number | null) => d !== null && d < (p === 'II' ? 1 : 0.25)
+  const soSai = phans.reduce((n, p) => n + p.cau.filter((q) => chuaDung(p.phan, diemCau(paper, q.id))).length, 0)
+  const soDung = phans.reduce((n, p) => n + p.cau.filter((q) => { const d = diemCau(paper, q.id); return d !== null && !chuaDung(p.phan, d) }).length, 0)
   const soTrong = phans.reduce((n, p) => n + p.cau.filter((q) => !daLamCau(paper.answers[q.id])).length, 0)
   const chuVi = 2 * Math.PI * 44
+  const domId = (id: string) => `ldct-kq-${id}`
+  const nhay = (id: string) => {
+    if (loc !== 'tat') setLoc('tat')
+    setTimeout(() => cuonToiCau(domId(id)), 30)
+  }
+
+  const tomTat = (
+    <section className="tlu-diem ldct-diem" aria-label="Điểm lượt này">
+      <span className="tlu-vong" role="img" aria-label={`Điểm ${so(diem)} trên 10`}>
+        <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true" focusable="false">
+          <circle cx="56" cy="56" r="44" className="tlu-vong-nen" strokeWidth="10" fill="none" />
+          <circle cx="56" cy="56" r="44" className="tlu-vong-dat" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${((chuVi * Math.min(10, diem)) / 10).toFixed(1)} ${chuVi.toFixed(1)}`} transform="rotate(-90 56 56)" />
+        </svg>
+        <span className="tlu-vong-chu"><b className="baloo tlu-tab">{so(diem)}</b><span>/ 10 điểm</span></span>
+      </span>
+      <dl className="tlu-diem-so ldct-diem-dau">
+        <div><dt>Điểm lượt này</dt><dd className="tlu-tab">{so(diem)} / 10</dd></div>
+        {coDetail && <div><dt>Câu chưa đúng</dt><dd className="tlu-tab">{soSai} câu</dd></div>}
+        {coDetail && <div><dt>Câu bỏ trống</dt><dd className="tlu-tab">{soTrong} câu</dd></div>}
+      </dl>
+      {coDetail ? (
+        <dl className="tlu-diem-so ldct-theo-phan">
+          {cacPhan.map((p) => (
+            <div key={p.phan}>
+              <dt>Phần {p.phan} · {p.ten}</dt>
+              <dd className="tlu-tab" aria-label={`${so(p.diem)} trên ${so(p.toiDa)} điểm`}>{so(p.diem)}/{so(p.toiDa)}</dd>
+              <span className="ldct-tp-phu tlu-tab">điểm · {p.phan === 'II' ? `${p.dung}/${p.soCau} câu đúng cả 4 ý` : `${p.dung}/${p.soCau} câu đúng`}</span>
+            </div>
+          ))}
+        </dl>
+      ) : (
+        <p className="tlu-ghi">Bài này chấm trước khi có bảng điểm theo phần — chỉ còn tổng điểm.</p>
+      )}
+      <p className="tlu-ghi">Câu nào chưa hiểu, em bấm Hỏi thầy ngay dưới câu đó.</p>
+    </section>
+  )
+  const chip = coDetail && (
+    <div className="tlu-chip-hang" role="group" aria-label="Lọc câu">
+      <button type="button" className="tlu-chip" aria-pressed={loc === 'tat'} onClick={() => setLoc('tat')}>Tất cả {tong} câu</button>
+      <button type="button" className="tlu-chip" aria-pressed={loc === 'sai'} onClick={() => setLoc('sai')}>Câu chưa đúng · {soSai}</button>
+      <button type="button" className="tlu-chip" aria-pressed={loc === 'dung'} onClick={() => setLoc('dung')}>Câu đúng · {soDung}</button>
+    </div>
+  )
+  const danhSach = (
+    <div className="tlu-ds-cau">
+      {phans.map((p) => {
+        const ds = p.cau.map((q, i) => ({ q, i, d: diemCau(paper, q.id) })).filter((x) => loc === 'tat' || (loc === 'sai' ? chuaDung(p.phan, x.d) : x.d !== null && !chuaDung(p.phan, x.d)))
+        if (!ds.length) return null
+        return (
+          <section key={p.phan} className="ldct-phan" aria-labelledby={`ldct-kq-phan-${p.phan}`}>
+            <h2 id={`ldct-kq-phan-${p.phan}`} className="tlu-muc ldct-phan-ten">Phần {p.phan} · {TEN_PHAN[p.phan]}</h2>
+            {ds.map(({ q, i, d }) => (
+              <CauXem key={q.id} domId={domId(q.id)} q={q} phan={p.phan} stt={i + 1} diem={d} giaTri={paper.answers[q.id] || ''} sol={getSolution(q.id)} />
+            ))}
+          </section>
+        )
+      })}
+      {loc === 'sai' && soSai === 0 && <p className="tlu-ghi tlu-ghi-giua">Không có câu nào sai. Em làm tốt lắm!</p>}
+      {loc === 'dung' && soDung === 0 && <p className="tlu-ghi tlu-ghi-giua">Chưa có câu đúng nào — xem lời giải từng câu rồi làm đề mới nhé.</p>}
+    </div>
+  )
+  const nut = (
+    <div className="tlu-hang-nut">
+      <button type="button" className="tlu-nut-chinh" onClick={() => setPaper(null)}>Về trang luyện đề</button>
+    </div>
+  )
+  const rong = boCuc !== 'doc'
+  const dau = (
+    <header className={rong ? 'tlu-dau tlu-dau-rong' : 'tlu-dau'}>
+      <div className="tlu-hang">
+        <button type="button" className="tlu-ve" aria-label="Về giới thiệu đề" onClick={() => setPaper(null)}><IconVe /></button>
+        <div className="tlu-tieu-khoi">
+          <h1 className="tlu-tieu tlu-tieu-nho">Kết quả luyện đề cấu trúc</h1>
+          <p className="tlu-phu tlu-tab">Đề 28 câu · làm lúc {ngayGio(paper.deadline - 50 * 60000)}</p>
+        </div>
+      </div>
+    </header>
+  )
+
+  if (rong) {
+    const kieu = (p: Phan, q: CauDe): 'dung' | 'sai' | 'trong' | 'mot_phan' => {
+      const d = diemCau(paper, q.id)
+      if (!daLamCau(paper.answers[q.id])) return 'trong'
+      if (d === null) return 'sai'
+      if (!chuaDung(p, d)) return 'dung'
+      return p === 'II' && d > 0 ? 'mot_phan' : 'sai'
+    }
+    const nhom = phans.map((p) => ({ phan: p.phan, ten: TEN_PHAN[p.phan], cau: p.cau.map((q, i) => ({ id: q.id, so: i + 1, kieu: kieu(p.phan, q) })) }))
+    return (
+      <div className="tlu tlu-rong ldct-toan" data-chang="ket-qua" data-bo-cuc={boCuc}>
+        {dau}
+        <div className="tlu-kq-luoi">
+          <aside className="tlu-kq-trai" aria-label="Tóm tắt kết quả">
+            {error && <p className="tlu-bao" data-kieu="loi" role="alert">{error}</p>}
+            {tomTat}
+            {coDetail && (
+              <section className="tlu-khoi" aria-labelledby="ldct-h-ban-do">
+                <h2 id="ldct-h-ban-do" className="tlu-muc">Bản đồ câu <span className="tlu-muc-phu">bấm một ô để xem lại câu đó</span></h2>
+                <BanDoKetQua nhom={nhom} onNhay={nhay} />
+              </section>
+            )}
+            {nut}
+          </aside>
+          <main className="tlu-kq-phai" aria-label="Xem lại từng câu">
+            {chip && <div className="tlu-kq-loc">{chip}</div>}
+            {danhSach}
+          </main>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="tlu ldct-toan" data-chang="ket-qua">
-      <header className="tlu-dau">
-        <div className="tlu-hang">
-          <button type="button" className="tlu-ve" aria-label="Về giới thiệu đề" onClick={() => setPaper(null)}><IconVe /></button>
-          <div className="tlu-tieu-khoi">
-            <h1 className="tlu-tieu tlu-tieu-nho">Kết quả luyện đề cấu trúc</h1>
-            <p className="tlu-phu tlu-tab">Đề 28 câu · làm lúc {ngayGio(paper.deadline - 50 * 60000)}</p>
-          </div>
-        </div>
-      </header>
+      {dau}
       <main className="tlu-than">
         {error && <p className="tlu-bao" data-kieu="loi" role="alert">{error}</p>}
-        <section className="tlu-diem ldct-diem" aria-label="Điểm lượt này">
-          <span className="tlu-vong" role="img" aria-label={`Điểm ${so(diem)} trên 10`}>
-            <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true" focusable="false">
-              <circle cx="56" cy="56" r="44" className="tlu-vong-nen" strokeWidth="10" fill="none" />
-              <circle cx="56" cy="56" r="44" className="tlu-vong-dat" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${((chuVi * Math.min(10, diem)) / 10).toFixed(1)} ${chuVi.toFixed(1)}`} transform="rotate(-90 56 56)" />
-            </svg>
-            <span className="tlu-vong-chu"><b className="baloo tlu-tab">{so(diem)}</b><span>/ 10 điểm</span></span>
-          </span>
-          <dl className="tlu-diem-so ldct-diem-dau">
-            <div><dt>Điểm lượt này</dt><dd className="tlu-tab">{so(diem)} / 10</dd></div>
-            {coDetail && <div><dt>Câu chưa đúng</dt><dd className="tlu-tab">{soSai} câu</dd></div>}
-            {coDetail && <div><dt>Câu bỏ trống</dt><dd className="tlu-tab">{soTrong} câu</dd></div>}
-          </dl>
-          {coDetail ? (
-            <dl className="tlu-diem-so ldct-theo-phan">
-              {cacPhan.map((p) => (
-                <div key={p.phan}>
-                  <dt>Phần {p.phan} · {p.ten}</dt>
-                  <dd className="tlu-tab" aria-label={`${so(p.diem)} trên ${so(p.toiDa)} điểm`}>{so(p.diem)}/{so(p.toiDa)}</dd>
-                  <span className="ldct-tp-phu tlu-tab">điểm · {p.phan === 'II' ? `${p.dung}/${p.soCau} câu đúng cả 4 ý` : `${p.dung}/${p.soCau} câu đúng`}</span>
-                </div>
-              ))}
-            </dl>
-          ) : (
-            <p className="tlu-ghi">Bài này chấm trước khi có bảng điểm theo phần — chỉ còn tổng điểm.</p>
-          )}
-          <p className="tlu-ghi">Câu nào chưa hiểu, em bấm Hỏi thầy ngay dưới câu đó.</p>
-        </section>
-        {coDetail && (
-          <div className="tlu-chip-hang" role="group" aria-label="Lọc câu">
-            <button type="button" className="tlu-chip" aria-pressed={!chiSai} onClick={() => setChiSai(false)}>Tất cả {tong} câu</button>
-            <button type="button" className="tlu-chip" aria-pressed={chiSai} onClick={() => setChiSai(true)}>Câu chưa đúng · {soSai}</button>
-          </div>
-        )}
-        <div className="tlu-ds-cau">
-          {phans.map((p) => {
-            const ds = p.cau.map((q, i) => ({ q, i, d: diemCau(paper, q.id) })).filter((x) => !chiSai || (x.d !== null && x.d < (p.phan === 'II' ? 1 : 0.25)))
-            if (!ds.length) return null
-            return (
-              <section key={p.phan} className="ldct-phan" aria-labelledby={`ldct-kq-phan-${p.phan}`}>
-                <h2 id={`ldct-kq-phan-${p.phan}`} className="tlu-muc ldct-phan-ten">Phần {p.phan} · {TEN_PHAN[p.phan]}</h2>
-                {ds.map(({ q, i, d }) => (
-                  <CauXem key={q.id} q={q} phan={p.phan} stt={i + 1} diem={d} giaTri={paper.answers[q.id] || ''} sol={getSolution(q.id)} />
-                ))}
-              </section>
-            )
-          })}
-          {chiSai && soSai === 0 && <p className="tlu-ghi tlu-ghi-giua">Không có câu nào sai. Em làm tốt lắm!</p>}
-        </div>
-        <div className="tlu-hang-nut">
-          <button type="button" className="tlu-nut-chinh" onClick={() => setPaper(null)}>Về trang luyện đề</button>
-        </div>
+        {tomTat}
+        {chip}
+        {danhSach}
+        {nut}
       </main>
     </div>
   )
 }
 
-function CauXem({ q, phan, stt, diem, giaTri, sol }: { q: CauDe; phan: Phan; stt: number; diem: number | null; giaTri: string; sol: ReturnType<LD['getSolution']> }) {
+function CauXem({ domId, q, phan, stt, diem, giaTri, sol }: { domId?: string; q: CauDe; phan: Phan; stt: number; diem: number | null; giaTri: string; sol: ReturnType<LD['getSolution']> }) {
   const chung = { ...q, cheDo: 'xem_lai' as const, stt, explanation: sol?.explanation, loiGiai: sol?.loiGiai }
   const dungHet = diem !== null && diem >= (phan === 'II' ? 1 : 0.25)
   const yDung = phan === 'II' && diem !== null ? [0, 0.1, 0.25, 0.5, 1].indexOf(diem) : -1
@@ -497,7 +605,7 @@ function CauXem({ q, phan, stt, diem, giaTri, sol }: { q: CauDe; phan: Phan; stt
     )
   else the = <TheCau {...chung} phan="III" selected={giaTri} correct={sol?.correct as string | undefined} />
   return (
-    <article className="tlu-the-cau m3" data-dung={diem === null ? undefined : dungHet ? 'true' : 'false'}>
+    <article id={domId} className="tlu-the-cau m3" data-dung={diem === null ? undefined : dungHet ? 'true' : 'false'}>
       <div className="tlu-the-cau-dau">
         <span className="tlu-so-cau">Câu {stt}</span>
         {diem !== null && (

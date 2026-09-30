@@ -10,6 +10,7 @@ import { hoiXacNhan } from '../hop-thoai'
 import '../m3'
 import '../hoa2/phong-baloo'
 import './tu-luyen.css'
+import './tu-luyen-rong.css'
 import type { HinhAnh } from '../../data/examContent'
 import { chiSoDuoiRo } from '../hoa2/cau-chuyen'
 import {
@@ -20,13 +21,16 @@ import {
   kepSoCauCheDo2,
   kepSoCauCheDo3,
   kepSoCauCheDo4,
+  tongHopTuLuyen,
   type CauCongKhai,
   type CheDoTuLuyen,
   type KetQuaCau,
+  type TongHopTuLuyen as TomTatTongHop,
 } from '../../lib/tu-luyen'
-import { nopBai, rutCau, taiNguon, xemLuot, xemTruoc, type KetQuaNop, type LuotDangLam, type NguonTuLuyen, type ThamSoRut } from './api'
+import { nopBai, rutCau, taiNguon, taiTongHop, xemLuot, xemTruoc, type KetQuaNop, type LuotDangLam, type NguonTuLuyen, type ThamSoRut } from './api'
 import TongHopTuLuyen, { DiemLuyenDeTongHop } from './TongHopTuLuyen'
 import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen-de'
+import { BanDoKetQua, KhungLamRong, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
 
 // Thẻ "Luyện đề cấu trúc" (30/09): mảnh NẠP LƯỜI khi em mở thẻ (ngoài precache — vite.config.ts globIgnores). Cổng + lý do khoá lấy từ
 // máy chủ `/luyen-de/dieu-kien` ngay khi mở Tu luyện (thẻ hiện ổ khoá, không ẩn).
@@ -42,7 +46,7 @@ type Chu = 'A' | 'B' | 'C' | 'D'
 type DS = 'D' | 'S'
 
 const MO_TA: Record<CheDoTuLuyen, { phu: string; y: string }> = {
-  1: { phu: 'Làm lại đúng những câu em đã sai', y: 'Chọn ca kiểm tra đã công bố điểm' },
+  1: { phu: 'Làm lại câu em đã sai từ 29/09', y: 'Ca kiểm tra + chiến dịch, cộng dồn' },
   2: { phu: 'Câu mới cùng dạng với câu em sai', y: 'Chia theo tỉ lệ câu sai từng dạng' },
   3: { phu: 'Chọn Lớp → Bài → Dạng để luyện sâu', y: 'Theo sách giáo khoa, không vượt khối em' },
   4: { phu: 'Rút ngẫu nhiên, lọc theo sao và loại câu', y: 'Lý thuyết hay bài tập tuỳ em' },
@@ -87,6 +91,28 @@ const daTraLoi = (c: CauCongKhai, v: string | undefined): boolean => {
   return v.trim().length > 0
 }
 const dongHo = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+/** Mã câu trong lượt có thể mang đuôi bản lặp `~2` (chế độ 1) — Hỏi thầy / lời giải đi theo câu GỐC. */
+const qidGoc = (qid: string) => qid.replace(/~\d+$/, '')
+const pt = (x: number) => `${x.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}%`
+const PHAN: CauCongKhai['phan'][] = ['I', 'II', 'III']
+/** Nhóm câu theo phần cho bảng câu bên phải (số câu giữ đúng thứ tự trong lượt). */
+function nhomTheoPhan(cau: readonly CauCongKhai[], traLoi: Record<string, string>): NhomBang[] {
+  return PHAN.map((p) => ({
+    phan: p,
+    ten: NHAN_PHAN_TU_LUYEN[p],
+    cau: cau.flatMap((c, i) => (c.phan === p ? [{ id: c.qid, so: i + 1, phan: p, giaTri: traLoi[c.qid] ?? '', daLam: daTraLoi(c, traLoi[c.qid]) }] : [])),
+  })).filter((n) => n.cau.length)
+}
+/** Nhãn chế độ 1 trên thẻ câu: "Luyện lại lần K" + dòng "Sai gốc: …" (máy chủ gửi sẵn chữ). */
+function NhanLuyen({ c }: { c: CauCongKhai }) {
+  if (!c.nhanLuyen && !c.saiGoc) return null
+  return (
+    <>
+      {c.nhanLuyen && <span className="tlu-nhan" data-kieu="luyen">{c.nhanLuyen}</span>}
+      {c.saiGoc && <span className="tlu-sai-goc">{c.saiGoc}</span>}
+    </>
+  )
+}
 
 function IconKhoaNho() {
   return (
@@ -112,7 +138,26 @@ function IconCheDo({ cheDo }: { cheDo: CheDoTuLuyen }) {
   return <svg {...p}><path d="M16 3h5v5" /><path d="M4 20L21 3" /><path d="M21 16v5h-5" /><path d="M15 15l6 6" /><path d="M4 4l5 5" /></svg>
 }
 
+function IconTongHop() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+    </svg>
+  )
+}
+function IconLuyenDeThe() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M7 3h8l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M15 3v4h4" />
+      <path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" />
+    </svg>
+  )
+}
+
 export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
+  const boCuc = useBoCuc()
+  const rong = boCuc !== 'doc'
   const [thePhu, setThePhu] = useState<'luyen' | 'tong-hop' | 'luyen-de'>('luyen')
   const [dieuKien, setDieuKien] = useState<DieuKienLuyenDe | null>(null)
   const [dangTaiDk, setDangTaiDk] = useState(true)
@@ -140,9 +185,17 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const [lamMoiTongHop, setLamMoiTongHop] = useState(0)
   const [dangMoLuot, setDangMoLuot] = useState('')
   const [loiXemLuot, setLoiXemLuot] = useState('')
+  // Số liệu nhanh cho thẻ "Tổng hợp" + từng chế độ ở màn chọn NGANG / MÁY TÍNH (một lượt đọc, cùng lệnh thẻ Tổng hợp dùng). Màn dọc không tải.
+  const [tomTat, setTomTat] = useState<TomTatTongHop | null>(null)
+  useEffect(() => {
+    if (!rong) return
+    let song = true
+    void taiTongHop(token).then((r) => { if (song && r.ok) setTomTat(tongHopTuLuyen(r.du.luot, r.du.cau, Date.now())) })
+    return () => { song = false }
+  }, [rong, token, lamMoiTongHop])
 
   // tham số từng chế độ
-  const [caChon1, setCaChon1] = useState<Set<string>>(new Set())
+  const [soCau1, setSoCau1] = useState(SO_CAU_MAC_DINH)
   const [caChon2, setCaChon2] = useState<Set<string>>(new Set())
   const [soCau2, setSoCau2] = useState(SO_CAU_MAC_DINH)
   const [lop3, setLop3] = useState('')
@@ -161,7 +214,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     if (!r.ok) { setLoiNguon(r.loi); return }
     setNguon(r.du)
     const tatCa = new Set(r.du.cacCa.map((c) => c.maCa))
-    setCaChon1(tatCa)
+    setSoCau1(Math.min(SO_CAU_MAC_DINH, r.du.khoCauSai?.tong ?? r.du.soCauSai))
     setCaChon2(new Set(tatCa))
     const l = r.du.danhMuc[r.du.danhMuc.length - 1] // danh mục đã lọc theo khối em, xếp tăng ⇒ lớp cuối = khối em
     if (l) {
@@ -174,12 +227,13 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
 
   // ---- tham số gửi máy chủ cho chế độ đang chọn
   const thamSo = useMemo<ThamSoRut | null>(() => {
-    if (cheDo === 1) return { cheDo: 1, dsMaCa: [...caChon1] }
+    // Luật 30/09: máy chủ tự gom kho câu sai từ 29/09; `dsMaCa` chỉ để máy chủ bản cũ (trước khi đẩy Worker mới) vẫn rút được.
+    if (cheDo === 1) return { cheDo: 1, soCau: soCau1, dsMaCa: nguon?.cacCa.map((c) => c.maCa) ?? [] }
     if (cheDo === 2) return { cheDo: 2, dsMaCa: [...caChon2], soCau: soCau2 }
     if (cheDo === 3) return { cheDo: 3, dsDang: [...dang3], soCau: soCau3 }
     if (cheDo === 4) return { cheDo: 4, mucDo: [...mucDo4], soCau: soCau4 }
     return null
-  }, [cheDo, caChon1, caChon2, soCau2, dang3, soCau3, mucDo4, soCau4])
+  }, [cheDo, soCau1, nguon, caChon2, soCau2, dang3, soCau3, mucDo4, soCau4])
   // Khoá xem trước KHÔNG gồm số câu (đổi thanh chọn không phải hỏi lại máy chủ).
   const khoaXt = useMemo(() => {
     if (cheDo === 2) return `2|${[...caChon2].sort().join(',')}`
@@ -282,39 +336,69 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const veChon = () => { setBai(null); setKetQua(null); setLoi('') }
 
   // ================================================================== KẾT QUẢ
-  if (ketQua) return <ManKetQua kq={ketQua.nop} cau={ketQua.cau} onVe={onVe} onLuyenTiep={() => { setKetQua(null); setBai(null); setThePhu('luyen') }} onTongHop={() => { veChon(); setThePhu('tong-hop') }} />
+  if (ketQua) return <ManKetQua boCuc={boCuc} kq={ketQua.nop} cau={ketQua.cau} onVe={onVe} onLuyenTiep={() => { setKetQua(null); setBai(null); setThePhu('luyen') }} onTongHop={() => { veChon(); setThePhu('tong-hop') }} />
 
   // ================================================================== ĐANG LÀM
   if (bai) {
     const daLam = bai.cau.filter((c) => daTraLoi(c, bai.traLoi[c.qid])).length
+    const theCau = bai.cau.map((c, i) => (
+      <article key={c.qid} id={`tlu-lam-${c.qid}`} className="tlu-the-cau m3" onFocusCapture={() => { cauDangNhin.current = c.qid }} onPointerDown={() => { cauDangNhin.current = c.qid }}>
+        <div className="tlu-the-cau-dau">
+          <span className="tlu-so-cau">Câu {i + 1}</span>
+          <span className="tlu-nhan">{NHAN_PHAN_TU_LUYEN[c.phan]}</span>
+          {c.sao > 0 && <span className="tlu-nhan" data-kieu="sao">{c.sao} sao</span>}
+          {c.tenDang && <span className="tlu-nhan tlu-nhan-dang">{c.tenDang}</span>}
+          <NhanLuyen c={c} />
+        </div>
+        <TheCauLam cau={c} stt={i + 1} giaTri={bai.traLoi[c.qid]} onDoi={(v) => traLoi(c.qid, v)} />
+        <NutHoiThay qid={qidGoc(c.qid)} nguon="tu_luyen" gon onHoi={() => setBai((b) => (b && !b.coGoiY.includes(c.qid) ? { ...b, coGoiY: [...b.coGoiY, c.qid] } : b))} />
+      </article>
+    ))
+    const nutNop = (
+      <button type="button" className="tlu-nut-chinh" onClick={nop} disabled={dangNop}>
+        {dangNop ? 'Đang chấm…' : 'Nộp bài'}
+      </button>
+    )
+    const dauLam = (
+      <div className="tlu-hang">
+        <button type="button" className="tlu-ve" aria-label="Bỏ bài, về chọn chế độ" onClick={boBai}><IconVe /></button>
+        <div className="tlu-tieu-khoi">
+          <h1 className="tlu-tieu tlu-tieu-nho">{bai.tieuDe || TEN_CHE_DO[bai.cheDo]}</h1>
+          <p className="tlu-phu">Tu luyện · {TEN_CHE_DO[bai.cheDo]} · không tính EXP</p>
+        </div>
+      </div>
+    )
+    if (boCuc !== 'doc') {
+      return (
+        <div className="tlu tlu-rong" data-chang="lam" data-bo-cuc={boCuc}>
+          <KhungLamRong
+            boCuc={boCuc}
+            dau={dauLam}
+            nhom={nhomTheoPhan(bai.cau, bai.traLoi)}
+            domId={domIdLam}
+            gocCuon={null}
+            dongHo={<b className="tlu-ben-lon"><DongHo giayRef={giayRef} /></b>}
+            nhanDongHo="Thời gian làm"
+            daLam={daLam}
+            tong={bai.cau.length}
+            loi={loi ? <p className="tlu-loi-nho" role="alert">{loi}</p> : null}
+            nutNop={nutNop}
+            onChon={traLoi}
+          >
+            <div className="tlu-ds-cau">{theCau}</div>
+          </KhungLamRong>
+        </div>
+      )
+    }
     return (
       <div className="tlu" data-chang="lam">
         <header className="tlu-dau tlu-dau-lam">
-          <div className="tlu-hang">
-            <button type="button" className="tlu-ve" aria-label="Bỏ bài, về chọn chế độ" onClick={boBai}><IconVe /></button>
-            <div className="tlu-tieu-khoi">
-              <h1 className="tlu-tieu tlu-tieu-nho">{bai.tieuDe || TEN_CHE_DO[bai.cheDo]}</h1>
-              <p className="tlu-phu">Tu luyện · {TEN_CHE_DO[bai.cheDo]} · không tính EXP</p>
-            </div>
-          </div>
+          {dauLam}
           <div className="tlu-tien-do" role="progressbar" aria-label="Số câu đã làm" aria-valuemin={0} aria-valuemax={bai.cau.length} aria-valuenow={daLam}>
             <span style={{ transform: `scaleX(${bai.cau.length ? daLam / bai.cau.length : 0})` }} />
           </div>
         </header>
-        <main className="tlu-than tlu-ds-cau">
-          {bai.cau.map((c, i) => (
-            <article key={c.qid} className="tlu-the-cau m3" onFocusCapture={() => { cauDangNhin.current = c.qid }} onPointerDown={() => { cauDangNhin.current = c.qid }}>
-              <div className="tlu-the-cau-dau">
-                <span className="tlu-so-cau">Câu {i + 1}</span>
-                <span className="tlu-nhan">{NHAN_PHAN_TU_LUYEN[c.phan]}</span>
-                {c.sao > 0 && <span className="tlu-nhan" data-kieu="sao">{c.sao} sao</span>}
-                {c.tenDang && <span className="tlu-nhan tlu-nhan-dang">{c.tenDang}</span>}
-              </div>
-              <TheCauLam cau={c} stt={i + 1} giaTri={bai.traLoi[c.qid]} onDoi={(v) => traLoi(c.qid, v)} />
-              <NutHoiThay qid={c.qid} nguon="tu_luyen" gon onHoi={() => setBai((b) => (b && !b.coGoiY.includes(c.qid) ? { ...b, coGoiY: [...b.coGoiY, c.qid] } : b))} />
-            </article>
-          ))}
-        </main>
+        <main className="tlu-than tlu-ds-cau">{theCau}</main>
         <footer className="tlu-thanh-nop">
           <div className="tlu-thanh-nop-trong">
             <div className="tlu-thanh-so">
@@ -322,9 +406,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
               <span>câu đã làm · <DongHo giayRef={giayRef} /></span>
             </div>
             {loi && <p className="tlu-loi-nho" role="alert">{loi}</p>}
-            <button type="button" className="tlu-nut-chinh" onClick={nop} disabled={dangNop}>
-              {dangNop ? 'Đang chấm…' : 'Nộp bài'}
-            </button>
+            {nutNop}
           </div>
         </footer>
       </div>
@@ -336,12 +418,17 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const lopHT = nguon?.danhMuc.find((l) => l.lop === lop3)
   const baiHT = lopHT?.bais.find((b) => b.tenBai === bai3)
   const tongXt = xt && xt.khoa === khoaXt ? xt : null
-  const soCauChon = cheDo === 1 ? (nguon?.cacCa.filter((c) => caChon1.has(c.maCa)).reduce((n, c) => n + c.soCauSai, 0) ?? 0) : cheDo === 2 ? soCau2 : cheDo === 3 ? soCau3 : soCau4
-  const coTheBatDau = !!cheDo && !khoa && !dangRut && (cheDo === 1 ? soCauChon > 0 : !!tongXt && !tongXt.dang && tongXt.tong > 0 && soCauChon > 0)
+  // Chế độ 1 (luật 30/09): kho câu sai từ 29/09 do máy chủ gom (máy chủ bản cũ chưa gửi ⇒ tạm dùng tổng câu sai của các ca).
+  const khoSai = nguon?.khoCauSai ?? null
+  const n1 = khoSai ? khoSai.tong : nguon?.soCauSai ?? 0
+  const tran1 = Math.min(100, 2 * n1)
+  const soCauChon = cheDo === 1 ? Math.min(soCau1, tran1) : cheDo === 2 ? soCau2 : cheDo === 3 ? soCau3 : soCau4
+  const coTheBatDau = !!cheDo && !khoa && !dangRut && (cheDo === 1 ? n1 > 0 && soCauChon > 0 : !!tongXt && !tongXt.dang && tongXt.tong > 0 && soCauChon > 0)
 
   const khoaCheDo = (m: CheDoTuLuyen): string => {
     if (!nguon) return ''
-    if ((m === 1 || m === 2 || m === 4) && nguon.cacCa.length === 0) return 'Chưa có câu sai ở ca đã công bố'
+    if (m === 1 && n1 === 0) return khoSai?.loi || 'Từ 29/09 em chưa có câu sai nào'
+    if ((m === 2 || m === 4) && nguon.cacCa.length === 0) return 'Chưa có câu sai ở ca đã công bố'
     if (m === 3 && nguon.danhMuc.length === 0) return nguon.loiDanhMuc || 'Kho chưa có dạng bài'
     return ''
   }
@@ -357,114 +444,221 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   )
   const nhanXt = tongXt?.dang ? <p className="tlu-ghi" role="status">Đang đếm câu trong kho…</p> : tongXt?.loi ? <p className="tlu-ghi" data-kieu="loi">{tongXt.loi}</p> : null
 
+  // Hai cột khi màn rộng: TRÁI = chọn nguồn (ca / lớp–bài–dạng / loại câu), PHẢI = số câu + nút bắt đầu. Màn dọc: hai khối `display: contents` ⇒ y như cũ.
   const bangCheDo = cheDo && (
     <section className="tlu-cau-hinh" aria-label={`Cài đặt ${TEN_CHE_DO[cheDo]}`}>
-      {cheDo === 1 && (
-        <>
-          <h2 className="tlu-muc">Chọn ca kiểm tra</h2>
-          <div className="tlu-ds-chon">
-            {nguon?.cacCa.map((c) => (
-              <label key={c.maCa} className="tlu-o-chon">
-                <input type="checkbox" checked={caChon1.has(c.maCa)} onChange={() => setCaChon1((s) => { const n = new Set(s); if (n.has(c.maCa)) n.delete(c.maCa); else n.add(c.maCa); return n })} />
-                <span className="tlu-o-chon-chu">{c.tenCa}</span>
-                <span className="tlu-o-chon-so tlu-tab">{c.soCauSai} câu sai</span>
-              </label>
-            ))}
-          </div>
-          <p className="tlu-ghi">Bỏ câu tự luận. Mỗi câu hiện lại nguyên đề, em tự làm lại rồi xem lời giải.</p>
-        </>
-      )}
-      {cheDo === 2 && (
-        <>
-          <h2 className="tlu-muc">Lấy câu sai từ ca nào</h2>
-          <div className="tlu-ds-chon">
-            {nguon?.cacCa.map((c) => (
-              <label key={c.maCa} className="tlu-o-chon">
-                <input type="checkbox" checked={caChon2.has(c.maCa)} onChange={() => setCaChon2((s) => { const n = new Set(s); if (n.has(c.maCa)) n.delete(c.maCa); else n.add(c.maCa); return n })} />
-                <span className="tlu-o-chon-chu">{c.tenCa}</span>
-                <span className="tlu-o-chon-so tlu-tab">{c.soCauSai} câu sai</span>
-              </label>
-            ))}
-          </div>
-          {tongXt && tongXt.thongKe.length > 0 && (
-            <ul className="tlu-ds-dang-sai" aria-label="Dạng câu sai của em">
-              {tongXt.thongKe.slice(0, 6).map((t) => (
-                <li key={t.tenDang}><span>{t.tenDang || 'Chưa gắn dạng'}</span><span className="tlu-tab">{t.soCauSai} câu sai · kho có {t.soUngVien} câu</span></li>
+      <div className="tlu-ch-trai">
+        {rong && <p className="tlu-ch-ten"><span className="tlu-ch-icon" data-che-do={cheDo}><IconCheDo cheDo={cheDo} /></span>{TEN_CHE_DO[cheDo]}</p>}
+        {cheDo === 1 && (
+          <>
+            <h2 className="tlu-muc">Kho câu sai của em</h2>
+            <div className="tlu-kho-sai" role="status">
+              <b className="baloo tlu-tab">{n1}</b>
+              <span className="tlu-kho-sai-chu">
+                <span>câu sai từ 29/09</span>
+                {khoSai && <span className="tlu-tab">{khoSai.tuCa} từ ca kiểm tra · {khoSai.tuChienDich} từ chiến dịch</span>}
+              </span>
+            </div>
+            <p className="tlu-ghi">Cộng dồn mọi câu em làm sai ở ca kiểm tra và chiến dịch từ 29/09. Câu em chưa luyện được lấy trước nên mỗi lượt một bộ câu khác; câu khó và câu dễ xếp xen kẽ. Bỏ câu tự luận.</p>
+          </>
+        )}
+        {cheDo === 2 && (
+          <>
+            <h2 className="tlu-muc">Lấy câu sai từ ca nào</h2>
+            <div className="tlu-ds-chon">
+              {nguon?.cacCa.map((c) => (
+                <label key={c.maCa} className="tlu-o-chon">
+                  <input type="checkbox" checked={caChon2.has(c.maCa)} onChange={() => setCaChon2((s) => { const n = new Set(s); if (n.has(c.maCa)) n.delete(c.maCa); else n.add(c.maCa); return n })} />
+                  <span className="tlu-o-chon-chu">{c.tenCa}</span>
+                  <span className="tlu-o-chon-so tlu-tab">{c.soCauSai} câu sai</span>
+                </label>
               ))}
-            </ul>
-          )}
-          {nhanXt}
-          {thanhChon(soCau2, setSoCau2, 1, tongXt?.tong ?? 0)}
-          <p className="tlu-ghi">Số câu mỗi dạng chia theo tỉ lệ câu em sai ở dạng đó.</p>
-        </>
-      )}
-      {cheDo === 3 && nguon && (
-        <>
-          <h2 className="tlu-muc">Lớp</h2>
-          <div className="tlu-chip-hang" role="radiogroup" aria-label="Lớp">
-            {nguon.danhMuc.map((l) => (
-              <button key={l.lop} type="button" role="radio" aria-checked={lop3 === l.lop} className="tlu-chip" onClick={() => {
-                setLop3(l.lop)
-                const b = l.bais[0]
-                setBai3(b?.tenBai ?? '')
+            </div>
+            {tongXt && tongXt.thongKe.length > 0 && (
+              <ul className="tlu-ds-dang-sai" aria-label="Dạng câu sai của em">
+                {tongXt.thongKe.slice(0, 6).map((t) => (
+                  <li key={t.tenDang}><span>{t.tenDang || 'Chưa gắn dạng'}</span><span className="tlu-tab">{t.soCauSai} câu sai · kho có {t.soUngVien} câu</span></li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+        {cheDo === 3 && nguon && (
+          <>
+            <h2 className="tlu-muc">Lớp</h2>
+            <div className="tlu-chip-hang" role="radiogroup" aria-label="Lớp">
+              {nguon.danhMuc.map((l) => (
+                <button key={l.lop} type="button" role="radio" aria-checked={lop3 === l.lop} className="tlu-chip" onClick={() => {
+                  setLop3(l.lop)
+                  const b = l.bais[0]
+                  setBai3(b?.tenBai ?? '')
+                  setDang3(new Set(b?.dangs[0] ? [b.dangs[0].ma] : []))
+                }}>Lớp {l.lop}</button>
+              ))}
+            </div>
+            <h2 className="tlu-muc"><label htmlFor="tlu-bai">Bài</label></h2>
+            <div className="tlu-chon-bai">
+              <select id="tlu-bai" value={bai3} onChange={(e) => {
+                setBai3(e.target.value)
+                const b = lopHT?.bais.find((x) => x.tenBai === e.target.value)
                 setDang3(new Set(b?.dangs[0] ? [b.dangs[0].ma] : []))
-              }}>Lớp {l.lop}</button>
-            ))}
-          </div>
-          <h2 className="tlu-muc"><label htmlFor="tlu-bai">Bài</label></h2>
-          <div className="tlu-chon-bai">
-            <select id="tlu-bai" value={bai3} onChange={(e) => {
-              setBai3(e.target.value)
-              const b = lopHT?.bais.find((x) => x.tenBai === e.target.value)
-              setDang3(new Set(b?.dangs[0] ? [b.dangs[0].ma] : []))
-            }}>
-              {lopHT?.bais.map((b) => <option key={b.tenBai} value={b.tenBai}>{b.tenBai}</option>)}
-            </select>
-          </div>
-          <h2 className="tlu-muc">Dạng bài <span className="tlu-muc-phu">chọn được nhiều dạng</span></h2>
-          <div className="tlu-ds-chon">
-            {baiHT?.dangs.map((d) => (
-              <label key={d.ma} className="tlu-o-chon">
-                <input type="checkbox" checked={dang3.has(d.ma)} onChange={() => setDang3((s) => { const n = new Set(s); if (n.has(d.ma)) n.delete(d.ma); else n.add(d.ma); return n })} />
-                <span className="tlu-o-chon-chu">{d.ten}</span>
-              </label>
-            ))}
-          </div>
-          {nhanXt}
-          {thanhChon(soCau3, setSoCau3, Math.min(5, tongXt?.tong ?? 5), Math.min(50, tongXt?.tong ?? 0))}
-        </>
-      )}
-      {cheDo === 4 && (
-        <>
-          <h2 className="tlu-muc">Loại câu</h2>
-          <div className="tlu-chip-hang" role="group" aria-label="Loại câu">
-            {LUA_CHON_TU_DO.map((m) => (
-              <button key={m.id} type="button" aria-pressed={mucDo4.has(m.id)} className="tlu-chip" onClick={() => setMucDo4((prev) => {
-                // Đúng luật chọn của khối cũ: "Ngẫu nhiên" loại trừ mọi lựa chọn khác; bỏ hết ⇒ về "Ngẫu nhiên".
-                if (m.id === 'ngau_nhien') return new Set(['ngau_nhien'])
-                const s = new Set(prev)
-                s.delete('ngau_nhien')
-                if (s.has(m.id)) s.delete(m.id)
-                else s.add(m.id)
-                if (s.size === 0) s.add('ngau_nhien')
-                return s
-              })}>{m.ten}</button>
-            ))}
-          </div>
-          {nhanXt}
-          {thanhChon(soCau4, setSoCau4, 1, Math.min(50, tongXt?.tong ?? 0))}
-          <p className="tlu-ghi">Rút từ kho câu cùng chuyên đề với các câu em từng sai.</p>
-        </>
-      )}
-      {loi && <p className="tlu-ghi" data-kieu="loi" role="alert">{loi}</p>}
-      <button type="button" className="tlu-nut-chinh tlu-nut-rong" disabled={!coTheBatDau} onClick={() => batDau()}>
-        {dangRut ? 'Đang rút câu…' : cheDo === 1 ? `Làm lại ${soCauChon} câu sai` : `Bắt đầu luyện · ${soCauChon} câu`}
-      </button>
+              }}>
+                {lopHT?.bais.map((b) => <option key={b.tenBai} value={b.tenBai}>{b.tenBai}</option>)}
+              </select>
+            </div>
+            <h2 className="tlu-muc">Dạng bài <span className="tlu-muc-phu">chọn được nhiều dạng</span></h2>
+            <div className="tlu-ds-chon">
+              {baiHT?.dangs.map((d) => (
+                <label key={d.ma} className="tlu-o-chon">
+                  <input type="checkbox" checked={dang3.has(d.ma)} onChange={() => setDang3((s) => { const n = new Set(s); if (n.has(d.ma)) n.delete(d.ma); else n.add(d.ma); return n })} />
+                  <span className="tlu-o-chon-chu">{d.ten}</span>
+                </label>
+              ))}
+            </div>
+          </>
+        )}
+        {cheDo === 4 && (
+          <>
+            <h2 className="tlu-muc">Loại câu</h2>
+            <div className="tlu-chip-hang" role="group" aria-label="Loại câu">
+              {LUA_CHON_TU_DO.map((m) => (
+                <button key={m.id} type="button" aria-pressed={mucDo4.has(m.id)} className="tlu-chip" onClick={() => setMucDo4((prev) => {
+                  // Đúng luật chọn của khối cũ: "Ngẫu nhiên" loại trừ mọi lựa chọn khác; bỏ hết ⇒ về "Ngẫu nhiên".
+                  if (m.id === 'ngau_nhien') return new Set(['ngau_nhien'])
+                  const s = new Set(prev)
+                  s.delete('ngau_nhien')
+                  if (s.has(m.id)) s.delete(m.id)
+                  else s.add(m.id)
+                  if (s.size === 0) s.add('ngau_nhien')
+                  return s
+                })}>{m.ten}</button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="tlu-ch-phai">
+        {cheDo === 1 && (
+          <>
+            {thanhChon(soCauChon, setSoCau1, 1, tran1)}
+            {soCauChon > n1 ? (
+              <p className="tlu-ghi" data-kieu="lap" role="status">Em chọn nhiều hơn kho {n1} câu: sẽ có {soCauChon - n1} câu lặp lại trong lượt này.</p>
+            ) : (
+              <p className="tlu-ghi">Kéo quá {n1} câu nếu em muốn luyện lặp (mỗi câu tối đa 2 lần trong một lượt).</p>
+            )}
+          </>
+        )}
+        {cheDo === 2 && (
+          <>
+            {nhanXt}
+            {thanhChon(soCau2, setSoCau2, 1, tongXt?.tong ?? 0)}
+            <p className="tlu-ghi">Số câu mỗi dạng chia theo tỉ lệ câu em sai ở dạng đó.</p>
+          </>
+        )}
+        {cheDo === 3 && nguon && (
+          <>
+            {nhanXt}
+            {thanhChon(soCau3, setSoCau3, Math.min(5, tongXt?.tong ?? 5), Math.min(50, tongXt?.tong ?? 0))}
+          </>
+        )}
+        {cheDo === 4 && (
+          <>
+            {nhanXt}
+            {thanhChon(soCau4, setSoCau4, 1, Math.min(50, tongXt?.tong ?? 0))}
+            <p className="tlu-ghi">Rút từ kho câu cùng chuyên đề với các câu em từng sai.</p>
+          </>
+        )}
+        {loi && <p className="tlu-ghi" data-kieu="loi" role="alert">{loi}</p>}
+        <button type="button" className="tlu-nut-chinh tlu-nut-rong" disabled={!coTheBatDau} onClick={() => batDau()}>
+          {dangRut ? 'Đang rút câu…' : cheDo === 1 ? `Luyện ${soCauChon} câu sai` : `Bắt đầu luyện · ${soCauChon} câu`}
+        </button>
+      </div>
     </section>
   )
 
+  /** Số liệu nhanh có nhãn trên thẻ (chỉ màn ngang / máy tính). */
+  const soLieuThe = (m: CheDoTuLuyen): { so: string; nhan: string }[] => {
+    const daLuyen = tomTat?.theoCheDo[m]
+    const luot = daLuyen && daLuyen.soLuot > 0 ? [{ so: pt(daLuyen.tiLe), nhan: `đúng · ${daLuyen.soLuot} lượt đã luyện` }] : []
+    if (!nguon) return luot
+    if (m === 1) return [{ so: String(n1), nhan: 'câu sai từ 29/09' }, ...luot]
+    if (m === 2) return [{ so: String(nguon.soCauSai), nhan: `câu sai ở ${nguon.cacCa.length} ca kiểm tra` }, ...luot]
+    if (m === 3) {
+      const soDang = nguon.danhMuc.reduce((t, l) => t + l.bais.reduce((u, b) => u + b.dangs.length, 0), 0)
+      return [{ so: String(soDang), nhan: `dạng bài · ${nguon.danhMuc.length} lớp` }, ...luot]
+    }
+    return [{ so: '50', nhan: 'câu tối đa mỗi lượt' }, ...luot]
+  }
+  const ldDaNop = (dieuKien?.items ?? []).filter((x) => x.status === 'submitted' && typeof x.score === 'number') as { score: number }[]
+  const ldKhoa = dieuKien?.trangThai === 'khoa'
+
+  const luoiRong = (
+    <div className="tlu-luoi-the">
+      <div className="tlu-luoi-the-nhom" role="radiogroup" aria-label="Chọn cách luyện">
+        {([1, 2, 3, 4] as CheDoTuLuyen[]).map((m) => {
+          const lyDoKhoa = khoaCheDo(m)
+          return (
+            <button key={m} type="button" role="radio" aria-checked={cheDo === m} className="tlu-the-che-do tlu-the-lon" data-che-do={m} disabled={!!lyDoKhoa} onClick={() => { setCheDo(m); setLoi('') }}>
+              <span className="tlu-the-hinh" aria-hidden="true"><IconCheDo cheDo={m} /></span>
+              <span className="tlu-the-dau">
+                <span className="tlu-the-che-do-icon"><IconCheDo cheDo={m} /></span>
+                {lyDoKhoa && <span className="tlu-the-khoa"><IconKhoaNho />Đang khoá</span>}
+              </span>
+              <span className="tlu-the-che-do-chu">
+                <span className="tlu-the-che-do-ten">{TEN_CHE_DO[m]}</span>
+                <span className="tlu-the-che-do-phu">{lyDoKhoa || MO_TA[m].phu}</span>
+              </span>
+              <span className="tlu-the-so">
+                {soLieuThe(m).map((x) => <span key={x.nhan} className="tlu-the-so-o"><b className="tlu-tab">{x.so}</b><span>{x.nhan}</span></span>)}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      <button type="button" className="tlu-the-che-do tlu-the-lon" data-che-do="th" onClick={() => setThePhu('tong-hop')}>
+        <span className="tlu-the-hinh" aria-hidden="true"><IconTongHop /></span>
+        <span className="tlu-the-dau"><span className="tlu-the-che-do-icon"><IconTongHop /></span></span>
+        <span className="tlu-the-che-do-chu">
+          <span className="tlu-the-che-do-ten">Tổng hợp</span>
+          <span className="tlu-the-che-do-phu">Tỉ lệ đúng theo tuần, dạng mạnh nhất, dạng cần luyện thêm</span>
+        </span>
+        <span className="tlu-the-so">
+          {tomTat && tomTat.soCau > 0 ? (
+            <>
+              <span className="tlu-the-so-o"><b className="tlu-tab">{pt(tomTat.tiLe)}</b><span>câu đúng</span></span>
+              <span className="tlu-the-so-o"><b className="tlu-tab">{tomTat.soLuot}</b><span>lượt đã nộp</span></span>
+            </>
+          ) : (
+            <span className="tlu-the-so-o"><span>{tomTat ? 'Chưa có lượt nào — nộp một lượt để xem' : 'Đang tải số liệu…'}</span></span>
+          )}
+        </span>
+      </button>
+      <button type="button" className="tlu-the-che-do tlu-the-lon" data-che-do="ld" data-khoa={ldKhoa ? 'true' : 'false'} onClick={() => setThePhu('luyen-de')}>
+        <span className="tlu-the-hinh" aria-hidden="true"><IconLuyenDeThe /></span>
+        <span className="tlu-the-dau">
+          <span className="tlu-the-che-do-icon"><IconLuyenDeThe /></span>
+          {ldKhoa ? <span className="tlu-the-khoa"><IconKhoaNho />Đang khoá</span> : dieuKien?.trangThai === 'mo' ? <span className="tlu-the-mo">Đã mở cho em</span> : null}
+        </span>
+        <span className="tlu-the-che-do-chu">
+          <span className="tlu-the-che-do-ten">Luyện đề cấu trúc</span>
+          <span className="tlu-the-che-do-phu">{ldKhoa ? dieuKien?.lyDo || 'Mục này đang khoá với em.' : '50 phút · 28 câu đúng cấu trúc đề Bộ'}</span>
+        </span>
+        <span className="tlu-the-so">
+          {ldDaNop.length > 0 ? (
+            <>
+              <span className="tlu-the-so-o"><b className="tlu-tab">{ldDaNop.length}</b><span>đề đã nộp</span></span>
+              <span className="tlu-the-so-o"><b className="tlu-tab">{ldDaNop[0]!.score.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}/10</b><span>điểm gần nhất</span></span>
+            </>
+          ) : (
+            <span className="tlu-the-so-o"><span>{dangTaiDk ? 'Đang kiểm tra quyền…' : 'Chưa có đề nào đã nộp'}</span></span>
+          )}
+        </span>
+      </button>
+    </div>
+  )
+
   return (
-    <div className="tlu" data-chang="chon">
+    <div className={rong ? 'tlu tlu-rong' : 'tlu'} data-chang="chon" data-bo-cuc={boCuc}>
       <header className="tlu-dau">
         <div className="tlu-hang">
           <button type="button" className="tlu-ve" aria-label="Về Sảnh" onClick={onVe}><IconVe /></button>
@@ -485,20 +679,22 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
       </header>
 
       {thePhu === 'luyen-de' ? (
-        <main className="tlu-than">
+        <main className="tlu-than" key="ld">
           <Suspense fallback={<div className="tlu-luoi-che-do" role="status" aria-label="Đang mở Luyện đề cấu trúc"><div className="tlu-xuong" /><div className="tlu-xuong" /></div>}>
             <LuyenDeCauTruc token={token} sbd={sbd} dieuKien={dieuKien} dangTaiDieuKien={dangTaiDk} onDoi={doiLuyenDe} />
           </Suspense>
         </main>
       ) : thePhu === 'tong-hop' ? (
-        <main className="tlu-than">
+        <main className="tlu-than" key="th">
           {loiXemLuot && <p className="tlu-bao" data-kieu="loi" role="alert">{loiXemLuot}</p>}
-          {dieuKien && <DiemLuyenDeTongHop items={dieuKien.items} onMo={() => setThePhu('luyen-de')} />}
+          {!rong && dieuKien && <DiemLuyenDeTongHop items={dieuKien.items} onMo={() => setThePhu('luyen-de')} />}
           <TongHopTuLuyen
             token={token}
             lamMoi={lamMoiTongHop}
             danhMuc={nguon?.danhMuc ?? []}
             dangMoLuot={dangMoLuot}
+            rong={rong}
+            luyenDe={rong && dieuKien ? <DiemLuyenDeTongHop items={dieuKien.items} onMo={() => setThePhu('luyen-de')} /> : null}
             onXemLuot={async (id) => {
               setDangMoLuot(id)
               setLoiXemLuot('')
@@ -516,7 +712,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
           />
         </main>
       ) : (
-        <main className="tlu-than">
+        <main className="tlu-than" key="luyen">
           {khoa && <p className="tlu-bao" data-kieu="khoa" role="status">Em đang có ca kiểm tra mở nên Tu luyện tạm khoá. Làm xong ca kiểm tra rồi luyện tiếp nhé.</p>}
           {dangTaiNguon && !nguon ? (
             <div className="tlu-luoi-che-do" aria-busy="true" role="status" aria-label="Đang tải">
@@ -527,6 +723,12 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
               <p>{loiNguon}</p>
               <button type="button" className="tlu-nut-phu" onClick={() => void napNguon()}>Thử lại</button>
             </div>
+          ) : rong ? (
+            <>
+              <h2 className="tlu-muc tlu-muc-dau">Chọn cách luyện</h2>
+              {luoiRong}
+              {cheDo ? bangCheDo : <p className="tlu-ghi tlu-ghi-giua">Chọn một cách luyện để bắt đầu. Làm xong em xem ngay đáp án, lời giải và tiến bộ của mình ở thẻ Tổng hợp.</p>}
+            </>
           ) : (
             <>
               <h2 className="tlu-muc tlu-muc-dau">Chọn cách luyện</h2>
@@ -553,6 +755,8 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     </div>
   )
 }
+
+const domIdLam = (qid: string) => `tlu-lam-${qid}`
 
 /** Ô đồng hồ tự vẽ lại mỗi giây (đọc ref) — phần còn lại của màn không vẽ lại. */
 function DongHo({ giayRef }: { giayRef: { current: number } }) {
@@ -648,65 +852,142 @@ function TheCauXem({ cau: c, kq, stt }: { cau: CauCongKhai; kq: KetQuaCau | unde
   return <TheCau {...chung} phan="III" selected={kq?.traLoi ?? ''} correct={kq?.dapAn || undefined} />
 }
 
-function ManKetQua({ kq, cau, onVe, onLuyenTiep, onTongHop }: { kq: KetQuaNop; cau: CauCongKhai[]; onVe: () => void; onLuyenTiep: () => void; onTongHop: () => void }) {
-  const [chiSai, setChiSai] = useState(false)
+function ManKetQua({ boCuc, kq, cau, onVe, onLuyenTiep, onTongHop }: { boCuc: BoCuc; kq: KetQuaNop; cau: CauCongKhai[]; onVe: () => void; onLuyenTiep: () => void; onTongHop: () => void }) {
+  const [loc, setLoc] = useState<LocXem>('tat')
   const theoQid = useMemo(() => new Map(kq.cau.map((k) => [k.qid, k])), [kq])
   const tiLe = kq.soCau ? Math.round((100 * kq.soDung) / kq.soCau) : 0
-  const ds = cau.map((c, i) => ({ c, i, k: theoQid.get(c.qid) })).filter((x) => !chiSai || !x.k?.dung)
+  const ds = cau.map((c, i) => ({ c, i, k: theoQid.get(c.qid) })).filter((x) => loc === 'tat' || (loc === 'sai' ? !x.k?.dung : !!x.k?.dung))
   const chuVi = 2 * Math.PI * 44
+  const rong = boCuc !== 'doc'
+  const domId = (qid: string) => `tlu-kq-${qid}`
+  const nhay = (qid: string) => {
+    const k = theoQid.get(qid)
+    if ((loc === 'sai' && k?.dung) || (loc === 'dung' && !k?.dung)) setLoc('tat')
+    setTimeout(() => cuonToiCau(domId(qid)), 30)
+  }
+
+  const vong = (
+    <span className="tlu-vong" role="img" aria-label={`Đúng ${kq.soDung} trên ${kq.soCau} câu`}>
+      <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true" focusable="false">
+        <circle cx="56" cy="56" r="44" className="tlu-vong-nen" strokeWidth="10" fill="none" />
+        <circle cx="56" cy="56" r="44" className="tlu-vong-dat" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${((chuVi * tiLe) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} transform="rotate(-90 56 56)" />
+      </svg>
+      <span className="tlu-vong-chu"><b className="baloo tlu-tab">{kq.soDung}/{kq.soCau}</b><span>câu đúng</span></span>
+    </span>
+  )
+  const diem = (
+    <section className="tlu-diem" aria-label="Kết quả lượt này">
+      {vong}
+      <dl className="tlu-diem-so">
+        <div><dt>Điểm lượt này</dt><dd className="tlu-tab">{kq.diem.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} / 10</dd></div>
+        <div><dt>Tỉ lệ đúng</dt><dd className="tlu-tab">{tiLe}%</dd></div>
+        <div><dt>Thời gian làm</dt><dd className="tlu-tab">{chuThoiGian(kq.giay)}</dd></div>
+      </dl>
+      <p className="tlu-ghi">Tu luyện không tính EXP và không đổi câu trong game.</p>
+    </section>
+  )
+  const soSai = kq.soCau - kq.soDung
+  const chip = (
+    <div className="tlu-chip-hang" role="group" aria-label="Lọc câu">
+      <button type="button" className="tlu-chip" aria-pressed={loc === 'tat'} onClick={() => setLoc('tat')}>Tất cả {kq.soCau} câu</button>
+      <button type="button" className="tlu-chip" aria-pressed={loc === 'sai'} onClick={() => setLoc('sai')}>Câu sai · {soSai}</button>
+      <button type="button" className="tlu-chip" aria-pressed={loc === 'dung'} onClick={() => setLoc('dung')}>Câu đúng · {kq.soDung}</button>
+    </div>
+  )
+  const danhSach = (
+    <div className="tlu-ds-cau">
+      {ds.length === 0 && <p className="tlu-ghi tlu-ghi-giua">{loc === 'sai' ? 'Không có câu sai nào. Em làm tốt lắm!' : 'Chưa có câu đúng nào trong lượt này — xem lời giải ở thẻ Câu sai rồi luyện lượt mới nhé.'}</p>}
+      {ds.map(({ c, i, k }) => (
+        <article key={c.qid} id={domId(c.qid)} className="tlu-the-cau m3" data-dung={k?.dung ? 'true' : 'false'}>
+          <div className="tlu-the-cau-dau">
+            <span className="tlu-so-cau">Câu {i + 1}</span>
+            <span className="tlu-nhan" data-kieu={k?.dung ? 'dung' : 'sai'}>{k?.dung ? 'Đúng' : c.phan === 'II' && k?.yDung ? `Đúng ${k.yDung}/4 ý` : 'Sai'}</span>
+            {c.tenDang && <span className="tlu-nhan tlu-nhan-dang">{c.tenDang}</span>}
+            <NhanLuyen c={c} />
+          </div>
+          {k?.anDapAn ? (
+            <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p>
+          ) : (
+            <TheCauXem cau={c} kq={k} stt={i + 1} />
+          )}
+          <NutHoiThay qid={qidGoc(c.qid)} nguon="tu_luyen" gon />
+        </article>
+      ))}
+    </div>
+  )
+  const nut = (
+    <div className="tlu-hang-nut">
+      <button type="button" className="tlu-nut-chinh" onClick={onLuyenTiep}>Luyện lượt mới</button>
+      <button type="button" className="tlu-nut-phu" onClick={onTongHop}>Xem tổng hợp</button>
+    </div>
+  )
+  const dau = (
+    <header className={rong ? 'tlu-dau tlu-dau-rong' : 'tlu-dau'}>
+      <div className="tlu-hang">
+        <button type="button" className="tlu-ve" aria-label="Về Sảnh" onClick={onVe}><IconVe /></button>
+        <div className="tlu-tieu-khoi">
+          <h1 className="tlu-tieu tlu-tieu-nho">Kết quả tu luyện</h1>
+          <p className="tlu-phu">{kq.tieuDe}</p>
+        </div>
+      </div>
+    </header>
+  )
+
+  if (rong) {
+    // Tóm tắt theo phần (biểu đồ thanh) + bản đồ câu: bên TRÁI dính; danh sách xem lại + lọc: bên PHẢI.
+    const kieu = (c: CauCongKhai): 'dung' | 'sai' | 'trong' | 'mot_phan' => {
+      const k = theoQid.get(c.qid)
+      if (k?.dung) return 'dung'
+      if (!String(k?.traLoi ?? '').replace(/-/g, '').trim()) return 'trong'
+      return c.phan === 'II' && (k?.yDung ?? 0) > 0 ? 'mot_phan' : 'sai'
+    }
+    const nhom = PHAN.map((p) => ({ phan: p, ten: NHAN_PHAN_TU_LUYEN[p], cau: cau.flatMap((c, i) => (c.phan === p ? [{ id: c.qid, so: i + 1, kieu: kieu(c) }] : [])) }))
+    return (
+      <div className="tlu tlu-rong" data-chang="ket-qua" data-bo-cuc={boCuc}>
+        {dau}
+        <div className="tlu-kq-luoi">
+          <aside className="tlu-kq-trai" aria-label="Tóm tắt kết quả">
+            {diem}
+            <section className="tlu-khoi" aria-labelledby="tlu-h-ban-do">
+              <h2 id="tlu-h-ban-do" className="tlu-muc">Bản đồ câu <span className="tlu-muc-phu">bấm một ô để xem lại câu đó</span></h2>
+              <BanDoKetQua nhom={nhom} onNhay={nhay} />
+            </section>
+            <section className="tlu-khoi" aria-labelledby="tlu-h-kq-phan">
+              <h2 id="tlu-h-kq-phan" className="tlu-muc">Theo phần</h2>
+              <ul className="tlu-ds-thanh">
+                {nhom.filter((n) => n.cau.length).map((n) => {
+                  const dung = n.cau.filter((c) => c.kieu === 'dung').length
+                  return (
+                    <li key={n.phan} className="tlu-hang-thanh">
+                      <div className="tlu-hang-thanh-dau">
+                        <span className="tlu-hang-thanh-nhan">Phần {n.phan} · {n.ten}</span>
+                        <span className="tlu-tab tlu-hang-thanh-so">{dung}/{n.cau.length} câu đúng</span>
+                      </div>
+                      <span className="tlu-thanh" aria-hidden="true"><span style={{ transform: `scaleX(${n.cau.length ? dung / n.cau.length : 0})` }} /></span>
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
+            {nut}
+          </aside>
+          <main className="tlu-kq-phai" aria-label="Xem lại từng câu">
+            <div className="tlu-kq-loc">{chip}</div>
+            {danhSach}
+          </main>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="tlu" data-chang="ket-qua">
-      <header className="tlu-dau">
-        <div className="tlu-hang">
-          <button type="button" className="tlu-ve" aria-label="Về Sảnh" onClick={onVe}><IconVe /></button>
-          <div className="tlu-tieu-khoi">
-            <h1 className="tlu-tieu tlu-tieu-nho">Kết quả tu luyện</h1>
-            <p className="tlu-phu">{kq.tieuDe}</p>
-          </div>
-        </div>
-      </header>
+      {dau}
       <main className="tlu-than">
-        <section className="tlu-diem" aria-label="Kết quả lượt này">
-          <span className="tlu-vong" role="img" aria-label={`Đúng ${kq.soDung} trên ${kq.soCau} câu`}>
-            <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true" focusable="false">
-              <circle cx="56" cy="56" r="44" className="tlu-vong-nen" strokeWidth="10" fill="none" />
-              <circle cx="56" cy="56" r="44" className="tlu-vong-dat" strokeWidth="10" fill="none" strokeLinecap="round" strokeDasharray={`${((chuVi * tiLe) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} transform="rotate(-90 56 56)" />
-            </svg>
-            <span className="tlu-vong-chu"><b className="baloo tlu-tab">{kq.soDung}/{kq.soCau}</b><span>câu đúng</span></span>
-          </span>
-          <dl className="tlu-diem-so">
-            <div><dt>Điểm lượt này</dt><dd className="tlu-tab">{kq.diem.toLocaleString('vi-VN', { maximumFractionDigits: 2 })} / 10</dd></div>
-            <div><dt>Tỉ lệ đúng</dt><dd className="tlu-tab">{tiLe}%</dd></div>
-            <div><dt>Thời gian làm</dt><dd className="tlu-tab">{chuThoiGian(kq.giay)}</dd></div>
-          </dl>
-          <p className="tlu-ghi">Tu luyện không tính EXP và không đổi câu trong game.</p>
-        </section>
-        <div className="tlu-chip-hang" role="group" aria-label="Lọc câu">
-          <button type="button" className="tlu-chip" aria-pressed={!chiSai} onClick={() => setChiSai(false)}>Tất cả {kq.soCau} câu</button>
-          <button type="button" className="tlu-chip" aria-pressed={chiSai} onClick={() => setChiSai(true)}>Câu sai · {kq.soCau - kq.soDung}</button>
-        </div>
-        <div className="tlu-ds-cau">
-          {ds.length === 0 && <p className="tlu-ghi tlu-ghi-giua">Không có câu sai nào. Em làm tốt lắm!</p>}
-          {ds.map(({ c, i, k }) => (
-            <article key={c.qid} className="tlu-the-cau m3" data-dung={k?.dung ? 'true' : 'false'}>
-              <div className="tlu-the-cau-dau">
-                <span className="tlu-so-cau">Câu {i + 1}</span>
-                <span className="tlu-nhan" data-kieu={k?.dung ? 'dung' : 'sai'}>{k?.dung ? 'Đúng' : c.phan === 'II' && k?.yDung ? `Đúng ${k.yDung}/4 ý` : 'Sai'}</span>
-                {c.tenDang && <span className="tlu-nhan tlu-nhan-dang">{c.tenDang}</span>}
-              </div>
-              {k?.anDapAn ? (
-                <p className="tlu-ghi">Câu này vừa vào một ca kiểm tra chưa công bố — đáp án và lời giải hiện lại sau khi thầy công bố điểm.</p>
-              ) : (
-                <TheCauXem cau={c} kq={k} stt={i + 1} />
-              )}
-              <NutHoiThay qid={c.qid} nguon="tu_luyen" gon />
-            </article>
-          ))}
-        </div>
-        <div className="tlu-hang-nut">
-          <button type="button" className="tlu-nut-chinh" onClick={onLuyenTiep}>Luyện lượt mới</button>
-          <button type="button" className="tlu-nut-phu" onClick={onTongHop}>Xem tổng hợp</button>
-        </div>
+        {diem}
+        {chip}
+        {danhSach}
+        {nut}
       </main>
     </div>
   )

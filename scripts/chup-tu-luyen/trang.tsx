@@ -74,6 +74,7 @@ function tongHopGia() {
 const MAY_CHU: Record<string, (b: Record<string, unknown>) => unknown> = {
   nguon: () => ({
     ok: true, khoi: 12, soCauSai: 17, loiCauSai: '', loiDanhMuc: '', dangThi: false,
+    khoCauSai: { tong: 23, tuCa: 15, tuChienDich: 8, loi: '' },
     cacCa: [{ maCa: 'C1', tenCa: 'Ca kiểm tra Ester – Lipid · 21/09', soCauSai: 9 }, { maCa: 'C2', tenCa: 'Ca kiểm tra Carbohydrate · 26/09', soCauSai: 8 }],
     danhMuc: [
       { lop: '11', bais: [{ tenBai: 'Bài 12. Alkane', dangs: [{ ma: 'DB-11-B12-D1', ten: 'Danh pháp alkane', soCau: 40 }] }] },
@@ -84,7 +85,9 @@ const MAY_CHU: Record<string, (b: Record<string, unknown>) => unknown> = {
     ],
   }),
   'xem-truoc': (b) => ({ ok: true, tongToiDa: b.cheDo === 2 ? 34 : b.cheDo === 3 ? 120 : 86, thongKe: b.cheDo === 2 ? [{ tenDang: 'Phản ứng thuỷ phân ester', soCauSai: 5, soUngVien: 22 }, { tenDang: 'Glucose và fructose', soCauSai: 4, soUngVien: 12 }] : undefined }),
-  rut: (b) => ({ ok: true, luotId: 'tl_gia000001', cheDo: b.cheDo, tieuDe: 'Dạng bài · Phản ứng thuỷ phân ester', taoLuc: now, tongToiDa: 120, cau: CAU }),
+  rut: (b) => b.cheDo === 1
+    ? { ok: true, luotId: 'tl_gia000001', cheDo: 1, tieuDe: 'Sửa câu sai · 5 câu', taoLuc: now, tongToiDa: 23, cau: CAU.map((c, i) => ({ ...c, nhanLuyen: ['Luyện lần đầu', 'Luyện lại lần 2', 'Luyện lần đầu', 'Luyện lại lần 3', 'Luyện lần đầu'][i], saiGoc: ['Sai gốc: Ca kiểm tra Ester – Lipid · 29/09', 'Sai gốc: Chiến dịch Ester – Lipid · Đoàn Hộ Tống · 30/09', 'Sai gốc: Bi-a · 30/09 và 1 lần khác', 'Sai gốc: Ca kiểm tra Carbohydrate · 29/09', 'Sai gốc: Đảo thần thú · 30/09'][i] })) }
+    : { ok: true, luotId: 'tl_gia000001', cheDo: b.cheDo, tieuDe: 'Dạng bài · Phản ứng thuỷ phân ester', taoLuc: now, tongToiDa: 120, cau: CAU },
   nop: () => {
     const cau = CAU.map((c) => {
       const tl = TRA_LOI_GIA[c.qid], da = DAP_AN[c.qid]

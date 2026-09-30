@@ -45,6 +45,8 @@ export interface NguonTuLuyen {
   danhMuc: LopDangBaiTL[]
   loiDanhMuc: string
   dangThi: boolean
+  /** Chế độ 1 (luật 30/09): kho câu sai từ 29/09 — ca kiểm tra + chiến dịch. Máy chủ cũ không gửi ⇒ null. */
+  khoCauSai: { tong: number; tuCa: number; tuChienDich: number; loi: string } | null
 }
 export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
   const j = await goi('nguon', token)
@@ -57,7 +59,9 @@ export async function taiNguon(token: string): Promise<KetQua<NguonTuLuyen>> {
       dangs: (Array.isArray(b.dangs) ? b.dangs : []).map((d: Obj) => ({ ma: chu(d.ma), ten: chu(d.ten), soCau: so(d.soCau) })),
     })),
   }))
-  return { ok: true, du: { cacCa, soCauSai: so(j.soCauSai), loiCauSai: chu(j.loiCauSai), danhMuc, loiDanhMuc: chu(j.loiDanhMuc), dangThi: j.dangThi === true } }
+  const k = j.khoCauSai && typeof j.khoCauSai === 'object' ? (j.khoCauSai as Obj) : null
+  const khoCauSai = k ? { tong: so(k.tong), tuCa: so(k.tuCa), tuChienDich: so(k.tuChienDich), loi: chu(k.loi) } : null
+  return { ok: true, du: { cacCa, soCauSai: so(j.soCauSai), loiCauSai: chu(j.loiCauSai), danhMuc, loiDanhMuc: chu(j.loiDanhMuc), dangThi: j.dangThi === true, khoCauSai } }
 }
 
 export interface ThamSoRut { cheDo: CheDoTuLuyen; soCau?: number; dsMaCa?: string[]; dsDang?: string[]; mucDo?: string[] }
