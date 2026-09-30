@@ -59,3 +59,7 @@ Chỉ triển khai khi người dùng yêu cầu. Cần chạy lại build/check
 `/workspace/bat-linh-preview/Bat-Linh-Xem-Giao-Dien.html` (~4,2 MB) chứa 37 ảnh chụp và bộ chọn 48 nét mặt, mọi ảnh nhúng sẵn. Đây là tài liệu xem thiết kế, không phải bản app tương tác đầy đủ. Đã kiểm tra các ảnh và nút biểu cảm khi browser không có mạng. Runtime Chromium cấm mở URL `file://`, nên kiểm thử nội dung bằng `setContent`; không khẳng định đã kiểm tra giao thức `file://` trên máy này.
 
 Thử gửi tệp qua Google Drive cũng bị từ chối: `ACCESS_TOKEN_SCOPE_INSUFFICIENT` / `insufficient authentication scopes` (403), không tạo được tệp Drive hay link tải. Cần cấu hình mạng cho Site hoặc cấp quyền tải tệp cho kết nối Drive qua quy trình chuẩn; không đi vòng giới hạn quyền.
+
+## Lệnh phát hành 2026-09-30 15:49 UTC
+
+Người dùng đã yêu cầu đẩy lên máy chủ app thật. Đã ghép lên main 4ee968a1 trong worktree riêng; mã giao diện 74bd9ec5. Kiểm tra bản ghép: build và SW 13/13 đạt, 104 kiểm tra trình duyệt đạt, các cổng biên dịch /hs /ph /?vai=gv mở đúng. Full suite 13.093 test có 129 lỗi; 127 lỗi tái hiện trên main, hai kiểm tra còn ràng buộc thiết kế cũ đã được cập nhật và chạy lại đạt. Các bản xem thử không nằm trong entry build phát hành. Dùng workflow hiện có `.github/workflows/deploy.yml`; giữ nguyên server/schema/dữ liệu. Mốc khôi phục: Pages a6fedac0 / main 4ee968a1.

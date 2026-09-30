@@ -254,7 +254,9 @@ describe('LogoDoc (khối thương hiệu dọc của màn đăng nhập)', () =
     for (const [t, v] of [['KhoaAppScreen', 'gv'], ['StudentPortalScreen', 'hs'], ['ParentPortalScreen', 'ph']] as const) {
       const c = doc(`src/screens/${t}.tsx`)
       expect(c, t).toContain("import { LogoDoc } from '../components/LogoVai'")
-      expect(c, t).toMatch(new RegExp(`<LogoDoc vai="${v}" size=\\{64\\}`))
+      // Bát Linh: logo HS/PH gọn 48 px, đặt cùng phần chào mới; logo GV giữ 64 px.
+      const co = v === 'gv' ? 64 : 48
+      expect(c, t).toMatch(new RegExp(`<LogoDoc vai="${v}" size=\\{${co}\\}`))
       expect(c, t).not.toContain('Kiên Trì')
     }
   })

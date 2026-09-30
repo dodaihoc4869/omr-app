@@ -89,8 +89,10 @@ describe('công tắc hiệu ứng nặng đọc chế độ máy yếu', () => 
     hat(cha, 10, 10, 12, ['rgb(255 255 255)'])
     expect(cha.childElementCount).toBe(0)
   })
-  it('thị sai Đảo 2.0 tắt theo cùng công tắc', () => {
-    expect(doc('src/game/than-thu-v2/dao2/CanhDao3D.tsx')).toMatch(/giamHieuUng\(\)\)return/)
+  it('Đảo sơn thủy không chạy thị sai hay vòng lặp JavaScript trên máy yếu', () => {
+    // Cảnh mới là tranh tĩnh + tiến độ; không còn bộ thị sai để bật/tắt.
+    const canh = doc('src/game/than-thu-v2/dao2/CanhDao3D.tsx')
+    expect(canh).not.toMatch(/requestAnimationFrame|setInterval|addEventListener|onPointerMove/)
   })
 })
 
