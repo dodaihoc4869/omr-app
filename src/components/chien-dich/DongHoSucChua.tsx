@@ -71,6 +71,11 @@ export default function DongHoSucChua({
         Em ở giữa lớp cần khoảng {khoiLuong} lượt{viSao} · có {sc.D} ngày × {theLuc} lượt/ngày = {sc.sucChua} lượt.
         {cauQuaTai}
       </p>
+      {sc.raiDeu && sc.cauMoiMoiNgay != null && (
+        <p className="cd-phu cd-so" data-khoi="rai-deu">
+          Rải đều: khoảng {sc.cauMoiMoiNgay} câu mới mỗi ngày trong {Math.max(1, sc.D - 3)} ngày đầu, 3 ngày cuối để ôn.
+        </p>
+      )}
       {noCu.length > 0 && (
         <ul className="cd-phu" data-khoi="no-cu">
           {noCu.slice(0, 5).map((x) => <li key={x.sbd}>{x.cau}.</li>)}

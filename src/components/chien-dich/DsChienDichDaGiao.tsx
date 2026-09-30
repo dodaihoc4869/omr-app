@@ -4,7 +4,7 @@
 // Số liệu lớp lấy từ `danh-sach` có `thongKe` (máy chủ cũ không gửi ⇒ ô số hiện "—"). "Xem bảng" / "Mở buổi chữa" mở đúng chiến dịch ở Chữa trên lớp.
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
-import { danhSachThongKe, dongChienDich, huyChienDich, type ChienDichTom } from './api'
+import { danhSachThongKe, doiRaiDeu, dongChienDich, huyChienDich, type ChienDichTom } from './api'
 import { KHOA_CHON_CHIEN_DICH } from './LenBangChienDich'
 import { hienNgay, phanTram } from './ngay'
 import SuaChienDich from './SuaChienDich'
@@ -108,6 +108,19 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
       return
     }
     showToast(viec === 'huy' ? 'Đã huỷ chiến dịch' : 'Đã kết thúc chiến dịch', 'success')
+    void tai()
+  }
+
+  // Công tắc rải đều câu mới (thầy 30/09) trên chiến dịch đang chạy: chỉ ghi cờ, có hiệu lực từ kế hoạch ngày mai (kế hoạch đã chốt hôm nay không đổi).
+  const doiRai = async (c: ChienDichTom, bat: boolean) => {
+    setDangLam(c.id)
+    const r = await doiRaiDeu(c.id, bat)
+    setDangLam('')
+    if (!r.ok) {
+      showToast(r.chu, 'warn')
+      return
+    }
+    showToast(bat ? 'Đã bật rải đều câu mới — áp dụng từ kế hoạch ngày mai' : 'Đã tắt rải đều câu mới — áp dụng từ kế hoạch ngày mai', 'success')
     void tai()
   }
 
@@ -292,6 +305,14 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                         <span className={`cd-chip-muc cd-chip-muc--${MAU_TRANG_THAI[tt]}`}>
                           {tt === 'sap_bat_dau' && c.batDau ? `${CHU_TRANG_THAI[tt]} · ${hienNgay(c.batDau, false)}` : CHU_TRANG_THAI[tt]}
                         </span>
+                        {c.trangThai === 'dang_chay' && !c.hetHan ? (
+                          <label className="cd-tich cd-phu" data-khoi="rai-deu">
+                            <input type="checkbox" role="switch" aria-label={`Rải đều câu mới · ${c.ten}`} aria-checked={c.raiDeu !== false} checked={c.raiDeu !== false} disabled={dangLam === c.id} onChange={(e) => void doiRai(c, e.target.checked)} />
+                            <span>Rải đều câu mới: {c.raiDeu !== false ? 'Bật' : 'Tắt'}</span>
+                          </label>
+                        ) : (
+                          c.raiDeu === false && <small className="cd-phu">Câu mới đổ theo sức</small>
+                        )}
                       </td>
                       <td>
                         <div className="cd-hang-nut cd-hang-nut--hep">

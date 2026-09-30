@@ -193,7 +193,9 @@ export default function BangChienDich({
             {lop.huyetChien}
             <small>em</small>
           </strong>
-          <span className="cd-kpi-phu cd-so">phải làm quá {cd.theLucNgay} lượt/ngày để kịp hạn</span>
+          <span className="cd-kpi-phu cd-so">
+            {cd.raiDeu === false ? 'Câu mới đổ theo sức · ' : 'Câu mới rải đều theo ngày · '}phải làm quá {cd.theLucNgay} lượt/ngày để kịp hạn
+          </span>
         </div>
         <div className="cd-kpi" data-mau="ho">
           <span className="cd-kpi-nhan">Cần thầy dạy lại</span>

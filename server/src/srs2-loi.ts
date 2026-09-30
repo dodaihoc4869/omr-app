@@ -224,6 +224,17 @@ export interface TuyChonKeHoach {
   hangTheoDang?: Readonly<Record<string, HangEm>>
   /** Hạng chung của em (gộp mọi dạng) cho dạng chưa có dữ liệu. Vắng ⇒ L2. */
   hangChung?: HangEm
+  /**
+   * RẢI ĐỀU CÂU MỚI THEO NGÀY (thầy chốt 30/09): bật ⇒ số câu MỚI mỗi ngày dừng đúng quota `ceil(số mới còn / (D − NGAY_DEM))`, KHÔNG đổ thêm câu mới
+   * cho đủ thể lực; lượt dư dồn cho nợ / củng cố / duy trì (tỉ lệ cũ), vẫn dư thì thôi. VẮNG ⇒ TẮT = hành vi cũ (đổ câu mới cho đầy thể lực);
+   * tầng đọc chiến dịch (`srs2-d1.ts`) quy chiến dịch không đặt (null) ⇒ BẬT.
+   */
+  raiDeu?: boolean
+  /**
+   * Số câu MỚI của kế hoạch hôm nay em ĐÃ LÀM (chỉ dùng khi `raiDeu`): lập LẠI kế hoạch giữa ngày (thay câu không phục vụ được) thì quota hôm nay
+   * trừ đi phần đã làm, không cộng dồn thêm câu mới. Vắng ⇒ 0.
+   */
+  moiDaLamHomNay?: number
 }
 
 export interface KeHoachNgay {
@@ -238,6 +249,8 @@ export interface KeHoachNgay {
   sucChua: number
   D: number
   tran: number
+  /** Công tắc rải đều câu mới đã áp cho kế hoạch này (chỉ-thêm, để chẩn đoán/test đọc). */
+  raiDeu: boolean
   catTia: string[]
 }
 
@@ -511,7 +524,7 @@ export function xepChuyenDao<T>(ds: readonly T[], laMoi: (x: T) => boolean, mucD
  * `daLamHomNay`: số câu của kế hoạch hôm nay em đã làm (trừ vào trần).
  * SỔ NỢ (thầy chốt 29/09): câu NỢ (mọi nguồn) tới lịch lấy TRƯỚC, trần 50% lượt khi chiến dịch còn câu mới (không chiến dịch ⇒ 100%),
  * xếp `soSanhNo`; câu mới lấy phần còn lại theo quota; rồi câu chiến dịch đã thành thạo tới lịch ôn chốt; ôn duy trì ≤ 20% và sau cùng;
- * còn chỗ ⇒ thêm câu mới, hết câu mới ⇒ thêm nợ. Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
+ * còn chỗ ⇒ thêm câu mới (trừ khi `raiDeu`: câu mới dừng đúng quota, thầy 30/09), hết câu mới ⇒ thêm nợ. Thứ tự phục vụ: đan xen theo sức em (`danXenNgay`).
  */
 export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<string, TrangThaiCau>, tc: TuyChonKeHoach, daLamHomNay = 0): KeHoachNgay {
   const tranNgay = tc.tranNgay ?? TRAN_NGAY
@@ -544,15 +557,21 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   // Trần nợ 50% khi chiến dịch còn câu mới chưa giao; không chiến dịch (hoặc hết câu mới) ⇒ nợ tới 100%.
   const tranNo = coChienDich && moi.length > 0 ? Math.floor(tran * TI_LE_TRAN_NO) : tran
   const layNo = Math.min(no.length, tranNo)
-  const quota = D > NGAY_DEM ? Math.ceil(moi.length / (D - NGAY_DEM)) : moi.length
+  // RẢI ĐỀU (thầy 30/09): quota hôm nay tính trên CẢ câu mới đã làm hôm nay (lập lại giữa ngày) rồi trừ phần đã làm (đã làm đủ ⇒ 0);
+  // lập đầu ngày (chưa làm) ⇒ ceil(...) ≥ 1 khi còn câu mới.
+  const raiDeu = tc.raiDeu === true
+  const daMoi = raiDeu ? Math.max(0, Math.floor(tc.moiDaLamHomNay ?? 0)) : 0
+  const quota = D > NGAY_DEM ? Math.max(0, Math.ceil((moi.length + daMoi) / (D - NGAY_DEM)) - daMoi) : moi.length
   const layMoi = Math.min(moi.length, quota, tran - layNo)
   const layCungCo = Math.min(cungCo.length, tran - layNo - layMoi)
   const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layNo - layMoi - layCungCo)
   let conDu = tran - layNo - layMoi - layCungCo - layDuyTri
-  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm); đã giao HẾT câu mới hôm nay mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
-  const themMoi = Math.min(Math.max(0, conDu), moi.length - layMoi)
+  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm) — TRỪ khi rải đều (câu mới dừng đúng quota, lượt dư để ôn);
+  // đã giao HẾT câu mới hôm nay (rải đều: đủ quota) mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
+  const themMoi = raiDeu ? 0 : Math.min(Math.max(0, conDu), moi.length - layMoi)
   conDu -= themMoi
-  const themNo = layMoi + themMoi >= moi.length ? Math.min(Math.max(0, conDu), no.length - layNo) : 0
+  const duMoiHomNay = layMoi + themMoi >= (raiDeu ? Math.min(moi.length, quota) : moi.length)
+  const themNo = duMoiHomNay ? Math.min(Math.max(0, conDu), no.length - layNo) : 0
   // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang`; số câu mới/ngày giữ nguyên quota.
   const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
   const thuTuMoi = tc.hangTheoDang ? bocCauMoiCaNhan(moi, layMoi, D > NGAY_DEM ? D - NGAY_DEM : 1, hangCua, cauChienDich) : moi
@@ -571,6 +590,7 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     D,
     tran: huyetChien ? tranHuyet : tranNgay,
     catTia,
+    raiDeu,
   }
 }
 

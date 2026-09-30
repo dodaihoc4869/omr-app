@@ -42,7 +42,8 @@ function fixture(soCau = 45) {
 }
 async function giao(env: Env) {
   const nay = Date.now()
-  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: new Date(nay + 5 * NGAY).toISOString().slice(0, 10) }, nay - 3 * NGAY)
+  // raiDeu:false (30/09): kiểm bàn Bi-a với kế hoạch đổ đầy thể lực (rải đều ⇒ chỉ 10 câu/ngày, trần bàn 4 < 8 bi)
+  const r = await gvChienDich(env, { action: 'tao', ten: 'Ester – Lipid', lop: '12A1', maDe: ['DE1'], hanNop: new Date(nay + 5 * NGAY).toISOString().slice(0, 10), raiDeu: false }, nay - 3 * NGAY)
   expect(r.ok).toBe(true)
 }
 const tran = (s: Record<string, unknown>) => s.tran as { con: number; tong: number }

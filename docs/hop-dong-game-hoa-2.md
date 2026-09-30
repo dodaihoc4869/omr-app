@@ -64,6 +64,7 @@ Hiển thị lời giải: **bắt buộc dùng khối LỜI GIẢI chuẩn củ
 | `suc-chua` | `lop` hoặc `sbd[]`, `maDe[]`, `hanNop`, `theLucNgay?` | `{ soCau, soEm, D, sucChua, khoiLuongTrungVi, tiLe, muc: xanh/vang/do, soEmQuaTai, goiY: { rutCon: {soCau, tiLe} \| null, luiHan: {hanNop, tiLe} \| null } \| null }` |
 | `tao` | như `suc-chua` + `ten`, `huyetChien?`, `maCa?`, `rutCon?` | `{ id, soCau, soEm }` (câu tự luận, câu chưa duyệt tự bỏ) |
 | `dong` / `huy` | `id` | `{ ok }` |
+| `rai-deu` (30/09) | `id`, `bat` (mặc định `true`) | `{ ok, id, raiDeu }` — CÔNG TẮC RẢI ĐỀU CÂU MỚI THEO NGÀY trên chiến dịch đang chạy: chỉ ghi cờ vào bảng phụ `chien_dich_tuy_chon` (chỉ-thêm, tạo lúc chạy) + xoá đệm; KHÔNG đụng `srs2_ke_hoach` ⇒ kế hoạch đã chốt hôm nay giữ nguyên, hiệu lực từ kế hoạch ngày kế tiếp. Không có dòng ⇒ BẬT (chiến dịch cũ đang chạy cũng bật). `id` không có ⇒ `ok:false`. |
 | `bang` | `id` | `{ chienDich, homNay, hetHan, lop: { coXat, thanhThao, huyetChien, canDayLaiCau, canDayLaiLuot }, dang[], em: [ { sbd, ten, coXat, thanhThao, canDayLai, treNhip, huyetChien, theoDang: { <dạng>: tỉ lệ 0–1 \| null }, hangTheoDang: { <dạng>: "L1"\|"L2"\|"L3"\|"L4" } } ], canDayLai: [ { qid, stt, dang, soEm } ] }` |
 | `buoi-chua` | `id`, `coMat[]?` | `{ chienDich, hetHan, soEm, lop: { coXat, thanhThao }, cau: [ { qid, stt, dang, phan, mucDo, soChuaThanhThao, soCanDayLai, diemChua, giaiMau: {sbd, ten} \| null, emSua: [ {sbd, ten} ] } ] }` — mỗi dạng 1 câu, giảm dần theo điểm chữa = chưa thành thạo + 2 × cần dạy lại |
 | `chua-xong` | `id`, `qids[]?` | `{ soLuot, ngayOnLai }` — câu cần dạy lại về Đoàn Hộ Tống từ hôm sau |
@@ -80,3 +81,18 @@ Lỗi: `{ ok:false, error:"<tiếng Việt>" }`.
   - Mọi câu mới giao hết trước ngày D − 3 (ép chín giữ nguyên). Mức câu: NB/Nhận biết/biet = 0 … VDC/Vận dụng cao/van_dung_cao = 3.
 - **Thứ tự trong ngày**: có nhóm L3/L4 ⇒ rải đều các mức (mỗi chuyến 6 câu có câu dễ và câu khó). **Trong chuyến Đảo** (`xepChuyenDao`): câu ôn Đúng–sai trước; câu mới dễ → khó ⇒ ải 1–2 dễ nhất, ải 6 (`vai:"trum"`) khó nhất.
 - `chan-doan-em` trả thêm `hangTheoDang`, `hangChung`.
+
+## Rải đều câu mới theo ngày (thầy chốt 30/09/2026)
+
+- Trường `raiDeu` (boolean) trả kèm ở `danh-sach`, `bang.chienDich`, `/gv/chien-dich/sua doc`, `chan-doan-em.chienDichDangChay`; nhận ở `tao` và `suc-chua` (vắng ⇒ `true`).
+- BẬT: số câu MỚI mỗi ngày dừng đúng quota = ceil(số câu mới còn / (D − 3)); KHÔNG đổ thêm câu mới cho đủ số lượt mỗi ngày; lượt dư dồn nợ / củng cố / duy trì (tỉ lệ cũ), vẫn dư thì thôi — ngày ngắn hơn là bình thường (Rương theo `tong` của ngày). D ≤ 3 vẫn đổ hết câu mới. Quá tải hôm nay (trần gấp đôi) chỉ nới nợ/ôn.
+- TẮT: y hệt trước 30/09 (đổ câu mới cho đầy số lượt).
+- `suc-chua` thêm `raiDeu` + `cauMoiMoiNgay` = ceil(câu mới của em giữa lớp / max(1, D − 3)) (chỉ để hiện; `tiLe/muc/sucChua` không đổi).
+- Lập lại kế hoạch giữa ngày (sửa chiến dịch / câu không phục vụ được): quota hôm nay trừ số câu mới đã làm (`TuyChonKeHoach.moiDaLamHomNay`), không cộng dồn.
+
+## Câu không phục vụ được trong kế hoạch đã chốt (sửa lỗi 30/09 "Chưa tải được câu hôm nay", rương kẹt 48/49)
+
+- `MetaCau.tuLuan` (một chỗ dùng chung, `docMetaCau`): cờ `tuLuan` của chỉ mục HOẶC luật `lyDoTuLuan` trên phần rút gọn. Câu tự luận không vào `hoSo.cau` ⇒ không vào kế hoạch, không đếm thể lực/rương/trần Bi-a. Dòng JSON hỏng hoặc không mang đúng `qid`/`version` ⇒ coi như đã rút khỏi kho.
+- Kế hoạch đã chốt còn câu tự luận / rút khỏi kho ⇒ LẬP LẠI bằng cơ chế sẵn có (giữ câu đã làm; thay bằng câu hợp lệ theo luật ngày & quota rải đều); `tamHoan` thêm `tuLuan` cho trường hợp không lập lại.
+- Lượt Đảo/Đoàn rỗng: ca ⇒ `cau_dang_bao_ve`; bàn Bi-a ⇒ `cau_dang_o_bia`; toàn bộ câu còn lại tự luận/vắng ⇒ `xong_ke_hoach` / `xong_on_hom_nay` (không lộ lý do); D1 ném khi nạp lô ⇒ `chua_nap_duoc` + một dòng `nhat_ky_may` nguồn `nap_cau_game`.
+

@@ -249,7 +249,7 @@ async function doc(env: Env, b: Row, nowMs: number) {
   const nk = await env.DB.prepare('SELECT luc, ai, tom_tat FROM chien_dich_sua WHERE chien_dich_id = ? ORDER BY luc DESC LIMIT 20').bind(cd.id).all<Row>().catch(() => ({ results: [] as Row[] }))
   return {
     ok: true, homNay,
-    chienDich: { id: cd.id, ten: cd.ten, lop: cd.lop, maDe: cd.maDe, sbd: cd.sbd, hanNop: cd.hanNop, theLucNgay: cd.theLucNgay, trangThai: cd.trangThai, soCau: cd.qids.length, soEm: cd.sbd.length, hetHan: cd.hanNop < homNay, batDau: cd.batDau, daBatDau: !chuaBatDau(cd, homNay) },
+    chienDich: { id: cd.id, ten: cd.ten, lop: cd.lop, maDe: cd.maDe, sbd: cd.sbd, hanNop: cd.hanNop, theLucNgay: cd.theLucNgay, trangThai: cd.trangThai, soCau: cd.qids.length, soEm: cd.sbd.length, hetHan: cd.hanNop < homNay, batDau: cd.batDau, daBatDau: !chuaBatDau(cd, homNay), raiDeu: cd.raiDeu },
     nhatKy: (nk.results ?? []).map((x) => ({ luc: str(x.luc), ai: str(x.ai), tomTat: str(x.tom_tat) })),
   }
 }
