@@ -179,3 +179,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 30/09 20:50 VN · phiên chính · PR #112 Thử sức thêm sẵn (cf1bd4c, chưa gộp, gộp sáng 01/10) · bản vẽ thử Bi-a mới cho thầy chốt: artifact HrJ8TQewddXp2NJuZRgbXV
 - 30/09 20:55 VN · thầy CHỐT bản vẽ thử Bi-a (HrJ8TQewddXp2NJuZRgbXV) · làn claude/bia-dieu-khien-3009 làm đúng như bản vẽ
 - 30/09 20:55 VN · thầy: đẩy trước 23:00 đêm nay (thầy cho phép ngoại lệ khung 20–24h) · PR #112 đã kiểm: merge sạch, tsc sạch, 449 test chỉ đỏ nền (bi-a G11, dau-truong ×2) + CauDaLam chập chờn do tải (chạy riêng xanh) · gộp đợt 22:12
+- 30/09 21:2x VN · PR #113 tối ưu Bi-a (e42f159) đã kiểm: merge sạch với main và #112, tsc sạch, 185 test bi-a chỉ đỏ nền G11 · chờ gộp đợt 22:12
