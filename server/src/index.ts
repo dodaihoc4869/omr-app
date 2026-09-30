@@ -536,7 +536,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     env.DB.prepare(
       `UPDATE luot SET nop_luc = ?, trang_thai = ?, dap_an_json = ?, giay_cau_json = ?,
               integrity_json = ?, so_lan_roi_man = ?, tong_giay_roi_man = ?, cap_nhat_luc = ?, da_day_sheet = 0
-       WHERE ${dk.sql} AND trang_thai = 'dang_lam'${chan ? ' AND NOT EXISTS (SELECT 1 FROM ca WHERE ma_ca = ? AND chi_nop_3_phut_cuoi = 1)' : ''}`,
+       WHERE ${dk.sql} AND trang_thai = 'dang_lam'${chan ? " AND NOT EXISTS (SELECT 1 FROM ca WHERE ma_ca = ? AND COALESCE(chi_nop_3_phut_cuoi, 0) NOT IN (0, '0', ''))" : ''}`,
     ).bind(
       nopLuc,
       trangThai,
@@ -563,9 +563,10 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
   let doi = Number(kq[maCa ? 1 : 0]?.meta?.changes ?? 0)
   let sau = ((kq[maCa ? 2 : 1]?.results ?? [])[0] ?? null) as DongLuot | null
 
-  if (kiemGio && ca && Number(ca.chi_nop_3_phut_cuoi ?? 0) === 1) {
-    // Câu ghi trong batch đã đứng yên ⇒ `sau` chính là lượt TRƯỚC khi ghi (như lần đọc riêng của bản cũ).
-    if (sau?.het_gio_luc) {
+  // Câu ghi trong batch ĐỨNG YÊN trong khi lượt vẫn `dang_lam` ⇒ chỉ có thể do chốt `NOT EXISTS` (ca có cờ khác 0 — chốt RỘNG hơn
+  // `Number(cờ) === 1` để cờ lưu kiểu lạ không bao giờ lọt): `sau` chính là lượt TRƯỚC khi ghi. Xét luật y như cũ rồi ghi ở vòng 2.
+  if (kiemGio && doi === 0 && sau?.trang_thai === 'dang_lam') {
+    if (ca && Number(ca.chi_nop_3_phut_cuoi ?? 0) === 1 && sau.het_gio_luc) {
       const hetGio = new Date(sau.het_gio_luc).getTime()
       const conLaiGiay = Math.round((hetGio - Date.now()) / 1000)
       // Chỉ nộp trong 1 phút cuối (60 giây), cộng 10 giây độ trễ mạng

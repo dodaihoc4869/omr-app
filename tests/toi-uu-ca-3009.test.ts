@@ -229,6 +229,16 @@ describe('/nop — một vòng D1, luật cũ giữ nguyên, tờ đáp án luô
     expect(k.j.ok).toBe(true)
     expect(d.dem('luot', "trang_thai = 'khoa'")).toBe(1)
   })
+  it('cờ "chỉ nộp phút cuối" lưu kiểu CHỮ (\'1\') vẫn chặn; cờ \'0\' kiểu chữ vẫn nộp được', async () => {
+    const { d, env } = await dung({ chiNop: 1 })
+    await vaoVaLam(env)
+    d.sql.prepare("UPDATE ca SET chi_nop_3_phut_cuoi = CAST('1' AS TEXT) WHERE ma_ca = 'C1'").run()
+    const n = await goi(env, '/nop', { maCa: 'C1', sbd: '10001', dapAn: DA })
+    expect(n.j).toMatchObject({ ok: false, lyDo: 'chua_den_1_phut_cuoi' })
+    d.sql.prepare("UPDATE ca SET chi_nop_3_phut_cuoi = CAST('0' AS TEXT) WHERE ma_ca = 'C1'").run()
+    const ok = await goi(env, '/nop', { maCa: 'C1', sbd: '10001', dapAn: DA })
+    expect(ok.j.ok).toBe(true)
+  })
   it('ca "chỉ nộp phút cuối": còn ≤ 70 s ⇒ nộp được (hai vòng D1)', async () => {
     const { d, env, dem } = await dung({ chiNop: 1 })
     await vaoVaLam(env)
