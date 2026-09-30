@@ -11,6 +11,7 @@ import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
 import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import { dongTraLoi, layCauTraLoi, traLoiBia, type PhanHoiBia } from './api'
 import { CHU_CAU_DOI, laLoiCauDoi } from '../than-thu-v2/loi-het-tran'
+import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { TEN_MUC, hangMuc } from './luat'
 import { dayDu, phanHoiChoLoiGiai } from './TamCauBia'
 import type { CauBia } from './dieu-khien'
@@ -20,6 +21,7 @@ interface Luot { session: string; cau: CauBia[]; tran: { con: number; tong: numb
 const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
 
 export default function TraLoiCau({ token, onVe }: TraLoiCauProps) {
+  useEffect(() => giuTrangKhongTaiLai(), []) // đang trả lời câu ⇒ app không tự tải lại vì bản mới (30/09)
   const [luot, setLuot] = useState<Luot | null>(null)
   const [viTri, setViTri] = useState(0)
   const [het, setHet] = useState('')

@@ -4,7 +4,8 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { KeyboardEvent as KE, PointerEvent as PE } from 'react'
 import { AmThanhBia } from './am-thanh'
-import { doiCauBia, doiCauBiaMang, ketVanBia } from './api'
+import { doiCauBia, doiCauBiaMang, giuBanBia, ketVanBia, NHIP_GIU_BAN_MS } from './api'
+import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { chonBoCuc, panTheoMan, raMan, tinhKhungBan, toaDoBan, type BoCuc, type KhungBan } from './bo-cuc'
 import { VanBia, type CauBia, type KetThucVan, type LoaiVan, type YeuCauCau } from './dieu-khien'
 import { CAU_NHAN, VanMang, type GoiTT, type KenhVan, type LoaiMang } from './dieu-khien-mang'
@@ -130,8 +131,16 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, loai !== 'giao_huu', keoRef.current.bi)
       return conChi
     }
-    veNgayRef.current = () => { veBan(performance.now()) }
+    veNgayRef.current = () => { try { veBan(performance.now()) } catch (e) { baoLoiVe(e) } }
+    // LỖI VẼ KHÔNG ĐÓNG GAME (30/09): một khung hình ném lỗi (máy yếu hết bộ nhớ canvas, số NaN…) trước đây làm vòng khung hình dừng hẳn — bàn đứng im như đã thoát.
+    // Nay hẹn khung kế TRƯỚC, bọc thân khung trong try/catch: khung lỗi bỏ qua, ván chạy tiếp; lỗi chỉ ghi console một lần.
+    let daBaoLoi = false
+    const baoLoiVe = (e: unknown) => { if (!daBaoLoi) { daBaoLoi = true; console.error('[Bi-a] lỗi một khung hình, bỏ qua', e) } }
     const khung = (now: number) => {
+      raf = requestAnimationFrame(khung)
+      try { motKhung(now) } catch (e) { baoLoiVe(e) }
+    }
+    const motKhung = (now: number) => {
       const dt = Math.min(0.05, Math.max(0, now - truoc) / 1000); truoc = now
       if (spaceRef.current !== null && v.pha === 'aim') { const p = Math.min(1, (now - spaceRef.current) / 1400); v.datLuc(p); setLucHien(p) }
       apNgon()
@@ -214,12 +223,22 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           ch.textContent = (v.pha === 'over' ? 'Hết ván' : me.ai ? `Lượt ${me.ngan}` : `Lượt em · ${giay} giây`) + (gon ? ` · Điểm ${v.diem[0]} : ${v.diem[1]}` : hep ? ` · ${v.diem[0]} : ${v.diem[1]}` : ` · Kim loại ${v.diem[0]} : ${v.diem[1]} Phi kim`) + (mt ? ` · Mắt thần ${mt}` : '')
         }
       }
-      raf = requestAnimationFrame(khung)
     }
     raf = requestAnimationFrame(khung)
     return () => { cancelAnimationFrame(raf); veNgayRef.current = () => {} }
   }, [v, am, loai])
   useEffect(() => () => { v.huy(); am.dong() }, [v, am])
+  // Đang ở màn chơi (kể cả bảng kết quả) ⇒ app KHÔNG tự tải lại vì bản mới (nguyên nhân gốc "đang chơi thoát luôn" 30/09); rời màn ⇒ bản mới vào.
+  useEffect(() => giuTrangKhongTaiLai(), [])
+  // Giữ bàn ở máy chủ (30/09): ván A.I có phiên câu ⇒ báo "còn chơi" mỗi 3 phút khi màn đang hiện, để máy chủ chỉ nhả câu của bàn THẬT SỰ bỏ dở
+  // (không hoạt động quá HAN_GIU_BAN_BIA_MS), không nhả bàn đang chơi. Ván online: phòng đấu giữ. Nối tiếp (không chồng lượt), lỗi thì bỏ qua.
+  useEffect(() => {
+    if (!session || vm || ket) return
+    let song = true, hen: ReturnType<typeof setTimeout> | null = null
+    const lap = () => { hen = setTimeout(() => { if (!song) return; if (typeof document === 'undefined' || document.visibilityState !== 'hidden') void giuBanBia(token, session).catch(() => {}); lap() }, NHIP_GIU_BAN_MS) }
+    lap()
+    return () => { song = false; if (hen) clearTimeout(hen) }
+  }, [token, session, vm, ket])
   // Trang xem thử / kiểm tự động (chỉ bản dev, không vào bản build): điều khiển ván từ bên ngoài.
   useEffect(() => { if (import.meta.env.DEV) (window as unknown as { __biaVan?: VanBia }).__biaVan = v }, [v])
   const xemRef = useRef(false); xemRef.current = xem

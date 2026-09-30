@@ -136,16 +136,26 @@ export async function cauDangGiu(env: Env, sbd: string, nowMs: number, dieuKien:
   return ra
 }
 
-/** Bàn Bi-a (ván A.I / online) chỉ giữ câu của ván đang diễn ra trong ngần này; quá hạn coi như em đã bỏ bàn (sửa lỗi 29/09). */
-export const HAN_GIU_BAN_BIA_MS = 30 * 60_000
+/**
+ * Bàn Bi-a (ván A.I / online) giữ câu chừng nào còn HOẠT ĐỘNG; KHÔNG hoạt động quá ngần này (không trả lời câu, không đổi câu, màn chơi không báo
+ * "còn ở bàn" — `bia-giu-ban` mỗi 3 phút khi màn đang hiện) ⇒ coi như em đã bỏ bàn. Sửa 30/09: trước tính theo GIỜ TẠO (30 phút) nên ván dài đang chơi bị đóng.
+ */
+export const HAN_GIU_BAN_BIA_MS = 15 * 60_000
+/**
+ * Mốc hoạt động gần nhất của một phiên Bi-a `s` (ISO, so chuỗi được): lớn nhất của giờ tạo, `$.hoatDong` (ms, từ `bia-giu-ban`) và lần trả lời gần nhất.
+ * Dùng trong điều kiện SQL (bảng `game_v2_session` đặt bí danh `s`).
+ */
+export const SQL_HOAT_DONG_BIA = `MAX(s.created_at,
+    COALESCE(strftime('%Y-%m-%dT%H:%M:%fZ', json_extract(s.json,'$.hoatDong') / 1000.0, 'unixepoch'), ''),
+    COALESCE((SELECT MAX(a.created_at) FROM game_v2_attempt a WHERE a.session = s.id AND a.sbd = s.sbd), ''))`
 /**
  * Em mở Đảo/Đoàn ⇒ Bi-a KHÔNG được "ăn" mất câu (sửa lỗi 29/09: phiên "Trả lời câu hỏi" em tắt máy không gọi `dong` giữ 4 câu cuối 2 giờ,
- * Đảo báo nhầm "ca kiểm tra"). Đóng NGAY mọi phiên chỉ-trả-lời (`chiCau`) còn mở và mọi bàn Bi-a mở quá `HAN_GIU_BAN_BIA_MS`
- * (câu chưa trả lời về lại kế hoạch; `bi_a_van` để nguyên cho `bia-ket-van`). Trả câu còn giữ ở bàn đang chơi thật (< 30 phút).
+ * Đảo báo nhầm "ca kiểm tra"). Đóng NGAY mọi phiên chỉ-trả-lời (`chiCau`) còn mở và mọi bàn Bi-a KHÔNG hoạt động quá `HAN_GIU_BAN_BIA_MS`
+ * (câu chưa trả lời về lại kế hoạch; `bi_a_van` để nguyên cho `bia-ket-van`). Trả câu còn giữ ở bàn đang chơi thật (còn hoạt động).
  */
 export async function nhaCauBiaChoDaoDoan(env: Env, sbd: string, nowMs: number): Promise<Set<string>> {
-  await env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.dong', 1) WHERE sbd = ? AND json_extract(json,'$.bia') = 1 AND COALESCE(json_extract(json,'$.dong'),0) = 0
-      AND (COALESCE(json_extract(json,'$.chiCau'),0) = 1 OR created_at < ?)`).bind(sbd, new Date(nowMs - HAN_GIU_BAN_BIA_MS).toISOString()).run().catch(() => null)
+  await env.DB.prepare(`UPDATE game_v2_session AS s SET json = json_set(s.json, '$.dong', 1) WHERE s.sbd = ? AND json_extract(s.json,'$.bia') = 1 AND COALESCE(json_extract(s.json,'$.dong'),0) = 0
+      AND (COALESCE(json_extract(s.json,'$.chiCau'),0) = 1 OR ${SQL_HOAT_DONG_BIA} < ?)`).bind(sbd, new Date(nowMs - HAN_GIU_BAN_BIA_MS).toISOString()).run().catch(() => null)
   return cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
 }
 
