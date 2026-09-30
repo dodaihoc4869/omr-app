@@ -68,6 +68,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
   // TU LUYỆN (migration-2909-tu-luyen.sql, 29/09): lượt em tự luyện — hồ sơ học tập của em, độc lập với game ⇒ GIỮ (như sổ su_kien_hoc).
   'tu_luyen_luot', 'tu_luyen_cau',
+  // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql, 30/09): ôn cách quãng + câu đã chấm từng câu — cùng hồ sơ Tu luyện ⇒ GIỮ.
+  'tu_luyen_khac_phuc', 'tu_luyen_cham_cau',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
 ]
