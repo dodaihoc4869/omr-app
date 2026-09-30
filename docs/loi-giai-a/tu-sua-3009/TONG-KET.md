@@ -14,3 +14,53 @@ Nguồn: quét toàn kho 30/09 (chỉ đọc). Đã loại 14 câu cố ý đổ
 
 ĐÃ GHI 30/09 ~10:50 (giờ VN): 8 việc / 6 đề, đọc lại khớp, không có ca mở. Kế hoạch: `ke-hoach.json`. Bản gốc từng câu: `../tu-sua-2909/sao-luu/<mã đề>.json`; nhật ký: `../tu-sua-2909/da-tu-sua.md`. 2 câu đổi nội dung đã soạn lại lời giải.
 Cổng kiểm gói mới (PR sau) sẽ tự gắn cờ `can_xem` cho các câu Phần III đáp án không đọc được ở lần lưu tờ kế tiếp.
+
+## Chuyển tự luận — ĐÃ GHI 30/09 ~11:20 (thầy cho tự xử lý, qua Boss)
+40 câu (20 nhóm nội dung, 18 đề) Phần III có đáp án là công thức / tên chất, máy chấm như số nên luôn chấm sai ⇒ đánh dấu TỰ LUẬN đúng cách kho dùng:
+nhãn `kieu: "tu_luan"` (định nghĩa chung `cau-tu-luan.ts` ⇒ rút đề, BTVN, Tu luyện bỏ) + cờ `can_xem` (đường game loại). Câu vẫn trong kho, qid không đổi, đáp án giữ để thầy xem.
+Công cụ: `tu-sua-kho.mjs` việc `tuLuan`; kế hoạch `ke-hoach-tu-luan.json`; bản gốc từng câu trong `../tu-sua-2909/sao-luu/`; lùi được bằng `--lui`.
+
+| qid | đáp án kho |
+|---|---|
+| DH-11-C2-B5-III-30 | (NH₄)₂Fe(SO₄)₂·6H₂O |
+| DB-11-B5-D2-III-87 | (NH₄)₂Fe(SO₄)₂·6H₂O |
+| DH-10-C1-B1-III-22 | K₂O |
+| DB-10-B1-D1-III-165 | K₂O |
+| DH-10-C1-B1-III-23 | FeS₂ |
+| DB-10-B1-D1-III-166 | FeS₂ |
+| DH-10-C1-B1-III-31 | K₂O |
+| DB-10-B1-D1-III-172 | K₂O |
+| DH-10-C1-B1-III-32 | AlCl₃ |
+| DB-10-B1-D1-III-173 | AlCl₃ |
+| DH-10-C1-B1-III-33 | FeS₂ |
+| DB-10-B1-D1-III-174 | FeS₂ |
+| DB-10-B5-D1-III-141 | S |
+| DH-10-C2-B7-III-22 | S |
+| DB-10-B5-D1-III-142 | Sulfur (S) |
+| DH-10-C2-B7-III-28 | Sulfur (S) |
+| DH-12-C3-B8-III-34 | C₇H₉N |
+| DB-12-B8-D1-III-430 | C₇H₉N |
+| DH-12-C3-B8-III-35 | (CH₃)₃N |
+| DB-12-B8-D1-III-431 | (CH₃)₃N |
+| DH-11-C2-B7-III-29 | thấp (khoảng 113 °C) |
+| DB-11-B7-D2-III-70 | thấp (khoảng 113 °C) |
+| DH-11-C2-B6-III-25 | Fe₃O₄ |
+| DB-11-B6-D2-III-80 | Fe₃O₄ |
+| DH-11-C2-B6-III-34 | Fe₃O₄ |
+| DB-11-B6-D2-III-89 | Fe₃O₄ |
+| DH-10-C2-B7-III-21 | N |
+| DB-10-B7-D1-III-60 | N |
+| DH-10-C2-B7-III-23 | Si |
+| DB-10-B7-D1-III-61 | Si |
+| DH-10-C2-B7-III-27 | Nitrogen (N) |
+| DB-10-B7-D1-III-64 | Nitrogen (N) |
+| DH-10-C2-B7-III-29 | Silicon (Si) |
+| DB-10-B7-D1-III-65 | Silicon (Si) |
+| DH-10-C1-B3-III-47 | AlCl₃ |
+| DB-10-B3-D2-III-94 | AlCl₃ |
+| DB-12-B9-P2-D1-III-222 | (Ala)₄ |
+| DH-12-C3-B9-P2-III-34 | (Ala)₄ |
+| DH-12-C3-B9-P2-III-31 | Tyr-Gly-Gly-Phe-Leu |
+| DB-12-B9-P2-D2-III-149 | Tyr-Gly-Gly-Phe-Leu |
+
+18 câu còn tranh luận: để nguyên, chờ thầy (mục "CHỜ THẦY" trong `tham-dinh-*.md`).

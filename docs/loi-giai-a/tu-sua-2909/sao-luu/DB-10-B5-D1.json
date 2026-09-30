@@ -569,5 +569,126 @@
    "nguonDe": "DH-10-C2-B7",
    "nguonCau": "III-11"
   }
+ },
+ "DB-10-B5-D1-III-141": {
+  "luc": "2026-09-30T04:04:55.120Z",
+  "cau": {
+   "phan": "III",
+   "so": 141,
+   "de": "Nguyên tử của nguyên tố R có cấu hình electron lớp ngoài cùng là ns²np⁴. Trong hợp chất hydride (hợp chất của R với hydrogen), nguyên tố R chiếm 94,12% khối lượng.\nXác định nguyên tố R (trả lời bằng kí hiệu hoá học).",
+   "dap_an": "S",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "Nhóm VIA ⇒ hoá trị với hydrogen là 8 − 6 = 2 ⇒ hydride RH₂.",
+    "buoc": [
+     "ns²np⁴ ⇒ 6 electron lớp ngoài cùng ⇒ R thuộc nhóm VIA.",
+     "Hoá trị với hydrogen = 8 − 6 = 2 ⇒ hydride là RH₂, khối lượng mol R + 2.",
+     "%R = R/(R + 2) = 0,9412 ⇒ R = 0,9412R + 1,8824 ⇒ 0,0588R = 1,8824.",
+     "R = 32,0 ⇒ R là sulfur (S), hydride là H₂S."
+    ],
+    "ket_qua": "S",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "S",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc hỏi 'xác định TÊN nguyên tố'; đã thêm một câu nhắc trả lời bằng KÍ HIỆU HOÁ HỌC để câu trả lời ngắn có đúng một đáp số. Nội dung hỏi không đổi."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "ns²np⁴ cho 6 electron lớp ngoài cùng ⇒ nhóm VIA ⇒ hydride là RH₂.",
+    "bay": "Viết hydride thành RH₄ hoặc RH₆ vì nhớ nhầm hoá trị."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.TINH_PHAN_TRAM",
+    "ten": "Suy vị trí từ cấu hình electron — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-22"
+  }
+ },
+ "DB-10-B5-D1-III-142": {
+  "luc": "2026-09-30T04:04:55.120Z",
+  "cau": {
+   "phan": "III",
+   "so": 142,
+   "de": "Nguyên tử của nguyên tố R có cấu hình electron lớp ngoài cùng là ns²np⁴. Trong hợp chất hydride (hợp chất của R với hydrogen), nguyên tố R chiếm 94,12% khối lượng.\nXác định tên nguyên tố R.",
+   "dap_an": "Sulfur (S)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Xu hướng biến đổi thành phần và một số tính chất của hợp chất",
+   "loi_giai": {
+    "chot": "%R = R : (R + 2) = 94,12% ⇒ R = 32 ⇒ sulfur.",
+    "buoc": [
+     "Lớp ngoài cùng ns²np⁴ ⇒ 6 electron ⇒ R thuộc nhóm VIA ⇒ hydride là H₂R.",
+     "%R = R : (R + 2×1) = 94,12% ⇒ R = 0,9412R + 1,8824.",
+     "⇒ 0,0588R = 1,8824 ⇒ R = 32.",
+     "R = 32 ⇒ nguyên tố sulfur (S), hydride là H₂S."
+    ],
+    "ket_qua": "Sulfur (S)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "Sulfur (S)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "ns²np⁴ ⇒ 6 electron lớp ngoài cùng ⇒ nhóm VIA ⇒ hydride dạng H₂R.",
+    "bay": "Viết hydride là RH₂ rồi vẫn tính đúng, nhưng nếu viết RH₄ thì sai hẳn."
+   },
+   "kienThuc": [
+    "Cấu hình ns²np⁴ ứng với nhóm VIA.",
+    "Nhóm VIA tạo hợp chất với hydrogen dạng H₂R."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.TINH_PHAN_TRAM",
+    "ten": "Suy vị trí từ cấu hình electron — tính phần trăm"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B7",
+   "nguonCau": "III-28"
+  }
  }
 }

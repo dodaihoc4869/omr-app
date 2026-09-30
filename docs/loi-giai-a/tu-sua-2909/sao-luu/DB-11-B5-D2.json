@@ -377,5 +377,67 @@
    "nguonDe": "DH-11-C2-B5",
    "nguonCau": "II-14"
   }
+ },
+ "DB-11-B5-D2-III-87": {
+  "luc": "2026-09-30T04:04:40.395Z",
+  "cau": {
+   "phan": "III",
+   "so": 87,
+   "de": "Hòa tan 3,92 gam một muối X ngậm nước vào cốc nước, thu được 100 mL dung dịch X gồm các ion: Fe²⁺, NH₄⁺ và SO₄²⁻. Cho dung dịch NaOH dư vào 10 mL dung dịch X, đun nóng, thu được 49,58 mL khí (đkc). Cho dung dịch BaCl₂ dư vào 10 mL dung dịch X, thu được 0,466 gam kết tủa.\nXác định công thức của X.",
+   "dap_an": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Ammonia. Muối ammonium",
+   "loi_giai": {
+    "chot": "Trong 10 mL: NH₄⁺ 0,002 mol, SO₄²⁻ 0,002 mol ⇒ Fe²⁺ 0,001 mol.",
+    "buoc": [
+     "Trong 10 mL X: n(NH₃) = 0,04958 : 24,79 = 0,002 mol ⇒ n(NH₄⁺) = 0,002 mol.",
+     "n(BaSO₄) = 0,466 : 233 = 0,002 mol ⇒ n(SO₄²⁻) = 0,002 mol.",
+     "Bảo toàn điện tích: 2n(Fe²⁺) + 0,002 = 2 × 0,002 ⇒ n(Fe²⁺) = 0,001 mol.",
+     "Cả 100 mL: Fe²⁺ 0,01 mol; NH₄⁺ 0,02 mol; SO₄²⁻ 0,02 mol ⇒ tỉ lệ 1 : 2 : 2 ⇒ muối khan là (NH₄)₂Fe(SO₄)₂, M = 284.",
+     "m(muối khan) = 0,01 × 284 = 2,84 g ⇒ m(H₂O) = 3,92 − 2,84 = 1,08 g ⇒ n(H₂O) = 0,06 mol.",
+     "n(H₂O) : n(muối) = 0,06 : 0,01 = 6 ⇒ X là (NH₄)₂Fe(SO₄)₂·6H₂O (muối Mohr)."
+    ],
+    "ket_qua": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "(NH₄)₂Fe(SO₄)₂·6H₂O",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Dùng bảo toàn điện tích để tìm ion còn lại, rồi lấy hiệu khối lượng để ra số phân tử nước.",
+    "bay": "Quên nhân 10 khi quy từ 10 mL lên 100 mL dung dịch."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.AMMONIA_AMMONIUM.VIET_CTCT",
+    "ten": "Ammonia và muối ammonium — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B5-D2",
+    "ten": "Phản ứng đặc trưng của ammonia",
+    "lop": "11",
+    "bai": "DB-11-B5",
+    "tenBai": "Ammonia. Muối ammonium",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B5",
+   "nguonCau": "III-30"
+  }
  }
 }

@@ -75,5 +75,71 @@
    "nguonDe": "DH-10-C1-B3",
    "nguonCau": "II-29"
   }
+ },
+ "DB-10-B3-D2-III-94": {
+  "luc": "2026-09-30T04:05:31.125Z",
+  "cau": {
+   "phan": "III",
+   "so": 94,
+   "de": "Hợp chất MX₃ được sử dụng là chất xúc tác trong tổng hợp chất hữu cơ. Tổng số hạt (p, n, e) trong hợp chất MX₃ là 196. Trong đó số hạt mang điện nhiều hơn không mang điện là 60.\nSố khối của M nhỏ hơn số khối của X là 8. Tổng số hạt trong ion X⁻ nhiều hơn trong ion M³⁺ là 16.\nXác định công thức của MX₃.",
+   "dap_an": "AlCl₃",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 3. Cấu trúc lớp vỏ electron nguyên tử",
+   "loi_giai": {
+    "chot": "pM + 3pX = 64; từ hai dữ kiện về số khối và về ion suy ra pX − pM = 4.",
+    "buoc": [
+     "Tổng 196 và hiệu 60 ⇒ 2(2pM + 6pX) = 256 ⇒ pM + 3pX = 64.",
+     "Tổng hạt trong X⁻ hơn trong M³⁺ là 16: (2pX + nX + 1) − (2pM + nM − 3) = 16.",
+     "Số khối M nhỏ hơn X là 8: (pX + nX) − (pM + nM) = 8.",
+     "Trừ hai phương trình trên: pX − pM = 16 − 4 − 8 = 4.",
+     "Thay vào pM + 3pX = 64 với pX = pM + 4 ⇒ 4pM = 52 ⇒ pM = 13, pX = 17.",
+     "M là aluminium, X là chlorine ⇒ hợp chất là AlCl₃."
+    ],
+    "ket_qua": "AlCl₃",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "AlCl₃",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Trừ phương trình 'tổng hạt trong ion' cho phương trình 'số khối' sẽ khử hết neutron.",
+    "bay": "Quên rằng X⁻ có thêm 1 electron còn M³⁺ đã mất 3 electron."
+   },
+   "kienThuc": [
+    "Ion X⁻ có 2pX + nX + 1 hạt; ion M³⁺ có 2pM + nM − 3 hạt.",
+    "Số khối A = p + n.",
+    "Cộng 'tổng hạt' với 'hiệu hạt mang điện – không mang điện' sẽ khử neutron."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.THANH_PHAN.VIET_CTCT",
+    "ten": "Thành phần nguyên tử — viết công thức cấu tạo"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B3-D2",
+    "ten": "Bài toán về các loại hạt của nguyên tử, ion",
+    "lop": "10",
+    "bai": "DB-10-B3",
+    "tenBai": "Cấu trúc lớp vỏ electron nguyên tử",
+    "soBai": 3,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B3",
+   "nguonCau": "III-47"
+  }
  }
 }

@@ -150,5 +150,67 @@
    "nguonDe": "DH-11-C2-B7",
    "nguonCau": "II-1"
   }
+ },
+ "DB-11-B7-D1-III-12": {
+  "luc": "2026-09-30T04:13:23.245Z",
+  "cau": {
+   "phan": "III",
+   "so": 12,
+   "de": "Tại nhiều làng nghề thủ công mĩ nghệ, sulfur dioxide được dùng là chất chống mốc cho các sản phẩm mây tre đan.\nTrong một ngày, một làng nghề đốt cháy 20 kg sulfur để tạo thành sulfur dioxide.\nTính thể tích khí SO₂ tạo thành (đkc) biết hiệu suất của phản ứng là 80%?",
+   "dap_an": "12 395",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "n(S) = 625 mol ⇒ n(SO₂) = 625 × 80% = 500 mol ⇒ V = 500 × 24,79 L.",
+    "buoc": [
+     "n(S) = 20 000 : 32 = 625 mol.",
+     "S + O₂ → SO₂ ⇒ n(SO₂) lí thuyết = 625 mol.",
+     "Hiệu suất 80% ⇒ n(SO₂) thực tế = 625 × 0,8 = 500 mol.",
+     "V(SO₂) = 500 × 24,79 = 12 395 L ≈ 12,4 m³."
+    ],
+    "ket_qua": "12 395",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "12 395",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Tỉ lệ S : SO₂ là 1 : 1, hiệu suất nhân vào cuối.",
+    "bay": "Dùng 22,4 L/mol thay cho 24,79 L/mol ở đkc."
+   },
+   "kienThuc": [
+    "S + O₂ →(t°) SO₂, tỉ lệ mol 1 : 1.",
+    "Ở đkc (25 °C, 1 bar), 1 mol khí chiếm 24,79 L."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.TINH_HIEU_SUAT",
+    "ten": "Sulfur và hợp chất sulfur dioxide — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D1",
+    "ten": "Bài toán điều chế SO2",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B7",
+   "nguonCau": "III-37"
+  }
  }
 }

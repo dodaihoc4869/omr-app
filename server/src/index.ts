@@ -5,6 +5,7 @@ import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
 import { lopCua } from '../../src/lib/loi-giai-kiem'
+import { kiemGoiDe } from '../../src/lib/kiem-goi-de'
 import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
@@ -2120,7 +2121,16 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
   if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2' }, 500)
 
-  const de = b.de
+  // CỔNG KIỂM GÓI (rà thêm đề 30/09): mọi đường ghi kho đi qua đây ⇒ gói lỗi bị TỪ CHỐI CẢ GÓI trước mọi lần ghi (R2, de_kho, cau_hoi),
+  // trả danh sách lỗi từng câu. Gói hợp lệ được chuẩn hoá (khoá ý a–d / phương án A–D, đáp án viết hoa, cờ cần xem cho Phần III không đọc được).
+  let de = b.de
+  let canhBaoGoi: string[] = []
+  if (de) {
+    const kq = kiemGoiDe(maDe, de)
+    if (kq.loi.length) return ra({ ok: false, error: `Gói đề ${maDe} chưa hợp lệ (${kq.loi.length} lỗi) — chưa ghi gì vào kho. Lỗi đầu: ${kq.loi[0]}`, loi: kq.loi.slice(0, 100), canhBao: kq.canhBao.slice(0, 100) }, 400)
+    de = kq.goi
+    canhBaoGoi = kq.canhBao
+  }
   const khoa = `kho/${maDe}.json`
   if (de) await env.DE.put(khoa, JSON.stringify(de))
 
@@ -2185,7 +2195,7 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
   let loiGiai: Record<string, unknown> | null = null
   if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
-  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai })
+  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
 }
 
 /** DANH SÁCH ĐỀ TRONG KHO — chỉ mục, không kéo gói. */

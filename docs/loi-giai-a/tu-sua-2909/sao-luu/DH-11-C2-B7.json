@@ -1289,5 +1289,180 @@
     "chuong": "C2 - Nitrogen và Surful"
    }
   }
+ },
+ "DH-11-C2-B7-III-29": {
+  "luc": "2026-09-30T04:05:10.669Z",
+  "cau": {
+   "phan": "III",
+   "so": 29,
+   "de": "Trong tinh thể sulfur, các phân tử S₈ tương tác với nhau bằng lực van der Waals yếu.\nHãy dự đoán về nhiệt độ nóng chảy (cao hay thấp) của đơn chất sulfur.",
+   "dap_an": "thấp (khoảng 113 °C)",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "Chỉ có lực van der Waals yếu giữa các phân tử S₈ ⇒ nhiệt độ nóng chảy THẤP (khoảng 113 °C).",
+    "buoc": [
+     "Trong tinh thể sulfur, các phân tử S₈ chỉ hút nhau bằng lực van der Waals yếu.",
+     "Muốn nóng chảy chỉ cần phá các lực yếu này, không cần phá liên kết cộng hoá trị trong vòng S₈.",
+     "⇒ Dự đoán nhiệt độ nóng chảy của sulfur THẤP; thực tế khoảng 113 °C."
+    ],
+    "ket_qua": "thấp (khoảng 113 °C)",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "thấp (khoảng 113 °C)",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Tệp nguồn bóc dính tiêu đề của mục kế tiếp vào cuối đề; đã cắt bỏ phần tiêu đề ấy."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Lực liên phân tử càng yếu thì càng dễ phá vỡ mạng tinh thể ⇒ nhiệt độ nóng chảy càng thấp.",
+    "bay": "Thấy S₈ nặng (256 amu) nên đoán nhiệt độ nóng chảy cao."
+   },
+   "kienThuc": [
+    "Tinh thể phân tử có lực liên kết yếu nên nhiệt độ nóng chảy thấp.",
+    "Sulfur nóng chảy ở khoảng 113 °C, thấp hơn nhiều so với tinh thể ion hay tinh thể nguyên tử."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.XAC_DINH_CHAT",
+    "ten": "Sulfur và hợp chất sulfur dioxide — xác định chất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D2",
+    "ten": "Tính chất của sulfur và sulfur dioxide",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B7-III-27": {
+  "luc": "2026-09-30T04:13:15.421Z",
+  "cau": {
+   "phan": "III",
+   "so": 27,
+   "de": "Cho giá trị enthalpy tạo thành chuẩn của SO₂(g) và SO₃(g) lần lượt là −298,8 kJ·mol⁻¹ và −395,7 kJ·mol⁻¹.\nTính giá trị biến thiên enthalpy chuẩn của phản ứng sau:\nSO₂(g) + ½O₂(g) → SO₃(g)\n(trả lời giá trị ΔrH⁰₂₉₈ theo kJ).",
+   "dap_an": "−96,9",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "ΔrH⁰₂₉₈ = ΔfH⁰(SO₃) − ΔfH⁰(SO₂) − ½ΔfH⁰(O₂).",
+    "buoc": [
+     "ΔfH⁰(O₂, g) = 0 vì O₂ là đơn chất bền ở điều kiện chuẩn.",
+     "ΔrH⁰₂₉₈ = (−395,7) − (−298,8) − ½ × 0 = −395,7 + 298,8.",
+     "ΔrH⁰₂₉₈ = −96,9 kJ. Giá trị âm ⇒ phản ứng toả nhiệt, thuận lợi về mặt năng lượng."
+    ],
+    "ket_qua": "−96,9",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "−96,9",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đề gốc gõ lỗi 'enthalpy tạo thành PHẦN chuẩn của SO₂ và KHI SO₃'; đã sửa. Vế hỏi thêm 'phản ứng có thuận lợi về năng lượng không' đã nằm trong lời giải nên câu hỏi được rút về đúng một đáp số."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "ΔrH⁰ = tổng ΔfH⁰ sản phẩm trừ tổng ΔfH⁰ chất đầu; đơn chất O₂ có ΔfH⁰ = 0.",
+    "bay": "Cộng hai giá trị thay vì trừ, hoặc gán cho O₂ một giá trị khác 0."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.TINH_NANG_LUONG",
+    "ten": "Sản xuất sulfuric acid — tính năng lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
+ },
+ "DH-11-C2-B7-III-37": {
+  "luc": "2026-09-30T04:13:15.421Z",
+  "cau": {
+   "phan": "III",
+   "so": 37,
+   "de": "Tại nhiều làng nghề thủ công mĩ nghệ, sulfur dioxide được dùng là chất chống mốc cho các sản phẩm mây tre đan.\nTrong một ngày, một làng nghề đốt cháy 20 kg sulfur để tạo thành sulfur dioxide.\nTính thể tích khí SO₂ tạo thành (đkc) biết hiệu suất của phản ứng là 80%?",
+   "dap_an": "12 395",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "loi_giai": {
+    "chot": "n(S) = 625 mol ⇒ n(SO₂) = 625 × 80% = 500 mol ⇒ V = 500 × 24,79 L.",
+    "buoc": [
+     "n(S) = 20 000 : 32 = 625 mol.",
+     "S + O₂ → SO₂ ⇒ n(SO₂) lí thuyết = 625 mol.",
+     "Hiệu suất 80% ⇒ n(SO₂) thực tế = 625 × 0,8 = 500 mol.",
+     "V(SO₂) = 500 × 24,79 = 12 395 L ≈ 12,4 m³."
+    ],
+    "ket_qua": "12 395",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "12 395",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Tỉ lệ S : SO₂ là 1 : 1, hiệu suất nhân vào cuối.",
+    "bay": "Dùng 22,4 L/mol thay cho 24,79 L/mol ở đkc."
+   },
+   "kienThuc": [
+    "S + O₂ →(t°) SO₂, tỉ lệ mol 1 : 1.",
+    "Ở đkc (25 °C, 1 bar), 1 mol khí chiếm 24,79 L."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.DON_CHAT_S.TINH_HIEU_SUAT",
+    "ten": "Sulfur và hợp chất sulfur dioxide — tính hiệu suất"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B7-D1",
+    "ten": "Bài toán điều chế SO2",
+    "lop": "11",
+    "bai": "DB-11-B7",
+    "tenBai": "Sulfur và sulfur dioxide",
+    "soBai": 7,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
  }
 }
