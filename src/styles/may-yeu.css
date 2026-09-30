@@ -29,3 +29,24 @@ html.may-yeu .shadow-2xl {
 html.may-yeu .h2-sanh {
   --h2-kinh-bong: 0 2px 6px rgb(70 40 120 / 0.14);
 }
+
+/* 4. (30/09, số đo docs/do-toi-uu-app-hs-3009.md) Cảnh Sảnh vẽ bằng SVG: ~55 hoạt ảnh lặp (sóng, mây, đom đóm, sương cuộn, tia nắng, vệt
+ *    quét) đổi `transform` trên phần tử SVG — Chrome KHÔNG đưa hoạt ảnh SVG lên luồng hợp thành, nên MỖI KHUNG luồng chính phải tính kiểu +
+ *    vẽ lại cả cảnh (đo CPU×6: Sảnh đứng yên khung p95 67 ms = 15 FPS; sau sửa 33 ms = 30 FPS). Hoạt ảnh dài 8–80 s nên "chạy một lượt" (mục 2) vẫn là 1 phút giật.
+ *    Máy yếu ⇒ cảnh đứng yên ngay ở dáng gốc (sóng, mây, đom đóm vẫn ở đúng chỗ; chỉ không trôi). Hoạt ảnh CHỨC NĂNG của Sảnh (mở màn,
+ *    rương rung, pháo khi xong việc) không thuộc các lớp dưới đây nên giữ nguyên. */
+html.may-yeu .h2c-song,
+html.may-yeu .h2c-lap,
+html.may-yeu .h2c-vet-nang ellipse,
+html.may-yeu .h2c-hao-troi,
+html.may-yeu .h2c-tia-troi,
+html.may-yeu .h2c-may-troi,
+html.may-yeu .h2c-bot-song,
+html.may-yeu .h2c-dom,
+html.may-yeu .h2c-dom circle,
+html.may-yeu .h2c-suong-cuon,
+html.may-yeu .h2c-rune,
+html.may-yeu .h2c-quet-deu {
+  animation: none !important;
+}
+

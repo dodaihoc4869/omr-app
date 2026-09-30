@@ -113,6 +113,11 @@
  .dao2 .dao2-bd-thu{animation:d2-nhun 1.6s ease-in-out infinite}
  .dao2 .dao2-bd-suong-vung{transition:opacity 1.2s ease}
 }
+/* MÁY YẾU (30/09, số đo docs/do-toi-uu-app-hs-3009.md): ~40 hoạt ảnh SVG trang trí của cảnh Đảo (sương cuộn, sóng, mây, tia nắng, sao, cây)
+   chạy ở LUỒNG CHÍNH mỗi khung (Chrome không hợp thành hoạt ảnh SVG) và dài 10–90 s nên "chạy một lượt" của may-yeu.css vẫn giật lâu.
+   Máy yếu ⇒ cảnh đứng yên ở dáng gốc. GIỮ nhịp ô đang đứng (.dao2-bd-nhip), cờ và vệt đường đi — là chỉ dẫn, rẻ (1 phần tử). */
+html.may-yeu .dao2 .dao2-3d-tia,html.may-yeu .dao2 .dao2-3d-sao>i,html.may-yeu .dao2 .dao2-3d-lap,html.may-yeu .dao2 .dao2-3d-song,html.may-yeu .dao2 .dao2-3d-may,
+html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .dao2 .dao2-3d-cay{animation:none}
 @keyframes d2-xoay{to{transform:rotate(360deg)}}
 @keyframes d2-lap{0%,100%{opacity:.15}50%{opacity:1}}
 @keyframes d2-troi{from{transform:translateX(0)}to{transform:translateX(-120px)}}

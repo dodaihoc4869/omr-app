@@ -1,0 +1,10 @@
+/* SẢNH BỊ CHE (30/09, số đo docs/do-toi-uu-app-hs-3009.md) — lớp `sanh-bi-che` do StudentPortalScreen gắn lên <html> khi một màn toàn màn
+ * hình (game, Câu đã làm, Tu luyện …) che kín Sảnh. Cảnh Sảnh có ~55 hoạt ảnh SVG chạy ở LUỒNG CHÍNH mỗi khung (Chrome không hợp thành hoạt ảnh
+ * SVG) ⇒ đang ở màn khác mà máy vẫn tính kiểu + vẽ lại phần bị che. TẠM DỪNG mọi hoạt ảnh của Sảnh — em không nhìn thấy nó; đóng màn là chạy
+ * tiếp đúng chỗ cũ. Mọi máy (không chỉ máy yếu). Không đổi bố cục, chữ, trạng thái. */
+html.sanh-bi-che .h2-sanh,
+html.sanh-bi-che .h2-sanh *,
+html.sanh-bi-che .h2-sanh *::before,
+html.sanh-bi-che .h2-sanh *::after {
+  animation-play-state: paused !important;
+}
