@@ -24,7 +24,7 @@ html:root body[data-bat-linh] .bl-ban-do .h2-ban-do.bl-hanh-trinh { position: re
   .bl-hanh-trinh__tranh { max-height: 550px; aspect-ratio: auto; }
 }
 @media (prefers-color-scheme: dark) {
-  .bl-hanh-trinh__nen { filter: brightness(.57) saturate(.8); }
-  .bl-hanh-trinh__suong { fill: rgb(22 43 45 / .78); }
+  .bl-hanh-trinh__nen { filter: brightness(.67) saturate(.8); }
+  .bl-hanh-trinh__suong { fill: rgb(22 43 45 / .6); }
   .bl-hanh-trinh__cau[data-khoa=true] { background: var(--bl-warm); color: var(--bl-warm-ink); }
 }

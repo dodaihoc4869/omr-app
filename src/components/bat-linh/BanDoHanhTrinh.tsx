@@ -27,7 +27,10 @@ export default function BanDoHanhTrinh({ s }: { s: SanhHoa2 | null }) {
     </header>
     <div className="bl-hanh-trinh__tranh">
       <svg viewBox="-12 -14 424 522" aria-hidden="true" focusable="false">
-        <defs><mask id={`${id}-suong`}><rect x="-12" y="-14" width="424" height="360" fill="white" /><circle data-ve="lo-khai-pha" cx="199" cy="306" r={Math.round(34 + p * 2.6)} fill="black" /></mask></defs>
+        <defs>
+          <radialGradient id={`${id}-tan`}><stop offset=".65" stopColor="black" /><stop offset="1" stopColor="white" /></radialGradient>
+          <mask id={`${id}-suong`}><rect x="-12" y="-14" width="424" height="360" fill="white" /><circle data-ve="lo-khai-pha" cx="199" cy="306" r={Math.round(34 + p * 2.6)} fill={`url(#${id}-tan)`} /></mask>
+        </defs>
         <image className="bl-hanh-trinh__nen" href="/bat-linh/ban-do-dao-nho.webp" x="-12" y="-14" width="424" height="522" preserveAspectRatio="none" />
         <path className="bl-hanh-trinh__duong" d="M118 408 Q109 352 130 298 Q156 265 179 251 Q204 264 226 283 Q274 281 276 221 Q264 188 289 154 L337 82" />
         <g data-ve="suong" data-phan-tram={p} opacity={p >= 100 ? 0 : 1}>
