@@ -180,3 +180,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 30/09 20:55 VN · thầy CHỐT bản vẽ thử Bi-a (HrJ8TQewddXp2NJuZRgbXV) · làn claude/bia-dieu-khien-3009 làm đúng như bản vẽ
 - 30/09 20:55 VN · thầy: đẩy trước 23:00 đêm nay (thầy cho phép ngoại lệ khung 20–24h) · PR #112 đã kiểm: merge sạch, tsc sạch, 449 test chỉ đỏ nền (bi-a G11, dau-truong ×2) + CauDaLam chập chờn do tải (chạy riêng xanh) · gộp đợt 22:12
 - 30/09 21:2x VN · PR #113 tối ưu Bi-a (e42f159) đã kiểm: merge sạch với main và #112, tsc sạch, 185 test bi-a chỉ đỏ nền G11 · chờ gộp đợt 22:12
+- 30/09 21:56 VN · phiên chính · gộp #112 Thử sức thêm (1e442b0), #115 tối ưu app HS (264423f), #116 tối ưu ca (9833292) · không ca mở · bản gộp 5 PR: full vitest 12.988 test, so lại 65 tệp đỏ với main: chỉ 2 đỏ mới đều ở ManChoi.tsx (#114, đang sửa) · lùi: git revert -m1 9833292 && git revert -m1 264423f && git revert -m1 1e442b0
