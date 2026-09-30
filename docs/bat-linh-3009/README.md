@@ -1,6 +1,6 @@
 # Bát Linh — giao diện học sinh và phụ huynh
 
-Giao diện Bát Linh đã phát hành ngày 30/09/2026 qua Actions 36739884487: mã 3fabae4a, Pages 329f0a53, Worker f4c33ff1-624b-4d71-ac30-92031087e9a0. Đang bổ sung chế độ tối tự động và Bản đồ hành trình theo yêu cầu tiếp theo.
+Bản mới đã phát hành lúc 00:21 ngày 01/10/2026 (giờ Việt Nam): commit 36ee817f, Actions 36749269228, Pages dfb4593e, Worker c3cdceeb-c987-4d01-b468-e52beae812c5. Gồm giao diện Bát Linh đã phát hành trước, chế độ tối tự động, Bản đồ hành trình mới và bảng giá phụ kiện m1-v2.
 
 ## Phạm vi
 
