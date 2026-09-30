@@ -1,9 +1,10 @@
 // DA-03 · Trên đầu (Đẹp) — nơ hai thanh song song kiểu liên kết đôi (=), bốn đầu là quả cầu (nguyên tử). Tĩnh.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="DA-03" viewBox="0 0 100 100">
       <g strokeLinecap="round" fill="none">
         <path d="M24 44L76 40" className="pk-s1" strokeWidth="8" />
         <path d="M24 60L76 56" className="pk-s1" strokeWidth="8" />
@@ -17,6 +18,6 @@ export default function Hinh({ id: _id }: HinhProps) {
         </g>
       ))}
       <rect x="44" y="42" width="12" height="20" rx="4" transform="rotate(-4 50 52)" className="pk-f2" />
-    </svg>
+    </TrangSuc>
   )
 }

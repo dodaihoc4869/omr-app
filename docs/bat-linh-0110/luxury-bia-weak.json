@@ -1,0 +1,34 @@
+{
+ "dist": "/workspace/omr-luxury-final/dist",
+ "mang": "fast3g",
+ "cpu": 6,
+ "mayYeu": true,
+ "luc": "2026-09-30T22:48:41.956Z",
+ "man": {
+  "bia": {
+   "sanSangMs": 2355,
+   "yen5s": {
+    "khung": 293,
+    "cham33": 2,
+    "p95": 17,
+    "max": 50,
+    "fps": 59,
+    "tbt": 0,
+    "commit": 0,
+    "veLai": 0
+   },
+   "thaoTac": {
+    "khung": 206,
+    "cham33": 16,
+    "p95": 50,
+    "max": 300,
+    "fps": 41,
+    "tbt": 605,
+    "commit": 9,
+    "veLai": 32
+   },
+   "heapMB": 3.8,
+   "loi": 0
+  }
+ }
+}

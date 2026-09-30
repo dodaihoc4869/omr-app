@@ -1,4 +1,5 @@
 // HQ-01 · Hào quang (Thường) — vòng sương trắng mỏng quanh chân thú, ba giọt nước nhỏ. viewBox 256: thú chiếm 53–203, chân y ≈ 203. Tĩnh.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const GIOT: [number, number, number][] = [
@@ -6,9 +7,9 @@ const GIOT: [number, number, number][] = [
   [204, 182, 0.85],
   [150, 226, 0.7],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="HQ-01" viewBox="0 0 256 256">
       <ellipse cx="128" cy="204" rx="98" ry="26" fill="none" className="pk-s1" strokeWidth="7" opacity=".22" />
       <ellipse cx="128" cy="204" rx="98" ry="26" fill="none" className="pk-s1" strokeWidth="2.6" opacity=".7" />
       <ellipse cx="128" cy="204" rx="78" ry="19" fill="none" className="pk-s1" strokeWidth="1.6" opacity=".4" />
@@ -18,6 +19,6 @@ export default function Hinh({ id: _id }: HinhProps) {
           <path className="pk-s3" d="M-3.5 4A4 4 0 0 0 0 9" fill="none" strokeWidth="2" strokeLinecap="round" />
         </g>
       ))}
-    </svg>
+    </TrangSuc>
   )
 }

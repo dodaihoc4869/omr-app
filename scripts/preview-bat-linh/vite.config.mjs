@@ -10,5 +10,5 @@ export default defineConfig({
   root: goc,
   plugins: [react()],
   define: { __PHIEN_BAN__: JSON.stringify('preview-bat-linh'), __SW_BUILT_AT__: 0 },
-  build: { emptyOutDir: true, rolldownOptions: { input: { app: resolve(goc, 'scripts/preview-bat-linh/trang.html'), games: resolve(goc, 'scripts/preview-bat-linh/games.html') } } },
+  build: { emptyOutDir: true, rolldownOptions: { input: { teacher: resolve(goc, 'scripts/preview-bat-linh/teacher.html'), app: resolve(goc, 'scripts/preview-bat-linh/trang.html'), games: resolve(goc, 'scripts/preview-bat-linh/games.html') } } },
 })

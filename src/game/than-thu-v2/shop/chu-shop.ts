@@ -164,3 +164,5 @@ export const loiMayChu = {
   matMang: chuMatMang, // [L9]
   loiKhongRo: chuLoiKhongRo, // [L10]
 } as const
+
+export const chuThongTinVatPham = 'Thông tin vật phẩm'

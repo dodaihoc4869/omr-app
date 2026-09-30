@@ -12,6 +12,7 @@ import { ThuHinh } from '../DoanHinh'
 import { hinhCuaMon } from './nap-hinh'
 import { kiHieuNguyenTo, monCuaO, type MonHinh } from './phu-kien-mon'
 import { neoCua, type DiemNeo } from './phu-kien-neo'
+import { DaTrangSuc } from './TrangSuc'
 import './phu-kien.css'
 
 /** Ô → mã món (đúng khoá của `dangMac` do máy chủ trả). */
@@ -83,6 +84,7 @@ function KhungTen({ mon, ten, nhan, dung }: { mon: MonHinh; ten: string; nhan?: 
             {kiHieu}
           </span>
         )}
+        <DaTrangSuc kieu={mon.kieu} />
         <span className="pk-khung-chu">
           {nhan && <small>{nhan}</small>}
           <strong>{ten}</strong>

@@ -1,4 +1,5 @@
 // VD-03 · Vệt di chuyển (Thường) — giọt phenolphthalein hồng rơi, loang thành vòng tròn nhạt. Giọt mới ở gần thú (phải), vòng loang cũ lớn dần về trái. Tĩnh.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const VONG: [number, number, number][] = [
@@ -6,9 +7,9 @@ const VONG: [number, number, number][] = [
   [112, 72, 30],
   [50, 72, 40],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-03" viewBox="0 0 256 96">
       {VONG.map(([x, y, r], i) => (
         <g key={x} opacity={1 - i * 0.16}>
           <ellipse cx={x} cy={y} rx={r} ry={r * 0.32} className="pk-f1" opacity=".3" />
@@ -23,6 +24,6 @@ export default function Hinh({ id: _id }: HinhProps) {
       <g transform="translate(224 70)">
         <ellipse rx="22" ry="7" className="pk-f2" opacity=".5" />
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

@@ -1,4 +1,5 @@
 // HQ-04 · Hào quang (Đẹp) — cụm tinh thể lam hình thoi mọc quanh bệ (CuSO₄·5H₂O). Tĩnh.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 // [x, y, chiều cao, góc nghiêng] — mọc trên cung sau chân thú
@@ -13,9 +14,9 @@ const TT: [number, number, number, number][] = [
   [46, 226, 18, -30],
   [212, 228, 18, 30],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="HQ-04" viewBox="0 0 256 256">
       <ellipse cx="128" cy="222" rx="104" ry="18" className="pk-f1" opacity=".14" />
       {TT.map(([x, y, h, g]) => {
         const w = h * 0.52
@@ -27,6 +28,6 @@ export default function Hinh({ id: _id }: HinhProps) {
           </g>
         )
       })}
-    </svg>
+    </TrangSuc>
   )
 }

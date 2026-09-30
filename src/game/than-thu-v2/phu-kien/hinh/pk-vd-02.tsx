@@ -1,4 +1,5 @@
 // VD-02 · Vệt di chuyển (Thường) — dấu chân rắc hạt muối tinh thể lập phương trắng. Ba dấu chân nhỏ dần, hạt muối vương xung quanh. Tĩnh.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const CHAN: [number, number, number][] = [
@@ -9,9 +10,9 @@ const CHAN: [number, number, number][] = [
 const HAT: [number, number, number][] = [
   [186, 44, 5], [166, 78, 4], [110, 44, 4.4], [98, 80, 3.6], [44, 48, 3], [28, 74, 2.6], [236, 30, 4],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-02" viewBox="0 0 256 96">
       {CHAN.map(([x, y, t]) => (
         <g key={x} transform={`translate(${x} ${y}) scale(${t})`} opacity={0.5 + t * 0.5}>
           <ellipse cx="0" cy="6" rx="13" ry="10" className="pk-f2" opacity=".55" />
@@ -26,6 +27,6 @@ export default function Hinh({ id: _id }: HinhProps) {
           <path className="pk-f3" d={`M${-s} ${-s}H${s}L${s * 0.5} ${-s * 0.4}H${-s * 0.5}Z`} opacity=".9" />
         </g>
       ))}
-    </svg>
+    </TrangSuc>
   )
 }

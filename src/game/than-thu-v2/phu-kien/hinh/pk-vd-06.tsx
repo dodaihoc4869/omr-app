@@ -1,4 +1,5 @@
 // VD-06 · Vệt di chuyển (Hiếm) — tia sáng trắng chói hình sao bắn ra theo bước chân (magnesium cháy). Quầng toả bằng vòng tròn mờ dần, KHÔNG <filter>. MỘT chuyển động: nhấp nháy.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const SAO: [number, number, number][] = [
@@ -9,9 +10,9 @@ const SAO: [number, number, number][] = [
   [54, 68, 0.34],
   [26, 50, 0.26],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-06" viewBox="0 0 256 96">
       <g className="pk-nhap">
         {SAO.map(([x, y, t]) => (
           <g key={x} transform={`translate(${x} ${y}) scale(${t})`}>
@@ -26,6 +27,6 @@ export default function Hinh({ id: _id }: HinhProps) {
           <circle key={x} cx={x} cy={y} r="1.6" className="pk-f3" />
         ))}
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

@@ -1,0 +1,44 @@
+/* App thầy: nền xanh xám, thẻ trắng, thứ bậc rõ; phạm vi .m3.vo-thay không vào màn thi. */
+.m3.vo-thay {
+  --m3-primary: rgb(24 104 91); --m3-on-primary: rgb(255 255 255);
+  --m3-primary-container: rgb(218 240 232); --m3-on-primary-container: rgb(21 72 62);
+  --m3-surface: rgb(250 252 252); --m3-surface-container: rgb(233 240 241);
+  --m3-surface-container-low: rgb(244 248 248); --m3-surface-container-high: rgb(228 237 237);
+  --m3-on-surface: rgb(30 47 53); --m3-on-surface-variant: rgb(84 107 112);
+  --m3-outline: rgb(119 143 148); --m3-outline-variant: rgb(212 225 227);
+  background: linear-gradient(150deg, rgb(237 245 244), rgb(229 237 242));
+}
+.m3.vo-thay .khung-noi-dung { box-shadow: 0 4px 24px rgb(32 62 69 / .05); border: 1px solid rgb(195 215 218 / .45); }
+.m3.vo-thay .ben-trai-muc { transition: background-color .15s, color .15s; }
+.m3.vo-thay .ben-trai-muc.dang { background: var(--m3-primary-container); }
+.m3.vo-thay .ben-trai-nut-ca { border-radius: 16px; box-shadow: 0 5px 12px rgb(24 104 91 / .17); }
+.m3.vo-thay .gv2-trang { gap: 22px; }
+.m3.vo-thay .gv2-dau { padding-bottom: 18px; border-bottom: 1px solid var(--m3-outline-variant); }
+.m3.vo-thay .gv2-tieu-de { font-size: clamp(25px, 2.4vw, 32px); letter-spacing: -.6px; }
+.m3.vo-thay .gv2-phu-de { line-height: 1.6; }
+.m3.vo-thay .gv2-the { border-radius: 20px; border-color: var(--m3-outline-variant); background: var(--m3-surface); box-shadow: 0 4px 12px rgb(33 65 72 / .04); }
+.m3.vo-thay .gv2-the-so { padding: 20px; background: linear-gradient(140deg, var(--m3-surface), var(--m3-surface-container-low)); }
+.m3.vo-thay .gv2-so-kpi { font-size: clamp(28px, 2.8vw, 36px); letter-spacing: -1px; }
+.m3.vo-thay .gv2-the-tieu-de { font-size: 17px; }
+.m3.vo-thay .gv2-nut-chinh, .m3.vo-thay .gv2-nut-vien { border-radius: 12px; }
+.m3.vo-thay .gv2-bang { font-variant-numeric: tabular-nums; }
+.m3.vo-thay .gv2-bang th { background: var(--m3-surface-container-low); color: var(--m3-on-surface-variant); font-weight: 700; }
+.m3.vo-thay .gv2-bang tbody tr:hover { background: var(--m3-surface-container-low); }
+.m3.vo-thay .gv2-bang td { padding-top: 14px; padding-bottom: 14px; }
+.m3.vo-thay :is(input,select,textarea) { border-radius: 10px; }
+.m3.vo-thay :is(button,a,input,select,textarea):focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 3px; }
+.m3.vo-thay .gv2-loi { border-radius: 14px; }
+@media(min-width:1100px) { .m3.vo-thay .giua-noi-dung { max-width: 1320px; } }
+@media(prefers-color-scheme:dark) {
+  .m3.vo-thay {
+    --m3-primary: rgb(121 216 190); --m3-on-primary: rgb(13 46 39);
+    --m3-primary-container: rgb(30 75 66); --m3-on-primary-container: rgb(203 240 226);
+    --m3-surface: rgb(20 34 40); --m3-surface-container: rgb(14 27 33);
+    --m3-surface-container-low: rgb(25 42 47); --m3-surface-container-high: rgb(34 53 58);
+    --m3-on-surface: rgb(228 240 239); --m3-on-surface-variant: rgb(171 195 196);
+    --m3-outline: rgb(110 140 144); --m3-outline-variant: rgb(57 79 84);
+    background: linear-gradient(150deg, rgb(16 32 36), rgb(10 23 29));
+  }
+  .m3.vo-thay .khung-noi-dung { border-color: rgb(57 79 84 / .6); }
+}
+@media(prefers-reduced-motion:reduce) { .m3.vo-thay .ben-trai-muc { transition: none; } }

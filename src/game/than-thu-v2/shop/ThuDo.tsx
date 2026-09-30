@@ -22,6 +22,7 @@ import {
   chuThieuVang,
   chuToiCuaHang,
   chuThuDo,
+  chuThongTinVatPham,
   chuThuDoPhu,
   chuTrangThai,
   chuTuHao,
@@ -113,6 +114,15 @@ function ChiTiet({ m, vang, em, dangGuiMac, onMua, onMac, onBoThu }: { m: MonSho
     <section className={`ps-kinh ps-chi-tiet ps-bac-${m.bac}`} aria-label={m.ten}>
       <HuyHieuBac bac={m.bac} them={` · ${TEN_O[m.oGan]}`} />
       <h3>{m.ten}</h3>
+      <div className={`ps-chi-duong ps-tt-${toneCua(tt)}`}>
+        <b>{tieu}</b>
+        <span>{goi}</span>
+      </div>
+      <button type="button" className={`ps-hanh-dong ps-hd-${hd.kieu}`} data-viec={hd.viec} disabled={hd.khoa} onClick={hd.chay}>
+        {hd.bieuTuong}
+        <span className="ps-so">{hd.chu}</span>
+      </button>
+      <details className="ps-thong-tin-mon"><summary>{chuThongTinVatPham}</summary>
       <div className="ps-bat-mi">
         <b>{chuBatMi}</b>
         {m.batMi}
@@ -138,14 +148,7 @@ function ChiTiet({ m, vang, em, dangGuiMac, onMua, onMac, onBoThu }: { m: MonSho
         <span>{chuSoLuong}</span>
         <b className="ps-so">{sl}</b>
       </div>
-      <div className={`ps-chi-duong ps-tt-${toneCua(tt)}`}>
-        <b>{tieu}</b>
-        <span>{goi}</span>
-      </div>
-      <button type="button" className={`ps-hanh-dong ps-hd-${hd.kieu}`} data-viec={hd.viec} disabled={hd.khoa} onClick={hd.chay}>
-        {hd.bieuTuong}
-        <span className="ps-so">{hd.chu}</span>
-      </button>
+      </details>
       <button type="button" className="ps-nut-mo" data-viec="bo-thu" onClick={() => onBoThu(m)}>
         {chuBoThu}
       </button>
@@ -171,8 +174,7 @@ export default function ThuDo(p: ThuDoProps) {
           </span>
         }
       />
-      {p.ngang ? (
-        <div className="ps-ngang ps-ngang-thu">
+        <div className={`ps-phong-thu${p.ngang ? ' ps-ngang ps-ngang-thu' : ''}`}>
           <div className="ps-ngang-trai">
       <SanKhau pet={p.pet} cap={p.cap} hienThi={hienThiTrenThu(p.dangMac, p.dangThu)} dangThu={p.dangThu} tenThu={p.tenThu} mon={p.mon} veThu={p.veThu} />
       <p className="ps-ban-be ps-cho-3" role="status" aria-live="polite">
@@ -212,45 +214,7 @@ export default function ThuDo(p: ThuDoProps) {
       {p.loiMac && <KhoiLoi loi={p.loiMac.loi} onThuLai={p.loiMac.thuLai} />}
           </div>
         </div>
-      ) : (
-        <>
-      <SanKhau pet={p.pet} cap={p.cap} hienThi={hienThiTrenThu(p.dangMac, p.dangThu)} dangThu={p.dangThu} tenThu={p.tenThu} mon={p.mon} veThu={p.veThu} />
-      <p className="ps-ban-be ps-cho-3" role="status" aria-live="polite">
-        {p.bao || chuTuHao}
-      </p>
 
-      <section className="ps-kinh ps-thu-ds" aria-labelledby="ps-thu-ds-tieu">
-        <h3 id="ps-thu-ds-tieu">{chuDangThuDanhSach}</h3>
-        {thu.length === 0 ? (
-          <div className="ps-thu-trong">
-            <p className="ps-ghi-chu">{chuChuaThuMon}</p>
-            <button type="button" className="ps-nut-mo" onClick={p.onToiCuaHang}>
-              {chuToiCuaHang}
-            </button>
-          </div>
-        ) : (
-          thu.map((m) => {
-            const tt = trangThaiMon(m, p.vang)
-            return (
-              <button key={m.ma} type="button" className={`ps-thu-hang ps-bac-${m.bac}`} aria-pressed={chon?.ma === m.ma} data-ma={m.ma} onClick={() => p.onTieuDiem(m.ma)}>
-                <span className="ps-ngoc" aria-hidden="true" />
-                <span className="ps-thu-chu">
-                  <b>{m.ten}</b>
-                  <span>
-                    <span className="ps-bac-chu">{TEN_BAC[m.bac]}</span> · {TEN_O[m.oGan]} · <span className="ps-so">{chuGia} {so(m.gia)} {chuVang}</span>
-                  </span>
-                </span>
-                <span className={`ps-thu-tt ps-tt-${toneCua(tt)}`}>{chuTrangThaiMon(tt, m, p.em)}</span>
-              </button>
-            )
-          })
-        )}
-      </section>
-
-      {chon && <ChiTiet m={chon} vang={p.vang} vi={p.vi} em={p.em} dangGuiMac={p.dangGuiMac} onMua={p.onMua} onMac={p.onMac} onToiDoi={p.onToiDoi} onBoThu={p.onBoThu} />}
-      {p.loiMac && <KhoiLoi loi={p.loiMac.loi} onThuLai={p.loiMac.thuLai} />}
-        </>
-      )}
     </>
   )
 }

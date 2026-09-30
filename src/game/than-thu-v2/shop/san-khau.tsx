@@ -7,7 +7,7 @@ import type { DangMac, MonShop, VeThu } from './kieu'
 import { demDangThu } from './logic-shop'
 
 /** Cạnh hộp thú trên sân khấu (px). */
-export const CO_THU_SAN = 172
+export const CO_THU_SAN = 204
 
 /** Bản vẽ mặc định: thú thật + lớp giữ chỗ bằng CSS. Mỗi lớp có `key` theo mã món nên đổi món thì lớp mới hiện vào (chuyển lớp 220 ms). */
 export function taoVeThuMacDinh(mon: readonly MonShop[]): VeThu {

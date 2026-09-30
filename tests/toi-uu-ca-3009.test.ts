@@ -154,6 +154,19 @@ describe('/vao-thi — MỘT batch đọc + MỘT câu ghi; bản đồ đề ri
     expect(p.j).toMatchObject({ ok: true, phongCho: true, batDau: false, batDauLuc: '', trangThai: 'mo' })
     expect(dem.vong - t2).toBe(1)
   })
+  it('300 học sinh hỏi route phòng chờ đồng thời: một truy vấn, không đề/đáp án; thầy bắt đầu được thấy ở nhịp sau', async () => {
+    const { d, env, dem } = await dung({ phongCho: 1 })
+    const t = dem.vong
+    const rs = await Promise.all(Array.from({length:300},()=>goi(env,'/phong-cho?maCa=C1')))
+    expect(dem.vong-t).toBe(1)
+    for(const r of rs) {
+      expect(r.status).toBe(200)
+      expect(r.j).toMatchObject({ok:true,phongCho:true,batDau:false,trangThai:'mo'})
+      expect(r.j.bank).toBeUndefined();expect(r.j.keyBank).toBeUndefined()
+    }
+    d.sql.exec("UPDATE ca SET phong_cho=0,bat_dau_thi_luc='2026-10-01T00:00:00Z' WHERE ma_ca='C1'")
+    expect((await goi(env,'/phong-cho?maCa=C1')).j).toMatchObject({ok:true,phongCho:false,batDau:true,batDauLuc:'2026-10-01T00:00:00Z'})
+  })
   it('cổng danh sách lớp vẫn chặn + ghi sổ chặn', async () => {
     const { d, env } = await dung()
     d.sql.prepare("INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES ('20001','A','2008','12A','x')").run()

@@ -1,4 +1,5 @@
 // VD-04 · Vệt di chuyển (Đẹp) — đuôi lửa tím hoa cà mảnh, tàn lửa li ti. viewBox 256×96: bên PHẢI là chỗ thú (đuôi kéo về TRÁI), đường đi dọc y ≈ 68. Không <filter>.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const TAN: [number, number, number][] = [
@@ -9,9 +10,9 @@ const TAN: [number, number, number][] = [
   [68, 77, 0.7],
   [38, 78, 0.5],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-04" viewBox="0 0 256 96">
       <g className="pk-nhap">
         {TAN.map(([x, y, t]) => (
           <g key={x} transform={`translate(${x} ${y}) scale(${t}) rotate(-72)`}>
@@ -21,6 +22,6 @@ export default function Hinh({ id: _id }: HinhProps) {
           </g>
         ))}
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

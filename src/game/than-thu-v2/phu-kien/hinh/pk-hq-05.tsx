@@ -1,9 +1,10 @@
 // HQ-05 · Hào quang (Hiếm) — vòng ống sáng đỏ cam kiểu đèn neon, sáng dịu rất chậm. KHÔNG dùng <filter>: quầng toả vẽ bằng bốn vòng nét dày mờ dần (rẻ hơn với máy yếu).
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="HQ-05" viewBox="0 0 256 256">
       <g className="pk-nhap-cham" fill="none">
         <circle cx="128" cy="128" r="100" className="pk-s1" strokeWidth="34" opacity=".1" />
         <circle cx="128" cy="128" r="100" className="pk-s1" strokeWidth="22" opacity=".18" />
@@ -17,6 +18,6 @@ export default function Hinh({ id: _id }: HinhProps) {
         <circle cx="128" cy="228" r="2.6" />
         <circle cx="28" cy="128" r="2.6" />
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

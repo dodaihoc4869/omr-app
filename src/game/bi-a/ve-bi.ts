@@ -113,25 +113,53 @@ export function taoMatNa(doc: Document | undefined, kiHieu: string): MatNa {
 }
 const DO_CHAM = [206, 32, 44] as const
 /** Tô ảnh một bi ĐANG LĂN vào `d` (RGBA, N × N). `q`: hướng quay (quaternion); `chu`: mặt nạ kí hiệu (bi cái: null). */
+// Chiếu sáng và màu nền mặt cầu không đổi khi xoay: dựng một lần mỗi cỡ/màu.
+// WeakMap cho phép thu hồi cùng BoVe; tối đa bốn ảnh nền nhỏ trên một cỡ bóng.
+const ANH_NEN_BI = new WeakMap<Bong, Partial<Record<KieuBi, Uint8ClampedArray>>>()
+function anhNenBi(B: Bong, kieu: KieuBi, mau: readonly number[]): Uint8ClampedArray {
+  let kho = ANH_NEN_BI.get(B)
+  if (!kho) { kho = {}; ANH_NEN_BI.set(B, kho) }
+  let anh = kho[kieu]
+  if (anh) return anh
+  anh = new Uint8ClampedArray(B.N * B.N * 4)
+  for (let k = 0; k < B.N * B.N; k++) {
+    if (B.al[k]! <= 0) continue
+    const o = k * 4, sh = B.sh[k]!, sp = B.sp[k]! * 255
+    anh[o] = mau[0]! * sh + sp; anh[o + 1] = mau[1]! * sh + sp; anh[o + 2] = mau[2]! * sh + sp; anh[o + 3] = B.al[k]! * 255
+  }
+  kho[kieu] = anh
+  return anh
+}
 export function toBiLan(B: Bong, kieu: KieuBi, chu: MatNa | null, q: readonly [number, number, number, number], xoay: boolean, d: Uint8ClampedArray): void {
   const w = q[0], qx = q[1], qy = q[2], qz = q[3], TR = MAU_BI.trang
   const m00 = 1 - 2 * (qy * qy + qz * qz), m01 = 2 * (qx * qy - w * qz), m02 = 2 * (qx * qz + w * qy), m10 = 2 * (qx * qy + w * qz), m11 = 1 - 2 * (qx * qx + qz * qz), m12 = 2 * (qy * qz - w * qx), m20 = 2 * (qx * qz - w * qy), m21 = 2 * (qy * qz + w * qx), m22 = 1 - 2 * (qx * qx + qy * qy)
   const la = kieu === 'cai', base = kieu === 'ta' ? MAU_BI.ta : kieu === 'dich' ? MAU_BI.dich : kieu === 'chot' ? MAU_BI.den : TR
   const Tt = CHU_T, SD = 0.5103, N = B.N
+  d.set(anhNenBi(B, kieu, base))
   for (let k = 0; k < N * N; k++) {
-    const al = B.al[k]!, o = k * 4
-    if (al <= 0) { d[o + 3] = 0; continue }
+    if (B.al[k]! <= 0) continue
+    const o = k * 4
     let nx = B.nx[k]!, ny = B.ny[k]!
     const nz = B.nz[k]!
     if (xoay) { const t = nx; nx = ny; ny = -t }
-    const lx = m00 * nx + m10 * ny + m20 * nz, ly = m01 * nx + m11 * ny + m21 * nz, lz = m02 * nx + m12 * ny + m22 * nz
+    const lx = m00 * nx + m10 * ny + m20 * nz
     let r: number = base[0], g: number = base[1], bl: number = base[2]
-    if (la) { if (lx > 0.972 || lx < -0.972 || ly > 0.972 || ly < -0.972 || lz > 0.972 || lz < -0.972) { r = DO_CHAM[0]; g = DO_CHAM[1]; bl = DO_CHAM[2] } }
-    else {
+    if (la) {
+      const ly = m01 * nx + m11 * ny + m21 * nz
+      const lz = m02 * nx + m12 * ny + m22 * nz
+      if (!(lx > 0.972 || lx < -0.972 || ly > 0.972 || ly < -0.972 || lz > 0.972 || lz < -0.972)) continue
+      r = DO_CHAM[0]; g = DO_CHAM[1]; bl = DO_CHAM[2]
+    } else {
       const ax = lx < 0 ? -lx : lx
-      if (kieu === 'dich' && (ly > 0.6 || ly < -0.6)) { r = TR[0]; g = TR[1]; bl = TR[2] } // dải đỏ cam quanh xích đạo chứa hai ô kí hiệu (±x) — lúc nằm yên ở dáng gốc là dải NGANG như ảnh vẽ sẵn
+      // Bi đặc không ở ô chữ: giữ ảnh nền đã tô, bỏ hai phép chiếu còn lại và việc chiếu sáng RGB.
+      if (kieu !== 'dich' && !(ax > 0.874 && chu)) continue
+      const ly = m01 * nx + m11 * ny + m21 * nz
+      const doiNen = kieu === 'dich' && (ly > 0.6 || ly < -0.6)
+      if (doiNen) { r = TR[0]; g = TR[1]; bl = TR[2] }
+      else if (!(ax > 0.874 && chu)) continue
       if (ax > 0.874 && chu) {
         if (kieu === 'chot') { r = TR[0]; g = TR[1]; bl = TR[2] }
+        const lz = m02 * nx + m12 * ny + m22 * nz
         let u = lz / SD
         const v = ly / SD
         if (lx < 0) u = -u
@@ -145,6 +173,5 @@ export function toBiLan(B: Bong, kieu: KieuBi, chu: MatNa | null, q: readonly [n
     }
     const sh = B.sh[k]!, sp = B.sp[k]! * 255
     d[o] = r * sh + sp; d[o + 1] = g * sh + sp; d[o + 2] = bl * sh + sp
-    d[o + 3] = al * 255
   }
 }

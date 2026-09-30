@@ -1,0 +1,7 @@
+// Chỉ dữ liệu giả cục bộ; chặn toàn bộ yêu cầu ra máy chủ ngoài.
+import{chromium}from'playwright';import{mkdirSync,writeFileSync}from'node:fs';import assert from'node:assert/strict';
+const origin=process.argv[2] || 'http://127.0.0.1:5183';const out=process.argv[3] || '/tmp/luxury-preview';mkdirSync(out,{recursive:true});const b=await chromium.launch({executablePath:process.env.PW_CHROMIUM || '/usr/bin/chromium',args:['--no-sandbox']});const rs=[];
+try{for(const w of [390,1440])for(const scheme of ['light','dark'])for(const man of ['tongquan','chiendich','hocsinh','caidat']){
+ const p=await b.newPage({viewport:{width:w,height:900},colorScheme:scheme,reducedMotion:'reduce'});const errors=[];p.on('pageerror',e=>errors.push(e.stack));await p.route('**/*',r=>new URL(r.request().url()).origin===origin?r.continue():r.abort());await p.goto(`${origin}/scripts/preview-bat-linh/teacher.html?man=${man}`);await p.waitForSelector('.vo-thay');await p.evaluate(()=>document.fonts.ready);await p.waitForTimeout(700);
+ const overflow=await p.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert.ok(overflow<=1,`${man} ${w} overflow ${overflow}`);assert.equal(errors.length,0,errors.join());await p.screenshot({path:`${out}/gv-${man}-${w}-${scheme}.jpg`,type:'jpeg',quality:60});rs.push({man,w,scheme,overflow,errors});await p.close();
+}}finally{await b.close();writeFileSync(out+'/teacher-check.json',JSON.stringify(rs,null,2))}console.log(JSON.stringify(rs));

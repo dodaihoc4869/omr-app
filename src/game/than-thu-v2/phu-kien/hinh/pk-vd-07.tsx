@@ -1,9 +1,10 @@
 // VD-07 · Vệt di chuyển (Sử thi) — dải đỏ tươi dài kiểu sao băng (strontium), đầu vệt có đốm sáng. Quầng bằng nhiều lớp mờ dần, KHÔNG <filter>. MỘT chuyển động: nhịp thở chậm.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-07" viewBox="0 0 256 96">
       <defs>
         <linearGradient id={`${id}d`} x1="1" y1="0" x2="0" y2="0">
           <stop offset="0" style={{ stopColor: 'var(--pk-2)', stopOpacity: 0.95 }} />
@@ -22,6 +23,6 @@ export default function Hinh({ id }: HinhProps) {
           <circle key={x} cx={x} cy={y} r={r} className="pk-f2" />
         ))}
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

@@ -1,4 +1,5 @@
 // VD-08 · Vệt di chuyển (Huyền thoại) — tia sét lam – vàng kim dọc đường đi, kí hiệu electron (vòng tròn + gạch âm) mờ dần. KHÔNG chữ, KHÔNG <filter>. MỘT chuyển động: nhấp nháy.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const TIA = 'M240 60 206 46 216 64 172 48 184 66 138 50 148 68 100 52 110 70 64 56 72 72 22 62'
@@ -7,9 +8,9 @@ const E: [number, number, number][] = [
   [140, 30, 0.7],
   [82, 34, 0.45],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-08" viewBox="0 0 256 96">
       <g className="pk-nhap">
         <path d={TIA} fill="none" className="pk-s1" strokeWidth="12" opacity=".14" strokeLinejoin="round" strokeLinecap="round" />
         <path d={TIA} fill="none" className="pk-s1" strokeWidth="6" opacity=".4" strokeLinejoin="round" strokeLinecap="round" />
@@ -22,6 +23,6 @@ export default function Hinh({ id: _id }: HinhProps) {
           </g>
         ))}
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

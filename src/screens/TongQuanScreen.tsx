@@ -2,7 +2,7 @@
 // "Hôm nay có gì": thẻ số (nhãn + đơn vị + mẫu số + dòng so sánh), chiến dịch đang chạy, ca đang mở, việc cần làm,
 // bài nộp 14 ngày. CHỈ dùng API sẵn có: `danhSachCa` + `/gv/chien-dich` danh-sach + bang. Không đổi máy chủ.
 // Phép tính thuần ở `src/lib/tong-quan-gv.ts` (có test). Ghi số đếm cạnh mục thanh bên vào `useSoDemGv`.
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, BookOpen, ChevronRight, Clock, Flag, MonitorCheck, RefreshCw, Star, Users, type LucideIcon } from 'lucide-react'
 import { danhSachCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
@@ -27,6 +27,7 @@ import {
   soVi,
   type DongChienDich,
 } from '../lib/tong-quan-gv'
+import { taiGioiHan } from '../lib/tai-gioi-han'
 import './gv-hoa2.css'
 
 
@@ -55,33 +56,37 @@ export default function TongQuanScreen() {
   const [du, setDu] = useState<DuLieu | null>(null)
   const [dangTai, setDangTai] = useState(false)
 
+  const lanTai = useRef(0)
   const tai = useCallback(async () => {
+    const lan = ++lanTai.current
     setDangTai(true)
-    let ca: CaTomTat[] = []
-    let loiCa = ''
-    try {
-      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim() || !mat.trim()) throw new Error('Chưa kết nối máy chủ — vào Cài đặt › Công cụ kỹ thuật › Kết nối máy chủ')
-      ca = await danhSachCa(url.trim(), mat.trim(), false)
-    } catch (e) {
-      loiCa = e instanceof Error ? e.message : 'Không tải được danh sách ca'
+    const taiCa = async () => {
+      try {
+        const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+        if (!url.trim() || !mat.trim()) throw new Error('Chưa kết nối máy chủ — vào Cài đặt › Công cụ kỹ thuật › Kết nối máy chủ')
+        return { ca: await danhSachCa(url.trim(), mat.trim(), false), loiCa: '' }
+      } catch (e) { return { ca: [] as CaTomTat[], loiCa: e instanceof Error ? e.message : 'Không tải được danh sách ca' } }
     }
-    let cd: ChienDichTom[] = []
-    let loiCd = ''
-    const r = await danhSach()
-    if (r.ok) cd = r.du.chienDich
-    else loiCd = r.chu
+    const taiCd = async () => {
+      try {
+        const r = await danhSach()
+        return r.ok ? { cd: r.du.chienDich, loiCd: '' } : { cd: [] as ChienDichTom[], loiCd: r.chu }
+      } catch (e) { return { cd: [] as ChienDichTom[], loiCd: e instanceof Error ? e.message : 'Không tải được chiến dịch' } }
+    }
+    const [{ ca, loiCa }, { cd, loiCd }] = await Promise.all([taiCa(), taiCd()])
+    if (lan !== lanTai.current) return
     const hien = chienDichHienTongQuan(cd)
-    const bang = await Promise.all(hien.map(async (c) => {
-      const b = await docBang(c.id)
-      return b.ok ? b.du : null
-    }))
+    const bang = await taiGioiHan(hien, async (c) => {
+      try { const b = await docBang(c.id); return b.ok ? b.du : null } catch { return null }
+    })
+    if (lan !== lanTai.current) return
     setDu({ ca, cd: hien, bang, loiCa, loiCd })
     setDangTai(false)
   }, [])
 
   useEffect(() => {
     void tai()
+    return () => { lanTai.current++ }
   }, [tai])
 
   const now = gioMayChu()

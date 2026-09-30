@@ -1,9 +1,10 @@
 // CL-03 · Trên lưng (Đẹp) — áo trắng phòng thí nghiệm dáng ngắn choàng lên lưng thú: cổ áo ve nhọn ở phía trước (phải), túi ngực cài ống nhỏ giọt. Lưng ở (50,50), thân dài 80; áo chỉ phủ ~55% thân để thấy thú. Tĩnh.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="CL-03" viewBox="0 0 100 100">
       <g transform="translate(50 50) scale(.62) translate(-50 -40)">
       <path d="M20 54C22 44 36 40 52 40S76 44 80 52L84 84C60 92 36 92 16 84Z" className="pk-f1" />
       <path d="M20 54C22 44 36 40 52 40S76 44 80 52L84 84C60 92 36 92 16 84Z" fill="none" className="pk-s2" strokeWidth="1.8" strokeLinejoin="round" />
@@ -16,6 +17,6 @@ export default function Hinh({ id: _id }: HinhProps) {
       <circle cx="56" cy="52" r="3.2" className="pk-f3" />
       <path d="M36 50v28" fill="none" className="pk-s2" strokeWidth="1" opacity=".4" />
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

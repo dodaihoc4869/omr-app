@@ -1,4 +1,5 @@
 // DA-06 · Trên đầu (Hiếm) — cặp sừng tinh thể bismuth: bậc thang vuông nghiêng ra ngoài, mỗi bậc một sắc cầu vồng (mạ ánh kim). Ánh lướt chậm bằng độ sáng (MỘT chuyển động).
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const MAU = ['pk-f1', 'pk-f2', 'pk-f3', 'pk-f4']
@@ -13,13 +14,13 @@ const Sung = ({ x, ra }: { x: number; ra: 4 | -4 }) => (
     ))}
   </g>
 )
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="DA-06" viewBox="0 0 100 100">
       <g className="pk-nhap-cham">
         <Sung x={30} ra={-4} />
         <Sung x={70} ra={4} />
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

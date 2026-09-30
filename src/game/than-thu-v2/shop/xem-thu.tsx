@@ -15,6 +15,8 @@ import '../game.css'
 import { KICH_BAN_MAU, ShopApiGia } from './du-lieu-mau'
 import type { MaLoiEp } from './du-lieu-mau'
 import ManShop from './ManShop'
+import { ThuMacDo } from '../phu-kien/ThuMacDo'
+import { HinhVatPham } from '../phu-kien/HinhVatPham'
 import type { ManShopMan } from './ManShop'
 
 const q = new URLSearchParams(location.search)
@@ -53,6 +55,8 @@ function Trang() {
       <ManShop
         key={`${kb}-${tre}-${lan}`}
         api={api}
+        veThu={(o) => <ThuMacDo {...o} />}
+        veHinhMon={(m) => <HinhVatPham ma={m.ma} />}
         pet={Number(q.get('pet') ?? 2)}
         cap={Number(q.get('cap') ?? 34)}
         tenThu={q.get('ten') ?? 'Be May'}

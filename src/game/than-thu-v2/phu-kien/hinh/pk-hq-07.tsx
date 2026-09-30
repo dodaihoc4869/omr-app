@@ -1,10 +1,11 @@
 // HQ-07 · Hào quang (Sử thi) — dải cực quang lục – tím uốn sau lưng thú. Quầng mờ dựng bằng nhiều nét dày mờ dần (không <filter>). MỘT chuyển động: nhịp thở 4 giây.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const DAI = ['M14 118C66 46 118 150 168 78S244 54 250 104', 'M20 168C78 100 130 196 184 130S240 118 246 158']
 export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="HQ-07" viewBox="0 0 256 256">
       <defs>
         <linearGradient id={`${id}c`} x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" style={{ stopColor: 'var(--pk-1)', stopOpacity: 0 }} />
@@ -23,6 +24,6 @@ export default function Hinh({ id }: HinhProps) {
           </g>
         ))}
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

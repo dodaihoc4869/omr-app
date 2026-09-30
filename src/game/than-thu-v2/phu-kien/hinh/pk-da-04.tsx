@@ -1,9 +1,10 @@
 // DA-04 · Trên đầu (Đẹp) — bình cầu đáy tròn đội lệch, dung dịch xanh lam bên trong sủi bọt (bọt nhấp nháy chậm). MỘT chuyển động: bọt.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="DA-04" viewBox="0 0 100 100">
       <defs>
         <clipPath id={`${id}b`}>
           <circle cx="50" cy="46" r="22" />
@@ -22,6 +23,6 @@ export default function Hinh({ id }: HinhProps) {
           <circle cx="51" cy="44" r="2" className="pk-f3" opacity=".8" />
         </g>
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

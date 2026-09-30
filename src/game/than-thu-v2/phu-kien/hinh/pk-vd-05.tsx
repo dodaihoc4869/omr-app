@@ -1,4 +1,5 @@
 // VD-05 · Vệt di chuyển (Đẹp) — đuôi lửa xanh lục (ngọn lửa đồng), lõi sáng trắng. MỘT chuyển động: cả đuôi nhấp nháy. Không <filter>.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const LUA: [number, number, number][] = [
@@ -9,9 +10,9 @@ const LUA: [number, number, number][] = [
   [68, 73, 0.7],
   [38, 74, 0.5],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="VD-05" viewBox="0 0 256 96">
       <g className="pk-nhap">
         {LUA.map(([x, y, t]) => (
           <g key={x} transform={`translate(${x} ${y}) scale(${t}) rotate(-78)`}>
@@ -23,6 +24,6 @@ export default function Hinh({ id: _id }: HinhProps) {
         ))}
         <path className="pk-s1" d="M20 78H222" fill="none" strokeWidth="1.6" opacity=".35" strokeLinecap="round" />
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

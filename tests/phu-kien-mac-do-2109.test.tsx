@@ -111,8 +111,11 @@ describe('ThuMacDo — ba lớp đúng chỗ, thú luôn hiện', () => {
     )
     await waitFor(() => expect(container.querySelectorAll('.pk-lop svg').length).toBe(2))
     const ids = [...container.querySelectorAll('.pk-lop [id]')].map((e) => e.id)
-    expect(ids.length).toBe(2)
-    expect(new Set(ids).size).toBe(2)
+    expect(ids.length).toBeGreaterThanOrEqual(2)
+    expect(new Set(ids).size).toBe(ids.length)
+    const idsMoiThu = [...container.querySelectorAll('.pk-lop svg')].map((svg) => [...svg.querySelectorAll('[id]')].map((e) => e.id))
+    expect(idsMoiThu[0]!.length).toBe(idsMoiThu[1]!.length)
+    expect(idsMoiThu[0]!.every((id) => !idsMoiThu[1]!.includes(id))).toBe(true)
   })
   it('CAO_KHUNG_TEN = 6 khoảng cách + 44 khung + 2 (nơi gọi chừa chỗ dưới hộp thú)', () => {
     expect(CAO_KHUNG_TEN).toBe(52)

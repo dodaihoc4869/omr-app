@@ -1,3 +1,4 @@
+import { docPhongChoDongThoi } from './phong-cho-dong-thoi'
 import { nhipCa } from './nhip-ca'
 import { denPhongBiA } from './bi-a-phong'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
@@ -693,7 +694,7 @@ async function xemTrangThai(env: Env, sbd: string): Promise<Response> {
  * giây — nên nó phải là câu nhẹ nhất trong toàn bộ máy chủ. */
 async function hoiPhongCho(env: Env, maCa: string): Promise<Response> {
   // Chỉ BA cột (tối ưu ca 30/09): `SELECT *` kéo cả bản đồ đề riêng của lớp (hàng trăm KB) cho MỖI nhịp hỏi 3 giây của MỖI em.
-  const ca = await env.DB.prepare('SELECT trang_thai, phong_cho, bat_dau_thi_luc FROM ca WHERE ma_ca = ?').bind(maCa).first<Pick<DongCa, 'trang_thai' | 'phong_cho' | 'bat_dau_thi_luc'>>()
+  const ca = await docPhongChoDongThoi(env, maCa)
   if (!ca) return ra({ ok: false, error: 'Không tìm thấy ca kiểm tra' })
   return ra({
     ok: true,

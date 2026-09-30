@@ -21,6 +21,7 @@ import type { ViecXacNhan } from './XacNhanMua'
 import { useNgang } from '../dao2/ngang'
 import './shop.css'
 import './shop-ngang.css'
+import './shop-trang-suc.css'
 
 export type ManShopMan = 'cua-hang' | 'thu-do' | 'tu-do'
 

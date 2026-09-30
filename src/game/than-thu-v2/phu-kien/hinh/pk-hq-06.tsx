@@ -1,4 +1,5 @@
 // HQ-06 · Hào quang (Hiếm) — lưới tứ diện carbon (mạng kim cương), nút mạng loé sáng. Không <filter>. MỘT chuyển động: nhóm nút nhấp nháy.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 const N: [number, number][] = [
@@ -7,9 +8,9 @@ const N: [number, number][] = [
 const CANH: [number, number][] = [
   [0, 1], [0, 2], [0, 4], [1, 3], [1, 4], [2, 4], [2, 5], [3, 6], [4, 6], [4, 7], [5, 7], [6, 8], [7, 8], [4, 8],
 ]
-export default function Hinh({ id: _id }: HinhProps) {
+export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="HQ-06" viewBox="0 0 256 256">
       <g fill="none" strokeLinecap="round">
         {CANH.map(([a, b]) => (
           <line key={`${a}-${b}`} x1={N[a]![0]} y1={N[a]![1]} x2={N[b]![0]} y2={N[b]![1]} className="pk-s1" strokeWidth="2.2" opacity=".55" />
@@ -24,6 +25,6 @@ export default function Hinh({ id: _id }: HinhProps) {
         ))}
         <path className="pk-s3" d="M128 44V68M116 56H140" fill="none" strokeWidth="2" strokeLinecap="round" />
       </g>
-    </svg>
+    </TrangSuc>
   )
 }

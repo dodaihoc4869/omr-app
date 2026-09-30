@@ -3,6 +3,7 @@
 // (cấp 1/10/30/50/70/100 — KHÔNG chỉ cấp 100) × thú nhìn phải / nhìn trái (`quayTrai`).
 // Khoá: hộp món ĐÚNG điểm neo (tâm; đầu: đỉnh đầu ở 70% hộp; lật ngang khi quay trái, hình cũng lật), món TRƯỚC thú (mũ, khăn, áo, ba lô) KHÔNG che mắt / mặt, cánh + áo choàng nằm SAU thú,
 // trên đầu nằm trên cùng, không tràn ngang; chuyển động: mỗi món ≤ 1, Thường = 0, Sử thi / Huyền thoại ≥ 1, mặc đủ 5 ô ⇒ một thú ≤ 3, bản tĩnh / giảm chuyển động = 0.
+import { existsSync, realpathSync } from 'node:fs'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { chromium, type Browser, type Page } from 'playwright'
 import { createServer, type ViteDevServer } from 'vite'
@@ -17,16 +18,17 @@ let goc = ''
 beforeAll(async () => {
   may = await createServer({
     configFile: false,
+    cacheDir: `/tmp/phu-kien-dat-do-trinh-duyet-2109.test-${process.pid}`,
     root: process.cwd(),
     plugins: [react()],
     define: { __PHIEN_BAN__: JSON.stringify('thu'), __SW_BUILT_AT__: 0 },
-    server: { host: '127.0.0.1', port: 0, hmr: false, watch: null },
+    server: { host: '127.0.0.1', port: 0, hmr: false, watch: null, fs: { allow: [process.cwd(), realpathSync('node_modules')] } },
     logLevel: 'error',
     optimizeDeps: { entries: ['src/components/xem-thu/phu-kien.html'] },
   })
   await may.listen()
   goc = `http://127.0.0.1:${(may.httpServer!.address() as AddressInfo).port}`
-  tr = await chromium.launch({ headless: true })
+  tr = await chromium.launch({ headless: true, executablePath: process.env.PW_CHROMIUM || (existsSync('/usr/bin/chromium') ? '/usr/bin/chromium' : undefined), args: ['--no-sandbox'] })
 }, 180_000)
 afterAll(async () => {
   await tr?.close()

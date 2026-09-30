@@ -1,0 +1,29 @@
+{
+  "total": 13115,
+  "pass": 12954,
+  "fail": 133,
+  "skipped": 28,
+  "newFailures": [
+    {
+      "name": "tô bi tối ưu giữ nguyên điểm ảnh và hướng lăn bốn loại bi × ba cỡ × hai hướng bàn × 24 góc quay, mặt nạ chữ có tô và viền",
+      "file": "/workspace/omr-luxury-final/tests/bi-a-shader-0110.test.ts",
+      "error": "Error: STACK_TRACE_ERROR\n    at task (file:///workspace/omr-app/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///workspace/omr-app/node_modules/@vitest/runner/dist/chunk-artifact.js:18"
+    }
+  ],
+  "oldResolved": [
+    "A.1 — bản nhớ kế hoạch: vẽ NGAY khi mở lại, rồi thay bằng bản mới bản mới về thì THAY: bỏ dòng \"đang cập nhật\", lưu lại bản nhớ mới",
+    "P06/RV07 — qid cho BTVN/Mom để coverage (§7.2) đếm đủ docCoverageTheoPlan đếm được kỹ năng K1 nhờ qid của BTVN (trước đây bỏ sót ⇒ 0)",
+    "Đảo báo nhầm \"ca kiểm tra\" — nguyên nhân (b): Bi-a giữ câu bàn Bi-a bỏ dở quá 30 phút ⇒ nhả câu cho Đảo; bàn đang chơi (< 30 phút) ⇒ lý do riêng \"đang ở bàn Bi-a\", không nói ca",
+    "(6) khiên 36 mảnh + 2 600 vàng + ngày ≥ 36 + 18(k − 1); khoá cấp shop bậc 4/5 bậc 4 cần cấp 10, bậc 5 cần cấp 20, bậc 1–3 không khoá (trường chỉ-thêm `canCap`); giá v4 giữ nguyên",
+    "việc on_thi mang câu từ hồ sơ, chỉ câu phục vụ được ca trong 3 ngày: on_thi có `chiTiet.qid` gồm câu em từng sai, phục vụ được, KHÔNG trùng on_lai, KHÔNG có câu đề bảo vệ / chưa lập chỉ mục / đề đã xoá",
+    "việc on_thi mang câu từ hồ sơ, chỉ câu phục vụ được câu đã khắc phục và câu cần dạy lại (`can_day_lai`) KHÔNG vào on_thi",
+    "việc on_thi mang câu từ hồ sơ, chỉ câu phục vụ được đề thi được công bố/đóng lại ⇒ câu hết bị bảo vệ và vào on_thi ở lần lập kế hoạch sau"
+  ],
+  "afterRerun": {
+    "newFailures": [],
+    "shaderByteComparison": "Buffer.compare: tất cả tổ hợp bằng byte, rerun đạt",
+    "knownFailures": 132,
+    "shopTargetPassed": 168,
+    "perfTargetPassed": 30
+  }
+}

@@ -1,9 +1,10 @@
 // HQ-08 · Hào quang (Huyền thoại) — ba quỹ đạo electron vàng kim xoay chậm, hạt nhân sáng sau lưng. MỘT chuyển động: cả bộ quỹ đạo xoay 40 giây/vòng (transform). Không <filter>.
+import { TrangSuc } from '../TrangSuc'
 import type { HinhProps } from '../nap-hinh'
 
 export default function Hinh({ id }: HinhProps) {
   return (
-    <svg viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+    <TrangSuc id={id} ma="HQ-08" viewBox="0 0 256 256">
       <defs>
         <radialGradient id={`${id}h`}>
           <stop offset="0" style={{ stopColor: 'var(--pk-3)', stopOpacity: 0.9 }} />
@@ -23,6 +24,6 @@ export default function Hinh({ id }: HinhProps) {
           </g>
         ))}
       </g>
-    </svg>
+    </TrangSuc>
   )
 }
