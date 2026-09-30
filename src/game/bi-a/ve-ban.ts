@@ -1,9 +1,9 @@
 // BI-A PHẢN ỨNG · VẼ BÀN + KHUNG HÌNH (chép từ bản vẽ). Bàn gỗ, nỉ có hoa văn vòng benzene mờ, 6 lỗ, chấm kim cương.
 // Khi bàn nằm ngang: hình học vẽ theo toạ độ bàn (ma trận quay), còn BI, BÓNG BI, CHỮ vẽ theo toạ độ màn để đèn luôn góc trên trái.
 import { datTFBan, raMan, type KhungBan } from './bo-cuc'
-import { duDoan, type DuDoan } from './du-doan'
+import { duongMatThan } from './du-doan'
 import { KL, MAU_QH, PK, kieuBi, type KieuBi, type KiHieu, type QuanHe } from './nguyen-to'
-import { KHUNG_ANH, MAU_BI_VANG, MS_VE_GOC, Q_GOC_DOC, Q_GOC_NGANG, noiQuay, taoAnhBi, taoBong, taoMatNa, toBiLan, veMotBi, type Bong, type MatNa } from './ve-bi'
+import { KHUNG_ANH, MAU_BI_VANG, taoAnhBi, taoBong, taoMatNa, toBiLan, veMotBi, type Bong, type MatNa } from './ve-bi'
 import { DIEM_CHAN, H, LO, R, T, W, type Bi } from './vat-ly'
 import type { Pha, VanBia } from './dieu-khien'
 
@@ -88,14 +88,11 @@ export class BoVe {
   private lan = new Map<string, { cv: HTMLCanvasElement; x: CanvasRenderingContext2D; img: ImageData; ver: number; so: number }>()
   /** Số ảnh bi lăn còn được tô lại trong khung này (máy yếu: tối đa 4, bi khác giữ ảnh cũ thêm một khung). */
   private conTo = Infinity
-  /** Bi VỪA DỪNG: trượt êm (MS_VE_GOC) từ hướng lúc dừng về dáng gốc rồi mới chuyển sang ảnh vẽ sẵn — kí hiệu không nhảy. */
-  private veGoc = new Map<string, { t0: number; q: [number, number, number, number] }>()
-  private lanTruoc = new Set<string>()
-  private readonly qTam: number[] = [1, 0, 0, 0]
-  private nhipVe = 0
-  private bayGio = 0
+  /** Bi ĐÃ LĂN ít nhất một lần trong ván (thầy 30/09 "muốn bi lăn thật"): từ đó luôn vẽ theo hướng quay 3D bền `b.q` (tích luỹ theo quãng lăn,
+   *  chỉ là hình ảnh cục bộ — không vào băm, không gửi qua mạng) — dừng thì kí hiệu nằm đâu GIỮ NGUYÊN đó. Bi đứng yên: ảnh đệm riêng của bi
+   *  chỉ tô lại khi hướng đổi (`b.ver`), mỗi khung chỉ drawImage. Bi chưa lăn lần nào (đầu ván) dùng ảnh dáng gốc vẽ sẵn. */
+  private daLan = new Set<string>()
   private nen: HTMLCanvasElement | null = null
-  private duDoanCu: { key: string; t: number; kq: DuDoan } = { key: '', t: 0, kq: { cue: [], obj: [] } }
   /** Ảnh bóng đổ dưới bi (vẽ sẵn một lần mỗi cỡ, mỗi khung chỉ drawImage — không tạo gradient mỗi khung). */
   private bongDo: HTMLCanvasElement | null = null
   /** Dải màu cây cơ (tạo một lần, dịch bằng translate). */
@@ -132,7 +129,7 @@ export class BoVe {
   datCo(k: KhungBan, dpr: number, nhe = this.nhe): void {
     this.k = k; this.dpr = dpr; this.nhe = nhe
     this.rAnh = R * k.S * dpr
-    this.anh.clear(); this.lan.clear(); this.veGoc.clear(); this.lanTruoc.clear()
+    this.anh.clear(); this.lan.clear()
     this.bong = taoBong(Math.max(12, Math.ceil(2 * this.rAnh) + 2))
     this.ganMatNa()
     this.nen = veNen(k, dpr, this.doc)
@@ -163,20 +160,13 @@ export class BoVe {
   private vanDangVe: VanBia | null = null
   private vangCua(b: Bi): boolean { const v = this.vanDangVe; return !!v && b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang }
   /** Bi đang chạy (có vận tốc) ⇒ vẽ lăn. */
-  private dangLan(b: Bi): boolean { return !!this.bong && (b.vx !== 0 || b.vy !== 0 || this.veGoc.has(b.id)) }
-  /** Cập nhật danh sách bi vừa dừng (gọi đầu mỗi khung vẽ). */
-  private capNhatVeGoc(balls: readonly Bi[], now: number): void {
-    if (!this.bong) return
-    for (const b of balls) {
-      const chay = b.on && (b.vx !== 0 || b.vy !== 0)
-      if (chay) { if (this.lan.has(b.id)) this.lanTruoc.add(b.id); this.veGoc.delete(b.id) } // chỉ bi đã có ảnh lăn (máy vẽ được canvas) mới cần trượt về dáng gốc
-      else if (this.lanTruoc.has(b.id)) { this.lanTruoc.delete(b.id); if (b.on) this.veGoc.set(b.id, { t0: now, q: [b.q[0], b.q[1], b.q[2], b.q[3]] }) }
-    }
-    for (const [id, e] of this.veGoc) if (now - e.t0 > MS_VE_GOC) { this.veGoc.delete(id); const c = this.lan.get(id); if (c) c.ver = -1 }
+  private dangLan(b: Bi): boolean {
+    if (!this.bong) return false
+    if (b.vx !== 0 || b.vy !== 0) this.daLan.add(b.id)
+    return this.daLan.has(b.id)
   }
   /** Số nhận dạng ảnh đang vẽ của bi (đổi ⇒ ô bi là vùng bẩn): bi lăn theo bản hướng quay, bi đứng yên theo kiểu + viền vàng. */
   private soAnhVe(b: Bi, doiEm: 0 | 1): number {
-    if (this.veGoc.has(b.id)) return 1e7 + this.nhipVe // đang trượt về dáng gốc: khung nào cũng đổi
     if (this.dangLan(b)) { const e = this.lan.get(b.id); return 100 + (e ? e.ver : -1) }
     return this.soAnh(b, doiEm) + 1
   }
@@ -191,15 +181,6 @@ export class BoVe {
       if (!x) return null
       e = { cv, x, img: x.createImageData(B.N, B.N), ver: -1, so: -1 }
       this.lan.set(b.id, e)
-    }
-    const goc = this.veGoc.get(b.id)
-    if (goc) { // vừa dừng: nội suy về dáng gốc (ease-out, đường ngắn nhất), tô mỗi khung
-      let m: MatNa | null = null
-      if (b.id !== 'cue') m = this.matNa.get(b.id) ?? null
-      const q = noiQuay(goc.q, this.k?.xoay ? Q_GOC_NGANG : Q_GOC_DOC, (this.bayGio - goc.t0) / MS_VE_GOC, this.qTam) as unknown as [number, number, number, number]
-      toBiLan(B, kieu, m, q, !!this.k?.xoay, e.img.data)
-      e.x.putImageData(e.img, 0, 0); e.ver = -3; e.so = so
-      return e.cv
     }
     if ((e.ver !== b.ver || e.so !== so) && (this.conTo > 0 || e.ver < 0)) {
       this.conTo--
@@ -226,7 +207,7 @@ export class BoVe {
    * Luôn ghi lại dấu trạng thái (gọi đúng một lần mỗi khung, rồi `ve` nếu true).
    */
   canVe(v: VanBia, chi: ChiBi | null, mtBat: boolean, keoBiCai: boolean, mo = false): boolean {
-    let ve = this.phaiVe || v.pha === 'moving' || v.pha === 'ai-nham' || v.fx.length > 0 || v.roi.length > 0 || v.noi.length > 0 || this.veGoc.size > 0 || this.lanTruoc.size > 0
+    let ve = this.phaiVe || v.pha === 'moving' || v.pha === 'ai-nham' || v.fx.length > 0 || v.roi.length > 0 || v.noi.length > 0
     const d = this.dauMoi, balls = v.st.balls
     let i = 0
     d[i++] = PHA_SO[v.pha]; d[i++] = v.cur; d[i++] = v.em; d[i++] = v.sheet ? v.sheet.ma : -1; d[i++] = v.phienBan
@@ -261,9 +242,7 @@ export class BoVe {
       px = vt.x; py = vt.y
     }
   }
-  private hopDuong(pts: readonly [number, number][], nua: number): void {
-    for (let i = 1; i < pts.length; i++) this.hopDoan(pts[i - 1]![0], pts[i - 1]![1], pts[i]![0], pts[i]![1], nua)
-  }
+
 
   /** Vẽ một khung hình của ván. `chi`: bi đang được chỉ (nhãn) và quan hệ. */
   /** `mo`: ngón đang ở vùng "Huỷ" của thanh lực ⇒ gậy + đường ngắm mờ đi (em biết thả là không đánh). */
@@ -277,13 +256,12 @@ export class BoVe {
     const s = k.S * this.dpr, balls = v.st.balls, vt = this.vt, nhe = this.nhe, cw = ctx.canvas.width, ch = ctx.canvas.height, n = balls.length
     const doiEm = v.ghe[v.em]!.doi
     this.conTo = nhe ? 4 : Infinity
-    this.nhipVe++; this.bayGio = typeof performance !== 'undefined' ? performance.now() : Date.now()
-    this.capNhatVeGoc(balls, this.bayGio)
     const nguoi = !v.ghe[v.cur]!.ai
     const nhin = ((v.pha === 'aim' && !v.sheet) || v.pha === 'ai-nham') && v.bi_('cue').on
     const mt = nguoi && ((v.matThan > 0 && mtBat) || (v.luonMT && v.cur === v.em)) // luôn bật Mắt thần: chỉ cú của chính em
     const info = nhin ? v.nham() : null
-    const dd = info && mt && v.pha === 'aim' ? this.duDoan(v) : null
+    // Mắt thần đơn giản (bản vẽ thử): hình học thuần từ điểm va — đường bi đích (dài khi có Mắt thần) + hướng bi cái đi tiếp (chỉ khi có Mắt thần)
+    const dd = info && nguoi && v.pha === 'aim' ? duongMatThan(info, v.aim, mt) : null
     const datBi = v.ballInHand && v.pha === 'aim' && nguoi && !v.sheet
     const sz = Math.max(8, Math.ceil(this.rAnh * KHUNG_ANH)), bd = this.bongDo, nuaBong = bd ? bd.width / 2 : 0
     // ── 1. ảnh bi (tô lại trong ngân sách, cùng thứ tự như trước: bi rơi rồi bi trên bàn) + vị trí vẽ
@@ -333,8 +311,7 @@ export class BoVe {
         this.hopDiem(info.b.x, info.b.y, (R + 5.5) * s)
         if (v.pha === 'ai-nham') this.hopDoan(info.b.x, info.b.y, info.b.x + info.nx * (60 + 140 * info.cut), info.b.y + info.ny * (60 + 140 * info.cut), 1.5 * s)
       }
-      if (dd) { this.hopDuong(dd.cue, 13 * s); this.hopDuong(dd.obj, 15 * s); // nét nối góc kiểu miter (giới hạn 10 × nửa nét) ở góc bật băng
-        const e = dd.cue[dd.cue.length - 1]; if (e) this.hopDiem(e[0], e[1], (R + 1) * s); const q = dd.obj[dd.obj.length - 1]; if (q) this.hopDiem(q[0], q[1], 5.5 * s) }
+      if (dd) { this.hopDoan(dd.dich.x0, dd.dich.y0, dd.dich.x1, dd.dich.y1, 2 * s); if (dd.tiep) this.hopDoan(dd.tiep.x0, dd.tiep.y0, dd.tiep.x1, dd.tiep.y1, 2 * s) }
       // cây cơ: từ R + kéo lùi, dài 406 đơn vị, dày 13; bóng đổ lệch 6 điểm ảnh xuống, mờ 8
       const c = info.c, a0 = R + 6 + v.power * 80, ux = -v.aim.x, uy = -v.aim.y
       this.hopDoan(c.x + ux * a0, c.y + uy * a0, c.x + ux * (a0 + 406), c.y + uy * (a0 + 406), 6.5 * s + (nhe ? 1 : 18), nhe ? 0 : 6)
@@ -360,7 +337,7 @@ export class BoVe {
       let dt = 0
       for (let j = 0; j < vung.length; j += 4) dt += Math.max(0, Math.min(cw, vung[j + 2]!) - Math.max(0, vung[j]!)) * Math.max(0, Math.min(ch, vung[j + 3]!) - Math.max(0, vung[j + 1]!))
       if (dt > TRAN_CAT * cw * ch) cat = false
-      else if (dt === 0) { this.xongKhung(hopPhu, no, dd); this.dem.bo++; return } // không điểm ảnh nào đổi
+      else if (dt === 0) { this.xongKhung(hopPhu, no); this.dem.bo++; return } // không điểm ảnh nào đổi
     }
     // ── 3. vẽ (y như vẽ cả bàn; khi cắt, clip bỏ các điểm ảnh ngoài vùng bẩn)
     if (cat) {
@@ -385,7 +362,7 @@ export class BoVe {
     if (info) {
       ctx.save(); ctx.lineCap = 'round'; if (mo) ctx.globalAlpha = 0.3
       const sx = info.c.x + v.aim.x * R, sy = info.c.y + v.aim.y * R
-      ctx.setLineDash([7, 7]); ctx.strokeStyle = mt ? 'rgba(255,224,130,.95)' : 'rgba(255,255,255,.85)'; ctx.lineWidth = 2
+      ctx.setLineDash([7, 7]); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2
       ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(info.gx, info.gy); ctx.stroke(); ctx.setLineDash([])
       ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(info.gx, info.gy, R, 0, 7); ctx.stroke()
       if (info.loai === 'bi') {
@@ -394,11 +371,11 @@ export class BoVe {
         if (!ok) { ctx.strokeStyle = 'rgba(255,107,107,.95)'; ctx.lineWidth = 2.4; const d = 8; ctx.beginPath(); ctx.moveTo(info.gx - d, info.gy - d); ctx.lineTo(info.gx + d, info.gy + d); ctx.moveTo(info.gx + d, info.gy - d); ctx.lineTo(info.gx - d, info.gy + d); ctx.stroke() }
         ctx.strokeStyle = ok ? 'rgba(255,255,255,.95)' : 'rgba(255,107,107,.9)'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.arc(info.b.x, info.b.y, R + 4, 0, 7); ctx.stroke() // bi đích hợp lệ: vòng TRẮNG (vàng chỉ dành cho bi đã giải trước)
       }
-      if (dd) {
-        ctx.setLineDash([2, 7]); ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 2.4; veDuong(ctx, dd.cue); ctx.setLineDash([])
-        ctx.strokeStyle = 'rgba(255,214,107,.95)'; ctx.lineWidth = 2.8; veDuong(ctx, dd.obj)
-        const e = dd.cue[dd.cue.length - 1]; if (e) { ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(e[0], e[1], R, 0, 7); ctx.stroke() }
-        const o = dd.obj[dd.obj.length - 1]; if (o) { ctx.fillStyle = 'rgba(255,214,107,.95)'; ctx.beginPath(); ctx.arc(o[0], o[1], 5, 0, 7); ctx.fill() }
+      if (dd && info.loai === 'bi') {
+        const ok = v.hopLe(info.b.id)
+        ctx.strokeStyle = ok ? 'rgba(255,255,255,.9)' : 'rgba(255,93,93,.95)'; ctx.lineWidth = 3
+        ctx.beginPath(); ctx.moveTo(dd.dich.x0, dd.dich.y0); ctx.lineTo(dd.dich.x1, dd.dich.y1); ctx.stroke()
+        if (dd.tiep) { ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 2; ctx.setLineDash([6, 7]); ctx.beginPath(); ctx.moveTo(dd.tiep.x0, dd.tiep.y0); ctx.lineTo(dd.tiep.x1, dd.tiep.y1); ctx.stroke(); ctx.setLineDash([]) }
       }
       ctx.restore()
     }
@@ -410,7 +387,7 @@ export class BoVe {
       if (!sp) continue
       ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(sp, this.viTri[4 * i + 2]! - sp.width / 2, this.viTri[4 * i + 3]! - sp.height / 2)
       // bi lăn đã giải trước: viền vàng mảnh vẽ thẳng (ảnh lăn không kèm viền)
-      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang && this.dangLan(b)) { ctx.strokeStyle = MAU_BI_VANG; ctx.lineWidth = this.rAnh * 0.16; ctx.beginPath(); ctx.arc(this.viTri[4 * i + 2]!, this.viTri[4 * i + 3]!, this.rAnh * 1.12, 0, 7); ctx.stroke() }
+      if (b.id !== 'cue' && b.id !== 'C' && v.bi[b.id].vang && this.daLan.has(b.id) && this.bong) { ctx.strokeStyle = MAU_BI_VANG; ctx.lineWidth = this.rAnh * 0.16; ctx.beginPath(); ctx.arc(this.viTri[4 * i + 2]!, this.viTri[4 * i + 3]!, this.rAnh * 1.12, 0, 7); ctx.stroke() }
     }
     datTFBan(ctx, k, this.dpr)
     if (datBi) {
@@ -442,14 +419,14 @@ export class BoVe {
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     if (cat) ctx.restore()
-    this.xongKhung(hopPhu, no, dd)
+    this.xongKhung(hopPhu, no)
   }
   /** Khung đã vẽ xong: nhớ hộp + trạng thái bi làm "khung trước"; còn ảnh bi nợ / Mắt thần chưa tính lại ⇒ buộc vẽ khung kế. */
-  private xongKhung(hopPhu: number[], no: boolean, dd: DuDoan | null): void {
+  private xongKhung(hopPhu: number[], no: boolean): void {
     this.hopCu = hopPhu
     const t = this.biCu; this.biCu = this.biMoi; this.biMoi = t
     this.hopDu = true
-    this.phaiVe = no || (!!dd && this.duDoanCu.key !== this.khoaDuDoan)
+    this.phaiVe = no
   }
   /** Toạ độ bàn → điểm ảnh canvas, ghi vào this.vt (không tạo mảng mới mỗi bi mỗi khung). */
   private man(x: number, y: number): void {
@@ -463,24 +440,6 @@ export class BoVe {
     this.gCo = g
     return g
   }
-  /** Khoá trạng thái của lần hỏi Mắt thần gần nhất (khác khoá đã tính ⇒ còn nợ một lần tính lại). */
-  private khoaDuDoan = ''
-  /** Mắt thần: tính lại tối đa ~16 lần/giây khi đổi hướng/lực/xoáy. */
-  private duDoan(v: VanBia): DuDoan {
-    const c = v.bi_('cue'), p = v.power > 0.02 ? v.power : 0.5
-    const key = [v.aim.x.toFixed(4), v.aim.y.toFixed(4), p.toFixed(2), v.spin.x.toFixed(2), v.spin.y.toFixed(2), c.x.toFixed(1), c.y.toFixed(1)].join()
-    this.khoaDuDoan = key
-    const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
-    if (key === this.duDoanCu.key || now - this.duDoanCu.t < 60) return this.duDoanCu.kq
-    this.duDoanCu = { key, t: now, kq: duDoan(v.st, v.aim, v.power, v.spin) }
-    return this.duDoanCu.kq
-  }
-}
-function veDuong(x: CanvasRenderingContext2D, pts: readonly [number, number][]): void {
-  if (pts.length < 2) return
-  x.beginPath(); x.moveTo(pts[0]![0], pts[0]![1])
-  for (let i = 1; i < pts.length; i++) x.lineTo(pts[i]![0], pts[i]![1])
-  x.stroke()
 }
 /** Vẽ một bi mẫu (Sảnh Bi-a: chú giải "Bi của em · Bi đối thủ · Bi chốt"), đúng hàm vẽ bi của bàn. */
 export function veBiMau(canvas: HTMLCanvasElement, kieu: KieuBi, kiHieu: string, vang = false): void {

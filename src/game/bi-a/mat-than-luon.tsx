@@ -1,5 +1,5 @@
 // BI-A · CÔNG TẮC "LUÔN BẬT MẮT THẦN" (thầy lệnh 29/09: "một nút bật mắt thần … chơi cho dễ"). Cho MỌI em, chữ trung tính.
-// Bật ⇒ mọi cú của CHÍNH em đều hiện đường dự đoán đầy đủ (du-doan.ts) như khi dùng Mắt thần; KHÔNG trừ lượt Mắt thần kiếm được,
+// Bật ⇒ mọi cú của CHÍNH em đều hiện đường Mắt thần dài (du-doan.ts: duongMatThan) như khi dùng Mắt thần; KHÔNG trừ lượt Mắt thần kiếm được,
 // không đổi luật/điểm/EXP. Nhớ theo MÁY (localStorage, bọc try/catch: chế độ riêng tư / chặn dữ liệu ⇒ coi như tắt, vẫn bật được trong phiên).
 import { useSyncExternalStore } from 'react'
 
