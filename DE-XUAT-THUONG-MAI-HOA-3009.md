@@ -84,7 +84,7 @@
 | Tên | Mô hình | Giá | Quy mô | Điểm yếu |
 |---|---|---|---|---|
 | HOCMAI | Khoá video | 510k/môn; 1,7 triệu tất cả môn | >1 triệu lượt cài, 37.000 bài giảng | Không game, không ôn cách quãng; bị chê video chậm, đen màn hình |
-| VUIHOC | Video + livestream | Lớp 12: 135 video, 5.500 bài tập | >300.000 HS; gọi vốn 6 triệu USD (2024), Series A+ (2026) | Lỗi hệ thống, thiếu hỗ trợ sau khi đóng tiền |
+| VUIHOC | Video + livestream | **chưa kiểm được** (KS Giá ước 2–6 triệu/khoá livestream, tin cậy thấp) | >300.000 HS; lớp 12: 135 video, 5.500 bài tập; gọi vốn 6 triệu USD (2024), Series A+ (2026) | Lỗi hệ thống, thiếu hỗ trợ sau khi đóng tiền |
 | Tuyensinh247 | Khoá theo thầy | 449–499k/khoá, hay giảm 50% | >1 triệu HS | Học thụ động, không game |
 | Onluyen | Luyện thích ứng | 1–2 triệu/năm | 200.000 câu, 9 môn | Không game hoá |
 | Moon.vn | Video + sách | 600k–1 triệu/khoá | — | Không game |
@@ -123,7 +123,7 @@ Nguồn: KS Thị trường, KS Nhu cầu. Giá hiện hành 2026 của Hocmai, 
 3. **"Làm trước, xem lời giải sau".** Vì 95,9% học sinh Việt Nam đã dùng chatbot AI, 92,1% dùng để giải bài (PISA 2025, khảo sát Cần Thơ).
 4. **Đúng lúc siết dạy thêm.** TT 29/2024 và TT 19/2026 buộc thầy công khai, minh bạch nên thầy cần công cụ quản lý lớp.
 
-**Lợi thế thật và giới hạn của nó.** Kho có 15.359 câu nhưng chỉ **6.921 câu duy nhất**, ít hơn nhiều so với VUIHOC (350.000 câu) và Onluyen (200.000 câu). Kho lại chưa có hồ sơ bản quyền. Vì vậy **kho câu không phải hào phòng thủ**. Thứ ta bảo vệ được là: (a) quy trình vận hành lớp của thầy (ca thi, điểm danh, báo cáo phụ huynh qua Zalo, học phí), (b) hợp đồng năm ký trước 20/8/2027, (c) tốc độ.
+**Lợi thế thật và giới hạn của nó.** Kho có 15.359 câu (268 tờ) nhưng chỉ khoảng **6.921 câu duy nhất** (số đếm của bản phản biện, chưa tìm thấy bảng đếm trong repo; cần đếm lại bằng `khu-trung-cau.ts` trước khi dùng), ít hơn nhiều so với VUIHOC (350.000 câu) và Onluyen (200.000 câu). Kho lại chưa có hồ sơ bản quyền. Vì vậy **kho câu không phải hào phòng thủ**. Thứ ta bảo vệ được là: (a) quy trình vận hành lớp của thầy (ca thi, điểm danh, báo cáo phụ huynh qua Zalo, học phí), (b) hợp đồng năm ký trước 20/8/2027, (c) tốc độ.
 
 **Hiện trạng mã (soát 30/09/2026, nhánh `claude/loving-babbage-9i6b83`, commit 11a74b1):** `server/wrangler.toml` chỉ có một cơ sở dữ liệu D1, không có Durable Object. Trong `server/src` không có `bi-a.ts`, `tu-luyen.ts`, `loi-giai.ts`. **Bi-a Phản Ứng, Tu luyện và Hỏi thầy vẫn ở nhánh riêng, chưa có trên bản đang chạy.** Mức tải 300 em đã đo là của bản không có Bi-a online. Vì vậy chưa được dùng ba tính năng này trong ảnh store hay trang bán, cho tới khi chúng chạy trên bản sống ≥4 tuần.
 
@@ -179,7 +179,7 @@ Nguồn: KS Nhu cầu; SOM B2B là phép tính từ bảng số chốt.
 |---|---|---|
 | Sốc đề mới | Đỉnh phổ 2025 tụt về 5,0–5,25; 2026 vẫn 22% dưới 5 | Luyện đề 28 câu/50 phút đúng cấu trúc, chấm Phần II theo bậc |
 | Bài tính toán quá dài | VnExpress 11/4/2026: "đánh vật" với hệ phương trình nhiều ẩn | Lời giải từng bước, mờ dần; xen kẽ dạng tính toán |
-| AI giải hộ | 92,1% dùng ChatGPT để giải bài, 64,8% hiếm khi kiểm chứng | Trả lời trước, xem lời giải sau; vé tính theo nỗ lực |
+| AI giải hộ | Khảo sát THPT Cần Thơ: 87,4% dùng ChatGPT, trong đó 92,1% dùng để giải bài tập, 64,8% hiếm khi kiểm chứng | Trả lời trước, xem lời giải sau; vé tính theo nỗ lực |
 | Không biết yếu ở đâu, không ai chữa | **chưa có khảo sát định lượng** | Sửa câu sai 4 nguồn + báo cáo dạng yếu; cần tự khảo sát 300 em |
 
 ---
@@ -197,7 +197,7 @@ Nguồn: KS Nhu cầu; SOM B2B là phép tính từ bảng số chốt.
 | 5 | Google Play, tài khoản tổ chức | Tổ chức được miễn thử kín 12 người/14 ngày | 25 USD một lần | 1–3 tuần | 11/2026 |
 | 6 | Apple Developer, tài khoản tổ chức | Tên pháp nhân, email theo tên miền, website | 99 USD/năm | 1–3 tuần | 11/2026 |
 | 7 | Đăng ký phí 15% (Apple Small Business, chương trình 15% của Google) | <1 triệu USD/năm | 0 | 1 ngày | ngày đầu |
-| 8 | Công văn hỏi Cục PTTH&TTĐT: app có 3 game "mỗi hành động = 1 câu" có phải trò chơi G1 không | NĐ 147/2024 | 0 (+ 20–50 triệu nếu thuê luật sư soạn) | 15–30 ngày chờ trả lời (ước lượng) | ngay khi có công ty |
+| 8 | Công văn hỏi Cục PTTH&TTĐT: app có 3 game "mỗi hành động = 1 câu" có phải trò chơi G1 không | NĐ 147/2024 | 0 (+ 20–50 triệu nếu thuê luật sư soạn — ước lượng, chưa có báo giá) | 15–30 ngày chờ trả lời (ước lượng) | ngay khi có công ty |
 | 9 | Bảng kê mọi bên xử lý dữ liệu: Cloudflare, Anthropic (lời giải), Sentry, RevenueCat, Google FCM, Zalo | Luật 91/2025, NĐ 356/2025 | 0 | 1 tuần | Tuần 1–2 |
 | 10 | Hồ sơ đánh giá tác động + hồ sơ chuyển dữ liệu ra nước ngoài (nộp A05) | Luật 91/2025 (phạt tới 5% doanh thu); Luật ANM 2018 Điều 26 + NĐ 53/2022 | 30–80 triệu luật sư (gộp mục 11–12) | 1–2 tháng | **trước khi thêm bất kỳ đảo nào** |
 | 11 | Chính sách riêng tư + điều khoản cho 3 vai (HS, PH, chủ đảo), lưu vết phiên bản | Luật 20/2023 GDĐT, Apple 5.1.4, Google Data safety | gộp mục 10 | — | trước pilot |
@@ -219,7 +219,7 @@ Nguồn: KS Nhu cầu; SOM B2B là phép tính từ bảng số chốt.
 - **Apple 3.1.3(b):** gói mua trên web được dùng trong app **nếu** gói đó cũng bán qua IAP, và app không dẫn sang web. Việt Nam **không** có quyền gắn link mua ngoài (chỉ EU, Mỹ, Nhật, Hàn, Brazil, Hà Lan).
 - **Apple 3.1.3(c):** dịch vụ bán cho tổ chức được thu ngoài IAP. Vì vậy **chỉ bán gói Đảo cho hộ kinh doanh hoặc công ty có đăng ký, có hợp đồng và hoá đơn**. Trong app, tính năng đảo hiện là "do lớp của em cung cấp", không trùng tên hay trùng màn với Nỗ lực+.
 - **Apple 5.1.1:** có nút xoá tài khoản trong app; không ép bật thông báo. **Apple 4.8:** nếu có đăng nhập Google thì phải có Sign in with Apple. Bản đầu chỉ dùng SĐT/email/SBD nên chưa cần.
-- **Phí:** Apple 15% (Small Business, phải đăng ký); Google 15% cho thuê bao từ ngày đầu. Mức 10% mới của Google chưa áp cho Việt Nam; theo một nguồn, Việt Nam giữ biểu cũ đến 30/9/2027 (tin cậy vừa). Giá bậc Apple Việt Nam: 25.000 / 49.000 / 79.000đ; Google tối thiểu 6.000đ.
+- **Phí:** Apple 15% (Small Business, phải đăng ký); Google 15% cho thuê bao từ ngày đầu. Biểu phí mới của Google (10%) áp cho Mỹ, Anh, EEA từ 30/6/2026; các nước còn lại, gồm Việt Nam, được đưa vào **chậm nhất 30/9/2027** (Android Developers Blog 6/2026). Kể cả khi áp, dùng Play Billing vẫn tốn khoảng 15% (10% phí dịch vụ + 5% phí thanh toán) — nên kế hoạch giữ mức 15%. Giá bậc Apple Việt Nam: 25.000 / 49.000 / 79.000đ; Google tối thiểu 6.000đ.
 - **Thuế Apple từ 21/8/2025:** tổ chức Việt Nam chịu thuế nhà thầu 5% trên phần hoa hồng Apple giữ. Với cá nhân, các nguồn ghi lệch nhau (2% hoặc 5% thuế thu nhập cá nhân). Chốt dùng công ty nên không phải xét trường hợp cá nhân. Thuế TNDN: 20%, có bậc 15%/17% cho doanh thu nhỏ (Luật TNDN 2025).
 
 ### 3.3 Dữ liệu trẻ em
@@ -292,7 +292,7 @@ Các con số hiệu ứng lấy từ KS Khoa học. Phần lớn được nhớ
 
 ### 5.3 Lý do chọn
 
-- **Ai trả và khi nào:** hai hướng B2C cần 40.000–200.000 tài khoản với tỉ lệ trả phí 3–4% trước khi có tiền, trong khi chuẩn freemium giáo dục chỉ khoảng 2% (RevenueCat). Hướng Trung tâm thu tiền từ tháng 4/2027, từ người đã có học sinh.
+- **Ai trả và khi nào:** hai hướng B2C cần 40.000–200.000 tài khoản với tỉ lệ trả phí 3–4% trước khi có tiền, trong khi chuẩn freemium chỉ khoảng 2,1% (RevenueCat, tính chung mọi ngành, không riêng giáo dục). Hướng Trung tâm thu tiền từ tháng 4/2027, từ người đã có học sinh.
 - **Pháp lý:** người ký là tổ chức nên trẻ em không phải người mua, không mất phí store, mã đảo chỉ gán lớp (Apple 3.1.3(c)).
 - **Khớp mã:** app giáo viên (ca thi, chiến dịch 11 lệnh, gọi lên bảng, điểm danh, ngân hàng đề) đã chạy thật.
 - **Điểm chết giám khảo nêu và cách xử lý:** một người bán phải chốt ~300 đảo là ảo → **hạ xuống 100/350 đảo**, thêm cổng đặt cọc. Chợ đề nhân rủi ro bản quyền → **hoãn Chợ đề**. Thi thử có xếp hạng tỉnh trái nguyên tắc của chính hướng này → **bỏ xếp hạng**.
@@ -354,7 +354,7 @@ Muốn học thêm thì lặp lại, trần game 60 phút/ngày. Phần II chấ
 |---|---|---|
 | T9 – giữa T1 | Chương mới theo lịch; ca cuối chương | 1 đảo = 1 chương; thú tiến hoá theo chương xong |
 | Tuần 19–20 | "Sửa sai HK1" từ kho câu sai 4 nguồn | Đoàn Hộ Tống mùa "Hộ tống về thành" |
-| T2–T5 | Chương HK2. Lớp 12 từ T3: Nước rút, retention nâng lên 0,93–0,95, **có trần số câu ôn mỗi ngày**. Thêm "luyện đề giao diện thi trên máy", vì thi TN 2027 (dự kiến 11–12/6/2027) thi trên máy tại điểm đủ điều kiện (vov2 2026) — mẫu giao diện chính thức: **chưa có nguồn** | Mùa nội dung mới |
+| T2–T5 | Chương HK2. Lớp 12 từ T3: Nước rút, retention nâng lên 0,93–0,95, **có trần số câu ôn mỗi ngày**. Thêm "luyện đề giao diện thi trên máy", vì thi TN 2027 (dự kiến 11–12/6/2027) thi trên máy tại điểm đủ điều kiện, nơi khác vẫn thi giấy (vietnamnet, nhandan 2026) — mẫu giao diện chính thức: **chưa có nguồn** | Mùa nội dung mới |
 | T6–T8 | Chỉ ôn tới hạn 5 câu/ngày, retention hạ về 0,85 | Đoàn Hộ Tống; đảo thầy không tính phí |
 
 ### 6.5 Onboarding 4 phút
@@ -445,7 +445,7 @@ Người mua là **phụ huynh** vì đây là lựa chọn đạo đức của 
 - Đáp án; EXP; vàng; mảnh; thần thú; khiên; trang phục; bậc; lượt; giờ chơi; "hồi sinh"; bỏ qua câu/ải.
 - Rương may rủi; cược; thứ hạng; quảng cáo; dữ liệu học sinh.
 - Lời mời mua trong app học sinh.
-- Giao dịch vật phẩm giữa học sinh (NĐ 147 Điều 57).
+- Giao dịch vật phẩm giữa học sinh (NĐ 147/2024 Điều 57 khoản 5; khoản 4 cấm quy đổi vật phẩm ảo ra tiền).
 - Chợ đề bán cho học sinh.
 
 Có test tự động kiểm hai điều: không có quyền lợi trả phí nào đọc tới bảng cửa hàng thú, và app học sinh không gọi API mua.
@@ -456,7 +456,7 @@ Có test tự động kiểm hai điều: không có quyền lợi trả phí n�
 2. **Thử dài, không rút lõi:** 14 ngày. RevenueCat: thử 17–32 ngày chuyển 42,5%.
 3. **Giá mùa cố định:** không "giảm 50%" liên tục; tối đa 30%, chỉ qua mã tỉnh/trường.
 4. **Giới thiệu:** chỉ bằng mã hoặc link do bạn tự nhập; không nhập SĐT hay danh bạ người khác. Thưởng thú/khiên (kiếm được) chỉ trao khi bạn đã học đủ 7 ngày; không gắn với gói trả phí. Với thầy: "thầy giới thiệu thầy", tặng 1 tháng.
-5. **Giữ gói năm:** báo cáo tuần; nhắc 30 ngày trước hạn; huỷ 1 chạm; hoàn tiền 7 ngày trên web (Apple 3.1.2; Luật BVQLNTD 19/2023 về dịch vụ liên tục ≥3 tháng).
+5. **Giữ gói năm:** báo cáo tuần; nhắc 30 ngày trước hạn; huỷ 1 chạm; hoàn tiền 7 ngày trên web (Apple 3.1.2; Luật BVQLNTD 19/2023/QH15, Điều 3 khoản 6: dịch vụ ≥3 tháng là "dịch vụ liên tục").
 6. **"Nâng cấp" giả để đo giá:** chỉ ở kênh phụ huynh (khảo sát Zalo, web). Bấm "Mua" xong hiện ngay "gói chưa mở bán, đây là khảo sát giá". Ba mức 39k/299k – 49k/399k – 69k/499k.
 
 ### 7.6 Thanh toán
@@ -477,7 +477,7 @@ Giả định (ước lượng, tin cậy thấp): tỉ lệ B2B/B2C 70/30 → 6
 | 10.000 | 6.000 / 4.000 | 793,8 triệu | 25,5 triệu | **≈ 0,82 tỷ** | ≈ 68 triệu | ≈ $25–40 |
 | 100.000 | 40.000 / 60.000 | 5,29 tỷ | 382 triệu | **≈ 5,67 tỷ** | ≈ 473 triệu | ≈ $450–700 |
 
-Chưa gồm: OTP (500–800đ/tin, ước lượng), tin ZNS (300đ/tin), lương, Gia sư AI. Bản cũ tính 10 tháng thu và 17k/em, ra 120 triệu / 1,04 tỷ / 7,2 tỷ — **đã thay**.
+Chưa gồm: OTP (500–800đ/tin, ước lượng), tin ZNS (giả định 300đ/tin; bảng giá ZNS từ 200đ/tin, cộng phụ phí ảnh/nút liên kết nên mẫu có link có thể đắt hơn), lương, Gia sư AI. Bản cũ tính 10 tháng thu và 17k/em, ra 120 triệu / 1,04 tỷ / 7,2 tỷ — **đã thay**.
 
 ---
 
@@ -510,15 +510,15 @@ Chưa gồm: OTP (500–800đ/tin, ước lượng), tin ZNS (300đ/tin), lươn
 
 | Kênh | Cách làm | Chi phí (nguồn) | Chi phí có khách |
 |---|---|---|---|
-| **Bán trực tiếp** (chính) | Thầy Đỗ, sau đó sale bán thời gian từ 1/2027; demo 30 phút, thử 60 ngày | Sale 12–15 triệu/tháng + 10% hoa hồng (topcv 2026) | **Đo trên 10 đảo đầu** (ghi giờ từng khâu); KS ước 300–600k/đảo, phản biện ước ~1,5 triệu nếu một sale chốt 10 đảo/tháng |
+| **Bán trực tiếp** (chính) | Thầy Đỗ, sau đó sale bán thời gian từ 1/2027; demo 30 phút, thử 60 ngày | Sale 12–15 triệu/tháng + 10% hoa hồng (topcv 2026, nguồn thứ cấp chưa đối chiếu lại) | **Đo trên 10 đảo đầu** (ghi giờ từng khâu); bản chiến lược ước 300–600k/đảo (ước lượng, không có trong khảo sát), phản biện ước ~1,5 triệu nếu một sale chốt 10 đảo/tháng |
 | Thầy giới thiệu thầy | Tặng 1 tháng cho cả hai bên | ≈ 1 tháng doanh thu/đảo | — |
 | KOL Hóa TikTok (756K / 497K / 226K) | Dùng đảo thật cho học viên khoá của họ (miễn phí tới 100 em đến 30/6/2027, sau đó giá sáng lập) + 20% doanh thu B2B từ thầy họ giới thiệu; cam kết không bán cho học sinh chính khoá; gắn nhãn quảng cáo | 0 tiền mặt | — |
 | TikTok/YouTube kênh thầy | "Chữa 1 câu Phần III đề 2026 trong 60 giây" | Sản xuất 5 triệu/tháng (ước lượng) | Kéo học sinh tự do, không tính doanh thu |
 | Nhóm Facebook giáo viên Hóa | Đăng đề thi thử + phổ điểm thật | 0 | — |
-| Zalo OA | Báo cáo tuần, nhắc ca | Gói cơ bản 0đ; ZNS 300đ/tin (zalo.solutions 2026) → ≈ 66k/đảo 55 em/tháng | Giá vốn, không phải chi phí có khách |
+| Zalo OA | Báo cáo tuần, nhắc ca | Gói cơ bản 0đ; ZNS giả định 300đ/tin (bảng giá từ 200đ/tin + phụ phí ảnh/nút) × 55 em × 4 tin/tháng → ≈ 66k/đảo/tháng (ước lượng) | Giá vốn, không phải chi phí có khách |
 | Hội thảo tổ Hóa của Sở | 90 phút, giới thiệu Đảo Trường | 10–15 triệu/buổi (ước lượng) | Chỉ từ Q2/2027 |
-| Quảng cáo TikTok/Facebook | **Không chạy cho B2C**: chi phí có một người trả phí ≈ 20k/lượt cài ÷ 3% ≈ 670k, cao hơn 350k/năm | CPM TikTok 25–50k; Facebook 50–200k (2026) | — |
-| **Bỏ trong năm 1** | Đại lý tỉnh (1,9 triệu/đảo quá ít với đại lý); giải Bi-a liên trường (rủi ro bị xếp G1, trái nguyên tắc không xếp hạng) | — | — |
+| Quảng cáo TikTok/Facebook | **Không chạy cho B2C**: chi phí có một người trả phí ≈ 20k/lượt cài ÷ 3% ≈ 670k, cao hơn 350k/năm | CPM TikTok 25–50k; Facebook 50–200k (bài của agency quảng cáo 2026, nguồn thứ cấp); 20k/lượt cài và 3% chuyển đổi là ước lượng | — |
+| **Bỏ trong năm 1** | Đại lý tỉnh (hoa hồng ước ~1,9 triệu/đảo/năm — ước lượng — quá ít với đại lý); giải Bi-a liên trường (rủi ro bị xếp G1, trái nguyên tắc không xếp hạng) | — | — |
 
 ### 8.4 Lịch năm học 2026–2027 gắn chiến dịch
 
@@ -540,7 +540,7 @@ Chưa gồm: OTP (500–800đ/tin, ước lượng), tin ZNS (300đ/tin), lươn
 
 | Khoản | Cách tính (nguồn) | Tiền |
 |---|---|---|
-| Kỹ sư 1 (bảo mật, đa đảo, tách dữ liệu, thu tiền web) | 35 triệu + 20% bảo hiểm × 12 tháng (topcv 2026: middle 25–40 triệu) | 504 triệu |
+| Kỹ sư 1 (bảo mật, đa đảo, tách dữ liệu, thu tiền web) | 35 triệu + 20% bảo hiểm × 12 tháng (topcv 2026: middle 25–40 triệu, nguồn thứ cấp chưa đối chiếu lại) | 504 triệu |
 | Kỹ sư 2 (native, giáo viên ảo) — chỉ khi qua cổng | 42 triệu × 9 tháng từ 1/2027 | 378 triệu |
 | Chuyên môn Hóa bán thời gian (bản quyền, duyệt lời giải) | 15 triệu × 12 | 180 triệu |
 | Sale/CS bán thời gian từ 1/2027 | 12 triệu × 9 (topcv 2025) | 108 triệu |
@@ -571,7 +571,7 @@ Năm 2 (tính): 2 kỹ sư 1,01 tỷ + chuyên môn 0,18 + CS 0,14 + sale 0,16 +
 | Chi năm 1 / năm 2 | 1,09 / 1,25 tỷ (1 kỹ sư) | 1,57 / 2,2 tỷ | 1,67 / 3,2 tỷ (3 kỹ sư) |
 | **Lãi/lỗ năm 1 / năm 2** | −1,06 / −0,80 | **−1,48 / −0,86** | −1,41 / +0,11 |
 | Lỗ luỹ kế 24 tháng | ≈ 1,86 tỷ | **≈ 2,34 tỷ** | ≈ 1,30 tỷ |
-| Hoà vốn | không trong 24 tháng (cần ~360 đảo, mới có 200) | sớm nhất năm học 2028–2029, cần **≥370 đảo** trả phí bình quân | doanh thu tháng vượt chi từ khoảng tháng 17 (2/2028) |
+| Hoà vốn | không trong 24 tháng (cần ~360 đảo, mới có 200) | sớm nhất năm học 2028–2029, cần **≥370 đảo** trả phí bình quân | doanh thu tháng vượt chi bình quân (3,2 tỷ/12 ≈ 267 triệu) từ khoảng tháng 15 (12/2027): 180 × 1,71 ≈ 308 đảo × 70 × 0,8 × 17k ≈ 293 triệu (tính); hè T6–T8/2028 lại dưới chi |
 | Tiềm năng B2C (**không cộng**) | — | 50.000 tài khoản × 2% × 350k × 0,91 ≈ 0,32 tỷ/năm | — |
 
 **Bảng độ nhạy — doanh thu một đảo/năm** (= em × 0,8 × giá × 9) **và số đảo cần để trả chi 2,2 tỷ/năm:**
@@ -593,9 +593,9 @@ Năm 2 (tính): 2 kỹ sư 1,01 tỷ + chuyên môn 0,18 + CS 0,14 + sale 0,16 +
 | Tiêu chí | Capacitor (chọn) | TWA/PWABuilder |
 |---|---|---|
 | iOS | Có plugin cho thông báo, mua trong app, xoay màn | Dễ bị từ chối theo mục 4.2 ("chỉ là website") |
-| Android | API 26+ (Android 8), WebView Chrome ≥60 | Chỉ làm dự phòng cho Android |
+| Android | API 26+ (Android 8), WebView Chrome ≥60 (Capacitor 9) | Chỉ làm dự phòng cho Android |
 
-- Yêu cầu: iOS 16+, Xcode 27 (Capacitor docs 2026) → cần máy Mac (thuê Mac trên mạng hoặc mua Mac mini; giá **chưa tra**).
+- Yêu cầu: Capacitor 9 (tài liệu nhánh main, npm đang ở 9.0.0-alpha ngày 30/09/2026) cần iOS 16+, Xcode 27, Android API 26+; bản ổn định hiện tại 8.5 cần iOS 15+, Xcode 26, Android API 24+. Bản nào cũng → cần máy Mac (thuê Mac trên mạng hoặc mua Mac mini; giá **chưa tra**).
 - Việc cần làm: icon/splash từ `docs/logo-1909/`; deep link (`apple-app-site-association`, `assetlinks.json`); vùng an toàn tai thỏ; **bỏ `orientation: portrait`** để Bi-a xoay ngang; ảnh thần thú 55 MB tải lười từ R2, không đóng vào gói (gói app < 50 MB); bản native tắt service worker.
 
 ### 9.2 Tài khoản
@@ -630,7 +630,7 @@ Năm 2 (tính): 2 kỹ sư 1,01 tỷ + chuyên môn 0,18 + CS 0,14 + sale 0,16 +
 | R2 (kho tệp) | $0,015/GB, không tính phí tải ra | Ảnh 55 MB | Ảnh, kho câu, lưu lạnh |
 | Workers | $5/tháng, 10 triệu yêu cầu, +$0,30/triệu | — | Đệm 60 giây đã có |
 
-**Chi phí** (ước lượng từ bản đo 250 em): ≈ $5–6/tháng @1.000; $25–40 @10.000; $450–700 @100.000 người dùng hoạt động/tháng. **Đường lùi** nếu luật buộc lưu tại Việt Nam: dữ liệu định danh (tên, SĐT, ngày sinh) đưa về Postgres đặt tại Việt Nam (VNG/FPT/Viettel), máy chủ nối qua Hyperdrive; sự kiện học đã ẩn danh ở lại D1.
+**Chi phí** (ước lượng từ bản đo 250 em): ≈ $5–6/tháng @1.000; $25–40 @10.000; $450–700 @100.000 người dùng hoạt động/tháng. KS Mã nguồn ước thấp hơn ($15–30 @10.000; $220–400 @100.000) vì chưa gồm hàng đợi, Analytics Engine, lưu lạnh; bảng này lấy mức cao để an toàn. Cả hai **chưa gồm** OTP/SMS, AI sinh lời giải, hỗ trợ. **Đường lùi** nếu luật buộc lưu tại Việt Nam: dữ liệu định danh (tên, SĐT, ngày sinh) đưa về Postgres đặt tại Việt Nam (VNG/FPT/Viettel), máy chủ nối qua Hyperdrive; sự kiện học đã ẩn danh ở lại D1.
 
 ### 9.6 Bảo mật
 
@@ -798,28 +798,39 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 - Quy mô học sinh: https://chinhsachcuocsong.vnanet.vn/mot-so-ket-qua-giao-duc-thpt-nam-hoc-2023-2024/45805.html (2024); https://giaoduc.net.vn/quy-mo-giao-vien-hoc-sinh-truong-lop-cua-giao-duc-pho-thong-post253231.gd (2025)
 - Chọn môn: https://vnexpress.net/hoc-sinh-ngay-cang-it-chon-mon-tu-nhien-5054710.html (2026); https://thieunien.vn/mon-vat-ly-duoc-hoc-sinh-lop-10-tai-ha-noi-lua-chon-nhieu-nhat-tbd57162.html (2023)
 - Cấu trúc đề 2025: https://xaydungchinhsach.chinhphu.vn/cau-truc-de-thi-tot-nghiep-thpt-tu-nam-2025-119240308200554932.htm (2024); https://luatvietnam.vn/giao-duc/quyet-dinh-764-qd-bgddt-2024-cau-truc-de-thi-ky-thi-tot-nghiep-thpt-tu-2025-302643-d1.html (2024)
-- Khung năm học: https://moet.gov.vn/tin-tuc/ban-hanh-khung-ke-hoach-thoi-gian-nam-hoc-toan-quoc-tu-nam-hoc-2026-20273.html (2026); https://xaydungchinhsach.chinhphu.vn/khung-ke-hoach-thoi-gian-nam-hoc-toan-quoc-tu-nam-hoc-2026-2027-119260808104932719.htm (2026)
+- Khung năm học (QĐ 2308/QĐ-BGDĐT ngày 6/8/2026): https://moet.gov.vn/tin-tuc/ban-hanh-khung-ke-hoach-thoi-gian-nam-hoc-toan-quoc-tu-nam-hoc-2026-20273.html (2026); https://vtv.vn/lan-dau-ban-hanh-khung-thoi-gian-nam-hoc-ap-dung-on-dinh-tu-2026-2027-100260807160543793.htm (2026)
+- Thi TN 2027 trên máy tính, dự kiến 11–12/6/2027: https://vietnamnet.vn/chinh-thuc-thi-tot-nghiep-tren-may-tinh-nam-2027-tai-diem-du-dieu-kien-2446438.html (2026); https://nhandan.vn/ky-thi-tot-nghiep-thpt-nam-2027-thi-tren-may-tinh-tai-cac-diem-co-du-dieu-kien-post910792.html (2026)
+- Thi Hóa 2024: https://vnexpress.net/hon-mot-trieu-thi-sinh-dang-ky-thi-tot-nghiep-thpt-2024-4744617.html (2024)
+- Học sinh 2025–26: https://www.vietnamplus.vn/khoang-26-trieu-hoc-sinh-sinh-vien-buoc-vao-nam-hoc-moi-2025-2026-post1060046.vnp (2025)
+- Tỉnh né khối tự nhiên: https://daibieunhandan.vn/thi-tot-nghiep-thpt-nam-2025-vi-sao-to-hop-tu-nhien-bi-lep-ve-voi-to-hop-xa-hoi-10353976.html (2025)
+- Trẻ em dùng internet (Cục Trẻ em): https://thanhnien.vn/89-tre-em-dung-internet-nguy-hay-co-185230305124528593.htm (2023)
+- Tỉ trọng kho theo khối, giờ cao điểm: nội bộ `DIEU-PHOI.md` (21/09/2026), `docs/khoi-cau-khong-doc-ra-2109.md` (268 tờ, 15.359 câu)
 - Khảo sát mức sống: https://www.nso.gov.vn/tin-tuc-thong-ke/2025/05/thong-cao-bao-chi-ket-qua-khao-sat-muc-song-dan-cu-nam-2024/ (2025); https://www.gso.gov.vn/du-lieu-va-so-lieu-thong-ke/2023/05/thong-cao-bao-chi-ket-qua-khao-sat-muc-song-dan-cu-2022/ (2023)
 - TT 29 và tác động: https://thuvienphapluat.vn/van-ban/Giao-duc/Thong-tu-29-2024-TT-BGDDT-quy-dinh-day-them-hoc-them-622469.aspx (2024); https://dantri.com.vn/giao-duc/trung-tam-day-them-hoc-them-tang-vot-sau-thong-tu-29-gia-cao-hon-nhieu-20250328180411649.htm (2025); https://dantri.com.vn/giao-duc/siet-hoc-them-trong-truong-phu-huynh-cho-con-hoc-trung-tam-dat-gap-5-lan-20260316155044130.htm (2026)
-- TT 19/2026: https://luatvietnam.vn/linh-vuc-khac/diem-moi-tai-thong-tu-19-2026-tt-bgddt-ve-day-them-hoc-them-tu-15-5-2026-883-108258-article.html (2026)
+- TT 19/2026: https://luatvietnam.vn/linh-vuc-khac/diem-moi-tai-thong-tu-19-2026-tt-bgddt-ve-day-them-hoc-them-tu-15-5-2026-883-108258-article.html (2026); https://vanban.chinhphu.vn/?pageid=27160&docid=217679 (2026)
+- TT 29 — hộ kinh doanh, công khai học phí: https://xaydungchinhsach.chinhphu.vn/thong-tu-so-29-2024-tt-bgddt-quy-dinh-ve-day-them-hoc-them-119250103212125862.htm (2025)
 - Điểm đau tính toán: https://vnexpress.net/hoc-sinh-viet-danh-vat-mon-hoa-vi-tinh-toan-qua-nhieu-5061151.html (2026)
 - AI: https://thanhnien.vn/gan-96-hoc-sinh-viet-dung-ai-ty-le-cao-nhat-the-gioi-185260910183700006.htm (2026); https://vjol.info.vn/index.php/tctbgd/article/view/126705 (2025)
 - Internet trẻ em: https://www.unicef.org/vietnam/press-releases/viet-nam-strives-build-safer-digital-environment-protect-children-online (2022); https://datareportal.com/reports/digital-2025-vietnam (2025)
 
 **Đối thủ Việt Nam**
-- HOCMAI: https://www.appbrain.com/dev/HOCMAI+INC./ (2025)
-- VUIHOC: https://baodautu.vn/vuihoc-goi-von-series-a-tang-toc-cuoc-choi-ai-d397813.html (2026)
+- HOCMAI: https://www.appbrain.com/dev/HOCMAI+INC./ (2025); giá: https://olm.vn/hoi-dap/tim-kiem?id=210401516723 (năm không rõ); https://apps.apple.com/vn/app/hocmai-h%E1%BB%8Dc-online-t%E1%BB%AB-l%E1%BB%9Bp-1-12/id1476075532?see-all=reviews (2025)
+- VUIHOC: https://baodautu.vn/vuihoc-goi-von-series-a-tang-toc-cuoc-choi-ai-d397813.html (2026); https://baodautu.vn/vuihoc-tiep-tuc-huy-dong-6-trieu-usd-trong-vong-goi-von-series-a-d195277.html (2024); https://vuihoc.vn/lop-12 (2025); 350.000 câu: https://apps.apple.com/us/app/vuihoc-thpt/id1665829265 (2025)
 - Onluyen: https://www.onluyen.vn/hoc-phi/ (2025)
-- Azota: https://tgs.vn/dong-chay/ung-dung-bai-tap-va-de-thi-azota-bat-ngo-nhan-hang-loat-danh-gia-1-sao/ (2025)
+- Moon.vn: https://fptshop.com.vn/tin-tuc/giai-tri/moonvn-185520 (2024)
+- Azota: https://tgs.vn/dong-chay/ung-dung-bai-tap-va-de-thi-azota-bat-ngo-nhan-hang-loat-danh-gia-1-sao/ (2025); https://mwm.ai/apps/azota-student/1556025594 (2025)
+- "Giải Hóa Học 8–12": https://www.thegioididong.com/game-app/top-7-ung-dung-giai-hoa-hoc-tot-nhat-tren-android-ios-1318558 (2025)
+- Hai app Hóa có game chưa mở được nội dung (đã xác nhận có trên Play qua tìm kiếm 30/09/2026): https://play.google.com/store/apps/details?id=com.quizapp.chemistry ; https://play.google.com/store/apps/details?id=com.tuanstudio.galuyenhoa
 - VioEdu: https://www.appbrain.com/app/vioedu-h%E1%BB%8Dc-sinh/vn.edu.vioedu.student (2025)
 - OLM: https://olm.vn/gioi-thieu (2025)
 - Tuyensinh247: https://tuyensinh247.com/khuyenmai-thang-11-r770.html (2025); https://tuyensinh247.com/khuyenmai-thang-1-r741.html (2026)
-- Marathon: https://marketing.marathon.edu.vn/event-chuong-trinh-uu-dai (2026)
-- Kiến Guru: https://www.appbrain.com/appstore/ki%E1%BA%BFn-guru-h%E1%BB%8Dc-online-%C4%91%E1%BA%A1t-9/ios-1471593203 (2025)
-- VietJack/Loigiaihay: https://similarweb.vn/top-websites-viet-nam-09-2025-giai-ma-insight-co-hoi/ (2025)
-- QANDA: https://qanda.ai/vi (2025)
+- Tuyensinh247 (>1 triệu HS): https://dantri.com.vn/giao-duc/tuyensinh247com-trang-hoc-truc-tuyen-dau-tien-viet-nam-nhan-nut-vang-youtube-20211012233650247.htm (2021); https://tuyensinh247.com/khuyen-mai-thang-6-r786.html (2026)
+- Marathon: https://marketing.marathon.edu.vn/event-chuong-trinh-uu-dai (2026); https://tiasang.com.vn/marathon-education-nen-tang-day-them-truc-tuyen-goi-von-trieu-do-5029672.html (2022)
+- Kiến Guru: https://www.appbrain.com/appstore/ki%E1%BA%BFn-guru-h%E1%BB%8Dc-online-%C4%91%E1%BA%A1t-9/ios-1471593203 (2025); https://www.scb.com.vn/vie/uu-dai-chu-the/scb-kien-guru-tang-goi-ung-dung-hoc-tap-01-thang-tri-gia-199000-vnd (2024)
+- VietJack/Loigiaihay: https://similarweb.vn/top-websites-viet-nam-09-2025-giai-ma-insight-co-hoi/ (2025); https://www.appbrain.com/dev/VietJack/ (2025); https://mwm.ai/apps/loi-giai-hay-loigiaihay-com/1209891610 (2025)
+- QANDA: https://qanda.ai/vi (2025); Gauth: https://app.appfigures.com/top-apps/google-play/vietnam/education (2026)
 - ELSA: https://vn.elsaspeak.com/bao-gia-hoc-phi-elsa-speak/ (2026)
-- Thầy Hóa TikTok: https://www.tiktok.com/@thaygiaomoidaden (2026); https://tyhh.net/danh-muc/khoa-hoc/133/khoa-hoc-hoa (2025)
+- Thầy Hóa TikTok: https://www.tiktok.com/@thaygiaomoidaden (2026); https://www.tiktok.com/@o.ba.day.hoa (2026); https://tyhh.net/danh-muc/khoa-hoc/133/khoa-hoc-hoa (2025)
 
 **Thế giới**
 - Duolingo 10-K 2025: https://www.sec.gov/Archives/edgar/data/1562088/000162828026012494/duol-20251231.htm (2026)
@@ -827,8 +838,13 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 - Năng lượng: https://www.classcentral.com/report/duolingo-breaks-hearts-for-energy/ (2025)
 - Prodigy: https://www.nbcnews.com/tech/tech-news/child-protection-nonprofit-alleges-manipulative-upselling-math-game-prodigy-n1258294 (2021); https://fairplayforkids.org/pf/prodigy/ (2021)
 - Epic–FTC: https://www.ftc.gov/business-guidance/blog/2022/12/245-million-ftc-settlement-alleges-fortnite-owner-epic-games-used-digital-dark-patterns-charge (2022)
-- RevenueCat: https://www.revenuecat.com/state-of-subscription-apps-2025 (2025)
-- Giữ chân: https://www.businessofapps.com/data/education-app-benchmarks/ (2025)
+- RevenueCat: https://www.revenuecat.com/state-of-subscription-apps-2025 (2025); https://www.revenuecat.com/blog/growth/subscription-app-trends-benchmarks-2026 (2026)
+- Giữ chân: https://www.businessofapps.com/data/education-app-benchmarks/ (2025); https://uxcam.com/blog/mobile-app-retention-benchmarks/ (2025–2026)
+- Quizlet 2022: https://medium.com/@maxtan0626/navigating-quizlets-controversial-changes-afeb97aafd1e (2022)
+- Khanmigo: https://nibble-app.com/blog/khan-academy-pricing (2026)
+- Duolingo Năng lượng (blog): https://blog.duolingo.com/duolingo-energy/ (2025)
+- Prodigy <5% trả phí: https://en.wikipedia.org/wiki/Prodigy_Math_Game (2021)
+- UK Age Appropriate Design Code (chuẩn 13): ico.org.uk (2021, chưa mở lại)
 - Byju's: https://business.cornell.edu/news/2024/07/01/what-investors-should-learn-from-fall-edtech-unicorn-byjus/ (2024)
 - Zenius: https://www.therunway.ventures/p/zenius (2024)
 - Kahoot: https://kahoot.com/files/2023/05/1Q23_Kahoot_quarterly_report.pdf (2023)
@@ -837,8 +853,12 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 **Pháp lý và cửa hàng**
 - Apple Review Guidelines: https://developer.apple.com/app-store/review/guidelines/ (đọc 2026)
 - Apple Small Business Program: https://developer.apple.com/app-store/small-business-program/ (2026)
-- Thuế Apple Việt Nam: https://developer.apple.com/news/?id=yo2104n5 (2025)
-- Google phí dịch vụ: https://support.google.com/googleplay/android-developer/answer/112622 (2026)
+- Thuế Apple Việt Nam: https://developer.apple.com/news/?id=yo2104n5 (2025); https://developer.apple.com/news/?id=e1b1hcmv (2025)
+- Bậc giá Apple Việt Nam 25k/49k/79k: https://vietnaminsiders.com/apple-to-raise-all-apps-price-in-vietnam/ (2022)
+- Xếp hạng tuổi Apple: https://developer.apple.com/news/?id=ks775ehf (2025)
+- Apple link mua ngoài (VN không có): https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.storekit.external-purchase-link (2025)
+- Google phí dịch vụ: https://support.google.com/googleplay/android-developer/answer/112622 (2026); biểu phí mới 10% và lịch 30/9/2027: https://android-developers.googleblog.com/2026/06/play-expanded-billing.html (2026); https://pricepush.app/blog/google-play-subscription-fees-2026-real-math (2026)
+- Google giá tối thiểu 6.000đ: https://blog.google/company-news/inside-google/around-the-globe/google-asia/minimum-purchase-price-for-apps-reduced/ (2016)
 - Google thử kín: https://support.google.com/googleplay/android-developer/answer/14151465 (2026)
 - Google Families: https://support.google.com/googleplay/android-developer/answer/9893335 (2025)
 - NĐ 147/2024: https://mic.gov.vn/nghi-dinh-147-2024-nd-cp-quan-ly-chat-che-dich-vu-tro-choi-dien-tu-tren-mang-va-thong-tin-tren-internet-197241227124622733.htm (2024); https://vtv.vn/cong-nghe/gioi-han-thoi-gian-choi-game-voi-nguoi-duoi-18-tuoi-20241118081729679.htm (2024); https://xaydungchinhsach.chinhphu.vn/nghi-dinh-147-2024-nd-cp-khong-mua-ban-vat-pham-ao-giua-nhung-nguoi-choi-tro-choi-dien-tu-voi-nhau-119241113161443995.htm (2024)
@@ -849,7 +869,12 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 - Luật TMĐT 122/2025: https://moit.gov.vn/tin-tuc/luat-thuong-mai-dien-tu-chinh-thuc-duoc-quoc-hoi-thong-qua.html (2025)
 - Luật QC 2025: https://thuvienphapluat.vn/phap-luat-doanh-nghiep/bai-viet/luat-quang-cao-2025-sua-doi-co-hieu-luc-tu-01-01-2026-da-duoc-thong-qua-ngay-16-6-2025-12818.html (2025)
 - Thông báo website: https://tenten.vn/tin-tuc/khong-thong-bao-website-voi-bo-cong-thuong/ (2026)
-- Luật BVQLNTD: https://moit.gov.vn/tin-tuc/thong-bao/luat-bao-ve-quyen-loi-nguoi-tieu-dung-nam-2023-chinh-thuc-co-hieu-luc-tu-ngay-1-7-2024.html (2024)
+- Luật BVQLNTD: https://moit.gov.vn/tin-tuc/thong-bao/luat-bao-ve-quyen-loi-nguoi-tieu-dung-nam-2023-chinh-thuc-co-hieu-luc-tu-ngay-1-7-2024.html (2024); Điều 3 khoản 6 (dịch vụ liên tục ≥3 tháng): https://thuvienphapluat.vn/van-ban/Thuong-mai/Luat-Bao-ve-quyen-loi-nguoi-tieu-dung-2023-19-2023-QH15-500102.aspx
+- NĐ 147/2024 Điều 57 (vật phẩm ảo): https://vtv.vn/cong-nghe/cam-mua-ban-vat-pham-ao-don-vi-ao-diem-thuong-giua-nhung-nguoi-choi-game-20241118083251875.htm (2024); NĐ 174/2026 phạt mua bán vật phẩm ảo: https://luatvietnam.vn/tin-van-ban-moi/tu-01-7-2026-mua-ban-vat-pham-ao-trong-game-phat-den-3-trieu-dong-186-109743-article.html (2026)
+- Giấy phép game, hồ sơ doanh nghiệp: https://luatvietnam.vn/linh-vuc-khac/kinh-doanh-tro-choi-dien-tu-tren-mang-883-100134-article.html (2025)
+- NĐ 38/2021 (phạt quảng cáo): https://thuvienphapluat.vn/van-ban/Thuong-mai/Nghi-dinh-38-2021-ND-CP-xu-phat-vi-pham-hanh-chinh-trong-linh-vuc-van-hoa-quang-cao-469165.aspx
+- Thuế cá nhân bán app qua store: https://vietnamnet.vn/nhieu-nguoi-viet-ung-dung-cho-apple-store-vao-tam-ngam-cuc-thue-thu-203-ti-dong-tien-thue-i392144.html
+- Văn bản dẫn theo tên, chưa mở nguyên văn: Bộ luật Dân sự 91/2015/QH13 Điều 21 khoản 4; Luật An ninh mạng 24/2018/QH14 Điều 26; NĐ 53/2022/NĐ-CP; Luật Giao dịch điện tử 20/2023/QH15; NĐ 52/2013, NĐ 85/2021 (thông báo website); NĐ 123/2020, NĐ 70/2025 (hoá đơn); Luật Thuế TNDN 2025 (bậc 15%/17%)
 
 **Khoa học học tập** (DOI, chưa mở lại toàn văn)
 - Dunlosky 2013: 10.1177/1529100612453266
@@ -863,6 +888,15 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 - Carter 2016: 10.1001/jamapediatrics.2016.2341
 - Zendle 2018: 10.1371/journal.pone.0206767
 - Wilson 2019: https://www.nature.com/articles/s41467-019-12552-4
+- Hu 2022 (game trong dạy Hóa, g≈0,70): https://onlinelibrary.wiley.com/doi/full/10.1002/tea.21765
+- Huang 2020 (hiệu ứng game giảm theo thời gian): 10.1007/s11423-020-09807-z
+- Kulik, Kulik & Bangert-Drowns 1990: Review of Educational Research 60(2)
+- Deci, Koestner & Ryan 1999: Psychological Bulletin 125(6)
+- Metcalfe 2017: Annual Review of Psychology 68
+- Sweller & Cooper 1985: Cognition and Instruction 2(1); Kalyuga 2003: Educational Psychologist 38(1)
+- Ryan & Deci 2020: https://selfdeterminationtheory.org/wp-content/uploads/2020/06/2020_RyanDeci_IntrinsicandExtrinsic.pdf
+- Hake 1998: American Journal of Physics 66
+- AASM (13–18 tuổi ngủ 8–10 giờ): khuyến nghị AASM, chưa mở lại
 - Benchmark FSRS: https://github.com/open-spaced-repetition/srs-benchmark (2026)
 
 **Kỹ thuật và chi phí**
@@ -871,11 +905,13 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 - Giá Workers: .../docs/workers/platform/pricing.mdx (2026)
 - Giá R2: .../docs/r2/pricing.mdx (2026)
 - Giá Durable Objects: .../partials/durable-objects/durable-objects-pricing.mdx (2026)
-- Capacitor: https://github.com/ionic-team/capacitor-docs (2026)
-- Zalo ZNS: zalo.solutions (2026)
+- Capacitor: https://github.com/ionic-team/capacitor-docs (nhánh main = Capacitor 9, 2026); https://registry.npmjs.org/@capacitor/core (latest 8.5.2, next 9.0.0-alpha, tra 30/09/2026); https://capacitorjs.com/docs/updating/8-0
+- Zalo ZNS: https://zalo.solutions/zns/pricing ; https://zns.nhanh.vn/bang-gia-dich-vu-zalo-zns-nhan-tin-cham-soc-khach-hang-qua-zalo-n97625.html (2026)
+- RevenueCat giá (miễn phí tới $2.500/tháng): nguồn thứ cấp, chưa mở trang chính thức
+- Sentry gói miễn phí 5.000 lỗi/tháng: nguồn thứ cấp
 - Lương: topcv.vn (2025–2026)
 - Quảng cáo: phuctdigital.com, klmarketing.vn (2026)
-- Nội bộ: `KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md`; `docs/do-tai-d1/ban-tai-071f5b6.md`; `docs/bao-cao-fsrs-2309.md`; `server/src/exp-cau-hinh.ts`; `server/src/game-v2-doan-mua.ts`
+- Nội bộ: `KE-HOACH-MAY-CHU-GIO-CAO-DIEM-2109.md`; `docs/do-tai-d1/ban-tai-071f5b6.md`; `docs/bao-cao-fsrs-2309.md`; `server/src/exp-cau-hinh.ts` + `src/lib/kinh-te-game.ts` (`MANH_REN_KHIEN = 21`); `server/src/game-v2-doan-mua.ts`; nhánh `tu-luyen-kho-sai-chung`: `docs/loi-giai-a/tu-sua-2909/THAM-DINH.md` (7.047 lời giải), `docs/loi-giai-a/TONG-KET.md` (305 câu lệch, 40 câu Phần III)
 
 ## Phụ lục B: Giả định & mức tin cậy
 
@@ -885,19 +921,19 @@ Sau 12 tuần: 4–6/2027 sửa theo phản hồi, chờ Cục; 7/2027 công kha
 | Tỉ lệ em hoạt động | 0,8 | thấp | Bảng sự kiện, 11/2026 |
 | Giá thực thu | 12k / 15k / 17k | thấp | Hợp đồng thật của 20 thầy đầu |
 | Thầy chịu trả tiền | chưa biết | — | Cổng đặt cọc 31/12/2026 |
-| Chi phí có một đảo | 300–600k (KS) hoặc ~1,5 triệu (phản biện) | thấp | Ghi giờ từng khâu trên 10 đảo đầu |
+| Chi phí có một đảo | 300–600k (bản chiến lược, không nguồn) hoặc ~1,5 triệu (phản biện) | thấp | Ghi giờ từng khâu trên 10 đảo đầu |
 | Churn đảo | ≤5%/tháng ngoài hè | thấp (không nguồn) | Đảo quay lại tháng 9/2027 |
 | Lộ trình đảo | 100 / 350 | thấp | Cổng từng giai đoạn |
 | Trả phí B2C | 2% (tham khảo: RevenueCat 2,1%; Duolingo 9,2% MAU; Prodigy <5%) | thấp | Thử 14 ngày sau khi mở |
 | Giá trị một người trả phí | 350k/năm | thấp | Theo bảng gói thật |
 | Tỉ lệ qua IAP | 60% (hệ số 0,91) | thấp | Báo cáo store |
 | Lương | 35 triệu + 20% (kỹ sư) | vừa (topcv 2026) | Tuyển thật |
-| Hạ tầng | $5–6 / $25–40 / $450–700 | thấp (suy từ đo 250 em) | Hoá đơn Cloudflare hằng tháng |
+| Hạ tầng | $5–6 / $25–40 / $450–700 (KS Mã nguồn: $15–30 @10k, $220–400 @100k) | thấp (suy từ đo 250 em) | Hoá đơn Cloudflare hằng tháng |
 | OTP | 500–800đ/tin | thấp | Báo giá nhà mạng |
 | Tuần-người còn lại | 35–50 (toàn bộ) | thấp | Theo dõi hằng tuần |
 | TAM | 0,9–1 triệu em | vừa | Số Bộ công bố theo lớp |
 | SAM/SOM B2C | 170.000 / 5–8 nghìn | thấp | Sau 8 tuần đo |
-| Tỉ trọng đề theo lớp 10/11/12 | ~10% / ~10–15% / ~75–80% | thấp | Đếm trên phân dạng kho |
+| Tỉ trọng đề thi TN theo lớp 10/11/12 | ~10% / ~10–15% / ~75–80% | thấp (ước lượng) | Đếm trên phân dạng đề thật; để so: kho hiện có 2.802 / 3.047 / 9.510 câu ≈ 18% / 20% / 62% (DIEU-PHOI 21/09) |
 | Hiệu ứng học (g) | 0,4–0,6 theo tổng quan | vừa (nhớ DOI) | Thí nghiệm mục 6.6 |
 | Trả lời của Cục về NĐ 147 | chưa có | — | Công văn 11/2026 |
 | VAT phần mềm | chưa chắc 8% hay không chịu | thấp | Kế toán, trước 12/2026 |
