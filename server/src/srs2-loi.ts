@@ -520,6 +520,26 @@ export function xepChuyenDao<T>(ds: readonly T[], laMoi: (x: T) => boolean, mucD
 }
 
 /**
+ * Quota câu MỚI của một ngày khi RẢI ĐỀU (thầy 30/09): ceil(số câu mới còn / (D − 3)); ba ngày ôn cuối (D ≤ 3) ⇒ mọi câu mới còn lại.
+ * MỘT công thức cho kế hoạch ngày (`lapKeHoachNgay`) và Thử sức thêm (`coLoThuSucThem`).
+ */
+export const quotaCauMoi = (soMoi: number, D: number): number => {
+  const n = Math.max(0, Math.floor(soMoi))
+  return D > NGAY_DEM ? Math.ceil(n / (D - NGAY_DEM)) : n
+}
+
+/**
+ * THỬ SỨC THÊM (thầy chốt 30/09): em làm xong kế hoạch hôm nay thì được lấy TRƯỚC câu mới của ngày mai, từng lô. Cỡ một lô =
+ * min(quota câu mới NGÀY MAI theo đúng công thức rải đều trên số câu mới còn lại, trần hôm nay − tổng kế hoạch hôm nay).
+ * Hôm nay đã là hạn nộp (chiến dịch không còn ngày mai) ⇒ 0. Ngày mai quota tự giảm vì số câu mới còn lại đã giảm ⇒ tổng câu mới cả chiến dịch không đổi.
+ */
+export function coLoThuSucThem(soMoiConLai: number, homNay: string, hanNop: string, tongHomNay: number, tran: number): number {
+  const mai = congNgay(homNay, 1)
+  if (mai > hanNop) return 0
+  return Math.max(0, Math.min(quotaCauMoi(soMoiConLai, soNgayConLai(mai, hanNop)), Math.floor(tran) - tongHomNay))
+}
+
+/**
  * Lập kế hoạch MỘT ngày cho một em. `trangThai` phải có đủ mọi câu trong `cau` (câu chưa làm ⇒ trạng thái mới).
  * `daLamHomNay`: số câu của kế hoạch hôm nay em đã làm (trừ vào trần).
  * SỔ NỢ (thầy chốt 29/09): câu NỢ (mọi nguồn) tới lịch lấy TRƯỚC, trần 50% lượt khi chiến dịch còn câu mới (không chiến dịch ⇒ 100%),
@@ -561,7 +581,7 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   // lập đầu ngày (chưa làm) ⇒ ceil(...) ≥ 1 khi còn câu mới.
   const raiDeu = tc.raiDeu === true
   const daMoi = raiDeu ? Math.max(0, Math.floor(tc.moiDaLamHomNay ?? 0)) : 0
-  const quota = D > NGAY_DEM ? Math.max(0, Math.ceil((moi.length + daMoi) / (D - NGAY_DEM)) - daMoi) : moi.length
+  const quota = Math.max(0, quotaCauMoi(moi.length + daMoi, D) - daMoi)
   const layMoi = Math.min(moi.length, quota, tran - layNo)
   const layCungCo = Math.min(cungCo.length, tran - layNo - layMoi)
   const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layNo - layMoi - layCungCo)

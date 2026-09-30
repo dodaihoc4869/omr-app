@@ -9,6 +9,7 @@ import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import {
   lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
+  coLoThuSucThem, congNgay,
   gopThongKeDang, tinhHangTheoDang,
   type CauSrs, type HangEm, type TuyChonKeHoach, type HoSoDangTho, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
@@ -723,9 +724,10 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
  * (`tamHoanCauKhoa`): đang bảo vệ cho ca kiểm tra, hoặc đã rút khỏi kho. Nhờ vậy em không bị kẹt (Đảo rỗng, Đảo khoá chờ Đoàn, rương 42/46);
  * câu bảo vệ vẫn KHÔNG ra máy em. Ca công bố xong ⇒ câu tự quay lại kế hoạch hôm nay (không ghi gì vào `srs2_ke_hoach`).
  */
-export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
+export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanTruoc?: Promise<Set<string>>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   // 29/09 (cao điểm 20h–24h): tập câu bảo vệ ca thi (dùng chung mọi em, đệm 5 s trong isolate) đọc SONG SONG với kế hoạch — trước: một đợt D1 nối tiếp sau kế hoạch.
-  const chanSom = protectedQuestions(env).catch(() => new Set<string>())
+  // `chanTruoc` (chỉ-thêm 30/09): nơi gọi đã bắt đầu đọc tập ấy (Sảnh cần lại cho Thử sức thêm) ⇒ dùng chung, không đọc hai lần.
+  const chanSom = chanTruoc ?? protectedQuestions(env).catch(() => new Set<string>())
   const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom)
   return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom), hs: r.hs }
 }
@@ -867,13 +869,15 @@ export const LOI_KHOA_DAO = 'Có xe hàng đang bị phục kích, hãy hoàn th
 
 export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   // Tối ưu 28/09: rương hôm nay (khoá theo ngày VN, không phụ thuộc kế hoạch) đọc SONG SONG với kế hoạch.
+  const chanSom = protectedQuestions(env).catch(() => new Set<string>())
   const [{ kh, hs }, ruong] = await Promise.all([
-    layKeHoachHomNay(env, sbd, nowMs),
-    env.DB.prepare('SELECT mo_luc, qua_json FROM ruong_bat_linh WHERE sbd = ? AND ngay = ?').bind(sbd, ngayVnCua(nowMs)).first<Row>().catch(() => null),
+    layKeHoachHomNay(env, sbd, nowMs, undefined, chanSom),
+    docRuongHomNay(env, sbd, ngayVnCua(nowMs)),
   ])
   const cd = hs.chienDich
   const tl = tiLeChienDich(hs.ttChienDich)
   const conLai = kh.conDao.length + kh.conDoan.length
+  const thuSuc = tinhThuSucThem(kh, hs, !!ruong, await chanSom)
   return {
     ok: true,
     cheDo2: true,
@@ -890,7 +894,88 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
     ruong: { daLam: kh.tong - conLai, tong: kh.tong, moDuoc: moDuocRuong(kh.tong, kh.tong - conLai), daMo: !!ruong, ...(ruong ? { qua: JSON.parse(str(ruong.qua_json) || '{}') } : {}) },
     // 30/09: số câu CÒN LẠI đang tạm giữ vì ca kiểm tra mở — CHỈ số, không qid/mã ca (Sảnh báo rõ thay vì "chưa có câu").
     ...((kh.tamHoan?.ca ?? 0) > 0 ? { tamGiu: { ca: kh.tamHoan!.ca } } : {}),
+    // THỬ SỨC THÊM (thầy 30/09): nút "Thử sức thêm (không bắt buộc)" — CHỈ cờ + cỡ lô sẽ thêm, không lộ qid.
+    thuSucThem: { duoc: thuSuc.duoc, soCau: thuSuc.duoc ? thuSuc.soCau : 0 },
   }
+}
+
+/** Rương Bát Linh hôm nay của em (đã mở ⇒ dòng; chưa ⇒ null). Lỗi đọc ⇒ null. */
+const docRuongHomNay = (env: Env, sbd: string, ngay: string): Promise<Row | null> =>
+  env.DB.prepare('SELECT mo_luc, qua_json FROM ruong_bat_linh WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+
+// ---------------------------------------------------------------- THỬ SỨC THÊM (thầy chốt 30/09)
+export type LyDoKhongThuSuc = 'chua_co_chien_dich' | 'het_ngay' | 'chua_xong' | 'tam_giu_ca' | 'chua_mo_ruong' | 'du_tran' | 'het_cau_moi'
+export const LOI_THU_SUC: Record<LyDoKhongThuSuc, string> = {
+  chua_co_chien_dich: 'Thầy chưa giao chiến dịch nào đang chạy cho em.',
+  het_ngay: 'Hôm nay là hạn nộp của chiến dịch, không còn câu của ngày mai để lấy trước.',
+  chua_xong: 'Em làm xong kế hoạch hôm nay rồi mới thử sức thêm được nhé.',
+  tam_giu_ca: 'Còn câu hôm nay đang tạm giữ vì lớp có ca kiểm tra. Em thử sức thêm sau khi ca kết thúc nhé.',
+  chua_mo_ruong: 'Em mở Rương Bát Linh hôm nay trước, rồi thử sức thêm nhé.',
+  du_tran: 'Hôm nay em đã nhận đủ số câu tối đa trong ngày.',
+  het_cau_moi: 'Em đã nhận hết câu mới của chiến dịch.',
+}
+/** Trần lượt HÔM NAY của kế hoạch — đúng `tran` của `lapKeHoachNgay`: ngày Huyết Chiến theo trần Huyết Chiến hiện hành, ngày thường = thể lực/ngày. */
+export const tranKeHoachHomNay = (cd: ChienDich, huyetChien: boolean): number => (huyetChien && cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay)
+
+/**
+ * THỬ SỨC THÊM (thầy chốt 30/09): em làm xong kế hoạch hôm nay thì được lấy TRƯỚC một lô câu MỚI của ngày mai (không bắt buộc); bấm nhiều lần được,
+ * mỗi lần một lô, tới trần hôm nay thì thôi. Điều kiện (MỌI điều): có chiến dịch đang chạy và còn ngày mai trong chiến dịch; kế hoạch hôm nay (đã chốt)
+ * CÒN LẠI 0 và không câu nào đang tạm giữ vì ca kiểm tra; còn câu mới chưa làm.
+ * RƯƠNG (cách chọn: đơn giản, an toàn): CHỈ cho khi Rương Bát Linh hôm nay ĐÃ MỞ — hoặc kế hoạch hôm nay rỗng (không có rương để khoá). Rương là một dòng/ngày ⇒
+ * `tong` tăng vì lô mới KHÔNG khoá lại rương đã mở (Sảnh đọc `daMo`), cũng không cho mở rương lần hai; làm xong lô là xong kế hoạch như thường.
+ * Cỡ lô = `coLoThuSucThem` (quota câu mới NGÀY MAI theo rải đều, trần − tong), không quá số câu mới lấy được NGAY: bỏ câu tự luận / đã rút khỏi kho (vốn
+ * không có trong `hs.cau`, soát lại theo `meta`), câu đang bảo vệ cho ca (`chan`: qid hoặc nhóm), câu sai của ca (chưa tới lượt), câu đã có trong kế hoạch hôm nay.
+ */
+export function tinhThuSucThem(kh: KeHoachDaChot, hs: Pick<HoSo2, 'chienDich' | 'cau' | 'tt' | 'meta' | 'qidCaSai'>, daMo: boolean, chan: ReadonlySet<string>): { duoc: boolean; soCau: number; lyDo: LyDoKhongThuSuc | null; ung: CauSrs[] } {
+  const khong = (lyDo: LyDoKhongThuSuc) => ({ duoc: false, soCau: 0, lyDo, ung: [] as CauSrs[] })
+  const cd = hs.chienDich
+  if (!cd) return khong('chua_co_chien_dich')
+  if (congNgay(kh.ngay, 1) > cd.hanNop) return khong('het_ngay')
+  if (kh.conDao.length + kh.conDoan.length > 0) return khong('chua_xong')
+  if ((kh.tamHoan?.ca ?? 0) > 0) return khong('tam_giu_ca')
+  if (kh.tong > 0 && !daMo) return khong('chua_mo_ruong')
+  // Câu mới còn lại — ĐÚNG tập `moi` mà `lapKeHoachNgay` ngày mai thấy (câu chiến dịch chưa làm, còn trong kho, không tự luận).
+  const moi = hs.cau.filter((c) => (c.nguon ?? 'chien_dich') === 'chien_dich' && hs.tt.get(c.qid)?.laMoi === true && !hs.tt.get(c.qid)!.catTia)
+  if (!moi.length) return khong('het_cau_moi')
+  const lo = coLoThuSucThem(moi.length, kh.ngay, cd.hanNop, kh.tong, tranKeHoachHomNay(cd, kh.huyetChien))
+  if (lo <= 0) return khong('du_tran')
+  const daCo = new Set([...kh.dao, ...kh.doan].map(qidGoc))
+  const ung = moi.filter((c) => {
+    const m = hs.meta.get(c.qid)
+    return !daCo.has(c.qid) && !hs.qidCaSai?.has(c.qid) && lyDoKhongPhucVu(m) === null && !chan.has(c.qid) && !chan.has(m!.group)
+  })
+  if (!ung.length) return khong('het_cau_moi')
+  return { duoc: true, soCau: Math.min(lo, ung.length), lyDo: null, ung }
+}
+
+/** Hai mảng khoá kế hoạch giống hệt (cùng thứ tự). */
+const cungMang = (a: readonly string[], b: readonly string[]): boolean => a.length === b.length && a.every((x, i) => x === b[i])
+
+/**
+ * Lệnh `hoa2-thu-suc-them`: thêm MỘT lô câu mới của ngày mai vào kế hoạch HÔM NAY (Đảo). Chọn câu bằng đúng bộ lọc kế hoạch (`lapKeHoachNgay` nhìn từ NGÀY MAI:
+ * dễ → khó / hạng cá nhân theo dạng, đan xen theo sức em) trên tập ứng viên của `tinhThuSucThem`. Ghi so-khớp-rồi-ghi (như #110): bản ghi đổi từ lúc đọc
+ * (máy khác vừa thêm lô / vừa sửa kế hoạch) ⇒ KHÔNG ghi, trả `them: 0` để máy em tải lại Sảnh — hai lần bấm cùng lúc chỉ thêm MỘT lô.
+ * Không đổi lược đồ: lô nằm ngay trong `dao_json`, `tong` cập nhật theo.
+ */
+export async function thuSucThem(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
+  const ngay = ngayVnCua(nowMs)
+  const chanSom = protectedQuestions(env).catch(() => new Set<string>())
+  const [goc, ruong] = await Promise.all([layKeHoachChot(env, sbd, nowMs, undefined, chanSom), docRuongHomNay(env, sbd, ngay)])
+  const hs = goc.hs
+  const kh = await tamHoanCauKhoa(env, goc.kh, hs, chanSom)
+  const t = tinhThuSucThem(kh, hs, !!ruong, await chanSom)
+  if (!t.duoc) return { ok: false, ma: t.lyDo, error: LOI_THU_SUC[t.lyDo!] }
+  const cd = hs.chienDich!
+  const hang = await docHangEm(env, sbd, hs).catch(() => null)
+  // Chỉ đưa câu MỚI ứng viên vào ⇒ không nợ / củng cố / duy trì; `raiDeu: false` + trần = cỡ lô ⇒ lấy ĐÚNG `soCau` câu theo thứ tự của ngày mai.
+  const lap = lapKeHoachNgay(t.ung, hs.tt, { homNay: congNgay(ngay, 1), hanNop: cd.hanNop, tranNgay: t.soCau, tranHuyetChien: t.soCau, raiDeu: false, ...(hang ?? {}) })
+  const lo = [...lap.dao, ...lap.doan].slice(0, t.soCau)
+  if (!lo.length) return { ok: false, ma: 'het_cau_moi', error: LOI_THU_SUC.het_cau_moi }
+  const cu = await env.DB.prepare('SELECT dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+  if (!cu || !cungMang(parseMang(cu.dao_json), goc.kh.dao) || !cungMang(parseMang(cu.doan_json), goc.kh.doan)) return { ok: true, them: 0, lapLai: true }
+  const dao = [...goc.kh.dao, ...themLanLam([...goc.kh.dao, ...goc.kh.doan], lo)]
+  const ghi = await ghiKeHoachNeuChuaDoi(env, sbd, ngay, cu, 'dao_json = ?, tong = ?', [JSON.stringify(dao), dao.length + goc.kh.doan.length])
+  return ghi ? { ok: true, them: lo.length } : { ok: true, them: 0, lapLai: true }
 }
 
 /** Gợi ý M3 cho lần phục vụ tới của câu. */
