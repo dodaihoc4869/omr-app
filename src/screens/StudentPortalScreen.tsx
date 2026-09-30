@@ -105,7 +105,7 @@ import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import { useToanManHinhGame } from '../components/useToanManHinhGame'
 import { ketThucLuotToanManHinh } from '../lib/toan-man-hinh-game'
-import ONhapDapSo from '../components/ONhapDapSo'
+import OSoTraLoi from '../components/OSoTraLoi'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from '../lib/hang-doi-nop'
 import { useHangDoiNop } from '../lib/use-hang-doi-nop'
@@ -2088,7 +2088,7 @@ export default function StudentPortalScreen() {
                             <label htmlFor={`cp-tl-${cau.id}`} className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                               Điền câu trả lời ngắn:
                             </label>
-                            <ONhapDapSo
+                            <OSoTraLoi
                               id={`cp-tl-${cau.id}`}
                               inputMode="text"
                               className="sm:w-80"

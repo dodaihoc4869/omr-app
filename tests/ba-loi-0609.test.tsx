@@ -102,6 +102,7 @@ describe('Lỗi 2 — iPhone khoá bài dù em không vi phạm', () => {
 
 describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
   // 28/09 (thầy): ô gọn — nút "−" CHỈ ở iPhone/iPad (bàn phím thập phân iOS thiếu dấu trừ), nút "," bỏ ở mọi máy ("." tự thành ",").
+  // 30/09 (thầy, ảnh iPhone "-3" thành "3"): OSoTraLoi — hai nút "±" "," LUÔN nằm trong ô ở MỌI máy (không đoán máy nữa).
   const laIPhone = () => vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)')
   afterEach(() => vi.restoreAllMocks())
   it('đổi dấu qua lại, ô trống bấm cũng ra dấu trừ', () => {
@@ -122,22 +123,22 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
     expect(laAm(null)).toBe(false)
   })
 
-  it('ô trả lời ngắn có NÚT DẤU ÂM (iPhone), bấm là ra dấu', () => {
+  it('ô trả lời ngắn có NÚT ĐỔI DẤU ÂM (iPhone), bấm là ra dấu', () => {
     laIPhone()
     const doi = vi.fn()
     render(<TheCau kieu="sa" id="c1" stt={1} text="Tính ΔH" selected="" onChange={doi} />)
-    const nut = document.querySelector('[aria-label="Thêm dấu âm"]') as HTMLElement
+    const nut = document.querySelector('[aria-label="Đổi dấu âm"]') as HTMLElement
     expect(nut).toBeTruthy()
     fireEvent.click(nut)
     expect(doi).toHaveBeenCalledWith('-')
   })
 
-  it('đang âm thì nút đổi nhãn thành BỎ dấu âm, bấm là bỏ', () => {
+  it('đang âm thì nút đổi dấu ở trạng thái BẬT (aria-pressed), bấm là bỏ', () => {
     laIPhone()
     const doi = vi.fn()
     render(<TheCau kieu="sa" id="c1" stt={1} text="Tính ΔH" selected="-92,4" onChange={doi} />)
-    const nut = document.querySelector('[aria-label="Bỏ dấu âm"]') as HTMLElement
-    expect(nut).toBeTruthy()
+    const nut = document.querySelector('[aria-label="Đổi dấu âm"]') as HTMLElement
+    expect(nut.getAttribute('aria-pressed')).toBe('true')
     fireEvent.click(nut)
     expect(doi).toHaveBeenCalledWith('92,4')
   })
@@ -163,12 +164,12 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
     expect(coPhay(null)).toBe(false)
   })
 
-  it('28/09: KHÔNG còn nút dấu phẩy ở mọi máy — gõ "." tự thành ","; iPhone chỉ còn nút dấu âm', () => {
+  it('30/09: CÓ cả nút dấu phẩy lẫn nút đổi dấu (trong ô); gõ "." vẫn tự thành ","', () => {
     laIPhone()
     const doi = vi.fn()
     render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="" onChange={doi} />)
-    expect(document.querySelector('[aria-label="Thêm dấu phẩy"]')).toBeNull()
-    expect(document.querySelector('[aria-label="Thêm dấu âm"]')).toBeTruthy()
+    expect(document.querySelector('[aria-label="Thêm dấu phẩy"]')).toBeTruthy()
+    expect(document.querySelector('[aria-label="Đổi dấu âm"]')).toBeTruthy()
     fireEvent.change(document.querySelector('input')!, { target: { value: '1.5' } })
     expect(doi).toHaveBeenCalledWith('1,5')
   })

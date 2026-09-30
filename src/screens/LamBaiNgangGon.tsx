@@ -101,7 +101,7 @@ function bocCuaCau(de: HTMLElement, n: number): HTMLElement | null {
 /** Phần "chọn đáp án" của thẻ câu: khối phương án (Phần I), khối ý Đúng/Sai (Phần II), ô đáp số (Phần III). */
 function khoiLuaChon(than: Element): HTMLElement | null {
   for (const c of Array.from(than.children) as HTMLElement[]) {
-    if (c.matches('.ond') || c.querySelector('.pa-hang, .y-hang, .ond, input')) return c
+    if (c.matches('.osl') || c.querySelector('.pa-hang, .y-hang, .osl, input')) return c
   }
   return null
 }

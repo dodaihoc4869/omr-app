@@ -16,7 +16,7 @@ import { ChemText } from '../lib/chem-format'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
 import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
-import ONhapDapSo from './ONhapDapSo'
+import OSoTraLoi from './OSoTraLoi'
 import './m3/the-cau.css' // chỉ có hiệu lực dưới tổ tiên `.m3` (luyện đề / khắc phục / báo cáo…); game và app giáo viên không đổi
 
 export type CheDo = 'thi' | 'xem_lai'
@@ -86,6 +86,8 @@ interface SaProps extends BaseProps {
   selected: string | null
   onChange?: (text: string) => void
   correct?: string
+  /** Ô đáp số đang khoá (đang gửi / đã chốt) ⇒ khoá cả ô lẫn hai nút "±" ",". */
+  khoaO?: boolean
 }
 
 export type TheCauProps = McqProps | TfProps | SaProps
@@ -373,7 +375,7 @@ export default function TheCau(props: TheCauProps) {
       </div>
     )
   } else {
-    const { selected, onChange, correct } = props
+    const { selected, onChange, correct, khoaO } = props
     const daTraLoi = !!normSo(selected ?? '')
     const dung = xemLai && daTraLoi && khopPhanIII(selected ?? '', correct ?? '') // 29/09: so GIÁ TRỊ như bộ chấm ("1237500000" = "1,2375×10⁹")
     body = xemLai ? (
@@ -405,27 +407,27 @@ export default function TheCau(props: TheCauProps) {
       //
       // 07/09 thêm nút DẤU PHẨY cùng lý do: vài bố cục bàn phím iOS không hiện
       // dấu phẩy, em không gõ nổi `1,5`.
-      // 21/09 (thầy: "quét mọi chỗ mọi app"): hai nút nay là THÀNH PHẦN DÙNG CHUNG `ONhapDapSo` — bấm nút KHÔNG làm mất tiêu điểm (bàn phím không đóng),
+      // 21/09 (thầy: "quét mọi chỗ mọi app"): hai nút nay là THÀNH PHẦN DÙNG CHUNG (khi ấy tên `ONhapDapSo`) — bấm nút KHÔNG làm mất tiêu điểm (bàn phím không đóng),
       // "," chèn TẠI CON TRỎ; bố cục cũ giữ nguyên (− , rồi ô), aria-label cũ giữ nguyên. Giá trị gửi lên vẫn là chuỗi em gõ (`onChange(chuỗi)`), không chuẩn hoá.
       // 28/09 (thầy): ô gọn — "." tự thành "," (chuẩn Việt Nam "7,44"; hàm chấm vốn coi như nhau), bỏ nút "," và nút xoá; nút "−" nhỏ trong ô, chỉ ở iPhone/iPad.
-      <ONhapDapSo
-        nutTruoc
+      // 30/09 (thầy, ảnh iPhone "-3" gõ thành "3"): THÀNH PHẦN MỚI `OSoTraLoi` — hai nút "±" và "," LUÔN nằm TRONG ô, mép phải, mọi máy
+      // (bản 28/09 chỉ hiện "−" khi đoán ra iPhone/iPad ⇒ đoán trượt là em không gõ nổi dấu âm). Màu nút kế thừa token thẻ câu.
+      <OSoTraLoi
         chuanViet
         value={selected ?? ''}
         onChange={(v) => onChange?.(v)}
+        disabled={khoaO}
         placeholder="Nhập đáp án"
+        ariaLabel="Đáp án của em"
         style={{
-          gap: 'var(--k2)',
-          ['--ond-cao' as string]: '56px',
-          ['--ond-bo' as string]: 'var(--bo-1)',
-          ['--ond-vien' as string]: 'var(--vien)',
-          ['--ond-nut-nen' as string]: 'var(--the-2)',
-          ['--ond-nut-chu' as string]: 'var(--muc)',
-          ['--ond-bat-nen' as string]: 'var(--muc)',
-          ['--ond-bat-chu' as string]: 'var(--muc-nguoc)',
+          ['--osl-cao' as string]: '56px',
+          ['--osl-bo' as string]: 'var(--bo-1)',
+          ['--osl-nen' as string]: 'var(--the-2)',
+          ['--osl-chu' as string]: 'var(--muc)',
+          ['--osl-vien' as string]: 'var(--vien)',
+          ['--osl-nut-rong' as string]: '44px',
+          ['--osl-tieu-diem' as string]: 'var(--m3-primary, var(--muc))',
         }}
-        nutClassName="tap-target"
-        nutStyle={{ minHeight: 56, borderRadius: 'var(--bo-1)', fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', minWidth: 48 }}
         inputClassName="tap-target"
         inputStyle={{
           minHeight: 56,

@@ -16,11 +16,11 @@ const TEP = lietKe(GOC)
 const doc = (f: string) => fs.readFileSync(f, 'utf8')
 const tuong = (f: string) => path.relative(process.cwd(), f)
 
-describe('mọi ô trả lời ngắn đều đi qua ONhapDapSo', () => {
-  it('`inputMode="decimal"` (bàn phím số) CHỈ nằm trong ONhapDapSo.tsx — mọi nơi khác phải dùng thành phần đó', () => {
+describe('mọi ô trả lời ngắn đều đi qua OSoTraLoi (30/09, trước là ONhapDapSo)', () => {
+  it('`inputMode="decimal"` (bàn phím số) CHỈ nằm trong OSoTraLoi.tsx — mọi nơi khác phải dùng thành phần đó', () => {
     const khongChuThich = (f: string) => doc(f).split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n')
     const coDecimal = TEP.filter((f) => /\.tsx$/.test(f) && /inputMode\s*=\s*["']decimal["']|inputMode\s*=\s*'decimal'|inputMode = 'decimal'/.test(khongChuThich(f))).map(tuong)
-    expect(coDecimal).toEqual(['src/components/ONhapDapSo.tsx'])
+    expect(coDecimal).toEqual(['src/components/OSoTraLoi.tsx'])
   })
   it('tờ phiếu HTML (chuỗi thô) có `inputmode="decimal"` ĐÚNG MỘT chỗ, và chỗ đó nằm trong khối có hai nút', () => {
     const src = doc(path.join(GOC, 'lib/html-phieu.ts'))
@@ -28,30 +28,30 @@ describe('mọi ô trả lời ngắn đều đi qua ONhapDapSo', () => {
     expect(dem).toHaveLength(1)
     expect(src).toMatch(/<div class="lam-nhap-khoi">.*inputmode="decimal".*<\/div>/)
   })
-  it('các nơi đã chuyển đang thật sự nhập và dùng ONhapDapSo', () => {
-    const NOI = ['components/TheCau.tsx', 'components/bang-nhiem-vu/LamCauOn.tsx', 'components/bang-nhiem-vu/MomM3.tsx', 'screens/StudentPortalScreen.tsx', 'game/than-thu-v2/DoanCau.tsx']
+  it('các nơi đã chuyển đang thật sự nhập và dùng OSoTraLoi', () => {
+    const NOI = ['components/TheCau.tsx', 'screens/ExamTakeScreen.tsx', 'components/bang-nhiem-vu/LamCauOn.tsx', 'components/bang-nhiem-vu/MomM3.tsx', 'screens/StudentPortalScreen.tsx', 'game/than-thu-v2/DoanCau.tsx']
     for (const n of NOI) {
       const s = doc(path.join(GOC, n))
-      expect(s, n).toMatch(/import ONhapDapSo from/)
-      expect(s, n).toMatch(/<ONhapDapSo/)
+      expect(s, n).toMatch(/import OSoTraLoi from/)
+      expect(s, n).toMatch(/<OSoTraLoi/)
     }
   })
-  it('ô "số hoặc chữ" / "đáp án" / "câu trả lời ngắn" KHÔNG còn là <input> trần ở nơi nào (placeholder đặc trưng chỉ đứng cạnh ONhapDapSo)', () => {
+  it('ô "số hoặc chữ" / "đáp án" / "câu trả lời ngắn" KHÔNG còn là <input> trần ở nơi nào (placeholder đặc trưng chỉ đứng cạnh OSoTraLoi)', () => {
     const DAC_TRUNG = /placeholder=["']?(Nhập đáp án số hoặc chữ|Nhập đáp án|Nhập đáp số|Ví dụ 12,5)/
     for (const f of TEP.filter((x) => /\.tsx$/.test(x))) {
       const s = doc(f)
       for (const m of s.matchAll(new RegExp(DAC_TRUNG.source, 'g'))) {
         const truoc = s.slice(Math.max(0, m.index! - 500), m.index)
-        // tìm thẻ mở gần nhất trước placeholder: phải là <ONhapDapSo, không phải <input
+        // tìm thẻ mở gần nhất trước placeholder: phải là <OSoTraLoi, không phải <input
         const thoMo = Math.max(truoc.lastIndexOf('<input'), truoc.lastIndexOf('<textarea'))
-        const daoMo = truoc.lastIndexOf('<ONhapDapSo')
-        expect(daoMo, `${tuong(f)}: ô "${m[1]}" phải là <ONhapDapSo>, không phải <input> trần`).toBeGreaterThan(thoMo)
+        const daoMo = truoc.lastIndexOf('<OSoTraLoi')
+        expect(daoMo, `${tuong(f)}: ô "${m[1]}" phải là <OSoTraLoi>, không phải <input> trần`).toBeGreaterThan(thoMo)
       }
     }
   })
-  it('không nơi nào tự chế nút đổi dấu âm/dấu phẩy khác (nhãn "Thêm dấu âm"/"Thêm dấu phẩy" chỉ ở ONhapDapSo và tờ phiếu)', () => {
-    const co = TEP.filter((f) => /Thêm dấu (âm|phẩy)|Bỏ dấu âm/.test(doc(f))).map(tuong).sort()
-    expect(co).toEqual(['src/components/ONhapDapSo.tsx', 'src/lib/html-phieu.ts'].sort())
+  it('không nơi nào tự chế nút đổi dấu âm/dấu phẩy khác (nhãn "Đổi dấu âm"/"Thêm dấu phẩy" chỉ ở OSoTraLoi và tờ phiếu)', () => {
+    const co = TEP.filter((f) => /Thêm dấu (âm|phẩy)|Bỏ dấu âm|Đổi dấu âm/.test(doc(f))).map(tuong).sort()
+    expect(co).toEqual(['src/components/OSoTraLoi.tsx', 'src/lib/html-phieu.ts'].sort())
   })
 })
 

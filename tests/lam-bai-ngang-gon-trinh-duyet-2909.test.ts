@@ -224,11 +224,11 @@ describe('Chromium thật — điện thoại xoay ngang', () => {
     it(`${w}×${h}: Phần III — bàn phím ảo mở (khung thấp lại) ⇒ ô đáp số nằm trọn trong vùng nhìn thấy`, async () => {
       if (!browser) return
       const p = await mo(w, h, 4)
-      await p.locator('.ond input').focus()
+      await p.locator('.osl input').focus()
       await p.setViewportSize({ width: w, height: Math.round(h * 0.45) })
       await p.waitForTimeout(500)
       const r = await p.evaluate(() => {
-        const i = document.querySelector('.ond input')!.getBoundingClientRect()
+        const i = document.querySelector('.osl input')!.getBoundingClientRect()
         return { top: i.top, bottom: i.bottom, cao: innerHeight, dangGo: document.activeElement?.tagName }
       })
       expect(r.dangGo).toBe('INPUT')

@@ -121,7 +121,7 @@ export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi}:TheCa
    selected:(/^[ABCD]$/.test(traLoi)?traLoi:null) as 'A'|'B'|'C'|'D'|null,onSelect:v=>{if(!khoa&&!gach.includes(v))onTraLoi(v)}}
   :q.phan==='II'?{...chung,phan:'II',ideas:q.ideas as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
    selected:Array.from({length:4},(_,i)=>(traLoi[i]==='D'||traLoi[i]==='S'?traLoi[i]:null) as 'D'|'S'|null),onSelect:(i,v)=>{if(!khoa){const a=(traLoi||'----').padEnd(4,'-').split('');a[i]=v;onTraLoi(a.join(''))}}}
-  :{...chung,phan:'III',selected:traLoi,onChange:v=>{if(!khoa)onTraLoi(v)}}
+  :{...chung,phan:'III',selected:traLoi,khoaO:khoa,onChange:v=>{if(!khoa)onTraLoi(v)}}
  return <section className="dao2-giay m3" aria-label={`Ải ${stt}`}>
   {typeof q.nhanNo==='string'&&q.nhanNo&&<p className="dao2-nhan-no" data-khoi="nhan-no">{q.nhanNo}</p>}
   {goiY&&<p className="dao2-bua">{BUA}<span><b>Bùa Trợ giảng:</b> {goiY.gach?`${chuGach(goiY.gach)} đã cháy thành tro.`:'mở trước Kiến thức cốt lõi của câu này.'}<small>Đúng nhờ Bùa chưa tính Thành thạo — câu sẽ quay lại để em tự làm.</small></span></p>}
