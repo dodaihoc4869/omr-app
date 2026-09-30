@@ -13,6 +13,8 @@ import '../m3'
 import '../hoa2/phong-baloo'
 import './tu-luyen.css'
 import './tu-luyen-rong.css'
+import ChonNguonSai from './ChonNguonSai'
+import { chonMacDinh, demChon, docNhoNguon, ghiNhoNguon, type MaNguonSai } from './nguon-cau-sai'
 import type { HinhAnh } from '../../data/examContent'
 import { chiSoDuoiRo } from '../hoa2/cau-chuyen'
 import {
@@ -232,6 +234,8 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
 
   // tham số từng chế độ
   const [soCau1, setSoCau1] = useState(SO_CAU_MAC_DINH)
+  // Chế độ 1 — nguồn câu sai em tick (30/09); nhớ theo máy.
+  const [nguon1, setNguon1] = useState<Set<MaNguonSai>>(new Set())
   const [soCau2, setSoCau2] = useState(SO_CAU_MAC_DINH)
   const [lop3, setLop3] = useState('')
   const [bai3, setBai3] = useState('')
@@ -249,24 +253,26 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     if (!r.ok) { setLoiNguon(r.loi); return }
     setNguon(r.du)
     setSoCau1(Math.min(SO_CAU_MAC_DINH, Math.max(1, 2 * (r.du.khoCauSai?.tong ?? r.du.soCauSai))))
+    if (r.du.khoCauSai?.theoNguon) setNguon1(chonMacDinh(r.du.khoCauSai.theoNguon, docNhoNguon(sbd)))
     const l = r.du.danhMuc[r.du.danhMuc.length - 1] // danh mục đã lọc theo khối em, xếp tăng ⇒ lớp cuối = khối em
     if (l) {
       setLop3(l.lop)
       const b = l.bais[0]
       if (b) { setBai3(b.tenBai); setDang3(new Set(b.dangs[0] ? [b.dangs[0].ma] : [])) }
     }
-  }, [token])
+  }, [token, sbd])
   useEffect(() => { void napNguon() }, [napNguon])
 
   // ---- tham số gửi máy chủ cho chế độ đang chọn
   const thamSo = useMemo<ThamSoRut | null>(() => {
     // Luật 30/09: máy chủ tự gom kho câu sai từ 29/09; `dsMaCa` chỉ để máy chủ bản cũ (trước khi đẩy Worker mới) vẫn rút được.
-    if (cheDo === 1) return { cheDo: 1, soCau: soCau1, dsMaCa: nguon?.cacCa.map((c) => c.maCa) ?? [] }
+    // Chọn nguồn (30/09): chỉ gửi `nguon` khi máy chủ đã trả đếm theo nguồn (máy chủ bản cũ ⇒ rút cả kho như trước).
+    if (cheDo === 1) return { cheDo: 1, soCau: soCau1, dsMaCa: nguon?.cacCa.map((c) => c.maCa) ?? [], ...(nguon?.khoCauSai?.theoNguon ? { nguon: [...nguon1] } : {}) }
     if (cheDo === 2) return { cheDo: 2, soCau: soCau2 }
     if (cheDo === 3) return { cheDo: 3, dsDang: [...dang3], soCau: soCau3 }
     if (cheDo === 4) return { cheDo: 4, mucDo: [...mucDo4], soCau: soCau4 }
     return null
-  }, [cheDo, soCau1, nguon, soCau2, dang3, soCau3, mucDo4, soCau4])
+  }, [cheDo, soCau1, nguon, nguon1, soCau2, dang3, soCau3, mucDo4, soCau4])
   // Khoá xem trước KHÔNG gồm số câu (đổi thanh chọn không phải hỏi lại máy chủ).
   const khoaXt = useMemo(() => {
     if (cheDo === 2) return '2|kho-chung'
@@ -495,12 +501,16 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const tongXt = xt && xt.khoa === khoaXt ? xt : null
   // Chế độ 1 (luật 30/09): kho câu sai từ 29/09 do máy chủ gom (máy chủ bản cũ chưa gửi ⇒ tạm dùng tổng câu sai của các ca).
   const khoSai = nguon?.khoCauSai ?? null
-  const n1 = khoSai ? khoSai.tong : nguon?.soCauSai ?? 0
+  const n1Kho = khoSai ? khoSai.tong : nguon?.soCauSai ?? 0
+  // n1 = số câu DUY NHẤT trong các nguồn em tick — tính ngay trên máy từ bảng mặt nạ nguồn, không hỏi lại máy chủ.
+  const theoNguon1 = khoSai?.theoNguon ?? null
+  const n1 = theoNguon1 && khoSai ? demChon(khoSai.theoMat, nguon1) : n1Kho
+  const chuaChonNguon = !!theoNguon1 && n1Kho > 0 && nguon1.size === 0
   const tran1 = Math.min(100, 2 * n1)
   const soCauChon = cheDo === 1 ? Math.min(soCau1, tran1) : cheDo === 2 ? soCau2 : cheDo === 3 ? soCau3 : soCau4
   const coTheBatDau = !!cheDo && !khoa && !dangRut && (cheDo === 1 ? n1 > 0 && soCauChon > 0 : !!tongXt && !tongXt.dang && tongXt.tong > 0 && soCauChon > 0)
   // Bộ đếm khắc phục (máy chủ bản cũ không gửi ⇒ tongTuMoc = số câu trong kho, đã khắc phục 0).
-  const tongKp = khoSai?.tongTuMoc ?? n1
+  const tongKp = khoSai?.tongTuMoc ?? n1Kho
   const daKp = khoSai?.daKhacPhuc ?? 0
   // Dạng nên luyện khi chưa có câu sai (nút gợi ý của chế độ 1): có trong danh mục Dạng bài ⇒ rút Dạng bài; không ⇒ sang Dạng câu sai.
   const nenLuyen = nguon?.dangNenLuyen ?? null
@@ -516,7 +526,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   }
   /** Dòng phụ trên thẻ: nguồn đang dùng (chế độ 2, 4) / trạng thái kho (chế độ 1). */
   const phuThe = (m: CheDoTuLuyen): string => {
-    if (m === 1 && nguon && n1 === 0) return tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai từ 29/09` : 'Em chưa sai câu nào từ 29/09'
+    if (m === 1 && nguon && n1Kho === 0) return tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai từ 29/09` : 'Em chưa sai câu nào từ 29/09'
     if (m === 2 && nguon?.dangCauSai?.nhan) return nguon.dangCauSai.nhan
     if (m === 4 && nguon?.tuDo?.nhan) return nguon.tuDo.nhan
     return MO_TA[m].phu
@@ -561,7 +571,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     <section className="tlu-cau-hinh" aria-label={`Cài đặt ${TEN_CHE_DO[cheDo]}`}>
       <div className="tlu-ch-trai">
         {rong && <p className="tlu-ch-ten"><span className="tlu-ch-icon" data-che-do={cheDo}><IconCheDo cheDo={cheDo} /></span>{TEN_CHE_DO[cheDo]}</p>}
-        {cheDo === 1 && n1 === 0 && nguon && (
+        {cheDo === 1 && n1Kho === 0 && nguon && (
           <div className="tlu-chuc-mung" role="status">
             <b className="baloo">{tongKp > 0 ? `Em đã khắc phục hết ${tongKp} câu sai!` : 'Em chưa sai câu nào từ 29/09!'}</b>
             <p>{tongKp > 0 ? 'Kho câu sai của em đang trống. Câu nào em làm sai sau này sẽ tự vào đây để luyện lại.' : 'Làm tốt lắm. Câu nào em làm sai ở ca kiểm tra, chiến dịch, Luyện đề hay Tu luyện sẽ tự vào đây để luyện lại.'}</p>
@@ -576,20 +586,24 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             )}
           </div>
         )}
-        {cheDo === 1 && n1 > 0 && (
+        {cheDo === 1 && n1Kho > 0 && (
           <>
             <h2 className="tlu-muc">Kho câu sai của em</h2>
-            <div className="tlu-kho-sai" role="status">
+            <div className="tlu-kho-sai" role="status" aria-live="polite">
               <b className="baloo tlu-tab">{n1}</b>
               <span className="tlu-kho-sai-chu">
-                <span>câu sai còn phải sửa</span>
-                {khoSai && (
+                <span>{theoNguon1 ? 'câu sai trong nguồn em chọn' : 'câu sai còn phải sửa'}</span>
+                {theoNguon1 && <span className="tlu-tab tlu-kho-sai-them">Kho câu sai của em: {n1Kho} câu</span>}
+                {khoSai && !theoNguon1 && (
                   <span className="tlu-tab">
                     {[`${khoSai.tuCa} từ ca kiểm tra`, `${khoSai.tuChienDich} từ chiến dịch`, khoSai.tuLuyenDe ? `${khoSai.tuLuyenDe} từ Luyện đề` : '', khoSai.tuTuLuyen ? `${khoSai.tuTuLuyen} từ Tu luyện` : ''].filter(Boolean).join(' · ')}
                   </span>
                 )}
               </span>
             </div>
+            {theoNguon1 && (
+              <ChonNguonSai theoNguon={theoNguon1} chon={nguon1} onDoi={(s) => { setNguon1(s); ghiNhoNguon(sbd, s, theoNguon1) }} />
+            )}
             <DemKhacPhuc da={daKp} tong={tongKp} />
             {!!khoSai?.toiHan && <p className="tlu-ghi" data-kieu="lap">{khoSai.toiHan} câu đã tới hẹn ôn lại — được lấy trước.</p>}
             <p className="tlu-ghi">Làm đúng một câu ⇒ hẹn gặp lại sau 1 ngày; đúng lần nữa vào ngày khác ⇒ câu đó được khắc phục và rời kho. Câu chưa luyện lấy trước, câu khó và dễ xếp xen kẽ. Bỏ câu tự luận.</p>
@@ -664,11 +678,13 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         )}
       </div>
       <div className="tlu-ch-phai">
-        {cheDo === 1 && n1 > 0 && (
+        {cheDo === 1 && n1Kho > 0 && (
           <>
             {thanhChon(soCauChon, setSoCau1, 1, tran1)}
-            {soCauChon > n1 ? (
-              <p className="tlu-ghi" data-kieu="lap" role="status">Em chọn nhiều hơn kho {n1} câu: sẽ có {soCauChon - n1} câu lặp lại trong lượt này.</p>
+            {chuaChonNguon ? (
+              <p className="tlu-ghi" data-kieu="loi" role="status">Em chọn ít nhất 1 nguồn câu sai để bắt đầu.</p>
+            ) : soCauChon > n1 ? (
+              <p className="tlu-ghi" data-kieu="lap" role="status">Em chọn nhiều hơn {n1} câu trong nguồn đã chọn: sẽ có {soCauChon - n1} câu lặp lại trong lượt này.</p>
             ) : (
               <p className="tlu-ghi">Kéo quá {n1} câu nếu em muốn luyện lặp (mỗi câu tối đa 2 lần trong một lượt).</p>
             )}
@@ -694,12 +710,12 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             <p className="tlu-ghi">{nguonXt?.kieu === 'toan_kho' ? 'Rút ngẫu nhiên từ toàn kho lớp em trở xuống.' : 'Rút từ kho câu cùng chuyên đề với các câu em từng sai.'}</p>
           </>
         )}
-        {!(cheDo === 1 && n1 === 0) && (
+        {!(cheDo === 1 && n1Kho === 0) && (
           <>
             {congTac}
             {loi && <p className="tlu-ghi" data-kieu="loi" role="alert">{loi}</p>}
             <button type="button" className="tlu-nut-chinh tlu-nut-rong" disabled={!coTheBatDau} onClick={() => batDau()}>
-              {dangRut ? 'Đang rút câu…' : cheDo === 1 ? `Luyện ${soCauChon} câu sai` : `Bắt đầu luyện · ${soCauChon} câu`}
+              {dangRut ? 'Đang rút câu…' : cheDo === 1 && chuaChonNguon ? 'Chọn nguồn để luyện' : cheDo === 1 ? `Luyện ${soCauChon} câu sai` : `Bắt đầu luyện · ${soCauChon} câu`}
             </button>
           </>
         )}
@@ -712,8 +728,8 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     const daLuyen = tomTat?.theoCheDo[m]
     const luot = daLuyen && daLuyen.soLuot > 0 ? [{ so: pt(daLuyen.tiLe), nhan: `đúng · ${daLuyen.soLuot} lượt đã luyện` }] : []
     if (!nguon) return luot
-    if (m === 1) return [{ so: String(n1), nhan: 'câu sai còn phải sửa' }, ...luot]
-    if (m === 2) return n1 > 0 ? [{ so: String(n1), nhan: 'câu sai làm nguồn dạng' }, ...luot] : luot
+    if (m === 1) return [{ so: String(n1Kho), nhan: 'câu sai còn phải sửa' }, ...luot]
+    if (m === 2) return n1Kho > 0 ? [{ so: String(n1Kho), nhan: 'câu sai làm nguồn dạng' }, ...luot] : luot
     if (m === 3) {
       const soDang = nguon.danhMuc.reduce((t, l) => t + l.bais.reduce((u, b) => u + b.dangs.length, 0), 0)
       return [{ so: String(soDang), nhan: `dạng bài · ${nguon.danhMuc.length} lớp` }, ...luot]

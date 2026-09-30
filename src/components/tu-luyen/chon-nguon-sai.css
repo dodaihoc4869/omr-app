@@ -1,0 +1,162 @@
+/* Khối "Nguồn câu sai" (chế độ 1). Màu qua token của Tu luyện; mỗi nguồn một sắc nhấn cho biểu tượng — kèm chữ, không phải kênh duy nhất. */
+.tlu-nguon-sai {
+  --tlu-ng-hong: rgb(255 176 206);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tlu-nguon-sai-dau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tlu-nguon-sai-dau .tlu-nut-chu {
+  touch-action: manipulation;
+}
+.tlu-nguon-sai-dau .tlu-nut-chu:disabled {
+  color: var(--tlu-chu-phu);
+  opacity: 0.7;
+}
+.tlu-nguon-sai-luoi {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.tlu-the-nguon {
+  --ng: var(--tlu-nhan);
+  position: relative;
+  min-height: 60px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 16px;
+  border: 1.5px solid var(--tlu-vien);
+  background: var(--tlu-nen-3);
+  color: var(--tlu-chu);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.tlu-the-nguon[data-nguon='ca'] { --ng: var(--tlu-cd-1); }
+.tlu-the-nguon[data-nguon='dao'] { --ng: var(--tlu-ngoc); }
+.tlu-the-nguon[data-nguon='doan'] { --ng: var(--tlu-cd-2); }
+.tlu-the-nguon[data-nguon='bia'] { --ng: var(--tlu-cd-4); }
+.tlu-the-nguon[data-nguon='tu_luyen'] { --ng: var(--tlu-vang); }
+.tlu-the-nguon[data-nguon='luyen_de'] { --ng: var(--tlu-ng-hong); }
+/* Ô tick thật: ẩn khỏi mắt nhưng vẫn nhận Tab/Space và trình đọc màn hình. */
+.tlu-the-nguon input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.tlu-the-nguon:has(input:focus-visible) {
+  outline: 3px solid var(--tlu-vang);
+  outline-offset: 2px;
+}
+.tlu-the-nguon-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--ng) 18%, transparent);
+  color: var(--ng);
+}
+.tlu-the-nguon-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.tlu-the-nguon-chu {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tlu-the-nguon-chu b {
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.tlu-the-nguon-chu span {
+  font-size: 13px;
+  color: var(--tlu-chu-phu);
+}
+.tlu-the-nguon-dau {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--tlu-vien);
+  background: var(--tlu-nen-2);
+  color: transparent;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.tlu-the-nguon-dau svg {
+  width: 12px;
+  height: 12px;
+}
+.tlu-the-nguon[data-chon='1'] {
+  border-color: var(--ng);
+  background: color-mix(in srgb, var(--ng) 12%, var(--tlu-nen-3));
+}
+.tlu-the-nguon[data-chon='1'] .tlu-the-nguon-dau {
+  background: var(--ng);
+  border-color: var(--ng);
+  color: var(--tlu-nhan-chu);
+}
+.tlu-the-nguon[data-chon='1'] .tlu-the-nguon-chu span {
+  color: var(--tlu-chu);
+}
+/* Nguồn 0 câu: mờ, không tick được. */
+.tlu-the-nguon[data-rong='1'] {
+  cursor: not-allowed;
+  background: transparent;
+  border-style: dashed;
+}
+.tlu-the-nguon[data-rong='1'] .tlu-the-nguon-icon,
+.tlu-the-nguon[data-rong='1'] .tlu-the-nguon-chu,
+.tlu-the-nguon[data-rong='1'] .tlu-the-nguon-dau {
+  opacity: 0.45;
+}
+@media (hover: hover) and (pointer: fine) {
+  .tlu-the-nguon[data-rong='0']:hover {
+    border-color: var(--ng);
+  }
+}
+.tlu-kho-sai-chu .tlu-kho-sai-them {
+  color: var(--tlu-chu-phu);
+}
+/* Màn ngang / máy tính (khung rộng): ba cột; màn ngang thấp: ba cột gọn. */
+.tlu-rong .tlu-nguon-sai-luoi {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-the-nguon {
+  min-height: 52px;
+  padding: 6px 8px;
+  gap: 8px;
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-the-nguon-icon {
+  width: 30px;
+  height: 30px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tlu-the-nguon,
+  .tlu-the-nguon-dau {
+    transition: none;
+  }
+}

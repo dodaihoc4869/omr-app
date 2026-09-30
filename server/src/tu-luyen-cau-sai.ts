@@ -52,11 +52,14 @@ const theoLuc = (a: LanSai, b: LanSai) => (a.luc < b.luc ? -1 : a.luc > b.luc ? 
  * Nhãn "Sai gốc" của một câu. Một nguồn ⇒ lần sai ĐẦU TIÊN kể từ mốc ("Sai gốc: Ca kiểm tra Ester · 29/09").
  * Nhiều nguồn ⇒ nguồn GẦN NHẤT + "và N lần khác" (N = số lần sai còn lại kể từ mốc) — đúng chữ Boss chốt 30/09.
  */
-export function nhanSaiGoc(ds: readonly LanSai[]): string {
+export function nhanSaiGoc(ds: readonly LanSai[], uuTien?: ReadonlySet<LoaiNguonSai> | null): string {
   if (!ds.length) return ''
   const xep = [...ds].sort(theoLuc)
-  if (new Set(xep.map(khoaNguon)).size <= 1) return `Sai gốc: ${chuNguonSai(xep[0]!)}`
-  return `Sai gốc: ${chuNguonSai(xep[xep.length - 1]!)} và ${xep.length - 1} lần khác`
+  // Em chọn nguồn (30/09): nguồn HIỂN THỊ lấy trong số nguồn em đã tick; "N lần khác" vẫn đếm mọi lần sai.
+  const hien = uuTien?.size ? xep.filter((l) => uuTien.has(l.loai)) : xep
+  const nhin = hien.length ? hien : xep
+  if (new Set(xep.map(khoaNguon)).size <= 1) return `Sai gốc: ${chuNguonSai(nhin[0]!)}`
+  return `Sai gốc: ${chuNguonSai(nhin[nhin.length - 1]!)} và ${xep.length - 1} lần khác`
 }
 
 /** "Luyện lần đầu" (K = 1) / "Luyện lại lần K" — K = số lần câu đã có trong các lượt Tu luyện ĐÃ NỘP + 1. */
@@ -392,3 +395,42 @@ export async function docLanLuyen(env: Env, sbd: string): Promise<Map<string, { 
   }
   return ra
 }
+
+// ------------------------------------------------------------------ CHỌN NGUỒN CÂU SAI (thầy lệnh 30/09: "cho hs chọn tick nguồn để rút câu")
+// Sáu nguồn, thứ tự cố định = thứ tự BIT trong mặt nạ (máy em dùng cùng thứ tự — src/components/tu-luyen/nguon-cau-sai.ts).
+export const DS_NGUON_SAI: readonly LoaiNguonSai[] = ['ca', 'dao', 'doan', 'bia', 'tu_luyen', 'luyen_de']
+const BIT_NGUON = new Map(DS_NGUON_SAI.map((l, i) => [l, 1 << i]))
+
+/** Mặt nạ nguồn của một câu: bit i bật ⇔ câu có ít nhất một lần sai thuộc nguồn DS_NGUON_SAI[i]. */
+export const matNguon = (ds: readonly LanSai[]): number => ds.reduce((m, l) => m | (BIT_NGUON.get(l.loai) ?? 0), 0)
+
+/**
+ * Đếm câu còn trong kho theo nguồn — một câu sai ở nhiều nguồn được đếm cho MỖI nguồn (`theoNguon`);
+ * `theoMat` = số câu theo từng mặt nạ nguồn (≤ 63 khoá) để máy em tính NGAY tổng câu DUY NHẤT của bất kỳ tổ hợp nguồn nào mà không hỏi lại máy chủ.
+ */
+export function demTheoNguon(ds: readonly { lanSai: readonly LanSai[] }[]): { theoNguon: Record<LoaiNguonSai, number>; theoMat: Record<string, number> } {
+  const theoNguon = Object.fromEntries(DS_NGUON_SAI.map((l) => [l, 0])) as Record<LoaiNguonSai, number>
+  const theoMat: Record<string, number> = {}
+  for (const c of ds) {
+    const m = matNguon(c.lanSai)
+    if (!m) continue
+    theoMat[m] = (theoMat[m] ?? 0) + 1
+    DS_NGUON_SAI.forEach((l, i) => { if (m & (1 << i)) theoNguon[l]++ })
+  }
+  return { theoNguon, theoMat }
+}
+
+/** Đọc CHẶT danh sách nguồn từ máy em. Không gửi (máy bản cũ) ⇒ null = mọi nguồn; gửi mảng ⇒ chỉ giữ tên nguồn hợp lệ (có thể rỗng). */
+export function docDsNguon(v: unknown): Set<LoaiNguonSai> | null {
+  if (!Array.isArray(v)) return null
+  const hop = new Set<string>(DS_NGUON_SAI)
+  return new Set(v.map((x) => str(x).trim()).filter((x): x is LoaiNguonSai => hop.has(x)))
+}
+
+/** Câu có ít nhất một lần sai thuộc nguồn đã chọn. `nguon = null` ⇒ giữ cả kho. */
+export function locTheoNguon<T extends { lanSai: readonly LanSai[] }>(ds: readonly T[], nguon: ReadonlySet<LoaiNguonSai> | null): T[] {
+  if (!nguon) return [...ds]
+  return ds.filter((c) => c.lanSai.some((l) => nguon.has(l.loai)))
+}
+
+export const LOI_CHUA_CHON_NGUON = 'Em chọn ít nhất 1 nguồn câu sai.'
