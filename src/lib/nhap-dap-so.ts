@@ -75,7 +75,7 @@ export function choPhepPhay(v: string, tu: number, den: number, maxLength?: numb
 // ---------------------------------------------------------------------------
 // MÀN THI (thầy 28/09, ảnh phiếu Phần III có câu điền "12.3"): ô đáp số của màn thi đổi "." thành ","
 // ngay khi gõ (chuẩn Việt Nam, như "7,44"); ô gọn, chỉ còn nút "−" ở iPhone/iPad. Chỉ bật ở nơi truyền `chuanViet` cho
-// `ONhapDapSo` — các nơi khác vẫn "em gõ gì gửi nấy". Hàm chấm (`normalizeNumericAnswer`) vốn coi
+// `OSoTraLoi` (trước 30/09 là `ONhapDapSo`) — các nơi khác vẫn "em gõ gì gửi nấy". Hàm chấm (`normalizeNumericAnswer`) vốn coi
 // "12.3" = "12,3" và "−0,5" = "-0,5" (test chứng minh), nên đây là việc HIỂN THỊ cho đúng chuẩn, không đổi điểm.
 
 /** Mọi kiểu gạch ngang/dấu trừ Unicode em có thể dán vào. */

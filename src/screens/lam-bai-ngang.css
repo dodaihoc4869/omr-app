@@ -176,10 +176,10 @@
   color: var(--lb-chu-2); font-size: 13px; font-weight: 800; cursor: pointer;
 }
 .lb-y button[aria-pressed='true'] { background: var(--lb-xd); color: var(--lb-tren-xd); box-shadow: none; }
-/* Phần III: ô đáp số gọn (nút "−" chỉ ở iPhone/iPad, nằm trong ô — ONhapDapSo chuanViet). */
+/* Phần III: ô đáp số gọn (OSoTraLoi chuanViet: hai nút "±" "," nằm trong ô, mọi máy). */
 .lb-o3 { flex: 1; min-width: 0; }
-.lb-o3 .ond { --ond-cao: 44px; --ond-bo: 12px; --ond-nen: var(--lb-mat); --ond-chu: var(--lb-chu); --ond-vien: var(--lb-vien); --ond-nut-nen: var(--lb-mat-2);
-  --ond-nut-chu: var(--lb-chu); --ond-tieu-diem: var(--lb-xd); --ond-bat-nen: var(--lb-xd); --ond-bat-chu: var(--lb-tren-xd); }
+.lb-o3 .osl { --osl-cao: 44px; --osl-bo: 12px; --osl-nen: var(--lb-mat); --osl-chu: var(--lb-chu); --osl-vien: var(--lb-vien); --osl-nut-nen: var(--lb-mat-2);
+  --osl-nut-rong: 38px; --osl-tieu-diem: var(--lb-xd); }
 
 .lb-goi-y { display: flex; flex: none; align-items: center; gap: 8px; margin: 0 calc(12px + var(--thi-le-phai, 0px)) 10px 8px; padding: 6px 6px 6px 12px; border-radius: 16px; background: var(--lb-mat); box-shadow: var(--lb-bong); font-size: 12.5px; color: var(--lb-chu-2); }
 .lb-goi-y-ds { display: flex; flex: 1; flex-wrap: wrap; align-items: center; column-gap: 12px; row-gap: 16px; min-width: 0; height: 24px; overflow: hidden; white-space: nowrap; }

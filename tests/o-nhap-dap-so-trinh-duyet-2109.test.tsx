@@ -1,5 +1,5 @@
 // @vitest-environment node
-// ONhapDapSo trong TRÌNH DUYỆT THẬT (Chromium): React chạy thật (đóng gói bằng rolldown từ `tests/_trinh-duyet-onds/entry.tsx`), chuột + chạm thật.
+// OSoTraLoi (30/09, trước là ONhapDapSo; hai nút "±" "," NẰM TRONG ô) trong TRÌNH DUYỆT THẬT (Chromium): React chạy thật (đóng gói bằng rolldown từ `tests/_trinh-duyet-onds/entry.tsx`), chuột + chạm thật.
 // Khoá điều thầy/Boss đòi: bấm "−" hoặc "," KHÔNG làm mất tiêu điểm (bàn phím không đóng); "," chèn tại con trỏ; "−" bật/tắt ở đầu số; chỉ một dấu thập phân; dán "0.54" vẫn nhận; nút ≥ 44 px; không tràn ngang ở 320/360/390 (sáng + tối).
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { chromium, type Browser, type Page } from 'playwright'
@@ -7,10 +7,10 @@ import { rolldown } from 'rolldown'
 import fs from 'node:fs'
 import path from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
-import ONhapDapSo from '../src/components/ONhapDapSo'
+import OSoTraLoi from '../src/components/OSoTraLoi'
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8').replace(/@import[^;]*;/g, '')
-const CSS = doc('src/components/o-nhap-dap-so.css')
+const CSS = doc('src/components/o-so-tra-loi.css')
 
 let browser: Browser | null = null
 let bundle = ''
@@ -40,9 +40,11 @@ async function mo(w = 360, h = 700, cham = false, mau: 'light' | 'dark' = 'light
   await page.waitForSelector('#o')
   return page
 }
-const gt = (p: Page) => p.evaluate(() => (document.getElementById('o') as HTMLInputElement).value)
+/** CHUỖI GỬI ĐI (giá trị cha giữ) — ô hiển thị "−" thay "-" ở đầu số. */
+const gt = (p: Page) => p.evaluate(() => document.getElementById('gia-tri')!.textContent)
+const hien = (p: Page) => p.evaluate(() => (document.getElementById('o') as HTMLInputElement).value)
 const td = (p: Page) => p.evaluate(() => ({ dangCoTieuDiem: document.activeElement === document.getElementById('o'), tu: (document.getElementById('o') as HTMLInputElement).selectionStart, den: (document.getElementById('o') as HTMLInputElement).selectionEnd }))
-const nutAm = (p: Page) => p.locator('button[aria-label$="dấu âm"]')
+const nutAm = (p: Page) => p.locator('button[aria-label="Đổi dấu âm"]')
 const nutPhay = (p: Page) => p.locator('button[aria-label="Thêm dấu phẩy"]')
 
 describe('Chromium thật — chuột', () => {
@@ -72,21 +74,24 @@ describe('Chromium thật — chuột', () => {
     expect(await gt(p)).toBe('1,75')
     await p.context().close()
   }, 30000)
-  it('"−": bấm ⇒ "-1,5" (dấu vào ĐẦU dù con trỏ ở cuối); bấm lại ⇒ "1,5"; tiêu điểm giữ; nhãn đổi Thêm/Bỏ dấu âm', async () => {
+  it('"±": bấm ⇒ gửi "-1,5", ô hiện "−1,5" (dấu vào ĐẦU dù con trỏ ở cuối); bấm lại ⇒ "1,5"; tiêu điểm giữ; aria-pressed theo dấu', async () => {
     if (!browser) return
     const p = await mo()
     await p.click('#o')
     await p.keyboard.type('1,5')
     await nutAm(p).click()
     expect(await gt(p)).toBe('-1,5')
+    expect(await hien(p)).toBe('\u22121,5')
     expect((await td(p)).dangCoTieuDiem).toBe(true)
-    expect(await nutAm(p).getAttribute('aria-label')).toBe('Bỏ dấu âm')
+    expect(await nutAm(p).getAttribute('aria-pressed')).toBe('true')
+    await p.keyboard.type('7') // gõ tiếp sau dấu hiển thị "−" vẫn đúng chỗ
+    expect(await gt(p)).toBe('-1,57')
     await nutAm(p).click()
-    expect(await gt(p)).toBe('1,5')
-    expect(await nutAm(p).getAttribute('aria-label')).toBe('Thêm dấu âm')
+    expect(await gt(p)).toBe('1,57')
+    expect(await nutAm(p).getAttribute('aria-pressed')).toBe('false')
     await p.context().close()
   }, 30000)
-  it('gõ bằng nút ra "-1,5" từ ô trống: − → 1 → , → 5', async () => {
+  it('gõ bằng nút ra "-1,5" từ ô trống: ± → 1 → , → 5', async () => {
     if (!browser) return
     const p = await mo()
     await p.click('#o')
@@ -121,7 +126,7 @@ describe('Chromium thật — chuột', () => {
     expect((await td(p)).dangCoTieuDiem).toBe(false)
     await p.context().close()
   }, 30000)
-  it('maxLength 12: đủ 12 ký tự ⇒ "," khoá; bấm "−" (thêm) không đổi gì', async () => {
+  it('maxLength 12: đủ 12 ký tự ⇒ "," khoá; bấm "±" (thêm) không đổi gì', async () => {
     if (!browser) return
     const p = await mo()
     await p.fill('#o', '123456789012')
@@ -144,7 +149,7 @@ describe('Chromium thật — chuột', () => {
 })
 
 describe('Chromium thật — CHẠM (điện thoại)', () => {
-  it('chạm "−" rồi "," ⇒ ô vẫn có tiêu điểm (bàn phím không đóng), giá trị đúng', async () => {
+  it('chạm "±" rồi "," ⇒ ô vẫn có tiêu điểm (bàn phím không đóng), giá trị đúng', async () => {
     if (!browser) return
     const p = await mo(360, 700, true)
     await p.tap('#o')
@@ -161,14 +166,14 @@ describe('Chromium thật — CHẠM (điện thoại)', () => {
 describe('Chromium thật — bố cục', () => {
   for (const [w, h] of [[320, 640], [360, 740], [390, 844]] as const)
     for (const mau of ['light', 'dark'] as const)
-      it(`${w}×${h} · ${mau}: hai nút ≥ 44 px, ô nhập rộng, 0 tràn ngang, ba phần tử cùng hàng, đổi giá trị KHÔNG làm đổi cỡ`, async () => {
+      it(`${w}×${h} · ${mau}: hai nút ≥ 36 px NẰM TRONG ô (mép phải), ô nhập rộng, 0 tràn ngang, đổi giá trị KHÔNG làm đổi cỡ`, async () => {
         if (!browser) return
         const p = await mo(w, h, false, mau)
         const chup = () => p.evaluate(() => {
           const r = (e: Element) => { const b = e.getBoundingClientRect(); return { x: Math.round(b.left * 10) / 10, y: Math.round(b.top * 10) / 10, w: Math.round(b.width * 10) / 10, h: Math.round(b.height * 10) / 10 } }
-          const k = document.querySelector('.ond')!
-          const [am, o, phay] = [k.children[0]!, k.children[1]!, k.children[2]!]
-          return { k: r(k), am: r(am), o: r(o), phay: r(phay), tran: document.documentElement.scrollWidth > document.documentElement.clientWidth }
+          const k = document.querySelector('.osl')!
+          const [am, o, phay] = [k.querySelector('.osl-nut-dau')!, k.querySelector('input')!, k.querySelector('.osl-nut-phay')!]
+          return { k: r(k), am: r(am), o: r(o), phay: r(phay), dem: parseFloat(getComputedStyle(o).paddingRight), tran: document.documentElement.scrollWidth > document.documentElement.clientWidth }
         })
         const a = await chup()
         await p.click('#o')
@@ -178,16 +183,17 @@ describe('Chromium thật — bố cục', () => {
         await p.context().close()
         for (const c of [a, b]) {
           expect(c.tran).toBe(false)
-          expect(c.am.w).toBeGreaterThanOrEqual(44)
-          expect(c.am.h).toBeGreaterThanOrEqual(44)
-          expect(c.phay.w).toBeGreaterThanOrEqual(44)
-          expect(c.phay.h).toBeGreaterThanOrEqual(44)
+          for (const n of [c.am, c.phay]) {
+            expect(n.w).toBeGreaterThanOrEqual(36)
+            expect(n.h).toBeGreaterThanOrEqual(36)
+            expect(n.x).toBeGreaterThanOrEqual(c.o.x) // nằm TRONG ô
+            expect(n.x + n.w).toBeLessThanOrEqual(c.o.x + c.o.w + 0.5)
+            expect(n.y).toBeGreaterThanOrEqual(c.o.y - 0.5)
+            expect(n.y + n.h).toBeLessThanOrEqual(c.o.y + c.o.h + 0.5)
+          }
+          expect(c.am.x + c.am.w).toBeLessThanOrEqual(c.phay.x + 0.5) // "±" trước ","
+          expect(c.dem).toBeGreaterThanOrEqual(c.o.x + c.o.w - c.am.x) // chữ không chui dưới nút
           expect(c.o.w).toBeGreaterThanOrEqual(120)
-          expect(c.am.y).toBeCloseTo(c.o.y, 0) // cùng hàng
-          expect(c.phay.y).toBeCloseTo(c.o.y, 0)
-          expect(c.am.x + c.am.w).toBeLessThanOrEqual(c.o.x + 0.5)
-          expect(c.o.x + c.o.w).toBeLessThanOrEqual(c.phay.x + 0.5)
-          expect(c.phay.x + c.phay.w).toBeLessThanOrEqual(c.k.x + c.k.w + 0.5)
         }
         expect(b.am).toEqual(a.am) // gõ chữ / đổi dấu KHÔNG làm nút nhảy
         expect(b.phay).toEqual(a.phay)
@@ -197,12 +203,12 @@ describe('Chromium thật — bố cục', () => {
 
 describe('khoá nguồn', () => {
   it('nút KHÔNG chặn Enter/không phải submit; hai nút dùng preventDefault ở pointerdown + mousedown; không hex trong CSS/TSX', () => {
-    const src = fs.readFileSync(path.join(process.cwd(), 'src/components/ONhapDapSo.tsx'), 'utf8')
-    expect(src.match(/type="button"/g)).toHaveLength(2) // "−" và "," (28/09: nút xoá đã bỏ theo lệnh thầy)
+    const src = fs.readFileSync(path.join(process.cwd(), 'src/components/OSoTraLoi.tsx'), 'utf8')
+    expect(src.match(/type="button"/g)).toHaveLength(2) // "±" và ","
     expect(src).toMatch(/onPointerDown=\{giuTieuDiem\}/)
     expect(src).toMatch(/onMouseDown=\{giuTieuDiem\}/)
     expect(src).not.toMatch(/onTouchStart/) // preventDefault ở touchstart chặn luôn cú click trên điện thoại
     expect(CSS).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
-    expect(renderToStaticMarkup(<ONhapDapSo value="" onChange={() => {}} />)).toContain('inputMode="decimal"')
+    expect(renderToStaticMarkup(<OSoTraLoi value="" onChange={() => {}} />)).toContain('inputMode="decimal"')
   })
 })

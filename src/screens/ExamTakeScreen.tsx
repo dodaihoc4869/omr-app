@@ -97,7 +97,7 @@ import { datDangLamBai } from '../lib/cap-nhat-app'
 import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import NutNopBtvn from '../components/NutNopBtvn'
-import ONhapDapSo from '../components/ONhapDapSo'
+import OSoTraLoi from '../components/OSoTraLoi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 // Bố cục NGANG nạp lười (mảnh riêng, ngoài precache — vite.config.ts globIgnores); dọc không bao giờ tải mảnh này.
@@ -3611,7 +3611,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             const f = flat[n - 1]
             if (f?.phan === 'III') setPhanIII(assignment.phanIII[f.i].qid, text)
           }}
-          oDapSo={(o) => <ONhapDapSo chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />}
+          oDapSo={(o) => <OSoTraLoi chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />}
           onDoiDau={(n) => {
             const f = flat[n - 1]
             if (f) doiDauCau(dsItem(f).qid)

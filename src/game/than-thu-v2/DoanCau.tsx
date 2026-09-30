@@ -10,7 +10,7 @@ import { LoiGiaiCauSai } from '../../components/KhoiCauSai'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from './core'
 import type { KetQuaCau } from './doan-kieu'
-import ONhapDapSo from '../../components/ONhapDapSo'
+import OSoTraLoi from '../../components/OSoTraLoi'
 import XemLaiChuan from './doan2/XemLaiChuan'
 
 const CHU = ['A', 'B', 'C', 'D'] as const
@@ -93,7 +93,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
           })}
         </div>
       )}
-      {q.phan === 'III' && <ONhapDapSo className="dh-so-khung" inputClassName="dh-so" ariaLabel="Đáp số của em" placeholder="Nhập đáp số" disabled={khoa} value={chon} maxLength={40} onChange={onChon} />}
+      {q.phan === 'III' && <OSoTraLoi className="dh-so-khung" inputClassName="dh-so" ariaLabel="Đáp số của em" placeholder="Nhập đáp số" disabled={khoa} value={chon} maxLength={40} onChange={onChon} />}
       <HinhTaiViTri hinhAnh={hinh} viTri="cuoi_cau" onZoom={onZoom} nhan="câu của em" />
       {ketQua && (
         <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status">
