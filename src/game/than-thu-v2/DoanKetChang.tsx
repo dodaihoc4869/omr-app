@@ -22,7 +22,7 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
         {k.thang && <div className="dh-hoa-giay" aria-hidden="true">{Array.from({ length: 14 }, (_, i) => <i key={i} style={{ left: `${(i * 37 + 11) % 96}%`, background: MAU_GIAY[i % MAU_GIAY.length], animationDelay: `${(i * .37) % 3}s`, animationDuration: `${2.8 + (i % 4) * .4}s` } as CSSProperties} />)}</div>}
         {banBe[0] && <ThuHinh pet={banBe[0].pet} cap={banBe[0].cap} size={92} className="dh-thu-phu dh-noi-2" style={{ left: '2%' }} />}
         {banBe[1] && <ThuHinh pet={banBe[1].pet} cap={banBe[1].cap} size={92} quayTrai className="dh-thu-phu dh-noi-2" style={{ right: '2%' }} />}
-        <ThuHinh pet={em.pet} cap={em.cap} size={190} className="dh-noi" />
+        <ThuHinh pet={em.pet} cap={em.cap} camXuc={k.thang ? 'mung' : 'sai'} size={190} className="dh-noi" />
       </div>
       <div className="dh-ket-sao" role="img" aria-label={`${k.sao} trên 3 sao`}>{[1, 2, 3].map(i => <SaoHinh key={i} size={i === 2 ? 46 : 38} sang={k.sao >= i} />)}</div>
       <h1 className="dh-ket-tieu-de">{k.thang ? <span className="dh-chu-vang">HOÀN THÀNH CHUYẾN!</span> : 'Linh Tâm cần nghỉ'}</h1>

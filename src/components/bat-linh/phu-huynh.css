@@ -1,0 +1,39 @@
+/* Parent app: the same sanctuary palette, quieter illustration and solid report cards. */
+html:root body[data-bat-linh] .ph3 {
+  --ph3-nen: var(--bl-ground); --ph3-mat: var(--bl-paper); --ph3-mat-2: rgb(237 241 225); --ph3-vien: var(--bl-line);
+  --ph3-chu: var(--bl-ink); --ph3-chu-2: var(--bl-muted); --ph3-chu-3: rgb(84 106 96);
+  --ph3-xd: var(--bl-teal); --ph3-xd-nen: var(--bl-teal-soft); --ph3-xd-dam: rgb(20 79 66);
+  --ph3-xl: rgb(34 120 76); --ph3-xl-nen: rgb(221 240 214); --ph3-xl-dam: rgb(29 81 43); --ph3-tren-xl: rgb(255 255 255);
+  --ph3-hp: rgb(143 94 24); --ph3-hp-nen: rgb(253 237 196); --ph3-hp-dam: rgb(101 64 17); --ph3-hp-nhat: rgb(255 245 218); --ph3-hp-vach: rgb(229 202 150);
+  --ph3-ho: rgb(166 63 63); --ph3-ho-nen: rgb(252 228 219); --ph3-ho-dam: rgb(115 42 36);
+  --ph3-tim: rgb(67 114 83); --ph3-tim-nen: rgb(227 239 214); --ph3-tim-dam: rgb(40 76 43); --ph3-tim-nhat: rgb(155 188 144);
+  --ph3-ah-nen: rgb(22 75 66); --ph3-ah-tron-1: rgb(27 94 77); --ph3-ah-tron-2: rgb(29 85 66);
+  --ph3-ah-o: rgb(39 104 83); --ph3-ah-vach: rgb(72 126 101); --ph3-ah-chu: rgb(255 253 234); --ph3-ah-chu-2: rgb(216 232 208); --ph3-ah-truc: rgb(163 196 167);
+  --ph3-vong-hp: rgb(255 208 109); --ph3-vong-xl: rgb(142 225 175); --ph3-vong-tim: rgb(201 219 155); --ph3-vong-xd: rgb(154 222 222); --ph3-vong-ho: rgb(255 174 150);
+  --ph3-bong: var(--bl-shadow); --ph3-bong-menu: 0 12px 40px rgb(22 62 62 / .2);
+  --ph3-phong: var(--sans, 'Be Vietnam Pro', system-ui, sans-serif);
+  color-scheme: light; background: radial-gradient(ellipse at top right, rgb(225 238 218), transparent 55%), var(--bl-ground);
+}
+html:root body[data-bat-linh] .ph3-dau { padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: 18px; }
+html:root body[data-bat-linh] .ph3-tieu-de h1 { font-family: var(--serif); letter-spacing: -.035em; }
+html:root body[data-bat-linh] .ph3-the { border: 1px solid var(--bl-line); border-radius: 24px; }
+html:root body[data-bat-linh] .ph3-ah { border: 1px solid rgb(192 211 170); box-shadow: var(--bl-shadow); background: linear-gradient(110deg, rgb(15 67 57 / .98) 12%, rgb(22 75 66 / .94) 58%, rgb(22 75 66 / .78)), var(--bl-scene) center / cover; }
+html:root body[data-bat-linh] .ph3-ah::before, html:root body[data-bat-linh] .ph3-ah::after { display: none; }
+html:root body[data-bat-linh] .ph3-ah h2 { font-family: var(--serif); font-size: 25px; letter-spacing: -.02em; }
+html:root body[data-bat-linh] .ph3-dieu-huong { background: var(--bl-paper); box-shadow: 0 -4px 20px rgb(22 62 62 / .06); }
+html:root body[data-bat-linh] .ph3-muc[aria-current='page'] .ph3-muc__bt { background: rgb(253 229 161); color: rgb(88 64 20); }
+html:root body[data-bat-linh] .ph3-muc[aria-current='page'] { color: var(--bl-teal); }
+html:root body[data-bat-linh] .ph3-nut-tong { background: linear-gradient(180deg, rgb(255 226 133), rgb(249 195 69)); color: rgb(75 53 15); border: 1px solid rgb(217 175 75); }
+html:root body[data-bat-linh] .ph3-vao { max-width: none; min-height: 100dvh; background: linear-gradient(180deg, rgb(247 243 220 / .28), rgb(244 243 232 / .9)), var(--bl-scene) center / cover; }
+html:root body[data-bat-linh] .ph3-vao__the { background: var(--bl-paper); border: 1px solid rgb(255 255 255 / .9); box-shadow: 0 24px 70px rgb(18 63 58 / .18); max-width: 460px; width: 100%; border-radius: 30px; }
+html:root body[data-bat-linh] .ph3-vao__the .bl-loi-chao { text-align: left; padding: 24px 0 8px; }
+html:root body[data-bat-linh] .ph3-vao__the .bl-loi-chao h1 { font-size: 29px; }
+html:root body[data-bat-linh] .ph3-vao__the input { background: rgb(255 255 250); border-color: var(--bl-line); }
+html:root body[data-bat-linh] .ph3-vao__chan { color: var(--bl-ink); background: rgb(255 252 243 / .85); padding: 10px 16px; border-radius: 14px; }
+@media (min-width: 1024px) {
+  html:root body[data-bat-linh] .ph3-dieu-huong { border-right: 1px solid var(--bl-line); background: linear-gradient(180deg, var(--bl-paper) 65%, rgb(231 240 220)); }
+  html:root body[data-bat-linh] .ph3-dieu-huong__con { border-bottom: 1px solid var(--bl-line); padding-bottom: 28px; margin-bottom: 12px; }
+  html:root body[data-bat-linh] .ph3-muc { margin: 2px 12px; border-radius: 18px; }
+  html:root body[data-bat-linh] .ph3-muc[aria-current='page'] { background: rgb(235 241 220); }
+  html:root body[data-bat-linh] .ph3-chinh { padding-top: 12px; }
+}

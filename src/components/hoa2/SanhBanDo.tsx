@@ -1,3 +1,4 @@
+import DongHanh from '../bat-linh/DongHanh'
 // GAME HÓA 2.0 — SẢNH BẢN ĐỒ BÁT LINH (bản vẽ đã chốt: docs/ban-ve-game-hoa-2-2709/Moi-SanhBanDo.dc.html;
 // Huyết Chiến theo HS-HuyetChien.dc.html; hết kế hoạch theo HS-XongHomNay.dc.html).
 // LỚP HÌNH 28/09: bản vẽ động "tươi sáng, 3D" (docs/ban-ve-sanh-dong-2809/Sanh-Dong.html) — cảnh ở CanhSanh3D.tsx,
@@ -538,9 +539,6 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   const trong = s.theLuc.tong === 0
   return (
     <>
-      {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
-        <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
-      )}
       {xong ? (
         <>
           <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} />
@@ -555,6 +553,9 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
         ) : null
       ) : (
         <NutViec p={p} s={s} />
+      )}
+      {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
+        <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       <NutTuLuyen p={p} />
     </>
@@ -946,11 +947,8 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
             <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} ngang thu={p.thu} />
           ) : (
             <>
-              <div className="h2-ng-bd-vung">
-                <CanhSanh3D s={s} ngang moMan={moMan} />
-              </div>
-              <TieuDeBanDo s={s} />
-              {s && <ChuGiai />}
+              <DongHanh thu={chonThu ? null : p.thu} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
+              <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><CanhSanh3D s={s} ngang moMan={moMan} /><TieuDeBanDo s={s} />{s && <ChuGiai />}</div></details>
             </>
           )}
         </section>
@@ -1012,11 +1010,11 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
     <div className="h2-sanh" data-mo-man={moMan ? 'true' : 'false'} data-trang-thai={s ? 'co' : chonThu ? 'chon-thu' : p.loi ? 'loi' : 'dang-tai'} {...nghePhun}>
       <div className="h2-fx" aria-hidden="true" />
       <div className="h2-khung">
-        <CanhSanh3D s={s} moMan={moMan} />
         <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} onDoiTen={chonThu ? undefined : p.onDoiTen} />
-        <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} onVaoThi={p.onVaoThi} caDangMo={p.caDangMo} coThu={!chonThu} />
+        <DongHanh thu={chonThu ? null : p.thu} xong={!!s && s.theLuc.tong > 0 && s.theLuc.con === 0} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
         <div className="h2-dem" aria-hidden="true" />
         <section className="h2-tam" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
+          <div className="bl-ke-hoach"><span className="bl-eyebrow">TỪNG BƯỚC TIẾN BỘ</span><h2>Hành trình hôm nay</h2></div>
           {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}
           <TheCaGanNhatSanh p={p} />
           {s ? (
@@ -1052,6 +1050,8 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
             </p>
           )}
         </section>
+        <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><CanhSanh3D s={s} moMan={moMan} /></div></details>
+        <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} onVaoThi={p.onVaoThi} caDangMo={p.caDangMo} coThu={!chonThu} />
       </div>
     </div>
   )

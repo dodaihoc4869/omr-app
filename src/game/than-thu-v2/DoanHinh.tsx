@@ -1,3 +1,5 @@
+import BieuCamThu, { type CamXucThu } from './BieuCamThu'
+import QuaiSonThuy from './QuaiSonThuy'
 // ĐOÀN HỘ TỐNG — hình vẽ dùng chung: thần thú THẬT (cắt từ atlas tiến hoá), tia chiêu thức THẬT, quái/trùm/Linh Tâm vẽ bằng SVG trong mã
 // (giả định đã chốt: khi thầy có ảnh quái thật thì thay ở đây, không đụng màn nào).
 import { useId } from 'react'
@@ -7,7 +9,7 @@ import { BATTLE_SKINS } from './learning-battle'
 import { anhWebp, doiVePng } from './anh-webp'
 
 /** Một ô thần thú trong suốt, đúng hình thái theo cấp. `quayTrai` = nhìn sang trái (đứng bên phải sân). */
-export function ThuHinh({ pet, cap, size, quayTrai = false, className = '', style }: { pet: number; cap: number; size?: number; quayTrai?: boolean; className?: string; style?: CSSProperties }) {
+export function ThuHinh({ pet, cap, size, quayTrai = false, className = '', style, camXuc }: { camXuc?: CamXucThu; pet: number; cap: number; size?: number; quayTrai?: boolean; className?: string; style?: CSSProperties }) {
   const crop = evolutionCrop(pet, cap), clip = useId(), lat = evolutionMirror(pet, cap) !== quayTrai
   const skin = BATTLE_SKINS[pet] ?? BATTLE_SKINS[0]
   return (
@@ -17,59 +19,17 @@ export function ThuHinh({ pet, cap, size, quayTrai = false, className = '', styl
         <defs><clipPath id={clip}><rect width={crop.width} height={crop.height} /></clipPath></defs>
         <g clipPath={`url(#${clip})`}><image href={anhWebp(`/than-thu-v2/evolution-${crop.atlas}-cutout.png`)} onError={doiVePng} x={-crop.x} y={-crop.y} width="1536" height="1024" /></g>
       </svg>
+      {camXuc && <BieuCamThu thu={pet} camXuc={camXuc} />}
     </div>
   )
 }
 
-const MAU_QUAI: Record<string, [string, string, string, string]> = {
-  bun_acid: ['rgb(230,255,122)', 'rgb(134,189,47)', 'rgb(53,92,18)', 'rgb(22,33,10)'],
-  khoi_oxi_hoa: ['rgb(241,230,255)', 'rgb(154,134,201)', 'rgb(60,47,102)', 'rgb(26,18,51)'],
-  tinh_the_ket_tua: ['rgb(216,246,255)', 'rgb(95,182,232)', 'rgb(29,79,138)', 'rgb(10,29,58)'],
-}
-/** Tạp Chất: ba loại cùng dáng, khác màu — đổi màu theo `loai` của lõi. */
+/** Each chemistry monster now has its own painted silhouette. */
 export function QuaiHinh({ loai, size, className = '' }: { loai: string; size: number; className?: string }) {
-  const id = useId(), [sang, giua, toi, net] = MAU_QUAI[loai] ?? MAU_QUAI.bun_acid!
-  return (
-    <svg className={className} viewBox="0 0 120 100" width={size} height={Math.round(size * 100 / 120)} style={{ overflow: 'visible' }} aria-hidden="true">
-      <defs><radialGradient id={id} cx="38%" cy="28%"><stop offset="0" stopColor={sang} /><stop offset=".55" stopColor={giua} /><stop offset="1" stopColor={toi} /></radialGradient></defs>
-      <ellipse cx="60" cy="93" rx="46" ry="6" fill="rgba(0,0,0,.4)" />
-      <path d="M14 84 C4 48 28 12 60 12 C94 12 116 48 106 84 C100 97 20 97 14 84Z" fill={`url(#${id})`} />
-      <path d="M22 86 q4 12 9 0 M84 88 q5 14 10 0" fill={giua} />
-      <path d="M30 38 C36 26 46 21 56 21" stroke="rgba(255,255,255,.6)" strokeWidth="5" strokeLinecap="round" fill="none" />
-      <path d="M32 44 L54 52 M88 44 L66 52" stroke={net} strokeWidth="5" strokeLinecap="round" />
-      <ellipse cx="45" cy="60" rx="8" ry="9" fill="rgb(255,255,255)" /><ellipse cx="75" cy="60" rx="8" ry="9" fill="rgb(255,255,255)" />
-      <circle cx="47" cy="62" r="4.2" fill={net} /><circle cx="73" cy="62" r="4.2" fill={net} />
-      <path d="M46 80 Q60 70 74 80" stroke={net} strokeWidth="4" strokeLinecap="round" fill="none" />
-    </svg>
-  )
-}
-
-const MAU_TRUM: Record<string, [string, string, string, string]> = {
-  chua_te_ket_tua: ['rgb(217,200,255)', 'rgb(122,79,224)', 'rgb(35,16,79)', 'rgb(127,233,255)'],
-  ba_chu_an_mon: ['rgb(255,226,194)', 'rgb(224,112,42)', 'rgb(79,26,8)', 'rgb(255,243,107)'],
-  lanh_chua_khoi_doc: ['rgb(214,255,233)', 'rgb(47,174,122)', 'rgb(8,57,31)', 'rgb(230,255,122)'],
+  return <QuaiSonThuy loai={loai} size={size} className={className} />
 }
 export function TrumHinh({ loai, size, className = '' }: { loai: string; size: number; className?: string }) {
-  const a = useId(), b = useId(), [sang, giua, toi, loi] = MAU_TRUM[loai] ?? MAU_TRUM.chua_te_ket_tua!
-  return (
-    <svg className={className} viewBox="0 0 220 210" width={size} height={Math.round(size * 210 / 220)} style={{ overflow: 'visible' }} aria-hidden="true">
-      <defs>
-        <linearGradient id={a} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={sang} /><stop offset=".45" stopColor={giua} /><stop offset="1" stopColor={toi} /></linearGradient>
-        <linearGradient id={b} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={giua} /><stop offset="1" stopColor={toi} /></linearGradient>
-      </defs>
-      <ellipse cx="110" cy="198" rx="84" ry="10" fill="rgba(0,0,0,.45)" />
-      <polygon points="44,100 8,58 20,150 52,158" fill={`url(#${b})`} /><polygon points="176,100 212,58 200,150 168,158" fill={`url(#${b})`} />
-      <polygon points="8,58 26,96 20,150" fill="rgba(255,255,255,.12)" />
-      <polygon points="60,84 160,84 186,160 110,196 34,160" fill={`url(#${a})`} />
-      <polygon points="60,84 110,118 34,160" fill="rgba(255,255,255,.16)" /><polygon points="160,84 110,118 186,160" fill="rgba(0,0,0,.22)" />
-      <polygon points="110,118 186,160 110,196 34,160" fill="rgba(0,0,0,.12)" />
-      <polygon points="110,12 142,58 132,98 88,98 78,58" fill={`url(#${a})`} /><polygon points="110,12 110,98 88,98 78,58" fill="rgba(255,255,255,.18)" />
-      <polygon points="78,58 62,22 92,44" fill={sang} /><polygon points="142,58 158,22 128,44" fill={giua} />
-      <polygon points="90,64 106,70 90,77" fill="rgb(255,243,107)" /><polygon points="130,64 114,70 130,77" fill="rgb(255,243,107)" />
-      <path d="M96 88 l6 -5 l6 5 l6 -5 l6 5" stroke={toi} strokeWidth="3" fill="none" />
-      <polygon points="110,128 124,148 110,170 96,148" fill={loi} />
-    </svg>
-  )
+  return <QuaiSonThuy loai={loai || 'chua_te_ket_tua'} size={size} className={className} />
 }
 
 /** Linh Tâm: quả cầu sáng có hai vòng sóng lan. */

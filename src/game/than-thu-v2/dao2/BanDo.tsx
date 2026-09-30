@@ -1,4 +1,4 @@
-// ĐẢO 2.0 · BẢN ĐỒ BÁT LINH ĐẢO — lớp hình 3D (CanhDao3D, bản vẽ docs/ban-ve-dao-3d-2809/Dao3D.html, đồng bộ Sảnh 3D): sương mù tan theo % vùng + CỌ XÁT, vùng theo dạng có %,
+// ĐẢO 2.0 · BẢN ĐỒ BÁT LINH ĐẢO — cảnh sơn thủy (CanhDao3D): sương mù tan theo % vùng + CỌ XÁT, vùng theo dạng có %,
 // đường 6 nút của chuyến hôm nay (nút Trùm có vương miện), thần thú đứng ở đầu đường; tấm dưới: "Chuyến thám hiểm k/n", 6 ô vai,
 // Rương Bát Linh, nút LÊN ĐƯỜNG. Mọi số lấy từ `hoa2-sanh` / câu `start` trả — thiếu thì ẩn, không bịa.
 import NutToanManHinh from '../../../components/NutToanManHinh'
@@ -37,7 +37,7 @@ export default function BanDo({profile,sanh,dangTai,loiSanh='',cau,ketQua,soan='
   {/* Dọc: hai lớp bọc là `display:contents` (một cột như cũ). Ngang: TRÁI = bản đồ đảo cao hết màn · PHẢI = số chiến dịch + tấm chuyến, nút ở đáy. */}
   <div className="dao2-bd-trai">
   <div className="dao2-bd-khung">
-   <CanhDao3D vung={vung} coXat={cd?.coXat??0} tong={cd?.tong??0} thanhThao={cd?.thanhThao??0} damSuong={damSuong} cau={cau} ketQua={ketQua} anhThu={anhThu(thu,profile.cap,true)} tenThu={ten}/>
+   <CanhDao3D vung={vung} coXat={cd?.coXat??0} tong={cd?.tong??0} thanhThao={cd?.thanhThao??0} damSuong={damSuong} cau={cau} ketQua={ketQua} anhThu={anhThu(thu,profile.cap)} tenThu={ten}/>
   </div>
   </div>
 

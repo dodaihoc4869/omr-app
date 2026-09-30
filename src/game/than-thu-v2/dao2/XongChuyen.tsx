@@ -1,3 +1,4 @@
+import BieuCamThu from '../BieuCamThu'
 // ĐẢO 2.0 · XONG CHUYẾN (bản vẽ Moi-DaoXong.dc.html): "SƯƠNG MÙ ĐÃ TAN", cụm lục giác sáng (ô đất mới), 3 chỉ số, tiến độ chuyến trong ngày,
 // Rương Bát Linh, nút "ĐI CHUYẾN k/n". Số ải đúng / EXP = máy chủ chấm; ô đất = `hoa2-sanh` trước/sau chuyến; ngày ôn lại = `hoa2-cau-da-lam`.
 import {chuNgay} from './dao2-core'
@@ -18,10 +19,10 @@ export interface XongChuyenProps{
  aiSai:readonly {ai:number;hen?:string}[];ruong:Ruong2|null;ruongVua?:number|null
  busy?:boolean;loi?:string
  /** Ảnh thần thú EM ĐÃ CHỌN đúng dạng theo cấp (`anhThu`) — chỉ bố cục ngang hiện, đứng cạnh cụm đất vừa khai phá. */
- anhThu?:string
+ anhThu?:string;thu?:number
  onDiTiep?:()=>void;onVeBanDo:()=>void;onMoSoTay?:()=>void;onMoRuong?:()=>void
 }
-export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiSai,ruong,ruongVua=null,busy=false,loi='',anhThu,onDiTiep,onVeBanDo,onMoSoTay,onMoRuong}:XongChuyenProps){
+export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiSai,ruong,ruongVua=null,busy=false,loi='',anhThu,thu,onDiTiep,onVeBanDo,onMoSoTay,onMoRuong}:XongChuyenProps){
  const haQuai=enemy===0,sang=Math.max(0,Math.min(SANG.length,oMoi??0)),n=soChuyen?.n??0,k=soChuyen?.k??0
  return <div className="dao2-xong" aria-live="polite">
   <div className="dao2-xong-canh">
@@ -49,6 +50,7 @@ export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiS
   </div>
 
   <div className="dao2-xong-than">
+   {thu!==undefined&&<BieuCamThu thu={thu} camXuc={tongKet.dung>0?'mung':'sai'} size={64}/>}
    <ul className="dao2-xong-so">
     <li className="dao2-kinh"><b>{tongKet.dung}/{tongKet.tong}</b><span>ải đúng</span></li>
     <li className="dao2-kinh"><b>+{tongKet.exp}</b><span>EXP</span></li>

@@ -1,0 +1,17 @@
+/* A short reaction per state change, no endless attention-seeking animation. */
+.bl-bieu-cam { display: inline-flex; flex: none; vertical-align: middle; overflow: hidden; border-radius: 38%; border: 2px solid rgb(245 216 151); background: rgb(249 246 226); box-shadow: 0 3px 10px rgb(17 68 56 / .2), 0 0 0 3px rgb(255 252 240 / .65); pointer-events: none; }
+.bl-bieu-cam > svg { display: block; width: 100%; height: 100%; overflow: hidden; }
+.dh-thu .bl-bieu-cam > svg { overflow: hidden; filter: none; }
+.bl-bieu-cam[data-cam-xuc="sai"] { border-color: rgb(154 195 181); }
+.dh-thu > .bl-bieu-cam { position: absolute; right: -8%; top: -8%; z-index: 5; width: clamp(32px, 38%, 64px) !important; height: auto !important; aspect-ratio: 1; }
+.bl-ban-dong-hanh > .bl-bieu-cam { position: absolute; right: 4%; top: 10%; z-index: 3; }
+.dao2-canh > .bl-bieu-cam { position: absolute; left: 4%; top: 29%; z-index: 4; }
+.dao2-xong .bl-bieu-cam { margin: 8px auto; }
+@media (prefers-reduced-motion: no-preference) {
+  .bl-bieu-cam > svg { animation: bl-net-mat .26s ease-out; }
+  .bl-bieu-cam[data-cam-xuc="mung"] > svg { animation: bl-vui .65s ease-out; }
+}
+@keyframes bl-net-mat { from { opacity: .3; transform: scale(.88); } to { opacity: 1; transform: scale(1); } }
+@keyframes bl-vui { 0%,100% { transform: translateY(0); } 40% { transform: translateY(-5px) rotate(-3deg); } 70% { transform: rotate(3deg); } }
+
+.dao-hon > .bl-bieu-cam { position: absolute; right: 14%; top: 19%; z-index: 4; }

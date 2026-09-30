@@ -54,11 +54,14 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
     ]
 
   return (
-    <div className={`dh-chuong ${cheDo2 ? 'dh2-chuong' : ''} ${tinh ? 'dh-tinh' : ''}`} role="dialog" aria-label="Cả đội ra đòn" data-che-do={cheDo2 ? '2' : undefined} onClick={onXong}>
+    <div className={`dh-chuong bl-tung-chuong ${cheDo2 ? 'dh2-chuong' : ''} ${tinh ? 'dh-tinh' : ''}`} role="dialog" aria-label="Cả đội ra đòn" data-che-do={cheDo2 ? '2' : undefined} onClick={onXong}>
       <div className="dh-chuong-tia-nen" />
+      <span className="bl-chuong-kicker">BÁT LINH · HIỆP {kq.hiep}</span>
       {cheDo2
         ? <button type="button" className="dh2-chuong-bo-qua" onClick={e => { e.stopPropagation(); onXong() }}>Bỏ qua</button>
         : <span className="dh-chuong-bo-qua">chạm để bỏ qua</span>}
+      <div className="bl-chuong-san-dau">
+      <svg className="bl-phap-tran" viewBox="0 0 400 180" aria-hidden="true"><ellipse cx="200" cy="90" rx="180" ry="67"/><ellipse cx="200" cy="90" rx="163" ry="54"/><ellipse cx="200" cy="90" rx="136" ry="43" strokeDasharray="3 9"/><path d="M20 90h360M200 23v134M76 43l248 94M76 137l248-94"/></svg>
       {kq.laTrum ? (
         <>
           <div className="dh-chuong-dai"><div><small>TRÙM · CÂU CHUNG CẢ ĐỘI</small><b>{kq.trum?.voGiap ? 'VỠ GIÁP TRÙM!' : `ĐÚNG ${kq.trum?.yDung ?? 0}/4 Ý`}</b></div></div>
@@ -76,13 +79,14 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
               <div className="dh-chuong-cot" style={{ left: tia.length === 1 ? 'calc(44% - 84px)' : i ? 'calc(44% + 2px)' : 'calc(44% - 170px)', transform: `rotate(${tia.length === 1 ? 0 : i ? -17 : 17}deg)` }}>
                 <div className="dh-chuong-tia" style={{ '--bc': `rgb(${BATTLE_SKINS[t.g.pet]!.color})` } as CSSProperties}><SpellArt pet={t.g.pet} stage={evolutionStage(t.g.cap)} clipId={i ? idB : idA} /></div>
               </div>
-              <ThuHinh pet={t.g.pet} cap={t.g.cap} size={150} quayTrai={i === 1} className="dh-chuong-thu" style={{ [i ? 'right' : 'left']: tia.length === 1 ? 'calc(50% - 75px)' : '2%' } as CSSProperties} />
+              <ThuHinh pet={t.g.pet} cap={t.g.cap} camXuc="quyet-tam" size={150} quayTrai={i === 1} className="dh-chuong-thu" style={{ [i ? 'right' : 'left']: tia.length === 1 ? 'calc(50% - 75px)' : '2%' } as CSSProperties} />
             </div>
           ))}
           {kq.tongSatThuong > 0 && <div className="dh-chuong-so">{cheDo2 && <small className="dh2-chuong-nhan-so">SÁT THƯƠNG CẢ ĐỘI</small>}<b className="dh-chu-vang">−{kq.tongSatThuong}</b>{kq.quaiHaGuc > 0 && <small>HẠ GỤC{kq.quaiHaGuc > 1 ? ` ×${kq.quaiHaGuc}` : ''}!</small>}</div>}
           {lienKich && <div className="dh-chuong-lk">LIÊN KÍCH ×2</div>}
         </>
       )}
+      </div>
       <div className="dh-chuong-san">
         {!kq.laTrum && <span>{tenQuai} · hạ {kq.quaiHaGuc} · còn {kq.quaiConLai}</span>}
         <span className={cheDo2 ? 'dh2-chuong-linh' : undefined} style={cheDo2 ? undefined : { color: 'rgb(200,246,255)' }}>Linh Tâm {kq.linhTamMat > 0 ? `mất ${kq.linhTamMat} máu` : 'không mất máu'}{kq.linhTamHoi > 0 ? `, hồi ${kq.linhTamHoi} máu` : ''}, còn {kq.linhTamSau} máu</span>

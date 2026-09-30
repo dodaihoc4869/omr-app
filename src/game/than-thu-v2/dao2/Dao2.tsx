@@ -122,7 +122,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  if(pha==='xong'&&ketThuc){const con=sanh?.dao?.con??null,coThem=con!==null&&con>0&&!sanh?.khoaDao,cd=sanh?.chienDich,hen=henOnCua(daLam,ketThuc.sai.map(s=>s.qid))
   return vo(<XongChuyen soChuyen={con!==null?{k:xongHomNay,n:xongHomNay+Math.ceil(con/SO_AI_CHUYEN)}:null} conCau={con} tongKet={ketThuc} enemy={ketThuc.enemy}
    oMoi={cd&&coXatTruoc!==null?Math.max(0,cd.coXat-coXatTruoc):null} coXat={cd?{co:cd.coXat,tong:cd.tong}:null} aiSai={ketThuc.sai.map(s=>({ai:s.ai,hen:hen[s.qid]}))}
-   ruong={sanh?.ruong??null} ruongVua={ruongVua} busy={busy} loi={loi} anhThu={anhThu(chiSoThu(profile.pet),profile.cap)} onDiTiep={coThem?()=>void chay(moChuyen):undefined} onVeBanDo={veBanDo} onMoSoTay={onMoSoTay} onMoRuong={()=>void moRuong()}/>,true)}
+   ruong={sanh?.ruong??null} ruongVua={ruongVua} busy={busy} loi={loi} anhThu={anhThu(chiSoThu(profile.pet),profile.cap)} thu={chiSoThu(profile.pet)} onDiTiep={coThem?()=>void chay(moChuyen):undefined} onVeBanDo={veBanDo} onMoSoTay={onMoSoTay} onMoRuong={()=>void moRuong()}/>,true)}
  if(khoa)return vo(<><KhoaDao message={khoa} doanCon={sanh?.doan?.con??null} onVeSanh={onDong} onMoDoan={doanMo?onMoDoan:undefined}/>{thanhDuoi}</>)
  return vo(<BanDo profile={profile} sanh={sanh} dangTai={dangTai} loiSanh={loiSanh} cau={luot?.cau??null} ketQua={luot?ketQua:[]} soan={soan} het={het} soChuyen={soChuyen(sanh?.dao?.con,xongHomNay)}
   vung={vungTheoDang(daLam,sanh?.chienDich?.id)} busy={busy} loi={loi} ruongVua={ruongVua} onLenDuong={()=>void lenDuong()} onThuLai={()=>void thuLai()} onVe={onDong} onMoRuong={()=>void moRuong()} thanhDuoi={thanhDuoi}/>)

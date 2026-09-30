@@ -1,3 +1,4 @@
+import BatLinhShell from './components/bat-linh/BatLinhShell'
 import './styles/teacher-layout.css'
 import './styles/vo-thay.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
@@ -308,7 +309,7 @@ function App() {
   if (laPhieu) {
     return (
       <ChanLoi o="Phiếu kết quả">
-        <PhieuScreen />
+        <BatLinhShell vai="ph"><PhieuScreen /></BatLinhShell>
       </ChanLoi>
     )
   }
@@ -317,7 +318,7 @@ function App() {
     return (
       <ChanLoi o="Cổng học sinh">
         <Suspense fallback={<ChoManEm />}>
-          <StudentPortalScreen />
+          <BatLinhShell vai="hs"><StudentPortalScreen /></BatLinhShell>
         </Suspense>
       </ChanLoi>
     )
@@ -326,7 +327,7 @@ function App() {
     return (
       <ChanLoi o="Cổng phụ huynh">
         <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}>
-          <ParentPortalScreen />
+          <BatLinhShell vai="ph"><ParentPortalScreen /></BatLinhShell>
         </Suspense>
       </ChanLoi>
     )
@@ -387,7 +388,7 @@ function App() {
     return (
       <ChanLoi o="Làm bài" veManChinh={() => location.reload()}>
         <Suspense fallback={<ChoManEm />}>
-          <ExamTakeScreen />
+          <BatLinhShell vai="hs"><ExamTakeScreen /></BatLinhShell>
         </Suspense>
       </ChanLoi>
     )

@@ -1,0 +1,167 @@
+/* Student home, game, practice, history, exam and collection share this visual language.
+ * Existing component classes and state attributes keep their original behavior. */
+html:root body[data-bat-linh] .h2-sanh {
+  --h2-chu: var(--bl-ink); --h2-chu-phu: var(--bl-muted); --h2-chu-mo: var(--bl-muted);
+  --h2-kinh-nen: rgb(255 252 243 / .96); --h2-kinh-vien: var(--bl-line); --h2-kinh-bong: var(--bl-shadow);
+  --h2-tam-nen: var(--bl-paper); --h2-ngoc: rgb(17 139 126); --h2-ngoc-dam: var(--bl-teal);
+  --h2-ngoc-sang: rgb(157 226 202); --h2-nau-chu: var(--bl-gold-ink); --h2-hong: rgb(173 67 74);
+  --h2-cam-chu: rgb(145 78 18); --h2-xanh: rgb(24 110 66); --h2-lua: rgb(158 60 22); --h2-khoa: rgb(139 91 22);
+  --h2-net-nhat: rgb(22 62 62 / .14);
+  background: radial-gradient(ellipse at top, rgb(222 237 218), transparent 70%), var(--bl-ground);
+  color-scheme: light;
+}
+html:root body[data-bat-linh] .h2-khung { max-width: 600px; padding-bottom: 20px; }
+html:root body[data-bat-linh] .h2-khung > .h2-hud { order: -3; margin-bottom: 10px; }
+html:root body[data-bat-linh] .h2-khung > .h2-ray { position: static; flex-direction: row; justify-content: space-evenly; gap: 4px; padding: 4px 12px 10px; flex-wrap: wrap; }
+html:root body[data-bat-linh] .h2-ray .h2-nut-ray { flex: 1 1 48px; width: auto; max-width: 94px; }
+html:root body[data-bat-linh] .h2-nut-ray-o { width: 42px; height: 42px; border-radius: 15px; }
+html:root body[data-bat-linh] .h2-nut-ray-chu { background: transparent; font-size: 10px; white-space: normal; }
+html:root body[data-bat-linh] .h2-dem { display: none; }
+html:root body[data-bat-linh] .h2-tam { margin: 0 12px; border: 1px solid var(--bl-line); border-radius: 26px; padding: 20px 16px; box-shadow: var(--bl-shadow); backdrop-filter: none; }
+html:root body[data-bat-linh] .h2-tam::before { display: none; }
+html:root body[data-bat-linh] .h2-kinh { backdrop-filter: none; -webkit-backdrop-filter: none; }
+html:root body[data-bat-linh] .h2-sanh :is(.h2-hud-so, .h2-nut-dao, .h2-nut-phu, .h2-ca-gan, .h2-ng-vong, .h2-vong) { background: var(--bl-paper); border-color: var(--bl-line); color: var(--bl-ink); }
+html:root body[data-bat-linh] .h2-sanh .h2-nut-dao:disabled { background: rgb(242 237 216); border-color: rgb(210 194 147); }
+html:root body[data-bat-linh] .h2-sanh .h2-nut-ray-chu { background: transparent; color: var(--bl-ink); }
+html:root body[data-bat-linh] .h2-sanh .h2-hud-so small { color: var(--bl-muted); }
+html:root body[data-bat-linh] .h2-sanh :is(.h2-cd-han, .h2-cd-so, .h2-ng-cd-ten) { color: var(--bl-ink); }
+html:root body[data-bat-linh] .h2-sanh .h2-xong { background: rgb(229 242 218); border-color: rgb(164 190 146); }
+html:root body[data-bat-linh] .h2-sanh .h2-ruong-da { background: rgb(252 237 191); border-color: rgb(204 176 104); }
+html:root body[data-bat-linh] .h2-sanh .h2-tam { border-color: var(--bl-line); box-shadow: var(--bl-shadow); }
+html:root body[data-bat-linh] .h2-sanh .baloo { font-family: var(--sans); letter-spacing: -.025em; }
+.bl-ke-hoach h2 { font: 700 23px/1.3 var(--serif); margin: 6px 0 0; }
+html:root body[data-bat-linh] .h2-nut-chinh { border-radius: 22px; box-shadow: inset 0 1px 0 rgb(255 255 255 / .8), 0 3px 0 rgb(173 118 20 / .4), 0 8px 20px rgb(168 120 31 / .12); }
+html:root body[data-bat-linh] .h2-nut-chinh-lon { font-size: clamp(16px, 4.3vw, 21px); letter-spacing: 0; }
+html:root body[data-bat-linh] .h2-nut-chinh-nho { font-size: 12px; }
+html:root body[data-bat-linh] .h2-nut-chinh::before { display: none; }
+html:root body[data-bat-linh] .h2-qua-tl {
+  --qtl-nen: rgb(18 67 57); --qtl-nen-2: rgb(24 86 72); --qtl-nen-3: rgb(34 110 90);
+  --qtl-chu: rgb(255 251 226); --qtl-chu-phu: rgb(220 238 211);
+  background: linear-gradient(125deg, var(--qtl-nen-3), var(--qtl-nen)); border-color: rgb(207 189 126); box-shadow: var(--bl-shadow);
+}
+html:root body[data-bat-linh] .h2-qua-tl::before { animation: none; }
+html:root body[data-bat-linh] .h2-ng-the { background: var(--bl-paper); border-color: var(--bl-line); box-shadow: var(--bl-shadow); }
+html:root body[data-bat-linh] .h2-ngang { height: auto; min-height: 100dvh; overflow: visible; }
+html:root body[data-bat-linh] .h2-ng-khung { height: auto; min-height: 100dvh; grid-template-rows: auto 1fr; padding: 20px 28px 32px; max-width: 1440px; }
+html:root body[data-bat-linh] .h2-ng-trai { align-self: start; background: var(--bl-paper); border-color: var(--bl-line); box-shadow: var(--bl-shadow); }
+html:root body[data-bat-linh] .h2-ng-phai { overflow: visible; }
+html:root body[data-bat-linh] .h2-ng-xong { background: linear-gradient(180deg, rgb(255 252 243 / .95), rgb(225 241 231 / .8)), var(--bl-scene) center / cover; color: var(--bl-ink); min-height: 550px; }
+.bl-dong-hanh { position: relative; min-height: 360px; margin: 0 12px 12px; border: 1px solid rgb(228 224 193); border-radius: 26px; overflow: hidden; background: linear-gradient(180deg, rgb(255 249 225 / .84), transparent 40%, rgb(27 78 57 / .1)), var(--bl-scene) center / cover; display: flex; flex-direction: column; align-items: center; }
+.bl-dong-hanh__dau { position: relative; z-index: 1; align-self: stretch; padding: 20px 22px 0; }
+.bl-dong-hanh__dau h1 { font: 700 clamp(28px, 4vw, 42px)/1.25 var(--serif); letter-spacing: -.04em; margin: 6px 0; color: rgb(22 62 62); }
+.bl-dong-hanh__dau p { max-width: 29ch; font-size: 12px; line-height: 1.6; color: rgb(39 79 70); margin: 0; }
+html:root body[data-bat-linh] button.bl-ban-dong-hanh { position: relative; display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: flex-end; width: min(86%, 380px); margin: -4px 0 0; padding: 0; background: none; border: none; color: var(--bl-ink); }
+.bl-ban-dong-hanh img { position: relative; z-index: 1; width: min(100%, 220px); height: auto; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 14px 8px rgb(19 69 59 / .26)); transform-origin: center 80%; }
+.bl-ban-dong-hanh__hao { position: absolute; width: 78%; aspect-ratio: 1; border-radius: 50%; top: 6%; background: radial-gradient(circle, rgb(216 255 241 / .65), transparent 68%); }
+.bl-ban-dong-hanh__ten { position: relative; z-index: 2; display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 9px 14px; border: 1px solid rgb(255 245 204); border-radius: 18px; background: rgb(255 252 241 / .95); font-weight: 700; font-size: 16px; box-shadow: var(--bl-shadow); max-width: 100%; overflow-wrap: anywhere; }
+.bl-ban-dong-hanh__ten small { font-size: 11px; background: var(--bl-teal-soft); padding: 4px 8px; border-radius: 10px; }
+.bl-dong-hanh__loi { display: flex; align-items: center; gap: 6px; padding: 7px 12px; margin: 10px 8px 18px; border-radius: 14px; background: rgb(255 252 243 / .95); color: rgb(33 72 57); font-size: 11px; text-align: center; }
+.bl-dong-hanh__moi { min-height: 270px; display: grid; place-content: center; justify-items: center; gap: 16px; color: var(--bl-teal); }
+html:root body[data-bat-linh] .h2-ng-trai .bl-dong-hanh { margin: 0; border: none; border-radius: 0; min-height: 560px; }
+html:root body[data-bat-linh] .h2-ng-trai .bl-ban-dong-hanh img { width: 360px; }
+html:root body[data-bat-linh] .h2-ng-trai .bl-dong-hanh__dau { padding: 28px 32px 0; }
+.bl-ban-do { margin: 12px; border: 1px solid var(--bl-line); border-radius: 18px; background: var(--bl-paper); overflow: hidden; }
+.bl-ban-do summary { padding: 15px 16px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--bl-ink); }
+.bl-ban-do summary span { float: right; font-size: 10px; font-weight: 400; color: var(--bl-muted); padding-top: 3px; }
+.bl-ban-do__canh { position: relative; height: 470px; overflow: hidden; }
+html:root body[data-bat-linh] .bl-ban-do .h2-ban-do { position: absolute; inset: 0; }
+html:root body[data-bat-linh] .bl-ban-do .h2-ng-bd-dau { max-width: 80%; }
+/* Learning and history tokens: solid ivory surfaces, clear teal navigation. */
+html:root body[data-bat-linh] .tlu {
+  --tlu-nen: var(--bl-ground); --tlu-nen-2: var(--bl-paper); --tlu-nen-3: rgb(230 240 226); --tlu-vien: var(--bl-line);
+  --tlu-chu: var(--bl-ink); --tlu-chu-phu: var(--bl-muted); --tlu-nhan: var(--bl-teal); --tlu-nhan-chu: rgb(255 255 255);
+  --tlu-ngoc: rgb(16 110 87); --tlu-do: rgb(169 49 45); --tlu-cd-1: rgb(158 87 22); --tlu-cd-2: rgb(14 108 108); --tlu-cd-3: rgb(44 111 61); --tlu-cd-4: rgb(105 80 128);
+  background: radial-gradient(ellipse at top right, rgb(224 238 220), transparent 70%), var(--bl-ground); color-scheme: light;
+}
+html:root body[data-bat-linh] .h2-cdl {
+  --h2c-nen: var(--bl-ground); --h2c-nen-2: var(--bl-paper); --h2c-nen-3: rgb(230 240 226); --h2c-chan: var(--bl-paper);
+  --h2c-vien: var(--bl-line); --h2c-chu: var(--bl-ink); --h2c-chu-phu: var(--bl-muted); --h2c-chu-nhat: var(--bl-muted);
+  --h2c-xanh: var(--bl-teal); --h2c-xanh-chu: rgb(255 255 255); color-scheme: light;
+}
+html:root body[data-bat-linh] :is(.h2-lsc-the, .tlu-the) { box-shadow: var(--bl-shadow); }
+/* Island, battle, collection and existing pet selection. */
+html:root body[data-bat-linh] .dao {
+  --dao-nen: var(--bl-ground); --dao-nen-2: rgb(233 239 218); --dao-chu: var(--bl-ink); --dao-chu-mo: var(--bl-muted); --dao-chu-nhat: var(--bl-muted);
+  --dao-nhan: var(--bl-teal); --dao-kinh: var(--bl-paper); --dao-kinh-vien: var(--bl-line); --dao-the: var(--bl-paper); --dao-the-chu: var(--bl-ink); --dao-the-chu-mo: var(--bl-muted);
+  --dao-the-kinh: var(--bl-paper); --dao-the-kinh-bong: var(--bl-shadow); --dao-nav-nen: var(--bl-paper); --dao-nav-hien: var(--bl-teal-soft); --dao-nav-vach: var(--bl-line); --dao-vach: var(--bl-line);
+  --dao-nen-anh: rgb(228 239 216); --dao-ngoc-chu: var(--bl-teal); --dao-vang-so: rgb(139 90 18);
+  background: var(--bl-ground); color: var(--bl-ink); color-scheme: light;
+}
+html:root body[data-bat-linh] .dao2 {
+  --d2-nen: var(--bl-ground); --d2-chu: var(--bl-ink); --d2-chu-mo: var(--bl-muted); --d2-chu-nhat: var(--bl-muted);
+  --d2-kinh: var(--bl-paper); --d2-kinh-vien: var(--bl-line); --d2-kinh-bong: var(--bl-shadow);
+  --d2-tam: var(--bl-paper); --d2-tam-bong: var(--bl-shadow); --d2-giay: var(--bl-paper); --d2-giay-bong: var(--bl-shadow);
+  --d2-vach: var(--bl-line); --d2-vach-2: var(--bl-line); --d2-o-nen: rgb(228 239 218); --d2-o-vien: var(--bl-line);
+  --d2-nhan-3d: var(--bl-paper); --d2-nhan-3d-chu: var(--bl-ink); --d2-xanh-chu: var(--bl-teal); --d2-ngoc-chu: var(--bl-teal);
+  --d2-vang-chu: rgb(129 80 20); --d2-vang-so: rgb(129 80 20); --d2-ruong-phu: rgb(129 80 20);
+  --d2-troi-1: rgb(227 238 212); --d2-troi-2: rgb(248 227 187); --d2-troi-3: rgb(255 227 186); --d2-troi-4: rgb(246 220 165);
+  --d2-b3-0: rgb(230 243 223); --d2-b3-1: rgb(178 227 210); --d2-b3-2: rgb(89 185 170); --d2-b3-3: rgb(26 130 127);
+  --d2-tat-nen: rgb(227 230 213); --d2-tat-chu: rgb(89 102 89); --d2-tat-vien: var(--bl-line);
+  --d2-onlai-chu: var(--bl-teal); --d2-moi-chu: rgb(137 77 25); --d2-het-chu: var(--bl-teal); --d2-kq-phu: var(--bl-muted);
+  --d2-mat-troi: 1; --d2-dem: 0; --d2-may: 1; color-scheme: light;
+}
+html:root body[data-bat-linh] .ps {
+  --ch-nen: var(--bl-ground); --ch-chu: var(--bl-ink); --ch-chu-mo: var(--bl-muted); --ch-nhan: var(--bl-teal);
+  --ch-may: linear-gradient(180deg, rgb(229 239 218), var(--bl-ground));
+  --ch-kinh: var(--bl-paper); --ch-kinh-vien: var(--bl-line); --ch-kinh-bong: var(--bl-shadow); --ch-the-nen: linear-gradient(var(--bl-paper), var(--bl-paper)); --ch-to-nen: rgb(237 241 220);
+  --ch-vang-so: rgb(136 88 18); --ch-vang-chu: rgb(136 88 18); --ch-xanh-chu: var(--bl-teal); --ch-lam: var(--bl-teal); color-scheme: light;
+}
+html:root body[data-bat-linh] .dh.dh2 { --dh2-chu: rgb(242 248 231); --dh2-mo: rgb(205 225 207); background: radial-gradient(ellipse at top, rgb(34 107 101), rgb(15 55 58)); }
+html:root body[data-bat-linh] .dh2 :is(.dh2-kinh, .dh-kinh) { background: rgb(18 67 65 / .94); box-shadow: inset 0 0 0 1px rgb(168 206 171 / .25); backdrop-filter: none; }
+html:root body[data-bat-linh] .dh2 .dh-chang { background: linear-gradient(130deg, rgb(21 94 83), rgb(37 114 89)); box-shadow: inset 0 0 0 1px rgb(159 202 154 / .6), var(--bl-shadow); }
+html:root body[data-bat-linh] .dh2 .dh-ban-do { background: linear-gradient(160deg, rgb(37 99 83), rgb(21 70 67)); }
+html:root body[data-bat-linh] .dh2 .dh2-canh { background: linear-gradient(rgb(15 65 61 / .28), rgb(15 65 61 / .18)), var(--bl-scene) center / cover; }
+html:root body[data-bat-linh] .dh2 .dh-giay { background: var(--bl-paper); color: var(--bl-ink); box-shadow: 0 -4px 20px rgb(12 49 40 / .15); }
+html:root body[data-bat-linh] .dh2 .dh-giay-dau .dh-vien-thuoc { background: var(--bl-teal); }
+html:root body[data-bat-linh] .dh2 :is(.dh-bua, .dh2-bua) { background: rgb(28 92 78); }
+html:root body[data-bat-linh] .dh-chuong { background: linear-gradient(180deg, rgb(19 80 74 / .88), rgb(10 46 47 / .96)), var(--bl-scene) center / cover; }
+html:root body[data-bat-linh] .dh-chuong-vi-sao { background: rgb(16 65 59 / .96); border: 1px solid rgb(153 183 138 / .4); }
+html:root body[data-bat-linh] .spirit-game { background: var(--bl-ground); color: var(--bl-ink); }
+html:root body[data-bat-linh] .spirit-game :is(.spirit-panel, .spirit-pick, .spirit-summary, .immortal-inventory) { background: var(--bl-paper); color: var(--bl-ink); border-color: var(--bl-line); box-shadow: var(--bl-shadow); }
+html:root body[data-bat-linh] .spirit-tabs button { border-color: var(--bl-line); color: var(--bl-muted); background: var(--bl-paper); }
+html:root body[data-bat-linh] .spirit-tabs button.active { background: var(--bl-teal); color: white; }
+html:root body[data-bat-linh] .bia {
+  --b-nen: var(--bl-ground); --b-kinh: var(--bl-paper); --b-kinh-2: rgb(243 245 232); --b-dac: var(--bl-paper); --b-vien: var(--bl-line);
+  --b-chu: var(--bl-ink); --b-chu-2: var(--bl-muted); --b-mo: var(--bl-muted);
+  --b-xanh-1: rgb(38 151 132); --b-xanh-2: rgb(14 108 108); --b-xanh-bo: rgb(17 79 77);
+  --b-do: rgb(167 49 45); --b-dung: rgb(28 107 69); --b-p0: rgb(151 98 18); --b-p1: rgb(14 108 108); color-scheme: light;
+}
+html:root body[data-bat-linh] .tlu-rong { --tlu-cd-5: rgb(140 94 23); --tlu-cd-6: rgb(151 72 97); }
+html:root body[data-bat-linh] .tlu-nguon-sai { --tlu-ng-hong: rgb(151 72 97); }
+html:root body[data-bat-linh] :is(.tlu-tieu, .tlu-hero h2, .ldct-the-ten) { font-family: var(--serif); }
+html:root body[data-bat-linh] .tlu-tieu { color: var(--bl-ink); }
+html:root body[data-bat-linh] .tlu-ve { background: var(--bl-paper); color: var(--bl-teal); }
+html:root body[data-bat-linh] :is(.tlu-dau-lam, .tlu-thanh-nop-trong, .tlu-kq-loc) { background: var(--bl-paper); box-shadow: var(--bl-shadow); backdrop-filter: none; }
+html:root body[data-bat-linh] .tlu-the-so-o { background: rgb(231 239 216); color: var(--bl-muted); }
+html:root body[data-bat-linh] .tlu-rong :is(.tlu-o-chon, .tlu-nut-phu):hover { background: rgb(225 236 210); }
+html:root body[data-bat-linh] .tlu-the-che-do { box-shadow: var(--bl-shadow); }
+html:root body[data-bat-linh] .tlu-hero-so b { color: var(--bl-teal); }
+html:root body[data-bat-linh] .tlu-the-cau { box-shadow: var(--bl-shadow); }
+html:root body[data-bat-linh] .tlu-the-cau[data-dung='true'] { box-shadow: 0 0 0 2px var(--tlu-ngoc), var(--bl-shadow); }
+html:root body[data-bat-linh] .tlu-the-cau[data-dung='false'] { box-shadow: 0 0 0 2px var(--tlu-do), var(--bl-shadow); }
+html:root body[data-bat-linh] .dao2 .dao2-xong-canh { background: linear-gradient(rgb(255 250 225 / .8), rgb(230 242 219 / .22)), var(--bl-scene) center / cover; }
+html:root body[data-bat-linh] .dao2 .dao2-xong-canh > svg { opacity: .15; }
+html:root body[data-bat-linh] .dao2 .dao2-xong-canh h2 { font-family: var(--serif); color: var(--bl-ink); text-shadow: none; line-height: 1.3; }
+html:root body[data-bat-linh] .dao2 .dao2-xong-canh p { color: var(--bl-ink); background: rgb(255 252 243 / .9); border-radius: 12px; padding: 6px; }
+html:root body[data-bat-linh] .dao2 .dao2-xong-thu { display: block; position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); width: min(46%, 200px); height: auto; object-fit: contain; }
+html:root body[data-bat-linh] .dao2 .dao2-xong-ntm { color: var(--bl-teal); }
+html:root body[data-bat-linh] .dao2 .dao2-xong-chip { position: absolute; bottom: 12px; right: 12px; left: auto; transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .bl-ban-dong-hanh img { animation: bl-tho 4s ease-in-out 3; }
+  .bl-ban-dong-hanh:hover img { transform: translateY(-4px) rotate(-2deg); transition: transform 220ms ease; }
+  @keyframes bl-tho { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(1deg); } }
+}
+@media (max-width: 380px) {
+  .bl-dong-hanh { min-height: 330px; }
+  .bl-ban-dong-hanh img { width: 190px; }
+  html:root body[data-bat-linh] .h2-tam { padding: 18px 12px; }
+  .bl-ban-do summary span { display: none; }
+}
+@media (min-width: 700px) and (max-height: 600px) {
+  html:root body[data-bat-linh] .h2-ngang[data-thap='true'] { zoom: 1; height: auto; min-height: 100dvh; }
+  html:root body[data-bat-linh] .h2-ng-khung { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px; }
+  html:root body[data-bat-linh] .h2-ng-trai { grid-column: 1; }
+  html:root body[data-bat-linh] .h2-ng-phai { grid-column: 2; }
+  html:root body[data-bat-linh] .h2-ng-trai .bl-dong-hanh { min-height: 380px; }
+  html:root body[data-bat-linh] .h2-ng-trai .bl-ban-dong-hanh img { width: 220px; }
+}

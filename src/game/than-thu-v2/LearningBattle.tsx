@@ -1,3 +1,5 @@
+import BieuCamThu from './BieuCamThu'
+import QuaiSonThuy from './QuaiSonThuy'
 import {useEffect,useRef,useState,useId} from 'react'
 import type {CSSProperties} from 'react'
 import {BATTLE_SKINS,learningBattle} from './learning-battle'
@@ -7,6 +9,8 @@ import {evolutionStage,EVOLUTION_NAMES} from './evolution'
 import {battleMuted,setBattleMuted,playBattleSound} from './battle-audio'
 import './learning-battle.css'
 import { anhWebp, doiVePng, napAnhGame } from './anh-webp'
+const SPELL_NAMES=['earth','water','fire','wind','faith','love','gratitude','awareness']
+
 export default function LearningBattle({pet,nickname,level,answers,total,event,finished}:{nickname?:string;pet:number;level:number;answers:BattleAnswer[];total:number;event:number;finished:boolean}){
  const battle=learningBattle(answers,total),skin=BATTLE_SKINS[pet]??BATTLE_SKINS[0]
  const [active,setActive]=useState(false);const [muted,setMuted]=useState(battleMuted);const spellClip=useId();const stageIndex=evolutionStage(level)
@@ -21,8 +25,8 @@ export default function LearningBattle({pet,nickname,level,answers,total,event,f
   <div className="battle-health"><div><b>Thần thú của em: {nickname||skin.name} · Cấp {level}</b><span>Máu {battle.hp}/100{battle.protected?' · Bảo hộ':''}</span><progress aria-label="Máu thần thú" max={100} value={battle.hp}/></div><div><b>Quái Sương Mù</b><span>Máu {battle.enemy}/100</span><progress aria-label="Máu quái vật" max={100} value={battle.enemy}/></div></div>
   <div className="battle-world" aria-hidden="true">
    <div className="battle-stars"/><div className="battle-moon"/><div className="battle-floor"/>
-   <div className="battle-companion"><div className="battle-aura"/><div className="battle-sprite"><Spirit2D index={pet} level={level} compact battle reducedMotion={quiet} motion={firing?'cast':hit?'hurt':'idle'} event={event}/></div><div className="battle-plinth"/>{firing&&<div key={event} className="battle-debris">{Array.from({length:9},(_,i)=><i key={i} style={{'--i':i} as CSSProperties}>◆</i>)}</div>}</div>
-   <div className={`battle-monster ${battle.enemy===0?'battle-defeated':''}`}><svg viewBox="0 0 240 240"><defs><radialGradient id="battle-monster-body"><stop stopColor="rgb(112,84,163)"/><stop offset="1" stopColor="rgb(32,24,72)"/></radialGradient></defs><path fill="url(#battle-monster-body)" stroke="rgb(171,142,221)" strokeWidth="3" d="M55 184 67 151 47 140 18 124 27 104 61 91 81 67 78 30 112 58 144 48 175 22 175 76 198 111 212 159 225 182 191 181 192 207 153 207 139 178 111 175 96 207 53 207Z"/><path fill="rgb(100,66,146)" stroke="rgb(162,113,202)" strokeWidth="2" d="m149 123 41-44 30-19-9 47 19 28-42-6-20 28Z"/><path fill="rgb(255,170,218)" d="m58 105 44-17-12 27-28 4Z"/><path fill="rgb(25,15,45)" d="m64 104 10-5-2 17-6 2Z"/><path fill="rgb(238,215,255)" d="m27 131 30 12-12 10Z"/><path fill="none" stroke="rgb(180,140,229)" strokeWidth="4" d="m110 64 10 19-12 13m31 45 17 12-6 13"/></svg><div className="battle-plinth"/></div>
+   <div className="battle-companion"><BieuCamThu thu={pet} camXuc={finished?'mung':hit?'sai':firing?'quyet-tam':'nghi'} size={52}/><div className="battle-aura"/><div className="battle-sprite"><Spirit2D index={pet} level={level} compact battle reducedMotion={quiet} motion={firing?'cast':hit?'hurt':'idle'} event={event}/></div><div className="battle-plinth"/>{firing&&<div key={event} className="battle-debris">{Array.from({length:9},(_,i)=><i key={i} style={{'--i':i} as CSSProperties}>◆</i>)}</div>}</div>
+   <div className={`battle-monster ${battle.enemy===0?'battle-defeated':''}`}><QuaiSonThuy loai="suong_mu" size={240}/><div className="battle-plinth"/></div>
    {active&&<div key={event} className={`battle-spell ${hit?'battle-reverse':''}`}><div className="battle-charge"/>{!hit&&<SpellArt pet={pet} stage={stageIndex} clipId={spellClip}/>}<div className="battle-beam"/><svg className="battle-ribbons" viewBox="0 0 600 160" preserveAspectRatio="none"><path d="M0 80 C90 -20 110 180 210 80 S330 -20 410 80 S530 180 600 80"/><path d="M0 80 C90 180 110 -20 210 80 S330 180 410 80 S530 -20 600 80"/><path d="M0 80 Q160 25 300 80 T600 80"/></svg>{[0,1,2].map(i=><span key={i} className="battle-ring" style={{left:`${38+i*13}%`}}/>)}<div className="battle-orb">{hit?'✹':skin.symbol}</div><div className="battle-impact"/>{Array.from({length:14},(_,i)=><i className="battle-particle" key={i} style={{'--i':i,'--angle':`${i*360/14}deg`} as CSSProperties}>{hit?'◆':skin.symbol}</i>)}</div>}
    {active&&<div key={`damage-${event}`} className={`battle-damage ${hit?'on-pet':''}`}>−{battle.damage}{battle.rage&&<small>CƯỜNG NỘ ×2</small>}{battle.heal>0&&<small>+{battle.heal} máu hồi phục</small>}</div>}
    <div className="battle-combo">{battle.streak>0?`${battle.streak} câu đúng liên tiếp`:'Đọc kỹ · nghĩ chắc · ra chiêu'}<span>{[0,1,2].map(i=><i key={i} className={i<(battle.streak%3|| (battle.streak?3:0))?'lit':''}>◆</i>)}</span></div>
@@ -32,7 +36,6 @@ export default function LearningBattle({pet,nickname,level,answers,total,event,f
  </div>
 }
 
-const SPELL_NAMES=['earth','water','fire','wind','faith','love','gratitude','awareness']
 // Row boundaries are measured from each painted source, not assumed equal.
 const SPELL_ROWS:number[][]=[
  [0,130,247,391,554,762,1024],

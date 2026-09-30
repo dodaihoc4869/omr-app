@@ -1,3 +1,4 @@
+import BieuCamThu from '../BieuCamThu'
 import {useState} from 'react'
 import type {FormEvent,ReactNode} from 'react'
 import {PETS} from '../core'
@@ -54,7 +55,7 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
    <svg className="dao-hon-dat" viewBox="0 0 358 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><path className="dao-dat-nui" d="M0 330 C70 300 120 340 190 316 S 300 300 358 326 L358 400 L0 400Z"/><ellipse className="dao-dat-co-dam" cx="179" cy="338" rx="150" ry="34"/><ellipse className="dao-dat-co" cx="179" cy="330" rx="150" ry="30"/><path className="dao-dat-da" d="M40 338 C70 392 130 400 179 400 C228 400 290 392 318 338Z"/><path className="dao-dat-re" d="M70 350 q10 26 22 4 M250 352 q12 30 24 2"/><g className="dao-dat-cay"><circle cx="66" cy="312" r="16"/><circle cx="84" cy="304" r="20"/><circle cx="292" cy="308" r="18"/><circle cx="276" cy="300" r="14"/></g></svg>
    <div className="dao-hon-vong"><svg viewBox="0 0 260 260" aria-hidden="true"><circle className="dao-vong-nen" cx="130" cy="130" r={BAN_KINH}/><circle className="dao-vong-day" cx="130" cy="130" r={BAN_KINH} strokeDasharray={`${(CHU_VI*vong.tiLe).toFixed(0)} ${CHU_VI.toFixed(0)}`}/></svg>
     <img className="dao-hon-thu" src={anhThu(thu,profile.cap)} alt="" width="288" height="288" decoding="async" draggable={false}/></div>
-   <div className="dao-hon-cap"><small>CẤP</small><strong>{profile.cap}</strong></div>
+   <BieuCamThu thu={thu} camXuc="chao" size={58}/><div className="dao-hon-cap"><small>CẤP</small><strong>{profile.cap}</strong></div>
    <div className="dao-hon-con" role="status">{vong.toiDa?`Cấp cao nhất · ${CAP_TOI_DA}`:(profile.choNgay??0)>0?`Thanh đầy · còn ${profile.choNgay} ngày đạt nữa lên cấp ${profile.cap+1}`:`còn ${vong.con.toLocaleString('vi-VN')} EXP lên cấp ${profile.cap+1}`}</div>
    {choMoc&&<p className="dao-hon-loi" data-vung="cho-moc">{choMoc}</p>}
    {profile.wallet>0&&profile.cap<CAP_TOI_DA&&onNap&&<button type="button" className="dao-hon-nap" disabled={busy} onClick={onNap}>Nạp {profile.wallet.toLocaleString('vi-VN')} EXP cho {ten}</button>}

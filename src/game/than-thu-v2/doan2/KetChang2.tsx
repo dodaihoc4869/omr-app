@@ -63,7 +63,7 @@ export default function KetChang2({ xem, expNhan, cau, ban, onRaDao, onVeBanDo, 
       <div className="dh2-thang-canh">
         <TranhThang thang={k.thang} ha={ha} />
         {banBe[0] && <ThuHinh pet={banBe[0].pet} cap={banBe[0].cap} className="dh-noi-2" style={{ left: '5.6%', top: '35.6%', width: '20.5%', aspectRatio: '1' } as CSSProperties} />}
-        <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi" style={{ left: '28.2%', top: '19.4%', width: '43.6%', aspectRatio: '1' } as CSSProperties} />
+        <ThuHinh pet={em.pet} cap={em.cap} camXuc={k.thang ? 'mung' : 'sai'} className="dh-noi" style={{ left: '28.2%', top: '19.4%', width: '43.6%', aspectRatio: '1' } as CSSProperties} />
         {banBe[1] && <ThuHinh pet={banBe[1].pet} cap={banBe[1].cap} quayTrai className="dh-noi-2" style={{ right: '5.6%', top: '36.7%', width: '19.5%', aspectRatio: '1' } as CSSProperties} />}
         <div className="dh2-sao" role="img" aria-label={`${k.sao} trên 3 sao`}>
           {[1, 2, 3].map(i => <SaoHinh key={i} size={i === 2 ? 44 : 32} sang={k.sao >= i} />)}

@@ -1,3 +1,4 @@
+import { LoiChao } from '../components/bat-linh/DongHanh'
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
@@ -234,7 +235,6 @@ export default function StudentPortalScreen() {
   const nowHocTap = useGioHocTap()
   // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
   const { hoi, bao, hop } = useHopThoai()
-  const hoiRoiBaiMom = () => { void hoi({ tieuDe: 'Rời bài đang làm?', noiDung: 'Em quay về danh sách bài. Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.', nutDongY: 'Rời bài', nutHuy: 'Làm tiếp' }).then((dongY) => { if (dongY) setDangLamMom(null) }) }
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
     try {
       const luu = localStorage.getItem(KHOA_LUU_AUTH)
@@ -343,6 +343,7 @@ export default function StudentPortalScreen() {
   // Bài của Mom giao (Đồng hồ đếm ngược 2 tiếng)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
   const [dangLamMom, setDangLamMom] = useState<BaiMomGiao | null>(null)
+  const hoiRoiBaiMom = () => { void hoi({ tieuDe: 'Rời bài đang làm?', noiDung: 'Em quay về danh sách bài. Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.', nutDongY: 'Rời bài', nutHuy: 'Làm tiếp' }).then((dongY) => { if (dongY) setDangLamMom(null) }) }
   // Việc ÔN CÂU (on_lai) đang làm trong sheet 'cauon': đúng các qid máy chủ chọn, nộp về /hs/on-lai/nop.
   const [cauOn, setCauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string; cauSan?: CauOn[]; duongNop?: string } | null>(null)
   const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
@@ -1180,11 +1181,10 @@ export default function StudentPortalScreen() {
   // NẾU CHƯA ĐĂNG NHẬP
   if (!auth) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-blue-50/20 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 flex flex-col justify-center items-center p-4">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition">
-          <div className="mb-6">
-            <LogoDoc vai="hs" size={64} />
-          </div>
+      <div className="bl-login">
+        <div className="bl-login__card">
+          <div className="bl-login__brand"><LogoDoc vai="hs" size={48} /></div>
+          <LoiChao vai="hs" />
 
           {chuaCoMatKhau ? (
             <form onSubmit={xuLyDatMatKhau} className="space-y-4">

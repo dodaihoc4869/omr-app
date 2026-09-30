@@ -1,3 +1,5 @@
+import BieuCamThu from '../BieuCamThu'
+import QuaiSonThuy from '../QuaiSonThuy'
 // ĐẢO 2.0 · TRONG ẢI (bản vẽ Moi-DaoAi.dc.html) + SAU KHI CHỐT (Moi-DaoLoiGiai.dc.html).
 // Trận GIỮ công thức `learning-battle.ts` (máu, 3 câu đúng liền ⇒ Cuồng nộ ×2); điểm/EXP do máy chủ chấm. Thẻ câu = TheCau (không sửa TheCau):
 // chế độ `thi` khi làm, chế độ `xem_lai` + khối LỜI GIẢI chuẩn (chuan-hoa-loi-giai) khi đã chốt. Gợi ý M3 CHỈ lấy từ `goiY` máy chủ gửi —
@@ -58,7 +60,7 @@ export function TienDoChuyen({cau,viTri,ketQua}:{cau:readonly CauDao2[];viTri:nu
 // ───────────── cảnh rừng sương + quái + thần thú ─────────────
 /** Cảnh giữ lại đòn gần nhất (số máu, Cuồng nộ) như sân đấu cũ; tiếng đòn phát ở `DaiKetQua` — lúc máy chủ vừa chấm. */
 /** `chuong` = chiếu hoạt cảnh bắn chưởng cho đòn `suKien` (chỉ lúc máy chủ VỪA chấm; dựng lại cảnh khi sang câu sau thì không chiếu lại). */
-export function CanhRung({profile,ketQua,tong,suKien,chuong=false}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;chuong?:boolean}){
+export function CanhRung({profile,ketQua,tong,suKien,chuong=false,trum=false,daChot=false}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;chuong?:boolean;trum?:boolean;daChot?:boolean}){
  const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted)
  const vuaNop=suKien>0&&tran.count>0,no=vuaNop&&tran.rage
  return <section className="dao2-canh" data-no={no?'':undefined} aria-label="Trận đấu" {...(chuong?thuocTinhCanh(ketQua,tong,suKien):{})}>
@@ -74,21 +76,10 @@ export function CanhRung({profile,ketQua,tong,suKien,chuong=false}:{profile:DaoP
    <g fill="rgb(255,255,255)" opacity=".8"><circle cx="120" cy="46" r="2"/><circle cx="170" cy="100" r="1.6"/><circle cx="80" cy="80" r="1.4"/></g>
   </svg>
   <div className="dao2-quai" key={`quai-${suKien}`} data-trung={vuaNop&&tran.correct?'':undefined} data-ha={tran.enemy===0?'':undefined}>
-   <svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
-    <defs>
-     <radialGradient id="d2-quai" cx="38%" cy="28%"><stop offset="0" stopColor="rgb(217,255,244)"/><stop offset=".55" stopColor="rgb(95,211,180)"/><stop offset="1" stopColor="rgb(30,111,92)"/></radialGradient>
-     <filter id="d2-toa" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="6"/></filter>
-    </defs>
-    <circle cx="60" cy="58" r="54" fill="rgb(95,211,180)" opacity=".3" filter="url(#d2-toa)"/>
-    <ellipse cx="60" cy="112" rx="52" ry="7" fill="rgba(0,0,0,.4)"/>
-    <path d="M14 106 C0 54 30 8 60 8 C94 8 122 54 108 106 C102 122 20 122 14 106Z" fill="url(#d2-quai)"/>
-    <path d="M32 40 C38 28 48 22 58 22" stroke="rgba(255,255,255,.6)" strokeWidth="5" strokeLinecap="round" fill="none"/>
-    <ellipse cx="46" cy="64" rx="8" ry="9" fill="rgb(255,255,255)"/><ellipse cx="74" cy="64" rx="8" ry="9" fill="rgb(255,255,255)"/>
-    <circle cx="47" cy="66" r="4" fill="rgb(14,59,49)"/><circle cx="73" cy="66" r="4" fill="rgb(14,59,49)"/>
-    <path d="M46 88 Q60 80 74 88" stroke="rgb(14,59,49)" strokeWidth="4" strokeLinecap="round" fill="none"/>
-   </svg>
+   <QuaiSonThuy loai={trum?'trum_suong_mu':'suong_mu'} size={120}/>
   </div>
   <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
+  <BieuCamThu thu={thu} camXuc={daChot?(tran.correct?(chuong?'quyet-tam':'dung'):'sai'):'nghi'} size={48}/>
   {chuong&&<ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>}
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
@@ -160,7 +151,7 @@ export function DaiKetQua({profile,cau:q,phanHoi,ketQua,tong}:{profile:DaoProfil
  // tiếng đòn: MỘT lần mỗi lần chấm (dải này dựng mới mỗi ải); tắt tiếng / chưa mở âm thanh ⇒ im lặng
  useEffect(()=>{playBattleSound(thu,evolutionStage(profile.cap),phanHoi.correct,tran.rage)},[]) // eslint-disable-line react-hooks/exhaustive-deps
  return <div className="dao2-kinh dao2-ket-qua" data-dung={phanHoi.correct?'':undefined} role="status">
-  <img src={anhThu(thu,profile.cap,true)} alt="" width="88" height="88" decoding="async" draggable={false} data-dich-exp=""/>
+  <span className="bl-phan-hoi-thu" data-dich-exp=""><BieuCamThu thu={thu} camXuc={phanHoi.correct?'dung':'sai'} size={64}/></span>
   <b className="dao2-ket-qua-so" aria-label={phanHoi.correct?`${TEN_QUAI} mất ${tran.damage} máu`:`Thần thú của em mất ${tran.damage} máu`}>−{tran.damage}</b>
   <span><strong>{phanHoi.correct?'Đúng rồi · quái trúng đòn':'Chưa đúng · quái phản đòn'}</strong>
    {phanHoi.correct&&tran.rage&&<em className="dao2-ket-qua-no">CUỒNG NỘ ×2 · 3 câu đúng liền</em>}
@@ -214,7 +205,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
     <NutToanManHinh/>
    </div>
    {!ngang&&!phanHoi&&nhan}
-   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={suKien} chuong={chuongSk===suKien}/>}
+   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={suKien} chuong={chuongSk===suKien} trum={vai==='trum'} daChot={!!phanHoiMay}/>}
    {phanHoi&&<DaiKetQua profile={profile} cau={q} phanHoi={phanHoi} ketQua={ketQua} tong={cau.length}/>}
    {ngang&&<TienDoChuyen cau={cau} viTri={viTri} ketQua={ketQua}/>}
   </div>

@@ -1,3 +1,4 @@
+import { LoiChao } from '../components/bat-linh/DongHanh'
 // APP PHỤ HUYNH — TRÙNG TU 28/09 (thầy: "Trùng tu toàn bộ app phụ huynh, app phụ huynh không có giao bài cho con nữa chỉ xem được báo cáo mọi thứ về con";
 // bản vẽ đã chốt https://claude.ai/artifact/2HShm51xEiuVKcTAUpfeFT). Lệnh mới này THAY quyết định 27/09 "bỏ hẳn app phụ huynh" (màn "đã ngừng" theo công tắc Game Hoá 2.0 đã gỡ):
 // app phụ huynh chạy lại, CHỈ XEM — không nút giao bài, không lệnh ghi nào của phụ huynh.
@@ -122,7 +123,8 @@ export default function ParentPortalScreen() {
       <div className="ph3">
         <main className="ph3-vao">
           <div className="ph3-vao__the">
-            <LogoDoc vai="ph" size={64} tieuDe />
+            <LogoDoc vai="ph" size={48} tieuDe />
+            <LoiChao vai="ph" />
             <form
               onSubmit={(e) => {
                 e.preventDefault()
