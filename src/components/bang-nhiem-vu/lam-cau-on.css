@@ -107,9 +107,10 @@
 .lco-nhap input::placeholder { color: var(--m3-on-surface-variant); font-weight: 500; }
 .lco-nhap input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--m3-primary); }
 .lco-nhap input:disabled { opacity: 0.7; }
-/* hai nút "−" và "," (ONhapDapSo) theo M3: cùng chiều cao ô, viền/màu M3 */
-.lco-nhap .ond { --ond-cao: 56px; --ond-bo: var(--m3-bo-12); --ond-vien: var(--m3-outline); --ond-nut-nen: transparent; --ond-nut-chu: var(--m3-on-surface); --ond-chu: var(--m3-on-surface); --ond-nen: transparent; --ond-tieu-diem: var(--m3-primary); }
-.lco-nhap .ond > input { width: auto; flex: 1 1 auto; min-width: 0; border: 0; padding: 0 var(--k4, 16px); }
+/* ô số OSoTraLoi (hai nút "±" "," nằm trong ô) theo M3: màu nút kế thừa vai trò M3 của màn */
+.lco-nhap .osl { --osl-cao: 56px; --osl-bo: var(--m3-bo-12); --osl-vien: var(--m3-outline); --osl-chu: var(--m3-on-surface); --osl-nen: transparent; --osl-tieu-diem: var(--m3-primary); --osl-nut-nen: var(--m3-surface-container-high); }
+.lco-nhap .osl > input { border: 0; }
+.lco-nhap .osl > input:focus { box-shadow: inset 0 0 0 2px var(--m3-primary); }
 
 /* lời giải sau khi chấm */
 .lco-loi-giai { display: flex; flex-direction: column; gap: var(--k2, 8px); }

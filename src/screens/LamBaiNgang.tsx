@@ -73,8 +73,8 @@ export interface LamBaiNgangProps {
   onChonPa: (stt: number, viTri: number) => void
   onGhiY: (stt: number, viTri: number, gt: 'D' | 'S') => void
   onNhap: (stt: number, text: string) => void
-  /** Ô đáp số Phần III (màn thi dựng bằng `ONhapDapSo` chuanViet). Truyền vào thay vì import để mảnh ngang không tách
-   * `ONhapDapSo` khỏi mảnh dùng chung hiện có (precache giữ nguyên số tệp). */
+  /** Ô đáp số Phần III (màn thi dựng bằng `OSoTraLoi` chuanViet). Truyền vào thay vì import để mảnh ngang không tách
+   * `OSoTraLoi` khỏi mảnh dùng chung hiện có (precache giữ nguyên số tệp). */
   oDapSo: (p: { value: string; onChange: (v: string) => void; ariaLabel: string }) => ReactNode
   onDoiDau: (stt: number) => void
   /** Chuỗi mm:ss; bài tập về nhà ⇒ null và hiện `chuThayDongHo`. */

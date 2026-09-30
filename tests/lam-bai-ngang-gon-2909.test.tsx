@@ -32,7 +32,7 @@ const The = ({ n }: { n: number }) => (
       <div>
         <div className="cau-de">Đề câu {n}</div>
         {n === 4 ? (
-          <div className="ond">
+          <div className="osl">
             <input aria-label={`Đáp số câu ${n}`} />
           </div>
         ) : (
@@ -260,7 +260,7 @@ describe('câu dài tự chia 2 cột + thanh chia em tự chỉnh', () => {
   it('Phần III: ô đáp số là khối cột phải; Phần II cũng chia đủ', () => {
     giaCao(620, 340)
     const r = render(<LamBaiNgang {...props({ cauBatDau: 4 })} />)
-    expect(r.container.querySelector('#cau-4 [data-lb-pa]')!.classList.contains('ond')).toBe(true)
+    expect(r.container.querySelector('#cau-4 [data-lb-pa]')!.classList.contains('osl')).toBe(true)
     fireEvent.click(r.getByRole('button', { name: 'Câu trước' }))
     expect(r.container.querySelector('#cau-3 [data-lb-pa] .pa-hang')).not.toBeNull()
   })

@@ -1,7 +1,7 @@
-// Khung dựng THẬT (React chạy trong Chromium) cho ONhapDapSo: được `tests/o-nhap-dap-so-trinh-duyet-2109.test.ts` đóng gói bằng rolldown rồi nhét vào trang thử.
+// Khung dựng THẬT (React chạy trong Chromium) cho OSoTraLoi (trước là ONhapDapSo): được `tests/o-nhap-dap-so-trinh-duyet-2109.test.ts` đóng gói bằng rolldown rồi nhét vào trang thử.
 import { createRoot } from 'react-dom/client'
 import { useState } from 'react'
-import ONhapDapSo from '../../src/components/ONhapDapSo'
+import OSoTraLoi from '../../src/components/OSoTraLoi'
 
 function App() {
   const [v, setV] = useState('')
@@ -10,7 +10,7 @@ function App() {
   return (
     <div>
       <form onSubmit={(e) => { e.preventDefault(); setNop((n) => n + 1) }}>
-        <ONhapDapSo id="o" value={v} onChange={setV} ariaLabel="Đáp số" placeholder="Đáp số" maxLength={12} />
+        <OSoTraLoi id="o" value={v} onChange={setV} ariaLabel="Đáp số" placeholder="Đáp số" maxLength={12} />
       </form>
       <output id="gia-tri">{v}</output>
     </div>

@@ -1,0 +1,26 @@
+/* Ô TRẢ LỜI SỐ (OSoTraLoi, thầy 30/09): hai nút nhỏ "±" và "," NẰM TRONG ô, mép phải. Nơi dùng đổi màu qua biến --osl-* (kế thừa token của màn);
+ * mặc định trung tính, có bản tối. Nút nhuộm theo màu chữ của ô (color-mix) nên tự hợp mọi nền. */
+.osl{--osl-cao:48px;--osl-bo:12px;--osl-nen:rgb(255,255,255);--osl-chu:rgb(28,32,40);--osl-vien:rgb(160,168,184);--osl-tieu-diem:rgb(26,86,219);
+  --osl-nut-rong:40px;--osl-nut-cao:max(36px,calc(var(--osl-cao) - 12px));
+  position:relative;display:block;width:100%;min-width:0;box-sizing:border-box}
+.osl *,.osl *::before,.osl *::after{box-sizing:border-box}
+.osl>input{display:block;width:100%;min-width:0;min-height:var(--osl-cao);margin:0;padding:0 14px;border:1.5px solid var(--osl-vien);border-radius:var(--osl-bo);background:var(--osl-nen);color:var(--osl-chu);font:inherit;font-size:16px;font-variant-numeric:tabular-nums}
+/* chừa chỗ cho hai nút (inline style của nơi dùng hay đặt padding ⇒ !important riêng mép phải) */
+.osl>input{padding-right:calc(var(--osl-nut-rong) * 2 + 16px) !important}
+.osl>input:focus{outline:none;border-color:var(--osl-tieu-diem);box-shadow:0 0 0 2px var(--osl-tieu-diem)}
+.osl>input:disabled{opacity:.7}
+.osl-cum{position:absolute;top:0;right:6px;bottom:0;display:flex;align-items:center;gap:4px;pointer-events:none}
+.osl-nut{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;width:var(--osl-nut-rong);min-width:36px;height:var(--osl-nut-cao);margin:0;padding:0;border:0;
+  border-radius:calc(var(--osl-bo) - 4px);background:rgba(128,128,128,.14);background:var(--osl-nut-nen,color-mix(in srgb,var(--osl-chu) 9%,transparent));
+  color:var(--osl-nut-chu,var(--osl-chu));font:inherit;font-size:20px;font-weight:700;line-height:1;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;transition:background-color .12s,color .12s}
+.osl-nut-phay{font-size:24px;padding-bottom:6px}
+@media (hover:hover){.osl-nut:not(:disabled):hover{background:rgba(128,128,128,.24);background:color-mix(in srgb,var(--osl-chu) 16%,transparent)}}
+.osl-nut:active:not(:disabled){transform:scale(.94)}
+.osl-nut:focus-visible{outline:2px solid var(--osl-tieu-diem);outline-offset:1px}
+.osl-nut:disabled{opacity:.35;cursor:default}
+.osl-nut[aria-pressed='true']{background:rgba(26,86,219,.16);background:var(--osl-bat-nen,color-mix(in srgb,var(--osl-tieu-diem) 18%,transparent));color:var(--osl-bat-chu,var(--osl-tieu-diem))}
+@media (prefers-color-scheme:dark){
+  .osl{--osl-nen:rgb(30,35,46);--osl-chu:rgb(232,236,246);--osl-vien:rgb(96,106,128);--osl-tieu-diem:rgb(150,190,255)}
+}
+@media (prefers-reduced-motion:reduce){.osl-nut{transition:none}.osl-nut:active:not(:disabled){transform:none}}

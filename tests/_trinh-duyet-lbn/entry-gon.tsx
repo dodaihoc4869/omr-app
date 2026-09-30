@@ -28,7 +28,7 @@ function The({ n, onChon, chon }: { n: number; chon: number | null; onChon: (v: 
             {de}
           </div>
           {n === 4 ? (
-            <div className="ond" style={{ display: 'flex' }}>
+            <div className="osl" style={{ display: 'flex' }}>
               <input aria-label="Đáp số câu 4" style={{ height: 48, flex: 1 }} />
             </div>
           ) : (
