@@ -34,6 +34,8 @@ export interface SanhHoa2 {
   ruong: { daLam: number; tong: number; moDuoc: boolean; daMo: boolean; qua: { vang: number } | null }
   /** Cửa thứ ba Bi-a Phản Ứng (máy chủ trả kèm `hoa2-sanh` khi cờ `bi_a` bật). null ⇒ không vẽ cửa. */
   bia: BiaTrenSanh | null
+  /** 30/09: số câu còn lại hôm nay đang tạm giữ vì lớp có ca kiểm tra (chỉ số, không qid). 0 ⇒ không có / máy chủ cũ. */
+  tamGiuCa: number
 }
 /** Tóm tắt Bi-a cho cửa trên Sảnh: số câu Bi-a còn / trần hôm nay; Bàn giao hữu; lý do khoá. */
 export interface BiaTrenSanh { con: number; tong: number; giaoHuu: { mo: boolean; con: number }; lyDoKhoa: string | null }
@@ -191,6 +193,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       khoaDao: o.khoaDao === true,
       loiKhoaDao: chu(o.loiKhoaDao).trim(),
       bia: docBiaTrenSanh(o.bia),
+      tamGiuCa: soKhongAm((o.tamGiu as Record<string, unknown> | undefined)?.ca),
       ruong: {
         daLam: soKhongAm(r.daLam),
         tong: soKhongAm(r.tong),
