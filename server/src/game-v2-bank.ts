@@ -166,6 +166,21 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   for(const ds of tapTheoCa)for(const x of ds)blocked.add(x)
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});demCaBaoVe.ghi('current',now,new Set(blocked));return blocked
 }
+/** CÂU THÔ của kho (mỗi câu có `qid`) đang được bảo vệ cho ca chưa công bố / còn làm được — theo qid HOẶC NHÓM NỘI DUNG
+ *  (bản chép cùng nội dung ở tờ DB-/DH- mang qid khác). Dùng cho kênh trả đáp án/lời giải ngoài game (BTVN…).
+ *  Lỗi đọc phạm vi bảo vệ ⇒ coi MỌI câu là đang bảo vệ (thà giấu nhầm một lúc còn hơn lộ đáp án câu đang thi). */
+export async function qidDangBaoVe(env:Env,cau:Row[]):Promise<Set<string>>{
+  const ra=new Set<string>()
+  let tap:Set<string>
+  try{tap=await protectedQuestions(env)}catch{for(const c of cau){const q=str(c.qid);if(q)ra.add(q)};return ra}
+  if(!tap.size)return ra
+  for(const c of cau){
+    const qid=str(c.qid);if(!qid)continue
+    if(tap.has(qid)){ra.add(qid);continue}
+    try{const [q]=await normalizeBank({ma_de:'bao-ve',cau:[{...c}]},'bao-ve');if(q&&tap.has(q.group))ra.add(qid)}catch{/* câu không chuẩn hoá được: chỉ so qid */}
+  }
+  return ra
+}
 /** Câu trong POOL của readScope: câu ĐẦY ĐỦ (bằng chứng của em, `originals`) hoặc bản NHẸ của kho theo dạng (`nhe: true`: chỉ siêu dữ liệu để CHỌN + cờ `tuLuan` tính sẵn; KHÔNG có text, choices, ideas, hinhAnh, correct, solution).
  *  Bản nhẹ là đối tượng ĐÓNG BĂNG dùng chung nhiều lượt: không được sửa; muốn đưa cho em thì phải qua `doDayDu`. */
 export type CauPool=PrivateQuestion&{nhe?:true;tuLuan?:boolean}
