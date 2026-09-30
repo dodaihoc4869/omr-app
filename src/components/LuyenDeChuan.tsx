@@ -1,27 +1,13 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { taoKhoGio, useGiayConLai, useMocGio, type KhoGio } from '../lib/dong-ho-thi'
+import { useEffect, useState, type ReactNode } from 'react'
+import { useGiayConLai, type KhoGio } from '../lib/dong-ho-thi'
 import TheCau from './TheCau'
 import { createPortal } from 'react-dom'
 import { ArrowUpRight, Clock3, FileText, ChevronLeft, Award, ChevronDown } from 'lucide-react'
-import { layCauHinhMayChu, xongNapDiaChi } from '../lib/may-chu-moi'
-import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
+import { demDaLam, useLuyenDe } from './luyen-de/dung-luyen-de'
 import ModalXacNhanNop from './ModalXacNhanNop'
 import './m3'
 import './m3/luyen-khac-phuc.css'
 import NutHoiThay from './loi-giai/NutHoiThay'
-
-type Paper = {
-  id: string
-  deadline: number
-  serverNow: number
-  status: string
-  answers: Record<string, string>
-  bank: PublicExamBank
-  result?: { score: number }
-  solutions?: TeacherExamSource[]
-}
-
-type History = { id: string; createdAt: number; status: string; score: number | null }
 
 /** Giây nguyên còn lại như bản cũ: làm tròn LÊN, không âm. */
 const giayNguyen = (giay: number | null) => Math.max(0, Math.ceil(giay ?? 0))
@@ -42,155 +28,17 @@ function DongHoLuyen({ kho, giayDau }: { kho: KhoGio | null; giayDau: number }) 
 }
 
 export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: string }) {
-  const [ready, setReady] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-  const [paper, setPaper] = useState<Paper | null>(null)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [history, setHistory] = useState<History[]>([])
-  const [seconds, setSeconds] = useState(0)
-  const [saved, setSaved] = useState('')
+  // LÕI (gọi máy chủ, lưu nháp, đồng hồ theo mốc, tự nộp khi hết giờ) nằm ở luyen-de/dung-luyen-de.ts — dùng chung với thẻ Luyện đề cấu trúc của Tu luyện.
+  const {
+    ready, setReady, busy, error, paper, setPaper, answers, history, seconds, saved,
+    khoGio, open, submit, change, getSolution,
+  } = useLuyenDe(sbd, token)
   const [hienXacNhanNop, setHienXacNhanNop] = useState(false)
   const [moDanhSach, setMoDanhSach] = useState(false)
-
-  const saveQueue = useRef(Promise.resolve())
-  const answerRef = useRef(answers)
-  const paperRef = useRef(paper)
-  const offset = useRef(0)
-  const submitting = useRef(false)
-  const alive = useRef(true)
-
-  answerRef.current = answers
-  paperRef.current = paper
-
-  async function api(action: string, data: Record<string, unknown> = {}) {
-    if (!token) throw new Error('Em đăng xuất rồi đăng nhập lại để mở luyện đề.')
-    await xongNapDiaChi()
-    const url = String((await layCauHinhMayChu()).URL || '').replace(/\/+$/, '')
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 60000)
-    try {
-      const r = await fetch(`${url}/luyen-de/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, token }),
-        signal: controller.signal,
-      })
-      const json = await r.json()
-      if (!r.ok || !json.ok) throw new Error(json.error || 'Không kết nối được máy chủ luyện đề.')
-      return json
-    } finally {
-      clearTimeout(timeout)
-    }
-  }
-
-  async function refresh() {
-    try {
-      const r = await api('history')
-      if (alive.current) {
-        const items = (r.items || []) as History[]
-        setHistory(items)
-        if (items.some((h) => h.status === 'active')) {
-          setMoDanhSach(true)
-        }
-      }
-    } catch (e) {
-      if (alive.current) setError(e instanceof Error ? e.message : 'Không tải được lịch sử.')
-    }
-  }
-
+  // Có bài đang làm ⇒ mở sẵn danh sách (như bản cũ: mỗi lần tải lịch sử).
   useEffect(() => {
-    alive.current = true
-    void refresh()
-    return () => {
-      alive.current = false
-    }
-  }, [sbd, token])
-
-  function accept(p: Paper) {
-    offset.current = p.serverNow - Date.now()
-    setPaper(p)
-    let local: Record<string, string> = {}
-    try {
-      local = JSON.parse(localStorage.getItem(`ddh.luyen2026.${sbd}.${p.id}`) || '{}')
-    } catch {}
-    setAnswers(p.status === 'active' ? { ...p.answers, ...local } : p.answers)
-    setSeconds(Math.max(0, Math.ceil((p.deadline - p.serverNow) / 1000)))
-  }
-
-  async function open(id?: string) {
-    setBusy(true)
-    setError('')
-    try {
-      accept(await api(id ? 'open' : 'start', id ? { id } : { daHocXong: ready }))
-      await refresh()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Không mở được đề.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  async function submit(_auto = false) {
-    const p = paperRef.current
-    if (!p || p.status !== 'active' || submitting.current) return
-    submitting.current = true
-    setBusy(true)
-    setError('')
-    try {
-      accept(await api('submit', { id: p.id, answers: answerRef.current }))
-      setSaved('Đã nộp bài')
-      await refresh()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Chưa nộp được bài. Em thử lại.')
-    } finally {
-      submitting.current = false
-      setBusy(false)
-    }
-  }
-
-  // Giờ còn lại nằm trong KHO GIỜ (lib/dong-ho-thi), giờ máy chủ = Date.now() + lệch.
-  // Gốc chỉ nghe MỐC (hết giờ hay chưa) ⇒ không vẽ lại cả đề mỗi giây.
-  const dangLam = paper?.status === 'active'
-  const khoGio = useMemo(
-    () => (paper && dangLam ? taoKhoGio(paper.deadline, () => Date.now() + offset.current) : null),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [paper?.id, dangLam, paper?.deadline],
-  )
-  const mocGio = useMocGio(khoGio)
-  // Hết giờ (giây làm tròn lên về 0 ⇔ còn ≤ 0) ⇒ tự nộp; nộp hỏng thì thử lại mỗi giây như bản cũ.
-  const hetGio = mocGio === 'het'
-  useEffect(() => {
-    if (!hetGio || !dangLam) return
-    const thu = () => {
-      if (!submitting.current) void submit(true)
-    }
-    thu()
-    const id = setInterval(thu, 1000)
-    return () => clearInterval(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hetGio, dangLam, paper?.id])
-
-  useEffect(() => {
-    if (!paper || paper.status !== 'active') return
-    try {
-      localStorage.setItem(`ddh.luyen2026.${sbd}.${paper.id}`, JSON.stringify(answers))
-    } catch {}
-    setSaved('Đang lưu…')
-    const timer = setTimeout(() => {
-      saveQueue.current = saveQueue.current.then(async () => {
-        if (answerRef.current !== answers || paperRef.current?.status !== 'active') return
-        try {
-          const r = await api('save', { id: paper.id, answers })
-          if (r.status) accept(r)
-          else setSaved('Đã lưu trên máy chủ')
-        } catch {
-          setSaved('Chưa lưu lên máy chủ. Đáp án đang giữ trên máy này.')
-        }
-      })
-    }, 600)
-    return () => clearTimeout(timer)
-  }, [answers, paper?.id, paper?.status])
+    if (history.some((h) => h.status === 'active')) setMoDanhSach(true)
+  }, [history])
 
   const panel = 'm3 m3-khoi p-4 sm:p-6 space-y-4'
 
@@ -312,14 +160,9 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
       {done && <NutHoiThay qid={qid} nguon="luyen_de" gon />}
     </div>
   )
-  const getSolution = (id: string) =>
-    paper.solutions?.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII]).find((q) => q.id === id)
-  const change = (id: string, v: string) => {
-    if (!done && (khoGio ? !hetGio : seconds > 0)) setAnswers((a) => ({ ...a, [id]: v }))
-  }
 
   const tongSoCau = paper.bank.phanI.length + paper.bank.phanII.length + paper.bank.phanIII.length
-  const soCauDaLam = Object.values(answers).filter((v) => v && v.trim() && v !== '----').length
+  const soCauDaLam = demDaLam(answers)
 
   return createPortal(
     <div className="m3 m3-man-lam fixed inset-0 z-50 overflow-y-auto overscroll-contain">

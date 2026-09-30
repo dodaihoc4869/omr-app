@@ -3,7 +3,7 @@
 // Mở từ cửa "Tu luyện" trên Sảnh (SanhBanDo), nạp lười (StudentPortalScreen). Ba chặng: CHỌN chế độ → LÀM (TheCau chế độ `thi`, không đáp án)
 // → KẾT QUẢ (máy chủ chấm; TheCau `xem_lai`: đáp án + lời giải chuẩn). Thẻ "Tổng hợp" ở đầu màn: tiến bộ của em (TongHopTuLuyen.tsx).
 // Nền đêm cùng bộ với Sảnh / Câu đã làm; thẻ câu dưới `.m3` (bảng màu M3 dùng chung). Máy chủ: server/src/tu-luyen.ts.
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import TheCau from '../TheCau'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { hoiXacNhan } from '../hop-thoai'
@@ -25,7 +25,12 @@ import {
   type KetQuaCau,
 } from '../../lib/tu-luyen'
 import { nopBai, rutCau, taiNguon, xemLuot, xemTruoc, type KetQuaNop, type LuotDangLam, type NguonTuLuyen, type ThamSoRut } from './api'
-import TongHopTuLuyen from './TongHopTuLuyen'
+import TongHopTuLuyen, { DiemLuyenDeTongHop } from './TongHopTuLuyen'
+import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen-de'
+
+// Thẻ "Luyện đề cấu trúc" (30/09): mảnh NẠP LƯỜI khi em mở thẻ (ngoài precache — vite.config.ts globIgnores). Cổng + lý do khoá lấy từ
+// máy chủ `/luyen-de/dieu-kien` ngay khi mở Tu luyện (thẻ hiện ổ khoá, không ẩn).
+const LuyenDeCauTruc = lazy(() => import('./LuyenDeCauTruc'))
 
 export interface ManTuLuyenProps {
   token: string
@@ -83,6 +88,14 @@ const daTraLoi = (c: CauCongKhai, v: string | undefined): boolean => {
 }
 const dongHo = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
+function IconKhoaNho() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5" />
+      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+    </svg>
+  )
+}
 function IconVe() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -100,7 +113,21 @@ function IconCheDo({ cheDo }: { cheDo: CheDoTuLuyen }) {
 }
 
 export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
-  const [thePhu, setThePhu] = useState<'luyen' | 'tong-hop'>('luyen')
+  const [thePhu, setThePhu] = useState<'luyen' | 'tong-hop' | 'luyen-de'>('luyen')
+  const [dieuKien, setDieuKien] = useState<DieuKienLuyenDe | null>(null)
+  const [dangTaiDk, setDangTaiDk] = useState(true)
+  const [lamMoiDk, setLamMoiDk] = useState(0)
+  useEffect(() => {
+    let song = true
+    setDangTaiDk(true)
+    void taiDieuKienLuyenDe(token).then((d) => {
+      if (!song) return
+      setDieuKien(d)
+      setDangTaiDk(false)
+    })
+    return () => { song = false }
+  }, [token, lamMoiDk])
+  const doiLuyenDe = useCallback(() => setLamMoiDk((n) => n + 1), [])
   const [nguon, setNguon] = useState<NguonTuLuyen | null>(null)
   const [loiNguon, setLoiNguon] = useState('')
   const [dangTaiNguon, setDangTaiNguon] = useState(true)
@@ -446,15 +473,27 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
             <p className="tlu-phu">Luyện tự do · không tính EXP · không ảnh hưởng game</p>
           </div>
         </div>
-        <div className="tlu-the-phu" role="tablist" aria-label="Tu luyện">
+        <div className="tlu-the-phu" data-so="3" role="tablist" aria-label="Tu luyện">
           <button type="button" role="tab" aria-selected={thePhu === 'luyen'} className="tlu-the-phu-nut" onClick={() => setThePhu('luyen')}>Luyện</button>
           <button type="button" role="tab" aria-selected={thePhu === 'tong-hop'} className="tlu-the-phu-nut" onClick={() => setThePhu('tong-hop')}>Tổng hợp</button>
+          <button type="button" role="tab" aria-selected={thePhu === 'luyen-de'} className="tlu-the-phu-nut tlu-the-phu-ldct" data-khoa={dieuKien?.trangThai === 'khoa' ? 'true' : 'false'} onClick={() => setThePhu('luyen-de')}>
+            {dieuKien?.trangThai === 'khoa' && <IconKhoaNho />}
+            <span>Luyện đề cấu trúc</span>
+            {dieuKien?.trangThai === 'khoa' && <span className="tlu-an">(đang khoá)</span>}
+          </button>
         </div>
       </header>
 
-      {thePhu === 'tong-hop' ? (
+      {thePhu === 'luyen-de' ? (
+        <main className="tlu-than">
+          <Suspense fallback={<div className="tlu-luoi-che-do" role="status" aria-label="Đang mở Luyện đề cấu trúc"><div className="tlu-xuong" /><div className="tlu-xuong" /></div>}>
+            <LuyenDeCauTruc token={token} sbd={sbd} dieuKien={dieuKien} dangTaiDieuKien={dangTaiDk} onDoi={doiLuyenDe} />
+          </Suspense>
+        </main>
+      ) : thePhu === 'tong-hop' ? (
         <main className="tlu-than">
           {loiXemLuot && <p className="tlu-bao" data-kieu="loi" role="alert">{loiXemLuot}</p>}
+          {dieuKien && <DiemLuyenDeTongHop items={dieuKien.items} onMo={() => setThePhu('luyen-de')} />}
           <TongHopTuLuyen
             token={token}
             lamMoi={lamMoiTongHop}

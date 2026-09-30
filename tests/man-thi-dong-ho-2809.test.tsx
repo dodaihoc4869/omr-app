@@ -138,9 +138,11 @@ describe('ExamTakeScreen / LuyenDeChuan / StudentPortal: không còn setState gi
   })
   it('luyện đề chuẩn: không setSeconds mỗi giây; tự nộp khi hết giờ theo mốc', () => {
     const l = doc('src/components/LuyenDeChuan.tsx')
-    expect(l).not.toMatch(/setSeconds\(n\)/)
+    // Lõi (mốc giờ, tự nộp) tách sang luyen-de/dung-luyen-de.ts (30/09) — dùng chung với thẻ Luyện đề cấu trúc của Tu luyện.
+    const loi = doc('src/components/luyen-de/dung-luyen-de.ts')
+    expect(l + loi).not.toMatch(/setSeconds\(n\)/)
     expect(l).toMatch(/<DongHoLuyen kho=\{khoGio\}/)
-    expect(l).toMatch(/const hetGio = mocGio === 'het'/)
+    expect(loi).toMatch(/const hetGio = mocGio === 'het'/)
   })
   it('cổng học sinh (bài gia đình giao): đồng hồ đếm trong DemGioMom, gốc không setState mỗi giây', () => {
     const s = doc('src/screens/StudentPortalScreen.tsx')

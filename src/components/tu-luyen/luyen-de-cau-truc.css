@@ -1,0 +1,380 @@
+/* LUYỆN ĐỀ CẤU TRÚC trong Tu luyện (30/09) — đi cùng mảnh nạp lười LuyenDeCauTruc (ngoài precache). Dựa trên token `.tlu` (tu-luyen.css);
+ * tiền tố `ldct-`. Chỉ rgb(), không mã thập lục phân (`npm run check:mau`). Chuyển động chỉ transform/opacity. */
+
+/* ---------------------------------------------------------------- thẻ giới thiệu */
+.ldct-gioi-thieu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ldct-the {
+  --ldct-mau: var(--tlu-vang);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 18px 16px;
+  border-radius: 22px;
+  border: 1px solid var(--tlu-vien);
+  background:
+    radial-gradient(110% 90% at 100% 0%, color-mix(in srgb, var(--ldct-mau) 24%, transparent), transparent 62%),
+    var(--tlu-nen-2);
+  color: var(--tlu-chu);
+  overflow: hidden;
+}
+.ldct-the[data-khoa='true'] {
+  --ldct-mau: var(--tlu-chu-phu);
+}
+.ldct-the-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--ldct-mau) 20%, transparent);
+  color: var(--ldct-mau);
+}
+.ldct-the-chu {
+  min-width: 0;
+}
+.ldct-the-ten {
+  margin: 0;
+  font-family: 'Baloo 2', var(--sans, system-ui), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.ldct-the-phu {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--tlu-chu-phu);
+}
+.ldct-trang-thai {
+  grid-column: 1 / -1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--tlu-nen-3);
+  color: var(--tlu-chu);
+}
+.ldct-trang-thai[data-kieu='mo'] {
+  background: rgb(94 224 200 / 0.18);
+  color: var(--tlu-ngoc);
+}
+.ldct-trang-thai[data-kieu='can_xac_nhan'] {
+  background: rgb(255 214 107 / 0.16);
+  color: var(--tlu-vang);
+}
+.ldct-trang-thai[data-kieu='khoa'] {
+  background: rgb(255 158 150 / 0.16);
+  color: var(--tlu-do);
+}
+.ldct-ly-do {
+  grid-column: 1 / -1;
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgb(8 16 40 / 0.55);
+  border: 1px solid rgb(255 158 150 / 0.4);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--tlu-chu);
+}
+.ldct-ly-do svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--tlu-do);
+}
+
+/* ---------------------------------------------------------------- cấu trúc đề 3 phần */
+.ldct-cau-truc {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.ldct-cau-truc li {
+  --ldct-p: var(--tlu-cd-1);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--tlu-nen-3);
+  border-left: 4px solid var(--ldct-p);
+}
+.ldct-cau-truc li[data-phan='II'] { --ldct-p: var(--tlu-cd-2); }
+.ldct-cau-truc li[data-phan='III'] { --ldct-p: var(--tlu-cd-3); }
+.ldct-ct-nhan {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tlu-chu);
+}
+.ldct-cau-truc b {
+  grid-row: span 2;
+  align-self: center;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--ldct-p);
+}
+.ldct-ct-diem {
+  font-size: 13px;
+  color: var(--tlu-chu-phu);
+}
+.ldct-ct-cach {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--tlu-chu-phu);
+}
+.ldct-kpi {
+  margin-top: 4px;
+}
+.ldct-luot-diem[data-kieu='dang'] {
+  color: var(--tlu-vang);
+}
+
+/* ---------------------------------------------------------------- màn làm bài / kết quả (toàn màn) */
+.ldct-toan {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.ldct-dau .tlu-hang {
+  gap: 10px;
+}
+.ldct-dau-chu {
+  flex: 1 1 auto;
+}
+.ldct-dong-ho {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--tlu-nen-3);
+  border: 1px solid var(--tlu-vien);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--tlu-chu);
+}
+.ldct-dong-ho[data-gap='true'] {
+  background: rgb(120 20 24 / 0.55);
+  border-color: var(--tlu-do);
+  color: var(--tlu-do);
+}
+.ldct-dieu-huong {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding: 2px 2px 6px;
+  margin: 0 -2px;
+}
+.ldct-dh-phan {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.ldct-dh-nhan {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tlu-chu-phu);
+  white-space: nowrap;
+  margin-right: 2px;
+}
+.ldct-dh-o {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid var(--tlu-vien);
+  background: transparent;
+  color: var(--tlu-chu-phu);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ldct-dh-o[data-da-lam='true'] {
+  background: var(--tlu-nhan);
+  border-color: var(--tlu-nhan);
+  color: var(--tlu-nhan-chu);
+}
+.ldct-phan {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.ldct-phan-ten {
+  margin-top: 8px;
+}
+.ldct-cau {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+.tlu[data-chang='lam'].ldct-toan .tlu-ds-cau {
+  padding-bottom: 120px;
+}
+/* Kết quả: vòng điểm + ba ô theo phần (điện thoại: ba ô nằm hàng dưới, đủ rộng; ≥ 720 px: nằm cạnh vòng) */
+.ldct-diem {
+  grid-template-columns: auto 1fr;
+}
+.ldct-theo-phan {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.tlu-diem-so.ldct-theo-phan div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--tlu-nen-3);
+  font-size: 13px;
+}
+.ldct-theo-phan dt {
+  font-size: 12px;
+  line-height: 1.3;
+}
+.ldct-theo-phan dd {
+  font-size: 17px;
+}
+.ldct-tp-phu {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--tlu-chu-phu);
+}
+.tlu-diem-so.ldct-diem-dau {
+  gap: 6px;
+}
+.ldct-diem-dau div {
+  flex-direction: column;
+  gap: 0;
+}
+.ldct-diem-dau dd {
+  font-size: 18px;
+}
+/* Thanh nộp: chữ trạng thái lưu co lại (một dòng, dấu …), nút Nộp bài không bị đẩy xuống dòng */
+.ldct-toan .tlu-thanh-nop-trong {
+  flex-wrap: nowrap;
+}
+.ldct-toan .tlu-thanh-so {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.ldct-luu {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ldct-toan .tlu-thanh-nop .tlu-nut-chinh {
+  flex-shrink: 0;
+}
+/* Tiêu đề màn làm/kết quả luôn cỡ nhỏ (tu-luyen.css ≥ 720 px phóng .tlu-tieu lên 36 px) */
+.ldct-toan .tlu-tieu.tlu-tieu-nho {
+  font-size: 18px;
+}
+
+@media (min-width: 720px) {
+  .ldct-diem {
+    grid-template-columns: auto auto 1fr;
+    gap: 16px 24px;
+  }
+  .ldct-theo-phan {
+    grid-column: auto;
+  }
+  .ldct-the {
+    grid-template-columns: auto 1fr auto;
+    padding: 22px 22px;
+  }
+  .ldct-trang-thai {
+    grid-column: auto;
+    justify-self: end;
+  }
+  .ldct-the-ten {
+    font-size: 26px;
+  }
+  .ldct-cau-truc {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ldct-dieu-huong {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    row-gap: 8px;
+  }
+  .ldct-dh-o {
+    width: 38px;
+    height: 38px;
+  }
+}
+@media (min-width: 1024px) {
+  .tlu.ldct-toan .tlu-dau,
+  .tlu.ldct-toan .tlu-than {
+    max-width: 900px;
+  }
+}
+/* Điện thoại ngang: thanh đầu vẫn dính (có đồng hồ) nhưng gọn — ẩn thanh tiến độ, ô câu nhỏ lại */
+@media (max-height: 500px) and (orientation: landscape) {
+  .tlu.ldct-toan .tlu-dau-lam {
+    position: sticky;
+    gap: 6px;
+    padding-top: max(6px, env(safe-area-inset-top));
+    padding-bottom: 6px;
+  }
+  .ldct-toan .tlu-tien-do {
+    display: none;
+  }
+  .ldct-dieu-huong {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  .ldct-dh-o {
+    width: 32px;
+    height: 32px;
+  }
+  .ldct-toan .tlu-ve {
+    width: 44px;
+    height: 44px;
+  }
+  .ldct-toan .tlu-thanh-nop {
+    padding: 4px 12px max(6px, env(safe-area-inset-bottom));
+  }
+  .ldct-toan .tlu-thanh-nop-trong {
+    padding: 6px 8px 6px 16px;
+  }
+  .ldct-toan .tlu-thanh-so {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .ldct-toan .tlu-so-lon {
+    font-size: 18px;
+  }
+  .ldct-toan .tlu-thanh-nop .tlu-nut-chinh {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

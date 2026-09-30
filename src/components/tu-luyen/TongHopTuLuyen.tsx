@@ -245,3 +245,35 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, on
     </div>
   )
 }
+
+/** Mục "Luyện đề cấu trúc" trong Tổng hợp (30/09): CHỈ ĐỌC điểm các lượt đã nộp từ `/luyen-de/dieu-kien` (cùng dữ liệu `/luyen-de/history`), không đổi schema. */
+export function DiemLuyenDeTongHop({ items, onMo }: { items: { id: string; createdAt: number; status: string; score: number | null }[]; onMo: () => void }) {
+  const daNop = items.filter((x) => x.status === 'submitted' && typeof x.score === 'number') as { id: string; createdAt: number; score: number }[]
+  if (daNop.length === 0) return null
+  const so = (n: number) => n.toLocaleString('vi-VN', { maximumFractionDigits: 2 })
+  const caoNhat = Math.max(...daNop.map((x) => x.score))
+  const tb = daNop.reduce((n, x) => n + x.score, 0) / daNop.length
+  return (
+    <section className="tlu-khoi" aria-labelledby="tlu-h-luyen-de">
+      <h2 id="tlu-h-luyen-de" className="tlu-muc">Luyện đề cấu trúc</h2>
+      <dl className="tlu-kpi">
+        <div><dt>Đề đã nộp</dt><dd className="tlu-tab">{daNop.length} đề</dd></div>
+        <div><dt>Điểm gần nhất</dt><dd className="tlu-tab">{so(daNop[0].score)} / 10</dd></div>
+        <div><dt>Điểm cao nhất</dt><dd className="tlu-tab">{so(caoNhat)} / 10</dd></div>
+        <div><dt>Điểm trung bình</dt><dd className="tlu-tab">{so(tb)} / 10</dd></div>
+      </dl>
+      <ul className="tlu-ds-thanh" aria-label="Điểm các đề gần đây">
+        {daNop.slice(0, 5).map((x) => (
+          <li key={x.id} className="tlu-hang-thanh">
+            <div className="tlu-hang-thanh-dau">
+              <span className="tlu-hang-thanh-nhan tlu-tab">{ngayGio(x.createdAt)}</span>
+              <span className="tlu-hang-thanh-so tlu-tab">{so(x.score)} / 10 điểm</span>
+            </div>
+            <span className="tlu-thanh" aria-hidden="true"><span style={{ transform: `scaleX(${Math.max(0, Math.min(1, x.score / 10))})` }} /></span>
+          </li>
+        ))}
+      </ul>
+      <button type="button" className="tlu-nut-chu" onClick={onMo}>Mở Luyện đề cấu trúc</button>
+    </section>
+  )
+}

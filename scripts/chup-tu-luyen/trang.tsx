@@ -96,6 +96,55 @@ const MAY_CHU: Record<string, (b: Record<string, unknown>) => unknown> = {
   },
   'tong-hop': () => tongHopGia(),
 }
+// ---------------------------------------------------------------- luyện đề cấu trúc giả (/luyen-de/*) — `?ld=khoa` thẻ khoá, `?ld=gap` còn 4 phút
+const ld = new URLSearchParams(location.search).get('ld') ?? ''
+const MAU_I = [
+  ['Chất nào sau đây là ester?', ['CH_{3}COOC_{2}H_{5}', 'CH_{3}COOH', 'C_{2}H_{5}OH', 'CH_{3}CHO']],
+  ['Kim loại nào sau đây có tính khử mạnh nhất?', ['K', 'Fe', 'Cu', 'Ag']],
+  ['Polymer nào sau đây được điều chế bằng phản ứng trùng ngưng?', ['Nylon-6,6', 'Polyethylene', 'Poly(vinyl chloride)', 'Polystyrene']],
+  ['Dung dịch nào sau đây làm quỳ tím chuyển màu xanh?', ['CH_{3}NH_{2}', 'C_{6}H_{5}NH_{2}', 'H_{2}NCH_{2}COOH', 'CH_{3}COOH']],
+] as const
+const BANK_LD = {
+  phanI: Array.from({ length: 18 }, (_, i) => { const m = MAU_I[i % 4]; return { id: `ld-a${i + 1}`, text: m[0], choices: [...m[1]] } }),
+  phanII: Array.from({ length: 4 }, (_, i) => ({ id: `ld-b${i + 1}`, text: 'Cho các phát biểu về chất béo và xà phòng:', ideas: ['Chất béo là triester của glycerol với acid béo.', 'Dầu thực vật chứa chủ yếu gốc acid béo no.', 'Xà phòng hoá chất béo thu được glycerol.', 'Chất béo tan tốt trong nước.'] })),
+  phanIII: Array.from({ length: 6 }, (_, i) => ({ id: `ld-c${i + 1}`, text: `Đun nóng ${(8.8 + i).toLocaleString('vi-VN')} gam ethyl acetate với 150 mL dung dịch NaOH 1M đến phản ứng hoàn toàn. Tính khối lượng chất rắn khan (gam, làm tròn đến hàng phần mười).` })),
+}
+const DA_LD: Record<string, unknown> = {}
+BANK_LD.phanI.forEach((q) => (DA_LD[q.id] = 'A'))
+BANK_LD.phanII.forEach((q) => (DA_LD[q.id] = ['D', 'S', 'D', 'S']))
+BANK_LD.phanIII.forEach((q) => (DA_LD[q.id] = '10,2'))
+const TL_LD: Record<string, string> = {}
+BANK_LD.phanI.forEach((q, i) => (TL_LD[q.id] = i % 4 === 3 ? 'B' : 'A'))
+BANK_LD.phanII.forEach((q, i) => (TL_LD[q.id] = i < 2 ? 'DSDS' : 'DSDD'))
+BANK_LD.phanIII.forEach((q, i) => (TL_LD[q.id] = i < 4 ? '10,2' : '9,8'))
+const DANG_LAM: Record<string, string> = {}
+Object.keys(TL_LD).slice(0, 11).forEach((k) => (DANG_LAM[k] = TL_LD[k]))
+function chiTietLd() {
+  const detail: Record<string, { correct: unknown; points: number }> = {}
+  let diem = 0
+  for (const q of BANK_LD.phanI) { const p = TL_LD[q.id] === DA_LD[q.id] ? 0.25 : 0; diem += p; detail[q.id] = { correct: DA_LD[q.id], points: p } }
+  for (const q of BANK_LD.phanII) { const n = (DA_LD[q.id] as string[]).filter((v, i) => v === TL_LD[q.id][i]).length; const p = [0, 0.1, 0.25, 0.5, 1][n]; diem += p; detail[q.id] = { correct: DA_LD[q.id], points: p } }
+  for (const q of BANK_LD.phanIII) { const p = TL_LD[q.id] === DA_LD[q.id] ? 0.25 : 0; diem += p; detail[q.id] = { correct: DA_LD[q.id], points: p } }
+  return { score: Math.round(diem * 100) / 100, detail }
+}
+const LICH_LD = [
+  { id: 'ld3', createdAt: now - 2 * NGAY, status: 'submitted', score: 7.25 },
+  { id: 'ld2', createdAt: now - 6 * NGAY, status: 'submitted', score: 6.5 },
+  { id: 'ld1', createdAt: now - 11 * NGAY, status: 'submitted', score: 5.75 },
+]
+const deHetLuc = now + (ld === 'gap' ? 4 * 60_000 + 12_000 : 37 * 60_000 + 25_000)
+const MAY_LD: Record<string, (b: Record<string, unknown>) => unknown> = {
+  'dieu-kien': () => (ld === 'khoa' ? { ok: true, trangThai: 'khoa', lyDo: 'Mục này chỉ dành cho học sinh khối 12.', items: [] } : { ok: true, trangThai: 'mo', lyDo: '', items: LICH_LD }),
+  history: () => ({ ok: true, items: ld === 'khoa' ? [] : LICH_LD }),
+  start: () => ({ ok: true, id: 'ld4', status: 'active', deadline: deHetLuc, serverNow: Date.now(), answers: DANG_LAM, bank: BANK_LD }),
+  open: () => ({ ok: true, id: 'ld4', status: 'active', deadline: deHetLuc, serverNow: Date.now(), answers: DANG_LAM, bank: BANK_LD }),
+  save: () => ({ ok: true, serverNow: Date.now() }),
+  submit: () => ({
+    ok: true, id: 'ld4', status: 'submitted', deadline: deHetLuc, serverNow: Date.now(), answers: TL_LD, bank: BANK_LD, result: chiTietLd(),
+    solutions: [{ maDe: 'gia', phanI: BANK_LD.phanI.map((q) => ({ ...q, correct: 'A', explanation: 'Chất có nhóm –COO– liên kết với gốc hydrocarbon là ester.' })), phanII: BANK_LD.phanII.map((q) => ({ ...q, correct: DA_LD[q.id] })), phanIII: BANK_LD.phanIII.map((q) => ({ ...q, correct: '10,2', explanation: 'm = 0,1 × 82 + 0,05 × 40 = 10,2 gam.' })) }],
+  }),
+}
+
 const fetchGoc = window.fetch.bind(window)
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -106,6 +155,12 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     await new Promise((r) => setTimeout(r, 120))
     const b = init?.body ? JSON.parse(String(init.body)) : {}
     return tra(MAY_CHU[m[1]]?.(b) ?? { ok: false, error: 'không có' })
+  }
+  const l = /\/luyen-de\/([a-z-]+)/.exec(url)
+  if (l) {
+    await new Promise((r) => setTimeout(r, 120))
+    const b = init?.body ? JSON.parse(String(init.body)) : {}
+    return tra(MAY_LD[l[1]]?.(b) ?? { ok: false, error: 'không có' })
   }
   if (url.includes('may-chu-gia')) return tra({ ok: false, error: 'giả' })
   return fetchGoc(input, init)
