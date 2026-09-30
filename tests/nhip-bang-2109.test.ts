@@ -24,7 +24,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/game/than-thu-v2/ImmortalShield.tsx': 1,
   'src/game/bi-a/TamCauBia.tsx': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
   'src/components/tu-luyen/ManTuLuyen.tsx': 2, // Tu luyện (29/09): 1 s đếm giờ làm trong ref + 1 s ô đồng hồ nhỏ tự vẽ lại; chấm qua /hs/tu-luyen/nop một lần, không vòng hỏi
-  'src/game/bi-a/ManChoi.tsx': 1, // 45 ms khi GIỮ nút xoay hướng nhắm (chỉ đổi hướng cục bộ)
+  'src/game/bi-a/ManChoi.tsx': 0, // 30/09 thầy duyệt "Bàn Bi-a mới": bỏ hai nút ◀ ▶ (vòng 45 ms khi GIỮ nút) — thay bằng bánh xe kéo, không hẹn giờ
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe

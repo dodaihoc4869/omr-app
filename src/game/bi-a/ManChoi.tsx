@@ -453,7 +453,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const doiEm = v.ghe[v.em]!.doi
   const doiThu = v.ghe.find((g) => g.doi !== doiEm)
   const tenTrai = doi ? 'Phe em' : 'Em', tenPhai = (doi ? 'Đối thủ' : (doiThu?.ngan ?? 'Đối thủ')) + (vm && v.ghe.some((g, i) => g.doi !== doiEm && vm.roiGhe[i]) ? ' · đang nối lại' : '')
-  const nhanMoi = vm?.nhanDen.at(-1)
+  const nhanMoi = vm && vm.nhanDen.length ? vm.nhanDen[vm.nhanDen.length - 1] : undefined
   const choDanh = !v.nguoiDuocDanh() // lượt người khác / bi lăn / tấm câu: thanh lực + bánh xe mờ
   const thanhLuc = <ThanhLuc dk={dkc} tat={choDanh} />
   const nutMat = <button type="button" className="bia-nut-kinh bia-nut-tron bia-nut-mat" aria-pressed={luonMT} onClick={() => setLuonMT(!luonMT)}
