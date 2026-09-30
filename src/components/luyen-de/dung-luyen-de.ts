@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { taoKhoGio, useMocGio, type KhoGio } from '../../lib/dong-ho-thi'
 import { layCauHinhMayChu, xongNapDiaChi } from '../../lib/may-chu-moi'
+import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import type { PublicExamBank, TeacherExamSource } from '../../data/examContent'
 
 export type PaperLuyenDe = {
@@ -158,6 +159,8 @@ export function useLuyenDe(sbd: string, token: string | undefined) {
     [paper?.id, dangLam, paper?.deadline],
   )
   const mocGio = useMocGio(khoGio)
+  // Đang trong ải/chặng/bài ⇒ app KHÔNG tự tải lại vì bản mới (quét ổn định 30/09, như Bi-a #95): bản mới chờ tới lúc em rời màn.
+  useEffect(() => (dangLam ? giuTrangKhongTaiLai() : undefined), [dangLam])
   // Hết giờ (giây làm tròn lên về 0 ⇔ còn ≤ 0) ⇒ tự nộp; nộp hỏng thì thử lại mỗi giây như bản cũ.
   const hetGio = mocGio === 'het'
   useEffect(() => {
