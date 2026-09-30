@@ -7,6 +7,7 @@ import { KetNoiBan, type GoiPhong, type TrangThaiNoi } from './ket-noi'
 import ManChoi from './ManChoi'
 import PhongCho, { type PhongCK } from './PhongCho'
 import type { GoiTT, VanMang } from './dieu-khien-mang'
+import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 
 export interface BanOnlineProps { token: string; hoTen: string; vao: VeVaoBan; conTran: number; onVe: () => void }
 const KHOA_XEP = (van: string) => `bia-xep:${van}`
@@ -28,6 +29,13 @@ export default function BanOnline({ token, hoTen, vao, conTran, onVe }: BanOnlin
   const choRef = useRef<GoiPhong[]>([])
   const daXep = useRef(false)
   const dauRef = useRef<GoiTT | null>(null)
+  useEffect(() => giuTrangKhongTaiLai(), []) // phòng chờ + ván online: app không tự tải lại vì bản mới (30/09)
+  // Mất mạng lâu (trạng thái 'mat') ⇒ có mạng lại / quay lại app thì TỰ nối lại đúng bàn bằng vé cũ (trước chỉ có nút "Nối lại").
+  useEffect(() => {
+    const thu = () => { const kn = knRef.current; if (kn && kn.trangThai === 'mat' && (typeof document === 'undefined' || document.visibilityState !== 'hidden')) kn.noiLai() }
+    window.addEventListener('online', thu); document.addEventListener('visibilitychange', thu)
+    return () => { window.removeEventListener('online', thu); document.removeEventListener('visibilitychange', thu) }
+  }, [])
 
   useEffect(() => {
     try { sessionStorage.setItem(KHOA_BAN_DANG, JSON.stringify(vao)) } catch { /* bỏ qua */ }

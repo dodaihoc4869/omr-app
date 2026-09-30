@@ -19,7 +19,7 @@ import { ELO_DAU, type CauBi } from '../../src/game/bi-a/tran'
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
 
-export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van', 'bia-tao-ban', 'bia-vao-ban', 'bia-moi', 'bia-loi-moi', 'bia-tra-loi-moi', 'bia-tra-loi'])
+export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van', 'bia-tao-ban', 'bia-vao-ban', 'bia-moi', 'bia-loi-moi', 'bia-tra-loi-moi', 'bia-tra-loi', 'bia-giu-ban'])
 /** Khoá cờ riêng (không nhét vào `game_hoa_2` vì `coLuu` của nó ghi đè đúng 3 trường). Giá trị `{bat, lop[], sbd[]}`. */
 export const KHOA_CO_BIA = 'bi_a'
 export const TI_LE_TRAN_BIA = 0.4
@@ -137,14 +137,19 @@ interface BoiCanh {
   ungDoan: string[]
   ungDao: string[]
 }
-async function boiCanh(env: Env, sbd: string, nowMs: number): Promise<BoiCanh> {
+/**
+ * `chiDaTraLoi` (Sảnh Bi-a, cửa trên Sảnh Bát Linh — sửa lỗi 30/09 "vào bàn, chưa trả lời câu nào, thoát ra ⇒ 18 thành 10"): số "còn" CHỈ trừ câu ĐÃ
+ * trả lời; câu còn nằm trên bàn Bi-a mở của chính em KHÔNG trừ và không chặn — vào bàn mới (`xepBan`, `chiTraLoi`, `xepBanOnline`) luôn đóng bàn cũ trước
+ * (`dongVanCu`, G8) nên các câu ấy về lại đúng thứ tự kế hoạch. Mặc định (trong ván: `doiCau`) vẫn tính câu đang giữ để không vượt trần.
+ */
+async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: boolean } = {}): Promise<BoiCanh> {
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   const phan = phanCua(kh)
   // Câu trả lời trong phiên Bi-a hôm nay (mỗi câu tính một lần).
   const da = await env.DB.prepare(`SELECT DISTINCT a.qid AS qid FROM game_v2_attempt a JOIN game_v2_session s ON s.id = a.session AND s.sbd = a.sbd
       WHERE a.sbd = ? AND a.created_at >= ? AND json_extract(s.json,'$.bia') = 1`).bind(sbd, dauNgayVn(kh.ngay)).all<Row>().catch(() => ({ results: [] as Row[] }))
-  // Câu đang nằm trên bàn Bi-a còn mở (kể cả bàn đang chơi) mà chưa trả lời: đã giữ chỗ trong trần.
-  const giuBia = await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
+  // Câu đang nằm trên bàn Bi-a còn mở (kể cả bàn đang chơi) mà chưa trả lời: đã giữ chỗ trong trần (trừ khi chỉ đếm câu đã trả lời).
+  const giuBia = o.chiDaTraLoi ? new Set<string>() : await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
   let dDoan = 0, dDao = 0
   const dem = (qid: string) => { const p = phan(qid); if (p === 'doan') dDoan++; else if (p === 'dao') dDao++ }
   for (const x of da.results ?? []) dem(str(x.qid))
@@ -203,6 +208,7 @@ export async function biaAction(env: Env, sbd: string, action: string, b: Row, n
   if (action === 'bia-loi-moi') return loiMoi(env, sbd, b, nowMs)
   if (action === 'bia-tra-loi-moi') return traLoiMoi(env, sbd, b, nowMs)
   if (action === 'bia-tra-loi') return chiTraLoi(env, sbd, b, nowMs)
+  if (action === 'bia-giu-ban') return giuBan(env, sbd, b, nowMs)
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
@@ -214,7 +220,7 @@ async function demGiaoHuuHomNay(env: Env, sbd: string, ngay: string): Promise<nu
 
 /** Tóm tắt cho màn Sảnh Bi-a (và cửa trên Sảnh Bát Linh). */
 async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
-  const c = await boiCanh(env, sbd, nowMs)
+  const c = await boiCanh(env, sbd, nowMs, { chiDaTraLoi: true })
   const { kh, hs, tran } = c
   const conKeHoach = kh.conDao.length + kh.conDoan.length
   const coCau = Math.min(tran.conDoan, c.ungDoan.length) + Math.min(tran.conDao, c.ungDao.length)
@@ -375,6 +381,18 @@ async function doiCau(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
 
 interface GheVao { ghe: number; doi: number; ai: boolean; dung: number; sai: number; an: number; vang: number }
 const soNguyen = (v: unknown, lo: number, hi: number): number => Math.max(lo, Math.min(hi, Math.floor(Number(v) || 0)))
+
+/**
+ * "Em còn ở bàn" (30/09): màn chơi ván A.I báo mỗi 3 phút khi đang hiện ⇒ ghi `$.hoatDong` (ms) vào phiên Bi-a còn mở của em. Máy chủ chỉ nhả câu của bàn
+ * KHÔNG hoạt động quá `HAN_GIU_BAN_BIA_MS` (nhaCauBiaChoDaoDoan) — bàn đang chơi dài bao lâu cũng không bị đóng. Một lệnh ghi, không đọc.
+ */
+async function giuBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const id = str(b.session)
+  if (!id) return { ok: true, conMo: false }
+  const r = await env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.hoatDong', ?) WHERE id = ? AND sbd = ? AND json_extract(json,'$.bia') = 1 AND COALESCE(json_extract(json,'$.dong'),0) = 0`)
+    .bind(nowMs, id, sbd).run()
+  return { ok: true, conMo: Number(r.meta?.changes ?? 0) > 0 }
+}
 
 /** Kết thúc ván: ghi `bi_a_van` + `bi_a_ghe`, đóng phiên (câu chưa trả lời tự về kế hoạch). Số câu đúng/sai của em lấy từ `game_v2_attempt` (máy chủ), không tin máy. */
 async function ketVan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {

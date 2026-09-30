@@ -332,7 +332,7 @@ describe('Bi-a — Trả lời câu hỏi (không cần chơi, thầy lệnh 29/
     const nay = Date.now()
     const tranTruoc = ((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con
     const r = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
-    expect(((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con).toBeLessThan(tranTruoc) // đang giữ chỗ
+    expect(((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con).toBe(tranTruoc) // 30/09 (ảnh 18 → 10): Sảnh CHỈ trừ câu đã trả lời, câu đang ở bàn không trừ
     expect(await biaAction(env, 'S1', 'bia-tra-loi', { dong: true, session: r.session }, nay)).toMatchObject({ ok: true, dong: true })
     const phien = JSON.parse((d.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(String(r.session)) as { json: string }).json)
     expect(phien.dong).toBe(1)

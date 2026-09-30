@@ -109,3 +109,9 @@ Phòng → máy em: `phong {toi, phong}` · `bat_dau {ghe, veGhe}` · `tt {toi, 
 - Chấm: lệnh `answer` chung (`assisted:true` khi em bấm Hỏi thầy trước khi chốt) ⇒ sổ `su_kien_hoc` nguồn Bi-a, EXP v5 (`expCau`), câu đã trả lời tính vào trần và không lên bàn bi-a hôm đó.
 - `bia-tra-loi {dong:true, session}` ⇒ đóng đúng phiên chỉ-trả-lời đó (em rời màn: câu chưa làm về kế hoạch ngay).
 - Luôn bật Mắt thần: công tắc theo máy (`localStorage` `bia_luon_mat_than`). Ván A.I: không trừ `matThan`. Phòng đấu: gói `cu` kèm `giuMT:true` (chỉ ghế người đang đánh) ⇒ `apCu` không trừ Mắt thần của ghế đó; luật/điểm/EXP không đổi.
+
+## Giữ bàn theo hoạt động + Sảnh chỉ trừ câu đã trả lời — sửa 30/09 ("Bi a đang chơi thoát luôn", Sảnh 18 → 10)
+- `POST /game-v2/bia-giu-ban { session }` (cổng `bia-*` chung) ⇒ `{ ok, conMo }`: ghi `$.hoatDong` (ms) vào phiên Bi-a CÒN MỞ của em; phiên đã đóng / không phải của em ⇒ `conMo:false`. Màn chơi ván A.I gọi mỗi 3 phút khi đang hiện (hẹn giờ nối tiếp; app ẩn thì thôi).
+- Đảo/Đoàn (`nhaCauBiaChoDaoDoan`) chỉ đóng bàn Bi-a KHÔNG hoạt động quá `HAN_GIU_BAN_BIA_MS` = 15 phút (hoạt động = lớn nhất của giờ tạo, `$.hoatDong`, lần trả lời gần nhất). Trước: đóng mọi bàn tạo quá 30 phút ⇒ ván dài đang chơi bị đóng.
+- `bia-sanh` / phần `bia` của `hoa2-sanh`: `tran.con` CHỈ trừ câu ĐÃ trả lời hôm nay; câu còn nằm trên bàn mở của em không trừ, không chặn (vào bàn mới luôn đóng bàn cũ trước — G8 — nên câu về lại đúng thứ tự kế hoạch, Câu chốt cũ vẫn là Câu chốt). `bia-doi-cau` trong ván vẫn tính câu đang giữ để không vượt trần.
+- Máy em: đang ở màn chơi / phòng online / "Trả lời câu hỏi" thì app KHÔNG tự tải lại vì bản mới (`giuTrangKhongTaiLai`, src/lib/cap-nhat-app.ts); rời màn thì bản mới vào.
