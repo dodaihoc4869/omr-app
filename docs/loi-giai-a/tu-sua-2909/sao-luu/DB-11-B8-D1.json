@@ -568,5 +568,65 @@
    "nguonDe": "DH-11-C2-B5",
    "nguonCau": "III-35"
   }
+ },
+ "DB-11-B8-D1-III-108": {
+  "luc": "2026-09-30T04:18:50.080Z",
+  "cau": {
+   "phan": "III",
+   "so": 108,
+   "de": "Đặt hai cốc (A) và (B) có khối lượng bằng nhau lên đĩa cân thấy cân thăng bằng. Cho vào cốc (A) 102 gam AgNO₃ dạng rắn; cốc (B) 124,2 gam K₂CO₃ dạng rắn.\nThêm 100 gam dung dịch HCl 29,2% vào cốc (A); 100 gam dung dịch H₂SO₄ 24,5% vào cốc (B).\nPhải thêm bao nhiêu gam nước vào cốc (A)(hay cốc (B)) để cân trở lại thăng bằng?",
+   "dap_an": "11,2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "Cốc A không sinh khí nên nặng 202 gam. Cốc B có H₂SO₄ hết trước, sinh 0,25 mol CO₂ tức 11 gam bay đi, còn 213,2 gam. Chênh lệch 11,2 gam nên thêm 11,2 gam nước vào cốc A.",
+    "buoc": [
+     "Cốc A: AgNO₃ + HCl → AgCl↓ + HNO₃, không có khí nên khối lượng là 102 + 100 = 202 gam.",
+     "Cốc B: n(K₂CO₃) = 124,2 : 138 = 0,9 mol; n(H₂SO₄) = 24,5 : 98 = 0,25 mol.",
+     "H₂SO₄ hết nên n(CO₂) = 0,25 mol, tức 11 gam khí bay đi.",
+     "Khối lượng cốc B = 124,2 + 100 − 11 = 213,2 gam.",
+     "Phải thêm 213,2 − 202 = 11,2 gam nước vào cốc A."
+    ],
+    "ket_qua": "11,2",
+    "dap_an_de": "11,2",
+    "dap_an_tu_giai": "11,2",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Câu cân bằng khối lượng hai cốc sau phản ứng có khí thoát ra.",
+    "bay": "Cốc A không có khí thoát ra nên giữ nguyên khối lượng; chỉ cốc B mất khối lượng do CO₂ bay đi."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SULFURIC_ACID.TINH_KHOI_LUONG",
+    "ten": "Sulfuric acid, muối sulfate và oleum — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D1",
+    "ten": "Tính acid của sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   },
+   "nguonDe": "DH-11-C2-B8",
+   "nguonCau": "III-27"
+  }
  }
 }

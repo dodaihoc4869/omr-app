@@ -78,5 +78,230 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "12-C3-B9-D2-II-25": {
+  "luc": "2026-09-30T04:17:23.551Z",
+  "cau": {
+   "phan": "II",
+   "so": 25,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Kết quả phân tích nguyên tố trong phân tử một dipeptide X như sau: %C = 36,36%; %H = 6,06%; %N = 21,21% (về khối lượng); còn lại là oxygen. Từ phổ khối lượng, xác định được phân tử khối của X bằng 132.",
+   "y": {
+    "a": "Công thức phân tử của X là C₄H₈O₃N₂.",
+    "b": "Công thức cấu tạo của X là Gly-Gly.",
+    "c": "Dung dịch của X có môi trường acid.",
+    "d": "Khi nhỏ dung dịch X vào dung dịch acid HNO₂ ở khoảng −5 °C thấy có khí không màu bay ra."
+   },
+   "dap_an": "DDSD",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Từ %C, %H, %N và M = 132 suy ra C₄H₈O₃N₂, ứng với Gly-Gly; phân tử chỉ có 1 -NH₂ và 1 -COOH nên dung dịch gần trung tính, còn -NH₂ đầu N là amine bậc I nên với HNO₂ giải phóng khí N₂.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: C = 132·36,36%/12 = 4; H = 132·6,06%/1 = 8; N = 132·21,21%/14 = 2; O = (132 − 48 − 8 − 28)/16 = 3 → công thức phân tử C₄H₈O₃N₂."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: dipeptide có M = 132 và công thức C₄H₈O₃N₂ chính là Gly-Gly, H₂N-CH₂-CO-NH-CH₂-COOH."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: X chỉ có 1 nhóm -COOH và 1 nhóm -NH₂, số nhóm acid bằng số nhóm base nên dung dịch gần trung tính, không có môi trường acid."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -NH₂ đầu N là amine bậc I, tác dụng với HNO₂ cho alcohol và giải phóng khí N₂ không màu."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi DDSS, thầy quyết bỏ. Chỉ lệch ý d. Máy chấm Đ (nhóm -NH2 đầu N là amine bậc I, với HNO₂ cho N₂). Đề chấm S, có lẽ vì điều kiện \"−5 °C\": ở nhiệt độ âm dung dịch đóng băng / phản ứng không xảy ra, hoặc tác giả coi 0 – 5 °C chỉ dành cho arylamine tạo muối diazonium. Thầy quyết. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng dạng suy công thức peptide từ phần trăm nguyên tố và phổ MS ở câu 19 phần II.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B9-P2",
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "12-C3-B9-D2-II-22": {
+  "luc": "2026-09-30T04:17:23.551Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Tính chất hóa học của các hợp chất (1) CH₃CH₂CH₂-NH₂; (2) HOOC-CH₂CH₂-NH₂; (3) Gly-Gly.",
+   "y": {
+    "a": "Đều có phản ứng với dung dịch HCl, sinh ra muối.",
+    "b": "Có 1 chất tham gia phản ứng thuỷ phân.",
+    "c": "Chất số (3) có thể trùng ngưng tạo thành peptide.",
+    "d": "Chất số (1) tạo phức với Cu(OH)₂, tạo thành dung dịch có màu xanh."
+   },
+   "dap_an": "DDDD",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Cả ba chất đều còn nhóm -NH₂ nên tạo muối với HCl; chỉ (3) có liên kết peptide để thuỷ phân; (3) vẫn còn -NH₂ và -COOH tự do nên trùng ngưng tiếp được; alkylamine tạo phức xanh với Cu(OH)₂.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -NH₂ của cả ba chất nhận H⁺ của HCl tạo muối ammonium tương ứng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: chỉ Gly-Gly có liên kết peptide -CO-NH- bị thuỷ phân cho glycine; (1) và (2) không có nhóm nào thuỷ phân được."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: Gly-Gly vẫn còn -NH₂ ở đầu N và -COOH ở đầu C nên tiếp tục trùng ngưng tách H₂O, kéo dài mạch thành polypeptide."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: 4CH₃CH₂CH₂NH₂ + Cu(OH)₂ → [Cu(CH₃CH₂CH₂NH₂)₄](OH)₂, dung dịch phức có màu xanh lam."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi DDSD, thầy quyết bỏ. Ý c mơ hồ: Gly-Gly (chất 3) còn -NH2 và -COOH tự do nên về nguyên tắc trùng ngưng tiếp cho polypeptide (máy chấm Đ). Nếu tác giả coi \"trùng ngưng tạo peptide\" chỉ dành cho amino acid thì c là S (khi đó đáp án DDSD). Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng phản ứng với HCl ở câu 25, thuỷ phân ở câu 26 và tạo phức với Cu(OH)₂ ở bài amine.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B9-P2",
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "12-C3-B9-D2-II-21": {
+  "luc": "2026-09-30T04:17:23.551Z",
+  "cau": {
+   "phan": "II",
+   "so": 21,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Tính chất vật lí của các hợp chất (1) CH₃CH₂CH₂-NH₂; (2) HOOC-CH₂CH₂-NH₂; (3) Gly-Gly.",
+   "y": {
+    "a": "Có 1 chất tan kém trong nước.",
+    "b": "Ở điều kiện thường, có 1 chất là chất khí, 1 chất lỏng và 1 chất rắn.",
+    "c": "Chất có nhiệt độ nóng chảy thấp nhất là (1) và cao nhất là (3).",
+    "d": "Khả năng tan tốt trong nước của các chất là do sự phân cực mạnh trong phân tử."
+   },
+   "dap_an": "SSDD",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Cả ba chất đều phân cực mạnh nên tan tốt trong nước; (1) là chất lỏng dễ bay hơi, còn (2) và (3) tồn tại dạng ion lưỡng cực nên là chất rắn nóng chảy cao.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: propylamine, 3-aminopropanoic acid và Gly-Gly đều tạo được liên kết hydrogen với nước nên cả ba đều tan tốt, không chất nào tan kém."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: ở điều kiện thường (1) là chất lỏng (sôi khoảng 48 °C), (2) và (3) đều là chất rắn — không có chất nào là chất khí."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: (1) là amine phân tử nhỏ, chỉ có liên kết hydrogen yếu nên nóng chảy thấp nhất; (3) là dipeptide dạng ion lưỡng cực, phân tử khối lớn nhất nên nóng chảy cao nhất (khoảng 260 °C)."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: cả ba phân tử đều phân cực mạnh — amine phân cực ở nhóm -NH₂, còn (2) và (3) tồn tại dạng ion lưỡng cực — nên hút nước mạnh và tan tốt."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "SSDS",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SSDS, thầy quyết bỏ. Chỉ lệch ý d. Máy chấm Đ (ba chất đều phân cực mạnh: amine tạo liên kết hydrogen, amino acid và peptide ở dạng ion lưỡng cực). Đề chấm S, có lẽ vì tác giả coi nguyên nhân tan là liên kết hydrogen với nước / cấu tạo ion lưỡng cực chứ không phải \"phân cực trong phân tử\". Thầy quyết cách hiểu. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng tính chất vật lí của amine, amino acid và peptide đã học ở hai bài trước.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B9-P2",
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }

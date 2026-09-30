@@ -688,5 +688,169 @@
    "nguonDe": "12-KT-C2-D2",
    "nguonCau": "I-8"
   }
+ },
+ "DB-12-B4-D3-II-107": {
+  "luc": "2026-09-30T04:17:32.354Z",
+  "cau": {
+   "phan": "II",
+   "so": 107,
+   "bang": null,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho khoảng 5 mL dung dịch hồ tinh bột 1% vào ống nghiệm. Sau đó thêm khoảng 1 mL dung dịch HCl 1 M vào, lắc đều.\nBước 2: Đặt ống nghiệm trong một cốc thuỷ tinh chứa nước nóng, đun cách thuỷ trong 10 phút. Sau đó để nguội.\nBước 3: Thêm từ từ NaHCO₃ vào ống nghiệm đến khi ngừng sủi bọt khí.\nBước 4: Cho khoảng 2 mL dung dịch thu được vào ống nghiệm chứa Cu(OH)₂ (được điều chế bằng cách cho 0,5 mL dung dịch CuSO₄ 5% vào 2 mL dung dịch NaOH 10%, lắc nhẹ). Sau đó đặt ống nghiệm trong cốc thuỷ tinh chứa nước nóng khoảng 5 phút.",
+   "y": {
+    "a": "Sau bước 1, thu được dung dịch đồng nhất.",
+    "b": "Trong bước 2, đã xảy ra phản ứng thủy phân tinh bột tạo thành glucose.",
+    "c": "Trong bước 3, NaHCO₃ được thêm vào nhằm mục đích làm tăng tốc độ phản ứng thủy phân ở bước 2.",
+    "d": "Sau bước 4, thu được dung dịch màu xanh lam."
+   },
+   "dap_an": "DDSS",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Hồ tinh bột loãng đun với HCl bị thuỷ phân thành glucose, NaHCO₃ ở bước 3 chỉ để trung hoà acid dư, và glucose khử Cu(OH)₂ khi đun nóng cho kết tủa Cu₂O đỏ gạch.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hồ tinh bột 1% rất loãng, thêm HCl 1 M và lắc đều vẫn thu được dung dịch đồng nhất."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: đun cách thuỷ với HCl, tinh bột bị thuỷ phân thành glucose."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: bước 3 thực hiện sau khi đã thuỷ phân xong nên không thể tăng tốc độ phản ứng ở bước 2; NaHCO₃ chỉ để trung hoà HCl dư, tránh hoà tan Cu(OH)₂ ở bước 4."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: đun nóng, glucose khử Cu(OH)₂ tạo kết tủa Cu₂O đỏ gạch chứ không còn dung dịch màu xanh lam."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SDSS, thầy quyết bỏ. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "NaHCO₃ chỉ để trung hoà acid dư trước khi thử Cu(OH)₂; đun nóng cho Cu₂O đỏ gạch chứ không phải dung dịch xanh lam.",
+    "bay": "Cho rằng NaHCO₃ làm phản ứng thuỷ phân nhanh hơn, hoặc chờ màu xanh lam khi đã đun nóng.",
+    "dk": [
+     "bay"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU",
+    "ten": "Phản ứng màu — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B7-D1",
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D2",
+   "nguonCau": "II-32"
+  }
+ },
+ "DB-12-B4-D3-II-127": {
+  "luc": "2026-09-30T04:17:32.354Z",
+  "cau": {
+   "phan": "II",
+   "so": 127,
+   "bang": null,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho khoảng 5 mL dung dịch hồ tinh bột 1% vào ống nghiệm. Sau đó thêm khoảng 1 mL dung dịch HCl 1 M vào, lắc đều.\nBước 2: Đặt ống nghiệm trong một cốc thuỷ tinh chứa nước nóng, đun cách thuỷ trong 10 phút. Sau đó để nguội.\nBước 3: Thêm từ từ NaHCO₃ vào ống nghiệm đến khi ngừng sủi bọt khí.\nBước 4: Cho khoảng 2 mL dung dịch thu được vào ống nghiệm chứa Cu(OH)₂ (được điều chế bằng cách cho 0,5 mL dung dịch CuSO₄ 5% vào 2 mL dung dịch NaOH 10%, lắc nhẹ). Sau đó đặt ống nghiệm trong cốc thuỷ tinh chứa nước nóng khoảng 5 phút.",
+   "y": {
+    "a": "Sau bước 1, thu được dung dịch đồng nhất.",
+    "b": "Trong bước 2, đã xảy ra phản ứng thủy phân tinh bột tạo thành glucose.",
+    "c": "Trong bước 3, NaHCO₃ được thêm vào nhằm mục đích làm tăng tốc độ phản ứng thủy phân ở bước 2.",
+    "d": "Sau bước 4, thu được dung dịch màu xanh lam."
+   },
+   "dap_an": "DDSS",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Tinh bột thuỷ phân trong HCl nóng cho glucose; NaHCO₃ chỉ trung hoà acid dư; đun nóng thì glucose khử Cu(OH)₂ thành Cu₂O đỏ gạch.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hồ tinh bột 1% rất loãng, thêm 1 mL HCl rồi lắc đều vẫn thu được dung dịch đồng nhất, không tách lớp."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: đun cách thuỷ với HCl, tinh bột thuỷ phân qua dextrin, maltose rồi thành glucose."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: bước 3 làm sau khi đã thuỷ phân xong và để nguội, NaHCO₃ chỉ trung hoà HCl dư để bước 4 còn Cu(OH)₂; nó không hề tăng tốc phản ứng ở bước 2."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: đun nóng, glucose khử Cu(OH)₂ tạo kết tủa Cu₂O đỏ gạch chứ không giữ dung dịch màu xanh lam."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "DDSS",
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SDSS, thầy quyết bỏ. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "NaHCO₃ chỉ để trung hoà acid dư trước khi thử Cu(OH)₂; đun nóng cho Cu₂O đỏ gạch chứ không phải dung dịch xanh lam.",
+    "bay": "Cho rằng NaHCO₃ làm phản ứng thuỷ phân nhanh hơn, hoặc chờ màu xanh lam khi đã đun nóng.",
+    "dk": [
+     "bay"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU",
+    "ten": "Phản ứng màu — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B7-D1",
+   "nguonCau": "II-3"
+  }
  }
 }

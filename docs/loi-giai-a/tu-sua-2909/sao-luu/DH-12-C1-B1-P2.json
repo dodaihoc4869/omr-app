@@ -285,5 +285,128 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
   }
+ },
+ "DH-12-C1-B1-P2-III-11": {
+  "luc": "2026-09-30T04:17:51.042Z",
+  "cau": {
+   "phan": "III",
+   "so": 11,
+   "de": "Trong thành phần của một loại sơn có các triglyceride là triester của glycerol với linoleic acid và linolenic acid.\nCó bao nhiêu công thức cấu tạo có thể có của các triester trên?",
+   "dap_an": "6",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "loi_giai": {
+    "chot": "Xếp hai gốc acid vào ba vị trí ester của glycerol, kể cả trường hợp ba gốc cùng loại, được 6 công thức cấu tạo.",
+    "buoc": [
+     "Đặt gốc linoleate là A, gốc linolenate là B; glycerol có ba vị trí ester, trong đó vị trí 1 và vị trí 3 đối xứng nhau.",
+     "Ba gốc cùng loại: AAA và BBB, được 2 chất.",
+     "Loại hai A một B: B ở vị trí 2 hoặc ở vị trí 1 (tương đương vị trí 3), được 2 chất; loại hai B một A tương tự được 2 chất.",
+     "Tổng cộng 2 + 2 + 2 = 6 công thức cấu tạo."
+    ],
+    "ket_qua": "6",
+    "dap_an_de": "4",
+    "dap_an_tu_giai": "4",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "nen"
+    ],
+    "ly_do": "Đề yêu cầu triester của glycerol với CẢ hai acid nên loại AAA và BBB.",
+    "bay": "Cộng thêm hai triester chỉ chứa một loại acid."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
+ },
+ "DH-12-C1-B1-P2-I-56": {
+  "luc": "2026-09-30T04:17:51.042Z",
+  "cau": {
+   "phan": "I",
+   "so": 56,
+   "de": "Số đồng phân cấu tạo tối đa của triester tạo nên từ palmitic acid, oleic acid và glycerol là",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I-2.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "I-2-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 2)",
+   "pa": {
+    "A": "3.",
+    "B": "5.",
+    "C": "6.",
+    "D": "4."
+   },
+   "loi_giai": {
+    "chot": "Đếm bộ ba gốc (x₁, x₂, x₃) với hai loại gốc, coi x₁ và x₃ đổi chỗ cho nhau là một chất.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Sai: đếm thiếu, chỉ mới kể các chất có hai gốc giống nhau."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Sai: 5 là kết quả khi bỏ sót một cấu hình."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Đúng: vị trí 2 mang gốc A cho 3 chất, mang gốc B cho 3 chất — tổng 6 đồng phân cấu tạo."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Sai: 4 là số đồng phân khi chỉ xét hai gốc ở hai đầu mạch."
+     }
+    },
+    "dap_an_de": "R₁-, R₂- là các gốc acid béo palmitic, oleic",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc dính chú thích của hình ('R₁-, R₂- là các gốc acid béo palmitic, oleic' và hai công thức (R₁COO)₃C₃H₅, (R₂COO)₃C₃H₅) vào thân câu; đã cắt bỏ. Bảng đáp án của đề ghi chính dòng chú thích ấy nên không dùng đối chiếu được — đáp án dưới đây là bản máy tự giải."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đếm cấu trúc: phải dựng ra rồi đếm",
+   "dang": {
+    "ma": "ESTER.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }

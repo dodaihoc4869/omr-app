@@ -540,5 +540,57 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
   }
+ },
+ "12-C8-B26-III-9": {
+  "luc": "2026-09-30T04:17:58.135Z",
+  "cau": {
+   "phan": "III",
+   "so": 9,
+   "de": "Iron (II)sulfate thường được bảo quản ở dạng muối Mohr màu xanh nhạt có công thức: FeSO₄.(NH₄)₂SO₄.nH₂O.\nThực hiện các thí nghiệm sau:\nThí nghiệm 1: Cân 1,96g muối Mohr rồi hòa tan vào nước, sau đó định mức trong bình 50mL. Chuẩn độ 5mL dung dịch vừa pha cần dùng 5mL dung dịch KMnO₄ 0,02M trong môi trường H₂SO₄ loãng.\nXác định công thức phân tử muối Mohr.\nThí nghiệm 2: Làm lạnh 100g dung dịch muối Mohr bão hòa ở 30 °C đến nhiệt độ ổn định ở 0 °C thu được m gam muối Mohr kết tinh.\nCho độ tan của muối Mohr trong nước ở các nhiệt độ như sau: Nhiệt độ 0 10 20 30 Độ tan 17,2 31 36,4 45 Giá trị của m là bao nhiêu?",
+   "dap_an": "19,2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "TN1 cho M = 392 ⇒ n = 6. TN2: 100 g dung dịch ở 30 °C chứa 31,03 g muối và 68,97 g nước; ở 0 °C lượng nước đó chỉ giữ nổi 11,86 g muối ⇒ m = 19,2 g.",
+    "buoc": [
+     "TN1: n(KMnO₄) = 0,005 × 0,02 = 10⁻⁴ ⇒ n(Fe²⁺) = 5.10⁻⁴ mol trong 5 mL.",
+     "Trong 50 mL: 5.10⁻³ mol ⇒ M = 1,96 : 5.10⁻³ = 392 ⇒ 284 + 18n = 392 ⇒ n = 6.",
+     "TN2 ở 30 °C: S = 45 ⇒ 100 g dung dịch có 45 × 100 : 145 = 31,03 g muối và 68,97 g nước.",
+     "Kết tinh muối Mohr thì lượng nước không đổi, vẫn 68,97 g.",
+     "Ở 0 °C: muối còn tan = 17,2 × 68,97 : 100 = 11,86 g.",
+     "m = 31,03 − 11,86 = 19,17 ≈ 19,2 gam."
+    ],
+    "ket_qua": "19,2",
+    "dap_an_de": "16,6",
+    "dap_an_tu_giai": "19,2",
+    "trang_thai": "lech",
+    "ghi_chu": "Tự giải ra 19,2 g, đề ghi 16,6 g. Đề dùng độ tan KHÔNG NHẤT QUÁN: ở 30 °C lấy đúng nghĩa 45 g muối trên 100 g nước (nên ra 31 g muối trong 100 g dung dịch), nhưng ở 0 °C lại lấy 17,2 như phần trăm khối lượng DUNG DỊCH. Tính đúng thì phần nước 68,97 g chỉ giữ được 11,86 g muối, kết tinh 19,17 g. Nếu lấy 31 g đã làm tròn thì ra 19,13 g — thầy chốt giúp là để 19,2 hay 19,1. Thầy chốt 11/09: máy tự quyết, không treo cờ."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Bài ghép hai thí nghiệm: chuẩn độ tìm n rồi mới dùng độ tan để tính khối lượng kết tinh.",
+    "bay": "Độ tan là số gam muối trên 100 gam NƯỚC, không phải trên 100 gam dung dịch — dùng nhầm là lệch đáp số ngay."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "PHUC_CHAT.CHUAN_DO.TINH_KHOI_LUONG",
+    "ten": "Chuẩn độ thuốc tím — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "de_goc": "12-TO-13",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề PHUC_CHAT"
+  }
  }
 }

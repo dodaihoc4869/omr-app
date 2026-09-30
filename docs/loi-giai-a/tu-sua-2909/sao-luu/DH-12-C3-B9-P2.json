@@ -757,5 +757,79 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "DH-12-C3-B9-P2-II-18": {
+  "luc": "2026-09-30T04:18:20.194Z",
+  "cau": {
+   "phan": "II",
+   "so": 18,
+   "de": "Kết quả phân tích nguyên tố trong phân tử một dipeptide X như sau: %C = 36,36%; %H = 6,06%; %N = 21,21% (về khối lượng); còn lại là oxygen. Từ phổ khối lượng, xác định được phân tử khối của X bằng 132.",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "bai": "Bài 9. Peptide (P2)",
+   "y": {
+    "a": "Công thức phân tử của X là C₄H₈O₃N₂.",
+    "b": "Công thức cấu tạo của X là Gly-Gly.",
+    "c": "Dung dịch của X có môi trường acid.",
+    "d": "Khi nhỏ dung dịch X vào dung dịch acid HNO₂ ở khoảng -5 °C thấy có khí không màu bay ra."
+   },
+   "loi_giai": {
+    "chot": "Phần trăm khối lượng cùng M = 132 cho C₄H₈N₂O₃, tức Gly-Gly: dung dịch gần trung tính nhưng nhóm -NH₂ bậc một tự do vẫn cho khí N₂ với HNO₂.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: %O = 100 − 36,36 − 6,06 − 21,21 = 36,37; số C = 132·36,36% : 12 = 4; số H = 132·6,06% : 1 = 8; số N = 132·21,21% : 14 = 2; số O = 132·36,37% : 16 = 3, được C₄H₈O₃N₂."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: X là dipeptide nên M = 2·75 − 18 = 132 ứng với hai gốc glycine, công thức cấu tạo là Gly-Gly."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: Gly-Gly còn đúng một nhóm -NH₂ và một nhóm -COOH, hai tính chất bù nhau nên dung dịch gần trung tính, quỳ tím không đổi màu."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -NH₂ bậc một mạch hở đầu N tác dụng HNO₂ tạo muối diazonium rất kém bền, phân huỷ ngay cả ở nhiệt độ thấp, giải phóng khí N₂ không màu."
+     }
+    },
+    "dap_an_de": "DDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc"
+    ],
+    "ly_do": "Nhóm -NH₂ đầu N đã trung hoà nhóm -COOH đầu C.",
+    "bay": "Cho rằng peptide có nhóm -COOH nên dung dịch có tính acid."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "đề cho dữ kiện định lượng phải giải ra",
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D1",
+    "ten": "Thiết lập công thức của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }

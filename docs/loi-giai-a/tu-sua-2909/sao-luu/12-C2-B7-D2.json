@@ -1,0 +1,83 @@
+{
+ "12-C2-B7-D2-II-4": {
+  "luc": "2026-09-30T04:18:43.853Z",
+  "cau": {
+   "phan": "II",
+   "so": 4,
+   "bang": null,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc):\n[C₆H₇O₂(OH)₃]ₙ + 3nHNO₃ →(H₂SO₄ đặc, t°) [C₆H₇O₂(ONO₂)₃]ₙ + 3nH₂O.\nKhi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+   "y": {
+    "a": "Trong phản ứng trên các nhóm -OH trong cellulose đã được thế bởi các nhóm -ONO₂.",
+    "b": "Công thức phân tử của mỗi mắt xích trong cellulose trinitrate là C₆H₇O₁₁N₃.",
+    "c": "Tỉ lệ mol của O₂ : N₂ trong phản ứng đốt cháy cellulose trinitrate là 2 : 1.",
+    "d": "Nguyên nhân phản ứng tỏa nhiệt mạnh khi cháy là do sự tạo thành khí N₂."
+   },
+   "dap_an": "DDSD",
+   "hinh": null,
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Mỗi mắt xích C₆H₇O₂(OH)₃ có 3 nhóm -OH chuyển thành -ONO₂ cho C₆H₇O₁₁N₃; đốt cháy cần 2,25 mol O₂ sinh 1,5 mol N₂ nên tỉ lệ là 3 : 2, không phải 2 : 1.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: đối chiếu [C₆H₇O₂(OH)₃]n với sản phẩm [C₆H₇O₂(ONO₂)₃]n thấy cả 3 nhóm -OH của mỗi mắt xích đã được thế bằng -ONO₂."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: gộp C₆H₇O₂(ONO₂)₃ được C₆H₇O₁₁N₃ (M = 297)."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: C₆H₇O₁₁N₃ + 2,25O₂ → 6CO₂ + 3,5H₂O + 1,5N₂, cân oxygen 11 + 2x = 12 + 3,5 → x = 2,25; tỉ lệ O₂ : N₂ = 2,25 : 1,5 = 3 : 2."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: liên kết ba N≡N rất bền, tạo N₂ cùng CO₂ giải phóng lượng nhiệt lớn nên phản ứng toả nhiệt mạnh, gây nổ."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "DDSD",
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SDSD, thầy quyết bỏ. Chỉ lệch ý a. Máy: sản phẩm [C₆H₇O₂(ONO₂)₃]n nên \"-OH được thế bởi -ONO2\" đúng về mặt cấu tạo. Đề chấm S, có lẽ theo cách nói ester hoá: chỉ H của -OH bị thay bằng -NO2 (O của cellulose vẫn giữ). Thầy quyết cách hiểu. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Suy mắt xích C₆H₇O₁₁N₃ từ phương trình rồi cân bằng phản ứng cháy để lấy tỉ lệ mol O₂ trên N₂.",
+    "bay": "Lấy tỉ lệ 2 trên 1 theo cảm tính mà không cân bằng phương trình đốt cháy.",
+    "dk": [
+     "buoc",
+     "nen"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 6. Tinh bột và cellulose",
+   "dangBai": {
+    "ma": "DB-12-B6-D2",
+    "ten": "Phản ứng với nitric acid của cellulose",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

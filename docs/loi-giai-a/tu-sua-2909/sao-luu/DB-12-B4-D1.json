@@ -637,5 +637,66 @@
    "nguonDe": "DH-12-C2-B4",
    "nguonCau": "I-87"
   }
+ },
+ "DB-12-B4-D1-III-76": {
+  "luc": "2026-09-30T04:17:43.845Z",
+  "cau": {
+   "phan": "III",
+   "so": 76,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:\n(1) Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát.\nĐun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.\n(2) Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)₂ trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan dần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nghiệm, thấy có kết tủa màu nâu đỏ.\n(3) Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.\n(4) Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt acid HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống nghiệm.\nLiệt kê các thí nghiệm mô tả đúng thành dãy số theo thứ tự tăng dần (Ví dụ: 124, 23,…)",
+   "dap_an": "14",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Tinh bột tạo hồ trong nước nóng; glucose khử Cu(OH)₂ cho kết tủa Cu₂O đỏ gạch (không phải nâu đỏ); saccharose không tráng bạc, chỉ sản phẩm thuỷ phân của nó mới tráng bạc.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "(1) đúng: tinh bột lắng trong nước lạnh, đun nóng tạo hồ tinh bột sệt",
+     "(2) sai: kết tủa Cu₂O có màu đỏ gạch, không phải nâu đỏ",
+     "(3) sai: saccharose không có nhóm -CHO, không tạo Ag",
+     "(4) đúng: thuỷ phân trong HCl cho glucose và fructose, tráng bạc được",
+     "Thay số: Các thí nghiệm đúng: 1 và 4"
+    ],
+    "ket_qua": "14",
+    "dap_an_de": "124",
+    "dap_an_tu_giai": "14",
+    "trang_thai": "lech",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi 124, thầy quyết bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Kết tủa Cu₂O có màu đỏ gạch chứ không phải nâu đỏ; saccharose không tự tráng bạc được.",
+    "bay": "Chấp nhận mô tả nâu đỏ vì nghe gần giống đỏ gạch.",
+    "dk": [
+     "bay"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.DEM_DONG_PHAN",
+    "ten": "Phản ứng tráng bạc — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D2",
+   "nguonCau": "III-20"
+  }
  }
 }

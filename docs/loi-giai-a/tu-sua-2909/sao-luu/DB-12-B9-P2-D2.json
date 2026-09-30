@@ -761,5 +761,82 @@
    "nguonDe": "DH-12-C3-B9-P2",
    "nguonCau": "III-31"
   }
+ },
+ "DB-12-B9-P2-D2-II-44": {
+  "luc": "2026-09-30T04:18:23.957Z",
+  "cau": {
+   "phan": "II",
+   "so": 44,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Tính chất hóa học của các hợp chất (1) CH₃CH₂CH₂-NH₂; (2) HOOC-CH₂CH₂-NH₂; (3) Gly-Gly.",
+   "y": {
+    "a": "Đều có phản ứng với dung dịch HCl, sinh ra muối.",
+    "b": "Có 1 chất tham gia phản ứng thuỷ phân.",
+    "c": "Chất số (3) có thể trùng ngưng tạo thành peptide.",
+    "d": "Chất số (1) tạo phức với Cu(OH)₂, tạo thành dung dịch có màu xanh."
+   },
+   "dap_an": "DDDD",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Cả ba chất đều còn nhóm -NH₂ nên tạo muối với HCl; chỉ (3) có liên kết peptide để thuỷ phân; (3) vẫn còn -NH₂ và -COOH tự do nên trùng ngưng tiếp được; alkylamine tạo phức xanh với Cu(OH)₂.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: nhóm -NH₂ của cả ba chất nhận H⁺ của HCl tạo muối ammonium tương ứng."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: chỉ Gly-Gly có liên kết peptide -CO-NH- bị thuỷ phân cho glycine; (1) và (2) không có nhóm nào thuỷ phân được."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: Gly-Gly vẫn còn -NH₂ ở đầu N và -COOH ở đầu C nên tiếp tục trùng ngưng tách H₂O, kéo dài mạch thành polypeptide."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: 4CH₃CH₂CH₂NH₂ + Cu(OH)₂ → [Cu(CH₃CH₂CH₂NH₂)₄](OH)₂, dung dịch phức có màu xanh lam."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDDD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi DDSD, thầy quyết bỏ. Ý c mơ hồ: Gly-Gly (chất 3) còn -NH2 và -COOH tự do nên về nguyên tắc trùng ngưng tiếp cho polypeptide (máy chấm Đ). Nếu tác giả coi \"trùng ngưng tạo peptide\" chỉ dành cho amino acid thì c là S (khi đó đáp án DDSD). Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng phản ứng với HCl ở câu 25, thuỷ phân ở câu 26 và tạo phức với Cu(OH)₂ ở bài amine.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU",
+    "ten": "Peptide — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B9-P2",
+   "dangBai": {
+    "ma": "DB-12-B9-P2-D2",
+    "ten": "Phản ứng thủy phân của peptide",
+    "lop": "12",
+    "bai": "DB-12-B9-P2",
+    "tenBai": "Peptide (P2)",
+    "soBai": 9,
+    "phanBai": 2,
+    "chuong": "C3 - Hợp chất chứa N"
+   },
+   "nguonDe": "12-C3-B9-D2",
+   "nguonCau": "II-22"
+  }
  }
 }

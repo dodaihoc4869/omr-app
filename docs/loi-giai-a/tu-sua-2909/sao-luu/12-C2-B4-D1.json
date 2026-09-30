@@ -74,5 +74,96 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "12-C2-B4-D1-I-61": {
+  "luc": "2026-09-30T04:18:37.968Z",
+  "cau": {
+   "phan": "I",
+   "so": 61,
+   "de": "Trong quá trình lên men một carbohydrate, biểu đồ nào dưới đây thể hiện tốt nhất vai trò xúc tác của enzyme cho sự hình thành sản phẩm [P] theo thời gian?",
+   "dap_an": "C",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I-83-0.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "I-83-1.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "I-83-2.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "I-83-3.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": ".",
+    "B": ".",
+    "C": ".",
+    "D": "."
+   },
+   "loi_giai": {
+    "chot": "Phản ứng có enzyme xúc tác: sản phẩm tăng nhanh lúc đầu rồi chậm dần và đạt giá trị không đổi khi chất phản ứng cạn.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đường thẳng tăng mãi: tốc độ không đổi và sản phẩm tăng vô hạn, không đúng vì chất phản ứng có hạn."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "[P] không đổi rồi mới tăng: không mô tả xúc tác enzyme."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "Tăng nhanh rồi tiến tới giá trị tối đa khi hết cơ chất, đúng dạng động học enzyme."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Tăng chậm rồi nhanh dần: ngược với thực tế tốc độ giảm khi cơ chất cạn."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi A, thầy quyết bỏ. Rà soát 11/09/2026: chốt lại đáp án và lời giải."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Chọn đồ thị tăng nhanh rồi bão hoà, thuộc kiến thức động học chung, không riêng phần carbohydrate.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.LEN_MEN.NHAN_DANG",
+    "ten": "Lên men — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B4-D2",
+    "ten": "Phản ứng lên men glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

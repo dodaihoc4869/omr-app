@@ -515,5 +515,91 @@
    "nguonDe": "DH-12-C1-B1-P1",
    "nguonCau": "II-33"
   }
+ },
+ "DB-12-B1-P1-D2-II-51": {
+  "luc": "2026-09-30T04:18:09.030Z",
+  "cau": {
+   "phan": "II",
+   "so": 51,
+   "de": "Tiến hành thí nghiệm điều chế isoamyl acetate (có mùi chuối chín) theo thứ tự các bước sau đây:\nBước 1. Cho 3 mL isoamyl alcohol, 4 mL acetic acid và 5 mL H₂SO₄ đặc vào bình cầu, lắc đều và đun nhẹ trong khoảng 7 – 8 phút.\nBước 2. Để nguội chất lỏng ở bình hứng, thêm 10 mL dung dịch NaCl bão hoà và cho sang phễu chiết để tách sản phẩm thu được.",
+   "dap_an": "DSDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_10.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Việc thêm dung dịch NaCl bão hoà giúp tách isoamyl acetate dễ dàng hơn.",
+    "b": "Trong phễu chiết, lớp chất lỏng phía dưới có thành phần chính là isoamyl acetate.",
+    "c": "Phản ứng điều chế isoamyl acetate trong thí nghiệm trên là phản ứng ester hoá.",
+    "d": "Vai trò của H₂SO₄ đặc là chất xúc tác để phản ứng xảy ra nhanh hơn."
+   },
+   "loi_giai": {
+    "chot": "H₂SO₄ đặc vừa là xúc tác vừa hút nước sinh ra, kéo cân bằng về phía tạo ester; nói 'là chất xúc tác' là kể thiếu vai trò.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: NaCl bão hoà làm tăng khối lượng riêng của lớp nước nên hai lớp tách rõ hơn."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: isoamyl acetate nhẹ hơn nước nên nằm ở lớp trên."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: acid tác dụng alcohol tạo ester chính là phản ứng ester hoá."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: H₂SO₄ đặc còn hút nước để chuyển dịch cân bằng, không chỉ đơn thuần là xúc tác."
+     }
+    },
+    "dap_an_de": "DSD?",
+    "dap_an_tu_giai": "DSDS",
+    "trang_thai": "lech",
+    "ghi_chu": "Khối đáp án của đề in lỗi: có hai dòng 'Đáp án:' và hai dòng 'c) Đúng', thiếu hẳn ý d. Máy tự chấm ý d là Sai vì H₂SO₄ đặc còn vai trò hút nước."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Bốn ý về thí nghiệm điều chế isoamyl acetate, ý cuối bẫy ở vai trò kép của H₂SO₄ đặc.",
+    "bay": null
+   },
+   "kienThuc": [
+    "vai trò của H₂SO₄ đặc",
+    "tách ester bằng phễu chiết"
+   ],
+   "loiThuongGap": [
+    "chỉ kể vai trò xúc tác của H₂SO₄ đặc"
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.CHON_PHAT_BIEU",
+    "ten": "Ester hoá — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "de_goc": "12-TO-06",
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "nguonDe": "12-C1-B1-D3",
+   "nguonCau": "II-11"
+  }
  }
 }

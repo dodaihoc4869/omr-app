@@ -428,5 +428,292 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "12-C2-B6-D2-II-32": {
+  "luc": "2026-09-30T04:17:37.005Z",
+  "cau": {
+   "phan": "II",
+   "so": 32,
+   "bang": null,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho khoảng 5 mL dung dịch hồ tinh bột 1% vào ống nghiệm. Sau đó thêm khoảng 1 mL dung dịch HCl 1 M vào, lắc đều.\nBước 2: Đặt ống nghiệm trong một cốc thuỷ tinh chứa nước nóng, đun cách thuỷ trong 10 phút. Sau đó để nguội.\nBước 3: Thêm từ từ NaHCO₃ vào ống nghiệm đến khi ngừng sủi bọt khí.\nBước 4: Cho khoảng 2 mL dung dịch thu được vào ống nghiệm chứa Cu(OH)₂ (được điều chế bằng cách cho 0,5 mL dung dịch CuSO₄ 5% vào 2 mL dung dịch NaOH 10%, lắc nhẹ). Sau đó đặt ống nghiệm trong cốc thuỷ tinh chứa nước nóng khoảng 5 phút.",
+   "y": {
+    "a": "Sau bước 1, thu được dung dịch đồng nhất.",
+    "b": "Trong bước 2, đã xảy ra phản ứng thủy phân tinh bột tạo thành glucose.",
+    "c": "Trong bước 3, NaHCO₃ được thêm vào nhằm mục đích làm tăng tốc độ phản ứng thủy phân ở bước 2.",
+    "d": "Sau bước 4, thu được dung dịch màu xanh lam."
+   },
+   "dap_an": "DDSS",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Hồ tinh bột loãng đun với HCl bị thuỷ phân thành glucose, NaHCO₃ ở bước 3 chỉ để trung hoà acid dư, và glucose khử Cu(OH)₂ khi đun nóng cho kết tủa Cu₂O đỏ gạch.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: hồ tinh bột 1% rất loãng, thêm HCl 1 M và lắc đều vẫn thu được dung dịch đồng nhất."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: đun cách thuỷ với HCl, tinh bột bị thuỷ phân thành glucose."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: bước 3 thực hiện sau khi đã thuỷ phân xong nên không thể tăng tốc độ phản ứng ở bước 2; NaHCO₃ chỉ để trung hoà HCl dư, tránh hoà tan Cu(OH)₂ ở bước 4."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: đun nóng, glucose khử Cu(OH)₂ tạo kết tủa Cu₂O đỏ gạch chứ không còn dung dịch màu xanh lam."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "DDSS",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SDSS, thầy quyết bỏ. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "NaHCO₃ chỉ để trung hoà acid dư trước khi thử Cu(OH)₂; đun nóng cho Cu₂O đỏ gạch chứ không phải dung dịch xanh lam.",
+    "bay": "Cho rằng NaHCO₃ làm phản ứng thuỷ phân nhanh hơn, hoặc chờ màu xanh lam khi đã đun nóng.",
+    "dk": [
+     "bay"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU",
+    "ten": "Phản ứng màu — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B7-D1",
+   "dangBai": {
+    "ma": "DB-12-B4-D3",
+    "ten": "Một số dạng toán khác của glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-C2-B6-D2-III-20": {
+  "luc": "2026-09-30T04:17:37.005Z",
+  "cau": {
+   "phan": "III",
+   "so": 20,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:\n(1) Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát.\nĐun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.\n(2) Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)₂ trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan dần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nghiệm, thấy có kết tủa màu nâu đỏ.\n(3) Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.\n(4) Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt acid HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống nghiệm.\nLiệt kê các thí nghiệm mô tả đúng thành dãy số theo thứ tự tăng dần (Ví dụ: 124, 23,…)",
+   "dap_an": "14",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "loi_giai": {
+    "chot": "Tinh bột tạo hồ trong nước nóng; glucose khử Cu(OH)₂ cho kết tủa Cu₂O đỏ gạch (không phải nâu đỏ); saccharose không tráng bạc, chỉ sản phẩm thuỷ phân của nó mới tráng bạc.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "(1) đúng: tinh bột lắng trong nước lạnh, đun nóng tạo hồ tinh bột sệt",
+     "(2) sai: kết tủa Cu₂O có màu đỏ gạch, không phải nâu đỏ",
+     "(3) sai: saccharose không có nhóm -CHO, không tạo Ag",
+     "(4) đúng: thuỷ phân trong HCl cho glucose và fructose, tráng bạc được",
+     "Thay số: Các thí nghiệm đúng: 1 và 4"
+    ],
+    "ket_qua": "14",
+    "dap_an_de": "124",
+    "dap_an_tu_giai": "14",
+    "trang_thai": "lech",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi 124, thầy quyết bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Kết tủa Cu₂O có màu đỏ gạch chứ không phải nâu đỏ; saccharose không tự tráng bạc được.",
+    "bay": "Chấp nhận mô tả nâu đỏ vì nghe gần giống đỏ gạch.",
+    "dk": [
+     "bay"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.DEM_DONG_PHAN",
+    "ten": "Phản ứng tráng bạc — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C2-B6",
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ },
+ "12-C2-B6-D2-II-22": {
+  "luc": "2026-09-30T04:17:37.005Z",
+  "cau": {
+   "phan": "II",
+   "so": 22,
+   "de": "Tiến hành thí nghiệm theo các bước sau:\nBước 1: Cho khoảng 5 mL dung dịch HNO₃ đặc vào cốc thuỷ tinh (loại 100 mL) ngâm trong chậu nước đá. Thêm từ từ khoảng 10 mL dung dịch H₂SO₄ đặc vào cốc và khuấy đều.\nBước 2: Sau đó, lấy cốc thuỷ tinh ra khỏi chậu nước đá, thêm tiếp một nhúm bông vào cốc và dùng đũa thuỷ tinh ấn bông ngập trong dung dịch. Ngâm cốc trong chậu nước nóng khoảng 10 phút.\nBước 3: Để nguội, lấy sản phẩm thu được ra khỏi cốc, rửa nhiều lần với nước lạnh (đến khi nước rửa không làm đổi màu quỳ tím), sau đó rửa lại bằng dung dịch NaHCO₃ loãng. Ép sản phẩm giữa hai miếng giấy lọc để hút nước và làm khô tự nhiên. Sau đó, để sản phẩm lên đĩa sứ rồi đốt cháy sản phẩm.",
+   "dap_an": "SSSS",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "y": {
+    "a": "Sau bước 3, sản phẩm thu được có màu vàng.",
+    "b": "Trong thí nghiệm trên, có thể thay thế nhúm bông bằng hồ tinh bột.",
+    "c": "Sau bước 3, lấy sản phẩm thu được đốt cháy thấy có khói trắng xuất hiện.",
+    "d": "Thí nghiệm trên chứng minh trong mỗi phân tử cellulose có ba nhóm hydroxy (-OH)."
+   },
+   "loi_giai": {
+    "chot": "[C₆H₇O₂(OH)₃]ₙ + 3nHNO₃ →(H₂SO₄ đặc, t°) [C₆H₇O₂(ONO₂)₃]ₙ + 3nH₂O: sản phẩm cellulose trinitrate là chất rắn màu trắng, cháy nhanh không khói, và ba nhóm -OH bị thế là của mỗi mắt xích chứ không phải cả phân tử ⇒ cả bốn ý đều sai.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cellulose trinitrate thu được sau bước 3 là chất rắn màu trắng (bông ngả trắng ngà), không phải màu vàng."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: hồ tinh bột là dung dịch keo chứa nhiều nước, làm loãng hỗn hợp acid và không tách được sản phẩm rắn để rửa, ép khô; thí nghiệm phải dùng bông (cellulose)."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cellulose trinitrate cháy rất nhanh, hầu như không tạo khói — đúng tên gọi thuốc súng không khói."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: ba nhóm -OH là của mỗi mắt xích C₆H₇O₂(OH)₃, phân tử cellulose gồm n mắt xích nên có 3n nhóm -OH."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "SSSS",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi DSSD, thầy quyết bỏ. Ý a (màu sản phẩm): cellulose trinitrate là chất rắn màu trắng (hơi vàng nhạt) theo SGK; máy chọn S nhưng không chắc cách tác giả mô tả màu. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng phản ứng điều chế cellulose trinitrate đã gắn sao ở câu 85 và câu 7 phần II.",
+    "bay": null,
+    "dk": [],
+    "y_can_chua": []
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B6",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBOHYDRATE"
+  }
+ },
+ "12-C2-B6-D2-II-34": {
+  "luc": "2026-09-30T04:17:37.005Z",
+  "cau": {
+   "phan": "II",
+   "so": 34,
+   "bang": null,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "de": "Cellulose trinitrate là một hóa chất được sử dụng nhiều trong công nghiệp quốc phòng với mục đích chính là làm thuốc nổ. Phản ứng điều chế cellulose trinitrate từ cellulose và nitric acid (xúc tác H₂SO₄ đặc):\n[C₆H₇O₂(OH)₃]ₙ + 3nHNO₃ →(H₂SO₄ đặc, t°) [C₆H₇O₂(ONO₂)₃]ₙ + 3nH₂O.\nKhi đốt cháy cellulose trinitrate bằng oxygen thu được sản phẩm cháy gồm CO₂, N₂ và H₂O.",
+   "y": {
+    "a": "Trong phản ứng trên các nhóm -OH trong cellulose đã được thế bởi các nhóm -ONO₂.",
+    "b": "Công thức phân tử của mỗi mắt xích trong cellulose trinitrate là C₆H₇O₁₁N₃.",
+    "c": "Tỉ lệ mol của O₂ : N₂ trong phản ứng đốt cháy cellulose trinitrate là 2 : 1.",
+    "d": "Nguyên nhân phản ứng tỏa nhiệt mạnh khi cháy là do sự tạo thành khí N₂."
+   },
+   "dap_an": "DDSD",
+   "hinh": null,
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Mỗi mắt xích C₆H₇O₂(OH)₃ có 3 nhóm -OH chuyển thành -ONO₂ cho C₆H₇O₁₁N₃; đốt cháy: C₆H₇O₁₁N₃ + 2,25O₂ → 6CO₂ + 3,5H₂O + 1,5N₂ nên O₂ : N₂ = 3 : 2.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: so sánh [C₆H₇O₂(OH)₃]n với sản phẩm [C₆H₇O₂(ONO₂)₃]n thấy các nhóm -OH đã được thế bởi các nhóm -ONO₂."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: C₆H₇O₂(ONO₂)₃ gộp lại là C₆H₇O₁₁N₃ (M = 297)."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: cân bằng O cho 1 mol mắt xích C₆H₇O₁₁N₃: 11 + 2x = 6×2 + 3,5 ⇒ x = 2,25 mol O₂, kèm 1,5 mol N₂ ⇒ O₂ : N₂ = 2,25 : 1,5 = 3 : 2."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: N₂ có liên kết ba rất bền, việc tạo thành N₂ (cùng CO₂) giải phóng lượng nhiệt lớn nên phản ứng toả nhiệt mạnh, gây nổ."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "SDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SDSD, thầy quyết bỏ. Chỉ lệch ý a. Máy: sản phẩm [C₆H₇O₂(ONO₂)₃]n nên \"-OH được thế bởi -ONO2\" đúng về mặt cấu tạo. Đề chấm S, có lẽ theo cách nói ester hoá: chỉ H của -OH bị thay bằng -NO2 (O của cellulose vẫn giữ). Thầy quyết cách hiểu. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Suy mắt xích C₆H₇O₁₁N₃ từ phương trình rồi cân bằng phản ứng cháy để lấy tỉ lệ mol O₂ trên N₂.",
+    "bay": "Lấy tỉ lệ 2 trên 1 theo cảm tính mà không cân bằng phương trình đốt cháy.",
+    "dk": [
+     "buoc",
+     "nen"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU",
+    "ten": "Ứng dụng — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C2-B7-D2",
+   "dangBai": {
+    "ma": "DB-12-B6-D2",
+    "ten": "Phản ứng với nitric acid của cellulose",
+    "lop": "12",
+    "bai": "DB-12-B6",
+    "tenBai": "Tinh bột và cellulose",
+    "soBai": 6,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

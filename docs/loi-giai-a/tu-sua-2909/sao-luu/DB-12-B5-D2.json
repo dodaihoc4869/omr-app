@@ -779,5 +779,180 @@
    "nguonDe": "DH-12-C2-B5",
    "nguonCau": "II-24"
   }
+ },
+ "DB-12-B5-D2-II-39": {
+  "luc": "2026-09-30T04:18:27.745Z",
+  "cau": {
+   "phan": "II",
+   "so": 39,
+   "de": "Cho các carbohydrate: glucose, fructose, saccharose, maltose.",
+   "y": {
+    "a": "Cả 4 chất ở điều kiện thường đều là chất rắn, vị ngọt, tan tốt trong nước.",
+    "b": "Có 2 cặp chất là đồng phân của nhau.",
+    "c": "Có 3 chất vừa có cấu tạo dạng mạch hở, vừa có cấu tạo dạng mạch vòng.",
+    "d": "Có 2 chất có nhóm -OH hemiacetal."
+   },
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Ba ý sau đều là ý đếm, phải xét từng chất một mới ra đúng số lượng.",
+    "bay": "Đếm maltose vào nhóm có dạng mạch hở vì thấy nó mở vòng được.",
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "loi_giai": {
+    "chot": "Chất nào còn -OH hemiacetal hoặc hemiketal thì mở được vòng nên có cả dạng mạch hở; saccharose không mở vòng được.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng. Glucose, fructose, saccharose, maltose ở điều kiện thường đều là chất rắn kết tinh, vị ngọt, tan tốt trong nước."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng. Glucose và fructose cùng C₆H₁₂O₆; saccharose và maltose cùng C₁₂H₂₂O₁₁, vậy có 2 cặp đồng phân."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng. Glucose và fructose là monosaccharide nên có cả dạng mạch hở lẫn mạch vòng; maltose còn -OH hemiacetal ở đơn vị glucose thứ hai nên cũng mở được vòng. Vậy đúng 3 chất, saccharose thì không."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng. Glucose dạng vòng và maltose đều còn -OH hemiacetal; fructose chỉ có -OH hemiketal, saccharose không còn nhóm này. Vậy đúng 2 chất."
+     }
+    },
+    "buoc": [
+     "Ý b: hai cặp đồng phân là glucose - fructose (C₆H₁₂O₆) và saccharose - maltose (C₁₂H₂₂O₁₁).",
+     "Ý c: glucose, fructose mở vòng được; maltose còn -OH hemiacetal tự do nên cũng mở vòng, vậy 3 chất có cả mạch hở và mạch vòng. Saccharose không còn -OH hemiacetal nên chỉ có dạng vòng.",
+     "Ý d: -OH hemiacetal chỉ có ở glucose và ở đơn vị glucose khử của maltose, tức 2 chất; fructose có -OH hemiketal nên không tính.",
+     "Ghép a, b, c, d được DDDD."
+    ],
+    "ket_qua": "DDDD",
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "de_goc": "12-BD7-13",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B5",
+   "nguonCau": "II-1"
+  }
+ },
+ "DB-12-B5-D2-II-159": {
+  "luc": "2026-09-30T04:18:27.745Z",
+  "cau": {
+   "phan": "II",
+   "so": 159,
+   "de": "Cho các carbohydrate: glucose, fructose, saccharose, maltose.",
+   "y": {
+    "a": "Cả 4 chất ở điều kiện thường đều là chất rắn, vị ngọt, tan tốt trong nước.",
+    "b": "Có 2 cặp chất là đồng phân của nhau.",
+    "c": "Có 3 chất vừa có cấu tạo dạng mạch hở, vừa có cấu tạo dạng mạch vòng.",
+    "d": "Có 2 chất có nhóm -OH hemiacetal."
+   },
+   "dap_an": "DDDD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Ba ý sau đều là ý đếm, phải xét từng chất một mới ra đúng số lượng.",
+    "bay": "Đếm maltose vào nhóm có dạng mạch hở vì thấy nó mở vòng được.",
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "loi_giai": {
+    "chot": "Maltose vẫn còn -OH ở carbon anomer nên mở vòng được, vì thế có tới 3 chất tồn tại cả dạng mạch hở lẫn mạch vòng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Cả bốn chất đều là chất rắn kết tinh, vị ngọt và tan tốt trong nước."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Glucose với fructose cùng C₆H₁₂O₆, saccharose với maltose cùng C₁₂H₂₂O₁₁, đúng hai cặp đồng phân."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Chất nào còn -OH ở carbon anomer thì chuyển qua lại giữa mạch vòng và mạch hở: glucose, fructose, maltose, đúng 3 chất. Saccharose bị khoá cả hai carbon anomer trong liên kết glycoside nên chỉ có mạch vòng."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Chỉ glucose và maltose có -OH hemiacetal, đúng 2 chất; fructose là -OH hemiketal, saccharose không còn nhóm nào."
+     }
+    },
+    "buoc": [
+     "Ý b: hai cặp đồng phân là glucose - fructose (C₆H₁₂O₆) và saccharose - maltose (C₁₂H₂₂O₁₁).",
+     "Ý c: maltose còn một đầu glucose có -OH anomer tự do nên mở vòng được như glucose và fructose; chỉ saccharose là không, vậy đúng 3 chất.",
+     "Ý d: tách bạch hemiacetal với hemiketal — glucose và maltose là hemiacetal (2 chất), fructose là hemiketal nên không tính."
+    ],
+    "ket_qua": "DDDD",
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "bai": "Bài 5. Saccharose và maltose",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-BD7-13",
+   "nguonCau": "II-1"
+  }
  }
 }

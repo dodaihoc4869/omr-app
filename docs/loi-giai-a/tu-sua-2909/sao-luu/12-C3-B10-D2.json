@@ -206,5 +206,124 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
   }
+ },
+ "12-C3-B10-D2-II-13": {
+  "luc": "2026-09-30T04:17:27.105Z",
+  "cau": {
+   "phan": "II",
+   "so": 13,
+   "bang": [
+    [
+     "Công thức cấu tạo",
+     "Kí hiệu",
+     "Khối lượng"
+    ],
+    [
+     "CH₃CH(NH₂)COOH",
+     "Ala",
+     "178 mg"
+    ],
+    [
+     "HOOC-CH₂CH₂CH(NH₂)COOH",
+     "Glu",
+     "44 mg"
+    ],
+    [
+     "HS-CH₂CH(NH₂)COOH",
+     "Cys",
+     "48 mg"
+    ],
+    [
+     "HO-CH₂CH(NH₂)COOH",
+     "Ser",
+     "105 mg"
+    ],
+    [
+     "HOOC-CH₂CH(NH₂)COOH",
+     "Asp",
+     "131 mg"
+    ],
+    [
+     "(CH₃)₂CH-CH(NH₂)-COOH",
+     "Val",
+     "47 mg"
+    ],
+    [
+     "H₂N-[CH₂]₄-CH(NH₂)-COOH",
+     "Lys",
+     "44 mg"
+    ]
+   ],
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Khi thuỷ phân hoàn toàn 500 mg một protein, chỉ thu được các amino acid với khối lượng như bảng sau:",
+   "y": {
+    "a": "Có thể dựa vào tính chất điện di để tách riêng từng amino acid trong bảng kết quả trên.",
+    "b": "Trong các amino acid ở trên, lysine (Lys) là một trong những amino acid đóng vai trò quan trọng cho quá trình xây dựng và tạo ra các mạch máu mới trong cơ thể.",
+    "c": "Tất cả các amino acid thu được từ quá trình thuỷ phân trên đều thuộc loại α-amino acid.",
+    "d": "Nếu phân tử khối của protein này là 50 000 thì số mắt xích trong 1 phân tử protein ở trên là 200 Ala; 30 Glu; 40 Cys; 100 Ser; 100 Asp; 40 Val và 20 Lys (làm tròn kết quả đến hàng đơn vị)."
+   },
+   "dap_an": "DDDS",
+   "hinh": [],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Số mắt xích mỗi loại = (m/M) × M(protein)/m(protein) = (m/M) × 100; tính ra Lys ≈ 30 và Asp ≈ 98 nên chỉ ý d sai.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Các amino acid trong bảng có pI khác nhau (Asp, Glu tính acid; Lys tính base; Ala, Cys, Ser, Val trung tính) nên trong cùng một điện trường chúng di chuyển khác nhau, tách riêng được bằng điện di."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Lysine là amino acid thiết yếu, cần cho quá trình tổng hợp collagen — thành phần cấu tạo nên thành mạch, nên góp phần xây dựng và tạo ra các mạch máu mới."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Cả 7 chất trong bảng đều có nhóm -NH₂ gắn vào carbon liền kề nhóm -COOH nên đều là α-amino acid."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Lys = (44/146)×100 ≈ 30 chứ không phải 20; Asp = (131/133)×100 ≈ 98 chứ không phải 100."
+     }
+    },
+    "buoc": [
+     "Tỉ số M(protein)/m(protein) = 50 000/500 = 100 nên số mắt xích mỗi loại = (m/M) × 100.",
+     "Ala: (178/89)×100 = 200; Glu: (44/147)×100 ≈ 30; Cys: (48/121)×100 ≈ 40; Ser: (105/105)×100 = 100.",
+     "Asp: (131/133)×100 ≈ 98; Val: (47/117)×100 ≈ 40; Lys: (44/146)×100 ≈ 30.",
+     "Ý d ghi Asp = 100 và Lys = 20 nên sai; ba ý a, b, c đều đúng ⇒ ĐĐĐS."
+    ],
+    "ket_qua": "DDDS",
+    "dap_an_de": "SDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi SDDS, thầy quyết bỏ. Ý d chắc chắn sai (tính ra Lys = 30, Asp ≈ 98–99). Ý b (lysine quan trọng cho xây dựng mạch máu mới) là kiến thức sinh học ngoài SGK, máy coi là đúng nhưng chưa chắc ý tác giả. Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Đổi khối lượng từng amino acid ra mol rồi nhân hệ số 50 000 chia 500 để ra số mắt xích mỗi loại.",
+    "bay": "Lấy tỉ lệ khối lượng làm luôn số mắt xích mà quên chia cho phân tử khối riêng của từng amino acid.",
+    "dk": [
+     "buoc",
+     "hay_gap"
+    ],
+    "y_can_chua": [
+     "a",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B10",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
  }
 }

@@ -433,5 +433,57 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
   }
+ },
+ "12-C1-B1-D2-III-40": {
+  "luc": "2026-09-30T04:17:47.195Z",
+  "cau": {
+   "phan": "III",
+   "so": 40,
+   "de": "Trong thành phần của một loại sơn có các triglyceride là triester của glycerol với linoleic acid và linolenic acid.\nCó bao nhiêu công thức cấu tạo có thể có của các triester trên?",
+   "dap_an": "6",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "hieu",
+   "loi_giai": {
+    "chot": "Ba vị trí ester của glycerol trong đó vị trí 1 và 3 tương đương, hai loại gốc acid ⇒ 6 công thức cấu tạo.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Gọi L là gốc linoleate C₁₇H₃₁COO–, N là gốc linolenate C₁₇H₂₉COO–.",
+     "Ba gốc giống nhau: (L,L,L) và (N,N,N) ⇒ 2 công thức.",
+     "Hai L một N: N ở vị trí 2 (LNL) hoặc N ở vị trí 1 (NLL, trùng LLN do 1 và 3 tương đương) ⇒ 2 công thức.",
+     "Hai N một L: L ở vị trí 2 (NLN) hoặc L ở vị trí 1 (LNN) ⇒ 2 công thức.",
+     "Tổng: 2 + 2 + 2 = 6 công thức cấu tạo."
+    ],
+    "ket_qua": "6",
+    "dap_an_de": "4",
+    "dap_an_tu_giai": "",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Rà soát 11/09/2026: chốt lại đáp án và lời giải."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Phải xét cả hai tổ hợp 2L+1N và 2N+1L, mỗi tổ hợp lại có gốc lẻ ở giữa hoặc ở đầu.",
+    "bay": "Chỉ đếm một tổ hợp nên ra 2, hoặc đếm cả triester đồng nhất mà đề không cho.",
+    "dk": [
+     "bay",
+     "buoc"
+    ]
+   },
+   "dang": {
+    "ma": "ESTER.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C1-B1-P2",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề ESTER"
+  }
  }
 }
