@@ -14,6 +14,7 @@
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { docKhoiEm } from './game-v2-bank'
+import { dbGoc } from './cau-hinh-dem'
 import { coCaDangMo } from './bi-a'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
 import { cauKhacPhucGoi, danhMucDangBai, deTheoDangBai, hsCauSai } from './goi-cu'
@@ -69,7 +70,7 @@ export const SQL_BANG_TU_LUYEN: readonly string[] = [
 ]
 const bangDaDung = new WeakMap<object, Promise<void>>()
 export function damBaoBangTuLuyen(env: Env): Promise<void> {
-  const db = env.DB as unknown as object
+  const db = dbGoc(env.DB as unknown as object) // bản session/bộ đếm bọc D1 ⇒ vẫn MỘT lần mỗi isolate
   let p = bangDaDung.get(db)
   if (!p) {
     p = env.DB.batch(SQL_BANG_TU_LUYEN.map((s) => env.DB.prepare(s))).then(() => undefined)
@@ -116,8 +117,7 @@ async function khoTheoCauSai(env: Env, sbd: string, dsCauSai: CauSaiDauVao[], kh
 }
 
 /** Danh mục Lớp → Bài → Dạng, CHỈ lớp em được chọn (không vượt khối em — luật Boss 21/09). */
-async function danhMucCuaEm(env: Env, khoiEm: Khoi | null): Promise<{ lops: LopDangBaiTL[]; loi: string }> {
-  const kq = await danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj)
+function locDanhMuc(kq: Obj, khoiEm: Khoi | null): { lops: LopDangBaiTL[]; loi: string } {
   if (kq.ok === false) return { lops: [], loi: str(kq.error) || 'Chưa đọc được danh mục dạng bài.' }
   return { lops: lopEmDuocChon(khoiEm, (Array.isArray(kq.lops) ? kq.lops : []) as LopDangBaiTL[]), loi: '' }
 }
@@ -181,12 +181,16 @@ function nhanDangKho(kho: TeacherExamSource[]): Map<string, { ma: string; ten: s
 // ------------------------------------------------------------------ /hs/tu-luyen/nguon — thứ em cần để chọn chế độ (KHÔNG đáp án)
 
 export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
-  const khoiEm = await docKhoiEm(env, sbd).catch(() => null)
-  const [cs, dm, kcs] = await Promise.all([
+  // MỌI lượt đọc chạy SONG SONG (quét tối ưu 30/09: trước đây khối em → [câu sai ‖ danh mục ‖ kho] → ca đang mở = 5 đợt nối tiếp ≈ 1,5–2 s trên D1 thật;
+  // nay 2–3 đợt). Danh mục chỉ cần khối em ở bước LỌC cuối (lopEmDuocChon) nên đọc thô trước, lọc sau — kết quả y hệt.
+  const [khoiEm, cs, dmTho, kcs, dangThi] = await Promise.all([
+    docKhoiEm(env, sbd).catch(() => null),
     cauSaiRutDuoc(env, sbd),
-    danhMucCuaEm(env, khoiEm),
+    danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj),
     docKhoCauSai(env, sbd).catch((e) => ({ ds: [], tuCa: 0, tuChienDich: 0, loi: e instanceof Error ? 'Chưa đọc được kho câu sai. Em thử lại sau.' : '' })),
+    coCaDangMo(env, sbd, Date.now()).catch(() => false),
   ])
+  const dm = locDanhMuc(dmTho, khoiEm)
   const theoCa = new Map<string, { maCa: string; tenCa: string; soCauSai: number }>()
   for (const c of cs.ds) {
     const ma = c.maCa || 'mac_dinh'
@@ -204,7 +208,7 @@ export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
     loiDanhMuc: dm.loi,
     // Chế độ 1 (luật 30/09): kho câu sai từ mốc 29/09 — ca kiểm tra + chiến dịch, đã khử trùng (tu-luyen-cau-sai.ts).
     khoCauSai: { tong: kcs.ds.length, tuCa: kcs.tuCa, tuChienDich: kcs.tuChienDich, loi: kcs.loi },
-    dangThi: await coCaDangMo(env, sbd, Date.now()).catch(() => false),
+    dangThi,
   }
 }
 
@@ -224,17 +228,20 @@ interface KetQuaRutTho {
 
 /** Chạy ĐÚNG thuật toán của chế độ. `rut = false` ⇒ chỉ đếm (xem trước), không rút. */
 async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promise<KetQuaRutTho> {
-  const khoiEm = await docKhoiEm(env, sbd).catch(() => null)
+  // Khối em đọc SONG SONG với nguồn của từng chế độ (quét tối ưu 30/09) — chế độ 1 không cần khối nên không phải chờ thêm một đợt D1.
+  const khoiP = docKhoiEm(env, sbd).catch(() => null)
   const meta = new Map<string, { dangMa: string; dangTen: string; bai: string; lop: string }>()
   const rong = (loi: string): KetQuaRutTho => ({ dsCau: [], tongToiDa: 0, tieuDe: '', meta, loi })
   const lopCua = (c: CauLuyen) => { const k = khoiCuaCau({ qid: c.id, maDe: c.maDe }); return k ? String(k) : '' }
 
   if (t.cheDo === 1) {
     // LUẬT 30/09 (thầy): cộng dồn câu sai từ 29/09 ở mọi ca kiểm tra + chiến dịch; chọn câu chưa/ít luyện trước; thiếu thì lặp; trộn dễ/khó.
+    const lanP = rut ? docLanLuyen(env, sbd) : null
+    lanP?.catch(() => undefined) // lỗi đọc ⇒ ném đúng chỗ `await` dưới như cũ, không thành lỗi "chưa bắt"
     const kho = await docKhoCauSai(env, sbd)
     if (kho.ds.length === 0) return rong(kho.loi)
-    if (!rut) return { dsCau: [], tongToiDa: kho.ds.length, tieuDe: '', meta, loi: '' }
-    const lan = await docLanLuyen(env, sbd)
+    if (!rut || !lanP) return { dsCau: [], tongToiDa: kho.ds.length, tieuDe: '', meta, loi: '' }
+    const lan = await lanP
     const theo = new Map(kho.ds.map((c) => [c.qid, c]))
     const chon = chonCauSai(
       kho.ds.map((c) => ({ qid: c.qid, kho: c.kho, soLanLuyen: lan.get(c.qid)?.n ?? 0, lanCuoi: lan.get(c.qid)?.cuoi ?? 0 })),
@@ -255,7 +262,7 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
   }
 
   if (t.cheDo === 2 || t.cheDo === 4) {
-    const csTatCa = await cauSaiRutDuoc(env, sbd)
+    const [csTatCa, khoiEm] = await Promise.all([cauSaiRutDuoc(env, sbd), khoiP])
     if (csTatCa.ds.length === 0) return rong(csTatCa.loi)
     const { kho, loi } = await khoTheoCauSai(env, sbd, csTatCa.ds, khoiEm)
     if (kho.length === 0) return rong(loi)
@@ -293,7 +300,8 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
 
   // Chế độ 3: Dạng bài — chỉ mã trong danh mục CỦA EM (không vượt khối).
   if (t.dsDang.length === 0) return rong('Em chọn ít nhất 1 dạng bài.')
-  const dm = await danhMucCuaEm(env, khoiEm)
+  const [dmTho, khoiEm] = await Promise.all([danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj), khoiP])
+  const dm = locDanhMuc(dmTho, khoiEm)
   const banDo = banDoDanhMuc(dm.lops)
   const hopLe = t.dsDang.filter((m) => banDo.has(m) && duocChonLop(khoiEm, banDo.get(m)!.lop))
   if (hopLe.length === 0) return rong(dm.loi || 'Dạng bài em chọn không có trong danh mục lớp của em.')

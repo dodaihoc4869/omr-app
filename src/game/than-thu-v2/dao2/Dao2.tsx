@@ -3,6 +3,7 @@
 // LUẬT CHƠI GIỮ NGUYÊN: cùng lệnh máy chủ như Đảo cũ — resume → sync → start (mode adventure) → answer → complete; máu/Cuồng nộ tính bằng
 // `learningBattle`, EXP và lý do thưởng do máy chủ trả. Chỉ thêm các lệnh đọc `hoa2-sanh`, `hoa2-cau-da-lam` và mở rương `hoa2-ruong-mo`.
 import {useCallback,useEffect,useRef,useState} from 'react'
+import {giuTrangKhongTaiLai} from '../../../lib/cap-nhat-app'
 import type {ReactNode} from 'react'
 import {learningBattle} from '../learning-battle'
 import type {BattleAnswer} from '../learning-battle'
@@ -41,6 +42,8 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const [sanh,setSanh]=useState<Sanh2|null>(()=>docSanh2(sanhDau)),[dangTai,setDangTai]=useState(false),[loiSanh,setLoiSanh]=useState('')
  const [daLam,setDaLam]=useState<unknown>(null)
  const [luot,setLuot]=useState<Luot2|null>(null),[pha,setPha]=useState<'ban-do'|'ai'|'xong'>('ban-do')
+ // Đang trong ải/chặng/bài ⇒ app KHÔNG tự tải lại vì bản mới (quét ổn định 30/09, như Bi-a #95): bản mới chờ tới lúc em rời màn.
+ useEffect(()=>pha==='ai'?giuTrangKhongTaiLai():undefined,[pha])
  const [khoa,setKhoa]=useState(''),[het,setHet]=useState(''),[soan,setSoan]=useState('')
  const [viTri,setViTri]=useState(0),[ketQua,setKetQua]=useState<BattleAnswer[]>([]),[traLoi,setTraLoi]=useState(''),[assisted,setAssisted]=useState(false),[phanHoi,setPhanHoi]=useState<PhanHoi2|null>(null),[exp,setExp]=useState(0)
  const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[maLoi,setMaLoi]=useState(''),[baoCau,setBaoCau]=useState('')

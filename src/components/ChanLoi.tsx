@@ -8,6 +8,14 @@
 // gửi lại, và hai đường thoát — về màn chính (không mất dữ liệu) hoặc tải lại.
 // Lỗi vẫn được in ra console cho lần gỡ sau.
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { laLoiThieuManh, taiLaiMotLan } from '../lib/nap-manh'
+
+/** Lỗi NẠP MẢNH MÃ (máy giữ bản cũ sau khi thầy phát hành) — kể cả dạng React báo khi `vite:preloadError` đã được chặn để tự tải lại
+ * (mảnh lười trả `undefined`: "Lazy element type must resolve…"). Loại này KHÔNG phải lỗi của màn: tải lại một lần là hết. */
+export function laLoiNapManh(e: unknown): boolean {
+  const s = e instanceof Error ? `${e.name}: ${e.message}` : String(e)
+  return laLoiThieuManh(e) || /Lazy element type must resolve|resolves to: undefined/i.test(s)
+}
 
 interface Props {
   children: ReactNode
@@ -29,11 +37,14 @@ export default class ChanLoi extends Component<Props, State> {
 
   componentDidCatch(loi: Error, thongTin: ErrorInfo) {
     console.error('[ChanLoi]', this.props.o ?? 'app', loi, thongTin.componentStack)
+    // Quét ổn định 30/09: thiếu mảnh mã ⇒ TỰ tải lại MỘT lần (chặn vòng lặp 30 s trong nap-manh) thay vì để em đứng trước màn báo lỗi.
+    if (laLoiNapManh(loi)) taiLaiMotLan()
   }
 
   render() {
     const { loi } = this.state
     if (!loi) return this.props.children
+    const napManh = laLoiNapManh(loi)
 
     const nut: React.CSSProperties = {
       minHeight: 44,
@@ -53,10 +64,10 @@ export default class ChanLoi extends Component<Props, State> {
       >
         <div style={{ background: 'var(--the)', borderRadius: 'var(--bo-3)', boxShadow: 'var(--bong-1)', padding: 'var(--k5)', maxWidth: 520, width: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--k3)' }}>
           <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)' }}>
-            Màn {this.props.o ?? 'này'} gặp lỗi
+            {napManh ? 'Đang tải bản mới của app' : `Màn ${this.props.o ?? 'này'} gặp lỗi`}
           </div>
           <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
-            Dữ liệu đã lưu vẫn còn nguyên. Thầy quay về màn chính rồi vào lại; còn lỗi thì chụp dòng dưới gửi lại.
+            {napManh ? 'Máy đang giữ bản cũ nên app tự tải lại. Bài đã lưu vẫn còn nguyên. Chờ vài giây; nếu màn này vẫn đứng yên thì bấm Tải lại app.' : 'Dữ liệu đã lưu vẫn còn nguyên. Thầy quay về màn chính rồi vào lại; còn lỗi thì chụp dòng dưới gửi lại.'}
           </div>
           <pre
             style={{

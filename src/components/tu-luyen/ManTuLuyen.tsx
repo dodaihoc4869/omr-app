@@ -30,6 +30,7 @@ import {
 import { nopBai, rutCau, taiNguon, taiTongHop, xemLuot, xemTruoc, type KetQuaNop, type LuotDangLam, type NguonTuLuyen, type ThamSoRut } from './api'
 import TongHopTuLuyen, { DiemLuyenDeTongHop } from './TongHopTuLuyen'
 import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen-de'
+import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { BanDoKetQua, KhungLamRong, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
 
 // Thẻ "Luyện đề cấu trúc" (30/09): mảnh NẠP LƯỜI khi em mở thẻ (ngoài precache — vite.config.ts globIgnores). Cổng + lý do khoá lấy từ
@@ -178,6 +179,9 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const [dangTaiNguon, setDangTaiNguon] = useState(true)
   const [cheDo, setCheDo] = useState<CheDoTuLuyen | null>(null)
   const [bai, setBai] = useState<BaiDangLam | null>(() => docNho(sbd))
+  // Đang làm một lượt ⇒ app KHÔNG tự tải lại vì bản mới (quét ổn định 30/09, như Bi-a #95): bản mới chờ tới lúc em nộp/rời lượt.
+  const coBai = bai !== null
+  useEffect(() => (coBai ? giuTrangKhongTaiLai() : undefined), [coBai])
   const [ketQua, setKetQua] = useState<{ nop: KetQuaNop; cau: CauCongKhai[] } | null>(null)
   const [dangRut, setDangRut] = useState(false)
   const [dangNop, setDangNop] = useState(false)

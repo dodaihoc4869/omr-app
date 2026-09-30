@@ -3,6 +3,7 @@
 // ở đây chỉ vẽ đúng thứ máy chủ trả về. Vẽ vào document.body (cổng) để là lớp phủ toàn màn, không dính kiểu nút của game cũ.
 import { daChamTran, docChangHomNay, docLuotCauNgay, type ChangHomNay, type LuotCauNgay } from './chu-het-luot'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
 import { createPortal } from 'react-dom'
 import type { Question } from './core'
 import { choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
@@ -108,6 +109,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   }, [sbd, call, apDung, apSanh, docLaiHoa2])
 
   const dangDi = !!xem && (!xem.batDau || !xem.tran?.ketThuc)
+  // Đang trong ải/chặng/bài ⇒ app KHÔNG tự tải lại vì bản mới (quét ổn định 30/09, như Bi-a #95): bản mới chờ tới lúc em rời màn.
+  useEffect(() => (dangDi ? giuTrangKhongTaiLai() : undefined), [dangDi])
   // Hỏi-đáp ngắn: chỉ khi đang có đoàn, tab đang hiện, không có lệnh khác đang bay.
   useEffect(() => {
     if (!dangDi || !xem) return
