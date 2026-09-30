@@ -112,6 +112,11 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const veNgayRef = useRef<() => void>(() => {})
   /** Cờ bố cục cho vòng khung hình (đọc ref, không đọc DOM mỗi khung). */
   const hepRef = useRef(false)
+  /** Đo nhãn chỉ bi (cỡ nhãn, cỡ hộp bàn, vị trí canvas) — đo lại khi nội dung nhãn đổi hoặc khung đổi cỡ, không đo mỗi khung (đo = ép trình duyệt tính bố cục). */
+  const nhanDoRef = useRef<{ w: number; h: number; W0: number; l: number; t: number } | null>(null)
+  /** TỰ HẠ CHẤT LƯỢNG (30/09): bi lăn mà hơn nửa số khung chậm quá 22 ms (dưới ~45 khung/giây) ⇒ chuyển sang chế độ máy yếu cho hết ván
+   *  (độ nét ≤ 1,5 điểm ảnh thật / điểm CSS, bỏ quầng sáng). Một lần mỗi ván, không tự nâng lại. */
+  const haRef = useRef(false), doBanRef = useRef<() => void>(() => {})
   const datKeo = (co: boolean) => { rootRef.current?.toggleAttribute('data-keo', co) }
   const chiDich = () => { const info = v.nham(); if (info && info.loai === 'bi') chiRef.current = { id: info.b.id, den: performance.now() + 1200 } }
   // Bộ điều khiển chạm: sống ngoài React (ref), vòng khung hình gọi `dk.khung()` một lần mỗi khung.
@@ -129,18 +134,20 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     // MỘT requestAnimationFrame duy nhất: vật lý bước cố định (bộ tích luỹ trong VanBia, dt kẹp 50 ms khi tab chậm),
     // vẽ nội suy giữa hai bước; không setState mỗi khung (trừ thanh lực khi giữ Space).
     // Không cấp phát mỗi khung: vòng đồng hồ + chip chỉ ghi DOM khi số (đã lượng tử hoá) đổi; dòng "Đang nhắm" bỏ qua khi bị ẩn (bố cục có cột điều khiển).
-    let raf = 0, truoc = performance.now(), chipCu = -1, gioCu = -2, ctx: CanvasRenderingContext2D | null = null
-    // Cỡ nhãn chỉ bi + bề rộng hộp bàn: chỉ đo khi nội dung nhãn đổi (không đọc bố cục mỗi khung khi đang kéo — tránh ép bố cục đồng bộ).
-    let nhW = 0, nhH = 0, banW = 0, cvL = 0, cvT = 0
-    const veBan = (now: number) => {
+    // Máy yếu (30/09): khung không đổi gì thì KHÔNG vẽ lại canvas (BoVe.canVe); có đổi thì chỉ tô vùng bẩn (BoVe.ve).
+    let raf = 0, truoc = performance.now(), chipCu = -1, gioCu = -2, ctx: CanvasRenderingContext2D | null = null, nhanX = '', nhanY = '', demLan = 0, demCham = 0
+    const veBan = (now: number, ep = false) => {
       const cv = cvRef.current, k = khungRef.current, bv = boVeRef.current
       if (cv && (!ctx || ctx.canvas !== cv)) ctx = cv.getContext('2d')
       const c = chiRef.current, conChi = c && (!c.den || now < c.den) ? c : null
       if (c && c.den && now >= c.den) chiRef.current = null
-      if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, loai !== 'giao_huu', dkc.dangKeoBi(), dkc.trongHuy())
+      if (ctx && k && bv) {
+        const chi = conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, mtBat = loai !== 'giao_huu', keoBi = dkc.dangKeoBi(), mo = dkc.trongHuy()
+        if (bv.canVe(v, chi, mtBat, keoBi, mo) || ep) bv.ve(ctx, v, chi, mtBat, keoBi, mo)
+      }
       return conChi
     }
-    veNgayRef.current = () => { try { veBan(performance.now()) } catch (e) { baoLoiVe(e) } }
+    veNgayRef.current = () => { try { veBan(performance.now(), true) } catch (e) { baoLoiVe(e) } }
     // LỖI VẼ KHÔNG ĐÓNG GAME (30/09): một khung hình ném lỗi (máy yếu hết bộ nhớ canvas, số NaN…) trước đây làm vòng khung hình dừng hẳn — bàn đứng im như đã thoát.
     // Nay hẹn khung kế TRƯỚC, bọc thân khung trong try/catch: khung lỗi bỏ qua, ván chạy tiếp; lỗi chỉ ghi console một lần.
     let daBaoLoi = false
@@ -150,7 +157,11 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       try { motKhung(now) } catch (e) { baoLoiVe(e) }
     }
     const motKhung = (now: number) => {
-      const dt = Math.min(0.05, Math.max(0, now - truoc) / 1000); truoc = now
+      const dtThat = Math.max(0, now - truoc), dt = Math.min(0.05, dtThat / 1000); truoc = now
+      if (v.pha === 'moving' && !haRef.current && dtThat > 0) {
+        demLan++; if (dtThat > 22) demCham++
+        if (demLan >= 40) { if (demCham >= 20) { haRef.current = true; doBanRef.current() } demLan = 0; demCham = 0 }
+      }
       dkc.khung(now) // áp thao tác chạm đang chờ (bàn, thanh lực, bánh xe, Space) + ghi DOM thanh lực
       v.buoc(dt)
       am.xa()
@@ -172,7 +183,8 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
         else {
           const nd = noiDungNhan(v, conChi.id), key = `${conChi.id}|${nd.chinh}|${nd.nho}`
           if (nh.dataset.k !== key) {
-            nh.dataset.k = key; nhW = 0
+            nhanDoRef.current = null
+            nh.dataset.k = key
             nh.style.setProperty('--vien', MAU_QH[nd.qh])
             nh.replaceChildren()
             const tb = document.createElement('b'); tb.textContent = conChi.id
@@ -180,14 +192,15 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
             const sm = document.createElement('small'); sm.textContent = nd.nho
             nh.append(tb, document.createTextNode(nd.tieuDe), em, sm)
           }
-          if (nh.hidden || !nhW) { nh.hidden = false; nhW = 0 }
-          if (!nhW) { nhW = nh.offsetWidth; nhH = nh.offsetHeight; banW = banRef.current?.clientWidth ?? 0; cvL = cv.offsetLeft; cvT = cv.offsetTop }
-          const [px, py] = raMan(k, dprRef.current, b.x, b.y), x0 = cvL + px / dprRef.current, y0 = cvT + py / dprRef.current, rr = R * k.S
-          const w = nhW, h = nhH, W0 = banW
+          if (nh.hidden) { nh.hidden = false; nhanDoRef.current = null }
+          const d = nhanDoRef.current ?? (nhanDoRef.current = { w: nh.offsetWidth, h: nh.offsetHeight, W0: banRef.current?.clientWidth ?? 0, l: cv.offsetLeft, t: cv.offsetTop })
+          const [px, py] = raMan(k, dprRef.current, b.x, b.y), x0 = d.l + px / dprRef.current, y0 = d.t + py / dprRef.current, rr = R * k.S
           let top = y0 - rr - 8, duoi = false
-          if (top - h < 4) { top = y0 + rr + 8; duoi = true }
-          if (duoi) nh.setAttribute('data-duoi', ''); else nh.removeAttribute('data-duoi')
-          nh.style.left = `${Math.max(w / 2 + 4, Math.min(W0 - w / 2 - 4, x0))}px`; nh.style.top = `${top}px`
+          if (top - d.h < 4) { top = y0 + rr + 8; duoi = true }
+          if (duoi !== nh.hasAttribute('data-duoi')) { if (duoi) nh.setAttribute('data-duoi', ''); else nh.removeAttribute('data-duoi') }
+          const lx = `${Math.max(d.w / 2 + 4, Math.min(d.W0 - d.w / 2 - 4, x0))}px`, ty = `${top}px`
+          if (lx !== nhanX || nh.style.left !== lx) { nhanX = lx; nh.style.left = lx }
+          if (ty !== nhanY || nh.style.top !== ty) { nhanY = ty; nh.style.top = ty }
         }
       }
       // chip toàn màn hình
@@ -226,7 +239,9 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     const goc = rootRef.current, ban = banRef.current, cv = cvRef.current
     if (!goc || !ban || !cv) return
     if (!boVeRef.current) boVeRef.current = new BoVe(document)
+    if (import.meta.env.DEV) (window as unknown as { __biaBoVe?: BoVe }).__biaBoVe = boVeRef.current // trang đo: so ảnh vẽ vùng bẩn với vẽ cả bàn
     const doBoCuc = () => {
+      nhanDoRef.current = null
       const r = goc.getBoundingClientRect(), bc = chonBoCuc(r.width, r.height)
       hepRef.current = r.width < 480
       setBoCuc(bc); setHuong(r.width > r.height ? 'ngang' : 'doc')
@@ -238,7 +253,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       if (bw <= 0 || bh <= 0) return
       // Hướng bàn chốt theo KHUNG NHÌN (máy dọc ⇒ bàn dọc), không theo phần dư của hộp bàn (dao động khi chữ quanh bàn xuống dòng).
       const r = goc.getBoundingClientRect(), cu = khungRef.current
-      const nhe = dangCheDoMayYeu()
+      const nhe = dangCheDoMayYeu() || haRef.current
       const k = tinhKhungBan(bw, bh, { khungDoc: r.width <= r.height, xoayCu: cu?.xoay })
       const dpr = Math.min(nhe ? 1.5 : 2, window.devicePixelRatio || 1)
       const w = Math.round(k.cw * dpr), h = Math.round(k.ch * dpr)
@@ -252,6 +267,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       veNgayRef.current() // vẽ lại NGAY trong cùng khung ⇒ không lộ canvas trắng
     }
     doBoCuc(); doBan()
+    doBanRef.current = doBan
     // Xoay máy / đổi cỡ: ResizeObserver đo NGAY (chạy sau bố trí, trước khi vẽ ⇒ canvas đổi cỡ + vẽ lại trong cùng khung, không lộ khung trắng);
     // tin xoay máy / khung nhìn gộp vào MỘT lần đo ở khung hình kế (rAF); mọi tin đều hẹn đo lại lần cuối sau 160 ms (debounce:
     // iOS báo cỡ mới trễ sau hoạt ảnh xoay). doBan tự bỏ qua khi cỡ thật không đổi.
@@ -263,7 +279,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     ro.observe(goc); ro.observe(ban)
     window.addEventListener('orientationchange', henDo)
     window.visualViewport?.addEventListener('resize', henDo)
-    void document.fonts?.ready?.then(() => boVeRef.current?.napLaiChu())
+    void document.fonts?.ready?.then(() => { nhanDoRef.current = null; boVeRef.current?.napLaiChu() })
     return () => {
       ro.disconnect(); window.removeEventListener('orientationchange', henDo); window.visualViewport?.removeEventListener('resize', henDo)
       if (hen) cancelAnimationFrame(hen)
