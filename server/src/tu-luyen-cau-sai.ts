@@ -25,13 +25,15 @@ const str = (v: unknown) => (v === null || v === undefined ? '' : String(v))
 /** MỐC nguồn câu sai: 29/09/2026 00:00 giờ Việt Nam (thầy: "từ ngày hôm qua" — lệnh ngày 30/09). Hằng số, không trượt theo ngày. */
 export const MOC_CAU_SAI_NGAY = '2026-09-29'
 export const MOC_CAU_SAI_ISO = '2026-09-28T17:00:00.000Z'
-export const LOI_KHO_CAU_SAI_TRONG = 'Từ 29/09 em chưa có câu sai nào ở ca kiểm tra hay chiến dịch. Làm thêm rồi quay lại nhé.'
+export const LOI_KHO_CAU_SAI_TRONG = 'Em chưa sai câu nào từ 29/09.'
+export const MOC_CAU_SAI_MS = Date.parse(MOC_CAU_SAI_ISO)
 
-/** Nguồn của một lần sai: ca kiểm tra, hoặc trò chơi trong chiến dịch. */
-export type LoaiNguonSai = 'ca' | 'dao' | 'doan' | 'bia'
+/** Nguồn của một lần sai: ca kiểm tra, trò chơi trong chiến dịch, Luyện đề cấu trúc, hoặc lượt Tu luyện (chế độ 2–4) đã nộp. */
+export type LoaiNguonSai = 'ca' | 'dao' | 'doan' | 'bia' | 'luyen_de' | 'tu_luyen'
 export interface LanSai { qid: string; loai: LoaiNguonSai; tenCa: string; tenChienDich: string; luc: string; ngay: string }
 
-const TEN_TRO: Record<Exclude<LoaiNguonSai, 'ca'>, string> = { dao: 'Đảo thần thú', doan: 'Đoàn Hộ Tống', bia: 'Bi-a' }
+const TEN_TRO: Record<Exclude<LoaiNguonSai, 'ca'>, string> = { dao: 'Đảo thần thú', doan: 'Đoàn Hộ Tống', bia: 'Bi-a', luyen_de: 'Luyện đề cấu trúc', tu_luyen: 'Tu luyện' }
+const LA_TRO = new Set<LoaiNguonSai>(['dao', 'doan', 'bia'])
 const ddmm = (ngay: string) => (/^\d{4}-\d{2}-\d{2}/.test(ngay) ? `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}` : '')
 
 /** Chữ một nguồn sai: "Ca kiểm tra Ester · 29/09" · "Chiến dịch Ôn ester · Đoàn Hộ Tống · 30/09" · "Đảo thần thú · 30/09". */
@@ -39,10 +41,11 @@ export function chuNguonSai(l: LanSai): string {
   const ngay = ddmm(l.ngay)
   const duoi = ngay ? ` · ${ngay}` : ''
   if (l.loai === 'ca') return `${l.tenCa.trim() || 'Ca kiểm tra'}${duoi}`
+  if (!LA_TRO.has(l.loai)) return `${TEN_TRO[l.loai as 'luyen_de']}${duoi}`
   return `${l.tenChienDich.trim() ? `Chiến dịch ${l.tenChienDich.trim()} · ` : ''}${TEN_TRO[l.loai]}${duoi}`
 }
 
-const khoaNguon = (l: LanSai) => (l.loai === 'ca' ? `ca|${l.tenCa}` : `${l.loai}|${l.tenChienDich}`)
+const khoaNguon = (l: LanSai) => (l.loai === 'ca' ? `ca|${l.tenCa}` : LA_TRO.has(l.loai) ? `${l.loai}|${l.tenChienDich}` : l.loai)
 const theoLuc = (a: LanSai, b: LanSai) => (a.luc < b.luc ? -1 : a.luc > b.luc ? 1 : 0)
 
 /**
@@ -95,11 +98,21 @@ export function xenKeDeKho<T extends { kho: boolean }>(ds: readonly T[], rnd: ()
   return ra
 }
 
-export interface UngVienSai { qid: string; kho: boolean; soLanLuyen: number; lanCuoi: number }
+export interface UngVienSai {
+  qid: string
+  kho: boolean
+  soLanLuyen: number
+  lanCuoi: number
+  /** Ôn cách quãng (luật 30/09 v3): đã đúng lần 1 và TỚI HẠN hẹn gặp lại ⇒ lấy TRƯỚC mọi câu khác. */
+  toiHan?: boolean
+  /** Đã đúng lần 1 nhưng CHƯA tới hạn ⇒ chỉ lấy khi kho cạn (đứng sau mọi câu khác, trước vòng lặp). */
+  choHen?: boolean
+}
 
-/** Thứ tự ƯU TIÊN: chưa luyện → luyện ít lần nhất → luyện lâu nhất; bằng nhau thì ngẫu nhiên. */
+/** Thứ tự ƯU TIÊN: câu tới hạn hẹn lại → chưa luyện → luyện ít lần nhất → luyện lâu nhất; bằng nhau thì ngẫu nhiên. Câu đang chờ hẹn xếp CUỐI. */
 export function thuTuUuTien<T extends UngVienSai>(ds: readonly T[], rnd: () => number): T[] {
-  return tron(ds, rnd).sort((a, b) => a.soLanLuyen - b.soLanLuyen || a.lanCuoi - b.lanCuoi)
+  const xep = (a: readonly T[]) => tron(a, rnd).sort((x, y) => Number(!!y.toiHan) - Number(!!x.toiHan) || x.soLanLuyen - y.soLanLuyen || x.lanCuoi - y.lanCuoi)
+  return [...xep(ds.filter((c) => !c.choHen)), ...xep(ds.filter((c) => c.choHen))]
 }
 
 /** Trần số câu một lượt chế độ 1: mỗi câu lặp tối đa hai lần trong lượt (kho N câu ⇒ tối đa 2N), không quá `tran`. */
@@ -143,27 +156,133 @@ export function cauLuyenTuCauGame(q: PrivateQuestion): CauLuyen {
   return cauLuyenTuBoCau([{ phan: q.phan, maDe: q.maDe, q: cau as never }])[0]!
 }
 
-export interface CauSaiKho { qid: string; q: PrivateQuestion; lanSai: LanSai[]; kho: boolean }
-export interface KhoCauSai { ds: CauSaiKho[]; tuCa: number; tuChienDich: number; loi: string }
+export interface CauSaiKho {
+  qid: string
+  q: PrivateQuestion
+  lanSai: LanSai[]
+  kho: boolean
+  /** Mọi qid cùng nhóm nội dung (khử trùng) — trạng thái khắc phục đọc theo bất kỳ qid nào trong nhóm. */
+  qids: string[]
+  /** Trạng thái ôn cách quãng ĐANG HIỆU LỰC (đã tính "sai lại ⇒ về đầu"); null = chưa đúng lần nào kể từ lần sai cuối. */
+  khacPhuc: TrangThaiKhacPhuc | null
+}
+export interface KhoCauSai {
+  /** Câu CÒN trong kho (chưa khắc phục). */
+  ds: CauSaiKho[]
+  tuCa: number
+  tuChienDich: number
+  tuLuyenDe: number
+  tuTuLuyen: number
+  /** Tổng câu sai từ mốc (còn trong kho + đã khắc phục) và số đã khắc phục — bộ đếm "Đã khắc phục X/Y câu sai". */
+  tong: number
+  daKhacPhuc: number
+  /** Lịch sử để Tổng hợp tính tỉ lệ khắc phục theo tuần: lúc câu vào kho (lần sai đầu, ms) và lúc khắc phục (ms | null). */
+  lichSu: { qid: string; vao: number; khacPhucLuc: number | null }[]
+  loi: string
+}
 
-/** Lần sai của em từ mốc (sổ `su_kien_hoc`, chỉ ĐỌC). Cột `visibility` chưa có ở CSDL cũ ⇒ đọc lại không có cột ấy. */
+// ------------------------------------------------------------------ ÔN CÁCH QUÃNG (luật 30/09 v3)
+//   đúng lần 1 ⇒ hẹn gặp lại sau ≥ 1 ngày (không rút lại trước hạn trừ khi kho cạn);
+//   đúng lần 2 LIÊN TIẾP ở NGÀY KHÁC ⇒ "Đã khắc phục", rời kho;  sai lại (ở Tu luyện hay bất kỳ nguồn nào sau đó) ⇒ về đầu.
+// Trạng thái ở bảng CHỈ-THÊM `tu_luyen_khac_phuc` (server/migration-3009-tu-luyen-khac-phuc.sql; dựng tại chỗ ở tu-luyen.ts).
+
+export const MOT_NGAY_MS = 86_400_000
+export interface TrangThaiKhacPhuc { soDungLien: number; lanCuoi: number; henLai: number | null; daKhacPhucLuc: number | null }
+const ngayVn = (ms: number) => Math.floor((ms + 7 * 3_600_000) / MOT_NGAY_MS)
+
+/** Trạng thái còn HIỆU LỰC: có lần sai (ở bất kỳ nguồn nào) SAU mốc của trạng thái ⇒ về đầu (null). */
+export function khacPhucHieuLuc(cu: TrangThaiKhacPhuc | null | undefined, saiCuoiMs: number): TrangThaiKhacPhuc | null {
+  if (!cu) return null
+  const moc = cu.daKhacPhucLuc ?? cu.lanCuoi
+  return saiCuoiMs > moc ? null : cu
+}
+
+/** Chấm xong một câu của kho câu sai ⇒ trạng thái mới (hàm thuần). `saiCuoiMs` = lần sai gần nhất của câu ở các nguồn (để "sai lại ⇒ về đầu"). */
+export function capNhatKhacPhuc(cu: TrangThaiKhacPhuc | null | undefined, dung: boolean, now: number, saiCuoiMs = 0): TrangThaiKhacPhuc {
+  if (!dung) return { soDungLien: 0, lanCuoi: now, henLai: null, daKhacPhucLuc: null }
+  const hl = khacPhucHieuLuc(cu, saiCuoiMs)
+  if (hl?.daKhacPhucLuc) return hl
+  if (!hl || hl.soDungLien <= 0) return { soDungLien: 1, lanCuoi: now, henLai: now + MOT_NGAY_MS, daKhacPhucLuc: null }
+  if (ngayVn(now) !== ngayVn(hl.lanCuoi)) return { soDungLien: 2, lanCuoi: now, henLai: null, daKhacPhucLuc: now }
+  return hl // đúng lần nữa trong CÙNG ngày: chưa tính, giữ hẹn cũ
+}
+
+/** Nhãn thêm trên thẻ câu khi áp dụng. */
+export const nhanConMotLan = (t: TrangThaiKhacPhuc | null): string => (t && !t.daKhacPhucLuc && t.soDungLien === 1 ? 'Còn 1 lần đúng nữa là khắc phục' : '')
+
+/** Chữ sau khi chấm một câu của kho câu sai. */
+export function chuSauCham(t: TrangThaiKhacPhuc, dung: boolean): string {
+  if (!dung) return 'Chưa đúng — câu này ở lại kho, luyện lại từ đầu'
+  if (t.daKhacPhucLuc) return 'Đã khắc phục câu này — rời kho câu sai'
+  if (t.soDungLien === 1) return 'Đúng lần 1 — hẹn gặp lại câu này sau 1 ngày'
+  return 'Đúng — làm lại vào ngày khác để khắc phục'
+}
+
+/** Hai bảng CHỈ-THÊM của bản v3 — y hệt server/migration-3009-tu-luyen-khac-phuc.sql (test khoá). */
+export const SQL_BANG_KHAC_PHUC: readonly string[] = [
+  'CREATE TABLE IF NOT EXISTS tu_luyen_khac_phuc ( sbd TEXT NOT NULL, qid TEXT NOT NULL, so_dung_lien INTEGER NOT NULL DEFAULT 0, lan_cuoi INTEGER NOT NULL DEFAULT 0, hen_lai INTEGER, da_khac_phuc_luc INTEGER, PRIMARY KEY (sbd, qid) )',
+  'CREATE TABLE IF NOT EXISTS tu_luyen_cham_cau ( luot_id TEXT NOT NULL, sbd TEXT NOT NULL, qid TEXT NOT NULL, tra_loi TEXT NOT NULL DEFAULT \'\', dung INTEGER NOT NULL DEFAULT 0, diem REAL NOT NULL DEFAULT 0, luc INTEGER NOT NULL, PRIMARY KEY (luot_id, qid) )',
+]
+
+/** Trạng thái khắc phục của em (qid ⇒ trạng thái). Bảng chưa có ⇒ rỗng. */
+export async function docKhacPhuc(env: Env, sbd: string): Promise<Map<string, TrangThaiKhacPhuc>> {
+  const r = await env.DB.prepare('SELECT qid, so_dung_lien, lan_cuoi, hen_lai, da_khac_phuc_luc FROM tu_luyen_khac_phuc WHERE sbd = ?').bind(sbd).all<Row>()
+    .catch(() => ({ results: [] as Row[] }))
+  const ra = new Map<string, TrangThaiKhacPhuc>()
+  for (const x of r.results ?? []) {
+    ra.set(str(x.qid), {
+      soDungLien: Number(x.so_dung_lien) || 0,
+      lanCuoi: Number(x.lan_cuoi) || 0,
+      henLai: x.hen_lai == null ? null : Number(x.hen_lai),
+      daKhacPhucLuc: x.da_khac_phuc_luc == null ? null : Number(x.da_khac_phuc_luc),
+    })
+  }
+  return ra
+}
+
+/** Câu lệnh GHI trạng thái (gộp vào batch của lượt nộp / chấm câu). */
+export function lenhGhiKhacPhuc(env: Env, sbd: string, qid: string, t: TrangThaiKhacPhuc) {
+  return env.DB.prepare(
+    `INSERT INTO tu_luyen_khac_phuc (sbd, qid, so_dung_lien, lan_cuoi, hen_lai, da_khac_phuc_luc) VALUES (?,?,?,?,?,?)
+     ON CONFLICT(sbd, qid) DO UPDATE SET so_dung_lien = excluded.so_dung_lien, lan_cuoi = excluded.lan_cuoi, hen_lai = excluded.hen_lai, da_khac_phuc_luc = excluded.da_khac_phuc_luc`,
+  ).bind(sbd, qid, t.soDungLien, t.lanCuoi, t.henLai, t.daKhacPhucLuc)
+}
+
+// ------------------------------------------------------------------ KHO CÂU SAI CHUNG (chế độ 1, 2, 4)
+
+const isoTuMs = (ms: number) => new Date(ms).toISOString()
+const ngayVnChu = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
+
+/**
+ * Lần sai của em từ mốc — BỐN nguồn, chỉ ĐỌC:
+ *   · sổ `su_kien_hoc`: ca kiểm tra ĐÃ CÔNG BỐ (sai hoặc bỏ trống) · game/chiến dịch (lần SAI) · Luyện đề cấu trúc (`nguon='luyen'`, đề ĐÃ NỘP, lần SAI);
+ *   · bảng `tu_luyen_cau`: câu SAI ở lượt Tu luyện chế độ 2–4 ĐÃ NỘP (chế độ 1 là luyện lại chính kho này — sai ở đó chỉ đặt lại ôn cách quãng).
+ * Cột `visibility` chưa có ở CSDL cũ ⇒ đọc lại không có cột ấy.
+ */
 async function docLanSai(env: Env, sbd: string): Promise<LanSai[]> {
   const sql = (coVis: boolean) => `SELECT s.qid, s.nguon, s.luc, s.ngay_vn, ${coVis ? 's.visibility' : 'NULL AS visibility'},
-      c.ten_ca, CASE WHEN s.nguon = 'thi' THEN (c.ma_ca IS NOT NULL AND COALESCE(c.trang_thai, '') <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}) ELSE 1 END AS hop_le,
+      c.ten_ca, CASE WHEN s.nguon = 'thi' THEN (c.ma_ca IS NOT NULL AND COALESCE(c.trang_thai, '') <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')})
+        WHEN s.nguon = 'luyen' THEN EXISTS (SELECT 1 FROM luyen_de_2026 ld WHERE ld.id = s.ma_nguon AND ld.sbd = s.sbd AND ld.status = 'submitted') ELSE 1 END AS hop_le,
       COALESCE(json_extract(g.json, '$.bia'), 0) AS bia, json_extract(g.json, '$.doan') AS doan
     FROM su_kien_hoc s
     LEFT JOIN ca c ON s.nguon = 'thi' AND c.ma_ca = s.ma_nguon
     LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
-    WHERE s.sbd = ? AND s.ngay_vn >= ? AND s.luc >= ? AND s.nguon IN ('thi', 'game') AND COALESCE(s.qid, '') <> ''
-      AND ((s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1) OR (s.nguon = 'game' AND s.ket_qua = 0))`
+    WHERE s.sbd = ? AND s.ngay_vn >= ? AND s.luc >= ? AND s.nguon IN ('thi', 'game', 'luyen') AND COALESCE(s.qid, '') <> ''
+      AND ((s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1) OR (s.nguon IN ('game', 'luyen') AND s.ket_qua = 0))`
   const r = await env.DB.prepare(sql(true)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>()
     .catch(() => env.DB.prepare(sql(false)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>())
   const ra: LanSai[] = []
   for (const x of r.results ?? []) {
     if (str(x.visibility) === 'embargoed' || Number(x.hop_le) !== 1) continue
     const nguon = str(x.nguon)
-    const loai: LoaiNguonSai = nguon === 'thi' ? 'ca' : Number(x.bia) === 1 ? 'bia' : x.doan != null ? 'doan' : 'dao'
+    const loai: LoaiNguonSai = nguon === 'thi' ? 'ca' : nguon === 'luyen' ? 'luyen_de' : Number(x.bia) === 1 ? 'bia' : x.doan != null ? 'doan' : 'dao'
     ra.push({ qid: str(x.qid), loai, tenCa: loai === 'ca' ? str(x.ten_ca) : '', tenChienDich: '', luc: str(x.luc), ngay: str(x.ngay_vn) })
+  }
+  const tl = await env.DB.prepare('SELECT qid, nop_luc FROM tu_luyen_cau WHERE sbd = ? AND dung = 0 AND che_do <> 1 AND nop_luc >= ?').bind(sbd, MOC_CAU_SAI_MS).all<Row>()
+    .catch(() => ({ results: [] as Row[] }))
+  for (const x of tl.results ?? []) {
+    const ms = Number(x.nop_luc) || 0
+    ra.push({ qid: qidGoc(str(x.qid)), loai: 'tu_luyen', tenCa: '', tenChienDich: '', luc: isoTuMs(ms), ngay: ngayVnChu(ms) })
   }
   return ra
 }
@@ -182,7 +301,7 @@ async function docTenChienDich(env: Env, sbd: string): Promise<Map<string, strin
 }
 
 /** Nội dung câu từ chỉ mục game (tờ còn, chỉ mục khớp nguồn). Câu vắng = đã đổi/rút khỏi kho ⇒ bỏ. */
-async function docNoiDung(env: Env, qids: string[]): Promise<Map<string, { group: string; q: PrivateQuestion }>> {
+export async function docNoiDung(env: Env, qids: string[]): Promise<Map<string, { group: string; q: PrivateQuestion }>> {
   const ra = new Map<string, { group: string; q: PrivateQuestion }>()
   for (let i = 0; i < qids.length; i += 800) {
     const r = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
@@ -197,38 +316,66 @@ async function docNoiDung(env: Env, qids: string[]): Promise<Map<string, { group
   return ra
 }
 
-/** KHO CÂU SAI của em từ mốc — khử trùng, lọc, kèm lịch sử sai từng câu. `loi` ≠ '' khi kho rỗng hoặc phải đóng cửa. */
+/**
+ * KHO CÂU SAI CHUNG của em từ mốc (chế độ 1, 2, 4 cùng dùng) — khử trùng qid + nhóm nội dung; bỏ tự luận, câu đang bảo vệ, câu đã đổi/rút khỏi kho;
+ * kèm trạng thái ôn cách quãng từng câu; câu ĐÃ KHẮC PHỤC (không sai lại sau đó) rời `ds` nhưng vẫn đếm vào `tong` / `daKhacPhuc`.
+ * `loi` ≠ '' khi kho (còn lại) rỗng hoặc phải đóng cửa.
+ */
 export async function docKhoCauSai(env: Env, sbd: string): Promise<KhoCauSai> {
-  const rong = (loi: string): KhoCauSai => ({ ds: [], tuCa: 0, tuChienDich: 0, loi })
+  const rong = (loi: string): KhoCauSai => ({ ds: [], tuCa: 0, tuChienDich: 0, tuLuyenDe: 0, tuTuLuyen: 0, tong: 0, daKhacPhuc: 0, lichSu: [], loi })
   const lan = await docLanSai(env, sbd)
   if (!lan.length) return rong(LOI_KHO_CAU_SAI_TRONG)
-  const tenCd = lan.some((l) => l.loai !== 'ca') ? await docTenChienDich(env, sbd) : new Map<string, string>()
+  const tenCd = lan.some((l) => LA_TRO.has(l.loai)) ? await docTenChienDich(env, sbd) : new Map<string, string>()
   const theoQid = new Map<string, LanSai[]>()
   for (const l of lan) {
-    if (l.loai !== 'ca') l.tenChienDich = tenCd.get(l.qid) ?? ''
+    if (LA_TRO.has(l.loai)) l.tenChienDich = tenCd.get(l.qid) ?? ''
     theoQid.set(l.qid, [...(theoQid.get(l.qid) ?? []), l])
   }
   const noiDung = await docNoiDung(env, [...theoQid.keys()])
   const baoVe = await docBaoVeKho(env)
   if (!baoVe) return rong(LOI_CHUA_KIEM_BAO_VE)
   // Khử trùng theo NHÓM NỘI DUNG: cùng một đề chép ở nhiều tờ ⇒ một câu (gộp lịch sử sai), giữ qid có lần sai gần nhất.
-  const theoNhom = new Map<string, CauSaiKho>()
+  const theoNhom = new Map<string, Omit<CauSaiKho, 'khacPhuc'>>()
   for (const [qid, ds] of theoQid) {
     const nd = noiDung.get(qid)
     if (!nd || laCauTuLuan(nd.q) || baoVe.has(qid) || (nd.group && baoVe.has(nd.group))) continue
     const khoa = nd.group || `qid|${qid}`
     const cu = theoNhom.get(khoa)
     const xep = [...ds].sort(theoLuc)
-    if (!cu) { theoNhom.set(khoa, { qid, q: nd.q, lanSai: xep, kho: laCauKho(nd.q) }); continue }
+    if (!cu) { theoNhom.set(khoa, { qid, q: nd.q, lanSai: xep, kho: laCauKho(nd.q), qids: [qid] }); continue }
     const gop = [...cu.lanSai, ...xep].sort(theoLuc)
     const moiHon = xep[xep.length - 1]!.luc > cu.lanSai[cu.lanSai.length - 1]!.luc
-    theoNhom.set(khoa, moiHon ? { qid, q: nd.q, lanSai: gop, kho: laCauKho(nd.q) } : { ...cu, lanSai: gop })
+    const qids = [...cu.qids, qid]
+    theoNhom.set(khoa, moiHon ? { qid, q: nd.q, lanSai: gop, kho: laCauKho(nd.q), qids } : { ...cu, lanSai: gop, qids })
   }
-  const ds = [...theoNhom.values()]
-  if (!ds.length) return rong(LOI_KHO_CAU_SAI_TRONG)
-  const tuCa = ds.filter((c) => c.lanSai[0]!.loai === 'ca').length
-  return { ds, tuCa, tuChienDich: ds.length - tuCa, loi: '' }
+  const tatCa = [...theoNhom.values()]
+  if (!tatCa.length) return rong(LOI_KHO_CAU_SAI_TRONG)
+  const tt = await docKhacPhuc(env, sbd)
+  const ds: CauSaiKho[] = []
+  const lichSu: KhoCauSai['lichSu'] = []
+  let daKhacPhuc = 0
+  for (const c of tatCa) {
+    const hl = khacPhucHieuLuc(c.qids.map((x) => tt.get(x)).find(Boolean) ?? null, saiCuoiMs(c.lanSai))
+    lichSu.push({ qid: c.qid, vao: Date.parse(c.lanSai[0]!.luc) || 0, khacPhucLuc: hl?.daKhacPhucLuc ?? null })
+    if (hl?.daKhacPhucLuc) { daKhacPhuc++; continue }
+    ds.push({ ...c, khacPhuc: hl })
+  }
+  const dem = (loai: (l: LoaiNguonSai) => boolean) => ds.filter((c) => loai(c.lanSai[0]!.loai)).length
+  return {
+    ds,
+    tuCa: dem((l) => l === 'ca'),
+    tuChienDich: dem((l) => LA_TRO.has(l)),
+    tuLuyenDe: dem((l) => l === 'luyen_de'),
+    tuTuLuyen: dem((l) => l === 'tu_luyen'),
+    tong: tatCa.length,
+    daKhacPhuc,
+    lichSu,
+    loi: ds.length ? '' : `Em đã khắc phục hết ${tatCa.length} câu sai từ 29/09.`,
+  }
 }
+
+/** Lần sai GẦN NHẤT (ms) trong lịch sử sai của một câu. */
+export const saiCuoiMs = (ds: readonly LanSai[]): number => ds.reduce((m, l) => Math.max(m, Date.parse(l.luc) || 0), 0)
 
 /** Số lần mỗi câu (qid gốc) đã có trong lượt Tu luyện ĐÃ NỘP của em + lần gần nhất (ms). Bảng chưa có ⇒ rỗng. */
 export async function docLanLuyen(env: Env, sbd: string): Promise<Map<string, { n: number; cuoi: number }>> {

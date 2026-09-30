@@ -25,8 +25,8 @@ export const NHAN_PHAN_TU_LUYEN: Record<PhanCau, string> = { I: 'Trắc nghiệm
 
 /** Trần số câu một lượt Tu luyện (máy chủ kẹp lại, không tin máy em). */
 export const TRAN_CAU_TU_LUYEN = 100
-/** Số câu mặc định của thanh chọn (chế độ 2, 3, 4) — đúng như khối cũ. */
-export const SO_CAU_MAC_DINH = 20
+/** Số câu mặc định của thanh chọn mọi chế độ (v3, thầy 30/09: "mặc định 10 câu/lượt"; thanh chọn vẫn kéo được). */
+export const SO_CAU_MAC_DINH = 10
 
 /** Một câu gửi xuống máy em KHI ĐANG LÀM: TUYỆT ĐỐI không có đáp án, lời giải, "em đã chọn … đáp án đúng là …". */
 export interface CauCongKhai {
@@ -46,6 +46,8 @@ export interface CauCongKhai {
   nhanLuyen?: string
   /** Chế độ 1: "Sai gốc: Ca kiểm tra Ester · 29/09" / "Sai gốc: Chiến dịch … · Đoàn Hộ Tống · 30/09 và 2 lần khác". */
   saiGoc?: string
+  /** Chế độ 1 (ôn cách quãng v3): "Còn 1 lần đúng nữa là khắc phục" khi câu đã đúng lần 1. */
+  conMotLan?: string
 }
 
 /** Phần RIÊNG của câu — chỉ nằm trên máy chủ tới lúc em nộp. */
@@ -62,9 +64,12 @@ export interface CauRieng {
   bai: string
   lop: string
   sao: 0 | 1 | 2
+  /** Câu thuộc KHO CÂU SAI (chế độ 1) ⇒ chấm xong cập nhật ôn cách quãng. `saiCuoi` = lần sai gần nhất (ms) lúc rút. */
+  khoSai?: true
+  saiCuoi?: number
 }
 
-/** Kết quả chấm một câu (trả về SAU khi nộp). */
+/** Kết quả chấm một câu (trả về SAU khi nộp, hoặc khi "Chấm từng câu"). */
 export interface KetQuaCau {
   qid: string
   phan: PhanCau
@@ -78,6 +83,8 @@ export interface KetQuaCau {
   loiGiai?: LoiGiaiCauTruc
   /** Câu vừa thuộc một ca kiểm tra đang bảo vệ ⇒ máy chủ chấm nhưng GIỮ đáp án + lời giải lại. */
   anDapAn?: true
+  /** Câu của kho câu sai: "Đúng lần 1 — hẹn gặp lại câu này sau 1 ngày" / "Đã khắc phục câu này — rời kho câu sai" / … */
+  khacPhuc?: string
 }
 
 const chuHoa = (v: unknown) => String(v ?? '').trim().toUpperCase()
