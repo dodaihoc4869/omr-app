@@ -407,11 +407,11 @@ export default function GiaoChienDich({
                 </small>
                 <label className="cd-tich">
                   <input type="checkbox" checked={huyetChien} onChange={(e) => setHuyetChien(e.target.checked)} />
-                  <span>Em chậm nhịp được làm tới {2 * theLuc} câu/ngày (Quá tải hôm nay · tự tính gấp đôi)</span>
+                  <span>Em chậm nhịp được làm tới {2 * theLuc} lượt/ngày (Quá tải hôm nay · tự tính gấp đôi)</span>
                 </label>
                 <label className="cd-tich">
                   <input type="checkbox" role="switch" aria-checked={raiDeu} checked={raiDeu} onChange={(e) => setRaiDeu(e.target.checked)} />
-                  <span>Rải đều câu mới theo ngày</span>
+                  <span>Rải đều câu mới</span>
                 </label>
                 <small className="cd-phu">Câu mới chia đều theo số ngày (trừ 3 ngày cuối để ôn); lượt dư trong ngày dùng để ôn. Tắt thì đổ câu mới cho đủ số lượt mỗi ngày.</small>
               </div>

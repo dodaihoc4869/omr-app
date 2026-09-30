@@ -51,16 +51,32 @@ describe('rải đều câu mới theo ngày (thầy 30/09)', () => {
     expect(demNo(ds)).toBe(10)
     expect(ds).toHaveLength(19)
   })
-  it('(c2) BẬT: đủ quota câu mới ⇒ nợ vẫn giữ trần 50 %, lượt dư bỏ trống (thầy "giữ các tỉ lệ hiện có; nếu vẫn dư thì thôi"); TẮT ⇒ nợ 50 %, câu mới lấp đầy', () => {
+  it('(c2) BẬT: đủ quota câu mới ⇒ lượt dư dồn cho nợ vượt trần 50 % (chữ màn Giao "lượt dư trong ngày dùng để ôn"); TẮT ⇒ nợ 50 %, câu mới lấp đầy', () => {
     const { cs, tt } = bo(25, 30, '2026-09-30')
     const bat = lapKeHoachNgay(cs, tt, { homNay: '2026-09-30', hanNop: HAN, tranNgay: 49, raiDeu: true })
     expect(demMoi(tatCa(bat))).toBe(9)
-    expect(demNo(tatCa(bat))).toBe(24) // floor(49 × 50 %) — KHÔNG lấp chỗ dư bằng nợ
-    expect(tatCa(bat)).toHaveLength(33)
+    expect(demNo(tatCa(bat))).toBe(30) // 24 (50 %) + 6 lấp chỗ dư — hết nợ tới lịch
+    expect(tatCa(bat)).toHaveLength(39)
     const tat = lapKeHoachNgay(cs, tt, { homNay: '2026-09-30', hanNop: HAN, tranNgay: 49 })
     expect(demNo(tatCa(tat))).toBe(24)
     expect(demMoi(tatCa(tat))).toBe(25)
     expect(tatCa(tat)).toHaveLength(49)
+  })
+  it('(c3) phản biện vòng 2 #110: BẬT, ngày 01/10 — 24 câu mới, 40 nợ tới lịch, thể lực 49 ⇒ 12 mới + 37 nợ = 49 (không bỏ trống 13 lượt khi còn nợ)', () => {
+    const { cs, tt } = bo(24, 40, '2026-10-01')
+    const bat = lapKeHoachNgay(cs, tt, { homNay: '2026-10-01', hanNop: HAN, tranNgay: 49, raiDeu: true })
+    expect(demMoi(tatCa(bat))).toBe(12) // ceil(24 / (5 − 3))
+    expect(demNo(tatCa(bat))).toBe(37)
+    expect(tatCa(bat)).toHaveLength(49)
+  })
+  it('(c4) phản biện vòng 2 #110 [NẶNG]: BẬT, ngày ôn (D = 2) còn sót 1 câu mới + 40 nợ ⇒ 1 mới + 40 nợ (như TẮT), không kẹp nợ 50 %', () => {
+    const { cs, tt } = bo(1, 40, '2026-10-04')
+    const bat = lapKeHoachNgay(cs, tt, { homNay: '2026-10-04', hanNop: HAN, tranNgay: 49, raiDeu: true })
+    const tat = lapKeHoachNgay(cs, tt, { homNay: '2026-10-04', hanNop: HAN, tranNgay: 49 })
+    expect(bat.D).toBe(2)
+    expect(demMoi(tatCa(bat))).toBe(1)
+    expect(demNo(tatCa(bat))).toBe(40)
+    expect(tatCa(bat)).toHaveLength(tatCa(tat).length)
   })
   it('(d) BẬT: D ≤ 3 ⇒ đổ hết câu mới còn lại (giữ luật ngày cuối)', () => {
     const { cs, tt } = bo(25, 0, '2026-10-03')

@@ -149,8 +149,10 @@ export default function BangChienDich({
         </div>
         <span className="cd-chip-muc cd-chip-muc--xanh">Đang chạy</span>
         {/* Rải đều câu mới (thầy 30/09): chip RIÊNG cạnh trạng thái, đúng chữ chuẩn — không nối vào ô Quá tải (phản biện PR 108). Máy chủ cũ không gửi ⇒ Bật. */}
-        <span className={`cd-chip-muc cd-chip-muc--${cd.raiDeu === false ? 'xam' : 'xanh'}`} data-khoi="rai-deu">
-          Rải đều câu mới: {cd.raiDeu === false ? 'Tắt' : 'Bật'}
+        {/* Phản biện vòng 2 PR 110: chiến dịch giao trước khi có công tắc (thầy chưa đặt) ⇒ "Bật (mặc định)" để thầy biết máy tự bật. */}
+        <span className={`cd-chip-muc cd-chip-muc--${cd.raiDeu === false ? 'xam' : 'xanh'}`} data-khoi="rai-deu"
+          title={cd.raiDeu !== false && cd.raiDeuMacDinh ? 'Chiến dịch giao trước khi có công tắc này: app tự bật. Tắt được ở danh sách chiến dịch.' : undefined}>
+          Rải đều câu mới: {cd.raiDeu === false ? 'Tắt' : cd.raiDeuMacDinh ? 'Bật (mặc định)' : 'Bật'}
         </span>
       </div>
 

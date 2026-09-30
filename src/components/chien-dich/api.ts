@@ -38,6 +38,8 @@ export interface ChienDichTom {
   thongKe?: ThongKeChienDich | null
   /** Rải đều câu mới theo ngày (thầy 30/09): câu mới/ngày dừng đúng quota, lượt dư để ôn. Máy chủ cũ vắng ⇒ coi là BẬT. */
   raiDeu?: boolean
+  /** Thầy CHƯA từng đặt cờ (chiến dịch giao trước khi có công tắc): máy tự bật ⇒ hiện "Bật (mặc định)". Máy chủ cũ vắng ⇒ không nhãn. */
+  raiDeuMacDinh?: boolean
 }
 
 /** Số liệu lớp gọn của một chiến dịch — bảng "Chiến dịch đã giao" (bản vẽ GV-ChienDichDaGiao 28/09). */

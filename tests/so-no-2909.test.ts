@@ -277,8 +277,8 @@ function fixture() {
 const sk = (sbd: string, qid: string, msLuc: number, dung: boolean, nguon: SuKien['nguon'] = 'game', maNguon = `phien-${msLuc}`): SuKien => ({
   nguon, maNguon, sbd, qid, lan: 1, ketQua: dung ? 1 : 0, luc: new Date(msLuc).toISOString(),
 })
-const giao = async (env: Env, maDe: string, hanNop: string, nowMs: number, theLucNgay = 40) => {
-  const r = await gvChienDich(env, { action: 'tao', ten: `CD ${maDe}`, lop: '12A1', maDe: [maDe], hanNop, theLucNgay }, nowMs)
+const giao = async (env: Env, maDe: string, hanNop: string, nowMs: number, theLucNgay = 40, raiDeu?: boolean) => {
+  const r = await gvChienDich(env, { action: 'tao', ten: `CD ${maDe}`, lop: '12A1', maDe: [maDe], hanNop, theLucNgay, ...(raiDeu === undefined ? {} : { raiDeu }) }, nowMs)
   expect(r.ok).toBe(true)
   return String(r.id)
 }
@@ -333,14 +333,28 @@ describe('Sổ nợ trên D1 thật', () => {
     expect(sc.khoiLuongTrungVi).toBe(70)
     expect(Number(sc.theLucDeXuat)).toBeGreaterThanOrEqual(10)
     expect((sc.noCu as { sbd: string; cau: string }[]).map((x) => x.cau)).toEqual(['Em Nguyễn An còn 10 câu nợ cũ — cần ≈ 7 ngày để trả hết'])
-    const id = await giao(env, 'DE2', '2026-10-09', T0, 6)
+    // raiDeu:false — kiểm trần nợ 50 % theo luật đổ đầy thể lực (luật cũ); rải đều (mặc định) có test riêng ngay dưới.
+    const id = await giao(env, 'DE2', '2026-10-09', T0, 6, false)
     const bang = await gvChienDich(env, { action: 'bang', id }, T0)
     expect((bang.noCu as { sbd: string; soCau: number; soNgay: number }[])).toMatchObject([{ sbd: 'S1', soCau: 10, soNgay: 7 }])
     // Kế hoạch em: 80 lượt (có 20 lượt nợ cũ) > 0,9 × 10 × 6 ⇒ Quá tải (trần 12); nợ ≤ 50%.
     const { kh } = await layKeHoachHomNay(env, 'S1', T0)
     expect(kh.huyetChien).toBe(true)
-    // 30/09: chiến dịch mới mặc định RẢI ĐỀU câu mới ⇒ 6 nợ (50 %) + 5 câu mới (quota ⌈30 / (10 − 3)⌉), lượt thứ 12 bỏ trống (không đổ thêm nợ/câu mới).
-    expect(kh.tong).toBe(11)
+    expect(kh.tong).toBe(12)
     expect([...kh.dao, ...kh.doan].filter((q) => q.startsWith('Q')).length).toBe(6)
+  })
+
+  it('RẢI ĐỀU (mặc định, phản biện vòng 2 #110): Quá tải trần 12 ⇒ 5 câu mới (quota ⌈30 / (10 − 3)⌉) + nợ lấp NỐT lượt dư (7 nợ) — không bỏ trống lượt khi còn nợ', async () => {
+    const { d, env } = fixture()
+    const cu = await giao(env, 'DE1', '2026-09-28', T0 - 5 * NGAY, 40)
+    d.sql.exec(`UPDATE chien_dich SET trang_thai = 'da_dong' WHERE id = '${cu}'`)
+    await ghiSuKien(env, Array.from({ length: 10 }, (_, i) => sk('S1', `Q${i + 1}`, T0 - 4 * NGAY + i, false)))
+    await giao(env, 'DE2', '2026-10-09', T0, 6)
+    const { kh } = await layKeHoachHomNay(env, 'S1', T0)
+    expect(kh.huyetChien).toBe(true)
+    expect(kh.tong).toBe(12)
+    const ds = [...kh.dao, ...kh.doan]
+    expect(ds.filter((q) => q.startsWith('Q')).length).toBe(7)
+    expect(ds.filter((q) => !q.startsWith('Q')).length).toBe(5)
   })
 })

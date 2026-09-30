@@ -5,11 +5,11 @@
 // (K2/K2b/K3) kế hoạch và game dùng CÙNG một phép kiểm tự luận (`laCauTuLuan` trên câu của chỉ mục) ⇒ phương án rỗng chữ không lọt; Đảo–Đoàn không khoá vòng.
 // (vang) câu vắng khi nạp mà meta còn ⇒ lỗi tạm `chua_nap_duoc`, không "xong" trái với Sảnh.
 // (CAS) ghi kế hoạch giữa ngày chỉ khi bản ghi chưa bị máy khác đổi.
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { docMetaCau, layKeHoachHomNay, qidGoc, sanh2, tuLuanTuMeta, xoaDemChienDich } from '../server/src/srs2-d1'
-import { boQuaMoi, lyDoLuotRong, startDao2, startDoan2 } from '../server/src/srs2-game'
+import { boQuaMoi, logChuaNap, lyDoLuotRong, startDao2, startDoan2 } from '../server/src/srs2-game'
 import { laCauTuLuan } from '../server/src/cam-tu-luan'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
@@ -242,5 +242,70 @@ describe('CAS — ghi kế hoạch giữa ngày không đè bản máy khác v�
     expect(chen).toBe(true)
     expect(JSON.parse(hangKeHoach(d).dao_json)).toEqual(banMayKhac)
     expect(sau.dao).toEqual(banMayKhac)
+  })
+})
+
+describe('PHẢN BIỆN vòng 2 #110', () => {
+  it('ĐỐI CHỨNG ngày cuối: làm hết kế hoạch, 1 câu sai ⇒ bổ sung lần 2 trong ngày', async () => {
+    const { env } = fixture(10)
+    await giao(env, { soNgayHan: 0 })
+    const nay = Date.now()
+    const { kh } = await layKeHoachHomNay(env, 'S1', nay)
+    const ds = kh.conDao.map(qidGoc)
+    await ghiSuKien(env, [suKien(ds[0]!, nay - 60_000, false)])
+    await lamXong(env, ds.slice(1), nay)
+    const { kh: sau } = await layKeHoachHomNay(env, 'S1', nay)
+    expect(sau.tong).toBeGreaterThan(kh.tong)
+    expect([...sau.conDao, ...sau.conDoan].map(qidGoc)).toContain(ds[0])
+  })
+  it('[VỪA] NGÀY CUỐI: còn 1 câu hỏng (tự luận) không có câu thay ⇒ phần bổ sung "làm lại câu sai trong ngày" VẪN có (không bị chặn cả ngày)', async () => {
+    const { d, env } = fixture(10)
+    await giao(env, { soNgayHan: 0 })
+    const nay = Date.now()
+    const { kh } = await layKeHoachHomNay(env, 'S1', nay)
+    const ds = kh.conDao.map(qidGoc)
+    const hong = ds[ds.length - 1]!
+    await ghiSuKien(env, [suKien(ds[0]!, nay - 60_000, false)])
+    await lamXong(env, ds.slice(1, -1), nay)
+    gatCoTuLuan(d, hong)
+    const { kh: sau } = await layKeHoachHomNay(env, 'S1', nay)
+    expect(sau.tong).toBeGreaterThan(kh.tong - 1)
+    expect([...sau.conDao, ...sau.conDoan].map(qidGoc)).toContain(ds[0])
+    expect(tatCaQid(sau).filter((q) => q === hong)).toHaveLength(0) // câu hỏng vẫn bị tạm hoãn khỏi tong
+  })
+  it('[NHẸ] câu THAY không lấy câu đang bảo vệ cho ca ⇒ lấy câu hợp lệ kế tiếp, tong giữ nguyên, không tạm hoãn "ca"', async () => {
+    const { d, env } = fixture(40)
+    await giao(env, { theLucNgay: 10, soNgayHan: 7, raiDeu: false })
+    const nay = Date.now()
+    const { kh } = await layKeHoachHomNay(env, 'S1', nay)
+    const ds = kh.conDao.map(qidGoc)
+    expect(kh.conDoan).toEqual([])
+    await lamXong(env, ds.slice(0, 5), nay)
+    const ngoai = Array.from({ length: 40 }, (_, i) => `Q${i + 1}`).filter((q) => !ds.includes(q))
+    const tuDo = ngoai[ngoai.length - 1]!
+    const bank = { phanI: ngoai.filter((q) => q !== tuDo).map((id) => ({ id, text: `Câu ${id}`, choices: ['a', 'b', 'c', 'd'], correct: 'B' })), phanII: [], phanIII: [] }
+    d.objects.set('de/CA-CU.json', bank)
+    const luc = nay - 2 * 3_600_000
+    d.sql.prepare(`INSERT INTO ca(ma_ca,ten_ca,trang_thai,bat_dau,het_han_vao,thoi_gian_phut,loai,cong_bo,bank_r2,cap_nhat_luc) VALUES('CA-CU','Ca cũ','dong',?,?,45,'thi','khong','de/CA-CU.json',?)`)
+      .run(new Date(luc).toISOString(), new Date(luc + 20 * 60_000).toISOString(), new Date(luc).toISOString())
+    xoaDemCaBaoVe()
+    gatCoTuLuan(d, ds[ds.length - 1]!)
+    const { kh: kh2 } = await layKeHoachHomNay(env, 'S1', nay)
+    expect(kh2.tong).toBe(kh.tong)
+    expect(tatCaQid(kh2)).toContain(tuDo)
+    expect(kh2.tamHoan?.ca ?? 0).toBe(0)
+  })
+  it('[NHẸ] chua_nap_duoc ⇒ log có SBD + mãĐề|qid (đánh dấu câu vắng khi nạp), không tên em', () => {
+    const loi = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const bq = boQuaMoi()
+    bq.vang.add('Q2')
+    const meta = new Map([['Q1', { maDe: 'DE1' }], ['Q2', { maDe: 'DE1' }]]) as never
+    logChuaNap('dao', 'S1', ['Q1', 'Q2', 'Q2#2'], { meta }, bq)
+    const dong = loi.mock.calls.map((c) => c.join(' ')).join('\n')
+    loi.mockRestore()
+    expect(dong).toContain('"sbd":"S1"')
+    expect(dong).toContain('DE1|Q1')
+    expect(dong).toContain('DE1|Q2 (vắng khi nạp)')
+    expect(dong).not.toContain('Nguyễn')
   })
 })
