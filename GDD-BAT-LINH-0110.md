@@ -817,3 +817,43 @@ Truy cập 01/10/2026. Mọi nguồn đọc **qua trích đoạn WebSearch**; We
 - Cấu trúc đề 2025: thuvienphapluat.vn/hoi-dap-phap-luat/de-hoa-thpt-2025-bao-nhieu-cau-cach-cham-diem-thi-tot-nghiep-thpt-2025-mon-hoa-138051782.html · mit.vn/dap-an-va-de-thi-chinh-thuc-mon-hoa-hoc-ky-thi-tot-nghiep-thpt-nam-2025/ · w3chem.com/de-tot-nghiep-thpt-p2-2025/ · daibieunhandan.vn/de-tham-khao-mon-hoa-tot-nghiep-thpt-2025-khong-qua-kho-nhung-kha-dai-post393666.html
 
 **Chưa kiểm được:** toàn văn mọi trang; thứ tự chương của bộ sách khác "Kết nối tri thức"; tỉ lệ lớp 10/11/12 và Biết/Hiểu/Vận dụng trong ma trận đề 2025 (đang để là giả định); mức 2 ý = 0,25 điểm của Phần II (theo hiểu biết, trích đoạn không nêu).
+
+---
+
+## 14. BẮT BUỘC: học sinh tự chọn phần kiến thức đã học (thầy chốt 01/10)
+
+**Luật cứng:** mọi kênh rút câu tự động (kế hoạch ngày, Đảo, Hộ Tống, Bi-a, thi thử, test đầu vào, bài tương tự, trận phục thù) **chỉ lấy câu thuộc phần em đã đánh dấu "đã học"**. Ngoại lệ duy nhất: "Câu thử" ở đảo sương mờ, do em tự bấm, không tính vào kế hoạch và không làm hạ năng lực.
+
+### 14.1 Đơn vị chọn: theo BÀI trong SGK, nhóm theo chương
+- Bước 1 khi đăng ký: chọn **lớp** và **bộ sách** (Kết nối tri thức / Chân trời sáng tạo / Cánh Diều). Thứ tự và tên bài khác nhau giữa các bộ nên app hiển thị đúng mục lục của bộ em học.
+- Bước 2: mục lục dạng cây **Chương → Bài**, mỗi bài một ô tick. Có nút nhanh: "Đã học hết chương", "Học tới bài này" (tick mọi bài từ đầu tới bài chọn).
+- Học sinh lớp 11, 12 được tick nhanh "đã học hết lớp 10/11"; muốn bỏ bớt bài quên thì bỏ tick từng bài.
+- Cập nhật bất cứ lúc nào: mỗi lần em tick thêm bài, đảo/vùng tương ứng **tan sương** (khoảnh khắc mở khoá trong game), câu của bài đó bắt đầu vào kế hoạch từ hôm sau.
+- Nhắc nhẹ định kỳ (1 lần/2 tuần, theo lịch năm học ước lượng): "Ở trường em học tới bài nào rồi?" — một chạm cập nhật.
+
+### 14.2 Bản đồ kho đề theo bài, không theo thứ tự sách
+- Mỗi câu gắn **mã chuẩn kiến thức** (yêu cầu cần đạt của chương trình 2018, ví dụ "Hoá 11 · Cân bằng · pH dung dịch acid/base mạnh"), KHÔNG gắn cứng vào số bài của một bộ sách.
+- Bảng nối **bài của từng bộ sách → các mã chuẩn kiến thức** do thầy duyệt một lần cho 3 bộ. Em tick bài ⇒ máy biết em đã học những mã nào ⇒ rút câu theo mã.
+- Câu đòi kiến thức của **nhiều bài** (câu tổng hợp) chỉ được rút khi em đã tick **đủ mọi bài** câu đó cần.
+- Mã đề kho hiện nay (`12-C1-B1-D1…`) theo một bộ sách; Code 4 chuyển sang gắn mã chuẩn kiến thức, giữ mã cũ để không lệch dữ liệu.
+
+### 14.3 Ảnh hưởng tới các hệ thống
+| Hệ thống | Luật |
+|---|---|
+| Test đầu vào | Chỉ hỏi trong phạm vi đã tick; phạm vi quá hẹp (< 3 bài) thì làm test ngắn và mở rộng dần |
+| Kế hoạch ngày / SRS | Câu mới chỉ từ bài đã tick; câu ôn của bài em **bỏ tick** thì tạm dừng (không xoá lịch sử), tick lại thì quay về |
+| Thi thử tuần | Ghép đề cấu trúc 2025 **trong phạm vi đã học**; ghi rõ "Đề thử phạm vi: …". Thi thử đủ chương trình chỉ mở khi đã tick hết |
+| Điểm dự báo | Chỉ dự báo trên phần đã học, ghi rõ phạm vi |
+| Bản đồ năng lực / thần thú | Bài chưa học không bị tính là "yếu" |
+| Bài tương tự / trận phục thù | Câu thay thế cũng phải trong phạm vi đã học |
+| Lớp do thầy quản (nếu có) | Chiến dịch thầy giao được ưu tiên; ngoài chiến dịch vẫn theo tick của em |
+
+### 14.4 Chống lách và sai lệch
+- Tick quá nhanh nhiều chương chưa học: kết quả test/ôn sẽ thấp ở các mã đó; máy gợi ý "Bài này em có chắc đã học chưa?" (không khoá, không phạt).
+- Không có cách tick để lấy thưởng: tan sương đảo không cho EXP/vàng; thưởng chỉ đến từ làm bài.
+
+### 14.5 Dữ liệu cần chuẩn bị
+1. Mục lục 3 bộ sách × 3 lớp (thầy hoặc Code 4 soạn, thầy duyệt).
+2. Danh sách mã chuẩn kiến thức theo chương trình 2018.
+3. Bảng nối bài ↔ mã cho từng bộ sách.
+4. Gắn mã chuẩn kiến thức cho toàn kho (Code 4 làm tự động, thầy duyệt câu máy gắn cờ).
