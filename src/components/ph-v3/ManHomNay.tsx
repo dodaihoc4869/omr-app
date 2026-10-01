@@ -32,10 +32,16 @@ export default function ManHomNay({ v, hoc2, canhBao, onDaXem }: { v: ViewPhMoi;
           {hoc2?.chienDich && <ChienDich cd={hoc2.chienDich} />}
           <BaiTapCu pm={pm} />
           {pm.caGanNhat && <CaGanNhat pm={pm} />}
-          <DieuMung pm={pm} />
+          {/* 01/10 (thầy: "lời thầy chuyển lên trên cho cân đối"): "Thầy đã lo cho con" lên ngay đầu cột trái, "Điều đáng mừng" xếp
+              bên dưới trong CÙNG một cột — thẻ ngắn không còn để khoảng trống lớn cạnh thẻ "Dạng con đang luyện thêm". */}
+          {(coDieuMung(pm) || coAiDaLo(pm)) && (
+            <div className="ph3-cot">
+              <AiDaLo pm={pm} />
+              <DieuMung pm={pm} />
+            </div>
+          )}
           <DangLuyenThem pm={pm} />
           <HocLucNao pm={pm} coChienDich={!!hoc2?.chienDich} />
-          <AiDaLo pm={pm} />
         </div>
       )}
     </div>
@@ -194,8 +200,12 @@ function CaGanNhat({ pm }: { pm: PhMoi }) {
   )
 }
 
+const dsMung = (pm: PhMoi) => (pm.dieuDangMung ?? []).filter((d) => d.loai !== 'chuoi' && d.so !== null && d.so > 0) // chuỗi ngày đã ở khối đầu
+const coDieuMung = (pm: PhMoi) => dsMung(pm).length > 0
+const coAiDaLo = (pm: PhMoi) => (pm.aiDaLam ?? []).some((x) => x.so !== null && x.so > 0)
+
 function DieuMung({ pm }: { pm: PhMoi }) {
-  const ds = (pm.dieuDangMung ?? []).filter((d) => d.loai !== 'chuoi' && d.so !== null && d.so > 0) // chuỗi ngày đã ở khối đầu
+  const ds = dsMung(pm)
   if (ds.length === 0) return null
   return (
     <The id="ph3-mung" tieuDe="Điều đáng mừng hôm nay" bieuTuong={<BtSao />} mau="xl">
@@ -206,7 +216,11 @@ function DieuMung({ pm }: { pm: PhMoi }) {
           ) : (
             <li key={i}>
               <span className="ph3-mung__bt"><BtLen co={16} day={3} /></span>
-              <span>Con lên bậc ở {d.dang.length > 0 ? <b>{d.dang.join(', ')}</b> : <b>{d.so} dạng</b>}</span>
+              {/* 01/10: tên dạng mỗi dòng một dạng (trước nối dấu phẩy thành một khối chữ dài khó đọc). */}
+              <span className="ph3-mung__len">
+                Con lên bậc ở {d.dang.length > 0 ? `${d.dang.length} dạng` : <b>{d.so} dạng</b>}
+                {d.dang.length > 0 && <span className="ph3-mung__dang">{d.dang.map((x) => <b key={x}>{x}</b>)}</span>}
+              </span>
             </li>
           ),
         )}
