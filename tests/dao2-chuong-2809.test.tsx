@@ -23,8 +23,9 @@ describe('Đảo 2.0 · bắn chưởng theo kết quả chấm', () => {
     const c = canh(kq(true))
     const lop = c.querySelector('.d2c')!
     expect(lop.getAttribute('data-kieu')).toBe('dung')
-    expect(c.querySelector('.bl-arena')?.getAttribute('data-dong-tac')).toBe('cast')
-    expect(c.querySelector('canvas.bl-arena-canvas')).toBeTruthy()
+    expect(lop.querySelector('.d2c-cau')).toBeTruthy()
+    expect(lop.querySelector('.d2c-no .d2c-song')).toBeTruthy()
+    expect(lop.querySelector('.d2c-do')).toBeNull()
     const sec = c.querySelector('.dao2-canh') as HTMLElement
     expect(sec.getAttribute('data-chuong')).toBe('dung')
     expect(Number(sec.style.getPropertyValue('--d2c-quai-tu'))).toBeCloseTo(100 / 91)
@@ -35,19 +36,18 @@ describe('Đảo 2.0 · bắn chưởng theo kết quả chấm', () => {
     const c = canh(kq(true, false))
     const lop = c.querySelector('.d2c')!
     expect(lop.getAttribute('data-kieu')).toBe('sai')
-    expect(c.querySelector('.bl-arena')?.getAttribute('data-dong-tac')).toBe('hit')
+    expect(lop.querySelector('.d2c-do')).toBeTruthy()
     expect(c.querySelector('.dao2-canh')!.getAttribute('data-chuong')).toBe('sai')
     expect(c.querySelector('.dao2-so')?.getAttribute('data-phia')).toBe('thu')
     const css = readFileSync('src/game/than-thu-v2/dao2/chuong.css', 'utf8')
     expect(css).toMatch(/\.d2c\[data-kieu="sai"\]\{--xa:var\(--xq\);--ya:var\(--yq\);--xb:var\(--xt\)/)
   })
-  it('3 câu đúng liền ⇒ Cuồng nộ, chữ "Combo x3", diễn tuyệt chiêu', () => {
+  it('3 câu đúng liền ⇒ Cuồng nộ, chữ "Combo x3", cầu to hơn', () => {
     giam(false)
     const c = canh(kq(false, true, true, true))
     const lop = c.querySelector('.d2c') as HTMLElement
     expect(lop.hasAttribute('data-cuong-no')).toBe(true)
     expect(lop.textContent).toContain('Combo x3')
-    expect(c.querySelector('.bl-arena')?.getAttribute('data-dong-tac')).toBe('ultimate')
     expect(Number(lop.style.getPropertyValue('--d2c-co'))).toBeGreaterThan(1.5)
     expect(donChuong(kq(true, true), 12, 2)).toMatchObject({ dung: true, combo: 2, cuongNo: false })
   })
@@ -74,9 +74,7 @@ describe('Đảo 2.0 · bắn chưởng theo kết quả chấm', () => {
     expect(container.querySelector('.d2c')).toBeNull()
     vi.useRealTimers()
     expect(readFileSync('src/game/than-thu-v2/dao2/chuong.css', 'utf8')).toMatch(/\.d2c\{position:absolute;inset:0;container-type:size;pointer-events:none/)
-    expect(MOC_CHUONG.phong).toBeLessThan(MOC_CHUONG.trung)
-    expect(MOC_CHUONG.trung).toBeLessThan(MOC_CHUONG.het)
-    expect(MOC_CHUONG.het).toBeLessThanOrEqual(2.2)
+    expect(MOC_CHUONG.het).toBeLessThanOrEqual(1.3)
   })
 
   it('cảnh dựng lại không có cờ chuong (sang câu sau, mở lại chuyến) ⇒ không chiếu chưởng lần hai', () => {
@@ -93,7 +91,7 @@ const PH: PhanHoi2 = { correct: true, answer: 'B', traLoi: 'B', solution: { chot
 const ai = (viTri: number, k: BattleAnswer[], ph: PhanHoi2 | null) => <div className="dao dao2"><TrongAi profile={hoSo} cau={CAU} viTri={viTri} ketQua={k} traLoi="B" assisted={false} phanHoi={ph}
   onTraLoi={() => {}} onAssisted={() => {}} onNop={() => {}} onTiep={() => {}} onRoi={() => {}} /></div>
 describe('Đảo 2.0 · chưởng chạy ngay lúc chốt, trước lời giải (dọc 390×844)', () => {
-  it('máy chủ trả kết quả ⇒ cảnh trận + chưởng hiện trước, sau khi chưởng tan mới mở lời giải; sang câu sau không chiếu lại', () => {
+  it('máy chủ trả kết quả ⇒ cảnh trận + chưởng hiện trước, ~1,1 s sau mới mở lời giải; sang câu sau không chiếu lại', () => {
     giam(false); vi.useFakeTimers()
     Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true }); Object.defineProperty(window, 'innerHeight', { value: 844, configurable: true })
     const { container: c, rerender } = render(ai(0, [], null))
@@ -103,19 +101,13 @@ describe('Đảo 2.0 · chưởng chạy ngay lúc chốt, trước lời giải
     expect(c.querySelector('.dao2-the-giai')).toBeNull()
     expect(c.querySelector('.dao2-ket-qua')).toBeNull()
     expect(c.querySelector('.dao2-nut-chot')).toBeNull() // không chốt lại được giữa hoạt cảnh
-    act(() => { vi.advanceTimersByTime(2300) })
+    act(() => { vi.advanceTimersByTime(1150) })
     expect(c.querySelector('.dao2-the-giai')).toBeTruthy()
     expect(c.querySelector('.dao2-canh')).toBeNull() // dọc: lời giải thay chỗ cảnh trận như cũ
     rerender(ai(1, kq(true), null)) // sang ải 2: cảnh dựng lại
     expect(c.querySelector('.dao2-canh')).toBeTruthy()
     expect(c.querySelector('.d2c')).toBeNull()
     vi.useRealTimers()
-  })
-  it('máy chủ gửi lại cùng kết quả trong khi chờ ⇒ không khởi động lại đồng hồ', () => {
-    giam(false);vi.useFakeTimers()
-    const {container:c,rerender}=render(ai(0,[],null));rerender(ai(0,kq(true),PH))
-    act(()=>vi.advanceTimersByTime(1500));rerender(ai(0,kq(true),{...PH}))
-    act(()=>vi.advanceTimersByTime(800));expect(c.querySelector('.dao2-the-giai')).toBeTruthy();vi.useRealTimers()
   })
   it('em bấm vào màn ⇒ bỏ qua hoạt cảnh, mở lời giải ngay', () => {
     giam(false)

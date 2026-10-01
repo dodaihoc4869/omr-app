@@ -261,3 +261,7 @@ Vỏ `dao/DaoThanThu` của Code 6 CHƯA có trên main (mới có màn 1 `ChonB
 ### Đã phát hành Bát Linh · 01/10/2026 20:35 (VN) · Codex
 - Đẩy main nguồn 8dc776305c40a290846951ebbe7be966dc0f502d từ worktree sạch; Actions 36868247959/job110389101254 SUCCESS. Hai bước đẩy Pages (13:35:37Z) và Worker (13:35:44Z) đều success; website https://omr-app-b3u.pages.dev/hs. Không thay mã Worker/D1 trong phần diễn hoạt.
 - Bằng chứng: docs/bat-linh-dien-hoat-0110/phat-hanh.json. Xác nhận qua GitHub; proxy workspace chặn pages.dev nên không kiểm tra trực tiếp tài nguyên trên website thật. Bản lùi b21a251e / Actions36863450803. Commit ghi sổ sau phát hành chỉ tài liệu [skip ci].
+
+### Khôi phục bản cũ theo yêu cầu người dùng · 01/10/2026 (VN) · Codex
+- Người dùng yêu cầu “quay lại bản cũ đi nhé”. Khôi phục 53 đường dẫn mã/tài nguyên của đợt diễn hoạt 90cde40b + cấu hình precache 63e4b44d về b21a251e. So src/server/public/scripts/tests/vite.config.ts/package.json/package-lock.json: không có sai khác với bản trước. Giữ hồ sơ và ảnh bằng chứng trong docs.
+- Không đổi dữ liệu D1; phát hành lại theo deploy.yml. Bản trước lần khôi phục: 8dc77630 / Actions36868247959. Bản cũ cần khôi phục: b21a251e / Actions36863450803. Đang chạy Vitest toàn bộ và build trước bước đẩy Cloudflare.

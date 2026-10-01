@@ -1,5 +1,7 @@
 # Ghép diễn hoạt Bát Linh vào Đảo và Đoàn · 01/10/2026
 
+**Trạng thái khôi phục:** người dùng yêu cầu quay lại bản cũ sau lần phát hành dưới đây. Đã khôi phục mã và tài nguyên game về `b21a251e`; đang kiểm tra để phát hành lại. Nội dung bên dưới lưu lại bộ diễn hoạt đã rút.
+
 Đã nối bộ tranh vào cảnh trong ải Đảo 2.0, cảnh chiến đấu Đoàn 2.0 và màn tung chưởng cuối hiệp của Đoàn. Đã phát hành lên Cloudflare Pages lúc 20:35 ngày 01/10/2026 (giờ Việt Nam), nguồn `8dc77630`; bước Worker cũng thành công. Cảnh chiến đấu của giao diện đời cũ và Võ đài chưa chuyển sang bộ diễn hoạt này.
 
 [Mở app học sinh](https://omr-app-b3u.pages.dev/hs) · [Quy trình phát hành thành công](https://github.com/dodaihoc4869/omr-app/actions/runs/36868247959) · [Bằng chứng phát hành](bat-linh-dien-hoat-0110/phat-hanh.json). Xác nhận qua trạng thái hai bước đẩy Cloudflare trên GitHub; mạng workspace chặn truy cập trực tiếp `pages.dev`, nên chưa kiểm tra tài nguyên từ website thật sau phát hành.

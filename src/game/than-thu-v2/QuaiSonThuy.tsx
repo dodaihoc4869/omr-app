@@ -10,9 +10,8 @@ const O_QUAI: Record<string, readonly [number, number, number, number]> = {
   chua_te_ket_tua: [890, 394, 439, 493],
   trum_suong_mu: [1330, 388, 444, 499],
 }
-export function oQuaiSonThuy(loai:string){return O_QUAI[loai]??O_QUAI.bun_acid!}
 export default function QuaiSonThuy({ loai, size, className = '', x, y }: { loai: string; size: number; className?: string; x?: number; y?: number }) {
-  const crop = oQuaiSonThuy(loai)
+  const crop = O_QUAI[loai] ?? O_QUAI.bun_acid!
   return <svg className={`bl-quai ${className}`} x={x} y={y} width={size} height={size} viewBox={crop.join(' ')} style={{ overflow: 'hidden' }} aria-hidden="true" focusable="false">
     <image href="/bat-linh/quai-son-thuy.webp" width="1774" height="887" />
   </svg>

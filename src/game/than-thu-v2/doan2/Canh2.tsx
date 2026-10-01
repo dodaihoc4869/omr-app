@@ -1,7 +1,5 @@
-import {useState} from 'react'
-import type {DongTac} from '../dien-hoat/kieu'
-import type {KetQuaCau} from '../doan-kieu'
 import XeLinhTam from '../XeLinhTam'
+import QuaiSonThuy from '../QuaiSonThuy'
 // ĐOÀN HỘ TỐNG · GAME HÓA 2.0 — nửa trên màn TRONG TRẬN theo bản vẽ Moi-DoanTran: cảnh hoàng hôn núi + đường + xe chở Linh Tâm phát sáng
 // (vòng Máu quanh cầu), quái phục kích màu hồng, số sát thương đòn vừa rồi; HUD kính "HIỆP k/8" + vạch 8 hiệp có kim cương hiệp trùm + đồng hồ vòng;
 // huy hiệu LIÊN KÍCH; đồng đội góc phải (CHỈ trạng thái, không bao giờ đáp án hay chữ "sai" của bạn). Mọi con số do máy chủ trả.
@@ -9,26 +7,23 @@ import XeLinhTam from '../XeLinhTam'
 import NutToanManHinh from '../../../components/NutToanManHinh'
 import { HE_LIEN_KICH, HIEP_TRUM, HP_QUAI } from '../doan-core'
 import { CHU_TRANG_THAI, type DoanXem, type TranXem } from '../doan-kieu'
-import { ThuHinh } from '../DoanHinh'
-import SanDauDienHoat from '../dien-hoat/SanDauDienHoat'
+import { ThuHinh, TrumHinh } from '../DoanHinh'
 
 interface Props {
   xem: DoanXem; tran: TranXem
   /** Giây còn của hiệp (vẽ từ mốc máy chủ) và hiệp đã mở chưa. */ con: number; mo: boolean
   /** Số "ổ phục kích" (câu ôn) còn lại hôm nay theo `hoa2-sanh`; null = chưa biết ⇒ không hiện. */ oPhucKich: number | null
-  onRoi: () => void;ketQua?:KetQuaCau|null;chan?:boolean
+  onRoi: () => void
 }
 
 const R_DONG_HO = 21, C_DONG_HO = 2 * Math.PI * R_DONG_HO
 /** Chỗ đứng của bạn trong cảnh (theo % khung tranh 390×340): em đứng trước, to nhất; bạn đứng sau, nhỏ hơn. */
+const CHO_BAN = [{ left: '1.5%', top: '44%', width: '16%' }, { left: '30%', top: '44%', width: '14.5%' }, { left: '17%', top: '37%', width: '13%' }]
+/** Quái phục kích: ô đầu to nhất đứng trước; tối đa 3 con trên tranh. */
+const CHO_QUAI = [{ x: 300, y: 290, s: 1 }, { x: 354, y: 296, s: .72 }, { x: 330, y: 262, s: .55 }]
 
-export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi,ketQua,chan=false }: Props) {
+export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
   const em = xem.ghe.find(g => g.laEm), ban = xem.ghe.filter(g => !g.laEm)
-  // Chỉ diễn đòn MỚI được máy chủ chấm; tải lại câu đã chốt không bắn lần hai.
-  const khoaCau=`${tran.hiep}/${xem.cau?.qid??''}`,dung=(ketQua??xem.cau?.ketQua)?.correct??null
-  const [truoc,setTruoc]=useState({khoa:khoaCau,dung}),[dong,setDong]=useState<DongTac>('idle')
-  if(truoc.khoa!==khoaCau){setTruoc({khoa:khoaCau,dung});setDong('idle')}
-  else if(truoc.dung!==dung){setTruoc({khoa:khoaCau,dung});if(truoc.dung===null&&dung!==null&&!tran.laTrum)setDong(chan?'guard':dung?'cast':'hit')}
   const phanGio = mo ? Math.max(0, Math.min(1, con / Math.max(1, tran.giay))) : 1
   const soTrum = HIEP_TRUM.indexOf(tran.hiep)
   // Đòn của em ở hiệp VỪA xong (máy chủ gửi `hiepVuaXong`): chỉ hiện khi đó đúng là hiệp liền trước và có sát thương thật.
@@ -36,14 +31,20 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi,ketQua,chan
   const nhanDon = donEm ? (donEm.lienKich ? 'LIÊN KÍCH' : donEm.haGuc > 0 ? 'HẠ GỤC' : 'ĐÒN CỦA EM') : ''
   // Huy hiệu Liên Kích: sẵn sàng (bạn vừa được em tiếp sức) hoặc đòn vừa rồi của em nổ Liên Kích — hai dòng cho gọn một ô.
   const lienKich = xem.tiepSuc?.lienKichSanSang && mo ? 'sẵn sàng' : donEm?.lienKich ? 'vừa nổ' : ''
-  const quai = tran.quai.slice(0, 3), tenQuai = tran.tenQuai[tran.hiep < HIEP_TRUM[0]! ? 0 : 1] ?? 'Tạp Chất'
+  const quai = tran.quai.slice(0, CHO_QUAI.length), dau = quai[0], tenQuai = tran.tenQuai[tran.hiep < HIEP_TRUM[0]! ? 0 : 1] ?? 'Tạp Chất'
   return (
-    <div className={`dh2-canh bl-canh-dien-hoat ${tran.laTrum ? 'dh2-canh-trum' : ''}`} data-vung="canh-2">
+    <div className={`dh2-canh ${tran.laTrum ? 'dh2-canh-trum' : ''}`} data-vung="canh-2">
       <div className="dh2-ve" aria-label={tran.laTrum ? `Trùm ${tran.tenTrum[soTrum] ?? ''} chặn đường, Linh Tâm còn Máu ${tran.linhTam.hp}/${tran.linhTam.toiDa}` : `Linh Tâm trên xe còn Máu ${tran.linhTam.hp}/${tran.linhTam.toiDa}, ${tran.quai.length} Tạp Chất phục kích`} role="img">
-        {em&&<SanDauDienHoat thu={em.pet} hanhDong={dong} suKien={khoaCau} dich={tran.laTrum?[{id:'trum',loai:tran.loaiTrum[soTrum]??'chua_te_ket_tua'}]:quai.map(q=>({id:q.ma,loai:q.loai}))} ban={ban.slice(0,3).map(g=>({id:g.ghe,pet:g.pet}))}/>}
-        <svg className="bl-xe-trong-canh" viewBox="120 165 150 140" aria-hidden="true">
+        <svg viewBox="0 0 390 340" aria-hidden="true">
           <XeLinhTam hp={tran.linhTam.hp} toiDa={tran.linhTam.toiDa} />
+          {/* Quái phục kích (hiệp thường) — thanh Máu trên con đứng đầu */}
+          {!tran.laTrum && [...quai].reverse().map((q, i) => { const c = CHO_QUAI[quai.length - 1 - i]!; return <g key={q.ma} transform={`translate(${c.x} ${c.y}) scale(${c.s})`}><QuaiSonThuy loai={q.loai} size={96} x={-48} y={-88}/></g> })}
+          {!tran.laTrum && dau && <g><rect x="271" y="212" width="58" height="6" rx="3" fill="rgba(0,0,0,.4)" /><rect x="271" y="212" width={Math.round(58 * Math.max(0, Math.min(1, dau.hp / 24)))} height="6" rx="3" fill="rgb(255,92,138)" /></g>}
+          {donEm && <path d="M250 250 l16 -8 l-6 10 l14 -2 l-16 10 l6 -8 z" fill="rgb(255,224,138)" />}
         </svg>
+        {tran.laTrum && <div className="dh2-trum"><TrumHinh loai={tran.loaiTrum[soTrum] ?? ''} size={150} className="dh-noi" /></div>}
+        {em && <ThuHinh pet={em.pet} cap={em.cap} camXuc={xem.cau?.ketQua ? (xem.cau.ketQua.correct ? 'dung' : 'sai') : mo ? 'nghi' : 'quyet-tam'} className="dh-noi dh-thu-em" style={{ left: '9%', top: '52%', width: '33%', aspectRatio: '1' }} />}
+        {ban.slice(0, CHO_BAN.length).map((g, i) => <ThuHinh key={g.ghe} pet={g.pet} cap={g.cap} className="dh-noi-2" style={{ ...CHO_BAN[i], aspectRatio: '1', animationDelay: `${i * .4}s` }} />)}
         {donEm && (
           <div className="dh2-sat-thuong" aria-label={`Đòn của em hiệp ${vua!.hiep}: ${donEm.satThuong} sát thương`}>
             <b>-{donEm.satThuong}</b><span>{nhanDon}</span>

@@ -1,4 +1,5 @@
 import BieuCamThu from '../BieuCamThu'
+import QuaiSonThuy from '../QuaiSonThuy'
 // ĐẢO 2.0 · TRONG ẢI (bản vẽ Moi-DaoAi.dc.html) + SAU KHI CHỐT (Moi-DaoLoiGiai.dc.html).
 // Trận GIỮ công thức `learning-battle.ts` (máu, 3 câu đúng liền ⇒ Cuồng nộ ×2); điểm/EXP do máy chủ chấm. Thẻ câu = TheCau (không sửa TheCau):
 // chế độ `thi` khi làm, chế độ `xem_lai` + khối LỜI GIẢI chuẩn (chuan-hoa-loi-giai) khi đã chốt. Gợi ý M3 CHỈ lấy từ `goiY` máy chủ gửi —
@@ -17,6 +18,7 @@ import type {BattleAnswer} from '../learning-battle'
 import {battleMuted,playBattleSound,setBattleMuted,unlockBattleAudio} from '../battle-audio'
 import {evolutionStage} from '../evolution'
 import {CHU_HET_TRAN_DAO,laLoiHetTran} from '../loi-het-tran'
+import {anhThu} from '../dao/anh'
 import {chiSoThu,tenThu} from '../dao/dao-core'
 import type {DaoProfile,LyDoThuong} from '../dao/kieu'
 import {NHAN_O_VAI,TEN_VAI,chuGach,dapAnDungSai,docGoiY,docVai,loiGiaiChoTheCau} from './dao2-core'
@@ -26,8 +28,6 @@ import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
 import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
-import SanDauDienHoat from '../dien-hoat/SanDauDienHoat'
-import {NHIP_CHUONG} from '../dien-hoat/kieu'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -62,9 +62,23 @@ export function TienDoChuyen({cau,viTri,ketQua}:{cau:readonly CauDao2[];viTri:nu
 export function CanhRung({profile,ketQua,tong,suKien,chuong=false,trum=false,daChot=false}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;chuong?:boolean;trum?:boolean;daChot?:boolean}){
  const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted)
  const vuaNop=suKien>0&&tran.count>0,no=vuaNop&&tran.rage
- const dong=chuong&&vuaNop?(tran.correct?(no?'ultimate':'cast'):'hit'):'idle'
- return <section className="dao2-canh bl-canh-dien-hoat" data-no={no?'':undefined} data-da-chot={daChot||undefined} aria-label="Trận đấu" {...(chuong?thuocTinhCanh(ketQua,tong,suKien):{})}>
-  <SanDauDienHoat thu={thu} hanhDong={dong} suKien={suKien} dich={[{id:'dao',loai:trum?'trum_suong_mu':'suong_mu',ha:tran.enemy===0}]}/>
+ return <section className="dao2-canh" data-no={no?'':undefined} aria-label="Trận đấu" {...(chuong?thuocTinhCanh(ketQua,tong,suKien):{})}>
+  <svg className="dao2-canh-nen" viewBox="0 0 390 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+   <defs>
+    <linearGradient id="d2-rung" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(14,42,74)"/><stop offset="1" stopColor="rgb(18,59,58)"/></linearGradient>
+    <filter id="d2-suong-a" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+   </defs>
+   <rect width="390" height="260" fill="url(#d2-rung)"/>
+   <path d="M0 200 L20 130 L40 200 Z M30 200 L56 110 L82 200 Z M320 200 L346 120 L372 200 Z M350 200 L372 140 L394 200 Z" fill="rgb(11,34,54)"/>
+   <path d="M0 200 C100 186 290 186 390 200 L390 260 L0 260 Z" fill="rgb(15,58,52)"/>
+   <g filter="url(#d2-suong-a)" fill="rgb(207,230,242)" opacity=".5"><circle cx="300" cy="150" r="70"/><circle cx="220" cy="70" r="50"/><circle cx="360" cy="60" r="50"/></g>
+   <g fill="rgb(255,255,255)" opacity=".8"><circle cx="120" cy="46" r="2"/><circle cx="170" cy="100" r="1.6"/><circle cx="80" cy="80" r="1.4"/></g>
+  </svg>
+  <div className="dao2-quai" key={`quai-${suKien}`} data-trung={vuaNop&&tran.correct?'':undefined} data-ha={tran.enemy===0?'':undefined}>
+   <QuaiSonThuy loai={trum?'trum_suong_mu':'suong_mu'} size={120}/>
+  </div>
+  <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
+  <BieuCamThu thu={thu} camXuc={daChot?(tran.correct?(chuong?'quyet-tam':'dung'):'sai'):'nghi'} size={48}/>
   {chuong&&<ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>}
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
@@ -160,14 +174,14 @@ export interface TrongAiProps{
 export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',baoCau='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
  const khung=useRef<HTMLDivElement>(null),[ti,setTi]=useState(docTi)
  // BẮN CHƯỞNG TRƯỚC LỜI GIẢI (thầy 28/09: "cho chưởng chạy ngay lúc em chốt đáp án"): máy chủ vừa trả kết quả (phanHoi null → có) ⇒ GIỮ cảnh trận
- // 2,16 s thường / 3,05 s Cuồng nộ (giảm chuyển động: 0,45 s) cho chưởng chạy trọn rồi mới mở lời giải; em bấm vào màn (click, không pointerdown: tránh cú chạm rơi trúng nút SANG ẢI vừa hiện) ⇒ bỏ qua. `chuongSk` = đòn được chiếu —
+ // ~1,1 s (giảm chuyển động: 0,45 s) cho chưởng chạy trọn rồi mới mở lời giải; em bấm vào màn (click, không pointerdown: tránh cú chạm rơi trúng nút SANG ẢI vừa hiện) ⇒ bỏ qua. `chuongSk` = đòn được chiếu —
  // sang câu sau thì xoá ⇒ cảnh dựng lại không chiếu lần hai. Máu/EXP/lời giải vẫn là số máy chủ, chỉ trễ lúc HIỆN.
  const suKien=ketQua.length,[phTruoc,setPhTruoc]=useState(phanHoiMay),[cho,setCho]=useState(false),[chuongSk,setChuongSk]=useState(-1)
  if(phanHoiMay!==phTruoc){setPhTruoc(phanHoiMay);if(phanHoiMay&&!phTruoc){setCho(true);setChuongSk(suKien)}else if(!phanHoiMay){setCho(false);setChuongSk(-1)}}
  const phanHoi=cho?null:phanHoiMay,boQua=()=>{if(cho)setCho(false)}
- const nhipCho=learningBattle([...ketQua],cau.length).rage?NHIP_CHUONG.tuyet:NHIP_CHUONG.thuong
- const choMs=giamChuyenDong()?450:(nhipCho.het+.08)*1000
- useEffect(()=>{if(!cho)return;khung.current?.querySelector('.dao2-canh')?.scrollIntoView?.({block:'nearest',behavior:giamChuyenDong()?'auto':'smooth'});const h=setTimeout(()=>setCho(false),choMs);return()=>clearTimeout(h)},[cho,choMs])
+ useEffect(()=>{if(!cho)return
+  khung.current?.querySelector('.dao2-canh')?.scrollIntoView?.({block:'nearest',behavior:'smooth'})
+  const h=setTimeout(()=>setCho(false),giamChuyenDong()?450:1100);return()=>clearTimeout(h)},[cho])
  // Ngang: thanh kéo giữa hai cột (thầy 28/09) — tỉ lệ cột trái % lưu trên máy em.
   const datTi=(v:number)=>{const x=Math.min(TI_MAX,Math.max(TI_MIN,v));setTi(x);try{localStorage.setItem(KHOA_TI,String(Math.round(x)))}catch{/* máy chặn lưu: bỏ qua */}}
  const keoTi=(x:number)=>{const r=khung.current?.getBoundingClientRect();if(r&&r.width>0)datTi((x-r.left)/r.width*100)}

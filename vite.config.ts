@@ -170,8 +170,6 @@ export default defineConfig({
           // Lời giải từng bước (29/09): khung tĩnh ~280 KB chỉ tải khi em bấm "Xem lời giải từng bước" — không cất sẵn.
           '**/loi-giai/**',
           '**/Spirit3D-*.js',
-          // Bộ diễn hoạt Đảo/Đoàn: chỉ tải lúc mở game, giữ ở kho chạy-lúc như mảnh game khác.
-          '**/SanDauDienHoat-*.{js,css}',
           // Bảng tin sàn của thầy: bản đồ lớp 3D nạp LƯỜI (import động) — three (≈ 536 KB) chỉ máy thầy tải khi mở màn Hôm nay; máy học sinh / phụ huynh KHÔNG được cất vào bộ nhớ đệm.
           '**/ban-do-3d-three-*.js',
           '**/{CaiDatScreen,TongQuanScreen,ChienDichScreen,DuyetLoiGiaiScreen,gv-hoa2,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,ca-chot-chien-dich,CauDaLam}-*.{js,css}',
