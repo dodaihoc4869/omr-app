@@ -1,5 +1,6 @@
 import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { nhipCa } from './nhip-ca'
+import { anhCo, anhDay, layAnh } from './kho-anh'
 import { denPhongBiA } from './bi-a-phong'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
@@ -747,14 +748,17 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   if (b.bank) {
     if (!env.DE) return ra({ ok: false, error: 'Chưa nối R2 — chưa đẩy gói đề được' }, 500)
     bankKey = `de/${maCa}.json`
-    await env.DE.put(bankKey, JSON.stringify(b.bank))
   }
+  // Đề và tờ đáp án cất SONG SONG (01/10, mở ca nhanh) — hai khoá độc lập.
+  await Promise.all([
+    bankKey ? env.DE!.put(bankKey, JSON.stringify(b.bank)) : null,
+    b.keyBank && env.DE ? env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank)) : null,
+  ])
   // NGÂN HÀNG CÓ ĐÁP ÁN — khoá RIÊNG, để `/nop` trả ngay cho em khi ca công bố
   // điểm. Đây là thứ gỡ nốt lượt gọi Apps Script cuối cùng khỏi đường của em.
   //
   // `key/` KHÔNG BAO GIỜ đi ra đường công khai `GET /de/:maCa`. Hai khoá khác
   // nhau, và chỉ `de/` được phục vụ công khai.
-  if (b.keyBank && env.DE) await env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank))
 
   // ĐẨY MỘT PHẦN — CHỈ MỐC BẮT ĐẦU VÀ BẢN ĐỒ ĐỀ RIÊNG.
   //
@@ -3269,6 +3273,8 @@ const boXuLy = {
       return ra({ ok: true, ten: 'may-chu-moi', coDB: !!env.DB, coR2: !!env.DE, coMat: !!env.MA_BI_MAT })
     }
     if (req.method === 'GET' && p.startsWith('/de/')) return layDe(env, decodeURIComponent(p.slice(4)), req)
+    // KHO ẢNH ĐỀ (01/10, mở ca nhanh): ảnh câu hỏi theo mã nội dung, công khai, đệm 1 năm — xem kho-anh.ts.
+    if (req.method === 'GET' && p.startsWith('/anh/')) return layAnh(env, decodeURIComponent(p.slice(5)), req, ctx)
     if (req.method === 'GET' && p === '/do-tai') {
       await moCaDoTai(env)
       return new Response(TRANG_DO_TAI, { headers: { 'content-type': 'text/html;charset=utf-8', ...CORS } })
@@ -3429,6 +3435,8 @@ const boXuLy = {
       if (p === '/hs/diem-danh') return ra(await hsDiemDanh(env, b))
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
+      if (p === '/anh/co') return anhCo(env, b)
+      if (p === '/anh/day') return anhDay(env, b)
             if (p === '/teacher-news') return ra(await teacherNews(env,b))
       // Token phụ huynh: cấp liên kết theo danh sách/lớp, và đếm truy cập (token so với SBD trần) để quyết giai đoạn cứng.
       if (p === '/ph/cap-ma') return ra(await phCapMa(envDoc, b))
