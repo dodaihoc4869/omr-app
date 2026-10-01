@@ -189,3 +189,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 30/09 23:15 VN · deploy 615 (#118) XANH 23:02 · gộp #119 Hỏi thầy chỉ hiện trong khối lời giải (444ea72), 13 chỗ · kiểm: tsc, 270 test chỉ đỏ nền cau-da-lam-2109 · không ca mở · lùi: git revert -m1 444ea72
 - 30/09 23:25 VN · deploy 616 (#119 Hỏi thầy sau lời giải) XANH 23:23 · hết việc đêm 30/09
 - 01/10 06:36 VN · gộp #120 Chuỗi ngày Hoá 2.0 đếm từ su_kien_hoc (f562dd5) · Sảnh, cửa hàng, phụ huynh · 270 test xanh, tsc sạch · không ca mở · còn: gv-hom-nay-v2.ts, thu-thach-rieng.ts vẫn demChuoiDat · lùi: git revert -m1 f562dd5
+- 01/10 07:1x VN · gộp #121 dựng lại khung lời giải đủ 13 bộ chìa khoá khối 10–11 (652ea46) + test chặn tái phát · không ca mở · lùi: git revert -m1 652ea46
