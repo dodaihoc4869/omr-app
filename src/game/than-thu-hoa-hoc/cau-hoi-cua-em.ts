@@ -175,7 +175,8 @@ export function tenDangCua(c: CauSaiTho): { ma: string; ten: string } {
  * báo cáo: ảnh thân câu, ảnh từng phương án, và ảnh chèn giữa bài theo `viTri`.
  */
 function gomAnh(c: CauSaiTho): { thanCau: string; theoPa: string[]; xen: AnhXen[] } {
-  const chuoiAnh = (x: unknown): string => (typeof x === 'string' && x.startsWith('data:') ? x : '')
+  // Ảnh đề từ 01/10 có thể là đường dẫn kho ảnh máy chủ (`https://…/anh/<băm>`), không chỉ data URL.
+  const chuoiAnh = (x: unknown): string => (typeof x === 'string' && (x.startsWith('data:') || /^https:\/\/[^\s]+\/anh\/[0-9a-f]{64}$/.test(x)) ? x : '')
   // Mọi ảnh CÓ VỊ TRÍ của câu, chuẩn hoá về { url, viTri } — cùng luật với
   // `anhCoViTri` trong `KhoiCauSai.tsx`, chỗ thầy đã chốt ngày 14-09.
   const coViTri: AnhXen[] = []

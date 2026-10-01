@@ -13,6 +13,7 @@ import { gzipSync } from 'fflate'
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
 import { voiHanCho } from './han-cho'
 import { guiCaBangXhr, laSamsungInternet } from './gui-ca-trinh-duyet'
+import { doiAnhSangKho } from './anh-len-may-chu'
 
 /** Hạn chờ khi đẩy. Rộng vì gói đề tới vài MB, nhưng vẫn hữu hạn. */
 export const HAN_DAY_CA_GIAY = 45
@@ -399,6 +400,13 @@ export const NGUONG_TACH_GOI_CA = 3 * 1024 * 1024
 export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDay, bank: unknown, keyBank?: unknown): Promise<boolean> {
   if (!ch.BAT || !ch.URL) throw new Error('Chưa có kết nối máy chủ. Thầy kiểm tra cấu hình kết nối.')
   if (!secret.trim()) throw new Error('Chưa có mã xác thực giáo viên. Thầy đăng nhập lại app giáo viên.')
+  // ẢNH SANG KHO ẢNH (01/10, mở ca nhanh): ảnh nhúng ≈ 90 % gói ca. Đẩy ảnh CÒN THIẾU lên kho ảnh theo lô nhỏ, gói ca chỉ còn đường dẫn
+  // (13 MB ⇒ ≈ 1 MB). Hỏng bất kỳ bước nào ⇒ giữ ảnh nhúng như cũ (đường gói lớn tách đôi bên dưới vẫn lo).
+  try {
+    const doi = await doiAnhSangKho(ch.URL, secret, bank, keyBank)
+    bank = doi.bank
+    keyBank = doi.keyBank
+  } catch { /* giữ ảnh nhúng */ }
   // GÓI LỚN TÁCH ĐÔI (thầy 01/10: "không mở được ca thi, máy chủ không phản hồi, gói 9946 KB"). Đề + đáp án có ảnh nhúng ≈ 13–14 MB chữ,
   // nén vẫn ≈ 10 MB, lại đi SONG SONG hai đường (thẳng + proxy) ⇒ 20 MB lên mạng một lúc: dễ đứt giữa chừng, máy chủ giữ cả hai bản trong bộ nhớ.
   // Nay: tờ đáp án đi TRƯỚC bằng lượt `chiMoc` (máy chủ cất `key/<mã>` rồi chỉ chạm hai cột mốc — ca chưa có thì không tạo gì), rồi mới ca + đề.

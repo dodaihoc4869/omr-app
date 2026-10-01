@@ -13,6 +13,7 @@ import { cauLapCuaEm, daLamLaiCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rien
 import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { taoCaDaXacNhan } from './day-ca-may-chu-moi'
+import { taiSanAnhDe } from './anh-len-may-chu'
 import { voiHanCho } from './han-cho'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
@@ -604,6 +605,8 @@ async function vaoThiQuaMayChuMoi(
       throw new Error('Gói đề tải về bị hỏng — báo Thầy đẩy lại đề cho ca này.')
     }
     if (!bank) throw new Error('Gói đề rỗng — báo Thầy đẩy lại đề cho ca này.')
+    // Ảnh đề nằm ở kho ảnh máy chủ (01/10, mở ca nhanh): tải sẵn ngay, mất mạng giữa bài vẫn thấy ảnh.
+    taiSanAnhDe(bank)
     if (r.soCau && (!bank.soCau || !bank.soCau.I)) {
       bank.soCau = r.soCau as any
     }

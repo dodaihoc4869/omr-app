@@ -30,10 +30,14 @@ export interface D1Database {
 export interface R2Object {
   body: ReadableStream
   httpEtag: string
+  /** Kho ảnh đề (kho-anh.ts) đọc kiểu nội dung đã cất. */
+  httpMetadata?: { contentType?: string; cacheControl?: string }
 }
 export interface R2Bucket {
   get(key: string): Promise<R2Object | null>
-  put(key: string, value: ArrayBuffer | string | ReadableStream): Promise<unknown>
+  put(key: string, value: ArrayBuffer | ArrayBufferView | string | ReadableStream, opts?: { httpMetadata?: { contentType?: string; cacheControl?: string } }): Promise<unknown>
+  /** Chỉ hỏi có/không (kho ảnh đề). R2 thật luôn có; bản giả trong test có thể vắng ⇒ kho-anh.ts lui về `get`. */
+  head?(key: string): Promise<unknown | null>
   delete(keys: string | string[]): Promise<void>
 }
 /** Durable Object (Bi-a Phản Ứng GĐ2 — phòng đấu `BanBiA`): chỉ khai đúng phần dùng tới. */
