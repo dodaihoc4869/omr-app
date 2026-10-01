@@ -34,7 +34,7 @@ const iso = (ms: number) => new Date(ms).toISOString()
 const HO_SO_GIU = ['su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qid_da_lam', 'skill_snapshot', 'nang_luc_cursor', 'learner_scope', 'quyen_hoc_sinh', 'cau_snapshot'] as const
 const TAI_KHOAN_GIU = ['hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_hinh', 'game_v2_settings', 'game_v2_scope', 'ma_da_dung', 'ph_truy_cap'] as const
 const HOA2_GIU = ['chien_dich', 'srs2_day_lai', 'dong_bo'] as const
-const CA_THI_XOA = ['ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'nop_khac_phuc', 'tien_do_ca', 'nhan_xet_ca_em'] as const
+const CA_THI_XOA = ['ca', 'luot', 'bai_bo_sung', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'nop_khac_phuc', 'tien_do_ca', 'nhan_xet_ca_em'] as const // 01/10: bai_bo_sung đi theo lượt ca thi
 const VANG_PHU_KIEN_XOA = ['vang_so', 'phu_kien_so_huu', 'phu_kien_dang_mac'] as const
 const GAME_XOA = ['game_v2_profile', 'than_thu', 'exp_so', 'manh_khien_so', 'cnh_exp_account', 'srs2_ke_hoach', 'ruong_bat_linh', 'doan_luot', 'btvn', 'btvn_em', 'mom_bai', 'ke_hoach_ngay', 'parent_daily_news', 'ph_giao_them'] as const
 

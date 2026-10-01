@@ -10,6 +10,7 @@ import { khopPhanIII } from '../src/lib/cham-so'
 import { dungPhieu } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 import { docSoPhanIII } from '../src/lib/doc-so-phan-iii'
+import { coSoMuRieng, dinhTriKhoa } from '../src/lib/cham-so-policy'
 
 const NGUON = readFileSync(resolve(__dirname, '..', 'src/lib/html-phieu.ts'), 'utf8')
 const a = NGUON.indexOf('      function chamTaiCho() {')
@@ -19,6 +20,9 @@ expect(a).toBeGreaterThan(0)
 const THAN = NGUON.slice(a, b).replace(/\\\\s/g, '\\s')
   // 29/09: phiếu nhúng NGUYÊN VĂN docSoPhanIII qua `${docSoPhanIII.toString()}` — đọc từ nguồn thì thay lại như trang thật.
   .replace('${docSoPhanIII.toString()}', () => docSoPhanIII.toString())
+  // 01/10: thêm hai hàm định trị ×10ⁿ của cham-so-policy, nhúng cùng cách.
+  .replace('${dinhTriKhoa.toString()}', () => dinhTriKhoa.toString())
+  .replace('${coSoMuRieng.toString()}', () => coSoMuRieng.toString())
 const chamTaiCho = new Function('du', 'lam', `${THAN}\nreturn chamTaiCho();`) as (du: unknown, lam: unknown) => { dung: number; sai: string[] }
 
 /** Chấm MỘT câu Phần III: đáp án đề `dapAn`, em gõ `chon` → có tính là đúng không. */

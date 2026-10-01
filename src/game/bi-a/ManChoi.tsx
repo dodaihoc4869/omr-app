@@ -63,6 +63,8 @@ export function noiDungNhan(v: VanBia, id: KiHieu): { qh: ReturnType<typeof quan
   return { qh, tieuDe: `${n.ten} · Z = ${n.z}`, chinh, nho }
 }
 
+/** Khung nhãn chỉ bi khi chạm (tên nguyên tố · quan hệ · luật). Thầy bỏ 01/10; bật lại = true. */
+const HIEN_NHAN_BI = false
 const GOI_Y_IOS = 'Thêm vào màn hình chính để chơi toàn màn hình'
 type DocWebkit = Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void }
 /** Khoá màn hình NGANG khi đang toàn màn hình (Android Chrome cho; trình duyệt khác từ chối ⇒ bỏ qua êm). */
@@ -188,7 +190,8 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       // nhãn chỉ bi
       const nh = nhanRef.current
       if (nh && cv && k) {
-        const b = conChi && !v.sheet && !xemRef.current ? v.bi_(conChi.id) : null
+        // 01/10 (thầy, ảnh bi F): chạm bi KHÔNG hiện khung nhãn nữa — chỉ còn vòng sáng quanh bi.
+        const b = HIEN_NHAN_BI && conChi && !v.sheet && !xemRef.current ? v.bi_(conChi.id) : null
         if (!b || !b.on || !conChi) { if (!nh.hidden) nh.hidden = true }
         else {
           const nd = noiDungNhan(v, conChi.id), key = `${conChi.id}|${nd.chinh}|${nd.nho}`

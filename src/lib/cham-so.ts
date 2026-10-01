@@ -15,7 +15,7 @@
 // P01 (CNH-1.0, 23/09/2026): luật chuẩn hoá + bốn policy CÓ VERSION đã chuyển sang `cham-so-policy.ts`
 // để có kiểm tra kiểu lúc chạy và chặn ba lỗi đã đo (hậu tố chữ bất kỳ, biên 1e-4 dấu phẩy động, bỏ qua
 // đơn vị khác nhau). Tệp này giữ nguyên TÊN HÀM CŨ cho mọi nơi gọi.
-import { chamTheoPolicy, ChamMaterialError, chuanHoaSoNhap, tachSoVaDonVi, POLICY_MAC_DINH_PHAN_III } from './cham-so-policy'
+import { chamTheoPolicy, ChamMaterialError, chuanHoaSoNhap, coSoMuRieng, dinhTriKhoa, tachSoVaDonVi, POLICY_MAC_DINH_PHAN_III } from './cham-so-policy'
 
 export { POLICY_VERSION, POLICY_MAC_DINH_PHAN_III, chamTheoPolicy, chuanHoaSoNhap, tachSoVaDonVi } from './cham-so-policy'
 
@@ -43,7 +43,12 @@ export function soKhopSo(v: unknown, d: unknown, cheDo: 'chat' | 'so_hoc'): bool
   const pa = tachSoVaDonVi(a, false), pb = tachSoVaDonVi(b, false)
   if (!pa.ok || !pb.ok) return false
   if (pa.so.unit && pb.so.unit && pa.so.unit !== pb.so.unit) return false
-  return pa.so.numText === pb.so.numText
+  if (pa.so.numText === pb.so.numText) return true
+  // 01/10: khoá "1,2375×10⁹ kJ", em ghi định trị "1,2375" (ô số không gõ được ×10⁹) ⇒ đúng — cùng luật với 'so_hoc'.
+  const dinhTri = coSoMuRieng(v) ? null : dinhTriKhoa(d)
+  if (dinhTri === null) return false
+  const pdt = tachSoVaDonVi(chuanHoaSoNhap(dinhTri), false)
+  return pdt.ok && pa.so.numText === pdt.so.numText
 }
 
 /**

@@ -197,10 +197,13 @@ i[data-mau="vong-tim"] { background: var(--ph3-vong-tim); }
 .ph3-gio__ray { position: relative; height: 28px; border-radius: 8px; background: var(--ph3-mat-2); }
 .ph3-gio__ray > span { position: absolute; top: 4px; bottom: 4px; min-width: 6px; border-radius: 4px; background: var(--ph3-tim); }
 .ph3-gio__moc { display: flex; justify-content: space-between; font-size: 12px; color: var(--ph3-chu-3); }
-.ph3-lan li { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--ph3-mat-2); }
-.ph3-lan li:last-child { border-bottom: none; padding-bottom: 0; }
-.ph3-lan b { font-size: 15px; font-weight: 700; min-width: 108px; }
-.ph3-lan span { font-size: 14px; line-height: 1.45; color: var(--ph3-chu-2); min-width: 0; }
+/* 01/10 (thầy: "cho vào box cho gọn"): các lần học nằm trong MỘT hộp, mỗi lần hai dòng ngắn (giờ ở trên, việc ở dưới) — trước đây
+   cột giờ chiếm nửa thẻ nên chữ bên phải vỡ từng chữ một dòng. Nhiều lần học thì hộp tự cuộn, thẻ không dài ra. */
+.ph3-lan { margin-top: 14px; padding: 4px 14px; border-radius: 16px; background: var(--ph3-mat-2); max-height: 288px; overflow-y: auto; overscroll-behavior: contain; }
+.ph3-lan li { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--ph3-vien); }
+.ph3-lan li:last-child { border-bottom: none; }
+.ph3-lan b { font-size: 15px; font-weight: 700; }
+.ph3-lan span { font-size: 14px; line-height: 1.4; color: var(--ph3-chu-2); min-width: 0; }
 
 .ph3-ai { display: flex; flex-direction: column; gap: 12px; }
 .ph3-ai li { display: flex; gap: 12px; font-size: 15px; line-height: 1.45; }

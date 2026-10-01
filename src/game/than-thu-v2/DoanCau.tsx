@@ -1,5 +1,6 @@
 // ĐOÀN HỘ TỐNG — thẻ câu nền giấy ấm, gọn để màn trận KHÔNG cuộn từ 360×740. Nội dung câu (công thức hoá, bảng, ảnh cắt từ đề)
 // dùng lại đúng bộ hiển thị của app (ChemText, BangSoLieu, CauHinh, HinhTaiViTri) — chỉ bố cục là riêng của game.
+import { chuPhuongAn } from '../../lib/anh-phuong-an'
 import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
 import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import type { ReactNode } from 'react'
@@ -68,7 +69,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             return (
               <button key={chu} type="button" disabled={khoa || chay} aria-pressed={chon === chu} data-kq={kq(chu)} className={chay ? 'dh2-chay' : undefined} onClick={() => { if (!chay) onChon(chu) }}>
                 <i>{chu}</i>
-                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={q.choices[i] ?? ''} />}
+                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`))} />}
                   <HinhTaiViTri hinhAnh={hinh} viTri={`sau_pa_${chu}`} onZoom={onZoom} nhan={`phương án ${chu}`} /></span>
                 {chay && <span className="dh2-an"> (đã cháy thành tro — phương án sai, không chọn được)</span>}
               </button>

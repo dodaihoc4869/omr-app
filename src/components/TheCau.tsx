@@ -11,6 +11,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 import { Check, History, RotateCcw, X as XIcon } from 'lucide-react'
 import { normalizeNumericAnswer } from '../engine/score'
 import { khopPhanIII } from '../lib/cham-so'
+import { laChuGiuCho } from '../lib/anh-phuong-an'
 import type { HinhAnh, LoiGiaiCauTruc, TrangThaiLoiGiai } from '../data/examContent'
 import { ChemText } from '../lib/chem-format'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
@@ -290,6 +291,9 @@ export default function TheCau(props: TheCauProps) {
           const chonSai = xemLai && daChon && !laDung
           const trangThai = laDung ? 'dung' : chonSai ? 'sai' : daChon ? 'chon' : 'trong'
           const img = choiceImgs?.[origIdx]
+          // 01/10: ô chỉ có chữ giữ chỗ "(xem hình phương án A)" ⇒ ảnh sau_pa_* vào TRONG ô, bỏ chữ.
+          const anhSau = (hinhAnh ?? []).filter((h) => h.viTri === `sau_pa_${orig}`)
+          const gopAnh = !img && anhSau.length > 0 && laChuGiuCho(choices[origIdx])
           return (
             <div key={displayPos} className="flex flex-col">
               <Hang
@@ -301,12 +305,14 @@ export default function TheCau(props: TheCauProps) {
               >
                 <span className="pa-ma" style={{ color: trangThai === 'trong' ? 'var(--nhat)' : chonSai ? 'var(--do)' : 'var(--xanh)' }}>{letter}.</span>
                 <span className="min-w-0 pa-noi-dung" style={{ overflowWrap: 'break-word' }}>
-                  {img ? <img decoding="async" src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" /> : <ChemText text={choices[origIdx]} />}
+                  {img ? <img decoding="async" src={img} alt={`Phương án ${letter}`} className="max-h-14 w-auto" />
+                    : gopAnh ? anhSau.map((h, k) => <img key={k} decoding="async" src={h.src} alt={h.alt ?? `Phương án ${letter}`} className="pa-anh" style={{ display: 'block', maxWidth: '100%', maxHeight: 112, width: 'auto', background: 'white', borderRadius: 'var(--bo-1)', padding: 4 }} />)
+                    : <ChemText text={choices[origIdx]} />}
                 </span>
                 {laDung && <DauDung />}
                 {chonSai && <DauSai />}
               </Hang>
-              <HinhTaiViTri hinhAnh={hinhAnh} viTri={`sau_pa_${orig}`} onZoom={onZoom} nhan={`${nhan} — phương án ${letter}`} />
+              {!gopAnh && <HinhTaiViTri hinhAnh={hinhAnh} viTri={`sau_pa_${orig}`} onZoom={onZoom} nhan={`${nhan} — phương án ${letter}`} />}
             </div>
           )
         })}

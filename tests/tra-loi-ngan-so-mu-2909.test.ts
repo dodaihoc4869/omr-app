@@ -80,7 +80,7 @@ describe('khopPhanIII — biên', () => {
     ['1,2375×10⁸', DAP_AN_ANH],
     ['123750000', DAP_AN_ANH],
     ['1237500000 J', DAP_AN_ANH], // khác đơn vị
-    ['1,2375', DAP_AN_ANH],
+    // 01/10: "1,2375" (chỉ định trị) nay là ĐÚNG — thầy chốt, xem tests/dinh-tri-so-mu-0110.test.ts
     ['2×10⁻¹⁹', '1,6.10⁻¹⁹'], // khoá rất nhỏ: không được coi mọi số tí hon là bằng nhau
     ['0,0026', '2,5.10^-3'],
     ['1.237', '1237'], // MỘT dấu chấm ⇒ luôn là thập phân (mơ hồ ⇒ không đoán là nghìn)

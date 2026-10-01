@@ -31,6 +31,8 @@ import { gomTuCongThuc, tachDongSoDo } from './chem-format-so-do'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 import { docSoPhanIII } from './doc-so-phan-iii'
+import { coSoMuRieng, dinhTriKhoa } from './cham-so-policy'
+import { chuPhuongAn } from './anh-phuong-an'
 import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, nopThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
@@ -1310,7 +1312,8 @@ export function theCauHtml(
         const dau = `${dung ? ' data-dung="1"' : ''}${laDaChonSai ? ' data-sai="1"' : ''}`
         const lop = 'q-opt'
         const anh = c.anhLuaChon?.[i]
-        const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(pa)
+        // 01/10: ô chỉ có chữ giữ chỗ "(xem hình phương án A)" mà có ảnh sau_pa_* ⇒ bỏ chữ, ảnh nằm trong ô.
+        const noi = anh ? anhHtml(anh, 'pa', `Phương án ${CHU_PA[i]}`) : chuHtml(chuPhuongAn(pa, (c.hinh ?? []).some((h) => h.viTri === `sau_pa_${CHU_PA[i]}`)))
         // THẺ NÚT THẬT, không phải div gắn sự kiện (thầy chốt 08/09 sau bốn
         // lần báo "nút bấm được nút không"). Trình duyệt di động xử lý cú chạm
         // cho <button> khác hẳn cho <div>: nó tự lo ngưỡng xê tay, tự huỷ đúng
@@ -2375,7 +2378,10 @@ export const JS_PHIEU = `
         // 29/09/2026: đọc số bằng NGUYÊN VĂN hàm dùng chung docSoPhanIII (src/lib/doc-so-phan-iii.ts) — hiểu "×10⁹", "10⁻³",
         // ".10^-3", "1.237.500.000"; trước đây phiếu (và máy chủ) chấm "1237500000" SAI với đáp án "1,2375×10⁹ kJ".
         var docSo = (${docSoPhanIII.toString()});
-        var khopIII = function (v, d) {
+        // 01/10/2026: khoá a×10ⁿ — em ghi đúng định trị ("1,2375" với "1,2375×10⁹ kJ") là đúng (NGUYÊN VĂN hàm của cham-so-policy).
+        var dinhTriKhoa = (${dinhTriKhoa.toString()});
+        var coSoMuRieng = (${coSoMuRieng.toString()});
+        var khopIIIGoc = function (v, d) {
           var a = chuanSoIII(v), b = chuanSoIII(d);
           if (!a || !b) return false;
           if (a === b) return true;
@@ -2389,6 +2395,11 @@ export const JS_PHIEU = `
           if (!(lech < 1e-4)) return false;
           // Khoá rất nhỏ (khác 0, |khoá| < 0,01): biên còn |khoá|/100 — y hệt lechNhoHon của cham-so-policy.
           return nb === 0 || Math.abs(nb) >= 0.01 || lech < Math.abs(nb) / 100;
+        };
+        var khopIII = function (v, d) {
+          if (khopIIIGoc(v, d)) return true;
+          var dt = coSoMuRieng(v) ? null : dinhTriKhoa(d);
+          return dt !== null && khopIIIGoc(v, dt + (docSo(d) && docSo(d).donVi ? ' ' + docSo(d).donVi : ''));
         };
         var dung = 0;
         var sai = [];
