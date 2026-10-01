@@ -186,8 +186,11 @@ export default defineConfig({
           // Màn Tu luyện (30/09, bố cục ngang + máy tính): cả mảnh ManTuLuyen nạp LƯỜI khi em bấm cửa Tu luyện ở Sảnh — mọi việc của nó đều cần máy chủ
           // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
           '**/{ManTuLuyen,LuyenDeCauTruc}-*.{js,css}',
-          // Màn làm bài NGANG (28/09): mảnh nạp lười chỉ máy ngang/máy tính cần; màn thi tải sẵn khi máy đang ngang, nạp hỏng thì ở lại bố cục dọc.
-          '**/LamBaiNgang-*.{js,css}',
+          // Màn làm bài NGANG: từ 01/10 VÀO precache (≈ 47 KB) — ngoài precache thì máy còn bản cũ sau một lượt phát hành, hay mạng yếu lúc xoay,
+          // nạp mảnh hỏng và em kẹt bố cục dọc (thầy báo "xoay ngang không hoạt động").
+          // Bù chỗ cho mảnh ngang (giữ trần 3000 KB): ba mảnh CHỈ màn thầy nhập (Tổng quan/Chiến dịch, Cài đặt/Học sinh, Giao/Sửa chiến dịch —
+          // các màn đó đã ngoài precache) ra kho chạy-lúc.
+          '**/{DsChienDichDaGiao,NutDongBoDanhSach,nguon-giao}-*.{js,css}',
           // Tải PDF "Câu đã làm" (28/09): jspdf (+ canvg `index.es`, dompurify `purify.es`, html2canvas mà jspdf kéo theo) và html2canvas-pro
           // ≈ 1 MB, chỉ nạp khi em bấm "Tải PDF" (import động, lúc đó đang có mạng) — cất ở kho chạy-lúc, KHÔNG vào precache vỏ.
           '**/{jspdf.es.min,html2canvas,html2canvas-pro.esm,purify.es,index.es,pdf-cau-da-lam}-*.js',

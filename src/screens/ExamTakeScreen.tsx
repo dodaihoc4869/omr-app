@@ -100,8 +100,14 @@ import NutNopBtvn from '../components/NutNopBtvn'
 import OSoTraLoi from '../components/OSoTraLoi'
 import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
-// Bố cục NGANG nạp lười (mảnh riêng, ngoài precache — vite.config.ts globIgnores); dọc không bao giờ tải mảnh này.
-const LamBaiNgang = lazy(() => import('./LamBaiNgang'))
+// Mảnh bố cục NGANG (01/10, thầy: "xoay ngang không hoạt động"): trước đây nạp lười NGOÀI precache, nạp hỏng một lần (mạng yếu, hay máy còn
+// bản cũ mà mảnh cũ đã bị thay sau một lượt phát hành) là React.lazy nhớ luôn lỗi ⇒ xoay bao nhiêu cũng ở bố cục dọc. Nay: mảnh có trong precache
+// (vite.config.ts), nạp thử lại một lần, và hỏng thì DỰNG LẠI lazy mới để lần xoay sau thử tiếp.
+const napNgang = () => import('./LamBaiNgang').catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(() => import('./LamBaiNgang')))
+let LamBaiNgang = lazy(napNgang)
+function lamMoiManhNgang() {
+  LamBaiNgang = lazy(napNgang)
+}
 // BÁO CÁO CHI TIẾT CA bản mới (BaoCaoChiTiet chế độ em, 28/09) — mảnh lazy ngoài precache.
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 
@@ -3838,20 +3844,24 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     </Trang>
   )
   if (!manNgang) return manDoc
-  // Mảnh ngang nạp LƯỜI (ngoài precache). Đang nạp ⇒ tạm hiện bố cục dọc; nạp hỏng (mất mạng, chưa có trong kho) ⇒ ở lại
-  // bố cục dọc — em vẫn làm bài bình thường, không bao giờ trắng màn.
+  // Mảnh ngang nạp lười (có trong precache). Đang nạp ⇒ tạm hiện bố cục dọc; nạp hỏng ⇒ ở lại bố cục dọc, xoay lại là thử nạp lại —
+  // em vẫn làm bài bình thường, không bao giờ trắng màn.
   return (
-    <BoLuiDoc duPhong={manDoc}>
+    <BoLuiDoc duPhong={manDoc} onLoi={lamMoiManhNgang}>
       <Suspense fallback={manDoc}>{manNgang}</Suspense>
     </BoLuiDoc>
   )
 }
 
 /** Mảnh bố cục ngang không nạp được ⇒ dựng bố cục dọc thay vì trắng màn. */
-class BoLuiDoc extends Component<{ duPhong: React.ReactNode; children: React.ReactNode }, { loi: boolean }> {
+/** Xoay về dọc là gỡ hẳn BoLuiDoc; xoay ngang lại là dựng mới với lazy mới (`onLoi`) ⇒ thử nạp lại mảnh ngang, không kẹt bố cục dọc mãi. */
+class BoLuiDoc extends Component<{ duPhong: React.ReactNode; children: React.ReactNode; onLoi?: () => void }, { loi: boolean }> {
   state = { loi: false }
   static getDerivedStateFromError() {
     return { loi: true }
+  }
+  componentDidCatch() {
+    this.props.onLoi?.()
   }
   render() {
     return this.state.loi ? this.props.duPhong : this.props.children
