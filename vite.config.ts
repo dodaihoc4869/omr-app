@@ -165,6 +165,8 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+        // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
+        '**/ChuyenBay-*.{js,css}',
           '**/404.html',
           '**/than-thu-v2/**',
           // Lời giải từng bước (29/09): khung tĩnh ~280 KB chỉ tải khi em bấm "Xem lời giải từng bước" — không cất sẵn.

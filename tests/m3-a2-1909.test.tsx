@@ -83,13 +83,14 @@ describe('MaCaInput (6 ô mã ca)', () => {
 })
 
 describe('PhongChoGame (phòng chờ)', () => {
-  it('nội dung bắt buộc còn nguyên; ngoài màn thi không m3; màn thi thì bọc m3; đầu thẻ có móc lớp', () => {
+  it('nội dung bắt buộc còn nguyên; ngoài màn thi không m3; màn thi thì bọc m3; đầu thẻ có móc lớp', async () => {
     datDuong('/')
     const a = render(<PhongChoGame cho={{ thoiGianPhut: 50, tenCa: 'Ca Ancol', lop: '12A1' }} loiCho="Mất kết nối" />)
+    await a.findByRole('heading', { name: /Chuyến bay hóa học/ })
     const chu = a.container.textContent || ''
-    for (const s of ['PHÒNG CHỜ THI TRỰC TUYẾN', 'Cao độ:', 'Điểm nguyên tử:', 'Đang chờ Thầy bấm bắt đầu', 'Bài làm trong 50 phút', 'Ca thi: Ca Ancol', 'Mất kết nối']) expect(chu, s).toContain(s)
+    for (const s of ['Chuyến bay hóa học', 'Điểm chơi', 'Đang chờ Thầy bấm bắt đầu', 'Bài làm trong 50 phút', 'Ca thi: Ca Ancol', 'Mất kết nối']) expect(chu, s).toContain(s)
     expect(a.container.querySelector('.m3')).toBeNull()
-    expect(a.container.querySelector('.m3-phong-cho-dau')).toBeTruthy()
+    expect(a.container.querySelector('.pc-wait')).toBeTruthy()
     a.unmount()
     datDuong('/?examCode=123456')
     const b = render(<PhongChoGame />)

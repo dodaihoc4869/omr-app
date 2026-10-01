@@ -1,0 +1,30 @@
+{
+  "tong": 25,
+  "dat": [
+    "Không tràn ngang 360",
+    "Có trạng thái chờ 360",
+    "Không tràn ngang 390",
+    "Có trạng thái chờ 390",
+    "Không tràn ngang 768",
+    "Có trạng thái chờ 768",
+    "Không tràn ngang 844",
+    "Có trạng thái chờ 844",
+    "Không tràn ngang 1440",
+    "Có trạng thái chờ 1440",
+    "Pause dừng vẽ Canvas",
+    "Chạm/nhặt tăng điểm chơi",
+    "Đổi nền giữ điểm",
+    "Đổi nền cập nhật palette",
+    "Hiện lỗi kết nối thật từ props",
+    "Chuyển vào bài ngay cả khi game pause",
+    "Tháo phòng chờ dừng vòng vẽ",
+    "Giảm chuyển động không tự vẽ",
+    "Giảm chuyển động vẫn nhặt được",
+    "Máy yếu dùng hình tĩnh",
+    "Thiếu Canvas vẫn giữ phòng chờ",
+    "Ngoài màn hình dừng Canvas",
+    "Không lỗi JS app-doc",
+    "Không lỗi JS app-ngang",
+    "Không lỗi JS app-toi"
+  ]
+}
