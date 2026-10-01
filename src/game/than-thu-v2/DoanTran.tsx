@@ -247,7 +247,7 @@ export default function DoanTran(p: Props) {
   const bocPhai = (x: ReactNode) => v2 ? <div className="dh2-cot dh2-cot-phai" data-vung="cot-phai">{x}</div> : x
   return (
     <div ref={khungRef} className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'} style={v2 ? { '--dh2-ti': ti } as CSSProperties : undefined}>
-      {v2 ? <div className="dh2-cot dh2-cot-trai" data-vung="cot-trai"><Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} /></div> : <>
+      {v2 ? <div className="dh2-cot dh2-cot-trai" data-vung="cot-trai"><Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} ketQua={p.ketQuaCau} chan={p.hanhDong==='chan'} /></div> : <>
         <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
         {canh}
         {daiDoi}

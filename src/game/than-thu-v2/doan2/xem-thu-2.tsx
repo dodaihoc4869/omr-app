@@ -16,8 +16,9 @@ import DoanHoTong from '../DoanHoTong'
 import type { DoanXem } from '../doan-kieu'
 
 const man = new URLSearchParams(location.search).get('man') ?? 'tran'
+const thu = Math.max(0,Math.min(7,Number(new URLSearchParams(location.search).get('thu')??2)))
 const ghe: DoanXem['ghe'] = [
-  { ghe: 0, ten: 'Minh', pet: 2, cap: 32, laMay: false, roi: false, laEm: true, trangThai: 'dang_lam', tinHieu: null },
+  { ghe: 0, ten: 'Minh', pet: thu, cap: 32, laMay: false, roi: false, laEm: true, trangThai: 'dang_lam', tinHieu: null },
   { ghe: 1, ten: 'Thu Hà', pet: 1, cap: 30, laMay: false, roi: false, laEm: false, trangThai: 'da_chot', tinHieu: null },
   { ghe: 2, ten: 'Nam', pet: 3, cap: 12, laMay: false, roi: false, laEm: false, trangThai: 'dang_lam', tinHieu: null },
 ]
@@ -61,4 +62,4 @@ const call = async (lenh: string) => {
   return { ok: true }
 }
 
-createRoot(document.getElementById('root')!).render(<StrictMode><DoanHoTong call={call} sbd="S1" pet={2} cap={32} onDong={() => {}} onVeBangNhiemVu={() => {}} /></StrictMode>)
+createRoot(document.getElementById('root')!).render(<StrictMode><DoanHoTong call={call} sbd="S1" pet={thu} cap={32} onDong={() => {}} onVeBangNhiemVu={() => {}} /></StrictMode>)

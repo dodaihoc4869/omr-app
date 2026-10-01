@@ -65,24 +65,24 @@
 
  /* nhân vật trong cảnh (dựng mới theo suKien nên hoạt cảnh chạy lại mỗi đòn) */
  .dao2 .dao2-canh[data-chuong="dung"] .dao2-canh-thu[data-dong="danh"]{transform-origin:50% 100%;animation:d2c-nhun .56s ease-out both}
- .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]{transform-origin:50% 100%;animation:d2c-lui .6s cubic-bezier(.2,.8,.3,1) .68s both}
+ .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]{transform-origin:50% 100%;animation:d2c-lui .6s cubic-bezier(.2,.8,.3,1) var(--d2c-trung,1.12s) both}
  .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]::before{content:"";position:absolute;inset:8% 12% 6%;border-radius:50% 50% 44% 44%/62% 62% 38% 38%;
-  background:rgba(255,255,255,.92);opacity:0;animation:d2c-trang .3s linear .68s both}
+  background:rgba(255,255,255,.92);opacity:0;animation:d2c-trang .3s linear var(--d2c-trung,1.12s) both}
  /* mặt nhăn: che mắt tròn, vẽ mắt "> <" (toạ độ khớp SVG quái 120×120) */
  .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]::after{content:"";position:absolute;inset:0;opacity:0;animation:d2c-nhan .62s linear .7s both;
   background:no-repeat center/100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='rgb(88,196,166)'%3E%3Cellipse cx='46' cy='65' rx='10' ry='11'/%3E%3Cellipse cx='74' cy='65' rx='10' ry='11'/%3E%3C/g%3E%3Cg fill='none' stroke='rgb(14,59,49)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M39 58l12 6-12 6M81 58l-12 6 12 6'/%3E%3Cpath d='M46 90q4-5 7 0t7 0 7 0 7 0'/%3E%3C/g%3E%3C/svg%3E")}
  .dao2 .dao2-canh[data-chuong="sai"] .dao2-quai{transform-origin:50% 100%;animation:d2c-phun .42s ease-in-out both}
  .dao2 .dao2-canh[data-chuong="sai"] .dao2-canh-thu[data-dong="dau"]{transform-origin:50% 100%;animation:d2c-giat .5s cubic-bezier(.2,.8,.3,1) .66s both}
  /* số máu bật ra ĐÚNG lúc trúng */
- .dao2 .dao2-canh[data-chuong] .dao2-so{animation:d2c-so .62s cubic-bezier(.2,1.5,.4,1) .68s both}
+ .dao2 .dao2-canh[data-chuong] .dao2-so{animation:d2c-so .62s cubic-bezier(.2,1.5,.4,1) var(--d2c-trung,1.12s) both}
  /* rung màn + thanh máu tụt mượt (tên keyframes đổi theo chẵn/lẻ ⇒ chạy lại mỗi đòn dù thẻ không dựng mới) */
- .dao2 .dao2-canh[data-chuong][data-nhip="0"]{animation:d2c-rung-0 .3s linear .68s}
- .dao2 .dao2-canh[data-chuong][data-nhip="1"]{animation:d2c-rung-1 .3s linear .68s}
+ .dao2 .dao2-canh[data-chuong][data-nhip="0"]{animation:d2c-rung-0 .3s linear var(--d2c-trung,1.12s)}
+ .dao2 .dao2-canh[data-chuong][data-nhip="1"]{animation:d2c-rung-1 .3s linear var(--d2c-trung,1.12s)}
  .dao2 .dao2-canh[data-chuong] .dao2-vach>i{transform-origin:0 50%}
- .dao2 .dao2-canh[data-chuong][data-nhip="0"] .dao2-mau-quai .dao2-vach>i{--tu:var(--d2c-quai-tu,1);animation:d2c-tut-0 .5s ease-out .72s both}
- .dao2 .dao2-canh[data-chuong][data-nhip="1"] .dao2-mau-quai .dao2-vach>i{--tu:var(--d2c-quai-tu,1);animation:d2c-tut-1 .5s ease-out .72s both}
- .dao2 .dao2-canh[data-chuong][data-nhip="0"] .dao2-mau-thu .dao2-vach>i{--tu:var(--d2c-thu-tu,1);animation:d2c-tut-0 .5s ease-out .72s both}
- .dao2 .dao2-canh[data-chuong][data-nhip="1"] .dao2-mau-thu .dao2-vach>i{--tu:var(--d2c-thu-tu,1);animation:d2c-tut-1 .5s ease-out .72s both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="0"] .dao2-mau-quai .dao2-vach>i{--tu:var(--d2c-quai-tu,1);animation:d2c-tut-0 .5s ease-out calc(var(--d2c-trung,1.12s) + .04s) both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="1"] .dao2-mau-quai .dao2-vach>i{--tu:var(--d2c-quai-tu,1);animation:d2c-tut-1 .5s ease-out calc(var(--d2c-trung,1.12s) + .04s) both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="0"] .dao2-mau-thu .dao2-vach>i{--tu:var(--d2c-thu-tu,1);animation:d2c-tut-0 .5s ease-out calc(var(--d2c-trung,1.12s) + .04s) both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="1"] .dao2-mau-thu .dao2-vach>i{--tu:var(--d2c-thu-tu,1);animation:d2c-tut-1 .5s ease-out calc(var(--d2c-trung,1.12s) + .04s) both}
 }
 @media (prefers-reduced-motion:no-preference) and (min-width:1024px),(prefers-reduced-motion:no-preference) and (orientation:landscape) and (min-width:700px){
  .d2c{--xt:22cqw;--yt:60cqh;--xq:79cqw;--yq:58cqh}

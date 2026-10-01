@@ -40,7 +40,8 @@ describe('Đảo 2.0 · bố cục ngang', () => {
     manHinh(true)
     const { container } = trongAi(null)
     const trai = container.querySelector('.dao2-ai-trai')!, phai = container.querySelector('.dao2-ai-phai')!
-    expect(trai.querySelector('.dao2-canh .dao2-canh-thu')?.getAttribute('alt')).toBe('Thần thú của em: Lửa Nhỏ')
+    expect(trai.querySelector('.dao2-canh .bl-arena canvas')).toBeTruthy()
+    expect(trai.querySelector('.dao2-mau-thu')?.textContent).toContain('Lửa Nhỏ')
     expect(trai.querySelector('.dao2-ai-dau .dao2-ai-nhan')?.textContent).toMatch(/^ẢI 3\/6 · ÔN LẠI/)
     expect([...trai.querySelectorAll('.dao2-tien-do-nhan li')].map(li => li.textContent)).toEqual(['Mới', 'Mới', 'Ôn lại', 'Mới', 'Mới', 'Trùm'])
     expect(trai.querySelector('.dao2-tien-do')?.textContent).toContain('Đúng 1 ải · Chưa đúng 1 ải')

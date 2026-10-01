@@ -1,15 +1,15 @@
 // ĐOÀN HỘ TỐNG — màn TUNG CHƯỞNG (bản vẽ 4, thầy yêu cầu thêm): 2–3 giây toàn màn cuối mỗi hiệp, bỏ qua bằng MỘT chạm.
-// Tia chiêu thức là ảnh THẬT (public/than-thu-v2/spells/*.png, cắt theo hình thái như màn luyện tập). Giảm chuyển động → ảnh tĩnh + số.
+// Tám thần thú dùng bảng diễn hoạt và chưởng riêng; giảm chuyển động → hình tĩnh + số.
 // Bảng "Vì sao đòn này mạnh" nối đòn đánh với VIỆC HỌC của chính em; về bạn chỉ nói điều tích cực (ra đòn, Liên Kích), không bao giờ nói bạn sai.
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
-import { SpellArt } from './LearningBattle'
 import { BATTLE_SKINS } from './learning-battle'
 import { evolutionStage } from './evolution'
 import { playBattleSound } from './battle-audio'
 import { CHAN, type KhungNhinHiep } from './doan-core'
 import type { GheXem } from './doan-kieu'
-import { QuaiHinh, ThuHinh, TrumHinh } from './DoanHinh'
+import {giamDienHoat} from './dien-hoat/kieu'
+import SanDauDienHoat from './dien-hoat/SanDauDienHoat'
 
 export const GIAY_TUNG_CHUONG = 3
 const so = (n: number) => String(n).replace('.', ',')
@@ -18,7 +18,6 @@ const so = (n: number) => String(n).replace('.', ',')
  *  (biển đêm, dải vàng Baloo, kính mờ), thêm nút "Bỏ qua" thật + Esc, số sát thương có nhãn. Vắng/false ⇒ giao diện cũ y nguyên. */
 export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXong, cheDo2 = false }: { kq: KhungNhinHiep; ghe: GheXem[]; loaiQuai: string; tenQuai: string; tinh: boolean; onXong: () => void; cheDo2?: boolean }) {
   const xong = useRef(onXong); xong.current = onXong
-  const idA = useId(), idB = useId()
   const em = ghe.find(g => g.laEm)!, toi = kq.cuaEm
   const emRaDon = !!toi && toi.satThuong + toi.lan > 0
   const banRaDon = kq.ban.filter(b => b.ra === 'don').map(b => ({ ...b, g: ghe[b.ghe]! })).filter(b => b.g)
@@ -27,9 +26,9 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
   const tia = [...(emRaDon ? [{ g: em, ten: toi!.tenChieu }] : []), ...banManh.map(b => ({ g: b.g, ten: b.tenChieu }))].slice(0, 2)
   const lienKich = !!toi?.lienKich || kq.ban.some(b => b.lienKich)
   useEffect(() => {
-    if (tia[0]) playBattleSound(tia[0].g.pet, evolutionStage(tia[0].g.cap), true, lienKich)
+    const am = setTimeout(() => { if (tia[0]) playBattleSound(tia[0].g.pet, evolutionStage(tia[0].g.cap), true, lienKich) }, (tinh||giamDienHoat()) ? 0 : (lienKich ? 1580 : 1540))
     const t = setTimeout(() => xong.current(), GIAY_TUNG_CHUONG * 1000)
-    return () => clearTimeout(t)
+    return () => { clearTimeout(t); clearTimeout(am) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   // 2.0: Esc đóng tấm phủ (chuẩn giao diện mục 3) — cùng việc với một chạm bỏ qua.
   useEffect(() => {
@@ -54,18 +53,18 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
     ]
 
   return (
-    <div className={`dh-chuong bl-tung-chuong ${cheDo2 ? 'dh2-chuong' : ''} ${tinh ? 'dh-tinh' : ''}`} role="dialog" aria-label="Cả đội ra đòn" data-che-do={cheDo2 ? '2' : undefined} onClick={onXong}>
+    <div className={`dh-chuong bl-tung-chuong bl-chuong-dien-hoat ${cheDo2 ? 'dh2-chuong' : ''} ${tinh ? 'dh-tinh' : ''}`} style={{'--bl-trung':`${(tinh||giamDienHoat())?.12:lienKich?1.58:1.54}s`} as CSSProperties} role="dialog" aria-label="Cả đội ra đòn" data-che-do={cheDo2 ? '2' : undefined} onClick={onXong}>
       <div className="dh-chuong-tia-nen" />
       <span className="bl-chuong-kicker">BÁT LINH · HIỆP {kq.hiep}</span>
       {cheDo2
         ? <button type="button" className="dh2-chuong-bo-qua" onClick={e => { e.stopPropagation(); onXong() }}>Bỏ qua</button>
         : <span className="dh-chuong-bo-qua">chạm để bỏ qua</span>}
       <div className="bl-chuong-san-dau">
+      <SanDauDienHoat thu={dai?.g.pet??em.pet} hanhDong={kq.laTrum?(kq.trum?.voGiap?'ultimate':'hit'):dai?(lienKich?'ultimate':'punch'):'guard'} suKien={kq.hiep} tinh={tinh} vaoSan={false} dich={[{id:'dich',loai:kq.laTrum?kq.trum?.loai??'chua_te_ket_tua':loaiQuai}]} ban={tia.slice(1).map(t=>({id:t.g.ghe,pet:t.g.pet,raDon:true}))}/>
       <svg className="bl-phap-tran" viewBox="0 0 400 180" aria-hidden="true"><ellipse cx="200" cy="90" rx="180" ry="67"/><ellipse cx="200" cy="90" rx="163" ry="54"/><ellipse cx="200" cy="90" rx="136" ry="43" strokeDasharray="3 9"/><path d="M20 90h360M200 23v134M76 43l248 94M76 137l248-94"/></svg>
       {kq.laTrum ? (
         <>
           <div className="dh-chuong-dai"><div><small>TRÙM · CÂU CHUNG CẢ ĐỘI</small><b>{kq.trum?.voGiap ? 'VỠ GIÁP TRÙM!' : `ĐÚNG ${kq.trum?.yDung ?? 0}/4 Ý`}</b></div></div>
-          <div className="dh-chuong-dich"><TrumHinh loai={kq.trum?.loai ?? ''} size={170} /></div>
           <div className="dh-chuong-so"><b className="dh-chu-vang">{kq.trum?.voGiap ? 'HẠ!' : `−${kq.linhTamMat}`}</b><small>{kq.trum?.voGiap ? 'CẢ ĐỘI CÙNG THẮNG' : 'LINH TÂM TRÚNG ĐÒN'}</small></div>
         </>
       ) : (
@@ -73,15 +72,6 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
           {dai && <div className="dh-chuong-dai"><div><small>{BATTLE_SKINS[dai.g.pet]!.name.toUpperCase()}{dai.g.laEm ? ' · ĐÒN CỦA EM' : ` · ${dai.g.ten.toUpperCase()}`}</small><b>{dai.ten.toUpperCase()}</b></div></div>}
           {!dai && <div className="dh-chuong-dai"><div><small>CẢ ĐỘI</small><b>CHẮN CHO LINH TÂM</b></div></div>}
           {tia[1] && <div className="dh-chuong-dai dh-phu"><div><small>{tia[1].g.ten.toUpperCase()} · {BATTLE_SKINS[tia[1].g.pet]!.name.toUpperCase()}</small><b>{tia[1].ten.toUpperCase()}</b></div></div>}
-          <div className="dh-chuong-dich"><QuaiHinh loai={loaiQuai} size={120} /></div>
-          {tia.map((t, i) => (
-            <div key={t.g.ghe}>
-              <div className="dh-chuong-cot" style={{ left: tia.length === 1 ? 'calc(44% - 84px)' : i ? 'calc(44% + 2px)' : 'calc(44% - 170px)', transform: `rotate(${tia.length === 1 ? 0 : i ? -17 : 17}deg)` }}>
-                <div className="dh-chuong-tia" style={{ '--bc': `rgb(${BATTLE_SKINS[t.g.pet]!.color})` } as CSSProperties}><SpellArt pet={t.g.pet} stage={evolutionStage(t.g.cap)} clipId={i ? idB : idA} /></div>
-              </div>
-              <ThuHinh pet={t.g.pet} cap={t.g.cap} camXuc="quyet-tam" size={150} quayTrai={i === 1} className="dh-chuong-thu" style={{ [i ? 'right' : 'left']: tia.length === 1 ? 'calc(50% - 75px)' : '2%' } as CSSProperties} />
-            </div>
-          ))}
           {kq.tongSatThuong > 0 && <div className="dh-chuong-so">{cheDo2 && <small className="dh2-chuong-nhan-so">SÁT THƯƠNG CẢ ĐỘI</small>}<b className="dh-chu-vang">−{kq.tongSatThuong}</b>{kq.quaiHaGuc > 0 && <small>HẠ GỤC{kq.quaiHaGuc > 1 ? ` ×${kq.quaiHaGuc}` : ''}!</small>}</div>}
           {lienKich && <div className="dh-chuong-lk">LIÊN KÍCH ×2</div>}
         </>
