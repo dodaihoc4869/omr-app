@@ -18,6 +18,7 @@ import {experimentHtml,experimentOriginal} from './experiments/render'
 // Chữ và công thức đi qua đúng `chuHtml` của phiếu, nên mhchem, chỉ số dưới và
 // ký tự hoá học hiện y như mọi tờ khác. Lời giải dùng lại `oGiaiHtml` — cùng
 // một khuôn với báo cáo và phiếu, không dựng khuôn thứ hai.
+import { chuPhuongAn } from './anh-phuong-an'
 import type { CauLuyen } from './bai-tap-pdf'
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
 import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
@@ -193,7 +194,7 @@ function thanCauHtml(c: CauLuyen): string {
   if (c.phan === 'I' && c.luaChon && c.luaChon.length > 0) {
     const o = c.luaChon.map((nd, i) => {
       const anh = c.anhLuaChon?.[i]
-      const than = anh ? anhHtml(anh, 'mc-anh-pa', `Phương án ${CHU_PA[i]}`) : chuDeChieu(nd)
+      const than = anh ? anhHtml(anh, 'mc-anh-pa', `Phương án ${CHU_PA[i]}`) : chuDeChieu(chuPhuongAn(nd, (c.hinh ?? []).some((h) => h.viTri === `sau_pa_${CHU_PA[i]}`)))
       return `<div class="mc-pa"><span class="mc-ky">${CHU_PA[i] ?? i + 1}</span><span class="mc-pa-chu">${than}</span>${hinhTaiViTri(c, `sau_pa_${CHU_PA[i]}`)}</div>`
     })
     khoi.push(`<div class="mc-ds-pa mc-auto-options">${o.join('')}</div>`)

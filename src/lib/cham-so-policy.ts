@@ -207,6 +207,23 @@ function donViTuongThich(a: TachSo, b: TachSo): boolean {
   return !(a.unit && b.unit && a.unit !== b.unit)
 }
 
+/** ĐỊNH TRỊ của đáp án viết dạng a×10ⁿ (n ≠ 0) — "1,2375×10⁹ kJ" → "1,2375"; khoá không có số mũ ⇒ null.
+ *  01/10/2026 (thầy báo, ảnh Ải 6): ô trả lời là bàn phím số, KHÔNG gõ được "×10⁹" ⇒ em làm đúng ghi "1,2375" vẫn bị chấm SAI.
+ *  Luật mới: khoá có ×10ⁿ thì em ghi ĐÚNG định trị (không kèm số mũ của riêng em) cũng là đúng; ghi cả số ("1237500000") vẫn đúng như cũ. */
+export function dinhTriKhoa(key: unknown): string | null {
+  const s = String(key ?? '')
+  const m = /^(.*?)(?:\s*[x×*·⋅∙]\s*10|\.10(?=\s*[\^⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]))\s*(?:\^|\*\*)?\s*[({]?\s*([+\-−⁻⁺]?[0-9⁰¹²³⁴⁵⁶⁷⁸⁹]+)/.exec(s)
+  if (!m || !m[1].trim()) return null
+  const mu = m[2].replace(/[⁻−]/g, '-').replace(/⁺/g, '').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (c) => String('⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c)))
+  if (!/^[+-]?\d+$/.test(mu) || Number(mu) === 0) return null
+  return m[1].trim()
+}
+
+/** Em tự ghi số mũ ("×10^9", "10⁹", "e9") ⇒ so cả số như thường, KHÔNG xét luật định trị. */
+export function coSoMuRieng(answer: unknown): boolean {
+  return /[x×*·⋅∙]\s*10|10\s*[\^⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]|\d\s*e\s*[+-]?\d/i.test(String(answer ?? ''))
+}
+
 
 // ---------------------------------------------------------------------------
 // 4. Kiểm tra kiểu LÚC CHẠY cho hợp đồng chấm
@@ -286,6 +303,11 @@ function chamSoHoc(key: string, answer: string, allowFraction: boolean): Grading
   if (!pa.ok) return { correct: false, error: 'unsupported-format' }
   if (!donViTuongThich(pa.so, k)) return { correct: false }
   if (bangNhau(pa.so.gia, k.gia) || lechNhoHon(pa.so.gia, k.gia)) return { correct: true }
+  const dinhTri = coSoMuRieng(answer) ? null : dinhTriKhoa(key)
+  if (dinhTri !== null) {
+    const dt = tachSoVaDonVi(chuanHoaSoNhap(dinhTri), allowFraction)
+    if (dt.ok && (bangNhau(pa.so.gia, dt.so.gia) || lechNhoHon(pa.so.gia, dt.so.gia))) return { correct: true }
+  }
   return { correct: false }
 }
 

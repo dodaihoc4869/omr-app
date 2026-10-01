@@ -1,4 +1,5 @@
 import ExperimentDemo from './ExperimentDemo'
+import { chuPhuongAn } from '../lib/anh-phuong-an'
 import {ChemText} from '../lib/chem-format'
 import {BangSoLieu,CauHinh} from './QuestionMedia'
 import {tachDongTheoY} from '../lib/tach-dong-cau'
@@ -34,5 +35,5 @@ export function MomQuestionStem({q}:{q:Q}){
 }
 export function MomOption({q,index,text,tf=false}:{q:Q;index:number;text:string;tf?:boolean}){
  const src=(tf?q.ideaImgs:q.choiceImgs)?.[index]||q.anhLuaChon?.[index]
- return <span className="block min-w-0 space-y-1 break-words">{src&&<img decoding="async" src={src} alt={`Hình phương án ${index+1}`} className="max-w-full max-h-48 rounded-lg bg-white"/>}<ChemText text={text}/><MomImagesAt q={q} position={tf?`sau_y_${String.fromCharCode(97+index)}`:`sau_pa_${String.fromCharCode(65+index)}`}/></span>
+ return <span className="block min-w-0 space-y-1 break-words">{src&&<img decoding="async" src={src} alt={`Hình phương án ${index+1}`} className="max-w-full max-h-48 rounded-lg bg-white"/>}<ChemText text={tf?text:chuPhuongAn(text,Boolean(src)||momImages(q).some(h=>h.viTri===`sau_pa_${String.fromCharCode(65+index)}`))}/><MomImagesAt q={q} position={tf?`sau_y_${String.fromCharCode(97+index)}`:`sau_pa_${String.fromCharCode(65+index)}`}/></span>
 }
