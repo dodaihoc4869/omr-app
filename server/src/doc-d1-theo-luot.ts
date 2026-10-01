@@ -8,18 +8,20 @@ export function gopDocD1(db: D1Database): D1Database {
   if (typeof db.batch !== 'function') return db
   type Cho = { st: D1PreparedStatement; xong: (r: D1Result) => void; loi: (e: unknown) => void }
   let ds: Cho[] = []
-  // Chuỗi chỉ thuộc request này: đọc/ghi không mở hai lô chồng nhau; lệnh ghi vẫn nguyên tử.
-  let dang: Promise<void> = Promise.resolve()
+  // Hàng rào chỉ thuộc request này: SELECT độc lập được song song; ghi chờ các đọc trước nó,
+  // đọc sau ghi chờ ghi xong. Giữ nguyên CAS/lô ghi, không chặn đọc bởi đọc khác.
+  let truoc: Promise<void> = Promise.resolve(), ghi: Promise<void> = Promise.resolve()
   function gui<T>(chay: () => Promise<T>): Promise<T> {
-    const p = dang.then(chay)
-    dang = p.then(() => undefined, () => undefined)
+    const p = truoc.then(chay)
+    ghi = p.then(() => undefined, () => undefined)
+    truoc = ghi
     return p
   }
   const goc = new WeakMap<D1PreparedStatement, { st: D1PreparedStatement; doc: boolean }>()
   function xa(): void {
     const lo = ds; ds = []
     if (!lo.length) return
-    void gui(async () => {
+    const p = ghi.then(async () => {
       try {
         const rs = await db.batch(lo.map(x => x.st))
         for (let i = 0; i < lo.length; i++) lo[i].xong(rs[i])
@@ -28,6 +30,7 @@ export function gopDocD1(db: D1Database): D1Database {
         await Promise.all(lo.map(x => x.st.all().then(x.xong, x.loi)))
       }
     })
+    truoc = Promise.all([truoc, p]).then(() => undefined)
   }
   function doc(st: D1PreparedStatement): Promise<D1Result> {
     return new Promise((xong, loi) => {

@@ -29,6 +29,7 @@ const CONG = Number(arg('cong', 8791))
 const DONG_LOAT = arg('dong-loat', '0') === '1'
 const CHI_PHONG_CHO = arg('chi-phong-cho', '0') === '1'
 const CHI_GAME = arg('chi-game', '0') === '1'
+const BIA = arg('bia', '0') === '1'
 const CHO_MS = Number(arg('cho-ms', 45000))
 const NOP_MS = Number(arg('nop-ms', 60000))
 let hat = Number(arg('hat', 1102026)) >>> 0
@@ -244,7 +245,7 @@ log(`Bắt đầu kịch bản: ${SO_EM} em · làm ${LAM_GIAY} s · nộp dồn
 const thay = CHI_PHONG_CHO || CHI_GAME ? Promise.resolve() : mayThay()
 const bd = CHI_PHONG_CHO || CHI_GAME ? Promise.resolve() : batDauThi()
 if (CHI_GAME) {
-  const { tokens } = await post('/__do/game', { sbds: EM.map(e => e.sbd) })
+  const { tokens } = await post('/__do/game', { sbds: EM.map(e => e.sbd), bia: BIA })
   await fetch(GOC_URL + '/__do/reset')
   await Promise.all(EM.map(async e => {
     const token = tokens[e.sbd]
@@ -315,7 +316,7 @@ const bang = [...theoLenh.values()].map((o) => {
 })
 const tong = { luot: khach.length, loi: khach.filter((k) => k.loi).length, cauD1: so.reduce((t, s) => t + s.cau, 0), vongD1: so.reduce((t, s) => t + s.vong, 0), docD1: so.reduce((t, s) => t + s.doc, 0), r2Doc: so.reduce((t, s) => t + s.r2Doc, 0), r2MB: +(so.reduce((t, s) => t + s.r2Byte, 0) / 1048576).toFixed(1), giay: Math.round((Date.now() - T0) / 1000) }
 mkdirSync(RA, { recursive: true })
-const kq = { nhan: NHAN, luc: new Date().toISOString(), cauHinh: { soEm: SO_EM, treD1: TRE_D1, treR2: TRE_R2, lamGiay: LAM_GIAY, deRieng: DE_RIENG, congBo: CONG_BO, dongLoat: DONG_LOAT, chiPhongCho: CHI_PHONG_CHO, chiGame: CHI_GAME, choMs: CHO_MS, nopMs: NOP_MS, hat: Number(arg('hat', 1102026)) }, doiChieu, tong, bang }
+const kq = { nhan: NHAN, luc: new Date().toISOString(), cauHinh: { soEm: SO_EM, treD1: TRE_D1, treR2: TRE_R2, lamGiay: LAM_GIAY, deRieng: DE_RIENG, congBo: CONG_BO, dongLoat: DONG_LOAT, chiPhongCho: CHI_PHONG_CHO, chiGame: CHI_GAME, bia: BIA, choMs: CHO_MS, nopMs: NOP_MS, hat: Number(arg('hat', 1102026)) }, doiChieu, tong, bang }
 writeFileSync(join(RA, `${NHAN}.json`), JSON.stringify(kq, null, 1) + '\n')
 const dong = (b) => `| ${b.lenh} | ${b.n} | ${b.loi} | ${b.p50} | ${b.p95} | ${b.max} | ${b.cauTb} | ${b.vongTb} (max ${b.vongMax}) | ${b.docTb} | ${b.r2DocTb} (${b.r2KBTb} KB) |`
 console.log(`\n### ${NHAN} — ${SO_EM} em, trễ D1 ${TRE_D1} ms/vòng, trễ R2 ${TRE_R2} ms\n\n| Lệnh | Lượt | Lỗi | p50 ms | p95 ms | max ms | Câu D1 TB | Vòng D1 TB | Dòng đọc TB | Đọc R2 TB |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n${bang.map(dong).join('\n')}\n`)

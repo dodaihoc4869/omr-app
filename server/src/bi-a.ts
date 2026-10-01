@@ -4,7 +4,7 @@
 // Trần Bi-a (thầy 30/09 "Bi a cũng rải luôn câu ôn lại đúng theo tỷ lệ trần của bi a"): floor(40% CẢ kế hoạch hôm nay), chia theo tỉ lệ câu mới : câu ôn
 // của kế hoạch (trước 30/09: 40% phần Đoàn + 40% phần Đảo). Xem `tinhTranBia`.
 import type { Env, DongCa, DongLuot } from './kieu'
-import { docCauHinhDem } from './cau-hinh-dem'
+import { docCauHinhDem, dbGoc } from './cau-hinh-dem'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { protectedQuestions } from './game-v2-bank'
@@ -59,19 +59,25 @@ export const SQL_BANG_BIA: readonly string[] = [
   'CREATE TABLE IF NOT EXISTS bi_a_co_mat (sbd TEXT PRIMARY KEY, ten_lop TEXT, last_seen TEXT NOT NULL, con_tran INTEGER)',
   'CREATE INDEX IF NOT EXISTS bi_a_co_mat_lop ON bi_a_co_mat(ten_lop, last_seen)',
 ]
-const bangDaDung = new WeakMap<object, Promise<void>>()
-export function damBaoBangBia(env: Env): Promise<void> {
-  const db = env.DB as unknown as object
-  let p = bangDaDung.get(db)
-  if (!p) {
-    p = env.DB.batch(SQL_BANG_BIA.map((s) => env.DB.prepare(s)))
-      // GĐ2 thêm cột (CHỈ THÊM): bảng đã dựng ở bản GĐ1 chưa có `con_tran` — ALTER một lần, "đã có cột" thì bỏ qua.
-      .then(() => env.DB.prepare('ALTER TABLE bi_a_co_mat ADD COLUMN con_tran INTEGER').run().catch(() => undefined))
-      .then(() => undefined)
-    p.catch(() => bangDaDung.delete(db)) // lỗi ⇒ lượt sau thử lại
-    bangDaDung.set(db, p)
+type OBangBia = { xong: boolean; dang: boolean }
+const bangDaDung = new WeakMap<object, OBangBia>()
+export async function damBaoBangBia(env: Env): Promise<void> {
+  const db = dbGoc(env.DB)
+  const cu = bangDaDung.get(db)
+  // Gộp việc khởi tạo theo D1 GỐC; mỗi request đợi bằng timer riêng, không dùng chung Promise I/O.
+  for (let n = 0; cu?.dang && bangDaDung.get(db) === cu && n < 63; n++) await new Promise<void>(xong => setTimeout(xong, 16))
+  if (bangDaDung.get(db)?.xong) return
+  const o: OBangBia = { xong: false, dang: true }
+  bangDaDung.set(db, o)
+  try {
+    await env.DB.batch(SQL_BANG_BIA.map(s => env.DB.prepare(s)))
+    // Giữ nguyên bước chỉ-thêm GĐ2; có cột rồi thì bỏ qua như cũ.
+    await env.DB.prepare('ALTER TABLE bi_a_co_mat ADD COLUMN con_tran INTEGER').run().catch(() => undefined)
+    o.xong = true
+  } finally {
+    o.dang = false
+    if (!o.xong && bangDaDung.get(db) === o) bangDaDung.delete(db)
   }
-  return p
 }
 
 // ---------------------------------------------------------------- cờ + khoá

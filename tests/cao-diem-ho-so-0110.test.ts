@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { gopDocD1 } from '../server/src/doc-d1-theo-luot'
 import { docLanLam } from '../server/src/srs2-d1'
+import { damBaoBangBia } from '../server/src/bi-a'
 import { loadProfile } from '../server/src/game-v2'
 import type { Env } from '../server/src/kieu'
 
@@ -46,6 +47,14 @@ describe('hồ sơ giờ cao điểm: dữ liệu tươi và lịch sử cần t
     await ghi();await ghi()
     expect(d.sql.prepare("SELECT n FROM test_cas WHERE k='P'").get()).toEqual({n:1})
     expect((await db.prepare("UPDATE test_cas SET n=2 WHERE k='P' RETURNING n").all()).results).toEqual([{n:2}])
+  })
+  it('20 lớp đọc request riêng vẫn khởi tạo Bi-a một lần theo D1 gốc',async()=>{
+    const d=taoD1That();let batch=0,alter=0
+    const goc=d.env.DB
+    const db={...goc,batch:((ds:Parameters<typeof goc.batch>[0])=>{batch++;return goc.batch(ds)}) as typeof goc.batch,prepare:(sql:string)=>{if(sql.startsWith('ALTER TABLE bi_a_co_mat'))alter++;return goc.prepare(sql)}}
+    await Promise.all(Array.from({length:20},()=>damBaoBangBia({...d.env,DB:gopDocD1(db)})))
+    expect(batch).toBe(1);expect(alter).toBe(1)
+    await damBaoBangBia({...d.env,DB:gopDocD1(db)});expect(batch).toBe(1)
   })
   it('mùa và hồ sơ đọc trong một batch tươi; thay mùa vẫn reset đúng qua CAS',async()=>{
     const d=taoD1That();await loadProfile(d.env,'S1')

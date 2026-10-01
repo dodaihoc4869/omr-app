@@ -130,7 +130,7 @@ export default {
       return Response.json({ rows: r.results })
     }
     if (url.pathname === '/__do/game') {
-      const { sbds } = (await req.json()) as { sbds: string[] }
+      const { sbds, bia } = (await req.json()) as { sbds: string[]; bia?: boolean }
       const luc = new Date().toISOString(), maDe = '12-PEAK-GAME', qids = Array.from({ length: 20 }, (_, i) => `PEAK-Q${i}`)
       const cau = qids.map(qid => ({ qid, maDe, version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu hoá giả lập ${qid}`, choices: ['a','b','c','d'], ideas: [], hinhAnh: [], dang: 'ES.A.D1', tenDang: 'Dạng thử', mucDo: 'hieu', sao: 1, kienThuc: ['k'], correct: 'B', solution: { chot: 'Lời giải thử' }, reviewed: true }))
       const st = [env.DB.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{\"bat\":true}',?)").bind(luc),
@@ -138,6 +138,7 @@ export default {
         env.DB.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,'v1',?)").bind(maDe,luc),
         ...cau.map(q => env.DB.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').bind(maDe,q.qid,q.version,q.group,q.dang,JSON.stringify(q))),
         env.DB.prepare("INSERT INTO chien_dich(id,ten,lop,sbd_json,ma_de_json,qid_json,han_nop,the_luc_ngay,tao_luc) VALUES('PEAK-CD','Chiến dịch giả','12A',?,?,?,'2026-10-04',40,?)").bind(JSON.stringify(sbds),JSON.stringify([maDe]),JSON.stringify(qids),luc)]
+      if (bia) st.push(env.DB.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bi_a','{\"bat\":true}',?)").bind(luc))
       await env.DB.batch(st)
       const profile = JSON.stringify({pet:'dat_quy',choice:false,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:luc,luatCap:LUAT_CAP_MOI,mocVang:0})
       const tokens: Record<string,string> = {}
