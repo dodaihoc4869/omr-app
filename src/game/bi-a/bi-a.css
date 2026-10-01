@@ -163,10 +163,9 @@
 .bia-banh-xe:not([data-doc]) .mui.sau{top:auto;bottom:0;background:linear-gradient(0deg,var(--b-kim-mat) 15%,transparent)}
 .bia-banh-xe::before{content:"";position:absolute;z-index:1;inset:2px;border-radius:12px;background:linear-gradient(180deg,rgb(255,255,255 / .55),transparent 35%,transparent 55%,rgb(61,57,27 / .24));box-shadow:inset 0 1px 3px rgb(61,57,27 / .22);pointer-events:none}
 .bia-banh-xe:not([data-doc])::before{background:linear-gradient(90deg,rgb(255,255,255 / .55),transparent 35%,transparent 55%,rgb(61,57,27 / .24))}
-.bia-ten-banh{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:9px;background:var(--b-kinh);border:1px solid var(--b-kim-vien);box-shadow:0 1px 3px rgb(61,57,27 / .13);color:var(--b-chu);font-size:12px;font-weight:700;white-space:nowrap;pointer-events:none}
+.bia-ten-banh{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:5px;padding:4px;border-radius:50%;background:var(--b-kinh);border:1px solid var(--b-kim-vien);box-shadow:0 1px 3px rgb(61,57,27 / .13);color:var(--b-chu);font-size:12px;font-weight:700;white-space:nowrap;pointer-events:none}
 .bia-ten-banh svg{width:18px;height:18px;flex:none}
 .bia-banh-xe:not([data-doc]) .bia-ten-banh{padding:5px}
-.bia-banh-xe:not([data-doc]) .bia-ten-banh span{display:none}
 .bia-banh-xe[data-tat]{opacity:.45;pointer-events:none}
 /* xoáy */
 .bia-nut-xoay{width:46px;height:46px;min-width:46px}
@@ -277,7 +276,7 @@
 .bia[data-bo-cuc='pc'] .bia-dk .bia-luc{order:2;position:relative;flex:1;min-height:180px;margin:0 0 4px}
 .bia[data-bo-cuc='pc'] .bia-luc .num-luc,.bia[data-bo-cuc='pc'] .bia-luc .vach span{right:auto;left:calc(100% + 6px)}
 .bia[data-bo-cuc='pc'] .bia-dk .bia-banh-xe{order:3;width:52px;flex:none}
-.bia[data-bo-cuc='pc'] .bia-ten-banh{padding:4px}.bia[data-bo-cuc='pc'] .bia-ten-banh span{display:none}
+.bia[data-bo-cuc='pc'] .bia-ten-banh{padding:4px}
 .bia[data-bo-cuc='pc'] .bia-pop-xoay,.bia[data-bo-cuc='pc'] .bia-pop-tuy{left:calc(100% + 8px);right:auto;top:0;bottom:auto}
 .bia-dien-bien{position:absolute;z-index:8;right:max(8px,env(safe-area-inset-right,0px));top:max(58px,env(safe-area-inset-top,0px));bottom:max(8px,env(safe-area-inset-bottom,0px));width:min(320px,calc(100% - 16px));display:flex;flex-direction:column;gap:16px;padding:14px;border-radius:20px;background:var(--b-dac);border:1px solid var(--b-vien);box-shadow:0 8px 28px rgb(22,62,62 / .16);overflow:auto;overscroll-behavior:contain}
 .bia-dong-dien-bien{align-self:flex-end}
