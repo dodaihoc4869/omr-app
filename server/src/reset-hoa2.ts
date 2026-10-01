@@ -34,7 +34,7 @@ export const CA_KHONG_TINH_HOAN = 'DOTAI'
  * KHÔNG có `dong_bo`: đó là DẤU đồng bộ `ca_day_du` (app thầy chỉ đọc danh sách ca từ D1 khi có dấu này) — GIỮ.
  */
 export const BANG_CA_THI_HOA2: readonly string[] = [
-  'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'nop_khac_phuc', 'tien_do_ca', 'nhan_xet_ca_em', 'ca',
+  'luot', 'bai_bo_sung', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'nop_khac_phuc', 'tien_do_ca', 'nhan_xet_ca_em', 'ca',
 ]
 
 /** XOÁ — theo lệnh thầy 27/09. Thứ tự = thứ tự xoá. */

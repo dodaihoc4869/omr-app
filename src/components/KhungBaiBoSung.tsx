@@ -23,10 +23,9 @@ export default function KhungBaiBoSung({ maCa, secret }: { maCa?: string; secret
       /* máy chủ chưa có bảng / mất mạng: im lặng, lần sau tải lại */
     }
   }, [maCa, matKhau])
+  // Tải khi mở màn / đổi ca (không chạy nhịp nền — bảng nhịp-bảng giữ mọi vòng setInterval có xếp loại).
   useEffect(() => {
     void tai()
-    const id = setInterval(() => void tai(), 60_000)
-    return () => clearInterval(id)
   }, [tai])
 
   if (ds.length === 0 && !bao) return null
