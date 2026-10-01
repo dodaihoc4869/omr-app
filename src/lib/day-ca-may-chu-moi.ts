@@ -393,10 +393,31 @@ export function diaChiGuiCa(server: string, origin: string): string {
   return base
 }
 
+/** Gói đề + đáp án lớn hơn mức này (chuỗi JSON) ⇒ gửi HAI lượt: tờ đáp án trước, rồi ca + đề. */
+export const NGUONG_TACH_GOI_CA = 3 * 1024 * 1024
+
 export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDay, bank: unknown, keyBank?: unknown): Promise<boolean> {
   if (!ch.BAT || !ch.URL) throw new Error('Chưa có kết nối máy chủ. Thầy kiểm tra cấu hình kết nối.')
   if (!secret.trim()) throw new Error('Chưa có mã xác thực giáo viên. Thầy đăng nhập lại app giáo viên.')
-  const bodyString = JSON.stringify({ ca, bank, keyBank, secret })
+  // GÓI LỚN TÁCH ĐÔI (thầy 01/10: "không mở được ca thi, máy chủ không phản hồi, gói 9946 KB"). Đề + đáp án có ảnh nhúng ≈ 13–14 MB chữ,
+  // nén vẫn ≈ 10 MB, lại đi SONG SONG hai đường (thẳng + proxy) ⇒ 20 MB lên mạng một lúc: dễ đứt giữa chừng, máy chủ giữ cả hai bản trong bộ nhớ.
+  // Nay: tờ đáp án đi TRƯỚC bằng lượt `chiMoc` (máy chủ cất `key/<mã>` rồi chỉ chạm hai cột mốc — ca chưa có thì không tạo gì), rồi mới ca + đề.
+  // Thứ tự này để ca không bao giờ MỞ mà thiếu tờ đáp án. Gói nhỏ giữ nguyên một lượt như cũ.
+  if (keyBank && JSON.stringify({ ca, bank, keyBank }).length > NGUONG_TACH_GOI_CA) {
+    await guiGoiCa(ch, secret, ca, { ca: { maCa: ca.maCa }, keyBank, chiMoc: true, secret }, { canDe: false, canKey: true })
+    return guiGoiCa(ch, secret, ca, { ca, bank, secret }, { canDe: !!bank, canKey: true })
+  }
+  return guiGoiCa(ch, secret, ca, { ca, bank, keyBank, secret }, { canDe: !!bank, canKey: !!keyBank })
+}
+
+async function guiGoiCa(
+  ch: CauHinhMayChu,
+  secret: string,
+  ca: CaDay,
+  goi: Record<string, unknown>,
+  canXacNhan: { canDe: boolean; canKey: boolean },
+): Promise<boolean> {
+  const bodyString = JSON.stringify(goi)
   let body: string | Uint8Array = bodyString
   if (bodyString.length > 512 * 1024) {
     try {
@@ -509,7 +530,7 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
     }
     // Chỉ đọc xác nhận; không dựng ca hay thay đổi bài của học sinh.
     try {
-      const res = await gui('/ca/xac-nhan', JSON.stringify({ secret, maCa: ca.maCa, batDau: ca.batDau, tenCa: ca.tenCa, canDe: !!bank, canKey: !!keyBank }), 10)
+      const res = await gui('/ca/xac-nhan', JSON.stringify({ secret, maCa: ca.maCa, batDau: ca.batDau, tenCa: ca.tenCa, ...canXacNhan }), 10)
       if (res.ok && res.data?.daLuu === true) return true
     } catch { /* Giữ nguyên lỗi ban đầu nếu mạng vẫn đứt. */ }
     if (!thuLai) break
