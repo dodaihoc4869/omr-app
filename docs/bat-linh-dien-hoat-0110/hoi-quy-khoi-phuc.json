@@ -1,0 +1,28 @@
+{
+  "maKhoiPhuc": "bb31ac4d",
+  "banCu": "b21a251e",
+  "maVaTaiNguyenKhopBanCu": true,
+  "tong": 13148,
+  "dat": 12992,
+  "boQua": 28,
+  "loiTrongLuotToanBo": 128,
+  "loiTrungNen": 127,
+  "kiemTraKhongOnDinhDaDatKhiChayLai": [
+    {
+      "tep": "tests/tran-ngay-game-2109.test.ts",
+      "ten": "cổng NGUYÊN TỬ của INSERT tính đúng loại: hai câu trả lời song song khi Đảo còn đúng 1 suất 35/36 Đảo + hai câu song song ⇒ chỉ MỘT được ghi (lượt thứ hai bị cổng chặn), tổng Đảo = 36"
+    }
+  ],
+  "chayLaiBanKhoiPhuc": {
+    "tong": 15,
+    "dat": 15
+  },
+  "chayLaiBanCu": {
+    "tong": 15,
+    "dat": 15
+  },
+  "loiMoiConLai": [],
+  "build": "dat",
+  "kiemMau": "dat",
+  "serviceWorker": "13/13"
+}

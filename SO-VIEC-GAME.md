@@ -265,3 +265,8 @@ Vỏ `dao/DaoThanThu` của Code 6 CHƯA có trên main (mới có màn 1 `ChonB
 ### Khôi phục bản cũ theo yêu cầu người dùng · 01/10/2026 (VN) · Codex
 - Người dùng yêu cầu “quay lại bản cũ đi nhé”. Khôi phục 53 đường dẫn mã/tài nguyên của đợt diễn hoạt 90cde40b + cấu hình precache 63e4b44d về b21a251e. So src/server/public/scripts/tests/vite.config.ts/package.json/package-lock.json: không có sai khác với bản trước. Giữ hồ sơ và ảnh bằng chứng trong docs.
 - Không đổi dữ liệu D1; phát hành lại theo deploy.yml. Bản trước lần khôi phục: 8dc77630 / Actions36868247959. Bản cũ cần khôi phục: b21a251e / Actions36863450803. Đang chạy Vitest toàn bộ và build trước bước đẩy Cloudflare.
+
+### Đã khôi phục và phát hành bản cũ · 01/10/2026 20:58 (VN) · Codex
+- Nguồn bb31ac4d5c64ffe67c9efa2f5ebd448132482225; Actions36870909750/job110398122803 SUCCESS. Pages hoàn tất13:58:22Z, Worker13:58:29Z; mã/tài nguyên trùng b21a251e, không sửa dữ liệu. Bản trước khôi phục8dc77630 / Actions36868247959.
+- Full Vitest13.148:12.992 đạt/128 lỗi/28 bỏ qua;127 tên lỗi trùng nền,1 ca đồng thời không ổn định đạt khi chạy lại, nhóm15/15 ở cả bản khôi phục và b21a251e. Build/kiểm màu/SW13/13 đạt. Không có lỗi mới còn lại sau đối chứng và chạy lại; chi tiết docs/bat-linh-dien-hoat-0110/hoi-quy-khoi-phuc.json.
+- Xác nhận phát hành qua GitHub; mạng workspace chặn kiểm tra trực tiếp website. Bằng chứng docs/bat-linh-dien-hoat-0110/khoi-phuc.json. Commit bổ sung chỉ tài liệu [skip ci].
