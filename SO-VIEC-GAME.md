@@ -252,3 +252,8 @@ Vỏ `dao/DaoThanThu` của Code 6 CHƯA có trên main (mới có màn 1 `ChonB
 - Đảo 2.0, cảnh Đoàn 2.0 và tấm phủ cuối hiệp dùng chung Canvas + 32 atlas WebP; chân/điểm phóng/đích va chạm theo video, đồng đội đứng sau. Cuồng nộ/Liên Kích có bản mạnh, Chắn không bắn đòn giả. Giữ máu/EXP và dữ liệu chấm; không phát lại khi đọc cùng kết quả. Bản nhẹ 450 ms, dừng vẽ ngoài màn, ảnh lỗi có dự phòng.
 - 78/78 test trong 11 tệp liên quan, 158 kiểm tra Chromium, 32 atlas RGBA đạt; tsc, build và kiểm màu đạt. Hai script kiểm tra trình duyệt + bốn JPG dưới 150 KiB đã lưu. Video H.264 quay màn thật ở scratch/dien-hoat-kiem/dao-doan-dien-hoat.mp4.
 - Chi tiết: docs/bat-linh-dien-hoat-0110.md. Chưa phát hành Pages; cảnh trận đời cũ/Võ đài chưa chuyển sang bộ này. Không đổi Worker/D1.
+
+### Chuẩn bị phát hành Bát Linh · 01/10/2026 (Codex)
+- Ghép bộ diễn hoạt với main b21a251e; mã game 90cde40b, gói cài 63e4b44d. Tách mảnh SanDauDienHoat khỏi precache để tải khi mở game; build + kiểm màu đạt, SW 13/13 (161 tệp, 2998 KiB).
+- Toàn Vitest: 13.154 ca, 12.997 đạt, 129 lỗi cũ, 28 bỏ qua. Chạy lại 60 tệp lỗi trên main b21a251e: 1.097 ca, đúng 129 lỗi; so tên từng ca: KHÔNG lỗi mới. Báo cáo: docs/bat-linh-dien-hoat-0110/hoi-quy-phat-hanh.json.
+- Phát hành theo workflow deploy.yml của dự án; bản lùi trước thay đổi là b21a251e (Actions 36863450803).
