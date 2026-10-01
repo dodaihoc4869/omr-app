@@ -9,6 +9,8 @@
 //   POST /__do/r2    {khoa, noiDung} → ghi R2 GỐC (không đếm)
 import { AsyncLocalStorage } from 'node:async_hooks'
 import worker from '../../server/src/index'
+import { gameToken } from '../../server/src/game-v2-auth'
+import { LUAT_CAP_MOI } from '../../src/lib/hap-thu-ngay'
 
 interface Luot {
   lenh: string
@@ -123,6 +125,29 @@ export default {
     const url = new URL(req.url)
     if (url.pathname === '/__do/dump') return Response.json({ so })
     if (url.pathname === '/__do/reset') { so.length = 0; return Response.json({ ok: true }) }
+    if (url.pathname === '/__do/game') {
+      const { sbds } = (await req.json()) as { sbds: string[] }
+      const luc = new Date().toISOString(), maDe = '12-PEAK-GAME', qids = Array.from({ length: 20 }, (_, i) => `PEAK-Q${i}`)
+      const cau = qids.map(qid => ({ qid, maDe, version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu hoá giả lập ${qid}`, choices: ['a','b','c','d'], ideas: [], hinhAnh: [], dang: 'ES.A.D1', tenDang: 'Dạng thử', mucDo: 'hieu', sao: 1, kienThuc: ['k'], correct: 'B', solution: { chot: 'Lời giải thử' }, reviewed: true }))
+      const st = [env.DB.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{\"bat\":true}',?)").bind(luc),
+        env.DB.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES(?,'Kho giả','12',20,'kho/peak.json',0,'v1')").bind(maDe),
+        env.DB.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,'v1',?)").bind(maDe,luc),
+        ...cau.map(q => env.DB.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').bind(maDe,q.qid,q.version,q.group,q.dang,JSON.stringify(q))),
+        env.DB.prepare("INSERT INTO chien_dich(id,ten,lop,sbd_json,ma_de_json,qid_json,han_nop,the_luc_ngay,tao_luc) VALUES('PEAK-CD','Chiến dịch giả','12A',?,?,?,'2026-10-04',40,?)").bind(JSON.stringify(sbds),JSON.stringify([maDe]),JSON.stringify(qids),luc)]
+      await env.DB.batch(st)
+      const profile = JSON.stringify({pet:'dat_quy',choice:false,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:luc,luatCap:LUAT_CAP_MOI,mocVang:0})
+      const tokens: Record<string,string> = {}
+      for (const sbd of sbds) {
+        await env.DB.batch([env.DB.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES(?,'Em giả','12A','mk',?)").bind(sbd,luc),env.DB.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,profile,luc)])
+        tokens[sbd] = await gameToken(env,sbd)
+      }
+      return Response.json({ tokens })
+    }
+    if (url.pathname === '/__do/doi-chieu') {
+      const { maCa } = (await req.json()) as { maCa: string }
+      const r = await env.DB.prepare('SELECT sbd, trang_thai, dap_an_json, giay_cau_json FROM luot WHERE ma_ca = ?').bind(maCa).all()
+      return Response.json({ rows: r.results })
+    }
     if (url.pathname === '/__do/sql') {
       const { cau } = (await req.json()) as { cau: string[] }
       let loi = 0

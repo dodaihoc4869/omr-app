@@ -1,3 +1,4 @@
+import { gopDocD1 } from './doc-d1-theo-luot'
 // THUẬT TOÁN 2.0 — LỚP D1 (đọc chiến dịch, sổ sự kiện; chốt kế hoạch ngày; số liệu Sảnh; Rương Bát Linh).
 // Lõi thuần ở `srs2-loi.ts`. Công tắc `cau_hinh.game_hoa_2` (mặc định TẮT ⇒ mọi đường cũ giữ nguyên):
 //   {"bat":true}                         ⇒ toàn trung tâm
@@ -152,35 +153,41 @@ export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau 
 /**
  * CAO ĐIỂM 20h–24h (29/09): danh sách chiến dịch chưa huỷ + ngày bắt đầu là dữ liệu CHUNG mọi em (bảng nhỏ) nhưng trước đây MỖI lệnh Sảnh / start / Đoàn của
  * MỖI em quét lại cả bảng và bung `sbd_json` của mọi chiến dịch (json_each) để lọc một em. Nay đọc CẢ danh sách một lần, đệm 15 s trong isolate (lượt đọc đang bay được
- * chia sẻ), lọc em bằng tập sbd dựng sẵn. Thầy tạo / đóng / huỷ / sửa chiến dịch hay đặt ngày bắt đầu ⇒ `xoaDemChienDich()` ngay (isolate ấy); isolate khác trễ ≤ 15 s.
+ * đợi bằng timer riêng, KHÔNG dùng chung Promise I/O), lọc em bằng tập sbd dựng sẵn. Thầy tạo / đóng / huỷ / sửa chiến dịch hay đặt ngày bắt đầu ⇒ `xoaDemChienDich()` ngay (isolate ấy); isolate khác trễ ≤ 15 s.
  * Lỗi đọc ⇒ rỗng như cũ và KHÔNG đệm.
  */
 type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; bd: Map<string, string>; rd: Map<string, number> }
-const demChienDich = new DemTTL<Promise<DsChienDich>>(15_000, 2)
+type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
+const demChienDich = new DemTTL<OChienDich>(15_000, 2)
 export function xoaDemChienDich(): void { demChienDich.xoa() }
-function docMoiChienDich(env: Env): Promise<DsChienDich> {
-  const nay = Date.now()
-  const co = demChienDich.doc('ds', nay)
-  if (co) return co
+async function docMoiChienDich(env: Env): Promise<DsChienDich> {
+  const co = demChienDich.doc('ds', Date.now())
+  for (let n = 0; co?.dangDoc && demChienDich.doc('ds', Date.now()) === co && n < 15; n++) await new Promise<void>(xong => setTimeout(xong, 16))
+  const daXong = demChienDich.doc('ds', Date.now())
+  if (daXong?.ds) return daXong.ds
+  const o: OChienDich = { ds: null, dangDoc: true }
+  demChienDich.ghi('ds', Date.now(), o)
   let loi = false
   // Không JOIN: bảng `chien_dich_bat_dau` tạo lúc chạy, có thể chưa có ⇒ lỗi riêng câu phụ, danh sách vẫn đúng (hành vi cũ).
-  const p = Promise.all([
-    env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY tao_luc DESC").all<Row>().catch(() => { loi = true; return { results: [] as Row[] } }),
-    // bảng tạo lúc chạy: chưa có (chưa ai đặt ngày bắt đầu) là BÌNH THƯỜNG ⇒ rỗng, vẫn đệm (`ghiBatDau` xoá đệm khi tạo)
-    env.DB.prepare("SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
-    // rải đều (30/09): bảng tạo lúc chạy, chưa có = mọi chiến dịch BẬT ⇒ rỗng (`ghiRaiDeu` xoá đệm khi đổi)
-    env.DB.prepare("SELECT id, rai_deu FROM chien_dich_tuy_chon WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
-  ]).then(([r, bd, rd]) => {
-    if (loi && demChienDich.doc('ds', Date.now()) === p) demChienDich.xoaKhoa('ds')
-    return {
-      // đúng ngữ nghĩa `json_each(sbd_json) … value = ?`: chỉ phần tử CHUỖI trùng khớp tuyệt đối
-      ds: (r.results ?? []).map((row) => { let a: unknown = []; try { a = JSON.parse(str(row.sbd_json) || '[]') } catch { /* sbd_json hỏng ⇒ không em nào */ } return { row, sbd: new Set((Array.isArray(a) ? a : []).filter((x): x is string => typeof x === 'string')) } }),
-      bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
-      rd: new Map((rd.results ?? []).map((x) => [str(x.id), Number(x.rai_deu)])),
-    }
-  })
-  demChienDich.ghi('ds', nay, p)
-  return p
+  try {
+    const giaTri = await Promise.all([
+      env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY tao_luc DESC").all<Row>().catch(() => { loi = true; return { results: [] as Row[] } }),
+      // bảng tạo lúc chạy: chưa có (chưa ai đặt ngày bắt đầu) là BÌNH THƯỜNG ⇒ rỗng, vẫn đệm (`ghiBatDau` xoá đệm khi tạo)
+      env.DB.prepare("SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
+      // rải đều (30/09): bảng tạo lúc chạy, chưa có = mọi chiến dịch BẬT ⇒ rỗng (`ghiRaiDeu` xoá đệm khi đổi)
+      env.DB.prepare("SELECT id, rai_deu FROM chien_dich_tuy_chon WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
+    ]).then(([r, bd, rd]) => {
+      if (loi && demChienDich.doc('ds', Date.now()) === o) demChienDich.xoaKhoa('ds')
+      return {
+        // đúng ngữ nghĩa `json_each(sbd_json) … value = ?`: chỉ phần tử CHUỖI trùng khớp tuyệt đối
+        ds: (r.results ?? []).map((row) => { let a: unknown = []; try { a = JSON.parse(str(row.sbd_json) || '[]') } catch { /* sbd_json hỏng ⇒ không em nào */ } return { row, sbd: new Set((Array.isArray(a) ? a : []).filter((x): x is string => typeof x === 'string')) } }),
+        bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
+        rd: new Map((rd.results ?? []).map((x) => [str(x.id), Number(x.rai_deu)])),
+      }
+    })
+    o.ds = loi ? null : giaTri
+    return giaTri
+  } finally { o.dangDoc = false; if (!o.ds && demChienDich.doc('ds', Date.now()) === o) demChienDich.xoaKhoa('ds') }
 }
 export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDich[]> {
   const { ds, bd, rd } = await docMoiChienDich(env)
@@ -292,14 +299,14 @@ export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map
 }
 
 /** Lần làm của em với các câu (mọi nguồn). Bỏ sự kiện CHE (ca chưa công bố); bỏ trống tính là sai; `assistance='assisted'` ⇒ có gợi ý. */
-export async function docLanLam(env: Env, sbd: string, qids: readonly string[]): Promise<LanLam[]> {
+export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = ''): Promise<LanLam[]> {
   if (!qids.length) return []
   const ds = JSON.stringify([...new Set(qids)])
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`).bind(sbd, ds).all<Row>()).results ?? []
+    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   } catch {
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`).bind(sbd, ds).all<Row>()).results ?? []
+    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   }
   return rows.filter((x) => str(x.visibility) !== 'embargoed').map(lanLamTuDong)
 }
@@ -435,6 +442,7 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 
 /** Toàn bộ trạng thái luyện của em: chiến dịch đang chạy + nợ cũ + ôn duy trì của chiến dịch trước. */
 export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<HoSo2> {
+  env = { ...env, DB: gopDocD1(env.DB) }
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
   const [ds, mocThem, qidSaiCa, qidSaiLop] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd)])
   const dangChay = chienDichDangChay(ds, homNay)
@@ -465,9 +473,17 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
     qidSaiTaiLop.add(q)
   }
   const qids = [...nguonTheoQid.keys()]
-  const [meta, lanLam, moc] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? []), docLanLam(env, sbd, qids), docMocDayLai(env, sbd)])
+  // Sự kiện trước mốc sớm nhất vốn bị loại bên dưới: lọc ngay trong D1, giảm dữ liệu truyền/parse.
+  // Vẫn xét mốc riêng từng câu sau khi đọc; có câu thiếu mốc thì giữ cận rỗng để không bỏ lịch sử.
+  const tuLuc = qids.reduce((min, q) => { const luc = tuLucTheoQid.get(q) ?? ''; return luc < min ? luc : min }, tuLucTheoQid.get(qids[0]) ?? '')
+  const [meta, lanLam, moc] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? []), docLanLam(env, sbd, qids, tuLuc), docMocDayLai(env, sbd)])
   const theoQid = new Map<string, LanLam[]>()
-  for (const x of lanLam) if (x.luc >= (tuLucTheoQid.get(x.qid) ?? '')) theoQid.set(x.qid, [...(theoQid.get(x.qid) ?? []), x])
+  // Thêm tại chỗ: tránh sao chép cả lịch sử O(n²) cho câu đã luyện nhiều lần.
+  for (const x of lanLam) if (x.luc >= (tuLucTheoQid.get(x.qid) ?? '')) {
+    let ls = theoQid.get(x.qid)
+    if (!ls) { ls = []; theoQid.set(x.qid, ls) }
+    ls.push(x)
+  }
   const tt = new Map<string, TrangThaiCau>()
   const cau: CauSrs[] = []
   const laMoiBo = new Set<string>()

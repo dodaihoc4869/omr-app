@@ -26,6 +26,13 @@ const LAM_GIAY = Number(arg('lam-giay', 180))
 const DE_RIENG = arg('de-rieng', '1') === '1'
 const CONG_BO = arg('cong-bo', 'ngay')
 const CONG = Number(arg('cong', 8791))
+const DONG_LOAT = arg('dong-loat', '0') === '1'
+const CHI_PHONG_CHO = arg('chi-phong-cho', '0') === '1'
+const CHI_GAME = arg('chi-game', '0') === '1'
+const CHO_MS = Number(arg('cho-ms', 45000))
+const NOP_MS = Number(arg('nop-ms', 60000))
+let hat = Number(arg('hat', 1102026)) >>> 0
+const ngauNhien = () => { hat = (Math.imul(hat, 1664525) + 1013904223) >>> 0; return hat / 4294967296 }
 const RA = resolve(REPO, arg('ra', 'docs/do-ca-3009'))
 const MAT = randomBytes(12).toString('hex')
 const MA_CA = '300930'
@@ -138,7 +145,7 @@ async function goi(lenh, duong, than, laLoi = (j) => j?.ok === false) {
   return j
 }
 const T0 = Date.now()
-const BAT_DAU_SAU = 45_000
+const BAT_DAU_SAU = CHO_MS
 let batDauLuc = 0
 let xongHet = false
 const bamGio = () => Date.now() - T0
@@ -159,11 +166,11 @@ function giayCauDen(k, soCau) {
 }
 
 async function motEm(e, k) {
-  await ngu(Math.random() * 40_000)
+  await ngu(DONG_LOAT ? 0 : ngauNhien() * 40_000)
   await goi('tra tên (/goi tenTheoSbd)', '/goi', { action: 'tenTheoSbd', maCa: MA_CA, sbd: e.sbd })
   const idThietBi = `may-${e.sbd}`
   let v = await goi('vào thi — phòng chờ (/vao-thi)', '/vao-thi', { maCa: MA_CA, sbd: e.sbd, idThietBi, hoTen: e.hoTen, namSinh: e.namSinh })
-  const nhipCho = 3000 * (1 + Math.random() * 0.4)
+  const nhipCho = 3000 * (1 + ngauNhien() * 0.4)
   while (v?.cach === 'cho') {
     await ngu(nhipCho)
     const pc = await goi('hỏi phòng chờ (GET /phong-cho)', `/phong-cho?maCa=${MA_CA}`)
@@ -173,11 +180,11 @@ async function motEm(e, k) {
   if (!v?.ok || !v.khoaLuot) return
   const vaoLuc = Date.now()
   await goi('tải đề (GET /de/:ca)', v.deUrl ?? `/de/${MA_CA}`, undefined, () => false)
-  const hanNop = batDauLuc + LAM_GIAY * 1000 + Math.random() * 60_000
-  const nhipTt = 10_000 * (1 + Math.random() * 0.4)
+  const hanNop = batDauLuc + LAM_GIAY * 1000 + ngauNhien() * NOP_MS
+  const nhipTt = 10_000 * (1 + ngauNhien() * 0.4)
   let soCau = 0
   let tt = Date.now() + nhipTt
-  let luu = Date.now() + Math.random() * 15_000
+  let luu = Date.now() + ngauNhien() * 15_000
   while (Date.now() < hanNop) {
     const toi = Math.min(tt, luu, hanNop)
     await ngu(toi - Date.now())
@@ -233,15 +240,45 @@ async function chamLo() {
   for (let i = 0; i < tatCa.length; i += 8) await goi('thầy: chấm lô 8 em (/cham-diem)', '/cham-diem', { __thay: 1, maCa: MA_CA, bai: tatCa.slice(i, i + 8) })
 }
 
-log(`Bắt đầu kịch bản: ${SO_EM} em · làm ${LAM_GIAY} s · nộp dồn 60 s`)
-const thay = mayThay()
-const bd = batDauThi()
-await Promise.all(EM.map((e, k) => motEm(e, k)))
+log(`Bắt đầu kịch bản: ${SO_EM} em · làm ${LAM_GIAY} s · nộp dồn ${NOP_MS / 1000} s`)
+const thay = CHI_PHONG_CHO || CHI_GAME ? Promise.resolve() : mayThay()
+const bd = CHI_PHONG_CHO || CHI_GAME ? Promise.resolve() : batDauThi()
+if (CHI_GAME) {
+  const { tokens } = await post('/__do/game', { sbds: EM.map(e => e.sbd) })
+  await fetch(GOC_URL + '/__do/reset')
+  await Promise.all(EM.map(async e => {
+    const token = tokens[e.sbd]
+    await goi('300 mở Sảnh game', '/game-v2/hoa2-sanh', { token })
+    const luot = await goi('300 vào Đảo', '/game-v2/start', { token, mode: 'adventure' })
+    if (!luot?.id || !luot.questions?.length) { khach.push({lenh:'Đảo không phát câu',ms:0,loi:'Không có lượt/câu'}); return }
+    await goi('300 chốt câu game', '/game-v2/answer', { token, session: luot.id, qid: luot.questions[0].qid, answer: 'B' })
+  }))
+} else if (CHI_PHONG_CHO) {
+  for (let dot = 0; dot < 3; dot++) await Promise.all(EM.map(() => goi('300 hỏi phòng chờ đồng thời', `/phong-cho?maCa=${MA_CA}`)))
+  const r = await goi('thầy bắt đầu', '/goi', { __thay: 1, action: 'batDauThi', maCa: MA_CA, dongBoGio: true, secret: MAT })
+  if (!r?.ok) throw new Error('Không bắt đầu được ca giả')
+  const rs = await Promise.all(EM.map(() => goi('300 thấy bắt đầu đồng thời', `/phong-cho?maCa=${MA_CA}`)))
+  if (rs.some(x => !x?.batDau)) console.error('Còn lượt chưa nhận được giờ bắt đầu')
+} else await Promise.all(EM.map((e, k) => motEm(e, k)))
 await bd
 log('Cả lớp đã nộp — thầy tải chi tiết + chấm')
 await ngu(3500)
+let doiChieu = null
+if (!CHI_PHONG_CHO && !CHI_GAME) {
+  // Nộp lặp và gói lưu trễ phải giữ nguyên bài đã chốt.
+  await goi('nộp lặp (giữ bài)', '/nop', { maCa: MA_CA, sbd: EM[0].sbd, dapAn: {}, giayCau: {} })
+  await goi('lưu trễ sau nộp (bị chặn)', '/luu-tam', { maCa: MA_CA, sbd: EM[0].sbd, dapAn: {} }, j => j?.lyDo !== 'khong_dang_lam')
+  const { rows } = await post('/__do/doi-chieu', { maCa: MA_CA })
+  const map = new Map(rows.map(r => [r.sbd, r]))
+  const sai = EM.filter((e, k) => {
+    const r = map.get(e.sbd)
+    return !r || r.trang_thai !== 'da_nop' || JSON.stringify(JSON.parse(r.dap_an_json ?? '{}')) !== JSON.stringify(dapAnDen(e, k, 28)) || JSON.stringify(JSON.parse(r.giay_cau_json ?? '{}')) !== JSON.stringify(giayCauDen(k, 28))
+  })
+  doiChieu = { soBai: rows.length, mongDoi: SO_EM, sai: sai.length, dapAnVaThoiGianKhop: rows.length === SO_EM && sai.length === 0 }
+  log('Đối chiếu bài thực trong D1 cục bộ:', JSON.stringify(doiChieu))
+}
 await goi('thầy: chi tiết ca (/ca/chi-tiet)', '/ca/chi-tiet', { __thay: 1, maCa: MA_CA })
-await chamLo()
+if (!CHI_PHONG_CHO && !CHI_GAME) await chamLo()
 xongHet = true
 await thay
 await ngu(2000)
@@ -271,10 +308,10 @@ const bang = [...theoLenh.values()].map((o) => {
 })
 const tong = { luot: khach.length, loi: khach.filter((k) => k.loi).length, cauD1: so.reduce((t, s) => t + s.cau, 0), vongD1: so.reduce((t, s) => t + s.vong, 0), docD1: so.reduce((t, s) => t + s.doc, 0), r2Doc: so.reduce((t, s) => t + s.r2Doc, 0), r2MB: +(so.reduce((t, s) => t + s.r2Byte, 0) / 1048576).toFixed(1), giay: Math.round((Date.now() - T0) / 1000) }
 mkdirSync(RA, { recursive: true })
-const kq = { nhan: NHAN, luc: new Date().toISOString(), cauHinh: { soEm: SO_EM, treD1: TRE_D1, treR2: TRE_R2, lamGiay: LAM_GIAY, deRieng: DE_RIENG, congBo: CONG_BO }, tong, bang }
+const kq = { nhan: NHAN, luc: new Date().toISOString(), cauHinh: { soEm: SO_EM, treD1: TRE_D1, treR2: TRE_R2, lamGiay: LAM_GIAY, deRieng: DE_RIENG, congBo: CONG_BO, dongLoat: DONG_LOAT, chiPhongCho: CHI_PHONG_CHO, chiGame: CHI_GAME, choMs: CHO_MS, nopMs: NOP_MS, hat: Number(arg('hat', 1102026)) }, doiChieu, tong, bang }
 writeFileSync(join(RA, `${NHAN}.json`), JSON.stringify(kq, null, 1) + '\n')
 const dong = (b) => `| ${b.lenh} | ${b.n} | ${b.loi} | ${b.p50} | ${b.p95} | ${b.max} | ${b.cauTb} | ${b.vongTb} (max ${b.vongMax}) | ${b.docTb} | ${b.r2DocTb} (${b.r2KBTb} KB) |`
 console.log(`\n### ${NHAN} — ${SO_EM} em, trễ D1 ${TRE_D1} ms/vòng, trễ R2 ${TRE_R2} ms\n\n| Lệnh | Lượt | Lỗi | p50 ms | p95 ms | max ms | Câu D1 TB | Vòng D1 TB | Dòng đọc TB | Đọc R2 TB |\n|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n${bang.map(dong).join('\n')}\n`)
 console.log('Tổng:', JSON.stringify(tong))
 for (const b of bang) if (b.loi) console.log('LỖI', b.lenh, b.loi, b.mauLoi.join(' · '))
-process.exit(0)
+process.exit(tong.loi || doiChieu?.dapAnVaThoiGianKhop === false ? 1 : 0)

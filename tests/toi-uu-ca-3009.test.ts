@@ -1,3 +1,4 @@
+import { xoaDemPhongCho } from '../server/src/phong-cho-dong-thoi'
 // @vitest-environment node
 // TỐI ƯU CA KIỂM TRA 30/09 (docs/do-toi-uu-ca-3009.md) — chốt BẤT BIẾN của đường nóng sau khi gộp vòng D1 + đệm isolate:
 //   · số vòng đi-về D1 của /vao-thi (2), /nop (1; ca "chỉ nộp phút cuối" 2), /phong-cho, /de/ (0 lượt R2 khi đệm còn đúng phiên);
@@ -154,7 +155,7 @@ describe('/vao-thi — MỘT batch đọc + MỘT câu ghi; bản đồ đề ri
     expect(p.j).toMatchObject({ ok: true, phongCho: true, batDau: false, batDauLuc: '', trangThai: 'mo' })
     expect(dem.vong - t2).toBe(1)
   })
-  it('300 học sinh hỏi route phòng chờ đồng thời: một truy vấn, không đề/đáp án; thầy bắt đầu được thấy ở nhịp sau', async () => {
+  it('300 học sinh hỏi phòng chờ: I/O riêng, đệm giá trị xong; đổi ca không lộ đề/đáp án', async () => {
     const { d, env, dem } = await dung({ phongCho: 1 })
     const t = dem.vong
     const rs = await Promise.all(Array.from({length:300},()=>goi(env,'/phong-cho?maCa=C1')))
@@ -165,6 +166,7 @@ describe('/vao-thi — MỘT batch đọc + MỘT câu ghi; bản đồ đề ri
       expect(r.j.bank).toBeUndefined();expect(r.j.keyBank).toBeUndefined()
     }
     d.sql.exec("UPDATE ca SET phong_cho=0,bat_dau_thi_luc='2026-10-01T00:00:00Z' WHERE ma_ca='C1'")
+    xoaDemPhongCho(env)
     expect((await goi(env,'/phong-cho?maCa=C1')).j).toMatchObject({ok:true,phongCho:false,batDau:true,batDauLuc:'2026-10-01T00:00:00Z'})
   })
   it('cổng danh sách lớp vẫn chặn + ghi sổ chặn', async () => {
