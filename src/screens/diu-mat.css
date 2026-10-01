@@ -4,34 +4,37 @@
  * KHÔNG đổi màu đánh dấu đã chọn (primary/tertiary…) ở nền sáng. Máy đang nền tối: dịu mắt luôn là giấy sáng nên đặt lại các vai trò màu
  * về đúng giá trị NỀN SÁNG của chúng (m3-theme.css / tokens.css) — ô đã chọn trông y như ở nền sáng.
  * Viết rgb() — `npm run check:mau` cấm mã thập lục phân ngoài tokens.css. */
-.man-lam-bai[data-diu-mat='bat'],
-.man-lam-bai[data-diu-mat='bat'] .m3 {
+/* 01/10 (thầy: "bấm Dịu mắt không thay đổi gì"): màn thi nằm trong khung Bát Linh, luật `:is(.bl-app, body[data-bat-linh]) :is(.m3, .bnv)`
+ * (độ ưu tiên 0,2,1) đè mọi biến --m3-* của luật dưới (0,2,0) ⇒ chỉ nút đổi màu, nền giữ nguyên. Thêm `:root` (0,3,0) để dịu mắt luôn thắng;
+ * và nền Bát Linh vốn đã là ngà nhạt (244 243 232) nên tông dịu mắt đậm hơn hẳn — giấy sepia, chữ phụ ≥ 7:1 trên mọi bề mặt. */
+:root .man-lam-bai[data-diu-mat='bat'],
+:root .man-lam-bai[data-diu-mat='bat'] .m3 {
   color-scheme: light;
-  --m3-surface: rgb(244 238 226);
-  --m3-surface-container-lowest: rgb(250 246 237);
-  --m3-surface-container-low: rgb(236 229 214);
-  --m3-surface-container: rgb(239 231 214);
-  --m3-surface-container-high: rgb(221 210 187);
-  --m3-on-surface: rgb(43 39 32);
-  --m3-on-surface-variant: rgb(79 71 58);
-  --m3-outline: rgb(122 111 92);
+  --m3-surface: rgb(236 224 199);
+  --m3-surface-container-lowest: rgb(246 238 220);
+  --m3-surface-container-low: rgb(232 219 192);
+  --m3-surface-container: rgb(228 214 186);
+  --m3-surface-container-high: rgb(214 198 166);
+  --m3-on-surface: rgb(46 38 26);
+  --m3-on-surface-variant: rgb(62 51 34);
+  --m3-outline: rgb(128 112 86);
   --m3-cao-do-1: 0 1px 2px rgb(80 60 20 / 0.12), 0 1px 3px 1px rgb(80 60 20 / 0.08);
 }
 /* đường không M3 (app giáo viên xem thử): token cũ đọc thẳng */
-.man-lam-bai[data-diu-mat='bat']:not(.m3) {
-  --nen: rgb(236 229 214);
-  --the: rgb(250 246 237);
-  --the-2: rgb(239 231 214);
-  --the-mo: rgb(250 246 237 / 0.88);
-  --muc: rgb(43 39 32);
-  --nhat: rgb(79 71 58);
-  --mo: rgb(92 83 68);
-  --vien: rgb(221 210 187);
-  --vien-dam: rgb(201 187 158);
+:root .man-lam-bai[data-diu-mat='bat']:not(.m3) {
+  --nen: rgb(232 219 192);
+  --the: rgb(246 238 220);
+  --the-2: rgb(228 214 186);
+  --the-mo: rgb(246 238 220 / 0.88);
+  --muc: rgb(46 38 26);
+  --nhat: rgb(62 51 34);
+  --mo: rgb(78 66 46);
+  --vien: rgb(214 198 166);
+  --vien-dam: rgb(190 172 138);
 }
 @media (prefers-color-scheme: dark) {
-  .man-lam-bai[data-diu-mat='bat'],
-  .man-lam-bai[data-diu-mat='bat'] .m3 {
+  :root .man-lam-bai[data-diu-mat='bat'],
+  :root .man-lam-bai[data-diu-mat='bat'] .m3 {
     --m3-primary: rgb(11 87 208);
     --m3-on-primary: rgb(255 255 255);
     --m3-primary-container: rgb(211 227 253);
@@ -51,7 +54,7 @@
     --m3-canh-bao-nen: rgb(254 247 224);
     --m3-canh-bao-chu: rgb(92 68 0);
   }
-  .man-lam-bai[data-diu-mat='bat']:not(.m3) {
+  :root .man-lam-bai[data-diu-mat='bat']:not(.m3) {
     --muc-nguoc: rgb(255 255 255);
     --tim: rgb(99 102 241);
     --tim-nen: rgb(238 242 255);
