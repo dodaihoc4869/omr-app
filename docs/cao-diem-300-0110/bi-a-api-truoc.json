@@ -1,0 +1,124 @@
+{
+  "treD1Ms": 40,
+  "lan": 5,
+  "luc": "2026-10-01T02:28:47.970Z",
+  "route": {
+    "vao-sanh (bia-sanh)": {
+      "p50": 294.1,
+      "p95": 295.1,
+      "max": 295.1,
+      "luotD1": 19,
+      "ghiD1": 0,
+      "n": 5
+    },
+    "cua-sanh Bat Linh (biaChoSanh)": {
+      "p50": 170.8,
+      "p95": 172.4,
+      "max": 172.4,
+      "luotD1": 15,
+      "ghiD1": 0,
+      "n": 5
+    },
+    "xep-ban A.I (bia-xep-ban)": {
+      "p50": 576.1,
+      "p95": 577.8,
+      "max": 577.8,
+      "luotD1": 26,
+      "ghiD1": 3,
+      "n": 5
+    },
+    "lay-cau chi tra loi (bia-tra-loi)": {
+      "p50": 497.7,
+      "p95": 502.5,
+      "max": 502.5,
+      "luotD1": 24,
+      "ghiD1": 2,
+      "n": 5
+    },
+    "tra-loi (answer chung)": {
+      "p50": 162,
+      "p95": 162.8,
+      "max": 162.8,
+      "luotD1": 8,
+      "ghiD1": 2,
+      "n": 5
+    },
+    "doi-cau sau cau sai (bia-doi-cau)": {
+      "p50": 454.6,
+      "p95": 455.3,
+      "max": 455.3,
+      "luotD1": 23,
+      "ghiD1": 1,
+      "n": 5
+    },
+    "ket-van (bia-ket-van)": {
+      "p50": 413.7,
+      "p95": 494.2,
+      "max": 494.2,
+      "luotD1": 20,
+      "ghiD1": 1,
+      "n": 5
+    },
+    "loi-moi 6 giay/lan (bia-loi-moi)": {
+      "p50": 283.2,
+      "p95": 284,
+      "max": 284,
+      "luotD1": 10,
+      "ghiD1": 1,
+      "n": 5
+    },
+    "tao-ban online (bia-tao-ban)": {
+      "p50": 453.3,
+      "p95": 454.1,
+      "max": 454.1,
+      "luotD1": 23,
+      "ghiD1": 2,
+      "n": 5
+    },
+    "vao-sanh qua gameV2 (token + ho so + bia-sanh)": {
+      "p50": 212.1,
+      "p95": 217.5,
+      "max": 217.5,
+      "luotD1": 17,
+      "ghiD1": 0,
+      "n": 5
+    }
+  },
+  "phong": {
+    "ketThuc": true,
+    "soCu": 25,
+    "soCau": 17,
+    "giayVan": 404,
+    "tinGui": 84,
+    "tinMoiGiay": 0.2,
+    "byteMoiTin": 2610,
+    "byteTt": 2610,
+    "kbMoiPhut": 31.8,
+    "ghiKhoMoiGoi": 4,
+    "byteGhiKhoMoiGoi": 4155,
+    "henGioMoiGoi": 1,
+    "d1MoiVan": 19,
+    "xuLy": {
+      "cu": {
+        "p50": 1,
+        "p95": 1.8,
+        "n": 25
+      },
+      "cau_xong": {
+        "p50": 40.9,
+        "p95": 122.1,
+        "n": 17
+      },
+      "vao": {
+        "p50": 1.3,
+        "p95": 1.3,
+        "n": 2
+      },
+      "san_sang": {
+        "p50": 2.2,
+        "p95": 2.2,
+        "n": 2
+      }
+    }
+  }
+}

@@ -137,8 +137,8 @@
     "Trần Bi-a còn ít hơn một bàn đủ: bàn vẫn mở với đúng số câu còn, báo rõ kế hoạch rải đều nhỏ (chỉ câu mới): trần X < 8 ⇒ Sảnh báo \"Hôm nay Bi-a còn X câu\", bàn có X câu (Câu chốt + X−1 bi), bi còn lại là bi trống",
     "tô bi tối ưu giữ nguyên điểm ảnh và hướng lăn bốn loại bi × ba cỡ × hai hướng bàn × 24 góc quay, mặt nạ chữ có tô và viền"
   ],
-  "total": 13131,
-  "passed": 12976,
+  "total": 13132,
+  "passed": 12977,
   "failed": 127,
   "pending": 28
 }
