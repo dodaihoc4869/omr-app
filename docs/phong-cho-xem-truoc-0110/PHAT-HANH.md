@@ -11,6 +11,7 @@ CSS có biến và bộ chọn riêng của phòng chờ; không thay nền hay 
 - 122/122 ca liên quan đạt; sau tách tải lười, chạy lại nhóm A2/phòng chờ 16/16 đạt.
 - 25 kiểm Chromium với component thật và props mẫu: 360/390/768/844/1440, pause dừng vẽ, nhặt tăng điểm, đổi nền giữ điểm, lỗi kết nối, chuyển vào bài khi pause, cleanup, giảm chuyển động, máy yếu, thiếu Canvas và ngoài màn. Hộp kiểm mô phỏng cha chuyển màn; không gọi ca thi thật.
 - TypeScript, build, kiểm màu đạt. SW13/13,163 tệp2996 KiB; mảnh JS/CSS ChuyenBay nằm ngoài precache, dùng cache chạy-lúc hiện có. Toàn Vitest đang chạy; CI cũng kiểm toàn bộ trước bước đẩy Cloudflare.
+- Vòng toàn bộ đầu phát hiện CSS tương thích chưa sinh lại sau đổi lớp của PhongChoGame. Đã chạy trình sinh chính thức, bỏ15 luật cũ không còn trong danh sách nguồn; nhóm M3 A2/B/C36/36 đạt. Build lại sau sinh CSS đạt; chạy lại toàn bộ để đối chiếu nền trên mã cuối.
 - Ảnh component thật: `app-doc.jpg`, `app-ngang.jpg`, `app-toi.jpg`; kết quả trình duyệt `kiem-that.json`.
 
 Phát hành từ worktree sạch theo `.github/workflows/deploy.yml`. Mốc lùi: `1eed4375` (mã triển khai trước `bb31ac4d`, Actions36870909750). Bản xem trước eb3c1584 được giữ riêng; README mẫu ghi đúng trạng thái tại thời điểm xem mẫu.
