@@ -1,0 +1,49 @@
+{
+  "thaoTac": [
+    {
+      "width": 844,
+      "height": 390,
+      "doiCoGiuVan": true,
+      "tayTraiPhai": true,
+      "dienBienEsc": true,
+      "huyLuc": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "doiCoGiuVan": true,
+      "tayTraiPhai": true,
+      "dienBienEsc": true,
+      "huyLuc": true
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "doiCoGiuVan": true,
+      "tayTraiPhai": true,
+      "dienBienEsc": true,
+      "huyLuc": true
+    },
+    {
+      "toanManHinh": true,
+      "doiMauHeThong": true,
+      "nenToi": "rgb(13, 29, 28)",
+      "nenSang": "rgb(244, 243, 232)"
+    }
+  ],
+  "amThanh": [
+    {
+      "peak": 0.09484107792377472,
+      "rms": 0.008159547965096964
+    },
+    {
+      "peak": 0.38164353370666504,
+      "rms": 0.03033825133518257
+    },
+    {
+      "peak": 0.5751515626907349,
+      "rms": 0.04614995609505249
+    }
+  ],
+  "reducedMotion": true
+}

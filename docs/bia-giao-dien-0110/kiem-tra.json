@@ -1,0 +1,490 @@
+[
+  {
+    "name": "doc-360",
+    "boCuc": "doc",
+    "canvas": {
+      "x": 4,
+      "y": 103.40625,
+      "width": 308,
+      "height": 531.1875
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 4
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 310,
+        "y": 4
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 6,
+        "y": 690
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 310,
+        "y": 691
+      }
+    ],
+    "power": {
+      "x": 319,
+      "y": 103.40625,
+      "width": 34,
+      "height": 531.1875
+    },
+    "errors": []
+  },
+  {
+    "name": "doc-768",
+    "boCuc": "doc",
+    "canvas": {
+      "x": 95.859375,
+      "y": 52,
+      "width": 532.28125,
+      "height": 918
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 4
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 718,
+        "y": 4
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 6,
+        "y": 974
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 718,
+        "y": 975
+      }
+    ],
+    "power": {
+      "x": 727,
+      "y": 52,
+      "width": 34,
+      "height": 918
+    },
+    "errors": []
+  },
+  {
+    "name": "pc-1280",
+    "boCuc": "pc",
+    "canvas": {
+      "x": 66,
+      "y": 73.78125,
+      "width": 1208,
+      "height": 700.421875
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 6
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 1118,
+        "y": 6
+      },
+      {
+        "name": "Tắt âm thanh",
+        "width": 44,
+        "height": 44,
+        "x": 1174,
+        "y": 6
+      },
+      {
+        "name": "Diễn biến ván",
+        "width": 44,
+        "height": 44,
+        "x": 1230,
+        "y": 6
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 9,
+        "y": 54
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 10,
+        "y": 110
+      }
+    ],
+    "power": {
+      "x": 15,
+      "y": 164,
+      "width": 34,
+      "height": 570
+    },
+    "errors": []
+  },
+  {
+    "name": "doc-sang",
+    "boCuc": "doc",
+    "canvas": {
+      "x": 4,
+      "y": 129.53125,
+      "width": 338,
+      "height": 582.921875
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 4
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 340,
+        "y": 4
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 6,
+        "y": 794
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 340,
+        "y": 795
+      }
+    ],
+    "power": {
+      "x": 349,
+      "y": 129.5390625,
+      "width": 34,
+      "height": 582.921875
+    },
+    "errors": []
+  },
+  {
+    "name": "doc-toi",
+    "boCuc": "doc",
+    "canvas": {
+      "x": 4,
+      "y": 129.53125,
+      "width": 338,
+      "height": 582.921875
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 4
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 340,
+        "y": 4
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 6,
+        "y": 794
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 340,
+        "y": 795
+      }
+    ],
+    "power": {
+      "x": 349,
+      "y": 129.5390625,
+      "width": 34,
+      "height": 582.921875
+    },
+    "errors": []
+  },
+  {
+    "name": "ngang-sang",
+    "boCuc": "ngang",
+    "canvas": {
+      "x": 92.59375,
+      "y": 4,
+      "width": 658.796875,
+      "height": 382
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 4
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 56
+      },
+      {
+        "name": "Tắt âm thanh",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 108
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 793,
+        "y": 4
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 160
+      }
+    ],
+    "power": {
+      "x": 799,
+      "y": 62,
+      "width": 34,
+      "height": 320
+    },
+    "errors": []
+  },
+  {
+    "name": "ngang-toi",
+    "boCuc": "ngang",
+    "canvas": {
+      "x": 92.59375,
+      "y": 4,
+      "width": 658.796875,
+      "height": 382
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 4
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 56
+      },
+      {
+        "name": "Tắt âm thanh",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 108
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 793,
+        "y": 4
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 160
+      }
+    ],
+    "power": {
+      "x": 799,
+      "y": 62,
+      "width": 34,
+      "height": 320
+    },
+    "errors": []
+  },
+  {
+    "name": "pc-sang",
+    "boCuc": "pc",
+    "canvas": {
+      "x": 66,
+      "y": 77.390625,
+      "width": 1368,
+      "height": 793.203125
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 6
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 1278,
+        "y": 6
+      },
+      {
+        "name": "Tắt âm thanh",
+        "width": 44,
+        "height": 44,
+        "x": 1334,
+        "y": 6
+      },
+      {
+        "name": "Diễn biến ván",
+        "width": 44,
+        "height": 44,
+        "x": 1390,
+        "y": 6
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 9,
+        "y": 54
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 10,
+        "y": 110
+      }
+    ],
+    "power": {
+      "x": 15,
+      "y": 164,
+      "width": 34,
+      "height": 670
+    },
+    "errors": []
+  },
+  {
+    "name": "pc-toi",
+    "boCuc": "pc",
+    "canvas": {
+      "x": 66,
+      "y": 77.390625,
+      "width": 1368,
+      "height": 793.203125
+    },
+    "bodyOverflow": false,
+    "buttons": [
+      {
+        "name": "Về Sảnh Bi-a",
+        "width": 44,
+        "height": 44,
+        "x": 6,
+        "y": 6
+      },
+      {
+        "name": "Luôn bật Mắt thần: đang tắt. Mắt thần em có: 0",
+        "width": 44,
+        "height": 44,
+        "x": 1278,
+        "y": 6
+      },
+      {
+        "name": "Tắt âm thanh",
+        "width": 44,
+        "height": 44,
+        "x": 1334,
+        "y": 6
+      },
+      {
+        "name": "Diễn biến ván",
+        "width": 44,
+        "height": 44,
+        "x": 1390,
+        "y": 6
+      },
+      {
+        "name": "Chọn điểm xoáy bi cái",
+        "width": 46,
+        "height": 46,
+        "x": 9,
+        "y": 54
+      },
+      {
+        "name": "Tuỳ chỉnh",
+        "width": 44,
+        "height": 44,
+        "x": 10,
+        "y": 110
+      }
+    ],
+    "power": {
+      "x": 15,
+      "y": 164,
+      "width": 34,
+      "height": 670
+    },
+    "errors": []
+  }
+]

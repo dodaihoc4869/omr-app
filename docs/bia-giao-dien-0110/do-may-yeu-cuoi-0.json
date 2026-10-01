@@ -1,0 +1,110 @@
+{
+  "dist": "/tmp/bia-ui-before",
+  "cpu": 6,
+  "luc": "2026-10-01T03:59:21.000Z",
+  "kichBan": {
+    "doc-thuong": {
+      "vaoBanMs": 614.3,
+      "lan10s": {
+        "soKhung": 591,
+        "fps": 59.1,
+        "p50": 16.7,
+        "p95": 16.7,
+        "p99": 16.8,
+        "max": 133.3,
+        "tren33": 2,
+        "tren50": 1,
+        "cpu": 35.4,
+        "taskDaiSo": 1,
+        "taskDaiMs": 128,
+        "taskDaiMax": 128
+      },
+      "dangLan": {
+        "soKhung": 342,
+        "fps": 59.7,
+        "p50": 16.7,
+        "p95": 16.7,
+        "p99": 16.8,
+        "tren33": 1
+      },
+      "yen3s": {
+        "soKhung": 180,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 16.8,
+        "tren33": 0,
+        "tren50": 0,
+        "cpu": 9.5
+      },
+      "keoGay": {
+        "soMau": 88,
+        "p50": 35.6,
+        "p95": 37.7,
+        "max": 39.2,
+        "doiHuong": 0
+      },
+      "heapVaoMB": 3.58,
+      "heapSauLanMB": 4.23,
+      "soCu": 2,
+      "coLopYeu": false,
+      "canvas": "600×1035",
+      "loi": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    },
+    "ngang-yeu": {
+      "vaoBanMs": 466.7,
+      "lan10s": {
+        "soKhung": 592,
+        "fps": 59.2,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 116.7,
+        "tren33": 2,
+        "tren50": 1,
+        "cpu": 27,
+        "taskDaiSo": 1,
+        "taskDaiMs": 126,
+        "taskDaiMax": 126
+      },
+      "dangLan": {
+        "soKhung": 343,
+        "fps": 59.7,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "tren33": 1
+      },
+      "yen3s": {
+        "soKhung": 179,
+        "fps": 60,
+        "p50": 16.7,
+        "p95": 16.8,
+        "p99": 16.8,
+        "max": 16.8,
+        "tren33": 0,
+        "tren50": 0,
+        "cpu": 9.1
+      },
+      "keoGay": {
+        "soMau": 22,
+        "p50": 35.2,
+        "p95": 37.2,
+        "max": 41.7,
+        "doiHuong": 0
+      },
+      "heapVaoMB": 3.64,
+      "heapSauLanMB": 4.23,
+      "soCu": 2,
+      "coLopYeu": true,
+      "canvas": "911×528",
+      "loi": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ]
+    }
+  }
+}
