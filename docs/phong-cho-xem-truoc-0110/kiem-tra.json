@@ -1,0 +1,22 @@
+{
+  "kiemTra": 15,
+  "dat": [
+    "Không tràn ngang 360",
+    "Không lỗi JS 360",
+    "Không tràn ngang 390",
+    "Không lỗi JS 390",
+    "Không tràn ngang 768",
+    "Không lỗi JS 768",
+    "Không tràn ngang 844",
+    "Không lỗi JS 844",
+    "Không tràn ngang 1440",
+    "Không lỗi JS 1440",
+    "Tạm dừng giữ nguyên hình",
+    "Nhặt hạt thực sự tăng điểm chơi",
+    "Mô phỏng bắt đầu tháo game khỏi màn",
+    "Giảm chuyển động không tự diễn hoạt",
+    "Giảm chuyển động vẫn nhặt được hạt bằng chạm"
+  ],
+  "build": false,
+  "phatHanh": false
+}
