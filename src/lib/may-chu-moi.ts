@@ -317,8 +317,8 @@ export async function nopMoi(
   dapAn: unknown,
   integrity: unknown,
   giayCau?: Record<string, number>,
-): Promise<{ ok: boolean; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown } | null> {
-  const r = await goiWorker<{ ok: boolean; lyDo?: string; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown }>(ch, '/nop', {
+): Promise<{ ok: boolean; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number } | null> {
+  const r = await goiWorker<{ ok: boolean; lyDo?: string; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number }>(ch, '/nop', {
     maCa,
     sbd,
     dapAn,

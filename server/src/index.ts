@@ -52,6 +52,7 @@ import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import {doiTenHocSinh} from './doi-ten-hoc-sinh'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
+import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -551,7 +552,7 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
       ...dk.tham,
       ...(chan ? [maCa] : []),
     )
-  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
+  const docLuot = () => env.DB.prepare(`SELECT het_gio_luc, trang_thai, nop_luc, khoa, ma_ca, sbd, lan_thu, dap_an_json FROM luot WHERE ${dk.sql}`).bind(...dk.tham)
   // Tờ đáp án (ca công bố ngay) tải SONG SONG với vòng D1 khi isolate đã biết ca này công bố ngay; quyết định trả hay không vẫn theo
   // `cong_bo` đọc trong chính batch dưới đây.
   const keySom = maCa && env.DE && doanCongBoNgay(maCa) ? docKeyBankDem(env, maCa).catch(() => null) : null
@@ -587,7 +588,11 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
     // chuyện thường, báo đỏ ở đây là em tưởng mất bài và nộp lại lần nữa.
     const da = sau
     if (da && (da.trang_thai === 'da_nop' || da.trang_thai === 'khoa')) {
-      return raCoKeyBank({ ok: true, daNhan: true, nopLuc: da.nop_luc }, await congBo())
+      // 01/10: lượt đã đóng (máy chủ chốt hộ / thầy khoá) mà máy em gửi tới bài KHÁC ⇒ cất làm BÀI BỔ SUNG chờ thầy duyệt,
+      // không vứt đi như trước (ca 313224: ba em mất mọi câu làm sau khi máy ngừng liên lạc).
+      const d = da as DongLuot & { khoa?: string; ma_ca?: string; sbd?: string; lan_thu?: number; dap_an_json?: unknown }
+      const boSung = d.khoa ? await catBaiBoSung(env, { khoa: d.khoa, ma_ca: String(d.ma_ca ?? ''), sbd: String(d.sbd ?? ''), lan_thu: Number(d.lan_thu) || 1, dap_an_json: d.dap_an_json }, b.dapAn, b.giayCau) : 0
+      return raCoKeyBank({ ok: true, daNhan: true, nopLuc: da.nop_luc, ...(boSung > 0 ? { boSung } : {}) }, await congBo())
     }
     return ra({ ok: false, lyDo: 'khong_tim_thay' })
   }
@@ -3569,6 +3574,14 @@ const boXuLy = {
       if (p === '/cham-diem') return chamDiem(env, b)
       // CHẤM LẠI MỘT CA CŨ bằng luật chấm hiện hành rồi ghi lại D1 (thầy chốt 23/09 — việc còn lại của MỤC 3).
       if (p === '/ca/cham-lai') return chamLaiCaRoute(env, b)
+      // BÀI BỔ SUNG (01/10): đáp án tới sau khi lượt đóng — thầy xem rồi Nhận (gộp + chấm lại ca) hoặc Bỏ.
+      if (p === '/bo-sung/ds') return ra(await dsBaiBoSung(env, b))
+      if (p === '/bo-sung/xu-ly') {
+        const x = await xuLyBaiBoSung(env, b)
+        if (!x.ok || !x.nhan || !x.maCa) return ra(x)
+        const cl = (await (await chamLaiCaRoute(env, { maCa: x.maCa })).json()) as Record<string, unknown>
+        return ra({ ...x, chamLai: cl?.ok === true, soGhi: cl?.soGhi ?? 0, loiChamLai: cl?.ok === true ? undefined : String(cl?.error ?? cl?.lyDo ?? '') })
+      }
       if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
       if (p === '/len-bang') return ghiLenBangMoi(env, b)
       if (p === '/kho/day') return dayDeKho(env, b)

@@ -306,7 +306,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // ĐÃ NỘP RỒI, MỞ LẠI LINK TRÊN MÁY KHÁC — thầy báo 07/09: em bấm link ca để
   // xem điểm thì nhận một ô ĐỎ như app hỏng. Bài đã nộp xong không phải lỗi,
   // nên tách riêng: ô vàng, nói rõ nộp lúc nào và điểm nằm ở đâu.
-  const [daNopRoi, setDaNopRoi] = useState<{ nopLuc: string; lanThu: number } | null>(null)
+  const [daNopRoi, setDaNopRoi] = useState<{ nopLuc: string; lanThu: number; boSung?: 'dang' | 'loi' | number } | null>(null)
   // CHẾ ĐỘ XEM ĐIỂM — đường `/d/<mã ca>` (thầy chốt 07/09).
   //
   // Cùng màn này, khác đúng hai chỗ: ô nhập chỉ hỏi SỐ BÁO DANH, và nút bấm mở
@@ -1388,7 +1388,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         // `lichSuEm` khoá theo id thiết bị của chính lượt đã nộp. Nói thẳng
         // điều đó và chỉ sang phiếu, thay vì ném một ô lỗi đỏ.
         if (kq.lyDo === 'da_nop') {
-          setDaNopRoi({ nopLuc: kq.nopLuc || '', lanThu: kq.lanThu || 1 })
+          // 01/10 (ca 313224): máy chủ đã CHỐT HỘ bài em (máy ngừng liên lạc giữa giờ) nhưng máy này còn giữ bài chưa nộp ⇒ gửi
+          // ngay phần đó lên. Máy chủ so với bài đã chốt: có câu mới thì cất làm BÀI BỔ SUNG chờ thầy duyệt (điểm không tự đổi).
+          const conBai = existing && !existing.submitted && (existing.lanThu ?? 1) === (kq.lanThu ?? 1)
+          if (conBai && existing) {
+            void submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? layIdThietBi(), existing.giayCau)
+              .then((r) => setDaNopRoi((d) => (d ? { ...d, boSung: r.boSung ?? 0 } : d)))
+              .catch(() => setDaNopRoi((d) => (d ? { ...d, boSung: 'loi' } : d)))
+          }
+          setDaNopRoi({ nopLuc: kq.nopLuc || '', lanThu: kq.lanThu || 1, ...(conBai ? { boSung: 'dang' as const } : {}) })
           setPhase('error')
           return
         }
@@ -1573,8 +1581,16 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       })
     }
     const id = setInterval(() => luu(true), chuKyRef.current.luuTam * 1000)
+    // 01/10 (ca 313224): có mạng lại / quay lại màn thi ⇒ gửi NGAY phần đang làm, không đợi nhịp 20 giây — mất mạng giữa giờ
+    // rồi có lại sát giờ chốt là đủ để bài kịp về máy chủ. Gửi hai lần trùng nội dung không sao (lưu tạm ghi đè).
+    const coMang = () => luu(true)
+    const hienLai = () => { if (document.visibilityState === 'visible') luu(true) }
+    window.addEventListener('online', coMang)
+    document.addEventListener('visibilitychange', hienLai)
     return () => {
       clearInterval(id)
+      window.removeEventListener('online', coMang)
+      document.removeEventListener('visibilitychange', hienLai)
       // Rời màn làm bài (nộp, hết giờ, đóng tab) thì lưu nốt nhịp cuối.
       luu()
     }
@@ -2819,8 +2835,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           <OThongBao tone="cam">
             Em đã nộp bài ca này{daNopRoi.nopLuc ? ` lúc ${gioNgan(daNopRoi.nopLuc)}` : ''}
             {daNopRoi.lanThu > 1 ? ` (lần ${daNopRoi.lanThu})` : ''}. Bài đã chấm xong.
-            {'\n\n'}Máy này không giữ bài của em nên không mở lại được điểm ở đây. Điểm, bài chữa và
-            nhận xét nằm trong PHIẾU KẾT QUẢ Thầy gửi riêng cho em — mở link phiếu đó.
+            {daNopRoi.boSung === 'dang' && '\n\nĐang gửi phần bài máy này còn giữ cho Thầy…'}
+            {typeof daNopRoi.boSung === 'number' && daNopRoi.boSung > 0 &&
+              `\n\nMáy này còn giữ ${daNopRoi.boSung} câu em làm mà máy chủ chưa nhận. Đã gửi ${daNopRoi.boSung} câu đó cho Thầy — Thầy duyệt thì điểm được tính lại.`}
+            {daNopRoi.boSung === 'loi' && '\n\nChưa gửi được phần bài máy này còn giữ. Có mạng thì bấm Quay lại rồi Vào thi lại để gửi.'}
+            {daNopRoi.boSung === undefined && '\n\nMáy này không giữ bài của em nên không mở lại được điểm ở đây.'}
+            {'\n\n'}Điểm, bài chữa và nhận xét nằm trong PHIẾU KẾT QUẢ Thầy gửi riêng cho em — mở link phiếu đó.
             {'\n\n'}Chưa nhận được phiếu thì nhắn Thầy gửi lại.
           </OThongBao>
           <NutChinh

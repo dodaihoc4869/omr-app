@@ -945,7 +945,7 @@ export async function submitAnswers(
   lanThu = 1,
   idThietBi = '',
   giayCau?: Record<string, number>,
-): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem }> {
+): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem; boSung?: number }> {
   // THỬ LẠI ĐƯỢC (T5) — và CHỈ vì T4 đã có khoá chống trùng `maCa|sbd|lanThu`.
   // Trước T4, một lượt nộp hết hạn ở máy em nhưng đã tới nơi ở máy chủ sẽ bị ghi
   // đè lần nữa; nếu thầy vừa khoá ca giữa hai lượt thì lượt sau ăn 'da_dong' và
@@ -972,6 +972,9 @@ export async function submitAnswers(
   // ĐỦ nghĩa là: ca KHÔNG công bố điểm (không cần đáp án), hoặc có công bố và
   // ngân hàng đã nằm sẵn trên máy chủ mới. Thiếu một trong hai thì vẫn đi
   // đường cũ — em nộp xong nhìn màn trắng còn tệ hơn chậm.
+  // 01/10: lượt đã đóng mà máy này còn câu chưa tới máy chủ ⇒ máy chủ cất BÀI BỔ SUNG chờ thầy duyệt (không gọi Apps Script nữa —
+  // bên đó cũng chỉ trả "đã nộp"). Bài trùng (gửi lại sau mất sóng) đi tiếp như cũ để còn lấy tờ đáp án công bố ngay.
+  if (daCat?.ok && daCat.daNhan && Number(daCat.boSung) > 0) return { keyBank: null, congBo: 'khong', boSung: Number(daCat.boSung) }
   if (daCat?.ok) {
     const cb = String(daCat.congBo ?? '')
     if (cb === 'khong' || cb === 'ca_lop_xong') return { keyBank: null, congBo: cb as CongBoDiem }
