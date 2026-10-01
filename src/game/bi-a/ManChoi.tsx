@@ -111,6 +111,10 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const chiRef = useRef<{ id: KiHieu; den: number; tro?: boolean } | null>(null)
   const [moTuyChinh, setMoTuyChinh] = useState(false)
   const [moDienBien, setMoDienBien] = useState(false)
+  const dongDienBien = () => {
+    setMoDienBien(false)
+    rootRef.current?.querySelector<HTMLButtonElement>('.bia-nut-them')?.focus({ preventScroll: true })
+  }
   const [huongDan, setHuongDan] = useState(false)
   const tay = KHO_TAY.use()
   const bietGiai = KHO_BIET_GIAI_TRUOC.use() === '1'
@@ -416,7 +420,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   // ───────── bàn phím (máy tính) ─────────
   const onKey = (e: KE<HTMLDivElement>) => {
     am.mo()
-    if (e.key === 'Escape') { if (moDienBien) { setMoDienBien(false); return } if (huongDan) { xongHuongDan(); return } if (moTuyChinh) { setMoTuyChinh(false); return } if (popXoay) { setPopXoay(false); return } if (xem) { setXem(false); v.datXemMo(false); return } if (toan) { datToan(false); return } }
+    if (e.key === 'Escape') { if (moDienBien) { dongDienBien(); return } if (huongDan) { xongHuongDan(); return } if (moTuyChinh) { setMoTuyChinh(false); return } if (popXoay) { setPopXoay(false); return } if (xem) { setXem(false); v.datXemMo(false); return } if (toan) { datToan(false); return } }
     const t = e.target as HTMLElement
     if (t.closest('.bia-tam,.bia-ket,.bia-dien-bien,input,textarea')) return
     if (e.key === 'f' || e.key === 'F') { if (ngang) datToanNgang(); else datToan(!toan); e.preventDefault(); return }
@@ -482,7 +486,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           <button type="button" className="bia-nut-kinh bia-nut-thoat" aria-label="Thoát toàn màn hình" onClick={() => datToan(false)}>{ICON.thoat}<span className="bia-chu-nut">Thoát</span></button>
         </div>
         {moDienBien && <section id="bia-dien-bien" className="bia-dien-bien" role="dialog" aria-label="Diễn biến ván">
-          <button type="button" className="bia-nut-chu bia-dong-dien-bien" autoFocus onClick={() => setMoDienBien(false)} aria-label="Đóng diễn biến ván">Đóng</button>
+          <button type="button" className="bia-nut-chu bia-dong-dien-bien" autoFocus onClick={dongDienBien} aria-label="Đóng diễn biến ván">Đóng</button>
           <div className="bia-nhat-ky"><b>Diễn biến ván</b><ol>{v.nhatKy.map((d) => <li key={d.ma} data-loai={d.loai || undefined}><time>{Math.floor(d.giay / 60)}:{String(d.giay % 60).padStart(2, '0')}</time><span>{d.chu}</span></li>)}</ol></div>
           <div className="bia-phim-tat"><b>Phím tắt</b><span>Kéo hoặc lăn chuột trên bàn để xoay gậy · giữ <kbd>Shift</kbd> khi lăn để chỉnh rất nhỏ</span><span><kbd>←</kbd><kbd>→</kbd> chỉnh nhỏ · giữ <kbd>Shift</kbd> để chỉnh rất nhỏ</span><span>Giữ <kbd>Space</kbd> lấy lực, thả để đánh</span><span><kbd>F</kbd> toàn màn hình · <kbd>M</kbd> âm thanh</span></div>
         </section>}

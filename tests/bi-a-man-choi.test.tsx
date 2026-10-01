@@ -118,6 +118,7 @@ describe('Màn chơi: tấm câu, câu sai sang lượt ngay, Xem lại câu sai
     fireEvent.keyDown(dong, { key: 'Escape' })
     expect(screen.queryByRole('dialog', { name: 'Diễn biến ván' })).toBeNull()
     expect(van()).toBe(v)
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Tuỳ chỉnh' }))
   })
   it('câu SAI ⇒ máy chủ chấm, lượt sang A.I NGAY (tấm vẫn mở), máy chủ đổi câu cho bi; "Đã đọc lời giải" đóng tấm; hiện "Xem lại câu sai 1"', async () => {
     veVan()
