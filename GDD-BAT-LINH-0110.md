@@ -824,18 +824,16 @@ Truy cập 01/10/2026. Mọi nguồn đọc **qua trích đoạn WebSearch**; We
 
 **Luật cứng:** mọi kênh rút câu tự động (kế hoạch ngày, Đảo, Hộ Tống, Bi-a, thi thử, test đầu vào, bài tương tự, trận phục thù) **chỉ lấy câu thuộc phần em đã đánh dấu "đã học"**. Ngoại lệ duy nhất: "Câu thử" ở đảo sương mờ, do em tự bấm, không tính vào kế hoạch và không làm hạ năng lực.
 
-### 14.1 Đơn vị chọn: theo BÀI trong SGK, nhóm theo chương
-- Bước 1 khi đăng ký: chọn **lớp** và **bộ sách** (Kết nối tri thức / Chân trời sáng tạo / Cánh Diều). Thứ tự và tên bài khác nhau giữa các bộ nên app hiển thị đúng mục lục của bộ em học.
-- Bước 2: mục lục dạng cây **Chương → Bài**, mỗi bài một ô tick. Có nút nhanh: "Đã học hết chương", "Học tới bài này" (tick mọi bài từ đầu tới bài chọn).
-- Học sinh lớp 11, 12 được tick nhanh "đã học hết lớp 10/11"; muốn bỏ bớt bài quên thì bỏ tick từng bài.
-- Cập nhật bất cứ lúc nào: mỗi lần em tick thêm bài, đảo/vùng tương ứng **tan sương** (khoảnh khắc mở khoá trong game), câu của bài đó bắt đầu vào kế hoạch từ hôm sau.
-- Nhắc nhẹ định kỳ (1 lần/2 tuần, theo lịch năm học ước lượng): "Ở trường em học tới bài nào rồi?" — một chạm cập nhật.
+### 14.1 Đơn vị chọn: theo BÀI của SGK Kết nối tri thức (thầy chốt 01/10: chỉ còn một bộ sách KNTT dùng chung cả nước)
+- Khi đăng ký chỉ chọn **lớp**; không có bước chọn bộ sách. App hiện mục lục KNTT dạng cây **Chương → Bài**, mỗi bài một ô tick.
+- Nút nhanh: "Đã học hết chương", "Học tới bài này" (tick mọi bài từ đầu tới bài chọn). Học sinh lớp 11, 12 tick nhanh "đã học hết lớp 10/11", bỏ tick từng bài nếu quên.
+- Cập nhật bất cứ lúc nào: tick thêm bài ⇒ đảo/vùng tương ứng **tan sương**, câu của bài đó vào kế hoạch từ hôm sau.
+- Nhắc nhẹ 1 lần/2 tuần: "Ở trường em học tới bài nào rồi?" — một chạm cập nhật.
 
-### 14.2 Bản đồ kho đề theo bài, không theo thứ tự sách
-- Mỗi câu gắn **mã chuẩn kiến thức** (yêu cầu cần đạt của chương trình 2018, ví dụ "Hoá 11 · Cân bằng · pH dung dịch acid/base mạnh"), KHÔNG gắn cứng vào số bài của một bộ sách.
-- Bảng nối **bài của từng bộ sách → các mã chuẩn kiến thức** do thầy duyệt một lần cho 3 bộ. Em tick bài ⇒ máy biết em đã học những mã nào ⇒ rút câu theo mã.
-- Câu đòi kiến thức của **nhiều bài** (câu tổng hợp) chỉ được rút khi em đã tick **đủ mọi bài** câu đó cần.
-- Mã đề kho hiện nay (`12-C1-B1-D1…`) theo một bộ sách; Code 4 chuyển sang gắn mã chuẩn kiến thức, giữ mã cũ để không lệch dữ liệu.
+### 14.2 Gắn kho đề theo bài KNTT
+- Mỗi câu gắn **danh sách bài KNTT** cần để làm được câu đó (mã dạng `L12-C2-B5`). Câu tổng hợp nhiều bài chỉ được rút khi em đã tick **đủ** các bài ấy.
+- Mã đề kho hiện nay (`12-C1-B1-D1…`) đã theo chương/bài; Code 4 kiểm đối chiếu với mục lục KNTT hiện hành, sửa chỗ lệch, gắn thêm bài cho câu tổng hợp và câu từ đề ngoài (DB-/DH-…). Giữ mã cũ để không lệch dữ liệu.
+- Vẫn lưu thêm trường "yêu cầu cần đạt" (tuỳ chọn) để sau này đổi sách không phải gắn lại.
 
 ### 14.3 Ảnh hưởng tới các hệ thống
 | Hệ thống | Luật |
@@ -853,7 +851,5 @@ Truy cập 01/10/2026. Mọi nguồn đọc **qua trích đoạn WebSearch**; We
 - Không có cách tick để lấy thưởng: tan sương đảo không cho EXP/vàng; thưởng chỉ đến từ làm bài.
 
 ### 14.5 Dữ liệu cần chuẩn bị
-1. Mục lục 3 bộ sách × 3 lớp (thầy hoặc Code 4 soạn, thầy duyệt).
-2. Danh sách mã chuẩn kiến thức theo chương trình 2018.
-3. Bảng nối bài ↔ mã cho từng bộ sách.
-4. Gắn mã chuẩn kiến thức cho toàn kho (Code 4 làm tự động, thầy duyệt câu máy gắn cờ).
+1. Mục lục KNTT Hoá 10, 11, 12 (chương → bài), thầy duyệt.
+2. Gắn danh sách bài KNTT cho toàn kho (Code 4 làm tự động, thầy duyệt câu máy gắn cờ).
