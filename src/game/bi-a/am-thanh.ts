@@ -8,9 +8,30 @@ export type TenTieng = 'bi' | 'bang' | 'co' | 'lo' | 'dat' | 'phan' | 'an' | 'du
 export const DS_TIENG: readonly TenTieng[] = ['co', 'bi', 'bang', 'lo', 'dat', 'phan', 'an', 'dung', 'sai', 'vang', 'loi', 'luot', 'tich', 'mo', 'thang']
 type Ctx = AudioContext
 
+/** Xung va chạm phenolic: đầu tiếng rộng dải, thân tiếng tắt nhanh; không có nốt ngân kim loại.
+ * Dựng sẵn ba mẫu ngắn, dùng lại khi nhiều bi va nhau. Không tải tệp và không chạy DSP trong khung hình chơi. */
+export function taoMauChamBi(tanSoMau: number, bienThe = 0, ngauNhien = Math.random): Float32Array {
+  const d = new Float32Array(Math.ceil(tanSoMau * 0.048))
+  let nhanh = 0, cham = 0
+  const lech = 1 + bienThe * 0.045
+  for (let i = 0; i < d.length; i++) {
+    const t = i / tanSoMau, n = ngauNhien() * 2 - 1
+    nhanh += 0.62 * (n - nhanh); cham += 0.13 * (n - cham)
+    const dau = (nhanh - cham) * Math.exp(-t / 0.0018) * 0.85
+    const than = Math.sin(2 * Math.PI * Math.min(1550 * lech, tanSoMau * 0.38) * t) * Math.exp(-t / 0.0045) * 0.32
+      + Math.sin(2 * Math.PI * Math.min(2630 * lech, tanSoMau * 0.43) * t) * Math.exp(-t / 0.0026) * 0.18
+      + Math.sin(2 * Math.PI * 510 * t) * Math.exp(-t / 0.006) * 0.12
+    const vao = 1 - Math.exp(-t / 0.00015)
+    // Khép đuôi mẫu về 0 để không có tiếng click khi nguồn dừng.
+    d[i] = (dau + than) * vao * Math.min(1, (d.length - 1 - i) / (tanSoMau * 0.004))
+  }
+  return d
+}
+
 export class AmThanhBia {
   ctx: Ctx | null = null
   private noise: AudioBuffer | null = null
+  private chamBi: AudioBuffer[] = []
   private master: GainNode | null = null
   private rv: ConvolverNode | null = null
   private hang: { k: 'bi' | 'bang'; v: number; pan: number; kho: boolean }[] = []
@@ -47,6 +68,11 @@ export class AmThanhBia {
     const len = c.sampleRate, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0)
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1
     this.noise = buf
+    this.chamBi = [0, 1, 2].map((bienThe) => {
+      const pcm = taoMauChamBi(c.sampleRate, bienThe), mau = c.createBuffer(1, pcm.length, c.sampleRate)
+      mau.getChannelData(0).set(pcm)
+      return mau
+    })
     const nen = c.createDynamicsCompressor()
     nen.threshold.value = -14; nen.knee.value = 12; nen.ratio.value = 4; nen.attack.value = 0.003; nen.release.value = 0.15
     nen.connect(c.destination)
@@ -95,10 +121,13 @@ export class AmThanhBia {
   /** Tạo một tiếng tại thời điểm t. v: vận tốc va chạm (đv/s) hoặc tốc độ cú đánh. */
   private tao(k: TenTieng, t: number, v: number, pan: number, kho = false): void {
     switch (k) {
-      case 'bi': { // bi nhựa phenolic chạm nhau: "cạch" sáng, 3 tần số không hoà âm, tắt rất nhanh
+      case 'bi': { // "cạch" khô, chắc; lực nhỏ mềm hơn, lực lớn rõ hơn. Phá bàn giữ hoàn toàn khô.
         const kk = Math.min(1, Math.pow(v / 1800, 0.8)); if (kk < 0.03) return
-        const o = this.daPhat(kho ? 0 : 0.25, pan), f = 2700 + Math.random() * 900
-        this.tone(o, t, f, 0.028, 0.34 * kk); this.tone(o, t, f * 1.53, 0.018, 0.2 * kk); this.tone(o, t, f * 2.31, 0.012, 0.12 * kk); this.nhieu(o, t, 0.012, 0.28 * kk, 'highpass', 3500); this.tone(o, t, 480, 0.02, 0.06 * kk); return
+        const o = this.daPhat(kho ? 0 : 0.08, pan), c = this.ctx!, nguon = c.createBufferSource()
+        nguon.buffer = this.chamBi[Math.floor(Math.random() * this.chamBi.length)]!
+        nguon.playbackRate.value = 0.92 + 0.14 * kk + (Math.random() - 0.5) * 0.04
+        o.gain.value = 0.85 * kk
+        nguon.connect(o); nguon.start(t); return
       }
       case 'bang': { const kk = Math.min(1, v / 2200); if (kk < 0.04) return; const o = this.daPhat(0.2, pan); this.nhieu(o, t, 0.06, 0.55 * kk, 'lowpass', 320, 0.8); this.tone(o, t, 120, 0.07, 0.35 * kk, 'sine', 70); this.nhieu(o, t, 0.018, 0.1 * kk, 'bandpass', 1100, 2); return }
       case 'co': { const kk = 0.25 + 0.75 * Math.min(1, v / 2600), o = this.daPhat(0.2, pan); this.nhieu(o, t, 0.014, 0.5 * kk, 'bandpass', 1700, 1.2); this.tone(o, t, 820, 0.03, 0.22 * kk, 'triangle', 600); this.tone(o, t, 190, 0.05, 0.18 * kk, 'sine', 120); if (kk > 0.8) this.nhieu(o, t, 0.008, 0.25 * kk, 'highpass', 4500); return }
@@ -143,5 +172,5 @@ export class AmThanhBia {
     }
     return nb + nc
   }
-  dong(): void { try { void this.ctx?.close() } catch { /* bỏ qua */ } this.ctx = null; this.master = null; this.rv = null }
+  dong(): void { try { void this.ctx?.close() } catch { /* bỏ qua */ } this.ctx = null; this.master = null; this.rv = null; this.chamBi = []; this.noise = null }
 }

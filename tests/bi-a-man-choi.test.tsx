@@ -101,6 +101,24 @@ const emAnBi = (v: VanBia, id: KiHieu) => act(() => {
 const veVan = (cheDo: 'don' | 'doi' = 'don') => render(<ManChoi token="tk" tenEm="Khánh Linh" van="v1" session="s1" cheDo={cheDo} loai="ai" cauEm={Array.from({ length: 7 }, (_, i) => cau(i + 1))} chot={cau(9)} onVeSanh={() => {}} onChoiLai={() => {}} />)
 
 describe('Màn chơi: tấm câu, câu sai sang lượt ngay, Xem lại câu sai', () => {
+  it('mở diễn biến khi cần; đọc bằng bàn phím và đóng bằng Esc không đổi góc hoặc đánh bi', () => {
+    KHO_HUONG_DAN.dat('1')
+    veVan()
+    const v = van(), gocDau = { ...v.aim }, soCu = v.soCu
+    expect(screen.queryByRole('dialog', { name: 'Diễn biến ván' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Tuỳ chỉnh' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Diễn biến ván' }))
+    const dong = screen.getByRole('button', { name: 'Đóng diễn biến ván' })
+    expect(screen.getByRole('dialog', { name: 'Diễn biến ván' })).toBeTruthy()
+    expect(document.activeElement).toBe(dong)
+    fireEvent.keyDown(dong, { key: 'ArrowRight' })
+    fireEvent.keyDown(dong, { key: ' ' })
+    expect(v.aim).toEqual(gocDau)
+    expect(v.soCu).toBe(soCu)
+    fireEvent.keyDown(dong, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Diễn biến ván' })).toBeNull()
+    expect(van()).toBe(v)
+  })
   it('câu SAI ⇒ máy chủ chấm, lượt sang A.I NGAY (tấm vẫn mở), máy chủ đổi câu cho bi; "Đã đọc lời giải" đóng tấm; hiện "Xem lại câu sai 1"', async () => {
     veVan()
     const v = van()

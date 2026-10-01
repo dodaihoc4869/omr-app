@@ -46,6 +46,7 @@ const ICON = {
   thoat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" /></svg>,
   mat: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>,
   them: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle cx="19" cy="12" r="1.3" /></svg>,
+  nhatKy: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M8 5h12M8 12h12M8 19h12" /><circle cx="3" cy="5" r="1" /><circle cx="3" cy="12" r="1" /><circle cx="3" cy="19" r="1" /></svg>,
 }
 function IconAm({ tat }: { tat: boolean }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4V5z" />{tat ? <path d="M16 9l5 6M21 9l-5 6" /> : <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />}</svg>
@@ -109,6 +110,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const [theLucSau, setTheLucSau] = useState<{ con: number; tong: number } | null>(null)
   const chiRef = useRef<{ id: KiHieu; den: number; tro?: boolean } | null>(null)
   const [moTuyChinh, setMoTuyChinh] = useState(false)
+  const [moDienBien, setMoDienBien] = useState(false)
   const [huongDan, setHuongDan] = useState(false)
   const tay = KHO_TAY.use()
   const bietGiai = KHO_BIET_GIAI_TRUOC.use() === '1'
@@ -261,6 +263,8 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       const r = goc.getBoundingClientRect(), cu = khungRef.current
       const nhe = dangCheDoMayYeu() || haRef.current
       const k = tinhKhungBan(bw, bh, { khungDoc: r.width <= r.height, xoayCu: cu?.xoay })
+      // Thanh lực dọc đi sát hai đầu bàn, không kéo dài qua khoảng trống do tỉ lệ màn hình.
+      ban.style.setProperty('--bia-cao-ban', `${k.ch}px`)
       const dpr = Math.min(nhe ? 1.5 : 2, window.devicePixelRatio || 1)
       const w = Math.round(k.cw * dpr), h = Math.round(k.ch * dpr)
       // Chỉ đặt lại width/height khi cỡ THẬT đổi (đặt lại là xoá canvas + vẽ lại nền, ảnh bi).
@@ -412,9 +416,9 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   // ───────── bàn phím (máy tính) ─────────
   const onKey = (e: KE<HTMLDivElement>) => {
     am.mo()
-    if (e.key === 'Escape') { if (huongDan) { xongHuongDan(); return } if (moTuyChinh) { setMoTuyChinh(false); return } if (popXoay) { setPopXoay(false); return } if (xem) { setXem(false); v.datXemMo(false); return } if (toan) { datToan(false); return } }
+    if (e.key === 'Escape') { if (moDienBien) { setMoDienBien(false); return } if (huongDan) { xongHuongDan(); return } if (moTuyChinh) { setMoTuyChinh(false); return } if (popXoay) { setPopXoay(false); return } if (xem) { setXem(false); v.datXemMo(false); return } if (toan) { datToan(false); return } }
     const t = e.target as HTMLElement
-    if (t.closest('.bia-tam,.bia-ket,input,textarea')) return
+    if (t.closest('.bia-tam,.bia-ket,.bia-dien-bien,input,textarea')) return
     if (e.key === 'f' || e.key === 'F') { if (ngang) datToanNgang(); else datToan(!toan); e.preventDefault(); return }
     if (e.key === 'm' || e.key === 'M') { am.datTat(!tat); setTat(!tat); return }
     if (!v.nguoiDuocDanh()) return
@@ -471,12 +475,14 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           <HangCham v={v} tenTrai={tenTrai} tenPhai={tenPhai} />
           {nutMat}
           <button type="button" className="bia-nut-kinh bia-nut-tron bia-nut-am" aria-pressed={!tat} aria-label={tat ? 'Bật âm thanh' : 'Tắt âm thanh'} title="Âm thanh (phím M)" onClick={() => { am.datTat(!tat); setTat(!tat) }}><IconAm tat={tat} /></button>
+          {boCuc === 'pc' && <button type="button" className="bia-nut-kinh bia-nut-tron" aria-label="Diễn biến ván" aria-expanded={moDienBien} aria-controls="bia-dien-bien" title="Diễn biến ván và phím tắt" onClick={() => setMoDienBien(!moDienBien)}>{ICON.nhatKy}</button>}
         </header>
         <div className="bia-toan-tren">
           <span className="bia-chip" ref={chipRef} />
           <button type="button" className="bia-nut-kinh bia-nut-thoat" aria-label="Thoát toàn màn hình" onClick={() => datToan(false)}>{ICON.thoat}<span className="bia-chu-nut">Thoát</span></button>
         </div>
-        {boCuc === 'pc' && <section className="bia-cot-phai" aria-label="Diễn biến ván">
+        {moDienBien && <section id="bia-dien-bien" className="bia-dien-bien" role="dialog" aria-label="Diễn biến ván">
+          <button type="button" className="bia-nut-chu bia-dong-dien-bien" autoFocus onClick={() => setMoDienBien(false)} aria-label="Đóng diễn biến ván">Đóng</button>
           <div className="bia-nhat-ky"><b>Diễn biến ván</b><ol>{v.nhatKy.map((d) => <li key={d.ma} data-loai={d.loai || undefined}><time>{Math.floor(d.giay / 60)}:{String(d.giay % 60).padStart(2, '0')}</time><span>{d.chu}</span></li>)}</ol></div>
           <div className="bia-phim-tat"><b>Phím tắt</b><span>Kéo hoặc lăn chuột trên bàn để xoay gậy · giữ <kbd>Shift</kbd> khi lăn để chỉnh rất nhỏ</span><span><kbd>←</kbd><kbd>→</kbd> chỉnh nhỏ · giữ <kbd>Shift</kbd> để chỉnh rất nhỏ</span><span>Giữ <kbd>Space</kbd> lấy lực, thả để đánh</span><span><kbd>F</kbd> toàn màn hình · <kbd>M</kbd> âm thanh</span></div>
         </section>}
@@ -507,6 +513,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           </div>}
           {moTuyChinh && <div className="bia-pop-tuy" role="dialog" aria-label="Tuỳ chỉnh">
             <CaiDatDieuKhien />
+            <button type="button" className="bia-nut-chu" onClick={() => { setMoTuyChinh(false); setMoDienBien(true) }}>Diễn biến ván</button>
             <button type="button" className="bia-nut-chu" aria-pressed={!tat} onClick={() => { am.datTat(!tat); setTat(!tat) }}>{tat ? 'Bật âm thanh' : 'Tắt âm thanh'}</button>
             {ngang
               ? <button type="button" className="bia-nut-chu" onClick={() => { setMoTuyChinh(false); datToanNgang() }} aria-pressed={toanThat}>{toanThat ? 'Thoát toàn màn hình' : 'Toàn màn hình'}</button>

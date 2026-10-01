@@ -326,7 +326,7 @@ describe('màn chơi DỌC 360 × 740', () => {
     expect(container.querySelector('.bia')!.getAttribute('data-tay')).toBe('trai')
     expect(localStorage.getItem(KHO_TAY.khoa)).toBe('trai')
     const css = readFileSync('src/game/bi-a/bi-a.css', 'utf8')
-    expect(css).toContain(".bia[data-bo-cuc='doc'][data-tay='trai'] .bia-luc{right:auto;left:13px}")
+    expect(css).toContain(".bia[data-bo-cuc='doc'][data-tay='trai'] .bia-luc{right:auto;left:7px}")
   })
   it('hướng dẫn lần đầu: 3 bước, chạm để qua, xong thì nhớ; lần sau không hiện; xem lại được ở Tuỳ chỉnh', async () => {
     localStorage.removeItem('bia_da_xem_huong_dan'); _quenCaiDatBia()

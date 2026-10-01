@@ -1,4 +1,4 @@
-// BI-A PHẢN ỨNG · VẼ BÀN + KHUNG HÌNH (chép từ bản vẽ). Bàn gỗ, nỉ có hoa văn vòng benzene mờ, 6 lỗ, chấm kim cương.
+// BI-A PHẢN ỨNG · VẼ BÀN + KHUNG HÌNH. Nỉ xanh ngọc, gỗ mật ong, viền champagne; 6 lỗ giữ nguyên hình học vật lý.
 // Khi bàn nằm ngang: hình học vẽ theo toạ độ bàn (ma trận quay), còn BI, BÓNG BI, CHỮ vẽ theo toạ độ màn để đèn luôn góc trên trái.
 import { datTFBan, raMan, type KhungBan } from './bo-cuc'
 import { duongMatThan } from './du-doan'
@@ -17,18 +17,23 @@ export function veNen(k: KhungBan, dpr: number, doc: Document = document): HTMLC
   const x = nen.getContext('2d')
   if (!x) return nen
   datTFBan(x, k, dpr)
+  // Viền sáng + gỗ mật ong: toàn bộ trang trí nằm trong kích thước bàn cũ.
   const g = x.createLinearGradient(-T, -T, W + T, H + T)
-  g.addColorStop(0, 'rgb(139,90,43)'); g.addColorStop(0.45, 'rgb(90,53,20)'); g.addColorStop(1, 'rgb(58,34,16)')
+  g.addColorStop(0, 'rgb(250,231,174)'); g.addColorStop(0.35, 'rgb(188,142,78)'); g.addColorStop(0.7, 'rgb(222,185,117)'); g.addColorStop(1, 'rgb(136,92,49)')
   goTron(x, -T, -T, W + 2 * T, H + 2 * T, 22); x.fillStyle = g; x.fill()
-  x.save(); goTron(x, -T, -T, W + 2 * T, H + 2 * T, 22); x.clip(); x.globalAlpha = 0.07; x.strokeStyle = 'rgb(255,232,200)'; x.lineWidth = 1
-  for (let i = 0; i < 46; i++) { const yy = -T + i * ((H + 2 * T) / 46); x.beginPath(); x.moveTo(-T, yy); x.bezierCurveTo(W * 0.3, yy + 8, W * 0.6, yy - 8, W + T, yy + 3); x.stroke() }
+  x.strokeStyle = 'rgb(255,246,212)'; x.lineWidth = 2; goTron(x, -T + 1.5, -T + 1.5, W + 2 * T - 3, H + 2 * T - 3, 20); x.stroke()
+  const go = x.createLinearGradient(0, -T, W, H)
+  go.addColorStop(0, 'rgb(177,126,66)'); go.addColorStop(0.5, 'rgb(146,99,48)'); go.addColorStop(1, 'rgb(109,73,37)')
+  goTron(x, -T + 5, -T + 5, W + 2 * T - 10, H + 2 * T - 10, 16); x.fillStyle = go; x.fill()
+  x.save(); goTron(x, -T + 5, -T + 5, W + 2 * T - 10, H + 2 * T - 10, 16); x.clip(); x.globalAlpha = 0.08; x.strokeStyle = 'rgb(255,232,200)'; x.lineWidth = 0.7
+  for (let i = 0; i < 34; i++) { const yy = -T + i * ((H + 2 * T) / 34); x.beginPath(); x.moveTo(-T, yy); x.bezierCurveTo(W * 0.3, yy + 5, W * 0.6, yy - 5, W + T, yy + 2); x.stroke() }
   x.restore()
-  x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = 1.2; goTron(x, -T + 2, -T + 2, W + 2 * T - 4, H + 2 * T - 4, 20); x.stroke()
-  const f = x.createRadialGradient(W / 2, H * 0.45, 40, W / 2, H * 0.5, H * 0.7)
-  f.addColorStop(0, 'rgb(27,145,124)'); f.addColorStop(0.6, 'rgb(14,107,92)'); f.addColorStop(1, 'rgb(9,74,64)')
+  x.strokeStyle = 'rgba(255,239,186,.6)'; x.lineWidth = 1; x.strokeRect(-2, -2, W + 4, H + 4)
+  const f = x.createRadialGradient(W * 0.38, H * 0.35, 35, W / 2, H * 0.45, H * 0.85)
+  f.addColorStop(0, 'rgb(53,178,142)'); f.addColorStop(0.48, 'rgb(30,151,121)'); f.addColorStop(1, 'rgb(15,106,89)')
   x.fillStyle = f; x.fillRect(0, 0, W, H)
-  x.save(); x.beginPath(); x.rect(0, 0, W, H); x.clip(); x.strokeStyle = 'rgba(255,255,255,.05)'; x.lineWidth = 1
-  const a = 22, hh = a * Math.sqrt(3)
+  x.save(); x.beginPath(); x.rect(0, 0, W, H); x.clip(); x.strokeStyle = 'rgba(233,255,236,.035)'; x.lineWidth = 0.8
+  const a = 28, hh = a * Math.sqrt(3)
   for (let row = -1; row < H / hh + 2; row++) for (let col = -1; col < W / (a * 3) + 2; col++) {
     const cx = col * a * 3 + (row % 2 ? a * 1.5 : 0), cy = row * hh / 2
     x.beginPath()
@@ -36,22 +41,22 @@ export function veNen(k: KhungBan, dpr: number, doc: Document = document): HTMLC
     x.closePath(); x.stroke()
   }
   x.restore()
-  // chữ trên nỉ: theo màn hình, không xoay theo bàn
-  { const s = k.S * dpr, [cx, cy] = raMan(k, dpr, W / 2, H / 2); x.save(); x.setTransform(s, 0, 0, s, cx, cy); x.globalAlpha = 0.11; x.fillStyle = 'rgb(255,255,255)'; x.textAlign = 'center'
-    x.font = "800 34px 'Baloo 2',sans-serif"; x.fillText('BI-A PHẢN ỨNG', 0, 10); x.font = "600 15px 'Be Vietnam Pro',sans-serif"; x.fillText('6,022 · 10²³', 0, 34); x.restore(); datTFBan(x, k, dpr) }
-  x.save(); x.strokeStyle = 'rgba(255,255,255,.16)'; x.setLineDash([6, 8]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, H * 0.75); x.lineTo(W, H * 0.75); x.stroke(); x.restore()
-  x.fillStyle = 'rgba(255,255,255,.28)'
-  for (const p of [DIEM_CHAN, { x: W / 2, y: H * 0.75 }]) { x.beginPath(); x.arc(p.x, p.y, 3, 0, 7); x.fill() }
-  const bong = (x0: number, y0: number, x1: number, y1: number) => { const gg = x.createLinearGradient(x0, y0, x1, y1); gg.addColorStop(0, 'rgba(0,0,0,.35)'); gg.addColorStop(1, 'rgba(0,0,0,0)'); return gg }
-  x.fillStyle = bong(0, 0, 0, 12); x.fillRect(0, 0, W, 12); x.fillStyle = bong(0, H, 0, H - 12); x.fillRect(0, H - 12, W, 12)
-  x.fillStyle = bong(0, 0, 12, 0); x.fillRect(0, 0, 12, H); x.fillStyle = bong(W, 0, W - 12, 0); x.fillRect(W - 12, 0, 12, H)
+  // Chữ theo màn hình, không xoay theo bàn. Nền được lưu một lần, không vẽ trang trí mỗi khung.
+  { const s = k.S * dpr, [cx, cy] = raMan(k, dpr, W / 2, H / 2); x.save(); x.setTransform(s, 0, 0, s, cx, cy); x.globalAlpha = 0.10; x.fillStyle = 'rgb(250,255,224)'; x.textAlign = 'center'
+    x.font = "800 28px 'Baloo 2',sans-serif"; x.fillText('BI-A PHẢN ỨNG', 0, 7); x.font = "600 12px 'Be Vietnam Pro',sans-serif"; x.fillText('6,022 · 10²³', 0, 28); x.restore(); datTFBan(x, k, dpr) }
+  x.save(); x.strokeStyle = 'rgba(238,255,225,.18)'; x.setLineDash([4, 10]); x.lineWidth = 1; x.beginPath(); x.moveTo(0, H * 0.75); x.lineTo(W, H * 0.75); x.stroke(); x.restore()
+  x.fillStyle = 'rgba(249,255,223,.45)'
+  for (const p of [DIEM_CHAN, { x: W / 2, y: H * 0.75 }]) { x.beginPath(); x.arc(p.x, p.y, 2.5, 0, 7); x.fill() }
+  const bong = (x0: number, y0: number, x1: number, y1: number) => { const gg = x.createLinearGradient(x0, y0, x1, y1); gg.addColorStop(0, 'rgba(6,62,43,.3)'); gg.addColorStop(1, 'rgba(6,62,43,0)'); return gg }
+  x.fillStyle = bong(0, 0, 0, 10); x.fillRect(0, 0, W, 10); x.fillStyle = bong(0, H, 0, H - 10); x.fillRect(0, H - 10, W, 10)
+  x.fillStyle = bong(0, 0, 10, 0); x.fillRect(0, 0, 10, H); x.fillStyle = bong(W, 0, W - 10, 0); x.fillRect(W - 10, 0, 10, H)
   for (const P of LO) {
     const gg = x.createRadialGradient(P.x, P.y, 2, P.x, P.y, P.v)
-    gg.addColorStop(0, 'rgb(0,0,0)'); gg.addColorStop(0.8, 'rgb(11,14,16)'); gg.addColorStop(1, 'rgb(29,34,36)')
+    gg.addColorStop(0, 'rgb(6,17,15)'); gg.addColorStop(0.8, 'rgb(14,28,23)'); gg.addColorStop(1, 'rgb(42,52,36)')
     x.fillStyle = gg; x.beginPath(); x.arc(P.x, P.y, P.v, 0, 7); x.fill()
-    x.strokeStyle = 'rgba(233,207,148,.55)'; x.lineWidth = 2.5; x.beginPath(); x.arc(P.x, P.y, P.v + 1, 0, 7); x.stroke()
+    x.strokeStyle = 'rgba(255,231,163,.85)'; x.lineWidth = 2.5; x.beginPath(); x.arc(P.x, P.y, P.v + 1, 0, 7); x.stroke()
   }
-  x.fillStyle = 'rgb(233,207,148)'
+  x.fillStyle = 'rgb(255,237,184)'
   const kc = (cx: number, cy: number) => { x.beginPath(); x.moveTo(cx, cy - 4.5); x.lineTo(cx + 3, cy); x.lineTo(cx, cy + 4.5); x.lineTo(cx - 3, cy); x.closePath(); x.fill() }
   for (const kk of [1, 2, 3, 5, 6, 7]) { kc(-T / 2, H * kk / 8); kc(W + T / 2, H * kk / 8) }
   for (const kk of [1, 2, 3]) { kc(W * kk / 4, -T / 2); kc(W * kk / 4, H + T / 2) }

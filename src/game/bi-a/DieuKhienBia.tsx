@@ -266,6 +266,7 @@ export function BanhXe({ dk, doc, tat }: { dk: BoDieuKhien; doc: boolean; tat: b
     <div className="bia-banh-xe" data-doc={doc ? '' : undefined} data-tat={tat ? '' : undefined} role="group" aria-label="Bánh xe chỉnh nhỏ hướng gậy: kéo để nhích từng chút, chạm hai đầu để nhích một nấc"
       onPointerDown={(e) => dk.xeDown(e, doc)} onPointerMove={(e) => dk.xeMove(e)} onPointerUp={(e) => dk.xeUp(e)} onPointerCancel={() => dk.xeUp(null)}>
       <div className="van" data-doc={doc ? '1' : undefined} ref={(el) => { dk.elVan = el }} aria-hidden="true" />
+      <span className="bia-ten-banh" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"><path d="M9.96,4.89 L10.32,2.45 L13.68,2.45 L14.04,4.89 L15.59,5.53 L17.56,4.05 L19.95,6.44 L18.47,8.41 L19.11,9.96 L21.55,10.32 L21.55,13.68 L19.11,14.04 L18.47,15.59 L19.95,17.56 L17.56,19.95 L15.59,18.47 L14.04,19.11 L13.68,21.55 L10.32,21.55 L9.96,19.11 L8.41,18.47 L6.44,19.95 L4.05,17.56 L5.53,15.59 L4.89,14.04 L2.45,13.68 L2.45,10.32 L4.89,9.96 L5.53,8.41 L4.05,6.44 L6.44,4.05 L8.41,5.53 Z" /><circle cx="12" cy="12" r="2.7" /></svg><span>Tinh chỉnh</span></span>
       <div className="mui" aria-hidden="true">{doc ? '‹' : '˄'}</div>
       <div className="mui sau" aria-hidden="true">{doc ? '›' : '˅'}</div>
     </div>
