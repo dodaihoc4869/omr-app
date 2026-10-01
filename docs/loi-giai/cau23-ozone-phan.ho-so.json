@@ -1,0 +1,696 @@
+{
+ "ghiChu": "Câu 23 (ozone phân) — 4 hồ sơ khuôn 1.2 dạng tln, bộ HYDROCARBON, đã qua kiem.bundle (4/4 đạt, 0 cờ dapAn). vao = đầu vào máy chủ phát (dauVao), hoSo = hồ sơ như máy chủ lưu.",
+ "goi": {
+  "ma_de": "LG-CAU23",
+  "cau": [
+   {
+    "qid": "LG-CAU23-X",
+    "phan": "III",
+    "so": "23 · ý 1 · X",
+    "de": "Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:\nR¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴\nNếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:\nR¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH\n1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y\nViết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.\n2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:\nA —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃\nXác định công thức phân tử và công thức cấu tạo của A.\nTrả lời ngắn (ý 1 – chất X): phân tử khối của X là bao nhiêu?",
+    "dap_an": "44",
+    "chuyen_de": "Hydrocarbon",
+    "muc_do": "van_dung",
+    "dang": {
+     "ma": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT"
+    }
+   },
+   {
+    "qid": "LG-CAU23-Y",
+    "phan": "III",
+    "so": "23 · ý 1 · Y",
+    "de": "Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:\nR¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴\nNếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:\nR¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH\n1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y\nViết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.\n2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:\nA —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃\nXác định công thức phân tử và công thức cấu tạo của A.\nTrả lời ngắn (ý 1 – chất Y): phân tử khối của Y là bao nhiêu?",
+    "dap_an": "58",
+    "chuyen_de": "Hydrocarbon",
+    "muc_do": "van_dung",
+    "dang": {
+     "ma": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT"
+    }
+   },
+   {
+    "qid": "LG-CAU23-Z",
+    "phan": "III",
+    "so": "23 · ý 1 · Z",
+    "de": "Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:\nR¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴\nNếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:\nR¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH\n1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y\nViết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.\n2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:\nA —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃\nXác định công thức phân tử và công thức cấu tạo của A.\nTrả lời ngắn (ý 1 – chất Z): phân tử khối của Z là bao nhiêu?",
+    "dap_an": "60",
+    "chuyen_de": "Hydrocarbon",
+    "muc_do": "van_dung",
+    "dang": {
+     "ma": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT"
+    }
+   },
+   {
+    "qid": "LG-CAU23-A",
+    "phan": "III",
+    "so": "23 · ý 2 · A",
+    "de": "Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:\nR¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴\nNếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:\nR¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH\n1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y\nCH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y\nViết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.\n2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:\nA —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃\nXác định công thức phân tử và công thức cấu tạo của A.\nTrả lời ngắn (ý 2 – chất A): một phân tử A có bao nhiêu nguyên tử hydrogen?",
+    "dap_an": "16",
+    "chuyen_de": "Hydrocarbon",
+    "muc_do": "van_dung",
+    "dang": {
+     "ma": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT"
+    }
+   }
+  ]
+ },
+ "hoSo": [
+  {
+   "vao": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-X",
+    "bam": "9d323ab76c4075b9",
+    "nguon": "LG-CAU23",
+    "so": "Câu 23 · ý 1 · X",
+    "dang": "tln",
+    "bo": "HYDROCARBON",
+    "chuong": "Hydrocarbon",
+    "mucDo": "van_dung",
+    "dangBai": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT",
+    "tang": "sau",
+    "de": "<p>Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:<br>R¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴<br>Nếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:<br>R¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH<br>1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y<br>Viết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.<br>2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:<br>A —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃<br>Xác định công thức phân tử và công thức cấu tạo của A.<br>Trả lời ngắn (ý 1 – chất X): phân tử khối của X là bao nhiêu?</p>",
+    "hinh": [],
+    "loiGiaiCo": {
+     "chot": "",
+     "tung": null,
+     "buoc": [],
+     "ket_qua": "",
+     "trang_thai": ""
+    },
+    "y": [],
+    "dapAn": {
+     "kq": "44"
+    }
+   },
+   "hoSo": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-X",
+    "bam": "9d323ab76c4075b9",
+    "dang": "tln",
+    "ten": "Ozone phân khử 2-methylbut-2-ene: sản phẩm aldehyde X",
+    "keys": [
+     "k1",
+     "k3",
+     "k6"
+    ],
+    "dung": [
+     {
+      "ic": "i-hex",
+      "t": "Dựng chất đầu, tìm C=C",
+      "p": "{CH3-CH=C(CH3)-CH3} là 2-methylbut-2-ene. Liên kết đôi nối C2 (mang 1 H và 1 nhóm {CH3}) với C3 (mang 2 nhóm {CH3}).",
+      "io": [
+       [
+        "in",
+        "C2: 1 H"
+       ],
+       [
+        "in",
+        "C3: 0 H"
+       ]
+      ]
+     },
+     {
+      "ic": "i-bolt",
+      "t": "Cắt đôi C=C, gắn O",
+      "p": "Mỗi C của liên kết đôi thành một nhóm C=O. C2 thành {CH3-CH=O}, C3 thành {O=C(CH3)2}.",
+      "io": [
+       [
+        "out",
+        "C=C"
+       ],
+       [
+        "in",
+        "2 nhóm C=O"
+       ]
+      ]
+     },
+     {
+      "ic": "i-lens",
+      "t": "Chất khử giữ nguyên aldehyde",
+      "p": "Chất khử {(CH3)2S} không oxi hoá nhóm –CHO. Đầu C2 cho aldehyde X; đầu C3 cho ketone Y (chung cả hai sơ đồ).",
+      "io": [
+       [
+        "in",
+        "X = {CH3CHO}"
+       ],
+       [
+        "in",
+        "Y = {CH3COCH3}"
+       ]
+      ]
+     },
+     {
+      "ic": "i-scale",
+      "t": "Gọi tên, tính M",
+      "p": "X là {CH3-CHO}: ethanal (acetaldehyde), {C2H4O}, M = 44.",
+      "io": [
+       [
+        "in",
+        "M = 44"
+       ]
+      ]
+     }
+    ],
+    "y": [],
+    "tl": {
+     "dapAn": "44",
+     "donVi": "g/mol",
+     "k": "k3",
+     "bay": "doivai",
+     "soi": "X chỉ có ở sơ đồ khử bằng {(CH3)2S}: đầu nào của C=C mang H thì đầu ấy cho aldehyde; đầu không mang H cho ketone Y.",
+     "g": [
+      "Chìa khoá <b>Phản ứng đặc trưng</b>: ozone phân cắt đôi C=C; mỗi C của liên kết đôi thành một nhóm C=O. C còn H cho aldehyde (khi khử) hoặc acid (khi oxi hoá bằng {H2O2}); C không có H cho ketone.",
+      "Trong {CH3-CH=C(CH3)-CH3}: C2 mang 1 H và 1 nhóm {CH3}; C3 mang 2 nhóm {CH3}. Y có ở cả hai sơ đồ, vậy Y đến từ đầu nào?",
+      "Y là ketone từ C3. X là sản phẩm còn lại của sơ đồ khử, từ C2: viết {CH3-CH=O}, rồi cộng khối lượng 2 C, 4 H, 1 O."
+     ],
+     "giai": "Đáp số: 44. Cắt C=C của 2-methylbut-2-ene: đầu C2 (còn 1 H) thành {CH3-CH=O}, đầu C3 thành {CH3-CO-CH3}. Khử bằng {(CH3)2S} giữ nguyên nhóm –CHO nên X là {CH3CHO}, tên ethanal (acetaldehyde). M(X) = 2 × 12 + 4 × 1 + 16 = 44."
+    },
+    "ket": "Đáp số: 44 (X là {CH3CHO}, ethanal)",
+    "nho": "Ozone phân khử: C của C=C còn H cho aldehyde, C không có H cho ketone.",
+    "phepTinh": [
+     {
+      "ten": "Bảo toàn C: chất đầu = X + Y",
+      "bieuThuc": "2+3",
+      "ketQua": 5,
+      "lamTron": 0
+     },
+     {
+      "ten": "M của X ({C2H4O})",
+      "bieuThuc": "2*12+4*1+16",
+      "ketQua": 44,
+      "lamTron": 0,
+      "laDapSo": true
+     }
+    ],
+    "tuongTu": [
+     {
+      "t": "Ozone phân khử but-2-ene ({CH3-CH=CH-CH3}) chỉ thu được một chất hữu cơ là ethanal.",
+      "d": "D",
+      "giai": "Đúng. Hai C của liên kết đôi đều mang 1 H và 1 nhóm {CH3}, nên cả hai nửa đều là {CH3-CHO}: 1 mol but-2-ene cho 2 mol ethanal."
+     },
+     {
+      "t": "Ozone phân khử 2-methylpropene ({CH2=C(CH3)2}) thu được ethanal và propanone.",
+      "d": "S",
+      "giai": "Sai. Đầu {CH2=} mang 2 H nên cho methanal {HCHO} (M = 30), không phải ethanal; đầu {=C(CH3)2} cho propanone.",
+      "phepTinh": [
+       {
+        "ten": "M của methanal {CH2O}",
+        "bieuThuc": "12+2*1+16",
+        "ketQua": 30,
+        "lamTron": 0
+       }
+      ]
+     }
+    ],
+    "co": [
+     {
+      "loai": "loiDe",
+      "ghi": "Chép từ ảnh, cần thầy kiểm: đề gốc gọi chất đầu {CH3-CH=C(CH3)-CH3} là X rồi lại dùng X cho một sản phẩm. Lời giải gọi chất đầu là 2-methylbut-2-ene; X, Y, Z là ba sản phẩm."
+     }
+    ],
+    "bo": "HYDROCARBON"
+   }
+  },
+  {
+   "vao": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-Y",
+    "bam": "e049bed538d41ed6",
+    "nguon": "LG-CAU23",
+    "so": "Câu 23 · ý 1 · Y",
+    "dang": "tln",
+    "bo": "HYDROCARBON",
+    "chuong": "Hydrocarbon",
+    "mucDo": "van_dung",
+    "dangBai": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT",
+    "tang": "sau",
+    "de": "<p>Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:<br>R¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴<br>Nếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:<br>R¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH<br>1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y<br>Viết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.<br>2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:<br>A —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃<br>Xác định công thức phân tử và công thức cấu tạo của A.<br>Trả lời ngắn (ý 1 – chất Y): phân tử khối của Y là bao nhiêu?</p>",
+    "hinh": [],
+    "loiGiaiCo": {
+     "chot": "",
+     "tung": null,
+     "buoc": [],
+     "ket_qua": "",
+     "trang_thai": ""
+    },
+    "y": [],
+    "dapAn": {
+     "kq": "58"
+    }
+   },
+   "hoSo": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-Y",
+    "bam": "e049bed538d41ed6",
+    "dang": "tln",
+    "ten": "Ozone phân 2-methylbut-2-ene: ketone Y chung hai sơ đồ",
+    "keys": [
+     "k3",
+     "k1",
+     "k6"
+    ],
+    "dung": [
+     {
+      "ic": "i-hex",
+      "t": "Dựng chất đầu, tìm C=C",
+      "p": "{CH3-CH=C(CH3)-CH3}: C3 của liên kết đôi mang 2 nhóm {CH3}, không có H.",
+      "io": [
+       [
+        "in",
+        "C3: 2 nhóm CH3"
+       ]
+      ]
+     },
+     {
+      "ic": "i-bolt",
+      "t": "Cắt C=C tại C3",
+      "p": "C3 thành nhóm C=O nối hai nhóm {CH3}: {CH3-CO-CH3}.",
+      "io": [
+       [
+        "out",
+        "C=C"
+       ],
+       [
+        "in",
+        "{CH3COCH3}"
+       ]
+      ]
+     },
+     {
+      "ic": "i-lens",
+      "t": "Vì sao Y có ở cả hai sơ đồ",
+      "p": "Nhóm ketone không bị {H2O2} oxi hoá, nên dù khử bằng {(CH3)2S} hay oxi hoá bằng {H2O2}, đầu C3 vẫn là {CH3COCH3}.",
+      "io": [
+       [
+        "in",
+        "Y ở cả hai sơ đồ"
+       ]
+      ]
+     },
+     {
+      "ic": "i-scale",
+      "t": "Gọi tên, tính M",
+      "p": "Y là propanone (acetone), {C3H6O}, M = 58.",
+      "io": [
+       [
+        "in",
+        "M = 58"
+       ]
+      ]
+     }
+    ],
+    "y": [],
+    "tl": {
+     "dapAn": "58",
+     "donVi": "g/mol",
+     "k": "k3",
+     "bay": "tengoi",
+     "soi": "Chữ Y xuất hiện ở cả hai sơ đồ: chỉ sản phẩm không bị {H2O2} oxi hoá mới giống nhau, đó là ketone.",
+     "g": [
+      "Chìa khoá <b>Phản ứng đặc trưng</b>: ozone phân cắt đôi C=C thành hai nhóm C=O; nhóm aldehyde bị {H2O2} oxi hoá thành –COOH, nhóm ketone thì không.",
+      "Trong {CH3-CH=C(CH3)-CH3}, C nào của liên kết đôi không mang H? Đầu đó cho ketone.",
+      "C3 mang 2 nhóm {CH3}: viết {CH3-CO-CH3}. Đây là propanone, không phải propanal (propanal có nhóm –CHO ở đầu mạch). Cộng khối lượng 3 C, 6 H, 1 O."
+     ],
+     "giai": "Đáp số: 58. C3 của liên kết đôi mang 2 nhóm {CH3}, cắt C=C cho {CH3-CO-CH3}. Nhóm ketone không bị {H2O2} oxi hoá nên Y có ở cả hai sơ đồ. Y là propanone (acetone), {C3H6O}, M(Y) = 3 × 12 + 6 × 1 + 16 = 58."
+    },
+    "ket": "Đáp số: 58 (Y là {CH3COCH3}, propanone)",
+    "nho": "Ketone sinh ra khi ozone phân không bị {H2O2} oxi hoá; chỉ aldehyde mới lên acid.",
+    "phepTinh": [
+     {
+      "ten": "M của Y ({C3H6O})",
+      "bieuThuc": "3*12+6*1+16",
+      "ketQua": 58,
+      "lamTron": 0,
+      "laDapSo": true
+     }
+    ],
+    "tuongTu": [
+     {
+      "t": "Ozone phân 2,3-dimethylbut-2-ene ({(CH3)2C=C(CH3)2}) rồi oxi hoá bằng {H2O2} chỉ thu được propanone.",
+      "d": "D",
+      "giai": "Đúng. Hai C của liên kết đôi đều không mang H, cả hai nửa là ketone {CH3COCH3}; {H2O2} không oxi hoá ketone."
+     },
+     {
+      "t": "Y và propanal là đồng phân của nhau nhưng có phân tử khối khác nhau.",
+      "d": "S",
+      "giai": "Sai. Propanone và propanal cùng công thức phân tử {C3H6O} nên là đồng phân, và cùng M = 58.",
+      "phepTinh": [
+       {
+        "ten": "M của {C3H6O}",
+        "bieuThuc": "3*12+6*1+16",
+        "ketQua": 58,
+        "lamTron": 0
+       }
+      ]
+     }
+    ],
+    "co": [
+     {
+      "loai": "loiDe",
+      "ghi": "Chép từ ảnh, cần thầy kiểm: đề gốc dùng chữ X hai lần (chất đầu và một sản phẩm); lời giải gọi chất đầu là 2-methylbut-2-ene."
+     }
+    ],
+    "bo": "HYDROCARBON"
+   }
+  },
+  {
+   "vao": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-Z",
+    "bam": "0ee5774c776b5ef7",
+    "nguon": "LG-CAU23",
+    "so": "Câu 23 · ý 1 · Z",
+    "dang": "tln",
+    "bo": "HYDROCARBON",
+    "chuong": "Hydrocarbon",
+    "mucDo": "van_dung",
+    "dangBai": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT",
+    "tang": "sau",
+    "de": "<p>Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:<br>R¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴<br>Nếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:<br>R¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH<br>1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y<br>Viết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.<br>2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:<br>A —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃<br>Xác định công thức phân tử và công thức cấu tạo của A.<br>Trả lời ngắn (ý 1 – chất Z): phân tử khối của Z là bao nhiêu?</p>",
+    "hinh": [],
+    "loiGiaiCo": {
+     "chot": "",
+     "tung": null,
+     "buoc": [],
+     "ket_qua": "",
+     "trang_thai": ""
+    },
+    "y": [],
+    "dapAn": {
+     "kq": "60"
+    }
+   },
+   "hoSo": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-Z",
+    "bam": "0ee5774c776b5ef7",
+    "dang": "tln",
+    "ten": "Ozone phân rồi oxi hoá bằng hydrogen peroxide: acid Z",
+    "keys": [
+     "k3",
+     "k1",
+     "k6"
+    ],
+    "dung": [
+     {
+      "ic": "i-hex",
+      "t": "Dựng chất đầu, tìm C=C",
+      "p": "{CH3-CH=C(CH3)-CH3}: C2 mang 1 H và 1 nhóm {CH3}; C3 mang 2 nhóm {CH3}.",
+      "io": [
+       [
+        "in",
+        "C2: 1 H"
+       ]
+      ]
+     },
+     {
+      "ic": "i-bolt",
+      "t": "Cắt C=C",
+      "p": "Đầu C2 thành {CH3-CH=O}, đầu C3 thành {CH3-CO-CH3} (Y).",
+      "io": [
+       [
+        "out",
+        "C=C"
+       ]
+      ]
+     },
+     {
+      "ic": "i-flask",
+      "t": "Hydrogen peroxide oxi hoá –CHO",
+      "p": "{H2O2} oxi hoá nhóm –CHO thành –COOH: {CH3-CHO} thành {CH3-COOH}. Ketone Y giữ nguyên.",
+      "io": [
+       [
+        "in",
+        "Z = {CH3COOH}"
+       ],
+       [
+        "in",
+        "Y giữ nguyên"
+       ]
+      ]
+     },
+     {
+      "ic": "i-scale",
+      "t": "Gọi tên, tính M",
+      "p": "Z là ethanoic acid (acetic acid), {C2H4O2}, M = 60.",
+      "io": [
+       [
+        "in",
+        "M = 60"
+       ]
+      ]
+     }
+    ],
+    "y": [],
+    "tl": {
+     "dapAn": "60",
+     "donVi": "g/mol",
+     "k": "k3",
+     "bay": "tuyetdoi",
+     "soi": "Sơ đồ thứ hai dùng {H2O2}: chỉ đầu cho aldehyde mới lên acid; không phải cả hai đầu đều thành acid.",
+     "g": [
+      "Chìa khoá <b>Phản ứng đặc trưng</b>: ozone phân rồi oxi hoá bằng {H2O2}: C của C=C còn H cho –COOH, C không có H cho ketone.",
+      "So hai sơ đồ: Y giống nhau, chỉ X đổi thành Z. Vậy Z đến từ đầu C2 (còn 1 H).",
+      "Đầu C2 cho {CH3-CHO}, {H2O2} oxi hoá tiếp thành {CH3-COOH}. Cộng khối lượng 2 C, 4 H, 2 O."
+     ],
+     "giai": "Đáp số: 60. Cắt C=C: đầu C2 (còn 1 H) cho {CH3-CHO}, bị {H2O2} oxi hoá thành {CH3-COOH}; đầu C3 cho ketone Y, không bị oxi hoá. Z là ethanoic acid (acetic acid), {C2H4O2}, M(Z) = 2 × 12 + 4 × 1 + 2 × 16 = 60."
+    },
+    "ket": "Đáp số: 60 (Z là {CH3COOH}, ethanoic acid)",
+    "nho": "Ozone phân + {H2O2}: đầu aldehyde lên carboxylic acid, đầu ketone giữ nguyên.",
+    "phepTinh": [
+     {
+      "ten": "M của Z ({C2H4O2})",
+      "bieuThuc": "2*12+4*1+2*16",
+      "ketQua": 60,
+      "lamTron": 0,
+      "laDapSo": true
+     },
+     {
+      "ten": "Z hơn X một nguyên tử O",
+      "bieuThuc": "60-44",
+      "ketQua": 16,
+      "lamTron": 0
+     }
+    ],
+    "tuongTu": [
+     {
+      "t": "Ozone phân but-2-ene rồi oxi hoá bằng {H2O2}, 1 mol but-2-ene cho 2 mol acetic acid.",
+      "d": "D",
+      "giai": "Đúng. Hai C của liên kết đôi đều mang 1 H, mỗi nửa cho {CH3CHO} rồi bị oxi hoá thành {CH3COOH}: 2 mol."
+     },
+     {
+      "t": "Ozone phân 2-methylbut-2-ene rồi oxi hoá bằng {H2O2}, sản phẩm có phân tử khối nhỏ hơn là acetic acid.",
+      "d": "S",
+      "giai": "Sai. Hai sản phẩm là acetic acid (M = 60) và propanone (M = 58); propanone nhẹ hơn.",
+      "phepTinh": [
+       {
+        "ten": "M acetic acid",
+        "bieuThuc": "2*12+4*1+2*16",
+        "ketQua": 60,
+        "lamTron": 0
+       },
+       {
+        "ten": "M propanone",
+        "bieuThuc": "3*12+6*1+16",
+        "ketQua": 58,
+        "lamTron": 0
+       }
+      ]
+     }
+    ],
+    "co": [],
+    "bo": "HYDROCARBON"
+   }
+  },
+  {
+   "vao": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-A",
+    "bam": "83347ca68c264de3",
+    "nguon": "LG-CAU23",
+    "so": "Câu 23 · ý 2 · A",
+    "dang": "tln",
+    "bo": "HYDROCARBON",
+    "chuong": "Hydrocarbon",
+    "mucDo": "van_dung",
+    "dangBai": "HYDROCARBON.OZONE_PHAN.XAC_DINH_CHAT",
+    "tang": "sau",
+    "de": "<p>Liên kết đôi C=C bị ozone phân rồi khử ngay bằng chất khử như dimethyl sulfide (CH₃)₂S thì thu được aldehyde và ketone:<br>R¹R²C=CR³R⁴ —(1. O₃; 2. (CH₃)₂S)→ R¹R²C=O + O=CR³R⁴<br>Nếu ozone phân rồi oxi hoá ngay bằng H₂O₂ thì nhóm aldehyde sinh ra bị oxi hoá thành nhóm carboxylic acid, nhóm ketone không bị oxi hoá:<br>R¹R²C=CHR³ —(1. O₃; 2. H₂O₂)→ R¹R²C=O + R³COOH<br>1. Ozone phân chất có công thức cấu tạo CH₃–CH=C(CH₃)–CH₃:<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. (CH₃)₂S)→ X + Y<br>CH₃–CH=C(CH₃)–CH₃ —(1. O₃; 2. H₂O₂)→ Z + Y<br>Viết công thức cấu tạo và gọi tên các chất hữu cơ X, Y, Z.<br>2. Từ tinh dầu chanh phân lập được chất A; A chứa 88,2353% carbon, còn lại là hydrogen; phổ khối lượng (MS) cho phân tử khối của A bằng 136. Ozone phân khử A:<br>A —(1. O₃; 2. (CH₃)₂S)→ HCH=O + OHC–CH₂–CH(COCH₃)–CH₂–CH₂–CO–CH₃<br>Xác định công thức phân tử và công thức cấu tạo của A.<br>Trả lời ngắn (ý 2 – chất A): một phân tử A có bao nhiêu nguyên tử hydrogen?</p>",
+    "hinh": [],
+    "loiGiaiCo": {
+     "chot": "",
+     "tung": null,
+     "buoc": [],
+     "ket_qua": "",
+     "trang_thai": ""
+    },
+    "y": [],
+    "dapAn": {
+     "kq": "16"
+    }
+   },
+   "hoSo": {
+    "khuon": "1.2",
+    "qid": "LG-CAU23-A",
+    "bam": "83347ca68c264de3",
+    "dang": "tln",
+    "ten": "Chất A trong tinh dầu chanh: ghép ngược từ ozone phân",
+    "keys": [
+     "k6",
+     "k2",
+     "k3",
+     "k1"
+    ],
+    "dung": [
+     {
+      "ic": "i-scale",
+      "t": "Từ %C và M ra công thức",
+      "p": "m(C) = 136 × 88,2353% = 120 g, tức 10 C; m(H) = 136 − 120 = 16 g, tức 16 H. A là {C10H16}.",
+      "io": [
+       [
+        "in",
+        "10 C"
+       ],
+       [
+        "in",
+        "16 H"
+       ]
+      ]
+     },
+     {
+      "ic": "i-atom",
+      "t": "Đếm π + vòng",
+      "p": "π + vòng = (2 × 10 + 2 − 16) : 2 = 3.",
+      "io": [
+       [
+        "in",
+        "π + vòng = 3"
+       ]
+      ]
+     },
+     {
+      "ic": "i-hex",
+      "t": "Đọc sản phẩm ozone phân",
+      "p": "Hai sản phẩm có 1 + 9 = 10 C và 1 + 3 = 4 nhóm C=O, tức A có 2 liên kết C=C. Còn 1 vòng: sản phẩm lớn chứa cả hai đầu của một C=C trong vòng.",
+      "io": [
+       [
+        "in",
+        "2 C=C"
+       ],
+       [
+        "in",
+        "1 vòng"
+       ]
+      ]
+     },
+     {
+      "ic": "i-chain",
+      "t": "Ghép ngược C=O thành C=C",
+      "p": "Nối C của CHO với C của CO–{CH3} cuối mạch (khép vòng 6 cạnh); nối C của {COCH3} nhánh với {HCHO} (nhóm {=CH2}).",
+      "io": [
+       [
+        "out",
+        "4 O"
+       ],
+       [
+        "in",
+        "limonene"
+       ]
+      ]
+     },
+     {
+      "ic": "i-lens",
+      "t": "Gọi tên A",
+      "p": "A là 1-methyl-4-(prop-1-en-2-yl)cyclohex-1-ene (limonene), có trong tinh dầu vỏ chanh.",
+      "io": []
+     }
+    ],
+    "y": [],
+    "tl": {
+     "dapAn": "16",
+     "donVi": "nguyên tử",
+     "k": "k6",
+     "bay": "conso",
+     "soi": "A chỉ gồm C và H: %H = 100 − 88,2353. Tính số C trước từ M = 136, số H là phần khối lượng còn lại.",
+     "g": [
+      "Chìa khoá <b>Tính theo phương trình</b>: có %C và M từ phổ khối thì số C = M × %C : 12, khối lượng H = M − 12 × số C.",
+      "Số C = 136 × 0,882353 : 12. Làm tròn ra số nguyên nào?",
+      "Khối lượng H trong một mol A = 136 − 12 × (số C). Mỗi nguyên tử H nặng 1."
+     ],
+     "giai": "Đáp số: 16. Số C = 136 × 0,882353 : 12 = 10; số H = 136 − 10 × 12 = 16. A là {C10H16}, π + vòng = (2 × 10 + 2 − 16) : 2 = 3. Sản phẩm ozone phân có 4 nhóm C=O (2 C=C) và đủ 10 C trong hai phân tử, nên A có 2 liên kết C=C và 1 vòng. Ghép ngược: C của nhóm CHO nối với C của nhóm C=O mang {CH3} ở cuối mạch (khép vòng 6 cạnh); C của nhóm {COCH3} ở nhánh nối với {CH2} từ {HCHO}. A là 1-methyl-4-(prop-1-en-2-yl)cyclohex-1-ene (limonene)."
+    },
+    "ket": "Đáp số: 16 (A là {C10H16}, limonene)",
+    "nho": "%C + M ra CTPT; π + vòng trừ số C=C (đếm nhóm C=O : 2) ra số vòng; ghép ngược từng cặp C=O.",
+    "phepTinh": [
+     {
+      "ten": "Số nguyên tử C trong A",
+      "bieuThuc": "136*88.2353/100/12",
+      "ketQua": 10,
+      "lamTron": 0
+     },
+     {
+      "ten": "π + vòng của {C10H16}",
+      "bieuThuc": "(2*10+2-16)/2",
+      "ketQua": 3,
+      "lamTron": 0
+     },
+     {
+      "ten": "Tổng C trong hai sản phẩm (HCHO + sản phẩm lớn)",
+      "bieuThuc": "1+9",
+      "ketQua": 10,
+      "lamTron": 0
+     },
+     {
+      "ten": "Số C=C = số nhóm C=O : 2",
+      "bieuThuc": "(1+3)/2",
+      "ketQua": 2,
+      "lamTron": 0
+     },
+     {
+      "ten": "Số vòng",
+      "bieuThuc": "3-2",
+      "ketQua": 1,
+      "lamTron": 0
+     },
+     {
+      "ten": "Số nguyên tử H trong A",
+      "bieuThuc": "136-10*12",
+      "ketQua": 16,
+      "lamTron": 0,
+      "laDapSo": true
+     }
+    ],
+    "tuongTu": [
+     {
+      "t": "Hydrocarbon {C10H16} có tổng số liên kết π và vòng bằng 3.",
+      "d": "D",
+      "giai": "Đúng. (2 × 10 + 2 − 16) : 2 = 3.",
+      "phepTinh": [
+       {
+        "ten": "π + vòng",
+        "bieuThuc": "(2*10+2-16)/2",
+        "ketQua": 3,
+        "lamTron": 0
+       }
+      ]
+     },
+     {
+      "t": "Ozone phân khử một hydrocarbon mạch hở có 2 liên kết C=C luôn cho đúng hai phân tử sản phẩm.",
+      "d": "S",
+      "giai": "Sai. Cắt 2 liên kết C=C trên mạch hở tách thành 3 mảnh. Limonene chỉ cho 2 sản phẩm vì một C=C nằm trong vòng: cắt nó chỉ mở vòng, không tách mảnh."
+     }
+    ],
+    "co": [
+     {
+      "loai": "loiDe",
+      "ghi": "Chép từ ảnh, cần thầy kiểm: sản phẩm lớn được vẽ khung trong ảnh, chép là OHC–CH2–CH(COCH3)–CH2–CH2–CO–CH3 (3-acetyl-6-oxoheptanal)."
+     },
+     {
+      "loai": "loiDe",
+      "ghi": "Chép từ ảnh, cần thầy kiểm: yêu cầu ý 2 bị cắt khỏi ảnh; giả định đề hỏi \"Xác định công thức phân tử và công thức cấu tạo của A\"."
+     }
+    ],
+    "bo": "HYDROCARBON"
+   }
+  }
+ ]
+}
