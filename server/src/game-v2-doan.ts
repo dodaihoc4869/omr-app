@@ -274,8 +274,11 @@ export async function gianhChangDoan(env: Env, ma: string, phong: PhongDoan, sbd
        SELECT ?, ?, ?, ?, ?
         WHERE NOT EXISTS (SELECT 1 FROM doan_luot l JOIN doan_chang c ON c.ma = l.ma_chang
                WHERE l.sbd = ? AND l.ket_luc IS NULL AND c.trang_thai IN ('sanh','dang_di') AND c.tao_luc > ?)
-          AND NOT EXISTS (SELECT 1 FROM doan_chang c2 WHERE c2.chu = ? AND c2.trang_thai IN ('sanh','dang_di') AND c2.tao_luc > ?)`,
-    ).bind(ma, JSON.stringify(phong), sbd, phong.chang ? 'dang_di' : 'sanh', iso(now), sbd, tu, sbd, tu),
+          AND NOT EXISTS (SELECT 1 FROM doan_chang c2 WHERE c2.chu = ? AND c2.trang_thai IN ('sanh','dang_di') AND c2.tao_luc > ?
+                  -- 01/10 (thầy báo, SBD 11016 "văng ra xong bị chặn"): chặng em ĐÃ RỜI (lượt có ket_luc) vẫn dang_di + đứng tên em tới 1 giờ ⇒ chặn mở
+                  -- chặng mới mà timDangDo không trả lại được ⇒ kẹt "Đoàn vừa đổi". Chặng em đã rời thì không tính.
+                  AND NOT EXISTS (SELECT 1 FROM doan_luot l2 WHERE l2.ma_chang = c2.ma AND l2.sbd = ? AND l2.ket_luc IS NOT NULL))`,
+    ).bind(ma, JSON.stringify(phong), sbd, phong.chang ? 'dang_di' : 'sanh', iso(now), sbd, tu, sbd, tu, sbd),
     env.DB.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) SELECT ?,?,?,?,0,? WHERE EXISTS (SELECT 1 FROM doan_chang WHERE ma = ?)')
       .bind(ma, sbd, ngayVn(iso(now)), lop, iso(now), ma),
   ])
@@ -698,6 +701,9 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       if (!phong.chang.ketThuc && !phong.chang.ghe[i]!.roi) { phong.chang = roiTran(phong.chang, sbd); delete phong.nop[i]; tienHanh(phong, now); doi = true }
       if (doi && !await luuPhong(env, ma, phong, revision)) continue
       await env.DB.prepare('UPDATE doan_luot SET ket_luc=? WHERE ma_chang=? AND sbd=? AND ket_luc IS NULL').bind(iso(now), ma, sbd).run()
+      // 01/10: người THẬT cuối cùng vừa rời ⇒ đóng chặng ngay (chỉ còn bạn máy, không ai đẩy hiệp) — không để chặng lơ lửng 1 giờ.
+      await env.DB.prepare(`UPDATE doan_chang SET trang_thai='huy', ket_luc=? WHERE ma=? AND trang_thai IN ('sanh','dang_di')
+        AND NOT EXISTS (SELECT 1 FROM doan_luot WHERE ma_chang=? AND ket_luc IS NULL)`).bind(iso(now), ma, ma).run()
       return { ok: true, daRoi: true }
     } else if (action === 'doan-tin-hieu') {
       const t = String(b.tinHieu ?? '')
