@@ -253,6 +253,7 @@ html, body { margin: 0; background: var(--m3-surface, rgb(253 251 255)); }
 body { font-family: "Google Sans", Roboto, system-ui, sans-serif; }
 .lg-nen.lg-nen--tinh { position: static; inset: auto; z-index: auto; width: 100%; max-width: 190mm; margin: 0 auto 24px; border: 1px solid var(--m3-outline-variant, rgb(196 199 197)); border-radius: 16px; overflow: hidden; }
 .lg-nen--tinh .lg-khung { display: block; flex: none; min-height: 400px; }
+.lg-nen--tinh .lg-khung[hidden] { display: none; }
 .dau { max-width: 190mm; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; color: var(--m3-on-surface); font-size: 15px; line-height: 1.55; }
 .dau h1 { margin: 0; font-size: 22px; }
 .dau p { margin: 0; }
@@ -263,7 +264,7 @@ body { font-family: "Google Sans", Roboto, system-ui, sans-serif; }
 .muc a { text-decoration: none; }
 @page { size: A4; margin: 10mm; }
 @media print {
-  .muc, .lg-nut { display: none !important; }
+  .muc, .lg-thanh .lg-nut { display: none !important; }
   .lg-nen.lg-nen--tinh { break-before: page; border: 0; border-radius: 0; margin: 0; }
   .lg-nen.lg-nen--tinh:first-of-type { break-before: auto; }
   .dau { padding: 0 0 8px; }
@@ -273,7 +274,7 @@ body { font-family: "Google Sans", Roboto, system-ui, sans-serif; }
 <body class="m3">
 <div class="dau">
   <h1>Câu 23 — Ozone phân alkene · lời giải từng bước</h1>
-  <p>Bốn hồ sơ dựng theo dây chuyền Lời giải A (khuôn 1.2, bộ chìa khoá <b>Hydrocarbon</b>), mỗi hồ sơ đã qua bộ kiểm của máy chủ (4/4 đạt). Mỗi hộp dưới đây là đúng khung học sinh mở trong app (nút “Lời giải từng bước”): phần gợi ý và lời giải chỉ hiện khi bấm hoặc nhập đáp số — muốn in kèm lời giải thì mở trong hộp trước rồi mới in.</p>
+  <p>Bốn hồ sơ dựng theo dây chuyền Lời giải A (khuôn 1.2, bộ chìa khoá <b>Hydrocarbon</b>), mỗi hồ sơ đã qua bộ kiểm của máy chủ (4/4 đạt). Mỗi hộp dưới đây là đúng khung học sinh mở trong app (nút “Lời giải từng bước”): phần gợi ý và lời giải chỉ hiện khi bấm hoặc nhập đáp số — khi in A4 (hoặc bấm “Mở hết để in”) mọi gợi ý, đáp số và lời giải tự bung ra.</p>
   <p>Khuôn trả lời ngắn của dây chuyền khoá đáp số là một <b>số</b>, nên ý 1 tách thành ba câu X, Y, Z (đáp số là phân tử khối), ý 2 chốt bằng số nguyên tử H của A; công thức cấu tạo và tên nằm trong phần Dựng và Lời giải.</p>
   <div class="can-kiem"><b>Chép từ ảnh, cần thầy kiểm:</b>
     <ol>
@@ -283,22 +284,22 @@ body { font-family: "Google Sans", Roboto, system-ui, sans-serif; }
     </ol>
   </div>
   <p><b>Đáp án:</b> X = CH₃CHO (ethanal) · Y = CH₃COCH₃ (propanone) · Z = CH₃COOH (ethanoic acid) · A = C₁₀H₁₆, π + vòng = 3, limonene = 1-methyl-4-(prop-1-en-2-yl)cyclohex-1-ene.</p>
-  <nav class="muc"><a class="lg-nut" href="#h0">Câu 23 · ý 1 · X</a><a class="lg-nut" href="#h1">Câu 23 · ý 1 · Y</a><a class="lg-nut" href="#h2">Câu 23 · ý 1 · Z</a><a class="lg-nut" href="#h3">Câu 23 · ý 2 · A</a></nav>
+  <nav class="muc"><a class="lg-nut" href="#h0">Câu 23 · ý 1 · X</a><a class="lg-nut" href="#h1">Câu 23 · ý 1 · Y</a><a class="lg-nut" href="#h2">Câu 23 · ý 1 · Z</a><a class="lg-nut" href="#h3">Câu 23 · ý 2 · A</a><button type="button" class="lg-nut lg-nut--chinh" id="bung">Mở hết để in</button></nav>
 </div>
 <section class="lg-nen lg-nen--tinh" id="h0" aria-labelledby="t0">
-  <div class="lg-thanh"><h2 id="t0" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 1 · X</h2></div>
+  <div class="lg-thanh"><h2 id="t0" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 1 · X</h2><button type="button" class="lg-nut" data-dong="0">Đóng</button></div>
   <iframe class="lg-khung" data-i="0" title="Lời giải từng bước Câu 23 · ý 1 · X" referrerpolicy="no-referrer"></iframe>
 </section>
 <section class="lg-nen lg-nen--tinh" id="h1" aria-labelledby="t1">
-  <div class="lg-thanh"><h2 id="t1" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 1 · Y</h2></div>
+  <div class="lg-thanh"><h2 id="t1" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 1 · Y</h2><button type="button" class="lg-nut" data-dong="1">Đóng</button></div>
   <iframe class="lg-khung" data-i="1" title="Lời giải từng bước Câu 23 · ý 1 · Y" referrerpolicy="no-referrer"></iframe>
 </section>
 <section class="lg-nen lg-nen--tinh" id="h2" aria-labelledby="t2">
-  <div class="lg-thanh"><h2 id="t2" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 1 · Z</h2></div>
+  <div class="lg-thanh"><h2 id="t2" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 1 · Z</h2><button type="button" class="lg-nut" data-dong="2">Đóng</button></div>
   <iframe class="lg-khung" data-i="2" title="Lời giải từng bước Câu 23 · ý 1 · Z" referrerpolicy="no-referrer"></iframe>
 </section>
 <section class="lg-nen lg-nen--tinh" id="h3" aria-labelledby="t3">
-  <div class="lg-thanh"><h2 id="t3" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 2 · A</h2></div>
+  <div class="lg-thanh"><h2 id="t3" class="lg-tieu-de">Lời giải từng bước · Câu 23 · ý 2 · A</h2><button type="button" class="lg-nut" data-dong="3">Đóng</button></div>
   <iframe class="lg-khung" data-i="3" title="Lời giải từng bước Câu 23 · ý 2 · A" referrerpolicy="no-referrer"></iframe>
 </section>
 <script type="text/plain" id="khung"><!doctype html>
@@ -3004,6 +3005,21 @@ window.addEventListener('message', e => {
 parent.postMessage({ loai: 'khung-san-sang' }, '*');
 
 <\/script>
+<style>@media print{.fstep{opacity:1!important;transform:none!important;animation:none!important}.hintbar,[data-replay],[data-reset],[data-tlcheck]{display:none!important}}</style>
+<script>
+window.bungHet = function () {
+  const q = QUESTIONS[0]; if (!q || window.__S) return
+  window.__S = JSON.stringify(S)
+  if (q.tl) S.ans[q.id + '_tl'] = q.tl.dapAn
+  q.y.forEach((y) => { S.ans[q.id + '_' + y.id] = y.d })
+  ;(q.tuongTu || []).forEach((t, i) => { S.ans[q.id + '_tt' + i] = t.d })
+  renderQ('q')
+  const sx = document.querySelector('.tlwrap .sx')
+  if (sx && q.tl) sx.insertAdjacentHTML('afterbegin', q.tl.g.map((g, i) => '<div class="hint"><b>' + HB[i] + ':</b> ' + fx(g) + '</div>').join(''))
+  document.querySelectorAll('.fstep').forEach((e) => { e.style.animation = 'none'; e.style.opacity = 1; e.style.transform = 'none' })
+}
+window.thuLai = function () { if (!window.__S) return; S = JSON.parse(window.__S); window.__S = null; renderQ('q') }
+<\/script>
 </body>
 </html>
 </script>
@@ -3022,7 +3038,13 @@ window.addEventListener('message', (e) => {
 const giãn = () => khungs.forEach((f) => { try { const h = f.contentDocument.documentElement.scrollHeight; if (h && Math.abs(f.offsetHeight - h) > 2) f.style.height = h + 'px' } catch (_) {} })
 khungs.forEach((f) => { f.srcdoc = KHUNG; f.addEventListener('load', () => { giãn(); try { new ResizeObserver(giãn).observe(f.contentDocument.body) } catch (_) {} }) })
 setInterval(giãn, 800)
-window.addEventListener('beforeprint', giãn)
+const bung = (mo) => { khungs.forEach((f) => { try { mo ? f.contentWindow.bungHet() : f.contentWindow.thuLai() } catch (_) {} }); giãn() }
+let daBung = false
+document.getElementById('bung').addEventListener('click', (e) => { daBung = !daBung; bung(daBung); e.target.textContent = daBung ? 'Thu lại như học sinh' : 'Mở hết để in' })
+// In A4: tự bung hết rồi thu lại; hộp đang đóng cũng mở ra để in.
+window.addEventListener('beforeprint', () => { khungs.forEach((f) => { f.hidden = false }); if (!daBung) bung(true) })
+window.addEventListener('afterprint', () => { if (!daBung) bung(false) })
+document.querySelectorAll('[data-dong]').forEach((b) => b.addEventListener('click', () => { const f = khungs[Number(b.dataset.dong)]; f.hidden = !f.hidden; b.textContent = f.hidden ? 'Mở' : 'Đóng' }))
 </script>
 </body>
 </html>
