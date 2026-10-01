@@ -270,3 +270,7 @@ Vỏ `dao/DaoThanThu` của Code 6 CHƯA có trên main (mới có màn 1 `ChonB
 - Nguồn bb31ac4d5c64ffe67c9efa2f5ebd448132482225; Actions36870909750/job110398122803 SUCCESS. Pages hoàn tất13:58:22Z, Worker13:58:29Z; mã/tài nguyên trùng b21a251e, không sửa dữ liệu. Bản trước khôi phục8dc77630 / Actions36868247959.
 - Full Vitest13.148:12.992 đạt/128 lỗi/28 bỏ qua;127 tên lỗi trùng nền,1 ca đồng thời không ổn định đạt khi chạy lại, nhóm15/15 ở cả bản khôi phục và b21a251e. Build/kiểm màu/SW13/13 đạt. Không có lỗi mới còn lại sau đối chứng và chạy lại; chi tiết docs/bat-linh-dien-hoat-0110/hoi-quy-khoi-phuc.json.
 - Xác nhận phát hành qua GitHub; mạng workspace chặn kiểm tra trực tiếp website. Bằng chứng docs/bat-linh-dien-hoat-0110/khoi-phuc.json. Commit bổ sung chỉ tài liệu [skip ci].
+
+### Ghép mẫu phòng chờ được duyệt · 01/10/2026 (VN) · Codex
+- Người dùng yêu cầu “đẩy lên app đi nhé” sau khi xem mẫu Chuyến bay hóa học. PhongChoGame lấy props ca/lớp/phút/lỗi thật; mini-game cục bộ, không đổi ExamTakeScreen/Worker/D1. Tải lười ChuyenBay, dừng vẽ khi pause/ngoài màn/tab ẩn, máy yếu/giảm chuyển động dùng chạm, đổi nền giữ điểm.
+- 122/122 liên quan,16/16 sau tách tải lười,25 kiểm trình duyệt đạt. Build/màu/SW13/13 đạt,163 tệp2996 KiB; toàn Vitest đang chạy và CI kiểm trước đẩy. Chi tiết docs/phong-cho-xem-truoc-0110/PHAT-HANH.md. Mốc lùi1eed4375 / mã đang triển khai bb31ac4d / Actions36870909750.

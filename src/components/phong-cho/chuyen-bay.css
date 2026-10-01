@@ -1,0 +1,40 @@
+.pc-game { border-radius: 24px; overflow: hidden; background: var(--pc-card); border: 1px solid var(--pc-line); box-shadow: 0 12px 40px rgba(31, 57, 55, .045); }
+.pc-game-head { display: flex; justify-content: space-between; align-items: center; padding: 23px 28px 21px; gap: 12px; }
+.pc-eyebrow { font-size: 9px; letter-spacing: .12em; font-weight: 600; color: var(--pc-muted); }
+.pc-game h2 { margin: 7px 0 0; font-size: 25px; font-weight: 600; letter-spacing: -.055em; line-height: 1.2; }
+.pc-game h2 span { font-size: 16px; margin-left: 11px; color: rgb(162, 126, 53); vertical-align: middle; }
+.pc-score { border-radius: 15px; background: var(--pc-soft); text-align: center; padding: 9px 15px; min-width: 77px; }
+.pc-score span { display: block; font-size: 10px; color: var(--pc-muted); }
+.pc-score strong { display: block; font-weight: 600; font-size: 23px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.pc-scene { height: 326px; position: relative; overflow: hidden; background: var(--pc-sky); }
+.pc-scene canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.pc-scene canvas:active { cursor: grabbing; }
+.pc-flight-tag { position: absolute; top: 19px; left: 25px; font-size: 11px; color: var(--pc-stage-ink); display: flex; gap: 6px; align-items: center; pointer-events: none; }
+.pc-room .pc-flight-tag { color: var(--pc-flight-ink, var(--pc-stage-ink)); }
+.pc-flight-tag span { font-size: 20px; }
+.pc-pause { position: absolute; top: 12px; right: 16px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 50%; width: 48px; height: 48px; background: rgba(255, 254, 247, .7); color: var(--pc-stage-ink); display: grid; place-items: center; }
+.pc-pause:hover { background: rgb(255, 254, 247); }
+.pc-scene-bottom { position: absolute; bottom: 20px; left: 26px; right: 26px; display: flex; justify-content: space-between; align-items: center; gap: 8px; pointer-events: none; font-size: 11px; color: var(--pc-stage-ink); }
+.pc-room .pc-scene-bottom { color: var(--pc-flight-ink, var(--pc-stage-ink)); }
+.pc-dots { display: flex; align-items: center; gap: 6px; }
+.pc-dots i { width: 7px; height: 7px; background: rgba(39, 81, 79, .12); border: 1px solid rgba(39, 81, 79, .35); border-radius: 50%; }
+.pc-dots i.pc-dot-filled { background: var(--pc-accent); }
+.pc-room .pc-dots i { border-color: var(--pc-dot-border, rgba(39, 81, 79, .35)); }
+.pc-discovery { display: flex; align-items: flex-start; gap: 12px; padding: 19px 25px 16px; min-height: 84px; }
+.pc-discovery-icon { width: 35px; height: 35px; border-radius: 12px; background: var(--pc-soft); display: grid; place-items: center; color: var(--pc-accent); flex: 0 0 35px; }
+.pc-discovery div { min-width: 0; }
+.pc-discovery strong { font-size: 13px; font-weight: 600; }
+.pc-discovery p { margin: 5px 0 0; font-size: 15px; color: var(--pc-muted); line-height: 1.7; }
+.pc-controls { display: flex; justify-content: space-between; align-items: center; padding: 0 25px 14px; gap: 10px; font-size: 11px; color: var(--pc-muted); }
+.pc-controls>div { display: flex; gap: 8px; }
+.pc-controls button { width: 48px; height: 40px; min-height: 48px; background: transparent; border: 1px solid var(--pc-line); border-radius: 11px; display: grid; place-items: center; }
+.pc-controls button:hover { background: var(--pc-soft); }
+.pc-paused { position: absolute; inset: 75px 35px 60px; border-radius: 16px; background: var(--pc-card); opacity: .96; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+.pc-paused span { font-weight: 600; }
+.pc-paused small { font-size: 11px; margin-top: 8px; padding: 0 12px; line-height: 1.7; color: var(--pc-muted); }
+
+@media (max-width: 520px) {
+  .pc-game { border-radius: 20px; }.pc-game-head { padding: 18px 18px 17px; }.pc-eyebrow { font-size: 8px; letter-spacing: .07em; }.pc-game h2 { font-size: 21px; }.pc-game h2 span { margin-left: 7px; font-size: 13px; }.pc-score { min-width: 65px; padding: 7px 10px; border-radius: 12px; }.pc-score strong { font-size: 21px; }
+  .pc-scene { height: 282px; }.pc-flight-tag { left: 17px; top: 18px; font-size: 10px; }.pc-scene-bottom { left: 18px; right: 18px; bottom: 17px; font-size: 10px; }.pc-pause { right: 11px; top: 9px; }
+  .pc-discovery { padding: 17px 17px 12px; gap: 10px; min-height: 105px; }.pc-discovery p { font-size: 15px; }.pc-discovery strong { font-size: 13px; }.pc-controls { padding: 0 17px 12px; font-size: 12px; }.pc-controls>span { max-width: 165px; line-height: 1.8; }
+}

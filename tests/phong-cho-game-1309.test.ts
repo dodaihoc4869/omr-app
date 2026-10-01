@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-describe('Phòng chờ thi Free Fire X Google Mini-Game', () => {
+describe('Phòng chờ thi · Chuyến bay hóa học', () => {
   const tepExamTake = readFileSync(resolve(__dirname, '../src/screens/ExamTakeScreen.tsx'), 'utf8')
   const tepPhongCho = readFileSync(resolve(__dirname, '../src/components/PhongChoGame.tsx'), 'utf8')
 
@@ -17,11 +17,11 @@ describe('Phòng chờ thi Free Fire X Google Mini-Game', () => {
     expect(than).toContain('<PhongChoGame')
   })
 
-  it('PhongChoGame chứa hoạt ảnh nhảy dù phong cách Free Fire 4 màu Google và mini-game nguyên tử', () => {
-    expect(tepPhongCho).toContain('PHÒNG CHỜ THI TRỰC TUYẾN')
-    expect(tepPhongCho).toContain('Cao độ:')
-    expect(tepPhongCho).toContain('Điểm nguyên tử:')
-    expect(tepPhongCho).toContain('KHO_NGUYEN_TU')
-    expect(tepPhongCho).toContain('canvas')
+  it('Phòng chờ giữ thông báo và nối mini-game cục bộ đã duyệt', () => {
+    expect(tepPhongCho).toContain('Đang chờ Thầy bấm bắt đầu')
+    expect(tepPhongCho).toContain('Điểm chơi chỉ để vui trong lúc chờ.')
+    expect(tepPhongCho).toContain('<ChuyenBay')
+    expect(tepPhongCho).toContain('loiCho')
+
   })
 })
