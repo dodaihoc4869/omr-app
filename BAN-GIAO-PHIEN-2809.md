@@ -195,3 +195,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 01/10 17:58 VN · gộp #123 trang thầy cộng thưởng nấc game vào EXP (ca90e2c) · deploy 625 XANH · kiểm thật: SBD 12006 expHomNay 461 = màn em (trước 301), expTong 1241 (trước 661) · không ca mở · lùi: git revert -m1 ca90e2c
 - 01/10 18:49 VN · gộp #124 mở ca gói lớn tách đáp án/đề thành hai lượt (b152ca9) · deploy 626 XANH · lùi: git revert -m1 b152ca9
 - 01/10 19:55 VN · gộp #125 mở ca nhanh: ảnh đề sang kho ảnh R2 `anh/<sha256>` (/anh/co, /anh/day, GET /anh/<băm>), gói ca chỉ còn đường dẫn (b21a251) · deploy 627 XANH · kiểm thật: /anh/co trả {ok,thieu}, GET băm 0 → 404, mã sai → 400 · không ca mở · lùi: git revert -m1 b21a251
+- 01/10 20:2x VN · đẩy sẵn toàn bộ ảnh kho đề lên kho ảnh R2 `anh/<sha256>` (chỉ-thêm): 268 bộ đề, 1147 ảnh (24,3 MB), mới 1037, hỏng 0; kiểm lại /anh/co thiếu 0/1147, 8 ảnh ngẫu nhiên khớp từng byte · script scratchpad kho-anh/day-anh.py
