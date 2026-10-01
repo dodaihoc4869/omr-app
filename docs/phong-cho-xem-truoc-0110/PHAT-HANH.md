@@ -4,6 +4,8 @@ Người dùng duyệt mẫu bằng yêu cầu “đẩy lên app đi nhé”. `
 
 Chỉ tải `ChuyenBay` khi màn chờ xuất hiện, có trạng thái tải riêng. Canvas dừng khi pause, tab ẩn hoặc ngoài màn; giảm chuyển động/máy yếu dùng nhặt hạt bằng chạm. Đổi nền không đặt lại điểm. Thiếu Canvas vẫn giữ thông báo chờ. Khi cha chuyển vào bài, mini-game được tháo và huỷ vòng vẽ/listener.
 
+Rào lỗi riêng của ô chơi giữ màn chờ nếu mảnh JS/CSS mini-game không tải được. Hai ca chặn yêu cầu tải ChuyenBay đã đạt: thông báo chờ còn hiện, cha vẫn chuyển vào bài. Kết quả `kiem-loi-tai.json`; tổng kiểm trình duyệt27 ca. Chạy lại122 ca liên quan và build sau bổ sung rào đều đạt.
+
 CSS có biến và bộ chọn riêng của phòng chờ; không thay nền hay kiểu nút toàn app. Không thêm ảnh lớn, không ghi điểm/EXP, không có nút mô phỏng hay dữ liệu ca mẫu trong entry app thật.
 
 - 122/122 ca liên quan đạt; sau tách tải lười, chạy lại nhóm A2/phòng chờ 16/16 đạt.
