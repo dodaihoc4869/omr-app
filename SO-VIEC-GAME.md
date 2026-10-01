@@ -274,3 +274,8 @@ Vỏ `dao/DaoThanThu` của Code 6 CHƯA có trên main (mới có màn 1 `ChonB
 ### Ghép mẫu phòng chờ được duyệt · 01/10/2026 (VN) · Codex
 - Người dùng yêu cầu “đẩy lên app đi nhé” sau khi xem mẫu Chuyến bay hóa học. PhongChoGame lấy props ca/lớp/phút/lỗi thật; mini-game cục bộ, không đổi ExamTakeScreen/Worker/D1. Tải lười ChuyenBay, dừng vẽ khi pause/ngoài màn/tab ẩn, máy yếu/giảm chuyển động dùng chạm, đổi nền giữ điểm.
 - 122/122 liên quan,16/16 sau tách tải lười,25 kiểm trình duyệt đạt. Build/màu/SW13/13 đạt,163 tệp2996 KiB; toàn Vitest đang chạy và CI kiểm trước đẩy. Chi tiết docs/phong-cho-xem-truoc-0110/PHAT-HANH.md. Mốc lùi1eed4375 / mã đang triển khai bb31ac4d / Actions36870909750.
+
+### Đã phát hành phòng chờ Chuyến bay hóa học · 01/10/2026 21:51 (VN) · Codex
+- Nguồn d66e2603d511a40a2cdf0a332787b68635a291e6, chứa mã phòng chờ24006b6b; Actions36877799904/job110421834074 tổng SUCCESS. Pages14:51:35Z, Worker14:51:44Z đều success. Bản gộp cập nhật khác thay thế lượt24006b6b bị hủy do concurrency; giữ nguyên mã mini-game.
+- Toàn Vitest trên24006b6b:13.148 ca/12.993 đạt/127 lỗi nền/28 bỏ qua,0 lỗi mới. Sau gộp122/122 liên quan,TypeScript/build/SW13/13 đạt,163 tệp2991 KB. Kiểm trình duyệt component thật27 ca đạt trước gộp; không gọi ca thi thật. Hồ sơ docs/phong-cho-xem-truoc-0110/PHAT-HANH.md,hoi-quy-phat-hanh.json,phat-hanh.json.
+- Xác nhận qua GitHub; proxy workspace chặn website thật. Bản lùi1eed4375/mã triển khai trướcbb31ac4d/Actions36870909750. Không ghi dữ liệu D1 trong phần phòng chờ. Ghi sổ sau phát hành chỉ tài liệu [skip ci].

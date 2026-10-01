@@ -1,0 +1,23 @@
+{
+  "source": "24006b6b6151ff0841b7daf3f70157ea33abcbe3",
+  "total": 13148,
+  "passed": 12993,
+  "failed": 127,
+  "pending": 28,
+  "new_failures": [],
+  "comparison": "Từng file + fullName với hai lần kiểm nền b21a251e / bb31ac4d; không kiểm mã thay đổi khác gộp sau 24006b6b.",
+  "after_merge": {
+    "source": "d66e2603",
+    "related_total": 122,
+    "related_passed": 122,
+    "related_failed": 0,
+    "typescript_build": "passed",
+    "service_worker": {
+      "passed": 13,
+      "total": 13,
+      "precache_files": 163,
+      "precache_KB": 2991
+    },
+    "minigame_source": "Không đổi so với 24006b6b; lazy JS/CSS vẫn nằm ngoài precache."
+  }
+}

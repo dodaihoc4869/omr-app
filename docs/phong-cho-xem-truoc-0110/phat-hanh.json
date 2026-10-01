@@ -1,0 +1,34 @@
+{
+  "source": "d66e2603d511a40a2cdf0a332787b68635a291e6",
+  "waiting_room_source": "24006b6b6151ff0841b7daf3f70157ea33abcbe3",
+  "run": "36877799904",
+  "job": "110421834074",
+  "url": "https://github.com/dodaihoc4869/omr-app/actions/runs/36877799904",
+  "status": "Success",
+  "confirmed_utc": "2026-10-01T14:52:22.985391+00:00",
+  "deploy_steps": [
+    {
+      "name": "Đẩy lên Cloudflare Pages",
+      "conclusion": "success",
+      "running": false,
+      "started": "2026-10-01T14:51:18Z",
+      "completed": "2026-10-01T14:51:35Z"
+    },
+    {
+      "name": "Đẩy lên Cloudflare Worker (Máy chủ)",
+      "conclusion": "success",
+      "running": false,
+      "started": "2026-10-01T14:51:35Z",
+      "completed": "2026-10-01T14:51:44Z"
+    }
+  ],
+  "app": "https://omr-app-b3u.pages.dev/hs",
+  "verification": "GitHub tổng Success và hai bước Cloudflare success. Proxy workspace chặn pages.dev; chưa kiểm tra trực tiếp website thật.",
+  "regression": "hoi-quy-phat-hanh.json",
+  "rollback": {
+    "source": "1eed4375",
+    "last_deployed_source": "bb31ac4d5c64ffe67c9efa2f5ebd448132482225",
+    "run": "36870909750"
+  },
+  "concurrent_update": "Bản gộp d66e2603 thay thế lượt24006b6b bị hủy do concurrency; giữ nguyên mã mini-game phòng chờ."
+}
