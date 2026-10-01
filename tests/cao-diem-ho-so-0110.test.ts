@@ -5,9 +5,22 @@ import { gopDocD1 } from '../server/src/doc-d1-theo-luot'
 import { docLanLam } from '../server/src/srs2-d1'
 import { damBaoBangBia } from '../server/src/bi-a'
 import { loadProfile } from '../server/src/game-v2'
+import { dbGoc } from '../server/src/cau-hinh-dem'
 import type { Env } from '../server/src/kieu'
 
 describe('hồ sơ giờ cao điểm: dữ liệu tươi và lịch sử cần thiết',()=>{
+  it('Bi-a giữ truy vấn độc lập, hàm hồ sơ con không gộp lại; request game khác vẫn gộp và không lẫn đệm D1',async()=>{
+    const d=taoD1That();let batch=0
+    const goc=d.env.DB
+    const db={...goc,batch:((ds:Parameters<typeof goc.batch>[0])=>{batch++;return goc.batch(ds)}) as typeof goc.batch}
+    const bia=gopDocD1(db,false)
+    expect(gopDocD1(bia)).toBe(bia);expect(dbGoc(bia)).toBe(db)
+    expect(await Promise.all([bia.prepare('SELECT 1 AS n').first(),bia.prepare('SELECT 2 AS n').first()])).toEqual([{n:1},{n:2}])
+    expect(batch).toBe(0)
+    const dao=gopDocD1(db)
+    expect(await Promise.all([dao.prepare('SELECT 3 AS n').first('n'),dao.prepare('SELECT 4 AS n').first('n')])).toEqual([3,4])
+    expect(batch).toBe(1)
+  })
   it('lọc lịch sử cũ nhưng giữ đủ lần sai/đúng/gợi ý tại mốc; không lẫn em/câu và không lấy sự kiện che',async()=>{
     const d=taoD1That()
     const st=d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,ket_qua,luc,ngay_vn,assistance,visibility) VALUES(?,?,?,?,?,?,?,?,?,?)')

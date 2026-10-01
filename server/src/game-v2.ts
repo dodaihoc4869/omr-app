@@ -247,7 +247,7 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
 const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
-  env = { ...env, DB: gopDocD1(env.DB) }
+  env = { ...env, DB: gopDocD1(env.DB, !LENH_BIA.has(action)) }
   // CHỐT ĐÁP ÁN (29/09): cờ cửa P08 cho phần trám bên dưới đọc CÙNG đợt đầu (đệm 15 s dùng chung lượt đọc đang bay) — không thêm một đợt D1 ở cuối.
   if(action==='answer')void docCauHinhKichHoat(env,true).catch(()=>null)
   // Cờ cửa hàng (đệm 30 s) đọc SONG SONG với phần chính (trước: một đợt nối tiếp ở cuối). Lỗi vẫn báo như cũ khi phần chính xong.

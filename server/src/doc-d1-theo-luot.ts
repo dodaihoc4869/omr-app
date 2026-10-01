@@ -3,9 +3,16 @@
 import type { D1Database, D1PreparedStatement, D1Result } from './kieu'
 import { gan } from './cau-hinh-dem'
 const DA_GOP = Symbol('omr.docD1TheoLuot')
-export function gopDocD1(db: D1Database): D1Database {
+export function gopDocD1(db: D1Database, bat = true): D1Database {
   if ((db as unknown as Record<symbol, unknown>)[DA_GOP]) return db
   if (typeof db.batch !== 'function') return db
+  // Một số lệnh Bi-a đã đọc song song tối ưu: gộp hàm hồ sơ con thêm đợt chờ.
+  // Đánh dấu RIÊNG request để hàm con giữ đường đọc cũ, không đánh dấu DB gốc.
+  if (!bat) {
+    const wrapped = gan({ prepare: db.prepare.bind(db), batch: db.batch.bind(db) }, db)
+    Object.defineProperty(wrapped, DA_GOP, { value: true })
+    return wrapped
+  }
   type Cho = { st: D1PreparedStatement; xong: (r: D1Result) => void; loi: (e: unknown) => void }
   let ds: Cho[] = []
   // Hàng rào chỉ thuộc request này: SELECT độc lập được song song; ghi chờ các đọc trước nó,
