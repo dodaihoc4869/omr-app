@@ -302,7 +302,14 @@ export async function gvVinhDanhNgay(env: Env, b: Record<string, unknown>, nowMs
   const dauNgay = dauNgayVnIso(ngay)
   const cuoiNgay = dauNgayVnIso(themNgay(ngay, 1))
 
-  const rExp = await Q.hoi('SELECT sbd, SUM(exp) AS exp FROM exp_so WHERE ngay_vn = ? GROUP BY sbd HAVING SUM(exp) > 0 ORDER BY SUM(exp) DESC, sbd LIMIT 1', ngay)
+  // EXP trong ngày = sổ EXP + thưởng nấc học trong game (`game_v2_reward`, cộng thật vào thú nhưng KHÔNG ghi sổ) — cùng công thức màn em
+  // (`docExpHomNay`). Thiếu phần thưởng nấc thì trang thầy báo thấp hơn màn em (thầy 01/10: SBD 12006 em thấy +461, thầy thấy 301).
+  const rExp = await Q.hoi(
+    `SELECT sbd, SUM(e) AS exp FROM (SELECT sbd, exp AS e FROM exp_so WHERE ngay_vn = ?
+       UNION ALL SELECT sbd, amount FROM game_v2_reward WHERE created_at >= ? AND created_at < ? AND amount > 0)
+      GROUP BY sbd HAVING SUM(e) > 0 ORDER BY SUM(e) DESC, sbd LIMIT 1`,
+    ngay, dauNgay, cuoiNgay,
+  )
   const rDung = await Q.hoi(
     `SELECT sbd, COUNT(*) AS dung_lai FROM nam_kt_cau WHERE trang_thai = 'da_khac_phuc' AND substr(COALESCE(luc_cuoi, ''), 1, 10) >= ? AND substr(COALESCE(luc_cuoi, ''), 1, 10) <= ? GROUP BY sbd`,
     d7, ngay,
@@ -386,7 +393,9 @@ const DONG_THOI_GIAN = (coCanhBao: boolean) => `
     FROM su_kien_hoc s WHERE s.sbd = ? AND s.nguon NOT IN ('thi', 'len_bang') GROUP BY s.nguon, s.ma_nguon, s.ngay_vn
   UNION ALL SELECT luc, 'len_bang', qid, COALESCE(chuyen_de, ''), COALESCE(dat, 0), 0, 0, 0, '' FROM len_bang WHERE sbd = ?
   )
-  UNION ALL SELECT MAX(luc), 'exp', ngay_vn, '', SUM(exp), COUNT(*), 0, 0, '' FROM exp_so WHERE sbd = ? GROUP BY ngay_vn
+  UNION ALL SELECT MAX(luc), 'exp', ngay_vn, '', SUM(exp), COUNT(*), 0, 0, '' FROM (
+    SELECT luc, ngay_vn, exp FROM exp_so WHERE sbd = ?
+    UNION ALL SELECT created_at, date(created_at, '+7 hours'), amount FROM game_v2_reward WHERE sbd = ? AND amount > 0) GROUP BY ngay_vn
   ${coCanhBao ? "UNION ALL SELECT gui_luc, 'canh_bao', id, ma_btvn, CASE WHEN em_xem_luc IS NULL THEN 0 ELSE 1 END, CASE WHEN ph_xem_luc IS NULL THEN 0 ELSE 1 END, 0, 0, loi_em FROM canh_bao_thay WHERE sbd = ?" : ''}`
 
 function dongTuHang(x: Dong): { luc: string; loai: LoaiDong; tieuDe: string; chiTiet: Record<string, unknown>; chips: Chip[] } {
@@ -459,10 +468,12 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
   const rTt = await Q.hoi('SELECT json FROM game_v2_profile WHERE sbd = ?', sbd)
   const rTong = await Q.hoi(
     `SELECT (SELECT MAX(luc) FROM ph_truy_cap WHERE sbd = ?) AS ph, (SELECT SUM(exp) FROM exp_so WHERE sbd = ?) AS exp_tong, (SELECT SUM(exp) FROM exp_so WHERE sbd = ? AND ngay_vn = ?) AS exp_nay,
+            (SELECT SUM(amount) FROM game_v2_reward WHERE sbd = ? AND amount > 0) AS exp_game_tong,
+            (SELECT SUM(amount) FROM game_v2_reward WHERE sbd = ? AND created_at >= ? AND created_at < ? AND amount > 0) AS exp_game_nay,
             (SELECT luc FROM su_kien_hoc WHERE sbd = ? ORDER BY luc DESC LIMIT 1) AS cuoi_luc, (SELECT nguon FROM su_kien_hoc WHERE sbd = ? ORDER BY luc DESC LIMIT 1) AS cuoi_nguon,
             (SELECT nop_luc FROM luot WHERE sbd = ? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 1) AS ca_luc,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = ?) AS moc_hien_thi, (SELECT gia_tri FROM cau_hinh WHERE khoa = ?) AS moc_ve_dich, (SELECT gia_tri FROM cau_hinh WHERE khoa = ?) AS moc_bang_tin`,
-    sbd, sbd, sbd, homNay, sbd, sbd, sbd, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO, // ba khoá mốc đọc CHUNG truy vấn này (giữ ≤ 12 truy vấn)
+    sbd, sbd, sbd, homNay, sbd, sbd, dauNgayVnIso(homNay), dauNgayVnIso(themNgay(homNay, 1)), sbd, sbd, sbd, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO, // ba khoá mốc đọc CHUNG truy vấn này (giữ ≤ 12 truy vấn)
   )
   const rDiem = await Q.hoi(
     `SELECT l.tong, l.ma_ca, l.nop_luc, COALESCE(c.ten_ca, '') AS ten_ca FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
@@ -488,11 +499,13 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
     ...(cuoiLuc ? { hoatDongCuoi: { luc: cuoiLuc, viec: viecCuoi } } : {}),
     ...(chuoi(tong?.ph) ? { phuHuynhXemCuoi: chuoi(tong?.ph) } : {}),
     ...(rDiem?.[0] ? { diemCaGanNhat: { diem: so(rDiem[0].tong), tenCa: chuoi(rDiem[0].ten_ca) || `Ca ${chuoi(rDiem[0].ma_ca)}`, maCa: chuoi(rDiem[0].ma_ca), luc: chuoi(rDiem[0].nop_luc) } } : {}),
-    ...(tong && tong.exp_tong !== null && tong.exp_tong !== undefined ? { expTong: so(tong.exp_tong), expHomNay: so(tong.exp_nay) } : {}),
+    // EXP = sổ + thưởng nấc game (xem rExp ở bảng tin lớp).
+    ...(tong && ((tong.exp_tong !== null && tong.exp_tong !== undefined) || so(tong.exp_game_tong) > 0)
+      ? { expTong: so(tong.exp_tong) + so(tong.exp_game_tong), expHomNay: so(tong.exp_nay) + so(tong.exp_game_nay) } : {}),
   }
 
   // 2 · dòng thời gian: MỘT truy vấn UNION (ca, sổ học theo nhóm, lên bảng, EXP theo ngày, cảnh báo)
-  const bindDong = (coCb: boolean) => [sbd, sbd, sbd, sbd, ...(coCb ? [sbd] : [])]
+  const bindDong = (coCb: boolean) => [sbd, sbd, sbd, sbd, sbd, ...(coCb ? [sbd] : [])]
   const sqlNgoai = (coCb: boolean) => `SELECT * FROM (${DONG_THOI_GIAN(coCb)}) WHERE luc IS NOT NULL AND luc <> '' AND luc < ? AND loai IN (SELECT value FROM json_each(?)) ORDER BY luc DESC LIMIT ${TOI_DA_DONG_MOT_TRANG + 1}`
   const mocTruoc = truoc || '9999-12-31T00:00:00.000Z'
   const rDong = (await Q.hoi(sqlNgoai(true), ...bindDong(true), mocTruoc, json(loaiLoc))) ?? (await Q.hoi(sqlNgoai(false), ...bindDong(false), mocTruoc, json(loaiLoc))) ?? []
