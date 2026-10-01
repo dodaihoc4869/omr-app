@@ -1,6 +1,8 @@
 # Ghép diễn hoạt Bát Linh vào Đảo và Đoàn · 01/10/2026
 
-Đã nối bộ tranh vào cảnh trong ải Đảo 2.0, cảnh chiến đấu Đoàn 2.0 và màn tung chưởng cuối hiệp của Đoàn. Đây là thay đổi mã giao diện trong workspace; chưa phát hành lên Pages. Cảnh chiến đấu của giao diện đời cũ và Võ đài chưa chuyển sang bộ diễn hoạt này.
+Đã nối bộ tranh vào cảnh trong ải Đảo 2.0, cảnh chiến đấu Đoàn 2.0 và màn tung chưởng cuối hiệp của Đoàn. Đã phát hành lên Cloudflare Pages lúc 20:35 ngày 01/10/2026 (giờ Việt Nam), nguồn `8dc77630`; bước Worker cũng thành công. Cảnh chiến đấu của giao diện đời cũ và Võ đài chưa chuyển sang bộ diễn hoạt này.
+
+[Mở app học sinh](https://omr-app-b3u.pages.dev/hs) · [Quy trình phát hành thành công](https://github.com/dodaihoc4869/omr-app/actions/runs/36868247959) · [Bằng chứng phát hành](bat-linh-dien-hoat-0110/phat-hanh.json). Xác nhận qua trạng thái hai bước đẩy Cloudflare trên GitHub; mạng workspace chặn truy cập trực tiếp `pages.dev`, nên chưa kiểm tra tài nguyên từ website thật sau phát hành.
 
 ## Hành vi
 
@@ -21,7 +23,7 @@ Canvas giới hạn độ phân giải, giảm tần suất khi đứng chờ, d
 
 - 11 tệp Vitest liên quan: **78/78 đạt**. Kiểm cả đòn đúng/sai, Cuồng nộ, bỏ qua, mở lại câu, gói chấm lặp, Chắn và số máu thật.
 - Chromium: **130 kiểm tra** tám thú ở màn 390/1440; **28 kiểm tra** luồng Đảo ở 360/390/768/844/1440, giảm chuyển động, đổi tùy chọn lúc chơi, dừng vẽ ngoài màn hình, lỗi ảnh và thiếu Canvas. Màn ngang thấp 844×390 đã soi thêm Đoàn và tấm phủ: bảng giải thích đứng cạnh sân.
-- 32 ảnh đạt kích thước, kênh RGBA và nền trong suốt. TypeScript, build production và kiểm màu đạt. Không chạy toàn bộ bộ test của ứng dụng.
+- 32 ảnh đạt kích thước, kênh RGBA và nền trong suốt. TypeScript, build production và kiểm màu đạt. Trước phát hành đã chạy toàn bộ Vitest: 13.154 ca, 12.997 đạt, 129 lỗi cũ, 28 bỏ qua. Đối chứng 60 tệp lỗi trên main gốc `b21a251e`: đúng 129 ca lỗi theo từng tên, không có lỗi mới. [Báo cáo đối chứng](bat-linh-dien-hoat-0110/hoi-quy-phat-hanh.json).
 - Ảnh bằng chứng: [Đảo dọc](bat-linh-dien-hoat-0110/dao-doc.jpg), [Đảo ngang](bat-linh-dien-hoat-0110/dao-ngang.jpg), [Đoàn dọc](bat-linh-dien-hoat-0110/doan-chuong-doc.jpg), [Đoàn ngang](bat-linh-dien-hoat-0110/doan-chuong-ngang.jpg). Mỗi JPG dưới 150 KiB.
 - Video quay component thật với máy chủ giả nằm ở `/workspace/scratch/dien-hoat-kiem/dao-doan-dien-hoat.mp4` (H.264, 13,04 giây). Trang xem thử không nằm trong bản build.
 

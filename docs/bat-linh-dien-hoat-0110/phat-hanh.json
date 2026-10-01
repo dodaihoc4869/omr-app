@@ -1,0 +1,21 @@
+{
+  "nguon": "8dc776305c40a290846951ebbe7be966dc0f502d",
+  "website": "https://omr-app-b3u.pages.dev/hs",
+  "actions": "https://github.com/dodaihoc4869/omr-app/actions/runs/36868247959",
+  "job": "110389101254",
+  "trangThai": "Success",
+  "xacNhanLucUTC": "2026-10-01T13:36:58Z",
+  "pages": {
+    "trangThai": "success",
+    "hoanTatLucUTC": "2026-10-01T13:35:37Z"
+  },
+  "worker": {
+    "trangThai": "success",
+    "hoanTatLucUTC": "2026-10-01T13:35:44Z"
+  },
+  "kiemTrucTiepWebsite": "Chua kiem: proxy workspace chan pages.dev",
+  "banLui": {
+    "nguon": "b21a251e1494aab277cc3e41afabc6c251b2bd94",
+    "actions": "https://github.com/dodaihoc4869/omr-app/actions/runs/36863450803"
+  }
+}

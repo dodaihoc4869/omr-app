@@ -257,3 +257,7 @@ Vỏ `dao/DaoThanThu` của Code 6 CHƯA có trên main (mới có màn 1 `ChonB
 - Ghép bộ diễn hoạt với main b21a251e; mã game 90cde40b, gói cài 63e4b44d. Tách mảnh SanDauDienHoat khỏi precache để tải khi mở game; build + kiểm màu đạt, SW 13/13 (161 tệp, 2998 KiB).
 - Toàn Vitest: 13.154 ca, 12.997 đạt, 129 lỗi cũ, 28 bỏ qua. Chạy lại 60 tệp lỗi trên main b21a251e: 1.097 ca, đúng 129 lỗi; so tên từng ca: KHÔNG lỗi mới. Báo cáo: docs/bat-linh-dien-hoat-0110/hoi-quy-phat-hanh.json.
 - Phát hành theo workflow deploy.yml của dự án; bản lùi trước thay đổi là b21a251e (Actions 36863450803).
+
+### Đã phát hành Bát Linh · 01/10/2026 20:35 (VN) · Codex
+- Đẩy main nguồn 8dc776305c40a290846951ebbe7be966dc0f502d từ worktree sạch; Actions 36868247959/job110389101254 SUCCESS. Hai bước đẩy Pages (13:35:37Z) và Worker (13:35:44Z) đều success; website https://omr-app-b3u.pages.dev/hs. Không thay mã Worker/D1 trong phần diễn hoạt.
+- Bằng chứng: docs/bat-linh-dien-hoat-0110/phat-hanh.json. Xác nhận qua GitHub; proxy workspace chặn pages.dev nên không kiểm tra trực tiếp tài nguyên trên website thật. Bản lùi b21a251e / Actions36863450803. Commit ghi sổ sau phát hành chỉ tài liệu [skip ci].
