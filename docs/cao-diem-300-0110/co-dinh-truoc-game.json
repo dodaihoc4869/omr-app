@@ -1,0 +1,91 @@
+{
+ "nhan": "co-dinh-truoc-game",
+ "luc": "2026-10-01T01:23:19.141Z",
+ "cauHinh": {
+  "soEm": 300,
+  "treD1": 40,
+  "treR2": 30,
+  "lamGiay": 180,
+  "deRieng": true,
+  "congBo": "ngay",
+  "dongLoat": false,
+  "chiPhongCho": false,
+  "chiGame": true,
+  "choMs": 45000,
+  "nopMs": 60000,
+  "hat": 1102026
+ },
+ "doiChieu": null,
+ "tong": {
+  "luot": 901,
+  "loi": 0,
+  "cauD1": 15306,
+  "vongD1": 14403,
+  "docD1": 74078,
+  "r2Doc": 301,
+  "r2MB": 21.3,
+  "giay": 48
+ },
+ "bang": [
+  {
+   "lenh": "300 mở Sảnh game",
+   "n": 300,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 16851,
+   "p95": 16951,
+   "max": 18899,
+   "cauTb": 18.01,
+   "vongTb": 18.01,
+   "vongMax": 22,
+   "docTb": 110,
+   "r2DocTb": 1,
+   "r2KBTb": 72
+  },
+  {
+   "lenh": "300 vào Đảo",
+   "n": 300,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 13281,
+   "p95": 13349,
+   "max": 13351,
+   "cauTb": 16.41,
+   "vongTb": 15.41,
+   "vongMax": 18,
+   "docTb": 118,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "300 chốt câu game",
+   "n": 300,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 11511,
+   "p95": 11545,
+   "max": 12786,
+   "cauTb": 16.58,
+   "vongTb": 14.58,
+   "vongMax": 15,
+   "docTb": 18,
+   "r2DocTb": 0,
+   "r2KBTb": 0
+  },
+  {
+   "lenh": "thầy: chi tiết ca (/ca/chi-tiet)",
+   "n": 1,
+   "loi": 0,
+   "mauLoi": [],
+   "p50": 59,
+   "p95": 59,
+   "max": 59,
+   "cauTb": 4,
+   "vongTb": 1,
+   "vongMax": 1,
+   "docTb": 2,
+   "r2DocTb": 1,
+   "r2KBTb": 121
+  }
+ ]
+}
