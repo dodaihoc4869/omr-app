@@ -264,6 +264,13 @@ await bd
 log('Cả lớp đã nộp — thầy tải chi tiết + chấm')
 await ngu(3500)
 let doiChieu = null
+if (CHI_GAME) {
+  const { rows } = await post('/__do/doi-chieu-game', {})
+  const map = new Map(rows.map(r => [r.sbd, r.n]))
+  const sai = EM.filter(e => map.get(e.sbd) !== 1).length
+  doiChieu = { soBai: rows.length, mongDoi: SO_EM, sai, dapAnVaThoiGianKhop: rows.length === SO_EM && sai === 0, loai: 'chot-game' }
+  log('Đối chiếu chốt game trong D1 cục bộ:', JSON.stringify(doiChieu))
+}
 if (!CHI_PHONG_CHO && !CHI_GAME) {
   // Nộp lặp và gói lưu trễ phải giữ nguyên bài đã chốt.
   await goi('nộp lặp (giữ bài)', '/nop', { maCa: MA_CA, sbd: EM[0].sbd, dapAn: {}, giayCau: {} })

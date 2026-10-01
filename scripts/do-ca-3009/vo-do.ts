@@ -125,6 +125,10 @@ export default {
     const url = new URL(req.url)
     if (url.pathname === '/__do/dump') return Response.json({ so })
     if (url.pathname === '/__do/reset') { so.length = 0; return Response.json({ ok: true }) }
+    if (url.pathname === '/__do/doi-chieu-game') {
+      const r = await env.DB.prepare('SELECT sbd, COUNT(*) AS n FROM game_v2_attempt GROUP BY sbd').all()
+      return Response.json({ rows: r.results })
+    }
     if (url.pathname === '/__do/game') {
       const { sbds } = (await req.json()) as { sbds: string[] }
       const luc = new Date().toISOString(), maDe = '12-PEAK-GAME', qids = Array.from({ length: 20 }, (_, i) => `PEAK-Q${i}`)
