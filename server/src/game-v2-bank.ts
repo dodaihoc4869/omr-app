@@ -132,7 +132,28 @@ export async function docCaSapMo(env:Env,nowIso:string,denCaIso:string):Promise<
 }
 const protectionCache=new Map<string,{fingerprint:string;blocked:Set<string>}>()
 /** qid + nhóm của từng đề đang bảo vệ, khoá `bank_r2|cap_nhat_luc` (xem protectedQuestions). Chỉ đọc (mảng dùng chung, không sửa). */
-const demQidDeBaoVe=new Map<string,readonly string[]>()
+type OQidDe = { ds: readonly string[] | null; dangDoc: boolean }
+const demQidDeBaoVe=new Map<string,OQidDe>()
+async function docQidDeBaoVe(env: Env, bankR2: string, khoa: string): Promise<readonly string[]> {
+  const cu = demQidDeBaoVe.get(khoa)
+  // Chỉ chia sẻ KẾT QUẢ chuẩn hoá theo phiên gói đề. Timer thuộc từng request, không chuyển Promise/stream R2 giữa các lượt.
+  for (let n = 0; cu?.dangDoc && demQidDeBaoVe.get(khoa) === cu && n < 63; n++) await new Promise<void>(xong => setTimeout(xong, 16))
+  const daXong = demQidDeBaoVe.get(khoa)
+  if (daXong?.ds) return daXong.ds
+  const o: OQidDe = { ds: null, dangDoc: true }
+  if(demQidDeBaoVe.size>=200)demQidDeBaoVe.clear()
+  demQidDeBaoVe.set(khoa,o)
+  try {
+    const bank=await readJson(env,bankR2), qs=await normalizeBank(bank,'protected')
+    if(!qs.length&&['phanI','phanII','phanIII'].some(p=>Array.isArray(bank[p])&&(bank[p] as unknown[]).length))throw new Error('Chưa kiểm tra xong phạm vi đề thi đang bảo vệ.')
+    const ds=qs.flatMap(q=>[q.qid,q.group])
+    o.ds=ds
+    return ds
+  } finally {
+    o.dangDoc=false
+    if(!o.ds&&demQidDeBaoVe.get(khoa)===o)demQidDeBaoVe.delete(khoa)
+  }
+}
 /** Thầy xác nhận 29/09/2026: chỉ khoá đề của ca từ hôm nay trở đi. Ca ĐÃ ĐÓNG có giờ bắt đầu (không có thì mốc cập nhật) TRƯỚC mốc này
  *  thì bỏ, không khoá câu nữa. Ca trước mốc mà vẫn đang MỞ thì vẫn khoá như cũ (còn em có thể đang làm). */
 export const MOC_KHOA_CA='2026-09-28T17:00:00.000Z'
@@ -160,12 +181,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   const blocked=new Set<string>()
   const tapTheoCa=await Promise.all(r.results.filter(ca=>ca.bank_r2).map(async ca=>{
     const khoa=`${str(ca.bank_r2)}|${str(ca.cap_nhat_luc)}`
-    const co=demQidDeBaoVe.get(khoa);if(co)return co
-    const bank=await readJson(env,str(ca.bank_r2));const qs=await normalizeBank(bank,'protected')
-    if(!qs.length&&['phanI','phanII','phanIII'].some(p=>Array.isArray(bank[p])&&(bank[p] as unknown[]).length))throw new Error('Chưa kiểm tra xong phạm vi đề thi đang bảo vệ.')
-    const ds=qs.flatMap(q=>[q.qid,q.group])
-    if(demQidDeBaoVe.size>=200)demQidDeBaoVe.clear() // chặn cỡ bộ nhớ isolate
-    demQidDeBaoVe.set(khoa,ds);return ds
+    return docQidDeBaoVe(env,str(ca.bank_r2),khoa)
   }))
   for(const ds of tapTheoCa)for(const x of ds)blocked.add(x)
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});demCaBaoVe.ghi('current',now,new Set(blocked));return blocked

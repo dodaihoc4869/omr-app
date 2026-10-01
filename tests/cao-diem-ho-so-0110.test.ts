@@ -35,6 +35,18 @@ describe('hồ sơ giờ cao điểm: dữ liệu tươi và lịch sử cần t
     const dbKhac=gopDocD1(d.env.DB)
     expect(await dbKhac.prepare('SELECT 43 AS n').first<number>('n')).toBe(43)
   })
+  it('gộp lô SELECT và first; lô ghi dùng changes() vẫn nguyên tử, nộp lặp không cộng hai lần',async()=>{
+    const d=taoD1That();d.sql.exec('CREATE TABLE test_cas(k TEXT PRIMARY KEY, n INTEGER); INSERT INTO test_cas VALUES(\'P\',0)')
+    let soBatch=0
+    const goc=d.env.DB.batch.bind(d.env.DB)
+    const db=gopDocD1({...d.env.DB,batch:((ds:Parameters<typeof goc>[0])=>{soBatch++;return goc(ds)}) as typeof goc})
+    const [a,b]=await Promise.all([db.prepare('SELECT 1 AS n').first<number>('n'),db.batch([db.prepare('SELECT 2 AS n'),db.prepare('SELECT 3 AS n')])])
+    expect(a).toBe(1);expect(b.map(x=>x.results)).toEqual([[{n:2}],[{n:3}]]);expect(soBatch).toBe(1)
+    const ghi=()=>db.batch([db.prepare("INSERT OR IGNORE INTO test_cas(k,n) VALUES('EVENT',1)"),db.prepare("UPDATE test_cas SET n=n+1 WHERE k='P' AND changes()=1")])
+    await ghi();await ghi()
+    expect(d.sql.prepare("SELECT n FROM test_cas WHERE k='P'").get()).toEqual({n:1})
+    expect((await db.prepare("UPDATE test_cas SET n=2 WHERE k='P' RETURNING n").all()).results).toEqual([{n:2}])
+  })
   it('mùa và hồ sơ đọc trong một batch tươi; thay mùa vẫn reset đúng qua CAS',async()=>{
     const d=taoD1That();await loadProfile(d.env,'S1')
     let batch=0
