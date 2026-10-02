@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiểm tốc độ app</title>
+<!-- Thầy 02/10: "bấm load trang ở mọi app mọi chỗ đều mất 10 giây". Trang này tự đo từng chặng trên ĐÚNG máy và ĐÚNG mạng của thầy/em,
+     để biết 10 giây nằm ở đâu: tìm địa chỉ (DNS), kết nối, Cloudflare Pages (tệp app), máy chủ Worker, hay chính app lúc khởi động.
+     Tên bắt đầu bằng "cai-" ⇒ service worker KHÔNG chặn trang này (src/sw.ts · KHONG_DUNG), đi thẳng ra mạng. Không gửi gì đi đâu. -->
+<style>
+  :root { --nen: #f6f7f9; --chu: #1b1f24; --mo: #5b6470; --vien: #d9dee5; --tot: #1f7a3a; --vua: #9a6a00; --cham: #b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --nen: #14171b; --chu: #e8ebef; --mo: #9aa3ad; --vien: #2c3138; --tot: #6fd08c; --vua: #f0c35a; --cham: #ff8a80; } }
+  body { margin: 0; padding: 16px; font: 16px/1.45 system-ui, -apple-system, sans-serif; background: var(--nen); color: var(--chu); }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p { margin: 4px 0 12px; color: var(--mo); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; }
+  td { padding: 8px 4px; border-bottom: 1px solid var(--vien); vertical-align: top; }
+  td.so { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .tot { color: var(--tot); } .vua { color: var(--vua); } .cham { color: var(--cham); }
+  #ket { font-weight: 600; font-size: 17px; margin: 12px 0; }
+  button { font: inherit; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--vien); background: transparent; color: var(--chu); }
+  iframe { width: 1px; height: 1px; border: 0; position: absolute; left: -9999px; }
+  pre { white-space: pre-wrap; font-size: 12px; color: var(--mo); }
+</style>
+</head>
+<body>
+<h1>Kiểm tốc độ app</h1>
+<p>Đang đo, mất khoảng 20–40 giây. Xong thì bấm “Chép kết quả” rồi gửi cho Claude.</p>
+<table id="bang"></table>
+<div id="ket"></div>
+<button id="chep" hidden>Chép kết quả</button>
+<pre id="tho"></pre>
+<script>
+const MAY_CHU = 'https://omr.ttadodaihoc.workers.dev'
+const bang = document.getElementById('bang'), ketEl = document.getElementById('ket'), tho = document.getElementById('tho')
+const dong = []
+const mau = (ms, tot, vua) => ms < 0 ? 'cham' : ms <= tot ? 'tot' : ms <= vua ? 'vua' : 'cham'
+const giay = (ms) => ms < 0 ? 'hỏng' : (ms / 1000).toFixed(2).replace('.', ',') + ' s'
+function ghi(ten, ms, tot = 800, vua = 2500, them = '') {
+  dong.push(`${ten}: ${ms < 0 ? 'hỏng' : Math.round(ms) + ' ms'}${them ? ' (' + them + ')' : ''}`)
+  const tr = document.createElement('tr')
+  tr.innerHTML = `<td>${ten}${them ? `<br><small>${them}</small>` : ''}</td><td class="so ${mau(ms, tot, vua)}">${giay(ms)}</td>`
+  bang.appendChild(tr)
+}
+async function do1(url, tuyChon = {}) {
+  const t = performance.now()
+  try {
+    const r = await fetch(url, { cache: 'no-store', ...tuyChon })
+    const b = await r.arrayBuffer()
+    return { ms: performance.now() - t, kb: b.byteLength / 1024, ok: r.ok || r.status < 500, chu: new TextDecoder().decode(b) }
+  } catch (e) { return { ms: -1, kb: 0, ok: false, chu: '', loi: String(e) } }
+}
+const giua = (a) => { const s = a.filter((x) => x >= 0).sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : -1 }
+
+async function chay() {
+  // 1. Chính trang này: tìm địa chỉ, kết nối, Pages trả byte đầu.
+  const n = performance.getEntriesByType('navigation')[0]
+  if (n) {
+    ghi('Tìm địa chỉ pages.dev (DNS)', n.domainLookupEnd - n.domainLookupStart, 150, 1000)
+    ghi('Kết nối + mã hoá tới Pages', n.connectEnd - n.connectStart, 300, 1500)
+    ghi('Pages trả byte đầu tiên', n.responseStart - n.requestStart, 500, 2000)
+  }
+  // 2. Pages: tệp nhỏ (độ trễ) ×3, trang app, tệp mã lớn nhất (băng thông).
+  const nho = []
+  for (let i = 0; i < 3; i++) nho.push((await do1('/sw-version.json?k=' + Math.random())).ms)
+  ghi('Pages: tệp nhỏ (trung vị 3 lần)', giua(nho), 500, 2000)
+  const trang = await do1('/hs?k=' + Math.random())
+  ghi('Pages: trang app (index.html)', trang.ms, 600, 2500, trang.kb.toFixed(0) + ' KB')
+  const ma = (trang.chu.match(/\/assets\/index-[^"']+\.js/) || [])[0]
+  if (ma) {
+    const r = await do1(ma + '?k=' + Math.random())
+    ghi('Pages: tệp mã chính của app', r.ms, 1500, 4000, `${r.kb.toFixed(0)} KB · ${r.ms > 0 ? (r.kb / (r.ms / 1000)).toFixed(0) : '?'} KB/s`)
+  }
+  // 3. Máy chủ Worker (workers.dev) ×3 — lệnh không cần đăng nhập, không ghi gì.
+  const mc = []
+  for (let i = 0; i < 3; i++) mc.push((await do1(MAY_CHU + '/hs/hoi-thay', { method: 'POST', body: '{}' })).ms)
+  ghi('Máy chủ Worker (trung vị 3 lần)', giua(mc), 800, 2500)
+  // 4. Mở app thật trong khung ẩn: từ lúc bắt đầu tới lúc trang có chữ.
+  const msApp = await new Promise((xong) => {
+    const f = document.createElement('iframe'); const t = performance.now(); let het = false
+    const thoi = setTimeout(() => { het = true; xong(-1) }, 30000)
+    f.src = '/hs?kiem=' + Date.now()
+    const nhin = () => {
+      if (het) return
+      try { const c = f.contentDocument?.querySelector('#root')?.innerText?.trim() || ''; if (c.length > 20) { clearTimeout(thoi); xong(performance.now() - t); return } } catch (e) {}
+      setTimeout(nhin, 100)
+    }
+    document.body.appendChild(f); nhin()
+  })
+  ghi('Mở app học sinh đến khi có chữ', msApp, 2000, 5000)
+  // 5. Bối cảnh máy.
+  const sw = navigator.serviceWorker ? await navigator.serviceWorker.getRegistration('/').catch(() => null) : null
+  const ket = navigator.connection ? `${navigator.connection.effectiveType || '?'} · rtt ${navigator.connection.rtt ?? '?'} ms · ${navigator.connection.downlink ?? '?'} Mb/s` : 'không rõ'
+  dong.push(`Mạng: ${ket}`, `Service worker: ${sw ? (sw.active ? 'đã cài' : 'đang cài') : 'chưa có'}`, `Máy: ${navigator.userAgent}`, `Lúc: ${new Date().toLocaleString('vi-VN')}`)
+  // Kết luận: chặng nào chậm nhất.
+  const pagesCham = giua(nho) > 2000 || (n && n.responseStart - n.requestStart > 2000) || (n && n.domainLookupEnd - n.domainLookupStart > 1000)
+  const mcCham = giua(mc) > 2500
+  ketEl.textContent = pagesCham && mcCham ? 'Chậm ở đường mạng tới Cloudflare (cả Pages lẫn máy chủ) — không phải do app.'
+    : pagesCham ? 'Chậm ở Cloudflare Pages (nơi chứa tệp app) — máy chủ vẫn nhanh.'
+    : mcCham ? 'Chậm ở máy chủ Worker — Pages vẫn nhanh.'
+    : msApp > 5000 ? 'Mạng nhanh nhưng app khởi động chậm — lỗi nằm trong app.'
+    : 'Lần đo này không thấy chậm.'
+  dong.unshift('KẾT LUẬN: ' + ketEl.textContent)
+  tho.textContent = dong.join('\n')
+  document.getElementById('chep').hidden = false
+}
+document.getElementById('chep').onclick = async () => {
+  try { await navigator.clipboard.writeText(tho.textContent); document.getElementById('chep').textContent = 'Đã chép' } catch (e) { alert(tho.textContent) }
+}
+chay()
+</script>
+</body>
+</html>
