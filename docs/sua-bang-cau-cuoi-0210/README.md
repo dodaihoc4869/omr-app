@@ -20,10 +20,12 @@ Hai câu gốc nghi thiếu dữ liệu theo tìm từ khoá: `DB-10-B7-D1-I-73`
 
 - 57/57 kiểm thử liên quan đạt, gồm nạp → phủ → dựng đề → hiển thị bảng, không lộ đáp án và tiến trình câu cuối.
 - Toàn bộ 13.302 kiểm thử: 13.146 đạt, 128 lỗi nền, 28 bỏ qua. So **tên lỗi** với bản gốc 13.294 kiểm thử: không có tên lỗi mới. Xem `doi-chieu-test.json`.
-- TypeScript app, kiểm màu, build Cloudflare và Service Worker 13/13 đạt.
+- TypeScript app và server, kiểm màu, build Cloudflare và Service Worker 13/13 đạt.
 - `bang-truoc.json` / `bang-sau.json`: đo trình duyệt trước/sau; ảnh JPG <150 KB. Chạy lại với Vite cổng 5197 và `node scripts/kiem-bang-trinh-duyet-0210.mjs`.
 - Tự soát thay đổi phần đề dùng chung: chỉ chuyển thêm bảng/ảnh riêng của biến thể, không đổi đáp án, cách chấm, phạm vi kiến thức hoặc ma trận rút đề. Không migration, không ghi đè dữ liệu thật.
 
 ## Phát hành
 
 Đẩy qua quy trình GitHub Actions hiện có: checkout sạch đúng commit → kiểm thử/build → Pages → Worker. Sẽ ghi mã phát hành sau khi Cloudflare xác nhận thành công. Workspace không mở trực tiếp được pages.dev; không coi ảnh thử cục bộ là ảnh production.
+
+ĐÃ PHÁT HÀNH `0df50f772b5dc4f51e807c9cfeb4645a541832ee` lúc 22:30 ngày 02/10 (VN): [Actions 37025804503](https://github.com/dodaihoc4869/omr-app/actions/runs/37025804503) / job110899991492 SUCCESS. Pages `617a7bd5`, Worker `4e9bd097-33f4-445e-8cbe-336f0f6268ff`. Hai bước Cloudflare đều success. Xác nhận bằng nhật ký phát hành; chưa kiểm trình duyệt production do giới hạn mạng workspace. Commit ghi sổ sau đó chỉ tài liệu `[skip ci]`.
