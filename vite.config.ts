@@ -198,6 +198,11 @@ export default defineConfig({
           // 01/10 (bài bổ sung + ảnh trong ô phương án làm vỏ nhích ~2 KB qua trần): màn Chi tiết ca của app phụ huynh nạp LƯỜI
           // (`lazy` trong AppPhuHuynh) và luôn cần mạng để tải ca ⇒ kho chạy-lúc (≈ 8 KB).
           '**/ManChiTietCa-*.{js,css}',
+          // Vòng học v2 (02/10): màn thầy "Gỡ nút thắt" + rút đề v2 (máy thầy) — tải khi mở, không cất sẵn trên máy em.
+          '**/BanGoNutThatScreen-*.{js,css}',
+          // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
+          '**/KhungLoiGiai-*.{js,css}',
+          '**/loi-giai-*.{js,css}',
           // Tải PDF "Câu đã làm" (28/09): jspdf (+ canvg `index.es`, dompurify `purify.es`, html2canvas mà jspdf kéo theo) và html2canvas-pro
           // ≈ 1 MB, chỉ nạp khi em bấm "Tải PDF" (import động, lúc đó đang có mạng) — cất ở kho chạy-lúc, KHÔNG vào precache vỏ.
           '**/{jspdf.es.min,html2canvas,html2canvas-pro.esm,purify.es,index.es,pdf-cau-da-lam}-*.js',
