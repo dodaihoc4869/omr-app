@@ -122,8 +122,9 @@ describe('PHẠM VI RÚT CÂU HỎI LẠI', () => {
   })
 
   it('tên nút nói đúng việc: 3 ca NGẪU NHIÊN, không phải 3 ca gần nhất', () => {
-    expect(TEN_PHAM_VI_HOI_LAI.ba_ca).toBe('3 ca ngẫu nhiên')
-    expect(TEN_PHAM_VI_HOI_LAI.gan_nhat).toBe('Ca gần nhất')
+    // ĐỔI CÓ CHỦ Ý 02/10 (thầy: gộp "Ca gần nhất" + "3 ca ngẫu nhiên" — rút đề v2 lấy câu sai từ hàng chữa lỗi chung, hai nút cho cùng kết quả)
+    expect(TEN_PHAM_VI_HOI_LAI.gan_nhat).toBe('Câu sai đến lịch ôn lại')
+    expect(TEN_PHAM_VI_HOI_LAI.ba_ca).toBe(TEN_PHAM_VI_HOI_LAI.gan_nhat)
   })
 })
 

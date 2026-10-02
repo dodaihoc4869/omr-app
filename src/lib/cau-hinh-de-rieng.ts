@@ -54,19 +54,21 @@ export interface CauHinhDeRieng {
 export type PhamViHoiLai = CauHinhDeRieng['PHAM_VI_HOI_LAI']
 
 /** Đọc phòng thủ giá trị phạm vi cất ở cấu hình ca (máy chủ, IndexedDB). Rỗng/lạ ⇒ `gan_nhat` như cũ. */
+// GỘP 02/10 (thầy: "làm nốt"): rút đề v2 lấy câu chữa lỗi từ hàng chữa lỗi chung ⇒ "3 ca ngẫu nhiên" trùng "Ca gần nhất" ⇒ gộp thành MỘT
+// lựa chọn. Ca cũ đã cất 'ba_ca' đọc thành 'gan_nhat' (cùng kết quả).
 export function docPhamViHoiLai(v: unknown): PhamViHoiLai {
-  return v === 'ba_ca' || v === 'khong' ? v : 'gan_nhat'
+  return v === 'khong' ? v : 'gan_nhat'
 }
 
-/** Ba nút theo đúng thứ tự trên màn Mở ca. */
-export const MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'ba_ca', 'khong']
+/** Hai nút theo đúng thứ tự trên màn Mở ca. */
+export const MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'khong']
 
 /** Bao nhiêu ca được BỐC khi chọn phạm vi `ba_ca`. */
 export const SO_CA_BOC_NGAU_NHIEN = 3
 
 export const TEN_PHAM_VI_HOI_LAI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
-  gan_nhat: 'Ca gần nhất',
-  ba_ca: '3 ca ngẫu nhiên',
+  gan_nhat: 'Câu sai đến lịch ôn lại',
+  ba_ca: 'Câu sai đến lịch ôn lại',
   khong: 'Không rút câu sai',
 }
 
