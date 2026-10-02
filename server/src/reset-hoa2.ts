@@ -74,6 +74,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'v2_hieu_chinh', 'cau_nghi_dap_an',
   // Ngân hàng câu kiến thức nền (thang-tu-go.ts, migration-0210-v2.sql) — học liệu ⇒ GIỮ.
   'cau_nen',
+  // Bàn gỡ nút thắt (ban-go-nut-that.ts, 02/10): em đã đọc lời thầy gỡ nào — hồ sơ học tập ⇒ GIỮ.
+  'loi_go_doc',
   // TU LUYỆN (migration-2909-tu-luyen.sql, 29/09): lượt em tự luyện — hồ sơ học tập của em, độc lập với game ⇒ GIỮ (như sổ su_kien_hoc).
   'tu_luyen_luot', 'tu_luyen_cau',
   // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql, 30/09): ôn cách quãng + câu đã chấm từng câu — cùng hồ sơ Tu luyện ⇒ GIỮ.

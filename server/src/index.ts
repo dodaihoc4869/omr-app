@@ -44,6 +44,7 @@ import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import { ghiCauBoTro } from './cau-bo-tro'
 import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
+import { gvNutThatDs, gvNutThatGo, hsLoiGo } from './ban-go-nut-that'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {hsCauKiem,hsGuiThay,hsLuyenNen,hsLuyenNenNop,hsThangGo,thayDayNen} from './thang-tu-go'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
@@ -3439,6 +3440,8 @@ const boXuLy = {
       if (p === '/hs/luyen-nen') return ra(await hsLuyenNen(env, b))
       if (p === '/hs/luyen-nen/nop') return ra(await hsLuyenNenNop(env, b))
       if (p === '/hs/gui-thay') return ra(await hsGuiThay(env, b))
+      // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): em đọc lời thầy gỡ của câu (theo băm), ghi đã đọc.
+      if (p === '/hs/loi-go') return ra(await hsLoiGo(env, b))
       // TU LUYỆN (29/09, server/src/tu-luyen.ts): 4 chế độ luyện tự do ở Sảnh — máy chủ rút bằng thuật toán cũ, gửi câu KHÔNG đáp án, chấm khi nộp.
       // Độc lập: chỉ ghi `tu_luyen_luot`/`tu_luyen_cau`; không EXP, không su_kien_hoc, không kế hoạch ngày.
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
@@ -3614,6 +3617,9 @@ const boXuLy = {
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
+      // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
+      if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))
+      if (p === '/gv/nut-that/go') return ra(await gvNutThatGo(env, b))
       if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
       if (p === '/gv/v2/tong') return ra(await gvTongV2(env))
       if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))

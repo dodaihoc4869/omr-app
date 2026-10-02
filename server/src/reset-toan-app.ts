@@ -178,6 +178,8 @@ export const BANG_GIU: readonly string[] = [
   'v2_hieu_chinh', 'cau_nghi_dap_an',
   // Ngân hàng câu kiến thức nền (thang-tu-go.ts, migration-0210-v2.sql) — học liệu ⇒ GIỮ.
   'cau_nen',
+  // Bàn gỡ nút thắt (ban-go-nut-that.ts, 02/10): em đã đọc lời thầy gỡ nào — hồ sơ học tập ⇒ GIỮ.
+  'loi_go_doc',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
   'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
   // TU LUYỆN (migration-2909-tu-luyen.sql) — sinh sau lần 21/09: GIỮ cho job ấy = không đụng (job đã xong).

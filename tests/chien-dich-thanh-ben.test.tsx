@@ -29,7 +29,8 @@ const tenMuc = () => [...document.querySelectorAll('.ben-trai-muc')].map((b) => 
 describe('thanh bên theo cờ', () => {
   it('cờ TẮT ⇒ đúng danh sách cũ (Hôm nay, Giao bài tập về nhà, Học sinh hỏi… còn nguyên)', () => {
     render(<ThanhBenTrai />)
-    expect(tenMuc()).toEqual(['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Ngân hàng đề', 'Giao bài tập về nhà', 'Gọi lên bảng', 'Học sinh hỏi', 'Giao đề theo tuần', 'Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): thêm "Gỡ nút thắt" ngay sau "Học sinh hỏi".
+    expect(tenMuc()).toEqual(['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Ngân hàng đề', 'Giao bài tập về nhà', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
     expect(screen.queryByText('Thêm…')).toBeNull()
   })
 
@@ -38,7 +39,8 @@ describe('thanh bên theo cờ', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     const { container } = render(<ThanhBenTrai />)
     expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()
-    expect(tenMuc()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Chiến dịch luyện', 'Chữa trên lớp', 'Học sinh', 'Kho đề', 'Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): "Gỡ nút thắt" hiện cả khi cờ Hóa 2 bật, ngay sau "Chữa trên lớp" (nhóm dạy học); đáy vẫn Kho đề · Cài đặt.
+    expect(tenMuc()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Chiến dịch luyện', 'Chữa trên lớp', 'Gỡ nút thắt', 'Học sinh', 'Kho đề', 'Cài đặt'])
     expect(container.querySelector('.ben-trai-vach[role="separator"]')).toBeTruthy()
     expect(screen.queryByText('Thêm…')).toBeNull()
     expect(container.textContent).not.toContain('10²³')
@@ -53,6 +55,9 @@ describe('thanh bên theo cờ', () => {
     expect(mucDangSang('toancanh', true)).toBe('hocsinh')
     expect(mucDangSang('exammonitor', true)).toBe('lichsuca')
     expect(mucDangSang('toancanh')).toBe('examhub')
+    fireEvent.click(screen.getByRole('button', { name: 'Gỡ nút thắt' }))
+    expect(useAppStore.getState().screen).toBe('bangonutthat')
+    expect(mucDangSang('bangonutthat', true)).toBe('bangonutthat')
   })
 
   it('máy chủ chưa có lệnh ⇒ cờ về TẮT (app như cũ)', async () => {
