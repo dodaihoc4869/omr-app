@@ -54,25 +54,29 @@ export interface CauHinhDeRieng {
 export type PhamViHoiLai = CauHinhDeRieng['PHAM_VI_HOI_LAI']
 
 /** Đọc phòng thủ giá trị phạm vi cất ở cấu hình ca (máy chủ, IndexedDB). Rỗng/lạ ⇒ `gan_nhat` như cũ. */
+// GỘP 02/10 (thầy: "làm nốt"): rút đề v2 lấy câu chữa lỗi từ hàng chữa lỗi chung ⇒ "3 ca ngẫu nhiên" trùng "Ca gần nhất" ⇒ gộp thành MỘT
+// lựa chọn. Ca cũ đã cất 'ba_ca' đọc thành 'gan_nhat' (cùng kết quả).
 export function docPhamViHoiLai(v: unknown): PhamViHoiLai {
-  return v === 'ba_ca' || v === 'khong' ? v : 'gan_nhat'
+  return v === 'khong' ? v : 'gan_nhat'
 }
 
-/** Ba nút theo đúng thứ tự trên màn Mở ca. */
-export const MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'ba_ca', 'khong']
+/** Hai nút theo đúng thứ tự trên màn Mở ca. */
+export const MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'khong']
 
 /** Bao nhiêu ca được BỐC khi chọn phạm vi `ba_ca`. */
 export const SO_CA_BOC_NGAU_NHIEN = 3
 
 export const TEN_PHAM_VI_HOI_LAI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
-  gan_nhat: 'Ca gần nhất',
-  ba_ca: '3 ca ngẫu nhiên',
+  gan_nhat: 'Câu sai đến lịch ôn lại',
+  ba_ca: 'Câu sai đến lịch ôn lại',
   khong: 'Không rút câu sai',
 }
 
 export const GIAI_THICH_PHAM_VI: Record<CauHinhDeRieng['PHAM_VI_HOI_LAI'], string> = {
-  gan_nhat: 'Quét ca gần nhất từng em có nộp: Rút câu theo Cặp đôi Song sinh 50/50 (50% câu sai gốc + 50% câu cùng dạng đổi số) theo chuẩn phân bổ {Phần I: ≤3, Phần II: ≤1, Phần III: ≤1}. 70% còn lại là câu mới nâng đỡ tiến bộ.',
-  ba_ca: 'Quét tích lũy các ca trước đó: Truy vết các dạng bài em sai dai dẳng (lặp lại nhiều lần) để ưu tiên bốc cặp song sinh 50/50, củng cố dứt điểm lỗ hổng kiến thức.',
+  // Rút đề v2 (02/10): câu chữa lỗi lấy từ HÀNG CHỮA LỖI của em (mọi câu sai từ 29/09 ở mọi kênh, đến lịch ôn lại) — "Ca gần nhất" và
+  // "3 ca ngẫu nhiên" cho CÙNG một kết quả; chữ nói đúng điều đó (không hứa điều máy không làm).
+  gan_nhat: 'Câu chữa lỗi lấy từ hàng chữa lỗi của từng em: câu em sai (ca thi đã công bố, game, luyện đề, Lên bảng…) từ 29/09 đang đến lịch ôn lại. Tối đa 30% mỗi phần (ca 14 câu: Phần I ≤ 3, Phần II ≤ 1, Phần III ≤ 1); lượt cần kiểm chứng thì dùng câu song sinh đổi số. Còn lại là câu mới em chưa gặp.',
+  ba_ca: 'Như "Ca gần nhất": từ bản v2, câu chữa lỗi lấy từ hàng chữa lỗi chung của em (mọi kênh từ 29/09), không còn quét riêng theo số ca.',
   khong: 'Không rút câu sai: 14 câu mới theo luật cá nhân hoá (không câu tự luận), bỏ mọi câu em đã gặp ở các ca kiểm tra trước — đề khác hẳn lần trước. Câu song sinh cùng dạng đổi số vẫn được dùng. Kho thiếu mới lấy lại câu em làm lâu nhất, có nhãn "Đã làm ở ca kiểm tra ngày…".',
 }
 
