@@ -103,7 +103,8 @@ describe('máy khách — lệnh', () => {
   it('batDauThi đòi mã bí mật và cho biết đã bấm trước hay chưa', async () => {
     const goi = gia({ ok: true, batDauLuc: '2026-09-07T16:00:00.000Z', daBatTruoc: true })
     const kq = await batDauThi('https://x', 'MAT', '371304')
-    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)).toEqual({ action: 'batDauThi', secret: 'MAT', maCa: '371304' })
+    // RÚT ĐỀ v2 (02/10): lượt đầu thử `/ca/chot-bat-dau`; phản hồi không có dấu `chot` (máy chủ cũ) ⇒ đi lệnh cũ `batDauThi`.
+    expect(JSON.parse((goi.mock.calls.find((c) => String(c[1]?.body ?? '').includes('"action"'))![1] as { body: string }).body)).toEqual({ action: 'batDauThi', secret: 'MAT', maCa: '371304' })
     expect(kq.daBatTruoc).toBe(true)
   })
 

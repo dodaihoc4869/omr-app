@@ -186,10 +186,6 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
     II: Math.min(SO_CAU_14.II, co.II),
     III: Math.min(SO_CAU_14.III, co.III),
   }))
-  // SỐ CÂU RÚT VÀO KHO CỦA CA. Lớn hơn số câu mỗi em thì mỗi em bốc một bộ khác
-  // nhau từ kho đó (máy bốc theo mã ca + số báo danh nên tái tạo lại được khi
-  // chấm lại). Bằng nhau thì cả lớp làm cùng một đề.
-  const [rieng, setRieng] = useState(true)
   const [chonCd, setChonCd] = useState<string[]>([])
   const [chonDang, setChonDang] = useState<LocDang>(LOC_DANG_MAC_DINH)
   // MỨC SAO — thầy chốt 07/09. Chồng lên lọc dạng, không thay nó.
@@ -205,6 +201,12 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   // câu — xem `locKhoToanBoTheoChuyenDeCa`, đã vá riêng, không phải lỗi ở đây).
   // Trả về tắt mặc định: thầy vẫn bật tay được ở nút bên dưới khi muốn dùng.
   const [deRieng, setDeRieng] = useState(false)
+  // SỐ CÂU RÚT VÀO KHO CỦA CA. Lớn hơn số câu mỗi em thì mỗi em bốc một bộ khác
+  // nhau từ kho đó (máy bốc theo mã ca + số báo danh nên tái tạo lại được khi
+  // chấm lại). Bằng nhau thì cả lớp làm cùng một đề.
+  // SỬA 02/10 (Rút đề v2): cờ này đi THEO LỰA CHỌN của thầy. Bản trước để riêng một cờ bật sẵn ⇒ thầy chọn "Cả lớp cùng một đề"
+  // mà kho vẫn bị nhân HE_SO_KHO lần, mỗi em bốc một bộ khác nhau. Cả lớp ⇒ kho đúng bằng số câu mỗi em.
+  const rieng = deRieng
   // HAI NÚT PHẠM VI (thầy chốt 08/09): lấy câu sai của ca gần nhất, hay gộp
   // câu sai của 3 ca gần nhất. Mặc định ca gần nhất — đo đúng buổi vừa dạy.
   // Thêm nút thứ ba "Không rút câu sai" (đặc tả 29/09 mục C). Bấm lại nút ĐANG
@@ -250,12 +252,14 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
       onDoi(null)
       return
     }
-    // CHỮA BÀI: cả lớp cùng một đề, bắt buộc. Mỗi em một bộ riêng là mất sạch
-    // hai chỉ số quyết định câu nào giảng cả lớp (xem đầu lib/rut-de.ts).
+    // KIỂM TRA ĐIỂM YẾU (Rút đề v2, 02/10): BỘ RIÊNG TỪNG EM. Số câu = số câu chẩn đoán theo thời lượng ca (`soCauCua(kq)`);
+    // lúc Bắt đầu, app rút cho từng em từ câu em đã sửa đúng nhưng chưa kiểm chứng và lỗi đến hạn của chính em (ưu tiên câu song
+    // sinh), thiếu thì lấp bằng câu cùng dạng rồi câu mới (src/lib/rut-de-v2.ts). Ca tự bật phòng chờ (cờ đề riêng). Kho chữa
+    // (`idsChua`) vẫn cất cho màn Gọi lên bảng.
     if (lenBang) {
       const kho = soCauCua(kq)
       const chua = rutKhoChua(uv, kq, { phut: phutLamBai, tranhQid: qidCaTruoc, seed })
-      onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua) })
+      onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua), deRieng: true, phamViHoiLai })
       return
     }
     // soCau báo lên là SỐ CÂU MỖI EM LÀM, không phải cỡ kho. Kho lớn hơn thì
@@ -341,7 +345,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             </div>
           )}
           <OThongBao tone="xanh">
-            Cả lớp làm CÙNG một đề — bắt buộc với buổi chữa bài. Có cùng đề thì app mới đếm được bao nhiêu em cùng sai một kiểu, và đó là thứ quyết định câu nào giảng cả lớp thay vì gọi một em lên bảng.
+            Mỗi em một bộ câu riêng: câu em đã sửa đúng nhưng chưa kiểm chứng và câu sai đến lịch ôn lại của chính em, ưu tiên câu song sinh; thiếu thì app lấp bằng câu cùng dạng rồi câu mới, đủ{' '}
+            <b style={SO}>{tongCau(soCauChuaBai)}</b> câu. Ca tự bật phòng chờ; thầy xem trước phân bổ từng em ở màn Theo dõi ca trước khi bấm Bắt đầu thi.
           </OThongBao>
           <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
             <button
@@ -382,7 +387,6 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
               onClick={() => {
                 setSoCau({ I: Math.min(9, co.I), II: Math.min(2, co.II), III: Math.min(3, co.III) })
                 setDeRieng(true)
-                setRieng(true)
               }}
               className="tap-target font-bold"
               style={{
@@ -458,7 +462,6 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 chon={deRieng}
                 onClick={() => {
                   setDeRieng(true)
-                  setRieng(true)
                 }}
                 mau="tim"
               >
@@ -469,7 +472,6 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 chon={!deRieng}
                 onClick={() => {
                   setDeRieng(false)
-                  setRieng(false)
                 }}
               >
                 <Users size={16} aria-hidden="true" style={{ display: 'inline-block', verticalAlign: '-3px', marginRight: 6 }} />

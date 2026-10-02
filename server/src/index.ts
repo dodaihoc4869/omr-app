@@ -76,6 +76,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 //   3. Lệnh của HỌC SINH không đòi mã bí mật (giống Apps Script hiện nay);
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
+import { chotBatDau, lapBoChoEmVaoMuon, loiDenHan } from './rut-de-v2'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
@@ -290,7 +291,7 @@ async function batchGop(env: Env, cau: D1PreparedStatement[], ghi: boolean[] = [
 const COT_CA_EM = 'ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop, cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, mat_khau, chi_nop_3_phut_cuoi, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, pham_vi, de_rieng, danh_sach_chon_json, dong_bo_gio'
 /** SBD đi thẳng vào đường dẫn JSON `$."<sbd>"` được — chỉ chữ/số/gạch; khoá đặc biệt của đối tượng JS thì đi đường đọc trọn (như cũ). */
 const SBD_DUONG_JSON = /^[A-Za-z0-9_-]{1,64}$/
-const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'bb', '__proto__', 'constructor', 'prototype'])
+const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'bb', 'bac', '__proto__', 'constructor', 'prototype'])
 
 export interface DocVaoThi {
   ca: DongCa | null
@@ -354,6 +355,9 @@ export async function docCaVaoThi(env: Env, maCa: string, sbd: string): Promise<
     goiGoc,
   }
 }
+
+/** Khe chờ bản đồ của đường Bắt đầu đời cũ (mốc trước, bản đồ sau): trong khe này em ca đề riêng được bảo thử lại thay vì cắt theo băm. */
+const CHO_BAN_DO_MS = 20_000
 
 async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
@@ -455,7 +459,22 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   //     5,69 xuống 2,56 hôm 10/09). Trước 12/09 chỗ này lùi về Apps Script;
   //     Apps Script đã cắt, nên nay phải TỪ CHỐI hẳn thay vì phát đề sai.
   const goiGoc = await doc.goiGoc()
-  const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  let goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  // RÚT ĐỀ v2 (02/10): ca đề riêng mà bản đồ CHƯA có em ⇒ KHÔNG cắt theo băm im lặng.
+  //   · Vừa bấm Bắt đầu (< 20 giây) mà bản đồ còn trống ⇒ máy thầy đời cũ đang đẩy bản đồ bằng lệnh thứ hai: bảo máy em thử lại sau
+  //     1,5 giây (chỉ em này chờ, cả phòng không bị chặn). Đường mới `/ca/chot-bat-dau` ghi mốc + bản đồ một lệnh nên không còn khe này.
+  //   · Còn lại (em vào phòng sau khi chốt, hoặc bản đồ thiếu em) ⇒ lấp riêng NGAY tại máy chủ bằng thang lấp và gộp vào bản đồ.
+  if (Number(ca.de_rieng ?? 0) === 1 && !goiRieng) {
+    const batDauMs = Date.parse(String(ca.bat_dau_thi_luc ?? ''))
+    if (!goiGoc && Number.isFinite(batDauMs) && now - batDauMs >= 0 && now - batDauMs < CHO_BAN_DO_MS) {
+      return ra({ ok: false, lyDo: 'cho_bo_cau', thuLaiSauMs: 1500, thoiGianPhut: ca.thoi_gian_phut ?? 45 })
+    }
+    const lap = await lapBoChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch((e) => {
+      console.error('[vao-thi] lấp bộ câu riêng lỗi:', e)
+      return null
+    })
+    if (lap) goiRieng = lap
+  }
   if (Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng) {
     await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), 'thieu_bo_cau').catch(() => {})
     return ra({ ok: false, lyDo: 'thieu_bo_cau', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
@@ -3561,6 +3580,9 @@ const boXuLy = {
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
+      // RÚT ĐỀ v2 (02/10, server/src/rut-de-v2.ts): chốt Bắt đầu MỘT lệnh (mốc + bản đồ); lỗi đến hạn theo em cho máy thầy chạy thử.
+      if (p === '/ca/chot-bat-dau') return ra({ ...(await chotBatDau(env, b)), chot: true })
+      if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
       if (p === '/ca/xac-nhan') {
         const maCa = String(b.maCa ?? '')
         const ca = await docCa(env, maCa)

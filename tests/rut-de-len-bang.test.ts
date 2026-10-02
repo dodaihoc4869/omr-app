@@ -170,13 +170,15 @@ describe('chọn câu cho buổi chữa bài', () => {
 })
 
 describe('khối Bộ câu ra đề — chế độ thứ ba', () => {
-  it('có chip "Kiểm tra điểm yếu" và ép cả lớp cùng một đề', async () => {
+  // RÚT ĐỀ v2 (02/10, thầy chốt): "Kiểm tra điểm yếu" ⇒ BỘ RIÊNG TỪNG EM (thay luật cũ "cả lớp cùng một đề").
+  it('có chip "Kiểm tra điểm yếu" và chuyển ca sang đề riêng từng em, đủ số câu chẩn đoán', async () => {
     const ma = (await import('../src/components/KhoiRutDe.tsx?raw')).default
     expect(ma).toContain('Kiểm tra điểm yếu')
     expect(ma).toContain("setCheDo('lenbang')")
-    // soCau báo lên = ĐÚNG cỡ kho đã rút ⇒ mỗi em làm hết ⇒ cả lớp cùng một đề
-    expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua) })')
-    expect(ma).toContain('Cả lớp làm CÙNG một đề')
+    // soCau báo lên = ĐÚNG cỡ bộ chẩn đoán; cờ đề riêng bật ⇒ lúc Bắt đầu mỗi em một bộ theo lỗi của chính em
+    expect(ma).toContain('onDoi({ ids: moiIdDaRut(kq), soCau: kho, lenBang: true, idsChua: moiIdDaRut(chua), deRieng: true, phamViHoiLai })')
+    expect(ma).not.toContain('Cả lớp làm CÙNG một đề')
+    expect(ma).toContain('Mỗi em một bộ câu riêng')
   })
 
   it('số câu tính theo thời lượng ca chứ không phải con số cứng', async () => {
