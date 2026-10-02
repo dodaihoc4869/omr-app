@@ -176,6 +176,8 @@ export const BANG_GIU: readonly string[] = [
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
   'v2_hieu_chinh', 'cau_nghi_dap_an',
+  // Ngân hàng câu kiến thức nền (thang-tu-go.ts, migration-0210-v2.sql) — học liệu ⇒ GIỮ.
+  'cau_nen',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
   'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
   // TU LUYỆN (migration-2909-tu-luyen.sql) — sinh sau lần 21/09: GIỮ cho job ấy = không đụng (job đã xong).

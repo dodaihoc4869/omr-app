@@ -12,3 +12,6 @@ CREATE INDEX IF NOT EXISTS cau_kiem_lam_em ON cau_kiem_lam(sbd, qid);
 -- GĐ5 tự hoàn thiện hằng tuần (tu-hoan-thien.ts): nhật ký hiệu chỉnh luật + câu nghi sai đáp án.
 CREATE TABLE IF NOT EXISTS v2_hieu_chinh (tuan TEXT PRIMARY KEY, n_kiem INTEGER NOT NULL, n_sai_lai INTEGER NOT NULL, ty_le REAL, tham_so_cu TEXT, tham_so_moi TEXT, luc TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS cau_nghi_dap_an (qid TEXT PRIMARY KEY, so_lan INTEGER NOT NULL, so_sai INTEGER NOT NULL, ty_le_sai REAL NOT NULL, trang_thai TEXT NOT NULL DEFAULT 'nghi', ghi_chu TEXT, luc TEXT NOT NULL);
+-- Ngân hàng câu kiến thức nền của thang tự gỡ (server/src/thang-tu-go.ts): mỗi câu một nhãn nền, nạp qua /kho/nen/day.
+CREATE TABLE IF NOT EXISTS cau_nen (id TEXT PRIMARY KEY, nhan TEXT NOT NULL, muc INTEGER NOT NULL DEFAULT 1, kieu TEXT NOT NULL, de TEXT NOT NULL, pa_json TEXT, dap_an TEXT NOT NULL, gia_tri_dung TEXT, giai_json TEXT, meo TEXT, cap_nhat_luc TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS cau_nen_nhan ON cau_nen(nhan, muc);

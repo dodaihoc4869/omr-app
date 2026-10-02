@@ -22,9 +22,10 @@ import { POLICY_VERSION } from './ho-so-cau-hinh'
 export const MUC_DICH_XEM_LOI_GIAI = 'xem_loi_giai'
 
 // `dau_gio` = Kiểm tra đầu giờ của mục Lên bảng (server/src/dau-gio.ts, 29/09): Đạt 1 / Chưa đạt 0, mã nguồn = mã buổi học.
-export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng' | 'dau_gio'
+// `nen` = câu luyện kiến thức nền của thang tự gỡ (server/src/thang-tu-go.ts, v2 02/10): qid 'nen:<id>', mã nguồn = câu đang gỡ, luôn `assisted`.
+export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng' | 'dau_gio' | 'nen'
 
-export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng', 'dau_gio']
+export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng', 'dau_gio', 'nen']
 
 /** Hỗ trợ đã cấp cho lần làm này (CNH-1.0 04 §2). */
 export type Assistance = 'none' | 'assisted' | 'unknown'

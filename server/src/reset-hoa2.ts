@@ -72,6 +72,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
   'v2_hieu_chinh', 'cau_nghi_dap_an',
+  // Ngân hàng câu kiến thức nền (thang-tu-go.ts, migration-0210-v2.sql) — học liệu ⇒ GIỮ.
+  'cau_nen',
   // TU LUYỆN (migration-2909-tu-luyen.sql, 29/09): lượt em tự luyện — hồ sơ học tập của em, độc lập với game ⇒ GIỮ (như sổ su_kien_hoc).
   'tu_luyen_luot', 'tu_luyen_cau',
   // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql, 30/09): ôn cách quãng + câu đã chấm từng câu — cùng hồ sơ Tu luyện ⇒ GIỮ.
