@@ -238,6 +238,13 @@ export interface TuyChonKeHoach {
    * trừ đi phần đã làm, không cộng dồn thêm câu mới. Vắng ⇒ 0.
    */
   moiDaLamHomNay?: number
+  /**
+   * VÒNG HỌC v2 — NHỊP RIÊNG TỪNG EM (thầy 02/10: "khắc phục luôn giới hạn này"): tỉ lệ trần nợ khi chiến dịch còn câu mới. Em có nhiều câu nợ đến
+   * hạn so với số câu em thực làm mỗi ngày ⇒ tỉ lệ cao hơn (trả nợ trước, câu mới chậm lại). Vắng ⇒ TI_LE_TRAN_NO (50 %).
+   */
+  tiLeNo?: number
+  /** VÒNG HỌC v2 — KÊNH RIÊNG: em không chơi Đoàn (7 ngày) mà chơi Đảo ⇒ câu ôn Phần I/III cũng vào Đảo (không bao giờ kẹt ở kênh em không mở). */
+  onVaoDao?: boolean
 }
 
 export interface KeHoachNgay {
@@ -578,7 +585,7 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const duyTri = xepOn(song.filter((c) => nguonCua(c) === 'duy_tri' && denLich(c)))
 
   // Trần nợ 50% khi chiến dịch còn câu mới chưa giao; không chiến dịch (hoặc hết câu mới) ⇒ nợ tới 100%.
-  const tranNo = coChienDich && moi.length > 0 ? Math.floor(tran * TI_LE_TRAN_NO) : tran
+  const tranNo = coChienDich && moi.length > 0 ? Math.floor(tran * Math.min(0.9, Math.max(TI_LE_TRAN_NO, tc.tiLeNo ?? TI_LE_TRAN_NO))) : tran
   const layNo = Math.min(no.length, tranNo)
   // RẢI ĐỀU (thầy 30/09): quota hôm nay tính trên CẢ câu mới đã làm hôm nay (lập lại giữa ngày) rồi trừ phần đã làm (đã làm đủ ⇒ 0);
   // lập đầu ngày (chưa làm) ⇒ ceil(...) ≥ 1 khi còn câu mới.
@@ -607,8 +614,8 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const suc = sucEmCua(tc.hangChung)
   const loai = (c: CauSrs) => phanLoaiDanXen(c.qid, tt(c), c)
   return {
-    dao: danXenNgay([...chonOn.filter((c) => c.phan === 'II'), ...chonMoi].map(loai), suc).map((x) => x.qid),
-    doan: danXenNgay(chonOn.filter((c) => c.phan !== 'II').map(loai), suc).map((x) => x.qid),
+    dao: danXenNgay([...chonOn.filter((c) => tc.onVaoDao || c.phan === 'II'), ...chonMoi].map(loai), suc).map((x) => x.qid),
+    doan: tc.onVaoDao ? [] : danXenNgay(chonOn.filter((c) => c.phan !== 'II').map(loai), suc).map((x) => x.qid),
     huyetChien,
     khoiLuong,
     sucChua: D * tranNgay,

@@ -17,3 +17,5 @@ CREATE TABLE IF NOT EXISTS cau_nen (id TEXT PRIMARY KEY, nhan TEXT NOT NULL, muc
 CREATE INDEX IF NOT EXISTS cau_nen_nhan ON cau_nen(nhan, muc);
 -- Bàn gỡ nút thắt (server/src/ban-go-nut-that.ts): em đã đọc lời thầy gỡ nào, lúc nào.
 CREATE TABLE IF NOT EXISTS loi_go_doc (sbd TEXT NOT NULL, go_id TEXT NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (sbd, go_id, luc));
+-- Cá nhân hoá sâu (ca-nhan-hoa-v2.ts): ngưỡng luật đóng lỗi RIÊNG từng em, tính hằng tuần.
+CREATE TABLE IF NOT EXISTS v2_tham_so_em (sbd TEXT PRIMARY KEY, tham_so_json TEXT NOT NULL, ty_le REAL, n_kiem INTEGER NOT NULL, n_sai_lai INTEGER NOT NULL, cap_nhat_luc TEXT NOT NULL);

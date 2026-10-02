@@ -7,6 +7,7 @@
 //      thầy (hoặc máy soạn) tính lại rồi chốt qua `/gv/cau-nghi/xu-ly`.
 // Chỉ đọc sổ + ghi 3 bảng/khoá riêng (chỉ thêm). Không đổi điểm, không đổi kho.
 import type { Env } from './kieu'
+import { damBaoBangThamSoEm, thamSoRieng, TY_LE_CHUNG_MAC_DINH } from './ca-nhan-hoa-v2'
 import { phatLaiLoi, tachSongSinh, cachNgay, THAM_SO_GOC, TU_NGAY, type LanLamLoi, type ThamSoLuat } from './loi-hoc-luat'
 
 type Row = Record<string, unknown>
@@ -131,7 +132,12 @@ export async function chayTuHoanThien(env: Env, nowMs: number): Promise<Record<s
   const cu = await docThamSo(env)
   const { theo, doc } = await docSoGon(env)
   let kiem = 0, saiLai = 0
-  for (const [k, ls] of theo) { const r = luotKiemDuyTri(ls, doc.get(k) ?? [], false, cu); kiem += r.kiem; saiLai += r.saiLai }
+  const theoEm = new Map<string, { kiem: number; saiLai: number }>()
+  for (const [k, ls] of theo) {
+    const r = luotKiemDuyTri(ls, doc.get(k) ?? [], false, cu); kiem += r.kiem; saiLai += r.saiLai
+    const sbd = k.slice(0, k.indexOf('|')), e = theoEm.get(sbd) ?? { kiem: 0, saiLai: 0 }
+    e.kiem += r.kiem; e.saiLai += r.saiLai; theoEm.set(sbd, e)
+  }
   const moi = deXuatThamSo(cu, kiem, saiLai)
   const nay = new Date(nowMs).toISOString()
   const lenh = [env.DB.prepare('INSERT OR IGNORE INTO v2_hieu_chinh (tuan, n_kiem, n_sai_lai, ty_le, tham_so_cu, tham_so_moi, luc) VALUES (?,?,?,?,?,?,?)')
@@ -142,19 +148,35 @@ export async function chayTuHoanThien(env: Env, nowMs: number): Promise<Record<s
   for (const c of nghi) lenh.push(env.DB.prepare(`INSERT INTO cau_nghi_dap_an (qid, so_lan, so_sai, ty_le_sai, trang_thai, luc) VALUES (?,?,?,?, 'nghi', ?)
     ON CONFLICT(qid) DO UPDATE SET so_lan = excluded.so_lan, so_sai = excluded.so_sai, ty_le_sai = excluded.ty_le_sai, luc = excluded.luc
     WHERE cau_nghi_dap_an.trang_thai = 'nghi'`).bind(c.qid, c.soLan, c.soSai, c.tyLeSai, nay))
+  // CÁ NHÂN HOÁ (02/10): ngưỡng luật RIÊNG từng em có lượt kiểm duy trì — co về tỉ lệ chung (ca-nhan-hoa-v2.ts `thamSoRieng`).
+  await damBaoBangThamSoEm(env)
+  const tyLeChung = kiem >= 30 ? saiLai / kiem : TY_LE_CHUNG_MAC_DINH
+  let soEm = 0
+  for (const [sbd, e] of theoEm) {
+    if (e.kiem < 1) continue
+    const r = thamSoRieng(e.kiem, e.saiLai, tyLeChung, moi)
+    lenh.push(env.DB.prepare(`INSERT INTO v2_tham_so_em (sbd, tham_so_json, ty_le, n_kiem, n_sai_lai, cap_nhat_luc) VALUES (?,?,?,?,?,?)
+      ON CONFLICT(sbd) DO UPDATE SET tham_so_json = excluded.tham_so_json, ty_le = excluded.ty_le, n_kiem = excluded.n_kiem, n_sai_lai = excluded.n_sai_lai, cap_nhat_luc = excluded.cap_nhat_luc`)
+      .bind(sbd, JSON.stringify(r.ts), r.tyLe, e.kiem, e.saiLai, nay))
+    soEm++
+  }
   for (let i = 0; i < lenh.length; i += 100) await env.DB.batch(lenh.slice(i, i + 100))
-  return { chay: true, tuan, kiem, saiLai, thamSo: moi, cauNghi: nghi.length }
+  return { chay: true, tuan, kiem, saiLai, thamSo: moi, cauNghi: nghi.length, emRieng: soEm }
 }
 
 /** `/gv/v2/tong` (thầy): tham số đang dùng, 8 tuần hiệu chỉnh gần nhất, câu đang nghi sai đáp án. */
 export async function gvTongV2(env: Env): Promise<Record<string, unknown>> {
   await damBaoBangTuHoanThien(env)
-  const [ts, hc, ng] = await Promise.all([
+  await damBaoBangThamSoEm(env)
+  const [ts, hc, ng, em] = await Promise.all([
     docThamSo(env),
     env.DB.prepare('SELECT * FROM v2_hieu_chinh ORDER BY tuan DESC LIMIT 8').all<Row>(),
     env.DB.prepare("SELECT * FROM cau_nghi_dap_an WHERE trang_thai = 'nghi' ORDER BY ty_le_sai DESC LIMIT 100").all<Row>(),
+    // Em có ngưỡng riêng, hay quên nhất trước (để thầy biết em nào được kiểm lại sớm hơn).
+    env.DB.prepare('SELECT t.sbd, h.ho_ten, t.ty_le, t.n_kiem, t.n_sai_lai, t.tham_so_json FROM v2_tham_so_em t LEFT JOIN hoc_sinh h ON h.sbd = t.sbd ORDER BY t.ty_le DESC LIMIT 30').all<Row>(),
   ])
-  return { ok: true, thamSo: ts, hieuChinh: hc.results ?? [], cauNghi: ng.results ?? [] }
+  const emRieng = (em.results ?? []).map((x) => { let t: Partial<ThamSoLuat> = {}; try { t = JSON.parse(str(x.tham_so_json)) } catch { /* bỏ */ } return { sbd: str(x.sbd), hoTen: str(x.ho_ten), tyLeSaiLai: Number(x.ty_le), soLuotKiem: Number(x.n_kiem), cachSaiCuoi: t.cachSaiCuoi, mocDuyTri: t.mocDuyTri } })
+  return { ok: true, thamSo: ts, hieuChinh: hc.results ?? [], cauNghi: ng.results ?? [], emRieng }
 }
 /** `/ca/cau-nghi-dap-an` (thầy): qid đang nghi ⇒ rút đề ca thi tạm bỏ. */
 export async function dsCauNghi(env: Env): Promise<{ ok: true; qid: string[] }> {

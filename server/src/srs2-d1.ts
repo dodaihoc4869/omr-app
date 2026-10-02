@@ -4,6 +4,7 @@ import { gopDocD1 } from './doc-d1-theo-luot'
 //   {"bat":true}                         ⇒ toàn trung tâm
 //   {"bat":true,"lop":["12A1"]}          ⇒ chỉ các lớp này
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
+import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
 import type { KetQuaLoi } from './loi-hoc-luat'
@@ -458,7 +459,7 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
-  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), docThamSo(env)])
+  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), docThamSoEm(env, sbd).then(async (r) => r ?? docThamSo(env)).catch(() => docThamSo(env))])
   const dangChay = chienDichDangChay(ds, homNay)
   const hanTheoQid = new Map<string, string>()
   // Thầy 28/09: "khi giao chiến dịch đầu tiên tất cả không có câu ôn, không được lấy câu ôn trước đó" ⇒ câu của một chiến dịch chỉ tính lần làm TỪ LÚC GIAO chiến dịch ấy.
@@ -860,7 +861,15 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
   const tuyChonGoc = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay, raiDeu: cd.raiDeu } : {}) }
   // Bốc câu mới cá nhân hoá (thầy 28/09): hạng theo dạng CHỈ đọc khi thật sự lập kế hoạch (kế hoạch đã chốt thì khỏi đọc).
   // Lỗi đọc hồ sơ ⇒ không có hạng ⇒ hành vi cũ (dễ trước), không làm hỏng kế hoạch.
-  const tuyChonLap = async (): Promise<TuyChonKeHoach> => ({ ...tuyChonGoc, ...((await docHangEm(env, sbd, hoSo).catch(() => null)) ?? {}) })
+  // CÁ NHÂN HOÁ (02/10): nhịp học riêng (tỉ lệ trần nợ) + kênh riêng (em không mở Đoàn ⇒ câu ôn vào Đảo) — ca-nhan-hoa-v2.ts.
+  //   Chỉ đo khi THẬT SỰ lập kế hoạch (kế hoạch đã chốt hôm nay ⇒ không tốn truy vấn nào ở giờ cao điểm).
+  const rieng = async (): Promise<Partial<TuyChonKeHoach>> => {
+    const nk = await docNhipKenh(env, sbd, nowMs)
+    if (!nk) return {}
+    const noDenHan = hoSo.cau.filter((c) => c.nguon === 'no_cu' && (hoSo.tt.get(c.qid)?.henOn ?? '9') <= ngay).length
+    return { tiLeNo: tiLeNoRieng(noDenHan, nk.nhipNgay), ...(onVaoDaoRieng(nk.luotDao, nk.luotDoan) ? { onVaoDao: true } : {}) }
+  }
+  const tuyChonLap = async (): Promise<TuyChonKeHoach> => ({ ...tuyChonGoc, ...(await rieng()), ...((await docHangEm(env, sbd, hoSo).catch(() => null)) ?? {}) })
   if (cu) {
     let kh = tuDong(cu, ngay, dem)
     // Thầy 28/09 ("đã giao chiến dịch test nhưng không bấm vào làm được"): kế hoạch chốt LÚC CHƯA CÓ chiến dịch (hoặc chiến dịch khác)

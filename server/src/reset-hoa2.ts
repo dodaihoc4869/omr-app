@@ -71,7 +71,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
-  'v2_hieu_chinh', 'cau_nghi_dap_an',
+  'v2_hieu_chinh', 'cau_nghi_dap_an', 'v2_tham_so_em',
   // Ngân hàng câu kiến thức nền (thang-tu-go.ts, migration-0210-v2.sql) — học liệu ⇒ GIỮ.
   'cau_nen',
   // Bàn gỡ nút thắt (ban-go-nut-that.ts, 02/10): em đã đọc lời thầy gỡ nào — hồ sơ học tập ⇒ GIỮ.

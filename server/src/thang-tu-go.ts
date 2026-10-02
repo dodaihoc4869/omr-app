@@ -10,6 +10,7 @@
 //   Thiếu điều kiện nào thì trả đúng câu chỉ việc còn thiếu ("Em đọc nốt bước 3", "Em thử câu tương tự này trước"…).
 // Mọi chấm ở MÁY CHỦ: đáp án câu kiểm / câu nền không xuống máy em trước khi em trả lời. Bước đánh số từ 0 (như `cau_kiem.buoc`,
 // `nut_that.buoc`, `loi_go.buoc`); chữ hiển thị cộng 1. Bảng `cau_nen` CHỈ THÊM, tự tạo lần đầu dùng; bản SQL: migration-0210-v2.sql.
+import { docNguongLuot } from './ca-nhan-hoa-v2'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { coCaDangMo } from './bi-a'
@@ -185,7 +186,7 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
     .map((x) => str(x.qid)).filter(Boolean)
   const qids = [...new Set([qid, ...cungNoiDung])]
   const json = JSON.stringify(qids)
-  const [so, hoi, doc, kiem, the, go, caMo, daDocGo] = await Promise.all([
+  const [so, hoi, doc, kiem, the, go, caMo, daDocGo, giayMoiBuoc] = await Promise.all([
     docSoHoc(env, sbd, qids, qid),
     env.DB.prepare('SELECT luc FROM loi_giai_hoi WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) ORDER BY luc').bind(sbd, json).all<Obj>().catch(() => ({ results: [] as Obj[] })),
     env.DB.prepare('SELECT giay, su_kien_json FROM doc_loi_giai WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))').bind(sbd, json).all<Obj>().catch(() => ({ results: [] as Obj[] })),
@@ -196,6 +197,8 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
     coCaDangMo(env, sbd, nay),
     // Đọc lời gỡ qua `/hs/loi-go` (ban-go-nut-that.ts ghi `loi_go_doc`) cũng tính là đã đọc — ngoài đường mở bước trong khung.
     env.DB.prepare('SELECT DISTINCT go_id FROM loi_go_doc WHERE sbd = ?').bind(sbd).all<Obj>().catch(() => ({ results: [] as Obj[] })),
+    // CÁ NHÂN HOÁ (02/10): ngưỡng "lướt" theo tốc độ đọc thường ngày của chính em (ca-nhan-hoa-v2.ts), không 5 giây cho mọi em.
+    docNguongLuot(env, sbd).catch(() => GIAY_MOI_BUOC),
   ])
   const goDaDoc = new Set((daDocGo.results ?? []).map((x) => str(x.go_id)))
   const lucHoi = (hoi.results ?? []).map((x) => str(x.luc)).filter(Boolean)
@@ -224,7 +227,7 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
   const soKiemDaTraLoi = buocKiem.filter((i) => daTraLoi.has(i)).length
   const tiLeKiem = buocKiem.length ? soKiemDaTraLoi / buocKiem.length : 1
   const chuaMo = Array.from({ length: n }, (_, i) => i).find((i) => !moBuoc.has(i))
-  const luot = giayDoc < GIAY_MOI_BUOC * n
+  const luot = giayDoc < giayMoiBuoc * n
   const c2: MucCong = {
     ma: 'doc_het',
     dat: chuaMo === undefined && tiLeKiem >= NGUONG_KIEM && !luot,
