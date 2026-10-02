@@ -27,6 +27,8 @@ export type ScreenId =
   | 'chiendich'
   // LỜI GIẢI TỪNG BƯỚC (29/09): thầy duyệt hồ sơ lời giải theo đề trước khi giao.
   | 'duyetloigiai'
+  // BÀN GỠ NÚT THẮT (Vòng học v2, 02/10): thẻ câu em đã đi hết thang tự gỡ mà vẫn vướng — thầy gỡ bước cuối.
+  | 'bangonutthat'
 
 export interface ScannedSheet {
   id: string

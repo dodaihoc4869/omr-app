@@ -3,7 +3,7 @@
 // hoặc câu thuộc đề của ca chưa công bố ⇒ trả lời lý do, không trả lời giải. Có hồ sơ từng bước ⇒ mở khung; chưa có ⇒ báo "thầy đang soạn" (thầy chốt 29/09: không hiện lời giải ngắn).
 // `onHoi`: gọi khi lời giải đã mở (game dùng để tính câu này là "có trợ giúp" — không nhận thưởng).
 import { useState } from 'react'
-import { docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai } from '../../lib/loi-giai-api'
+import { docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
 import KhungLoiGiai from './KhungLoiGiai'
 import './loi-giai.css'
 
@@ -12,7 +12,7 @@ export const CHU_DANG_SOAN = 'Thầy đang soạn lời giải từng bước ch
 export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: string | null; nguon: string; onHoi?: () => void; gon?: boolean }) {
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
-  const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai } | null>(null)
+  const [mo, setMo] = useState<{ cau: CauChoKhung; hoSo: HoSoLoiGiai; kiem?: KiemKhung } | null>(null)
   if (!qid || !docTokenHs()) return null
   const bam = async () => {
     setDangTai(true)
@@ -22,7 +22,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
     if (!r.ok) { setLoi(r.loi); return }
     // Thầy chốt 29/09: câu CHƯA có lời giải từng bước ⇒ KHÔNG hiện lời giải ngắn của kho, chỉ báo đang soạn (không tính "có trợ giúp").
     if (!r.hoSo) { setLoi(CHU_DANG_SOAN); return }
-    setMo({ cau: r.cau, hoSo: r.hoSo })
+    setMo({ cau: r.cau, hoSo: r.hoSo, kiem: r.kiem })
     onHoi?.()
   }
   return (
@@ -31,7 +31,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
         {dangTai ? 'Đang mở…' : 'Hỏi thầy'}
       </button>
       {loi && <span className="lg-loi" role="status">{loi}</span>}
-      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} nguon={nguon} onDong={() => setMo(null)} />}
+      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
     </div>
   )
 }

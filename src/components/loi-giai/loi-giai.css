@@ -72,3 +72,33 @@ button.lg-nut.lg-nut--hoi {
   box-shadow: none; transform: none;
 }
 button.lg-nut.lg-nut--hoi:disabled { opacity: 0.6; cursor: progress; }
+
+/* THANG TỰ GỠ (Vòng học v2 GĐ2): thanh dưới hộp lời giải + ô Gửi thầy + hộp Luyện kiến thức nền. */
+.lg-thang {
+  display: flex; flex-direction: column; gap: 8px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--m3-outline-variant, transparent); background: var(--m3-surface-container); max-height: 55vh; overflow: auto; overscroll-behavior: contain;
+}
+.lg-thang-dau { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lg-thang-bac { font-size: 14px; font-weight: 700; color: var(--m3-primary); }
+.lg-thang-viec { font-size: 15px; line-height: 1.45; color: var(--m3-on-surface); }
+.lg-gui { display: flex; flex-direction: column; gap: 8px; max-width: 760px; }
+.lg-gui label { font-size: 14px; font-weight: 600; }
+.lg-gui textarea { resize: vertical; min-height: 88px; line-height: 1.5; }
+.lg-dem-chu { font-size: 13px; color: var(--m3-on-surface-variant, var(--m3-on-surface)); font-variant-numeric: tabular-nums; }
+.lg-an { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.lg-hop-nen {
+  position: fixed; inset: 0; z-index: 100003; display: flex; align-items: flex-end; justify-content: center;
+  background: color-mix(in srgb, var(--m3-scrim, var(--m3-on-surface)) 40%, transparent); overscroll-behavior: contain;
+}
+.lg-hop-nen-than {
+  display: flex; flex-direction: column; width: 100%; max-width: 760px; max-height: 88vh; border-radius: 24px 24px 0 0; overflow: hidden;
+  background: var(--m3-surface); color: var(--m3-on-surface);
+}
+.lg-nen-cau { display: flex; flex-direction: column; gap: 12px; }
+.lg-nen-so { font-size: 14px; font-weight: 700; color: var(--m3-primary); font-variant-numeric: tabular-nums; }
+.lg-nen-pa { display: flex; flex-direction: column; gap: 8px; }
+.lg-nen-pa .lg-loc-nut { text-align: left; border-radius: 12px; padding: 8px 14px; font-size: 15px; }
+.lg-kq { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; }
+.lg-kq--dung { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.lg-kq--sai { background: var(--m3-error-container); color: var(--m3-on-error-container); }
+.lg-nen-xong { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }

@@ -214,8 +214,11 @@ describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và m�
     }
     expect(coDapAn(a[6])).toBe(true)
     expect(coDapAn(b[6])).toBe(true)
-    const { lenBang: _a, ...conLaiA } = a[7] as Record<string, unknown>
-    const { lenBang: _b, ...conLaiB } = b[7] as Record<string, unknown>
+    // RÚT ĐỀ v2 (02/10, thầy chốt): "Kiểm tra điểm yếu" ⇒ BỘ RIÊNG TỪNG EM ⇒ ca bật cờ đề riêng (kéo theo phòng chờ). Hai cờ ấy đổi
+    // theo chế độ là ĐÚNG thiết kế; mọi tuỳ chọn khác vẫn không được đổi.
+    const { lenBang: _a, deRieng: drA, phongCho: pcA, ...conLaiA } = a[7] as Record<string, unknown>
+    const { lenBang: _b, deRieng: drB, phongCho: pcB, ...conLaiB } = b[7] as Record<string, unknown>
+    expect([drA, pcA, drB, pcB]).toEqual([true, true, false, false])
     expect(conLaiA).toEqual(conLaiB)
   }, HAN_PHEP_KIEM)
 })

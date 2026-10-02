@@ -337,11 +337,13 @@ describe('Sổ nợ trên D1 thật', () => {
     const id = await giao(env, 'DE2', '2026-10-09', T0, 6, false)
     const bang = await gvChienDich(env, { action: 'bang', id }, T0)
     expect((bang.noCu as { sbd: string; soCau: number; soNgay: number }[])).toMatchObject([{ sbd: 'S1', soCau: 10, soNgay: 7 }])
-    // Kế hoạch em: 80 lượt (có 20 lượt nợ cũ) > 0,9 × 10 × 6 ⇒ Quá tải (trần 12); nợ ≤ 50%.
+    // Kế hoạch em: 80 lượt (có 20 lượt nợ cũ) > 0,9 × 10 × 6 ⇒ Quá tải (trần 12).
+    // ĐỔI CÓ CHỦ Ý 02/10 (thầy: "khắc phục luôn giới hạn này" — NHỊP HỌC RIÊNG, server/src/ca-nhan-hoa-v2.ts `tiLeNoRieng`): S1 có 10 câu nợ
+    // đến hạn mà 14 ngày chỉ làm 10 câu (< 5 câu/ngày) ⇒ nợ > nhịp ⇒ trần nợ 65 % (trước: cố định 50 % ⇒ 6) ⇒ floor(12 × 0,65) = 7.
     const { kh } = await layKeHoachHomNay(env, 'S1', T0)
     expect(kh.huyetChien).toBe(true)
     expect(kh.tong).toBe(12)
-    expect([...kh.dao, ...kh.doan].filter((q) => q.startsWith('Q')).length).toBe(6)
+    expect([...kh.dao, ...kh.doan].filter((q) => q.startsWith('Q')).length).toBe(7)
   })
 
   it('RẢI ĐỀU (mặc định, phản biện vòng 2 #110): Quá tải trần 12 ⇒ 5 câu mới (quota ⌈30 / (10 − 3)⌉) + nợ lấp NỐT lượt dư (7 nợ) — không bỏ trống lượt khi còn nợ', async () => {

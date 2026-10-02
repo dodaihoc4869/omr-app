@@ -42,7 +42,11 @@ import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
+import { ghiCauBoTro } from './cau-bo-tro'
+import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
+import { gvNutThatDs, gvNutThatGo, hsLoiGo } from './ban-go-nut-that'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import {hsCauKiem,hsGuiThay,hsLuyenNen,hsLuyenNenNop,hsThangGo,thayDayNen} from './thang-tu-go'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -72,6 +76,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 //   3. Lệnh của HỌC SINH không đòi mã bí mật (giống Apps Script hiện nay);
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
+import { chotBatDau, lapBoChoEmVaoMuon, loiDenHan } from './rut-de-v2'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
@@ -286,7 +291,7 @@ async function batchGop(env: Env, cau: D1PreparedStatement[], ghi: boolean[] = [
 const COT_CA_EM = 'ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop, cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, mat_khau, chi_nop_3_phut_cuoi, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, pham_vi, de_rieng, danh_sach_chon_json, dong_bo_gio'
 /** SBD đi thẳng vào đường dẫn JSON `$."<sbd>"` được — chỉ chữ/số/gạch; khoá đặc biệt của đối tượng JS thì đi đường đọc trọn (như cũ). */
 const SBD_DUONG_JSON = /^[A-Za-z0-9_-]{1,64}$/
-const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'bb', '__proto__', 'constructor', 'prototype'])
+const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'bb', 'bac', '__proto__', 'constructor', 'prototype'])
 
 export interface DocVaoThi {
   ca: DongCa | null
@@ -350,6 +355,9 @@ export async function docCaVaoThi(env: Env, maCa: string, sbd: string): Promise<
     goiGoc,
   }
 }
+
+/** Khe chờ bản đồ của đường Bắt đầu đời cũ (mốc trước, bản đồ sau): trong khe này em ca đề riêng được bảo thử lại thay vì cắt theo băm. */
+const CHO_BAN_DO_MS = 20_000
 
 async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
@@ -451,7 +459,22 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
   //     5,69 xuống 2,56 hôm 10/09). Trước 12/09 chỗ này lùi về Apps Script;
   //     Apps Script đã cắt, nên nay phải TỪ CHỐI hẳn thay vì phát đề sai.
   const goiGoc = await doc.goiGoc()
-  const goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  let goiRieng = locGoiDeRiengChoEm(goiGoc, sbd)
+  // RÚT ĐỀ v2 (02/10): ca đề riêng mà bản đồ CHƯA có em ⇒ KHÔNG cắt theo băm im lặng.
+  //   · Vừa bấm Bắt đầu (< 20 giây) mà bản đồ còn trống ⇒ máy thầy đời cũ đang đẩy bản đồ bằng lệnh thứ hai: bảo máy em thử lại sau
+  //     1,5 giây (chỉ em này chờ, cả phòng không bị chặn). Đường mới `/ca/chot-bat-dau` ghi mốc + bản đồ một lệnh nên không còn khe này.
+  //   · Còn lại (em vào phòng sau khi chốt, hoặc bản đồ thiếu em) ⇒ lấp riêng NGAY tại máy chủ bằng thang lấp và gộp vào bản đồ.
+  if (Number(ca.de_rieng ?? 0) === 1 && !goiRieng) {
+    const batDauMs = Date.parse(String(ca.bat_dau_thi_luc ?? ''))
+    if (!goiGoc && Number.isFinite(batDauMs) && now - batDauMs >= 0 && now - batDauMs < CHO_BAN_DO_MS) {
+      return ra({ ok: false, lyDo: 'cho_bo_cau', thuLaiSauMs: 1500, thoiGianPhut: ca.thoi_gian_phut ?? 45 })
+    }
+    const lap = await lapBoChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch((e) => {
+      console.error('[vao-thi] lấp bộ câu riêng lỗi:', e)
+      return null
+    })
+    if (lap) goiRieng = lap
+  }
   if (Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng) {
     await ghiChanVao(env, maCa, sbd, String(b.hoTen ?? ''), String(b.namSinh ?? ''), 'thieu_bo_cau').catch(() => {})
     return ra({ ok: false, lyDo: 'thieu_bo_cau', thoiGianPhut: ca.thoi_gian_phut ?? 45 })
@@ -2315,7 +2338,10 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
   let loiGiai: Record<string, unknown> | null = null
   if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
-  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
+  // VÒNG HỌC v2 (02/10): câu song sinh / câu kiểm từng bước / nhãn nền ⇒ bảng `cau_bo_tro` theo băm. Móc CHỈ-THÊM, lỗi không làm hỏng nạp đề.
+  let boTro: number | Record<string, unknown> = 0
+  if (goi) { try { boTro = await ghiCauBoTro(env, maDe, goi) } catch (e) { boTro = { loi: (e as Error).message } } }
+  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, boTro, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
 }
 
 /** DANH SÁCH ĐỀ TRONG KHO — chỉ mục, không kéo gói. */
@@ -3242,6 +3268,8 @@ const boXuLy = {
       // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
       // Lô ĐẦU của chốt "đạt ngày" (con trỏ theo lô 40 em; cron mỗi phút ở nhánh dưới chạy tiếp cho tới khi xong). Lỗ cũ: chỉ MỘT lô 40 em/đêm ⇒ em đạt mà chưa được ghi mất mảnh ngày ấy.
       await chotExpNgayQuaDayDu(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
+      // VÒNG HỌC v2 — GĐ5 (02/10): tự hoàn thiện hằng tuần (đêm thứ Hai giờ VN, idempotent theo tuần): hiệu chỉnh luật đóng lỗi theo tỉ lệ sai lại + câu nghi sai đáp án.
+      if(new Date(Date.now()+7*3600000).getUTCDay()===1)await chayTuHoanThien(env,Date.now()).then(r=>console.log('[v2] tự hoàn thiện',JSON.stringify(r))).catch(async e=>{console.error('[v2] tự hoàn thiện lỗi:',e);await ghiLoiMay(env,'v2_tu_hoan_thien')})
       if(!hoa2CaTruong)await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
@@ -3425,6 +3453,14 @@ const boXuLy = {
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
       if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
       if (p === '/hs/doc-loi-giai') return ra(await hsDocLoiGiai(env, b))
+      // THANG TỰ GỠ (Vòng học v2 GĐ2, server/src/thang-tu-go.ts): câu kiểm từng bước chấm ở máy chủ, cổng nỗ lực, luyện nền, gửi thầy.
+      if (p === '/hs/cau-kiem') return ra(await hsCauKiem(env, b))
+      if (p === '/hs/thang-go') return ra(await hsThangGo(env, b))
+      if (p === '/hs/luyen-nen') return ra(await hsLuyenNen(env, b))
+      if (p === '/hs/luyen-nen/nop') return ra(await hsLuyenNenNop(env, b))
+      if (p === '/hs/gui-thay') return ra(await hsGuiThay(env, b))
+      // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): em đọc lời thầy gỡ của câu (theo băm), ghi đã đọc.
+      if (p === '/hs/loi-go') return ra(await hsLoiGo(env, b))
       // TU LUYỆN (29/09, server/src/tu-luyen.ts): 4 chế độ luyện tự do ở Sảnh — máy chủ rút bằng thuật toán cũ, gửi câu KHÔNG đáp án, chấm khi nộp.
       // Độc lập: chỉ ghi `tu_luyen_luot`/`tu_luyen_cau`; không EXP, không su_kien_hoc, không kế hoạch ngày.
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
@@ -3544,6 +3580,9 @@ const boXuLy = {
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
+      // RÚT ĐỀ v2 (02/10, server/src/rut-de-v2.ts): chốt Bắt đầu MỘT lệnh (mốc + bản đồ); lỗi đến hạn theo em cho máy thầy chạy thử.
+      if (p === '/ca/chot-bat-dau') return ra({ ...(await chotBatDau(env, b)), chot: true })
+      if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
       if (p === '/ca/xac-nhan') {
         const maCa = String(b.maCa ?? '')
         const ca = await docCa(env, maCa)
@@ -3594,11 +3633,19 @@ const boXuLy = {
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
       // LỜI GIẢI TỪNG BƯỚC: máy soạn của thầy (lấp kho, nhận lô, nộp hồ sơ) + màn Duyệt lời giải.
       if (p === '/kho/loi-giai/nap-hang') return ra(await napHangTuKho(env, b))
+      // Ngân hàng câu kiến thức nền của thang tự gỡ (thang-tu-go.ts): nạp / cập nhật theo id.
+      if (p === '/kho/nen/day') return ra(await thayDayNen(env, b))
       if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
+      // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
+      if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))
+      if (p === '/gv/nut-that/go') return ra(await gvNutThatGo(env, b))
       if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
+      if (p === '/gv/v2/tong') return ra(await gvTongV2(env))
+      if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))
+      if (p === '/ca/cau-nghi-dap-an') return ra(await dsCauNghi(env))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))
       if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
       if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))

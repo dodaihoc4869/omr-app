@@ -9,7 +9,7 @@
 //   Bỏ nhãn "Thêm…" và dòng "6,022 · 10²³" (logo = "Đỗ Đại Học · Giáo viên"). Ẩn Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo
 //   tuần. Số đếm cạnh mục lấy từ `useSoDemGv` (màn đã tải ghi vào) — chưa biết thì không vẽ. Cờ tắt ⇒ đúng danh sách cũ.
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { CalendarDays, ClipboardCheck, FileText, Flag, Home, Library, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
+import { CalendarDays, ClipboardCheck, FileText, Flag, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
 import { AnhLogo } from './LogoVai'
@@ -31,6 +31,9 @@ export interface MucDieuHuong {
   cuoi?: boolean
 }
 
+/** BÀN GỠ NÚT THẮT (Vòng học v2, 02/10): thầy gỡ bước cuối cho câu em đã nỗ lực thật mà vẫn vướng. Hiện ở CẢ hai chế độ (cờ Hóa 2 bật/tắt). */
+export const MUC_GO_NUT_THAT: MucDieuHuong = { id: 'bangonutthat', ten: 'Gỡ nút thắt', ngan: 'Gỡ nút', icon: LifeBuoy }
+
 export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'examhub', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home, con: ['toancanh'] },
   // "Danh sách lớp" không có mục riêng (thầy chốt 04-09): danh sách đã nạp lên máy chủ; màn ấy thuộc mục Học sinh.
@@ -40,6 +43,7 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'giaobtvn', ten: 'Giao bài tập về nhà', ngan: 'Bài tập', icon: ClipboardCheck },
   { id: 'goilenbang', ten: 'Gọi lên bảng', ngan: 'Lên bảng', icon: Presentation },
   { id: 'cauhoi', ten: 'Học sinh hỏi', ngan: 'Hỏi', icon: MessageCircleQuestion },
+  MUC_GO_NUT_THAT,
   { id: 'khodegiao', ten: 'Giao đề theo tuần', ngan: 'Giao đề', icon: FileText },
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
@@ -52,11 +56,18 @@ export const MUC_HOA2_CHINH: MucDieuHuong[] = [
   { id: 'goilenbang', ten: 'Chữa trên lớp', ngan: 'Chữa bài', icon: Presentation },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
 ]
-/** GAME HÓA 2.0 — hai mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). */
+/** GAME HÓA 2.0 — hai mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). "Gỡ nút thắt" đứng ĐẦU danh sách này để điện
+ *  thoại vào được qua bánh răng (thanh đáy giữ ≤ 5 mục — luật C6); ở ngăn kéo / rail nó được vẽ trong nhóm chính, ngay sau "Chữa trên lớp"
+ *  (`MUC_HOA2_BEN`), không lặp ở đáy. */
 export const MUC_HOA2_DAY: MucDieuHuong[] = [
+  MUC_GO_NUT_THAT,
   { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library, cuoi: true },
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
+/** Ngăn kéo / rail khi Game Hóa 2.0 bật: nhóm chính + "Gỡ nút thắt" ngay sau "Chữa trên lớp" (nhóm dạy học); đáy chỉ Kho đề · Cài đặt. */
+export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH.flatMap((m) => (m.id === 'goilenbang' ? [m, MUC_GO_NUT_THAT] : [m]))
+const MUC_HOA2_BEN_DAY: MucDieuHuong[] = MUC_HOA2_DAY.filter((m) => m.id !== MUC_GO_NUT_THAT.id)
+
 /** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`. */
 export const MAN_AN_KHI_HOA2: readonly ScreenId[] = ['examhub', 'giaobtvn', 'cauhoi', 'khodegiao']
 /** Màn CHỈ có khi Game Hóa 2.0 bật — cờ tắt thì App chuyển về Hôm nay. */
@@ -123,10 +134,10 @@ export default function ThanhBenTrai() {
           <Plus size={22} aria-hidden="true" />
           <span className="ben-trai-nut-ca-chu">Mở ca kiểm tra</span>
         </button>
-        <div className="ben-trai-danh-sach">{MUC_HOA2_CHINH.map((m) => nut(m))}</div>
+        <div className="ben-trai-danh-sach">{MUC_HOA2_BEN.map((m) => nut(m))}</div>
         <div className="ben-trai-cuoi ben-trai-cuoi--gv2">
           <div className="ben-trai-vach" role="separator" />
-          {MUC_HOA2_DAY.map((m) => nut(m, true))}
+          {MUC_HOA2_BEN_DAY.map((m) => nut(m, true))}
         </div>
       </nav>
     )

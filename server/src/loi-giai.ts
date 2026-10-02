@@ -22,6 +22,8 @@ import {
   type CauKho, type DangLoiGiai,
 } from '../../src/lib/loi-giai-kiem'
 import { BO_CHIA_KHOA } from '../../src/lib/loi-giai-bo'
+import { docBoTro } from './cau-bo-tro'
+import { damBaoBangNutThat } from './nut-that'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -523,13 +525,49 @@ export async function hsHoiThay(env: Env, b: Obj) {
     await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngayVn(nay)}`, sbd, qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
   }
   const cau = cauChoKhung(ht.c)
-  if (hoSo) return { ok: true, coLoiGiai: true, hoSo, cau }
+  if (hoSo) {
+    // Vòng học v2 GĐ2: câu có học liệu bổ trợ ⇒ kèm "Đọc từng bước" (chữ bước + câu kiểm KHÔNG đáp án + lời thầy gỡ). Không có ⇒ khung chạy như cũ.
+    const kiem = await kiemChoKhung(env, ht.bam).catch(() => undefined)
+    return { ok: true, coLoiGiai: true, hoSo, cau, ...(kiem ? { kiem } : {}) }
+  }
   return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiGiaiChu(ht.c) }
+}
+
+/** Câu kiểm gửi xuống máy em: CHỈ đề + lựa chọn — đáp án (`dap_an`, `dung`, `sai_so`) ở lại máy chủ, chấm qua `/hs/cau-kiem`. */
+export interface CauKiemKhung { buoc: number; kieu: 'so' | 'chon'; hoi: string; lua_chon?: string[] }
+export interface KiemKhung { buoc: string[]; cauKiem: CauKiemKhung[]; loiGo: { buoc: number; noiDung: string }[] }
+
+/**
+ * VÒNG HỌC v2 — bậc 2 của thang tự gỡ ("đọc lời giải chủ động"): chữ từng bước (lời giải kho của câu), câu kiểm của bước then chốt
+ * (một câu mỗi bước, bỏ đáp án), lời thầy gỡ gắn vào bước (bảng `loi_go`). Bước đánh số từ 0 như `cau_kiem.buoc`. Câu chưa có học liệu ⇒ undefined.
+ */
+export async function kiemChoKhung(env: Env, bam: string): Promise<KiemKhung | undefined> {
+  const bt = (await docBoTro(env, [bam])).get(bam)
+  if (!bt || !bt.buoc.length) return undefined
+  const n = bt.buoc.length
+  const daCo = new Set<number>()
+  const cauKiem: CauKiemKhung[] = []
+  for (const k of bt.cauKiem) {
+    if (!Number.isInteger(k.buoc) || k.buoc < 0 || k.buoc >= n || daCo.has(k.buoc)) continue
+    daCo.add(k.buoc)
+    cauKiem.push(k.kieu === 'chon' ? { buoc: k.buoc, kieu: 'chon', hoi: k.hoi, lua_chon: (k.lua_chon ?? []).map(String) } : { buoc: k.buoc, kieu: 'so', hoi: k.hoi })
+  }
+  await damBaoBangNutThat(env)
+  const r = await env.DB.prepare('SELECT buoc, kieu, noi_dung FROM loi_go WHERE bam = ? ORDER BY luc').bind(bam).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const loiGo: KiemKhung['loiGo'] = []
+  for (const x of r.results ?? []) {
+    const buoc = Number(x.buoc)
+    if (!Number.isInteger(buoc) || buoc < 0 || buoc >= n) continue
+    const noiDung = str(x.noi_dung) || (x.kieu === 'lop' ? 'Thầy đã giảng bước này trên lớp.' : x.kieu === 'sua' ? 'Thầy đã sửa lời giải ở bước này.' : '')
+    if (noiDung) loiGo.push({ buoc, noiDung })
+  }
+  return { buoc: bt.buoc.map(String), cauKiem: cauKiem.sort((a, b) => a.buoc - b.buoc), loiGo }
 }
 
 // ---------------------------------------------------------------- GĐ1 v2: em đọc lời giải thế nào
 
-const KIEU_DOC = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot'])
+// v2 GĐ2: `mo_buoc` (mở bước y của "Đọc từng bước"), `kiem` (trả lời câu kiểm bước y — đúng/sai do MÁY CHỦ chấm, khung chỉ báo lại).
+const KIEU_DOC = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot', 'mo_buoc', 'kiem'])
 
 /** Lọc thao tác máy em gửi: chỉ kiểu đã biết, tối đa 200, mốc thời gian là số. Dữ liệu máy em gửi KHÔNG đáng tin ⇒ chỉ giữ trường cần. */
 export function locSuKienDoc(v: unknown): { k: string; y?: string; d?: boolean; m?: number; t: number }[] {

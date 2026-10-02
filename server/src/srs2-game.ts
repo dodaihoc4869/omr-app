@@ -2,6 +2,7 @@
 // Chỉ chạy khi `cheDo2(env, sbd)` (cờ `cau_hinh.game_hoa_2`); cờ tắt ⇒ game đi đường cũ nguyên vẹn.
 // Luật chơi giữ nguyên; chỉ đổi NGUỒN CÂU: Đảo nhận câu mới + câu ôn Đúng–sai, Đoàn nhận câu ôn Trắc nghiệm/Trả lời ngắn,
 // đúng kế hoạch ngày đã chốt (`layKeHoachHomNay`). Đảo khoá khi còn câu ôn hôm nay ở Đoàn.
+import { phuNeuCan } from './hang-chua-loi'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
@@ -69,7 +70,8 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   const day = await napCau(env, hs, luot.map((x) => x.qid), luot.length, chan, boQua)
   const theo = new Map(day.map((x) => [x.q.qid, x]))
   const xep = danXenLuot(luot.filter((x) => theo.has(x.qid)), suc, { trumKho: trumKho && theo.size === co })
-  return xep.map((x) => theo.get(x.qid)!)
+  // VÒNG HỌC v2: câu lỗi đến lượt làm lại ⇒ phục vụ CÂU SONG SINH (qid ảo "<gốc>~ss0|1"; chấm ở máy chủ như câu thường).
+  return xep.map((x) => { const c = theo.get(x.qid)!; return { ...c, q: phuNeuCan(c.q, hs.songSinhCho, hs.boTro) } })
 }
 /** Sức em (hạng chung) cho đan xen; lỗi đọc ⇒ trung bình. */
 export async function sucEmHomNay(env: Env, sbd: string, hs: HoSo2): Promise<SucEm> {

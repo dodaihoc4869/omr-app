@@ -29,7 +29,8 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
   it('cờ TẮT ⇒ như cũ: 4 mục chính + Thêm, tờ Thêm đủ các mục còn lại', () => {
     render(<BottomNav />)
     expect(nhanThanh()).toEqual(['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Bài tập', 'Thêm'])
-    expect(moThem()).toEqual(['Ngân hàng đề', 'Gọi lên bảng', 'Học sinh hỏi', 'Giao đề theo tuần', 'Cài đặt'])
+    // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): tờ Thêm có thêm "Gỡ nút thắt".
+    expect(moThem()).toEqual(['Ngân hàng đề', 'Gọi lên bảng', 'Học sinh hỏi', 'Gỡ nút thắt', 'Giao đề theo tuần', 'Cài đặt'])
     expect(document.querySelector('nav.day-thay')?.hasAttribute('data-hoa2')).toBe(false)
   })
 
@@ -53,11 +54,13 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Kho đề và Cài đặt' }))
     const menu = screen.getByRole('menu', { name: 'Kho đề và Cài đặt' })
     expect([...within(menu).getAllByRole('menuitem')].map((b) => b.textContent?.trim())).toEqual(MUC_HOA2_DAY.map((m) => m.ten))
+    // 02/10 (Vòng học v2): điện thoại vào "Gỡ nút thắt" qua bánh răng — thanh đáy giữ 5 mục.
+    expect(MUC_HOA2_DAY.map((m) => m.ten)).toEqual(['Gỡ nút thắt', 'Kho đề', 'Cài đặt'])
     fireEvent.click(screen.getByRole('menuitem', { name: 'Kho đề' }))
     expect(useAppStore.getState().screen).toBe('nganhangde')
   })
 
   it('cờ TẮT vẫn dùng MUC_DIEU_HUONG (không đụng danh sách cũ)', () => {
-    expect(MUC_DIEU_HUONG.map((m) => m.id)).toEqual(['examhub', 'hocsinh', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'khodegiao', 'caidat'])
+    expect(MUC_DIEU_HUONG.map((m) => m.id)).toEqual(['examhub', 'hocsinh', 'lichsuca', 'nganhangde', 'giaobtvn', 'goilenbang', 'cauhoi', 'bangonutthat', 'khodegiao', 'caidat'])
   })
 })

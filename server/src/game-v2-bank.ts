@@ -1,4 +1,6 @@
 import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
+import { tachSongSinh } from './loi-hoc-luat'
+import { phuSongSinhTheoQid } from './song-sinh-game'
 import {DemTTL} from './dem-chung'
 import {dbGoc} from './cau-hinh-dem'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
@@ -80,6 +82,8 @@ const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_
 /** Câu ĐẦY ĐỦ (bản mới nhất: lời giải mới nhất) theo tham chiếu của lượt (ma_de, qid, version), chỉ khi tờ còn và chỉ mục khớp nguồn.
  *  Chỉ mục lệch (kho vừa ghi, chưa đồng bộ) ⇒ đồng bộ đúng tờ đó rồi tra lại. `null` ⇒ câu thật sự đổi đề/đáp án hoặc tờ đã rút. */
 export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:string}):Promise<PrivateQuestion|null>{
+  // Vòng học v2 (02/10): qid ảo song sinh "<gốc>~ss0|1" ⇒ câu gốc (cùng mã đề, phiên bản) phủ đề/đáp án song sinh.
+  const ss=tachSongSinh(ref.qid);if(ss.songSinh!==null){const goc=await docCauTheoRef(env,{...ref,qid:ss.goc});return goc?phuSongSinhTheoQid(env,goc,ref.qid):null}
   const tra=()=>env.DB.prepare(SQL_THEO_REF).bind(ref.maDe,ref.qid,ref.version).first<{json:string}>()
   let row=await tra()
   if(!row&&await dongBoCacTo(env,[ref.maDe]))row=await tra()
@@ -218,6 +222,15 @@ export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQue
  *  29/09: câu vắng mà tờ của nó đang lệch chỉ mục ⇒ đồng bộ đúng các tờ đó rồi tra lại phần vắng (version tất định nên câu không đổi vẫn khớp). */
 export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;version:string}[]):Promise<Map<string,PrivateQuestion>>{
   const theo=new Map<string,PrivateQuestion>();if(!ds.length)return theo
+  // Vòng học v2 (02/10): tham chiếu song sinh ⇒ nạp câu gốc cùng lô rồi phủ (khoá Map giữ qid ảo).
+  const ao=ds.filter(q=>tachSongSinh(q.qid).songSinh!==null)
+  if(ao.length){
+    const thuong=ds.filter(q=>tachSongSinh(q.qid).songSinh===null)
+    const goc=await napDayDuMem(env,[...thuong,...ao.map(q=>({...q,qid:tachSongSinh(q.qid).goc}))])
+    for(const q of thuong){const v=goc.get(`${q.maDe}|${q.qid}|${q.version}`);if(v)theo.set(`${q.maDe}|${q.qid}|${q.version}`,v)}
+    for(const q of ao){const g=goc.get(`${q.maDe}|${tachSongSinh(q.qid).goc}|${q.version}`);const v=g?await phuSongSinhTheoQid(env,g,q.qid):null;if(v)theo.set(`${q.maDe}|${q.qid}|${q.version}`,v)}
+    return theo
+  }
   const tra=async(xs:readonly {maDe:string;qid:string;version:string}[])=>{
     const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(xs.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
     for(const x of r.results??[]){try{const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}catch{/* JSON hỏng ⇒ coi như vắng */}}
