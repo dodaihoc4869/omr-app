@@ -459,7 +459,7 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
-  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), docThamSoEm(env, sbd).then(async (r) => r ?? docThamSo(env)).catch(() => docThamSo(env))])
+  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung)])
   const dangChay = chienDichDangChay(ds, homNay)
   const hanTheoQid = new Map<string, string>()
   // Thầy 28/09: "khi giao chiến dịch đầu tiên tất cả không có câu ôn, không được lấy câu ôn trước đó" ⇒ câu của một chiến dịch chỉ tính lần làm TỪ LÚC GIAO chiến dịch ấy.

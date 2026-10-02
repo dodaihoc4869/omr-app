@@ -3,7 +3,7 @@
 // lời giải của song sinh (bảng `cau_bo_tro`). Đáp án chỉ nằm ở máy chủ như câu thường (`publicQuestion` bỏ `correct`, `solution`).
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
-import { docBoTro, type BoTro, type SongSinh } from './cau-bo-tro'
+import { dongBoTro, type BoTro, type SongSinh } from './cau-bo-tro'
 import { tachSongSinh } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
@@ -43,15 +43,11 @@ export async function boTroTheoQid(env: Env, qids: readonly string[]): Promise<M
   const ra = new Map<string, BoTro>()
   const ds = [...new Set(qids.filter(Boolean))]
   if (!ds.length) return ra
-  const bamCua = new Map<string, string>()
-  for (let i = 0; i < ds.length; i += 90) {
-    const lo = ds.slice(i, i + 90)
-    const r = await env.DB.prepare(`SELECT qid, bam FROM loi_giai_cau WHERE qid IN (${lo.map(() => '?').join(',')})`).bind(...lo).all<Obj>().catch(() => ({ results: [] as Obj[] }))
-    for (const x of r.results ?? []) bamCua.set(String(x.qid), String(x.bam))
-  }
-  if (!bamCua.size) return ra
-  const bt = await docBoTro(env, [...bamCua.values()]).catch(() => new Map<string, BoTro>())
-  for (const [q, b] of bamCua) { const v = bt.get(b); if (v) ra.set(q, v) }
+  // MỘT truy vấn (JOIN qid → băm → học liệu), không tạo bảng trên đường đọc: kế hoạch ngày có ngân sách vòng D1 (do-toi-uu-may-chu-2809).
+  // Bảng chưa có (chưa nạp học liệu lần nào) ⇒ lỗi ⇒ rỗng.
+  const r = await env.DB.prepare(`SELECT lc.qid AS qid_hoi, b.* FROM loi_giai_cau lc JOIN cau_bo_tro b ON b.bam = lc.bam WHERE lc.qid IN (SELECT value FROM json_each(?))`)
+    .bind(JSON.stringify(ds)).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  for (const x of r.results ?? []) ra.set(String(x.qid_hoi), dongBoTro(x))
   return ra
 }
 

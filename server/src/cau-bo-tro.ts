@@ -82,6 +82,12 @@ export async function ghiCauBoTro(env: Env, maDe: string, goi: unknown): Promise
 
 const docJson = <T>(s: unknown): T[] => { try { const v = JSON.parse(String(s ?? '[]')); return Array.isArray(v) ? v as T[] : [] } catch { return [] } }
 
+/** Một dòng `cau_bo_tro` → BoTro. */
+export const dongBoTro = (x: Obj): BoTro => ({
+  bam: String(x.bam), qidMau: String(x.qid_mau), songSinh: docJson<SongSinh>(x.song_sinh_json), cauKiem: docJson<CauKiem>(x.cau_kiem_json),
+  nhanNen: docJson<NhanNen>(x.nhan_nen_json), buoc: docJson<string>(x.buoc_json),
+})
+
 /** Học liệu bổ trợ theo băm (≤ 90 băm mỗi truy vấn). Băm chưa có ⇒ vắng trong Map. */
 export async function docBoTro(env: Env, bams: readonly string[]): Promise<Map<string, BoTro>> {
   await damBaoBangBoTro(env)
@@ -90,10 +96,7 @@ export async function docBoTro(env: Env, bams: readonly string[]): Promise<Map<s
   for (let i = 0; i < ds.length; i += 90) {
     const lo = ds.slice(i, i + 90)
     const r = await env.DB.prepare(`SELECT * FROM cau_bo_tro WHERE bam IN (${lo.map(() => '?').join(',')})`).bind(...lo).all<Obj>()
-    for (const x of r.results ?? []) ra.set(String(x.bam), {
-      bam: String(x.bam), qidMau: String(x.qid_mau), songSinh: docJson<SongSinh>(x.song_sinh_json), cauKiem: docJson<CauKiem>(x.cau_kiem_json),
-      nhanNen: docJson<NhanNen>(x.nhan_nen_json), buoc: docJson<string>(x.buoc_json),
-    })
+    for (const x of r.results ?? []) ra.set(String(x.bam), dongBoTro(x))
   }
   return ra
 }

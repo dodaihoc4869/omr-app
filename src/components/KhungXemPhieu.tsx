@@ -137,7 +137,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
         // NÚT HỎI THẦY trên phiếu học sinh (29/09): chỉ nhận từ chính iframe của khung này; máy chủ tự chặn câu đang thi.
         if (e.source !== iframeRef.current?.contentWindow) return
         void hoiThay(String(e.data.qid), 'phieu').then((r) => {
-          if (r.ok) setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: r.kiem })
+          if (r.ok) setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu, kiem: 'kiem' in r ? r.kiem : undefined })
           else setLoiHoi(r.loi)
         })
         return
