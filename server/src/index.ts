@@ -41,6 +41,7 @@ import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
+import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
@@ -3597,6 +3598,7 @@ const boXuLy = {
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
+      if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))
       if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
       if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))

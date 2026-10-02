@@ -23,6 +23,8 @@ const STORE = 'ester-lab-v2';
 let S = { lv: 'vung', ans: {}, gan: {}, hint: {}, mc: {}, xp: {k1:0,k2:0,k3:0,k4:0,k5:0,k6:0}, streak: 0, best: 0 };
 function load() { try { const o = JSON.parse(localStorage.getItem(STORE) || 'null'); if (o) { S = Object.assign(S, o); S.xp = Object.assign({k1:0,k2:0,k3:0,k4:0,k5:0,k6:0}, o.xp || {}); } } catch (e) {} }
 function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+// GĐ1 v2 (02/10): báo từng thao tác lên trang mẹ (chỉ postMessage — khung vẫn không gọi mạng). Trang mẹ gom rồi gửi máy chủ khi đóng.
+function bao(kieu, ct) { try { parent.postMessage(Object.assign({ loai: 'khung-su-kien', kieu: kieu }, ct || {}), '*'); } catch (e) {} }
 function addXP(k) { if (!S.xp[k] && S.xp[k] !== 0) return; S.xp[k] = Math.min(GOAL, S.xp[k] + 1); save(); paintXP(); }
 function paintXP() {
   const pips = $('#pips');
