@@ -168,6 +168,8 @@ export default defineConfig({
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
         '**/ChuyenBay-*.{js,css}',
           '**/404.html',
+          // Trang đo tốc độ (02/10): luôn đi thẳng ra mạng để đo đúng, không lưu trên máy.
+          '**/cai-kiem-toc-do.html',
           '**/than-thu-v2/**',
           // Lời giải từng bước (29/09): khung tĩnh ~280 KB chỉ tải khi em bấm "Xem lời giải từng bước" — không cất sẵn.
           '**/loi-giai/**',
