@@ -352,7 +352,8 @@ describe('8. Màn Mở ca — khối chế độ đề 3 lựa chọn, bấm l�
     expect(nut('Ca gần nhất').getAttribute('aria-checked')).toBe('true')
     expect(nut('3 ca ngẫu nhiên')).toBeTruthy()
     expect(nut('Không rút câu sai').getAttribute('aria-checked')).toBe('false')
-    expect(screen.getByText(/Cặp đôi Song sinh \(50\/50\):/)).toBeTruthy()
+    // ĐỔI CÓ CHỦ Ý 02/10 (rút đề v2): chữ mô tả theo thang lấp v2, không còn "Cặp đôi Song sinh 50/50".
+    expect(screen.getByText(/Ô chữa lỗi \(tối đa 30% mỗi phần\):/)).toBeTruthy()
 
     fireEvent.click(nut('Ca gần nhất'))
     expect(nut('Không rút câu sai').getAttribute('aria-checked')).toBe('true')

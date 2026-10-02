@@ -493,7 +493,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 ) : (
                   <>
                     <div style={NHAN_NHO}>
-                      <b>Cặp đôi Song sinh (50/50):</b> Tự động rút 50% câu sai gốc (đo độ hiểu lời giải) + 50% câu song sinh cùng dạng đổi số từ kho đề (chống học vẹt đáp án). Áp dụng trần chuẩn {'{I: 3, II: 1, III: 1}'} cho ca 14 câu.
+                      <b>Ô chữa lỗi (tối đa 30% mỗi phần):</b> câu sai đến lịch ôn lại của chính em; luật đóng lỗi báo lượt này cần câu song sinh (đổi số, cùng cách giải) thì dùng song sinh để em không làm theo trí nhớ đáp án; không có thì câu cùng dạng em chưa gặp. Ví dụ ca 14 câu: tối đa {'{I: 3, II: 1, III: 1}'} câu chữa lỗi.
                     </div>
                     <div style={NHAN_NHO}>
                       <b>70% câu mới:</b> Rút thích ứng dạng bài để củng cố lỗ hổng và phát triển năng lực cho từng em.
@@ -632,7 +632,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
               <span>
                 <b>Thuật toán mới cá nhân hóa 100%:</b> Quét toàn bộ kho {tongKho} câu ứng viên để rút đề riêng biệt đẳng cấu cho từng em (cùng dạng bài và mức độ, triệt tiêu quay cóp lân cận). {khongRutCauSai
                   ? 'Không rút câu sai: toàn bộ là câu mới, bỏ mọi câu em đã gặp ở các ca kiểm tra trước.'
-                  : 'Tự động lồng ghép Cặp đôi Song sinh 50/50 từ câu sai ca trước và 70% câu mới nâng đỡ tiến bộ.'}
+                  : 'Tối đa 30% mỗi phần là câu chữa lỗi đến lịch của chính em (câu gốc hoặc câu song sinh), còn lại là câu mới em chưa gặp.'}
               </span>
             ) : (
               'Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.'
