@@ -76,8 +76,14 @@ export async function taiLoiGiai(qid: string): Promise<KetQuaLoiGiai> {
 
 /** Lời giải chữ của kho — hiện khi câu chưa có hồ sơ từng bước (máy chủ đã đẩy câu lên đầu hàng soạn). */
 export interface LoiGiaiChu { dapAn: string; chot: string; tung: { id: string; dung: boolean; viSao: string }[]; buoc: string[]; ketQua: string }
+/** Vòng học v2 (thang tự gỡ, bậc 2): chữ từng bước + câu kiểm (KHÔNG đáp án — máy chủ chấm) + lời thầy gỡ. Bước đánh số từ 0. */
+export interface KiemKhung {
+  buoc: string[]
+  cauKiem: { buoc: number; kieu: 'so' | 'chon'; hoi: string; lua_chon?: string[] }[]
+  loiGo: { buoc: number; noiDung: string }[]
+}
 export type KetQuaHoiThay =
-  | { ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined }
+  | { ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined; kiem?: KiemKhung }
   | { ok: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu: LoiGiaiChu }
   | { ok: false; loi: string; khoa?: 'dang_kiem_tra' | 'ca_chua_cong_bo' }
 
@@ -88,7 +94,7 @@ export async function hoiThay(qid: string, nguon: string): Promise<KetQuaHoiThay
   const j = await goiHs('/hs/hoi-thay', { token, qid, nguon })
   if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
   if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
-  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai }
+  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai, ...(j.kiem ? { kiem: j.kiem as KiemKhung } : {}) }
   return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu }
 }
 
@@ -107,6 +113,61 @@ export function baoDocLoiGiai(qid: string, nguon: string, giay: number, suKien: 
       body: JSON.stringify({ token, qid, nguon, giay, suKien: suKien.slice(0, 200) }),
     })
   }).catch(() => undefined)
+}
+
+// ---------------------------------------------------------------- thang tự gỡ (Vòng học v2 GĐ2 — máy chủ: server/src/thang-tu-go.ts)
+
+export type KetQuaCauKiem = { ok: true; dung: boolean; dapAn?: string; nhanNen?: string; tenNen?: string } | { ok: false; loi: string }
+
+/** Câu kiểm một bước: máy chủ chấm (đáp án không có ở máy em). */
+export async function guiCauKiem(qid: string, buoc: number, traLoi: string, giay: number): Promise<KetQuaCauKiem> {
+  const token = docTokenHs()
+  if (!token) return { ok: false, loi: 'Em đăng nhập lại để trả lời.' }
+  const j = await goiHs('/hs/cau-kiem', { token, qid, buoc, traLoi, giay })
+  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
+  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa kiểm được câu trả lời.') }
+  return { ok: true, dung: j.dung === true, ...(typeof j.dapAn === 'string' ? { dapAn: j.dapAn } : {}), ...(typeof j.nhanNen === 'string' ? { nhanNen: j.nhanNen, tenNen: String(j.tenNen ?? '') } : {}) }
+}
+
+export interface MucCong { ma: 'tu_lam' | 'doc_het' | 'lam_lai' | 'chi_buoc' | 'khong_bua'; dat: boolean; viec: string }
+export interface ThangGo { bac: 1 | 2 | 3 | 4 | 5; cong: MucCong[]; coTheGui: boolean; soBuoc: number; buocVuong?: number; nhanNenVuong?: string; tenNenVuong?: string }
+
+/** Em đang ở bậc nào của thang tự gỡ. `dang`: thao tác của lần đọc đang mở (máy chủ chỉ tính, không ghi). null = lỗi / câu không có thang. */
+export async function thangGo(qid: string, dang?: { giay: number; suKien: SuKienKhung[] }): Promise<ThangGo | null> {
+  const token = docTokenHs()
+  if (!token) return null
+  const j = await goiHs('/hs/thang-go', { token, qid, ...(dang ? { dang: { giay: dang.giay, suKien: dang.suKien.slice(0, 200) } } : {}) })
+  if (!j || j.ok !== true || j.coThang !== true) return null
+  return j as unknown as ThangGo
+}
+
+export interface CauNen { id: string; muc: number; kieu: 'so' | 'tn'; de: string; pa?: Record<string, string> }
+export async function luyenNen(nhan: string): Promise<{ ok: true; ten: string; cau: CauNen[] } | { ok: false; loi: string }> {
+  const token = docTokenHs()
+  if (!token) return { ok: false, loi: 'Em đăng nhập lại để luyện.' }
+  const j = await goiHs('/hs/luyen-nen', { token, nhan })
+  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
+  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được bài luyện.') }
+  return { ok: true, ten: String(j.ten ?? ''), cau: Array.isArray(j.cau) ? (j.cau as CauNen[]) : [] }
+}
+export type KetQuaNopNen = { ok: true; dung: boolean; dapAn: string; giai: string[]; meo: string } | { ok: false; loi: string }
+export async function nopLuyenNen(id: string, traLoi: string, qid: string): Promise<KetQuaNopNen> {
+  const token = docTokenHs()
+  if (!token) return { ok: false, loi: 'Em đăng nhập lại để nộp.' }
+  const j = await goiHs('/hs/luyen-nen/nop', { token, id, traLoi, qid })
+  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
+  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa nộp được.') }
+  return { ok: true, dung: j.dung === true, dapAn: String(j.dapAn ?? ''), giai: Array.isArray(j.giai) ? (j.giai as unknown[]).map(String) : [], meo: String(j.meo ?? '') }
+}
+
+export async function guiThay(qid: string, buoc: number, viet: string): Promise<{ ok: true } | { ok: false; loi: string; cong?: MucCong[] }> {
+  const token = docTokenHs()
+  if (!token) return { ok: false, loi: 'Em đăng nhập lại để gửi.' }
+  const j = await goiHs('/hs/gui-thay', { token, qid, buoc, viet })
+  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
+  if (j.ok === true) return { ok: true }
+  const cong = Array.isArray(j.cong) ? (j.cong as MucCong[]) : undefined
+  return { ok: false, loi: String(j.error ?? cong?.find((c) => !c.dat)?.viec ?? 'Chưa gửi được.'), ...(cong ? { cong } : {}) }
 }
 
 // ---------------------------------------------------------------- thầy

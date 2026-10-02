@@ -44,6 +44,7 @@ import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import { ghiCauBoTro } from './cau-bo-tro'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import {hsCauKiem,hsGuiThay,hsLuyenNen,hsLuyenNenNop,hsThangGo,thayDayNen} from './thang-tu-go'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -3429,6 +3430,12 @@ const boXuLy = {
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
       if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
       if (p === '/hs/doc-loi-giai') return ra(await hsDocLoiGiai(env, b))
+      // THANG TỰ GỠ (Vòng học v2 GĐ2, server/src/thang-tu-go.ts): câu kiểm từng bước chấm ở máy chủ, cổng nỗ lực, luyện nền, gửi thầy.
+      if (p === '/hs/cau-kiem') return ra(await hsCauKiem(env, b))
+      if (p === '/hs/thang-go') return ra(await hsThangGo(env, b))
+      if (p === '/hs/luyen-nen') return ra(await hsLuyenNen(env, b))
+      if (p === '/hs/luyen-nen/nop') return ra(await hsLuyenNenNop(env, b))
+      if (p === '/hs/gui-thay') return ra(await hsGuiThay(env, b))
       // TU LUYỆN (29/09, server/src/tu-luyen.ts): 4 chế độ luyện tự do ở Sảnh — máy chủ rút bằng thuật toán cũ, gửi câu KHÔNG đáp án, chấm khi nộp.
       // Độc lập: chỉ ghi `tu_luyen_luot`/`tu_luyen_cau`; không EXP, không su_kien_hoc, không kế hoạch ngày.
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
@@ -3598,6 +3605,8 @@ const boXuLy = {
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
       // LỜI GIẢI TỪNG BƯỚC: máy soạn của thầy (lấp kho, nhận lô, nộp hồ sơ) + màn Duyệt lời giải.
       if (p === '/kho/loi-giai/nap-hang') return ra(await napHangTuKho(env, b))
+      // Ngân hàng câu kiến thức nền của thang tự gỡ (thang-tu-go.ts): nạp / cập nhật theo id.
+      if (p === '/kho/nen/day') return ra(await thayDayNen(env, b))
       if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
