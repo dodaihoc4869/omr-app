@@ -29,6 +29,8 @@ export interface LanLam {
   luc: string
   dung: boolean
   coGoiY: boolean
+  /** Vòng học v2 (02/10): lần làm CÂU SONG SINH của câu này (qid sổ "<gốc>~ss0|1", đã quy về gốc). */
+  songSinh?: true
   /**
    * Nguồn trong sổ (`su_kien_hoc.nguon`, chỉ-thêm 29/09). `'dau_gio'` (Kiểm tra đầu giờ) ĐÚNG ⇒ thầy xác nhận: thành thạo NGAY kể cả
    * câu 2 sao. Vắng ⇒ như nguồn thường.

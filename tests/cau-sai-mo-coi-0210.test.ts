@@ -21,9 +21,23 @@ describe('/gv/cau-sai-mo-coi — câu sai không có đường quay lại', () =
     ghi(d, 'E1', 'Q-C#2', 'game', 1, '2026-10-01T03:00:00.000Z')
     ghi(d, 'E2', 'Q-A', 'on_lai', 0, '2026-10-01T03:00:00.000Z', 'xem_loi_giai') // chỉ đọc lời giải ⇒ không phải lần làm
     const r = await goiWorker(worker, d.env, '/gv/cau-sai-mo-coi', {}, true)
-    expect(r).toMatchObject({ ok: true, tuNgay: '2026-09-29', tong: { cauSai: 3, moCoi: 2, soEm: 1 } })
-    expect(r.kenh).toEqual([{ kenh: 'thi', cauSai: 3, boTrong: 1, moCoi: 2, soEm: 1 }])
+    expect(r).toMatchObject({ ok: true, tuNgay: '2026-09-29', tong: { cauSai: 3, moCoi: 2, ngoaiKho: 3, soEm: 1 } })
+    expect(r.kenh).toEqual([{ kenh: 'thi', cauSai: 3, boTrong: 1, moCoi: 2, ngoaiKho: 3, soEm: 1 }])
     expect(r.emNhieuNhat).toEqual([{ sbd: 'E1', moCoi: 2 }])
+  })
+
+  it('câu sai trong ca ĐÃ CÔNG BỐ và câu sai Lên bảng / đầu giờ đã có nguồn kéo ⇒ không mồ côi', async () => {
+    const d = taoD1That()
+    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,cong_bo,cap_nhat_luc) VALUES('CA1','Ca 1','dong','thi','12','ngay','x')").run()
+    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,cong_bo,cap_nhat_luc) VALUES('CA2','Ca 2','dong','thi','12','khong','x')").run()
+    const them = (qid: string, nguon: string, maNguon: string) => d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,luc,ngay_vn,ket_qua) VALUES(?,?,?,?,?,?,?,0)')
+      .run(`${nguon}|${qid}`, 'E1', qid, nguon, maNguon, '2026-09-30T03:00:00.000Z', '2026-09-30')
+    them('Q-CB', 'thi', 'CA1') // ca đã công bố ⇒ có nguồn
+    them('Q-CHUA', 'thi', 'CA2') // ca chưa công bố ⇒ chưa có nguồn (mồ côi tới khi công bố)
+    them('Q-LB', 'len_bang', 'B1') // Lên bảng ⇒ có nguồn
+    them('Q-LUYEN', 'luyen', 'L1') // luyện đề ⇒ mồ côi
+    const r = await goiWorker(worker, d.env, '/gv/cau-sai-mo-coi', {}, true)
+    expect(r.tong).toMatchObject({ cauSai: 4, moCoi: 2 })
   })
 
   it('học sinh không gọi được', async () => {

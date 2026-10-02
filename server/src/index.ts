@@ -42,6 +42,7 @@ import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
+import { ghiCauBoTro } from './cau-bo-tro'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
@@ -2315,7 +2316,10 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // LỜI GIẢI TỪNG BƯỚC (29/09): câu mới / đổi nội dung tự vào hàng soạn. Móc CHỈ-THÊM — lỗi ở đây không được làm hỏng việc nạp đề.
   let loiGiai: Record<string, unknown> | null = null
   if (goi) { try { loiGiai = await ghiCauVaoHang(env, maDe, goi) } catch (e) { loiGiai = { loi: (e as Error).message } } }
-  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
+  // VÒNG HỌC v2 (02/10): câu song sinh / câu kiểm từng bước / nhãn nền ⇒ bảng `cau_bo_tro` theo băm. Móc CHỈ-THÊM, lỗi không làm hỏng nạp đề.
+  let boTro: number | Record<string, unknown> = 0
+  if (goi) { try { boTro = await ghiCauBoTro(env, maDe, goi) } catch (e) { boTro = { loi: (e as Error).message } } }
+  return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, boTro, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
 }
 
 /** DANH SÁCH ĐỀ TRONG KHO — chỉ mục, không kéo gói. */
