@@ -16,6 +16,7 @@ import { laySucHoc } from '../../lib/buoi-hoc-api'
 import { cauTuDeChon, demCau, dungToChieuDayHoc, khoDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
 import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, xepEmChoDanhSach, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
+import { ChemText } from '../../lib/chem-format'
 import { BuocDiemDanh, useDiemDanhBuoi } from './DiemDanhBuoi'
 import './day-hoc.css'
 
@@ -267,7 +268,17 @@ export default function DayHocLenBang() {
                         {c.tuLuan && <span className="dh-chip dh-chip--vang">Tự luận</span>}
                         <span className="dh-cau-dang">{c.tenDang || c.chuyenDe}</span>
                       </p>
-                      <p className="dh-cau-de">{tomTatDe(c)}</p>
+                      <div className="dh-cau-de" style={c.tuLuan ? { whiteSpace: 'pre-wrap' } : undefined}>
+                        {c.tuLuan ? <ChemText text={c.q.text || tomTatDe(c)} /> : tomTatDe(c)}
+                      </div>
+                      {c.tuLuan && (() => {
+                        const h = (c.q as any).imageDataUrl || (c.q as any).hinhAnh?.[0]?.src || (c.q as any).hinh?.[0]?.du_lieu || (c.q as any).hinh?.[0]?.src
+                        return h ? (
+                          <div style={{ marginTop: 6 }}>
+                            <img src={h} alt="Hình câu hỏi" style={{ maxWidth: '100%', maxHeight: 240, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--vien, #e2e8f0)' }} />
+                          </div>
+                        ) : null
+                      })()}
                       {g && !bo && (
                         <div className="dh-giao">
                           <span className="dh-giao-em">
