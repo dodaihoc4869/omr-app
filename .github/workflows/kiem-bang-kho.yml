@@ -1,0 +1,22 @@
+name: Kiểm tra bảng dữ liệu kho câu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/sua-bang-cau-cuoi-0210]
+    paths: ['scripts/kiem-bang-kho-0210.mjs', '.github/workflows/kiem-bang-kho.yml']
+permissions:
+  contents: read
+jobs:
+  kiem-bang:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Quét bảng trong câu gốc và câu biến thể
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/kiem-bang-kho-0210.mjs
