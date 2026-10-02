@@ -170,6 +170,8 @@ export const BANG_GIU: readonly string[] = [
   'thay_da_chua',
   // LỜI GIẢI TỪNG BƯỚC (loi-giai.ts, 29/09): hồ sơ lời giải thầy duyệt + chỉ mục câu + hàng soạn — HỌC LIỆU, không phải tiến độ game ⇒ GIỮ.
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
+  // Em đọc lời giải thế nào (migration-0210-doc-loi-giai.sql, GĐ1 v2 02/10) — hồ sơ học tập của em ⇒ GIỮ (như sổ su_kien_hoc).
+  'doc_loi_giai',
   // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
   'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
   // TU LUYỆN (migration-2909-tu-luyen.sql) — sinh sau lần 21/09: GIỮ cho job ấy = không đụng (job đã xong).

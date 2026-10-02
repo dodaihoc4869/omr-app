@@ -158,7 +158,8 @@ export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: strin
       tt.lanSai = 0
       tt.catTia = false
       tt.ngayChua = ngayVnCuaIso(moc[iMoc]!)
-      if (!tt.laMoi) tt.henOn = congNgay(moc[iMoc]!.slice(0, 10), 1)
+      // 02/10: ngày HÔM SAU theo giờ VN (mốc là ISO UTC — cắt 10 ký tự đầu lấy ngày UTC, bấm lúc 0–7 giờ sáng VN thì hẹn ngay hôm đó).
+      if (!tt.laMoi) tt.henOn = congNgay(ngayVnCuaIso(moc[iMoc]!), 1)
       iMoc++
     }
   }

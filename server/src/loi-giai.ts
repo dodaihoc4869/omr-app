@@ -16,7 +16,7 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { coCaDangMo } from './bi-a'
 import { protectedQuestions } from './game-v2-bank'
 import { qidGoc } from './srs2-d1'
-import { ghiSuKien, ngayVn } from './su-kien-hoc'
+import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
 import {
   bamCau, boCua, cauTrongGoi, chuHtml, dauVao, deHtml, gonHoSo, kiemHoSo, laHoSoSach, lopCua, loaiCau, tangCau,
   type CauKho, type DangLoiGiai,
@@ -37,6 +37,9 @@ export const SQL_BANG_LOI_GIAI: readonly string[] = [
   // Nút "Hỏi thầy" (29/09): mỗi lần em bấm một dòng — màn "Học sinh hỏi" của thầy và luật chấm luyện tập đọc được em đã xem lời giải câu nào.
   `CREATE TABLE IF NOT EXISTS loi_giai_hoi (sbd TEXT NOT NULL, qid TEXT NOT NULL, nguon TEXT, luc TEXT NOT NULL, co_ho_so INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (sbd, qid, luc))`,
   'CREATE INDEX IF NOT EXISTS loi_giai_hoi_qid ON loi_giai_hoi(qid)',
+  // GĐ1 v2 (02/10): mỗi lần em ĐÓNG khung lời giải một dòng — đọc bao lâu, làm bao nhiêu thao tác, đúng bao nhiêu (cửa "đã nỗ lực thật").
+  `CREATE TABLE IF NOT EXISTS doc_loi_giai (id INTEGER PRIMARY KEY AUTOINCREMENT, sbd TEXT NOT NULL, qid TEXT NOT NULL, nguon TEXT, luc TEXT NOT NULL, ngay_vn TEXT NOT NULL, giay INTEGER NOT NULL DEFAULT 0, so_su_kien INTEGER NOT NULL DEFAULT 0, tom_tat_json TEXT, su_kien_json TEXT)`,
+  'CREATE INDEX IF NOT EXISTS doc_loi_giai_sbd_qid ON doc_loi_giai(sbd, qid)',
 ]
 const bangDaDung = new WeakMap<object, Promise<void>>()
 export function damBaoBangLoiGiai(env: Env): Promise<void> {
@@ -515,9 +518,62 @@ export async function hsHoiThay(env: Env, b: Obj) {
   // Ôn lại lấy kết quả LẦN ĐẦU trong ngày (nộp lại không đổi) ⇒ em không nhận EXP cho câu vừa xem lời giải, câu quay lại lịch ôn để tự làm.
   // Đã nộp rồi mới hỏi thì khoá trùng ⇒ không đổi gì. Chỉ các nguồn có luật "lần đầu" này mới ghi (game tự gửi `assisted` khi trả lời).
   if (nguon === 'on_lai') {
-    await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngayVn(nay)}`, sbd, qid, lan: 1, ketQua: 0, luc, assistance: 'assisted' }]).catch(() => null)
+    // 02/10 (Vòng học khép kín v2, GĐ1): dòng này chỉ KHOÁ lần làm hôm nay (không EXP, câu quay lại lịch ôn) — nó là sự kiện ĐỌC LỜI GIẢI,
+    // không phải một lần làm sai. `purpose = xem_loi_giai` ⇒ ôn tập / hồ sơ năm / năng lực bỏ qua dòng này khi đếm đúng–sai.
+    await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngayVn(nay)}`, sbd, qid, lan: 1, ketQua: 0, luc, assistance: 'assisted', purpose: MUC_DICH_XEM_LOI_GIAI }]).catch(() => null)
   }
   const cau = cauChoKhung(ht.c)
   if (hoSo) return { ok: true, coLoiGiai: true, hoSo, cau }
   return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiGiaiChu(ht.c) }
+}
+
+// ---------------------------------------------------------------- GĐ1 v2: em đọc lời giải thế nào
+
+const KIEU_DOC = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot'])
+
+/** Lọc thao tác máy em gửi: chỉ kiểu đã biết, tối đa 200, mốc thời gian là số. Dữ liệu máy em gửi KHÔNG đáng tin ⇒ chỉ giữ trường cần. */
+export function locSuKienDoc(v: unknown): { k: string; y?: string; d?: boolean; m?: number; t: number }[] {
+  if (!Array.isArray(v)) return []
+  const ra: { k: string; y?: string; d?: boolean; m?: number; t: number }[] = []
+  for (const x of v.slice(0, 200)) {
+    if (!x || typeof x !== 'object') continue
+    const o = x as Obj
+    if (typeof o.k !== 'string' || !KIEU_DOC.has(o.k) || !Number.isFinite(Number(o.t))) continue
+    ra.push({ k: o.k, ...(typeof o.y === 'string' ? { y: o.y.slice(0, 12) } : {}), ...(typeof o.d === 'boolean' ? { d: o.d } : {}), ...(Number.isFinite(Number(o.m)) && o.m != null ? { m: Math.min(3, Math.max(0, Number(o.m))) } : {}), t: Number(o.t) })
+  }
+  return ra
+}
+
+/** Tóm tắt một lần đọc: số ý đã chọn / đúng, số lần xin gợi ý, đã làm câu chốt chưa và đúng không. */
+export function tomTatDoc(ds: { k: string; y?: string; d?: boolean; m?: number }[]) {
+  const chon = ds.filter((x) => x.k === 'chon' || x.k === 'tra_loi_so')
+  const chot = ds.find((x) => x.k === 'chot')
+  return {
+    soY: new Set(chon.map((x) => x.y ?? '')).size,
+    soYDung: chon.filter((x) => x.d === true).length,
+    soGoiY: ds.filter((x) => x.k === 'goi_y').length,
+    soTuongTu: ds.filter((x) => x.k === 'tuong_tu').length,
+    soTuongTuDung: ds.filter((x) => x.k === 'tuong_tu' && x.d === true).length,
+    daChot: !!chot,
+    chotDung: chot ? chot.d === true : null,
+  }
+}
+
+/**
+ * `/hs/doc-loi-giai {token, qid, nguon, giay, suKien}` — máy em gửi khi đóng khung lời giải. Chỉ ghi khi em ĐÃ bấm Hỏi thầy câu này
+ * (có dòng `loi_giai_hoi`) — không ai ghi bừa cho câu chưa mở. Chỉ thêm dữ liệu; không đổi điểm, EXP, lịch ôn.
+ */
+export async function hsDocLoiGiai(env: Env, b: Obj) {
+  await damBaoBangLoiGiai(env)
+  const sbd = await gameIdentity(env, b)
+  const qid = qidGoc(str(b.qid))
+  if (!qid) return { ok: false, error: 'Thiếu câu.' }
+  const daHoi = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_hoi WHERE sbd = ? AND qid = ? LIMIT 1').bind(sbd, qid).first<Obj>()
+  if (!daHoi) return { ok: false, error: 'Em chưa mở lời giải câu này.' }
+  const ds = locSuKienDoc(b.suKien)
+  const giay = Math.min(6 * 3600, Math.max(0, Math.round(Number(b.giay) || 0)))
+  const nay = Date.now()
+  await env.DB.prepare('INSERT INTO doc_loi_giai (sbd, qid, nguon, luc, ngay_vn, giay, so_su_kien, tom_tat_json, su_kien_json) VALUES (?,?,?,?,?,?,?,?,?)')
+    .bind(sbd, qid, str(b.nguon).slice(0, 40) || 'luyen', new Date(nay).toISOString(), ngayVn(nay), giay, ds.length, JSON.stringify(tomTatDoc(ds)), JSON.stringify(ds)).run()
+  return { ok: true }
 }

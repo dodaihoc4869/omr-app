@@ -31,7 +31,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
         {dangTai ? 'Đang mở…' : 'Hỏi thầy'}
       </button>
       {loi && <span className="lg-loi" role="status">{loi}</span>}
-      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} onDong={() => setMo(null)} />}
+      {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} nguon={nguon} onDong={() => setMo(null)} />}
     </div>
   )
 }

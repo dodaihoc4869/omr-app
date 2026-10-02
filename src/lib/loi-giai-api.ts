@@ -92,6 +92,23 @@ export async function hoiThay(qid: string, nguon: string): Promise<KetQuaHoiThay
   return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu }
 }
 
+/** Một thao tác em làm trong khung lời giải (GĐ1 v2): chọn Đ/S một ý, xin gợi ý, gắn chìa khoá, câu tương tự, trả lời số, chốt. */
+export interface SuKienKhung { k: string; y?: string; d?: boolean; m?: number; t: number }
+
+/** GĐ1 v2 (02/10): đóng khung lời giải ⇒ gửi máy chủ em đã đọc bao lâu, làm những gì. Không chờ, không báo lỗi cho em —
+ *  mất một lần ghi chỉ thiếu dữ liệu, không ảnh hưởng em. `keepalive` để vẫn tới khi em đóng trang ngay sau đó. */
+export function baoDocLoiGiai(qid: string, nguon: string, giay: number, suKien: SuKienKhung[]): void {
+  const token = docTokenHs()
+  if (!token || !qid) return
+  void layDiaChiMayChu().then((url) => {
+    if (!url) return
+    return fetch(`${url}/hs/doc-loi-giai`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, keepalive: true,
+      body: JSON.stringify({ token, qid, nguon, giay, suKien: suKien.slice(0, 200) }),
+    })
+  }).catch(() => undefined)
+}
+
 // ---------------------------------------------------------------- thầy
 
 async function goiThay(duong: string, body: Record<string, unknown>): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
