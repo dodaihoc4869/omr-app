@@ -43,6 +43,7 @@ import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import { ghiCauBoTro } from './cau-bo-tro'
+import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
@@ -3246,6 +3247,8 @@ const boXuLy = {
       // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
       // Lô ĐẦU của chốt "đạt ngày" (con trỏ theo lô 40 em; cron mỗi phút ở nhánh dưới chạy tiếp cho tới khi xong). Lỗ cũ: chỉ MỘT lô 40 em/đêm ⇒ em đạt mà chưa được ghi mất mảnh ngày ấy.
       await chotExpNgayQuaDayDu(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
+      // VÒNG HỌC v2 — GĐ5 (02/10): tự hoàn thiện hằng tuần (đêm thứ Hai giờ VN, idempotent theo tuần): hiệu chỉnh luật đóng lỗi theo tỉ lệ sai lại + câu nghi sai đáp án.
+      if(new Date(Date.now()+7*3600000).getUTCDay()===1)await chayTuHoanThien(env,Date.now()).then(r=>console.log('[v2] tự hoàn thiện',JSON.stringify(r))).catch(async e=>{console.error('[v2] tự hoàn thiện lỗi:',e);await ghiLoiMay(env,'v2_tu_hoan_thien')})
       if(!hoa2CaTruong)await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
@@ -3603,6 +3606,9 @@ const boXuLy = {
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
+      if (p === '/gv/v2/tong') return ra(await gvTongV2(env))
+      if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))
+      if (p === '/ca/cau-nghi-dap-an') return ra(await dsCauNghi(env))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))
       if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
       if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))

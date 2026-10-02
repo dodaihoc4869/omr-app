@@ -19,6 +19,10 @@ export const GIO_DOC_LOI_GIAI_CAM = 12
 export const CACH_SAI_CUOI_TOI_THIEU = 3
 export const MOC_DUY_TRI = [14, 30] as const
 
+/** Tham số luật — Giai đoạn 5 tự hiệu chỉnh hằng tuần theo tỉ lệ sai lại thực tế (tu-hoan-thien.ts, `cau_hinh` khoá 'v2_tham_so'). */
+export interface ThamSoLuat { cachSaiCuoi: number; mocDuyTri: readonly number[]; gioDocLoiGiai: number }
+export const THAM_SO_GOC: ThamSoLuat = { cachSaiCuoi: CACH_SAI_CUOI_TOI_THIEU, mocDuyTri: MOC_DUY_TRI, gioDocLoiGiai: GIO_DOC_LOI_GIAI_CAM }
+
 /** Một lần em gặp câu (câu gốc hoặc song sinh của nó). `ketQua`: 1 đúng · 0 sai · null bỏ trống. */
 export interface LanLamLoi {
   luc: string // ISO
@@ -65,12 +69,13 @@ export function cachNgay(a: string, b: string): number {
  * Phát lại một (em, câu). `docLoiGiaiLuc`: các mốc ISO em đọc lời giải câu này (Hỏi thầy / khung lời giải) — lượt làm trong 12 giờ sau
  * mốc đọc bị coi là có hỗ trợ. `coSongSinh`: kho có câu song sinh cho câu này (không có thì luật "một lượt là song sinh" được miễn).
  */
-export function phatLaiLoi(lan: readonly LanLamLoi[], docLoiGiaiLuc: readonly string[], coSongSinh: boolean, homNay: string): KetQuaLoi {
+export function phatLaiLoi(lan: readonly LanLamLoi[], docLoiGiaiLuc: readonly string[], coSongSinh: boolean, homNay: string, ts: ThamSoLuat = THAM_SO_GOC): KetQuaLoi {
+  const MOC = ts.mocDuyTri
   const doc = docLoiGiaiLuc.map((x) => Date.parse(x)).filter(Number.isFinite)
   const tuLam = (x: LanLamLoi) => {
     if (x.coHoTro) return false
     const t = Date.parse(x.luc)
-    return !doc.some((d) => d <= t && t - d < GIO_DOC_LOI_GIAI_CAM * 3_600_000)
+    return !doc.some((d) => d <= t && t - d < ts.gioDocLoiGiai * 3_600_000)
   }
   const ds = [...lan].filter((x) => x.ngayVn >= TU_NGAY).sort((a, b) => a.luc.localeCompare(b.luc))
   const kq: KetQuaLoi = { trangThai: 'khong_loi', saiCuoi: '', soLanSai: 0, ngayDung: [], daDungSongSinh: false, denHan: '', nenSongSinh: false, dongNgay: '', mocDuyTri: 0, nguonSai: '' }
@@ -80,7 +85,7 @@ export function phatLaiLoi(lan: readonly LanLamLoi[], docLoiGiaiLuc: readonly st
       if (kq.trangThai === 'khong_loi') continue // đúng trước khi từng sai: không phải việc của hàng chữa lỗi
       if (kq.trangThai === 'dong' || kq.trangThai === 'duy_tri') {
         // Lượt kiểm duy trì đúng ⇒ qua một mốc.
-        const moc = MOC_DUY_TRI[kq.mocDuyTri]
+        const moc = MOC[kq.mocDuyTri]
         if (moc !== undefined && cachNgay(kq.dongNgay, x.ngayVn) >= moc) kq.mocDuyTri++
         continue
       }
@@ -88,7 +93,7 @@ export function phatLaiLoi(lan: readonly LanLamLoi[], docLoiGiaiLuc: readonly st
       if (x.songSinh) kq.daDungSongSinh = true
       const duNgay = kq.ngayDung.length >= 2
       const duSongSinh = kq.daDungSongSinh || !coSongSinh
-      const duCach = cachNgay(kq.saiCuoi, x.ngayVn) >= CACH_SAI_CUOI_TOI_THIEU
+      const duCach = cachNgay(kq.saiCuoi, x.ngayVn) >= ts.cachSaiCuoi
       if (duNgay && duSongSinh && duCach) {
         kq.trangThai = 'dong'
         kq.dongNgay = x.ngayVn
@@ -108,11 +113,11 @@ export function phatLaiLoi(lan: readonly LanLamLoi[], docLoiGiaiLuc: readonly st
       kq.mocDuyTri = 0
     }
   }
-  if (kq.trangThai === 'dong' && kq.mocDuyTri >= MOC_DUY_TRI.length) kq.trangThai = 'duy_tri'
+  if (kq.trangThai === 'dong' && kq.mocDuyTri >= MOC.length) kq.trangThai = 'duy_tri'
   // Hạn: lỗi mở ⇒ làm lại ngay hôm sau lần sai (hôm nay nếu đã quá); chờ kiểm ⇒ ngày sớm nhất đủ điều kiện đóng; đã đóng ⇒ mốc duy trì kế.
   if (kq.trangThai === 'mo') kq.denHan = maxNgay(congNgayVn(kq.saiCuoi, 1), '')
-  else if (kq.trangThai === 'cho_kiem') kq.denHan = maxNgay(congNgayVn(kq.ngayDung[kq.ngayDung.length - 1]!, 1), congNgayVn(kq.saiCuoi, CACH_SAI_CUOI_TOI_THIEU))
-  else if (kq.trangThai === 'dong') kq.denHan = congNgayVn(kq.dongNgay, MOC_DUY_TRI[kq.mocDuyTri]!)
+  else if (kq.trangThai === 'cho_kiem') kq.denHan = maxNgay(congNgayVn(kq.ngayDung[kq.ngayDung.length - 1]!, 1), congNgayVn(kq.saiCuoi, ts.cachSaiCuoi))
+  else if (kq.trangThai === 'dong') kq.denHan = congNgayVn(kq.dongNgay, MOC[kq.mocDuyTri]!)
   if (kq.denHan && kq.denHan < homNay && kq.trangThai !== 'mo') kq.denHan = homNay
   if (kq.trangThai === 'mo' && kq.denHan < homNay) kq.denHan = homNay
   // Song sinh: lượt kế phục vụ song sinh khi câu có song sinh và em chưa đúng song sinh (lượt mở: song sinh luôn — không nhớ đáp án).

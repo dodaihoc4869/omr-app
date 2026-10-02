@@ -8,7 +8,7 @@
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import type { LanLam, TrangThaiCau } from './srs2-loi'
-import { phatLaiLoi, tachSongSinh, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
+import { phatLaiLoi, tachSongSinh, TU_NGAY, type KetQuaLoi, type ThamSoLuat } from './loi-hoc-luat'
 import { boTroTheoQid } from './song-sinh-game'
 import type { BoTro } from './cau-bo-tro'
 import { apSongSinh } from './song-sinh-game'
@@ -55,8 +55,8 @@ const sangLoi = (x: LanLam) => ({ luc: x.luc, ngayVn: x.ngay, ketQua: (x.dung ? 
  *   mở / chờ kiểm ⇒ CHƯA thành thạo, hẹn theo luật v2 (song sinh, cách ≥ 3 ngày…); đã đóng ⇒ thành thạo, hẹn mốc duy trì 14/30 ngày;
  *   hết mốc ⇒ giữ hẹn srs2. `catTia` ("Cần thầy dạy lại") giữ của srs2.
  */
-export function apLuatChung(t: TrangThaiCau, lan: readonly LanLam[], docLuc: readonly string[], coSongSinh: boolean, homNay: string): { t: TrangThaiCau; loi: KetQuaLoi } {
-  const loi = phatLaiLoi(lan.map(sangLoi), docLuc, coSongSinh, homNay)
+export function apLuatChung(t: TrangThaiCau, lan: readonly LanLam[], docLuc: readonly string[], coSongSinh: boolean, homNay: string, ts?: ThamSoLuat): { t: TrangThaiCau; loi: KetQuaLoi } {
+  const loi = phatLaiLoi(lan.map(sangLoi), docLuc, coSongSinh, homNay, ts)
   if (loi.trangThai === 'khong_loi') return { t, loi }
   if (loi.trangThai === 'mo' || loi.trangThai === 'cho_kiem') {
     return { t: { ...t, laMoi: false, thanhThao: false, henOn: loi.denHan || homNay, ngayVaoNo: t.ngayVaoNo ?? loi.saiCuoi }, loi }

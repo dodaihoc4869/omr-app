@@ -4,6 +4,7 @@ import { gopDocD1 } from './doc-d1-theo-luot'
 //   {"bat":true}                         ⇒ toàn trung tâm
 //   {"bat":true,"lop":["12A1"]}          ⇒ chỉ các lớp này
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
+import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
 import type { KetQuaLoi } from './loi-hoc-luat'
 import type { BoTro } from './cau-bo-tro'
@@ -457,7 +458,7 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
-  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd)])
+  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), docThamSo(env)])
   const dangChay = chienDichDangChay(ds, homNay)
   const hanTheoQid = new Map<string, string>()
   // Thầy 28/09: "khi giao chiến dịch đầu tiên tất cả không có câu ôn, không được lấy câu ôn trước đó" ⇒ câu của một chiến dịch chỉ tính lần làm TỪ LÚC GIAO chiến dịch ấy.
@@ -519,7 +520,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
     let t = t0
     if (qidSaiMoiKenh.has(qid)) {
       const soSS = boTro.get(qid)?.songSinh.length ?? 0
-      const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay)
+      const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoV2)
       t = ap.t
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
       if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, chonSongSinh(theoQid.get(qid) ?? [], soSS))
