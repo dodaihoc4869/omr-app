@@ -1,5 +1,5 @@
 // BÀN GỠ NÚT THẮT — màn thầy (src/screens/BanGoNutThatScreen.tsx): vẽ thẻ theo thứ tự máy chủ, khối Kèm riêng ở đầu, không lộ mã nội bộ,
-// bấm "Gỡ ngắn" gửi đúng lệnh; "Dạy trên lớp" chọn buổi học đang mở.
+// bấm "Gỡ ngắn" gửi đúng lệnh (bước trong dữ liệu đánh số từ 0, màn hiện buoc+1); "Dạy trên lớp" chọn buổi học đang mở.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { KetQuaDsNut } from '../src/lib/nut-that-api'
@@ -46,7 +46,7 @@ describe('màn Bàn gỡ nút thắt', () => {
     const the = await screen.findAllByTestId('the-nut-that')
     expect(the).toHaveLength(2)
     expect(within(the[0]!).getByText('Câu 6')).toBeTruthy()
-    expect(within(the[0]!).getByText('Vướng bước 2')).toBeTruthy()
+    expect(within(the[0]!).getByText('Vướng bước 3')).toBeTruthy()
     expect(within(the[0]!).getByText('2 em')).toBeTruthy()
     expect(within(the[0]!).getByText('Kiến thức nền: Bảo toàn electron')).toBeTruthy()
     expect(within(the[0]!).getByText('Nhiều em vướng — nên sửa lời giải')).toBeTruthy()
@@ -58,6 +58,8 @@ describe('màn Bàn gỡ nút thắt', () => {
     expect(within(the[1]!).getByText('Câu 3')).toBeTruthy()
     expect(screen.getByText(/Kèm riêng trên lớp · 1 em/)).toBeTruthy()
     expect(screen.getByText('Phạm Dũng')).toBeTruthy()
+    expect(document.body.textContent).toContain('Câu 7, bước 2: Đổi đơn vị') // dữ liệu bước 1 (đánh số từ 0) ⇒ màn hiện "bước 2"
+    expect(the[0]!.textContent).toContain('Bước 3 các em vướng')
     expect(document.body.textContent).toContain('12 em vướng Bảo toàn electron ở 5 câu')
     expect(document.body.textContent).not.toMatch(/BAM1|BAM2|12-THU-I-6|E1\b/)
   })
@@ -71,7 +73,7 @@ describe('màn Bàn gỡ nút thắt', () => {
     fireEvent.change(within(the[0]!).getByLabelText(/Lời gỡ ngắn gửi 2 em/), { target: { value: '  Fe nhường 3 electron.  ' } })
     fireEvent.click(gui)
     await waitFor(() => expect(api.gvGoNutThat).toHaveBeenCalledWith({ bam: 'BAM1', buoc: 2, kieu: 'ngan', noiDung: 'Fe nhường 3 electron.' }))
-    await screen.findByText(/Đã gửi lời gỡ Câu 6, bước 2 cho 2 em/)
+    await screen.findByText(/Đã gửi lời gỡ Câu 6, bước 3 cho 2 em/)
     expect(api.gvDsNutThat).toHaveBeenCalledTimes(2)
   })
 

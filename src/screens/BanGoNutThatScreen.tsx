@@ -2,7 +2,7 @@
 // sự nhưng không thể làm được khi đã đọc kĩ lời giải"). Thay vai trò màn "Học sinh hỏi" cho câu đã nỗ lực: em đi hết thang tự gỡ mà vẫn
 // vướng ⇒ một thẻ; màn này GOM thẻ theo (câu, bước vướng), xếp ưu tiên (máy chủ tính), thầy gỡ MỘT lần cho cả nhóm.
 // Ba cách gỡ: Gỡ ngắn (gõ ~1 phút; ghi âm/ảnh để sau) · Dạy trên lớp (chọn buổi học) · Sửa lời giải/đề (ghi chỗ cần sửa — app không tự
-// sửa kho). Khối "Kèm riêng" ở đầu: em vẫn tự làm sai ≥ 2 lần sau lời gỡ. Máy chủ: server/src/ban-go-nut-that.ts.
+// sửa kho). Bước trong dữ liệu đánh số TỪ 0 — màn hiện "Bước buoc+1". Khối "Kèm riêng" ở đầu: em vẫn tự làm sai ≥ 2 lần sau lời gỡ. Máy chủ: server/src/ban-go-nut-that.ts.
 import { useCallback, useEffect, useState } from 'react'
 import { gvDsNutThat, gvGoNutThat, type KetQuaDsNut, type KieuGo, type NhomNut } from '../lib/nut-that-api'
 import { buoiDangMo } from '../lib/buoi-hoc-api'
@@ -55,7 +55,7 @@ export default function BanGoNutThatScreen() {
     setDangGhi(false)
     if (!r.ok) { setBao(r.error ?? 'Máy chủ chưa nhận lời gỡ.'); return }
     setGo(null)
-    const ten = `${n.so || 'câu này'}, bước ${n.buoc}`
+    const ten = `${n.so || 'câu này'}, bước ${n.buoc + 1}`
     if (go.kieu === 'ngan') setBao(`Đã gửi lời gỡ ${ten} cho ${r.soThe ?? 0} em.`)
     else if (go.kieu === 'sua') setBao(`Đã lưu ghi chú sửa ${ten} (${r.soThe ?? 0} thẻ đã chuyển sang “đã gỡ”). App chưa tự sửa kho — thầy sửa kho theo ghi chú này.`)
     else {
@@ -94,7 +94,7 @@ export default function BanGoNutThatScreen() {
           <ul className="lg-co">
             {kq.kemRieng!.map((e, i) => (
               <li key={`${e.sbd}-${e.qid}-${e.buoc}-${i}`}>
-                <b>{e.hoTen}</b> — {e.so || 'Câu đã gỡ'}, bước {e.buoc}{e.chuBuoc ? `: ${e.chuBuoc}` : ''}
+                <b>{e.hoTen}</b> — {e.so || 'Câu đã gỡ'}, bước {e.buoc + 1}{e.chuBuoc ? `: ${e.chuBuoc}` : ''}
               </li>
             ))}
           </ul>
@@ -134,7 +134,7 @@ export default function BanGoNutThatScreen() {
               <li key={n.khoa} className="gv2-the lg-dong" data-testid="the-nut-that">
                 <div className="lg-dong-dau">
                   <span className="gv2-the-tieu-de">{n.so || 'Câu trong kho'}</span>
-                  <span className="gv2-chip" data-tone="vang">Vướng bước {n.buoc}</span>
+                  <span className="gv2-chip" data-tone="vang">Vướng bước {n.buoc + 1}</span>
                   <span className="gv2-chip" data-tone="xam">{n.soEm} em</span>
                   {n.nhanNen && <span className="gv2-chip" data-tone="la">Kiến thức nền: {n.nhanNen}</span>}
                   {n.nhieuEmVuong && <span className="gv2-chip" data-tone="do">Nhiều em vướng — nên sửa lời giải</span>}
@@ -155,7 +155,7 @@ export default function BanGoNutThatScreen() {
                 )}
 
                 <div style={{ padding: '8px 12px', borderRadius: 12, background: 'var(--m3-tertiary-container)', color: 'var(--m3-on-tertiary-container)' }}>
-                  <strong>Bước {n.buoc} các em vướng:</strong>{' '}
+                  <strong>Bước {n.buoc + 1} các em vướng:</strong>{' '}
                   {n.chuBuoc ? <span dangerouslySetInnerHTML={{ __html: n.chuBuoc }} /> : <span>chưa có chữ bước này trong lời giải.</span>}
                 </div>
                 {n.cauKiemHoi && <p className="gv2-phu">Câu kiểm của bước: {n.cauKiemHoi}</p>}

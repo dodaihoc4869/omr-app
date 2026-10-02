@@ -35,7 +35,8 @@ async function dung() {
   const lgc = d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES(?,?,?,'tn','x')")
   lgc.run(Q1, 'BAM1', DE); lgc.run('Q2', 'BAM2', 'DE2'); lgc.run('Q3', 'BAM3', 'DE3')
   const bt = d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cau_kiem_json,nhan_nen_json,buoc_json,cap_nhat_luc) VALUES(?,?,'[]',?,?,?,'x')")
-  bt.run('BAM1', Q1, JSON.stringify([{ buoc: 2, kieu: 'so', hoi: 'Số mol electron nhận là bao nhiêu?', dap_an: '0,4' }]), JSON.stringify([{ buoc: 2, nen: 'Bảo toàn electron' }]), JSON.stringify(['Viết phương trình', 'Bảo toàn electron: 3x = 0,4', 'Tính m']))
+  // Bước đánh số TỪ 0: buoc 2 = phần tử thứ ba của buoc[].
+  bt.run('BAM1', Q1, JSON.stringify([{ buoc: 2, kieu: 'so', hoi: 'Số mol electron nhận là bao nhiêu?', dap_an: '0,4' }]), JSON.stringify([{ buoc: 2, nen: 'Bảo toàn electron' }, { buoc: 0, nen: 'Viết phương trình phản ứng' }]), JSON.stringify(['Viết phương trình', 'Đổi ra số mol', 'Bảo toàn electron: 3x = 0,4', 'Tính m']))
   bt.run('BAM2', 'Q2', '[]', JSON.stringify([{ buoc: 1, nen: 'Bảo toàn electron' }]), JSON.stringify(['Lập hệ']))
   return { d, env }
 }
@@ -84,6 +85,22 @@ describe('/gv/nut-that/ds — gom thẻ + thứ tự ưu tiên', () => {
     expect(r.cungNen).toEqual([{ nen: 'Bảo toàn electron', soEm: 3, soCau: 2, khoa: ['BAM1|2', 'BAM2|1'] }])
     expect(r.tong).toMatchObject({ soThe: 7, soNhom: 4, quaTai: false })
     expect(nhom.every((n) => !('nhieuEmVuong' in n) || (n as unknown as { nhieuEmVuong: boolean }).nhieuEmVuong === false)).toBe(true)
+  })
+
+  it('bước đánh số TỪ 0: bước 0 và bước 1 là hai nhóm khác nhau, chữ bước + nhãn nền đúng chỉ số; ngoài phạm vi ⇒ rỗng', async () => {
+    const { d } = await dung()
+    the(d, 'E1', Q1, 'BAM1', 0, '2026-10-18T02:00:00.000Z')
+    the(d, 'E2', Q1, 'BAM1', 1, '2026-10-18T03:00:00.000Z')
+    the(d, 'E3', Q1, 'BAM1', 9, '2026-10-18T04:00:00.000Z')
+    const r = await thay(d, '/gv/nut-that/ds', {})
+    const theo = Object.fromEntries((r.nhom as { khoa: string; chuBuoc: string; nhanNen: string; cauKiemHoi: string }[]).map((n) => [n.khoa, n]))
+    expect(Object.keys(theo).sort()).toEqual(['BAM1|0', 'BAM1|1', 'BAM1|9'])
+    expect(theo['BAM1|0']).toMatchObject({ chuBuoc: 'Viết phương trình', nhanNen: 'Viết phương trình phản ứng', cauKiemHoi: '' })
+    expect(theo['BAM1|1']).toMatchObject({ chuBuoc: 'Đổi ra số mol', nhanNen: '' })
+    expect(theo['BAM1|9']!.chuBuoc).toBe('')
+    expect(await thay(d, '/gv/nut-that/go', { bam: 'BAM1', buoc: 0, kieu: 'ngan', noiDung: 'Gỡ bước đầu' })).toMatchObject({ ok: true, soThe: 1 })
+    expect(d.dem('nut_that', "buoc=1 AND trang_thai='cho'")).toBe(1)
+    expect(await thay(d, '/gv/nut-that/go', { bam: 'BAM1', buoc: -1, kieu: 'ngan', noiDung: 'x' })).toMatchObject({ ok: false })
   })
 
   it('công thức ưu tiên: số em × mức hay gặp × hạn', () => {

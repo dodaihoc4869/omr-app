@@ -199,10 +199,10 @@ async function cauKho(env: Env, qid: string, boNho: Map<string, unknown>): Promi
   return cauTrongGoi(maDe, goi).find((x) => x.qid === qid) ?? null
 }
 
-/** Chữ bước `buoc` trong một danh sách bước. Bước đánh số TỪ 1 như chữ "Bước 1" em thấy; số 0 (nếu máy gửi) ⇒ bước đầu. */
+/** Chữ bước `buoc` trong một danh sách bước. QUY ƯỚC CHỐT (02/10): bước đánh số TỪ 0 ở mọi dữ liệu (nut_that, loi_go, cau_kiem_lam,
+ *  cau_bo_tro.cau_kiem/nhan_nen, chỉ số mảng buoc[]); chỉ màn hình hiện "Bước buoc+1". Ngoài phạm vi ⇒ chuỗi rỗng. */
 function chuCuaBuoc(ds: readonly string[], buoc: number): string {
-  const i = buoc >= 1 ? buoc - 1 : 0
-  return str(ds[i])
+  return Number.isInteger(buoc) && buoc >= 0 && buoc < ds.length ? str(ds[buoc]) : ''
 }
 
 /** Chữ bước từ hồ sơ lời giải từng bước (R2 `giai/<băm>.json`, mảng `dung` [{t, p}]). */
@@ -212,7 +212,7 @@ async function chuBuocHoSo(env: Env, bam: string, buoc: number): Promise<string>
     if (!o) return ''
     const h = (await new Response(o.body).json()) as Obj
     const dung = Array.isArray(h.dung) ? (h.dung as Obj[]) : []
-    const b = dung[buoc >= 1 ? buoc - 1 : 0]
+    const b = Number.isInteger(buoc) && buoc >= 0 ? dung[buoc] : undefined // bước đánh số từ 0
     return b ? [str(b.t), str(b.p)].filter(Boolean).join(': ') : ''
   } catch {
     return ''
@@ -360,7 +360,7 @@ export async function gvNutThatGo(env: Env, b: Obj, nowMs: number = Date.now()) 
   const bam = str(b.bam), buoc = Number(b.buoc), kieu = str(b.kieu)
   const noiDung = str(b.noiDung).slice(0, TOI_DA_NOI_DUNG)
   const buoiHoc = str(b.buoiHoc).slice(0, 80)
-  if (!bam || !Number.isInteger(buoc)) return { ok: false, error: 'Thiếu câu hoặc bước cần gỡ.' }
+  if (!bam || !Number.isInteger(buoc) || buoc < 0) return { ok: false, error: 'Thiếu câu hoặc bước cần gỡ.' }
   if (!KIEU_GO.has(kieu)) return { ok: false, error: 'Cách gỡ không rõ.' }
   if (kieu !== 'lop' && !noiDung) return { ok: false, error: kieu === 'sua' ? 'Thầy ghi nội dung cần sửa trước khi lưu.' : 'Thầy gõ lời gỡ trước khi gửi.' }
   if (kieu === 'lop' && !buoiHoc && !noiDung) return { ok: false, error: 'Thầy chọn buổi học hoặc ghi buổi sẽ dạy.' }
