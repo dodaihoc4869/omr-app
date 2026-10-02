@@ -3,6 +3,7 @@
 const token = process.env.CLOUDFLARE_API_TOKEN?.trim()
 const account = process.env.CLOUDFLARE_ACCOUNT_ID?.trim()
 if (!token || !account) throw new Error('Thiếu cấu hình Cloudflare của quy trình phát hành')
+if (/\s/.test(token) || !/^[0-9a-f]{32}$/i.test(account)) throw new Error('Cấu hình Cloudflare chưa được chuẩn hoá')
 const database = 'd2e6d322-374a-45d7-83a3-9fac486b23f1'
 async function query(sql, params = []) {
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/${database}/query`, {
