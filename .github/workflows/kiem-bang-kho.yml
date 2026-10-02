@@ -6,6 +6,9 @@ on:
     paths: ['scripts/kiem-bang-kho-0210.mjs', '.github/workflows/kiem-bang-kho.yml']
 permissions:
   contents: read
+concurrency:
+  group: kiem-bang-kho-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   kiem-bang:
     runs-on: ubuntu-latest

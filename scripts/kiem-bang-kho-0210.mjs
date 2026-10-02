@@ -7,7 +7,7 @@ if (/\s/.test(token) || !/^[0-9a-f]{32}$/i.test(account)) throw new Error('Cấu
 const database = 'd2e6d322-374a-45d7-83a3-9fac486b23f1'
 async function query(sql, params = []) {
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/${database}/query`, {
-    method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }),
+    method: 'POST', signal: AbortSignal.timeout(30_000), headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ sql, params }),
   })
   const j = await r.json()
   if (!r.ok || !j.success) throw new Error(`Không đọc được D1: HTTP ${r.status}; mã ${(j.errors ?? []).map(x => x.code).join(',')}`)
@@ -49,8 +49,10 @@ const objects = new Map()
 for (const q of targets.values()) {
   const key = q.r2 || `kho/${q.maDe}.json`
   if (!objects.has(key)) {
-    const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/r2/buckets/omr-de/objects/${encodeURIComponent(key)}`, { headers: { Authorization: `Bearer ${token}` } })
-    objects.set(key, r.ok ? await r.json() : { readError: r.status })
+    try {
+      const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/r2/buckets/omr-de/objects/${encodeURIComponent(key)}`, { signal: AbortSignal.timeout(20_000), headers: { Authorization: `Bearer ${token}` } })
+      objects.set(key, r.ok ? await r.json() : { readError: r.status })
+    } catch { objects.set(key, { readError: 'khong_doc_duoc' }) }
   }
   const raw = objects.get(key)
   const list = raw.cau ?? ['I','II','III'].flatMap(p => (raw[`phan${p}`] ?? []).map(c => ({ ...c, phan: p })))
