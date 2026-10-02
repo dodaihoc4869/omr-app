@@ -9,3 +9,5 @@ CREATE TABLE IF NOT EXISTS loi_go (id TEXT PRIMARY KEY, bam TEXT NOT NULL, buoc 
 CREATE INDEX IF NOT EXISTS loi_go_cau ON loi_go(bam, buoc);
 CREATE TABLE IF NOT EXISTS cau_kiem_lam (id INTEGER PRIMARY KEY AUTOINCREMENT, sbd TEXT NOT NULL, qid TEXT NOT NULL, bam TEXT NOT NULL, buoc INTEGER NOT NULL, tra_loi TEXT, dung INTEGER NOT NULL, giay INTEGER NOT NULL DEFAULT 0, luc TEXT NOT NULL, ngay_vn TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS cau_kiem_lam_em ON cau_kiem_lam(sbd, qid);
+-- Bàn gỡ nút thắt (server/src/ban-go-nut-that.ts): em đã đọc lời thầy gỡ nào, lúc nào.
+CREATE TABLE IF NOT EXISTS loi_go_doc (sbd TEXT NOT NULL, go_id TEXT NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (sbd, go_id, luc));

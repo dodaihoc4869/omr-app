@@ -93,6 +93,7 @@ const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen')
 const TongQuanScreen = lazy(() => import('./screens/TongQuanScreen'))
 const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 const DuyetLoiGiaiScreen = lazy(() => import('./screens/DuyetLoiGiaiScreen'))
+const BanGoNutThatScreen = lazy(() => import('./screens/BanGoNutThatScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -128,6 +129,7 @@ const TEN_MAN: Record<string, string> = {
   tongquan: 'Tổng quan',
   chiendich: 'Chiến dịch luyện',
   duyetloigiai: 'Duyệt lời giải',
+  bangonutthat: 'Bàn gỡ nút thắt',
 }
 
 /** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
@@ -428,6 +430,7 @@ function App() {
         {screen === 'tongquan' && <TongQuanScreen />}
         {screen === 'chiendich' && <ChienDichScreen />}
         {screen === 'duyetloigiai' && <DuyetLoiGiaiScreen />}
+        {screen === 'bangonutthat' && <BanGoNutThatScreen />}
         </Suspense>
       </ChanLoi>
       )}
