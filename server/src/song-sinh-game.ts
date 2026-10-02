@@ -4,6 +4,7 @@
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { dongBoTro, type BoTro, type SongSinh } from './cau-bo-tro'
+import { bangSongSinh, duBangSongSinh } from '../../src/lib/bang-song-sinh'
 import { tachSongSinh } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
@@ -14,6 +15,9 @@ export const qidSongSinh = (goc: string, i: number) => `${goc}~ss${i}`
 /** Phủ song sinh lên câu gốc. Chỉ Phần I (4 phương án) và Phần III (số); Phần II / song sinh thiếu dữ liệu ⇒ null. */
 export function apSongSinh(q: PrivateQuestion, ss: SongSinh, i: number): PrivateQuestion | null {
   if (q.phan === 'II') return null
+  // Câu gốc có bảng / đề mới dẫn tới bảng nhưng học liệu không mang bảng riêng ⇒
+  // dùng câu gốc đủ dữ kiện (`phuNeuCan`), tránh buộc em đoán hoặc ghép số liệu cũ với đáp án mới.
+  if (!duBangSongSinh(ss.de, ss.bang, !!q.table?.length)) return null
   if (q.phan === 'I') {
     const pa = ss.pa ?? {}
     const choices = ['A', 'B', 'C', 'D'].map((k) => String(pa[k] ?? '').trim())
@@ -32,8 +36,8 @@ function phu(q: PrivateQuestion, ss: SongSinh, i: number, them: { choices: strin
     text: ss.de,
     choices: them.choices,
     correct: them.correct,
-    // Song sinh tự mang đủ dữ kiện trong đề (máy soạn chép bảng vào chữ) ⇒ bỏ bảng / ảnh của câu gốc để không lẫn số cũ.
-    table: undefined, thanCauImg: undefined, imageDataUrl: undefined, choiceImgs: undefined, ideaImgs: undefined, hinhAnh: [],
+    // Chỉ dùng bảng của song sinh, bỏ ảnh của câu gốc để không lẫn số cũ.
+    table: bangSongSinh(ss.bang), thanCauImg: undefined, imageDataUrl: undefined, choiceImgs: undefined, ideaImgs: undefined, hinhAnh: [],
     solution: { chot: typeof lg.chot === 'string' ? lg.chot : '', buoc: ss.buoc ?? [], ket_qua: ss.dap_an, dap_an_de: them.correct, song_sinh: true },
   }
 }

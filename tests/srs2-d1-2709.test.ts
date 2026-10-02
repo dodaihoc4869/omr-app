@@ -1,7 +1,9 @@
 // @vitest-environment node
 // Game Hóa 2.0 — tích hợp trên D1 thật (node:sqlite, lược đồ đủ migration): giao chiến dịch → Sảnh → khoá Đảo →
 // Đoàn có gợi ý M3 → cắt tỉa → Chữa xong → Rương Bát Linh; kế hoạch ngày chốt, dựng lại từ sổ khớp 100% (N3).
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { gameV2 } from '../server/src/game-v2'
+import { gameToken } from '../server/src/game-v2-auth'
 import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { cheDo2, layKeHoachHomNay, sanh2, docHoSo2, LOI_KHOA_DAO } from '../server/src/srs2-d1'
@@ -37,6 +39,31 @@ function fixture(soCau = 12) {
 
 const suKien = (sbd: string, qid: string, msLuc: number, dung: boolean, extra: Partial<SuKien> = {}): SuKien => ({
   nguon: 'game', maNguon: `phien-${msLuc}`, sbd, qid, lan: 1, ketQua: dung ? 1 : 0, luc: new Date(msLuc).toISOString(), ...extra,
+})
+
+it('Hóa 2.0: đã đi 6 chặng nhưng còn 1 câu ôn vẫn mở/vào đoàn miễn phí, trả lời xong mới mở Đảo', async () => {
+  vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0)
+  try {
+    const { d, env } = fixture(1)
+    d.sql.exec("UPDATE hoc_sinh SET mat_khau='mk'")
+    d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong','{"toanBo":true}','x')`)
+    const profile = { pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z' }
+    for (const sbd of ['S1', 'S2']) {
+      d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run(sbd, JSON.stringify(profile), 'x')
+      for (let i = 0; i < 6; i++) d.sql.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc,ket_luc) VALUES(?,?,?,?,0,?,?)').run(`CU-${i}`, sbd, '2026-09-30', '12A1', new Date(T0 - 3_600_000).toISOString(), new Date(T0 - 1_800_000).toISOString())
+    }
+    await giao(env, '2026-10-04', T0 - 3 * NGAY)
+    await ghiSuKien(env, ['S1', 'S2'].map((sbd) => suKien(sbd, 'Q1', T0 - 2 * NGAY, false)))
+    expect(await sanh2(env, 'S1', T0)).toMatchObject({ doan: { con: 1 }, khoaDao: true })
+    const call = async (sbd: string, action: string, b: Record<string, unknown> = {}) => gameV2(env, action, { token: await gameToken(env, sbd), ...b }) as Promise<Record<string, any>>
+    const mo = await call('S1', 'doan-mo', { cheDo: 'phong' })
+    expect(mo.doan.ghe).toHaveLength(1)
+    const vao = await call('S2', 'doan-vao', { ma: mo.doan.ma })
+    expect(vao.doan.ghe).toHaveLength(2)
+    expect(d.sql.prepare("SELECT COUNT(*) n FROM doan_ve_so WHERE loai='tieu'").get()).toEqual({ n: 0 })
+    await ghiSuKien(env, [suKien('S1', 'Q1', T0, true)])
+    expect(await sanh2(env, 'S1', T0)).toMatchObject({ doan: { con: 0 }, khoaDao: false })
+  } finally { vi.useRealTimers() }
 })
 
 async function giao(env: Env, hanNop = '2026-10-04', nowMs = T0 - NGAY) {

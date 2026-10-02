@@ -674,7 +674,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
         const khac = await timDangDo()
         if (khac && khac.ma_chang !== ma) throw new Error('Em đang ở một đoàn khác. Em rời đoàn ấy trước rồi vào đoàn này nhé.')
         const toi = toiMoi ??= await taoNguoi(env, sbd, hoSo, b, goiGame, now)
-        await quaCongVe(env, sbd, ma, now)
+        if (!await cheDo2(env, sbd)) await quaCongVe(env, sbd, ma, now)
         phong.nguoi.push(toi); i = phong.nguoi.length - 1; doi = true
         if (!await luuPhong(env, ma, phong, revision)) continue
         await env.DB.prepare('INSERT OR IGNORE INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,?,?)').bind(ma, sbd, ngayVn(iso(now)), toi.lop, i, iso(now)).run()

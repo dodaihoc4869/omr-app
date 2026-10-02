@@ -488,7 +488,7 @@ export interface LoiDenHanEm {
   phan?: 'I' | 'II' | 'III'
   mucDo?: string
   dang?: string
-  cauSongSinh?: { id: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; correct: string }
+  cauSongSinh?: { id: string; phan: 'I' | 'II' | 'III'; text: string; table?: string[][]; choices?: string[]; correct: string }
 }
 
 /** RÚT ĐỀ v2 — `/ca/loi-den-han` theo LÔ 20 em (4 lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI (chỗ gọi đi đường rút cũ). */

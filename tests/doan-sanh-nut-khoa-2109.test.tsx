@@ -39,6 +39,18 @@ beforeEach(() => {
 })
 afterEach(cleanup)
 
+it.each([1, 2])('Hóa 2.0 còn %i câu: hết trần chặng/câu và hết vé của chế độ cũ vẫn mở được cả hai lối', (con) => {
+  const p = goc({ hoa2: { con, daoCon: 19 }, chang: { daDi: 6, toiDa: 6 }, goiY: goiY(true, { daDung: 60, tran: 60 }), sanh: sanh({ ve: 0 }) })
+  const { container } = render(<DoanSanh {...p} />)
+  expect(nutDi(container).disabled).toBe(false)
+  expect(nutMo(container).disabled).toBe(false)
+  expect(lyDo(container)).toBeNull()
+  fireEvent.click(nutDi(container))
+  fireEvent.click(nutMo(container))
+  expect(p.onLenDuong).toHaveBeenCalledOnce()
+  expect(p.onMoPhong).toHaveBeenCalledOnce()
+})
+
 describe('nút "Mở đoàn mới" khoá ⇒ dòng lý do NGAY DƯỚI nút', () => {
   it('bình thường (còn vé, chưa hết 200 câu): nút bấm được, KHÔNG có dòng lý do', () => {
     const { container } = render(<DoanSanh {...goc()} />)

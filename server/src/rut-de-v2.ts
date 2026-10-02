@@ -12,6 +12,7 @@ import { xoaDemCaBaoVe } from './game-v2-bank'
 import { xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { docKeyBankDem } from './dem-ca-thi'
 import { khoTuNguon, rutDeV2, banDoTuKetQua, type HoSoEmV2, type LoiEmV2, type NguonV2, type PhanV2 } from '../../src/lib/rut-de-v2'
+import { bangSongSinh, duBangSongSinh } from '../../src/lib/bang-song-sinh'
 
 type Obj = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim())
@@ -75,7 +76,7 @@ const chuanMucDo = (v: unknown): string => {
 const chuanPhan = (v: unknown): PhanV2 | undefined => (v === 'I' || v === 'II' || v === 'III' ? v : undefined)
 
 /** Câu song sinh dựng thành câu đề (CÓ đáp án — chỉ đi về máy thầy / kho đáp án của ca). Phần I: 4 phương án; Phần III: giá trị đúng. */
-export interface CauSongSinhRa { id: string; phan: PhanV2; text: string; choices?: string[]; correct: string }
+export interface CauSongSinhRa { id: string; phan: PhanV2; text: string; table?: string[][]; choices?: string[]; correct: string }
 
 /** Lỗi dùng được của một em từ hồ sơ hàng chữa lỗi: mọi lỗi CÒN VIỆC (có hạn) + meta câu gốc + câu song sinh lượt tới. */
 export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa })[] {
@@ -87,13 +88,16 @@ export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa }
     const phan = chuanPhan(m?.phan)
     const ssK = hs.songSinhCho?.get(qid)
     const ss = ssK !== undefined ? hs.boTro?.get(qid)?.songSinh?.[ssK] : undefined
+    const bang = ss ? bangSongSinh(ss.bang) : undefined
+    const media = bang ? { table: bang } : {}
+    const du = ss && duBangSongSinh(ss.de, ss.bang, !!m?.coBang)
     let cauSongSinh: CauSongSinhRa | undefined
-    if (ss && phan === 'I' && ss.pa && ['A', 'B', 'C', 'D'].every((x) => typeof ss.pa?.[x] === 'string') && /^[ABCD]$/.test(chuoi(ss.dap_an))) {
-      cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, choices: ['A', 'B', 'C', 'D'].map((x) => String(ss.pa![x])), correct: chuoi(ss.dap_an) }
-    } else if (ss && phan === 'III' && /^-?\d+(,\d+)?$/.test(chuoi(ss.dap_an))) {
+    if (du && phan === 'I' && ss.pa && ['A', 'B', 'C', 'D'].every((x) => typeof ss.pa?.[x] === 'string') && /^[ABCD]$/.test(chuoi(ss.dap_an))) {
+      cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, ...media, choices: ['A', 'B', 'C', 'D'].map((x) => String(ss.pa![x])), correct: chuoi(ss.dap_an) }
+    } else if (du && phan === 'III' && /^-?\d+(,\d+)?$/.test(chuoi(ss.dap_an))) {
       // Đáp án chấm = `dap_an` ĐÃ làm tròn theo câu làm tròn của đề song sinh (dấu phẩy) — KHÔNG phải `gia_tri_dung` (giá trị chính xác
       // chưa làm tròn, dấu chấm, vd "1086.8421052632": em ghi 1086,8 đúng yêu cầu đề sẽ bị chấm sai).
-      cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, correct: chuoi(ss.dap_an) }
+      cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, ...media, correct: chuoi(ss.dap_an) }
     }
     ra.push({
       qid,
