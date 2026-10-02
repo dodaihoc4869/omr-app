@@ -98,7 +98,7 @@ export async function docSuKienNL(env: Env, sbd: string): Promise<KetQuaDocSo> {
   const goc = 'khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, muc_do'
   const them = ', attempt_id, assistance, visibility, correction_of, purpose, received_at'
   const chay = async (coMoi: boolean) =>
-    env.DB.prepare(`SELECT ${goc}${coMoi ? them : ''} FROM su_kien_hoc WHERE sbd = ? ORDER BY ${coMoi ? 'received_at, khoa' : 'luc, khoa'}`)
+    env.DB.prepare(`SELECT ${goc}${coMoi ? them : ''} FROM su_kien_hoc WHERE sbd = ? ${coMoi ? "AND COALESCE(purpose, '') <> 'xem_loi_giai'" : ''} ORDER BY ${coMoi ? 'received_at, khoa' : 'luc, khoa'}`)
       .bind(sbd).all<Record<string, unknown>>()
   let r: { results?: Record<string, unknown>[] }
   try {

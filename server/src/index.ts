@@ -41,7 +41,7 @@ import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
-import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -3423,6 +3423,7 @@ const boXuLy = {
       if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
       if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
+      if (p === '/hs/doc-loi-giai') return ra(await hsDocLoiGiai(env, b))
       // TU LUYỆN (29/09, server/src/tu-luyen.ts): 4 chế độ luyện tự do ở Sảnh — máy chủ rút bằng thuật toán cũ, gửi câu KHÔNG đáp án, chấm khi nộp.
       // Độc lập: chỉ ghi `tu_luyen_luot`/`tu_luyen_cau`; không EXP, không su_kien_hoc, không kế hoạch ngày.
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))

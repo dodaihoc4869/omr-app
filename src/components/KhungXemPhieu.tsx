@@ -245,7 +245,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
       {phu}
-      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} onDong={() => setHoi(null)} />}
+      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} nguon="phieu" onDong={() => setHoi(null)} />}
       {loiHoi && (
         <div className="lg-bao-loi m3" role="alert">
           <span>{loiHoi}</span>

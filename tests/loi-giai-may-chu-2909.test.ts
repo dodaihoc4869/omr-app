@@ -7,6 +7,7 @@ import path from 'node:path'
 import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
+import { docLanLam } from '../server/src/srs2-d1'
 
 const GOC = path.resolve(__dirname, '..')
 const MAU = JSON.parse(fs.readFileSync(path.join(GOC, 'docs/ra-soat-hien-thi-de-2809/sao-luu-truoc-sua.json'), 'utf8')) as Record<string, { cau: Record<string, unknown> }>
@@ -264,6 +265,9 @@ describe('nút Hỏi thầy (/hs/hoi-thay) — mọi câu luyện tập, trừ l
     const { d, token } = await coDe()
     await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'on_lai' })
     expect(d.dem('su_kien_hoc', `sbd='E1' AND qid='${QA.ds}' AND nguon='on_lai' AND lan=1 AND ket_qua=0 AND assistance='assisted'`)).toBe(1)
+    // 02/10 (Vòng học khép kín v2, GĐ1): dòng đó là sự kiện ĐỌC LỜI GIẢI, không phải một lần làm sai ⇒ ôn tập không đếm.
+    expect(d.dem('su_kien_hoc', `sbd='E1' AND qid='${QA.ds}' AND purpose='xem_loi_giai'`)).toBe(1)
+    expect(await docLanLam(d.env, 'E1', [QA.ds])).toEqual([])
     // nguồn khác (phiếu, game…) không ghi sổ ôn lại
     await em(d, '/hs/hoi-thay', { token, qid: QA.tn, nguon: 'phieu' })
     expect(d.dem('su_kien_hoc', `qid='${QA.tn}'`)).toBe(0)
@@ -274,5 +278,39 @@ describe('nút Hỏi thầy (/hs/hoi-thay) — mọi câu luyện tập, trừ l
     const r = await em(d, '/hs/hoi-thay', { token: 'gia.mao', qid: QA.ds })
     expect(r.ok).not.toBe(true)
     expect(r.cau).toBeUndefined()
+  })
+})
+
+describe('GĐ1 v2 — /hs/doc-loi-giai: em đọc lời giải thế nào (02/10)', () => {
+  async function coDe() {
+    const d = taoD1That()
+    await napDe(d, DE_A, GOI_A)
+    hocSinh(d, 'E1')
+    return { d, token: await gameToken(d.env, 'E1') }
+  }
+  const SK = [
+    { k: 'chon', y: 'a', d: true, t: 1 }, { k: 'goi_y', y: 'b', m: 1, t: 2 }, { k: 'chon', y: 'b', d: false, t: 3 },
+    { k: 'chot', y: 'mc', d: true, t: 4 }, { k: 'hack', y: 'x', t: 5 }, { k: 'chon', y: 'c' },
+  ]
+
+  it('chưa bấm Hỏi thầy câu này ⇒ không ghi', async () => {
+    const { d, token } = await coDe()
+    expect(await em(d, '/hs/doc-loi-giai', { token, qid: QA.ds, giay: 30, suKien: SK })).toMatchObject({ ok: false })
+    expect(d.dem('doc_loi_giai')).toBe(0)
+  })
+
+  it('đã hỏi ⇒ ghi một dòng: lọc kiểu lạ, tóm tắt đúng, câu game "#2" về câu gốc', async () => {
+    const { d, token } = await coDe()
+    await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'on_lai' })
+    expect(await em(d, '/hs/doc-loi-giai', { token, qid: QA.ds + '#2', nguon: 'on_lai', giay: 95, suKien: SK })).toMatchObject({ ok: true })
+    const r = d.sql.prepare('SELECT sbd, qid, nguon, giay, so_su_kien, tom_tat_json FROM doc_loi_giai').get() as Record<string, unknown>
+    expect(r).toMatchObject({ sbd: 'E1', qid: QA.ds, nguon: 'on_lai', giay: 95, so_su_kien: 4 })
+    expect(JSON.parse(String(r.tom_tat_json))).toEqual({ soY: 2, soYDung: 1, soGoiY: 1, soTuongTu: 0, soTuongTuDung: 0, daChot: true, chotDung: true })
+  })
+
+  it('token giả ⇒ không ghi', async () => {
+    const { d } = await coDe()
+    expect((await em(d, '/hs/doc-loi-giai', { token: 'gia.mao', qid: QA.ds, giay: 1, suKien: [] })).ok).not.toBe(true)
+    expect(d.dem('doc_loi_giai')).toBe(0)
   })
 })

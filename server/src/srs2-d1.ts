@@ -304,7 +304,7 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
   const ds = JSON.stringify([...new Set(qids)])
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
+    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ? AND COALESCE(purpose, '') <> 'xem_loi_giai'`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   } catch {
     rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   }
@@ -518,7 +518,7 @@ export async function docLichSuCoNguon(env: Env, sbd: string, qids: readonly str
   const sql = (coVis: boolean) => `SELECT s.qid, s.luc, s.ngay_vn, s.ket_qua, s.nguon, ${coVis ? 's.visibility' : 'NULL AS visibility'},
       COALESCE(json_extract(g.json, '$.bia'), 0) AS bia, json_extract(g.json, '$.doan') AS doan
     FROM su_kien_hoc s LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
-    WHERE s.sbd = ? AND s.qid IN (SELECT value FROM json_each(?)) ORDER BY s.luc`
+    WHERE s.sbd = ? AND s.qid IN (SELECT value FROM json_each(?)) ${coVis ? "AND COALESCE(s.purpose, '') <> 'xem_loi_giai'" : ''} ORDER BY s.luc`
   const r = await env.DB.prepare(sql(true)).bind(sbd, ds).all<Row>().catch(() => env.DB.prepare(sql(false)).bind(sbd, ds).all<Row>()).catch(() => null)
   if (!r) return null
   for (const x of r.results ?? []) {
@@ -617,7 +617,7 @@ export async function noCuCaLop(env: Env, dsSbd: readonly string[], homNay: stri
   if (!tatCa.size) return ra
   const qs = JSON.stringify([...tatCa])
   const [rLan, loai] = await Promise.all([
-    env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`).bind(arr, qs).all<Row>()
+    env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?)) AND COALESCE(purpose, '') <> 'xem_loi_giai'`).bind(arr, qs).all<Row>()
       .catch(() => env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`).bind(arr, qs).all<Row>())
       .catch(() => ({ results: [] as Row[] })),
     docLoaiCau(env, [...tatCa]),

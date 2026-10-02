@@ -66,6 +66,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'thay_da_chua',
   // Lời giải từng bước (loi-giai.ts, 29/09): hồ sơ thầy duyệt + chỉ mục câu + hàng soạn — học liệu ⇒ GIỮ.
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
+  // Em đọc lời giải thế nào (migration-0210-doc-loi-giai.sql, GĐ1 v2 02/10) — hồ sơ học tập của em ⇒ GIỮ (như sổ su_kien_hoc).
+  'doc_loi_giai',
   // TU LUYỆN (migration-2909-tu-luyen.sql, 29/09): lượt em tự luyện — hồ sơ học tập của em, độc lập với game ⇒ GIỮ (như sổ su_kien_hoc).
   'tu_luyen_luot', 'tu_luyen_cau',
   // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql, 30/09): ôn cách quãng + câu đã chấm từng câu — cùng hồ sơ Tu luyện ⇒ GIỮ.

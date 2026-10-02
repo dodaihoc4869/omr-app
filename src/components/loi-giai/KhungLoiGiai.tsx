@@ -3,7 +3,7 @@
 // Dữ liệu đi một chiều qua postMessage khi khung báo "khung-san-sang". Esc / nút Đóng để thoát; tiêu điểm trả về nút đã mở.
 // Câu CHƯA có hồ sơ từng bước (nút Hỏi thầy): hộp hiện lời giải chữ đang có của kho, vẽ bằng React (chữ kho là chữ thường, React tự thoát).
 import { useEffect, useId, useRef } from 'react'
-import type { CauChoKhung, HoSoLoiGiai, LoiGiaiChu } from '../../lib/loi-giai-api'
+import { baoDocLoiGiai, type CauChoKhung, type HoSoLoiGiai, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import './loi-giai.css'
 
 export const DUONG_KHUNG = `${import.meta.env.BASE_URL}loi-giai/khung.html`
@@ -35,8 +35,18 @@ function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
   )
 }
 
-export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, thay = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; thay?: boolean; onDong: () => void }) {
+const KIEU_SU_KIEN = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot'])
+
+export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, thay = false, nguon = '', onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; thay?: boolean; nguon?: string; onDong: () => void }) {
   const khung = useRef<HTMLIFrameElement>(null)
+  // GĐ1 v2: gom thao tác em làm trong khung (khung chỉ postMessage, không gọi mạng) — đóng hộp thì gửi một lần. Màn thầy không gửi.
+  const suKien = useRef<SuKienKhung[]>([])
+  useEffect(() => {
+    if (thay || !hoSo) return
+    const batDau = Date.now()
+    suKien.current = []
+    return () => baoDocLoiGiai(cau.qid, nguon, Math.round((Date.now() - batDau) / 1000), suKien.current)
+  }, [thay, hoSo, cau.qid, nguon])
   const nutDong = useRef<HTMLButtonElement>(null)
   const id = useId()
   useEffect(() => {
@@ -44,7 +54,12 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, thay = false, onDo
     nutDong.current?.focus()
     const nghe = (e: MessageEvent) => {
       if (!hoSo || e.source !== khung.current?.contentWindow) return
-      if ((e.data as { loai?: string })?.loai === 'khung-san-sang') khung.current?.contentWindow?.postMessage({ loai: 'loi-giai', hoSo, cau, thay }, '*')
+      const m = e.data as { loai?: string; kieu?: string; y?: unknown; dung?: unknown; muc?: unknown } | null
+      if (m?.loai === 'khung-su-kien' && typeof m.kieu === 'string' && KIEU_SU_KIEN.has(m.kieu) && suKien.current.length < 200) {
+        suKien.current.push({ k: m.kieu, ...(typeof m.y === 'string' ? { y: m.y.slice(0, 12) } : {}), ...(typeof m.dung === 'boolean' ? { d: m.dung } : {}), ...(typeof m.muc === 'number' ? { m: m.muc } : {}), t: Date.now() })
+        return
+      }
+      if (m?.loai === 'khung-san-sang') khung.current?.contentWindow?.postMessage({ loai: 'loi-giai', hoSo, cau, thay }, '*')
     }
     const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') onDong() }
     window.addEventListener('message', nghe)

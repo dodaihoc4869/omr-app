@@ -251,7 +251,7 @@ const CHON_SO = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_d
                    FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) ORDER BY sbd, luc, khoa`
 /** CNH-1.0 P04: đọc kèm `assistance`; D1 chưa áp migration thì tự lùi về `CHON_SO` (không làm hỏng hồ sơ). */
 const CHON_SO_MOI = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, assistance
-                   FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) ORDER BY sbd, luc, khoa`
+                   FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND COALESCE(purpose, '') <> 'xem_loi_giai' ORDER BY sbd, luc, khoa`
 let coCotHoTro: boolean | null = null
 export function xoaBietCotHoTro(): void { coCotHoTro = null }
 

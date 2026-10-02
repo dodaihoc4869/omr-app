@@ -18,6 +18,9 @@ import type { D1PreparedStatement, Env } from './kieu'
 import { answerText, homeworkQuestions, isAnswerCorrect, kiemTraDapAnBtvn } from './btvn-grading'
 import { POLICY_VERSION } from './ho-so-cau-hinh'
 
+/** `purpose` của dòng "em đọc lời giải trước khi làm" (Hỏi thầy ở Ôn lại): chỉ để khoá lần làm hôm nay, KHÔNG phải một lần làm — mọi bộ đếm đúng/sai bỏ qua. */
+export const MUC_DICH_XEM_LOI_GIAI = 'xem_loi_giai'
+
 // `dau_gio` = Kiểm tra đầu giờ của mục Lên bảng (server/src/dau-gio.ts, 29/09): Đạt 1 / Chưa đạt 0, mã nguồn = mã buổi học.
 export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng' | 'dau_gio'
 

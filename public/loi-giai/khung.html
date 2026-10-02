@@ -1210,6 +1210,8 @@ const STORE = 'ester-lab-v2';
 let S = { lv: 'vung', ans: {}, gan: {}, hint: {}, mc: {}, xp: {k1:0,k2:0,k3:0,k4:0,k5:0,k6:0}, streak: 0, best: 0 };
 function load() { try { const o = JSON.parse(localStorage.getItem(STORE) || 'null'); if (o) { S = Object.assign(S, o); S.xp = Object.assign({k1:0,k2:0,k3:0,k4:0,k5:0,k6:0}, o.xp || {}); } } catch (e) {} }
 function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+// GĐ1 v2 (02/10): báo từng thao tác lên trang mẹ (chỉ postMessage — khung vẫn không gọi mạng). Trang mẹ gom rồi gửi máy chủ khi đóng.
+function bao(kieu, ct) { try { parent.postMessage(Object.assign({ loai: 'khung-su-kien', kieu: kieu }, ct || {}), '*'); } catch (e) {} }
 function addXP(k) { if (!S.xp[k] && S.xp[k] !== 0) return; S.xp[k] = Math.min(GOAL, S.xp[k] + 1); save(); paintXP(); }
 function paintXP() {
   const pips = $('#pips');
@@ -2378,10 +2380,10 @@ function bindTL(set, q, el) {
   const k = q.id + '_tl', w = $('.tlwrap', el);
   const again = () => { w.innerHTML = tlHTML(q); bindTL(set, q, el); $('.sc', el).textContent = scoreText(q); renderBar(set); };
   const btn = $('[data-tlcheck]', w), inp = $('input', w);
-  const go = () => { if (S.ans[k] != null) return; const v = inp.value.trim(); if (!v || soVN(v) === null) { inp.focus(); return; } S.ans[k] = v; save(); if (Math.abs(soVN(v) - soVN(q.tl.dapAn)) < 1e-9) { addXP(q.tl.k); const r = btn.getBoundingClientRect(); burst(r.left + r.width / 2, r.top); } again(); };
+  const go = () => { if (S.ans[k] != null) return; const v = inp.value.trim(); if (!v || soVN(v) === null) { inp.focus(); return; } S.ans[k] = v; save(); bao('tra_loi_so', { y: 'tl', dung: Math.abs(soVN(v) - soVN(q.tl.dapAn)) < 1e-9 }); if (Math.abs(soVN(v) - soVN(q.tl.dapAn)) < 1e-9) { addXP(q.tl.k); const r = btn.getBoundingClientRect(); burst(r.left + r.width / 2, r.top); } again(); };
   if (btn) btn.addEventListener('click', go);
   if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-  const h = $('[data-tlhint]', w); if (h) h.addEventListener('click', () => { const cur = S.hint[k] != null ? S.hint[k] : (S.lv === 'nen' ? 1 : 0); S.hint[k] = Math.min(3, cur + 1); save(); again(); });
+  const h = $('[data-tlhint]', w); if (h) h.addEventListener('click', () => { const cur = S.hint[k] != null ? S.hint[k] : (S.lv === 'nen' ? 1 : 0); S.hint[k] = Math.min(3, cur + 1); save(); bao('goi_y', { y: 'tl', muc: S.hint[k] }); again(); });
 }
 function ttHTML(q, t, i) {
   const k = q.id + '_tt' + i, picked = S.ans[k];
@@ -2392,7 +2394,7 @@ function ttHTML(q, t, i) {
 function bindTT(q, it) {
   const i = +it.dataset.tt, t = q.tuongTu[i], k = q.id + '_tt' + i;
   $$('.dsbtn button', it).forEach(b => b.addEventListener('click', () => {
-    if (S.ans[k]) return; S.ans[k] = b.dataset.v; save();
+    if (S.ans[k]) return; S.ans[k] = b.dataset.v; save(); bao('tuong_tu', { y: 'tt' + i, dung: b.dataset.v === t.d });
     if (b.dataset.v === t.d) { const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top); }
     const tmp = document.createElement('div'); tmp.innerHTML = ttHTML(q, t, i); const nu = tmp.firstElementChild; it.replaceWith(nu); bindTT(q, nu);
   }));
@@ -2462,17 +2464,17 @@ function bindStmt(set, q, it) {
   const y = q.y.find(z => z.id === it.dataset.y), k = ak(q, y);
   $$('.dsbtn button', it).forEach(b => b.addEventListener('click', () => {
     if (S.ans[k]) return;
-    S.ans[k] = b.dataset.v; save();
+    S.ans[k] = b.dataset.v; save(); bao('chon', { y: y.id, dung: b.dataset.v === y.d });
     if (b.dataset.v === y.d) { addXP(y.k); const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); }
     refreshStmt(set, q, y);
   }));
-  const h = $('[data-hint]', it); if (h) h.addEventListener('click', () => { const cur = S.hint[k] != null ? S.hint[k] : (S.lv === 'nen' ? 1 : 0); S.hint[k] = Math.min(3, cur + 1); save(); refreshStmt(set, q, y); });
-  $$('[data-gan]', it).forEach(b => b.addEventListener('click', () => { if (S.gan[k]) return; S.gan[k] = b.dataset.gan; save(); refreshStmt(set, q, y); }));
+  const h = $('[data-hint]', it); if (h) h.addEventListener('click', () => { const cur = S.hint[k] != null ? S.hint[k] : (S.lv === 'nen' ? 1 : 0); S.hint[k] = Math.min(3, cur + 1); save(); bao('goi_y', { y: y.id, muc: S.hint[k] }); refreshStmt(set, q, y); });
+  $$('[data-gan]', it).forEach(b => b.addEventListener('click', () => { if (S.gan[k]) return; S.gan[k] = b.dataset.gan; save(); bao('gan', { y: y.id, dung: b.dataset.gan === y.k }); refreshStmt(set, q, y); }));
   const lb = $('[data-lab]', it); if (lb) lb.addEventListener('click', () => openLab(lb.dataset.lab, lb.dataset.p, true));
 }
 function bindMC(set, q, el) {
   $$('[data-mc]', el).forEach(b => b.addEventListener('click', () => {
-    if (S.mc[q.id]) return; S.mc[q.id] = b.dataset.mc; save();
+    if (S.mc[q.id]) return; S.mc[q.id] = b.dataset.mc; save(); bao('chot', { y: 'mc', dung: b.dataset.mc === q.mc.d });
     if (b.dataset.mc === q.mc.d) { const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top); }
     $('.mcwrap', el).innerHTML = mcHTML(q); bindMC(set, q, el);
   }));
