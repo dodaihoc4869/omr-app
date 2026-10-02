@@ -185,16 +185,19 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
     .map((x) => str(x.qid)).filter(Boolean)
   const qids = [...new Set([qid, ...cungNoiDung])]
   const json = JSON.stringify(qids)
-  const [so, hoi, doc, kiem, the, go, caMo] = await Promise.all([
+  const [so, hoi, doc, kiem, the, go, caMo, daDocGo] = await Promise.all([
     docSoHoc(env, sbd, qids, qid),
     env.DB.prepare('SELECT luc FROM loi_giai_hoi WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) ORDER BY luc').bind(sbd, json).all<Obj>().catch(() => ({ results: [] as Obj[] })),
     env.DB.prepare('SELECT giay, su_kien_json FROM doc_loi_giai WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))').bind(sbd, json).all<Obj>().catch(() => ({ results: [] as Obj[] })),
     env.DB.prepare('SELECT buoc, dung FROM cau_kiem_lam WHERE sbd = ? AND bam = ?').bind(sbd, bam).all<Obj>().catch(() => ({ results: [] as Obj[] })),
     env.DB.prepare(`SELECT SUM(CASE WHEN ngay_vn = ? THEN 1 ELSE 0 END) AS hom_nay, SUM(CASE WHEN bam = ? AND trang_thai = 'cho' THEN 1 ELSE 0 END) AS dang_cho
       FROM nut_that WHERE sbd = ?`).bind(homNay, bam, sbd).first<Obj>().catch(() => null),
-    env.DB.prepare('SELECT buoc, luc FROM loi_go WHERE bam = ?').bind(bam).all<Obj>().catch(() => ({ results: [] as Obj[] })),
+    env.DB.prepare('SELECT id, buoc, luc FROM loi_go WHERE bam = ?').bind(bam).all<Obj>().catch(() => ({ results: [] as Obj[] })),
     coCaDangMo(env, sbd, nay),
+    // Đọc lời gỡ qua `/hs/loi-go` (ban-go-nut-that.ts ghi `loi_go_doc`) cũng tính là đã đọc — ngoài đường mở bước trong khung.
+    env.DB.prepare('SELECT DISTINCT go_id FROM loi_go_doc WHERE sbd = ?').bind(sbd).all<Obj>().catch(() => ({ results: [] as Obj[] })),
   ])
+  const goDaDoc = new Set((daDocGo.results ?? []).map((x) => str(x.go_id)))
   const lucHoi = (hoi.results ?? []).map((x) => str(x.luc)).filter(Boolean)
   const docDau = lucHoi[0] ?? ''
 
@@ -260,8 +263,8 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
   // [5] không gửi bừa.
   const soTheHomNay = Number(the?.hom_nay ?? 0)
   const buocXet = chon ? [chon.buoc] : buocVuong !== undefined ? [buocVuong] : Array.from({ length: n }, (_, i) => i)
-  const goChuaDoc = (go.results ?? []).map((x) => ({ buoc: Number(x.buoc), luc: Date.parse(str(x.luc)) }))
-    .filter((x) => buocXet.includes(x.buoc) && !((moBuoc.get(x.buoc) ?? 0) > (Number.isFinite(x.luc) ? x.luc : 0)))
+  const goChuaDoc = (go.results ?? []).map((x) => ({ id: str(x.id), buoc: Number(x.buoc), luc: Date.parse(str(x.luc)) }))
+    .filter((x) => buocXet.includes(x.buoc) && !goDaDoc.has(x.id) && !((moBuoc.get(x.buoc) ?? 0) > (Number.isFinite(x.luc) ? x.luc : 0)))
     .sort((a, b) => a.buoc - b.buoc)[0]
   const c5viec = caMo ? 'Em đang có ca kiểm tra, làm xong rồi gửi nhé'
     : soTheHomNay >= TRAN_THE_NGAY ? `Hôm nay em đã gửi đủ ${TRAN_THE_NGAY} câu`

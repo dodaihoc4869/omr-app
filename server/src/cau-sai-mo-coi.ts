@@ -15,7 +15,7 @@ const NGAY = /^\d{4}-\d{2}-\d{2}$/
 const sqlCauSai = (coMucDich: boolean) => `
 WITH ev AS (
   SELECT sbd, CASE WHEN instr(qid, '#') > 0 THEN substr(qid, 1, instr(qid, '#') - 1) ELSE qid END AS q, nguon, ket_qua, luc
-    FROM su_kien_hoc WHERE ngay_vn >= ?${coMucDich ? " AND COALESCE(purpose, '') <> 'xem_loi_giai'" : ''}
+    FROM su_kien_hoc WHERE ngay_vn >= ? AND nguon <> 'nen'${coMucDich ? " AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(assistance, '') <> 'assisted'" : ''}
 ),
 cuoi AS (
   SELECT ev.sbd, ev.q, ev.nguon, ev.ket_qua FROM ev

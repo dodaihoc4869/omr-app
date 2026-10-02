@@ -290,6 +290,15 @@ describe('/hs/gui-thay — chỉ khi qua cổng', () => {
     await em(d, '/hs/doc-loi-giai', { token, qid: QA.ds, ...doc })
     expect(await em(d, '/hs/gui-thay', { token, qid: QA.ds, buoc: 0, viet: '' })).toMatchObject({ ok: true })
   })
+
+  it('NỐI NHÁNH (02/10): đọc lời gỡ qua /hs/loi-go của Bàn gỡ nút thắt cũng tính là đã đọc', async () => {
+    const { d, bam, token } = await chuanBi()
+    await quaHetCong(d, token)
+    d.sql.prepare("INSERT INTO loi_go(id,bam,buoc,kieu,noi_dung,luc) VALUES('g1',?,0,'ngan','Đổi 5,6 lít ra mol trước',?)").run(bam, iso(1))
+    expect(viec(await em(d, '/hs/thang-go', { token, qid: QA.ds }), 'khong_bua')?.dat).toBe(false)
+    expect(await em(d, '/hs/loi-go', { token, qid: QA.ds })).toMatchObject({ ok: true })
+    expect(viec(await em(d, '/hs/thang-go', { token, qid: QA.ds }), 'khong_bua')?.dat).toBe(true)
+  })
 })
 
 describe('luyện kiến thức nền — chấm máy chủ', () => {
