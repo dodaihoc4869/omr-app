@@ -224,6 +224,7 @@ export const chienDichSapBatDau = (ds: readonly ChienDich[], homNay: string): Ch
 /** `sao`: số sao "cần chữa" của câu trong kho (`canChua.sao` → `sao` trong json câu game): 2 = vận dụng cao đánh dấu 2 sao. */
 export interface MetaCau {
   qid: string; maDe: string; version: string; group: string; phan: Phan; mucDo: string | null; dang: string | null; tenDang: string | null; sao: number
+  /** Câu gốc có bảng; song sinh phải mang dữ liệu bảng riêng. */ coBang?: boolean
   /**
    * CÂU TỰ LUẬN (luật chặt #107, 30/09) — MỘT chỗ dùng chung cho kế hoạch ngày / rương / Sảnh / Bi-a: ĐÚNG phép `laCauTuLuan` mà `napCau` dùng khi phát câu,
    * chạy trên CHÍNH câu trong chỉ mục (bỏ ảnh/lời giải, ảnh phương án thay bằng cờ có/không — `tuLuanTuMeta`). Câu tự luận KHÔNG vào kế hoạch,
@@ -274,7 +275,7 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
   const ra = new Map<string, MetaCau>()
   if (!qids.length) return ra
   const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao,
-        ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version
+        ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version, json_array_length(json,'$.table') AS so_dong_bang
       FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)`).bind(JSON.stringify([...new Set(qids)])).all<Row>()
   const uuTien = new Set(uuTienMaDe)
   for (const x of r.results ?? []) {
@@ -283,7 +284,7 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
     const cu = ra.get(qid)
     if (cu && (uuTien.has(cu.maDe) || !uuTien.has(str(x.ma_de)))) continue
     const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
-    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x) })
+    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x), ...(Number(x.so_dong_bang) > 0 ? { coBang: true } : {}) })
   }
   return ra
 }

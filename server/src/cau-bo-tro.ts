@@ -6,11 +6,12 @@
 // theo BĂM nội dung câu (bản trùng ở nhiều đề dùng chung một dòng). Bảng CHỈ THÊM, tự tạo lần đầu dùng; bản SQL: migration-0210-v2.sql.
 import type { D1PreparedStatement, Env } from './kieu'
 import { bamCau, cauTrongGoi } from '../../src/lib/loi-giai-kiem'
+import { bangSongSinh } from '../../src/lib/bang-song-sinh'
 
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
 
-export interface SongSinh { de: string; pa?: Record<string, string>; dap_an: string; buoc?: string[]; gia_tri_dung?: string }
+export interface SongSinh { de: string; pa?: Record<string, string>; bang?: string[][]; dap_an: string; buoc?: string[]; gia_tri_dung?: string }
 export interface CauKiem { buoc: number; kieu: 'so' | 'chon'; hoi: string; dap_an?: string; sai_so?: string; lua_chon?: string[]; dung?: number }
 export interface NhanNen { buoc: number; nen: string }
 export interface BoTro { bam: string; qidMau: string; songSinh: SongSinh[]; cauKiem: CauKiem[]; nhanNen: NhanNen[]; buoc: string[] }
@@ -35,6 +36,7 @@ export function locBoTro(c: Obj): { songSinh: SongSinh[]; cauKiem: CauKiem[]; nh
   const ss = Array.isArray(c.song_sinh) ? c.song_sinh.filter((x): x is Obj => laObj(x) && typeof x.de === 'string' && x.dap_an != null) : []
   const songSinh = ss.slice(0, 2).map((x) => ({
     de: String(x.de), dap_an: String(x.dap_an),
+    ...(bangSongSinh(x.bang) ? { bang: bangSongSinh(x.bang) } : {}),
     ...(laObj(x.pa) ? { pa: Object.fromEntries(Object.entries(x.pa).map(([k, v]) => [k, String(v)])) } : {}),
     ...(Array.isArray(x.buoc) ? { buoc: x.buoc.map(String) } : {}),
     ...(x.gia_tri_dung != null ? { gia_tri_dung: String(x.gia_tri_dung) } : {}),

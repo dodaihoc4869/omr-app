@@ -11,6 +11,7 @@ import { mergeAndStrip, type TeacherExamSource, type TeacherMcqQuestion, type Te
 import { docSoCauCa, loadExamSources, loadSessionTeacherBank, saveSessionTeacherBank } from './exam-db'
 import { loiDenHanTheoEm, noiKhoCa, type LoiDenHanEm } from './exam-api'
 import { ngayVnCua } from './de-rieng-nguon'
+import { bangSongSinh, duBangSongSinh } from './bang-song-sinh'
 import {
   BAC_HOI_LAI,
   banDoTuKetQua,
@@ -50,10 +51,12 @@ export const docRutThu = (maCa: string): RutThuCa | undefined => nho.get(maCa)
 export const boRutThu = (maCa: string): void => void nho.delete(maCa)
 
 /** Dựng câu song sinh thành câu đề CÓ đáp án (chỉ nằm ở máy thầy + kho đáp án của ca). */
-function cauTuSongSinh(l: LoiDenHanEm, goc?: { mucDo?: unknown; chuyenDe?: string; dang?: unknown }): CauNgoai | null {
+export function cauTuSongSinh(l: LoiDenHanEm, goc?: { mucDo?: unknown; chuyenDe?: string; dang?: unknown; table?: string[][] }): CauNgoai | null {
   const ss = l.cauSongSinh
   if (!ss || !ss.id || !ss.text) return null
-  const them = { ...(goc?.mucDo ? { mucDo: goc.mucDo } : l.mucDo ? { mucDo: l.mucDo } : {}), ...(goc?.chuyenDe ? { chuyenDe: goc.chuyenDe } : {}), ...(goc?.dang ? { dang: goc.dang } : {}) }
+  if (!duBangSongSinh(ss.text, ss.table, !!goc?.table?.length)) return null
+  const table = bangSongSinh(ss.table)
+  const them = { ...(table ? { table } : {}), ...(goc?.mucDo ? { mucDo: goc.mucDo } : l.mucDo ? { mucDo: l.mucDo } : {}), ...(goc?.chuyenDe ? { chuyenDe: goc.chuyenDe } : {}), ...(goc?.dang ? { dang: goc.dang } : {}) }
   if (ss.phan === 'I' && Array.isArray(ss.choices) && ss.choices.length === 4 && /^[ABCD]$/.test(ss.correct)) {
     return { phan: 'I', cau: { id: ss.id, text: ss.text, choices: ss.choices as [string, string, string, string], correct: ss.correct as 'A', ...them } as TeacherMcqQuestion }
   }
