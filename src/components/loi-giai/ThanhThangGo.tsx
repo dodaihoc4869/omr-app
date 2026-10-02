@@ -3,6 +3,7 @@
 // khi câu kiểm hỏng ở bước có nhãn nền, nút "Gửi thầy" chỉ bật khi qua cổng nỗ lực (chọn bước vướng + viết em hiểu đến đâu).
 import { useEffect, useId, useRef, useState } from 'react'
 import { guiThay, luyenNen, nopLuyenNen, thangGo, type CauNen, type KetQuaNopNen, type KiemKhung, type SuKienKhung, type ThangGo } from '../../lib/loi-giai-api'
+import OSoTraLoi from '../OSoTraLoi'
 import './loi-giai.css'
 
 export const TEN_BAC: Record<number, string> = { 1: 'Nhìn lại lựa chọn', 2: 'Đọc lời giải từng bước', 3: 'Làm lại câu tương tự', 4: 'Luyện kiến thức nền', 5: 'Gửi thầy' }
@@ -85,8 +86,8 @@ function HopLuyenNen({ nhan, ten, qid, onDong }: { nhan: string; ten: string; qi
                     ) : (
                       <form className="lg-tim-hang" onSubmit={(e) => { e.preventDefault(); void nop(traLoi) }}>
                         <label className="lg-an" htmlFor={`${id}-o`}>Câu trả lời của em</label>
-                        <input id={`${id}-o`} className="lg-o" inputMode="decimal" autoComplete="off" value={traLoi} disabled={!!kq || dangNop}
-                          placeholder="Nhập con số, ví dụ 0,25" onChange={(e) => setTraLoi(e.target.value)} />
+                        {/* Ô số chung của mọi câu trả lời ngắn (bàn phím số, dấu phẩy, dấu trừ) — luật 30/09: không tự dựng ô nhập số riêng. */}
+                        <OSoTraLoi id={`${id}-o`} inputClassName="lg-o" value={traLoi} disabled={!!kq || dangNop} placeholder="Nhập con số, ví dụ 0,25" onChange={setTraLoi} />
                         <button type="submit" className="lg-nut lg-nut--chinh" disabled={!!kq || dangNop || !traLoi.trim()}>{dangNop ? 'Đang chấm…' : 'Nộp câu này'}</button>
                       </form>
                     )}

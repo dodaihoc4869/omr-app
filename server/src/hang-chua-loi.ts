@@ -59,7 +59,11 @@ export function apLuatChung(t: TrangThaiCau, lan: readonly LanLam[], docLuc: rea
   const loi = phatLaiLoi(lan.map(sangLoi), docLuc, coSongSinh, homNay, ts)
   if (loi.trangThai === 'khong_loi') return { t, loi }
   if (loi.trangThai === 'mo' || loi.trangThai === 'cho_kiem') {
-    return { t: { ...t, laMoi: false, thanhThao: false, henOn: loi.denHan || homNay, ngayVaoNo: t.ngayVaoNo ?? loi.saiCuoi }, loi }
+    // Hẹn = mốc SỚM hơn giữa srs2 và luật v2: srs2 dồn lịch về hạn chiến dịch (ngày cuối "làm lại câu sai trong ngày", thầy chốt #110) —
+    // làm thêm sớm không hại; việc ĐÓNG lỗi vẫn chỉ theo luật v2 (thanhThao = false tới khi đủ bằng chứng).
+    const v2 = loi.denHan || homNay
+    const hen = t.henOn && t.henOn < v2 ? t.henOn : v2
+    return { t: { ...t, laMoi: false, thanhThao: false, henOn: hen, ngayVaoNo: t.ngayVaoNo ?? loi.saiCuoi }, loi }
   }
   if (loi.trangThai === 'dong') return { t: { ...t, laMoi: false, thanhThao: true, henOn: loi.denHan }, loi }
   return { t: { ...t, laMoi: false, thanhThao: true }, loi }
