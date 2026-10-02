@@ -402,3 +402,21 @@ describe('/ca/loi-den-han — lỗi đến hạn theo em (hàng chữa lỗi) ch
     expect(qua.ok).toBe(false)
   })
 })
+
+// Soát của phiên chủ 02/10: đáp án câu song sinh Phần III phải là `dap_an` đã làm tròn (dấu phẩy), không phải `gia_tri_dung`.
+describe('song sinh Phần III — đáp án chấm là đáp án đã làm tròn theo đề', () => {
+  it('/ca/loi-den-han trả correct = dap_an "1086,8", không phải giá trị chính xác', async () => {
+    const d = taoD1That()
+    const env = d.env as unknown as Env
+    d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','An','12','x')")
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
+      .run('DE9', 'Y1', 'v1', 'g-Y1', 'D1', JSON.stringify({ qid: 'Y1', maDe: 'DE9', version: 'v1', group: 'g-Y1', phan: 'III', text: 'Câu Y1', choices: [], hinhAnh: [], dang: 'D1', mucDo: 'VD', correct: '1000,5', reviewed: true, solution: {} }))
+    await damBaoBangLoiGiai(env); await damBaoBangBoTro(env)
+    d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES('Y1','BAMY','DE9','tln','x')").run()
+    d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cau_kiem_json,nhan_nen_json,buoc_json,cap_nhat_luc) VALUES('BAMY','Y1',?,'[]','[]','[]','x')")
+      .run(JSON.stringify([{ de: 'Song sinh Y: tính a. (Kết quả làm tròn đến hàng phần mười.)', dap_an: '1086,8', gia_tri_dung: '1086.8421052632', buoc: [] }]))
+    d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES(?,?,?,?,?,1,0,?,?)').run('k1', 'S1', 'Y1', 'luyen', 'M', '2026-09-30T03:00:00.000Z', '2026-09-30')
+    const r = await goiWorker(worker, env, '/ca/loi-den-han', { sbd: ['S1'], ngay: '2026-10-01' }, true)
+    expect(r.em.S1[0].cauSongSinh).toEqual({ id: 'Y1~ss0', phan: 'III', text: 'Song sinh Y: tính a. (Kết quả làm tròn đến hàng phần mười.)', correct: '1086,8' })
+  })
+})

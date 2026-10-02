@@ -90,8 +90,10 @@ export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa }
     let cauSongSinh: CauSongSinhRa | undefined
     if (ss && phan === 'I' && ss.pa && ['A', 'B', 'C', 'D'].every((x) => typeof ss.pa?.[x] === 'string') && /^[ABCD]$/.test(chuoi(ss.dap_an))) {
       cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, choices: ['A', 'B', 'C', 'D'].map((x) => String(ss.pa![x])), correct: chuoi(ss.dap_an) }
-    } else if (ss && phan === 'III' && chuoi(ss.gia_tri_dung ?? ss.dap_an)) {
-      cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, correct: chuoi(ss.gia_tri_dung ?? ss.dap_an) }
+    } else if (ss && phan === 'III' && /^-?\d+(,\d+)?$/.test(chuoi(ss.dap_an))) {
+      // Đáp án chấm = `dap_an` ĐÃ làm tròn theo câu làm tròn của đề song sinh (dấu phẩy) — KHÔNG phải `gia_tri_dung` (giá trị chính xác
+      // chưa làm tròn, dấu chấm, vd "1086.8421052632": em ghi 1086,8 đúng yêu cầu đề sẽ bị chấm sai).
+      cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, correct: chuoi(ss.dap_an) }
     }
     ra.push({
       qid,
