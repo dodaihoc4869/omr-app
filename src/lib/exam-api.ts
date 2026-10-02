@@ -10,7 +10,7 @@ import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, daLamLaiCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
-import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi, xongNapDiaChi } from './may-chu-moi'
+import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi as vaoThiMoiGoc, xongNapDiaChi } from './may-chu-moi'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { taoCaDaXacNhan } from './day-ca-may-chu-moi'
 import { taiSanAnhDe } from './anh-len-may-chu'
@@ -198,6 +198,8 @@ export type LyDoChan =
   /** CA ĐỀ RIÊNG mà máy chủ chưa có bộ câu của chính em này. KHÔNG phát đề cắt
    * theo luật khác — điểm sẽ lệch với bảng chấm của thầy mà không ai thấy. */
   | 'thieu_bo_cau'
+  /** RÚT ĐỀ v2: thầy vừa bấm Bắt đầu, máy chủ chưa có bộ câu của em — máy em đã tự thử lại mấy lượt mà vẫn chưa có. */
+  | 'cho_bo_cau'
   | 'thieu'
 
 /** Phạm vi gửi ca (QUANLYCATHI mục 4): tu_do = ai có mã đều vào · khoi = theo
@@ -437,6 +439,98 @@ export async function noiKhoCa(
   return { themBank: Number(r.themBank) || 0, themKey: Number(r.themKey) || 0 }
 }
 
+/** RÚT ĐỀ v2 — `/ca/chot-bat-dau`: một lệnh ghi mốc bắt đầu + bản đồ đề riêng.
+ *
+ * Trả `null` khi KHÔNG chắc lệnh đã chạy theo đường mới (máy chủ đời cũ trả 404, mạng hỏng, phản hồi sai khuôn) ⇒ chỗ gọi đi
+ * đường cũ. Lặp lại an toàn: lệnh chạy rồi thì đường cũ chỉ nhận "đã bắt đầu từ trước" và đẩy lại đúng bản đồ ấy.
+ * Máy chủ từ chối CÓ lý do (ca đã đóng, đồng bộ giờ sai) ⇒ NÉM LỖI — đường cũ cũng sẽ từ chối y như thế. */
+export async function chotBatDauMoi(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  boTheoEm: unknown,
+  dongBoGio?: boolean,
+): Promise<{ batDauLuc: string; daBatTruoc: boolean; canBoTheoEm: boolean; coBoTheoEm: boolean } | null> {
+  const base = await layDiaChiMayChu(scriptUrl).catch(() => '')
+  if (!base) return null
+  let r: Record<string, unknown>
+  try {
+    const res = await fetchCoHan(
+      `${base}/ca/chot-bat-dau`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
+        body: JSON.stringify({ secret: secret.trim(), maCa, ...(boTheoEm ? { boTheoEm } : {}), ...(typeof dongBoGio === 'boolean' ? { dongBoGio } : {}) }),
+      },
+      HAN_GIAY,
+    )
+    if (!res.ok) return null
+    r = (await res.json()) as Record<string, unknown>
+  } catch {
+    return null
+  }
+  // Dấu `chot: true` chỉ lệnh mới trả ⇒ phản hồi lạ (cổng chung, máy chủ cũ) không bao giờ bị hiểu nhầm là đã chốt.
+  if (!r || typeof r !== 'object' || r.chot !== true) return null
+  const coBo = { canBoTheoEm: r.canBoTheoEm === true, coBoTheoEm: r.coBoTheoEm === true }
+  if (r.ok === true && typeof r.batDauLuc === 'string' && r.batDauLuc) return { batDauLuc: r.batDauLuc, daBatTruoc: false, ...coBo }
+  if (r.ok === false && r.lyDo === 'da_bat_dau' && typeof r.batDauLuc === 'string' && r.batDauLuc) return { batDauLuc: r.batDauLuc, daBatTruoc: true, ...coBo }
+  if (r.ok === false && typeof r.error === 'string' && r.error) throw new Error(r.error)
+  return null
+}
+
+/** Một lỗi của em (hàng chữa lỗi) như `/ca/loi-den-han` trả về. `cauSongSinh` có ĐÁP ÁN — chỉ ở máy thầy, chỉ để nối vào kho ca. */
+export interface LoiDenHanEm {
+  qid: string
+  denHan: string
+  trangThai: string
+  nenSongSinh?: boolean
+  songSinh?: number
+  phan?: 'I' | 'II' | 'III'
+  mucDo?: string
+  dang?: string
+  cauSongSinh?: { id: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; correct: string }
+}
+
+/** RÚT ĐỀ v2 — `/ca/loi-den-han` theo LÔ 20 em (4 lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI (chỗ gọi đi đường rút cũ). */
+export async function loiDenHanTheoEm(
+  scriptUrl: string,
+  secret: string,
+  dsSbd: string[],
+  ngay: string,
+  qids?: string[],
+): Promise<{ em: Record<string, LoiDenHanEm[]>; daGap: Record<string, Record<string, string>>; hong: string[] }> {
+  const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
+  const ra = { em: {} as Record<string, LoiDenHanEm[]>, daGap: {} as Record<string, Record<string, string>>, hong: [] as string[] }
+  if (ds.length === 0) return ra
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) throw new Error('Máy này chưa có địa chỉ máy chủ mới')
+  const lo: string[][] = []
+  for (let i = 0; i < ds.length; i += 20) lo.push(ds.slice(i, i + 20))
+  let chiSo = 0
+  const chay = async () => {
+    while (chiSo < lo.length) {
+      const phan = lo[chiSo++]!
+      const res = await fetchCoHan(
+        `${base}/ca/loi-den-han`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
+          body: JSON.stringify({ secret: secret.trim(), sbd: phan, ngay, ...(qids && qids.length ? { qids } : {}) }),
+        },
+        HAN_GIAY,
+      )
+      if (!res.ok) throw new Error(res.status === 404 ? 'Máy chủ chưa có lệnh lỗi đến hạn' : `Máy chủ trả lỗi HTTP ${res.status}`)
+      const r = (await res.json()) as { ok?: boolean; error?: string; em?: Record<string, LoiDenHanEm[]>; daGap?: Record<string, Record<string, string>>; hong?: string[] }
+      if (!r.ok) throw new Error(r.error || 'Không đọc được lỗi đến hạn')
+      Object.assign(ra.em, r.em ?? {})
+      Object.assign(ra.daGap, r.daGap ?? {})
+      ra.hong.push(...(r.hong ?? []))
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(4, lo.length) }, chay))
+  return ra
+}
+
 /** THẦY BẤM BẮT ĐẦU THI. Từ giây đó máy em mới xin đề và đồng hồ mới chạy.
  * Bấm lần hai giữ mốc lần đầu — không kéo dài giờ của em đã vào. */
 export async function batDauThi(
@@ -465,7 +559,30 @@ export async function batDauThi(
   dongBoGio?: boolean,
   /** Ca "Không rút câu sai": sbd → (qid → 'dd/mm') câu phải làm lại vì kho thiếu. */
   daLamLaiTheoEm?: Record<string, Record<string, string>>,
+  /** RÚT ĐỀ v2: sbd → (qid → bậc lấp) — chỉ thầy xem, máy chủ không gửi xuống máy em. */
+  bacTheoEm?: Record<string, Record<string, string>>,
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean; chuaSangMayChuMoi: boolean }> {
+  // RÚT ĐỀ v2 (02/10): CHỐT MỘT LỆNH — mốc bắt đầu và bản đồ đề riêng ghi trong CÙNG một câu UPDATE trên máy chủ, nên không em nào
+  // vào được khe "đã bắt đầu mà chưa có bản đồ". Máy chủ đời cũ chưa có lệnh (404) ⇒ đi tiếp đường cũ bên dưới (dự phòng).
+  const goiBanDo = boTheoEm
+    ? {
+        bo: boTheoEm,
+        lap: lapTheoEm ?? {},
+        dem: demSaiTheoEm ?? {},
+        bb: bienBan ?? null,
+        ...(daLamLaiTheoEm && Object.keys(daLamLaiTheoEm).length > 0 ? { daLam: daLamLaiTheoEm } : {}),
+        ...(bacTheoEm && Object.keys(bacTheoEm).length > 0 ? { bac: bacTheoEm } : {}),
+      }
+    : undefined
+  const chot = await chotBatDauMoi(scriptUrl, secret, maCa, goiBanDo, dongBoGio)
+  if (chot) {
+    return {
+      batDauLuc: chot.batDauLuc,
+      daBatTruoc: chot.daBatTruoc,
+      thieuBoTheoEm: chot.daBatTruoc && chot.canBoTheoEm && !chot.coBoTheoEm,
+      chuaSangMayChuMoi: false,
+    }
+  }
   const r = await postJson(scriptUrl, { action: 'batDauThi', secret, maCa, boTheoEm, lapTheoEm, demSaiTheoEm, bienBan, dongBoGio })
   if (!r.ok) throw new Error(r.error || 'Không bắt đầu được ca')
 
@@ -489,9 +606,7 @@ export async function batDauThi(
         secret,
         maCa,
         String(r.batDauLuc ?? ''),
-        boTheoEm
-          ? { bo: boTheoEm, lap: lapTheoEm ?? {}, dem: demSaiTheoEm ?? {}, bb: bienBan ?? null, ...(daLamLaiTheoEm && Object.keys(daLamLaiTheoEm).length > 0 ? { daLam: daLamLaiTheoEm } : {}) }
-          : undefined,
+        goiBanDo,
       )
       chuaSangMayChuMoi = !xong
     }
@@ -522,6 +637,21 @@ export async function batDauThi(
  *
  * LUẬT TỪ NAY: mọi nhánh phải kết thúc bằng một câu trả lời thật — cho vào, từ
  * chối có lý do, hoặc ném lỗi nói rõ em phải làm gì. CẤM trả `null`. */
+/** Số lượt máy em tự thử lại khi máy chủ trả `cho_bo_cau` (mỗi lượt 1–2 giây). */
+export const SO_LAN_CHO_BO_CAU = 8
+
+/** `/vao-thi` kèm CHỜ BỘ CÂU (Rút đề v2): ca đề riêng vừa bấm Bắt đầu mà máy chủ chưa có bộ câu của em ⇒ máy chủ bảo thử lại sau
+ * 1–2 giây. Chỉ em này chờ, KHÔNG cắt đề theo băm (lệch bảng chấm của thầy). Hết lượt thử thì trả nguyên lý do để màn nói ra. */
+async function vaoThiMoi(...thamSo: Parameters<typeof vaoThiMoiGoc>): ReturnType<typeof vaoThiMoiGoc> {
+  let r = await vaoThiMoiGoc(...thamSo)
+  for (let i = 0; r && !r.ok && r.lyDo === 'cho_bo_cau' && i < SO_LAN_CHO_BO_CAU; i++) {
+    const cho = Math.min(2000, Math.max(1000, Number((r as { thuLaiSauMs?: unknown }).thuLaiSauMs) || 1500))
+    await new Promise((xong) => setTimeout(xong, cho))
+    r = await vaoThiMoiGoc(...thamSo)
+  }
+  return r
+}
+
 async function vaoThiQuaMayChuMoi(
   scriptUrl: string,
   maCa: string,
@@ -681,6 +811,8 @@ export function thongDiepChan(kq: Extract<KetQuaVaoThi, { ok: false }>, gio: (is
       return 'Số báo danh của em không có trong danh sách lớp của ca này. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'
     case 'thieu_bo_cau':
       return 'Ca này mỗi em một đề riêng, mà máy chủ chưa có bộ câu của em. Báo Thầy bấm lại "Bắt đầu thi" — đừng làm bài khi chưa có, kẻo điểm không khớp.'
+    case 'cho_bo_cau':
+      return 'Thầy vừa bấm Bắt đầu thi, máy chủ đang chia đề riêng cho em. Đợi vài giây rồi bấm Vào thi lại.'
     // KHÔNG nói rõ sai ở ô nào: nói ra là cho phép dò tên từ số báo danh.
     case 'sai_ho_so':
       return 'Số báo danh, họ tên hoặc năm sinh không khớp danh sách lớp. Kiểm tra lại đúng như Thầy ghi trong sổ; vẫn không vào được thì báo Thầy.'
