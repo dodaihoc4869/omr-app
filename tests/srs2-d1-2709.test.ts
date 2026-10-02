@@ -8,6 +8,8 @@ import { cheDo2, layKeHoachHomNay, sanh2, docHoSo2, LOI_KHOA_DAO } from '../serv
 import { startDao2, startDoan2, hoa2Action, docCotLoi, VANG_RUONG } from '../server/src/srs2-game'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
+import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
+import { damBaoBangLoiGiai } from '../server/src/loi-giai'
 
 const T0 = Date.parse('2026-09-30T07:59:00Z') // 14:59 Thứ Tư 30/09 giờ VN
 const NGAY = 86_400_000
@@ -47,6 +49,23 @@ async function giao(env: Env, hanNop = '2026-10-04', nowMs = T0 - NGAY) {
 }
 
 describe('Game Hóa 2.0 trên D1 thật', () => {
+  it('chỉ còn 1 câu ôn: phát biến thể, làm xong hạ cầu và cho vào Đảo ngay', async () => {
+    const { d, env } = fixture(6)
+    const cd = await giao(env)
+    await damBaoBangBoTro(env); await damBaoBangLoiGiai(env)
+    d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES('Q1','B1','DE1','tn','x')").run()
+    d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cap_nhat_luc) VALUES('B1','Q1',?,'x')")
+      .run(JSON.stringify([{ de: 'Câu mới đủ dữ kiện', pa: { A: '1', B: '2', C: '3', D: '4' }, dap_an: 'B' }]))
+    await ghiSuKien(env, [suKien('S1', 'Q1', T0 - NGAY, false)])
+    d.sql.prepare('INSERT INTO srs2_ke_hoach(sbd,ngay,chien_dich_id,dao_json,doan_json,huyet_chien,tong,tao_luc) VALUES(?,?,?,?,?,0,2,?)')
+      .run('S1', '2026-09-30', cd, '["Q2"]', '["Q1"]', new Date(T0).toISOString())
+    expect(await sanh2(env, 'S1', T0)).toMatchObject({ doan: { con: 1 }, khoaDao: true })
+    const luot = await startDoan2(env, 'S1', T0)
+    expect(luot.questions).toMatchObject([{ qid: 'Q1~ss0' }])
+    await ghiSuKien(env, [suKien('S1', 'Q1~ss0', T0 + 60_000, true)])
+    expect(await sanh2(env, 'S1', T0 + 60_001)).toMatchObject({ doan: { con: 0 }, khoaDao: false, ruong: { daLam: 1, tong: 2 } })
+    expect((await startDao2(env, 'S1', T0 + 60_002)).questions).toMatchObject([{ qid: 'Q2' }])
+  })
   it('công tắc theo lớp; giao chiến dịch bỏ câu tự luận', async () => {
     const { d, env } = fixture()
     expect(await cheDo2(env, 'S1')).toBe(true)

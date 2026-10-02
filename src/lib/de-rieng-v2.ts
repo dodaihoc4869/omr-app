@@ -53,7 +53,8 @@ export const boRutThu = (maCa: string): void => void nho.delete(maCa)
 function cauTuSongSinh(l: LoiDenHanEm, goc?: { mucDo?: unknown; chuyenDe?: string; dang?: unknown }): CauNgoai | null {
   const ss = l.cauSongSinh
   if (!ss || !ss.id || !ss.text) return null
-  const them = { ...(goc?.mucDo ? { mucDo: goc.mucDo } : l.mucDo ? { mucDo: l.mucDo } : {}), ...(goc?.chuyenDe ? { chuyenDe: goc.chuyenDe } : {}), ...(goc?.dang ? { dang: goc.dang } : {}) }
+  const them = { ...(goc?.mucDo ? { mucDo: goc.mucDo } : l.mucDo ? { mucDo: l.mucDo } : {}), ...(goc?.chuyenDe ? { chuyenDe: goc.chuyenDe } : {}), ...(goc?.dang ? { dang: goc.dang } : {}),
+    ...(ss.table ? { table: ss.table } : {}), ...(ss.hinhAnh?.length ? { hinhAnh: ss.hinhAnh } : {}) }
   if (ss.phan === 'I' && Array.isArray(ss.choices) && ss.choices.length === 4 && /^[ABCD]$/.test(ss.correct)) {
     return { phan: 'I', cau: { id: ss.id, text: ss.text, choices: ss.choices as [string, string, string, string], correct: ss.correct as 'A', ...them } as TeacherMcqQuestion }
   }

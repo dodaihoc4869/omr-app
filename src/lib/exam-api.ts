@@ -2,7 +2,7 @@
 // Dùng Content-Type: text/plain cho POST để tránh trình duyệt gửi preflight
 // OPTIONS — Apps Script Web App không xử lý OPTIONS, preflight sẽ lỗi CORS
 // nếu dùng application/json.
-import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
+import type { PublicExamBank, QuestionMedia, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { AnswerRecord, IntegrityLog } from './exam-db'
 import type { CauHoiCuaEm, GoiCauHoi } from './hoi-bai'
 import type { DiemMotCa } from './phieu-du-lieu'
@@ -488,7 +488,7 @@ export interface LoiDenHanEm {
   phan?: 'I' | 'II' | 'III'
   mucDo?: string
   dang?: string
-  cauSongSinh?: { id: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; correct: string }
+  cauSongSinh?: { id: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; correct: string } & QuestionMedia
 }
 
 /** RÚT ĐỀ v2 — `/ca/loi-den-han` theo LÔ 20 em (4 lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI (chỗ gọi đi đường rút cũ). */

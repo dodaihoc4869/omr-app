@@ -3,7 +3,7 @@
 // Nguồn thứ 4 của kế hoạch ngày: câu sai TỰ LÀM ở MỌI kênh từ 29/09 ⇒ nợ; luật đóng lỗi chung; làm lại bằng câu song sinh.
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { docHoSo2 } from '../server/src/srs2-d1'
+import { docHoSo2, docKeHoachDaChot } from '../server/src/srs2-d1'
 import { napDayDuMem } from '../server/src/game-v2-bank'
 import { publicQuestion } from '../src/game/than-thu-v2/core'
 import type { Env } from '../server/src/kieu'
@@ -34,6 +34,29 @@ const ghi = (d: ReturnType<typeof taoD1That>, qid: string, nguon: string, kq: nu
     .run(`${nguon}|${qid}|${ngay}|${Math.random()}`, 'S1', qid, nguon, 'M', kq, `${ngay}T03:00:00.000Z`, ngay, them.assistance ?? null, them.purpose ?? null)
 
 describe('hàng chữa lỗi — nguồn thứ 4 + luật chung + song sinh', () => {
+  it('chỉ chọn biến thể đủ dữ kiện; biến thể thiếu bảng không làm vòng sửa sai kẹt mãi', async () => {
+    const { d, env } = await dung()
+    const thieu = { ...SS[0], de: 'Cho các giá trị trong bảng sau. Tính m.' }
+    d.sql.prepare("UPDATE cau_bo_tro SET song_sinh_json=? WHERE bam='BAM1'").run(JSON.stringify([thieu, SS[1]]))
+    ghi(d, 'X1', 'luyen', 0, '2026-09-30')
+    expect((await docHoSo2(env, 'S1', '2026-10-01')).songSinhCho?.get('X1')).toBe(1)
+    d.sql.prepare("UPDATE cau_bo_tro SET song_sinh_json=? WHERE bam='BAM1'").run(JSON.stringify([thieu, thieu]))
+    expect((await docHoSo2(env, 'S1', '2026-10-01')).songSinhCho?.has('X1')).toBe(false)
+  })
+  it('làm biến thể xong thì hết câu ôn cuối; cộng cả gốc và hai biến thể đúng ngày, đúng em', async () => {
+    const { d, env } = await dung()
+    const ngay = '2026-10-02', now = Date.parse(`${ngay}T08:00:00Z`)
+    d.sql.prepare('INSERT INTO srs2_ke_hoach(sbd,ngay,dao_json,doan_json,huyet_chien,tong,tao_luc) VALUES(?,?,?,?,0,3,?)')
+      .run('S1', ngay, '["X2"]', '["X1","X1#2"]', new Date(now).toISOString())
+    ghi(d, 'X1~ss0', 'game', 1, ngay)
+    expect((await docKeHoachDaChot(env, 'S1', now))?.conDoan).toEqual(['X1#2'])
+    ghi(d, 'X1~ss1', 'game', 0, ngay)
+    const kh = await docKeHoachDaChot(env, 'S1', now)
+    expect(kh?.conDoan).toEqual([])
+    expect(kh?.conDao).toEqual(['X2'])
+    expect(kh?.tong).toBe(3)
+    expect((await docKeHoachDaChot(env, 'S1', now + 86400000))).toBeNull()
+  })
   it('sai tự làm ở kênh bất kỳ từ 29/09 ⇒ vào nợ; trước 29/09, có hỗ trợ, đọc lời giải ⇒ không', async () => {
     const { d, env } = await dung()
     ghi(d, 'X1', 'luyen', 0, '2026-09-30')

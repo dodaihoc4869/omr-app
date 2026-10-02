@@ -6,6 +6,7 @@
 //   · `lapBoChoEmVaoMuon`: `/vao-thi` của ca đề riêng mà bản đồ chưa có em ⇒ lấp riêng NGAY trên máy chủ bằng đúng thang lấp
 //     (src/lib/rut-de-v2.ts) và gộp vào bản đồ bằng MỘT câu `json_patch` — không cắt theo băm im lặng.
 import type { Env } from './kieu'
+import { docBangSongSinh, songSinhDuDuLieu } from './cau-bo-tro'
 import { docHoSo2, type HoSo2 } from './srs2-d1'
 import { ngayVn } from './su-kien-hoc'
 import { xoaDemCaBaoVe } from './game-v2-bank'
@@ -75,7 +76,7 @@ const chuanMucDo = (v: unknown): string => {
 const chuanPhan = (v: unknown): PhanV2 | undefined => (v === 'I' || v === 'II' || v === 'III' ? v : undefined)
 
 /** Câu song sinh dựng thành câu đề (CÓ đáp án — chỉ đi về máy thầy / kho đáp án của ca). Phần I: 4 phương án; Phần III: giá trị đúng. */
-export interface CauSongSinhRa { id: string; phan: PhanV2; text: string; choices?: string[]; correct: string }
+export interface CauSongSinhRa { id: string; phan: PhanV2; text: string; choices?: string[]; correct: string; table?: string[][]; hinhAnh?: { src: string; viTri: string }[] }
 
 /** Lỗi dùng được của một em từ hồ sơ hàng chữa lỗi: mọi lỗi CÒN VIỆC (có hạn) + meta câu gốc + câu song sinh lượt tới. */
 export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa })[] {
@@ -88,12 +89,17 @@ export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa }
     const ssK = hs.songSinhCho?.get(qid)
     const ss = ssK !== undefined ? hs.boTro?.get(qid)?.songSinh?.[ssK] : undefined
     let cauSongSinh: CauSongSinhRa | undefined
-    if (ss && phan === 'I' && ss.pa && ['A', 'B', 'C', 'D'].every((x) => typeof ss.pa?.[x] === 'string') && /^[ABCD]$/.test(chuoi(ss.dap_an))) {
+    if (ss && phan === 'I' && songSinhDuDuLieu(phan, ss)) {
       cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, choices: ['A', 'B', 'C', 'D'].map((x) => String(ss.pa![x])), correct: chuoi(ss.dap_an) }
-    } else if (ss && phan === 'III' && /^-?\d+(,\d+)?$/.test(chuoi(ss.dap_an))) {
+    } else if (ss && phan === 'III' && songSinhDuDuLieu(phan, ss)) {
       // Đáp án chấm = `dap_an` ĐÃ làm tròn theo câu làm tròn của đề song sinh (dấu phẩy) — KHÔNG phải `gia_tri_dung` (giá trị chính xác
       // chưa làm tròn, dấu chấm, vd "1086.8421052632": em ghi 1086,8 đúng yêu cầu đề sẽ bị chấm sai).
       cauSongSinh = { id: `${qid}~ss${ssK}`, phan, text: ss.de, correct: chuoi(ss.dap_an) }
+    }
+    if (cauSongSinh && ss) {
+      const table = docBangSongSinh(ss.bang)
+      if (table) cauSongSinh.table = table
+      if (ss.hinh?.length) cauSongSinh.hinhAnh = ss.hinh.filter(h => /^(sau_de|cuoi_cau|sau_pa_[ABCD]|sau_y_[abcd])$/.test(h.vi_tri)).map(h => ({ src: h.du_lieu, viTri: h.vi_tri }))
     }
     ra.push({
       qid,
