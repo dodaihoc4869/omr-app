@@ -879,6 +879,11 @@ const JS_MAY_CHIEU = `
     }
     var nut = e.target && e.target.closest ? e.target.closest('.mc-nut-giai') : null;
     if (!nut) return;
+    if (window.__mcMoLoiGiai) {
+      var hienMo = window.__mcLgMo ? window.__mcLgMo() : nut.getAttribute('aria-expanded') === 'true';
+      window.__mcMoLoiGiai(!hienMo);
+      return;
+    }
     var o = document.getElementById(nut.getAttribute('aria-controls'));
     if (!o) return;
     var mo = nut.getAttribute('aria-expanded') === 'true';
@@ -1106,8 +1111,8 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   <button type="button" id="mc-len-bang">Lên bảng</button>
   <div class="mc-phim-nhom" id="mc-phim-nhom">
     <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
-    <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Chưa đạt</span></button>
-    <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Lời giải</span></button>
+    <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>
+    <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>
     <button type="button" class="mc-nut-phim" data-k="B"><kbd>B</kbd><span class="mc-nut-chu">Bút</span></button>
     <button type="button" class="mc-nut-phim" data-k="Tab"><kbd>Tab</kbd><span class="mc-nut-chu">Tổng quan</span></button>
