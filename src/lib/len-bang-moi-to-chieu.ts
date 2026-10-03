@@ -44,18 +44,16 @@ body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-giai .sol-box{font-si
 /* 8 · phương án là phương trình: không ngắt giữa hai vế */
 body.mc .mc-pa-chu{overflow-wrap:normal}
 body.mc .mc-pa-chu:has(.mt){white-space:nowrap}
-/* 6 · LỜI GIẢI NẰM DƯỚI ĐỀ (không còn lớp phủ), hiện dần */
-body.mc-bc .mc-vung-de>.mc-giai{position:static;inset:auto;overflow:visible;margin:.5em 0 0;padding:.3em 0 0;border-top:.08em solid var(--mc-nhan);background:transparent;border-radius:0;z-index:auto;padding-bottom:0}
-body.mc-bc .mc-vung-de>.mc-giai .sol-box{padding:0;border:0;box-shadow:none}
-body.mc .mc-giai .mc-buoc-an{opacity:0}
-body.mc .mc-giai .mc-buoc-cu{opacity:.5}
-body.mc .mc-giai .mc-buoc-nay{opacity:1;background:rgba(201,138,11,.14);border-radius:.3em}
+/* 6 · LỜI GIẢI NẰM DƯỚI ĐỀ — hiển thị chuẩn như trong app */
+body.mc-bc .mc-vung-de>.mc-giai{position:static;inset:auto;overflow:visible;margin:.6em 0 0;padding:0;background:transparent;border:0;z-index:auto}
+body.mc-bc .mc-vung-de>.mc-giai .sol-box{display:block;margin:12px 0;padding:16px 20px;background:rgba(254,243,199,.6);border:1.5px solid rgb(253,230,138);border-left:5px solid rgb(217,119,6);border-radius:16px;box-shadow:0 3px 12px rgba(180,83,9,.08);color:var(--mc-muc,rgb(30,41,59));font-size:calc(var(--mc-co,28px) * 0.92)!important}
+body.mc .mc-giai .mc-buoc-an,body.mc .mc-giai .mc-buoc-cu,body.mc .mc-giai .mc-buoc-nay{opacity:1!important}
 body.mc .mc-giai .sol-box>*,body.mc .mc-giai .sol-pa{transition:opacity .35s,background .35s}
 body.mc .mc-giai-dem{display:block;font:600 calc(var(--u)*1) var(--mc-sans);color:var(--mc-phu);margin:0 0 .3em}
 body.mc .mc-pa.mc-y-sang{background:linear-gradient(90deg,rgba(36,86,201,.16),transparent);border-radius:.3em}
 body.mc .mc-pa.mc-pa-dung .mc-ky{color:var(--mc-lam-chu);background:var(--mc-lam-nen);border-radius:.3em;padding:0 .15em}
-/* Nút lời giải / chấm cũ trong cột 1/3: chuyển hết xuống thanh dưới (không bị thẻ tên đè, không chiếu vào chỗ em viết). Giữ trong DOM cho cầu nối. */
-body.mc-bc .mc-giai-vung{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0);clip-path:inset(50%);padding:0!important;margin:-1px!important;border:0!important}
+/* Nút lời giải trên tờ máy chiếu: luôn hiển thị rõ ràng, trang nhã ngay dưới đề bài */
+body.mc-bc .mc-giai-vung{position:static!important;width:auto!important;height:auto!important;overflow:visible!important;clip:auto!important;clip-path:none!important;margin:12px 0!important;padding:0!important;display:flex!important;align-items:center!important;gap:12px!important}
 /* 2 · LẬT TRANG (chờ gọi) */
 body.mc-bc .mc-vung-de{overflow:hidden}
 body.mc-bc .mc-vung-de>.mc-de-dau,body.mc-bc .mc-vung-de>.mc-than,body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-tk{transition:transform .3s cubic-bezier(.3,.8,.3,1)}
@@ -409,7 +407,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     }); });
     var dem = g.querySelector(':scope > .mc-giai-dem');
     if (!dem) { dem = tao('span', 'mc-giai-dem'); g.insertBefore(dem, g.firstChild); }
-    dem.textContent = 'Lời giải · Space: hiện tiếp · ' + k + '/' + ds.length;
+    dem.textContent = 'Lời giải chi tiết';
     // ý a–d / phương án đang nói tới sáng lên trong đề
     var nua = g.closest('.mc-nua') || g.closest('.mc-dot'), hienTai = k > 0 ? ds[k - 1] : null, khoa = '';
     if (hienTai) hienTai.forEach(function (el) { if (el.classList.contains('sol-pa')) { var s = el.querySelector('strong'); khoa = s ? s.textContent.replace(/[.)\\s]/g, '').toLowerCase() : ''; } });
@@ -424,7 +422,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function moLoiGiai(mo) {
     var d = dot(); if (!d) return;
     $$(d, '.mc-giai').forEach(function (g) {
-      g.hidden = !mo; g.__buoc = mo ? 1 : 0;
+      g.hidden = !mo; g.__buoc = mo ? 999 : 0;
       var nut = d.querySelector('.mc-nut-giai[aria-controls="' + g.id + '"]');
       if (nut) { nut.setAttribute('aria-expanded', mo ? 'true' : 'false'); var c = nut.querySelector('.mc-nut-chu'); if (c) c.textContent = mo ? 'Ẩn lời giải' : 'Hiện lời giải'; }
       if (mo) veLoiGiai(g); else $$(d, '.mc-pa').forEach(function (p) { p.classList.remove('mc-y-sang', 'mc-pa-dung'); });
@@ -466,7 +464,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     $$(nhom, '[data-k]').forEach(function (b) {
       var k = b.getAttribute('data-k');
       if (k === 'D' || k === 'K') b.hidden = !(p === 'chua' && noi);
-      if (k === 'G') { b.classList.toggle('mc-bat', lgMo()); var c = b.querySelector('.mc-nut-chu'); if (c) c.textContent = lgMo() ? 'Ẩn lời giải' : 'Lời giải'; }
+      if (k === 'G') { b.classList.toggle('mc-bat', lgMo()); var c = b.querySelector('.mc-nut-chu'); if (c) c.textContent = lgMo() ? 'Ẩn lời giải' : 'Hiện lời giải'; }
       if (k === 'T') b.classList.toggle('mc-bat', S.tk);
       if (k === 'B') b.classList.toggle('mc-bat', S.but);
     });

@@ -156,7 +156,13 @@ export async function dungToChieuDayHoc(
   const o = new Map<string, OGhiDayHoc>()
   const dsO = dsCau.map((c, i) => {
     const [cl] = cauLuyenTuBoCau([{ phan: c.phan, maDe: c.maDe, q: c.q }])
-    const cau = { ...cl!, chuyenDe: cl!.chuyenDe || c.chuyenDe }
+    const cau = {
+      ...cl!,
+      chuyenDe: cl!.chuyenDe || c.chuyenDe,
+      explanation: cl!.explanation || (c.q as any).explanation || (c.q as any).huongDanGiai || (c.q as any).loiGiaiChiTiet,
+      loiGiai: cl!.loiGiai || (c.q as any).loiGiai,
+      chot: cl!.chot || (c.q as any).loiGiai?.chot || (c.q as any).kienThucCotLoi || '',
+    }
     const em = giao.get(c.khoa)
     const coNut = !!maPhien && !!em && !!c.chuyenDe
     if (coNut) o.set(khoaToChieu(em.sbd, c.qid), { sbd: em.sbd, hoTen: em.hoTen, qid: c.qid, chuyenDe: c.chuyenDe })

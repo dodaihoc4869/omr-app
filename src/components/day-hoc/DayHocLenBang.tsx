@@ -6,7 +6,7 @@
 //  3 · CHIẾU — màn chiếu MỚI (`dungToChieuDayHoc` → `taoHtmlMayChieu`, lớp bản vẽ 28/09): đủ từng câu thầy chọn. "Chiếu lên bảng" ⇒ app chọn em
 //      CÓ MẶT có khả năng làm đúng cao nhất cho từng câu (`chon-em-day-hoc.ts`); "Đổi em khác"; "Đúng" / "Sai" ghi bằng `ghiLenBang` (đường ghi sẵn có).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Check, Eye, EyeOff, Lightbulb, MonitorPlay, RefreshCw, Shuffle, Smartphone, UserCheck, X } from 'lucide-react'
+import { Check, Eye, EyeOff, Lightbulb, MonitorPlay, RefreshCw, Shuffle, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import KhungXemPhieu from '../KhungXemPhieu'
@@ -17,9 +17,8 @@ import { cauTuDeChon, demCau, dungToChieuDayHoc, khoDayHoc, tomTatDe, type CauDa
 import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, xepEmChoDanhSach, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { ChemText } from '../../lib/chem-format'
+import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi } from './DiemDanhBuoi'
-import ModalDieuKhienTuXa from '../to-chieu/ModalDieuKhienTuXa'
-import { BoLangNgheLenhToChieu, dangKyPhienMayChu } from '../../lib/to-chieu-dong-bo-remote'
 import './day-hoc.css'
 
 /** Chữ tấm chiếu mã điểm danh — nay nằm ở `DiemDanhBuoi.tsx` (dùng chung với Kiểm tra đầu giờ); giữ lối xuất cũ. */
@@ -50,86 +49,6 @@ function ghiNhoBuoi(id: string, n: NhoBuoi) {
 
 const TEN_PHAN: Record<CauDayHoc['phan'], string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
 const pt = (x: number) => `${Math.round(x * 100)}%`
-
-function LoiGiaiCauDayHoc({ c }: { c: CauDayHoc }) {
-  const q = c.q as any
-  const lg = q.loiGiai as any
-  const chot = lg?.chot || q.kienThucCotLoi || ''
-  const buoc = Array.isArray(lg?.buoc) ? lg.buoc : []
-  const loiGiaiText = q.explanation || q.huongDanGiai || q.loiGiaiChiTiet || ''
-
-  return (
-    <div className="dh-cau-giai">
-      {/* 1. ĐÁP ÁN ĐÚNG */}
-      <div className="dh-giai-dap-an">
-        <span style={{ color: 'var(--bts-chu-phu, rgb(100, 116, 139))', fontSize: 13 }}>Đáp án đúng:</span>
-        {c.phan === 'I' && 'choices' in q && (
-          <span>
-            <b>{q.correct}.</b>{' '}
-            {'ABCD'.indexOf(q.correct) >= 0 && q.choices?.[['A', 'B', 'C', 'D'].indexOf(q.correct)] ? (
-              <ChemText text={q.choices[['A', 'B', 'C', 'D'].indexOf(q.correct)]} />
-            ) : null}
-          </span>
-        )}
-        {c.phan === 'II' && 'ideas' in q && (
-          <div className="dh-giai-pa" style={{ width: '100%', marginTop: 4 }}>
-            {['a', 'b', 'c', 'd'].map((ch, idx) => {
-              const dung = Array.isArray(q.correct) ? q.correct[idx] : undefined
-              const lyDo = lg?.tungY?.[ch]?.viSao
-              return (
-                <div key={ch} className="dh-giai-pa-dong">
-                  <span className={`dh-chip ${dung ? 'dh-chip--xanh' : 'dh-chip--do'}`} style={{ minHeight: 22, padding: '1px 8px', fontSize: 12 }}>
-                    Ý {ch}) {dung ? 'ĐÚNG' : 'SAI'}
-                  </span>
-                  <span style={{ flex: 1 }}>
-                    <ChemText text={q.ideas?.[idx] || ''} />
-                    {lyDo && <span style={{ color: 'var(--bts-chu-phu)', display: 'block', fontSize: 12 }}>→ {lyDo}</span>}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {c.phan === 'III' && (
-          <span>
-            <b>{q.correct || '—'}</b> {c.tuLuan ? <span className="dh-chip dh-chip--vang" style={{ marginLeft: 6, fontSize: 11 }}>Tham khảo</span> : null}
-          </span>
-        )}
-      </div>
-
-      {/* 2. KIẾN THỨC CỐT LÕI */}
-      {chot && (
-        <div className="dh-giai-cot-loi">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-            <Lightbulb size={15} /> <b>Kiến thức cốt lõi:</b>
-          </div>
-          <ChemText text={chot} />
-        </div>
-      )}
-
-      {/* 3. CÁC BƯỚC / HƯỚNG DẪN GIẢI CHI TIẾT */}
-      {buoc.length > 0 ? (
-        <div className="dh-giai-chi-tiet">
-          <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--bts-chu-phu)' }}>Các bước giải:</span>
-          <ol style={{ margin: '4px 0 0 18px', padding: 0 }}>
-            {buoc.map((b: string, i: number) => (
-              <li key={i} style={{ marginBottom: 4 }}>
-                <ChemText text={b} />
-              </li>
-            ))}
-          </ol>
-        </div>
-      ) : loiGiaiText ? (
-        <div className="dh-giai-chi-tiet">
-          <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--bts-chu-phu)' }}>Hướng dẫn giải:</span>
-          <div style={{ marginTop: 2 }}>
-            <ChemText text={loiGiaiText} />
-          </div>
-        </div>
-      ) : null}
-    </div>
-  )
-}
 
 export default function DayHocLenBang() {
   const showToast = useAppStore((s) => s.showToast)
@@ -192,9 +111,6 @@ export default function DayHocLenBang() {
   const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `day-hoc|${idBuoi}` : '')
 
   const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
-  const [moRemoteModal, setMoRemoteModal] = useState(false)
-  const [maPhienHienTai, setMaPhienHienTai] = useState('')
-  const [maPinHienTai, setMaPinHienTai] = useState('')
 
   const moTo = async (coEm: boolean, giaoMoi = giao) => {
     if (!cauChieu.length) {
@@ -216,78 +132,12 @@ export default function DayHocLenBang() {
       ganO(ma, o)
       setHtml(h)
 
-      const dsGui = cauChieu.map((c, idx) => {
-        const g = giaoMoi[c.khoa]
-        let dapAn = ''
-        let pa: string[] | undefined
-        const q = c.q as any
-        if (c.phan === 'I' && 'choices' in q) {
-          dapAn = String(q.correct || '')
-          pa = [...q.choices]
-        } else if (c.phan === 'II' && 'ideas' in q) {
-          const cor = Array.isArray(q.correct) ? q.correct : []
-          dapAn = cor.map((v: boolean, i: number) => `${'abcd'[i]}: ${v ? 'Đúng' : 'Sai'}`).join(' · ')
-          pa = [...q.ideas]
-        } else if ('correct' in q) {
-          dapAn = String(q.correct || '')
-        }
-        const lg = q.loiGiai as any
-        return {
-          soCau: idx + 1,
-          phan: c.phan,
-          sao: typeof (c.q as any).sao === 'number' ? (c.q as any).sao : undefined,
-          sbd: g?.sbd,
-          hoTen: g?.hoTen,
-          lop: lopCuaEm.get(g?.sbd || '') || tt?.buoi.lop,
-          lanLenBang: g ? cauChieu.slice(0, idx + 1).filter((x) => giaoMoi[x.khoa]?.sbd === g.sbd).length : undefined,
-          qid: c.qid,
-          de: q.text || tomTatDe(c),
-          pa,
-          dapAn,
-          loiGiai: q.explanation || (typeof lg?.chot === 'string' ? lg.chot : '') || q.loiGiaiChiTiet,
-          huongDan: q.huongDanGiai,
-          kienThucCotLoi: lg?.chot || q.kienThucCotLoi,
-          mucDo: c.mucDo || undefined,
-          tuLuan: c.tuLuan,
-        }
-      })
-      setMaPhienHienTai(ma)
-      void dangKyPhienMayChu({
-        maPhien: ma,
-        tieuDe: `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`,
-        dotHienTai: 0,
-        tongSoDot: cauChieu.length,
-        pha: 'cho',
-        loiGiaiMo: false,
-        dsO: dsGui,
-      }).then((res) => {
-        if (res.maPin) setMaPinHienTai(res.maPin)
-      })
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không mở được tờ máy chiếu', 'warn')
     } finally {
       setDangChieu(false)
     }
   }
-
-  // Lắng nghe lệnh từ điện thoại gửi về để điều khiển tờ máy chiếu
-  useEffect(() => {
-    if (!html || !maPhienHienTai) return
-    const bo = new BoLangNgheLenhToChieu(maPhienHienTai, (lenh) => {
-      const iframe = document.querySelector('.lop-xem-phieu iframe') as HTMLIFrameElement | null
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'ddh-mc-lenh', loai: lenh.loai, thamSo: lenh.thamSo }, '*')
-      }
-      if (lenh.loai === 'CHAM' && lenh.thamSo?.khoa) {
-        const c = cauChieu.find((x) => x.qid === lenh.thamSo.khoa || (giao[x.khoa]?.sbd && `${giao[x.khoa]!.sbd}|${x.qid}` === lenh.thamSo.khoa))
-        if (c) void ghiKq(c, Boolean(lenh.thamSo.dat))
-      } else if (lenh.loai === 'DOI_EM' && lenh.thamSo?.khoa) {
-        const c = cauChieu.find((x) => x.qid === lenh.thamSo.khoa || x.khoa === lenh.thamSo.khoa)
-        if (c) void doiEm(c)
-      }
-    })
-    return () => bo.dung()
-  }, [html, maPhienHienTai, cauChieu, giao])
 
   const cauChon = (c: CauDayHoc) => ({ qid: c.qid, maDang: c.maDang, chuyenDe: c.chuyenDe, mucDo: c.mucDo })
   const napSucHoc = async (): Promise<Record<string, SucHocEm>> => {
@@ -468,7 +318,7 @@ export default function DayHocLenBang() {
                           </div>
                         ) : null
                       })()}
-                      {xemLoiGiai.has(c.khoa) && <LoiGiaiCauDayHoc c={c} />}
+                      {xemLoiGiai.has(c.khoa) && <TheCauHienThi c={c} stt={stt ?? undefined} />}
                       {g && !bo && (
                         <div className="dh-giao">
                           <span className="dh-giao-em">
@@ -531,25 +381,76 @@ export default function DayHocLenBang() {
           <button type="button" className="m3-nut-vien dh-nut" disabled={dangChieu || !cauChieu.length} onClick={() => void moTo(coGiao)}>
             {coGiao ? 'Mở lại tờ chiếu' : 'Chiếu đề (chưa gọi em)'}
           </button>
-          <button
-            type="button"
-            className="m3-nut-tonal dh-nut"
-            disabled={!cauChieu.length}
-            onClick={() => {
-              if (!maPhienHienTai) {
-                void moTo(coGiao)
-              }
-              setMoRemoteModal(true)
-            }}
-          >
-            <Smartphone size={18} aria-hidden="true" /> Điều khiển điện thoại
-          </button>
           {coGiao && (
             <button type="button" className="m3-nut-chu dh-nut" onClick={() => setGiao({})}>
               <RefreshCw size={16} aria-hidden="true" /> Bỏ phân công
             </button>
           )}
         </div>
+
+        {cauChieu.length > 0 && (
+          <div style={{ marginTop: 'var(--k3)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, margin: '12px 0 8px' }}>
+              <p className="dh-tong" style={{ margin: 0, fontWeight: 700 }}>
+                {cauChieu.length} câu trong buổi dạy ({cauChieu.filter((c) => xemLoiGiai.has(c.khoa)).length}/{cauChieu.length} đang mở lời giải)
+              </p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="m3-nut-tonal dh-nut-nho"
+                  onClick={() => setXemLoiGiai(new Set(cauChieu.map((c) => c.khoa)))}
+                >
+                  <Eye size={15} /> Hiện lời giải tất cả
+                </button>
+                {xemLoiGiai.size > 0 && (
+                  <button
+                    type="button"
+                    className="m3-nut-chu dh-nut-nho"
+                    onClick={() => setXemLoiGiai(new Set())}
+                  >
+                    <EyeOff size={15} /> Ẩn tất cả
+                  </button>
+                )}
+              </div>
+            </div>
+            <ol className="dh-cau-ds">
+              {cauChieu.map((c, i) => {
+                const g = giao[c.khoa]
+                const mo = xemLoiGiai.has(c.khoa)
+                return (
+                  <li key={`b3-${c.khoa}`} className="dh-cau">
+                    <div className="dh-cau-than" style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+                        <span className="font-bold" style={{ fontSize: 'var(--cx-1)' }}>
+                          Câu {i + 1} {g ? `· Em ${g.hoTen || g.sbd}` : '· Cả lớp'} · {c.tenDang || c.chuyenDe}
+                        </span>
+                        <button
+                          type="button"
+                          className={`dh-nut-giai ${mo ? 'dh-nut-giai--mo' : ''}`}
+                          onClick={() =>
+                            setXemLoiGiai((cu) => {
+                              const m = new Set(cu)
+                              if (m.has(c.khoa)) m.delete(c.khoa)
+                              else m.add(c.khoa)
+                              return m
+                            })
+                          }
+                        >
+                          <Lightbulb size={14} /> {mo ? 'Ẩn lời giải' : 'Hiện lời giải'}
+                        </button>
+                      </div>
+                      {mo ? (
+                        <TheCauHienThi c={c} stt={i + 1} />
+                      ) : (
+                        <div className="dh-cau-de" style={{ marginTop: 4 }}>{tomTatDe(c)}</div>
+                      )}
+                    </div>
+                  </li>
+                )
+              })}
+            </ol>
+          </div>
+        )}
       </section>
 
       {hopMo && (
@@ -615,33 +516,6 @@ export default function DayHocLenBang() {
             dongPhien()
             setHtml('')
           }}
-          phu={
-            maPhienHienTai ? (
-              <button
-                type="button"
-                onClick={() => setMoRemoteModal(true)}
-                className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-sm transition-all cursor-pointer"
-                title="Mở mã QR điều khiển từ xa bằng điện thoại"
-              >
-                <Smartphone size={18} />
-                <span>Điều khiển điện thoại</span>
-                {maPinHienTai && (
-                  <span className="bg-emerald-900/60 px-2 py-0.5 rounded-full text-xs font-mono font-bold tracking-wider">
-                    {maPinHienTai}
-                  </span>
-                )}
-              </button>
-            ) : null
-          }
-        />
-      )}
-
-      {moRemoteModal && (
-        <ModalDieuKhienTuXa
-          maPhien={maPhienHienTai || 'day-hoc'}
-          maPin={maPinHienTai}
-          tieuDe={`Dạy học · ${tt?.buoi.ten || 'Buổi học'}`}
-          onDong={() => setMoRemoteModal(false)}
         />
       )}
     </div>

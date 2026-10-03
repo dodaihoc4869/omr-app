@@ -16,9 +16,7 @@ import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu }
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Save, MonitorPlay, UserCheck, Trash2, Smartphone, Lightbulb, Eye, EyeOff } from 'lucide-react'
-import ModalDieuKhienTuXa from '../components/to-chieu/ModalDieuKhienTuXa'
-import { BoLangNgheLenhToChieu, dangKyPhienMayChu } from '../lib/to-chieu-dong-bo-remote'
+import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Save, MonitorPlay, UserCheck, Trash2, Lightbulb, Eye, EyeOff } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import HopXacNhan from '../components/HopXacNhan'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
@@ -345,9 +343,6 @@ function GoiLenBangCu() {
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState<Set<string>>(new Set())
   const [dangCham, setDangCham] = useState('')
-  const [maPhienHienTai, setMaPhienHienTai] = useState('')
-  const [maPinHienTai, setMaPinHienTai] = useState('')
-  const [moRemoteModal, setMoRemoteModal] = useState(false)
   /** Kết quả thầy đã bấm trên BẢNG BUỔI CHỮA (Engine E), theo `sbd|qid`. Máy chủ nhận rồi thì
    * khoá nút: bấm lại là ghi đôi vào sổ lên bảng, mà sổ chỉ thêm, không sửa. */
   const [ketQuaBuoi, setKetQuaBuoi] = useState<Record<string, 'dat' | 'khong_dat'>>({})
@@ -1245,53 +1240,6 @@ function GoiLenBangCu() {
 
       phienChieu.current = { ma: maPhien, o: oTrenTo, cuaSo: null, goc: '*' }
       setHtmlMayChieu(html)
-      setMaPhienHienTai(maPhien)
-
-      // Đăng ký phiên lên máy chủ để điện thoại điều khiển từ xa
-      const dsGui = dsO.map((o, idx) => {
-        const c = o.cau
-        const day = o.qid ? timCauTheoId(traCau, o.qid) || traCau.get(o.qid) : undefined
-        const q = (day?.q || {}) as any
-        const lg = q.loiGiai as any
-        let pa: string[] | undefined
-        if (c.luaChon) {
-          pa = c.luaChon.map((x, i) => (typeof x === 'string' ? `${['A', 'B', 'C', 'D'][i]}. ${x}` : `${(x as any).nhan || ['A', 'B', 'C', 'D'][i]}. ${(x as any).chu || x}`))
-        } else if (q.choices) {
-          pa = q.choices.map((t: string, i: number) => `${['A', 'B', 'C', 'D'][i]}. ${t}`)
-        }
-        return {
-          khoa: khoaToChieu(o.sbd, o.qid || ''),
-          dot: idx + 1,
-          soCau: o.soCau,
-          phan: o.cau.phan,
-          sao: o.sao,
-          sbd: o.sbd,
-          hoTen: o.hoTen,
-          lop: o.lop || du?.lop,
-          lanLenBang: o.lanLenBang,
-          qid: o.qid,
-          de: c.text,
-          pa,
-          dapAn: c.dapAn || q.correct,
-          loiGiai: c.chot || q.explanation || q.loiGiaiChiTiet || (typeof lg?.chot === 'string' ? lg.chot : ''),
-          huongDan: (c.buoc && c.buoc.length > 0 ? c.buoc.join('\n') : '') || q.huongDanGiai,
-          kienThucCotLoi: c.chot || lg?.chot || q.kienThucCotLoi,
-          mucDo: o.mucDo || undefined,
-        }
-      })
-
-      void dangKyPhienMayChu({
-        maPhien,
-        tieuDe: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
-        dotHienTai: 0,
-        tongSoDot: dsO.length,
-        pha: 'cho',
-        loiGiaiMo: false,
-        dsO: dsGui,
-      }).then((res) => {
-        if (res.maPin) setMaPinHienTai(res.maPin)
-      })
-
       showToast('Đang mở tờ chiếu lên bảng', 'success')
     } catch (e) {
       console.error('Lỗi khi mở tờ máy chiếu:', e)
@@ -1499,21 +1447,6 @@ function GoiLenBangCu() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [htmlMayChieu])
 
-  // Lắng nghe lệnh từ điện thoại gửi về để điều khiển tờ máy chiếu
-  useEffect(() => {
-    if (!htmlMayChieu || !maPhienHienTai) return
-    const bo = new BoLangNgheLenhToChieu(maPhienHienTai, (lenh) => {
-      const iframe = document.querySelector('.lop-xem-phieu iframe') as HTMLIFrameElement | null
-      if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'ddh-mc-lenh', loai: lenh.loai, thamSo: lenh.thamSo }, '*')
-      }
-      if (lenh.loai === 'CHAM' && lenh.thamSo?.khoa) {
-        const p = kq?.phanCong.find((x) => khoaToChieu(x.sbd, x.cau.id) === lenh.thamSo.khoa || `${x.sbd}|${x.cau.id}` === lenh.thamSo.khoa)
-        if (p) void cham(p, Boolean(lenh.thamSo.dat))
-      }
-    })
-    return () => bo.dung()
-  }, [htmlMayChieu, maPhienHienTai, kq])
 
   const boDong = (p: DongPhanCong) => {
     setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))
@@ -2209,22 +2142,7 @@ function GoiLenBangCu() {
                   <MonitorPlay size={16} />
                   <span>{dangMoMayChieu ? 'Đang mở tờ chiếu...' : 'Chiếu lên bảng ngay'}</span>
                 </button>
-                {htmlMayChieu && maPhienHienTai && (
-                  <button
-                    type="button"
-                    onClick={() => setMoRemoteModal(true)}
-                    className="tap-target inline-flex items-center font-bold px-4 py-2 rounded-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors"
-                    style={{ gap: 6, minHeight: 40, fontSize: 'var(--cx-1)' }}
-                  >
-                    <Smartphone size={16} />
-                    <span>Điều khiển điện thoại</span>
-                    {maPinHienTai && (
-                      <span className="bg-emerald-800/60 px-2 py-0.5 rounded text-xs font-mono font-bold">
-                        PIN: {maPinHienTai}
-                      </span>
-                    )}
-                  </button>
-                )}
+
                 <button
                   type="button"
                   onClick={() => void navigator.clipboard.writeText(bangChuBuoiChuaMoi(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
@@ -2614,38 +2532,10 @@ function GoiLenBangCu() {
           ten="Tờ máy chiếu — gọi lên bảng"
           dong={() => {
             setHtmlMayChieu('')
-            setMaPhienHienTai('')
-            setMaPinHienTai('')
           }}
-          phu={
-            maPhienHienTai ? (
-              <button
-                type="button"
-                onClick={() => setMoRemoteModal(true)}
-                className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-sm transition-all cursor-pointer"
-                title="Mở mã QR điều khiển từ xa bằng điện thoại"
-              >
-                <Smartphone size={18} />
-                <span>Điều khiển điện thoại</span>
-                {maPinHienTai && (
-                  <span className="bg-emerald-900/60 px-2 py-0.5 rounded-full text-xs font-mono font-bold tracking-wider">
-                    {maPinHienTai}
-                  </span>
-                )}
-              </button>
-            ) : null
-          }
         />
       )}
 
-      {moRemoteModal && (
-        <ModalDieuKhienTuXa
-          maPhien={maPhienHienTai}
-          maPin={maPinHienTai}
-          tieuDe={du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng'}
-          onDong={() => setMoRemoteModal(false)}
-        />
-      )}
 
       {/* XOÁ PHIÊN PHÂN CÔNG — chỉ dọn trên máy này, không đụng máy chủ (nói thật trong hộp). */}
       {hoiXoaPhien && (

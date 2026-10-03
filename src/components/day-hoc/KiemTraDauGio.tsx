@@ -7,7 +7,7 @@
 //  3 · CHẤM — mỗi câu Đạt / Chưa đạt (idempotent theo buổi + em + câu, ghi sổ nguon='dau_gio') + ô "Thầy đã chữa" (nhãn + mốc dạy lại).
 //      "Kết thúc": câu chưa chấm KHÔNG ghi gì vào sổ.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Check, Flag, MonitorPlay, UserPlus, X } from 'lucide-react'
+import { Check, Eye, EyeOff, Flag, Lightbulb, MonitorPlay, UserPlus, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { hoiXacNhan } from '../hop-thoai'
@@ -18,6 +18,7 @@ import { cauTheoQid, locUngVienTheoKho } from '../../lib/dau-gio-kho'
 import { chamCau, chotLuot, ghiDaChua, ketThucDauGio, layLichSuHoi, layUngVien, xemDauGio, type LichSuHoi, type LuotHoi } from '../../lib/dau-gio-api'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { BuocDiemDanh, tenNgan, useDiemDanhBuoi } from './DiemDanhBuoi'
+import TheCauHienThi from './TheCauHienThi'
 import './day-hoc.css'
 import './dau-gio.css'
 
@@ -98,6 +99,7 @@ export default function KiemTraDauGio() {
 
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)
+  const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
   const luotCuoi = luot.length ? Math.max(...luot.map((x) => x.luot)) : 0
 
   /** Dựng tờ chiếu cho các lượt `ds`. `ls` = lịch sử vừa nạp (state có thể chưa kịp cập nhật). */
@@ -274,6 +276,7 @@ export default function KiemTraDauGio() {
                 <MonitorPlay size={18} aria-hidden="true" /> Mở lại tờ chiếu lượt {luotCuoi}
               </button>
             )}
+
             {luot.length > 0 && (
               <button type="button" className="m3-nut-chu dh-nut" onClick={() => void ketThuc()}>
                 <Flag size={16} aria-hidden="true" /> Kết thúc kiểm tra
@@ -311,20 +314,40 @@ export default function KiemTraDauGio() {
           <p className="dh-phu">Chưa gọi em nào. Bấm “Chiếu lên bảng” ở bước 2.</p>
         ) : (
           <>
-            <p className="dh-tong dg-tong">
-              <span>
-                Đã gọi <b>{dem.goi}</b> em
-              </span>
-              <span>
-                Đạt <b>{dem.dat}</b>
-              </span>
-              <span>
-                Chưa đạt <b>{dem.chuaDat}</b>
-              </span>
-              <span>
-                Chưa chấm <b>{dem.cho}</b>
-              </span>
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, margin: '8px 0' }}>
+              <p className="dh-tong dg-tong" style={{ margin: 0 }}>
+                <span>
+                  Đã gọi <b>{dem.goi}</b> em
+                </span>
+                <span>
+                  Đạt <b>{dem.dat}</b>
+                </span>
+                <span>
+                  Chưa đạt <b>{dem.chuaDat}</b>
+                </span>
+                <span>
+                  Chưa chấm <b>{dem.cho}</b>
+                </span>
+              </p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="m3-nut-tonal dh-nut-nho"
+                  onClick={() => setXemLoiGiai(new Set(luot.map(khoa)))}
+                >
+                  <Eye size={15} /> Hiện lời giải tất cả
+                </button>
+                {xemLoiGiai.size > 0 && (
+                  <button
+                    type="button"
+                    className="m3-nut-chu dh-nut-nho"
+                    onClick={() => setXemLoiGiai(new Set())}
+                  >
+                    <EyeOff size={15} /> Ẩn tất cả
+                  </button>
+                )}
+              </div>
+            </div>
             {theoLuot.map(([so, ds]) => (
               <div key={so} className="dg-luot">
                 <h3 className="dg-luot-ten">Lượt {so}</h3>
@@ -333,9 +356,10 @@ export default function KiemTraDauGio() {
                     const c = khoSan ? kho.current?.get(x.qid) : undefined
                     const t = trangThai(x)
                     const ls = lichSu[khoa(x)]
+                    const mo = xemLoiGiai.has(khoa(x))
                     return (
                       <li key={khoa(x)} className="dh-cau dg-dong" data-trang-thai={t}>
-                        <div className="dh-cau-than">
+                        <div className="dh-cau-than" style={{ width: '100%' }}>
                           <p className="dg-ten">
                             <b title={x.hoTen || x.sbd}>{x.hoTen || x.sbd}</b>
                             <small>SBD {x.sbd}</small>
@@ -365,6 +389,25 @@ export default function KiemTraDauGio() {
                                 </button>
                               </>
                             )}
+                            <button
+                              type="button"
+                              className={`m3-nut-vien dh-nut-nho ${mo ? 'dh-nut-giai--mo' : ''}`}
+                              onClick={() =>
+                                setXemLoiGiai((cu) => {
+                                  const m = new Set(cu)
+                                  if (m.has(khoa(x))) m.delete(khoa(x))
+                                  else m.add(khoa(x))
+                                  return m
+                                })
+                              }
+                              style={{
+                                background: mo ? 'var(--xanh-nen)' : undefined,
+                                color: mo ? 'var(--xanh)' : undefined,
+                                borderColor: mo ? 'var(--xanh)' : undefined,
+                              }}
+                            >
+                              <Lightbulb size={15} /> {mo ? 'Ẩn lời giải' : 'Hiện lời giải'}
+                            </button>
                             <label className={`dg-da-chua${x.daChuaLuc ? ' dg-da-chua--co' : ''}`}>
                               <input
                                 type="checkbox"
@@ -375,6 +418,15 @@ export default function KiemTraDauGio() {
                               <span>Thầy đã chữa{x.daChuaLuc ? ` · ${ngayNganVn(x.daChuaLuc)}` : ''}</span>
                             </label>
                           </div>
+                          {mo && (
+                            c ? (
+                              <TheCauHienThi c={c} />
+                            ) : (
+                              <div className="dh-cau-de" style={{ marginTop: 8, fontStyle: 'italic' }}>
+                                Chưa có câu này trong kho trên máy. Bấm Ngân hàng câu hỏi → Đồng bộ ngay.
+                              </div>
+                            )
+                          )}
                         </div>
                       </li>
                     )
