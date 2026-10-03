@@ -96,4 +96,20 @@ describe('Đoàn 2.0 · Sảnh chặng câu ôn', () => {
     fireEvent.click(screen.getByRole('button', { name: 'QUA CẦU · KHÁM PHÁ ĐẢO' })); expect(p.onRaDao).toHaveBeenCalledTimes(1); expect(p.onLenDuong).not.toHaveBeenCalled()
     expect((screen.getByRole('button', { name: /Mở đoàn mới/ }) as HTMLButtonElement).disabled).toBe(true)
   })
+
+  it('còn câu ôn (hoa2.con = 39) dù đã đi đủ 6 chặng (chang: { daDi: 6, toiDa: 6 }): nút LÊN ĐƯỜNG VẪN MỞ, không bị trần 6 chặng khoá', () => {
+    const p = cb()
+    const { container } = render(
+      <div className="dh dh2">
+        <DoanSanh pet={0} cap={12} tenDoan="Đoàn Hộ Tống" goiY={null} chang={{ daDi: 6, toiDa: 6 }} sanh={sanh()} anThach={null} banDongHanh={null} phong={null} ban={false} loi="" hoa2={{ con: 39, daoCon: 28 }} {...p} />
+      </div>
+    )
+    const di = container.querySelector('.dh-chang .dh-nut-vang') as HTMLButtonElement
+    expect(di.disabled).toBe(false)
+    expect(di.textContent).toBe('LÊN ĐƯỜNG')
+    expect(container.querySelector('.dh-the-chang')).toBeNull()
+    expect(container.querySelector('.dh-chang')!.textContent).toContain('còn 39 câu = 39 ổ phục kích')
+    fireEvent.click(di)
+    expect(p.onLenDuong).toHaveBeenCalledTimes(1)
+  })
 })

@@ -622,7 +622,8 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     // Sảnh hằng ngày: vé, chuỗi/rương, Đoàn lớp, Trùm lớp. Chưa chạy migration bước 5 → `sanh:null`, giao diện giữ các ô "SẮP MỞ".
     await env.DB.prepare("DELETE FROM doan_ve_so WHERE sbd=? AND loai='tieu' AND ma_nguon IN (SELECT ma FROM doan_chang WHERE trang_thai IN ('sanh','huy') AND tao_luc<?)").bind(sbd, iso(now - PHONG_HET_HAN_MS)).run().catch(() => { /* chưa có sổ vé */ })
     const homNay = ngayVn(iso(now)), pet = Math.max(0, PETS.findIndex(x => x.id === hoSo.pet)), sanh = await docSanh(env, sbd, now)
-    return { ok: true, tranNgay: TRAN_CAU_DOAN_NGAY, dailyUsed: await demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan'), ...await changHomNay(env, sbd, homNay), sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
+    const hoa2 = await cheDo2(env, sbd)
+    return { ok: true, ...(hoa2 ? {} : { tranNgay: TRAN_CAU_DOAN_NGAY }), dailyUsed: await demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan'), ...(hoa2 ? {} : await changHomNay(env, sbd, homNay)), sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
   }
   if (action === 'doan-hien-thi') {
     // Hợp đồng hiển thị NGOÀI game (docs/hop-dong-doan-hien-thi-2109.md): hào quang + danh hiệu của chính em.
@@ -674,7 +675,8 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
         const khac = await timDangDo()
         if (khac && khac.ma_chang !== ma) throw new Error('Em đang ở một đoàn khác. Em rời đoàn ấy trước rồi vào đoàn này nhé.')
         const toi = toiMoi ??= await taoNguoi(env, sbd, hoSo, b, goiGame, now)
-        await quaCongVe(env, sbd, ma, now)
+        const hoa2 = await cheDo2(env, sbd)
+        if (!hoa2) await quaCongVe(env, sbd, ma, now)
         phong.nguoi.push(toi); i = phong.nguoi.length - 1; doi = true
         if (!await luuPhong(env, ma, phong, revision)) continue
         await env.DB.prepare('INSERT OR IGNORE INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,?,?)').bind(ma, sbd, ngayVn(iso(now)), toi.lop, i, iso(now)).run()
