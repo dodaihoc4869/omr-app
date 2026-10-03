@@ -135,6 +135,10 @@ export interface EmBang {
   nhip?: NhipEm
   /** Số ngày liền không làm câu nào (chưa làm ⇒ tính từ ngày giao). */
   soNgayTre?: number
+  /** Tổng số câu tồn của những ngày trước (thầy 03/10). */
+  soCauTon?: number
+  /** Số câu cần hoàn thành của những ngày trước. */
+  soCauCanTruoc?: number
 }
 
 export type HangEm = 'L1' | 'L2' | 'L3' | 'L4'

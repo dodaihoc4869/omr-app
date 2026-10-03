@@ -62,7 +62,7 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
   it('5 thẻ số có nhãn + mẫu số + so với hôm qua; heatmap em yếu trước, dạng lớp yếu trước; nhãn Quá tải hôm nay, Trễ nhịp', () => {
     const { container } = render(
       <BangChienDich
-        du={bang([em('Trần Bảo', [0.8, 0.55, 0.3, 0.1, null]), em('Lê Chi', [0.3, 0.15, 0.05, 0.25, 0.2], { huyetChien: true, treNhip: 2, coXat: 35, thanhThao: 8 })], {
+        du={bang([em('Trần Bảo', [0.8, 0.55, 0.3, 0.1, null]), em('Lê Chi', [0.3, 0.15, 0.05, 0.25, 0.2], { huyetChien: true, soCauTon: 5, coXat: 35, thanhThao: 8 })], {
           lop: { coXat: 0.93, thanhThao: 0.34, huyetChien: 2, canDayLaiCau: 4, canDayLaiLuot: 16, homQua: { coXat: 0.85, thanhThao: 0.36 }, nhip: { vuot: 0, dung: 1, tre12: 1, tre3: 0 }, dungNhip: 1 },
         })}
         nowMs={NOW}
@@ -85,7 +85,7 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     expect(o.textContent).toContain('câu em đã làm ít nhất 1 lần')
     expect(o.textContent).toContain('TB 37 / 40 câu · ▲ 8 điểm so với hôm qua')
     expect(o.textContent).toContain('▼ 2 điểm so với hôm qua')
-    expect(o.textContent).toContain('1 em trễ nhịp · 0 em từ 3 ngày')
+    expect(o.textContent).toContain('1 em tồn câu · 0 em không làm')
     expect(o.textContent).toContain('16 lượt em')
     expect(o.textContent).not.toMatch(/Cọ xát|Huyết Chiến/)
 
@@ -95,10 +95,11 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     const hangBao = screen.getByRole('rowheader', { name: 'Trần Bảo' }).closest('tr') as HTMLElement
     expect([...hangBao.querySelectorAll('[data-o]')].map((x) => x.getAttribute('data-o'))).toEqual(['L1', 'L1', 'trong', 'L2', 'L3'])
     expect([...hangBao.querySelectorAll('[data-o]')].map((x) => x.textContent)).toEqual(['30', '10', '—', '55', '80'])
+    expect(hangBao.textContent).toContain('Đúng nhịp')
 
     const hangChi = screen.getByRole('rowheader', { name: /Lê Chi/ }).closest('tr') as HTMLElement
     expect(within(hangChi).getByText('Quá tải hôm nay')).toBeTruthy()
-    expect(hangChi.textContent).toContain('2 ngày')
+    expect(hangChi.textContent).toContain('Tồn 5 câu')
     expect(hangChi.textContent).toContain('20%') // thành thạo 8/40
 
     // Em thành thạo thấp trước: Chi (8) rồi Bảo (20); dòng đầu là "Cả lớp"
@@ -113,7 +114,7 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
 
   it('ô "Chưa làm" gạch chéo khi em chưa làm câu nào của dạng; dòng Cả lớp có hạng; thẻ nhịp lớp và hạng lớp theo dạng', () => {
     const ds = [
-      em('An', [0.9, 0.7, 0.5, 0, 0.2], { daLamTheoDang: { 'Chất béo': 0 }, nhip: 'tre3', soNgayTre: 4, treNhip: 4 }),
+      em('An', [0.9, 0.7, 0.5, 0, 0.2], { daLamTheoDang: { 'Chất béo': 0 }, soCauTon: 8, nhip: 'tre3', soNgayTre: 4, treNhip: 4 }),
       em('Bình', [0.9, 0.7, 0.5, 0.3, 0.2], { nhip: 'vuot' }),
     ]
     const { container } = render(
@@ -137,7 +138,7 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     const oBeo = [...hangAn.querySelectorAll('[data-o]')].find((x) => x.getAttribute('title')?.startsWith('Chất béo'))!
     expect(oBeo.getAttribute('data-o')).toBe('chua-lam')
     expect(oBeo.textContent).toBe('Chưa làm')
-    expect(hangAn.textContent).toContain('4 ngày')
+    expect(hangAn.textContent).toContain('Tồn 8 câu')
     const lop = container.querySelector('[data-khoi="hang-ca-lop"]') as HTMLElement
     expect(lop.textContent).toContain('Giỏi')
     expect(lop.textContent).toContain('Yếu')
@@ -192,6 +193,57 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     const e = [em('A', [0.9, 0.9, 0.9, 0.9, 0.9]), em('B', [0.5, 0.5, 0.5, 0.5, 0.5])]
     const ds = nguoiGiaiMau(bang(e).canDayLai.slice(0, 2), e)
     expect(ds.map((o) => o.sbd)).toEqual(['A', 'B'])
+  })
+
+  it('quy tắc nhịp 03/10: chưa làm câu nào ⇒ Không làm; làm đủ full câu mỗi ngày ⇒ Đúng nhịp; trễ nhịp ⇒ Tồn X câu', () => {
+    const ds = [
+      em('Chưa Động', [null, null, null, null, null], { coXat: 0, thanhThao: 0, treNhip: null }),
+      em('Đúng Nhịp', [0.8, 0.8, 0.8, 0.8, 0.8], { coXat: 30, thanhThao: 24, treNhip: 0, soCauTon: 0 }),
+      em('Trễ Nhẹ', [0.4, 0.4, 0.4, 0.4, 0.4], { coXat: 18, thanhThao: 10, treNhip: 1, soCauTon: 6 }),
+      em('Trễ Nặng', [0.2, 0.2, 0.2, 0.2, 0.2], { coXat: 8, thanhThao: 4, treNhip: 3, soCauTon: 16 }),
+    ]
+    const { container } = render(
+      <BangChienDich
+        du={bang(ds, {
+          lop: {
+            coXat: 0.35, thanhThao: 0.24, huyetChien: 0, canDayLaiCau: 0, canDayLaiLuot: 0,
+            ngayThu: 4, tongNgay: 7, dungNhip: 1,
+            nhip: { vuot: 0, dung: 1, tre12: 1, tre3: 1 },
+          },
+        })}
+        nowMs={NOW}
+        dangChieu={false}
+        onChieu={vi.fn(async () => true)}
+        onDaChua={vi.fn()}
+      />,
+    )
+    const hang = (ten: string) => screen.getByRole('rowheader', { name: new RegExp(ten) }).closest('tr') as HTMLElement
+
+    // 1. Chưa làm câu nào: hiện "Không làm", class cd-phu
+    const hChua = hang('Chưa Động')
+    expect(hChua.textContent).toContain('Không làm')
+    const tdChua = hChua.querySelector('td.cd-so:nth-of-type(2)') as HTMLElement
+    expect(tdChua.className).toContain('cd-phu')
+
+    // 2. Làm đủ full câu mỗi ngày: hiện "Đúng nhịp", class cd-chu-xanh
+    const hDung = hang('Đúng Nhịp')
+    expect(hDung.textContent).toContain('Đúng nhịp')
+    const tdDung = hDung.querySelector('td.cd-so:nth-of-type(2)') as HTMLElement
+    expect(tdDung.className).toContain('cd-chu-xanh')
+
+    // 3. Trễ nhịp thay bằng tổng số câu tồn của những ngày trước
+    const hNhe = hang('Trễ Nhẹ')
+    expect(hNhe.textContent).toContain('Tồn 6 câu')
+
+    const hNang = hang('Trễ Nặng')
+    expect(hNang.textContent).toContain('Tồn 16 câu')
+    const tdNang = hNang.querySelector('td.cd-so:nth-of-type(2)') as HTMLElement
+    expect(tdNang.className).toContain('cd-chu-do')
+
+    // 4. Thẻ KPI hiển thị đúng số em
+    expect(container.querySelector('[data-so="dung-nhip"]')?.textContent).toBe('1/ 4 em')
+    const kpiDung = container.querySelector('[data-so="dung-nhip"]')?.closest('.cd-kpi')
+    expect(kpiDung?.querySelector('.cd-kpi-phu')?.textContent).toContain('2 em tồn câu · 1 em không làm')
   })
 })
 

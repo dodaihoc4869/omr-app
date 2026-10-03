@@ -420,6 +420,9 @@ async function bang(env: Env, id: string, nowMs: number) {
     }))
     const coXat = ds.filter((t) => !t.laMoi).length
     const tre = soNgayTre(ngayCuoi, moc.ngayGiao, homNay)
+    const soNgayTruoc = cd.hanNop < homNay ? moc.tongNgay : Math.max(0, moc.ngayThu - 1)
+    const soCauCanTruoc = Math.round(soCau * (soNgayTruoc / moc.tongNgay))
+    const soCauTon = coXat === 0 ? 0 : Math.max(0, soCauCanTruoc - coXat)
     return {
       sbd: s, ten: ten.get(s) ?? s, coXat, thanhThao: ds.filter((t) => t.thanhThao).length, canDayLai: ds.filter((t) => t.catTia).length,
       treNhip: ngayCuoi ? Math.max(0, Math.round((Date.parse(homNay) - Date.parse(ngayCuoi)) / 86_400_000) - 1) : null, huyetChien: huyet.has(s), theoDang,
@@ -427,6 +430,7 @@ async function bang(env: Env, id: string, nowMs: number) {
       hangTheoDang: Object.fromEntries(Object.entries(hangTuHoSo(hoSoDang.get(s) ?? [], lanTho.get(s) ?? [], meta, cd.qids, mocTinhCua(cd.mocBatDau, them.get(s))).hangTheoDang)
         .filter(([ma]) => tenCuaMa.has(ma)).map(([ma, h]) => [tenCuaMa.get(ma)!, h])),
       daLamTheoDang, nhip: nhipEm(tre, coXat / soCau, moc.mucCanHomNay), soNgayTre: tre,
+      soCauTon, soCauCanTruoc,
     }
   })
   const canDayLai = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
