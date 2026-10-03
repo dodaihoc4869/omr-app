@@ -150,6 +150,8 @@ export interface CauCanDayLai {
   dang: string
   soEm: number
   mucDo?: string | null
+  phan?: 'I' | 'II' | 'III'
+  cau?: any
 }
 
 /** Một dòng báo nợ cũ: "Em X còn N câu nợ cũ — cần ≈ K ngày để trả hết" (máy chủ viết sẵn ở `cau`). */
@@ -199,6 +201,7 @@ export interface CauBuoiChua {
   diemChua: number
   giaiMau: EmTen | null
   emSua: EmTen[]
+  cau?: any
 }
 
 export interface BuoiChuaMayChu {

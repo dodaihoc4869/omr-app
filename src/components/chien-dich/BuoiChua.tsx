@@ -31,6 +31,7 @@ export function oChieuTuDong(dong: readonly DongBuoiChua[]): OChieu[] {
       sbd: nguoi?.sbd ?? '',
       ten: nguoi?.ten ?? 'Cả lớp',
       viSao: d.giaiMau ? 'Giải mẫu' : 'Chưa em nào thành thạo — thầy giải mẫu cùng em',
+      cauGoc: d.cau.cau,
     }
   })
 }

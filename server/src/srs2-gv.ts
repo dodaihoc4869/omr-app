@@ -435,6 +435,38 @@ async function bang(env: Env, id: string, nowMs: number) {
   })
   const canDayLai = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
     .filter((x) => x.soEm > 0).sort((a, b) => b.soEm - a.soEm)
+  if (canDayLai.length) {
+    const qidList = canDayLai.map((x) => x.qid)
+    const rows = (await env.DB.prepare('SELECT qid, phan, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qidList)).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
+    const cauMap = new Map<string, Row>()
+    for (const r of rows) cauMap.set(str(r.qid), r)
+    for (const item of canDayLai as (typeof canDayLai[number] & { phan?: string; cau?: Record<string, unknown> })[]) {
+      const r = cauMap.get(item.qid)
+      if (r) {
+        try {
+          const q = JSON.parse(str(r.json))
+          item.phan = q.phan || 'I'
+          item.cau = {
+            id: item.qid,
+            phan: q.phan || 'I',
+            text: q.text || '',
+            choices: q.choices,
+            ideas: q.ideas,
+            correct: q.correct,
+            explanation: q.explanation || q.huongDanGiai || q.loiGiaiChiTiet,
+            loiGiai: q.loiGiai || q.solution,
+            thanCauImg: q.thanCauImg,
+            imageDataUrl: q.imageDataUrl,
+            hinhAnh: q.hinhAnh,
+            table: q.table,
+            chuyenDe: q.chuyenDe,
+            dang: q.dang ? { ma: q.dang, ten: q.tenDang || q.dang } : null,
+            mucDo: q.mucDo || item.mucDo,
+          }
+        } catch {}
+      }
+    }
+  }
   const tong = cd.qids.length * Math.max(1, cd.sbd.length)
   // SỔ NỢ (29/09): em có nợ cũ (ngoài chiến dịch này) vượt trần 50% nhiều ngày ⇒ dòng báo thầy. Lỗi đọc ⇒ không báo.
   const noCu = await noCuCaLop(env, cd.sbd, homNay, cd.qids, cd.id).then((m) => dongNoCu(env, m, cd.theLucNgay, ten)).catch(() => [])
@@ -511,6 +543,38 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
     if (giaiMau) daGiaiMau.set(giaiMau, (daGiaiMau.get(giaiMau) ?? 0) + 1)
     return { ...c, giaiMau: giaiMau ? { sbd: giaiMau, ten: ten.get(giaiMau) ?? giaiMau } : null, emSua: c.emSua.map((s) => ({ sbd: s, ten: ten.get(s) ?? s })) }
   })
+  if (deXuat.length) {
+    const qidList = deXuat.map((x) => x.qid)
+    const rows = (await env.DB.prepare('SELECT qid, phan, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qidList)).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
+    const cauMap = new Map<string, Row>()
+    for (const r of rows) cauMap.set(str(r.qid), r)
+    for (const item of deXuat as (typeof deXuat[number] & { phan?: string; cau?: Record<string, unknown> })[]) {
+      const r = cauMap.get(item.qid)
+      if (r) {
+        try {
+          const q = JSON.parse(str(r.json))
+          item.phan = q.phan || 'I'
+          item.cau = {
+            id: item.qid,
+            phan: q.phan || 'I',
+            text: q.text || '',
+            choices: q.choices,
+            ideas: q.ideas,
+            correct: q.correct,
+            explanation: q.explanation || q.huongDanGiai || q.loiGiaiChiTiet,
+            loiGiai: q.loiGiai || q.solution,
+            thanCauImg: q.thanCauImg,
+            imageDataUrl: q.imageDataUrl,
+            hinhAnh: q.hinhAnh,
+            table: q.table,
+            chuyenDe: q.chuyenDe,
+            dang: q.dang ? { ma: q.dang, ten: q.tenDang || q.dang } : null,
+            mucDo: q.mucDo || item.mucDo,
+          }
+        } catch {}
+      }
+    }
+  }
   const tong = cd.qids.length * Math.max(1, em.length)
   let coXat = 0, thanhThao = 0
   for (const s of em) for (const t of tt.get(s)!.values()) { if (!t.laMoi) coXat++; if (t.thanhThao) thanhThao++ }

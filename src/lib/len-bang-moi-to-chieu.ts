@@ -46,7 +46,31 @@ body.mc .mc-pa-chu{overflow-wrap:normal}
 body.mc .mc-pa-chu:has(.mt){white-space:nowrap}
 /* 6 · LỜI GIẢI NẰM DƯỚI ĐỀ — hiển thị chuẩn như trong app */
 body.mc-bc .mc-vung-de>.mc-giai{position:static;inset:auto;overflow:visible;margin:.6em 0 0;padding:0;background:transparent;border:0;z-index:auto}
-body.mc-bc .mc-vung-de>.mc-giai .sol-box{display:block;margin:12px 0;padding:16px 20px;background:rgba(254,243,199,.6);border:1.5px solid rgb(253,230,138);border-left:5px solid rgb(217,119,6);border-radius:16px;box-shadow:0 3px 12px rgba(180,83,9,.08);color:var(--mc-muc,rgb(30,41,59));font-size:calc(var(--mc-co,28px) * 0.92)!important}
+body.mc-bc .mc-vung-de>.mc-giai .sol-box{display:block;margin:12px 0;padding:16px 20px;background:rgba(254,243,199,.6);border:1.5px solid rgb(253,230,138);border-left:5px solid rgb(217,119,6);border-radius:16px;box-shadow:0 3px 12px rgba(180,83,9,.08);color:var(--mc-muc,rgb(30,41,59));font-size:var(--mc-co,28px)!important}
+/* Cỡ chữ lời giải chiếu lên bảng ĐỀU NHAU, GIỐNG NHAU và BẰNG VỚI KÍCH THƯỚC CỦA ĐỀ: var(--mc-co, 28px) */
+body.mc-bc .mc-vung-de>.mc-giai .sol-box,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box *,
+body.mc .mc-giai .sol-box,
+body.mc .mc-giai .sol-box *,
+body.mc .mc-giai .sol-dap,
+body.mc .mc-giai .sol-dap b,
+body.mc .mc-giai .sol-cot-loi,
+body.mc .mc-giai .sol-text,
+body.mc .mc-giai .sol-pa,
+body.mc .mc-giai .sol-pa strong,
+body.mc .mc-giai .sol-pa span,
+body.mc .mc-giai .sol-dau,
+body.mc .mc-giai .sol-ly,
+body.mc .mc-giai .sol-step,
+body.mc .mc-giai .sol-ket{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
+body.mc .mc-giai .sol-box .sol-label,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-label{font-size:calc(var(--mc-co,28px)*0.75)!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:0.05em!important;line-height:1.4!important}
+body.mc .mc-giai .sol-box .katex,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .katex{font-size:1em!important}
+body.mc .mc-giai .sol-box sub,
+body.mc .mc-giai .sol-box sup,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box sub,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box sup{font-size:.75em!important;line-height:0!important}
 body.mc .mc-giai .mc-buoc-an,body.mc .mc-giai .mc-buoc-cu,body.mc .mc-giai .mc-buoc-nay{opacity:1!important}
 body.mc .mc-giai .sol-box>*,body.mc .mc-giai .sol-pa{transition:opacity .35s,background .35s}
 body.mc .mc-giai-dem{display:block;font:600 calc(var(--u)*1) var(--mc-sans);color:var(--mc-phu);margin:0 0 .3em}

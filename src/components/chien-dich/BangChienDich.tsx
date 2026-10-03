@@ -118,7 +118,16 @@ export function nguoiGiaiMau(cau: readonly CauCanDayLai[], em: readonly EmBang[]
     const xep = [...em].sort((a, b) => (b.theoDang[c.dang] ?? -1) - (a.theoDang[c.dang] ?? -1) || b.thanhThao - a.thanhThao)
     const e = xep.find((x) => !daGoi.has(x.sbd)) ?? xep[0]
     if (e) daGoi.add(e.sbd)
-    return { qid: c.qid, stt: c.stt, phan: 'I', mucDo: null, sbd: e?.sbd ?? '', ten: e?.ten ?? 'Cả lớp', viSao: `${c.soEm} em cần thầy dạy lại` }
+    return {
+      qid: c.qid,
+      stt: c.stt,
+      phan: c.phan ?? 'I',
+      mucDo: c.mucDo ?? null,
+      sbd: e?.sbd ?? '',
+      ten: e?.ten ?? 'Cả lớp',
+      viSao: `${c.soEm} em cần thầy dạy lại`,
+      cauGoc: c.cau,
+    }
   })
 }
 
