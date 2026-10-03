@@ -38,9 +38,12 @@ export function thongKeHtml(t: ThongKeLopCau | null | undefined): string {
 export const CSS_LEN_BANG_MOI = `
 /* ═══ LÊN BẢNG — BẢN VẼ MỚI 28/09 ═══ */
 :root{--u:min(1vw,1.777778vh);--mc-den:rgb(0,0,0);--mc-vang-noi:rgb(255,210,122);--mc-thanh2:rgb(27,26,23)}
-/* 1 · CHỮ CỐ ĐỊNH: đề = phương án = lời giải = --mc-co (không co, không bậc chữ) */
+/* 1 · CHỮ CỐ ĐỊNH: đề = phương án = lời giải = --mc-co (không co, không bậc chữ) cho cả dạy học, đầu giờ và chiến dịch */
+body.mc-bc .mc-vung-de .mc-de,body.mc .mc-de{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
 body.mc-bc .mc-vung-de .mc-pa,body.mc-bc .mc-vung-de .mc-pa-chu{font-size:var(--mc-co,28px)}
-body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
+body.mc .mc-pa,body.mc .mc-pa-chu{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
+.mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
+body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-giai .sol-box,body.mc .mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
 /* 8 · phương án là phương trình: không ngắt giữa hai vế */
 body.mc .mc-pa-chu{overflow-wrap:normal}
 body.mc .mc-pa-chu:has(.mt){white-space:nowrap}
