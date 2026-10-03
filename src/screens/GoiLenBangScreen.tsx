@@ -1533,13 +1533,22 @@ function GoiLenBangCu() {
       if (a) a.push(p)
       else m.set(p.luot, [p])
     }
+    const khongLamEm = (p: DongPhanCong) => {
+      const em = hoSoLop.find((e) => e.sbd === p.sbd)
+      return !!em && em.btvn.soCauGiao > 0 && em.btvn.soDaLam === 0
+    }
     const tonEm = (p: DongPhanCong) => {
       const em = hoSoLop.find((e) => e.sbd === p.sbd)
       const soChuaLam = em?.btvn.soChuaLam ?? 0
       return soChuaLam > 0 ? soChuaLam : p.muc === 3 ? 1 : 0
     }
     for (const ds of m.values()) {
-      ds.sort((a, b) => tonEm(b) - tonEm(a))
+      ds.sort((a, b) => {
+        const klA = khongLamEm(a)
+        const klB = khongLamEm(b)
+        if (klA !== klB) return klA ? -1 : 1
+        return tonEm(b) - tonEm(a)
+      })
     }
     return [...m.entries()].sort((a, b) => a[0] - b[0])
   }, [kq, hoSoLop])

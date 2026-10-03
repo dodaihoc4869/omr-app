@@ -246,15 +246,21 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     expect(kpiDung?.querySelector('.cd-kpi-phu')?.textContent).toContain('2 em tồn câu · 1 em không làm')
   })
 
-  it('thứ tự em: bạn nào tồn thì đẩy lên đầu, tồn nhiều thì lên trên (thầy 03/10)', () => {
-    const emKhongLam = em('Em Không Làm', [0.1, 0.1, 0.1, 0.1, 0.1], { coXat: 0, thanhThao: 0, soCauTon: 20 })
-    const emTon8 = em('Em Tồn 8', [0.3, 0.3, 0.3, 0.3, 0.3], { coXat: 12, thanhThao: 5, soCauTon: 8 })
-    const emTon2 = em('Em Tồn 2', [0.5, 0.5, 0.5, 0.5, 0.5], { coXat: 18, thanhThao: 10, soCauTon: 2 })
+  it('thứ tự em: ưu tiên không làm lên đầu xong mới đến số câu tồn cao nhất (thầy 03/10)', () => {
+    // Em Không Làm 1 (tồn 5 câu do chưa làm câu nào)
+    const emKhongLam1 = em('Em Không Làm 1', [0.1, 0.1, 0.1, 0.1, 0.1], { coXat: 0, thanhThao: 0, soCauTon: 5 })
+    // Em Không Làm 2 (tồn 10 câu do chưa làm câu nào)
+    const emKhongLam2 = em('Em Không Làm 2', [0.1, 0.1, 0.1, 0.1, 0.1], { coXat: 0, thanhThao: 0, soCauTon: 10 })
+    // Em Tồn 20 (có làm bài nhưng tồn 20 câu — dù 20 > 10 và 5, nhưng không làm vẫn được ưu tiên lên đầu)
+    const emTon20 = em('Em Tồn 20', [0.3, 0.3, 0.3, 0.3, 0.3], { coXat: 10, thanhThao: 5, soCauTon: 20 })
+    // Em Tồn 3 (có làm bài, tồn 3 câu)
+    const emTon3 = em('Em Tồn 3', [0.5, 0.5, 0.5, 0.5, 0.5], { coXat: 18, thanhThao: 10, soCauTon: 3 })
+    // Em Đúng Nhịp (tồn 0 câu)
     const emDungNhip = em('Em Đúng Nhịp', [0.9, 0.9, 0.9, 0.9, 0.9], { coXat: 20, thanhThao: 20, soCauTon: 0 })
 
     const { container } = render(
       <BangChienDich
-        du={bang([emDungNhip, emTon2, emKhongLam, emTon8], {
+        du={bang([emDungNhip, emTon3, emKhongLam1, emTon20, emKhongLam2], {
           homNay: '2026-10-03',
           chienDich: { ...bang([]).chienDich, soCau: 40, hanNop: '2026-10-05', taoLuc: '2026-10-01' },
           lop: { coXat: 0.5, thanhThao: 0.35, huyetChien: 1, canDayLaiCau: 0, canDayLaiLuot: 0 },
@@ -268,10 +274,14 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
 
     const dsTen = [...container.querySelectorAll('tbody th')].map((x) => x.textContent)
     expect(dsTen[0]).toContain('Cả lớp')
-    expect(dsTen[1]).toContain('Em Không Làm')
-    expect(dsTen[2]).toContain('Em Tồn 8')
-    expect(dsTen[3]).toContain('Em Tồn 2')
-    expect(dsTen[4]).toContain('Em Đúng Nhịp')
+    // 1. Nhóm "Không làm" lên đầu (xếp theo tồn 10 trước tồn 5)
+    expect(dsTen[1]).toContain('Em Không Làm 2')
+    expect(dsTen[2]).toContain('Em Không Làm 1')
+    // 2. Xong mới đến nhóm có làm: xếp theo số câu tồn cao nhất (20 > 3)
+    expect(dsTen[3]).toContain('Em Tồn 20')
+    expect(dsTen[4]).toContain('Em Tồn 3')
+    // 3. Cuối cùng là đúng nhịp (tồn 0)
+    expect(dsTen[5]).toContain('Em Đúng Nhịp')
   })
 })
 

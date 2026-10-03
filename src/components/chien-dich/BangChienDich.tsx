@@ -87,17 +87,26 @@ export const chuTre = (e: EmBang, soCauCanTruoc = 0, soCauMoiNgay = 1): string =
   thongTinNhip(e, soCauCanTruoc, soCauMoiNgay).chu
 
 /**
- * Thứ tự em trong bảng chiến dịch (thầy 03/10: "Những bạn nào tồn thì đẩy lên đầu, tồn nhiều thì lên trên nhé"):
- * 1. Bạn nào TỒN (ton > 0, bao gồm trễ nhịp và chưa làm câu nào) thì đẩy lên đầu.
- * 2. Tồn NHIỀU câu hơn thì xếp lên trên (ton giảm dần).
- * 3. Sau các bạn tồn là các bạn Đúng nhịp (tồn = 0).
+ * Thứ tự em trong bảng chiến dịch (thầy 03/10: "Ưu tiên không làm lên đầu xong mới đến số câu tồn cao nhất"):
+ * 1. Ưu tiên học sinh "Không làm" lên đầu tiên (chưa làm câu nào từ khi giao chiến dịch).
+ * 2. Tiếp theo là các em có tồn câu, xếp theo số câu tồn cao nhất (ton giảm dần).
+ * 3. Cuối cùng là các em Đúng nhịp (tồn = 0).
  * 4. Khi cùng số câu tồn: em thành thạo thấp hơn lên trước, hoà thì theo tên tiếng Việt.
  */
 export function sapEmYeuTruoc(em: readonly EmBang[], soCauCanTruoc = 0, soCauMoiNgay = 1): EmBang[] {
   return [...em].sort((a, b) => {
-    const tonA = thongTinNhip(a, soCauCanTruoc, soCauMoiNgay).ton
-    const tonB = thongTinNhip(b, soCauCanTruoc, soCauMoiNgay).ton
-    if (tonB !== tonA) return tonB - tonA
+    const nhipA = thongTinNhip(a, soCauCanTruoc, soCauMoiNgay)
+    const nhipB = thongTinNhip(b, soCauCanTruoc, soCauMoiNgay)
+    const khongLamA = nhipA.kieu === 'khong_lam'
+    const khongLamB = nhipB.kieu === 'khong_lam'
+
+    // 1. Ưu tiên "Không làm" lên đầu (thầy 03/10)
+    if (khongLamA !== khongLamB) return khongLamA ? -1 : 1
+
+    // 2. Xong mới đến số câu tồn cao nhất (tồn nhiều hơn lên trên)
+    if (nhipB.ton !== nhipA.ton) return nhipB.ton - nhipA.ton
+
+    // 3. Cùng số câu tồn: thành thạo thấp hơn lên trước, hoà thì theo tên tiếng Việt
     return a.thanhThao - b.thanhThao || a.ten.localeCompare(b.ten, 'vi')
   })
 }
