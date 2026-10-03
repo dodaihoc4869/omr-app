@@ -431,6 +431,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     });
     xep(); if (mo) denBuoc();
     veThanh();
+    try { document.dispatchEvent(new CustomEvent('mc-giai-doi', { detail: { mo: mo } })); } catch (x) {}
   }
   function lgMo() { var d = dot(); return !!(d && d.querySelector('.mc-giai:not([hidden])')); }
   function denBuoc() {
@@ -658,6 +659,11 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     }
   }
   window.__mcLenh = lenh;
+  window.__mcMoLoiGiai = moLoiGiai;
+  window.__mcLgMo = lgMo;
+  window.__mcTrangThai = function () {
+    return { dot: chiSo(), soDot: soDot(), pha: pha(), lgMo: lgMo() };
+  };
   document.addEventListener('keydown', function (e) {
     if (e.target && e.target.closest && e.target.closest('input,textarea,select')) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;

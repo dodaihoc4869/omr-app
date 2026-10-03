@@ -827,6 +827,16 @@ const JS_MAY_CHIEU = `
   window.__mcSoDot = function () { return dots.length; };
   window.__mcDen = den;
   window.__mcLenBang = lenBang;
+  window.__mcBatLoiGiai = function (mo) {
+    if (window.__mcMoLoiGiai) return window.__mcMoLoiGiai(mo);
+    var page = dots[i];
+    if (!page) return;
+    Array.prototype.forEach.call(page.querySelectorAll('.mc-nut-giai'), function (nut) {
+      var hienNay = nut.getAttribute('aria-expanded') === 'true';
+      var canMo = typeof mo === 'boolean' ? mo : !hienNay;
+      if (canMo !== hienNay) nut.click();
+    });
+  };
 
   // Kéo tay cũng phải cập nhật số đợt, nếu không đếm một đằng chiếu một nẻo.
   if (ray) {

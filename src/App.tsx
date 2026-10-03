@@ -98,6 +98,7 @@ const BanGoNutThatScreen = lazy(() => import('./screens/BanGoNutThatScreen'))
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
 const ParentPortalScreen = lazy(() => import('./screens/ParentPortalScreen'))
+const DieuKhienToChieuScreen = lazy(() => import('./screens/DieuKhienToChieuScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 import './styles/gv-mau.css' // BẢN MÀU app thầy (28/09), phạm vi .vo-thay
@@ -130,6 +131,7 @@ const TEN_MAN: Record<string, string> = {
   chiendich: 'Chiến dịch luyện',
   duyetloigiai: 'Duyệt lời giải',
   bangonutthat: 'Bàn gỡ nút thắt',
+  remotetochieu: 'Điều khiển máy chiếu',
 }
 
 /** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
@@ -165,6 +167,8 @@ function App() {
   const [laHocSinh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'hocsinh')
   // CỔNG PHỤ HUYNH (/phu-huynh, /ph, ?vai=phuhuynh): cổng thông tin cho phụ huynh — tra cứu điểm của con bằng SBD, giao bài tập.
   const [laPhuHuynh] = useState(() => docDuongVao(location.search, location.pathname).vai === 'phuhuynh')
+  // ĐIỀU KHIỂN TỜ MÁY CHIẾU TỪ ĐIỆN THOẠI (?remote= hoặc /remote/)
+  const [laRemote] = useState(() => docDuongVao(location.search, location.pathname).vai === 'remote')
   // MẬT KHẨU MỞ APP (MATKHAUMOAPP.md). CHỈ hỏi ở app quản lý của thầy — vào
   // thi, báo cáo phụ huynh, link riêng cũ đều không bao giờ bị hỏi.
   const [canHoi] = useState(() => laManThayQuanLy(location.search, location.pathname))
@@ -331,6 +335,15 @@ function App() {
       <ChanLoi o="Cổng phụ huynh">
         <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}>
           <BatLinhShell vai="ph"><ParentPortalScreen /></BatLinhShell>
+        </Suspense>
+      </ChanLoi>
+    )
+  }
+  if (laRemote) {
+    return (
+      <ChanLoi o="Điều khiển máy chiếu">
+        <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}>
+          <DieuKhienToChieuScreen />
         </Suspense>
       </ChanLoi>
     )

@@ -16,7 +16,9 @@ import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu }
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Save, MonitorPlay, UserCheck, Trash2 } from 'lucide-react'
+import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Save, MonitorPlay, UserCheck, Trash2, Smartphone, Lightbulb, Eye, EyeOff } from 'lucide-react'
+import ModalDieuKhienTuXa from '../components/to-chieu/ModalDieuKhienTuXa'
+import { BoLangNgheLenhToChieu, dangKyPhienMayChu } from '../lib/to-chieu-dong-bo-remote'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import HopXacNhan from '../components/HopXacNhan'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
@@ -341,8 +343,11 @@ function GoiLenBangCu() {
   /** Hộp xác nhận "Xoá phiên phân công lên bảng". */
   const [hoiXoaPhien, setHoiXoaPhien] = useState(false)
   const [daCopy, setDaCopy] = useState(false)
-  const [xemCau, setXemCau] = useState('')
+  const [xemCau, setXemCau] = useState<Set<string>>(new Set())
   const [dangCham, setDangCham] = useState('')
+  const [maPhienHienTai, setMaPhienHienTai] = useState('')
+  const [maPinHienTai, setMaPinHienTai] = useState('')
+  const [moRemoteModal, setMoRemoteModal] = useState(false)
   /** Kết quả thầy đã bấm trên BẢNG BUỔI CHỮA (Engine E), theo `sbd|qid`. Máy chủ nhận rồi thì
    * khoá nút: bấm lại là ghi đôi vào sổ lên bảng, mà sổ chỉ thêm, không sửa. */
   const [ketQuaBuoi, setKetQuaBuoi] = useState<Record<string, 'dat' | 'khong_dat'>>({})
@@ -760,7 +765,7 @@ function GoiLenBangCu() {
     const r = phanCong(dsCau, baiLam, dsEmCa, { ...MAC_DINH, soLuot: luot })
     setSoLuot(luot)
     setKq(r)
-    setXemCau('')
+    setXemCau(new Set())
   }
 
   /** MỘT NÚT CHẠY CẢ HAI, đúng thứ tự: xếp giờ trước để biết em nào lên bảng,
@@ -863,7 +868,7 @@ function GoiLenBangCu() {
       try {
         // Seed theo MÃ CA: cùng ca, cùng đầu vào ⇒ cùng bảng (không còn bốc thăm `Math.random` mỗi lần bấm).
         const result = phanCongDayHoc(dsCau, dsEmCa.map(e => ({...e, soLanLenBang: lichSu.theoEm[e.sbd]?.soLan ?? 0})), hashSeed(`day-hoc:${du?.maCa ?? ''}`))
-        setKqBuoi(null); setKq(result); setXemCau('')
+        setKqBuoi(null); setKq(result); setXemCau(new Set())
       } catch (e) { showToast(e instanceof Error ? e.message : 'Chưa phân công được', 'warn') }
       return
     }
@@ -968,7 +973,7 @@ function GoiLenBangCu() {
     setKetQuaBuoi({})
     setDaGoiCau({})
     setSoLuot(1)
-    setXemCau('')
+    setXemCau(new Set())
     setBuoiDo(null)
     setBuoiQuyet(null)
     setTiepBuoi(null)
@@ -1240,6 +1245,53 @@ function GoiLenBangCu() {
 
       phienChieu.current = { ma: maPhien, o: oTrenTo, cuaSo: null, goc: '*' }
       setHtmlMayChieu(html)
+      setMaPhienHienTai(maPhien)
+
+      // Đăng ký phiên lên máy chủ để điện thoại điều khiển từ xa
+      const dsGui = dsO.map((o, idx) => {
+        const c = o.cau
+        const day = o.qid ? timCauTheoId(traCau, o.qid) || traCau.get(o.qid) : undefined
+        const q = (day?.q || {}) as any
+        const lg = q.loiGiai as any
+        let pa: string[] | undefined
+        if (c.luaChon) {
+          pa = c.luaChon.map((x, i) => (typeof x === 'string' ? `${['A', 'B', 'C', 'D'][i]}. ${x}` : `${(x as any).nhan || ['A', 'B', 'C', 'D'][i]}. ${(x as any).chu || x}`))
+        } else if (q.choices) {
+          pa = q.choices.map((t: string, i: number) => `${['A', 'B', 'C', 'D'][i]}. ${t}`)
+        }
+        return {
+          khoa: khoaToChieu(o.sbd, o.qid || ''),
+          dot: idx + 1,
+          soCau: o.soCau,
+          phan: o.cau.phan,
+          sao: o.sao,
+          sbd: o.sbd,
+          hoTen: o.hoTen,
+          lop: o.lop || du?.lop,
+          lanLenBang: o.lanLenBang,
+          qid: o.qid,
+          de: c.text,
+          pa,
+          dapAn: c.dapAn || q.correct,
+          loiGiai: c.chot || q.explanation || q.loiGiaiChiTiet || (typeof lg?.chot === 'string' ? lg.chot : ''),
+          huongDan: (c.buoc && c.buoc.length > 0 ? c.buoc.join('\n') : '') || q.huongDanGiai,
+          kienThucCotLoi: c.chot || lg?.chot || q.kienThucCotLoi,
+          mucDo: o.mucDo || undefined,
+        }
+      })
+
+      void dangKyPhienMayChu({
+        maPhien,
+        tieuDe: dayHoc ? 'Dạy học · Gọi lên bảng' : du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng',
+        dotHienTai: 0,
+        tongSoDot: dsO.length,
+        pha: 'cho',
+        loiGiaiMo: false,
+        dsO: dsGui,
+      }).then((res) => {
+        if (res.maPin) setMaPinHienTai(res.maPin)
+      })
+
       showToast('Đang mở tờ chiếu lên bảng', 'success')
     } catch (e) {
       console.error('Lỗi khi mở tờ máy chiếu:', e)
@@ -1447,9 +1499,31 @@ function GoiLenBangCu() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [htmlMayChieu])
 
+  // Lắng nghe lệnh từ điện thoại gửi về để điều khiển tờ máy chiếu
+  useEffect(() => {
+    if (!htmlMayChieu || !maPhienHienTai) return
+    const bo = new BoLangNgheLenhToChieu(maPhienHienTai, (lenh) => {
+      const iframe = document.querySelector('.lop-xem-phieu iframe') as HTMLIFrameElement | null
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'ddh-mc-lenh', loai: lenh.loai, thamSo: lenh.thamSo }, '*')
+      }
+      if (lenh.loai === 'CHAM' && lenh.thamSo?.khoa) {
+        const p = kq?.phanCong.find((x) => khoaToChieu(x.sbd, x.cau.id) === lenh.thamSo.khoa || `${x.sbd}|${x.cau.id}` === lenh.thamSo.khoa)
+        if (p) void cham(p, Boolean(lenh.thamSo.dat))
+      }
+    })
+    return () => bo.dung()
+  }, [htmlMayChieu, maPhienHienTai, kq])
+
   const boDong = (p: DongPhanCong) => {
     setKq((cu) => (cu ? { ...cu, phanCong: cu.phanCong.filter((x) => !(x.sbd === p.sbd && x.cau.id === p.cau.id)) } : cu))
-    if (xemCau === p.sbd + p.cau.id) setXemCau('')
+    const ma = p.sbd + p.cau.id
+    setXemCau((cu) => {
+      if (!cu.has(ma)) return cu
+      const tiep = new Set(cu)
+      tiep.delete(ma)
+      return tiep
+    })
   }
 
   const theoLuot = useMemo(() => {
@@ -1459,14 +1533,24 @@ function GoiLenBangCu() {
       if (a) a.push(p)
       else m.set(p.luot, [p])
     }
+    const tonEm = (p: DongPhanCong) => {
+      const em = hoSoLop.find((e) => e.sbd === p.sbd)
+      const soChuaLam = em?.btvn.soChuaLam ?? 0
+      return soChuaLam > 0 ? soChuaLam : p.muc === 3 ? 1 : 0
+    }
+    for (const ds of m.values()) {
+      ds.sort((a, b) => tonEm(b) - tonEm(a))
+    }
     return [...m.entries()].sort((a, b) => a[0] - b[0])
-  }, [kq])
+  }, [kq, hoSoLop])
 
   /** Thẻ câu đầy đủ (phương án, hình, lời giải) — dựng bằng đúng thẻ của màn
    * xem lại, không vẽ một kiểu hiển thị thứ hai. */
   const veCau = (id: string, so: number) => {
-    const day = traCau.get(id)
+    const day = timCauTheoId(traCau, id) || traCau.get(id)
     if (!day) return <OThongBao tone="cam">Không tìm thấy câu này trong bản đề của ca.</OThongBao>
+    const exp = day.q.explanation || (day.q as any).huongDanGiai || (day.q as any).loiGiaiChiTiet
+    const lg = day.q.loiGiai || ((day.q as any).kienThucCotLoi ? { chot: (day.q as any).kienThucCotLoi } : undefined)
     if (day.phan === 'I')
       return (
         <TheCau
@@ -1484,8 +1568,8 @@ function GoiLenBangCu() {
           choicePerm={[0, 1, 2, 3]}
           selected={null}
           correct={day.q.correct}
-          explanation={day.q.explanation}
-          loiGiai={day.q.loiGiai}
+          explanation={exp}
+          loiGiai={lg}
           nhanLoiGiai={day.q.loiGiaiTrangThai}
         />
       )
@@ -1505,8 +1589,8 @@ function GoiLenBangCu() {
           ideaImgs={day.q.ideaImgs}
           selected={[null, null, null, null]}
           correct={day.q.correct}
-          explanation={day.q.explanation}
-          loiGiai={day.q.loiGiai}
+          explanation={exp}
+          loiGiai={lg}
           nhanLoiGiai={day.q.loiGiaiTrangThai}
         />
       )
@@ -1523,8 +1607,8 @@ function GoiLenBangCu() {
         hinhAnh={day.q.hinhAnh}
         selected={null}
         correct={day.q.correct}
-        explanation={day.q.explanation}
-        loiGiai={day.q.loiGiai}
+        explanation={exp}
+        loiGiai={lg}
         nhanLoiGiai={day.q.loiGiaiTrangThai}
       />
     )
@@ -2116,6 +2200,22 @@ function GoiLenBangCu() {
                   <MonitorPlay size={16} />
                   <span>{dangMoMayChieu ? 'Đang mở tờ chiếu...' : 'Chiếu lên bảng ngay'}</span>
                 </button>
+                {htmlMayChieu && maPhienHienTai && (
+                  <button
+                    type="button"
+                    onClick={() => setMoRemoteModal(true)}
+                    className="tap-target inline-flex items-center font-bold px-4 py-2 rounded-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors"
+                    style={{ gap: 6, minHeight: 40, fontSize: 'var(--cx-1)' }}
+                  >
+                    <Smartphone size={16} />
+                    <span>Điều khiển điện thoại</span>
+                    {maPinHienTai && (
+                      <span className="bg-emerald-800/60 px-2 py-0.5 rounded text-xs font-mono font-bold">
+                        PIN: {maPinHienTai}
+                      </span>
+                    )}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => void navigator.clipboard.writeText(bangChuBuoiChuaMoi(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
@@ -2239,9 +2339,36 @@ function GoiLenBangCu() {
               {daCopy ? <Check size={16} /> : <ClipboardCopy size={16} />} {daCopy ? 'Đã copy' : 'Copy bảng'}
             </button>
           </div>
-          <div style={{ ...NHAN_NHO, marginTop: 4 }} data-dong-tong>
-            <span style={SO}>{kq.thongKe.length - kq.giangCaLop.length - kq.chiDocDapAn.length}</span> câu đáng chữa · <span style={SO}>{kq.giangCaLop.length}</span> giảng cả lớp ·{' '}
-            <span style={SO}>{kq.chiDocDapAn.length}</span> đọc đáp án
+          <div className="flex items-center justify-between flex-wrap gap-2" style={{ marginTop: 'var(--k2)' }}>
+            <div style={{ ...NHAN_NHO }} data-dong-tong>
+              <span style={SO}>{kq.thongKe.length - kq.giangCaLop.length - kq.chiDocDapAn.length}</span> câu đáng chữa · <span style={SO}>{kq.giangCaLop.length}</span> giảng cả lớp ·{' '}
+              <span style={SO}>{kq.chiDocDapAn.length}</span> đọc đáp án
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="tap-target inline-flex items-center font-bold"
+                style={{ gap: 6, minHeight: 32, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)', border: '1px solid var(--vien)', fontSize: 'var(--cx-1)' }}
+                onClick={() => {
+                  const tatCa = new Set<string>()
+                  kq?.phanCong.forEach((p) => tatCa.add(p.sbd + p.cau.id))
+                  kq?.giangCaLop.forEach((t) => tatCa.add(t.cau.id))
+                  setXemCau(tatCa)
+                }}
+              >
+                <Eye size={14} /> Hiện lời giải tất cả
+              </button>
+              {xemCau.size > 0 && (
+                <button
+                  type="button"
+                  className="tap-target inline-flex items-center font-bold"
+                  style={{ gap: 6, minHeight: 32, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'transparent', color: 'var(--mo)', border: 'none', fontSize: 'var(--cx-1)' }}
+                  onClick={() => setXemCau(new Set())}
+                >
+                  <EyeOff size={14} /> Ẩn tất cả
+                </button>
+              )}
+            </div>
           </div>
 
           {/* GIẢNG CẢ LỚP LÊN ĐẦU — chỗ đắt nhất của buổi: một lần giảng sửa cho
@@ -2254,25 +2381,58 @@ function GoiLenBangCu() {
               <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                 {kq.giangCaLop.map((t) => (
                   <div key={t.cau.id}>
-                    <button
-                      type="button"
-                      onClick={() => setXemCau(xemCau === t.cau.id ? '' : t.cau.id)}
-                      className="tap-target text-left w-full"
-                      style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
-                    >
-                      <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-                        {chuCau(t.cau)}
-                      </span>
-                      <span className="block" style={{ ...NHAN_NHO, ...SO }}>
-                        {chuChum(t)}
-                      </span>
-                      {t.cau.tomTat && (
-                        <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
-                          {t.cau.tomTat}
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setXemCau((cu) => {
+                            const tiep = new Set(cu)
+                            if (tiep.has(t.cau.id)) tiep.delete(t.cau.id)
+                            else tiep.add(t.cau.id)
+                            return tiep
+                          })
+                        }
+                        className="tap-target text-left flex-1 min-w-0"
+                        style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
+                      >
+                        <span className="block font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
+                          {chuCau(t.cau)}
                         </span>
-                      )}
-                    </button>
-                    {xemCau === t.cau.id && <div style={{ marginTop: 'var(--k2)' }}>{veCau(t.cau.id, t.cau.so)}</div>}
+                        <span className="block" style={{ ...NHAN_NHO, ...SO }}>
+                          {chuChum(t)}
+                        </span>
+                        {t.cau.tomTat && (
+                          <span className="block" style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+                            {t.cau.tomTat}
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setXemCau((cu) => {
+                            const tiep = new Set(cu)
+                            if (tiep.has(t.cau.id)) tiep.delete(t.cau.id)
+                            else tiep.add(t.cau.id)
+                            return tiep
+                          })
+                        }
+                        className="tap-target inline-flex items-center font-bold shrink-0"
+                        style={{
+                          gap: 5,
+                          minHeight: 32,
+                          padding: '0 var(--k3)',
+                          borderRadius: 'var(--bo-tron)',
+                          background: xemCau.has(t.cau.id) ? 'var(--xanh-nen)' : 'var(--the)',
+                          color: xemCau.has(t.cau.id) ? 'var(--xanh)' : 'var(--muc)',
+                          border: '1px solid var(--vien)',
+                          fontSize: 'var(--cx-1)',
+                        }}
+                      >
+                        <Lightbulb size={14} /> {xemCau.has(t.cau.id) ? 'Ẩn lời giải' : 'Hiện lời giải'}
+                      </button>
+                    </div>
+                    {xemCau.has(t.cau.id) && <div style={{ marginTop: 'var(--k2)' }}>{veCau(t.cau.id, t.cau.so)}</div>}
                   </div>
                 ))}
               </div>
@@ -2293,7 +2453,14 @@ function GoiLenBangCu() {
                       <Hang style={{ alignItems: 'flex-start' }}>
                         <button
                           type="button"
-                          onClick={() => setXemCau(xemCau === ma ? '' : ma)}
+                          onClick={() =>
+                            setXemCau((cu) => {
+                              const tiep = new Set(cu)
+                              if (tiep.has(ma)) tiep.delete(ma)
+                              else tiep.add(ma)
+                              return tiep
+                            })
+                          }
                           className="flex-1 min-w-0 text-left tap-target"
                           style={{ background: 'none', border: 'none', padding: 0, minHeight: 0, color: 'var(--muc)' }}
                         >
@@ -2352,10 +2519,35 @@ function GoiLenBangCu() {
                         >
                           <ThumbsDown size={15} /> Không đạt
                         </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setXemCau((cu) => {
+                              const tiep = new Set(cu)
+                              if (tiep.has(ma)) tiep.delete(ma)
+                              else tiep.add(ma)
+                              return tiep
+                            })
+                          }
+                          className="tap-target inline-flex items-center font-bold"
+                          style={{
+                            gap: 6,
+                            minHeight: 36,
+                            padding: '0 var(--k4)',
+                            borderRadius: 'var(--bo-tron)',
+                            background: xemCau.has(ma) ? 'var(--xanh-nen)' : 'var(--the-2)',
+                            color: xemCau.has(ma) ? 'var(--xanh)' : 'var(--muc)',
+                            border: '1px solid var(--vien)',
+                            fontFamily: 'var(--sans)',
+                            fontSize: 'var(--cx-1)',
+                          }}
+                        >
+                          <Lightbulb size={15} /> {xemCau.has(ma) ? 'Ẩn lời giải' : 'Hiện lời giải'}
+                        </button>
                         {dangCham === ma && <span style={NHAN_NHO}>Đang ghi…</span>}
                       </div>
 
-                      {xemCau === ma && <div>{veCau(p.cau.id, p.cau.so)}</div>}
+                      {xemCau.has(ma) && <div>{veCau(p.cau.id, p.cau.so)}</div>}
                     </div>
                   )
                 })}
@@ -2408,7 +2600,42 @@ function GoiLenBangCu() {
 
       {/* TỜ MÁY CHIẾU — mở đúng trong khung xem chung với mọi phiếu khác. */}
       {htmlMayChieu && (
-        <KhungXemPhieu html={htmlMayChieu} ten="Tờ máy chiếu — gọi lên bảng" dong={() => setHtmlMayChieu('')} />
+        <KhungXemPhieu
+          html={htmlMayChieu}
+          ten="Tờ máy chiếu — gọi lên bảng"
+          dong={() => {
+            setHtmlMayChieu('')
+            setMaPhienHienTai('')
+            setMaPinHienTai('')
+          }}
+          phu={
+            maPhienHienTai ? (
+              <button
+                type="button"
+                onClick={() => setMoRemoteModal(true)}
+                className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-lg border border-emerald-400/40 backdrop-blur-sm transition-all cursor-pointer"
+                title="Mở mã QR điều khiển từ xa bằng điện thoại"
+              >
+                <Smartphone size={18} />
+                <span>Điều khiển điện thoại</span>
+                {maPinHienTai && (
+                  <span className="bg-emerald-900/60 px-2 py-0.5 rounded-full text-xs font-mono font-bold tracking-wider">
+                    {maPinHienTai}
+                  </span>
+                )}
+              </button>
+            ) : null
+          }
+        />
+      )}
+
+      {moRemoteModal && (
+        <ModalDieuKhienTuXa
+          maPhien={maPhienHienTai}
+          maPin={maPinHienTai}
+          tieuDe={du ? `Chữa bài ca ${du.maCa}` : 'Gọi lên bảng'}
+          onDong={() => setMoRemoteModal(false)}
+        />
       )}
 
       {/* XOÁ PHIÊN PHÂN CÔNG — chỉ dọn trên máy này, không đụng máy chủ (nói thật trong hộp). */}

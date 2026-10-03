@@ -45,30 +45,6 @@ export function demHangLop(tb: Record<string, number | null>, hangMayChu?: Recor
   return dem
 }
 
-/** Thứ tự em: thành thạo thấp trước (thầy cần thấy em yếu trước), hoà thì theo tên. */
-export function sapEmYeuTruoc(em: readonly EmBang[]): EmBang[] {
-  return [...em].sort((a, b) => a.thanhThao - b.thanhThao || a.ten.localeCompare(b.ten, 'vi'))
-}
-
-/** Người lên bảng cho mỗi câu cần dạy lại: em thành thạo dạng ấy nhiều nhất, không lặp em nếu còn em khác. */
-export function nguoiGiaiMau(cau: readonly CauCanDayLai[], em: readonly EmBang[]): OChieu[] {
-  const daGoi = new Set<string>()
-  return cau.map((c) => {
-    const xep = [...em].sort((a, b) => (b.theoDang[c.dang] ?? -1) - (a.theoDang[c.dang] ?? -1) || b.thanhThao - a.thanhThao)
-    const e = xep.find((x) => !daGoi.has(x.sbd)) ?? xep[0]
-    if (e) daGoi.add(e.sbd)
-    return { qid: c.qid, stt: c.stt, phan: 'I', mucDo: null, sbd: e?.sbd ?? '', ten: e?.ten ?? 'Cả lớp', viSao: `${c.soEm} em cần thầy dạy lại` }
-  })
-}
-
-/** Chênh lệch điểm % so với hôm qua: "▲ 8 hôm qua" / "▼ 2 hôm qua" / "bằng hôm qua". */
-function chuChenh(nay: number, homQua: number | undefined): { chu: string; huong: 'len' | 'xuong' | 'bang' } | null {
-  if (typeof homQua !== 'number' || !Number.isFinite(homQua)) return null
-  const d = Math.round(nay * 100) - Math.round(homQua * 100)
-  if (d === 0) return { chu: 'bằng hôm qua', huong: 'bang' }
-  return { chu: `${d > 0 ? '▲' : '▼'} ${Math.abs(d)} điểm so với hôm qua`, huong: d > 0 ? 'len' : 'xuong' }
-}
-
 const CHU_NHIP: Record<NhipEm, string> = { vuot: 'Vượt nhịp', dung: 'Đúng nhịp', tre12: 'Trễ 1–2 ngày', tre3: 'Trễ từ 3 ngày' }
 
 /**
@@ -82,7 +58,7 @@ export function thongTinNhip(e: EmBang, soCauCanTruoc: number, soCauMoiNgay: num
     return {
       chu: 'Không làm',
       kieu: 'khong_lam' as const,
-      ton: soCauCanTruoc,
+      ton: typeof e.soCauTon === 'number' ? e.soCauTon : soCauCanTruoc,
       laDo: false,
       moTa: 'Chưa làm câu nào từ khi giao chiến dịch',
     }
@@ -110,6 +86,41 @@ export function thongTinNhip(e: EmBang, soCauCanTruoc: number, soCauMoiNgay: num
 export const chuTre = (e: EmBang, soCauCanTruoc = 0, soCauMoiNgay = 1): string =>
   thongTinNhip(e, soCauCanTruoc, soCauMoiNgay).chu
 
+/**
+ * Thứ tự em trong bảng chiến dịch (thầy 03/10: "Những bạn nào tồn thì đẩy lên đầu, tồn nhiều thì lên trên nhé"):
+ * 1. Bạn nào TỒN (ton > 0, bao gồm trễ nhịp và chưa làm câu nào) thì đẩy lên đầu.
+ * 2. Tồn NHIỀU câu hơn thì xếp lên trên (ton giảm dần).
+ * 3. Sau các bạn tồn là các bạn Đúng nhịp (tồn = 0).
+ * 4. Khi cùng số câu tồn: em thành thạo thấp hơn lên trước, hoà thì theo tên tiếng Việt.
+ */
+export function sapEmYeuTruoc(em: readonly EmBang[], soCauCanTruoc = 0, soCauMoiNgay = 1): EmBang[] {
+  return [...em].sort((a, b) => {
+    const tonA = thongTinNhip(a, soCauCanTruoc, soCauMoiNgay).ton
+    const tonB = thongTinNhip(b, soCauCanTruoc, soCauMoiNgay).ton
+    if (tonB !== tonA) return tonB - tonA
+    return a.thanhThao - b.thanhThao || a.ten.localeCompare(b.ten, 'vi')
+  })
+}
+
+/** Người lên bảng cho mỗi câu cần dạy lại: em thành thạo dạng ấy nhiều nhất, không lặp em nếu còn em khác. */
+export function nguoiGiaiMau(cau: readonly CauCanDayLai[], em: readonly EmBang[]): OChieu[] {
+  const daGoi = new Set<string>()
+  return cau.map((c) => {
+    const xep = [...em].sort((a, b) => (b.theoDang[c.dang] ?? -1) - (a.theoDang[c.dang] ?? -1) || b.thanhThao - a.thanhThao)
+    const e = xep.find((x) => !daGoi.has(x.sbd)) ?? xep[0]
+    if (e) daGoi.add(e.sbd)
+    return { qid: c.qid, stt: c.stt, phan: 'I', mucDo: null, sbd: e?.sbd ?? '', ten: e?.ten ?? 'Cả lớp', viSao: `${c.soEm} em cần thầy dạy lại` }
+  })
+}
+
+/** Chênh lệch điểm % so với hôm qua: "▲ 8 hôm qua" / "▼ 2 hôm qua" / "bằng hôm qua". */
+function chuChenh(nay: number, homQua: number | undefined): { chu: string; huong: 'len' | 'xuong' | 'bang' } | null {
+  if (typeof homQua !== 'number' || !Number.isFinite(homQua)) return null
+  const d = Math.round(nay * 100) - Math.round(homQua * 100)
+  if (d === 0) return { chu: 'bằng hôm qua', huong: 'bang' }
+  return { chu: `${d > 0 ? '▲' : '▼'} ${Math.abs(d)} điểm so với hôm qua`, huong: d > 0 ? 'len' : 'xuong' }
+}
+
 export default function BangChienDich({
   du,
   nowMs,
@@ -135,8 +146,6 @@ export default function BangChienDich({
   const tb = useMemo(() => tbLopTheoDang(du), [du])
   // Dạng xếp theo cả lớp yếu nhất bên trái (dạng không có số đứng cuối).
   const dang = useMemo(() => [...du.dang].sort((a, b) => (tb[a] ?? 2) - (tb[b] ?? 2)), [du.dang, tb])
-  const dsEm = useMemo(() => sapEmYeuTruoc(du.em), [du.em])
-  const hien = caLop ? dsEm : dsEm.slice(0, SO_EM_THU_GON)
   const ba = du.canDayLai.slice(0, 3)
   const luotBa = ba.reduce((s, c) => s + c.soEm, 0)
   const lop = du.lop
@@ -174,6 +183,10 @@ export default function BangChienDich({
   const soNgayTruoc = laHetHan ? tongNgay : Math.max(0, ngayThu - 1)
   const soCauCanTruoc = Math.round(soCau * (soNgayTruoc / tongNgay))
   const soCauMoiNgay = Math.max(1, Math.round(soCau / tongNgay))
+
+  // Những bạn nào tồn đẩy lên đầu, tồn nhiều lên trên (thầy 03/10)
+  const dsEm = useMemo(() => sapEmYeuTruoc(du.em, soCauCanTruoc, soCauMoiNgay), [du.em, soCauCanTruoc, soCauMoiNgay])
+  const hien = caLop ? dsEm : dsEm.slice(0, SO_EM_THU_GON)
 
   const thongKeNhipLop = useMemo(() => {
     let khongLam = 0
@@ -311,8 +324,8 @@ export default function BangChienDich({
                     <th scope="col" className="cd-nhiet-ten">
                       Học sinh
                     </th>
-                    <th scope="col">Thành thạo ▲</th>
-                    <th scope="col" title="Đúng nhịp = làm đủ full câu mỗi ngày · Trễ nhịp = tổng số câu tồn của những ngày trước · Chưa làm câu nào = Không làm">Trễ nhịp</th>
+                    <th scope="col" title="Thành thạo = số câu đúng / tổng số câu">Thành thạo</th>
+                    <th scope="col" title="Những bạn tồn đẩy lên đầu, tồn nhiều lên trên · Đúng nhịp = làm đủ full câu mỗi ngày · Chưa làm câu nào = Không làm">Trễ nhịp ▼</th>
                     {dang.map((d) => (
                       <th key={d} scope="col" title={d} className="cd-nhiet-dang">
                         <span className="cd-ten-dang-xoay">{d}</span>

@@ -245,6 +245,34 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     const kpiDung = container.querySelector('[data-so="dung-nhip"]')?.closest('.cd-kpi')
     expect(kpiDung?.querySelector('.cd-kpi-phu')?.textContent).toContain('2 em tồn câu · 1 em không làm')
   })
+
+  it('thứ tự em: bạn nào tồn thì đẩy lên đầu, tồn nhiều thì lên trên (thầy 03/10)', () => {
+    const emKhongLam = em('Em Không Làm', [0.1, 0.1, 0.1, 0.1, 0.1], { coXat: 0, thanhThao: 0, soCauTon: 20 })
+    const emTon8 = em('Em Tồn 8', [0.3, 0.3, 0.3, 0.3, 0.3], { coXat: 12, thanhThao: 5, soCauTon: 8 })
+    const emTon2 = em('Em Tồn 2', [0.5, 0.5, 0.5, 0.5, 0.5], { coXat: 18, thanhThao: 10, soCauTon: 2 })
+    const emDungNhip = em('Em Đúng Nhịp', [0.9, 0.9, 0.9, 0.9, 0.9], { coXat: 20, thanhThao: 20, soCauTon: 0 })
+
+    const { container } = render(
+      <BangChienDich
+        du={bang([emDungNhip, emTon2, emKhongLam, emTon8], {
+          homNay: '2026-10-03',
+          chienDich: { ...bang([]).chienDich, soCau: 40, hanNop: '2026-10-05', taoLuc: '2026-10-01' },
+          lop: { coXat: 0.5, thanhThao: 0.35, huyetChien: 1, canDayLaiCau: 0, canDayLaiLuot: 0 },
+        })}
+        nowMs={NOW}
+        dangChieu={false}
+        onChieu={vi.fn(async () => true)}
+        onDaChua={vi.fn()}
+      />,
+    )
+
+    const dsTen = [...container.querySelectorAll('tbody th')].map((x) => x.textContent)
+    expect(dsTen[0]).toContain('Cả lớp')
+    expect(dsTen[1]).toContain('Em Không Làm')
+    expect(dsTen[2]).toContain('Em Tồn 8')
+    expect(dsTen[3]).toContain('Em Tồn 2')
+    expect(dsTen[4]).toContain('Em Đúng Nhịp')
+  })
 })
 
 describe('màn Lên bảng (chế độ chiến dịch)', () => {
