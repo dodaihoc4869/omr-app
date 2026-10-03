@@ -71,9 +71,9 @@ function chuChenh(nay: number, homQua: number | undefined): { chu: string; huong
 
 const CHU_NHIP: Record<NhipEm, string> = { vuot: 'Vượt nhịp', dung: 'Đúng nhịp', tre12: 'Trễ 1–2 ngày', tre3: 'Trễ từ 3 ngày' }
 const chuTre = (e: EmBang): string => {
-  const n = e.soNgayTre ?? e.treNhip
-  if (e.treNhip == null && e.soNgayTre == null) return 'Chưa làm'
-  return n && n > 0 ? `${n} ngày` : '—'
+  if (e.treNhip == null || e.coXat === 0) return 'Chưa làm'
+  const n = e.treNhip
+  return n > 0 ? `${n} ngày` : '—'
 }
 
 export default function BangChienDich({
@@ -275,7 +275,12 @@ export default function BangChienDich({
                           )}
                         </th>
                         <td className="cd-so">{phanTram(e.thanhThao / soCau)}</td>
-                        <td className={`cd-so${(e.soNgayTre ?? e.treNhip ?? 0) >= 3 ? ' cd-chu-do' : (e.soNgayTre ?? e.treNhip ?? 0) >= 1 ? ' cd-chu-vang' : ''}`}>{chuTre(e)}</td>
+                        <td
+                          className={`cd-so${e.treNhip == null || e.coXat === 0 ? ' cd-phu' : e.treNhip >= 3 ? ' cd-chu-do' : e.treNhip >= 1 ? ' cd-chu-vang' : ''}`}
+                          title={e.treNhip == null || e.coXat === 0 ? (typeof e.soNgayTre === 'number' && e.soNgayTre > 0 ? `Chưa làm câu nào (${e.soNgayTre} ngày từ khi giao)` : 'Chưa làm câu nào') : undefined}
+                        >
+                          {chuTre(e)}
+                        </td>
                         {dang.map((d) => {
                           const t = e.theoDang[d]
                           const m = mucO(t, e.daLamTheoDang?.[d])

@@ -27,6 +27,11 @@ export function apSongSinh(q: PrivateQuestion, ss: SongSinh, i: number): Private
 
 function phu(q: PrivateQuestion, ss: SongSinh, i: number, them: { choices: string[]; correct: string }): PrivateQuestion {
   const lg = (q.solution && typeof q.solution === 'object' ? q.solution : {}) as Obj
+  const chot = (typeof ss.chot === 'string' && ss.chot.trim())
+    ? ss.chot.trim()
+    : (Array.isArray(ss.buoc) && ss.buoc.length > 0)
+      ? ss.buoc.join('\n')
+      : (typeof lg.chot === 'string' ? lg.chot : '')
   return {
     ...q,
     qid: qidSongSinh(tachSongSinh(q.qid).goc, i),
@@ -37,7 +42,7 @@ function phu(q: PrivateQuestion, ss: SongSinh, i: number, them: { choices: strin
     table: docBangSongSinh(ss.bang), thanCauImg: undefined, imageDataUrl: undefined, choiceImgs: undefined, ideaImgs: undefined,
     hinhAnh: (ss.hinh ?? []).filter(h => /^(sau_de|cuoi_cau|sau_pa_[ABCD]|sau_y_[abcd])$/.test(h.vi_tri))
       .map(h => ({ src: h.du_lieu, viTri: h.vi_tri })),
-    solution: { chot: typeof lg.chot === 'string' ? lg.chot : '', buoc: ss.buoc ?? [], ket_qua: ss.dap_an, dap_an_de: them.correct, song_sinh: true },
+    solution: { chot, buoc: ss.buoc ?? [], ket_qua: ss.dap_an, dap_an_de: them.correct, song_sinh: true },
   }
 }
 

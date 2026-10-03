@@ -10,7 +10,7 @@ import { bamCau, cauTrongGoi } from '../../src/lib/loi-giai-kiem'
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
 
-export interface SongSinh { de: string; pa?: Record<string, string>; dap_an: string; buoc?: string[]; gia_tri_dung?: string; bang?: string[][]; hinh?: { du_lieu: string; vi_tri: string }[] }
+export interface SongSinh { de: string; pa?: Record<string, string>; dap_an: string; buoc?: string[]; gia_tri_dung?: string; bang?: string[][]; hinh?: { du_lieu: string; vi_tri: string }[]; chot?: string }
 
 /** Không tự điền ô/suy số liệu: bảng chỉ dùng khi đủ hàng cột, ô là chữ hoặc số. */
 export function docBangSongSinh(v: unknown): string[][] | undefined {
@@ -61,6 +61,7 @@ export function locBoTro(c: Obj): { songSinh: SongSinh[]; cauKiem: CauKiem[]; nh
     ...(laObj(x.pa) ? { pa: Object.fromEntries(Object.entries(x.pa).map(([k, v]) => [k, String(v)])) } : {}),
     ...(Array.isArray(x.buoc) ? { buoc: x.buoc.map(String) } : {}),
     ...(x.gia_tri_dung != null ? { gia_tri_dung: String(x.gia_tri_dung) } : {}),
+    ...(x.chot != null ? { chot: String(x.chot) } : {}),
     ...(docBangSongSinh(x.bang ?? x.table) ? { bang: docBangSongSinh(x.bang ?? x.table) } : {}),
     ...(Array.isArray(x.hinh) ? { hinh: x.hinh.filter((h): h is Obj => laObj(h) && typeof h.du_lieu === 'string' && /^(sau_de|cuoi_cau|sau_pa_[ABCD]|sau_y_[abcd])$/.test(String(h.vi_tri)))
       .map(h => ({ du_lieu: String(h.du_lieu), vi_tri: String(h.vi_tri) })) } : {}),

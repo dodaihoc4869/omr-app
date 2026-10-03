@@ -2243,7 +2243,35 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     })
   }
 
-  const doSubmit = async (a: ExamAttempt, tuDongNop = false) => {
+  const doSubmit = async (aParam: ExamAttempt, tuDongNop = false) => {
+    let a = attemptRef.current ?? aParam
+    // LƯỚI BẢO HIỂM: Thu hoạch trực tiếp giá trị thực tế đang gõ trên DOM (đặc biệt Phần III câu trả lời ngắn)
+    // để loại bỏ hoàn toàn khả năng bị rỗng do lệch pha closure hoặc debounce/state update lúc hết giờ.
+    if (assignment?.phanIII && a.answers) {
+      const phanILen = assignment.phanI?.length ?? 0
+      const phanIILen = assignment.phanII?.length ?? 0
+      const sttOffset = phanILen + phanIILen
+      const phanIIIMoi = { ...(a.answers.phanIII ?? {}) }
+      let coThayDoi = false
+
+      assignment.phanIII.forEach((item, idx) => {
+        const stt = sttOffset + idx + 1
+        const card = document.getElementById(`cau-${stt}`)
+        const input = card?.querySelector('input') as HTMLInputElement | null
+        if (input && input.value && input.value.trim()) {
+          const val = input.value.trim()
+          if (!phanIIIMoi[item.qid] || phanIIIMoi[item.qid] !== val) {
+            phanIIIMoi[item.qid] = val
+            coThayDoi = true
+          }
+        }
+      })
+
+      if (coThayDoi) {
+        a = { ...a, answers: { ...a.answers, phanIII: phanIIIMoi } }
+        attemptRef.current = a
+      }
+    }
     const remaining = conLaiNgay()
     if (!tuDongNop && a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60) {
       showToast(`Chỉ được nộp bài trong 1 phút cuối của ca thi (còn ${Math.ceil((remaining - 60) / 60)} phút)`, 'warn')
@@ -2261,6 +2289,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // biết ngay em nào cơ chế không chạy.
     const integrity = dem.coChay ? { ...a.integrity, soLanTatDe: dem.soLan, giayTatDe: Math.round(dem.giay) } : a.integrity
     const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
+    attemptRef.current = updated
     setAttempt(updated)
     await saveAttempt(updated)
     setPhase('submitted')
@@ -2462,7 +2491,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   useEffect(() => {
     if (phase !== 'exam' || !attempt) return
     if (attempt.loai === 'baitap') return // bài tập không tự nộp theo giờ
-    if (mocGio === 'het') void doSubmit(attempt, true)
+    if (mocGio === 'het') void doSubmit(attemptRef.current ?? attempt, true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mocGio, phase])
 
@@ -2575,6 +2604,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     setAttempt((cur) => {
       if (!cur) return cur
       const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
+      attemptRef.current = next
       saveAttempt(next)
       return next
     })
@@ -3534,7 +3564,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               onClick={() => {
                 if (camNopSom) return
                 setShowConfirm(false)
-                doSubmit(attempt)
+                doSubmit(attemptRef.current ?? attempt)
               }}
             >
               {nhanNutNop}
@@ -3556,7 +3586,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               onClick={() => {
                 if (camNopSom) return
                 setShowBackDialog(false)
-                doSubmit(attempt)
+                doSubmit(attemptRef.current ?? attempt)
               }}
             >
               {nhanNutNop}
