@@ -43,13 +43,27 @@ body.mc-bc .mc-vung-de .mc-de,body.mc .mc-de{font-size:var(--mc-co,28px)!importa
 body.mc-bc .mc-vung-de .mc-pa,body.mc-bc .mc-vung-de .mc-pa-chu{font-size:var(--mc-co,28px)}
 body.mc .mc-pa,body.mc .mc-pa-chu{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
 .mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
-body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-giai .sol-box,body.mc .mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
+body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
+body.mc .mc-giai .sol-box{font-size:var(--mc-co,28px)!important}
 /* 8 · phương án là phương trình: không ngắt giữa hai vế */
 body.mc .mc-pa-chu{overflow-wrap:normal}
 body.mc .mc-pa-chu:has(.mt){white-space:nowrap}
 /* 6 · LỜI GIẢI NẰM DƯỚI ĐỀ — hiển thị chuẩn như trong app */
 body.mc-bc .mc-vung-de>.mc-giai{position:static;inset:auto;overflow:visible;margin:.6em 0 0;padding:0;background:transparent;border:0;z-index:auto}
 body.mc-bc .mc-vung-de>.mc-giai .sol-box{display:block;margin:12px 0;padding:16px 20px;background:rgba(254,243,199,.6);border:1.5px solid rgb(253,230,138);border-left:5px solid rgb(217,119,6);border-radius:16px;box-shadow:0 3px 12px rgba(180,83,9,.08);color:var(--mc-muc,rgb(30,41,59));font-size:var(--mc-co,28px)!important}
+/* Lời giải hiển thị theo hàng ngang, cân đối, đẹp mắt, không bị ép thành 4 cột dọc */
+body.mc .mc-giai .sol-box .sol-text,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-text{display:flex!important;flex-direction:column!important;width:100%!important;gap:10px!important;padding:4px 0!important}
+body.mc .mc-giai .sol-box .sol-pa,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa{display:flex!important;flex-direction:row!important;align-items:flex-start!important;gap:12px!important;width:100%!important;box-sizing:border-box!important;padding:8px 12px!important;border-radius:8px!important}
+body.mc .mc-giai .sol-box .sol-pa strong,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa strong{flex-shrink:0!important;font-weight:800!important;min-width:1.4em!important}
+body.mc .mc-giai .sol-box .sol-pa .sol-dau,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa .sol-dau{flex-shrink:0!important;font-weight:900!important;min-width:1.2em!important;text-align:center!important}
+body.mc .mc-giai .sol-box .sol-pa .sol-ly,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa .sol-ly{flex:1 1 auto!important;min-width:0!important;overflow-wrap:break-word!important}
+body.mc .mc-giai .sol-box .sol-pa.chon,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa.chon{background:rgba(16,185,129,.12)!important;border-left:5px solid rgb(5,150,105)!important;font-weight:700!important}
 /* Cỡ chữ lời giải chiếu lên bảng ĐỀU NHAU, GIỐNG NHAU và BẰNG VỚI KÍCH THƯỚC CỦA ĐỀ: var(--mc-co, 28px) */
 body.mc-bc .mc-vung-de>.mc-giai .sol-box,
 body.mc-bc .mc-vung-de>.mc-giai .sol-box *,
@@ -65,9 +79,11 @@ body.mc .mc-giai .sol-pa span,
 body.mc .mc-giai .sol-dau,
 body.mc .mc-giai .sol-ly,
 body.mc .mc-giai .sol-step,
-body.mc .mc-giai .sol-ket{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
+body.mc .mc-giai .sol-ket,
 body.mc .mc-giai .sol-box .sol-label,
-body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-label{font-size:calc(var(--mc-co,28px)*0.75)!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:0.05em!important;line-height:1.4!important}
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-label{font-size:var(--mc-co,28px)!important;line-height:1.6!important}
+body.mc .mc-giai .sol-box .sol-label,
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-label{font-weight:800!important;text-transform:uppercase!important;letter-spacing:0.05em!important;margin-top:14px!important;margin-bottom:8px!important}
 body.mc .mc-giai .sol-box .katex,
 body.mc-bc .mc-vung-de>.mc-giai .sol-box .katex{font-size:1em!important}
 body.mc .mc-giai .sol-box sub,
