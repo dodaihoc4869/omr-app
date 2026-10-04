@@ -10,6 +10,7 @@
 // để trống ô và báo, không lấp câu chưa đúng.
 import type { Env } from './kieu'
 import { tachSongSinh } from './loi-hoc-luat'
+import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { chuanMucDo } from './rut-de-v2'
 import { xoaDemCaBaoVe } from './game-v2-bank'
 import { docKeyBankDem } from './dem-ca-thi'
@@ -23,7 +24,10 @@ const SBD_DUONG_JSON = /^[A-Za-z0-9_-]{1,64}$/
 export const TOI_DA_EM_CAU_DA_DUNG = 20
 
 /** Lần làm được tính là "tự làm": không hỗ trợ, không chỉ đọc lời giải, không thuộc ca chưa công bố. */
-const TU_LAM = `COALESCE(assistance,'') <> 'assisted' AND COALESCE(purpose,'') <> 'xem_loi_giai' AND COALESCE(visibility,'') <> 'embargoed' AND qid NOT LIKE 'nen:%'`
+const TU_LAM_MOI = `COALESCE(assistance,'') <> 'assisted' AND COALESCE(purpose,'') <> 'xem_loi_giai' AND COALESCE(visibility,'') <> 'embargoed' AND qid NOT LIKE 'nen:%'`
+// Sổ CŨ chưa có cột assistance/purpose/visibility (migration-2309 chưa chạy trên bản thật — 05/10: lỗi "no such column: assistance") ⇒ lọc
+// được gì lọc nấy: câu nền, và câu ca thi chỉ tính khi ca đã công bố (thay cho cờ che 'embargoed').
+const TU_LAM_CU = `qid NOT LIKE 'nen:%' AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
 
 /** Tên kênh thân thiện (bảng từ chuẩn) cho nguồn không phải ca thi / game. */
 const TEN_KENH: Record<string, string> = {
@@ -63,7 +67,7 @@ export async function docCauDaDung(env: Env, dsSbd: readonly string[]): Promise<
   const ra: Record<string, CauDaDungRa[]> = Object.fromEntries(ds.map((s) => [s, [] as CauDaDungRa[]]))
   if (ds.length === 0) return ra
   const dsJson = JSON.stringify(ds)
-  const [rCd, rDem, rMoi] = await env.DB.batch([
+  const lo = (TU_LAM: string) => env.DB.batch([
     // Chiến dịch còn hiệu lực mà ít nhất một em của lô có mặt.
     env.DB.prepare(
       `SELECT id, ten, sbd_json, qid_json, tao_luc FROM chien_dich
@@ -81,6 +85,7 @@ export async function docCauDaDung(env: Env, dsSbd: readonly string[]): Promise<
          FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND ket_qua = 1 AND ${TU_LAM} GROUP BY sbd, qid`,
     ).bind(dsJson),
   ])
+  const [rCd, rDem, rMoi] = await lo(TU_LAM_MOI).catch(() => lo(TU_LAM_CU))
   // Em → câu gốc → các chiến dịch chứa câu (em có mặt).
   const cdCuaEm = new Map<string, Map<string, ChienDichRa[]>>()
   for (const x of (rCd?.results ?? []) as Obj[]) {

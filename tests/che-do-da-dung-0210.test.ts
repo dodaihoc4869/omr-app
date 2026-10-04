@@ -154,6 +154,13 @@ function dungD1() {
 }
 
 describe('/ca/cau-da-dung — câu em đã TỰ làm đúng trong chiến dịch, kèm nhãn', () => {
+  it('05/10 — sổ CŨ thiếu cột assistance/purpose/visibility (bản thật) ⇒ vẫn chạy, không lỗi D1', async () => {
+    const { d, env } = dungD1()
+    for (const c of ['assistance', 'purpose', 'visibility']) d.sql.exec(`ALTER TABLE su_kien_hoc DROP COLUMN ${c}`)
+    const r = await goiWorker(worker, env, '/ca/cau-da-dung', { sbd: ['S1'] }, true)
+    expect(r.ok).toBe(true)
+    expect((r.em.S1 as { qid: string }[]).map((x) => x.qid)).toContain('Q1')
+  })
   it('nguồn đúng luật; nhãn ca / chiến dịch + kênh / kênh khác; số lần đúng/sai; không mã bí mật ⇒ từ chối', async () => {
     const { env } = dungD1()
     expect((await goiWorker(worker, env, '/ca/cau-da-dung', { sbd: ['S1'] })).ok).toBe(false)

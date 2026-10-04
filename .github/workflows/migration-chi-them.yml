@@ -1,0 +1,44 @@
+# CHẠY MỘT MIGRATION CHỈ-THÊM lên D1 thật (thầy cấp quyền tự chạy migration chỉ-thêm — CLAUDE.md). Bấm tay (workflow_dispatch), nhập tên tệp
+# server/migration-*.sql. Chặn cứng: tệp có DROP / DELETE / UPDATE / RENAME / ALTER ... DROP thì DỪNG, không chạy.
+# Lý do có tệp này (05/10): bản thật chưa từng chạy migration-2309-cnh1-su-kien-chuan.sql ⇒ sổ su_kien_hoc thiếu cột assistance/purpose/
+# visibility ⇒ cờ "có hỗ trợ" và "chỉ đọc lời giải" bị bỏ khi ghi; container phiên Claude không có khoá Cloudflare nên phải chạy ở đây.
+name: Chạy migration chỉ-thêm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tep:
+        description: 'Tên tệp trong server/ (vd migration-2309-cnh1-su-kien-chuan.sql)'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phat-hanh
+
+jobs:
+  chay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Kiểm tệp chỉ-thêm
+        env:
+          TEP: ${{ github.event.inputs.tep }}
+        run: |
+          case "$TEP" in migration-*.sql) ;; *) echo "Tên tệp không hợp lệ: $TEP"; exit 1 ;; esac
+          test -f "server/$TEP" || { echo "Không có server/$TEP"; exit 1; }
+          if grep -v '^\s*--' "server/$TEP" | grep -iqE '\b(DROP|DELETE|UPDATE|RENAME|REPLACE INTO|TRUNCATE)\b'; then echo "Tệp có lệnh không chỉ-thêm — dừng."; exit 1; fi
+          echo "OK: server/$TEP chỉ-thêm"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chạy migration lên D1 thật
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: d1 execute omr --remote --file=${{ github.event.inputs.tep }}
+          workingDirectory: server
