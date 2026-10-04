@@ -65,7 +65,7 @@ export async function chotBatDau(env: Env, b: Obj): Promise<Obj> {
 
 // ---------------------------------------------------------------- hồ sơ lỗi theo em
 
-const chuanMucDo = (v: unknown): string => {
+export const chuanMucDo = (v: unknown): string => {
   const s = chuoi(v).toLowerCase()
   if (['biet', 'nb', 'nhan_biet', 'nhận biết'].includes(s)) return 'biet'
   if (['hieu', 'th', 'thong_hieu', 'thông hiểu'].includes(s)) return 'hieu'

@@ -103,6 +103,8 @@ export interface ExamAttempt {
   demLap?: Record<string, number>
   /** Ca "Không rút câu sai": qid → 'dd/mm' câu em đã làm ở ca kiểm tra trước (kho thiếu). */
   daLamLai?: Record<string, string>
+  /** Ca "Kiểm chứng câu đã đúng" (02/10): qid → nhãn nơi · ngày · mức độ của lần em làm đúng gần nhất. Máy em in "Em đã làm đúng: …". */
+  daDungNhan?: Record<string, string>
   answers: AnswerRecord
   integrity: IntegrityLog
   submitted: boolean
