@@ -61,7 +61,8 @@ describe('màn ca thi có nút báo em còn sai lại', () => {
     // Bản trước gắn nút vào `soEmCoLap > 0`, nên ca đề riêng rút hụt là màn
     // hình im lặng hoàn toàn (thầy bắt được 08/09: "vẫn chưa có nút xem lại câu
     // đã làm sai buổi trước"). Nay nút bám vào CHẾ ĐỘ CA, không bám vào kết quả.
-    expect(MAN).toContain('{laCaDeRieng && (')
+    // ĐỔI CÓ CHỦ Ý 04/10: ca "Kiểm chứng câu đã đúng" không rút câu sai ⇒ không mọc nút này (laCaDaDungNay).
+    expect(MAN).toContain('{laCaDeRieng && !laCaDaDungNay && (')
     expect(MAN).not.toContain('{tongKetLap.soEmCoLap > 0 && (')
     // Ca thường: cả ba nguồn đều tắt ⇒ không mọc khối rỗng.
     expect(MAN).toContain('caCanDeRieng ||')
