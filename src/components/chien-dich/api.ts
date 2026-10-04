@@ -135,6 +135,10 @@ export interface EmBang {
   nhip?: NhipEm
   /** Số ngày liền không làm câu nào (chưa làm ⇒ tính từ ngày giao). */
   soNgayTre?: number
+  /** Tổng số câu tồn của những ngày trước (thầy 03/10). */
+  soCauTon?: number
+  /** Số câu cần hoàn thành của những ngày trước. */
+  soCauCanTruoc?: number
 }
 
 export type HangEm = 'L1' | 'L2' | 'L3' | 'L4'
@@ -146,6 +150,8 @@ export interface CauCanDayLai {
   dang: string
   soEm: number
   mucDo?: string | null
+  phan?: 'I' | 'II' | 'III'
+  cau?: any
 }
 
 /** Một dòng báo nợ cũ: "Em X còn N câu nợ cũ — cần ≈ K ngày để trả hết" (máy chủ viết sẵn ở `cau`). */
@@ -195,6 +201,7 @@ export interface CauBuoiChua {
   diemChua: number
   giaiMau: EmTen | null
   emSua: EmTen[]
+  cau?: any
 }
 
 export interface BuoiChuaMayChu {

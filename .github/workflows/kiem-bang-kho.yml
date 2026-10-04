@@ -1,0 +1,30 @@
+name: Kiểm tra bảng dữ liệu kho câu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/sua-bang-cau-cuoi-0210]
+    paths: ['scripts/kiem-bang-kho-0210.mjs', '.github/workflows/kiem-bang-kho.yml']
+permissions:
+  contents: read
+concurrency:
+  group: kiem-bang-kho-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem-bang:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Quét bảng trong câu gốc và câu biến thể
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc kho và chỉ xuất số liệu kiểm tra
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/kiem-bang-kho-0210.mjs

@@ -46,6 +46,81 @@ describe('(1) cây DẠY HỌC đủ khối', () => {
     ])
     expect(ds.every((s) => s.maDe.startsWith('DH-'))).toBe(true)
   })
+  it('khoDayHoc: giữ đủ Ví dụ minh hoạ và Các dạng toán trọng tâm dù câu trùng với đề toàn bài', () => {
+    const nhom = '11 · DẠY HỌC/C2 - Nitrogen và Surful'
+    const bai = 'Bài 5. Ammonia. Muối ammonium'
+    const khoDH: TeacherExamSource[] = [
+      {
+        maDe: 'DH-11-C2-B5',
+        nhom,
+        nguon: bai,
+        phanI: [q('DH-11-C2-B5-I-1', 'Khí ammonia có tính chất gì?')],
+        phanII: [{ id: 'DH-11-C2-B5-II-1', text: 'Nhận định về ammonia', ideas: ['Ý 1', 'Ý 2', 'Ý 3', 'Ý 4'], correct: ['D', 'S', 'D', 'S'] }],
+        phanIII: [{ id: 'DH-11-C2-B5-III-1', text: 'Giải thích hiện tượng ammonia hoá lỏng trước', correct: 'NH3 tạo liên kết hydrogen' }],
+      },
+      {
+        maDe: 'DH-11-C2-B5-VD',
+        nhom,
+        nguon: `${bai} · VÍ DỤ MINH HOẠ — Chuyên đề bài tập dạy thêm`,
+        phanI: [q('DH-11-C2-B5-VD-I-1', 'Khí ammonia có tính chất gì?')],
+        phanII: [],
+        phanIII: [{ id: 'DH-11-C2-B5-VD-III-1', text: 'Giải thích hiện tượng ammonia hoá lỏng trước', correct: 'NH3 tạo liên kết hydrogen' }],
+      },
+      {
+        maDe: 'DH-11-C2-B5-DT',
+        nhom,
+        nguon: `${bai} · CÁC DẠNG TOÁN TRỌNG TÂM — Chuyên đề bài tập dạy thêm`,
+        phanI: [],
+        phanII: [],
+        phanIII: [{ id: 'DH-11-C2-B5-DT-III-1', text: 'Tính khối lượng muối', correct: '6,1' }],
+      },
+    ]
+
+    const ds = khoDayHoc(khoDH, khuTrungNguon, tachNhieuTheoPhan)
+    expect(ds.map((s) => s.maDe)).toEqual([
+      'DH-11-C2-B5-TN',
+      'DH-11-C2-B5-DS',
+      'DH-11-C2-B5-TLN',
+      'DH-11-C2-B5-VD',
+      'DH-11-C2-B5-DT',
+    ])
+    const cay = dungCay(ds)
+    const bai5 = cay[0]!.con[0]!.con[0]!.con[0]!
+    expect(bai5.nhan).toBe('Bài 5. Ammonia. Muối ammonium')
+    expect(bai5.con.map((c) => c.nhan)).toEqual([
+      'Ví dụ minh hoạ',
+      'Các dạng toán trọng tâm',
+      'Trắc nghiệm',
+      'Đúng sai',
+      'Trả lời ngắn',
+    ])
+  })
+  it('mục dạy học: câu tự luận được giữ nguyên và đánh dấu tuLuan = true để hiển thị đầy đủ', async () => {
+    const { cauTuDeChon } = await import('../src/lib/day-hoc-len-bang')
+    const cau = cauTuDeChon(
+      [
+        {
+          maDe: 'DH-11-C2-B5-VD',
+          nhom: '11 · DẠY HỌC/C2 - Nitrogen',
+          nguon: 'Bài 5. Ammonia · VÍ DỤ MINH HOẠ',
+          phanI: [q('DH-11-C2-B5-VD-I-1', 'Trắc nghiệm ngắn')],
+          phanII: [],
+          phanIII: [
+            {
+              id: 'DH-11-C2-B5-VD-III-1',
+              text: 'Khi làm lạnh hỗn hợp khí gồm ammonia, hydrogen và nitrogen thì ammonia sẽ hoá lỏng trước.\nTính chất vật lí nào của các chất giúp giải thích hiện tượng trên?',
+              correct: 'NH3 tạo được liên kết hydrogen nên nhiệt độ sôi cao hơn hẳn N2 và H2',
+            },
+          ],
+        },
+      ],
+      new Set(['DH-11-C2-B5-VD']),
+    )
+    expect(cau).toHaveLength(2)
+    const cauTL = cau.find((c) => c.phan === 'III')!
+    expect(cauTL.tuLuan).toBe(true)
+    expect(cauTL.q.text).toContain('ammonia sẽ hoá lỏng trước')
+  })
   it('chip lọc lớp TỰ SINH theo dữ liệu: có khối 10 và 12 ⇒ Tất cả · Lớp 10 · Lớp 12 (không có Lớp 11)', () => {
     render(<HopChonDe ds={khoDayHoc(KHO, khuTrungNguon, tachNhieuTheoPhan)} daChon={new Set()} onChon={() => {}} chonNhieu />)
     const nhom = screen.getByRole('group', { name: 'Lọc theo khối' })

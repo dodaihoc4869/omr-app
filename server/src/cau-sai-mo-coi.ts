@@ -14,8 +14,11 @@ const NGAY = /^\d{4}-\d{2}-\d{2}$/
 
 const sqlCauSai = (coMucDich: boolean) => `
 WITH ev AS (
-  SELECT sbd, CASE WHEN instr(qid, '#') > 0 THEN substr(qid, 1, instr(qid, '#') - 1) ELSE qid END AS q, nguon, ket_qua, luc
+  -- Câu gốc: bỏ hậu tố lượt game "#n" rồi hậu tố câu song sinh "~ss0|1" (04/10: thiếu bước này ⇒ lượt làm song sinh bị đếm thành câu "ngoài kho").
+  SELECT sbd, CASE WHEN instr(q0, '~ss') > 0 THEN substr(q0, 1, instr(q0, '~ss') - 1) ELSE q0 END AS q, nguon, ket_qua, luc FROM (
+  SELECT sbd, CASE WHEN instr(qid, '#') > 0 THEN substr(qid, 1, instr(qid, '#') - 1) ELSE qid END AS q0, nguon, ket_qua, luc
     FROM su_kien_hoc WHERE ngay_vn >= ? AND nguon <> 'nen'${coMucDich ? " AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(assistance, '') <> 'assisted'" : ''}
+  )
 ),
 cuoi AS (
   SELECT ev.sbd, ev.q, ev.nguon, ev.ket_qua FROM ev

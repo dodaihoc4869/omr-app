@@ -3,7 +3,7 @@
 // lời giải của song sinh (bảng `cau_bo_tro`). Đáp án chỉ nằm ở máy chủ như câu thường (`publicQuestion` bỏ `correct`, `solution`).
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
-import { dongBoTro, type BoTro, type SongSinh } from './cau-bo-tro'
+import { dongBoTro, docBangSongSinh, songSinhDuDuLieu, type BoTro, type SongSinh } from './cau-bo-tro'
 import { tachSongSinh } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
@@ -13,6 +13,7 @@ export const qidSongSinh = (goc: string, i: number) => `${goc}~ss${i}`
 
 /** Phủ song sinh lên câu gốc. Chỉ Phần I (4 phương án) và Phần III (số); Phần II / song sinh thiếu dữ liệu ⇒ null. */
 export function apSongSinh(q: PrivateQuestion, ss: SongSinh, i: number): PrivateQuestion | null {
+  if (!songSinhDuDuLieu(q.phan, ss)) return null
   if (q.phan === 'II') return null
   if (q.phan === 'I') {
     const pa = ss.pa ?? {}
@@ -26,15 +27,22 @@ export function apSongSinh(q: PrivateQuestion, ss: SongSinh, i: number): Private
 
 function phu(q: PrivateQuestion, ss: SongSinh, i: number, them: { choices: string[]; correct: string }): PrivateQuestion {
   const lg = (q.solution && typeof q.solution === 'object' ? q.solution : {}) as Obj
+  const chot = (typeof ss.chot === 'string' && ss.chot.trim())
+    ? ss.chot.trim()
+    : (Array.isArray(ss.buoc) && ss.buoc.length > 0)
+      ? ss.buoc.join('\n')
+      : (typeof lg.chot === 'string' ? lg.chot : '')
   return {
     ...q,
     qid: qidSongSinh(tachSongSinh(q.qid).goc, i),
     text: ss.de,
     choices: them.choices,
     correct: them.correct,
-    // Song sinh tự mang đủ dữ kiện trong đề (máy soạn chép bảng vào chữ) ⇒ bỏ bảng / ảnh của câu gốc để không lẫn số cũ.
-    table: undefined, thanCauImg: undefined, imageDataUrl: undefined, choiceImgs: undefined, ideaImgs: undefined, hinhAnh: [],
-    solution: { chot: typeof lg.chot === 'string' ? lg.chot : '', buoc: ss.buoc ?? [], ket_qua: ss.dap_an, dap_an_de: them.correct, song_sinh: true },
+    // Giữ bảng/ảnh CỦA SONG SINH; tuyệt đối không trộn dữ kiện của câu gốc đã đổi số.
+    table: docBangSongSinh(ss.bang), thanCauImg: undefined, imageDataUrl: undefined, choiceImgs: undefined, ideaImgs: undefined,
+    hinhAnh: (ss.hinh ?? []).filter(h => /^(sau_de|cuoi_cau|sau_pa_[ABCD]|sau_y_[abcd])$/.test(h.vi_tri))
+      .map(h => ({ src: h.du_lieu, viTri: h.vi_tri })),
+    solution: { chot, buoc: ss.buoc ?? [], ket_qua: ss.dap_an, dap_an_de: them.correct, song_sinh: true },
   }
 }
 

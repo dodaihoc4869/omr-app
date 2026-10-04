@@ -183,7 +183,7 @@ export default defineConfig({
           '**/pk-{cl,da,hq,vd}-*.js',
           // Gộp ngang + app thầy 2.0 (28/09): các mảnh nạp LƯỜI chỉ của app thầy (giao/chiếu chiến dịch, bố cục tờ chiếu) và của game
           // (cửa hàng phụ kiện, lọc câu theo khối) ra kho chạy-lúc — giữ precache vỏ ≤ 2850 KB (chừa ≥ 150 KB dưới trần 3000 KB).
-          '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau}-*.{js,css}',
+          '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
           // Thẻ "Luyện đề cấu trúc" trong Tu luyện (30/09): mảnh nạp LƯỜI khi em bấm thẻ (luyện đề cần mạng để rút/chấm ở máy chủ) — kho chạy-lúc.

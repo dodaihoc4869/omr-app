@@ -159,7 +159,7 @@ describe('chạy thử lúc mở ca → chốt lúc Bắt đầu', () => {
       const em: Record<string, unknown[]> = {}
       for (const s of dsSbd) {
         em[s] = s === 'A'
-          ? [{ qid: 'D-I-3', denHan: '2026-10-01', trangThai: 'mo', nenSongSinh: true, songSinh: 0, phan: 'I', mucDo: 'hieu', dang: 'CD:Ester', cauSongSinh: { id: 'D-I-3~ss0', phan: 'I', text: 'Song sinh: tính m', choices: ['1', '2', '3', '4'], correct: 'C' } }]
+          ? [{ qid: 'D-I-3', denHan: '2026-10-01', trangThai: 'mo', nenSongSinh: true, songSinh: 0, phan: 'I', mucDo: 'hieu', dang: 'CD:Ester', cauSongSinh: { id: 'D-I-3~ss0', phan: 'I', text: 'Song sinh: tính m', choices: ['1', '2', '3', '4'], correct: 'C', table: [['Chất', 'Khối lượng'], ['A', '2']] } }]
           : s === 'C'
             ? [{ qid: 'D-I-7', denHan: '2026-10-02', trangThai: 'mo', phan: 'I', mucDo: 'hieu' }]
             : []
@@ -190,6 +190,8 @@ describe('chạy thử lúc mở ca → chốt lúc Bắt đầu', () => {
     expect(bankEm.phanI.map((q) => q.id)).toEqual(['D-I-3~ss0'])
     expect(bankEm.phanI[0]!.correct).toBeUndefined() // đáp án không xuống máy em
     expect(keyBank.phanI[0]).toMatchObject({ id: 'D-I-3~ss0', correct: 'C' })
+    expect(keyBank.phanI[0].table).toEqual([['Chất', 'Khối lượng'], ['A', '2']])
+    expect(bankEm.phanI[0].table).toEqual([['Chất', 'Khối lượng'], ['A', '2']])
     expect(chot.soCauNoiThem).toBe(1)
     expect((chot.bienBan as { v2?: unknown }).v2).toBeTruthy()
     for (const b of Object.values(chot.boTheoEm)) expect(b).toHaveLength(4)

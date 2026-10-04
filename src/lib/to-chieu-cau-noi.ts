@@ -35,6 +35,10 @@ export const TIN_TO_CHIEU = {
   HO_SO: 'ddh-mc-ho-so',
   /** App → tờ chiếu: hồ sơ em (`hoSo`, số thật từ `/gv/ho-so-len-bang`) hoặc `loi` cho lệnh `HO_SO` cùng `id`. */
   HO_SO_TRA: 'ddh-mc-ho-so-tra',
+  /** App / Remote → tờ chiếu: lệnh điều khiển từ xa (gọi lên bảng, bật lời giải, chuyển đợt...) */
+  LENH: 'ddh-mc-lenh',
+  /** Tờ chiếu → app / Remote: báo trạng thái hiện tại (đợt, pha, lời giải) */
+  TRANG_THAI: 'ddh-mc-trang-thai',
 } as const
 
 /** Quá số giây này mà app không trả lời thì tờ chiếu coi là LỖI và mở lại nút. */
@@ -205,6 +209,66 @@ export function jsCauNoiToChieu(): string {
     nutCua(v).forEach(function (b) { b.disabled = false; });
     tin(v, 'chưa ghi được, bấm lại');
   }
+  function thucThiLenh(lenh, thamSo) {
+    if (!lenh) return;
+    if (lenh === 'LEN_BANG' || lenh === 'L') {
+      if (window.__mcLenh) window.__mcLenh('L');
+      else if (window.__mcLenBang) window.__mcLenBang();
+    } else if (lenh === 'BAT_LOI_GIAI' || lenh === 'G') {
+      if (thamSo && typeof thamSo.mo === 'boolean') {
+        if (window.__mcMoLoiGiai) window.__mcMoLoiGiai(thamSo.mo);
+        else if (window.__mcBatLoiGiai) window.__mcBatLoiGiai(thamSo.mo);
+      } else {
+        if (window.__mcLenh) window.__mcLenh('G');
+        else if (window.__mcBatLoiGiai) window.__mcBatLoiGiai();
+      }
+    } else if (lenh === 'CHUYEN_DOT' || lenh === 'DEN') {
+      var k = typeof thamSo === 'number' ? thamSo : (thamSo && typeof thamSo.dot === 'number' ? thamSo.dot : 0);
+      if (window.__mcDen) window.__mcDen(k);
+    } else if (lenh === 'CHAM' || lenh === 'D' || lenh === 'K') {
+      var dat = lenh === 'D' ? true : lenh === 'K' ? false : (thamSo && typeof thamSo.dat === 'boolean' ? thamSo.dat : true);
+      if (window.__mcLenh) window.__mcLenh(dat ? 'D' : 'K');
+    } else if (lenh === 'BUOC_TIEP' || lenh === 'SP') {
+      if (window.__mcLenh) window.__mcLenh('SP');
+    } else if (lenh === 'XUONG' || lenh === '↓') {
+      if (window.__mcLenh) window.__mcLenh('↓');
+    } else if (lenh === 'LEN' || lenh === '↑') {
+      if (window.__mcLenh) window.__mcLenh('↑');
+    }
+  }
+  function baoTrangThai() {
+    var tt = window.__mcTrangThai ? window.__mcTrangThai() : null;
+    if (!tt) {
+      tt = {
+        dot: window.__mcChiSo ? window.__mcChiSo() : 0,
+        soDot: window.__mcSoDot ? window.__mcSoDot() : 1,
+        pha: document.body.getAttribute('data-pha') || '',
+        lgMo: false,
+      };
+    }
+    var msg = { type: '${TIN_TO_CHIEU.TRANG_THAI}', maPhien: ma, trangThai: tt };
+    try { window.parent.postMessage(msg, goc); } catch (x) {}
+    if (bc) { try { bc.postMessage(msg); } catch (x) {} }
+  }
+  document.addEventListener('mc-doi-dot', baoTrangThai);
+  document.addEventListener('mc-doi-pha', baoTrangThai);
+  document.addEventListener('mc-vao-dot', baoTrangThai);
+  document.addEventListener('mc-giai-doi', baoTrangThai);
+  var bc = null;
+  try {
+    if (typeof BroadcastChannel !== 'undefined' && ma) {
+      bc = new BroadcastChannel('ddh-to-chieu-' + ma);
+      bc.onmessage = function (e) {
+        var d = e && e.data;
+        if (!d || typeof d !== 'object') return;
+        if (d.type === '${TIN_TO_CHIEU.LENH}' || d.type === 'mc-lenh') {
+          thucThiLenh(d.lenh || d.loai, d.thamSo);
+        } else if (d.loai) {
+          thucThiLenh(d.loai, d.thamSo);
+        }
+      };
+    }
+  } catch (x) {}
   window.addEventListener('message', function (e) {
     if (e.source !== window.parent) return;
     if (goc !== '*' && e.origin !== goc) return;
@@ -214,6 +278,7 @@ export function jsCauNoiToChieu(): string {
       noi = true;
       if (nhip) { clearInterval(nhip); nhip = null; }
       body.classList.add('mc-noi');
+      baoTrangThai();
     } else if (d.type === '${TIN_TO_CHIEU.PHAN_HOI}') {
       xong(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi', typeof d.dat === 'boolean' ? d.dat : undefined);
     } else if (d.type === '${TIN_TO_CHIEU.DA_GHI}') {
@@ -221,6 +286,8 @@ export function jsCauNoiToChieu(): string {
     } else if (d.type === '${TIN_TO_CHIEU.HO_SO_TRA}') {
       var cb = hoi[String(d.id)];
       if (cb) { delete hoi[String(d.id)]; cb(d.hoSo && typeof d.hoSo === 'object' ? d.hoSo : null, d.loi ? String(d.loi) : ''); }
+    } else if (d.type === '${TIN_TO_CHIEU.LENH}' || d.type === 'mc-lenh') {
+      thucThiLenh(d.lenh || d.loai, d.thamSo);
     }
   });
   document.addEventListener('click', function (e) {

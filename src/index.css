@@ -165,6 +165,8 @@ body {
  * cả trang tràn ngang. Chữ trong ô không nhỏ hơn 13px: bảng dưới 5 cột cấm
  * đổi thành ảnh, nên bảng thật phải đọc được ngay trên màn 360px. */
 .cau-bang {
+  /* Thẻ câu dùng flex dọc: giữ đủ chiều cao bảng, cho cuộn thẻ khi đề dài. */
+  flex-shrink: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1015,4 +1017,3 @@ input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-calenda
 .mt-tran .mt-than {
   min-width: 20px;
 }
-

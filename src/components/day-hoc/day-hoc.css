@@ -557,3 +557,69 @@
     white-space: nowrap;
   }
 }
+
+/* NÚT VÀ KHỐI HIỂN THỊ LỜI GIẢI */
+.dh-nut-giai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--bts-vien);
+  background: var(--bts-mat-2);
+  color: var(--bts-chu);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.dh-nut-giai:hover,
+.dh-nut-giai--mo {
+  background: var(--bts-duong-nhat);
+  color: var(--bts-duong);
+  border-color: var(--bts-duong);
+}
+.dh-cau-giai {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bts-mat-2);
+  border: 1px dashed var(--bts-vien);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.dh-giai-dap-an {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--bts-luc);
+}
+.dh-giai-cot-loi {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--bts-cam);
+  font-weight: 600;
+}
+.dh-giai-chi-tiet {
+  color: var(--bts-chu);
+  white-space: pre-wrap;
+}
+.dh-giai-pa {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.dh-giai-pa-dong {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+

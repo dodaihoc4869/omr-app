@@ -7,8 +7,8 @@ import { gopDocD1 } from './doc-d1-theo-luot'
 import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
-import type { KetQuaLoi } from './loi-hoc-luat'
-import type { BoTro } from './cau-bo-tro'
+import { tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
+import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
@@ -520,11 +520,12 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
     // VÒNG HỌC v2: câu từng sai tự làm từ 29/09 ⇒ LUẬT ĐÓNG LỖI CHUNG quyết thành thạo / hẹn; lượt làm lại ưu tiên câu song sinh.
     let t = t0
     if (qidSaiMoiKenh.has(qid)) {
-      const soSS = boTro.get(qid)?.songSinh.length ?? 0
+      const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => songSinhDuDuLieu(m.phan, ss) ? [i] : [])
+      const soSS = ssDungDuoc.length
       const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoV2)
       t = ap.t
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
-      if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, chonSongSinh(theoQid.get(qid) ?? [], soSS))
+      if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!)
     }
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
@@ -734,7 +735,14 @@ const lanThu = (k: string): number => Number(/#(\d+)$/.exec(k)?.[1] ?? 1)
 /** Số lần em đã làm mỗi câu hôm nay trong game. */
 async function docDemHomNay(env: Env, sbd: string, ngay: string): Promise<Map<string, number>> {
   const r = await env.DB.prepare("SELECT qid, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game' GROUP BY qid").bind(sbd, ngay).all<Row>().catch(() => ({ results: [] as Row[] }))
-  return new Map((r.results ?? []).map((x) => [str(x.qid), Number(x.n) || 0]))
+  // Kế hoạch giữ qid gốc, sổ giữ qid biến thể. Cộng vào cùng nhiệm vụ để làm xong
+  // câu cuối thì hạ cầu ngay; không sửa lịch sử, điểm hay điều kiện thành thạo.
+  const dem = new Map<string, number>()
+  for (const x of r.results ?? []) {
+    const q = tachSongSinh(str(x.qid)).goc
+    dem.set(q, (dem.get(q) ?? 0) + (Number(x.n) || 0))
+  }
+  return dem
 }
 
 const hoanThien = (ngay: string, id: string | null, dao: string[], doan: string[], huyetChien: boolean, dem: ReadonlyMap<string, number>): KeHoachDaChot => {

@@ -55,6 +55,8 @@ export interface CauLuyen {
   lyDo: { khoa: string; dung: boolean; ly: string }[] | null
   buoc: string[] | null
   ketQua: string
+  explanation?: string
+  loiGiai?: any
   /** Ảnh cắt cả thân câu — có ảnh này thì ảnh LÀ đề, không in `text` nữa
    * (đúng như màn làm bài của học sinh). */
   anhThanCau?: string
@@ -181,10 +183,12 @@ function doiSang(c: CauNguon): CauLuyen {
     text: q.text || '',
     luaChon: c.phan === 'I' ? [...(mcq.choices ?? [])] : c.phan === 'II' ? [...(tf.ideas ?? [])] : null,
     dapAn: c.phan === 'I' ? String(mcq.correct ?? '') : c.phan === 'II' ? (tf.correct ?? []).join('') : String(sa.correct ?? ''),
-    chot: lg?.chot ?? '',
+    chot: lg?.chot ?? ((q as any).kienThucCotLoi || ''),
     lyDo,
     buoc: lg?.buoc ? [...lg.buoc] : null,
     ketQua: lg?.ketQua ?? '',
+    explanation: (q as any).explanation || (q as any).huongDanGiai || (q as any).loiGiaiChiTiet,
+    loiGiai: (q as any).loiGiai,
     anhThanCau: q.thanCauImg,
     anhLuaChon: c.phan === 'I' ? [...(mcq.choiceImgs ?? [])] : c.phan === 'II' ? [...(tf.ideaImgs ?? [])] : undefined,
     hinh: hinh.length > 0 ? hinh : undefined,

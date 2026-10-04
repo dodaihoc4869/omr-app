@@ -1,0 +1,16 @@
+{
+  "truoc": {
+    "numTotalTests": 13294,
+    "numPassedTests": 13138,
+    "numFailedTests": 128,
+    "numPendingTests": 28
+  },
+  "sau": {
+    "numTotalTests": 13302,
+    "numPassedTests": 13146,
+    "numFailedTests": 128,
+    "numPendingTests": 28
+  },
+  "loi_moi": [],
+  "loi_cu_het_do": []
+}

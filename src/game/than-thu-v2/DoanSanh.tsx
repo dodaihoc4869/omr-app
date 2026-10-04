@@ -54,9 +54,11 @@ export default function DoanSanh(p: Props) {
   const chuHetOn = !v2 ? '' : v2.daoCon > 0 ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : 'Hôm nay em không còn câu ôn nào. Mai quay lại hộ tống nhé.'
   // Nút "Mở đoàn mới": khoá thì nói LÝ DO ngay dưới nút. Máy chủ (`doan-mo`, cả cheDo phong) cũng qua cổng vé (`quaCongVe`) nên hết vé thì mở đoàn bị từ chối — khoá cùng luật với nút LÊN ĐƯỜNG, không đổi luật.
   const chuHetLuot = chuHetLuotDoan(p.goiY) // trần do máy chủ nói, không viết cứng số
-  const hetChang = daHetChang(p.chang) // `doan-mo` (cả cheDo phong) ném lỗi khi đủ chặng/ngày — khoá đúng chỗ máy chủ sẽ từ chối, số chặng do máy chủ nói
+  // GAME HÓA 2.0: mọi chặng đều chở câu ôn của kế hoạch ngày ⇒ miễn phí, không trần số chặng (chỉ khoá khi hetOn = hết câu ôn).
+  const hetChang = !v2 && daHetChang(p.chang) // `doan-mo` (cả cheDo phong) ném lỗi khi đủ chặng/ngày ở chế độ thường
+  const hetLuot = !v2 && !!p.goiY?.hetLuot
   const chuHetChangNay = p.chang ? chuHetChang(p.chang) : ''
-  const khoaMo = hetOn ? chuHetOn : p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
+  const khoaMo = hetOn ? chuHetOn : hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
   // Hóa 2.0 · bố cục NGANG (docs/ban-ve-ngang-2809/Ngang-DoanSanh, doan2-ngang.css): bọc hai cột `display:contents` ⇒ màn dọc y nguyên;
   // màn ngang: bản đồ đoàn bên trái, thẻ chặng + nút LÊN ĐƯỜNG + các thẻ phụ bên phải. Cờ tắt: không bọc gì.
@@ -76,7 +78,7 @@ export default function DoanSanh(p: Props) {
         <div className="dh-hang-the">
           {s && s.ve !== null && !v2 && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}><Ticket size={16} aria-hidden="true" />Vé hộ tống: {s.ve}</span>}
           {s && s.chuoi.ngay > 0 && <span className="dh-the-so dh-the-chuoi" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}><Flame size={16} aria-hidden="true" />Chuỗi {s.chuoi.ngay} ngày</span>}
-          {p.chang && <span className="dh-the-so dh-the-chang" data-vung="chang-hom-nay"><Flag size={16} aria-hidden="true" />{chuChangHomNay(p.chang)}</span>}
+          {p.chang && !v2 && <span className="dh-the-so dh-the-chang" data-vung="chang-hom-nay"><Flag size={16} aria-hidden="true" />{chuChangHomNay(p.chang)}</span>}
         </div>
       )}
 
@@ -126,9 +128,9 @@ export default function DoanSanh(p: Props) {
             {loiO('len')}
             {raDao
               ? <button type="button" className="dh-nut-vang" onClick={() => (p.onRaDao ?? p.onDong)()}><span>QUA CẦU · KHÁM PHÁ ĐẢO</span></button>
-              : <button type="button" className="dh-nut-vang" disabled={p.ban || hetOn || !!p.goiY?.hetLuot || hetChang || hetVe} onClick={() => { setNut('len'); p.onLenDuong() }}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetOn ? 'HẾT CÂU ÔN HÔM NAY' : hetChang ? 'ĐÃ ĐI ĐỦ CHẶNG HÔM NAY' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>}
+              : <button type="button" className="dh-nut-vang" disabled={p.ban || hetOn || hetLuot || hetChang || hetVe} onClick={() => { setNut('len'); p.onLenDuong() }}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetOn ? 'HẾT CÂU ÔN HÔM NAY' : hetLuot ? 'HẾT LƯỢT HÔM NAY' : hetChang ? 'ĐÃ ĐI ĐỦ CHẶNG HÔM NAY' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>}
             <small>{hetOn ? 'Câu em chưa đúng hôm nay sẽ quay lại thành ổ phục kích theo lịch ôn lại.'
-              : p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : v2 ? 'Chuyến chở câu ôn của em: miễn phí · phá hết ổ phục kích hôm nay là cầu sang Bát Linh Đảo hạ · thua không mất gì'
+              : hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : v2 ? 'Chuyến chở câu ôn của em: miễn phí · phá hết ổ phục kích hôm nay là cầu sang Bát Linh Đảo hạ · thua không mất gì'
               : hetVe ? CHU_HET_VE : s ? 'Chuyến thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
           </section>
           {p.khoiThem}

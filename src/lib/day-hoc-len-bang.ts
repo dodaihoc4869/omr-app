@@ -4,6 +4,7 @@
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { chuongCuaDe, thuMucCuaDe } from './cay-chon-de'
 import { laCauTuLuan } from './cau-tu-luan'
+import { laMucDayHocDacBiet } from './tach-phan-de'
 import { qidMayChuCuaIdCau } from './lich-su-cau-len-bang'
 import type { MucDo } from './chon-em-day-hoc'
 
@@ -18,12 +19,37 @@ export function locDeDayHoc<T extends Pick<TeacherExamSource, 'nhom'>>(ds: reado
   return ds.filter(laDeDayHoc)
 }
 
-/** KHO CỦA BẢNG DẠY HỌC: LỌC nhánh DẠY HỌC TRƯỚC, rồi mới khử trùng câu TRONG nhánh ấy, rồi tách theo phần.
+/** KHO CỦA BẢNG DẠY HỌC: LỌC nhánh DẠY HỌC TRƯỚC, bảo tồn các mục chuyên biệt (Ví dụ minh hoạ, Dạng toán trọng tâm)
+ *  để không bị đề toàn bài nuốt mất câu, khử trùng câu giữa các đề phổ thông trong nhánh ấy, rồi tách theo phần.
  *  LỖI 28/09 (thầy báo "cây thiếu lớp 10"): bản đầu khử trùng trên CẢ KHO rồi mới lọc — câu Dạy học trùng với "Bộ đề" (hạng ưu tiên cao hơn) hoặc
  *  với cây bài `10-…/11-…/12-…` (cùng hạng nhưng đứng trước theo mã đề) bị nhánh kia giành, nên kho thật 845 / 972 / 1542 câu (khối 10 / 11 / 12)
  *  chỉ còn 0 / 80 / 120 và cả Khối 10 biến mất. Bảng Dạy học chỉ chiếu nhánh này nên không có gì để "nhường" cho nhánh khác. */
-export function khoDayHoc(ds: readonly TeacherExamSource[], khuTrung: (x: TeacherExamSource[]) => { nguon: TeacherExamSource[] }, tach: (x: TeacherExamSource[]) => TeacherExamSource[]): TeacherExamSource[] {
-  return locDeDayHoc(tach(khuTrung(locDeDayHoc(ds)).nguon))
+export function khoDayHoc(
+  ds: readonly TeacherExamSource[],
+  khuTrung: (x: TeacherExamSource[]) => { nguon: TeacherExamSource[] },
+  tach: (x: TeacherExamSource[]) => TeacherExamSource[],
+): TeacherExamSource[] {
+  const dayHoc = locDeDayHoc(ds)
+  const dacBiet = dayHoc.filter(laMucDayHocDacBiet)
+  const phoThong = dayHoc.filter((s) => !laMucDayHocDacBiet(s))
+  const phoThongKhuMap = new Map(khuTrung(phoThong).nguon.map((s) => [s.maDe, s]))
+  const dacBietKhuMap = new Map(
+    dacBiet.map((s) => {
+      const kq = khuTrung([s]).nguon[0] ?? s
+      return [s.maDe, kq]
+    }),
+  )
+  const ketQua: TeacherExamSource[] = []
+  for (const s of dayHoc) {
+    if (laMucDayHocDacBiet(s)) {
+      const db = dacBietKhuMap.get(s.maDe)
+      if (db) ketQua.push(db)
+    } else {
+      const pt = phoThongKhuMap.get(s.maDe)
+      if (pt) ketQua.push(pt)
+    }
+  }
+  return locDeDayHoc(tach(ketQua))
 }
 
 export type CauGocDayHoc = TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion
@@ -130,7 +156,13 @@ export async function dungToChieuDayHoc(
   const o = new Map<string, OGhiDayHoc>()
   const dsO = dsCau.map((c, i) => {
     const [cl] = cauLuyenTuBoCau([{ phan: c.phan, maDe: c.maDe, q: c.q }])
-    const cau = { ...cl!, chuyenDe: cl!.chuyenDe || c.chuyenDe }
+    const cau = {
+      ...cl!,
+      chuyenDe: cl!.chuyenDe || c.chuyenDe,
+      explanation: cl!.explanation || (c.q as any).explanation || (c.q as any).huongDanGiai || (c.q as any).loiGiaiChiTiet,
+      loiGiai: cl!.loiGiai || (c.q as any).loiGiai,
+      chot: cl!.chot || (c.q as any).loiGiai?.chot || (c.q as any).kienThucCotLoi || '',
+    }
     const em = giao.get(c.khoa)
     const coNut = !!maPhien && !!em && !!c.chuyenDe
     if (coNut) o.set(khoaToChieu(em.sbd, c.qid), { sbd: em.sbd, hoTen: em.hoTen, qid: c.qid, chuyenDe: c.chuyenDe })

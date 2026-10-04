@@ -20,7 +20,7 @@
 // `public/404.html` đổi hai đường trên thành `?vai=gv` / `?examCode=…` khi máy
 // chưa cài service worker; `chuanHoaDuongDan()` làm đúng việc đó ở trong app,
 // nên máy đã cài app (service worker nuốt mất 404.html) vẫn chạy đúng.
-export type VaiTro = 'gv' | 'phieu' | 'diem' | 'hocsinh' | 'phuhuynh'
+export type VaiTro = 'gv' | 'phieu' | 'diem' | 'hocsinh' | 'phuhuynh' | 'remote'
 
 export interface DuongVao {
   vai: VaiTro | null
@@ -97,6 +97,8 @@ export function docDuongVao(search: string, duongDan = ''): DuongVao {
   if (vaiQ === 'diem') return { vai: 'diem', maCa }
   if (vaiQ === 'hocsinh') return { vai: 'hocsinh', maCa: '' }
   if (vaiQ === 'phuhuynh') return { vai: 'phuhuynh', maCa: '' }
+  if (vaiQ === 'remote' || q.get('remote')) return { vai: 'remote', maCa: '' }
+  if (duongDan.startsWith('/remote')) return { vai: 'remote', maCa: '' }
 
   const tuDuong = duongDan ? docVaiTuDuongDan(duongDan) : null
   if (tuDuong && (tuDuong.vai || tuDuong.maCa)) {
@@ -136,7 +138,7 @@ export function dangChayTuManHinhChinh(): boolean {
 export function laManThayQuanLy(search: string, duongDan = '', _daCai = dangChayTuManHinhChinh): boolean {
   if (laLinkAppCu(search, duongDan)) return false
   const d = docDuongVao(search, duongDan)
-  if (d.vai === 'phieu' || d.vai === 'diem' || d.vai === 'hocsinh' || d.vai === 'phuhuynh') return false
+  if (d.vai === 'phieu' || d.vai === 'diem' || d.vai === 'hocsinh' || d.vai === 'phuhuynh' || d.vai === 'remote') return false
   if (d.maCa) return false
   // ĐƯỜNG NÓI RÕ `gv` LUÔN THẮNG CỜ. Bản đầu của bản vá này hỏi cờ trước, nên
   // trên máy thầy từng mở link thi thử thì gõ `?vai=gv` cũng không vào được màn

@@ -80,15 +80,20 @@ export function chuongCuaDe(c: Pick<TeacherExamSource, 'nhom'>): string {
 /** Tên bài hiện cho thầy đọc: ưu tiên `nguon` (vd "Bài 4. Glucose và
  * fructose"), thiếu thì lấy mã gốc. Cắt phần chú thích dài sau dấu " — ". */
 export function tenBai(c: Pick<TeacherExamSource, 'maDe' | 'nguon'>): string {
-  const n = (c.nguon || '').normalize('NFC').split(' — ')[0].trim().replace(/\s*·\s*(?:VÍ DỤ MINH HOẠ|VÍ DỤ MINH HỌA|CÁC DẠNG TOÁN TRỌNG TÂM)\s*$/i, '')
-  return n || goMaDeTachRa(c.maDe).goc
+  const n = (c.nguon || '').normalize('NFC').split(' — ')[0].trim().replace(/\s*·\s*(?:VÍ DỤ MINH HOẠ|VÍ DỤ MINH HỌA|CÁC DẠNG TOÁN TRỌNG TÂM|DẠNG TOÁN TRỌNG TÂM)\s*$/i, '')
+  return n || goMaDeTachRa(c.maDe).goc.replace(/-(?:VD|VDMH|DT|DTTT)$/i, '')
 }
 
-function tenMucDayHoc(c: TeacherExamSource): string | null {
-  if (thuMucCuaDe(c).normalize('NFC').toUpperCase() !== 'DẠY HỌC') return null
+export function tenMucDayHoc(c: TeacherExamSource): string | null {
+  const tm = thuMucCuaDe(c).normalize('NFC').toUpperCase()
+  const laDayHoc = tm === 'DẠY HỌC' || c.maDe.startsWith('DH-')
+  if (!laDayHoc) return null
   const ma = goMaDeTachRa(c.maDe).goc
-  if (/-VD$/.test(ma)) return 'Ví dụ minh hoạ'
-  if (/-DT$/.test(ma)) return 'Các dạng toán trọng tâm'
+  if (/-(?:VD|VDMH)$/i.test(ma)) return 'Ví dụ minh hoạ'
+  if (/-(?:DT|DTTT)$/i.test(ma)) return 'Các dạng toán trọng tâm'
+  const ng = (c.nguon || '').normalize('NFC').toUpperCase()
+  if (ng.includes('VÍ DỤ MINH HOẠ') || ng.includes('VÍ DỤ MINH HỌA')) return 'Ví dụ minh hoạ'
+  if (ng.includes('DẠNG TOÁN TRỌNG TÂM')) return 'Các dạng toán trọng tâm'
   return null
 }
 

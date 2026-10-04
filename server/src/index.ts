@@ -55,7 +55,8 @@ import {phCanhBaoXem,phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} fro
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
-import {doiTenHocSinh} from './doi-ten-hoc-sinh'
+import { doiTenHocSinh } from './doi-ten-hoc-sinh'
+import { capNhatTrangThaiToChieu, guiLenhToChieu, layLenhMoiToChieu, layPhienToChieu, taoHoacCapNhatPhienToChieu } from './to-chieu-remote'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
 import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
@@ -3327,6 +3328,31 @@ const boXuLy = {
     if (req.method === 'GET' && p === '/ten-theo-sbd') {
       return tenTheoSbd(env, (url.searchParams.get('maCa') ?? '').trim(), (url.searchParams.get('sbd') ?? '').trim())
     }
+    // ĐIỀU KHIỂN TỜ MÁY CHIẾU TỪ XA (qua điện thoại hoặc máy khác)
+    if (req.method === 'GET' && p === '/gv/to-chieu/phien') {
+      const ma = (url.searchParams.get('ma') || '').trim()
+      const phien = layPhienToChieu(ma)
+      if (!phien) return ra({ ok: false, error: 'Không tìm thấy phiên chiếu' }, 404)
+      return ra({ ok: true, phien })
+    }
+    if (req.method === 'GET' && p === '/gv/to-chieu/lenh-moi') {
+      const ma = (url.searchParams.get('ma') || '').trim()
+      const sau = Number(url.searchParams.get('sau') || 0)
+      return ra(layLenhMoiToChieu(ma, sau))
+    }
+    if (req.method === 'GET' && p === '/gv/to-chieu/trang-thai') {
+      const ma = (url.searchParams.get('ma') || '').trim()
+      const phien = layPhienToChieu(ma)
+      if (!phien) return ra({ ok: false, error: 'Không tìm thấy phiên chiếu' }, 404)
+      return ra({
+        ok: true,
+        dotHienTai: phien.dotHienTai,
+        tongSoDot: phien.tongSoDot,
+        pha: phien.pha,
+        loiGiaiMo: phien.loiGiaiMo,
+        daCham: phien.daCham,
+      })
+    }
     if (req.method === 'GET' && (p === '' || p === '/')) {
       return Response.redirect('https://omr-app-b3u.pages.dev', 302)
     }
@@ -3484,6 +3510,12 @@ const boXuLy = {
       // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
       if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
       if (p === '/hs/diem-danh') return ra(await hsDiemDanh(env, b))
+
+      // ĐIỀU KHIỂN TỜ MÁY CHIẾU TỪ XA (điện thoại hoặc máy khác gửi lệnh qua mã phiên, không bắt buộc mã bí mật)
+      if (p === '/gv/to-chieu/phien') return ra(taoHoacCapNhatPhienToChieu(b as any))
+      if (p === '/gv/to-chieu/lenh') return ra(guiLenhToChieu(String(b.maPhien || ''), b.loai as any, b.thamSo))
+      if (p === '/gv/to-chieu/trang-thai') return ra(capNhatTrangThaiToChieu(String(b.maPhien || ''), b as any))
+
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
       if (p === '/anh/co') return anhCo(env, b)

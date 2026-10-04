@@ -6,7 +6,7 @@
 //  3 · CHIẾU — màn chiếu MỚI (`dungToChieuDayHoc` → `taoHtmlMayChieu`, lớp bản vẽ 28/09): đủ từng câu thầy chọn. "Chiếu lên bảng" ⇒ app chọn em
 //      CÓ MẶT có khả năng làm đúng cao nhất cho từng câu (`chon-em-day-hoc.ts`); "Đổi em khác"; "Đúng" / "Sai" ghi bằng `ghiLenBang` (đường ghi sẵn có).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Check, MonitorPlay, RefreshCw, Shuffle, UserCheck, X } from 'lucide-react'
+import { Check, Eye, EyeOff, Lightbulb, MonitorPlay, RefreshCw, Shuffle, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import KhungXemPhieu from '../KhungXemPhieu'
@@ -16,6 +16,8 @@ import { laySucHoc } from '../../lib/buoi-hoc-api'
 import { cauTuDeChon, demCau, dungToChieuDayHoc, khoDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
 import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, xepEmChoDanhSach, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
+import { ChemText } from '../../lib/chem-format'
+import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi } from './DiemDanhBuoi'
 import './day-hoc.css'
 
@@ -108,6 +110,8 @@ export default function DayHocLenBang() {
   const [sucHoc, setSucHoc] = useState<Record<string, SucHocEm>>({})
   const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `day-hoc|${idBuoi}` : '')
 
+  const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
+
   const moTo = async (coEm: boolean, giaoMoi = giao) => {
     if (!cauChieu.length) {
       showToast('Chưa chọn câu nào để chiếu', 'warn')
@@ -127,6 +131,7 @@ export default function DayHocLenBang() {
       const { html: h, o } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined)
       ganO(ma, o)
       setHtml(h)
+
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không mở được tờ máy chiếu', 'warn')
     } finally {
@@ -231,11 +236,31 @@ export default function DayHocLenBang() {
           </p>
         ) : (
           <>
-            <p className="dh-tong">
-              <b>{dem.tong}</b> câu sẽ chiếu · Trắc nghiệm {dem.I} · Đúng–sai {dem.II} · Trả lời ngắn {dem.III}
-              {dem.tuLuan ? ` · trong đó ${dem.tuLuan} câu tự luận` : ''}
-              {boCau.size ? ` · đã bỏ ${tatCaCau.length - cauChieu.length} câu` : ''}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, margin: '8px 0' }}>
+              <p className="dh-tong" style={{ margin: 0 }}>
+                <b>{dem.tong}</b> câu sẽ chiếu · Trắc nghiệm {dem.I} · Đúng–sai {dem.II} · Trả lời ngắn {dem.III}
+                {dem.tuLuan ? ` · trong đó ${dem.tuLuan} câu tự luận` : ''}
+                {boCau.size ? ` · đã bỏ ${tatCaCau.length - cauChieu.length} câu` : ''}
+              </p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="m3-nut-tonal dh-nut-nho"
+                  onClick={() => setXemLoiGiai(new Set(cauChieu.map((c) => c.khoa)))}
+                >
+                  <Eye size={15} /> Hiện lời giải tất cả
+                </button>
+                {xemLoiGiai.size > 0 && (
+                  <button
+                    type="button"
+                    className="m3-nut-chu dh-nut-nho"
+                    onClick={() => setXemLoiGiai(new Set())}
+                  >
+                    <EyeOff size={15} /> Ẩn tất cả
+                  </button>
+                )}
+              </div>
+            </div>
             <ol className="dh-cau-ds">
               {tatCaCau.map((c) => {
                 const bo = boCau.has(c.khoa)
@@ -266,8 +291,34 @@ export default function DayHocLenBang() {
                         {c.mucDo && <span>{TEN_MUC_CAU[mucCauSo(c.mucDo)]}</span>}
                         {c.tuLuan && <span className="dh-chip dh-chip--vang">Tự luận</span>}
                         <span className="dh-cau-dang">{c.tenDang || c.chuyenDe}</span>
+                        <button
+                          type="button"
+                          className={`dh-nut-giai ${xemLoiGiai.has(c.khoa) ? 'dh-nut-giai--mo' : ''}`}
+                          onClick={() =>
+                            setXemLoiGiai((cu) => {
+                              const m = new Set(cu)
+                              if (m.has(c.khoa)) m.delete(c.khoa)
+                              else m.add(c.khoa)
+                              return m
+                            })
+                          }
+                          style={{ marginLeft: 'auto' }}
+                        >
+                          <Lightbulb size={14} /> {xemLoiGiai.has(c.khoa) ? 'Ẩn lời giải' : 'Hiện lời giải'}
+                        </button>
                       </p>
-                      <p className="dh-cau-de">{tomTatDe(c)}</p>
+                      <div className="dh-cau-de" style={c.tuLuan ? { whiteSpace: 'pre-wrap' } : undefined}>
+                        {c.tuLuan ? <ChemText text={c.q.text || tomTatDe(c)} /> : tomTatDe(c)}
+                      </div>
+                      {c.tuLuan && (() => {
+                        const h = (c.q as any).imageDataUrl || (c.q as any).hinhAnh?.[0]?.src || (c.q as any).hinh?.[0]?.du_lieu || (c.q as any).hinh?.[0]?.src
+                        return h ? (
+                          <div style={{ marginTop: 6 }}>
+                            <img src={h} alt="Hình câu hỏi" style={{ maxWidth: '100%', maxHeight: 240, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--vien)' }} />
+                          </div>
+                        ) : null
+                      })()}
+                      {xemLoiGiai.has(c.khoa) && <TheCauHienThi c={c} stt={stt ?? undefined} />}
                       {g && !bo && (
                         <div className="dh-giao">
                           <span className="dh-giao-em">

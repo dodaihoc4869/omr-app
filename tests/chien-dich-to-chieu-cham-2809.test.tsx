@@ -63,6 +63,48 @@ describe('dựng tờ chiếu có nút', () => {
     expect(html).not.toContain('class="mc-cham"')
     expect(o.size).toBe(0)
   })
+
+  it('hiển thị rõ nội dung đề thật và lời giải chi tiết khi có cauGoc hoặc tra theo STT', async () => {
+    const cauGocMock = {
+      id: 'Q13',
+      phan: 'I',
+      text: 'Chất nào sau đây là carbohydrate?',
+      choices: ['Glucose', 'Ancol etylic', 'Axit axetic', 'Benzen'],
+      correct: 'A',
+      explanation: 'Glucose là monosaccharide thuộc nhóm carbohydrate.',
+      loiGiai: {
+        chot: 'Glucose là monosaccharide quan trọng.',
+        tungPa: {
+          A: { dung: true, viSao: 'Glucose là carbohydrate.' },
+          B: { dung: false, viSao: 'Ancol etylic là ancol.' },
+          C: { dung: false, viSao: 'Axit axetic là axit cacboxylic.' },
+          D: { dung: false, viSao: 'Benzen là hiđrocacbon thơm.' },
+        },
+      },
+    }
+    const { html, soThieu } = await dungToChieu(
+      [
+        {
+          qid: 'Q13',
+          stt: 13,
+          phan: 'I',
+          mucDo: 'Biết',
+          sbd: '01',
+          ten: 'Nguyễn Văn A',
+          viSao: '1 em cần thầy dạy lại',
+          cauGoc: cauGocMock,
+        },
+      ],
+      'Chữa sớm · Carbohydrate',
+    )
+    expect(soThieu).toBe(0)
+    expect(html).toContain('Chất nào sau đây là carbohydrate?')
+    expect(html).toContain('Glucose')
+    expect(html).toContain('Glucose là monosaccharide quan trọng.')
+    expect(html).toContain('Glucose là carbohydrate.')
+    // Cỡ chữ các thành phần lời giải đều nhau và bằng var(--mc-co, 28px)
+    expect(html).toContain('font-size:var(--mc-co,28px)!important')
+  })
 })
 
 type Tay = ReturnType<typeof useGhiToChieu>
