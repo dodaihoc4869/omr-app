@@ -45,4 +45,13 @@ describe('/gv/cau-sai-mo-coi — câu sai không có đường quay lại', () =
     const r = await goiWorker(worker, d.env, '/gv/cau-sai-mo-coi', {})
     expect(r.ok).not.toBe(true)
   })
+
+  it('04/10: lượt làm câu SONG SINH ("<gốc>~ss0") quy về câu gốc — không đếm thành câu ngoài kho', async () => {
+    const d = taoD1That()
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE9', 'G1', 'v1', 'g', 'D1', '{}')
+    d.sql.prepare("INSERT INTO chien_dich(id,ten,lop,sbd_json,ma_de_json,qid_json,han_nop,tao_luc) VALUES('CD1','Ôn','12','[\"E1\"]','[\"D\"]','[\"G1\"]','2026-10-05','2026-09-28T00:00:00.000Z')").run()
+    ghi(d, 'E1', 'G1~ss0', 'game', 0, '2026-10-03T03:00:00.000Z')
+    const r = await goiWorker(worker, d.env, '/gv/cau-sai-mo-coi', {}, true)
+    expect(r.tong).toMatchObject({ cauSai: 1, moCoi: 0, ngoaiKho: 0 })
+  })
 })
