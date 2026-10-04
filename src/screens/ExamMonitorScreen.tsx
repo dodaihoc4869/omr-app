@@ -25,7 +25,10 @@ import { sinhBoTheoEm, TEN_MUC_PHAN_TANG } from '../lib/de-rieng-blueprint'
 import { docCheDoDeRieng, docDeRiengCa, docSoCauCa, loadScriptUrl, loadSessionTeacherBank, luuDeRiengCa, luuSoCauCa, saveSessionTeacherBank, loadTeacherSecret, type BienBanDeRieng, type DeRiengCaLuu } from '../lib/exam-db'
 import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
-import { CAU_HINH_DE_RIENG_MAC_DINH, docPhamViHoiLai } from '../lib/cau-hinh-de-rieng'
+import { CAU_HINH_DE_RIENG_MAC_DINH, docPhamViHoiLai, laCaDaDung } from '../lib/cau-hinh-de-rieng'
+import { chayThuRutDeDaDung, chotRutDeDaDung, docRutThuDaDung, type RutThuDaDung } from '../lib/de-rieng-da-dung'
+import { xepSaiLaiDaDung, type EmSaiLaiDaDung } from '../lib/rut-de-da-dung'
+import { BangRutThuDaDung, KhoiSaiLaiDaDung } from '../components/ca-thi/KhoiDaDung'
 import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
 import { chayThuRutDeCa, chotRutDeCa, docRutThu, type RutThuCa } from '../lib/de-rieng-v2'
 import { demBac, MOI_BAC_LAP, PHAN_V2, TEN_BAC_LAP } from '../lib/rut-de-v2'
@@ -218,6 +221,8 @@ interface HangEm {
     /** Câu hỏi lại em đã làm đúng — tin tốt, cũng phải đếm được. */
     daSuaChiTiet: { phan: 'I' | 'II' | 'III'; soCau: number; qid: string; chuyenDe: string }[]
   } | null
+  /** Ca "Kiểm chứng câu đã đúng": câu em đã làm đúng trước đây có trong đề + câu nay sai lại (kèm nhãn). `null` ở ca khác. */
+  daDung?: EmSaiLaiDaDung | null
 }
 
 /** BIÊN BẢN LÚC RÚT ĐỀ RIÊNG — trả lời "vì sao em này không có câu hỏi lại".
@@ -396,6 +401,8 @@ export default function ExamMonitorScreen() {
   const [dangRutThu, setDangRutThu] = useState(false)
   const [loiRutThu, setLoiRutThu] = useState('')
   const [tenEmLop, setTenEmLop] = useState<Record<string, string>>({})
+  // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10): kết quả chạy thử riêng của chế độ này (src/lib/de-rieng-da-dung.ts).
+  const [rutThuDaDung, setRutThuDaDung] = useState<RutThuDaDung | null>(null)
   const daRutThuRef = useRef<string>('')
   const [gioChungTheoCa, setGioChungTheoCa] = useState<Record<string, boolean>>({})
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
@@ -601,6 +608,26 @@ export default function ExamMonitorScreen() {
           lap = null
         }
       }
+      // KIỂM CHỨNG CÂU ĐÃ ĐÚNG: câu nào trong đề là câu em đã làm đúng trước đây (bản đồ máy chủ `daDung`), nay đúng hay sai.
+      let daDung: HangEm['daDung'] = null
+      const nhanEm = chiTiet.daDungTheoEm?.[sbd]
+      if (nhanEm && Object.keys(nhanEm).length > 0 && teacherBank && moiNhat.dapAn && graded) {
+        try {
+          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
+          const cua = rows.filter((r) => r.qid in nhanEm)
+          const demEm = chiTiet.demDaDungTheoEm?.[sbd] ?? {}
+          daDung = {
+            sbd,
+            hoTen: hs?.hoTen ?? moiNhat.hoTen ?? '',
+            tong: cua.length,
+            sai: cua
+              .filter((r) => r.dungSai !== true)
+              .map((r) => ({ soCau: r.soCau, phan: r.phan, qid: r.qid, nhan: nhanEm[r.qid] ?? '', soLanDung: demEm[r.qid]?.[0], soLanSai: demEm[r.qid]?.[1] })),
+          }
+        } catch {
+          daDung = null
+        }
+      }
       out.push({
         sbd,
         hoTen: hs?.hoTen ?? moiNhat.hoTen ?? '',
@@ -611,6 +638,7 @@ export default function ExamMonitorScreen() {
         graded,
         diem: graded ? graded.score.total : moiNhat.tong,
         lap,
+        daDung,
       })
     })
     // Đã nộp/khoá lên trước theo giờ nộp mới nhất, rồi đang làm, rồi chờ thi lại.
@@ -1027,6 +1055,9 @@ export default function ExamMonitorScreen() {
       qidTrongKho: kho,
     })
   }, [bienBanGoc, teacherBank, chiTiet, deRiengCa, lapDungLai])
+  // KIỂM CHỨNG CÂU ĐÃ ĐÚNG: em sai nhiều câu đã làm đúng nhất lên đầu (thầy: "hiển thị lên trên trước cho tôi biết").
+  const laCaDaDungNay = laCaDaDung((chiTiet?.ca as { phamViHoiLai?: unknown } | undefined)?.phamViHoiLai) || Object.keys(chiTiet?.daDungTheoEm ?? {}).length > 0
+  const emSaiLaiDaDung = useMemo(() => xepSaiLaiDaDung(dsEm.flatMap((e) => (e.daDung ? [e.daDung] : []))), [dsEm])
   const tongKetLap = useMemo(() => {
     const co = dsEm.filter((e) => e.lap && e.lap.tong > 0)
     return {
@@ -1085,7 +1116,8 @@ export default function ExamMonitorScreen() {
       }
       setTenEmLop(ten)
       if (ds.size === 0) { setRutThu(null); return }
-      setRutThu(await chayThuRutDeCa(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { cheDo: cheDoRutV2 }))
+      if (laCaDaDungNay) setRutThuDaDung(await chayThuRutDeDaDung(scriptUrl.trim(), secret.trim(), maCaNay, [...ds]))
+      else setRutThu(await chayThuRutDeCa(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { cheDo: cheDoRutV2 }))
     } catch (e) {
       setLoiRutThu(e instanceof Error ? e.message : 'lỗi không rõ')
     } finally {
@@ -1094,13 +1126,13 @@ export default function ExamMonitorScreen() {
   }
   useEffect(() => {
     if (!canRutThu || !chiTiet || !scriptUrl.trim() || !secret.trim()) return
-    const khoa = `${chiTiet.ca.maCa}|${cheDoRutV2}`
+    const khoa = `${chiTiet.ca.maCa}|${laCaDaDungNay ? 'da_dung' : cheDoRutV2}`
     if (daRutThuRef.current === khoa) return
     daRutThuRef.current = khoa
     void chayRutThu()
     // Chạy MỘT lần mỗi ca (chiTiet tự làm mới 5 giây — không chạy lại theo nó); thầy bấm "Chạy thử lại" khi muốn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canRutThu, chiTiet?.ca.maCa, cheDoRutV2, scriptUrl, secret])
+  }, [canRutThu, chiTiet?.ca.maCa, cheDoRutV2, laCaDaDungNay, scriptUrl, secret])
 
   const batDauCaNay = async () => {
     if (!chiTiet) return
@@ -1120,6 +1152,7 @@ export default function ExamMonitorScreen() {
       let demSai: Record<string, Record<string, number>> | undefined
       let daLamLaiTheoEm: Record<string, Record<string, string>> | undefined
       let bacTheoEm: Record<string, Record<string, string>> | undefined
+      let banDoDaDung: { daDung: Record<string, Record<string, string>>; demDaDung: Record<string, Record<string, [number, number]>> } | undefined
       if (caCanDeRieng) {
         // ĐÚNG NHỮNG EM TRONG PHÒNG CHỜ — không ∪ cả lớp đăng ký (vá 19/09). Bản 17/09
         // gộp thêm mọi em cùng lớp: em vắng cũng chiếm một suất chia vòng tròn, nên
@@ -1139,7 +1172,27 @@ export default function ExamMonitorScreen() {
         // vào phòng sau; thang lấp: câu sai đến lịch ôn lại → câu song sinh → câu cùng dạng → câu mới (src/lib/rut-de-v2.ts).
         // Máy chủ chưa có lệnh lỗi đến hạn / máy này thiếu kho ⇒ đi đường rút cũ ngay bên dưới, và nói ra.
         // Ca "Không rút câu sai" giữ đường cũ (không có ô ôn lại nào để lấp).
-        if (pv !== 'khong') {
+        if (laCaDaDungNay) {
+          // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10): dùng lại chạy thử, chốt MỘT lệnh. Hỏng thì KHÔNG đi đường rút cũ (đường cũ lấp câu em chưa đúng
+          // — trái yêu cầu "chỉ chọn câu làm đúng"): báo thầy và dừng, chưa bắt đầu ca.
+          try {
+            const dd = await chotRutDeDaDung(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho)
+            boTheoEm = dd.boTheoEm
+            lapTheoEm = {}
+            demSai = {}
+            banDoDaDung = dd.banDoDaDung
+            bienBan = dd.bienBan as unknown as BienBanDeRieng
+            await luuDeRiengCa(chiTiet.ca.maCa, dd.boTheoEm, {}, {}, bienBan)
+            setRutThuDaDung(docRutThuDaDung(chiTiet.ca.maCa) ?? null)
+            if (dd.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${dd.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
+            if (dd.soCauNoiThem > 0) showToast(`Đã nối ${dd.soCauNoiThem} câu em đã làm đúng (ngoài kho ca) vào đề ca này.`, 'success')
+            for (const c of dd.canhBao) showToast(c, 'warn')
+          } catch (e) {
+            showToast(`Chưa rút được đề "Kiểm chứng câu đã đúng" (${e instanceof Error ? e.message : 'lỗi không rõ'}) — ca chưa bắt đầu, thầy bấm lại.`, 'error')
+            setDangBatDau(false)
+            return
+          }
+        } else if (pv !== 'khong') {
           try {
             const v2 = await chotRutDeCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, dsCho, { cheDo: cheDoRutV2, phamVi: pv })
             boTheoEm = v2.boTheoEm
@@ -1225,7 +1278,7 @@ export default function ExamMonitorScreen() {
           }
         }
       }
-      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>, gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false, daLamLaiTheoEm, bacTheoEm)
+      const kq = await batDauThi(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, boTheoEm, lapTheoEm, demSai, bienBan as unknown as Record<string, unknown>, gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false, daLamLaiTheoEm, bacTheoEm, banDoDaDung)
       for (const d of bcTranTrung) showToast(d, d.startsWith('Không dựng được') ? 'error' : 'success')
       if (kq.thieuBoTheoEm) {
         // KHÔNG NUỐT. Ca đã phát đề trước khi có bản đồ ⇒ em làm một bộ câu,
@@ -1390,7 +1443,16 @@ export default function ExamMonitorScreen() {
               matKetNoi={soHut > 0}
             />
           )}
-          {caCanDeRieng && chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && pvCa !== 'khong' && (
+          {caCanDeRieng && chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && laCaDaDungNay && (
+            <BangRutThuDaDung
+              rt={rutThuDaDung?.maCa === chiTiet.ca.maCa ? rutThuDaDung : null}
+              dang={dangRutThu || (canRutThu && daRutThuRef.current !== `${chiTiet.ca.maCa}|da_dung`)}
+              loi={canRutThu ? loiRutThu : teacherBank && soCauCa ? loiRutThu : 'máy này chưa có bản đề có đáp án hoặc số câu mỗi phần của ca'}
+              tenCua={tenEmLop}
+              onChayLai={() => void chayRutThu()}
+            />
+          )}
+          {caCanDeRieng && chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && pvCa !== 'khong' && !laCaDaDungNay && (
             <BangRutThuV2
               rt={rutThu?.maCa === chiTiet.ca.maCa ? rutThu : null}
               dang={dangRutThu || (canRutThu && daRutThuRef.current !== `${chiTiet.ca.maCa}|${cheDoRutV2}`)}
@@ -1476,7 +1538,8 @@ export default function ExamMonitorScreen() {
     if (!chiTiet) return null
     return (
       <>
-        {laCaDeRieng && (
+        {laCaDaDungNay && <KhoiSaiLaiDaDung ds={emSaiLaiDaDung} soEmDaCham={emSaiLaiDaDung.length} />}
+        {laCaDeRieng && !laCaDaDungNay && (
               <div>
                 <button
                   type="button"

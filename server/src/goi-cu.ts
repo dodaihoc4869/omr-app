@@ -607,11 +607,14 @@ function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: string): R
   const dem = doiTuong(goi.dem)[sbd]
   // Ca "Không rút câu sai" (29/09): nhãn "đã làm ở ca dd/mm" của CHÍNH em — chỉ qid + ngày, không đáp án.
   const daLam = doiTuong(goi.daLam)[sbd]
+  // Ca "Kiểm chứng câu đã đúng" (02/10): nhãn "Em đã làm đúng: …" của CHÍNH em — chỉ qid + chữ nhãn, không đáp án.
+  const daDung = doiTuong(goi.daDung)[sbd]
   return {
     bo: { [sbd]: cua },
     lap: Array.isArray(lap) ? { [sbd]: lap } : {},
     dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
     ...(daLam && typeof daLam === 'object' && !Array.isArray(daLam) ? { daLam: { [sbd]: daLam } } : {}),
+    ...(daDung && typeof daDung === 'object' && !Array.isArray(daDung) ? { daDung: { [sbd]: daDung } } : {}),
     bb: null,
   }
 }

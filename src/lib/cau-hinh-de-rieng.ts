@@ -60,6 +60,15 @@ export function docPhamViHoiLai(v: unknown): PhamViHoiLai {
   return v === 'khong' ? v : 'gan_nhat'
 }
 
+/** Phạm vi ghi ở ca (cột `pham_vi_hoi_lai`): thêm `da_dung` = chế độ "Kiểm chứng câu đã đúng" (02/10 — src/lib/rut-de-da-dung.ts).
+ * Giữ RIÊNG khỏi `PhamViHoiLai` để mọi đường rút cũ đọc `docPhamViHoiLai` vẫn y như trước. */
+export type PhamViHoiLaiCa = PhamViHoiLai | 'da_dung'
+export function docPhamViHoiLaiCa(v: unknown): PhamViHoiLaiCa {
+  return v === 'da_dung' ? 'da_dung' : docPhamViHoiLai(v)
+}
+/** Ca mở ở chế độ "Kiểm chứng câu đã đúng". */
+export const laCaDaDung = (v: unknown): boolean => v === 'da_dung'
+
 /** Hai nút theo đúng thứ tự trên màn Mở ca. */
 export const MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'khong']
 

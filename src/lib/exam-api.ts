@@ -19,7 +19,8 @@ import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
-import { docPhamViHoiLai } from './cau-hinh-de-rieng'
+import { docPhamViHoiLaiCa } from './cau-hinh-de-rieng'
+import { daDungCuaEm } from './rut-de-da-dung'
 import { donTheoMocReset } from './don-moc-reset-giao-vien'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -273,6 +274,8 @@ export type KetQuaVaoThi =
       /** Ca "Không rút câu sai": qid → 'dd/mm' câu em đã làm ở ca kiểm tra trước,
        * phát lại vì kho thiếu. Máy em in nhãn "Đã làm ở ca kiểm tra dd/mm". */
       daLamLai?: Record<string, string>
+      /** Ca "Kiểm chứng câu đã đúng": qid → nhãn "Ca … · dd/mm · Thông hiểu" (máy em in "Em đã làm đúng: …"). Không kèm đáp án. */
+      daDungNhan?: Record<string, string>
     }
   | { ok: false; lyDo: LyDoChan; nopLuc?: string; lanThu?: number; batDau?: string; hetHanVao?: string; namSinh?: string; error?: string }
 
@@ -531,6 +534,52 @@ export async function loiDenHanTheoEm(
   return ra
 }
 
+/** Một câu em đã tự làm đúng như `/ca/cau-da-dung` trả về (KHÔNG có đáp án). */
+export interface CauDaDungEm {
+  qid: string
+  phan: 'I' | 'II' | 'III'
+  mucDo: string
+  dang: string
+  noi: string
+  ngayDung: string
+  nhan: string
+  lucDung: string
+  soLanDung: number
+  soLanSai: number
+}
+
+/** KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10) — `/ca/cau-da-dung` theo LÔ 20 em (4 lô song song). Máy chủ chưa có lệnh ⇒ NÉM LỖI. */
+export async function cauDaDungTheoEm(scriptUrl: string, secret: string, dsSbd: string[]): Promise<{ em: Record<string, CauDaDungEm[]> }> {
+  const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
+  const ra = { em: {} as Record<string, CauDaDungEm[]> }
+  if (ds.length === 0) return ra
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) throw new Error('Máy này chưa có địa chỉ máy chủ mới')
+  const lo: string[][] = []
+  for (let i = 0; i < ds.length; i += 20) lo.push(ds.slice(i, i + 20))
+  let chiSo = 0
+  const chay = async () => {
+    while (chiSo < lo.length) {
+      const phan = lo[chiSo++]!
+      const res = await fetchCoHan(
+        `${base}/ca/cau-da-dung`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
+          body: JSON.stringify({ secret: secret.trim(), sbd: phan }),
+        },
+        HAN_GIAY,
+      )
+      if (!res.ok) throw new Error(res.status === 404 ? 'Máy chủ chưa có lệnh câu đã làm đúng' : `Máy chủ trả lỗi HTTP ${res.status}`)
+      const r = (await res.json()) as { ok?: boolean; error?: string; em?: Record<string, CauDaDungEm[]> }
+      if (!r.ok) throw new Error(r.error || 'Không đọc được câu em đã làm đúng')
+      Object.assign(ra.em, r.em ?? {})
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(4, lo.length) }, chay))
+  return ra
+}
+
 /** THẦY BẤM BẮT ĐẦU THI. Từ giây đó máy em mới xin đề và đồng hồ mới chạy.
  * Bấm lần hai giữ mốc lần đầu — không kéo dài giờ của em đã vào. */
 export async function batDauThi(
@@ -561,6 +610,8 @@ export async function batDauThi(
   daLamLaiTheoEm?: Record<string, Record<string, string>>,
   /** RÚT ĐỀ v2: sbd → (qid → bậc lấp) — chỉ thầy xem, máy chủ không gửi xuống máy em. */
   bacTheoEm?: Record<string, Record<string, string>>,
+  /** Ca "Kiểm chứng câu đã đúng" (02/10): `daDung` sbd → (qid → nhãn — máy chủ chỉ trả phần của chính em), `demDaDung` (chỉ thầy xem). */
+  banDoDaDung?: { daDung: Record<string, Record<string, string>>; demDaDung: Record<string, Record<string, [number, number]>> },
 ): Promise<{ batDauLuc: string; daBatTruoc: boolean; thieuBoTheoEm: boolean; chuaSangMayChuMoi: boolean }> {
   // RÚT ĐỀ v2 (02/10): CHỐT MỘT LỆNH — mốc bắt đầu và bản đồ đề riêng ghi trong CÙNG một câu UPDATE trên máy chủ, nên không em nào
   // vào được khe "đã bắt đầu mà chưa có bản đồ". Máy chủ đời cũ chưa có lệnh (404) ⇒ đi tiếp đường cũ bên dưới (dự phòng).
@@ -572,6 +623,7 @@ export async function batDauThi(
         bb: bienBan ?? null,
         ...(daLamLaiTheoEm && Object.keys(daLamLaiTheoEm).length > 0 ? { daLam: daLamLaiTheoEm } : {}),
         ...(bacTheoEm && Object.keys(bacTheoEm).length > 0 ? { bac: bacTheoEm } : {}),
+        ...(banDoDaDung ? { cheDo: 'da_dung', daDung: banDoDaDung.daDung, demDaDung: banDoDaDung.demDaDung } : {}),
       }
     : undefined
   const chot = await chotBatDauMoi(scriptUrl, secret, maCa, goiBanDo, dongBoGio)
@@ -705,7 +757,7 @@ async function vaoThiQuaMayChuMoi(
   // Không đoán, vì đoán sai ở đây là em làm bài trên một lượt không tồn tại.
   if (!r.cach) throw new Error('Máy chủ trả lời thiếu trường "cách vào" — báo Thầy.')
 
-  const goi = (r.boTheoEm ?? null) as { bo?: Record<string, string[]>; lap?: Record<string, string[]>; dem?: Record<string, Record<string, number>>; daLam?: Record<string, unknown> } | null
+  const goi = (r.boTheoEm ?? null) as { bo?: Record<string, string[]>; lap?: Record<string, string[]>; dem?: Record<string, Record<string, number>>; daLam?: Record<string, unknown>; daDung?: Record<string, unknown> } | null
   const coBanDo = !!goi && !!goi.bo && Object.keys(goi.bo).length > 0
   const boEm = coBanDo ? goi!.bo![sbd] : undefined
   // CA ĐỀ RIÊNG MÀ BẢN ĐỒ THIẾU PHẦN CỦA EM ⇒ TỪ CHỐI HẲN, không phát đề.
@@ -765,6 +817,7 @@ async function vaoThiQuaMayChuMoi(
     boCuaEm: cauLapCuaEm(boEm),
     demLap: demLapCuaEm(goi?.dem?.[sbd], cauLapCuaEm(goi?.lap?.[sbd])),
     daLamLai: daLamLaiCuaEm(goi?.daLam?.[sbd]),
+    daDungNhan: daDungCuaEm(goi?.daDung?.[sbd]),
   }
 }
 
@@ -898,7 +951,7 @@ export interface MocThoiGianCa {
    * phải rút bộ câu riêng (thầy bắt được ở ca 933467, 08/09). */
   deRieng?: boolean
   /** Lấy câu sai của ca gần nhất hay gộp 3 ca gần nhất (thầy chốt 08/09). */
-  phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong'
+  phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' | 'da_dung'
   matKhau?: string
   chiNop3PhutCuoi?: boolean
 }
@@ -991,7 +1044,7 @@ export async function publishSession(
                 : '',
           lenBang: moc.lenBang !== false,
           deRieng: moc.deRieng === true,
-          phamViHoiLai: docPhamViHoiLai(moc.phamViHoiLai),
+          phamViHoiLai: docPhamViHoiLaiCa(moc.phamViHoiLai),
           matKhau: moc.matKhau?.trim() || undefined,
           chiNop3PhutCuoi: moc.chiNop3PhutCuoi === true,
         },
@@ -2296,7 +2349,7 @@ export interface CaTomTat {
    * Ca mở trước 08/09 không có cột này ⇒ false, chạy y như trước. */
   deRieng?: boolean
   /** Phạm vi lấy câu sai của ca đề riêng: 'gan_nhat' | 'ba_ca' | 'khong'. */
-  phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong'
+  phamViHoiLai?: 'gan_nhat' | 'ba_ca' | 'khong' | 'da_dung'
   daVao: number
   daNop: number
   canhBao: number
@@ -2452,6 +2505,10 @@ export interface ChiTietCa {
   demSaiTheoEm?: Record<string, Record<string, number>>
   /** Biên bản lúc rút đề riêng, đọc từ máy chủ. */
   bienBanDeRieng?: Record<string, unknown> | null
+  /** Ca "Kiểm chứng câu đã đúng": sbd → qid → nhãn nơi · ngày · mức độ (đọc từ máy chủ). */
+  daDungTheoEm?: Record<string, Record<string, string>>
+  /** sbd → qid → [số lần đúng, số lần sai] trước ca này. */
+  demDaDungTheoEm?: Record<string, Record<string, [number, number]>>
   /** Tổng số phút thầy đã "Thêm phút" cho ca (máy chủ có lệnh /ca/them-phut mới trả; vắng = 0 hoặc máy chủ cũ). */
   themPhutTong?: number
 }
@@ -2522,6 +2579,8 @@ function doiChiTietCaMoi(j: Record<string, unknown>): ChiTietCa {
     lapTheoEm: ((j.boTheoEmCa as { lap?: Record<string, string[]> } | null)?.lap) ?? undefined,
     demSaiTheoEm: ((j.boTheoEmCa as { dem?: Record<string, Record<string, number>> } | null)?.dem) ?? undefined,
     bienBanDeRieng: ((j.boTheoEmCa as { bb?: Record<string, unknown> } | null)?.bb) ?? undefined,
+    daDungTheoEm: ((j.boTheoEmCa as { daDung?: Record<string, Record<string, string>> } | null)?.daDung) ?? undefined,
+    demDaDungTheoEm: ((j.boTheoEmCa as { demDaDung?: Record<string, Record<string, [number, number]>> } | null)?.demDaDung) ?? undefined,
     ...(Number.isFinite(Number(j.themPhutTong ?? c.themPhutTong)) && (j.themPhutTong ?? c.themPhutTong) != null ? { themPhutTong: Number(j.themPhutTong ?? c.themPhutTong) } : {}),
   }
 }

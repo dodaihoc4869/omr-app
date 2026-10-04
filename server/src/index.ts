@@ -78,6 +78,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 //      lệnh của THẦY thì đòi. Không nới luật này ở bất kỳ đâu.
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chotBatDau, lapBoChoEmVaoMuon, loiDenHan } from './rut-de-v2'
+import { cauDaDung, lapBoDaDungChoEmVaoMuon } from './cau-da-dung'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
@@ -267,11 +268,14 @@ export function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: str
   const dem = doiTuong(goi.dem)[sbd]
   // Ca "Không rút câu sai" (29/09): nhãn "đã làm ở ca dd/mm" của CHÍNH em — chỉ qid + ngày, không đáp án.
   const daLam = doiTuong(goi.daLam)[sbd]
+  // Ca "Kiểm chứng câu đã đúng" (02/10): nhãn "Em đã làm đúng: …" của CHÍNH em — chỉ qid + chữ nhãn, không đáp án.
+  const daDung = doiTuong(goi.daDung)[sbd]
   return {
     bo: { [sbd]: cua },
     lap: Array.isArray(lap) ? { [sbd]: lap } : {},
     dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
     ...(daLam && typeof daLam === 'object' && !Array.isArray(daLam) ? { daLam: { [sbd]: daLam } } : {}),
+    ...(daDung && typeof daDung === 'object' && !Array.isArray(daDung) ? { daDung: { [sbd]: daDung } } : {}),
     // BIÊN BẢN là ghi chép của THẦY về cả lớp — không đi xuống máy em.
     bb: null,
   }
@@ -289,10 +293,10 @@ async function batchGop(env: Env, cau: D1PreparedStatement[], ghi: boolean[] = [
 /** Cột `ca` mà đường nóng của EM cần (vào thi · phòng chờ · nộp): mọi cột `vaoThi`/`quyetDinhVaoThi`/`mocHetGio`/`hopPhamVi` đọc — TRỪ
  * `bo_theo_em_json`. Bản đồ đề riêng của CẢ LỚP nằm ở cột ấy (300 em ≈ 150–300 KB): `SELECT *` kéo nguyên khối qua mạng D1 rồi
  * JSON.parse ở MỖI lượt vào thi, dù em chỉ cần phần của mình (tối ưu ca 30/09). Tên cột ⊂ cột `dayCa` đang ghi ⇒ chắc chắn có trên D1 thật. */
-const COT_CA_EM = 'ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop, cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, mat_khau, chi_nop_3_phut_cuoi, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, pham_vi, de_rieng, danh_sach_chon_json, dong_bo_gio'
+const COT_CA_EM = 'ma_ca, ten_ca, trang_thai, bat_dau, het_han_vao, thoi_gian_phut, loai, han_nop, cong_bo, nguong_lan, nguong_giay, bank_r2, so_cau_json, mat_khau, chi_nop_3_phut_cuoi, cap_nhat_luc, lop, phong_cho, bat_dau_thi_luc, giu_de_doc, an_han_giay, pham_vi, de_rieng, danh_sach_chon_json, dong_bo_gio, pham_vi_hoi_lai'
 /** SBD đi thẳng vào đường dẫn JSON `$."<sbd>"` được — chỉ chữ/số/gạch; khoá đặc biệt của đối tượng JS thì đi đường đọc trọn (như cũ). */
 const SBD_DUONG_JSON = /^[A-Za-z0-9_-]{1,64}$/
-const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'bb', 'bac', '__proto__', 'constructor', 'prototype'])
+const KHOA_KHONG_CAT = new Set(['bo', 'lap', 'dem', 'daLam', 'daDung', 'demDaDung', 'cheDo', 'bb', 'bac', '__proto__', 'constructor', 'prototype'])
 
 export interface DocVaoThi {
   ca: DongCa | null
@@ -318,9 +322,10 @@ export async function docCaVaoThi(env: Env, maCa: string, sbd: string): Promise<
                 CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_lap,
                 CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_dem,
                 CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_da_lam,
+                CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_da_dung,
                 CASE WHEN ${laDoiTuong} THEN bo_theo_em_json -> ? END AS goi_phang
            FROM ca WHERE ma_ca = ?`,
-      ).bind(`$.bo.${q}`, `$.lap.${q}`, `$.dem.${q}`, `$.daLam.${q}`, `$.${q}`, maCa)
+      ).bind(`$.bo.${q}`, `$.lap.${q}`, `$.dem.${q}`, `$.daLam.${q}`, `$.daDung.${q}`, `$.${q}`, maCa)
     : env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa)
   const [rCa, rCo, rEm, rLuot] = await batchGop(env, [
     cauCa,
@@ -344,7 +349,7 @@ export async function docCaVaoThi(env: Env, maCa: string, sbd: string): Promise<
     const g = (v: unknown): unknown => (v === null || v === undefined ? undefined : JSON.parse(String(v)))
     const dat = (o: Record<string, unknown>, v: unknown) => { if (v !== undefined) o[sbd] = v; return o }
     if (dong.goi_kieu_bo === 'object') {
-      return { bo: dat({}, g(dong.goi_bo)), lap: dat({}, g(dong.goi_lap)), dem: dat({}, g(dong.goi_dem)), daLam: dat({}, g(dong.goi_da_lam)) }
+      return { bo: dat({}, g(dong.goi_bo)), lap: dat({}, g(dong.goi_lap)), dem: dat({}, g(dong.goi_dem)), daLam: dat({}, g(dong.goi_da_lam)), daDung: dat({}, g(dong.goi_da_dung)) }
     }
     return dat({}, g(dong.goi_phang))
   }
@@ -470,10 +475,13 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     if (!goiGoc && Number.isFinite(batDauMs) && now - batDauMs >= 0 && now - batDauMs < CHO_BAN_DO_MS) {
       return ra({ ok: false, lyDo: 'cho_bo_cau', thuLaiSauMs: 1500, thoiGianPhut: ca.thoi_gian_phut ?? 45 })
     }
-    const lap = await lapBoChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch((e) => {
-      console.error('[vao-thi] lấp bộ câu riêng lỗi:', e)
-      return null
-    })
+    // Ca "Kiểm chứng câu đã đúng" (02/10): lấp CHỈ từ câu em đã tự làm đúng (server/src/cau-da-dung.ts) — không lấp câu em chưa đúng.
+    const laDaDung = String((ca as { pham_vi_hoi_lai?: unknown }).pham_vi_hoi_lai ?? '') === 'da_dung'
+    const loiLap = (e: unknown) => { console.error('[vao-thi] lấp bộ câu riêng lỗi:', e); return null }
+    // Em CHƯA có câu đã đúng nào trong kho ca (em mới / chưa làm chiến dịch) ⇒ KHÔNG chặn em ngoài phòng: lấp bằng thang rút đề v2 thường
+    // (câu mới đúng ma trận). Bộ này không có nhãn "đã làm đúng"; bảng xem trước của thầy đã báo em thiếu câu đã đúng.
+    const lap = (laDaDung ? await lapBoDaDungChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch(loiLap) : null)
+      ?? await lapBoChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch(loiLap)
     if (lap) goiRieng = lap
   }
   if (Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng) {
@@ -1389,7 +1397,7 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       // ca này phát đề riêng từng em; thiếu nó là thầy bấm Bắt đầu mà cả lớp
       // nhận chung một đề.
       deRieng: Number(ca.de_rieng ?? 0) === 1,
-      phamViHoiLai: ['ba_ca', 'khong'].includes(String(ca.pham_vi_hoi_lai ?? '')) ? String(ca.pham_vi_hoi_lai) : 'gan_nhat',
+      phamViHoiLai: ['ba_ca', 'khong', 'da_dung'].includes(String(ca.pham_vi_hoi_lai ?? '')) ? String(ca.pham_vi_hoi_lai) : 'gan_nhat',
       danhSachChon: doJson(ca.danh_sach_chon_json),
     },
     luot,
@@ -3615,6 +3623,8 @@ const boXuLy = {
       // RÚT ĐỀ v2 (02/10, server/src/rut-de-v2.ts): chốt Bắt đầu MỘT lệnh (mốc + bản đồ); lỗi đến hạn theo em cho máy thầy chạy thử.
       if (p === '/ca/chot-bat-dau') return ra({ ...(await chotBatDau(env, b)), chot: true })
       if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
+      // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10, server/src/cau-da-dung.ts): câu em đã tự làm đúng trong các chiến dịch, kèm nhãn nơi · ngày · mức độ.
+      if (p === '/ca/cau-da-dung') return ra(await cauDaDung(env, b))
       if (p === '/ca/xac-nhan') {
         const maCa = String(b.maCa ?? '')
         const ca = await docCa(env, maCa)

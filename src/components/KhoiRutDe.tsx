@@ -14,7 +14,8 @@ import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
-import { GIAI_THICH_PHAM_VI, MOI_PHAM_VI_HOI_LAI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../lib/cau-hinh-de-rieng'
+import { GIAI_THICH_PHAM_VI, MOI_PHAM_VI_HOI_LAI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng, type PhamViHoiLaiCa } from '../lib/cau-hinh-de-rieng'
+import { chuPhanBo, phanBoMaTran2026, soCauTheoPhan } from '../lib/rut-de-da-dung'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -149,15 +150,18 @@ export interface KhoiRutDeProps {
    *
    * `lenBang` = bộ này rút cho buổi chữa bài ⇒ ca đẩy dữ liệu sang màn Gọi lên
    * bảng. `idsChua` = KHO CHỮA rộng hơn đề em làm, chỉ có ở chế độ đó. */
-  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: CauHinhDeRieng['PHAM_VI_HOI_LAI'] } | null) => void
+  onDoi: (kq: { ids: Set<string>; soCau: SoCauPhan; lenBang: boolean; idsChua?: Set<string>; deRieng?: boolean; phamViHoiLai?: PhamViHoiLaiCa } | null) => void
   /** Đổi thời lượng ca giúp thầy. Chỉ gọi khi thầy BẤM chip "Phân công lên
    * bảng": bộ câu chẩn đoán chốt cứng 15 phút, để ca 45 phút thì ô giờ nói một
    * đằng bộ câu một nẻo. Không ép sau đó — thầy vẫn sửa ô giờ tuỳ ý. */
   onDoiPhutLamBai?: (phut: number) => void
 }
 
-/** Ba cách lấy câu. `lenbang` là chế độ máy tự chọn cho buổi chữa bài. */
-type CheDoLay = 'rut' | 'tron' | 'lenbang'
+/** Bốn cách lấy câu. `lenbang` là chế độ máy tự chọn cho buổi chữa bài; `dadung` = "Kiểm chứng câu đã đúng" (02/10). */
+type CheDoLay = 'rut' | 'tron' | 'lenbang' | 'dadung'
+
+/** Số câu mỗi em chọn nhanh ở chế độ "Kiểm chứng câu đã đúng" (chia theo tỷ lệ ma trận 2026). */
+const SO_CAU_DA_DUNG_NHANH = [10, 14, 28] as const
 
 /** Kho ca rộng gấp mấy lần số câu mỗi em, để hai em ngồi cạnh nhau nhận đề
  * khác nhau. Gấp 3 là mỗi em lấy 1/3 kho: đủ khác nhau mà gói đề chưa phình. */
@@ -180,6 +184,10 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [cheDo, setCheDo] = useState<CheDoLay>(() => (tongKho > tongCau(SO_CAU_CHUAN) ? 'rut' : 'tron'))
   const rut = cheDo === 'rut'
   const lenBang = cheDo === 'lenbang'
+  const daDung = cheDo === 'dadung'
+  // KIỂM CHỨNG CÂU ĐÃ ĐÚNG: thầy chọn TỔNG số câu; app chia theo tỷ lệ từng ô (phần × mức độ) của ma trận 2026.
+  const [tongDaDung, setTongDaDung] = useState(14)
+  const phanBoDaDung = useMemo(() => phanBoMaTran2026(tongDaDung), [tongDaDung])
   // SỐ CÂU MỖI EM LÀM — mặc định cấu trúc chuẩn 14 câu (9 - 2 - 3) Thầy chốt.
   const [soCau, setSoCau] = useState<SoCauPhan>(() => ({
     I: Math.min(SO_CAU_14.I, co.I),
@@ -252,6 +260,18 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
       onDoi(null)
       return
     }
+    // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10): ca đề riêng từng em, mỗi em chỉ nhận câu CHÍNH EM đã tự làm đúng trong các chiến dịch, theo tỷ
+    // lệ ma trận 2026 (src/lib/rut-de-da-dung.ts). Kho rộng (mọi câu đã tích) để câu em đã đúng có sẵn trong kho ca thì khỏi nối thêm.
+    if (daDung) {
+      onDoi({
+        ids: new Set(nguon.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))),
+        soCau: soCauTheoPhan(phanBoDaDung),
+        lenBang: false,
+        deRieng: true,
+        phamViHoiLai: 'da_dung',
+      })
+      return
+    }
     // KIỂM TRA ĐIỂM YẾU (Rút đề v2, 02/10): BỘ RIÊNG TỪNG EM. Số câu = số câu chẩn đoán theo thời lượng ca (`soCauCua(kq)`);
     // lúc Bắt đầu, app rút cho từng em từ câu em đã sửa đúng nhưng chưa kiểm chứng và lỗi đến hạn của chính em (ưu tiên câu song
     // sinh), thiếu thì lấp bằng câu cùng dạng rồi câu mới (src/lib/rut-de-v2.ts). Ca tự bật phòng chờ (cờ đề riêng). Kho chữa
@@ -275,7 +295,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
       deRieng,
       phamViHoiLai,
     })
-  }, [cheDo, lenBang, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, deRieng, phamViHoiLai, nguon])
+  }, [cheDo, lenBang, daDung, phanBoDaDung, kq, soCau, onDoi, uv, phutLamBai, qidCaTruoc, seed, deRieng, phamViHoiLai, nguon])
 
   const daRut = kq ? soCauCua(kq) : { I: 0, II: 0, III: 0 }
   const thieu = kq ? PHAN_DE.filter((p) => kq.thieu[p] > 0) : []
@@ -327,9 +347,35 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
         >
           Kiểm tra điểm yếu
         </Chip>
+        <Chip chon={daDung} onClick={() => setCheDo('dadung')} mau="tim">
+          Kiểm chứng câu đã đúng
+        </Chip>
       </div>
 
-      {lenBang ? (
+      {daDung ? (
+        <div className="flex flex-col" style={{ gap: 'var(--k2)' }} data-khoi="da-dung">
+          <div style={NHAN_NHO}>
+            Mỗi em một đề riêng CHỈ gồm câu chính em đã tự làm đúng trong các chiến dịch em tham gia (không tính lần có hỗ trợ hay chỉ đọc lời giải, không câu tự luận). App bốc ngẫu nhiên đúng tỷ lệ ma trận 2026
+            theo từng phần và mức độ. Mỗi câu ghi rõ em đã làm đúng ở đâu, ngày nào, mức độ gì.
+          </div>
+          <div style={NHAN_NHO}>Số câu mỗi em làm</div>
+          <div className="flex flex-wrap items-end" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Số câu mỗi em">
+            {SO_CAU_DA_DUNG_NHANH.map((n) => (
+              <Chip key={n} chon={tongDaDung === n} onClick={() => setTongDaDung(n)}>
+                {n} câu
+              </Chip>
+            ))}
+            <OSo nhan="Tổng số câu" tri={tongDaDung} doi={(n) => setTongDaDung(Math.max(1, n))} tran={40} />
+          </div>
+          <div style={{ ...NHAN_NHO, color: 'var(--muc)' }} data-khoi="phan-bo-da-dung">
+            {chuPhanBo(phanBoDaDung)}
+          </div>
+          <OThongBao tone="xanh">
+            Em nào chưa làm đúng đủ câu ở một ô thì app lấy câu em đã đúng cùng phần, mức độ gần nhất; vẫn thiếu thì ô đó để trống — không lấp bằng câu em chưa làm đúng. Ca tự bật phòng chờ; thầy xem
+            trước em nào thiếu câu ở màn Theo dõi ca trước khi bấm Bắt đầu thi.
+          </OThongBao>
+        </div>
+      ) : lenBang ? (
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }} data-khoi="len-bang">
           <div style={NHAN_NHO}>
             App tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối. Ca này để ĐO điểm yếu; muốn tự tay chọn bài chữa thì
