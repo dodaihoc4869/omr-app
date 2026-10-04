@@ -9,6 +9,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // hàng, mã thẳng hàng với dòng đầu của nội dung. Ảnh cắt từ đề gốc (HinhAnh) nhúng đúng vị trí: sau đề, sau từng
 // phương án/ý (đi theo chữ cái GỐC khi xáo), cuối câu. Chỉ dùng biến tokens.css.
 import { Check, History, RotateCcw, X as XIcon } from 'lucide-react'
+import { chuNhanDaDung } from '../lib/rut-de-da-dung'
 import { normalizeNumericAnswer } from '../engine/score'
 import { khopPhanIII } from '../lib/cham-so'
 import { laChuGiuCho } from '../lib/anh-phuong-an'
@@ -56,6 +57,9 @@ interface BaseProps {
    * vì kho thiếu. `ngay` = 'dd/mm' ('' = không rõ ngày). Chỉ báo đã gặp — không
    * nói đúng/sai, không kèm đáp án. */
   daLamO?: { ngay: string }
+  /** Ca "Kiểm chứng câu đã đúng" (02/10): câu em ĐÃ TỰ LÀM ĐÚNG trước đây. `nhan` = "Ca … · dd/mm · Thông hiểu" (nơi của lần đúng gần
+   * nhất, ngày, mức độ). Chữ nhỏ, màu trung tính, ngay dưới số câu. Không kèm đáp án. */
+  daDungO?: { nhan: string }
   onZoom?: (src: string) => void
   /** Nút "Hỏi thầy" (thầy lệnh 30/09: CHỈ hiện khi lời giải đang hiện). Vẽ BÊN TRONG khối lời giải ⇒ chế độ `thi`
    * (chưa có lời giải) hoặc câu không có lời giải thì không có nút. KHÔNG truyền trong màn thi. */
@@ -198,6 +202,14 @@ function DaiDaLam({ ngay }: { ngay: string }) {
     >
       <History size={15} aria-hidden />
       <span>{ngay ? `Đã làm ở ca kiểm tra ${ngay}` : 'Đã làm ở ca kiểm tra trước'}</span>
+    </div>
+  )
+}
+
+function DaiDaDung({ nhan }: { nhan: string }) {
+  return (
+    <div data-da-dung="1" style={{ padding: '6px var(--k5)', background: 'var(--the-2)', color: 'var(--nhat)', fontSize: 13, lineHeight: 1.5 }}>
+      {chuNhanDaDung(nhan)}
     </div>
   )
 }
@@ -486,6 +498,7 @@ export default function TheCau(props: TheCauProps) {
           không còn ảnh hưởng bài làm. */}
       {props.cauHoiLai && <DaiHoiLai soLanSai={props.cauHoiLai.soLanSai} />}
       {props.daLamO && <DaiDaLam ngay={props.daLamO.ngay} />}
+      {props.daDungO && props.daDungO.nhan && <DaiDaDung nhan={props.daDungO.nhan} />}
       <div className="flex flex-col" style={{ padding: 'var(--k5)', gap: 'var(--k3)' }}>
         {thanCauImg ? (
           <button type="button" onClick={() => onZoom?.(thanCauImg)} className="block w-full" title="Bấm để phóng to">

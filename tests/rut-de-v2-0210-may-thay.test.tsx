@@ -227,7 +227,7 @@ describe('màn Theo dõi ca — bảng Xem trước phân bổ và nút Bắt đ
     expect(than.indexOf('chotRutDeCa(')).toBeGreaterThan(0)
     expect(than.indexOf('chotRutDeCa(')).toBeLessThan(than.indexOf('dungDeRiengChoCa('))
     expect(than).toContain('if (!boTheoEm) {')
-    expect(than).toContain('daLamLaiTheoEm, bacTheoEm)')
+    expect(than).toContain('daLamLaiTheoEm, bacTheoEm, banDoDaDung)') // 02/10: thêm bản đồ nhãn ca "Kiểm chứng câu đã đúng"
     expect(ma).toContain('chayThuRutDeCa(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { cheDo: cheDoRutV2 })')
     expect(ma).toContain("const cheDoRutV2: 'ca' | 'diem_yeu' = chiTiet?.ca.lenBang === true ? 'diem_yeu' : 'ca'")
   })

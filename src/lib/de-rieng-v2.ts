@@ -25,7 +25,7 @@ import {
   type PhanV2,
 } from './rut-de-v2'
 
-type CauNgoai = { phan: PhanV2; cau: TeacherMcqQuestion | TeacherShortAnswerQuestion | TeacherExamSource['phanII'][number] }
+export type CauNgoai = { phan: PhanV2; cau: TeacherMcqQuestion | TeacherShortAnswerQuestion | TeacherExamSource['phanII'][number] }
 
 export interface RutThuCa {
   maCa: string
@@ -62,7 +62,7 @@ function cauTuSongSinh(l: LoiDenHanEm, goc?: { mucDo?: unknown; chuyenDe?: strin
 }
 
 /** Tìm câu theo id trong một danh sách đề. */
-function timCau(nguon: readonly TeacherExamSource[], ids: ReadonlySet<string>): Map<string, CauNgoai> {
+export function timCau(nguon: readonly TeacherExamSource[], ids: ReadonlySet<string>): Map<string, CauNgoai> {
   const ra = new Map<string, CauNgoai>()
   for (const s of nguon) {
     for (const [phan, ds] of [['I', s.phanI], ['II', s.phanII], ['III', s.phanIII]] as const) {
@@ -72,14 +72,14 @@ function timCau(nguon: readonly TeacherExamSource[], ids: ReadonlySet<string>): 
   return ra
 }
 
-interface NguonRut {
+export interface NguonRut {
   bank: TeacherExamSource[]
   soCau: Record<PhanV2, number>
   khoCa: CauKhoV2[]
   khoToanBo?: TeacherExamSource[]
 }
 
-async function napNguon(maCa: string): Promise<NguonRut> {
+export async function napNguon(maCa: string): Promise<NguonRut> {
   const bank = await loadSessionTeacherBank(maCa)
   if (!bank || bank.length === 0) throw new Error('Máy này chưa có bản đề CÓ đáp án của ca')
   const sc = await docSoCauCa(maCa)
@@ -134,7 +134,7 @@ async function docHoSoVaCauNgoai(
 }
 
 /** Kho dùng để rút = kho ca + câu ngoài kho (đã lọc tự luận bằng `khoTuNguon`). Câu song sinh mang đúng mức/dạng câu gốc. */
-function khoDayDu(khoCa: CauKhoV2[], cauNgoai: Record<string, CauNgoai>): CauKhoV2[] {
+export function khoDayDu(khoCa: CauKhoV2[], cauNgoai: Record<string, CauNgoai>): CauKhoV2[] {
   const nguon: TeacherExamSource = { maDe: 'ngoai-kho', phanI: [], phanII: [], phanIII: [] }
   for (const c of Object.values(cauNgoai)) (nguon[c.phan === 'I' ? 'phanI' : c.phan === 'II' ? 'phanII' : 'phanIII'] as unknown[]).push(c.cau)
   const theoId = new Map(khoCa.map((c) => [c.id, c]))

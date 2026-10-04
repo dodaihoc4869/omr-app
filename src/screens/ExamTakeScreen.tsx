@@ -1480,7 +1480,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const cauLap = (kq.cauLap && kq.cauLap.length > 0 ? kq.cauLap : existing?.cauLap) ?? []
       const demLap = (kq.demLap && Object.keys(kq.demLap).length > 0 ? kq.demLap : existing?.demLap) ?? {}
       const daLamLai = (kq.daLamLai && Object.keys(kq.daLamLai).length > 0 ? kq.daLamLai : existing?.daLamLai) ?? {}
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap, daLamLai }
+      // Ca "Kiểm chứng câu đã đúng" (02/10): nhãn "Em đã làm đúng: …" từng câu — máy chủ gửi cùng đề, không kèm đáp án.
+      const daDungNhan = (kq.daDungNhan && Object.keys(kq.daDungNhan).length > 0 ? kq.daDungNhan : existing?.daDungNhan) ?? {}
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap, daLamLai, daDungNhan }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -3329,6 +3331,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   // CA "KHÔNG RÚT CÂU SAI" (29/09): câu kho thiếu phải phát lại — nói thật là em đã làm.
   const daLamLai = attempt.daLamLai ?? {}
   const nhanDaLam = (qid: string) => (qid in daLamLai ? { ngay: daLamLai[qid] ?? '' } : undefined)
+  // CA "KIỂM CHỨNG CÂU ĐÃ ĐÚNG" (02/10): câu em đã tự làm đúng — nhãn nơi · ngày · mức độ ngay dưới số câu.
+  const daDungNhan = attempt.daDungNhan ?? {}
+  const nhanDaDung = (qid: string) => (daDungNhan[qid] ? { nhan: daDungNhan[qid]! } : undefined)
 
   let stt = 0
   const renderPhan = (phan: PhanKey) => {
@@ -3354,6 +3359,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 id={`cau-${stt}`}
                 cauHoiLai={nhanHoiLai(item.qid)}
                 daLamO={nhanDaLam(item.qid)}
+                daDungO={nhanDaDung(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
@@ -3385,6 +3391,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 id={`cau-${stt}`}
                 cauHoiLai={nhanHoiLai(item.qid)}
                 daLamO={nhanDaLam(item.qid)}
+                daDungO={nhanDaDung(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
@@ -3416,6 +3423,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 id={`cau-${stt}`}
                 cauHoiLai={nhanHoiLai(item.qid)}
                 daLamO={nhanDaLam(item.qid)}
+                daDungO={nhanDaDung(item.qid)}
                 text={item.question.text}
                 thanCauImg={item.question.thanCauImg}
                 table={item.question.table}
