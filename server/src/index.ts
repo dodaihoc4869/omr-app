@@ -476,10 +476,11 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     }
     // Ca "Kiểm chứng câu đã đúng" (02/10): lấp CHỈ từ câu em đã tự làm đúng (server/src/cau-da-dung.ts) — không lấp câu em chưa đúng.
     const laDaDung = String((ca as { pham_vi_hoi_lai?: unknown }).pham_vi_hoi_lai ?? '') === 'da_dung'
-    const lap = await (laDaDung ? lapBoDaDungChoEmVaoMuon : lapBoChoEmVaoMuon)(env, maCa, sbd, ca.so_cau_json, now).catch((e) => {
-      console.error('[vao-thi] lấp bộ câu riêng lỗi:', e)
-      return null
-    })
+    const loiLap = (e: unknown) => { console.error('[vao-thi] lấp bộ câu riêng lỗi:', e); return null }
+    // Em CHƯA có câu đã đúng nào trong kho ca (em mới / chưa làm chiến dịch) ⇒ KHÔNG chặn em ngoài phòng: lấp bằng thang rút đề v2 thường
+    // (câu mới đúng ma trận). Bộ này không có nhãn "đã làm đúng"; bảng xem trước của thầy đã báo em thiếu câu đã đúng.
+    const lap = (laDaDung ? await lapBoDaDungChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch(loiLap) : null)
+      ?? await lapBoChoEmVaoMuon(env, maCa, sbd, ca.so_cau_json, now).catch(loiLap)
     if (lap) goiRieng = lap
   }
   if (Number(ca.de_rieng ?? 0) === 1 && goiGoc && !goiRieng) {

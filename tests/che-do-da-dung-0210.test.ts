@@ -209,11 +209,16 @@ describe('/vao-thi — ca "Kiểm chứng câu đã đúng": em vào sau ⇒ l�
     expect(lai.boTheoEm.daDung.S1).toEqual(v.boTheoEm.daDung.S1)
   })
 
-  it('em chưa có câu nào đã đúng trong kho ca ⇒ không phát câu chưa đúng (chặn thiếu bộ câu)', async () => {
+  // ĐỔI CÓ CHỦ Ý (phiên chủ 04/10): một em thiếu câu không được kẹt ngoài phòng ⇒ em chưa có câu đã đúng nào được lấp bằng thang
+  // rút đề v2 thường (câu mới, KHÔNG nhãn "đã làm đúng"); bảng xem trước đã báo thầy em này thiếu câu đã đúng.
+  it('em chưa có câu nào đã đúng trong kho ca ⇒ không bị chặn: nhận bộ rút đề v2 thường, không có nhãn "đã làm đúng"', async () => {
     const { d, env } = await dungCa({ bo: { S2: ['Q9'] }, cheDo: 'da_dung' })
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S9','Chín','12A','x')")
     const v = await goiWorker(worker, env, '/vao-thi', { maCa: 'C1', sbd: 'S9', idThietBi: 'm9' })
-    expect(v).toMatchObject({ ok: false, lyDo: 'thieu_bo_cau' })
+    expect(v.lyDo).not.toBe('thieu_bo_cau')
+    expect(v.ok).toBe(true)
+    expect(v.boTheoEm.bo.S9.length).toBeGreaterThan(0)
+    expect(v.boTheoEm?.daDung?.S9).toBeUndefined()
   })
 
   it('màn thầy đọc chế độ ca: phamViHoiLai = da_dung', async () => {
