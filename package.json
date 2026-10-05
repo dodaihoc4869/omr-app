@@ -18,6 +18,7 @@
     "kiem:lo-dap-an": "vitest run tests/lo-dap-an-chi-de-1509.test.ts && node scripts/kiem-lo-dap-an.mjs",
     "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs",
     "kiem:sw": "node scripts/kiem-sw.mjs",
+    "kiem:mau-giu": "node scripts/kiem-mau-giu-nguyen.mjs",
     "test:d1": "vitest run --config vitest.config.d1.ts"
   },
   "dependencies": {

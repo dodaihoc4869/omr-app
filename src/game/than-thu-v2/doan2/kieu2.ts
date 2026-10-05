@@ -18,6 +18,12 @@ export function docHoa2(r: unknown): Hoa2Xem | null {
   return { doanCon: so(x.doan?.con), daoCon: so(x.dao?.con) }
 }
 
+/** OMNI 3 (05/10): `hoa2-sanh` có `omni.bat === true` ⇒ công tắc OMNI áp cho em (Đoàn gửi thêm `msLam`/`tuTin` trong `doan-nop`, có chip "Chưa chắc"). */
+export function coOmniTrongSanh(r: unknown): boolean {
+  const o = r && typeof r === 'object' ? (r as { omni?: unknown }).omni : null
+  return !!o && typeof o === 'object' && (o as { bat?: unknown }).bat === true
+}
+
 /** Gợi ý M3 của câu đang chơi (máy chủ gửi `doan.cau.goiY` khi em đủ điều kiện). Chỉ nhận chữ cái A–D để gạch; `cotLoi` phải là chữ thật. */
 export function goiYCuaCau(cau: CauXem | undefined): GoiYM3 | null {
   const g = (cau as (CauXem & { goiY?: unknown }) | undefined)?.goiY

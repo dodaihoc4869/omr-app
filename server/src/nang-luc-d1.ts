@@ -9,6 +9,7 @@
 import type { Env } from './kieu'
 import { mucTuChu } from '../../src/lib/btvn-nang-do'
 import { thieuCot } from './su-kien-hoc'
+import { SQL_LA_LAN_LAM } from './omni-kieu'
 import {
   anhChupTuSuKien, gopTangDan, POLICY_VERSION,
   type AnhChupNangLuc, type BangNangLuc, type MucDoCau, type NangLucSkill, type SuKienNL,
@@ -98,7 +99,8 @@ export async function docSuKienNL(env: Env, sbd: string): Promise<KetQuaDocSo> {
   const goc = 'khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, muc_do'
   const them = ', attempt_id, assistance, visibility, correction_of, purpose, received_at'
   const chay = async (coMoi: boolean) =>
-    env.DB.prepare(`SELECT ${goc}${coMoi ? them : ''} FROM su_kien_hoc WHERE sbd = ? ${coMoi ? "AND COALESCE(purpose, '') <> 'xem_loi_giai'" : ''} ORDER BY ${coMoi ? 'received_at, khoa' : 'luc, khoa'}`)
+    // OMNI 3: bỏ dòng đọc lời giải VÀ dòng lướt (`SQL_LA_LAN_LAM` — không phải một lần làm).
+    env.DB.prepare(`SELECT ${goc}${coMoi ? them : ''} FROM su_kien_hoc WHERE sbd = ? ${coMoi ? `AND ${SQL_LA_LAN_LAM}` : ''} ORDER BY ${coMoi ? 'received_at, khoa' : 'luc, khoa'}`)
       .bind(sbd).all<Record<string, unknown>>()
   let r: { results?: Record<string, unknown>[] }
   try {

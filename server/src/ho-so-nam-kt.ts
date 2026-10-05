@@ -9,7 +9,8 @@
 // của từng em × câu. Một quan sát/ngày VN, sai ưu tiên; bỏ trống không chấm Again.
 import type { D1PreparedStatement, Env } from './kieu'
 import { DemTTL } from './dem-chung'
-import { ngayVnFsrs, taoLichOnFsrs, type LichOnFsrs } from './lich-on-fsrs'
+import { hangFsrsTu, ngayVnFsrs, taoLichOnFsrs, type LichOnFsrs } from './lich-on-fsrs'
+import { SQL_LA_LAN_LAM } from './omni-kieu'
 import {
   BAC_DANG_BAT_DAU,
   BAC_DANG_TOI_DA,
@@ -39,6 +40,10 @@ export interface SuKienDoc {
    * Lần có hỗ trợ KHÔNG cập nhật lịch nhớ (02 §4.1: "Lần làm lại assisted không thêm Good và không kéo mốc xa").
    */
   assistance?: string
+  /** OMNI 3 (`raw_json.tt`): tự tin lúc làm ('chac' | 'chua_chac'); chỉ có khi OMNI bật lúc làm. Vắng ⇒ hạng FSRS Again/Good như cũ. */
+  tuTin?: string
+  /** OMNI 3 (`raw_json.td`): nhãn tốc độ đã tính lúc chấm ('troi_chay' | 'thuong' | 'cham' | 'luot'). */
+  nhanTocDo?: string
 }
 
 export interface NamKtCau {
@@ -203,7 +208,9 @@ export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_T
       }
       if (e.ketQua !== null) {
         // CNH-1.0 P04: lần có HỖ TRỢ không cập nhật lịch nhớ (không thêm Good, không kéo mốc xa).
-        t.lich = on(t.lich, Date.parse(e.luc), e.ketQua, { docLap: docLapLanNay, cursor: e.khoa })
+        // OMNI 3 (FSRS 4 mức): có tự tin / nhãn tốc độ trong sổ ⇒ Again · Hard · Good · Easy; thiếu ⇒ Again/Good như cũ.
+        const hang = hangFsrsTu(e.ketQua, e.tuTin, e.nhanTocDo)
+        t.lich = on(t.lich, Date.parse(e.luc), e.ketQua, { docLap: docLapLanNay, cursor: e.khoa, ...(hang ? { hang } : {}) })
         c.mocOnKe = ngayVnFsrs(t.lich.card.due.getTime())
       }
       c.canDayLai = c.lanSai >= SO_LAN_SAI_DAY_LAI && c.dungLienTiep === 0
@@ -249,9 +256,14 @@ export function dangYeu(d: NamKtDang, homNay: string): boolean {
 
 const CHON_SO = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de
                    FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) ORDER BY sbd, luc, khoa`
-/** CNH-1.0 P04: đọc kèm `assistance`; D1 chưa áp migration thì tự lùi về `CHON_SO` (không làm hỏng hồ sơ). */
-const CHON_SO_MOI = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, assistance
-                   FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND COALESCE(purpose, '') <> 'xem_loi_giai' ORDER BY sbd, luc, khoa`
+/**
+ * CNH-1.0 P04: đọc kèm `assistance`; D1 chưa áp migration thì tự lùi về `CHON_SO` (không làm hỏng hồ sơ).
+ * OMNI 3: bỏ cả dòng LƯỚT (`SQL_LA_LAN_LAM`: không phải một lần làm, như đọc lời giải); đọc `tt`/`td` của raw (tự tin, nhãn tốc độ) cho FSRS 4 mức.
+ */
+const CHON_SO_MOI = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, assistance,
+                          CASE WHEN json_valid(raw_json) THEN json_extract(raw_json, '$.tt') END AS tt,
+                          CASE WHEN json_valid(raw_json) THEN json_extract(raw_json, '$.td') END AS td
+                   FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND ${SQL_LA_LAN_LAM} ORDER BY sbd, luc, khoa`
 let coCotHoTro: boolean | null = null
 export function xoaBietCotHoTro(): void { coCotHoTro = null }
 
@@ -280,6 +292,8 @@ export async function docSuKienDoc(env: Env, dsSbd: string[]): Promise<SuKienDoc
     maDang: x.ma_dang ? String(x.ma_dang) : null,
     chuyenDe: String(x.chuyen_de ?? ''),
     assistance: String(x.assistance ?? '').trim() || 'none',
+    ...(x.tt != null && String(x.tt) ? { tuTin: String(x.tt) } : {}),
+    ...(x.td != null && String(x.td) ? { nhanTocDo: String(x.td) } : {}),
   }))
 }
 

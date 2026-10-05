@@ -1,0 +1,209 @@
+{
+ "dist": "/tmp/claude-0/-home-user-omr-app/01ae1b33-2db9-5f4c-b33a-c7353dc47998/scratchpad/dist-main",
+ "cpu": 6,
+ "mang": "slow4g",
+ "khung": {
+  "width": 360,
+  "height": 740
+ },
+ "luc": "2026-10-05T10:08:19.706Z",
+ "man": {
+  "nhanh": {
+   "moDau": {
+    "fcp": 8212,
+    "lcpDangNhap": 8212,
+    "dangNhapSanSang": 8203,
+    "taiToiDangNhap": {
+     "jsKB": 301,
+     "jsThoKB": 1012,
+     "soJs": 54,
+     "cssKB": 71,
+     "anhKB": 0,
+     "soAnh": 0,
+     "phongKB": 0,
+     "soPhong": 0,
+     "khacKB": 0
+    },
+    "bamDangNhapToiSanh": 3285,
+    "sanhSanSang": 12425,
+    "tti": 12425,
+    "taskMax": 337,
+    "tbt": 960,
+    "taiToiSanh": {
+     "jsKB": 370,
+     "jsThoKB": 1297,
+     "soJs": 55,
+     "cssKB": 78,
+     "anhKB": 158,
+     "soAnh": 4,
+     "phongKB": 122,
+     "soPhong": 8,
+     "khacKB": 1
+    },
+    "taiSau6s": {
+     "jsKB": 370,
+     "jsThoKB": 1297,
+     "soJs": 55,
+     "cssKB": 78,
+     "anhKB": 661,
+     "soAnh": 8,
+     "phongKB": 146,
+     "soPhong": 10,
+     "khacKB": 1
+    },
+    "swCaiXongSauMs": 10
+   },
+   "moLai": {
+    "fcp": 2016,
+    "lcp": 2320,
+    "sanhSanSang": 2889,
+    "tti": 2889,
+    "taskMax": 408,
+    "tbt": 924,
+    "quaMang": {
+     "soTep": 2,
+     "kb": 1
+    },
+    "swDieuKhien": true
+   },
+   "moLai2": {
+    "fcp": 2340,
+    "lcp": 2516,
+    "sanhSanSang": 3035,
+    "tti": 3035,
+    "taskMax": 273,
+    "tbt": 608,
+    "quaMang": {
+     "soTep": 2,
+     "kb": 1
+    },
+    "swDieuKhien": true
+   },
+   "loi": [],
+   "man": {
+    "sanhYen": {
+     "khung": 299,
+     "cham33": 0,
+     "p95Ms": 17,
+     "maxMs": 33,
+     "fpsTb": 60,
+     "fpsP95": 60,
+     "taskMax": 0,
+     "tbt": 0,
+     "commit": 0,
+     "veLai": 0
+    },
+    "vaoDao": {
+     "chuyenMs": 2544,
+     "taskMax": 62,
+     "tbt": 12,
+     "inp": 112,
+     "commit": 13,
+     "veLai": 67
+    },
+    "daoYen": {
+     "khung": 301,
+     "cham33": 0,
+     "p95Ms": 17,
+     "maxMs": 17,
+     "fpsTb": 60,
+     "fpsP95": 60,
+     "taskMax": 0,
+     "tbt": 0,
+     "commit": 1,
+     "veLai": 41
+    },
+    "daoLenDuong": {
+     "chuyenMs": 374,
+     "taskMax": 311,
+     "tbt": 261,
+     "inp": 384,
+     "commit": 3,
+     "veLai": 59
+    },
+    "daoTranYen": {
+     "khung": 301,
+     "cham33": 0,
+     "p95Ms": 17,
+     "maxMs": 17,
+     "fpsTb": 60,
+     "fpsP95": 60,
+     "taskMax": 0,
+     "tbt": 0,
+     "commit": 0,
+     "veLai": 0
+    },
+    "daoChon": {
+     "chuyenMs": null,
+     "taskMax": 0,
+     "tbt": 0,
+     "inp": 80,
+     "commit": 1,
+     "veLai": 23
+    },
+    "vaoTranDoan": {
+     "chuyenMs": 1857,
+     "taskMax": 249,
+     "tbt": 560,
+     "inp": 224,
+     "commit": 11,
+     "veLai": 152
+    },
+    "doanTranYen": {
+     "khung": 354,
+     "cham33": 1,
+     "p95Ms": 17,
+     "maxMs": 83,
+     "fpsTb": 59,
+     "fpsP95": 60,
+     "taskMax": 0,
+     "tbt": 0,
+     "commit": 11,
+     "veLai": 264
+    },
+    "doanChon": {
+     "chuyenMs": null,
+     "taskMax": 0,
+     "tbt": 0,
+     "inp": 40,
+     "commit": 3,
+     "veLai": 108
+    },
+    "vaoCauDaLam": {
+     "chuyenMs": 1615,
+     "taskMax": 2104,
+     "tbt": 3169,
+     "inp": 168,
+     "commit": 5,
+     "veLai": 716
+    },
+    "cdlCuon": {
+     "khung": 238,
+     "cham33": 1,
+     "p95Ms": 17,
+     "maxMs": 50,
+     "fpsTb": 60,
+     "fpsP95": 60,
+     "taskMax": 55,
+     "tbt": 5,
+     "commit": 0,
+     "veLai": 0
+    },
+    "cdlLocTatCa": {
+     "chuyenMs": null,
+     "taskMax": 134,
+     "tbt": 84,
+     "inp": 208,
+     "commit": 2,
+     "veLai": 41
+    }
+   },
+   "heapMB": 9.7,
+   "dom": {
+    "nut": 17149,
+    "ngheSk": 361
+   },
+   "loiMan": []
+  }
+ }
+}

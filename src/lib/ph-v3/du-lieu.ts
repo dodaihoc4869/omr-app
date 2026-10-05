@@ -3,7 +3,9 @@
 //   POST /ph/loi-thay   {pass|sbd}       ⇒ nhận xét của thầy ở các ca đã công bố
 //   POST /ph/hoc-2      {pass|sbd}       ⇒ chiến dịch Game Hoá 2.0 + kế hoạch hôm nay đã chốt + câu từng sai
 // Cùng nguyên tắc với src/lib/ph-moi/du-lieu.ts: khối sai dạng ⇒ VẮNG (không bịa 0); ca CHƯA công bố ⇒ không điểm/đáp án/nhận xét dù JSON lỡ có; không trường game; không ném lỗi.
+// OMNI 3 (05/10): `/ph/hoc-2` có thể kèm `omni` (docs/hop-dong-omni-3.md mục C, kiểu `PhOmni` ở server/src/omni-kieu.ts — chỉ import KIỂU).
 import type { CongBo } from '../ph-moi/du-lieu'
+import type { PhOmni } from '../../../server/src/omni-kieu'
 
 const laDoiTuong = (x: unknown): x is Record<string, unknown> => x !== null && typeof x === 'object' && !Array.isArray(x)
 const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) ? x : null)
@@ -122,7 +124,52 @@ export interface Hoc2 {
   chienDich: { ten: string; hanNop: string; conNgay: number; tong: number; daGap: number; thanhThao: number; canDayLai: number } | null
   homNay: { tong: number; daLam: number } | null
   cauTungSai: { tong: number; thanhThao: number; canDayLai: number; dangOn: number } | null
+  /** OMNI 3 — CHỈ có khoá này khi máy chủ gửi `omni` là một đối tượng (công tắc OMNI bật cho con). Vắng ⇒ không khoá ⇒ màn y hệt trước OMNI. */
+  omni?: PhOmni
 }
+
+/** "20:30" hoặc khoảng "20:30–21:15" (giờ Việt Nam). Dạng khác (mã khung giờ nội bộ như `20_22`…) ⇒ null: không lộ mã trên màn phụ huynh. */
+function docGioHoc(x: unknown): string | null {
+  const m = /^(\d{1,2}):(\d{2})(?:\s*[–-]\s*(\d{1,2}):(\d{2}))?$/.exec(chuoi(x, 40))
+  if (!m) return null
+  const gio = (h: string, p: string): string | null => (Number(h) <= 23 && Number(p) <= 59 ? `${h.padStart(2, '0')}:${p}` : null)
+  const dau = gio(m[1]!, m[2]!)
+  if (!dau || m[3] === undefined) return dau
+  const cuoi = gio(m[3], m[4]!)
+  return cuoi ? `${dau}–${cuoi}` : null
+}
+
+/**
+ * Phần OMNI 3 của `/ph/hoc-2` (docs/hop-dong-omni-3.md mục C). Đọc chặt TỪNG trường: trường sai dạng ⇒ coi như vắng (null · rỗng · 0), không bịa số.
+ * `khoangCach8` CHỈ giữ khi `hieuChuan.du` (≥ 3 ca chốt, sai số trung bình ≤ 0,6 điểm) — chưa hiệu chuẩn thì phụ huynh không thấy điểm dự báo (đặc tả mục 7, 10).
+ * `chungChi` giữ thứ tự máy chủ (gần nhất trước); độ tin 0..1, điểm ca chốt 0..10 (sai ⇒ null).
+ */
+export function docOmniPh(x: unknown): PhOmni | null {
+  if (!laDoiTuong(x)) return null
+  const hc = laDoiTuong(x.hieuChuan) ? x.hieuChuan : null
+  const hieuChuan = { soCaChot: nguyenKhongAm(hc?.soCaChot) ?? 0, du: hc?.du === true }
+  const kc = so(x.khoangCach8)
+  const s = so(x.sEm)
+  const chungChi: PhOmni['chungChi'] = []
+  for (const c of mang(x.chungChi)) {
+    if (!laDoiTuong(c)) continue
+    const ten = chuoi(c.ten, 120)
+    const doTin = so(c.doTin)
+    if (!ten || doTin === null || doTin < 0 || doTin > 1) continue
+    const diem = so(c.diem)
+    chungChi.push({ ten, doTin, ngay: chuoi(c.ngay, 40), diem: diem !== null && diem >= 0 && diem <= 10 ? diem : null })
+  }
+  return {
+    khoangCach8: hieuChuan.du && kc !== null && Math.abs(kc) <= 10 ? kc : null,
+    hieuChuan,
+    dangCanVung: [...new Set(mang(x.dangCanVung).map((d) => chuoi(d, 120)).filter(Boolean))],
+    sEm: s !== null && s >= 0 && s <= 1 ? s : null,
+    chungChi,
+    gioHoc: docGioHoc(x.gioHoc),
+    canThayChua: nguyenKhongAm(x.canThayChua) ?? 0,
+  }
+}
+
 export function docHoc2(raw: unknown): Hoc2 | null {
   if (!laDoiTuong(raw) || raw.ok !== true) return null
   if (raw.cheDo2 !== true) return { chienDich: null, homNay: null, cauTungSai: null }
@@ -152,5 +199,6 @@ export function docHoc2(raw: unknown): Hoc2 | null {
     const dangOn = nguyenKhongAm(t.dangOn)
     if (tong !== null && tong > 0 && thanhThao !== null && canDayLai !== null && dangOn !== null && thanhThao + canDayLai + dangOn === tong) cauTungSai = { tong, thanhThao, canDayLai, dangOn }
   }
-  return { chienDich, homNay, cauTungSai }
+  const omni = docOmniPh(raw.omni)
+  return { chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
 }

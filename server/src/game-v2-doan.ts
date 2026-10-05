@@ -111,7 +111,8 @@ const TIN_HIEU = ['can_tiep_suc', 'chac_y', 'ban_them', 'doi_ti'] as const
 const iso = (ms: number) => new Date(ms).toISOString()
 /** Phần kết quả của `answer` được phép về máy em sau khi em chốt. */
 // `assisted` (chỉ-thêm, luật v4 29/09): máy em KHÔNG phát hiệu ứng "+N EXP" cho câu có trợ giúp.
-const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage, assisted: (r.attempt as { assisted?: unknown } | undefined)?.assisted === true, ...(typeof r.expCau === 'number' && r.expCau > 0 ? { expCau: r.expCau } : {}), ...(typeof r.expThuThach === 'number' && r.expThuThach > 0 ? { expThuThach: r.expThuThach } : {}) })
+/** Kết quả một câu của Đoàn gửi về máy em (export để test). */
+export const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage, assisted: (r.attempt as { assisted?: unknown } | undefined)?.assisted === true, ...(typeof r.expCau === 'number' && r.expCau > 0 ? { expCau: r.expCau } : {}), ...(typeof r.expThuThach === 'number' && r.expThuThach > 0 ? { expThuThach: r.expThuThach } : {}), ...(r.omni && typeof r.omni === 'object' ? { omni: r.omni } : {}) }) // OMNI 3: dòng nhắn dưới kết quả (Trạm KHÔNG mở trong Đoàn — `answer` nội bộ đã chặn)
 const hex = (n: number) => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase()
 /** Tên gọi trong đội: hai chữ cuối của họ tên ("Nguyễn Thu Hà" → "Thu Hà"). Không bao giờ dùng SBD. */
 export function tenGoi(hoTen: string, duPhong: string): string {
@@ -765,7 +766,8 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       let dung = false
       if (!boTrong) {
         // Đã nhận thẻ tiếp sức → `assisted:true`: máy chủ game KHÔNG ghi bằng chứng, KHÔNG thưởng mastery cho câu này (luật cũ giữ nguyên). Cờ do máy chủ quyết, không do máy em khai.
-        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i] }))
+        // OMNI 3: thời lượng máy em đo + tự tin (Chắc/Chưa chắc) chuyển nguyên vào `answer` nội bộ — cờ OMNI tắt thì `answer` bỏ qua hai trường này.
+        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i], msLam: b.msLam, tuTin: b.tuTin }))
         dung = r.correct === true; kem = { ketQuaCau: ketQuaCau(r) }
       }
       phong.nop[i] = { dung, hanhDong, tuLam: !phong.the[i], boTrong, tiepSucBoi: phong.the[i]?.tu }
