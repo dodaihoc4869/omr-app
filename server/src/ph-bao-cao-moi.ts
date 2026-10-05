@@ -15,6 +15,7 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { CHI_NHAN_TOKEN } from './ph-tat-ca-ve-con'
 import { sbdCuaPhuHuynh } from './ph-truy-cap'
 import { cheDo2, docHoSo2, docKeHoachDaChot, ngayVnCua, tamHoanCauKhoa } from './srs2-d1'
+import { omniBat, omniChoPh } from './omni-d1'
 import { soNgayConLai, tiLeChienDich } from './srs2-loi'
 
 type Row = Record<string, unknown>
@@ -83,6 +84,11 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
     const thanhThao = tungSai.filter((t) => t.thanhThao).length
     const canDayLai = tungSai.filter((t) => t.catTia && !t.thanhThao).length
     ra.cauTungSai = { tong: tungSai.length, thanhThao, canDayLai, dangOn: tungSai.length - thanhThao - canDayLai }
+  }
+  // OMNI 3 (chỉ-thêm): khối `omni` CHỈ khi công tắc OMNI áp cho con — tắt ⇒ phản hồi y hệt trước. Dùng lại hồ sơ srs2 vừa đọc (đếm câu cắt tỉa). CHỈ ĐỌC.
+  if (await omniBat(envDoc, sbd)) {
+    const omni = await omniChoPh(envDoc, sbd, nowMs, hs)
+    if (omni) ra.omni = omni
   }
   return ra
 }

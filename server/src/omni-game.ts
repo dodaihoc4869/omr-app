@@ -27,6 +27,7 @@ import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docCauDaLamMoiNguon } from './game-v2-cau-moi'
 import { laCauTuLuan } from './cam-tu-luan'
 import { chayDdlMotLan } from './ddl-mot-lan'
+import { damBaoCauNenTuDong } from './omni-cau-nen-sinh'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -281,6 +282,9 @@ async function taoTram(env: Env, qids: readonly string[], hs: HoSoOmniEm | null)
   const vkn = chonViKyNangTram(goc.map((q) => { const c = qm.get(q); return c ? [...c.vkn, ...(c.vknY ?? []).flat()] : [] }), pCua)
   const tt = vkn ? (await vknTheoId(env, [vkn])).get(vkn) : undefined
   const nhan = !vkn ? null : vkn.startsWith(TIEN_TO_NEN) ? vkn.slice(TIEN_TO_NEN.length) || null : vkn.startsWith(TIEN_TO_DANG) ? null : str(tt?.nhanNen).trim() || null
+  // OMNI 3 (điều phối 05/10, thầy: "Bạn hãy làm mọi thứ tôi chỉ chữa bài hs cần chữa"): nhãn tính toán thiếu câu nền ⇒ A.I Đỗ Đại Học tự sinh
+  // (omni-cau-nen-sinh.ts, đáp án tính bằng mã + kiểm chéo) TRƯỚC khi xét có câu nền. Lỗi ⇒ bỏ qua, trạm vẫn mở (đổi ải dễ hơn).
+  if (nhan) await damBaoCauNenTuDong(env, nhan).catch(() => 0)
   const coCauNen = nhan ? await coCauNenCho(env, nhan) : false
   const ten = chuChoEm(tt?.ten), tenLoi = chuChoEm(tt?.tenLoi) ?? ten
   return { vkn, ten, tenLoi, nhan, coCauNen, chu: chuTram(tenLoi, coCauNen) }
