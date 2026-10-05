@@ -193,7 +193,7 @@ const sangDongThe = (x: Obj): DongThe => ({ id: str(x.id), sbd: str(x.sbd), qid:
 export async function danhDauKemRieng(env: Env, sbd: string, qid: string, nowMs: number = Date.now()): Promise<number> {
   await damBaoBangNutThat(env)
   const goc = tachSongSinh(qid).goc
-  const the = (await hoi(env, `SELECT ${COT_THE} FROM nut_that WHERE sbd = ? AND (qid = ? OR qid LIKE ?) AND trang_thai IN ('cho', 'da_go', 'kem_rieng')`, sbd, goc, `${goc}~ss%`)).map(sangDongThe)
+  const the = (await hoi(env, `SELECT ${COT_THE} FROM nut_that WHERE sbd = ? AND (qid = ? OR qid LIKE ? OR qid LIKE ? OR qid LIKE ?) AND trang_thai IN ('cho', 'da_go', 'kem_rieng')`, sbd, goc, `${goc}~ss%`, `${goc}~bt%`, `${goc}~yd%`)).map(sangDongThe)
   return phatLaiThe(env, the, ngayVn(nowMs))
 }
 
@@ -432,7 +432,7 @@ export async function hsLoiGo(env: Env, b: Obj, nowMs: number = Date.now()) {
   if (!bam) return { ok: true, loiGo: [] }
   if (await dangBaoVe(env, qid, bam)) return { ok: false, error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em xem lại nhé.' }
   const coThe = (await hoiAnToan(env, 'SELECT 1 AS co FROM nut_that WHERE sbd = ? AND bam = ? LIMIT 1', sbd, bam))?.length
-  const daLuyen = coThe ? 1 : (await hoiAnToan(env, `SELECT 1 AS co FROM su_kien_hoc WHERE sbd = ? AND (qid = ? OR qid LIKE ?) AND nguon <> 'thi' LIMIT 1`, sbd, qid, `${qid}~ss%`))?.length
+  const daLuyen = coThe ? 1 : (await hoiAnToan(env, `SELECT 1 AS co FROM su_kien_hoc WHERE sbd = ? AND (qid = ? OR qid LIKE ? OR qid LIKE ? OR qid LIKE ?) AND nguon <> 'thi' LIMIT 1`, sbd, qid, `${qid}~ss%`, `${qid}~bt%`, `${qid}~yd%`))?.length
   const daCongBo = coThe || daLuyen ? 1 : (await hoiAnToan(env, `SELECT 1 AS co FROM chi_tiet_cau t JOIN ca c ON c.ma_ca = t.ma_ca WHERE t.sbd = ? AND t.qid = ? AND c.trang_thai IS NOT 'da_xoa' AND ${SQL_DA_CONG_BO('c')} LIMIT 1`, sbd, qid))?.length
   if (!coThe && !daLuyen && !daCongBo) return { ok: false, error: 'Lời thầy gỡ mở sau khi em tự làm câu này.' }
   const rows = await hoi(env, "SELECT g.id, g.buoc, g.kieu, g.noi_dung, g.buoi_hoc, g.luc FROM loi_go g WHERE g.bam = ? AND g.kieu IN ('ngan', 'lop') ORDER BY g.buoc, g.luc", bam)

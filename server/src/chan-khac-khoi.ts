@@ -15,11 +15,18 @@
 // KHÔNG gọi cổng cho phần THẦY TỰ CHỌN (tick bài, chọn tờ, dựng ca thi, Gọi lên bảng chọn tay) — luật C.
 //
 // ĐO: mỗi lần cổng chặn ≥ 1 câu ⇒ một dòng console `[chan-khac-khoi]` (kênh, vai, khối đích, số giữ, số chặn theo lý do: khác khối · không rõ · mâu thuẫn ·
-// em/lớp không rõ). Đếm cộng dồn trong isolate: `demChanKhoi()` (test đọc), `xoaDemChanKhoi()`.
+// em/lớp không rõ · nghi đáp án). Đếm cộng dồn trong isolate: `demChanKhoi()` (test đọc), `xoaDemChanKhoi()`.
+// 06/10 CÂU NGHI SAI ĐÁP ÁN (làn A đợt 2): cổng EM (luật A: `chanKhacKhoiEm` / `TheoEm` / `Dong`) loại thêm câu đang 'nghi' trong `cau_nghi_dap_an` (tu-hoan-thien.ts) —
+// em không được làm (và bị chấm sai) câu mà đáp án kho đang bị nghi. Lý do mới `nghi_dap_an` đếm cùng bảng đếm, ghi console như mọi lý do. Chỉ MỘT truy vấn / 60 giây / isolate
+// (`docCauNghiDem`). KHÔNG lọc ở: cổng LỚP (luật B — danh sách của thầy), `chanMetaKhacKhoi` (siêu dữ liệu hồ sơ: "Câu đã làm" phải giữ câu em đã làm), nơi thầy TỰ CHỌN (Gọi lên bảng,
+// dựng ca thi — ca thi đã có `/ca/cau-nghi-dap-an`), kênh `luot_cu` (resume lượt ĐÃ phát — `KENH_GIU_CAU_NGHI`).
+// Đi kèm ở KẾ HOẠCH: srs2-d1.ts `tamHoanCauKhoa` bỏ câu nghi khỏi phần CÒN LẠI của kế hoạch ngày (như câu ca bảo vệ) — không thì em kẹt "còn N câu", rương không mở.
 // TỐN D1: khối em truyền sẵn ⇒ 0 truy vấn; chỉ có SBD ⇒ 1 truy vấn `hoc_sinh`. Làm giàu nguồn khối từ D1 (`de_kho.lop`, `cau_hoi.lop/chuyen_de`,
 // `game_v2_question.ma_de/dang`) — MỘT truy vấn — mặc định chỉ cho câu tự thân không đọc ra khối (hiếm: kho thật 28/15 359 câu, tờ `100`).
 import type { Env } from './kieu'
 import { khoiCuaEm, khoiCuaLop, phanTichKhoiCau, type Khoi, type LyDoChanKhoi } from '../../src/lib/khoi-cau'
+import { dangKyXoaDem } from './dem-chung'
+import { dbGoc } from './cau-hinh-dem'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -33,10 +40,10 @@ export const B_GIU_KHONG_RO = true
 
 // ---------------------------------------------------------------- đếm để đo
 export type VaiCong = 'em' | 'lop'
-/** `giu` = số phần tử cho qua; bốn lý do = số phần tử BỊ CHẶN; `qua_khong_ro` = cho qua dù không rõ khối (luật B / lớp chưa rõ khối); `qua_thay_giao` = cho qua vì thầy giao trực tiếp (em chưa rõ khối). */
-export interface DemCong { giu: number; khac_khoi: number; khong_ro: number; mau_thuan: number; em_khong_ro: number; qua_khong_ro: number; qua_thay_giao: number }
+/** `giu` = số phần tử cho qua; năm lý do (bốn lý do khối + `nghi_dap_an`) = số phần tử BỊ CHẶN; `qua_khong_ro` = cho qua dù không rõ khối (luật B / lớp chưa rõ khối); `qua_thay_giao` = cho qua vì thầy giao trực tiếp (em chưa rõ khối). */
+export interface DemCong { giu: number; khac_khoi: number; khong_ro: number; mau_thuan: number; em_khong_ro: number; qua_khong_ro: number; qua_thay_giao: number; nghi_dap_an: number }
 const DEM = new Map<string, DemCong>()
-const demMoi = (): DemCong => ({ giu: 0, khac_khoi: 0, khong_ro: 0, mau_thuan: 0, em_khong_ro: 0, qua_khong_ro: 0, qua_thay_giao: 0 })
+const demMoi = (): DemCong => ({ giu: 0, khac_khoi: 0, khong_ro: 0, mau_thuan: 0, em_khong_ro: 0, qua_khong_ro: 0, qua_thay_giao: 0, nghi_dap_an: 0 })
 /** Ảnh chụp bộ đếm theo `vai:kênh` (cộng dồn trong isolate). */
 export function demChanKhoi(): Record<string, DemCong> {
   return Object.fromEntries([...DEM].map(([k, v]) => [k, { ...v }]))
@@ -47,7 +54,7 @@ function ghiDem(vai: VaiCong, kenh: string, khoiDich: Khoi | readonly Khoi[] | n
   const c = DEM.get(k) ?? demMoi()
   for (const x of Object.keys(d) as (keyof DemCong)[]) c[x] += d[x]
   DEM.set(k, c)
-  const chan = d.khac_khoi + d.khong_ro + d.mau_thuan + d.em_khong_ro
+  const chan = d.khac_khoi + d.khong_ro + d.mau_thuan + d.em_khong_ro + d.nghi_dap_an
   if (chan > 0 || d.qua_khong_ro > 0) console.log('[chan-khac-khoi]', JSON.stringify({ kenh, vai, khoi: khoiDich, ...d }))
 }
 
@@ -148,7 +155,7 @@ export interface TuyChonCong<T> {
 }
 
 /** Cổng THUẦN (không IO): giữ phần tử ĐÚNG khối, GIỮ NGUYÊN thứ tự; đếm + ghi console. `vai = 'lop'` ⇒ luật B (giữ câu không rõ khối; lớp chưa rõ khối ⇒ giữ hết). */
-export function congKhoi<T>(vai: VaiCong, kenh: string, khoiDich: Khoi | readonly Khoi[] | null | undefined, ds: readonly T[], tuyChon: TuyChonCong<T> = {}, them?: ReadonlyMap<string, Row[]>): T[] {
+export function congKhoi<T>(vai: VaiCong, kenh: string, khoiDich: Khoi | readonly Khoi[] | null | undefined, ds: readonly T[], tuyChon: TuyChonCong<T> = {}, them?: ReadonlyMap<string, Row[]>, nghi?: ReadonlySet<string>): T[] {
   if (!Array.isArray(ds) || !ds.length) return []
   const tap: Khoi[] = Array.isArray(khoiDich) ? (khoiDich as Khoi[]).filter(laKhoi) : laKhoi(khoiDich) ? [khoiDich] : []
   const cauCua = tuyChon.cauCua ?? ((x: T) => x as unknown)
@@ -159,6 +166,8 @@ export function congKhoi<T>(vai: VaiCong, kenh: string, khoiDich: Khoi | readonl
     const ly = lyDoChanTap(tap, c, them?.get(qidGocKhoi(qidCua(c))) ?? [])
     const thayGiao = vai === 'em' && ly === 'em_khong_ro' && !!tuyChon.thayGiao?.(x)
     const quaKhongRo = vai === 'lop' && (ly === 'em_khong_ro' || (ly === 'khong_ro' && B_GIU_KHONG_RO))
+    // 06/10: câu đang NGHI sai đáp án (cổng EM — `nghi` chỉ truyền cho vai 'em'): câu qua được cổng khối (kể cả câu thầy giao khi em chưa rõ khối) vẫn bị loại.
+    if (nghi?.size && (ly === null || thayGiao) && nghi.has(qidGocKhoi(qidCua(c)))) { d.nghi_dap_an++; continue }
     if (ly === null || thayGiao || quaKhongRo) {
       giu.push(x)
       d.giu++
@@ -168,6 +177,36 @@ export function congKhoi<T>(vai: VaiCong, kenh: string, khoiDich: Khoi | readonl
   }
   ghiDem(vai, kenh, tap.length === 1 ? tap[0]! : tap, d)
   return giu
+}
+
+// ---------------------------------------------------------------- câu NGHI sai đáp án (06/10)
+/** Tuổi thọ đệm danh sách câu nghi trong isolate (thầy chốt câu nghi ⇒ em thấy lại câu trong ≤ 60 giây). */
+export const HAN_DEM_CAU_NGHI_MS = 60_000
+interface DemNghi { at: number; p: Promise<ReadonlySet<string>> }
+let demNghi = new WeakMap<object, DemNghi>()
+/** Xoá đệm danh sách câu nghi (test / sau khi thầy chốt câu nghi ở cùng isolate). `xoaMoiDem()` (dem-chung.ts) gọi hàm này. */
+export function xoaDemCauNghi(): void { demNghi = new WeakMap() }
+/** Kênh KHÔNG lọc câu nghi: lượt ĐÃ phát (resume) — câu đã qua cổng lúc phát; thêm một truy vấn ở mỗi lần mở app không đáng (đáp án chỉ bị nghi sau khi tự hoàn thiện đêm thứ Hai chạy). */
+export const KENH_GIU_CAU_NGHI: ReadonlySet<string> = new Set(['luot_cu'])
+dangKyXoaDem(xoaDemCauNghi)
+const RONG: ReadonlySet<string> = new Set()
+/**
+ * Tập qid câu đang 'nghi' trong `cau_nghi_dap_an` (tu-hoan-thien.ts `dsCauNghi`; ở đây đọc THẲNG, không tạo bảng — đường đọc nóng không được ghi DDL). Đệm HAN_DEM_CAU_NGHI_MS theo D1 gốc;
+ * lượt gọi chồng nhau dùng chung MỘT truy vấn. Bảng chưa có / lỗi đọc ⇒ tập rỗng (không chặn thêm câu nào — "không biết ⇒ không kết tội"), cũng đệm cùng hạn.
+ */
+export function docCauNghiDem(env: Env, nowMs: number = Date.now()): Promise<ReadonlySet<string>> {
+  const k = dbGoc(env.DB as unknown as object)
+  const c = demNghi.get(k)
+  if (c && nowMs - c.at >= 0 && nowMs - c.at < HAN_DEM_CAU_NGHI_MS) return c.p
+  const p = Promise.resolve().then(() => env.DB.prepare("SELECT qid FROM cau_nghi_dap_an WHERE trang_thai = 'nghi'").all<Row>())
+    .then((r) => new Set((r.results ?? []).map((x) => qidGocKhoi(x.qid)).filter(Boolean)) as ReadonlySet<string>)
+    .catch(() => RONG)
+  demNghi.set(k, { at: nowMs, p })
+  return p
+}
+/** Khối em mà `chanMetaKhacKhoi` đã ghi cho `meta` của hồ sơ này (cùng hồ sơ ⇒ 0 truy vấn); chưa lọc lần nào ⇒ undefined. */
+export function khoiDaLocCua(meta: object): Khoi | null | undefined {
+  return DA_LOC.get(meta)?.khoi
 }
 
 async function nguonThem<T>(env: Env, ds: readonly T[], tap: readonly Khoi[], tuyChon: TuyChonCong<T>, macDinh: 'luon' | 'khi_khong_ro'): Promise<Map<string, Row[]> | undefined> {
@@ -191,7 +230,8 @@ export async function chanKhacKhoiEm<T>(env: Env, kenh: string, em: string | EmC
   const cauCua = tuyChon.cauCua ?? ((x: T) => x as unknown)
   // Hồ sơ Hoá 2.0 đã lọc (`chanMetaKhacKhoi`): câu được giữ vì thầy giao trực tiếp ở bước hồ sơ cũng được giữ ở cổng cuối (em chưa rõ khối).
   const tc: TuyChonCong<T> = !tuyChon.thayGiao && daLoc?.thayGiao.size ? { ...tuyChon, thayGiao: (x) => daLoc.thayGiao.has(qidGocKhoi(qidCua(cauCua(x)))) } : tuyChon
-  return congKhoi('em', kenh, tap, ds, tc, await nguonThem(env, ds, tap, tc, 'khi_khong_ro'))
+  const [them, nghi] = await Promise.all([nguonThem(env, ds, tap, tc, 'khi_khong_ro'), tap.length && !KENH_GIU_CAU_NGHI.has(kenh) ? docCauNghiDem(env) : Promise.resolve(RONG)]) // câu nghi: cùng đợt với nguồn khối (không thêm đợt nối tiếp)
+  return congKhoi('em', kenh, tap, ds, tc, them, nghi)
 }
 
 /**
@@ -215,10 +255,10 @@ export async function chanKhacKhoiTheoEm<T>(env: Env, kenh: string, ds: Readonly
   const khoi = await docKhoiCacEmCong(env, [...ds.keys()]).catch(() => new Map<string, Khoi | null>())
   const tatCa = [...ds.values()].flat()
   const coKhoi = [...khoi.values()].filter(laKhoi)
-  const them = await nguonThem(env, tatCa, [...new Set(coKhoi)], tuyChon, 'khi_khong_ro')
+  const [them, nghi] = await Promise.all([nguonThem(env, tatCa, [...new Set(coKhoi)], tuyChon, 'khi_khong_ro'), coKhoi.length ? docCauNghiDem(env) : Promise.resolve(RONG)])
   for (const [sbd, cua] of ds) {
     const k = khoi.get(sbd) ?? null
-    ra.set(sbd, congKhoi('em', kenh, k ? [k] : [], cua, tuyChon, them))
+    ra.set(sbd, congKhoi('em', kenh, k ? [k] : [], cua, tuyChon, them, nghi))
   }
   return ra
 }
@@ -232,11 +272,12 @@ export async function chanKhacKhoiDong<T extends { sbd?: unknown; qid?: unknown 
   const theoEm = new Map<string, T[]>()
   for (const x of ds) { const s = str(x.sbd); let a = theoEm.get(s); if (!a) { a = []; theoEm.set(s, a) } a.push(x) }
   const tuyChon: TuyChonCong<T> = { cauCua: (x) => str(x.qid) }
-  const them = await nguonThem(env, ds, [...new Set([...khoiEm.values()].filter(laKhoi))], tuyChon, 'khi_khong_ro')
+  const tapKhoi = [...new Set([...khoiEm.values()].filter(laKhoi))]
+  const [them, nghi] = await Promise.all([nguonThem(env, ds, tapKhoi, tuyChon, 'khi_khong_ro'), tapKhoi.length ? docCauNghiDem(env) : Promise.resolve(RONG)])
   const giu = new Set<T>()
   for (const [s, cua] of theoEm) {
     const k = khoiEm.get(s) ?? null
-    for (const x of congKhoi('em', kenh, k ? [k] : [], cua, tuyChon, them)) giu.add(x)
+    for (const x of congKhoi('em', kenh, k ? [k] : [], cua, tuyChon, them, nghi)) giu.add(x)
   }
   return ds.filter((x) => giu.has(x))
 }

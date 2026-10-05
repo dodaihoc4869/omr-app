@@ -2,7 +2,7 @@
 // Máy soạn (scripts/loi-giai/may-soan.mjs) soạn 8–12 Ý MỚI cùng đề dẫn cho mỗi câu Đúng/Sai (ngoài 4 ý gốc), mỗi ý Đ/S + lí do 1 dòng,
 // KIỂM HAI LƯỢT ĐỘC LẬP (lượt soạn ↔ lượt kiểm mù không thấy giá trị đề xuất — server/src/may-soan-kiem.ts). CHỈ LƯU ý hai lượt khớp:
 // máy chủ đòi bằng chứng `kiem.d2` khớp `d` của từng ý và kiểm lại ý với câu gốc dựng từ KHO (không tin máy soạn).
-// Thang làm lại câu sai (làn khác, dùng sau) đọc bằng `docYDs(env, bams)` để ra câu Đ/S bằng ý MỚI thay vì 4 ý em đã thuộc.
+// Thang làm lại câu sai đọc bằng `docYDs(env, bams)` / `docYDsTheoQid(env, qids)` (06/10, ban-khac-ao.ts: qid ảo `<Q>~yd<k>`) để ra câu Đ/S bằng ý MỚI thay vì 4 ý em đã thuộc.
 //
 // Bảng CHỈ-THÊM `cau_y_ds` (băm câu, ý, giá trị, lí do, nguồn, lúc) — tạo lúc GHI (như cau-bo-tro.ts); bản SQL: server/migration-0510-y-ds.sql
 // (chỉ thêm, chưa chạy --remote). Đường đọc KHÔNG tạo bảng (ngân sách vòng D1 của kế hoạch ngày): bảng chưa có ⇒ rỗng.
@@ -107,6 +107,11 @@ export async function nopYDs(env: Env, b: Obj): Promise<Obj> {
 /** Một ý Đ–S mới. `qid`/`maDe`/`lop` là của câu gốc — đưa thẳng vào `cauHopKhoi(khoiEm, y)`. `d` là ĐÁP ÁN: không gửi xuống máy em trước khi nộp. */
 export interface YDs { bam: string; stt: number; t: string; d: 'D' | 'S'; lyDo: string; nguon: string; luc: string; qid: string; maDe: string; lop: string }
 
+const dongYDs = (x: Obj): YDs => ({
+  bam: str(x.bam), stt: Number(x.stt), t: String(x.noi_dung ?? ''), d: str(x.gia_tri) === 'S' ? 'S' : 'D', lyDo: String(x.ly_do ?? ''),
+  nguon: str(x.nguon), luc: str(x.luc), qid: str(x.qid_mau), maDe: str(x.ma_de), lop: str(x.lop),
+})
+
 /**
  * HÀM ĐỌC cho thang làm lại: ý Đ–S mới theo băm câu, đúng thứ tự `stt`. Mặc định BỎ câu đang nằm diện nghi đáp án (`cau_nghi_dap_an` 'nghi'
  * của bất kì bản cùng nội dung) — kênh tự động không dùng câu nghi. `lop` ⇒ chỉ ý soạn từ câu cùng khối (không dùng chéo khối);
@@ -127,12 +132,36 @@ export async function docYDs(env: Env, bams: readonly string[], opts: { lop?: st
       try { rows = (await env.DB.prepare(sql(false)).bind(...tham).all<Obj>()).results ?? [] } catch { rows = [] }
     }
     for (const x of rows) {
-      const y: YDs = {
-        bam: str(x.bam), stt: Number(x.stt), t: String(x.noi_dung ?? ''), d: str(x.gia_tri) === 'S' ? 'S' : 'D', lyDo: String(x.ly_do ?? ''),
-        nguon: str(x.nguon), luc: str(x.luc), qid: str(x.qid_mau), maDe: str(x.ma_de), lop: str(x.lop),
-      }
+      const y = dongYDs(x)
       if (opts.khoiEm !== undefined && !cauHopKhoi(opts.khoiEm, y)) continue
       ra.set(y.bam, [...(ra.get(y.bam) ?? []), y])
+    }
+  }
+  return ra
+}
+
+/**
+ * Như `docYDs` nhưng theo qid CÂU GỐC (06/10 — thang làm lại câu sai, bộ ý Đ–S mới `~yd`): MỘT truy vấn nối `loi_giai_cau` (qid → băm) với `cau_y_ds`, không cần biết
+ * băm trước. Cùng luật: bỏ câu nghi đáp án, `lop` lọc theo khối câu, `khoiEm` qua `cauHopKhoi`; ý đúng thứ tự `stt`. Bảng chưa có / lỗi ⇒ Map rỗng (không ném, không tạo bảng).
+ */
+export async function docYDsTheoQid(env: Env, qids: readonly string[], opts: { lop?: string; khoiEm?: Khoi | null; boNghi?: boolean } = {}): Promise<Map<string, YDs[]>> {
+  const ra = new Map<string, YDs[]>()
+  const ds = [...new Set(qids.map(str).filter(Boolean))]
+  const lop = str(opts.lop)
+  const sql = (nghi: boolean) => `SELECT lc.qid AS qid_hoi, y.* FROM loi_giai_cau lc JOIN cau_y_ds y ON y.bam = lc.bam WHERE lc.qid IN (SELECT value FROM json_each(?))${lop ? ' AND y.lop = ?' : ''}
+    ${nghi ? "AND NOT EXISTS (SELECT 1 FROM loi_giai_cau q JOIN cau_nghi_dap_an n ON n.qid = q.qid AND n.trang_thai = 'nghi' WHERE q.bam = y.bam)" : ''}
+    ORDER BY lc.qid, y.stt`
+  for (let i = 0; i < ds.length; i += 90) {
+    const tham = [JSON.stringify(ds.slice(i, i + 90)), ...(lop ? [lop] : [])]
+    let rows: Obj[] = []
+    try { rows = (await env.DB.prepare(sql(opts.boNghi !== false)).bind(...tham).all<Obj>()).results ?? [] } catch {
+      try { rows = (await env.DB.prepare(sql(false)).bind(...tham).all<Obj>()).results ?? [] } catch { rows = [] }
+    }
+    for (const x of rows) {
+      const y = dongYDs(x)
+      if (opts.khoiEm !== undefined && !cauHopKhoi(opts.khoiEm, y)) continue
+      const q = str(x.qid_hoi)
+      ra.set(q, [...(ra.get(q) ?? []), y])
     }
   }
   return ra

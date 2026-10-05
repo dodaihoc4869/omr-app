@@ -15,7 +15,7 @@
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
-import { TU_NGAY } from './loi-hoc-luat'
+import { TU_NGAY, tachSongSinh } from './loi-hoc-luat'
 import { damBaoBangBoTro, docBoTro, songSinhDuDuLieu, type SongSinh } from './cau-bo-tro'
 import { damBaoBangTuHoanThien } from './tu-hoan-thien'
 import { BO_CHIA_KHOA } from '../../src/lib/loi-giai-bo'
@@ -135,7 +135,7 @@ export async function docCauEmSai(env: Env): Promise<Map<string, Set<string>>> {
   }
   const ra = new Map<string, Set<string>>()
   for (const x of rows) {
-    const q = qidGocMaySoan(str(x.qid)), sbd = str(x.sbd)
+    const q = qidGocMaySoan(tachSongSinh(str(x.qid)).goc), sbd = str(x.sbd) // 06/10: `tachSongSinh` thêm `~bt<k>` / `~yd<k>` (bản khác ảo) — bộ kiểm đóng gói (kiem.bundle.mjs) không đổi
     if (!q || !sbd) continue
     const s = ra.get(q) ?? new Set<string>()
     s.add(sbd)

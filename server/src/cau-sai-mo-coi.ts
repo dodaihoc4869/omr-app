@@ -15,8 +15,11 @@ const NGAY = /^\d{4}-\d{2}-\d{2}$/
 
 const sqlCauSai = (coMucDich: boolean) => `
 WITH ev AS (
-  -- Câu gốc: bỏ hậu tố lượt game "#n" rồi hậu tố câu song sinh "~ss0|1" (04/10: thiếu bước này ⇒ lượt làm song sinh bị đếm thành câu "ngoài kho").
-  SELECT sbd, CASE WHEN instr(q0, '~ss') > 0 THEN substr(q0, 1, instr(q0, '~ss') - 1) ELSE q0 END AS q, nguon, ket_qua, luc FROM (
+  -- Câu gốc: bỏ hậu tố lượt game "#n" rồi hậu tố câu song sinh "~ss0|1" (04/10: thiếu bước này ⇒ lượt làm song sinh bị đếm thành câu "ngoài kho"),
+  -- biến thể bằng mã "~bt<k>" và bộ ý Đ–S mới "~yd<k>" (06/10, ban-khac-ao.ts — cùng lẽ).
+  SELECT sbd, CASE WHEN instr(q0, '~ss') > 0 THEN substr(q0, 1, instr(q0, '~ss') - 1)
+    WHEN instr(q0, '~bt') > 0 THEN substr(q0, 1, instr(q0, '~bt') - 1)
+    WHEN instr(q0, '~yd') > 0 THEN substr(q0, 1, instr(q0, '~yd') - 1) ELSE q0 END AS q, nguon, ket_qua, luc FROM (
   SELECT sbd, CASE WHEN instr(qid, '#') > 0 THEN substr(qid, 1, instr(qid, '#') - 1) ELSE qid END AS q0, nguon, ket_qua, luc
     FROM su_kien_hoc WHERE ngay_vn >= ? AND nguon <> 'nen'${coMucDich ? ` AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted'` : ''}
   )
