@@ -505,3 +505,7 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
  * ⇒ trên thẻ lời giải sáng của Đảo 2.0 chữ vàng trên nền kem gần như không đọc được, trông như nút bị khoá (bản build thật, ảnh chụp 05/10).
  * Đặc hiệu 0,4,1 thắng `.dao.dao button.lg-nut--hoi` (0,3,1) bất kể tệp nào nạp trước. Chỉ đổi màu; cỡ, chữ, vị trí giữ nguyên. */
 .dao.dao2.dao-v2 button.lg-nut--hoi{--nut-nen:rgb(214,240,238);--nut-chu:rgb(10,90,96);--nut-bong:inset 0 0 0 1px rgb(150,210,210)}
+/* ĐỀ THỬ (05/10): thanh nộp NỔI ở đáy suốt lúc làm (data-noi) — nút còn khoá có nền gần trong suốt (--d2-tat-nen) và dòng "Đã làm n/N câu"
+ * không có nền ⇒ chữ thẻ câu bên dưới hiện xuyên qua, đè lên nhau (ảnh chụp 05/10). Ở ải thường thanh chỉ nổi khi đã chọn đáp án nên không gặp.
+ * Cho thanh một tấm nền mờ đục như thẻ; chữ, nút, vị trí giữ nguyên. */
+.dao2 .dao2-de-thu[data-pha="lam"] > .dao2-chan[data-noi]{background:var(--d2-bot);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:18px;padding:8px 10px 10px;box-shadow:0 6px 18px -8px var(--d2-bong-dao)}
