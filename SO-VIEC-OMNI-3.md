@@ -17,6 +17,9 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [ ] "thêm những mục cần thiết đồng bộ với giao diện hiện tại nhé để học sinh không cảm thấy thay đổi nhiều" | bằng chứng: (chưa có)
 - [ ] "Làm luôn công cụ duyệt vi kỹ năng cho chương đang dạy, tự động chuẩn xác luôn nhé. Ko cần tôi." | bằng chứng: (chưa có)
 - [ ] "Bạn hãy làm mọi thứ tôi chỉ chữa bài hs cần chữa" ⇒ câu nền cho các nhãn hay sai cũng tự động (sinh câu có đáp án tính bằng mã, kiểm chéo) | bằng chứng: (chưa có)
+- [ ] "Tôi tick đề rồi, cho thêm chỗ chọn giao cho hs nhé" (thầy nhắn 05/10 giữa lúc build) ⇒ sau khi tick bài có chỗ chọn em được giao | bằng chứng: (chưa có)
+- [ ] "bạn bê luôn cái chọn hs ở chiến dịch cũ" ⇒ dùng lại đúng bộ chọn học sinh của màn tạo chiến dịch cũ | bằng chứng: (chưa có)
+- [ ] "cho chọn hs theo điểm danh nữa" ⇒ chọn nhanh các em có mặt theo điểm danh buổi học | bằng chứng: máy chủ xong 9e82611 (lệnh chỉ-đọc gan-day: buổi gần đây kể cả đã đóng + SBD có mặt; buoiGanDay ở app thầy; test 4/4 + test buổi học cũ 12/12); giao diện đã giao làn C1, máy chủ tick làm chắc đã giao làn B1
 - [ ] "hãy thiết kế tính tế đồng điệu với giao diện hiện tại nhé" ⇒ dùng lại đúng lớp CSS/token/thành phần đang có (h2-*, cd-*, m3), không màn mới kiểu khác, không đổi bố cục cũ | bằng chứng: (chưa có)
 
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
