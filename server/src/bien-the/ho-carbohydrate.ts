@@ -760,7 +760,7 @@ const CELLULOSE: MauDe[] = [
     sinh(r, phan) {
       const [c, D] = r.chon([[63, 1.4], [65, 1.4], [68, 1.41]] as const), b = r.chon([29.7, 44.55, 59.4, 89.1, 118.8, 148.5, 178.2, 297])
       const n = b / MNIT, nT = 3 * n, mT = nT * MHNO3, mdd = mT / (c / 100), kq = mdd / D
-      return soHoc(`Để điều chế ${vn(b)} kg cellulose trinitrate theo phương trình: ${PT_NITRAT}. Coi hiệu suất phản ứng đạt 100%, thể tích dung dịch HNO₃ ${c}% (D = ${vn(D)} g/mL) cần dùng là V lít. ${hoi(phan, 'V')}`, kq, [
+      return soHoc(`Cellulose trinitrate được điều chế theo phương trình: ${PT_NITRAT}. Để điều chế ${vn(b)} kg cellulose trinitrate (coi hiệu suất phản ứng đạt 100%) cần dùng V lít dung dịch HNO₃ ${c}% (D = ${vn(D)} g/mL). ${hoi(phan, 'V')}`, kq, [
         { giaTri: n * MHNO3 / (c / 100) / D, viSao: 'quên hệ số 3 (lấy 1 mắt xích cần 1 HNO₃)' },
         { giaTri: mT / (c / 100), viSao: 'dừng ở khối lượng dung dịch, quên chia khối lượng riêng' },
         { giaTri: mT / D, viSao: `quên chia nồng độ ${c}%` },
@@ -859,7 +859,9 @@ function lapGanSo(de: string, tenHoi: readonly string[], soCua: ReadonlyMap<stri
     kienThuc: ['chuyển hoá carbohydrate', 'tên gọi các quá trình lên men'],
   }
 }
-const cauHoiGanSo = (phan: Phan, k: number) => (phan === 'I' ? `Dãy ${CHU_SO[k]} chữ số thu được là` : `Viết dãy ${CHU_SO[k]} chữ số đó.`)
+/** Lời yêu cầu theo cách kho của thầy viết ("… và sắp xếp theo trình tự thành dãy bốn số"); Phần I thêm câu dẫn tới phương án. */
+const yeuCauGanSo = (phan: Phan, tenHoi: readonly string[]) =>
+  `theo tên gọi: ${tenHoi.join(', ')} và sắp xếp theo trình tự đó thành dãy ${CHU_SO[tenHoi.length]} số.${phan === 'I' ? ` Dãy ${CHU_SO[tenHoi.length]} số thu được là` : ''}`
 
 /** Chọn k phương trình KHÁC TÊN (không lấy cùng lúc hai phản ứng thuỷ phân). */
 function phuongTrinhKhacTen(r: Rng, k: number): string[] {
@@ -873,15 +875,15 @@ function phuongTrinhKhacTen(r: Rng, k: number): string[] {
 }
 /** Dạng "sơ đồ chuyển hoá" (đánh số theo mũi tên). */
 function ganSoSoDo(r: Rng, phan: Phan, chat: readonly string[], pu: readonly string[]): BanSinh {
-  const k = pu.length, so = new Map(pu.map((p, i) => [PU[p]!.ten, i + 1] as const)), tenHoi = r.xao(pu.map((p) => PU[p]!.ten))
+  const so = new Map(pu.map((p, i) => [PU[p]!.ten, i + 1] as const)), tenHoi = r.xao(pu.map((p) => PU[p]!.ten))
   const sd = chat.map((c, i) => (i === 0 ? c : `→(${i}) ${c}`)).join(' ')
-  return lapGanSo(`Cho sơ đồ chuyển hoá: ${sd}. Gán số thứ tự của các phản ứng theo tên gọi: ${tenHoi.join(', ')} rồi viết các số theo đúng thứ tự tên gọi đó thành một dãy ${CHU_SO[k]} chữ số. ${cauHoiGanSo(phan, k)}`,
+  return lapGanSo(`Cho sơ đồ chuyển hoá: ${sd}. Gán số thứ tự của các phản ứng ${yeuCauGanSo(phan, tenHoi)}`,
     tenHoi, so, pu.map((p, i) => `(${i + 1}) ${chat[i]} → ${chat[i + 1]}: ${PU[p]!.ten}.`))
 }
 /** Dạng "danh sách phương trình" (đánh số ngẫu nhiên). */
 function ganSoPhuongTrinh(r: Rng, phan: Phan, ma: readonly string[]): BanSinh {
-  const k = ma.length, ds = r.xao(ma), so = new Map(ds.map((x, i) => [PU[x]!.ten, i + 1] as const)), tenHoi = r.xao(ds.map((x) => PU[x]!.ten))
-  return lapGanSo(`Cho các phương trình hoá học: ${ds.map((x, i) => `(${i + 1}) ${PU[x]!.pt}`).join('; ')}. Gán số thứ tự phương trình hoá học theo tên gọi: ${tenHoi.join(', ')} rồi viết các số theo đúng thứ tự tên gọi đó thành một dãy ${CHU_SO[k]} chữ số. ${cauHoiGanSo(phan, k)}`,
+  const ds = r.xao(ma), so = new Map(ds.map((x, i) => [PU[x]!.ten, i + 1] as const)), tenHoi = r.xao(ds.map((x) => PU[x]!.ten))
+  return lapGanSo(`Cho các phương trình hoá học: ${ds.map((x, i) => `(${i + 1}) ${PU[x]!.pt}`).join('; ')}. Gán số thứ tự phương trình hoá học của các phản ứng ${yeuCauGanSo(phan, tenHoi)}`,
     tenHoi, so, ds.map((x, i) => `(${i + 1}) là phản ứng ${PU[x]!.ten}.`))
 }
 

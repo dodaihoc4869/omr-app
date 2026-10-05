@@ -401,7 +401,7 @@ const SULFURIC: MauDe[] = [
     ma: 'sulfuric.van_dung.thu_dong', dang: [SA_TT], muc: 'van_dung', tuKhoa: /nguội|thụ động/,
     sinh(r, phan) {
       const kl = r.chon(['Al', 'Fe']), A = NTK[kl]!, x = r.boi(0.02, 0.3, 0.01), y = r.boi(0.02, 0.3, 0.01), a = lam(A * x + 64 * y), kq = y * V_KHI
-      return soHoc(`Cho ${vn(a)} gam hỗn hợp gồm ${vn(lam(A * x))} gam ${kl} và Cu vào dung dịch H₂SO₄ đặc, nguội, dư, thu được V lít khí SO₂ (sản phẩm khử duy nhất, đkc). ${hoi(phan, 'V')}`, kq, [
+      return soHoc(`Cho ${vn(a)} gam hỗn hợp gồm ${kl} và Cu (trong đó có ${vn(lam(A * x))} gam ${kl}) vào dung dịch H₂SO₄ đặc, nguội, dư, thu được V lít khí SO₂ (sản phẩm khử duy nhất, đkc). ${hoi(phan, 'V')}`, kq, [
         { giaTri: (1.5 * x + y) * V_KHI, viSao: `quên ${kl} bị thụ động trong H₂SO₄ đặc, nguội (tính cả ${kl} phản ứng)` },
         { giaTri: (x + y) * V_KHI, viSao: `tính cả ${kl} phản ứng với tỉ lệ 1 : 1` },
         { giaTri: a / 64 * V_KHI, viSao: 'coi cả hỗn hợp là Cu' },

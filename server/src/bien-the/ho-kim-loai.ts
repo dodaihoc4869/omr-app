@@ -347,7 +347,7 @@ function thuTuCathode(r: import('./chung').Rng, phan: Phan, muc: 'biet' | 'hieu'
   const theoDien = [...ds].sort((a, b) => (QT[b]!.ion.includes('³') ? 3 : QT[b]!.ion.includes('²') ? 2 : 1) - (QT[a]!.ion.includes('³') ? 3 : QT[a]!.ion.includes('²') ? 2 : 1) || QT[b]!.E - QT[a]!.E)
   nhieu.push({ chu: theoDien.map((q) => so.get(q)).join(''), viSao: 'xếp theo điện tích ion giảm dần thay vì theo thế điện cực' })
   for (let i = 0; i + 1 < k; i++) { const a = [...dap]; [a[i], a[i + 1]] = [a[i + 1]!, a[i]!]; nhieu.push({ chu: a.join(''), viSao: `đổi chỗ hai quá trình (${a[i]}) và (${a[i + 1]})` }) }
-  const de = `Điện phân dung dịch hỗn hợp gồm ${hh.muoi.join(', ')} (điện cực trơ). Cho các quá trình có thể xảy ra tại cathode: ${ds.map((q, i) => `(${i + 1}) ${QT[q]!.chu}`).join('; ')}. Liệt kê số thứ tự các quá trình theo đúng thứ tự xảy ra tại cathode thành một dãy ${SO_CHU[k]} chữ số. ${phan === 'I' ? `Dãy ${SO_CHU[k]} chữ số đó là` : `Viết dãy ${SO_CHU[k]} chữ số đó.`}`
+  const de = `Điện phân dung dịch hỗn hợp gồm ${hh.muoi.join(', ')} (điện cực trơ). Cho các quá trình có thể xảy ra tại cathode: ${ds.map((q, i) => `(${i + 1}) ${QT[q]!.chu}`).join('; ')}. Liệt kê số thứ tự các quá trình theo đúng thứ tự xảy ra tại cathode thành một dãy ${SO_CHU[k]} chữ số.${phan === 'I' ? ` Dãy ${SO_CHU[k]} chữ số đó là` : ''}`
   return {
     de, kieu: 'chu', dapAnChu: dap, nhieu: nhieu.filter((x) => x.chu !== dap),
     lyDoDung: `xếp theo E° giảm dần: ${dung.map((q) => `(${so.get(q)}) ${QT[q]!.ion}`).join(' > ')}`,

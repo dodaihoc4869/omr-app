@@ -203,7 +203,7 @@ const XA_PHONG_HOA: MauDe[] = [
       }
       const Mz = M(Z), n = A / Mb, kq = 3 * n * Mz * H / 100
       const Mmuoi = M(b.no ? b.muoiNa : 'C₁₇H₃₅COONa')
-      return soHoc(`Từ ${vn(A)} kg ${b.ten} điều chế chất hữu cơ Z theo sơ đồ: ${sd}. Biết hiệu suất của toàn bộ quá trình là ${H}%, khối lượng Z thu được tối đa là m kg. ${hoi(phan, 'm')}`, kq, [
+      return soHoc(`Từ ${vn(A)} kg ${b.ten} điều chế chất hữu cơ Z theo sơ đồ: ${sd}. Biết hiệu suất của toàn bộ quá trình là ${H}%, khối lượng Z thu được là m kg. ${hoi(phan, 'm')}`, kq, [
         { giaTri: kq / 3, viSao: 'quên hệ số 3 (1 mol chất béo cho 3 mol gốc acid béo)' },
         { giaTri: 3 * n * Mmuoi * H / 100, viSao: 'dừng ở muối sodium (nhầm Z là muối)' },
         { giaTri: kq / (H / 100), viSao: `quên nhân hiệu suất ${H}%` },

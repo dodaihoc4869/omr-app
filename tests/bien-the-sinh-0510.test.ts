@@ -226,7 +226,7 @@ const giaiCellulose: BoGiai = (text) => {
   if (m) { khoang(Number(m[3]), 50, 95, 'H'); return { so: so(m[1]!) / MCel * pt.Msp * Number(m[3]) / 100 } }
   m = khop(R(`^Để sản xuất ${S} (kg|tấn) (cellulose trinitrate|cellulose triacetate) theo phương trình: .* với hiệu suất (\\d+)% \\(tính theo (nitric acid|acetic anhydride)\\), khối lượng \\5 tối thiểu cần dùng là m \\2\\.$`), de)
   if (m) return { so: so(m[1]!) / pt.Msp * pt.heSo * pt.Mthuoc / (Number(m[4]) / 100) }
-  m = khop(R(`^Để điều chế ${S} kg cellulose trinitrate theo phương trình: .*\\. Coi hiệu suất phản ứng đạt 100%, thể tích dung dịch HNO₃ (\\d+)% \\(D = ${S} g/mL\\) cần dùng là V lít\\.$`), de)
+  m = khop(R(`^Cellulose trinitrate được điều chế theo phương trình: .*\\. Để điều chế ${S} kg cellulose trinitrate \\(coi hiệu suất phản ứng đạt 100%\\) cần dùng V lít dung dịch HNO₃ (\\d+)% \\(D = ${S} g/mL\\)\\.$`), de)
   if (m) return { so: so(m[1]!) / pt.Msp * pt.heSo * pt.Mthuoc / (Number(m[2]) / 100) / so(m[3]!) }
   m = khop(R(`^Để điều chế ${S} kg cellulose trinitrate theo phương trình: .* với hiệu suất (\\d+)% \\(tính theo nitric acid\\), cần V lít dung dịch HNO₃ (\\d+)% \\(D = ${S} g/mL\\)\\.$`), de)
   if (m) return { so: so(m[1]!) / pt.Msp * pt.heSo / (Number(m[2]) / 100) * pt.Mthuoc / (Number(m[3]) / 100) / so(m[4]!) }
@@ -249,9 +249,10 @@ function tenPhanUng(dau: string[], sau: string[]): string {
   throw new Error(`không phân loại được: ${dau.join(' + ')} → ${sau.join(' + ')}`)
 }
 const giaiGanSo: BoGiai = (text) => {
-  const tenM = /theo tên gọi: (.+?) rồi viết/.exec(text)
+  const tenM = /theo tên gọi: (.+?) và sắp xếp theo trình tự đó thành dãy (ba|bốn) số\./.exec(text)
   if (!tenM) throw new Error(`gán số — thiếu tên gọi: ${text}`)
   const ten = tenM[1]!.split(', ')
+  expect(ten.length, `số tên gọi ≠ độ dài dãy đề nêu: ${text}`).toBe(tenM[2] === 'ba' ? 3 : 4)
   const soCua = new Map<string, number>()
   const sd = /^Cho sơ đồ chuyển hoá: (.+?)\. Gán số/.exec(text)
   if (sd) {
@@ -302,7 +303,7 @@ const giaiXaPhong: BoGiai = (text) => {
     expect(MUOI_TEN[m[5]!]).toBe(`${GOC_BEO[m[3]!]}COONa`); khoang(Number(m[2]), 50, 100, 'hàm lượng'); khoang(Number(m[4]), 50, 90, '% muối')
     return { so: so(m[1]!) * Number(m[2]) / 100 / MT(ctBeo(m[3]!)) * 3 * MT(MUOI_TEN[m[5]!]!) * Number(m[6]) / 100 / (Number(m[4]) / 100) }
   }
-  m = khop(R(`^Từ ${S} kg ${BEO} điều chế chất hữu cơ Z theo sơ đồ: \\2 (.+?)\\. Biết hiệu suất của toàn bộ quá trình là (\\d+)%, khối lượng Z thu được tối đa là m kg\\.$`), de)
+  m = khop(R(`^Từ ${S} kg ${BEO} điều chế chất hữu cơ Z theo sơ đồ: \\2 (.+?)\\. Biết hiệu suất của toàn bộ quá trình là (\\d+)%, khối lượng Z thu được là m kg\\.$`), de)
   if (m) {
     // Đi theo sơ đồ: giữ gốc acid béo R; +H₂ dư ⇒ R no (C₁₇H₃₅ / C₁₅H₃₁); +NaOH ⇒ RCOONa; +HCl ⇒ RCOOH; +CH₃OH ⇒ RCOOCH₃.
     let R0 = GOC_BEO[m[2]!]!, dang = 'beo'
@@ -575,8 +576,8 @@ const giaiSulfuric: BoGiai = (text) => {
   if (m) return { so: so(m[1]!) + so(m[1]!) / NTK_T[m[2]!]! * TRI_DAC[m[2]!]! / 2 * MSO4() }
   m = khop(R(`^Cho ${S} gam hỗn hợp gồm Fe và Cu vào dung dịch H₂SO₄ loãng, dư, thu được ${S} lít khí H₂ \\(đkc\\) và còn lại chất rắn không tan\\. Cho toàn bộ chất rắn không tan đó tác dụng hết với dung dịch H₂SO₄ đặc, nóng, dư, thu được V lít khí SO₂ \\(sản phẩm khử duy nhất, đkc\\)\\.$`), de)
   if (m) { const nFe = so(m[2]!) / V_MOL / (TRI_LOANG.Fe! / 2), mCu = so(m[1]!) - nFe * NTK_T.Fe!; expect(mCu > 0, text).toBe(true); return { so: mCu / NTK_T.Cu! * TRI_DAC.Cu! / 2 * V_MOL } }
-  m = khop(R(`^Cho ${S} gam hỗn hợp gồm ${S} gam (Al|Fe) và Cu vào dung dịch H₂SO₄ đặc, nguội, dư, thu được V lít khí SO₂ \\(sản phẩm khử duy nhất, đkc\\)\\.$`), de)
-  if (m) { const mCu = so(m[1]!) - so(m[2]!); expect(mCu > 0, text).toBe(true); return { so: mCu / NTK_T.Cu! * TRI_DAC.Cu! / 2 * V_MOL } }
+  m = khop(R(`^Cho ${S} gam hỗn hợp gồm (Al|Fe) và Cu \\(trong đó có ${S} gam \\2\\) vào dung dịch H₂SO₄ đặc, nguội, dư, thu được V lít khí SO₂ \\(sản phẩm khử duy nhất, đkc\\)\\.$`), de)
+  if (m) { const mCu = so(m[1]!) - so(m[3]!); expect(mCu > 0, text).toBe(true); return { so: mCu / NTK_T.Cu! * TRI_DAC.Cu! / 2 * V_MOL } }
   m = khop(R(`^Hoà tan hoàn toàn ${S} gam hỗn hợp X gồm (\\S+) và (\\S+) trong dung dịch H₂SO₄ đặc, nóng, dư, thu được ${S} lít khí SO₂ \\(sản phẩm khử duy nhất, đkc\\)\\. Khối lượng muối sulfate tạo thành là m gam\\.$`), de)
   if (m) {
     const a = so(m[1]!), nS = so(m[4]!) / V_MOL, [k1, k2] = [m[2]!, m[3]!]
@@ -775,14 +776,14 @@ describe('Tất định + khoá băm chống trôi', () => {
     thuy_phan: ['c36e46e258af27a0', 'bc7f0196a59bba61', '371ab174cafb8a37'],
     trang_bac: ['355dcac9c5a882cc', 'cd8aeea2388fef57', 'e7e5909fbb108111'],
     cellulose: ['b3a512f39a9a77a1', 'cb56e5fcb231f659', '423844230815f382'],
-    gan_so_chuyen_hoa: ['d16731a31c709887', '1990e97bf6ddd854', '011bdb7fd1ef3b1a'],
-    xa_phong_hoa: ['7ad8004ba7bcbe1a', 'c73c3120889e9e47', '415c842dc9d5c98f'],
+    gan_so_chuyen_hoa: ['ebefc495ad95d421', 'ad0b00b2e51fc957', 'ccc5df166b350a97'],
+    xa_phong_hoa: ['7ad8004ba7bcbe1a', 'c73c3120889e9e47', 'bfbdf063464ce86d'],
     ester_hoa: ['3ab8714bf9f9f600', '9fa5ae4d4d66bfae', '19e963d9f82dfc02'],
     dot_chay_ester: ['b4739799c5a1aac3', 'acf314d2c9d43980', 'a562108bb52fdeec'],
     chi_so_chat_beo: ['5ffd5fde641787a3', '136a1cb395c781ab', '4f014a531a8cce40'],
     dieu_che_kim_loai: ['bd136007bcb866d0', '3126b81be0843cf3', '6236e2d6a781c831'],
     dien_phan_dung_dich: ['09c19be7179ce3da', '3027a9a6ad5aeac4', '83bd615abbb7ad59'],
-    thu_tu_cathode: ['4574223ca287c4ac', '10b412dc13930d7d', 'b25b9bf363244544'],
+    thu_tu_cathode: ['4574223ca287c4ac', '995059756ef9de4f', 'b25b9bf363244544'],
     hang_so_can_bang: ['cc3ef608916ffe9c', 'f249877cbada14bc', 'e9c48babba95d40a'],
     sulfuric_acid: ['5bc692e38b79d028', 'c5071713ed71e9f4', '4815a6c7d645cf7d'],
   }
