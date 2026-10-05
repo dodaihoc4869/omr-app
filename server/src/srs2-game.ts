@@ -11,6 +11,9 @@ import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidGoc, sanh2, thuSucThem, type HoSo2, type MetaCau } from './srs2-d1'
 import { ghiLoiMay } from './nhat-ky-may'
+import { omniBat } from './omni-d1'
+import { hoa2OmniAction, LENH_OMNI_HOA2, startVe } from './omni-game'
+import { CHU_CHO_BAI_MOI } from '../../src/lib/omni-chu'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -234,7 +237,8 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const tamHoan = kh.tamHoan?.ca ?? 0
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
   if (kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
-  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
+  // OMNI 3: ngày chưa có câu nào mà em đang ở chế độ chờ bài mới (`hs.omni` chỉ có khi OMNI bật cho em) ⇒ lời báo "chờ thầy giao bài mới".
+  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
   const dangCho = await dangChoSom
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
@@ -273,6 +277,21 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
   return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), vai: refs[i]!.role, ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}) })), ...tomTat }
+}
+
+/** OMNI 3: em đang ở chế độ chờ bài mới? (`HoSo2.omni` do làn kế hoạch thêm, CHỈ có khi OMNI bật cho em ⇒ cờ tắt luôn false.) */
+const cheDoChoOmni = (hs: HoSo2): boolean => {
+  const o = (hs as HoSo2 & { omni?: { bat?: boolean; cheDoCho?: boolean } }).omni
+  return !!o && o.bat !== false && o.cheDoCho === true
+}
+/**
+ * `start` Đảo (Hoá 2.0): thân có `ve` (mã dạng | 'auto') VÀ OMNI bật cho em ⇒ chuyến VÉ THỬ THÁCH (omni-game.ts `startVe`).
+ * Không có `ve` hoặc OMNI tắt ⇒ `startDao2` y hệt hôm nay (không thêm lượt đọc nào khi không có `ve`).
+ */
+export async function startDao2CoVe(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const ve = typeof b.ve === 'string' ? b.ve.trim() : ''
+  if (ve && await omniBat(env, sbd).catch(() => false)) return startVe(env, sbd, ve, nowMs)
+  return startDao2(env, sbd, nowMs)
 }
 
 /** Phiên câu riêng của em cho MỘT chặng Đoàn (gọi nội bộ từ `taoNguoi`). Chặng ít câu ôn thì ngắn lại, không độn câu. */
@@ -317,7 +336,7 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
 }
 
 // ---------------------------------------------------------------- lệnh hoa2-* của app học sinh
-export const LENH_HOA2: ReadonlySet<string> = new Set(['hoa2-sanh', 'hoa2-cau-da-lam', 'hoa2-cau-chi-tiet', 'hoa2-ruong-mo', 'hoa2-thu-suc-them'])
+export const LENH_HOA2: ReadonlySet<string> = new Set(['hoa2-sanh', 'hoa2-cau-da-lam', 'hoa2-cau-chi-tiet', 'hoa2-ruong-mo', 'hoa2-thu-suc-them', ...LENH_OMNI_HOA2])
 
 export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, nowMs = Date.now()): Promise<Record<string, unknown>> {
   if (action === 'hoa2-sanh') return sanh2(env, sbd, nowMs)
@@ -326,6 +345,8 @@ export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, 
   if (action === 'hoa2-ruong-mo') return moRuong(env, sbd, nowMs)
   // THỬ SỨC THÊM (thầy 30/09): xong kế hoạch hôm nay ⇒ lấy trước một lô câu mới của ngày mai (srs2-d1 `thuSucThem`).
   if (action === 'hoa2-thu-suc-them') return thuSucThem(env, sbd, nowMs)
+  // OMNI 3 (omni-game.ts): Trạm hồi phục xong, nhật ký, đổi thứ tự khung giờ, đề thử nửa. OMNI tắt cho em ⇒ { ok:false, error }.
+  if (LENH_OMNI_HOA2.includes(action)) return hoa2OmniAction(env, sbd, action, b, nowMs)
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
