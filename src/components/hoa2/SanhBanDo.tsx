@@ -21,6 +21,7 @@ import HopDoiTen from './HopDoiTen'
 import { hat, hatBay, loatPhao, MAU_PHAO, nhanLuotMoMan, timFx, veToaDoFx } from './hieu-ung-sanh'
 import './sanh-ban-do.css'
 import './phong-baloo'
+import { boCuaNhanh, useNapTruocManSanh } from './man-sanh-luoi'
 
 /** Câu thứ mấy trở đi em không nhận EXP ở ngày Huyết Chiến = trần EXP ngày thường (40 câu, srs2-loi.ts TRAN_NGAY) + 1. */
 export const CAU_HET_EXP_HUYET_CHIEN = 41
@@ -967,10 +968,15 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
   )
 }
 
-export default function SanhBanDo(p: SanhBanDoProps) {
+export default function SanhBanDo(goc: SanhBanDoProps) {
+  // Chuyển màn nhanh (05/10, man-sanh-luoi.ts): cửa Câu đã làm / Tu luyện bắn lệnh mở màn ngay lúc chạm rồi gọi đúng hàm cửa cũ.
+  const p = boCuaNhanh(goc)
   const bc = useBoCucNgang()
   const kq = p.ketQua
   const moMan = useMoMan(!!kq && kq.cheDo2 && !kq.canChonThu && !!kq.sanh)
+  // Chuyển màn nhanh (05/10): Sảnh có số ⇒ lúc rảnh nạp sẵn mảnh Đảo / Đoàn / Câu đã làm / Tu luyện (man-sanh-luoi.ts). Không đổi gì trên màn.
+  const sanhCo = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
+  useNapTruocManSanh(!!sanhCo, !!sanhCo && sanhCo.doan.con > 0)
   if (bc.ngang) return <SanhNgang p={p} bc={bc} moMan={moMan} />
   return <SanhDoc p={p} moMan={moMan} />
 }

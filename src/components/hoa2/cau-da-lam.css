@@ -192,6 +192,13 @@
   background: var(--h2c-nen-2);
   overflow: hidden;
 }
+/* CHUYỂN MÀN NHANH (05/10): thẻ đóng NẰM NGOÀI khung nhìn được trình duyệt bỏ qua dựng kiểu / bố cục / vẽ tới khi cuộn gần
+   (content-visibility: auto — vẫn trong cây trợ năng, tìm chữ được). Thẻ trong khung nhìn vẽ y hệt cũ: thẻ vốn `overflow: hidden`
+   nên phần khoanh vùng (contain) đi kèm không đổi điểm ảnh nào. Thẻ đang mở (lời giải, Hỏi thầy) KHÔNG áp. */
+.h2-cdl-ds > .h2-the:not([data-mo='true']) {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 210px;
+}
 .h2-the-nut {
   width: 100%;
   min-height: 48px;

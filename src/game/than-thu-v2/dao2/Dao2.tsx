@@ -2,7 +2,7 @@
 // Chỉ chạy khi `hoa2-sanh` trả `cheDo2:true` (Game.tsx hỏi một lần, `DaoThanThu` chuyển vào đây). Cờ tắt ⇒ Đảo cũ nguyên vẹn.
 // LUẬT CHƠI GIỮ NGUYÊN: cùng lệnh máy chủ như Đảo cũ — resume → sync → start (mode adventure) → answer → complete; máu/Cuồng nộ tính bằng
 // `learningBattle`, EXP và lý do thưởng do máy chủ trả. Chỉ thêm các lệnh đọc `hoa2-sanh`, `hoa2-cau-da-lam` và mở rương `hoa2-ruong-mo`.
-import {useCallback,useEffect,useRef,useState} from 'react'
+import {Activity,startTransition,useCallback,useEffect,useRef,useState} from 'react'
 import {giuTrangKhongTaiLai} from '../../../lib/cap-nhat-app'
 import type {ReactNode} from 'react'
 import {learningBattle} from '../learning-battle'
@@ -42,6 +42,9 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const [sanh,setSanh]=useState<Sanh2|null>(()=>docSanh2(sanhDau)),[dangTai,setDangTai]=useState(false),[loiSanh,setLoiSanh]=useState('')
  const [daLam,setDaLam]=useState<unknown>(null)
  const [luot,setLuot]=useState<Luot2|null>(null),[pha,setPha]=useState<'ban-do'|'ai'|'xong'>('ban-do')
+ // TRẬN DỰNG SẴN (05/10, xem cuối hàm): `lanVao` tăng mỗi lần RỜI trận ⇒ lần vào sau là thể hiện trận MỚI, y như cũ.
+ const [phaTruoc,setPhaTruoc]=useState(pha),[lanVao,setLanVao]=useState(0)
+ if(pha!==phaTruoc){setPhaTruoc(pha);if(phaTruoc==='ai')setLanVao(n=>n+1)}
  // Đang trong ải/chặng/bài ⇒ app KHÔNG tự tải lại vì bản mới (quét ổn định 30/09, như Bi-a #95): bản mới chờ tới lúc em rời màn.
  useEffect(()=>pha==='ai'?giuTrangKhongTaiLai():undefined,[pha])
  const [khoa,setKhoa]=useState(''),[het,setHet]=useState(''),[soan,setSoan]=useState('')
@@ -90,8 +93,12 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
 
  const moChuyen=async()=>{let l=luot&&Date.now()-luot.luc<HAN_LUOT?luot:null
   if(!l){setLuot(null);l=await soanChuyen(sanh)}
-  if(l){setCoXatTruoc(sanh?.chienDich?.coXat??null);setKetThuc(null);setPha('ai')}else setPha('ban-do')}
- const lenDuong=()=>chay(moChuyen)
+  if(l)vaoTran();else setPha('ban-do')}
+ // Vào trận trong startTransition (05/10): lượt chạm LÊN ĐƯỜNG được vẽ lại ngay (INP thấp), màn trận — đã dựng sẵn ẩn — hiện ở nhịp kế.
+ // Chuyến đã soạn, còn hạn ⇒ vào thẳng: không lệnh mạng nào nên không bật "bận" (khỏi vẽ lại bản đồ hai lần trong lượt chạm), lỗi cũ xoá
+ // như `chay` vẫn xoá. Chưa có chuyến ⇒ soạn như cũ.
+ function vaoTran(){startTransition(()=>{setLoi('');setMaLoi('');setCoXatTruoc(sanh?.chienDich?.coXat??null);setKetThuc(null);setPha('ai')})}
+ const lenDuong=()=>{if(!dangChay.current&&luot&&Date.now()-luot.luc<HAN_LUOT){vaoTran();return}void chay(moChuyen)}
  const thuLai=()=>chay(async()=>{setDangTai(true);try{const s=await napSanh();if(!s){setLoiSanh(LOI_BAN_DO);return}await soanChuyen(s)}catch(e){setLoiSanh(e instanceof Error&&e.message?e.message:LOI_BAN_DO)}finally{if(conSong.current)setDangTai(false)}})
  const nop=()=>chay(async()=>{const q=luot?.cau[viTri];if(!luot||!q)return
   setBaoCau('')
@@ -117,13 +124,19 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const moRuong=()=>chay(async()=>{const r=await call('hoa2-ruong-mo') as DaoKetQua&{qua?:{vang?:unknown}};const v=Number(r.qua?.vang);setRuongVua(Number.isFinite(v)&&v>0?v:null);await napSanh().catch(()=>null)})
 
  const vo=(con:ReactNode,tham=false)=><div className={`dao dao-vo dao-v2 dao2${tham?' dao-vo-tham':''}`} data-thu={chiSoThu(profile.pet)} data-pha={pha} hidden={an||undefined}>{con}</div>
- if(pha==='ai'&&luot)return vo(<TrongAi profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} busy={busy} loi={loi} maLoi={maLoi} baoCau={baoCau}
-  onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onRoi={roi}/>,true)
+ // TRẬN DỰNG SẴN (05/10). Đo trước khi sửa (CPU×6): bấm LÊN ĐƯỜNG = một tác vụ ~0,3–0,4 s dựng cả màn trận (React + KaTeX đề + cảnh) ngay
+ // trong lượt chạm. Nay chuyến đã soạn mà em còn ở bản đồ ⇒ React dựng sẵn màn trận ẨN (<Activity hidden>: việc nền lúc rảnh, chưa chạy hiệu
+ // ứng nào, không chiếm chỗ, không bấm/đọc được) — bấm LÊN ĐƯỜNG chỉ còn việc hiện ra. Mọi nhánh trả về cùng khung <>{màn}{trận}</> (`ra`).
+ const dangAi=pha==='ai'&&!!luot
+ const tran=luot&&(dangAi||(pha==='ban-do'&&!khoa))?<Activity key={`${luot.id}:${lanVao}`} mode={dangAi?'visible':'hidden'}>{vo(<TrongAi profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} busy={busy} loi={loi} maLoi={maLoi} baoCau={baoCau}
+  onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onRoi={roi}/>,true)}</Activity>:null
+ const ra=(man:ReactNode)=><>{man}{tran}</>
+ if(dangAi)return ra(null)
  if(pha==='xong'&&ketThuc){const con=sanh?.dao?.con??null,coThem=con!==null&&con>0&&!sanh?.khoaDao,cd=sanh?.chienDich,hen=henOnCua(daLam,ketThuc.sai.map(s=>s.qid))
-  return vo(<XongChuyen soChuyen={con!==null?{k:xongHomNay,n:xongHomNay+Math.ceil(con/SO_AI_CHUYEN)}:null} conCau={con} tongKet={ketThuc} enemy={ketThuc.enemy}
+  return ra(vo(<XongChuyen soChuyen={con!==null?{k:xongHomNay,n:xongHomNay+Math.ceil(con/SO_AI_CHUYEN)}:null} conCau={con} tongKet={ketThuc} enemy={ketThuc.enemy}
    oMoi={cd&&coXatTruoc!==null?Math.max(0,cd.coXat-coXatTruoc):null} coXat={cd?{co:cd.coXat,tong:cd.tong}:null} aiSai={ketThuc.sai.map(s=>({ai:s.ai,hen:hen[s.qid]}))}
-   ruong={sanh?.ruong??null} ruongVua={ruongVua} busy={busy} loi={loi} anhThu={anhThu(chiSoThu(profile.pet),profile.cap)} thu={chiSoThu(profile.pet)} onDiTiep={coThem?()=>void chay(moChuyen):undefined} onVeBanDo={veBanDo} onMoSoTay={onMoSoTay} onMoRuong={()=>void moRuong()}/>,true)}
- if(khoa)return vo(<><KhoaDao message={khoa} doanCon={sanh?.doan?.con??null} onVeSanh={onDong} onMoDoan={doanMo?onMoDoan:undefined}/>{thanhDuoi}</>)
- return vo(<BanDo profile={profile} sanh={sanh} dangTai={dangTai} loiSanh={loiSanh} cau={luot?.cau??null} ketQua={luot?ketQua:[]} soan={soan} het={het} soChuyen={soChuyen(sanh?.dao?.con,xongHomNay)}
-  vung={vungTheoDang(daLam,sanh?.chienDich?.id)} busy={busy} loi={loi} ruongVua={ruongVua} onLenDuong={()=>void lenDuong()} onThuLai={()=>void thuLai()} onVe={onDong} onMoRuong={()=>void moRuong()} thanhDuoi={thanhDuoi}/>)
+   ruong={sanh?.ruong??null} ruongVua={ruongVua} busy={busy} loi={loi} anhThu={anhThu(chiSoThu(profile.pet),profile.cap)} thu={chiSoThu(profile.pet)} onDiTiep={coThem?()=>void chay(moChuyen):undefined} onVeBanDo={veBanDo} onMoSoTay={onMoSoTay} onMoRuong={()=>void moRuong()}/>,true))}
+ if(khoa)return ra(vo(<><KhoaDao message={khoa} doanCon={sanh?.doan?.con??null} onVeSanh={onDong} onMoDoan={doanMo?onMoDoan:undefined}/>{thanhDuoi}</>))
+ return ra(vo(<BanDo profile={profile} sanh={sanh} dangTai={dangTai} loiSanh={loiSanh} cau={luot?.cau??null} ketQua={luot?ketQua:[]} soan={soan} het={het} soChuyen={soChuyen(sanh?.dao?.con,xongHomNay)}
+  vung={vungTheoDang(daLam,sanh?.chienDich?.id)} busy={busy} loi={loi} ruongVua={ruongVua} onLenDuong={()=>void lenDuong()} onThuLai={()=>void thuLai()} onVe={onDong} onMoRuong={()=>void moRuong()} thanhDuoi={thanhDuoi}/>))
 }
