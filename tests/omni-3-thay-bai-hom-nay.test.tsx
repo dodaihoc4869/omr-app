@@ -31,6 +31,8 @@ import {
   laToKhongGiao,
   maDeMacDinh,
   phamViTruoc,
+  soBaiCuaTen,
+  soChuongCuaTen,
   tenNganBai,
   trangThaiBai,
   type ToBai,
@@ -134,6 +136,51 @@ describe('phần thuần (src/lib/bai-hom-nay.ts)', () => {
     expect(dsBaiCuaKhoi(dungCay(kho), '11').map((b) => b.khoaBai)).toEqual(['DH-11-C2-B3', 'DH-11-C2-B4'])
     expect(dsBaiCuaKhoi(dungCay(kho), '10')).toEqual([])
     expect(khoaBaiCua({ khoa: 'DẠY HỌC/12/x/Bài lạ', laMa: ['A-1', 'B-2'] })).toBe('DẠY HỌC/12/x/Bài lạ')
+  })
+  it('thầy 06/10: kho nhập "Bài 10, 11, 8, 9" và chương lẫn thứ tự ⇒ cây theo số chương rồi số bài TĂNG DẦN (số học, C10 sau C3); viTri đi theo thứ tự đã sắp nên "bài đứng trước" đúng', () => {
+    const c = (n: number, ten: string) => `12 · DẠY HỌC/C${n} - ${ten}`
+    const lan = [
+      to('DH-12-C3-B10', 'Bài 10. Protein và enzyme', 2, 0, c(3, 'Hợp chất chứa N')),
+      to('DH-12-C3-B11A', 'Bài 11. Ôn tập chương 3 (Đề 1)', 2, 0, c(3, 'Hợp chất chứa N')),
+      to('DH-12-C3-B11B', 'Bài 11. Ôn tập chương 3 (Đề 2)', 2, 0, c(3, 'Hợp chất chứa N')),
+      to('DH-12-C3-B8', 'Bài 8. Amine', 2, 0, c(3, 'Hợp chất chứa N')),
+      to('DH-12-C3-B9B', 'Bài 9. Peptide (P2)', 2, 0, c(3, 'Hợp chất chứa N')),
+      to('DH-12-C3-B9A', 'Bài 9. Amino acid (P1)', 2, 0, c(3, 'Hợp chất chứa N')),
+      to('DH-12-C10-B30', 'Bài 30. Chương cuối', 2, 0, c(10, 'Chương cuối')),
+      to('DH-12-C2-B6', 'Bài 6. Tinh bột và cellulose', 2, 0, c(2, 'Carbohidrate')),
+      to('DH-12-C2-B4', 'Bài 4. Glucose và fructose', 2, 0, c(2, 'Carbohidrate')),
+      to('DH-12-C2-B5', 'Bài 5. Saccharose và maltose', 2, 0, c(2, 'Carbohidrate')),
+      to('DH-12-C1-B1', 'Bài 1. Ester', 2, 0, c(1, 'Ester lipid')),
+    ]
+    const dsLan = dsBaiCuaKhoi(dungCay(locDeDayHoc(tachNhieuTheoPhan(lan))), '12')
+    expect(dsLan.map((b) => [b.viTri, b.tenBai])).toEqual([
+      [1, 'Bài 1. Ester'],
+      [2, 'Bài 4. Glucose và fructose'],
+      [3, 'Bài 5. Saccharose và maltose'],
+      [4, 'Bài 6. Tinh bột và cellulose'],
+      [5, 'Bài 8. Amine'],
+      [6, 'Bài 9. Amino acid (P1)'],
+      [7, 'Bài 9. Peptide (P2)'],
+      [8, 'Bài 10. Protein và enzyme'],
+      [9, 'Bài 11. Ôn tập chương 3 (Đề 1)'],
+      [10, 'Bài 11. Ôn tập chương 3 (Đề 2)'],
+      [11, 'Bài 30. Chương cuối'],
+    ])
+    expect([...new Set(dsLan.map((b) => b.chuong))]).toEqual(['C1 - Ester lipid', 'C2 - Carbohidrate', 'C3 - Hợp chất chứa N', 'C10 - Chương cuối'])
+    // Bài 10 giao ⇒ bài cũ ôn lại là MỌI bài số nhỏ hơn (8, 9) và KHÔNG có Bài 11 (trước đây kho xếp 10, 11 đứng trước 8, 9 nên đảo).
+    const b10 = dsLan.find((b) => b.tenBai.startsWith('Bài 10.'))!
+    expect(phamViTruoc(dsLan, b10.viTri).map((b) => b.tenBai)).toEqual([
+      'Bài 1. Ester', 'Bài 4. Glucose và fructose', 'Bài 5. Saccharose và maltose', 'Bài 6. Tinh bột và cellulose', 'Bài 8. Amine', 'Bài 9. Amino acid (P1)', 'Bài 9. Peptide (P2)',
+    ])
+    // Tên không có "Bài <số>" giữ thứ tự cây (xếp sau các bài có số trong cùng chương).
+    const lan2 = dsBaiCuaKhoi(
+      dungCay(locDeDayHoc(tachNhieuTheoPhan([to('DH-12-C1-ON', 'Ôn tập cuối chương', 1, 0, c(1, 'Ester lipid')), to('DH-12-C1-B2', 'Bài 2. Lipid', 1, 0, c(1, 'Ester lipid')), to('DH-12-C1-B1', 'Bài 1. Ester', 1, 0, c(1, 'Ester lipid'))]))),
+      '12',
+    )
+    expect(lan2.map((b) => b.tenBai)).toEqual(['Bài 1. Ester', 'Bài 2. Lipid', 'Ôn tập cuối chương'])
+    expect(soBaiCuaTen('Bài 10. Protein')).toBe(10)
+    expect(soBaiCuaTen('Ôn tập')).toBeNull()
+    expect([soChuongCuaTen('C3 - Hợp chất chứa N'), soChuongCuaTen('Chương 12: X'), soChuongCuaTen('Khác')]).toEqual([3, 12, null])
   })
   it('tờ TỰ GIAO chỉ ba phần Trắc nghiệm / Đúng sai / Trả lời ngắn (bỏ hẳn Ví dụ minh hoạ + Các dạng toán trọng tâm); phạm vi = mọi bài đứng trước, cùng luật', () => {
     expect(maDeMacDinh(ds[2]!)).toEqual(['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'])
