@@ -129,3 +129,4 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] Gộp làn C1 app thầy (kèm chọn em theo điểm danh) | bằng chứng: cb384f5c; 55/55 làn + 18/18 bài hôm nay sau sửa gợi ý
 - [x] Gói tải sẵn vượt trần sau khi gộp C1 (3 040 KB) — nguyên nhân gốc: mảnh chỉ màn thầy bị precache | bằng chứng: 41f95154; kiem-sw 13/13, 160 tệp / 2 983 KB
 - [x] Toàn vitest bản cuối | bằng chứng: 13 912 test · 13 724 đạt · 141 đỏ · 9 tệp lỗi môi trường (= nền); 1 tên đỏ mới là test nhạy tải doan-het-cau-2809 (chạy riêng 4/4, đạt trên main)
+- [x] (làn thang 4 bậc, việc giao từ dòng máy soạn ở trên) `ghiCauBoTro` nạp lại gói GỘP song sinh (giữ mọi chỗ cũ ~ssN, chỗ của gói nhận bản gói cùng vị trí, khử trùng theo nội dung, trần 4); `locBoTro` 4 bản, `tachSongSinh` ~ss<số>; đọc sổ phủ 8 chỗ ~ss0..7 (`CHO_SONG_SINH`) | bằng chứng: 731f8fda + 86b90f51; tests/cau-bo-tro-gop-0510.test.ts 6/6 (đỏ khi trở lại ghi đè), may-soan-hoc-lieu-0510 + chat-luong-loi-0510 xanh
