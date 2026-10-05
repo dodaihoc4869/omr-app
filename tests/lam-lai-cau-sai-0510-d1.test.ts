@@ -490,3 +490,28 @@ describe('tiêu chí 3 · Bàn gỡ nút thắt của thầy: em sửa bằng c�
     expect((d.sql.prepare("SELECT trang_thai FROM nut_that WHERE id = 'T1'").get() as { trang_thai: string }).trang_thai).toBe('kem_rieng')
   })
 })
+
+describe('thang tự gỡ của em: lượt câu anh em sau khi đọc lời giải = "làm lại kín" (như song sinh)', () => {
+  async function dungThang() {
+    const r = dung(KHO2, ['Q2'])
+    await damBaoBangLoiGiai(r.env); await damBaoBangBoTro(r.env); await damBaoBangNutThat(r.env)
+    r.d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES('Q2','BAMQ2',?,'ds','x')").run(TO11)
+    r.d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cau_kiem_json,nhan_nen_json,buoc_json,cap_nhat_luc) VALUES('BAMQ2','Q2','[]','[]','[]','[\"Bước 1\",\"Bước 2\"]','x')").run()
+    ghi(r.d, 'Q2', 0, luc('2026-10-05', '08:00'))
+    r.d.sql.prepare("INSERT INTO loi_giai_hoi(sbd,qid,nguon,luc,co_ho_so) VALUES('S1','Q2','on_lai',?,1)").run(new Date(luc('2026-10-05', '09:00')).toISOString())
+    return r
+  }
+  const ghiTc = (d: D1That, qid: string, kq: 0 | 1, ms: number) => d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn,assistance,raw_json) VALUES(?,?,?,?,?,1,?,?,?,?,?)')
+    .run(`game|S1|${qid}|${ms}`, 'S1', qid, 'game', `P-${ms}`, kq, new Date(ms).toISOString(), ngayVnCua(ms), 'none', JSON.stringify({ chon: 'DSDS', tc: 'Q2' }))
+  const lamLai = async (env: Env) => ((await em(env, '/hs/thang-go', { qid: 'Q2' })).cong as { ma: string; dat: boolean; viec: string }[]).find((c) => c.ma === 'lam_lai')
+  it('2 lượt câu anh em sau khi đọc (1 sai) ⇒ [3] đạt; cả 2 đúng ⇒ "chưa cần gửi thầy"', async () => {
+    const { d, env } = await dungThang()
+    vi.setSystemTime(luc('2026-10-07'))
+    expect(await lamLai(env)).toMatchObject({ dat: false })
+    ghiTc(d, 'A2', 0, luc('2026-10-06'))
+    ghiTc(d, 'A2V', 1, luc('2026-10-06', '20:00'))
+    expect(await lamLai(env)).toMatchObject({ dat: true })
+    d.sql.exec("UPDATE su_kien_hoc SET ket_qua = 1 WHERE qid = 'A2'")
+    expect(await lamLai(env)).toMatchObject({ dat: false, viec: 'Em đã làm đúng câu tương tự, chưa cần gửi thầy' })
+  })
+})
