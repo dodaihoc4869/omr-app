@@ -129,18 +129,26 @@ const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS
 /** Bộ não A.I đã gỡ (thầy lệnh 28/09/2026): lời trả cho mọi lệnh cũ của chức năng này. */
 const DA_GO_BO_NAO = 'Chức năng đã gỡ'
 
-async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const kh = await hsKeHoachNgayCoExp(env, b)
+async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = ''): Promise<Record<string, unknown>> {
+  // TỐI ƯU 05/10: `sbdBiet` (SBD nơi gọi đã xác định từ token/sbd — đúng SBD kế hoạch sẽ dùng) ⇒ hai khối phụ KHÔNG phụ thuộc kế hoạch (cờ Đoàn, cảnh báo
+  // của thầy — chỉ đọc bảng kế hoạch/EXP không ghi) bắt đầu CÙNG đợt đầu của kế hoạch; "về đích" đọc hồ sơ nắm kiến thức mà kế hoạch vừa dựng lại ⇒ bắt đầu
+  // NGAY SAU khi kế hoạch ghi xong, song song phần EXP (EXP không ghi bảng nào "về đích" đọc). Trước: cả ba chờ hết kế hoạch + EXP. Phản hồi y hệt.
+  const som = sbdBiet ? { doanMo: doanMoCho(env, sbdBiet), canhBao: canhBaoChoEm(env, sbdBiet) } : null
+  som?.doanMo.catch(() => {}); som?.canhBao.catch(() => {})
+  // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
+  const docVeDich = (sbd: string) => docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null })
+  let veDichSom: { sbd: string; p: ReturnType<typeof docVeDich> } | null = null
+  const kh = await hsKeHoachNgayCoExp(env, b, (sbd) => { veDichSom = { sbd, p: docVeDich(sbd) } })
   if (kh.ok === true && typeof kh.sbd === 'string') {
     const sbd = kh.sbd
+    const vdSom = veDichSom as { sbd: string; p: ReturnType<typeof docVeDich> } | null
     // HẠ TẢI D1 (Boss 21/09): bốn khối phụ ĐỘC LẬP chạy SONG SONG (trước đây tuần tự); khoá gán đúng thứ tự cũ để phản hồi y hệt.
     const [doanMo, vd, canhBao] = await Promise.all([
       // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
-      doanMoCho(env, sbd),
-      // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
-      docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null }),
+      som && sbd === sbdBiet ? som.doanMo : doanMoCho(env, sbd),
+      vdSom && vdSom.sbd === sbd ? vdSom.p : docVeDich(sbd),
       // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay`.
-      canhBaoChoEm(env, sbd),
+      som && sbd === sbdBiet ? som.canhBao : canhBaoChoEm(env, sbd),
     ])
     kh.doanMo = doanMo
     if (vd) { kh.no = vd.no; kh.veDich = vd.veDich }
@@ -3505,8 +3513,11 @@ const boXuLy = {
         let sbdKhoa = ''
         try { sbdKhoa = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
         if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
+        // Tối ưu 05/10: cờ cửa hàng (đệm 30 giây, không phụ thuộc kế hoạch) đọc CÙNG đợt đầu — trước: một đợt riêng ở cuối. Dùng đúng chỗ cũ.
+        const shopSom = shopBatCho(env, sbdKhoa)
+        shopSom.catch(() => {})
         let laLuotThat = false
-        const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b) })
+        const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b, sbdKhoa) })
         if (!laLuotThat && kh.ok === true) {
           kh.thanThu = await docThanThu(env, sbdKhoa)
           // Thông báo MỘT LẦN (EXP / mảnh khiên vừa nhận) đã đi ra ở lượt thật: lượt đệm KHÔNG lặp lại (em không thấy thưởng hai lần).
@@ -3514,7 +3525,7 @@ const boXuLy = {
           if ('manhNhan' in kh) kh.manhNhan = []
         }
         // `shopBat` trong khối `thanThu` (boolean): máy em hiện nút "Cửa hàng" hay không, không tốn lượt gọi nào (cờ đọc từ đệm 30 giây). Tạo khối MỚI: không ghi bẩn bản trong đệm kế hoạch.
-        if (kh.ok === true && kh.thanThu && typeof kh.thanThu === 'object') kh.thanThu = { ...(kh.thanThu as object), shopBat: await shopBatCho(env, sbdKhoa) }
+        if (kh.ok === true && kh.thanThu && typeof kh.thanThu === 'object') kh.thanThu = { ...(kh.thanThu as object), shopBat: await shopSom }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))

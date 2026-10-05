@@ -318,28 +318,25 @@ export async function traCuuTheoQid(env: Env, qids: string[]): Promise<TraCuuCau
   if (qids.length === 0) return { dang, chuyenDe }
   const now = Date.now()
   const thieuDang = qids.filter((q) => { const c = demDangTheoQid.doc(q, now); if (c === undefined) return true; if (c) dang.set(q, c); return false })
-  if (thieuDang.length > 0) {
-    try {
-      const r = await env.DB.prepare(
-        'SELECT qid, MIN(dang) AS dang FROM game_v2_question WHERE dang IS NOT NULL AND qid IN (SELECT value FROM json_each(?)) GROUP BY qid',
-      ).bind(JSON.stringify(thieuDang)).all<{ qid: string; dang: string }>()
-      const co = new Map((r.results ?? []).map((x) => [String(x.qid), String(x.dang)]))
-      for (const q of thieuDang) { const v = co.get(q) ?? ''; if (v) dang.set(q, v); demDangTheoQid.ghi(q, now, v) }
-    } catch {
-      /* chưa lập chỉ mục dạng */
-    }
-  }
   const thieuCd = qids.filter((q) => { const c = demChuyenDeTheoQid.doc(q, now); if (c === undefined) return true; if (c) chuyenDe.set(q, c); return false })
-  if (thieuCd.length > 0) {
-    try {
-      const r = await env.DB.prepare(
-        "SELECT qid, chuyen_de FROM cau_hoi WHERE COALESCE(chuyen_de,'') <> '' AND qid IN (SELECT value FROM json_each(?))",
-      ).bind(JSON.stringify(thieuCd)).all<{ qid: string; chuyen_de: string }>()
-      const co = new Map((r.results ?? []).map((x) => [String(x.qid), String(x.chuyen_de)]))
-      for (const q of thieuCd) { const v = co.get(q) ?? ''; if (v) chuyenDe.set(q, v); demChuyenDeTheoQid.ghi(q, now, v) }
-    } catch {
-      /* chưa có chỉ mục câu hỏi */
-    }
+  // Tối ưu 05/10: hai tra cứu độc lập (dạng · chuyên đề) chạy SONG SONG — trước: nối tiếp hai đợt D1. Kết quả, đệm và cách bỏ lỗi y hệt.
+  const [rDang, rCd] = await Promise.all([
+    thieuDang.length > 0
+      ? env.DB.prepare('SELECT qid, MIN(dang) AS dang FROM game_v2_question WHERE dang IS NOT NULL AND qid IN (SELECT value FROM json_each(?)) GROUP BY qid')
+        .bind(JSON.stringify(thieuDang)).all<{ qid: string; dang: string }>().catch(() => null /* chưa lập chỉ mục dạng */)
+      : Promise.resolve(null),
+    thieuCd.length > 0
+      ? env.DB.prepare("SELECT qid, chuyen_de FROM cau_hoi WHERE COALESCE(chuyen_de,'') <> '' AND qid IN (SELECT value FROM json_each(?))")
+        .bind(JSON.stringify(thieuCd)).all<{ qid: string; chuyen_de: string }>().catch(() => null /* chưa có chỉ mục câu hỏi */)
+      : Promise.resolve(null),
+  ])
+  if (rDang) {
+    const co = new Map((rDang.results ?? []).map((x) => [String(x.qid), String(x.dang)]))
+    for (const q of thieuDang) { const v = co.get(q) ?? ''; if (v) dang.set(q, v); demDangTheoQid.ghi(q, now, v) }
+  }
+  if (rCd) {
+    const co = new Map((rCd.results ?? []).map((x) => [String(x.qid), String(x.chuyen_de)]))
+    for (const q of thieuCd) { const v = co.get(q) ?? ''; if (v) chuyenDe.set(q, v); demChuyenDeTheoQid.ghi(q, now, v) }
   }
   return { dang, chuyenDe }
 }
@@ -393,17 +390,20 @@ const dau = (v: unknown[]): string => JSON.stringify(v)
  */
 export async function dungLaiHoSo(env: Env, dsSbd: string[], nay: string): Promise<KetQuaDung> {
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
+  const arr = JSON.stringify(em)
+  // Tối ưu 05/10: hồ sơ CŨ (để so khác) không phụ thuộc sổ ⇒ đọc CÙNG đợt với sổ (trước: đợt riêng sau khi phát lại). Lỗi vẫn ném đúng chỗ `await` cũ.
+  const pCu = Promise.all([
+    env.DB.prepare(`SELECT khoa, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?))`).bind(arr).all<Record<string, unknown>>(),
+    env.DB.prepare(`SELECT khoa, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?))`).bind(arr).all<Record<string, unknown>>(),
+  ])
+  pCu.catch(() => {})
   const ds = await docSuKienDoc(env, em)
   const tra = await traCuuTheoQid(env, [...new Set(ds.filter((e) => !e.maDang || !e.chuyenDe).map((e) => e.qid))])
   const denLuc = Date.parse(nay)
   if (!Number.isFinite(denLuc)) throw new RangeError('Giờ dựng hồ sơ không hợp lệ')
   const { cau, dang } = phatLaiSuKien(ds, tra, { denLuc })
-  const arr = JSON.stringify(em)
 
-  const [rcCu, rdCu] = await Promise.all([
-    env.DB.prepare(`SELECT khoa, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?))`).bind(arr).all<Record<string, unknown>>(),
-    env.DB.prepare(`SELECT khoa, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?))`).bind(arr).all<Record<string, unknown>>(),
-  ])
+  const [rcCu, rdCu] = await pCu
   const dauCauCu = new Map((rcCu.results ?? []).map((r) => [String(r.khoa), dau([chu(r.ma_dang), chu(r.chuyen_de), so(r.lan_gap), so(r.lan_sai), so(r.lan_trong), so(r.dung_lien_tiep), so(r.ngay_dung_khac_nhau), so(r.ket_qua_cuoi), chu(r.nguon_cuoi), chu(r.luc_cuoi), chu(r.moc_on_ke), chu(r.trang_thai), so(r.can_day_lai), so(r.giay_tb)])]))
   const dauDangCu = new Map((rdCu.results ?? []).map((r) => [String(r.khoa), dau([so(r.so_gap), so(r.so_sai), so(r.so_da_khac_phuc), so(r.so_moi_sai), so(r.so_chua_thay_sai), so(r.bac), chu(r.moc_on_ke), chu(r.moc_moi_sai)])]))
 

@@ -248,6 +248,8 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const emCanDocHoSo = hoSoSan ? em.filter((s) => !hoSoSan.has(s)) : em
   const arrCanDoc = json(emCanDocHoSo)
   const pCauHinh = chan(docCauHinhKeHoach(env))
+  // Tối ưu 05/10: cờ phạm vi học (đệm 30 s) đọc CÙNG đợt các lượt đọc độc lập bên dưới — trước: một đợt riêng sau khi lọc câu phục vụ được.
+  const pPhamViBat = chan(phamViBat(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
   const pRc = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(
     `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai, luc_cuoi FROM nam_kt_cau
@@ -364,7 +366,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const denHan = [...(rc.results ?? []), ...denHanTuBoNho]
   const phucVu = await tapQidPhucVu(env, denHan.map((x) => String(x.qid)), coChiMuc, baoVe)
   // CỔNG PHẠM VI HỌC (P02): đọc cờ MỘT LẦN cho cả hai danh sách tự động của lượt này.
-  const batPhamViHoc = await phamViBat(env)
+  const batPhamViHoc = await pPhamViBat
   const phamViToiHan = await locPhamViChoKeHoach(env, denHan.map((x) => ({ sbd: String(x.sbd), qid: String(x.qid) })), batPhamViHoc)
   for (const x of denHan) {
     if (x.luc_cuoi && ngayVn(Date.parse(String(x.luc_cuoi))) === homNay) continue // Đã làm/gặp hôm nay ⇒ không giao lại (tránh vòng lặp nộp lại on_lai vô tận)
@@ -577,25 +579,33 @@ export interface KeHoachDaLap extends KeHoachNgay {
  * Lập kế hoạch hôm nay cho một lô em (≤ 50): dựng lại hồ sơ của em nào có sổ đổi, đọc đầu vào, lập, lưu.
  * Ngày đã chốt (`ket_qua` khác NULL) không bị ghi đè. `now` do nơi gọi truyền (giờ máy chủ).
  */
-export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tuyChon: { luu?: boolean } = {}): Promise<Map<string, KeHoachDaLap>> {
+/** Hai lượt ĐỌC đầu của `lapVaLuuKeHoach` (tổng hợp sổ + dòng kế hoạch gần nhất) — bắt đầu được TRƯỚC khi lập (tối ưu 05/10: song song lượt kiểm SBD có thật). */
+export interface DocDauKeHoach { tongHop: Promise<Map<string, TongHopEm> | null>; rk: Promise<D1Result<Record<string, unknown>>> }
+export function batDauDocKeHoach(env: Env, dsSbd: string[], now: number): DocDauKeHoach {
+  const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
+  const homNay = ngayVn(now)
+  const arr = json(em)
+  const ngay30 = themNgay(homNay, -SO_NGAY_DO_VAN_TOC)
+  return {
+    tongHop: (async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await docMocHienThi(env), now), ngay30, new Date(now).toISOString()) } catch { return null } })(),
+    rk: tat(() => env.DB.prepare(
+      `SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k
+        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
+    ).bind(arr).all<Record<string, unknown>>(), trong()),
+  }
+}
+export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tuyChon: { luu?: boolean } = {}, docSom?: DocDauKeHoach): Promise<Map<string, KeHoachDaLap>> {
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
   const ra = new Map<string, KeHoachDaLap>()
   if (em.length === 0) return ra
   const nowIso = new Date(now).toISOString()
   const homNay = ngayVn(now)
-  const arr = json(em)
-  const ngay30 = themNgay(homNay, -SO_NGAY_DO_VAN_TOC)
 
   // Sổ đổi so với lần lập trước ⇒ hồ sơ cũ. So tổng số dòng sổ (`tongHop.soSuKien` — HẠ TẢI M3: MỘT truy vấn gộp cả
   // đếm này lẫn tiến bộ/hiển thị hôm nay mà `docDauVao` cần bên dưới, khỏi đọc lại) với `so_su_kien` của dòng kế hoạch
-  // gần nhất. Hai lời hứa độc lập chạy SONG SONG (hạ tải D1: một lượt chờ hàng đợi thay vì hai).
-  const [tongHop, rk] = await Promise.all([
-    (async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await docMocHienThi(env), now), ngay30, new Date(now).toISOString()) } catch { return null } })(),
-    tat(() => env.DB.prepare(
-      `SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k
-        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
-    ).bind(arr).all<Record<string, unknown>>(), trong()),
-  ])
+  // gần nhất. Hai lời hứa độc lập chạy SONG SONG (hạ tải D1: một lượt chờ hàng đợi thay vì hai). `docSom`: nơi gọi đã bắt đầu đúng hai lượt ấy.
+  const dau = docSom ?? batDauDocKeHoach(env, em, now)
+  const [tongHop, rk] = await Promise.all([dau.tongHop, dau.rk])
   const soSk = new Map(em.map((s) => [s, tongHop?.get(s)?.soSuKien ?? 0]))
   const daLap = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.so_su_kien)]))
   const phienCu = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.phien_ban)]))
@@ -814,10 +824,16 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promi
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
   // Đường này công khai (như `/hs/btvn`), nên SBD bịa KHÔNG được phép sinh ra dòng nào trong `ke_hoach_ngay`.
   // Em có thật = có trong hoc_sinh, danh sách lớp, hoặc đã có lượt thi. Kiểm TRƯỚC mọi thao tác ghi.
-  if (sbd.length > 40 || !(await laHocSinhThat(env, sbd))) return { ok: false, error: 'Không tìm thấy học sinh' }
-  const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
+  if (sbd.length > 40) return { ok: false, error: 'Không tìm thấy học sinh' }
+  // Tối ưu 05/10: hai lượt ĐỌC đầu của kế hoạch + thần thú (đọc tươi, kế hoạch không ghi hồ sơ game) bắt đầu CÙNG đợt với lượt kiểm SBD có thật
+  // (trước: ba đợt nối tiếp). Mọi lệnh GHI vẫn chỉ chạy SAU khi kiểm xong; SBD bịa ⇒ chỉ tốn vài lượt đọc theo SBD, không dòng nào được ghi.
+  const now = Date.now()
+  const docSom = batDauDocKeHoach(env, [sbd], now)
+  const thanThuSom = docThanThu(env, sbd)
+  if (!(await laHocSinhThat(env, sbd))) return { ok: false, error: 'Không tìm thấy học sinh' }
+  const kh = (await lapVaLuuKeHoach(env, [sbd], now, {}, docSom)).get(sbd)!
   // `thanThu` đọc tươi mỗi lần gọi, KHÔNG nằm trong bản ghi `ke_hoach_ngay`.
-  return { ok: true, ...kh, thanThu: await docThanThu(env, sbd) }
+  return { ok: true, ...kh, thanThu: await thanThuSom }
 }
 
 /** `POST /hs/thoi-gian-hoc {token, phut}` — em đặt số phút học mỗi ngày (10–45). Chỉ HẠ mục tiêu, không nâng vượt trần 16. */
