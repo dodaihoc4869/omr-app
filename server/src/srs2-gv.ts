@@ -12,6 +12,8 @@ import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
+import { cacQidSongSinh } from './loi-hoc-luat'
+import { lanLamTuDongTc, sqlQidHoacTc } from './lam-lai-so'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -123,16 +125,19 @@ export async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readon
   if (!sbd.length || !qids.length) return ra
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc
-        WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(sbd), JSON.stringify(qids)).all<Row>()).results ?? []
+    // 05/10: đọc kèm câu SONG SINH ("<gốc>~ss0..3") và CÂU ANH EM làm thay câu gốc (`raw_json.tc`, lam-lai-so.ts) — như `docLanLam` của em,
+    // để Bảng chiến dịch thấy câu đã sửa bằng bản khác. CSDL cũ (thiếu cột) ⇒ truy vấn lùi như trước.
+    rows = (await env.DB.prepare(sqlQidHoacTc('sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd IN (SELECT value FROM json_each(?1))'))
+      .bind(JSON.stringify(sbd), JSON.stringify(qids.flatMap(cacQidSongSinh)), JSON.stringify(qids)).all<Row>()).results ?? []
   } catch {
     rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`)
       .bind(JSON.stringify(sbd), JSON.stringify(qids)).all<Row>()).results ?? []
   }
+  const tap = new Set(qids)
   for (const x of rows) {
     if (str(x.visibility) === 'embargoed') continue
     const k = str(x.sbd)
-    ra.set(k, [...(ra.get(k) ?? []), lanLamTuDong(x)])
+    ra.set(k, [...(ra.get(k) ?? []), ...lanLamTuDongTc(x, lanLamTuDong, tap)])
   }
   return ra
 }

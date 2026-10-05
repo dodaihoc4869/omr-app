@@ -1,5 +1,5 @@
 // CÂU SONG SINH TRONG GAME — Vòng học khép kín v2. Câu sai được làm lại bằng câu SONG SINH (cùng cách giải, đổi số) để em không làm lại
-// theo trí nhớ đáp án. Song sinh không có dòng riêng trong kho game: qid ảo "<gốc>~ss0|1" ⇒ nạp câu gốc rồi PHỦ đề / phương án / đáp án /
+// theo trí nhớ đáp án. Song sinh không có dòng riêng trong kho game: qid ảo "<gốc>~ss0..3" (trần TRAN_SONG_SINH) ⇒ nạp câu gốc rồi PHỦ đề / phương án / đáp án /
 // lời giải của song sinh (bảng `cau_bo_tro`). Đáp án chỉ nằm ở máy chủ như câu thường (`publicQuestion` bỏ `correct`, `solution`).
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -8,7 +8,7 @@ import { tachSongSinh } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
 
-/** qid ảo của song sinh thứ i (0|1). */
+/** qid ảo của song sinh thứ i (0 … TRAN_SONG_SINH − 1). */
 export const qidSongSinh = (goc: string, i: number) => `${goc}~ss${i}`
 
 /** Phủ song sinh lên câu gốc. Chỉ Phần I (4 phương án) và Phần III (số); Phần II / song sinh thiếu dữ liệu ⇒ null. */

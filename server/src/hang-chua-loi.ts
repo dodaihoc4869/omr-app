@@ -7,6 +7,7 @@
 // thành thạo, lượt làm lại ưu tiên câu SONG SINH. Chỉ đọc sổ — không bảng trạng thái riêng (phát lại mỗi lần đọc, như srs2).
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { SQL_LA_LAN_LAM } from './omni-kieu'
 import type { LanLam, TrangThaiCau } from './srs2-loi'
 import { phatLaiLoi, tachSongSinh, TU_NGAY, type KetQuaLoi, type ThamSoLuat } from './loi-hoc-luat'
 import { boTroTheoQid } from './song-sinh-game'
@@ -18,7 +19,7 @@ type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
 
 /**
- * NGUỒN THỨ 4: qid → lúc sai TỰ LÀM sớm nhất từ 29/09, mọi kênh. Bỏ: sự kiện đọc lời giải, lượt có hỗ trợ, sự kiện bị che (ca chưa công bố —
+ * NGUỒN THỨ 4: qid → lúc sai TỰ LÀM sớm nhất từ 29/09, mọi kênh. Bỏ: sự kiện đọc lời giải, lượt lướt (OMNI 3), lượt có hỗ trợ, sự kiện bị che (ca chưa công bố —
  * công bố xong mới kéo, như nguồn ca; câu ca thi chỉ tính khi ca ĐÃ công bố — không lộ câu thi). Bỏ trống chỉ tính sai ở ca thi (kênh khác NULL có thể là "chưa làm"). Lỗi đọc ⇒ rỗng.
  */
 export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, string>> {
@@ -26,7 +27,7 @@ export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, st
   const sql = (moi: boolean) => `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ?
       AND (ket_qua = 0 OR (ket_qua IS NULL AND nguon = 'thi')) AND COALESCE(qid, '') <> ''
       AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))
-      ${moi ? "AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed'" : ''}
+      ${moi ? `AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed'` : ''}
     GROUP BY qid`
   let rows: Row[]
   try { rows = (await env.DB.prepare(sql(true)).bind(sbd, TU_NGAY).all<Row>()).results ?? [] } catch {
@@ -69,7 +70,7 @@ export function apLuatChung(t: TrangThaiCau, lan: readonly LanLam[], docLuc: rea
   return { t: { ...t, laMoi: false, thanhThao: true }, loi }
 }
 
-/** Chọn song sinh cho lượt tới: xen kẽ ss0/ss1 theo số lần em đã làm song sinh. */
+/** Chọn song sinh cho lượt tới: xoay vòng ss0 → ss1 → … (đủ `soSongSinh` bản, trần TRAN_SONG_SINH = 4) theo số lần em đã làm song sinh / câu anh em. */
 export function chonSongSinh(lan: readonly LanLam[], soSongSinh: number): number {
   if (soSongSinh <= 0) return -1
   return lan.filter((x) => x.songSinh).length % soSongSinh

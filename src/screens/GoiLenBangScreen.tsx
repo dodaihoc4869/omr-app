@@ -63,6 +63,7 @@ import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import LenBangChienDich from '../components/chien-dich/LenBangChienDich'
 import DayHocLenBang from '../components/day-hoc/DayHocLenBang'
 import KiemTraDauGio from '../components/day-hoc/KiemTraDauGio'
+import { docMoTheDayHoc } from '../lib/bai-hom-nay'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -228,7 +229,8 @@ async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<
 export default function GoiLenBangScreen() {
   const hoa2 = useHoa2Bat()
   // Mỗi lần mở mục là thẻ thứ nhất (không nhớ qua lần tải lại — tránh thầy mở ra màn khác với lần trước mà không để ý).
-  const [the, chon] = useState<'chinh' | 'day_hoc' | 'dau_gio'>('chinh')
+  // OMNI 3 (05/10): riêng khi thầy vừa bấm "Giao theo bài" ở mục Chiến dịch luyện ⇒ mở sẵn thẻ Dạy học (khoá phiên đọc một lần rồi xoá).
+  const [the, chon] = useState<'chinh' | 'day_hoc' | 'dau_gio'>(() => (docMoTheDayHoc() ? 'day_hoc' : 'chinh'))
   const DS_THE = [
     { id: 'chinh' as const, ten: hoa2 ? 'Chiến dịch' : 'Theo ca kiểm tra' },
     { id: 'day_hoc' as const, ten: 'Dạy học' },

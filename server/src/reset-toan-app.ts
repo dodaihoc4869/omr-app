@@ -174,6 +174,8 @@ export const BANG_GIU: readonly string[] = [
   'doc_loi_giai',
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
+  // Học liệu máy soạn 05/10 (migration-0510-y-ds.sql): kho ý Đúng–Sai mới (học liệu) + hàng "chỉ học liệu" (như loi_giai_viec) ⇒ GIỮ.
+  'cau_y_ds', 'may_soan_viec',
   // HỌC PHÍ (hoc-phi.ts, migration-0510-hoc-phi.sql): sổ thu tiền của trung tâm — dữ liệu tài chính thật ⇒ GIỮ.
   'hoc_phi', 'hoc_phi_nop',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
@@ -188,6 +190,9 @@ export const BANG_GIU: readonly string[] = [
   'tu_luyen_luot', 'tu_luyen_cau',
   // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql) — cũng sinh sau lần 21/09: GIỮ = không đụng.
   'tu_luyen_khac_phuc', 'tu_luyen_cham_cau',
+  // OMNI 3 (migration-0510-omni-3.sql, 05/10) — sinh sau lần 21/09: GIỮ cho job ấy = không đụng (job đã xong).
+  'bai_da_day', 'pham_vi_lop', 'de_kho_thu_muc', 'omni_vkn', 'omni_q', 'omni_em', 'omni_p_vkn', 'omni_beta_cau', 'omni_du_bao',
+  'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */

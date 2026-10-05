@@ -1,8 +1,18 @@
 import {startAppPresence} from './lib/app-presence'
 import { batDocNhipDeNghi } from './lib/nhip-de-nghi'
-import { StrictMode } from 'react'
+import { StrictMode, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
+// THỨ TỰ CSS GIỮ NGUYÊN (05/10, tối ưu mở app học sinh — thầy: "giữ nguyên mọi màu sắc các lớp trong 3 app"). Gốc React nay nạp ĐỘNG
+// theo đường vào (cuối tệp) nên mọi tờ CSS trước đây đi chung mảnh chính (do App.tsx + các mảnh dùng chung nhập) được nhập THẲNG ở đây,
+// ĐÚNG thứ tự cũ: sáu tờ của mảnh dùng chung (trước đây là sáu thẻ <link> đứng trước tờ chính), rồi phông, tờ gốc, và các tờ App.tsx kéo theo
+// (khối cuối). Cả ba app vẫn nhận đúng chuỗi luật CSS như trước, cùng một tệp, trước lượt vẽ đầu.
+import './components/m3/m3-tuong-thich.css'
+import './components/bang-nhiem-vu/m3-theme.css'
+import './components/m3/m3.css'
+import './components/loi-giai/loi-giai.css'
+import './components/o-so-tra-loi.css'
+import './components/m3/khung-xem-phieu.css'
 // PHÔNG CÓ DẤU TIẾNG VIỆT — tự chứa trong app, KHÔNG gọi Google Fonts.
 // Charter (phông cũ) thiếu dấu tiếng Việt nên trình duyệt phải nhặt dấu từ
 // phông khác và dấu rơi khỏi chữ. Nạp thẳng từ node_modules, chỉ hai subset
@@ -27,11 +37,23 @@ import './styles/the-loc.css'
 import './styles/may-yeu.css'
 // Hiệu ứng "+N EXP" dùng chung (luật v4 29/09): CSS nằm trong gói CSS vỏ để mảnh `ExpCau` (dùng ở bảng nhiệm vụ, BTVN, mọi game) không đẻ thêm một tệp CSS precache.
 import './components/exp-cau/exp-cau.css'
+// Các tờ trước đây đi theo App.tsx (vỏ Bát Linh, khung app thầy, logo, thanh bên, phiếu, bảng màu thầy) — đúng thứ tự cũ, xem đầu tệp.
+import './components/bat-linh/bat-linh.css'
+import './components/bat-linh/hoc-sinh.css'
+import './components/bat-linh/phu-huynh.css'
+import './components/bat-linh/game-toan-bo.css'
+import './components/bat-linh/che-do-toi.css'
+import './styles/teacher-layout.css'
+import './styles/vo-thay.css'
+import './components/logo-ddh.css'
+import './components/chien-dich/thanh-ben-hoa2.css'
+import './components/thanh-ben-gv2.css'
+import './components/m3/phieu-screen.css'
+import './styles/gv-mau.css'
+import './styles/teacher-modern.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
-import App, { huaManEmSom } from './App.tsx'
-import { napKatex } from './lib/chem-format'
 
-import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
+import { chuanHoaDuongDan, docDuongVao, laLinkAppCu, nhoVaiDaDung } from './lib/vai-tro'
 import { khoaVaiVaoUrl } from './lib/khoa-vai'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi, tuTaiLaiKhiDoiBan } from './lib/cap-nhat-app'
@@ -40,6 +62,9 @@ import { batSuKienCaiApp } from './lib/pwa-install'
 import { batLoiThieuManh } from './lib/nap-manh'
 import { napDiaChiMayChuMoiChoEm } from './lib/may-chu-moi'
 import { batCheDoMayYeu } from './lib/may-yeu'
+
+/** KaTeX nạp lười qua chem-format (mảnh chung của các màn có công thức) — nạp ĐỘNG để màn đầu của em không phải tải chem-format trước khi hiện. */
+const napKatex = () => import('./lib/chem-format').then((m) => m.napKatex())
 
 // Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
 // KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
@@ -73,6 +98,18 @@ if (typeof window !== 'undefined' && location.search.includes('_moi')) {
 // Chạy SAU `chuanHoaDuongDan` để không phải tranh nhau ghi địa chỉ, và TRƯỚC
 // khi React dựng để màn đầu tiên đã thấy đường đúng.
 khoaVaiVaoUrl(import.meta.env.BASE_URL)
+
+// GỐC REACT THEO ĐƯỜNG VÀO (05/10, tối ưu mở app học sinh): cổng học sinh dựng vỏ RIÊNG `AppHocSinh` (màn đăng nhập nhẹ, KHÔNG kéo App.tsx
+// của thầy); mọi đường khác dựng App.tsx như cũ. Bắt đầu tải NGAY (index.html đã nạp trước đúng nhóm mảnh của đường vào — vite.config.ts
+// `napTruocManEm`), dựng React khi mảnh về. Tính SAU khi chuẩn hoá + khoá vai vào đường dẫn ⇒ cùng kết luận với App.tsx. Mảnh gốc tải hỏng
+// thì thử lại một lần; thiếu mảnh vì đang mở bản cũ thì `batLoiThieuManh()` (dưới) tự tải lại trang.
+type GocApp = { default: ComponentType; huaManEmSom: () => Promise<unknown> | null }
+const thuLai = <T,>(nap: () => Promise<T>): Promise<T> => nap().catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(nap))
+// Link riêng CŨ (`/hs/<token>?vai=hocsinh`…) App.tsx chặn bằng màn "link đã ngừng dùng" TRƯỚC nhánh cổng ⇒ đi App.tsx như cũ.
+const laCongHocSinh = docDuongVao(location.search, location.pathname).vai === 'hocsinh' && !laLinkAppCu(location.search, location.pathname)
+const napGoc: Promise<GocApp> = laCongHocSinh ? thuLai(() => import('./AppHocSinh')) : thuLai(() => import('./App'))
+/** Lượt tải mảnh màn em (màn thi / cổng học sinh) của gốc vừa chọn — KaTeX tải NỐI SAU nó. */
+const huaManEmSom = () => napGoc.then((g) => g.huaManEmSom())
 
 // NHỚ VAI MÁY NÀY DÙNG — để lần sau mở `/` trần (biểu tượng trên màn hình chính
 // luôn mở `/` trần vì `start_url` của manifest là `./`) app biết đưa em vào màn
@@ -138,29 +175,47 @@ void napDiaChiMayChuMoiChoEm()
 // bản đầu tiên.
 tuTaiLaiKhiDoiBan()
 
-registerSW({
-  immediate: true,
-  onRegisteredSW(_url, dangKy) {
-    if (!dangKy) return
-    // Máy đang giữ service worker cũ có thể đã tải xong bản mới nhưng để nó
-    // nằm chờ — đẩy sang ngay lúc mở app.
-    daySangBanMoi(dangKy)
-    batTuHoiBanMoi(dangKy, {
-      addEventListener: (t, f) => window.addEventListener(t, f),
-      removeEventListener: (t, f) => window.removeEventListener(t, f),
-      an: () => document.visibilityState === 'hidden',
-    })
-  },
-})
+const dangKySW = () =>
+  registerSW({
+    immediate: true,
+    onRegisteredSW(_url, dangKy) {
+      if (!dangKy) return
+      // Máy đang giữ service worker cũ có thể đã tải xong bản mới nhưng để nó
+      // nằm chờ — đẩy sang ngay lúc mở app.
+      daySangBanMoi(dangKy)
+      batTuHoiBanMoi(dangKy, {
+        addEventListener: (t, f) => window.addEventListener(t, f),
+        removeEventListener: (t, f) => window.removeEventListener(t, f),
+        an: () => document.visibilityState === 'hidden',
+      })
+    },
+  })
+// MÁY EM MỞ CỔNG HỌC SINH LẦN ĐẦU (chưa có service worker điều khiển trang — 05/10, tối ưu mở app học sinh): ĐĂNG KÝ SAU khi Sảnh đã vẽ
+// (sự kiện `ddh-sanh-da-ve` của hoa2/api.ts) hoặc sau 30 giây nếu em chưa vào Sảnh. Lượt cài precache (~3 MB, tất-cả-hoặc-không) nhờ thế
+// không giành đường truyền với màn đăng nhập, mảnh cổng và lệnh đăng nhập/Sảnh trên mạng yếu. Lần đầu chưa có bản cũ nào để thay ⇒ không
+// chậm việc nhận bản mới. Máy đã có service worker (mở lại, cập nhật bản) và MỌI đường khác (màn thi, phụ huynh, thầy) ⇒ đăng ký NGAY như cũ.
+if (laCongHocSinh && typeof navigator !== 'undefined' && navigator.serviceWorker && !navigator.serviceWorker.controller) {
+  let daDangKy = false
+  const dangKyMotLan = () => {
+    if (daDangKy) return
+    daDangKy = true
+    dangKySW()
+  }
+  window.addEventListener('ddh-sanh-da-ve', dangKyMotLan, { once: true })
+  setTimeout(dangKyMotLan, 30_000)
+} else dangKySW()
 // LỚP BẢO HIỂM 4 (P1 21/09): ba lớp trên đều trông vào service worker cài được bản mới; máy nào cài hỏng (mạng yếu rớt một tệp precache) thì kẹt bản cũ mãi.
 // Lớp này tự hỏi sw-version.json rồi so với giờ dựng đóng trong gói; mới hơn mà 20 giây sau chưa tự lên thì xoá kho SW + nạp lại. Rào: không ép lúc em làm bài;
 // mỗi bản tối đa 2 lần; không đụng IndexedDB/localStorage. Xem bao-hiem-ban-moi.ts.
 batBaoHiemBanMoi()
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+const goc = createRoot(document.getElementById('root')!)
+void napGoc.then(({ default: App }) =>
+  goc.render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  ),
 )
 
 startAppPresence()

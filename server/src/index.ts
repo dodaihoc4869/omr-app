@@ -44,8 +44,10 @@ import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import { ghiCauBoTro } from './cau-bo-tro'
 import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
+import { gvChatLuongLoi } from './chat-luong-loi'
 import { gvNutThatDs, gvNutThatGo, hsLoiGo } from './ban-go-nut-that'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import { duongMaySoan } from './hoc-lieu-may-soan'
 import {hsCauKiem,hsGuiThay,hsLuyenNen,hsLuyenNenNop,hsThangGo,thayDayNen} from './thang-tu-go'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
@@ -99,6 +101,14 @@ import { aiSaiCau } from './ai-sai-cau'
 import { doiSbd } from './doi-sbd'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
+// OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
+import { gvBaiDaDay } from './bai-da-day'
+import { ghiThuMucKhiDayDe, gvKhoThuMuc, thuMucTuNhom } from './kho-thu-muc'
+// OMNI 3 (05/10): A.I Đỗ Đại Học tự gắn vi kỹ năng (ma trận Q) + tự sinh câu nền — thầy không phải duyệt.
+import { chayGanVknDem, ganVknChoMaDe, kiemDinhQTuan } from './omni-gan-vkn'
+import { damBaoMoiCauNenTuDong } from './omni-cau-nen-sinh'
+import { gvOmni } from './omni-gv'
+import { chayOmniDem, docCoOmni, hieuChinhOmniTuan } from './omni-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
@@ -2354,6 +2364,14 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // VÒNG HỌC v2 (02/10): câu song sinh / câu kiểm từng bước / nhãn nền ⇒ bảng `cau_bo_tro` theo băm. Móc CHỈ-THÊM, lỗi không làm hỏng nạp đề.
   let boTro: number | Record<string, unknown> = 0
   if (goi) { try { boTro = await ghiCauBoTro(env, maDe, goi) } catch (e) { boTro = { loi: (e as Error).message } } }
+  // OMNI 3 (05/10): thư mục mục đích của tờ (DẠY HỌC / TU LUYỆN) suy từ `nhom` của gói (kho-thu-muc.ts). CHỈ khi có gói: không có gói thì không biết
+  // thư mục — giữ dòng cũ (không lật tờ DẠY HỌC thành TU LUYỆN). Hàm không bao giờ ném lỗi; app thầy còn đồng bộ lại qua `/kho/thu-muc`.
+  if (goi) {
+    await ghiThuMucKhiDayDe(env, maDe, typeof goi.nhom === 'string' ? goi.nhom : null)
+    // Tờ DẠY HỌC ⇒ A.I Đỗ Đại Học gắn vi kỹ năng cho câu của tờ ngay (câu chưa đồng bộ vào game thì việc đêm gắn bù). Lỗi không chặn nạp đề.
+    // Chỉ khi công tắc OMNI bật (tắt ⇒ không ghi gì mới, app y như hôm nay).
+    if (thuMucTuNhom(maDe, goi.nhom) === 'DAY_HOC') { try { if ((await docCoOmni(env)).bat) await ganVknChoMaDe(env, [maDe], Date.now()) } catch { /* việc đêm gắn bù */ } }
+  }
   return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, boTro, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
 }
 
@@ -3283,6 +3301,16 @@ const boXuLy = {
       await chotExpNgayQuaDayDu(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
       // VÒNG HỌC v2 — GĐ5 (02/10): tự hoàn thiện hằng tuần (đêm thứ Hai giờ VN, idempotent theo tuần): hiệu chỉnh luật đóng lỗi theo tỉ lệ sai lại + câu nghi sai đáp án.
       if(new Date(Date.now()+7*3600000).getUTCDay()===1)await chayTuHoanThien(env,Date.now()).then(r=>console.log('[v2] tự hoàn thiện',JSON.stringify(r))).catch(async e=>{console.error('[v2] tự hoàn thiện lỗi:',e);await ghiLoiMay(env,'v2_tu_hoan_thien')})
+      // OMNI 3 (05/10): β câu + ảnh chụp hồ sơ các em đang bật OMNI (chia lô, idempotent theo ngày) · đêm thứ Hai: hiệu chỉnh tham số tuần. Lỗi chỉ ghi nhật ký máy.
+      await chayOmniDem(env,Date.now()).then(r=>{if(r.soEm||r.soBeta)console.log('[omni] đêm',JSON.stringify(r))}).catch(async e=>{console.error('[omni] đêm lỗi:',e);await ghiLoiMay(env,'omni_dem')})
+      if(new Date(Date.now()+7*3600000).getUTCDay()===1)await hieuChinhOmniTuan(env,Date.now()).then(r=>console.log('[omni] hiệu chỉnh tuần',JSON.stringify(r))).catch(async e=>{console.error('[omni] hiệu chỉnh tuần lỗi:',e);await ghiLoiMay(env,'omni_tuan')})
+      // OMNI 3: A.I Đỗ Đại Học gắn vi kỹ năng bù cho câu DẠY HỌC (ưu tiên bài vừa tick, ≤ 400 câu/lượt) + giữ đủ câu nền tự sinh cho mọi nhãn tính toán · đêm thứ Hai: tự kiểm định ma trận Q theo dữ liệu.
+      // Chỉ khi công tắc OMNI bật: câu nền tự sinh ghi vào `cau_nen` (bậc thang tự gỡ sẵn có cũng dùng) ⇒ tắt thì KHÔNG chạy để app y như hôm nay.
+      if((await docCoOmni(env).catch(()=>({bat:false}))).bat){
+        await chayGanVknDem(env,Date.now()).then(r=>{if(r.soGhi)console.log('[omni] gắn vi kỹ năng',JSON.stringify(r))}).catch(async e=>{console.error('[omni] gắn vi kỹ năng lỗi:',e);await ghiLoiMay(env,'omni_gan_vkn')})
+        await damBaoMoiCauNenTuDong(env,Date.now()).then(r=>{if(r.soThem)console.log('[omni] câu nền tự sinh',JSON.stringify(r))}).catch(async e=>{console.error('[omni] câu nền tự sinh lỗi:',e);await ghiLoiMay(env,'omni_cau_nen')})
+        if(new Date(Date.now()+7*3600000).getUTCDay()===1)await kiemDinhQTuan(env,Date.now()).then(r=>console.log('[omni] kiểm định Q tuần',JSON.stringify(r).slice(0,500))).catch(async e=>{console.error('[omni] kiểm định Q tuần lỗi:',e);await ghiLoiMay(env,'omni_kiem_q')})
+      }
       if(!hoa2CaTruong)await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
@@ -3290,6 +3318,12 @@ const boXuLy = {
       // ĐỢT 1 thần thú mỗi ngày: chuyển đổi hồ sơ đã chơi sang luật cấp mới, ≤ 40 hồ sơ/phút cho tới hết (rồi cờ chuyen_doi_cap = xong, phút sau không truy vấn). Lỗi chỉ ghi nhật ký máy.
       await chuyenDoiLoCron(env,Date.now()).then(r=>{if(r.soDoc>0)console.log('[hap-thu] cron chuyển đổi',JSON.stringify(r))}).catch(async e=>{console.error('[hap-thu] cron lỗi:',e);await ghiLoiMay(env,'hap_thu_chuyen_doi')})
       await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
+      // OMNI 3: khung 00:02–05:00 giờ VN — chạy TIẾP ảnh chụp đêm (con trỏ theo lô ≤ 40 em; lượt đầu ở cron 00:01; xong rồi / công tắc tắt ⇒ 1–2 lượt đọc rồi về)
+      // và mỗi 5 phút gắn vi kỹ năng bù (≤ 400 câu/lượt, chỉ khi công tắc bật). Ngoài khung: không truy vấn.
+      {const g=new Date(Date.now()+7*3600000),ph=g.getUTCHours()*60+g.getUTCMinutes();if(ph>=2&&ph<300){
+        await chayOmniDem(env,Date.now()).then(r=>{if(r.soEm||r.soBeta)console.log('[omni] đêm (tiếp)',JSON.stringify(r))}).catch(async e=>{console.error('[omni] đêm lỗi:',e);await ghiLoiMay(env,'omni_dem')})
+        if(ph%5===0&&(await docCoOmni(env).catch(()=>({bat:false}))).bat)await chayGanVknDem(env,Date.now()).then(r=>{if(r.soGhi)console.log('[omni] gắn vi kỹ năng (tiếp)',JSON.stringify(r))}).catch(async e=>{console.error('[omni] gắn vi kỹ năng lỗi:',e);await ghiLoiMay(env,'omni_gan_vkn')})
+      }}
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
       await capNhatSaiNhanhNeuCu(env,Date.now())
       // GAME HÓA 2.0 bật cả trung tâm ⇒ BTVN đã bỏ: không nhắc nộp BTVN.
@@ -3598,6 +3632,18 @@ const boXuLy = {
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))
+      // OMNI 3 (05/10): tick bài đã dạy ⇒ tự giao chiến dịch theo bài (bai-da-day.ts) · Bảng bài, xác nhận dạng, ma trận Q, ca chốt 50/50 (omni-gv.ts). Có ghi ⇒ `env`.
+      if (p === '/gv/bai-da-day') {
+        const kq = await gvBaiDaDay(env, b)
+        // Tick bài ⇒ A.I Đỗ Đại Học gắn vi kỹ năng ngay cho các tờ của bài (chạy nền; lỗi không ảnh hưởng tick; việc đêm gắn bù).
+        if (kq.ok === true && String(b.action ?? '') === 'tick' && Array.isArray(b.maDe)) {
+          const viec = ganVknChoMaDe(env, (b.maDe as unknown[]).map(String).slice(0, 40), Date.now()).catch(() => undefined)
+          if (ctx) ctx.waitUntil(viec)
+          else await viec
+        }
+        return ra(kq)
+      }
+      if (p === '/gv/omni') return ra(await gvOmni(env, b))
       // SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, srs2-sua.ts): thêm đề (chia lại câu chưa làm), thêm/bớt em (không xoá sổ), sửa hạn (hết hạn ⇒ mở lại). GHI — dùng env.
       if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
@@ -3680,6 +3726,8 @@ const boXuLy = {
       if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
       if (p === '/len-bang') return ghiLenBangMoi(env, b)
       if (p === '/kho/day') return dayDeKho(env, b)
+      // OMNI 3: app thầy đồng bộ thư mục mục đích của tờ (DẠY HỌC / TU LUYỆN) — kho-thu-muc.ts.
+      if (p === '/kho/thu-muc') return ra(await gvKhoThuMuc(env, b))
       if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
       if (p === '/kho/lay') return layDeKho(env, String(b.maDe ?? ''))
       if (p === '/kho/xoa') return xoaDeKho(env, b)
@@ -3692,12 +3740,16 @@ const boXuLy = {
       if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
+      // HỌC LIỆU MÁY SOẠN 05/10 (hoc-lieu-may-soan.ts): nộp bản khác + ý Đ–S đã qua hai lượt, xem hàng câu em đã sai — cùng cổng mã bí mật ở trên.
+      if (p.startsWith('/kho/may-soan/')) return ra(await duongMaySoan(env, p, b))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))
       if (p === '/gv/nut-that/go') return ra(await gvNutThatGo(env, b))
       if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
       if (p === '/gv/v2/tong') return ra(await gvTongV2(env))
+      // 5 THƯỚC ĐO CHẤT LƯỢNG SỬA LỖI theo lớp (thầy 05/10, server/src/chat-luong-loi.ts): thẻ ở Tổng quan app thầy. CHỈ ĐỌC (SELECT) ⇒ `envDoc`.
+      if (p === '/gv/chat-luong-loi') return ra(await gvChatLuongLoi(envDoc, b))
       if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))
       if (p === '/ca/cau-nghi-dap-an') return ra(await dsCauNghi(env))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))

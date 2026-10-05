@@ -3,6 +3,7 @@
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { layHoiSom } from '../../lib/hoi-som'
 import { donKhiDoiMocReset } from './don-moc-reset'
 import { dongGoiBanNho, laKeHoachNgayHopLe, phucHoiBanNho, type DuLieuBangNhiemVu, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
 
@@ -18,7 +19,9 @@ async function goiPost(duong: string, body: unknown, giay: number): Promise<any 
   try {
     const url = await layDiaChiMayChu()
     if (!url) return null
-    const r = await fetch(`${url}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: c.signal })
+    const than = JSON.stringify(body)
+    // Lệnh đã HỎI SỚM (src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
+    const r = (await layHoiSom(`${url}${duong}`, than, c.signal)) ?? (await fetch(`${url}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: than, signal: c.signal }))
     if (!r.ok) return null
     return await r.json()
   } catch {

@@ -3,6 +3,8 @@
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import { mauSoTiLeDung, type PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2 } from '../../lib/ph-v3/du-lieu'
+import type { PhOmni } from '../../../server/src/omni-kieu'
+import { chuPhKhoangCach, chuSoY, diemChu, doTinChu } from '../../lib/omni-chu'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { chuHanNop, chuGuiLuc, tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
 import { gioVn, ngayDayDuVn, soVn, tachVn } from '../../lib/ph-moi/dinh-dang'
@@ -29,7 +31,7 @@ export default function ManHomNay({ v, hoc2, canhBao, onDaXem }: { v: ViewPhMoi;
         <div className="ph3-luoi">
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
           <AnhHung pm={pm} hoc2={hoc2} />
-          {hoc2?.chienDich && <ChienDich cd={hoc2.chienDich} />}
+          {hoc2?.chienDich && <ChienDich cd={hoc2.chienDich} omni={hoc2.omni} />}
           <BaiTapCu pm={pm} />
           {pm.caGanNhat && <CaGanNhat pm={pm} />}
           {/* 01/10 (thầy: "lời thầy chuyển lên trên cho cân đối"): "Thầy đã lo cho con" lên ngay đầu cột trái, "Điều đáng mừng" xếp
@@ -126,10 +128,45 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
   )
 }
 
-function ChienDich({ cd }: { cd: NonNullable<Hoc2['chienDich']> }) {
+// ---------------------------------------------------------------- OMNI 3 (05/10) — dòng thêm trong thẻ "Chiến dịch của con"
+// Thầy 05/10: "giữ nguyên mọi giao diện hiện tại… thêm những mục cần thiết đồng bộ với giao diện hiện tại". ⇒ KHÔNG thẻ mới: các dòng nằm cuối CÙNG thẻ,
+// trong một ô xám `ph3-o-xam` như ô "Tổng · Hạn nộp" ngay trên, chữ `ph3-ghi` sẵn có; dòng khoảng cách tới 8 đậm như dòng "Tổng" của ô trên.
+// Chữ: dùng lại src/lib/omni-chu.ts (một nguồn), chỉ đổi sang giọng phụ huynh ở đây; không chữ game; độ tin không bao giờ 100% (doTinChu kẹp 99%).
+
+/** Mục tiêu sơ ý của chứng chỉ (điều kiện C = `THAM_SO_OMNI.C_SO_Y` ở server/src/omni-kieu.ts; app chỉ import KIỂU từ máy chủ nên ghi lại số — test khoá hai số bằng nhau). */
+export const SO_Y_MUC_TIEU = 0.07
+/** Tối đa số tên dạng ghi trên dòng "Dạng cần vững" (còn lại gộp "và N dạng khác") — dòng ngắn trên điện thoại. */
+const DANG_TOI_DA = 3
+
+/** "Sơ ý của con: 6% (mục tiêu dưới 7%)" — chữ chung `chuSoY` đổi sang giọng phụ huynh, cùng kiểu "nhãn: số" với các dòng khác của ô. */
+export function chuPhSoY(s: number | null): string | null {
+  const c = chuSoY(s, SO_Y_MUC_TIEU)
+  return c && c.replace(/^Sơ ý /, 'Sơ ý của con: ')
+}
+
+/** Các dòng OMNI theo thứ tự đọc: khoảng cách tới 8 → dạng cần vững → sơ ý → chứng chỉ gần nhất → giờ học → cần thầy chữa. Không có số thật ⇒ không dòng. */
+export function dongOmniPh(o: PhOmni): { khoa: string; chu: string; dam?: true }[] {
+  const ra: { khoa: string; chu: string; dam?: true }[] = []
+  const kc = chuPhKhoangCach(o.khoangCach8)
+  if (kc) ra.push({ khoa: 'khoang-cach-8', chu: kc, dam: true })
+  if (o.dangCanVung.length > 0) {
+    const them = o.dangCanVung.length - DANG_TOI_DA
+    ra.push({ khoa: 'dang-can-vung', chu: `Dạng cần vững: ${o.dangCanVung.slice(0, DANG_TOI_DA).join(', ')}${them > 0 ? ` và ${them} dạng khác` : ''}` })
+  }
+  const soY = chuPhSoY(o.sEm)
+  if (soY) ra.push({ khoa: 'so-y', chu: soY })
+  const cc = o.chungChi[0]
+  if (cc) ra.push({ khoa: 'chung-chi', chu: `Chứng chỉ gần nhất: ${cc.ten} · Sẵn sàng 8+ · độ tin ${doTinChu(cc.doTin)}${cc.diem !== null ? ` · điểm ca chốt ${diemChu(cc.diem)}` : ''}` })
+  if (o.gioHoc) ra.push({ khoa: 'gio-hoc', chu: `Giờ học con chọn: ${o.gioHoc}` })
+  if (o.canThayChua > 0) ra.push({ khoa: 'can-thay-chua', chu: `Cần thầy chữa: ${o.canThayChua} chỗ` })
+  return ra
+}
+
+function ChienDich({ cd, omni }: { cd: NonNullable<Hoc2['chienDich']>; omni?: PhOmni }) {
   const dangLuyen = cd.daGap - cd.thanhThao - cd.canDayLai
   const chuaGap = cd.tong - cd.daGap
   const pt = (n: number) => `${(n / cd.tong) * 100}%`
+  const dongOmni = omni ? dongOmniPh(omni) : []
   return (
     <The id="ph3-cd" className="ph3-o-hep" vung="chien-dich" tieuDe="Chiến dịch của con" phu={cd.ten} bieuTuong={<BtCo />} mau="xd"
       chip={<Chip mau="xd">Còn {cd.conNgay} ngày</Chip>}>
@@ -148,6 +185,11 @@ function ChienDich({ cd }: { cd: NonNullable<Hoc2['chienDich']> }) {
         <b>Tổng {cd.tong} câu · con đã gặp {cd.daGap} câu</b>
         <span className="ph3-dong-bt"><BtDongHo co={16} />Hạn nộp {chuHanNgay(cd.hanNop)}</span>
       </div>
+      {dongOmni.length > 0 && (
+        <div className="ph3-o-xam" data-vung="chien-dich-omni">
+          {dongOmni.map((d) => (d.dam ? <b key={d.khoa}>{d.chu}</b> : <span key={d.khoa} className="ph3-ghi">{d.chu}</span>))}
+        </div>
+      )}
     </The>
   )
 }

@@ -70,6 +70,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'doc_loi_giai',
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
+  // Học liệu máy soạn 05/10 (migration-0510-y-ds.sql): kho ý Đúng–Sai mới (học liệu) + hàng "chỉ học liệu" (như loi_giai_viec) ⇒ GIỮ.
+  'cau_y_ds', 'may_soan_viec',
   // HỌC PHÍ (hoc-phi.ts, migration-0510-hoc-phi.sql): sổ thu tiền của trung tâm — dữ liệu tài chính thật ⇒ GIỮ.
   'hoc_phi', 'hoc_phi_nop',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
@@ -82,6 +84,11 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'tu_luyen_luot', 'tu_luyen_cau',
   // TU LUYỆN v3 (migration-3009-tu-luyen-khac-phuc.sql, 30/09): ôn cách quãng + câu đã chấm từng câu — cùng hồ sơ Tu luyện ⇒ GIỮ.
   'tu_luyen_khac_phuc', 'tu_luyen_cham_cau',
+  // OMNI 3 (migration-0510-omni-3.sql, 05/10) — sinh SAU lần 2 (chạy thật 28/09, khoá `xong`, không bao giờ chạy lại): GIỮ = không đụng. Về nghĩa cũng GIỮ:
+  // tick bài + phạm vi lớp (thầy chủ động tạo, như `chien_dich`) · thư mục kho, vi kỹ năng, ma trận Q (học liệu) · hồ sơ omni_* (dựng lại từ sổ, như `nam_kt_cau`)
+  // · chứng chỉ, xác nhận của thầy, ca chốt, đề thử (hồ sơ học tập) · đếm câu lộ diện, vé tuần (vận hành, khoá theo ngày/tuần nên tự làm mới).
+  'bai_da_day', 'pham_vi_lop', 'de_kho_thu_muc', 'omni_vkn', 'omni_q', 'omni_em', 'omni_p_vkn', 'omni_beta_cau', 'omni_du_bao',
+  'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
 ]

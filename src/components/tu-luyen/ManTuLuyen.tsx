@@ -35,6 +35,7 @@ import { chamCau, nopBai, rutCau, taiNguon, taiTongHop, xemLuot, xemTruoc, type 
 import TongHopTuLuyen from './TongHopTuLuyen'
 import { taiDieuKienLuyenDe, type DieuKienLuyenDe } from '../luyen-de/dung-luyen-de'
 import { giuTrangKhongTaiLai } from '../../lib/cap-nhat-app'
+import { taoGoiSom } from '../hoa2/nap-truoc-man'
 import { BanDoKetQua, KhungLamRong, cuonToiCau, useBoCuc, type BoCuc, type LocXem, type NhomBang } from './bo-cuc'
 
 // Thẻ "Luyện đề cấu trúc" (30/09): mảnh NẠP LƯỜI khi em mở thẻ (ngoài precache — vite.config.ts globIgnores). Cổng + lý do khoá lấy từ
@@ -186,6 +187,20 @@ function IconLuyenDeThe() {
   )
 }
 
+// GỌI SỚM (chuyển màn nhanh 05/10, components/hoa2/man-sanh-luoi.ts · moManTuLuyenNhanh): chạm "Tu luyện" ở Sảnh khi mảnh này đã nạp trước
+// ⇒ bắn NGAY hai lệnh mở màn (nguồn câu + điều kiện Luyện đề) song song với lúc vẽ màn; lượt tải ĐẦU của màn nhận lại lời hứa — số lệnh không đổi.
+const somNguon = taoGoiSom<Awaited<ReturnType<typeof taiNguon>>>()
+const somDieuKien = taoGoiSom<DieuKienLuyenDe | null>()
+export function goiSomTuLuyen(token: string): void {
+  if (!token) return
+  somNguon.ban(token, () => taiNguon(token))
+  somDieuKien.ban(token, () => taiDieuKienLuyenDe(token))
+}
+const xoaSom = () => {
+  somNguon.xoa()
+  somDieuKien.xoa()
+}
+
 export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const boCuc = useBoCuc()
   const rong = boCuc !== 'doc'
@@ -196,13 +211,14 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   useEffect(() => {
     let song = true
     setDangTaiDk(true)
-    void taiDieuKienLuyenDe(token).then((d) => {
+    void (somDieuKien.nhan(token) ?? taiDieuKienLuyenDe(token)).then((d) => {
       if (!song) return
       setDieuKien(d)
       setDangTaiDk(false)
     })
     return () => { song = false }
   }, [token, lamMoiDk])
+  useEffect(() => xoaSom, []) // rời màn ⇒ bỏ lệnh sớm chưa ai nhận
   const doiLuyenDe = useCallback(() => setLamMoiDk((n) => n + 1), [])
   const [nguon, setNguon] = useState<NguonTuLuyen | null>(null)
   const [loiNguon, setLoiNguon] = useState('')
@@ -247,7 +263,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const napNguon = useCallback(async () => {
     setDangTaiNguon(true)
     setLoiNguon('')
-    const r = await taiNguon(token)
+    const r = await (somNguon.nhan(token) ?? taiNguon(token))
     setDangTaiNguon(false)
     if (!r.ok) { setLoiNguon(r.loi); return }
     setNguon(r.du)

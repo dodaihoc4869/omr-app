@@ -1,4 +1,3 @@
-import { LoiChao } from '../components/bat-linh/DongHanh'
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
@@ -40,11 +39,8 @@ import {
   CheckCircle2,
   ChevronRight,
   Eye,
-  EyeOff,
-  Lock,
   LogIn,
   RefreshCw,
-  Sparkles,
   AlertCircle,
   ArrowRight,
   Clock,
@@ -68,12 +64,14 @@ import {
   voDaiBatDauApi, voDaiXemApi, voDaiNopApi, voDaiDongApi,
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
-import { voiHanCho } from '../lib/han-cho'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
+import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
+import { veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { moManGameNhanh, napManCauDaLam, napManGame, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
@@ -83,6 +81,11 @@ const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
 // TU LUYỆN (29/09): màn riêng, nạp lười — máy yếu không tải khi chưa bấm cửa.
 const ManTuLuyen = lazy(() => import('../components/tu-luyen/ManTuLuyen'))
+// CHUYỂN MÀN NHANH (05/10): Sảnh 2.0 nạp trước ba mảnh trên lúc rảnh (components/hoa2/man-sanh-luoi.ts). `veNgayKhiCo`: mảnh đã có ⇒ vẽ
+// thẳng, KHÔNG treo Suspense + 300 ms giữ màn chờ của React; chưa có ⇒ đúng lazy cũ ở trên (cùng màn chờ).
+const GameNhanh = veNgayKhiCo(ThanThuHoaHocGame, napManGame)
+const CauDaLamNhanh = veNgayKhiCo(CauDaLam, napManCauDaLam)
+const ManTuLuyenNhanh = veNgayKhiCo(ManTuLuyen, napManTuLuyen)
 // LỊCH SỬ CA + BÁO CÁO CHI TIẾT bản mới (28/09): hai mảnh lazy NGOÀI precache.
 const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
@@ -114,6 +117,8 @@ import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from
 import { useHangDoiNop } from '../lib/use-hang-doi-nop'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
+/** Hai lệnh màn đăng nhập dùng — lấy từ exam-api (xuất lại từ hs-dang-nhap-api.ts) để phép kiểm giả lập exam-api vẫn chặn được. */
+const API_DANG_NHAP: ApiDangNhapHs = { dangNhap: hsDangNhapApi, datMatKhau: hsDatMatKhauApi }
 
 export interface BaiMomGiao {
   id: string
@@ -252,20 +257,6 @@ export default function StudentPortalScreen() {
     window.addEventListener('focus',kich);window.addEventListener('online',kich);document.addEventListener('visibilitychange',kich)
     return()=>{nhip.dung();window.removeEventListener('focus',kich);window.removeEventListener('online',kich);document.removeEventListener('visibilitychange',kich)}
   },[auth?.sbd,auth?.token])
-
-  // Đăng nhập state
-  const [sbdInput, setSbdInput] = useState('')
-  const [matKhauInput, setMatKhauInput] = useState('')
-  const [hienMatKhau, setHienMatKhau] = useState(false)
-  const [dangXuLyDangNhap, setDangXuLyDangNhap] = useState(false)
-  const [loiDangNhap, setLoiDangNhap] = useState('')
-
-  // Đặt mật khẩu lần đầu
-  const [chuaCoMatKhau, setChuaCoMatKhau] = useState(false)
-  const [matKhauMoi, setMatKhauMoi] = useState('')
-  const [xacNhanMatKhau, setXacNhanMatKhau] = useState('')
-  const [dangDatMatKhau, setDangDatMatKhau] = useState(false)
-  const [loiDatMatKhau, setLoiDatMatKhau] = useState('')
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
@@ -894,93 +885,16 @@ export default function StudentPortalScreen() {
     }
   }, [auth])
 
-  const xuLyDangNhap = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    const sbd = sbdInput.trim()
-    if (!sbd) {
-      setLoiDangNhap('Vui lòng nhập số báo danh (SBD)')
-      return
-    }
-    setDangXuLyDangNhap(true)
-    setLoiDangNhap('')
-    try {
-      const url = await voiHanCho(loadScriptUrlHoacMacDinh(), 8000, 'timeout').catch(() => '')
-      const res = await voiHanCho(hsDangNhapApi(url, sbd, matKhauInput.trim()), 15000, 'Máy chủ không trả lời — em thử lại sau ít phút.').catch(e => ({ ok: false, error: e.message } as any))
-      if (res.chuaCoMatKhau) {
-        setChuaCoMatKhau(true)
-        setDangXuLyDangNhap(false)
-        return
-      }
-      if (!res.ok) {
-        setLoiDangNhap(res.error || 'Đăng nhập không thành công. Kiểm tra lại SBD hoặc mật khẩu.')
-        return
-      }
-      const thongTin: ThongTinHs = {
-        sbd: res.sbd || sbd,
-        hoTen: res.hoTen || `Học sinh ${sbd}`,
-        lop: res.lop || '',
-        namSinh: res.namSinh || '',
-        token: res.token,
-      }
-      localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
-      setAuth(thongTin)
-    } catch (err) {
-      setLoiDangNhap(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
-    } finally {
-      setDangXuLyDangNhap(false)
-    }
-  }
-
-  const xuLyDatMatKhau = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    if (!matKhauMoi || matKhauMoi.length < 6) {
-      setLoiDatMatKhau('Mật khẩu mới phải có tối thiểu 6 ký tự')
-      return
-    }
-    if (matKhauMoi !== xacNhanMatKhau) {
-      setLoiDatMatKhau('Xác nhận mật khẩu không khớp')
-      return
-    }
-    setDangDatMatKhau(true)
-    setLoiDatMatKhau('')
-    try {
-      const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-      const res = await hsDatMatKhauApi(url, sbdInput.trim(), matKhauMoi.trim())
-      if (!res.ok) {
-        setLoiDatMatKhau(res.error || 'Không thể đặt mật khẩu')
-        return
-      }
-      // Sau khi đặt thành công, tự động đăng nhập
-      setMatKhauInput(matKhauMoi)
-      const resDn = await hsDangNhapApi(url, sbdInput.trim(), matKhauMoi.trim())
-      if (resDn.ok) {
-        const thongTin: ThongTinHs = {
-          sbd: resDn.sbd || sbdInput.trim(),
-          hoTen: resDn.hoTen || `Học sinh ${sbdInput.trim()}`,
-          lop: resDn.lop || '',
-          namSinh: resDn.namSinh || '',
-          token: resDn.token,
-        }
-        localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
-        setAuth(thongTin)
-        setChuaCoMatKhau(false)
-      } else {
-        setChuaCoMatKhau(false)
-        setLoiDangNhap('Đặt mật khẩu thành công! Vui lòng đăng nhập.')
-      }
-    } catch (err) {
-      setLoiDatMatKhau(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
-    } finally {
-      setDangDatMatKhau(false)
-    }
+  // Đăng nhập (+ đặt mật khẩu lần đầu): màn DangNhapHocSinh (05/10, tách để vỏ app học sinh dựng trước cổng). Cất phiên rồi vào cổng như cũ.
+  const daDangNhap = (thongTin: ThongTinHs) => {
+    localStorage.setItem(KHOA_LUU_AUTH, JSON.stringify(thongTin))
+    setAuth(thongTin)
   }
 
   const dangXuat = async () => {
     try{const r=await navigator.serviceWorker?.getRegistration();const sub=await r?.pushManager?.getSubscription();if(sub&&auth?.token){await noticeApi(auth.token,'unsubscribe',{endpoint:sub.endpoint});await sub.unsubscribe()}}catch{/* Generic push contains no personal data. */}
     localStorage.removeItem(KHOA_LUU_AUTH)
     setAuth(null)
-    setMatKhauInput('')
-    setSbdInput('')
   }
 
   const tongSoCauSaiDaChon = useMemo(() => {
@@ -1178,152 +1092,9 @@ export default function StudentPortalScreen() {
     setManThi(true)
   }
 
-  // NẾU CHƯA ĐĂNG NHẬP
+  // NẾU CHƯA ĐĂNG NHẬP — màn đăng nhập (cây JSX chép nguyên văn sang DangNhapHocSinh.tsx 05/10; vỏ app học sinh dựng nó trước cổng).
   if (!auth) {
-    return (
-      <div className="bl-login">
-        <div className="bl-login__card">
-          <div className="bl-login__brand"><LogoDoc vai="hs" size={48} /></div>
-          <LoiChao vai="hs" />
-
-          {chuaCoMatKhau ? (
-            <form onSubmit={xuLyDatMatKhau} className="space-y-4">
-              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-amber-800 dark:text-amber-300 text-xs leading-relaxed flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-                <div>
-                  <strong>Thiết lập mật khẩu lần đầu:</strong> SBD <strong>{sbdInput}</strong> chưa có mật khẩu. Em hãy tạo mật khẩu mới (tối thiểu 6 ký tự) để đăng nhập vào các lần sau.
-                </div>
-              </div>
-
-              {loiDatMatKhau && (
-                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>{loiDatMatKhau}</span>
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="hs-mk-moi" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Mật khẩu mới
-                </label>
-                <input
-                  id="hs-mk-moi"
-                  type="password"
-                  value={matKhauMoi}
-                  onChange={(e) => setMatKhauMoi(e.target.value)}
-                  placeholder="Nhập mật khẩu mới…"
-                  className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="hs-mk-xac-nhan" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Xác nhận mật khẩu
-                </label>
-                <input
-                  id="hs-mk-xac-nhan"
-                  type="password"
-                  value={xacNhanMatKhau}
-                  onChange={(e) => setXacNhanMatKhau(e.target.value)}
-                  placeholder="Nhập lại mật khẩu…"
-                  className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
-                  required
-                />
-              </div>
-
-              <div className="pt-2 flex gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setChuaCoMatKhau(false)}
-                  className="w-1/3 min-h-[48px] py-2.5 px-3 rounded-full btn-google-outlined text-sm font-semibold cursor-pointer"
-                >
-                  Quay lại
-                </button>
-                <button
-                  type="submit"
-                  disabled={dangDatMatKhau}
-                  className="w-2/3 min-h-[48px] py-2.5 px-4 rounded-full btn-google-primary text-sm shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                >
-                  {dangDatMatKhau ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                  <span>Xác nhận & Đăng nhập</span>
-                </button>
-              </div>
-            </form>
-          ) : (
-            <form onSubmit={xuLyDangNhap} className="space-y-4">
-              {loiDangNhap && (
-                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>{loiDangNhap}</span>
-                </div>
-              )}
-
-              <div>
-                <label htmlFor="hs-dn-sbd" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Số báo danh (SBD)
-                </label>
-                <input
-                  id="hs-dn-sbd"
-                  type="text"
-                  inputMode="numeric"
-                  value={sbdInput}
-                  onChange={(e) => setSbdInput(e.target.value)}
-                  placeholder="Ví dụ: 110234 hoặc 12026"
-                  className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-mono transition"
-                  required
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="hs-dn-mat-khau" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    Mật khẩu
-                  </label>
-                  <span className="text-[11px] text-slate-400">
-                    (Lần đầu chưa có để trống để đặt)
-                  </span>
-                </div>
-                <div className="relative">
-                  <input
-                    id="hs-dn-mat-khau"
-                    type={hienMatKhau ? 'text' : 'password'}
-                    value={matKhauInput}
-                    onChange={(e) => setMatKhauInput(e.target.value)}
-                    placeholder="Nhập mật khẩu của em…"
-                    className="w-full min-h-[48px] px-4 py-2.5 pr-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setHienMatKhau(!hienMatKhau)}
-                    aria-label={hienMatKhau ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-                  >
-                    {hienMatKhau ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={dangXuLyDangNhap}
-                className="btn-google-primary w-full min-h-[48px] py-3 px-4 text-sm disabled:opacity-50 mt-3 shadow-sm cursor-pointer"
-              >
-                {dangXuLyDangNhap ? <RefreshCw className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-                <span>Đăng nhập</span>
-              </button>
-
-              <div className="text-center pt-2">
-                <p className="text-[11px] text-slate-400">
-                  Quên mật khẩu: nhắn thầy để đặt lại.
-                </p>
-              </div>
-            </form>
-          )}
-        </div>
-      </div>
-    )
+    return <DangNhapHocSinh api={API_DANG_NHAP} onDangNhap={daDangNhap} logo={<LogoDoc vai="hs" size={48} />} />
   }
 
   // Vỏ M3 của sheet toàn màn: chỉ ở cổng học sinh (dungM3) và không phải game (game thần thú giữ nguyên, test khoá).
@@ -1336,6 +1107,8 @@ export default function StudentPortalScreen() {
     } catch {
       /* máy chặn lưu: game vẫn mở ở màn Đảo */
     }
+    // Chuyển màn nhanh (05/10): bắn ngay lệnh mở game + tải mảnh màn đích, song song với lúc vẽ (man-sanh-luoi.ts · moManGameNhanh).
+    moManGameNhanh(auth.sbd, auth.token || undefined, manDau)
     moGame()
   }
   const hoiDangXuat = () => {
@@ -1470,7 +1243,7 @@ export default function StudentPortalScreen() {
       {tab === 'caudalam' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <CauDaLam token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
+            <CauDaLamNhanh token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
           </Suspense>
         </div>
       )}
@@ -1486,7 +1259,7 @@ export default function StudentPortalScreen() {
       {tab === 'tuluyen' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <ManTuLuyen token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} />
+            <ManTuLuyenNhanh token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} />
           </Suspense>
         </div>
       )}
@@ -2361,7 +2134,7 @@ export default function StudentPortalScreen() {
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
         {tab === 'thanthu' && (
           <Suspense fallback={<ChoNapGame />}>
-          <ThanThuHoaHocGame
+          <GameNhanh
             sbd={auth.sbd}
             token={auth.token}
             dsLichSu={dsLichSu}

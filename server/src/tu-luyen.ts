@@ -22,6 +22,8 @@ import { dbGoc } from './cau-hinh-dem'
 import { coCaDangMo } from './bi-a'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
 import { cauKhacPhucGoi, danhMucDangBai, deTheoDangBai } from './goi-cu'
+import { omniBat } from './omni-d1'
+import { thuMucCuaMaDe } from './kho-thu-muc'
 import type { TeacherExamSource } from '../../src/data/examContent'
 import type { CauLuyen } from '../../src/lib/bai-tap-pdf'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
@@ -111,6 +113,42 @@ export function damBaoBangTuLuyen(env: Env): Promise<void> {
 /** Xác thực: SBD LUÔN lấy từ token của em (không nhận `sbd` trần). */
 async function emCua(env: Env, b: Obj): Promise<string> {
   return gameIdentity(env, b)
+}
+
+// ------------------------------------------------------------------ OMNI 3: câu MỚI chỉ từ tờ TU LUYỆN (kho-thu-muc.ts)
+// Luật kho (DAC-TA-BUILD-OMNI-3-0510.md mục 2): khi OMNI bật cho em, câu mới / câu rút thêm / câu bù kho của MỌI chế độ chỉ lấy từ tờ thư mục
+// TU LUYỆN (tờ DẠY HỌC dành cho tick bài và game); kho CÂU SAI của em giữ nguyên mọi nguồn (chế độ 1 và câu sai làm "mồi" ở chế độ 2, 4).
+// Cờ tắt (hoặc đọc cờ lỗi) ⇒ không một truy vấn nào thêm, Tu luyện y hệt cũ.
+
+/** OMNI bật cho em? (omni-d1 `omniBat`; lỗi ⇒ tắt). */
+const omniCuaEm = (env: Env, sbd: string): Promise<boolean> => omniBat(env, sbd).catch(() => false)
+
+/** Giữ phần tử thuộc tờ TU LUYỆN (thư mục tra theo mã gốc; thiếu dòng ⇒ luật lùi: mã "DH-" là DẠY HỌC). */
+async function chiToTuLuyen<T>(env: Env, ds: readonly T[], maCua: (x: T) => string): Promise<T[]> {
+  if (!ds.length) return []
+  const tm = await thuMucCuaMaDe(env, [...new Set(ds.map(maCua))])
+  return ds.filter((x) => tm.get(maCua(x)) === 'TU_LUYEN')
+}
+
+/** qid các câu thuộc tờ KHÔNG phải TU LUYỆN trong các chuyên đề — đưa vào `loaiTru` để `cauKhacPhucGoi` không phí chỗ (200 câu, 8–40 tờ) cho câu DẠY HỌC. */
+async function qidNgoaiTuLuyen(env: Env, chuyenDe: readonly string[]): Promise<string[]> {
+  if (!chuyenDe.length) return []
+  const r = await env.DB.prepare(`SELECT c.qid, c.ma_de FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
+      WHERE d.da_xoa = 0 AND c.chuyen_de IN (SELECT value FROM json_each(?)) LIMIT 3000`).bind(JSON.stringify(chuyenDe)).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const dong = (r.results ?? []).map((x) => ({ qid: str(x.qid), maDe: str(x.ma_de) })).filter((x) => x.qid && x.maDe)
+  if (!dong.length) return []
+  const tm = await thuMucCuaMaDe(env, [...new Set(dong.map((x) => x.maDe))])
+  return dong.filter((x) => tm.get(x.maDe) !== 'TU_LUYEN').map((x) => x.qid)
+}
+
+/** Danh mục Dạng bài chỉ còn dạng (tờ DB-…) thuộc TU LUYỆN; bài/lớp rỗng thì bỏ. */
+async function danhMucTuLuyen(env: Env, lops: LopDangBaiTL[]): Promise<LopDangBaiTL[]> {
+  const ma = [...new Set(lops.flatMap((l) => l.bais.flatMap((b) => b.dangs.map((d) => d.ma))))]
+  if (!ma.length) return lops
+  const tm = await thuMucCuaMaDe(env, ma)
+  return lops
+    .map((l) => ({ ...l, bais: l.bais.map((b) => ({ ...b, dangs: b.dangs.filter((d) => tm.get(d.ma) === 'TU_LUYEN') })).filter((b) => b.dangs.length) }))
+    .filter((l) => l.bais.length)
 }
 
 // ------------------------------------------------------------------ nạp nguồn (y hệt đường của máy em cũ, nhưng chạy ở máy chủ)
@@ -237,7 +275,7 @@ async function daiDienDang(env: Env, dsDang: { ma: string; qids: string[] }[]): 
  * CHẾ ĐỘ 2 — nguồn "câu sai" cho thuật toán CŨ theo thứ tự: kho câu sai chung → dạng em còn yếu → chương đang học → dạng phổ biến của lớp.
  * Mỗi tầng chạy ĐÚNG `phanTichTyLeDang` trên kho cùng chuyên đề; tầng nào rút được câu (tongToiDa > 0) thì dùng tầng ấy.
  */
-async function nguonCheDo2(env: Env, sbd: string, khoiEm: Khoi | null, kho: KhoCauSai): Promise<{ kieu: KieuNguonDang; dsCauSai: CauSaiDauVao[]; khoDe: TeacherExamSource[] } | { loi: string }> {
+async function nguonCheDo2(env: Env, sbd: string, khoiEm: Khoi | null, kho: KhoCauSai, omni = false): Promise<{ kieu: KieuNguonDang; dsCauSai: CauSaiDauVao[]; khoDe: TeacherExamSource[] } | { loi: string }> {
   let loi = ''
   const tang: [KieuNguonDang, () => Promise<CauSaiDauVao[]>][] = [
     ['cau_sai', () => (kho.ds.length ? cauSaiTuKho(env, kho) : Promise.resolve([]))],
@@ -248,7 +286,7 @@ async function nguonCheDo2(env: Env, sbd: string, khoiEm: Khoi | null, kho: KhoC
   for (const [kieu, lay] of tang) {
     const dsCauSai = await lay()
     if (!dsCauSai.length) continue
-    const k = await khoTheoCauSai(env, sbd, dsCauSai, khoiEm)
+    const k = await khoTheoCauSai(env, sbd, dsCauSai, khoiEm, omni)
     if (!k.kho.length) { loi = loi || k.loi; continue }
     if (phanTichTyLeDang(dsCauSai, k.kho).tongToiDa > 0) return { kieu, dsCauSai, khoDe: k.kho }
   }
@@ -260,17 +298,19 @@ async function nguonCheDo2(env: Env, sbd: string, khoiEm: Khoi | null, kho: KhoC
  * bỏ câu đang bảo vệ, khử trùng nhóm nội dung). Đọc một mẫu NGẪU NHIÊN của chỉ mục (không tải cả kho).
  */
 const MAU_TOAN_KHO = 400
-async function ungVienToanKho(env: Env, khoiEm: Khoi | null, loc: ReadonlySet<string>): Promise<{ ds: CauLuyen[]; dang: Map<string, { ma: string; ten: string }>; loi: string }> {
+async function ungVienToanKho(env: Env, khoiEm: Khoi | null, loc: ReadonlySet<string>, omni = false): Promise<{ ds: CauLuyen[]; dang: Map<string, { ma: string; ten: string }>; loi: string }> {
   const dang = new Map<string, { ma: string; ten: string }>()
   if (khoiEm === null) return { ds: [], dang, loi: LOI_KHONG_LOP }
   const baoVe = await docBaoVeKho(env)
   if (!baoVe) return { ds: [], dang, loi: LOI_CHUA_KIEM_BAO_VE }
-  const r = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+  const r = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json, q.ma_de FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
       JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
      WHERE COALESCE(d.da_xoa, 0) = 0 ORDER BY RANDOM() LIMIT ?`).bind(MAU_TOAN_KHO).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  // OMNI 3: mẫu toàn kho chỉ giữ câu của tờ TU LUYỆN.
+  const dong = omni ? await chiToTuLuyen(env, r.results ?? [], (x) => str(x.ma_de)) : r.results ?? []
   const nhom = new Set<string>()
   const ds: CauLuyen[] = []
-  for (const x of r.results ?? []) {
+  for (const x of dong) {
     let q: PrivateQuestion
     try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
     const k = khoiCuaCau(q) // LUẬT THẦY 05/10: mọi nguồn khối của câu (mã tờ, mã câu, chương) phải KHỚP và ĐÚNG khối em
@@ -286,12 +326,14 @@ async function ungVienToanKho(env: Env, khoiEm: Khoi | null, loc: ReadonlySet<st
   return { ds, dang, loi: ds.length ? '' : 'Không tìm thấy câu hợp với lựa chọn của em.' }
 }
 
-/** Kho câu cùng chuyên đề/dạng với câu sai — `napKhoChoMayEm` chuyển sang máy chủ (gọi thẳng `cauKhacPhucGoi`). */
-async function khoTheoCauSai(env: Env, sbd: string, dsCauSai: CauSaiDauVao[], khoiEm: Khoi | null): Promise<{ kho: TeacherExamSource[]; loi: string }> {
+/** Kho câu cùng chuyên đề/dạng với câu sai — `napKhoChoMayEm` chuyển sang máy chủ (gọi thẳng `cauKhacPhucGoi`).
+ *  `omni` (OMNI 3): chỉ câu của tờ TU LUYỆN — loại câu tờ khác ngay từ `loaiTru`, rồi lọc lại tờ trả về (lưới an toàn). */
+async function khoTheoCauSai(env: Env, sbd: string, dsCauSai: CauSaiDauVao[], khoiEm: Khoi | null, omni = false): Promise<{ kho: TeacherExamSource[]; loi: string }> {
   const chuyenDe = [...new Set(dsCauSai.map((c) => str(c.chuyenDe).trim()).filter(Boolean))]
   if (chuyenDe.length === 0) return { kho: [], loi: 'Các câu sai chưa gắn chuyên đề nên chưa tìm được câu cùng dạng.' }
   const maCa = str(dsCauSai.find((c) => c.maCa)?.maCa)
-  const loaiTru = dsCauSai.map((c) => str(c.qid)).filter(Boolean)
+  const loaiTruSai = dsCauSai.map((c) => str(c.qid)).filter(Boolean)
+  const loaiTru = omni ? [...new Set([...loaiTruSai, ...(await qidNgoaiTuLuyen(env, chuyenDe))])] : loaiTruSai
   const dsDang = [...new Set(dsCauSai.map((c) => str(c.dangMa).trim()).filter(Boolean))]
   const kq = await cauKhacPhucGoi(env, { maCa, sbd, chuyenDe, loaiTru, soCau: SO_CAU_XIN_KHO, ...(dsDang.length ? { dsDang } : {}) })
   if (kq.ok === false) return { kho: [], loi: str(kq.error) || 'Không xin được kho từ máy chủ.' }
@@ -302,7 +344,8 @@ async function khoTheoCauSai(env: Env, sbd: string, dsCauSai: CauSaiDauVao[], kh
     const dung = buildTeacherSourceFromKhoDe(doc.json)
     if (dung.errors.length === 0) nguon.push(dung.source)
   }
-  const kho = nguonHopKhoi(khoiEm, nguon)
+  const khoHop = nguonHopKhoi(khoiEm, nguon)
+  const kho = omni ? await chiToTuLuyen(env, khoHop, (s) => str(s.maDe)) : khoHop
   return { kho, loi: kho.length ? '' : 'Chưa tìm được câu nào cùng dạng trong kho.' }
 }
 
@@ -385,15 +428,18 @@ async function dangNenLuyen(env: Env, ds: readonly { ma: string }[]): Promise<{ 
 export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
   // MỌI lượt đọc chạy SONG SONG (quét tối ưu 30/09): khối em ‖ danh mục thô ‖ kho câu sai chung ‖ ca đang mở; danh mục lọc theo khối ở bước cuối.
   // Hai tầng dự phòng đầu (dạng yếu, chương đang học) đọc CÙNG đợt để thẻ ghi đúng nguồn mà không thêm đợt D1.
-  const [khoiEm, dmTho, kcs, dangThi, yeu, chuong] = await Promise.all([
+  const [khoiEm, dmTho, kcs, dangThi, yeu, chuong, omni] = await Promise.all([
     docKhoiEm(env, sbd).catch(() => null),
     danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj),
     docKhoCauSai(env, sbd).catch((e): KhoCauSai => ({ ds: [], tuCa: 0, tuChienDich: 0, tuLuyenDe: 0, tuTuLuyen: 0, tong: 0, daKhacPhuc: 0, lichSu: [], loi: e instanceof Error ? 'Chưa đọc được kho câu sai. Em thử lại sau.' : '' })),
     coCaDangMo(env, sbd, Date.now()).catch(() => false),
     dangYeuTheoHoSo(env, sbd).catch(() => []),
     dangTheoChienDich(env, sbd).catch(() => []),
+    omniCuaEm(env, sbd),
   ])
-  const dm = locDanhMuc(dmTho, khoiEm)
+  const dm0 = locDanhMuc(dmTho, khoiEm)
+  // OMNI 3: danh mục chế độ Dạng bài chỉ còn dạng của thư mục TU LUYỆN (đúng luật rút ở `chayCheDo`).
+  const dm = omni ? { ...dm0, lops: await danhMucTuLuyen(env, dm0.lops) } : dm0
   const kieu2: KieuNguonDang | null = kcs.ds.length ? 'cau_sai' : yeu.length ? 'yeu' : chuong.length ? 'chuong' : khoiEm === null ? null : 'pho_bien'
   const nenLuyen = kcs.ds.length ? null : await dangNenLuyen(env, [...yeu, ...chuong]).catch(() => null)
   const now = Date.now()
@@ -444,6 +490,8 @@ interface KetQuaRutTho {
 async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promise<KetQuaRutTho> {
   // Khối em đọc SONG SONG với nguồn của từng chế độ (quét tối ưu 30/09) — chế độ 1 không cần khối nên không phải chờ thêm một đợt D1.
   const khoiP = docKhoiEm(env, sbd).catch(() => null)
+  // OMNI 3 (cờ đọc song song): chế độ 2, 3, 4 lấy câu MỚI chỉ từ tờ TU LUYỆN; chế độ 1 là kho câu sai của em ⇒ không cần cờ.
+  const omniP = t.cheDo === 1 ? Promise.resolve(false) : omniCuaEm(env, sbd)
   const meta = new Map<string, { dangMa: string; dangTen: string; bai: string; lop: string }>()
   const rong = (loi: string): KetQuaRutTho => ({ dsCau: [], tongToiDa: 0, tieuDe: '', meta, loi })
   const lopCua = (c: CauLuyen) => { const k = khoiCuaCau({ qid: c.id, maDe: c.maDe }); return k ? String(k) : '' }
@@ -489,10 +537,10 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
   }
 
   if (t.cheDo === 2 || t.cheDo === 4) {
-    const [khoSai, khoiEm] = await Promise.all([docKhoCauSai(env, sbd), khoiP])
+    const [khoSai, khoiEm, omni] = await Promise.all([docKhoCauSai(env, sbd), khoiP, omniP])
     if (t.cheDo === 2) {
       // Chế độ 2 GIỮ thuật toán cũ (phanTichTyLeDang → rutDsThemDangCauSai), chỉ đổi NGUỒN: kho câu sai chung; kho trống ⇒ dự phòng 3 tầng.
-      const ng = await nguonCheDo2(env, sbd, khoiEm, khoSai)
+      const ng = await nguonCheDo2(env, sbd, khoiEm, khoSai, omni)
       if ('loi' in ng) return rong(ng.loi)
       const nguonDang = { kieu: ng.kieu, nhan: NHAN_NGUON_DANG[ng.kieu] }
       const nhan = nhanDangKho(ng.khoDe)
@@ -519,7 +567,7 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
     const nhanLoc = loc.has('ngau_nhien') ? ['Ngẫu nhiên'] : [loc.has('sao_2') && '2 sao', loc.has('sao_1') && '1 sao', loc.has('ly_thuyet') && 'Lý thuyết', loc.has('bai_tap') && 'Bài tập'].filter(Boolean)
     if (khoSai.ds.length) {
       const dsCauSai = await cauSaiTuKho(env, khoSai)
-      const { kho } = dsCauSai.length ? await khoTheoCauSai(env, sbd, dsCauSai, khoiEm) : { kho: [] as TeacherExamSource[] }
+      const { kho } = dsCauSai.length ? await khoTheoCauSai(env, sbd, dsCauSai, khoiEm, omni) : { kho: [] as TeacherExamSource[] }
       if (kho.length && ungVienTuDo(kho, loc).length) {
         const nguonDang = { kieu: 'cau_sai', nhan: 'Theo câu sai của em' }
         if (!rut) return { dsCau: [], tongToiDa: ungVienTuDo(kho, loc).length, tieuDe: '', meta, loi: '', nguonDang }
@@ -532,7 +580,7 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
         return { dsCau, tongToiDa: tong, tieuDe: `Tự do · ${nhanLoc.join(' + ')}`, meta, loi: dsCau.length ? '' : 'Không tìm thấy câu hợp với lựa chọn của em.', nguonDang }
       }
     }
-    const tk = await ungVienToanKho(env, khoiEm, loc)
+    const tk = await ungVienToanKho(env, khoiEm, loc, omni)
     const nguonDang = { kieu: 'toan_kho', nhan: khoiEm !== null ? `Toàn kho lớp ${khoiEm}` : '' }
     if (!tk.ds.length) return { ...rong(tk.loi), nguonDang }
     if (!rut) return { dsCau: [], tongToiDa: tk.ds.length, tieuDe: '', meta, loi: '', nguonDang }
@@ -543,9 +591,10 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
 
   // Chế độ 3: Dạng bài — chỉ mã trong danh mục CỦA EM (không vượt khối).
   if (t.dsDang.length === 0) return rong('Em chọn ít nhất 1 dạng bài.')
-  const [dmTho, khoiEm] = await Promise.all([danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj), khoiP])
+  const [dmTho, khoiEm, omni] = await Promise.all([danhMucDangBai(env).catch((e) => ({ ok: false, error: e instanceof Error ? e.message : '' }) as Obj), khoiP, omniP])
   const dm = locDanhMuc(dmTho, khoiEm)
-  const banDo = banDoDanhMuc(dm.lops)
+  // OMNI 3: chỉ dạng (tờ DB-…) thuộc TU LUYỆN mới rút được.
+  const banDo = banDoDanhMuc(omni ? await danhMucTuLuyen(env, dm.lops) : dm.lops)
   const hopLe = t.dsDang.filter((m) => banDo.has(m) && duocChonLop(khoiEm, banDo.get(m)!.lop))
   if (hopLe.length === 0) return rong(dm.loi || 'Dạng bài em chọn không có trong danh mục lớp của em.')
   const { kho, loi } = await khoDangBai(env, hopLe, khoiEm)

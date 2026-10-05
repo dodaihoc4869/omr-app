@@ -21,6 +21,7 @@ import {
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { protectedQuestions, docCauTheoRef } from './game-v2-bank'
+import { apXaoTheoRef } from './lam-lai-so'
 import { docKhoiChungCacEm } from './chan-khac-khoi'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { laCauTuLuan } from './cam-tu-luan'
@@ -72,6 +73,7 @@ export const danhDau = <T extends object>(b: T): T => { noiBo.add(b); return b }
 export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 /** `an` = dạng của câu này em ĐÃ KHẮC PHỤC XONG (ấn thạch sáng) → kỹ năng ở hiệp này là biến thể ấn (×1,25). */
 interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; phan?: string; mucDo?: string | null; an?: boolean; /** Nhãn nợ (Sổ nợ 29/09): "Sai 2 lần · Ca 26/09". */ nhanNo?: string; goiY?: { gach?: string[]; cotLoi?: string }
+  /** 05/10 (cau-anh-em.ts): hoán vị BẢN XÁO của câu làm lại (chỉ máy chủ; `answer` chấm theo đúng hoán vị này qua ref phiên). */ xt?: number[]
   /** M6 (23/09): số từ của đề + phương án/ý, và có hình/bảng hay không — nguồn cho THỜI GIAN ĐỌC
    *  của hạn hiệp (`giayDocThem` trong doan-core). Thiếu ⇒ hạn y hệt bản cũ. */
   soTu?: number; coHinh?: boolean }
@@ -112,7 +114,8 @@ const TIN_HIEU = ['can_tiep_suc', 'chac_y', 'ban_them', 'doi_ti'] as const
 const iso = (ms: number) => new Date(ms).toISOString()
 /** Phần kết quả của `answer` được phép về máy em sau khi em chốt. */
 // `assisted` (chỉ-thêm, luật v4 29/09): máy em KHÔNG phát hiệu ứng "+N EXP" cho câu có trợ giúp.
-const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage, assisted: (r.attempt as { assisted?: unknown } | undefined)?.assisted === true, ...(typeof r.expCau === 'number' && r.expCau > 0 ? { expCau: r.expCau } : {}), ...(typeof r.expThuThach === 'number' && r.expThuThach > 0 ? { expThuThach: r.expThuThach } : {}) })
+/** Kết quả một câu của Đoàn gửi về máy em (export để test). */
+export const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage, assisted: (r.attempt as { assisted?: unknown } | undefined)?.assisted === true, ...(typeof r.expCau === 'number' && r.expCau > 0 ? { expCau: r.expCau } : {}), ...(typeof r.expThuThach === 'number' && r.expThuThach > 0 ? { expThuThach: r.expThuThach } : {}), ...(r.omni && typeof r.omni === 'object' ? { omni: r.omni } : {}) }) // OMNI 3: dòng nhắn dưới kết quả (Trạm KHÔNG mở trong Đoàn — `answer` nội bộ đã chặn)
 const hex = (n: number) => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase()
 /** Tên gọi trong đội: hai chữ cuối của họ tên ("Nguyễn Thu Hà" → "Thu Hà"). Không bao giờ dùng SBD. */
 export function tenGoi(hoTen: string, duPhong: string): string {
@@ -203,12 +206,12 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
 }
 
 // ───────────────────────── Câu hỏi ─────────────────────────
-async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version'>): Promise<PrivateQuestion | null> {
+async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version' | 'xt'>): Promise<PrivateQuestion | null> {
   // 29/09: chỉ mục lệch nguồn ⇒ tự đồng bộ đúng tờ rồi tra lại (version tất định: câu không đổi vẫn khớp); null = câu đổi đề/đáp án hoặc đã rút.
   const q = await docCauTheoRef(env, ref)
   // CẤM RÚT TỰ LUẬN (21/09): phòng tạo trước lệnh cấm còn ghim câu tự luận ⇒ coi như câu đã rút khỏi kho (đường `rut: true` sẵn có, hiệp không bị tính sai).
   if (!q) return null
-  return laCauTuLuan(q) ? null : q
+  return laCauTuLuan(q) ? null : apXaoTheoRef(q, ref) // 05/10: câu làm lại BẢN XÁO ⇒ hiển thị/thẻ gợi ý/lời giải theo đúng hoán vị đã chấm
 }
 
 /** SỐ TỪ (đề + phương án/ý) và CÓ HÌNH/BẢNG của một câu — nguồn cho THỜI GIAN ĐỌC (M6, `giayDocThem`).
@@ -235,7 +238,7 @@ async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Prom
   } catch { coHoSo = false }
   const nhan = (q: Question): NhanCau => !coHoSo ? 'vua_suc' : toiHan.has(q.qid) ? 'toi_han_on' : q.dang && dangYeu.has(q.dang) ? 'dang_yeu' : daGap.has(q.qid) ? 'vua_suc' : 'cau_moi'
   const thuTu: NhanCau[] = ['toi_han_on', 'dang_yeu', 'cau_moi', 'vua_suc']
-  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q), ...((q as { goiY?: CauRef['goiY'] }).goiY ? { goiY: (q as { goiY?: CauRef['goiY'] }).goiY } : {}), ...((q as { nhanNo?: string }).nhanNo ? { nhanNo: (q as { nhanNo?: string }).nhanNo } : {}) } }))
+  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q), ...((q as { goiY?: CauRef['goiY'] }).goiY ? { goiY: (q as { goiY?: CauRef['goiY'] }).goiY } : {}), ...((q as { nhanNo?: string }).nhanNo ? { nhanNo: (q as { nhanNo?: string }).nhanNo } : {}), ...((q as { xt?: number[] }).xt ? { xt: (q as { xt?: number[] }).xt } : {}) } })) // `xt` (05/10): hoán vị bản xáo từ `startDoan2` nội bộ
     .sort((a, b) => thuTu.indexOf(a.ref.nhan) - thuTu.indexOf(b.ref.nhan) || a.i - b.i).map(x => x.ref)
 }
 
@@ -766,7 +769,8 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       let dung = false
       if (!boTrong) {
         // Đã nhận thẻ tiếp sức → `assisted:true`: máy chủ game KHÔNG ghi bằng chứng, KHÔNG thưởng mastery cho câu này (luật cũ giữ nguyên). Cờ do máy chủ quyết, không do máy em khai.
-        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i] }))
+        // OMNI 3: thời lượng máy em đo + tự tin (Chắc/Chưa chắc) chuyển nguyên vào `answer` nội bộ — cờ OMNI tắt thì `answer` bỏ qua hai trường này.
+        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i], msLam: b.msLam, tuTin: b.tuTin }))
         dung = r.correct === true; kem = { ketQuaCau: ketQuaCau(r) }
       }
       phong.nop[i] = { dung, hanhDong, tuLam: !phong.the[i], boTrong, tiepSucBoi: phong.the[i]?.tu }

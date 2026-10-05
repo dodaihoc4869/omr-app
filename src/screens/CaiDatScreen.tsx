@@ -3,6 +3,7 @@
 // GAME HÓA 2.0 (thầy chốt 28/09 · docs/ban-ve-gv-2809/RA-SOAT.md mục 7): còn Giao diện · Game Hóa 2.0 (Bộ não A.I đã gỡ 28/09); mọi thứ kỹ thuật
 // (kết nối máy chủ, máy chủ mới, mật khẩu mở app, cập nhật app, đồng bộ lại phiếu mọi ca, đồng bộ danh sách lớp) gom vào MỘT nhóm
 // thu gọn "Công cụ kỹ thuật" (mặc định đóng). Không đổi hàm nào — chỉ chỗ đặt. Cờ tắt ⇒ màn như cũ.
+// OMNI 3 (05/10): thêm thẻ "OMNI (theo lớp)" + "Số lượt mỗi ngày và ma trận đề thi" ngay sau Game Hóa 2.0 (`CongTacOmni.tsx`, cùng kiểu thẻ công tắc).
 import { useState, type ReactNode } from 'react'
 import { ChevronDown, ChevronRight, Monitor, Moon, Sun } from 'lucide-react'
 import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
@@ -11,6 +12,7 @@ import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { TheNoiDung } from '../components/DesignSystem'
 import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
 import CongTacBia from '../components/chien-dich/CongTacBia'
+import CongTacOmni from '../components/chien-dich/CongTacOmni'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
@@ -85,6 +87,8 @@ export default function CaiDatScreen() {
 
       {/* GAME HÓA 2.0 — công tắc cả trung tâm / theo lớp (`/gv/chien-dich` co-luu), có hộp xác nhận nói rõ hậu quả. */}
       <CongTacHoa2 />
+      {/* OMNI 3 (05/10) — công tắc theo lớp (`/gv/omni` co-luu) + số lượt mỗi ngày theo lớp + ma trận đề thi 2026 (`cau-hinh-luu`). */}
+      <CongTacOmni />
       {/* BI-A PHẢN ỨNG — cửa thứ ba trên Sảnh Bát Linh (`/gv/chien-dich` bia-co-luu, khoá riêng `bi_a`, mặc định TẮT). */}
       <CongTacBia />
 

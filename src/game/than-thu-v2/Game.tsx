@@ -1,4 +1,5 @@
-import {Suspense,lazy,useCallback,useEffect,useRef,useState} from 'react'
+import {Suspense,useCallback,useEffect,useRef,useState} from 'react'
+import {boNap,lazyNapTruoc,taoGoiSom} from '../../components/hoa2/nap-truoc-man'
 import {PETS} from './core'
 import type {Arena,Mastery,Mode,Question} from './core'
 import LearningBattle from './LearningBattle'
@@ -9,9 +10,13 @@ import {chanPhanHoiCau} from '../../lib/cau-tu-luan-may-hs'
 import {CHU_CAU_DOI,CHU_HET_TRAN_GAME,laLoiCauDoi,laLoiHetTran,loiCuaKetQua,maCuaLoi} from './loi-het-tran'
 import {batNhipBenVung} from '../../lib/nhip-ben-vung'
 // Lối chơi chính mới (19/09): nạp riêng để không làm nặng đảo thần thú.
-const DoanHoTong=lazy(()=>import('./DoanHoTong'))
+// Nạp lười kiểu `lazyNapTruoc` (05/10, components/hoa2/nap-truoc-man.ts): Sảnh 2.0 nạp trước lúc rảnh ⇒ mảnh đã có thì vẽ thẳng, không treo màn chờ.
+const DoanHoTong=lazyNapTruoc(boNap(()=>import('./DoanHoTong')))
 // Đảo thần thú bản mới: MỘT vỏ của Code 6, nạp lazy.
-const DaoThanThu=lazy(()=>import('./dao/DaoThanThu'))
+const DaoThanThu=lazyNapTruoc(boNap(()=>import('./dao/DaoThanThu')))
+/** Sảnh 2.0 nạp trước lúc rảnh (components/hoa2/man-sanh-luoi.ts): mảnh Đảo (vỏ Đảo + Đảo 2.0) / mảnh Đoàn Hộ Tống. */
+export const napTruocDao=()=>DaoThanThu.napTruoc().then(m=>m.napTruocDao2())
+export const napTruocDoan=()=>DoanHoTong.napTruoc()
 /** Võ đài 2 đấu 2 cũ giữ nguyên mã, chỉ đổi cửa vào: sự kiện tuần, mở thứ Bảy (giờ Việt Nam). */
 export const laThuBayVn=(now=Date.now())=>new Date(now+7*3600000).getUTCDay()===6
 /** CỬA VÀO TỪ NGOÀI (Bảng nhiệm vụ, Sảnh bản đồ 2.0…): truyền prop `manDau="doan"`, hoặc đặt sessionStorage `game-v2:man-dau`=`doan` trước khi mở tab thần thú.
@@ -40,6 +45,28 @@ interface Profile {nickname?:string;academic?:{total:number;today:number;lastGai
 interface Feedback {correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}
 interface Result {ok:boolean;doanMo?:boolean;dailyUsed?:number;suggestions?:{title:string;source:string;part:string}[];history?:{day:string;total:number;correct:number}[];mode?:Mode;answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[];pass?:string;tasks?:{id:string;dang:string}[];error?:string;profile?:Profile;revision?:number;remaining?:number;questions?:Question[];id?:string;message?:string;missing?:number;correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[]}
 interface Props {sbd:string;token?:string;manDau?:'home'|'doan'|'shop'|'tui-do';onDong:()=>void;[key:string]:unknown}
+/** MỘT lệnh `game-v2/<action>` qua mạng — dùng cho `request` của Game và cho lệnh GỌI SỚM (dưới).
+ *  HẠN 25 GIÂY (quét ổn định 30/09): trước đây fetch không hạn ⇒ mạng treo là nút bận MÃI (`running` khoá mọi lệnh sau) tới khi em tải lại trang.
+ *  Lệnh answer/complete có biên nhận (session|qid) ở máy chủ nên bấm lại sau khi hết hạn không chấm hai lần. */
+async function goiGame(action:string,data:Record<string,unknown>,sessionToken:string):Promise<Result>{
+ const base=await layDiaChiMayChu('');const hetHan=new AbortController();const hen=setTimeout(()=>hetHan.abort(),25_000)
+ try{const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken}),signal:hetHan.signal});return await response.json() as Result}
+ catch{throw new Error(hetHan.signal.aborted?'Máy chủ trả lời chậm. Em bấm lại nhé.':'Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.')}
+ finally{clearTimeout(hen)}
+}
+// GỌI SỚM (chuyển màn nhanh 05/10, components/hoa2/man-sanh-luoi.ts · moManGameNhanh): em chạm cửa game ở Sảnh 2.0 ⇒ bắn NGAY các lệnh đọc
+// mà Game CHẮC CHẮN gọi đầu tiên (đúng lệnh, đúng thân `{token}`), song song với lúc vẽ màn; lượt `request` ĐẦU của lệnh ấy (không dữ liệu, cùng
+// phiên, còn hạn, chưa hỏng) nhận lại lời hứa thay vì gọi lần hai — số lệnh tới máy chủ không đổi, chỉ đi sớm hơn. Hỏng trước lúc nhận ⇒ gọi như cũ.
+const goiSom=taoGoiSom<Result>()
+const khoaSom=(action:string,sessionToken:string)=>action+'\u0000'+sessionToken
+const nhanLenhGame=(action:string,data:Record<string,unknown>,sessionToken:string)=>Object.keys(data).length?null:goiSom.nhan(khoaSom(action,sessionToken))
+/** Phiên game của em — y như trạng thái `token` lúc Game mở (sessionStorage `game-v2:<sbd>`, không có thì phiên app). */
+const phienGame=(sbd:string,initialToken?:string)=>{try{return sessionStorage.getItem(`game-v2:${sbd}`)||initialToken||''}catch{return initialToken||''}}
+/** Sảnh gọi lúc em chạm cửa game (mảnh game đã có): `profile` + `hoa2-sanh` (Game mở là gọi); mở thẳng Đoàn Hộ Tống thì thêm `doan-sanh` (lệnh đầu của Đoàn). */
+export function goiSomGame(sbd:string,initialToken:string|undefined,manDau:''|'doan'|'shop'|'tui-do'=''):void{
+ const sessionToken=phienGame(sbd,initialToken);if(!sessionToken)return
+ for(const action of manDau==='doan'?['profile','hoa2-sanh','doan-sanh']:['profile','hoa2-sanh'])goiSom.ban(khoaSom(action,sessionToken),()=>goiGame(action,{},sessionToken))
+}
 export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const [doanMo,setDoanMo]=useState(false)
  // GAME HÓA 2.0: null = chưa biết (đang hỏi `hoa2-sanh`), true/false = đã biết. `sanh2` = phản hồi ấy, đưa cho Đảo dùng lần vẽ đầu.
@@ -49,7 +76,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  useEffect(()=>{latestRevision.current=0},[sbd])
  const [zoom,setZoom]=useState('')
  const [tasks,setTasks]=useState<{id:string;dang:string}[]>([])
- const [token,setToken]=useState(()=>{try{return sessionStorage.getItem(`game-v2:${sbd}`)||initialToken||''}catch{return initialToken||''}});const [password,setPassword]=useState('')
+ const [token,setToken]=useState(()=>phienGame(sbd,initialToken));const [password,setPassword]=useState('')
  const [profile,setProfile]=useState<Profile|null>(null);const [,setRevision]=useState(0);const [manDauDoc]=useState(()=>docManDau(manDau));const [tab,setTab]=useState<Tab>(manDauDoc.tab)
  const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [maLoi,setMaLoi]=useState('');const [notice,setNotice]=useState('');const [syncLeft,setSyncLeft]=useState<number|null>(null)
  const [mediaFailed,setMediaFailed]=useState(false)
@@ -63,14 +90,12 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  useEffect(()=>{if(tab!=='home')setSanh2(null)},[tab])
  const mounted=useRef(true);const running=useRef(false)
  useEffect(()=>()=>{mounted.current=false},[])
- const request=useCallback(async(action:string,data:Record<string,unknown>={},sessionToken=token):Promise<Result>=>{
-  // HẠN 25 GIÂY (quét ổn định 30/09): trước đây fetch không hạn ⇒ mạng treo là nút bận MÃI (`running` khoá mọi lệnh sau) tới khi em tải lại trang.
-  // Lệnh answer/complete có biên nhận (session|qid) ở máy chủ nên bấm lại sau khi hết hạn không chấm hai lần.
-  const base=await layDiaChiMayChu('');const hetHan=new AbortController();const hen=setTimeout(()=>hetHan.abort(),25_000)
-  let tho:Result
-  try{const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken}),signal:hetHan.signal});tho=await response.json() as Result}
-  catch{throw new Error(hetHan.signal.aborted?'Máy chủ trả lời chậm. Em bấm lại nhé.':'Chưa kết nối được máy chủ. Em kiểm tra mạng rồi thử lại.')}
-  finally{clearTimeout(hen)}
+ useEffect(()=>()=>goiSom.xoa(),[]) // rời game ⇒ bỏ lệnh sớm chưa ai nhận (vd. `doan-sanh` khi Đoàn không mở)
+ // `hoa2-sanh` ĐI SỚM cùng lúc với `profile` (05/10, xem hiệu ứng nạp hồ sơ dưới): lời hứa giữ riêng cho hiệu ứng hỏi chế độ 2.0 của chính thể hiện này.
+ const [hoa2Som]=useState(()=>taoGoiSom<Result>())
+ const request=useCallback(async(action:string,data:Record<string,unknown>={},sessionToken=token,som?:Promise<Result>|null):Promise<Result>=>{
+  // Hạn 25 giây + lời lỗi mạng: xem goiGame. Lệnh đọc đã bắn sớm (lúc em chạm cửa ở Sảnh / lúc mở game — cùng lệnh, cùng thân) ⇒ nhận lại lời hứa ấy.
+  const tho=await(som??nhanLenhGame(action,data,sessionToken)??goiGame(action,data,sessionToken))
   const r=chanPhanHoiCau(tho,`game-v2/${action}`) // chốt chặn cuối: bỏ câu tự luận (thầy lệnh 21/09)
   if(!r.ok){const loi=loiCuaKetQua(r) // `error` hoặc `loi` (lệnh Game Hóa 2.0) ⇒ hiện đúng lời máy chủ
    if(/Phiên game|Mật khẩu đã đổi|nhập lại mật khẩu/.test(loi)){setToken('');setProfile(null);try{sessionStorage.removeItem(`game-v2:${sbd}`)}catch{/* Storage may be disabled. */}}throw Object.assign(new Error(loi||'Chưa kết nối được game. Em thử lại.'),{ma:String((r as {ma?:unknown}).ma??'')})}
@@ -81,9 +106,11 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  // Hỏi MỘT lần mỗi phiên game: chế độ 2.0 bật cho em này chưa. Máy chủ cũ / lỗi ⇒ false (Đảo cũ nguyên vẹn).
  const coHoSo=!!profile
  useEffect(()=>{if(!token||!coHoSo)return;let huy=false
-  request('hoa2-sanh').then(r=>{if(huy)return;const bat=(r as {cheDo2?:unknown}).cheDo2===true;setCheDo2(bat);setSanh2(bat?r:null)}).catch(()=>{if(!huy)setCheDo2(false)})
-  return()=>{huy=true}},[token,coHoSo,request])
- useEffect(()=>{mounted.current=true;if(!token){setBusy(false);return}let cancelled=false;setBusy(true);request('profile').catch(e=>{if(!cancelled)setError(String(e.message))}).finally(()=>{if(!cancelled)setBusy(false)});return()=>{cancelled=true}},[token,request])
+  request('hoa2-sanh',{},token,hoa2Som.nhan(token)).then(r=>{if(huy)return;const bat=(r as {cheDo2?:unknown}).cheDo2===true;setCheDo2(bat);setSanh2(bat?r:null)}).catch(()=>{if(!huy)setCheDo2(false)})
+  return()=>{huy=true}},[token,coHoSo,request,hoa2Som])
+ // `hoa2-sanh` (hiệu ứng trên hỏi khi hồ sơ về) BẮN SỚM cùng lúc với `profile` (05/10): hai lệnh đọc song song thay vì nối tiếp — bớt trọn một vòng mạng
+ // trước khi thấy bản đồ. Lệnh sớm hỏng trước lúc hồ sơ về ⇒ hiệu ứng trên gọi lại như cũ. Sảnh đã bắn lúc em chạm cửa ⇒ nhận lại lệnh ấy, không gọi thêm.
+ useEffect(()=>{mounted.current=true;if(!token){setBusy(false);return}let cancelled=false;setBusy(true);hoa2Som.ban(token,()=>nhanLenhGame('hoa2-sanh',{},token)??goiGame('hoa2-sanh',{},token));request('profile').catch(e=>{if(!cancelled)setError(String(e.message))}).finally(()=>{if(!cancelled)setBusy(false)});return()=>{cancelled=true}},[token,request,hoa2Som])
  useEffect(()=>{if(!token)return;let pending=false;const refresh=async():Promise<boolean>=>{if(document.hidden||pending||running.current)return true;pending=true;try{await request('profile');return true}catch{/* The next user action reports authentication errors. */return false}finally{pending=false}};
  // Nhịp nền CHẬM (180 s ± 30 s, không chồng, lỗi ⇒ lùi 30→60→120 s; sự cố D1 21/09: 20 giây × mọi máy em); vào game đã nạp hồ sơ nên KHÔNG gọi ngay; quay lại tab vẫn nạp nhưng dội ≥ 20 giây.
  const nhip=batNhipBenVung(refresh,{chayNgay:false});const kich=()=>nhip.kich();window.addEventListener('focus',kich);return()=>{nhip.dung();window.removeEventListener('focus',kich)}},[token,request])

@@ -3,6 +3,8 @@
 // Luật chơi giữ nguyên; chỉ đổi NGUỒN CÂU: Đảo nhận câu mới + câu ôn Đúng–sai, Đoàn nhận câu ôn Trắc nghiệm/Trả lời ngắn,
 // đúng kế hoạch ngày đã chốt (`layKeHoachHomNay`). Đảo khoá khi còn câu ôn hôm nay ở Đoàn.
 import { phuNeuCan } from './hang-chua-loi'
+import { apLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
+import { refLamLai, type LamLaiRef } from './lam-lai-so'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
@@ -12,6 +14,9 @@ import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidGoc, sanh2, thuSucThem, type HoSo2, type MetaCau } from './srs2-d1'
 import { ghiLoiMay } from './nhat-ky-may'
+import { omniBat } from './omni-d1'
+import { hoa2OmniAction, LENH_OMNI_HOA2, startVe } from './omni-game'
+import { CHU_CHO_BAI_MOI } from '../../src/lib/omni-chu'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -50,14 +55,15 @@ export async function soCauGameHomNay(env: Env, sbd: string, nowMs: number): Pro
   return Number(r?.n) || 0
 }
 
-export interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
+/** `tc`/`xt`/`nv` (05/10, cau-anh-em.ts): làm lại câu sai bằng bản khác — chỉ ở JSON phiên máy chủ (chấm, ghi sổ), KHÔNG xuống máy em. */
+export interface RefPhien extends LamLaiRef { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
 
 /**
  * ĐAN XEN (thầy 29/09): câu của LƯỢT TỚI (chuyến Đảo / chặng Đoàn) — chia phần kế hoạch còn lại theo mật độ của em (`chiaLuot`), lấy lượt
  * đầu, nạp câu đầy đủ, rồi xếp thứ tự trong lượt (`danXenLuot`: mở/kết bằng câu dễ, không 2 khó/2 nợ liền nhau). Tất định: cùng kế hoạch
  * còn lại ⇒ cùng lượt. Câu bị chặn / thiếu siêu dữ liệu bị bỏ TRƯỚC khi chia.
  */
-export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>, suc: SucEm, co: number, trumKho = false, boQua?: BoQuaNap): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
+export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>, suc: SucEm, co: number, trumKho = false, boQua?: BoQuaNap, lamLai?: BoiCanhLamLai): Promise<CauLuot[]> {
   const thay = new Set<string>()
   const ung: CauDanXen[] = []
   for (const k of khoa) {
@@ -71,8 +77,11 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   const day = await napCau(env, hs, luot.map((x) => x.qid), luot.length, chan, boQua)
   const theo = new Map(day.map((x) => [x.q.qid, x]))
   const xep = danXenLuot(luot.filter((x) => theo.has(x.qid)), suc, { trumKho: trumKho && theo.size === co })
-  // VÒNG HỌC v2: câu lỗi đến lượt làm lại ⇒ phục vụ CÂU SONG SINH (qid ảo "<gốc>~ss0|1"; chấm ở máy chủ như câu thường).
-  return xep.map((x) => { const c = theo.get(x.qid)!; return { ...c, q: phuNeuCan(c.q, hs.songSinhCho, hs.boTro) } })
+  // VÒNG HỌC v2: câu lỗi đến lượt làm lại ⇒ phục vụ CÂU SONG SINH (qid ảo "<gốc>~ss0..3"; chấm ở máy chủ như câu thường).
+  const ds = xep.map((x) => { const c = theo.get(x.qid)!; return { ...c, q: phuNeuCan(c.q, hs.songSinhCho, hs.boTro) } })
+  // 05/10 thang làm lại (cau-anh-em.ts): câu lỗi trong cửa sổ lỗi mà vẫn ra nguyên văn ⇒ song sinh bản kế / câu anh em cùng dạng / bản xáo / nguyên văn (đếm).
+  // Câu anh em cũng tránh `chan` của lượt. Không `lamLai` (hoặc khoá `lam_lai_khac` tắt) ⇒ y hệt hôm nay.
+  return lamLai ? apLamLaiKhac(env, hs, ds, lamLai, chan) : ds
 }
 /** Sức em (hạng chung) cho đan xen; lỗi đọc ⇒ trung bình. */
 export async function sucEmHomNay(env: Env, sbd: string, hs: HoSo2): Promise<SucEm> {
@@ -235,12 +244,14 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const tamHoan = kh.tamHoan?.ca ?? 0
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
   if (kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
-  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
+  // OMNI 3: ngày chưa có câu nào mà em đang ở chế độ chờ bài mới (`hs.omni` chỉ có khi OMNI bật cho em) ⇒ lời báo "chờ thầy giao bài mới".
+  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
   const dangCho = await dangChoSom
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
-    if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === r.qid))) {
-      const day = await napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set())
+    // 05/10: câu anh em (`tc`) đứng thay câu gốc của kế hoạch; lượt có câu anh em / bản xáo nạp lại theo ref phiên (cau-anh-em.ts), còn lại như cũ.
+    if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === (r.tc ?? r.qid)))) {
+      const day = await napLaiLuotCho(env, hs, cu.questions, SO_CAU_CHUYEN, () => napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set()))
       if (day.length === cu.questions.length) return { ok: true, id: str(dangCho.id), questions: day.map(({ q }, i) => ({ ...publicQuestion(q), vai: cu.questions[i]!.role, ...(cu.questions[i]!.goiY ? { goiY: cu.questions[i]!.goiY } : {}), ...(cu.questions[i]!.nhanNo ? { nhanNo: cu.questions[i]!.nhanNo } : {}) })), ...tomTat }
     }
   }
@@ -254,7 +265,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   ])
   const chan = new Set([...chanCa, ...giuBia])
   const boQua = boQuaMoi()
-  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
+  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua, { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan] }), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.`, ...tomTat }
@@ -265,15 +276,30 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
     return { ok: true, questions: [], lyDo, message: LOI_LUOT_RONG[lyDo], ...tomTat }
   }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
-  const refs: RefPhien[] = chon.map(({ q, m }, i) => {
-    const t = hs.tt.get(q.qid)
+  const refs: RefPhien[] = chon.map((x, i) => {
+    const { q, m } = x, t = hs.tt.get(q.qid)
     const g = goiYCho(q, t, `${sbd}|${q.qid}|${kh.ngay}`)
     const n = nhan.get(q.qid)
-    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}) }
+    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}), ...refLamLai(x) }
   })
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
   return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), vai: refs[i]!.role, ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}) })), ...tomTat }
+}
+
+/** OMNI 3: em đang ở chế độ chờ bài mới? (`HoSo2.omni` do làn kế hoạch thêm, CHỈ có khi OMNI bật cho em ⇒ cờ tắt luôn false.) */
+const cheDoChoOmni = (hs: HoSo2): boolean => {
+  const o = (hs as HoSo2 & { omni?: { bat?: boolean; cheDoCho?: boolean } }).omni
+  return !!o && o.bat !== false && o.cheDoCho === true
+}
+/**
+ * `start` Đảo (Hoá 2.0): thân có `ve` (mã dạng | 'auto') VÀ OMNI bật cho em ⇒ chuyến VÉ THỬ THÁCH (omni-game.ts `startVe`).
+ * Không có `ve` hoặc OMNI tắt ⇒ `startDao2` y hệt hôm nay (không thêm lượt đọc nào khi không có `ve`).
+ */
+export async function startDao2CoVe(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  const ve = typeof b.ve === 'string' ? b.ve.trim() : ''
+  if (ve && await omniBat(env, sbd).catch(() => false)) return startVe(env, sbd, ve, nowMs)
+  return startDao2(env, sbd, nowMs)
 }
 
 /** Phiên câu riêng của em cho MỘT chặng Đoàn (gọi nội bộ từ `taoNguoi`). Chặng ít câu ôn thì ngắn lại, không độn câu. */
@@ -290,13 +316,14 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
     sucEmHomNay(env, sbd, hs),
   ])
   const dangPhat = new Set<string>()
-  for (const x of r.results ?? []) for (const q of (JSON.parse(str(x.json)) as { questions: RefPhien[] }).questions) dangPhat.add(q.qid)
+  for (const x of r.results ?? []) for (const q of (JSON.parse(str(x.json)) as { questions: RefPhien[] }).questions) { dangPhat.add(q.qid); if (q.tc) dangPhat.add(q.tc) } // 05/10: câu anh em đang phát thay câu gốc ⇒ câu gốc cũng đang phát
   const chan = new Set(chanCa)
   for (const q of dangPhat) chan.add(q)
   for (const q of chanBia) chan.add(q)
   const boQua = boQuaMoi()
-  let chon = await napLuot(env, hs, kh.conDoan, chan, suc, SO_CAU_CHANG, false, boQua)
-  if (!chon.length) { const lai = new Set(chanCa); for (const q of chanBia) lai.add(q); chon = await napLuot(env, hs, kh.conDoan, lai, suc, SO_CAU_CHANG, false, boQua) } // phiên cũ bỏ dở: phát lại
+  const lamLai: BoiCanhLamLai = { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan] }
+  let chon = await napLuot(env, hs, kh.conDoan, chan, suc, SO_CAU_CHANG, false, boQua, lamLai)
+  if (!chon.length) { const lai = new Set(chanCa); for (const q of chanBia) lai.add(q); chon = await napLuot(env, hs, kh.conDoan, lai, suc, SO_CAU_CHANG, false, boQua, lamLai) } // phiên cũ bỏ dở: phát lại
   chon = await chanKhacKhoiEm(env, 'doan2', { sbd, meta: hs.meta }, chon, { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDoan, hs, chanCa, chanBia, boQua)
@@ -308,18 +335,20 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
     return { ok: true, questions: [], lyDo, message: LOI_LUOT_RONG[lyDo] }
   }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
-  const refs: RefPhien[] = chon.map(({ q, m }) => {
+  const refs: RefPhien[] = chon.map((x) => {
+    const { q, m } = x
     const g = goiYCho(q, hs.tt.get(q.qid), `${sbd}|${q.qid}|${kh.ngay}`)
     const n = nhan.get(q.qid)
-    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: false, role: 'toi_han', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}) }
+    return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: false, role: 'toi_han', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}), ...refLamLai(x) }
   })
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
-  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), role: 'toi_han', ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}) })), soCauThieu: Math.max(0, SO_CAU_CHANG - chon.length) }
+  // Kết quả này CHỈ đi nội bộ tới Đoàn (`taoNguoi` → `ganNhan`), không xuống máy em: kèm hoán vị `xt` để Đoàn hiển thị đúng bản xáo đã chấm (cau-anh-em.ts).
+  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), role: 'toi_han', ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}), ...(refs[i]!.xt ? { xt: refs[i]!.xt } : {}) })), soCauThieu: Math.max(0, SO_CAU_CHANG - chon.length) }
 }
 
 // ---------------------------------------------------------------- lệnh hoa2-* của app học sinh
-export const LENH_HOA2: ReadonlySet<string> = new Set(['hoa2-sanh', 'hoa2-cau-da-lam', 'hoa2-cau-chi-tiet', 'hoa2-ruong-mo', 'hoa2-thu-suc-them'])
+export const LENH_HOA2: ReadonlySet<string> = new Set(['hoa2-sanh', 'hoa2-cau-da-lam', 'hoa2-cau-chi-tiet', 'hoa2-ruong-mo', 'hoa2-thu-suc-them', ...LENH_OMNI_HOA2])
 
 export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, nowMs = Date.now()): Promise<Record<string, unknown>> {
   if (action === 'hoa2-sanh') return sanh2(env, sbd, nowMs)
@@ -328,6 +357,8 @@ export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, 
   if (action === 'hoa2-ruong-mo') return moRuong(env, sbd, nowMs)
   // THỬ SỨC THÊM (thầy 30/09): xong kế hoạch hôm nay ⇒ lấy trước một lô câu mới của ngày mai (srs2-d1 `thuSucThem`).
   if (action === 'hoa2-thu-suc-them') return thuSucThem(env, sbd, nowMs)
+  // OMNI 3 (omni-game.ts): Trạm hồi phục xong, nhật ký, đổi thứ tự khung giờ, đề thử nửa. OMNI tắt cho em ⇒ { ok:false, error }.
+  if (LENH_OMNI_HOA2.includes(action)) return hoa2OmniAction(env, sbd, action, b, nowMs)
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
@@ -472,7 +503,8 @@ async function cauChiTiet(env: Env, sbd: string, b: Row): Promise<Record<string,
       const [q] = await doDayDu(env, [{ qid, maDe: m.maDe, version: m.version, nhe: true } as unknown as CauPool])
       if (!q) continue
       if (!tapBaoVe || tapBaoVe.has(qid) || tapBaoVe.has(q.group)) { khoa.push(qid); continue }
-      const tl = await env.DB.prepare("SELECT json_extract(json,'$.traLoi') AS t FROM game_v2_attempt WHERE sbd = ? AND qid = ? ORDER BY created_at DESC LIMIT 1").bind(sbd, qid).first<Row>().catch(() => null)
+      // 05/10: lượt BẢN XÁO lưu thêm `traLoiGoc` (đáp án em chọn quy về khung gốc) — xem lại trên câu gốc phải đọc khoá ấy.
+      const tl = await env.DB.prepare("SELECT COALESCE(json_extract(json,'$.traLoiGoc'), json_extract(json,'$.traLoi')) AS t FROM game_v2_attempt WHERE sbd = ? AND qid = ? ORDER BY created_at DESC LIMIT 1").bind(sbd, qid).first<Row>().catch(() => null)
       // 30/09: câu tự luận ⇒ `tuLuan: true` — máy em hiện "Câu tự luận — không chấm tự động" thay đỏ/xanh (PDF cũng vậy).
       ra.push({ de: publicQuestionDayDu(q), dapAn: q.correct, loiGiai: q.solution, emTraLoi: tl?.t == null ? null : str(tl.t), ...(laCauTuLuan(q) ? { tuLuan: true } : {}) })
     } catch { /* câu đã rút khỏi kho */ }

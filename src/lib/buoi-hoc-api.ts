@@ -2,6 +2,7 @@
 //   THẦY (mã bí mật, qua `goiLenh`):
 //     POST /gv/buoi-hoc {action:'mo', lop?, ten?, kemLop?}   → TrangThaiBuoi (mở buổi mới)
 //     POST /gv/buoi-hoc {action:'dang-mo'}                   → { buoi: BuoiHoc[] } (buổi còn mở, nối tiếp khi mở lại app)
+//     POST /gv/buoi-hoc {action:'gan-day', soNgay?, lop?}    → { buoi: (BuoiHoc & {coMat: sbd[]})[] } (buổi gần đây kể cả đã đóng — chọn em giao bài theo điểm danh, OMNI 3)
 //     POST /gv/buoi-hoc {action:'xem'|'dong', id, kemLop?}   → TrangThaiBuoi
 //     POST /gv/buoi-hoc {action:'them-em', id, sbd[]} / {action:'bot-em', id, sbd} → TrangThaiBuoi
 //     POST /gv/buoi-hoc/suc-hoc {sbd[], cau[]}               → { em: {sbd: SucHocEm} }  (ĐỌC-CHỈ)
@@ -10,6 +11,7 @@
 //     POST /hs/diem-danh {token, ma}   → { buoi } | { ok:false, lyDo, error }
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
+import { layHoiSom } from './hoi-som'
 import type { SucHocEm } from './chon-em-day-hoc'
 
 export interface BuoiHoc {
@@ -96,6 +98,23 @@ export async function buoiDangMo(): Promise<KetQuaLenh<BuoiHoc[]>> {
   return { ok: true, du: (Array.isArray(r.du.buoi) ? r.du.buoi : []).map(docBuoi).filter((x): x is BuoiHoc => !!x) }
 }
 
+/** Buổi gần đây kèm SBD em CÓ MẶT (OMNI 3, 05/10 — chọn em giao bài theo điểm danh). */
+export interface BuoiGanDay extends BuoiHoc {
+  coMat: string[]
+}
+export async function buoiGanDay(lop = '', soNgay = 7): Promise<KetQuaLenh<BuoiGanDay[]>> {
+  const r = await goiLenh('/gv/buoi-hoc', { action: 'gan-day', lop, soNgay }, KHONG_CO_LENH)
+  if (!r.ok) return r
+  const ra: BuoiGanDay[] = []
+  for (const x of Array.isArray(r.du.buoi) ? r.du.buoi : []) {
+    const b = docBuoi(x)
+    if (!b) continue
+    const coMat = [...new Set(Array.isArray(doiTuong(x).coMat) ? (doiTuong(x).coMat as unknown[]).map(chu).filter(Boolean) : [])]
+    ra.push({ ...b, soCoMat: coMat.length, coMat })
+  }
+  return { ok: true, du: ra }
+}
+
 const dem = (v: unknown) => {
   const o = doiTuong(v)
   return { n: Math.max(0, so(o.n) ?? 0), d: Math.max(0, so(o.d) ?? 0) }
@@ -146,7 +165,9 @@ async function goiHs(duong: string, body: Record<string, unknown>): Promise<Reco
   const hen = setTimeout(() => c.abort(), 15_000)
   try {
     const goc = await layDiaChiMayChu('')
-    const r = await fetch(`${goc}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: c.signal })
+    const than = JSON.stringify(body)
+    // Lệnh đã HỎI SỚM (src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
+    const r = (await layHoiSom(`${goc}${duong}`, than, c.signal)) ?? (await fetch(`${goc}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: than, signal: c.signal }))
     if (r.status === 404) return { ok: false, error: 'Máy chủ chưa có chức năng điểm danh.' }
     return doiTuong(await r.json().catch(() => null))
   } catch {

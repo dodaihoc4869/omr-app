@@ -1,6 +1,6 @@
 // THANG TỰ GỠ — Vòng học khép kín v2, Giai đoạn 2 (phía HỌC SINH). Mỗi câu em sai đi qua 5 bậc:
 //   (1) nhìn lại lựa chọn (màn báo cáo) · (2) ĐỌC LỜI GIẢI CHỦ ĐỘNG: các bước mở dần, bước then chốt có CÂU KIỂM, máy chủ chấm (`/hs/cau-kiem`)
-//   · (3) làm lại kín bằng câu song sinh (kế hoạch ngày, qid "<gốc>~ss0|1") · (4) KIẾN THỨC NỀN: hỏng câu kiểm ở bước gắn nhãn nền ⇒ 3–5 câu
+//   · (3) làm lại kín bằng câu song sinh (kế hoạch ngày, qid "<gốc>~ss0..3") hoặc câu anh em / bản xáo (05/10, cau-anh-em.ts) · (4) KIẾN THỨC NỀN: hỏng câu kiểm ở bước gắn nhãn nền ⇒ 3–5 câu
 //   ngắn của nhãn đó (`/hs/luyen-nen`, ngân hàng `cau_nen`) · (5) GỬI THẦY (`/hs/gui-thay`) — CHỈ khi qua CỔNG NỖ LỰC 5 điều kiện:
 //     [1] đã tự làm câu gốc và sai (sổ su_kien_hoc, lượt không hỗ trợ, không phải sự kiện đọc lời giải);
 //     [2] đã đọc hết lời giải chủ động: mở đủ mọi bước, trả lời ≥ 80% câu kiểm, không lướt (trung bình ≥ 5 giây một bước);
@@ -16,10 +16,12 @@ import { gameIdentity } from './game-v2-auth'
 import { coCaDangMo } from './bi-a'
 import { qidGoc } from './srs2-d1'
 import { tachSongSinh, GIO_DOC_LOI_GIAI_CAM } from './loi-hoc-luat'
+import { SQL_TC } from './lam-lai-so'
 import { docBoTro, type BoTro, type CauKiem } from './cau-bo-tro'
 import { damBaoBangNutThat, TRAN_THE_NGAY } from './nut-that'
 import { damBaoBangLoiGiai, locSuKienDoc } from './loi-giai'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
+import { MUC_DICH_LUOT } from './omni-kieu'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -155,19 +157,24 @@ const NGUONG_KIEM = 0.8
 const GIAY_MOI_BUOC = 5
 const CHU_TOI_THIEU = 10
 
-interface DongSo { qid: string; nguon: string; ketQua: number | null; luc: string; hoTro: boolean }
+/** `thay` (05/10, cau-anh-em.ts): dòng CÂU ANH EM làm thay câu này (`raw_json.tc`) — một lần "làm lại kín" như câu song sinh, không phải lần làm câu gốc. */
+interface DongSo { qid: string; nguon: string; ketQua: number | null; luc: string; hoTro: boolean; thay?: boolean }
 
 async function docSoHoc(env: Env, sbd: string, qids: string[], qidGocCau: string): Promise<DongSo[]> {
-  const sql = (moi: boolean) => `SELECT qid, nguon, ket_qua, luc${moi ? ', assistance, purpose' : ''} FROM su_kien_hoc
-    WHERE sbd = ? AND (qid IN (SELECT value FROM json_each(?)) OR qid GLOB ? OR (nguon = 'nen' AND ma_nguon = ?))`
+  const sql = (moi: boolean) => `SELECT qid, nguon, ket_qua, luc${moi ? `, assistance, purpose, ${SQL_TC} AS tc` : ''} FROM su_kien_hoc
+    WHERE sbd = ? AND (qid IN (SELECT value FROM json_each(?)) OR qid GLOB ? OR (nguon = 'nen' AND ma_nguon = ?)${moi ? ` OR (${SQL_TC} IS NOT NULL AND ${SQL_TC} IN (SELECT value FROM json_each(?)))` : ''})`
   const tham = [sbd, JSON.stringify(qids), `${qidGocCau}[#~]*`, qidGocCau]
   let rows: Obj[]
-  try { rows = (await env.DB.prepare(sql(true)).bind(...tham).all<Obj>()).results ?? [] } catch {
+  try { rows = (await env.DB.prepare(sql(true)).bind(...tham, JSON.stringify(qids)).all<Obj>()).results ?? [] } catch {
     try { rows = (await env.DB.prepare(sql(false)).bind(...tham).all<Obj>()).results ?? [] } catch { return [] }
   }
+  const cua = new Set(qids)
   return rows.map((x) => ({
     qid: str(x.qid), nguon: str(x.nguon), ketQua: x.ket_qua === null || x.ket_qua === undefined ? null : Number(x.ket_qua), luc: str(x.luc),
-    hoTro: str(x.assistance) === 'assisted' || str(x.purpose) === MUC_DICH_XEM_LOI_GIAI,
+    // OMNI 3: dòng lướt (purpose 'luot') không phải một lần làm — xử như đọc lời giải.
+    hoTro: str(x.assistance) === 'assisted' || str(x.purpose) === MUC_DICH_XEM_LOI_GIAI || str(x.purpose) === MUC_DICH_LUOT,
+    // Dòng của câu KHÁC (không thuộc các bản của câu này) mà làm thay câu này ⇒ lượt câu anh em.
+    ...(str(x.tc) && cua.has(str(x.tc)) && !cua.has(tachSongSinh(qidGoc(str(x.qid))).goc) ? { thay: true } : {}),
   }))
 }
 
@@ -205,7 +212,7 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
   const docDau = lucHoi[0] ?? ''
 
   // [1] đã tự làm câu gốc (hoặc bản cùng nội dung) và sai.
-  const laGoc = (x: DongSo) => x.nguon !== 'nen' && tachSongSinh(x.qid).songSinh === null
+  const laGoc = (x: DongSo) => x.nguon !== 'nen' && !x.thay && tachSongSinh(x.qid).songSinh === null
   const soLanSai = so.filter((x) => laGoc(x) && !x.hoTro && (x.ketQua === 0 || (x.ketQua === null && x.nguon === 'thi'))).length
   const c1: MucCong = { ma: 'tu_lam', dat: soLanSai > 0, viec: soLanSai > 0 ? '' : 'Em tự làm câu này trước đã' }
 
@@ -243,7 +250,7 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
     if (!(Date.parse(x.luc) > Date.parse(docDau)) || x.ketQua === null) return false
     if (x.nguon === 'nen') return true
     if (x.hoTro) return false
-    if (tachSongSinh(x.qid).songSinh !== null) return true
+    if (tachSongSinh(x.qid).songSinh !== null || x.thay) return true // song sinh / câu anh em (05/10) = làm lại kín
     return !coSongSinh && !docTruoc(x.luc)
   })
   const soLamLaiSai = lamLai.filter((x) => x.ketQua === 0).length
