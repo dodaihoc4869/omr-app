@@ -256,7 +256,10 @@ interface DauVaoBai {
   tenBai: string
   viTri: number
   maDe: string[]
+  /** Em được giao: thầy chọn (`sbd`, đã lọc) hoặc cả lớp. */
   em: { sbd: string; ten: string }[]
+  /** Số em của lớp (cả lớp, theo danh sách học sinh). */
+  soEmLop: number
   theLuc: number
   hanNop: string | null
   nguoi: string | null
@@ -280,10 +283,15 @@ async function docDauVaoBai(env: Env, b: Row, nowMs: number, canBai: boolean): P
   if (hanNop && hanNop < ngayVnCua(nowMs)) return { loi: 'Hạn nộp đã qua.' }
   const tlVao = Math.floor(Number(b.theLucNgay))
   const theLuc = Number.isFinite(tlVao) && tlVao >= 1 ? Math.min(THE_LUC_TOI_DA, tlVao) : await theLucCuaLop(env, lop, nowMs)
-  // Danh sách em: mặc định = em của lớp lúc tick (nguồn màn Học sinh). `sbd` (tuỳ chọn, ngoài hợp đồng) cho thầy giao một phần lớp.
-  const sbdVao = mangChuoi(b.sbd)
-  const bang = sbdVao.length ? await bangLopCacEm(env, nowMs) : null
-  const em = bang ? sbdVao.map((s) => ({ sbd: s, ten: bang.get(s)?.ten ?? s })) : await emCuaLopBai(env, lop, nowMs)
+  // Em được giao (thầy 05/10: chọn em khi tick bài). Vắng `sbd` ⇒ cả lớp lúc tick (nguồn màn Học sinh). Có `sbd` (mảng) ⇒ đúng các em thầy chọn:
+  // bỏ trùng, bỏ SBD không có trong danh sách học sinh hoặc đã khoá (bangLopCacEm không chứa em khoá); còn 0 em ⇒ từ chối.
+  const emLop = await emCuaLopBai(env, lop, nowMs)
+  let em = emLop
+  if (Array.isArray(b.sbd)) {
+    const bang = await bangLopCacEm(env, nowMs)
+    em = mangChuoi(b.sbd).filter((s) => bang.has(s)).sort((a, c) => a.localeCompare(c)).map((s) => ({ sbd: s, ten: bang.get(s)!.ten }))
+    if (!em.length) return { loi: 'Chưa chọn em nào hợp lệ.' }
+  }
   const phamVi: BaiTruoc[] = []
   for (const x of (Array.isArray(b.phamVi) ? b.phamVi : []).slice(0, TOI_DA_BAI_TRUOC)) {
     const o = (x && typeof x === 'object' ? x : {}) as Row
@@ -292,7 +300,7 @@ async function docDauVaoBai(env: Env, b: Row, nowMs: number, canBai: boolean): P
     if (!k || k === khoaBai || !Number.isFinite(v)) continue
     phamVi.push({ khoaBai: k, tenBai: str(o.tenBai).replace(/\s+/g, ' ').trim() || k, viTri: Math.floor(v), maDe: mangChuoi(o.maDe).slice(0, TOI_DA_TO_MOI_BAI) })
   }
-  return { lop, khoaBai, tenBai, viTri: Number.isFinite(viTriSo) ? Math.floor(viTriSo) : 0, maDe, em, theLuc, hanNop, nguoi: str(b.nguoi).trim().slice(0, 60) || null, phamVi }
+  return { lop, khoaBai, tenBai, viTri: Number.isFinite(viTriSo) ? Math.floor(viTriSo) : 0, maDe, em, soEmLop: emLop.length, theLuc, hanNop, nguoi: str(b.nguoi).trim().slice(0, 60) || null, phamVi }
 }
 
 /**
@@ -380,7 +388,8 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
     soCau: ct.qids.length, soTuLuan: cb.soTuLuan,
     hanNop: han.hanNop, D: han.D,
     luotCan: han.luotCan, sucChua,
-    duLuot: dv.em.length - quaTai.length, tongEm: dv.em.length,
+    // "Giao N em" = soEmChon (em được giao sau lọc); tongEm = số em của lớp. duLuot / quaTai / duDiem8 tính trên em được giao.
+    soEmChon: dv.em.length, duLuot: dv.em.length - quaTai.length, tongEm: dv.soEmLop,
     duDiem8: await demDuDiem8(env, dv, ct.qids, han.D, nowMs),
     quaTai, theLucNgay: dv.theLuc,
   }
@@ -556,7 +565,11 @@ async function danhSach(env: Env, b: Row, nowMs: number): Promise<Record<string,
  *   xem-truoc {lop, khoaBai, tenBai, viTri, maDe[], theLucNgay?, hanNop?} ⇒ { ok, soCau, soTuLuan, hanNop, D, luotCan, sucChua, duLuot, tongEm, duDiem8, quaTai:[{sbd,ten}], theLucNgay }
  *   tick {lop, khoaBai, tenBai, viTri, maDe[], phamVi:[{khoaBai,tenBai,viTri,maDe[]}], hanNop?, theLucNgay?, nguoi?} ⇒ { ok, chienDichId, hanNop, daCo }
  *   bo-tick {lop, khoaBai}                          ⇒ { ok, chienDich: 'da_huy'|'da_dong'|null }
- * Thêm (ngoài hợp đồng, tuỳ chọn): `sbd[]` ở xem-truoc/tick để giao một phần lớp. `conNgay` = số ngày còn lại tính cả hôm nay (null khi không đang luyện).
+ * Chọn em được giao (thầy 05/10): `sbd[]` ở xem-truoc/tick — bỏ trùng, bỏ SBD không có trong danh sách học sinh hoặc đã khoá; còn 0 em ⇒
+ * { ok:false, error:'Chưa chọn em nào hợp lệ.' }; vắng `sbd` ⇒ cả lớp. xem-truoc trả thêm `soEmChon` (số em được giao); `tongEm` = số em của lớp;
+ * duLuot / quaTai / duDiem8 tính trên em được giao. Tick lại bài còn hiệu lực (kể cả với danh sách em khác) ⇒ `daCo`, KHÔNG tạo chiến dịch mới
+ * (sửa em qua màn Sửa chiến dịch sẵn có). `learner_scope` chỉ ghi cho em được giao.
+ * `conNgay` = số ngày còn lại tính cả hôm nay (null khi không đang luyện).
  */
 export async function gvBaiDaDay(env: Env, b: Row, nowMs = Date.now()): Promise<Record<string, unknown>> {
   const action = str(b.action)

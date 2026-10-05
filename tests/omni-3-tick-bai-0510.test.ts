@@ -86,7 +86,7 @@ describe('xem-truoc — dòng xác nhận, không ghi gì', () => {
     const r = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, maDe: MA_B6 }, T0)
     // 9 câu dùng được: bỏ 1 câu Phần III tự luận + 2 câu tờ "-DT" (luật tự luận chung cau-tu-luan.ts coi mã -VD/-DT/-TL là mục dạy học/tự luận)
     // ⇒ soTuLuan 3; em mới: 18 lượt; thể lực mặc định 40 ⇒ D nhỏ nhất với 18 ≤ 0,8 × D × 40 là 7.
-    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 3, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
+    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 3, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
     expect([d.dem('chien_dich'), d.dem('bai_da_day'), d.dem('pham_vi_lop')]).toEqual([0, 0, 0])
   })
   it('thể lực lớp đọc từ cau_hinh.the_luc_lop; thể lực quá thấp ⇒ D = 14 và danh sách em quá tải có tên', async () => {
@@ -208,6 +208,45 @@ describe('tick — tạo đúng một chiến dịch theo bài', () => {
     d.sql.exec('DROP TABLE bai_da_day; DROP TABLE pham_vi_lop')
     expect((await tickB6(env)).ok).toBe(true)
     expect([d.dem('bai_da_day'), d.dem('pham_vi_lop')]).toEqual([1, 3])
+  })
+})
+
+describe('chọn em được giao (thầy 05/10: app gửi sbd ở xem-truoc và tick)', () => {
+  it('lọc sbd: bỏ trùng, bỏ SBD không có trong danh sách học sinh hoặc đã khoá; soEmChon = số em sau lọc, tongEm = số em của lớp; số liệu tính trên em được giao', async () => {
+    const { env } = dung()
+    const r = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, maDe: MA_B6, sbd: ['S3', 'S1', 'S1', ' S3 ', 'S5', 'KHONG-CO', ''] }, T0)
+    expect(r).toMatchObject({ ok: true, soEmChon: 2, tongEm: 3, duLuot: 2, quaTai: [] })
+    const r1 = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, maDe: MA_B6, sbd: ['S3', 'S1'], theLucNgay: 1 }, T0)
+    expect(r1).toMatchObject({ ok: true, soEmChon: 2, tongEm: 3, duLuot: 0 })
+    expect(r1.quaTai).toEqual([{ sbd: 'S1', ten: 'An' }, { sbd: 'S3', ten: 'Chi' }])
+    // Em lớp khác vẫn có trong danh sách học sinh ⇒ được nhận (thầy chủ động chọn).
+    expect(await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, maDe: MA_B6, sbd: ['S1', 'S4'] }, T0)).toMatchObject({ ok: true, soEmChon: 2, tongEm: 3 })
+    // Không gửi sbd ⇒ cả lớp.
+    expect(await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, maDe: MA_B6 }, T0)).toMatchObject({ ok: true, soEmChon: 3, tongEm: 3 })
+  })
+  it('còn 0 em hợp lệ (chỉ em khoá / SBD lạ / mảng rỗng) ⇒ "Chưa chọn em nào hợp lệ." ở cả xem-truoc lẫn tick, không ghi gì', async () => {
+    const { d, env } = dung()
+    for (const sbd of [['S5', 'KHONG-CO'], [], ['  ']]) {
+      expect(await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, maDe: MA_B6, sbd }, T0), JSON.stringify(sbd)).toEqual({ ok: false, error: 'Chưa chọn em nào hợp lệ.' })
+      expect(await tickB6(env, { sbd }), JSON.stringify(sbd)).toEqual({ ok: false, error: 'Chưa chọn em nào hợp lệ.' })
+    }
+    expect([d.dem('chien_dich'), d.dem('bai_da_day'), d.dem('pham_vi_lop')]).toEqual([0, 0, 0])
+  })
+  it('tick giao đúng em được chọn; learner_scope chỉ ghi cho em được chọn (em vắng không bị đánh dấu đã dạy)', async () => {
+    const { d, env } = dung()
+    const r = await tickB6(env, { sbd: ['S2', 'S1', 'S5'] })
+    expect(r).toMatchObject({ ok: true, daCo: false })
+    expect(JSON.parse(String(chienDich(d, String(r.chienDichId)).sbd_json))).toEqual(['S1', 'S2'])
+    expect(d.sql.prepare('SELECT DISTINCT sbd FROM learner_scope ORDER BY sbd').all()).toEqual([{ sbd: 'S1' }, { sbd: 'S2' }])
+  })
+  it('tick lần hai cùng bài với danh sách em KHÁC ⇒ vẫn daCo, không tạo chiến dịch mới, không đổi em của chiến dịch cũ', async () => {
+    const { d, env } = dung()
+    const r = await tickB6(env, { sbd: ['S1', 'S2'] })
+    const r2 = await tickB6(env, { sbd: ['S3'] }, T0 + 3_600_000)
+    expect(r2).toEqual({ ok: true, chienDichId: r.chienDichId, hanNop: '2026-10-11', daCo: true })
+    expect(d.dem('chien_dich')).toBe(1)
+    expect(JSON.parse(String(chienDich(d, String(r.chienDichId)).sbd_json))).toEqual(['S1', 'S2'])
+    expect(d.dem('learner_scope', "sbd = 'S3'")).toBe(0)
   })
 })
 
