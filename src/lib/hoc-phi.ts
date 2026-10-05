@@ -24,6 +24,9 @@ export function trangThaiHocPhi(phaiNop: number, daNop: number): TrangThaiHocPhi
   return daNop > 0 ? 'con_thieu' : 'chua_nop'
 }
 
+/** Ghi chú để HIỆN: bỏ thẻ nguồn máy "[excel:…]" (máy chủ dùng để nạp lại không ghi đôi). */
+export const ghiChuHien = (g: string) => g.replace(/\s*\[excel:[^\]]*\]\s*$/u, '').trim()
+
 export const conThieu = (x: { phaiNop: number; daNop: number }) => Math.max(0, x.phaiNop - x.daNop)
 
 /** Học phí của một em: có ở máy chủ thì lấy, không thì mức chuẩn, chưa nộp. */
