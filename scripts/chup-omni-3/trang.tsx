@@ -1,5 +1,5 @@
 // TRANG CHỤP ẢNH OMNI 3 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
-// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai|gv-bang-cu|gv-bang-omni|gv-cai-dat`.
+// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai|gv-bang-cu|gv-bang-omni|gv-cai-dat|gv-tong-quan`.
 // Dữ liệu OMNI theo đúng hợp đồng docs/hop-dong-omni-3.md (SanhOmni, PhOmni). Các màn thêm sau khi gộp làn: dao, gv-bai, gv-bang.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -31,6 +31,8 @@ import DayHocLenBang from '../../src/components/day-hoc/DayHocLenBang'
 import BangChienDich from '../../src/components/chien-dich/BangChienDich'
 import CongTacOmni from '../../src/components/chien-dich/CongTacOmni'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
+import TongQuanScreen from '../../src/screens/TongQuanScreen'
+import { useCoHoa2 } from '../../src/components/chien-dich/co-hoa2'
 import { useAppStore } from '../../src/store/appStore'
 import { BANG, NOW_BANG, OMNI_BANG } from './gia/bang-gv'
 import '../../src/game/than-thu-v2/game.css'
@@ -153,6 +155,11 @@ const CAU_NEN = {
   ],
 }
 
+const ngayTruoc = (n: number, gio: number) => new Date(now - n * 86_400_000).toISOString().slice(0, 10) + `T${String(gio).padStart(2, '0')}:00:00Z`
+const caDong = (maCa: string, tenCa: string, lop: string, n: number, daNop: number) =>
+  ({ maCa, tenCa, lop, thoiGianPhut: 45, moLuc: ngayTruoc(n, 12), batDau: ngayTruoc(n, 12), hetHanVao: ngayTruoc(n, 13), trangThai: 'dong', phamVi: 'tu_do', congBo: 'ngay', loai: 'thi', hanNop: '', lenBang: true, daVao: daNop, daNop, canhBao: 0 })
+const CA_TONG_QUAN = [caDong('DH-12-C1-B2-TN', 'Kiểm tra Bài 2 · Lipid', '12A1', 2, 41), caDong('DH-11-C2-B3-TN', 'Kiểm tra Bài 3 · Ammonia', '11B', 4, 27), caDong('DH-12-C1-B1-TN', 'Kiểm tra Bài 1 · Ester', '12A1', 6, 43)]
+
 // ---------------------------------------------------------------- máy chủ giả (chặn MỌI fetch ra ngoài trang)
 const fetchGoc = window.fetch.bind(window)
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -170,6 +177,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/ph/ke-hoach')) return tra({ ok: true, canhBao: [] })
   if (u.pathname.endsWith('/game-v2/hoa2-sanh')) return tra(man === 'sanh-cho' ? SANH_CHO : SANH)
   if (u.pathname.endsWith('/hs/luyen-nen')) return tra(CAU_NEN)
+  // Tổng quan app thầy (cảnh gv-tong-quan): danh sách ca giả — 3 ca đã đóng mấy ngày trước (biểu đồ bài nộp), không ca nào đang mở.
+  if (man === 'gv-tong-quan' && (u.pathname.endsWith('/ca/danh-sach') || b.action === 'danhSachCa')) return tra({ ok: true, items: CA_TONG_QUAN, dauDongBo: { ma: 'ca_day_du' } })
   if (u.pathname.endsWith('/hs/luyen-nen/nop')) return tra({ ok: true, dung: true, dapAn: '0,1', giai: ['M(CO₂) = 12 + 2 · 16 = 44 g/mol', 'n(CO₂) = m : M = 4,4 : 44 = 0,1 mol'], meo: 'n = m : M; nhớ cộng đủ nguyên tử khối theo chỉ số trong công thức (CO₂ có 2 nguyên tử O).' })
   return tra({ ok: true })
 }
@@ -191,9 +200,10 @@ const con =
   : man === 'gv-bang-cu' || man === 'gv-bang-omni'
     ? h(BangChienDich, { du: BANG, nowMs: NOW_BANG, dangChieu: false, onChieu: async () => true, onDaChua: noop, omni: man === 'gv-bang-omni' ? OMNI_BANG : null, onOmniDoi: noop } as never)
   : man === 'gv-cai-dat' ? h(CongTacOmni)
+  : man === 'gv-tong-quan' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(TongQuanScreen)) // màn đầu app thầy khi Game Hóa 2.0 bật
   : manSanh(SANH)
 // Màn thầy: dựng ĐÚNG khung App.tsx (thanh bên trái thật + khung nội dung) để bố cục, màu như app thầy thật.
-const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat' }
+const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat', 'gv-tong-quan': 'tongquan' }
 const manThay = MAN_THAY[man]
 if (manThay) useAppStore.setState({ screen: manThay as never })
 createRoot(document.getElementById('root')!).render(
