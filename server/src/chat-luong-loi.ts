@@ -30,7 +30,7 @@
 //    câu đã sai: có cờ `raw_json.nv` ⇒ theo cờ (1 = nguyên văn); không cờ ⇒ cùng qid gốc, không song sinh, không câu thay thế, không bản xáo (`raw_json.xt = 1`).
 //    `dat` = số lượt lặp nguyên văn, n = số lượt làm lại trong cửa sổ lỗi.
 import type { Env } from './kieu'
-import { GIO_DOC_LOI_GIAI_CAM, THAM_SO_GOC, TU_NGAY, cachNgay, congNgayVn, phatLaiLoi, type LanLamLoi, type ThamSoLuat } from './loi-hoc-luat'
+import { GIO_DOC_LOI_GIAI_CAM, THAM_SO_GOC, TU_NGAY, cacQidSongSinh, cachNgay, congNgayVn, phatLaiLoi, type LanLamLoi, type ThamSoLuat } from './loi-hoc-luat'
 import { docThamSo, luotKiemDuyTri } from './tu-hoan-thien'
 import { MS_SAU_DOC_LOI_GIAI } from './omni-p-vkn'
 import { MUC_DICH_LUOT } from './omni-kieu'
@@ -400,7 +400,8 @@ export async function chatLuongCuaLop(env0: Env, lop: LopGv, homNay: string, soN
   }
   const ungVienLa = [...new Set([...dauTien].filter(([, n]) => n >= tuCuaSo).map(([k]) => k.slice(k.indexOf('|') + 1)))]
   // Bản song sinh của câu cũng là "đã gặp câu ấy" (chỉ mục idx_skh_em_qid_ngay: tra đúng (em, câu), không đọc dòng thừa).
-  const loLa = chia(ungVienLa, 300).map((lo) => lo.flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`, `${q}~ss2`, `${q}~ss3`]))
+  // 05/10: mọi chỗ song sinh (`cacQidSongSinh` ~ss0..7 — máy soạn có thể nối sau bản hỏng), không tự viết danh sách.
+  const loLa = chia(ungVienLa, 300).map((lo) => lo.flatMap(cacQidSongSinh))
   const loBoTro = chia([...qidSai], 400)
   soTruyVan += Math.ceil(qids.size / 800) + loBoTro.length
   const [kho, boTroLo, gapLo] = await Promise.all([
