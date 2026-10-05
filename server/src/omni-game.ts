@@ -30,6 +30,7 @@ import { docCauDaLamMoiNguon } from './game-v2-cau-moi'
 import { laCauTuLuan } from './cam-tu-luan'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { damBaoCauNenTuDong } from './omni-cau-nen-sinh'
+import { LENH_OMNI_CAN_THAN, canThanTu, ghiBuocSai, phanCanThanChoTraLoi } from './omni-can-than'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -230,7 +231,9 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
       : dv.dung && nhan === 'cham' && msLam != null ? chuDungNhungCham(msLam, kyVong)
         : dv.dung && tuTin === 'chua_chac' ? CHU_DUNG_CHUA_CHAC
           : chacMaSai ? CHU_CHAC_MA_SAI : null
-    const omni: KetQuaOmniTraLoi = { nhanTocDo: nhan, msLam, msKyVong: Math.round(kyVong), luot, chacMaSai, ...(tram ? { tram } : {}), ...(dang ? { dang } : {}), loiNhan }
+    // CẨN THẬN (omni-can-than.ts): hồ sơ TRƯỚC lượt này có Sơ ý > ngưỡng ⇒ `canThan` (+ thẻ "Sai vì bước nào?" khi chắc-mà-sai); không ⇒ không thêm trường nào.
+    const canThan = await phanCanThanChoTraLoi({ canThan: canThanTu(true, hs), chacMaSai, vkn: knMoi, tenVkn: (ids) => vknTheoId(env, ids) })
+    const omni: KetQuaOmniTraLoi = { nhanTocDo: nhan, msLam, msKyVong: Math.round(kyVong), luot, chacMaSai, ...(tram ? { tram } : {}), ...(dang ? { dang } : {}), loiNhan, ...canThan }
     const so: SoOmni = {
       luot,
       ...(luot ? { purpose: MUC_DICH_LUOT } : ve ? { purpose: MUC_DICH_VE } : {}),
@@ -546,7 +549,7 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
 }
 
 // ---------------------------------------------------------------- lệnh hoa2-omni-* của app học sinh
-export const LENH_OMNI_HOA2: readonly string[] = ['hoa2-omni-tram-xong', 'hoa2-omni-nhat-ky', 'hoa2-omni-doi-thu-tu', 'hoa2-omni-de-thu', 'hoa2-omni-de-thu-nop']
+export const LENH_OMNI_HOA2: readonly string[] = ['hoa2-omni-tram-xong', 'hoa2-omni-nhat-ky', 'hoa2-omni-doi-thu-tu', 'hoa2-omni-de-thu', 'hoa2-omni-de-thu-nop', ...LENH_OMNI_CAN_THAN]
 /** Mọi lệnh mới: OMNI tắt cho em ⇒ `{ ok:false, error }` (Hoá 2.0 tắt thì cổng chung của game-v2.ts đã trả `{ ok:true, cheDo2:false }` từ trước). */
 export async function hoa2OmniAction(env: Env, sbd: string, action: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
   if (!(await omniBat(env, sbd).catch(() => false))) return { ok: false, error: LOI_OMNI_TAT }
@@ -559,6 +562,7 @@ export async function hoa2OmniAction(env: Env, sbd: string, action: string, b: R
   }
   if (action === 'hoa2-omni-de-thu') return deThu(env, sbd, nowMs)
   if (action === 'hoa2-omni-de-thu-nop') return deThuNop(env, sbd, b, nowMs)
+  if (action === LENH_OMNI_CAN_THAN[0]) return ghiBuocSai(env, sbd, b, nowMs) // CẨN THẬN (c): em bấm một bước ở thẻ "Sai vì bước nào?" ⇒ ghi sổ riêng, không chấm
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
