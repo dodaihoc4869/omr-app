@@ -36,10 +36,10 @@ vi.mock('../server/src/omni-ke-hoach', async (goc) => {
   return { ...that, dangDaVung: vi.fn(() => [...gia.dangVung]) }
 })
 
-import { chanDoanEm, docHoSo2, docKeHoachOmni, docQuyetMetGio, doiThuTuMetGio, layKeHoachHomNay, qidGoc, sanh2, type HoSo2, type KeHoachDaChot } from '../server/src/srs2-d1'
+import { chanDoanEm, docHoSo2, docKeHoachOmni, docQuyetMetGio, doiThuTuMetGio, layKeHoachHomNay, qidGoc, sanh2, type KeHoachDaChot } from '../server/src/srs2-d1'
 import { bam, congNgay, quotaCauMoi, soNgayConLai } from '../server/src/srs2-loi'
 import { theLucCho } from '../server/src/omni-ke-hoach'
-import { dungKichBanHaiChienDich, HOM_NAY, lam, lucVn, NGAY_MS, T_SANG, taoKhoOmni, themChienDich, type KhoOmni } from './omni-3-ke-hoach-chung'
+import { dungKichBanHaiChienDich, HOM_NAY, lam, lucVn, T_SANG, taoKhoOmni, themChienDich, type KhoOmni } from './omni-3-ke-hoach-chung'
 
 function phamViBai(...bai: { ma: string; viTri: number; tick?: string }[]): PhamViGia {
   return {
@@ -332,8 +332,7 @@ describe('OMNI 3 · mô phỏng D1 nhiều ngày: bài 2 tick ngày 4, bài 3 kh
       for (const q of k.qids('DH-B2')) { const n = gapDau.get(`${s}|${q}`); if (!n || n > '2026-10-07') tre.push(`${s} ${q} ${n}`) }
     }
     expect(tre).toEqual([])
-    expect(soNgayHuyetChien).toBeGreaterThanOrEqual(0)
+    expect(soNgayHuyetChien).toBeGreaterThan(0) // thể lực 12 cho 66 câu mới trong 10 ngày ⇒ có ngày Huyết Chiến (có cờ, trần 24)
     expect(bangCo(k, 'srs2_ke_hoach_omni')).toBe(true)
-    void NGAY_MS
   }, 60_000)
 })
