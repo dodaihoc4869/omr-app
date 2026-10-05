@@ -80,8 +80,11 @@ export async function dongBoVe(env: Env, sbd: string, now: number): Promise<numb
   try {
     await capNhatExp(env, sbd, now)
     const lenh: D1PreparedStatement[] = []
-    for (const ngay of [ngayVn(iso(now)), ngayVn(iso(now - MOT_NGAY))]) {
-      const t = await docThanhTichNgay(env, sbd, now, ngay)
+    // Tối ưu 05/10: thành tích hôm nay + hôm qua (hai lượt ĐỌC độc lập) cùng đợt — trước: nối tiếp. Xét đúng thứ tự cũ.
+    const cacNgay = [ngayVn(iso(now)), ngayVn(iso(now - MOT_NGAY))]
+    const thanhTich = await Promise.all(cacNgay.map((ngay) => docThanhTichNgay(env, sbd, now, ngay)))
+    for (let k = 0; k < cacNgay.length; k++) {
+      const ngay = cacNgay[k]!, t = thanhTich[k]!
       if (!t.bat) continue
       if (t.datNgay) lenh.push(themVe(env, `${sbd}|dat|${ngay}`, sbd, ngay, 'dat', VE_DAT_NGAY, `dat|${ngay}`, now))
       for (const lo of t.loDungNhip) lenh.push(themVe(env, `${sbd}|${lo.khoa}`, sbd, ngay, 'lo', VE_LO_DUNG_NHIP, lo.khoa, now))
@@ -133,8 +136,12 @@ export const hoanVe = (env: Env, sbd: string, maChang: string) => env.DB.prepare
 
 export interface DoanLopXem { lop: string; tram: number; tongTram: number; changThang: number; changMoiTram: number; conChangToiTramKe: number; mocKe: number | null; tenMocKe: string | null; conTramToiMoc: number | null; gopSucHomNay: number; siSo: number }
 async function docDoanLop(env: Env, lop: string, mua: MuaDoan, homNay: string): Promise<DoanLopXem> {
-  const si = await env.DB.prepare("SELECT COUNT(*) n FROM hoc_sinh WHERE COALESCE(lop,'')=? AND COALESCE(trang_thai,'')<>'khoa'").bind(lop).first<{ n: number }>()
-  const r = await env.DB.prepare('SELECT COUNT(*) thang, COUNT(DISTINCT CASE WHEN ngay_vn=? THEN sbd END) homNay FROM doan_luot WHERE lop=? AND thang=1 AND ngay_vn BETWEEN ? AND ?').bind(homNay, lop, mua.tuNgay, mua.denNgay).first<{ thang: number; homNay: number }>()
+  // Tối ưu 05/10: hai lượt ĐỌC độc lập (sĩ số, chặng thắng của lớp) cùng đợt — trước: nối tiếp. Lỗi tới đúng chỗ `await` cũ.
+  const pSi = env.DB.prepare("SELECT COUNT(*) n FROM hoc_sinh WHERE COALESCE(lop,'')=? AND COALESCE(trang_thai,'')<>'khoa'").bind(lop).first<{ n: number }>()
+  const pR = env.DB.prepare('SELECT COUNT(*) thang, COUNT(DISTINCT CASE WHEN ngay_vn=? THEN sbd END) homNay FROM doan_luot WHERE lop=? AND thang=1 AND ngay_vn BETWEEN ? AND ?').bind(homNay, lop, mua.tuNgay, mua.denNgay).first<{ thang: number; homNay: number }>()
+  pR.catch(() => {})
+  const si = await pSi
+  const r = await pR
   const siSo = Math.max(1, si?.n ?? 1), thang = r?.thang ?? 0, moi = changMoiTram(siSo), tram = tramCuaLop(thang, siSo)
   const mocKe = MOC_TRAM.find(m => m > tram) ?? null
   return { lop, tram, tongTram: SO_TRAM, changThang: thang, changMoiTram: moi, conChangToiTramKe: tram >= SO_TRAM ? 0 : moi - (thang % moi), mocKe, tenMocKe: mocKe ? TEN_MOC[mocKe]! : null, conTramToiMoc: mocKe ? mocKe - tram : null, gopSucHomNay: r?.homNay ?? 0, siSo }
@@ -150,18 +157,30 @@ export interface SanhXem {
 /** SẢNH: đồng bộ vé từ việc học, mở rương / quà mốc còn nợ (idempotent), rồi trả mọi con số — tất cả ĐỌC từ sổ, không số nào do máy em khai. */
 export async function docSanh(env: Env, sbd: string, now: number): Promise<SanhXem | null> {
   try {
-    const homNay = ngayVn(iso(now)), mua = await docMua(env, homNay)
-    const hs = await docDongLop(env.DB, sbd)
+    // Tối ưu 05/10: mùa, lớp em, vé 3 ngày — ba lượt ĐỌC độc lập cùng đợt (trước: ba đợt nối tiếp). Lỗi tới đúng chỗ `await` cũ.
+    const homNay = ngayVn(iso(now))
+    const pMua = docMua(env, homNay), pHs = docDongLop(env.DB, sbd)
+    const pTruoc = env.DB.prepare('SELECT khoa FROM doan_ve_so WHERE sbd=? AND ngay_vn>=?').bind(sbd, ngayVn(iso(now - 2 * MOT_NGAY))).all<{ khoa: string }>()
+    pHs.catch(() => {}); pTruoc.catch(() => {})
+    const mua = await pMua
+    const hs = await pHs
     const lop = String(hs?.lop ?? '')
-    const truoc = new Set(((await env.DB.prepare('SELECT khoa FROM doan_ve_so WHERE sbd=? AND ngay_vn>=?').bind(sbd, ngayVn(iso(now - 2 * MOT_NGAY))).all<{ khoa: string }>()).results ?? []).map(x => x.khoa))
+    const truoc = new Set(((await pTruoc).results ?? []).map(x => x.khoa))
+    // Sổ lượt, Đoàn lớp, đã góp sức mùa này, đóng góp Trùm lớp: ĐỌC các bảng mà phần đồng bộ vé (sổ EXP, vé) KHÔNG ghi ⇒ bắt đầu CÙNG lúc với nó
+    // (trước: chờ đồng bộ vé xong rồi đọc nối tiếp từng câu). Kết quả y hệt; lỗi tới đúng chỗ `await` cũ.
+    const pLuot = env.DB.prepare('SELECT DISTINCT ngay_vn FROM doan_luot WHERE sbd=? AND thang IS NOT NULL AND ngay_vn>=?').bind(sbd, ngayVn(iso(now - 40 * MOT_NGAY))).all<{ ngay_vn: string }>()
+    const pDoanLop = docDoanLop(env, lop, mua, homNay)
+    const pDaGop = env.DB.prepare('SELECT COUNT(*) n FROM doan_luot WHERE sbd=? AND thang=1 AND ngay_vn BETWEEN ? AND ?').bind(sbd, mua.tuNgay, mua.denNgay).first<{ n: number }>()
+    const khung = khungTrumLop(now), chuNhatXet = khung.dangMo || khung.moSauMs > 6 * MOT_NGAY ? (khung.dangMo ? khung.chuNhat : ngayVn(iso(Date.parse(`${khung.chuNhat}T12:00:00+07:00`) - 7 * MOT_NGAY))) : khung.chuNhat
+    const pGop = env.DB.prepare('SELECT COALESCE(SUM(sat_thuong),0) tong, COALESCE(SUM(CASE WHEN sbd=? THEN 1 ELSE 0 END),0) cuaEm FROM doan_trum_lop WHERE lop=? AND chu_nhat=?').bind(sbd, lop, chuNhatXet).first<{ tong: number; cuaEm: number }>()
+    pLuot.catch(() => {}); pDoanLop.catch(() => {}); pDaGop.catch(() => {}); pGop.catch(() => {})
     await dongBoVe(env, sbd, now)
 
-    const luot = (await env.DB.prepare('SELECT DISTINCT ngay_vn FROM doan_luot WHERE sbd=? AND thang IS NOT NULL AND ngay_vn>=?').bind(sbd, ngayVn(iso(now - 40 * MOT_NGAY))).all<{ ngay_vn: string }>()).results ?? []
+    const luot = (await pLuot).results ?? []
     const chuoi = chuoiNgay(luot.map(x => x.ngay_vn), homNay)
-    const doanLop = await docDoanLop(env, lop, mua, homNay)
-    const daGopMua = ((await env.DB.prepare('SELECT COUNT(*) n FROM doan_luot WHERE sbd=? AND thang=1 AND ngay_vn BETWEEN ? AND ?').bind(sbd, mua.tuNgay, mua.denNgay).first<{ n: number }>())?.n ?? 0) > 0
-    const khung = khungTrumLop(now), chuNhatXet = khung.dangMo || khung.moSauMs > 6 * MOT_NGAY ? (khung.dangMo ? khung.chuNhat : ngayVn(iso(Date.parse(`${khung.chuNhat}T12:00:00+07:00`) - 7 * MOT_NGAY))) : khung.chuNhat
-    const gop = await env.DB.prepare('SELECT COALESCE(SUM(sat_thuong),0) tong, COALESCE(SUM(CASE WHEN sbd=? THEN 1 ELSE 0 END),0) cuaEm FROM doan_trum_lop WHERE lop=? AND chu_nhat=?').bind(sbd, lop, chuNhatXet).first<{ tong: number; cuaEm: number }>()
+    const doanLop = await pDoanLop
+    const daGopMua = ((await pDaGop)?.n ?? 0) > 0
+    const gop = await pGop
     const mucTieu = doanLop.siSo * TRUM_LOP.mauMoiEm, daHa = (gop?.tong ?? 0) >= mucTieu
 
     const lenh: D1PreparedStatement[] = []
@@ -170,11 +189,15 @@ export async function docSanh(env: Env, sbd: string, now: number): Promise<SanhX
     if (daHa && (gop?.cuaEm ?? 0) > 0) lenh.push(themVe(env, `${sbd}|trum|${mua.khoa}|${chuNhatXet}`, sbd, homNay, 'trum', 1, `trum|${chuNhatXet}`, now))
     if (lenh.length) await env.DB.batch(lenh)
 
-    const moi = ((await env.DB.prepare('SELECT khoa,loai,so,ma_nguon FROM doan_ve_so WHERE sbd=? AND ngay_vn>=? AND so>0').bind(sbd, ngayVn(iso(now - 2 * MOT_NGAY))).all<Row>()).results ?? []).filter(x => !truoc.has(String(x.khoa)))
+    // Tối ưu 05/10: vé mới, tổng vé, chặng đã đi hôm nay — ba lượt ĐỌC độc lập (sau lô ghi vé như cũ) cùng đợt; trước: nối tiếp.
+    const pMoi = env.DB.prepare('SELECT khoa,loai,so,ma_nguon FROM doan_ve_so WHERE sbd=? AND ngay_vn>=? AND so>0').bind(sbd, ngayVn(iso(now - 2 * MOT_NGAY))).all<Row>()
+    const pVe = soVe(env, sbd), pDaDi = daDiHomNay(env, sbd, homNay, '')
+    pVe.catch(() => {}); pDaDi.catch(() => {})
+    const moi = ((await pMoi).results ?? []).filter(x => !truoc.has(String(x.khoa)))
     const ghiChu = (x: Row) => x.loai === 'dat' ? 'Em đạt nhiệm vụ ngày' : x.loai === 'lo' ? 'Em xong một lô bài tập đúng nhịp' : x.loai === 'ruong' ? `Rương chuỗi ${String(x.ma_nguon).split('|')[1]} ngày` : x.loai === 'moc' ? `Cả lớp tới ${TEN_MOC[Number(String(x.ma_nguon).split('|')[1])] ?? 'mốc mới'}` : 'Lớp em đã hạ Trùm lớp'
     const mocKe = MOC_RUONG.find(m => m > chuoi.ngay) ?? null
     return {
-      lop, tenDoan: `Đoàn Hộ Tống ${lop || 'Tự do'}`, mua: { so: mua.so, conNgay: mua.conNgay }, ve: await soVe(env, sbd), mienPhiHomNay: !await daDiHomNay(env, sbd, homNay, ''),
+      lop, tenDoan: `Đoàn Hộ Tống ${lop || 'Tự do'}`, mua: { so: mua.so, conNgay: mua.conNgay }, ve: await pVe, mienPhiHomNay: !await pDaDi,
       chuoi: { ...chuoi, mocKe, conNgay: mocKe ? mocKe - chuoi.ngay : null }, doanLop,
       trumLop: { dangMo: khung.dangMo, chuNhat: khung.chuNhat, moSauMs: khung.moSauMs, conMs: khung.conMs, daGop: gop?.tong ?? 0, mucTieu, daHa },
       quaMoi: moi.map(x => ({ loai: x.loai as SanhXem['quaMoi'][number]['loai'], ve: Number(x.so), ghiChu: ghiChu(x) })),

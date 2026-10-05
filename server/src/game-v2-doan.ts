@@ -10,7 +10,7 @@
 //
 // Câu chung của TRÙM không tạo bằng chứng cá nhân: không ghi attempt, không ghi sổ, không tính vào trần câu của Đoàn (60).
 import { cheDo2 } from './srs2-d1'
-import { nhoTheoLuot } from './doc-d1-theo-luot'
+import { BANG_CAU_HINH, nhoTheoLuot } from './doc-d1-theo-luot'
 import type { Env, D1PreparedStatement } from './kieu'
 import type { Profile } from './game-v2'
 import { PETS, publicQuestion, type PrivateQuestion, type Question } from '../../src/game/than-thu-v2/core'
@@ -57,7 +57,7 @@ export const LOI_CHUA_MO = 'Đoàn Hộ Tống sắp ra mắt. Em chờ thêm í
 export async function doanMoCho(env: Env, sbd: string): Promise<boolean> {
   try {
     // Nhớ theo lượt (tối ưu 05/10): `gameV2Tho` đọc sẵn cờ cùng lô hồ sơ cho lệnh `doan-*` ⇒ ở đây dùng lại (ngoài bản gộp đọc ⇒ đọc thẳng như cũ).
-    const r = await nhoTheoLuot(env.DB, 'cau_hinh|doan_ho_tong', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='doan_ho_tong'").first<{ gia_tri: string | null }>())
+    const r = await nhoTheoLuot(env.DB, 'cau_hinh|doan_ho_tong', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='doan_ho_tong'").first<{ gia_tri: string | null }>(), BANG_CAU_HINH)
     if (!r?.gia_tri) return false
     const o = JSON.parse(r.gia_tri) as { dsSbd?: unknown; toanBo?: unknown }
     return o.toanBo === true || (Array.isArray(o.dsSbd) && o.dsSbd.map(x => String(x).trim()).includes(sbd))
@@ -172,7 +172,7 @@ function soiHanSession(p: PhongDoan, now: number): boolean {
 // ───────────────────────── Đọc / ghi phòng ─────────────────────────
 /** Dòng chặng (JSON + revision) — nhớ theo lượt (tối ưu 05/10): `gameV2Tho` đọc sẵn cùng lô hồ sơ; mọi lệnh GHI của lượt xoá sổ nhớ ⇒ vòng thử lại đọc tươi. */
 export function docDongChang(env: Env, ma: string): Promise<{ json: string; revision: number } | null> {
-  return nhoTheoLuot(env.DB, `doan_chang|${ma}`, () => env.DB.prepare('SELECT json,revision FROM doan_chang WHERE ma=?').bind(ma).first<{ json: string; revision: number }>())
+  return nhoTheoLuot(env.DB, `doan_chang|${ma}`, () => env.DB.prepare('SELECT json,revision FROM doan_chang WHERE ma=?').bind(ma).first<{ json: string; revision: number }>(), ['doan_chang'])
 }
 /** Mã chặng của lệnh `doan-*` có đọc phòng theo `b.ma` (cùng cách chuẩn hoá của `chay`); lệnh không đọc phòng theo `b.ma` ⇒ ''. */
 export function maChangCuaLenh(action: string, b: Row): string {
@@ -633,9 +633,17 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
   if (action === 'doan-sanh') {
     // Sảnh hằng ngày: vé, chuỗi/rương, Đoàn lớp, Trùm lớp. Chưa chạy migration bước 5 → `sanh:null`, giao diện giữ các ô "SẮP MỞ".
     await env.DB.prepare("DELETE FROM doan_ve_so WHERE sbd=? AND loai='tieu' AND ma_nguon IN (SELECT ma FROM doan_chang WHERE trang_thai IN ('sanh','huy') AND tao_luc<?)").bind(sbd, iso(now - PHONG_HET_HAN_MS)).run().catch(() => { /* chưa có sổ vé */ })
-    const homNay = ngayVn(iso(now)), pet = Math.max(0, PETS.findIndex(x => x.id === hoSo.pet)), sanh = await docSanh(env, sbd, now)
-    const hoa2 = await cheDo2(env, sbd)
-    return { ok: true, ...(hoa2 ? {} : { tranNgay: TRAN_CAU_DOAN_NGAY }), dailyUsed: await demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan'), ...(hoa2 ? {} : await changHomNay(env, sbd, homNay)), sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
+    const homNay = ngayVn(iso(now)), pet = Math.max(0, PETS.findIndex(x => x.id === hoSo.pet))
+    // Tối ưu 05/10: các phần ĐỌC không phụ thuộc Sảnh (chế độ Hoá 2.0, số câu Đoàn hôm nay, ấn thạch, chặng đang dở — bảng Sảnh không ghi) chạy CÙNG lúc với
+    // Sảnh; bạn đồng hành (cần lớp của Sảnh) và chặng hôm nay (chỉ chế độ cũ) bắt đầu ngay sau. Khoá phản hồi và lỗi y như cũ (await đúng thứ tự cũ).
+    const pSanh = docSanh(env, sbd, now), pHoa2 = cheDo2(env, sbd), pDaily = demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan')
+    const pAn = docAnThach(env, sbd, homNay), pDangDo = timDangDo()
+    pHoa2.catch(() => {}); pDaily.catch(() => {}); pAn.catch(() => {}); pDangDo.catch(() => {})
+    const sanh = await pSanh
+    const hoa2 = await pHoa2
+    const pChang = hoa2 ? null : changHomNay(env, sbd, homNay), pBan = goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi)
+    pChang?.catch(() => {}); pBan.catch(() => {})
+    return { ok: true, ...(hoa2 ? {} : { tranNgay: TRAN_CAU_DOAN_NGAY }), dailyUsed: await pDaily, ...(hoa2 ? {} : await pChang!), sanh, anThach: anChoSanh(await pAn, pet), banDongHanh: await pBan, dangDo: (await pDangDo)?.ma_chang ?? null }
   }
   if (action === 'doan-hien-thi') {
     // Hợp đồng hiển thị NGOÀI game (docs/hop-dong-doan-hien-thi-2109.md): hào quang + danh hiệu của chính em.

@@ -294,6 +294,20 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   const ngayMai = themNgay(homNay, 1)
   const dau14 = themNgay(homNay, -(SO_NGAY_NHIP - 1))
   const ra: Row = { ok: true, serverNow: nowMs, hoTen: '' }
+  // Tối ưu 05/10: lệnh này CHỈ ĐỌC (đếm truy cập đã tách ở `sbdCuaPhuHuynh`) ⇒ các lượt đọc chỉ phụ thuộc em (hồ sơ gộp, sổ, lượt nộp, về đích) bắt đầu
+  // CÙNG đợt; các lượt cần kết quả đợt trước (công bố, BTVN, câu chặn, hạng chăm, A.I) bắt đầu ngay khi có đủ đầu vào — trước: 13 đợt nối tiếp.
+  // Mọi kết quả dùng đúng chỗ cũ, đúng thứ tự; lỗi tới đúng chỗ `await` cũ.
+  const chan = <T,>(p: Promise<T>): Promise<T> => { p.catch(() => {}); return p }
+  const pHoSo = chan(docHoSo(hoi, sbd, homNay))
+  const pSk = chan(hoi('SELECT khoa, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de FROM su_kien_hoc WHERE sbd = ? ORDER BY luc, khoa', sbd))
+  const pLuot = chan(hoi(
+    `SELECT l.ma_ca, l.lan_thu, l.vao_luc, l.nop_luc, l.tong, l.diem_i, l.diem_ii, l.diem_iii, COALESCE(c.ten_ca, '') AS ten_ca
+       FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
+      WHERE l.sbd = ? AND l.nop_luc IS NOT NULL AND l.nop_luc <> '' AND COALESCE(c.loai, 'thi') <> 'baitap' AND COALESCE(c.trang_thai, '') <> 'da_xoa'
+      ORDER BY l.nop_luc DESC, l.lan_thu DESC LIMIT 100`,
+    sbd,
+  ))
+  const pVeDich = chan(docVeDichCuaEm(env, sbd, nowMs))
 
   // 1 · truy vấn gộp: tên em, số lượt giao thêm hôm nay, kế hoạch hôm nay, (qid → dạng) của hồ sơ
   let hoTen = ''
@@ -302,7 +316,7 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   let coHoSo = false
   const cauHinhMoc = new Map<string, unknown>()
   const tra: { dang: Map<string, string>; chuyenDe: Map<string, string> } = { dang: new Map(), chuyenDe: new Map() }
-  for (const x of await docHoSo(hoi, sbd, homNay)) {
+  for (const x of await pHoSo) {
     if (x.k === 'em') hoTen = chuoi(x.a)
     else if (x.k === 'moc') cauHinhMoc.set(chuoi(x.a), x.b)
     else if (x.k === 'gt') daGiaoThem = so(x.a)
@@ -315,9 +329,15 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   }
   ra.hoTen = hoTen
   const moc = giaiMocHienThi(cauHinhMoc.get('hien_thi_tu'), cauHinhMoc.get('ve_dich_tu'), cauHinhMoc.get('bang_tin_tu'))
+  // Cần mốc: hạng chăm hôm nay + A.I đã làm (thử thách riêng / nhắc nộp) — bắt đầu ngay.
+  const pDoCham = chan(hangChamCuaEm(env, sbd, nowMs, moc))
+  const sqlTt = "SELECT 'tt' AS k, so_cau AS a, tao_luc AS b FROM thu_thach_rieng WHERE sbd = ? AND ngay = ? AND tao_luc >= ?"
+  const sqlNh = "SELECT 'nh' AS k, COUNT(*) AS a, MAX(gui_luc) AS b FROM canh_bao_thay WHERE sbd = ? AND ngay = ? AND gui_ph = 1 AND gui_luc >= ?"
+  const bindAi = [sbd, homNay, moc.iso]
+  const pAi = chan(hoi(`${sqlTt} UNION ALL ${sqlNh}`, ...bindAi, ...bindAi))
 
   // 2 · sổ học (mọi nguồn) của em
-  const rSk = (await hoi('SELECT khoa, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de FROM su_kien_hoc WHERE sbd = ? ORDER BY luc, khoa', sbd)) ?? []
+  const rSk = (await pSk) ?? []
   const skTho: Sk[] = rSk.filter((x) => chuoi(x.qid) && chuoi(x.ngay_vn)).map((x) => ({
     khoa: chuoi(x.khoa), sbd, qid: chuoi(x.qid), nguon: chuoi(x.nguon), maNguon: chuoi(x.ma_nguon), lan: so(x.lan) || 1,
     ketQua: x.ket_qua === null || x.ket_qua === undefined ? null : Number(x.ket_qua) === 1 ? 1 : 0, giay: soHoacNull(x.giay),
@@ -325,30 +345,29 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   }))
 
   // 3 · các lượt nộp của em (ca kiểm tra; loại ca bài tập/đã xoá) — mới nhất trước
-  const rLuot = (await hoi(
-    `SELECT l.ma_ca, l.lan_thu, l.vao_luc, l.nop_luc, l.tong, l.diem_i, l.diem_ii, l.diem_iii, COALESCE(c.ten_ca, '') AS ten_ca
-       FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
-      WHERE l.sbd = ? AND l.nop_luc IS NOT NULL AND l.nop_luc <> '' AND COALESCE(c.loai, 'thi') <> 'baitap' AND COALESCE(c.trang_thai, '') <> 'da_xoa'
-      ORDER BY l.nop_luc DESC, l.lan_thu DESC LIMIT 100`,
-    sbd,
-  )) ?? []
+  const rLuot = (await pLuot) ?? []
   const luotCuaCa = new Map<string, Row>() // mỗi ca giữ lượt nộp MỚI NHẤT
   for (const x of rLuot) if (!luotCuaCa.has(chuoi(x.ma_ca))) luotCuaCa.set(chuoi(x.ma_ca), x)
   const dsCa = [...luotCuaCa.values()] // mới → cũ
 
   // 4 · trạng thái công bố (MỘT truy vấn, luật ở cong-bo-diem.ts) cho ca của các lượt VÀ ca của mọi sự kiện thi
   const dsMaCa = [...new Set([...dsCa.map((x) => chuoi(x.ma_ca)), ...skTho.filter((e) => e.nguon === 'thi').map((e) => e.maNguon)])]
-  const congBo = await docTrangThaiCongBo(env, dsMaCa)
+  // Công bố, BTVN + gói gia đình, câu chặn (bài chưa nộp — chỉ khi có sự kiện, như cũ): ba lượt đọc độc lập ⇒ cùng đợt.
+  const pCongBo = chan(docTrangThaiCongBo(env, dsMaCa))
+  const pBt = chan(docBtvnVaMom(hoi, sbd, [...new Set(skTho.filter((e) => e.nguon === 'mom').map((e) => e.maNguon))]))
+  const coSuKienNhan = skTho.some((e) => nhanNguon(e.nguon) !== null)
+  const pChanBtvn = coSuKienNhan ? chan(docCauChanBtvnChuaNop(env, sbd)) : null
+  const congBo = await pCongBo
 
   // 5 · BTVN + gói gia đình giao (nộp hay chưa; bài đang chạy; bài đã nộp)
-  const rBt = await docBtvnVaMom(hoi, sbd, [...new Set(skTho.filter((e) => e.nguon === 'mom').map((e) => e.maNguon))])
+  const rBt = await pBt
   // A.I đã làm gì cho con hôm nay (số THẬT, từ mốc): thử thách riêng đã soạn + lần nhắc nộp đã gửi cho phụ huynh — MỘT truy vấn gộp; thiếu bảng ⇒ từng phần một, phần nào thiếu thì bỏ dòng ấy.
   const aiTho = { thuThach: null as { so: number; luc: string } | null, nhac: null as { so: number; luc: string } | null }
   {
-    const tt = "SELECT 'tt' AS k, so_cau AS a, tao_luc AS b FROM thu_thach_rieng WHERE sbd = ? AND ngay = ? AND tao_luc >= ?"
-    const nh = "SELECT 'nh' AS k, COUNT(*) AS a, MAX(gui_luc) AS b FROM canh_bao_thay WHERE sbd = ? AND ngay = ? AND gui_ph = 1 AND gui_luc >= ?"
-    const bind = [sbd, homNay, moc.iso]
-    let r = await hoi(`${tt} UNION ALL ${nh}`, ...bind, ...bind)
+    const tt = sqlTt
+    const nh = sqlNh
+    const bind = bindAi
+    let r = await pAi
     if (r === null) r = [...((await hoi(tt, ...bind)) ?? []), ...((await hoi(nh, ...bind)) ?? [])]
     for (const x of r) {
       if (x.k === 'tt' && so(x.a) > 0) aiTho.thuThach = { so: so(x.a), luc: chuoi(x.b) }
@@ -372,7 +391,7 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   for (const [qid, ds] of suKienTheoQid) { const c = lyDoCheCuaCau(ds, congBo, btvnDaNop, momDaNop); if (c) cheTheoQid.set(qid, c) }
   // câu thuộc bài tập về nhà CHƯA nộp dù em làm ở kênh ôn (chưa có sự kiện nào ở bài đó): che 'chua_nop' (chua_cong_bo từ sự kiện vẫn thắng)
   if (suKienTheoQid.size > 0) {
-    const chanBtvn = await docCauChanBtvnChuaNop(env, sbd)
+    const chanBtvn = await (pChanBtvn ?? docCauChanBtvnChuaNop(env, sbd))
     if (chanBtvn.size > 0) for (const qid of suKienTheoQid.keys()) if (!cheTheoQid.has(qid) && chanBtvn.has(qid)) cheTheoQid.set(qid, 'chua_nop')
   }
   for (const e of skTho) e.che = cheTheoQid.get(e.qid) ?? null
@@ -533,13 +552,16 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
     ...vuaLenTho.slice(0, 12).map((x) => x.ma), ...dangLenBacTho.slice(0, 12), ...lenBacHomNayTho.slice(0, 12),
     ...cauMoiNhat.filter((e) => e.che === null).map((e) => dangCuaSk(e)).filter(Boolean),
   ])].slice(0, 60)
-  const ten = maCanTen.length > 0 ? await tenCuaCacDang(env, maCanTen) : new Map<string, string>()
+  // Tên dạng và đề các câu được phép hiện: hai lượt đọc độc lập ⇒ cùng đợt (trước: nối tiếp).
+  const pTen = maCanTen.length > 0 ? chan(tenCuaCacDang(env, maCanTen)) : null
+  const pKho = qidCanDoc.length > 0 ? chan(hoi('SELECT qid, MIN(json) AS json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) GROUP BY qid', json(qidCanDoc))) : null
+  const ten = pTen ? await pTen : new Map<string, string>()
   const coTen = (ma: string): boolean => ten.has(ma)
 
   // 7 · đề của các câu ĐƯỢC PHÉP hiện (câu bị che không bao giờ được đọc từ kho)
   const kho = new Map<string, Row>()
   if (qidCanDoc.length > 0) {
-    for (const x of (await hoi('SELECT qid, MIN(json) AS json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) GROUP BY qid', json(qidCanDoc))) ?? []) {
+    for (const x of (await pKho!) ?? []) {
       const q = parse<Row | null>(x.json, null)
       if (q) kho.set(chuoi(x.qid), q)
     }
@@ -742,7 +764,7 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
 
   // ── độ chăm hôm nay ("Con đang hạng 9 trong 42 bạn về độ chăm hôm nay"): DÙNG CHUNG hàm xếp hạng của lệnh thi đua (thi-dua-hom-nay.ts), 3 truy vấn thêm.
   // Chỉ hai con số hạng + sĩ số — không tên bạn nào, không thần thú. Con chưa học hôm nay / chưa xác định được lớp / đọc lỗi ⇒ VẮNG (không hạng bịa).
-  const doCham = await hangChamCuaEm(env, sbd, nowMs, moc)
+  const doCham = await pDoCham
   if (doCham) ra.doCham = { hang: doCham.hang, siSo: doCham.siSo }
 
   // ── điều đáng mừng · A.I đã làm / đã chuẩn bị (CHỈ sự thật ĐO ĐƯỢC từ mốc; không có gì ⇒ mảng rỗng / vắng, KHÔNG bịa) ────────────────────────────────
@@ -771,7 +793,7 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
 
   // ── `no` (Dồn về đích, thầy chốt 21/09): { theoNgay:[{ngay, loai, ten, soCau, phut}], tongCau, tongPhut } — nối `docVeDichCuaEm` (ve-dich-d1.ts, Code 4 soạn; Code 3 nối W3). CHỈ khi có nợ; không nợ / lỗi ⇒ vắng khoá (khối thiếu ⇒ vắng, không bịa).
   try {
-    const vd = await docVeDichCuaEm(env, sbd, nowMs)
+    const vd = await pVeDich
     if (vd.no.tongCau > 0) ra.no = vd.no
   } catch (e) {
     console.error('[ph-tat-ca-ve-con] không đọc được nợ (bỏ khối no):', e instanceof Error ? e.message : e)

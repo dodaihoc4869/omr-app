@@ -3,41 +3,56 @@
 import type { D1Database, D1PreparedStatement, D1Result } from './kieu'
 import { gan } from './cau-hinh-dem'
 const DA_GOP = Symbol('omr.docD1TheoLuot')
-/** Sổ nhớ ĐỌC của MỘT lượt (tối ưu 05/10): khoá → Promise kết quả. Chỉ bản gộp đọc (`gopDocD1(db, true)`) có; MỌI lệnh GHI của lượt xoá sạch. */
+/** Sổ nhớ ĐỌC của MỘT lượt (tối ưu 05/10): khoá → Promise kết quả (+ các BẢNG mà lượt đọc ấy đọc). Chỉ bản gộp đọc (`gopDocD1(db, true)`) có.
+ *  Lệnh GHI của lượt xoá: mục KHÔNG khai bảng ⇒ mọi lệnh ghi xoá (như trước); mục có khai bảng ⇒ chỉ lệnh ghi mà câu SQL CÓ NHẮC tới một trong các bảng ấy mới xoá
+ *  (lược đồ không có trigger/khoá ngoại cascade ⇒ một lệnh ghi chỉ đổi đúng bảng nó nhắc tên; so khớp nguyên từ, thà xoá thừa). */
 const NHO = Symbol('omr.nhoTheoLuot')
-type SoNho = Map<string, Promise<unknown>>
+type SoNho = Map<string, { p: Promise<unknown>; bang?: readonly string[] }>
 const soNho = (db: D1Database): SoNho | undefined => (db as unknown as Record<symbol, SoNho | undefined>)[NHO]
+const nhacBang = (sql: string, bang: string): boolean => new RegExp(`\\b${bang}\\b`, 'i').test(sql)
+/** Xoá khỏi sổ nhớ các mục có thể bị lệnh ghi `sql` (cả lô: nối các câu) làm cũ. */
+function xoaNhoSauGhi(nho: SoNho, sql: string): void {
+  for (const [k, v] of nho) if (!v.bang || v.bang.some((b) => nhacBang(sql, b))) nho.delete(k)
+}
 /**
- * Đọc NHỚ THEO LƯỢT: cùng `khoa` trong CÙNG một request (cùng bản `gopDocD1`) và chưa có lệnh ghi nào xen giữa ⇒ dùng lại đúng Promise lần đọc trước
+ * Đọc NHỚ THEO LƯỢT: cùng `khoa` trong CÙNG một request (cùng bản `gopDocD1`) và chưa có lệnh ghi nào (đụng `bang`) xen giữa ⇒ dùng lại đúng Promise lần đọc trước
  * (trước: cùng một câu SELECT chạy lại nối tiếp — mùa game, cờ `exp_moi`, lớp của em… — mỗi lần một đợt D1). Ngoài bản gộp (D1 thô, bản Bi-a) ⇒ gọi thẳng `f`
  * (không nhớ chéo request). Lỗi ⇒ bỏ khỏi sổ (lần sau đọc lại như cũ). Giá trị nhớ dùng chung ⇒ nơi gọi KHÔNG được sửa đối tượng trả về.
+ * `bang`: các bảng câu đọc của `f` đọc (vắng ⇒ mọi lệnh ghi đều xoá mục này).
  */
-export function nhoTheoLuot<T>(db: D1Database, khoa: string, f: () => Promise<T>): Promise<T> {
+export function nhoTheoLuot<T>(db: D1Database, khoa: string, f: () => Promise<T>, bang?: readonly string[]): Promise<T> {
   const m = soNho(db)
   if (!m) return f()
   const co = m.get(khoa)
-  if (co) return co as Promise<T>
+  if (co) return co.p as Promise<T>
   const p = f()
-  m.set(khoa, p)
-  p.catch(() => { if (m.get(khoa) === p) m.delete(khoa) })
+  const muc = { p, bang }
+  m.set(khoa, muc)
+  p.catch(() => { if (m.get(khoa) === muc) m.delete(khoa) })
   return p
 }
 /** Gieo sẵn sổ nhớ bằng giá trị CHÍNH lượt này vừa đọc theo đường khác (vd. lô mùa + hồ sơ của `loadProfile`). Ngoài bản gộp ⇒ không làm gì.
  *  `giaTri` là Promise (lượt đọc ĐANG bay của chính lượt này) ⇒ người hỏi sau dùng chung lượt ấy; lỗi ⇒ bỏ khỏi sổ (hỏi lại thì đọc lại như cũ). */
-export function gieoNho(db: D1Database, khoa: string, giaTri: unknown): void {
+export function gieoNho(db: D1Database, khoa: string, giaTri: unknown, bang?: readonly string[]): void {
   const m = soNho(db)
   if (!m || m.has(khoa)) return
   const p = giaTri instanceof Promise ? giaTri : Promise.resolve(giaTri)
-  m.set(khoa, p)
-  p.catch(() => { if (m.get(khoa) === p) m.delete(khoa) })
+  const muc = { p, bang }
+  m.set(khoa, muc)
+  p.catch(() => { if (m.get(khoa) === muc) m.delete(khoa) })
 }
+/** Bảng của các mục nhớ dùng chung (khai MỘT chỗ). */
+export const BANG_MUA: readonly string[] = ['game_v2_settings']
+export const BANG_LOP: readonly string[] = ['hoc_sinh']
+export const BANG_CAU_HINH: readonly string[] = ['cau_hinh']
+export const BANG_HO_SO: readonly string[] = ['game_v2_settings', 'game_v2_profile']
 /** Dòng mùa game (`game_v2_settings.season`) — đọc một lần mỗi lượt (hồ sơ, EXP, Đoàn, đồng bộ học tập đều cần). Không có dòng ⇒ null. */
 export function docDongMua(db: D1Database): Promise<{ json: string } | null> {
-  return nhoTheoLuot(db, 'mua', () => db.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{ json: string }>())
+  return nhoTheoLuot(db, 'mua', () => db.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{ json: string }>(), BANG_MUA)
 }
 /** Lớp (`hoc_sinh.lop`) của em — đọc một lần mỗi lượt (cờ Hoá 2.0, Bi-a, Sảnh Đoàn). Không có dòng ⇒ null. */
 export function docDongLop(db: D1Database, sbd: string): Promise<{ lop: string | null } | null> {
-  return nhoTheoLuot(db, `lop|${sbd}`, () => db.prepare('SELECT lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ lop: string | null }>())
+  return nhoTheoLuot(db, `lop|${sbd}`, () => db.prepare('SELECT lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ lop: string | null }>(), BANG_LOP)
 }
 /**
  * RÀO GHI (tối ưu 05/10 — lệnh game khi đệm "cổng đóng băng" của reset vừa hết hạn, index.ts): mọi lệnh GHI qua bản này CHỜ `rao` (lượt đọc cổng đang bay);
@@ -90,7 +105,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     truoc = ghi
     return p
   }
-  const goc = new WeakMap<D1PreparedStatement, { st: D1PreparedStatement; doc: boolean }>()
+  const goc = new WeakMap<D1PreparedStatement, { st: D1PreparedStatement; doc: boolean; sql: string }>()
   function xa(): void {
     const lo = ds; ds = []
     if (!lo.length) return
@@ -112,26 +127,28 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
       queueMicrotask(xa)
     })
   }
-  function boc(st: D1PreparedStatement, laDoc: boolean): D1PreparedStatement {
+  function boc(st: D1PreparedStatement, laDoc: boolean, sql: string): D1PreparedStatement {
     const p: D1PreparedStatement = {
-      bind: (...tham) => boc(st.bind(...tham), laDoc),
-      all: <T>() => { if (!laDoc) { nho.clear(); xa(); return gui(() => st.all<T>()) }; return doc(st) as Promise<D1Result<T>> },
+      bind: (...tham) => boc(st.bind(...tham), laDoc, sql),
+      all: <T>() => { if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.all<T>()) }; return doc(st) as Promise<D1Result<T>> },
       first: async <T>(cot?: string) => {
-        if (!laDoc) { nho.clear(); xa(); return gui(() => st.first<T>(cot)) }
+        if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.first<T>(cot)) }
         const r = await doc(st), dong = r.results[0]
         return (cot ? (dong as Record<string, unknown> | undefined)?.[cot] ?? null : dong ?? null) as T | null
       },
-      run: <T>() => { nho.clear(); xa(); return gui(() => st.run<T>()) },
+      run: <T>() => { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.run<T>()) },
     }
-    goc.set(p, { st, doc: laDoc })
+    goc.set(p, { st, doc: laDoc, sql })
     return p
   }
   const wrapped = gan({
-    prepare: (sql: string) => boc(db.prepare(sql), /^\s*SELECT\b/i.test(sql)),
+    prepare: (sql: string) => boc(db.prepare(sql), /^\s*SELECT\b/i.test(sql), sql),
     batch: <T>(cau: D1PreparedStatement[]) => {
-      const that = cau.map(st => goc.get(st) ?? { st, doc: false })
+      // Câu không qua `prepare` của bản này (không biết SQL) ⇒ coi như nhắc MỌI bảng (xoá cả sổ nhớ, như trước).
+      const that = cau.map(st => goc.get(st) ?? { st, doc: false, sql: '' })
       if (that.length && that.every(x => x.doc)) return Promise.all(that.map(x => doc(x.st))) as Promise<D1Result<T>[]>
-      nho.clear()
+      if (that.some(x => !x.sql)) nho.clear()
+      else xoaNhoSauGhi(nho, that.map(x => x.sql).join(' ;; '))
       xa()
       return gui(() => db.batch<T>(that.map(x => x.st)))
     },

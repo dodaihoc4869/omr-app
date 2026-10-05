@@ -1,4 +1,4 @@
-import { docDongLop, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
+import { BANG_HO_SO, BANG_MUA, docDongLop, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
 import {BANG_NGAY_CAP,EXP_MOI_VANG,MANH_REN_KHIEN,VANG_REN_KHIEN,ngayDatKhien} from '../../src/lib/kinh-te-game'
 import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08,docCauHinhKichHoat} from './cnh-exp-adapter'
 import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
@@ -57,7 +57,7 @@ export async function loadProfile(env:Env,sbd:string,docSan?:readonly {results:R
   // Cao điểm 01/10: hai SELECT tươi trong MỘT batch của CHÍNH request này, không đệm hồ sơ/vàng hay mùa.
   const [mua,hoSo]=(docSan??await env.DB.batch<Row>(lenhDocHoSo(env,sbd))) as readonly [{results:Row[]},{results:Row[]}]
   const reset=mua.results[0],row0=hoSo.results[0]
-  gieoNho(env.DB,'mua',reset??null) // tối ưu 05/10: các phần sau của CHÍNH lượt này (EXP, Đoàn, đồng bộ học tập) khỏi đọc lại dòng mùa
+  gieoNho(env.DB,'mua',reset??null,BANG_MUA) // tối ưu 05/10: các phần sau của CHÍNH lượt này (EXP, Đoàn, đồng bộ học tập) khỏi đọc lại dòng mùa
   const season=reset?String(JSON.parse(String(reset.json)).id):''
   let row:Row|null|undefined=row0
   if(!row){
@@ -328,8 +328,8 @@ export const DOI_TEN_MOI_NGAY=3
 function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string){
   // Hồ sơ (mùa + hồ sơ, hai SELECT của `loadProfile`) đọc ngay; dòng mùa gieo vào sổ nhớ của lượt để EXP/Đoàn/đồng bộ học tập khỏi đọc lại.
   // Nhớ theo lượt: lệnh `answer` NỘI BỘ của Đoàn (cùng request, chưa ghi gì từ lúc này) dùng lại đúng lượt đọc này thay vì đọc hồ sơ lần nữa.
-  const hoSoSom=som(nhoTheoLuot(env.DB,`hoso|${sbd}`,()=>env.DB.batch<Row>(lenhDocHoSo(env,sbd))))
-  gieoNho(env.DB,'mua',hoSoSom.then(r=>r[0]?.results[0]??null))
+  const hoSoSom=som(nhoTheoLuot(env.DB,`hoso|${sbd}`,()=>env.DB.batch<Row>(lenhDocHoSo(env,sbd)),BANG_HO_SO))
+  gieoNho(env.DB,'mua',hoSoSom.then(r=>r[0]?.results[0]??null),BANG_MUA)
   // Đoàn Hộ Tống: cờ mở Đoàn + dòng chặng (theo `b.ma`) là hai lượt ĐỌC đầu của `doanAction` ⇒ đọc CÙNG lô hồ sơ (nhớ theo lượt; trước: hai đợt nối tiếp sau hồ sơ).
   if(action.startsWith('doan-')){void doanMoCho(env,sbd).catch(()=>null);const maChang=maChangCuaLenh(action,b);if(maChang)void docDongChang(env,maChang).catch(()=>null)}
   // CHỐT ĐÁP ÁN (thầy 29/09 "bấm chốt đáp án nó chấm 1 lúc mới được"): lượt, câu bảo vệ ca thi, phạm vi thầy đặt, bản chấm cũ KHÔNG phụ thuộc hồ sơ ⇒

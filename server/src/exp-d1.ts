@@ -13,7 +13,7 @@ import { emCoGhi } from './dem-ke-hoach'
 import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, D1Result, Env } from './kieu'
 import { DemTTL } from './dem-chung'
-import { docDongMua, nhoTheoLuot } from './doc-d1-theo-luot'
+import { BANG_CAU_HINH, docDongMua, nhoTheoLuot } from './doc-d1-theo-luot'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
 import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, bangGiaExp } from './exp-cau-hinh'
@@ -65,7 +65,7 @@ const TAT: CauHinhExp = { tu: null, dsSbd: [], toanBo: false, tuDsSbd: null }
 
 export async function docCauHinhExp(env: Env): Promise<CauHinhExp> {
   // Nhớ theo lượt (tối ưu 05/10): một request gọi tới đây nhiều lần (Sảnh Đoàn: 3 lần nối tiếp) ⇒ đọc một lần.
-  const r = await an(() => nhoTheoLuot(env.DB, 'cau_hinh|exp_moi', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'").first<{ gia_tri: string }>()), null)
+  const r = await an(() => nhoTheoLuot(env.DB, 'cau_hinh|exp_moi', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'").first<{ gia_tri: string }>(), BANG_CAU_HINH), null)
   if (!r) return EXP_MOI_TU ? { tu: EXP_MOI_TU, dsSbd: [], toanBo: true, tuDsSbd: null } : TAT
   try {
     const o = JSON.parse(String(r.gia_tri)) as Record<string, unknown>
