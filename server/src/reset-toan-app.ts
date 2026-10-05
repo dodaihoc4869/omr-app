@@ -743,6 +743,19 @@ export async function dangLamMoi(env: Env, nowMs: number): Promise<boolean> {
   }
 }
 
+/**
+ * CHỈ ĐỌC ĐỆM (tối ưu 05/10, không chạm D1): bản đệm HAN_DEM_MS còn hạn ⇒ đúng quyết định `dangLamMoi` sẽ trả (true/false) — cùng đệm, cùng luật;
+ * đệm trống/hết hạn ⇒ `null` (nơi gọi phải hỏi `dangLamMoi`, có một lượt D1). Dùng cho lệnh game: biết ngay khi đệm còn, chỉ khi đệm hết mới cho lượt
+ * đọc cổng chạy song song với các lượt ĐỌC đầu của lệnh (mọi lệnh GHI vẫn chờ cổng — index.ts).
+ */
+export function dangLamMoiTuDem(env: Env, nowMs: number): boolean | null {
+  const dungDem = !!env.DB && (typeof env.DB === 'object' || typeof env.DB === 'function')
+  if (!dungDem) return null
+  const c = boNhoChung.get(dbGoc(env.DB as unknown as object))
+  if (!c || !(nowMs >= c.at && nowMs - c.at < HAN_DEM_MS)) return null
+  return CAC_JOB_RESET.some((j, i) => dongBangJob(j, c.v[i], nowMs))
+}
+
 /** Một job có đang đóng băng ghi không (xem `dangLamMoi`, `KhoaJobReset.dongBangTuLenDan`). */
 function dongBangJob(j: KhoaJobReset, c: TrangThaiChung | undefined, nowMs: number): boolean {
   if (!c || !c.choPhep || c.huy || c.lenDanMs === null) return false

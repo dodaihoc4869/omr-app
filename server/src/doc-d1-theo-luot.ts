@@ -22,10 +22,14 @@ export function nhoTheoLuot<T>(db: D1Database, khoa: string, f: () => Promise<T>
   p.catch(() => { if (m.get(khoa) === p) m.delete(khoa) })
   return p
 }
-/** Gieo sẵn sổ nhớ bằng giá trị CHÍNH lượt này vừa đọc theo đường khác (vd. lô mùa + hồ sơ của `loadProfile`). Ngoài bản gộp ⇒ không làm gì. */
+/** Gieo sẵn sổ nhớ bằng giá trị CHÍNH lượt này vừa đọc theo đường khác (vd. lô mùa + hồ sơ của `loadProfile`). Ngoài bản gộp ⇒ không làm gì.
+ *  `giaTri` là Promise (lượt đọc ĐANG bay của chính lượt này) ⇒ người hỏi sau dùng chung lượt ấy; lỗi ⇒ bỏ khỏi sổ (hỏi lại thì đọc lại như cũ). */
 export function gieoNho(db: D1Database, khoa: string, giaTri: unknown): void {
   const m = soNho(db)
-  if (m && !m.has(khoa)) m.set(khoa, Promise.resolve(giaTri))
+  if (!m || m.has(khoa)) return
+  const p = giaTri instanceof Promise ? giaTri : Promise.resolve(giaTri)
+  m.set(khoa, p)
+  p.catch(() => { if (m.get(khoa) === p) m.delete(khoa) })
 }
 /** Dòng mùa game (`game_v2_settings.season`) — đọc một lần mỗi lượt (hồ sơ, EXP, Đoàn, đồng bộ học tập đều cần). Không có dòng ⇒ null. */
 export function docDongMua(db: D1Database): Promise<{ json: string } | null> {
@@ -35,6 +39,35 @@ export function docDongMua(db: D1Database): Promise<{ json: string } | null> {
 export function docDongLop(db: D1Database, sbd: string): Promise<{ lop: string | null } | null> {
   return nhoTheoLuot(db, `lop|${sbd}`, () => db.prepare('SELECT lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ lop: string | null }>())
 }
+/**
+ * RÀO GHI (tối ưu 05/10 — lệnh game khi đệm "cổng đóng băng" của reset vừa hết hạn, index.ts): mọi lệnh GHI qua bản này CHỜ `rao` (lượt đọc cổng đang bay);
+ * cổng báo đang đóng băng ⇒ `rao` bị từ chối ⇒ lệnh ghi bị từ chối, KHÔNG tới D1. Lệnh ĐỌC (SELECT) đi ngay — nhờ vậy lượt đọc cổng chạy CÙNG đợt với
+ * các lượt đọc đầu của lệnh thay vì một đợt riêng trước. Khoá trên `env`: `RAO_GHI` (index.ts đặt, `gameV2` dùng).
+ */
+export const RAO_GHI = Symbol('omr.raoGhi')
+export function raoGhiD1(db: D1Database, rao: Promise<unknown>): D1Database {
+  const goc = new WeakMap<D1PreparedStatement, { st: D1PreparedStatement; doc: boolean }>()
+  const boc = (st: D1PreparedStatement, doc: boolean): D1PreparedStatement => {
+    const p: D1PreparedStatement = {
+      bind: (...tham) => boc(st.bind(...tham), doc),
+      first: <T>(cot?: string) => (doc ? st.first<T>(cot) : rao.then(() => st.first<T>(cot))),
+      all: <T>() => (doc ? st.all<T>() : rao.then(() => st.all<T>())),
+      run: <T>() => rao.then(() => st.run<T>()),
+    }
+    goc.set(p, { st, doc })
+    return p
+  }
+  return gan({
+    prepare: (sql: string) => boc(db.prepare(sql), /^\s*SELECT\b/i.test(sql)),
+    batch: <T>(cau: D1PreparedStatement[]) => {
+      const that = cau.map((st) => goc.get(st) ?? { st, doc: false })
+      const chay = () => db.batch<T>(that.map((x) => x.st))
+      return that.length && that.every((x) => x.doc) ? chay() : rao.then(chay)
+    },
+  }, db)
+}
+/** `db` đã là bản gộp đọc của một lượt (có hàng rào + sổ nhớ của lượt)? */
+export const laBanGop = (db: D1Database): boolean => !!(db as unknown as Record<symbol, unknown>)[DA_GOP]
 export function gopDocD1(db: D1Database, bat = true): D1Database {
   if ((db as unknown as Record<symbol, unknown>)[DA_GOP]) return db
   if (typeof db.batch !== 'function') return db

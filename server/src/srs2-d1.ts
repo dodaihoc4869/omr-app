@@ -717,11 +717,17 @@ export function ganNguonDuoi<T extends object>(lichSu: readonly T[], day: readon
  * Nhãn nợ của các câu (chỉ câu đã làm mà chưa thành thạo, kể cả "Cần thầy dạy lại"): "Sai 2 lần · Ca 26/09 · Lên bảng 28/09 · …".
  * Một truy vấn sổ. Lỗi đọc ⇒ nhãn không có nguồn ("Sai 2 lần · Sai 26/09"). Câu không nợ ⇒ không có trong kết quả.
  */
-export async function docNhanNo(env: Env, sbd: string, hs: HoSo2, qids: readonly string[]): Promise<Map<string, string>> {
+/** Câu (trong `qids`) cần nhãn nợ: đã làm mà chưa thành thạo / cần thầy dạy lại — đúng tập `docNhanNo` đọc lịch sử. */
+export function qidCanNhanNo(hs: HoSo2, qids: readonly string[]): string[] {
+  return [...new Set(qids)].filter((q) => { const t = hs.tt.get(q); return !!t && (laNo(t) || t.catTia) })
+}
+/** `lsSom` (tối ưu 05/10): lịch sử có nguồn nơi gọi đã đọc SỚM cho một TẬP CHA của câu cần nhãn (lượt sắp phát, cùng lúc nạp câu) — mỗi câu một danh sách
+ *  riêng, đọc tập cha cho đúng danh sách ấy ⇒ nhãn y hệt. Vắng ⇒ đọc như cũ. */
+export async function docNhanNo(env: Env, sbd: string, hs: HoSo2, qids: readonly string[], lsSom?: Promise<Map<string, LanLamCoNguon[]> | null>): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  const can = [...new Set(qids)].filter((q) => { const t = hs.tt.get(q); return !!t && (laNo(t) || t.catTia) })
+  const can = qidCanNhanNo(hs, qids)
   if (!can.length) return ra
-  const ls = await docLichSuCoNguon(env, sbd, can).catch(() => null)
+  const ls = await (lsSom ?? docLichSuCoNguon(env, sbd, can)).catch(() => null)
   for (const q of can) {
     const t = hs.tt.get(q)!
     const lich = (ls && ganNguonDuoi(t.lichSu, ls.get(q))) ?? t.lichSu

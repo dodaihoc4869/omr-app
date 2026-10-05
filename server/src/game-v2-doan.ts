@@ -10,6 +10,7 @@
 //
 // Câu chung của TRÙM không tạo bằng chứng cá nhân: không ghi attempt, không ghi sổ, không tính vào trần câu của Đoàn (60).
 import { cheDo2 } from './srs2-d1'
+import { nhoTheoLuot } from './doc-d1-theo-luot'
 import type { Env, D1PreparedStatement } from './kieu'
 import type { Profile } from './game-v2'
 import { PETS, publicQuestion, type PrivateQuestion, type Question } from '../../src/game/than-thu-v2/core'
@@ -55,7 +56,8 @@ export const HAN_CHO_TIEP_MS = 15 * 60_000
 export const LOI_CHUA_MO = 'Đoàn Hộ Tống sắp ra mắt. Em chờ thêm ít hôm nhé.'
 export async function doanMoCho(env: Env, sbd: string): Promise<boolean> {
   try {
-    const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='doan_ho_tong'").first<{ gia_tri: string | null }>()
+    // Nhớ theo lượt (tối ưu 05/10): `gameV2Tho` đọc sẵn cờ cùng lô hồ sơ cho lệnh `doan-*` ⇒ ở đây dùng lại (ngoài bản gộp đọc ⇒ đọc thẳng như cũ).
+    const r = await nhoTheoLuot(env.DB, 'cau_hinh|doan_ho_tong', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='doan_ho_tong'").first<{ gia_tri: string | null }>())
     if (!r?.gia_tri) return false
     const o = JSON.parse(r.gia_tri) as { dsSbd?: unknown; toanBo?: unknown }
     return o.toanBo === true || (Array.isArray(o.dsSbd) && o.dsSbd.map(x => String(x).trim()).includes(sbd))
@@ -168,8 +170,17 @@ function soiHanSession(p: PhongDoan, now: number): boolean {
 }
 
 // ───────────────────────── Đọc / ghi phòng ─────────────────────────
+/** Dòng chặng (JSON + revision) — nhớ theo lượt (tối ưu 05/10): `gameV2Tho` đọc sẵn cùng lô hồ sơ; mọi lệnh GHI của lượt xoá sổ nhớ ⇒ vòng thử lại đọc tươi. */
+export function docDongChang(env: Env, ma: string): Promise<{ json: string; revision: number } | null> {
+  return nhoTheoLuot(env.DB, `doan_chang|${ma}`, () => env.DB.prepare('SELECT json,revision FROM doan_chang WHERE ma=?').bind(ma).first<{ json: string; revision: number }>())
+}
+/** Mã chặng của lệnh `doan-*` có đọc phòng theo `b.ma` (cùng cách chuẩn hoá của `chay`); lệnh không đọc phòng theo `b.ma` ⇒ ''. */
+export function maChangCuaLenh(action: string, b: Row): string {
+  if (action === 'doan-sanh' || action === 'doan-hien-thi' || action === 'doan-mo') return ''
+  return String(b.ma ?? '').trim().toUpperCase()
+}
 async function docPhong(env: Env, ma: string): Promise<{ phong: PhongDoan; revision: number }> {
-  const row = await env.DB.prepare('SELECT json,revision FROM doan_chang WHERE ma=?').bind(ma).first<{ json: string; revision: number }>()
+  const row = await docDongChang(env, ma)
   if (!row) throw new Error('Không tìm thấy chặng này. Em kiểm tra lại mã đoàn.')
   const phong = JSON.parse(row.json) as PhongDoan
   phong.the ??= {}; phong.daGiup ??= []; phong.choGhi ??= [] // phòng mở trước bước 4

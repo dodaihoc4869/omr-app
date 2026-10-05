@@ -15,7 +15,7 @@ import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {congBoSuKien,dungLaiNangLuc,nangLucBat} from './nang-luc-d1'
 import {dtoNangLuc} from './ho-so-dto'
 import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
-import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
+import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,dangLamMoiTuDem,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
@@ -62,7 +62,8 @@ import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
-import { gameV2 } from './game-v2'
+import { gameV2, laLenhCongSongSong } from './game-v2'
+import { RAO_GHI } from './doc-d1-theo-luot'
 import { shopBatCho } from './game-v2-shop'
 import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity } from './game-v2-auth'
@@ -3350,7 +3351,19 @@ const boXuLy = {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
     // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách
     // không coi là lỗi đăng nhập/mất mạng. Ngoài cửa sổ: không tốn truy vấn nào. Chỉ chuyển hướng và /khoe được qua.
-    if (!DUONG_QUA_BANG.has(p) && !p.startsWith('/t/') && !p.startsWith('/d/') && (await dangLamMoi(env, Date.now()))) return ra(LOI_DANG_LAM_MOI)
+    // Tối ưu 05/10: đệm cổng còn hạn ⇒ quyết ngay (không D1, y như `dangLamMoi`). Đệm hết hạn ⇒ lệnh game CHỈ chạm D1 (`laLenhCongSongSong`) cho lượt đọc cổng chạy
+    // SONG SONG với các lượt ĐỌC đầu của lệnh — mọi lệnh GHI của lệnh chờ cổng (rào ghi, doc-d1-theo-luot.ts); cổng báo đóng băng ⇒ trả đúng lời cũ, không ghi gì.
+    // Lệnh khác: chờ cổng trước như cũ.
+    let congGame: Promise<boolean> | null = null
+    if (!DUONG_QUA_BANG.has(p) && !p.startsWith('/t/') && !p.startsWith('/d/')) {
+      const nowCong = Date.now()
+      const tuDem = dangLamMoiTuDem(env, nowCong)
+      if (tuDem === true) return ra(LOI_DANG_LAM_MOI)
+      if (tuDem === null) {
+        if (req.method === 'POST' && p.startsWith('/game-v2/') && laLenhCongSongSong(p.slice('/game-v2/'.length))) congGame = dangLamMoi(env, nowCong)
+        else if (await dangLamMoi(env, nowCong)) return ra(LOI_DANG_LAM_MOI)
+      }
+    }
     // PHIẾU: đường đọc CÔNG KHAI, đặt trước mọi cổng mã bí mật.
     if (req.method === 'GET' && p.startsWith('/phieu/')) {
       return layPhieuR2(env, decodeURIComponent(p.slice('/phieu/'.length)))
@@ -3429,6 +3442,7 @@ const boXuLy = {
           b = {}
         }
       } catch (e: any) {
+        if (congGame && (await congGame)) return ra(LOI_DANG_LAM_MOI) // cổng đi trước mọi lời khác, như cũ
         return ra({ ok: false, error: `Thân gói không phải JSON. Lỗi: ${e.message}` }, 400)
       }
 
@@ -3479,7 +3493,17 @@ const boXuLy = {
       if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
-      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
+      if (p.startsWith('/game-v2/')) {
+        if (!congGame) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
+        // Cổng đang đọc (đệm vừa hết hạn): lệnh chạy ngay với RÀO GHI; cổng báo đóng băng ⇒ trả lời cũ, bỏ kết quả lệnh (mọi lệnh ghi của nó bị rào chặn).
+        const cong = congGame
+        const rao = cong.then((dong) => { if (dong) throw new Error(LOI_DANG_LAM_MOI.error) })
+        rao.catch(() => {})
+        const kq = gameV2({ ...env, [RAO_GHI]: rao } as Env, p.slice('/game-v2/'.length), b, ctx)
+        kq.catch(() => {})
+        if (await cong) return ra(LOI_DANG_LAM_MOI)
+        return ra(await kq)
+      }
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))

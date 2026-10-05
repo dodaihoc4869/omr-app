@@ -18,16 +18,37 @@ export async function gameToken(env:Env,sbd:string,matKhauVuaDoc?:unknown):Promi
 /** ĐỆM XÁC THỰC TOKEN 60 giây (Boss 21/09: `SELECT mat_khau` 38 nghìn lượt/giờ khi D1 nghẽn): chỉ lưu token ĐÃ QUA MỌI KIỂM (chữ ký, hạn, mật khẩu còn khớp); khoá = chính chuỗi token nên không lẫn giữa các em; hết hạn = sớm hơn hạn token.
  *  HỆ QUẢ ĐÃ CHẤP NHẬN: em/thầy đổi mật khẩu hoặc khoá em ⇒ token cũ còn dùng được tới 60 giây rồi mới bị từ chối. KHÔNG dùng cho đăng nhập, vào thi, nộp bài thi (các đường ấy không đi qua hàm này). Token sai/hết hạn KHÔNG bao giờ được đệm. */
 const demXacThuc=new DemTTL<{sbd:string;exp:number}>(60_000,3000)
-export async function gameIdentity(env:Env,b:Record<string,unknown>):Promise<string>{
+/** `khiDaKy` (chỉ-thêm, tối ưu 05/10): gọi NGAY khi token qua bước kiểm KHÔNG chạm D1 (đệm / chữ ký / hạn), TRƯỚC lượt đọc mật khẩu — nơi gọi bắt đầu
+ *  các lượt ĐỌC của mình cùng đợt với lượt ấy (xem `gameIdentityHaiBuoc`). Kết quả, lỗi, đệm y như cũ. */
+export async function gameIdentity(env:Env,b:Record<string,unknown>,khiDaKy?:(sbd:string)=>void):Promise<string>{
+  const {sbd,xong}=await gameIdentityHaiBuoc(env,b)
+  khiDaKy?.(sbd)
+  return xong
+}
+/**
+ * `gameIdentity` TÁCH HAI BƯỚC (tối ưu 05/10) — cùng kiểm, cùng thứ tự, cùng lời lỗi, cùng đệm:
+ *  - bước 1 (KHÔNG chạm D1): đệm xác thực → chữ ký → JSON → không phải mã phụ huynh → còn hạn. Sai ⇒ ném NGAY như cũ (token giả không tốn lượt D1 nào).
+ *    Trả `sbd` của token ĐÃ KÝ ĐÚNG (chính là SBD sẽ trả về nếu bước 2 qua).
+ *  - bước 2 `xong`: mật khẩu còn khớp (một lượt D1; qua ⇒ vào đệm 60 s) ⇒ `sbd`, sai ⇒ lỗi "Mật khẩu đã đổi" như cũ.
+ * Nơi gọi CHỈ được bắt đầu các lượt ĐỌC theo `sbd` (không ghi, không đệm gì, không trả gì cho em) trong lúc chờ `xong` — cùng đợt với lượt đọc mật khẩu;
+ * mọi việc còn lại làm SAU `await xong`. Trúng đệm ⇒ `xong` đã xong sẵn.
+ */
+export async function gameIdentityHaiBuoc(env:Env,b:Record<string,unknown>):Promise<{sbd:string;xong:Promise<string>}>{
   const token=String(b.token??'');const [payload,sig]=token.split('.');if(!payload||!sig)throw new Error('Em nhập lại mật khẩu để mở hồ sơ game trên máy này.')
-  const daBiet=demXacThuc.doc(token,Date.now());if(daBiet&&daBiet.exp>=Date.now())return daBiet.sbd // hết hạn của chính token vẫn được kiểm ở mỗi lượt
+  const daBiet=demXacThuc.doc(token,Date.now());if(daBiet&&daBiet.exp>=Date.now())return {sbd:daBiet.sbd,xong:Promise.resolve(daBiet.sbd)} // hết hạn của chính token vẫn được kiểm ở mỗi lượt
   const expected=await signature(env,payload);let diff=expected.length^sig.length;for(let i=0;i<expected.length;i++)diff|=expected.charCodeAt(i)^(sig.charCodeAt(i)||0);if(diff)throw new Error('Phiên game không hợp lệ.')
   let o:{sbd:string;exp:number;pwd:string};try{o=JSON.parse(atob(payload))}catch{throw new Error('Phiên game không hợp lệ.')}
   if((o as {purpose?:unknown}).purpose)throw new Error('Phiên game không hợp lệ.') // mã phụ huynh (có `purpose`) KHÔNG bao giờ là phiên học sinh
   if(!o.sbd||o.exp<Date.now())throw new Error('Phiên game đã hết hạn. Em đăng nhập lại.')
-  const row=await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(o.sbd).first<{mat_khau:string}>();if(!row?.mat_khau||await hash(row.mat_khau)!==o.pwd)throw new Error('Mật khẩu đã đổi. Em đăng nhập lại.')
-  demXacThuc.ghi(token,Date.now(),{sbd:o.sbd,exp:Number(o.exp)})
-  return o.sbd
+  const xong=(async()=>{
+    // Nhường MỘT vi tác vụ: lượt đọc mật khẩu vào CÙNG lô D1 với các lượt đọc nơi gọi bắt đầu ngay sau bước 1 (bản gộp đọc của lượt) — chỉ bớt lượt gọi D1.
+    await null
+    const row=await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(o.sbd).first<{mat_khau:string}>();if(!row?.mat_khau||await hash(row.mat_khau)!==o.pwd)throw new Error('Mật khẩu đã đổi. Em đăng nhập lại.')
+    demXacThuc.ghi(token,Date.now(),{sbd:o.sbd,exp:Number(o.exp)})
+    return o.sbd
+  })()
+  xong.catch(()=>{}) // nơi gọi luôn `await xong` (lỗi tới đúng chỗ); chặn cảnh báo "lỗi chưa xử lý" khi nơi gọi đang bận chỗ khác
+  return {sbd:o.sbd,xong}
 }
 /**
  * MÃ PHỤ HUYNH (dùng cho `/game-v2-parent`, `/parent-news/*`, `/mom/create|parent-list`, `/ph/*`). HMAC-SHA256, 30 ngày, `purpose:'game-parent'`.

@@ -11,7 +11,7 @@
 // KHÔNG BAO GIỜ NÉM LỖI: EXP hỏng thì lượt nộp bài vẫn thành công (sổ là nguồn sự thật, lần gọi sau tự bắt kịp).
 import { emCoGhi } from './dem-ke-hoach'
 import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
-import type { D1PreparedStatement, Env } from './kieu'
+import type { D1PreparedStatement, D1Result, Env } from './kieu'
 import { DemTTL } from './dem-chung'
 import { docDongMua, nhoTheoLuot } from './doc-d1-theo-luot'
 import { gameIdentity } from './game-v2-auth'
@@ -782,6 +782,49 @@ export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs
     await congVaoHoSoGame(env, sbd, tuNgay, tuy)
     emCoGhi(sbd) // EXP game vừa ghi ⇒ đệm kế hoạch ngày của em hết hiệu lực
     return { bat: true, exp: nhan, daGhiTruoc: false, ...(tuy.ra ? { hoSo: tuy.ra } : {}) }
+  } catch (e) {
+    console.error('[exp] ghi khoản game lỗi (bỏ qua):', e instanceof Error ? e.message : e)
+    return { bat: false, exp: 0, daGhiTruoc: false }
+  }
+}
+
+/**
+ * KHOẢN EXP CÂU GAME GHI CÙNG LÔ CHẤM (tối ưu 05/10, `answer`): đúng các câu lô của `ghiGameNguyenTu` vòng đầu (chèn khoản ⇒ nâng revision hồ sơ ⇒ đọc tổng sổ),
+ * để nơi gọi gắn NGAY SAU câu UPDATE hồ sơ của lô chấm — trước: một lô riêng ở đợt sau. Câu chèn khoản thêm `changes()=1` (nối với CHÍNH câu UPDATE hồ sơ
+ * của lô chấm ngay trước nó): chấm thua CAS ⇒ khoản không vào, dù revision có trùng. `null` ⇒ không đi đường gộp (EXP chưa bật cho em / khoản đã có /
+ * đọc trước lỗi) — nơi gọi đi `ghiKhoanExpGame` như cũ. `hoSoSauCham` = hồ sơ ngay sau câu UPDATE của lô chấm (revision + JSON).
+ */
+export interface KhoanGop { lenh: D1PreparedStatement[]; exp: number; jsonSau: string; revisionSau: number; tuNgay: string; moP08: boolean }
+export function lenhKhoanExpGameGop(env: Env, sbd: string, k: KhoanGame, doc: DocTruocKhoanGame, nowMs: number, hoSoSauCham: { revision: number; json: string }): KhoanGop | null {
+  if (!mocExpCuaEm(doc.cfg, sbd, nowMs)) return null
+  const khoa = `${sbd}|${k.khoa}`
+  if (doc.daCo.has(khoa)) return null
+  const p = JSON.parse(hoSoSauCham.json) as Profile
+  const exp = k.khongTran ? Math.max(0, Math.floor(Number(k.exp) || 0)) : nhanExpGame(p, k.ngay, k.exp)
+  const jsonP = json(p)
+  return {
+    lenh: [
+      env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
+        SELECT ?,?,?,?,?,?,?,?,? WHERE changes()=1 AND EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)
+        AND (? <> 'tiepsuc' OR ? IS NULL OR NOT EXISTS(SELECT 1 FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc' AND ma_nguon=?))`)
+        .bind(khoa, sbd, k.ngay, k.loai, k.qid ?? null, k.maNguon ?? null, exp, k.luc, k.ghiChu, sbd, hoSoSauCham.revision,
+          k.loai, k.maNguon ?? null, sbd, k.ngay, k.maNguon ?? null),
+      env.DB.prepare('UPDATE game_v2_profile SET json=?, revision=revision+1 WHERE sbd=? AND revision=? AND changes()=1')
+        .bind(jsonP, sbd, hoSoSauCham.revision),
+      lenhTongSo(env, sbd, doc.tuNgay),
+    ],
+    exp, jsonSau: jsonP, revisionSau: hoSoSauCham.revision + 1, tuNgay: doc.tuNgay, moP08: doc.moP08,
+  }
+}
+/** Phần SAU lô của khoản gộp (y hệt `ghiKhoanExpGame` sau khi ghi): cộng phần chênh sổ vào thú, xoá đệm kế hoạch. `kq` = kết quả ba câu `g.lenh` trong lô.
+ *  Khoản KHÔNG vào (bị lượt khác chen) ⇒ `null`: nơi gọi đi `ghiKhoanExpGame` như cũ (nó tự xử lý "đã có"/thử lại). Không ném lỗi. */
+export async function xongKhoanExpGameGop(env: Env, sbd: string, g: KhoanGop, kq: readonly D1Result[]): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean; hoSo?: { revision: number; json: string } } | null> {
+  if (!kq[0]?.meta.changes) return null
+  try {
+    const tuy: TuyChonCong = { moP08: g.moP08, hoSo: { revision: g.revisionSau, json: g.jsonSau }, tong: (kq[2]?.results as DongTongSo[] | undefined)?.[0] }
+    await congVaoHoSoGame(env, sbd, g.tuNgay, tuy)
+    emCoGhi(sbd) // EXP game vừa ghi ⇒ đệm kế hoạch ngày của em hết hiệu lực
+    return { bat: true, exp: g.exp, daGhiTruoc: false, ...(tuy.ra ? { hoSo: tuy.ra } : {}) }
   } catch (e) {
     console.error('[exp] ghi khoản game lỗi (bỏ qua):', e instanceof Error ? e.message : e)
     return { bat: false, exp: 0, daGhiTruoc: false }
