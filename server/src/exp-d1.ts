@@ -794,15 +794,38 @@ export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs
  * của lô chấm ngay trước nó): chấm thua CAS ⇒ khoản không vào, dù revision có trùng. `null` ⇒ không đi đường gộp (EXP chưa bật cho em / khoản đã có /
  * đọc trước lỗi) — nơi gọi đi `ghiKhoanExpGame` như cũ. `hoSoSauCham` = hồ sơ ngay sau câu UPDATE của lô chấm (revision + JSON).
  */
-export interface KhoanGop { lenh: D1PreparedStatement[]; exp: number; jsonSau: string; revisionSau: number; tuNgay: string; moP08: boolean }
-export function lenhKhoanExpGameGop(env: Env, sbd: string, k: KhoanGame, doc: DocTruocKhoanGame, nowMs: number, hoSoSauCham: { revision: number; json: string }): KhoanGop | null {
+export interface KhoanGop { lenh: D1PreparedStatement[]; exp: number; jsonSau: string; revisionSau: number; tuNgay: string; moP08: boolean
+  /** Tối ưu 05/10 (chỉ-thêm): bước CỘNG VÀO HỒ SƠ (`congVaoHoSoGame`) gắn CÙNG lô — câu thứ 4 của `lenh`; vắng ⇒ bước ấy chạy sau lô như cũ. */
+  cong?: { jsonMoi: string; revisionMoi: number } }
+/** Tổng sổ EXP/mảnh/ngày đạt của em (đúng câu `lenhTongSo`, `since` = ngày bắt đầu mùa như khoản game) ĐỌC TRƯỚC lô chấm (tối ưu 05/10) — để `lenhKhoanExpGameGop`
+ *  gắn luôn bước cộng vào hồ sơ vào CÙNG lô. EXP mới chưa bật cho em / lỗi ⇒ null (lô như cũ). Chỉ ĐỌC. */
+export interface TongSoTruoc { since: string; tong: DongTongSo }
+export async function docTongSoTruocKhoanGame(env: Env, sbd: string, nowMs: number): Promise<TongSoTruoc | null> {
+  const [cfg, since] = await Promise.all([docCauHinhExp(env), docTuNgayMua(env)])
+  if (!mocExpCuaEm(cfg, sbd, nowMs)) return null
+  const tong = await an(() => lenhTongSo(env, sbd, since).first<DongTongSo>(), null)
+  return tong ? { since, tong } : null
+}
+/** Điều kiện SQL "tổng sổ của em lúc này ĐÚNG BẰNG `t`" (cùng các câu con của `lenhTongSo`; ngày đạt so theo tập đã sắp — luật ngày nghỉ chỉ dùng TẬP ngày). */
+function dieuKienTongSo(sbd: string, since: string, t: DongTongSo): { sql: string; tham: unknown[] } {
+  const dsSap = String(t.ds ?? '').split(',').map((x) => x.trim()).filter(Boolean).sort().join(',')
+  return {
+    sql: `(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) = ?
+      AND (SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) = ?
+      AND (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) = ?
+      AND COALESCE((SELECT group_concat(ngay_vn) FROM (SELECT ngay_vn FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC} ORDER BY ngay_vn)), '') = ?
+      AND ${SQL_KHIEN_MOC} = ? AND COALESCE((SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi'), '') = ?`,
+    tham: [sbd, since, Number(t.e) || 0, sbd, since, Number(t.m) || 0, sbd, since, Number(t.d) || 0, sbd, since, dsSap, String(t.moc ?? ''), String(t.nn ?? '')],
+  }
+}
+export function lenhKhoanExpGameGop(env: Env, sbd: string, k: KhoanGame, doc: DocTruocKhoanGame, nowMs: number, hoSoSauCham: { revision: number; json: string }, tongTruoc?: TongSoTruoc | null): KhoanGop | null {
   if (!mocExpCuaEm(doc.cfg, sbd, nowMs)) return null
   const khoa = `${sbd}|${k.khoa}`
   if (doc.daCo.has(khoa)) return null
   const p = JSON.parse(hoSoSauCham.json) as Profile
   const exp = k.khongTran ? Math.max(0, Math.floor(Number(k.exp) || 0)) : nhanExpGame(p, k.ngay, k.exp)
   const jsonP = json(p)
-  return {
+  const ra: KhoanGop = {
     lenh: [
       env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
         SELECT ?,?,?,?,?,?,?,?,? WHERE changes()=1 AND EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)
@@ -815,11 +838,42 @@ export function lenhKhoanExpGameGop(env: Env, sbd: string, k: KhoanGame, doc: Do
     ],
     exp, jsonSau: jsonP, revisionSau: hoSoSauCham.revision + 1, tuNgay: doc.tuNgay, moP08: doc.moP08,
   }
+  // Tối ưu 05/10 — CỘNG VÀO HỒ SƠ CÙNG LÔ (trước: `congVaoHoSoGame` sau lô, một đợt riêng): biết tổng sổ TRƯỚC lô (`tongTruoc`, cùng `since`) ⇒ tổng SAU khi khoản
+  // vào = tổng trước + exp (khoản game chỉ ghi `exp_so`). Tính hồ sơ mới y như `congVaoHoSoGame` (cùng hàm, cùng số) rồi ghi bằng câu CHỈ chạy khi câu khoản vừa
+  // thắng (`changes() = 1`), đúng revision, VÀ tổng sổ lúc ấy đúng bằng số đã dùng để tính. Không khớp (lượt khác chen) ⇒ câu không đổi gì, phần sau lô làm
+  // `congVaoHoSoGame` như cũ. Không cần cộng (tổng đã khớp hồ sơ) ⇒ không gắn gì.
+  if (tongTruoc && tongTruoc.since === doc.tuNgay) {
+    const t: DongTongSo = { ...tongTruoc.tong, e: (Number(tongTruoc.tong.e) || 0) + exp }
+    let pc: HoSoGameExp & Record<string, unknown>
+    try { pc = JSON.parse(jsonP) as HoSoGameExp & Record<string, unknown> } catch { return ra }
+    const tongExp = Number(t.e) || 0, tongManh = Number(t.m) || 0, ngayDat = Number(t.d) || 0
+    const ngayNghi = demNgayNghiChoCap(String(t.nn ?? ''), String(t.ds ?? ''), String(t.moc ?? ''), doc.tuNgay, ngayVn(nowMs))
+    if (tongExp === (pc.expMoi?.daCong ?? 0) && tongManh === (pc.expMoi?.manhDaTinh ?? 0) && ngayDat === (pc.expMoi?.ngayDat ?? 0) && ngayNghi === (pc.expMoi?.ngayNghi ?? 0)) return ra
+    const cong = congTongSoVaoHoSo(pc, tongExp, tongManh, ngayDat, ngayNghi)
+    const jsonMoi = json(pc)
+    const dk = dieuKienTongSo(sbd, doc.tuNgay, t)
+    ra.lenh.push(env.DB.prepare(`UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ? AND changes() = 1 AND ${dk.sql}`)
+      .bind(jsonMoi, sbd, ra.revisionSau, ...dk.tham))
+    if (doc.moP08 && cong.exp > 0) {
+      ra.lenh.push(env.DB.prepare(
+        `UPDATE cnh_exp_account
+            SET wallet_exp = wallet_exp + ?, earned_exp = earned_exp + ?, revision = revision + 1, cap_nhat_luc = datetime('now')
+          WHERE student_id = ? AND changes() = 1`,
+      ).bind(cong.exp, cong.exp, sbd))
+    }
+    ra.cong = { jsonMoi, revisionMoi: ra.revisionSau + 1 }
+  }
+  return ra
 }
 /** Phần SAU lô của khoản gộp (y hệt `ghiKhoanExpGame` sau khi ghi): cộng phần chênh sổ vào thú, xoá đệm kế hoạch. `kq` = kết quả ba câu `g.lenh` trong lô.
  *  Khoản KHÔNG vào (bị lượt khác chen) ⇒ `null`: nơi gọi đi `ghiKhoanExpGame` như cũ (nó tự xử lý "đã có"/thử lại). Không ném lỗi. */
 export async function xongKhoanExpGameGop(env: Env, sbd: string, g: KhoanGop, kq: readonly D1Result[]): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean; hoSo?: { revision: number; json: string } } | null> {
   if (!kq[0]?.meta.changes) return null
+  // Bước cộng vào hồ sơ đã chạy CÙNG lô (tối ưu 05/10) ⇒ xong, khỏi một đợt; câu ấy không đổi gì (tổng sổ lệch) ⇒ `congVaoHoSoGame` như cũ bên dưới.
+  if (g.cong && Number(kq[3]?.meta.changes ?? 0) > 0) {
+    emCoGhi(sbd)
+    return { bat: true, exp: g.exp, daGhiTruoc: false, hoSo: { revision: g.cong.revisionMoi, json: g.cong.jsonMoi } }
+  }
   try {
     const tuy: TuyChonCong = { moP08: g.moP08, hoSo: { revision: g.revisionSau, json: g.jsonSau }, tong: (kq[2]?.results as DongTongSo[] | undefined)?.[0] }
     await congVaoHoSoGame(env, sbd, g.tuNgay, tuy)

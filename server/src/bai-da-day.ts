@@ -17,6 +17,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
+import { nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { laCauTuLuan } from './cam-tu-luan'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
@@ -93,6 +94,19 @@ async function bangLopCacEm(env: Env, nowMs = Date.now()): Promise<Map<string, E
   const db = dbGoc(env.DB as unknown as object)
   const o = demLop.doc('bang', nowMs)
   if (o && o.db === db) return o.v
+  // Tối ưu 05/10: lúc đệm vừa hết, nhiều chỗ CÙNG LÚC hỏi lớp (phạm vi bài + prior lớp của MỘT em; Bảng bài của thầy: từng em trong 40 em) ⇒ dùng chung
+  // MỘT lượt đọc đang bay (như đệm 30 s vốn dùng chung kết quả; trước: mỗi chỗ một cặp câu đọc cả bảng — Bảng bài: 80 cặp). Xong ⇒ bỏ khỏi sổ đang bay.
+  const dang = dangDocLop.get(db)
+  if (dang) return dang
+  const p = docBangLopCacEm(env, nowMs, db)
+  dangDocLop.set(db, p)
+  const bo = () => { if (dangDocLop.get(db) === p) dangDocLop.delete(db) }
+  p.then(bo, bo)
+  return p
+}
+/** Lượt đọc bảng lớp ĐANG BAY theo D1 gốc (tối ưu 05/10). */
+const dangDocLop = new WeakMap<object, Promise<Map<string, EmLop>>>()
+async function docBangLopCacEm(env: Env, nowMs: number, db: object): Promise<Map<string, EmLop>> {
   const hoi = async (sql: string): Promise<Row[] | null> => {
     try {
       return (await env.DB.prepare(sql).all<Row>()).results ?? []
@@ -178,6 +192,9 @@ const demPhamVi = new DemTTL<{ db: object; v: PhamViLop | null }>(30_000, 200)
 export function xoaDemPhamVi(lop?: string): void {
   if (lop) demPhamVi.xoaKhoa(lop)
   else demPhamVi.xoa()
+  // Tối ưu 05/10: lượt đọc đang bay (bắt đầu trước khi thầy đổi) không được chia cho người hỏi SAU lúc này.
+  if (lop) for (const m of dangDocPhamVi.values()) m.delete(lop)
+  else dangDocPhamVi.clear()
 }
 
 /**
@@ -216,18 +233,36 @@ export async function phamViLop(env: Env, lop: string): Promise<PhamViLop | null
   const now = Date.now()
   const o = demPhamVi.doc(l, now)
   if (o && o.db === db) return o.v
-  try {
-    const [tick, pv] = await Promise.all([
-      env.DB.prepare('SELECT khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, chien_dich_id FROM bai_da_day WHERE lop = ? AND bo_tick_luc IS NULL ORDER BY vi_tri, tick_luc').bind(l).all<Row>(),
-      env.DB.prepare('SELECT khoa_bai, ten_bai, vi_tri, ma_de_json FROM pham_vi_lop WHERE lop = ? ORDER BY vi_tri').bind(l).all<Row>(),
-    ])
-    const v = dungPhamVi(l, tick.results ?? [], pv.results ?? [])
-    demPhamVi.ghi(l, now, { db, v })
-    return v
-  } catch (e) {
-    if (/no such table/i.test(String(e))) demPhamVi.ghi(l, now, { db, v: null }) // chưa ai tick bài nào ⇒ bảng chưa có
-    return null
-  }
+  // Tối ưu 05/10: nhiều chỗ CÙNG LÚC hỏi phạm vi của một lớp lúc đệm vừa hết (Bảng bài: từng em của lớp) ⇒ dùng chung MỘT lượt đọc đang bay (như đệm 30 s).
+  // `xoaDemPhamVi` (thầy vừa tick/bỏ tick) bỏ luôn lượt đang bay ⇒ lần hỏi sau đọc tươi.
+  const dangBay = dangDocPhamVi.get(db)?.get(l)
+  if (dangBay) return dangBay
+  const p = docPhamViLop(env, l, db, now)
+  let m = dangDocPhamVi.get(db)
+  if (!m) { m = new Map(); dangDocPhamVi.set(db, m) }
+  const so = m
+  so.set(l, p)
+  const bo = () => { if (so.get(l) === p) so.delete(l); if (!so.size && dangDocPhamVi.get(db) === so) dangDocPhamVi.delete(db) }
+  p.then(bo, bo)
+  return p
+}
+/** Lượt đọc phạm vi lớp ĐANG BAY theo (D1 gốc, lớp) (tối ưu 05/10). Xong ⇒ tự bỏ; `xoaDemPhamVi` bỏ luôn. */
+const dangDocPhamVi = new Map<object, Map<string, Promise<PhamViLop | null>>>()
+async function docPhamViLop(env: Env, l: string, db: object, now: number): Promise<PhamViLop | null> {
+  return nhoTheoLuot(env.DB, `pham_vi_lop|${l}`, async () => {
+    try {
+      const [tick, pv] = await Promise.all([
+        env.DB.prepare('SELECT khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, chien_dich_id FROM bai_da_day WHERE lop = ? AND bo_tick_luc IS NULL ORDER BY vi_tri, tick_luc').bind(l).all<Row>(),
+        env.DB.prepare('SELECT khoa_bai, ten_bai, vi_tri, ma_de_json FROM pham_vi_lop WHERE lop = ? ORDER BY vi_tri').bind(l).all<Row>(),
+      ])
+      const v = dungPhamVi(l, tick.results ?? [], pv.results ?? [])
+      demPhamVi.ghi(l, now, { db, v })
+      return v
+    } catch (e) {
+      if (/no such table/i.test(String(e))) demPhamVi.ghi(l, now, { db, v: null }) // chưa ai tick bài nào ⇒ bảng chưa có
+      return null
+    }
+  }, ['bai_da_day', 'pham_vi_lop'])
 }
 
 /** Phạm vi đã dạy của EM (theo lớp của em: lớp trong danh sách học sinh / chiến dịch gần nhất của em). null ⇒ không lọc. */

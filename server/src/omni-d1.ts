@@ -31,6 +31,7 @@ import { ngayVn, phanTuQid } from './su-kien-hoc'
 import { tachSongSinh } from './loi-hoc-luat'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
+import { daNho, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { boTroTheoQid } from './song-sinh-game'
@@ -449,13 +450,25 @@ async function docDongSoTho(env: Env, sbds: readonly string[], tuNhan?: number):
     return (await env.DB.prepare(`SELECT ${COT_SO_CU} FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?))`).bind(ds).all<Row>()).results ?? []
   }
 }
-/** Dòng sổ của các em (một truy vấn `sbd IN (…)`). D1 cũ thiếu cột CNH-1.0 ⇒ lùi câu SQL không có cột mới (như `docLanLam`). `dem` (số đếm vừa đọc) ⇒ dùng đệm dòng sổ. */
-async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<string, DemSo>): Promise<Row[]> {
+/**
+ * Dòng sổ của MỘT em ĐỌC ĐOÁN TRƯỚC (tối ưu 05/10), CÙNG đợt với `demSoDong`: đệm dòng sổ đang có ⇒ phần tiếp nhận từ mốc đệm (`tu`), chưa có ⇒ cả sổ (`tu` null).
+ * `docDongSo` CHỈ dùng khi đó đúng là lượt đọc nó sẽ tự chạy (cùng em, cùng câu SQL, cùng tham số); không khớp ⇒ đọc như cũ. Lỗi ⇒ null (đọc như cũ).
+ */
+interface SoDoan { sbd: string; tu: number | null; p: Promise<Row[] | null> }
+function docSoDoan(env: Env, s: string): SoDoan {
+  const cu = demSo.doc(s, Date.now())
+  const tu = cu && cu.r > 0 ? cu.r : null
+  return { sbd: s, tu, p: (tu != null ? docDongSoTho(env, [s], tu) : docDongSoTho(env, [s])).then((x) => x, () => null) }
+}
+/** Dòng sổ của các em (một truy vấn `sbd IN (…)`). D1 cũ thiếu cột CNH-1.0 ⇒ lùi câu SQL không có cột mới (như `docLanLam`). `dem` (số đếm vừa đọc) ⇒ dùng đệm dòng sổ.
+ *  `soDoan` (chỉ-thêm, tối ưu 05/10): dòng sổ một em đã đọc đoán trước — dùng thay lượt đọc giống hệt. */
+async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<string, DemSo>, soDoan?: SoDoan): Promise<Row[]> {
   if (!sbds.length) return []
   if (!dem) return docDongSoTho(env, sbds)
   const now = Date.now()
   const ra: Row[] = []
   const can: string[] = []
+  const doan = async (s: string, tu: number | null): Promise<Row[] | null> => (soDoan && soDoan.sbd === s && soDoan.tu === tu ? soDoan.p : null)
   for (const s of sbds) {
     const d = dem.get(s) ?? { n: 0, r: 0 }
     const cu = demSo.doc(s, now)
@@ -463,7 +476,7 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
     if (cu && cu.r > 0 && d.n > cu.n && d.r >= cu.r) {
       try {
         const daCo = new Set(cu.rows.map((x) => str(x.khoa)))
-        const moi = (await docDongSoTho(env, [s], cu.r)).filter((x) => !daCo.has(str(x.khoa)))
+        const moi = ((await doan(s, cu.r)) ?? (await docDongSoTho(env, [s], cu.r))).filter((x) => !daCo.has(str(x.khoa)))
         if (cu.n + moi.length === d.n) {
           const rows = [...cu.rows, ...moi]
           demSo.ghi(s, now, { rows, n: rows.length, r: maxNhan(rows) }, rows.length)
@@ -475,7 +488,7 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
     can.push(s)
   }
   if (can.length) {
-    const rows = await docDongSoTho(env, can)
+    const rows = (can.length === 1 ? await doan(can[0]!, null) : null) ?? (await docDongSoTho(env, can))
     const theo = new Map<string, Row[]>(can.map((s) => [s, []]))
     for (const x of rows) theo.get(str(x.sbd))?.push(x)
     for (const [s, a] of theo) {
@@ -554,9 +567,22 @@ async function docPhamViNhieuEm(env: Env, sbds: readonly string[]): Promise<Map<
   return new Map(sbds.map((s, i) => [s, ds[i] ?? null]))
 }
 interface SoVaMeta { suKien: Map<string, SuKienOmni[]>; kho: Map<string, CauKho>; goiY: Map<string, GoiYCau>; phamVi: Map<string, PhamViLop | null>; baiCuaQid: Map<string, Map<string, string>> }
-/** Sổ của nhiều em ⇒ SuKienOmni (bỏ dòng che — ca chưa công bố), kèm siêu dữ liệu câu. `truocMs` ⇒ chỉ dòng TIẾP NHẬN trước mốc (ảnh chụp đêm). */
-async function docSoVaMeta(env: Env, sbds: readonly string[], truocMs?: number, dem?: ReadonlyMap<string, DemSo>): Promise<SoVaMeta> {
-  const [rows, phamVi] = await Promise.all([docDongSo(env, sbds, dem), docPhamViNhieuEm(env, sbds)])
+/** Câu (qid gốc) có thời lượng làm (`raw_json.ms`) trong sổ — ĐÚNG thứ tự `dungHoSoNoi` duyệt `suKien` (em theo `sbds`, sự kiện theo (tiếp nhận, khoá)). Thuần. */
+function cauCoMsTuDong(sbds: readonly string[], theoEm: ReadonlyMap<string, readonly Row[]>): string[] {
+  const ra = new Set<string>()
+  for (const s of sbds) {
+    const ds = (theoEm.get(s) ?? []).map((x) => ({ khoa: str(x.khoa), receivedAt: thoiDiemTiepNhan(x), qid: tachSongSinh(str(x.qid)).goc, ms: docRawOmni(x.raw_json).msLam }))
+    ds.sort((a, b) => a.receivedAt - b.receivedAt || (a.khoa < b.khoa ? -1 : a.khoa > b.khoa ? 1 : 0)) // = sapSuKien
+    for (const e of ds) if (e.ms != null) ra.add(e.qid)
+  }
+  return [...ra]
+}
+/** Sổ của nhiều em ⇒ SuKienOmni (bỏ dòng che — ca chưa công bố), kèm siêu dữ liệu câu. `truocMs` ⇒ chỉ dòng TIẾP NHẬN trước mốc (ảnh chụp đêm).
+ *  Tối ưu 05/10 (chỉ-thêm): `som` = dòng sổ / phạm vi đã đọc đoán trước; `khiCoMs` = báo NGAY khi có dòng sổ danh sách câu có thời lượng (để β câu đọc sớm).
+ *  Siêu dữ liệu câu bắt đầu ngay khi có dòng sổ (trước: chờ cả phạm vi bài). Kết quả y hệt. */
+async function docSoVaMeta(env: Env, sbds: readonly string[], truocMs?: number, dem?: ReadonlyMap<string, DemSo>, som?: { so?: SoDoan; phamVi?: Promise<Map<string, PhamViLop | null>> }, khiCoMs?: (coMs: string[]) => void): Promise<SoVaMeta> {
+  const pPhamVi = som?.phamVi ?? docPhamViNhieuEm(env, sbds)
+  const rows = await docDongSo(env, sbds, dem, som?.so)
   const theoEm = new Map<string, Row[]>()
   const goiY = new Map<string, GoiYCau>()
   for (const x of rows) {
@@ -569,7 +595,8 @@ async function docSoVaMeta(env: Env, sbds: readonly string[], truocMs?: number, 
     const g = tachSongSinh(str(x.qid)).goc
     if (!goiY.has(g)) goiY.set(g, { phan: phanTuQid(g, 'I') as Phan, maDang: str(x.ma_dang).trim() || null, mucDo: str(x.muc_do).trim() || null, chuyenDe: str(x.chuyen_de).trim() || null })
   }
-  const kho = await docCauKho(env, [...goiY.keys()])
+  if (khiCoMs) khiCoMs(cauCoMsTuDong(sbds, theoEm))
+  const [kho, phamVi] = await Promise.all([docCauKho(env, [...goiY.keys()]), pPhamVi])
   const suKien = new Map<string, SuKienOmni[]>()
   const baiCuaQid = new Map<string, Map<string, string>>()
   for (const s of sbds) {
@@ -594,12 +621,18 @@ export async function docSuKienOmni(env: Env, sbds: readonly string[], tuy: { tr
 }
 
 // ---------------------------------------------------------------- β câu, xác nhận thầy, lớp
+/** β câu (thời gian chuẩn) — nhớ theo lượt; `docSomOmniTraLoi` (omni-game.ts) đọc sớm câu đang trả lời. */
+export const docBetaCau = (env: Env, qids: readonly string[]): Promise<Map<string, number>> => docBeta(env, qids)
 async function docBeta(env: Env, qids: readonly string[]): Promise<Map<string, number>> {
-  const ra = new Map<string, number>()
-  if (!qids.length) return ra
-  const r = await env.DB.prepare('SELECT qid, beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(dsJson(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
-  for (const x of r.results ?? []) if (x.beta != null && Number.isFinite(Number(x.beta))) ra.set(str(x.qid), Number(x.beta))
-  return ra
+  if (!qids.length) return new Map<string, number>()
+  // Nhớ theo lượt (tối ưu 05/10): cùng danh sách câu trong MỘT request (đọc sớm lúc trả lời / hai lượt dựng hồ sơ) ⇒ một lượt đọc. Nơi gọi không sửa Map trả về.
+  const ds = dsJson(qids)
+  return nhoTheoLuot(env.DB, `omni_beta|${ds}`, async () => {
+    const ra = new Map<string, number>()
+    const r = await env.DB.prepare('SELECT qid, beta FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?))').bind(ds).all<Row>().catch(() => ({ results: [] as Row[] }))
+    for (const x of r.results ?? []) if (x.beta != null && Number.isFinite(Number(x.beta))) ra.set(str(x.qid), Number(x.beta))
+    return ra
+  }, ['omni_beta_cau'])
 }
 async function docXacNhan(env: Env, sbds: readonly string[]): Promise<Map<string, XacNhanThay[]>> {
   const ra = new Map<string, XacNhanThay[]>()
@@ -629,27 +662,38 @@ async function lopCuaNhieuEm(env: Env, sbds: readonly string[]): Promise<Map<str
 }
 
 // ---------------------------------------------------------------- dựng hồ sơ (phát lại)
-interface TuyDung { truocMs?: number; coPrior: boolean; homNay: string; ts: ThamSoOmni; dem?: ReadonlyMap<string, DemSo> }
+/** Lượt đọc của bước dựng hồ sơ MỘT em bắt đầu ĐOÁN TRƯỚC (tối ưu 05/10, `hoSoOmniNhieuEm`): cùng đợt với lượt đếm sổ. Không promise nào bị từ chối. */
+interface DocSomHoSo { so: SoDoan; xacNhan: Promise<Map<string, XacNhanThay[]>>; phamVi: Promise<Map<string, PhamViLop | null>>; prior: Promise<Map<string, Map<string, number>>> }
+function batDauDocHoSo(env: Env, sbd: string, homNay: string, tsP: Promise<ThamSoOmni>): DocSomHoSo {
+  return { so: docSoDoan(env, sbd), xacNhan: docXacNhan(env, [sbd]), phamVi: docPhamViNhieuEm(env, [sbd]), prior: tsP.then((ts) => priorChoNhieuEm(env, [sbd], homNay, ts)) }
+}
+interface TuyDung { truocMs?: number; coPrior: boolean; homNay: string; ts: ThamSoOmni; dem?: ReadonlyMap<string, DemSo>; som?: DocSomHoSo }
 interface KetQuaDung { hs: HoSoOmniEm; p0: ReadonlyMap<string, number>; suKien: SuKienOmni[] }
 async function dungHoSoNoi(env: Env, sbdsVao: readonly string[], tuy: TuyDung): Promise<Map<string, KetQuaDung>> {
   const ra = new Map<string, KetQuaDung>()
   const sbds = [...new Set(sbdsVao.filter(Boolean))]
   if (!sbds.length) return ra
-  const [so, xn] = await Promise.all([docSoVaMeta(env, sbds, tuy.truocMs, tuy.dem), docXacNhan(env, sbds)])
+  // Tối ưu 05/10: prior lớp + xác nhận của thầy KHÔNG phụ thuộc sổ của em ⇒ bắt đầu NGAY (trước: prior chờ cả sổ + siêu dữ liệu câu); β câu bắt đầu ngay
+  // khi có dòng sổ (trước: chờ thêm siêu dữ liệu + phạm vi). Cùng tham số, cùng thứ tự ⇒ kết quả y hệt. `som` chỉ dùng khi đúng MỘT em ấy.
+  const som = tuy.som && sbds.length === 1 && tuy.som.so.sbd === sbds[0] && tuy.truocMs == null && tuy.coPrior ? tuy.som : undefined
+  const pPrior = tuy.coPrior ? (som?.prior ?? priorChoNhieuEm(env, sbds, tuy.homNay, tuy.ts)) : Promise.resolve(new Map<string, Map<string, number>>())
+  const beta: { p: Promise<Map<string, number>> | null } = { p: null }
+  const [so, xn] = await Promise.all([
+    docSoVaMeta(env, sbds, tuy.truocMs, tuy.dem, som, (coMs) => { beta.p = docBeta(env, coMs) }),
+    som?.xacNhan ?? docXacNhan(env, sbds),
+  ])
   const qids = [...so.goiY.keys()]
-  const coMs = new Set<string>()
-  for (const ds of so.suKien.values()) for (const e of ds) if (e.msLam != null) coMs.add(e.qid)
-  const [q, beta, prior] = await Promise.all([
+  const [q, betaCau, prior] = await Promise.all([
     qTuKho(env, qids, so.kho, so.goiY),
-    docBeta(env, [...coMs]),
-    tuy.coPrior ? priorChoNhieuEm(env, sbds, tuy.homNay, tuy.ts) : Promise.resolve(new Map<string, Map<string, number>>()),
+    beta.p ?? docBeta(env, []),
+    pPrior,
   ])
   const catIso = tuy.truocMs != null ? new Date(tuy.truocMs).toISOString() : null
   for (const s of sbds) {
     const suKien = so.suKien.get(s) ?? []
     const xacNhan = (xn.get(s) ?? []).filter((v) => !catIso || v.luc < catIso)
     const p0 = prior.get(s) ?? new Map<string, number>()
-    const hs = phatLaiEm(s, { suKien, q, beta, xacNhan, p0, homNay: tuy.homNay, baiCuaQid: so.baiCuaQid.get(s) ?? new Map(), ts: tuy.ts })
+    const hs = phatLaiEm(s, { suKien, q, beta: betaCau, xacNhan, p0, homNay: tuy.homNay, baiCuaQid: so.baiCuaQid.get(s) ?? new Map(), ts: tuy.ts })
     ra.set(s, { hs, p0, suKien })
   }
   return ra
@@ -722,18 +766,23 @@ async function priorChoNhieuEm(env: Env, sbds: readonly string[], homNay: string
 }
 
 // ---------------------------------------------------------------- hồ sơ trực tiếp (đệm 60 s)
+const khoaDemSo = (sbds: readonly string[]): string => `omni_dem_so|${dsJson(sbds)}`
 async function demSoDong(env: Env, sbds: readonly string[]): Promise<Map<string, DemSo>> {
   const ra = new Map<string, DemSo>()
   if (!sbds.length) return ra
   const ds = dsJson(sbds)
-  let rows: Row[]
-  try {
-    rows = (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(COALESCE(received_at, 0)) AS r FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
-  } catch {
-    // D1 cũ chưa có `received_at`: khoá theo số dòng + giờ học lớn nhất (đệm dòng sổ không dùng — r âm không bao giờ khớp)
-    rows = (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(luc) AS l FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
-    for (const x of rows) x.r = -(Date.parse(str(x.l)) || 1)
-  }
+  // Nhớ theo lượt (tối ưu 05/10): MỘT request hỏi số đếm sổ của cùng (các) em nhiều lần (đoán trước lúc trả lời, Sảnh: lập kế hoạch rồi phần OMNI) ⇒ một lượt đọc;
+  // lượt ghi `su_kien_hoc` của chính request ⇒ đếm lại.
+  const rows = await nhoTheoLuot(env.DB, khoaDemSo(sbds), async () => {
+    try {
+      return (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(COALESCE(received_at, 0)) AS r FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
+    } catch {
+      // D1 cũ chưa có `received_at`: khoá theo số dòng + giờ học lớn nhất (đệm dòng sổ không dùng — r âm không bao giờ khớp)
+      const cu = (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(luc) AS l FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
+      for (const x of cu) x.r = -(Date.parse(str(x.l)) || 1)
+      return cu
+    }
+  }, ['su_kien_hoc'])
   for (const x of rows) ra.set(str(x.sbd), { n: Number(x.n) || 0, r: Number(x.r) || 0 })
   return ra
 }
@@ -744,8 +793,15 @@ export async function hoSoOmniNhieuEm(env: Env, dsSbd: readonly string[], nowMs:
   const ra = new Map<string, HoSoOmniEm>()
   let ts: ThamSoOmni = THAM_SO_OMNI
   try {
-    ts = await docThamSoOmni(env)
-    const dem = await demSoDong(env, sbds)
+    // Tối ưu 05/10: lượt đếm sổ KHÔNG cần tham số ⇒ bắt đầu cùng lượt đọc tham số (trước: chờ tham số xong). Thứ tự `await` như cũ (tham số trước).
+    // MỘT em, lượt hỏi ĐẦU TIÊN của request (bản gộp đọc của lệnh game): các lượt đọc của bước dựng (sổ, xác nhận của thầy, phạm vi bài, prior lớp) cũng bắt đầu
+    // CÙNG đợt. Đệm hồ sơ trúng ⇒ bỏ chúng (chỉ phí vài câu đọc nhỏ cùng lô); trượt ⇒ dùng đúng chúng (trước: 3–6 đợt nối tiếp sau lượt đếm).
+    const tsP = docThamSoOmni(env)
+    const som = sbds.length === 1 && laBanGop(env.DB) && !daNho(env.DB, khoaDemSo(sbds)) ? batDauDocHoSo(env, sbds[0]!, homNay, tsP) : undefined
+    const demP = demSoDong(env, sbds)
+    demP.catch(() => {})
+    ts = await tsP
+    const dem = await demP
     const khoa = (s: string) => `${s}|${homNay}|${dem.get(s)?.n ?? 0}|${dem.get(s)?.r ?? 0}|${khoaTs(ts)}|${phienBanDem}`
     const thieu: string[] = []
     for (const s of sbds) {
@@ -754,7 +810,7 @@ export async function hoSoOmniNhieuEm(env: Env, dsSbd: readonly string[], nowMs:
       else thieu.push(s)
     }
     if (thieu.length) {
-      const moi = await dungHoSoNoi(env, thieu, { coPrior: true, homNay, ts, dem })
+      const moi = await dungHoSoNoi(env, thieu, { coPrior: true, homNay, ts, dem, som })
       for (const [s, k] of moi) { ra.set(s, k.hs); demHoSo.ghi(khoa(s), nowMs, k.hs) }
     }
   } catch { /* lỗi ⇒ hồ sơ rỗng cho em còn thiếu */ }
@@ -763,7 +819,9 @@ export async function hoSoOmniNhieuEm(env: Env, dsSbd: readonly string[], nowMs:
 }
 /** Hồ sơ OMNI của em tại `nowMs` (phát lại TOÀN BỘ sổ + Q + β + xác nhận + prior lớp + bài của câu; đệm 60 s). Lỗi ⇒ hồ sơ rỗng (prior). */
 export async function hoSoOmniEm(env: Env, sbd: string, nowMs: number): Promise<HoSoOmniEm> {
-  return (await hoSoOmniNhieuEm(env, [sbd], nowMs)).get(sbd)!
+  // Nhớ theo lượt (tối ưu 05/10): `answer` hỏi hồ sơ HAI lần song song (thời gian kỳ vọng + hồ sơ) và đoán trước lúc vào lệnh ⇒ MỘT lần dựng (trước: dựng hai lần).
+  // Không khai bảng ⇒ MỌI lệnh ghi của request xoá mục này (hỏi sau lệnh ghi ⇒ dựng lại như cũ). Hồ sơ trả về dùng chung (như đệm 60 s) — nơi gọi không sửa.
+  return nhoTheoLuot(env.DB, `omni_ho_so|${sbd}|${ngayVnCua(nowMs)}`, async () => (await hoSoOmniNhieuEm(env, [sbd], nowMs)).get(sbd)!)
 }
 /** Thời gian kỳ vọng riêng (ms) của em cho câu: e^{β câu − τ em} (omni-toc-do.ts `msKyVong`; β vắng ⇒ ước lượng theo phần × mức). */
 export async function kyVongMsCau(env: Env, sbd: string, q: { qid: string; phan: 'I' | 'II' | 'III'; mucDo: string | null }, nowMs: number): Promise<number> {
@@ -777,8 +835,12 @@ export async function kyVongMsCau(env: Env, sbd: string, q: { qid: string; phan:
 }
 /** Số lượt lướt hôm nay của em (dòng purpose 'luot' ngày VN hôm nay). Lỗi / D1 cũ ⇒ 0. */
 export async function soLuotHomNay(env: Env, sbd: string, nowMs: number): Promise<number> {
-  const r = await env.DB.prepare('SELECT COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND purpose = ?').bind(sbd, ngayVnCua(nowMs), MUC_DICH_LUOT).first<Row>().catch(() => null)
-  return Number(r?.n) || 0
+  const ngay = ngayVnCua(nowMs)
+  // Nhớ theo lượt (tối ưu 05/10): đọc đoán trước lúc vào lệnh trả lời dùng lại; lệnh ghi sổ của chính request ⇒ đọc lại.
+  return nhoTheoLuot(env.DB, `omni_luot|${sbd}|${ngay}`, async () => {
+    const r = await env.DB.prepare('SELECT COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND purpose = ?').bind(sbd, ngay, MUC_DICH_LUOT).first<Row>().catch(() => null)
+    return Number(r?.n) || 0
+  }, ['su_kien_hoc'])
 }
 
 // ---------------------------------------------------------------- tiện ích phạm vi / dự báo
@@ -892,14 +954,22 @@ async function conCauMoiChuaLam(env: Env, sbd: string, nowMs: number, dangLuyen:
 }
 
 // ---------------------------------------------------------------- Sảnh
-/** Phần OMNI thêm vào `hoa2-sanh` (null khi OMNI tắt cho em hoặc lỗi — Sảnh cũ không bao giờ hỏng vì OMNI). */
-export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { tong: number; con: number; chienDichId: string | null; onBaiCu?: number; cheDoCho?: boolean }): Promise<SanhOmni | null> {
+/** Lượt ĐỌC của ô OMNI trên Sảnh KHÔNG phụ thuộc kế hoạch hôm nay (tối ưu 05/10): `sanh2` bắt đầu chúng cùng lúc lập/đọc kế hoạch rồi đưa vào `omniChoSanh`.
+ *  Lỗi được "đánh dấu đã bắt" (không thành lỗi treo); nơi dùng vẫn nhận đúng lỗi ở chỗ `await` cũ. */
+export interface DocSomSanhOmni { ds: Promise<ChienDich[]>; chungChi: Promise<ChungChiDoc[]>; veDaDung: Promise<number>; daThu: Promise<boolean> }
+export function docSomChoSanh(env: Env, sbd: string, nowMs: number): DocSomSanhOmni {
+  const homNay = ngayVnCua(nowMs)
+  const som = <T>(p: Promise<T>): Promise<T> => { p.catch(() => {}); return p }
+  return { ds: som(docChienDichCuaEm(env, sbd)), chungChi: som(docChungChiEm(env, sbd)), veDaDung: som(docVeDaDung(env, sbd, homNay)), daThu: som(coDeThuHomNay(env, sbd, homNay)) }
+}
+/** Phần OMNI thêm vào `hoa2-sanh` (null khi OMNI tắt cho em hoặc lỗi — Sảnh cũ không bao giờ hỏng vì OMNI). `som` (chỉ-thêm): lượt đọc `docSomChoSanh` đã bắt đầu. */
+export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { tong: number; con: number; chienDichId: string | null; onBaiCu?: number; cheDoCho?: boolean }, som?: DocSomSanhOmni | null): Promise<SanhOmni | null> {
   try {
     if (!(await omniBat(env, sbd))) return null
     const ts = await docThamSoOmni(env)
     const homNay = ngayVnCua(nowMs)
     const [ds, hs, chungChi, veDaDung, daThu] = await Promise.all([
-      docChienDichCuaEm(env, sbd), hoSoOmniEm(env, sbd, nowMs), docChungChiEm(env, sbd), docVeDaDung(env, sbd, homNay), coDeThuHomNay(env, sbd, homNay),
+      som?.ds ?? docChienDichCuaEm(env, sbd), hoSoOmniEm(env, sbd, nowMs), som?.chungChi ?? docChungChiEm(env, sbd), som?.veDaDung ?? docVeDaDung(env, sbd, homNay), som?.daThu ?? coDeThuHomNay(env, sbd, homNay),
     ])
     const dangLuyen = chienDichDangLuyen(ds, homNay)
     const gan = dangLuyen[0] ?? null
@@ -1019,18 +1089,24 @@ export async function docHieuChuan(env: Env, ts: ThamSoOmni = THAM_SO_OMNI): Pro
 
 // ---------------------------------------------------------------- phụ huynh
 /** Phần OMNI thêm vào `/ph/hoc-2` (null khi tắt / lỗi). `hs2` (tuỳ chọn) = hồ sơ srs2 phụ huynh đã đọc (đếm câu cắt tỉa khỏi đọc lại). CHỈ ĐỌC. */
-export async function omniChoPh(env: Env, sbd: string, nowMs: number, hs2?: Pick<HoSo2, 'tt'>): Promise<PhOmni | null> {
+/** `hs2` (chỉ-thêm, tối ưu 05/10): có thể là Promise (hồ sơ srs2 nơi gọi ĐANG đọc) — phần OMNI bắt đầu cùng lúc, chỉ chờ nó ở chỗ cần (số câu cắt tỉa).
+ *  `batSan`: lời hỏi `omniBat` nơi gọi đã bắt đầu (dùng chung). */
+export async function omniChoPh(env: Env, sbd: string, nowMs: number, hs2?: Pick<HoSo2, 'tt'> | Promise<Pick<HoSo2, 'tt'>>, batSan?: Promise<boolean>): Promise<PhOmni | null> {
   try {
-    if (!(await omniBat(env, sbd))) return null
+    if (!(await (batSan ?? omniBat(env, sbd)))) return null
     const ts = await docThamSoOmni(env)
     const homNay = ngayVnCua(nowMs)
+    // Tối ưu 05/10: Q các câu của bài đang luyện bắt đầu ngay khi có danh sách chiến dịch (trước: chờ thêm hồ sơ OMNI + các lượt đọc khác). Lỗi tới đúng chỗ cũ.
+    const pDs = docChienDichCuaEm(env, sbd)
+    const pCau = pDs.then((ds) => { const g = chienDichDangLuyen(ds, homNay)[0] ?? null; return g ? qCuaCau(env, g.qids).then((m) => [...m.values()]) : [] })
+    pCau.catch(() => {})
     const [ds, hs, hc, cc, nutThat, tt] = await Promise.all([
-      docChienDichCuaEm(env, sbd), hoSoOmniEm(env, sbd, nowMs), docHieuChuan(env, ts), docChungChiEm(env, sbd),
+      pDs, hoSoOmniEm(env, sbd, nowMs), docHieuChuan(env, ts), docChungChiEm(env, sbd),
       env.DB.prepare("SELECT COUNT(*) AS n FROM nut_that WHERE sbd = ? AND trang_thai = 'cho'").bind(sbd).first<Row>().then((r) => Number(r?.n) || 0).catch(() => 0),
-      hs2 ? Promise.resolve(hs2.tt) : docHoSo2(env, sbd, homNay).then((h) => h.tt).catch(() => new Map<string, never>()),
+      hs2 ? Promise.resolve(hs2).then((h) => h.tt) : docHoSo2(env, sbd, homNay).then((h) => h.tt).catch(() => new Map<string, never>()),
     ])
     const gan = chienDichDangLuyen(ds, homNay)[0] ?? null
-    const cau = gan ? [...(await qCuaCau(env, gan.qids)).values()] : []
+    const cau = gan ? await pCau : []
     let khoangCach8: number | null = null
     if (gan && hc.du && cau.length) {
       const db = duBaoDiem(hs, cau, { khung: khungTheoPhamVi(cau, ts), mucTieu: ts.MUC_TIEU }, ts)

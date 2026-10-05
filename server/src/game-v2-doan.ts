@@ -239,9 +239,13 @@ async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Prom
   let coHoSo = true
   try {
     const cho = qs.map(() => '?').join(',')
-    const r = await env.DB.prepare(`SELECT qid,moc_on_ke,trang_thai FROM nam_kt_cau WHERE sbd=? AND qid IN (${cho})`).bind(sbd, ...qs.map(q => q.qid)).all<Row>()
+    // Tối ưu 05/10: hai lượt ĐỌC độc lập cùng đợt (trước: nối tiếp); `await` đúng thứ tự cũ ⇒ lỗi xử lý như cũ.
+    const pR = env.DB.prepare(`SELECT qid,moc_on_ke,trang_thai FROM nam_kt_cau WHERE sbd=? AND qid IN (${cho})`).bind(sbd, ...qs.map(q => q.qid)).all<Row>()
+    const pD = env.DB.prepare('SELECT ma_dang FROM nam_kt_dang WHERE sbd=? AND (so_moi_sai>0 OR moc_on_ke IS NOT NULL)').bind(sbd).all<Row>()
+    pD.catch(() => {})
+    const r = await pR
     for (const x of r.results ?? []) { daGap.add(String(x.qid)); if ((x.trang_thai === 'moi_sai' || x.trang_thai === 'dang_on') && x.moc_on_ke && String(x.moc_on_ke) <= homNay) toiHan.add(String(x.qid)) }
-    const d = await env.DB.prepare('SELECT ma_dang FROM nam_kt_dang WHERE sbd=? AND (so_moi_sai>0 OR moc_on_ke IS NOT NULL)').bind(sbd).all<Row>()
+    const d = await pD
     for (const x of d.results ?? []) dangYeu.add(String(x.ma_dang))
   } catch { coHoSo = false }
   const nhan = (q: Question): NhanCau => !coHoSo ? 'vua_suc' : toiHan.has(q.qid) ? 'toi_han_on' : q.dang && dangYeu.has(q.dang) ? 'dang_yeu' : daGap.has(q.qid) ? 'vua_suc' : 'cau_moi'
@@ -259,12 +263,18 @@ async function taoNguoi(env: Env, sbd: string, p: Profile, b: Row, goiGame: GoiG
   const qs = (start.questions ?? []) as Question[]
   if (!qs.length) throw new Error(String(start.message ?? 'Chưa có câu vừa sức trong kho cho em. Em hoàn thành bài Thầy giao rồi quay lại lên đường nhé.'))
   const phien = String(start.id)
+  // Tối ưu 05/10: tên/lớp em, ấn thạch, nhãn câu ĐỌC các bảng mà câu đóng dấu phiên (`game_v2_session`) KHÔNG ghi ⇒ bắt đầu trước câu ấy, cùng một đợt
+  // (trước: 4–5 đợt nối tiếp sau nó). Thứ tự `await` và lỗi như cũ.
+  const pHs = env.DB.prepare('SELECT ho_ten,lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
+  const pAn = docAnThach(env, sbd, ngayVn(iso(now)))
+  const pNhan = ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now)
+  pHs.catch(() => {}); pAn.catch(() => {}); pNhan.catch(() => {})
   await env.DB.prepare("UPDATE game_v2_session SET json=json_set(json,'$.doan',1) WHERE id=? AND sbd=?").bind(phien, sbd).run()
-  const hs = await env.DB.prepare('SELECT ho_ten,lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
+  const hs = await pHs
   const pet = Math.max(0, PETS.findIndex(x => x.id === p.pet))
   // Ấn thạch SÁNG của em (dạng đã khắc phục xong theo hồ sơ thật) → đánh dấu câu thuộc dạng ấy; chụp MỘT lần lúc vào đoàn để cả chặng tất định.
-  const anSang = new Set((await docAnThach(env, sbd, ngayVn(iso(now)))).filter(a => a.trangThai === 'sang').map(a => a.dang))
-  const cau = (await ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now)).map(c => ({ ...c, an: !!c.dang && anSang.has(c.dang) }))
+  const anSang = new Set((await pAn).filter(a => a.trangThai === 'sang').map(a => a.dang))
+  const cau = (await pNhan).map(c => ({ ...c, an: !!c.dang && anSang.has(c.dang) }))
   return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau, soCauThieu:Math.max(0,Number(start.soCauThieu)||0), ...(start.hetCauMoi === true ? { hetCauMoi: true } : {}), phienMoi: !truoc }
 }
 

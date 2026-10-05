@@ -38,9 +38,9 @@ import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v
 import {cheDo2,docCoHoa2} from './srs2-d1'
 import {startDao2CoVe,startDoan2,hoa2Action,LENH_HOA2} from './srs2-game'
 import {omniBat} from './omni-d1'
-import {docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
+import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
-import {ghiKhoanExpGame,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
+import {ghiKhoanExpGame,docCauHinhExp,docTongSoTruocKhoanGame,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
 import {LENH_BIA,biaAction,batDauBiaChoSanh,docCoBia} from './bi-a'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
@@ -297,6 +297,9 @@ function docTruocAnswer(env:Env,sbd:string,b:Record<string,unknown>){
     // Phần ĐỌC của khoản EXP câu đúng (cấu hình EXP, mùa, cờ P08, khoá đã có) — đọc SẴN cùng đợt (chưa biết đúng/sai; câu sai ⇒ bỏ không dùng, không ghi gì).
     // Trước: đọc sau khi chấm, và lô ghi chấm phải chờ thêm một đợt.
     exp:som(docTruocKhoanGame(env,sbd,[`cau_game|${id}|${qid}`,`thuthach|${qid}`])),
+    // Tối ưu 05/10: máy em gửi `msLam` (OMNI áp cho em ⇒ trước lô chấm còn các lượt đọc OMNI) ⇒ đọc sẵn TỔNG SỔ EXP (song song phần OMNI) để bước cộng vào
+    // hồ sơ của câu đúng đi CÙNG lô chấm (exp-d1.ts `lenhKhoanExpGameGop`). Không gửi ⇒ không đọc gì thêm (đường cũ y hệt).
+    tong:b.msLam!==undefined&&b.msLam!==null?som(docTongSoTruocKhoanGame(env,sbd,Date.now())):null,
   }
 }
 /** Câu ĐẦY ĐỦ của câu `qid` trong lượt `id` — như `SQL_THEO_REF` (game-v2-bank.ts) với (ma_de, version) của câu ĐẦU TIÊN mang qid ấy trong JSON phiên. */
@@ -336,6 +339,10 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   // bắt đầu CÙNG đợt với loadProfile (trước: 5 đợt nối tiếp). Nhánh `answer` vẫn await đúng thứ tự cũ ⇒ lỗi nào báo trước vẫn như cũ.
   const truocAnswer=action==='answer'?docTruocAnswer(env,sbd,b):null
   const truocComplete=action==='complete'?docTruocComplete(env,sbd,b):null
+  // OMNI 3 (tối ưu 05/10): máy em gửi `msLam` (chỉ khi OMNI áp cho em) ⇒ các lượt ĐỌC OMNI của lần trả lời bắt đầu CÙNG đợt hồ sơ (nhớ theo lượt, omni-game.ts).
+  if(action==='answer'||action==='doan-nop')docSomOmniTraLoi(env,sbd,action,b)
+  // Đoàn + OMNI: cờ EXP (nhớ theo lượt) đọc ngay đợt đầu ⇒ lệnh `answer` nội bộ đọc được tổng sổ EXP cùng đợt với phiên/câu (xem `docTruocAnswer`).
+  if(action==='doan-nop'&&b.msLam!==undefined&&b.msLam!==null)void docCauHinhExp(env).catch(()=>null)
   // CAO ĐIỂM 20h–24h (29/09): cờ Game Hóa 2.0 / Bi-a (đệm 15 s dùng chung, lượt đọc đang bay được chia sẻ) đọc CÙNG đợt với hồ sơ thay vì một đợt riêng sau đó.
   if(LENH_HOA2.has(action)||action==='start'||action==='recommendations'){void docCoHoa2(env).catch(()=>null);if(action!=='start')void docCoBia(env).catch(()=>null)}
   // Tối ưu 05/10: "em có ở Hoá 2.0" (cờ đệm + lớp của em, nhớ theo lượt) hỏi CÙNG đợt với hồ sơ — trước: một đợt nối tiếp sau hồ sơ. Chỉ ĐỌC.
@@ -629,7 +636,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const viTriHoSo=queries.length-(omni?.omni.tram?2:1)
     let gop:KhoanGop|null=null
     const kc=coExp?khoanCuaCau(attempt):null
-    if(kc&&expSom){try{gop=lenhKhoanExpGameGop(env,sbd,kc.k,await expSom,Date.now(),{revision:revision+1,json:jsonP})}catch{gop=null}}
+    if(kc&&expSom){try{gop=lenhKhoanExpGameGop(env,sbd,kc.k,await expSom,Date.now(),{revision:revision+1,json:jsonP},truoc.tong?await truoc.tong.catch(()=>null):null)}catch{gop=null}}
     let written:D1Result[]
     if(gop){
       // Lô gộp lỗi (vd. bảng sổ EXP lệch) ⇒ chạy lại ĐÚNG lô chấm cũ (lô lỗi đã huỷ cả giao dịch) rồi EXP đi đường cũ — không để phần EXP làm hỏng lượt chấm.

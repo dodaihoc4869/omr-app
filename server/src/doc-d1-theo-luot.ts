@@ -41,6 +41,10 @@ export function gieoNho(db: D1Database, khoa: string, giaTri: unknown, bang?: re
   m.set(khoa, muc)
   p.catch(() => { if (m.get(khoa) === muc) m.delete(khoa) })
 }
+/** Sổ nhớ của lượt ĐÃ có `khoa` (đang bay hoặc xong) chưa? Ngoài bản gộp ⇒ false. Chỉ để nơi gọi quyết có ĐỌC ĐOÁN TRƯỚC hay không (không đổi kết quả). */
+export function daNho(db: D1Database, khoa: string): boolean {
+  return !!soNho(db)?.has(khoa)
+}
 /** Bảng của các mục nhớ dùng chung (khai MỘT chỗ). */
 export const BANG_MUA: readonly string[] = ['game_v2_settings']
 export const BANG_LOP: readonly string[] = ['hoc_sinh']
