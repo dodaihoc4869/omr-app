@@ -105,7 +105,7 @@ import { ghiThuMucKhiDayDe, gvKhoThuMuc, thuMucTuNhom } from './kho-thu-muc'
 import { chayGanVknDem, ganVknChoMaDe, kiemDinhQTuan } from './omni-gan-vkn'
 import { damBaoMoiCauNenTuDong } from './omni-cau-nen-sinh'
 import { gvOmni } from './omni-gv'
-import { chayOmniDem, hieuChinhOmniTuan } from './omni-d1'
+import { chayOmniDem, docCoOmni, hieuChinhOmniTuan } from './omni-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
@@ -2366,7 +2366,8 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   if (goi) {
     await ghiThuMucKhiDayDe(env, maDe, typeof goi.nhom === 'string' ? goi.nhom : null)
     // Tờ DẠY HỌC ⇒ A.I Đỗ Đại Học gắn vi kỹ năng cho câu của tờ ngay (câu chưa đồng bộ vào game thì việc đêm gắn bù). Lỗi không chặn nạp đề.
-    if (thuMucTuNhom(maDe, goi.nhom) === 'DAY_HOC') { try { await ganVknChoMaDe(env, [maDe], Date.now()) } catch { /* việc đêm gắn bù */ } }
+    // Chỉ khi công tắc OMNI bật (tắt ⇒ không ghi gì mới, app y như hôm nay).
+    if (thuMucTuNhom(maDe, goi.nhom) === 'DAY_HOC') { try { if ((await docCoOmni(env)).bat) await ganVknChoMaDe(env, [maDe], Date.now()) } catch { /* việc đêm gắn bù */ } }
   }
   return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, boTro, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
 }
@@ -3301,9 +3302,12 @@ const boXuLy = {
       await chayOmniDem(env,Date.now()).then(r=>{if(r.soEm||r.soBeta)console.log('[omni] đêm',JSON.stringify(r))}).catch(async e=>{console.error('[omni] đêm lỗi:',e);await ghiLoiMay(env,'omni_dem')})
       if(new Date(Date.now()+7*3600000).getUTCDay()===1)await hieuChinhOmniTuan(env,Date.now()).then(r=>console.log('[omni] hiệu chỉnh tuần',JSON.stringify(r))).catch(async e=>{console.error('[omni] hiệu chỉnh tuần lỗi:',e);await ghiLoiMay(env,'omni_tuan')})
       // OMNI 3: A.I Đỗ Đại Học gắn vi kỹ năng bù cho câu DẠY HỌC (ưu tiên bài vừa tick, ≤ 400 câu/lượt) + giữ đủ câu nền tự sinh cho mọi nhãn tính toán · đêm thứ Hai: tự kiểm định ma trận Q theo dữ liệu.
-      await chayGanVknDem(env,Date.now()).then(r=>{if(r.soGhi)console.log('[omni] gắn vi kỹ năng',JSON.stringify(r))}).catch(async e=>{console.error('[omni] gắn vi kỹ năng lỗi:',e);await ghiLoiMay(env,'omni_gan_vkn')})
-      await damBaoMoiCauNenTuDong(env,Date.now()).then(r=>{if(r.soThem)console.log('[omni] câu nền tự sinh',JSON.stringify(r))}).catch(async e=>{console.error('[omni] câu nền tự sinh lỗi:',e);await ghiLoiMay(env,'omni_cau_nen')})
-      if(new Date(Date.now()+7*3600000).getUTCDay()===1)await kiemDinhQTuan(env,Date.now()).then(r=>console.log('[omni] kiểm định Q tuần',JSON.stringify(r).slice(0,500))).catch(async e=>{console.error('[omni] kiểm định Q tuần lỗi:',e);await ghiLoiMay(env,'omni_kiem_q')})
+      // Chỉ khi công tắc OMNI bật: câu nền tự sinh ghi vào `cau_nen` (bậc thang tự gỡ sẵn có cũng dùng) ⇒ tắt thì KHÔNG chạy để app y như hôm nay.
+      if((await docCoOmni(env).catch(()=>({bat:false}))).bat){
+        await chayGanVknDem(env,Date.now()).then(r=>{if(r.soGhi)console.log('[omni] gắn vi kỹ năng',JSON.stringify(r))}).catch(async e=>{console.error('[omni] gắn vi kỹ năng lỗi:',e);await ghiLoiMay(env,'omni_gan_vkn')})
+        await damBaoMoiCauNenTuDong(env,Date.now()).then(r=>{if(r.soThem)console.log('[omni] câu nền tự sinh',JSON.stringify(r))}).catch(async e=>{console.error('[omni] câu nền tự sinh lỗi:',e);await ghiLoiMay(env,'omni_cau_nen')})
+        if(new Date(Date.now()+7*3600000).getUTCDay()===1)await kiemDinhQTuan(env,Date.now()).then(r=>console.log('[omni] kiểm định Q tuần',JSON.stringify(r).slice(0,500))).catch(async e=>{console.error('[omni] kiểm định Q tuần lỗi:',e);await ghiLoiMay(env,'omni_kiem_q')})
+      }
       if(!hoa2CaTruong)await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
@@ -3311,6 +3315,12 @@ const boXuLy = {
       // ĐỢT 1 thần thú mỗi ngày: chuyển đổi hồ sơ đã chơi sang luật cấp mới, ≤ 40 hồ sơ/phút cho tới hết (rồi cờ chuyen_doi_cap = xong, phút sau không truy vấn). Lỗi chỉ ghi nhật ký máy.
       await chuyenDoiLoCron(env,Date.now()).then(r=>{if(r.soDoc>0)console.log('[hap-thu] cron chuyển đổi',JSON.stringify(r))}).catch(async e=>{console.error('[hap-thu] cron lỗi:',e);await ghiLoiMay(env,'hap_thu_chuyen_doi')})
       await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
+      // OMNI 3: khung 00:02–05:00 giờ VN — chạy TIẾP ảnh chụp đêm (con trỏ theo lô ≤ 40 em; lượt đầu ở cron 00:01; xong rồi / công tắc tắt ⇒ 1–2 lượt đọc rồi về)
+      // và mỗi 5 phút gắn vi kỹ năng bù (≤ 400 câu/lượt, chỉ khi công tắc bật). Ngoài khung: không truy vấn.
+      {const g=new Date(Date.now()+7*3600000),ph=g.getUTCHours()*60+g.getUTCMinutes();if(ph>=2&&ph<300){
+        await chayOmniDem(env,Date.now()).then(r=>{if(r.soEm||r.soBeta)console.log('[omni] đêm (tiếp)',JSON.stringify(r))}).catch(async e=>{console.error('[omni] đêm lỗi:',e);await ghiLoiMay(env,'omni_dem')})
+        if(ph%5===0&&(await docCoOmni(env).catch(()=>({bat:false}))).bat)await chayGanVknDem(env,Date.now()).then(r=>{if(r.soGhi)console.log('[omni] gắn vi kỹ năng (tiếp)',JSON.stringify(r))}).catch(async e=>{console.error('[omni] gắn vi kỹ năng lỗi:',e);await ghiLoiMay(env,'omni_gan_vkn')})
+      }}
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
       await capNhatSaiNhanhNeuCu(env,Date.now())
       // GAME HÓA 2.0 bật cả trung tâm ⇒ BTVN đã bỏ: không nhắc nộp BTVN.

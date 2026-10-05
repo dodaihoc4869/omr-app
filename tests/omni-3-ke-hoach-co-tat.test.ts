@@ -42,7 +42,7 @@ describe('OMNI 3 · cờ tắt ⇒ hồ sơ, kế hoạch, Sảnh y hệt bản 
     expect(bam(chupHoSo(await docHoSo2(env, 'S1', HOM_NAY)))).toBe(KY_VONG.hoSoS1Lan2)
     expect(JSON.stringify(await sanh2(env, 'S2', T_SANG + 200_000))).toBe(KY_VONG.sanhS2)
     expect(JSON.stringify(await chanDoanEm(env, 'S1', T_SANG + 240_000))).toBe(KY_VONG.chanDoanS1)
-    // không đụng bảng phụ OMNI
-    expect(Number((d.sql.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE name = 'srs2_ke_hoach_omni'").get() as { n: number }).n)).toBe(0)
+    // không ghi bảng phụ OMNI (bảng có sẵn từ migration-0510 — điều phối đưa vào 05/10 — nhưng cờ tắt thì phải RỖNG)
+    expect(Number((d.sql.prepare('SELECT COUNT(*) n FROM srs2_ke_hoach_omni').get() as { n: number }).n)).toBe(0)
   })
 })

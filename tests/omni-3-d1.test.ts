@@ -50,6 +50,7 @@ import { SQL_CHI_MUC_MOT_TICK } from '../server/src/bai-da-day'
 import type { Env } from '../server/src/kieu'
 import { docOmniPh } from '../src/lib/ph-v3/du-lieu'
 import { tuanVnCua } from '../server/src/omni-game'
+import { SQL_BANG_GAN_VKN } from '../server/src/omni-gan-vkn'
 
 const T0 = Date.parse('2026-10-05T03:00:00Z') // 10:00 Thứ Hai 05/10/2026 giờ VN
 const NGAY = 86_400_000
@@ -89,7 +90,8 @@ describe('damBaoBangOmni — bảng chỉ-thêm khớp migration-0510', () => {
     }
     const a = new DatabaseSync(':memory:'), b = new DatabaseSync(':memory:')
     a.exec(readFileSync('server/migration-0510-omni-3.sql', 'utf8'))
-    for (const l of LENH_TAO_BANG_OMNI) b.exec(l)
+    // Hai nguồn tạo lúc chạy: lớp D1 OMNI (LENH_TAO_BANG_OMNI) + bộ A.I gắn vi kỹ năng (SQL_BANG_GAN_VKN: omni_q_gan / omni_q_nhat_ky / omni_q_nghi — điều phối đưa vào migration 05/10).
+    for (const l of [...LENH_TAO_BANG_OMNI, ...SQL_BANG_GAN_VKN]) b.exec(l)
     expect(JSON.stringify(chup(b))).toBe(JSON.stringify(chup(a)))
     expect(chup(a).length).toBeGreaterThanOrEqual(19)
     expect(LENH_TAO_BANG_OMNI).toContain(LENH_TAO_BANG_KE_HOACH_OMNI) // bảng kế hoạch nhiều bài (A2) đúng nguyên chuỗi của srs2-d1
