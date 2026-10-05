@@ -75,18 +75,24 @@ describe('tờ chạy thật — nút X', () => {
     t.tuCha({
       type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
       ds: [
-        { sbd: 'S1', ten: 'Trần An', luc: '2026-10-03T03:00:00Z', noi: 'Lên bảng', giay: 40 },
+        { sbd: 'S1', ten: 'Trần An', luc: '2026-10-03T03:00:00Z', noi: 'Lên bảng', giay: 40, uocTinh: true },
         { sbd: 'S1', ten: 'Trần An', luc: '2026-10-01T02:05:00Z', noi: 'Ca Kiểm tra tuần 3', giay: 95 },
         { sbd: 'S2', ten: 'Lê Bình', luc: '2026-10-01T02:06:00Z', noi: 'Ca Kiểm tra tuần 3', giay: null },
       ],
     })
-    expect(panel.querySelector('.mc-sai-tt')!.textContent).toBe('2 em · 3 lượt làm sai')
-    const dong = [...panel.querySelectorAll('tbody tr')].map((tr) => [...tr.querySelectorAll('td')].map((td) => td.textContent))
-    expect(dong).toEqual([
-      ['Trần An', '10:00 · 03/10', 'Lên bảng', '40 giây'],
-      ['Trần An', '09:05 · 01/10', 'Ca Kiểm tra tuần 3', '1 phút 35 giây'],
-      ['Lê Bình', '09:06 · 01/10', 'Ca Kiểm tra tuần 3', '—'],
-    ])
+    // 4 ô số: em · lượt · trung bình (có ước tính ⇒ "≈") · nơi sai nhiều nhất
+    // (40 + 95) / 2 = 67,5 ⇒ 68 giây
+    expect([...panel.querySelectorAll('.mc-sai-o b')].map((b) => b.textContent)).toEqual(['2', '3', '≈ 1 phút 8 giây', 'Ca'])
+    // thanh theo nơi: "Ca Kiểm tra tuần 3" gộp vào nhóm "Ca"; xếp nhiều trước
+    expect([...panel.querySelectorAll('.mc-sai-thanh')].map((x) => [x.querySelector('span')!.textContent, x.querySelector('em')!.textContent])).toEqual([['Ca', '2'], ['Lên bảng', '1']])
+    // cột theo ngày, tăng dần
+    expect([...panel.querySelectorAll('.mc-sai-ngay span')].map((x) => x.textContent)).toEqual(['01/10', '03/10'])
+    // thẻ từng em: em sai nhiều trước; mỗi lượt một chip giờ (VN) · nơi · thời gian (ước tính có "≈")
+    const em = [...panel.querySelectorAll('.mc-sai-em')]
+    expect(em.map((x) => x.querySelector('.mc-sai-ten')!.textContent)).toEqual(['Trần An2 lần sai', 'Lê Bình1 lần sai'])
+    expect([...em[0]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['10:00 · 03/10 · Lên bảng · ≈ 40 giây', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 35 giây'])
+    expect([...em[1]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['09:06 · 01/10 · Ca Kiểm tra tuần 3'])
+    expect(panel.textContent).toContain('thời gian ước tính')
     t.phim('Escape')
     expect(panel.classList.contains('mc-mo')).toBe(false)
   })

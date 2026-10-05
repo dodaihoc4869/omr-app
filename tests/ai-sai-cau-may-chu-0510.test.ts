@@ -32,3 +32,21 @@ describe('máy chủ /gv/ai-sai-cau', () => {
   })
 })
 
+
+describe('lượt game: thời gian ƯỚC TÍNH (thầy 05/10: "chỗ làm trong chưa hiển thị")', () => {
+  it('giây ≈ từ lần trả lời trước (câu đầu: từ lúc mở lượt) tới lần này; quá 15 phút ⇒ không đoán (null); có cờ uocTinh', async () => {
+    const d = taoD1That()
+    const env = d.env as unknown as Env
+    d.sql.prepare('INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)').run('S1', 'Trần An', '2010', '11', 'x')
+    const t0 = Date.parse('2026-10-04T13:00:00Z')
+    d.sql.prepare('INSERT INTO game_v2_session (id, sbd, json, created_at) VALUES (?,?,?,?)').run('P1', 'S1', JSON.stringify({ created: t0 }), new Date(t0).toISOString())
+    const tl = (qid: string, at: number) => d.sql.prepare('INSERT INTO game_v2_attempt (id, sbd, session, qid, content_group, json, created_at) VALUES (?,?,?,?,?,?,?)').run(`P1|${qid}`, 'S1', 'P1', qid, 'g', JSON.stringify({ at, qid }), new Date(at).toISOString())
+    const sk = (khoa: string, qid: string, at: number) => d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, ket_qua, giay, luc, ngay_vn) VALUES (?, 'S1', ?, 'game', 'P1', 0, NULL, ?, ?)").run(khoa, qid, new Date(at).toISOString(), '2026-10-04')
+    tl('A', t0 + 45_000); sk('g1', 'Q1', t0 + 45_000) // câu đầu lượt: 45 giây từ lúc mở lượt
+    tl('B', t0 + 80_000) // câu khác, em làm đúng
+    tl('Q1~ss0', t0 + 110_000); sk('g2', 'Q1~ss0', t0 + 110_000) // 30 giây từ câu trước
+    tl('C', t0 + 2_000_000); sk('g3', 'Q1', t0 + 3_000_000) // không có lần trả lời khớp ⇒ null
+    const r = await goiWorker(worker, env, '/gv/ai-sai-cau', { qids: ['Q1'] }, true)
+    expect(r.ds.map((x: { giay: number | null; uocTinh?: boolean }) => [x.giay, x.uocTinh ?? false])).toEqual([[null, false], [30, true], [45, true]])
+  })
+})
