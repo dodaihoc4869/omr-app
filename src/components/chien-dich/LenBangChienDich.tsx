@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { chuThieuNoiDung } from '../../lib/tra-cau-chieu'
 import KhungXemPhieu from '../KhungXemPhieu'
-import { danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
+import { chuaXong, qidCuaDong, danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
 import { caChotOmni, docBangOmniCua, docCoOmni, omniApChoLop, type GoiCaChotOmni } from './api-omni'
 import type { BangOmni } from '../../../server/src/omni-kieu'
 import BangChienDich from './BangChienDich'
@@ -151,7 +151,27 @@ export default function LenBangChienDich() {
 
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)
-  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId)
+  // Nút "Thầy chữa" trên tờ (thầy 05/10): chiến dịch ghi bằng ĐÚNG lệnh "Chữa xong" (`chua-xong` một câu) — câu quay lại Đoàn Hộ Tống của cả lớp từ hôm sau.
+  const thayChuaO = useCallback(
+    async (o: { qid: string }) => {
+      // Câu gộp từ nhiều bản trùng nội dung ⇒ mở khoá đủ cả nhóm (bảng chiến dịch + buổi chữa đều mang `qidCung`).
+      const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
+      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid])
+      if (!r.ok) return { ok: false as const, chu: r.chu }
+      void tai(chonId, coMat)
+      return { ok: true as const }
+    },
+    [chonId, coMat, tai, bang, buoi],
+  )
+  // Nút X trên tờ: tra đủ các bản trùng nội dung của câu (bảng chiến dịch / buổi chữa mang `qidCung`).
+  const aiSaiQids = useCallback(
+    (o: { qid: string }) => {
+      const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
+      return dong ? qidCuaDong(dong) : [o.qid]
+    },
+    [bang, buoi],
+  )
+  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO, aiSaiQids)
   const moChieu = async (dsO: OChieu[], tenBuoi: string): Promise<boolean> => {
     if (!dsO.length) {
       showToast('Chưa có câu nào để chiếu lên bảng', 'warn')

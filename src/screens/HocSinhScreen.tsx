@@ -659,6 +659,20 @@ export default function HocSinhScreen() {
               })}
             </div>
           )}
+
+          {/* Lọc theo học phí (thầy 05/10) — cùng trạng thái với chip ở bảng tổng Học phí; số em theo khối/lớp đang chọn */}
+          <div className="tl-hang" role="group" aria-label="Lọc theo học phí" data-khoi="loc-hoc-phi">
+            <span className="tl-nhan">Học phí</span>
+            {([null, 'con_thieu', 'chua_nop'] as const).map((t) => {
+              const chon = locHocPhi === t
+              const so = t && tongHp ? tongHp.dem[t] : null
+              return (
+                <button key={t ?? 'tat_ca_hp'} type="button" disabled={t !== null && !hocPhi} onClick={() => setLocHocPhi(t)} aria-pressed={chon} aria-label={t ? tenTheLoc(TEN_TRANG_THAI[t], so ?? 0, ' · ', 'em') : undefined} className={`tl-the hs-chip${chon ? ' hs-chip--chon' : ''}`}>
+                  {t === null ? 'Tất cả' : so === null ? TEN_TRANG_THAI[t] : <ChuTheLoc chu={TEN_TRANG_THAI[t]} so={so} donVi="em" />}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {loi && <OThongBao tone="do">{loi}</OThongBao>}

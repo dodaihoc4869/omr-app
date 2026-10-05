@@ -1,5 +1,5 @@
 // CHỮ HIỂN THỊ CỦA OMNI 3 — MỘT NGUỒN cho máy chủ (server/src/omni-*.ts import tệp này) và ba app.
-// Luật chữ: docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md (A1: số có nhãn, một khái niệm một từ, không nhãn năng lực, không doạ, không hứa 100 %).
+// Luật chữ: docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md (A1: số có nhãn, một khái niệm một từ, không nhãn năng lực, không doạ, không hứa 100%).
 // Thầy lệnh 05/10: chữ MỚI dùng "A.I Đỗ Đại Học" làm chủ ngữ thay "máy" (chữ "máy" chỉ THIẾT BỊ giữ nguyên: máy chủ, máy em…).
 // Thầy lệnh 05/10: giữ nguyên giao diện hiện tại — các chữ ở đây là DÒNG THÊM vào thẻ/khung sẵn có, ngắn, cùng giọng với chữ cũ.
 // Hàm thuần, không đọc đồng hồ.
@@ -10,13 +10,13 @@ export const TEN_AI = 'A.I Đỗ Đại Học'
 export function soP(p: number): string {
   return (Math.round(Math.max(0, Math.min(1, p)) * 100) / 100).toFixed(2).replace('.', ',')
 }
-/** "6 %" — tỉ lệ 0..1 thành phần trăm nguyên (dấu cách trước %, theo bảng chữ của app). */
+/** "6%" — tỉ lệ 0..1 thành phần trăm nguyên, viết LIỀN như phần lớn app (ô "Làm đúng 79%" cùng thẻ). */
 export function phanTram(p: number): string {
-  return `${Math.round(Math.max(0, Math.min(1, p)) * 100)} %`
+  return `${Math.round(Math.max(0, Math.min(1, p)) * 100)}%`
 }
-/** Độ tin hiển thị: KHÔNG BAO GIỜ 100 % (kẹp 99 %). */
+/** Độ tin hiển thị: KHÔNG BAO GIỜ 100% (kẹp 99%). */
 export function doTinChu(p: number): string {
-  return `${Math.min(99, Math.round(Math.max(0, Math.min(1, p)) * 100))} %`
+  return `${Math.min(99, Math.round(Math.max(0, Math.min(1, p)) * 100))}%`
 }
 /** "1 phút 05 giây" · "42 giây" từ mili-giây. */
 export function thoiLuongChu(ms: number): string {

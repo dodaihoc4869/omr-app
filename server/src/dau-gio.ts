@@ -120,7 +120,7 @@ async function daHoiCua(env: Env, sbd: readonly string[]): Promise<Set<string>> 
 }
 
 /** Loại lượt game theo phiên: Đoàn (`$.doan`), Bi-a (`$.bia` = 1), còn lại Đảo. */
-async function loaiGameCua(env: Env, phien: readonly string[]): Promise<Map<string, 'doan' | 'bia' | 'dao'>> {
+export async function loaiGameCua(env: Env, phien: readonly string[]): Promise<Map<string, 'doan' | 'bia' | 'dao'>> {
   const ra = new Map<string, 'doan' | 'bia' | 'dao'>()
   if (!phien.length) return ra
   const r =

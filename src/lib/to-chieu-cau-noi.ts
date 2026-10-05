@@ -39,6 +39,14 @@ export const TIN_TO_CHIEU = {
   LENH: 'ddh-mc-lenh',
   /** Tờ chiếu → app / Remote: báo trạng thái hiện tại (đợt, pha, lời giải) */
   TRANG_THAI: 'ddh-mc-trang-thai',
+  /** Tờ chiếu → app (thầy 05/10): thầy bấm "Thầy chữa" ở ô `khoa` — KHÔNG gọi em lên nữa, câu tính là thầy đã chữa. */
+  THAY_CHUA: 'ddh-mc-thay-chua',
+  /** App → tờ chiếu: kết quả của `THAY_CHUA` cho ô `khoa` (`kq` 'da_ghi' | 'loi'); cũng gửi lại lúc bắt tay cho ô đã chữa trong phiên. */
+  THAY_CHUA_XONG: 'ddh-mc-thay-chua-xong',
+  /** Tờ chiếu → app (thầy 05/10, nút X): xin danh sách em đã làm SAI câu của ô `khoa` (kèm `id`). CHỈ ĐỌC. */
+  AI_SAI: 'ddh-mc-ai-sai',
+  /** App → tờ chiếu: `ds` (em · lúc · nơi · giây) hoặc `loi` cho lệnh `AI_SAI` cùng `id`. */
+  AI_SAI_TRA: 'ddh-mc-ai-sai-tra',
 } as const
 
 /** Quá số giây này mà app không trả lời thì tờ chiếu coi là LỖI và mở lại nút. */
@@ -70,6 +78,8 @@ export type TinDenToChieu =
   | { loai: 'san_sang' }
   | { loai: 'cham'; khoa: string; dat: boolean; giayThuc?: { giay: number; duTinh: number } }
   | { loai: 'ho_so'; khoa: string; id: string }
+  | { loai: 'thay_chua'; khoa: string }
+  | { loai: 'ai_sai'; khoa: string; id: string }
 
 export interface BoiCanhKiemTin {
   /** Mã phiên của tờ chiếu đang mở. */
@@ -105,6 +115,15 @@ export function kiemTinToChieu(e: { data: unknown; origin: string; source: unkno
     if (typeof t.id !== 'string' || !/^[A-Za-z0-9_-]{1,40}$/.test(t.id)) return null
     return { loai: 'ho_so', khoa: t.khoa, id: t.id }
   }
+  if (t.type === TIN_TO_CHIEU.AI_SAI) {
+    if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
+    if (typeof t.id !== 'string' || !/^[A-Za-z0-9_-]{1,40}$/.test(t.id)) return null
+    return { loai: 'ai_sai', khoa: t.khoa, id: t.id }
+  }
+  if (t.type === TIN_TO_CHIEU.THAY_CHUA) {
+    if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
+    return { loai: 'thay_chua', khoa: t.khoa }
+  }
   return null
 }
 
@@ -121,7 +140,8 @@ export function gocGuiLai(originCuaTin: string): string {
 //   · `<body data-cau-noi="MÃ PHIÊN">` (mã đã qua `chuanMaPhien`);
 //   · chèn `<style>${CSS_CAU_NOI_TO_CHIEU}</style>` và `<script>${jsCauNoiToChieu()}</script>` (sau script của tờ);
 //   · không có mã phiên thì KHÔNG chèn gì cả — tờ y như chưa có cầu nối.
-// Class/thuộc tính mà JS dùng: `.mc-cham[data-khoa][data-cham]`, `.mc-cham-nut[data-kq]`, `.mc-cham-tin`, `body.mc-noi`.
+// Class/thuộc tính mà JS dùng: `.mc-cham[data-khoa][data-cham]`, `.mc-cham-nut[data-kq]`, `.mc-cham-tin`, `body.mc-noi`;
+// nút "Thầy chữa" (05/10): `.mc-thay-chua[data-khoa-tc][data-trang]` — thuộc tính RIÊNG để nơi đếm `data-khoa` vẫn thấy mỗi ô một lần.
 
 /** Mã phiên đưa vào thuộc tính HTML: chỉ giữ `A-Za-z0-9_-`. Rỗng = không có cầu nối. */
 export function chuanMaPhien(ma: unknown): string {
@@ -139,6 +159,14 @@ export function mangNutChamToChieu(khoa: string): string {
   return `<span class="mc-cham" data-khoa="${thoatThuocTinh(khoa)}" data-cham="cho"><button type="button" class="mc-cham-nut" data-kq="1">Đạt</button><button type="button" class="mc-cham-nut" data-kq="0">Chưa đạt</button><span class="mc-cham-tin" role="status" aria-live="polite"></span></span>`
 }
 
+/** NÚT "THẦY CHỮA" của MỘT ô (thầy 05/10, MỌI tờ chiếu): bấm ⇒ không gọi em lên bảng nữa, câu tính là thầy đã chữa — màn đang
+ * nghe tờ tự ghi theo loại của nó (chiến dịch: chữa xong câu; đầu giờ: ô "Thầy đã chữa"; Gọi lên bảng / Dạy học: nhãn "Thầy đã chữa").
+ * Cùng khoá ô `sbd|qid` với hai nút chấm (cùng lớp kiểm "ô có trên tờ") nhưng lớp RIÊNG và nằm NGOÀI `.mc-cham` — không lẫn vào
+ * đường ghi Đạt / Chưa đạt, không đổi bất biến "mỗi ô đúng hai nút chấm". */
+export function mangNutThayChua(khoa: string): string {
+  return `<span class="mc-thay-chua" data-khoa-tc="${thoatThuocTinh(khoa)}" data-trang="cho"><button type="button" class="mc-thay-chua-nut">Thầy chữa</button><span class="mc-cham-tin" role="status" aria-live="polite"></span></span>`
+}
+
 /** CSS CỦA HAI NÚT — chỉ chèn khi tờ có `cauNoi`. Chỉ giữ LUẬT HIỆN/ẨN và một diện mạo trung tính dự phòng (viền xám, cùng kiểu cho
  * cả hai nút, không xanh/đỏ); tờ chiếu M3 vẽ lại nút bằng luật riêng, đặc hiệu hơn (`giao-dien-to-chieu.ts`). */
 export const CSS_CAU_NOI_TO_CHIEU = `
@@ -152,6 +180,14 @@ body.mc-noi .mc-giai-vung .mc-giai{flex:0 0 100%;margin-top:0}
 .mc-cham-tin{color:var(--mc-nhat);font:600 12px var(--mc-sans)}
 .mc-cham-xong{padding:4px 12px;border:1px solid var(--mc-vien);border-radius:999px;color:var(--mc-nhat);font:700 12px var(--mc-sans)}
 @media print{.mc-cham{display:none!important}}
+.mc-thay-chua{display:none}
+body.mc-noi .mc-thay-chua{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--mc-sans)}
+.mc-thay-chua-nut{min-height:36px;padding:0 14px;border:1px solid var(--mc-vien);border-radius:999px;background:transparent;color:var(--mc-muc);font:700 13px var(--mc-sans);cursor:pointer}
+.mc-thay-chua-nut[disabled]{opacity:.5;cursor:default}
+.mc-thay-chua-xong{padding:4px 12px;border:1px solid var(--mc-vien);border-radius:999px;color:var(--mc-muc);font:700 12px var(--mc-sans)}
+.mc-dot[data-thay-chua] .mc-em,.mc-dot[data-thay-chua] .mc-nut-hien-em,.mc-dot[data-thay-chua] .mc-cham{display:none!important}
+.mc-dot[data-thay-chua] .mc-cot-lam-bai::before{content:"Thầy chữa";display:flex;align-items:center;justify-content:center;height:100%;min-height:120px;color:var(--mc-nhat);font:800 28px var(--mc-sans)}
+@media print{.mc-thay-chua{display:none!important}}
 `
 
 /** JS CỦA HAI NÚT — chỉ chèn khi tờ có `cauNoi`. Giao thức và số giây ở đầu tệp này.
@@ -165,11 +201,13 @@ export function jsCauNoiToChieu(): string {
   var body = document.body;
   var ma = body ? body.getAttribute('data-cau-noi') : '';
   var vung = Array.prototype.slice.call(document.querySelectorAll('.mc-cham'));
-  if (!ma || !vung.length) return;
+  var vungTc = Array.prototype.slice.call(document.querySelectorAll('.mc-thay-chua'));
+  if (!ma || (!vung.length && !vungTc.length)) return;
   function bo() {
-    vung.forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    vung.concat(vungTc).forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
     body.classList.remove('mc-noi');
     try { delete window.__mcHoiHoSo; } catch (x) { window.__mcHoiHoSo = undefined; }
+    try { delete window.__mcHoiAiSai; } catch (x) { window.__mcHoiAiSai = undefined; }
   }
   // MỞ RIÊNG (tệp đã lưu, mở lại hôm khác, tab riêng): không có app ở trên để ghi ⇒ bỏ hẳn hai nút, tờ y như thường.
   if (window.parent === window) { bo(); return; }
@@ -208,6 +246,30 @@ export function jsCauNoiToChieu(): string {
     v.setAttribute('data-cham', 'cho');
     nutCua(v).forEach(function (b) { b.disabled = false; });
     tin(v, 'chưa ghi được, bấm lại');
+  }
+  // THẦY CHỮA (05/10): app ghi xong ⇒ ô này thôi gọi em (ẩn thẻ tên, nút Đạt / Chưa đạt), cột làm bài ghi "Thầy chữa".
+  var choTc = {};
+  function xongTc(khoa, kq) {
+    vungTc.forEach(function (v) {
+      if (v.getAttribute('data-khoa-tc') !== khoa || v.getAttribute('data-trang') === 'xong') return;
+      if (kq !== 'da_ghi' && v.getAttribute('data-trang') !== 'dang') return;
+      if (choTc[khoa]) { clearTimeout(choTc[khoa]); choTc[khoa] = 0; }
+      if (kq === 'da_ghi') {
+        v.setAttribute('data-trang', 'xong');
+        while (v.firstChild) v.removeChild(v.firstChild);
+        var s = document.createElement('span');
+        s.className = 'mc-thay-chua-xong';
+        s.textContent = 'Thầy đã chữa';
+        v.appendChild(s);
+        var dot = v.closest ? v.closest('.mc-dot') : null;
+        if (dot) dot.setAttribute('data-thay-chua', '1');
+        document.dispatchEvent(new CustomEvent('mc-thay-chua', { detail: { khoa: khoa } }));
+        return;
+      }
+      v.setAttribute('data-trang', 'cho');
+      var b = v.querySelector('.mc-thay-chua-nut'); if (b) b.disabled = false;
+      tin(v, 'chưa ghi được, bấm lại');
+    });
   }
   function thucThiLenh(lenh, thamSo) {
     if (!lenh) return;
@@ -278,11 +340,17 @@ export function jsCauNoiToChieu(): string {
       noi = true;
       if (nhip) { clearInterval(nhip); nhip = null; }
       body.classList.add('mc-noi');
+      try { document.dispatchEvent(new CustomEvent('mc-noi')); } catch (x) {}
       baoTrangThai();
     } else if (d.type === '${TIN_TO_CHIEU.PHAN_HOI}') {
       xong(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi', typeof d.dat === 'boolean' ? d.dat : undefined);
     } else if (d.type === '${TIN_TO_CHIEU.DA_GHI}') {
       xong(String(d.khoa), 'da_ghi', typeof d.dat === 'boolean' ? d.dat : undefined);
+    } else if (d.type === '${TIN_TO_CHIEU.THAY_CHUA_XONG}') {
+      xongTc(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi');
+    } else if (d.type === '${TIN_TO_CHIEU.AI_SAI_TRA}') {
+      var cbs = hoiSai[String(d.id)];
+      if (cbs) { delete hoiSai[String(d.id)]; cbs(Array.isArray(d.ds) ? d.ds : null, d.loi ? String(d.loi) : '', d.conNua === true); }
     } else if (d.type === '${TIN_TO_CHIEU.HO_SO_TRA}') {
       var cb = hoi[String(d.id)];
       if (cb) { delete hoi[String(d.id)]; cb(d.hoSo && typeof d.hoSo === 'object' ? d.hoSo : null, d.loi ? String(d.loi) : ''); }
@@ -291,6 +359,19 @@ export function jsCauNoiToChieu(): string {
     }
   });
   document.addEventListener('click', function (e) {
+    var tc = e.target && e.target.closest ? e.target.closest('.mc-thay-chua-nut') : null;
+    if (tc) {
+      if (!noi) return;
+      var vt = tc.closest('.mc-thay-chua');
+      var kt = vt ? vt.getAttribute('data-khoa-tc') : '';
+      if (!kt || vt.getAttribute('data-trang') !== 'cho' || choTc[kt]) return;
+      vt.setAttribute('data-trang', 'dang');
+      tc.disabled = true;
+      tin(vt, 'Đang ghi…');
+      choTc[kt] = setTimeout(function () { choTc[kt] = 0; xongTc(kt, 'loi'); }, ${GIAY_CHO_PHAN_HOI * 1000});
+      gui({ type: '${TIN_TO_CHIEU.THAY_CHUA}', khoa: kt });
+      return;
+    }
     var nut = e.target && e.target.closest ? e.target.closest('.mc-cham-nut') : null;
     if (!nut || !noi) return;
     var v = nut.closest('.mc-cham');
@@ -319,6 +400,15 @@ export function jsCauNoiToChieu(): string {
     hoi[id] = cb;
     gui({ type: '${TIN_TO_CHIEU.HO_SO}', khoa: String(khoa), id: id });
     setTimeout(function () { if (hoi[id]) { var f = hoi[id]; delete hoi[id]; f(null, 'het_gio'); } }, 20000);
+  };
+  // AI SAI CÂU NÀY (nút X, thầy 05/10): xin qua app thầy — tờ không tự gọi máy chủ.
+  var hoiSai = {}, soHoiSai = 0;
+  window.__mcHoiAiSai = function (khoa, cb) {
+    if (!noi) { cb(null, 'khong_noi'); return; }
+    var id = 's' + (++soHoiSai);
+    hoiSai[id] = cb;
+    gui({ type: '${TIN_TO_CHIEU.AI_SAI}', khoa: String(khoa), id: id });
+    setTimeout(function () { if (hoiSai[id]) { var f = hoiSai[id]; delete hoiSai[id]; f(null, 'het_gio'); } }, 20000);
   };
   gui({ type: '${TIN_TO_CHIEU.SAN_SANG}' });
   nhip = setInterval(function () {
