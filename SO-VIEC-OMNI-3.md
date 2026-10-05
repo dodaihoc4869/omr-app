@@ -73,3 +73,8 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] Nối móc A.I gắn vi kỹ năng: nạp tờ DẠY HỌC, tick bài (nền), việc đêm, kiểm định thứ Hai, Trạm tự sinh câu nền | bằng chứng: 6e7cfd52; test các làn chạm 141/141
 - [x] Gộp làn B2 lớp D1 + /gv/omni + Sảnh/PH | bằng chứng: 16f1facf; làn báo 53/53 + workerd 2/2
 - [x] Việc đêm mới chỉ chạy khi công tắc bật (giữ tiêu chí 9 "tắt ⇒ y như hôm nay": câu nền tự sinh ghi cau_nen mà bậc thang tự gỡ sẵn có dùng) + chạy tiếp ảnh chụp đêm 00:02–05:00 | bằng chứng: f2efcb8f; mọi test OMNI + reset + điểm danh 602/602
+- [x] Test nghiệm thu xuyên làn KHÔNG giả lớp nào (tick ⇒ gắn vi kỹ năng ⇒ Sảnh omni ⇒ Trạm có câu nền tự sinh ⇒ luyện nền chấm đúng ⇒ Bảng bài ⇒ tắt công tắc) | bằng chứng: 25e44d03; tests/omni-3-nghiem-thu-0510.test.ts 1/1
+- [x] Gộp làn C2 app học sinh | bằng chứng: 135240bb; làn báo 41/41 + 198/198 liên quan; chữ mới không có "máy" làm chủ ngữ, không "vi kỹ năng" trên màn em
+- [x] Đoàn: doan-nop chuyển phần omni ra kết quả câu (dòng nhắn hiện trong Đoàn) | bằng chứng: ca931e98; tests/omni-3-doan-ket-qua-0510.test.ts 2/2
+- [x] Xếp loại vòng 1 giây đồng hồ đề thử vào SO-VIEC-GIAO-DIEN.md | bằng chứng: 6f15603e
+- [ ] Ảnh chụp app thật: Sảnh, Đảo (chip Chưa chắc, đúng-nhưng-chậm, chắc-mà-sai), Trạm + câu nền, đề thử, phụ huynh, thầy | bằng chứng: (chờ toàn vitest xong rồi chụp)
