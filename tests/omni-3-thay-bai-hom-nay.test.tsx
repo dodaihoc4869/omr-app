@@ -305,6 +305,17 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
     await waitFor(() => expect(lenh('xem-truoc').at(-1)).toMatchObject({ khoaBai: 'DH-12-C1-B3', sbd: ['S1', 'S2', 'S3'] }))
   })
 
+  it('máy chủ B1 trả soEmChon (em được giao) ⇒ hai ô "Đủ lượt" chia cho số em được giao, ghi kèm số em cả lớp', async () => {
+    coDuEm()
+    xem = { ...XEM, soEmChon: 3, duLuot: 2, duDiem8: 1 }
+    await chonBai3()
+    const the = (await screen.findByText('Câu rút được')).closest('[data-khoi="xac-nhan-tick"]') as HTMLElement
+    const o = (k: string) => (the.querySelector(`[data-so-tick="${k}"]`) as HTMLElement).textContent ?? ''
+    expect(o('du-luot')).toContain('2/ 3 em')
+    expect(o('du-luot')).toContain('em được giao · lớp có 44 em')
+    expect(o('du-diem-8')).toContain('1/ 3 em')
+  })
+
   it('"Theo điểm danh": buổi đang mở + tối đa 3 buổi gần nhất (bỏ buổi 0 em, bỏ trùng); bấm ⇒ đúng em có mặt; "Cả lớp" trả về mặc định; tick gửi đúng sbd', async () => {
     coDuEm()
     const { khoi } = await chonBai3()

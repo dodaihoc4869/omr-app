@@ -281,7 +281,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     }
     const ten = tenNganBai(chon.tenBai)
     showToast(
-      r.du.daCo ? `${ten} đã giao cho ${lop} từ trước — giữ chiến dịch có sẵn` : `Đã giao ${ten} cho ${lop}${r.du.hanNop ? ` · hạn nộp ${hienHanNop(r.du.hanNop)}` : ''}`,
+      r.du.daCo ? `${ten} đã giao cho ${lop} từ trước — giữ chiến dịch có sẵn (đổi em nhận bài: bấm Sửa em)` : `Đã giao ${ten} cho ${lop}${r.du.hanNop ? ` · hạn nộp ${hienHanNop(r.du.hanNop)}` : ''}`,
       'success',
     )
     setChon(null)
@@ -647,15 +647,16 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
             <span className="cd-kpi-nhan">Đủ lượt để luyện hết</span>
             <strong>
               {xem.duLuot}
-              <small>/ {xem.tongEm} em</small>
+              <small>/ {xem.soEmChon} em</small>
             </strong>
+            {xem.soEmChon !== xem.tongEm && <span className="cd-kpi-phu">em được giao · lớp có {xem.tongEm} em</span>}
           </div>
           {xem.duDiem8 !== null && (
             <div className="cd-kpi" data-so-tick="du-diem-8">
               <span className="cd-kpi-nhan">Đủ lượt để ca chốt ≥ 8</span>
               <strong>
                 {xem.duDiem8}
-                <small>/ {xem.tongEm} em</small>
+                <small>/ {xem.soEmChon} em</small>
               </strong>
             </div>
           )}

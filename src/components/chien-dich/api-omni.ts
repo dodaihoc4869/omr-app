@@ -93,8 +93,12 @@ export interface XemTruocTick {
   D: number
   luotCan: number
   sucChua: number
+  /** Số em đủ lượt để luyện hết — tính trên EM ĐƯỢC GIAO (`soEmChon`). */
   duLuot: number
+  /** Số em của cả lớp (danh sách học sinh). */
   tongEm: number
+  /** Số em được giao sau lọc (thầy chọn em, 05/10) — máy chủ cũ chưa gửi ⇒ bằng `tongEm` (giao cả lớp). */
+  soEmChon: number
   /** Số em đủ lượt để dự báo ca chốt ≥ 8; `null` = chưa có P để tính (màn ẩn ô này). */
   duDiem8: number | null
   quaTai: { sbd: string; ten: string }[]
@@ -151,6 +155,7 @@ export async function baiDaDayXemTruoc(dv: DauVaoBai): Promise<KetQuaLenh<XemTru
       sucChua: soNguyen(d.sucChua),
       duLuot: soNguyen(d.duLuot),
       tongEm: soNguyen(d.tongEm),
+      soEmChon: so(d.soEmChon) === null ? soNguyen(d.tongEm) : soNguyen(d.soEmChon),
       duDiem8: so(d.duDiem8) === null ? null : soNguyen(d.duDiem8),
       quaTai: Array.isArray(d.quaTai) ? d.quaTai.filter(laHo).map((e) => ({ sbd: chu(e.sbd), ten: chu(e.ten) || chu(e.sbd) })) : [],
       theLucNgay: soNguyen(d.theLucNgay),
