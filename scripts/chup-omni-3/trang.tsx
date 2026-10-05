@@ -1,5 +1,5 @@
 // TRANG CHỤP ẢNH OMNI 3 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
-// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tram|de-thu`.
+// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tram|de-thu|gv-bai`.
 // Dữ liệu OMNI theo đúng hợp đồng docs/hop-dong-omni-3.md (SanhOmni, PhOmni). Các màn thêm sau khi gộp làn: dao, gv-bai, gv-bang.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -23,6 +23,7 @@ import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
 import Dao2 from '../../src/game/than-thu-v2/dao2/Dao2'
 import DeThu from '../../src/game/than-thu-v2/dao2/DeThu'
+import DayHocLenBang from '../../src/components/day-hoc/DayHocLenBang'
 import '../../src/game/than-thu-v2/game.css'
 import { CHU_CHAC_MA_SAI, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
 import type { DaoKetQua, DaoProfile } from '../../src/game/than-thu-v2/dao/kieu'
@@ -160,5 +161,6 @@ const con =
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'de-thu' ? h(DeThu, { call: callDao, onVe: noop } as never)
+  : man === 'gv-bai' ? h(DayHocLenBang)
   : manSanh(SANH)
 createRoot(document.getElementById('root')!).render(con)

@@ -115,6 +115,21 @@ const MAN = [
     await t.waitForTimeout(1200)
     await chup(t, 'hs-de-thu-390')
   }],
+  // ── App thầy: bảng Dạy học → bước "Bài hôm nay" (tick bài, chọn em theo điểm danh) ──
+  ['gv-bai', [1440, 900], async (t) => {
+    await t.getByRole('heading', { name: 'Bài hôm nay' }).first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(800)
+    await t.locator('[data-bai="DH-12-C1-B3"] input[type="radio"], [data-bai="DH-12-C1-B3"] [role="radio"]').first().click()
+    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(1200)
+    await t.getByRole('heading', { name: 'Bài hôm nay' }).first().scrollIntoViewIfNeeded()
+    await chup(t, 'gv-bai-hom-nay-ca-lop-1440', true)
+    const chip = t.getByRole('group', { name: 'Chọn em theo điểm danh' }).getByRole('button').first()
+    await chip.click()
+    await t.waitForTimeout(1200)
+    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().scrollIntoViewIfNeeded()
+    await chup(t, 'gv-bai-hom-nay-theo-diem-danh-1440')
+  }],
   ['ph', [390, 844], async (t) => {
     await t.waitForSelector('[data-vung="chien-dich"]', { timeout: 30000 })
     await t.waitForTimeout(800)
