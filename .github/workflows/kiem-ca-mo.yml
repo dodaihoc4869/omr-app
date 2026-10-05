@@ -1,0 +1,37 @@
+# KIỂM CA THI ĐANG MỞ (CHỈ ĐỌC) — chạy trước mỗi lần phát hành: luật của trung tâm "không phát hành khi đang có ca thi mở"
+# (học sinh đang làm bài mà đổi bản live là hỏng thật). Phiên Claude trên đám mây không có khoá Cloudflare nên kiểm ở đây.
+# Chỉ in HAI CON SỐ (số ca mở, số lượt đang làm trong ca mở) — KHÔNG in mã ca / tên em: repo công khai, nhật ký chạy ai cũng đọc được.
+# Bấm tay (workflow_dispatch) hoặc chạy lại lượt chạy cũ ("Re-run") — mỗi lần đọc D1 lại từ đầu.
+name: Kiểm ca thi đang mở (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/kiem-ca-mo-0610]
+    paths: ['.github/workflows/kiem-ca-mo.yml', 'scripts/kiem-ca-mo.sql']
+permissions:
+  contents: read
+concurrency:
+  group: kiem-ca-mo-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tệp SQL chỉ có SELECT
+        run: |
+          if grep -v '^\s*--' scripts/kiem-ca-mo.sql | grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|TRUNCATE|PRAGMA)\b'; then echo "Tệp có lệnh không chỉ-đọc — dừng."; exit 1; fi
+          echo "OK: chỉ SELECT"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm ca thi mở (chỉ đọc)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: d1 execute omr --remote --file=../scripts/kiem-ca-mo.sql
+          workingDirectory: server
