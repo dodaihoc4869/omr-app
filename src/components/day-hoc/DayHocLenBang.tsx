@@ -11,7 +11,7 @@ import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import KhungXemPhieu from '../KhungXemPhieu'
 import HopChonDe from '../HopChonDe'
-import { useGhiToChieu } from '../chien-dich/ghi-to-chieu'
+import { thayChuaQuaMayChu, useGhiToChieu } from '../chien-dich/ghi-to-chieu'
 import { laySucHoc } from '../../lib/buoi-hoc-api'
 import { cauTuDeChon, demCau, dungToChieuDayHoc, khoDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
 import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, xepEmChoDanhSach, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
@@ -108,7 +108,9 @@ export default function DayHocLenBang() {
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)
   const [sucHoc, setSucHoc] = useState<Record<string, SucHocEm>>({})
-  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `day-hoc|${idBuoi}` : '')
+  // Nút "Thầy chữa" trên tờ (thầy 05/10): nhãn "Thầy đã chữa" + mốc dạy lại, nguồn day_hoc theo buổi.
+  const thayChuaO = useCallback((o: { sbd: string; qid: string }) => thayChuaQuaMayChu(o, 'day_hoc', idBuoi || 'day-hoc'), [idBuoi])
+  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `day-hoc|${idBuoi}` : '', undefined, thayChuaO)
 
   const [xemLoiGiai, setXemLoiGiai] = useState<Set<string>>(new Set())
 

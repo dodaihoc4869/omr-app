@@ -64,6 +64,9 @@ body.mc .mc-cham-nut:hover:not([disabled]){background:rgba(244,239,228,.24);colo
 body.mc .mc-cham-tin{color:var(--mc-bang-phu);font:600 clamp(11px,1vw,18px) var(--mc-sans)}
 body.mc .mc-cham-xong{padding:0 clamp(10px,1vw,18px);height:clamp(28px,2.6vw,46px);display:inline-flex;align-items:center;border:0;border-radius:999px;background:var(--mc-bang-nut);color:var(--mc-bang-phu);font:600 clamp(11px,1vw,18px) var(--mc-sans)}
 body.mc-noi .mc-cham{margin-left:0}
+body.mc .mc-thay-chua-nut{height:clamp(32px,3.12vw,56px);min-height:0;padding:0 clamp(12px,1.25vw,24px);border:1px solid var(--mc-bang-chu);border-radius:999px;background:transparent;color:var(--mc-bang-chu);font:700 clamp(12px,1.17vw,22px)/1 var(--mc-sans);cursor:pointer}
+body.mc .mc-thay-chua-xong{padding:0 clamp(10px,1vw,18px);height:clamp(28px,2.6vw,46px);display:inline-flex;align-items:center;border:0;border-radius:999px;background:var(--mc-bang-nut);color:var(--mc-bang-chu);font:700 clamp(11px,1vw,18px) var(--mc-sans)}
+body.mc-bc .mc-giai-mo .mc-thay-chua-nut{border-color:var(--mc-chu);color:var(--mc-chu)}
 body.mc-bc .mc-giai-mo .mc-cham-nut{background:var(--mc-chu);color:var(--mc-giay)}
 body.mc-bc .mc-giai-mo .mc-cham-xong,body.mc-bc .mc-giai-mo .mc-cham-tin{background:color-mix(in srgb,var(--mc-chu) 12%,transparent);color:var(--mc-phu)}
 `
