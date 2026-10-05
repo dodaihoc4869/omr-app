@@ -16,7 +16,16 @@ const MAU = [
 const chu = (i: number, n = 2) => Array.from({ length: n }, (_, k) => MAU[(i * 7 + k * 3) % MAU.length]).join('. ')
 const DANG = ['Chất béo', 'Danh pháp ester', 'Thuỷ phân ester', 'Đốt cháy ester', 'Xà phòng hoá', 'Đồng phân']
 
-export const kichBan = { doanTran: false, ruongMoDuoc: false, lanSanh: 0 }
+export const kichBan = { doanTran: false, ruongMoDuoc: false, lanSanh: 0, omni: false }
+
+/** Sảnh khi lớp BẬT OMNI (hình dữ liệu như scripts/chup-omni-3/trang.tsx `SANH_OMNI`) — chỉ gửi khi `kichBan.omni` (do-app-hs --omni=1). */
+const SANH_OMNI = {
+  bat: true,
+  baiDangLuyen: [{ id: 'cd6', ten: 'Bài 6 · Tinh bột và cellulose', hanNop: '2026-10-06' }, { id: 'cd1', ten: 'Ester – Lipid', hanNop: '2026-10-04' }],
+  dangVung: { a: 5, b: 8 }, conDangDe8: 2, sEm: 0.06, sMucTieu: 0.07,
+  chungChi: [{ ten: 'Bài 4', doTin: 0.92, ngay: '2026-09-28' }], ve: { con: 2, tong: 2 },
+  choBaiMoi: false, onBaiCu: 6, metGio: null, nhatKy: null, deThu: { duoc: true, soCau: 14, phut: 25 },
+}
 
 const sanh = (): Obj => ({
   ok: true, cheDo2: true, ngay: '2026-09-30',
@@ -24,6 +33,7 @@ const sanh = (): Obj => ({
   theLuc: { con: 28, tong: 40 }, huyetChien: false, doan: { con: 4 }, dao: { con: 28 }, khoaDao: false, loiKhoaDao: '',
   ruong: kichBan.ruongMoDuoc ? { daLam: 40, tong: 40, moDuoc: true, daMo: false } : { daLam: 12, tong: 40, moDuoc: false, daMo: false },
   bia: null, tamGiuCa: 0,
+  ...(kichBan.omni ? { omni: SANH_OMNI } : {}),
 })
 
 const VAI = ['moi', 'moi', 'on_lai', 'moi', 'moi', 'trum']
@@ -83,6 +93,7 @@ export function datLai() {
   kichBan.doanTran = false
   kichBan.ruongMoDuoc = false
   kichBan.lanSanh = 0
+  kichBan.omni = false
   revDoan = 5
 }
 

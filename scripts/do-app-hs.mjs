@@ -7,6 +7,8 @@
 //
 //   node scripts/do-app-hs.mjs --dist=dist [--kich=mo-dau,mo-lai,man,dao,doan,heap] [--khung=doc|ngang] [--ra=kq.json]
 //   node scripts/do-app-hs.mjs --kham=1   (in mọi lượt gọi máy chủ + chụp màn — dò đường khi viết kịch bản)
+//   node scripts/do-app-hs.mjs --dist=<dist> --kich=anh --anh=<thư mục> [--omni=1] [--gio=ISO] [--cpu=1]
+//        (ẢNH GIAO DIỆN 9 màn học sinh, trạng thái tất định — so điểm ảnh hai bản: node scripts/do-app-hs/so-anh.mjs <trước> <sau>)
 //
 // Chromium: PW_CHROMIUM hoặc /opt/pw-browsers/chromium-*/chrome-linux/chrome (KHÔNG `playwright install`).
 // Kết quả + cách đọc: docs/do-toi-uu-app-hs-3009.md.
@@ -26,6 +28,9 @@ const KHUNG = arg('khung', 'doc')
 const RA = arg('ra', '')
 const KHAM = arg('kham', '') === '1'
 const CHUP = arg('chup', '')
+const THU_MUC_ANH = arg('anh', '')
+const OMNI_GIA = arg('omni', '') === '1'
+const GIO = arg('gio', '2026-09-30T03:00:00Z')
 const LAN = Number(arg('lan', '1'))
 const PHUT_HEAP = Number(arg('phut-heap', '5'))
 const muon = (ten) => !KICH || KICH.split(',').includes(ten)
@@ -209,7 +214,7 @@ const NHAT_KY = []
 // Thời gian xử lý giả của Worker cho mỗi lệnh (p50 đo ở docs/do-tai-d1 ~ 40–80 ms) — cộng vào trễ mạng.
 const MAY_CHU_MS = Number(arg('may-chu-ms', '60'))
 let TRE_API = true
-const vite = await (await import('vite')).createServer({ configFile: false, logLevel: 'error', server: { middlewareMode: true, hmr: false, ws: false }, optimizeDeps: { noDiscovery: true, include: [] }, appType: 'custom' })
+const vite = await (await import('vite')).createServer({ configFile: false, logLevel: 'error', server: { middlewareMode: true, hmr: false, ws: false, watch: null }, optimizeDeps: { noDiscovery: true, include: [] }, appType: 'custom' })
 const GIA = await vite.ssrLoadModule('/scripts/do-app-hs/may-chu-gia.ts')
 async function mayChuGia(ctx, goc) {
   await ctx.route(
@@ -628,6 +633,74 @@ async function heapDai(phut) {
   return kq
 }
 
+// ── ẢNH GIAO DIỆN để SO ĐIỂM ẢNH (thầy 05/10: "app của học sinh giữ nguyên mọi thứ giao diện, hình nền màu nhé") ──────────────────────
+/** Một bước kịch bản: `chờ:<bộ chọn>` · `ngu:<ms>` · `kb:<json>` (đổi kịch bản máy chủ giả) · `css:<bộ chọn>` (bấm) · `cuon:<bộ chọn>` (cuộn tới)
+ *  · `anh:<tên>` (chụp vào --anh, tắt hoạt ảnh/chuyển cảnh CHỈ lúc chụp) · `js:<biểu thức>` (in kết quả — dò lỗi) · còn lại = bấm theo chữ. */
+async function chayBuoc(p, b) {
+  if (b.startsWith('chờ:')) await p.waitForSelector(b.slice(4), { timeout: 30000 }).catch(() => console.log('KHÔNG THẤY', b))
+  else if (b.startsWith('ngu:')) await p.waitForTimeout(Number(b.slice(4)))
+  else if (b.startsWith('kb:')) Object.assign(GIA.kichBan, JSON.parse(b.slice(3)))
+  else if (b.startsWith('css:')) await p.locator(b.slice(4)).first().click({ timeout: 15000 }).catch(() => console.log('KHÔNG BẤM ĐƯỢC', b))
+  else if (b.startsWith('cuon:')) await p.locator(b.slice(5)).first().scrollIntoViewIfNeeded({ timeout: 15000 }).catch(() => console.log('KHÔNG CUỘN ĐƯỢC', b))
+  else if (b.startsWith('anh:')) await chupMan(p, b.slice(4))
+  else if (b.startsWith('js:')) console.log('JS:', JSON.stringify(await p.evaluate(b.slice(3)).catch((e) => String(e.message).slice(0, 120))))
+  else await p.getByText(b, { exact: false }).first().click({ timeout: 15000 }).catch(() => console.log('KHÔNG BẤM ĐƯỢC', b))
+}
+/** Chờ mọi vùng cuộn (trang + phần tử cuộn được) ĐỨNG YÊN 3 lần đo liền (app tự cuộn mượt tới nút chốt… ⇒ chụp giữa chừng là lệch dọc). */
+async function choCuonDung(p) {
+  let truoc = ''
+  for (let i = 0, yen = 0; i < 60 && yen < 3; i++) {
+    const nay = await p.evaluate(() => [document.scrollingElement, ...document.querySelectorAll('*')].filter((e) => e && e.scrollHeight > e.clientHeight + 1).map((e) => e.scrollTop).join(','))
+    yen = nay === truoc ? yen + 1 : 0
+    truoc = nay
+    await p.waitForTimeout(150)
+  }
+}
+/** Chụp bằng chế độ tắt hoạt ảnh CÓ SẴN của Playwright (hoạt ảnh hữu hạn tua tới cuối, vô hạn về đầu rồi chạy tiếp) — KHÔNG chèn/gỡ CSS vào app:
+ *  gỡ một luật `animation:none` làm mọi hoạt ảnh CHẠY LẠI từ đầu ⇒ khung co giãn giữa chừng, vùng cuộn nhảy về đầu (đã gặp 05/10, chụp lệch). */
+async function chupMan(p, ten) {
+  await choCuonDung(p)
+  await p.screenshot({ path: join(THU_MUC_ANH, `${ten}.png`), animations: 'disabled', caret: 'hide' })
+}
+/** 9 màn học sinh ở trạng thái TẤT ĐỊNH: giờ đóng băng (`--gio`, page.clock.setFixedTime), không giả mạng, mỗi kịch bản một phiên mới
+ *  (đăng nhập lại). `--omni=1`: máy chủ giả trả thêm `omni` cho Sảnh như khi lớp bật OMNI. */
+const KICH_ANH = [
+  ['Sảnh + Đảo', true, ['ngu:2000', 'anh:1-sanh', 'Khám phá Bát Linh Đảo', 'chờ:.dao2-bd', 'ngu:2500', 'anh:2-dao-ban-do', 'LÊN ĐƯỜNG', 'chờ:.dao2-canh', 'ngu:3000',
+    'anh:3-dao-tran', 'A.', 'ngu:600', 'anh:4-dao-chon', 'CHỐT ĐÁP ÁN · TUNG CHIÊU', 'ngu:4500', 'cuon:.lg-nut--hoi', 'ngu:800', 'anh:5-dao-loi-giai-hoi-thay']],
+  ['Câu đã làm', false, ['ngu:1500', 'Câu đã làm', 'chờ:.h2-cdl-loc', 'ngu:3000', 'anh:6-cau-da-lam']],
+  ['Đoàn', false, ['kb:{"doanTran":true}', 'ngu:1000', 'PHÁ 4 Ổ PHỤC KÍCH', 'chờ:.dh-nut-lam', 'ngu:3000', 'anh:7-doan-tran']],
+  ['Tu luyện', false, ['ngu:1500', 'Tu luyện', 'chờ:text=Sửa câu sai', 'ngu:2500', 'anh:8-tu-luyen']],
+]
+async function chupAnhGiaoDien() {
+  mkdirSync(THU_MUC_ANH, { recursive: true })
+  TRE_API = false
+  const ket = []
+  for (const [ten, anhDangNhap, buoc] of KICH_ANH) {
+    GIA.datLai()
+    GIA.kichBan.omni = OMNI_GIA
+    const { ctx, p, loi } = await moMay(trinh, goc, { mang: false })
+    try {
+      await p.clock.setFixedTime(new Date(GIO))
+      await p.goto(goc + '/hs')
+      if (anhDangNhap) {
+        await p.waitForSelector('input[type="password"]', { timeout: 90000 })
+        await p.waitForTimeout(1500)
+        await chupMan(p, '0-dang-nhap')
+      }
+      await dangNhap(p)
+      await p.waitForSelector(SANH, { timeout: 90000 })
+      for (const b of buoc) {
+        await chayBuoc(p, b)
+        await p.waitForTimeout(300)
+      }
+      ket.push({ kich: ten, loi: loi.slice(0, 3) })
+    } finally {
+      await ctx.close()
+    }
+  }
+  return ket
+}
+
 // ── chạy ─────────────────────────────────────────────────────────────────────────────────────────
 const trinh = await chromium.launch({ headless: true, executablePath: timChromium(), args: ['--ignore-certificate-errors'] })
 const { s, goc } = await mayChuTinh(DIST)
@@ -637,19 +710,17 @@ try {
   else if (!KHAM && muon('mo-dau')) ket.man.moDau = await moDauVaMoLai()
   if (!KHAM && muon('man')) ket.man.cacMan = await cacMan()
   if (!KHAM && muon('heap')) ket.man.heap = await heapDai(PHUT_HEAP)
+  if (!KHAM && KICH === 'anh') ket.man.anh = await chupAnhGiaoDien()
   if (KHAM) {
     // --buoc="Khám phá Bát Linh Đảo|chờ:.dao2|…": bấm lần lượt theo chữ (hoặc `css:` bộ chọn), `chờ:` đợi bộ chọn, `ngu:ms`.
     TRE_API = false
     const { ctx, p, loi } = await moMay(trinh, goc, { mang: false })
+    if (process.argv.some((a) => a.startsWith('--gio='))) await p.clock.setFixedTime(new Date(GIO))
     await p.goto(goc + '/hs')
     await dangNhap(p)
     await p.waitForSelector('.h2-sanh[data-trang-thai="co"]', { timeout: 60000 })
     for (const b of arg('buoc', '').split('|').filter(Boolean)) {
-      if (b.startsWith('chờ:')) await p.waitForSelector(b.slice(4), { timeout: 30000 }).catch((e) => console.log('KHÔNG THẤY', b))
-      else if (b.startsWith('ngu:')) await p.waitForTimeout(Number(b.slice(4)))
-      else if (b.startsWith('kb:')) Object.assign(GIA.kichBan, JSON.parse(b.slice(3)))
-      else if (b.startsWith('css:')) await p.locator(b.slice(4)).first().click({ timeout: 15000 }).catch(() => console.log('KHÔNG BẤM ĐƯỢC', b))
-      else await p.getByText(b, { exact: false }).first().click({ timeout: 15000 }).catch(() => console.log('KHÔNG BẤM ĐƯỢC', b))
+      await chayBuoc(p, b)
       await p.waitForTimeout(1500)
     }
     await p.waitForTimeout(3000)
