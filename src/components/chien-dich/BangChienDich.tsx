@@ -1,13 +1,13 @@
 // BẢNG CHIẾN DỊCH khi đang chạy (bản vẽ docs/ban-ve-gv-2809/GV-BangChienDich, thầy chốt 28/09) — dữ liệu từ `bang`.
 // 5 thẻ số (Đã làm qua · Thành thạo · Đúng nhịp · Quá tải hôm nay · Cần thầy dạy lại, có mẫu số + so với hôm qua) ·
 // heatmap em × dạng (MỘT dải xanh nhạt → đậm theo hạng Yếu/Trung bình/Khá/Giỏi, số % in trong ô, "Chưa làm" gạch chéo) ·
-// nhịp của lớp · "Cần thầy dạy lại" + "Chiếu 3 câu đầu lên bảng" · hạng của lớp theo dạng.
+// nhịp của lớp · "Cần thầy dạy lại" (hộp cuộn) + "Chiếu cả N câu lên bảng" · hạng của lớp theo dạng.
 // HẠNG dùng ĐÚNG ngưỡng thuật toán (`hangTuTiLe`): Yếu < 40% · Trung bình 40–65% · Khá 65–85% · Giỏi > 85% (bản vẽ ghi 40/60/80 — đã sửa).
-// Chữa sớm giữa kỳ: chiếu 3 câu đầu, chữa xong thì bấm "Chữa xong 3 câu này" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong` với đúng 3 câu.
+// Chữa sớm giữa kỳ: chiếu CẢ danh sách (thầy 05/10), chữa xong thì bấm "Chữa xong cả N câu" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong` với đủ N câu.
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import HopXacNhan from '../HopXacNhan'
-import { chuaXong, type BangChienDich as DuBang, type CauCanDayLai, type EmBang, type HangEm, type NhipEm } from './api'
+import { chuaXong, qidCuaDong, type BangChienDich as DuBang, type CauCanDayLai, type EmBang, type HangEm, type NhipEm } from './api'
 import { congNgay, conLai, hienHanNop, hienNgay, phanTram } from './ngay'
 import type { OChieu } from './to-chieu'
 import { CHU_GIAI_HANG, CHU_HANG, hangTuTiLe, mucO } from './tinh'
@@ -112,6 +112,9 @@ export function sapEmYeuTruoc(em: readonly EmBang[], soCauCanTruoc = 0, soCauMoi
 }
 
 /** Người lên bảng cho mỗi câu cần dạy lại: em thành thạo dạng ấy nhiều nhất, không lặp em nếu còn em khác. */
+/** Mức độ trong kho (biet · hieu · van_dung) → chữ chuẩn trên màn. */
+const TEN_MUC_DO_CAU: Record<string, string> = { biet: 'Nhận biết', hieu: 'Thông hiểu', van_dung: 'Vận dụng' }
+
 export function nguoiGiaiMau(cau: readonly CauCanDayLai[], em: readonly EmBang[]): OChieu[] {
   const daGoi = new Set<string>()
   return cau.map((c) => {
@@ -164,7 +167,8 @@ export default function BangChienDich({
   const tb = useMemo(() => tbLopTheoDang(du), [du])
   // Dạng xếp theo cả lớp yếu nhất bên trái (dạng không có số đứng cuối).
   const dang = useMemo(() => [...du.dang].sort((a, b) => (tb[a] ?? 2) - (tb[b] ?? 2)), [du.dang, tb])
-  const ba = du.canDayLai.slice(0, 3)
+  // Chữa MỘT LẦN cả danh sách (thầy 05/10: "cho chữa tất cả 1 lần") — trước chỉ 3 câu đầu.
+  const ba = du.canDayLai
   const luotBa = ba.reduce((s, c) => s + c.soEm, 0)
   const lop = du.lop
   const soEm = du.em.length || cd.soEm
@@ -226,7 +230,7 @@ export default function BangChienDich({
   }
   const chuaBa = async () => {
     setDangChua(true)
-    const r = await chuaXong(cd.id, ba.map((c) => c.qid))
+    const r = await chuaXong(cd.id, ba.flatMap(qidCuaDong))
     setDangChua(false)
     setHoiChua(false)
     if (!r.ok) {
@@ -485,25 +489,28 @@ export default function BangChienDich({
             {du.canDayLai.length === 0 ? (
               <p className="cd-phu">Chưa có câu nào cần thầy dạy lại — các em đang tự ôn được.</p>
             ) : (
+              // Hộp cuộn (thầy 05/10): danh sách dài không đẩy nút chiếu xuống tận cuối trang.
+              <div className="cd-ds-cau-cuon" tabIndex={0} role="region" aria-label={`Danh sách ${du.canDayLai.length} câu cần thầy dạy lại`}>
               <ol className="cd-ds-cau">
                 {du.canDayLai.map((c) => (
                   <li key={c.qid}>
                     <span>
                       <b>Câu {c.stt}</b> · {c.dang}
-                      {c.mucDo && <small className="cd-phu"> · {c.mucDo}</small>}
+                      {c.mucDo && <small className="cd-phu"> · {TEN_MUC_DO_CAU[c.mucDo] ?? c.mucDo}</small>}
                     </span>
                     <b className="cd-so">{c.soEm} em</b>
                   </li>
                 ))}
               </ol>
+              </div>
             )}
             <button type="button" className="m3-nut-chinh" disabled={ba.length === 0 || dangChieu} onClick={() => void chieuBa()}>
-              {dangChieu ? 'Đang mở tờ chiếu…' : `Chiếu ${ba.length || 3} câu đầu lên bảng`}
+              {dangChieu ? 'Đang mở tờ chiếu…' : ba.length > 1 ? `Chiếu cả ${ba.length} câu lên bảng` : 'Chiếu câu này lên bảng'}
             </button>
             <p className="cd-phu">Chữa sớm giữa kỳ: chữa xong, câu quay lại Đoàn Hộ Tống của các em từ hôm sau.</p>
             {daChieu3 && (
               <button type="button" className="m3-nut-vien cd-nut-nho" onClick={() => setHoiChua(true)}>
-                Chữa xong {ba.length} câu này
+                {ba.length > 1 ? `Chữa xong cả ${ba.length} câu` : 'Chữa xong câu này'}
               </button>
             )}
           </section>
@@ -535,7 +542,7 @@ export default function BangChienDich({
 
       {hoiChua && (
         <HopXacNhan
-          tieuDe={`Chữa xong ${ba.length} câu này?`}
+          tieuDe={ba.length > 1 ? `Chữa xong cả ${ba.length} câu?` : 'Chữa xong câu này?'}
           noiDung={
             <p>
               {luotBa} lượt em đang “Cần thầy dạy lại” ở câu {ba.map((c) => c.stt).join(', ')} được mở khoá: các câu này quay lại Đoàn Hộ Tống của các em từ{' '}

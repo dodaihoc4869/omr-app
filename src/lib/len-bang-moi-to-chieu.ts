@@ -124,6 +124,10 @@ body.mc-bc[data-pha="chua"] .mc-cot-lam-bai::before,body.mc-bc[data-pha="chua"] 
 /* 4 · CHỜ GỌI: cột 1/3 chỉ có lời mời, KHÔNG tên em nào */
 body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai{display:grid;place-items:center;text-align:center}
 body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai::before{content:"Chờ thầy gọi\\A Bấm L hoặc nút “Lên bảng”\\A \\A Tên em chỉ hiện khi thầy bấm Lên bảng";white-space:pre-line;font:600 calc(var(--u)*1.25)/1.5 var(--mc-sans);color:var(--mc-bang-phu);padding:calc(var(--u)*1.5)}
+body.mc-bc .mc-dot-don[data-thay-chua] .mc-cot-lam-bai::before,body.mc-bc[data-pha] .mc-dot-don[data-thay-chua] .mc-cot-lam-bai::before{content:"Thầy chữa\\A Câu này không gọi em lên bảng";white-space:pre-line;font:800 calc(var(--u)*1.6)/1.5 var(--mc-sans);color:var(--mc-bang-chu);padding:calc(var(--u)*1.5)}
+body[data-dot-thay-chua] .mc-thanh #mc-len-bang{display:none}
+body[data-dot-thay-chua] .mc-thanh #mc-pha{font-size:0}
+body[data-dot-thay-chua] .mc-thanh #mc-pha::after{content:"THẦY CHỮA";font-size:max(13px,calc(var(--u)*1.15))}
 /* THẺ TÊN (bản vẽ H15 + thầy 28/09): lưới cố định; nhãn Đạt/Chưa đạt là viên thuốc MỘT dòng, tên dài tự cắt "…" */
 body.mc .mc-em .mc-ten-hang{grid-column:2;grid-row:1;display:flex;align-items:center;min-width:0;gap:.6em}
 body.mc .mc-em:not(:has(.mc-thu)) .mc-ten-hang{grid-column:1 / span 2}
@@ -153,8 +157,10 @@ body.mc .mc-thanh #mc-len-bang{min-height:calc(var(--u)*2.5)}
 .mc-nut-phim.mc-bat{background:var(--mc-bang-chu);color:var(--mc-thanh2)}
 .mc-nut-phim.mc-bat kbd{background:var(--mc-thanh2);color:var(--mc-bang-chu)}
 .mc-nut-phim[hidden]{display:none}
-@media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]) .mc-nut-chu{display:none}}
+@media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]):not([data-k="C"]):not([data-k="X"]) .mc-nut-chu{display:none}}
 /* Nút G, D, K luôn hiện chữ, nổi bật dễ bấm */
+body.mc .mc-phim-nhom [data-k="C"] .mc-nut-chu,
+body.mc .mc-phim-nhom [data-k="X"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="G"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="D"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="K"] .mc-nut-chu{display:inline!important;font-weight:700;margin-left:2px}
@@ -245,6 +251,44 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-ct{position:fixed;top:0;right:0;bottom:0;width:68%;z-index:81;transform:translateX(104%);transition:transform .45s cubic-bezier(.2,.9,.2,1);background:rgba(19,23,36,.9);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-left:1px solid rgba(255,255,255,.12);
   color:rgb(238,241,248);font:500 max(12px,calc(var(--u)*.85))/1.4 var(--mc-sans);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr auto;padding:calc(var(--u)*1) calc(var(--u)*1.3) calc(var(--u)*.6);gap:calc(var(--u)*.75);overflow:hidden}
 .mc-ct.mc-mo{transform:none}
+.mc-sai{position:fixed;top:0;right:0;bottom:0;width:78%;z-index:81;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.9,.2,1);background:radial-gradient(120% 70% at 100% 0%,rgba(57,135,229,.22),transparent 60%),radial-gradient(90% 60% at 0% 100%,rgba(213,81,129,.16),transparent 60%),rgb(15,18,30);border-left:1px solid rgba(255,255,255,.14);color:rgb(255,255,255);font-family:var(--mc-sans);padding:calc(var(--u)*1.8) calc(var(--u)*2.2) calc(var(--u)*2.4);overflow-y:auto;box-sizing:border-box;box-shadow:-2em 0 4em rgba(0,0,0,.45)}
+.mc-sai.mc-mo{transform:none}
+.mc-sai button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+.mc-sai .mc-ct-dong{position:absolute;top:calc(var(--u)*1);right:calc(var(--u)*1.1);width:calc(var(--u)*2.6);height:calc(var(--u)*2.6);min-width:34px;min-height:34px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.4)}
+.mc-sai-ke{display:inline-flex;align-items:center;gap:.5em;font:800 max(12px,calc(var(--u)*.85)) var(--mc-sans);letter-spacing:.14em;text-transform:uppercase;color:rgb(255,210,122)}
+.mc-sai-ke::before{content:"";width:.6em;height:.6em;border-radius:50%;background:rgb(230,103,103);box-shadow:0 0 0 .3em rgba(230,103,103,.25)}
+.mc-sai h2{margin:.25em calc(var(--u)*3.4) calc(var(--u)*1.2) 0;font:900 max(22px,calc(var(--u)*2.3))/1.1 var(--mc-sans);background:linear-gradient(90deg,rgb(255,255,255),rgb(195,194,183));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mc-sai .mc-sai-tt{margin:0;color:rgba(255,255,255,.72);font:600 max(14px,calc(var(--u)*1.1)) var(--mc-sans)}
+.mc-sai-o4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*.9);margin-bottom:calc(var(--u)*1.4)}
+.mc-sai-o{position:relative;overflow:hidden;padding:calc(var(--u)*1) calc(var(--u)*1.2);border-radius:calc(var(--u)*1.1);background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12)}
+.mc-sai-o::after{content:"";position:absolute;left:0;top:0;bottom:0;width:.32em;background:var(--mc-sai-c,rgb(57,135,229))}
+.mc-sai-o b{display:block;font:900 max(26px,calc(var(--u)*2.8))/1.05 var(--mc-sans);font-variant-numeric:tabular-nums;color:rgb(255,255,255)}
+.mc-sai-o span{display:block;margin-top:.35em;font:700 max(12px,calc(var(--u)*.92)) var(--mc-sans);color:rgba(255,255,255,.7)}
+.mc-sai-hai{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:calc(var(--u)*1);margin-bottom:calc(var(--u)*1.4)}
+.mc-sai-the{padding:calc(var(--u)*1.1) calc(var(--u)*1.3);border-radius:calc(var(--u)*1.1);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.mc-sai-the h3{margin:0 0 calc(var(--u)*.8);font:800 max(13px,calc(var(--u)*1.02)) var(--mc-sans);color:rgba(255,255,255,.86)}
+.mc-sai-thanh{display:grid;grid-template-columns:minmax(5em,auto) minmax(0,1fr) 2.6em;align-items:center;gap:.6em;margin:.45em 0;font:700 max(13px,calc(var(--u)*1)) var(--mc-sans)}
+.mc-sai-thanh i{display:block;height:calc(var(--u)*1.25);min-height:12px;border-radius:0 4px 4px 0;background:var(--mc-sai-c);width:0;transition:width .9s cubic-bezier(.2,.9,.2,1)}
+.mc-sai-thanh em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums;color:rgb(255,255,255)}
+.mc-sai-cot{display:flex;align-items:flex-end;gap:2px;height:calc(var(--u)*9);min-height:90px;border-bottom:1px solid rgba(255,255,255,.18)}
+.mc-sai-cot div{position:relative;flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.mc-sai-cot i{display:block;width:72%;max-width:3.2em;border-radius:4px 4px 0 0;background:linear-gradient(180deg,rgb(57,135,229),rgba(57,135,229,.55));height:0;transition:height .9s cubic-bezier(.2,.9,.2,1)}
+.mc-sai-cot div:hover i{background:rgb(120,175,240)}
+.mc-sai-cot b{margin-bottom:.3em;font:800 max(11px,calc(var(--u)*.85)) var(--mc-sans);color:rgb(255,255,255);font-variant-numeric:tabular-nums}
+.mc-sai-ngay{display:flex;gap:2px;margin-top:.4em}
+.mc-sai-ngay span{flex:1;text-align:center;font:600 max(10px,calc(var(--u)*.72)) var(--mc-sans);color:rgba(255,255,255,.6)}
+.mc-sai-luoi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*.8)}
+.mc-sai-em{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.2em calc(var(--u)*.9);padding:calc(var(--u)*.9) calc(var(--u)*1.1);border-radius:calc(var(--u)*1);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.mc-sai-anh{grid-row:span 2;width:calc(var(--u)*3.2);height:calc(var(--u)*3.2);min-width:38px;min-height:38px;border-radius:30%;display:grid;place-items:center;font:900 max(14px,calc(var(--u)*1.2)) var(--mc-sans);background:linear-gradient(140deg,rgba(255,210,122,.95),rgba(230,103,103,.9));color:rgb(27,26,23)}
+.mc-sai-ten{font:800 max(15px,calc(var(--u)*1.2)) var(--mc-sans);display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap}
+.mc-sai-ten small{font:700 .72em var(--mc-sans);color:rgb(255,210,122)}
+.mc-sai-chip{display:flex;flex-wrap:wrap;gap:.35em}
+.mc-sai-chip span{display:inline-flex;align-items:center;gap:.4em;padding:.25em .65em;border-radius:999px;background:rgba(255,255,255,.08);font:600 max(12px,calc(var(--u)*.88)) var(--mc-sans);color:rgba(255,255,255,.92);font-variant-numeric:tabular-nums}
+.mc-sai-chip span::before{content:"";width:.55em;height:.55em;border-radius:50%;background:var(--mc-sai-c)}
+.mc-sai-chip span u{text-decoration:none;color:rgb(255,210,122);font-weight:800}
+.mc-sai-chu{margin:calc(var(--u)*.8) 0 0;font:600 max(11px,calc(var(--u)*.8)) var(--mc-sans);color:rgba(255,255,255,.55)}
+@media(max-width:900px){.mc-sai{width:100%}.mc-sai-o4{grid-template-columns:repeat(2,minmax(0,1fr))}.mc-sai-hai,.mc-sai-luoi{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.mc-sai,.mc-sai-thanh i,.mc-sai-cot i{transition:none}}
 .mc-ct button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
 .mc-ct .mc-ct-dong{position:absolute;top:calc(var(--u)*.9);right:calc(var(--u)*1);width:calc(var(--u)*2.4);height:calc(var(--u)*2.4);min-width:32px;min-height:32px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.3);line-height:1}
 .mc-ct-dau{display:grid;grid-template-columns:calc(var(--u)*6.6) minmax(0,1fr);gap:calc(var(--u)*1.2);align-items:center;padding-right:calc(var(--u)*3)}
@@ -532,6 +576,10 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     $$(nhom, '[data-k]').forEach(function (b) {
       var k = b.getAttribute('data-k');
       if (k === 'D' || k === 'K') b.hidden = !(p === 'chua' && noi);
+      // "Thầy chữa" (05/10): có khi tờ đã nối app và đợt này còn nút chưa bấm; đợt đã thầy chữa thì ẩn.
+      if (k === 'C') { var dc = dot(); b.hidden = !(noi && dc && dc.querySelector('.mc-thay-chua[data-trang="cho"]')); }
+      if (k === 'C') { if (thayChuaDot()) body.setAttribute('data-dot-thay-chua', ''); else body.removeAttribute('data-dot-thay-chua'); }
+      if (k === 'X') b.hidden = !coAiSai();
       if (k === 'G') { b.classList.toggle('mc-bat', lgMo()); var c = b.querySelector('.mc-nut-chu'); if (c) c.textContent = lgMo() ? 'Ẩn giải' : 'Giải'; }
       if (k === 'T') b.classList.toggle('mc-bat', S.tk);
       if (k === 'B') b.classList.toggle('mc-bat', S.but);
@@ -647,7 +695,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function moPhim() {
     var ds = [['L', 'Gọi em lên bảng (hiệu ứng gọi tên)'], ['G', 'Mở / đóng lời giải (ngay dưới đề, trong 2/3)'], ['Space', 'Lời giải đang mở: hiện mục tiếp — hết mục thì lật trang / cuộn'],
       ['↓ PageDown', 'Chờ gọi: lật trang của câu · Đang chữa: cuộn một khung'], ['↑ PageUp', 'Trang trước / cuộn lên'], ['← →', 'Đổi đợt'],
-      ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], ['B', 'Bút vẽ (3 màu, tẩy)'], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
+      ['C', 'Thầy chữa câu này (không gọi em)'], ['X', 'Học sinh làm sai câu này (giờ, ca, thời gian làm)'], ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], ['B', 'Bút vẽ (3 màu, tẩy)'], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
     phim.innerHTML = '<div class="mc-h"><h2>Phím tắt</h2><dl>' + ds.map(function (x) { return '<dt>' + x[0].split(' ').map(function (k) { return k === '/' || k === '+' || k === 'số' ? k : '<kbd>' + k + '</kbd>'; }).join(' ') + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>';
     phim.classList.add('mc-mo');
   }
@@ -725,10 +773,107 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     moCt(the.closest('.mc-nua') || the);
   });
 
+  // ── X · AI LÀM SAI CÂU NÀY (thầy 05/10; mọi tờ trừ Dạy học — tờ Dạy học không dựng nút X): em · giờ · ca/nơi · thời gian làm, xin qua app thầy ──
+  var saiMo = tao('div', 'mc-ct-mo', body), sai = tao('aside', 'mc-sai', body);
+  sai.setAttribute('aria-label', 'Học sinh làm sai câu này');
+  saiMo.addEventListener('click', dongSai);
+  sai.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.mc-ct-dong')) dongSai(); });
+  function dongSai() { sai.classList.remove('mc-mo'); saiMo.classList.remove('mc-mo'); }
+  function khoaDot() {
+    var d = dot(); if (!d) return '';
+    var a = d.querySelector('.mc-thay-chua[data-khoa-tc]'); if (a) return a.getAttribute('data-khoa-tc') || '';
+    var c = CHAM ? d.querySelector(CHAM + '[data-khoa]') : null; return c ? c.getAttribute('data-khoa') || '' : '';
+  }
+  function coNutAiSai() { return !!(nhom && nhom.querySelector('[data-k="X"]')); }
+  function coAiSai() { return coNutAiSai() && body.classList.contains('mc-noi') && !!window.__mcHoiAiSai && !!khoaDot(); }
+  function saiHai(n) { return (n < 10 ? '0' : '') + n; }
+  function saiGio(iso) { var t = Date.parse(iso); if (!isFinite(t)) return ''; var d = new Date(t + 7 * 3600000); return saiHai(d.getUTCHours()) + ':' + saiHai(d.getUTCMinutes()) + ' · ' + saiHai(d.getUTCDate()) + '/' + saiHai(d.getUTCMonth() + 1); }
+  function saiThoiLuong(g) { if (g == null || !isFinite(g)) return '—'; var m = Math.floor(g / 60), x = g % 60; return m ? m + ' phút' + (x ? ' ' + x + ' giây' : '') : x + ' giây'; }
+  // Màu theo NƠI làm (gắn cố định với nơi, không theo thứ hạng; bộ màu đã qua kiểm mù màu trên nền tối).
+  var MAU_NOI = [['Ca', 'rgb(57,135,229)'], ['Đoàn', 'rgb(217,89,38)'], ['Đảo', 'rgb(25,158,112)'], ['Lên bảng', 'rgb(201,133,0)'], ['Bi-a', 'rgb(213,81,129)'], ['Đầu giờ', 'rgb(144,133,233)']];
+  function nhomNoi(noi) { var n = String(noi || ''); for (var i = 0; i < MAU_NOI.length; i++) if (n === MAU_NOI[i][0] || n.indexOf(MAU_NOI[i][0] + ' ') === 0) return MAU_NOI[i][0]; return 'Khác'; }
+  function mauNoi(noi) { var g = nhomNoi(noi); for (var i = 0; i < MAU_NOI.length; i++) if (MAU_NOI[i][0] === g) return MAU_NOI[i][1]; return 'rgb(0,131,0)'; }
+  function saiNgay(iso) { var t = Date.parse(iso); if (!isFinite(t)) return ''; var d = new Date(t + 7 * 3600000); return saiHai(d.getUTCDate()) + '/' + saiHai(d.getUTCMonth() + 1); }
+  function chuCai(ten) { var p = String(ten || '?').trim().split(/ +/); return (p[p.length - 1] || '?').charAt(0).toUpperCase(); }
+  function veAiSai(ds, conNua) {
+    var theoEm = {}, thuTu = [], theoNoi = {}, theoNgay = {}, tongGiay = 0, soGiay = 0, coUoc = false;
+    ds.forEach(function (x) {
+      if (!theoEm[x.sbd]) { theoEm[x.sbd] = { ten: x.ten || x.sbd, ds: [] }; thuTu.push(x.sbd); }
+      theoEm[x.sbd].ds.push(x);
+      var g = nhomNoi(x.noi); theoNoi[g] = (theoNoi[g] || 0) + 1;
+      var ng = String(x.luc || '').slice(0, 10); if (ng) theoNgay[ng] = (theoNgay[ng] || 0) + 1;
+      if (x.giay != null && isFinite(x.giay)) { tongGiay += x.giay; soGiay++; if (x.uocTinh) coUoc = true; }
+    });
+    thuTu.sort(function (a, b) { return theoEm[b].ds.length - theoEm[a].ds.length || theoEm[a].ten.localeCompare(theoEm[b].ten, 'vi'); });
+    var noiXep = Object.keys(theoNoi).sort(function (a, b) { return theoNoi[b] - theoNoi[a]; });
+    var maxNoi = theoNoi[noiXep[0]] || 1;
+    var tb = soGiay ? Math.round(tongGiay / soGiay) : null;
+    var h = '<div class="mc-sai-o4">'
+      + '<div class="mc-sai-o" style="--mc-sai-c:rgb(230,103,103)"><b>' + thuTu.length + '</b><span>em làm sai</span></div>'
+      + '<div class="mc-sai-o" style="--mc-sai-c:rgb(255,210,122)"><b>' + ds.length + '</b><span>lượt làm sai' + (conNua ? ' (300 lượt gần nhất)' : '') + '</span></div>'
+      + '<div class="mc-sai-o" style="--mc-sai-c:rgb(57,135,229)"><b>' + (tb == null ? '—' : (coUoc ? '≈ ' : '') + saiThoiLuong(tb)) + '</b><span>trung bình mỗi lượt</span></div>'
+      + '<div class="mc-sai-o" style="--mc-sai-c:' + mauNoi(noiXep[0]) + '"><b>' + thoat(noiXep[0] || '—') + '</b><span>sai nhiều nhất (' + (theoNoi[noiXep[0]] || 0) + ' lượt)</span></div>'
+      + '</div><div class="mc-sai-hai"><section class="mc-sai-the" aria-label="Lượt sai theo nơi làm"><h3>Lượt sai theo nơi làm</h3>';
+    noiXep.forEach(function (g) {
+      h += '<div class="mc-sai-thanh" title="' + thoat(g) + ': ' + theoNoi[g] + ' lượt"><span>' + thoat(g) + '</span><i style="--mc-sai-c:' + mauNoi(g) + '" data-w="' + Math.max(4, Math.round(theoNoi[g] / maxNoi * 100)) + '"></i><em>' + theoNoi[g] + '</em></div>';
+    });
+    h += '</section><section class="mc-sai-the" aria-label="Lượt sai theo ngày"><h3>Lượt sai theo ngày</h3>';
+    var ngay = Object.keys(theoNgay).sort().slice(-10), maxNg = 1;
+    ngay.forEach(function (n) { if (theoNgay[n] > maxNg) maxNg = theoNgay[n]; });
+    h += '<div class="mc-sai-cot">';
+    ngay.forEach(function (n) { h += '<div title="' + n.slice(8, 10) + '/' + n.slice(5, 7) + ': ' + theoNgay[n] + ' lượt"><b>' + theoNgay[n] + '</b><i data-h="' + Math.max(3, Math.round(theoNgay[n] / maxNg * 82)) + '"></i></div>'; });
+    h += '</div><div class="mc-sai-ngay">';
+    ngay.forEach(function (n) { h += '<span>' + n.slice(8, 10) + '/' + n.slice(5, 7) + '</span>'; });
+    h += '</div></section></div><section aria-label="Từng em"><h3 class="mc-sai-tt" style="margin-bottom:.6em">Từng em</h3><div class="mc-sai-luoi">';
+    thuTu.forEach(function (sbd) {
+      var e = theoEm[sbd];
+      h += '<article class="mc-sai-em"><span class="mc-sai-anh" aria-hidden="true">' + thoat(chuCai(e.ten)) + '</span><span class="mc-sai-ten">' + thoat(e.ten) + '<small>' + e.ds.length + ' lần sai</small></span><span class="mc-sai-chip">';
+      e.ds.forEach(function (x) {
+        h += '<span style="--mc-sai-c:' + mauNoi(x.noi) + '">' + thoat(saiGio(x.luc)) + ' · ' + thoat(x.noi || '') + (x.giay != null ? ' · <u>' + (x.uocTinh ? '≈ ' : '') + thoat(saiThoiLuong(x.giay)) + '</u>' : '') + '</span>';
+      });
+      h += '</span></article>';
+    });
+    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt trong game — thời gian ước tính từ lúc trả lời câu trước tới câu này (game không đo giờ từng câu).</p>' : '');
+    sai.insertAdjacentHTML('beforeend', h);
+    // Thanh / cột mọc lên sau một nhịp (tắt khi giảm chuyển động — CSS lo).
+    requestAnimationFrame(function () {
+      $$(sai, '.mc-sai-thanh i').forEach(function (x) { x.style.width = x.getAttribute('data-w') + '%'; });
+      $$(sai, '.mc-sai-cot i').forEach(function (x) { x.style.height = x.getAttribute('data-h') + '%'; });
+    });
+  }
+  function moAiSai() {
+    if (!coAiSai()) { baoNhanh(coNutAiSai() ? (body.classList.contains('mc-noi') ? 'Câu này không tra được danh sách làm sai' : 'Tờ chưa nối với app thầy') : 'Tờ này không có danh sách làm sai'); return; }
+    var d = dot(), cs = d && d.querySelector('.mc-cau-so'), soCau = cs ? String(cs.textContent || '').split('·')[0].trim() : '';
+    sai.innerHTML = '<button type="button" class="mc-ct-dong" aria-label="Đóng">×</button><span class="mc-sai-ke">' + thoat(soCau ? soCau + ' · ai đã sai?' : 'Ai đã sai?') + '</span><h2>Học sinh làm sai câu này</h2><p class="mc-sai-tt">Đang tải…</p>';
+    sai.classList.add('mc-mo'); saiMo.classList.add('mc-mo');
+    window.__mcHoiAiSai(khoaDot(), function (ds, loi, conNua) {
+      var tt = sai.querySelector('.mc-sai-tt');
+      if (!ds) { if (tt) tt.textContent = 'Chưa tải được danh sách' + (loi === 'het_gio' ? ' — app thầy trả lời chậm, bấm X lần nữa.' : '.'); return; }
+      if (!ds.length) { if (tt) tt.textContent = 'Chưa em nào làm sai câu này.'; return; }
+      if (tt) tt.remove();
+      veAiSai(ds, conNua);
+    });
+  }
+
   // ── ĐIỀU KHIỂN ──
   function toiDot(k) { if (window.__mcDen) window.__mcDen(Math.max(0, Math.min(soDot() - 1, k))); baoNhanh('Đợt ' + (chiSo() + 1) + ' / ' + soDot(), 900); }
+  // "THẦY CHỮA" (05/10): bấm nút ẩn của đợt (cầu nối gửi app ghi); đợt đã thầy chữa thì không gọi em, không chấm em — phím L / D / K chỉ nhắc.
+  function thayChua() {
+    if (!body.classList.contains('mc-noi')) { baoNhanh('Tờ chưa nối với app thầy — chưa ghi được'); return; }
+    var d = dot(), n = d ? d.querySelector('.mc-thay-chua[data-trang="cho"] .mc-thay-chua-nut') : null;
+    if (!n) { baoNhanh('Câu này không ghi "Thầy chữa" được'); return; }
+    n.click();
+    baoNhanh('Đang ghi: Thầy chữa');
+  }
+  document.addEventListener('mc-noi', veThanh);
+  document.addEventListener('mc-vao-dot', dongSai); // tờ vừa nối app (cầu nối): hiện nút chỉ dùng được khi có app
+  document.addEventListener('mc-thay-chua', function () { veThanh(); baoNhanh('Đã ghi: Thầy chữa — không gọi em'); });
+  function thayChuaDot() { var d = dot(); return !!(d && d.hasAttribute && d.hasAttribute('data-thay-chua')); }
   function lenh(k) {
+    if ((k === 'L' || k === 'D' || k === 'K' || k === 'C') && thayChuaDot()) { baoNhanh('Câu này thầy chữa — không gọi em'); return; }
     switch (k) {
+      case 'C': thayChua(); break;
+      case 'X': moAiSai(); break;
       case 'L': if (pha() === 'cho' && window.__mcLenBang) window.__mcLenBang(); else if (daGoi()) baoNhanh('Em đã lên bảng'); break;
       case 'G': moLoiGiai(!lgMo()); break;
       case 'D': cham(true); break;
@@ -761,13 +906,14 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       var lop = [phim, luoi, phong].filter(function (x) { return x.classList.contains('mc-mo'); })[0];
       if (lop) { lop.classList.remove('mc-mo'); return; }
       if (ct.classList.contains('mc-mo')) { dongCt(); return; }
+      if (sai.classList.contains('mc-mo')) { dongSai(); return; }
       if (S.but) { batBut(); return; }
       return;
     }
     if (/^[0-9]$/.test(k)) { S.soGo = (S.soGo + k).slice(-3); baoNhanh('Tới đợt: ' + S.soGo + '  ↵ Enter', 0); return; }
     if (k === 'Backspace' && S.soGo) { S.soGo = S.soGo.slice(0, -1); baoNhanh(S.soGo ? 'Tới đợt: ' + S.soGo + '  ↵ Enter' : '', 0); return; }
     if (k === 'Enter' && S.soGo) { var n = +S.soGo; S.soGo = ''; luoi.classList.remove('mc-mo'); e.preventDefault(); toiDot(n - 1); return; }
-    var MAP = { l: 'L', g: 'G', d: 'D', k: 'K', t: 'T', b: 'B', Tab: 'Tab', '?': '?', ArrowRight: '→', ArrowLeft: '←', ' ': 'SP', ArrowDown: '↓', PageDown: '↓', ArrowUp: '↑', PageUp: '↑', Home: 'H', End: 'E' };
+    var MAP = { l: 'L', g: 'G', d: 'D', k: 'K', c: 'C', x: 'X', t: 'T', b: 'B', Tab: 'Tab', '?': '?', ArrowRight: '→', ArrowLeft: '←', ' ': 'SP', ArrowDown: '↓', PageDown: '↓', ArrowUp: '↑', PageUp: '↑', Home: 'H', End: 'E' };
     var m = MAP[k] || MAP[k.toLowerCase ? k.toLowerCase() : k];
     if (!m) return;
     e.preventDefault();
