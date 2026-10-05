@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // Thầy chốt 28/09: ca kiểm tra ĐÃ CÔNG BỐ ⇒ câu em SAI / BỎ TRỐNG tự vào hàng ôn của Đoàn (nguồn thứ 3 `ca_sai`, server/src/srs2-d1.ts), kể cả câu không thuộc chiến dịch nào.
 // Luật thời điểm: kế hoạch hôm nay đã chốt KHÔNG đổi; câu sai của ca vào từ lần lập kế hoạch kế tiếp (ngày hôm sau).
 import { describe, expect, it } from 'vitest'
@@ -11,7 +12,7 @@ import type { Env } from '../server/src/kieu'
 const T0 = Date.parse('2026-09-30T02:00:00Z') // 09:00 VN 30/09
 const NGAY = 86_400_000
 const cau = (qid: string, tuLuan = false) => JSON.stringify({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB',
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB',
   correct: 'B', reviewed: true, solution: { chot: 'c' }, ...(tuLuan ? { kieu: 'tu_luan' } : {}),
 })
 function dung(congBo = 'khong') {

@@ -8,6 +8,7 @@
 import type { Env } from './kieu'
 import { grade, publicQuestion, type PrivateQuestion, type Question } from '../../src/game/than-thu-v2/core'
 import { cauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { diemDungSai } from '../../src/lib/tu-luyen'
 import { CHU_CHAC_MA_SAI, CHU_DUNG_CHUA_CHAC, CHU_LUOT, NUT_DE_MAI, NUT_LAM_LUON, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
 import { MUC_DICH_LUOT, THAM_SO_OMNI, type HoSoOmniEm, type KetQuaOmniTraLoi, type Phan, type QCau, type TramHoiPhuc, type TuTin } from './omni-kieu'
@@ -520,7 +521,7 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
       const b = bacMuc(m.mucDo)
       return b != null && b >= dich && hopLeChung(m, bc) && !trongKeHoach.has(m.qid) && !lamHomNay(m.qid, bc)
     })
-    const day = await napTheoThuTu(env, xepUngVien(ung, bc, (m) => bacMuc(m.mucDo)! - dich, `${sbd}|${homNay}|ve`), TS.VE_SO_CAU, new Set())
+    const day = await chanKhacKhoiEm(env, 'omni_ve', { sbd, khoiEm: bc.khoiEm }, await napTheoThuTu(env, xepUngVien(ung, bc, (m) => bacMuc(m.mucDo)! - dich, `${sbd}|${homNay}|ve`), TS.VE_SO_CAU, new Set()), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối
     if (!day.length) continue
     const id = crypto.randomUUID(), luc = new Date(nowMs).toISOString()
     const refs: RefOmni[] = day.map(({ q, m }) => ({ qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !bc.daLam.has(m.qid), role: 'thu_thach' }))
@@ -610,7 +611,7 @@ async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, n
   const ungKh = [...keHoach].map((q) => hs.meta.get(q)).filter((m): m is MetaCau => !!m && hop(m))
   const ungPv = (await metaTheoDang(env, mCu.dang, await phamViChon(env, sbd))).filter((m) => hop(m) && !keHoach.has(m.qid) && !lamHomNay(m.qid, bc))
   const thu = xepUngVien([...ungKh, ...ungPv], bc, (m) => bac - 1 - bacMuc(m.mucDo)!, `${sbd}|${ngayVnCua(nowMs)}|tram`, (m) => (keHoach.has(m.qid) ? 0 : 1))
-  const [chon] = await napTheoThuTu(env, thu.slice(0, 12), 1)
+  const [chon] = await chanKhacKhoiEm(env, 'omni_tram', { sbd, khoiEm: bc.khoiEm }, await napTheoThuTu(env, thu.slice(0, 12), 1), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — câu thấp hơn ĐÚNG khối em
   if (!chon) return null
   // Câu của kế hoạch mà kế hoạch đang phục vụ bằng câu SONG SINH (vòng học v2) ⇒ phủ song sinh như `napLuot`.
   const q = keHoach.has(chon.m.qid) ? phuNeuCan(chon.q, hs.songSinhCho, hs.boTro) : chon.q
@@ -675,7 +676,7 @@ async function deThu(env: Env, sbd: string, nowMs: number): Promise<Record<strin
     if (thieu <= 0) break
     chon[p].push(...await napTheoThuTu(env, theoPhan[p].filter((m) => !daChon.has(m.group)), thieu, daChon))
   }
-  const ds = [...chon.I, ...chon.II, ...chon.III]
+  const ds = await chanKhacKhoiEm(env, 'omni_de_thu', { sbd, khoiEm: bc.khoiEm }, [...chon.I, ...chon.II, ...chon.III], { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — đề thử chỉ câu ĐÚNG khối em
   if (ds.length < TS.DE_THU.soCau) return { ok: false, lyDo: 'chua_du_cau', error: `Chưa đủ ${TS.DE_THU.soCau} câu em chưa làm trong phần đã học để lập đề thử.` }
   const id = crypto.randomUUID(), tao = new Date(nowMs).toISOString(), het = new Date(nowMs + TS.DE_THU.phut * PHUT_MS).toISOString()
   const refs: RefDeThu[] = ds.map(({ q, m }) => ({ qid: q.qid, maDe: m.maDe, version: m.version, phan: q.phan }))

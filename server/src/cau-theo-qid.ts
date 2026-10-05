@@ -14,6 +14,7 @@ import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { ghiSnapshot, quyetDinhSnapshot } from './cau-snapshot'
 // CỔNG PHẠM VI CÁ NHÂN (CNH-1.0 P02) áp cho ĐƯỜNG ĐỌC CÂU DÙNG CHUNG (`/hs/cau-theo-qid` + `/hs/on-lai/nop`):
 // trước đây chỉ kế hoạch ngày lọc phạm vi; đường này phục vụ theo qid nên phải qua CÙNG cổng, nếu không thì
@@ -303,9 +304,11 @@ export async function hsCauTheoQid(env: Env, b: Record<string, unknown>): Promis
   if (b.qid.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần xin tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
   const r = await layCauChoEm(env, sbd, donQid(b.qid))
   if (r.loi) return { ok: false, error: r.loi }
+  const cau = await chanKhacKhoiEm(env, 'on_lai', sbd, r.cau) // LUẬT THẦY 05/10: cổng cuối — câu khác khối em không ra máy em (gộp vào `khongCo`)
+  const boKhoi = r.cau.filter((q) => !cau.includes(q)).map((q) => q.qid)
   // CHỐT ẢNH CHỤP TRƯỚC KHI TRẢ CÂU RA (T34). Lỗi ghi không chặn việc giao câu (xem chú thích hàm trên).
-  await ghiSnapshotKhiGiao(env, sbd, r.cau, r.snapshotBat)
-  return { ok: true, cau: r.cau.map(cauCongKhai), khongCo: r.khongCo }
+  await ghiSnapshotKhiGiao(env, sbd, cau, r.snapshotBat)
+  return { ok: true, cau: cau.map(cauCongKhai), khongCo: [...r.khongCo, ...boKhoi] }
 }
 
 /**

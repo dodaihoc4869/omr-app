@@ -1,5 +1,5 @@
 import BieuCamThu from '../../game/than-thu-v2/BieuCamThu'
-import { Sparkles, Compass, BookOpen, Leaf } from 'lucide-react'
+import { Sparkles, Compass, Leaf } from 'lucide-react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 
 /** All pet identity and level come from the student's existing server state. */
@@ -30,11 +30,5 @@ export default function DongHanh({ thu, xong = false, onMo }: {
   )
 }
 
-export function LoiChao({ vai }: { vai: 'hs' | 'ph' }) {
-  return <div className={`bl-loi-chao bl-loi-chao--${vai}`}>
-    <span className="bl-eyebrow"><BookOpen size={16} aria-hidden="true" /> HỌC HOÁ MỖI NGÀY</span>
-    <h1>{vai === 'hs' ? 'Hành trình lớn lên cùng tri thức' : 'Cùng con, từng bước tiến bộ'}</h1>
-    <p>{vai === 'hs' ? 'Hiểu bài sâu hơn. Tự tin hơn mỗi ngày.' : 'Nhìn thấy nỗ lực, hiểu điều con cần và đồng hành đúng lúc.'}</p>
-    {vai === 'hs' && <img src={anhThu(1, 50)} alt="Thần thú Thuỷ Long chào đón em" width={220} height={220} decoding="async" />}
-  </div>
-}
+// Lời chào màn đăng nhập nay ở LoiChao.tsx (05/10) — xuất lại để mọi chỗ nhập cũ giữ nguyên.
+export { LoiChao } from './LoiChao'

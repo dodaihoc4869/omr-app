@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09): "thêm đề, thêm bớt học sinh, chỉnh lại hạn; lưu lại thì phân bổ lại số câu nếu thêm đề".
 // Máy chủ `server/src/srs2-sua.ts` (`POST /gv/chien-dich/sua`, sau cổng thầy) chạy THẬT trên SQLite lược đồ thật (`_d1-that`).
 import { readFileSync } from 'node:fs'
@@ -15,7 +16,7 @@ const T0 = Date.parse('2026-09-30T02:00:00Z') // 09:00 VN 30/09
 const GIO = 3_600_000
 const HOM_NAY = '2026-09-30'
 const cau = (qid: string, ma: string, tuLuan = false) => JSON.stringify({
-  qid, maDe: ma, version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [],
+  qid, maDe: ma, lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [],
   hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' }, ...(tuLuan ? { kieu: 'tu_luan' } : {}),
 })
 

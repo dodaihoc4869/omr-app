@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // TOKEN PHỤ HUYNH — GIAI ĐOẠN MỀM (server/src/ph-truy-cap.ts; hợp đồng docs/token-phu-huynh-1909.md). SQLite thật, lược đồ thật + mọi migration.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
@@ -16,7 +17,7 @@ const themEm = (d: D1That, sbd: string, hoTen: string, lop: string, matKhau: str
 const truyCap = (d: D1That) => d.sql.prepare('SELECT sbd,kieu,duong,so FROM ph_truy_cap ORDER BY sbd,kieu,duong').all() as { sbd: string; kieu: string; duong: string; so: number }[]
 const giaiMa = (t: string) => JSON.parse(atob(t.split('.')[0]!)) as Record<string, any>
 const cauKho = (qid: string) => ({
-  qid, maDe: 'x', version: 'v', group: `g-${qid}`, phan: 'I', text: `Chọn phát biểu đúng về ${qid}.`, choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [],
+  qid, maDe: 'x', lop: '12', version: 'v', group: `g-${qid}`, phan: 'I', text: `Chọn phát biểu đúng về ${qid}.`, choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [],
   dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'hieu', sao: 1, kienThuc: ['k1'], correct: 'B', solution: 'Lời giải ngắn', reviewed: true,
 })
 function themCau(d: D1That, cau: string[]) {

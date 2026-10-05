@@ -3,6 +3,7 @@
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
+import { chanKhacKhoiLop } from './chan-khac-khoi'
 import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -442,6 +443,7 @@ async function bang(env: Env, id: string, nowMs: number) {
   })
   let canDayLai: { qid: string; stt: number; dang: string | undefined; mucDo: string | null; soEm: number; phan?: string; cau?: Record<string, unknown>; qidCung?: string[] }[] = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
     .filter((x) => x.soEm > 0).sort((a, b) => b.soEm - a.soEm)
+  canDayLai = await chanKhacKhoiLop(env, 'can_day_lai', { lop: cd.lop, sbd: cd.sbd }, canDayLai, { cauCua: (x) => x.qid }) // LUẬT THẦY 05/10: "Cần thầy dạy lại" / "Chiếu cả N câu lên bảng" chỉ câu ĐÚNG khối lớp
   if (canDayLai.length) {
     const qidList = canDayLai.map((x) => x.qid)
     const rows = (await env.DB.prepare('SELECT qid, phan, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qidList)).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
@@ -579,7 +581,7 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
   })
   // Câu trùng nội dung ⇒ xét MỘT bản (bản đứng trước), mang `qidCung` cả nhóm; số em gộp theo em (không đếm đôi).
   const nhom = await nhomCauTrung(env, cd.qids)
-  const cauGop = gopCauTrung(cau, nhom).map((c) => {
+  const cauGop = gopCauTrung(await chanKhacKhoiLop(env, 'buoi_chua', { lop: cd.lop, sbd: cd.sbd }, cau, { cauCua: (x) => x.qid }), nhom).map((c) => { // LUẬT THẦY 05/10: buổi chữa chỉ câu ĐÚNG khối lớp
     if (c.qidCung.length < 2) return c
     const chua = em.filter((s) => c.qidCung.some((q) => !tt.get(s)!.get(q)!.thanhThao))
     const dayLai = em.filter((s) => c.qidCung.some((q) => tt.get(s)!.get(q)!.catTia))

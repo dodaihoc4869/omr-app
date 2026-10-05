@@ -14,6 +14,7 @@ import {viecPhu} from './viec-phu'
 import {gameIdentity,parentPass} from './game-v2-auth'
 import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
 import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
+import {chanKhacKhoiEm} from './chan-khac-khoi'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
@@ -111,7 +112,7 @@ async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string;maDe?:
   const r=rSom?await rSom:await env.DB.prepare('SELECT q.qid,q.version,q.json FROM game_v2_question q WHERE q.qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(refs.map(x=>x.qid))).all<{qid:string;version:string;json:string}>()
   const can=new Set(refs.map(x=>`${x.qid}|${x.version}`))
   for(const x of r.results)if(can.has(`${x.qid}|${x.version}`)&&jsonLaTuLuan(x.json))ra.add(x.qid)
-  for(const x of refs)if(!cauHopKhoi(khoiEm,x))ra.add(x.qid)
+  const giu=new Set(await chanKhacKhoiEm(env,'luot_cu',{khoiEm},refs));for(const x of refs)if(!giu.has(x))ra.add(x.qid) // LUẬT THẦY 05/10: cổng cuối như lúc mở lượt — chỉ câu ĐÚNG khối em (khác khối / không rõ / mâu thuẫn ⇒ không phục vụ)
   return ra
 }
 /** TƯƠNG THÍCH máy em đang sống (Boss 21/09): màn Đảo cũ chỉ biết vai yeu|toi_han|lap|thu_thach ⇒ `role` trả tập cũ (moi → lap, trum → thu_thach); `roleV2` = vai THẬT cho màn mới. */
@@ -140,7 +141,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
         const old=JSON.parse(dangCho.json) as Session;const tuLuan=await qidTuLuanTrongLuot(env,old.questions,khoiEm);const qs=[]
         // Thầy có thể giao BTVN SAU khi lượt này đã bốc câu: câu nào nay nằm trong bài em chưa nộp ⇒ bỏ lượt chờ, mở lượt mới (không trả lại câu có thể lộ đáp án).
         const chanBtvn=await docCauBtvnChuaNop(env,sbd),chanCu=await protectedQuestions(env);for(const key of control.blocked)chanCu.add(key)
-        const daHocCu=learnedQuestionFilter(scope.evidence,chanCu),theoQid=new Map(scope.pool.map(q=>[q.qid,q]));if(old.questions.some(ref=>{const q=theoQid.get(ref.qid);return chanBtvn.has(ref.qid)||chanBtvn.has(ref.group)||!cauHopKhoi(khoiEm,ref)||!q||!daHocCu(q)})){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
+        const daHocCu=learnedQuestionFilter(scope.evidence,chanCu),theoQid=new Map(scope.pool.map(q=>[q.qid,q]));if(old.questions.some(ref=>{const q=theoQid.get(ref.qid);return chanBtvn.has(ref.qid)||chanBtvn.has(ref.group)||!cauHopKhoi(khoiEm,q??ref)||!q||!daHocCu(q)})){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
         for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),...vaiChoMay(ref.role)})}
         if(qs.length)return {ok:true,id:dangCho.id,questions:qs,missing:scope.missing,luot:tom,maiCho:cho}
       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}
@@ -183,6 +184,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
     if(kq.dungLaiTask.size)giuDangMo=Object.fromEntries(kq.dungLaiTask)
     void nhomTheoQid
   }
+  chon=await chanKhacKhoiEm(env,'dao',{sbd,khoiEm},chon,{cauCua:x=>x.q}) // LUẬT THẦY 05/10: cổng cuối (cả gợi ý `recommendations`) — chỉ câu đúng khối em
   if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
   // P05 mục 4 + RV01/RV02: GIÀNH CHỖ nguyên tử theo ĐƠN VỊ NỘI DUNG (`content_group`) cho các câu của lượt;
   // nhiệm vụ CÒN hiệu lực (dù hết lease thiết bị) thì KHÔNG bị chiếm — trả `giuChoDangMo` để em RESUME.
@@ -244,6 +246,7 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
     const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu,boQuaDung30:true}))
     if(bu.length){hetCauMoi=true;chon=[...chon,...bu]}
   }
+  chon=await chanKhacKhoiEm(env,'doan_kho_lop',{sbd,khoiEm:opt.khoiEm},chon,{cauCua:x=>x.q}) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if(!chon.length){
     const lyDo=!poolHopLe.length?'kho_trong':(!moi.length&&!cu.length)?'het_cau_moi_hom_nay':'chi_con_cau_qua_bac'
     const message=lyDo==='het_cau_moi_hom_nay'?'Hôm nay em đã làm hết câu mới hợp sức em trong kho. Mai em quay lại nhé.':lyDo==='chi_con_cau_qua_bac'?'Các câu còn lại cao hơn mức em đang làm ở dạng đó. Em làm thêm bài Thầy giao rồi quay lại nhé.':'Chưa có câu thuộc phần em đã học. Em hoàn thành bài Thầy giao rồi quay lại nhé.'
@@ -514,6 +517,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // RV02: câu đã phát cho nhiệm vụ CÒN hiệu lực ⇒ trả lại để RESUME, không phát mới.
       if(kq.dungLaiTask.size)giuDangMo=Object.fromEntries(kq.dungLaiTask)
     }
+    chon=await chanKhacKhoiEm(env,'game_cu',sbd,chon,{cauCua:x=>x.q}) // LUẬT THẦY 05/10: cổng cuối — Linh Tâm/võ đài/repair/tower/đường cũ chỉ câu đúng khối em
     const selected=chon.map(x=>x.q),vai=new Map(chon.map(x=>[x.q.qid,x.role]))
     if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:tranCuaLoai(loaiTran),suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
     if(!remaining)throw hetTran(tranCuaLoai(loaiTran))

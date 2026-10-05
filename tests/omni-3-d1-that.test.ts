@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // OMNI 3 · LÀN B2 — LỚP D1 + LỆNH THẦY chạy với LÕI THẬT (làn A1 đã gộp: omni-p-vkn, du-bao-diem, omni-chung-chi, omni-q…) trên D1 thật (node:sqlite).
 // Không giả lõi: kiểm tích hợp đầu-cuối + tính chất "xoá bảng đệm omni_* rồi gọi lại ⇒ hồ sơ / Bảng bài y hệt" với công thức thật (kể cả τ dùng β).
 import { describe, expect, it } from 'vitest'
@@ -17,7 +18,7 @@ const NGAY = 86_400_000
 const LOP1 = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
 
 function cau(d: D1That, qid: string, dang: string, phan: 'I' | 'II' | 'III' = 'I') {
-  const json = { qid, maDe: 'DEA', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [], dang, tenDang: `Dạng ${dang}`,
+  const json = { qid, maDe: 'DEA', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [], dang, tenDang: `Dạng ${dang}`,
     mucDo: 'Thông hiểu', kienThuc: [], correct: phan === 'II' ? 'DSDS' : phan === 'III' ? '12' : 'B', solution: {}, reviewed: true, hinhAnh: [] }
   d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DEA', qid, 'v1', `g-${qid}`, dang, JSON.stringify(json))
 }

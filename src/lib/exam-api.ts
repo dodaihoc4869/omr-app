@@ -15,6 +15,8 @@ import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { taoCaDaXacNhan } from './day-ca-may-chu-moi'
 import { taiSanAnhDe } from './anh-len-may-chu'
 import { voiHanCho } from './han-cho'
+import { fetchCoHan } from './fetch-co-han'
+import { layHoiSom } from './hoi-som'
 import { dayPhieuMoi, layPhieuMoi } from './phieu-may-chu-moi'
 import { chamDiemMoi, chiTietCaMoi, danhSachEmMoi, dayDanhSachMoi, dayMocBatDauMoi, ghiDiemMoi, ghiLenBangMoi, luotCuaCaMoi, napDayDuCaMoi, suaCaMoi, tienDoEmMoi, type OSuaCa } from './day-ca-may-chu-moi'
 import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, type CaDayNhieu } from './man-ca-may-chu-moi'
@@ -55,22 +57,7 @@ export interface SessionConfig {
  * gọi máy chủ từ nay đều có hạn, hết hạn thì báo thẳng. */
 const HAN_GIAY = 25
 
-/** `fetch` có hạn chờ. Không dùng thẳng AbortSignal.timeout vì Safari cũ
- * (iPhone đời trước) chưa có — tự dựng bằng AbortController cho chắc. */
-async function fetchCoHan(url: string, init: RequestInit, giay: number): Promise<Response> {
-  const bo = new AbortController()
-  const hen = setTimeout(() => bo.abort(), giay * 1000)
-  try {
-    return await fetch(url, { ...init, signal: bo.signal })
-  } catch (e) {
-    if (e instanceof DOMException && e.name === 'AbortError') {
-      throw new Error(`Máy chủ không trả lời sau ${giay} giây. Kiểm tra mạng rồi thử lại.`)
-    }
-    throw e
-  } finally {
-    clearTimeout(hen)
-  }
-}
+// `fetchCoHan` (fetch có hạn chờ) nay ở fetch-co-han.ts (05/10) — màn đăng nhập học sinh dùng chung mà không phải tải exam-api.
 
 /** HẠN CHỜ RIÊNG CHO `vaoThi` VÀ `submit` — KHACPHUCTREOHANGLOAT.md T5.
  *
@@ -3280,50 +3267,8 @@ export async function napToanBoCaLenMayChuMoi(
 // CỔNG THÔNG TIN HỌC SINH — GỌI MÁY CHỦ
 // ---------------------------------------------------------------------------
 
-export async function hsDangNhapApi(scriptUrl: string, sbd: string, matKhau?: string): Promise<{
-  token?: string
-  ok: boolean
-  chuaCoMatKhau?: boolean
-  sbd?: string
-  hoTen?: string
-  lop?: string
-  namSinh?: string
-  error?: string
-}> {
-  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
-  const base = await layDiaChiMayChu(scriptUrl)
-  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
-  try {
-    const res = await fetchCoHan(`${base}/hs/dang-nhap`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ sbd: sbd.trim(), matKhau: (matKhau ?? '').trim() }),
-    }, HAN_GIAY)
-    return (await res.json()) as any
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
-  }
-}
-
-export async function hsDatMatKhauApi(scriptUrl: string, sbd: string, matKhauMoi: string, matKhauCu?: string): Promise<{
-  ok: boolean
-  message?: string
-  error?: string
-}> {
-  // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.
-  const base = await layDiaChiMayChu(scriptUrl)
-  if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
-  try {
-    const res = await fetchCoHan(`${base}/hs/dat-mat-khau`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ sbd: sbd.trim(), matKhauMoi: matKhauMoi.trim(), matKhauCu: (matKhauCu ?? '').trim() }),
-    }, HAN_GIAY)
-    return (await res.json()) as any
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
-  }
-}
+// Đăng nhập + đặt mật khẩu lần đầu của em: nay ở hs-dang-nhap-api.ts (05/10, màn đăng nhập nhẹ) — XUẤT LẠI, mọi chỗ gọi cũ giữ nguyên.
+export { hsDangNhapApi, hsDatMatKhauApi } from './hs-dang-nhap-api'
 
 export async function resetMatKhauHsApi(scriptUrl: string, secret: string, sbd: string): Promise<{
   ok: boolean
@@ -3376,11 +3321,13 @@ export async function hsLichSuCaApi(scriptUrl: string, sbd: string): Promise<{
   const base = await layDiaChiMayChu(scriptUrl)
   if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
-    const res = await fetch(`${base}/hs/lich-su`, {
+    const than = JSON.stringify({ sbd: sbd.trim() })
+    // Lệnh đã HỎI SỚM (lúc mở app / vừa đăng nhập, src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
+    const res = (await layHoiSom(`${base}/hs/lich-su`, than)) ?? (await fetch(`${base}/hs/lich-su`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ sbd: sbd.trim() }),
-    })
+      body: than,
+    }))
     return (await res.json()) as any
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }

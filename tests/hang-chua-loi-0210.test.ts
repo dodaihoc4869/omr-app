@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // Vòng học v2 — hàng chữa lỗi (thầy 02/10: "đảm bảo tất cả các câu sai phải được xử lý triệt để", "chỉ tính từ 29/09").
 // Nguồn thứ 4 của kế hoạch ngày: câu sai TỰ LÀM ở MỌI kênh từ 29/09 ⇒ nợ; luật đóng lỗi chung; làm lại bằng câu song sinh.
 import { describe, expect, it } from 'vitest'
@@ -11,7 +12,7 @@ import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
 
 const cau = (qid: string) => JSON.stringify({
-  qid, maDe: 'DE9', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu gốc ${qid}`, choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH',
+  qid, maDe: 'DE9', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu gốc ${qid}`, choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH',
   correct: 'B', reviewed: true, solution: { chot: 'Bảo toàn khối lượng' },
 })
 const SS = [

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // EXP HỌC TẬP + MẢNH KHIÊN — TẦNG D1 (DE-XUAT-EXP-MANH-KHIEN-1909.md, Bước 2). Chạy trên SQLite THẬT (lược đồ thật + mọi migration).
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
@@ -28,7 +29,7 @@ const TU = '2026-09-01T00:00:00.000Z'
 const iso = (ms: number) => new Date(ms).toISOString()
 
 const hoSoGame = (o: Record<string, unknown> = {}) => ({ pet: 'dat_quy', choice: false, legacy: null, cap: 1, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2026-08-01T00:00:00.000Z', ...o })
-const themHs = (d: D1That, sbd = 'S1') => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES(?,'x','x')").run(sbd)
+const themHs = (d: D1That, sbd = 'S1') => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES(?,'x','12','x')").run(sbd)
 const themHoSoGame = (d: D1That, o: Record<string, unknown> = {}, sbd = 'S1') => d.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run(sbd, JSON.stringify(hoSoGame(o)), 'x')
 const docHoSoGame = (d: D1That, sbd = 'S1') => JSON.parse((d.sql.prepare('SELECT json FROM game_v2_profile WHERE sbd=?').get(sbd) as { json: string }).json) as Record<string, any>
 const bat = (d: D1That, o: Record<string, unknown> = { dsSbd: ['S1'] }) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ tu: TU, ...o }))
@@ -556,7 +557,7 @@ describe('đường nộp và màn hình', () => {
     d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',1,'kho/DE1.json',0,'v1')").run()
     d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
     const c = {
-      qid: q, maDe: 'DE1', version: 'v', group: `g-${q}`, phan, text: 'Đề', choices: phan === 'I' ? ['A', 'B', 'C', 'D'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+      qid: q, maDe: 'DE1', lop: '12', version: 'v', group: `g-${q}`, phan, text: 'Đề', choices: phan === 'I' ? ['A', 'B', 'C', 'D'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
       hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'hieu', sao: 2, kienThuc: ['k1'], correct, solution: 'giải', reviewed: true,
     }
     d.sql.prepare('INSERT OR REPLACE INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q, 'v', c.group, c.dang, JSON.stringify(c))
@@ -635,7 +636,7 @@ describe('luật CŨ ngừng sinh khoản mới sau mốc (syncAcademic)', () =>
       themHs(d)
       d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',1,'kho/DE1.json',0,'v1')").run()
       d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
-      const c = { qid: 'DE1-I-1', maDe: 'DE1', version: 'v', group: 'g1', phan: 'I', text: 'Đề', choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'hieu', sao: 1, kienThuc: ['k1'], correct: 'B', solution: 'g', reviewed: true }
+      const c = { qid: 'DE1-I-1', maDe: 'DE1', lop: '12', version: 'v', group: 'g1', phan: 'I', text: 'Đề', choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'hieu', sao: 1, kienThuc: ['k1'], correct: 'B', solution: 'g', reviewed: true }
       d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', c.qid, 'v', c.group, c.dang, JSON.stringify(c))
       await ghiSuKien(d.env, [{ nguon: 'btvn', maNguon: 'B', sbd: 'S1', qid: 'DE1-I-1', lan: 1, ketQua: 0, luc: iso(Date.now() - 3 * D) }])
       await dungLaiHoSo(d.env, ['S1'], iso(Date.now()))

@@ -10,6 +10,7 @@
 // Bảng bài: cột = dạng; ô P của dạng = P vi kỹ năng `dang:<ma>` (khái niệm dạng); vi kỹ năng `nen:*` yếu nhất hiện trong "Cần thầy chữa" (nút thắt / sơ ý).
 import type { Env } from './kieu'
 import { xoaDemCauHinh } from './cau-hinh-dem'
+import { chanKhacKhoiLop, congKhoi, docKhoiLopCong } from './chan-khac-khoi'
 import {
   KHOA_CO_OMNI, KHOA_MA_TRAN_THI, KHOA_THE_LUC_LOP, THAM_SO_OMNI, docCoOmniTu,
   type BangOmni, type CanThayChua, type HoSoOmniEm, type KhungDe, type Phan, type QCau, type ThamSoOmni, type TrangThaiSprt, type Vkn,
@@ -177,6 +178,7 @@ async function bang(env: Env, id: string, nowMs: number): Promise<Record<string,
   const tt = await pTt
   const cau = cd.qids.map((q) => qMap.get(q)!).filter(Boolean)
   const stt = new Map(cd.qids.map((q, i) => [q, i + 1]))
+  const dungKhoiLop = new Set(await chanKhacKhoiLop(env, 'omni_can_thay_chua', { lop: cd.lop, sbd: cd.sbd }, cd.qids)) // LUẬT THẦY 05/10: "Cần thầy chữa" chỉ câu ĐÚNG khối lớp
   const dangMa = [...new Set(cau.map((c) => c.maDang ?? '').filter(Boolean))]
   const tenD = new Map<string, string>()
   for (const q of cd.qids) { const m = kho.get(q); if (m?.dang && m.tenDang && !tenD.has(m.dang)) tenD.set(m.dang, m.tenDang) }
@@ -203,7 +205,7 @@ async function bang(env: Env, id: string, nowMs: number): Promise<Record<string,
   const theoCauNut = new Map<string, { sbd: Set<string>; buoc: Map<number, number> }>()
   for (const x of nut) {
     const q = tachSongSinh(str(x.qid)).goc
-    if (!stt.has(q)) continue
+    if (!stt.has(q) || !dungKhoiLop.has(q)) continue
     const g = theoCauNut.get(q) ?? { sbd: new Set<string>(), buoc: new Map<number, number>() }
     g.sbd.add(str(x.sbd))
     const bu = Number(x.buoc)
@@ -227,7 +229,7 @@ async function bang(env: Env, id: string, nowMs: number): Promise<Record<string,
     })
   }
   // (2) Câu sai ≥ NGUONG_CAT_TIA lần đã rời kế hoạch (cắt tỉa) ≥ 1 em
-  const catDs = cd.qids.map((q) => ({ q, sbd: cd.sbd.filter((s) => tt.get(s)?.get(q)?.catTia) })).filter((x) => x.sbd.length > 0)
+  const catDs = cd.qids.filter((q) => dungKhoiLop.has(q)).map((q) => ({ q, sbd: cd.sbd.filter((s) => tt.get(s)?.get(q)?.catTia) })).filter((x) => x.sbd.length > 0)
     .sort((a, b) => b.sbd.length - a.sbd.length || stt.get(a.q)! - stt.get(b.q)!)
   for (const { q, sbd } of catDs) {
     canThayChua.push({ loai: 'cat_tia', tieuDe: `Câu ${stt.get(q)} · ${tenCuaCau(q)}`, phu: `${sbd.length} em sai từ ${NGUONG_CAT_TIA} lần, câu đã rời kế hoạch — chờ thầy chữa`, soEm: sbd.length, qids: [q], sbd })
@@ -453,7 +455,9 @@ async function caChot(env: Env, id: string) {
   }
   const ung = [...theoQid.values()].filter(({ m }) => m.reviewed && !m.tuLuan && !nhomCd.has(m.group) && oCan.has(oCua(m)))
   const thuMuc = await thuMucCuaMaDe(env, [...new Set(ung.flatMap((u) => [...u.maDe]))])
-  const tuLuyen = ung.filter((u) => [...u.maDe].every((md) => thuMuc.get(md) === 'TU_LUYEN'))
+  const khoiCa = await docKhoiLopCong(env, { lop: cd.lop, sbd: cd.sbd }) // LUẬT THẦY 05/10: câu lạ máy tự thêm vào ca chốt ⇒ ĐÚNG khối lớp (lớp lẫn khối / chưa rõ khối ⇒ không câu lạ)
+  const moiTo = new Map(ung.map((u) => [u.m.qid, [...u.maDe].map((md) => ({ ma_de: md }))])) // câu nằm ở nhiều tờ: mỗi tờ một nguồn khối (tờ khác khối ⇒ mâu thuẫn ⇒ chặn)
+  const tuLuyen = congKhoi('em', 'omni_ca_chot_la', khoiCa.length === 1 ? khoiCa : [], ung.filter((u) => [...u.maDe].every((md) => thuMuc.get(md) === 'TU_LUYEN')), { cauCua: (u) => u.m }, moiTo)
   // Lớp = em của chiến dịch ∪ học sinh cùng lớp (chiến dịch giao theo lớp).
   let lop = [...cd.sbd]
   if (cd.lop) {

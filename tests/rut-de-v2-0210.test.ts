@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // RÚT ĐỀ CA KIỂM TRA v2 (02/10) — thang lấp từng ô của từng em (src/lib/rut-de-v2.ts) + máy chủ (server/src/rut-de-v2.ts):
 //   · chốt Bắt đầu MỘT lệnh (mốc + bản đồ) ⇒ không còn khe "đã bắt đầu mà chưa có bản đồ";
 //   · /vao-thi ca đề riêng mà bản đồ thiếu em ⇒ lấp riêng trên máy chủ / bảo thử lại, KHÔNG cắt theo băm im lặng;
@@ -339,7 +340,7 @@ describe('/vao-thi — ca đề riêng mà bản đồ chưa có em ⇒ KHÔNG c
     const { d, env } = await dungCa({ batDau: '2026-10-02T02:50:00.000Z', bo: { bo: { S1: ['K-I-0', 'K-I-1', 'K-I-2', 'K-II-0', 'K-III-0'] } } })
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S3','Ba','12A','x')")
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-      .run('DE9', 'X1', 'v1', 'g-X1', 'D1', JSON.stringify({ qid: 'X1', maDe: 'DE9', version: 'v1', group: 'g-X1', phan: 'I', text: 'Câu X1', choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', mucDo: 'TH', correct: 'B', reviewed: true }))
+      .run('DE9', 'X1', 'v1', 'g-X1', 'D1', JSON.stringify({ qid: 'X1', maDe: 'DE9', lop: '12', version: 'v1', group: 'g-X1', phan: 'I', text: 'Câu X1', choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', mucDo: 'TH', correct: 'B', reviewed: true }))
     await damBaoBangLoiGiai(env); await damBaoBangBoTro(env)
     d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES(?,?,?,?,?,1,0,?,?)')
       .run('k1', 'S3', 'X1', 'luyen', 'M', '2026-09-30T03:00:00.000Z', '2026-09-30')
@@ -384,7 +385,7 @@ describe('/ca/loi-den-han — lỗi đến hạn theo em (hàng chữa lỗi) ch
     const env = d.env as unknown as Env
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','An','12','x')")
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-      .run('DE9', 'X1', 'v1', 'g-X1', 'D1', JSON.stringify({ qid: 'X1', maDe: 'DE9', version: 'v1', group: 'g-X1', phan: 'I', text: 'Câu X1', choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', mucDo: 'TH', correct: 'B', reviewed: true, solution: { chot: 'BTKL' } }))
+      .run('DE9', 'X1', 'v1', 'g-X1', 'D1', JSON.stringify({ qid: 'X1', maDe: 'DE9', lop: '12', version: 'v1', group: 'g-X1', phan: 'I', text: 'Câu X1', choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', mucDo: 'TH', correct: 'B', reviewed: true, solution: { chot: 'BTKL' } }))
     await damBaoBangLoiGiai(env); await damBaoBangBoTro(env)
     d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES('X1','BAM1','DE9','tn','x')").run()
     d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cau_kiem_json,nhan_nen_json,buoc_json,cap_nhat_luc) VALUES('BAM1','X1',?,'[]','[]','[]','x')").run(JSON.stringify(SS))
@@ -410,7 +411,7 @@ describe('song sinh Phần III — đáp án chấm là đáp án đã làm trò
     const env = d.env as unknown as Env
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','An','12','x')")
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-      .run('DE9', 'Y1', 'v1', 'g-Y1', 'D1', JSON.stringify({ qid: 'Y1', maDe: 'DE9', version: 'v1', group: 'g-Y1', phan: 'III', text: 'Câu Y1', choices: [], hinhAnh: [], dang: 'D1', mucDo: 'VD', correct: '1000,5', reviewed: true, solution: {} }))
+      .run('DE9', 'Y1', 'v1', 'g-Y1', 'D1', JSON.stringify({ qid: 'Y1', maDe: 'DE9', lop: '12', version: 'v1', group: 'g-Y1', phan: 'III', text: 'Câu Y1', choices: [], hinhAnh: [], dang: 'D1', mucDo: 'VD', correct: '1000,5', reviewed: true, solution: {} }))
     await damBaoBangLoiGiai(env); await damBaoBangBoTro(env)
     d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES('Y1','BAMY','DE9','tln','x')").run()
     d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cau_kiem_json,nhan_nen_json,buoc_json,cap_nhat_luc) VALUES('BAMY','Y1',?,'[]','[]','[]','x')")

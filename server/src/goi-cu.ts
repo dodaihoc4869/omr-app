@@ -1,7 +1,7 @@
 import { xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { docKhoiEm, xoaDemCaBaoVe } from './game-v2-bank'
 import { docKhoDeGiaoCuaEm } from './kho-de-giao'
-import { cauHopKhoi } from '../../src/lib/khoi-cau'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect,kiemTraDapAnBtvn,LoiChamBtvn} from './btvn-grading'
 import {ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,laBoTrong,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
@@ -2629,7 +2629,7 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
     .all<Record<string, unknown>>()
   // LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): chuyên đề/dạng trùng tên giữa các khối ⇒ chỉ giữ câu của tờ khối em hoặc THẤP hơn (máy em gửi `sbd`; không có `sbd` ⇒ không lọc).
   const khoiEm = sbd ? await docKhoiEm(env, sbd) : null
-  const rCau = { results: (rCauTho.results ?? []).filter((x) => cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de })) }
+  const rCau = { results: await chanKhacKhoiEm(env, 'khac_phuc', { khoiEm }, rCauTho.results ?? [], { cauCua: (x) => ({ qid: x.qid, ma_de: x.ma_de, chuyen_de: x.chuyen_de }) }) } // LUẬT THẦY 05/10: chỉ câu ĐÚNG khối em (không `sbd` ⇒ không rõ khối ⇒ không câu nào)
   // LUẬT "KHO ĐỀ GIAO THEO TUẦN": em có giao đang hiệu lực ⇒ CHỈ giữ câu thuộc đề đã tick (không rút ngoài kho).
   const giaoKP = sbd ? await docKhoDeGiaoCuaEm(env, sbd, Date.now()) : null
   if (giaoKP) rCau.results = rCau.results.filter((x) => giaoKP.maDe.has(chuoi(x.ma_de).trim()))

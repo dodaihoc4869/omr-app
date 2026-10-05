@@ -1,5 +1,5 @@
 // "Luyện nâng cao / Thử sức ngay" (Bảng nhiệm vụ → mở thử thách): chọn 2 câu từ kho đề máy em.
-// Luật: chỉ câu HỢP KHỐI của em (câu khối cao hơn ⇒ bỏ; không rõ khối em / khối câu ⇒ giữ — đúng luật `khoi-cau.ts`), ưu tiên câu Vận dụng
+// Luật (thầy 05/10, `khoi-cau.ts`): chỉ câu ĐÚNG KHỐI em (khác khối thấp hay cao ⇒ bỏ; không rõ khối em / khối câu ⇒ bỏ), ưu tiên câu Vận dụng
 // (2 sao hoặc mức "vận dụng") có đáp án; không đủ thì lấy câu bất kỳ có đáp án. Hàm THUẦN — màn chỉ gọi.
 import type { CauLuyen } from './bai-tap-pdf'
 import { locCauHopKhoi, type Khoi } from './khoi-cau'

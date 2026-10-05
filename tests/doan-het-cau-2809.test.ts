@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // ĐOÀN HỘ TỐNG 2.0 · EM HẾT CÂU RIÊNG TRƯỚC BẠN (thầy 28/09 "cho trợ lý làm cho hợp lý luôn").
 // Hiện trạng + nguyên nhân: docs/doan-het-cau-2809/HIEN-TRANG.md. Luật mới:
 //  * hiệp thường em không còn câu riêng ⇒ máy coi em đã chốt vai GIỮ KHIÊN (+8 khiên như bạn máy chắn, không đúng/sai),
@@ -110,7 +111,7 @@ function dungTruong(): D1That {
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',?,?,0,'v1')").run(KHO.length, 'kho/DE1.json')
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of KHO) {
-    const q = { qid: c.qid, maDe: 'DE1', version: 'v1', group: `g-${c.qid}`, phan: 'I', text: `Đề ${c.qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: c.dang, tenDang: 'Dạng', mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: c.correct, solution: `LG-${c.qid}`, reviewed: true }
+    const q = { qid: c.qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${c.qid}`, phan: 'I', text: `Đề ${c.qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: c.dang, tenDang: 'Dạng', mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: c.correct, solution: `LG-${c.qid}`, reviewed: true }
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
   }
   for (const [sbd, ten] of [['S1', 'Nguyễn Thu Hà'], ['S2', 'Trần Văn Nam'], ['S3', 'Lê Minh An']] as const) {

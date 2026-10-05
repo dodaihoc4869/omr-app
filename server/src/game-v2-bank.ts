@@ -209,7 +209,7 @@ export async function qidDangBaoVe(env:Env,cau:Row[]):Promise<Set<string>>{
  *  Bản nhẹ là đối tượng ĐÓNG BĂNG dùng chung nhiều lượt: không được sửa; muốn đưa cho em thì phải qua `doDayDu`. */
 export type CauPool=PrivateQuestion&{nhe?:true;tuLuan?:boolean}
 const CO_NHE=['qid','maDe','version','group','phan','dang','tenDang','mucDo','sao','kienThuc','reviewed','family'] as const
-export function lamNhe(q:PrivateQuestion):CauPool{const n:Record<string,unknown>={};for(const k of CO_NHE)n[k]=(q as unknown as Record<string,unknown>)[k];n.nhe=true;n.tuLuan=laCauTuLuan(q);return Object.freeze(n) as unknown as CauPool}
+export function lamNhe(q:PrivateQuestion):CauPool{const n:Record<string,unknown>={};for(const k of CO_NHE)n[k]=(q as unknown as Record<string,unknown>)[k];const lop=(q as unknown as Record<string,unknown>).lop;if(lop!=null)n.lop=lop/* LUẬT THẦY 05/10: khối ghi trong JSON câu là một nguồn khối — giữ ở bản nhẹ để bộ lọc khối thấy */;n.nhe=true;n.tuLuan=laCauTuLuan(q);return Object.freeze(n) as unknown as CauPool}
 /** `laCauTuLuan` cho câu trong pool: bản nhẹ dùng cờ tính sẵn (hàm gốc cần text/đáp án); câu đầy đủ tính tại chỗ. */
 export const laTuLuanPool=(q:CauPool):boolean=>q.tuLuan??laCauTuLuan(q)
 /** Nạp bản ĐẦY ĐỦ của các câu nhẹ (một truy vấn, theo (ma_de, qid, version)); câu đầy đủ giữ nguyên. Thứ tự và độ dài giữ nguyên. Câu vừa bị sửa/rút khỏi kho ⇒ lỗi để em mở lượt mới (không tính sai). */

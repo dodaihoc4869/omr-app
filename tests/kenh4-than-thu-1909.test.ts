@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // GĐ 5 — KÊNH 4 (thần thú): bằng chứng từ hồ sơ, một đồng hồ ôn (moc_on_ke), chặn câu đã làm/đang giao hôm nay, nhiệm vụ tự sinh từ kế hoạch ngày.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
@@ -18,7 +19,7 @@ beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new 
 afterEach(() => vi.useRealTimers())
 const iso = (gio: number) => new Date(Date.now() + gio * H).toISOString()
 const cauKho = (qid: string, dang: string | null, mucDo: string | null = 'biet', o: Record<string, unknown> = {}) => ({
-  qid, maDe: 'x', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang, tenDang: 'Dạng', mucDo, sao: 1,
+  qid, maDe: 'x', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang, tenDang: 'Dạng', mucDo, sao: 1,
   kienThuc: ['K1'], correct: 'B', solution: 'Giải', reviewed: true, ...o,
 })
 function themCau(d: D1That, cau: ReturnType<typeof cauKho>[]) {
@@ -26,7 +27,7 @@ function themCau(d: D1That, cau: ReturnType<typeof cauKho>[]) {
   d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of cau) d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', c.qid, c.version, c.group, c.dang, JSON.stringify({ ...c, maDe: 'DE1' }))
 }
-const themHs = (d: D1That, sbd: string) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES(?,'x','mk','x')").run(sbd)
+const themHs = (d: D1That, sbd: string) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES(?,'x','12','mk','x')").run(sbd)
 type Ev = { sbd?: string; qid: string; nguon: NguonSuKien; gio: number; kq: 0 | 1; lan?: number; dang?: string | null }
 async function ghi(d: D1That, ds: Ev[]) {
   const r = await ghiSuKien(d.env, ds.map((e, i) => ({ nguon: e.nguon, maNguon: `M${i}`, sbd: e.sbd ?? 'S1', qid: e.qid, lan: e.lan ?? 1, ketQua: e.kq, luc: iso(e.gio), maDang: e.dang === undefined ? 'ES.A.X' : e.dang })))
@@ -187,6 +188,7 @@ describe('K4.3 nhiệm vụ thần thú tự sinh từ việc than_thu NHÃN bu 
   async function dungThieu() {
     const d = taoD1That()
     themHs(d, 'S1')
+    d.sql.prepare("INSERT INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES('A1','DE1','12','x')").run() // LUẬT THẦY 05/10: câu ôn phải rõ khối (= khối em 12)
     await ghi(d, [{ qid: 'A1', nguon: 'btvn', gio: -72, kq: 0, dang: 'ES.A.X' }])
     return d
   }

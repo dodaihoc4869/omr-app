@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // THÀNH THẠO LẦN ĐẦU (thầy CHỐT 28/09/2026): đúng ngay lần đầu, không gợi ý ⇒ thành thạo luôn — CHỈ với câu khó đoán mò:
 // Phần II (đúng cả 4 ý), Phần III, Phần I Nhận biết; trừ câu 2 sao. Còn lại (Phần I Thông hiểu/Vận dụng, câu 2 sao, câu có gợi ý,
 // câu sai lần đầu): đúng 2 ngày khác nhau như cũ. Ước lượt: P1 (câu mới 2 lượt) — MỘT hàm `khoiLuongCan` cho mọi ô.
@@ -134,7 +135,7 @@ describe('kế hoạch ngày + khối lượng', () => {
 const T0 = Date.parse('2026-09-30T02:00:00Z') // 09:00 VN 30/09
 const GIO = 3_600_000
 const cauKho = (qid: string, ma: string, phan: 'I' | 'II' | 'III', mucDo: string, sao = 1) => JSON.stringify({
-  qid, maDe: ma, version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+  qid, maDe: ma, lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
   hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo, sao, kienThuc: ['k'], correct: phan === 'I' ? 'B' : phan === 'II' ? 'DSDS' : '4', reviewed: true, solution: { chot: 'c' },
 })
 function dung() {

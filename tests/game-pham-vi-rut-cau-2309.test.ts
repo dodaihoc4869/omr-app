@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {gameV2} from '../server/src/game-v2'
 import {gameToken} from '../server/src/game-v2-auth'
@@ -19,7 +20,7 @@ function dung(){
   const them=d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
   for(const dang of ['A','B'])for(let i=0;i<20;i++){
     const qid=`${dang}${i}`,group=i===2||i===3?`${dang}-trung`:`g-${qid}`
-    const q={qid,maDe:'DE',version:'v1',group,phan:'I',text:`${dang} ${i}`,choices:['a','b','c','d'],ideas:[],hinhAnh:[],dang,tenDang:dang,mucDo:'biet',sao:1,kienThuc:[`${dang}-KT`],correct:'A',solution:'',reviewed:true}
+    const q={qid,maDe:'DE', lop: '12',version:'v1',group,phan:'I',text:`${dang} ${i}`,choices:['a','b','c','d'],ideas:[],hinhAnh:[],dang,tenDang:dang,mucDo:'biet',sao:1,kienThuc:[`${dang}-KT`],correct:'A',solution:'',reviewed:true}
     them.run('DE',qid,'v1',group,dang,JSON.stringify(q))
   }
   for(const sbd of ['S1','S2','S3']){
@@ -75,7 +76,7 @@ describe('kho game theo phần từng em đã học',()=>{
 })
 
 describe('ôn có khoảng cách và chi phí chọn',()=>{
-  const cau=(qid:string,group=`g-${qid}`):PrivateQuestion=>({qid,group,maDe:'DE',version:'v1',phan:'I',text:qid,choices:['a','b','c','d'],ideas:[],hinhAnh:[],dang:'A',tenDang:'A',mucDo:'biet',sao:1,kienThuc:['A-KT'],correct:'A',solution:'',reviewed:true})
+  const cau=(qid:string,group=`g-${qid}`):PrivateQuestion=>({qid,group,maDe:'DE', lop: '12',version:'v1',phan:'I',text:qid,choices:['a','b','c','d'],ideas:[],hinhAnh:[],dang:'A',tenDang:'A',mucDo:'biet',sao:1,kienThuc:['A-KT'],correct:'A',solution:'',reviewed:true})
   it('làm sai câu vận dụng không nâng bậc; tự làm đúng 4/5 câu qua hai lượt mới tăng mức',()=>{
     const evidence:Evidence[]=[{qid:'A-kho',group:'g-kho',dang:'A',mucDo:'van_dung',kienThuc:['A-KT'],wrong:true,date:new Date(T-3*86_400_000).toISOString(),ca:'thi'}]
     expect(targetLevel('A',evidence,[])).toBe(0)
@@ -90,7 +91,7 @@ describe('ôn có khoảng cách và chi phí chọn',()=>{
       const d=dung()
       for(const [qid,mucDo] of [['TRUM-KHO','van_dung'],...(coCauDe?[['TRUM-DE','biet']]:[])]){
         const q={...cau(qid!),phan:'II',ideas:['a','b','c','d'],correct:'DSDS',mucDo}
-        d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE',qid,'v1',q.group,'A',JSON.stringify({...q,maDe:'DE',version:'v1'}))
+        d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE',qid,'v1',q.group,'A',JSON.stringify({...q,maDe:'DE', lop: '12',version:'v1'}))
       }
       const r=await gameV2(d.env,'doan-mo',{token:await gameToken(d.env,'S1')}) as any
       const row=d.sql.prepare('SELECT json FROM doan_chang WHERE ma=?').get(r.doan.ma) as {json:string}

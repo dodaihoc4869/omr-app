@@ -130,10 +130,12 @@ describe('Tu luyện — câu công khai, chấm ở máy chủ', () => {
     expect(khac.ok).toBe(false)
   })
 
-  it('chế độ 3 không vượt khối em: dạng lớp 11 được, mã ngoài danh mục bị từ chối', async () => {
+  it('chế độ 3 chỉ ĐÚNG khối em (luật 05/10): danh mục chỉ lớp của em; mã ngoài danh mục bị từ chối', async () => {
     const d = await dung()
     const ng = await tuLuyenNguon(d.env, 'HS1')
-    expect((ng.danhMuc as { lop: string }[]).map((l) => l.lop)).toEqual(['11', '12'])
+    // SỬA CÓ CHỦ Ý 05/10 (trước: em khối 12 thấy cả lớp 11 — "không vượt khối em"). LUẬT THẦY (nguyên văn): "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm
+    // sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé" ⇒ chỉ dạng bài ĐÚNG khối em.
+    expect((ng.danhMuc as { lop: string }[]).map((l) => l.lop)).toEqual(['12'])
     d.sql.prepare("UPDATE hoc_sinh SET lop='11' WHERE sbd='HS1'").run()
     const r = await tuLuyenRut(d.env, 'HS1', { cheDo: 3, dsDang: [MA_DB], soCau: 5 })
     expect(r.ok).toBe(false)

@@ -17,7 +17,8 @@ const NOW = Date.parse('2026-09-23T03:00:00Z')
 
 async function fixture() {
   const d = taoD1That()
-  d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','Em 1','x'); INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('D','Q1','v','g','ES.1','{}')")
+  // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): hàng ôn chỉ câu ĐÚNG khối em ⇒ em lớp 12, câu ghi khối `lop` 12.
+  d.sql.exec(`INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Em 1','12','x'); INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('D','Q1','v','g','ES.1','{"lop":"12"}')`)
   await ghiSuKien(d.env, [{ nguon: 'on_lai', maNguon: 'M', sbd: 'S1', qid: 'Q1', lan: 1, ketQua: 1, luc: '2026-09-01T03:00:00Z', maDang: 'ES.1', chuyenDe: 'Este' }])
   return d
 }
