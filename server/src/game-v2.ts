@@ -358,7 +358,10 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   const cheDo2Som=LENH_HOA2.has(action)?som(cheDo2(env,sbd)):null
   // Sảnh: phần ĐỌC của ô Bi-a (cờ + ca đang mở) chạy song song với Sảnh; phần sau (bàn Bi-a) vẫn chạy SAU kế hoạch như cũ.
   const biaSom=action==='hoa2-sanh'?batDauBiaChoSanh(env,sbd,Date.now()):null
-  return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,biaSom}
+  // "Câu đã làm" + chi tiết câu (tối ưu vòng 2, 06/10): hai lệnh CHỈ ĐỌC ⇒ chạy luôn CÙNG đợt với hồ sơ thần thú (trước: chờ hồ sơ xong mới bắt đầu — một đợt D1 nối tiếp thừa). Em chưa chọn thần thú / chưa ở
+  // Hoá 2.0 ⇒ kết quả bỏ không dùng (đường kiểm bên dưới giữ nguyên thứ tự và lời cũ); lỗi của nó chỉ tới đúng chỗ `await` như cũ.
+  const cauDaLamSom=action==='hoa2-cau-da-lam'||action==='hoa2-cau-chi-tiet'?som(hoa2Action(env,sbd,action,b)):null
+  return {sbd,hoSoSom,truocAnswer,truocComplete,cheDo2Som,biaSom,cauDaLamSom}
 }
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
@@ -367,13 +370,13 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   const sbd=await gameIdentity(env,b,s=>{if(action!=='sync')giu.ds=batDauDocSom(env,action,b,s)})
   if(action==='sync')return {ok:true,...await syncIndex(env)}
   const ds=giu.ds&&giu.ds.sbd===sbd?giu.ds:batDauDocSom(env,action,b,sbd)
-  const {truocAnswer,truocComplete,cheDo2Som,biaSom}=ds
+  const {truocAnswer,truocComplete,cheDo2Som,biaSom,cauDaLamSom}=ds
   const {profile:p,revision}=await loadProfile(env,sbd,await ds.hoSoSom)
   if(action.startsWith('escort-')){if(p.choice)throw new Error('Em chọn thần thú trước khi vào võ đài.');return escortAction(env,sbd,p.pet,p.cap,action,b)}
   if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
   if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
   // GAME HÓA 2.0 (srs2-game.ts): Sảnh bản đồ, Câu đã làm, Rương Bát Linh. Chỉ khi cờ `cau_hinh.game_hoa_2` bật cho em.
-  if(LENH_HOA2.has(action)){if(!await cheDo2Som)return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};const h=await hoa2Action(env,sbd,action,b);if(action==='hoa2-sanh'&&h.ok===true&&biaSom)h.bia=await biaSom();return h}
+  if(LENH_HOA2.has(action)){if(!await cheDo2Som)return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};const h=await(cauDaLamSom??hoa2Action(env,sbd,action,b));if(action==='hoa2-sanh'&&h.ok===true&&biaSom)h.bia=await biaSom();return h}
   // BI-A PHẢN ỨNG (bi-a.ts; cờ `cau_hinh.bi_a`, mặc định TẮT): cửa thứ ba trên Sảnh Bát Linh. Câu trả lời đi qua `answer` chung bên dưới.
   if(LENH_BIA.has(action))return biaAction(env,sbd,action,b)
   if(LENH_SHOP.has(action)){if(p.choice)throw new Error('Em chọn thần thú trước khi vào Cửa hàng.');return shopAction(env,sbd,p,revision,action,b,()=>loadProfile(env,sbd))} // Cửa hàng phụ kiện (game-v2-shop.ts; cờ cau_hinh.shop_phu_kien mặc định TẮT)
