@@ -62,25 +62,46 @@ export function diaChiDangDung(): string {
 export const HAN_SANH_KEM_MS = 30_000
 
 /**
- * ĐĂNG NHẬP KÈM SẢNH (D1 06/10): máy chủ trả sẵn phản hồi `hoa2-sanh` của em trong phản hồi đăng nhập ⇒ ghi nó như một phản hồi "hỏi sớm" ĐÃ VỀ — Sảnh
- * nhận đúng cơ chế cũ (khớp địa chỉ + thân `{token}`, dùng MỘT lần) nên lượt vẽ đầu của Sảnh có số ngay, và lệnh `hoa2-sanh` không phải gửi nữa.
- * Chỉ nhận khi đúng dạng (đối tượng, `ok === true`); thiếu / sai ⇒ không làm gì (Sảnh đi đường cũ: nhận lệnh hỏi sớm hoặc tự gửi).
+ * ĐĂNG NHẬP KÈM SẢNH (D1 06/10): máy chủ trả phản hồi `hoa2-sanh` của em cùng lệnh đăng nhập — hoặc ĐÃ có sẵn (`sanh`), hoặc ĐANG VỀ theo luồng (`sanhHua`, dòng 2 của phản
+ * hồi đăng nhập; dòng 1 đã đưa em vào cổng). Ghi nó như một phản hồi "hỏi sớm" — Sảnh nhận đúng cơ chế cũ (khớp địa chỉ + thân `{token}`, dùng MỘT lần), nên lệnh `hoa2-sanh`
+ * không phải gửi nữa; lượt vẽ đầu của Sảnh có số ngay nếu dòng 2 đã về, chưa về thì lượt hỏi của Sảnh chờ nó như chờ một lệnh hỏi sớm đang bay.
+ * Chỉ nhận khi đúng dạng (đối tượng, `ok === true`); thiếu / sai / `null` ⇒ lời hứa thành `null` ⇒ chỗ gọi (`goiHoa2`) tự gửi lệnh như cũ.
  */
-function nhanSanhKemDangNhap(goc: string, token: string, sanh: unknown): void {
-  if (!sanh || typeof sanh !== 'object' || (sanh as Record<string, unknown>).ok !== true) return
+function nhanSanhKemDangNhap(goc: string, token: string, kem: KemDangNhap): void {
   const k = kho()
   if (!k) return
-  const x: PhanHoiSom = { ok: true, status: 200, text: JSON.stringify(sanh), nhip: null }
-  k[DUONG_SANH] = { goc, than: JSON.stringify({ token }), hua: Promise.resolve(x), xong: x, tuHtml: false, het: Date.now() + HAN_SANH_KEM_MS }
+  const hopLe = (sanh: unknown): sanh is Record<string, unknown> => !!sanh && typeof sanh === 'object' && (sanh as Record<string, unknown>).ok === true
+  const thanhPhanHoi = (sanh: Record<string, unknown>): PhanHoiSom => ({ ok: true, status: 200, text: JSON.stringify(sanh), nhip: null })
+  const than = JSON.stringify({ token })
+  const het = Date.now() + HAN_SANH_KEM_MS
+  if (hopLe(kem.sanh)) {
+    const x = thanhPhanHoi(kem.sanh)
+    k[DUONG_SANH] = { goc, than, hua: Promise.resolve(x), xong: x, tuHtml: false, het }
+    return
+  }
+  if (!kem.sanhHua || typeof (kem.sanhHua as Promise<unknown>).then !== 'function') return
+  const muc: MucHoiSom = { goc, than, hua: Promise.resolve(null), xong: undefined, tuHtml: false, het }
+  muc.hua = (kem.sanhHua as Promise<unknown>).then(
+    (sanh) => {
+      const x = hopLe(sanh) ? thanhPhanHoi(sanh) : null
+      muc.xong = x
+      return x
+    },
+    () => {
+      muc.xong = null
+      return null
+    },
+  )
+  k[DUONG_SANH] = muc
 }
 const DUONG_SANH = '/game-v2/hoa2-sanh'
 
-/** Gửi sớm các lệnh Sảnh cho phiên vừa đăng nhập (cùng hàm đoạn mã nội tuyến dùng). `kem.sanh` (máy chủ đính kèm đăng nhập) thay cho lệnh `hoa2-sanh`. */
+/** Gửi sớm các lệnh Sảnh cho phiên vừa đăng nhập (cùng hàm đoạn mã nội tuyến dùng). `kem` (máy chủ đính kèm đăng nhập: `sanh` có sẵn / `sanhHua` đang về) thay cho lệnh `hoa2-sanh`. */
 export function batDauHoiSom(goc: string, phien: { token?: string; sbd?: string }, kem?: KemDangNhap): void {
   if (typeof window === 'undefined' || typeof fetch !== 'function' || !goc || !phien.token) return
   try {
     // Ghi phản hồi Sảnh kèm đăng nhập TRƯỚC: `hoiSomSanh` thấy mục cùng địa chỉ + thân chưa dùng thì không gửi lệnh `hoa2-sanh` lần nữa.
-    if (kem?.sanh) nhanSanhKemDangNhap(goc, phien.token, kem.sanh)
+    if (kem && (kem.sanh || kem.sanhHua)) nhanSanhKemDangNhap(goc, phien.token, kem)
     hoiSomSanh(window, goc, phien, LENH_HOI_SOM, false)
   } catch {
     /* hỏi sớm chỉ là tăng tốc */

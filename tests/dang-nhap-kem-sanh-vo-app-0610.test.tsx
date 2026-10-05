@@ -77,6 +77,34 @@ describe('AppHocSinh — đăng nhập kèm Sảnh', () => {
     expect(phien).toEqual({ sbd: '99001', hoTen: 'Em', lop: '12A', namSinh: '2008', token: 'tk-moi' })
   })
 
+  it('máy chủ trả THEO LUỒNG (Sảnh chưa về): vào cổng NGAY, bắn 4 lệnh còn lại NGAY (không chờ Sảnh); Sảnh về sau thì lượt hỏi của Sảnh nhận đúng phản hồi ấy; phiên không chứa nó', async () => {
+    let tra!: (x: unknown) => void
+    const sanhHua = new Promise<unknown>((xong) => { tra = xong })
+    mocks.dangNhap.mockResolvedValue({ ok: true, sbd: '99001', hoTen: 'Em', lop: '12A', namSinh: '2008', token: 'tk-moi', sanhHua })
+    render(<AppHocSinh />)
+    await dangNhap()
+    expect(await screen.findByTestId('cong')).toHaveProperty('textContent', 'chua-co-so') // đăng nhập KHÔNG chờ Sảnh
+    const duong = goiThat.mock.calls.map((c) => String(c[0]).replace(GOC, ''))
+    expect(duong).not.toContain(DUONG_SANH)
+    expect(duong.sort()).toEqual(['/hs/buoi-hoc', '/hs/ca-dang-mo', '/hs/ke-hoach-ngay', '/hs/lich-su']) // các lệnh còn lại đi ngay
+    const cho = layHoiSom(GOC + DUONG_SANH, thanTk('tk-moi')) // lượt hỏi của Sảnh: chờ dòng 2
+    expect(cho).not.toBeNull()
+    tra(SANH)
+    const r = await cho!
+    expect(r && (await r.json())).toEqual(SANH)
+    expect(goiThat).toHaveBeenCalledTimes(4)
+    expect(JSON.parse(localStorage.getItem('omr_student_portal_auth')!)).toEqual({ sbd: '99001', hoTen: 'Em', lop: '12A', namSinh: '2008', token: 'tk-moi' })
+  })
+
+  it('luồng đứt (sanhHua = null) ⇒ lượt hỏi của Sảnh nhận null và tự gửi lệnh hoa2-sanh như cũ', async () => {
+    mocks.dangNhap.mockResolvedValue({ ok: true, sbd: '99001', hoTen: 'Em', token: 'tk-moi', sanhHua: Promise.resolve(null) })
+    render(<AppHocSinh />)
+    await dangNhap()
+    await screen.findByTestId('cong')
+    await expect(layHoiSom(GOC + DUONG_SANH, thanTk('tk-moi'))).resolves.toBeNull()
+    expect(goiThat).toHaveBeenCalledTimes(4)
+  })
+
   it('máy chủ cũ (không có `sanh`) ⇒ đường cũ y hệt: gửi đủ 5 lệnh (có hoa2-sanh), lượt vẽ đầu chưa có số', async () => {
     mocks.dangNhap.mockResolvedValue({ ok: true, sbd: '99001', hoTen: 'Em', token: 'tk-moi' })
     render(<AppHocSinh />)

@@ -17,6 +17,12 @@ export interface ApiDangNhapHs {
   datMatKhau: typeof hsDatMatKhauApi
 }
 
+/** Phần Sảnh máy chủ đính kèm phản hồi đăng nhập (D1 06/10) — chỉ khoá nào CÓ mới đưa ra; không có gì ⇒ undefined (y như trước). */
+function kemCuaDangNhap(res: { sanh?: unknown; sanhHua?: Promise<unknown> }): KemDangNhap | undefined {
+  if (!res.sanh && !res.sanhHua) return undefined
+  return { ...(res.sanh ? { sanh: res.sanh } : {}), ...(res.sanhHua ? { sanhHua: res.sanhHua } : {}) }
+}
+
 /** Hỏi địa chỉ máy chủ (đọc IndexedDB) — hạn 8 giây như bản cũ, lỗi ⇒ rỗng (lệnh đăng nhập tự hỏi lại). */
 const hoiDiaChi = () => voiHanCho(loadScriptUrlHoacMacDinh(), 8000, 'timeout').catch(() => '')
 
@@ -77,7 +83,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
           namSinh: res.namSinh || '',
           token: res.token,
         },
-        res.sanh ? { sanh: res.sanh } : undefined,
+        kemCuaDangNhap(res),
       )
     } catch (err) {
       setLoiDangNhap(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
@@ -117,7 +123,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
             namSinh: resDn.namSinh || '',
             token: resDn.token,
           },
-          resDn.sanh ? { sanh: resDn.sanh } : undefined,
+          kemCuaDangNhap(resDn),
         )
         setChuaCoMatKhau(false)
       } else {
