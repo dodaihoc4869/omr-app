@@ -41,7 +41,7 @@ import {omniBat} from './omni-d1'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docCauHinhExp,docTongSoTruocKhoanGame,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
-import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
+import {LENH_SHOP,docCoCuaHangTuoi,shopAction,shopBatCho} from './game-v2-shop'
 import {LENH_BIA,biaAction,batDauBiaChoSanh,docCoBia} from './bi-a'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
 export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number;ngayNghi?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4;/** Luật v5: EXP tràn hôm nay + luỹ kế. */tranV5?:TranV5;/** Dấu vết trước khi sang v5 (để lùi). */truocV5?:TruocV5}
@@ -341,6 +341,8 @@ function batDauDocSom(env:Env,action:string,b:Record<string,unknown>,sbd:string)
   const truocComplete=action==='complete'?docTruocComplete(env,sbd,b):null
   // OMNI 3 (tối ưu 05/10): máy em gửi `msLam` (chỉ khi OMNI áp cho em) ⇒ các lượt ĐỌC OMNI của lần trả lời bắt đầu CÙNG đợt hồ sơ (nhớ theo lượt, omni-game.ts).
   if(action==='answer'||action==='doan-nop')docSomOmniTraLoi(env,sbd,action,b)
+  // Cửa hàng (tối ưu 05/10): cờ cửa hàng ĐỌC TƯƠI của lượt (nhớ theo lượt, `moCua` dùng lại) vào CÙNG lô đọc với hồ sơ — trước: một đợt riêng.
+  if(LENH_SHOP.has(action))void docCoCuaHangTuoi(env).catch(()=>null)
   // Đoàn + OMNI: cờ EXP (nhớ theo lượt) đọc ngay đợt đầu ⇒ lệnh `answer` nội bộ đọc được tổng sổ EXP cùng đợt với phiên/câu (xem `docTruocAnswer`).
   if(action==='doan-nop'&&b.msLam!==undefined&&b.msLam!==null)void docCauHinhExp(env).catch(()=>null)
   // CAO ĐIỂM 20h–24h (29/09): cờ Game Hóa 2.0 / Bi-a (đệm 15 s dùng chung, lượt đọc đang bay được chia sẻ) đọc CÙNG đợt với hồ sơ thay vì một đợt riêng sau đó.

@@ -33,14 +33,22 @@ export async function ducVang(env: Env, sbd: string, p: Pick<Profile, 'earned'> 
   const tong = vangDangDuc(p)
   if (tong <= 0) return 0
   try {
-    const r = await env.DB.prepare(
+    const chen = env.DB.prepare(
       `INSERT OR IGNORE INTO vang_so(sbd, loai, so_vang, exp_tru, ma_mon, khoa_yeu_cau, luc)
        SELECT ?, 'doi', ? - d.v, 0, NULL, ?, ?
          FROM (SELECT COALESCE(SUM(so_vang), 0) AS v FROM vang_so WHERE sbd = ? AND loai = 'doi' AND khoa_yeu_cau LIKE '${TIEN_TO_DUC}%') d
         WHERE ? - d.v > 0`,
-    ).bind(sbd, tong, `${TIEN_TO_DUC}${tong}`, new Date(nowMs).toISOString(), sbd, tong).run()
+    ).bind(sbd, tong, `${TIEN_TO_DUC}${tong}`, new Date(nowMs).toISOString(), sbd, tong)
+    const docLai = env.DB.prepare('SELECT so_vang FROM vang_so WHERE sbd = ? AND khoa_yeu_cau = ?').bind(sbd, `${TIEN_TO_DUC}${tong}`)
+    // Tối ưu 05/10: chèn + đọc lại dòng vừa đúc trong MỘT lô (một giao dịch — câu đọc ngay sau câu chèn như đọc nối tiếp cũ) — trước: hai đợt. D1 không có `batch` ⇒ như cũ.
+    if (typeof env.DB.batch === 'function') {
+      const [r, moi] = await env.DB.batch<{ so_vang: number }>([chen, docLai])
+      if (!r?.meta.changes) return 0
+      return Math.max(0, Number(moi?.results?.[0]?.so_vang) || 0)
+    }
+    const r = await chen.run()
     if (!r.meta.changes) return 0
-    const moi = await env.DB.prepare('SELECT so_vang FROM vang_so WHERE sbd = ? AND khoa_yeu_cau = ?').bind(sbd, `${TIEN_TO_DUC}${tong}`).first<{ so_vang: number }>()
+    const moi = await docLai.first<{ so_vang: number }>()
     return Math.max(0, Number(moi?.so_vang) || 0)
   } catch (e) {
     if (!thieuBang(e)) console.error('[vang-duc] đúc vàng lỗi (bỏ qua, lần đọc sau đúc tiếp):', e instanceof Error ? e.message : e)
