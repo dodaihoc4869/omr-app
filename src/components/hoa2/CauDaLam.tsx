@@ -8,7 +8,7 @@
 // Bản NGANG (docs/ban-ve-ngang-2809/Ngang-CauDaLam): cột trái bộ lọc + danh sách gọn, cột phải chi tiết câu đang chọn (cùng khối
 // TheCau xem_lai), Tải PDF lên hàng trên. Điểm ngắt: bo-cuc-ngang.ts. Điện thoại dọc giữ nguyên.
 import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
@@ -17,6 +17,7 @@ import { taiCauDaLam, taiChiTiet, type CauDaLamMuc, type ChiTietCau, type KetQua
 import { NHAN_TRANG_THAI, NHAN_TU_LUAN, cauLuyenTuChiTiet, chiSoDuoiRo, chuLanLam, chuLanLamTuLuan, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
 import { gioThuNgay, thuNgayThang } from './thoi-gian'
 import { useBoCucNgang } from './bo-cuc-ngang'
+import { nhanCauDaLamSom, xoaCauDaLamSom } from './man-sanh-luoi'
 import './cau-da-lam.css'
 
 export type BoLoc = 'tat_ca' | 'sai_gan' | 'dang_on' | 'thanh_thao' | 'can_day_lai'
@@ -86,7 +87,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
     let huy = false
     setDangTai(true)
     setLoi('')
-    taiCauDaLam(token)
+    // Chuyển màn nhanh (05/10): Sảnh đã bắn lệnh tải danh sách ngay lúc em chạm cửa ⇒ lượt tải đầu nhận lại lời hứa ấy (man-sanh-luoi.ts).
+    ;(nhanCauDaLamSom(token) ?? taiCauDaLam(token))
       .then((kq) => {
         if (huy) return
         setDu(kq)
@@ -102,6 +104,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
       huy = true
     }
   }, [token, luot])
+  useEffect(() => xoaCauDaLamSom, []) // rời màn ⇒ bỏ lệnh sớm chưa ai nhận
 
   const dsChienDich = du && du.cheDo2 ? du.chienDich : []
   const tatCaCau = du && du.cheDo2 ? du.cau : []
@@ -125,7 +128,9 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
       taiChiTiet(token, qids)
         .then((ds) => {
           const theo = new Map(ds.map((d) => [d.de.qid, d]))
-          setChiTiet((x) => ({
+          // Vẽ dòng đề + đáp án của cả danh sách (KaTeX từng thẻ) là việc NẶNG: đi trong startTransition (05/10) ⇒ React chia nhỏ, máy vẫn
+          // cuộn / bấm được trong lúc vẽ; kết quả hiện ra y như cũ.
+          startTransition(() => setChiTiet((x) => ({
             ...x,
             ...Object.fromEntries(
               qids.map((q) => {
@@ -133,7 +138,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
                 return [q, ct ? { ct } : { loi: 'Máy chủ chưa trả được đề của câu này.' }] as [string, TrangThaiChiTiet]
               }),
             ),
-          }))
+          })))
         })
         .catch((e: unknown) => {
           const loiChu = e instanceof Error ? e.message : 'Chưa tải được lời giải.'
