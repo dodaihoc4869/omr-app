@@ -5,8 +5,8 @@
 // bộ giải ĐỘC LẬP đọc lại chính chữ đề (tự phân tích công thức, tự tính khối lượng mol, tự cân bằng) — không gọi lại hàm ở đây.
 // Số liệu chuẩn: nguyên tử khối SGK H 1 · C 12 · N 14 · O 16 · Na 23 · Mg 24 · Al 27 · S 32 · Cl 35,5 · K 39 · Ca 40 · Fe 56 · Cu 64 · Zn 65 · Ag 108 ·
 // Ba 137; thể tích mol khí ở điều kiện chuẩn (25 °C, 1 bar) 24,79 L/mol (chương trình 2018); F = 96 500 C/mol; E° theo SGK.
-// 26 nhãn: 20 nhãn đầu + 6 bước tính toán thêm 05/10 (bảo toàn electron, lập hệ phương trình, công thức phân tử, hằng số cân bằng, biến thiên enthalpy,
-// năng lượng liên kết). Với 3 nhãn nhiệt / cân bằng: ΔfH°298, Eb, nồng độ (số mol) lúc cân bằng LUÔN IN TRONG ĐỀ (SGK các bộ lệch nhau) — không dùng
+// 27 nhãn: 20 nhãn đầu + 6 bước tính toán thêm 05/10 (bảo toàn electron, lập hệ phương trình, công thức phân tử, hằng số cân bằng, biến thiên enthalpy,
+// năng lượng liên kết) + bảo toàn điện tích (chỉ ghép ion CÙNG TỒN TẠI được; cô cạn không dùng HCO₃⁻, NH₄⁺, H⁺). Với 3 nhãn nhiệt / cân bằng: ΔfH°298, Eb, nồng độ (số mol) lúc cân bằng LUÔN IN TRONG ĐỀ (SGK các bộ lệch nhau) — không dùng
 // hằng số ẩn; đề ghi rõ "ΔfH°298 của đơn chất bền bằng 0". Bảo toàn electron: sản phẩm khử duy nhất, axit dư (Fe ⇒ Fe³⁺). Trắc nghiệm công thức phân tử:
 // cả 4 phương án là công thức hợp lệ (H chẵn, độ bất bão hoà nguyên ≥ 0), đúng một phương án khớp dữ kiện.
 // Mã câu: `sinh.<nhãn>.<số>` — khớp /^[\w.-]{1,80}$/ của `locCauNen`; sổ ghi qid `nen:<id>`. Câu thầy nạp = id KHÔNG bắt đầu bằng "sinh." — không đụng tới.
@@ -1136,6 +1136,113 @@ function nangLuongLienKet(): Nhap[] {
   return ra
 }
 
+// ---------------------------------------------------------------- 27. Bảo toàn điện tích (dung dịch chỉ gồm các ion CÙNG TỒN TẠI được)
+interface IonDT { ten: string; q: number; m: number }
+/** Ion, điện tích, khối lượng (nguyên tử khối SGK; nhóm NH₄ 18, NO₃ 62, HCO₃ 61, SO₄ 96, CO₃ 60, PO₄ 95, Cl 35,5). */
+const ION_DT: readonly IonDT[] = [
+  { ten: 'Na⁺', q: 1, m: 23 }, { ten: 'K⁺', q: 1, m: 39 }, { ten: 'NH₄⁺', q: 1, m: 18 }, { ten: 'H⁺', q: 1, m: 1 },
+  { ten: 'Mg²⁺', q: 2, m: 24 }, { ten: 'Ca²⁺', q: 2, m: 40 }, { ten: 'Ba²⁺', q: 2, m: 137 }, { ten: 'Fe²⁺', q: 2, m: 56 },
+  { ten: 'Cu²⁺', q: 2, m: 64 }, { ten: 'Zn²⁺', q: 2, m: 65 }, { ten: 'Al³⁺', q: 3, m: 27 }, { ten: 'Fe³⁺', q: 3, m: 56 },
+  { ten: 'Cl⁻', q: -1, m: 35.5 }, { ten: 'NO₃⁻', q: -1, m: 62 }, { ten: 'HCO₃⁻', q: -1, m: 61 }, { ten: 'SO₄²⁻', q: -2, m: 96 },
+  { ten: 'CO₃²⁻', q: -2, m: 60 }, { ten: 'PO₄³⁻', q: -3, m: 95 },
+]
+/** Cặp tạo kết tủa ngoài các luật nhóm bên dưới: BaSO₄, CaSO₄. */
+const CAP_KHONG_CUNG: ReadonlySet<string> = new Set(['Ba²⁺|SO₄²⁻', 'Ca²⁺|SO₄²⁻'])
+/** CO₃²⁻, PO₄³⁻ chỉ đi với Na⁺, K⁺, NH₄⁺ (với H⁺ ⇒ khí / axit yếu; với ion kim loại khác ⇒ kết tủa). */
+const VOI_CO3_PO4: ReadonlySet<string> = new Set(['Na⁺', 'K⁺', 'NH₄⁺'])
+/** HCO₃⁻: không H⁺ (CO₂ bay ra), không Al³⁺/Fe³⁺ (thuỷ phân kép); giữ chắc chỉ các ion của nước cứng / kiềm. */
+const VOI_HCO3: ReadonlySet<string> = new Set(['Na⁺', 'K⁺', 'NH₄⁺', 'Mg²⁺', 'Ca²⁺', 'Ba²⁺'])
+/** Cô cạn thì phân huỷ / bay hơi ⇒ không dùng ở dạng cô cạn. */
+const MAT_KHI_CO_CAN: ReadonlySet<string> = new Set(['HCO₃⁻', 'NH₄⁺', 'H⁺'])
+const cungTonTai = (duong: string, am: string) => !CAP_KHONG_CUNG.has(`${duong}|${am}`)
+  && (am !== 'CO₃²⁻' && am !== 'PO₄³⁻' || VOI_CO3_PO4.has(duong)) && (am !== 'HCO₃⁻' || VOI_HCO3.has(duong))
+/** Mọi cặp ion dương – âm cùng tồn tại; không có bộ ba H⁺ + Fe²⁺ + NO₃⁻ (oxi hoá – khử). */
+function boIonHopLe(ds: readonly IonDT[]): boolean {
+  const co = (t: string) => ds.some((i) => i.ten === t)
+  return ds.filter((i) => i.q > 0).every((d) => ds.filter((i) => i.q < 0).every((a) => cungTonTai(d.ten, a.ten))) && !(co('H⁺') && co('Fe²⁺') && co('NO₃⁻'))
+}
+function toHop<T>(ds: readonly T[], k: number): T[][] {
+  if (k === 0) return [[]]
+  const ra: T[][] = []
+  ds.forEach((x, i) => { for (const r of toHop(ds.slice(i + 1), k - 1)) ra.push([x, ...r]) })
+  return ra
+}
+const N_DT = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4] as const
+const MEO_DT = 'Bảo toàn điện tích: Σ(số mol × điện tích) các ion dương = Σ(số mol × điện tích) các ion âm. Cô cạn dung dịch: m muối khan = tổng khối lượng các ion (Cl 35,5; NO₃ 62; SO₄ 96; CO₃ 60; PO₄ 95).'
+function baoToanDienTich(): Nhap[] {
+  const ra: Nhap[] = []
+  const DUONG = ION_DT.filter((i) => i.q > 0), AM = ION_DT.filter((i) => i.q < 0)
+  const bo: IonDT[][] = []
+  for (const [nd, na] of [[2, 2], [2, 1], [1, 2]] as const) for (const d of toHop(DUONG, nd)) for (const a of toHop(AM, na)) if (boIonHopLe([...d, ...a])) bo.push([...d, ...a])
+  bo.forEach((ds, ib) => {
+    const r = prng(bam32(`bao-toan-dien-tich|${ds.map((i) => i.ten).join(',')}`))
+    const chon = () => N_DT[Math.floor(r() * N_DT.length)]!
+    const duong = ds.filter((i) => i.q > 0), am = ds.filter((i) => i.q < 0)
+    const coCan = !ds.some((i) => MAT_KHI_CO_CAN.has(i.ten))
+    /** Vế điện tích: "n(Na⁺) + 2n(Mg²⁺)". */
+    const veN = (ve: readonly IonDT[]) => ve.map((i) => `${Math.abs(i.q) === 1 ? '' : Math.abs(i.q)}n(${i.ten})`).join(' + ')
+    /** Vế điện tích thay số; ẩn viết "2x". */
+    const veSo = (ve: readonly IonDT[], n: Map<string, number>, an: Map<string, string>) => ve.map((i) => {
+      const k = Math.abs(i.q), bien = an.get(i.ten)
+      return bien ? `${k === 1 ? '' : k}${bien}` : `${k === 1 ? '' : `${k} · `}${vn(n.get(i.ten)!)}`
+    }).join(' + ')
+    const dong = (n: Map<string, number>, an: Map<string, string>) => noi(ds.map((i) => `${an.get(i.ten) ?? vn(n.get(i.ten)!)} mol ${i.ten}`))
+    const khoiLuong = (n: Map<string, number>) => lam(ds.reduce((s, i) => s + n.get(i.ten)! * i.m, 0))
+    /** Thử tối đa 40 bộ số mol cho các ion đã biết; ẩn tính từ bảo toàn điện tích, phải dương, ≤ 2 chữ số thập phân, ≤ 0,6 mol. */
+    const timBo = (an: IonDT) => {
+      for (let t = 0; t < 40; t++) {
+        const n = new Map<string, number>(ds.filter((i) => i !== an).map((i) => [i.ten, chon()] as const))
+        const S = lam(ds.filter((i) => i !== an).reduce((s, i) => s + i.q * n.get(i.ten)!, 0)) // tổng điện tích đã biết (có dấu)
+        const x = lam(-S / an.q)
+        if (x > 0 && x <= 0.6 && dep(x, 2)) { n.set(an.ten, x); return n }
+      }
+      return null
+    }
+    // (a) Tìm số mol một ion.
+    const anA = ds[ib % ds.length]!, nA = timBo(anA)
+    if (nA) {
+      const bien = new Map([[anA.ten, 'x']])
+      ra.push(so(1, `Dung dịch X chứa ${dong(nA, bien)}. Tính x.`, nA.get(anA.ten)!,
+        [`Bảo toàn điện tích: ${veN(duong)} = ${veN(am)}.`, `${veSo(duong, nA, bien)} = ${veSo(am, nA, bien)} ⇒ x = ${vn(nA.get(anA.ten)!)}.`], MEO_DT))
+    }
+    if (!coCan) return
+    // (b) Tìm x bằng bảo toàn điện tích rồi tính khối lượng muối khan.
+    const anB = ds[(ib + 1) % ds.length]!, nB = timBo(anB)
+    if (nB) {
+      const bien = new Map([[anB.ten, 'x']]), m = khoiLuong(nB)
+      if (dep(m)) ra.push(so(1, `Dung dịch X chứa ${dong(nB, bien)}. Cô cạn dung dịch X thu được m gam muối khan. Tính m.`, m,
+        [`Bảo toàn điện tích: ${veN(duong)} = ${veN(am)} ⇒ ${veSo(duong, nB, bien)} = ${veSo(am, nB, bien)} ⇒ x = ${vn(nB.get(anB.ten)!)}.`,
+          `m muối khan = tổng khối lượng các ion = ${ds.map((i) => `${vn(nB.get(i.ten)!)} · ${vn(i.m)}`).join(' + ')} = ${vn(m)} gam.`], MEO_DT))
+    }
+    // (c) Hai ẩn cùng dấu: bảo toàn điện tích + khối lượng muối khan ⇒ hệ hai phương trình.
+    const cap = am.length === 2 && (duong.length < 2 || ib % 2 === 0) ? am : duong.length === 2 ? duong : null
+    if (!cap) return
+    const [A, B] = cap as [IonDT, IonDT]
+    for (let t = 0; t < 40; t++) {
+      const n = new Map<string, number>(ds.filter((i) => i !== B).map((i) => [i.ten, chon()] as const))
+      const S = lam(ds.filter((i) => i !== B).reduce((s, i) => s + i.q * n.get(i.ten)!, 0))
+      const y = lam(-S / B.q)
+      if (!(y > 0 && y <= 0.6 && dep(y, 2))) continue
+      n.set(B.ten, y)
+      const m = khoiLuong(n), x = n.get(A.ten)!
+      if (!dep(m)) continue
+      const bien = new Map([[A.ten, 'x'], [B.ten, 'y']])
+      const kA = Math.abs(A.q), kB = Math.abs(B.q)
+      // Hai ẩn là TẤT CẢ ion cùng dấu ⇒ các ion còn lại đều trái dấu: kA·x + kB·y = Σ(điện tích × số mol) của chúng.
+      const conLai = ds.filter((i) => i !== A && i !== B)
+      const qBiet = lam(conLai.reduce((s, i) => s + Math.abs(i.q) * n.get(i.ten)!, 0))
+      const mBiet = lam(conLai.reduce((s, i) => s + n.get(i.ten)! * i.m, 0)), mConLai = lam(m - mBiet)
+      const hoi = ib % 4 < 2 ? 'x' : 'y'
+      ra.push(so(2, `Dung dịch X chứa ${dong(n, bien)}. Cô cạn dung dịch X thu được ${vn(m)} gam muối khan. Tính ${hoi}.`, hoi === 'x' ? x : y,
+        [`Bảo toàn điện tích: ${veN(duong)} = ${veN(am)} ⇒ ${kA === 1 ? '' : kA}x + ${kB === 1 ? '' : kB}y = ${vn(qBiet)}.`,
+          `Khối lượng muối: ${vn(A.m)}x + ${vn(B.m)}y = ${vn(m)} − ${conLai.length > 1 ? `(${conLai.map((i) => `${vn(n.get(i.ten)!)} · ${vn(i.m)}`).join(' + ')})` : conLai.map((i) => `${vn(n.get(i.ten)!)} · ${vn(i.m)}`).join('')} = ${vn(mConLai)}.`,
+          `Giải hệ: x = ${vn(x)}; y = ${vn(y)}.`], MEO_DT))
+      break
+    }
+  })
+  return ra
+}
+
 /** Chữ mọi phương trình viết sẵn của 3 nhãn nhiệt / cân bằng (test kiểm cân bằng bằng bộ đếm nguyên tử riêng). */
 export const PHAN_UNG_MOI_CHU: readonly string[] = [
   ...PU_KC.map(chuKc), ...PU_NHIET.map(({ p }) => chuPhanUng(p)), ...PU_LIEN_KET.map((p) => `${vePhan(theKhi(p.trai))} → ${vePhan(theKhi(p.phai))}`),
@@ -1151,6 +1258,7 @@ const BO_SINH: Readonly<Record<string, () => Nhap[]>> = {
   toc_do_phan_ung: tocDoPhanUng, can_bang_phuong_trinh: canBangPhuongTrinh, bao_toan_nguyen_to: baoToanNguyenTo,
   bao_toan_electron: baoToanElectron, lap_he_phuong_trinh: lapHePhuongTrinh, cong_thuc_phan_tu: congThucPhanTu,
   hang_so_can_bang: hangSoCanBang, bien_thien_enthalpy: bienThienEnthalpy, nang_luong_lien_ket: nangLuongLienKet,
+  bao_toan_dien_tich: baoToanDienTich,
 }
 /** Mọi nhãn có bộ sinh (thứ tự cố định). 'tinh_chat_hoa_hoc', 'lam_tron_ket_qua'… không có bộ sinh. */
 export const NHAN_CO_BO_SINH: readonly string[] = Object.keys(BO_SINH)
