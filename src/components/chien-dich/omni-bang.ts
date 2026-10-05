@@ -58,10 +58,13 @@ export function tbSoY(om: Pick<BangOmni, 'sEm'>): number | null {
 export const laSoYCao = (s: number | null | undefined): boolean => typeof s === 'number' && s > THAM_SO_OMNI.SO_Y_CAO
 
 export type LoaiCanThayChua = CanThayChua['loai']
-/** Ba nhóm "Cần thầy chữa" — đúng thứ tự và nghĩa của đặc tả (mục 0). */
+/**
+ * Ba nhóm "Cần thầy chữa" — nghĩa theo đặc tả (mục 0). THỨ TỰ (thầy lệnh 05/10, làm lại 06/10): câu sai từ 4 lần đã rời kế hoạch lên ĐẦU thẻ
+ * (câu em bỏ rồi — việc thầy chữa gấp nhất), rồi vi kỹ năng có thẻ nút thắt, rồi em sơ ý cao. Máy chủ (`omni-gv.ts` `bang`) dựng cùng thứ tự.
+ */
 export const NHOM_CAN_THAY_CHUA: { loai: LoaiCanThayChua; ten: string; rong: string }[] = [
-  { loai: 'nut_that', ten: 'Vi kỹ năng có thẻ nút thắt (em đã qua thang tự gỡ mà vẫn vướng)', rong: 'Chưa có vi kỹ năng nào vướng.' },
   { loai: 'cat_tia', ten: 'Câu sai từ 4 lần, đã rời kế hoạch', rong: 'Chưa có câu nào sai từ 4 lần.' },
+  { loai: 'nut_that', ten: 'Vi kỹ năng có thẻ nút thắt (em đã qua thang tự gỡ mà vẫn vướng)', rong: 'Chưa có vi kỹ năng nào vướng.' },
   { loai: 'so_y', ten: 'Em sơ ý cao dù kiến thức vững', rong: 'Chưa em nào sơ ý cao.' },
 ]
 

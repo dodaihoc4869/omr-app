@@ -14,7 +14,7 @@ import LenBangChienDich from '../src/components/chien-dich/LenBangChienDich'
 import type { BangChienDich as DuBang, EmBang } from '../src/components/chien-dich/api'
 import type { BangOmni } from '../server/src/omni-kieu'
 import { chuDangHieuChuan, chuKhoangCach8, phanTram, soP, TIEU_DE_CAN_THAY_CHUA, NUT_DAY_LAI, NUT_XAC_NHAN_VUNG, TEN_AI } from '../src/lib/omni-chu'
-import { ghepCotDang, mucP, nhomCanThayChua, tbPLop } from '../src/components/chien-dich/omni-bang'
+import { NHOM_CAN_THAY_CHUA, ghepCotDang, mucP, nhomCanThayChua, tbPLop } from '../src/components/chien-dich/omni-bang'
 import { idVknMoi } from '../src/components/chien-dich/ViKyNangBai'
 
 const DANG = ['Danh pháp ester', 'Thuỷ phân ester đơn chức', 'Chất béo']
@@ -95,15 +95,16 @@ describe('phần thuần (omni-bang.ts)', () => {
     expect(tbPLop(OMNI, 'D-TP')).toBeCloseTo(0.62)
     expect(tbPLop(OMNI, null)).toBeNull()
   })
-  it('ba nhóm Cần thầy chữa đúng thứ tự; máy chủ chưa gửi nhóm câu sai ≥ 4 ⇒ dựng từ "Cần thầy dạy lại" (đủ qid trùng nội dung)', () => {
+  it('ba nhóm Cần thầy chữa đúng thứ tự (thầy 06/10: câu sai từ 4 lần lên ĐẦU thẻ → nút thắt → sơ ý cao); máy chủ chưa gửi nhóm câu sai ≥ 4 ⇒ dựng từ "Cần thầy dạy lại" (đủ qid trùng nội dung)', () => {
+    expect(NHOM_CAN_THAY_CHUA.map((x) => x.loai)).toEqual(['cat_tia', 'nut_that', 'so_y'])
     const g = nhomCanThayChua(OMNI.canThayChua, bang().canDayLai)
     expect(g.map((x) => [x.loai, x.dong.length])).toEqual([
-      ['nut_that', 1],
       ['cat_tia', 2],
+      ['nut_that', 1],
       ['so_y', 1],
     ])
-    expect(g[1]!.dong[0]).toMatchObject({ tieuDe: 'Câu 17 · Thuỷ phân ester đơn chức', phu: 'Vận dụng', soEm: 6, qids: ['DH-A-I-17', 'DH-B-I-3'] })
-    expect(nhomCanThayChua([{ loai: 'cat_tia', tieuDe: 'Câu 9', phu: '', soEm: 3, qids: ['Q9'] }], bang().canDayLai)[1]!.dong.map((d) => d.tieuDe)).toEqual(['Câu 9'])
+    expect(g[0]!.dong[0]).toMatchObject({ tieuDe: 'Câu 17 · Thuỷ phân ester đơn chức', phu: 'Vận dụng', soEm: 6, qids: ['DH-A-I-17', 'DH-B-I-3'] })
+    expect(nhomCanThayChua([{ loai: 'cat_tia', tieuDe: 'Câu 9', phu: '', soEm: 3, qids: ['Q9'] }], bang().canDayLai)[0]!.dong.map((d) => d.tieuDe)).toEqual(['Câu 9'])
   })
   it('id vi kỹ năng mới = <mã dạng>#<số kế tiếp>', () => {
     expect(idVknMoi('D-TP', [{ id: 'D-TP#1' }, { id: 'D-TP#3' }, { id: 'dang:D-TP' }, { id: 'D-DP#9' }])).toBe('D-TP#4')
@@ -153,7 +154,9 @@ describe('Bảng chiến dịch + Bảng bài OMNI', () => {
     expect(screen.getByRole('heading', { name: TIEU_DE_CAN_THAY_CHUA })).toBeTruthy()
     expect(screen.queryByRole('heading', { name: 'Cần thầy dạy lại' })).toBeNull()
     const khoi = container.querySelector('[data-khoi="can-thay-chua"]') as HTMLElement
-    expect([...khoi.querySelectorAll('[data-nhom]')].map((x) => x.getAttribute('data-nhom'))).toEqual(['nut_that', 'cat_tia', 'so_y'])
+    // THỨ TỰ thẻ (thầy 06/10): câu sai từ 4 lần đã rời kế hoạch ĐẦU TIÊN, rồi nút thắt, rồi sơ ý cao — cả trong DOM.
+    expect([...khoi.querySelectorAll('[data-nhom]')].map((x) => x.getAttribute('data-nhom'))).toEqual(['cat_tia', 'nut_that', 'so_y'])
+    expect(khoi.querySelector('[data-nhom]')!.getAttribute('data-nhom')).toBe('cat_tia')
     expect(khoi.querySelector('[data-nhom="nut_that"]')!.textContent).toContain('Hệ số NaOH với ester của phenol')
     expect(khoi.querySelector('[data-nhom="cat_tia"]')!.textContent).toContain('Câu 17 · Thuỷ phân ester đơn chức')
     expect(khoi.querySelector('[data-nhom="so_y"]')!.textContent).toContain('Sơ ý cao: Lê Chi')

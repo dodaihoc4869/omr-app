@@ -219,6 +219,13 @@ async function bang(env: Env, id: string, nowMs: number): Promise<Record<string,
     .map(({ s, hs }) => ({ s, hs, nen: nenYeuNhat([hs], nenPhamVi) }))
   const tenVkn = await vknTen([...nutDs.map((x) => x.nen?.vkn), ...soYDs.map((x) => x.nen?.vkn)].filter((x): x is string => !!x))
   const canThayChua: CanThayChua[] = []
+  // THỨ TỰ THẺ (thầy 05–06/10): (2) câu sai ≥ NGUONG_CAT_TIA lần đã rời kế hoạch (cắt tỉa) ≥ 1 em lên ĐẦU → (1) nút thắt → (3) sơ ý cao.
+  // App thầy gom theo `loai` theo `NHOM_CAN_THAY_CHUA` (omni-bang.ts) — hai nơi giữ CÙNG thứ tự.
+  const catDs = cd.qids.filter((q) => dungKhoiLop.has(q)).map((q) => ({ q, sbd: cd.sbd.filter((s) => tt.get(s)?.get(q)?.catTia) })).filter((x) => x.sbd.length > 0)
+    .sort((a, b) => b.sbd.length - a.sbd.length || stt.get(a.q)! - stt.get(b.q)!)
+  for (const { q, sbd } of catDs) {
+    canThayChua.push({ loai: 'cat_tia', tieuDe: `Câu ${stt.get(q)} · ${tenCuaCau(q)}`, phu: `${sbd.length} em sai từ ${NGUONG_CAT_TIA} lần, câu đã rời kế hoạch — chờ thầy chữa`, soEm: sbd.length, qids: [q], sbd })
+  }
   for (const { q, g, nen } of nutDs.sort((a, b) => b.g.sbd.size - a.g.sbd.size || stt.get(a.q)! - stt.get(b.q)!)) {
     const buoc = [...g.buoc].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0]?.[0]
     const tenNen = nen ? tenVkn.get(nen.vkn)?.ten ?? nen.vkn : null
@@ -227,12 +234,6 @@ async function bang(env: Env, id: string, nowMs: number): Promise<Record<string,
       phu: `${g.sbd.size} em gửi thẻ nút thắt${buoc != null ? ` ở bước ${buoc}` : ''} — đã tự gỡ mà chưa xong${tenNen ? ` · nền yếu nhất: ${tenNen}` : ''}`,
       soEm: g.sbd.size, qids: [q], sbd: [...g.sbd].sort(), ...(nen ? { vkn: nen.vkn } : {}),
     })
-  }
-  // (2) Câu sai ≥ NGUONG_CAT_TIA lần đã rời kế hoạch (cắt tỉa) ≥ 1 em
-  const catDs = cd.qids.filter((q) => dungKhoiLop.has(q)).map((q) => ({ q, sbd: cd.sbd.filter((s) => tt.get(s)?.get(q)?.catTia) })).filter((x) => x.sbd.length > 0)
-    .sort((a, b) => b.sbd.length - a.sbd.length || stt.get(a.q)! - stt.get(b.q)!)
-  for (const { q, sbd } of catDs) {
-    canThayChua.push({ loai: 'cat_tia', tieuDe: `Câu ${stt.get(q)} · ${tenCuaCau(q)}`, phu: `${sbd.length} em sai từ ${NGUONG_CAT_TIA} lần, câu đã rời kế hoạch — chờ thầy chữa`, soEm: sbd.length, qids: [q], sbd })
   }
   for (const { s, hs, nen } of soYDs.sort((a, b) => b.hs.sEm - a.hs.sEm || (a.s < b.s ? -1 : 1))) {
     const tenNen = nen ? tenVkn.get(nen.vkn)?.ten ?? nen.vkn : null
