@@ -3,11 +3,13 @@
 // Bộ giải đọc lại CHÍNH CHỮ ĐỀ như học sinh (tách số liệu, tự phân tích công thức có chỉ số Unicode, tự tính khối lượng mol bằng bảng nguyên tử khối
 // riêng, tự suy hệ số từ công thức / phương trình trong đề, tự giải phương trình bậc hai bằng công thức nghiệm, tự xếp thế điện cực theo bảng E° riêng)
 // — KHÔNG import hằng số hay hàm tính nào của bộ sinh. Chọn bộ giải theo họ (`bienThe.ho`), trong họ nhận mẫu bằng chữ đề.
-// Mỗi họ ≥ 300 câu (đủ mọi mã dạng × Phần I/III × 3 mức độ). Phần III: đáp số = làm tròn theo ĐÚNG câu "Làm tròn …" trong đề, ≤ 4 kí tự, ổn định
-// khi làm tròn trung gian ±0,05 %; Phần I: đúng 1 phương án khớp, 4 phương án khác nhau, lý do từng phương án khớp chữ cái đúng; đề không chứa đáp án.
-// ĐÃ THỬ LÀM HỎNG BỘ SINH (05/10, mỗi lần một chỗ, chạy lại tệp này ⇒ ĐỎ, rồi trả lại): xem báo cáo làn — M(ethanol) 46 → 44; hệ số ethanol của
-// saccharose 4 → 2; thể tích mol 24,79 → 24; F 96 500 → 96 000; E° Fe³⁺/Fe²⁺ 0,771 → 0,3; Kc giải với V = 1; xà phòng hoá quên trừ glycerol;
-// khối lượng mol triacetate 288 → 297; bỏ cổng ổn định làm tròn; phương án nhiễu trùng đáp án.
+// Mỗi họ ≥ 600 câu, mỗi câu một hạt giống (đủ mọi mã dạng × Phần I/III × 3 mức độ); kiểm sâu: BIEN_THE_SO_CAU=5000 (05/10 đã chạy: 14 × 5000 câu
+// xanh). Phần III: đáp số = làm tròn theo ĐÚNG câu "Làm tròn …" trong đề, ≤ 4 kí tự, ổn định khi làm tròn trung gian ±0,05 %; Phần I: đúng 1
+// phương án khớp, 4 phương án khác nhau, lý do từng phương án khớp chữ cái đúng; đề không chứa đáp án; số liệu hợp lí (hiệu suất 50–98 %…).
+// ĐÃ THỬ LÀM HỎNG BỘ SINH (05/10, mỗi lần một chỗ, chạy lại tệp này, rồi trả nguyên) — 14/14 lần ĐỎ: M(ethanol) 46 → 44; saccharose cho 4 → 2
+// ethanol; thể tích mol 24,79 → 24; F 96 500 → 96 000; E° Fe³⁺/Fe²⁺ 0,771 → 0,3; Kc giải với V = 1 (số mol thay nồng độ); xà phòng hoá quên trừ
+// glycerol; M cellulose triacetate 288 → 297; bỏ cổng ổn định làm tròn; cho nhiễu trùng đáp án; Fe trong H₂SO₄ đặc nóng lên Fe²⁺; ester no đơn
+// chức M = 14n + 30; tráng bạc glucose 1 : 1 Ag; đảo thứ tự tên trong câu gán số.
 import { createHash } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 import { apBienThe, cacDangCoBoSinh, cacHoDe, coBoSinh, sinhBienThe, type CauBienThe } from '../server/src/bien-the-sinh'
