@@ -149,8 +149,9 @@ async function mocDayLaiCaLop(env: Env, sbd: readonly string[]): Promise<Map<str
 /** Thầy chốt 28/09 "Thành thạo lần đầu": loại câu (phần, mức độ, sao) đưa vào `phatLaiCau` ⇒ câu thành thạo lần đầu tính 0 lượt ở mọi ô ước khối lượng.
  *  `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới.
  *  `themLuc` (Sửa chiến dịch 28/09): em được THÊM sau ⇒ mốc của em là lúc được thêm. */
-export async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>, themLuc?: ReadonlyMap<string, string>): Promise<Map<string, Map<string, TrangThaiCau>>> {
-  const [lanTho, moc, loai] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd), docLoaiCau(env, qids)])
+export async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>, themLucVao?: ReadonlyMap<string, string> | Promise<ReadonlyMap<string, string>>): Promise<Map<string, Map<string, TrangThaiCau>>> {
+  // `themLucVao` (chỉ-thêm, tối ưu 05/10) có thể là Promise (mốc thêm em đang đọc) ⇒ ba lượt đọc dưới đây không chờ nó (trước: chờ thêm một đợt).
+  const [lanTho, moc, loai, themLuc] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd), docLoaiCau(env, qids), themLucVao])
   const lan = new Map([...lanTho].map(([em, ds]) => {
     const tu = mocTinhCua(tuLuc, themLuc?.get(em))
     return [em, ds.filter((x) => x.luc >= tu)] as const
@@ -235,7 +236,7 @@ function thongKeLop(env: Env, cd: ChienDich, homNay: string, nowMs: number): Pro
 /** Số liệu LỚP gọn của một chiến dịch (dùng cho danh sách chiến dịch đã giao). */
 async function thongKeLopTho(env: Env, cd: ChienDich, homNay: string) {
   const [tt, kh] = await Promise.all([
-    docMocThemCaLop(env, cd.id).then((them) => trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, undefined, them)),
+    trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, undefined, docMocThemCaLop(env, cd.id)),
     env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] })),
   ])
   const moc = mocNhip(cd.mocBatDau, cd.hanNop, homNay)

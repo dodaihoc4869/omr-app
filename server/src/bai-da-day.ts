@@ -23,7 +23,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
-import { docChienDichCuaEm, docChienDichKemBatDau, ngayVnCua, noCuCaLop } from './srs2-d1'
+import { docBatDauMap, docChienDichCuaEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop } from './srs2-d1'
 import { congNgay, khoiLuongCan, soNgayConLai, soNgayGiua } from './srs2-loi'
 import { KHOA_THE_LUC_LOP, SQL_LA_LAN_LAM, THAM_SO_OMNI } from './omni-kieu'
 import { soNgayHanBai } from './omni-ke-hoach'
@@ -580,8 +580,14 @@ async function danhSach(env: Env, b: Row, nowMs: number): Promise<Record<string,
   await damBaoBangBaiDaDay(env)
   const rows = (await env.DB.prepare('SELECT * FROM bai_da_day WHERE lop = ? AND bo_tick_luc IS NULL ORDER BY vi_tri, tick_luc').bind(lop).all<Row>()).results ?? []
   const ids = [...new Set(rows.map((r) => str(r.chien_dich_id)).filter(Boolean))]
+  // Tối ưu 05/10: ngày bắt đầu / rải đều / số chứng chỉ chỉ cần MÃ chiến dịch (đã có từ dòng tick) ⇒ đọc CÙNG đợt với dòng chiến dịch (trước: chờ dòng chiến dịch).
+  // Ghép đúng như `docChienDichKemBatDau` (tra theo mã ⇒ mã thừa không ảnh hưởng).
+  const pBdRd = Promise.all([docBatDauMap(env, ids), docRaiDeuMap(env, ids)])
+  const pDat = demChungChi(env, ids)
+  pBdRd.catch(() => {}); pDat.catch(() => {})
   const cdRows = ids.length ? (await env.DB.prepare('SELECT * FROM chien_dich WHERE id IN (SELECT value FROM json_each(?))').bind(JSON.stringify(ids)).all<Row>()).results ?? [] : []
-  const [dsCd, dat] = await Promise.all([docChienDichKemBatDau(env, cdRows), demChungChi(env, ids)])
+  const [[bd, rd], dat] = await Promise.all([pBdRd, pDat])
+  const dsCd = cdRows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null }))
   const cds = new Map(dsCd.map((c) => [c.id, c]))
   const homNay = ngayVnCua(nowMs)
   const bai = rows.map((r) => {

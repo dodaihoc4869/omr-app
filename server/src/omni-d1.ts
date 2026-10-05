@@ -469,23 +469,34 @@ async function docDongSo(env: Env, sbds: readonly string[], dem?: ReadonlyMap<st
   const ra: Row[] = []
   const can: string[] = []
   const doan = async (s: string, tu: number | null): Promise<Row[] | null> => (soDoan && soDoan.sbd === s && soDoan.tu === tu ? soDoan.p : null)
-  for (const s of sbds) {
+  // Tối ưu 05/10: phần thêm của MỌI em có đệm bắt đầu CÙNG lúc (trước: chờ từng em một — Bảng bài 40 em có thể thành 40 đợt nối tiếp); ghép kết quả đúng thứ tự cũ.
+  type Buoc = { s: string; rows: Row[] } | { s: string; cu: { rows: Row[]; n: number; r: number }; d: DemSo; p: Promise<Row[]> } | { s: string }
+  const buoc: Buoc[] = sbds.map((s) => {
     const d = dem.get(s) ?? { n: 0, r: 0 }
     const cu = demSo.doc(s, now)
-    if (cu && cu.n === d.n && cu.r === d.r) { ra.push(...cu.rows); continue }
+    if (cu && cu.n === d.n && cu.r === d.r) return { s, rows: cu.rows }
     if (cu && cu.r > 0 && d.n > cu.n && d.r >= cu.r) {
+      const p = doan(s, cu.r).then((x) => x ?? docDongSoTho(env, [s], cu.r))
+      p.catch(() => {})
+      return { s, cu, d, p }
+    }
+    return { s }
+  })
+  for (const b of buoc) {
+    if ('rows' in b) { ra.push(...b.rows); continue }
+    if ('p' in b) {
       try {
-        const daCo = new Set(cu.rows.map((x) => str(x.khoa)))
-        const moi = ((await doan(s, cu.r)) ?? (await docDongSoTho(env, [s], cu.r))).filter((x) => !daCo.has(str(x.khoa)))
-        if (cu.n + moi.length === d.n) {
-          const rows = [...cu.rows, ...moi]
-          demSo.ghi(s, now, { rows, n: rows.length, r: maxNhan(rows) }, rows.length)
+        const daCo = new Set(b.cu.rows.map((x) => str(x.khoa)))
+        const moi = (await b.p).filter((x) => !daCo.has(str(x.khoa)))
+        if (b.cu.n + moi.length === b.d.n) {
+          const rows = [...b.cu.rows, ...moi]
+          demSo.ghi(b.s, now, { rows, n: rows.length, r: maxNhan(rows) }, rows.length)
           ra.push(...rows)
           continue
         }
       } catch { /* đọc lại cả sổ của em bên dưới */ }
     }
-    can.push(s)
+    can.push(b.s)
   }
   if (can.length) {
     const rows = (can.length === 1 ? await doan(can[0]!, null) : null) ?? (await docDongSoTho(env, can))
@@ -1175,9 +1186,10 @@ async function nhipNgayNhieuEm(env: Env, sbds: readonly string[], nowMs: number)
  * (`xetChungChi`); đạt ⇒ INSERT OR IGNORE `omni_chung_chi` (chỉ-thêm — đã cấp không thu lại). `cap_luc` = lúc nộp ca chốt (tất định).
  * Gọi lười ở Bảng bài của thầy và ở việc đêm.
  */
-export async function capNhatChungChi(env: Env, chienDichId: string, nowMs: number): Promise<{ ok: boolean; soEm: number; daCap: number; error?: string }> {
+export async function capNhatChungChi(env: Env, chienDichId: string, nowMs: number, cdSan?: ChienDich | null): Promise<{ ok: boolean; soEm: number; daCap: number; error?: string }> {
   await damBaoBangOmni(env)
-  const cd = await docChienDichTheoId(env, chienDichId)
+  // `cdSan` (chỉ-thêm, tối ưu 05/10): chiến dịch nơi gọi (Bảng bài) VỪA đọc ⇒ khỏi đọc lại (trước: hai đợt).
+  const cd = cdSan && cdSan.id === chienDichId ? cdSan : await docChienDichTheoId(env, chienDichId)
   if (!cd) return { ok: false, soEm: 0, daCap: 0, error: 'Không tìm thấy chiến dịch.' }
   const ca = await env.DB.prepare('SELECT ma_ca FROM omni_ca_chot WHERE chien_dich_id = ? ORDER BY luc').bind(cd.id).all<Row>().catch(() => ({ results: [] as Row[] }))
   const maCa = (ca.results ?? []).map((x) => str(x.ma_ca)).filter(Boolean)
