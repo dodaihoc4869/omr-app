@@ -28,6 +28,8 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "bỏ phần ví dụ minh họa và các dạng trọng tâm nhé" ⇒ không bao giờ giao -VD, -DT (cả bài mới lẫn bài cũ ôn lại), bỏ ô tích thêm | bằng chứng: bai-hom-nay.ts laMaToKhongGiao (-VD/-DT/-TL/-VDMH/-DTTT + tên), máy chủ bai-da-day.ts lưới an toàn ở maDe + phamVi; test omni-3-tick-bai-0510
 - [x] "Làm thêm 6 bước tính toán" ⇒ bộ sinh câu nền: bao_toan_electron, lap_he_phuong_trinh, cong_thuc_phan_tu, hang_so_can_bang, bien_thien_enthalpy, nang_luong_lien_ket (kiểm chéo độc lập) | bằng chứng: gộp ac234db2 (00cef6d0); 93/93; 6 câu mẫu điều phối tính tay khớp (9,916 L · 30% · C₇H₈O · Kc 250 · −902 kJ · −2 880 kJ)
 
+- [ ] "Làm luôn bộ sinh câu bảo toàn điện tích nhé" (thầy 05/10) ⇒ bộ sinh câu nền bao_toan_dien_tich, ion cùng tồn tại được, đáp án kiểm chéo độc lập ⇒ 27/29 bước | bằng chứng: (chưa có)
+
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
 
 - [x] 1. Tick bài ⇒ chiến dịch đúng tờ, đúng hạn tự tính, dòng xác nhận đúng 6 con số; tick lần hai không tạo thêm | bằng chứng: OMNI-3-build-status.md mục 2
