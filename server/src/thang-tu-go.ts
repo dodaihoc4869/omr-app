@@ -20,6 +20,7 @@ import { docBoTro, type BoTro, type CauKiem } from './cau-bo-tro'
 import { damBaoBangNutThat, TRAN_THE_NGAY } from './nut-that'
 import { damBaoBangLoiGiai, locSuKienDoc } from './loi-giai'
 import { ghiSuKien, ngayVn, MUC_DICH_XEM_LOI_GIAI } from './su-kien-hoc'
+import { MUC_DICH_LUOT } from './omni-kieu'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -167,7 +168,8 @@ async function docSoHoc(env: Env, sbd: string, qids: string[], qidGocCau: string
   }
   return rows.map((x) => ({
     qid: str(x.qid), nguon: str(x.nguon), ketQua: x.ket_qua === null || x.ket_qua === undefined ? null : Number(x.ket_qua), luc: str(x.luc),
-    hoTro: str(x.assistance) === 'assisted' || str(x.purpose) === MUC_DICH_XEM_LOI_GIAI,
+    // OMNI 3: dòng lướt (purpose 'luot') không phải một lần làm — xử như đọc lời giải.
+    hoTro: str(x.assistance) === 'assisted' || str(x.purpose) === MUC_DICH_XEM_LOI_GIAI || str(x.purpose) === MUC_DICH_LUOT,
   }))
 }
 

@@ -6,6 +6,7 @@ import { HinhTaiViTri } from '../../../components/QuestionMedia'
 import { chuanHoaLoiGiaiCau, CHUA_CO_LOI_GIAI } from '../../../lib/chuan-hoa-loi-giai'
 import type { HinhAnh, LoiGiaiCauTruc, LyDoY } from '../../../data/examContent'
 import type { Question } from '../core'
+import { chiSoRo, chiSoRoSau } from '../../../lib/chi-so-ro'
 
 type Chu = 'A' | 'B' | 'C' | 'D'
 type DS = 'D' | 'S'
@@ -33,13 +34,13 @@ export interface XemLaiChuanProps {
 }
 
 export default function XemLaiChuan({ q, chon, dapAn, solution, solutionImages, stt, onZoom }: XemLaiChuanProps) {
-  const { loiGiai, explanation } = loiGiaiChoTheCau(solution, q.phan, dapAn)
-  const chung = { cheDo: 'xem_lai' as const, stt, tieuDe: q.tenDang || 'Hoá học', text: q.text, thanCauImg: q.thanCauImg, table: q.table, imageDataUrl: q.imageDataUrl, hinhAnh: q.hinhAnh as HinhAnh[], loiGiai, explanation, onZoom }
+  const { loiGiai, explanation } = loiGiaiChoTheCau(chiSoRoSau(solution), q.phan, dapAn)
+  const chung = { cheDo: 'xem_lai' as const, stt, tieuDe: q.tenDang || 'Hoá học', text: chiSoRo(q.text), thanCauImg: q.thanCauImg, table: q.table, imageDataUrl: q.imageDataUrl, hinhAnh: q.hinhAnh as HinhAnh[], loiGiai, explanation, onZoom }
   const the = q.phan === 'I' ? (
-    <TheCau {...chung} phan="I" choices={bon(q.choices)} choiceImgs={bonTuyChon(q.choiceImgs)} choicePerm={[0, 1, 2, 3]}
+    <TheCau {...chung} phan="I" choices={bon(q.choices?.map(chiSoRo))} choiceImgs={bonTuyChon(q.choiceImgs)} choicePerm={[0, 1, 2, 3]}
       selected={/^[ABCD]$/.test(chon) ? chon as Chu : null} correct={/^[ABCD]$/.test(dapAn) ? dapAn as Chu : undefined} />
   ) : q.phan === 'II' ? (
-    <TheCau {...chung} phan="II" ideas={bon(q.ideas)} ideaImgs={bonTuyChon(q.ideaImgs)}
+    <TheCau {...chung} phan="II" ideas={bon(q.ideas?.map(chiSoRo))} ideaImgs={bonTuyChon(q.ideaImgs)}
       selected={[0, 1, 2, 3].map(i => (chon[i] === 'D' || chon[i] === 'S' ? chon[i] as DS : null))}
       correct={/^[DS]{4}$/.test(dapAn) ? dapAn.split('') as [DS, DS, DS, DS] : undefined} />
   ) : (

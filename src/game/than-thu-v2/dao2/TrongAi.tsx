@@ -7,6 +7,8 @@ import QuaiSonThuy from '../QuaiSonThuy'
 import {SoExpCau,useCheDoHieuUng} from '../../../components/exp-cau/ExpCau'
 import {expCauGame} from '../../../lib/hieu-ung-exp-cau'
 import {useEffect,useLayoutEffect,useRef,useState} from 'react'
+import type {ReactNode} from 'react'
+import {CHIP_CHUA_CHAC,GOI_Y_CHIP_CHUA_CHAC} from '../../../lib/omni-chu'
 import TheCau from '../../../components/TheCau'
 import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {TheCauProps} from '../../../components/TheCau'
@@ -28,6 +30,7 @@ import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
 import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
+import {chiSoRo,chiSoRoSau} from '../../../lib/chi-so-ro'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -35,7 +38,13 @@ export interface PhanHoi2{correct:boolean;answer:string;traLoi:string;solution:u
  /** Luật v4 (chỉ-thêm): EXP câu thử thách máy chủ trả; `coTroGiup` = câu có trợ giúp / Bùa / Hỏi thầy ⇒ không hiệu ứng. */
  expThuThach?:number;coTroGiup?:boolean
  /** Luật 29/09: EXP thật máy chủ ghi cho câu này (dùng nguyên số). */
- expCau?:number}
+ expCau?:number
+ /** OMNI 3 (chỉ-thêm): `loiNhan` = MỘT dòng nhỏ máy chủ viết sẵn dưới dải kết quả; `chacMaSai` ⇒ tự đưa khối LỜI GIẢI vào tầm mắt. Vắng ⇒ như cũ. */
+ omni?:{loiNhan:string|null;chacMaSai:boolean}
+ /** OMNI 3: câu chưa đúng mà KHÔNG trừ Máu — 'luot' (máy chủ chưa tính câu bấm quá nhanh) · 've' (câu của vé thử thách). */
+ mien?:'luot'|'ve'}
+/** OMNI 3: tiêu đề dải kết quả khi câu chưa đúng nhưng KHÔNG trừ Máu (lướt / vé thử thách) — số máu thật không đổi nên không hiện "quái phản đòn". */
+export const CHU_MIEN_MAU:Record<'luot'|'ve',string>={luot:'Chưa tính câu này · không mất Máu',ve:'Chưa đúng · không mất Máu'}
 
 // ───────────── thanh 6 nút của chuyến ─────────────
 /** Nút đã qua: xanh (đúng) / hồng (chưa đúng); nút đang làm sáng; nút Trùm ải là ô trám tím viền vàng. */
@@ -77,14 +86,14 @@ export function CanhRung({profile,ketQua,tong,suKien,chuong=false,trum=false,daC
   <div className="dao2-quai" key={`quai-${suKien}`} data-trung={vuaNop&&tran.correct?'':undefined} data-ha={tran.enemy===0?'':undefined}>
    <QuaiSonThuy loai={trum?'trum_suong_mu':'suong_mu'} size={120}/>
   </div>
-  <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
+  <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop&&(tran.correct||tran.damage>0)?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
   <BieuCamThu thu={thu} camXuc={daChot?(tran.correct?(chuong?'quyet-tam':'dung'):'sai'):'nghi'} size={48}/>
   {chuong&&<ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>}
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
    <span className="dao2-vach" role="progressbar" aria-label={`Máu ${TEN_QUAI}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.enemy}><i style={{width:`${tran.enemy}%`}}/></span></div>
   <div className="dao2-kinh dao2-mau-thu"><span className="dao2-vach dao2-vach-thu" role="progressbar" aria-label={`Máu của ${ten}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.hp}><i style={{width:`${tran.hp}%`}}/></span><span>{ten} · Máu {tran.hp}/100</span></div>
-  {vuaNop&&<p className="dao2-so" key={`so-${suKien}`} data-phia={tran.correct?'quai':'thu'} aria-hidden="true">−{tran.damage}</p>}
+  {vuaNop&&tran.damage>0&&<p className="dao2-so" key={`so-${suKien}`} data-phia={tran.correct?'quai':'thu'} aria-hidden="true">−{tran.damage}</p>}
   <button type="button" className="dao2-tieng" aria-pressed={!tat} aria-label={tat?'Bật tiếng trận đấu':'Tắt tiếng trận đấu'} onClick={()=>{setBattleMuted(!tat);setTat(!tat)}}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/>{tat?<path d="m22 9-6 6M16 9l6 6"/>:<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>}</svg></button>
  </section>
 }
@@ -102,40 +111,47 @@ function useGachPhuongAn(goc:{current:HTMLElement|null},gach:readonly string[]){
    if(h instanceof HTMLButtonElement)h.disabled=bi})
  })
 }
-export interface TheCauAiProps{cau:CauDao2;stt:number;traLoi:string;khoa:boolean;onTraLoi:(v:string)=>void;onZoom?:(src:string)=>void;onHinhLoi?:()=>void}
-export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi}:TheCauAiProps){
+export interface TheCauAiProps{cau:CauDao2;stt:number;traLoi:string;khoa:boolean;onTraLoi:(v:string)=>void;onZoom?:(src:string)=>void;onHinhLoi?:()=>void
+ /** Nhãn đọc máy của thẻ (mặc định "Ải k"; đề thử OMNI 3 dùng "Câu k"). */
+ nhan?:string}
+export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi,nhan}:TheCauAiProps){
  const goiY=docGoiY(q.goiY,q.phan),gach=goiY?.gach??[],goc=useRef<HTMLDivElement>(null)
  useGachPhuongAn(goc,gach)
- const chung={stt,onZoom,text:q.text,table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'thi' as const}
- const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:q.choices as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
+ const chung={stt,onZoom,text:chiSoRo(q.text),table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'thi' as const}
+ const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:(q.choices as string[]).map(chiSoRo) as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
    selected:(/^[ABCD]$/.test(traLoi)?traLoi:null) as 'A'|'B'|'C'|'D'|null,onSelect:v=>{if(!khoa&&!gach.includes(v))onTraLoi(v)}}
-  :q.phan==='II'?{...chung,phan:'II',ideas:q.ideas as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
+  :q.phan==='II'?{...chung,phan:'II',ideas:(q.ideas as string[]).map(chiSoRo) as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
    selected:Array.from({length:4},(_,i)=>(traLoi[i]==='D'||traLoi[i]==='S'?traLoi[i]:null) as 'D'|'S'|null),onSelect:(i,v)=>{if(!khoa){const a=(traLoi||'----').padEnd(4,'-').split('');a[i]=v;onTraLoi(a.join(''))}}}
   :{...chung,phan:'III',selected:traLoi,khoaO:khoa,onChange:v=>{if(!khoa)onTraLoi(v)}}
- return <section className="dao2-giay m3" aria-label={`Ải ${stt}`}>
+ return <section className="dao2-giay m3" aria-label={nhan??`Ải ${stt}`}>
   {typeof q.nhanNo==='string'&&q.nhanNo&&<p className="dao2-nhan-no" data-khoi="nhan-no">{q.nhanNo}</p>}
   {goiY&&<p className="dao2-bua">{BUA}<span><b>Bùa Trợ giảng:</b> {goiY.gach?`${chuGach(goiY.gach)} đã cháy thành tro.`:'mở trước Kiến thức cốt lõi của câu này.'}<small>Đúng nhờ Bùa chưa tính Thành thạo — câu sẽ quay lại để em tự làm.</small></span></p>}
-  {goiY?.cotLoi&&<div className="loi-giai-chot lg-chot dao2-cot-loi" data-cot-loi=""><div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div><ChemText text={goiY.cotLoi}/></div>}
+  {goiY?.cotLoi&&<div className="loi-giai-chot lg-chot dao2-cot-loi" data-cot-loi=""><div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div><ChemText text={chiSoRo(goiY.cotLoi)}/></div>}
   <div ref={goc} className="dao2-giay-cau" data-gach={gach.join('')||undefined} onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')onHinhLoi?.()}}><TheCau {...pc}/></div>
  </section>
 }
 
 // ───────────── sau khi chốt: kết quả + LỜI GIẢI chuẩn ─────────────
-export interface KhoiLoiGiaiProps{cau:CauDao2;stt:number;phanHoi:PhanHoi2;traLoiMay:string;onZoom?:(src:string)=>void;/** nơi em bấm Hỏi thầy (thống kê) */nguon?:string}
+export interface KhoiLoiGiaiProps{cau:CauDao2;stt:number;phanHoi:PhanHoi2;traLoiMay:string;onZoom?:(src:string)=>void;/** nơi em bấm Hỏi thầy (thống kê) */nguon?:string
+ /** Nhãn đầu thẻ (mặc định "ẢI k · vai"); đề thử OMNI 3 dùng "CÂU k". */
+ nhan?:string
+ /** false ⇒ không tự cuộn tới khối LỜI GIẢI (danh sách nhiều thẻ của đề thử). Mặc định true. */
+ tuCuon?:boolean}
 /** Thẻ trắng M3: đầu thẻ "ẢI k · CÂU MỚI" + dạng · mức độ; TheCau `xem_lai` (phương án ✓ ✗ + khối LỜI GIẢI → KIẾN THỨC CỐT LÕI → từng phương án/ý) + hình sau lời giải. */
-export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao'}:KhoiLoiGiaiProps){
+export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao',nhan,tuCuon=true}:KhoiLoiGiaiProps){
  // Ngang: thẻ lời giải là cột tự cuộn, khối LỜI GIẢI nằm dưới 4 ý ⇒ em không thấy (thầy báo 28/09). Vừa chốt xong thì tự cuộn tới khối LỜI GIẢI.
- const ngang=useNgang(),goc=useRef<HTMLElement>(null)
- useEffect(()=>{if(ngang)goc.current?.querySelector('.loi-giai')?.scrollIntoView?.({block:'start',behavior:'smooth'})},[ngang,stt])
+ // OMNI 3: "chắc mà sai" ⇒ khối LỜI GIẢI tự mở vào tầm mắt ở MỌI bố cục (dọc cũng cuộn tới) — chỗ đáng xem nhất hôm nay.
+ const ngang=useNgang(),goc=useRef<HTMLElement>(null),moLoiGiai=!!phanHoi.omni?.chacMaSai
+ useEffect(()=>{if(tuCuon&&(ngang||moLoiGiai))goc.current?.querySelector('.loi-giai')?.scrollIntoView?.({block:'start',behavior:'smooth'})},[ngang,stt,tuCuon,moLoiGiai])
  const em=(phanHoi.traLoi||traLoiMay).trim(),dap=phanHoi.answer.trim(),vai=docVai(q.vai)
- const chung={stt,onZoom,text:q.text,table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'xem_lai' as const,loiGiai:loiGiaiChoTheCau(phanHoi.solution,q.phan,dap)}
- const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:q.choices as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
+ const chung={stt,onZoom,text:chiSoRo(q.text),table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'xem_lai' as const,loiGiai:loiGiaiChoTheCau(chiSoRoSau(phanHoi.solution),q.phan,dap)}
+ const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:(q.choices as string[]).map(chiSoRo) as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
    selected:(/^[ABCD]$/.test(em)?em:null) as 'A'|'B'|'C'|'D'|null,correct:(/^[ABCD]$/.test(dap)?dap:undefined) as 'A'|'B'|'C'|'D'|undefined}
-  :q.phan==='II'?{...chung,phan:'II',ideas:q.ideas as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
+  :q.phan==='II'?{...chung,phan:'II',ideas:(q.ideas as string[]).map(chiSoRo) as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
    selected:Array.from({length:4},(_,i)=>(em[i]==='D'||em[i]==='S'?em[i]:null) as 'D'|'S'|null),correct:dapAnDungSai(dap)}
   :{...chung,phan:'III',selected:em||null,correct:dap}
- return <section ref={goc} className="dao2-the-giai m3" aria-label={`Lời giải ải ${stt}`}>
-  <p className="dao2-giai-dau"><b data-vai={vai??undefined}>ẢI {stt}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
+ return <section ref={goc} className="dao2-the-giai m3" aria-label={nhan?`Lời giải ${nhan.toLocaleLowerCase('vi')}`:`Lời giải ải ${stt}`} data-mo-loi-giai={moLoiGiai?'':undefined}>
+  <p className="dao2-giai-dau"><b data-vai={nhan?undefined:vai??undefined}>{nhan??`ẢI ${stt}${vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}`}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
   {/* Hỏi thầy nằm trong khối LỜI GIẢI của TheCau (thầy lệnh 30/09: chỉ hiện khi lời giải đang hiện). */}
   <TheCau {...pc} hoiThay={{qid:q.qid,nguon,gon:true}}/>
   <HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom}/>
@@ -146,17 +162,18 @@ const TU_NUT_DAO2=['.dao2-nut-chot','.dao2-ai .dao2-nut-xanh'] as const
 /** Dải kết quả trên thẻ lời giải: đúng ⇒ quái trúng đòn; chưa đúng ⇒ quái phản đòn (số máu đúng `learningBattle`). Chữ thưởng lấy nguyên lời máy chủ. */
 export function DaiKetQua({profile,cau:q,phanHoi,ketQua,tong}:{profile:DaoProfile;cau:CauDao2;phanHoi:PhanHoi2;ketQua:readonly BattleAnswer[];tong:number}){
  const cheDo=useCheDoHieuUng(),expBay=expCauGame({correct:phanHoi.correct,coTroGiup:phanHoi.coTroGiup,reward:phanHoi.reward,expThuThach:phanHoi.expThuThach,expCau:phanHoi.expCau})
- const tran=learningBattle([...ketQua],tong),thu=chiSoThu(profile.pet),lyDo=phanHoi.lyDo.chu.replace(/^\+\d+\s*(EXP)?\s*·\s*/,'').trim()
+ const tran=learningBattle([...ketQua],tong),thu=chiSoThu(profile.pet),lyDo=phanHoi.lyDo.chu.replace(/^\+\d+\s*(EXP)?\s*·\s*/,'').trim(),mien=!phanHoi.correct?phanHoi.mien:undefined
  // tiếng đòn: MỘT lần mỗi lần chấm (dải này dựng mới mỗi ải); tắt tiếng / chưa mở âm thanh ⇒ im lặng
  useEffect(()=>{playBattleSound(thu,evolutionStage(profile.cap),phanHoi.correct,tran.rage)},[]) // eslint-disable-line react-hooks/exhaustive-deps
  return <div className="dao2-kinh dao2-ket-qua" data-dung={phanHoi.correct?'':undefined} role="status">
   <span className="bl-phan-hoi-thu" data-dich-exp=""><BieuCamThu thu={thu} camXuc={phanHoi.correct?'dung':'sai'} size={64}/></span>
-  <b className="dao2-ket-qua-so" aria-label={phanHoi.correct?`${TEN_QUAI} mất ${tran.damage} máu`:`Thần thú của em mất ${tran.damage} máu`}>−{tran.damage}</b>
-  <span><strong>{phanHoi.correct?'Đúng rồi · quái trúng đòn':'Chưa đúng · quái phản đòn'}</strong>
+  {!mien&&<b className="dao2-ket-qua-so" aria-label={phanHoi.correct?`${TEN_QUAI} mất ${tran.damage} máu`:`Thần thú của em mất ${tran.damage} máu`}>−{tran.damage}</b>}
+  <span><strong>{phanHoi.correct?'Đúng rồi · quái trúng đòn':mien?CHU_MIEN_MAU[mien]:'Chưa đúng · quái phản đòn'}</strong>
    {phanHoi.correct&&tran.rage&&<em className="dao2-ket-qua-no">CUỒNG NỘ ×2 · 3 câu đúng liền</em>}
    {/* Luật v4: "+N EXP" bay sang ảnh thú nhỏ (số máy chủ); câu có trợ giúp vẫn hiện số thưởng tĩnh như cũ */}
    {expBay>0?<SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" tu={TU_NUT_DAO2}/>:phanHoi.reward>0&&<em>+{phanHoi.reward} EXP</em>}
-   <small>{[lyDo,!phanHoi.correct&&docVai(q.vai)==='moi'?'Ô đất vẫn được khai phá.':'',!phanHoi.correct?'Câu này sẽ quay lại theo lịch ôn lại.':''].filter(Boolean).join(' ')}</small></span>
+   <small>{[lyDo,!phanHoi.correct&&docVai(q.vai)==='moi'?'Ô đất vẫn được khai phá.':'',!phanHoi.correct?'Câu này sẽ quay lại theo lịch ôn lại.':''].filter(Boolean).join(' ')}</small>
+   {phanHoi.omni?.loiNhan&&<small data-khoi="omni-loi-nhan">{phanHoi.omni.loiNhan}</small>}</span>
  </div>
 }
 
@@ -170,8 +187,14 @@ export interface TrongAiProps{
  /** Lời báo (không phải lỗi) khi máy vừa tự bỏ qua câu thầy mới sửa (mã `cau_doi`, 29/09). */
  baoCau?:string
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onRoi:()=>void
+ /** OMNI 3 (chỉ-thêm; vắng ⇒ không có chip, DOM như cũ): chip "Chưa chắc" cạnh chip Trợ giúp — bật ⇒ gửi `tuTin:'chua_chac'`; mặc định tắt (= chắc). */
+ chuaChac?:boolean;onChuaChac?:(v:boolean)=>void
+ /** Lần đầu trong ngày em chạm chip ⇒ một dòng gợi ý nhỏ. */
+ goiYChip?:boolean
+ /** Thẻ Trạm hồi phục (OMNI 3) đặt trên nút sang ải, sau kết quả. */
+ tram?:ReactNode
 }
-export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',baoCau='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
+export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',baoCau='',onTraLoi,onAssisted,onNop,onTiep,onRoi,chuaChac=false,onChuaChac,goiYChip=false,tram}:TrongAiProps){
  const khung=useRef<HTMLDivElement>(null),[ti,setTi]=useState(docTi)
  // BẮN CHƯỞNG TRƯỚC LỜI GIẢI (thầy 28/09: "cho chưởng chạy ngay lúc em chốt đáp án"): máy chủ vừa trả kết quả (phanHoi null → có) ⇒ GIỮ cảnh trận
  // ~1,1 s (giảm chuyển động: 0,45 s) cho chưởng chạy trọn rồi mới mở lời giải; em bấm vào màn (click, không pointerdown: tránh cú chạm rơi trúng nút SANG ẢI vừa hiện) ⇒ bỏ qua. `chuongSk` = đòn được chiếu —
@@ -228,10 +251,15 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
       <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label="Câu này em có trợ giúp" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/>
       <span className="dao2-tro-chu" aria-hidden="true">Trợ giúp</span>
      </label>}
+     {onChuaChac&&<label className="dao2-tro" data-khoi="chua-chac" data-bat={chuaChac?'':undefined} title={GOI_Y_CHIP_CHUA_CHAC}>
+      <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label={CHIP_CHUA_CHAC} checked={chuaChac} disabled={busy} onChange={e=>onChuaChac(e.target.checked)}/>
+      <span className="dao2-tro-chu" aria-hidden="true">{CHIP_CHUA_CHAC}</span>
+     </label>}
      <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
     </div>
-    {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}</>
-    :<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button>}</>}
+    {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}
+    {goiYChip&&onChuaChac&&<small className="dao2-tro-ghi" data-khoi="goi-y-chua-chac">{GOI_Y_CHIP_CHUA_CHAC}</small>}</>
+    :<>{tram}<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button></>}</>}
   </div>
   </div>
  </div>

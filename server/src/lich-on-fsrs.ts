@@ -6,8 +6,12 @@
 //   · MỘT quan sát ĐỘC LẬP mỗi card mỗi ngày VN; trong ngày: có sai hợp lệ thì Again thắng, chỉ đúng thì Good.
 //   · Lần làm lại có HỖ TRỢ (`assisted`) KHÔNG thêm Good và KHÔNG đẩy mốc xa — chỉ ghi nhận.
 //   · Thiếu trả lời (bỏ trống) không cập nhật card.
-//   · Không suy Easy/Hard từ tốc độ; không đọc đồng hồ; không `Math.random`.
-import { createEmptyCard, fsrs, Rating, type Card } from 'ts-fsrs'
+//   · Không đọc đồng hồ; không `Math.random`.
+//   · OMNI 3 (đặc tả 4.5) — HẠNG 4 MỨC chỉ khi nơi gọi đưa `hang` (suy từ tự tin + nhãn tốc độ ĐÃ GHI lúc chấm, `hangFsrsTu`):
+//     sai → Again · đúng + chưa chắc → Hard · đúng + chắc → Good · đúng + chắc + trôi chảy → Easy. Vắng `hang` ⇒ Again/Good như cũ.
+//     PHIEN_BAN_FSRS KHÔNG đổi: sự kiện cũ không có tự tin/nhãn tốc độ ⇒ hạng Again/Good y hệt ⇒ state dựng từ sổ cũ vẫn đúng từng bit;
+//     lịch FSRS không lưu D1 (phát lại mỗi lần đọc) nên không có state cũ nào cần dựng lại.
+import { createEmptyCard, fsrs, Rating, type Card, type Grade } from 'ts-fsrs'
 
 /** Đổi cấu hình này phải tăng PHIEN_BAN_KE_HOACH để dựng lại hồ sơ đã lưu. */
 export const CAU_HINH_FSRS = Object.freeze({ request_retention: 0.9, enable_fuzz: false, enable_short_term: false })
@@ -52,6 +56,24 @@ export interface LichOnFsrs {
 
 export const ngayVnFsrs = (ms: number): string => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 
+/** Hạng một quan sát (OMNI 3, 4 mức). */
+export type HangFsrs = 'again' | 'hard' | 'good' | 'easy'
+/**
+ * Hạng 4 mức từ kết quả + tự tin + nhãn tốc độ đã ghi lúc chấm (`su_kien_hoc.raw_json` `{tt, td}`). Thiếu CẢ hai ⇒ undefined (Again/Good như cũ).
+ * Thiếu tự tin nhưng có nhãn ⇒ coi là "chắc" (mặc định của hợp đồng). Thuần.
+ */
+export function hangFsrsTu(ketQua: 0 | 1, tuTin: unknown, nhanTocDo: unknown): HangFsrs | undefined {
+  const coTuTin = tuTin === 'chac' || tuTin === 'chua_chac'
+  const coNhan = typeof nhanTocDo === 'string' && nhanTocDo !== ''
+  if (!coTuTin && !coNhan) return undefined
+  if (ketQua === 0) return 'again'
+  if (tuTin === 'chua_chac') return 'hard'
+  return nhanTocDo === 'troi_chay' ? 'easy' : 'good'
+}
+/** Điểm FSRS của một quan sát: sai (hoặc hạng 'again') ⇒ Again; đúng ⇒ theo hạng, vắng hạng ⇒ Good (hành vi cũ). */
+const diemFsrs = (ketQua: 0 | 1, hang: HangFsrs | undefined): Grade =>
+  ketQua === 0 || hang === 'again' ? Rating.Again : hang === 'hard' ? Rating.Hard : hang === 'easy' ? Rating.Easy : Rating.Good
+
 /** Tuỳ chọn của một quan sát: khoá trí nhớ, con trỏ và có phải lần tự làm hay không. */
 export interface QuanSatFsrs {
   /** Có phải lần TỰ LÀM (máy chủ chưa cấp gợi ý/lời giải). Mặc định `true` (giữ nguyên hành vi cũ). */
@@ -60,11 +82,13 @@ export interface QuanSatFsrs {
   khoa?: string
   /** Khoá sự kiện (để giải thích "đã dùng bằng chứng nào"). */
   cursor?: string
+  /** OMNI 3: hạng 4 mức của quan sát (`hangFsrsTu`). Vắng ⇒ Again/Good theo kết quả (hành vi cũ). */
+  hang?: HangFsrs
 }
 
 /**
- * Một quan sát/ngày: có sai thì dùng Again trên state đầu ngày; Good lặp không tăng mốc.
- * Bỏ trống không gọi hàm này. Không suy luận Easy/Hard từ tốc độ.
+ * Một quan sát/ngày: có sai thì dùng Again trên state đầu ngày; đúng lặp trong ngày không tăng mốc (quan sát ĐẦU ngày quyết định hạng).
+ * Bỏ trống không gọi hàm này. Hard/Easy chỉ khi nơi gọi đưa `hang` (OMNI 3).
  * Quan sát có HỖ TRỢ (`docLap:false`) chỉ được ĐẾM, KHÔNG đổi card và KHÔNG đẩy mốc.
  */
 export function taoLichOnFsrs(retention: number = CAU_HINH_FSRS.request_retention) {
@@ -84,17 +108,19 @@ export function taoLichOnFsrs(retention: number = CAU_HINH_FSRS.request_retentio
     }
     if (vaoCardMoi) {
       if (!docLap) return { ...moi, docLap: false, soLanHoTro: 1 }
-      const card = scheduler.next(moi.truocNgay, new Date(luc), ketQua === 0 ? Rating.Again : Rating.Good).card
-      return { ...moi, card, daSai: ketQua === 0, cursor }
+      const diem = diemFsrs(ketQua, quanSat.hang)
+      const card = scheduler.next(moi.truocNgay, new Date(luc), diem).card
+      return { ...moi, card, daSai: diem === Rating.Again, cursor }
     }
     const c = cu
     if (!docLap) return { ...c, docLap: false, soLanHoTro: c.soLanHoTro + 1, cursor } // hỗ trợ: KHÔNG đẩy mốc
-    if (c.ngay === ngay && (c.daSai || ketQua === 1)) return c
+    const diem = diemFsrs(ketQua, quanSat.hang)
+    if (c.ngay === ngay && (c.daSai || diem !== Rating.Again)) return c
     const cungNgay = c.ngay === ngay
     const truocNgay = (cungNgay ? c.truocNgay : c.card) ?? createEmptyCard<Card>(new Date(luc))
     const lucDauNgay = cungNgay ? c.lucDauNgay : luc
-    const card = scheduler.next(truocNgay, new Date(lucDauNgay), ketQua === 0 ? Rating.Again : Rating.Good).card
-    return { card, truocNgay, ngay, daSai: ketQua === 0, lucDauNgay, khoa: c.khoa, phienBan, lucGoc: c.lucGoc, cursor, docLap: true, soLanHoTro: c.soLanHoTro }
+    const card = scheduler.next(truocNgay, new Date(lucDauNgay), diem).card
+    return { card, truocNgay, ngay, daSai: diem === Rating.Again, lucDauNgay, khoa: c.khoa, phienBan, lucGoc: c.lucGoc, cursor, docLap: true, soLanHoTro: c.soLanHoTro }
   }
 }
 

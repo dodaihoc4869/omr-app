@@ -10,10 +10,14 @@
 //
 // Mọi luật gom nhóm và trạng thái ô tích nằm trong `src/lib/cay-chon-de.ts`,
 // có test. Ở đây chỉ vẽ.
+//
+// OMNI 3 (05/10): `theoMucDich` ⇒ cây hai thư mục DẠY HỌC / TU LUYỆN (`src/lib/cay-muc-dich.ts`) — dùng ở Mở ca kiểm tra và Giao chiến dịch
+// (vẫn chọn được MỌI tờ). Thư mục TU LUYỆN mở sẵn để thầy thấy ngay các khối như trước. Vắng cờ ⇒ cây cũ y nguyên.
 import { useMemo, useState } from 'react'
 import { CheckSquare, Square, MinusSquare, Search, ChevronRight, Circle, CircleDot } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { bamTich, dungCay, khoiCuaDe, locCay, moiMaTrongCay, tongCau, tongDaChon, trangThaiTich, type Nut } from '../lib/cay-chon-de'
+import { dungCayTheoMucDich, KHOA_THU_MUC_TU_LUYEN } from '../lib/cay-muc-dich'
 
 export { khoiCuaDe }
 export const KHOI_CO_THE = ['10', '11', '12'] as const
@@ -132,9 +136,11 @@ export interface HopChonDeProps {
   /** Cho tích ô cha và hiện nút Chọn tất cả. */
   chonNhieu?: boolean
   onChonTatCa?: (ma: string[]) => void
+  /** OMNI 3: xếp cây theo mục đích — thư mục DẠY HỌC và TU LUYỆN (mọi nhánh khác). Vắng ⇒ cây cũ. */
+  theoMucDich?: boolean
 }
 
-export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308, chonNhieu, onChonTatCa }: HopChonDeProps) {
+export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308, chonNhieu, onChonTatCa, theoMucDich = false }: HopChonDeProps) {
   const [tim, setTim] = useState('')
   const [khoi, setKhoi] = useState('')
   /** Nhánh thầy TỰ bấm mở/gập, gắn với chữ đang gõ. Đổi chữ tìm là quay về mặc định. */
@@ -144,7 +150,7 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
   const dsKhoi = useMemo(() => [...new Set(ds.map((c) => khoiCuaDe(c)).filter(Boolean))].sort((a, b) => Number(a) - Number(b) || a.localeCompare(b)), [ds])
 
   const dsLoc = useMemo(() => ds.filter((c) => (!khoi || khoiCuaDe(c) === khoi) && (!nhomLoc || (c.nhom || '') === nhomLoc)), [ds, khoi, nhomLoc])
-  const cayGoc = useMemo(() => dungCay(dsLoc), [dsLoc])
+  const cayGoc = useMemo(() => (theoMucDich ? dungCayTheoMucDich(dsLoc) : dungCay(dsLoc)), [dsLoc, theoMucDich])
   const { cay, moKhoa } = useMemo(() => locCay(cayGoc, tim), [cayGoc, tim])
 
   // TRẠNG THÁI GẬP/MỞ tính NGAY TRONG LÚC VẼ, không qua useEffect. Để effect
@@ -154,7 +160,11 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
   //   · không gõ tìm  → thu gọn toàn bộ thư mục
   //   · đang gõ tìm   → mở đúng nhánh có kết quả
   //   · thầy tự bấm   → theo tay thầy, cho đến khi đổi chữ trong ô tìm
-  const macDinh = useMemo(() => new Set<string>(tim.trim() ? moKhoa : []), [tim, moKhoa, cayGoc])
+  //   · theo mục đích → thư mục TU LUYỆN mở sẵn (thấy ngay các khối như cây cũ), DẠY HỌC gập
+  const macDinh = useMemo(
+    () => new Set<string>(tim.trim() ? moKhoa : theoMucDich && cayGoc.some((n) => n.khoa === KHOA_THU_MUC_TU_LUYEN) ? [KHOA_THU_MUC_TU_LUYEN] : []),
+    [tim, moKhoa, cayGoc, theoMucDich],
+  )
   const moRong = moTay && moTay.tim === tim ? moTay.set : macDinh
 
   const gap = (khoa: string) => {

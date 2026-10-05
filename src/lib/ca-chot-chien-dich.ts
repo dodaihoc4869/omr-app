@@ -18,6 +18,9 @@ export interface GoiCaChot {
   lop: string | null
   /** Mã câu máy chủ, đúng thứ tự Buổi chữa xếp. */
   qids: string[]
+  /** OMNI 3 (05/10): câu lấy từ `/gv/omni ca-chot` (ca chốt 50/50: nửa câu của bài, nửa câu chưa gặp cùng ô từ TU LUYỆN) ⇒ màn Mở ca mở xong
+   *  gọi thêm `gan-ca-chot` để máy chủ chấm điều kiện T của chứng chỉ. Vắng ⇒ gói cũ, màn Mở ca như trước. */
+  omni?: boolean
 }
 
 /** Đọc gói ca chốt (không xoá). Sai dạng / không có / máy chặn bộ nhớ ⇒ null. */
@@ -28,7 +31,13 @@ export function docGoiCaChot(kho: Pick<Storage, 'getItem'> | undefined = globalT
     const j = JSON.parse(s) as Partial<GoiCaChot>
     const qids = Array.isArray(j.qids) ? j.qids.map(String).filter((q) => q.trim() !== '') : []
     if (qids.length === 0) return null
-    return { chienDichId: String(j.chienDichId ?? ''), ten: String(j.ten ?? '').trim(), lop: typeof j.lop === 'string' && j.lop.trim() ? j.lop.trim() : null, qids }
+    return {
+      chienDichId: String(j.chienDichId ?? ''),
+      ten: String(j.ten ?? '').trim(),
+      lop: typeof j.lop === 'string' && j.lop.trim() ? j.lop.trim() : null,
+      qids,
+      ...(j.omni === true ? { omni: true } : {}),
+    }
   } catch {
     return null
   }

@@ -5,6 +5,7 @@ import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
 import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import type { ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
+import { chiSoRo, chiSoRoSau } from '../../lib/chi-so-ro'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from '../../components/QuestionMedia'
 import { LoiGiaiCauSai } from '../../components/KhoiCauSai'
@@ -23,7 +24,7 @@ export function DeBai({ q, onZoom }: { q: Question; onZoom: (src: string) => voi
     <>
       {q.thanCauImg
         ? <button type="button" onClick={() => onZoom(q.thanCauImg!)} title="Bấm để phóng to"><img decoding="async" src={q.thanCauImg} alt="Đề bài" /></button>
-        : <div className="dh-de"><ChemText text={tachDongTheoY(q.text)} /></div>}
+        : <div className="dh-de"><ChemText text={tachDongTheoY(chiSoRo(q.text))} /></div>}
       <BangSoLieu table={q.table} />
       {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt="Hình của câu" onZoom={onZoom} />}
       <HinhTaiViTri hinhAnh={hinh} viTri="sau_de" onZoom={onZoom} nhan="câu của em" />
@@ -40,9 +41,11 @@ export function duDapAn(q: Question, chon: string): boolean {
  *  - `gach`: phương án SAI máy chủ đã gạch (Bùa Trợ giảng) — ô tối "cháy thành tro", KHÔNG bấm được;
  *  - `bua`: dải Bùa Trợ giảng đặt ngay dưới đầu thẻ, trước đề;
  *  - `xemLaiChuan`: đã có kết quả ⇒ thay cả thẻ bằng khối xem lại CHUẨN của app (`TheCau` xem_lai + `chuanHoaLoiGiaiCau`), số trên đầu thẻ = `stt`. */
-export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number } }
+/** `cuoi` (OMNI 3, 05/10): phần thêm đặt TRONG thẻ câu, sau phương án/ô đáp số (chip "Chưa chắc") — không chiếm hàng dưới thẻ, nên thẻ câu
+ *  và các nút đòn giữ đúng bố cục đang chạy (thầy 05/10: "app của học sinh giữ nguyên mọi thứ giao diện"). */
+export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number }; cuoi?: ReactNode }
 
-export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
+export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan, cuoi }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
   const hinh = q.hinhAnh as HinhAnh[]
   // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`expCau`; máy chủ cũ: `reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
   const cheDo = useCheDoHieuUng()
@@ -50,7 +53,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>
-      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
+      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{ketQua.loiNhan && <small data-khoi="omni-loi-nhan">{ketQua.loiNhan}</small>}{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
       <XemLaiChuan q={q} chon={chon} dapAn={ketQua.answer} solution={ketQua.solution} solutionImages={ketQua.solutionImages} stt={xemLaiChuan.stt} onZoom={onZoom} />
     </section>
   )
@@ -69,7 +72,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             return (
               <button key={chu} type="button" disabled={khoa || chay} aria-pressed={chon === chu} data-kq={kq(chu)} className={chay ? 'dh2-chay' : undefined} onClick={() => { if (!chay) onChon(chu) }}>
                 <i>{chu}</i>
-                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`))} />}
+                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chiSoRo(chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`)))} />}
                   <HinhTaiViTri hinhAnh={hinh} viTri={`sau_pa_${chu}`} onZoom={onZoom} nhan={`phương án ${chu}`} /></span>
                 {chay && <span className="dh2-an"> (đã cháy thành tro — phương án sai, không chọn được)</span>}
               </button>
@@ -84,7 +87,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             const dat = (gt: 'D' | 'S') => { const a = (chon || '----').padEnd(4, '-').split(''); a[i] = gt; onChon(a.join('')) }
             return (
               <div key={i}>
-                <span><small>Ý {'abcd'[i]}</small>{q.ideaImgs?.[i] ? <img decoding="async" src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} /> : <ChemText text={y} />}</span>
+                <span><small>Ý {'abcd'[i]}</small>{q.ideaImgs?.[i] ? <img decoding="async" src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} /> : <ChemText text={chiSoRo(y)} />}</span>
                 <div className="dh-ds">
                   <button type="button" disabled={khoa} aria-pressed={v === 'D'} onClick={() => dat('D')}>Đúng</button>
                   <button type="button" disabled={khoa} aria-pressed={v === 'S'} onClick={() => dat('S')}>Sai</button>
@@ -96,13 +99,15 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
       )}
       {q.phan === 'III' && <OSoTraLoi className="dh-so-khung" inputClassName="dh-so" ariaLabel="Đáp số của em" placeholder="Nhập đáp số" disabled={khoa} value={chon} maxLength={40} onChange={onChon} />}
       <HinhTaiViTri hinhAnh={hinh} viTri="cuoi_cau" onZoom={onZoom} nhan="câu của em" />
+      {cuoi}
       {ketQua && (
         <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status">
           <b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>
+          {ketQua.loiNhan && <small data-khoi="omni-loi-nhan">{ketQua.loiNhan}</small>}
           {expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}
           <details open={!ketQua.correct}>
             <summary>Lời giải</summary>
-            <LoiGiaiCauSai hoaHoc c={{ text: q.text, phan: q.phan, dapAnDung: ketQua.answer, loiGiai: ketQua.solution }} qid={q.qid} nguon="doan" />
+            <LoiGiaiCauSai hoaHoc c={{ text: chiSoRo(q.text), phan: q.phan, dapAnDung: ketQua.answer, loiGiai: chiSoRoSau(ketQua.solution) }} qid={q.qid} nguon="doan" />
             <HinhTaiViTri hinhAnh={ketQua.solutionImages ?? []} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom} />
           </details>
         </div>

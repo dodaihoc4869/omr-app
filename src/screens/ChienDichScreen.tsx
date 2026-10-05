@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
 import DsChienDichDaGiao from '../components/chien-dich/DsChienDichDaGiao'
+import NutGiaoTheoBai from '../components/chien-dich/NutGiaoTheoBai'
 import { useSoDemGv, type GiaoTuCa } from '../lib/so-dem-gv'
 import './gv-hoa2.css'
 
@@ -25,10 +26,14 @@ export default function ChienDichScreen() {
           <h1 className="gv2-tieu-de">Chiến dịch luyện</h1>
         </div>
         {!moGiao && (
-          <button type="button" className="gv2-nut-chinh" onClick={() => setMoGiao(true)}>
-            <Plus size={18} aria-hidden="true" />
-            Giao chiến dịch mới
-          </button>
+          <div className="gv2-dau-nut">
+            {/* OMNI 3 (05/10): "Giao theo bài" — lối vào thứ hai của bước Bài hôm nay (chỉ khi OMNI bật; tắt ⇒ không vẽ gì). */}
+            <NutGiaoTheoBai />
+            <button type="button" className="gv2-nut-chinh" onClick={() => setMoGiao(true)}>
+              <Plus size={18} aria-hidden="true" />
+              Giao chiến dịch mới
+            </button>
+          </div>
         )}
       </header>
 

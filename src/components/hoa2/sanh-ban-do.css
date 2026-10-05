@@ -830,6 +830,17 @@
   font-size: 15px;
   font-weight: 700;
 }
+/* OMNI 3 (05/10): CHỈ bố cục cho phần thêm — hàng hai nút nhỏ "Để mai · Làm luôn" và khối kính bản ngang; màu/nút dùng lại .h2-nut-phu, .h2-ng-the. */
+.h2-omni-hang {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.h2-omni-khoi {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 /* dải Vào thi (chỉ khi có ca đang mở) */
 .h2-ca {
