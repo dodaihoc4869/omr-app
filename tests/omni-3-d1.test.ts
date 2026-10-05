@@ -20,7 +20,7 @@ vi.mock('../server/src/omni-met-gio', async (goc) => {
 vi.mock('../server/src/omni-q', async (goc) => {
   const m = await goc<typeof import('../server/src/omni-q')>()
   const g = await import('./omni-3-d1-gia')
-  return { ...m, goiYQ: vi.fn((cau: Parameters<typeof m.goiYQ>[0], vknDang: Parameters<typeof m.goiYQ>[1]) => { g.gia.goiYQ.push({ cau, vknDang }); return m.goiYQ(cau, vknDang) }) }
+  return { ...m, goiYQ: vi.fn((...a: Parameters<typeof m.goiYQ>) => { g.gia.goiYQ.push({ cau: a[0], vknDang: a[1], danhMucNen: a[2] }); return m.goiYQ(...a) }) }
 })
 vi.mock('../server/src/omni-toc-do', async (goc) => {
   const m = await goc<typeof import('../server/src/omni-toc-do')>()
@@ -215,9 +215,10 @@ describe('qCuaCau — thầy > A.I gợi (omni_q goi_y) > goiYQ từ nhãn kho >
     expect(q.get('NGOAI-KHO-III-1')).toMatchObject({ qid: 'NGOAI-KHO-III-1', phan: 'III', nguon: 'mac_dinh' })
     for (const v of q.values()) expect(v.vkn.length).toBeGreaterThan(0)
     // câu chưa có dòng omni_q ⇒ goiYQ nhận nhãn kho của câu
-    const goi = gia.goiYQ.map((x) => (x as { cau: { qid: string; kienThuc?: string[]; maDang: string | null } }).cau)
-    expect(goi.map((c) => c.qid)).toEqual(['Q4'])
-    expect(goi[0]).toMatchObject({ kienThuc: ['Cân bằng phương trình'], maDang: 'D1', phan: 'I' })
+    const goi = gia.goiYQ as { cau: { qid: string; kienThuc?: string[]; maDang: string | null }; danhMucNen: unknown }[]
+    expect(goi.map((x) => x.cau.qid)).toEqual(['Q4'])
+    expect(goi[0]!.cau).toMatchObject({ kienThuc: ['Cân bằng phương trình'], maDang: 'D1', phan: 'I' })
+    expect(goi[0]!.danhMucNen).toBe(TEN_NEN) // nhãn nền ⇒ vi kỹ năng nen:<nhãn> theo danh mục TEN_NEN
   })
   it('thầy duyệt (q-duyet) ⇒ đệm Q bỏ ngay, câu chuyển sang nguồn thầy', async () => {
     const { d, env } = dung()
@@ -322,6 +323,28 @@ describe('hoSoOmniEm — phát lại sổ + Q + β + xác nhận + prior lớp',
     const hs = await hoSoOmniEm(env, 'S1', T0 + 3000)
     expect(gia.goi.length).toBeGreaterThan(n)
     expect(hs.vkn['dang:D2']!.nTuLam).toBe(2)
+  })
+  it('đệm dòng sổ: câu trả lời mới chỉ đọc phần thêm (received_at ≥ mốc); dòng tới muộn mang mốc cũ ⇒ đọc lại cả sổ — kết quả = đọc mới hoàn toàn', async () => {
+    const { d, env } = dung()
+    await ghiLop(env, d)
+    const sql: string[] = []
+    const goc = env.DB.prepare.bind(env.DB)
+    env.DB.prepare = ((q: string) => { sql.push(q); return goc(q) }) as typeof env.DB.prepare
+    await hoSoOmniEm(env, 'S1', T0)
+    await ghiSuKien(env, [sk('S1', 'Q3', T0 + 5_000, 0)])
+    sql.length = 0
+    const moi = await hoSoOmniEm(env, 'S1', T0 + 6_000)
+    expect(sql.some((q) => q.includes('received_at >= ?'))).toBe(true)
+    expect(sql.filter((q) => q.includes('FROM su_kien_hoc WHERE sbd IN') && !q.includes('received_at >= ?') && !q.includes('COUNT(*)')).length).toBe(0)
+    xoaDemOmni()
+    expect(JSON.stringify(await hoSoOmniEm(env, 'S1', T0 + 6_000))).toBe(JSON.stringify(moi))
+    await ghiSuKien(env, [sk('S1', 'Q2', T0 - 5 * NGAY, 0)]) // tới muộn, mốc tiếp nhận cũ
+    sql.length = 0
+    const sau = await hoSoOmniEm(env, 'S1', T0 + 7_000)
+    expect(sql.some((q) => q.includes('FROM su_kien_hoc WHERE sbd IN') && !q.includes('received_at >= ?') && !q.includes('COUNT(*)'))).toBe(true)
+    xoaDemOmni()
+    expect(JSON.stringify(await hoSoOmniEm(env, 'S1', T0 + 7_000))).toBe(JSON.stringify(sau))
+    expect(sau.vkn['dang:D1']!.nTuLam).toBe(moi.vkn['dang:D1']!.nTuLam + 1)
   })
   it('lỗi đọc ⇒ hồ sơ rỗng (không ném)', async () => {
     const env = { DB: { prepare() { throw new Error('D1 hỏng') }, batch() { throw new Error('D1 hỏng') } } } as unknown as Env
@@ -519,10 +542,11 @@ describe('chayOmniDem — β + ảnh chụp theo lô ≤ 40 em, idempotent theo 
     expect(r1).toMatchObject({ soEm: 40, soBeta: 1, xong: false })
     expect(gia.beta).toEqual([[20_000, 21_000, 22_000, 23_000, 24_000, 25_000, 26_000, 27_000, 28_000]])
     expect(d.dem('omni_beta_cau')).toBe(1)
-    const r2 = await chayOmniDem(env, T0 + 60_000)
-    expect(r2).toMatchObject({ soEm: 6, soBeta: 0, xong: false })
+    const r2 = await chayOmniDem(env, T0 + 60_000) // lô cuối + chứng chỉ trong cùng lượt
+    expect(r2).toEqual({ soEm: 6, soBeta: 0, xong: true })
     expect(d.dem('omni_em')).toBe(46)
     expect(d.dem('omni_em', `cap_nhat_luc = '2026-10-04T17:00:00.000Z'`)).toBe(46) // dấu = 00:00 VN ngày chụp
+    expect(JSON.parse((d.sql.prepare(`SELECT gia_tri FROM cau_hinh WHERE khoa = '${KHOA_CON_TRO_DEM}'`).get() as { gia_tri: string }).gia_tri)).toMatchObject({ ngay: '2026-10-05', xong: true })
     expect(await chayOmniDem(env, T0 + 120_000)).toEqual({ soEm: 0, soBeta: 0, xong: true })
     expect(await chayOmniDem(env, T0 + 180_000)).toEqual({ soEm: 0, soBeta: 0, xong: true })
     // ngày mới ⇒ chạy lại từ đầu
