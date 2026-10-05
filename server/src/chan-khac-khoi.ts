@@ -19,7 +19,8 @@
 // 06/10 CÂU NGHI SAI ĐÁP ÁN (làn A đợt 2): cổng EM (luật A: `chanKhacKhoiEm` / `TheoEm` / `Dong`) loại thêm câu đang 'nghi' trong `cau_nghi_dap_an` (tu-hoan-thien.ts) —
 // em không được làm (và bị chấm sai) câu mà đáp án kho đang bị nghi. Lý do mới `nghi_dap_an` đếm cùng bảng đếm, ghi console như mọi lý do. Chỉ MỘT truy vấn / 60 giây / isolate
 // (`docCauNghiDem`). KHÔNG lọc ở: cổng LỚP (luật B — danh sách của thầy), `chanMetaKhacKhoi` (siêu dữ liệu hồ sơ: "Câu đã làm" phải giữ câu em đã làm), nơi thầy TỰ CHỌN (Gọi lên bảng,
-// dựng ca thi — ca thi đã có `/ca/cau-nghi-dap-an`).
+// dựng ca thi — ca thi đã có `/ca/cau-nghi-dap-an`), kênh `luot_cu` (resume lượt ĐÃ phát — `KENH_GIU_CAU_NGHI`).
+// Đi kèm ở KẾ HOẠCH: srs2-d1.ts `tamHoanCauKhoa` bỏ câu nghi khỏi phần CÒN LẠI của kế hoạch ngày (như câu ca bảo vệ) — không thì em kẹt "còn N câu", rương không mở.
 // TỐN D1: khối em truyền sẵn ⇒ 0 truy vấn; chỉ có SBD ⇒ 1 truy vấn `hoc_sinh`. Làm giàu nguồn khối từ D1 (`de_kho.lop`, `cau_hoi.lop/chuyen_de`,
 // `game_v2_question.ma_de/dang`) — MỘT truy vấn — mặc định chỉ cho câu tự thân không đọc ra khối (hiếm: kho thật 28/15 359 câu, tờ `100`).
 import type { Env } from './kieu'

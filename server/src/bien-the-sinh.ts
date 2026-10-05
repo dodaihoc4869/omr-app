@@ -8,7 +8,7 @@
 // KHỐI: biến thể chỉ dùng cho em CÙNG KHỐI câu gốc ⇒ `maDe` (mã tờ) của câu gốc được GIỮ NGUYÊN trong biến thể (cùng `lop`/`khoi`/`nhom` nếu câu gốc có)
 // để `khoiCuaCau` / cổng khối đọc đúng khối câu gốc; biến thể KHÔNG tự gắn khối riêng. `apBienThe` (kênh đưa câu cho em) đòi khối em = khối câu gốc
 // (cả hai phải rõ) rồi lọc thêm bằng `cauHopKhoi` (src/lib/khoi-cau.ts).
-// Không nối vào game / thang làm lại ở đợt này (điều phối nối đợt sau). Không IO, không D1/R2.
+// Đã nối vào thang làm lại câu sai (06/10, ban-khac-ao.ts: qid ảo `<Q>~bt<k>`, hạt giống = qid ảo). Không IO, không D1/R2.
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { cauHopKhoi, khoiCuaCau, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'

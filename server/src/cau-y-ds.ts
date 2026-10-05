@@ -2,7 +2,7 @@
 // Máy soạn (scripts/loi-giai/may-soan.mjs) soạn 8–12 Ý MỚI cùng đề dẫn cho mỗi câu Đúng/Sai (ngoài 4 ý gốc), mỗi ý Đ/S + lí do 1 dòng,
 // KIỂM HAI LƯỢT ĐỘC LẬP (lượt soạn ↔ lượt kiểm mù không thấy giá trị đề xuất — server/src/may-soan-kiem.ts). CHỈ LƯU ý hai lượt khớp:
 // máy chủ đòi bằng chứng `kiem.d2` khớp `d` của từng ý và kiểm lại ý với câu gốc dựng từ KHO (không tin máy soạn).
-// Thang làm lại câu sai (làn khác, dùng sau) đọc bằng `docYDs(env, bams)` để ra câu Đ/S bằng ý MỚI thay vì 4 ý em đã thuộc.
+// Thang làm lại câu sai đọc bằng `docYDs(env, bams)` / `docYDsTheoQid(env, qids)` (06/10, ban-khac-ao.ts: qid ảo `<Q>~yd<k>`) để ra câu Đ/S bằng ý MỚI thay vì 4 ý em đã thuộc.
 //
 // Bảng CHỈ-THÊM `cau_y_ds` (băm câu, ý, giá trị, lí do, nguồn, lúc) — tạo lúc GHI (như cau-bo-tro.ts); bản SQL: server/migration-0510-y-ds.sql
 // (chỉ thêm, chưa chạy --remote). Đường đọc KHÔNG tạo bảng (ngân sách vòng D1 của kế hoạch ngày): bảng chưa có ⇒ rỗng.
