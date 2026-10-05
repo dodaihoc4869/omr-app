@@ -60,9 +60,7 @@ function napTruocManEm(): Plugin {
         type Manh = { type: 'chunk'; fileName: string; imports: string[]; facadeModuleId: string | null; isDynamicEntry: boolean; viteMetadata?: { importedCss: Set<string> } }
         const manh = Object.values(goi).filter((x) => x.type === 'chunk') as unknown as Manh[]
         const theoTen = new Map(manh.map((m) => [m.fileName, m]))
-        const dsCua = (duoi: string): string[] => {
-          const dau = manh.find((m) => m.isDynamicEntry && (m.facadeModuleId || '').split('\\').join('/').endsWith(duoi))
-          if (!dau) return []
+        const dsCua = (...duoi: string[]): string[] => {
           const thay = new Set<string>()
           const di = (ten: string) => {
             if (thay.has(ten)) return
@@ -72,11 +70,33 @@ function napTruocManEm(): Plugin {
             for (const c of m.viteMetadata?.importedCss ?? []) thay.add(c)
             for (const con of m.imports) di(con)
           }
-          di(dau.fileName)
+          for (const d of duoi) {
+            const dau = manh.find((m) => m.isDynamicEntry && (m.facadeModuleId || '').split('\\').join('/').endsWith(d))
+            if (dau) di(dau.fileName)
+          }
           return [...thay].filter((t) => !html.includes(t)).map((t) => goc + t)
         }
-        const bang = { thi: dsCua('/src/screens/ExamTakeScreen.tsx'), hs: dsCua('/src/screens/StudentPortalScreen.tsx'), ph: dsCua('/src/screens/ParentPortalScreen.tsx') }
-        if (bang.thi.length + bang.hs.length + bang.ph.length === 0) return html
+        // 05/10: main.tsx nạp ĐỘNG gốc React ⇒ nhóm `app` (App.tsx, mọi đường trừ cổng học sinh) và `hsVo` (vỏ AppHocSinh + màn đăng nhập);
+        // `hs` = phần mảnh cổng NGOÀI vỏ (máy đã đăng nhập: nạp ngay; chưa đăng nhập: nạp ưu tiên thấp sau DOMContentLoaded); `thi` / `ph` bỏ phần
+        // đã có trong `app`. Phông Sảnh (`phongHs`): mặt chữ Be Vietnam Pro / Noto Serif / Baloo 2 mà màn đăng nhập + Sảnh dùng — chỉ nạp trước
+        // khi trang do service worker phục vụ. Luật chọn nhóm: src/lib/nap-truoc-man-em.ts.
+        const app = dsCua('/src/App.tsx')
+        const hsVo = dsCua('/src/AppHocSinh.tsx')
+        const ngoai = (ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
+        const phongHs = Object.values(goi)
+          .map((x) => (x as { fileName: string }).fileName)
+          .filter((f) => /^assets\/(?:be-vietnam-pro-(?:latin|vietnamese)-(?:400|600|700)|noto-serif-(?:latin|vietnamese)-700|baloo-2-(?:latin|vietnamese)-(?:700|800))-normal-[\w-]+\.woff2$/.test(f))
+          .sort()
+          .map((f) => goc + f)
+        const bang = {
+          thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
+          hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
+          ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), app),
+          app,
+          hsVo,
+          phongHs,
+        }
+        if (bang.thi.length + bang.hs.length + bang.ph.length + app.length + hsVo.length === 0) return html
         // Đặt TRƯỚC mọi thẻ Vite chèn: script nội tuyến đứng sau <link rel="stylesheet"> phải chờ tờ CSS tải xong mới chạy
         // (đo: mất ~1,5 s trên 3G) — đặt trước thì chạy ngay khi trình duyệt vừa đọc tới.
         const moc = html.indexOf('<script type="module"')
@@ -205,6 +225,11 @@ export default defineConfig({
           // Bù chỗ cho phần OMNI của Sảnh em (≈ 14 KB, mảnh khởi động): "Làm câu ôn" (bảng nhiệm vụ cũ) nạp LƯỜI khi em bấm và mọi việc của nó cần máy chủ
           // (tải câu, chấm) — mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc (như Tu luyện 30/09).
           '**/LamCauOn-*.{js,css}',
+          // Bù chỗ cho mở app học sinh nhanh (05/10): gốc React nạp ĐỘNG theo đường vào ⇒ khung lời giải (KhungLoiGiai, thang tự gỡ, ô số) vốn là
+          // mảnh riêng NGOÀI precache nay gộp vào mảnh chung khởi động (precache — tốt cho máy mất mạng). Bù bằng hai mảnh CHỈ màn thầy nhập (đồ thị
+          // nhập đã soát: `hom-nay` = Kiên trì + Toàn cảnh một em; `uoc-luong-bo-cuc` = Gọi lên bảng + Lên bảng chiến dịch — các màn ấy đều đã ngoài
+          // precache) ⇒ kho chạy-lúc. Máy em / phụ huynh / màn thi không bao giờ tải hai mảnh này.
+          '**/{hom-nay,uoc-luong-bo-cuc}-*.{js,css}',
           // Vòng học v2 (02/10): màn thầy "Gỡ nút thắt" + rút đề v2 (máy thầy) — tải khi mở, không cất sẵn trên máy em.
           '**/BanGoNutThatScreen-*.{js,css}',
           // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
