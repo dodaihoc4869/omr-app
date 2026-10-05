@@ -43,6 +43,10 @@ export const TIN_TO_CHIEU = {
   THAY_CHUA: 'ddh-mc-thay-chua',
   /** App → tờ chiếu: kết quả của `THAY_CHUA` cho ô `khoa` (`kq` 'da_ghi' | 'loi'); cũng gửi lại lúc bắt tay cho ô đã chữa trong phiên. */
   THAY_CHUA_XONG: 'ddh-mc-thay-chua-xong',
+  /** Tờ chiếu → app (thầy 05/10, nút X): xin danh sách em đã làm SAI câu của ô `khoa` (kèm `id`). CHỈ ĐỌC. */
+  AI_SAI: 'ddh-mc-ai-sai',
+  /** App → tờ chiếu: `ds` (em · lúc · nơi · giây) hoặc `loi` cho lệnh `AI_SAI` cùng `id`. */
+  AI_SAI_TRA: 'ddh-mc-ai-sai-tra',
 } as const
 
 /** Quá số giây này mà app không trả lời thì tờ chiếu coi là LỖI và mở lại nút. */
@@ -75,6 +79,7 @@ export type TinDenToChieu =
   | { loai: 'cham'; khoa: string; dat: boolean; giayThuc?: { giay: number; duTinh: number } }
   | { loai: 'ho_so'; khoa: string; id: string }
   | { loai: 'thay_chua'; khoa: string }
+  | { loai: 'ai_sai'; khoa: string; id: string }
 
 export interface BoiCanhKiemTin {
   /** Mã phiên của tờ chiếu đang mở. */
@@ -109,6 +114,11 @@ export function kiemTinToChieu(e: { data: unknown; origin: string; source: unkno
     if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
     if (typeof t.id !== 'string' || !/^[A-Za-z0-9_-]{1,40}$/.test(t.id)) return null
     return { loai: 'ho_so', khoa: t.khoa, id: t.id }
+  }
+  if (t.type === TIN_TO_CHIEU.AI_SAI) {
+    if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
+    if (typeof t.id !== 'string' || !/^[A-Za-z0-9_-]{1,40}$/.test(t.id)) return null
+    return { loai: 'ai_sai', khoa: t.khoa, id: t.id }
   }
   if (t.type === TIN_TO_CHIEU.THAY_CHUA) {
     if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
@@ -197,6 +207,7 @@ export function jsCauNoiToChieu(): string {
     vung.concat(vungTc).forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
     body.classList.remove('mc-noi');
     try { delete window.__mcHoiHoSo; } catch (x) { window.__mcHoiHoSo = undefined; }
+    try { delete window.__mcHoiAiSai; } catch (x) { window.__mcHoiAiSai = undefined; }
   }
   // MỞ RIÊNG (tệp đã lưu, mở lại hôm khác, tab riêng): không có app ở trên để ghi ⇒ bỏ hẳn hai nút, tờ y như thường.
   if (window.parent === window) { bo(); return; }
@@ -337,6 +348,9 @@ export function jsCauNoiToChieu(): string {
       xong(String(d.khoa), 'da_ghi', typeof d.dat === 'boolean' ? d.dat : undefined);
     } else if (d.type === '${TIN_TO_CHIEU.THAY_CHUA_XONG}') {
       xongTc(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi');
+    } else if (d.type === '${TIN_TO_CHIEU.AI_SAI_TRA}') {
+      var cbs = hoiSai[String(d.id)];
+      if (cbs) { delete hoiSai[String(d.id)]; cbs(Array.isArray(d.ds) ? d.ds : null, d.loi ? String(d.loi) : '', d.conNua === true); }
     } else if (d.type === '${TIN_TO_CHIEU.HO_SO_TRA}') {
       var cb = hoi[String(d.id)];
       if (cb) { delete hoi[String(d.id)]; cb(d.hoSo && typeof d.hoSo === 'object' ? d.hoSo : null, d.loi ? String(d.loi) : ''); }
@@ -386,6 +400,15 @@ export function jsCauNoiToChieu(): string {
     hoi[id] = cb;
     gui({ type: '${TIN_TO_CHIEU.HO_SO}', khoa: String(khoa), id: id });
     setTimeout(function () { if (hoi[id]) { var f = hoi[id]; delete hoi[id]; f(null, 'het_gio'); } }, 20000);
+  };
+  // AI SAI CÂU NÀY (nút X, thầy 05/10): xin qua app thầy — tờ không tự gọi máy chủ.
+  var hoiSai = {}, soHoiSai = 0;
+  window.__mcHoiAiSai = function (khoa, cb) {
+    if (!noi) { cb(null, 'khong_noi'); return; }
+    var id = 's' + (++soHoiSai);
+    hoiSai[id] = cb;
+    gui({ type: '${TIN_TO_CHIEU.AI_SAI}', khoa: String(khoa), id: id });
+    setTimeout(function () { if (hoiSai[id]) { var f = hoiSai[id]; delete hoiSai[id]; f(null, 'het_gio'); } }, 20000);
   };
   gui({ type: '${TIN_TO_CHIEU.SAN_SANG}' });
   nhip = setInterval(function () {

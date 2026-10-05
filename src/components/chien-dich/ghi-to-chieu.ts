@@ -66,6 +66,36 @@ export type GhiMotO = (o: OGhiToChieu, dat: boolean, giayThuc?: number) => Promi
  * mặc định `/gv/thay-chua-cau` (nhãn "Thầy đã chữa" + mốc dạy lại) với nguồn `len_bang`. */
 export type ThayChuaMotO = (o: OGhiToChieu) => Promise<{ ok: true } | { ok: false; chu: string }>
 
+/** Một lượt làm sai (nút X "Ai sai" trên tờ, thầy 05/10). */
+export interface LuotSaiToChieu { sbd: string; ten: string; luc: string; noi: string; giay: number | null }
+
+/** Lệnh thầy CHỈ ĐỌC `/gv/ai-sai-cau` — em đã làm sai các bản `qids` của một câu. */
+export async function aiSaiQuaMayChu(qids: readonly string[]): Promise<{ ok: true; ds: LuotSaiToChieu[]; conNua: boolean } | { ok: false; chu: string }> {
+  try {
+    const [{ layCauHinhMayChu }, { loadTeacherSecret }] = await Promise.all([import('../../lib/may-chu-moi'), import('../../lib/exam-db')])
+    const [ch, mat] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
+    if (!ch.URL) return { ok: false, chu: 'Chưa kết nối được máy chủ.' }
+    const res = await fetch(`${ch.URL}/gv/ai-sai-cau`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' },
+      body: JSON.stringify({ qids }),
+    })
+    const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; ds?: LuotSaiToChieu[]; conNua?: boolean }
+    return j.ok === true && Array.isArray(j.ds) ? { ok: true, ds: j.ds, conNua: j.conNua === true } : { ok: false, chu: j.error || 'Không đọc được danh sách làm sai.' }
+  } catch {
+    return { ok: false, chu: 'Không nối được máy chủ.' }
+  }
+}
+
+/** Gửi kết quả `AI_SAI` về đúng khung tờ chiếu (dùng chung cho mọi màn nghe tờ). */
+export function traAiSai(cuaSo: Window, goc: string, maPhien: string, id: string, r: Awaited<ReturnType<typeof aiSaiQuaMayChu>>) {
+  try {
+    cuaSo.postMessage({ type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien, id, ...(r.ok ? { ds: r.ds, conNua: r.conNua } : { loi: r.chu }) }, goc)
+  } catch {
+    /* khung đã đóng */
+  }
+}
+
 /** Lệnh máy chủ chung `/gv/thay-chua-cau` — Gọi lên bảng / Dạy học. */
 export async function thayChuaQuaMayChu(o: { sbd: string; qid: string }, nguon: 'len_bang' | 'day_hoc', maNguon: string): Promise<{ ok: true } | { ok: false; chu: string }> {
   try {
@@ -85,7 +115,8 @@ export async function thayChuaQuaMayChu(o: { sbd: string; qid: string }, nguon: 
 }
 
 /** Hook của màn Lên bảng chiến dịch: giữ bảng kết quả của chiến dịch đang chọn và nghe tờ chiếu đang mở. */
-export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thayChuaO?: ThayChuaMotO) {
+/** `aiSaiQids` (nút X): các qid cần tra cho ô `o` — chiến dịch truyền cả nhóm câu trùng nội dung; mặc định `[o.qid]`. */
+export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thayChuaO?: ThayChuaMotO, aiSaiQids?: (o: OGhiToChieu) => string[]) {
   const showToast = useAppStore((s) => s.showToast)
   const [ketQua, setKetQua] = useState<BangKetQua>(() => docKetQuaNho(chienDichId))
   const ketQuaRef = useRef(ketQua)
@@ -102,6 +133,8 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thay
   const dangThayChua = useRef(new Map<string, Promise<boolean>>())
   const thayChuaRef = useRef(thayChuaO)
   thayChuaRef.current = thayChuaO
+  const aiSaiRef = useRef(aiSaiQids)
+  aiSaiRef.current = aiSaiQids
   useEffect(() => {
     daThayChua.current = new Set()
   }, [chienDichId])
@@ -187,6 +220,13 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thay
       }
       const o = p.o.get(tin.khoa)
       if (!o) return
+      if (tin.loai === 'ai_sai') {
+        const id = tin.id
+        void aiSaiQuaMayChu(aiSaiRef.current?.(o) ?? [o.qid]).then((r) => {
+          if (phien.current === p) traAiSai(cuaSo, goc, p.ma, id, r)
+        })
+        return
+      }
       if (tin.loai === 'thay_chua') {
         const khoa = tin.khoa
         const tra = (ok: boolean) => {

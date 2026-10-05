@@ -131,7 +131,15 @@ export default function LenBangChienDich() {
     },
     [chonId, coMat, tai, bang, buoi],
   )
-  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO)
+  // Nút X trên tờ: tra đủ các bản trùng nội dung của câu (bảng chiến dịch / buổi chữa mang `qidCung`).
+  const aiSaiQids = useCallback(
+    (o: { qid: string }) => {
+      const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
+      return dong ? qidCuaDong(dong) : [o.qid]
+    },
+    [bang, buoi],
+  )
+  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO, aiSaiQids)
   const moChieu = async (dsO: OChieu[], tenBuoi: string): Promise<boolean> => {
     if (!dsO.length) {
       showToast('Chưa có câu nào để chiếu lên bảng', 'warn')

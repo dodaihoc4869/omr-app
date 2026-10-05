@@ -2,7 +2,7 @@ import NhomCaThuGon from '../components/NhomCaThuGon'
 import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 import { hashSeed } from '../lib/exam-shuffle'
 import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu } from '../lib/to-chieu-cau-noi'
-import { thayChuaQuaMayChu } from '../components/chien-dich/ghi-to-chieu'
+import { aiSaiQuaMayChu, thayChuaQuaMayChu, traAiSai } from '../components/chien-dich/ghi-to-chieu'
 // GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
 // Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
@@ -1439,6 +1439,14 @@ function GoiLenBangCu() {
       }
       const o = p.o.get(tin.khoa)
       if (!o) return
+      if (tin.loai === 'ai_sai') {
+        // Nút X "Ai sai câu này" (thầy 05/10): chỉ đọc sổ, trả danh sách về đúng khung.
+        const id = tin.id
+        void aiSaiQuaMayChu([qidMayChuCuaIdCau(o.cau.id) ?? o.cau.id]).then((r) => {
+          if (phienChieu.current === p) traAiSai(cuaSo, goc, p.ma, id, r)
+        })
+        return
+      }
       if (tin.loai === 'thay_chua') {
         // "Thầy chữa": không gọi em nữa — ghi nhãn "Thầy đã chữa" + mốc dạy lại cho câu của em (lệnh `/gv/thay-chua-cau`, nguồn len_bang).
         const khoa = tin.khoa

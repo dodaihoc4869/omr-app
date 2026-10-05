@@ -95,6 +95,7 @@ import { gvHoSoLenBang } from './ho-so-em-chieu'
 import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
 import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
+import { aiSaiCau } from './ai-sai-cau'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
@@ -3606,6 +3607,8 @@ const boXuLy = {
       if (p === '/gv/dau-gio') return ra(await gvDauGio(env, b))
       // THẦY CHỮA một câu từ tờ chiếu (thầy 05/10, server/src/thay-chua-cau.ts): Gọi lên bảng / Dạy học — nhãn "Thầy đã chữa" + mốc dạy lại.
       if (p === '/gv/thay-chua-cau') return ra(await thayChuaCau(env, b))
+      // AI ĐÃ LÀM SAI CÂU NÀY (thầy 05/10, nút X trên tờ chiếu; server/src/ai-sai-cau.ts): CHỈ ĐỌC sổ — em · lúc · nơi · số giây.
+      if (p === '/gv/ai-sai-cau') return ra(await aiSaiCau(envDoc, b))
       // GIAO ĐỀ THEO TUẦN (26/09, gv-kho-de-giao.ts): màn thầy `GiaoDeTheoTuanScreen` gọi lệnh này; dòng định tuyến bị rơi mất sau một lần gộp ⇒ màn báo
       // "Máy chủ chưa có lệnh". Nối lại (28/09). Có ghi (`luu`) ⇒ dùng `env` (không phải bản đọc-chỉ).
       if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(env, b))

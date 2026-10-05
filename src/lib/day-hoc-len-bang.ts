@@ -151,6 +151,8 @@ export async function dungToChieuDayHoc(
   giao: ReadonlyMap<string, EmLenCau>,
   tenBuoi: string,
   maPhien?: string,
+  /** Nút X "Ai sai" (thầy 05/10): Kiểm tra đầu giờ CÓ, Dạy học KHÔNG (truyền false). */
+  nutAiSai = true,
 ): Promise<{ html: string; o: Map<string, OGhiDayHoc> }> {
   const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }, { uocLuongBacCauGoc }, { CAU_HINH_LEN_BANG_MAC_DINH }, { khoaToChieu }] = await Promise.all([
     import('./bai-tap-pdf'),
@@ -191,6 +193,7 @@ export async function dungToChieuDayHoc(
     ngay: new Date(),
     nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,
     ...(maPhien && o.size > 0 ? { cauNoi: { maPhien } } : {}),
+    nutAiSai,
   })
   return { html, o }
 }

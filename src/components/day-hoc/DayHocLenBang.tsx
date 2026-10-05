@@ -130,7 +130,7 @@ export default function DayHocLenBang() {
           const lan = cauChieu.slice(0, cauChieu.indexOf(c) + 1).filter((x) => giaoMoi[x.khoa]?.sbd === g.sbd).length
           m.set(c.khoa, { sbd: g.sbd, hoTen: g.hoTen, lop: lopCuaEm.get(g.sbd) || tt?.buoi.lop || undefined, lanLenBang: lan })
         }
-      const { html: h, o } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined)
+      const { html: h, o } = await dungToChieuDayHoc(cauChieu, m, `Dạy học · ${tt?.buoi.ten || 'Buổi học'}`, coEm ? ma : undefined, false)
       ganO(ma, o)
       setHtml(h)
 

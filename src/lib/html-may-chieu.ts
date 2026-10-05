@@ -109,6 +109,8 @@ export interface TuyChonMayChieu {
    * riêng (tệp đã lưu, tab riêng): khi ấy không có ai để ghi. Không có `cauNoi` thì tờ không có nút, mã phiên,
    * kiểu chữ hay script cầu nối nào. Xem `to-chieu-cau-noi.ts`. */
   cauNoi?: { maPhien: string }
+  /** Nút X "Ai sai câu này" (thầy 05/10): mặc định CÓ khi tờ có cầu nối, TRỪ tờ Dạy học (`dayHoc` hoặc `nutAiSai: false`). */
+  nutAiSai?: boolean
   /** Ngân sách buổi (phút) — chữ "Buổi: x/N phút" ở thanh dưới. Thiếu thì chỉ ghi số phút đã trôi. */
   nganSachPhut?: number
 }
@@ -1104,6 +1106,8 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   }
   const soDot = dot.length
   const nganSach = Math.max(0, Math.round(Number(tuyChon.nganSachPhut) || 0))
+  // Nút X "Ai sai" (thầy 05/10): chỉ khi tờ có cầu nối, TRỪ tờ Dạy học.
+  const coAiSai = !!tuyChon.cauNoi?.maPhien && !tuyChon.dayHoc && tuyChon.nutAiSai !== false
 
   // THANH DƯỚI: đợt k/n · trạng thái · nút gọi lên bảng · ghi chú · cài đặt.
   const than = `<div class="mc-thanh" id="mc-thanh">
@@ -1116,7 +1120,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   <button type="button" id="mc-len-bang">Lên bảng</button>
   <div class="mc-phim-nhom" id="mc-phim-nhom">
     <button type="button" class="mc-nut-phim" data-k="C" hidden><kbd>C</kbd><span class="mc-nut-chu">Thầy chữa</span></button>
-    <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
+${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kbd>X</kbd><span class="mc-nut-chu">Ai sai</span></button>\n' : ''}    <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>
