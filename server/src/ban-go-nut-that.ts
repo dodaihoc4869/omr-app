@@ -21,6 +21,7 @@ import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { ngayVn } from './su-kien-hoc'
+import { MUC_DICH_LUOT } from './omni-kieu'
 import { cauTrongGoi, chuHtml, deHtml, type CauKho } from '../../src/lib/loi-giai-kiem'
 
 type Obj = Record<string, unknown>
@@ -105,7 +106,8 @@ async function docSo(env: Env, cap: readonly { sbd: string; goc: string }[]): Pr
     if (kq === null && nguon !== 'thi') continue
     const d: DongSo = {
       sbd: str(x.sbd), goc: t.goc, luc: str(x.luc), ngayVn: str(x.ngay_vn), ketQua: kq,
-      coHoTro: str(x.assistance) === 'assisted' || str(x.purpose) === 'xem_loi_giai',
+      // OMNI 3: dòng lướt (purpose 'luot') không phải một lần làm — như đọc lời giải: không tính đúng, không tính sai.
+      coHoTro: str(x.assistance) === 'assisted' || str(x.purpose) === 'xem_loi_giai' || str(x.purpose) === MUC_DICH_LUOT,
       songSinh: t.songSinh !== null, nguon, chon: chonTuRaw(x.raw_json),
     }
     ra.set(k, [...(ra.get(k) ?? []), d])
