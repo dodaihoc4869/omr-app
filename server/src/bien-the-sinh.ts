@@ -6,7 +6,8 @@
 //
 // API: `coBoSinh(dang)`, `sinhBienThe(dang, hatGiong, phan, mucDo?, goc?)` (tất định), `cacHoDe()`; tiện ích phủ lên câu gốc `apBienThe`.
 // KHỐI: biến thể chỉ dùng cho em CÙNG KHỐI câu gốc ⇒ `maDe` (mã tờ) của câu gốc được GIỮ NGUYÊN trong biến thể (cùng `lop`/`khoi`/`nhom` nếu câu gốc có)
-// để `khoiCuaCau` / cổng khối đọc đúng khối câu gốc; biến thể KHÔNG tự gắn khối riêng. `apBienThe` lọc thêm bằng `cauHopKhoi` (src/lib/khoi-cau.ts).
+// để `khoiCuaCau` / cổng khối đọc đúng khối câu gốc; biến thể KHÔNG tự gắn khối riêng. `apBienThe` (kênh đưa câu cho em) đòi khối em = khối câu gốc
+// (cả hai phải rõ) rồi lọc thêm bằng `cauHopKhoi` (src/lib/khoi-cau.ts).
 // Không nối vào game / thang làm lại ở đợt này (điều phối nối đợt sau). Không IO, không D1/R2.
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
@@ -245,20 +246,24 @@ export function sinhBienThe(dang: string, hatGiong: string, phan: 'I' | 'III', m
 
 /**
  * Phủ biến thể lên câu gốc (đúng hình PrivateQuestion, qid = `qidAo` do nơi gọi đặt; mặc định hạt giống = qid ảo ⇒ chấm lại sinh lại được đúng câu).
- * Chặn: câu tự luận, Phần II, câu không có bộ sinh, câu gốc KHÁC KHỐI em (`cauHopKhoi`), qid ảo làm lệch khối so với câu gốc.
+ * Chặn: câu tự luận, Phần II, câu không có bộ sinh; KHỐI (luật 05/10, kênh tự động): khối em và khối câu gốc phải RÕ và TRÙNG nhau
+ * (em lớp 12 cũng không nhận biến thể câu lớp 11; không rõ khối em / khối câu ⇒ chặn), câu gốc qua `cauHopKhoi`, qid ảo không lệch khối.
  * `version` là băm NỘI DUNG biến thể (bộ sinh đổi ⇒ version đổi ⇒ lượt cũ không chấm theo câu khác).
  */
 export function apBienThe(goc: PrivateQuestion, qidAo: string, khoiEm: Khoi | null, hatGiong: string = qidAo): PrivateQuestion | null {
   if (!goc || (goc.phan !== 'I' && goc.phan !== 'III') || !goc.dang || !qidAo) return null
   if (laCauTuLuan(goc)) return null
+  // CÙNG KHỐI, tự kiểm ở đây (không chờ làn sửa khoi-cau.ts gộp): `cauHopKhoi` bản hiện tại còn cho em khối trên nhận câu khối dưới.
+  const khoiGoc = khoiCuaCau(goc)
+  if (khoiEm === null || khoiGoc === null || khoiEm !== khoiGoc) return null
   if (!cauHopKhoi(khoiEm, goc)) return null
   // qid ảo phải mang ĐÚNG khối câu gốc (hoặc không mang khối): lệch khối = mâu thuẫn ⇒ chặn (luật khối 05/10).
-  const khoiAo = khoiCuaMaDe(qidAo), khoiGoc = khoiCuaCau(goc)
+  const khoiAo = khoiCuaMaDe(qidAo)
   if (khoiAo !== null && khoiAo !== khoiGoc) return null
   const bt = sinhBienThe(goc.dang, hatGiong, goc.phan, goc.mucDo ?? undefined, goc)
   if (!bt) return null
   const { bienThe, ...cau } = bt
   const q = { ...cau, qid: qidAo, solution: { ...(cau.solution as Record<string, unknown>), bien_the_cua: goc.qid, ho: bienThe.ho, mau: bienThe.mau } } as PrivateQuestion
-  if (khoiCuaCau(q) !== khoiCuaCau(goc) || !cauHopKhoi(khoiEm, q)) return null
+  if (khoiCuaCau(q) !== khoiGoc || !cauHopKhoi(khoiEm, q)) return null
   return q
 }

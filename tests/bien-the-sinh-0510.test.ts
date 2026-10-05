@@ -623,7 +623,7 @@ function kiemCau(c: CauBienThe, kq: KQ): void {
     expect(lg.ketQua).toBe(c.correct)
     if (kq.chu !== undefined) {
       expect(c.correct, ten).toBe(kq.chu)
-      expect((c.text.match(/\d+/g) ?? []).includes(c.correct), ten).toBe(false)
+      expect((c.text.match(/\d+/g) ?? ([] as string[])).includes(c.correct), ten).toBe(false)
       return
     }
     const x = kq.so!
@@ -831,6 +831,27 @@ describe('Khối của biến thể = khối câu gốc (cổng khối đọc đ
     const q11 = apBienThe(g11, `${g11.qid}~bt0`, 11)!
     expect(khoiCuaCau(q11)).toBe(11)
     expect(apBienThe(g11, `${g11.qid}~bt0`, 10)).toBeNull() // em lớp 10 không nhận câu lớp 11
+  })
+  it('apBienThe: CÙNG KHỐI tuyệt đối — em lớp trên không nhận biến thể câu lớp dưới; không rõ khối em / khối câu gốc ⇒ null', () => {
+    const g11 = goc('11-C1-B1', 'I', 'CAN_BANG.HANG_SO_K.TINH_HANG_SO', 'hieu')
+    expect(apBienThe(g11, `${g11.qid}~bt0`, 12)).toBeNull() // cauHopKhoi bản cũ cho qua (11 ≤ 12) — biến thể thì không
+    expect(apBienThe(g11, `${g11.qid}~bt0`, null)).toBeNull()
+    const khongKhoi = { ...goc('', 'III', 'CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG'), qid: 'cau-khong-ma-7' }
+    expect(khoiCuaCau(khongKhoi)).toBeNull()
+    for (const k of [10, 11, 12] as const) expect(apBienThe(khongKhoi, 'cau-khong-ma-7~bt0', k)).toBeNull()
+    // Khối chỉ nằm ở `lop` (dòng D1) vẫn được tính, và biến thể mang theo đúng khối đó.
+    const theoLop = { ...khongKhoi, lop: '12' } as PrivateQuestion
+    const q = apBienThe(theoLop, 'cau-khong-ma-7~bt0', 12)!
+    expect(khoiCuaCau(q)).toBe(12)
+    expect(apBienThe(theoLop, 'cau-khong-ma-7~bt0', 11)).toBeNull()
+    // Mọi biến thể đưa ra (đủ 14 họ) đều cùng khối em = khối câu gốc.
+    for (const h of cacHoDe()) for (const k of [10, 11, 12] as const) {
+      const g = goc(`${k}-C1-B1`, 'III', h.cacDang[0]!, 'hieu')
+      const bt = apBienThe(g, `${g.qid}~bt0`, k)
+      expect(bt, `${h.ma} lớp ${k}`).not.toBeNull()
+      expect(khoiCuaCau(bt)).toBe(k)
+      for (const khac of [10, 11, 12] as const) if (khac !== k) expect(apBienThe(g, `${g.qid}~bt0`, khac), `${h.ma} câu lớp ${k} → em lớp ${khac}`).toBeNull()
+    }
   })
   it('chọn mẫu GẦN câu gốc khi có chữ câu gốc (cùng cách giải): câu cellulose trinitrate ⇒ biến thể cellulose; câu tráng gương ⇒ biến thể tráng bạc', () => {
     for (let i = 0; i < 20; i++) {
