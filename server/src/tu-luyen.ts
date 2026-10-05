@@ -27,6 +27,7 @@ import type { CauLuyen } from '../../src/lib/bai-tap-pdf'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
 import { duocChonLop, lopEmDuocChon, nguonHopKhoi } from '../../src/lib/khac-phuc-khoi'
 import { khoiCuaCau, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { hopLeDeRut } from '../../src/lib/loc-cau-rut'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -202,7 +203,7 @@ async function dangPhoBienCuaLop(env: Env, khoiEm: Khoi | null): Promise<{ ma: s
      WHERE COALESCE(d.da_xoa, 0) = 0 AND COALESCE(q.dang, '') <> '' GROUP BY q.ma_de, q.dang`).all<Obj>().catch(() => ({ results: [] as Obj[] }))
   const dong = (r.results ?? []).map((x) => ({ maDe: str(x.ma_de), dang: str(x.dang), n: Number(x.n) || 0, k: khoiCuaMaDe(str(x.ma_de)) }))
   const dungKhoi = dong.filter((x) => x.k === khoiEm)
-  const chon = dungKhoi.length ? dungKhoi : dong.filter((x) => x.k !== null && x.k <= khoiEm)
+  const chon = dungKhoi // LUẬT THẦY 05/10: chỉ dạng của tờ ĐÚNG khối em (trước đây thiếu thì lấy tờ khối thấp hơn)
   const tong = new Map<string, { n: number; maDe: Set<string> }>()
   for (const x of chon) {
     const t = tong.get(x.dang) ?? { n: 0, maDe: new Set<string>() }
@@ -272,9 +273,9 @@ async function ungVienToanKho(env: Env, khoiEm: Khoi | null, loc: ReadonlySet<st
   for (const x of r.results ?? []) {
     let q: PrivateQuestion
     try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
-    const k = khoiCuaCau({ qid: q.qid, maDe: q.maDe })
+    const k = khoiCuaCau(q) // LUẬT THẦY 05/10: mọi nguồn khối của câu (mã tờ, mã câu, chương) phải KHỚP và ĐÚNG khối em
     const g = str(x.content_group)
-    if ((k !== null && k > khoiEm) || laCauTuLuan(q) || baoVe.has(q.qid) || (g && baoVe.has(g)) || (g && nhom.has(g))) continue
+    if (k !== khoiEm || laCauTuLuan(q) || baoVe.has(q.qid) || (g && baoVe.has(g)) || (g && nhom.has(g))) continue
     if (!hopLeDeRut({ phan: q.phan, maDe: q.maDe, dapAnDung: q.correct, text: q.text, choices: q.phan === 'II' ? q.ideas : q.choices })) continue
     const c = cauLuyenTuCauGame(q)
     if (!khopBoLocTuDo(loc, c)) continue
@@ -597,7 +598,7 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
   const baoVe = await docBaoVeKho(env)
   if (!baoVe) return { ok: false, error: LOI_CHUA_KIEM_BAO_VE }
   const r = await chayCheDo(env, sbd, t, true)
-  const dsCau = r.dsCau.filter((c) => !laCauTuLuan(c) && !baoVe.has(qidGoc(c.id))).slice(0, TRAN_CAU_TU_LUYEN)
+  const dsCau = (await chanKhacKhoiEm(env, 'tu_luyen', sbd, r.dsCau.filter((c) => !laCauTuLuan(c) && !baoVe.has(qidGoc(c.id))), { cauCua: (c) => ({ qid: qidGoc(c.id), maDe: c.maDe, dang: r.meta.get(c.id)?.dangMa }) })).slice(0, TRAN_CAU_TU_LUYEN) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (dsCau.length === 0) return { ok: false, error: r.loi || 'Không rút được câu nào. Em đổi lựa chọn rồi thử lại.' }
 
   const congKhai: CauCongKhai[] = []

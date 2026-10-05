@@ -1,5 +1,7 @@
 // @vitest-environment node
 // "Luyện nâng cao / Thử sức ngay": câu thử thách chỉ được lấy từ câu HỢP KHỐI của em (Code 1 yêu cầu 21/09 — em lớp 11 không nhận câu lớp 12).
+// SỬA CÓ CHỦ Ý 05/10 — LUẬT THẦY (nguyên văn): "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
+// ⇒ chỉ câu ĐÚNG khối em; câu không đọc ra khối (mã lạ) bị bỏ; em chưa rõ khối ⇒ không câu nào (trước: không lọc).
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -33,11 +35,12 @@ describe('chonCauThuThach', () => {
   })
   it('không đủ 2 câu Vận dụng hợp khối ⇒ lấy câu có đáp án bất kỳ NHƯNG vẫn hợp khối', () => {
     const r = chonCauThuThach(KHO, 10)
-    expect(r.map((c) => c.id)).toEqual(['DH-10-C1-B1-I-1', 'X-1'])
+    // luật 05/10: 'X-1' (mã lạ, không rõ khối) KHÔNG còn được lấy bù ⇒ thiếu thì trả thiếu
+    expect(r.map((c) => c.id)).toEqual(['DH-10-C1-B1-I-1'])
     expect(chonCauThuThach([cau('DH-12-A', 'DH-12-A')], 11)).toEqual([])
   })
-  it('không rõ khối em (chưa xếp lớp) ⇒ không lọc (giữ hành vi cũ); câu không đáp án bị bỏ', () => {
-    expect(chonCauThuThach(KHO, khoiCuaEm({ lop: '' })).map((c) => c.id)).toEqual(['DH-12-C1-B1-I-1', 'DH-12-C1-B1-I-2'])
+  it('không rõ khối em (chưa xếp lớp) ⇒ (luật 05/10) KHÔNG câu nào; câu không đáp án bị bỏ', () => {
+    expect(chonCauThuThach(KHO, khoiCuaEm({ lop: '' }))).toEqual([])
     expect(chonCauThuThach([cau('a', 'DH-12-A', { dapAn: '' }), cau('b', 'DH-12-B')], 12).map((c) => c.id)).toEqual(['b'])
   })
   it('màn thử thách legacy đi qua server và lịch riêng của em', () => {

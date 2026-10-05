@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // HẠ TẢI D1 (Boss 21/09 ~20:50, D1 nghẽn giờ cao điểm): (1) đệm TTL dùng chung có trần; (2) kho câu THEO DẠNG của readScope đệm 60 giây, khoá có phiên bản kho, KHÔNG lẫn giữa lớp / em, phần riêng của em vẫn đọc tươi;
 // (3) xác thực token đệm 60 giây (đổi mật khẩu có hiệu lực ≤ 60 giây), token sai / hết hạn / sửa nội dung không bao giờ lọt.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -39,7 +40,7 @@ describe('DemTTL', () => {
 })
 
 const cau = (qid: string, dang: string, maDe: string, version = 'v1', text = `Đề ${qid}`) => ({
-  qid, maDe, version, group: `g-${qid}`, phan: 'I', text, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: 'B', solution: 'LG', reviewed: true,
+  qid, maDe, lop: '12', version, group: `g-${qid}`, phan: 'I', text, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: 'B', solution: 'LG', reviewed: true,
 })
 function kho(): D1That {
   const d = taoD1That()
@@ -142,7 +143,7 @@ describe('pool NHẸ + nạp đầy đủ khi chọn (Code 1 đo: kho thật 60 
     for (const q of p) {
       expect(q.nhe).toBe(true); expect(Object.isFrozen(q)).toBe(true); expect(q.tuLuan).toBe(false)
       for (const k of ['text', 'choices', 'ideas', 'correct', 'solution', 'hinhAnh']) expect(k in q, k).toBe(false)
-      expect(q).toMatchObject({ maDe: 'DE-A', version: 'v1', dang: 'A.1', phan: 'I', reviewed: true, mucDo: 'biet' })
+      expect(q).toMatchObject({ maDe: 'DE-A', lop: '12', version: 'v1', dang: 'A.1', phan: 'I', reviewed: true, mucDo: 'biet' })
     }
     const day = await doDayDu(d.env, p)
     expect(day.map((q) => q.text)).toEqual(['Đề DE-A-0', 'Đề DE-A-1', 'Đề DE-A-2']); for (const q of day) { expect(q.correct).toBe('B'); expect(q.choices).toHaveLength(4); expect(laTuLuanPool(p[0]!)).toBe(laCauTuLuan(q)) }

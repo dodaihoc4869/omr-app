@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // RẢI ĐỀU CÂU MỚI THEO NGÀY (thầy chốt 30/09) — lớp D1 + lệnh thầy `/gv/chien-dich`:
 // cờ lưu ở bảng phụ chỉ-thêm `chien_dich_tuy_chon` (tạo lúc chạy, không ALTER `chien_dich`); KHÔNG có dòng ⇒ BẬT (chiến dịch cũ đang chạy cũng bật);
 // `tao` LUÔN ghi dòng (bật/tắt — phản biện vòng 2 #110: không dòng = chiến dịch giao trước công tắc ⇒ "Bật (mặc định)"); action `rai-deu {id, bat}` đổi cờ trên chiến dịch đang chạy mà KHÔNG đụng kế hoạch
@@ -14,7 +15,7 @@ const T0 = Date.parse('2026-09-29T03:00:00Z') // 10:00 VN thứ Ba 29/09
 const HAN = '2026-10-05' // D = 7 tính từ 29/09
 
 function cauJson(qid: string) {
-  return JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' } })
+  return JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' } })
 }
 function dung(soCau = 120) {
   const d = taoD1That()

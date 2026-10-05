@@ -9,6 +9,7 @@ import { khopPhanIII } from '../../src/lib/cham-so'
 import { docSoPhanIII } from '../../src/lib/doc-so-phan-iii'
 import { laCauTuLuan } from './cam-tu-luan'
 import { docKhoiEm } from './game-v2-bank'
+import { congKhoi } from './chan-khac-khoi'
 // QUYỀN DO MÁY CHỦ XÁC NHẬN (CNH-1.0 P02 mục 3): cờ TẮT ⇒ giữ nguyên cổng cũ; cờ BẬT ⇒ máy khách khai vô hiệu.
 import { QUYEN_TOAN_CHUONG_TRINH, choPhepToanChuongTrinh, coQuyen, quyenMayChuBat } from './pham-vi-hoc'
 
@@ -42,10 +43,10 @@ export const LOI_CAN_QUYEN_THAY='Mục này cần quyền do thầy mở cho em.
 export const LOI_CHUA_HOC_XONG='Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.'
 export const LOI_KHOI_12='Mục này chỉ dành cho học sinh khối 12.'
 export type TrangThaiLuyenDe='mo'|'can_xac_nhan'|'khoa'
-/** HÀM THUẦN — cùng thứ tự với cổng `start`: cờ BẬT ⇒ phải có quyền thầy mở; cờ TẮT ⇒ em tự xác nhận; rồi luật khối 12 (không rõ khối ⇒ không chặn). */
+/** HÀM THUẦN — cùng thứ tự với cổng `start`: cờ BẬT ⇒ phải có quyền thầy mở; cờ TẮT ⇒ em tự xác nhận; rồi luật khối 12 (LUẬT THẦY 05/10: chỉ em ĐÚNG khối 12; không rõ khối ⇒ chặn — trước đây không chặn). */
 export function dieuKienLuyenDe(o:{coBat:boolean;coQuyen:boolean;khoi:number|null}):{trangThai:TrangThaiLuyenDe;lyDo:string}{
   if(o.coBat&&!choPhepToanChuongTrinh(o.coQuyen))return {trangThai:'khoa',lyDo:LOI_CAN_QUYEN_THAY}
-  if(o.khoi!==null&&o.khoi<12)return {trangThai:'khoa',lyDo:LOI_KHOI_12}
+  if(o.khoi!==12)return {trangThai:'khoa',lyDo:LOI_KHOI_12}
   return o.coBat?{trangThai:'mo',lyDo:''}:{trangThai:'can_xac_nhan',lyDo:LOI_CHUA_HOC_XONG}
 }
 const lichSu=async(env:Env,sbd:string)=>{
@@ -72,7 +73,7 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
       if(!choPhepToanChuongTrinh(co,b.daHocXong))throw new Error(LOI_CAN_QUYEN_THAY)
     }else if(b.daHocXong!==true)throw new Error(LOI_CHUA_HOC_XONG)
     // LUẬT KHỐI (Boss 21/09): Bộ đề là đề khối 12; cờ `daHocXong` do MÁY EM tự gửi nên máy chủ tự kiểm khối — em khối 10/11 không mở được. Không rõ khối ⇒ giữ cổng cũ.
-    const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==null&&khoiEm<12)throw new Error(LOI_KHOI_12)
+    const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==12)throw new Error(LOI_KHOI_12) // LUẬT THẦY 05/10: chỉ em ĐÚNG khối 12 (không rõ khối ⇒ chặn)
     row=await env.DB.prepare("SELECT * FROM luyen_de_2026 WHERE sbd=? AND status='active'").bind(sbd).first<Row>()
     if(!row){
       const r=await env.DB.prepare("SELECT ma_de,r2_khoa FROM de_kho WHERE da_xoa=0 AND lop='12' AND (lower(ten_de) LIKE '%bộ đề%' OR ten_de LIKE '%BỘ ĐỀ%' OR ten_de LIKE '%Bộ đề%') ORDER BY ma_de").all<{ma_de:string;r2_khoa:string}>()
@@ -91,7 +92,7 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
             // CẤM RÚT TỰ LUẬN (21/09): đề luyện chỉ ghép câu trắc nghiệm / đúng sai / trả lời ngắn.
             if(!blocked.has(group)&&!blocked.has(q.id)&&!laCauTuLuan(q,phan))kept.push(q)
           }
-          ;(s[`phan${phan}`] as unknown[])=kept
+          ;(s[`phan${phan}`] as unknown[])=congKhoi('em','luyen_de',12,kept,{cauCua:(q)=>({maDe:s.maDe,qid:q.id,nhom:s.nhom,lop:'12',dang:q.dang??null,chuyenDe:q.chuyenDe??null})}) // LUẬT THẦY 05/10: cổng cuối — chỉ câu ĐÚNG khối 12 (`lop` = de_kho.lop: truy vấn trên chỉ lấy tờ lop='12'; mã câu/chương khác khối ⇒ mâu thuẫn ⇒ chặn)
         }
         sources.push(s)
       }

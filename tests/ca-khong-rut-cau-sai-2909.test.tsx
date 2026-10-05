@@ -310,11 +310,14 @@ describe('7. Tầng lấy dữ liệu — dungDeRiengChoCa chế độ khong', (
   })
 
   it('kho ca thiếu câu mới ⇒ bù từ kho máy thầy bằng câu CHƯA em nào gặp, trước khi phải lấy lại câu cũ', async () => {
+    // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): phần MÁY TỰ BÙ chỉ câu ĐÚNG khối ca ⇒ ca phải rõ khối (lớp "12A1")
+    // và kho bù phải đọc ra khối (mã tờ `DH-12-X`); lớp không rõ khối ("L1") ⇒ không bù câu nào.
+    danhSachEm.mockResolvedValue(LOP_CA.map((sbd) => ({ sbd, namSinh: '2009', lop: '12A1' })))
     loadSessionTeacherBank.mockResolvedValue([{ maDe: 'D', phanI: Array.from({ length: 20 }, (_, i) => mcq(`D-${i}`)), phanII: [], phanIII: [] }])
-    loadExamSources.mockResolvedValue([{ maDe: 'X', phanI: [...Array.from({ length: 20 }, (_, i) => mcq(`D-${i}`)), ...Array.from({ length: 30 }, (_, i) => mcq(`BU-${i}`))], phanII: [], phanIII: [] }])
+    loadExamSources.mockResolvedValue([{ maDe: 'DH-12-X', phanI: [...Array.from({ length: 20 }, (_, i) => mcq(`D-${i}`)), ...Array.from({ length: 30 }, (_, i) => mcq(`BU-${i}`))], phanII: [], phanIII: [] }])
     const LAM = Object.fromEntries(LOP_CA.map((s) => [s, Array.from({ length: 14 }, (_, j) => `D-${j}`)]))
     banDoSaiCa.mockResolvedValue({ cu: { sai: {}, lam: LAM } })
-    const ra = await dungDeRiengChoCa('u', 'm', 'moi', LOP_CA, KHONG, { ngayCa: '2026-09-29', lopCa: 'L1' })
+    const ra = await dungDeRiengChoCa('u', 'm', 'moi', LOP_CA, KHONG, { ngayCa: '2026-09-29', lopCa: '12A1' })
     expect(noiKhoCa).toHaveBeenCalledTimes(1)
     for (const s of LOP_CA) {
       expect(ra.boTheoEm[s]).toHaveLength(14)

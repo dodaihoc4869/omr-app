@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // ĐOÀN HỘ TỐNG DÙNG KHO LỚP (thầy 21/09; Boss/Code 1 W3): câu cá nhân của Đoàn lấy từ dạng LỚP đã học (như lượt Đảo mới) thay vì chỉ dạng em có bằng chứng — em MỚI (chưa bằng chứng nào) vào Đoàn được, thay vì "Chưa có câu vừa sức".
 // Rào giữ nguyên: bài về nhà CHƯA nộp, câu em đã làm hôm nay ở chỗ khác, trần 60 câu/ngày, câu Phần II không thành câu cá nhân; cờ lùi `cau_hinh.game_luot_moi = 'tat'` ⇒ đường cũ. SQLite thật.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,7 +12,7 @@ const T0 = Date.parse('2026-09-22T12:00:00+07:00')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
 afterEach(() => vi.useRealTimers())
 const cau = (qid: string, dang: string, phan: 'I' | 'II' | 'III' = 'I') => ({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Đề ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Đề ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
   hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: phan === 'II' ? 'DSDS' : 'B', solution: `LG-${qid}`, reviewed: true,
 })
 

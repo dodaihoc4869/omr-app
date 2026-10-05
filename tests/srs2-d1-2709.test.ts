@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Game Hóa 2.0 — tích hợp trên D1 thật (node:sqlite, lược đồ đủ migration): giao chiến dịch → Sảnh → khoá Đảo →
 // Đoàn có gợi ý M3 → cắt tỉa → Chữa xong → Rương Bát Linh; kế hoạch ngày chốt, dựng lại từ sổ khớp 100% (N3).
 import { describe, expect, it } from 'vitest'
@@ -16,7 +17,7 @@ const NGAY = 86_400_000
 
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true,
     solution: { chot: `Cốt lõi của ${qid}`, tungPa: {} },
   })

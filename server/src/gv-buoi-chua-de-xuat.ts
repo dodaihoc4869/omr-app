@@ -14,6 +14,8 @@ import { protectedQuestions } from './game-v2-bank'
 import { jsonLaTuLuan } from './cam-tu-luan'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { docBangTenLop, tenLopCuaEm } from './ten-lop'
+import { congKhoi, khoiDichLop } from './chan-khac-khoi'
+import { khoiCuaEm } from '../../src/lib/khoi-cau'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -135,7 +137,7 @@ export async function gvBuoiChuaDeXuat(env: Env, b: Record<string, unknown>, now
   }
   if (!rNoiDung) lyDoThieu.cauSaiNhieu = 'Không đọc được kho câu'
 
-  const giu = baoVe === null || !rNoiDung ? [] : (rCau ?? []).filter((x) => {
+  let giu = baoVe === null || !rNoiDung ? [] : (rCau ?? []).filter((x) => {
     const q = chuoi(x.qid)
     const nd = noiDung.get(q)
     if (!nd) return false // không tra được nội dung câu ⇒ không đề xuất (không bịa)
@@ -144,6 +146,7 @@ export async function gvBuoiChuaDeXuat(env: Env, b: Record<string, unknown>, now
     return true
   }).slice(0, TOI_DA_CAU)
 
+  giu = congKhoi('lop', 'buoi_chua_de_xuat', khoiDichLop(lopLoc, dsSbd.map((s) => khoiCuaEm({ lop: em.get(s)?.khoi, tenLop: em.get(s)?.lop }))), giu, { cauCua: (x) => ({ ...noiDung.get(chuoi(x.qid)), qid: chuoi(x.qid) }) }) // LUẬT THẦY 05/10: chỉ câu ĐÚNG khối lớp
   // 6 · em sai từng câu đã giữ + câu cốt lõi của bài tập về nhà
   const dsQidGiu = giu.map((x) => chuoi(x.qid))
   const rSai = giu.length > 0

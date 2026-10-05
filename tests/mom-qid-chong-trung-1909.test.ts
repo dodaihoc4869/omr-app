@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Sửa lỗi: em thấy CÙNG MỘT câu ở hai nơi — việc "ôn lại" của kế hoạch ngày và bài Mom/daily_ chưa nộp (0.Planer 19/09).
 // Cách sửa: `mom_bai.qid_json` (cột chỉ-thêm) lưu mã câu của bài; kế hoạch loại các qid đó khỏi việc on_lai.
 import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
@@ -80,11 +81,12 @@ describe('hàm thuần: việc ôn lại không trùng câu với bài Mom chưa
 })
 
 describe('D1 thật: mom create lưu qid_json; kế hoạch loại câu trùng', () => {
-  const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+  const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run()
   /** Câu tới hạn thật trong hồ sơ: dựng bằng sổ + dựng lại hồ sơ (như đường thật). */
   async function emCoCauToiHan(d: D1That, qids: string[]) {
     const { ghiSuKien } = await import('../server/src/su-kien-hoc')
     themHs(d)
+    for (const q of qids) d.sql.prepare("INSERT OR IGNORE INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES(?,'DE1','12','x')").run(q) // LUẬT THẦY 05/10: câu ôn phải rõ khối (= khối em 12)
     const r = await ghiSuKien(d.env, qids.map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd: 'S1', qid: q, lan: i + 1, ketQua: 0 as const, luc: new Date(Date.now() - 72 * H).toISOString() })))
     expect(r.ok).toBe(true)
   }

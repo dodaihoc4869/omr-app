@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // LỖI THẦY CHỤP 21:36 29/09: Bát Linh Đảo "Rương 42/46", còn 4 câu, khung báo "Các câu hôm nay đang dùng cho ca kiểm tra…" trong khi KHÔNG có ca nào mở.
 // Mỗi nguyên nhân khả dĩ làm `napLuot` rỗng một test (D1 thật = node:sqlite, lược đồ đủ migration):
 //   (b) phiên Bi-a "Trả lời câu hỏi" (chiCau) / bàn Bi-a bỏ dở GIỮ câu 2 giờ ⇒ Đảo rỗng  ← NGUYÊN NHÂN GỐC ra đúng ảnh
@@ -22,7 +23,7 @@ const LOI_CA = 'đang dùng cho ca kiểm tra'
 
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: `Cốt lõi ${qid}` },
   })
 }
