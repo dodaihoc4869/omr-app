@@ -15,7 +15,7 @@
 //        thuộc tập nhãn bước (giao), cả câu = dạng ∪ nhãn bước.
 //   Câu chỉ-dạng ⇒ doTin 1. nguon luôn 'goi_y' (A.I gắn tự động); dòng thầy duyệt ('thay') KHÔNG bao giờ bị đè.
 // Bảng chỉ-thêm của làn này (tự tạo lúc chạy; bản SQL: SQL_BANG_GAN_VKN): omni_q_gan (phiên bản gắn từng câu), omni_q_nhat_ky (nhật ký thay đổi Q
-// của kiểm định tuần), omni_q_nghi (đường lùi khi cau_nghi_dap_an không đúng cấu trúc). Ghi omni_q / omni_vkn đúng lược đồ migration-0510-omni-3.sql.
+// của kiểm định tuần), omni_q_nghi (câu nghi của kiểm định tuần — KHÔNG ghi cau_nghi_dap_an để rút đề ca kiểm tra không bị bỏ câu). Ghi omni_q / omni_vkn đúng lược đồ migration-0510-omni-3.sql.
 import type { D1PreparedStatement, Env } from './kieu'
 import { SQL_LA_LAN_LAM, TEN_AI, type Phan, type QCau, type Vkn } from './omni-kieu'
 import { SO_NEN_TOI_DA, chuanHoaNhan, vknMacDinh, vknNen } from './omni-q'
@@ -478,7 +478,7 @@ export function ganVknCau(cau: CauCanGan, tuy: TuyChonGan = {}): KetQuaGan {
 
 // ---------------------------------------------------------------- D1: bảng
 
-/** Bảng của làn (CHỈ-THÊM). omni_vkn/omni_q đúng lược đồ migration-0510-omni-3.sql; cau_nghi_dap_an đúng lược đồ tu-hoan-thien.ts. */
+/** Bảng của làn (CHỈ-THÊM). omni_vkn/omni_q đúng lược đồ migration-0510-omni-3.sql; ba bảng phụ omni_q_gan / omni_q_nhat_ky / omni_q_nghi. */
 export const SQL_BANG_GAN_VKN: readonly string[] = [
   'CREATE TABLE IF NOT EXISTS omni_vkn (id TEXT PRIMARY KEY, ma_dang TEXT NOT NULL, ten TEXT NOT NULL, ten_loi TEXT, nhan_nen TEXT, thu_tu INTEGER NOT NULL DEFAULT 0)',
   'CREATE INDEX IF NOT EXISTS omni_vkn_dang ON omni_vkn(ma_dang, thu_tu)',
@@ -487,7 +487,6 @@ export const SQL_BANG_GAN_VKN: readonly string[] = [
   'CREATE TABLE IF NOT EXISTS omni_q_nhat_ky (id INTEGER PRIMARY KEY AUTOINCREMENT, qid TEXT NOT NULL, y INTEGER NOT NULL DEFAULT -1, luc TEXT NOT NULL, loai TEXT NOT NULL, cu TEXT, moi TEXT, vkn_them TEXT, ly_do TEXT, ban_cau TEXT)',
   'CREATE INDEX IF NOT EXISTS omni_q_nhat_ky_qid ON omni_q_nhat_ky(qid, loai)',
   'CREATE TABLE IF NOT EXISTS omni_q_nghi (qid TEXT PRIMARY KEY, so_lan INTEGER NOT NULL, so_sai INTEGER NOT NULL, ty_le_sai REAL NOT NULL, ghi_chu TEXT, luc TEXT NOT NULL)',
-  `CREATE TABLE IF NOT EXISTS cau_nghi_dap_an (qid TEXT PRIMARY KEY, so_lan INTEGER NOT NULL, so_sai INTEGER NOT NULL, ty_le_sai REAL NOT NULL, trang_thai TEXT NOT NULL DEFAULT 'nghi', ghi_chu TEXT, luc TEXT NOT NULL)`,
 ]
 const daTaoBang = new WeakMap<object, Promise<void>>()
 export function damBaoBangGanVkn(env: Env): Promise<void> {
@@ -833,7 +832,7 @@ const pt = (x: number) => `${Math.round(x * 100)} %`
 /**
  * Tự kiểm định ma trận Q hằng tuần: câu ≥ 30 lượt tự làm (bỏ đọc lời giải/lướt/hỗ trợ) — lượt CUỐI của mỗi em — nhóm em VỮNG mọi vi kỹ năng đã gắn
  * (omni_p_vkn 'vung', ≥ 10 em) đúng < 60 % ⇒ thêm nhãn nền tách nhóm vững tốt nhất (chênh ≥ 0,3, mỗi nhóm ≥ 10 em) vào Q (nguon 'goi_y', ghi lý do);
- * không có ⇒ đánh dấu câu nghi (cau_nghi_dap_an, không đè quyết định cũ của thầy). Phần II xét TỪNG Ý (subitem_json); thiếu kết quả từng ý ⇒ bỏ qua.
+ * không có ⇒ đánh dấu câu nghi (bảng riêng omni_q_nghi — không đụng cau_nghi_dap_an). Phần II xét TỪNG Ý (subitem_json); thiếu kết quả từng ý ⇒ bỏ qua.
  * Không bao giờ xoá vi kỹ năng; câu thầy duyệt Q ⇒ chỉ ghi gợi ý vào nhật ký. Thiếu dữ liệu ⇒ không đổi gì. Idempotent theo tuần.
  */
 export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Record<string, unknown>> {
@@ -948,15 +947,11 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
       }
     }
     await chayLo(env, lenh)
-    // Câu nghi vào bảng có sẵn cau_nghi_dap_an (rút đề ca kiểm tra tạm bỏ câu; KHÔNG đè quyết định cũ của thầy); bảng khác cấu trúc ⇒ bảng phụ omni_q_nghi.
+    // Câu nghi CHỈ vào bảng riêng omni_q_nghi (điều phối 05/10). KHÔNG ghi cau_nghi_dap_an: bảng đó làm khâu rút đề ca kiểm tra tạm bỏ câu, mà
+    // "ma trận Q chưa giải thích được" KHÔNG có nghĩa đáp án sai — luật nghi đáp án đã có ở tu-hoan-thien.ts với ngưỡng riêng.
     for (const n of dsNghi) {
-      try {
-        await env.DB.prepare(`INSERT INTO cau_nghi_dap_an (qid, so_lan, so_sai, ty_le_sai, trang_thai, ghi_chu, luc) VALUES (?,?,?,?,'nghi',?,?) ON CONFLICT(qid) DO NOTHING`)
-          .bind(n.q, n.soVung, n.soSai, n.tyLe, n.ghiChu, nay).run()
-      } catch {
-        await env.DB.prepare('INSERT INTO omni_q_nghi (qid, so_lan, so_sai, ty_le_sai, ghi_chu, luc) VALUES (?,?,?,?,?,?) ON CONFLICT(qid) DO NOTHING')
-          .bind(n.q, n.soVung, n.soSai, n.tyLe, n.ghiChu, nay).run().catch(() => undefined)
-      }
+      await env.DB.prepare('INSERT INTO omni_q_nghi (qid, so_lan, so_sai, ty_le_sai, ghi_chu, luc) VALUES (?,?,?,?,?,?) ON CONFLICT(qid) DO NOTHING')
+        .bind(n.q, n.soVung, n.soSai, n.tyLe, n.ghiChu, nay).run().catch(() => undefined)
     }
     return xong({ soCauXet, soThemNhan, soGoiYThay, soNghi, chiTiet: chiTiet.slice(0, 100) })
   } catch (e) {

@@ -250,11 +250,12 @@ describe('kiemDinhQTuan — tự kiểm định ma trận Q theo dữ liệu', (
     expect(ca(d, 'Q4')!.vkn).toEqual([DANG])
     expect(ca(d, 'Q5')).toEqual({ y: -1, vkn: [DANG], nguon: 'thay' }) // không bao giờ sửa Q thầy duyệt
     expect(qRow(d, 'Q6').map((x) => x.vkn)).toEqual([[DANG, 'nen:hieu_suat'], [DANG], [DANG], [DANG, 'nen:hieu_suat'], [DANG]])
-    const nghi = d.sql.prepare("SELECT * FROM cau_nghi_dap_an WHERE qid = 'Q2'").get() as Row
-    expect(nghi).toMatchObject({ trang_thai: 'nghi', so_lan: 40, so_sai: 28 })
+    const nghi = d.sql.prepare("SELECT * FROM omni_q_nghi WHERE qid = 'Q2'").get() as Row
+    expect(nghi).toMatchObject({ so_lan: 40, so_sai: 28 })
     expect(Number(nghi.ty_le_sai)).toBeCloseTo(0.7, 9)
     expect(String(nghi.ghi_chu)).toContain('A.I Đỗ Đại Học kiểm ma trận Q')
-    expect(d.dem('cau_nghi_dap_an')).toBe(1)
+    expect(d.dem('omni_q_nghi')).toBe(1)
+    expect(d.dem('cau_nghi_dap_an')).toBe(0) // không đụng bảng nghi đáp án ⇒ rút đề ca kiểm tra không bị bỏ câu
     const nk = nhatKy(d)
     expect(nk.map((x) => [x.qid, x.y, x.loai, x.vkn_them])).toEqual([
       ['Q1', -1, 'them_nhan', 'nen:hieu_suat'], ['Q2', -1, 'nghi', null], ['Q5', -1, 'goi_y_thay', 'nen:hieu_suat'], ['Q6', 2, 'them_nhan', 'nen:hieu_suat'],
@@ -270,7 +271,7 @@ describe('kiemDinhQTuan — tự kiểm định ma trận Q theo dữ liệu', (
     const d = taoD1That()
     chuanBiKiem(d)
     await kiemDinhQTuan(d.env, NAY)
-    const chup = () => [d.chup('omni_q'), d.chup('omni_q_nhat_ky'), d.chup('cau_nghi_dap_an')].join('\n')
+    const chup = () => [d.chup('omni_q'), d.chup('omni_q_nhat_ky'), d.chup('omni_q_nghi')].join('\n')
     const sau1 = chup()
     expect(await kiemDinhQTuan(d.env, NAY + 2 * NGAY)).toMatchObject({ ok: true, chay: false, lyDo: 'da_chay_tuan_nay' })
     expect(chup()).toBe(sau1)
@@ -290,18 +291,17 @@ describe('kiemDinhQTuan — tự kiểm định ma trận Q theo dữ liệu', (
   it('thiếu dữ liệu (chưa có trạng thái vững) ⇒ không đổi gì', async () => {
     const d = taoD1That()
     chuanBiKiem(d, false)
-    const truoc = [d.chup('omni_q'), d.chup('cau_nghi_dap_an')].join('\n')
+    const truoc = [d.chup('omni_q'), d.chup('omni_q_nghi')].join('\n')
     const kq = await kiemDinhQTuan(d.env, NAY)
     expect(kq).toMatchObject({ ok: true, chay: true, soThemNhan: 0, soNghi: 0, soGoiYThay: 0 })
-    expect([d.chup('omni_q'), d.chup('cau_nghi_dap_an')].join('\n')).toBe(truoc)
+    expect([d.chup('omni_q'), d.chup('omni_q_nghi')].join('\n')).toBe(truoc)
     expect(d.dem('omni_q_nhat_ky')).toBe(0)
     const rong = taoD1That()
     expect(await kiemDinhQTuan(rong.env, NAY)).toMatchObject({ ok: true, chay: true, soCauXet: 0 })
   })
 
-  it('cau_nghi_dap_an khác cấu trúc ⇒ câu nghi ghi vào bảng phụ omni_q_nghi (không làm hỏng lượt kiểm định)', async () => {
+  it('câu nghi KHÔNG BAO GIỜ vào cau_nghi_dap_an (rút đề ca kiểm tra không bị ảnh hưởng) — chỉ vào omni_q_nghi', async () => {
     const d = taoD1That()
-    d.sql.exec('DROP TABLE cau_nghi_dap_an; CREATE TABLE cau_nghi_dap_an (qid TEXT PRIMARY KEY, x INTEGER)')
     chuanBiKiem(d)
     const kq = await kiemDinhQTuan(d.env, NAY)
     expect(kq).toMatchObject({ ok: true, soNghi: 1, soThemNhan: 2 })
