@@ -32,7 +32,7 @@ import { khoiCuaCau, khoiCuaMaDe } from '../../src/lib/khoi-cau'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
-import { bacMuc, boiCanh, docChiMucTheoDang, hopLeChung, lamHomNay, metaTheoDang, napTheoThuTu, phamViChon, xepUngVien, type BoiCanh, type PhamViChon } from './omni-game'
+import { bacMuc, bam32, boiCanh, docChiMucTheoDang, hopLeChung, lamHomNay, metaTheoDang, napTheoThuTu, phamViChon, xepUngVien, type BoiCanh, type PhamViChon } from './omni-game'
 import { docMetaCau, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
 import { napDayDuMem } from './game-v2-bank'
 import { thuMucCuaMaDe } from './kho-thu-muc'
@@ -222,20 +222,24 @@ async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Pro
   if (dayHoc) return dayHoc
   // Nguồn 2 (06/10, A3): DẠY HỌC thiếu ⇒ kho TU LUYỆN cùng dạng — cùng luật khối / mức / khác nhóm, em CHƯA gặp, không tự luận, không câu ca bảo vệ (`hopLeChung`).
   let tl = chung.theoDangTL.get(dang)
-  if (!tl) { tl = metaTuLuyenTheoDang(env, dang, chiMucSom?.get(dang)); chung.theoDangTL.set(dang, tl) }
+  if (!tl) { tl = metaTuLuyenTheoDang(env, dang, bc.daLam, `${lb.sbd}|${ngayVnCua(lb.nowMs)}|${dang}`, chiMucSom?.get(dang)); chung.theoDangTL.set(dang, tl) }
   const kho = await tl
   for (const x of kho.meta) if (!chung.lopTo.has(x.maDe)) chung.lopTo.set(x.maDe, kho.lopTo.get(x.maDe) ?? null) // `lop` của tờ đã đọc cùng đợt ⇒ `chonTuUng` không đọc lại
   return chonTuUng(kho.meta.filter((x) => hopLe(x, chuaGap)))
 }
 
+/** Trần số câu TU LUYỆN (chưa gặp) của một dạng được nạp meta mỗi lượt — dạng lớn có hàng trăm câu; chọn mẫu tất định theo (em, ngày, dạng) để nhẹ D1. */
+export const TRAN_UNG_VIEN_TU_LUYEN = 200
 /**
- * Meta kho TU LUYỆN của một dạng (A3, 06/10): chỉ mục dạng (đã đọc sớm nếu có) → tờ có thư mục `TU_LUYEN` (`de_kho_thu_muc`; thiếu dòng ⇒ luật mã `DH-` = DẠY HỌC) mà câu đã duyệt
- * → meta đầy đủ + cột `lop` của các tờ (luật khối). KHÔNG giới hạn phạm vi đã dạy (kho luyện tập). Không có ⇒ rỗng; lỗi đọc ⇒ NÉM (nơi gọi rơi xuống bậc 3/4 — không phát câu chưa kiểm được).
+ * Meta kho TU LUYỆN của một dạng (A3, 06/10): chỉ mục dạng (đã đọc sớm nếu có) → câu em CHƯA gặp (`daLam`), đã duyệt, mẫu tất định ≤ TRAN_UNG_VIEN_TU_LUYEN → tờ có thư mục `TU_LUYEN`
+ * (`de_kho_thu_muc`; thiếu dòng ⇒ luật mã `DH-` = DẠY HỌC) → meta đầy đủ + cột `lop` của các tờ (luật khối). KHÔNG giới hạn phạm vi đã dạy (kho luyện tập).
+ * Không có ⇒ rỗng; lỗi đọc ⇒ NÉM (nơi gọi rơi xuống bậc 3/4 — không phát câu chưa kiểm được).
  */
-async function metaTuLuyenTheoDang(env: Env, dang: string, chiMucSom?: Promise<Record<string, unknown>[]>): Promise<{ meta: MetaCau[]; lopTo: Map<string, string> }> {
+async function metaTuLuyenTheoDang(env: Env, dang: string, daLam: ReadonlyMap<string, number>, muoi: string, chiMucSom?: Promise<Record<string, unknown>[]>): Promise<{ meta: MetaCau[]; lopTo: Map<string, string> }> {
   const rows = await (chiMucSom ?? docChiMucTheoDang(env, dang))
   const laThat = (v: unknown): boolean => v === 1 || v === true || v === '1' || v === 'true'
-  const hop = rows.filter((x) => laThat(x.rv))
+  const chua = rows.filter((x) => laThat(x.rv) && !daLam.has(String(x.qid)))
+  const hop = chua.length > TRAN_UNG_VIEN_TU_LUYEN ? [...chua].sort((a, b) => bam32(`${muoi}|${a.qid}`) - bam32(`${muoi}|${b.qid}`)).slice(0, TRAN_UNG_VIEN_TU_LUYEN) : chua
   if (!hop.length) return { meta: [], lopTo: new Map() }
   const maTo = [...new Set(hop.map((x) => String(x.ma_de)))]
   const [thuMuc, lopTo] = await Promise.all([thuMucCuaMaDe(env, maTo), docLopTo(env, maTo)])

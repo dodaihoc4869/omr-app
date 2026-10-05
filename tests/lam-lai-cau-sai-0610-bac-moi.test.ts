@@ -13,7 +13,7 @@ import { xoaDemPhamVi } from '../server/src/bai-da-day'
 import { docHoSo2, docLanLam, xoaDemChienDich } from '../server/src/srs2-d1'
 import { DEM_NGUOC_MS } from '../server/src/game-v2-doan'
 import { damBaoBangYDs, docYDsTheoQid } from '../server/src/cau-y-ds'
-import { damBaoBangTuHoanThien } from '../server/src/tu-hoan-thien'
+import { damBaoBangTuHoanThien, dsCauNghi } from '../server/src/tu-hoan-thien'
 import { chanKhacKhoiDong, chanKhacKhoiEm, chanKhacKhoiLop, chanKhacKhoiTheoEm, congKhoi, demChanKhoi, docCauNghiDem, xoaDemCauNghi, xoaDemChanKhoi } from '../server/src/chan-khac-khoi'
 import { apBienThe, cacHoDe, sinhBienThe } from '../server/src/bien-the-sinh'
 import { apYDsMoi, bienTheTheoQid, chonBanKhacMoi, deCoHinh, nhomYDs, phuQidAoMoi } from '../server/src/ban-khac-ao'
@@ -536,6 +536,19 @@ describe('A4 · cổng cuối của em loại câu NGHI sai đáp án (lý do `n
     log.mockRestore()
   })
 
+  it('MỌI kênh của em đi qua cùng cổng: Đảo · Đoàn · Tu luyện · Bi-a · ôn lại · khắc phục · lượt cũ ⇒ câu nghi bị loại ở từng kênh; rút đề ca thi (dsCauNghi) vẫn đọc đúng danh sách', async () => {
+    const d = taoD1That()
+    const env = d.env as unknown as Env
+    await damBaoBangTuHoanThien(env)
+    nghi(d, 'DH-11-B1-I-2')
+    for (const kenh of ['dao2', 'doan2', 'tu_luyen', 'tu_luyen_kho_sai', 'bia', 'on_lai', 'khac_phuc', 'luot_cu', 'game_cu', 'ph_giao_them']) {
+      const ra = await chanKhacKhoiEm(env, kenh, { khoiEm: 11 }, [{ qid: 'DH-11-B1-I-1', maDe: TO11 }, { qid: 'DH-11-B1-I-2', maDe: TO11 }], { cauCua: (x) => x })
+      expect(ra.map((x) => x.qid), kenh).toEqual(['DH-11-B1-I-1'])
+      expect(demChanKhoi()[`em:${kenh}`], kenh).toMatchObject({ giu: 1, nghi_dap_an: 1 })
+    }
+    expect(await dsCauNghi(env)).toEqual({ ok: true, qid: ['DH-11-B1-I-2'] }) // ca thi: cổng riêng của rút đề, không đổi
+  })
+
   it('lý do khối đứng TRƯỚC (câu khác khối ⇒ khac_khoi, không đếm nghi); câu thầy giao khi em chưa rõ khối vẫn bị loại nếu nghi', () => {
     const nghiSet = new Set(['DH-12-B1-I-1', 'DH-11-B1-I-2'])
     expect(congKhoi('em', 'x_1', 11, ['DH-12-B1-I-1', 'DH-11-B1-I-2', 'DH-11-B1-I-3'], {}, undefined, nghiSet)).toEqual(['DH-11-B1-I-3'])
@@ -582,6 +595,25 @@ describe('A4 · cổng cuối của em loại câu NGHI sai đáp án (lý do `n
     const truoc = so()
     expect(await chanKhacKhoiEm(env, 'dem', { khoiEm: null }, ds)).toEqual([])
     expect(so()).toBe(truoc)
+  })
+
+  it('Đảo: MỌI câu còn lại của kế hoạch đều nghi ⇒ "hết câu hôm nay" (không báo "chưa tải được câu", không log lỗi tải); không nghi ⇒ câu ra bình thường', async () => {
+    const Q8: CauThu = { qid: 'Q8', maDe: TO11, phan: 'II', dang: 'D8', mucDo: 'TH', correct: 'DDSS' }
+    const loi = vi.spyOn(console, 'error').mockImplementation(() => {})
+    for (const coNghi of [false, true]) {
+      const { d, env } = dung([Q8], ['Q8'])
+      if (coNghi) { await damBaoBangTuHoanThien(env); nghi(d, 'Q8') }
+      vi.setSystemTime(luc('2026-10-06'))
+      const r = await dao(env)
+      expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
+      if (coNghi) {
+        expect(r.questions).toEqual([])
+        expect(r.lyDo).toBe('xong_ke_hoach')
+        expect(String(r.message)).not.toContain('Chưa tải được')
+      } else expect(r.questions.map((q: { qid: string }) => q.qid)).toEqual(['Q8'])
+    }
+    expect(loi.mock.calls.filter((c) => String(c[0]).includes('nap-cau-game'))).toEqual([])
+    loi.mockRestore()
   })
 
   it('Đảo: câu của kế hoạch đang nghi bị loại khỏi chuyến (câu kia vẫn ra); không nghi ⇒ cả hai; câu anh em đang nghi không được chọn', async () => {
