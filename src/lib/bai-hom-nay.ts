@@ -86,13 +86,44 @@ function timKhoi(cay: readonly Nut[], khoi: string): Nut | null {
   return null
 }
 
-/** Danh sách bài của một khối, đúng thứ tự cây (chương → bài). Khối không có trong cây ⇒ []. */
+/** So tên theo số học ("Bài 8" đứng trước "Bài 10"), không phân biệt hoa thường / dấu thanh. */
+const soTen = new Intl.Collator('vi', { numeric: true, sensitivity: 'base' })
+
+/** Số đứng sau chữ "Bài" ở đầu tên bài ("Bài 10. Protein và enzyme" → 10); tên không bắt đầu bằng "Bài <số>" ⇒ null. */
+export function soBaiCuaTen(ten: string): number | null {
+  const m = /^\s*bài\s+(\d+)/i.exec(ten.normalize('NFC'))
+  return m ? Number(m[1]) : null
+}
+/** Số chương đứng đầu tên chương ("C3 - Hợp chất chứa N", "Chương 3: …" → 3); không có ⇒ null. */
+export function soChuongCuaTen(ten: string): number | null {
+  const m = /^\s*(?:chương\s*|c)(\d+)/i.exec(ten.normalize('NFC'))
+  return m ? Number(m[1]) : null
+}
+/** Có số đứng trước, không số đứng sau (không số ⇒ giữ nguyên thứ tự cây). */
+const soSanhSo = (a: number | null, b: number | null): number => (a !== null && b !== null ? a - b : a === null ? (b === null ? 0 : 1) : -1)
+
+/**
+ * Danh sách bài của một khối: chương theo SỐ CHƯƠNG, bài trong chương theo SỐ BÀI tăng dần (cùng số bài ⇒ theo tên, số học). Khối không có trong cây ⇒ [].
+ * Thầy 06/10: kho nhập "Bài 10, 11, 8, 9" ⇒ cây phải hiện 8, 9, 10, 11. `viTri` (1, 2, 3…) đi theo thứ tự ĐÃ SẮP — "bài đứng trước" của OMNI
+ * (`phamViTruoc`) cũng đúng theo. Sắp ổn định: tên không có số giữ thứ tự cây.
+ */
 export function dsBaiCuaKhoi(cay: readonly Nut[], khoi: string): BaiCay[] {
   const nutKhoi = khoi ? timKhoi(cay, khoi) : null
   if (!nutKhoi) return []
   const ra: BaiCay[] = []
-  for (const chuong of nutKhoi.con) {
-    const dsBai = chuong.tang === 'bai' ? [chuong] : chuong.con.filter((b) => b.tang === 'bai')
+  const dsChuong = nutKhoi.con
+    .map((c, i) => ({ c, i }))
+    .sort((x, y) => soSanhSo(soChuongCuaTen(x.c.nhan), soChuongCuaTen(y.c.nhan)) || x.i - y.i)
+    .map((x) => x.c)
+  for (const chuong of dsChuong) {
+    const dsBai = (chuong.tang === 'bai' ? [chuong] : chuong.con.filter((b) => b.tang === 'bai'))
+      .map((b, i) => ({ b, i }))
+      .sort((x, y) => {
+        const a = soBaiCuaTen(x.b.nhan)
+        const b = soBaiCuaTen(y.b.nhan)
+        return a === null || b === null ? soSanhSo(a, b) || x.i - y.i : a - b || soTen.compare(x.b.nhan, y.b.nhan) || x.i - y.i
+      })
+      .map((x) => x.b)
     for (const bai of dsBai) {
       const to: ToBai[] = bai.con
         .filter((l) => !!l.maDe)
