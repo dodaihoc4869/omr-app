@@ -8,7 +8,7 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "giải thích toàn bộ 1 vòng thuật toán cho tôi trước khi build nhé" | bằng chứng: trả lời 12 bước + mục 1 của đặc tả, commit aa95c68
 - [ ] "THỰC THI LUÔN" (build theo `DAC-TA-BUILD-OMNI-3-0510.md`) | bằng chứng: (chưa có)
 - [ ] "Thay từ máy bằng A.i Đỗ Đại Học" | bằng chứng: (chưa có)
-- [ ] "giao cho nhiều agent làm nhất có thể để tăng tốc nhé" | bằng chứng: (chưa có)
+- [ ] "giao cho nhiều agent làm nhất có thể để tăng tốc nhé" | bằng chứng: đang chạy 5 agent máy chủ song song (A1 lõi thuần · A2 kế hoạch nhiều bài · B1 tick bài + thư mục + Tu luyện · B2 D1 + API thầy/PH · B3 đường trả lời + game), mỗi agent một worktree; 3 agent giao diện (thầy · học sinh · PH + chữ) chờ khảo sát giao diện xong
 - [ ] "khi buidl xong hết nhắn tôi trước khi đẩy nhé" — KHÔNG gộp main, KHÔNG deploy Worker/Pages, KHÔNG migration --remote trước khi thầy cho | bằng chứng: (chưa có)
 - [ ] "tôi chỉ phải làm bước cuối cùng là chữa bài học sinh cần thầy chữa" ⇒ danh sách "Cần thầy chữa" + "Chữa xong" | bằng chứng: (chưa có)
 - [ ] "build thành công luôn lần đầu" ⇒ qua đủ cổng mục 8 của đặc tả | bằng chứng: (chưa có)
@@ -39,9 +39,9 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 
 ## Việc tự phát sinh
 
-- [ ] Cài node_modules (repo chưa có) | bằng chứng: (chưa có)
-- [ ] Đo nền vitest trên bản sạch HEAD trước khi sửa (so TÊN test đỏ) | bằng chứng: (chưa có)
-- [ ] Hợp đồng chung (kiểu + API + bảng) trước khi chia agent | bằng chứng: (chưa có)
+- [x] Cài node_modules (repo chưa có) | bằng chứng: `npm ci` EXIT 0, 369 gói, có vitest/tsc/vite/wrangler
+- [x] Đo nền vitest trên bản sạch HEAD trước khi sửa (so TÊN test đỏ) | bằng chứng: worktree sạch aa95c68, 13 262 test: 13 074 đạt · 141 đỏ · 47 bỏ qua; 146 tên đỏ lưu scratchpad/nen-do-ten.txt
+- [x] Hợp đồng chung (kiểu + API + bảng) trước khi chia agent | bằng chứng: commit ec17bca + f189d2b (omni-kieu.ts, omni-chu.ts, stub 10 tệp, migration-0510-omni-3.sql chạy 2 lần sạch trên SQLite, docs/hop-dong-omni-3.md); tsc máy chủ + app EXIT 0; định tuyến f6213b1
 - [ ] Gộp nhánh các agent, nối định tuyến index.ts, tsc app + server | bằng chứng: (chưa có)
 - [ ] Toàn vitest bản cuối so nền, build, check:mau, kiem-sw | bằng chứng: (chưa có)
 - [ ] Ảnh chụp app thật sau build (390×844, 1440×900) | bằng chứng: (chưa có)
