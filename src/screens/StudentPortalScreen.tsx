@@ -74,6 +74,8 @@ import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
+import { veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { moManGameNhanh, napManCauDaLam, napManGame, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
@@ -83,6 +85,11 @@ const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
 // TU LUYỆN (29/09): màn riêng, nạp lười — máy yếu không tải khi chưa bấm cửa.
 const ManTuLuyen = lazy(() => import('../components/tu-luyen/ManTuLuyen'))
+// CHUYỂN MÀN NHANH (05/10): Sảnh 2.0 nạp trước ba mảnh trên lúc rảnh (components/hoa2/man-sanh-luoi.ts). `veNgayKhiCo`: mảnh đã có ⇒ vẽ
+// thẳng, KHÔNG treo Suspense + 300 ms giữ màn chờ của React; chưa có ⇒ đúng lazy cũ ở trên (cùng màn chờ).
+const GameNhanh = veNgayKhiCo(ThanThuHoaHocGame, napManGame)
+const CauDaLamNhanh = veNgayKhiCo(CauDaLam, napManCauDaLam)
+const ManTuLuyenNhanh = veNgayKhiCo(ManTuLuyen, napManTuLuyen)
 // LỊCH SỬ CA + BÁO CÁO CHI TIẾT bản mới (28/09): hai mảnh lazy NGOÀI precache.
 const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
@@ -1336,6 +1343,8 @@ export default function StudentPortalScreen() {
     } catch {
       /* máy chặn lưu: game vẫn mở ở màn Đảo */
     }
+    // Chuyển màn nhanh (05/10): bắn ngay lệnh mở game + tải mảnh màn đích, song song với lúc vẽ (man-sanh-luoi.ts · moManGameNhanh).
+    moManGameNhanh(auth.sbd, auth.token || undefined, manDau)
     moGame()
   }
   const hoiDangXuat = () => {
@@ -1470,7 +1479,7 @@ export default function StudentPortalScreen() {
       {tab === 'caudalam' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <CauDaLam token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
+            <CauDaLamNhanh token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
           </Suspense>
         </div>
       )}
@@ -1486,7 +1495,7 @@ export default function StudentPortalScreen() {
       {tab === 'tuluyen' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <ManTuLuyen token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} />
+            <ManTuLuyenNhanh token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} />
           </Suspense>
         </div>
       )}
@@ -2361,7 +2370,7 @@ export default function StudentPortalScreen() {
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
         {tab === 'thanthu' && (
           <Suspense fallback={<ChoNapGame />}>
-          <ThanThuHoaHocGame
+          <GameNhanh
             sbd={auth.sbd}
             token={auth.token}
             dsLichSu={dsLichSu}
