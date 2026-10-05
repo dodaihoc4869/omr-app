@@ -229,11 +229,11 @@ export async function docLuotDangCho(env: Env, sbd: string, nowMs: number): Prom
 
 /** Dữ liệu cho `luotHomNay` (Code 1): số lượt đã mở, xong chặng BTVN hôm nay (null = không có bài đang chạy), xong ôn tới hạn, đạt ngày, số câu thú đúng/tổng hôm nay (Đoàn/Linh Tâm không tính). */
 export async function docDauVaoLuot(env: Env, sbd: string, ngay: string, nowMs: number, datHomNay: boolean): Promise<DauVaoLuot> {
-  const soLuotDaLam = await demLuotHomNay(env, sbd, ngay, nowMs)
-  let xongChangHomNay: boolean | null = null
-  let xongOnToiHan = false
-  try {
-    const r = await env.DB.prepare(
+  // Tối ưu 05/10: ba lượt ĐỌC độc lập (số lượt đã mở, chặng/ôn hôm nay, câu thú hôm nay) bắt đầu CÙNG đợt — trước: ba đợt nối tiếp.
+  // Lỗi của mỗi lượt vẫn tới đúng chỗ `await` cũ (lượt đầu ném như cũ; hai lượt sau bắt lỗi riêng như cũ).
+  const chay = <T,>(f: () => Promise<T>): Promise<T> => { try { const p = f(); p.catch(() => {}); return p } catch (e) { const p = Promise.reject(e); p.catch(() => {}); return p } }
+  const pLuot = chay(() => demLuotHomNay(env, sbd, ngay, nowMs))
+  const pChang = chay(() => env.DB.prepare(
       // `+nguon` (dấu cộng đơn ngôi) CẤM planner dùng idx_skh_nguon(nguon, ma_nguon): không có ANALYZE nó ưu tiên chỉ mục có cột `nguon` và đọc MỌI dòng btvn_lo / on_lai của CẢ TRƯỜNG (≈2,4 nghìn dòng mỗi lượt, tăng theo số chặng nộp — Code 1 đo bằng EXPLAIN 21/09); có dấu cộng thì đi idx_skh_em_ngay(sbd, ngay_vn) chỉ các dòng của em hôm nay. Không đổi kết quả.
       // Bài "đang chạy" = CÒN chặng chưa xong (đã xong hết chặng mà chưa bấm nộp KHÔNG tính). Chặng "xong hôm nay" = có câu btvn_lo hôm nay của chặng ĐÃ XONG (chỉ số < lo_da_xong), không phải mới làm 1 câu.
       `SELECT (SELECT COUNT(*) FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn WHERE be.sbd = ? AND be.nop_luc IS NULL AND b.da_xoa = 0 AND COALESCE(be.thu_hoi, 0) = 0 AND b.han_nop > ?
@@ -242,7 +242,17 @@ export async function docDauVaoLuot(env: Env, sbd: string, ngay: string, nowMs: 
                  JOIN btvn_em be2 ON be2.ma_btvn = x.ma AND be2.sbd = ? WHERE x.chi < COALESCE(be2.lo_da_xong, 0)) AS chang_xong_hom_nay,
               (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND +nguon = 'on_lai') AS on_hom_nay,
               (SELECT COUNT(*) FROM nam_kt_cau WHERE sbd = ? AND moc_on_ke IS NOT NULL AND substr(moc_on_ke, 1, 10) <= ? AND trang_thai IN ('moi_sai', 'dang_on') AND COALESCE(can_day_lai, 0) = 0) AS con_toi_han`,
-    ).bind(sbd, new Date(nowMs).toISOString(), sbd, ngay, sbd, sbd, ngay, sbd, ngay).first<{ dang_chay: number; chang_xong_hom_nay: number; on_hom_nay: number; con_toi_han: number }>()
+    ).bind(sbd, new Date(nowMs).toISOString(), sbd, ngay, sbd, sbd, ngay, sbd, ngay).first<{ dang_chay: number; chang_xong_hom_nay: number; on_hom_nay: number; con_toi_han: number }>())
+  const pThu = chay(() => env.DB.prepare(
+      `SELECT COUNT(*) AS tong, COALESCE(SUM(CASE WHEN json_extract(a.json, '$.attempt.correct') = 1 AND COALESCE(json_extract(a.json, '$.attempt.assisted'), 0) = 0 THEN 1 ELSE 0 END), 0) AS dung
+         FROM game_v2_attempt a WHERE a.sbd = ? AND a.created_at >= ? AND a.created_at < ?
+          AND NOT EXISTS (SELECT 1 FROM game_v2_session s WHERE s.id = a.session AND (json_extract(s.json, '$.doan') IS NOT NULL OR json_extract(s.json, '$.guardian') IS NOT NULL))`,
+    ).bind(sbd, batDauNgay(ngay), hetNgay(ngay)).first<{ tong: number; dung: number }>())
+  const soLuotDaLam = await pLuot
+  let xongChangHomNay: boolean | null = null
+  let xongOnToiHan = false
+  try {
+    const r = await pChang
     // Luật "xong chặng / xong ôn tới hạn" là hàm thuần của Code 1 (`dauVaoLuotTuSo`): ôn tới hạn xong = hôm nay có ≥ 1 câu ôn lại VÀ không còn câu tới hạn; khắc phục không tính; số lạ ⇒ chưa xong.
     const t = dauVaoLuotTuSo({ changXongHomNay: so(r?.chang_xong_hom_nay) > 0, soCauOnHomNay: so(r?.on_hom_nay), conCauToiHan: so(r?.con_toi_han), coBaiConChang: so(r?.dang_chay) > 0 })
     xongChangHomNay = t.xongChangHomNay
@@ -251,11 +261,7 @@ export async function docDauVaoLuot(env: Env, sbd: string, ngay: string, nowMs: 
   let dungHomNay = 0
   let tongHomNay = 0
   try {
-    const r = await env.DB.prepare(
-      `SELECT COUNT(*) AS tong, COALESCE(SUM(CASE WHEN json_extract(a.json, '$.attempt.correct') = 1 AND COALESCE(json_extract(a.json, '$.attempt.assisted'), 0) = 0 THEN 1 ELSE 0 END), 0) AS dung
-         FROM game_v2_attempt a WHERE a.sbd = ? AND a.created_at >= ? AND a.created_at < ?
-          AND NOT EXISTS (SELECT 1 FROM game_v2_session s WHERE s.id = a.session AND (json_extract(s.json, '$.doan') IS NOT NULL OR json_extract(s.json, '$.guardian') IS NOT NULL))`,
-    ).bind(sbd, batDauNgay(ngay), hetNgay(ngay)).first<{ tong: number; dung: number }>()
+    const r = await pThu
     tongHomNay = so(r?.tong)
     dungHomNay = so(r?.dung)
   } catch { /* chưa có lượt nào */ }

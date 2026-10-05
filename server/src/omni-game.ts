@@ -12,7 +12,8 @@ import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { diemDungSai } from '../../src/lib/tu-luyen'
 import { CHU_CHAC_MA_SAI, CHU_DUNG_CHUA_CHAC, CHU_LUOT, NUT_DE_MAI, NUT_LAM_LUON, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
 import { MUC_DICH_LUOT, THAM_SO_OMNI, type HoSoOmniEm, type KetQuaOmniTraLoi, type Phan, type QCau, type TramHoiPhuc, type TuTin } from './omni-kieu'
-import { hoSoOmniEm, kyVongMsCau, nhatKyHomNay, omniBat, qCuaCau, soLuotHomNay, vknTheoId } from './omni-d1'
+import { docBetaCau, hoSoOmniEm, kyVongMsCau, nhatKyHomNay, omniBat, qCuaCau, soLuotHomNay, vknTheoId } from './omni-d1'
+import { docDongLop, nhoTheoLuot } from './doc-d1-theo-luot'
 import { capNhatHoi, pAnd } from './omni-p-vkn'
 import { nhanTocDo } from './omni-toc-do'
 import { dangDaVung } from './omni-ke-hoach'
@@ -97,6 +98,10 @@ export const phienMoTram = (s: PhienOmni): boolean => s.hoa2 === 1 && s.mode ===
 /** Một lượt đã trả lời trong phiên (`game_v2_attempt`). `luot` = lượt lướt (kết quả mang `luot: true`). */
 export interface LuotPhien { qid: string; dung: boolean; hoTro: boolean; luot: boolean; at: number }
 async function docLuotPhien(env: Env, sbd: string, phienId: string): Promise<LuotPhien[]> {
+  // Nhớ theo lượt (tối ưu 05/10): đọc đoán trước lúc vào lệnh trả lời (`docSomOmniTraLoi`) dùng lại; lệnh ghi lượt của chính request ⇒ đọc lại. Nơi gọi không sửa mảng.
+  return nhoTheoLuot(env.DB, `omni_luot_phien|${sbd}|${phienId}`, () => docLuotPhienTho(env, sbd, phienId), ['game_v2_attempt'])
+}
+async function docLuotPhienTho(env: Env, sbd: string, phienId: string): Promise<LuotPhien[]> {
   const r = await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session = ? AND sbd = ?').bind(phienId, sbd).all<Row>()
   const ra: LuotPhien[] = []
   for (const x of r.results ?? []) {
@@ -131,6 +136,26 @@ export interface DocTruocOmni {
   luotPhien: Promise<LuotPhien[] | null>
 }
 const batLoi = <T>(p: Promise<T>): Promise<T | null> => p.then((x) => x, (e: unknown) => { console.error('[omni-game] đọc OMNI lỗi (bỏ phần OMNI):', e instanceof Error ? e.message : e); return null })
+/**
+ * ĐỌC ĐOÁN TRƯỚC của lệnh trả lời (tối ưu 05/10; `answer` Đảo, `doan-nop` Đoàn): máy em CHỈ gửi `msLam` khi `hoa2-sanh` báo OMNI áp cho em (hợp đồng OMNI 3)
+ * ⇒ bắt đầu NGAY, cùng đợt hồ sơ/phiên, các lượt đọc mà `omniBat` + `docTruocOmni` sẽ cần: lớp em, cờ, hồ sơ OMNI, số lượt lướt hôm nay, β + Q của câu, lượt của
+ * chuyến — tất cả qua nhớ theo lượt ⇒ đường cũ dùng lại đúng các lượt ấy (trước: bắt đầu sau khi đọc xong phiên + câu, rồi 4–5 đợt nối tiếp).
+ * Quyết định OMNI vẫn do `omniBat` như cũ; đoán sai ⇒ chỉ phí vài lượt đọc, kết quả không đổi. Không có `msLam` ⇒ không làm gì. Không ghi, không ném lỗi.
+ */
+export function docSomOmniTraLoi(env: Env, sbd: string, action: string, b: Row): void {
+  if (b.msLam === undefined || b.msLam === null) return
+  const now = Date.now()
+  const bo = (f: () => Promise<unknown>): void => { try { f().catch(() => {}) } catch { /* bỏ */ } }
+  bo(() => docDongLop(env.DB, sbd))
+  bo(() => omniBat(env, sbd))
+  bo(() => hoSoOmniEm(env, sbd, now))
+  bo(() => soLuotHomNay(env, sbd, now))
+  if (action !== 'answer') return
+  const goc = qidGocOmni(str(b.qid))
+  if (goc) { bo(() => docBetaCau(env, [goc])); bo(() => qCuaCau(env, [goc])) }
+  const phien = str(b.session)
+  if (phien) bo(() => docLuotPhien(env, sbd, phien))
+}
 export function docTruocOmni(env: Env, sbd: string, phienId: string, phien: PhienOmni, cau: Pick<Question, 'qid' | 'phan' | 'mucDo'>, nowMs: number): DocTruocOmni {
   const goc = qidGocOmni(cau.qid)
   const p = <T>(f: () => Promise<T>): Promise<T | null> => { try { return batLoi(f()) } catch (e) { return batLoi(Promise.reject(e)) } }
@@ -360,17 +385,24 @@ export const lamHomNay = (qid: string, bc: BoiCanh): boolean => (bc.daLam.get(qi
 const laThat = (v: unknown): boolean => v === 1 || v === true || v === '1' || v === 'true'
 
 /** Dòng chỉ mục → siêu dữ liệu câu ĐƯỢC PHÉP: trong phạm vi, đã duyệt, thư mục DẠY HỌC (`de_kho_thu_muc`, thiếu ⇒ luật mã `DH-`), không tự luận. */
-async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon): Promise<MetaCau[]> {
+async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon, khiCoMaTo?: (maTo: string[]) => void): Promise<MetaCau[]> {
   const hop = rows.filter((x) => pv.coMa(str(x.ma_de)) && laThat(x.rv))
   if (!hop.length) return []
   const maTo = [...new Set(hop.map((x) => str(x.ma_de)))]
+  khiCoMaTo?.(maTo) // tối ưu 05/10: nơi gọi bắt đầu phần đọc theo tờ của mình CÙNG đợt hai lượt đọc dưới (vd. `lop` của tờ — cau-anh-em.ts)
   const [meta, thuMuc] = await Promise.all([docMetaCau(env, [...new Set(hop.map((x) => str(x.qid)))], maTo), thuMucCuaMaDe(env, maTo)])
   return [...meta.values()].filter((m) => pv.coMa(m.maDe) && (thuMuc.get(m.maDe) ?? thuMucTheoMa(m.maDe)) === 'DAY_HOC' && !m.tuLuan)
 }
 const SQL_CHI_MUC = "SELECT qid, ma_de, json_extract(json,'$.reviewed') AS rv FROM game_v2_question"
-export async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon): Promise<MetaCau[]> {
+/** Lượt ĐỌC đầu của `metaTheoDang` (chỉ mục câu theo dạng) — không phụ thuộc phạm vi ⇒ nơi gọi bắt đầu SỚM được (tối ưu 05/10, thang làm lại). */
+export async function docChiMucTheoDang(env: Env, maDang: string): Promise<Row[]> {
   const r = await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()
-  return metaTuDong(env, r.results ?? [], pv)
+  return r.results ?? []
+}
+/** `som` (tối ưu 05/10, chỉ-thêm): `chiMuc` = `docChiMucTheoDang` đã bắt đầu sớm; `khiCoMaTo` = gọi khi biết các tờ ứng viên. Vắng ⇒ y hệt cũ. */
+export async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon, som?: { chiMuc?: Promise<Row[]>; khiCoMaTo?: (maTo: string[]) => void }): Promise<MetaCau[]> {
+  const rows = som?.chiMuc ? await som.chiMuc : ((await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()).results ?? [])
+  return metaTuDong(env, rows, pv, som?.khiCoMaTo)
 }
 async function metaTheoPhamVi(env: Env, pv: PhamViChon): Promise<MetaCau[]> {
   const rows: Row[] = []

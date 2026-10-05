@@ -69,7 +69,14 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-hoc-2', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
   if (!(await cheDo2(envDoc, sbd))) return { ok: true, cheDo2: false }
   const ngay = ngayVnCua(nowMs)
-  const [hs, khTho] = await Promise.all([docHoSo2(envDoc, sbd, ngay), docKeHoachDaChot(envDoc, sbd, nowMs)])
+  // Tối ưu 05/10: lệnh CHỈ ĐỌC ⇒ khối OMNI (cờ + phần đọc không phụ thuộc hồ sơ srs2) bắt đầu CÙNG lúc phần chính, chỉ chờ hồ sơ srs2 ở chỗ cần (số câu cắt tỉa)
+  // — trước: chờ phần chính xong mới hỏi cờ rồi đọc (≈ 9 đợt nối tiếp). Lời hỏi cờ dùng chung cho hồ sơ srs2 (cùng hàm `omniBat`). Kết quả và khoá phản hồi
+  // như cũ; lỗi phần chính vẫn ném đúng chỗ cũ.
+  const omniBatP = omniBat(envDoc, sbd)
+  const pHs = docHoSo2(envDoc, sbd, ngay, omniBatP)
+  const omniP = omniBatP.then((bat) => (bat ? omniChoPh(envDoc, sbd, nowMs, pHs, omniBatP) : null))
+  omniP.catch(() => {})
+  const [hs, khTho] = await Promise.all([pHs, docKeHoachDaChot(envDoc, sbd, nowMs)])
   // Phản biện #108: cùng một con số với Sảnh/rương của con — câu còn lại đang dùng cho ca kiểm tra / đã rút khỏi kho / tự luận bị bỏ khỏi "hôm nay" (CHỈ ĐỌC, không ghi).
   const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hs) : null
   const ra: Row = { ok: true, cheDo2: true, ngay }
@@ -86,8 +93,8 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
     ra.cauTungSai = { tong: tungSai.length, thanhThao, canDayLai, dangOn: tungSai.length - thanhThao - canDayLai }
   }
   // OMNI 3 (chỉ-thêm): khối `omni` CHỈ khi công tắc OMNI áp cho con — tắt ⇒ phản hồi y hệt trước. Dùng lại hồ sơ srs2 vừa đọc (đếm câu cắt tỉa). CHỈ ĐỌC.
-  if (await omniBat(envDoc, sbd)) {
-    const omni = await omniChoPh(envDoc, sbd, nowMs, hs)
+  if (await omniBatP) {
+    const omni = await omniP
     if (omni) ra.omni = omni
   }
   return ra

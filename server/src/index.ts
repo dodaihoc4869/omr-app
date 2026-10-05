@@ -15,7 +15,7 @@ import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {congBoSuKien,dungLaiNangLuc,nangLucBat} from './nang-luc-d1'
 import {dtoNangLuc} from './ho-so-dto'
 import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
-import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
+import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,dangLamMoiTuDem,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
@@ -64,7 +64,8 @@ import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
-import { gameV2 } from './game-v2'
+import { gameV2, laLenhCongSongSong } from './game-v2'
+import { RAO_GHI } from './doc-d1-theo-luot'
 import { shopBatCho } from './game-v2-shop'
 import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
 import { gameToken, gameIdentity } from './game-v2-auth'
@@ -132,18 +133,26 @@ const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS
 /** Bộ não A.I đã gỡ (thầy lệnh 28/09/2026): lời trả cho mọi lệnh cũ của chức năng này. */
 const DA_GO_BO_NAO = 'Chức năng đã gỡ'
 
-async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const kh = await hsKeHoachNgayCoExp(env, b)
+async function dungKeHoachEm(env: Env, b: Record<string, unknown>, sbdBiet = ''): Promise<Record<string, unknown>> {
+  // TỐI ƯU 05/10: `sbdBiet` (SBD nơi gọi đã xác định từ token/sbd — đúng SBD kế hoạch sẽ dùng) ⇒ hai khối phụ KHÔNG phụ thuộc kế hoạch (cờ Đoàn, cảnh báo
+  // của thầy — chỉ đọc bảng kế hoạch/EXP không ghi) bắt đầu CÙNG đợt đầu của kế hoạch; "về đích" đọc hồ sơ nắm kiến thức mà kế hoạch vừa dựng lại ⇒ bắt đầu
+  // NGAY SAU khi kế hoạch ghi xong, song song phần EXP (EXP không ghi bảng nào "về đích" đọc). Trước: cả ba chờ hết kế hoạch + EXP. Phản hồi y hệt.
+  const som = sbdBiet ? { doanMo: doanMoCho(env, sbdBiet), canhBao: canhBaoChoEm(env, sbdBiet) } : null
+  som?.doanMo.catch(() => {}); som?.canhBao.catch(() => {})
+  // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
+  const docVeDich = (sbd: string) => docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null })
+  let veDichSom: { sbd: string; p: ReturnType<typeof docVeDich> } | null = null
+  const kh = await hsKeHoachNgayCoExp(env, b, (sbd) => { veDichSom = { sbd, p: docVeDich(sbd) } })
   if (kh.ok === true && typeof kh.sbd === 'string') {
     const sbd = kh.sbd
+    const vdSom = veDichSom as { sbd: string; p: ReturnType<typeof docVeDich> } | null
     // HẠ TẢI D1 (Boss 21/09): bốn khối phụ ĐỘC LẬP chạy SONG SONG (trước đây tuần tự); khoá gán đúng thứ tự cũ để phản hồi y hệt.
     const [doanMo, vd, canhBao] = await Promise.all([
       // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
-      doanMoCho(env, sbd),
-      // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
-      docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null }),
+      som && sbd === sbdBiet ? som.doanMo : doanMoCho(env, sbd),
+      vdSom && vdSom.sbd === sbd ? vdSom.p : docVeDich(sbd),
       // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay`.
-      canhBaoChoEm(env, sbd),
+      som && sbd === sbdBiet ? som.canhBao : canhBaoChoEm(env, sbd),
     ])
     kh.doanMo = doanMo
     if (vd) { kh.no = vd.no; kh.veDich = vd.veDich }
@@ -3345,7 +3354,19 @@ const boXuLy = {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
     // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách
     // không coi là lỗi đăng nhập/mất mạng. Ngoài cửa sổ: không tốn truy vấn nào. Chỉ chuyển hướng và /khoe được qua.
-    if (!DUONG_QUA_BANG.has(p) && !p.startsWith('/t/') && !p.startsWith('/d/') && (await dangLamMoi(env, Date.now()))) return ra(LOI_DANG_LAM_MOI)
+    // Tối ưu 05/10: đệm cổng còn hạn ⇒ quyết ngay (không D1, y như `dangLamMoi`). Đệm hết hạn ⇒ lệnh game CHỈ chạm D1 (`laLenhCongSongSong`) cho lượt đọc cổng chạy
+    // SONG SONG với các lượt ĐỌC đầu của lệnh — mọi lệnh GHI của lệnh chờ cổng (rào ghi, doc-d1-theo-luot.ts); cổng báo đóng băng ⇒ trả đúng lời cũ, không ghi gì.
+    // Lệnh khác: chờ cổng trước như cũ.
+    let congGame: Promise<boolean> | null = null
+    if (!DUONG_QUA_BANG.has(p) && !p.startsWith('/t/') && !p.startsWith('/d/')) {
+      const nowCong = Date.now()
+      const tuDem = dangLamMoiTuDem(env, nowCong)
+      if (tuDem === true) return ra(LOI_DANG_LAM_MOI)
+      if (tuDem === null) {
+        if (req.method === 'POST' && p.startsWith('/game-v2/') && laLenhCongSongSong(p.slice('/game-v2/'.length))) congGame = dangLamMoi(env, nowCong)
+        else if (await dangLamMoi(env, nowCong)) return ra(LOI_DANG_LAM_MOI)
+      }
+    }
     // PHIẾU: đường đọc CÔNG KHAI, đặt trước mọi cổng mã bí mật.
     if (req.method === 'GET' && p.startsWith('/phieu/')) {
       return layPhieuR2(env, decodeURIComponent(p.slice('/phieu/'.length)))
@@ -3424,6 +3445,7 @@ const boXuLy = {
           b = {}
         }
       } catch (e: any) {
+        if (congGame && (await congGame)) return ra(LOI_DANG_LAM_MOI) // cổng đi trước mọi lời khác, như cũ
         return ra({ ok: false, error: `Thân gói không phải JSON. Lỗi: ${e.message}` }, 400)
       }
 
@@ -3434,9 +3456,11 @@ const boXuLy = {
       if (p === '/trang-thai') return dayTrangThai(env, b)
       if (p === '/phong-cho') return ghiPhongCho(env, b)
       if (p === '/hs/dang-nhap') {
-        const result = await G.hsDangNhap(env, b)
+        // Tối ưu 05/10: token game ký từ đúng dòng `hoc_sinh` vừa đọc + so khớp (trước: đọc lại `mat_khau` thêm một đợt nối tiếp) và vào đệm xác thực.
+        const daDoc: { matKhau?: unknown } = {}
+        const result = await G.hsDangNhap(env, b, daDoc)
         if (result.ok && !result.chuaCoMatKhau) {
-          try { result.token = await gameToken(env, String(result.sbd)) } catch { /* Game must not block academic login. */ }
+          try { result.token = await gameToken(env, String(result.sbd), 'matKhau' in daDoc ? daDoc.matKhau : undefined) } catch { /* Game must not block academic login. */ }
         }
         return ra(result)
       }
@@ -3472,7 +3496,17 @@ const boXuLy = {
       if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
-      if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
+      if (p.startsWith('/game-v2/')) {
+        if (!congGame) return ra(await gameV2(env, p.slice('/game-v2/'.length), b, ctx))
+        // Cổng đang đọc (đệm vừa hết hạn): lệnh chạy ngay với RÀO GHI; cổng báo đóng băng ⇒ trả lời cũ, bỏ kết quả lệnh (mọi lệnh ghi của nó bị rào chặn).
+        const cong = congGame
+        const rao = cong.then((dong) => { if (dong) throw new Error(LOI_DANG_LAM_MOI.error) })
+        rao.catch(() => {})
+        const kq = gameV2({ ...env, [RAO_GHI]: rao } as Env, p.slice('/game-v2/'.length), b, ctx)
+        kq.catch(() => {})
+        if (await cong) return ra(LOI_DANG_LAM_MOI)
+        return ra(await kq)
+      }
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
       if (p === '/hs/lich-su') return ra(await G.hsLichSuCa(env, b))
       if (p === '/hs/cau-sai') return ra(await G.hsCauSai(env, b))
@@ -3506,8 +3540,11 @@ const boXuLy = {
         let sbdKhoa = ''
         try { sbdKhoa = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
         if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
+        // Tối ưu 05/10: cờ cửa hàng (đệm 30 giây, không phụ thuộc kế hoạch) đọc CÙNG đợt đầu — trước: một đợt riêng ở cuối. Dùng đúng chỗ cũ.
+        const shopSom = shopBatCho(env, sbdKhoa)
+        shopSom.catch(() => {})
         let laLuotThat = false
-        const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b) })
+        const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b, sbdKhoa) })
         if (!laLuotThat && kh.ok === true) {
           kh.thanThu = await docThanThu(env, sbdKhoa)
           // Thông báo MỘT LẦN (EXP / mảnh khiên vừa nhận) đã đi ra ở lượt thật: lượt đệm KHÔNG lặp lại (em không thấy thưởng hai lần).
@@ -3515,7 +3552,7 @@ const boXuLy = {
           if ('manhNhan' in kh) kh.manhNhan = []
         }
         // `shopBat` trong khối `thanThu` (boolean): máy em hiện nút "Cửa hàng" hay không, không tốn lượt gọi nào (cờ đọc từ đệm 30 giây). Tạo khối MỚI: không ghi bẩn bản trong đệm kế hoạch.
-        if (kh.ok === true && kh.thanThu && typeof kh.thanThu === 'object') kh.thanThu = { ...(kh.thanThu as object), shopBat: await shopBatCho(env, sbdKhoa) }
+        if (kh.ok === true && kh.thanThu && typeof kh.thanThu === 'object') kh.thanThu = { ...(kh.thanThu as object), shopBat: await shopSom }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))

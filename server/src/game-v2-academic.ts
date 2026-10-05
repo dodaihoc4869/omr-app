@@ -4,6 +4,7 @@ import {dapAnTheoMaDe} from './goi-cu'
 import {hash,readScope,normalizeBank,readJson} from './game-v2-bank'
 import {grade} from '../../src/game/than-thu-v2/core'
 import {docCauHinhExp,mocExpCuaEm} from './exp-d1'
+import {docDongMua} from './doc-d1-theo-luot'
 import {congExpVaoHoSo} from './exp-ho-so-game'
 type Row=Record<string,unknown>
 export interface Academic {since?:string;seen:string[];sources:Record<string,string>;days:Record<string,number>;total:number;lastGain:number;at:string}
@@ -23,7 +24,7 @@ export function creditAcademic(p:Profile,events:{key:string;at:string;amount:num
 /** Read academic records only. The profile and its receipt ledger are committed together with CAS by the caller. */
 export async function syncAcademic(env:Env,sbd:string,p:Profile,mom:unknown){
  creditAcademic(p,[]);const a=p.academic!
- const setting=await env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{json:string}>()
+ const setting=await docDongMua(env.DB) // nhớ theo lượt: `loadProfile` của chính lượt này vừa đọc dòng mùa (tối ưu 05/10)
  const started=setting?obj(setting.json).startedAt:null;if(typeof started==='string'&&Number.isFinite(Date.parse(started)))a.since=started
  const since=a.since??p.cutover
  const events:{key:string;at:string;amount:number}[]=[];let pending=0,processed=0

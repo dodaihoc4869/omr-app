@@ -29,16 +29,20 @@ export interface TranHapThu { tran: number; dat: boolean; coHoc: boolean; /** S�
  */
 export async function docTranHapThu(env: Env, sbd: string, ngay: string): Promise<TranHapThu> {
   // HAI lần đọc, mỗi lần bọc RIÊNG (Boss soát 83c4826): đếm câu lỗi KHÔNG được kéo theo mất trần của em ĐÃ ĐẠT (200); đọc "đạt" lỗi ⇒ coi như chưa đạt.
+  // Tối ưu 05/10: hai lượt đọc độc lập chạy CÙNG đợt (trước: nối tiếp); mỗi lượt vẫn bắt lỗi RIÊNG, đúng thứ tự cũ.
+  const chay = <T,>(f: () => Promise<T>): Promise<T> => { try { const p = f(); p.catch(() => {}); return p } catch (e) { return Promise.reject(e) } }
+  const pDat = chay(() => env.DB.prepare("SELECT COUNT(*) AS n FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay'").bind(sbd, ngay).first<{ n: number }>())
+  const pCau = chay(() => env.DB.prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL').bind(sbd, ngay).first<{ n: number }>())
   let dat = false
   try {
-    const r = await env.DB.prepare("SELECT COUNT(*) AS n FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay'").bind(sbd, ngay).first<{ n: number }>()
+    const r = await pDat
     dat = (Number(r?.n) || 0) > 0
   } catch (e) {
     console.error('[hap-thu] đọc "đạt ngày" lỗi (coi như chưa đạt):', e instanceof Error ? e.message : e)
   }
   let soCauHomNay = 0
   try {
-    const r = await env.DB.prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL').bind(sbd, ngay).first<{ n: number }>()
+    const r = await pCau
     soCauHomNay = Math.max(0, Math.floor(Number(r?.n) || 0))
   } catch (e) {
     console.error('[hap-thu] đếm câu hôm nay lỗi (coi như 0 câu; em đã đạt vẫn được 200):', e instanceof Error ? e.message : e)

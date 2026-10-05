@@ -4,6 +4,7 @@
 // Trần Bi-a (thầy 30/09 "Bi a cũng rải luôn câu ôn lại đúng theo tỷ lệ trần của bi a"): floor(40% CẢ kế hoạch hôm nay), chia theo tỉ lệ câu mới : câu ôn
 // của kế hoạch (trước 30/09: 40% phần Đoàn + 40% phần Đảo). Xem `tinhTranBia`.
 import type { Env, DongCa, DongLuot } from './kieu'
+import { docDongLop } from './doc-d1-theo-luot'
 import { docCauHinhDem, dbGoc } from './cau-hinh-dem'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
@@ -94,7 +95,7 @@ export async function biaMoCho(env: Env, sbd: string): Promise<boolean> {
     if (co.sbd.includes(sbd)) return true
     if (!co.lop.length && !co.sbd.length) return true
     if (!co.lop.length) return false
-    const r = await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ lop: string }>().catch(() => null)
+    const r = await docDongLop(env.DB, sbd).catch(() => null) // nhớ theo lượt (tối ưu 05/10)
     return !!r && co.lop.includes(str(r.lop))
   } catch { return false }
 }
@@ -104,14 +105,16 @@ export async function biaMoCho(env: Env, sbd: string): Promise<boolean> {
  */
 export async function coCaDangMo(env: Env, sbd: string, nowMs: number): Promise<boolean> {
   try {
-    const em = await env.DB.prepare(`SELECT COALESCE(NULLIF(h.lop, ''), d.lop, '') AS lop FROM (SELECT ? AS sbd) x LEFT JOIN hoc_sinh h ON h.sbd = x.sbd LEFT JOIN danh_sach d ON d.sbd = x.sbd`)
-      .bind(sbd).first<{ lop: string }>()
-    const lop = str(em?.lop).trim()
-    if (!lop) return false
-    const r = await env.DB.prepare(`SELECT c.trang_thai, c.loai, c.bat_dau, c.het_han_vao, c.thoi_gian_phut, c.dong_bo_gio, c.bat_dau_thi_luc, c.han_nop,
+    // Tối ưu 05/10: MỘT lượt D1 thay hai lượt nối tiếp (lớp em → ca mở của lớp). Ca `mo` (mọi lớp, thường 0–vài dòng) kèm lớp đã TRIM của ca và lớp của em;
+    // lọc lớp ở đây đúng như cũ: lớp em `trim()` của JS, rỗng ⇒ không ca; so BẰNG với TRIM(COALESCE(c.lop,'')) như câu cũ.
+    const r = await env.DB.prepare(`SELECT (SELECT COALESCE(NULLIF(h.lop, ''), d.lop, '') FROM (SELECT ? AS sbd) x LEFT JOIN hoc_sinh h ON h.sbd = x.sbd LEFT JOIN danh_sach d ON d.sbd = x.sbd) AS lop_em,
+        TRIM(COALESCE(c.lop, '')) AS lop_ca, c.trang_thai, c.loai, c.bat_dau, c.het_han_vao, c.thoi_gian_phut, c.dong_bo_gio, c.bat_dau_thi_luc, c.han_nop,
         (SELECT l.trang_thai FROM luot l WHERE l.ma_ca = c.ma_ca AND l.sbd = ? ORDER BY l.lan_thu DESC LIMIT 1) AS luot_tt
-        FROM ca c WHERE c.trang_thai = 'mo' AND COALESCE(c.loai, 'thi') = 'thi' AND TRIM(COALESCE(c.lop, '')) = ?`).bind(sbd, lop).all<Row>()
-    for (const c of r.results ?? []) {
+        FROM ca c WHERE c.trang_thai = 'mo' AND COALESCE(c.loai, 'thi') = 'thi'`).bind(sbd, sbd).all<Row>()
+    const ds = r.results ?? []
+    const lop = ds.length ? str(ds[0]!.lop_em).trim() : ''
+    if (!lop) return false
+    for (const c of ds.filter((x) => str(x.lop_ca) === lop).map(({ lop_em: _e, lop_ca: _c, ...x }) => x)) {
       const luot = c.luot_tt ? ({ trang_thai: str(c.luot_tt), lan_thu: 1, id_thiet_bi: '' } as unknown as DongLuot) : null
       if (quyetDinhVaoThi(c as unknown as DongCa, luot, '', nowMs).ok) return true
     }
@@ -525,14 +528,26 @@ async function chiTraLoi(env: Env, sbd: string, b: Row, nowMs: number): Promise<
 
 /** Phần `bia` trả kèm `hoa2-sanh` để Sảnh Bát Linh vẽ cửa thứ ba. Cờ tắt ⇒ `{ bat:false }` (không vẽ cửa). Lỗi ⇒ `{ bat:false }`. */
 export async function biaChoSanh(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
-  try {
-    const [mo, coCa] = await Promise.all([biaMoCho(env, sbd), coCaDangMo(env, sbd, nowMs)])
-    if (!mo) return { bat: false }
-    if (coCa) return { bat: true, lyDoKhoa: 'dang_co_ca', con: 0, tong: 0, giaoHuu: { mo: false, con: 0 } }
-    const s = await sanhBia(env, sbd, nowMs)
-    const t = s.tran as { con: number; tong: number }, g = s.giaoHuu as { mo: boolean; con: number }
-    return { bat: true, con: t.con, tong: t.tong, giaoHuu: { mo: g.mo, con: g.con }, ...(s.lyDoKhoa ? { lyDoKhoa: s.lyDoKhoa } : {}) }
-  } catch { return { bat: false } }
+  return batDauBiaChoSanh(env, sbd, nowMs)()
+}
+/**
+ * Tối ưu 05/10 — hai pha của `biaChoSanh` (kết quả y hệt): pha ĐỌC (cờ Bi-a + em có ca đang mở) bắt đầu NGAY (song song với Sảnh), hàm trả về chạy phần
+ * còn lại (bàn Bi-a hôm nay) khi nơi gọi cần — Sảnh gọi SAU khi kế hoạch hôm nay đã chốt, như cũ. Cờ Bi-a tắt cho em ⇒ khỏi đọc ca (kết quả vẫn `bat:false`).
+ */
+export function batDauBiaChoSanh(env: Env, sbd: string, nowMs: number): () => Promise<Record<string, unknown>> {
+  const moP = biaMoCho(env, sbd)
+  const dau = Promise.all([moP, moP.then((mo) => (mo ? coCaDangMo(env, sbd, nowMs) : false))])
+  dau.catch(() => {})
+  return async () => {
+    try {
+      const [mo, coCa] = await dau
+      if (!mo) return { bat: false }
+      if (coCa) return { bat: true, lyDoKhoa: 'dang_co_ca', con: 0, tong: 0, giaoHuu: { mo: false, con: 0 } }
+      const s = await sanhBia(env, sbd, nowMs)
+      const t = s.tran as { con: number; tong: number }, g = s.giaoHuu as { mo: boolean; con: number }
+      return { bat: true, con: t.con, tong: t.tong, giaoHuu: { mo: g.mo, con: g.con }, ...(s.lyDoKhoa ? { lyDoKhoa: s.lyDoKhoa } : {}) }
+    } catch { return { bat: false } }
+  }
 }
 
 /** Ngày VN hiện tại — xuất lại cho test. */

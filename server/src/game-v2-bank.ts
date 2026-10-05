@@ -286,10 +286,17 @@ export async function docKhoiThapNhat(env:Env,sbds:readonly string[]):Promise<Kh
   return ra
 }
 export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:CauPool[];missing:number}> {
-  const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
+  // Tối ưu 05/10: bốn lượt ĐỌC đầu (chi tiết câu ca thi, lượt đã nộp, hồ sơ nguồn khác, sổ nguồn khác) chỉ phụ thuộc em ⇒ bắt đầu CÙNG đợt
+  // (trước: bốn đợt nối tiếp). Xử lý + bắt lỗi vẫn theo đúng thứ tự cũ (hai lượt đầu ném như cũ; hai lượt sau lỗi ⇒ bỏ qua như cũ).
+  const som=<T,>(f:()=>Promise<T>):Promise<T>=>{try{const p=f();p.catch(()=>{});return p}catch(e){const p=Promise.reject(e);p.catch(()=>{});return p}}
+  const pRows=som(()=>env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>())
+  const pCompleted=som(()=>env.DB.prepare(`SELECT l.ma_ca,l.lan_thu,l.nop_luc,l.dap_an_json,ca.bo_theo_em_json FROM luot l JOIN ca ON ca.ma_ca=l.ma_ca WHERE l.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>())
+  const pRh=som(()=>env.DB.prepare(`SELECT qid,trang_thai,luc_cuoi,nguon_cuoi FROM nam_kt_cau WHERE sbd=? AND qid IN (SELECT qid FROM su_kien_hoc s WHERE s.sbd=? AND (s.nguon NOT IN ('thi','game') OR (s.nguon='thi' AND NOT EXISTS (SELECT 1 FROM ca WHERE ca.ma_ca=s.ma_nguon))))`).bind(sbd,sbd).all<Row>())
+  const pSu=som(()=>env.DB.prepare("SELECT qid, MAX(luc) AS nop_luc, MIN(ket_qua) AS dung_sai FROM su_kien_hoc WHERE sbd=? AND nguon NOT IN ('thi','game') AND ket_qua IN (0,1) GROUP BY qid").bind(sbd).all<Row>())
+  const rows=await pRows
   // Recover missing detail rows read-only, using only qids explicitly submitted by this learner.
   // Never fill an incomplete personal paper with the rest of the class bank.
-  const completed=await env.DB.prepare(`SELECT l.ma_ca,l.lan_thu,l.nop_luc,l.dap_an_json,ca.bo_theo_em_json FROM luot l JOIN ca ON ca.ma_ca=l.ma_ca WHERE l.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
+  const completed=await pCompleted
   const knownRows=new Set(rows.results.map(r=>`${r.ma_ca}|${r.lan_thu}|${r.qid}`))
   for(const l of completed.results){
     let answers:Row;let assigned:string[]|null=null
@@ -309,7 +316,7 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
   // ở đó thành "weak"; câu làm đúng ở đó thành nền để mở câu cùng dạng. Loại `thi` vì đường ca thi ở trên đã lọc theo công bố (ca chưa công bố KHÔNG được lọt) — TRỪ sự kiện `thi` của ca KHÔNG CÒN trong bảng `ca` (reset toàn app xoá ca, giữ sổ): coi là đã công bố;
   // loại `game` vì game tự có `attempts`. Câu có ở cả hai nơi: HỒ SƠ quyết `wrong` (sai ở thi rồi sửa đúng ở BTVN thì không còn "weak"). Thiếu bảng thì bỏ qua.
   try{
-    const rh=await env.DB.prepare(`SELECT qid,trang_thai,luc_cuoi,nguon_cuoi FROM nam_kt_cau WHERE sbd=? AND qid IN (SELECT qid FROM su_kien_hoc s WHERE s.sbd=? AND (s.nguon NOT IN ('thi','game') OR (s.nguon='thi' AND NOT EXISTS (SELECT 1 FROM ca WHERE ca.ma_ca=s.ma_nguon))))`).bind(sbd,sbd).all<Row>()
+    const rh=await pRh
     const chuaKhacPhuc=(t:unknown)=>t==='moi_sai'||t==='dang_on'
     const hoSo=new Map(rh.results.map(h=>[str(h.qid),h]))
     for(const r of rows.results){const h=hoSo.get(str(r.qid));if(h){r.dung_sai=chuaKhacPhuc(h.trang_thai)?0:1;hoSo.delete(str(r.qid))}}
@@ -320,7 +327,7 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
   // (tránh tự mở rộng phạm vi từ một lượt cũ) hay ca thi chưa công bố.
   try{
     const co=new Set(rows.results.map(r=>str(r.qid)))
-    const su=await env.DB.prepare("SELECT qid, MAX(luc) AS nop_luc, MIN(ket_qua) AS dung_sai FROM su_kien_hoc WHERE sbd=? AND nguon NOT IN ('thi','game') AND ket_qua IN (0,1) GROUP BY qid").bind(sbd).all<Row>()
+    const su=await pSu
     for(const r of su.results??[])if(!co.has(str(r.qid))){rows.results.push({qid:r.qid,ma_ca:'su_kien_hoc',lan_thu:1,nop_luc:r.nop_luc,dung_sai:r.dung_sai});co.add(str(r.qid))}
   }catch{/* thiếu sổ học: giữ bằng chứng ca thi đã công bố */}
   const evidence:Evidence[]=[];let missing=0
