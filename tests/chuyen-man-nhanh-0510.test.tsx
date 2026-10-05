@@ -10,7 +10,7 @@ vi.mock('../src/game/than-thu-v2/DoanHoTong', () => ({ default: () => <div data-
 vi.mock('../src/game/than-thu-v2/ProgressChart', () => ({ default: () => null }))
 vi.mock('../src/game/than-thu-v2/LearningBattle', () => ({ default: () => null, SpellPreview: () => null }))
 import { boNap, lazyNapTruoc, napTruocLanLuot, nenNapTruoc, taoGoiSom } from '../src/components/hoa2/nap-truoc-man'
-import { boCuaNhanh, dungNapTruocManSanh, napTruocManSanh } from '../src/components/hoa2/man-sanh-luoi'
+import { boCuaNhanh, dungNapTruocManSanh, napManCauDaLam, napTruocManSanh } from '../src/components/hoa2/man-sanh-luoi'
 import Game, { goiSomGame } from '../src/game/than-thu-v2/Game'
 import CauDaLam from '../src/components/hoa2/CauDaLam'
 
@@ -182,8 +182,8 @@ describe('Game: profile + hoa2-sanh song song; lệnh bắn sớm lúc chạm c�
   })
 })
 
-describe('Câu đã làm: chạm cửa ở Sảnh bắn ngay lệnh danh sách; màn nhận lại — không tải hai lần', () => {
-  it('boCuaNhanh.onCauDaLam ⇒ hoa2-cau-da-lam đi ngay + gọi đúng hàm cửa cũ; CauDaLam mở ⇒ vẫn chỉ MỘT lệnh danh sách', async () => {
+describe('Câu đã làm: chạm cửa ở Sảnh bắn ngay lệnh danh sách (mảnh đã nạp trước); màn nhận lại — không tải hai lần', () => {
+  it('mảnh CHƯA nạp ⇒ chạm cửa không bắn gì (màn tự tải lúc mở, như cũ); mảnh đã nạp ⇒ hoa2-cau-da-lam đi ngay + gọi đúng hàm cửa cũ; CauDaLam mở ⇒ vẫn MỘT lệnh danh sách', async () => {
     const goi: string[] = []
     vi.stubGlobal(
       'fetch',
@@ -198,6 +198,11 @@ describe('Câu đã làm: chạm cửa ở Sảnh bắn ngay lệnh danh sách; 
     const p = boCuaNhanh({ token: 't', onCauDaLam: moCua })
     p.onCauDaLam()
     expect(moCua).toHaveBeenCalledTimes(1)
+    await new Promise((ok) => setTimeout(ok, 0))
+    expect(goi).toEqual([]) // mảnh chưa nạp: không lệnh sớm nào
+    await napManCauDaLam()
+    p.onCauDaLam()
+    expect(moCua).toHaveBeenCalledTimes(2)
     await waitFor(() => expect(goi).toEqual(['hoa2-cau-da-lam']))
     render(<CauDaLam token="t" hoTen="Em A" sbd="S1" onVe={() => {}} />)
     await waitFor(() => expect(document.querySelector('.h2-cdl-xuong')).toBeNull())
