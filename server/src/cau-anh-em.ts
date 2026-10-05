@@ -242,11 +242,10 @@ async function metaTuLuyenTheoDang(env: Env, dang: string, daLam: ReadonlyMap<st
   const hop = chua.length > TRAN_UNG_VIEN_TU_LUYEN ? [...chua].sort((a, b) => bam32(`${muoi}|${a.qid}`) - bam32(`${muoi}|${b.qid}`)).slice(0, TRAN_UNG_VIEN_TU_LUYEN) : chua
   if (!hop.length) return { meta: [], lopTo: new Map() }
   const maTo = [...new Set(hop.map((x) => String(x.ma_de)))]
-  const [thuMuc, lopTo] = await Promise.all([thuMucCuaMaDe(env, maTo), docLopTo(env, maTo)])
+  // MỘT đợt: thư mục tờ + `lop` của tờ + meta của mẫu câu đọc SONG SONG (meta đọc đoán trước — lọc theo tờ TU LUYỆN sau; mẫu ≤ TRAN_UNG_VIEN_TU_LUYEN dòng) ⇒ rơi vào TU LUYỆN chỉ tốn một đợt đọc.
+  const [thuMuc, lopTo, meta] = await Promise.all([thuMucCuaMaDe(env, maTo), docLopTo(env, maTo), docMetaCau(env, [...new Set(hop.map((x) => String(x.qid)))], maTo)])
   const tl = new Set(maTo.filter((ma) => thuMuc.get(ma) === 'TU_LUYEN'))
-  if (!tl.size) return { meta: [], lopTo }
-  const meta = await docMetaCau(env, [...new Set(hop.filter((x) => tl.has(String(x.ma_de))).map((x) => String(x.qid)))], [...tl])
-  return { meta: [...meta.values()].filter((x) => tl.has(x.maDe) && !x.tuLuan), lopTo }
+  return { meta: tl.size ? [...meta.values()].filter((x) => tl.has(x.maDe) && !x.tuLuan) : [], lopTo }
 }
 
 /**
