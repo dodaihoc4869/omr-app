@@ -236,6 +236,31 @@ describe('Vi kỹ năng — A.I tự gắn, thầy không phải duyệt', () =>
       vknMoi: [{ id: 'D-TP#3', maDang: 'D-TP', ten: 'Tính số mol NaOH phản ứng', tenLoi: 'quên phenol ăn 2 NaOH', nhanNen: null, thuTu: 3 }],
     })
   })
+
+  it('câu Đúng–sai giữ vi kỹ năng từng ý khi lưu (máy chủ B2 thay mọi dòng cũ của câu); "Xem thêm" sau khi lưu lấy mốc là câu CHƯA sửa cuối cùng', async () => {
+    const LO2 = {
+      ...LO,
+      cau: [LO.cau[1], { qid: 'DH-A-II-2', stt: 22, de: 'Cho các phát biểu về ester…', phan: 'II', maDang: 'D-TP', tenDang: 'Thuỷ phân ester đơn chức', goiY: ['D-TP#1'], vknY: [['D-TP#1'], ['D-TP#2'], ['D-TP#1'], ['D-TP#2']] }],
+      conLai: 3,
+    }
+    goi.mockImplementation(async (_d: string, b: Record<string, unknown>) =>
+      b.action === 'q-lo' ? { ok: true, du: b.sau ? { ...LO, cau: [], conLai: 0 } : LO2 } : b.action === 'q-duyet' ? { ok: true, du: { ok: true, daDuyet: 1 } } : { ok: false, loai: 'tu_choi', chu: 'x' },
+    )
+    const { container } = ve(OMNI)
+    fireEvent.click(within(container.querySelector('[data-khoi="vi-ky-nang-bai"]') as HTMLElement).getByRole('button', { name: 'Xem' }))
+    const than = (await screen.findByRole('heading', { name: 'Vi kỹ năng của bài' })).closest('section') as HTMLElement
+    fireEvent.click(within(than).getByRole('button', { name: 'Sửa vi kỹ năng' }))
+    fireEvent.click(within(than.querySelector('[data-q="DH-A-II-2"]') as HTMLElement).getByRole('button', { name: 'Hệ số NaOH với ester của phenol' }))
+    fireEvent.click(within(than).getByRole('button', { name: 'Lưu vi kỹ năng đã sửa' }))
+    await waitFor(() => expect(goi.mock.calls.some(([, b]) => b.action === 'q-duyet')).toBe(true))
+    expect(goi.mock.calls.find(([, b]) => b.action === 'q-duyet')![1]).toEqual({
+      action: 'q-duyet',
+      ds: [{ qid: 'DH-A-II-2', vkn: ['D-TP#1', 'D-TP#2'], vknY: [['D-TP#1'], ['D-TP#2'], ['D-TP#1'], ['D-TP#2']] }],
+    })
+    // Câu II-2 vừa lưu rời danh sách "chưa duyệt" của máy chủ ⇒ mốc "Xem thêm" là câu chưa sửa cuối cùng (DH-A-I-5).
+    fireEvent.click(await within(than).findByRole('button', { name: 'Xem thêm câu (còn 3 câu)' }))
+    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/omni', { action: 'q-lo', chienDichId: 'cd-1', sau: 'DH-A-I-5' }))
+  })
 })
 
 describe('màn Lên bảng (chế độ chiến dịch) nạp Bảng bài OMNI', () => {

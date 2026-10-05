@@ -37,6 +37,8 @@ export default function ViKyNangBai({ chienDichId }: { chienDichId: string }) {
   const [tenLoiMoi, setTenLoiMoi] = useState('')
   const [dangLuu, setDangLuu] = useState(false)
   const [loiLuu, setLoiLuu] = useState('')
+  // Câu thầy đã lưu trong lượt mở này: máy chủ bỏ chúng khỏi danh sách "chưa duyệt" của `q-lo` ⇒ không dùng làm mốc "Xem thêm".
+  const [daSua, setDaSua] = useState<ReadonlySet<string>>(() => new Set())
 
   const tai = async (sau?: string) => {
     setDangTai(true)
@@ -93,7 +95,12 @@ export default function ViKyNangBai({ chienDichId }: { chienDichId: string }) {
     setDangLuu(true)
     setLoiLuu('')
     const r = await duyetLoQ(
-      daDoi.map((c) => ({ qid: c.qid, vkn: chon[c.qid] ?? [], ...(c.vknY ? { vknY: c.vknY } : {}) })),
+      daDoi.map((c) => {
+        const vkn = chon[c.qid] ?? []
+        // Đúng–sai: giữ vi kỹ năng từng ý (máy chủ thay MỌI dòng cũ của câu); ý trống ⇒ dùng vi kỹ năng cả câu; không đủ 4 ý ⇒ không gửi.
+        const vknY = c.vknY?.length === 4 ? c.vknY.map((y) => (y.length ? y : vkn)) : undefined
+        return { qid: c.qid, vkn, ...(vknY ? { vknY } : {}) }
+      }),
       vknMoi,
     )
     setDangLuu(false)
@@ -104,6 +111,7 @@ export default function ViKyNangBai({ chienDichId }: { chienDichId: string }) {
     showToast(`Đã lưu vi kỹ năng thầy sửa: ${r.du.daDuyet} câu`, 'success')
     // Câu đã sửa thành vi kỹ năng đang gắn mới; vi kỹ năng mới vào danh mục.
     setLo((cu) => (cu ? { ...cu, cau: cu.cau.map((c) => ({ ...c, goiY: chon[c.qid] ?? c.goiY })), vkn: [...cu.vkn, ...vknMoi] } : cu))
+    setDaSua((cu) => new Set([...cu, ...daDoi.map((c) => c.qid)]))
     setVknMoi([])
     setSua(false)
   }
@@ -181,7 +189,7 @@ export default function ViKyNangBai({ chienDichId }: { chienDichId: string }) {
               </ol>
               {lo.conLai > 0 && (
                 <div>
-                  <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangTai} onClick={() => void tai(lo.cau[lo.cau.length - 1]?.qid)}>
+                  <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangTai} onClick={() => void tai([...lo.cau].reverse().find((c) => !daSua.has(c.qid))?.qid)}>
                     {dangTai ? 'Đang tải…' : `Xem thêm câu (còn ${lo.conLai} câu)`}
                   </button>
                 </div>
