@@ -95,7 +95,18 @@ export default function KiemTraDauGio() {
     },
     [idBuoi],
   )
-  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `dau-gio|${idBuoi}` : '', ghiO)
+  // Nút "Thầy chữa" trên tờ (thầy 05/10) = ô "Thầy đã chữa" của bảng chấm (`/gv/dau-gio` da-chua) — cùng nhãn, cùng mốc dạy lại.
+  const thayChuaO = useCallback(
+    async (o: { sbd: string; qid: string }) => {
+      if (!idBuoi) return { ok: false as const, chu: 'Chưa có buổi học.' }
+      const r = await ghiDaChua(idBuoi, o.sbd, o.qid)
+      if (!r.ok) return { ok: false as const, chu: r.chu }
+      setLuot((cu) => cu.map((x) => (x.sbd === o.sbd && x.qid === o.qid ? { ...x, daChuaLuc: x.daChuaLuc || r.du.luc } : x)))
+      return { ok: true as const }
+    },
+    [idBuoi],
+  )
+  const { ketQua, moPhien, ganO, dongPhien, ghi } = useGhiToChieu(idBuoi ? `dau-gio|${idBuoi}` : '', ghiO, thayChuaO)
 
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)

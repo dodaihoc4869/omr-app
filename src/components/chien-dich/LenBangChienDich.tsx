@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { chuThieuNoiDung } from '../../lib/tra-cau-chieu'
 import KhungXemPhieu from '../KhungXemPhieu'
-import { danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
+import { chuaXong, danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
 import { hienNgay, mocHetHan } from './ngay'
@@ -119,7 +119,17 @@ export default function LenBangChienDich() {
 
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)
-  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId)
+  // Nút "Thầy chữa" trên tờ (thầy 05/10): chiến dịch ghi bằng ĐÚNG lệnh "Chữa xong" (`chua-xong` một câu) — câu quay lại Đoàn Hộ Tống của cả lớp từ hôm sau.
+  const thayChuaO = useCallback(
+    async (o: { qid: string }) => {
+      const r = await chuaXong(chonId, [o.qid])
+      if (!r.ok) return { ok: false as const, chu: r.chu }
+      void tai(chonId, coMat)
+      return { ok: true as const }
+    },
+    [chonId, coMat, tai],
+  )
+  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO)
   const moChieu = async (dsO: OChieu[], tenBuoi: string): Promise<boolean> => {
     if (!dsO.length) {
       showToast('Chưa có câu nào để chiếu lên bảng', 'warn')

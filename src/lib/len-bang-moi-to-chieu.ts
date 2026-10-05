@@ -124,6 +124,10 @@ body.mc-bc[data-pha="chua"] .mc-cot-lam-bai::before,body.mc-bc[data-pha="chua"] 
 /* 4 · CHỜ GỌI: cột 1/3 chỉ có lời mời, KHÔNG tên em nào */
 body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai{display:grid;place-items:center;text-align:center}
 body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai::before{content:"Chờ thầy gọi\\A Bấm L hoặc nút “Lên bảng”\\A \\A Tên em chỉ hiện khi thầy bấm Lên bảng";white-space:pre-line;font:600 calc(var(--u)*1.25)/1.5 var(--mc-sans);color:var(--mc-bang-phu);padding:calc(var(--u)*1.5)}
+body.mc-bc .mc-dot-don[data-thay-chua] .mc-cot-lam-bai::before,body.mc-bc[data-pha] .mc-dot-don[data-thay-chua] .mc-cot-lam-bai::before{content:"Thầy chữa\\A Câu này không gọi em lên bảng";white-space:pre-line;font:800 calc(var(--u)*1.6)/1.5 var(--mc-sans);color:var(--mc-bang-chu);padding:calc(var(--u)*1.5)}
+body[data-dot-thay-chua] .mc-thanh #mc-len-bang{display:none}
+body[data-dot-thay-chua] .mc-thanh #mc-pha{font-size:0}
+body[data-dot-thay-chua] .mc-thanh #mc-pha::after{content:"THẦY CHỮA";font-size:max(13px,calc(var(--u)*1.15))}
 /* THẺ TÊN (bản vẽ H15 + thầy 28/09): lưới cố định; nhãn Đạt/Chưa đạt là viên thuốc MỘT dòng, tên dài tự cắt "…" */
 body.mc .mc-em .mc-ten-hang{grid-column:2;grid-row:1;display:flex;align-items:center;min-width:0;gap:.6em}
 body.mc .mc-em:not(:has(.mc-thu)) .mc-ten-hang{grid-column:1 / span 2}
@@ -153,8 +157,9 @@ body.mc .mc-thanh #mc-len-bang{min-height:calc(var(--u)*2.5)}
 .mc-nut-phim.mc-bat{background:var(--mc-bang-chu);color:var(--mc-thanh2)}
 .mc-nut-phim.mc-bat kbd{background:var(--mc-thanh2);color:var(--mc-bang-chu)}
 .mc-nut-phim[hidden]{display:none}
-@media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]) .mc-nut-chu{display:none}}
+@media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]):not([data-k="C"]) .mc-nut-chu{display:none}}
 /* Nút G, D, K luôn hiện chữ, nổi bật dễ bấm */
+body.mc .mc-phim-nhom [data-k="C"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="G"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="D"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="K"] .mc-nut-chu{display:inline!important;font-weight:700;margin-left:2px}
@@ -532,6 +537,9 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     $$(nhom, '[data-k]').forEach(function (b) {
       var k = b.getAttribute('data-k');
       if (k === 'D' || k === 'K') b.hidden = !(p === 'chua' && noi);
+      // "Thầy chữa" (05/10): có khi tờ đã nối app và đợt này còn nút chưa bấm; đợt đã thầy chữa thì ẩn.
+      if (k === 'C') { var dc = dot(); b.hidden = !(noi && dc && dc.querySelector('.mc-thay-chua[data-trang="cho"]')); }
+      if (k === 'C') { if (thayChuaDot()) body.setAttribute('data-dot-thay-chua', ''); else body.removeAttribute('data-dot-thay-chua'); }
       if (k === 'G') { b.classList.toggle('mc-bat', lgMo()); var c = b.querySelector('.mc-nut-chu'); if (c) c.textContent = lgMo() ? 'Ẩn giải' : 'Giải'; }
       if (k === 'T') b.classList.toggle('mc-bat', S.tk);
       if (k === 'B') b.classList.toggle('mc-bat', S.but);
@@ -647,7 +655,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function moPhim() {
     var ds = [['L', 'Gọi em lên bảng (hiệu ứng gọi tên)'], ['G', 'Mở / đóng lời giải (ngay dưới đề, trong 2/3)'], ['Space', 'Lời giải đang mở: hiện mục tiếp — hết mục thì lật trang / cuộn'],
       ['↓ PageDown', 'Chờ gọi: lật trang của câu · Đang chữa: cuộn một khung'], ['↑ PageUp', 'Trang trước / cuộn lên'], ['← →', 'Đổi đợt'],
-      ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], ['B', 'Bút vẽ (3 màu, tẩy)'], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
+      ['C', 'Thầy chữa câu này (không gọi em)'], ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], ['B', 'Bút vẽ (3 màu, tẩy)'], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
     phim.innerHTML = '<div class="mc-h"><h2>Phím tắt</h2><dl>' + ds.map(function (x) { return '<dt>' + x[0].split(' ').map(function (k) { return k === '/' || k === '+' || k === 'số' ? k : '<kbd>' + k + '</kbd>'; }).join(' ') + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>';
     phim.classList.add('mc-mo');
   }
@@ -727,8 +735,21 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
 
   // ── ĐIỀU KHIỂN ──
   function toiDot(k) { if (window.__mcDen) window.__mcDen(Math.max(0, Math.min(soDot() - 1, k))); baoNhanh('Đợt ' + (chiSo() + 1) + ' / ' + soDot(), 900); }
+  // "THẦY CHỮA" (05/10): bấm nút ẩn của đợt (cầu nối gửi app ghi); đợt đã thầy chữa thì không gọi em, không chấm em — phím L / D / K chỉ nhắc.
+  function thayChua() {
+    if (!body.classList.contains('mc-noi')) { baoNhanh('Tờ chưa nối với app thầy — chưa ghi được'); return; }
+    var d = dot(), n = d ? d.querySelector('.mc-thay-chua[data-trang="cho"] .mc-thay-chua-nut') : null;
+    if (!n) { baoNhanh('Câu này không ghi "Thầy chữa" được'); return; }
+    n.click();
+    baoNhanh('Đang ghi: Thầy chữa');
+  }
+  document.addEventListener('mc-noi', veThanh); // tờ vừa nối app (cầu nối): hiện nút chỉ dùng được khi có app
+  document.addEventListener('mc-thay-chua', function () { veThanh(); baoNhanh('Đã ghi: Thầy chữa — không gọi em'); });
+  function thayChuaDot() { var d = dot(); return !!(d && d.hasAttribute && d.hasAttribute('data-thay-chua')); }
   function lenh(k) {
+    if ((k === 'L' || k === 'D' || k === 'K' || k === 'C') && thayChuaDot()) { baoNhanh('Câu này thầy chữa — không gọi em'); return; }
     switch (k) {
+      case 'C': thayChua(); break;
       case 'L': if (pha() === 'cho' && window.__mcLenBang) window.__mcLenBang(); else if (daGoi()) baoNhanh('Em đã lên bảng'); break;
       case 'G': moLoiGiai(!lgMo()); break;
       case 'D': cham(true); break;
@@ -767,7 +788,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     if (/^[0-9]$/.test(k)) { S.soGo = (S.soGo + k).slice(-3); baoNhanh('Tới đợt: ' + S.soGo + '  ↵ Enter', 0); return; }
     if (k === 'Backspace' && S.soGo) { S.soGo = S.soGo.slice(0, -1); baoNhanh(S.soGo ? 'Tới đợt: ' + S.soGo + '  ↵ Enter' : '', 0); return; }
     if (k === 'Enter' && S.soGo) { var n = +S.soGo; S.soGo = ''; luoi.classList.remove('mc-mo'); e.preventDefault(); toiDot(n - 1); return; }
-    var MAP = { l: 'L', g: 'G', d: 'D', k: 'K', t: 'T', b: 'B', Tab: 'Tab', '?': '?', ArrowRight: '→', ArrowLeft: '←', ' ': 'SP', ArrowDown: '↓', PageDown: '↓', ArrowUp: '↑', PageUp: '↑', Home: 'H', End: 'E' };
+    var MAP = { l: 'L', g: 'G', d: 'D', k: 'K', c: 'C', t: 'T', b: 'B', Tab: 'Tab', '?': '?', ArrowRight: '→', ArrowLeft: '←', ' ': 'SP', ArrowDown: '↓', PageDown: '↓', ArrowUp: '↑', PageUp: '↑', Home: 'H', End: 'E' };
     var m = MAP[k] || MAP[k.toLowerCase ? k.toLowerCase() : k];
     if (!m) return;
     e.preventDefault();

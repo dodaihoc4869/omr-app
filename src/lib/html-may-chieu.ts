@@ -25,7 +25,7 @@ import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
 import { CSS_BO_CUC, jsBoCuc } from './bo-cuc-to-chieu'
 import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, mauHaoQuang } from './giao-dien-to-chieu'
 import type { NhanLichSuCau } from './lich-su-cau-len-bang'
-import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
+import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu, mangNutThayChua } from './to-chieu-cau-noi'
 import { CSS_LEN_BANG_MOI, jsLenBangMoi, thongKeHtml, type ThongKeLopCau } from './len-bang-moi-to-chieu'
 import { laCauTuLuan } from './cau-tu-luan'
 
@@ -337,7 +337,10 @@ function gioCuaO(o: OBang, dayHoc: boolean): { lam: number; chua: number; lam0: 
 /** Hai nút Đạt / Không đạt của một ô — chỉ khi tờ được dựng kèm `cauNoi` và ô có `qid`. Mảnh markup, CSS và JS nằm
  * ở `to-chieu-cau-noi.ts` (tờ chiếu chỉ việc đặt mảnh này ở đâu thầy muốn). TẾ NHỊ TRƯỚC LỚP: xem ghi chú ở đó. */
 function chamHtml(o: OBang, cauNoi: boolean): string {
-  return cauNoi && o.qid ? mangNutChamToChieu(khoaToChieu(o.sbd, o.qid)) : ''
+  if (!cauNoi || !o.qid) return ''
+  const khoa = khoaToChieu(o.sbd, o.qid)
+  // + nút "Thầy chữa" (thầy 05/10, mọi tờ chiếu): không gọi em nữa, câu tính là thầy đã chữa.
+  return mangNutChamToChieu(khoa) + mangNutThayChua(khoa)
 }
 
 /** MỘT ĐỢT = MỘT CÂU MỘT EM (bản vẽ Lên bảng 28/09 — bỏ đợt đôi ½ bảng): 2/3 bảng chiếu đề (+ lời giải), 1/3 cột em lên làm. */
@@ -1112,6 +1115,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   <span class="mc-pha" id="mc-pha"></span>
   <button type="button" id="mc-len-bang">Lên bảng</button>
   <div class="mc-phim-nhom" id="mc-phim-nhom">
+    <button type="button" class="mc-nut-phim" data-k="C" hidden><kbd>C</kbd><span class="mc-nut-chu">Thầy chữa</span></button>
     <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>

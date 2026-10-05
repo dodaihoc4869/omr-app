@@ -62,8 +62,30 @@ interface Phien {
 /** Hàm ghi một ô — mặc định `ghiMotO` (lệnh `ghiLenBang`). Kiểm tra đầu giờ (29/09) truyền hàm riêng ghi qua `/gv/dau-gio` (sổ nguon='dau_gio'). */
 export type GhiMotO = (o: OGhiToChieu, dat: boolean, giayThuc?: number) => Promise<{ ok: true } | { ok: false; chu: string }>
 
+/** Nút "Thầy chữa" trên tờ (thầy 05/10): ghi ô này là THẦY ĐÃ CHỮA (không gọi em). Mỗi màn truyền đường ghi của mình;
+ * mặc định `/gv/thay-chua-cau` (nhãn "Thầy đã chữa" + mốc dạy lại) với nguồn `len_bang`. */
+export type ThayChuaMotO = (o: OGhiToChieu) => Promise<{ ok: true } | { ok: false; chu: string }>
+
+/** Lệnh máy chủ chung `/gv/thay-chua-cau` — Gọi lên bảng / Dạy học. */
+export async function thayChuaQuaMayChu(o: { sbd: string; qid: string }, nguon: 'len_bang' | 'day_hoc', maNguon: string): Promise<{ ok: true } | { ok: false; chu: string }> {
+  try {
+    const [{ layCauHinhMayChu }, { loadTeacherSecret }] = await Promise.all([import('../../lib/may-chu-moi'), import('../../lib/exam-db')])
+    const [ch, mat] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
+    if (!ch.URL) return { ok: false, chu: 'Chưa kết nối được máy chủ.' }
+    const res = await fetch(`${ch.URL}/gv/thay-chua-cau`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' },
+      body: JSON.stringify({ sbd: o.sbd, qid: o.qid, nguon, maNguon }),
+    })
+    const j = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+    return j.ok === true ? { ok: true } : { ok: false, chu: j.error || 'Không ghi được "Thầy đã chữa".' }
+  } catch {
+    return { ok: false, chu: 'Không nối được máy chủ — chưa ghi "Thầy đã chữa".' }
+  }
+}
+
 /** Hook của màn Lên bảng chiến dịch: giữ bảng kết quả của chiến dịch đang chọn và nghe tờ chiếu đang mở. */
-export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO) {
+export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO, thayChuaO?: ThayChuaMotO) {
   const showToast = useAppStore((s) => s.showToast)
   const [ketQua, setKetQua] = useState<BangKetQua>(() => docKetQuaNho(chienDichId))
   const ketQuaRef = useRef(ketQua)
@@ -75,6 +97,14 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO) {
   }, [chienDichId])
 
   const phien = useRef<Phien | null>(null)
+  /** Ô đã bấm "Thầy chữa" thành công trong lúc màn này mở (khoá `sbd|qid`) — gửi lại lúc tờ bắt tay để tờ mới khoá ngay. */
+  const daThayChua = useRef(new Set<string>())
+  const dangThayChua = useRef(new Map<string, Promise<boolean>>())
+  const thayChuaRef = useRef(thayChuaO)
+  thayChuaRef.current = thayChuaO
+  useEffect(() => {
+    daThayChua.current = new Set()
+  }, [chienDichId])
   const [maDangMo, setMaDangMo] = useState('')
   const dangGhi = useRef(new Map<string, Promise<boolean>>())
 
@@ -152,10 +182,40 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO) {
         p.goc = goc
         gui(p, { type: TIN_TO_CHIEU.KET_NOI })
         for (const khoa of p.o.keys()) if (ketQuaRef.current[khoa]) gui(p, { type: TIN_TO_CHIEU.DA_GHI, khoa })
+        for (const khoa of p.o.keys()) if (daThayChua.current.has(khoa)) gui(p, { type: TIN_TO_CHIEU.THAY_CHUA_XONG, khoa, kq: 'da_ghi' })
         return
       }
       const o = p.o.get(tin.khoa)
       if (!o) return
+      if (tin.loai === 'thay_chua') {
+        const khoa = tin.khoa
+        const tra = (ok: boolean) => {
+          if (phien.current !== p) return
+          try {
+            cuaSo.postMessage({ type: TIN_TO_CHIEU.THAY_CHUA_XONG, maPhien: p.ma, khoa, kq: ok ? 'da_ghi' : 'loi' }, goc)
+          } catch {
+            /* khung đã đóng */
+          }
+        }
+        if (daThayChua.current.has(khoa)) return tra(true)
+        let luot = dangThayChua.current.get(khoa)
+        if (!luot) {
+          const ham = thayChuaRef.current ?? ((x: OGhiToChieu) => thayChuaQuaMayChu(x, 'len_bang', chienDichId || 'len-bang'))
+          luot = ham(o).then((r) => {
+            if (!r.ok) {
+              showToast(r.chu, 'error')
+              return false
+            }
+            daThayChua.current.add(khoa)
+            showToast(`Câu của ${o.hoTen || o.sbd}: đã ghi "Thầy đã chữa"`, 'success')
+            return true
+          })
+          dangThayChua.current.set(khoa, luot)
+          void luot.finally(() => dangThayChua.current.delete(khoa))
+        }
+        void luot.then(tra)
+        return
+      }
       if (tin.loai === 'ho_so') {
         // Bảng chi tiết em trên tờ chiếu (bản vẽ 28/09): app gọi lệnh thầy chỉ-đọc rồi trả về đúng khung.
         void import('../../lib/ho-so-em-thay').then(({ layHoSoLenBang }) => layHoSoLenBang(o.sbd, o.qid)).catch(() => null).then((hoSo) => {
@@ -179,7 +239,7 @@ export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO) {
     }
     window.addEventListener('message', nghe)
     return () => window.removeEventListener('message', nghe)
-  }, [maDangMo])
+  }, [maDangMo, chienDichId, showToast])
 
   // `ghi`: nút Đúng / Sai NGAY TRÊN MÀN THẦY (bảng Dạy học, 28/09) — cùng khoá `sbd|qid`, cùng chống ghi đôi, cùng lệnh `ghiLenBang` như nút trên tờ.
   return { ketQua, moPhien, ganO, dongPhien, ghi: ghiTheoKhoa }
