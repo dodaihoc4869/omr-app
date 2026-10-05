@@ -54,3 +54,7 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] Mã câu nền tự sinh phải khớp luật id của thầy `/^[\w.-]{1,80}$/` ⇒ `sinh.<nhãn>.<số>` | bằng chứng: đã báo làn D1
 - [x] Gộp làn A1 lõi thuần | bằng chứng: 2a02088; 4 tệp tests/omni-3-loi*.test.ts 96/96 trên nhánh gộp; số vàng 8,66 · 88%; phát lại 12 thứ tự y hệt
 - [!] PHÁT HIỆN cần thầy quyết (không tự hạ ngưỡng): chứng chỉ ĐỦ K∧C∧M chậm hơn con số đã báo. Chỉ điều kiện mô hình: 58/60 em ≤ 7 ngày. Đủ ba điều kiện, 14 ngày: sơ ý 6% ⇒ 36/40 em; sơ ý 10% ⇒ 1/40. Làn A1 đo thêm: đủ ba điều kiện trong 7 ngày chỉ 33–48% em (S 6%). Khai oan 0 ở mọi ô. Con số 91–99% ≤ 7 ngày báo trước đây chỉ tính điều kiện mô hình.
+- [x] Gộp làn B3 đường trả lời + game | bằng chứng: 8cacf5f; 3 tệp tests/omni-3-tra-loi*.test.ts 33/33 (làn báo)
+- [x] Sửa 7 test reset đỏ do 15 bảng OMNI chưa phân loại (lỗi của bước hợp đồng ec17bca) — nguyên nhân gốc: bộ kiểm reset bắt mọi bảng trong migration phải được xếp XOÁ/GIỮ | bằng chứng: c276369; xếp GIỮ ở cả hai job (cả hai đã `xong` 21/09 và 28/09, không chạy lại); đúng lệnh cũ `npx vitest run tests/reset-hoa2-2709.test.ts tests/reset-toan-app-1909.test.ts` 67/67
+- [ ] Soát 2 test CauDaLam (PDF) làn B3 thấy đỏ khi chạy chung, xanh khi chạy riêng — không có trong nền | bằng chứng: (chờ toàn vitest)
+- [ ] Giới hạn đã biết: Đoàn chưa đọc cờ lướt (sổ ghi đúng, nhưng trong trận lướt vẫn tính trượt) — ghi vào báo cáo | bằng chứng: báo cáo làn B3
