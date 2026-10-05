@@ -417,16 +417,17 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
         <p className="dh-phu">Tờ vào bài luyện (câu tự luận tự bỏ):</p>
         <ul className="dh-chip-ds">
           {chon.to.map((t) => (
-            <li key={t.maDe}>
+            <li key={t.maDe} style={{ maxWidth: '100%' }}>
               <label className="dh-them-o">
                 <input type="checkbox" checked={toChon.has(t.maDe)} onChange={() => doiTo(t.maDe)} />
                 <span>
-                  {t.nhan} · {t.soCau} câu{t.laViDu && !toChon.has(t.maDe) ? ' (mặc định không — dùng khi dạy)' : ''}
+                  {t.nhan} · {t.soCau} câu
                 </span>
               </label>
             </li>
           ))}
         </ul>
+        {chon.to.some((t) => t.laViDu && !toChon.has(t.maDe)) && <p className="dh-phu">“Ví dụ minh hoạ” mặc định không vào bài luyện (dùng khi dạy) — tích để thêm.</p>}
       </div>
 
       {!dauVao ? (
