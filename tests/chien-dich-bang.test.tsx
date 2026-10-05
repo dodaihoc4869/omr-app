@@ -35,7 +35,7 @@ const bang = (dsEm: EmBang[], them: Partial<DuBang> = {}): DuBang => ({
     { qid: 'DE-A-I-17', stt: 17, dang: 'Thuỷ phân ester đơn chức', soEm: 9 },
     { qid: 'DE-A-I-31', stt: 31, dang: 'Đồng phân', soEm: 4 },
     { qid: 'DE-A-I-5', stt: 5, dang: 'Danh pháp ester', soEm: 2 },
-    { qid: 'DE-A-I-28', stt: 28, dang: 'Đốt cháy', soEm: 1 },
+    { qid: 'DE-A-I-28', stt: 28, dang: 'Đốt cháy', soEm: 1, mucDo: 'hieu' },
   ],
   ...them,
 })
@@ -166,27 +166,35 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
     expect(container.querySelectorAll('tbody tr')).toHaveLength(16)
   })
 
-  it('"Chiếu 3 câu đầu lên bảng" chiếu đúng 3 câu cần dạy lại; "Chữa xong 3 câu này" hỏi lại rồi gọi `chua-xong` đúng 3 câu', async () => {
+  it('(thầy 05/10) "Chiếu cả 4 câu lên bảng" chiếu TẤT CẢ câu cần dạy lại; "Chữa xong cả 4 câu" hỏi lại rồi gọi `chua-xong` đủ 4 câu', async () => {
     goi.mockResolvedValue({ ok: true, du: { ok: true, soLuot: 15, ngayOnLai: '2026-10-04' } })
     const onChieu = vi.fn(async () => true)
     const onDaChua = vi.fn()
     const du = bang([em('Trần Bảo', [0.8, 0.9, 0.7, 0.5, 0.5]), em('Lê Chi', [0.1, 0.1, 0.1, 0.1, 0.1])])
     render(<BangChienDich du={du} nowMs={NOW} dangChieu={false} onChieu={onChieu} onDaChua={onDaChua} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chiếu 3 câu đầu lên bảng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Chiếu cả 4 câu lên bảng' }))
     await waitFor(() => expect(onChieu).toHaveBeenCalled())
     const [ds, tenBuoi] = onChieu.mock.calls[0] as unknown as [{ qid: string; sbd: string }[], string]
-    expect(ds.map((o) => o.qid)).toEqual(['DE-A-I-17', 'DE-A-I-31', 'DE-A-I-5'])
+    expect(ds.map((o) => o.qid)).toEqual(['DE-A-I-17', 'DE-A-I-31', 'DE-A-I-5', 'DE-A-I-28'])
     expect(ds[0]!.sbd).toBe('Trần Bảo') // em thành thạo dạng ấy nhiều nhất giải mẫu
     expect(tenBuoi).toContain('Ester – Lipid')
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Chữa xong 3 câu này' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Chữa xong cả 4 câu' }))
     const hop = screen.getByRole('alertdialog')
     expect(hop.textContent).toContain('Đoàn Hộ Tống')
     expect(hop.textContent).toContain('không hoàn tác')
     expect(goi).not.toHaveBeenCalled()
     fireEvent.click(within(hop).getByRole('button', { name: 'Chữa xong' }))
-    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich', { action: 'chua-xong', id: 'cd-1', qids: ['DE-A-I-17', 'DE-A-I-31', 'DE-A-I-5'] }))
+    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich', { action: 'chua-xong', id: 'cd-1', qids: ['DE-A-I-17', 'DE-A-I-31', 'DE-A-I-5', 'DE-A-I-28'] }))
     await waitFor(() => expect(onDaChua).toHaveBeenCalled())
+  })
+
+  it('(thầy 05/10) danh sách "Cần thầy dạy lại" nằm trong hộp cuộn; mức độ hiện chữ chuẩn, không mã kho', () => {
+    const { container } = render(<BangChienDich du={bang([em('A', [0.5, 0.5, 0.5, 0.5, 0.5])])} nowMs={NOW} dangChieu={false} onChieu={vi.fn(async () => true)} onDaChua={vi.fn()} />)
+    const hop = container.querySelector('.cd-ds-cau-cuon')
+    expect(hop?.querySelectorAll('li')).toHaveLength(4)
+    expect(hop?.textContent).toContain('Thông hiểu')
+    expect(hop?.textContent).not.toMatch(/· hieu\b/)
   })
 
   it('người giải mẫu không lặp một em khi còn em khác', () => {
