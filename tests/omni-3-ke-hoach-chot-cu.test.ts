@@ -210,3 +210,27 @@ describe('OMNI 3 · lapKeHoachNgay vắng tham số mới ⇒ JSON y hệt bản
     for (const kb of KICH_BAN) expect(chayKichBan(kb)).toBe(chayKichBan(kb))
   })
 })
+
+describe('OMNI 3 · trường mới mang giá trị TRUNG TÍNH ⇒ kế hoạch y hệt bản cũ', () => {
+  const coCd = KICH_BAN.filter((k) => k.D === null || k.D === 'qua' || k.D >= 5) // D ≤ 4: luật "câu mới bắt buộc giữ chỗ" của nhiều bài khác đường cũ (có chủ ý)
+  it('đủ kịch bản để so', () => expect(coCd.length).toBeGreaterThanOrEqual(20))
+  for (const kb of coCd) {
+    it(`một chiến dịch qua chienDich (cd trên câu) ⇒ y hệt hanNop — ${kb.ten}`, () => {
+      const { cau, tt, tc, daLam } = dungKichBan(kb)
+      const cauCd = cau.map((c) => ((c.nguon ?? 'chien_dich') === 'chien_dich' ? { ...c, cd: 'CD-1' } : c))
+      const ds = tc.hanNop ? [{ id: 'CD-1', hanNop: tc.hanNop, theLucNgay: tc.tranNgay ?? 40, raiDeu: tc.raiDeu === true }] : []
+      const { moiTheoCd, ...conLai } = lapKeHoachNgay(cauCd, tt, { ...tc, tranHuyetChien: tc.tranHuyetChien ?? 80, chienDich: ds }, daLam)
+      expect(JSON.stringify(conLai)).toBe(KY_VONG[kb.ten])
+      if (ds.length && tc.hanNop! >= '2026-10-05') expect(Object.keys(moiTheoCd ?? {})).toEqual(['CD-1'])
+    })
+  }
+  for (const kb of KICH_BAN) {
+    it(`onBaiCu rỗng / dangVung rỗng / cheDoCho khi có chiến dịch ⇒ y hệt — ${kb.ten}`, () => {
+      const { cau, tt, tc, daLam } = dungKichBan(kb)
+      const { onBaiCu, ...conLai } = lapKeHoachNgay(cau, tt, { ...tc, onBaiCu: [], dangVung: [] }, daLam)
+      expect(onBaiCu).toEqual([])
+      expect(JSON.stringify(conLai)).toBe(KY_VONG[kb.ten])
+      if (tc.hanNop && tc.hanNop >= '2026-10-05') expect(JSON.stringify(lapKeHoachNgay(cau, tt, { ...tc, cheDoCho: { theLuc: 24 } }, daLam))).toBe(KY_VONG[kb.ten])
+    })
+  }
+})
