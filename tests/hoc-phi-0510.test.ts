@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
-import { conThieu, dinhDangTien, docSoTien, hocPhiCuaEm, MUC_HOC_PHI_CHUAN, tongHocPhi, trangThaiHocPhi, type HocPhiEm } from '../src/lib/hoc-phi'
+import { conThieu, dinhDangTien, ghiChuHien, docSoTien, hocPhiCuaEm, MUC_HOC_PHI_CHUAN, tongHocPhi, trangThaiHocPhi, type HocPhiEm } from '../src/lib/hoc-phi'
 
 describe('lõi học phí', () => {
   it('trạng thái 4 màu', () => {
@@ -41,6 +41,11 @@ describe('lõi học phí', () => {
     expect(docSoTien('2 triệu')).toBe(2_000_000)
     expect(docSoTien('3000000vnđ')).toBe(3_000_000)
     for (const sai of ['', 'abc', '0', '-500', '500.5', '1.50.000', '12,3']) expect(docSoTien(sai)).toBeNull()
+  })
+  it('ghi chú hiện bỏ thẻ nguồn máy', () => {
+    expect(ghiChuHien('File Excel ghi "đã đóng đủ" với 2.250.000 đ [excel:DS_2026_1b]')).toBe('File Excel ghi "đã đóng đủ" với 2.250.000 đ')
+    expect(ghiChuHien('[excel:DS_2026_1]')).toBe('')
+    expect(ghiChuHien('giảm 50%')).toBe('giảm 50%')
   })
   it('định dạng tiền', () => {
     expect(dinhDangTien(4_500_000)).toBe('4.500.000 đ')
