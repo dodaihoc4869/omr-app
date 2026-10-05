@@ -47,6 +47,17 @@ describe('/gv/doi-sbd', () => {
     // không còn dấu SBD cũ ⇒ chạy lại: không còn gì để đổi
     expect((await g({ cu: '100042', moi: '10049' })).bang).toEqual([])
   })
+  it('liệt kê cột; làm từng cột một: chỉ đổi đúng cột đó; cột lạ ⇒ từ chối', async () => {
+    const { d, env } = dung()
+    const g = (b: Record<string, unknown>) => goiWorker(worker, env, '/gv/doi-sbd', b, true)
+    const ds = (await g({ cu: '100042', moi: '10048', lietKeCot: true })).cot as string[]
+    expect(ds).toContain('su_kien_hoc.khoa')
+    expect(ds).toContain('hoc_sinh.sbd')
+    const r = await g({ cu: '100042', moi: '10048', cot: 'su_kien_hoc.khoa', chayThat: true })
+    expect(r).toMatchObject({ ok: true, soO: 1, bang: [{ bang: 'su_kien_hoc', cot: 'khoa', dung: 0, nhung: 1 }] })
+    expect(d.sql.prepare("SELECT sbd FROM su_kien_hoc WHERE khoa = '153169|10048|Q1'").get()).toEqual({ sbd: '100042' }) // cột khác chưa đổi
+    expect((await g({ cu: '100042', moi: '10048', cot: 'khong_co.x' })).ok).toBe(false)
+  })
   it('SBD mới đã có dữ liệu ⇒ từ chối, không ghi gì; đang có ca mở ⇒ từ chối', async () => {
     const { d, env } = dung()
     const r = await goiWorker(worker, env, '/gv/doi-sbd', { cu: '100042', moi: '10042', chayThat: true }, true)

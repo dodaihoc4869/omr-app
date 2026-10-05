@@ -14,6 +14,11 @@ describe('chonDeCanTai — chỉ tải đề mới hoặc đã đổi', () => {
     expect(moi.map((x) => x.maDe)).toEqual(['100'])
     expect(capNhat.map((x) => x.maDe)).toEqual(['102'])
   })
+  it('(05/10) kho sửa câu mà KHÔNG đổi ngayNap ⇒ capNhatLuc khác ⇒ vẫn tải lại; capNhatLuc trùng ⇒ bỏ qua', () => {
+    const tren = [{ ...item('A', '2026-10-01'), capNhatLuc: '2026-10-02T04:25:26.357Z' }, { ...item('B', '2026-10-01'), capNhatLuc: '2026-10-02T04:00:00.000Z' }]
+    const co = [{ ...local('A', '2026-10-01') }, { ...local('B', '2026-10-01'), capNhatKho: '2026-10-02T04:00:00.000Z' }]
+    expect(chonDeCanTai(tren, co).capNhat.map((x) => x.maDe)).toEqual(['A'])
+  })
 })
 
 // Trước khi xoá một đề, hộp hỏi phải nói ĐÚNG số ca đã mở dùng đề đó. Nói sai

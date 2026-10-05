@@ -131,8 +131,8 @@ export function thieuTruongDang(s: TeacherExamSource): boolean {
   return [...s.phanI, ...s.phanII, ...s.phanIII].some((q) => (q as { dang?: unknown }).dang === undefined)
 }
 
-/** Quyết định đề nào cần tải: chưa có local · ngayNap khác · bản local còn
- * thiếu trường `dang` · hoặc thầy bấm ép tải lại. */
+/** Quyết định đề nào cần tải: chưa có local · ngayNap khác · kho đã sửa sau lần tải (capNhatLuc khác, 05/10) ·
+ * bản local còn thiếu trường `dang` · hoặc thầy bấm ép tải lại. */
 export function chonDeCanTai(
   tren: KhoDeItem[],
   local: TeacherExamSource[],
@@ -144,7 +144,7 @@ export function chonDeCanTai(
   for (const item of tren) {
     const cu = localMap.get(item.maDe)
     if (!cu) moi.push(item)
-    else if (epTaiLai || (cu.ngayNap ?? '') !== (item.ngayNap ?? '') || thieuTruongDang(cu)) capNhat.push(item)
+    else if (epTaiLai || (cu.ngayNap ?? '') !== (item.ngayNap ?? '') || (!!item.capNhatLuc && (cu.capNhatKho ?? '') !== item.capNhatLuc) || thieuTruongDang(cu)) capNhat.push(item)
   }
   return { moi, capNhat }
 }
@@ -179,6 +179,7 @@ export async function dongBoNganHang(scriptUrl: string, secret: string, epTaiLai
       if (v.length > 0) throw new Error(v[0])
       // ÁP SỔ SỬA MÃ. Không áp thì đề tải về đè mã cũ lên cái thầy vừa sửa,
       // và thầy sẽ thấy sửa xong một lúc lại về như cũ mà không hiểu vì sao.
+      if (item.capNhatLuc) source.capNhatKho = item.capNhatLuc // mốc sửa kho — lần sau so để biết kho có bản mới (05/10)
       await saveExamSource(apDungSoSua(source, soSua))
       if (moi.includes(item)) kq.moi.push(item.maDe)
       else {
