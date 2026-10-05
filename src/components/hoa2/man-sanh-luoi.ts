@@ -6,13 +6,15 @@
 //
 // NAY:
 // · NẠP TRƯỚC: Sảnh có số + chờ CHO_SAU_SANH_MS (ảnh, phông, lệnh mở app của Sảnh đi trước) ⇒ nạp sẵn LẦN LƯỢT từng mảnh, đợi lúc rảnh;
-//   tiết kiệm dữ liệu / 2G / mất mạng thì không nạp; một mảnh hỏng thì dừng (lúc em bấm tải như cũ). Mảnh về được service worker cất ở kho
-//   chạy-lúc y như lúc em bấm. Thứ tự: đường của NÚT CHÍNH trước (còn ổ phục kích ⇒ Đoàn; không ⇒ Đảo), Câu đã làm, đường game còn lại,
-//   Tu luyện. Các màn dùng `veNgayKhiCo` / `lazyNapTruoc` ⇒ mảnh đã có thì vẽ thẳng, không màn chờ.
+//   tiết kiệm dữ liệu / 2G / mất mạng thì không nạp; một mảnh hỏng thì dừng (lúc em bấm tải như cũ); em chạm một cửa thì thôi nạp tiếp
+//   (không giành máy với màn vừa mở). Mảnh về được service worker cất ở kho chạy-lúc y như lúc em bấm. Thứ tự: đường của NÚT CHÍNH trước
+//   (còn ổ phục kích ⇒ Đoàn; không ⇒ Đảo), Câu đã làm, đường game còn lại, Tu luyện. Các màn dùng `veNgayKhiCo` / `lazyNapTruoc` ⇒ mảnh
+//   đã có thì vẽ thẳng, không màn chờ.
 // · GỌI SỚM (lúc chạm — cửa game: StudentPortalScreen · moGameTai gọi `moManGameNhanh`; cửa Câu đã làm / Tu luyện: SanhBanDo bọc bằng
-//   `boCuaNhanh`) — CHỈ khi mảnh của màn đã nạp (trước), tức màn chắc chắn mở ngay trong lượt chạm: bắn các lệnh đọc mà màn CHẮC CHẮN gọi
-//   đầu tiên, song song với lúc vẽ màn; màn nhận lại lời hứa — số lệnh tới máy chủ không đổi; màn đóng thì bỏ lệnh sớm chưa ai nhận. Mảnh của
-//   màn đích (cả lớp con: vỏ Đảo + Đảo 2.0 / Đoàn) tải ngay lúc chạm, không đợi lớp trên vẽ xong mới tải lớp dưới.
+//   `boCuaNhanh`): bắn các lệnh đọc mà màn CHẮC CHẮN gọi đầu tiên, song song với lúc tải mảnh + vẽ màn; màn nhận lại lời hứa — số lệnh tới
+//   máy chủ không đổi; màn đóng thì bỏ lệnh sớm chưa ai nhận. Câu đã làm: bắn NGAY cả khi mảnh chưa về (hàm tải nằm ở api.ts, Sảnh vốn
+//   có). Game / Tu luyện: hàm gọi nằm trong mảnh của màn ⇒ chỉ bắn khi mảnh đã nạp (trước). Mảnh của màn đích (cả lớp con: vỏ Đảo + Đảo 2.0
+//   / Đoàn) tải ngay lúc chạm, không đợi lớp trên vẽ xong mới tải lớp dưới.
 import { useEffect } from 'react'
 import { boNap, napTruocLanLuot, nenNapTruoc, taoGoiSom } from './nap-truoc-man'
 import { taiCauDaLam, type KetQuaCauDaLam } from './api'
@@ -27,14 +29,31 @@ export const napManTuLuyen = boNap(() => import('../tu-luyen/ManTuLuyen'))
 /** Chờ sau khi Sảnh có số rồi mới nạp trước — để các việc mở app của Sảnh (ảnh, phông, lệnh máy chủ) đi trước. */
 export const CHO_SAU_SANH_MS = 1500
 
-let daBatDau = false
-/** Nạp trước MỘT lần mỗi lượt mở trang. `uuTienDoan` = nút chính của Sảnh đang là "PHÁ N Ổ PHỤC KÍCH" (mở Đoàn). */
+/** Hàng mảnh còn chờ nạp trước (dựng MỘT lần mỗi lượt mở trang); `null` = chưa dựng. */
+let hang: (() => Promise<unknown>)[] | null = null
+/** Đang có một lượt nạp chạy (không chạy hai lượt song song). */
+let dangNap = false
+/** Em đã chạm một cửa (rời Sảnh): thôi nạp trước trong lượt mở trang này — không giành máy / đường mạng với màn em vừa mở
+ *  (mảnh đang tải dở vẫn về). Cửa nào chưa nạp thì lúc em bấm tải như cũ. */
+let daRoiSanh = false
+/** Chạm cửa nào cũng gọi (moManGameNhanh, boCuaNhanh). */
+export const dungNapTruocManSanh = (): void => {
+  daRoiSanh = true
+}
+
+/** Nạp trước LẦN LƯỢT các mảnh còn trong hàng. `uuTienDoan` = nút chính của Sảnh đang là "PHÁ N Ổ PHỤC KÍCH" (mở Đoàn). */
 export function napTruocManSanh(uuTienDoan: boolean): Promise<void> {
-  if (daBatDau || !nenNapTruoc()) return Promise.resolve()
-  daBatDau = true
-  const dao = () => napManGame().then((m) => m.napTruocDao())
-  const doan = () => napManGame().then((m) => m.napTruocDoan())
-  return napTruocLanLuot(uuTienDoan ? [doan, napManCauDaLam, dao, napManTuLuyen] : [dao, napManCauDaLam, doan, napManTuLuyen])
+  if (daRoiSanh || !nenNapTruoc()) return Promise.resolve()
+  if (!hang) {
+    const dao = () => napManGame().then((m) => m.napTruocDao())
+    const doan = () => napManGame().then((m) => m.napTruocDoan())
+    hang = uuTienDoan ? [doan, napManCauDaLam, dao, napManTuLuyen] : [dao, napManCauDaLam, doan, napManTuLuyen]
+  }
+  if (dangNap || !hang.length) return Promise.resolve()
+  dangNap = true
+  return napTruocLanLuot(hang, undefined, () => !daRoiSanh).finally(() => {
+    dangNap = false
+  })
 }
 
 /** Sảnh 2.0 gọi. `sanSang` = Sảnh đã có số của máy chủ (cảnh + nút đã vẽ). */
@@ -54,6 +73,7 @@ const boQua = () => {
 /** Chạm cửa game ở Sảnh (`manDau` như `moGameTai`): mảnh game đã có ⇒ bắn lệnh mở game (Game.tsx · goiSomGame); và tải ngay mảnh của màn
  *  đích (vỏ Đảo + Đảo 2.0, hoặc Đoàn) — mảnh game chưa về thì tải tiếp ngay khi nó về. */
 export function moManGameNhanh(sbd: string, token: string | undefined, manDau: '' | 'doan' | 'shop' | 'tui-do'): void {
+  dungNapTruocManSanh()
   const tai = (m: Awaited<ReturnType<typeof napManGame>>): Promise<unknown> => (manDau === 'doan' ? m.napTruocDoan() : m.napTruocDao())
   const m = napManGame.san()
   if (m) m.goiSomGame(sbd, token, manDau)
@@ -65,20 +85,22 @@ const somCauDaLam = taoGoiSom<KetQuaCauDaLam>()
 export const nhanCauDaLamSom = (token: string): Promise<KetQuaCauDaLam> | null => somCauDaLam.nhan(token)
 export const xoaCauDaLamSom = (): void => somCauDaLam.xoa()
 
-/** Sảnh bọc hai cửa (mảnh của màn đã nạp trước ⇒ màn mở ngay trong lượt chạm): "Câu đã làm" ⇒ bắn ngay lệnh tải danh sách câu
- *  (`hoa2-cau-da-lam`, CauDaLam nhận lại ở lượt tải đầu); "Tu luyện" ⇒ bắn ngay hai lệnh mở màn (ManTuLuyen.tsx · goiSomTuLuyen). Rồi gọi
- *  đúng hàm cửa cũ. Mảnh chưa có ⇒ như cũ. */
+/** Sảnh bọc hai cửa: "Câu đã làm" ⇒ bắn ngay lệnh tải danh sách câu (`hoa2-cau-da-lam`, CauDaLam nhận lại ở lượt tải đầu — kể cả khi
+ *  mảnh chưa về: lệnh đi song song với lúc tải mảnh); "Tu luyện" (mảnh đã nạp trước) ⇒ bắn ngay hai lệnh mở màn (ManTuLuyen.tsx ·
+ *  goiSomTuLuyen). Rồi gọi đúng hàm cửa cũ. */
 export function boCuaNhanh<P extends { token: string; onCauDaLam: () => void; onTuLuyen?: () => void }>(p: P): P {
   const tuLuyen = p.onTuLuyen
   return {
     ...p,
     onCauDaLam: () => {
-      if (p.token && napManCauDaLam.san()) somCauDaLam.ban(p.token, () => taiCauDaLam(p.token))
+      dungNapTruocManSanh()
+      if (p.token) somCauDaLam.ban(p.token, () => taiCauDaLam(p.token))
       p.onCauDaLam()
     },
     onTuLuyen:
       tuLuyen &&
       (() => {
+        dungNapTruocManSanh()
         if (p.token) napManTuLuyen.san()?.goiSomTuLuyen(p.token)
         tuLuyen()
       }),

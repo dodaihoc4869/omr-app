@@ -193,11 +193,13 @@
   overflow: hidden;
 }
 /* CHUYỂN MÀN NHANH (05/10): thẻ đóng NẰM NGOÀI khung nhìn được trình duyệt bỏ qua dựng kiểu / bố cục / vẽ tới khi cuộn gần
-   (content-visibility: auto — vẫn trong cây trợ năng, tìm chữ được). Thẻ trong khung nhìn vẽ y hệt cũ: thẻ vốn `overflow: hidden`
-   nên phần khoanh vùng (contain) đi kèm không đổi điểm ảnh nào. Thẻ đang mở (lời giải, Hỏi thầy) KHÔNG áp. */
-.h2-cdl-ds > .h2-the:not([data-mo='true']) {
+   (content-visibility: auto — vẫn trong cây trợ năng, tìm chữ được). Áp lên NÚT thân thẻ (con duy nhất, lấp kín thẻ đóng — thẻ vốn
+   `overflow: hidden` bo góc nên phần khoanh vùng đi kèm không đổi điểm ảnh nào); hỏi cỡ chính cái nút (offsetWidth…) không bắt trình
+   duyệt dựng lại phần bên trong. Cỡ tạm lúc chưa dựng: 182 px nội dung + 28 px đệm = 210 px (trung bình thẻ thật, đo 05/10).
+   Thẻ đang mở (lời giải, Hỏi thầy) KHÔNG áp. */
+.h2-cdl-ds > .h2-the:not([data-mo='true']) > .h2-the-nut {
   content-visibility: auto;
-  contain-intrinsic-block-size: auto 210px;
+  contain-intrinsic-block-size: auto 182px;
 }
 .h2-the-nut {
   width: 100%;

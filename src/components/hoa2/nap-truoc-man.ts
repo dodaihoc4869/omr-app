@@ -115,19 +115,29 @@ export function nenNapTruoc(nav: Navigator | undefined = typeof navigator === 'u
 
 /**
  * Nạp trước LẦN LƯỢT (một mảnh một lúc, mỗi mảnh đợi lúc rảnh) — không tranh đường mạng / luồng chính với việc em đang làm.
- * Một mảnh hỏng ⇒ DỪNG cả lượt (mạng yếu thì thôi). Lời hứa xong khi hết danh sách hoặc dừng; không bao giờ ném lỗi.
+ * `hang` là HÀNG ĐỢI dùng chung: mảnh nào bắt đầu tải thì rời hàng ⇒ gọi lại với cùng hàng là đi tiếp phần còn lại.
+ * `con()` sai (em đã chạm cửa, rời Sảnh) ⇒ DỪNG trước mảnh kế, không giành máy với màn em vừa mở; mảnh đang tải dở vẫn về.
+ * Một mảnh hỏng ⇒ bỏ cả hàng (mạng yếu thì thôi — lúc em bấm tải như cũ). Lời hứa xong khi hết hàng hoặc dừng; không bao giờ ném lỗi.
  */
-export function napTruocLanLuot(ds: readonly (() => Promise<unknown>)[], hen: (viec: () => void) => void = henLucRanh): Promise<void> {
+export function napTruocLanLuot(
+  hang: (() => Promise<unknown>)[],
+  hen: (viec: () => void) => void = henLucRanh,
+  con: () => boolean = () => true,
+): Promise<void> {
   return new Promise((xong) => {
-    let i = 0
     const tiep = (): void => {
-      if (i >= ds.length) return xong()
-      const nap = ds[i++]!
+      if (!hang.length || !con()) return xong()
       hen(() => {
-        try {
-          nap().then(tiep, () => xong())
-        } catch {
+        if (!hang.length || !con()) return xong()
+        const nap = hang.shift()!
+        const hong = (): void => {
+          hang.length = 0
           xong()
+        }
+        try {
+          nap().then(tiep, hong)
+        } catch {
+          hong()
         }
       })
     }
