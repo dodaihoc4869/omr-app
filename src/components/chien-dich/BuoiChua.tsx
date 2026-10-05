@@ -4,12 +4,16 @@
 // thời gian ước lượng bằng CÙNG công thức của Gọi lên bảng (`thoiGianCau`), tổng ≤ 90 phút, mỗi em có mặt ≥ 1 lượt (`xepBuoiChua`).
 // Nút chính "Mở tờ máy chiếu" (luồng tờ chiếu có sẵn), "Chữa xong" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong`, "Mở ca chốt".
 // Kết quả Đạt / Chưa đạt thầy bấm trên tờ chiếu (`ghi-to-chieu.ts`) hiện lại ở cột "Người lên bảng" của đúng câu.
+// OMNI 3 (05/10): OMNI bật cho lớp của chiến dịch ⇒ "Mở ca chốt" lấy câu từ `/gv/omni ca-chot` (ca chốt 50/50) thay danh sách cũ, gói ghi `omni: true`
+// để màn Mở ca mở xong gọi `gan-ca-chot`. Màn cha (`LenBangChienDich`) đọc sẵn và truyền `caChotOmni` (nút vẫn bấm một chạm như cũ; màn này không tự gọi
+// lệnh nào khi mở); vắng ⇒ đúng danh sách cũ.
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { thoiGianCau } from '../../lib/thoi-gian-len-bang'
 import { KHOA_CA_CHOT, type GoiCaChot } from '../../lib/ca-chot-chien-dich'
 import HopXacNhan from '../HopXacNhan'
 import { chuaXong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
+import type { GoiCaChotOmni } from './api-omni'
 import type { BangKetQua } from './ghi-to-chieu'
 import HopChon from './HopChon'
 import { congNgay, hienHanNop, hienNgay } from './ngay'
@@ -48,6 +52,7 @@ export default function BuoiChua({
   onChieu,
   onDoiCoMat,
   onDaChua,
+  caChotOmni = null,
 }: {
   du: BuoiChuaMayChu
   /** Mọi em của chiến dịch (để chọn em có mặt). */
@@ -63,6 +68,8 @@ export default function BuoiChua({
   onChieu: (ds: OChieu[], tenBuoi: string) => Promise<boolean>
   onDoiCoMat: (sbd: string[]) => void
   onDaChua: () => void
+  /** OMNI 3: câu ca chốt 50/50 từ `/gv/omni ca-chot` (màn cha đọc sẵn). Vắng ⇒ "Mở ca chốt" dùng danh sách cũ. */
+  caChotOmni?: GoiCaChotOmni | null
 }) {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
@@ -71,6 +78,8 @@ export default function BuoiChua({
   const [daChua, setDaChua] = useState<{ soLuot: number; ngayOnLai: string } | null>(null)
   const [moCoMat, setMoCoMat] = useState(false)
   const [chonCoMat, setChonCoMat] = useState<Set<string>>(new Set())
+  // OMNI 3: gói ca chốt 50/50 (màn cha đọc sẵn khi OMNI áp cho lớp của chiến dịch). null ⇒ danh sách cũ.
+  const goiOmni = caChotOmni
 
   const emCoMat = useMemo(() => (coMat.length ? dsEm.filter((e) => coMat.includes(e.sbd)) : dsEm), [dsEm, coMat])
   const kq = useMemo(
@@ -125,13 +134,14 @@ export default function BuoiChua({
     onDaChua()
   }
 
+  const qidsCaChot = goiOmni?.qids ?? caChot
   const moCaChot = () => {
     // Màn Mở ca kiểm tra đọc gói này MỘT LẦN khi mở (tích sẵn tờ + câu, hiện dòng "Đang mở ca chốt…") rồi xoá.
-    const goi: GoiCaChot = { chienDichId: du.chienDich.id, ten: du.chienDich.ten, lop: du.chienDich.lop, qids: caChot }
+    const goi: GoiCaChot = { chienDichId: du.chienDich.id, ten: du.chienDich.ten, lop: du.chienDich.lop, qids: qidsCaChot, ...(goiOmni ? { omni: true } : {}) }
     try {
       sessionStorage.setItem(KHOA_CA_CHOT, JSON.stringify(goi))
     } catch {
-      showToast(`Máy chặn bộ nhớ phiên: thầy tự chọn ${caChot.length} câu của chiến dịch ${du.chienDich.ten} ở màn Mở ca`, 'warn')
+      showToast(`Máy chặn bộ nhớ phiên: thầy tự chọn ${qidsCaChot.length} câu của chiến dịch ${du.chienDich.ten} ở màn Mở ca`, 'warn')
     }
     setScreen('examsetup')
   }
@@ -161,8 +171,14 @@ export default function BuoiChua({
           </p>
         </div>
         <div className="cd-hang-nut">
-          <button type="button" className="m3-nut-vien cd-nut-nho" disabled={caChot.length === 0} onClick={moCaChot}>
-            Mở ca chốt · {caChot.length} câu
+          <button
+            type="button"
+            className="m3-nut-vien cd-nut-nho"
+            disabled={qidsCaChot.length === 0}
+            onClick={moCaChot}
+            title={goiOmni ? `Ca chốt 50/50: ${goiOmni.soCu} câu của bài + ${goiOmni.soLa} câu chưa gặp cùng dạng (thư mục TU LUYỆN)` : undefined}
+          >
+            Mở ca chốt · {qidsCaChot.length} câu
           </button>
           <button type="button" className="m3-nut-vien cd-nut-nho" disabled={!!daChua || kq.dong.length === 0} onClick={() => setHoiChua(true)}>
             {daChua ? 'Đã chữa xong' : 'Chữa xong'}

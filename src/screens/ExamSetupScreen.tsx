@@ -44,6 +44,7 @@ import TamPhuChieuMa, { gopEmDaVao } from '../components/TamPhuChieuMa'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
+import { ganCaChot } from '../components/chien-dich/api-omni'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
@@ -391,6 +392,8 @@ export default function ExamSetupScreen() {
         showToast(`Ca #${maCa} đã lưu trên máy chủ; chưa lưu được bản sao trên máy này.`, 'error')
       })
       setOpened({ maCa, joinLink: taoLinkMoiTrucTiep(maCa, diaChi), batDau: moc.batDau, hetHanVao: moc.hetHanVao })
+      // OMNI 3 (05/10): ca mở từ gói ca chốt 50/50 ⇒ báo máy chủ gắn mã ca vào chiến dịch (chấm điều kiện T của chứng chỉ). Lỗi bỏ qua — ca đã mở.
+      if (caChot?.omni && caChot.chienDichId) void ganCaChot(caChot.chienDichId, maCa)
       setDaCopy(false)
       showToast('Đã mở ca', 'success')
     } catch (e) {
@@ -832,6 +835,7 @@ export default function ExamSetupScreen() {
                 nhomLoc={nhomLoc}
                 chonNhieu
                 onChonTatCa={(ma) => setSelectedMaDe(new Set(ma))}
+                theoMucDich
               />
             </div>
 
