@@ -323,3 +323,9 @@
 :root[data-giao-dien='sang'] .dh2 .dh2-tran .dh-don button small{color:rgb(62,72,108)}
 :root[data-giao-dien='sang'] .dh2 .dh2-tran .dh-don button[aria-pressed=true] small{color:rgb(90,48,0)}
 :root[data-giao-dien='sang'] .dh2 .dh2-tran .dh2-cot-trai+.dh2-cot-phai>.dh-giay:first-child{box-shadow:0 14px 30px rgba(70,40,120,.18)}
+/* OMNI 3 · CẨN THẬN (c) (06/10): thẻ "Em biết câu này. Sai vì bước nào?" trong thẻ câu — CHỈ bố cục; nút dùng lại lớp chip `dh-xin`, chữ kế thừa màu thẻ. */
+.dh2 .dh-buoc-sai{display:flex;flex-direction:column;gap:8px;margin-top:10px;color:inherit}
+.dh2 .dh-buoc-sai b{font-size:14px}
+.dh2 .dh-buoc-sai-nut{display:flex;flex-wrap:wrap;gap:8px}
+.dh2 .dh-buoc-sai-nut .dh-xin{align-self:auto;height:auto;padding:8px 14px;line-height:1.3;text-align:center}
+.dh2 .dh-buoc-sai small{font-size:12px;opacity:.85}

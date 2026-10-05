@@ -18,8 +18,9 @@ import DoanTiepSuc from './DoanTiepSuc'
 import { ManHinhAnh } from '../../components/QuestionMedia'
 import { unlockBattleAudio } from './battle-audio'
 import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
-import { coOmniTrongSanh, docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
+import { canThanTrongSanh, coOmniTrongSanh, docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
 import { docKetQuaOmni, lanDauChamChip, thanOmniTraLoi } from '../../lib/omni-hs'
+import { omniBuocSai } from '../../components/hoa2/api'
 import KetChang2 from './doan2/KetChang2'
 import './doan.css'
 import './doan2/doan2.css'
@@ -56,6 +57,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   // OMNI 3 (05/10): `hoa2-sanh` có `omni` ⇒ `doan-nop` thêm `msLam` (từ lúc câu hiện tới lúc chốt) + `tuTin` khi chip "Chưa chắc" bật. Tắt ⇒ y hệt cũ.
   // Trạm hồi phục KHÔNG mở trong Đoàn nhiều người (hợp đồng mục A).
   const [omniBat, setOmniBat] = useState(false), [chuaChac, setChuaChac] = useState(false), [goiYChip, setGoiYChip] = useState(false), mocCau = useRef(0)
+  // CẨN THẬN (đặc tả 4.6): `hoa2-sanh` báo `omni.canThan` (Sơ ý > 7%) ⇒ chip "Soát lại đơn vị và số liệu" ở câu Phần III + thẻ "Sai vì bước nào?" sau lượt chắc-mà-sai. Vắng ⇒ y hệt hôm nay.
+  const [canThan, setCanThan] = useState(false), [soatLai, setSoatLai] = useState(false)
   const [ketQuaCau, setKetQuaCau] = useState<KetQuaCau | null>(null), [cauVuaLam, setCauVuaLam] = useState<CauVuaLam | null>(null)
   const [tungChuong, setTungChuong] = useState<KhungNhinHiep | null>(null), [loiGiaiTrum, setLoiGiaiTrum] = useState<LoiGiaiTrum | null>(null)
   const [goiYThe, setGoiYTiepSuc] = useState<GoiYTiepSuc | null>(null), [expTiepSuc, setExpTiepSuc] = useState(0)
@@ -82,14 +85,14 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (d.cau?.qid && goiYNay) goiYCau.current.set(d.cau.qid, goiYNay)
     moc.current = { luc: performance.now(), conMs: d.tran?.conMs ?? 0, moSauMs: d.tran?.moSauMs ?? 0 }
     const hiep = d.tran?.hiep ?? 0
-    if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0); setChuaChac(false); setGoiYChip(false) }
+    if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0); setChuaChac(false); setGoiYChip(false); setSoatLai(false) }
     const vua = d.hiepVuaXong
     if (vua && vua.hiep > hiepDaChieu.current) { hiepDaChieu.current = vua.hiep; setTungChuong(vua); setLoiGiaiTrum(null) }
     setXem(d)
   }, [sbd])
 
   // Đọc `hoa2-sanh` KHÔNG qua `goi` (không khoá nút, không hiện lỗi): lỗi / máy chủ cũ ⇒ giữ nguyên chế độ đang có.
-  const docLaiHoa2 = useCallback(() => call('hoa2-sanh').then(r => { const h = docHoa2(r); if (song.current) { datHoa2(h); setOmniBat(h !== null && coOmniTrongSanh(r)) } return h }).catch(() => undefined), [call, datHoa2])
+  const docLaiHoa2 = useCallback(() => call('hoa2-sanh').then(r => { const h = docHoa2(r); if (song.current) { datHoa2(h); setOmniBat(h !== null && coOmniTrongSanh(r)); setCanThan(h !== null && canThanTrongSanh(r)) } return h }).catch(() => undefined), [call, datHoa2])
 
   const goi = useCallback(async (lenh: string, data: Record<string, unknown> = {}) => {
     if (khoa.current) return null
@@ -172,7 +175,10 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (!r) return
     // OMNI 3: lời nhắn một dòng của máy chủ (đúng nhưng chậm, lướt…) đi kèm kết quả câu — đọc ở `omni` của phản hồi hoặc của `ketQuaCau`.
     const om = omniBat ? docKetQuaOmni((r as { omni?: unknown }).omni ?? (r.ketQuaCau as { omni?: unknown } | undefined)?.omni) : null
-    const kq = r.ketQuaCau ? (om?.loiNhan ? { ...r.ketQuaCau, loiNhan: om.loiNhan } : r.ketQuaCau) : null
+    // CẨN THẬN (c): thẻ "Sai vì bước nào?" đi CÙNG kết quả câu (sống/chết theo `ketQuaCau` / `cauVuaLam`); docKetQuaOmni chỉ trả `buocSai` khi máy chủ báo canThan ∧ chắc-mà-sai.
+    const qidCau = xem.cau?.qid ?? deHienTai?.qid
+    const them = { ...(om?.loiNhan ? { loiNhan: om.loiNhan } : {}), ...(om?.buocSai && qidCau ? { buocSai: { qid: qidCau, lua: om.buocSai.lua } } : {}) }
+    const kq = r.ketQuaCau ? (Object.keys(them).length ? { ...r.ketQuaCau, ...them } : r.ketQuaCau) : null
     // Đi một mình thì chốt xong hiệp giải NGAY và máy chủ đã sang hiệp mới: kết quả này thuộc hiệp cũ, chỉ hiện ở quãng nghỉ (cauVuaLam).
     if (r.doan?.tran?.hiep === tran.hiep) setKetQuaCau(kq)
     if (kq?.reward) setExpNhan(n => n + (kq.reward ?? 0))
@@ -237,6 +243,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
       onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum}
       cheDo2={laHoa2} goiY={xem.cau?.qid ? goiYCau.current.get(xem.cau.qid) ?? null : null} oPhucKich={hoa2?.doanCon ?? null}
       {...(omniBat ? { chuaChac, goiYChip, onChuaChac: (v: boolean) => { setChuaChac(v); if (lanDauChamChip(sbd)) setGoiYChip(true) } } : {})}
+      {...(omniBat && canThan ? { soatLai, onSoatLai: setSoatLai } : {})}
+      {...(omniBat ? { onBuocSai: async (qid: string, ma: string) => { await omniBuocSai(call, qid, ma) } } : {})}
       onDanhTiep={danhTiep} nhanTiep={giuCuoi ? 'XEM KẾT QUẢ CHUYẾN' : undefined} />
   )
 

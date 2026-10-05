@@ -15,7 +15,7 @@ import Canh2 from './doan2/Canh2'
 import BuaTroGiang from './doan2/BuaTroGiang'
 import XemLaiChuan from './doan2/XemLaiChuan'
 import type { GoiYM3 } from './doan2/kieu2'
-import { CHIP_CHUA_CHAC, GOI_Y_CHIP_CHUA_CHAC } from '../../lib/omni-chu'
+import { CHIP_CHUA_CHAC, CHU_SOAT_LAI, GOI_Y_CHIP_CHUA_CHAC, GOI_Y_SOAT_LAI } from '../../lib/omni-chu'
 
 export interface CauVuaLam { q: Question; chon: string; ketQua: KetQuaCau | null; /** Chỉ-thêm: hiệp của câu (để biết câu này đã là "câu vừa rồi" chưa). */ hiep?: number }
 export interface LoiGiaiTrum { hiep: number; de: Question; answer: string; solution: unknown }
@@ -34,6 +34,8 @@ interface Props {
   onDanhTiep?: () => void; nhanTiep?: string
   /** OMNI 3 (chỉ-thêm; vắng ⇒ không chip, DOM như cũ): chip "Chưa chắc" (nút phụ cùng kiểu "Cần tiếp sức") — bật ⇒ `doan-nop` gửi `tuTin:'chua_chac'`. */
   chuaChac?: boolean; onChuaChac?: (v: boolean) => void; /** Lần đầu trong ngày em chạm chip ⇒ một dòng gợi ý nhỏ. */ goiYChip?: boolean
+  /** CẨN THẬN (b)(c) (chỉ-thêm; vắng ⇒ không chip, không thẻ, DOM như cũ — CHỈ truyền cho em `canThan`): chip "Soát lại đơn vị và số liệu" ở câu Phần III (không bắt buộc) + ghi lựa chọn thẻ "Sai vì bước nào?". */
+  soatLai?: boolean; onSoatLai?: (v: boolean) => void; onBuocSai?: (qid: string, ma: string) => Promise<void>
 }
 
 const phut = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -149,14 +151,14 @@ export default function DoanTran(p: Props) {
       </section>
     ) : p.cauVuaLam ? (
       <DoanCau q={p.cauVuaLam.q} chon={p.cauVuaLam.chon} onChon={() => {}} khoa ketQua={p.cauVuaLam.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">{v2 ? 'CÂU ÔN EM VỪA LÀM' : 'CÂU EM VỪA LÀM'}</b><span>đọc lại trước khi sang hiệp mới</span></>}
-        xemLaiChuan={v2 ? { stt: p.cauVuaLam.hiep ?? Math.max(1, tran.hiep - 1) } : undefined} />
+        xemLaiChuan={v2 ? { stt: p.cauVuaLam.hiep ?? Math.max(1, tran.hiep - 1) } : undefined} onBuocSai={p.onBuocSai} />
     ) : (
       <section className="dh-giay"><div className="dh-de">{tran.hiep === 1 ? 'Cả đội vào vị trí. Mỗi bạn sẽ nhận MỘT câu của riêng mình — làm đúng thì ra đòn, làm sai thì thần thú tự chắn cho Linh Tâm.' : 'Hiệp mới sắp mở.'}</div></section>
     )
   } else if (coXemLai && xemLai) {
     than = (
       <DoanCau q={cauTruoc!.q} chon={cauTruoc!.chon} onChon={() => {}} khoa ketQua={cauTruoc!.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">CÂU ÔN EM VỪA LÀM</b><span>đồng hồ hiệp này vẫn chạy</span></>}
-        xemLaiChuan={{ stt: cauTruoc!.hiep! }} />
+        xemLaiChuan={{ stt: cauTruoc!.hiep! }} onBuocSai={p.onBuocSai} />
     )
   } else if (tran.laTrum) {
     const trum = xem.trum
@@ -201,13 +203,15 @@ export default function DoanTran(p: Props) {
     ) : (
       <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={!!p.dangChot || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
         dau={<><b className="dh-vien-thuoc">{nhanThe}</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span>{v2 && cau?.nhanNo ? <small className="dh-nhan-no" data-khoi="nhan-no">{cau.nhanNo}</small> : null}</>}
-        gach={gach} bua={bua} xemLaiChuan={v2 ? { stt: tran.hiep } : undefined}
-        cuoi={p.onChuaChac && mo && !tran.laTrum && !cau?.daChot && !cau?.rut ? (
+        gach={gach} bua={bua} xemLaiChuan={v2 ? { stt: tran.hiep } : undefined} onBuocSai={p.onBuocSai}
+        cuoi={(p.onChuaChac || p.onSoatLai) && mo && !tran.laTrum && !cau?.daChot && !cau?.rut ? (
           // OMNI 3 · chip "Chưa chắc" TRONG thẻ câu, dưới phương án cuối (05/10): đặt thành hàng riêng dưới thẻ thì màn Đoàn (vừa khít máy)
           // phải ép thẻ câu ngắn lại, phương án C/D bị che — thầy: "app của học sinh giữ nguyên mọi thứ giao diện".
           <>
-            <button type="button" className="dh-xin" data-vung="chua-chac" aria-pressed={!!p.chuaChac} title={GOI_Y_CHIP_CHUA_CHAC} style={{ minHeight: 44 }} onClick={() => p.onChuaChac!(!p.chuaChac)}>{CHIP_CHUA_CHAC}</button>
-            {p.goiYChip && <div className="dh-cho" data-vung="goi-y-chua-chac" style={{ fontSize: 12 }}>{GOI_Y_CHIP_CHUA_CHAC}</div>}
+            {p.onChuaChac && <button type="button" className="dh-xin" data-vung="chua-chac" aria-pressed={!!p.chuaChac} title={GOI_Y_CHIP_CHUA_CHAC} style={{ minHeight: 44 }} onClick={() => p.onChuaChac!(!p.chuaChac)}>{CHIP_CHUA_CHAC}</button>}
+            {/* CẨN THẬN (b): cùng kiểu chip "Chưa chắc", chỉ câu Phần III, không bắt buộc (không chặn nút chốt, không gửi gì) */}
+            {p.onSoatLai && p.de?.phan === 'III' && <button type="button" className="dh-xin" data-vung="soat-lai" aria-pressed={!!p.soatLai} title={GOI_Y_SOAT_LAI} style={{ minHeight: 44 }} onClick={() => p.onSoatLai!(!p.soatLai)}>{CHU_SOAT_LAI}</button>}
+            {p.goiYChip && p.onChuaChac && <div className="dh-cho" data-vung="goi-y-chua-chac" style={{ fontSize: 12 }}>{GOI_Y_CHIP_CHUA_CHAC}</div>}
           </>
         ) : undefined} />
     )

@@ -2,7 +2,7 @@ import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
-import { chuoiNgaySanh, doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
+import { canThanTuSanh, chuoiNgaySanh, doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
 import { PETS } from '../game/than-thu-v2/core'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
@@ -913,6 +913,8 @@ export default function StudentPortalScreen() {
   // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
   const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
+  // CẨN THẬN (đặc tả 4.6): `hoa2-sanh` báo `omni.canThan` (OMNI bật ∧ Sơ ý > 7%) ⇒ câu ôn Phần III có ô "Soát lại đơn vị và số liệu". Vắng ⇒ y hệt hôm nay.
+  const canThanSanh = canThanTuSanh(hoa2.ketQua)
   // MÁY YẾU (30/09, số đo docs/do-toi-uu-app-hs-3009.md): màn toàn màn hình (game, Câu đã làm, Tu luyện…) che kín Sảnh nhưng ~55 hoạt ảnh
   // SVG của cảnh Sảnh vẫn chạy ở LUỒNG CHÍNH mỗi khung (tính kiểu + vẽ lại phần bị che). Gắn lớp `sanh-bi-che` lên <html> ⇒ may-yeu.css TẠM
   // DỪNG các hoạt ảnh ấy (animation-play-state) — không gỡ Sảnh, không đổi trạng thái/chữ; đóng màn là chạy tiếp đúng chỗ cũ.
@@ -2052,7 +2054,7 @@ export default function StudentPortalScreen() {
         {/* ÔN CÂU HÔM NAY (việc on_lai): lấy đề → làm → nộp → lời giải. Đóng sheet thì màn cổng hỏi lại kế hoạch ngày. */}
         {tab === 'cauon' && cauOn && auth && auth.token && (
           <Suspense fallback={<div className="m3-xuong" style={{ height: 160 }} />}>
-            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} cauSan={cauOn.cauSan} duongNop={cauOn.duongNop} onXong={() => setTab(null)} xepHang={(m) => hangNop.them({ id: m.id, loai: 'on_cau', sbd: auth.sbd, goi: m.goi })} />
+            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} cauSan={cauOn.cauSan} duongNop={cauOn.duongNop} onXong={() => setTab(null)} xepHang={(m) => hangNop.them({ id: m.id, loai: 'on_cau', sbd: auth.sbd, goi: m.goi })} {...(canThanSanh ? { canThan: true } : {})} />
           </Suspense>
         )}
 
