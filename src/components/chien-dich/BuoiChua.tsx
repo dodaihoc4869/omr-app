@@ -9,7 +9,7 @@ import { useAppStore } from '../../store/appStore'
 import { thoiGianCau } from '../../lib/thoi-gian-len-bang'
 import { KHOA_CA_CHOT, type GoiCaChot } from '../../lib/ca-chot-chien-dich'
 import HopXacNhan from '../HopXacNhan'
-import { chuaXong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
+import { chuaXong, qidCuaDong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
 import type { BangKetQua } from './ghi-to-chieu'
 import HopChon from './HopChon'
 import { congNgay, hienHanNop, hienNgay } from './ngay'
@@ -113,7 +113,7 @@ export default function BuoiChua({
 
   const chua = async () => {
     setDangChua(true)
-    const r = await chuaXong(du.chienDich.id, kq.dong.map((d) => d.cau.qid))
+    const r = await chuaXong(du.chienDich.id, kq.dong.flatMap((d) => qidCuaDong(d.cau)))
     setDangChua(false)
     setHoiChua(false)
     if (!r.ok) {
