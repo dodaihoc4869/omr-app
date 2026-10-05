@@ -33,7 +33,7 @@ function giaLap(o: { kho?: Record<string, unknown>; dang2?: Record<string, unkno
       ok: true, cacCa: [], soCauSai: 0, danhMuc: DM, dangThi: false,
       khoCauSai: o.kho ?? { tong: 0, tuCa: 0, tuChienDich: 0, tuLuyenDe: 0, tuTuLuyen: 0, loi: 'Em chưa sai câu nào từ 29/09.', tongTuMoc: 0, daKhacPhuc: 0 },
       dangCauSai: o.dang2 ?? { kieu: 'yeu', nhan: 'Theo dạng em còn yếu' },
-      tuDo: { kieu: 'toan_kho', nhan: 'Toàn kho lớp 12 trở xuống' },
+      tuDo: { kieu: 'toan_kho', nhan: 'Toàn kho lớp 12' },
       dangNenLuyen: { ma: 'ES.A.X', ten: 'Ester đơn chức' },
     })
     if (u === '/hs/tu-luyen/tong-hop') return ok(o.tongHop ?? { ok: true, luot: [], cau: [], luyenDe: [], khacPhuc: null })
@@ -55,7 +55,7 @@ describe('Không còn khoá vì kho câu sai trống', () => {
     expect(screen.queryByText('Đang khoá')).toBeNull()
     for (const r of screen.getAllByRole('radio').filter((x) => x.classList.contains('tlu-the-che-do'))) expect((r as HTMLButtonElement).disabled).toBe(false)
     expect(screen.getByText('Theo dạng em còn yếu')).toBeTruthy()
-    expect(screen.getByText('Toàn kho lớp 12 trở xuống')).toBeTruthy()
+    expect(screen.getByText('Toàn kho lớp 12')).toBeTruthy()
     fireEvent.click(the1)
     expect(screen.getByText('Em chưa sai câu nào từ 29/09!')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Luyện dạng Ester đơn chức' }))

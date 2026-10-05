@@ -21,8 +21,10 @@
 //   · mã tờ `maDe`/`ma_de`/`maTo` (`DH-12-C2-B6-TN`, `DB-12-B8-D1`, `DH-11-III-1` ⇒ đoạn 2; `12-C1-B2-D1`, `10-C1-B1` ⇒ đoạn đầu);
 //   · mã câu `qid`/`id` (bắt đầu bằng mã tờ: `DH-12-C1-B2-I-49`; câu song sinh `…~ss0` theo câu gốc);
 //   · cột `lop`/`khoi`/`lopTo`/`lop_to` (`de_kho.lop`, `cau_hoi.lop`) và `nhom` ("12 · DẠY HỌC/…");
-//   · CHƯƠNG: mã dạng `dang`/`ma_dang`/`maDang` (đoạn đầu là mã chương của từ vựng đóng, "CAN_BANG.DIEN_LI.NHAN_DANG" ⇒ 11; "CD:<chuyên đề>"),
-//     hoặc tên chương `chuong`/`tenChuong`/`chuyenDe`/`chuyen_de` (khớp ĐÚNG tên chương — không đoán chữ tự do như "Este", "Amin").
+//   · CHƯƠNG — CHỈ DÙNG KHI CÁC NGUỒN TRÊN KHÔNG ĐỌC RA KHỐI: mã dạng `dang`/`ma_dang`/`maDang` (đoạn đầu là mã chương của từ vựng đóng,
+//     "CAN_BANG.DIEN_LI.NHAN_DANG" ⇒ 11; "CD:<chuyên đề>"), hoặc tên chương `chuong`/`tenChuong`/`chuyenDe`/`chuyen_de` (khớp ĐÚNG tên chương —
+//     không đoán chữ tự do như "Este", "Amin"). Lý do (điều phối 05/10): thầy chặn theo KHO ("rút nhầm kho khác khối") = khối của TỜ chứa câu;
+//     đề ôn thi khối 12 có câu kiến thức lớp 10/11 (mã dạng chương lớp 10/11) vẫn là câu của kho khối 12 — không được coi là mâu thuẫn mà chặn.
 //   Không nguồn nào đọc ra ⇒ KHÔNG RÕ; hai nguồn ra hai khối khác nhau ⇒ MÂU THUẪN (khối = null). Cả hai đều bị chặn ở kênh tự động.
 // KHỐI CỦA EM = `hoc_sinh.lop` ('12A1', '11', "12 - Tinh Hoa") và/hoặc tên lớp; hai nguồn KHÁC nhau ⇒ không rõ (null) — không đoán.
 
@@ -124,7 +126,8 @@ export function phanTichKhoiCau(c: unknown): PhanTichKhoi {
   for (const x of ['maDe', 'ma_de', 'maTo', 'ma_to']) for (const k of cacKhoiCuaMa(c[x])) s.add(k)
   for (const k of cacKhoiCuaMa(maGoc(chuoi(c.qid) || c.id))) s.add(k) // `id` chỉ đọc khi không có `qid` (như luật cũ — `id` có thể là mã khác)
   for (const x of ['lop', 'khoi', 'lopTo', 'lop_to', 'nhom']) them(khoiCuaLop(c[x]))
-  for (const x of ['dang', 'ma_dang', 'maDang', 'chuong', 'tenChuong', 'chuyenDe', 'chuyen_de']) them(khoiCuaChuong(c[x]))
+  // Chương chỉ CỨU câu mà mã tờ / mã câu / cột lớp / nhóm không nói khối (vd. tờ "100"); không dùng để kết tội mâu thuẫn (đề ôn khối 12 có câu lớp 10/11).
+  if (s.size === 0) for (const x of ['dang', 'ma_dang', 'maDang', 'chuong', 'tenChuong', 'chuyenDe', 'chuyen_de']) them(khoiCuaChuong(c[x]))
   return ketLuan(s)
 }
 
