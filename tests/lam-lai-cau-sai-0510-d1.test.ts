@@ -14,6 +14,7 @@ import { docHoSo2, docLanLam, xoaDemChienDich } from '../server/src/srs2-d1'
 import { DEM_NGUOC_MS } from '../server/src/game-v2-doan'
 import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
+import { damBaoBangNutThat } from '../server/src/nut-that'
 import { phatLaiLoi } from '../server/src/loi-hoc-luat'
 import { sqlQidHoacTc } from '../server/src/lam-lai-so'
 import { SQL_LA_LAN_LAM } from '../server/src/omni-kieu'
@@ -454,5 +455,38 @@ describe('sổ "thay cho" (tc) đọc theo chỉ mục — không quét mọi d�
       expect(tim[0]).toMatch(/USING (COVERING )?INDEX idx_skh_em_qid\w* \(sbd=\? AND qid=\?\)/)
       expect(tim[1]).toMatch(/USING INDEX idx_skh_em_tc \(sbd=\? AND <expr>=\?\)/)
     }
+  })
+})
+
+describe('tiêu chí 3 · Bàn gỡ nút thắt của thầy: em sửa bằng câu anh em ⇒ thẻ rời bàn; sai câu anh em sau lời gỡ ⇒ kèm riêng', () => {
+  async function dungThe(trangThai: 'cho' | 'da_go') {
+    const r = dung(KHO2, ['Q2'])
+    await damBaoBangLoiGiai(r.env); await damBaoBangBoTro(r.env); await damBaoBangNutThat(r.env)
+    r.d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES('Q2','BAMQ2',?,'ds','x')").run(TO11)
+    r.d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,song_sinh_json,cau_kiem_json,nhan_nen_json,buoc_json,cap_nhat_luc) VALUES('BAMQ2','Q2','[]','[]','[]','[\"Bước 1\"]','x')").run()
+    if (trangThai === 'da_go') r.d.sql.prepare("INSERT INTO loi_go(id,bam,buoc,kieu,noi_dung,luc) VALUES('G1','BAMQ2',0,'ngan','Gỡ','2026-10-06T00:00:00.000Z')").run()
+    r.d.sql.prepare('INSERT INTO nut_that(id,sbd,qid,bam,buoc,viet,bang_chung_json,gui_luc,ngay_vn,trang_thai,go_id,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)')
+      .run('T1', 'S1', 'Q2', 'BAMQ2', 0, '', '{}', '2026-10-05T12:00:00.000Z', '2026-10-05', trangThai, trangThai === 'da_go' ? 'G1' : null, '2026-10-05T12:00:00.000Z')
+    ghi(r.d, 'Q2', 0, luc('2026-10-05', '10:00'))
+    return r
+  }
+  const ghiTc = (d: D1That, qid: string, kq: 0 | 1, ms: number) => d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn,assistance,raw_json) VALUES(?,?,?,?,?,1,?,?,?,?,?)')
+    .run(`game|S1|${qid}|${ms}`, 'S1', qid, 'game', `P-${ms}`, kq, new Date(ms).toISOString(), ngayVnCua(ms), 'none', JSON.stringify({ chon: 'DSDS', tc: 'Q2' }))
+  it('A2 đúng 06/10 + A2V đúng 08/10 (thay cho Q2) ⇒ lỗi Q2 đóng ⇒ thẻ "xong", thầy không phải chữa', async () => {
+    const { d, env } = await dungThe('cho')
+    ghiTc(d, 'A2', 1, luc('2026-10-06'))
+    ghiTc(d, 'A2V', 1, luc('2026-10-08'))
+    vi.setSystemTime(luc('2026-10-08', '12:00'))
+    const r = await thay(env, '/gv/nut-that/ds', {})
+    expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
+    expect((d.sql.prepare("SELECT trang_thai FROM nut_that WHERE id = 'T1'").get() as { trang_thai: string }).trang_thai).toBe('xong')
+  })
+  it('sau lời gỡ em sai câu anh em 2 lần (thay cho Q2) ⇒ thẻ "kèm riêng"', async () => {
+    const { d, env } = await dungThe('da_go')
+    ghiTc(d, 'A2', 0, luc('2026-10-06'))
+    ghiTc(d, 'A2V', 0, luc('2026-10-07'))
+    vi.setSystemTime(luc('2026-10-07', '12:00'))
+    await thay(env, '/gv/nut-that/ds', {})
+    expect((d.sql.prepare("SELECT trang_thai FROM nut_that WHERE id = 'T1'").get() as { trang_thai: string }).trang_thai).toBe('kem_rieng')
   })
 })
