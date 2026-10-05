@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
-import { conThieu, dinhDangTien, docSoTien, hocPhiCuaEm, MUC_HOC_PHI_CHUAN, tongHocPhi, trangThaiHocPhi, type HocPhiEm } from '../src/lib/hoc-phi'
+import { conThieu, dinhDangTien, ghiChuHien, docSoTien, hocPhiCuaEm, MUC_HOC_PHI_CHUAN, tongHocPhi, trangThaiHocPhi, type HocPhiEm } from '../src/lib/hoc-phi'
 
 describe('lõi học phí', () => {
   it('trạng thái 4 màu', () => {
@@ -41,6 +41,11 @@ describe('lõi học phí', () => {
     expect(docSoTien('2 triệu')).toBe(2_000_000)
     expect(docSoTien('3000000vnđ')).toBe(3_000_000)
     for (const sai of ['', 'abc', '0', '-500', '500.5', '1.50.000', '12,3']) expect(docSoTien(sai)).toBeNull()
+  })
+  it('ghi chú hiện bỏ thẻ nguồn máy', () => {
+    expect(ghiChuHien('File Excel ghi "đã đóng đủ" với 2.250.000 đ [excel:DS_2026_1b]')).toBe('File Excel ghi "đã đóng đủ" với 2.250.000 đ')
+    expect(ghiChuHien('[excel:DS_2026_1]')).toBe('')
+    expect(ghiChuHien('giảm 50%')).toBe('giảm 50%')
   })
   it('định dạng tiền', () => {
     expect(dinhDangTien(4_500_000)).toBe('4.500.000 đ')
@@ -135,5 +140,16 @@ describe('máy chủ học phí (D1 thật)', () => {
     expect(ds.get('10002')).toMatchObject({ phaiNop: 2_250_000, daNop: 2_250_000 })
     expect(ds.get('10003')).toMatchObject({ phaiNop: 0, daNop: 0 })
     expect(tongHocPhi(['10001', '10002', '10003'], ds)).toMatchObject({ phaiNop: 6_750_000, daNop: 6_750_000, conThieu: 0 })
+  })
+})
+
+describe('màn Học sinh: hàng lọc Học phí (thầy 05/10)', () => {
+  it('có hàng "Học phí" cạnh Khối/Lớp với Tất cả · Còn thiếu · Chưa nộp, dùng chung trạng thái lọc', async () => {
+    const { readFileSync } = await import('node:fs')
+    const src = readFileSync('src/screens/HocSinhScreen.tsx', 'utf8')
+    const khoi = src.slice(src.indexOf('data-khoi="loc-hoc-phi"'), src.indexOf('data-khoi="loc-hoc-phi"') + 900)
+    expect(khoi).toContain("[null, 'con_thieu', 'chua_nop']")
+    expect(khoi).toContain('setLocHocPhi(t)')
+    expect(src).toContain('trangThaiHocPhi(hp.phaiNop, hp.daNop) === locHocPhi')
   })
 })
