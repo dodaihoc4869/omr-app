@@ -5,8 +5,13 @@
 // bộ giải ĐỘC LẬP đọc lại chính chữ đề (tự phân tích công thức, tự tính khối lượng mol, tự cân bằng) — không gọi lại hàm ở đây.
 // Số liệu chuẩn: nguyên tử khối SGK H 1 · C 12 · N 14 · O 16 · Na 23 · Mg 24 · Al 27 · S 32 · Cl 35,5 · K 39 · Ca 40 · Fe 56 · Cu 64 · Zn 65 · Ag 108 ·
 // Ba 137; thể tích mol khí ở điều kiện chuẩn (25 °C, 1 bar) 24,79 L/mol (chương trình 2018); F = 96 500 C/mol; E° theo SGK.
+// 26 nhãn: 20 nhãn đầu + 6 bước tính toán thêm 05/10 (bảo toàn electron, lập hệ phương trình, công thức phân tử, hằng số cân bằng, biến thiên enthalpy,
+// năng lượng liên kết). Với 3 nhãn nhiệt / cân bằng: ΔfH°298, Eb, nồng độ (số mol) lúc cân bằng LUÔN IN TRONG ĐỀ (SGK các bộ lệch nhau) — không dùng
+// hằng số ẩn; đề ghi rõ "ΔfH°298 của đơn chất bền bằng 0". Bảo toàn electron: sản phẩm khử duy nhất, axit dư (Fe ⇒ Fe³⁺). Trắc nghiệm công thức phân tử:
+// cả 4 phương án là công thức hợp lệ (H chẵn, độ bất bão hoà nguyên ≥ 0), đúng một phương án khớp dữ kiện.
 // Mã câu: `sinh.<nhãn>.<số>` — khớp /^[\w.-]{1,80}$/ của `locCauNen`; sổ ghi qid `nen:<id>`. Câu thầy nạp = id KHÔNG bắt đầu bằng "sinh." — không đụng tới.
-// Đáp án số viết dấu phẩy thập phân như app đang chấm (`chamCauNen`/`docSo` của thang-tu-go.ts); `gia_tri_dung` là số chuẩn dấu chấm.
+// Đáp án số viết dấu phẩy thập phân như app đang chấm (`chamCauNen`/`docSo` của thang-tu-go.ts); `gia_tri_dung` là số chuẩn dấu chấm. ΔrH°298 / ΔfH°298
+// có thể ÂM: `dap_an` viết "-1366,8" (dấu "-" như ô nhập của app), chữ đề / lời giải viết "−"; docSo đọc cả "-", "−", "–".
 import type { D1PreparedStatement, Env } from './kieu'
 import { damBaoBangCauNen } from './thang-tu-go'
 
@@ -61,7 +66,7 @@ type ThanhPhan = Readonly<Record<string, number>>
 const CHAT: Readonly<Record<string, ThanhPhan>> = {
   'H₂': { H: 2 }, 'O₂': { O: 2 }, 'N₂': { N: 2 }, 'Cl₂': { Cl: 2 },
   'Fe': { Fe: 1 }, 'Cu': { Cu: 1 }, 'Al': { Al: 1 }, 'Mg': { Mg: 1 }, 'Zn': { Zn: 1 }, 'Ag': { Ag: 1 }, 'Na': { Na: 1 }, 'Ca': { Ca: 1 },
-  'H₂O': { H: 2, O: 1 }, 'CO₂': { C: 1, O: 2 }, 'SO₂': { S: 1, O: 2 }, 'SO₃': { S: 1, O: 3 }, 'NO₂': { N: 1, O: 2 }, 'NO': { N: 1, O: 1 }, 'NH₃': { N: 1, H: 3 }, 'H₂S': { H: 2, S: 1 },
+  'H₂O': { H: 2, O: 1 }, 'CO₂': { C: 1, O: 2 }, 'CO': { C: 1, O: 1 }, 'SO₂': { S: 1, O: 2 }, 'SO₃': { S: 1, O: 3 }, 'NO₂': { N: 1, O: 2 }, 'NO': { N: 1, O: 1 }, 'NH₃': { N: 1, H: 3 }, 'H₂S': { H: 2, S: 1 },
   'CH₄': { C: 1, H: 4 }, 'C₂H₆': { C: 2, H: 6 }, 'C₃H₈': { C: 3, H: 8 }, 'C₄H₁₀': { C: 4, H: 10 }, 'C₅H₁₂': { C: 5, H: 12 }, 'C₂H₄': { C: 2, H: 4 }, 'C₃H₆': { C: 3, H: 6 },
   'C₄H₈': { C: 4, H: 8 }, 'C₂H₂': { C: 2, H: 2 }, 'C₃H₄': { C: 3, H: 4 }, 'C₄H₆': { C: 4, H: 6 }, 'C₆H₆': { C: 6, H: 6 }, 'C₇H₈': { C: 7, H: 8 }, 'C₈H₁₀': { C: 8, H: 10 }, 'C₆H₁₂': { C: 6, H: 12 },
   'C₂H₅OH': { C: 2, H: 6, O: 1 }, 'CH₃OH': { C: 1, H: 4, O: 1 }, 'CH₃COOH': { C: 2, H: 4, O: 2 }, 'CH₃COOC₂H₅': { C: 4, H: 8, O: 2 }, 'C₆H₁₂O₆': { C: 6, H: 12, O: 6 },
@@ -730,6 +735,412 @@ function baoToanNguyenTo(): Nhap[] {
   return ra
 }
 
+// ---------------------------------------------------------------- số có dấu (ΔrH°298, ΔfH°298 có thể ÂM)
+
+/** Số có dấu trong chữ đề / lời giải: "−890,3" (dấu trừ U+2212 như SGK). Đáp án `dap_an` vẫn là "-890,3" (`vn`, dấu "-" như ô nhập của app); docSo đọc cả hai. */
+const vnS = (x: number) => (x < 0 ? `−${vn(-x)}` : vn(x))
+/** ΔfH°298 in kèm dấu như SGK: "+52,4" · "−74,8". */
+const vnDauS = (x: number) => (x > 0 ? `+${vn(x)}` : vnS(x))
+/** Số âm trong phép tính đặt trong ngoặc: 2 · (−285,8). */
+const ngoac = (x: number) => (x < 0 ? `(${vnS(x)})` : vn(x))
+/** Đáp án có dấu: khác 0, hữu hạn, ≤ 3 chữ số thập phân. */
+const depCoDau = (x: number) => Number.isFinite(x) && Math.abs(x) > 1e-9 && soLe(x) <= 3
+type DsChat = readonly (readonly [number, string])[]
+/** Gắn thể khí "(g)" cho từng chất. */
+const theKhi = (ds: DsChat): DsChat => ds.map(([k, c]) => [k, `${c}(g)`] as const)
+
+// ---------------------------------------------------------------- 21. Bảo toàn electron (kim loại + HNO₃ / H₂SO₄ đặc, nóng — sản phẩm khử duy nhất)
+const KL_OXH: readonly { kl: string; z: number; ion: string; khi: readonly string[] }[] = [
+  { kl: 'Mg', z: 2, ion: 'Mg²⁺', khi: ['NO', 'NO₂', 'N₂O', 'N₂', 'SO₂'] },
+  { kl: 'Al', z: 3, ion: 'Al³⁺', khi: ['NO', 'NO₂', 'N₂O', 'N₂', 'SO₂'] },
+  { kl: 'Zn', z: 2, ion: 'Zn²⁺', khi: ['NO', 'NO₂', 'N₂O', 'N₂', 'SO₂'] },
+  // Fe tan hết trong axit có tính oxi hoá mạnh, DƯ ⇒ Fe³⁺. Fe, Cu chỉ đi với NO / NO₂ / SO₂ như đề chuẩn.
+  { kl: 'Fe', z: 3, ion: 'Fe³⁺', khi: ['NO', 'NO₂', 'SO₂'] },
+  { kl: 'Cu', z: 2, ion: 'Cu²⁺', khi: ['NO', 'NO₂', 'SO₂'] },
+]
+/** Số mol electron mỗi mol khí nhận + môi trường tạo ra khí (NO₂ cần HNO₃ đặc, nóng; SO₂ cần H₂SO₄ đặc, nóng — Al, Fe thụ động khi nguội). */
+const SP_KHU: Readonly<Record<string, { e: number; axit: string; nguon: string; ban: string }>> = {
+  'NO': { e: 3, axit: 'HNO₃ loãng', nguon: 'N⁺⁵', ban: 'N⁺⁵ + 3e → N⁺² (NO)' },
+  'NO₂': { e: 1, axit: 'HNO₃ đặc, nóng', nguon: 'N⁺⁵', ban: 'N⁺⁵ + 1e → N⁺⁴ (NO₂)' },
+  'N₂O': { e: 8, axit: 'HNO₃ loãng', nguon: 'N⁺⁵', ban: '2N⁺⁵ + 8e → 2N⁺¹ (N₂O)' },
+  'N₂': { e: 10, axit: 'HNO₃ loãng', nguon: 'N⁺⁵', ban: '2N⁺⁵ + 10e → N₂⁰' },
+  'SO₂': { e: 2, axit: 'H₂SO₄ đặc, nóng', nguon: 'S⁺⁶', ban: 'S⁺⁶ + 2e → S⁺⁴ (SO₂)' },
+}
+const MEO_BTE = 'Bảo toàn electron: tổng số mol electron kim loại nhường = tổng số mol electron chất oxi hoá nhận. Mỗi mol khí nhận: NO 3 mol e; NO₂ 1; N₂O 8; N₂ 10; SO₂ 2. Fe tan hết trong axit có tính oxi hoá mạnh, dư ⇒ Fe³⁺.'
+function baoToanElectron(): Nhap[] {
+  const ra: Nhap[] = []
+  for (const k of KL_OXH) {
+    const M = NTK[k.kl]!
+    for (const khi of k.khi) {
+      const s = SP_KHU[khi]!
+      for (const nKhi of [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]) {
+        const nKl = lam(nKhi * s.e / k.z), m = lam(nKl * M), V = lam(nKhi * V_KHI)
+        if (!dep(nKl) || !dep(m, 2) || !dep(V) || m < 1 || m > 40) continue
+        const vao = `trong dung dịch ${s.axit}, dư, thu được`
+        const sp = `khí ${khi} (sản phẩm khử duy nhất của ${s.nguon}, ở điều kiện chuẩn 25 °C, 1 bar)`
+        const qt = `Quá trình: ${k.kl} → ${k.ion} + ${k.z}e; ${s.ban}.`
+        ra.push(so(1, `Hoà tan hoàn toàn ${vn(m)} gam ${k.kl} ${vao} V lít ${sp}. Tính V.`, V, [
+          `n(${k.kl}) = ${vn(m)} : ${M} = ${vn(nKl)} mol. ${qt}`,
+          `Bảo toàn electron: ${k.z} · ${vn(nKl)} = ${s.e} · n(${khi}) ⇒ n(${khi}) = ${vn(nKhi)} mol.`,
+          `V = ${vn(nKhi)} · 24,79 = ${vn(V)} lít.`], MEO_BTE))
+        ra.push(so(2, `Hoà tan hoàn toàn m gam ${k.kl} ${vao} ${vn(V)} lít ${sp}. Tính m.`, m, [
+          `n(${khi}) = ${vn(V)} : 24,79 = ${vn(nKhi)} mol. ${qt}`,
+          `Bảo toàn electron: ${k.z} · n(${k.kl}) = ${s.e} · ${vn(nKhi)} ⇒ n(${k.kl}) = ${vn(nKl)} mol.`,
+          `m = ${vn(nKl)} · ${M} = ${vn(m)} gam.`], MEO_BTE))
+      }
+    }
+  }
+  return ra
+}
+
+// ---------------------------------------------------------------- 22. Lập hệ phương trình (hỗn hợp hai kim loại + HCl / H₂SO₄ loãng, dư)
+/** Hoá trị khi tan trong axit KHÔNG có tính oxi hoá mạnh (Fe chỉ lên Fe²⁺). */
+const KL_AXIT_LOANG: readonly { kl: string; hoa: number }[] = [{ kl: 'Mg', hoa: 2 }, { kl: 'Al', hoa: 3 }, { kl: 'Zn', hoa: 2 }, { kl: 'Fe', hoa: 2 }]
+const AXIT_LOANG = ['HCl dư', 'H₂SO₄ loãng, dư'] as const
+const N_HE = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3] as const
+const MEO_HE = 'Đặt ẩn là số mol từng kim loại, lập 2 phương trình: khối lượng hỗn hợp và bảo toàn electron với H₂ (2n(H₂) = 2n(Mg) + 3n(Al) + 2n(Zn) + 2n(Fe); trong HCl, H₂SO₄ loãng Fe chỉ lên Fe²⁺) rồi giải hệ.'
+function lapHePhuongTrinh(): Nhap[] {
+  const ra: Nhap[] = []
+  for (let i = 0; i < KL_AXIT_LOANG.length; i++) for (let j = i + 1; j < KL_AXIT_LOANG.length; j++) {
+    const A = KL_AXIT_LOANG[i]!, B = KL_AXIT_LOANG[j]!, MA = NTK[A.kl]!, MB = NTK[B.kl]!
+    N_HE.forEach((x, ix) => N_HE.forEach((y, iy) => {
+      const m = lam(x * MA + y * MB), nH2 = lam((A.hoa * x + B.hoa * y) / 2), V = lam(nH2 * V_KHI)
+      if (!dep(m, 2) || !dep(V)) return
+      const dau = `Cho ${vn(m)} gam hỗn hợp X gồm ${A.kl} và ${B.kl} tác dụng hết với dung dịch ${AXIT_LOANG[(ix + iy) % 2]}, thu được ${vn(V)} lít khí H₂ (ở điều kiện chuẩn 25 °C, 1 bar).`
+      const he = [`Đặt n(${A.kl}) = x mol, n(${B.kl}) = y mol ⇒ ${MA}x + ${MB}y = ${vn(m)}.`,
+        `n(H₂) = ${vn(V)} : 24,79 = ${vn(nH2)} mol; bảo toàn electron: ${A.hoa}x + ${B.hoa}y = 2 · ${vn(nH2)} = ${vn(lam(2 * nH2))}.`,
+        `Giải hệ: x = ${vn(x)}; y = ${vn(y)}.`]
+      const mA = lam(x * MA), mB = lam(y * MB)
+      ra.push(so(1, `${dau} Tính khối lượng (gam) của ${A.kl} trong X.`, mA, [...he, `m(${A.kl}) = ${vn(x)} · ${MA} = ${vn(mA)} gam.`], MEO_HE))
+      ra.push(so(1, `${dau} Tính khối lượng (gam) của ${B.kl} trong X.`, mB, [...he, `m(${B.kl}) = ${vn(y)} · ${MB} = ${vn(mB)} gam.`], MEO_HE))
+      for (const [kl, mk] of [[A.kl, mA], [B.kl, mB]] as const) {
+        const p = lam(mk / m * 100)
+        if (dep(p, 2)) ra.push(so(2, `${dau} Tính phần trăm khối lượng của ${kl} trong X.`, p, [...he, `%m(${kl}) = ${vn(mk)} : ${vn(m)} · 100% = ${vn(p)}%.`], MEO_HE))
+      }
+    }))
+  }
+  return ra
+}
+
+// ---------------------------------------------------------------- 23. Tìm công thức phân tử (trắc nghiệm; 4 phương án đều là công thức HỢP LỆ)
+type Cho = readonly [number, number, number]
+const ctCho = ([c, h, o]: Cho) => `C${chiSo(c)}H${chiSo(h)}${o ? `O${chiSo(o)}` : ''}`
+const mCho = ([c, h, o]: Cho) => 12 * c + h + 16 * o
+/** CxHyOz hợp lệ: số H chẵn, độ bất bão hoà k = (2x + 2 − y) : 2 nguyên ≥ 0, số O ≤ số C + 2. */
+const hopLeCho = ([c, h, o]: Cho) => c >= 1 && h >= 2 && h % 2 === 0 && h <= 2 * c + 2 && o >= 0 && o <= c + 2
+/** Chất có thật: hydrocarbon và hợp chất chứa C, H, O (đáp án luôn là một chất có thật). */
+const HC_THAT: readonly Cho[] = [[1, 4, 0], [2, 6, 0], [3, 8, 0], [4, 10, 0], [5, 12, 0], [6, 14, 0], [2, 4, 0], [3, 6, 0], [4, 8, 0], [5, 10, 0], [6, 12, 0],
+  [2, 2, 0], [3, 4, 0], [4, 6, 0], [6, 6, 0], [7, 8, 0], [8, 10, 0], [8, 8, 0]]
+const HCO_THAT: readonly Cho[] = [[1, 4, 1], [2, 6, 1], [3, 8, 1], [4, 10, 1], [1, 2, 1], [2, 4, 1], [3, 6, 1], [4, 8, 1], [3, 4, 1], [6, 6, 1], [7, 8, 1],
+  [1, 2, 2], [2, 4, 2], [3, 6, 2], [4, 8, 2], [5, 10, 2], [3, 4, 2], [4, 6, 2], [2, 6, 2], [3, 8, 2], [7, 6, 2], [2, 4, 3], [3, 6, 3], [3, 8, 3],
+  [2, 2, 4], [4, 4, 4], [4, 6, 4], [6, 12, 6]]
+const MEO_CTPT = 'X là CxHyOz: x = n(CO₂) : n(X); y = 2n(H₂O) : n(X); z = (M − 12x − y) : 16. Kiểm tra lại: số H chẵn, độ bất bão hoà k = (2x + 2 − y) : 2 là số nguyên ≥ 0.'
+/** Ba phương án nhiễu HỢP LỆ, khác đáp án (mỗi cái sai với dữ kiện): ưu tiên bẫy quên/thừa O, lệch H, cùng khối lượng mol, đồng đẳng, gấp đôi. */
+function nhieuCho(dung: Cho, loai: 'hc' | 'o' | 'tuy', hat: number): Cho[] {
+  const [C, H, O] = dung, M = mCho(dung), ung: Cho[] = []
+  const cungM = (gan: boolean) => {
+    for (let c = 1; c <= 12; c++) if (c !== C && (Math.abs(c - C) <= 1) === gan) for (let o = 0; o <= 6; o++) ung.push([c, M - 12 * c - 16 * o, o])
+  }
+  if (loai !== 'hc') ung.push([C, H, O + 1], [C, H, O - 1])
+  ung.push([C, H - 2, O], [C, H + 2, O])
+  cungM(true)
+  ung.push([C + 1, H + 2, O], [C - 1, H - 2, O], [2 * C, 2 * H, 2 * O], [C + 1, H, O], [C - 1, H, O])
+  cungM(false)
+  const da = new Set([ctCho(dung)]), tot: Cho[] = []
+  for (const x of ung) {
+    if (!hopLeCho(x) || (loai === 'hc' && x[2] !== 0) || (loai === 'o' && x[2] < 1)) continue
+    const k = ctCho(x)
+    if (da.has(k)) continue
+    da.add(k); tot.push(x)
+  }
+  return xao(tot.slice(0, 5), hat).slice(0, 3)
+}
+function tnCho(muc: 1 | 2, de: string, dung: Cho, loai: 'hc' | 'o' | 'tuy', giai: string[]): Nhap | null {
+  const hat = bam32(de), nhieu = nhieuCho(dung, loai, hat)
+  if (nhieu.length < 3) return null
+  const thuTu = xao([0, 1, 2, 3], hat ^ 0x9e3779b9), ds = [dung, ...nhieu]
+  const pa = Object.fromEntries(CHU_CAI.map((k, i) => [k, ctCho(ds[thuTu[i]!]!)])) as Record<ChuCai, string>
+  return { muc, kieu: 'tn', de, pa, dapAn: CHU_CAI[thuTu.indexOf(0)]!, giaTri: '', giai, meo: MEO_CTPT }
+}
+function congThucPhanTu(): Nhap[] {
+  const ra: Nhap[] = []
+  const day = (x: Nhap | null) => { if (x) ra.push(x) }
+  const CTPT = 'Công thức phân tử của X là'
+  for (const X of HC_THAT) {
+    const [C, H] = X
+    for (const n of [0.05, 0.1, 0.15, 0.2]) {
+      const nCO2 = lam(C * n), nH2O = lam(H / 2 * n)
+      day(tnCho(1, `Đốt cháy hoàn toàn ${vn(n)} mol hydrocarbon X, thu được ${vn(nCO2)} mol CO₂ và ${vn(nH2O)} mol H₂O. ${CTPT}`, X, 'hc', [
+        `Số C = n(CO₂) : n(X) = ${vn(nCO2)} : ${vn(n)} = ${C}; số H = 2n(H₂O) : n(X) = ${vn(lam(2 * nH2O))} : ${vn(n)} = ${H}.`,
+        `${CTPT} ${ctCho(X)}.`]))
+    }
+  }
+  for (const X of HCO_THAT) {
+    const [C, H, O] = X, M = mCho(X)
+    for (const n of [0.05, 0.1, 0.2]) {
+      const nCO2 = lam(C * n), nH2O = lam(H / 2 * n)
+      day(tnCho(2, `Đốt cháy hoàn toàn ${vn(n)} mol chất hữu cơ X (phân tử gồm C, H, O), thu được ${vn(nCO2)} mol CO₂ và ${vn(nH2O)} mol H₂O. Biết khối lượng mol của X là ${M} g/mol. ${CTPT}`, X, 'o', [
+        `Số C = ${vn(nCO2)} : ${vn(n)} = ${C}; số H = 2 · ${vn(nH2O)} : ${vn(n)} = ${H}.`,
+        `Số O = (${M} − 12 · ${C} − ${H}) : 16 = ${O}.`,
+        `${CTPT} ${ctCho(X)}.`]))
+    }
+  }
+  for (const X of [...HC_THAT, ...HCO_THAT]) {
+    const [C, H, O] = X, M = mCho(X)
+    ;[0.05, 0.1, 0.2].forEach((n, i) => {
+      const mX = lam(n * M), mCO2 = lam(44 * C * n), mH2O = lam(9 * H * n), nC = lam(C * n), nH = lam(H * n)
+      const quaTiKhoi = i % 2 === 0
+      day(tnCho(2, `Đốt cháy hoàn toàn ${vn(mX)} gam chất hữu cơ X, thu được ${vn(mCO2)} gam CO₂ và ${vn(mH2O)} gam H₂O. ${quaTiKhoi ? `Tỉ khối hơi của X so với H₂ là ${M / 2}.` : `Khối lượng mol của X là ${M} g/mol.`} ${CTPT}`, X, 'tuy', [
+        `n(C) = n(CO₂) = ${vn(mCO2)} : 44 = ${vn(nC)} mol; n(H) = 2n(H₂O) = 2 · ${vn(mH2O)} : 18 = ${vn(nH)} mol.`,
+        O ? `m(O) = ${vn(mX)} − 12 · ${vn(nC)} − ${vn(nH)} = ${vn(lam(16 * O * n))} gam ⇒ n(O) = ${vn(lam(O * n))} mol.`
+          : `m(C) + m(H) = 12 · ${vn(nC)} + ${vn(nH)} = ${vn(mX)} gam = m(X) ⇒ X không chứa O.`,
+        `M(X) = ${quaTiKhoi ? `${M / 2} · 2 = ` : ''}${M} g/mol ⇒ n(X) = ${vn(mX)} : ${M} = ${vn(n)} mol ⇒ số C = ${C}, số H = ${H}${O ? `, số O = ${O}` : ''}.`,
+        `${CTPT} ${ctCho(X)}.`]))
+    })
+  }
+  for (const X of [...HC_THAT, ...HCO_THAT]) {
+    const [C, H, O] = X, M = mCho(X)
+    const pC = Math.round(1200 * C / M * 100) / 100, pH = Math.round(100 * H / M * 100) / 100
+    const de = O
+      ? `Chất hữu cơ X có thành phần khối lượng: ${vn(pC)}% C; ${vn(pH)}% H; còn lại là O. Khối lượng mol của X là ${M} g/mol. ${CTPT}`
+      : `Hydrocarbon X có ${vn(pC)}% C về khối lượng. Khối lượng mol của X là ${M} g/mol. ${CTPT}`
+    day(tnCho(1, de, X, O ? 'o' : 'hc', [
+      `Số C = ${M} · ${vn(pC)} : 1200 ≈ ${C}; số H = ${O ? `${M} · ${vn(pH)} : 100 ≈ ${H}` : `${M} − 12 · ${C} = ${H}`}.`,
+      ...(O ? [`Số O = (${M} − 12 · ${C} − ${H}) : 16 = ${O}.`] : []),
+      `${CTPT} ${ctCho(X)}.`]))
+  }
+  return ra
+}
+
+// ---------------------------------------------------------------- 24. Hằng số cân bằng Kc (nồng độ / số mol lúc cân bằng CHO SẴN trong đề)
+interface PuKc { trai: DsChat; phai: DsChat; mien: readonly (readonly number[])[] }
+/** Sáu cân bằng pha khí của đặc tả; `mien` = các nồng độ cân bằng (M) thử cho từng chất (thứ tự: chất đầu rồi sản phẩm). */
+const PU_KC: readonly PuKc[] = [
+  { trai: [[1, 'H₂'], [1, 'I₂']], phai: [[2, 'HI']], mien: [[0.1, 0.2, 0.25, 0.5], [0.1, 0.2, 0.25, 0.5], [0.2, 0.4, 0.5, 0.8, 1, 1.6]] },
+  { trai: [[1, 'N₂'], [3, 'H₂']], phai: [[2, 'NH₃']], mien: [[0.1, 0.2, 0.25, 0.5, 1], [0.1, 0.2, 0.5, 1], [0.01, 0.02, 0.04, 0.05, 0.1, 0.2, 0.4]] },
+  { trai: [[2, 'SO₂'], [1, 'O₂']], phai: [[2, 'SO₃']], mien: [[0.1, 0.2, 0.4, 0.5], [0.05, 0.1, 0.2, 0.25, 0.5], [0.2, 0.4, 0.5, 0.8, 1]] },
+  { trai: [[1, 'CO'], [1, 'H₂O']], phai: [[1, 'CO₂'], [1, 'H₂']], mien: [[0.1, 0.2, 0.5], [0.1, 0.2, 0.5], [0.1, 0.2, 0.4], [0.1, 0.2, 0.4]] },
+  { trai: [[1, 'N₂O₄']], phai: [[2, 'NO₂']], mien: [[0.01, 0.02, 0.04, 0.05, 0.1, 0.2, 0.25, 0.4, 0.5, 1], [0.01, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.2, 0.3, 0.4]] },
+  { trai: [[1, 'PCl₅']], phai: [[1, 'PCl₃'], [1, 'Cl₂']], mien: [[0.1, 0.2, 0.5, 1], [0.05, 0.1, 0.2, 0.4], [0.05, 0.1, 0.2, 0.4]] },
+]
+const MU = ['', '', '²', '³'] as const
+/** "H₂(g) + I₂(g) ⇌ 2HI(g)" */
+const chuKc = (p: PuKc) => `${vePhan(theKhi(p.trai))} ⇌ ${vePhan(theKhi(p.phai))}`
+const tichKc = (ds: DsChat, f: (c: string) => string) => ds.map(([k, c]) => `${f(c)}${MU[k] ?? `^${k}`}`).join(' · ')
+const boNgoac = (ds: DsChat, s: string) => (ds.length > 1 ? `(${s})` : s)
+function tichDescartes(mien: readonly (readonly number[])[]): number[][] {
+  let ra: number[][] = [[]]
+  for (const ds of mien) ra = ra.flatMap((x) => ds.map((v) => [...x, v]))
+  return ra
+}
+const MEO_KC = 'Kc = tích nồng độ lúc cân bằng của sản phẩm (mũ hệ số) : tích nồng độ lúc cân bằng của chất phản ứng (mũ hệ số). Dùng nồng độ mol lúc cân bằng [X] = n : V, không dùng số mol.'
+function hangSoCanBang(): Nhap[] {
+  const ra: Nhap[] = []
+  for (const p of PU_KC) {
+    const chat = [...p.trai, ...p.phai], soTrai = p.trai.length, pt = chuKc(p)
+    const tenNd = (c: string) => `[${c}]`
+    const bieuThuc = `${tichKc(p.phai, tenNd)} : ${boNgoac(p.trai, tichKc(p.trai, tenNd))}`
+    tichDescartes(p.mien).forEach((C, ic) => {
+      const gt = new Map(chat.map(([, c], i) => [c, C[i]!] as const))
+      const g = (c: string) => gt.get(c)!, sg = (c: string) => vn(g(c))
+      const tich = (ds: DsChat) => ds.reduce((s, [k, c]) => s * g(c) ** k, 1)
+      const Kc = lam(tich(p.phai) / tich(p.trai))
+      if (!dep(Kc) || Kc < 0.01 || Kc > 1000) return
+      const thaySo = `${tichKc(p.phai, sg)} : ${boNgoac(p.trai, tichKc(p.trai, sg))}`
+      ra.push(so(1, `Cho phản ứng: ${pt}. Ở một nhiệt độ xác định, khi phản ứng đạt trạng thái cân bằng: ${chat.map(([, c]) => `[${c}] = ${sg(c)} M`).join('; ')}. Tính hằng số cân bằng Kc của phản ứng ở nhiệt độ đó.`, Kc,
+        [`Kc = ${bieuThuc}.`, `Kc = ${thaySo} = ${vn(Kc)}.`], MEO_KC))
+      // Ẩn nồng độ một chất có hệ số 1 (xoay vòng theo bộ số) — đáp án chính là nồng độ đã chọn.
+      const heSo1 = chat.map(([k, c], i) => ({ k, c, trai: i < soTrai })).filter((x) => x.k === 1)
+      const an = heSo1[ic % heSo1.length]!
+      const khacTrai = p.trai.filter(([, c]) => c !== an.c), khacPhai = p.phai.filter(([, c]) => c !== an.c)
+      const rut = (f: (c: string) => string, K: string) => (an.trai
+        ? `${tichKc(p.phai, f)} : ${khacTrai.length ? `(${K} · ${tichKc(khacTrai, f)})` : K}`
+        : `${K} · ${boNgoac(p.trai, tichKc(p.trai, f))}${khacPhai.length ? ` : ${boNgoac(khacPhai, tichKc(khacPhai, f))}` : ''}`)
+      ra.push(so(2, `Cho phản ứng: ${pt}. Ở một nhiệt độ xác định, phản ứng có hằng số cân bằng Kc = ${vn(Kc)}. Khi cân bằng: ${chat.filter(([, c]) => c !== an.c).map(([, c]) => `[${c}] = ${sg(c)} M`).join('; ')}. Tính nồng độ mol (M) của ${an.c} ở trạng thái cân bằng.`, g(an.c),
+        [`Kc = ${bieuThuc} ⇒ [${an.c}] = ${rut(tenNd, 'Kc')}.`, `[${an.c}] = ${rut(sg, vn(Kc))} = ${sg(an.c)} M.`], MEO_KC))
+      // Cho SỐ MOL trong bình V lít ⇒ phải đổi ra nồng độ trước khi thay vào Kc.
+      const V = [2, 4, 5, 10][ic % 4]!
+      const mol = chat.map(([, c]) => lam(g(c) * V))
+      if (mol.every((x) => dep(x))) ra.push(so(2, `Cho phản ứng: ${pt}. Trong một bình kín dung tích ${V} lít, ở một nhiệt độ xác định, khi phản ứng đạt trạng thái cân bằng có ${noi(chat.map(([, c], i) => `${vn(mol[i]!)} mol ${c}`))}. Tính hằng số cân bằng Kc của phản ứng ở nhiệt độ đó.`, Kc,
+        [`Nồng độ lúc cân bằng: ${chat.map(([, c], i) => `[${c}] = ${vn(mol[i]!)} : ${V} = ${sg(c)} M`).join('; ')}.`, `Kc = ${bieuThuc} = ${thaySo} = ${vn(Kc)}.`], MEO_KC))
+    })
+  }
+  return ra
+}
+
+// ---------------------------------------------------------------- 25. Biến thiên enthalpy (ΔfH°298 CHO SẴN trong đề; đơn chất bền = 0)
+/** ΔfH°298 (kJ/mol) hay gặp (bộ A) — LUÔN in trong đề (SGK các bộ lệch nhau vài kJ; học sinh không phải nhớ). */
+const DF_298: Readonly<Record<string, number>> = {
+  'CH₄(g)': -74.8, 'C₂H₆(g)': -84, 'C₃H₈(g)': -103.8, 'C₂H₄(g)': 52.4, 'C₂H₂(g)': 227.4, 'C₂H₅OH(l)': -277.6, 'CH₃OH(l)': -239.2, 'C₆H₁₂O₆(s)': -1273.3,
+  'CO₂(g)': -393.5, 'CO(g)': -110.5, 'H₂O(l)': -285.8, 'H₂O(g)': -241.8, 'H₂S(g)': -20.6, 'SO₂(g)': -296.8, 'SO₃(g)': -395.7, 'HCl(g)': -92.3,
+  'NH₃(g)': -45.9, 'NO(g)': 91.3, 'NO₂(g)': 33.2, 'N₂O₄(g)': 11.1, 'CaCO₃(s)': -1207.6, 'CaO(s)': -634.9, 'Ca(OH)₂(s)': -985.2,
+  'NaHCO₃(s)': -950.8, 'Na₂CO₃(s)': -1130.7, 'Fe₂O₃(s)': -824.2, 'Al₂O₃(s)': -1675.7, 'CuO(s)': -157.3,
+}
+/** Bộ B: số liệu của tài liệu khác (lệch vài kJ) — chỉ dùng cho câu tính ΔrH°298 / ΔfH°298, đề vẫn in đủ số. */
+const DF_298_B: Readonly<Record<string, number>> = {
+  ...DF_298, 'CH₄(g)': -74.6, 'C₂H₆(g)': -84.7, 'C₃H₈(g)': -104.7, 'C₂H₄(g)': 52.5, 'C₂H₂(g)': 226.7, 'C₂H₅OH(l)': -277.7, 'CH₃OH(l)': -238.7,
+  'C₆H₁₂O₆(s)': -1274.4, 'NH₃(g)': -46.1, 'NO(g)': 90.3, 'N₂O₄(g)': 9.2, 'CaCO₃(s)': -1206.9, 'CaO(s)': -635.1, 'Ca(OH)₂(s)': -986.1,
+  'NaHCO₃(s)': -947.7, 'CuO(s)': -155.2,
+}
+/** Đơn chất bền ở điều kiện chuẩn: ΔfH°298 = 0 (đề ghi rõ). */
+const DON_CHAT_BEN: ReadonlySet<string> = new Set(['O₂(g)', 'H₂(g)', 'N₂(g)', 'Cl₂(g)', 'Fe(s)', 'Al(s)', 'Cu(s)'])
+interface PuNhiet { p: PhanUngSinh; viec: 'chay' | 'phan_huy' | 'pu' }
+const PU_NHIET: readonly PuNhiet[] = [
+  { p: pu([[1, 'CH₄(g)'], [2, 'O₂(g)']], [[1, 'CO₂(g)'], [2, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[1, 'CH₄(g)'], [2, 'O₂(g)']], [[1, 'CO₂(g)'], [2, 'H₂O(g)']]), viec: 'chay' },
+  { p: pu([[2, 'C₂H₆(g)'], [7, 'O₂(g)']], [[4, 'CO₂(g)'], [6, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[1, 'C₂H₄(g)'], [3, 'O₂(g)']], [[2, 'CO₂(g)'], [2, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[2, 'C₂H₂(g)'], [5, 'O₂(g)']], [[4, 'CO₂(g)'], [2, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[1, 'C₃H₈(g)'], [5, 'O₂(g)']], [[3, 'CO₂(g)'], [4, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[1, 'C₂H₅OH(l)'], [3, 'O₂(g)']], [[2, 'CO₂(g)'], [3, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[2, 'CH₃OH(l)'], [3, 'O₂(g)']], [[2, 'CO₂(g)'], [4, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[1, 'C₆H₁₂O₆(s)'], [6, 'O₂(g)']], [[6, 'CO₂(g)'], [6, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[2, 'H₂S(g)'], [3, 'O₂(g)']], [[2, 'SO₂(g)'], [2, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[2, 'CO(g)'], [1, 'O₂(g)']], [[2, 'CO₂(g)']]), viec: 'chay' },
+  { p: pu([[2, 'H₂(g)'], [1, 'O₂(g)']], [[2, 'H₂O(l)']]), viec: 'chay' },
+  { p: pu([[1, 'CaCO₃(s)']], [[1, 'CaO(s)'], [1, 'CO₂(g)']]), viec: 'phan_huy' },
+  { p: pu([[2, 'NaHCO₃(s)']], [[1, 'Na₂CO₃(s)'], [1, 'CO₂(g)'], [1, 'H₂O(g)']]), viec: 'phan_huy' },
+  { p: pu([[1, 'N₂(g)'], [3, 'H₂(g)']], [[2, 'NH₃(g)']]), viec: 'pu' },
+  { p: pu([[2, 'SO₂(g)'], [1, 'O₂(g)']], [[2, 'SO₃(g)']]), viec: 'pu' },
+  { p: pu([[1, 'Fe₂O₃(s)'], [3, 'CO(g)']], [[2, 'Fe(s)'], [3, 'CO₂(g)']]), viec: 'pu' },
+  { p: pu([[4, 'NH₃(g)'], [5, 'O₂(g)']], [[4, 'NO(g)'], [6, 'H₂O(g)']]), viec: 'pu' },
+  { p: pu([[2, 'NO(g)'], [1, 'O₂(g)']], [[2, 'NO₂(g)']]), viec: 'pu' },
+  { p: pu([[2, 'NO₂(g)']], [[1, 'N₂O₄(g)']]), viec: 'pu' },
+  { p: pu([[1, 'C₂H₄(g)'], [1, 'H₂(g)']], [[1, 'C₂H₆(g)']]), viec: 'pu' },
+  { p: pu([[1, 'C₂H₂(g)'], [2, 'H₂(g)']], [[1, 'C₂H₆(g)']]), viec: 'pu' },
+  { p: pu([[2, 'Al(s)'], [1, 'Fe₂O₃(s)']], [[1, 'Al₂O₃(s)'], [2, 'Fe(s)']]), viec: 'pu' },
+  { p: pu([[1, 'CaO(s)'], [1, 'H₂O(l)']], [[1, 'Ca(OH)₂(s)']]), viec: 'pu' },
+  { p: pu([[1, 'CuO(s)'], [1, 'H₂(g)']], [[1, 'Cu(s)'], [1, 'H₂O(g)']]), viec: 'pu' },
+  { p: pu([[1, 'CH₄(g)'], [1, 'H₂O(g)']], [[1, 'CO(g)'], [3, 'H₂(g)']]), viec: 'pu' },
+  { p: pu([[1, 'H₂(g)'], [1, 'Cl₂(g)']], [[2, 'HCl(g)']]), viec: 'pu' },
+]
+const dfTheo = (bo: Readonly<Record<string, number>>, c: string): number => {
+  if (DON_CHAT_BEN.has(c)) return 0
+  const v = bo[c]
+  if (v === undefined) throw new Error(`omni-cau-nen-sinh: thiếu ΔfH°298 của ${c}`)
+  return v
+}
+const boThe = (c: string) => c.replace(/\((?:g|l|s)\)$/, '')
+const MEO_DH = 'ΔrH°298 = Σ(hệ số × ΔfH°298) sản phẩm − Σ(hệ số × ΔfH°298) chất đầu; đơn chất bền có ΔfH°298 = 0. ΔrH°298 < 0: phản ứng toả nhiệt; > 0: thu nhiệt. Nhiệt lượng tỉ lệ với số mol chất phản ứng theo hệ số.'
+function bienThienEnthalpy(): Nhap[] {
+  const ra: Nhap[] = []
+  const CT = 'ΔrH°298 = Σ(hệ số · ΔfH°298) sản phẩm − Σ(hệ số · ΔfH°298) chất đầu; đơn chất bền có ΔfH°298 = 0.'
+  PU_NHIET.forEach(({ p, viec }, ip) => {
+    const pt = chuPhanUng(p)
+    const hopChat = [...p.trai, ...p.phai].filter(([, c]) => !DON_CHAT_BEN.has(c))
+    let dHA = 0
+    for (const bo of [DF_298, DF_298_B]) {
+      const df = (c: string) => dfTheo(bo, c)
+      const tong = (ds: DsChat) => lam(ds.reduce((s, [k, c]) => s + k * df(c), 0))
+      const bieu = (ds: DsChat) => { const t = ds.filter(([, c]) => !DON_CHAT_BEN.has(c)); return t.length ? t.map(([k, c]) => `${k} · ${ngoac(df(c))}`).join(' + ') : '0' }
+      const dsDf = (ds: DsChat) => (ds.length ? `ΔfH°298 (kJ/mol) của ${ds.map(([, c]) => c).join(', ')} ${ds.length > 1 ? 'lần lượt là' : 'là'} ${ds.map(([, c]) => vnDauS(df(c))).join('; ')}; ` : '')
+      const sP = tong(p.phai), sT = tong(p.trai), dH = lam(sP - sT)
+      if (bo === DF_298) dHA = dH
+      if (!depCoDau(dH)) continue
+      // (1) Tính ΔrH°298 từ ΔfH°298 cho sẵn.
+      ra.push(so(hopChat.length <= 3 ? 1 : 2, `Cho phản ứng: ${pt}. Biết ${dsDf(hopChat)}ΔfH°298 của đơn chất bền bằng 0. Tính biến thiên enthalpy chuẩn ΔrH°298 (kJ) của phản ứng.`, dH,
+        [CT, `Σ sản phẩm = ${bieu(p.phai)} = ${vnS(sP)} kJ; Σ chất đầu = ${bieu(p.trai)} = ${vnS(sT)} kJ.`, `ΔrH°298 = ${vnS(sP)} − ${ngoac(sT)} = ${vnS(dH)} kJ.`], MEO_DH))
+      // (2) Biết ΔrH°298 ⇒ tìm ΔfH°298 của một hợp chất.
+      for (const [k, X] of hopChat) {
+        const x = df(X), oTrai = p.trai.some(([, c]) => c === X), kx = lam(k * x)
+        const sPk = tong(p.phai.filter(([, c]) => c !== X)), sTk = tong(p.trai.filter(([, c]) => c !== X))
+        const trai = `${k === 1 ? '' : `${k} · `}ΔfH°298(${X})`, donVi = k === 1 ? 'kJ/mol' : 'kJ'
+        const buoc = oTrai
+          ? `${trai} = Σ sản phẩm − Σ chất đầu còn lại − ΔrH°298 = ${vnS(sP)} − ${ngoac(sTk)} − ${ngoac(dH)} = ${vnS(kx)} ${donVi}.`
+          : `${trai} = ΔrH°298 + Σ chất đầu − Σ sản phẩm còn lại = ${vnS(dH)} + ${ngoac(sT)} − ${ngoac(sPk)} = ${vnS(kx)} ${donVi}.`
+        ra.push(so(2, `Cho phản ứng: ${pt}, có ΔrH°298 = ${vnS(dH)} kJ. Biết ${dsDf(hopChat.filter(([, c]) => c !== X))}ΔfH°298 của đơn chất bền bằng 0. Tính ΔfH°298 (kJ/mol) của ${X}.`, x,
+          [CT, buoc, ...(k === 1 ? [] : [`ΔfH°298(${X}) = ${vnS(kx)} : ${k} = ${vnS(x)} kJ/mol.`])], MEO_DH))
+      }
+    }
+    // (3) Nhiệt lượng theo lượng chất; (4) ngược lại: biết nhiệt lượng ⇒ ΔrH°298 (có dấu). ΔrH°298 in sẵn trong đề (bộ A).
+    const dH = dHA
+    if (!depCoDau(dH)) return
+    const [k0, X0] = p.trai[0]!, ct0 = boThe(X0), M0 = mCua(ct0), toa = dH < 0, nhiet = toa ? 'toả ra' : 'thu vào'
+    ;[0.1, 0.2, 0.5].forEach((n, iN) => {
+      const Q = lam(Math.abs(dH) * n / k0)
+      if (!dep(Q)) return
+      const cach: { luong: string; buoc: string[] }[] = [{ luong: `${vn(n)} mol ${ct0}`, buoc: [] }]
+      const m = lam(n * M0), V = lam(n * V_KHI)
+      if (dep(m, 2)) cach.push({ luong: `${vn(m)} gam ${ct0}`, buoc: [`n(${ct0}) = ${vn(m)} : ${vn(M0)} = ${vn(n)} mol.`] })
+      if (X0.endsWith('(g)') && dep(V)) cach.push({ luong: `${vn(V)} lít khí ${ct0} (ở điều kiện chuẩn 25 °C, 1 bar)`, buoc: [`n(${ct0}) = ${vn(V)} : 24,79 = ${vn(n)} mol.`] })
+      const viecVoi = (luong: string) => (viec === 'chay' ? `đốt cháy hoàn toàn ${luong}` : viec === 'phan_huy' ? `phân huỷ hoàn toàn ${luong}` : `${luong} phản ứng hết`)
+      const c3 = cach[(iN + ip) % cach.length]!, c4 = cach[(iN + ip + 1) % cach.length]!
+      ra.push(so(1, `Cho phương trình nhiệt hoá học: ${pt}; ΔrH°298 = ${vnS(dH)} kJ. Tính nhiệt lượng (kJ) ${toa ? `toả ra khi ${viecVoi(c3.luong)}` : `cần cung cấp để ${viecVoi(c3.luong)}`}.`, Q,
+        [...c3.buoc, `Theo phương trình: ${k0} mol ${ct0} phản ứng thì ${nhiet} ${vn(Math.abs(dH))} kJ.`,
+          `Q = ${vn(n)} · ${vn(Math.abs(dH))}${k0 === 1 ? '' : ` : ${k0}`} = ${vn(Q)} kJ.`], MEO_DH))
+      ra.push(so(2, `Cho phản ứng: ${pt}. Khi ${viecVoi(c4.luong)} thì ${nhiet} ${vn(Q)} kJ. Tính biến thiên enthalpy chuẩn ΔrH°298 (kJ) của phản ứng theo phương trình trên.`, dH,
+        [...c4.buoc, `Theo hệ số phương trình, ${k0} mol ${ct0} phản ứng thì ${nhiet} ${vn(Q)} · ${k0} : ${vn(n)} = ${vn(Math.abs(dH))} kJ.`,
+          `Phản ứng ${toa ? 'toả nhiệt nên ΔrH°298 < 0' : 'thu nhiệt nên ΔrH°298 > 0'}: ΔrH°298 = ${vnS(dH)} kJ.`], MEO_DH))
+    })
+  })
+  return ra
+}
+
+// ---------------------------------------------------------------- 26. ΔrH°298 theo năng lượng liên kết (mọi chất ở thể khí; Eb CHO SẴN trong đề)
+/** Số liên kết của mỗi phân tử, đếm theo CÔNG THỨC CẤU TẠO (test kiểm lại bằng hoá trị). */
+const LIEN_KET: Readonly<Record<string, Readonly<Record<string, number>>>> = {
+  'H₂': { 'H–H': 1 }, 'Cl₂': { 'Cl–Cl': 1 }, 'F₂': { 'F–F': 1 }, 'HCl': { 'H–Cl': 1 }, 'HF': { 'H–F': 1 }, 'O₂': { 'O=O': 1 }, 'H₂O': { 'O–H': 2 },
+  'N₂': { 'N≡N': 1 }, 'NH₃': { 'N–H': 3 }, 'CH₄': { 'C–H': 4 }, 'C₂H₆': { 'C–C': 1, 'C–H': 6 }, 'C₃H₈': { 'C–C': 2, 'C–H': 8 },
+  'C₂H₄': { 'C=C': 1, 'C–H': 4 }, 'C₂H₂': { 'C≡C': 1, 'C–H': 2 }, 'CO₂': { 'C=O': 2 }, 'CH₃Cl': { 'C–H': 3, 'C–Cl': 1 },
+  'C₂H₅Cl': { 'C–C': 1, 'C–H': 5, 'C–Cl': 1 },
+}
+/** Eb (kJ/mol): hai bộ số SGK / sổ tay thường gặp — đề luôn in đúng số đã dùng. */
+const EB: Readonly<Record<string, readonly [number, number]>> = {
+  'H–H': [436, 432], 'Cl–Cl': [243, 242], 'H–Cl': [432, 431], 'F–F': [159, 158], 'H–F': [565, 567], 'O=O': [498, 494], 'O–H': [467, 464],
+  'C–H': [413, 414], 'C–C': [347, 346], 'C=C': [614, 611], 'C≡C': [839, 837], 'C=O': [799, 803], 'N≡N': [945, 946], 'N–H': [391, 390], 'C–Cl': [339, 330],
+}
+const PU_LIEN_KET: readonly PhanUngSinh[] = [
+  pu([[1, 'H₂'], [1, 'Cl₂']], [[2, 'HCl']]), pu([[1, 'H₂'], [1, 'F₂']], [[2, 'HF']]), pu([[1, 'N₂'], [3, 'H₂']], [[2, 'NH₃']]),
+  pu([[2, 'H₂'], [1, 'O₂']], [[2, 'H₂O']]), pu([[2, 'NH₃'], [3, 'Cl₂']], [[1, 'N₂'], [6, 'HCl']]), pu([[4, 'NH₃'], [3, 'O₂']], [[2, 'N₂'], [6, 'H₂O']]),
+  pu([[1, 'CH₄'], [2, 'O₂']], [[1, 'CO₂'], [2, 'H₂O']]), pu([[1, 'C₂H₄'], [3, 'O₂']], [[2, 'CO₂'], [2, 'H₂O']]),
+  pu([[2, 'C₂H₂'], [5, 'O₂']], [[4, 'CO₂'], [2, 'H₂O']]), pu([[2, 'C₂H₆'], [7, 'O₂']], [[4, 'CO₂'], [6, 'H₂O']]),
+  pu([[1, 'C₃H₈'], [5, 'O₂']], [[3, 'CO₂'], [4, 'H₂O']]), pu([[1, 'C₂H₄'], [1, 'H₂']], [[1, 'C₂H₆']]), pu([[1, 'C₂H₂'], [2, 'H₂']], [[1, 'C₂H₆']]),
+  pu([[1, 'C₂H₂'], [1, 'H₂']], [[1, 'C₂H₄']]), pu([[1, 'CH₄'], [1, 'Cl₂']], [[1, 'CH₃Cl'], [1, 'HCl']]),
+  pu([[1, 'C₂H₆'], [1, 'Cl₂']], [[1, 'C₂H₅Cl'], [1, 'HCl']]), pu([[1, 'C₂H₄'], [1, 'HCl']], [[1, 'C₂H₅Cl']]),
+]
+const MEO_LK = 'ΔrH°298 = ΣEb(chất đầu) − ΣEb(sản phẩm) (dùng khi mọi chất ở thể khí). Đếm liên kết theo công thức cấu tạo rồi nhân hệ số: CH₄ có 4 C–H; C₂H₆ có 1 C–C và 6 C–H; C₂H₄ có 1 C=C và 4 C–H; C₂H₂ có 1 C≡C và 2 C–H; CO₂ có 2 C=O; H₂O có 2 O–H; NH₃ có 3 N–H.'
+function nangLuongLienKet(): Nhap[] {
+  const ra: Nhap[] = []
+  for (const p of PU_LIEN_KET) {
+    const pt = `${vePhan(theKhi(p.trai))} → ${vePhan(theKhi(p.phai))}`
+    const demVe = (ds: DsChat) => {
+      const d = new Map<string, number>()
+      for (const [k, c] of ds) for (const [b, n] of Object.entries(LIEN_KET[c]!)) d.set(b, (d.get(b) ?? 0) + k * n)
+      return d
+    }
+    const dT = demVe(p.trai), dP = demVe(p.phai)
+    const lk = [...new Set([...dT.keys(), ...dP.keys()])]
+    const coCacbon = lk.some((b) => b.split(/[–=≡]/).includes('C'))
+    const dem = `Đếm liên kết theo cấu tạo: ${[...p.trai, ...p.phai].map(([k, c]) => `${k === 1 ? '' : k}${c}: ${Object.entries(LIEN_KET[c]!).map(([b, n]) => `${k * n} ${b}`).join(' + ')}`).join('; ')}.`
+    for (let v = 0; v < 3; v++) {
+      const eb = new Map(lk.map((b, i) => [b, EB[b]![v < 2 ? v : i % 2]] as const))
+      const tongVe = (d: Map<string, number>) => [...d].reduce((s, [b, n]) => s + n * eb.get(b)!, 0)
+      const bieuVe = (d: Map<string, number>) => [...d].map(([b, n]) => (n === 1 ? `${eb.get(b)}` : `${n} · ${eb.get(b)}`)).join(' + ')
+      const dsEb = (bo?: string) => lk.filter((b) => b !== bo).map((b) => `${b} ${eb.get(b)}`).join('; ')
+      const sT = tongVe(dT), sP = tongVe(dP), dH = sT - sP
+      if (dH === 0) continue
+      ra.push(so(coCacbon ? 2 : 1, `Cho phản ứng: ${pt}. Biết năng lượng liên kết Eb (kJ/mol): ${dsEb()}. Tính biến thiên enthalpy chuẩn ΔrH°298 (kJ) của phản ứng theo năng lượng liên kết.`, dH,
+        [dem, `ΣEb(chất đầu) = ${bieuVe(dT)} = ${sT} kJ; ΣEb(sản phẩm) = ${bieuVe(dP)} = ${sP} kJ.`, `ΔrH°298 = ΣEb(chất đầu) − ΣEb(sản phẩm) = ${sT} − ${sP} = ${vnS(dH)} kJ.`], MEO_LK))
+      for (const b of lk) {
+        const c = (dT.get(b) ?? 0) - (dP.get(b) ?? 0), x = eb.get(b)!
+        if (c === 0) continue // liên kết triệt tiêu hai vế ⇒ không tìm được từ ΔrH
+        const K = dH - c * x // phần đã biết: ΣEb(chất đầu) − ΣEb(sản phẩm) không kể liên kết b
+        const tinh = c === 1 ? `Eb(${b}) = ${vnS(dH)} − ${ngoac(K)} = ${x} kJ/mol.`
+          : c === -1 ? `Eb(${b}) = ${vnS(K)} − ${ngoac(dH)} = ${x} kJ/mol.`
+            : `Eb(${b}) = (${vnS(dH)} − ${ngoac(K)}) : ${ngoac(c)} = ${x} kJ/mol.`
+        ra.push(so(2, `Cho phản ứng: ${pt}, có ΔrH°298 = ${vnS(dH)} kJ. Biết năng lượng liên kết Eb (kJ/mol): ${dsEb(b)}. Tính năng lượng liên kết Eb(${b}) (kJ/mol).`, x,
+          [dem, `ΔrH°298 = ΣEb(chất đầu) − ΣEb(sản phẩm) ⇒ ${vnS(dH)} = ${vnS(K)} ${c > 0 ? '+' : '−'} ${Math.abs(c) === 1 ? '' : `${Math.abs(c)} · `}Eb(${b}).`, tinh], MEO_LK))
+      }
+    }
+  }
+  return ra
+}
+
+/** Chữ mọi phương trình viết sẵn của 3 nhãn nhiệt / cân bằng (test kiểm cân bằng bằng bộ đếm nguyên tử riêng). */
+export const PHAN_UNG_MOI_CHU: readonly string[] = [
+  ...PU_KC.map(chuKc), ...PU_NHIET.map(({ p }) => chuPhanUng(p)), ...PU_LIEN_KET.map((p) => `${vePhan(theKhi(p.trai))} → ${vePhan(theKhi(p.phai))}`),
+]
+
 // ---------------------------------------------------------------- danh mục bộ sinh
 
 const BO_SINH: Readonly<Record<string, () => Nhap[]>> = {
@@ -738,6 +1149,8 @@ const BO_SINH: Readonly<Record<string, () => Nhap[]>> = {
   hieu_suat: hieuSuat, chat_du_het: chatDuHet, phan_tram_khoi_luong: phanTramKhoiLuong, do_bat_bao_hoa: doBatBaoHoa, ph_nong_do_ion: phNongDoIon,
   dung_dich_pha_loang: phaLoang, dien_phan_faraday: dienPhan, gia_tri_trung_binh: giaTriTrungBinh, the_dien_cuc_pin: theDienCucPin,
   toc_do_phan_ung: tocDoPhanUng, can_bang_phuong_trinh: canBangPhuongTrinh, bao_toan_nguyen_to: baoToanNguyenTo,
+  bao_toan_electron: baoToanElectron, lap_he_phuong_trinh: lapHePhuongTrinh, cong_thuc_phan_tu: congThucPhanTu,
+  hang_so_can_bang: hangSoCanBang, bien_thien_enthalpy: bienThienEnthalpy, nang_luong_lien_ket: nangLuongLienKet,
 }
 /** Mọi nhãn có bộ sinh (thứ tự cố định). 'tinh_chat_hoa_hoc', 'lam_tron_ket_qua'… không có bộ sinh. */
 export const NHAN_CO_BO_SINH: readonly string[] = Object.keys(BO_SINH)

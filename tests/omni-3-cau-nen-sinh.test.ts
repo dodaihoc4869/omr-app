@@ -2,6 +2,9 @@
 // OMNI 3 · D1 — TỰ SINH CÂU NỀN (server/src/omni-cau-nen-sinh.ts): KIỂM CHÉO mọi đáp án bằng một bộ giải ĐỘC LẬP viết riêng ở đây.
 // Bộ giải này ĐỌC LẠI CHỮ ĐỀ như học sinh (tự phân tích công thức có chỉ số Unicode, tự tính khối lượng mol bằng bảng nguyên tử khối riêng,
 // tự cân bằng phương trình bằng vét cạn) — không gọi lại hàm nào của bộ sinh. Sai một số trong đề / một hệ số / một khối lượng mol ⇒ test đỏ.
+// 6 nhãn thêm 05/10 có bảng RIÊNG ở đây (số e tính từ số oxi hoá trong công thức khí, hoá trị kim loại, 6 cân bằng Kc, bảng cấu tạo – liên kết tự kiểm
+// bằng hoá trị, dạng bền của đơn chất) và được giải lại TOÀN BỘ không gian câu, không chỉ 50 câu đầu. Đã thử cố ý làm sai bộ sinh 13 kiểu (hoá trị Al,
+// Fe²⁺/Fe³⁺, số e của N₂O, số liên kết C₂H₆/CO₂, dấu ΔrH, quên hệ số, quên mũ trong Kc, đổi số mol sai, khối lượng H₂O, nhiễu H lẻ, nhiễu k < 0) ⇒ test đều đỏ.
 import { describe, expect, it, vi } from 'vitest'
 import { chamCauNen, docSo, locCauNen } from '../server/src/thang-tu-go'
 import { NHAN_CO_BO_SINH, coBoSinh, damBaoCauNenTuDong, damBaoMoiCauNenTuDong, sinhCauNen, sinhLoCauNen, soCauKhongGian, type CauNenSinh } from '../server/src/omni-cau-nen-sinh'
@@ -18,6 +21,7 @@ const veAscii = (s: string) => [...s].map((c) => (DUOI.includes(c) ? String(DUOI
 function phanTichCongThuc(ct: string): Record<string, number> {
   const s = veAscii(ct)
   let i = 0
+  const soSau = () => { const m = /^\d+/.exec(s.slice(i)); if (!m) return 1; i += m[0].length; return Number(m[0]) }
   const nhom = (): Record<string, number> => {
     const ra: Record<string, number> = {}
     const cong = (o: Record<string, number>, k: number) => { for (const [e, n] of Object.entries(o)) ra[e] = (ra[e] ?? 0) + n * k }
@@ -37,7 +41,6 @@ function phanTichCongThuc(ct: string): Record<string, number> {
     }
     return ra
   }
-  const soSau = () => { const m = /^\d+/.exec(s.slice(i)); if (!m) return 1; i += m[0].length; return Number(m[0]) }
   const kq = nhom()
   if (i !== s.length) throw new Error(`công thức thừa ký tự: ${ct}`)
   return kq
@@ -84,6 +87,38 @@ const V_MOL = 24.79
 const FARADAY = 96500
 const TOKEN = '(\\S+?)(?=[,.\\s?]|$)'
 const R = (s: string) => new RegExp(s)
+
+// ---------------------------------------------------------------- bảng RIÊNG cho 6 nhãn mới (05/10) — không import gì từ tệp sinh
+
+/** Hai nhãn có đáp án được phép ÂM (ΔrH°298, ΔfH°298). */
+const NHAN_AM = ['bien_thien_enthalpy', 'nang_luong_lien_ket']
+const NHAN_MOI = ['bao_toan_electron', 'lap_he_phuong_trinh', 'cong_thuc_phan_tu', 'hang_so_can_bang', 'bien_thien_enthalpy', 'nang_luong_lien_ket']
+/** Sáu cân bằng pha khí của đặc tả (viết lại bằng tay). */
+const CAN_BANG_KC_T = ['H₂ + I₂ ⇌ 2HI', 'N₂ + 3H₂ ⇌ 2NH₃', '2SO₂ + O₂ ⇌ 2SO₃', 'CO + H₂O ⇌ CO₂ + H₂', 'N₂O₄ ⇌ 2NO₂', 'PCl₅ ⇌ PCl₃ + Cl₂']
+/** Số liên kết mỗi phân tử theo CÔNG THỨC CẤU TẠO (bảng riêng; test "bảng cấu tạo" kiểm lại bằng hoá trị + số nguyên tử). */
+const LK_T: Record<string, Record<string, number>> = {
+  'H₂': { 'H–H': 1 }, 'Cl₂': { 'Cl–Cl': 1 }, 'F₂': { 'F–F': 1 }, 'O₂': { 'O=O': 1 }, 'N₂': { 'N≡N': 1 }, 'HCl': { 'H–Cl': 1 }, 'HF': { 'H–F': 1 },
+  'H₂O': { 'O–H': 2 }, 'NH₃': { 'N–H': 3 }, 'CO₂': { 'C=O': 2 }, 'CH₄': { 'C–H': 4 }, 'C₂H₆': { 'C–H': 6, 'C–C': 1 }, 'C₃H₈': { 'C–H': 8, 'C–C': 2 },
+  'C₂H₄': { 'C–H': 4, 'C=C': 1 }, 'C₂H₂': { 'C–H': 2, 'C≡C': 1 }, 'CH₃Cl': { 'C–H': 3, 'C–Cl': 1 }, 'C₂H₅Cl': { 'C–H': 5, 'C–C': 1, 'C–Cl': 1 },
+}
+/** Dạng bền của đơn chất ở 25 °C, 1 bar (ΔfH°298 = 0). */
+const DON_CHAT_BEN_T = new Set(['O₂|g', 'H₂|g', 'N₂|g', 'Cl₂|g', 'Fe|s', 'Al|s', 'Cu|s'])
+/** "CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(l)" ⇒ [hệ số, công thức, thể]. Thiếu thể ⇒ ném lỗi. */
+type ChatThe = [number, string, string]
+interface PtThe { trai: ChatThe[]; phai: ChatThe[] }
+function docPtThe(chu: string): PtThe {
+  const ve = chu.split(/\s*[→⇌]\s*/)
+  if (ve.length !== 2) throw new Error(`phương trình lạ: ${chu}`)
+  const doc = (x: string): ChatThe[] => x.split(' + ').map((t) => {
+    const m = /^(\d*)(.+)\((g|l|s)\)$/.exec(t.trim())
+    if (!m) throw new Error(`số hạng thiếu thể: ${t}`)
+    return [m[1] ? Number(m[1]) : 1, m[2]!, m[3]!]
+  })
+  return { trai: doc(ve[0]!), phai: doc(ve[1]!) }
+}
+const boTheT = (p: PtThe): PtT => ({ trai: p.trai.map(([k, c]) => [k, c]), phai: p.phai.map(([k, c]) => [k, c]) })
+/** Số trong đề phải là số nguyên (sai số `sai`). */
+const nguyenT = (x: number, ghi: string, sai = 1e-9) => { const r = Math.round(x); expect(Math.abs(x - r), `${ghi} ⇒ ${x}`).toBeLessThanOrEqual(sai); return r }
 
 // ---------------------------------------------------------------- bộ giải độc lập theo nhãn (đọc chữ đề)
 
@@ -313,16 +348,230 @@ const GIAI: Record<string, (c: CauNenSinh) => KetQua> = {
     }
     throw new Error(de)
   },
+
+  // ---------------------------------------------------------------- 6 nhãn mới (05/10)
+  bao_toan_electron: ({ de }) => {
+    const m = /^Hoà tan hoàn toàn (m|[\d,]+) gam (\S+) trong dung dịch (HNO₃|H₂SO₄) (loãng|đặc, nóng), dư, thu được (V|[\d,]+) lít khí (\S+) \(sản phẩm khử duy nhất của (N⁺⁵|S⁺⁶), ở điều kiện chuẩn 25 °C, 1 bar\)\. Tính (m|V)\.$/.exec(de)
+    if (!m) throw new Error(de)
+    const mKl = m[1]!, kl = m[2]!, axit = m[3]!, moiTruong = m[4]!, vKhi = m[5]!, khi = m[6]!, nguon = m[7]!, hoi = m[8]!
+    // Hoá trị khi tan HẾT trong axit có tính oxi hoá mạnh, DƯ (Fe ⇒ Fe³⁺).
+    const HOA_TRI_MAX: Record<string, number> = { Mg: 2, Al: 3, Zn: 2, Fe: 3, Cu: 2 }
+    const z = HOA_TRI_MAX[kl]
+    if (!z) throw new Error(`kim loại lạ: ${de}`)
+    // Số electron 1 mol khí nhận, tính từ SỐ OXI HOÁ trong công thức khí (O = −2): N⁺⁵ / S⁺⁶ xuống số oxi hoá trong khí.
+    const tp = phanTichCongThuc(khi), X = axit === 'HNO₃' ? 'N' : 'S', cao = axit === 'HNO₃' ? 5 : 6
+    expect(Object.keys(tp).every((e) => e === X || e === 'O'), de).toBe(true)
+    expect(nguon).toBe(axit === 'HNO₃' ? 'N⁺⁵' : 'S⁺⁶')
+    const e = tp[X]! * cao - 2 * (tp.O ?? 0)
+    expect(e, de).toBeGreaterThan(0)
+    // Hoá học có thật: NO₂ ⇐ HNO₃ đặc, nóng; SO₂ ⇐ H₂SO₄ đặc, nóng; NO, N₂O, N₂ ⇐ HNO₃ loãng; Cu, Fe không cho N₂O, N₂.
+    expect(moiTruong, de).toBe(khi === 'SO₂' || khi === 'NO₂' ? 'đặc, nóng' : 'loãng')
+    if (kl === 'Cu' || kl === 'Fe') expect(['NO', 'NO₂', 'SO₂'], de).toContain(khi)
+    if (hoi === 'V') { expect(vKhi).toBe('V'); return sv(mKl) / NTK_T[kl]! * z / e * V_MOL }
+    expect(mKl).toBe('m')
+    return sv(vKhi) / V_MOL * e / z * NTK_T[kl]!
+  },
+  lap_he_phuong_trinh: ({ de }) => {
+    const m = /^Cho ([\d,]+) gam hỗn hợp X gồm (\S+) và (\S+) tác dụng hết với dung dịch (HCl dư|H₂SO₄ loãng, dư), thu được ([\d,]+) lít khí H₂ \(ở điều kiện chuẩn 25 °C, 1 bar\)\. Tính (khối lượng \(gam\)|phần trăm khối lượng) của (\S+) trong X\.$/.exec(de)
+    if (!m) throw new Error(de)
+    // Số mol H₂ do 1 mol kim loại sinh ra với axit KHÔNG có tính oxi hoá mạnh (Fe chỉ lên Fe²⁺).
+    const H2_MOI_MOL: Record<string, number> = { Mg: 1, Zn: 1, Fe: 1, Al: 1.5 }
+    const mX = sv(m[1]!), A = m[2]!, B = m[3]!, nH2 = sv(m[5]!) / V_MOL, hoi = m[7]!
+    const a1 = NTK_T[A]!, b1 = NTK_T[B]!, a2 = H2_MOI_MOL[A]!, b2 = H2_MOI_MOL[B]!
+    const D = a1 * b2 - a2 * b1
+    expect(Math.abs(D), de).toBeGreaterThan(1e-9) // hệ có nghiệm duy nhất
+    const x = (mX * b2 - nH2 * b1) / D, y = (a1 * nH2 - a2 * mX) / D
+    expect(x > 1e-9 && y > 1e-9, `${de} ⇒ x = ${x}, y = ${y}`).toBe(true) // nghiệm dương
+    expect([A, B]).toContain(hoi)
+    const mHoi = hoi === A ? x * a1 : y * b1
+    return m[6]!.startsWith('khối') ? mHoi : mHoi / mX * 100
+  },
+  cong_thuc_phan_tu: ({ de, pa }) => {
+    let C: number, H: number, O: number
+    let m = /^Đốt cháy hoàn toàn ([\d,]+) mol hydrocarbon X, thu được ([\d,]+) mol CO₂ và ([\d,]+) mol H₂O\. Công thức phân tử của X là$/.exec(de)
+    if (m) {
+      const n = sv(m[1]!)
+      C = nguyenT(sv(m[2]!) / n, de); H = nguyenT(2 * sv(m[3]!) / n, de); O = 0
+    } else if ((m = /^Đốt cháy hoàn toàn ([\d,]+) mol chất hữu cơ X \(phân tử gồm C, H, O\), thu được ([\d,]+) mol CO₂ và ([\d,]+) mol H₂O\. Biết khối lượng mol của X là (\d+) g\/mol\. Công thức phân tử của X là$/.exec(de))) {
+      const n = sv(m[1]!), MX = Number(m[4])
+      C = nguyenT(sv(m[2]!) / n, de); H = nguyenT(2 * sv(m[3]!) / n, de); O = nguyenT((MX - C * NTK_T.C! - H * NTK_T.H!) / NTK_T.O!, de)
+      expect(O, de).toBeGreaterThanOrEqual(1)
+    } else if ((m = /^Đốt cháy hoàn toàn ([\d,]+) gam chất hữu cơ X, thu được ([\d,]+) gam CO₂ và ([\d,]+) gam H₂O\. (?:Tỉ khối hơi của X so với H₂ là (\d+)|Khối lượng mol của X là (\d+) g\/mol)\. Công thức phân tử của X là$/.exec(de))) {
+      const mX = sv(m[1]!), nC = sv(m[2]!) / M('CO₂'), nH = 2 * sv(m[3]!) / M('H₂O')
+      const mO = mX - nC * NTK_T.C! - nH * NTK_T.H!
+      expect(mO, de).toBeGreaterThanOrEqual(-1e-9) // không âm: dữ kiện không tự mâu thuẫn
+      const MX = m[4] ? Number(m[4]) * M('H₂') : Number(m[5]), nX = mX / MX
+      C = nguyenT(nC / nX, de); H = nguyenT(nH / nX, de); O = nguyenT(mO / NTK_T.O! / nX, de)
+    } else if ((m = /^Chất hữu cơ X có thành phần khối lượng: ([\d,]+)% C; ([\d,]+)% H; còn lại là O\. Khối lượng mol của X là (\d+) g\/mol\. Công thức phân tử của X là$/.exec(de))) {
+      const MX = Number(m[3])
+      // % in đề đã làm tròn 2 chữ số ⇒ số nguyên tử lệch rất nhỏ khỏi số nguyên.
+      C = nguyenT(MX * sv(m[1]!) / 100 / NTK_T.C!, de, 0.02); H = nguyenT(MX * sv(m[2]!) / 100 / NTK_T.H!, de, 0.05)
+      O = nguyenT((MX - C * NTK_T.C! - H * NTK_T.H!) / NTK_T.O!, de)
+      expect(O, de).toBeGreaterThanOrEqual(1)
+    } else if ((m = /^Hydrocarbon X có ([\d,]+)% C về khối lượng\. Khối lượng mol của X là (\d+) g\/mol\. Công thức phân tử của X là$/.exec(de))) {
+      const MX = Number(m[2])
+      C = nguyenT(MX * sv(m[1]!) / 100 / NTK_T.C!, de, 0.02); H = nguyenT(MX - C * NTK_T.C!, de); O = 0
+    } else throw new Error(de)
+    // Bốn phương án đều là công thức HỢP LỆ (chỉ C, H, O; H chẵn; k = (2C + 2 − H) : 2 nguyên ≥ 0); đúng MỘT phương án khớp dữ kiện.
+    const khop = (['A', 'B', 'C', 'D'] as const).filter((k) => {
+      const t = phanTichCongThuc(pa![k]), c = t.C ?? 0, h = t.H ?? 0
+      expect(Object.keys(t).every((e) => e === 'C' || e === 'H' || e === 'O') && c >= 1 && h >= 2, pa![k]).toBe(true)
+      expect(h % 2, pa![k]).toBe(0)
+      const kk = (2 * c + 2 - h) / 2
+      expect(Number.isInteger(kk) && kk >= 0, pa![k]).toBe(true)
+      return c === C && h === H && (t.O ?? 0) === O
+    })
+    expect(khop, `${de} | ${JSON.stringify(pa)} | cần C${C}H${H}O${O}`).toHaveLength(1)
+    return khop[0]!
+  },
+  hang_so_can_bang: ({ de }) => {
+    const m0 = /^Cho phản ứng: (.+?)\. (.+)$/.exec(de)
+    if (!m0) throw new Error(de)
+    const p = docPtThe(m0[1]!)
+    expect([...p.trai, ...p.phai].every(([, , t]) => t === 'g'), de).toBe(true) // cân bằng pha khí
+    expect(CAN_BANG_KC_T, de).toContain(m0[1]!.replace(/\(g\)/g, ''))
+    expect(canBang(boTheT(p)), de).toBe(true)
+    const C = new Map<string, number>()
+    for (const x of m0[2]!.matchAll(/\[([^\]]+)\] = ([\d,]+) M/g)) C.set(x[1]!, sv(x[2]!))
+    const V = /dung tích (\d+) lít/.exec(m0[2]!)
+    if (V) for (const x of m0[2]!.matchAll(/([\d,]+) mol ([^\s,.]+)/g)) C.set(x[2]!, sv(x[1]!) / Number(V[1])) // số mol ⇒ nồng độ
+    const tich = (ds: ChatThe[], f: (c: string) => number) => ds.reduce((s, [k, c]) => s * f(c) ** k, 1)
+    const an = /Tính nồng độ mol \(M\) của (\S+) ở trạng thái cân bằng\.$/.exec(de)
+    if (an) {
+      const X = an[1]!, K = sv(/hằng số cân bằng Kc = ([\d,]+)\./.exec(de)![1]!)
+      expect(C.has(X), de).toBe(false)
+      const f = (c: string) => (c === X ? 1 : C.get(c)!)
+      const A = tich(p.phai, f) / tich(p.trai, f)
+      const laSp = p.phai.some(([, c]) => c === X), k = [...p.trai, ...p.phai].find(([, c]) => c === X)![0]
+      return (laSp ? K / A : A / K) ** (1 / k)
+    }
+    expect(de).toMatch(/Tính hằng số cân bằng Kc của phản ứng ở nhiệt độ đó\.$/)
+    for (const [, c] of [...p.trai, ...p.phai]) expect(C.has(c), `${de} — thiếu [${c}]`).toBe(true)
+    return tich(p.phai, (c) => C.get(c)!) / tich(p.trai, (c) => C.get(c)!)
+  },
+  bien_thien_enthalpy: ({ de }) => {
+    const dfDe = (s: string) => {
+      const ra = new Map<string, number>()
+      expect(s, de).toContain('ΔfH°298 của đơn chất bền bằng 0.')
+      const m = /ΔfH°298 \(kJ\/mol\) của (.+?) (?:lần lượt là|là) (.+?); ΔfH°298 của đơn chất bền bằng 0\./.exec(s)
+      if (m) {
+        const chat = m[1]!.split(', '), gt = m[2]!.split('; ')
+        expect(chat.length, de).toBe(gt.length)
+        chat.forEach((c, i) => ra.set(c, sv(gt[i]!)))
+      }
+      return ra
+    }
+    const df = (biet: Map<string, number>, [, c, t]: ChatThe) => {
+      if (Object.keys(phanTichCongThuc(c)).length === 1) { // đơn chất: phải ở dạng bền ⇒ 0
+        expect(DON_CHAT_BEN_T.has(`${c}|${t}`), `${c}(${t}) không phải dạng bền: ${de}`).toBe(true)
+        return 0
+      }
+      const v = biet.get(`${c}(${t})`)
+      if (v === undefined) throw new Error(`đề thiếu ΔfH°298 của ${c}(${t}): ${de}`)
+      return v
+    }
+    const luong = (p: PtThe, s: string) => {
+      const x = /^(?:đốt cháy hoàn toàn |phân huỷ hoàn toàn )?(.+?)(?: phản ứng hết)?$/.exec(s)![1]!
+      let ct: string, n: number, mm: RegExpExecArray | null
+      if ((mm = /^([\d,]+) mol (\S+)$/.exec(x))) { ct = mm[2]!; n = sv(mm[1]!) }
+      else if ((mm = /^([\d,]+) gam (\S+)$/.exec(x))) { ct = mm[2]!; n = sv(mm[1]!) / M(ct) }
+      else if ((mm = /^([\d,]+) lít khí (\S+) \(ở điều kiện chuẩn 25 °C, 1 bar\)$/.exec(x))) { ct = mm[2]!; n = sv(mm[1]!) / V_MOL }
+      else throw new Error(`lượng chất lạ: ${s}`)
+      const chat = p.trai.find(([, c]) => c === ct)
+      if (!chat) throw new Error(`${ct} không là chất phản ứng: ${de}`)
+      if (/ lít khí /.test(x)) expect(chat[2], de).toBe('g')
+      if (s.startsWith('đốt cháy')) expect(p.trai.some(([, c]) => c === 'O₂'), de).toBe(true)
+      if (s.startsWith('phân huỷ')) expect(p.trai, de).toHaveLength(1)
+      return { n, k: chat[0] }
+    }
+    // Thực tế: mọi phản ứng có O₂ tham gia trong bộ câu đều TOẢ nhiệt.
+    const soatDau = (p: PtThe, dH: number) => { if (p.trai.some(([, c]) => c === 'O₂')) expect(dH, de).toBeLessThan(0) }
+    let m = /^Cho phản ứng: (.+?)\. Biết (.+) Tính biến thiên enthalpy chuẩn ΔrH°298 \(kJ\) của phản ứng\.$/.exec(de)
+    if (m) {
+      const p = docPtThe(m[1]!), biet = dfDe(m[2]!)
+      expect(canBang(boTheT(p)), de).toBe(true)
+      const kq = p.phai.reduce((s, x) => s + x[0] * df(biet, x), 0) - p.trai.reduce((s, x) => s + x[0] * df(biet, x), 0)
+      soatDau(p, kq)
+      return kq
+    }
+    m = /^Cho phản ứng: (.+?), có ΔrH°298 = ([+−-]?[\d,]+) kJ\. Biết (.+) Tính ΔfH°298 \(kJ\/mol\) của (\S+)\.$/.exec(de)
+    if (m) {
+      const p = docPtThe(m[1]!), dH = sv(m[2]!), biet = dfDe(m[3]!), X = m[4]!
+      expect(canBang(boTheT(p)), de).toBe(true)
+      soatDau(p, dH)
+      expect(biet.has(X), de).toBe(false)
+      let k = 0, phia = 0, biet_ = 0
+      for (const x of p.trai) { if (`${x[1]}(${x[2]})` === X) { k = x[0]; phia = -1 } else biet_ -= x[0] * df(biet, x) }
+      for (const x of p.phai) { if (`${x[1]}(${x[2]})` === X) { k = x[0]; phia = 1 } else biet_ += x[0] * df(biet, x) }
+      expect(k, de).toBeGreaterThan(0)
+      return (dH - biet_) / (phia * k) // ΔrH = phần đã biết + phía · k · ΔfH(X)
+    }
+    m = /^Cho phương trình nhiệt hoá học: (.+?); ΔrH°298 = ([+−-]?[\d,]+) kJ\. Tính nhiệt lượng \(kJ\) (toả ra khi|cần cung cấp để) (.+)\.$/.exec(de)
+    if (m) {
+      const p = docPtThe(m[1]!), dH = sv(m[2]!)
+      expect(canBang(boTheT(p)), de).toBe(true)
+      soatDau(p, dH)
+      expect(m[3] === 'toả ra khi', de).toBe(dH < 0)
+      const { n, k } = luong(p, m[4]!)
+      return Math.abs(dH) * n / k
+    }
+    m = /^Cho phản ứng: (.+?)\. Khi (.+) thì (toả ra|thu vào) ([\d,]+) kJ\. Tính biến thiên enthalpy chuẩn ΔrH°298 \(kJ\) của phản ứng theo phương trình trên\.$/.exec(de)
+    if (m) {
+      const p = docPtThe(m[1]!)
+      expect(canBang(boTheT(p)), de).toBe(true)
+      const { n, k } = luong(p, m[2]!)
+      const kq = (m[3] === 'toả ra' ? -1 : 1) * sv(m[4]!) * k / n
+      soatDau(p, kq)
+      return kq
+    }
+    throw new Error(de)
+  },
+  nang_luong_lien_ket: ({ de }) => {
+    const m = /^Cho phản ứng: (.+?)(?:, có ΔrH°298 = ([+−-]?\d+) kJ)?\. Biết năng lượng liên kết Eb \(kJ\/mol\): (.+?)\. Tính (.+)$/.exec(de)
+    if (!m) throw new Error(de)
+    const p = docPtThe(m[1]!)
+    expect([...p.trai, ...p.phai].every(([, , t]) => t === 'g'), de).toBe(true) // mọi chất ở thể khí
+    expect(canBang(boTheT(p)), de).toBe(true)
+    const eb = new Map<string, number>()
+    for (const x of m[3]!.split('; ')) { const y = /^(\S+) (\d+)$/.exec(x); if (!y) throw new Error(`Eb lạ: ${x}`); eb.set(y[1]!, Number(y[2])) }
+    const dem = (ds: ChatThe[]) => {
+      const d = new Map<string, number>()
+      for (const [k, c] of ds) {
+        const lk = LK_T[c]
+        if (!lk) throw new Error(`test chưa có cấu tạo ${c}`)
+        for (const [b, n] of Object.entries(lk)) d.set(b, (d.get(b) ?? 0) + k * n)
+      }
+      return d
+    }
+    const dT = dem(p.trai), dP = dem(p.phai)
+    const gia = (b: string) => { const v = eb.get(b); if (v === undefined) throw new Error(`đề thiếu Eb(${b}): ${de}`); return v }
+    if (m[4] === 'biến thiên enthalpy chuẩn ΔrH°298 (kJ) của phản ứng theo năng lượng liên kết.') {
+      expect(m[2], de).toBeUndefined()
+      const tong = (d: Map<string, number>) => [...d].reduce((s, [b, n]) => s + n * gia(b), 0)
+      return tong(dT) - tong(dP)
+    }
+    const an = /^năng lượng liên kết Eb\((\S+)\) \(kJ\/mol\)\.$/.exec(m[4]!)
+    if (!an || m[2] === undefined) throw new Error(de)
+    const X = an[1]!, dH = sv(m[2])
+    expect(eb.has(X), de).toBe(false)
+    let biet = 0, c = 0
+    for (const [b, n] of dT) { if (b === X) c += n; else biet += n * gia(b) }
+    for (const [b, n] of dP) { if (b === X) c -= n; else biet -= n * gia(b) }
+    expect(c, de).not.toBe(0)
+    return (dH - biet) / c
+  },
 }
 
 const SO_CAU = 50
 const tatCa = new Map<string, CauNenSinh[]>(NHAN_CO_BO_SINH.map((n) => [n, sinhLoCauNen(n, 1, SO_CAU)]))
 
 describe('Bộ sinh câu nền — danh mục', () => {
-  it('đủ 20 nhãn tính toán của đặc tả, mỗi nhãn có bộ giải độc lập và ≥ 50 câu khác nội dung', () => {
+  it('đủ 26 nhãn tính toán (20 nhãn đầu + 6 bước tính toán thêm 05/10), mỗi nhãn có bộ giải độc lập và ≥ 50 câu khác nội dung', () => {
+    expect(NHAN_CO_BO_SINH).toHaveLength(26)
     expect([...NHAN_CO_BO_SINH].sort()).toEqual(['bao_toan_khoi_luong', 'bao_toan_nguyen_to', 'can_bang_phuong_trinh', 'chat_du_het', 'dien_phan_faraday',
       'do_bat_bao_hoa', 'doi_mol_khoi_luong', 'doi_mol_the_tich_khi', 'dung_dich_pha_loang', 'gia_tri_trung_binh', 'hieu_suat', 'khoi_luong_rieng',
-      'nong_do_mol', 'nong_do_phan_tram', 'ph_nong_do_ion', 'phan_tram_khoi_luong', 'the_dien_cuc_pin', 'ti_khoi_khi', 'ti_le_mol_phuong_trinh', 'toc_do_phan_ung'])
+      'nong_do_mol', 'nong_do_phan_tram', 'ph_nong_do_ion', 'phan_tram_khoi_luong', 'the_dien_cuc_pin', 'ti_khoi_khi', 'ti_le_mol_phuong_trinh', 'toc_do_phan_ung',
+      ...NHAN_MOI].sort())
     for (const n of NHAN_CO_BO_SINH) {
       expect(GIAI[n], n).toBeTypeOf('function')
       expect(soCauKhongGian(n), n).toBeGreaterThanOrEqual(SO_CAU)
@@ -336,17 +585,18 @@ describe('Bộ sinh câu nền — danh mục', () => {
 
 describe.each(NHAN_CO_BO_SINH.map((n) => [n]))('Kiểm chéo 50 câu — %s', (nhan) => {
   const ds = tatCa.get(nhan)!
-  it('đáp án = kết quả bộ giải độc lập (khớp tuyệt đối), dương, hữu hạn, ≤ 3 chữ số thập phân', () => {
+  it('đáp án = kết quả bộ giải độc lập (khớp tuyệt đối), hữu hạn, ≤ 3 chữ số thập phân; dương (riêng ΔrH°298 / ΔfH°298 được âm, khác 0)', () => {
+    const coAm = NHAN_AM.includes(nhan)
     for (const c of ds) {
       const kq = GIAI[nhan]!(c)
       if (c.kieu === 'tn') { expect(c.dap_an, c.de).toBe(kq); continue }
       const so = kq as number
-      expect(Number.isFinite(so) && so > 0, c.de).toBe(true)
+      expect(Number.isFinite(so) && (coAm ? Math.abs(so) > 1e-9 : so > 0), c.de).toBe(true)
       expect(soLe(so), `${c.de} ⇒ ${so}`).toBeLessThanOrEqual(3)
-      expect(Math.abs(docSo(c.dap_an)! - so), `${c.de} | đáp án ${c.dap_an} ≠ ${so}`).toBeLessThanOrEqual(1e-9 * Math.max(1, so))
-      expect(Math.abs(Number(c.gia_tri_dung) - so)).toBeLessThanOrEqual(1e-9 * Math.max(1, so))
+      expect(Math.abs(docSo(c.dap_an)! - so), `${c.de} | đáp án ${c.dap_an} ≠ ${so}`).toBeLessThanOrEqual(1e-9 * Math.max(1, Math.abs(so)))
+      expect(Math.abs(Number(c.gia_tri_dung) - so)).toBeLessThanOrEqual(1e-9 * Math.max(1, Math.abs(so)))
       expect(c.dap_an).not.toContain('.') // dấu phẩy thập phân như app đang chấm
-      expect(c.dap_an).toMatch(/^\d+(,\d{1,3})?$/)
+      expect(c.dap_an).toMatch(coAm ? /^-?\d+(,\d{1,3})?$/ : /^\d+(,\d{1,3})?$/)
     }
   })
   it('chamCauNen chấm ĐÚNG đáp án và chấm SAI đáp án lệch 5 % (trắc nghiệm: chấm sai chữ cái khác)', () => {
@@ -431,6 +681,76 @@ describe('Tất định', () => {
       expect(canBang(docPhuongTrinh(chu)), chu).toBe(true)
     }
     for (const [cap, e] of Object.entries(m.E0_SGK)) expect(E0_T[cap], cap).toBe(e)
+    // Phương trình của 3 nhãn nhiệt / cân bằng (có ghi thể): đủ thể, cân bằng.
+    expect(m.PHAN_UNG_MOI_CHU.length).toBeGreaterThanOrEqual(6 + 20 + 15)
+    for (const chu of m.PHAN_UNG_MOI_CHU) expect(canBang(boTheT(docPtThe(chu))), chu).toBe(true)
+  })
+})
+
+describe('Sáu bước tính toán thêm 05/10 — TOÀN BỘ không gian câu qua bộ giải độc lập (không chỉ 50 câu đầu)', () => {
+  it.each(NHAN_MOI.map((n) => [n]))('%s', (nhan) => {
+    const ds = sinhLoCauNen(nhan, 1, soCauKhongGian(nhan))
+    expect(ds.length).toBeGreaterThanOrEqual(SO_CAU)
+    expect(new Set(ds.map((c) => `${c.de}|${c.pa_json ?? ''}`)).size).toBe(ds.length)
+    for (const c of ds) {
+      const kq = GIAI[nhan]!(c)
+      if (c.kieu === 'tn') { expect(c.dap_an, c.de).toBe(kq); continue }
+      const so = kq as number
+      expect(Number.isFinite(so) && Math.abs(so) > 1e-9, c.de).toBe(true)
+      if (!NHAN_AM.includes(nhan)) expect(so, c.de).toBeGreaterThan(0)
+      expect(soLe(so), `${c.de} ⇒ ${so}`).toBeLessThanOrEqual(3)
+      expect(Math.abs(docSo(c.dap_an)! - so), `${c.de} | đáp án ${c.dap_an} ≠ ${so}`).toBeLessThanOrEqual(1e-9 * Math.max(1, Math.abs(so)))
+      expect([1, 2]).toContain(c.muc)
+      expect(c.giai.length >= 2 && c.giai.length <= 4, c.id).toBe(true)
+    }
+  })
+  it('đề cho sẵn mọi hằng số: ΔfH°298 + câu "đơn chất bền bằng 0", Eb, nồng độ / số mol cân bằng; khí đo ở 25 °C, 1 bar', () => {
+    for (const c of sinhLoCauNen('bien_thien_enthalpy', 1, soCauKhongGian('bien_thien_enthalpy'))) {
+      if (/ΔfH°298/.test(c.de)) expect(c.de, c.id).toContain('ΔfH°298 của đơn chất bền bằng 0.')
+      if (/ lít khí /.test(c.de)) expect(c.de, c.id).toContain('ở điều kiện chuẩn 25 °C, 1 bar')
+    }
+    for (const c of sinhLoCauNen('nang_luong_lien_ket', 1, soCauKhongGian('nang_luong_lien_ket'))) expect(c.de, c.id).toContain('Biết năng lượng liên kết Eb (kJ/mol): ')
+    for (const n of ['bao_toan_electron', 'lap_he_phuong_trinh']) for (const c of sinhLoCauNen(n, 1, soCauKhongGian(n))) expect(c.de, c.id).toContain('ở điều kiện chuẩn 25 °C, 1 bar')
+  })
+})
+
+describe('Số âm (ΔrH°298 / ΔfH°298): docSo + chamCauNen của thang-tu-go.ts', () => {
+  it('chấm ĐÚNG khi em gõ "-" (ASCII), "−" (U+2212), "–", có khoảng trắng, dấu chấm; chấm SAI khi mất dấu / dấu "+" / lệch 5 %', () => {
+    const am = NHAN_AM.flatMap((n) => sinhLoCauNen(n, 1, soCauKhongGian(n))).filter((c) => Number(c.gia_tri_dung) < 0)
+    expect(am.length).toBeGreaterThan(50)
+    for (const c of am) {
+      expect(c.dap_an, c.id).toMatch(/^-\d+(,\d{1,3})?$/)
+      const dong = { kieu: c.kieu, dap_an: c.dap_an, gia_tri_dung: c.gia_tri_dung }, tri = c.dap_an.slice(1)
+      for (const go of [c.dap_an, `-${tri}`, `−${tri}`, `– ${tri}`, ` − ${tri} `, `-${tri.replace(',', '.')}`]) expect(chamCauNen(dong, go), `${c.id}: ${go}`).toBe(true)
+      for (const go of [tri, `+${tri}`]) expect(chamCauNen(dong, go), `${c.id}: ${go}`).toBe(false)
+      const g = Number(c.gia_tri_dung)
+      expect(chamCauNen(dong, String(lam9(g * 1.05)).replace('.', ','))).toBe(false)
+      expect(chamCauNen(dong, String(lam9(g * 0.95)).replace('.', ','))).toBe(false)
+    }
+    expect(docSo('−890,3')).toBe(-890.3)
+    expect(docSo('-890,3')).toBe(-890.3)
+    expect(docSo('– 890,3')).toBe(-890.3)
+    // Đáp án thầy nạp tay viết "−" (U+2212) cũng chấm được.
+    expect(chamCauNen({ kieu: 'so', dap_an: '−92,3', gia_tri_dung: '-92.3' }, '-92,3')).toBe(true)
+    expect(chamCauNen({ kieu: 'so', dap_an: '−92,3', gia_tri_dung: '-92.3' }, '92,3')).toBe(false)
+  })
+})
+
+describe('Bảng cấu tạo của test (năng lượng liên kết) tự kiểm bằng hoá trị', () => {
+  it('mỗi phân tử: tổng bậc liên kết quanh mỗi nguyên tố = hoá trị × số nguyên tử; số liên kết = số nguyên tử − 1 (không vòng)', () => {
+    const HOA_TRI: Record<string, number> = { C: 4, H: 1, O: 2, N: 3, Cl: 1, F: 1 }
+    const BAC: Record<string, number> = { '–': 1, '=': 2, '≡': 3 }
+    for (const [ct, lk] of Object.entries(LK_T)) {
+      const tp = phanTichCongThuc(ct), quanh: Record<string, number> = {}
+      for (const [b, n] of Object.entries(lk)) {
+        const m = /^([A-Z][a-z]?)([–=≡])([A-Z][a-z]?)$/.exec(b)!
+        quanh[m[1]!] = (quanh[m[1]!] ?? 0) + BAC[m[2]!]! * n
+        quanh[m[3]!] = (quanh[m[3]!] ?? 0) + BAC[m[2]!]! * n
+      }
+      for (const [e, so] of Object.entries(tp)) expect(quanh[e], `${ct}: ${e}`).toBe(HOA_TRI[e]! * so)
+      expect(Object.keys(quanh).every((e) => tp[e]), ct).toBe(true)
+      expect(Object.values(lk).reduce((s, n) => s + n, 0), ct).toBe(Object.values(tp).reduce((s, n) => s + n, 0) - 1)
+    }
   })
 })
 
