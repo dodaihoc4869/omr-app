@@ -4,6 +4,8 @@
 //   · ô đúng bằng SBD cũ ⇒ đổi thẳng;
 //   · ô chứa SBD cũ như một "số riêng" (trước/sau không phải chữ số) ⇒ thay đúng chỗ đó — "1000420" hay "2100042" không bị đụng.
 // An toàn: `chayThat` vắng ⇒ CHỈ ĐẾM (chạy thử); từ chối khi SBD mới đã có dữ liệu ở bất kỳ đâu, hoặc đang có ca thi mở.
+// Dữ liệu thật lớn (một lượt quét mọi cột > 120 giây) ⇒ `lietKeCot: true` trả danh sách bảng.cột; `cot: "bang.cot"` chỉ làm MỘT cột.
+// Nơi gọi phải chạy thử ĐỦ mọi cột (không cột nào vướng) rồi mới chạy thật từng cột.
 import type { Env } from './kieu'
 
 type Obj = Record<string, unknown>
@@ -38,7 +40,11 @@ export async function doiSbd(env: Env, b: Obj): Promise<Obj> {
   if (cu === moi) return { ok: false, error: 'Số báo danh mới trùng số cũ' }
   const caMo = await env.DB.prepare("SELECT ma_ca FROM ca WHERE trang_thai = 'mo' LIMIT 1").first<Obj>().catch(() => null)
   if (caMo) return { ok: false, error: `Đang có ca thi mở (${String(caMo.ma_ca)}) — đổi số báo danh sau khi đóng ca` }
-  const cot = await cacCot(env)
+  const tatCa = await cacCot(env)
+  if (b.lietKeCot === true) return { ok: true, cot: tatCa.map((x) => `${x.bang}.${x.cot}`) }
+  const chon = String(b.cot ?? '').trim()
+  const cot = chon ? tatCa.filter((x) => `${x.bang}.${x.cot}` === chon) : tatCa
+  if (chon && cot.length === 0) return { ok: false, error: `Không có cột ${chon}` }
   const bang: DongDoiSbd[] = []
   const vuong: string[] = []
   for (const { bang: t, cot: c } of cot) {

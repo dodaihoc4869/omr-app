@@ -211,6 +211,9 @@ export interface TeacherExamSource {
    * đề nào mới/đã đổi (so `ngayNap`), không tải lại tất cả mỗi lần. */
   nguon?: string
   ngayNap?: string
+  /** `capNhatLuc` của đề trên kho lúc máy này tải về (05/10): kho sửa câu mà không đổi `ngayNap` (vd dựng lại bảng 02/10) thì
+   *  máy thầy vẫn biết để tải bản mới — trước đây màn "Cần thầy chữa" còn chiếu bảng dẹt "Mẫu | … 1 | 10 2 | 18". */
+  capNhatKho?: string
   /** NHÓM ĐỀ = tên thư mục con thầy tạo trong kho-de/moi/ (vd "12A1",
    * "Chuyen-de/Ester") — pipeline ghi vào JSON, app dùng để lọc khi chọn đề
    * mở ca. Không có thư mục con thì rỗng. */
