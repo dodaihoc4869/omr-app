@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // ĐO trước/sau tối ưu máy chủ 28/09 (việc 4): số VÒNG D1 và số ĐỢT NỐI TIẾP (≈ độ trễ; mỗi đợt ≈ 300–400 ms trên D1 thật).
 // Tệp này chạy được trên CẢ origin/main (trước) lẫn nhánh tối ưu (sau): chỉ dùng hàm có ở cả hai; in dòng `DO|tên|vòng|đợt|...` để ghi bảng
 // docs/toi-uu-2809/MAY-CHU.md. Ngưỡng `expect` là của bản SAU (trên origin/main chúng đỏ — đó là bằng chứng trước/sau).
@@ -14,7 +15,7 @@ import type { Env } from '../server/src/kieu'
 
 export const T0 = Date.parse('2026-09-30T02:00:00Z')
 const cau = (qid: string, phan: 'I' | 'II') => JSON.stringify({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
   hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: phan === 'I' ? 'B' : 'DSDS', reviewed: true, solution: { chot: 'c' },
 })
 export async function dungSanh() {

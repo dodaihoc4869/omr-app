@@ -7,6 +7,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidGoc, sanh2, thuSucThem, type HoSo2, type MetaCau } from './srs2-d1'
@@ -257,7 +258,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   ])
   const chan = new Set([...chanCa, ...giuBia])
   const boQua = boQuaMoi()
-  const chon = await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua)
+  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.`, ...tomTat }
@@ -315,6 +316,7 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   const boQua = boQuaMoi()
   let chon = await napLuot(env, hs, kh.conDoan, chan, suc, SO_CAU_CHANG, false, boQua)
   if (!chon.length) { const lai = new Set(chanCa); for (const q of chanBia) lai.add(q); chon = await napLuot(env, hs, kh.conDoan, lai, suc, SO_CAU_CHANG, false, boQua) } // phiên cũ bỏ dở: phát lại
+  chon = await chanKhacKhoiEm(env, 'doan2', { sbd, meta: hs.meta }, chon, { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDoan, hs, chanCa, chanBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_on_hom_nay', message: kh.conDao.length ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : `Hôm nay em không còn câu ôn nào.${loiTamHoan(kh.tamHoan?.ca ?? 0)} Mai quay lại hộ tống nhé.` }

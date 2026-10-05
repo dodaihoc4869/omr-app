@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // RV07 mục 7 (02 §7.1) — HAI DANH SÁCH TỰ ĐỘNG CỦA KẾ HOẠCH NGÀY đi qua CHÍNH bộ chọn chung khi cờ BẬT.
 // Cờ `cau_hinh.ngan_sach_luot` TẮT (mặc định) ⇒ hành vi cũ nguyên vẹn; BẬT ⇒ câu bị CHẶN CỨNG bị loại khỏi việc ôn
 // (kế hoạch NGẮN hơn, không lấp chỗ bằng câu không hợp lệ), câu BẢO VỆ vẫn bị loại như trước.
@@ -31,7 +32,7 @@ async function dung(o: { mucDangLuyen?: number; bat?: boolean; nhanFamily?: bool
   ]
   for (const [qid, mucDo, maDang, fam] of qs) {
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-      .run('DE1', qid, 'v1', `g-${qid}`, maDang, JSON.stringify({ qid, maDe: 'DE1', phan: 'I', text: 'Đề', choices: ['A', 'B', 'C', 'D'], correct: 'A', sao: 1, dang: { ma: maDang }, mucDo, kienThuc: ['K1'], ...(nhan ? { family: fam } : {}) }))
+      .run('DE1', qid, 'v1', `g-${qid}`, maDang, JSON.stringify({ qid, maDe: 'DE1', lop: '12', phan: 'I', text: 'Đề', choices: ['A', 'B', 'C', 'D'], correct: 'A', sao: 1, dang: { ma: maDang }, mucDo, kienThuc: ['K1'], ...(nhan ? { family: fam } : {}) }))
   }
   d.sql.prepare(
     'INSERT OR REPLACE INTO skill_snapshot(sbd,skill_id,policy_version,working_level,validated_level,confidence,family_count,day_count,last_validated_at,can_kiem_lai,episode_state,episode_json,recent5_json,evidence_json,nhat_ky_json,cursor_received_at,cursor_event_id,revision,cap_nhat_luc)'

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // POST /hs/on-lai/nop — em NỘP bài làm câu "ôn lại": máy chủ chấm, ghi sổ nguon='on_lai', dựng lại hồ sơ, rồi MỚI trả đáp án.
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
@@ -17,7 +18,7 @@ vi.mock('../server/src/game-v2-auth', async (orig) => ({
 const H = 3_600_000
 const LOI_GIAI = 'LOI-GIAI-BI-MAT-XYZ'
 const cauKho = (qid: string, phan: string, correct: string, o: Record<string, unknown> = {}) => ({
-  qid, maDe: 'x', version: 'v', group: `g-${qid}`, phan, text: `Câu ${qid}.`, choices: phan === 'I' ? ['A. a', 'B. b', 'C. c', 'D. d'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+  qid, maDe: 'x', lop: '12', version: 'v', group: `g-${qid}`, phan, text: `Câu ${qid}.`, choices: phan === 'I' ? ['A. a', 'B. b', 'C. c', 'D. d'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
   hinhAnh: [{ viTri: 'truoc_de', url: 't.png' }, { viTri: 'sau_loi_giai', url: 'ANH-LOI-GIAI.png' }], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'hieu', sao: 1, kienThuc: ['k1'],
   correct, solution: LOI_GIAI, reviewed: true, ...o,
 })
@@ -28,7 +29,7 @@ function themCau(d: D1That, cau: ReturnType<typeof cauKho>[]) {
   d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of cau) d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', c.qid, 'v', c.group, c.dang, JSON.stringify({ ...c, maDe: 'DE1' }))
 }
-const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run()
 /** Em S1 đã SAI 3 câu (I, II, III) cách đây 3 ngày ở BTVN → hồ sơ: moi_sai, tới mốc ôn. */
 async function dung() {
   const d = taoD1That()
@@ -70,7 +71,7 @@ describe('xác thực: BẮT BUỘC token học sinh', () => {
   })
   it('có token thì SBD lấy từ chữ ký, sbd trong body bị bỏ qua (không nộp hộ em khác)', async () => {
     const d = await dung()
-    d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S2','x','x')").run()
+    d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S2','x','12','x')").run()
     const r = await nop(d, [{ qid: I1, dapAn: 'B' }], 'token-S1', { sbd: 'S2' })
     expect(r.ok).toBe(true)
     expect(suKien(d, I1)).toHaveLength(1)

@@ -9,6 +9,7 @@
 // "em không có gì" với "lô này hỏng"). Mọi `sbd` trong `dsSbd` đều có khoá trong `em`, kể cả rỗng.
 import type { Env } from './kieu'
 import { ngayVn } from './su-kien-hoc'
+import { chanKhacKhoiTheoEm } from './chan-khac-khoi'
 
 type Row = Record<string, unknown>
 
@@ -94,6 +95,7 @@ export async function hoSoOnCa(env: Env, b: Record<string, unknown>, now: number
       const e = em[String(x.sbd)]
       if (e && e.lam.length < TOI_DA_LAM_MOI_EM) e.lam.push(String(x.qid)) // đã sắp mới nhất trước: cắt phần CŨ nhất
     }
+    for (const [s, sai] of await chanKhacKhoiTheoEm(env, 'ho_so_on_ca', new Map(Object.entries(em).map(([k, e]) => [k, e.sai])), { cauCua: (x) => ({ qid: x.qid, ma_dang: x.maDang }) })) em[s]!.sai = sai // LUẬT THẦY 05/10: câu sai cũ máy gợi ý hỏi lại chỉ câu ĐÚNG khối em (+1 truy vấn khối em; +1 truy vấn nguồn khối chỉ khi có mã câu không đọc ra khối)
     return { ok: true, em }
   } catch (e) {
     console.error('[hoSoOnCa] lỗi:', e instanceof Error ? e.message : e)

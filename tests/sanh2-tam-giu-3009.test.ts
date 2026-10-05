@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // 30/09: `sanh2` báo số câu CÒN LẠI đang tạm giữ vì ca kiểm tra (`tamGiu: { ca }`) — CHỈ số, không qid, không mã/tên ca.
 // Trước đây `tamHoanCauKhoa` bỏ câu khỏi kế hoạch nhưng Sảnh không biết ⇒ "chưa có câu nào" / "24/24 câu kế hoạch" tưởng lỗi.
 // D1 thật = node:sqlite (mẫu tests/dao-bao-nham-ca-2909.test.ts).
@@ -14,7 +15,7 @@ const NGAY = 86_400_000
 
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: `Cốt lõi ${qid}` },
   })
 }

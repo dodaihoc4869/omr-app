@@ -22,7 +22,8 @@ import { baoVeMotLuot, danhTinhChiMucKhop, qidPhucVuDuoc } from './cau-theo-qid'
 // PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02): cổng cho hai danh sách TỰ ĐỘNG của kế hoạch ngày. Cờ TẮT ⇒ không đổi gì.
 import { docPhamViNhieu, eligibleScope, scopeQuestion, phamViBat, type CauXetDuyet } from './pham-vi-hoc'
 import { docCaSapMo, docKhoiVaLopCacEm } from './game-v2-bank'
-import { cauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
+import type { Khoi } from '../../src/lib/khoi-cau'
+import { chanKhacKhoiDong } from './chan-khac-khoi'
 import { ngayVn } from './su-kien-hoc'
 import { tuLucHomNay } from './cau-da-lam'
 import { docMocHienThi } from './moc-no'
@@ -302,7 +303,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const cua = (x: Record<string, unknown>) => map.get(String(x.sbd))
   // LUẬT KHỐI (Boss 21/09): hàng ôn chỉ nhận câu khối em hoặc THẤP hơn — kể cả câu khối cao đã lọt vào sổ của em từ trước (mã tờ ở đầu qid). Không đọc được khối ⇒ không lọc.
   const { khoi: khoiEm, lop: lopEm } = await pKhoiLop
-  const hopKhoi = (x: Record<string, unknown>) => cauHopKhoi(khoiEm.get(String(x.sbd)), String(x.qid))
+  // LUẬT THẦY 05/10 (chan-khac-khoi.ts): hàng ôn chỉ câu ĐÚNG khối em — lọc theo dòng (em, câu) ngay trước hai vòng dưới, làm giàu nguồn khối từ D1 cho câu mã lạ.
   const coChiMuc = await pCoChiMuc
   const baoVe = await pBaoVe
 
@@ -366,10 +367,9 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // CỔNG PHẠM VI HỌC (P02): đọc cờ MỘT LẦN cho cả hai danh sách tự động của lượt này.
   const batPhamViHoc = await phamViBat(env)
   const phamViToiHan = await locPhamViChoKeHoach(env, denHan.map((x) => ({ sbd: String(x.sbd), qid: String(x.qid) })), batPhamViHoc)
-  for (const x of denHan) {
+  for (const x of await chanKhacKhoiDong(env, 'ke_hoach_ngay_on_lai', khoiEm, denHan)) {
     if (x.luc_cuoi && ngayVn(Date.parse(String(x.luc_cuoi))) === homNay) continue // Đã làm/gặp hôm nay ⇒ không giao lại (tránh vòng lặp nộp lại on_lai vô tận)
     if (phucVu && !phucVu.has(String(x.qid))) continue
-    if (!hopKhoi(x)) continue
     if (phamViToiHan?.has(`${String(x.sbd)}\u0000${String(x.qid)}`)) continue
     cua(x)?.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
   }
@@ -449,9 +449,8 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
     const ung = [...(ro.results ?? []), ...ungTuBoNho]
     const phucVuThi = await tapQidPhucVu(env, [...new Set(ung.map((x) => String(x.qid)))], coChiMuc, baoVe)
     const phamViThi = await locPhamViChoKeHoach(env, ung.map((x) => ({ sbd: String(x.sbd), qid: String(x.qid) })), batPhamViHoc)
-    for (const x of ung) {
+    for (const x of await chanKhacKhoiDong(env, 'ke_hoach_ngay_on_thi', khoiEm, ung)) {
       if (phucVuThi && !phucVuThi.has(String(x.qid))) continue
-      if (!hopKhoi(x)) continue
       if (phamViThi?.has(`${String(x.sbd)}\u0000${String(x.qid)}`)) continue
       cua(x)?.cauOnThi?.push({ qid: String(x.qid), lanSai: Number(x.lan_sai) || 0, moiSai: String(x.trang_thai) === 'moi_sai' })
     }

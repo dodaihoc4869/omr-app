@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // P01 / T34 — SNAPSHOT ĐỀ LÚC GIAO: chấm theo ảnh chụp v1 hoặc THU HỒI có lý do; KHÔNG trộn đề cũ với đáp án mới.
 // Test gọi CODE SẢN PHẨM THẬT (server/src/cau-snapshot.ts + hai route thật qua Worker) và chạy SQL trên
 // D1 THẬT bằng `node:sqlite` với đúng `server/schema.sql` + mọi `server/migration-*.sql` (tests/_d1-that.ts).
@@ -22,7 +23,7 @@ vi.mock('../server/src/game-v2-auth', async (orig) => ({
 
 const H = 3_600_000
 const cauKho = (qid: string, phan: string, correct: string, version = 'v1', group = `g-${qid}`) => ({
-  qid, maDe: 'DE1', version, group, phan, text: `Câu ${qid}.`,
+  qid, maDe: 'DE1', lop: '12', version, group, phan, text: `Câu ${qid}.`,
   choices: phan === 'I' ? ['A. a', 'B. b', 'C. c', 'D. d'] : [],
   ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
   hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'hieu', sao: 1, kienThuc: ['k1'],
@@ -50,7 +51,7 @@ const batCo = (d: D1That, giaTri = 'bat') =>
 /** Em S1 đã GẶP câu I1 (sai, cách đây 3 ngày) ⇒ câu phục vụ được cho cả hai đường. */
 async function dung(dapAnKho = 'B') {
   const d = taoD1That()
-  d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+  d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run()
   themCau(d, [cauKho(I1, 'I', dapAnKho)])
   const luc = new Date(Date.now() - 72 * H).toISOString()
   const g = await ghiSuKien(d.env, [{ nguon: 'btvn' as const, maNguon: 'B', sbd: 'S1', qid: I1, lan: 1, ketQua: 0 as const, luc }])

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // Cá nhân hoá sâu v2 (thầy 02/10: "khắc phục luôn giới hạn này"): ngưỡng luật riêng, tốc độ đọc riêng, nhịp học riêng, kênh riêng.
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
@@ -57,7 +58,7 @@ describe('D1: tuần tính ngưỡng riêng ⇒ kế hoạch dùng ngưỡng c�
 
   it('docHoSo2 dùng ngưỡng của em: cùng lịch sử, em ngưỡng chung ĐÓNG lỗi, em cần cách 5 ngày còn CHỜ KIỂM', async () => {
     const d = taoD1That(); const env = d.env as unknown as Env
-    const cau = (qid: string) => JSON.stringify({ qid, maDe: 'DE9', version: 'v1', group: `g-${qid}`, phan: 'I', text: qid, choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'TH', correct: 'B', reviewed: true, solution: {} })
+    const cau = (qid: string) => JSON.stringify({ qid, maDe: 'DE9', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: qid, choices: ['a', 'b', 'c', 'd'], hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'TH', correct: 'B', reviewed: true, solution: {} })
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE9', 'X1', 'v1', 'g-X1', 'D1', cau('X1'))
     for (const sbd of ['A', 'B']) {
       d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES(?,?,'12','x')").run(sbd, sbd)

@@ -12,6 +12,7 @@ import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
+import { chanMetaKhacKhoi, docKhoiEmCong } from './chan-khac-khoi'
 import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import {
@@ -252,6 +253,8 @@ export interface MetaCau {
    * không đếm vào thể lực/rương (sửa lỗi 30/09 "Chưa tải được câu hôm nay" + rương kẹt 48/49).
    */
   tuLuan: boolean
+  /** Khối ghi THẲNG trong JSON câu (`lop`/`khoi`) — một nguồn khối của câu khi mã tờ không mang khối (luật thầy 05/10, `khoi-cau.ts`). Vắng ⇒ không có. */
+  lop?: string | null
 }
 /**
  * Phần SQL đọc câu RÚT GỌN cho `tuLuanTuMeta` (bảng `game_v2_question`, cột `json`): câu bỏ trường nặng (ảnh, lời giải, bảng), ảnh phương án/ý thay bằng
@@ -295,7 +298,7 @@ export function tuLuanTuMeta(x: Row): boolean {
 export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: readonly string[] = [], maDeCua?: Map<string, Set<string>>): Promise<Map<string, MetaCau>> {
   const ra = new Map<string, MetaCau>()
   if (!qids.length) return ra
-  const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao,
+  const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao, COALESCE(json_extract(json,'$.lop'), json_extract(json,'$.khoi')) AS lop_json,
         ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version
       FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)`).bind(JSON.stringify([...new Set(qids)])).all<Row>()
   const uuTien = new Set(uuTienMaDe)
@@ -307,7 +310,7 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
     const cu = ra.get(qid)
     if (cu && (uuTien.has(cu.maDe) || !uuTien.has(str(x.ma_de)))) continue
     const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
-    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x) })
+    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x), ...(x.lop_json != null ? { lop: str(x.lop_json) } : {}) })
   }
   return ra
 }
@@ -593,6 +596,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     qidSaiV2.add(q)
   }
   const qids = [...nguonTheoQid.keys()]
+  const khoiEmP = docKhoiEmCong(env, sbd).catch(() => null) // LUẬT THẦY 05/10 (chan-khac-khoi.ts): khối em đọc CÙNG ĐỢT lượt đọc chính dưới (gopDocD1 gộp — không thêm vòng D1)
   // Sự kiện trước mốc sớm nhất vốn bị loại bên dưới: lọc ngay trong D1, giảm dữ liệu truyền/parse.
   // Vẫn xét mốc riêng từng câu sau khi đọc; có câu thiếu mốc thì giữ cận rỗng để không bỏ lịch sử.
   const tuLuc = qids.reduce((min, q) => { const luc = tuLucTheoQid.get(q) ?? ''; return luc < min ? luc : min }, tuLucTheoQid.get(qids[0]) ?? '')
@@ -618,6 +622,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     if (!ls) { ls = []; theoQid.set(x.qid, ls) }
     ls.push(x)
   }
+  { const thayGiao = new Set([...ds.flatMap((c) => c.qids), ...qidSaiCa.keys()]); await chanMetaKhacKhoi(env, 'hoa2_ho_so', await khoiEmP, meta, (q) => thayGiao.has(q)) } // LUẬT THẦY 05/10: câu khác khối em ⇒ như đã rút khỏi kho của RIÊNG em (kế hoạch, Đảo/Đoàn/Bi-a, "Câu đã làm", báo cáo); em chưa rõ khối ⇒ chỉ giữ câu thầy giao trực tiếp (chiến dịch, câu sai ca thầy dựng)
   const tt = new Map<string, TrangThaiCau>()
   const cau: CauSrs[] = []
   const laMoiBo = new Set<string>()

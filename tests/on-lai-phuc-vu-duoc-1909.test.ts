@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // LỖI 19/09 (0.Planer): kế hoạch ngày chọn qid cho việc `on_lai` mà `/hs/cau-theo-qid` KHÔNG phục vụ được → "Ôn 3 câu" không bao giờ xong.
 // Sửa tận gốc: MỘT định nghĩa "phục vụ được" (`qidPhucVuDuoc`) dùng cho cả kế hoạch và lệnh lấy đề.
 import { describe, it, expect } from 'vitest'
@@ -12,7 +13,7 @@ import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
 const D = 86_400_000
 const cauKho = (qid: string) => ({
-  qid, maDe: 'x', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 1,
+  qid, maDe: 'x', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 1,
   kienThuc: ['K1'], correct: 'B', solution: 'Giải', reviewed: true,
 })
 function themCau(d: D1That, maDe: string, cau: string[], daXoa = 0) {
@@ -27,7 +28,7 @@ function themCaBaoVe(d: D1That, maCa: string, qid: string[]) {
     "INSERT INTO ca(ma_ca,trang_thai,cong_bo,bank_r2,loai,thoi_gian_phut,bat_dau,het_han_vao,cap_nhat_luc) VALUES(?,'mo','ca_lop_xong',?,'thi',45,?,?,'x')",
   ).run(maCa, `de/${maCa}.json`, new Date(Date.now() + 3600_000).toISOString(), new Date(Date.now() + 7200_000).toISOString())
 }
-const themHs = (d: D1That, sbd = 'S1') => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES(?,'x','mk','x')").run(sbd)
+const themHs = (d: D1That, sbd = 'S1') => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES(?,'x','12','mk','x')").run(sbd)
 const luc = (soNgayTruoc: number) => new Date(Date.now() - soNgayTruoc * D).toISOString()
 async function sai(d: D1That, qids: string[], sbd = 'S1') {
   const r = await ghiSuKien(d.env, qids.map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd, qid: q, lan: i + 1, ketQua: 0 as const, luc: luc(3) })))
@@ -98,6 +99,7 @@ describe('kế hoạch chỉ chọn qid mà lệnh lấy đề PHỤC VỤ ĐƯ�
   it('chưa lập chỉ mục game nào (máy chủ mới/fixture cũ): KHÔNG lọc, giữ hành vi cũ', async () => {
     const d = taoD1That()
     themHs(d)
+    for (const q of ['A1', 'A2']) d.sql.prepare("INSERT INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES(?,'DE1','12','x')").run(q) // LUẬT THẦY 05/10: câu ôn phải rõ khối (= khối em 12); cổng khối không phải cổng chỉ mục
     await sai(d, ['A1', 'A2'])
     expect((await qidOnLai(d)).qid).toEqual(['A1', 'A2'])
   })

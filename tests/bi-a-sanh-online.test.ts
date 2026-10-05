@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // BI-A PHẢN ỨNG GĐ2 · LỆNH SẢNH ONLINE (server/src/bi-a.ts) trên D1 thật: tạo bàn + mã 4 chữ số, nhập mã, có mặt ở Sảnh Bi-a (20 giây),
 // mời bạn cùng lớp (hết hạn 60 giây), nhận/từ chối, xếp câu cho đúng các bi của ghế (G11) + vé trận cho phòng đấu, vé câu thay, Bàn giao hữu với bạn.
 import { describe, expect, it } from 'vitest'
@@ -14,7 +15,7 @@ import { biCuaGhe, chiaBi } from '../src/game/bi-a/luat'
 const T0 = Date.parse('2026-09-30T07:59:00Z')
 const NGAY = 86_400_000
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
-  return JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: 'x' } })
+  return JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: 'x' } })
 }
 async function fixture(o: { online?: boolean } = {}) {
   const d = taoD1That()

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // CNH-1.0 P06 (02 §8) — VÒNG ĐỜI TASK CÁ NHÂN của Đoàn Hộ Tống trên MÁY CHỦ THẬT (SQLite + lược đồ thật):
 //   · hiệp chuyển khi em CHƯA chốt ⇒ task `continuing` (vẫn nộp được tới hạn session 24 giờ), KHÔNG ghi thành sai;
 //   · nộp task `continuing` chỉ ĐÓNG task, KHÔNG sửa thứ hạng đội đã chốt (máu Linh Tâm không đổi);
@@ -33,7 +34,7 @@ function dungTruong(): D1That {
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',?,?,0,'v1')").run(KHO.length, 'kho/DE1.json')
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of KHO) {
-    const q = { qid: c.qid, maDe: 'DE1', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Đề ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: c.phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [], hinhAnh: [], dang: c.dang, tenDang: c.dang, mucDo: c.mucDo, sao: 1, kienThuc: ['K1'], correct: c.correct, solution: 'x', reviewed: true }
+    const q = { qid: c.qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Đề ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: c.phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [], hinhAnh: [], dang: c.dang, tenDang: c.dang, mucDo: c.mucDo, sao: 1, kienThuc: ['K1'], correct: c.correct, solution: 'x', reviewed: true }
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
   }
   d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn Thu Hà','12A','mk','x')").run()

@@ -20,7 +20,8 @@ import {
   boQuaHiepTrong, banMayDungY, CHAN,
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
-import { protectedQuestions, docKhoiThapNhat, docCauTheoRef } from './game-v2-bank'
+import { protectedQuestions, docCauTheoRef } from './game-v2-bank'
+import { docKhoiChungCacEm } from './chan-khac-khoi'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { laCauTuLuan } from './cam-tu-luan'
 import { readGameScope } from './game-v2-reports'
@@ -333,7 +334,7 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
   } catch { /* chưa có bảng hồ sơ: không xếp theo độ yếu của lớp, ai cũng bậc 0 */ }
   const r = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
     WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${cho(ds.length)}) AND json_extract(q.json,'$.phan')='II' LIMIT 400`).bind(...ds).all<{ json: string }>()
-  const khoiDoi = await docKhoiThapNhat(env, nguoi.map(n => n.sbd)) // câu chung hiện cho CẢ đội ⇒ hợp khối với em thấp nhất (Boss 21/09)
+  const khoiDoi = await docKhoiChungCacEm(env, nguoi.map(n => n.sbd)) // câu chung hiện cho CẢ đội ⇒ LUẬT THẦY 05/10: đúng khối CHUNG của mọi em (đội lẫn khối / em chưa rõ khối ⇒ không câu chung); trước đây khối em thấp nhất
   const ungVien = r.results.map(x => JSON.parse(x.json) as PrivateQuestion)
     .filter(q => cauHopKhoi(khoiDoi, q) && q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
       && cacMuc.includes(q.mucDo ?? '') && cacMuc.indexOf(q.mucDo!) <= (tranMuc.get(q.dang!) ?? 0)
