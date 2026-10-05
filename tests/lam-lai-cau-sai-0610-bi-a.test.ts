@@ -12,6 +12,7 @@ import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { xoaDemCauHinh } from '../server/src/cau-hinh-dem'
 import { xoaDemPhamVi } from '../server/src/bai-da-day'
 import { LENH_TAO_BANG_TUY_CHON, xoaDemChienDich } from '../server/src/srs2-d1'
+import { cauDangGiu, DK_PHIEN_BIA_MO } from '../server/src/srs2-game'
 import type { Env } from '../server/src/kieu'
 
 interface CauThu { qid: string; maDe: string; dang: string; mucDo: string; correct: string; group?: string }
@@ -131,11 +132,14 @@ describe('Bi-a · câu LỖI lên bàn ⇒ bản khác (câu anh em ĐÚNG KHỐ
   })
 
   it('LUẬT KHỐI: chỉ còn ứng viên khác khối / cùng nhóm ⇒ KHÔNG BAO GIỜ lấy câu lớp 10 / lớp 12 / không rõ khối — câu lỗi ra BẢN XÁO, chấm đúng theo thứ tự đã xáo, sổ quy về khung gốc', async () => {
-    // Q5 khác dạng (D9, không câu anh em nào); S1 cùng dạng với Q3 nhưng CÙNG nhóm nội dung ⇒ loại; còn lại chỉ có câu lớp 10 / 12 / không rõ khối ⇒ chỉ còn bản xáo.
-    const kho = [...Q.map((c) => (c.qid === 'Q5' ? { ...c, dang: 'D9' } : c)), { qid: 'S1', maDe: TO_B, dang: 'D1', mucDo: 'TH', correct: 'C', group: 'g-Q3' }, ...KHAC_KHOI]
+    // Q3 (dạng D1) và Q5 (dạng D2): mỗi dạng chỉ có MỘT câu anh em cùng khối mà CÙNG nhóm nội dung với câu lỗi (S1 ~ Q3, S2 ~ Q5) ⇒ loại; còn lại chỉ có câu lớp 10 / 12 / không rõ khối
+    // ở cả hai dạng ⇒ dù Câu chốt là câu lỗi nào, chỉ còn bản xáo. (Bỏ cổng khối ⇒ câu khác khối lên bàn ⇒ test đỏ.)
+    const khacKhoi2: CauThu[] = KHAC_KHOI.map((c) => ({ ...c, qid: `${c.qid}b`, dang: 'D2' }))
+    const kho = [...Q.map((c) => (c.qid === 'Q5' ? { ...c, dang: 'D2' } : c)), { qid: 'S1', maDe: TO_B, dang: 'D1', mucDo: 'TH', correct: 'C', group: 'g-Q3' },
+      { qid: 'S2', maDe: TO_B, dang: 'D2', mucDo: 'TH', correct: 'D', group: 'g-Q5' }, ...KHAC_KHOI, ...khacKhoi2]
     const { d, env, ban } = await banMoi(kho)
     const qids = trenBan(ban).map((x) => x.qid)
-    for (const sai of ['L10', 'L12', 'LX', 'S1']) expect(qids).not.toContain(sai)
+    for (const sai of ['L10', 'L12', 'LX', 'L10b', 'L12b', 'LXb', 'S1', 'S2']) expect(qids).not.toContain(sai)
     const chot = ban.chot as CauBan
     expect(SAI).toContain(chot.qid) // bản xáo của chính câu lỗi
     const goc = Q.find((c) => c.qid === chot.qid)!
@@ -207,5 +211,18 @@ describe('Bi-a · đổi câu (bia-doi-cau) và Trả lời câu hỏi (bia-tra-
     for (const x of ['L10', 'L12', 'LX']) expect(qids).not.toContain(x)
     for (const loi of SAI) expect(qids).not.toContain(loi)
     khongLoDapAn(r)
+  })
+})
+
+describe('Bàn đang GIỮ câu anh em / bản song sinh thay một câu lỗi ⇒ giữ cả câu GỐC (Bi-a ⇄ Đảo ⇄ Đoàn không phát lại câu lỗi dưới dạng khác)', () => {
+  it('cauDangGiu: ref {qid: S1, tc: Q3} ⇒ giữ S1 và Q3; ref {qid: Q5~ss1} ⇒ giữ Q5~ss1 và Q5; câu ĐÃ trả lời không giữ', async () => {
+    const { d, env } = dung([...Q, ...ANH_EM])
+    vi.setSystemTime(luc('2026-10-06'))
+    const ref = (qid: string, them: Record<string, unknown> = {}) => ({ qid, maDe: TO_A, version: 'v1', group: `g-${qid}`, novel: false, role: 'on_lai', ...them })
+    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('B1', 'S1', JSON.stringify({ mode: 'bia', hoa2: 1, bia: 1, created: Date.now(),
+      questions: [ref('S1', { tc: 'Q3' }), ref('Q5~ss1'), ref('Q8', { tc: 'Q9' }), ref('Q11')] }), new Date().toISOString())
+    d.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)').run('B1|Q8', 'S1', 'B1', 'Q8', 'g-Q8', '{}', new Date().toISOString()) // Q8 (thay Q9) đã trả lời
+    const giu = await cauDangGiu(env, 'S1', Date.now(), DK_PHIEN_BIA_MO)
+    expect([...giu].sort()).toEqual(['Q11', 'Q3', 'Q5', 'Q5~ss1', 'S1'])
   })
 })
