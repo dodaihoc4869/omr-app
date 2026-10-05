@@ -3,7 +3,7 @@
 // Luật chơi giữ nguyên; chỉ đổi NGUỒN CÂU: Đảo nhận câu mới + câu ôn Đúng–sai, Đoàn nhận câu ôn Trắc nghiệm/Trả lời ngắn,
 // đúng kế hoạch ngày đã chốt (`layKeHoachHomNay`). Đảo khoá khi còn câu ôn hôm nay ở Đoàn.
 import { phuNeuCan } from './hang-chua-loi'
-import { apLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
+import { apLamLaiKhac, batDauLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
 import { refLamLai, type LamLaiRef } from './lam-lai-so'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
@@ -76,6 +76,9 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   // `khiCoLuot` (tối ưu 05/10): nơi gọi bắt đầu được phần đọc theo câu (nhãn nợ) của lượt này CÙNG lúc nạp câu. Câu trả về có thể khác lượt (song sinh,
   // câu anh em của thang làm lại) ⇒ nơi gọi chỉ dùng phần đọc sớm khi nó PHỦ đủ câu cần nhãn (`batDauNhanNo().ls`), không thì đọc như cũ.
   khiCoLuot?.(luot.map((x) => x.qid))
+  // Tối ưu 05/10: phần ĐỌC của thang làm lại (công tắc, phạm vi + bối cảnh, chỉ mục câu cùng dạng) chạy CÙNG đợt nạp câu khi lượt có câu chắc cần
+  // câu anh em (cau-anh-em.ts `batDauLamLaiKhac`) — trước: 4–5 đợt nối tiếp sau khi nạp xong. `apLamLaiKhac` quyết y hệt.
+  const lamLaiSom = lamLai ? batDauLamLaiKhac(env, hs, luot.map((x) => x.qid), lamLai, chan) : undefined
   const day = await napCau(env, hs, luot.map((x) => x.qid), luot.length, chan, boQua)
   const theo = new Map(day.map((x) => [x.q.qid, x]))
   const xep = danXenLuot(luot.filter((x) => theo.has(x.qid)), suc, { trumKho: trumKho && theo.size === co })
@@ -83,7 +86,7 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   const ds = xep.map((x) => { const c = theo.get(x.qid)!; return { ...c, q: phuNeuCan(c.q, hs.songSinhCho, hs.boTro) } })
   // 05/10 thang làm lại (cau-anh-em.ts): câu lỗi trong cửa sổ lỗi mà vẫn ra nguyên văn ⇒ song sinh bản kế / câu anh em cùng dạng / bản xáo / nguyên văn (đếm).
   // Câu anh em cũng tránh `chan` của lượt. Không `lamLai` (hoặc khoá `lam_lai_khac` tắt) ⇒ y hệt hôm nay.
-  return lamLai ? apLamLaiKhac(env, hs, ds, lamLai, chan) : ds
+  return lamLai ? apLamLaiKhac(env, hs, ds, lamLai, chan, lamLaiSom) : ds
 }
 /** Sức em (hạng chung) cho đan xen; lỗi đọc ⇒ trung bình. */
 export async function sucEmHomNay(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: Promise<Map<string, HoSoDangTho[]>>): Promise<SucEm> {

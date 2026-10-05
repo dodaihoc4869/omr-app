@@ -41,7 +41,7 @@ import {startDao2CoVe,startDoan2,hoa2Action,LENH_HOA2} from './srs2-game'
 import {omniBat} from './omni-d1'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
-import {ghiKhoanExpGame,docCauHinhExp,docTongSoTruocKhoanGame,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
+import {ghiKhoanExpGame,docCauHinhExp,docTongSoSom,docTruocKhoanGame,lenhKhoanExpGameGop,xongKhoanExpGameGop,type DocTruocKhoanGame,type KhoanGame,type KhoanGop} from './exp-d1'
 import {LENH_SHOP,docCoCuaHangTuoi,shopAction,shopBatCho} from './game-v2-shop'
 import {LENH_BIA,biaAction,batDauBiaChoSanh,docCoBia} from './bi-a'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
@@ -298,9 +298,9 @@ function docTruocAnswer(env:Env,sbd:string,b:Record<string,unknown>){
     // Phần ĐỌC của khoản EXP câu đúng (cấu hình EXP, mùa, cờ P08, khoá đã có) — đọc SẴN cùng đợt (chưa biết đúng/sai; câu sai ⇒ bỏ không dùng, không ghi gì).
     // Trước: đọc sau khi chấm, và lô ghi chấm phải chờ thêm một đợt.
     exp:som(docTruocKhoanGame(env,sbd,[`cau_game|${id}|${qid}`,`thuthach|${qid}`])),
-    // Tối ưu 05/10: máy em gửi `msLam` (OMNI áp cho em ⇒ trước lô chấm còn các lượt đọc OMNI) ⇒ đọc sẵn TỔNG SỔ EXP (song song phần OMNI) để bước cộng vào
-    // hồ sơ của câu đúng đi CÙNG lô chấm (exp-d1.ts `lenhKhoanExpGameGop`). Không gửi ⇒ không đọc gì thêm (đường cũ y hệt).
-    tong:b.msLam!==undefined&&b.msLam!==null?som(docTongSoTruocKhoanGame(env,sbd,Date.now())):null,
+    // Tối ưu 05/10: TỔNG SỔ EXP đọc sẵn CÙNG đợt (exp-d1.ts `docTongSoSom`: một câu, mốc mùa lấy trong SQL) để bước cộng vào hồ sơ của câu đúng đi CÙNG
+    // lô chấm (`lenhKhoanExpGameGop`) — trước: một lô riêng ở đợt sau. Câu sai / EXP tắt ⇒ bỏ không dùng, không ghi gì.
+    tong:som(docTongSoSom(env,sbd,Date.now())),
   }
 }
 /** Câu ĐẦY ĐỦ của câu `qid` trong lượt `id` — như `SQL_THEO_REF` (game-v2-bank.ts) với (ma_de, version) của câu ĐẦU TIÊN mang qid ấy trong JSON phiên. */

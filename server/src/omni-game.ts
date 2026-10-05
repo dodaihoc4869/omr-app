@@ -384,17 +384,24 @@ export const lamHomNay = (qid: string, bc: BoiCanh): boolean => (bc.daLam.get(qi
 const laThat = (v: unknown): boolean => v === 1 || v === true || v === '1' || v === 'true'
 
 /** Dòng chỉ mục → siêu dữ liệu câu ĐƯỢC PHÉP: trong phạm vi, đã duyệt, thư mục DẠY HỌC (`de_kho_thu_muc`, thiếu ⇒ luật mã `DH-`), không tự luận. */
-async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon): Promise<MetaCau[]> {
+async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon, khiCoMaTo?: (maTo: string[]) => void): Promise<MetaCau[]> {
   const hop = rows.filter((x) => pv.coMa(str(x.ma_de)) && laThat(x.rv))
   if (!hop.length) return []
   const maTo = [...new Set(hop.map((x) => str(x.ma_de)))]
+  khiCoMaTo?.(maTo) // tối ưu 05/10: nơi gọi bắt đầu phần đọc theo tờ của mình CÙNG đợt hai lượt đọc dưới (vd. `lop` của tờ — cau-anh-em.ts)
   const [meta, thuMuc] = await Promise.all([docMetaCau(env, [...new Set(hop.map((x) => str(x.qid)))], maTo), thuMucCuaMaDe(env, maTo)])
   return [...meta.values()].filter((m) => pv.coMa(m.maDe) && (thuMuc.get(m.maDe) ?? thuMucTheoMa(m.maDe)) === 'DAY_HOC' && !m.tuLuan)
 }
 const SQL_CHI_MUC = "SELECT qid, ma_de, json_extract(json,'$.reviewed') AS rv FROM game_v2_question"
-export async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon): Promise<MetaCau[]> {
+/** Lượt ĐỌC đầu của `metaTheoDang` (chỉ mục câu theo dạng) — không phụ thuộc phạm vi ⇒ nơi gọi bắt đầu SỚM được (tối ưu 05/10, thang làm lại). */
+export async function docChiMucTheoDang(env: Env, maDang: string): Promise<Row[]> {
   const r = await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()
-  return metaTuDong(env, r.results ?? [], pv)
+  return r.results ?? []
+}
+/** `som` (tối ưu 05/10, chỉ-thêm): `chiMuc` = `docChiMucTheoDang` đã bắt đầu sớm; `khiCoMaTo` = gọi khi biết các tờ ứng viên. Vắng ⇒ y hệt cũ. */
+export async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon, som?: { chiMuc?: Promise<Row[]>; khiCoMaTo?: (maTo: string[]) => void }): Promise<MetaCau[]> {
+  const rows = som?.chiMuc ? await som.chiMuc : ((await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()).results ?? [])
+  return metaTuDong(env, rows, pv, som?.khiCoMaTo)
 }
 async function metaTheoPhamVi(env: Env, pv: PhamViChon): Promise<MetaCau[]> {
   const rows: Row[] = []

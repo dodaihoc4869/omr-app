@@ -797,14 +797,29 @@ export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs
 export interface KhoanGop { lenh: D1PreparedStatement[]; exp: number; jsonSau: string; revisionSau: number; tuNgay: string; moP08: boolean
   /** Tối ưu 05/10 (chỉ-thêm): bước CỘNG VÀO HỒ SƠ (`congVaoHoSoGame`) gắn CÙNG lô — câu thứ 4 của `lenh`; vắng ⇒ bước ấy chạy sau lô như cũ. */
   cong?: { jsonMoi: string; revisionMoi: number } }
-/** Tổng sổ EXP/mảnh/ngày đạt của em (đúng câu `lenhTongSo`, `since` = ngày bắt đầu mùa như khoản game) ĐỌC TRƯỚC lô chấm (tối ưu 05/10) — để `lenhKhoanExpGameGop`
- *  gắn luôn bước cộng vào hồ sơ vào CÙNG lô. EXP mới chưa bật cho em / lỗi ⇒ null (lô như cũ). Chỉ ĐỌC. */
+/** Tổng sổ EXP/mảnh/ngày đạt của em (đúng các câu con của `lenhTongSo`, `since` = ngày bắt đầu mùa như khoản game) ĐỌC TRƯỚC lô chấm (tối ưu 05/10,
+ *  `docTongSoSom`) — để `lenhKhoanExpGameGop` gắn luôn bước cộng vào hồ sơ vào CÙNG lô. EXP mới chưa bật cho em / lỗi ⇒ null (lô như cũ). */
 export interface TongSoTruoc { since: string; tong: DongTongSo }
-export async function docTongSoTruocKhoanGame(env: Env, sbd: string, nowMs: number): Promise<TongSoTruoc | null> {
-  const [cfg, since] = await Promise.all([docCauHinhExp(env), docTuNgayMua(env)])
-  if (!mocExpCuaEm(cfg, sbd, nowMs)) return null
-  const tong = await an(() => lenhTongSo(env, sbd, since).first<DongTongSo>(), null)
-  return tong ? { since, tong } : null
+/**
+ * Tối ưu 05/10 — TỔNG SỔ đọc trước lô chấm, câu tổng sổ đi NGAY, CÙNG đợt đọc đầu của lệnh trả lời (trước: chờ cấu hình EXP + dòng mùa xong mới hỏi,
+ * và chỉ khi OMNI áp ⇒ khi OMNI tắt bước cộng vào hồ sơ chạy thành một đợt riêng sau lô chấm). `since` lấy ngay trong SQL từ dòng mùa
+ * (`startedAt`), JS đối chiếu lại ĐÚNG BẰNG `docTuNgayMua` (lệch / `startedAt` không phải ngày hợp lệ ⇒ null: lô chấm như cũ); cổng `mocExpCuaEm` như cũ;
+ * các câu con y hệt `lenhTongSo`. Câu ghi cộng-cùng-lô vẫn tự kiểm tổng sổ lúc ghi (`dieuKienTongSo`) ⇒ số đọc sớm không bao giờ làm sai hồ sơ. Chỉ ĐỌC.
+ */
+export async function docTongSoSom(env: Env, sbd: string, nowMs: number): Promise<TongSoTruoc | null> {
+  const cau = an(() => env.DB.prepare(
+    `SELECT mua.s AS since,
+            (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= mua.s) AS e,
+            (SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= mua.s AND ngay_vn >= ${SQL_KHIEN_MOC}) AS m,
+            (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= mua.s AND ngay_vn >= ${SQL_KHIEN_MOC}) AS d,
+            (SELECT group_concat(ngay_vn) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= mua.s AND ngay_vn >= ${SQL_KHIEN_MOC}) AS ds,
+            ${SQL_KHIEN_MOC} AS moc,
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi') AS nn
+       FROM (SELECT COALESCE((SELECT CASE WHEN json_valid(json) THEN json_extract(json, '$.startedAt') END FROM game_v2_settings WHERE key = 'season'), '') AS s) mua`,
+  ).bind(sbd, sbd, sbd, sbd).first<DongTongSo & { since: unknown }>(), null)
+  const [cfg, since, r] = await Promise.all([docCauHinhExp(env), docTuNgayMua(env), cau])
+  if (!mocExpCuaEm(cfg, sbd, nowMs) || !r || typeof r.since !== 'string' || r.since !== since) return null
+  return { since, tong: { e: r.e, m: r.m, d: r.d, ds: r.ds, moc: r.moc, nn: r.nn } }
 }
 /** Điều kiện SQL "tổng sổ của em lúc này ĐÚNG BẰNG `t`" (cùng các câu con của `lenhTongSo`; ngày đạt so theo tập đã sắp — luật ngày nghỉ chỉ dùng TẬP ngày). */
 function dieuKienTongSo(sbd: string, since: string, t: DongTongSo): { sql: string; tham: unknown[] } {
