@@ -6,11 +6,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
-const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
+// Kho giả nằm trong khối `vi.hoisted` (gán sau khi dựng `KHO`) ⇒ nhà máy `vi.mock` không đọc biến trước khi khai báo (luật no-use-before-define).
+const { goi, khoGia } = vi.hoisted(() => ({ goi: vi.fn(), khoGia: { ds: [] as unknown[] } }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
 vi.mock('../src/lib/exam-db', async (goc) => ({
   ...(await goc<typeof import('../src/lib/exam-db')>()),
-  loadExamSources: async () => KHO,
+  loadExamSources: async () => khoGia.ds,
   loadScriptUrl: async () => 'https://may-chu',
   loadTeacherSecret: async () => 'mat',
 }))
@@ -38,6 +39,7 @@ const KHO: TeacherExamSource[] = [
   to('DH-11-C2-B3', 'Bài 3. Ammonia', 2, 0, '11 · DẠY HỌC/C2 - Nitrogen'),
   to('KT-12-C1', 'Đề kiểm tra chương 1', 3, 0, '12 · C1 - Ester lipid'),
 ]
+khoGia.ds = KHO
 
 const BUOI = { id: 'BH-9', ten: 'Buổi học 05/10 · 12A1', lop: '12A1', moLuc: '2026-10-05T11:00:00Z', hetHan: '2026-10-06T11:00:00Z', dongLuc: null, dangMo: true }
 const XEM = { ok: true, soCau: 112, soTuLuan: 6, hanNop: '2026-10-12', D: 7, luotCan: 224, sucChua: 280, duLuot: 41, tongEm: 44, duDiem8: 29, quaTai: [{ sbd: '1', ten: 'Minh' }, { sbd: '2', ten: 'Hà' }, { sbd: '3', ten: 'Phúc' }], theLucNgay: 40 }
@@ -48,6 +50,8 @@ let dsEm: Record<string, unknown>[] | null = null
 let coMatBuoi: Record<string, unknown>[] = []
 let ganDay: Record<string, unknown>[] | null = null
 let cd1: string | null = 'cd-1'
+/** Bộ giả lập chuẩn của lượt test hiện tại (để một test chỉ đè một lệnh rồi trả phần còn lại về bộ chuẩn). */
+let chuanMockGoc: unknown
 const EM_MAY_CHU = [
   { sbd: 'S1', hoTen: 'Nguyễn An', khoi: '12', tenLop: '12A1' },
   { sbd: 'S2', hoTen: 'Trần Bảo', khoi: '12', tenLop: '12A1' },
@@ -408,7 +412,6 @@ describe('"Giao theo bài" ở mục Chiến dịch luyện — lối vào thứ
   })
 })
 
-let chuanMockGoc: unknown
 beforeEach(() => {
   chuanMockGoc = goi.getMockImplementation()
 })
