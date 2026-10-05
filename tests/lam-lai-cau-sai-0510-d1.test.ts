@@ -282,6 +282,30 @@ describe('tiêu chí 2 + 4 · Đoàn: câu sai Phần I ⇒ câu anh em; không 
   })
 })
 
+describe('tiêu chí 4 · Đảo Phần II bản xáo: ý đổi chỗ, MẪU Đ/S đổi, chấm đúng theo thứ tự đã xáo, sổ quy về khung gốc', () => {
+  it('mẫu em nhớ (DSSD) không còn đúng; nộp theo thứ tự đã xáo ⇒ đúng; phát lại (resume) y hệt; sổ chon = DSSD + xt', async () => {
+    const { d, env } = dung([Q2, ...KHAC_KHOI], ['Q2'])
+    ghi(d, 'Q2', 0, luc('2026-10-05', '10:00'))
+    vi.setSystemTime(luc('2026-10-06'))
+    const r = await dao(env)
+    expect(r.questions.map((q: { qid: string }) => q.qid)).toEqual(['Q2'])
+    const de = r.questions[0] as { ideas: string[] }
+    const mau = dapAnHien(Q2, de)
+    expect(mau).not.toBe('DSSD')
+    khongLoDapAn(r)
+    const lai = await em(env, '/game-v2/resume', {})
+    expect(lai.id).toBe(r.id)
+    expect(lai.questions[0].ideas).toEqual(de.ideas)
+    khongLoDapAn(lai)
+    const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q2', answer: mau })
+    expect(t.ok, JSON.stringify(t).slice(0, 300)).toBe(true)
+    expect(t.correct).toBe(true)
+    expect(t.answer).toBe(mau) // sau khi nộp: đáp án theo đúng thứ tự em thấy
+    expect(JSON.parse(soCua(d, 'Q2')[0]!.raw_json!)).toMatchObject({ chon: 'DSSD', xt: 1 })
+    expect((await docHoSo2(env, 'S1', '2026-10-06')).loiV2?.get('Q2')).toMatchObject({ trangThai: 'cho_kiem', ngayDung: ['2026-10-06'], daDungSongSinh: false })
+  })
+})
+
 describe('tiêu chí 1 · bậc 1 song sinh: 4 bản xoay đủ 4; lượt chờ kiểm sau khi đã đúng song sinh vẫn là song sinh (bản kế)', () => {
   const Q3: CauThu = { qid: 'Q3', maDe: TO11, phan: 'I', dang: 'D3', mucDo: 'TH', correct: 'B' }
   const SS = [0, 1, 2, 3].map((i) => ({ de: `Song sinh ${i}: tính m`, pa: { A: `${i}1`, B: `${i}2`, C: `${i}3`, D: `${i}4` }, dap_an: 'ABCD'[i]!, buoc: ['n = 0,1'], gia_tri_dung: `${i}` }))
@@ -311,6 +335,21 @@ describe('tiêu chí 1 · bậc 1 song sinh: 4 bản xoay đủ 4; lượt chờ
     }
     expect(thay).toEqual(['Q3~ss0', 'Q3~ss1', 'Q3~ss2', 'Q3~ss3', 'Q3~ss0'])
     expect(soCua(d, 'Q3')).toEqual([]) // câu gốc Q3 chưa lần nào ra nguyên văn trong cửa sổ lỗi
+  })
+  it('Đảo (em chỉ chơi Đảo ⇒ câu ôn Phần I vào Đảo): lượt làm lại là song sinh ~ss0, đề của song sinh, không lộ đáp án; Q3 nguyên văn không ra', async () => {
+    const { d, env } = await dungSS(4)
+    // Nhịp kênh: 7 ngày qua em chỉ mở chuyến Đảo (không Đoàn) ⇒ kế hoạch đưa câu ôn Phần I/III vào Đảo (ca-nhan-hoa-v2 onVaoDaoRieng).
+    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('CU1', 'S1', JSON.stringify({ mode: 'adventure', created: luc('2026-10-04'), hoa2: 1, questions: [] }), new Date(luc('2026-10-04')).toISOString())
+    ghi(d, 'Q3', 0, luc('2026-10-05', '10:00'))
+    vi.setSystemTime(luc('2026-10-06'))
+    const r = await dao(env)
+    expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
+    expect(r.questions.map((q: { qid: string }) => q.qid)).toEqual(['Q3~ss0'])
+    expect(r.questions[0]).toMatchObject({ vai: 'on_lai', text: 'Song sinh 0: tính m', choices: ['01', '02', '03', '04'] })
+    khongLoDapAn(r)
+    const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q3~ss0', answer: 'A' })
+    expect(t.correct).toBe(true)
+    expect(soCua(d, 'Q3~ss0').length).toBe(1)
   })
   it('đúng song sinh ~ss0 (06/10) ⇒ lượt chờ kiểm 08/10 là ~ss1, KHÔNG phải câu gốc nguyên văn; tắt khoá lam_lai_khac ⇒ câu gốc như hôm nay', async () => {
     for (const tat of [false, true]) {
