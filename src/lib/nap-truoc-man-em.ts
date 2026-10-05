@@ -15,7 +15,8 @@
 //   · `hsVo`  — vỏ cổng học sinh + màn đăng nhập (nhỏ). Có nhóm này thì: máy ĐÃ đăng nhập (màn đầu là Sảnh) nạp mảnh CỔNG (`hs`) như cũ;
 //               máy CHƯA đăng nhập nạp mảnh cổng SAU KHI mã khởi động đã về và chạy (DOMContentLoaded), ưu tiên THẤP (`fetchpriority=low`) —
 //               không giành đường truyền với tờ CSS + mã của màn đăng nhập; mã cổng chỉ CHẠY sau khi màn đăng nhập đã vẽ (AppHocSinh.tsx),
-//               em gõ xong là cổng đã sẵn.
+//               em gõ xong là cổng đã sẵn. Mảnh KaTeX (`katex`) tải trước cùng lúc ⇒ main.tsx nối KaTeX ngay sau mảnh cổng (luật cũ) mà không
+//               phải đi mạng lúc em vừa bấm Đăng nhập. Máy đã đăng nhập (service worker phục vụ) không nạp trước KaTeX — tải sau mảnh cổng như cũ.
 //   · `phongHs` — phông chữ Sảnh: chỉ nạp trước khi máy đã có service worker (lấy từ bộ nhớ máy, không tốn mạng) ⇒ Sảnh vẽ một lần đúng phông.
 // Máy đã đăng nhập còn HỎI SỚM các lệnh Sảnh (`hoiSomSanh`) ngay lúc đọc HTML — xem src/lib/hoi-som.ts.
 
@@ -33,6 +34,8 @@ export interface BangNapTruoc {
   hsVo?: string[]
   /** Phông Sảnh (chỉ nạp khi trang đã do service worker phục vụ). */
   phongHs?: string[]
+  /** Mảnh KaTeX (`katex-goi` + CSS): máy CHƯA đăng nhập nạp trước cùng mảnh cổng (ưu tiên thấp) — xem `taoMaNapTruoc`. */
+  katex?: string[]
 }
 
 /** Khoá localStorage của phiên đăng nhập cổng học sinh (= `KHOA_LUU_AUTH` StudentPortalScreen; phien-hoc-sinh.ts xuất lại). Tệp này không
@@ -120,6 +123,6 @@ export function taoMaNapTruoc(bang: BangNapTruoc): string {
     `if(c==='hs'&&b.hsVo){var p=null;try{p=JSON.parse(localStorage.getItem(${JSON.stringify(KHOA_PHIEN_HS)})||'null')}catch(e){}nap(b.hsVo);` +
     `if(p){nap(b.hs);var g='';try{g=localStorage.getItem(${JSON.stringify(KHOA_DIA_CHI_HS)})||''}catch(e){}` +
     `if(/^https:\\/\\/[^\\/]+$/.test(g)&&typeof fetch==='function'){try{(${hoiSomSanh.toString()})(window,g,p,${JSON.stringify(LENH_HOI_SOM)},true)}catch(e){}}` +
-    `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1)});return}` +
+    `if(navigator.serviceWorker&&navigator.serviceWorker.controller)nap(b.phongHs)}else document.addEventListener('DOMContentLoaded',function(){nap(b.hs,1);nap(b.katex,1)});return}` +
     `if(b.app&&c!=='hs')nap(b.app);nap(c&&b[c])}catch(e){}})()`
 }

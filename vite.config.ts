@@ -89,6 +89,7 @@ function napTruocManEm(): Plugin {
           .sort()
           .map((f) => goc + f)
         const bang = {
+          katex: dsCua('/src/lib/katex-goi.ts'),
           thi: ngoai(dsCua('/src/screens/ExamTakeScreen.tsx'), app),
           hs: ngoai(dsCua('/src/screens/StudentPortalScreen.tsx'), hsVo),
           ph: ngoai(dsCua('/src/screens/ParentPortalScreen.tsx'), app),

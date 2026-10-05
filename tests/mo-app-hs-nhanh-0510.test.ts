@@ -11,6 +11,7 @@ const BANG: BangNapTruoc = {
   app: ['/assets/App-e.js'],
   hsVo: ['/assets/AppHocSinh-f.js'],
   phongHs: ['/assets/be-vietnam-pro-latin-400-normal-g.woff2'],
+  katex: ['/assets/katex-goi-h.js', '/assets/katex-goi-h.css'],
 }
 const GOC = 'https://omr.ttadodaihoc.workers.dev'
 
@@ -41,13 +42,15 @@ function chay(duong: string, q: string, o: { phien?: object | null; diaChi?: str
 }
 
 describe('đoạn mã nội tuyến — cổng học sinh', () => {
-  it('máy CHƯA đăng nhập: vỏ + màn đăng nhập nạp ngay; mảnh cổng nạp SAU DOMContentLoaded, ưu tiên THẤP; không gọi máy chủ', () => {
+  it('máy CHƯA đăng nhập: vỏ + màn đăng nhập nạp ngay; mảnh cổng + KaTeX nạp SAU DOMContentLoaded, ưu tiên THẤP; không gọi máy chủ', () => {
     const { them, goi, truocKhiXong } = chay('/hs', '')
     expect(truocKhiXong).toBe(1)
     expect(them.map((t) => [t.href, t.fetchPriority ?? ''])).toEqual([
       ['/assets/AppHocSinh-f.js', ''],
       ['/assets/StudentPortalScreen-c.js', 'low'],
       ['/assets/StudentPortalScreen-c.css', 'low'],
+      ['/assets/katex-goi-h.js', 'low'],
+      ['/assets/katex-goi-h.css', 'low'],
     ])
     expect(goi).toEqual([])
   })
