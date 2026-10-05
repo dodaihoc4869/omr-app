@@ -47,6 +47,7 @@ import { PHIEN_BAN_OMNI, THAM_SO_OMNI, type HoSoOmniEm } from '../server/src/omn
 import { TEN_NEN } from '../server/src/thang-tu-go'
 import type { Env } from '../server/src/kieu'
 import { docOmniPh } from '../src/lib/ph-v3/du-lieu'
+import { tuanVnCua } from '../server/src/omni-game'
 
 const T0 = Date.parse('2026-10-05T03:00:00Z') // 10:00 Thứ Hai 05/10/2026 giờ VN
 const NGAY = 86_400_000
@@ -609,9 +610,7 @@ describe('hàm thuần', () => {
   it('thuHaiCua + gioHocTu', () => {
     // cùng công thức tuần với `tuanVnCua` của omni-game.ts (khoá omni_ve): thứ Hai giờ VN của tuần chứa thời điểm
     for (let ms = Date.parse('2026-10-04T16:59:00Z'); ms < Date.parse('2026-10-20T00:00:00Z'); ms += 3 * 3_600_000 + 17 * 60_000) {
-      const d = new Date(ms + 7 * 3_600_000)
-      const tuan = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7))).toISOString().slice(0, 10)
-      expect(thuHaiCua(new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10))).toBe(tuan)
+      expect(thuHaiCua(new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10))).toBe(tuanVnCua(ms))
     }
     expect(thuHaiCua('2026-10-05')).toBe('2026-10-05')
     expect(thuHaiCua('2026-10-11')).toBe('2026-10-05')
