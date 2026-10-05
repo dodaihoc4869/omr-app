@@ -25,7 +25,7 @@
 // 4. cauLaCungDang — chuyển giao, định nghĩa của OMNI (omni-p-vkn `phatLaiEm`, như `nCauLaDung`/`nTuLam`): quan sát độc lập = lượt ĐẦU TIÊN của câu trong
 //    ngày, tự làm (không lướt, không dòng đọc lời giải, có kết quả, assistance 'none'), không trong 12 giờ sau dòng đọc lời giải của câu; câu LẠ = em chưa
 //    có dòng sổ nào của câu gốc trước đó (kể cả phần sổ cũ không đọc chi tiết — tra riêng theo (em, câu)); CÙNG DẠNG = `dang` trùng dạng của một câu em đã
-//    tự làm sai trước đó: tỉ lệ ĐÚNG. n = số quan sát.
+//    tự làm sai trước đó (trong phần sổ đã đọc): tỉ lệ ĐÚNG. n = số quan sát.
 // 5. lapNguyenVan — lượt làm (mọi lượt, kể cả có hỗ trợ) trong CỬA SỔ LỖI của câu (trạng thái phatLaiLoi trước lượt là mở / chờ kiểm) mà đề là NGUYÊN VĂN
 //    câu đã sai: có cờ `raw_json.nv` ⇒ theo cờ (1 = nguyên văn); không cờ ⇒ cùng qid gốc, không song sinh, không câu thay thế, không bản xáo (`raw_json.xt = 1`).
 //    `dat` = số lượt lặp nguyên văn, n = số lượt làm lại trong cửa sổ lỗi.
@@ -300,7 +300,7 @@ export function tinhChatLuongLoi(dv: DauVaoChatLuong): KetQuaChatLuong {
       const quanSat = dauNgay && tuLamOmni && !(doc0 !== undefined && p.t - doc0 <= MS_SAU_DOC_LOI_GIAI)
       const dang = dangCua(p.goc)
       if (quanSat && !gapTruoc && dang && dangCoLoi.has(dang) && trong(x.ngayVn)) { n4++; if (x.ketQua === 1) d4++ }
-      // Dạng có lỗi: lượt TỰ LÀM sai (luật đóng lỗi) của câu khác khối đã bị bỏ ở trên.
+      // Dạng có lỗi: lượt TỰ LÀM sai theo luật đóng lỗi (câu khác khối / tự luận đã bị bỏ ở bước 1 nên không làm dạng "có lỗi").
       if (dang && p.laLanLam && !p.hoTro && x.ketQua !== 1) dangCoLoi.add(dang)
     }
   }
