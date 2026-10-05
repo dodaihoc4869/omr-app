@@ -30,6 +30,11 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 
 - [ ] "Làm luôn bộ sinh câu bảo toàn điện tích nhé" (thầy 05/10) ⇒ bộ sinh câu nền bao_toan_dien_tich, ion cùng tồn tại được, đáp án kiểm chéo độc lập ⇒ 27/29 bước | bằng chứng: (chưa có)
 
+- [ ] "Tối ưu code cho tinh gọn" (thầy 05/10) ⇒ gọn mã OMNI: bỏ trùng lặp, mã chết, gộp hàm trùng | bằng chứng: (chưa có)
+- [ ] "tối ưu luôn cho máy chủ" ⇒ giảm số vòng D1 tuần tự + ms CPU ở lệnh nóng (hoa2-sanh, start, answer, việc đêm) | bằng chứng: (chưa có)
+- [ ] "app thật mượt mà nhanh gấp 2 lần hiện tại nhé" ⇒ đo bằng máy trên điện thoại yếu giả lập (scripts/do-app-hs.mjs) + đo máy chủ, so main hiện tại; mục tiêu ≥ 2× ở chỉ số chính | bằng chứng: (chưa có)
+- [ ] "Chưa đẩy gì nhé" ⇒ KHÔNG deploy Worker/Pages, KHÔNG gộp main, KHÔNG migration --remote (chỉ đẩy nhánh tính năng để giữ việc) | bằng chứng: (chưa có)
+
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
 
 - [x] 1. Tick bài ⇒ chiến dịch đúng tờ, đúng hạn tự tính, dòng xác nhận đúng 6 con số; tick lần hai không tạo thêm | bằng chứng: OMNI-3-build-status.md mục 2
