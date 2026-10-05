@@ -65,25 +65,30 @@ function xao<T>(ds: readonly T[], rng: () => number): T[] {
  */
 export function chonLuotDauGio(
   em: readonly EmUngVien[],
-  tuy: { toiDa?: number; daGoi?: ReadonlySet<string>; cauDaDung?: ReadonlySet<string>; rng?: () => number; nowMs?: number } = {},
+  tuy: { toiDa?: number; daGoi?: ReadonlySet<string>; cauDaDung?: ReadonlySet<string>; rng?: () => number; nowMs?: number; khoaNoiDung?: (qid: string) => string | undefined } = {},
 ): GoiDauGio[] {
   const toiDa = Math.max(0, Math.min(TOI_DA_EM_MOI_LUOT, tuy.toiDa ?? TOI_DA_EM_MOI_LUOT))
   const rng = tuy.rng ?? Math.random
   const nowMs = tuy.nowMs ?? Date.now()
   const daGoi = tuy.daGoi ?? new Set<string>()
   const dung = new Set(tuy.cauDaDung ?? [])
+  // Câu TRÙNG NỘI DUNG (chép ở nhiều đề) coi như một câu (thầy 05/10): khoá nội dung của câu đã dùng cũng chặn bản trùng.
+  const nd = (q: string) => tuy.khoaNoiDung?.(q)
+  for (const q of tuy.cauDaDung ?? []) { const k = nd(q); if (k) dung.add(`nd:${k}`) }
   const daCo = new Set<string>()
   const ra: GoiDauGio[] = []
   for (const e of xao(em, rng)) {
     if (ra.length >= toiDa) break
     if (!e.sbd || daGoi.has(e.sbd) || daCo.has(e.sbd)) continue
     const con = xepUngVien(
-      e.cau.filter((c) => c.qid && !dung.has(c.qid)),
+      e.cau.filter((c) => c.qid && !dung.has(c.qid) && !dung.has(`nd:${nd(c.qid) ?? ''}`)),
       nowMs,
     )
     if (!con.length) continue
     const c = con[Math.floor(rng() * Math.min(CUA_SO_NGAU_NHIEN, con.length))]!
     dung.add(c.qid)
+    const kc = nd(c.qid)
+    if (kc) dung.add(`nd:${kc}`)
     daCo.add(e.sbd)
     ra.push({ sbd: e.sbd, hoTen: e.hoTen, qid: c.qid })
   }

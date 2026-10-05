@@ -2,6 +2,7 @@ import NhomCaThuGon from '../components/NhomCaThuGon'
 import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
 import { hashSeed } from '../lib/exam-shuffle'
 import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu } from '../lib/to-chieu-cau-noi'
+import { aiSaiQuaMayChu, thayChuaQuaMayChu, traAiSai } from '../components/chien-dich/ghi-to-chieu'
 // GỌI HỌC SINH LÊN BẢNG — MỘT MÀN, MỘT LUỒNG (thầy chốt 05/09 chiều).
 //
 // Nguồn duy nhất là CA thầy vừa cho lớp làm. Từ một ca ấy ra cả hai việc:
@@ -29,7 +30,7 @@ import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
-import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
+import { baiLamTuCa, boCauTrungNoiDung, boTrungTrongBanDe, cauTuBanDe, khoaNoiDungBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
 import { rutDeChua } from '../lib/rut-de-chua'
 import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
@@ -363,6 +364,11 @@ function GoiLenBangCu() {
    * trước mở khoá lại, bấm tiếp là ghi đôi). `daGhiKhoa`: các ô máy chủ ĐÃ nhận trong phiên này. */
   const dangGhiKhoa = useRef(new Map<string, Promise<boolean>>())
   const daGhiKhoa = useRef(new Set<string>())
+  /** Nút "Thầy chữa" trên tờ (thầy 05/10): ô đã ghi "Thầy đã chữa" trong phiên này / đang chờ máy chủ (khoá `sbd|qid`). */
+  const daThayChuaKhoa = useRef(new Set<string>())
+  const dangThayChuaKhoa = useRef(new Map<string, Promise<boolean>>())
+  const maCaRef = useRef('')
+  maCaRef.current = du?.maCa ?? ''
   /** PHIÊN TỜ MÁY CHIẾU đang mở: mã phiên ngẫu nhiên, các ô có trên tờ (tra lại theo `khoa`, không tin tin đến),
    * khung iframe đã bắt tay (`cuaSo`) và gốc của nó. `null` khi không có tờ nào đang chiếu. */
   const phienChieu = useRef<{
@@ -537,14 +543,15 @@ function GoiLenBangCu() {
   const bankThem: BanDeCa = useMemo(() => {
     // Thầy tự chọn thì BỎ HẲN kho tự nạp: gộp cả hai là bảng chữa lại đầy câu
     // máy chọn, đúng chỗ thầy vừa kêu.
-    if (cachLayCau === 'theo_dang') return bankTheoDang
-    if (cachLayCau === 'btvn_gan_nhat') return bankTichTay
+    // CÂU TRÙNG NỘI DUNG (cùng câu chép ở nhiều đề) chỉ hiện MỘT lần (thầy 05/10).
+    if (cachLayCau === 'theo_dang') return boTrungTrongBanDe(bankTheoDang)
+    if (cachLayCau === 'btvn_gan_nhat') return boTrungTrongBanDe(bankTichTay)
     const san = cachLayCau === 'san' ? du?.khoChua : null
-    return {
+    return boTrungTrongBanDe({
       phanI: [...(san?.phanI ?? []), ...bankTichTay.phanI],
       phanII: [...(san?.phanII ?? []), ...bankTichTay.phanII],
       phanIII: [...(san?.phanIII ?? []), ...bankTichTay.phanIII],
-    }
+    })
   }, [du, bankTichTay, cachLayCau, bankTheoDang])
 
   /** NẠP BTVN ĐÃ GIAO CHO CA NÀY (ĐỂ CHỌN CHỮA BTVN GẦN NHẤT) */
@@ -587,12 +594,15 @@ function GoiLenBangCu() {
    * dòng cùng ghi "Phần I câu 3" là thầy đọc nhầm câu ngay trên lớp. */
   const dsCau: CauChua[] = useMemo(() => {
     // THẦY TỰ CHỌN BÀI hoặc CHỌN BTVN GẦN NHẤT ⇒ CHỈ chữa đúng những câu đó.
+    // `bankThem` đã bỏ câu trùng nội dung trong nó; dưới đây bỏ thêm câu thêm TRÙNG câu của ca (câu của ca luôn giữ) — thầy 05/10.
     if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(bankThem)
+    const khoaThem = khoaNoiDungBanDe(bankThem)
 
     const cuaCa = du ? cauTuBanDe(du.bank) : []
     const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
     const daCo = new Set(cuaCa.map((c) => c.id))
-    return [...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))]
+    const khoa = new Map([...khoaThem, ...(du ? khoaNoiDungBanDe(du.bank) : [])])
+    return boCauTrungNoiDung([...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))], khoa, daCo)
   }, [du, bankThem, cachLayCau])
   const baiLam = useMemo(() => (du ? baiLamTuCa(du.bank, du.maCa, du.luot) : []), [du])
   const dsEmCa = useMemo(() => (du ? emTuCa(du.luot, du.hoSo, dsCau, daGoiCau, vang) : []), [du, dsCau, daGoiCau, vang])
@@ -1424,10 +1434,49 @@ function GoiLenBangCu() {
         guiToChieu({ type: TIN_TO_CHIEU.KET_NOI })
         // Ô đã ghi từ trước khi tờ mở (bảng buổi chữa, bảng Phân công): khoá ngay, khỏi để bấm lần nữa.
         for (const khoa of p.o.keys()) if (daGhiKhoa.current.has(khoa)) guiToChieu({ type: TIN_TO_CHIEU.DA_GHI, khoa })
+        for (const khoa of p.o.keys()) if (daThayChuaKhoa.current.has(khoa)) guiToChieu({ type: TIN_TO_CHIEU.THAY_CHUA_XONG, khoa, kq: 'da_ghi' })
         return
       }
       const o = p.o.get(tin.khoa)
       if (!o) return
+      if (tin.loai === 'ai_sai') {
+        // Nút X "Ai sai câu này" (thầy 05/10): chỉ đọc sổ, trả danh sách về đúng khung.
+        const id = tin.id
+        void aiSaiQuaMayChu([qidMayChuCuaIdCau(o.cau.id) ?? o.cau.id]).then((r) => {
+          if (phienChieu.current === p) traAiSai(cuaSo, goc, p.ma, id, r)
+        })
+        return
+      }
+      if (tin.loai === 'thay_chua') {
+        // "Thầy chữa": không gọi em nữa — ghi nhãn "Thầy đã chữa" + mốc dạy lại cho câu của em (lệnh `/gv/thay-chua-cau`, nguồn len_bang).
+        const khoa = tin.khoa
+        const tra = (ok: boolean) => {
+          if (phienChieu.current !== p) return
+          try {
+            cuaSo.postMessage({ type: TIN_TO_CHIEU.THAY_CHUA_XONG, maPhien: p.ma, khoa, kq: ok ? 'da_ghi' : 'loi' }, goc)
+          } catch {
+            /* khung đã đóng */
+          }
+        }
+        if (daThayChuaKhoa.current.has(khoa)) return tra(true)
+        let luot = dangThayChuaKhoa.current.get(khoa)
+        if (!luot) {
+          const qid = qidMayChuCuaIdCau(o.cau.id) ?? o.cau.id
+          luot = thayChuaQuaMayChu({ sbd: o.sbd, qid }, 'len_bang', maCaRef.current || 'goi-len-bang').then((r) => {
+            if (!r.ok) {
+              showToast(r.chu, 'error')
+              return false
+            }
+            daThayChuaKhoa.current.add(khoa)
+            showToast(`Câu của ${o.hoTen || o.sbd}: đã ghi "Thầy đã chữa"`, 'success')
+            return true
+          })
+          dangThayChuaKhoa.current.set(khoa, luot)
+          void luot.finally(() => dangThayChuaKhoa.current.delete(khoa))
+        }
+        void luot.then(tra)
+        return
+      }
       void ghiTheoKhoaRef.current?.(o, tin.dat, tin.giayThuc).then((ok) => {
         if (phienChieu.current !== p) return // tờ đã đóng/đổi phiên trong lúc chờ máy chủ
         try {

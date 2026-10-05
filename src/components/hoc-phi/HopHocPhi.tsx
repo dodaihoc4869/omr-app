@@ -4,6 +4,7 @@ import {
   conThieu,
   dinhDangTien,
   docSoTien,
+  ghiChuHien,
   nopHocPhi,
   suaMucHocPhi,
   taoMaLanNop,
@@ -38,7 +39,7 @@ export default function HopHocPhi({ sbd, hoTen, banDau, onDong, onDoi }: {
   const [bao, setBao] = useState('')
   const [hoiXoa, setHoiXoa] = useState<string | null>(null)
   const [mucChu, setMucChu] = useState(String(banDau.phaiNop))
-  const [mucGhiChu, setMucGhiChu] = useState(banDau.ghiChu)
+  const [mucGhiChu, setMucGhiChu] = useState(ghiChuHien(banDau.ghiChu))
   const maLan = useRef(taoMaLanNop())
   const oNhap = useRef<HTMLInputElement>(null)
   const nutMo = useRef<Element | null>(typeof document !== 'undefined' ? document.activeElement : null)
@@ -53,7 +54,7 @@ export default function HopHocPhi({ sbd, hoTen, banDau, onDong, onDoi }: {
     chiTietHocPhi(sbd)
       .then((r) => {
         if (huy) return
-        if (r.em) { nhan(r.em); setMucChu(String(r.em.phaiNop)); setMucGhiChu(r.em.ghiChu) }
+        if (r.em) { nhan(r.em); setMucChu(String(r.em.phaiNop)); setMucGhiChu(ghiChuHien(r.em.ghiChu)) }
         if (r.loi) setLoi(r.loi)
         setDaTaiChiTiet(true)
       })
@@ -146,7 +147,7 @@ export default function HopHocPhi({ sbd, hoTen, banDau, onDong, onDoi }: {
           <dt>Còn thiếu</dt>
           <dd className={thieu > 0 ? 'hp-thieu' : 'hp-du'}>{dinhDangTien(thieu)}</dd>
         </dl>
-        {em.ghiChu && <div className="hp-hop-sbd">Ghi chú: {em.ghiChu}</div>}
+        {ghiChuHien(em.ghiChu) && <div className="hp-hop-sbd">Ghi chú: {ghiChuHien(em.ghiChu)}</div>}
 
         {thieu > 0 ? (
           <>
