@@ -844,7 +844,8 @@ export function thuHaiCua(ngay: string): string {
   const dow = new Date(`${ngay}T00:00:00Z`).getUTCDay() // 0 = Chủ nhật
   return congNgay(ngay, -((dow + 6) % 7))
 }
-const NHAN_GIO: Record<KhungGio, string> = { truoc18: '06:00–18:00', '18_20': '18:00–20:00', '20_22': '20:00–22:00', '22_24': '22:00–24:00', sau24: '00:00–06:00' }
+/** Nhãn khung giờ (24 giờ, giờ VN; app phụ huynh đọc chặt dạng HH:MM–HH:MM, giờ ≤ 23 ⇒ khung cuối ngày ghi tới 23:59). */
+const NHAN_GIO: Record<KhungGio, string> = { truoc18: '06:00–18:00', '18_20': '18:00–20:00', '20_22': '20:00–22:00', '22_24': '22:00–23:59', sau24: '00:00–06:00' }
 /** Khung giờ em học nhiều nhất (theo lượt thật của hồ sơ); chưa có lượt ⇒ null. Thuần. */
 export function gioHocTu(hs: Pick<HoSoOmniEm, 'khungGio'>): string | null {
   let tot: KhungGio | null = null
@@ -1197,15 +1198,12 @@ export async function chayOmniDem(env: Env, nowMs: number): Promise<{ soEm: numb
   const homNay = ngayVnCua(nowMs)
   let ct: ConTroDem = { ngay: homNay, buoc: 'beta', sbdCuoi: '', xong: false, loi: 0 }
   try {
+    // Công tắc tắt ⇒ KHÔNG ghi gì (kể cả con trỏ, bảng): máy chủ y hệt khi chưa có OMNI. Cờ đọc qua đệm 15 s.
+    if (!(await docCoOmni(env)).bat) return { soEm: 0, soBeta: 0, xong: true }
     const cu = await docConTro(env)
     if (cu && cu.ngay === homNay) {
       if (cu.xong) return { soEm: 0, soBeta: 0, xong: true }
       ct = cu
-    }
-    const co = await docCoOmni(env)
-    if (!co.bat) {
-      await ghiConTro(env, { ...ct, buoc: 'xong', xong: true }, nowMs)
-      return { soEm: 0, soBeta: 0, xong: true }
     }
     await damBaoBangOmni(env)
     const ts = await docThamSoOmni(env)
@@ -1272,12 +1270,13 @@ export function uocTTheoDang(quanSat: readonly { sbd: string; maDang: string; du
 /**
  * Hiệu chỉnh tuần (đêm thứ Hai): S0 gộp từ lượt vững của ảnh chụp hồ sơ (co về S0 cũ 50 lượt ảo, trong (0; 0,5) và 1 − S ≥ G) · T theo dạng (tỉ lệ sai ⇒ đúng
  * ở lượt kế, 7 ngày, kẹp [T_MIN, T_MAX]) · MAE + thiên lệch dự báo ca chốt. Ghi `cau_hinh.omni_tham_so` + một dòng `v2_hieu_chinh` (tuan = 'omni:' + thứ Hai).
- * Idempotent theo tuần. Không ném lỗi.
+ * Idempotent theo tuần; công tắc OMNI tắt ⇒ không làm gì. Không ném lỗi.
  */
 export async function hieuChinhOmniTuan(env: Env, nowMs: number): Promise<Record<string, unknown>> {
   const thuHai = thuHaiCua(ngayVnCua(nowMs))
   const tuan = `omni:${thuHai}`
   try {
+    if (!(await docCoOmni(env)).bat) return { ok: true, tuan, boQua: 'omni_tat' } // công tắc tắt ⇒ không ghi tham số, không thêm dòng nhật ký
     await damBaoBangTuHoanThien(env)
     await damBaoBangOmni(env)
     const daCo = await env.DB.prepare('SELECT 1 AS c FROM v2_hieu_chinh WHERE tuan = ?').bind(tuan).first<Row>().catch(() => null)

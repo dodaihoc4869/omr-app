@@ -10,6 +10,7 @@ import { gvChienDich } from '../server/src/srs2-gv'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import { THAM_SO_OMNI } from '../server/src/omni-kieu'
 import type { Env } from '../server/src/kieu'
+import { docOmniPh } from '../src/lib/ph-v3/du-lieu'
 
 const T0 = Date.parse('2026-10-05T03:00:00Z') // 10:00 Thứ Hai 05/10/2026 giờ VN
 const NGAY = 86_400_000
@@ -88,6 +89,7 @@ describe('lõi thật — tích hợp lớp D1', () => {
     expect(Object.keys(ph.omni as object).sort()).toEqual(['canThayChua', 'chungChi', 'dangCanVung', 'gioHoc', 'hieuChuan', 'khoangCach8', 'sEm'])
     expect((ph.omni as { canThayChua: number }).canThayChua).toBe(1)
     expect(await omniChoPh(env, 'S3', T0)).toEqual(ph.omni)
+    expect(docOmniPh(ph.omni)).toEqual(ph.omni) // app phụ huynh đọc chặt: không trường nào bị gạt
     const b = await gvOmni(env, { action: 'bang', chienDichId: id }, T0)
     expect((b.canThayChua as { loai: string; qids?: string[] }[]).find((c) => c.loai === 'cat_tia')).toMatchObject({ qids: ['A5'], sbd: ['S3'] })
     const r = await gvOmni(env, { action: 'ca-chot', chienDichId: id })

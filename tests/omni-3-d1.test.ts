@@ -46,6 +46,7 @@ import { msKyVong } from '../server/src/omni-toc-do'
 import { PHIEN_BAN_OMNI, THAM_SO_OMNI, type HoSoOmniEm } from '../server/src/omni-kieu'
 import { TEN_NEN } from '../server/src/thang-tu-go'
 import type { Env } from '../server/src/kieu'
+import { docOmniPh } from '../src/lib/ph-v3/du-lieu'
 
 const T0 = Date.parse('2026-10-05T03:00:00Z') // 10:00 Thứ Hai 05/10/2026 giờ VN
 const NGAY = 86_400_000
@@ -352,7 +353,8 @@ describe('hoSoOmniEm — phát lại sổ + Q + β + xác nhận + prior lớp',
     expect(hs).toMatchObject({ sbd: 'S1', vkn: {}, nVung: 0 })
     expect(await omniBat(env, 'S1')).toBe(false)
     expect(await omniChoSanh(env, 'S1', T0, { tong: 0, con: 0, chienDichId: null })).toBeNull()
-    expect(await chayOmniDem(env, T0)).toEqual({ soEm: 0, soBeta: 0, xong: false })
+    expect(await chayOmniDem(env, T0)).toMatchObject({ soEm: 0, soBeta: 0 })
+    expect(await hieuChinhOmniTuan(env, T0)).toMatchObject({ ok: true })
   })
   it('kyVongMsCau = msKyVong(β câu, τ em, phần, mức)', async () => {
     const { d, env } = dung()
@@ -527,6 +529,10 @@ describe('chayOmniDem — β + ảnh chụp theo lô ≤ 40 em, idempotent theo 
     expect(await chayOmniDem(env, T0)).toEqual({ soEm: 0, soBeta: 0, xong: true })
     expect(d.dem("sqlite_master", "name = 'omni_em'")).toBe(1) // bảng có sẵn từ migration trong D1 giả
     expect(d.dem('omni_em')).toBe(0)
+    expect(d.dem('cau_hinh', `khoa = '${KHOA_CON_TRO_DEM}'`)).toBe(0) // không cả con trỏ
+    expect(await hieuChinhOmniTuan(env, T0)).toMatchObject({ ok: true, boQua: 'omni_tat' })
+    expect(d.dem('v2_hieu_chinh')).toBe(0)
+    expect(d.dem('cau_hinh', "khoa = 'omni_tham_so'")).toBe(0)
   })
   it('lô 40 em/lượt, con trỏ, xong thì lượt sau cùng ngày không làm gì; β đủ ≥ 8 mẫu đúng tự làm có thời lượng', async () => {
     const { d, env } = dung()
@@ -606,5 +612,11 @@ describe('hàm thuần', () => {
     expect(thuHaiCua('2026-10-12')).toBe('2026-10-12')
     expect(gioHocTu({ khungGio: { truoc18: { n: 2, soY: 0 }, '18_20': { n: 0, soY: 0 }, '20_22': { n: 5, soY: 1 }, '22_24': { n: 5, soY: 0 }, sau24: { n: 0, soY: 0 } } })).toBe('20:00–22:00')
     expect(gioHocTu({ khungGio: { truoc18: { n: 0, soY: 0 }, '18_20': { n: 0, soY: 0 }, '20_22': { n: 0, soY: 0 }, '22_24': { n: 0, soY: 0 }, sau24: { n: 0, soY: 0 } } })).toBeNull()
+    // app phụ huynh đọc chặt HH:MM–HH:MM (giờ ≤ 23): mọi nhãn phải qua được bộ đọc của app
+    for (const k of ['truoc18', '18_20', '20_22', '22_24', 'sau24'] as const) {
+      const kg = { truoc18: { n: 0, soY: 0 }, '18_20': { n: 0, soY: 0 }, '20_22': { n: 0, soY: 0 }, '22_24': { n: 0, soY: 0 }, sau24: { n: 0, soY: 0 }, [k]: { n: 1, soY: 0 } }
+      const nhan = gioHocTu({ khungGio: kg })!
+      expect(docOmniPh({ gioHoc: nhan })!.gioHoc).toBe(nhan)
+    }
   })
 })
