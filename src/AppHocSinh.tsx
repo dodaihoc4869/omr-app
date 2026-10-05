@@ -24,34 +24,26 @@ import { danhDauAppHocSinh } from './lib/pwa-install'
 /** Tải mảnh cổng; hỏng (mạng chập) thì chờ 0,8 giây thử lại một lần (như App.tsx). Thiếu mảnh vì đang mở bản cũ ⇒ batLoiThieuManh() lo. */
 const napCong = () => import('./screens/StudentPortalScreen').catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(() => import('./screens/StudentPortalScreen')))
 let huaCong: ReturnType<typeof napCong> | null = null
-const layCong = () => (huaCong ??= napCong())
+/** Lượt tải mảnh cổng đã XONG (thành hay hỏng) — mốc KaTeX, xem `huaManEmSom`. */
+let baoCongXong: () => void = () => {}
+const congXong = new Promise<void>((r) => (baoCongXong = r))
+const layCong = () => {
+  if (!huaCong) {
+    huaCong = napCong()
+    huaCong.then(baoCongXong, baoCongXong)
+  }
+  return huaCong
+}
 /** Máy ĐÃ đăng nhập lúc mở: cổng là màn đầu ⇒ `lazy` + Suspense (ChoManEm) như App.tsx. */
 const StudentPortalScreen = lazy(layCong)
 
-/** Sảnh đã vẽ lượt trả lời đầu của máy chủ (hoa2/api.ts báo bằng sự kiện cửa sổ — vỏ không nhập mảnh cổng). Lưới an toàn: 15 giây sau khi vỏ
- *  chạy mà chưa có (em còn ở màn đăng nhập, phiên cũ không token…) thì coi như tới mốc — KaTeX vẫn về sớm như bản cũ. */
-const SU_KIEN_SANH_DA_VE = 'ddh-sanh-da-ve'
-const sanhDaVe = new Promise<void>((r) => {
-  if (typeof window === 'undefined') return
-  if ((window as Window & { __ddhSanhDaVe?: boolean }).__ddhSanhDaVe) return r()
-  window.addEventListener(SU_KIEN_SANH_DA_VE, () => r(), { once: true })
-  setTimeout(r, 15_000)
-})
-
 /**
- * Mốc tải KaTeX (main.tsx nối KaTeX SAU lời hứa này — cùng tên/ý với `huaManEmSom` của App.tsx): Sảnh đã vẽ lượt trả lời đầu của máy chủ,
- * rồi chờ lúc luồng chính rảnh. Sảnh không có công thức; trước đây KaTeX (≈ 70 KB nén + dịch ~260 KB) tải ngay sau mảnh cổng nên giành mạng
- * và luồng chính với đúng lượt vẽ Sảnh. Màn có công thức mở trước mốc này vẫn tự xin KaTeX (`useKatex`), y như cũ.
+ * Mốc tải KaTeX — GIỮ ĐÚNG LUẬT CŨ của App.tsx (`huaManEmSom` = lượt tải mảnh cổng): main.tsx nối KaTeX NGAY SAU khi mảnh cổng về, không hoãn
+ * thêm (điều phối 05/10: màn có công thức không được hiện chữ thô dù một nhịp ⇒ KaTeX về sớm như bản cũ). Hàm này không tự gọi tải mảnh cổng:
+ * máy đã đăng nhập tải ngay lúc vỏ chạy (dưới), máy chưa đăng nhập tải sau lượt vẽ màn đăng nhập (AppHocSinh).
  */
 export function huaManEmSom(): Promise<unknown> {
-  return sanhDaVe.then(
-    () =>
-      new Promise<void>((r) => {
-        const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
-        if (w.requestIdleCallback) w.requestIdleCallback(() => r(), { timeout: 2000 })
-        else setTimeout(r, 300)
-      }),
-  )
+  return congXong
 }
 
 // MÁY ĐÃ ĐĂNG NHẬP: màn đầu là cổng ⇒ tải mảnh cổng ngay lúc vỏ vừa chạy (index.html đã nạp trước), không chờ React dựng. Tìm địa chỉ máy chủ

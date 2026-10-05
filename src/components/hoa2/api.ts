@@ -465,8 +465,8 @@ export interface TrangThaiSanh {
 
 /**
  * Báo Sảnh ĐÃ CÓ SỐ (lượt trả lời đầu của máy chủ — thành công hay lỗi — đã vẽ ra màn) trong phiên trang này: cờ `window.__ddhSanhDaVe` +
- * sự kiện cửa sổ `ddh-sanh-da-ve`. Vỏ app học sinh (AppHocSinh.tsx) nối việc tải KaTeX vào sau mốc này (05/10): Sảnh không có công thức,
- * tải KaTeX sớm chỉ giành mạng + luồng chính với đúng lượt vẽ Sảnh. Dùng sự kiện để vỏ không phải nhập mảnh cổng.
+ * sự kiện cửa sổ `ddh-sanh-da-ve`. main.tsx: máy mở cổng học sinh LẦN ĐẦU đăng ký service worker sau mốc này (05/10) — lượt cài precache không
+ * giành đường truyền với đăng nhập + lượt vẽ Sảnh. Dùng sự kiện để main.tsx không phải nhập mảnh cổng.
  */
 function baoSanhDaVe(): void {
   if (typeof window === 'undefined') return
@@ -476,7 +476,7 @@ function baoSanhDaVe(): void {
   try {
     window.dispatchEvent(new Event('ddh-sanh-da-ve'))
   } catch {
-    /* trình duyệt cũ: KaTeX vẫn tự tải khi màn có công thức cần */
+    /* trình duyệt cũ: service worker vẫn đăng ký sau 30 giây (main.tsx) */
   }
 }
 
