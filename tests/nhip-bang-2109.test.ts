@@ -21,6 +21,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/bang-nhiem-vu/DanhSachNhiemVu.tsx': 1,
   'src/components/bang-tin-san/hooks.ts': 1,
   'src/game/than-thu-v2/DoanHoTong.tsx': 1, // 250 ms vẽ lại đồng hồ trận (vòng HỎI trận đã chuyển sang batVongTrucTiep)
+  'src/game/than-thu-v2/dao2/DeThu.tsx': 1, // OMNI 3 đề thử (05/10): 1 s vẽ lại đồng hồ đếm ngược theo `hetLuc` máy chủ; hết giờ tự nộp MỘT lần (không vòng hỏi)
   'src/game/than-thu-v2/ImmortalShield.tsx': 1,
   'src/game/bi-a/TamCauBia.tsx': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
   'src/components/tu-luyen/ManTuLuyen.tsx': 2, // Tu luyện (29/09): 1 s đếm giờ làm trong ref + 1 s ô đồng hồ nhỏ tự vẽ lại; chấm qua /hs/tu-luyen/nop một lần, không vòng hỏi

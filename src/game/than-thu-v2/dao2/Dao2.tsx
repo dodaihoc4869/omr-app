@@ -57,7 +57,8 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const [viecOmni]=useState(()=>layViecOmniDao()),veCho=useRef(false)
  const [luot,setLuot]=useState<Luot2|null>(null),[pha,setPha]=useState<'ban-do'|'ai'|'xong'|'de-thu'>(()=>viecOmni==='de-thu'&&docSanh2(sanhDau)?.omni?.deThu.duoc?'de-thu':'ban-do')
  // Đang trong ải/chặng/bài ⇒ app KHÔNG tự tải lại vì bản mới (quét ổn định 30/09, như Bi-a #95): bản mới chờ tới lúc em rời màn.
- useEffect(()=>pha==='ai'||pha==='de-thu'?giuTrangKhongTaiLai():undefined,[pha])
+ useEffect(()=>pha==='ai'?giuTrangKhongTaiLai():undefined,[pha])
+ useEffect(()=>pha==='de-thu'?giuTrangKhongTaiLai():undefined,[pha]) // OMNI 3: đang làm đề thử cũng giữ trang
  // OMNI 3: bật khi `hoa2-sanh` có `omni` (cờ áp cho em). Tắt ⇒ mọi phần dưới đây nằm im: không chip, không trường thân mới, không lệnh mới.
  const omniBat=!!sanh?.omni
  const [chuaChac,setChuaChac]=useState(false),[goiYChip,setGoiYChip]=useState(false),[tram,setTram]=useState<Tram2|null>(null)
