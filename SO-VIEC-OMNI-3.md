@@ -67,3 +67,9 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] Gộp làn A2 kế hoạch ngày nhiều bài | bằng chứng: e295a47a; 5 tệp tests/omni-3-ke-hoach-*.test.ts 133/133 (làn báo), 30 kịch bản JSON y hệt bản cũ, cờ tắt trùng ảnh chụp f189d2b
 - [x] Bảng đệm srs2_ke_hoach_omni vào migration + phân loại reset | bằng chứng: migration 2 lần sạch (16 bảng); reset + kế hoạch D1 80/80
 - [ ] Soát test mô phỏng chứng chỉ (omni-3-loi-mo-phong) quá giờ 5 giây khi máy tải nặng — chạy riêng xanh | bằng chứng: (chờ toàn vitest)
+- [x] Gộp làn D1 A.I gắn vi kỹ năng + câu nền tự sinh | bằng chứng: 2348eb52; 147/147 (làn báo); chạy thử 799 câu thật: 342 câu lý thuyết chỉ nhận dang:, 251/457 câu bài tập được gắn nhãn nền; câu nền 20 nhãn × 50 câu kiểm chéo bằng bộ giải độc lập
+- [x] Sửa tác dụng phụ: kiểm định Q tuần ghi câu nghi vào cau_nghi_dap_an ⇒ rút đề ca kiểm tra bỏ câu tốt — nay CHỈ ghi bảng riêng omni_q_nghi | bằng chứng: bd8ca8e6; test D1 sửa theo ý định mới
+- [x] Ba bảng phụ omni_q_gan / omni_q_nhat_ky / omni_q_nghi vào migration + reset GIỮ | bằng chứng: bd8ca8e6; migration 2 lần sạch (20 bảng)
+- [x] Nối móc A.I gắn vi kỹ năng: nạp tờ DẠY HỌC, tick bài (nền), việc đêm, kiểm định thứ Hai, Trạm tự sinh câu nền | bằng chứng: 6e7cfd52; test các làn chạm 141/141
+- [x] Gộp làn B2 lớp D1 + /gv/omni + Sảnh/PH | bằng chứng: 16f1facf; làn báo 53/53 + workerd 2/2
+- [x] Việc đêm mới chỉ chạy khi công tắc bật (giữ tiêu chí 9 "tắt ⇒ y như hôm nay": câu nền tự sinh ghi cau_nen mà bậc thang tự gỡ sẵn có dùng) + chạy tiếp ảnh chụp đêm 00:02–05:00 | bằng chứng: f2efcb8f; mọi test OMNI + reset + điểm danh 602/602
