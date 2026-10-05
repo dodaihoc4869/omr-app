@@ -174,6 +174,8 @@ export const BANG_GIU: readonly string[] = [
   'doc_loi_giai',
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
+  // HỌC PHÍ (hoc-phi.ts, migration-0510-hoc-phi.sql): sổ thu tiền của trung tâm — dữ liệu tài chính thật ⇒ GIỮ.
+  'hoc_phi', 'hoc_phi_nop',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
   'v2_hieu_chinh', 'cau_nghi_dap_an', 'v2_tham_so_em',
   // Ngân hàng câu kiến thức nền (thang-tu-go.ts, migration-0210-v2.sql) — học liệu ⇒ GIỮ.

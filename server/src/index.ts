@@ -79,6 +79,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chotBatDau, lapBoChoEmVaoMuon, loiDenHan } from './rut-de-v2'
 import { cauDaDung, lapBoDaDungChoEmVaoMuon } from './cau-da-dung'
+import { gvHocPhi } from './hoc-phi'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
@@ -3625,6 +3626,8 @@ const boXuLy = {
       if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
       // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10, server/src/cau-da-dung.ts): câu em đã tự làm đúng trong các chiến dịch, kèm nhãn nơi · ngày · mức độ.
       if (p === '/ca/cau-da-dung') return ra(await cauDaDung(env, b))
+      // HỌC PHÍ (thầy 05/10, server/src/hoc-phi.ts): sổ thu từng em — danh sách, một em, ghi một lần nộp, sửa mức riêng, xoá lần nhập nhầm, nạp sổ Excel.
+      if (p.startsWith('/gv/hoc-phi/')) return ra(await gvHocPhi(env, p, b))
       if (p === '/ca/xac-nhan') {
         const maCa = String(b.maCa ?? '')
         const ca = await docCa(env, maCa)
