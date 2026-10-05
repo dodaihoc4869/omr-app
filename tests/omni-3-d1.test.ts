@@ -607,6 +607,12 @@ describe('hàm thuần', () => {
     expect(khungTheoPhamVi([])).toEqual({ I: 18, II: 4, III: 6 })
   })
   it('thuHaiCua + gioHocTu', () => {
+    // cùng công thức tuần với `tuanVnCua` của omni-game.ts (khoá omni_ve): thứ Hai giờ VN của tuần chứa thời điểm
+    for (let ms = Date.parse('2026-10-04T16:59:00Z'); ms < Date.parse('2026-10-20T00:00:00Z'); ms += 3 * 3_600_000 + 17 * 60_000) {
+      const d = new Date(ms + 7 * 3_600_000)
+      const tuan = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7))).toISOString().slice(0, 10)
+      expect(thuHaiCua(new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10))).toBe(tuan)
+    }
     expect(thuHaiCua('2026-10-05')).toBe('2026-10-05')
     expect(thuHaiCua('2026-10-11')).toBe('2026-10-05')
     expect(thuHaiCua('2026-10-12')).toBe('2026-10-12')

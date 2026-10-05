@@ -99,10 +99,12 @@ const demQ = new DemTTL<QCau>(10 * 60_000, 8_000)
 const demKho = new DemTTL<CauKho | null>(10 * 60_000, 8_000)
 const demTenDang = new DemTTL<string>(10 * 60_000, 4_000)
 const demHieuChuan = new DemTTL<HieuChuan>(10 * 60_000, 4)
+/** Nhật ký hôm nay: Sảnh mở lại nhiều lần sau khi xong kế hoạch ⇒ đệm 60 s theo (em, ngày, số dòng sổ). */
+const demNhatKy = new DemTTL<string[]>(60_000, 400)
 let phienBanDem = 0
 /** Bỏ mọi đệm OMNI của isolate (sau khi thầy duyệt Q, xác nhận dạng, đổi tham số). */
 export function xoaDemOmni(): void {
-  demHoSo.xoa(); demTho.xoa(); demQ.xoa(); demKho.xoa(); demTenDang.xoa(); demHieuChuan.xoa(); demSo.xoa()
+  demHoSo.xoa(); demTho.xoa(); demQ.xoa(); demKho.xoa(); demTenDang.xoa(); demHieuChuan.xoa(); demSo.xoa(); demNhatKy.xoa()
   phienBanDem++
 }
 
@@ -629,7 +631,7 @@ async function dungHoSoNoi(env: Env, sbdsVao: readonly string[], tuy: TuyDung): 
   const ra = new Map<string, KetQuaDung>()
   const sbds = [...new Set(sbdsVao.filter(Boolean))]
   if (!sbds.length) return ra
-  const [so, xn] = await Promise.all([docSoVaMeta(env, sbds, tuy.truocMs, tuy.truocMs == null ? tuy.dem : undefined), docXacNhan(env, sbds)])
+  const [so, xn] = await Promise.all([docSoVaMeta(env, sbds, tuy.truocMs, tuy.dem), docXacNhan(env, sbds)])
   const qids = [...so.goiY.keys()]
   const coMs = new Set<string>()
   for (const ds of so.suKien.values()) for (const e of ds) if (e.msLam != null) coMs.add(e.qid)
@@ -932,10 +934,23 @@ export async function nhatKyHomNay(env: Env, sbd: string, nowMs: number): Promis
   try {
     const ts = await docThamSoOmni(env)
     const homNay = ngayVnCua(nowMs)
+    const dem = await demSoDong(env, [sbd])
+    const khoa = `${sbd}|${homNay}|${dem.get(sbd)?.n ?? 0}|${dem.get(sbd)?.r ?? 0}|${khoaTs(ts)}|${phienBanDem}`
+    const co = demNhatKy.doc(khoa, nowMs)
+    if (co) return [...co]
+    const dong = await dungNhatKy(env, sbd, homNay, ts, dem)
+    demNhatKy.ghi(khoa, nowMs, dong)
+    return [...dong]
+  } catch {
+    return []
+  }
+}
+async function dungNhatKy(env: Env, sbd: string, homNay: string, ts: ThamSoOmni, dem: ReadonlyMap<string, DemSo>): Promise<string[]> {
+  {
     const moc = Date.parse(dauNgayVn(homNay))
     const [nay, truoc] = await Promise.all([
-      dungHoSoNoi(env, [sbd], { coPrior: true, homNay, ts }).then((m) => m.get(sbd)),
-      dungHoSoNoi(env, [sbd], { truocMs: moc, coPrior: true, homNay, ts }).then((m) => m.get(sbd)),
+      dungHoSoNoi(env, [sbd], { coPrior: true, homNay, ts, dem }).then((m) => m.get(sbd)),
+      dungHoSoNoi(env, [sbd], { truocMs: moc, coPrior: true, homNay, ts, dem }).then((m) => m.get(sbd)),
     ])
     if (!nay) return []
     const laLam = (e: SuKienOmni) => e.ketQua !== null && e.purpose !== 'xem_loi_giai' && e.purpose !== MUC_DICH_LUOT
@@ -957,8 +972,11 @@ export async function nhatKyHomNay(env: Env, sbd: string, nowMs: number): Promis
       if (d > 0.005 && (!tot || d > tot.b - tot.a || (d === tot.b - tot.a && k < tot.k))) tot = { k, a, b: v.p, n }
     }
     if (tot) {
-      const ten = (await vknTheoId(env, [tot.k]).catch(() => new Map<string, Vkn>())).get(tot.k)?.ten ?? tot.k
-      dong.push(`${ten}: ${soP(tot.a)} → ${soP(tot.b)} (${tot.n} câu)`)
+      const k = tot.k
+      const [tenMap, qMap] = await Promise.all([vknTheoId(env, [k]).catch(() => new Map<string, Vkn>()), qCuaCau(env, [...dau.keys()]).catch(() => new Map<string, QCau>())])
+      // số CÂU hôm nay chạm vi kỹ năng ấy (câu Đúng–sai nhiều ý vẫn là một câu); không tra được Q ⇒ số quan sát
+      const soCau = [...dau.keys()].filter((q) => { const c = qMap.get(q); return !!c && vknCuaCau(c).includes(k) }).length || tot.n
+      dong.push(`${tenMap.get(k)?.ten ?? k}: ${soP(tot.a)} → ${soP(tot.b)} (${soCau} câu)`)
     }
     const nen = new Set(homNayLam.filter((e) => e.nguon === 'nen' && e.ketQua === 1).map((e) => e.qid)).size
     if (nen > 0) dong.push(`Câu nền làm đúng hôm nay: ${nen} câu.`)
@@ -972,8 +990,6 @@ export async function nhatKyHomNay(env: Env, sbd: string, nowMs: number): Promis
       if (moi > 0) dong.push(`Câu em gặp lần đầu hôm nay: ${moi} câu.`)
     }
     return dong.slice(0, 5)
-  } catch {
-    return []
   }
 }
 
