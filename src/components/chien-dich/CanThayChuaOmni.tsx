@@ -57,7 +57,9 @@ export default function CanThayChuaOmni({
                   {/* Cột phải của Bảng chiến dịch hẹp (340 px): nút "Chữa xong" xuống dòng dưới chữ, số em giữ ở mép phải như dòng cũ. */}
                   <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, flex: '1 1 auto' }}>
                     <span>
-                      <b>{d.tieuDe || '—'}</b>
+                      {/* whiteSpace: luật chung `.cd-ds-cau li b:last-child { nowrap }` (dành cho số "N em" cuối dòng) bắt nhầm tên câu khi dòng
+                          không có chữ phụ ⇒ tên dài không xuống dòng, đè lên "N em" (ảnh chụp 05/10: "…đơn chức2 em"). */}
+                      <b style={{ whiteSpace: 'normal' }}>{d.tieuDe || '—'}</b>
                       {d.phu && <small className="cd-phu"> · {d.phu}</small>}
                     </span>
                     {d.qids?.length ? (

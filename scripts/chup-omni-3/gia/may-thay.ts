@@ -1,17 +1,19 @@
 // MÁY CHỦ GIẢ CỦA APP THẦY cho trang chụp OMNI 3 (chép hình dữ liệu từ tests/omni-3-thay-bai-hom-nay.test.tsx của làn C1).
 // Không dữ liệu học sinh thật; không yêu cầu nào ra mạng (goiLenh bị thay ở gia/goi-lenh-thay.ts).
+import { CAU_HINH_OMNI } from './bang-gv'
 import type { TeacherExamSource } from '../../../src/data/examContent'
 
 let soCau = 0
 const cau = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-I-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, choices: ['a', 'b', 'c', 'd'], correct: 'A' }))
 const cauII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-II-${++soCau}`, text: `Ý ${soCau} của ${maDe}`, ideas: ['a', 'b', 'c', 'd'], correct: 'DDSS' }))
-const to = (maDe: string, nguon: string, nI: number, nII = 0, nhom = '12 · DẠY HỌC/C1 - Ester lipid'): TeacherExamSource =>
-  ({ maDe, nhom, nguon, phanI: cau(maDe, nI), phanII: cauII(maDe, nII), phanIII: [] }) as unknown as TeacherExamSource
+const cauIII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-III-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, correct: '1,5' }))
+const to = (maDe: string, nguon: string, nI: number, nII = 0, nhom = '12 · DẠY HỌC/C1 - Ester lipid', nIII = 0): TeacherExamSource =>
+  ({ maDe, nhom, nguon, phanI: cau(maDe, nI), phanII: cauII(maDe, nII), phanIII: cauIII(maDe, nIII) }) as unknown as TeacherExamSource
 export const KHO: TeacherExamSource[] = [
   to('DH-12-C1-B1', 'Bài 1. Ester', 24, 6),
   to('DH-12-C1-B1-VD', 'Bài 1. Ester · VÍ DỤ MINH HOẠ — dạy thêm', 6),
   to('DH-12-C1-B2', 'Bài 2. Lipid', 20, 4),
-  to('DH-12-C1-B3', 'Bài 3. Xà phòng và chất giặt rửa', 22, 6),
+  to('DH-12-C1-B3', 'Bài 3. Xà phòng và chất giặt rửa', 80, 24, undefined, 8), // 80 + 24 + 8 = 112 = XEM.soCau
   to('DH-12-C1-B3-VD', 'Bài 3. Xà phòng và chất giặt rửa · VÍ DỤ MINH HOẠ', 5),
   to('DH-11-C2-B3', 'Bài 3. Ammonia', 18, 0, '11 · DẠY HỌC/C2 - Nitrogen'),
   to('KT-12-C1', 'Đề kiểm tra chương 1', 28, 0, '12 · C1 - Ester lipid'),
@@ -36,6 +38,7 @@ export async function traLoiThay(duong: string, b: Record<string, unknown>): Pro
   if (duong === '/gv/buoi-hoc') return du({ buoi: BUOI, ma: '482915', doiMaLuc: Date.now() + 40_000, coMat: EM.slice(0, 38).map((e, i) => ({ sbd: e.sbd, hoTen: e.hoTen, luc: `2026-10-05T11:${String(i % 60).padStart(2, '0')}:00Z`, cach: 'ma' })), siSo: 44, lopEm: [] })
   if (duong === '/gv/chien-dich' && b.action === 'ds-em') return du({ em: EM })
   if (duong === '/gv/omni' && b.action === 'co-doc') return du({ co: { bat: true, lop: ['12A1'], sbd: [] } })
+  if (duong === '/gv/omni' && b.action === 'cau-hinh-doc') return du(CAU_HINH_OMNI)
   if (duong === '/gv/bai-da-day' && b.action === 'danh-sach')
     return du({
       bai: [

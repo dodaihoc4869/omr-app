@@ -1,5 +1,5 @@
 // TRANG CHỤP ẢNH OMNI 3 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
-// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai`.
+// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai|gv-bang-cu|gv-bang-omni|gv-cai-dat`.
 // Dữ liệu OMNI theo đúng hợp đồng docs/hop-dong-omni-3.md (SanhOmni, PhOmni). Các màn thêm sau khi gộp làn: dao, gv-bai, gv-bang.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -18,12 +18,21 @@ import '../../src/index.css'
 import '../../src/styles/the-loc.css'
 import '../../src/components/m3'
 import '../../src/components/bang-nhiem-vu/sheet-m3.css'
+// Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
+import '../../src/styles/vo-thay.css'
+import '../../src/styles/gv-mau.css'
+import '../../src/styles/teacher-modern.css'
 import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
 import Dao2 from '../../src/game/than-thu-v2/dao2/Dao2'
 import { datViecOmniDao } from '../../src/lib/omni-hs'
 import DayHocLenBang from '../../src/components/day-hoc/DayHocLenBang'
+import BangChienDich from '../../src/components/chien-dich/BangChienDich'
+import CongTacOmni from '../../src/components/chien-dich/CongTacOmni'
+import ThanhBenTrai from '../../src/components/ThanhBenTrai'
+import { useAppStore } from '../../src/store/appStore'
+import { BANG, NOW_BANG, OMNI_BANG } from './gia/bang-gv'
 import '../../src/game/than-thu-v2/game.css'
 import { CHU_CHAC_MA_SAI, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
 import type { DaoKetQua, DaoProfile } from '../../src/game/than-thu-v2/dao/kieu'
@@ -177,5 +186,16 @@ const con =
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'de-thu' ? (datViecOmniDao('de-thu'), h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })) // đúng đường app thật: nút Đề thử ở Sảnh ⇒ Đảo mở màn đề thử trong khung `.dao2`
   : man === 'gv-bai' ? h(DayHocLenBang)
+  : man === 'gv-bang-cu' || man === 'gv-bang-omni'
+    ? h(BangChienDich, { du: BANG, nowMs: NOW_BANG, dangChieu: false, onChieu: async () => true, onDaChua: noop, omni: man === 'gv-bang-omni' ? OMNI_BANG : null, onOmniDoi: noop } as never)
+  : man === 'gv-cai-dat' ? h(CongTacOmni)
   : manSanh(SANH)
-createRoot(document.getElementById('root')!).render(con)
+// Màn thầy: dựng ĐÚNG khung App.tsx (thanh bên trái thật + khung nội dung) để bố cục, màu như app thầy thật.
+const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat' }
+const manThay = MAN_THAY[man]
+if (manThay) useAppStore.setState({ screen: manThay as never })
+createRoot(document.getElementById('root')!).render(
+  manThay
+    ? h('div', { className: 'min-h-screen m3 m3-thay vo-thay' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)))
+    : con,
+)

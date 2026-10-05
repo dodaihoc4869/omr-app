@@ -147,6 +147,35 @@ const MAN = [
     await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().scrollIntoViewIfNeeded()
     await chup(t, 'gv-bai-hom-nay-theo-diem-danh-1440')
   }],
+  // ── Bảng chiến dịch của thầy: OMNI TẮT (bảng cũ y nguyên) và OMNI BẬT (ô P + n câu, Sơ ý, Khoảng cách tới 8, "Cần thầy chữa" ba nhóm) ──
+  ['gv-bang-cu', [1440, 900], async (t) => {
+    await t.getByRole('heading', { name: 'Cần thầy dạy lại' }).first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(800)
+    await chup(t, 'gv-bang-chien-dich-omni-tat-1440', true)
+    await t.getByRole('heading', { name: 'Cần thầy dạy lại' }).first().scrollIntoViewIfNeeded()
+    await t.waitForTimeout(300)
+    await chup(t, 'gv-can-thay-day-lai-omni-tat-1440')
+  }],
+  ['gv-bang-omni', [1440, 900], async (t) => {
+    await t.getByRole('heading', { name: 'Cần thầy chữa' }).first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(800)
+    await chup(t, 'gv-bang-chien-dich-omni-bat-1440', true)
+    await t.getByRole('heading', { name: 'Cần thầy chữa' }).first().scrollIntoViewIfNeeded()
+    await t.waitForTimeout(300)
+    await chup(t, 'gv-can-thay-chua-omni-bat-1440')
+    // Thẻ có hộp cuộn: cuộn hộp xuống đáy để thấy nhóm 2 (câu sai từ 4 lần — danh sách cũ) và nhóm 3 (em sơ ý cao).
+    await t.evaluate(() => {
+      const the = document.getElementById('cd-can-day-lai')?.closest('section')
+      for (const el of the ? [...the.querySelectorAll('*')] : []) if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) el.scrollTop = el.scrollHeight
+    })
+    await t.waitForTimeout(300)
+    await chup(t, 'gv-can-thay-chua-cuon-xuong-1440')
+  }],
+  ['gv-cai-dat', [1440, 900], async (t) => {
+    await t.getByText(/OMNI/).first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1200)
+    await chup(t, 'gv-cai-dat-omni-1440', true)
+  }],
   ['ph', [390, 844], async (t) => {
     await t.waitForSelector('[data-vung="chien-dich"]', { timeout: 30000 })
     await t.waitForTimeout(800)
