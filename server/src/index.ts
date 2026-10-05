@@ -65,6 +65,7 @@ import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2, laLenhCongSongSong } from './game-v2'
+import { sanhKemDangNhap } from './dang-nhap-kem-sanh'
 import { RAO_GHI } from './doc-d1-theo-luot'
 import { shopBatCho } from './game-v2-shop'
 import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
@@ -3461,6 +3462,12 @@ const boXuLy = {
         const result = await G.hsDangNhap(env, b, daDoc)
         if (result.ok && !result.chuaCoMatKhau) {
           try { result.token = await gameToken(env, String(result.sbd), 'matKhau' in daDoc ? daDoc.matKhau : undefined) } catch { /* Game must not block academic login. */ }
+          // Tối ưu vòng 2 (06/10, dang-nhap-kem-sanh.ts): máy em xin `kemSanh` ⇒ chạy luôn lệnh Sảnh của em, gắn khoá `sanh` (bớt một vòng mạng). Lỗi / quá hạn ⇒ không có khoá.
+          if (b.kemSanh === true && typeof result.token === 'string' && result.token) {
+            const token = result.token
+            const sanh = await sanhKemDangNhap(() => gameV2(env, 'hoa2-sanh', { token }, ctx), (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }))
+            if (sanh) result.sanh = sanh
+          }
         }
         return ra(result)
       }

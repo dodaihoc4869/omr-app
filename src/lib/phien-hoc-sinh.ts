@@ -13,6 +13,12 @@ export interface ThongTinHs {
   token?: string
 }
 
+/** Phần máy chủ đính kèm phản hồi đăng nhập (D1 06/10, server/src/dang-nhap-kem-sanh.ts): hiện chỉ `sanh` — phản hồi `hoa2-sanh` của em. KHÔNG nằm trong
+ *  phiên đã cất (`ThongTinHs`): chỉ đi từ form đăng nhập tới `batDauHoiSom` (hoi-som.ts) rồi bỏ. */
+export interface KemDangNhap {
+  sanh?: unknown
+}
+
 /** Phiên đã cất — đọc ĐÚNG như StudentPortalScreen đọc lúc dựng (vỏ và cổng cùng một kết luận). Máy chặn lưu / hỏng ⇒ null. */
 export function docPhienHs(): ThongTinHs | null {
   try {

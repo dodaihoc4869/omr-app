@@ -16,9 +16,9 @@ import ChanLoi from './components/ChanLoi'
 import { LogoDoc } from './components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './screens/DangNhapHocSinh'
 import { layDiaChiMayChu } from './lib/dia-chi-may-chu'
-import { hsDangNhapApi, hsDatMatKhauApi } from './lib/hs-dang-nhap-api'
-import { batDauHoiSom } from './lib/hoi-som'
-import { docPhienHs, ghiPhienHs, type ThongTinHs } from './lib/phien-hoc-sinh'
+import { hsDangNhapKemSanhApi, hsDatMatKhauApi } from './lib/hs-dang-nhap-api'
+import { batDauHoiSom, diaChiDangDung } from './lib/hoi-som'
+import { docPhienHs, ghiPhienHs, type KemDangNhap, type ThongTinHs } from './lib/phien-hoc-sinh'
 import { danhDauAppHocSinh } from './lib/pwa-install'
 
 /** Tải mảnh cổng; hỏng (mạng chập) thì chờ 0,8 giây thử lại một lần (như App.tsx). Thiếu mảnh vì đang mở bản cũ ⇒ batLoiThieuManh() lo. */
@@ -57,7 +57,8 @@ if (phienLucMo) {
 /** Chỗ giữ màn khi mảnh cổng đang về — đúng nền app, không chữ, không nhấp nháy (= ChoManEm của App.tsx). */
 const ChoManEm = () => <div className="min-h-screen" style={{ background: 'var(--nen)' }} />
 
-const API_DANG_NHAP: ApiDangNhapHs = { dangNhap: hsDangNhapApi, datMatKhau: hsDatMatKhauApi }
+// Đăng nhập XIN KÈM SẢNH (D1 06/10, server/src/dang-nhap-kem-sanh.ts): máy chủ trả sẵn phản hồi `hoa2-sanh` trong phản hồi đăng nhập ⇒ Sảnh có số ngay, bớt một vòng mạng.
+const API_DANG_NHAP: ApiDangNhapHs = { dangNhap: hsDangNhapKemSanhApi, datMatKhau: hsDatMatKhauApi }
 
 export default function AppHocSinh() {
   // Màn cổng dựng ở đâu: máy đã đăng nhập lúc mở ⇒ bản `lazy` (chờ mảnh dưới Suspense như App.tsx); em vừa đăng nhập ⇒ CHÍNH component của mảnh
@@ -82,10 +83,13 @@ export default function AppHocSinh() {
       clearTimeout(id)
     }
   }, [coPhien])
-  const daDangNhap = async (t: ThongTinHs) => {
+  const daDangNhap = async (t: ThongTinHs, kem?: KemDangNhap) => {
     ghiPhienHs(t) // máy chặn lưu ⇒ ném lỗi ⇒ form báo lỗi, ở lại màn đăng nhập (như cũ)
-    // Hỏi sớm lệnh Sảnh NGAY (địa chỉ vừa dùng để đăng nhập, đã nhớ trong máy) — song song với lúc chạy mảnh cổng.
-    void layDiaChiMayChu('').then((goc) => batDauHoiSom(goc, t)).catch(() => {})
+    // Hỏi sớm lệnh Sảnh NGAY (địa chỉ vừa dùng để đăng nhập, đã nhớ trong máy) — song song với lúc chạy mảnh cổng. Máy chủ đã đính kèm phản hồi Sảnh vào
+    // lệnh đăng nhập (`kem.sanh`) ⇒ ghi nó TRƯỚC lượt vẽ cổng (địa chỉ vừa dùng đã biết ⇒ không chờ đọc IndexedDB), lượt vẽ đầu của Sảnh nhận số ngay.
+    const gocBiet = diaChiDangDung()
+    if (gocBiet) batDauHoiSom(gocBiet, t, kem)
+    else void layDiaChiMayChu('').then((goc) => batDauHoiSom(goc, t, kem)).catch(() => {})
     // Mảnh cổng (đã tải + chạy sẵn trong lúc em gõ) — nút giữ vòng quay tới khi có, không chớp màn trống giữa hai màn. Tải hỏng ⇒ bản `lazy`
     // nhận đúng lỗi ấy, ChanLoi báo như cũ.
     const m = await layCong().catch(() => null)

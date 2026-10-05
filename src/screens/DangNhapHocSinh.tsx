@@ -10,7 +10,7 @@ import { LoiChao } from '../components/bat-linh/LoiChao'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { voiHanCho } from '../lib/han-cho'
 import type { hsDangNhapApi, hsDatMatKhauApi } from '../lib/hs-dang-nhap-api'
-import type { ThongTinHs } from '../lib/phien-hoc-sinh'
+import type { KemDangNhap, ThongTinHs } from '../lib/phien-hoc-sinh'
 
 export interface ApiDangNhapHs {
   dangNhap: typeof hsDangNhapApi
@@ -25,7 +25,7 @@ const hoiDiaChi = () => voiHanCho(loadScriptUrlHoacMacDinh(), 8000, 'timeout').c
  * lưu thì lỗi hiện đúng ở ô báo lỗi của form. Trả lời hứa (vỏ nhẹ chờ mảnh cổng về) ⇒ nút giữ vòng quay tới khi xong.
  * `logo`: khối thương hiệu đầu thẻ — nơi gọi trao `<LogoDoc vai="hs" size={48} />` (logo-bo-moi-1909: màn đăng nhập học sinh dùng LogoDoc 48).
  */
-export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDangNhapHs; onDangNhap: (t: ThongTinHs) => void | Promise<void>; logo: ReactNode }) {
+export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDangNhapHs; onDangNhap: (t: ThongTinHs, kem?: KemDangNhap) => void | Promise<void>; logo: ReactNode }) {
   // Đăng nhập state
   const [sbdInput, setSbdInput] = useState('')
   const [matKhauInput, setMatKhauInput] = useState('')
@@ -69,13 +69,16 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
         setLoiDangNhap(res.error || 'Đăng nhập không thành công. Kiểm tra lại SBD hoặc mật khẩu.')
         return
       }
-      await onDangNhap({
-        sbd: res.sbd || sbd,
-        hoTen: res.hoTen || `Học sinh ${sbd}`,
-        lop: res.lop || '',
-        namSinh: res.namSinh || '',
-        token: res.token,
-      })
+      await onDangNhap(
+        {
+          sbd: res.sbd || sbd,
+          hoTen: res.hoTen || `Học sinh ${sbd}`,
+          lop: res.lop || '',
+          namSinh: res.namSinh || '',
+          token: res.token,
+        },
+        res.sanh ? { sanh: res.sanh } : undefined,
+      )
     } catch (err) {
       setLoiDangNhap(err instanceof Error ? err.message : 'Lỗi kết nối máy chủ')
     } finally {
@@ -106,13 +109,16 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
       setMatKhauInput(matKhauMoi)
       const resDn = await api.dangNhap(url, sbdInput.trim(), matKhauMoi.trim())
       if (resDn.ok) {
-        await onDangNhap({
-          sbd: resDn.sbd || sbdInput.trim(),
-          hoTen: resDn.hoTen || `Học sinh ${sbdInput.trim()}`,
-          lop: resDn.lop || '',
-          namSinh: resDn.namSinh || '',
-          token: resDn.token,
-        })
+        await onDangNhap(
+          {
+            sbd: resDn.sbd || sbdInput.trim(),
+            hoTen: resDn.hoTen || `Học sinh ${sbdInput.trim()}`,
+            lop: resDn.lop || '',
+            namSinh: resDn.namSinh || '',
+            token: resDn.token,
+          },
+          resDn.sanh ? { sanh: resDn.sanh } : undefined,
+        )
         setChuaCoMatKhau(false)
       } else {
         setChuaCoMatKhau(false)

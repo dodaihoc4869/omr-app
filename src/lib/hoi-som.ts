@@ -12,6 +12,7 @@
 //   · Phản hồi đến từ đoạn mã nội tuyến (chạy trước khi app bọc fetch) ⇒ ghi lại header nhịp đề nghị của máy chủ như bộ bọc fetch vẫn ghi.
 import { KHOA_DIA_CHI_HS, LENH_HOI_SOM, hoiSomSanh } from './nap-truoc-man-em'
 import { ghiHeSo } from './nhip-de-nghi'
+import type { KemDangNhap } from './phien-hoc-sinh'
 
 /** Phản hồi đã đọc xong thân. */
 export interface PhanHoiSom {
@@ -28,6 +29,8 @@ interface MucHoiSom {
   xong?: PhanHoiSom | null
   daDung?: boolean
   tuHtml?: boolean
+  /** Hạn dùng (ms epoch) — CHỈ phản hồi đi kèm đăng nhập có (quá hạn mà chưa ai nhận ⇒ bỏ, tránh số cũ). Lệnh hỏi sớm thường không có hạn. */
+  het?: number
 }
 type KhoHoiSom = Record<string, MucHoiSom>
 
@@ -50,10 +53,34 @@ export function ghiDiaChiDaDung(goc: string): void {
   }
 }
 
-/** Gửi sớm các lệnh Sảnh cho phiên vừa đăng nhập (cùng hàm đoạn mã nội tuyến dùng). */
-export function batDauHoiSom(goc: string, phien: { token?: string; sbd?: string }): void {
+/** Địa chỉ máy chủ app vừa dùng trong phiên trang này ('' nếu chưa biết) — đăng nhập vừa tìm ra nó, nơi gọi dùng ngay không phải hỏi lại (IndexedDB). */
+export function diaChiDangDung(): string {
+  return diaChiDaDung
+}
+
+/** Phản hồi Sảnh đi KÈM đăng nhập chỉ có giá trị ngắn: em vào Sảnh ngay sau đăng nhập; quá hạn này chưa ai nhận thì bỏ (không để số cũ lọt vào lượt vẽ sau). */
+export const HAN_SANH_KEM_MS = 30_000
+
+/**
+ * ĐĂNG NHẬP KÈM SẢNH (D1 06/10): máy chủ trả sẵn phản hồi `hoa2-sanh` của em trong phản hồi đăng nhập ⇒ ghi nó như một phản hồi "hỏi sớm" ĐÃ VỀ — Sảnh
+ * nhận đúng cơ chế cũ (khớp địa chỉ + thân `{token}`, dùng MỘT lần) nên lượt vẽ đầu của Sảnh có số ngay, và lệnh `hoa2-sanh` không phải gửi nữa.
+ * Chỉ nhận khi đúng dạng (đối tượng, `ok === true`); thiếu / sai ⇒ không làm gì (Sảnh đi đường cũ: nhận lệnh hỏi sớm hoặc tự gửi).
+ */
+function nhanSanhKemDangNhap(goc: string, token: string, sanh: unknown): void {
+  if (!sanh || typeof sanh !== 'object' || (sanh as Record<string, unknown>).ok !== true) return
+  const k = kho()
+  if (!k) return
+  const x: PhanHoiSom = { ok: true, status: 200, text: JSON.stringify(sanh), nhip: null }
+  k[DUONG_SANH] = { goc, than: JSON.stringify({ token }), hua: Promise.resolve(x), xong: x, tuHtml: false, het: Date.now() + HAN_SANH_KEM_MS }
+}
+const DUONG_SANH = '/game-v2/hoa2-sanh'
+
+/** Gửi sớm các lệnh Sảnh cho phiên vừa đăng nhập (cùng hàm đoạn mã nội tuyến dùng). `kem.sanh` (máy chủ đính kèm đăng nhập) thay cho lệnh `hoa2-sanh`. */
+export function batDauHoiSom(goc: string, phien: { token?: string; sbd?: string }, kem?: KemDangNhap): void {
   if (typeof window === 'undefined' || typeof fetch !== 'function' || !goc || !phien.token) return
   try {
+    // Ghi phản hồi Sảnh kèm đăng nhập TRƯỚC: `hoiSomSanh` thấy mục cùng địa chỉ + thân chưa dùng thì không gửi lệnh `hoa2-sanh` lần nữa.
+    if (kem?.sanh) nhanSanhKemDangNhap(goc, phien.token, kem.sanh)
     hoiSomSanh(window, goc, phien, LENH_HOI_SOM, false)
   } catch {
     /* hỏi sớm chỉ là tăng tốc */
@@ -65,10 +92,12 @@ function timMuc(url: string, than: string): MucHoiSom | null {
   if (!k) return null
   for (const duong of Object.keys(k)) {
     const m = k[duong]
-    if (!m.daDung && m.than === than && m.goc + duong === url) return m
+    if (!m.daDung && m.than === than && m.goc + duong === url && !quaHan(m)) return m
   }
   return null
 }
+
+const quaHan = (m: MucHoiSom): boolean => m.het !== undefined && Date.now() > m.het
 
 function thanhResponse(m: MucHoiSom, x: PhanHoiSom | null): Response | null {
   if (!x || x.status < 200 || x.status > 599) return null
@@ -103,7 +132,7 @@ export function layHoiSom(url: string, than: string, tin?: AbortSignal): Promise
  */
 export function xemHoiSomDaVe(duong: string, than: string): PhanHoiSom | null {
   const m = kho()?.[duong]
-  if (!m || m.daDung || m.than !== than || !diaChiDaDung || m.goc !== diaChiDaDung || !m.xong) return null
+  if (!m || m.daDung || m.than !== than || !diaChiDaDung || m.goc !== diaChiDaDung || !m.xong || quaHan(m)) return null
   return m.xong
 }
 
