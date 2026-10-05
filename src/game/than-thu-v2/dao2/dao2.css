@@ -501,3 +501,7 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 /* OMNI 3 · ĐỀ THỬ: CHỈ bố cục — danh sách thẻ câu giấy của Đảo (dọc như ải), rộng tối đa 760 px cho dễ đọc; màu/nút dùng lại lớp sẵn có. */
 .dao2 .dao2-de-thu{display:flex;flex-direction:column;gap:12px;max-width:760px}
 .dao2 .dao2-de-thu-cau{display:flex;flex-direction:column;gap:6px}
+/* NÚT "HỎI THẦY" TRÊN THẺ GIẤY SÁNG CỦA ĐẢO 2.0 (05/10): dao.css tô nút kiểu "kính tối + chữ vàng" (--dao-kinh/--dao-vang) cho Đảo cũ nền tối
+ * ⇒ trên thẻ lời giải sáng của Đảo 2.0 chữ vàng trên nền kem gần như không đọc được, trông như nút bị khoá (bản build thật, ảnh chụp 05/10).
+ * Đặc hiệu 0,4,1 thắng `.dao.dao button.lg-nut--hoi` (0,3,1) bất kể tệp nào nạp trước. Chỉ đổi màu; cỡ, chữ, vị trí giữ nguyên. */
+.dao.dao2.dao-v2 button.lg-nut--hoi{--nut-nen:rgb(214,240,238);--nut-chu:rgb(10,90,96);--nut-bong:inset 0 0 0 1px rgb(150,210,210)}
