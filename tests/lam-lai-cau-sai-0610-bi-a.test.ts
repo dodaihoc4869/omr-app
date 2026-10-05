@@ -81,10 +81,10 @@ const xepBan = (env: Env, b: Record<string, unknown> = {}) => em(env, '/game-v2/
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); xoaDemCaBaoVe(); xoaDemChienDich(); xoaDemPhamVi() })
 afterEach(() => vi.useRealTimers())
 
-async function banMoi(kho: CauThu[], tuyChon: { soBi?: number; tat?: boolean } = {}) {
+async function banMoi(kho: CauThu[], tuyChon: { soBi?: number; tat?: boolean; sai?: string[] } = {}) {
   const { d, env } = dung(kho)
   if (tuyChon.tat) { d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('lam_lai_khac','{"bat":false}','x')`); xoaDemCauHinh(env) }
-  for (const q of SAI) ghi(d, q, 0, luc('2026-10-05', '10:00'))
+  for (const q of tuyChon.sai ?? SAI) ghi(d, q, 0, luc('2026-10-05', '10:00'))
   vi.setSystemTime(luc('2026-10-06'))
   const ban = await xepBan(env, tuyChon.soBi ? { soBi: tuyChon.soBi } : {})
   expect(ban.ok, JSON.stringify(ban).slice(0, 400)).toBe(true)
@@ -163,8 +163,10 @@ describe('Bi-a · câu LỖI lên bàn ⇒ bản khác (câu anh em ĐÚNG KHỐ
 })
 
 describe('Bi-a · đổi câu (bia-doi-cau) và Trả lời câu hỏi (bia-tra-loi) cũng qua thang', () => {
-  it('bàn nhỏ (3 bi): em sai một bi rồi đổi câu ⇒ câu thay lên bàn; câu thay là câu LỖI thì không nguyên văn; phản hồi không lộ đáp án', async () => {
-    const { d, env, ban } = await banMoi([...Q, ...ANH_EM, ...KHAC_KHOI], { soBi: 3 })
+  it('bàn nhỏ (3 bi), còn suất ÔN: em sai một bi rồi đổi câu ⇒ câu thay là câu LỖI thì ra BẢN KHÁC (câu anh em, tc), không nguyên văn; không lộ đáp án', async () => {
+    // 4 câu lỗi ⇒ trần ôn 2: Câu chốt (câu lỗi) lấy 1, còn 1 suất ôn cho lần đổi câu.
+    const sai4 = ['Q3', 'Q5', 'Q7', 'Q9']
+    const { d, env, ban } = await banMoi([...Q, ...ANH_EM, ...KHAC_KHOI], { soBi: 3, sai: sai4 })
     const bi = ban.bi as CauBan[]
     expect(bi.length).toBeGreaterThan(0)
     const cu = bi[0]!
@@ -172,15 +174,26 @@ describe('Bi-a · đổi câu (bia-doi-cau) và Trả lời câu hỏi (bia-tra-
     expect(sai.ok, JSON.stringify(sai).slice(0, 300)).toBe(true)
     const moi = await em(env, '/game-v2/bia-doi-cau', { session: ban.session, qidCu: cu.qid })
     expect(moi.ok, JSON.stringify(moi).slice(0, 300)).toBe(true)
-    if (moi.trong) return // hết trần: không có câu thay (đúng luật cũ)
+    expect(moi.trong, 'còn suất ôn ⇒ phải có câu thay').toBeFalsy()
     khongLoDapAn(moi)
     const qm = moi.cau as CauBan
     for (const x of ['L10', 'L12', 'LX']) expect(qm.qid).not.toBe(x)
-    const refs = phien(d, ban.session).questions
-    const ref = refs.find((r) => r.qid === qm.qid && !trenBan(ban).some((b) => b.qid === qm.qid) ? true : r.qid === qm.qid && r !== refs[0])!
-    expect(ref).toBeTruthy()
-    // Câu thay là câu lỗi (Q3/Q5) hoặc thay cho câu lỗi ⇒ phải là bản khác (tc hoặc xt), không nguyên văn.
-    if (SAI.includes(qm.qid)) expect(Array.isArray(ref.xt)).toBe(true)
+    for (const loi of sai4) expect(qm.qid, 'câu lỗi nguyên văn không được lên bàn khi còn bậc 1–3').not.toBe(loi)
+    expect(['S1', 'S2'], `câu thay phải là câu anh em, nhận ${qm.qid}`).toContain(qm.qid)
+    const ref = phien(d, ban.session).questions.at(-1)!
+    expect(ref).toMatchObject({ qid: qm.qid })
+    expect(sai4).toContain(String(ref.tc))
+  })
+
+  it('bàn nhỏ (3 bi), câu thay là câu thường (không lỗi) ⇒ y hệt hôm nay: không khoá làm lại trong ref', async () => {
+    const { d, env, ban } = await banMoi([...Q, ...ANH_EM, ...KHAC_KHOI], { soBi: 3 })
+    const cu = (ban.bi as CauBan[])[0]!
+    await em(env, '/game-v2/answer', { session: ban.session, qid: cu.qid, answer: 'A' })
+    const moi = await em(env, '/game-v2/bia-doi-cau', { session: ban.session, qidCu: cu.qid })
+    expect(moi.ok, JSON.stringify(moi).slice(0, 300)).toBe(true)
+    if (moi.trong) return
+    const ref = phien(d, ban.session).questions.at(-1)!
+    if (!SAI.includes(String((moi.cau as CauBan).qid))) for (const k of ['tc', 'xt', 'nv']) expect(k in ref, `ref có khoá ${k}`).toBe(false)
   })
 
   it('Trả lời câu hỏi (không cần chơi): câu lỗi cũng ra bản khác, không nguyên văn', async () => {
