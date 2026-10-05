@@ -52,3 +52,5 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] Bộ chụp ảnh nghiệm thu `scripts/chup-omni-3/` (component thật + máy chủ giả, chặn mọi yêu cầu ra ngoài) | bằng chứng: ac9e858; chạy thử 4 ảnh, 0 lỗi trang, 0 tràn ngang
 - [x] Gộp main mới (13 commit) vào nhánh tính năng | bằng chứng: 8fa147a, không xung đột, tsc máy chủ + app EXIT 0, đã push nhánh tính năng
 - [x] Mã câu nền tự sinh phải khớp luật id của thầy `/^[\w.-]{1,80}$/` ⇒ `sinh.<nhãn>.<số>` | bằng chứng: đã báo làn D1
+- [x] Gộp làn A1 lõi thuần | bằng chứng: 2a02088; 4 tệp tests/omni-3-loi*.test.ts 96/96 trên nhánh gộp; số vàng 8,66 · 88%; phát lại 12 thứ tự y hệt
+- [!] PHÁT HIỆN cần thầy quyết (không tự hạ ngưỡng): chứng chỉ ĐỦ K∧C∧M chậm hơn con số đã báo. Chỉ điều kiện mô hình: 58/60 em ≤ 7 ngày. Đủ ba điều kiện, 14 ngày: sơ ý 6% ⇒ 36/40 em; sơ ý 10% ⇒ 1/40. Làn A1 đo thêm: đủ ba điều kiện trong 7 ngày chỉ 33–48% em (S 6%). Khai oan 0 ở mọi ô. Con số 91–99% ≤ 7 ngày báo trước đây chỉ tính điều kiện mô hình.
