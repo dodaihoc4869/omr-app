@@ -530,3 +530,30 @@ describe('tự hoàn thiện hằng tuần: lượt kiểm duy trì làm bằng 
     expect(kq).toMatchObject({ chay: true, kiem: 1, saiLai: 1 })
   })
 })
+
+describe('OMNI bật: thang làm lại vẫn chạy; bản xáo Phần II ghi kết quả TỪNG Ý theo khung gốc', () => {
+  it('Đảo: Q2 không ra nguyên văn; nộp bản xáo ⇒ answer có omni, sổ subitem theo thứ tự ý GỐC', async () => {
+    const { d, env } = dung([Q2, ...KHAC_KHOI], ['Q2'])
+    d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('omni','{"bat":true,"lop":[],"sbd":[]}','x')`)
+    xoaDemCauHinh(env)
+    ghi(d, 'Q2', 0, luc('2026-10-05', '10:00'))
+    vi.setSystemTime(luc('2026-10-06'))
+    const r = await dao(env)
+    expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
+    const i = (r.questions as { qid: string }[]).findIndex((q) => q.qid === 'Q2')
+    expect(i).toBeGreaterThanOrEqual(0)
+    const de = r.questions[i] as { ideas: string[] }
+    expect(de.ideas).not.toEqual([0, 1, 2, 3].map((k) => Y('Q2', k)))
+    khongLoDapAn(r)
+    // Em đúng ý 1 và ý 4 của câu GỐC, sai ý 2, 3 (chọn ngược) — gửi theo thứ tự đang hiện.
+    const gocChon = 'DDDD' // gốc DSSD ⇒ đúng ý 1, 4; sai ý 2, 3
+    const hien = de.ideas.map((y) => gocChon[[0, 1, 2, 3].find((k) => Y('Q2', k) === y)!]!).join('')
+    const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q2', answer: hien, msLam: 60_000, tuTin: 'chac' })
+    expect(t.ok, JSON.stringify(t).slice(0, 300)).toBe(true)
+    expect(t.correct).toBe(false)
+    expect('omni' in t).toBe(true)
+    const so = d.sql.prepare("SELECT raw_json, subitem_json FROM su_kien_hoc WHERE sbd = 'S1' AND qid = 'Q2' AND nguon = 'game'").get() as { raw_json: string; subitem_json: string | null }
+    expect(JSON.parse(so.raw_json)).toMatchObject({ chon: 'DDDD', xt: 1 })
+    expect(JSON.parse(so.subitem_json ?? 'null')).toEqual([1, 0, 0, 1])
+  })
+})
