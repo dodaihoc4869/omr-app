@@ -20,10 +20,11 @@ async function dung(phamVi: string | null) {
   ).run(JSON.stringify({ I: 4, II: 0, III: 0 }), phamVi)
   await env.DE!.put('key/C1.json', JSON.stringify(KEY))
   // S1 từng làm SAI K0, K1 (sau 29/09) ⇒ hồ sơ có lỗi đến hạn
+  // Câu kho mang mã tờ khối 12 (DH-12-…) = khối lớp 12A của em: luật khối thầy 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối") chặn câu KHÔNG RÕ khối ở ô chữa lỗi tự bổ sung.
   d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','An','12A','x')")
   for (const c of KEY.phanI)
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-      .run('DE9', c.id, 'v1', `g-${c.id}`, 'D1', JSON.stringify({ qid: c.id, maDe: 'DE9', version: 'v1', group: `g-${c.id}`, phan: 'I', text: c.text, choices: c.choices, hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'TH', correct: 'B', reviewed: true, solution: {} }))
+      .run('DH-12-DE9', c.id, 'v1', `g-${c.id}`, 'D1', JSON.stringify({ qid: c.id, maDe: 'DH-12-DE9', version: 'v1', group: `g-${c.id}`, phan: 'I', text: c.text, choices: c.choices, hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'TH', correct: 'B', reviewed: true, solution: {} }))
   for (const q of ['K0', 'K1'])
     d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES(?,?,?,?,?,1,0,?,?)')
       .run(`k-${q}`, 'S1', q, 'game', 'M', '2026-10-01T03:00:00.000Z', '2026-10-01')
