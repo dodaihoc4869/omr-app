@@ -178,9 +178,13 @@ export async function lapBoChoEmVaoMuon(env: Env, maCa: string, sbd: string, soC
   const [hs, daGap, caRow] = await Promise.all([
     docHoSo2(env, sbd, ngay).catch(() => null),
     docDaGap(env, [sbd], ngay, null).catch(() => ({} as Record<string, Record<string, string>>)),
-    env.DB.prepare('SELECT len_bang, de_rieng FROM ca WHERE ma_ca = ?').bind(maCa).first<Obj>().catch(() => null),
+    env.DB.prepare('SELECT len_bang, de_rieng, pham_vi_hoi_lai FROM ca WHERE ma_ca = ?').bind(maCa).first<Obj>()
+      .catch(() => env.DB.prepare('SELECT len_bang, de_rieng FROM ca WHERE ma_ca = ?').bind(maCa).first<Obj>())
+      .catch(() => null),
   ])
-  const hoSo: HoSoEmV2 = { loi: hs ? loiTuHoSo(hs) : [], daGap: daGap[sbd] ?? {} }
+  // Ca "Không rút câu sai" (pham_vi_hoi_lai = 'khong', thầy 05/10): em vào muộn cũng KHÔNG có ô chữa lỗi — chỉ câu mới em chưa gặp.
+  const khongLoi = chuoi(caRow?.pham_vi_hoi_lai) === 'khong'
+  const hoSo: HoSoEmV2 = { loi: hs && !khongLoi ? loiTuHoSo(hs) : [], daGap: daGap[sbd] ?? {} }
   // Ca "Kiểm tra điểm yếu" = ca đề riêng mở ở chế độ lên bảng (KhoiRutDe 02/10).
   const cheDo = Number(caRow?.de_rieng ?? 0) === 1 && Number(caRow?.len_bang ?? 0) === 1 ? 'diem_yeu' : 'ca'
   const kq = rutDeV2({ kho, soCau: sc, dsSbd: [sbd], hoSo: { [sbd]: hoSo }, ngay, cheDo, seed: maCa })
