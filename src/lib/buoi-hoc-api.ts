@@ -11,6 +11,7 @@
 //     POST /hs/diem-danh {token, ma}   → { buoi } | { ok:false, lyDo, error }
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
+import { layHoiSom } from './hoi-som'
 import type { SucHocEm } from './chon-em-day-hoc'
 
 export interface BuoiHoc {
@@ -164,7 +165,9 @@ async function goiHs(duong: string, body: Record<string, unknown>): Promise<Reco
   const hen = setTimeout(() => c.abort(), 15_000)
   try {
     const goc = await layDiaChiMayChu('')
-    const r = await fetch(`${goc}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: c.signal })
+    const than = JSON.stringify(body)
+    // Lệnh đã HỎI SỚM (src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
+    const r = (await layHoiSom(`${goc}${duong}`, than, c.signal)) ?? (await fetch(`${goc}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: than, signal: c.signal }))
     if (r.status === 404) return { ok: false, error: 'Máy chủ chưa có chức năng điểm danh.' }
     return doiTuong(await r.json().catch(() => null))
   } catch {

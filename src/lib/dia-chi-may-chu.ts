@@ -41,6 +41,7 @@
 import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
 import { loadDiaChiMayChuMoiChoEm } from './exam-db'
 import { diaChiMayChuHopLe as don } from './cau-hinh-may-chu'
+import { ghiDiaChiDaDung } from './hoi-som'
 
 /** Nhớ địa chỉ ĐÃ RA ĐƯỢC. Không bao giờ nhớ chuỗi rỗng (luật 2). */
 let daBiet = ''
@@ -61,6 +62,13 @@ export function quenDiaChiMayChu(): void {
  *             không sao — đó chính là điểm của tệp này.
  */
 export async function layDiaChiMayChu(goiY = ''): Promise<string> {
+  const u = await timDiaChiMayChu(goiY)
+  // HỎI SỚM (05/10, src/lib/hoi-som.ts): nhớ địa chỉ vừa dùng — lệnh Sảnh gửi sớm chỉ được nhận khi đi đúng máy chủ này.
+  if (u) ghiDiaChiDaDung(u)
+  return u
+}
+
+async function timDiaChiMayChu(goiY: string): Promise<string> {
   try {
     const ch = await layCauHinhMayChu()
     const u = don(ch.URL)

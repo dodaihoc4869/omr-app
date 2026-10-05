@@ -5,6 +5,8 @@
 // nghe ở main.tsx), để màn vào thi hiện nút "Cài đặt" 1 chạm; (2) cho biết
 // app đang chạy trong trình duyệt thường hay đã ở chế độ standalone.
 
+import { nhoVaiDaDung } from './vai-tro'
+
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
@@ -103,6 +105,20 @@ export function datManifestTheoVai(vai: 'gv' | 'hs' | 'ph' | null): void {
     document.head.appendChild(link)
   }
   if (link.getAttribute('href') !== href) link.setAttribute('href', href)
+}
+
+/** Đánh dấu máy đang mở APP HỌC SINH: nhớ vai, manifest + tên app khi cài (iOS đọc thẻ meta) — đúng việc StudentPortalScreen làm lúc dựng.
+ *  Gọi ở màn đầu của cổng (vỏ AppHocSinh — màn đăng nhập nay đứng trước cổng, 05/10); gọi lại vô hại. */
+export function danhDauAppHocSinh(): void {
+  nhoVaiDaDung('hs')
+  try {
+    datManifestTheoVai('hs')
+    document.title = 'ĐĐH Học Sinh'
+    const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]')
+    if (meta) meta.setAttribute('content', 'ĐĐH Học Sinh')
+  } catch {
+    // ignore
+  }
 }
 
 /** Tên app sẽ hiện trên màn hình chính của từng vai — phải khớp `short_name`

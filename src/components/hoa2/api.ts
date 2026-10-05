@@ -3,6 +3,7 @@
 // Đọc CHẶT: trường thiếu/sai kiểu thì bỏ, KHÔNG bịa số. Cờ `cheDo2` chỉ tính khi đúng `true`.
 import { useEffect, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { danhDauDaNhan, layHoiSom, xemHoiSomDaVe } from '../../lib/hoi-som'
 import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
 import { chanCauTuLuan, choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
@@ -144,12 +145,17 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
   const hen = setTimeout(() => c.abort(), giay * 1000)
   try {
     const goc = await layDiaChiMayChu('')
-    const r = await fetch(`${goc}/game-v2/${lenh}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...du, token }),
-      signal: c.signal,
-    })
+    const url = `${goc}/game-v2/${lenh}`
+    const than = JSON.stringify({ ...du, token })
+    // Lệnh đã HỎI SỚM (lúc mở app / vừa đăng nhập, src/lib/hoi-som.ts) ⇒ nhận phản hồi ấy, không gửi lại; không có / hỏng ⇒ gửi như cũ.
+    const r =
+      (await layHoiSom(url, than, c.signal)) ??
+      (await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: than,
+        signal: c.signal,
+      }))
     let j: unknown = null
     try {
       j = await r.json()
@@ -458,20 +464,76 @@ export interface TrangThaiSanh {
 }
 
 /**
+ * Báo Sảnh ĐÃ CÓ SỐ (lượt trả lời đầu của máy chủ — thành công hay lỗi — đã vẽ ra màn) trong phiên trang này: cờ `window.__ddhSanhDaVe` +
+ * sự kiện cửa sổ `ddh-sanh-da-ve`. main.tsx: máy mở cổng học sinh LẦN ĐẦU đăng ký service worker sau mốc này (05/10) — lượt cài precache không
+ * giành đường truyền với đăng nhập + lượt vẽ Sảnh. Dùng sự kiện để main.tsx không phải nhập mảnh cổng.
+ */
+function baoSanhDaVe(): void {
+  if (typeof window === 'undefined') return
+  const w = window as Window & { __ddhSanhDaVe?: boolean }
+  if (w.__ddhSanhDaVe) return
+  w.__ddhSanhDaVe = true
+  try {
+    window.dispatchEvent(new Event('ddh-sanh-da-ve'))
+  } catch {
+    /* trình duyệt cũ: service worker vẫn đăng ký sau 30 giây (main.tsx) */
+  }
+}
+
+/**
+ * Phản hồi `hoa2-sanh` đã HỎI SỚM và ĐÃ VỀ trước khi Sảnh dựng (src/lib/hoi-som.ts) ⇒ đọc đồng bộ để lượt vẽ ĐẦU có số ngay, không qua
+ * trạng thái "đang tải". Chỉ nhận phản hồi `ok:true` đọc chặt đủ phần (`docSanh`); còn lại ⇒ null, đi đường thường (gửi/nhận như cũ).
+ */
+function sanhHoiSom(token: string | undefined): { than: string; kq: KetQuaSanh } | null {
+  if (!token) return null
+  const than = JSON.stringify({ token })
+  const x = xemHoiSomDaVe('/game-v2/hoa2-sanh', than)
+  if (!x || !x.ok) return null
+  try {
+    const o = JSON.parse(x.text) as unknown
+    if (!o || typeof o !== 'object' || (o as Record<string, unknown>).ok !== true) return null
+    const kq = docSanh(o as Record<string, unknown>)
+    return kq ? { than, kq } : null
+  } catch {
+    return null
+  }
+}
+
+/**
  * Hỏi `hoa2-sanh` khi đăng nhập, mỗi lần `lamMoi` đổi (vừa đóng game / màn con), và khi quay lại tab (dội ≥ 20 giây).
  * Lỗi mạng: GIỮ bản cuối (nếu có) và báo `loi`; cờ nhớ không đổi (không nháy về app cũ vì một lần mất mạng).
+ * 05/10: phản hồi đã hỏi sớm và đã về lúc dựng ⇒ lượt hỏi "khi đăng nhập" CHÍNH LÀ lượt ấy (không gửi lại), lượt vẽ đầu đã có số.
  */
 export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number): TrangThaiSanh & { taiLai: () => void } {
-  const [t, setT] = useState<TrangThaiSanh>(() => ({ pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false }))
+  const som = useRef<{ than: string; kq: KetQuaSanh } | null | undefined>(undefined)
+  if (som.current === undefined) som.current = sbd ? sanhHoiSom(token) : null
+  const [t, setT] = useState<TrangThaiSanh>(() =>
+    som.current
+      ? { pha: 'xong', cheDo2: som.current.kq.cheDo2, ketQua: som.current.kq, loi: '', dangTai: false }
+      : { pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false },
+  )
   const [luot, setLuot] = useState(0)
   const lanCuoi = useRef(0)
+  const khoaDung = useRef(`${token ?? ''}|${sbd ?? ''}`)
   useEffect(() => {
+    // Đổi em (đăng xuất / đăng nhập SBD khác) ⇒ về "chờ". Lượt dựng đầu: trạng thái ban đầu vốn đã đúng (không vẽ lại thừa).
+    const khoa = `${token ?? ''}|${sbd ?? ''}`
+    if (khoaDung.current === khoa) return
+    khoaDung.current = khoa
     setT({ pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false })
   }, [token, sbd])
   useEffect(() => {
     if (!token || !sbd) return
-    let huy = false
     lanCuoi.current = Date.now()
+    const daCo = som.current
+    if (daCo) {
+      // Lượt hỏi lúc dựng = lượt đã hỏi sớm: nhận nó (lượt sau gửi thật), ghi nhớ chế độ như khi gửi thường.
+      som.current = null
+      danhDauDaNhan('/game-v2/hoa2-sanh', daCo.than)
+      ghiNhoCheDo2(sbd, daCo.kq.cheDo2)
+      return
+    }
+    let huy = false
     setT((x) => ({ ...x, dangTai: true }))
     taiSanh(token)
       .then((kq) => {
@@ -487,6 +549,9 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       huy = true
     }
   }, [token, sbd, lamMoi, luot])
+  useEffect(() => {
+    if (t.pha === 'xong') baoSanhDaVe()
+  }, [t.pha])
   useEffect(() => {
     if (!token) return
     const kich = () => {
