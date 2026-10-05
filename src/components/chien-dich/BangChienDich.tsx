@@ -7,7 +7,7 @@
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import HopXacNhan from '../HopXacNhan'
-import { chuaXong, type BangChienDich as DuBang, type CauCanDayLai, type EmBang, type HangEm, type NhipEm } from './api'
+import { chuaXong, qidCuaDong, type BangChienDich as DuBang, type CauCanDayLai, type EmBang, type HangEm, type NhipEm } from './api'
 import { congNgay, conLai, hienHanNop, hienNgay, phanTram } from './ngay'
 import type { OChieu } from './to-chieu'
 import { CHU_GIAI_HANG, CHU_HANG, hangTuTiLe, mucO } from './tinh'
@@ -230,7 +230,7 @@ export default function BangChienDich({
   }
   const chuaBa = async () => {
     setDangChua(true)
-    const r = await chuaXong(cd.id, ba.map((c) => c.qid))
+    const r = await chuaXong(cd.id, ba.flatMap(qidCuaDong))
     setDangChua(false)
     setHoiChua(false)
     if (!r.ok) {

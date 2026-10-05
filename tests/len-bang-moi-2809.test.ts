@@ -154,8 +154,8 @@ describe('LUẬT 7 — thanh dưới, T, B, ?', () => {
   it('nhóm nút phím trên thanh dưới; chữ thanh ≥ 22 px@1920 (1,15 vw) đậm; D/K chỉ hiện khi đang chữa và đã nối app', () => {
     const t = moTo([o('A', 'An')], { cauNoi: true })
     const k = [...t.doc.querySelectorAll('#mc-phim-nhom [data-k]')].map((b) => b.getAttribute('data-k'))
-    // thầy 05/10: thêm "C · Thầy chữa" đầu nhóm (chỉ hiện khi đã nối app và đợt còn nút chưa bấm)
-    expect(k).toEqual(['C', 'D', 'K', 'G', 'T', 'B', 'Tab', '?'])
+    // thầy 05/10: thêm "C · Thầy chữa" và "X · Ai sai" đầu nhóm (chỉ hiện khi đã nối app)
+    expect(k).toEqual(['C', 'X', 'D', 'K', 'G', 'T', 'B', 'Tab', '?'])
     expect(t.doc.querySelector<HTMLElement>('[data-k="C"]')!.hidden).toBe(true)
     expect(CSS_LEN_BANG_MOI).toMatch(/body\.mc \.mc-thanh\{[^}]*font-size:max\(14px,calc\(var\(--u\)\*1\.15\)\);font-weight:700/)
     expect(t.doc.querySelector<HTMLElement>('[data-k="D"]')!.hidden).toBe(true)
