@@ -119,10 +119,12 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const moChuyen=async()=>{let l=luot&&Date.now()-luot.luc<HAN_LUOT?luot:null
   if(!l){setLuot(null);l=await soanChuyen(sanh)}
   if(l)vaoTran();else setPha('ban-do')}
- // Vào trận trong startTransition (05/10): lượt chạm LÊN ĐƯỜNG được vẽ lại ngay (INP thấp), màn trận — đã dựng sẵn ẩn — hiện ở nhịp kế.
- // Chuyến đã soạn, còn hạn ⇒ vào thẳng: không lệnh mạng nào nên không bật "bận" (khỏi vẽ lại bản đồ hai lần trong lượt chạm), lỗi cũ xoá
- // như `chay` vẫn xoá. Chưa có chuyến ⇒ soạn như cũ.
- function vaoTran(){startTransition(()=>{setLoi('');setMaLoi('');setCoXatTruoc(sanh?.chienDich?.coXat??null);setKetThuc(null);setPha('ai')})}
+ // Vào trận (05/10): trận đã DỰNG SẴN ẩn (cảnh trận đã có trong khung ẩn) ⇒ đi trong startTransition: lượt chạm LÊN ĐƯỜNG được vẽ lại ngay
+ // (INP thấp), màn trận hiện ở nhịp kế. Chưa dựng xong (máy bận, chưa kịp lúc rảnh) ⇒ vẽ ngay như cũ, để transition (nhường máy từng 5 ms) không
+ // làm chậm hơn bản cũ. Chuyến đã soạn, còn hạn ⇒ vào thẳng: không lệnh mạng nào nên không bật "bận" (khỏi vẽ lại bản đồ hai lần trong lượt
+ // chạm), lỗi cũ xoá như `chay` vẫn xoá. Chưa có chuyến ⇒ soạn như cũ.
+ function vaoTran(){const dat=()=>{setLoi('');setMaLoi('');setCoXatTruoc(sanh?.chienDich?.coXat??null);setKetThuc(null);setPha('ai')}
+  if(typeof document!=='undefined'&&document.querySelector('.dao2.dao-vo-tham .dao2-canh'))startTransition(dat);else dat()}
  const lenDuong=()=>{if(!dangChay.current&&luot&&Date.now()-luot.luc<HAN_LUOT){vaoTran();return}void chay(moChuyen)}
  const thuLai=()=>chay(async()=>{setDangTai(true);try{const s=await napSanh();if(!s){setLoiSanh(LOI_BAN_DO);return}await soanChuyen(s)}catch(e){setLoiSanh(e instanceof Error&&e.message?e.message:LOI_BAN_DO)}finally{if(conSong.current)setDangTai(false)}})
  const nop=()=>chay(async()=>{const q=luot?.cau[viTri];if(!luot||!q)return
