@@ -30,6 +30,7 @@ import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-
 import { duocChonLop, lopEmDuocChon, nguonHopKhoi } from '../../src/lib/khac-phuc-khoi'
 import { khoiCuaCau, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
+import { thayCauSaiTheoThang } from './tu-luyen-thang'
 import { hopLeDeRut } from '../../src/lib/loc-cau-rut'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -482,6 +483,11 @@ interface KetQuaRutTho {
   thongKe?: { tenDang: string; soCauSai: number; soUngVien: number }[]
   /** Chế độ 1: nhãn từng câu (theo mã câu trong lượt) — "Luyện lại lần K" + "Sai gốc: …" (+ "Còn 1 lần đúng nữa là khắc phục"). */
   nhan?: Map<string, { nhanLuyen: string; saiGoc: string; conMotLan: string; saiCuoi: number }>
+  /**
+   * Chế độ 1 (06/10, thang làm lại — tu-luyen-thang.ts): chỗ nào câu hiển thị là BẢN KHÁC của câu sai (hoặc nguyên văn có đếm) — theo mã câu trong lượt:
+   * `tc` = câu sai gốc (đơn vị tiến độ: ôn cách quãng, số lần luyện), `hien` = qid câu em THẬT SỰ làm, `bac` = bậc thang. Ghi vào `de_rieng_json` của lượt.
+   */
+  thay?: Map<string, { tc: string; hien: string; bac: 'song_sinh' | 'anh_em' | 'xao' | 'nguyen_van' }>
   /** Chế độ 2: nguồn dạng đang dùng (câu sai / dạng còn yếu / chương đang học / dạng phổ biến). Chế độ 4: nguồn câu. */
   nguonDang?: { kieu: string; nhan: string }
 }
@@ -524,16 +530,23 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
       Math.random,
     )
     const nhan = new Map<string, { nhanLuyen: string; saiGoc: string; conMotLan: string; saiCuoi: number }>()
+    const thay = new Map<string, { tc: string; hien: string; bac: 'song_sinh' | 'anh_em' | 'xao' | 'nguyen_van' }>()
     const dsCau: CauLuyen[] = []
-    for (const x of chon) {
+    // 06/10 THANG làm lại câu sai (tu-luyen-thang.ts): thứ tự + số câu + nhãn GIỮ NGUYÊN; câu đang trong cửa sổ lỗi hiển thị BẢN KHÁC (câu anh em đúng khối / song sinh / xáo),
+    // không có bản khác ⇒ nguyên văn (lệnh thầy 30/09). Mã câu trong lượt vẫn là câu GỐC (đơn vị ôn cách quãng, đếm lần luyện, nhãn) — chỉ NỘI DUNG câu đổi.
+    const hien = await thayCauSaiTheoThang(env, sbd, chon.map((x) => theo.get(x.qid)!.q), now)
+    for (const [i, x] of chon.entries()) {
       const c = theo.get(x.qid)!
       const id = x.lap > 0 ? `${c.qid}~${x.lap + 1}` : c.qid
-      const cl = { ...cauLuyenTuCauGame(c.q), id }
+      const th = hien[i] ?? { q: c.q }
+      const cl = { ...cauLuyenTuCauGame(th.q), id }
       dsCau.push(cl)
-      meta.set(id, { dangMa: str(c.q.dang), dangTen: str(c.q.tenDang), bai: '', lop: lopCua({ ...cl, id: c.qid }) })
+      meta.set(id, { dangMa: str(th.q.dang), dangTen: str(th.q.tenDang), bai: '', lop: lopCua({ ...cl, id: c.qid }) })
       nhan.set(id, { nhanLuyen: nhanLanLuyen(x.soLanLuyen + 1 + x.lap), saiGoc: nhanSaiGoc(c.lanSai, t.nguon), conMotLan: nhanConMotLan(c.khacPhuc), saiCuoi: saiCuoiMs(c.lanSai) })
+      const bac = th.lamLai?.tc ? 'anh_em' : th.lamLai?.xt ? 'xao' : th.lamLai?.nv ? 'nguyen_van' : th.q.qid !== c.qid ? 'song_sinh' : null
+      if (bac) thay.set(id, { tc: c.qid, hien: th.q.qid, bac })
     }
-    return { dsCau, tongToiDa: dsKho.length, tieuDe: `Sửa câu sai · ${dsCau.length} câu`, meta, loi: '', nhan }
+    return { dsCau, tongToiDa: dsKho.length, tieuDe: `Sửa câu sai · ${dsCau.length} câu`, meta, loi: '', nhan, ...(thay.size ? { thay } : {}) }
   }
 
   if (t.cheDo === 2 || t.cheDo === 4) {
@@ -647,11 +660,12 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
   const baoVe = await docBaoVeKho(env)
   if (!baoVe) return { ok: false, error: LOI_CHUA_KIEM_BAO_VE }
   const r = await chayCheDo(env, sbd, t, true)
-  const dsCau = (await chanKhacKhoiEm(env, 'tu_luyen', sbd, r.dsCau.filter((c) => !laCauTuLuan(c) && !baoVe.has(qidGoc(c.id))), { cauCua: (c) => ({ qid: qidGoc(c.id), maDe: c.maDe, dang: r.meta.get(c.id)?.dangMa }) })).slice(0, TRAN_CAU_TU_LUYEN) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
+  // `hien` (06/10): câu em THẬT SỰ làm (bản khác của câu sai) — cổng khối kiểm đúng câu ấy, không kiểm mã câu gốc.
+  const dsCau = (await chanKhacKhoiEm(env, 'tu_luyen', sbd, r.dsCau.filter((c) => !laCauTuLuan(c) && !baoVe.has(qidGoc(c.id))), { cauCua: (c) => ({ qid: r.thay?.get(c.id)?.hien ?? qidGoc(c.id), maDe: c.maDe, dang: r.meta.get(c.id)?.dangMa }) })).slice(0, TRAN_CAU_TU_LUYEN) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (dsCau.length === 0) return { ok: false, error: r.loi || 'Không rút được câu nào. Em đổi lựa chọn rồi thử lại.' }
 
   const congKhai: CauCongKhai[] = []
-  const rieng: CauRieng[] = []
+  const rieng: (CauRieng & { tc?: string; hien?: string; bac?: string })[] = [] // + `tc`/`hien`/`bac`: ghi sổ thang làm lại (chỉ ở phần riêng của lượt, không xuống máy em)
   const daCo = new Set<string>()
   for (const c of dsCau) {
     if (daCo.has(c.id)) continue
@@ -663,6 +677,7 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
       qid: c.id, phan: c.phan, dapAn: c.dapAn, chot: c.chot, lyDo: c.lyDo, buoc: c.buoc, ketQua: c.ketQua,
       dangMa: m.dangMa, dangTen: m.dangTen, bai: m.bai, lop: m.lop, sao: c.sao === 2 || c.sao === 1 ? c.sao : 0,
       ...(nh ? { khoSai: true as const, saiCuoi: nh.saiCuoi } : {}),
+      ...(r.thay?.get(c.id) ?? {}),
     })
   }
   const id = maLuot()
