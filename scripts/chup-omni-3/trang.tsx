@@ -32,6 +32,8 @@ import BangChienDich from '../../src/components/chien-dich/BangChienDich'
 import CongTacOmni from '../../src/components/chien-dich/CongTacOmni'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import TongQuanScreen from '../../src/screens/TongQuanScreen'
+import GoiLenBangScreen from '../../src/screens/GoiLenBangScreen'
+import ChienDichScreen from '../../src/screens/ChienDichScreen'
 import { useCoHoa2 } from '../../src/components/chien-dich/co-hoa2'
 import { useAppStore } from '../../src/store/appStore'
 import { BANG, NOW_BANG, OMNI_BANG } from './gia/bang-gv'
@@ -197,13 +199,16 @@ const con =
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'de-thu' ? (datViecOmniDao('de-thu'), h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })) // đúng đường app thật: nút Đề thử ở Sảnh ⇒ Đảo mở màn đề thử trong khung `.dao2`
   : man === 'gv-bai' ? h(DayHocLenBang)
+  // ĐƯỜNG ĐI thật tới "Bài hôm nay" (thầy 06/10 "Tôi không thấy chỗ này"): Game Hóa 2.0 bật ⇒ thanh bên "Chữa trên lớp" → thẻ "Dạy học"; và "Chiến dịch luyện" → nút "Giao theo bài".
+  : man === 'gv-len-bang' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(GoiLenBangScreen))
+  : man === 'gv-chien-dich' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(ChienDichScreen))
   : man === 'gv-bang-cu' || man === 'gv-bang-omni'
     ? h(BangChienDich, { du: BANG, nowMs: NOW_BANG, dangChieu: false, onChieu: async () => true, onDaChua: noop, omni: man === 'gv-bang-omni' ? OMNI_BANG : null, onOmniDoi: noop } as never)
   : man === 'gv-cai-dat' ? h(CongTacOmni)
   : man === 'gv-tong-quan' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(TongQuanScreen)) // màn đầu app thầy khi Game Hóa 2.0 bật
   : manSanh(SANH)
 // Màn thầy: dựng ĐÚNG khung App.tsx (thanh bên trái thật + khung nội dung) để bố cục, màu như app thầy thật.
-const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat', 'gv-tong-quan': 'tongquan' }
+const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat', 'gv-tong-quan': 'tongquan', 'gv-len-bang': 'goilenbang', 'gv-chien-dich': 'chiendich' }
 const manThay = MAN_THAY[man]
 if (manThay) useAppStore.setState({ screen: manThay as never })
 createRoot(document.getElementById('root')!).render(

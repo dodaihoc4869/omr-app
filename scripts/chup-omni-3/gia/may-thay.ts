@@ -38,7 +38,7 @@ const CHAT_LUONG: Record<string, Record<string, unknown>> = {
     ngayToiDong: { trungVi: 3.5, n: 8, du: false }, cauLaCungDang: tl(11, 19), lapNguyenVan: tl(9, 23), boKhacKhoi: 0, soEmCoLuot: 26 },
 }
 /** Cảnh Tổng quan: thêm chiến dịch + cờ Game Hóa 2.0 CHỈ cho cảnh này (các cảnh khác giữ đúng câu trả lời cũ ⇒ ảnh cũ không đổi). */
-const LA_TONG_QUAN = new URLSearchParams(globalThis.location?.search ?? '').get('man') === 'gv-tong-quan'
+const LA_TONG_QUAN = ['gv-tong-quan', 'gv-len-bang', 'gv-chien-dich'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('man') ?? '') // + hai cảnh đường đi (06/10): cũng cần cờ Game Hóa 2.0 + chiến dịch
 
 type KQ = { ok: true; du: Record<string, unknown> } | { ok: false; loai: string; chu: string }
 export async function traLoiThay(duong: string, b: Record<string, unknown>): Promise<KQ> {

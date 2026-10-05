@@ -56,6 +56,18 @@ async function chotDapAn(t, chu) {
 }
 
 /** Mỗi màn: [tên, khổ, hàm chạy]. Hàm nhận trang đã mở `?man=<tên>`. */
+/** Chụp RIÊNG một phần tử (cắt đúng khung phần tử, tự cuộn tới) — dùng khi cần ảnh gọn, chữ đọc được. JPG ≤ 150 KB như `chup`. */
+async function chupPhan(trang, chon, ten) {
+  const el = trang.locator(chon).first()
+  for (const q of [72, 60, 50, 40, 32, 25]) {
+    const buf = await el.screenshot({ type: 'jpeg', quality: q })
+    if (buf.length <= 150 * 1024 || q === 25) {
+      writeFileSync(join(RA, `${ten}.jpg`), buf)
+      console.log(`${ten}.jpg ${(buf.length / 1024).toFixed(0)} KB (q${q})`)
+      return
+    }
+  }
+}
 const MAN = [
   ['sanh', [390, 844], async (t) => {
     await t.waitForSelector('text=Tu luyện', { timeout: 20000 })
@@ -146,6 +158,28 @@ const MAN = [
     await t.waitForTimeout(1200)
     await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().scrollIntoViewIfNeeded()
     await chup(t, 'gv-bai-hom-nay-theo-diem-danh-1440')
+  }],
+  // ── ĐƯỜNG ĐI tới "Bài hôm nay" (thầy 06/10: "Tôi không thấy chỗ này"): thanh bên "Chữa trên lớp" → thẻ "Dạy học" → bước "Bài hôm nay" ──
+  ['gv-len-bang', [1440, 1750], async (t) => {
+    await t.getByRole('tab', { name: 'Dạy học' }).waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1500)
+    await chup(t, 'gv-duong-di-1-chua-tren-lop-cac-the-1440')
+    await t.getByRole('tab', { name: 'Dạy học' }).click()
+    await t.getByRole('heading', { name: 'Bài hôm nay' }).first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1200)
+    await chup(t, 'gv-duong-di-2-the-day-hoc-bon-buoc-1440')
+    await t.locator('[data-bai="DH-12-C1-B3"] input[type="radio"], [data-bai="DH-12-C1-B3"] [role="radio"]').first().click()
+    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.setViewportSize({ width: 1440, height: 2400 }) // đủ cao để thấy nút "Giao Bài … cho …" ở cuối thẻ xác nhận
+    await t.waitForTimeout(1500)
+    await chup(t, 'gv-duong-di-3-chon-bai-xac-nhan-nut-giao-1440')
+    await chupPhan(t, 'section[data-khoi="bai-hom-nay"]', 'gv-duong-di-4-buoc-bai-hom-nay-chi-tiet-1440')
+  }],
+  ['gv-chien-dich', [1440, 900], async (t) => {
+    await t.getByRole('heading', { name: 'Chiến dịch luyện' }).first().waitFor({ timeout: 30000 })
+    await t.getByRole('button', { name: /Giao theo bài/ }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(800)
+    await chup(t, 'gv-duong-di-5-chien-dich-luyen-nut-giao-theo-bai-1440')
   }],
   // ── Bảng chiến dịch của thầy: OMNI TẮT (bảng cũ y nguyên) và OMNI BẬT (ô P + n câu, Sơ ý, Khoảng cách tới 8, "Cần thầy chữa" ba nhóm) ──
   ['gv-bang-cu', [1440, 900], async (t) => {
