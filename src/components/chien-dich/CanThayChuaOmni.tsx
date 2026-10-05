@@ -41,8 +41,10 @@ export default function CanThayChuaOmni({
     onDaChua()
   }
 
+  const tong = nhom.reduce((s, g) => s + g.dong.length, 0)
   return (
-    <div data-khoi="can-thay-chua">
+    // Hộp cuộn như danh sách "Cần thầy dạy lại" (thầy 05/10): danh sách dài không đẩy nút chiếu xuống tận cuối trang.
+    <div className="cd-ds-cau-cuon" tabIndex={0} role="region" aria-label={`Danh sách cần thầy chữa · ${tong} mục`} data-khoi="can-thay-chua">
       {nhom.map((g) => (
         <div key={g.loai} data-nhom={g.loai}>
           <p className="cd-nhan-nhom">{g.ten}</p>

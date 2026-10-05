@@ -2,7 +2,7 @@
 // Phần TÍNH THUẦN: màu ô theo P (dùng lại 4 lớp màu `cd-o--L1…L4` của thang đang dùng), ghép cột dạng của bảng cũ (tên dạng) với dạng OMNI (mã + tên),
 // trung bình lớp, ba nhóm "Cần thầy chữa". Không IO. Test: `tests/omni-3-thay-bang-bai.test.tsx`.
 import { THAM_SO_OMNI, type BangOmni, type CanThayChua } from '../../../server/src/omni-kieu'
-import type { CauCanDayLai, HangEm } from './api'
+import { qidCuaDong, type CauCanDayLai, type HangEm } from './api'
 
 /** Ngưỡng màu ô P (chú giải hình GV-BangBai): ≥ 0,95 vững (đúng ngưỡng K của chứng chỉ) · 0,80–0,95 · 0,50–0,80 · dưới 0,50. Chỉ để tô màu. */
 export const NGUONG_MAU_P = Object.freeze({ vung: THAM_SO_OMNI.K_P_VKN, cao: 0.8, giua: 0.5 })
@@ -65,12 +65,22 @@ export const NHOM_CAN_THAY_CHUA: { loai: LoaiCanThayChua; ten: string; rong: str
   { loai: 'so_y', ten: 'Em sơ ý cao dù kiến thức vững', rong: 'Chưa em nào sơ ý cao.' },
 ]
 
+/** Mức độ trong kho → chữ chuẩn (cùng bảng của thẻ "Cần thầy dạy lại"). */
+const TEN_MUC_DO: Record<string, string> = { biet: 'Nhận biết', hieu: 'Thông hiểu', van_dung: 'Vận dụng' }
+
 /** Gom danh sách "Cần thầy chữa" theo ba nhóm. Máy chủ chưa gửi dòng nào loại `cat_tia` ⇒ dựng từ "Cần thầy dạy lại" sẵn có (cùng nghĩa: sai ≥ 4 lần). */
 export function nhomCanThayChua(ds: readonly CanThayChua[], canDayLai: readonly CauCanDayLai[]): { loai: LoaiCanThayChua; ten: string; rong: string; dong: CanThayChua[] }[] {
   return NHOM_CAN_THAY_CHUA.map((n) => {
     let dong = ds.filter((x) => x.loai === n.loai)
     if (n.loai === 'cat_tia' && dong.length === 0)
-      dong = canDayLai.map((c) => ({ loai: 'cat_tia' as const, tieuDe: `Câu ${c.stt} · ${c.dang}`, phu: c.mucDo ? String(c.mucDo) : '', soEm: c.soEm, qids: [c.qid] }))
+      // Câu gộp từ nhiều bản trùng nội dung (`qidCung`, thầy 05/10) ⇒ "Chữa xong" mở khoá đủ cả nhóm.
+      dong = canDayLai.map((c) => ({
+        loai: 'cat_tia' as const,
+        tieuDe: `Câu ${c.stt} · ${c.dang}`,
+        phu: c.mucDo ? (TEN_MUC_DO[c.mucDo] ?? String(c.mucDo)) : '',
+        soEm: c.soEm,
+        qids: qidCuaDong(c),
+      }))
     return { ...n, dong }
   })
 }
