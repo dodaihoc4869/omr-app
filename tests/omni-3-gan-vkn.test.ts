@@ -89,6 +89,12 @@ describe('ganVknCau — câu tính toán: dò mẫu mạnh', () => {
     expect(r.doTin).toBe(0.8)
     expect(r.lyDo.some((l) => l.startsWith('Dò mẫu:'))).toBe(true)
   })
+  it('ΔrH tính từ các liên kết bị phá vỡ / hình thành ⇒ năng lượng liên kết; chữ "liên kết" trong câu lý thuyết ⇒ không', () => {
+    const r = ganVknCau(cau('T28', { de: 'Tính ΔrH của phản ứng 2H₂ + O₂ → 2H₂O.', loiGiai: { buoc: ['ΔrH = tổng năng lượng các liên kết bị phá vỡ − tổng năng lượng các liên kết hình thành = 2·436 + 498 − 4·464 = −486 kJ.'] } }))
+    expect(nen(r)).toEqual(['nang_luong_lien_ket'])
+    const lt = ganVknCau(cau('T29', { phan: 'I', de: 'Phản ứng hình thành liên kết thì ΔrH có dấu gì?', pa: pa('âm', 'dương', 'bằng 0', 'không xác định'), loiGiai: { chot: 'Hình thành liên kết giải phóng năng lượng nên ΔrH < 0.' } }))
+    expect(lt.q.vkn).toEqual([D])
+  })
   it('chữ "theo phương trình hoá học sau:" chỉ để giới thiệu phương trình ⇒ không gắn tỉ lệ mol', () => {
     const r = ganVknCau(cau('T23', { de: 'Phản ứng xảy ra theo phương trình hoá học sau: 2SO₂ + O₂ ⇌ 2SO₃. Tính KC khi biết [SO₃] = 0,4 M; [SO₂] = 0,2 M; [O₂] = 0,1 M.', loiGiai: { buoc: ['KC = 0,4² : (0,2² · 0,1) = 40.'] } }))
     expect(nen(r)).toEqual(['hang_so_can_bang']) // nồng độ cho sẵn ⇒ KHÔNG gắn nồng độ mol

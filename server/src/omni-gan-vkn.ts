@@ -288,7 +288,7 @@ const LUAT_NEN: readonly LuatNen[] = [
       [/(?:enthalpy|nhiet) tao thanh|tao thanh chuan|nhiet luong (?:toa|thu)(?: ra| vao)?[^.;\n]{0,50}?\d+(?:,\d+)? ?kj|\d+(?:,\d+)? ?kj[^.;\n]{0,50}?nhiet luong/, 'bd'],
     ],
   },
-  { nhan: 'nang_luong_lien_ket', cong: 'A', mau: [[/nang luong lien ket/, 'bd'], [/\bE\s*_?\s*b\s*\(|\bEb\b|\bE_b\b|Σ\s*E\s*_?\s*b/, 'toan']] },
+  { nhan: 'nang_luong_lien_ket', cong: 'A', mau: [[/nang luong lien ket|(?:δ|delta) ?_? ?r? ?h[^.;\n]{0,60}\blien ket|\blien ket[^.;\n]{0,60}(?:δ|delta) ?_? ?r? ?h|enthalpy[^.;\n]{0,40}\blien ket/, 'bd'], [/\bE\s*_?\s*b\s*\(|\bEb\b|\bE_b\b|Σ\s*E\s*_?\s*b/, 'toan']] },
   { nhan: 'dien_phan_faraday', cong: '-', mau: [[/faraday|96 ?500\b|\bi ?[*.]? ?t ?\/ ?(?:n ?[*.]? ?)?f\b|\bq ?= ?i ?[*.]? ?t\b/, 'bd']] },
   { nhan: 'dien_phan_faraday', cong: 'A', mau: [[/cuong do dong dien/, 'bd']] },
   { nhan: 'the_dien_cuc_pin', cong: 'A', mau: [[/E\s*[°⁰]|\bE\s*_?\s*pin\b|\bE\s*\^?\s*o\s*(?:\(|pin)/u, 'toan'], [/suat dien dong|suc dien dong|the dien cuc/, 'bd']] },
@@ -872,8 +872,8 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
       for (const x of r.results ?? []) { const s = str(x.sbd); vung.set(s, (vung.get(s) ?? new Set()).add(str(x.vkn_id))) }
     }
     const ungVien = Object.keys(TEN_NEN).filter((n) => n !== NHAN_PHU)
-    const nghiCuaBang = await cauNghiDungCauTruc(env)
     const lenh: D1PreparedStatement[] = [], chiTiet: Record<string, unknown>[] = []
+    const dsNghi: { q: string; soVung: number; soSai: number; tyLe: number; ghiChu: string }[] = []
     let soThemNhan = 0, soGoiYThay = 0, soNghi = 0, soCauXet = 0
     for (const q of coQ) {
       const qq = Q.get(q)!, em = cuoi.get(q)
@@ -901,7 +901,10 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
           const cu = qq.dong.get(d.y) ?? vknCa, moi = [...cu, d.vkn]
           const lyDo = `Kiểm định tuần ${tuan}: ${d.soVung} em vững mọi vi kỹ năng đã gắn nhưng chỉ đúng ${pt(d.tiLeVung)}; em vững thêm ${d.vkn} đúng ${pt(d.r1!)} (${d.n1} em), chưa vững đúng ${pt(d.r0!)} (${d.n0} em)`
           if (qq.nguon === 'thay') {
-            lenh.push(env.DB.prepare('INSERT INTO omni_q_nhat_ky (qid, y, luc, loai, cu, moi, vkn_them, ly_do, ban_cau) VALUES (?,?,?,?,?,?,?,?,?)').bind(q, d.y, nay, 'goi_y_thay', JSON.stringify(cu), JSON.stringify(moi), d.vkn, `${lyDo} — câu thầy đã duyệt Q nên chỉ gợi ý, chưa áp`, ver))
+            // Gợi ý cho câu thầy duyệt: ghi MỘT lần cho mỗi (câu, ý, nhãn, phiên bản câu) — tuần sau không ghi lặp.
+            lenh.push(env.DB.prepare(`INSERT INTO omni_q_nhat_ky (qid, y, luc, loai, cu, moi, vkn_them, ly_do, ban_cau) SELECT ?,?,?,'goi_y_thay',?,?,?,?,?
+              WHERE NOT EXISTS (SELECT 1 FROM omni_q_nhat_ky WHERE qid = ? AND y = ? AND loai = 'goi_y_thay' AND vkn_them = ? AND COALESCE(ban_cau, '') = ?)`)
+              .bind(q, d.y, nay, JSON.stringify(cu), JSON.stringify(moi), d.vkn, `${lyDo} — câu thầy đã duyệt Q nên chỉ gợi ý, chưa áp`, ver, q, d.y, d.vkn, ver))
           } else {
             const dongMoi: [number, string[]][] = [[d.y, moi]]
             if (d.y >= 0) { const ca = qq.dong.get(-1) ?? vknCa; if (!ca.includes(d.vkn)) dongMoi.push([-1, [...ca, d.vkn]]) }
@@ -921,9 +924,7 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
         const d = nghi.reduce((a, b) => (b.tiLeVung < a.tiLeVung ? b : a))
         const soSai = Math.round(d.soVung * (1 - d.tiLeVung))
         const ghiChu = `${TEN_AI} kiểm ma trận Q (tuần ${tuan})${d.y >= 0 ? `, ý ${'abcd'[d.y]}` : ''}: ${d.soVung} em đã vững mọi kỹ năng của câu nhưng chỉ đúng ${pt(d.tiLeVung)} — nghi đáp án, hoặc câu cần kỹ năng chưa gắn.`
-        lenh.push(nghiCuaBang
-          ? env.DB.prepare(`INSERT INTO cau_nghi_dap_an (qid, so_lan, so_sai, ty_le_sai, trang_thai, ghi_chu, luc) VALUES (?,?,?,?,'nghi',?,?) ON CONFLICT(qid) DO NOTHING`).bind(q, d.soVung, soSai, 1 - d.tiLeVung, ghiChu, nay)
-          : env.DB.prepare('INSERT INTO omni_q_nghi (qid, so_lan, so_sai, ty_le_sai, ghi_chu, luc) VALUES (?,?,?,?,?,?) ON CONFLICT(qid) DO NOTHING').bind(q, d.soVung, soSai, 1 - d.tiLeVung, ghiChu, nay))
+        dsNghi.push({ q, soVung: d.soVung, soSai, tyLe: 1 - d.tiLeVung, ghiChu })
         lenh.push(env.DB.prepare(`INSERT INTO omni_q_nhat_ky (qid, y, luc, loai, cu, moi, vkn_them, ly_do, ban_cau) SELECT ?,?,?,'nghi',?,?,NULL,?,? WHERE NOT EXISTS (SELECT 1 FROM omni_q_nhat_ky WHERE qid = ? AND loai = 'nghi' AND COALESCE(ban_cau, '') = ?)`)
           .bind(q, d.y, nay, JSON.stringify(vknCa), JSON.stringify(vknCa), ghiChu, ver, q, ver))
         soNghi++
@@ -931,14 +932,18 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
       }
     }
     await chayLo(env, lenh)
+    // Câu nghi vào bảng có sẵn cau_nghi_dap_an (rút đề ca kiểm tra tạm bỏ câu; KHÔNG đè quyết định cũ của thầy); bảng khác cấu trúc ⇒ bảng phụ omni_q_nghi.
+    for (const n of dsNghi) {
+      try {
+        await env.DB.prepare(`INSERT INTO cau_nghi_dap_an (qid, so_lan, so_sai, ty_le_sai, trang_thai, ghi_chu, luc) VALUES (?,?,?,?,'nghi',?,?) ON CONFLICT(qid) DO NOTHING`)
+          .bind(n.q, n.soVung, n.soSai, n.tyLe, n.ghiChu, nay).run()
+      } catch {
+        await env.DB.prepare('INSERT INTO omni_q_nghi (qid, so_lan, so_sai, ty_le_sai, ghi_chu, luc) VALUES (?,?,?,?,?,?) ON CONFLICT(qid) DO NOTHING')
+          .bind(n.q, n.soVung, n.soSai, n.tyLe, n.ghiChu, nay).run().catch(() => undefined)
+      }
+    }
     return xong({ soCauXet, soThemNhan, soGoiYThay, soNghi, chiTiet: chiTiet.slice(0, 100) })
   } catch (e) {
     return { ok: false, chay: false, loi: String((e as Error)?.message ?? e).slice(0, 200) }
   }
-}
-/** cau_nghi_dap_an có đủ cột cần ghi (qid, so_lan, so_sai, ty_le_sai, trang_thai, ghi_chu, luc)? Không ⇒ dùng omni_q_nghi. */
-async function cauNghiDungCauTruc(env: Env): Promise<boolean> {
-  const r = await env.DB.prepare(`SELECT name FROM pragma_table_info('cau_nghi_dap_an')`).all<Row>().catch(() => ({ results: [] as Row[] }))
-  const cot = new Set((r.results ?? []).map((x) => str(x.name)))
-  return ['qid', 'so_lan', 'so_sai', 'ty_le_sai', 'trang_thai', 'ghi_chu', 'luc'].every((c) => cot.has(c))
 }
