@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS bai_da_day (
   bo_tick_luc   TEXT
 );
 CREATE INDEX IF NOT EXISTS bai_da_day_lop ON bai_da_day(lop, vi_tri);
+-- Một tick ĐANG HIỆU LỰC cho mỗi (lớp, bài): hai lượt bấm đồng thời không tạo hai chiến dịch (bai-da-day.ts SQL_CHI_MUC_MOT_TICK, cũng tạo lúc chạy).
+CREATE UNIQUE INDEX IF NOT EXISTS bai_da_day_mot ON bai_da_day(lop, khoa_bai) WHERE bo_tick_luc IS NULL;
 CREATE TABLE IF NOT EXISTS pham_vi_lop (
   lop          TEXT NOT NULL,
   khoa_bai     TEXT NOT NULL,
@@ -44,6 +46,8 @@ CREATE TABLE IF NOT EXISTS omni_p_vkn (sbd TEXT NOT NULL, vkn_id TEXT NOT NULL, 
 CREATE TABLE IF NOT EXISTS omni_beta_cau (qid TEXT PRIMARY KEY, beta REAL NOT NULL, n INTEGER NOT NULL, cap_nhat_luc TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS omni_du_bao (sbd TEXT NOT NULL, pham_vi TEXT NOT NULL, ky_vong REAL NOT NULL, p8 REAL NOT NULL, sai_so REAL NOT NULL, s_dung REAL NOT NULL,
   con_duong TEXT, con_thieu_json TEXT, so_bang_chung INTEGER NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (sbd, pham_vi));
+-- Kế hoạch ngày nhiều bài ĐÃ CHỐT (ĐỆM, lập lại từ sổ; đúng câu lệnh srs2-d1.ts LENH_TAO_BANG_KE_HOACH_OMNI, cũng tạo lúc chạy)
+CREATE TABLE IF NOT EXISTS srs2_ke_hoach_omni (sbd TEXT NOT NULL, ngay TEXT NOT NULL, chien_dich_json TEXT, on_bai_cu_json TEXT, met_gio TEXT, cap_nhat_luc TEXT, PRIMARY KEY (sbd, ngay));
 -- Sự kiện gốc / ghi nhận (chỉ-thêm)
 CREATE TABLE IF NOT EXISTS omni_chung_chi (sbd TEXT NOT NULL, chien_dich_id TEXT NOT NULL, cap_luc TEXT NOT NULL, do_tin REAL NOT NULL, diem_ca_chot REAL, ma_ca TEXT, PRIMARY KEY (sbd, chien_dich_id));
 CREATE TABLE IF NOT EXISTS omni_xac_nhan (sbd TEXT NOT NULL, ma_dang TEXT NOT NULL, ket TEXT NOT NULL, luc TEXT NOT NULL, nguoi TEXT, PRIMARY KEY (sbd, ma_dang, luc));

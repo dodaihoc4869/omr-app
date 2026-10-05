@@ -61,3 +61,9 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] Sửa 7 test reset đỏ do 15 bảng OMNI chưa phân loại (lỗi của bước hợp đồng ec17bca) — nguyên nhân gốc: bộ kiểm reset bắt mọi bảng trong migration phải được xếp XOÁ/GIỮ | bằng chứng: c276369; xếp GIỮ ở cả hai job (cả hai đã `xong` 21/09 và 28/09, không chạy lại); đúng lệnh cũ `npx vitest run tests/reset-hoa2-2709.test.ts tests/reset-toan-app-1909.test.ts` 67/67
 - [ ] Soát 2 test CauDaLam (PDF) làn B3 thấy đỏ khi chạy chung, xanh khi chạy riêng — không có trong nền | bằng chứng: (chờ toàn vitest)
 - [ ] Giới hạn đã biết: Đoàn chưa đọc cờ lướt (sổ ghi đúng, nhưng trong trận lướt vẫn tính trượt) — ghi vào báo cáo | bằng chứng: báo cáo làn B3
+- [x] Gộp làn B1 tick bài + thư mục + Tu luyện (kèm lọc em được chọn) | bằng chứng: 22318590; 3 tệp test của làn 45/45 trên nhánh gộp
+- [x] Nối móc dayDeKho ⇒ ghiThuMucKhiDayDe (chỉ khi có gói) + chỉ mục bai_da_day_mot vào migration | bằng chứng: commit nối móc; tests/omni-3-day-de-thu-muc-0510.test.ts 3/3; migration chạy 2 lần sạch (node:sqlite)
+- [x] Tờ "-DT" không vào luyện tự động — GIỮ theo luật thầy "KHÔNG rút câu TỰ LUẬN ở bất kỳ kênh rút đề tự động nào" (laMaDeTuLuan coi -VD/-DT/-TL là mục dạy học/tự luận) | bằng chứng: báo cáo làn B1; ghi vào báo cáo cuối
+- [x] Gộp làn A2 kế hoạch ngày nhiều bài | bằng chứng: e295a47a; 5 tệp tests/omni-3-ke-hoach-*.test.ts 133/133 (làn báo), 30 kịch bản JSON y hệt bản cũ, cờ tắt trùng ảnh chụp f189d2b
+- [x] Bảng đệm srs2_ke_hoach_omni vào migration + phân loại reset | bằng chứng: migration 2 lần sạch (16 bảng); reset + kế hoạch D1 80/80
+- [ ] Soát test mô phỏng chứng chỉ (omni-3-loi-mo-phong) quá giờ 5 giây khi máy tải nặng — chạy riêng xanh | bằng chứng: (chờ toàn vitest)

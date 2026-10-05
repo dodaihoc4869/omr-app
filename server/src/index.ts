@@ -100,7 +100,7 @@ import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 // OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
 import { gvBaiDaDay } from './bai-da-day'
-import { gvKhoThuMuc } from './kho-thu-muc'
+import { ghiThuMucKhiDayDe, gvKhoThuMuc } from './kho-thu-muc'
 import { gvOmni } from './omni-gv'
 import { chayOmniDem, hieuChinhOmniTuan } from './omni-d1'
 import { viecPhu } from './viec-phu'
@@ -2358,6 +2358,9 @@ async function dayDeKho(env: Env, b: Record<string, unknown>): Promise<Response>
   // VÒNG HỌC v2 (02/10): câu song sinh / câu kiểm từng bước / nhãn nền ⇒ bảng `cau_bo_tro` theo băm. Móc CHỈ-THÊM, lỗi không làm hỏng nạp đề.
   let boTro: number | Record<string, unknown> = 0
   if (goi) { try { boTro = await ghiCauBoTro(env, maDe, goi) } catch (e) { boTro = { loi: (e as Error).message } } }
+  // OMNI 3 (05/10): thư mục mục đích của tờ (DẠY HỌC / TU LUYỆN) suy từ `nhom` của gói (kho-thu-muc.ts). CHỈ khi có gói: không có gói thì không biết
+  // thư mục — giữ dòng cũ (không lật tờ DẠY HỌC thành TU LUYỆN). Hàm không bao giờ ném lỗi; app thầy còn đồng bộ lại qua `/kho/thu-muc`.
+  if (goi) await ghiThuMucKhiDayDe(env, maDe, typeof goi.nhom === 'string' ? goi.nhom : null)
   return ra({ ok: true, maDe, soCau: soCauThat, soDongChiMuc: cauDs.length, coGoi: !!de, loiGiai, boTro, ...(canhBaoGoi.length ? { canhBao: canhBaoGoi.slice(0, 100) } : {}) })
 }
 
