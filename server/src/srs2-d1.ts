@@ -652,6 +652,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   // OMNI 3 — ÔN BÀI CŨ: ứng viên = câu phạm vi (không thuộc chiến dịch đang chạy, không tự luận) chưa gặp, hoặc chưa thành thạo/cắt tỉa và chưa có trong `cau`.
   // Câu đã có trạng thái (nguồn cũ) dùng trạng thái ấy; câu gặp lần đầu ở đây phát lại TOÀN BỘ sổ, không hạn. Trạng thái + meta thêm vào `tt`/`meta`.
   let onBaiCu: CauSrs[] = []
+  if (phamViOn?.meta.size) await chanMetaKhacKhoi(env, 'hoa2_on_bai_cu', await khoiEmP, phamViOn.meta) // LUẬT THẦY 05/10: ôn bài cũ (máy tự rút trong phạm vi đã dạy) chỉ câu ĐÚNG khối em
   if (omni && phamViOn?.qids.length) {
     const trongCau = new Set(cau.map((c) => c.qid))
     const lanTheo = new Map<string, LanLam[]>()
