@@ -2,6 +2,7 @@
 // Ghi/CAS giữ nguyên lô và thứ tự; xả nhóm đọc trước khi gửi ghi. Không gộp ghi vào nhóm đọc.
 import type { D1Database, D1PreparedStatement, D1Result } from './kieu'
 import { gan } from './cau-hinh-dem'
+import { dangKyXoaDem } from './dem-chung'
 const DA_GOP = Symbol('omr.docD1TheoLuot')
 /** Sổ nhớ ĐỌC của MỘT lượt (tối ưu 05/10): khoá → Promise kết quả (+ các BẢNG mà lượt đọc ấy đọc). Chỉ bản gộp đọc (`gopDocD1(db, true)`) có.
  *  Lệnh GHI của lượt xoá: mục KHÔNG khai bảng ⇒ mọi lệnh ghi xoá (như trước); mục có khai bảng ⇒ chỉ lệnh ghi mà câu SQL CÓ NHẮC tới một trong các bảng ấy mới xoá
@@ -85,6 +86,31 @@ export function raoGhiD1(db: D1Database, rao: Promise<unknown>): D1Database {
     },
   }, db)
 }
+/**
+ * ĐỆM ISOLATE "BẢNG CHƯA CÓ" (tối ưu 05/10): một câu ĐỌC nhắc bảng phụ chưa được tạo (bảng dựng lười bằng DDL, vd. `chien_dich_em`, `loi_giai_hoi`)
+ * làm HỎNG CẢ LÔ đọc gộp ⇒ trước: mọi câu của lô chạy lại từng câu ở MỘT ĐỢT SAU. Nay: bảng D1 báo "no such table: X" được nhớ trong isolate
+ * `HAN_BANG_VANG` ms; trong thời gian ấy câu nhắc X đi RIÊNG (song song với lô, không vào lô) ⇒ lô của các câu còn lại không hỏng theo. Câu đi riêng
+ * vẫn ra ĐÚNG kết quả như cũ (bảng đã có ⇒ đọc bình thường; chưa có ⇒ lỗi ở đúng câu ấy, nơi gọi tự bắt như cũ). Chỉ đổi cách GỬI, không đổi kết quả.
+ */
+const BANG_VANG = new Map<string, number>()
+export const HAN_BANG_VANG = 60_000
+const RE_BANG_VANG = /no such table:\s*(?:main\.)?([A-Za-z_][A-Za-z0-9_]*)/i
+function ghiBangVang(e: unknown): void {
+  const m = RE_BANG_VANG.exec(e instanceof Error ? e.message : String(e))
+  if (m) BANG_VANG.set(m[1]!.toLowerCase(), Date.now() + HAN_BANG_VANG)
+}
+function nhacBangVang(sql: string): boolean {
+  if (!BANG_VANG.size || !sql) return false
+  const bay = Date.now()
+  for (const [bang, het] of BANG_VANG) {
+    if (het <= bay) { BANG_VANG.delete(bang); continue }
+    if (new RegExp(`\\b${bang}\\b`, 'i').test(sql)) return true
+  }
+  return false
+}
+/** Xoá đệm "bảng chưa có" (test; `xoaMoiDem()` cũng gọi — mỗi D1 giả mới của test bắt đầu sạch). */
+export function xoaDemBangVang(): void { BANG_VANG.clear() }
+dangKyXoaDem(xoaDemBangVang)
 /** `db` đã là bản gộp đọc của một lượt (có hàng rào + sổ nhớ của lượt)? */
 export const laBanGop = (db: D1Database): boolean => !!(db as unknown as Record<symbol, unknown>)[DA_GOP]
 export function gopDocD1(db: D1Database, bat = true): D1Database {
@@ -97,7 +123,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     Object.defineProperty(wrapped, DA_GOP, { value: true })
     return wrapped
   }
-  type Cho = { st: D1PreparedStatement; xong: (r: D1Result) => void; loi: (e: unknown) => void }
+  type Cho = { st: D1PreparedStatement; xong: (r: D1Result) => void; loi: (e: unknown) => void; sql: string }
   let ds: Cho[] = []
   const nho: SoNho = new Map()
   // Hàng rào chỉ thuộc request này: SELECT độc lập được song song; ghi chờ các đọc trước nó,
@@ -114,19 +140,28 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     const lo = ds; ds = []
     if (!lo.length) return
     const p = ghi.then(async () => {
+      // Câu nhắc bảng isolate này đã thấy "chưa có" ⇒ đi riêng, song song với lô (đệm `BANG_VANG`); lô chỉ gồm câu còn lại.
+      const motMinh = (x: Cho) => x.st.all().then(x.xong, (e: unknown) => { ghiBangVang(e); x.loi(e) })
+      const rieng = BANG_VANG.size ? lo.filter((x) => nhacBangVang(x.sql)) : []
+      const chung = rieng.length ? lo.filter((x) => !rieng.includes(x)) : lo
+      const chayRieng = rieng.map(motMinh)
       try {
-        const rs = await db.batch(lo.map(x => x.st))
-        for (let i = 0; i < lo.length; i++) lo[i].xong(rs[i])
-      } catch {
-        // Bảng/cột phụ chưa có: lỗi một SELECT không làm mất những SELECT hợp lệ.
-        await Promise.all(lo.map(x => x.st.all().then(x.xong, x.loi)))
+        if (chung.length) {
+          const rs = await db.batch(chung.map(x => x.st))
+          for (let i = 0; i < chung.length; i++) chung[i].xong(rs[i])
+        }
+      } catch (e) {
+        // Bảng/cột phụ chưa có: lỗi một SELECT không làm mất những SELECT hợp lệ. Nhớ bảng chưa có (lô + từng câu) cho các lô sau.
+        ghiBangVang(e)
+        await Promise.all(chung.map(motMinh))
       }
+      await Promise.all(chayRieng)
     })
     truoc = Promise.all([truoc, p]).then(() => undefined)
   }
-  function doc(st: D1PreparedStatement): Promise<D1Result> {
+  function doc(st: D1PreparedStatement, sql = ''): Promise<D1Result> {
     return new Promise((xong, loi) => {
-      ds.push({ st, xong, loi })
+      ds.push({ st, xong, loi, sql })
       if (ds.length !== 1) return
       queueMicrotask(xa)
     })
@@ -134,10 +169,10 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   function boc(st: D1PreparedStatement, laDoc: boolean, sql: string): D1PreparedStatement {
     const p: D1PreparedStatement = {
       bind: (...tham) => boc(st.bind(...tham), laDoc, sql),
-      all: <T>() => { if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.all<T>()) }; return doc(st) as Promise<D1Result<T>> },
+      all: <T>() => { if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.all<T>()) }; return doc(st, sql) as Promise<D1Result<T>> },
       first: async <T>(cot?: string) => {
         if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.first<T>(cot)) }
-        const r = await doc(st), dong = r.results[0]
+        const r = await doc(st, sql), dong = r.results[0]
         return (cot ? (dong as Record<string, unknown> | undefined)?.[cot] ?? null : dong ?? null) as T | null
       },
       run: <T>() => { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.run<T>()) },
@@ -150,7 +185,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     batch: <T>(cau: D1PreparedStatement[]) => {
       // Câu không qua `prepare` của bản này (không biết SQL) ⇒ coi như nhắc MỌI bảng (xoá cả sổ nhớ, như trước).
       const that = cau.map(st => goc.get(st) ?? { st, doc: false, sql: '' })
-      if (that.length && that.every(x => x.doc)) return Promise.all(that.map(x => doc(x.st))) as Promise<D1Result<T>[]>
+      if (that.length && that.every(x => x.doc)) return Promise.all(that.map(x => doc(x.st, x.sql))) as Promise<D1Result<T>[]>
       if (that.some(x => !x.sql)) nho.clear()
       else xoaNhoSauGhi(nho, that.map(x => x.sql).join(' ;; '))
       xa()

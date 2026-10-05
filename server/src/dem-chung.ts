@@ -4,6 +4,8 @@
 // `xoaMoiDem()` xoá mọi đệm (test / sau khi đổi cấu hình tay); `tests/_d1-that.ts` gọi nó mỗi lần dựng D1 giả để các test không lẫn nhau.
 const moiDem: Array<() => void> = []
 export function xoaMoiDem(): void { for (const f of moiDem) f() }
+/** Đệm mức mô-đun KHÔNG phải `DemTTL` (vd. đệm "bảng chưa có" của doc-d1-theo-luot.ts) đăng ký cách xoá để `xoaMoiDem()` xoá cả nó (chỉ-thêm, 05/10). */
+export function dangKyXoaDem(f: () => void): void { moiDem.push(f) }
 
 export class DemTTL<T> {
   private kho = new Map<string, { at: number; v: T; co: number }>()
