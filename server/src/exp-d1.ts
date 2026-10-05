@@ -13,6 +13,7 @@ import { emCoGhi } from './dem-ke-hoach'
 import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, Env } from './kieu'
 import { DemTTL } from './dem-chung'
+import { docDongMua, nhoTheoLuot } from './doc-d1-theo-luot'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
 import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, bangGiaExp } from './exp-cau-hinh'
@@ -63,7 +64,8 @@ export interface CauHinhExp {
 const TAT: CauHinhExp = { tu: null, dsSbd: [], toanBo: false, tuDsSbd: null }
 
 export async function docCauHinhExp(env: Env): Promise<CauHinhExp> {
-  const r = await an(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'").first<{ gia_tri: string }>(), null)
+  // Nhớ theo lượt (tối ưu 05/10): một request gọi tới đây nhiều lần (Sảnh Đoàn: 3 lần nối tiếp) ⇒ đọc một lần.
+  const r = await an(() => nhoTheoLuot(env.DB, 'cau_hinh|exp_moi', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'exp_moi'").first<{ gia_tri: string }>()), null)
   if (!r) return EXP_MOI_TU ? { tu: EXP_MOI_TU, dsSbd: [], toanBo: true, tuDsSbd: null } : TAT
   try {
     const o = JSON.parse(String(r.gia_tri)) as Record<string, unknown>
@@ -236,7 +238,7 @@ async function docMetaCau(env: Env, qids: string[]): Promise<Record<string, Meta
 }
 
 async function docTuNgayMua(env: Env): Promise<string> {
-  const r = await an(() => env.DB.prepare("SELECT json FROM game_v2_settings WHERE key = 'season'").first<{ json: string }>(), null)
+  const r = await an(() => docDongMua(env.DB), null)
   try {
     const t = (JSON.parse(String(r?.json ?? '{}')) as { startedAt?: unknown }).startedAt
     return typeof t === 'string' && Number.isFinite(Date.parse(t)) ? t : ''

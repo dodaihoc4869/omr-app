@@ -8,6 +8,7 @@ import type { Env, D1PreparedStatement } from './kieu'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { ngayVn } from './su-kien-hoc'
 import { capNhatExp, docThanhTichNgay } from './exp-d1'
+import { docDongLop, docDongMua } from './doc-d1-theo-luot'
 
 type Row = Record<string, unknown>
 export const SO_TRAM = 30
@@ -65,7 +66,7 @@ export function khungTrumLop(now: number): { dangMo: boolean; chuNhat: string; m
 const thieuBang = (e: unknown) => e instanceof Error && /no such table/i.test(e.message)
 async function docMua(env: Env, homNay: string): Promise<MuaDoan> {
   let id = ''
-  try { const r = await env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{ json: string }>(); id = r ? String((JSON.parse(r.json) as { id?: unknown }).id ?? '') : '' } catch { /* chưa có bảng mùa */ }
+  try { const r = await docDongMua(env.DB); id = r ? String((JSON.parse(r.json) as { id?: unknown }).id ?? '') : '' } catch { /* chưa có bảng mùa */ }
   return muaHienTai(id, homNay)
 }
 const themVe = (env: Env, khoa: string, sbd: string, ngay: string, loai: string, so: number, maNguon: string | null, now: number): D1PreparedStatement =>
@@ -150,7 +151,7 @@ export interface SanhXem {
 export async function docSanh(env: Env, sbd: string, now: number): Promise<SanhXem | null> {
   try {
     const homNay = ngayVn(iso(now)), mua = await docMua(env, homNay)
-    const hs = await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{ lop: string | null }>()
+    const hs = await docDongLop(env.DB, sbd)
     const lop = String(hs?.lop ?? '')
     const truoc = new Set(((await env.DB.prepare('SELECT khoa FROM doan_ve_so WHERE sbd=? AND ngay_vn>=?').bind(sbd, ngayVn(iso(now - 2 * MOT_NGAY))).all<{ khoa: string }>()).results ?? []).map(x => x.khoa))
     await dongBoVe(env, sbd, now)

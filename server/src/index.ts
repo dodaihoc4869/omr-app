@@ -3431,9 +3431,11 @@ const boXuLy = {
       if (p === '/trang-thai') return dayTrangThai(env, b)
       if (p === '/phong-cho') return ghiPhongCho(env, b)
       if (p === '/hs/dang-nhap') {
-        const result = await G.hsDangNhap(env, b)
+        // Tối ưu 05/10: token game ký từ đúng dòng `hoc_sinh` vừa đọc + so khớp (trước: đọc lại `mat_khau` thêm một đợt nối tiếp) và vào đệm xác thực.
+        const daDoc: { matKhau?: unknown } = {}
+        const result = await G.hsDangNhap(env, b, daDoc)
         if (result.ok && !result.chuaCoMatKhau) {
-          try { result.token = await gameToken(env, String(result.sbd)) } catch { /* Game must not block academic login. */ }
+          try { result.token = await gameToken(env, String(result.sbd), 'matKhau' in daDoc ? daDoc.matKhau : undefined) } catch { /* Game must not block academic login. */ }
         }
         return ra(result)
       }
