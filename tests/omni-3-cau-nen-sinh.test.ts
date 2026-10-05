@@ -5,6 +5,10 @@
 // 6 nhãn thêm 05/10 có bảng RIÊNG ở đây (số e tính từ số oxi hoá trong công thức khí, hoá trị kim loại, 6 cân bằng Kc, bảng cấu tạo – liên kết tự kiểm
 // bằng hoá trị, dạng bền của đơn chất) và được giải lại TOÀN BỘ không gian câu, không chỉ 50 câu đầu. Đã thử cố ý làm sai bộ sinh 13 kiểu (hoá trị Al,
 // Fe²⁺/Fe³⁺, số e của N₂O, số liên kết C₂H₆/CO₂, dấu ΔrH, quên hệ số, quên mũ trong Kc, đổi số mol sai, khối lượng H₂O, nhiễu H lẻ, nhiễu k < 0) ⇒ test đều đỏ.
+// Bảo toàn điện tích (05/10): bảng ion [điện tích, khối lượng] + bảng cấm cặp ion viết riêng; 9 kiểu làm sai (khối lượng SO₄, điện tích Al, cho Ba²⁺ + SO₄²⁻,
+// CO₃²⁻ + Mg²⁺, HCO₃⁻ + Al³⁺, cô cạn có H⁺, bỏ luật H⁺ + Fe²⁺ + NO₃⁻, quên một ion khi cộng khối lượng, sai dấu điện tích) ⇒ test đều đỏ.
+// 26 nhãn có trước được khoá bằng băm toàn bộ không gian câu (BAM_26_NHAN).
+import { createHash } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 import { chamCauNen, docSo, locCauNen } from '../server/src/thang-tu-go'
 import { NHAN_CO_BO_SINH, coBoSinh, damBaoCauNenTuDong, damBaoMoiCauNenTuDong, sinhCauNen, sinhLoCauNen, soCauKhongGian, type CauNenSinh } from '../server/src/omni-cau-nen-sinh'
@@ -13,7 +17,7 @@ import { taoD1That } from './_d1-that'
 // ---------------------------------------------------------------- bảng + bộ phân tích RIÊNG của test
 
 /** Nguyên tử khối SGK (viết lại độc lập với bộ sinh). */
-const NTK_T: Record<string, number> = { H: 1, C: 12, N: 14, O: 16, Na: 23, Mg: 24, Al: 27, S: 32, Cl: 35.5, K: 39, Ca: 40, Fe: 56, Cu: 64, Zn: 65, Ag: 108, Ba: 137, Br: 80 }
+const NTK_T: Record<string, number> = { H: 1, C: 12, N: 14, O: 16, Na: 23, Mg: 24, Al: 27, S: 32, Cl: 35.5, K: 39, Ca: 40, Fe: 56, Cu: 64, Zn: 65, Ag: 108, Ba: 137, Br: 80, P: 31 }
 const DUOI = '₀₁₂₃₄₅₆₇₈₉'
 const veAscii = (s: string) => [...s].map((c) => (DUOI.includes(c) ? String(DUOI.indexOf(c)) : c)).join('')
 
@@ -92,7 +96,60 @@ const R = (s: string) => new RegExp(s)
 
 /** Hai nhãn có đáp án được phép ÂM (ΔrH°298, ΔfH°298). */
 const NHAN_AM = ['bien_thien_enthalpy', 'nang_luong_lien_ket']
-const NHAN_MOI = ['bao_toan_electron', 'lap_he_phuong_trinh', 'cong_thuc_phan_tu', 'hang_so_can_bang', 'bien_thien_enthalpy', 'nang_luong_lien_ket']
+const NHAN_MOI = ['bao_toan_electron', 'lap_he_phuong_trinh', 'cong_thuc_phan_tu', 'hang_so_can_bang', 'bien_thien_enthalpy', 'nang_luong_lien_ket', 'bao_toan_dien_tich']
+/** Ion: [điện tích, khối lượng] — bảng riêng (nhóm NO₃ 62, SO₄ 96, CO₃ 60, PO₄ 95, Cl 35,5 theo đặc tả); test "bảng ion" đối chiếu với công thức. */
+const ION_T: Record<string, [number, number]> = {
+  'Na⁺': [1, 23], 'K⁺': [1, 39], 'NH₄⁺': [1, 18], 'H⁺': [1, 1], 'Mg²⁺': [2, 24], 'Ca²⁺': [2, 40], 'Ba²⁺': [2, 137], 'Fe²⁺': [2, 56], 'Fe³⁺': [3, 56],
+  'Cu²⁺': [2, 64], 'Zn²⁺': [2, 65], 'Al³⁺': [3, 27], 'Cl⁻': [-1, 35.5], 'NO₃⁻': [-1, 62], 'HCO₃⁻': [-1, 61], 'SO₄²⁻': [-2, 96], 'CO₃²⁻': [-2, 60], 'PO₄³⁻': [-3, 95],
+}
+/** Bảng cấm viết RIÊNG (liệt kê từng cặp): cặp ion dương – âm KHÔNG cùng tồn tại trong dung dịch (kết tủa, khí, thuỷ phân kép). */
+const CAM_ION_T = new Set([
+  'Ba²⁺|SO₄²⁻', 'Ba²⁺|CO₃²⁻', 'Ba²⁺|PO₄³⁻', 'Ca²⁺|SO₄²⁻', 'Ca²⁺|CO₃²⁻', 'Ca²⁺|PO₄³⁻', 'Mg²⁺|CO₃²⁻', 'Mg²⁺|PO₄³⁻',
+  'Fe²⁺|CO₃²⁻', 'Fe²⁺|PO₄³⁻', 'Cu²⁺|CO₃²⁻', 'Cu²⁺|PO₄³⁻', 'Zn²⁺|CO₃²⁻', 'Zn²⁺|PO₄³⁻', 'Al³⁺|CO₃²⁻', 'Al³⁺|PO₄³⁻', 'Al³⁺|HCO₃⁻',
+  'Fe³⁺|CO₃²⁻', 'Fe³⁺|PO₄³⁻', 'Fe³⁺|HCO₃⁻', 'H⁺|CO₃²⁻', 'H⁺|HCO₃⁻', 'H⁺|PO₄³⁻',
+  // Thêm cho chắc (không có trong đề chuẩn): hydrogencarbonate của Fe²⁺, Cu²⁺, Zn²⁺.
+  'Fe²⁺|HCO₃⁻', 'Cu²⁺|HCO₃⁻', 'Zn²⁺|HCO₃⁻',
+])
+/** Mọi ion trong đề đều CÙNG TỒN TẠI được; cô cạn thì không HCO₃⁻ / NH₄⁺ / H⁺. */
+function kiemIonCungTonTai(ten: string[], coCan: boolean, de: string) {
+  expect(new Set(ten).size, de).toBe(ten.length)
+  for (const t of ten) expect(t, de).not.toMatch(/^Ag/)
+  const duong = ten.filter((t) => ION_T[t]![0] > 0), am = ten.filter((t) => ION_T[t]![0] < 0)
+  expect(duong.length >= 1 && am.length >= 1, de).toBe(true)
+  for (const d of duong) for (const a of am) expect(CAM_ION_T.has(`${d}|${a}`), `${d} và ${a} không cùng tồn tại: ${de}`).toBe(false)
+  expect(ten.includes('H⁺') && ten.includes('Fe²⁺') && ten.includes('NO₃⁻'), `H⁺ + Fe²⁺ + NO₃⁻ phản ứng oxi hoá – khử: ${de}`).toBe(false)
+  if (coCan) for (const t of ['HCO₃⁻', 'NH₄⁺', 'H⁺']) expect(ten, `cô cạn có ${t}: ${de}`).not.toContain(t)
+}
+/** Băm (sha256, 16 ký tự) TOÀN BỘ không gian câu của 26 nhãn trước khi thêm bảo toàn điện tích (05/10) — mã sinh.<nhãn>.<số> đã cấp không được đổi nghĩa. */
+const BAM_26_NHAN: Record<string, string> = {
+  doi_mol_khoi_luong: '896:147f2b257e447d83',
+  doi_mol_the_tich_khi: '533:19e616dec5fe1228',
+  nong_do_mol: '2654:0f82ae53d3dddc33',
+  nong_do_phan_tram: '1020:0b3176b2014eaa0d',
+  khoi_luong_rieng: '324:2b51cb150b707866',
+  ti_khoi_khi: '58:8a6a92ae01dcf020',
+  ti_le_mol_phuong_trinh: '1568:074317456eae83c3',
+  bao_toan_khoi_luong: '752:e2e147abdfd24e38',
+  hieu_suat: '1344:5e0f64b8583558e8',
+  chat_du_het: '2016:284f8edcab1df770',
+  phan_tram_khoi_luong: '128:125656539cfd05ef',
+  do_bat_bao_hoa: '456:52441f77b03d676c',
+  ph_nong_do_ion: '122:68ad834d7ab61ec2',
+  dung_dich_pha_loang: '2566:5a7df63e72ff6401',
+  dien_phan_faraday: '660:81b60e9dd3d898cf',
+  gia_tri_trung_binh: '738:4448a99d3f4a19e3',
+  the_dien_cuc_pin: '87:4f75b19c397bf3ac',
+  toc_do_phan_ung: '444:122ae9ca2412cdee',
+  can_bang_phuong_trinh: '156:9df40c22cd2eba1e',
+  bao_toan_nguyen_to: '330:51585b1a798e91d1',
+  bao_toan_electron: '162:d6c6b395b06fdc3b',
+  lap_he_phuong_trinh: '182:7282d85bd8dbc3a9',
+  cong_thuc_phan_tu: '340:c842141c4e16dfd5',
+  hang_so_can_bang: '1521:70b8a4504b63b6a0',
+  bien_thien_enthalpy: '331:ade5a94d384a481f',
+  nang_luong_lien_ket: '258:47c57a6a2f3fd134',
+}
+const bamKhongGian = (n: string) => `${soCauKhongGian(n)}:${createHash('sha256').update(JSON.stringify(sinhLoCauNen(n, 1, soCauKhongGian(n)))).digest('hex').slice(0, 16)}`
 /** Sáu cân bằng pha khí của đặc tả (viết lại bằng tay). */
 const CAN_BANG_KC_T = ['H₂ + I₂ ⇌ 2HI', 'N₂ + 3H₂ ⇌ 2NH₃', '2SO₂ + O₂ ⇌ 2SO₃', 'CO + H₂O ⇌ CO₂ + H₂', 'N₂O₄ ⇌ 2NO₂', 'PCl₅ ⇌ PCl₃ + Cl₂']
 /** Số liên kết mỗi phân tử theo CÔNG THỨC CẤU TẠO (bảng riêng; test "bảng cấu tạo" kiểm lại bằng hoá trị + số nguyên tử). */
@@ -560,14 +617,49 @@ const GIAI: Record<string, (c: CauNenSinh) => KetQua> = {
     expect(c, de).not.toBe(0)
     return (dH - biet) / c
   },
+  bao_toan_dien_tich: ({ de }) => {
+    const m0 = /^Dung dịch X chứa (.+?)\. (Tính x\.|Cô cạn dung dịch X thu được (m|[\d,]+) gam muối khan\. Tính (m|x|y)\.)$/.exec(de)
+    if (!m0) throw new Error(de)
+    const coCan = m0[2]!.startsWith('Cô cạn')
+    const ds = m0[1]!.split(/, | và /).map((t) => {
+      const m = /^([\d,]+|x|y) mol (\S+)$/.exec(t)
+      if (!m || !ION_T[m[2]!]) throw new Error(`ion lạ "${t}": ${de}`)
+      const [q, Mi] = ION_T[m[2]!]!
+      return { ten: m[2]!, q, Mi, bien: m[1] === 'x' || m[1] === 'y' ? m[1] : '', n: m[1] === 'x' || m[1] === 'y' ? 0 : sv(m[1]!) }
+    })
+    kiemIonCungTonTai(ds.map((i) => i.ten), coCan, de)
+    const biet = ds.filter((i) => !i.bien), an = ds.filter((i) => i.bien)
+    const S = biet.reduce((s, i) => s + i.q * i.n, 0) // tổng điện tích đã biết (có dấu)
+    const mBiet = biet.reduce((s, i) => s + i.Mi * i.n, 0)
+    if (!coCan) { // (a) một ẩn: S + q·x = 0
+      expect(an.map((i) => i.bien), de).toEqual(['x'])
+      const x = -S / an[0]!.q
+      expect(x, de).toBeGreaterThan(0)
+      return x
+    }
+    if (m0[3] === 'm') { // (b) tìm ẩn (nếu có) rồi cộng khối lượng các ion
+      expect(an.length, de).toBeLessThanOrEqual(1)
+      if (!an.length) { expect(Math.abs(S), de).toBeLessThan(1e-9); return mBiet }
+      const x = -S / an[0]!.q
+      expect(x, de).toBeGreaterThan(0)
+      return mBiet + x * an[0]!.Mi
+    }
+    // (c) hai ẩn: qA·x + qB·y = −S; MA·x + MB·y = m − m(ion đã biết)
+    expect(an.map((i) => i.bien), de).toEqual(['x', 'y'])
+    const A = an[0]!, B = an[1]!, R = sv(m0[3]!) - mBiet, D = A.q * B.Mi - B.q * A.Mi
+    expect(Math.abs(D), de).toBeGreaterThan(1e-9)
+    const x = (-S * B.Mi - B.q * R) / D, y = (A.q * R + A.Mi * S) / D
+    expect(x > 1e-9 && y > 1e-9, `${de} ⇒ x = ${x}, y = ${y}`).toBe(true)
+    return m0[4] === 'x' ? x : y
+  },
 }
 
 const SO_CAU = 50
 const tatCa = new Map<string, CauNenSinh[]>(NHAN_CO_BO_SINH.map((n) => [n, sinhLoCauNen(n, 1, SO_CAU)]))
 
 describe('Bộ sinh câu nền — danh mục', () => {
-  it('đủ 26 nhãn tính toán (20 nhãn đầu + 6 bước tính toán thêm 05/10), mỗi nhãn có bộ giải độc lập và ≥ 50 câu khác nội dung', () => {
-    expect(NHAN_CO_BO_SINH).toHaveLength(26)
+  it('đủ 27 nhãn tính toán (20 nhãn đầu + 6 bước tính toán + bảo toàn điện tích thêm 05/10), mỗi nhãn có bộ giải độc lập và ≥ 50 câu khác nội dung', () => {
+    expect(NHAN_CO_BO_SINH).toHaveLength(27)
     expect([...NHAN_CO_BO_SINH].sort()).toEqual(['bao_toan_khoi_luong', 'bao_toan_nguyen_to', 'can_bang_phuong_trinh', 'chat_du_het', 'dien_phan_faraday',
       'do_bat_bao_hoa', 'doi_mol_khoi_luong', 'doi_mol_the_tich_khi', 'dung_dich_pha_loang', 'gia_tri_trung_binh', 'hieu_suat', 'khoi_luong_rieng',
       'nong_do_mol', 'nong_do_phan_tram', 'ph_nong_do_ion', 'phan_tram_khoi_luong', 'the_dien_cuc_pin', 'ti_khoi_khi', 'ti_le_mol_phuong_trinh', 'toc_do_phan_ung',
@@ -687,7 +779,7 @@ describe('Tất định', () => {
   })
 })
 
-describe('Sáu bước tính toán thêm 05/10 — TOÀN BỘ không gian câu qua bộ giải độc lập (không chỉ 50 câu đầu)', () => {
+describe('Bảy nhãn thêm 05/10 — TOÀN BỘ không gian câu qua bộ giải độc lập (không chỉ 50 câu đầu)', () => {
   it.each(NHAN_MOI.map((n) => [n]))('%s', (nhan) => {
     const ds = sinhLoCauNen(nhan, 1, soCauKhongGian(nhan))
     expect(ds.length).toBeGreaterThanOrEqual(SO_CAU)
@@ -733,6 +825,49 @@ describe('Số âm (ΔrH°298 / ΔfH°298): docSo + chamCauNen của thang-tu-go
     // Đáp án thầy nạp tay viết "−" (U+2212) cũng chấm được.
     expect(chamCauNen({ kieu: 'so', dap_an: '−92,3', gia_tri_dung: '-92.3' }, '-92,3')).toBe(true)
     expect(chamCauNen({ kieu: 'so', dap_an: '−92,3', gia_tri_dung: '-92.3' }, '92,3')).toBe(false)
+  })
+})
+
+describe('Bảo toàn điện tích — ion cùng tồn tại, bảng ion, 26 nhãn cũ không đổi', () => {
+  const ds = sinhLoCauNen('bao_toan_dien_tich', 1, soCauKhongGian('bao_toan_dien_tich'))
+  it('MỌI câu: mọi cặp ion trong đề cùng tồn tại được (bảng cấm riêng); cô cạn không có HCO₃⁻, NH₄⁺, H⁺; đủ 3 dạng', () => {
+    const dem = { a: 0, b: 0, c: 0 }
+    for (const c of ds) {
+      const ten = [...c.de.matchAll(/(?:[\d,]+|x|y) mol (\S+?)(?=,| và |\.)/g)].map((m) => m[1]!)
+      expect(ten.length, c.de).toBeGreaterThanOrEqual(3)
+      kiemIonCungTonTai(ten, c.de.includes('Cô cạn'), c.de)
+      // Lời giải kết thúc đúng bằng đáp án (không chỉ đáp án đúng mà các bước cũng đúng số).
+      const cuoi = c.giai[c.giai.length - 1]!
+      if (/Tính m\.$/.test(c.de)) { dem.b++; expect(cuoi, c.id).toMatch(new RegExp(`= ${c.dap_an} gam\\.$`)) }
+      else if (c.de.includes('Cô cạn')) {
+        dem.c++
+        expect(c.muc).toBe(2)
+        const hoi = /Tính ([xy])\.$/.exec(c.de)![1]!
+        expect(cuoi, c.id).toContain(`${hoi} = ${c.dap_an}${hoi === 'x' ? ';' : '.'}`)
+        // Bước 1, 2 khớp bộ giải: vế phải phương trình điện tích = Σ điện tích ion đã biết; phương trình khối lượng = m − m(ion đã biết).
+        const biet = [...c.de.matchAll(/([\d,]+) mol (\S+?)(?=,| và |\.)/g)].map((m) => ({ n: sv(m[1]!), ion: m[2]! }))
+        expect(sv(/= ([\d,]+)\.$/.exec(c.giai[0]!)![1]!), c.id).toBeCloseTo(Math.abs(biet.reduce((s, i) => s + ION_T[i.ion]![0] * i.n, 0)), 9)
+        const mMuoi = sv(/thu được ([\d,]+) gam/.exec(c.de)![1]!)
+        expect(sv(/= ([\d,]+)\.$/.exec(c.giai[1]!)![1]!), c.id).toBeCloseTo(mMuoi - biet.reduce((s, i) => s + ION_T[i.ion]![1] * i.n, 0), 9)
+      } else { dem.a++; expect(c.muc).toBe(1); expect(cuoi, c.id).toMatch(new RegExp(`x = ${c.dap_an}\\.$`)) }
+    }
+    expect(dem.a, JSON.stringify(dem)).toBeGreaterThanOrEqual(50)
+    expect(dem.b, JSON.stringify(dem)).toBeGreaterThanOrEqual(50)
+    expect(dem.c, JSON.stringify(dem)).toBeGreaterThanOrEqual(50)
+  })
+  it('bảng ion của test khớp chính công thức ion: điện tích đọc từ chỉ số trên, khối lượng từ nguyên tử khối SGK', () => {
+    const TREN = '⁰¹²³⁴⁵⁶⁷⁸⁹'
+    for (const [ion, [q, Mi]] of Object.entries(ION_T)) {
+      const m = /^(.+?)([⁰¹²³⁴⁵⁶⁷⁸⁹]*)([⁺⁻])$/.exec(ion)!
+      const doLon = m[2] ? Number([...m[2]].map((c) => TREN.indexOf(c)).join('')) : 1
+      expect(q, ion).toBe((m[3] === '⁺' ? 1 : -1) * doLon)
+      expect(M(m[1]!), ion).toBe(Mi)
+    }
+    expect([M('NO₃'), M('SO₄'), M('CO₃'), M('PO₄'), NTK_T.Cl]).toEqual([62, 96, 60, 95, 35.5])
+  })
+  it('26 nhãn có trước sinh Y HỆT bản trước (băm toàn bộ không gian câu)', () => {
+    expect(Object.keys(BAM_26_NHAN)).toHaveLength(26)
+    for (const [n, bam] of Object.entries(BAM_26_NHAN)) expect(bamKhongGian(n), n).toBe(bam)
   })
 })
 
