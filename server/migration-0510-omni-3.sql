@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS bai_da_day (
   bo_tick_luc   TEXT
 );
 CREATE INDEX IF NOT EXISTS bai_da_day_lop ON bai_da_day(lop, vi_tri);
+-- Một tick ĐANG HIỆU LỰC cho mỗi (lớp, bài): hai lượt bấm đồng thời không tạo hai chiến dịch (bai-da-day.ts SQL_CHI_MUC_MOT_TICK, cũng tạo lúc chạy).
+CREATE UNIQUE INDEX IF NOT EXISTS bai_da_day_mot ON bai_da_day(lop, khoa_bai) WHERE bo_tick_luc IS NULL;
 CREATE TABLE IF NOT EXISTS pham_vi_lop (
   lop          TEXT NOT NULL,
   khoa_bai     TEXT NOT NULL,
