@@ -28,6 +28,9 @@ async function dung(o: { caSai?: boolean } = {}) {
   for (let i = 1; i <= 5; i++) st.run('DE9', `X${i}`, 'v1', `g-X${i}`, 'D1', cau(`X${i}`, 'DE9'))
   d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true}','x'),('bi_a','{"bat":true}','x')`)
   if (o.caSai) {
+    // 06/10 (làn A'): Bi-a nay cũng qua THANG làm lại câu sai (bi-a.ts `quaThangBia`) — câu sai trong ca là câu LỖI nên sẽ ra bản khác. Test này kiểm đường
+    // NGUYÊN VĂN của 'Câu đã làm' (câu ôn ngoài chiến dịch trả lời bằng chữ cái 'B' cứng) nên tắt khoá `lam_lai_khac`; đường BẬT: tests/lam-lai-cau-sai-0610-bi-a.test.ts.
+    d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('lam_lai_khac','{"bat":false}','x')`)
     // ca kiểm tra đã công bố hôm qua: em sai X1..X5 (đề DE9, không thuộc chiến dịch nào)
     d.sql.exec("INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,cong_bo,thoi_gian_phut,cap_nhat_luc) VALUES('C1','KT','dong','thi','12A1','ngay',45,'x')")
     const hqua = new Date(Date.now() - NGAY).toISOString()
