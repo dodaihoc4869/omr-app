@@ -1,0 +1,47 @@
+/* THẺ "CHẤT LƯỢNG SỬA LỖI" (Tổng quan app thầy, 05/10) — CHỈ BỐ CỤC. Chữ, nút, thẻ dùng lớp gv2-* sẵn có (screens/gv-hoa2.css);
+ * màu duy nhất ở đây là đường kẻ dòng = biến sẵn có của app thầy (--m3-outline, như .gv2-viec li). Khoảng cách theo thang 4/8/12. */
+.clg-phu-de {
+  margin: 0;
+}
+.clg-lop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.clg-lop .gv2-nut-vien {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.clg-ds {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0 0;
+}
+.clg-dong {
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--m3-outline);
+}
+.clg-dong:last-child {
+  border-bottom: 0;
+}
+.clg-dong dt {
+  margin: 0;
+}
+.clg-gia-tri {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+  margin: 2px 0 0;
+}
+.clg-trang-thai,
+.clg-loi {
+  margin-top: 12px;
+}
+.clg-chu-thich {
+  margin: 8px 0 0;
+}
