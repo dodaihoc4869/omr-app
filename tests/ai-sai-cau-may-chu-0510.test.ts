@@ -40,7 +40,7 @@ describe('lượt game: thời gian ƯỚC TÍNH (thầy 05/10: "chỗ làm tron
     d.sql.prepare('INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)').run('S1', 'Trần An', '2010', '11', 'x')
     const t0 = Date.parse('2026-10-04T13:00:00Z')
     d.sql.prepare('INSERT INTO game_v2_session (id, sbd, json, created_at) VALUES (?,?,?,?)').run('P1', 'S1', JSON.stringify({ created: t0 }), new Date(t0).toISOString())
-    const tl = (qid: string, at: number) => d.sql.prepare('INSERT INTO game_v2_attempt (id, sbd, session, qid, content_group, json, created_at) VALUES (?,?,?,?,?,?,?)').run(`P1|${qid}`, 'S1', 'P1', qid, 'g', JSON.stringify({ at, qid }), new Date(at).toISOString())
+    const tl = (qid: string, at: number) => d.sql.prepare('INSERT INTO game_v2_attempt (id, sbd, session, qid, content_group, json, created_at) VALUES (?,?,?,?,?,?,?)').run(`P1|${qid}`, 'S1', 'P1', qid, 'g', JSON.stringify({ attempt: { at, qid }, correct: false }) /* hình dạng THẬT: game-v2.ts ghi `result` = {attempt, traLoi, correct, …} */, new Date(at).toISOString())
     const sk = (khoa: string, qid: string, at: number) => d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, ket_qua, giay, luc, ngay_vn) VALUES (?, 'S1', ?, 'game', 'P1', 0, NULL, ?, ?)").run(khoa, qid, new Date(at).toISOString(), '2026-10-04')
     tl('A', t0 + 45_000); sk('g1', 'Q1', t0 + 45_000) // câu đầu lượt: 45 giây từ lúc mở lượt
     tl('B', t0 + 80_000) // câu khác, em làm đúng
