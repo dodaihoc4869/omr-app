@@ -136,7 +136,7 @@ Fisher information của IRT cực đại khi θ ≈ b (câu "vừa sức"). B�
 
 ### 2.4 (D) "Dạng đã vững" — hoàn thành theo mức nắm, không theo số câu đã làm
 
-**Định nghĩa duy nhất** (một chỗ `ho-so-cau-hinh.ts`): dạng d của em **đã vững** khi `P ≥ 0,90` **và** ≥ 4 câu tự làm khác `content_group` **và** bằng chứng ở ≥ 2 ngày VN **và** không đợt dạy lại đang mở ở d hoặc kiến thức nền của d **và** (bổ sung 05/10, mục 2.7) đúng ≥ 2 câu **chưa từng gặp** cùng dạng/mức lấy từ kho ngoài kho dạy học — không phải song sinh — để loại "vững ảo" do nhớ khuôn. Bốn điều kiện sau lấy nguyên từ luật xác nhận mức của `nang-luc.ts` (cùng tinh thần cổng cũ của game: 5 lượt tự làm, ≥ 4 đúng, ≥ 2 phiên — `than-thu-v2/core.ts:75-89`) — không đặt luật thứ hai. Vì cờ `nang_luc_v1` đang tắt, luật này **tính ngay trong `p-nam-dang.ts`**, không phụ thuộc bật CNH-1.0.
+**Định nghĩa duy nhất** (một chỗ `ho-so-cau-hinh.ts`): dạng d của em **đã vững** khi `P ≥ 0,90` **và** ≥ 4 câu tự làm khác `content_group` **và** bằng chứng ở ≥ 2 ngày VN **và** không đợt dạy lại đang mở ở d hoặc kiến thức nền của d **và** (bổ sung 05/10, mục 2.6) đúng ≥ 2 câu **chưa từng gặp** cùng dạng/mức lấy từ kho ngoài kho dạy học — không phải song sinh — để loại "vững ảo" do nhớ khuôn. Bốn điều kiện sau lấy nguyên từ luật xác nhận mức của `nang-luc.ts` (cùng tinh thần cổng cũ của game: 5 lượt tự làm, ≥ 4 đúng, ≥ 2 phiên — `than-thu-v2/core.ts:75-89`) — không đặt luật thứ hai. Vì cờ `nang_luc_v1` đang tắt, luật này **tính ngay trong `p-nam-dang.ts`**, không phụ thuộc bật CNH-1.0.
 
 **Hệ quả trong chiến dịch** (đổi một luật đã chốt — xin thầy quyết ở mục 8): câu **mới** còn lại của dạng đã vững **không còn bắt buộc** cọ xát trước D − 3; chúng chuyển sang "Thử sức thêm (không bắt buộc)" và vào ôn duy trì FSRS (đúng "câu dư → nhỏ giọt" của đặc tả). Thể lực tiết kiệm được đổ cho dạng chưa vững theo 2.3. Câu **ôn** (câu từng sai) **không** được miễn — luật đóng lỗi `loi-hoc-luat.ts` giữ nguyên.
 
@@ -163,7 +163,7 @@ Fisher information của IRT cực đại khi θ ≈ b (câu "vừa sức"). B�
 - Rào đã chốt phải giữ (Boss 21/09, `DIEU-PHOI.md:403`: "khiên không được đụng dữ liệu học"): vé **chỉ mở cửa**, không sửa sự thật — lượt sai vẫn ghi sổ như mọi lượt, câu sai vẫn vào lịch ôn FSRS/đóng lỗi như thường; thứ được miễn chỉ là hậu quả **trong game** (Máu, chuỗi) và việc hạ bậc.
 - Không đụng "Thử sức thêm" (câu mới của ngày mai) — hai việc khác nhau, hai chữ khác nhau.
 
-### 2.7 Hai kho: DẠY trên kho dạy học, ĐO trên kho còn lại (thầy hỏi 05/10)
+### 2.6 Hai kho: DẠY trên kho dạy học, ĐO trên kho còn lại (thầy hỏi 05/10)
 
 **Hiện trạng**: app nhận tờ dạy học qua mã `DH-…` hoặc mục "DẠY HỌC" (`cay-chon-de.ts:87-90`); chiến dịch mặc định = đề vừa kiểm tra, tức kho dạy học **đã là xương sống** (đúng vai Bank 2 của đặc tả). Kho còn lại (mã `DB-…`, mã số-đầu `12-C1-B2-D1`… — 38 % kho là mã số-đầu, `khoi-cau.ts:33`) hiện chỉ dùng rút đề thi/đề riêng.
 
@@ -178,17 +178,17 @@ Fisher information của IRT cực đại khi θ ≈ b (câu "vừa sức"). B�
 
 **Điều kiện để kho còn lại có giá trị**: **cùng một bộ mã dạng** với kho dạy học. Kho dạy học là nguồn sự thật về phân loại (dạng `A.B.C`, kiến thức nền, mức độ, sao); câu kho còn lại được gắn mã dạng theo bộ ấy — máy gợi ý theo tương đồng nội dung, thầy duyệt theo lô; dạng nào không gắn được thì **nói ra**, không bịa. GĐ0 đo độ phủ trước khi làm gì khác.
 
-### 2.8 Biến thể: bao nhiêu là đủ, và loại nào (thầy hỏi "12 câu song sinh thay số")
+### 2.7 Biến thể: bao nhiêu là đủ, và loại nào (thầy hỏi "12 câu song sinh thay số")
 
 - **Số lần một em gặp một câu** trong chu kỳ chiến dịch + duy trì ≈ 3–6 (mới · hẹn +3 · +7/+14 · duy trì 30) ⇒ cần ≈ **2–5 biến thể khác nhau** là đủ để không nhớ đáp án; từ biến thể thứ 6 trở đi gần như không bao giờ được ra. Mã hiện giữ tối đa 2 song sinh/câu (`cau-bo-tro.ts:59`, `slice(0, 2)`) — **nâng lên 4 là đủ**, không cần 12.
 - **"Thay số" chỉ áp được cho câu TÍNH TOÁN** (Trả lời ngắn và bài tập ở Phần I/II). Câu LÝ THUYẾT — phần lớn Phần I Nhận biết/Thông hiểu và nhiều ý Đúng–sai — không có số để thay. Mỗi loại cần một kiểu biến thể:
   - Trắc nghiệm lý thuyết: đổi chất cùng loại (ester khác, kim loại cùng nhóm), đổi phương án nhiễu theo lỗi hay gặp, đảo chiều hỏi (chất → tính chất ↔ tính chất → chất).
   - Đúng–sai: mỗi đề dẫn một **kho 8–12 ý đã kiểm**; mỗi lần ra rút 4 ý (≥ 1 đúng, ≥ 1 sai) ⇒ hàng chục tổ hợp, đoán mò vẫn 1/16.
   - Tính toán: **script tham số theo family** (sinh vô hạn, kiểm một lần) thay cho 12 bản tĩnh (12 bản = 12 lần kiểm đáp án, 12 chỗ có thể sai — `cau_nghi_dap_an` đã phải gánh câu sai đáp án rồi).
-- **Biến thể là công cụ CỦNG CỐ** (bước 3 thang tự gỡ, đóng lỗi), **không phải công cụ CHUYỂN GIAO**. Chuyển giao đo bằng câu chưa gặp (2.7). Hai việc, hai nguồn câu.
+- **Biến thể là công cụ CỦNG CỐ** (bước 3 thang tự gỡ, đóng lỗi), **không phải công cụ CHUYỂN GIAO**. Chuyển giao đo bằng câu chưa gặp (2.6). Hai việc, hai nguồn câu.
 - **"Đơn giản hoá kho dạy học" nên hiểu là CẤU TRÚC HOÁ, không phải thu nhỏ**: mỗi ô (dạng × mức độ) một câu mẫu chuẩn + mã dạng + kiến thức nền + phần + sao + script tham số nếu là tính toán; khử bản trùng theo `content_group`. Số câu có thể ít đi, **độ phủ ma trận thi phải không giảm** — máy kiểm độ phủ theo ô và báo ô trống.
 
-### 2.6 Hai thứ lấy thêm, cỡ nhỏ
+### 2.8 Hai thứ lấy thêm, cỡ nhỏ
 
 - **Prior lớp theo dạng** (swarm): mỗi sáng, P0 cho em chưa có dữ liệu ở dạng d = trung bình P của lớp ở d (≥ 5 em có dữ liệu); kèm chữ "ước theo lớp, chưa đo em".
 - **Song sinh tham số** cho Trả lời ngắn: `cau_bo_tro.script_json` cho ≤ 10 family hay sai nhất (hiệu suất, nồng độ, tỉ khối, pH, bảo toàn…): script sinh (đề, đáp án, nhiễu) từ bộ số nguyên "đẹp", soạn **nền** bằng máy + Python kiểm như GĐ1 của v2 đã làm — AI không chạy lúc em làm bài (đặc tả và app cùng chốt). Mỗi lần câu ra lại ⇒ biến thể mới ⇒ hết học vẹt đáp án.
@@ -312,7 +312,7 @@ GĐ0–2 **không đổi một hành vi nào em nhìn thấy**. GĐ3 đổi th�
 
 ## 9. RỦI RO VÀ ĐIỂM YẾU TỰ NHẬN
 
-**Tối ưu tới đâu (thầy hỏi 05/10 "đã tối ưu thực sự chưa")**: bản ghép này tối ưu về **cấu trúc** — một hàm mục tiêu rõ (điểm kỳ vọng trên ma trận), tất định, phát lại được, đo được — nhưng **chưa tối ưu về tham số** cho tới khi so với ca chốt thật (GĐ5–6), và còn ba lỗ lý thuyết nói thẳng: (1) P nắm dạng coi các dạng **độc lập**, trong khi Hoá có kiến thức nền chung (mol, bảo toàn, cân bằng) — nhãn nền đã có trong `cau_bo_tro.nhan_nen`, dựng đồ thị "dạng → nền" là bước nâng sau để sửa gốc thay sửa lá; (2) hai lịch ôn song song chưa hợp nhất; (3) trước 2.7 chưa có phép đo **chuyển giao** — nay đã bổ sung thành điều kiện bắt buộc.
+**Tối ưu tới đâu (thầy hỏi 05/10 "đã tối ưu thực sự chưa")**: bản ghép này tối ưu về **cấu trúc** — một hàm mục tiêu rõ (điểm kỳ vọng trên ma trận), tất định, phát lại được, đo được — nhưng **chưa tối ưu về tham số** cho tới khi so với ca chốt thật (GĐ5–6), và còn ba lỗ lý thuyết nói thẳng: (1) P nắm dạng coi các dạng **độc lập**, trong khi Hoá có kiến thức nền chung (mol, bảo toàn, cân bằng) — nhãn nền đã có trong `cau_bo_tro.nhan_nen`, dựng đồ thị "dạng → nền" là bước nâng sau để sửa gốc thay sửa lá; (2) hai lịch ôn song song chưa hợp nhất; (3) trước 2.6 chưa có phép đo **chuyển giao** — nay đã bổ sung thành điều kiện bắt buộc.
 
 - **Độ phủ mã dạng** quyết định tất cả: dạng không có mã rơi về chuyên đề ⇒ P thô hơn, dự báo rộng hơn. GĐ0 đo trước; thấp ⇒ ưu tiên gắn mã dạng cho câu của chiến dịch đang chạy trước khi làm GĐ3.
 - **Dự báo sai trong vài tuần đầu** là chắc chắn — vì thế chỉ thầy thấy, kèm số ca chốt đã so. Hứa sớm với PH là mất tin.
