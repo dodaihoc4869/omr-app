@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // PHẢN BIỆN #108 (vòng 1, 30/09) — khoá các lỗ hổng của bản sửa "Chưa tải được câu hôm nay" / rương kẹt 48/49 + rải đều câu mới:
 // (K1/SOÁT) câu không phục vụ được giữa ngày ⇒ CHỈ thay đúng câu ấy (mới thay mới, ôn thay ôn), KHÔNG lập lại cả ngày theo cờ rải đều hiện tại —
 //          "kế hoạch đã chốt hôm nay không đổi"; Huyết Chiến đã chốt giữ nguyên.
@@ -20,7 +21,7 @@ const LOI_CHUA_NAP = 'Chưa tải được câu hôm nay'
 
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: `Cốt lõi ${qid}` },
   })
 }

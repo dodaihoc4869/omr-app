@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // CHI PHÍ D1 của kho rút câu game (Boss 21/09: truy vấn `game_v2_question … ORDER BY cursor LIMIT 300` ≈ 246 triệu dòng đọc/ngày): bản mới TÁCH HAI PHA (khoá rồi json theo 300), tuyến tính.
 // Khoá: kết quả (nội dung + THỨ TỰ) đúng như thuật toán cũ; đề đã xoá / chỉ mục lệch phiên bản bị loại; mọi truy vấn ≤ 100 tham số (giới hạn D1); không còn phân trang bằng ORDER BY cursor. SQLite thật.
 import { describe, expect, it } from 'vitest'
@@ -8,6 +9,7 @@ import { taoD1That, type D1That } from './_d1-that'
 /** Bộ giả: 4 dạng; đề 'A' và 'A1' CÙNG qid (thứ tự `ma_de|qid` khác thứ tự bộ (ma_de, qid): 'A1|q' < 'A|q'); đề 'Z' đã xoá; đề 'OLD' chỉ mục lệch phiên bản. > 300 câu để nhiều trang. */
 function dung(): { d: D1That; dang: string[]; soKhop: number } {
   const d = taoD1That()
+  d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run() // LUẬT THẦY 05/10: em chưa rõ khối ⇒ kho rút câu rỗng ⇒ em giả khối 12
   const dang = ['D.ONE', 'D.TWO', 'D.THREE', 'D.FOUR']
   const de = [['A', 0], ['A1', 0], ['B', 0], ['Z', 1], ['OLD', 0]] as const
   for (const [ma, xoa] of de) {
@@ -19,7 +21,7 @@ function dung(): { d: D1That; dang: string[]; soKhop: number } {
   for (const [ma] of de) {
     for (let i = 1; i <= 260; i++) {
       const qid = ma === 'B' ? `b${i}` : `q${i}` // 'A' và 'A1' CÙNG qid: qid thắng cuối theo thứ tự `ma_de|qid` ('A1|q' < 'A|q' ⇒ bản của 'A' thắng); 'B' qid riêng
-      them.run(ma, qid, 'v', `g-${ma}-${i}`, dang[i % 4], JSON.stringify({ qid, maDe: ma, version: 'v', group: `g-${ma}-${i}`, phan: 'I', dang: dang[i % 4], tenDang: 'T', mucDo: 'biet', sao: 1, kienThuc: ['K'], reviewed: true, text: `Đề ${ma}-${i}`, i }))
+      them.run(ma, qid, 'v', `g-${ma}-${i}`, dang[i % 4], JSON.stringify({ qid, maDe: ma, lop: '12', version: 'v', group: `g-${ma}-${i}`, phan: 'I', dang: dang[i % 4], tenDang: 'T', mucDo: 'biet', sao: 1, kienThuc: ['K'], reviewed: true, text: `Đề ${ma}-${i}`, i }))
       if (ma !== 'Z' && ma !== 'OLD') khop++
     }
   }

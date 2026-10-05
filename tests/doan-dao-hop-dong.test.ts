@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Hợp đồng máy chủ cho ĐẢO THẦN THÚ bản mới (Code 6): `start` trả `role` từng câu, `answer` trả `lyDoThuong`. KHÔNG đổi cách chọn câu / chấm / thưởng.
 import { describe, it, expect } from 'vitest'
 import { chooseSession, chooseSessionWithRoles, DAY, type Attempt, type Evidence, type PrivateQuestion } from '../src/game/than-thu-v2/core'
@@ -9,7 +10,7 @@ import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { taoD1That } from './_d1-that'
 
-const q = (i: number, o: Partial<PrivateQuestion> = {}): PrivateQuestion => ({ qid: `Q${i}`, maDe: 'D', version: 'v', group: `g${i}`, phan: 'I', text: 't', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: `D${i % 4}`, tenDang: 'x', mucDo: 'biet', sao: 1, kienThuc: ['K'], correct: 'A', solution: null, reviewed: true, ...o })
+const q = (i: number, o: Partial<PrivateQuestion> = {}): PrivateQuestion => ({ qid: `Q${i}`, maDe: 'D', lop: '12', version: 'v', group: `g${i}`, phan: 'I', text: 't', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: `D${i % 4}`, tenDang: 'x', mucDo: 'biet', sao: 1, kienThuc: ['K'], correct: 'A', solution: null, reviewed: true, ...o })
 const NOW = 1_800_000_000_000
 describe('Đảo thần thú · vai của từng câu', () => {
   const pool = [...Array.from({ length: 16 }, (_, i) => q(i)), q(90, { dang: 'D0', mucDo: 'hieu' })]
@@ -41,8 +42,8 @@ describe('Đảo thần thú · lệnh đọc-chỉ so-tay + role/lyDoThuong qua
   it('so-tay chỉ liệt kê dạng em ĐƯỢC PHÉP làm (có bằng chứng), kèm tên + mã chương; start trả role, answer trả lyDoThuong; không ghi gì', async () => {
     const d = taoD1That()
     d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',9,'k',0,'v1')").run(); d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
-    for (let i = 0; i < 9; i++) { const es = i < 6, x = q(i, { maDe: 'DE1', version: 'v1', dang: es ? 'ES.A.X' : 'AN.B.Y', tenDang: es ? 'Ester' : 'Ancol' }); d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', x.qid, 'v1', x.group, x.dang, JSON.stringify(x)) }
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('S1','x','mk','x')").run()
+    for (let i = 0; i < 9; i++) { const es = i < 6, x = q(i, { maDe: 'DE1', lop: '12', version: 'v1', dang: es ? 'ES.A.X' : 'AN.B.Y', tenDang: es ? 'Ester' : 'Ancol' }); d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', x.qid, 'v1', x.group, x.dang, JSON.stringify(x)) }
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','x','12','mk','x')").run()
     d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({ pet: 'dat_quy', choice: false, legacy: null, cap: 1, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z' }), 'x')
     await ghiSuKien(d.env, [{ nguon: 'btvn', maNguon: 'B', sbd: 'S1', qid: 'Q0', lan: 1, ketQua: 0, luc: new Date(Date.now() - 72 * 3_600_000).toISOString(), maDang: 'ES.A.X' }]); await dungLaiHoSo(d.env, ['S1'], new Date().toISOString())
     const token = await gameToken(d.env, 'S1'), truoc = (d.sql.prepare('SELECT COUNT(*) n FROM game_v2_session').get() as any).n

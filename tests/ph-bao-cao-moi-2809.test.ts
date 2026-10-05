@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // APP PHỤ HUYNH MỚI 28/09 — ba lệnh CHỈ-ĐỌC (server/src/ph-bao-cao-moi.ts) trên D1 thật (node:sqlite, lược đồ đủ migration):
 // báo cáo một ca + nhận xét thầy (chặn theo luật công bố), lời thầy các ca đã công bố, Game Hoá 2.0 của con (KHÔNG chốt kế hoạch thay con).
 import { describe, expect, it } from 'vitest'
@@ -98,7 +99,7 @@ describe('/ph/loi-thay — nhận xét của thầy ở các ca đã công bố'
 
 // ---------------------------------------------------------------- Game Hoá 2.0 ----------------------------------------------------------------
 function cauJson(qid: string, dang: string) {
-  return JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], dang, tenDang: `Dạng ${dang}`, mucDo: 'TH', correct: 'B', reviewed: true, solution: { chot: 'x', tungPa: {} } })
+  return JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], dang, tenDang: `Dạng ${dang}`, mucDo: 'TH', correct: 'B', reviewed: true, solution: { chot: 'x', tungPa: {} } })
 }
 function dung2(soCau = 6) {
   const { d, env } = dung()

@@ -116,6 +116,9 @@ type KqKhacPhuc = { ok: boolean; error?: string; items: unknown[]; thuTu: string
 type KqDangBai = { ok: boolean; error?: string; de?: unknown }
 
 describe('Lộ đáp án ca đang mở qua `cauKhacPhuc` / `deTheoDangBai` (không kèm sbd)', () => {
+  // LUẬT THẦY 05/10 ("rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"):
+  // `cauKhacPhuc` không kèm `sbd` ⇒ không rõ khối em ⇒ KHÔNG trả câu nào (trước: cả tờ). Phần "câu tự do vẫn phục vụ đủ đáp án" kiểm với em ĐÃ RÕ khối 12.
+  const themEm12 = (d: ReturnType<typeof dungKho>) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','12A','mk','x')").run()
   it('ca dựng từ kho giữ NGUYÊN qid của kho — tiền đề của lỗ hổng', () => {
     const d = dungKho()
     moCa(d)
@@ -126,10 +129,15 @@ describe('Lộ đáp án ca đang mở qua `cauKhacPhuc` / `deTheoDangBai` (khô
   it('cauKhacPhuc theo chuyên đề, KHÔNG sbd, ca đang mở: gói trả về không còn câu nào của ca (kể cả đáp án/lời giải)', async () => {
     const d = dungKho()
     moCa(d)
-    const r = await cauKhacPhucGoi(d.env, { chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
+    const r0 = await cauKhacPhucGoi(d.env, { chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
+    expect(r0.ok).toBe(true)
+    expect(r0.items.flatMap(cauTrongGoi).filter(laDeThi)).toEqual([]) // trước bản vá: 3 câu thi, kèm dap_an 'B'/'C'/'DSDS' + loi_giai
+    expect(r0.thuTu).toEqual([]) // luật 05/10: không sbd ⇒ không câu nào
+    themEm12(d)
+    const r = await cauKhacPhucGoi(d.env, { sbd: 'S1', chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
     expect(r.ok).toBe(true)
     const cau = r.items.flatMap(cauTrongGoi)
-    expect(cau.filter(laDeThi)).toEqual([]) // trước bản vá: 3 câu thi, kèm dap_an 'B'/'C'/'DSDS' + loi_giai
+    expect(cau.filter(laDeThi)).toEqual([])
     expect(r.thuTu.filter((q) => QID_THI.includes(q))).toEqual([])
     // Câu KHÔNG thuộc ca vẫn phục vụ đủ đáp án — luyện tập không bị hỏng.
     expect([...r.thuTu].sort()).toEqual([...QID_TU_DO].sort())
@@ -140,7 +148,12 @@ describe('Lộ đáp án ca đang mở qua `cauKhacPhuc` / `deTheoDangBai` (khô
   it('cauKhacPhuc theo dạng (dsDang), KHÔNG sbd, ca đang mở: không trả câu của ca', async () => {
     const d = dungKho()
     moCa(d)
-    const r = await cauKhacPhucGoi(d.env, { chuyenDe: ['CD1'], dsDang: ['ES.A.X'], soCau: 50 }) as KqKhacPhuc
+    const r0 = await cauKhacPhucGoi(d.env, { chuyenDe: ['CD1'], dsDang: ['ES.A.X'], soCau: 50 }) as KqKhacPhuc
+    expect(r0.ok).toBe(true)
+    expect(r0.items.flatMap(cauTrongGoi).filter(laDeThi)).toEqual([])
+    expect(r0.thuTu).toEqual([]) // luật 05/10: không sbd ⇒ không câu nào
+    themEm12(d)
+    const r = await cauKhacPhucGoi(d.env, { sbd: 'S1', chuyenDe: ['CD1'], dsDang: ['ES.A.X'], soCau: 50 }) as KqKhacPhuc
     expect(r.ok).toBe(true)
     const cau = r.items.flatMap(cauTrongGoi)
     expect(cau.filter(laDeThi)).toEqual([])
@@ -210,7 +223,8 @@ describe('Lộ đáp án ca đang mở qua `cauKhacPhuc` / `deTheoDangBai` (khô
   it('ca đã công bố và hết giờ: câu quay lại kênh luyện (không chặn thừa)', async () => {
     const d = dungKho()
     moCa(d, { trangThai: 'dong', congBo: 'ca_lop_xong', batDau: T0 - 3 * 3_600_000, hetHanVao: T0 - 2 * 3_600_000 })
-    const r = await cauKhacPhucGoi(d.env, { chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
+    themEm12(d) // luật 05/10: chỉ em RÕ khối mới nhận câu khắc phục
+    const r = await cauKhacPhucGoi(d.env, { sbd: 'S1', chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
     expect([...r.thuTu].sort()).toEqual([...QID_THI, ...QID_TU_DO].sort())
     const r2 = await deTheoDangBai(d.env, { ma: MA_DB }) as KqDangBai
     expect(cauTrongGoi(r2.de)).toHaveLength(3)
@@ -218,7 +232,8 @@ describe('Lộ đáp án ca đang mở qua `cauKhacPhuc` / `deTheoDangBai` (khô
 
   it('không có ca nào: hai lệnh trả như cũ', async () => {
     const d = dungKho()
-    const r = await cauKhacPhucGoi(d.env, { chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
+    themEm12(d) // luật 05/10: chỉ em RÕ khối mới nhận câu khắc phục
+    const r = await cauKhacPhucGoi(d.env, { sbd: 'S1', chuyenDe: ['CD1'], soCau: 50 }) as KqKhacPhuc
     expect([...r.thuTu].sort()).toEqual([...QID_THI, ...QID_TU_DO].sort())
     const r2 = await deTheoDangBai(d.env, { ma: MA_DB }) as KqDangBai
     expect(cauTrongGoi(r2.de)).toHaveLength(3)

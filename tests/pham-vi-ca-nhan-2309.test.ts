@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { taoD1That, type D1That } from './_d1-that'
@@ -14,7 +15,7 @@ function setup() {
   const d = taoD1That()
   d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Một','12','x'),('S2','Hai','12','x'),('NEW','Mới','12','x'); INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE','Đề','12',20,'k',0,'v'); INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE','v','x')")
   const question = (id: string, dang: string, knowledge = ['k'], group = id) => {
-    const q = { qid:id, maDe:'DE', version:'v', group, phan:'I', text:`Nội dung ${id}`, choices:['A. a','B. b','C. c','D. d'], ideas:[], hinhAnh:[], dang, tenDang:dang, mucDo:'biet', sao:0, kienThuc:knowledge, correct:'B', solution:'Giải', reviewed:true }
+    const q = { qid:id, maDe:'DE', lop: '12', version:'v', group, phan:'I', text:`Nội dung ${id}`, choices:['A. a','B. b','C. c','D. d'], ideas:[], hinhAnh:[], dang, tenDang:dang, mucDo:'biet', sao:0, kienThuc:knowledge, correct:'B', solution:'Giải', reviewed:true }
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE',id,'v',group,dang,JSON.stringify(q))
   }
   const learn = (sbd: string, id: string, dang: string, ngay = '2026-09-01') => {
@@ -35,7 +36,7 @@ describe('phạm vi tự động theo từng em, không bù lớp/chương', () 
     question('duplicate','ES.A');learn('S1','duplicate','ES.A')
     const raw=JSON.parse((d.sql.prepare("SELECT json FROM game_v2_question WHERE qid='duplicate'").get() as {json:string}).json)
     d.sql.exec("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE2','Đề khác','12',1,'k2',0,'v'); INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE2','v','x')")
-    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE2','duplicate','v','other','ES.B',JSON.stringify({...raw,maDe:'DE2',group:'other',dang:'ES.B',text:'Nội dung chưa học'}))
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE2','duplicate','v','other','ES.B',JSON.stringify({...raw,maDe:'DE2', lop: '12',group:'other',dang:'ES.B',text:'Nội dung chưa học'}))
     const scope=await readScope(d.env,'S1')
     expect(scope.evidence).toEqual([])
     expect(scope.missing).toBeGreaterThan(0)

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // ĐOÀN RÚT CÂU KHÔNG LẶP (thầy lệnh 21/09 ~19:35 "rút câu theo đúng luật cá nhân hóa, nâng đỡ tiến bộ và chặn câu lặp lại cho mỗi học sinh"; server/src/game-v2-cau-moi.ts + startDoanKhoLop dùng chooseLuotMoi 'kham_pha'):
 //  • 60 câu cá nhân/ngày của MỘT em không qid trùng (10 chặng liền); • ưu tiên câu CHƯA TỪNG làm ở mọi nguồn/mọi ngày; • hết câu mới ⇒ câu LÂU NHẤT chưa gặp + `hetCauMoi` thật; • làm hết trong ngày ⇒ báo thật, không lặp;
 //  • hai em khác hồ sơ ⇒ bộ câu khác (2 suất yếu theo dạng yếu của CHÍNH em); • trùm nhớ câu đã ra ở chặng trước của các em trong đoàn và câu các em đã làm hôm nay. Không Phần II ở câu cá nhân. SQLite thật.
@@ -13,7 +14,7 @@ const T0 = Date.parse('2026-09-22T12:00:00+07:00')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
 afterEach(() => vi.useRealTimers())
 const cau = (qid: string, dang: string, phan: 'I' | 'II' | 'III' = 'I') => ({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Đề ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Đề ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
   hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: phan === 'II' ? 'DSDS' : 'B', solution: `LG-${qid}`, reviewed: true,
 })
 /** Lớp 12, các em S1..S3; lớp đã học A.1 (bài cá nhân hoá có câu A-0) và B.2 (câu B-0). Kho: A-0…A-{soA-1} (Phần I, A.1), B-0…B-{soB-1} (B.2), P-0…P-{soII-1} Phần II (A.1, kiến thức K1) cho trùm. */

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // P05/T09 — NGÂN SÁCH NGÀY DÙNG CHUNG: lượt game chỉ lấy phần CÒN LẠI (02 §5.2 + 06 T09).
 // Test gọi CODE SẢN PHẨM THẬT qua Worker THẬT (`goiWorker`) trên D1 THẬT, cờ `cau_hinh.ngan_sach_luot`.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -23,7 +24,7 @@ afterEach(() => vi.useRealTimers())
 
 /** Câu Phần I mức 'hieu' (base 105) — dạng A.1 để mở được phạm vi cho em. `/nhãn/` vắng = kho CHƯA gắn family. */
 const cau = (qid: string, nhanFamily?: string | null) => ({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`,
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`,
   choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [], dang: 'A.1', tenDang: 'Dạng A.1',
   mucDo: 'hieu', sao: 1, kienThuc: ['K1'], correct: 'B', solution: `LG-${qid}`, reviewed: true,
   ...(nhanFamily ? { family: nhanFamily } : {}),

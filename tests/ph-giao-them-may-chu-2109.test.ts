@@ -1,3 +1,4 @@
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 import { daHocDang } from './_pham-vi-ca-nhan'
 // @vitest-environment node
 // `POST /ph/giao-them` (Code 3, docs/hop-dong-ph-giao-them-2109.md mục 5) trên D1 GIẢ BẰNG SQLITE THẬT: máy chủ dựng đầu vào cho `tinhGiaoThem` (Code 1) rồi CHỌN qid — không tự luận, không câu bài tập chưa nộp, không câu làm 14 ngày
@@ -18,7 +19,7 @@ const H = (gio: string): number => T(`${NGAY}T${gio}:00`) // giờ Việt Nam ng
 const themNgay = (ngay: string, n: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
 
 const cauKho = (qid: string, dang: string, mucDo: 'biet' | 'hieu' | 'van_dung', o: Record<string, unknown> = {}) => ({
-  qid, maDe: 'DE', version: 'v', group: `g-${qid}`, phan: 'I', text: `Chọn phát biểu đúng về ${qid}.`, choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [],
+  qid, maDe: 'DE', lop: '12', version: 'v', group: `g-${qid}`, phan: 'I', text: `Chọn phát biểu đúng về ${qid}.`, choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [],
   dang, tenDang: `Tên ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct: 'B', solution: 'LG-BI-MAT', reviewed: true, ...o,
 })
 const themKho = (d: D1That, cau: ReturnType<typeof cauKho>[]) => {

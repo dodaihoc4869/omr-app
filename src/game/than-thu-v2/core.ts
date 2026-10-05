@@ -195,7 +195,7 @@ export const tranCauDaiTheoCap=(cap:number)=>cap>=30?3:cap>=10?2:1
 const GIO_VN=7*3600000
 const ngayVnChi=(ms:number)=>Math.floor((ms+GIO_VN)/DAY)
 const ngayVnChuoi=(ms:number)=>new Date(ms+GIO_VN).toISOString().slice(0,10)
-export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number>
+export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em. LUẬT THẦY 05/10: chỉ câu ĐÚNG khối em (khác khối thấp hay cao, câu không rõ/mâu thuẫn khối ⇒ không vào lượt); `null` (em không rõ khối) ⇒ không câu nào; BỎ TRỐNG (không truyền) ⇒ hàm chọn không lọc khối — máy chủ luôn truyền, lọc kho ở `readScope` và chặn ở cổng cuối `chan-khac-khoi.ts`. */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number>
   /** VÒNG BÙ (thầy lệnh 25/09, "Đoàn chỉ 1 câu rồi lặp"): khi đang BÙ đủ suất bằng câu CŨ, cho phép lấy câu
    * "vừa đúng chưa tới 30 ngày" (bỏ chặn `dung30`) — chọn câu LÂU NHẤT chưa gặp; KHÔNG bỏ chặn `sai3`.
    * Mặc định `false`: đường chọn bình thường KHÔNG đổi một byte. */
@@ -224,7 +224,7 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   const dai=(q:Question)=>q.phan!=='I'
   const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
   const thuongNhanQid=diemThuongNhanTheoQid(pool,evidence,attempts)
-  const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&cauHopKhoi(opt.khoiEm,q)&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
+  const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(opt.khoiEm===undefined||cauHopKhoi(opt.khoiEm,q))&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
   const nhanCoYeu=kho.some(q=>weak.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q)),nhanCoTH=kho.some(q=>(opt.dueQids?.has(q.qid)||due.has(key(q)))&&level(q)<=target(q.dang)&&!saiHomNay(q))
   const tranDai=opt.loai==='trum'?N:Math.min(opt.thuong?2:1,tranCauDaiTheoCap(opt.cap))
   const tranDaiToiDa=opt.loai==='trum'?N:tranCauDaiTheoCap(opt.cap)

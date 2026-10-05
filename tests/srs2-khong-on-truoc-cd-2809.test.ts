@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // Thầy 28/09: "xoá bỏ tất cả các câu ôn trước, khi giao chiến dịch đầu tiên tất cả không có câu ôn, không được lấy câu ôn trước đó".
 // ⇒ Câu của chiến dịch chỉ tính lần làm TỪ LÚC GIAO; lịch sử trước đó (ca thi, BTVN, bài Mẹ giao…) không sinh câu ôn.
 import { describe, expect, it } from 'vitest'
@@ -10,7 +11,7 @@ import type { Env } from '../server/src/kieu'
 
 const GIAO = Date.parse('2026-09-28T02:00:00Z') // 09:00 VN
 const cau = (qid: string, phan: 'I' | 'II') => JSON.stringify({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
   hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: phan === 'I' ? 'B' : 'DSDS', reviewed: true, solution: { chot: 'c' },
 })
 async function dung() {

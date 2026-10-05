@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Lệnh `hoSoOnCa` (docs/hop-dong-ho-so-on-ca-1909.md): hồ sơ ôn cho RÚT ĐỀ RIÊNG. CHỈ ĐỌC; lỗi/thiếu bảng → ok:false, KHÔNG ok:true rỗng.
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
@@ -35,7 +36,9 @@ function dung() {
   hoSo(d, 'S1', 'Q3', 'dang_on', { lanSai: 1, moc: '2026-09-25', maDang: 'CD:Ester - Lipid' }); hoSo(d, 'S1', 'Q5', 'chua_thay_sai')
   // S1 sai ở C1: Q9 moi_sai (S2 cũng sai Q9 ở C1)
   sai(d, 'S1', 'C1', 'Q9'); sai(d, 'S2', 'C1', 'Q9'); hoSo(d, 'S1', 'Q9', 'moi_sai'); hoSo(d, 'S2', 'Q9', 'dang_on')
-  d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x'),('S2','x','x'),('S3','x','x')").run()
+  d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x'),('S2','x','12','x'),('S3','x','12','x')").run()
+  // LUẬT THẦY 05/10: câu sai cũ chỉ gợi ý khi ĐÚNG khối em; mã câu giả 'Q…' không đọc ra khối ⇒ ghi khối 12 ở `cau_hoi` (nguồn khối của kho).
+  for (const q of ['Q0', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9']) d.sql.prepare("INSERT OR IGNORE INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES(?,'DE1','12','x')").run(q)
   return d
 }
 
@@ -100,6 +103,8 @@ describe('sai[] / daKhacPhuc[] / tuCa', () => {
     const d = taoD1That()
     ca(d, 'C2', '2026-09-17T01:00:00.000Z'); nop(d, 'S1', 'C2', 'Q1'); sai(d, 'S1', 'C2', 'Q1')
     hoSo(d, 'S1', 'Q1', 'moi_sai', { moc: 'mai', maDang: null })
+    // LUẬT THẦY 05/10: em và câu phải rõ khối (cùng khối 12) thì câu sai cũ mới được gợi ý.
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run(); d.sql.prepare("INSERT INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES('Q1','DE1','12','x')").run()
     const s = (await goi(d, { dsSbd: ['S1'] })).em.S1.sai[0]
     expect(s).toEqual({ qid: 'Q1', lanSai: 1, mocOnKe: null, maDang: null, trangThai: 'moi_sai' })
   })
@@ -195,7 +200,9 @@ describe('đầu vào, lỗi, chi phí, CHỈ ĐỌC', () => {
     // `/goi` còn tốn vài truy vấn của cổng: đo riêng hàm thuần.
     d.soLenh.prepare = 0
     await hoSoOnCa(d.env, { dsSbd: ['S1', 'S2', 'S3', 'E1', 'E2'], maCa: 'CA-SAP-MO', ngayCa: NGAY_CA })
-    expect(d.soLenh.prepare).toBe(3)
+    // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): cổng cuối +1 truy vấn khối em (`hoc_sinh`, cả lô) +1 truy vấn nguồn khối
+    // (`cau_hoi`/`de_kho`, CHỈ vì mã câu giả 'Q…' không tự đọc ra khối — mã thật 'DH-12-…' không tốn truy vấn này). Vẫn KHÔNG phụ thuộc số em.
+    expect(d.soLenh.prepare).toBe(5)
     const trong = taoD1That()
     trong.soLenh.prepare = 0
     await hoSoOnCa(trong.env, { dsSbd: ['S1'], maCa: 'X', ngayCa: NGAY_CA })

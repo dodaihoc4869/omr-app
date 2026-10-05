@@ -8,6 +8,7 @@ import { docCauHinhDem, dbGoc } from './cau-hinh-dem'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { protectedQuestions } from './game-v2-bank'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { HANG_MUC_DO } from './srs2-loi'
 import { cheDo2, docCoHoa2Tu, docNhanNo, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type KeHoachDaChot, type MetaCau } from './srs2-d1'
 import { cauDangGiu, DK_PHIEN_BIA_MO, DK_PHIEN_DAO_DOAN, goiYCho, napCau, type RefPhien } from './srs2-game'
@@ -235,7 +236,7 @@ export function xepUngVienChot(khoa: readonly string[], hs: Pick<HoSo2, 'meta' |
 
 async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>) {
   // Tối ưu 28/09: napCau đã nạp theo lô (một truy vấn) và bỏ câu hỏng ⇒ không lặp từng câu (N+1). Kết quả y hệt: câu dùng được ĐẦU TIÊN.
-  const [x] = await napCau(env, hs, khoa, 1, chan)
+  const [x] = await chanKhacKhoiEm(env, 'bia', { meta: hs.meta }, await napCau(env, hs, khoa, 1, chan), { cauCua: (y) => y.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   return x ?? null
 }
 
@@ -354,7 +355,7 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   const nOn = Math.min(con.on, nBi - nMoi)
   nMoi = Math.min(con.moi, nBi - nOn)
   const nap = async (khoa: readonly string[], n: number) => {
-    const ra = n > 0 ? await napCau(env, hs, khoa, n, chanThem) : []
+    const ra = n > 0 ? await chanKhacKhoiEm(env, 'bia', { sbd, meta: hs.meta }, await napCau(env, hs, khoa, n, chanThem), { cauCua: (x) => x.q }) : [] // LUẬT THẦY 05/10: cổng cuối
     for (const x of ra) chanThem.add(x.q.qid)
     return ra
   }

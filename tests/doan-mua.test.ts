@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // ĐOÀN HỘ TỐNG — bước 5: mồi hằng ngày (vé, Đoàn lớp theo mùa, rương chuỗi, Trùm lớp). Hàm thuần tính tay + luồng D1 trên SQLite thật.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
@@ -63,7 +64,7 @@ function truong(soEm = 3): D1That {
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',40,'kho/DE1.json',0,'v1')").run()
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (let i = 0; i < 40; i++) {
-    const q = { qid: `X${i}`, maDe: 'DE1', version: 'v1', group: `g${i}`, phan: 'I', text: `Đề ${i}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Ester', mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: DAP(i), solution: 'x', reviewed: true }
+    const q = { qid: `X${i}`, maDe: 'DE1', lop: '12', version: 'v1', group: `g${i}`, phan: 'I', text: `Đề ${i}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Ester', mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: DAP(i), solution: 'x', reviewed: true }
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
   }
   for (let k = 1; k <= soEm; k++) {

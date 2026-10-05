@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // CẤM RÚT CÂU TỰ LUẬN — MÁY CHỦ (Code 3, 21/09/2026). Đề bài: prompt-cam-rut-tu-luan.md.
 // Thầy: "Tuyệt đối không rút câu tự luận, chỉ được rút câu trắc nghiệm, đúng sai, trả lời ngắn — ở mọi chỗ rút đề, TRỪ màn Gọi lên bảng".
 //
@@ -53,7 +54,7 @@ const SACCHAROSE_QID = qidCua(KHO_THO[5]!)
 function cauRieng(t: Tho, maDe = MA, o: Tho = {}) {
   const phan = String(t.phan)
   return {
-    qid: `${maDe}-${phan}-${String(t.so)}`, maDe, version: 'v1', group: `g-${maDe}-${phan}-${String(t.so)}`, phan, text: String(t.de),
+    qid: `${maDe}-${phan}-${String(t.so)}`, maDe, lop: '12', version: 'v1', group: `g-${maDe}-${phan}-${String(t.so)}`, phan, text: String(t.de),
     choices: phan === 'I' ? Object.values(t.pa as object) : [], ideas: phan === 'II' ? Object.values(t.y as object) : [], hinhAnh: [],
     dang: 'ES.A.X', tenDang: 'Dạng X', mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: String(t.dap_an), solution: 'Giải', reviewed: true, ...o,
   }
@@ -136,7 +137,7 @@ describe('A · game Đảo thần thú (game-v2.ts): chọn phiên, sổ tay, l�
   it('LƯỢT CŨ soạn trước lệnh cấm còn câu tự luận: resume chỉ trả câu rút được, answer câu tự luận bị đóng, complete chỉ đòi câu rút được', async () => {
     const d = dungKho()
     const id = 'LUOT-CU'
-    const ref = (qid: string) => ({ qid, maDe: MA, version: 'v1', group: `g-${qid}`, novel: true })
+    const ref = (qid: string) => ({ qid, maDe: MA, lop: '12', version: 'v1', group: `g-${qid}`, novel: true })
     d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run(id, 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: [ref(`${MA}-I-1`), ref(SACCHAROSE_QID), ref(`${MA}-I-3`)] }), new Date().toISOString())
     const token = await gameToken(d.env, 'S1')
     const r = await gameV2(d.env, 'resume', { token }) as { questions: { qid: string }[] }
@@ -150,7 +151,7 @@ describe('A · game Đảo thần thú (game-v2.ts): chọn phiên, sổ tay, l�
   })
   it('resume: lượt cũ TOÀN câu tự luận ⇒ coi như không có lượt để tiếp tục', async () => {
     const d = dungKho()
-    const ref = (qid: string) => ({ qid, maDe: MA, version: 'v1', group: `g-${qid}`, novel: true })
+    const ref = (qid: string) => ({ qid, maDe: MA, lop: '12', version: 'v1', group: `g-${qid}`, novel: true })
     d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('LUOT-TL', 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: [ref(SACCHAROSE_QID)] }), new Date().toISOString())
     const r = await gameV2(d.env, 'resume', { token: await gameToken(d.env, 'S1') }) as { questions: unknown[] }
     expect(r.questions).toEqual([])

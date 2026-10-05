@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // BI-A · CÂU ĐÃ LÀM (thầy 28/09: "Phải lưu câu đã làm ở game bia nữa. Tôi chưa thấy lưu").
 // Nguyên nhân gốc: Bi-a (và Đoàn) phát CÂU ÔN trước; câu ôn gồm câu sai trong ca kiểm tra đã công bố (nguồn `ca_sai`) — không thuộc chiến dịch nào,
 // mà `hoa2-cau-da-lam` chỉ liệt kê câu của chiến dịch ⇒ em trả lời trong Bi-a xong không thấy. Nay: nhóm "Câu sai trong ca kiểm tra" + nguồn từng lần làm.
@@ -14,7 +15,7 @@ import { chuLanLam } from '../src/components/hoa2/cau-chuyen'
 import type { Env } from '../server/src/kieu'
 
 const NGAY = 86_400_000
-const cau = (qid: string, ma = 'DE1') => JSON.stringify({ qid, maDe: ma, version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: `Cốt lõi ${qid}` } })
+const cau = (qid: string, ma = 'DE1') => JSON.stringify({ qid, maDe: ma, lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: `Cốt lõi ${qid}` } })
 type Muc = { qid: string; chienDichId: string; trangThai: string; lichSu: { ngay: string; dung: boolean; nguon?: string }[] }
 
 async function dung(o: { caSai?: boolean } = {}) {

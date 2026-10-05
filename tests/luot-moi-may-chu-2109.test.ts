@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // ĐỢT 2 "THẦN THÚ MỖI NGÀY" — MÁY CHỦ (prompt-than-thu-moi-ngay-2109.md; Điều 3, 4, 5): kho rút = phần LỚP đã học (bảng đệm lop_da_hoc), quota lượt/ngày (3 sẵn + mở thêm) ở máy chủ, trần 60 câu, chặn câu bài tập về nhà
 // CHƯA nộp, EXP câu thử thách/Lượt trùm, `maiCho`, cờ lùi `cau_hinh.game_luot_moi = 'tat'`. SQLite thật (tests/_d1-that.ts); số viết thẳng.
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -19,7 +20,7 @@ afterEach(() => vi.useRealTimers())
 const gio = (s: string) => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date(`${s}+07:00`)) }
 const NGAY = '2026-09-22'
 const TEN_LOP = '12 - Lớp Thường'
-const cauJson = (qid: string, dang: string, mucDo: string) => ({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['K1'], correct: 'B', solution: { chot: 'Giải' }, reviewed: true })
+const cauJson = (qid: string, dang: string, mucDo: string) => ({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['K1'], correct: 'B', solution: { chot: 'Giải' }, reviewed: true })
 
 /** Lớp 12 (mặc định "12 - Lớp Thường"): em S1 + bạn S2. Kho: A-0…A-39 dạng A.1 (bài cá nhân hoá giao cho bạn S2 ⇒ lớp đã học), B-0…B-7 dạng B.2 (chưa ai học), C-0…C-7 dạng C.3 (ca lớp sẽ đóng). */
 function dung(o: { mucDoA?: string; daHoc?: boolean } = {}): D1That {
@@ -154,7 +155,7 @@ describe('vai tương thích với máy em đang sống', () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung()
     const iso = new Date().toISOString()
-    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('SV', 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: ['moi', 'trum', 'yeu', 'lap', 'thu_thach', 'toi_han'].map((role, i) => ({ qid: `A-${i + 1}`, maDe: 'DE1', version: 'v1', group: `g-A-${i + 1}`, novel: true, role })) }), iso)
+    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('SV', 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: ['moi', 'trum', 'yeu', 'lap', 'thu_thach', 'toi_han'].map((role, i) => ({ qid: `A-${i + 1}`, maDe: 'DE1', lop: '12', version: 'v1', group: `g-A-${i + 1}`, novel: true, role })) }), iso)
     const r = await start(d) // lượt chờ (chưa trả lời câu nào) ⇒ trả lại chính nó
     expect(r.id).toBe('SV')
     expect(r.questions.map((c: any) => [c.role, c.roleV2])).toEqual([['lap', 'moi'], ['thu_thach', 'trum'], ['yeu', 'yeu'], ['lap', 'lap'], ['thu_thach', 'thu_thach'], ['toi_han', 'toi_han']])

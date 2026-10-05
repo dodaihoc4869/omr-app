@@ -10,6 +10,7 @@ import { gomDiemNhan, thuongNhan, type BangChungCau, type LichSuCuaEm } from '..
 import { chuHan } from './canh-bao-thay'
 import { protectedQuestions, readScope } from './game-v2-bank'
 import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { mom } from './mom'
@@ -330,7 +331,8 @@ export async function phGiaoThem(env: Env, b: Record<string, unknown>, nowMs: nu
   const tuChoi = (ma: string, lyDo: string[]): Row => ({ ...base, conLaiHomNay: conLai(cacHang), ...(g0 ? { goiGanNhat: g0 } : {}), tuChoi: { ma, lyDo } })
   if (kq.tuChoi) return tuChoi(kq.tuChoi.ma, kq.tuChoi.lyDo)
 
-  const { cau, thucTe } = chonQid(kq.thanhPhan, nguon)
+  const { cau: cauChon, thucTe } = chonQid(kq.thanhPhan, nguon)
+  const cau = await chanKhacKhoiEm(env, 'ph_giao_them', sbd, cauChon) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối con
   const h = nguon.dauVao.hoSo
   if (cau.length < GIAO_THEM.TOI_THIEU_MOI_GOI) {
     const vap = h.dang.reduce((t, d) => t + d.soKhaDungDungBac + d.soKhaDungThapHon, 0)

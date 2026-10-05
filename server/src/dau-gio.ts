@@ -20,6 +20,7 @@
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { ghiSuKien, ngayVn } from './su-kien-hoc'
+import { chanKhacKhoiTheoEm } from './chan-khac-khoi'
 // Mốc dạy lại của Sổ nợ (trợ lý A, docs/so-no-2909/HOP-DONG.md mục 2): ghi `srs2_day_lai` ⇒ đếm sai về 0, câu quay lại kế hoạch hôm sau.
 import { ghiMocDayLai } from './srs2-d1'
 import { chuLichSuCau, tenNguonNgan, xepUngVien, TOI_DA_EM_MOI_LUOT, TOI_DA_UNG_VIEN_MOI_EM, type LanLamNgan, type UngVienCau } from '../../src/lib/dau-gio'
@@ -105,7 +106,7 @@ async function cauDaDung(env: Env, sbd: readonly string[], qidLoc?: readonly str
     ds.push({ qid: str(x.qid), soLan: num(x.n), dungLanDau: dau.endsWith('1'), lanCuoi: cuoi.slice(0, -1) })
     ra.set(em, ds)
   }
-  return ra
+  return chanKhacKhoiTheoEm(env, 'dau_gio', ra) // LUẬT THẦY 05/10: ứng viên hỏi đầu giờ chỉ câu ĐÚNG khối từng em (câu khác khối đã lọt vào sổ không được gọi)
 }
 
 async function daKetThuc(env: Env, buoiId: string): Promise<boolean> {

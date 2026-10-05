@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // LÁT CẮT 1 — CHỐNG LẶP CÂU + CẤP PHÁT RETRY/CẠNH TRANH (thầy 24/09: chỉ 3 nhóm; nhóm 1 = chống lặp câu).
 // CA TÍCH HỢP ĐƯỜNG THẬT: gọi ĐÚNG route của Worker (`/game-v2/start` = lượt Đảo + nguồn câu cá nhân của Đoàn, `/hs/thu-thach-hom-nay` = thử thách riêng)
 // trên D1 THẬT (node:sqlite, nạp đủ schema + migration) với dữ liệu TỔNG HỢP. Ba điều bắt buộc kiểm:
@@ -17,7 +18,7 @@ beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) 
 afterEach(() => vi.useRealTimers())
 
 const cau = (qid: string, dang: string, mucDo: 'biet' | 'hieu' | 'van_dung' = 'biet', phan: 'I' | 'II' = 'I') => ({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Đề ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Đề ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
   hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['K1'], correct: phan === 'II' ? 'DSDS' : 'B', solution: `LG-${qid}`, reviewed: true,
 })
 
@@ -94,7 +95,7 @@ describe('LÁT 1 · /game-v2/start (lượt Đảo — nguồn câu cá nhân c�
 describe('LÁT 1 · /parent-news/assign (bài hằng ngày của phụ huynh): giao MỘT lần/ngày khi retry/cạnh tranh', () => {
   const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Em Một','12','x')").run()
   const cauKho = (qid: string, dang: string, mucDo = 'hieu') => ({
-    qid, maDe: 'DE12', version: 'v', group: `g-${qid}`, phan: 'I', text: `Chọn phát biểu đúng về ${qid}.`,
+    qid, maDe: 'DE12', lop: '12', version: 'v', group: `g-${qid}`, phan: 'I', text: `Chọn phát biểu đúng về ${qid}.`,
     choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [], dang, tenDang: `Tên ${dang}`, mucDo, sao: 1,
     kienThuc: ['k1'], correct: 'B', solution: 'Lời giải ngắn', reviewed: true,
   })

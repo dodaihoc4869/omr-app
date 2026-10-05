@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // THẦY BÁO 30/09 (hai ảnh cùng một vùng):
 //   (1) Sảnh "Bi-a Phản Ứng · còn 10/18 câu": vào bàn, CHƯA trả lời câu nào, thoát ra (app tải lại / đóng app / Về) ⇒ mất 8 câu (18 → 10).
 //       Gốc: số "còn" trừ cả câu đang nằm trên bàn Bi-a còn mở của em (7 bi + Câu chốt = 8). Sửa: Sảnh chỉ trừ câu ĐÃ trả lời.
@@ -20,7 +21,7 @@ import type { Env } from '../server/src/kieu'
 const NGAY = 86_400_000
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: `Cốt lõi ${qid}` },
   })
 }
