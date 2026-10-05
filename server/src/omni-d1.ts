@@ -51,9 +51,14 @@ export async function soLuotHomNay(env: Env, sbd: string, nowMs: number): Promis
   return 0
 }
 /** Phần OMNI thêm vào `hoa2-sanh` (null khi OMNI tắt cho em). `kh`, `hs` là kế hoạch + hồ sơ srs2 sanh2 đã đọc (khỏi đọc lại). */
-export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { tong: number; con: number; chienDichId: string | null }): Promise<SanhOmni | null> {
+export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { tong: number; con: number; chienDichId: string | null; onBaiCu?: number; cheDoCho?: boolean }): Promise<SanhOmni | null> {
   void env; void sbd; void nowMs; void ngu
   return null
+}
+/** "Hôm nay em tiến thêm gì": 2–5 dòng từ sổ hôm nay + hồ sơ (P vi kỹ năng trước/sau, câu nền đúng, sơ ý, đúng nhưng chậm). Rỗng ⇒ []. */
+export async function nhatKyHomNay(env: Env, sbd: string, nowMs: number): Promise<string[]> {
+  void env; void sbd; void nowMs
+  return []
 }
 /** Phần OMNI thêm vào `/ph/hoc-2` (null khi tắt). */
 export async function omniChoPh(env: Env, sbd: string, nowMs: number): Promise<PhOmni | null> {
