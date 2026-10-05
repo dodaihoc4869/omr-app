@@ -666,7 +666,7 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
       {xem && quaTai.length > 0 && (
         <p className="dh-loi" role="alert" data-khoi="qua-tai">
           {quaTai.length} em quá tải ngay từ ngày đầu: {quaTai.slice(0, TOI_DA_TEN_QUA_TAI).map((e) => e.ten).join(', ')}
-          {quaTai.length > TOI_DA_TEN_QUA_TAI ? ` và ${quaTai.length - TOI_DA_TEN_QUA_TAI} em nữa` : ''}. Gợi ý: bỏ tờ “Các dạng toán trọng tâm”, lùi hạn nộp hoặc tăng số lượt mỗi
+          {quaTai.length > TOI_DA_TEN_QUA_TAI ? ` và ${quaTai.length - TOI_DA_TEN_QUA_TAI} em nữa` : ''}. Gợi ý: bỏ bớt tờ ở trên, lùi hạn nộp hoặc tăng số lượt mỗi
           ngày. Vẫn giao được.
         </p>
       )}
