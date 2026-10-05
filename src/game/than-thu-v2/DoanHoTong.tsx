@@ -18,7 +18,8 @@ import DoanTiepSuc from './DoanTiepSuc'
 import { ManHinhAnh } from '../../components/QuestionMedia'
 import { unlockBattleAudio } from './battle-audio'
 import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
-import { docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
+import { coOmniTrongSanh, docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
+import { docKetQuaOmni, lanDauChamChip, thanOmniTraLoi } from '../../lib/omni-hs'
 import KetChang2 from './doan2/KetChang2'
 import './doan.css'
 import './doan2/doan2.css'
@@ -52,6 +53,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   // mạng điện thoại 1–2 giây làm em đổi ý bấm lại bị nuốt ⇒ máy lấy đáp án bấm ĐẦU (thầy 19:24: "đáp án bị nhảy").
   const [dangChot, setDangChot] = useState(false)
   const [chon, setChon] = useState(''), [hanhDong, setHanhDong] = useState<HanhDong>('danh'), [yChon, setYChon] = useState<Record<number, 'D' | 'S'>>({})
+  // OMNI 3 (05/10): `hoa2-sanh` có `omni` ⇒ `doan-nop` thêm `msLam` (từ lúc câu hiện tới lúc chốt) + `tuTin` khi chip "Chưa chắc" bật. Tắt ⇒ y hệt cũ.
+  // Trạm hồi phục KHÔNG mở trong Đoàn nhiều người (hợp đồng mục A).
+  const [omniBat, setOmniBat] = useState(false), [chuaChac, setChuaChac] = useState(false), [goiYChip, setGoiYChip] = useState(false), mocCau = useRef(0)
   const [ketQuaCau, setKetQuaCau] = useState<KetQuaCau | null>(null), [cauVuaLam, setCauVuaLam] = useState<CauVuaLam | null>(null)
   const [tungChuong, setTungChuong] = useState<KhungNhinHiep | null>(null), [loiGiaiTrum, setLoiGiaiTrum] = useState<LoiGiaiTrum | null>(null)
   const [goiYThe, setGoiYTiepSuc] = useState<GoiYTiepSuc | null>(null), [expTiepSuc, setExpTiepSuc] = useState(0)
@@ -78,14 +82,14 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (d.cau?.qid && goiYNay) goiYCau.current.set(d.cau.qid, goiYNay)
     moc.current = { luc: performance.now(), conMs: d.tran?.conMs ?? 0, moSauMs: d.tran?.moSauMs ?? 0 }
     const hiep = d.tran?.hiep ?? 0
-    if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0) }
+    if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0); setChuaChac(false); setGoiYChip(false) }
     const vua = d.hiepVuaXong
     if (vua && vua.hiep > hiepDaChieu.current) { hiepDaChieu.current = vua.hiep; setTungChuong(vua); setLoiGiaiTrum(null) }
     setXem(d)
   }, [sbd])
 
   // Đọc `hoa2-sanh` KHÔNG qua `goi` (không khoá nút, không hiện lỗi): lỗi / máy chủ cũ ⇒ giữ nguyên chế độ đang có.
-  const docLaiHoa2 = useCallback(() => call('hoa2-sanh').then(r => { const h = docHoa2(r); if (song.current) datHoa2(h); return h }).catch(() => undefined), [call, datHoa2])
+  const docLaiHoa2 = useCallback(() => call('hoa2-sanh').then(r => { const h = docHoa2(r); if (song.current) { datHoa2(h); setOmniBat(h !== null && coOmniTrongSanh(r)) } return h }).catch(() => undefined), [call, datHoa2])
 
   const goi = useCallback(async (lenh: string, data: Record<string, unknown> = {}) => {
     if (khoa.current) return null
@@ -149,6 +153,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const conGiay = Math.ceil(Math.max(0, moc.current.conMs - Math.max(0, troi - moc.current.moSauMs)) / 1000)
   // Hiệp vừa mở hoặc vừa hết giờ → hỏi ngay, không chờ nhịp.
   const daMo = moSauGiay <= 0
+  // OMNI 3: mốc "câu hiện" cho `msLam` — câu mới / hiệp mới / hiệp vừa mở (hết quãng chuẩn bị).
+  useEffect(() => { mocCau.current = performance.now() }, [xem?.cau?.qid, xem?.tran?.hiep, daMo])
   useEffect(() => { if (xem?.batDau && !xem.tran?.ketThuc && !khoa.current) void call('doan-xem', { ma: xem.ma }).then(r => apDung(r as PhanHoiDoan)).catch(() => {}) }, [daMo, conGiay <= 0]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Gợi ý của Đảo (`recommendations`) chỉ cho danh sách "câu của riêng em"; hết lượt + số lượt là của ĐOÀN (doan-sanh). Chưa có số của Đoàn (máy chủ cũ) ⇒ không khoá theo lượt.
@@ -162,9 +168,11 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     unlockBattleAudio()
     setDangChot(true)
     let r: PhanHoiDoan | null = null
-    try { r = await goi('doan-nop', boTrong ? { ma: xem.ma, hiep: tran.hiep, boTrong: true, hanhDong: 'chan' } : { ma: xem.ma, hiep: tran.hiep, answer: chon, hanhDong }) } finally { if (song.current) setDangChot(false) }
+    try { r = await goi('doan-nop', boTrong ? { ma: xem.ma, hiep: tran.hiep, boTrong: true, hanhDong: 'chan' } : { ma: xem.ma, hiep: tran.hiep, answer: chon, hanhDong, ...thanOmniTraLoi(omniBat, performance.now() - mocCau.current, chuaChac) }) } finally { if (song.current) setDangChot(false) }
     if (!r) return
-    const kq = r.ketQuaCau ?? null
+    // OMNI 3: lời nhắn một dòng của máy chủ (đúng nhưng chậm, lướt…) đi kèm kết quả câu — đọc ở `omni` của phản hồi hoặc của `ketQuaCau`.
+    const om = omniBat ? docKetQuaOmni((r as { omni?: unknown }).omni ?? (r.ketQuaCau as { omni?: unknown } | undefined)?.omni) : null
+    const kq = r.ketQuaCau ? (om?.loiNhan ? { ...r.ketQuaCau, loiNhan: om.loiNhan } : r.ketQuaCau) : null
     // Đi một mình thì chốt xong hiệp giải NGAY và máy chủ đã sang hiệp mới: kết quả này thuộc hiệp cũ, chỉ hiện ở quãng nghỉ (cauVuaLam).
     if (r.doan?.tran?.hiep === tran.hiep) setKetQuaCau(kq)
     if (kq?.reward) setExpNhan(n => n + (kq.reward ?? 0))
@@ -228,6 +236,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
       onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
       onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum}
       cheDo2={laHoa2} goiY={xem.cau?.qid ? goiYCau.current.get(xem.cau.qid) ?? null : null} oPhucKich={hoa2?.doanCon ?? null}
+      {...(omniBat ? { chuaChac, goiYChip, onChuaChac: (v: boolean) => { setChuaChac(v); if (lanDauChamChip(sbd)) setGoiYChip(true) } } : {})}
       onDanhTiep={danhTiep} nhanTiep={giuCuoi ? 'XEM KẾT QUẢ CHUYẾN' : undefined} />
   )
 

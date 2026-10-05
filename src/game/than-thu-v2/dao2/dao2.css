@@ -493,3 +493,8 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 @media (max-width:1023px) and (orientation:portrait){
  .dao2 .dao2-canh{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;height:clamp(130px,22vh,190px);box-shadow:0 10px 18px -8px rgba(0,0,0,.55)}
 }
+/* OMNI 3 (05/10) · chip "Chưa chắc" cạnh chip Trợ giúp: máy hẹp (≤ 400 px) vẫn giữ chữ — hai công tắc trơn đứng cạnh nhau không phân biệt được. */
+@media (max-width:400px){.dao2 .dao2-tro[data-khoi="chua-chac"] .dao2-tro-chu{display:inline}}
+/* OMNI 3 · ĐỀ THỬ: CHỈ bố cục — danh sách thẻ câu giấy của Đảo (dọc như ải), rộng tối đa 760 px cho dễ đọc; màu/nút dùng lại lớp sẵn có. */
+.dao2 .dao2-de-thu{display:flex;flex-direction:column;gap:12px;max-width:760px}
+.dao2 .dao2-de-thu-cau{display:flex;flex-direction:column;gap:6px}

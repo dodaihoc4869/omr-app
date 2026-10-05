@@ -14,6 +14,7 @@ import Canh2 from './doan2/Canh2'
 import BuaTroGiang from './doan2/BuaTroGiang'
 import XemLaiChuan from './doan2/XemLaiChuan'
 import type { GoiYM3 } from './doan2/kieu2'
+import { CHIP_CHUA_CHAC, GOI_Y_CHIP_CHUA_CHAC } from '../../lib/omni-chu'
 
 export interface CauVuaLam { q: Question; chon: string; ketQua: KetQuaCau | null; /** Chỉ-thêm: hiệp của câu (để biết câu này đã là "câu vừa rồi" chưa). */ hiep?: number }
 export interface LoiGiaiTrum { hiep: number; de: Question; answer: string; solution: unknown }
@@ -30,6 +31,8 @@ interface Props {
   cheDo2?: boolean; /** Gợi ý M3 (Bùa Trợ giảng) của câu đang chơi. */ goiY?: GoiYM3 | null; /** Ổ phục kích (câu ôn) còn lại hôm nay; null = chưa biết. */ oPhucKich?: number | null
   /** Chỉ-thêm (Hóa 2.0): có ⇒ quãng nghỉ giữ nguyên lời giải, KHÔNG đồng hồ, tới khi em bấm nút này (`nhanTiep`, mặc định "ĐÁNH TIẾP"). */
   onDanhTiep?: () => void; nhanTiep?: string
+  /** OMNI 3 (chỉ-thêm; vắng ⇒ không chip, DOM như cũ): chip "Chưa chắc" (nút phụ cùng kiểu "Cần tiếp sức") — bật ⇒ `doan-nop` gửi `tuTin:'chua_chac'`. */
+  chuaChac?: boolean; onChuaChac?: (v: boolean) => void; /** Lần đầu trong ngày em chạm chip ⇒ một dòng gợi ý nhỏ. */ goiYChip?: boolean
 }
 
 const phut = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -229,6 +232,8 @@ export default function DoanTran(p: Props) {
         <button type="button" aria-pressed={p.hanhDong === 'chan'} onClick={() => p.onHanhDong('chan')}>{BieuTuong.chan}<b>Chắn</b><small>+{CHAN} giáp cho Linh Tâm</small></button>
         <button type="button" aria-pressed={p.hanhDong === 'ky_nang'} disabled={tran.nangLuong < NL_KY_NANG} onClick={() => p.onHanhDong('ky_nang')}>{BieuTuong.ky_nang}<b>{tenKyNang}</b><small>{cau?.an ? `ấn sáng ×1,25 · Năng lượng ${tran.nangLuong}/${NL_KY_NANG}` : `Năng lượng ${tran.nangLuong}/${NL_KY_NANG}`}</small></button>
       </div>
+      {p.onChuaChac && p.de && !cau?.rut && <button type="button" className="dh-xin" data-vung="chua-chac" aria-pressed={!!p.chuaChac} title={GOI_Y_CHIP_CHUA_CHAC} style={{ minHeight: 44 }} onClick={() => p.onChuaChac!(!p.chuaChac)}>{CHIP_CHUA_CHAC}</button>}
+      {p.onChuaChac && p.goiYChip && <div className="dh-cho" data-vung="goi-y-chua-chac" style={{ fontSize: 12 }}>{GOI_Y_CHIP_CHUA_CHAC}</div>}
       {ts && !ts.theNhan && !cau?.rut && (ts.conLuotNhan > 0
         ? <button type="button" className="dh-xin" aria-pressed={ts.daXin} disabled={p.ban} onClick={() => p.onXinTiepSuc(!ts.daXin)}>{ts.daXin ? 'Đang chờ bạn tiếp sức… (chạm để thôi)' : `Cần tiếp sức · còn ${ts.conLuotNhan} lần được tiếp sức`}</button>
         : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chuyến này — câu này em tự làm nhé.</div>)}
