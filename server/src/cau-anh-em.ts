@@ -27,7 +27,7 @@ import { khoiCuaMaDe } from '../../src/lib/khoi-cau'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
-import { bacMuc, boiCanh, hopLeChung, lamHomNay, metaTheoDang, napTheoThuTu, phamViChon, xepUngVien, type BoiCanh, type PhamViChon } from './omni-game'
+import { bacMuc, boiCanh, docChiMucTheoDang, hopLeChung, lamHomNay, metaTheoDang, napTheoThuTu, phamViChon, xepUngVien, type BoiCanh, type PhamViChon } from './omni-game'
 import { ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
 import { napDayDuMem } from './game-v2-bank'
 import { readGameScope } from './game-v2-reports'
@@ -73,9 +73,9 @@ async function docLopTo(env: Env, maDe: readonly string[]): Promise<Map<string, 
  * `chan`: câu/nhóm bị chặn ở lượt này (ca thi, Bi-a đang giữ, đang phát ở phiên khác) — câu anh em cũng tránh. Công tắc tắt ⇒ trả y nguyên (đường hôm
  * nay). Lỗi đọc khi chọn câu anh em ⇒ rơi xuống bậc 3/4 cho câu ấy (không làm hỏng lượt).
  */
-export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: PrivateQuestion; m: MetaCau }[], bc: BoiCanhLamLai, chan: ReadonlySet<string> = new Set()): Promise<CauLuot[]> {
+export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: PrivateQuestion; m: MetaCau }[], bc: BoiCanhLamLai, chan: ReadonlySet<string> = new Set(), som?: DocSomLamLai): Promise<CauLuot[]> {
   const can = new Set(ds.filter((x) => tachSongSinh(x.q.qid).songSinh === null && canBanKhac(hs, x.q.qid)))
-  if (!can.size || !(await lamLaiKhacBat(env))) return [...ds]
+  if (!can.size || !(await (som?.bat ?? lamLaiKhacBat(env)))) return [...ds]
   const ngay = ngayVnCua(bc.nowMs)
   let chung: Promise<ChungAnhEm> | null = null // phạm vi + bối cảnh đọc MỘT lần cho cả lượt, và chỉ khi có câu cần
   const daDung = new Set(ds.map((x) => tachSongSinh(x.q.qid).goc)), nhomDung = new Set(ds.map((x) => x.m.group))
@@ -86,7 +86,7 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
     const ss = phuNeuCan(x.q, hs.songSinhLamLai, hs.boTro)
     if (ss.qid !== x.q.qid) { ra.push({ ...x, q: ss }); continue }
     // Bậc 2: câu anh em.
-    const ae = await chonCauAnhEm(env, bc, x.m, (chung ??= chungAnhEm(env, bc, chan)), daDung, nhomDung)
+    const ae = await chonCauAnhEm(env, bc, x.m, (chung ??= som?.chung ?? chungAnhEm(env, bc, chan)), daDung, nhomDung, som?.chiMuc)
       .catch((e: unknown) => { console.error('[cau-anh-em] không chọn được câu anh em (rơi xuống bậc 3/4):', e instanceof Error ? e.message : e); return null })
     if (ae) { daDung.add(ae.m.qid); nhomDung.add(ae.m.group); ra.push({ q: ae.q, m: ae.m, lamLai: { tc: x.q.qid } }); continue }
     // Bậc 3: bản xáo (muối theo em + ngày + câu + lần: số lần sai, số ngày đã đúng sau lần sai cuối).
@@ -100,7 +100,9 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
 }
 
 /** Đọc chung cho cả lượt (một lần): phạm vi, bối cảnh, kế hoạch, câu bị chặn; đệm meta theo dạng + lớp của tờ (nhiều câu lỗi cùng dạng/tờ ⇒ không đọc lại). */
-interface ChungAnhEm { pv: PhamViChon; bc: BoiCanh; keHoach: Set<string>; chan: Set<string>; theoDang: Map<string, Promise<MetaCau[]>>; lopTo: Map<string, string | null> }
+interface ChungAnhEm { pv: PhamViChon; bc: BoiCanh; keHoach: Set<string>; chan: Set<string>; theoDang: Map<string, Promise<MetaCau[]>>; lopTo: Map<string, string | null>
+  /** Tối ưu 05/10: `lop` của MỌI tờ ứng viên một dạng (tập cha của tờ cần kiểm khối), đọc CÙNG đợt meta của dạng ấy. */
+  lopSom: { ma: ReadonlySet<string>; p: Promise<Map<string, string>> }[] }
 async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>): Promise<ChungAnhEm> {
   // `boiCanh` ném khi không đọc được tập câu bảo vệ ca thi ⇒ không chọn câu anh em (thà không phát còn hơn lộ câu ca thi).
   const [pv, boi, pham] = await Promise.all([
@@ -112,8 +114,29 @@ async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>
     pv, bc: boi,
     keHoach: new Set((bc.keHoach ?? []).map((k) => tachSongSinh(qidGoc(k)).goc)),
     chan: new Set([...chan, ...(Array.isArray(pham?.blocked) ? pham.blocked.map(String) : [])]),
-    theoDang: new Map(), lopTo: new Map(),
+    theoDang: new Map(), lopTo: new Map(), lopSom: [],
   }
+}
+
+/**
+ * ĐỌC SỚM của thang (tối ưu 05/10): `napLuot` gọi NGAY khi biết câu của lượt (trước khi nạp câu) — công tắc, phần đọc chung (phạm vi, bối cảnh, câu
+ * thầy chặn) và chỉ mục câu cùng dạng chạy CÙNG đợt nạp câu thay vì 4–5 đợt nối tiếp sau đó. Chỉ khi lượt có câu CHẮC tới bậc 2 nếu nạp được: câu gốc
+ * trong cửa sổ lỗi mà không có song sinh dùng được (luật 02/10 lẫn bậc 1) ⇒ lượt không cần thì không đọc thêm gì. Đều là ĐỌC, không ghi nào xen giữa
+ * (lượt đọc cũ cũng chạy sau lô đóng phiên Bi-a, trước lô ghi phiên) ⇒ cùng dữ liệu; `apLamLaiKhac` vẫn quyết y hệt (đoán thừa ⇒ phí vài lượt đọc).
+ */
+export interface DocSomLamLai { bat: Promise<boolean>; chung: Promise<ChungAnhEm>; chiMuc: ReadonlyMap<string, Promise<Record<string, unknown>[]>> }
+const coSongSinh = (chon: ReadonlyMap<string, number> | undefined, boTro: HoSo2['boTro'], q: string): boolean => {
+  const i = chon?.get(q)
+  return i !== undefined && i >= 0 && !!boTro?.get(q)?.songSinh[i]
+}
+export function batDauLamLaiKhac(env: Env, hs: HoSo2, qids: readonly string[], bc: BoiCanhLamLai, chan: ReadonlySet<string>): DocSomLamLai | undefined {
+  const can = qids.filter((q) => tachSongSinh(q).songSinh === null && canBanKhac(hs, q) && !coSongSinh(hs.songSinhCho, hs.boTro, q) && !coSongSinh(hs.songSinhLamLai, hs.boTro, q))
+  if (!can.length) return undefined
+  const chiMuc = new Map<string, Promise<Record<string, unknown>[]>>()
+  for (const q of can) { const d = hs.meta.get(q)?.dang; if (d && !chiMuc.has(d)) chiMuc.set(d, docChiMucTheoDang(env, d)) }
+  const ra: DocSomLamLai = { bat: lamLaiKhacBat(env), chung: chungAnhEm(env, bc, chan), chiMuc }
+  for (const p of [ra.bat, ra.chung, ...chiMuc.values()]) p.catch(() => {}) // đoán thừa / lỗi ⇒ nơi dùng tự nhận lỗi như cũ, không treo lỗi
+  return ra
 }
 
 /**
@@ -121,7 +144,7 @@ async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>
  * câu/nhóm đã có trong lượt hay kế hoạch hôm nay, không bị chặn, hợp lệ chung (`hopLeChung` ⇒ `cauHopKhoi`), chưa làm hôm nay, chưa gặp hoặc gặp quá
  * NGAY_GAP_LAI ngày. Xếp tất định (`xepUngVien`, muối em|ngày|Q) rồi nạp bản đầy đủ của câu đầu còn trong kho. Không có ⇒ null.
  */
-async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Promise<ChungAnhEm>, daDung: ReadonlySet<string>, nhomDung: ReadonlySet<string>): Promise<{ q: PrivateQuestion; m: MetaCau } | null> {
+async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Promise<ChungAnhEm>, daDung: ReadonlySet<string>, nhomDung: ReadonlySet<string>, chiMucSom?: DocSomLamLai['chiMuc']): Promise<{ q: PrivateQuestion; m: MetaCau } | null> {
   if (!m.dang) return null
   const chung = await chungP
   const { pv, bc, keHoach, chan } = chung
@@ -131,14 +154,24 @@ async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Pro
   const khoang = (x: MetaCau): number => { if (bacQ == null) return 0; const b = bacMuc(x.mucDo); return b == null ? 9 : Math.abs(b - bacQ) }
   const lauRoi = (x: MetaCau): boolean => !bc.daLam.has(x.qid) || bc.daLam.get(x.qid)! <= lb.nowMs - NGAY_GAP_LAI * NGAY_MS
   let theoDang = chung.theoDang.get(m.dang)
-  if (!theoDang) { theoDang = metaTheoDang(env, m.dang, pv); chung.theoDang.set(m.dang, theoDang) }
+  if (!theoDang) {
+    // Tối ưu 05/10: chỉ mục dạng đọc sớm (nếu có) + `lop` của mọi tờ ứng viên đọc CÙNG đợt meta (trước: một đợt riêng sau khi lọc).
+    const khiCoMaTo = (maTo: string[]): void => { const p = docLopTo(env, maTo); p.catch(() => {}); chung.lopSom.push({ ma: new Set(maTo), p }) }
+    theoDang = metaTheoDang(env, m.dang, pv, { chiMuc: chiMucSom?.get(m.dang), khiCoMaTo })
+    chung.theoDang.set(m.dang, theoDang)
+  }
   const truoc = (await theoDang).filter((x) =>
     x.qid !== m.qid && x.phan === m.phan && x.group !== m.group && !daDung.has(x.qid) && !nhomDung.has(x.group) && !keHoach.has(x.qid)
     && !chan.has(x.qid) && !chan.has(x.group) && hopLeChung(x, bc) && !lamHomNay(x.qid, bc) && khoang(x) <= 1 && lauRoi(x)
     && [khoiCuaMaDe(x.maDe), khoiCuaMaDe(x.qid)].every((k) => k === null || k === khoi)) // lọc nhanh: mã tờ/qid không lệch khối; đủ luật `dungKhoi` (kèm `lop` của tờ) ngay dưới
   if (!truoc.length) return null
   const canDoc = [...new Set(truoc.map((x) => x.maDe))].filter((ma) => !chung.lopTo.has(ma))
-  if (canDoc.length) { const doc = await docLopTo(env, canDoc); for (const ma of canDoc) chung.lopTo.set(ma, doc.get(ma) ?? null) }
+  if (canDoc.length) {
+    // Lượt đọc sớm PHỦ đủ tờ cần ⇒ dùng nó (cùng bảng, không ghi nào xen giữa ⇒ cùng số; lỗi đọc ⇒ ném như cũ); không thì đọc như cũ.
+    const som = chung.lopSom.find((x) => canDoc.every((ma) => x.ma.has(ma)))
+    const doc = await (som ? som.p : docLopTo(env, canDoc))
+    for (const ma of canDoc) chung.lopTo.set(ma, doc.get(ma) ?? null)
+  }
   const ung = truoc.filter((x) => dungKhoi(x, chung.lopTo.get(x.maDe), khoi))
   if (!ung.length) return null
   const thu = xepUngVien(ung, bc, khoang, `${lb.sbd}|${ngayVnCua(lb.nowMs)}|${m.qid}`)

@@ -131,10 +131,9 @@ async function cauHinhLuu(env: Env, b: Row, nowMs: number) {
 async function tenEm(env: Env, ds: readonly string[]): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
   if (!ds.length) return ra
-  for (const bang of ['danh_sach', 'hoc_sinh']) {
-    const r = await env.DB.prepare(`SELECT sbd, ho_ten FROM ${bang} WHERE sbd IN (SELECT value FROM json_each(?))`).bind(JSON.stringify([...new Set(ds)])).all<Row>().catch(() => ({ results: [] as Row[] }))
-    for (const x of r.results ?? []) if (str(x.ho_ten).trim()) ra.set(str(x.sbd), str(x.ho_ten).trim())
-  }
+  // Tối ưu 05/10: hai bảng đọc CÙNG đợt (trước: nối tiếp); ghép đúng thứ tự cũ (hoc_sinh đè danh_sach).
+  const kq = await Promise.all(['danh_sach', 'hoc_sinh'].map((bang) => env.DB.prepare(`SELECT sbd, ho_ten FROM ${bang} WHERE sbd IN (SELECT value FROM json_each(?))`).bind(JSON.stringify([...new Set(ds)])).all<Row>().catch(() => ({ results: [] as Row[] }))))
+  for (const r of kq) for (const x of r.results ?? []) if (str(x.ho_ten).trim()) ra.set(str(x.sbd), str(x.ho_ten).trim())
   return ra
 }
 const vknCuaCau = (c: QCau): string[] => [...new Set([...c.vkn, ...(c.vknY ?? []).flat()])]
@@ -165,14 +164,18 @@ export function nenYeuNhat(hsDs: readonly Pick<HoSoOmniEm, 'vkn'>[], ids: Iterab
 async function bang(env: Env, id: string, nowMs: number): Promise<Record<string, unknown>> {
   const cd = await docChienDichTheoId(env, id)
   if (!cd) return { ok: false, error: 'Không tìm thấy chiến dịch.' }
-  await capNhatChungChi(env, cd.id, nowMs).catch(() => null) // chứng chỉ lười (chỉ-thêm)
+  await capNhatChungChi(env, cd.id, nowMs, cd).catch(() => null) // chứng chỉ lười (chỉ-thêm) — dùng lại chiến dịch vừa đọc (tối ưu 05/10)
   const ts = await docThamSoOmni(env)
-  const [hsMap, qMap, kho, ten, hc, them, nut] = await Promise.all([
-    hoSoOmniNhieuEm(env, cd.sbd, nowMs), qCuaCau(env, cd.qids), docCauKho(env, cd.qids), tenEm(env, cd.sbd), docHieuChuan(env, ts), docMocThemCaLop(env, cd.id),
+  // Tối ưu 05/10: trạng thái lớp (lần làm, dạy lại, loại câu; mốc thêm em chỉ dùng lúc ghép) bắt đầu NGAY, song song hồ sơ OMNI (trước: chờ cả lô dưới).
+  const pThem = docMocThemCaLop(env, cd.id)
+  const pTt = trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, undefined, pThem)
+  pTt.catch(() => {})
+  const [hsMap, qMap, kho, ten, hc, , nut] = await Promise.all([
+    hoSoOmniNhieuEm(env, cd.sbd, nowMs), qCuaCau(env, cd.qids), docCauKho(env, cd.qids), tenEm(env, cd.sbd), docHieuChuan(env, ts), pThem,
     env.DB.prepare("SELECT sbd, qid, buoc FROM nut_that WHERE trang_thai = 'cho' AND sbd IN (SELECT value FROM json_each(?)) ORDER BY gui_luc, id")
       .bind(JSON.stringify(cd.sbd)).all<Row>().then((r) => r.results ?? []).catch(() => [] as Row[]),
   ])
-  const tt = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, undefined, them)
+  const tt = await pTt
   const cau = cd.qids.map((q) => qMap.get(q)!).filter(Boolean)
   const stt = new Map(cd.qids.map((q, i) => [q, i + 1]))
   const dungKhoiLop = new Set(await chanKhacKhoiLop(env, 'omni_can_thay_chua', { lop: cd.lop, sbd: cd.sbd }, cd.qids)) // LUẬT THẦY 05/10: "Cần thầy chữa" chỉ câu ĐÚNG khối lớp

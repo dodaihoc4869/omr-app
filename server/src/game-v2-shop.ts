@@ -15,9 +15,10 @@ import { ducVang } from './vang-duc'
 import { cuaP08Mo, doiVangQuaP08 } from './cnh-exp-adapter'
 import { tramP08LenHienThi } from './cnh-exp-p08-hien-thi'
 
-import type { Env } from './kieu'
+import type { D1Result, Env } from './kieu'
 import type { Profile } from './game-v2'
 import { DemTTL } from './dem-chung'
+import { BANG_CAU_HINH, nhoTheoLuot } from './doc-d1-theo-luot'
 import { DOT_MO_BAN, MUA_BAN, PHIEN_BAN, O_GAN, docMonPhuKien, monDangBan, type MonPhuKien, type OGanPhuKien } from '../../src/lib/phu-kien-danh-muc'
 import { docAnThach } from './game-v2-doan-an'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
@@ -58,7 +59,12 @@ function coMo(giaTri: string | null | undefined, sbd: string): boolean {
 }
 /** Lệnh GHI tiền / đồ (vang-doi, shop-mua…) đọc cờ TƯƠI mỗi lượt (không đệm): tắt cờ là ngừng bán ngay. */
 async function moCua(env: Env, sbd: string): Promise<boolean> {
-  try { return coMo((await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'shop_phu_kien'").first<{ gia_tri: string }>())?.gia_tri, sbd) } catch { return false }
+  try { return coMo((await docCoCuaHangTuoi(env))?.gia_tri, sbd) } catch { return false }
+}
+/** Dòng cờ cửa hàng ĐỌC TƯƠI trong lượt này — nhớ theo lượt (tối ưu 05/10): `gameV2` bắt đầu ngay đợt đầu cho lệnh cửa hàng, `moCua` dùng lại. Lệnh ghi
+ *  `cau_hinh` của chính lượt ⇒ đọc lại. Vẫn là đọc tươi mỗi lượt (không đệm giữa các lượt). */
+export function docCoCuaHangTuoi(env: Env): Promise<{ gia_tri: string } | null> {
+  return nhoTheoLuot(env.DB, 'cau_hinh|shop_phu_kien', () => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'shop_phu_kien'").first<{ gia_tri: string }>(), BANG_CAU_HINH)
 }
 
 /** Cờ cho việc HIỆN cửa vào cửa hàng (không tốn lượt D1 mỗi phản hồi: đệm 30 giây mức mô-đun, chỉ đọc). Cờ bật/tắt hiện chậm nhất 30 giây ở nút cửa hàng; lệnh mua/đổi vẫn kiểm cờ tươi. */
@@ -136,7 +142,13 @@ export async function shopAction(
     if (action === 'vang-xem') return await vangXem(env, sbd, p, nowMs)
     // Luật v4: bỏ đổi tay EXP → vàng (kể cả nhánh P08). Hàm cũ `vangDoi` giữ lại bên dưới để lùi được.
     if (action === 'vang-doi') return (await moCua(env, sbd)) ? loi('da_bo') : loi('tam_dong')
-    if (action === 'shop-danh-sach') { await ducVang(env, sbd, p, nowMs); return await shopDanhSach(env, sbd, nowMs, p.cap) }
+    if (action === 'shop-danh-sach') {
+      // Tối ưu 05/10: các lượt ĐỌC của danh sách KHÔNG đọc sổ vàng (đồ đang mặc, điều kiện học, số đã bán, đồ đã có) bắt đầu CÙNG lúc đúc vàng
+      // (trước: chờ đúc + cờ xong); số dư vàng vẫn đọc SAU khi đúc như cũ. Cửa đóng ⇒ bỏ chúng.
+      const som = batDauDocDanhSach(env, sbd, nowMs, p.cap)
+      await ducVang(env, sbd, p, nowMs)
+      return await shopDanhSach(env, sbd, nowMs, p.cap, som)
+    }
     if (action === 'shop-mua') { await ducVang(env, sbd, p, nowMs); return await shopMua(env, sbd, b, nowMs, p.cap) }
     return await thuMacDo(env, sbd, b)
   } catch (e) {
@@ -150,8 +162,11 @@ async function vangXem(env: Env, sbd: string, p: Profile, nowMs: number): Promis
   if (!(await moCua(env, sbd))) return { ok: true, bat: false }
   // Luật v4: đúc vàng còn thiếu rồi mới đọc số dư. Không còn ống nghiệm / đổi tay ⇒ `ongNghiem`, `doiToiDa`, `ngayAn` = 0 (giữ trường cho máy em bản cũ).
   if (p.luatCap === LUAT_CAP_MOI) {
+    // Tối ưu 05/10: điều kiện học (chuỗi ngày, ấn thạch — bảng đúc vàng không ghi) đọc CÙNG lúc đúc vàng; số dư đọc sau khi đúc như cũ. Lỗi tới đúng chỗ `await` cũ.
+    const pCo = docEmCo(env, sbd, nowMs, p.cap)
+    pCo.catch(() => {})
     await ducVang(env, sbd, p, nowMs)
-    const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs, p.cap)])
+    const [vang, co] = await Promise.all([docVang(env, sbd), pCo])
     return { ok: true, bat: true, vang, ongNghiem: 0, giuLai: 0, doiToiDa: 0, ngayAn: 0, expMoiVang: EXP_MOI_VANG, tuDong: true, chuoiNgay: co.chuoiNgay, anThachSang: co.anThachSang, mua: MUA_BAN }
   }
   // CNH-1.0 P08 (Cline 25/09): cửa P08 MỞ ⇒ "ống nghiệm" hiển thị là ví P08 (`cnh_exp_account`) — CÙNG nguồn với
@@ -209,13 +224,24 @@ async function vangDoi(env: Env, sbd: string, p0: Profile, revision0: number, b:
   throw new Error('Đổi vàng chưa xong vì hồ sơ đang bận. Em bấm lại nhé, số EXP của em chưa bị trừ.')
 }
 
-async function shopDanhSach(env: Env, sbd: string, nowMs: number, cap: number): Promise<Kq> {
+/** Lượt ĐỌC của danh sách cửa hàng không phụ thuộc sổ vàng (tối ưu 05/10) — bắt đầu trước lúc đúc vàng; lỗi được "đánh dấu đã bắt", nhận ở chỗ `await` cũ. */
+interface DocSomDanhSach { dangMac: ReturnType<typeof docDangMac>; co: ReturnType<typeof docEmCo>; daBan: ReturnType<typeof docDaBan>; so: Promise<D1Result<{ ma_mon: string }>> }
+function lenhDocDaCo(env: Env, sbd: string): Promise<D1Result<{ ma_mon: string }>> {
+  return env.DB.prepare('SELECT ma_mon FROM phu_kien_so_huu WHERE sbd = ?').bind(sbd).all<{ ma_mon: string }>()
+}
+function batDauDocDanhSach(env: Env, sbd: string, nowMs: number, cap: number): DocSomDanhSach {
+  const gioiHan = monDangBan().filter((m) => m.suatTong !== null).map((m) => m.ma)
+  const som: DocSomDanhSach = { dangMac: docDangMac(env, sbd), co: docEmCo(env, sbd, nowMs, cap), daBan: docDaBan(env, gioiHan), so: lenhDocDaCo(env, sbd) }
+  for (const p of Object.values(som)) (p as Promise<unknown>).catch(() => {})
+  return som
+}
+async function shopDanhSach(env: Env, sbd: string, nowMs: number, cap: number, som?: DocSomDanhSach): Promise<Kq> {
   if (!(await moCua(env, sbd))) return loi('tam_dong')
   const ban = monDangBan()
   const gioiHan = ban.filter((m) => m.suatTong !== null).map((m) => m.ma)
   const [vang, dangMac, co, daBan, so] = await Promise.all([
-    docVang(env, sbd), docDangMac(env, sbd), docEmCo(env, sbd, nowMs, cap), docDaBan(env, gioiHan),
-    env.DB.prepare('SELECT ma_mon FROM phu_kien_so_huu WHERE sbd = ?').bind(sbd).all<{ ma_mon: string }>(),
+    docVang(env, sbd), som?.dangMac ?? docDangMac(env, sbd), som?.co ?? docEmCo(env, sbd, nowMs, cap), som?.daBan ?? docDaBan(env, gioiHan),
+    som?.so ?? lenhDocDaCo(env, sbd),
   ])
   const daCo = new Set((so.results ?? []).map((x) => String(x.ma_mon)))
   const mon = ban.map((m) => {

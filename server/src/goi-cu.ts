@@ -2790,7 +2790,9 @@ export function maNgauNhien(): string {
 // CỔNG THÔNG TIN HỌC SINH — ĐĂNG NHẬP, ĐẶT MẬT KHẨU, LỊCH SỬ & KHẮC PHỤC
 // ===========================================================================
 
-export async function hsDangNhap(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+/** `ngoai` (chỉ-thêm, tối ưu 05/10): nơi gọi trong máy chủ nhận lại `mat_khau` THÔ của dòng `hoc_sinh` vừa đọc (KHÔNG bao giờ vào phản hồi) để cấp token game
+ *  khỏi đọc lại đúng dòng ấy (trước: thêm một đợt D1 nối tiếp ngay sau đăng nhập). */
+export async function hsDangNhap(env: Env, b: Record<string, unknown>, ngoai?: { matKhau?: unknown }): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   const matKhau = chuoi(b.matKhau).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
@@ -2798,6 +2800,7 @@ export async function hsDangNhap(env: Env, b: Record<string, unknown>): Promise<
   let em = await env.DB.prepare('SELECT sbd, ho_ten, nam_sinh, lop, mat_khau FROM hoc_sinh WHERE sbd = ?')
     .bind(sbd)
     .first<Record<string, unknown>>()
+  if (ngoai && em) ngoai.matKhau = em.mat_khau
 
   if (!em) {
     const ds = await env.DB.prepare('SELECT sbd, ho_ten, nam_sinh, lop FROM danh_sach WHERE sbd = ?')
