@@ -54,18 +54,19 @@ export default function CanThayChuaOmni({
             <ul className="cd-ds-cau">
               {g.dong.map((d, i) => (
                 <li key={`${g.loai}-${d.vkn ?? d.qids?.join(',') ?? d.sbd?.join(',') ?? i}-${i}`}>
-                  <span>
-                    <b>{d.tieuDe || '—'}</b>
-                    {d.phu && <small className="cd-phu"> · {d.phu}</small>}
-                  </span>
-                  <span className="cd-hang-nut cd-hang-nut--hep">
-                    <b className="cd-so">{d.soEm} em</b>
+                  {/* Cột phải của Bảng chiến dịch hẹp (340 px): nút "Chữa xong" xuống dòng dưới chữ, số em giữ ở mép phải như dòng cũ. */}
+                  <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, flex: '1 1 auto' }}>
+                    <span>
+                      <b>{d.tieuDe || '—'}</b>
+                      {d.phu && <small className="cd-phu"> · {d.phu}</small>}
+                    </span>
                     {d.qids?.length ? (
-                      <button type="button" className="m3-nut-vien cd-nut-nho" onClick={() => setHoi(d)}>
+                      <button type="button" className="m3-nut-vien cd-nut-nho" style={{ whiteSpace: 'nowrap' }} onClick={() => setHoi(d)}>
                         Chữa xong
                       </button>
                     ) : null}
                   </span>
+                  <b className="cd-so">{d.soEm} em</b>
                 </li>
               ))}
             </ul>

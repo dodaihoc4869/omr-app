@@ -462,13 +462,15 @@ export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: T
                     <h3>{g.chuong}</h3>
                   </div>
                 )}
-                <ul className="dh-them-ds" aria-label={g.chuong || 'Bài'}>
+                {/* MỘT cột: dòng bài có tên + chip trạng thái + "Sửa em" / "Bỏ tick" — lưới nhiều cột của khối "Thêm em" làm tên bài bị cắt cụt. */}
+                <ul className="dh-them-ds" aria-label={g.chuong || 'Bài'} style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}>
                   {g.bai.map((b) => {
                     const tick = tickTheoKhoa.get(b.khoaBai)
                     const tt = trangThaiBai(tick, chon?.khoaBai === b.khoaBai)
                     return (
-                      <li key={b.khoaBai} className="dh-them-dong" data-bai={b.khoaBai} data-trang-thai={tt.kieu}>
-                        <label className={`dh-them-o${tick ? ' dh-them-o--co' : ''}`}>
+                      // Điện thoại hẹp: tên bài giữ trọn dòng đầu, chip trạng thái + nút xuống dòng sau (không để chip đè mất tên bài).
+                      <li key={b.khoaBai} className="dh-them-dong" data-bai={b.khoaBai} data-trang-thai={tt.kieu} style={{ flexWrap: 'wrap', rowGap: 2 }}>
+                        <label className={`dh-them-o${tick ? ' dh-them-o--co' : ''}`} style={{ flex: '1 1 200px' }}>
                           <input type="radio" name="dh-bai-hom-nay" checked={chon?.khoaBai === b.khoaBai} disabled={!!tick} onChange={() => chonBai(b)} />
                           <span className="dh-them-chu">
                             <span className="dh-them-ten" title={b.tenBai}>

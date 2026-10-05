@@ -391,7 +391,7 @@ export default function BangChienDich({
                     ))}
                     {om && (
                       <>
-                        <th scope="col" title="Sơ ý = tỉ lệ sai khi mọi kỹ năng cần đã vững" data-cot="so-y">
+                        <th scope="col" title="Sơ ý = tỉ lệ sai khi mọi kỹ năng cần đã vững" data-cot="so-y" style={{ whiteSpace: 'nowrap' }}>
                           Sơ ý
                         </th>
                         <th scope="col" title="Điểm còn thiếu tới mốc 8 theo dự báo — chỉ thầy thấy" data-cot="khoang-cach-8">
