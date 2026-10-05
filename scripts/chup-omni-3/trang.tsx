@@ -22,7 +22,7 @@ import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
 import Dao2 from '../../src/game/than-thu-v2/dao2/Dao2'
-import DeThu from '../../src/game/than-thu-v2/dao2/DeThu'
+import { datViecOmniDao } from '../../src/lib/omni-hs'
 import DayHocLenBang from '../../src/components/day-hoc/DayHocLenBang'
 import '../../src/game/than-thu-v2/game.css'
 import { CHU_CHAC_MA_SAI, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
@@ -160,7 +160,7 @@ const con =
   man === 'ph' ? h(ParentPortalScreen)
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
-  : man === 'de-thu' ? h(DeThu, { call: callDao, onVe: noop } as never)
+  : man === 'de-thu' ? (datViecOmniDao('de-thu'), h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })) // đúng đường app thật: nút Đề thử ở Sảnh ⇒ Đảo mở màn đề thử trong khung `.dao2`
   : man === 'gv-bai' ? h(DayHocLenBang)
   : manSanh(SANH)
 createRoot(document.getElementById('root')!).render(con)
