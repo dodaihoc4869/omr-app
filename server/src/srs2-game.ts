@@ -5,6 +5,7 @@
 import { phuNeuCan } from './hang-chua-loi'
 import { apLamLaiKhac, batDauLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
 import { refLamLai, type LamLaiRef } from './lam-lai-so'
+import { tachSongSinh } from './loi-hoc-luat'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
@@ -188,7 +189,14 @@ function cauGiuTuPhien(phien: readonly Row[]): Set<string> {
     try { da = JSON.parse(str(x.da) || '[]') } catch { da = [] }
     const daTraLoi = new Set((Array.isArray(da) ? da : []).map((q) => str(q)))
     const qs = (JSON.parse(str(x.json)) as { questions?: RefPhien[] }).questions ?? []
-    for (const q of qs) if (!daTraLoi.has(q.qid)) ra.add(q.qid)
+    for (const q of qs) {
+      if (daTraLoi.has(q.qid)) continue
+      ra.add(q.qid)
+      // 06/10 (làn A'): câu anh em / bản song sinh đang GIỮ thay một câu lỗi ⇒ câu gốc cũng đang giữ (Bi-a ⇄ Đảo ⇄ Đoàn không phát lại câu lỗi dưới dạng khác khi bản thay còn chưa trả lời).
+      if (q.tc) ra.add(q.tc)
+      const goc = tachSongSinh(q.qid).goc
+      if (goc !== q.qid) ra.add(goc)
+    }
   }
   return ra
 }

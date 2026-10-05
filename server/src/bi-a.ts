@@ -13,6 +13,9 @@ import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { HANG_MUC_DO } from './srs2-loi'
 import { cheDo2, docCoHoa2Tu, docNhanNo, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type KeHoachDaChot, type MetaCau } from './srs2-d1'
 import { cauDangGiu, DK_PHIEN_BIA_MO, DK_PHIEN_DAO_DOAN, goiYCho, napCau, type RefPhien } from './srs2-game'
+import { apLamLaiKhac, type CauLuot } from './cau-anh-em'
+import { refLamLai, type LamLaiRef } from './lam-lai-so'
+import { tachSongSinh } from './loi-hoc-luat'
 import { quyetDinhVaoThi } from './luat-vao-thi'
 import { docVe, kyVe } from './bi-a-ve'
 import { biCuaGhe, chiaBi, giayCau } from '../../src/game/bi-a/luat'
@@ -174,7 +177,9 @@ async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: 
   // TỐI ƯU 30/09 (đo docs/do-toi-uu-bia-3009.md): bốn lượt đọc KHÔNG phụ thuộc kế hoạch (câu đã trả lời trong phiên Bi-a hôm nay — ngày kế hoạch luôn là
   // ngayVnCua(nowMs); câu đang giữ ở bàn Bi-a / ở Đảo-Đoàn; câu bảo vệ ca) bắt đầu CÙNG đợt với kế hoạch ngày thay vì nối tiếp sau nó. Kết quả y hệt;
   // `layKeHoachHomNay` không ghi các bảng này. Lỗi đọc giữ đúng cách cũ (đã trả lời / đang giữ lỗi ⇒ rỗng; câu bảo vệ ca lỗi ⇒ ném).
-  const docDa = (ngay: string) => env.DB.prepare(`SELECT DISTINCT a.qid AS qid FROM game_v2_attempt a JOIN game_v2_session s ON s.id = a.session AND s.sbd = a.sbd
+  // 06/10 (làn A'): `tc` = câu LỖI mà câu trên bàn làm thay (thang làm lại, cau-anh-em.ts) — lượt trả lời câu anh em / bản song sinh tính vào trần như câu kế hoạch gốc.
+  const docDa = (ngay: string) => env.DB.prepare(`SELECT DISTINCT a.qid AS qid, json_extract(j.value,'$.tc') AS tc FROM game_v2_attempt a JOIN game_v2_session s ON s.id = a.session AND s.sbd = a.sbd
+      LEFT JOIN json_each(s.json,'$.questions') j ON json_extract(j.value,'$.qid') = a.qid
       WHERE a.sbd = ? AND a.created_at >= ? AND json_extract(s.json,'$.bia') = 1`).bind(sbd, dauNgayVn(ngay)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const ngaySom = ngayVnCua(nowMs)
   const daSom = docDa(ngaySom)
@@ -193,7 +198,9 @@ async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: 
   const giuBia = await giuBiaSom
   let dMoi = 0, dOn = 0
   const dem = (qid: string) => { if (!trongKh.has(qid)) return; if (moiKh.has(qid)) dMoi++; else dOn++ }
-  for (const x of da.results ?? []) dem(str(x.qid))
+  const daKeHoach = new Set<string>() // qid KẾ HOẠCH của câu đã trả lời: câu anh em ⇒ `tc` (câu gốc), bản song sinh ⇒ câu gốc, còn lại chính nó (mỗi câu kế hoạch một lần)
+  for (const x of da.results ?? []) daKeHoach.add(str(x.tc) || tachSongSinh(str(x.qid)).goc)
+  for (const q of daKeHoach) dem(q)
   for (const q of giuBia) dem(q)
   const tran = tinhTranBia(soMoi, tatCa.length - soMoi, dMoi, dOn)
   const chanCa = await chanCaSom
@@ -218,10 +225,11 @@ const lyDoHetCau = (c: BoiCanh): LyDoKhoaBia => ([...c.kh.conDoan, ...c.kh.conDa
 // ---------------------------------------------------------------- câu công khai
 type CauBia = Record<string, unknown>
 const cauCongKhai = (q: PrivateQuestion, ref: RefPhien): CauBia => ({ ...publicQuestion(q), vai: ref.role, ...(ref.goiY ? { goiY: ref.goiY } : {}) })
-function taoRef(q: PrivateQuestion, m: MetaCau, hs: HoSo2, sbd: string, ngay: string, laChot: boolean): RefPhien {
+function taoRef(q: PrivateQuestion, m: MetaCau, hs: HoSo2, sbd: string, ngay: string, laChot: boolean, lamLai?: LamLaiRef): RefPhien {
   const t = hs.tt.get(q.qid)
   const g = goiYCho(q, t, `${sbd}|${q.qid}|${ngay}`)
-  return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: laChot ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}) }
+  // `lamLai` (06/10, thang làm lại): khoá `tc`/`xt`/`nv` chỉ ở JSON phiên máy chủ — `answer` chấm theo bản xáo, sổ ghi `raw_json.tc`/`xt`/`nv`; vắng ⇒ ref y hệt hôm nay.
+  return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: laChot ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...refLamLai({ lamLai }) }
 }
 const hangMuc = (m: string | null | undefined): number => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : -1)
 /**
@@ -241,6 +249,27 @@ async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: Readon
   // Tối ưu 28/09: napCau đã nạp theo lô (một truy vấn) và bỏ câu hỏng ⇒ không lặp từng câu (N+1). Kết quả y hệt: câu dùng được ĐẦU TIÊN.
   const [x] = await chanKhacKhoiEm(env, 'bia', { meta: hs.meta }, await napCau(env, hs, khoa, 1, chan), { cauCua: (y) => y.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   return x ?? null
+}
+
+/**
+ * THANG LÀM LẠI CÂU SAI cho các câu ĐÃ CHỌN lên bàn (06/10, làn A'; hàm thang `apLamLaiKhac` của cau-anh-em.ts — KHÔNG viết lại luật ở đây): câu LỖI trong cửa sổ lỗi
+ * mà vẫn ra nguyên văn ⇒ song sinh bản kế → câu anh em ĐÚNG KHỐI → bản xáo → nguyên văn có đếm. Chọn câu (trần / rải đều / Câu chốt) đã xong TRƯỚC khi gọi — thang
+ * chỉ đổi NỘI DUNG câu đã chiếm chỗ ⇒ trần, tỉ lệ mới : ôn, Câu chốt giữ nguyên. Câu không phải lỗi / khoá `lam_lai_khac` tắt ⇒ y nguyên. Cùng thứ tự, cùng độ dài.
+ * Câu thay (đổi nội dung) QUA LẠI cổng khối chung `chanKhacKhoiEm` (kênh `bia_thang`); bị chặn ⇒ giữ câu cũ (đã qua cổng `bia`). Lỗi đọc thang ⇒ câu cũ, không làm hỏng bàn.
+ */
+async function quaThangBia(env: Env, c: Pick<BoiCanh, 'hs' | 'kh'>, sbd: string, nowMs: number, ds: readonly { q: PrivateQuestion; m: MetaCau }[], chan: ReadonlySet<string>): Promise<CauLuot[]> {
+  const nguyen = (): CauLuot[] => ds.map((x) => ({ q: x.q, m: x.m }))
+  if (!ds.length) return []
+  let ra: CauLuot[]
+  try { ra = await apLamLaiKhac(env, c.hs, ds, { sbd, nowMs, keHoach: [...c.kh.dao, ...c.kh.doan] }, chan) } catch (e) {
+    console.error('[bi-a] thang làm lại lỗi (giữ câu như cũ):', e instanceof Error ? e.message : e)
+    return nguyen()
+  }
+  if (ra.length !== ds.length) return nguyen()
+  const doi = ra.filter((x, i) => x.q !== ds[i]!.q || x.lamLai)
+  if (!doi.length) return ra
+  const giu = new Set(await chanKhacKhoiEm(env, 'bia_thang', { sbd, meta: c.hs.meta }, doi, { cauCua: (y) => y.q })) // LUẬT THẦY 05/10: cổng cuối cho câu thay của thang
+  return ra.map((x, i) => (doi.includes(x) && !giu.has(x) ? { q: ds[i]!.q, m: ds[i]!.m } : x))
 }
 
 // ---------------------------------------------------------------- lệnh
@@ -346,8 +375,7 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   const cau: CauBia[] = [], qs: PrivateQuestion[] = []
   let chot: CauBia | null = null
   if (chon) {
-    const ref = taoRef(chon.q, chon.m, hs, sbd, kh.ngay, true)
-    refs.push(ref); chot = cauCongKhai(chon.q, ref); daLay.add(chon.q.qid)
+    daLay.add(chon.q.qid)
     const k = c.ung.find((x) => qidGoc(x) === chon.q.qid)
     if (k && c.laMoi(k)) con.moi = Math.max(0, con.moi - 1); else con.on = Math.max(0, con.on - 1)
   }
@@ -368,8 +396,15 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   if (biOn.length + biMoi.length < nBi) biOn.push(...(await nap(c.ungOn, Math.min(con.on - biOn.length, nBi - biOn.length - biMoi.length))))
   if (biOn.length + biMoi.length < nBi) biMoi.push(...(await nap(c.ungMoi, Math.min(con.moi - biMoi.length, nBi - biOn.length - biMoi.length))))
   const bi = [...biOn, ...biMoi]
-  for (const x of bi) {
-    const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, false)
+  // THANG làm lại câu sai (06/10): chọn xong (trần, rải đều, Câu chốt) mới thay NỘI DUNG câu lỗi — một lượt thang cho cả Câu chốt lẫn các bi.
+  const thang = await quaThangBia(env, c, sbd, nowMs, [...(chon ? [chon] : []), ...bi], chanThem)
+  const chonT = chon ? thang[0]! : null
+  if (chonT) {
+    const ref = taoRef(chonT.q, chonT.m, hs, sbd, kh.ngay, true, chonT.lamLai)
+    refs.push(ref); chot = cauCongKhai(chonT.q, ref)
+  }
+  for (const x of thang.slice(chon ? 1 : 0)) {
+    const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, false, x.lamLai)
     refs.push(ref); cau.push(cauCongKhai(x.q, ref)); qs.push(x.q)
   }
   if (!refs.length) { const lyDo = lyDoHetCau(c); return { ok: false, kq: { ok: true, lyDo, message: LOI_BIA[lyDo] } } }
@@ -380,7 +415,7 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   const session = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)')
     .bind(session, sbd, JSON.stringify({ mode: 'bia', created: nowMs, hoa2: 1, bia: 1, van, cheDo, ...them, questions: refs }), new Date(nowMs).toISOString()).run()
-  return { ok: true, session, cau, qs, chot, chotQ: chon?.q ?? null, tranCon: Math.max(0, tran.con - refs.length), tranTong: tran.tong, kh }
+  return { ok: true, session, cau, qs, chot, chotQ: chonT?.q ?? null, tranCon: Math.max(0, tran.con - refs.length), tranTong: tran.tong, kh }
 }
 
 async function xepBan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
@@ -432,20 +467,22 @@ async function doiCau(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
   if (!daTl) throw new Error('Em trả lời câu này trước rồi mới đổi câu.')
   const c = await boiCanh(env, sbd, nowMs)
   const { kh, hs } = c
-  for (const q of p.questions) c.chan.add(q.qid)
+  // Câu đã có trên bàn chặn cả câu GỐC của nó (06/10: câu anh em / bản song sinh làm thay một câu lỗi — đừng đưa câu lỗi ấy lên bàn lần nữa dưới dạng khác).
+  for (const q of p.questions) { c.chan.add(q.qid); if (q.tc) c.chan.add(q.tc); c.chan.add(tachSongSinh(q.qid).goc) }
   const phep = khoaPhep(c, conTheoNhom(c))
   if (!phep.length) return { ok: true, trong: true, ...(await veTrong(env, p, sbd, b, nowMs)) }
   const dang = hs.meta.get(qidCu)?.dang ?? null
   const cungDang = phep.filter((k) => dang && hs.meta.get(qidGoc(k))?.dang === dang)
   const thu = laChot ? xepUngVienChot(phep, hs) : [...cungDang, ...phep.filter((k) => !cungDang.includes(k))]
-  const x = await napMot(env, hs, thu, c.chan)
-  if (!x) return { ok: true, trong: true, ...(await veTrong(env, p, sbd, b, nowMs)) }
-  const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, laChot)
+  const x0 = await napMot(env, hs, thu, c.chan)
+  if (!x0) return { ok: true, trong: true, ...(await veTrong(env, p, sbd, b, nowMs)) }
+  const [x] = await quaThangBia(env, c, sbd, nowMs, [x0], c.chan) // THANG làm lại câu sai (06/10): câu lỗi thay vào bi trống cũng không ra nguyên văn khi còn bậc 1–3
+  const ref = taoRef(x!.q, x!.m, hs, sbd, kh.ngay, laChot, x!.lamLai)
   p.questions.push(ref)
   await env.DB.prepare('UPDATE game_v2_session SET json = ? WHERE id = ? AND sbd = ?').bind(JSON.stringify(p), id, sbd).run()
-  const cauMoi = cauCongKhai(x.q, ref)
+  const cauMoi = cauCongKhai(x!.q, ref)
   if (p.online === 1 && p.van && laKiHieu(b.ki)) {
-    const ve = await kyVe(env, { k: 'cau', van: p.van, sbd, ki: b.ki, cau: cauBiCua(x.q), het: nowMs + HAN_VE_MS })
+    const ve = await kyVe(env, { k: 'cau', van: p.van, sbd, ki: b.ki, cau: cauBiCua(x!.q), het: nowMs + HAN_VE_MS })
     return { ok: true, trong: false, cau: cauMoi, ve }
   }
   return { ok: true, trong: false, cau: cauMoi }

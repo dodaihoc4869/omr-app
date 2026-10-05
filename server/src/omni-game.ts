@@ -21,6 +21,8 @@ import { phamViCuaEm } from './bai-da-day'
 import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
+import { apLamLaiKhac, canBanKhac, lamLaiKhacBat } from './cau-anh-em'
+import { apXaoTheoRef, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { HANG_MUC_DO } from './srs2-loi'
 import { chuaBatDau, docChienDichCuaEm, docHangEm, docMetaCau, doiThuTuMetGio, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
@@ -80,7 +82,8 @@ export function tuanVnCua(ms: number): string {
 export const bacMuc = (m: string | null | undefined): number | null => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : null)
 
 // ---------------------------------------------------------------- phiên game (phần OMNI đọc)
-export interface RefOmni { qid: string; maDe: string; version: string; group: string; novel?: boolean; role?: string }
+// 06/10 (làn A'): ref ải đổi sau Trạm mang thêm khoá làm lại `tc`/`xt`/`nv` (lam-lai-so.ts) khi câu thay là bản khác của một câu LỖI — chỉ ở JSON phiên máy chủ, KHÔNG xuống máy em.
+export interface RefOmni extends LamLaiRef { qid: string; maDe: string; version: string; group: string; novel?: boolean; role?: string }
 export interface PhienOmni {
   mode?: string; created?: number; hoa2?: number; doan?: number; bia?: number; guardian?: string
   /** Chuyến vé thử thách (`start` có `ve`). */ ve?: number; veDang?: string
@@ -511,6 +514,9 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
   const daDung = await docVeDaDung(env, sbd, tuan)
   if (daDung >= TS.VE_MOI_TUAN) return hetVe()
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
+  // 06/10 (làn A'): vé đo bậc CAO HƠN bằng câu em chưa vững — câu LỖI đang trong cửa sổ lỗi (chờ kiểm / đã đóng, chưa tới lịch nên không nằm trong kế hoạch hôm nay) không phải
+  // câu để đo và không được ra NGUYÊN VĂN ⇒ bỏ khỏi ứng viên (câu lỗi quay lại qua thang làm lại ở Đảo / Đoàn / Bi-a / Trạm). Khoá `lam_lai_khac` tắt ⇒ y hôm nay.
+  const boCauLoi = await lamLaiKhacBat(env).catch(() => false)
   const dsDang = ve === 'auto' ? await dangTuDongChoVe(env, sbd, nowMs) : [{ ma: ve, ten: '' }]
   if (!dsDang.length) return { ok: false, lyDo: 'khong_co_dang', error: 'Chưa có dạng nào cần thử thách thêm trong bài đang luyện.' }
   const [pv, bc] = await Promise.all([phamViChon(env, sbd), boiCanh(env, sbd, nowMs)])
@@ -522,7 +528,7 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
     if (dich > 3) continue // đã vững mức cao nhất của dạng
     const ung = (await metaTheoDang(env, d.ma, pv)).filter((m) => {
       const b = bacMuc(m.mucDo)
-      return b != null && b >= dich && hopLeChung(m, bc) && !trongKeHoach.has(m.qid) && !lamHomNay(m.qid, bc)
+      return b != null && b >= dich && hopLeChung(m, bc) && !trongKeHoach.has(m.qid) && !lamHomNay(m.qid, bc) && !(boCauLoi && canBanKhac(hs, m.qid))
     })
     const day = await chanKhacKhoiEm(env, 'omni_ve', { sbd, khoiEm: bc.khoiEm }, await napTheoThuTu(env, xepUngVien(ung, bc, (m) => bacMuc(m.mucDo)! - dich, `${sbd}|${homNay}|ve`), TS.VE_SO_CAU, new Set()), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối
     if (!day.length) continue
@@ -589,7 +595,7 @@ async function tramXong(env: Env, sbd: string, b: Row, nowMs: number): Promise<R
     const cu = s.questions[viTri]!
     const thay = await timCauThapHon(env, sbd, s, cu, nowMs)
     if (!thay) return { ok: true, cau: null, viTri: null }
-    const ref: RefOmni = { qid: thay.q.qid, maDe: thay.m.maDe, version: thay.m.version, group: thay.m.group, novel: thay.moi, role: cu.role ?? 'on_lai' }
+    const ref: RefOmni = { qid: thay.q.qid, maDe: thay.m.maDe, version: thay.m.version, group: thay.m.group, novel: thay.moi, role: cu.role ?? 'on_lai', ...refLamLai(thay) }
     const moi: PhienOmni = { ...s, questions: s.questions.map((r, i) => (i === viTri ? ref : r)), tramXong: { viTri, qid: ref.qid } }
     const ghi = await env.DB.prepare('UPDATE game_v2_session SET json = ? WHERE id = ? AND sbd = ? AND json = ?').bind(JSON.stringify(moi), id, sbd, json).run()
     if (ghi.meta.changes) return { ok: true, cau: { ...publicQuestion(thay.q), vai: ref.role }, viTri }
@@ -600,9 +606,9 @@ async function traCauDaDoi(env: Env, s: PhienOmni): Promise<Record<string, unkno
   const viTri = s.tramXong!.viTri, r = s.questions[viTri]
   if (!r) return { ok: true, cau: null, viTri: null }
   const q = (await napDayDuMem(env, [{ maDe: r.maDe, qid: r.qid, version: r.version }])).get(`${r.maDe}|${r.qid}|${r.version}`)
-  return q ? { ok: true, cau: { ...publicQuestion(q), vai: r.role }, viTri } : { ok: true, cau: null, viTri: null }
+  return q ? { ok: true, cau: { ...publicQuestion(apXaoTheoRef(q, r)), vai: r.role }, viTri } : { ok: true, cau: null, viTri: null } // 06/10: bản xáo phát lại y hệt lúc phát
 }
-async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, nowMs: number): Promise<{ q: PrivateQuestion; m: MetaCau; moi: boolean } | null> {
+async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, nowMs: number): Promise<{ q: PrivateQuestion; m: MetaCau; moi: boolean; lamLai?: LamLaiRef } | null> {
   const gocCu = qidGocOmni(cu.qid)
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   const mCu = hs.meta.get(gocCu) ?? (await docMetaCau(env, [gocCu], [cu.maDe])).get(gocCu)
@@ -619,7 +625,34 @@ async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, n
   if (!chon) return null
   // Câu của kế hoạch mà kế hoạch đang phục vụ bằng câu SONG SINH (vòng học v2) ⇒ phủ song sinh như `napLuot`.
   const q = keHoach.has(chon.m.qid) ? phuNeuCan(chon.q, hs.songSinhCho, hs.boTro) : chon.q
-  return { q, m: chon.m, moi: !bc.daLam.has(chon.m.qid) }
+  // 06/10 (làn A'): câu thay là câu LỖI trong cửa sổ lỗi mà vẫn ra nguyên văn ⇒ THANG làm lại (song sinh bản kế → câu anh em ĐÚNG KHỐI → bản xáo → nguyên văn có đếm).
+  const thang = await quaThangTram(env, sbd, hs, kh, { q, m: chon.m }, new Set([...trongPhien, ...nhomPhien]), bc, nowMs, bac)
+  return { q: thang.q, m: thang.m, moi: !bc.daLam.has(thang.m.qid), ...(thang.lamLai ? { lamLai: thang.lamLai } : {}) }
+}
+/**
+ * THANG làm lại cho câu thay ải sau Trạm (đặc tả DE-XUAT-LAM-LAI-CAU-SAI-0510.md mục 2; hàm thang `apLamLaiKhac` của cau-anh-em.ts, KHÔNG viết lại luật ở đây).
+ * Câu không phải lỗi / khoá `lam_lai_khac` tắt ⇒ trả y nguyên. Câu thay (câu anh em, bản song sinh, bản xáo) QUA LẠI cổng khối chung `chanKhacKhoiEm` (kênh
+ * `omni_tram_thang`) — bị chặn ⇒ giữ câu cũ (đã qua cổng `omni_tram`), không bao giờ phát câu khác khối. Lỗi đọc thang ⇒ câu cũ (đường hôm nay), không làm hỏng Trạm.
+ * Mục đích của Trạm là ĐỔI ẢI DỄ HƠN: câu anh em mức KHÔNG thấp hơn ải bị thay (`bacCu`) bị bỏ — dùng bản xáo của chính câu lỗi (bậc 3; không xáo được ⇒ nguyên văn có đếm).
+ */
+async function quaThangTram(env: Env, sbd: string, hs: HoSo2, kh: { dao: readonly string[]; doan: readonly string[] }, x: { q: PrivateQuestion; m: MetaCau }, chan: ReadonlySet<string>, bc: BoiCanh, nowMs: number, bacCu: number): Promise<{ q: PrivateQuestion; m: MetaCau; lamLai?: LamLaiRef }> {
+  let ra: Awaited<ReturnType<typeof apLamLaiKhac>>[number] | undefined
+  try {
+    ;[ra] = await apLamLaiKhac(env, hs, [x], { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan] }, chan)
+  } catch (e) {
+    console.error('[omni-game] thang làm lại của Trạm lỗi (giữ câu thay như cũ):', e instanceof Error ? e.message : e)
+    return x
+  }
+  if (!ra || (ra.q === x.q && !ra.lamLai)) return x
+  if (ra.lamLai?.tc) {
+    const b = bacMuc(ra.m.mucDo)
+    if (b != null && b >= bacCu) {
+      const xao = xaoCau(x.q, `${sbd}|${ngayVnCua(nowMs)}|tram|${x.q.qid}`)
+      ra = xao ? { q: xao.q, m: x.m, lamLai: { xt: xao.xt } } : { q: x.q, m: x.m, lamLai: { nv: 1 } }
+    }
+  }
+  const [giu] = await chanKhacKhoiEm(env, 'omni_tram_thang', { sbd, khoiEm: bc.khoiEm }, [ra], { cauCua: (y) => y.q }) // LUẬT THẦY 05/10: cổng cuối cho câu thay của thang
+  return giu ?? x
 }
 
 // ---------------------------------------------------------------- đề thử nửa
