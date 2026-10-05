@@ -1,4 +1,5 @@
 // TRANG CHỤP ẢNH OMNI 3 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
+// (06/10) thêm cảnh CẨN THẬN: `?man=dao-can-than-soat|dao-can-than-the` (Sảnh có omni.canThan) — chip "Soát lại đơn vị và số liệu" ở câu Phần III + thẻ "Em biết câu này. Sai vì bước nào?".
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai|gv-bang-cu|gv-bang-omni|gv-cai-dat|gv-tong-quan`.
 // Dữ liệu OMNI theo đúng hợp đồng docs/hop-dong-omni-3.md (SanhOmni, PhOmni). Các màn thêm sau khi gộp làn: dao, gv-bai, gv-bang.
 import { createElement as h } from 'react'
@@ -79,6 +80,13 @@ const SANH = {
   ruong: { daLam: 14, tong: 40, moDuoc: false, daMo: false },
   omni: SANH_OMNI,
 }
+/** CẨN THẬN (06/10): em có Sơ ý 11% (> 7%) ⇒ `omni.canThan` — CHỈ cảnh `dao-can-than-*` dùng bản này; các cảnh khác giữ SANH (không canThan) để ảnh cũ không đổi. */
+const SANH_CAN_THAN = { ...SANH, omni: { ...SANH_OMNI, sEm: 0.11, canThan: true } }
+const BUOC_SAI_GIA = [
+  { ma: 'nen:doi_mol_khoi_luong', ten: 'Đổi khối lượng ra số mol' },
+  { ma: 'nen:khoi_luong_ly_thuyet', ten: 'Tính khối lượng sản phẩm lí thuyết' },
+  { ma: 'nen:hieu_suat', ten: 'Tính hiệu suất phản ứng' },
+]
 /** Ngày 8 không tick bài mới: chế độ chờ, ôn bài cũ, nhật ký cuối ngày, mệt giờ. */
 const SANH_CHO = {
   ...SANH,
@@ -126,6 +134,7 @@ let soLanTraLoi = 0
 function traLoiDao(d: Record<string, unknown>): Record<string, unknown> {
   soLanTraLoi++
   const omni = (o: Record<string, unknown>) => ({ nhanTocDo: 'thuong', msLam: 62_000, msKyVong: 85_000, luot: false, chacMaSai: false, loiNhan: null, ...o })
+  if (man.startsWith('dao-can-than-the')) return { correct: false, answer: 'B', traLoi: d.answer, solution: GIAI, reward: 0, stage: 0, omni: omni({ chacMaSai: true, loiNhan: CHU_CHAC_MA_SAI, canThan: true, buocSai: { lua: BUOC_SAI_GIA } }) }
   if (man === 'dao-tln') return { correct: true, answer: '9,9', traLoi: d.answer, solution: GIAI_TLN, reward: 4, stage: 1, omni: omni({}) }
   if (man === 'dao-cham') return { correct: true, answer: 'B', traLoi: d.answer, solution: GIAI, reward: 4, stage: 1, omni: omni({ nhanTocDo: 'cham', msLam: 204_000, loiNhan: chuDungNhungCham(204_000, 85_000) }) }
   if (man === 'dao-chac-sai') return { correct: false, answer: 'B', traLoi: d.answer, solution: GIAI, reward: 0, stage: 0, omni: omni({ chacMaSai: true, loiNhan: CHU_CHAC_MA_SAI }) }
@@ -137,11 +146,12 @@ function traLoiDao(d: Record<string, unknown>): Record<string, unknown> {
 const callDao = async (action: string, data: Record<string, unknown> = {}): Promise<DaoKetQua> => {
   await new Promise((r) => setTimeout(r, 60))
   const kq: Record<string, unknown> =
-    action === 'hoa2-sanh' ? SANH
+    action === 'hoa2-sanh' ? (man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH)
     : action === 'resume' ? { questions: [] }
     : action === 'sync' ? { remaining: 0 }
-    : action === 'start' ? { id: 'P1', questions: man === 'dao-tln' ? [CAU_TLN, cauDao(1)] : [0, 1, 2, 3].map(cauDao), theLuc: { con: 26, tong: 40 }, dao: { con: 26 }, doan: { con: 4 } }
+    : action === 'start' ? { id: 'P1', questions: man === 'dao-tln' || man.startsWith('dao-can-than-soat') ? [CAU_TLN, cauDao(1)] : [0, 1, 2, 3].map(cauDao), theLuc: { con: 26, tong: 40 }, dao: { con: 26 }, doan: { con: 4 } }
     : action === 'answer' ? traLoiDao(data)
+    : action === 'hoa2-omni-buoc-sai' ? { daGhi: true }
     : action === 'hoa2-omni-tram-xong' ? { cau: { ...cauDao(4), mucDo: 'hieu' }, viTri: 3 }
     : action === 'hoa2-cau-da-lam' ? { cau: [] }
     : action === 'hoa2-omni-de-thu' ? { id: 'DT1', cau: Array.from({ length: 14 }, (_, k) => ({ ...cauDao(k % 5), qid: `DT${k + 1}` })), phut: 25, hetLuc: new Date(Date.now() + 25 * 60_000).toISOString() }
@@ -196,7 +206,7 @@ function manSanh(du: Record<string, unknown>) {
 const con =
   man === 'ph' ? h(ParentPortalScreen)
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
-  : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
+  : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'de-thu' ? (datViecOmniDao('de-thu'), h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })) // đúng đường app thật: nút Đề thử ở Sảnh ⇒ Đảo mở màn đề thử trong khung `.dao2`
   : man === 'gv-bai' ? h(DayHocLenBang)
   // ĐƯỜNG ĐI thật tới "Bài hôm nay" (thầy 06/10 "Tôi không thấy chỗ này"): Game Hóa 2.0 bật ⇒ thanh bên "Chữa trên lớp" → thẻ "Dạy học"; và "Chiến dịch luyện" → nút "Giao theo bài".

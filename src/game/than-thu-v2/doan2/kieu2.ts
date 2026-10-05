@@ -24,6 +24,12 @@ export function coOmniTrongSanh(r: unknown): boolean {
   return !!o && typeof o === 'object' && (o as { bat?: unknown }).bat === true
 }
 
+/** CẨN THẬN (đặc tả 4.6; chỉ-thêm): `hoa2-sanh` → `omni.canThan === true` (OMNI bật ∧ Sơ ý > 7%) ⇒ Đoàn hiện chip "Soát lại đơn vị và số liệu" ở câu Phần III + thẻ "Sai vì bước nào?". Vắng ⇒ y hệt hôm nay. */
+export function canThanTrongSanh(r: unknown): boolean {
+  const o = r && typeof r === 'object' ? (r as { omni?: unknown }).omni : null
+  return coOmniTrongSanh(r) && (o as { canThan?: unknown }).canThan === true
+}
+
 /** Gợi ý M3 của câu đang chơi (máy chủ gửi `doan.cau.goiY` khi em đủ điều kiện). Chỉ nhận chữ cái A–D để gạch; `cotLoi` phải là chữ thật. */
 export function goiYCuaCau(cau: CauXem | undefined): GoiYM3 | null {
   const g = (cau as (CauXem & { goiY?: unknown }) | undefined)?.goiY

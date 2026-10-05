@@ -15,6 +15,7 @@ import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, 
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
 import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
 import { expTheoCau, type AnhThuNhan, type CheDoHieuUng } from '../../lib/hieu-ung-exp-cau'
+import { CHU_SOAT_LAI, GOI_Y_SOAT_LAI } from '../../lib/omni-chu'
 
 const KY_TU = ['A', 'B', 'C', 'D', 'E', 'F']
 const NHAN_PHAN: Record<CauOn['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng / Sai', III: 'Phần III · Trả lời ngắn' }
@@ -35,6 +36,8 @@ export interface LamCauOnProps {
   duongNop?: string
   /** Máy chủ BẬN lúc nộp ⇒ đưa bài vào HÀNG ĐỢI NỘP LẠI TỰ ĐỘNG của cổng (`hang-doi-nop.ts`); vắng ⇒ như cũ (em bấm nộp lại). Kết quả về qua sự kiện `SU_KIEN_HANG_DOI_XONG`. */
   xepHang?: (m: { id: string; goi: { traLoi: MucTraLoi[]; duong: string } }) => void
+  /** CẨN THẬN (b) (chỉ-thêm; vắng ⇒ DOM như cũ): `hoa2-sanh` báo `omni.canThan` (Sơ ý > 7%) ⇒ câu Phần III có ô một chạm "Soát lại đơn vị và số liệu" — KHÔNG bắt buộc, không chặn nút Nộp, không gửi gì. */
+  canThan?: boolean
 }
 
 type Pha = 'tai' | 'loi' | 'lam'
@@ -62,12 +65,13 @@ export function daTraLoi(c: CauOn, dapAn: string | undefined): boolean {
 
 const chuanDS = (s: string) => s.replace(/[Đđ]/g, 'D').toUpperCase().replace(/[^DS]/g, '')
 
-export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauSan, duongNop, xepHang }: LamCauOnProps) {
+export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauSan, duongNop, xepHang, canThan }: LamCauOnProps) {
   const [pha, setPha] = useState<Pha>('tai')
   const [loiTai, setLoiTai] = useState('')
   const [cau, setCau] = useState<CauOn[]>([])
   const [khongCo, setKhongCo] = useState<string[]>([])
   const [traLoi, setTraLoi] = useState<Record<string, string>>({})
+  const [soat, setSoat] = useState<Record<string, boolean>>({}) // CẨN THẬN (b): câu Phần III em đã chạm "Soát lại…" (chỉ trên máy, không gửi)
   const [ketQua, setKetQua] = useState<Record<string, KetQuaCauOn>>({})
   const [chuaLam, setChuaLam] = useState<string[]>([])
   const [tienBo, setTienBo] = useState<TienBoOn | null>(null)
@@ -315,6 +319,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
               onChonY={(y, v) => chonY(c.qid, y, v)}
               expCau={expCau[c.qid] ?? 0}
               cheDo={cheDo}
+              {...(canThan ? { soat: !!soat[c.qid], onSoat: (v: boolean) => setSoat((o) => ({ ...o, [c.qid]: v })) } : {})}
             />
           ))}
           {khongCo.map((q, i) => (
@@ -382,6 +387,8 @@ function TheCauOn({
   onChonY,
   expCau = 0,
   cheDo = 'tinh',
+  soat = false,
+  onSoat,
 }: {
   c: CauOn
   so: number
@@ -394,6 +401,9 @@ function TheCauOn({
   /** Luật v4: EXP máy chủ vừa ghi cho CÂU NÀY (0 = không hiệu ứng). */
   expCau?: number
   cheDo?: CheDoHieuUng
+  /** CẨN THẬN (b): ô "Soát lại đơn vị và số liệu" (chỉ Phần III, chỉ khi có `onSoat`). */
+  soat?: boolean
+  onSoat?: (v: boolean) => void
 }) {
   const daCham = !!ketQua
   const khoaO = daCham || khoa
@@ -483,6 +493,14 @@ function TheCauOn({
             <label className="lco-nhap-nhan" htmlFor="lco-dap-an">Đáp án của em (số)</label>
             <OSoTraLoi id="lco-dap-an" value={dapAn} onChange={onChon} disabled={khoaO} placeholder="Ví dụ 12,5" />
           </div>
+          {/* CẨN THẬN (b): cùng kiểu hàng chọn `lco-lua` (nền/viền M3 sẵn có) — một chạm, KHÔNG bắt buộc; chỉ trước khi nộp. */}
+          {onSoat && !daCham && (
+            <label className="lco-lua lco-soat" data-chon={soat || undefined} title={GOI_Y_SOAT_LAI}>
+              <input type="checkbox" checked={soat} disabled={khoaO} onChange={(e) => onSoat(e.target.checked)} />
+              <span className="lco-ky" aria-hidden="true">{soat && <Check size={16} />}</span>
+              <span className="lco-nd">{CHU_SOAT_LAI}</span>
+            </label>
+          )}
         </div>
       )}
 

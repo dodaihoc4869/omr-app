@@ -7,6 +7,7 @@ import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
 import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
+import { canThanTu, nhanMocDuyTri } from './omni-can-than'
 import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
 import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC } from './lam-lai-so'
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
@@ -574,8 +575,10 @@ async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangCh
  *  - LỌC PHẠM VI: câu không có tờ nào DẠY HỌC (thư mục `de_kho_thu_muc`, luật lùi "DH-") — hoặc, khi lớp đã tick bài, không có tờ DẠY HỌC nào trong phạm
  *    vi đã dạy — KHÔNG vào `cau` (vẫn ở `meta`/`tt` để "Câu đã làm" hiện đủ). Không bao giờ có câu của bài chưa tick trong kế hoạch;
  *  - ÔN BÀI CŨ: `onBaiCu` (xem HoSo2), `omni` = { bat, cheDoCho, onBaiCuSo }.
+ * CẨN THẬN (a) (omni-can-than.ts, đặc tả 4.6; chỉ-thêm): `canThanSom` = nơi gọi ĐÃ có hồ sơ OMNI (lúc LẬP kế hoạch ngày — `layKeHoachChot`) cho biết em có `canThan`
+ * không; ĐÚNG ⇒ mốc kiểm duy trì của luật đóng lỗi × 0,7. Vắng / OMNI tắt / sai ⇒ mốc y hệt hôm nay (KHÔNG đọc thêm D1 ở đây).
  */
-export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>): Promise<HoSo2> {
+export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   const omniP = omniSom ?? omniBatEm(env, sbd)
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
@@ -652,6 +655,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     ls.push(x)
   }
   { const thayGiao = new Set([...ds.flatMap((c) => c.qids), ...qidSaiCa.keys()]); await chanMetaKhacKhoi(env, 'hoa2_ho_so', await khoiEmP, meta, (q) => thayGiao.has(q)) } // LUẬT THẦY 05/10: câu khác khối em ⇒ như đã rút khỏi kho của RIÊNG em (kế hoạch, Đảo/Đoàn/Bi-a, "Câu đã làm", báo cáo); em chưa rõ khối ⇒ chỉ giữ câu thầy giao trực tiếp (chiến dịch, câu sai ca thầy dựng)
+  const thamSoDung = omni && canThanSom ? nhanMocDuyTri(thamSoV2, await canThanSom.catch(() => false)) : thamSoV2 // CẨN THẬN (a): em canThan ⇒ mốc × 0,7
   const tt = new Map<string, TrangThaiCau>()
   const cau: CauSrs[] = []
   const laMoiBo = new Set<string>()
@@ -667,7 +671,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
       // Chỉ chỗ < CHO_SONG_SINH: qid ảo phát ra phải nằm trong danh sách đọc sổ (`cacQidSongSinh`), không thì lượt làm rơi khỏi lịch sử câu gốc.
       const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => i < CHO_SONG_SINH && songSinhDuDuLieu(m.phan, ss) ? [i] : [])
       const soSS = ssDungDuoc.length
-      const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoV2)
+      const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoDung)
       t = ap.t
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
       if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!)
@@ -1276,9 +1280,11 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
   const lapSom: Promise<DocLapSom | null> = cuP.then((cu) => (cu ? null : batDauDocLap(env, sbd, nowMs)))
   // OMNI 3 (tối ưu 05/10): hôm nay CHƯA chốt + OMNI bật ⇒ hồ sơ OMNI của em (chỉ dùng khi LẬP — `tuyChonKeHoachOmni`) bắt đầu dựng NGAY khi biết (nhớ theo lượt
   // trong omni-d1.ts, cùng `nowMs`) — song song phần đọc hồ sơ 2.0 / ứng viên; trước: chờ hồ sơ 2.0 xong mới bắt đầu (4–6 đợt nối tiếp). Chỉ ĐỌC.
-  void Promise.all([cuP, omniSom]).then(([cu, bat]) => { if (!cu && bat) void lanOmniD1().then((m) => m.hoSoOmniEm(env, sbd, nowMs)).catch(() => null) }, () => null)
+  const hsOmniSom = Promise.all([cuP, omniSom]).then(([cu, bat]) => (!cu && bat ? lanOmniD1().then((m) => m.hoSoOmniEm(env, sbd, nowMs)) : null)).catch(() => null)
+  // CẨN THẬN (a): cùng lượt đọc hồ sơ trên cho biết `canThan` (S_em > 0,07) ⇒ `docHoSo2` nhân mốc duy trì × 0,7 — chỉ LÚC LẬP kế hoạch (hôm nay chưa chốt), không thêm lượt D1 nào.
+  const canThanSom = hsOmniSom.then((h) => canThanTu(true, h))
   const [hoSo, dem, cu, luuOmni] = await Promise.all([
-    hs ?? docHoSo2(env, sbd, ngay, omniSom),
+    hs ?? docHoSo2(env, sbd, ngay, omniSom, canThanSom),
     docDemHomNay(env, sbd, ngay),
     cuP,
     omniSom.then((bat) => (bat ? docKeHoachOmni(env, sbd, ngay) : null)),

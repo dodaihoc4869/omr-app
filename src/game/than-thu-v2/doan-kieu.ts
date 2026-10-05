@@ -3,6 +3,7 @@
 import type { Question } from './core'
 import type { HanhDong, KhungNhinHiep, Quai, TomTatGhe } from './doan-core'
 import type { HinhAnh } from '../../data/examContent'
+import type { LuaChonBuocSai } from '../../../server/src/omni-kieu'
 
 export type GoiDoan = (action: string, data?: Record<string, unknown>) => Promise<unknown>
 export type TrangThaiGhe = 'cho' | 'may' | 'dang_lam' | 'da_chot' | 'can_tiep_suc'
@@ -15,7 +16,7 @@ export interface TranXem {
   /** Chỉ-thêm (Hóa 2.0, phòng một người thật): hiệp kế đang CHỜ em bấm "ĐÁNH TIẾP" — không có đồng hồ. Vắng ⇒ nhịp cũ. */
   choTiep?: boolean
 }
-export interface KetQuaCau { correct: boolean; answer: string; solution: unknown; solutionImages?: HinhAnh[]; reward?: number; stage?: number; /** Chỉ-thêm (luật v4): câu có trợ giúp ⇒ không hiệu ứng EXP. */ assisted?: boolean; /** Luật 29/09: EXP thật đã vào thú nhờ câu này (máy chủ tính). */ expCau?: number; /** OMNI 3 (chỉ-thêm): MỘT dòng nhỏ máy chủ viết sẵn dưới kết quả (đúng nhưng chậm, lướt…). */ loiNhan?: string }
+export interface KetQuaCau { correct: boolean; answer: string; solution: unknown; solutionImages?: HinhAnh[]; reward?: number; stage?: number; /** Chỉ-thêm (luật v4): câu có trợ giúp ⇒ không hiệu ứng EXP. */ assisted?: boolean; /** Luật 29/09: EXP thật đã vào thú nhờ câu này (máy chủ tính). */ expCau?: number; /** OMNI 3 (chỉ-thêm): MỘT dòng nhỏ máy chủ viết sẵn dưới kết quả (đúng nhưng chậm, lướt…). */ loiNhan?: string; /** CẨN THẬN (c) (chỉ-thêm): thẻ "Em biết câu này. Sai vì bước nào?" — CHỈ khi máy chủ báo canThan ∧ chắc-mà-sai. */ buocSai?: { qid: string; lua: LuaChonBuocSai[] } }
 export interface CauXem { qid?: string; nhan?: NhanCau; /** Nhãn nợ (Sổ nợ 29/09): "Sai 2 lần · Ca 26/09". */ nhanNo?: string; an?: boolean; de?: Question; giuNguyen?: boolean; daChot?: boolean; hanhDong?: HanhDong; boTrong?: boolean; ketQua?: KetQuaCau | null; het?: boolean; rut?: boolean; loiNhan?: string
   /** 28/09: em đã hết câu riêng ⇒ hiệp này máy tính em chốt vai GIỮ KHIÊN (`chan` = khiên góp cho Linh Tâm). */
   giuKhien?: boolean; chan?: number }

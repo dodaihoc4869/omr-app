@@ -22,6 +22,7 @@ import { duBaoDiem, trongSoCau } from './du-bao-diem'
 import { xetChungChi } from './omni-chung-chi'
 import { dangDaVung } from './omni-ke-hoach'
 import { xetMetGio } from './omni-met-gio'
+import { canThanTu } from './omni-can-than'
 import { goiYQ, qMacDinh, vknMacDinh } from './omni-q'
 import { betaTuMau, msKyVong } from './omni-toc-do'
 import { lopCuaEm, phamViCuaEm, type PhamViLop } from './bai-da-day'
@@ -1006,6 +1007,7 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
       metGio,
       nhatKy: nhatKy.length ? nhatKy : null,
       deThu: { duoc: !!gan && soNgayGiua(gan.batDau, homNay) >= ts.DE_THU.ngayTu - 1 && !daThu, soCau: ts.DE_THU.soCau, phut: ts.DE_THU.phut },
+      ...(canThanTu(true, hs, ts) ? { canThan: true } : {}), // CẨN THẬN (omni-can-than.ts): chỉ-thêm, CHỈ khi Sơ ý (số `sEm` ở trên) > ngưỡng — vắng ⇒ app em y hệt
     }
   } catch {
     return null

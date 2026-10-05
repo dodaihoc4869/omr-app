@@ -20,10 +20,11 @@ import type {PhanHoi2} from './TrongAi'
 import XongChuyen from './XongChuyen'
 import KhoaDao from './KhoaDao'
 import TheTram from './TramHoiPhuc'
+import TheBuocSai from './TheBuocSai'
 import DeThu from './DeThu'
 import {docKetQuaOmni,lanDauChamChip,layViecOmniDao,thanOmniTraLoi} from '../../../lib/omni-hs'
-import {omniTramXong} from '../../../components/hoa2/api'
-import type {TramHoiPhuc} from '../../../../server/src/omni-kieu'
+import {omniBuocSai,omniTramXong} from '../../../components/hoa2/api'
+import type {LuaChonBuocSai,TramHoiPhuc} from '../../../../server/src/omni-kieu'
 import {LOI_KHOA_DAO_MAC_DINH,SO_AI_CHUYEN,THONG_BAO_TRONG_2,docGoiY,docGoiYPhien,docSanh2,docSoChuyenXong,ghepGoiY,ghiSoChuyenXong,gopTomTat,henOnCua,nhoGoiYPhien,soChuyen,vungTheoDang} from './dao2-core'
 import type {CauDao2,Sanh2} from './dao2-core'
 import './dao2.css'
@@ -33,6 +34,8 @@ interface Luot2{id:string;cau:CauDao2[];luc:number;/** OMNI 3: chuyến của v�
 const VAI_VE='thu_thach'
 const laChuyenVe=(cau:readonly CauDao2[])=>cau.length>0&&cau.every(c=>c.vai===VAI_VE)
 interface Tram2{du:TramHoiPhuc;qid:string;session:string;xong:boolean}
+/** CẨN THẬN (c): thẻ "Em biết câu này. Sai vì bước nào?" của câu vừa chấm (qid trong chuyến — máy chủ quy về câu gốc khi ghi). */
+interface BuocSai2{qid:string;lua:LuaChonBuocSai[]}
 type Answered=NonNullable<DaoKetQua['answered']>
 /** Lượt máy chủ giữ 2 giờ (`answer` từ chối lượt cũ hơn) ⇒ lượt soạn sẵn quá hạn thì soạn lại. */
 const HAN_LUOT=2*3600_000-5*60_000
@@ -65,6 +68,10 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  // OMNI 3: bật khi `hoa2-sanh` có `omni` (cờ áp cho em). Tắt ⇒ mọi phần dưới đây nằm im: không chip, không trường thân mới, không lệnh mới.
  const omniBat=!!sanh?.omni
  const [chuaChac,setChuaChac]=useState(false),[goiYChip,setGoiYChip]=useState(false),[tram,setTram]=useState<Tram2|null>(null)
+ // CẨN THẬN (đặc tả 4.6): CHỈ khi `hoa2-sanh` báo `omni.canThan` (Sơ ý > 7%): (b) chip "Soát lại đơn vị và số liệu" ở câu Phần III, (c) thẻ "Sai vì bước nào?" sau lượt chắc-mà-sai.
+ // Vắng ⇒ không chip, không thẻ, không lệnh mới: DOM y hệt hôm nay.
+ const canThan=!!sanh?.omni?.canThan
+ const [soat,setSoat]=useState(false),[buocSai,setBuocSai]=useState<BuocSai2|null>(null)
  /** Mốc câu hiện (performance.now) ⇒ `msLam` lúc gửi. */
  const mocCau=useRef(0)
  const [khoa,setKhoa]=useState(''),[het,setHet]=useState(''),[soan,setSoan]=useState('')
@@ -82,7 +89,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const napSanh=useCallback(async()=>{const s=docSanh2(await call('hoa2-sanh'));if(conSong.current&&s){setSanh(s);setLoiSanh('')}return s},[call])
  const napDaLam=useCallback(()=>{void call('hoa2-cau-da-lam').then(r=>{if(conSong.current)setDaLam(r)}).catch(()=>{})},[call])
  const datLuot=(l:Omit<Luot2,'luc'|'ve'>,da:Answered=[])=>{const dau=l.cau.findIndex(c=>!da.some(a=>a.attempt.qid===c.qid))
-  setLuot({...l,luc:Date.now(),ve:laChuyenVe(l.cau)});setKetQua(da.map(a=>a.attempt));setExp(da.reduce((s,a)=>s+(a.reward||0),0));setViTri(Math.max(0,dau));setTraLoi('');setAssisted(false);setPhanHoi(null);setChuaChac(false);setGoiYChip(false);setTram(null)
+  setLuot({...l,luc:Date.now(),ve:laChuyenVe(l.cau)});setKetQua(da.map(a=>a.attempt));setExp(da.reduce((s,a)=>s+(a.reward||0),0));setViTri(Math.max(0,dau));setTraLoi('');setAssisted(false);setPhanHoi(null);setChuaChac(false);setGoiYChip(false);setTram(null);setSoat(false);setBuocSai(null)
   return {...l,luc:Date.now(),ve:laChuyenVe(l.cau)}}
 
  /** Soạn chuyến: chuyến dở (resume) → không thì sync tới hết → start. Khoá / hết câu ⇒ null (màn tự đổi). */
@@ -144,6 +151,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
   setPhanHoi({correct,answer:r.answer??'',traLoi:typeof emGui==='string'?emGui:traLoi,solution:r.solution,solutionImages:r.solutionImages??[],reward,lyDo,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0,...(typeof r.expCau==='number'?{expCau:r.expCau}:{}),coTroGiup:assisted||coBua,
    ...(om?{omni:{loiNhan:om.loiNhan,chacMaSai:om.chacMaSai}}:{}),...(mien?{mien}:{})})
   // OMNI 3 · Trạm hồi phục (3 câu sai liền): thẻ trạm hiện sau kết quả; không có câu nền ⇒ báo chữ + đổi ải kế ngay (Máu không đổi).
+  if(om?.buocSai)setBuocSai({qid:q.qid,lua:om.buocSai.lua}) // CẨN THẬN (c): docKetQuaOmni chỉ trả `buocSai` khi máy chủ báo canThan ∧ chắc-mà-sai
   if(om?.tram&&!tram){const t:Tram2={du:om.tram,qid:q.qid,session:luot.id,xong:false};setTram(t);if(!om.tram.coCauNen)await xongTram(t)}})
  /** Trạm xong (đóng hộp câu nền, không có câu nền, hoặc em sang ải luôn): MỘT lần `hoa2-omni-tram-xong`; có câu ⇒ thay đúng vị trí trong chuyến đang chơi. */
  async function xongTram(t:Tram2|null){if(!t||t.xong)return
@@ -158,7 +166,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const chamChip=(v:boolean)=>{setChuaChac(v);if(lanDauChamChip(sbd))setGoiYChip(true)}
  const tiep=()=>chay(async()=>{setBaoCau('');if(tram&&!tram.xong)await xongTram(tram);await sangAiKe()})
  async function sangAiKe(){if(!luot)return
-  setChuaChac(false);setGoiYChip(false);setTram(null)
+  setChuaChac(false);setGoiYChip(false);setTram(null);setSoat(false);setBuocSai(null)
   if(viTri+1<luot.cau.length){setViTri(viTri+1);setTraLoi('');setAssisted(false);setPhanHoi(null);return}
   await call('complete',{session:luot.id})
   const tran=learningBattle([...ketQua],luot.cau.length),xong=xongHomNay+1
@@ -178,7 +186,8 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const dangAi=pha==='ai'&&!!luot
  const tran=luot&&(dangAi||(pha==='ban-do'&&!khoa))?<Activity key={`${luot.id}:${lanVao}`} mode={dangAi?'visible':'hidden'}>{vo(<TrongAi profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} busy={busy} loi={loi} maLoi={maLoi} baoCau={baoCau}
   onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onRoi={roi}
-  {...(omniBat?{chuaChac,onChuaChac:chamChip,goiYChip}:{})} tram={tram?<TheTram tram={tram.du} qid={tram.qid} xong={tram.xong} onXong={()=>void xongTram(tram)}/>:undefined}/>,true)}</Activity>:null
+  {...(omniBat?{chuaChac,onChuaChac:chamChip,goiYChip}:{})} {...(omniBat&&canThan?{soatLai:soat,onSoatLai:setSoat}:{})} tram={tram?<TheTram tram={tram.du} qid={tram.qid} xong={tram.xong} onXong={()=>void xongTram(tram)}/>:undefined}
+  theBuocSai={omniBat&&buocSai?<TheBuocSai key={buocSai.qid} lua={buocSai.lua} onChon={async ma=>{await omniBuocSai(call,buocSai.qid,ma)}}/>:undefined}/>,true)}</Activity>:null
  const ra=(man:ReactNode)=><>{man}{tran}</>
  if(dangAi)return ra(null)
  if(pha==='de-thu')return ra(vo(<DeThu sbd={sbd} call={call} onVe={onDong}/>,true))
