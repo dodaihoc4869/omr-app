@@ -34,6 +34,8 @@ import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import { useAppStore } from '../../src/store/appStore'
 import { BANG, NOW_BANG, OMNI_BANG } from './gia/bang-gv'
 import '../../src/game/than-thu-v2/game.css'
+// App thật nạp dao.css qua các màn game khác (DaoCuaEm, ThamHiem…) trước khi vào Đảo 2.0 — thiếu thì nút Đảo mất nền (ảnh chụp 05/10).
+import '../../src/game/than-thu-v2/dao/dao.css'
 import { CHU_CHAC_MA_SAI, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
 import type { DaoKetQua, DaoProfile } from '../../src/game/than-thu-v2/dao/kieu'
 import { PH_OK } from '../../tests/_ph-moi/du-lieu-mau'

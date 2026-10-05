@@ -495,6 +495,9 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 }
 /* OMNI 3 (05/10) · chip "Chưa chắc" cạnh chip Trợ giúp: máy hẹp (≤ 400 px) vẫn giữ chữ — hai công tắc trơn đứng cạnh nhau không phân biệt được. */
 @media (max-width:400px){.dao2 .dao2-tro[data-khoi="chua-chac"] .dao2-tro-chu{display:inline}}
+/* Có chip "Chưa chắc" (OMNI bật) thì chip Trợ giúp cạnh nó cũng giữ chữ: một công tắc trơn không chữ đứng cạnh công tắc có chữ, em không biết
+   nó là gì (ảnh chụp 05/10). Hàng này đã xuống dòng nút chốt nên đủ chỗ. OMNI tắt ⇒ không có chip ⇒ y như cũ. */
+@media (max-width:400px){.dao2 .dao2-chan-hang:has([data-khoi="chua-chac"]) .dao2-tro-chu{display:inline}}
 /* OMNI 3 · ĐỀ THỬ: CHỈ bố cục — danh sách thẻ câu giấy của Đảo (dọc như ải), rộng tối đa 760 px cho dễ đọc; màu/nút dùng lại lớp sẵn có. */
 .dao2 .dao2-de-thu{display:flex;flex-direction:column;gap:12px;max-width:760px}
 .dao2 .dao2-de-thu-cau{display:flex;flex-direction:column;gap:6px}
