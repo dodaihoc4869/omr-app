@@ -183,6 +183,18 @@ describe('Đảo 2.0 · vé thử thách (cửa vào từ Sảnh)', () => {
     fireEvent.click(await nutSang(2))
     expect(await screen.findByText('Lửa Nhỏ · Máu 100/100')).toBeTruthy()
   })
+  it('máy chủ gắn `ve: true` / `luot: true` ở gốc kết quả answer (server/src/omni-game.ts) ⇒ cũng không trừ Máu', async () => {
+    const m = dung({ omni: OMNI, kich: { answer: d => (d.qid === 'q0' ? { ...SAI, ve: true, omni: omniKq({}) } : { ...SAI, luot: true, omni: omniKq({}) }) } })
+    await lenDuong()
+    chot()
+    await nutSang(2)
+    expect(m.container.querySelector('.dao2-ket-qua strong')?.textContent).toBe(CHU_MIEN_MAU.ve)
+    fireEvent.click(await nutSang(2))
+    expect(await screen.findByText('Lửa Nhỏ · Máu 100/100')).toBeTruthy()
+    chot()
+    await screen.findByRole('button', { name: 'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN' })
+    expect(m.container.querySelector('.dao2-ket-qua strong')?.textContent).toBe(CHU_MIEN_MAU.luot)
+  })
   it('cờ OMNI tắt ⇒ khoá vé bị bỏ qua: start y hệt cũ (không gọi lệnh mới)', async () => {
     sessionStorage.setItem(KHOA_OMNI_DAO, 've')
     const m = dung()

@@ -125,8 +125,9 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
   let r:Awaited<ReturnType<DaoCall>>;try{r=await call('answer',than)}catch(e){if(!laLoiCauDoi(e))throw e;await sangAiKe();if(conSong.current)setBaoCau(CHU_CAU_DOI);return}
   const correct=!!r.correct,reward=r.reward??0,coBua=!!docGoiY(q.goiY,q.phan)
   // OMNI 3: lướt (máy chủ chưa tính câu) hoặc câu của vé thử thách ⇒ câu chưa đúng KHÔNG trừ Máu (`mien` trong learningBattle).
-  const om=omniBat?docKetQuaOmni((r as {omni?:unknown}).omni):null
-  const mien:'luot'|'ve'|undefined=correct?undefined:om?.luot?'luot':omniBat&&luot.ve?'ve':undefined
+  // Máy chủ (server/src/omni-game.ts `themVaoKetQua`) còn gắn `luot: true` / `ve: true` ở gốc kết quả — nhận cả hai nơi; cờ tắt ⇒ không đọc.
+  const om=omniBat?docKetQuaOmni((r as {omni?:unknown}).omni):null,goc=r as {luot?:unknown;ve?:unknown}
+  const mien:'luot'|'ve'|undefined=correct||!omniBat?undefined:om?.luot||goc.luot===true?'luot':luot.ve||goc.ve===true?'ve':undefined
   const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted:assisted||coBua,reward,stage:r.stage??0})
   const emGui=(r as {traLoi?:unknown}).traLoi
   setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct,...(mien?{mien:true}:{})}]);setExp(t=>t+(typeof r.expCau==='number'?Math.max(0,r.expCau):reward))
