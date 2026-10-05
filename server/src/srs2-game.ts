@@ -274,6 +274,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const dangChoSom = env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0
       AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).first<Row>().catch(() => null)
   const hdSom = hoSoDangSom(env, sbd)
+  void docCauNghiDem(env) // 06/10: danh sách câu nghi đáp án cho cổng cuối — đọc SỚM, cùng đợt với kế hoạch (đệm 60 s; không bao giờ ném) ⇒ cổng không thêm đợt nối tiếp
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   const tamHoan = kh.tamHoan?.ca ?? 0
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
@@ -341,6 +342,7 @@ export async function startDao2CoVe(env: Env, sbd: string, b: Row, nowMs: number
 /** Phiên câu riêng của em cho MỘT chặng Đoàn (gọi nội bộ từ `taoNguoi`). Chặng ít câu ôn thì ngắn lại, không độn câu. */
 export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const hdSom = hoSoDangSom(env, sbd)
+  void docCauNghiDem(env) // 06/10: như startDao2 — đọc sớm danh sách câu nghi cho cổng cuối
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   if (!kh.conDoan.length) return { ok: true, questions: [], lyDo: 'xong_on_hom_nay', message: kh.conDao.length ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : `Hôm nay em không còn câu ôn nào.${loiTamHoan(kh.tamHoan?.ca ?? 0)} Mai quay lại hộ tống nhé.` }
   // Câu đã nằm trong một phiên Đoàn chưa chốt hết của hôm nay thì không phát lại ở phiên khác.

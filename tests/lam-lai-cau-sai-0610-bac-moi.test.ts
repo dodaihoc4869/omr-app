@@ -541,11 +541,14 @@ describe('A4 · cổng cuối của em loại câu NGHI sai đáp án (lý do `n
     const env = d.env as unknown as Env
     await damBaoBangTuHoanThien(env)
     nghi(d, 'DH-11-B1-I-2')
-    for (const kenh of ['dao2', 'doan2', 'tu_luyen', 'tu_luyen_kho_sai', 'bia', 'on_lai', 'khac_phuc', 'luot_cu', 'game_cu', 'ph_giao_them']) {
+    for (const kenh of ['dao2', 'doan2', 'tu_luyen', 'tu_luyen_kho_sai', 'bia', 'on_lai', 'khac_phuc', 'game_cu', 'ph_giao_them']) {
       const ra = await chanKhacKhoiEm(env, kenh, { khoiEm: 11 }, [{ qid: 'DH-11-B1-I-1', maDe: TO11 }, { qid: 'DH-11-B1-I-2', maDe: TO11 }], { cauCua: (x) => x })
       expect(ra.map((x) => x.qid), kenh).toEqual(['DH-11-B1-I-1'])
       expect(demChanKhoi()[`em:${kenh}`], kenh).toMatchObject({ giu: 1, nghi_dap_an: 1 })
     }
+    // Lượt ĐÃ phát (resume): câu đã qua cổng lúc phát — không lọc nghi (và không tốn truy vấn mỗi lần mở app).
+    const resume = await chanKhacKhoiEm(env, 'luot_cu', { khoiEm: 11 }, [{ qid: 'DH-11-B1-I-1', maDe: TO11 }, { qid: 'DH-11-B1-I-2', maDe: TO11 }], { cauCua: (x) => x })
+    expect(resume.map((x) => x.qid)).toEqual(['DH-11-B1-I-1', 'DH-11-B1-I-2'])
     expect(await dsCauNghi(env)).toEqual({ ok: true, qid: ['DH-11-B1-I-2'] }) // ca thi: cổng riêng của rút đề, không đổi
   })
 

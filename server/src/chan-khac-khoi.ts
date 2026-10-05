@@ -185,6 +185,8 @@ interface DemNghi { at: number; p: Promise<ReadonlySet<string>> }
 let demNghi = new WeakMap<object, DemNghi>()
 /** Xoá đệm danh sách câu nghi (test / sau khi thầy chốt câu nghi ở cùng isolate). `xoaMoiDem()` (dem-chung.ts) gọi hàm này. */
 export function xoaDemCauNghi(): void { demNghi = new WeakMap() }
+/** Kênh KHÔNG lọc câu nghi: lượt ĐÃ phát (resume) — câu đã qua cổng lúc phát; thêm một truy vấn ở mỗi lần mở app không đáng (đáp án chỉ bị nghi sau khi tự hoàn thiện đêm thứ Hai chạy). */
+export const KENH_GIU_CAU_NGHI: ReadonlySet<string> = new Set(['luot_cu'])
 dangKyXoaDem(xoaDemCauNghi)
 const RONG: ReadonlySet<string> = new Set()
 /**
@@ -227,7 +229,7 @@ export async function chanKhacKhoiEm<T>(env: Env, kenh: string, em: string | EmC
   const cauCua = tuyChon.cauCua ?? ((x: T) => x as unknown)
   // Hồ sơ Hoá 2.0 đã lọc (`chanMetaKhacKhoi`): câu được giữ vì thầy giao trực tiếp ở bước hồ sơ cũng được giữ ở cổng cuối (em chưa rõ khối).
   const tc: TuyChonCong<T> = !tuyChon.thayGiao && daLoc?.thayGiao.size ? { ...tuyChon, thayGiao: (x) => daLoc.thayGiao.has(qidGocKhoi(qidCua(cauCua(x)))) } : tuyChon
-  const [them, nghi] = await Promise.all([nguonThem(env, ds, tap, tc, 'khi_khong_ro'), tap.length ? docCauNghiDem(env) : Promise.resolve(RONG)]) // câu nghi: cùng đợt với nguồn khối (không thêm đợt nối tiếp)
+  const [them, nghi] = await Promise.all([nguonThem(env, ds, tap, tc, 'khi_khong_ro'), tap.length && !KENH_GIU_CAU_NGHI.has(kenh) ? docCauNghiDem(env) : Promise.resolve(RONG)]) // câu nghi: cùng đợt với nguồn khối (không thêm đợt nối tiếp)
   return congKhoi('em', kenh, tap, ds, tc, them, nghi)
 }
 
