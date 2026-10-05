@@ -136,7 +136,7 @@ Fisher information của IRT cực đại khi θ ≈ b (câu "vừa sức"). B�
 
 ### 2.4 (D) "Dạng đã vững" — hoàn thành theo mức nắm, không theo số câu đã làm
 
-**Định nghĩa duy nhất** (một chỗ `ho-so-cau-hinh.ts`): dạng d của em **đã vững** khi `P ≥ 0,90` **và** ≥ 4 câu tự làm khác `content_group` **và** bằng chứng ở ≥ 2 ngày VN **và** không đợt dạy lại đang mở ở d hoặc kiến thức nền của d **và** (bổ sung 05/10, mục 2.6) đúng ≥ 2 câu **chưa từng gặp** cùng dạng/mức lấy từ kho ngoài kho dạy học — không phải song sinh — để loại "vững ảo" do nhớ khuôn. Bốn điều kiện sau lấy nguyên từ luật xác nhận mức của `nang-luc.ts` (cùng tinh thần cổng cũ của game: 5 lượt tự làm, ≥ 4 đúng, ≥ 2 phiên — `than-thu-v2/core.ts:75-89`) — không đặt luật thứ hai. Vì cờ `nang_luc_v1` đang tắt, luật này **tính ngay trong `p-nam-dang.ts`**, không phụ thuộc bật CNH-1.0.
+**Định nghĩa duy nhất** (một chỗ `ho-so-cau-hinh.ts`): dạng d của em **đã vững** khi `P ≥ 0,90` **và** ≥ 4 câu tự làm khác `content_group` **và** bằng chứng ở ≥ 2 ngày VN **và** không đợt dạy lại đang mở ở d hoặc kiến thức nền của d **và** (bổ sung 05/10, mục 2.6) đúng ≥ 2 câu **chưa từng gặp** cùng dạng/mức lấy từ **bài khác trong kho DẠY HỌC** — không phải song sinh — để loại "vững ảo" do nhớ khuôn. Chuyển giao sang đề lạ đo ở **ca chốt** (thầy chốt 05/10: kho TU LUYỆN chỉ rút trong Tu luyện và ca kiểm tra, không vào game). Bốn điều kiện sau lấy nguyên từ luật xác nhận mức của `nang-luc.ts` (cùng tinh thần cổng cũ của game: 5 lượt tự làm, ≥ 4 đúng, ≥ 2 phiên — `than-thu-v2/core.ts:75-89`) — không đặt luật thứ hai. Vì cờ `nang_luc_v1` đang tắt, luật này **tính ngay trong `p-nam-dang.ts`**, không phụ thuộc bật CNH-1.0.
 
 **Hệ quả trong chiến dịch** (đổi một luật đã chốt — xin thầy quyết ở mục 8): câu **mới** còn lại của dạng đã vững **không còn bắt buộc** cọ xát trước D − 3; chúng chuyển sang "Thử sức thêm (không bắt buộc)" và vào ôn duy trì FSRS (đúng "câu dư → nhỏ giọt" của đặc tả). Thể lực tiết kiệm được đổ cho dạng chưa vững theo 2.3. Câu **ôn** (câu từng sai) **không** được miễn — luật đóng lỗi `loi-hoc-luat.ts` giữ nguyên.
 
@@ -167,14 +167,15 @@ Fisher information của IRT cực đại khi θ ≈ b (câu "vừa sức"). B�
 
 **Hiện trạng**: app nhận tờ dạy học qua mã `DH-…` hoặc mục "DẠY HỌC" (`cay-chon-de.ts:87-90`); chiến dịch mặc định = đề vừa kiểm tra, tức kho dạy học **đã là xương sống** (đúng vai Bank 2 của đặc tả). Kho còn lại (mã `DB-…`, mã số-đầu `12-C1-B2-D1`… — 38 % kho là mã số-đầu, `khoi-cau.ts:33`) hiện chỉ dùng rút đề thi/đề riêng.
 
-**Vai trò đề nghị cho kho còn lại: bộ đo chuyển giao** — như tập kiểm tra giữ riêng, không dùng để dạy:
+**Vai trò đề nghị cho kho còn lại (thầy chốt 05/10: gom thành thư mục TU LUYỆN, chỉ rút trong Tu luyện và ca kiểm tra): bộ đo chuyển giao** — như tập kiểm tra giữ riêng, không dùng để dạy, không vào game:
 
-| Dùng ở đâu | Lấy gì từ kho còn lại | Vì sao |
+| Dùng ở đâu | Lấy gì | Vì sao |
 |---|---|---|
-| **Kiểm chuyển giao** (điều kiện 5 của "Dạng đã vững", 2.4) | 2 câu **chưa gặp** cùng dạng/mức, ≥ 1 ngày khác; sai ⇒ P hạ như thường, dạng về "đang luyện", câu vào lịch ôn | Em làm được mọi bản thay số của một khuôn vẫn có thể trượt câu cùng dạng đặt khác; đề thi đặt khác |
-| **Ca chốt** | 50 % câu chiến dịch (ra bản song sinh) + 50 % câu chưa gặp cùng ô ma trận | Đo nắm thật thay đo trí nhớ câu; cũng là dữ liệu hiệu chuẩn dự báo (2.2). Đổi luật 27/09 "rút từ chiến dịch" ⇒ xin thầy chốt |
-| Vé thử thách · Thử sức thêm · ôn duy trì sau 30 ngày | Câu chưa gặp cùng dạng | Đo kỹ năng, không đo trí nhớ một câu |
-| Hiệu chỉnh | Lịch sử ca thi của kho còn lại: độ khó Wilson, câu nghi sai đáp án, soát nhãn mức độ | Dữ liệu đã có sẵn, chưa ai dùng |
+| **Kiểm chuyển giao trong game** (điều kiện 5 của "Dạng đã vững", 2.4) | 2 câu **chưa gặp** cùng dạng/mức từ **bài khác trong DẠY HỌC**, ≥ 1 ngày khác; sai ⇒ P hạ như thường, dạng về "đang luyện", câu vào lịch ôn | Em làm được mọi bản thay số của một khuôn vẫn có thể trượt câu cùng dạng đặt khác |
+| **Ca chốt** (ca kiểm tra, được chọn mọi kho) | 50 % câu chiến dịch (ra bản song sinh) + 50 % câu **chưa gặp** cùng ô ma trận từ **TU LUYỆN** | Đo chuyển giao sang đề lạ thật; cũng là dữ liệu hiệu chuẩn dự báo (2.2). Đổi luật 27/09 "rút từ chiến dịch" ⇒ xin thầy chốt |
+| **Tu luyện**, chế độ "Kiểm chuyển giao dạng vừa vững" (em tự chọn, không bắt buộc) | Câu chưa gặp cùng dạng từ TU LUYỆN | Em tự kiểm; kết quả vào sổ như mọi lượt |
+| Vé thử thách · Thử sức thêm · ôn duy trì sau 30 ngày | Câu chưa gặp cùng dạng từ **bài cũ trong DẠY HỌC** | Đo kỹ năng, không đo trí nhớ một câu; không rút TU LUYỆN vào game |
+| Hiệu chỉnh | Lịch sử ca thi của TU LUYỆN: độ khó Wilson, câu nghi sai đáp án, soát nhãn mức độ | Dữ liệu đã có sẵn, chưa ai dùng |
 
 **Điều kiện để kho còn lại có giá trị**: **cùng một bộ mã dạng** với kho dạy học. Kho dạy học là nguồn sự thật về phân loại (dạng `A.B.C`, kiến thức nền, mức độ, sao); câu kho còn lại được gắn mã dạng theo bộ ấy — máy gợi ý theo tương đồng nội dung, thầy duyệt theo lô; dạng nào không gắn được thì **nói ra**, không bịa. GĐ0 đo độ phủ trước khi làm gì khác.
 
