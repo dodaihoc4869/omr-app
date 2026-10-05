@@ -196,6 +196,10 @@ function App() {
   useEffect(() => {
     if (laVoThay) void docCoHoa2()
   }, [laVoThay, docCoHoa2])
+  // OMNI 3 (05/10): đồng bộ thư mục mục đích của tờ (DẠY HỌC / TU LUYỆN) lên máy chủ — chạy nền, tối đa 1 lần/ngày, lô ≤ 400 mã; lỗi chỉ bỏ qua.
+  useEffect(() => {
+    if (laVoThay) void import('./lib/dong-bo-thu-muc').then((m) => m.dongBoThuMucKho()).catch(() => {})
+  }, [laVoThay])
   // Màn đã bỏ khi 2.0 bật (Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về Tổng quan, không dựng màn cũ lấy một nhịp.
   // Ngược lại: cờ TẮT mà đang ở màn chỉ 2.0 mới có (Tổng quan, Chiến dịch luyện) ⇒ về Hôm nay như app cũ.
   const anKhiHoa2 = laVoThay && ((hoa2 && MAN_AN_KHI_HOA2.includes(screen)) || (!hoa2 && MAN_CHI_HOA2.includes(screen)))

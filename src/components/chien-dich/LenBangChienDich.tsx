@@ -2,11 +2,16 @@
 // Đầu màn chọn chiến dịch (`danh-sach`). Chiến dịch đang chạy ⇒ Bảng chiến dịch (`bang`); hết hạn nộp ⇒ TỰ chuyển Buổi chữa
 // (`buoi-chua`), kể cả khi màn đang mở đúng lúc qua 23:59. Tờ máy chiếu dùng lại luồng có sẵn (`to-chieu.ts` + `KhungXemPhieu`).
 // Tờ có hai nút Đạt / Chưa đạt (cầu nối của Gọi lên bảng, `ghi-to-chieu.ts`); kết quả hiện lại trên Buổi chữa.
+// OMNI 3 (05/10): bảng đang chạy nạp xong ⇒ hỏi thêm `/gv/omni bang` (Bảng bài: P × dạng, Sơ ý, Khoảng cách tới 8, Cần thầy chữa). Có số ⇒ truyền xuống
+// Bảng chiến dịch; OMNI tắt / lỗi / sai dạng ⇒ bỏ qua im lặng, bảng cũ y nguyên. Hết hạn (Buổi chữa) và OMNI áp cho lớp ⇒ đọc sẵn gói ca chốt 50/50
+// (`/gv/omni ca-chot`) cho nút "Mở ca chốt".
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { chuThieuNoiDung } from '../../lib/tra-cau-chieu'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { chuaXong, qidCuaDong, danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
+import { caChotOmni, docBangOmniCua, docCoOmni, omniApChoLop, type GoiCaChotOmni } from './api-omni'
+import type { BangOmni } from '../../../server/src/omni-kieu'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
 import { hienNgay, mocHetHan } from './ngay'
@@ -39,6 +44,8 @@ export default function LenBangChienDich() {
     }
   })
   const [bang, setBang] = useState<DuBang | null>(null)
+  const [omni, setOmni] = useState<BangOmni | null>(null)
+  const [goiCaChot, setGoiCaChot] = useState<GoiCaChotOmni | null>(null)
   const [buoi, setBuoi] = useState<BuoiChuaMayChu | null>(null)
   const [coMat, setCoMat] = useState<string[]>([])
   const [loi, setLoi] = useState('')
@@ -71,6 +78,23 @@ export default function LenBangChienDich() {
   }, [taiDs])
 
   const luot = useRef(0)
+  // Bảng bài OMNI: nạp SAU bảng chiến dịch (không làm chậm bảng cũ); câu trả lời của chiến dịch cũ về muộn thì bỏ.
+  const luotOmni = useRef(0)
+  const napOmni = useCallback(async (id: string) => {
+    const l = ++luotOmni.current
+    const r = await docBangOmniCua(id)
+    if (l !== luotOmni.current) return
+    setOmni(r.ok && (!r.du.chienDich.id || r.du.chienDich.id === id) ? r.du : null)
+  }, [])
+  // Gói ca chốt 50/50: chỉ khi OMNI áp cho lớp của chiến dịch; lỗi ⇒ null (nút dùng danh sách cũ).
+  const napCaChot = useCallback(async (id: string, lop: string | null) => {
+    const l = ++luotOmni.current
+    const co = await docCoOmni()
+    if (l !== luotOmni.current || !co.ok || !omniApChoLop(co.du, lop)) return
+    const r = await caChotOmni(id)
+    if (l !== luotOmni.current) return
+    setGoiCaChot(r.ok ? r.du : null)
+  }, [])
   const tai = useCallback(async (id: string, dsCoMat: string[]) => {
     if (!id) return
     const l = ++luot.current
@@ -86,6 +110,11 @@ export default function LenBangChienDich() {
       return
     }
     setBang(b.du)
+    if (!b.du.hetHan) void napOmni(id)
+    else {
+      setOmni(null)
+      void napCaChot(id, b.du.chienDich.lop)
+    }
     if (b.du.hetHan) {
       const bc = await docBuoiChua(id, dsCoMat)
       if (l !== luot.current) return
@@ -95,9 +124,12 @@ export default function LenBangChienDich() {
       } else setBuoi(bc.du)
     } else setBuoi(null)
     setDangTai(false)
-  }, [])
+  }, [napOmni, napCaChot])
   useEffect(() => {
     // Đổi chiến dịch: bỏ số của chiến dịch cũ ngay (không để thầy đọc nhầm bảng cũ trong lúc chờ).
+    luotOmni.current++
+    setOmni(null)
+    setGoiCaChot(null)
     setBang(null)
     setBuoi(null)
     setCoMat([])
@@ -225,7 +257,15 @@ export default function LenBangChienDich() {
       )}
 
       {bang && !bang.hetHan && (
-        <BangChienDich du={bang} nowMs={nowMs} dangChieu={dangChieu} onChieu={moChieu} onDaChua={() => void tai(chonId, coMat)} />
+        <BangChienDich
+          du={bang}
+          nowMs={nowMs}
+          dangChieu={dangChieu}
+          onChieu={moChieu}
+          onDaChua={() => void tai(chonId, coMat)}
+          omni={omni}
+          onOmniDoi={() => void napOmni(chonId)}
+        />
       )}
 
       {bang && bang.hetHan && !buoi && dangTai && (
@@ -250,6 +290,7 @@ export default function LenBangChienDich() {
             void tai(chonId, sbd)
           }}
           onDaChua={() => void taiDs()}
+          caChotOmni={goiCaChot}
         />
       )}
 

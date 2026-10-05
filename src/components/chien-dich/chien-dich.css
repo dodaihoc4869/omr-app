@@ -1285,6 +1285,22 @@
   height: 26px;
   border-radius: 4px;
 }
+/* OMNI 3 (05/10): ô P của Bảng bài bấm được để thầy xác nhận dạng — cùng 4 màu thang; vùng chạm cao hơn ô nhờ ::after; ô đang chọn có viền nhấn. */
+button.cd-o {
+  position: relative;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button.cd-o::after {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
+}
+button.cd-o[aria-pressed='true'] {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 1px;
+}
 .cd-nhiet th.cd-nhiet-ten {
   min-width: 150px;
   padding-right: 8px;

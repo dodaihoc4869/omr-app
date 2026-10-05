@@ -5,6 +5,7 @@
 // Hiện ở màn ca đã kết thúc (điền sẵn tờ đề + lớp của ca) và ở màn Chiến dịch luyện ("Giao chiến dịch mới", chưa điền gì).
 // Mỗi lần đổi đầu vào ⇒ gọi `suc-chua`; nút chính "Giao chiến dịch cho N em" ⇒ `tao`. KHÔNG có nút rút bớt câu hay nút dời hạn (thầy 28/09).
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
+// OMNI 3 (05/10): cây Kho đề xếp theo mục đích (thư mục DẠY HỌC / TU LUYỆN — `cay-muc-dich.ts`), vẫn chọn được mọi tờ.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import HopChonDe from '../HopChonDe'
@@ -300,7 +301,7 @@ export default function GiaoChienDich({
                 ) : kho.length === 0 ? (
                   <p className="cd-phu">Máy này chưa có Kho đề — vào Kho đề để đồng bộ trước.</p>
                 ) : (
-                  <HopChonDe ds={kho} daChon={chon} chonNhieu cao={260} onChon={tichTuCay} onChonTatCa={datChonTuCay} />
+                  <HopChonDe ds={kho} daChon={chon} chonNhieu cao={260} onChon={tichTuCay} onChonTatCa={datChonTuCay} theoMucDich />
                 ))}
               {tongMucDo > 0 && (
                 <div className="cd-co-cau" data-khoi="co-cau-muc-do">

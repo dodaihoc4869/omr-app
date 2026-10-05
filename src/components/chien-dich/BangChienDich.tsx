@@ -4,6 +4,10 @@
 // nhịp của lớp · "Cần thầy dạy lại" (hộp cuộn) + "Chiếu cả N câu lên bảng" · hạng của lớp theo dạng.
 // HẠNG dùng ĐÚNG ngưỡng thuật toán (`hangTuTiLe`): Yếu < 40% · Trung bình 40–65% · Khá 65–85% · Giỏi > 85% (bản vẽ ghi 40/60/80 — đã sửa).
 // Chữa sớm giữa kỳ: chiếu CẢ danh sách (thầy 05/10), chữa xong thì bấm "Chữa xong cả N câu" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong` với đủ N câu.
+// OMNI 3 (05/10 — hình docs/omni-0510/GV-BangBai.jpg, chỉ lấy NỘI DUNG): khi `/gv/omni bang` có số (prop `omni`, màn cha nạp) — ô em × dạng hiện P kèm
+// số câu tự làm (cùng 4 màu thang đang dùng), thêm cột "Sơ ý" và "Khoảng cách tới 8", bấm ô ⇒ "Thầy xác nhận em đã vững" / "Chưa đạt, dạy lại" (`xac-nhan`);
+// thẻ "Cần thầy dạy lại" đổi tên "Cần thầy chữa", hiện đủ ba nhóm (`CanThayChuaOmni`); cuối bảng một dòng "Vi kỹ năng: … đã gắn tự động · Xem".
+// Không có `omni` (OMNI tắt / máy chủ lỗi / sai dạng) ⇒ bảng cũ y nguyên, không gọi thêm lệnh nào.
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import HopXacNhan from '../HopXacNhan'
@@ -11,6 +15,12 @@ import { chuaXong, qidCuaDong, type BangChienDich as DuBang, type CauCanDayLai, 
 import { congNgay, conLai, hienHanNop, hienNgay, phanTram } from './ngay'
 import type { OChieu } from './to-chieu'
 import { CHU_GIAI_HANG, CHU_HANG, hangTuTiLe, mucO } from './tinh'
+import { THAM_SO_OMNI, type BangOmni } from '../../../server/src/omni-kieu'
+import { chuDangHieuChuan, chuKhoangCach8, doTinChu, NUT_DAY_LAI, NUT_XAC_NHAN_VUNG, phanTram as phanTramOmni, soP, TIEU_DE_CAN_THAY_CHUA } from '../../lib/omni-chu'
+import { xacNhanDang } from './api-omni'
+import { CHU_GIAI_P, ghepCotDang, laSoYCao, mucP, tbPLop, tbSoY, type CotDang } from './omni-bang'
+import CanThayChuaOmni from './CanThayChuaOmni'
+import ViKyNangBai from './ViKyNangBai'
 import './chien-dich.css'
 
 export { CHU_HANG }
@@ -148,6 +158,8 @@ export default function BangChienDich({
   dangChieu,
   onChieu,
   onDaChua,
+  omni = null,
+  onOmniDoi,
 }: {
   du: DuBang
   nowMs: number
@@ -155,6 +167,10 @@ export default function BangChienDich({
   onChieu: (ds: OChieu[], tenBuoi: string) => Promise<boolean>
   /** Gọi sau khi "Chữa xong" thành công để nạp lại bảng. */
   onDaChua: () => void
+  /** Bảng bài OMNI 3 (`/gv/omni bang`) — vắng ⇒ bảng cũ y nguyên. */
+  omni?: BangOmni | null
+  /** Gọi sau khi thầy xác nhận một dạng để màn cha nạp lại Bảng bài OMNI. */
+  onOmniDoi?: () => void
 }) {
   const showToast = useAppStore((s) => s.showToast)
   const [caLop, setCaLop] = useState(false)
@@ -167,6 +183,12 @@ export default function BangChienDich({
   const tb = useMemo(() => tbLopTheoDang(du), [du])
   // Dạng xếp theo cả lớp yếu nhất bên trái (dạng không có số đứng cuối).
   const dang = useMemo(() => [...du.dang].sort((a, b) => (tb[a] ?? 2) - (tb[b] ?? 2)), [du.dang, tb])
+  // OMNI 3: cột dạng = cột cũ (đúng thứ tự) ghép mã dạng OMNI; dạng chỉ OMNI có thêm vào cuối. Vắng OMNI ⇒ đúng cột cũ.
+  const om = omni
+  const cot = useMemo<CotDang[]>(() => (om ? ghepCotDang(dang, om.dang) : dang.map((ten) => ({ ten, ma: null, moi: false }))), [om, dang])
+  const [oChon, setOChon] = useState<{ sbd: string; ten: string; ma: string; tenDang: string; p: number; n: number } | null>(null)
+  const [dangXacNhan, setDangXacNhan] = useState(false)
+  const soYLop = om ? tbSoY(om) : null
   // Chữa MỘT LẦN cả danh sách (thầy 05/10: "cho chữa tất cả 1 lần") — trước chỉ 3 câu đầu.
   const ba = du.canDayLai
   const luotBa = ba.reduce((s, c) => s + c.soEm, 0)
@@ -240,6 +262,20 @@ export default function BangChienDich({
     showToast(`Đã ghi chữa xong: ${r.du.soLuot} lượt em, ôn lại từ ${hienNgay(r.du.ngayOnLai)}`, 'success')
     setDaChieu3(false)
     onDaChua()
+  }
+
+  const xacNhan = async (ket: 'vung' | 'day_lai') => {
+    if (!oChon || dangXacNhan) return
+    setDangXacNhan(true)
+    const r = await xacNhanDang(oChon.sbd, oChon.ma, ket)
+    setDangXacNhan(false)
+    if (!r.ok) {
+      showToast(r.chu, 'warn')
+      return
+    }
+    showToast(ket === 'vung' ? `Đã ghi: ${oChon.ten} vững dạng ${oChon.tenDang}` : `Đã ghi: ${oChon.ten} cần dạy lại dạng ${oChon.tenDang}`, 'success')
+    setOChon(null)
+    onOmniDoi?.()
   }
 
   return (
@@ -330,7 +366,7 @@ export default function BangChienDich({
         <section className="cd-the" aria-labelledby="cd-bang-em">
           <div className="cd-the-dau">
             <div>
-              <h2 id="cd-bang-em">Từng em × dạng · % câu thành thạo</h2>
+              <h2 id="cd-bang-em">Từng em × dạng · {om ? 'P nắm dạng kèm số câu tự làm' : '% câu thành thạo'}</h2>
               <span className="cd-so cd-phu">
                 Hiện {hien.length}/{dsEm.length} em · {soDangYeu}/{dang.length} dạng Yếu
               </span>
@@ -348,11 +384,22 @@ export default function BangChienDich({
                     </th>
                     <th scope="col" title="Thành thạo = số câu đúng / tổng số câu">Thành thạo</th>
                     <th scope="col" title="Những bạn tồn đẩy lên đầu, tồn nhiều lên trên · Đúng nhịp = làm đủ full câu mỗi ngày · Chưa làm câu nào = Không làm">Trễ nhịp ▼</th>
-                    {dang.map((d) => (
+                    {cot.map(({ ten: d }) => (
                       <th key={d} scope="col" title={d} className="cd-nhiet-dang">
                         <span className="cd-ten-dang-xoay">{d}</span>
                       </th>
                     ))}
+                    {om && (
+                      <>
+                        <th scope="col" title="Sơ ý = tỉ lệ sai khi mọi kỹ năng cần đã vững" data-cot="so-y" style={{ whiteSpace: 'nowrap' }}>
+                          Sơ ý
+                        </th>
+                        <th scope="col" title="Điểm còn thiếu tới mốc 8 theo dự báo — chỉ thầy thấy" data-cot="khoang-cach-8">
+                          Khoảng cách tới 8
+                          {!om.hieuChuan.du && <small className="cd-hang-duoi">{chuDangHieuChuan(om.hieuChuan.soCaChot, THAM_SO_OMNI.HIEU_CHUAN.soCaChot)}</small>}
+                        </th>
+                      </>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -362,9 +409,20 @@ export default function BangChienDich({
                     </th>
                     <td className="cd-so">{phanTram(lop.thanhThao)}</td>
                     <td>—</td>
-                    {dang.map((d) => {
-                      const t = tb[d]
-                      const h = lop.hangTheoDang?.[d] ?? (typeof t === 'number' ? hangTuTiLe(t) : null)
+                    {cot.map(({ ten: d, ma, moi }) => {
+                      const pLop = om ? tbPLop(om, ma) : null
+                      if (pLop !== null) {
+                        const mp = mucP(pLop)
+                        return (
+                          <td key={d}>
+                            <span className={`cd-o cd-o--${mp}`} data-o-p={mp} title={`${d}: P trung bình lớp ${soP(pLop)}`}>
+                              {soP(pLop)}
+                            </span>
+                          </td>
+                        )
+                      }
+                      const t = moi ? undefined : tb[d]
+                      const h = moi ? null : (lop.hangTheoDang?.[d] ?? (typeof t === 'number' ? hangTuTiLe(t) : null))
                       const m = mucO(t)
                       return (
                         <td key={d}>
@@ -375,6 +433,12 @@ export default function BangChienDich({
                         </td>
                       )
                     })}
+                    {om && (
+                      <>
+                        <td className="cd-so">{soYLop !== null ? phanTramOmni(soYLop) : '—'}</td>
+                        <td>—</td>
+                      </>
+                    )}
                   </tr>
                   {hien.map((e) => {
                     const hangChu = chuHangTheoDang(e.hangTheoDang, dang)
@@ -397,10 +461,30 @@ export default function BangChienDich({
                         >
                           {nhip.chu}
                         </td>
-                        {dang.map((d) => {
-                          const t = e.theoDang[d]
-                          const m = mucO(t, e.daLamTheoDang?.[d])
-                          const h = e.hangTheoDang?.[d]
+                        {cot.map(({ ten: d, ma, moi }) => {
+                          const op = om && ma ? om.o[e.sbd]?.[ma] : undefined
+                          if (op && ma) {
+                            const mp = mucP(op.p)
+                            const dangChon = oChon?.sbd === e.sbd && oChon.ma === ma
+                            return (
+                              <td key={d}>
+                                <button
+                                  type="button"
+                                  className={`cd-o cd-o--${mp}`}
+                                  data-o-p={mp}
+                                  aria-pressed={dangChon}
+                                  title={`${e.ten} · ${d}: P ${soP(op.p)} · ${op.n} câu tự làm${op.trangThai === 'vung' ? ' · đã vững' : ''} — bấm để xác nhận dạng`}
+                                  onClick={() => setOChon(dangChon ? null : { sbd: e.sbd, ten: e.ten, ma, tenDang: d, p: op.p, n: op.n })}
+                                >
+                                  {soP(op.p)}
+                                </button>
+                                <span className="cd-hang-duoi">{op.n} câu</span>
+                              </td>
+                            )
+                          }
+                          const t = moi ? undefined : e.theoDang[d]
+                          const m = mucO(t, moi ? undefined : e.daLamTheoDang?.[d])
+                          const h = moi ? undefined : e.hangTheoDang?.[d]
                           return (
                             <td key={d}>
                               <span
@@ -413,6 +497,20 @@ export default function BangChienDich({
                             </td>
                           )
                         })}
+                        {om && (
+                          <>
+                            <td className={`cd-so${laSoYCao(om.sEm[e.sbd]) ? ' cd-chu-do' : ''}`} data-o-so-y={e.sbd}>
+                              {typeof om.sEm[e.sbd] === 'number' ? phanTramOmni(om.sEm[e.sbd]!) : '—'}
+                            </td>
+                            <td
+                              className="cd-so"
+                              data-o-kc8={e.sbd}
+                              title={typeof om.sanSang[e.sbd] === 'number' ? `Độ tin sẵn sàng 8+: ${doTinChu(om.sanSang[e.sbd]!)}` : undefined}
+                            >
+                              {chuKhoangCach8(om.khoangCach8[e.sbd] ?? null)}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     )
                   })}
@@ -431,16 +529,47 @@ export default function BangChienDich({
               <span className="cd-o cd-o--mau cd-o--chua-lam" aria-hidden="true" />
               Chưa làm
             </span>
+            {om &&
+              CHU_GIAI_P.map((g) => (
+                <span key={`p-${g.hang}`} data-chu-giai-p={g.hang}>
+                  <span className={`cd-o cd-o--mau cd-o--${g.hang}`} aria-hidden="true" />
+                  {g.chu}
+                </span>
+              ))}
             {dsEm.length > SO_EM_THU_GON && (
               <button type="button" className="m3-nut-vien cd-nut-nho" aria-expanded={caLop} onClick={() => setCaLop((x) => !x)}>
-                {caLop ? 'Thu gọn' : `Xem cả ${dsEm.length} em · ${dang.length} dạng`}
+                {caLop ? 'Thu gọn' : `Xem cả ${dsEm.length} em · ${cot.length} dạng`}
               </button>
             )}
           </div>
-          <p className="cd-phu">
-            Em xếp theo thành thạo thấp trước (▲). Dạng xếp theo cả lớp yếu nhất bên trái. Số trong ô = % câu của dạng em đã thành thạo; hạng theo đúng ngưỡng app
-            dùng để bốc câu mới. Đúng nhịp = làm đủ full câu mỗi ngày. Trễ nhịp = tổng số câu tồn của những ngày trước. Chưa làm câu nào = Không làm. Rê chuột lên tên em để xem sức học theo dạng.
-          </p>
+          {om ? (
+            <p className="cd-phu" data-khoi="giai-thich-omni">
+              Ô = P nắm dạng (0–1) kèm số câu em tự làm; bấm một ô để thầy xác nhận dạng (ghi sổ, phát lại được). Sơ ý = tỉ lệ sai khi mọi kỹ năng cần đã vững.
+              Khoảng cách tới 8 = điểm còn thiếu tới mốc 8 theo dự báo, chỉ thầy thấy. Đúng nhịp = làm đủ full câu mỗi ngày. Trễ nhịp = tổng số câu tồn của những ngày
+              trước. Chưa làm câu nào = Không làm.
+            </p>
+          ) : (
+            <p className="cd-phu">
+              Em xếp theo thành thạo thấp trước (▲). Dạng xếp theo cả lớp yếu nhất bên trái. Số trong ô = % câu của dạng em đã thành thạo; hạng theo đúng ngưỡng app
+              dùng để bốc câu mới. Đúng nhịp = làm đủ full câu mỗi ngày. Trễ nhịp = tổng số câu tồn của những ngày trước. Chưa làm câu nào = Không làm. Rê chuột lên tên em để xem sức học theo dạng.
+            </p>
+          )}
+          {om && oChon && (
+            <div className="cd-thanh-hanh-dong" role="group" aria-label={`Xác nhận dạng ${oChon.tenDang} của ${oChon.ten}`} data-khoi="xac-nhan-dang">
+              <p className="cd-phu">
+                <b>{oChon.ten}</b> · {oChon.tenDang} · P {soP(oChon.p)} · {oChon.n} câu tự làm. Ghi sổ, phát lại được; bấm nút còn lại để đổi.
+              </p>
+              <button type="button" className="m3-nut-tonal cd-nut-nho" disabled={dangXacNhan} onClick={() => void xacNhan('vung')}>
+                {NUT_XAC_NHAN_VUNG}
+              </button>
+              <button type="button" className="m3-nut-vien cd-nut-nho" disabled={dangXacNhan} onClick={() => void xacNhan('day_lai')}>
+                {NUT_DAY_LAI}
+              </button>
+              <button type="button" className="m3-nut-chu cd-nut-nho" onClick={() => setOChon(null)}>
+                Đóng
+              </button>
+            </div>
+          )}
         </section>
 
         <div className="cd-cot-phai">
@@ -480,13 +609,17 @@ export default function BangChienDich({
 
           <section className="cd-the cd-the--nhan" aria-labelledby="cd-can-day-lai">
             <div className="cd-the-dau">
-              <h2 id="cd-can-day-lai">Cần thầy dạy lại</h2>
+              <h2 id="cd-can-day-lai">{om ? TIEU_DE_CAN_THAY_CHUA : 'Cần thầy dạy lại'}</h2>
               <span className="cd-so cd-phu">
                 {lop.canDayLaiCau} câu · {lop.canDayLaiLuot} lượt em
               </span>
             </div>
-            <p className="cd-phu">Câu em sai từ 4 lần, lần cuối vẫn sai — đã tạm rời game, chờ thầy chữa.</p>
-            {du.canDayLai.length === 0 ? (
+            {om ? (
+              <CanThayChuaOmni ds={om.canThayChua} canDayLai={du.canDayLai} chienDichId={cd.id} homNay={du.homNay} onDaChua={onDaChua} />
+            ) : (
+              <p className="cd-phu">Câu em sai từ 4 lần, lần cuối vẫn sai — đã tạm rời game, chờ thầy chữa.</p>
+            )}
+            {om ? null : du.canDayLai.length === 0 ? (
               <p className="cd-phu">Chưa có câu nào cần thầy dạy lại — các em đang tự ôn được.</p>
             ) : (
               // Hộp cuộn (thầy 05/10): danh sách dài không đẩy nút chiếu xuống tận cuối trang.
@@ -539,6 +672,8 @@ export default function BangChienDich({
           )}
         </div>
       </div>
+
+      {om && <ViKyNangBai chienDichId={cd.id} />}
 
       {hoiChua && (
         <HopXacNhan
