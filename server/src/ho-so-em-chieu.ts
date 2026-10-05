@@ -101,7 +101,8 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
       const lan = rLan.filter((x) => str(x.visibility) !== 'embargoed' && x.ket_qua !== null && x.ket_qua !== undefined)
       const idGame = lan.filter((x) => str(x.nguon) === 'game').map((x) => str(x.attempt_id) || `${str(x.ma_nguon)}|${qid}`)
       const phien = [...new Set(lan.filter((x) => str(x.nguon) === 'game').map((x) => str(x.ma_nguon)))]
-      const rAtt = idGame.length ? await hoi(env, "SELECT id, json_extract(json, '$.traLoi') AS tra_loi FROM game_v2_attempt WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(idGame)) : []
+      // 05/10: lượt BẢN XÁO (cau-anh-em.ts) lưu thêm `traLoiGoc` = đáp án em chọn quy về khung gốc — tờ chiếu so với câu gốc nên đọc khoá ấy trước.
+      const rAtt = idGame.length ? await hoi(env, "SELECT id, COALESCE(json_extract(json, '$.traLoiGoc'), json_extract(json, '$.traLoi')) AS tra_loi FROM game_v2_attempt WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(idGame)) : []
       const rPhien = phien.length ? await hoi(env, "SELECT id, json_extract(json, '$.doan') IS NOT NULL AS doan, COALESCE(json_extract(json, '$.bia'), 0) AS bia FROM game_v2_session WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))", sbd, JSON.stringify(phien)) : []
       const caThi = [...new Set(lan.filter((x) => str(x.nguon) === 'thi').map((x) => str(x.ma_nguon)))]
       const rCt = caThi.length ? await hoi(env, 'SELECT ma_ca, lan_thu, dap_an_chon FROM chi_tiet_cau WHERE sbd = ? AND qid = ? AND ma_ca IN (SELECT value FROM json_each(?))', sbd, qid, JSON.stringify(caThi)) : []

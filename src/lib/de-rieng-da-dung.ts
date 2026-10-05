@@ -3,14 +3,14 @@
 // ca lúc chốt (`noiKhoCa`), bản đồ chốt MỘT lệnh qua `batDauThi` (`/ca/chot-bat-dau`).
 //
 // Nguồn câu của từng em: máy chủ `/ca/cau-da-dung` (câu em đã TỰ làm đúng trong các chiến dịch em có mặt — server/src/cau-da-dung.ts).
-// Thuật toán: src/lib/rut-de-da-dung.ts (tỷ lệ ma trận 2026, ô thiếu để trống + báo, KHÔNG lấp câu em chưa đúng).
+// Thuật toán: src/lib/rut-de-da-dung.ts (tỷ lệ ma trận 2026; thiếu câu đã đúng ⇒ BÙ câu khác trong kho ca cùng mức độ — thầy 05/10).
 import { mergeAndStrip, type TeacherExamSource, type TeacherMcqQuestion, type TeacherShortAnswerQuestion } from '../data/examContent'
 import { loadExamSources, loadSessionTeacherBank, saveSessionTeacherBank } from './exam-db'
 import { cauDaDungTheoEm, noiKhoCa, type CauDaDungEm } from './exam-api'
 import { ngayVnCua } from './de-rieng-nguon'
 import { khoDayDu, napNguon, timCau, type CauNgoai } from './de-rieng-v2'
 import type { CauKhoV2 } from './rut-de-v2'
-import { banDoDaDung, chuThieuDaDung, gopKetQuaDaDung, rutDeDaDung, taoNhanDaDung, type CauDaDung, type KetQuaDaDung } from './rut-de-da-dung'
+import { banDoDaDung, chuThieuDaDung, gopKetQuaDaDung, khoBuTuKho, rutDeDaDung, taoNhanDaDung, type CauDaDung, type KetQuaDaDung } from './rut-de-da-dung'
 
 export interface RutThuDaDung {
   maCa: string
@@ -75,7 +75,7 @@ export async function chayThuRutDeDaDung(url: string, mat: string, maCa: string,
   const cauNgoai: Record<string, CauNgoai> = {}
   const { nguon, khongNoiDung } = await docNguonEm(url, mat, ds, ng.khoCa, cauNgoai, {})
   const t0 = performance.now()
-  const kq = rutDeDaDung({ nguon, dsSbd: ds, tongCau, seed: maCa })
+  const kq = rutDeDaDung({ nguon, dsSbd: ds, tongCau, seed: maCa, khoBu: khoBuTuKho(ng.khoCa) })
   const rt: RutThuDaDung = { maCa, ngay, cheDo: 'da_dung', kq, tongCau, nguon, khongNoiDung, cauNgoai, khoCa: ng.khoCa, lucRut: new Date().toISOString(), msThuatToan: performance.now() - t0 }
   nho.set(maCa, rt)
   return rt
@@ -101,7 +101,7 @@ export async function chotRutDeDaDung(url: string, mat: string, maCa: string, ds
   if (them.length > 0) {
     const cauNgoai = { ...rt.cauNgoai }
     const x = await docNguonEm(url, mat, them, rt.khoCa, cauNgoai, {})
-    const kqThem = rutDeDaDung({ nguon: x.nguon, dsSbd: them, tongCau: rt.tongCau, seed: maCa, daDung: rt.kq.daDung })
+    const kqThem = rutDeDaDung({ nguon: x.nguon, dsSbd: them, tongCau: rt.tongCau, seed: maCa, daDung: rt.kq.daDung, khoBu: khoBuTuKho(rt.khoCa) })
     rt = { ...rt, kq: gopKetQuaDaDung(rt.kq, kqThem), cauNgoai, nguon: { ...rt.nguon, ...x.nguon }, khongNoiDung: { ...rt.khongNoiDung, ...x.khongNoiDung } }
     nho.set(maCa, rt)
   }
@@ -126,16 +126,18 @@ export async function chotRutDeDaDung(url: string, mat: string, maCa: string, ds
       canhBao.push(`Không nối được ${canNoi.length} câu em đã làm đúng (ngoài kho ca) vào ca — đã rút lại chỉ từ kho ca. ${e instanceof Error ? e.message : ''}`.trim())
       const coKho = new Set(rt.khoCa.map((c) => c.id))
       const nguon = Object.fromEntries(Object.entries(rt.nguon).map(([s, l]) => [s, l.filter((c) => coKho.has(c.qid))]))
-      const kq = rutDeDaDung({ nguon, dsSbd: Object.keys(rt.kq.theoEm), tongCau: rt.tongCau, seed: maCa })
+      const kq = rutDeDaDung({ nguon, dsSbd: Object.keys(rt.kq.theoEm), tongCau: rt.tongCau, seed: maCa, khoBu: khoBuTuKho(rt.khoCa) })
       rt = { ...rt, kq, nguon, cauNgoai: {} }
       nho.set(maCa, rt)
     }
   }
   const bd = banDoDaDung(rt.kq)
   const thieuChu = Object.entries(rt.kq.thieu).flatMap(([sbd, ds]) => chuThieuDaDung(`Em ${sbd}`, ds))
-  if (thieuChu.length > 0) canhBao.push(`${Object.keys(rt.kq.thieu).length} em chưa làm đúng đủ câu — các ô đó để trống (không lấp câu em chưa làm đúng).`)
+  const soEmBu = Object.keys(rt.kq.bu ?? {}).length
+  if (soEmBu > 0) canhBao.push(`${soEmBu} em chưa làm đúng đủ câu — đã bù câu khác trong kho ca cùng mức độ (câu bù không có nhãn "đã làm đúng").`)
+  if (thieuChu.length > 0) canhBao.push(`${Object.keys(rt.kq.thieu).length} em vẫn thiếu câu sau khi bù vì kho ca không đủ câu cùng phần — các ô đó máy em tự lấp từ đề ca.`)
   const khongBo = Object.keys(rt.kq.theoEm).filter((s) => !bd.bo[s])
-  if (khongBo.length > 0) canhBao.push(`${khongBo.length} em chưa có câu nào đã làm đúng — các em đó không vào được ca này.`)
+  if (khongBo.length > 0) canhBao.push(`${khongBo.length} em chưa có bộ câu (kho ca trống) — máy em nhận đề chung của ca.`)
   const lucRut = new Date().toISOString()
   const bienBan = {
     canCua: {},
@@ -145,11 +147,11 @@ export async function chotRutDeDaDung(url: string, mat: string, maCa: string, ds
     boQua: [],
     caDaQuet: [],
     ghiChu: [
-      { loai: 'tin' as const, loi: 'kiểm chứng câu đã đúng: chỉ câu em đã tự làm đúng trong các chiến dịch, bốc ngẫu nhiên theo tỷ lệ ma trận 2026' },
+      { loai: 'tin' as const, loi: 'kiểm chứng câu đã đúng: câu em đã tự làm đúng trong các chiến dịch, bốc ngẫu nhiên theo tỷ lệ ma trận 2026; thiếu thì bù câu khác trong kho cùng mức độ' },
       ...thieuChu.map((loi) => ({ loai: 'canh_bao' as const, loi })),
     ],
     lucRut,
-    daDung: { phanBo: rt.kq.phanBo, thieu: rt.kq.thieu, khongNoiDung: rt.khongNoiDung },
+    daDung: { phanBo: rt.kq.phanBo, thieu: rt.kq.thieu, bu: rt.kq.bu ?? {}, khongNoiDung: rt.khongNoiDung },
   }
   return { boTheoEm: bd.bo, banDoDaDung: { daDung: bd.daDung, demDaDung: bd.demDaDung }, bienBan, soEmRutThem: them.length, soCauNoiThem, canhBao }
 }

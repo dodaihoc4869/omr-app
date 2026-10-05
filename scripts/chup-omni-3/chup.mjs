@@ -176,6 +176,33 @@ const MAN = [
     await t.waitForTimeout(1200)
     await chup(t, 'gv-cai-dat-omni-1440', true)
   }],
+  // ── Tổng quan app thầy: thẻ "Chất lượng sửa lỗi · 14 ngày" (5 thước đo theo lớp, 05/10) — cả trang, thẻ, đổi lớp, nền tối, điện thoại 390 ──
+  ['gv-tong-quan', [1440, 900], async (t) => {
+    const the = t.getByRole('region', { name: /Chất lượng sửa lỗi/ })
+    await the.waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1000)
+    await chup(t, 'gv-tong-quan-ca-trang-1440', true)
+    await the.scrollIntoViewIfNeeded()
+    await t.waitForTimeout(300)
+    await chup(t, 'gv-tong-quan-chat-luong-sua-loi-1440')
+    await the.getByRole('button', { name: '11B' }).click()
+    await the.getByText(/Lớp 11B/).waitFor({ timeout: 20000 })
+    await the.scrollIntoViewIfNeeded()
+    await t.waitForTimeout(400)
+    await chup(t, 'gv-chat-luong-sua-loi-lop-11b-1440')
+    await the.getByRole('button', { name: '12A1' }).click()
+    await the.getByText(/Lớp 12A1/).waitFor({ timeout: 20000 })
+    await t.emulateMedia({ colorScheme: 'dark' })
+    await the.scrollIntoViewIfNeeded()
+    await t.waitForTimeout(600)
+    await chup(t, 'gv-chat-luong-sua-loi-toi-1440')
+    await t.emulateMedia({ colorScheme: 'light' })
+    await t.setViewportSize({ width: 390, height: 844 })
+    await t.waitForTimeout(800)
+    await the.scrollIntoViewIfNeeded()
+    await t.waitForTimeout(300)
+    await chup(t, 'gv-chat-luong-sua-loi-390')
+  }],
   ['ph', [390, 844], async (t) => {
     await t.waitForSelector('[data-vung="chien-dich"]', { timeout: 30000 })
     await t.waitForTimeout(800)

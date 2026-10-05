@@ -41,9 +41,11 @@ export function duDapAn(q: Question, chon: string): boolean {
  *  - `gach`: phương án SAI máy chủ đã gạch (Bùa Trợ giảng) — ô tối "cháy thành tro", KHÔNG bấm được;
  *  - `bua`: dải Bùa Trợ giảng đặt ngay dưới đầu thẻ, trước đề;
  *  - `xemLaiChuan`: đã có kết quả ⇒ thay cả thẻ bằng khối xem lại CHUẨN của app (`TheCau` xem_lai + `chuanHoaLoiGiaiCau`), số trên đầu thẻ = `stt`. */
-export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number } }
+/** `cuoi` (OMNI 3, 05/10): phần thêm đặt TRONG thẻ câu, sau phương án/ô đáp số (chip "Chưa chắc") — không chiếm hàng dưới thẻ, nên thẻ câu
+ *  và các nút đòn giữ đúng bố cục đang chạy (thầy 05/10: "app của học sinh giữ nguyên mọi thứ giao diện"). */
+export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number }; cuoi?: ReactNode }
 
-export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
+export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan, cuoi }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
   const hinh = q.hinhAnh as HinhAnh[]
   // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`expCau`; máy chủ cũ: `reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
   const cheDo = useCheDoHieuUng()
@@ -97,6 +99,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
       )}
       {q.phan === 'III' && <OSoTraLoi className="dh-so-khung" inputClassName="dh-so" ariaLabel="Đáp số của em" placeholder="Nhập đáp số" disabled={khoa} value={chon} maxLength={40} onChange={onChon} />}
       <HinhTaiViTri hinhAnh={hinh} viTri="cuoi_cau" onZoom={onZoom} nhan="câu của em" />
+      {cuoi}
       {ketQua && (
         <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status">
           <b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>

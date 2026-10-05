@@ -16,7 +16,9 @@ const MAU = [
 const chu = (i: number, n = 2) => Array.from({ length: n }, (_, k) => MAU[(i * 7 + k * 3) % MAU.length]).join('. ')
 const DANG = ['Chất béo', 'Danh pháp ester', 'Thuỷ phân ester', 'Đốt cháy ester', 'Xà phòng hoá', 'Đồng phân']
 
-export const kichBan = { doanTran: false, ruongMoDuoc: false, lanSanh: 0, omni: false }
+/** `gio`: giờ máy chủ cố định (ms) cho ảnh giao diện tất định (do-app-hs --kich=anh) — null ⇒ giờ thật. */
+export const kichBan: { doanTran: boolean; ruongMoDuoc: boolean; lanSanh: number; omni: boolean; gio: number | null } = { doanTran: false, ruongMoDuoc: false, lanSanh: 0, omni: false, gio: null }
+const bayGio = () => kichBan.gio ?? Date.now()
 
 /** Sảnh khi lớp BẬT OMNI (hình dữ liệu như scripts/chup-omni-3/trang.tsx `SANH_OMNI`) — chỉ gửi khi `kichBan.omni` (do-app-hs --omni=1). */
 const SANH_OMNI = {
@@ -50,7 +52,7 @@ const ghe = [
 ]
 let revDoan = 5
 const tranDoan = (): Obj => ({
-  ma: 'DH1', revision: revDoan, laChu: true, batDau: true, ghe, gioMayChu: Date.now(),
+  ma: 'DH1', revision: revDoan, laChu: true, batDau: true, ghe, gioMayChu: bayGio(),
   tran: { tenChang: 'Vượt Đầm Bùn Acid', hiep: 3, soHiep: 8, laTrum: false, ketThuc: false, thang: null, linhTam: { hp: 80, toiDa: 100 }, quai: [{ ma: 5, loai: 'bun_acid', hp: 9 }, { ma: 6, loai: 'khoi_oxi_hoa', hp: 12 }], trumVoGiap: [],
     nangLuong: 1, daNhanTiepSuc: 0, giay: 40, moSauMs: 0, conMs: 27000, tenQuai: ['Bùn Acid', 'Khói Oxi Hoá'], loaiQuai: ['bun_acid', 'khoi_oxi_hoa'], tenTrum: ['Chúa tể Kết Tủa', 'Bá chủ Ăn Mòn'], loaiTrum: ['chua_te_ket_tua', 'ba_chu_an_mon'] },
   cau: { qid: 'Q1', nhan: 'toi_han_on', de: { qid: 'Q1', maDe: 'D', version: 'v', group: 'g', phan: 'I', text: `${chu(3)} Tính $n_{CO_2}$.`, choices: ['phương án một', 'phương án hai', 'phương án ba', 'phương án bốn'], ideas: [], hinhAnh: [], dang: 'ES', tenDang: 'Ester', mucDo: 'hieu', sao: 2, kienThuc: [] } },
@@ -94,6 +96,7 @@ export function datLai() {
   kichBan.ruongMoDuoc = false
   kichBan.lanSanh = 0
   kichBan.omni = false
+  kichBan.gio = null
   revDoan = 5
 }
 
@@ -111,7 +114,7 @@ export async function traLoi(duong: string, body: Obj): Promise<Obj> {
     case '/hs/tu-luyen/xem-truoc':
       return { ok: true, tongToiDa: 30, loi: '', thongKe: DANG.map((t) => ({ tenDang: t, soCauSai: 3, soUngVien: 12 })), nguonDang: { kieu: 'cau_sai', nhan: 'Theo câu sai của em', loi: '' } }
     case '/hs/tu-luyen/rut':
-      return { ok: true, luotId: 'L-moi', cheDo: body.cheDo ?? 'cau_sai', tieuDe: 'Luyện câu sai', taoLuc: Date.now(), cau: cauTuLuyen(Number(body.soCau) || 10) }
+      return { ok: true, luotId: 'L-moi', cheDo: body.cheDo ?? 'cau_sai', tieuDe: 'Luyện câu sai', taoLuc: bayGio(), cau: cauTuLuyen(Number(body.soCau) || 10) }
     case '/hs/tu-luyen/cham-cau':
       return { ok: true, qid: body.qid, dung: true, dapAn: 'A', traLoi: body.traLoi, loiGiai: { chot: 'Chốt lời giải' } }
   }

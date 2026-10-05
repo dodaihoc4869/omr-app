@@ -10,6 +10,7 @@ import type { Env } from './kieu'
 import { damBaoBangThamSoEm, thamSoRieng, TY_LE_CHUNG_MAC_DINH } from './ca-nhan-hoa-v2'
 import { phatLaiLoi, tachSongSinh, cachNgay, THAM_SO_GOC, TU_NGAY, type LanLamLoi, type ThamSoLuat } from './loi-hoc-luat'
 import { MUC_DICH_LUOT } from './omni-kieu'
+import { SQL_TC } from './lam-lai-so'
 
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
@@ -79,7 +80,9 @@ export function deXuatThamSo(cu: ThamSoLuat, kiem: number, saiLai: number): Tham
 /** Đọc sổ từ 29/09 (cột gọn) ⇒ lần làm theo (em, câu gốc). */
 async function docSoGon(env: Env): Promise<{ theo: Map<string, LanLamLoi[]>; doc: Map<string, string[]> }> {
   const theo = new Map<string, LanLamLoi[]>(), doc = new Map<string, string[]>()
-  const sql = (moi: boolean) => `SELECT sbd, qid, nguon, ket_qua, luc, ngay_vn${moi ? ', assistance, purpose, visibility' : ''} FROM su_kien_hoc WHERE ngay_vn >= ?`
+  // 05/10 (lam-lai-so.ts): kèm `tc` — dòng CÂU ANH EM làm thay câu gốc cũng là một lượt (song sinh) của câu gốc, như docLanLam (hiệu chỉnh luật đọc
+  // đúng lượt kiểm duy trì làm bằng câu anh em; câu nghi sai đáp án bỏ lượt song sinh nên không bị ảnh hưởng).
+  const sql = (moi: boolean) => `SELECT sbd, qid, nguon, ket_qua, luc, ngay_vn${moi ? `, assistance, purpose, visibility, ${SQL_TC} AS tc` : ''} FROM su_kien_hoc WHERE ngay_vn >= ?`
   let rows: Row[]
   try { rows = (await env.DB.prepare(sql(true)).bind(TU_NGAY).all<Row>()).results ?? [] } catch { rows = (await env.DB.prepare(sql(false)).bind(TU_NGAY).all<Row>()).results ?? [] }
   for (const x of rows) {
@@ -89,8 +92,11 @@ async function docSoGon(env: Env): Promise<{ theo: Map<string, LanLamLoi[]>; doc
     const t = tachSongSinh(str(x.qid))
     const k = `${str(x.sbd)}|${t.goc}`
     const ls = theo.get(k) ?? []
-    ls.push({ luc: str(x.luc), ngayVn: str(x.ngay_vn), ketQua: Number(x.ket_qua) === 1 ? 1 : 0, coHoTro: str(x.assistance) === 'assisted', songSinh: t.songSinh !== null, nguon: str(x.nguon) })
+    const lan: LanLamLoi = { luc: str(x.luc), ngayVn: str(x.ngay_vn), ketQua: Number(x.ket_qua) === 1 ? 1 : 0, coHoTro: str(x.assistance) === 'assisted', songSinh: t.songSinh !== null, nguon: str(x.nguon) }
+    ls.push(lan)
     theo.set(k, ls)
+    const tc = str(x.tc)
+    if (tc && tc !== t.goc) { const kTc = `${str(x.sbd)}|${tc}`; theo.set(kTc, [...(theo.get(kTc) ?? []), { ...lan, songSinh: true }]) }
   }
   const r = await env.DB.prepare('SELECT sbd, qid, luc FROM loi_giai_hoi WHERE luc >= ?').bind(`${TU_NGAY}T00:00:00`).all<Row>().catch(() => ({ results: [] as Row[] }))
   for (const x of r.results ?? []) { const k = `${str(x.sbd)}|${str(x.qid)}`; doc.set(k, [...(doc.get(k) ?? []), str(x.luc)]) }

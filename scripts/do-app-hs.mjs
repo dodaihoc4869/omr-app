@@ -678,6 +678,7 @@ async function chupAnhGiaoDien() {
   for (const [ten, anhDangNhap, buoc] of KICH_ANH) {
     GIA.datLai()
     GIA.kichBan.omni = OMNI_GIA
+    GIA.kichBan.gio = Date.parse(GIO) // máy chủ giả cùng giờ đóng băng với trang ⇒ đồng hồ hiệp Đoàn tất định
     const { ctx, p, loi } = await moMay(trinh, goc, { mang: false })
     try {
       await p.clock.setFixedTime(new Date(GIO))

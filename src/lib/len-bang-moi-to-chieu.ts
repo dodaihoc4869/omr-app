@@ -251,14 +251,14 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-ct{position:fixed;top:0;right:0;bottom:0;width:68%;z-index:81;transform:translateX(104%);transition:transform .45s cubic-bezier(.2,.9,.2,1);background:rgba(19,23,36,.9);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);border-left:1px solid rgba(255,255,255,.12);
   color:rgb(238,241,248);font:500 max(12px,calc(var(--u)*.85))/1.4 var(--mc-sans);display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr auto;padding:calc(var(--u)*1) calc(var(--u)*1.3) calc(var(--u)*.6);gap:calc(var(--u)*.75);overflow:hidden}
 .mc-ct.mc-mo{transform:none}
-.mc-sai{position:fixed;top:0;right:0;bottom:0;width:78%;z-index:81;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.9,.2,1);background:radial-gradient(120% 70% at 100% 0%,rgba(57,135,229,.22),transparent 60%),radial-gradient(90% 60% at 0% 100%,rgba(213,81,129,.16),transparent 60%),rgb(15,18,30);border-left:1px solid rgba(255,255,255,.14);color:rgb(255,255,255);font-family:var(--mc-sans);padding:calc(var(--u)*1.8) calc(var(--u)*2.2) calc(var(--u)*2.4);overflow-y:auto;box-sizing:border-box;box-shadow:-2em 0 4em rgba(0,0,0,.45)}
-.mc-sai.mc-mo{transform:none}
-.mc-sai button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
-.mc-sai .mc-ct-dong{position:absolute;top:calc(var(--u)*1);right:calc(var(--u)*1.1);width:calc(var(--u)*2.6);height:calc(var(--u)*2.6);min-width:34px;min-height:34px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.4)}
+.mc-aisai{position:fixed;top:0;right:0;bottom:0;width:78%;z-index:81;transform:translateX(104%);transition:transform .5s cubic-bezier(.2,.9,.2,1);background:radial-gradient(120% 70% at 100% 0%,rgba(57,135,229,.22),transparent 60%),radial-gradient(90% 60% at 0% 100%,rgba(213,81,129,.16),transparent 60%),rgb(15,18,30);border-left:1px solid rgba(255,255,255,.14);color:rgb(255,255,255);font-family:var(--mc-sans);padding:calc(var(--u)*1.8) calc(var(--u)*2.2) calc(var(--u)*2.4);overflow-y:auto;box-sizing:border-box;box-shadow:-2em 0 4em rgba(0,0,0,.45)}
+.mc-aisai.mc-mo{transform:none}
+.mc-aisai button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+.mc-aisai .mc-ct-dong{position:absolute;top:calc(var(--u)*1);right:calc(var(--u)*1.1);width:calc(var(--u)*2.6);height:calc(var(--u)*2.6);min-width:34px;min-height:34px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.4)}
 .mc-sai-ke{display:inline-flex;align-items:center;gap:.5em;font:800 max(12px,calc(var(--u)*.85)) var(--mc-sans);letter-spacing:.14em;text-transform:uppercase;color:rgb(255,210,122)}
 .mc-sai-ke::before{content:"";width:.6em;height:.6em;border-radius:50%;background:rgb(230,103,103);box-shadow:0 0 0 .3em rgba(230,103,103,.25)}
-.mc-sai h2{margin:.25em calc(var(--u)*3.4) calc(var(--u)*1.2) 0;font:900 max(22px,calc(var(--u)*2.3))/1.1 var(--mc-sans);background:linear-gradient(90deg,rgb(255,255,255),rgb(195,194,183));-webkit-background-clip:text;background-clip:text;color:transparent}
-.mc-sai .mc-sai-tt{margin:0;color:rgba(255,255,255,.72);font:600 max(14px,calc(var(--u)*1.1)) var(--mc-sans)}
+.mc-aisai h2{margin:.25em calc(var(--u)*3.4) calc(var(--u)*1.2) 0;font:900 max(22px,calc(var(--u)*2.3))/1.1 var(--mc-sans);background:linear-gradient(90deg,rgb(255,255,255),rgb(195,194,183));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mc-aisai .mc-sai-tt{margin:0;color:rgba(255,255,255,.72);font:600 max(14px,calc(var(--u)*1.1)) var(--mc-sans)}
 .mc-sai-o4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*.9);margin-bottom:calc(var(--u)*1.4)}
 .mc-sai-o{position:relative;overflow:hidden;padding:calc(var(--u)*1) calc(var(--u)*1.2);border-radius:calc(var(--u)*1.1);background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12)}
 .mc-sai-o::after{content:"";position:absolute;left:0;top:0;bottom:0;width:.32em;background:var(--mc-sai-c,rgb(57,135,229))}
@@ -287,8 +287,8 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-sai-chip span::before{content:"";width:.55em;height:.55em;border-radius:50%;background:var(--mc-sai-c)}
 .mc-sai-chip span u{text-decoration:none;color:rgb(255,210,122);font-weight:800}
 .mc-sai-chu{margin:calc(var(--u)*.8) 0 0;font:600 max(11px,calc(var(--u)*.8)) var(--mc-sans);color:rgba(255,255,255,.55)}
-@media(max-width:900px){.mc-sai{width:100%}.mc-sai-o4{grid-template-columns:repeat(2,minmax(0,1fr))}.mc-sai-hai,.mc-sai-luoi{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.mc-sai,.mc-sai-thanh i,.mc-sai-cot i{transition:none}}
+@media(max-width:900px){.mc-aisai{width:100%}.mc-sai-o4{grid-template-columns:repeat(2,minmax(0,1fr))}.mc-sai-hai,.mc-sai-luoi{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.mc-aisai,.mc-sai-thanh i,.mc-sai-cot i{transition:none}}
 .mc-ct button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
 .mc-ct .mc-ct-dong{position:absolute;top:calc(var(--u)*.9);right:calc(var(--u)*1);width:calc(var(--u)*2.4);height:calc(var(--u)*2.4);min-width:32px;min-height:32px;border-radius:50%;background:rgba(255,255,255,.1);font-size:calc(var(--u)*1.3);line-height:1}
 .mc-ct-dau{display:grid;grid-template-columns:calc(var(--u)*6.6) minmax(0,1fr);gap:calc(var(--u)*1.2);align-items:center;padding-right:calc(var(--u)*3)}
@@ -774,7 +774,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   });
 
   // ── X · AI LÀM SAI CÂU NÀY (thầy 05/10; mọi tờ trừ Dạy học — tờ Dạy học không dựng nút X): em · giờ · ca/nơi · thời gian làm, xin qua app thầy ──
-  var saiMo = tao('div', 'mc-ct-mo', body), sai = tao('aside', 'mc-sai', body);
+  var saiMo = tao('div', 'mc-ct-mo', body), sai = tao('aside', 'mc-aisai', body);
   sai.setAttribute('aria-label', 'Học sinh làm sai câu này');
   saiMo.addEventListener('click', dongSai);
   sai.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.mc-ct-dong')) dongSai(); });

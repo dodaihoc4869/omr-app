@@ -24,7 +24,7 @@ import { thuMucCuaMaDe } from './kho-thu-muc'
 import { THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
 import { docMocThemCaLop } from './srs2-d1'
 import { NGUONG_CAT_TIA } from './srs2-loi'
-import { tachSongSinh } from './loi-hoc-luat'
+import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
 import { phanTram, soP } from '../../src/lib/omni-chu'
 
 type Row = Record<string, unknown>
@@ -441,7 +441,7 @@ async function caChot(env: Env, id: string) {
   const theoQid = new Map<string, { maDe: Set<string>; m: CauKho }>()
   for (const x of r.results ?? []) {
     const q = str(x.qid)
-    if (cdSet.has(q) || /~ss[01]$/.test(q)) continue
+    if (cdSet.has(q) || tachSongSinh(q).songSinh !== null) continue
     const cu = theoQid.get(q)
     if (cu) { cu.maDe.add(str(x.ma_de)); continue }
     const dang = str(x.dang).trim() || null
@@ -463,7 +463,7 @@ async function caChot(env: Env, id: string) {
   const daGap = new Set<string>()
   const ds = tuLuyen.map((u) => u.m.qid)
   for (let i = 0; i < ds.length && lop.length; i += 300) {
-    const lo = ds.slice(i, i + 300).flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`])
+    const lo = ds.slice(i, i + 300).flatMap(cacQidSongSinh)
     const rg = await env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))')
       .bind(JSON.stringify(lop), JSON.stringify(lo)).all<Row>().catch(() => ({ results: [] as Row[] }))
     for (const x of rg.results ?? []) daGap.add(tachSongSinh(str(x.qid)).goc)

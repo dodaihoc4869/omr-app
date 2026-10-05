@@ -97,7 +97,40 @@ describe('rút: chỉ câu đã đúng, đúng ô, ngẫu nhiên có hạt giố
     const thieu = kq.thieu.X!
     expect(thieu.filter((t) => t.phan === 'II').reduce((n, t) => n + t.so, 0)).toBe(2)
     expect(thieu.filter((t) => t.phan === 'III').reduce((n, t) => n + t.so, 0)).toBe(1)
-    expect(chuThieuDaDung('Em X', thieu)).toEqual(['Em X thiếu 2 câu Phần II vì chưa làm đúng đủ', 'Em X thiếu 1 câu Phần III vì chưa làm đúng đủ'])
+    expect(chuThieuDaDung('Em X', thieu)).toEqual(['Em X thiếu 2 câu Phần II vì kho ca không đủ câu', 'Em X thiếu 1 câu Phần III vì kho ca không đủ câu'])
+  })
+
+  it('(thầy 05/10) có kho bù ⇒ thiếu câu đã đúng thì BÙ câu khác trong kho CÙNG mức trước, rồi mới mượn mức gần nhất; câu bù không nhãn', () => {
+    const nguon = [...khoDu('D').filter((c) => c.phan === 'I'), cau('D-III-vd', 'III', 'van_dung'), cau('D-III-b', 'III', 'biet')]
+    const khoBu = [
+      ...(['hieu', 'van_dung'] as const).map((m, i) => ({ qid: `K-II-${i}`, phan: 'II' as const, mucDo: m })),
+      { qid: 'K-III-h', phan: 'III' as const, mucDo: 'hieu' },
+      { qid: 'D-III-vd', phan: 'III' as const, mucDo: 'van_dung' }, // câu đã đúng cũng nằm trong kho ⇒ không bị tính là câu bù
+    ]
+    const kq = rutDeDaDung({ nguon: { X: nguon }, dsSbd: ['X'], tongCau: 14, seed: 'CA1', khoBu })
+    const bo = kq.theoEm.X!
+    // 14 câu ⇒ I 6·2·1, II 0·2·0, III 0·1·2.
+    expect(bo.filter((c) => c.phan === 'II').map((c) => c.qid).sort()).toEqual(['K-II-0', 'K-II-1']) // ô II Thông hiểu ×2: bù cùng mức trước, rồi mức gần nhất
+    const p3 = bo.filter((c) => c.phan === 'III')
+    // III: ô Vận dụng ×2 = D-III-vd (đã đúng) + ? ; ô Thông hiểu ×1 = K-III-h (bù CÙNG mức, đứng trước câu đã đúng lệch mức D-III-b)
+    expect(p3.find((c) => c.mucO === 'hieu')).toMatchObject({ qid: 'K-III-h', bu: true })
+    expect(p3.map((c) => c.qid).sort()).toEqual(['D-III-b', 'D-III-vd', 'K-III-h'])
+    expect(kq.thieu.X).toBeUndefined()
+    expect(kq.bu.X).toBe(3)
+    expect(kq.nhan.X!['K-III-h']).toBe('')
+    const bd = banDoDaDung(kq)
+    expect(Object.keys(bd.daDung.X!).sort()).toEqual([...nguon.filter((c) => bo.some((b) => b.qid === c.qid)).map((c) => c.qid)].sort()) // chỉ câu đã đúng mang nhãn
+    expect(bd.demDaDung.X!['K-II-0']).toEqual([0, 0])
+  })
+
+  it('(thầy 05/10) em chưa đúng câu nào ⇒ đề bù đủ câu từ kho theo đúng ô mức độ, không bị chặn', () => {
+    const khoBu = khoDu('K').map((c) => ({ qid: c.qid, phan: c.phan, mucDo: c.mucDo }))
+    const kq = rutDeDaDung({ nguon: { Y: [] }, dsSbd: ['Y'], tongCau: 28, seed: 'CA2', khoBu })
+    expect(kq.theoEm.Y).toHaveLength(28)
+    expect(kq.theoEm.Y!.every((c) => c.bu && c.mucDo === c.mucO)).toBe(true)
+    // ma trận 2026: I 11·4·3, II 0·3·1, III 1·2·3
+    expect(demO(kq.theoEm.Y!)).toEqual({ 'I|biet': 11, 'I|hieu': 4, 'I|van_dung': 3, 'II|hieu': 3, 'II|van_dung': 1, 'III|biet': 1, 'III|hieu': 2, 'III|van_dung': 3 })
+    expect(kq.bu.Y).toBe(28)
   })
 
   it('bản đồ: bộ câu + nhãn từng câu từng em + đếm đúng/sai cũ', () => {
@@ -198,34 +231,35 @@ describe('/vao-thi — ca "Kiểm chứng câu đã đúng": em vào sau ⇒ l�
     return { d, env }
   }
 
-  it('em S1 vào sau khi chốt ⇒ chỉ câu S1 đã đúng (Q1 Q2 Q3 Q7), ô thiếu để trống, nhãn đi kèm, bản đồ gộp', async () => {
+  it('em S1 vào sau khi chốt ⇒ câu S1 đã đúng (Q1 Q2 Q3 Q7) + BÙ câu kho ca cùng mức (thầy 05/10), nhãn chỉ câu đã đúng, bản đồ gộp', async () => {
     const { d, env } = await dungCa({ bo: { S2: ['Q9'] }, cheDo: 'da_dung', daDung: { S2: { Q9: 'Luyện đề · 25/09 · Thông hiểu' } } })
     const v = await goiWorker(worker, env, '/vao-thi', { maCa: 'C1', sbd: 'S1', idThietBi: 'm1' })
     expect(v.ok).toBe(true)
-    expect([...v.boTheoEm.bo.S1].sort()).toEqual(['Q1', 'Q2', 'Q3', 'Q7'])
+    for (const q of ['Q1', 'Q2', 'Q3', 'Q7']) expect(v.boTheoEm.bo.S1).toContain(q)
+    expect(v.boTheoEm.bo.S1.length).toBeGreaterThan(4) // ô còn thiếu được bù câu kho ca
+    expect(Object.keys(v.boTheoEm.daDung.S1).sort()).toEqual(['Q1', 'Q2', 'Q3', 'Q7']) // nhãn "đã làm đúng" chỉ câu đã đúng
     expect(v.boTheoEm.daDung.S1.Q1).toBe('Ca Kiểm tra tuần 3 · 28/09 · Nhận biết')
     expect(v.boTheoEm.daDung.S2).toBeUndefined() // nhãn của bạn khác không xuống máy em
     expect(JSON.stringify(v)).not.toContain('correct')
     expect(v.boTheoEm.demDaDung).toBeUndefined() // đếm đúng/sai chỉ thầy xem
     const banDo = JSON.parse((d.sql.prepare("SELECT bo_theo_em_json AS b FROM ca WHERE ma_ca='C1'").get() as { b: string }).b)
     expect(banDo.bo.S2).toEqual(['Q9'])
-    expect([...banDo.bo.S1].sort()).toEqual(['Q1', 'Q2', 'Q3', 'Q7'])
+    expect([...banDo.bo.S1].sort()).toEqual([...v.boTheoEm.bo.S1].sort())
     expect(banDo.demDaDung.S1.Q2).toEqual([1, 1])
     const lai = await goiWorker(worker, env, '/vao-thi', { maCa: 'C1', sbd: 'S1', idThietBi: 'm1' })
     expect(lai.boTheoEm.bo.S1).toEqual(v.boTheoEm.bo.S1)
     expect(lai.boTheoEm.daDung.S1).toEqual(v.boTheoEm.daDung.S1)
   })
 
-  // ĐỔI CÓ CHỦ Ý (phiên chủ 04/10): một em thiếu câu không được kẹt ngoài phòng ⇒ em chưa có câu đã đúng nào được lấp bằng thang
-  // rút đề v2 thường (câu mới, KHÔNG nhãn "đã làm đúng"); bảng xem trước đã báo thầy em này thiếu câu đã đúng.
-  it('em chưa có câu nào đã đúng trong kho ca ⇒ không bị chặn: nhận bộ rút đề v2 thường, không có nhãn "đã làm đúng"', async () => {
+  // Thầy 05/10: em không bị chặn — em chưa có câu đã đúng nào ⇒ đề BÙ câu kho ca cùng mức độ (không nhãn "đã làm đúng").
+  it('em chưa có câu nào đã đúng trong kho ca ⇒ không bị chặn: nhận đề bù từ kho ca, không có nhãn "đã làm đúng"', async () => {
     const { d, env } = await dungCa({ bo: { S2: ['Q9'] }, cheDo: 'da_dung' })
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S9','Chín','12A','x')")
     const v = await goiWorker(worker, env, '/vao-thi', { maCa: 'C1', sbd: 'S9', idThietBi: 'm9' })
     expect(v.lyDo).not.toBe('thieu_bo_cau')
     expect(v.ok).toBe(true)
     expect(v.boTheoEm.bo.S9.length).toBeGreaterThan(0)
-    expect(v.boTheoEm?.daDung?.S9).toBeUndefined()
+    expect(Object.keys(v.boTheoEm?.daDung?.S9 ?? {})).toEqual([])
   })
 
   it('màn thầy đọc chế độ ca: phamViHoiLai = da_dung', async () => {

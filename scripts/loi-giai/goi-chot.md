@@ -21,7 +21,8 @@ Thầy không duyệt từng điểm tranh luận nữa: bạn là người ch�
 3. **Đáp án kho sai thật, hoặc có hai đáp án cùng đúng**:
    - giữ `loai: "dapAn"`;
    - thêm `"chot": "Đáp án đúng là … vì …"`.
-   Không đổi `d`: bộ kiểm khoá đáp án kho. Hồ sơ này sẽ không công bố cho tới khi kho sửa đáp án; câu tự vào lại hàng soạn sau khi sửa.
+   Không đổi `d`: bộ kiểm khoá đáp án kho. Sau phiên này, một lượt máy KHÁC giải lại câu gốc độc lập (không thấy đáp án, không thấy hồ sơ):
+   ra đúng đáp án kho ⇒ giữ đáp án kho, hồ sơ công bố; vẫn lệch ⇒ hồ sơ không công bố và câu tạm bị loại khỏi các kênh tự động (thầy 05/10: không ai duyệt tay).
 
 Cờ `hienThi`, `loiDe` đã có sẵn: nếu viết được `sua` chính xác thì thêm vào; không thì để nguyên.
 

@@ -26,6 +26,7 @@ import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } 
 import { docBatDauMap, docChienDichCuaEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop } from './srs2-d1'
 import { congNgay, khoiLuongCan, soNgayConLai, soNgayGiua } from './srs2-loi'
 import { KHOA_THE_LUC_LOP, SQL_LA_LAN_LAM, THAM_SO_OMNI } from './omni-kieu'
+import { cacQidSongSinh } from './loi-hoc-luat'
 import { soNgayHanBai } from './omni-ke-hoach'
 import { hoSoOmniNhieuEm, omniBat, qCuaCau } from './omni-d1'
 import { duBaoDiem } from './du-bao-diem'
@@ -532,7 +533,7 @@ async function tick(env: Env, b: Row, nowMs: number): Promise<Record<string, unk
 /** Chiến dịch đã có lượt làm nào (của em trong chiến dịch, câu của chiến dịch — kể cả câu song sinh) kể từ lúc tạo? Lỗi đọc ⇒ coi như CÓ (đóng an toàn hơn huỷ). */
 async function coLuotLam(env: Env, cd: { sbd: string[]; qids: string[]; taoLuc: string }): Promise<boolean> {
   if (!cd.sbd.length || !cd.qids.length) return false
-  const qids = JSON.stringify(cd.qids.flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`]))
+  const qids = JSON.stringify(cd.qids.flatMap(cacQidSongSinh))
   const sbd = JSON.stringify(cd.sbd)
   const goc = 'SELECT 1 AS co FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?'
   try {
