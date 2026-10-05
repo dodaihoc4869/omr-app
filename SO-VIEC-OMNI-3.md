@@ -26,7 +26,7 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "hiển thị lại cho tôi xem" ⇒ ảnh lời giải hiện đúng (Đảo + câu nền sau khi nộp), chụp đúng khung nhìn | bằng chứng: hs-dao-loi-giai-trac-nghiem-390, hs-dao-loi-giai-tra-loi-ngan-390, hs-tram-cau-nen-loi-giai-390 (docs/omni-0510/anh-build/)
 - [x] "Khi tích chọn bạn chỉ lấy 3 phần trắc nghiệm, đúng sai trả lời ngắn làm tự động giao" ⇒ tick bài chỉ giao -TN/-DS/-TLN | bằng chứng: gộp C1 d9ea2096 (475f173b); dòng "Tự giao: …" thay ô tích; ảnh gv-bai-hom-nay-theo-diem-danh-1440; 56/56 test tick + nghiệm thu
 - [x] "bỏ phần ví dụ minh họa và các dạng trọng tâm nhé" ⇒ không bao giờ giao -VD, -DT (cả bài mới lẫn bài cũ ôn lại), bỏ ô tích thêm | bằng chứng: bai-hom-nay.ts laMaToKhongGiao (-VD/-DT/-TL/-VDMH/-DTTT + tên), máy chủ bai-da-day.ts lưới an toàn ở maDe + phamVi; test omni-3-tick-bai-0510
-- [ ] "Làm thêm 6 bước tính toán" ⇒ bộ sinh câu nền: bao_toan_electron, lap_he_phuong_trinh, cong_thuc_phan_tu, hang_so_can_bang, bien_thien_enthalpy, nang_luong_lien_ket (kiểm chéo độc lập) | bằng chứng: (chưa có)
+- [x] "Làm thêm 6 bước tính toán" ⇒ bộ sinh câu nền: bao_toan_electron, lap_he_phuong_trinh, cong_thuc_phan_tu, hang_so_can_bang, bien_thien_enthalpy, nang_luong_lien_ket (kiểm chéo độc lập) | bằng chứng: gộp ac234db2 (00cef6d0); 93/93; 6 câu mẫu điều phối tính tay khớp (9,916 L · 30% · C₇H₈O · Kc 250 · −902 kJ · −2 880 kJ)
 
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
 
