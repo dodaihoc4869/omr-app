@@ -16,9 +16,9 @@ const cauI = (them: Partial<PrivateQuestion> = {}): PrivateQuestion => ({
 const cauII = (them: Partial<PrivateQuestion> = {}): PrivateQuestion => ({ ...cauI(), phan: 'II', choices: [], ideas: ['y1', 'y2', 'y3', 'y4'], hinhAnh: [{ src: 'h', viTri: 'sau_y_c' }], correct: 'DSSD', solution: { chot: 'Cốt lõi', tung_y: { a: { dung: true, vi_sao: 'a' }, b: { dung: false, vi_sao: 'b' }, c: { dung: false, vi_sao: 'c' }, d: { dung: true, vi_sao: 'd' } } }, ...them })
 
 describe('bậc 1 — trần song sinh 2 → 4', () => {
-  it('TRAN_SONG_SINH = 4; qid ảo ~ss0..~ss3 đều tách được; danh sách đọc sổ có 5 phần tử', () => {
+  it('TRAN_SONG_SINH = 4; qid ảo ~ss0..~ss3 đều tách được; danh sách đọc sổ phủ đủ 8 chỗ (máy soạn có thể nối sau bản hỏng)', () => {
     expect(TRAN_SONG_SINH).toBe(4)
-    expect(cacQidSongSinh('Q1')).toEqual(['Q1', 'Q1~ss0', 'Q1~ss1', 'Q1~ss2', 'Q1~ss3'])
+    expect(cacQidSongSinh('Q1')).toEqual(['Q1', ...[0, 1, 2, 3, 4, 5, 6, 7].map((i) => `Q1~ss${i}`)])
     expect(tachSongSinh('Q1~ss3#2')).toEqual({ goc: 'Q1', songSinh: 3 })
     expect(tachSongSinh('Q1~ss2')).toEqual({ goc: 'Q1', songSinh: 2 })
     expect(tachSongSinh('Q1')).toEqual({ goc: 'Q1', songSinh: null })

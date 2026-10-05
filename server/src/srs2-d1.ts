@@ -7,7 +7,7 @@ import { gopDocD1 } from './doc-d1-theo-luot'
 import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
-import { cacQidSongSinh, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
+import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
 import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC } from './lam-lai-so'
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
@@ -639,7 +639,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     // VÒNG HỌC v2: câu từng sai tự làm từ 29/09 ⇒ LUẬT ĐÓNG LỖI CHUNG quyết thành thạo / hẹn; lượt làm lại ưu tiên câu song sinh.
     let t = t0
     if (qidSaiMoiKenh.has(qid)) {
-      const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => songSinhDuDuLieu(m.phan, ss) ? [i] : [])
+      // Chỉ chỗ < CHO_SONG_SINH: qid ảo phát ra phải nằm trong danh sách đọc sổ (`cacQidSongSinh`), không thì lượt làm rơi khỏi lịch sử câu gốc.
+      const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => i < CHO_SONG_SINH && songSinhDuDuLieu(m.phan, ss) ? [i] : [])
       const soSS = ssDungDuoc.length
       const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoV2)
       t = ap.t
