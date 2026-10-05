@@ -2512,6 +2512,10 @@ var BO_CHIA_KHOA = {
   }
 };
 
+// server/src/loi-hoc-luat.ts
+var TRAN_SONG_SINH = 4;
+var CHO_SONG_SINH = 2 * TRAN_SONG_SINH;
+
 // server/src/cau-bo-tro.ts
 function docBangSongSinh(v) {
   if (!Array.isArray(v) || v.length < 2 || !Array.isArray(v[0]) || v[0].length < 2) return void 0;

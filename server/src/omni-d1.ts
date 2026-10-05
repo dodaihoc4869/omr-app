@@ -28,7 +28,7 @@ import { lopCuaEm, phamViCuaEm, type PhamViLop } from './bai-da-day'
 import { cheDo2, chuaBatDau, dauNgayVn, docChienDichCuaEm, docChienDichKemBatDau, docCoHoa2, docHoSo2, docKeHoachDaChot, docQuyetMetGio, ngayVnCua, qidGoc, type ChienDich, type CoHoa2, type HoSo2 } from './srs2-d1'
 import { congNgay, soNgayGiua } from './srs2-loi'
 import { ngayVn, phanTuQid } from './su-kien-hoc'
-import { tachSongSinh } from './loi-hoc-luat'
+import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
@@ -885,7 +885,7 @@ async function conCauMoiChuaLam(env: Env, sbd: string, nowMs: number, dangLuyen:
   const ung = [...new Set([...kh.conDao, ...kh.conDoan].map(qidGoc).filter((q) => cdQ.has(q)))]
   if (!ung.length) return false
   const r = await env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))')
-    .bind(sbd, JSON.stringify(ung.flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`]))).all<Row>().catch(() => null)
+    .bind(sbd, JSON.stringify(ung.flatMap(cacQidSongSinh))).all<Row>().catch(() => null)
   if (!r) return false
   const da = new Set((r.results ?? []).map((x) => tachSongSinh(str(x.qid)).goc))
   return ung.some((q) => !da.has(q))

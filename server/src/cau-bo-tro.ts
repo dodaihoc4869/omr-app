@@ -1,11 +1,12 @@
 // HỌC LIỆU BỔ TRỢ TỪNG CÂU — Vòng học khép kín v2. Kho đề mang thêm 3 trường (chỉ thêm, GĐ1 soạn bằng máy + Python kiểm):
-//   · `song_sinh`: 2 câu cùng cách giải, đổi số liệu ({de, pa?, dap_an, buoc, gia_tri_dung}) — làm lại kín không nhớ đáp án.
+//   · `song_sinh`: tối đa TRAN_SONG_SINH (4, từ 05/10 — trước 2) câu cùng cách giải, đổi số liệu ({de, pa?, dap_an, buoc, gia_tri_dung}) — làm lại kín không nhớ đáp án.
 //   · `cau_kiem`: câu hỏi kiểm từng bước lời giải ({buoc, kieu: so|chon, hoi, dap_an|lua_chon+dung, sai_so}) — đọc lời giải chủ động.
 //   · `nhan_nen`: nhãn kiến thức nền của từng bước ({buoc, nen}) — hỏng bước nào thì luyện nền đó.
 // Đọc gói R2 mỗi lần em làm thì quá chậm ⇒ lúc NẠP ĐỀ (mọi đường nạp đi qua `dayDeKho` → móc này) chép 3 trường vào bảng `cau_bo_tro`
 // theo BĂM nội dung câu (bản trùng ở nhiều đề dùng chung một dòng). Bảng CHỈ THÊM, tự tạo lần đầu dùng; bản SQL: migration-0210-v2.sql.
 import type { D1PreparedStatement, Env } from './kieu'
 import { bamCau, cauTrongGoi } from '../../src/lib/loi-giai-kiem'
+import { TRAN_SONG_SINH } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
@@ -56,7 +57,7 @@ export function damBaoBangBoTro(env: Env): Promise<void> {
 /** Lọc học liệu bổ trợ của một câu kho thô (dữ liệu máy soạn — chỉ giữ trường đúng kiểu). */
 export function locBoTro(c: Obj): { songSinh: SongSinh[]; cauKiem: CauKiem[]; nhanNen: NhanNen[]; buoc: string[] } {
   const ss = Array.isArray(c.song_sinh) ? c.song_sinh.filter((x): x is Obj => laObj(x) && typeof x.de === 'string' && x.dap_an != null) : []
-  const songSinh = ss.slice(0, 2).map((x) => ({
+  const songSinh = ss.slice(0, TRAN_SONG_SINH).map((x) => ({
     de: String(x.de), dap_an: String(x.dap_an),
     ...(laObj(x.pa) ? { pa: Object.fromEntries(Object.entries(x.pa).map(([k, v]) => [k, String(v)])) } : {}),
     ...(Array.isArray(x.buoc) ? { buoc: x.buoc.map(String) } : {}),
@@ -86,23 +87,67 @@ function cauTho(goi: unknown): { c: Obj; phan?: 'I' | 'II' | 'III' }[] {
   return ra
 }
 
-/** Móc nạp đề: chép học liệu bổ trợ của gói vào `cau_bo_tro`. Câu không có trường nào thì bỏ qua (không xoá dòng cũ của bản trùng). */
+/** Khoá NỘI DUNG của một bản song sinh (khử trùng): đề + 4 phương án, bỏ thẻ HTML, chữ thường, bỏ khoảng trắng / dấu câu — cùng cách máy soạn
+ *  (may-soan-kiem.ts `khoaBan` / `chuanChu`) so bản nộp với bản đã có. */
+export function khoaBanSongSinh(x: { de?: unknown; pa?: unknown }): string {
+  const pa = laObj(x.pa) ? ['A', 'B', 'C', 'D'].map((k) => String((x.pa as Obj)[k] ?? '')).join(' ') : ''
+  return `${String(x.de ?? '')} ${pa}`.replace(/<\/?[a-z][a-z0-9]*\b[^>]*>/gi, ' ').normalize('NFC').toLowerCase()
+    .replace(/[\s.,;:!?()[\]{}"'“”‘’«»\-–—_/\\|*+=^~`…]+/gu, '')
+}
+/** Bản do máy soạn nối (`/kho/may-soan/nop-bo-tro` ghi `nguon`), không phải bản của gói đề. */
+const laBanNoi = (x: Obj): boolean => typeof x.nguon === 'string' && x.nguon.trim() !== ''
+
+/**
+ * GỘP bản song sinh của GÓI vào bản đang có trong `cau_bo_tro` (05/10 — máy soạn NỐI bản khác vào đây; nạp lại gói KHÔNG được xoá chúng). Thuần.
+ *   · Mọi chỗ cũ GIỮ NGUYÊN vị trí (qid ảo "~ssN" trong sổ và trong lượt đang mở không đổi nghĩa); không bao giờ bỏ bản cũ.
+ *   · Chỗ cũ do GÓI ghi (không mang `nguon`) nhận bản gói CÙNG vị trí — gói sửa bản của chính nó như trước 05/10 — trừ khi bản ấy đã có ở chỗ khác.
+ *   · Bản gói còn lại chưa có (khử trùng theo `khoaBanSongSinh`) nối vào cuối, tới khi đủ TRAN_SONG_SINH bản.
+ */
+export function gopSongSinh(cu: readonly Obj[], goi: readonly SongSinh[]): Obj[] {
+  const ra: Obj[] = cu.filter(laObj).map((x) => ({ ...x }))
+  const coKhoa = (k: string, tru = -1) => ra.some((x, j) => j !== tru && khoaBanSongSinh(x) === k)
+  const conLai: SongSinh[] = []
+  goi.forEach((g, i) => {
+    const k = khoaBanSongSinh(g)
+    if (coKhoa(k)) return
+    if (i < ra.length && !laBanNoi(ra[i]!)) { ra[i] = { ...g }; return }
+    conLai.push(g)
+  })
+  for (const g of conLai) {
+    if (ra.length >= TRAN_SONG_SINH) break
+    if (!coKhoa(khoaBanSongSinh(g))) ra.push({ ...g })
+  }
+  return ra
+}
+
+/**
+ * Móc nạp đề: chép học liệu bổ trợ của gói vào `cau_bo_tro`. Câu không có trường nào thì bỏ qua (không xoá dòng cũ của bản trùng).
+ * Song sinh GỘP với bản đang có (`gopSongSinh`: giữ bản máy soạn đã nối, khử trùng, trần 4); câu kiểm / nhãn nền / bước theo gói như cũ.
+ */
 export async function ghiCauBoTro(env: Env, maDe: string, goi: unknown): Promise<number> {
   await damBaoBangBoTro(env)
   const nay = new Date().toISOString()
-  const lenh: D1PreparedStatement[] = []
+  const ds: { bam: string; qid: string; bt: ReturnType<typeof locBoTro> }[] = []
   for (const { c, phan } of cauTho(goi)) {
     const bt = locBoTro(c)
     if (!bt.songSinh.length && !bt.cauKiem.length && !bt.nhanNen.length) continue
     const k = cauTrongGoi(maDe, phan ? { [`phan${phan}`]: [c] } : { cau: [c] })[0]
     if (!k) continue
-    const bam = await bamCau(k)
-    lenh.push(env.DB.prepare(
-      `INSERT INTO cau_bo_tro (bam, qid_mau, song_sinh_json, cau_kiem_json, nhan_nen_json, buoc_json, cap_nhat_luc) VALUES (?,?,?,?,?,?,?)
-       ON CONFLICT(bam) DO UPDATE SET qid_mau=excluded.qid_mau, song_sinh_json=excluded.song_sinh_json, cau_kiem_json=excluded.cau_kiem_json,
-         nhan_nen_json=excluded.nhan_nen_json, buoc_json=excluded.buoc_json, cap_nhat_luc=excluded.cap_nhat_luc`,
-    ).bind(bam, k.qid, JSON.stringify(bt.songSinh), JSON.stringify(bt.cauKiem), JSON.stringify(bt.nhanNen), JSON.stringify(bt.buoc), nay))
+    ds.push({ bam: await bamCau(k), qid: k.qid, bt })
   }
+  // Bản đang có (kể cả bản máy soạn đã nối) — đọc thô để giữ mọi trường (nguon, qid_mau, ma_de, lop…).
+  const cu = new Map<string, Obj[]>()
+  const bams = [...new Set(ds.map((x) => x.bam))]
+  for (let i = 0; i < bams.length; i += 90) {
+    const lo = bams.slice(i, i + 90)
+    const r = await env.DB.prepare(`SELECT bam, song_sinh_json FROM cau_bo_tro WHERE bam IN (${lo.map(() => '?').join(',')})`).bind(...lo).all<Obj>()
+    for (const x of r.results ?? []) cu.set(String(x.bam), docJson<Obj>(x.song_sinh_json))
+  }
+  const lenh: D1PreparedStatement[] = ds.map(({ bam, qid, bt }) => env.DB.prepare(
+    `INSERT INTO cau_bo_tro (bam, qid_mau, song_sinh_json, cau_kiem_json, nhan_nen_json, buoc_json, cap_nhat_luc) VALUES (?,?,?,?,?,?,?)
+     ON CONFLICT(bam) DO UPDATE SET qid_mau=excluded.qid_mau, song_sinh_json=excluded.song_sinh_json, cau_kiem_json=excluded.cau_kiem_json,
+       nhan_nen_json=excluded.nhan_nen_json, buoc_json=excluded.buoc_json, cap_nhat_luc=excluded.cap_nhat_luc`,
+  ).bind(bam, qid, JSON.stringify(gopSongSinh(cu.get(bam) ?? [], bt.songSinh)), JSON.stringify(bt.cauKiem), JSON.stringify(bt.nhanNen), JSON.stringify(bt.buoc), nay))
   for (let i = 0; i < lenh.length; i += 100) await env.DB.batch(lenh.slice(i, i + 100))
   return lenh.length
 }
