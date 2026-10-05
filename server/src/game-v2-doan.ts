@@ -765,7 +765,8 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       let dung = false
       if (!boTrong) {
         // Đã nhận thẻ tiếp sức → `assisted:true`: máy chủ game KHÔNG ghi bằng chứng, KHÔNG thưởng mastery cho câu này (luật cũ giữ nguyên). Cờ do máy chủ quyết, không do máy em khai.
-        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i] }))
+        // OMNI 3: thời lượng máy em đo + tự tin (Chắc/Chưa chắc) chuyển nguyên vào `answer` nội bộ — cờ OMNI tắt thì `answer` bỏ qua hai trường này.
+        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i], msLam: b.msLam, tuTin: b.tuTin }))
         dung = r.correct === true; kem = { ketQuaCau: ketQuaCau(r) }
       }
       phong.nop[i] = { dung, hanhDong, tuLam: !phong.the[i], boTrong, tiepSucBoi: phong.the[i]?.tu }

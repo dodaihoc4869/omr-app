@@ -1,5 +1,5 @@
 // KIỂM "CÂU SAI MỒ CÔI" (thầy 02/10: "đảm bảo tất cả các câu sai phải được xử lý triệt để" + "chỉ tính từ 29/09 thôi nhé").
-// Chỉ ĐỌC. Một (em, câu) là câu sai khi LẦN TỰ LÀM CUỐI (bỏ sự kiện đọc lời giải) từ ngày VN `tuNgay` là sai hoặc bỏ trống.
+// Chỉ ĐỌC. Một (em, câu) là câu sai khi LẦN TỰ LÀM CUỐI (bỏ sự kiện đọc lời giải và lượt LƯỚT — OMNI 3) từ ngày VN `tuNgay` là sai hoặc bỏ trống.
 // Câu sai "mồ côi" = KHÔNG nguồn nào của kế hoạch ngày (srs2-d1 `docHoSo2`) kéo lại: không thuộc chiến dịch nào của em, không phải câu
 // sai trong ca ĐÃ CÔNG BỐ (`docQidSaiCaDaCongBo`), không phải câu sai Lên bảng / đầu giờ (`docQidSaiTaiLop`). Sửa 02/10: bản đầu chỉ
 // xét chiến dịch nên đếm thừa (381 ⇒ phần lớn là câu ca đã công bố vốn ĐÃ vào nợ). `ngoaiKho`: câu không có trong kho game ⇒ game
@@ -8,6 +8,7 @@
 // chỉ còn mồ côi câu NGOÀI kho game (`sauV2` = `ngoaiKho`; vd câu tự luận / đề chưa vào game) — số này cần câu song sinh / cùng dạng thay thế.
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { SQL_LA_LAN_LAM } from './omni-kieu'
 
 type Obj = Record<string, unknown>
 const NGAY = /^\d{4}-\d{2}-\d{2}$/
@@ -17,7 +18,7 @@ WITH ev AS (
   -- Câu gốc: bỏ hậu tố lượt game "#n" rồi hậu tố câu song sinh "~ss0|1" (04/10: thiếu bước này ⇒ lượt làm song sinh bị đếm thành câu "ngoài kho").
   SELECT sbd, CASE WHEN instr(q0, '~ss') > 0 THEN substr(q0, 1, instr(q0, '~ss') - 1) ELSE q0 END AS q, nguon, ket_qua, luc FROM (
   SELECT sbd, CASE WHEN instr(qid, '#') > 0 THEN substr(qid, 1, instr(qid, '#') - 1) ELSE qid END AS q0, nguon, ket_qua, luc
-    FROM su_kien_hoc WHERE ngay_vn >= ? AND nguon <> 'nen'${coMucDich ? " AND COALESCE(purpose, '') <> 'xem_loi_giai' AND COALESCE(assistance, '') <> 'assisted'" : ''}
+    FROM su_kien_hoc WHERE ngay_vn >= ? AND nguon <> 'nen'${coMucDich ? ` AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted'` : ''}
   )
 ),
 cuoi AS (
