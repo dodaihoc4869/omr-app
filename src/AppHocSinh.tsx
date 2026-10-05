@@ -10,7 +10,7 @@
 //   · Đã đăng nhập ⇒ tải mảnh cổng ngay (index.html đã nạp trước + đã hỏi sớm lệnh Sảnh), Sảnh có số sớm hơn một vòng mạng.
 // Cây phần tử, chữ, lớp CSS y như khi App.tsx dựng cổng: ChanLoi → Suspense(ChoManEm) → BatLinhShell vai="hs" → màn. App.tsx VẪN giữ nhánh
 // cổng học sinh (phép kiểm dựng thẳng <App/>) — hai nhánh cùng một cây.
-import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import BatLinhShell from './components/bat-linh/BatLinhShell'
 import ChanLoi from './components/ChanLoi'
 import { LogoDoc } from './components/LogoVai'
@@ -76,6 +76,18 @@ export default function AppHocSinh() {
   // từ đăng nhập sang cổng trong cùng một component). Chọn MỘT lần, giữ suốt phiên trang (đăng xuất do cổng tự vẽ lại màn đăng nhập).
   const [Cong, setCong] = useState<ComponentType | null>(() => (docPhienHs() ? (congDaVe ?? StudentPortalScreen) : null))
   const coPhien = Cong !== null
+  // Em VỪA đăng nhập: Sảnh luôn mở từ ĐẦU TRANG. Trước đây lượt vẽ đầu của cổng là màn chờ ngắn ⇒ trình duyệt tự kéo vị trí cuộn của màn đăng nhập (hơi dài trên máy nhỏ) về 0.
+  // Nay Sảnh có thể có số ngay lượt đầu (đính kèm trong lệnh đăng nhập) ⇒ trang không ngắn lại, vị trí cuộn cũ bị giữ nguyên, Sảnh mở lệch xuống. Kéo về 0 trước khi vẽ cho khỏi lệch.
+  const vuaDangNhap = useRef(false)
+  useLayoutEffect(() => {
+    if (!coPhien || !vuaDangNhap.current) return
+    vuaDangNhap.current = false
+    try {
+      window.scrollTo(0, 0)
+    } catch {
+      /* máy chặn cuộn: bỏ qua */
+    }
+  }, [coPhien])
   useEffect(() => {
     // Tên app + manifest + nhớ vai — như StudentPortalScreen làm lúc dựng (màn đăng nhập trước đây nằm trong cổng).
     danhDauAppHocSinh()
@@ -103,6 +115,7 @@ export default function AppHocSinh() {
     // Mảnh cổng (đã tải + chạy sẵn trong lúc em gõ) — nút giữ vòng quay tới khi có, không chớp màn trống giữa hai màn. Tải hỏng ⇒ bản `lazy`
     // nhận đúng lỗi ấy, ChanLoi báo như cũ.
     const m = await layCong().catch(() => null)
+    vuaDangNhap.current = true
     setCong(() => (m ? m.default : StudentPortalScreen))
   }
   return (

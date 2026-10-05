@@ -41,7 +41,11 @@ import { layHoiSom } from '../src/lib/hoi-som'
 
 describe('AppHocSinh — đăng nhập kèm Sảnh', () => {
   let goiThat: ReturnType<typeof vi.fn>
+  let keo: ReturnType<typeof vi.fn> // window.scrollTo giả: jsdom không cài (in lỗi "Not implemented"), và để kiểm cổng mở từ đầu trang
   beforeEach(() => {
+    keo = vi.fn()
+    vi.stubGlobal('scrollTo', keo)
+    window.scrollTo = keo as unknown as typeof window.scrollTo
     localStorage.clear()
     ;(window as unknown as { __ddhHoiSom?: unknown }).__ddhHoiSom = undefined
     mocks.cong.thay = null
@@ -113,6 +117,25 @@ describe('AppHocSinh — đăng nhập kèm Sảnh', () => {
     const duong = goiThat.mock.calls.map((c) => String(c[0]).replace(GOC, ''))
     expect(duong).toContain(DUONG_SANH)
     expect(duong).toHaveLength(5)
+  })
+
+  it('em VỪA đăng nhập ⇒ cổng mở từ ĐẦU TRANG (kéo cuộn về 0, kể cả khi Sảnh có số ngay lượt đầu nên trang không ngắn lại); máy ĐÃ đăng nhập sẵn lúc mở thì KHÔNG đụng vị trí cuộn', async () => {
+    // 1) máy chưa đăng nhập: vẽ màn đăng nhập, chưa ai kéo cuộn
+    mocks.dangNhap.mockResolvedValue({ ok: true, sbd: '99001', hoTen: 'Em', token: 'tk-moi', sanh: SANH })
+    render(<AppHocSinh />)
+    await screen.findByLabelText('Số báo danh (SBD)')
+    expect(keo).not.toHaveBeenCalled()
+    await dangNhap()
+    await screen.findByTestId('cong')
+    expect(keo).toHaveBeenCalledTimes(1)
+    expect(keo).toHaveBeenCalledWith(0, 0)
+    // 2) máy đã đăng nhập sẵn lúc mở: dựng cổng ngay, không kéo cuộn
+    cleanup()
+    keo.mockClear()
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: '99001', hoTen: 'Em', token: 'tk-moi' }))
+    render(<AppHocSinh />)
+    await screen.findByTestId('cong')
+    expect(keo).not.toHaveBeenCalled()
   })
 
   it('lệnh hoa2-sanh sau đó (lượt hỏi của Sảnh) nhận đúng phản hồi kèm, một lần; lượt kế gửi thật', async () => {
