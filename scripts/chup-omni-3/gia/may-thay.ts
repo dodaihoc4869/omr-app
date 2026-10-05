@@ -1,6 +1,6 @@
 // MÁY CHỦ GIẢ CỦA APP THẦY cho trang chụp OMNI 3 (chép hình dữ liệu từ tests/omni-3-thay-bai-hom-nay.test.tsx của làn C1).
 // Không dữ liệu học sinh thật; không yêu cầu nào ra mạng (goiLenh bị thay ở gia/goi-lenh-thay.ts).
-import { CAU_HINH_OMNI } from './bang-gv'
+import { BANG, CAU_HINH_OMNI } from './bang-gv'
 import type { TeacherExamSource } from '../../../src/data/examContent'
 
 let soCau = 0
@@ -27,11 +27,31 @@ const coMat = (tu: number, den: number) => EM.slice(tu, den).map((e) => e.sbd)
 const buoiCu = (id: string, ngay: string, ds: string[]) => ({ id, ten: `Buổi ${ngay}`, lop: '12A1', moLuc: `${ngay}T11:00:00Z`, hetHan: '', dongLuc: `${ngay}T13:00:00Z`, dangMo: false, coMat: ds })
 const XEM = { ok: true, soCau: 112, soTuLuan: 6, hanNop: '2026-10-12', D: 7, luotCan: 224, sucChua: 280, duLuot: 37, tongEm: 44, soEmChon: 38, duDiem8: 29, quaTai: [{ sbd: 'S7', ten: 'Đặng Minh' }], theLucNgay: 40 }
 
+// Thẻ "Chất lượng sửa lỗi · 14 ngày" ở Tổng quan (05/10): hình dạng đúng `/gv/chat-luong-loi` (server/src/chat-luong-loi.ts). Số giả kiểu tuần
+// đầu (sổ tính từ 29/09): chưa có lượt kiểm 14/30 ngày nào ⇒ hai dòng "Chưa đủ dữ liệu"; lớp 11B ít mẫu hơn.
+const tl = (dat: number, n: number) => ({ tiLe: n ? dat / n : null, dat, n, du: n >= 10 })
+const chuaKiem = [{ moc: 14, ...tl(0, 0) }, { moc: 30, ...tl(0, 0) }]
+const CHAT_LUONG: Record<string, Record<string, unknown>> = {
+  '12A1': { tenLop: '12A1', khoi: '12', soEm: 44, tuNgay: '2026-09-29', denNgay: '2026-10-05', soNgay: 14, nToiThieu: 10, lamLaiDau: tl(31, 48), saiLaiDuyTri: chuaKiem,
+    ngayToiDong: { trungVi: 4, n: 17, du: true }, cauLaCungDang: tl(28, 40), lapNguyenVan: tl(12, 48), boKhacKhoi: 3, soEmCoLuot: 41 },
+  '11B': { tenLop: '11B', khoi: '11', soEm: 30, tuNgay: '2026-09-29', denNgay: '2026-10-05', soNgay: 14, nToiThieu: 10, lamLaiDau: tl(14, 23), saiLaiDuyTri: chuaKiem,
+    ngayToiDong: { trungVi: 3.5, n: 8, du: false }, cauLaCungDang: tl(11, 19), lapNguyenVan: tl(9, 23), boKhacKhoi: 0, soEmCoLuot: 26 },
+}
+/** Cảnh Tổng quan: thêm chiến dịch + cờ Game Hóa 2.0 CHỈ cho cảnh này (các cảnh khác giữ đúng câu trả lời cũ ⇒ ảnh cũ không đổi). */
+const LA_TONG_QUAN = new URLSearchParams(globalThis.location?.search ?? '').get('man') === 'gv-tong-quan'
+
 type KQ = { ok: true; du: Record<string, unknown> } | { ok: false; loai: string; chu: string }
 export async function traLoiThay(duong: string, b: Record<string, unknown>): Promise<KQ> {
   await new Promise((r) => setTimeout(r, 60))
   const du = (o: Record<string, unknown>): KQ => ({ ok: true, du: { ok: true, ...o } })
   if (duong === '/gv/lop') return du({ lop: [{ tenLop: '12A1', khoi: '12', soEm: 44, sbd: [] }, { tenLop: '11B', khoi: '11', soEm: 30, sbd: [] }] })
+  if (duong === '/gv/chat-luong-loi') {
+    const lop = typeof b.lop === 'string' && CHAT_LUONG[b.lop] ? b.lop : '12A1'
+    return du({ homNay: '2026-10-05', soNgay: 14, nToiThieu: 10, lop: [{ tenLop: '12A1', khoi: '12', soEm: 44 }, { tenLop: '11B', khoi: '11', soEm: 30 }], chon: lop, ketQua: CHAT_LUONG[lop] })
+  }
+  if (LA_TONG_QUAN && duong === '/gv/chien-dich' && b.action === 'co-doc') return du({ co: { bat: true, lop: [], sbd: [] } })
+  if (LA_TONG_QUAN && duong === '/gv/chien-dich' && b.action === 'danh-sach') return du({ homNay: BANG.homNay, chienDich: [BANG.chienDich] })
+  if (LA_TONG_QUAN && duong === '/gv/chien-dich' && b.action === 'bang') return du(BANG as unknown as Record<string, unknown>)
   if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return du({ buoi: [BUOI] })
   if (duong === '/gv/buoi-hoc' && b.action === 'gan-day')
     return du({ buoi: [{ ...buoiCu('BH-9', '2026-10-05', coMat(0, 38)), dangMo: true }, buoiCu('BH-8', '2026-10-03', coMat(2, 42)), buoiCu('BH-7', '2026-10-01', []), buoiCu('BH-6', '2026-09-29', coMat(0, 41))] })

@@ -44,6 +44,7 @@ import {phGiaoThem} from './ph-giao-them'
 import { gvCauSaiMoCoi } from './cau-sai-mo-coi'
 import { ghiCauBoTro } from './cau-bo-tro'
 import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
+import { gvChatLuongLoi } from './chat-luong-loi'
 import { gvNutThatDs, gvNutThatGo, hsLoiGo } from './ban-go-nut-that'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {hsCauKiem,hsGuiThay,hsLuyenNen,hsLuyenNenNop,hsThangGo,thayDayNen} from './thang-tu-go'
@@ -3741,6 +3742,8 @@ const boXuLy = {
       if (p === '/gv/nut-that/go') return ra(await gvNutThatGo(env, b))
       if (p === '/gv/cau-sai-mo-coi') return ra(await gvCauSaiMoCoi(env, b))
       if (p === '/gv/v2/tong') return ra(await gvTongV2(env))
+      // 5 THƯỚC ĐO CHẤT LƯỢNG SỬA LỖI theo lớp (thầy 05/10, server/src/chat-luong-loi.ts): thẻ ở Tổng quan app thầy. CHỈ ĐỌC (SELECT) ⇒ `envDoc`.
+      if (p === '/gv/chat-luong-loi') return ra(await gvChatLuongLoi(envDoc, b))
       if (p === '/gv/cau-nghi/xu-ly') return ra(await gvXuLyCauNghi(env, b))
       if (p === '/ca/cau-nghi-dap-an') return ra(await dsCauNghi(env))
       if (p === '/gv/loi-giai/xem') return ra(await gvXemHoSo(env, b))

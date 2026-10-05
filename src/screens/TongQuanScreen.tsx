@@ -28,6 +28,7 @@ import {
   type DongChienDich,
 } from '../lib/tong-quan-gv'
 import { taiGioiHan } from '../lib/tai-gioi-han'
+import TheChatLuongLoi from '../components/chat-luong/TheChatLuongLoi'
 import './gv-hoa2.css'
 
 
@@ -348,6 +349,9 @@ export default function TongQuanScreen() {
                   </div>
                 )}
               </section>
+
+              {/* Chất lượng sửa lỗi theo lớp (thầy 05/10): thẻ tự tải, máy chủ lỗi / chưa có lệnh ⇒ ẩn — phần cũ của màn không đổi. */}
+              <TheChatLuongLoi />
             </div>
           </div>
         </>
