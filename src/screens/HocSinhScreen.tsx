@@ -7,7 +7,7 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp, Users } from 'lucide-react'
+import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
@@ -29,6 +29,10 @@ import { doiTenEmTrongDanhSachLop } from '../lib/classlist-db'
 import type { KetQuaDoiTen } from '../lib/doi-ten-hs-api'
 import './hoc-sinh-m3.css'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
+import TongHocPhi from '../components/hoc-phi/TongHocPhi'
+import HopHocPhi from '../components/hoc-phi/HopHocPhi'
+import { conThieu, dinhDangTien, hocPhiCuaEm, taiHocPhi, TEN_TRANG_THAI, tongHocPhi, trangThaiHocPhi, type HocPhiEm, type TrangThaiHocPhi } from '../lib/hoc-phi'
+import '../components/hoc-phi/hoc-phi.css'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -89,6 +93,11 @@ export default function HocSinhScreen() {
   const lopThay = useLopThay()
   const [doiLop, setDoiLop] = useState(false)
   const [lopLoc, setLopLoc] = useState('')
+  // HỌC PHÍ (thầy 05/10): sổ từ máy chủ (em không có trong Map = 4.500.000 đ, chưa nộp), lọc theo trạng thái, hộp một em.
+  const [hocPhi, setHocPhi] = useState<Map<string, HocPhiEm> | null>(null)
+  const [loiHocPhi, setLoiHocPhi] = useState('')
+  const [locHocPhi, setLocHocPhi] = useState<TrangThaiHocPhi | null>(null)
+  const [hopHocPhi, setHopHocPhi] = useState<{ sbd: string; hoTen: string } | null>(null)
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const [lanTaiHoSo, setLanTaiHoSo] = useState(0) // tăng lên để tải lại hồ sơ (sau khi đổi tên)
@@ -104,6 +113,8 @@ export default function HocSinhScreen() {
       if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ')
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
       setCauHinh({ url: url.trim(), mat: mat.trim() })
+      // Học phí tải SONG SONG, lỗi riêng (không chặn danh sách).
+      void taiHocPhi().then((m) => { setHocPhi(m); setLoiHocPhi('') }).catch((e) => setLoiHocPhi(`Chưa tải được học phí: ${e instanceof Error ? e.message : 'lỗi không rõ'}`))
       setDs(await danhSachEm(url.trim(), mat.trim()))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
@@ -210,18 +221,29 @@ export default function HocSinhScreen() {
     return Array.from(new Set((ds ?? []).map((e) => e.lop?.trim()).filter(Boolean) as string[])).sort()
   }, [ds, lopThay.ds])
 
-  const dsLoc = useMemo(() => {
-    const q = timKiem.trim().toLowerCase()
+  /** Em theo khối/lớp đang chọn — phạm vi của bảng tổng học phí (không theo ô tìm, không theo chip học phí). */
+  const dsTheoLop = useMemo(() => {
     return (ds ?? []).filter((e) => {
       const khoi = khoiTuNamSinh(e.namSinh)
+      return (khoiLoc === null || khoi === khoiLoc) && (!lopLoc || tenLopEm(e.sbd, e.lop) === lopLoc)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ds, khoiLoc, lopLoc, lopThay.ds])
+
+  const dsLoc = useMemo(() => {
+    const q = timKiem.trim().toLowerCase()
+    return dsTheoLop.filter((e) => {
+      const hp = locHocPhi ? hocPhiCuaEm(e.sbd, hocPhi) : null
       return (
-        (khoiLoc === null || khoi === khoiLoc) &&
-        (!lopLoc || tenLopEm(e.sbd, e.lop) === lopLoc) &&
-        (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || tenLopEm(e.sbd, e.lop).toLowerCase().includes(q))
+        (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || tenLopEm(e.sbd, e.lop).toLowerCase().includes(q)) &&
+        (!hp || trangThaiHocPhi(hp.phaiNop, hp.daNop) === locHocPhi)
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ds, timKiem, khoiLoc, lopLoc, lopThay.ds])
+  }, [dsTheoLop, timKiem, locHocPhi, hocPhi])
+
+  const tongHp = useMemo(() => (hocPhi && ds ? tongHocPhi(dsTheoLop.map((e) => e.sbd), hocPhi) : null), [dsTheoLop, hocPhi, ds])
+  const phamViHp = lopLoc ? `Lớp ${lopLoc}` : khoiLoc !== null ? `Khối ${khoiLoc}` : 'Toàn trung tâm'
 
   const caMoiNhat = useMemo(() => {
     if (!hoSo?.ca || hoSo.ca.length === 0) return null
@@ -563,6 +585,8 @@ export default function HocSinhScreen() {
         </div>
       </div>
 
+      <TongHocPhi tong={tongHp} phamVi={phamViHp} loc={locHocPhi} onLoc={setLocHocPhi} loi={loiHocPhi || undefined} />
+
       {/* Hướng dẫn quản lý — 2.0 bỏ (hộp hướng dẫn dài). */}
       {!hoa2 && (
       <details className="gv-help hs-huong-dan">
@@ -705,8 +729,8 @@ export default function HocSinhScreen() {
                     {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
                   </span>
 
-                  {/* BA NÚT MỖI EM */}
-                  <span className="gv-student-actions grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                  {/* BỐN NÚT MỖI EM (Học phí thêm 05/10) */}
+                  <span className="gv-student-actions grid grid-cols-2 sm:grid-cols-4" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                     {(
                       [
                         ['bao-cao', <FileText key="i" size={15} />, 'Báo cáo'],
@@ -742,6 +766,23 @@ export default function HocSinhScreen() {
                     >
                       <KeyRound size={15} /> {dangResetMk ? 'Đang đặt lại…' : 'Đặt lại mật khẩu'}
                     </button>
+                    {(() => {
+                      const hp = hocPhiCuaEm(e.sbd, hocPhi)
+                      const tt = trangThaiHocPhi(hp.phaiNop, hp.daNop)
+                      const chu = !hocPhi ? 'Học phí' : tt === 'con_thieu' ? `Thiếu ${dinhDangTien(conThieu(hp))}` : TEN_TRANG_THAI[tt]
+                      return (
+                        <button
+                          type="button"
+                          disabled={!hocPhi}
+                          onClick={() => setHopHocPhi({ sbd: e.sbd, hoTen: e.hoTen })}
+                          aria-label={`Học phí của ${e.hoTen || `SBD ${e.sbd}`}: ${TEN_TRANG_THAI[tt]}, đã nộp ${dinhDangTien(hp.daNop)}, còn thiếu ${dinhDangTien(conThieu(hp))}`}
+                          className={`tap-target hp-nut hp-mau--${hocPhi ? tt : 'khong_thu'}`}
+                          data-hoc-phi={tt}
+                        >
+                          <Wallet size={15} /> <span className="hp-nut-chu">{chu}</span>
+                        </button>
+                      )
+                    })()}
                   </span>
                 </Hang>
               )
@@ -750,6 +791,15 @@ export default function HocSinhScreen() {
         )}
       </TheNoiDung>
       {hopXacNhan}
+      {hopHocPhi && (
+        <HopHocPhi
+          sbd={hopHocPhi.sbd}
+          hoTen={hopHocPhi.hoTen}
+          banDau={hocPhiCuaEm(hopHocPhi.sbd, hocPhi)}
+          onDong={() => setHopHocPhi(null)}
+          onDoi={(em) => setHocPhi((truoc) => new Map(truoc ?? []).set(em.sbd, em))}
+        />
+      )}
     </div>
   )
 }
