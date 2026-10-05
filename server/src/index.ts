@@ -96,6 +96,7 @@ import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc
 import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
 import { aiSaiCau } from './ai-sai-cau'
+import { doiSbd } from './doi-sbd'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
@@ -3634,6 +3635,8 @@ const boXuLy = {
       if (p === '/ca/cau-da-dung') return ra(await cauDaDung(env, b))
       // HỌC PHÍ (thầy 05/10, server/src/hoc-phi.ts): sổ thu từng em — danh sách, một em, ghi một lần nộp, sửa mức riêng, xoá lần nhập nhầm, nạp sổ Excel.
       if (p.startsWith('/gv/hoc-phi/')) return ra(await gvHocPhi(env, p, b))
+      // ĐỔI SỐ BÁO DANH một em (thầy 05/10, server/src/doi-sbd.ts): quét mọi bảng; mặc định chạy thử (chỉ đếm), `chayThat` mới ghi.
+      if (p === '/gv/doi-sbd') return ra(await doiSbd(env, b))
       if (p === '/ca/xac-nhan') {
         const maCa = String(b.maCa ?? '')
         const ca = await docCa(env, maCa)
