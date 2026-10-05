@@ -8,7 +8,7 @@ import {SoExpCau,useCheDoHieuUng} from '../../../components/exp-cau/ExpCau'
 import {expCauGame} from '../../../lib/hieu-ung-exp-cau'
 import {useEffect,useLayoutEffect,useRef,useState} from 'react'
 import type {ReactNode} from 'react'
-import {CHIP_CHUA_CHAC,GOI_Y_CHIP_CHUA_CHAC} from '../../../lib/omni-chu'
+import {CHIP_CHUA_CHAC,CHU_SOAT_LAI,GOI_Y_CHIP_CHUA_CHAC,GOI_Y_SOAT_LAI} from '../../../lib/omni-chu'
 import TheCau from '../../../components/TheCau'
 import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {TheCauProps} from '../../../components/TheCau'
@@ -191,10 +191,14 @@ export interface TrongAiProps{
  chuaChac?:boolean;onChuaChac?:(v:boolean)=>void
  /** Lần đầu trong ngày em chạm chip ⇒ một dòng gợi ý nhỏ. */
  goiYChip?:boolean
+ /** CẨN THẬN (b) (chỉ-thêm; vắng ⇒ không chip, DOM như cũ — CHỈ truyền cho em `canThan`): chip "Soát lại đơn vị và số liệu" cạnh các chip, chỉ ở câu Phần III; KHÔNG bắt buộc, không chặn nút chốt. */
+ soatLai?:boolean;onSoatLai?:(v:boolean)=>void
  /** Thẻ Trạm hồi phục (OMNI 3) đặt trên nút sang ải, sau kết quả. */
  tram?:ReactNode
+ /** CẨN THẬN (c) (chỉ-thêm): thẻ "Em biết câu này. Sai vì bước nào?" sau kết quả chắc-mà-sai, trên thẻ Trạm. */
+ theBuocSai?:ReactNode
 }
-export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',baoCau='',onTraLoi,onAssisted,onNop,onTiep,onRoi,chuaChac=false,onChuaChac,goiYChip=false,tram}:TrongAiProps){
+export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',baoCau='',onTraLoi,onAssisted,onNop,onTiep,onRoi,chuaChac=false,onChuaChac,goiYChip=false,soatLai=false,onSoatLai,tram,theBuocSai}:TrongAiProps){
  const khung=useRef<HTMLDivElement>(null),[ti,setTi]=useState(docTi)
  // BẮN CHƯỞNG TRƯỚC LỜI GIẢI (thầy 28/09: "cho chưởng chạy ngay lúc em chốt đáp án"): máy chủ vừa trả kết quả (phanHoi null → có) ⇒ GIỮ cảnh trận
  // ~1,1 s (giảm chuyển động: 0,45 s) cho chưởng chạy trọn rồi mới mở lời giải; em bấm vào màn (click, không pointerdown: tránh cú chạm rơi trúng nút SANG ẢI vừa hiện) ⇒ bỏ qua. `chuongSk` = đòn được chiếu —
@@ -255,11 +259,15 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
       <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label={CHIP_CHUA_CHAC} checked={chuaChac} disabled={busy} onChange={e=>onChuaChac(e.target.checked)}/>
       <span className="dao2-tro-chu" aria-hidden="true">{CHIP_CHUA_CHAC}</span>
      </label>}
+     {onSoatLai&&q.phan==='III'&&<label className="dao2-tro" data-khoi="soat-lai" data-bat={soatLai?'':undefined} title={GOI_Y_SOAT_LAI}>
+      <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label={CHU_SOAT_LAI} checked={soatLai} disabled={busy} onChange={e=>onSoatLai(e.target.checked)}/>
+      <span className="dao2-tro-chu" aria-hidden="true">{CHU_SOAT_LAI}</span>
+     </label>}
      <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
     </div>
     {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}
     {goiYChip&&onChuaChac&&<small className="dao2-tro-ghi" data-khoi="goi-y-chua-chac">{GOI_Y_CHIP_CHUA_CHAC}</small>}</>
-    :<>{tram}<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button></>}</>}
+    :<>{theBuocSai}{tram}<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button></>}</>}
   </div>
   </div>
  </div>

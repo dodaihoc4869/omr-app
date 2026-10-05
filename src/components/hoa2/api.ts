@@ -395,6 +395,12 @@ export async function omniTramXong(goi: GoiLenhHoa2, session: string): Promise<{
   return cau && viTri !== null ? { cau, viTri } : { cau: null, viTri: null }
 }
 
+/** CẨN THẬN (c): em chạm một bước ở thẻ "Em biết câu này. Sai vì bước nào?" (hoặc "Em chưa rõ") ⇒ máy chủ ghi sổ riêng `omni_buoc_sai`, KHÔNG chấm. Lỗi ⇒ NÉM câu của máy chủ. */
+export async function omniBuocSai(goi: GoiLenhHoa2, qid: string, ma: string): Promise<{ daGhi: boolean }> {
+  const o = vatOmni(await goi('hoa2-omni-buoc-sai', { qid, ma }))
+  return { daGhi: o.daGhi === true }
+}
+
 /** Đề thử nửa (14 câu lạ, 25 phút): câu CÔNG KHAI (không đáp án) + hạn nộp của máy chủ. */
 export interface DeThuOmni {
   id: string
