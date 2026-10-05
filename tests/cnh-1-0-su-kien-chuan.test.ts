@@ -109,7 +109,8 @@ describe('Sự kiện chuẩn: attempt key, assistance, dữ liệu thô (04 §2
     expect(cot.map((x) => x.name)).toContain('attempt_id') // migration đã chạy trên D1 thật của test
     // Bỏ chỉ mục của migration trước (chỉ mục khoá cột thì SQLite không cho DROP COLUMN), rồi bỏ cột:
     // mô phỏng ĐÚNG một D1 CHƯA áp migration-2309-cnh1-su-kien-chuan.sql.
-    d.sql.exec('DROP INDEX IF EXISTS idx_skh_sua_diem; DROP INDEX IF EXISTS idx_skh_tiep_nhan')
+    // 05/10: chỉ mục biểu thức idx_skh_em_tc (migration-lam-lai-0510.sql) khoá cột raw_json ⇒ cũng phải bỏ trước khi mô phỏng D1 chưa có cột ấy.
+    d.sql.exec('DROP INDEX IF EXISTS idx_skh_sua_diem; DROP INDEX IF EXISTS idx_skh_tiep_nhan; DROP INDEX IF EXISTS idx_skh_em_tc')
     for (const c of ['attempt_id', 'assistance', 'visibility', 'correction_of', 'policy_version', 'purpose', 'raw_json', 'subitem_json', 'received_at']) {
       d.sql.exec(`ALTER TABLE su_kien_hoc DROP COLUMN ${c}`)
     }
