@@ -29,9 +29,11 @@ jobs:
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
       - name: Đếm ca thi mở (chỉ đọc)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ env.CF_TOKEN_SACH }}
-          accountId: ${{ env.CF_ACC_SACH }}
-          command: d1 execute omr --remote --file=../scripts/kiem-ca-mo.sql
-          workingDirectory: server
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          # Chế độ --file của wrangler chỉ in tóm tắt, không in hàng kết quả ⇒ dùng --command (đúng câu SELECT trong tệp) + --json để thấy hai con số.
+          SQL=$(grep -v '^\s*--' ../scripts/kiem-ca-mo.sql | tr '\n' ' ')
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL"
