@@ -45,6 +45,8 @@ import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import { msKyVong } from '../server/src/omni-toc-do'
 import { PHIEN_BAN_OMNI, THAM_SO_OMNI, type HoSoOmniEm } from '../server/src/omni-kieu'
 import { TEN_NEN } from '../server/src/thang-tu-go'
+import { LENH_TAO_BANG_KE_HOACH_OMNI } from '../server/src/srs2-d1'
+import { SQL_CHI_MUC_MOT_TICK } from '../server/src/bai-da-day'
 import type { Env } from '../server/src/kieu'
 import { docOmniPh } from '../src/lib/ph-v3/du-lieu'
 import { tuanVnCua } from '../server/src/omni-game'
@@ -89,7 +91,12 @@ describe('damBaoBangOmni — bảng chỉ-thêm khớp migration-0510', () => {
     a.exec(readFileSync('server/migration-0510-omni-3.sql', 'utf8'))
     for (const l of LENH_TAO_BANG_OMNI) b.exec(l)
     expect(JSON.stringify(chup(b))).toBe(JSON.stringify(chup(a)))
-    expect(chup(a).length).toBeGreaterThanOrEqual(18)
+    expect(chup(a).length).toBeGreaterThanOrEqual(19)
+    expect(LENH_TAO_BANG_OMNI).toContain(LENH_TAO_BANG_KE_HOACH_OMNI) // bảng kế hoạch nhiều bài (A2) đúng nguyên chuỗi của srs2-d1
+    expect(LENH_TAO_BANG_OMNI).toContain(SQL_CHI_MUC_MOT_TICK) // chỉ mục một tick đang hiệu lực (B1)
+    // cùng câu lệnh (kể cả UNIQUE / WHERE của chỉ mục), không chỉ cùng tên cột
+    const sqlCua = (sql: DatabaseSync) => JSON.stringify(sql.prepare("SELECT name, REPLACE(REPLACE(sql, char(10), ' '), '  ', ' ') AS s FROM sqlite_master WHERE type = 'index' AND sql IS NOT NULL ORDER BY name").all())
+    expect(sqlCua(b)).toBe(sqlCua(a))
   })
   it('chạy một lần mỗi isolate (một batch), gọi lại không lỗi', async () => {
     const { d, env } = dung()
@@ -447,6 +454,19 @@ describe('omniChoSanh — phần OMNI thêm vào hoa2-sanh', () => {
     expect(r.conDangDe8).toBe(1)
     expect(r.metGio).toEqual({ khung: '20_22', tiLe: 0.3, tiLeTot: 0.1, coTheDoi: false })
     expect(r.nhatKy?.[0]).toBe('Hôm nay em làm 1 câu, đúng 0 câu.')
+    // còn câu mới chưa làm trong kế hoạch đã chốt ⇒ được đổi; em đã quyết "Làm luôn" hôm nay ⇒ không gợi ý lại
+    d.sql.exec("CREATE TABLE IF NOT EXISTS srs2_ke_hoach (sbd TEXT NOT NULL, ngay TEXT NOT NULL, chien_dich_id TEXT, dao_json TEXT NOT NULL, doan_json TEXT NOT NULL, huyet_chien INTEGER NOT NULL DEFAULT 0, tong INTEGER NOT NULL, tao_luc TEXT NOT NULL, PRIMARY KEY (sbd, ngay))")
+    d.sql.prepare("INSERT INTO srs2_ke_hoach(sbd,ngay,chien_dich_id,dao_json,doan_json,huyet_chien,tong,tao_luc) VALUES('S1','2026-10-05',NULL,'[\"A3\"]','[]',0,1,'x')").run()
+    themCau(d, 'A3', { maDe: 'DEA', dang: 'D2' })
+    const cd = d.sql.prepare('SELECT id, qid_json FROM chien_dich').get() as { id: string; qid_json: string }
+    d.sql.prepare('UPDATE chien_dich SET qid_json = ? WHERE id = ?').run(JSON.stringify([...JSON.parse(cd.qid_json), 'A3']), cd.id)
+    const { xoaDemChienDich } = await import('../server/src/srs2-d1')
+    xoaDemChienDich(); xoaDemOmni()
+    expect((await omniChoSanh(env, 'S1', T0, { tong: 3, con: 1, chienDichId: null }))!.metGio?.coTheDoi).toBe(true)
+    d.sql.exec(LENH_TAO_BANG_KE_HOACH_OMNI)
+    d.sql.prepare("INSERT INTO srs2_ke_hoach_omni(sbd,ngay,met_gio,cap_nhat_luc) VALUES('S1','2026-10-05','lam_luon','x')").run()
+    xoaDemOmni()
+    expect((await omniChoSanh(env, 'S1', T0, { tong: 3, con: 1, chienDichId: null }))!.metGio?.coTheDoi).toBe(false)
   })
 })
 

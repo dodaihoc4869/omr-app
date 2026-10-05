@@ -25,7 +25,7 @@ import { xetMetGio } from './omni-met-gio'
 import { goiYQ, qMacDinh, vknMacDinh } from './omni-q'
 import { betaTuMau, msKyVong } from './omni-toc-do'
 import { lopCuaEm, phamViCuaEm, type PhamViLop } from './bai-da-day'
-import { cheDo2, chuaBatDau, dauNgayVn, docChienDichCuaEm, docChienDichKemBatDau, docCoHoa2, docHoSo2, docKeHoachDaChot, ngayVnCua, qidGoc, type ChienDich, type CoHoa2, type HoSo2 } from './srs2-d1'
+import { cheDo2, chuaBatDau, dauNgayVn, docChienDichCuaEm, docChienDichKemBatDau, docCoHoa2, docHoSo2, docKeHoachDaChot, docQuyetMetGio, ngayVnCua, qidGoc, type ChienDich, type CoHoa2, type HoSo2 } from './srs2-d1'
 import { congNgay, soNgayGiua } from './srs2-loi'
 import { ngayVn, phanTuQid } from './su-kien-hoc'
 import { tachSongSinh } from './loi-hoc-luat'
@@ -67,6 +67,8 @@ const duDuLieu = (n: number, ts: ThamSoOmni): boolean => n >= ts.S_AO
 export const LENH_TAO_BANG_OMNI: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS bai_da_day (id TEXT PRIMARY KEY, lop TEXT NOT NULL, khoa_bai TEXT NOT NULL, ten_bai TEXT NOT NULL, vi_tri INTEGER NOT NULL, ma_to_json TEXT NOT NULL, tick_luc TEXT NOT NULL, nguoi TEXT, chien_dich_id TEXT, bo_tick_luc TEXT)`,
   `CREATE INDEX IF NOT EXISTS bai_da_day_lop ON bai_da_day(lop, vi_tri)`,
+  // Một tick ĐANG HIỆU LỰC cho mỗi (lớp, bài) — làn B1 (bai-da-day.ts `SQL_CHI_MUC_MOT_TICK`), chép nguyên chuỗi.
+  'CREATE UNIQUE INDEX IF NOT EXISTS bai_da_day_mot ON bai_da_day(lop, khoa_bai) WHERE bo_tick_luc IS NULL',
   `CREATE TABLE IF NOT EXISTS pham_vi_lop (lop TEXT NOT NULL, khoa_bai TEXT NOT NULL, ten_bai TEXT NOT NULL, vi_tri INTEGER NOT NULL, ma_de_json TEXT NOT NULL, nguon TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL, PRIMARY KEY (lop, khoa_bai))`,
   `CREATE TABLE IF NOT EXISTS de_kho_thu_muc (ma_de TEXT PRIMARY KEY, thu_muc TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS omni_vkn (id TEXT PRIMARY KEY, ma_dang TEXT NOT NULL, ten TEXT NOT NULL, ten_loi TEXT, nhan_nen TEXT, thu_tu INTEGER NOT NULL DEFAULT 0)`,
@@ -76,6 +78,8 @@ export const LENH_TAO_BANG_OMNI: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS omni_p_vkn (sbd TEXT NOT NULL, vkn_id TEXT NOT NULL, p REAL NOT NULL, n_tu_lam INTEGER NOT NULL, n_cau INTEGER NOT NULL DEFAULT 0, n_ngay INTEGER NOT NULL, n_troi_chay INTEGER NOT NULL DEFAULT 0, n_cau_la_dung INTEGER NOT NULL DEFAULT 0, diem_sprt REAL NOT NULL DEFAULT 0, trang_thai TEXT NOT NULL, day_lai INTEGER NOT NULL DEFAULT 0, phien_ban TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL, PRIMARY KEY (sbd, vkn_id))`,
   `CREATE TABLE IF NOT EXISTS omni_beta_cau (qid TEXT PRIMARY KEY, beta REAL NOT NULL, n INTEGER NOT NULL, cap_nhat_luc TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS omni_du_bao (sbd TEXT NOT NULL, pham_vi TEXT NOT NULL, ky_vong REAL NOT NULL, p8 REAL NOT NULL, sai_so REAL NOT NULL, s_dung REAL NOT NULL, con_duong TEXT, con_thieu_json TEXT, so_bang_chung INTEGER NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (sbd, pham_vi))`,
+  // Kế hoạch nhiều bài (làn A2, srs2-d1.ts `LENH_TAO_BANG_KE_HOACH_OMNI`): chép NGUYÊN chuỗi — không tham chiếu hằng của srs2-d1 lúc nạp mô-đun (vòng import).
+  'CREATE TABLE IF NOT EXISTS srs2_ke_hoach_omni (sbd TEXT NOT NULL, ngay TEXT NOT NULL, chien_dich_json TEXT, on_bai_cu_json TEXT, met_gio TEXT, cap_nhat_luc TEXT, PRIMARY KEY (sbd, ngay))',
   `CREATE TABLE IF NOT EXISTS omni_chung_chi (sbd TEXT NOT NULL, chien_dich_id TEXT NOT NULL, cap_luc TEXT NOT NULL, do_tin REAL NOT NULL, diem_ca_chot REAL, ma_ca TEXT, PRIMARY KEY (sbd, chien_dich_id))`,
   `CREATE TABLE IF NOT EXISTS omni_xac_nhan (sbd TEXT NOT NULL, ma_dang TEXT NOT NULL, ket TEXT NOT NULL, luc TEXT NOT NULL, nguoi TEXT, PRIMARY KEY (sbd, ma_dang, luc))`,
   `CREATE TABLE IF NOT EXISTS omni_ca_chot (chien_dich_id TEXT NOT NULL, ma_ca TEXT NOT NULL, luc TEXT NOT NULL, qid_la_json TEXT, PRIMARY KEY (chien_dich_id, ma_ca))`,
@@ -903,7 +907,9 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
     const dangCo = dsDang(cau)
     const vung = gan ? dangDaVung(hs, cau, ts).filter((d) => dangCo.includes(d)) : []
     const met = xetMetGio(hs, khungGioCua(nowMs), ts)
-    const metGio = met && met.kichHoat ? { khung: met.khung, tiLe: met.tiLe, tiLeTot: met.tiLeTot, coTheDoi: await conCauMoiChuaLam(env, sbd, nowMs, dangLuyen) } : null
+    // Em đã bấm "Để mai"/"Làm luôn" hôm nay (srs2_ke_hoach_omni.met_gio) ⇒ không gợi ý đổi thứ tự lần nữa trong ngày.
+    const daQuyet = met && met.kichHoat ? await docQuyetMetGio(env, sbd, nowMs).catch(() => null) : null
+    const metGio = met && met.kichHoat ? { khung: met.khung, tiLe: met.tiLe, tiLeTot: met.tiLeTot, coTheDoi: !daQuyet && (await conCauMoiChuaLam(env, sbd, nowMs, dangLuyen)) } : null
     const nhatKy = ngu.con === 0 && ngu.tong > 0 ? await nhatKyHomNay(env, sbd, nowMs) : []
     return {
       bat: true,

@@ -38,7 +38,7 @@ describe('omni-d1 trên workerd D1', () => {
     await damBaoBangOmni(ENV)
     const r = await DB.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'omni_%' ORDER BY name").all<{ name: string }>()
     expect(r.results.map((x) => x.name)).toEqual(['omni_beta_cau', 'omni_ca_chot', 'omni_chung_chi', 'omni_de_thu', 'omni_du_bao', 'omni_em', 'omni_lo_dien', 'omni_p_vkn', 'omni_q', 'omni_ve', 'omni_vkn', 'omni_xac_nhan'])
-    expect(LENH_TAO_BANG_OMNI.length).toBe(18)
+    expect(LENH_TAO_BANG_OMNI.length).toBe(20)
   })
   it('đọc sổ ⇒ SuKienOmni (json_each, song sinh, ý Đúng–sai, raw), β câu, chụp hồ sơ thô, prior lớp, Q', async () => {
     const ds = (await docSuKienOmni(ENV, ['R1'])).get('R1')!
