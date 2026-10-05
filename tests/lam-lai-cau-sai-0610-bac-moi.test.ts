@@ -215,6 +215,27 @@ describe('A1 · khối 11 sai câu Phần III có bộ sinh, không song sinh �
     expect(JSON.parse(soCua(d, 'Q3')[0]!.raw_json!)).toEqual({ chon: '4,5' })
   })
 
+  it('OMNI BẬT (bản sống đang bật cho mọi em): nộp ~bt ⇒ kết quả có omni, sổ ghi tc + {ms, tt, td}, câu đúng tính cho Q3; sai nhanh vẫn xét lướt như câu thường', async () => {
+    const { d, env } = await dungBT()
+    d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('omni','{"bat":true,"lop":[],"sbd":[]}','x')`)
+    xoaDemCauHinh(env)
+    ghi(d, 'Q3', 0, luc('2026-10-05', '10:00'))
+    vi.setSystemTime(luc('2026-10-06'))
+    const r = await dao(env)
+    expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
+    expect((r.questions as { qid: string }[]).map((q) => q.qid)).toContain('Q3~bt0')
+    khongLoDapAn(r)
+    const bt = apBienThe(gocCua(d, 'Q3'), 'Q3~bt0', 11)!
+    const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q3~bt0', answer: bt.correct, msLam: 90_000, tuTin: 'chac' })
+    expect(t.ok, JSON.stringify(t).slice(0, 300)).toBe(true)
+    expect(t.correct).toBe(true)
+    expect('omni' in t).toBe(true)
+    const so = soCua(d, 'Q3~bt0')
+    expect(so).toHaveLength(1)
+    expect(JSON.parse(so[0]!.raw_json!)).toMatchObject({ chon: bt.correct, tc: 'Q3', ms: 90_000, tt: 'chac' })
+    expect((await docHoSo2(env, 'S1', '2026-10-06')).loiV2?.get('Q3')).toMatchObject({ trangThai: 'cho_kiem', daDungSongSinh: true })
+  })
+
   it('dạng KHÔNG có bộ sinh (D5) ⇒ không ~bt: rơi xuống nguyên văn có đếm (Phần III, không anh em)', async () => {
     const Q5: CauThu = { qid: 'Q5', maDe: TO11, phan: 'III', dang: 'D5', mucDo: 'TH', correct: '4,5' }
     const { d, env } = await dungBT([Q5], ['Q5'])
