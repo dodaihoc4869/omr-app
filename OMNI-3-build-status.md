@@ -3,23 +3,23 @@
 **Kết luận: BUILD XONG · CHƯA PHÁT HÀNH.** Thầy dặn "khi build xong hết nhắn tôi trước khi đẩy" ⇒ chưa gộp `main`, chưa đẩy Worker/Pages, chưa chạy migration `--remote`. Chỉ đẩy nhánh `claude/gracious-heisenberg-hoe97n`.
 
 - Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` · hợp đồng: `docs/hop-dong-omni-3.md` · sổ việc: `SO-VIEC-OMNI-3.md`
-- Mã commit nghiệm thu: `e271f424` (109 commit trên `main` 416ee47, gồm 30 commit gộp: 9 làn + `main` mới)
+- Mã commit nghiệm thu: `ac234db2` (bản cuối sau ba lệnh thêm của thầy 05/10; trước đó `e271f424`). Gốc `main` 416ee47.
 - Công tắc `cau_hinh.omni` mặc định TẮT ⇒ phát hành xong chưa em nào thấy gì mới cho tới khi thầy bật theo lớp ở Cài đặt.
 
 ## 1. Bảng nghiệm thu (số liệu là kết quả thật của lệnh chạy trong phiên)
 
 | Việc | Cách đo | Kết quả | Đạt/Trượt |
 |---|---|---|---|
-| Toàn bộ vitest so nền | `npx vitest run` (JSON), so TÊN với nền `aa95c68` | 13 912 test: 13 724 đạt · 141 đỏ · 47 bỏ qua; 9 tệp lỗi môi trường (đúng 9 tệp của nền). Tên đỏ mới: 1 — `doan-het-cau-2809` "đi một mình… 2 câu" (sao tính theo máu, test chạy theo đồng hồ thật ⇒ máy quá tải thì quái kịp đánh); chạy riêng 4/4 đạt trên nhánh, đạt trên `main` | Đạt |
+| Toàn bộ vitest so nền | `npx vitest run` (JSON), so TÊN với nền `aa95c68` | Bản cuối `ac234db2`: 13 949 test · 13 761 đạt · 141 đỏ · 47 bỏ qua; 141 tên đỏ TRÙNG ĐÚNG nền; 9 tệp lỗi môi trường TRÙNG ĐÚNG nền. Tên đỏ mới: 0 | Đạt |
 | Test OMNI + reset + điểm danh + nhịp | `npx vitest run tests/omni-3-*.test.ts* tests/reset-* tests/buoi-hoc-may-chu-2809… tests/nhip-bang-2109…` | 38 tệp · 723/723 | Đạt |
 | Nghiệm thu xuyên làn không giả lớp nào | `tests/omni-3-nghiem-thu-0510.test.ts` | 1/1: tick (chọn em, lọc SBD lạ, tick lần hai không tạo thêm) ⇒ A.I gắn vi kỹ năng ⇒ Sảnh omni ⇒ Trạm có câu nền tự sinh ⇒ luyện nền chấm đúng ⇒ Bảng bài ⇒ tắt công tắc y như cũ | Đạt |
 | Kiểm kiểu | `cd server && npx tsc --noEmit -p tsconfig.json` · `npx tsc --noEmit -p tsconfig.app.json` | EXIT 0 · EXIT 0 | Đạt |
 | Build | `npm run build` | EXIT 0 | Đạt |
 | Màu | `npm run check:mau` | "Không có mã màu # nào ngoài src/styles/tokens.css" | Đạt |
-| Service worker | `node scripts/kiem-sw.mjs` | 13/13 · precache 160 tệp / 2 983 KB (trần 170 / 3 000; `main` 2 993 KB) | Đạt |
+| Service worker | `node scripts/kiem-sw.mjs` | 13/13 · precache 162 tệp / 2 984 KB (trần 170 / 3 000; `main` 2 993 KB) | Đạt |
 | Màn thi không đổi | `git diff origin/main HEAD -- src/screens/ExamTakeScreen.tsx` | 0 dòng | Đạt |
 | Migration chỉ-thêm | chạy `server/migration-0510-omni-3.sql` 2 lần trên node:sqlite | sạch cả 2 lần, 20 bảng; không ALTER bảng cũ | Đạt |
-| Ảnh app thật | `scripts/chup-omni-3/` (component thật + máy chủ giả, chặn mọi yêu cầu ra ngoài) | 14 ảnh · 0 lỗi trang · 0 tràn ngang (`docs/omni-0510/anh-build/`) | Đạt |
+| Ảnh app thật | `scripts/chup-omni-3/` (component thật + máy chủ giả, chặn mọi yêu cầu ra ngoài) | 18 ảnh (gồm lời giải trắc nghiệm, trả lời ngắn, câu nền sau khi nộp) · 0 lỗi trang · 0 tràn ngang (`docs/omni-0510/anh-build/`) | Đạt |
 
 ## 2. Định nghĩa hoàn thành (đặc tả mục 9)
 
