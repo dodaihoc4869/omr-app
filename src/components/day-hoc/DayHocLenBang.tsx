@@ -5,6 +5,7 @@
 //  2 · CHỌN CÂU — hộp tích chọn RIÊNG cây thư mục DẠY HỌC của kho (`locDeDayHoc`), tích tờ/bài rồi bỏ từng câu; KHÔNG lọc tự luận.
 //  3 · CHIẾU — màn chiếu MỚI (`dungToChieuDayHoc` → `taoHtmlMayChieu`, lớp bản vẽ 28/09): đủ từng câu thầy chọn. "Chiếu lên bảng" ⇒ app chọn em
 //      CÓ MẶT có khả năng làm đúng cao nhất cho từng câu (`chon-em-day-hoc.ts`); "Đổi em khác"; "Đúng" / "Sai" ghi bằng `ghiLenBang` (đường ghi sẵn có).
+//  4 · BÀI HÔM NAY (OMNI 3, 05/10 — `BaiHomNay.tsx`): CHỈ khi công tắc OMNI bật — tick bài vừa dạy ⇒ tự giao luyện theo bài; OMNI tắt ⇒ bảng y như cũ.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Eye, EyeOff, Lightbulb, MonitorPlay, RefreshCw, Shuffle, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
@@ -19,6 +20,7 @@ import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { ChemText } from '../../lib/chem-format'
 import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi } from './DiemDanhBuoi'
+import { BuocBaiHomNay, DongChoBaiMoi, useBaiHomNay } from './BaiHomNay'
 import './day-hoc.css'
 
 /** Chữ tấm chiếu mã điểm danh — nay nằm ở `DiemDanhBuoi.tsx` (dùng chung với Kiểm tra đầu giờ); giữ lối xuất cũ. */
@@ -98,6 +100,8 @@ export default function DayHocLenBang() {
   useEffect(() => {
     if (maChon.size && !kho) void napKho()
   }, [maChon, kho, napKho])
+  // ───── 4 · BÀI HÔM NAY (OMNI 3) — dùng chung kho Dạy học đã nạp; ẩn hẳn khi OMNI tắt ─────
+  const bhn = useBaiHomNay(dd, kho, napKho)
 
   const tatCaCau = useMemo(() => (kho ? cauTuDeChon(kho, maChon) : []), [kho, maChon])
   const cauChieu = useMemo(() => tatCaCau.filter((c) => !boCau.has(c.khoa)), [tatCaCau, boCau])
@@ -202,6 +206,7 @@ export default function DayHocLenBang() {
       <header className="dh-dau">
         <h1>Dạy học</h1>
         <p>Điểm danh lấy danh sách em học hôm nay → chọn câu trong kho Dạy học → chiếu lên máy chiếu. App gọi em có mặt có khả năng làm đúng câu cao nhất.</p>
+        <DongChoBaiMoi bhn={bhn} />
       </header>
 
       <BuocDiemDanh dd={dd} />
@@ -388,6 +393,9 @@ export default function DayHocLenBang() {
           )}
         </div>
       </section>
+
+      {/* ───── BƯỚC 4 (OMNI 3) ───── */}
+      <BuocBaiHomNay bhn={bhn} kho={kho} />
 
       {hopMo && (
         <div className="dh-phu-lop" role="dialog" aria-modal="true" aria-labelledby="dh-hop-ten" onKeyDown={(e) => e.key === 'Escape' && setHopMo(false)}>
