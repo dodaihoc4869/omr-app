@@ -99,7 +99,8 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
   return ra
 }
 
-interface ChungAnhEm { pv: PhamViChon; bc: BoiCanh; keHoach: Set<string>; chan: Set<string> }
+/** Đọc chung cho cả lượt (một lần): phạm vi, bối cảnh, kế hoạch, câu bị chặn; đệm meta theo dạng + lớp của tờ (nhiều câu lỗi cùng dạng/tờ ⇒ không đọc lại). */
+interface ChungAnhEm { pv: PhamViChon; bc: BoiCanh; keHoach: Set<string>; chan: Set<string>; theoDang: Map<string, Promise<MetaCau[]>>; lopTo: Map<string, string | null> }
 async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>): Promise<ChungAnhEm> {
   // `boiCanh` ném khi không đọc được tập câu bảo vệ ca thi ⇒ không chọn câu anh em (thà không phát còn hơn lộ câu ca thi).
   const [pv, boi, pham] = await Promise.all([
@@ -111,6 +112,7 @@ async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>
     pv, bc: boi,
     keHoach: new Set((bc.keHoach ?? []).map((k) => tachSongSinh(qidGoc(k)).goc)),
     chan: new Set([...chan, ...(Array.isArray(pham?.blocked) ? pham.blocked.map(String) : [])]),
+    theoDang: new Map(), lopTo: new Map(),
   }
 }
 
@@ -121,19 +123,23 @@ async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>
  */
 async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Promise<ChungAnhEm>, daDung: ReadonlySet<string>, nhomDung: ReadonlySet<string>): Promise<{ q: PrivateQuestion; m: MetaCau } | null> {
   if (!m.dang) return null
-  const { pv, bc, keHoach, chan } = await chungP
+  const chung = await chungP
+  const { pv, bc, keHoach, chan } = chung
   const khoi = khoiCanCo(bc.khoiEm, m)
   if (khoi == null) return null
   const bacQ = bacMuc(m.mucDo)
   const khoang = (x: MetaCau): number => { if (bacQ == null) return 0; const b = bacMuc(x.mucDo); return b == null ? 9 : Math.abs(b - bacQ) }
   const lauRoi = (x: MetaCau): boolean => !bc.daLam.has(x.qid) || bc.daLam.get(x.qid)! <= lb.nowMs - NGAY_GAP_LAI * NGAY_MS
-  const truoc = (await metaTheoDang(env, m.dang, pv)).filter((x) =>
+  let theoDang = chung.theoDang.get(m.dang)
+  if (!theoDang) { theoDang = metaTheoDang(env, m.dang, pv); chung.theoDang.set(m.dang, theoDang) }
+  const truoc = (await theoDang).filter((x) =>
     x.qid !== m.qid && x.phan === m.phan && x.group !== m.group && !daDung.has(x.qid) && !nhomDung.has(x.group) && !keHoach.has(x.qid)
     && !chan.has(x.qid) && !chan.has(x.group) && hopLeChung(x, bc) && !lamHomNay(x.qid, bc) && khoang(x) <= 1 && lauRoi(x)
     && [khoiCuaMaDe(x.maDe), khoiCuaMaDe(x.qid)].every((k) => k === null || k === khoi)) // lọc nhanh: mã tờ/qid không lệch khối; đủ luật `dungKhoi` (kèm `lop` của tờ) ngay dưới
   if (!truoc.length) return null
-  const lopTo = await docLopTo(env, truoc.map((x) => x.maDe))
-  const ung = truoc.filter((x) => dungKhoi(x, lopTo.get(x.maDe), khoi))
+  const canDoc = [...new Set(truoc.map((x) => x.maDe))].filter((ma) => !chung.lopTo.has(ma))
+  if (canDoc.length) { const doc = await docLopTo(env, canDoc); for (const ma of canDoc) chung.lopTo.set(ma, doc.get(ma) ?? null) }
+  const ung = truoc.filter((x) => dungKhoi(x, chung.lopTo.get(x.maDe), khoi))
   if (!ung.length) return null
   const thu = xepUngVien(ung, bc, khoang, `${lb.sbd}|${ngayVnCua(lb.nowMs)}|${m.qid}`)
   const [chon] = await napTheoThuTu(env, thu.slice(0, SO_THU_NAP), 1)
