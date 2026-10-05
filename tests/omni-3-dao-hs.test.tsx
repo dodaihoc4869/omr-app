@@ -271,6 +271,20 @@ describe('Đảo 2.0 · đề thử (cửa vào từ Sảnh)', () => {
     expect(screen.getByRole('button', { name: 'VỀ SẢNH' })).toBeTruthy()
     expect(cuon.some(el => el.classList.contains('loi-giai'))).toBe(false) // danh sách kết quả không tự cuộn nhảy
   })
+  it('hết giờ theo hạn máy chủ ⇒ tự nộp MỘT lần phần đã làm (không hỏi lại)', async () => {
+    sessionStorage.setItem(KHOA_OMNI_DAO, 'de-thu')
+    const m = dung({
+      omni: { ...OMNI, deThu: { duoc: true, soCau: 14, phut: 25 } },
+      kich: {
+        'hoa2-omni-de-thu': () => ({ id: 'dt2', cau: [cau(0)], phut: 25, hetLuc: new Date(Date.now() + 300).toISOString() }),
+        'hoa2-omni-de-thu-nop': () => ({ diem: 0, dung: 0, tong: 1, cau: [{ qid: 'q0', dung: false, traLoi: '', dapAn: 'B', loiGiai: { chot: 'Chốt' } }] }),
+      },
+    })
+    await waitFor(() => expect(m.than('hoa2-omni-de-thu-nop')).toEqual({ id: 'dt2', traLoi: { q0: '' } }), { timeout: 5000 })
+    expect(await screen.findByText(`Điểm đề thử: ${diemChu(0)}`)).toBeTruthy()
+    expect(m.nhat.filter(n => n[0] === 'hoa2-omni-de-thu-nop')).toHaveLength(1)
+    expect(screen.queryByRole('alertdialog')).toBeNull()
+  })
   it('khoá đề thử nhưng máy chủ chưa cho (deThu.duoc false) ⇒ Đảo soạn chuyến như thường, không gọi hoa2-omni-de-thu', async () => {
     sessionStorage.setItem(KHOA_OMNI_DAO, 'de-thu')
     const m = dung({ omni: OMNI })

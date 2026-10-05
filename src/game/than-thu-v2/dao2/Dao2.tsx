@@ -28,7 +28,7 @@ import {LOI_KHOA_DAO_MAC_DINH,SO_AI_CHUYEN,THONG_BAO_TRONG_2,docGoiY,docGoiYPhie
 import type {CauDao2,Sanh2} from './dao2-core'
 import './dao2.css'
 
-interface Luot2{id:string;cau:CauDao2[];luc:number}
+interface Luot2{id:string;cau:CauDao2[];luc:number;/** OMNI 3: chuyến của vé thử thách (chốt lúc soạn, câu thay ở Trạm không làm đổi). */ve?:boolean}
 /** OMNI 3: vai câu của chuyến vé thử thách (máy chủ `start` kèm `ve`). Cả chuyến mang vai này ⇒ câu chưa đúng không trừ Máu. */
 const VAI_VE='thu_thach'
 const laChuyenVe=(cau:readonly CauDao2[])=>cau.length>0&&cau.every(c=>c.vai===VAI_VE)
@@ -77,9 +77,9 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  useEffect(()=>{if(pha==='ai')mocCau.current=performance.now()},[pha,luot?.id,viTri])
  const napSanh=useCallback(async()=>{const s=docSanh2(await call('hoa2-sanh'));if(conSong.current&&s){setSanh(s);setLoiSanh('')}return s},[call])
  const napDaLam=useCallback(()=>{void call('hoa2-cau-da-lam').then(r=>{if(conSong.current)setDaLam(r)}).catch(()=>{})},[call])
- const datLuot=(l:Omit<Luot2,'luc'>,da:Answered=[])=>{const dau=l.cau.findIndex(c=>!da.some(a=>a.attempt.qid===c.qid))
-  setLuot({...l,luc:Date.now()});setKetQua(da.map(a=>a.attempt));setExp(da.reduce((s,a)=>s+(a.reward||0),0));setViTri(Math.max(0,dau));setTraLoi('');setAssisted(false);setPhanHoi(null);setChuaChac(false);setGoiYChip(false);setTram(null)
-  return {...l,luc:Date.now()}}
+ const datLuot=(l:Omit<Luot2,'luc'|'ve'>,da:Answered=[])=>{const dau=l.cau.findIndex(c=>!da.some(a=>a.attempt.qid===c.qid))
+  setLuot({...l,luc:Date.now(),ve:laChuyenVe(l.cau)});setKetQua(da.map(a=>a.attempt));setExp(da.reduce((s,a)=>s+(a.reward||0),0));setViTri(Math.max(0,dau));setTraLoi('');setAssisted(false);setPhanHoi(null);setChuaChac(false);setGoiYChip(false);setTram(null)
+  return {...l,luc:Date.now(),ve:laChuyenVe(l.cau)}}
 
  /** Soạn chuyến: chuyến dở (resume) → không thì sync tới hết → start. Khoá / hết câu ⇒ null (màn tự đổi). */
  const soanChuyen=useCallback(async(s:Sanh2|null):Promise<Luot2|null>=>{
@@ -126,7 +126,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
   const correct=!!r.correct,reward=r.reward??0,coBua=!!docGoiY(q.goiY,q.phan)
   // OMNI 3: lướt (máy chủ chưa tính câu) hoặc câu của vé thử thách ⇒ câu chưa đúng KHÔNG trừ Máu (`mien` trong learningBattle).
   const om=omniBat?docKetQuaOmni((r as {omni?:unknown}).omni):null
-  const mien:'luot'|'ve'|undefined=correct?undefined:om?.luot?'luot':omniBat&&laChuyenVe(luot.cau)?'ve':undefined
+  const mien:'luot'|'ve'|undefined=correct?undefined:om?.luot?'luot':omniBat&&luot.ve?'ve':undefined
   const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted:assisted||coBua,reward,stage:r.stage??0})
   const emGui=(r as {traLoi?:unknown}).traLoi
   setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct,...(mien?{mien:true}:{})}]);setExp(t=>t+(typeof r.expCau==='number'?Math.max(0,r.expCau):reward))

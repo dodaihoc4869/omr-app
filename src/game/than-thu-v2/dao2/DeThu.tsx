@@ -27,7 +27,7 @@ export interface DeThuProps{sbd:string;call:DaoCall;/** Về Sảnh (app học s
 export default function DeThu({call,onVe}:DeThuProps){
  const [de,setDe]=useState<DeThuOmni|null>(null),[loiTai,setLoiTai]=useState(''),[traLoi,setTraLoi]=useState<Record<string,string>>({})
  const [dangNop,setDangNop]=useState(false),[loi,setLoi]=useState(''),[kq,setKq]=useState<KetQuaDeThu|null>(null),[zoom,setZoom]=useState(''),[,setNhip]=useState(0)
- const hetMs=useRef(0),daNop=useRef(false),song=useRef(true)
+ const hetMs=useRef(0),daNop=useRef(false),daTuNop=useRef(false),song=useRef(true)
  useEffect(()=>{song.current=true;return()=>{song.current=false}},[])
  const tai=useCallback(()=>{setLoiTai('');setDe(null)
   omniDeThu(call).then(d=>{if(!song.current)return
@@ -45,9 +45,9 @@ export default function DeThu({call,onVe}:DeThuProps){
   catch(e){daNop.current=false;if(song.current)setLoi(e instanceof Error&&e.message?e.message:'Chưa nộp được đề thử. Em bấm nộp lại.')}
   finally{if(song.current)setDangNop(false)}}
  const nopRef=useRef(nop);nopRef.current=nop
- // Đồng hồ: vẽ lại mỗi giây (chỉ để hiện); hết giờ theo hạn máy chủ ⇒ tự nộp MỘT lần phần đã làm.
+ // Đồng hồ: vẽ lại mỗi giây (chỉ để hiện); hết giờ theo hạn máy chủ ⇒ tự nộp MỘT lần phần đã làm (lỗi mạng ⇒ em bấm "Nộp đề thử", không bắn lại mỗi giây).
  useEffect(()=>{if(!de||kq)return
-  const t=setInterval(()=>{setNhip(n=>n+1);if(Date.now()>=hetMs.current&&!daNop.current)void nopRef.current(true)},1000)
+  const t=setInterval(()=>{setNhip(n=>n+1);if(Date.now()>=hetMs.current&&!daNop.current&&!daTuNop.current){daTuNop.current=true;void nopRef.current(true)}},1000)
   return()=>clearInterval(t)},[de,kq])
  const doi=(qid:string,v:string)=>{if(dangNop||hetGio||!de)return;setTraLoi(x=>{const m={...x,[qid]:v};ghiNhap(de.id,m);return m})}
  const roi=async()=>{if(kq||!de){onVe();return}
