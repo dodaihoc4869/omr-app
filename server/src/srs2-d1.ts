@@ -1081,3 +1081,14 @@ export async function chanDoanEm(env: Env, sbd: string, nowMs: number): Promise<
     hangChung: hang?.hangChung ?? null,
   }
 }
+
+// ---------------------------------------------------------------- OMNI 3: hồ sơ mệt — đổi thứ tự kế hoạch đã chốt (STUB HỢP ĐỒNG; agent "Kế hoạch ngày" làm thật)
+/**
+ * Em bấm "Để mai" / "Làm luôn" ở dòng gợi ý khung giờ (Sảnh). 'de_mai' ⇒ bỏ khỏi kế hoạch HÔM NAY các câu MỚI chưa làm có mức Vận dụng trở lên
+ * (chúng quay về quỹ câu mới, quota ngày mai tính lại), đưa câu ôn nhẹ lên trước; ghi lại bằng `ghiKeHoachNeuChuaDoi` (so bản cũ). 'lam_luon' ⇒ chỉ ghi
+ * nhận (không gợi ý lại hôm nay). Trả tóm tắt kế hoạch mới { ok, theLuc:{con,tong}, dao:{con}, doan:{con} }. OMNI tắt ⇒ { ok:false }.
+ */
+export async function doiThuTuMetGio(env: Env, sbd: string, nowMs: number, quyet: 'de_mai' | 'lam_luon'): Promise<Record<string, unknown>> {
+  void env; void sbd; void nowMs; void quyet
+  return { ok: false, error: 'Chức năng đang dựng.' }
+}
