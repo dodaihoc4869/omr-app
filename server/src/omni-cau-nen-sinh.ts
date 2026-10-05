@@ -50,6 +50,8 @@ const dep = (x: number, toiDa = 3) => Number.isFinite(x) && x > 0 && soLe(x) <= 
 const vn = (x: number) => chuoiChuan(x).replace('.', ',')
 /** Thế điện cực: luôn 2 chữ số thập phân, có dấu (+0,34 · −0,76 · 0,00). */
 const vnDau = (x: number) => (Math.abs(x) < 1e-12 ? '0,00' : `${x > 0 ? '+' : '−'}${Math.abs(x).toFixed(2).replace('.', ',')}`)
+/** Hiệu điện thế viết đủ 2 chữ số thập phân như SGK (1,10 V). */
+const vn2 = (x: number) => x.toFixed(2).replace('.', ',')
 
 // ---------------------------------------------------------------- chất: công thức (chỉ số Unicode) + thành phần nguyên tố
 
@@ -620,12 +622,12 @@ function theDienCucPin(): Nhap[] {
     const X = CAP_OXH[i]!, Y = CAP_OXH[j]!
     const lon = X.e > Y.e ? X : Y, nho = X.e > Y.e ? Y : X, E = lam(lon.e - nho.e)
     ra.push(so(1, `Cho thế điện cực chuẩn: E°(${X.cap}) = ${vnDau(X.e)} V; E°(${Y.cap}) = ${vnDau(Y.e)} V. Tính sức điện động chuẩn (V) của pin điện hoá tạo bởi hai cặp này.`, E,
-      [`Cặp ${lon.cap} có E° lớn hơn là cực dương (cathode); cặp ${nho.cap} là cực âm (anode).`, `E°pin = ${vnDau(lon.e)} − (${vnDau(nho.e)}) = ${vn(E)} V.`], MEO_PIN))
+      [`Cặp ${lon.cap} có E° lớn hơn là cực dương (cathode); cặp ${nho.cap} là cực âm (anode).`, `E°pin = ${vnDau(lon.e)} − (${vnDau(nho.e)}) = ${vn2(E)} V.`], MEO_PIN))
   }
   for (const cat of CAP_OXH.filter((x) => x.e > 0)) for (const an of CAP_OXH.filter((x) => x.e < cat.e)) {
     const E = lam(cat.e - an.e)
-    ra.push(so(2, `Pin điện hoá tạo bởi hai cặp ${an.cap} và ${cat.cap} có sức điện động chuẩn ${vn(E)} V. Biết E°(${an.cap}) = ${vnDau(an.e)} V và cặp ${cat.cap} là cực dương. Tính E°(${cat.cap}) (V).`, cat.e,
-      [`E°pin = E°(${cat.cap}) − E°(${an.cap}).`, `E°(${cat.cap}) = ${vn(E)} + (${vnDau(an.e)}) = ${vn(cat.e)} V.`], MEO_PIN))
+    ra.push(so(2, `Pin điện hoá tạo bởi hai cặp ${an.cap} và ${cat.cap} có sức điện động chuẩn ${vn2(E)} V. Biết E°(${an.cap}) = ${vnDau(an.e)} V và cặp ${cat.cap} là cực dương. Tính E°(${cat.cap}) (V).`, cat.e,
+      [`E°pin = E°(${cat.cap}) − E°(${an.cap}).`, `E°(${cat.cap}) = ${vn2(E)} + (${vnDau(an.e)}) = ${vn2(cat.e)} V.`], MEO_PIN))
   }
   return ra
 }
