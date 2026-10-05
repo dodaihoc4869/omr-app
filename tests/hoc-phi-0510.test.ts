@@ -142,3 +142,14 @@ describe('máy chủ học phí (D1 thật)', () => {
     expect(tongHocPhi(['10001', '10002', '10003'], ds)).toMatchObject({ phaiNop: 6_750_000, daNop: 6_750_000, conThieu: 0 })
   })
 })
+
+describe('màn Học sinh: hàng lọc Học phí (thầy 05/10)', () => {
+  it('có hàng "Học phí" cạnh Khối/Lớp với Tất cả · Còn thiếu · Chưa nộp, dùng chung trạng thái lọc', async () => {
+    const { readFileSync } = await import('node:fs')
+    const src = readFileSync('src/screens/HocSinhScreen.tsx', 'utf8')
+    const khoi = src.slice(src.indexOf('data-khoi="loc-hoc-phi"'), src.indexOf('data-khoi="loc-hoc-phi"') + 900)
+    expect(khoi).toContain("[null, 'con_thieu', 'chua_nop']")
+    expect(khoi).toContain('setLocHocPhi(t)')
+    expect(src).toContain('trangThaiHocPhi(hp.phaiNop, hp.daNop) === locHocPhi')
+  })
+})

@@ -1242,8 +1242,13 @@ export async function xoaEm(env: Env, b: Record<string, unknown>): Promise<Recor
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
   // XOÁ ĐĂNG KÝ, KHÔNG XOÁ BÀI. Bảng `luot` giữ nguyên: bài em đã làm là dữ
   // liệu của thầy, không phải của hồ sơ đăng ký.
-  await env.DB.prepare('DELETE FROM hoc_sinh WHERE sbd = ?').bind(sbd).run()
-  return { ok: true }
+  // Xoá CẢ dòng `danh_sach` (05/10): màn Học sinh (`/em/danh-sach`) đọc bảng này — chỉ xoá `hoc_sinh` thì nút
+  // "Xoá khỏi danh sách" báo xong mà em vẫn nằm trên danh sách (và vẫn vào thi được).
+  const [, d] = await env.DB.batch([
+    env.DB.prepare('DELETE FROM hoc_sinh WHERE sbd = ?').bind(sbd),
+    env.DB.prepare('DELETE FROM danh_sach WHERE sbd = ?').bind(sbd),
+  ])
+  return { ok: true, daXoaKhoiDanhSach: (d?.meta?.changes ?? 0) > 0 }
 }
 
 export async function dsEmDangKy(env: Env): Promise<Record<string, unknown>> {
