@@ -1,4 +1,4 @@
-import { gopDocD1 } from './doc-d1-theo-luot'
+import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
 // THUẬT TOÁN 2.0 — LỚP D1 (đọc chiến dịch, sổ sự kiện; chốt kế hoạch ngày; số liệu Sảnh; Rương Bát Linh).
 // Lõi thuần ở `srs2-loi.ts`. Công tắc `cau_hinh.game_hoa_2` (mặc định TẮT ⇒ mọi đường cũ giữ nguyên):
 //   {"bat":true}                         ⇒ toàn trung tâm
@@ -72,7 +72,7 @@ export async function cheDo2(env: Env, sbd: string): Promise<boolean> {
   if (co.sbd.includes(sbd)) return true
   if (!co.lop.length && !co.sbd.length) return true
   if (!co.lop.length) return false
-  const r = await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ lop: string }>().catch(() => null)
+  const r = await docDongLop(env.DB, sbd).catch(() => null) // nhớ theo lượt (tối ưu 05/10): Sảnh/Bi-a/Đoàn hỏi lớp em nhiều lần mỗi request
   return !!r && co.lop.includes(str(r.lop))
 }
 
@@ -840,9 +840,10 @@ export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly La
 }
 
 /** Hạng theo dạng của em cho kế hoạch hôm nay (không chiến dịch ⇒ chỉ từ hồ sơ dạng). */
-export async function docHangEm(env: Env, sbd: string, hs: HoSo2): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm } | null> {
+export async function docHangEm(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: Promise<Map<string, HoSoDangTho[]>>): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm } | null> {
   const cd = hs.chienDich
-  const hoSoDang = (await docHoSoDangCaLop(env, [sbd])).get(sbd) ?? []
+  // `hoSoDangSom` (tối ưu 05/10): nơi lập kế hoạch đã bắt đầu đọc hồ sơ dạng sớm (song song lượt đọc thứ hai của hồ sơ) ⇒ dùng lại, không đọc lần nữa.
+  const hoSoDang = (await (hoSoDangSom ?? docHoSoDangCaLop(env, [sbd]))).get(sbd) ?? []
   // Không chiến dịch (Sổ nợ 29/09): vẫn cần hạng CHUNG để đan xen câu nợ theo sức em — chỉ từ hồ sơ dạng.
   if (!cd) return hangTuHoSo(hoSoDang, [], hs.meta, [], '')
   // OMNI 3 — nhiều bài song song: dạng của MỌI bài đang chạy; lần làm đã lọc theo mốc từng bài (`lanLamChienDich`), cận dưới = mốc sớm nhất.
@@ -1062,10 +1063,10 @@ export function tuyChonGocOmni(hoSo: HoSo2, ngay: string): TuyChonKeHoach {
  * (`hoSoOmniEm`) ⇒ ma trận Q (`qCuaCau`) của câu chiến dịch + ứng viên ôn bài cũ ⇒ `trongSoCacCau` (chỉ khi em đã có quan sát tự làm — chưa có P ⇒ thứ tự cũ)
  * và `dangDaVung`; tỉ lệ ôn bài cũ theo ngày thứ mấy của bài hạn gần nhất (`tiLeOnBaiCu`); chế độ chờ ⇒ `theLucCho(thể lực lớp)`. Lỗi phần OMNI ⇒ bỏ phần ấy.
  */
-export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, hoSo: HoSo2): Promise<TuyChonKeHoach> {
+export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, hoSo: HoSo2, som?: DocLapSom | null): Promise<TuyChonKeHoach> {
   const ngay = ngayVnCua(nowMs)
   const rieng = async (): Promise<Partial<TuyChonKeHoach>> => {
-    const nk = await docNhipKenh(env, sbd, nowMs)
+    const nk = await (som?.nk ?? docNhipKenh(env, sbd, nowMs))
     if (!nk) return {}
     const noDenHan = hoSo.cau.filter((c) => c.nguon === 'no_cu' && (hoSo.tt.get(c.qid)?.henOn ?? '9') <= ngay).length
     return { tiLeNo: tiLeNoRieng(noDenHan, nk.nhipNgay), ...(onVaoDaoRieng(nk.luotDao, nk.luotDoan) ? { onVaoDao: true } : {}) }
@@ -1073,7 +1074,7 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
   const cauQ = [...hoSo.cau.filter((c) => (c.nguon ?? 'chien_dich') === 'chien_dich'), ...(hoSo.onBaiCu ?? [])]
   const [r, hang, hsOmni, q, theLucLop] = await Promise.all([
     rieng().catch(() => ({})),
-    docHangEm(env, sbd, hoSo).catch(() => null),
+    docHangEm(env, sbd, hoSo, som?.hd).catch(() => null),
     lanOmniD1().then((m) => m.hoSoOmniEm(env, sbd, nowMs)).catch(() => null),
     cauQ.length ? lanOmniD1().then((m) => m.qCuaCau(env, cauQ.map((c) => c.qid))).catch(() => null) : Promise.resolve(null),
     hoSo.omni?.cheDoCho ? theLucLopCuaEm(env, sbd).catch(() => null) : Promise.resolve(null),
@@ -1106,7 +1107,7 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
  * nhiều bài song song + ôn bài cũ + chế độ chờ (`tuyChonKeHoachOmni`); kế hoạch đã chốt mà TẬP chiến dịch đổi (thầy vừa tick bài / bài hết hạn) ⇒ lập lại
  * GIỮ câu đã làm (như đổi `chien_dich_id`), quota câu mới trừ phần đã làm theo TỪNG bài; tập + câu ôn bài cũ lưu ở `srs2_ke_hoach_omni`.
  */
-async function layKeHoachChotOmni(env: Env, sbd: string, nowMs: number, hoSo: HoSo2, dem: ReadonlyMap<string, number>, cu: Row | null, luu: KeHoachOmniLuu | null, chanSom?: Promise<Set<string>>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
+async function layKeHoachChotOmni(env: Env, sbd: string, nowMs: number, hoSo: HoSo2, dem: ReadonlyMap<string, number>, cu: Row | null, luu: KeHoachOmniLuu | null, chanSom?: Promise<Set<string>>, lapSom?: DocLapSom | null): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   const ngay = ngayVnCua(nowMs)
   const cd = hoSo.chienDich
   const tapCd = (hoSo.chienDichHet ?? (cd ? [cd] : [])).map((c) => c.id)
@@ -1177,32 +1178,44 @@ async function layKeHoachChotOmni(env: Env, sbd: string, nowMs: number, hoSo: Ho
     if (!luu || luu.chienDich == null) await ghiKeHoachOmni(env, sbd, ngay, tapCd, on, nowMs).catch(() => undefined) // bản ghi chốt trước khi bật OMNI / bảng phụ bị xoá ⇒ dựng lại dòng
     return { kh: kemOn(kh, on), hs: hoSo }
   }
-  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, await tuyChonKeHoachOmni(env, sbd, nowMs, hoSo))
-  const moi = await env.DB.prepare('INSERT OR IGNORE INTO srs2_ke_hoach (sbd, ngay, chien_dich_id, dao_json, doan_json, huyet_chien, tong, tao_luc) VALUES (?,?,?,?,?,?,?,?)')
-    .bind(sbd, ngay, cd?.id ?? null, JSON.stringify(lap.dao), JSON.stringify(lap.doan), lap.huyetChien ? 1 : 0, lap.dao.length + lap.doan.length, new Date(nowMs).toISOString()).run()
-  const thang = Number(moi.meta?.changes ?? 0) > 0
-  if (thang) await ghiKeHoachOmni(env, sbd, ngay, tapCd, lap.onBaiCu ?? [], nowMs).catch(() => undefined)
-  // Hai yêu cầu song song: bản ghi thắng là bản CHỐT, đọc lại để cả hai trả cùng một kế hoạch.
-  const [chot, luuMoi] = await Promise.all([
-    env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>(),
-    thang ? Promise.resolve(null) : docKeHoachOmni(env, sbd, ngay),
+  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, await tuyChonKeHoachOmni(env, sbd, nowMs, hoSo, lapSom))
+  // Hai yêu cầu song song: bản ghi thắng là bản CHỐT, đọc lại để cả hai trả cùng một kế hoạch. Tối ưu 05/10: ghi + đọc lại dòng chốt trong MỘT lô
+  // (câu đọc không phụ thuộc bảng phụ OMNI ⇒ đọc trước khi ghi bảng phụ cho kết quả y hệt) — trước: ba đợt nối tiếp.
+  const [moi, docLai] = await env.DB.batch<Row>([
+    env.DB.prepare('INSERT OR IGNORE INTO srs2_ke_hoach (sbd, ngay, chien_dich_id, dao_json, doan_json, huyet_chien, tong, tao_luc) VALUES (?,?,?,?,?,?,?,?)')
+      .bind(sbd, ngay, cd?.id ?? null, JSON.stringify(lap.dao), JSON.stringify(lap.doan), lap.huyetChien ? 1 : 0, lap.dao.length + lap.doan.length, new Date(nowMs).toISOString()),
+    env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay),
   ])
+  const thang = Number(moi?.meta?.changes ?? 0) > 0
+  const chot = docLai?.results?.[0] ?? null
+  const luuMoi = thang ? (await ghiKeHoachOmni(env, sbd, ngay, tapCd, lap.onBaiCu ?? [], nowMs).catch(() => undefined), null) : await docKeHoachOmni(env, sbd, ngay)
   const on = thang ? (lap.onBaiCu ?? []) : (luuMoi?.onBaiCu ?? [])
   return { kh: kemOn(chot ? tuDong(chot, ngay, dem) : hoanThien(ngay, cd?.id ?? null, lap.dao, lap.doan, lap.huyetChien, dem), on), hs: hoSo }
 }
 
+/** Hai lượt ĐỌC chỉ cần khi LẬP kế hoạch (nhịp/kênh riêng, hồ sơ dạng) — bắt đầu sớm khi biết hôm nay chưa chốt (tối ưu 05/10). Không bao giờ ném lỗi treo. */
+interface DocLapSom { nk: Promise<Awaited<ReturnType<typeof docNhipKenh>>>; hd: Promise<Map<string, HoSoDangTho[]>> }
+function batDauDocLap(env: Env, sbd: string, nowMs: number): DocLapSom {
+  const nk = docNhipKenh(env, sbd, nowMs), hd = docHoSoDangCaLop(env, [sbd])
+  nk.catch(() => {}); hd.catch(() => {})
+  return { nk, hd }
+}
 async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanSom?: Promise<Set<string>>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   const ngay = ngayVnCua(nowMs)
   // OMNI 3: hỏi cờ MỘT lần (dùng chung với docHoSo2); bật ⇒ đọc thêm bảng phụ kế hoạch OMNI CÙNG ĐỢT. Tắt ⇒ không thêm lượt đọc nào.
   const omniSom = hs ? Promise.resolve(!!hs.omni?.bat) : omniBatEm(env, sbd)
   // Tối ưu 28/09: hồ sơ, số lần làm hôm nay và kế hoạch đã chốt là ba lượt ĐỌC độc lập ⇒ chạy SONG SONG (trước: ba đợt nối tiếp).
+  const cuP = env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+  // Tối ưu 05/10: hôm nay CHƯA chốt kế hoạch ⇒ đọc sẵn nhịp/kênh riêng và hồ sơ dạng (chỉ dùng khi LẬP) ngay khi biết, song song lượt đọc thứ hai
+  // của hồ sơ — trước: hai đợt nối tiếp SAU hồ sơ. Đã chốt ⇒ không đọc gì thêm (như cũ).
+  const lapSom: Promise<DocLapSom | null> = cuP.then((cu) => (cu ? null : batDauDocLap(env, sbd, nowMs)))
   const [hoSo, dem, cu, luuOmni] = await Promise.all([
     hs ?? docHoSo2(env, sbd, ngay, omniSom),
     docDemHomNay(env, sbd, ngay),
-    env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null),
+    cuP,
     omniSom.then((bat) => (bat ? docKeHoachOmni(env, sbd, ngay) : null)),
   ])
-  if (hoSo.omni?.bat) return layKeHoachChotOmni(env, sbd, nowMs, hoSo, dem, cu, luuOmni, chanSom)
+  if (hoSo.omni?.bat) return layKeHoachChotOmni(env, sbd, nowMs, hoSo, dem, cu, luuOmni, chanSom, await lapSom)
   const cd = hoSo.chienDich
   // SỔ NỢ (29/09): không chiến dịch ⇒ trần = thể lực của chiến dịch vừa đóng gần nhất (mặc định 40).
   const tranNgay = cd?.theLucNgay ?? hoSo.theLucNoCu
@@ -1211,13 +1224,17 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
   // Lỗi đọc hồ sơ ⇒ không có hạng ⇒ hành vi cũ (dễ trước), không làm hỏng kế hoạch.
   // CÁ NHÂN HOÁ (02/10): nhịp học riêng (tỉ lệ trần nợ) + kênh riêng (em không mở Đoàn ⇒ câu ôn vào Đảo) — ca-nhan-hoa-v2.ts.
   //   Chỉ đo khi THẬT SỰ lập kế hoạch (kế hoạch đã chốt hôm nay ⇒ không tốn truy vấn nào ở giờ cao điểm).
-  const rieng = async (): Promise<Partial<TuyChonKeHoach>> => {
-    const nk = await docNhipKenh(env, sbd, nowMs)
+  const rieng = async (som?: DocLapSom | null): Promise<Partial<TuyChonKeHoach>> => {
+    const nk = await (som?.nk ?? docNhipKenh(env, sbd, nowMs))
     if (!nk) return {}
     const noDenHan = hoSo.cau.filter((c) => c.nguon === 'no_cu' && (hoSo.tt.get(c.qid)?.henOn ?? '9') <= ngay).length
     return { tiLeNo: tiLeNoRieng(noDenHan, nk.nhipNgay), ...(onVaoDaoRieng(nk.luotDao, nk.luotDoan) ? { onVaoDao: true } : {}) }
   }
-  const tuyChonLap = async (): Promise<TuyChonKeHoach> => ({ ...tuyChonGoc, ...(await rieng()), ...((await docHangEm(env, sbd, hoSo).catch(() => null)) ?? {}) })
+  // Tối ưu 05/10: nhịp/kênh và hạng theo dạng là hai lượt ĐỌC độc lập ⇒ song song (trước: nối tiếp); dùng phần đã đọc sẵn khi có.
+  const tuyChonLap = async (som?: DocLapSom | null): Promise<TuyChonKeHoach> => {
+    const [r, hang] = await Promise.all([rieng(som), docHangEm(env, sbd, hoSo, som?.hd).catch(() => null)])
+    return { ...tuyChonGoc, ...r, ...(hang ?? {}) }
+  }
   if (cu) {
     let kh = tuDong(cu, ngay, dem)
     // Thầy 28/09 ("đã giao chiến dịch test nhưng không bấm vào làm được"): kế hoạch chốt LÚC CHƯA CÓ chiến dịch (hoặc chiến dịch khác)
@@ -1264,11 +1281,15 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
     }
     return { kh, hs: hoSo }
   }
-  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, await tuyChonLap())
-  await env.DB.prepare('INSERT OR IGNORE INTO srs2_ke_hoach (sbd, ngay, chien_dich_id, dao_json, doan_json, huyet_chien, tong, tao_luc) VALUES (?,?,?,?,?,?,?,?)')
-    .bind(sbd, ngay, cd?.id ?? null, JSON.stringify(lap.dao), JSON.stringify(lap.doan), lap.huyetChien ? 1 : 0, lap.dao.length + lap.doan.length, new Date(nowMs).toISOString()).run()
-  // Hai yêu cầu song song: bản ghi thắng là bản CHỐT, đọc lại để cả hai trả cùng một kế hoạch.
-  const chot = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>()
+  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, await tuyChonLap(await lapSom))
+  // Hai yêu cầu song song: bản ghi thắng là bản CHỐT, đọc lại để cả hai trả cùng một kế hoạch. Tối ưu 05/10: ghi + đọc lại trong MỘT lô
+  // (D1 chạy lô tuần tự trong một giao dịch ⇒ câu đọc thấy đúng dòng vừa ghi hoặc dòng đã có) — trước: hai đợt nối tiếp.
+  const [, docLai] = await env.DB.batch<Row>([
+    env.DB.prepare('INSERT OR IGNORE INTO srs2_ke_hoach (sbd, ngay, chien_dich_id, dao_json, doan_json, huyet_chien, tong, tao_luc) VALUES (?,?,?,?,?,?,?,?)')
+      .bind(sbd, ngay, cd?.id ?? null, JSON.stringify(lap.dao), JSON.stringify(lap.doan), lap.huyetChien ? 1 : 0, lap.dao.length + lap.doan.length, new Date(nowMs).toISOString()),
+    env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay),
+  ])
+  const chot = docLai?.results?.[0] ?? null
   return { kh: chot ? tuDong(chot, ngay, dem) : hoanThien(ngay, cd?.id ?? null, lap.dao, lap.doan, lap.huyetChien, dem), hs: hoSo }
 }
 

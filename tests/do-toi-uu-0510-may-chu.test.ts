@@ -174,6 +174,9 @@ async function dungThe(omni: boolean): Promise<The> {
   // Lớp thứ hai (trung tâm có nhiều lớp): 10 em, chiến dịch riêng — chỉ để bảng chung có dữ liệu của lớp khác như máy thật.
   EM2.forEach((sbd, i) => themEm.run(sbd, `${HO[(i + 3) % 8]} ${TEN[(i + 5) % 10]} ${i + 41}`, LOP2, `mk-${sbd}`, '2008', '2026-09-01T00:00:00.000Z'))
   s.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["${LOP}"]}','x'),('doan_ho_tong','{"toanBo":true}','x'),('shop_phu_kien','{"bat":true}','x')`)
+  // Như máy thật sau reset 21/09 (docs/moc-reset-1909.md): mùa game + EXP mới bật cho mọi em từ lúc reset.
+  s.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi','{"tu":"2026-09-21T17:01:00.000Z","toanBo":true}','x')`)
+  s.exec(`INSERT INTO game_v2_settings(key,json) VALUES('season','{"id":"2026-09-22-mua-1","startedAt":"2026-09-21T17:01:00.000Z"}')`)
   if (omni) s.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('omni','{"bat":true,"lop":[],"sbd":[]}','x')`)
   const kho = new Map<string, CauKho>()
   const themDe = s.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,da_xoa,cap_nhat_luc) VALUES(?,?,'12',30,0,'v1')")

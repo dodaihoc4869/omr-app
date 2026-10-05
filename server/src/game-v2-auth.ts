@@ -3,7 +3,18 @@ import {hash} from './game-v2-bank'
 import {DemTTL} from './dem-chung'
 const enc=new TextEncoder()
 async function signature(env:Env,payload:string){const k=await crypto.subtle.importKey('raw',enc.encode(env.MA_BI_MAT),{name:'HMAC',hash:'SHA-256'},false,['sign']);const s=await crypto.subtle.sign('HMAC',k,enc.encode(payload));return [...new Uint8Array(s)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-export async function gameToken(env:Env,sbd:string):Promise<string>{const row=await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{mat_khau:string}>();if(!row?.mat_khau)return '';const payload=btoa(JSON.stringify({sbd,exp:Date.now()+30*86400000,pwd:await hash(row.mat_khau)}));return `${payload}.${await signature(env,payload)}`}
+/** `matKhauVuaDoc` (chỉ-thêm, tối ưu 05/10 — CHỈ đường đăng nhập truyền): `mat_khau` THÔ của dòng `hoc_sinh` mà CHÍNH request này vừa đọc và vừa so khớp
+ *  ⇒ khỏi đọc lại dòng ấy. Token vừa ký từ mật khẩu ấy là token ĐÃ QUA MỌI KIỂM (chữ ký, hạn 30 ngày, mật khẩu khớp) ⇒ ghi luôn vào đệm xác thực 60 giây:
+ *  lượt game đầu tiên sau đăng nhập (Sảnh) khỏi một đợt `SELECT mat_khau` — cùng luật đệm đã chấp nhận bên dưới. Không truyền ⇒ y như cũ. */
+export async function gameToken(env:Env,sbd:string,matKhauVuaDoc?:unknown):Promise<string>{
+  const daDoc=matKhauVuaDoc!==undefined
+  const mk=daDoc?(matKhauVuaDoc==null?null:String(matKhauVuaDoc)):(await env.DB.prepare('SELECT mat_khau FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{mat_khau:string}>())?.mat_khau
+  if(!mk)return ''
+  const exp=Date.now()+30*86400000
+  const payload=btoa(JSON.stringify({sbd,exp,pwd:await hash(mk)}));const token=`${payload}.${await signature(env,payload)}`
+  if(daDoc)demXacThuc.ghi(token,Date.now(),{sbd,exp})
+  return token
+}
 /** ĐỆM XÁC THỰC TOKEN 60 giây (Boss 21/09: `SELECT mat_khau` 38 nghìn lượt/giờ khi D1 nghẽn): chỉ lưu token ĐÃ QUA MỌI KIỂM (chữ ký, hạn, mật khẩu còn khớp); khoá = chính chuỗi token nên không lẫn giữa các em; hết hạn = sớm hơn hạn token.
  *  HỆ QUẢ ĐÃ CHẤP NHẬN: em/thầy đổi mật khẩu hoặc khoá em ⇒ token cũ còn dùng được tới 60 giây rồi mới bị từ chối. KHÔNG dùng cho đăng nhập, vào thi, nộp bài thi (các đường ấy không đi qua hàm này). Token sai/hết hạn KHÔNG bao giờ được đệm. */
 const demXacThuc=new DemTTL<{sbd:string;exp:number}>(60_000,3000)

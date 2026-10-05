@@ -1,4 +1,4 @@
-import { gopDocD1 } from './doc-d1-theo-luot'
+import { docDongLop, gieoNho, gopDocD1 } from './doc-d1-theo-luot'
 import {BANG_NGAY_CAP,EXP_MOI_VANG,MANH_REN_KHIEN,VANG_REN_KHIEN,ngayDatKhien} from '../../src/lib/kinh-te-game'
 import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08,docCauHinhKichHoat} from './cnh-exp-adapter'
 import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
@@ -41,7 +41,7 @@ import {docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,t
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame,docTruocKhoanGame,type DocTruocKhoanGame} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
-import {LENH_BIA,biaAction,biaChoSanh,docCoBia} from './bi-a'
+import {LENH_BIA,biaAction,batDauBiaChoSanh,docCoBia} from './bi-a'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
 export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number;ngayNghi?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4;/** Luật v5: EXP tràn hôm nay + luỹ kế. */tranV5?:TranV5;/** Dấu vết trước khi sang v5 (để lùi). */truocV5?:TruocV5}
 type Row={revision:number;json:string}
@@ -53,6 +53,7 @@ export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;r
   // Cao điểm 01/10: hai SELECT tươi trong MỘT batch của CHÍNH request này, không đệm hồ sơ/vàng hay mùa.
   const [mua,hoSo]=await env.DB.batch<Row>([env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'"),env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd)])
   const reset=mua.results[0],row0=hoSo.results[0]
+  gieoNho(env.DB,'mua',reset??null) // tối ưu 05/10: các phần sau của CHÍNH lượt này (EXP, Đoàn, đồng bộ học tập) khỏi đọc lại dòng mùa
   const season=reset?String(JSON.parse(String(reset.json)).id):''
   let row:Row|null|undefined=row0
   if(!row){
@@ -287,12 +288,18 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   const truocAnswer=action==='answer'?docTruocAnswer(env,sbd,b):null
   // CAO ĐIỂM 20h–24h (29/09): cờ Game Hóa 2.0 / Bi-a (đệm 15 s dùng chung, lượt đọc đang bay được chia sẻ) đọc CÙNG đợt với hồ sơ thay vì một đợt riêng sau đó.
   if(LENH_HOA2.has(action)||action==='start'||action==='recommendations'){void docCoHoa2(env).catch(()=>null);if(action!=='start')void docCoBia(env).catch(()=>null)}
+  // Tối ưu 05/10: "em có ở Hoá 2.0" (cờ đệm + lớp của em, nhớ theo lượt) hỏi CÙNG đợt với hồ sơ — trước: một đợt nối tiếp sau hồ sơ. Chỉ ĐỌC.
+  // Lớp của em (cờ Hoá 2.0 theo lớp) vào CÙNG lô đọc với hồ sơ — kể cả khi cờ còn đang được đọc (một dòng theo khoá chính, không thêm lượt D1).
+  if(LENH_HOA2.has(action))void docDongLop(env.DB,sbd).catch(()=>null)
+  const cheDo2Som=LENH_HOA2.has(action)?som(cheDo2(env,sbd)):null
+  // Sảnh: phần ĐỌC của ô Bi-a (cờ + ca đang mở) chạy song song với Sảnh; phần sau (bàn Bi-a) vẫn chạy SAU kế hoạch như cũ.
+  const biaSom=action==='hoa2-sanh'?batDauBiaChoSanh(env,sbd,Date.now()):null
   const {profile:p,revision}=await loadProfile(env,sbd)
   if(action.startsWith('escort-')){if(p.choice)throw new Error('Em chọn thần thú trước khi vào võ đài.');return escortAction(env,sbd,p.pet,p.cap,action,b)}
   if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
   if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
   // GAME HÓA 2.0 (srs2-game.ts): Sảnh bản đồ, Câu đã làm, Rương Bát Linh. Chỉ khi cờ `cau_hinh.game_hoa_2` bật cho em.
-  if(LENH_HOA2.has(action)){if(!await cheDo2(env,sbd))return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};const h=await hoa2Action(env,sbd,action,b);if(action==='hoa2-sanh'&&h.ok===true)h.bia=await biaChoSanh(env,sbd,Date.now());return h}
+  if(LENH_HOA2.has(action)){if(!await cheDo2Som)return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};const h=await hoa2Action(env,sbd,action,b);if(action==='hoa2-sanh'&&h.ok===true&&biaSom)h.bia=await biaSom();return h}
   // BI-A PHẢN ỨNG (bi-a.ts; cờ `cau_hinh.bi_a`, mặc định TẮT): cửa thứ ba trên Sảnh Bát Linh. Câu trả lời đi qua `answer` chung bên dưới.
   if(LENH_BIA.has(action))return biaAction(env,sbd,action,b)
   if(LENH_SHOP.has(action)){if(p.choice)throw new Error('Em chọn thần thú trước khi vào Cửa hàng.');return shopAction(env,sbd,p,revision,action,b,()=>loadProfile(env,sbd))} // Cửa hàng phụ kiện (game-v2-shop.ts; cờ cau_hinh.shop_phu_kien mặc định TẮT)
