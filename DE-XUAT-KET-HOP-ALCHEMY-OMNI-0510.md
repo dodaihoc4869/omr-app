@@ -96,6 +96,8 @@ Ví dụ P = 0,50: Trắc nghiệm đúng → 0,78 → 0,82; sai → 0,12 → 0,
 
 **Mã**: `server/src/p-nam-dang.ts` (hàm thuần, test phát lại 2 lần ra cùng số), bảng đệm chỉ-thêm `omni_p_dang (sbd, ma_dang, p, n_tu_lam, n_ngay, p_truoc_quen, phien_ban, cap_nhat_luc)`, tham số ở `cau_hinh` khoá `omni_tham_so` do `tu-hoan-thien.ts` chỉnh hằng tuần (đã có cron, đã có bảng `v2_hieu_chinh` để ghi nhật ký).
 
+**Ước lượng EM (bản "Baum–Welch" của đặc tả, không cần Python)**: khi một dạng có ≥ 10 000 quan sát tự làm, script Node offline `scripts/uoc-luong-bkt.mjs` chạy EM trên sổ xuất ra (1 lần/tháng, máy thầy), tách 20 % lượt làm tập giữ riêng; chỉ ghi G/S/T mới vào `omni_tham_so` nếu log-likelihood trên tập giữ riêng tốt hơn **và** vẫn thoả 0 < G < 0,5 · 0 < S < 0,5 · 1 − S ≥ G; không đạt thì giữ tham số đếm hằng tuần. Dưới ngưỡng dữ liệu, EM không chạy — nói ra số quan sát còn thiếu.
+
 ### 2.2 (B) Dự báo điểm theo ma trận — cây cầu từ P tới "8+"
 
 **Cấu trúc đề 2025+** (đúng luật chấm app đang dùng, `diemDungSai` `src/lib/tu-luyen.ts:97`): Phần I 18 câu × 0,25 = 4,5 · Phần II 4 câu, mỗi câu 4 ý: 1/2/3/4 ý đúng = 0,1/0,25/0,5/1,0 → tối đa 4,0 · Phần III 6 câu × 0,25 = 1,5. Tổng 10.
@@ -165,7 +167,7 @@ Fisher information của IRT cực đại khi θ ≈ b (câu "vừa sức"). B�
 
 ### 2.6 Hai kho: DẠY trên kho dạy học, ĐO trên kho còn lại (thầy hỏi 05/10)
 
-**Hiện trạng**: app nhận tờ dạy học qua mã `DH-…` hoặc mục "DẠY HỌC" (`cay-chon-de.ts:87-90`); chiến dịch mặc định = đề vừa kiểm tra, tức kho dạy học **đã là xương sống** (đúng vai Bank 2 của đặc tả). Kho còn lại (mã `DB-…`, mã số-đầu `12-C1-B2-D1`… — 38 % kho là mã số-đầu, `khoi-cau.ts:33`) hiện chỉ dùng rút đề thi/đề riêng.
+**Hiện trạng**: app nhận tờ dạy học qua mã `DH-…` hoặc mục "DẠY HỌC" (`cay-chon-de.ts:87-90`); chiến dịch mặc định = đề vừa kiểm tra, tức kho dạy học **đã là xương sống** (đúng vai Bank 2 của đặc tả). **Dual-Bank của đặc tả được hiện thực bằng luồng tick bài** (`prompt-tick-bai-tu-giao.md`): DẠY HỌC = Bank 2 (dạy, luyện tự động theo phạm vi đã dạy), TU LUYỆN = Bank 1 (em tự chọn, thầy đo ở ca kiểm tra); mục G của prompt ấy nối tick bài vào P nắm dạng, dự báo điểm, Dạng đã vững, Trạm hồi phục, lướt, vé. Kho còn lại (mã `DB-…`, mã số-đầu `12-C1-B2-D1`… — 38 % kho là mã số-đầu, `khoi-cau.ts:33`) hiện chỉ dùng rút đề thi/đề riêng.
 
 **Vai trò đề nghị cho kho còn lại (thầy chốt 05/10: gom thành thư mục TU LUYỆN, chỉ rút trong Tu luyện và ca kiểm tra): bộ đo chuyển giao** — như tập kiểm tra giữ riêng, không dùng để dạy, không vào game:
 
