@@ -59,6 +59,8 @@ export interface BaiDaTick {
   hanNop: string | null
   conNgay: number | null
   chungChi: { dat: number; tong: number } | null
+  /** Số em đã giao (chiến dịch của bài) — máy chủ gửi thì dùng; vắng ⇒ null (màn lấy `chungChi.tong`). */
+  soEm: number | null
 }
 export interface DanhSachBaiDaDay {
   bai: BaiDaTick[]
@@ -75,6 +77,8 @@ export interface DauVaoBai {
   maDe: string[]
   hanNop?: string
   theLucNgay?: number
+  /** Em nhận bài (thầy chọn — bộ chọn em của màn Giao / theo điểm danh, 05/10). Vắng ⇒ máy chủ giao cả lớp như cũ. */
+  sbd?: string[]
 }
 export interface BaiPhamVi {
   khoaBai: string
@@ -118,6 +122,7 @@ function docBaiDaTick(x: unknown): BaiDaTick | null {
     hanNop: chu(x.hanNop) || null,
     conNgay: so(x.conNgay),
     chungChi: cc,
+    soEm: so(x.soEm) === null ? null : soNguyen(x.soEm),
   }
 }
 

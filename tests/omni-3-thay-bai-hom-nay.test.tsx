@@ -43,11 +43,28 @@ const BUOI = { id: 'BH-9', ten: 'Buổi học 05/10 · 12A1', lop: '12A1', moLuc
 const XEM = { ok: true, soCau: 112, soTuLuan: 6, hanNop: '2026-10-12', D: 7, luotCan: 224, sucChua: 280, duLuot: 41, tongEm: 44, duDiem8: 29, quaTai: [{ sbd: '1', ten: 'Minh' }, { sbd: '2', ten: 'Hà' }, { sbd: '3', ten: 'Phúc' }], theLucNgay: 40 }
 let co: Record<string, unknown> = { bat: true, lop: ['12A1'], sbd: [] }
 let xem: Record<string, unknown> = XEM
+// Chọn em nhận bài (thầy nhắn 05/10): danh sách em máy chủ (`ds-em`), em có mặt buổi đang mở, buổi gần đây (`gan-day`). Mặc định TẮT ⇒ hành vi cũ.
+let dsEm: Record<string, unknown>[] | null = null
+let coMatBuoi: Record<string, unknown>[] = []
+let ganDay: Record<string, unknown>[] | null = null
+let cd1: string | null = 'cd-1'
+const EM_MAY_CHU = [
+  { sbd: 'S1', hoTen: 'Nguyễn An', khoi: '12', tenLop: '12A1' },
+  { sbd: 'S2', hoTen: 'Trần Bảo', khoi: '12', tenLop: '12A1' },
+  { sbd: 'S3', hoTen: 'Lê Chi', khoi: '12', tenLop: '12A1' },
+  { sbd: 'S9', hoTen: 'Phạm Hà', khoi: '12', tenLop: '12 - Tinh Hoa' },
+  { sbd: 'S11', hoTen: 'Vũ Khoa', khoi: '11', tenLop: '11B' },
+]
+const buoiCu = (id: string, ngay: string, coMat: string[]) => ({ id, ten: `Buổi ${ngay}`, lop: '12A1', moLuc: `${ngay}T11:00:00Z`, hetHan: '', dongLuc: `${ngay}T13:00:00Z`, dangMo: false, coMat })
 function chuanMock() {
   goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
     if (duong === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 44, sbd: [] }, { tenLop: '11B', khoi: '11', soEm: 30, sbd: [] }] } }
     if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [BUOI] } }
-    if (duong === '/gv/buoi-hoc') return { ok: true, du: { ok: true, buoi: BUOI, ma: '482915', doiMaLuc: 1, coMat: [], siSo: 44, lopEm: [] } }
+    if (duong === '/gv/buoi-hoc' && b.action === 'gan-day') return ganDay ? { ok: true, du: { ok: true, buoi: ganDay } } : { ok: false, loai: 'chua_co_lenh', chu: 'lệnh lạ' }
+    if (duong === '/gv/buoi-hoc') return { ok: true, du: { ok: true, buoi: BUOI, ma: '482915', doiMaLuc: 1, coMat: coMatBuoi, siSo: 44, lopEm: [] } }
+    if (duong === '/gv/chien-dich' && b.action === 'ds-em' && dsEm) return { ok: true, du: { ok: true, em: dsEm } }
+    if (duong === '/gv/chien-dich/sua' && b.action === 'doc')
+      return { ok: true, du: { ok: true, homNay: '2026-10-05', chienDich: { id: b.id, ten: 'Bài 2. Lipid', lop: '12A1', maDe: ['DH-12-C1-B2'], sbd: ['S1', 'S2'], hanNop: '2026-10-07', theLucNgay: 40, trangThai: 'dang_chay', soCau: 2, soEm: 2, hetHan: false }, nhatKy: [] } }
     if (duong === '/gv/omni' && b.action === 'co-doc') return { ok: true, du: { ok: true, co } }
     if (duong === '/gv/bai-da-day' && b.action === 'danh-sach')
       return {
@@ -55,7 +72,7 @@ function chuanMock() {
         du: {
           ok: true,
           bai: [
-            { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, tickLuc: '2026-09-22T03:00:00Z', chienDichId: 'cd-1', trangThai: 'da_day', hanNop: '2026-09-29', conNgay: null, chungChi: { dat: 38, tong: 44 } },
+            { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, tickLuc: '2026-09-22T03:00:00Z', chienDichId: cd1, trangThai: 'da_day', hanNop: '2026-09-29', conNgay: null, chungChi: { dat: 38, tong: 44 } },
             { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, tickLuc: '2026-09-30T03:00:00Z', chienDichId: 'cd-2', trangThai: 'dang_luyen', hanNop: '2026-10-07', conNgay: 2, chungChi: { dat: 0, tong: 44 } },
           ],
           choBaiMoi: { soNgay: 4 },
@@ -73,6 +90,10 @@ beforeEach(() => {
   goi.mockReset()
   co = { bat: true, lop: ['12A1'], sbd: [] }
   xem = XEM
+  dsEm = null
+  coMatBuoi = []
+  ganDay = null
+  cd1 = 'cd-1'
   chuanMock()
 })
 afterEach(() => {
@@ -131,6 +152,7 @@ describe('màn: bước Bài hôm nay', () => {
     await waitFor(() => expect(goi.mock.calls.some(([d]) => d === '/gv/omni')).toBe(true))
     expect(screen.queryByRole('heading', { name: 'Bài hôm nay' })).toBeNull()
     expect(goi.mock.calls.some(([d]) => d === '/gv/bai-da-day')).toBe(false)
+    expect(goi.mock.calls.some(([, b]) => b.action === 'ds-em' || b.action === 'gan-day')).toBe(false)
     expect(document.querySelector('[data-khoi="cho-bai-moi"]')).toBeNull()
   })
 
@@ -248,6 +270,102 @@ describe('màn: bước Bài hôm nay', () => {
     hop = await screen.findByRole('alertdialog')
     fireEvent.click(within(hop).getByRole('button', { name: 'Bỏ tick' }))
     await waitFor(() => expect(lenh('bo-tick')).toEqual([{ action: 'bo-tick', lop: '12A1', khoaBai: 'DH-12-C1-B2' }]))
+  })
+})
+
+describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của chiến dịch cũ + chọn theo điểm danh)', () => {
+  const coDuEm = () => {
+    dsEm = EM_MAY_CHU
+    coMatBuoi = [
+      { sbd: 'S1', hoTen: 'Nguyễn An', luc: '2026-10-05T11:01:00Z', cach: 'ma' },
+      { sbd: 'S3', hoTen: 'Lê Chi', luc: '2026-10-05T11:02:00Z', cach: 'ma' },
+      { sbd: 'X9', hoTen: 'Em lạ', luc: '2026-10-05T11:03:00Z', cach: 'thay' },
+    ]
+    ganDay = [
+      { ...buoiCu('BH-9', '2026-10-05', ['S1', 'S3', 'X9']), dangMo: true }, // trùng buổi đang mở ⇒ bỏ
+      buoiCu('BH-8', '2026-10-03', ['S2', 'S3']),
+      buoiCu('BH-7', '2026-10-01', []), // 0 em có mặt ⇒ bỏ
+      buoiCu('BH-6', '2026-09-29', ['S1']),
+      buoiCu('BH-5', '2026-09-27', ['S2']),
+      buoiCu('BH-4', '2026-09-25', ['S3']), // quá 3 buổi gần nhất ⇒ bỏ
+    ]
+  }
+  const chonBai3 = async () => {
+    const buoc = await moBuoc()
+    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
+    const khoi = (await screen.findByRole('heading', { name: 'Chọn em nhận chiến dịch' })).closest('section') as HTMLElement
+    return { buoc, khoi }
+  }
+
+  it('mặc định CẢ LỚP của bài (bộ chọn em của màn Giao, chip "N / M em"); xem-truoc gửi đúng sbd', async () => {
+    coDuEm()
+    const { khoi } = await chonBai3()
+    expect(khoi.querySelector('.cd-chip-muc')?.textContent).toBe('3 / 5 em')
+    expect(within(khoi).getByRole('button', { name: 'Chọn em' })).toBeTruthy() // đúng ô chọn của màn Giao
+    await waitFor(() => expect(lenh('xem-truoc').at(-1)).toMatchObject({ khoaBai: 'DH-12-C1-B3', sbd: ['S1', 'S2', 'S3'] }))
+  })
+
+  it('"Theo điểm danh": buổi đang mở + tối đa 3 buổi gần nhất (bỏ buổi 0 em, bỏ trùng); bấm ⇒ đúng em có mặt; "Cả lớp" trả về mặc định; tick gửi đúng sbd', async () => {
+    coDuEm()
+    const { khoi } = await chonBai3()
+    const hang = (await within(khoi).findByRole('group', { name: 'Chọn em theo điểm danh' })) as HTMLElement
+    expect(within(hang).getAllByRole('button').map((b) => b.textContent)).toEqual([
+      'Buổi 05/10 · 3 em có mặt',
+      'Buổi 03/10 · 2 em có mặt',
+      'Buổi 29/09 · 1 em có mặt',
+      'Buổi 27/09 · 1 em có mặt',
+      'Cả lớp (3 em)',
+    ])
+    expect(goi).toHaveBeenCalledWith('/gv/buoi-hoc', expect.objectContaining({ action: 'gan-day', lop: '12A1' }))
+    expect(within(hang).getByRole('button', { name: 'Cả lớp (3 em)' }).getAttribute('aria-pressed')).toBe('true')
+
+    // Buổi đang mở: S1, S3 có mặt (X9 không có trong danh sách em ⇒ không chọn được).
+    fireEvent.click(within(hang).getByRole('button', { name: 'Buổi 05/10 · 3 em có mặt' }))
+    expect(within(hang).getByRole('button', { name: 'Buổi 05/10 · 3 em có mặt' }).getAttribute('aria-pressed')).toBe('true')
+    expect(khoi.querySelector('.cd-chip-muc')?.textContent).toBe('2 / 5 em')
+    await waitFor(() => expect(lenh('xem-truoc').at(-1)!.sbd).toEqual(['S1', 'S3']))
+
+    fireEvent.click(within(hang).getByRole('button', { name: 'Cả lớp (3 em)' }))
+    await waitFor(() => expect(lenh('xem-truoc').at(-1)!.sbd).toEqual(['S1', 'S2', 'S3']))
+
+    fireEvent.click(within(hang).getByRole('button', { name: 'Buổi 03/10 · 2 em có mặt' }))
+    await waitFor(() => expect(lenh('xem-truoc').at(-1)!.sbd).toEqual(['S2', 'S3']))
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(false))
+    fireEvent.click(screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
+    await waitFor(() => expect(lenh('tick')).toHaveLength(1))
+    expect(lenh('tick')[0]).toMatchObject({ khoaBai: 'DH-12-C1-B3', sbd: ['S2', 'S3'] })
+  })
+
+  it('bỏ hết em ⇒ "Chọn ít nhất 1 em", nút giao khoá, không gọi xem-truoc với 0 em', async () => {
+    coDuEm()
+    const { khoi } = await chonBai3()
+    await waitFor(() => expect(lenh('xem-truoc').length).toBeGreaterThan(0))
+    fireEvent.click(within(khoi).getByRole('button', { name: 'Bỏ 12A1' }))
+    expect(khoi.querySelector('.cd-chip-muc')?.textContent).toBe('0 / 5 em')
+    expect(within(khoi).getByText('Chọn ít nhất 1 em.')).toBeTruthy()
+    expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(true)
+    await new Promise((r) => setTimeout(r, 400))
+    expect(lenh('xem-truoc').every((b) => (b.sbd as string[] | undefined)?.length !== 0)).toBe(true)
+  })
+
+  it('chưa có danh sách em ⇒ giữ hành vi cũ: không có khối chọn em, KHÔNG gửi sbd (máy chủ giao cả lớp)', async () => {
+    const buoc = await moBuoc()
+    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
+    await waitFor(() => expect(lenh('xem-truoc').length).toBe(1))
+    expect(lenh('xem-truoc')[0]!.sbd).toBeUndefined()
+    expect(screen.queryByRole('heading', { name: 'Chọn em nhận chiến dịch' })).toBeNull()
+  })
+
+  it('bài ĐÃ tick: "Đã giao N em" + "Sửa em" mở hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện', async () => {
+    cd1 = null
+    const { useAppStore } = await import('../src/store/appStore')
+    const buoc = await moBuoc()
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 44 em')
+    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Sửa em' }))
+    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich/sua', { action: 'doc', id: 'cd-2' }))
+    expect(await screen.findByText(/Chỉnh sửa: Bài 2\. Lipid/)).toBeTruthy()
+    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByRole('button', { name: 'Sửa em' }))
+    expect(useAppStore.getState().screen).toBe('chiendich')
   })
 })
 

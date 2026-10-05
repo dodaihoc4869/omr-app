@@ -4,8 +4,12 @@
 // từ `/gv/bai-da-day danh-sach`) → `xem-truoc` ⇒ thẻ xác nhận 6 con số + cảnh báo quá tải → nút chính "Giao Bài <số> cho <lớp>" ⇒ `tick`
 // (tờ đã tách phần của bài trừ "Ví dụ minh hoạ" — có ô tích để thêm; phạm vi = mọi bài đứng TRƯỚC trong cây cùng khối kèm tờ của chúng).
 // Bài đã tick: "Bỏ tick" (hỏi lại, nói thật hậu quả). Lớp chờ bài mới từ 3 ngày ⇒ một dòng nhỏ ở đầu bảng (`DongChoBaiMoi`).
+// CHỌN EM NHẬN BÀI (thầy nhắn 05/10: "cho thêm chỗ chọn giao cho hs nhé (bạn bê luôn cái chọn hs ở chiến dịch cũ, cho chọn hs theo điểm danh nữa)"):
+// trong thẻ xác nhận, BÊ NGUYÊN khối "Chọn em nhận chiến dịch" của màn Giao (`ChonEmGiao` + `useDsEmGiao`, mặc định cả lớp của bài) + hàng chip
+// "Theo điểm danh:" (buổi đang mở + tối đa 3 buổi gần nhất của lớp, `buoiGanDay`) + chip "Cả lớp". Gửi `sbd` trong CẢ `xem-truoc` lẫn `tick`;
+// chưa có danh sách em ⇒ giữ hành vi cũ (giao cả lớp, không gửi `sbd`). Bài đã tick: "Đã giao N em" + "Sửa em" (hộp sửa chiến dịch sẵn có).
 // Chữ: bảng A2 (app thầy dùng "lượt/ngày", không "thể lực"); chủ ngữ chữ MỚI là "A.I Đỗ Đại Học" (omni-chu.ts).
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
@@ -18,11 +22,13 @@ import {
   khoiCuaTenLop,
   maDeMacDinh,
   phamViTruoc,
+  ngayThangVn,
   tenNganBai,
   trangThaiBai,
   type BaiCay,
   type KieuTrangThaiBai,
 } from '../../lib/bai-hom-nay'
+import { buoiGanDay, type BuoiGanDay } from '../../lib/buoi-hoc-api'
 import {
   baiDaDayBoTick,
   baiDaDayDanhSach,
@@ -35,6 +41,8 @@ import {
   type XemTruocTick,
 } from '../chien-dich/api-omni'
 import { hienHanNop, laNgay, ngayVn } from '../chien-dich/ngay'
+import ChonEmGiao, { type EmLop } from '../chien-dich/ChonEmGiao'
+import { useDsEmGiao } from '../chien-dich/nguon-giao'
 import { hoiXacNhan } from '../hop-thoai'
 import type { DiemDanhBuoi } from './DiemDanhBuoi'
 import '../chien-dich/chien-dich.css'
@@ -48,6 +56,36 @@ const TOI_DA_TEN_QUA_TAI = 8
 const LUOT_TOI_DA = 500
 
 const LOP_CHIP: Record<KieuTrangThaiBai, string> = { da_day: 'dh-chip dh-chip--xanh', dang_luyen: 'dh-chip dh-chip--vang', hom_nay: 'dh-chip', chua_day: 'dh-chip dh-chip--xam' }
+/** Số buổi gần đây (ngoài buổi đang mở) hiện trong hàng chip "Theo điểm danh". */
+const SO_BUOI_GAN_DAY = 3
+/** Hộp sửa chiến dịch sẵn có (thêm/bớt em) — nạp lười, chỉ khi thầy bấm "Sửa em". */
+const SuaChienDich = lazy(() => import('../chien-dich/SuaChienDich'))
+
+/** Một chip "Theo điểm danh": buổi + SBD em có mặt. */
+export interface ChipBuoi {
+  id: string
+  chu: string
+  sbd: string[]
+}
+/** Chip điểm danh: buổi đang mở của bảng Dạy học (cùng lớp) trước, rồi tối đa 3 buổi gần nhất của lớp; bỏ buổi 0 em có mặt, bỏ trùng. Thuần. */
+export function dungChipBuoi(lop: string, dangMo: { id: string; lop: string; moLuc: string; coMat: string[] } | null, ganDay: readonly Pick<BuoiGanDay, 'id' | 'lop' | 'moLuc' | 'coMat'>[]): ChipBuoi[] {
+  const ra: ChipBuoi[] = []
+  const chip = (b: { id: string; moLuc: string; coMat: readonly string[] }) => {
+    const sbd = [...new Set(b.coMat.filter(Boolean))]
+    if (!sbd.length || ra.some((x) => x.id === b.id)) return
+    const ngay = ngayThangVn(b.moLuc)
+    ra.push({ id: b.id, chu: `Buổi${ngay ? ` ${ngay}` : ''} · ${sbd.length} em có mặt`, sbd })
+  }
+  if (dangMo && (!dangMo.lop || dangMo.lop === lop)) chip(dangMo)
+  const truoc = ra.length
+  for (const b of ganDay) {
+    if (ra.length - truoc >= SO_BUOI_GAN_DAY) break
+    if (b.lop && lop && b.lop !== lop) continue
+    chip(b)
+  }
+  return ra
+}
+const giongTap = (a: ReadonlySet<string>, b: readonly string[]) => a.size === b.length && b.every((x) => a.has(x))
 
 /** Trạng thái + lệnh của bước Bài hôm nay. `kho` = kho DẠY HỌC của bảng (`khoDayHoc`), nạp lười bằng `napKho`. */
 export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: TeacherExamSource[] | null, napKho: () => Promise<TeacherExamSource[]>) {
@@ -111,6 +149,42 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   const dsBai = useMemo(() => (kho && khoi ? dsBaiCuaKhoi(dungCay(locDeDayHoc(kho)), khoi) : []), [kho, khoi])
   const tickTheoKhoa = useMemo(() => new Map((ds?.bai ?? []).map((b) => [b.khoaBai, b])), [ds])
 
+  // CHỌN EM NHẬN BÀI (05/10): danh sách em của bộ chọn màn Giao (`useDsEmGiao`, nạp qua `NapDsEm` chỉ khi OMNI bật + có lớp) — mặc định cả lớp.
+  const [dsEm, setDsEm] = useState<EmLop[]>([])
+  const [chonEm, setChonEm] = useState<Set<string>>(new Set())
+  const daDienEm = useRef('')
+  const emLop = useMemo(() => dsEm.filter((e) => e.khoi === lop || e.tenLop === lop).map((e) => e.sbd), [dsEm, lop])
+  useEffect(() => {
+    // Danh sách về / đổi lớp ⇒ tích sẵn em của lớp MỘT lần (như màn Giao tích theo lớp của ca).
+    if (!dsEm.length || !lop || daDienEm.current === lop) return
+    daDienEm.current = lop
+    setChonEm(new Set(emLop))
+  }, [dsEm, lop, emLop])
+  const coDanhSachEm = dsEm.length > 0
+  const sbdChon = useMemo(() => dsEm.filter((e) => chonEm.has(e.sbd)).map((e) => e.sbd), [dsEm, chonEm])
+  // Buổi gần đây của lớp (điểm danh) — lỗi / không có ⇒ không có chip.
+  const [dsBuoi, setDsBuoi] = useState<BuoiGanDay[]>([])
+  useEffect(() => {
+    let song = true
+    setDsBuoi([])
+    if (!bat || !lop) return
+    void buoiGanDay(lop).then((r) => {
+      if (song && r.ok) setDsBuoi(r.du)
+    })
+    return () => {
+      song = false
+    }
+  }, [bat, lop])
+  const tt = dd.tt
+  const chipBuoi = useMemo(() => {
+    const dangMo = tt?.buoi.dangMo ? { id: tt.buoi.id, lop: (tt.buoi.lop ?? '').trim(), moLuc: tt.buoi.moLuc, coMat: tt.coMat.map((e) => e.sbd) } : null
+    const coTrongDs = new Set(dsEm.map((e) => e.sbd))
+    // Chỉ giữ em có trong danh sách em (bấm chip ⇒ chọn đúng các em có mặt).
+    return dungChipBuoi(lop, dangMo, dsBuoi)
+      .map((c) => ({ ...c, chon: c.sbd.filter((s) => coTrongDs.has(s)) }))
+      .filter((c) => c.chon.length > 0)
+  }, [tt, dsBuoi, dsEm, lop])
+
   // CHỌN MỘT BÀI + tờ vào bài luyện + sửa hạn nộp / số lượt.
   const [chon, setChon] = useState<BaiCay | null>(null)
   const [toChon, setToChon] = useState<Set<string>>(new Set())
@@ -147,6 +221,8 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     if (!chon || !lop) return null
     const maDe = chon.to.filter((t) => toChon.has(t.maDe)).map((t) => t.maDe)
     if (!maDe.length) return null
+    // Có danh sách em ⇒ gửi đúng em đã chọn (0 em ⇒ chưa đủ đầu vào); chưa có ⇒ hành vi cũ: máy chủ giao cả lớp.
+    if (coDanhSachEm && !sbdChon.length) return null
     return {
       lop,
       khoaBai: chon.khoaBai,
@@ -155,8 +231,9 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
       maDe,
       ...(hanSua && hanHopLe ? { hanNop: hanSua } : {}),
       ...(theLucSua ? { theLucNgay: theLucSua } : {}),
+      ...(coDanhSachEm ? { sbd: sbdChon } : {}),
     }
-  }, [chon, lop, toChon, hanSua, hanHopLe, theLucSua])
+  }, [chon, lop, toChon, hanSua, hanHopLe, theLucSua, coDanhSachEm, sbdChon])
 
   // XEM TRƯỚC: mỗi lần đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const [xem, setXem] = useState<XemTruocTick | null>(null)
@@ -241,8 +318,27 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     void taiDs()
   }
 
+  // "Sửa em" của bài đã tick: hộp sửa chiến dịch sẵn có; không có mã chiến dịch ⇒ sang mục Chiến dịch luyện.
+  const setScreen = useAppStore((s) => s.setScreen)
+  const [suaCd, setSuaCd] = useState<{ id: string; ten: string } | null>(null)
+  const suaEm = (b: Pick<BaiDaTick, 'chienDichId' | 'tenBai'>) => {
+    if (b.chienDichId) setSuaCd({ id: b.chienDichId, ten: b.tenBai })
+    else setScreen('chiendich')
+  }
+
   const chuCho = bat && lop ? chuChoBaiMoi(lop, ds?.choBaiMoi) : null
   return {
+    setDsEm,
+    dsEm,
+    chonEm,
+    setChonEm,
+    emLop,
+    coDanhSachEm,
+    sbdChon,
+    chipBuoi,
+    suaCd,
+    setSuaCd,
+    suaEm,
     bat,
     co,
     dsLop,
@@ -306,6 +402,7 @@ export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: T
   }
   return (
     <section className="dh-buoc" aria-labelledby="dh-b4" data-khoi="bai-hom-nay">
+      {lop && <NapDsEm onCo={bhn.setDsEm} />}
       <div className="dh-buoc-dau">
         <span className="dh-so" aria-hidden="true">
           {soBuoc}
@@ -377,10 +474,18 @@ export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: T
                             <span className="dh-them-ten" title={b.tenBai}>
                               {b.tenBai}
                             </span>
-                            <small>{b.soCau} câu</small>
+                            <small>
+                              {b.soCau} câu
+                              {tick && (tick.soEm ?? tick.chungChi?.tong) ? ` · Đã giao ${tick.soEm ?? tick.chungChi?.tong} em` : ''}
+                            </small>
                           </span>
                         </label>
                         <span className={LOP_CHIP[tt.kieu]}>{tt.chu}</span>
+                        {tick && (
+                          <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => bhn.suaEm(tick)} title={tick.chienDichId ? 'Thêm / bớt em của chiến dịch bài này' : 'Mở mục Chiến dịch luyện'}>
+                            Sửa em
+                          </button>
+                        )}
                         {tick && (
                           <button type="button" className="m3-nut-chu dh-nut-nho" disabled={bhn.dangBo === b.khoaBai} onClick={() => void bhn.boTick(b)}>
                             {bhn.dangBo === b.khoaBai ? 'Đang bỏ…' : 'Bỏ tick'}
@@ -397,13 +502,37 @@ export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: T
       )}
 
       {chon && <TheXacNhan bhn={bhn} chon={chon} xem={xem} />}
+      {bhn.suaCd && (
+        <Suspense fallback={null}>
+          <SuaChienDich
+            id={bhn.suaCd.id}
+            ten={bhn.suaCd.ten}
+            onDong={() => bhn.setSuaCd(null)}
+            onDaLuu={(kq) => {
+              bhn.setSuaCd(null)
+              useAppStore.getState().showToast(`Đã lưu chiến dịch: ${kq.tomTat}`, 'success')
+              void taiDs()
+            }}
+          />
+        </Suspense>
+      )}
     </section>
   )
+}
+
+/** Nạp danh sách em của bộ chọn màn Giao (`useDsEmGiao`) — chỉ dựng khi OMNI bật và đã có lớp (OMNI tắt ⇒ không gọi thêm lệnh nào). */
+function NapDsEm({ onCo }: { onCo: (ds: EmLop[]) => void }) {
+  const ds = useDsEmGiao()
+  useEffect(() => {
+    onCo(ds)
+  }, [ds, onCo])
+  return null
 }
 
 /** Thẻ XÁC NHẬN TRƯỚC KHI GIAO: tờ vào bài luyện, 6 con số có nhãn, cảnh báo quá tải, nút chính + nút sửa hạn nộp / số lượt. */
 function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: XemTruocTick | null }) {
   const { lop, toChon, doiTo, moSua, setMoSua, hanSua, setHanSua, theLucChu, setTheLucChu, theLucSua, loiTheLuc, hanHopLe, homNay, dauVao, loiXem, dangXem, giao, dangGiao, loiGiao } = bhn
+  const { dsEm, chonEm, setChonEm, emLop, coDanhSachEm, sbdChon, chipBuoi } = bhn
   const ten = tenNganBai(chon.tenBai)
   const quaTai = xem?.quaTai ?? []
   const pct = xem && xem.sucChua > 0 ? Math.round((100 * xem.luotCan) / xem.sucChua) : null
@@ -430,10 +559,46 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
         {chon.to.some((t) => t.laViDu && !toChon.has(t.maDe)) && <p className="dh-phu">“Ví dụ minh hoạ” mặc định không vào bài luyện (dùng khi dạy) — tích để thêm.</p>}
       </div>
 
+      {/* BÊ NGUYÊN khối "Chọn em nhận chiến dịch" của màn Giao (thầy nhắn 05/10) + chọn theo điểm danh. Chưa có danh sách em ⇒ giao cả lớp như cũ. */}
+      {coDanhSachEm && (
+        <section className="cd-buoc" aria-labelledby="dh-tick-em" data-khoi="chon-em-tick">
+          <div className="cd-buoc-dau">
+            <h3 id="dh-tick-em">Chọn em nhận chiến dịch</h3>
+            <span className={`cd-chip-muc cd-chip-muc--${sbdChon.length ? 'xanh' : 'xam'} cd-so`}>
+              {sbdChon.length} / {dsEm.length} em
+            </span>
+          </div>
+          {chipBuoi.length > 0 && (
+            <div className="cd-hang-chip" role="group" aria-label="Chọn em theo điểm danh" data-khoi="theo-diem-danh">
+              <span className="cd-phu">Theo điểm danh:</span>
+              {chipBuoi.map((c) => (
+                <button key={c.id} type="button" className="cd-chip" aria-pressed={giongTap(chonEm, c.chon)} onClick={() => setChonEm(new Set(c.chon))}>
+                  {c.chu}
+                </button>
+              ))}
+              {emLop.length > 0 && (
+                <button type="button" className="cd-chip" aria-pressed={giongTap(chonEm, emLop)} onClick={() => setChonEm(new Set(emLop))}>
+                  Cả lớp ({emLop.length} em)
+                </button>
+              )}
+            </div>
+          )}
+          <ChonEmGiao ds={dsEm} chon={chonEm} onDoi={setChonEm} />
+          {!sbdChon.length && (
+            <p className="dh-loi" role="alert">
+              Chọn ít nhất 1 em.
+            </p>
+          )}
+        </section>
+      )}
+
       {!dauVao ? (
-        <p className="dh-loi" role="alert">
-          {toChon.size === 0 ? 'Chọn ít nhất một tờ để giao.' : !hanHopLe ? 'Hạn nộp phải từ hôm nay trở đi.' : 'Chưa đủ thông tin để xem trước.'}
-        </p>
+        // Chưa chọn em ⇒ lời báo đã nằm NGAY CẠNH bộ chọn em (không nhắc hai chỗ).
+        toChon.size > 0 && coDanhSachEm && !sbdChon.length ? null : (
+          <p className="dh-loi" role="alert">
+            {toChon.size === 0 ? 'Chọn ít nhất một tờ để giao.' : !hanHopLe ? 'Hạn nộp phải từ hôm nay trở đi.' : 'Chưa đủ thông tin để xem trước.'}
+          </p>
+        )
       ) : loiXem && !dangXem ? (
         <p className="dh-loi" role="alert">
           {loiXem}
