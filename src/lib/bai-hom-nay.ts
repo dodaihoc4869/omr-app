@@ -129,3 +129,16 @@ export function chuChoBaiMoi(lop: string, choBaiMoi: { soNgay: number } | null |
   if (!lop.trim() || typeof n !== 'number' || n < NGAY_NHAC_CHO_BAI_MOI) return null
   return `Lớp ${lop.trim()}: ${n} ngày chưa có bài mới`
 }
+
+/** Khoá phiên (sessionStorage): nút "Giao theo bài" ở mục Chiến dịch luyện nhờ mục Lên bảng mở sẵn thẻ Dạy học (bước Bài hôm nay). Đọc một lần rồi xoá. */
+export const KHOA_MO_THE_DAY_HOC = 'ddh.moTheDayHoc'
+/** Đọc (và xoá) yêu cầu mở sẵn thẻ Dạy học. Máy chặn bộ nhớ / không có ⇒ false (mở thẻ thứ nhất như cũ). */
+export function docMoTheDayHoc(kho: Pick<Storage, 'getItem' | 'removeItem'> | undefined = globalThis.sessionStorage): boolean {
+  try {
+    const v = kho?.getItem(KHOA_MO_THE_DAY_HOC)
+    if (v) kho?.removeItem(KHOA_MO_THE_DAY_HOC)
+    return v === '1'
+  } catch {
+    return false
+  }
+}

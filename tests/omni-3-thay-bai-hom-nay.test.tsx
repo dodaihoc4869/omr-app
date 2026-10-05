@@ -251,6 +251,34 @@ describe('màn: bước Bài hôm nay', () => {
   })
 })
 
+describe('"Giao theo bài" ở mục Chiến dịch luyện — lối vào thứ hai của cùng bước Bài hôm nay', () => {
+  it('OMNI bật ⇒ nút hiện; bấm ⇒ sang Lên bảng và mục ấy mở sẵn thẻ Dạy học (khoá phiên đọc một lần rồi xoá)', async () => {
+    const [{ default: NutGiaoTheoBai }, { useAppStore }, { default: GoiLenBangScreen }, { KHOA_MO_THE_DAY_HOC, docMoTheDayHoc }] = await Promise.all([
+      import('../src/components/chien-dich/NutGiaoTheoBai'),
+      import('../src/store/appStore'),
+      import('../src/screens/GoiLenBangScreen'),
+      import('../src/lib/bai-hom-nay'),
+    ])
+    render(<NutGiaoTheoBai />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Giao theo bài' }))
+    expect(useAppStore.getState().screen).toBe('goilenbang')
+    expect(sessionStorage.getItem(KHOA_MO_THE_DAY_HOC)).toBe('1')
+    cleanup()
+    render(<GoiLenBangScreen />)
+    expect(screen.getByRole('tab', { name: 'Dạy học' }).getAttribute('aria-selected')).toBe('true')
+    expect(await screen.findByRole('heading', { name: 'Bài hôm nay' })).toBeTruthy()
+    expect(sessionStorage.getItem(KHOA_MO_THE_DAY_HOC)).toBeNull()
+    expect(docMoTheDayHoc()).toBe(false)
+  })
+  it('OMNI tắt ⇒ không có nút (màn như cũ)', async () => {
+    co = { bat: false, lop: [], sbd: [] }
+    const { default: NutGiaoTheoBai } = await import('../src/components/chien-dich/NutGiaoTheoBai')
+    const { container } = render(<NutGiaoTheoBai />)
+    await waitFor(() => expect(goi.mock.calls.some(([d]) => d === '/gv/omni')).toBe(true))
+    expect(container.innerHTML).toBe('')
+  })
+})
+
 let chuanMockGoc: unknown
 beforeEach(() => {
   chuanMockGoc = goi.getMockImplementation()
