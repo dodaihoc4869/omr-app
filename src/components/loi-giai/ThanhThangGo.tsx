@@ -20,7 +20,8 @@ export function viecConThieu(tg: ThangGo): string {
   return thieu[0]?.viec ?? ''
 }
 
-function HopLuyenNen({ nhan, ten, qid, onDong }: { nhan: string; ten: string; qid: string; onDong: () => void }) {
+/** Hộp "Luyện kiến thức nền" (câu nền theo nhãn, `/hs/luyen-nen`). Xuất ra để Trạm hồi phục của Đảo 2.0 (OMNI 3) mở ĐÚNG hộp này. */
+export function HopLuyenNen({ nhan, ten, qid, onDong }: { nhan: string; ten: string; qid: string; onDong: () => void }) {
   const id = useId()
   const [ds, setDs] = useState<CauNen[] | null>(null)
   const [loi, setLoi] = useState('')

@@ -40,6 +40,21 @@ async function chup(trang, ten, fullPage = false) {
   }
 }
 
+async function lenDuong(t) {
+  const nut = t.getByRole('button', { name: /LÊN ĐƯỜNG/ }).first()
+  await nut.waitFor({ timeout: 30000 })
+  for (let i = 0; i < 40 && (await nut.isDisabled()); i++) await t.waitForTimeout(250)
+  await nut.click()
+  await t.getByText(/^ẢI 1\//).first().waitFor({ timeout: 20000 })
+  await t.waitForTimeout(800)
+}
+async function chotDapAn(t, chu) {
+  await t.getByRole('button', { name: chu }).first().click()
+  await t.waitForTimeout(250)
+  await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU' }).first().click()
+  await t.waitForTimeout(400)
+}
+
 /** Mỗi màn: [tên, khổ, hàm chạy]. Hàm nhận trang đã mở `?man=<tên>`. */
 const MAN = [
   ['sanh', [390, 844], async (t) => {
@@ -52,6 +67,53 @@ const MAN = [
     await t.waitForSelector('text=Tu luyện', { timeout: 20000 })
     await t.waitForTimeout(1500)
     await chup(t, 'hs-sanh-cho-bai-moi-ca-trang-390', true)
+  }],
+  // ── Đảo 2.0 thật (Dao2 + máy chủ giả qua prop call) ──
+  ['dao-chip', [390, 844], async (t) => {
+    await lenDuong(t)
+    await chup(t, 'hs-dao-cau-co-chip-chua-chac-390')
+  }],
+  ['dao-cham', [390, 844], async (t) => {
+    await lenDuong(t)
+    await chotDapAn(t, /^B\./)
+    await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(600)
+    await chup(t, 'hs-dao-dung-nhung-cham-390')
+    await chup(t, 'hs-dao-dung-nhung-cham-ca-trang-390', true)
+  }],
+  ['dao-chac-sai', [390, 844], async (t) => {
+    await lenDuong(t)
+    await chotDapAn(t, /^C\./)
+    await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(900)
+    await chup(t, 'hs-dao-chac-ma-sai-mo-loi-giai-390')
+  }],
+  ['dao-tram', [390, 844], async (t) => {
+    await lenDuong(t)
+    for (let i = 1; i <= 3; i++) {
+      await chotDapAn(t, /^A\./)
+      if (i < 3) {
+        const nut = t.getByRole('button', { name: new RegExp(`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${i + 1}`) })
+        await nut.waitFor({ timeout: 20000 })
+        await nut.click()
+        await t.waitForTimeout(500)
+      }
+    }
+    await t.getByText('Trạm hồi phục', { exact: false }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(700)
+    await t.getByText('Trạm hồi phục', { exact: false }).first().scrollIntoViewIfNeeded()
+    await chup(t, 'hs-tram-hoi-phuc-390')
+    const lam = t.getByRole('button', { name: 'Làm 3 câu nền' })
+    if (await lam.count()) {
+      await lam.first().click()
+      await t.waitForTimeout(1200)
+      await chup(t, 'hs-tram-cau-nen-390')
+    }
+  }],
+  ['de-thu', [390, 844], async (t) => {
+    await t.getByRole('button', { name: 'Nộp đề thử' }).first().waitFor({ timeout: 20000 }).catch(() => {})
+    await t.waitForTimeout(1200)
+    await chup(t, 'hs-de-thu-390')
   }],
   ['ph', [390, 844], async (t) => {
     await t.waitForSelector('[data-vung="chien-dich"]', { timeout: 30000 })

@@ -50,7 +50,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>
-      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
+      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{ketQua.loiNhan && <small data-khoi="omni-loi-nhan">{ketQua.loiNhan}</small>}{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
       <XemLaiChuan q={q} chon={chon} dapAn={ketQua.answer} solution={ketQua.solution} solutionImages={ketQua.solutionImages} stt={xemLaiChuan.stt} onZoom={onZoom} />
     </section>
   )
@@ -99,6 +99,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
       {ketQua && (
         <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status">
           <b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>
+          {ketQua.loiNhan && <small data-khoi="omni-loi-nhan">{ketQua.loiNhan}</small>}
           {expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}
           <details open={!ketQua.correct}>
             <summary>Lời giải</summary>
