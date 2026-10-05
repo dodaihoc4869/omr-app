@@ -15,6 +15,7 @@ import { DEM_NGUOC_MS } from '../server/src/game-v2-doan'
 import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
 import { damBaoBangNutThat } from '../server/src/nut-that'
+import { chayTuHoanThien } from '../server/src/tu-hoan-thien'
 import { phatLaiLoi } from '../server/src/loi-hoc-luat'
 import { sqlQidHoacTc } from '../server/src/lam-lai-so'
 import { SQL_LA_LAN_LAM } from '../server/src/omni-kieu'
@@ -513,5 +514,19 @@ describe('thang tự gỡ của em: lượt câu anh em sau khi đọc lời gi�
     expect(await lamLai(env)).toMatchObject({ dat: true })
     d.sql.exec("UPDATE su_kien_hoc SET ket_qua = 1 WHERE qid = 'A2'")
     expect(await lamLai(env)).toMatchObject({ dat: false, viec: 'Em đã làm đúng câu tương tự, chưa cần gửi thầy' })
+  })
+})
+
+describe('tự hoàn thiện hằng tuần: lượt kiểm duy trì làm bằng câu anh em được đếm cho câu gốc', () => {
+  it('Q2 đóng lỗi nhờ 2 câu anh em; kiểm duy trì (≥ 14 ngày) bằng câu anh em SAI ⇒ kiem 1, saiLai 1', async () => {
+    const { d, env } = dung(KHO2, ['Q2'])
+    const ghiTc = (qid: string, kq: 0 | 1, ms: number) => d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn,assistance,raw_json) VALUES(?,?,?,?,?,1,?,?,?,?,?)')
+      .run(`game|S1|${qid}|${ms}`, 'S1', qid, 'game', `P-${ms}`, kq, new Date(ms).toISOString(), ngayVnCua(ms), 'none', JSON.stringify({ tc: 'Q2' }))
+    ghi(d, 'Q2', 0, luc('2026-10-05', '10:00'))
+    ghiTc('A2', 1, luc('2026-10-06'))
+    ghiTc('A2V', 1, luc('2026-10-08'))
+    ghiTc('A2G', 0, luc('2026-10-23'))
+    const kq = await chayTuHoanThien(env, luc('2026-10-26'))
+    expect(kq).toMatchObject({ chay: true, kiem: 1, saiLai: 1 })
   })
 })
