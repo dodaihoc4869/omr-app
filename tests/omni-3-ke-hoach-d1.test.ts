@@ -19,10 +19,12 @@ vi.mock('../server/src/omni-d1', async (goc) => {
     ...that,
     omniBat: vi.fn(async (_env: unknown, sbd: string) => gia.omni.has(sbd)),
     omniChoSanh: vi.fn(async (_env: unknown, sbd: string, _nowMs: number, ngu: Record<string, unknown>) => { gia.sanh.push({ sbd, ngu }); return { bat: true, onBaiCu: ngu.onBaiCu, choBaiMoi: !!ngu.cheDoCho } }),
-    hoSoOmniEm: vi.fn(async (env: Parameters<typeof that.hoSoOmniEm>[0], sbd: string, nowMs: number) => {
-      const h = await that.hoSoOmniEm(env, sbd, nowMs)
-      return gia.coQuanSat ? { ...h, vkn: { 'dang:x': { vkn: 'dang:x', p: 0.5, nTuLam: 3, nCau: 3, nNgay: 2, nTroiChay: 0, nCauLaDung: 0, diemSprt: 0, trangThai: 'chua_du' as const, ngayCuoi: null, dayLai: false } } } : h
-    }),
+    // hồ sơ OMNI TỔNG HỢP (không phụ thuộc bản phát lại thật của làn khác): chưa / đã có quan sát tự làm
+    hoSoOmniEm: vi.fn(async (_env: unknown, sbd: string) => ({
+      sbd, sEm: 0.08, nVung: 0, nSaiVung: 0, tau: 0, nTau: 0, luotHomNay: 0, cursor: '', phienBan: 'test',
+      khungGio: { truoc18: { n: 0, soY: 0 }, '18_20': { n: 0, soY: 0 }, '20_22': { n: 0, soY: 0 }, '22_24': { n: 0, soY: 0 }, sau24: { n: 0, soY: 0 } },
+      vkn: gia.coQuanSat ? { 'dang:x': { vkn: 'dang:x', p: 0.5, nTuLam: 3, nCau: 3, nNgay: 2, nTroiChay: 0, nCauLaDung: 0, diemSprt: 0, trangThai: 'chua_du' as const, ngayCuoi: null, dayLai: false } } : {},
+    })),
   }
 })
 vi.mock('../server/src/bai-da-day', async (goc) => {
@@ -31,7 +33,7 @@ vi.mock('../server/src/bai-da-day', async (goc) => {
 })
 vi.mock('../server/src/omni-ke-hoach', async (goc) => {
   const that = await goc<typeof import('../server/src/omni-ke-hoach')>()
-  return { ...that, dangDaVung: vi.fn((...a: Parameters<typeof that.dangDaVung>) => (gia.dangVung.length ? gia.dangVung : that.dangDaVung(...a))) }
+  return { ...that, dangDaVung: vi.fn(() => [...gia.dangVung]) }
 })
 
 import { chanDoanEm, docHoSo2, docKeHoachOmni, docQuyetMetGio, doiThuTuMetGio, layKeHoachHomNay, qidGoc, sanh2, type HoSo2, type KeHoachDaChot } from '../server/src/srs2-d1'
@@ -134,6 +136,24 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     const moiD1 = hs.cau.filter((c) => c.dang === 'DH-B2.D1' && hs.tt.get(c.qid)!.laMoi).map((c) => c.qid)
     expect(moiD1.length).toBeGreaterThan(0)
     expect(tatCa(kh).some((q) => moiD1.includes(q))).toBe(false)
+  })
+})
+
+describe('OMNI 3 · ôn bài cũ khi chưa có trọng số: dạng yếu trước, bài gần nhất trước', () => {
+  it('hạng theo dạng (nam_kt_dang) L1 → L4 xếp ứng viên; trong cùng hạng giữ thứ tự hồ sơ', async () => {
+    const k = taoKhoOmni({ 'DH-B0': 8, 'DH-B1': 12 })
+    gia.omni = new Set(['S1'])
+    gia.phamVi = phamViBai({ ma: 'DH-B0', viTri: 0 }, { ma: 'DH-B1', viTri: 1, tick: 'CD1' })
+    themChienDich(k.d, { id: 'CD1', maDe: ['DH-B1'], qids: k.qids('DH-B1'), sbd: ['S1'], hanNop: '2026-10-20', taoLuc: '2026-10-05T01:00:00.000Z', theLuc: 40 })
+    const st = k.d.sql.prepare('INSERT INTO nam_kt_dang (khoa, sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, cap_nhat_luc) VALUES (?,?,?,?,?,0,0,0,0,?)')
+    st.run('S1|DH-B0.D2', 'S1', 'DH-B0.D2', 10, 9, '2026-10-01T00:00:00.000Z') // p ≈ 0,21 ⇒ L1
+    st.run('S1|DH-B0.D1', 'S1', 'DH-B0.D1', 10, 5, '2026-10-01T00:00:00.000Z') // p = 0,5 ⇒ L2
+    st.run('S1|DH-B0.D0', 'S1', 'DH-B0.D0', 10, 0, '2026-10-01T00:00:00.000Z') // p ≈ 0,86 ⇒ L4
+    const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
+    expect(hs.onBaiCu?.map((c) => c.qid)).toEqual(['DH-B0-0', 'DH-B0-1', 'DH-B0-2', 'DH-B0-3', 'DH-B0-4', 'DH-B0-5', 'DH-B0-6', 'DH-B0-7'])
+    const { kh } = await layKeHoachHomNay(k.env, 'S1', T_SANG)
+    // ngày 1 của bài (tỉ lệ 0,2 ⇒ ≤ 8 câu ôn bài cũ): dạng D2 (L1) → D1 (L2) → D0 (L4)
+    expect(kh.onBaiCu).toEqual(['DH-B0-2', 'DH-B0-5', 'DH-B0-1', 'DH-B0-4', 'DH-B0-7', 'DH-B0-0', 'DH-B0-3', 'DH-B0-6'])
   })
 })
 

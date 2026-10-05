@@ -508,16 +508,18 @@ const thuMucAnToan = (env: Env, maDe: readonly string[]): Promise<Map<string, Th
  * bỏ câu của chiến dịch đang chạy; kèm thư mục các tờ phạm vi, siêu dữ liệu và TOÀN BỘ sổ của em trên các câu ấy (không mốc — ôn bài cũ không có hạn).
  */
 async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangChay: readonly ChienDich[]): Promise<{ thuMuc: Map<string, ThuMuc>; qids: string[]; meta: Map<string, MetaCau>; lanLam: LanLam[] }> {
-  const toPhamVi = [...phamVi.maDe]
-  const thuMuc = await thuMucAnToan(env, toPhamVi)
   const viTri = (m: string) => phamVi.baiTheoMaDe.get(m)?.viTri ?? -1
-  const toDayHoc = toPhamVi.filter((m) => thuMuc.get(m) === 'DAY_HOC').sort((a, b) => viTri(b) - viTri(a) || (a < b ? -1 : a > b ? 1 : 0))
-  if (!toDayHoc.length) return { thuMuc, qids: [], meta: new Map(), lanLam: [] }
+  const toPhamVi = [...phamVi.maDe].sort((a, b) => viTri(b) - viTri(a) || (a < b ? -1 : a > b ? 1 : 0))
+  // Thư mục và câu các tờ phạm vi đọc SONG SONG (một đợt); câu chỉ ở tờ không phải DẠY HỌC bị lọc sau theo mọi tờ chứa câu.
+  const [thuMuc, cauPhamVi] = await Promise.all([thuMucAnToan(env, toPhamVi), toPhamVi.length ? cauCuaToPhamVi(env, toPhamVi) : Promise.resolve([] as string[])])
+  const dayHoc = new Set(toPhamVi.filter((m) => thuMuc.get(m) === 'DAY_HOC'))
+  if (!dayHoc.size) return { thuMuc, qids: [], meta: new Map(), lanLam: [] }
   const chay = new Set(dangChay.flatMap((c) => c.qids))
-  const qids = (await cauCuaToPhamVi(env, toDayHoc)).filter((q) => !chay.has(q)).slice(0, TRAN_UNG_VIEN_ON_BAI_CU)
-  if (!qids.length) return { thuMuc, qids, meta: new Map(), lanLam: [] }
-  const [meta, lanLam] = await Promise.all([docMetaCau(env, qids, toDayHoc), docLanLam(env, sbd, qids, '')])
-  return { thuMuc, qids, meta, lanLam }
+  const ung = cauPhamVi.filter((q) => !chay.has(q)).slice(0, TRAN_UNG_VIEN_ON_BAI_CU)
+  if (!ung.length) return { thuMuc, qids: [], meta: new Map(), lanLam: [] }
+  const maDeCua = new Map<string, Set<string>>()
+  const [meta, lanLam] = await Promise.all([docMetaCau(env, ung, [...dayHoc], maDeCua), docLanLam(env, sbd, ung, '')])
+  return { thuMuc, qids: ung.filter((q) => [...(maDeCua.get(q) ?? [])].some((m) => dayHoc.has(m))), meta, lanLam }
 }
 
 /**
@@ -1072,8 +1074,13 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
     } catch { trongSoCau = undefined; dangVung = [] }
   }
   const cd = hoSo.chienDich
+  // Ôn bài cũ khi CHƯA có trọng số OMNI (prompt tick bài mục C): dạng yếu trước (hạng theo dạng L1 → L4), giữ thứ tự docHoSo2 (tới lịch → chưa gặp →
+  // chưa tới lịch; bài gần nhất trước) trong cùng hạng.
+  const hangSo = (c: CauSrs): number => ({ L1: 0, L2: 1, L3: 2, L4: 3 } as const)[hang?.hangTheoDang?.[c.dang ?? ''] ?? hang?.hangChung ?? 'L2']
+  const onBaiCu = !trongSoCau && hang ? (hoSo.onBaiCu ?? []).map((c, i) => [c, i] as const).sort((a, b) => hangSo(a[0]) - hangSo(b[0]) || a[1] - b[1]).map(([c]) => c) : (hoSo.onBaiCu ?? [])
   return {
     ...tuyChonGocOmni(hoSo, ngay), ...r, ...(hang ?? {}),
+    onBaiCu,
     ...(trongSoCau ? { trongSoCau } : {}),
     ...(dangVung.length ? { dangVung } : {}),
     tiLeOnBaiCu: tiLeOnBaiCu(cd ? soNgayGiua(cd.batDau, ngay) + 1 : null),

@@ -626,10 +626,11 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const nhom: Nhom[] = []
   if (nhieu) {
     const daCo = new Set<string>()
+    // hạn gần trước; cùng hạn ⇒ giữ thứ tự truyền vào (sort ổn định — lớp D1 đã xếp bắt đầu sớm trước, rồi giao gần nhất)
     const ds = tc.chienDich!
       .filter((c) => !!c.hanNop && c.hanNop >= tc.homNay && !(c.batDau && c.batDau > tc.homNay))
       .slice()
-      .sort((a, b) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+      .sort((a, b) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : 0))
     for (const c of ds) {
       if (daCo.has(c.id)) continue
       daCo.add(c.id)
