@@ -1,5 +1,5 @@
 // TRANG CHỤP ẢNH OMNI 3 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
-// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tram|de-thu|gv-bai`.
+// (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai`.
 // Dữ liệu OMNI theo đúng hợp đồng docs/hop-dong-omni-3.md (SanhOmni, PhOmni). Các màn thêm sau khi gộp làn: dao, gv-bai, gv-bang.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -92,12 +92,26 @@ const cauDao = (i: number) => [
   { text: 'Đun nóng 3 gam acetic acid với ethanol dư, hiệu suất phản ứng 60%. Khối lượng ethyl acetate thu được là', choices: ['2,64 gam', '4,40 gam', '1,76 gam', '3,30 gam'] },
   { text: 'Thể tích dung dịch NaOH 1M cần để thuỷ phân hoàn toàn 8,8 gam ethyl acetate là', choices: ['50 mL', '100 mL', '150 mL', '200 mL'] },
 ].map((c, k) => ({ qid: `HS${k + 1}`, maDe: 'DH-B6-TN', version: '1', group: `g${k + 1}`, phan: 'I', text: c.text, choices: c.choices, ideas: [], hinhAnh: [], dang: 'HSE', tenDang: 'Hiệu suất phản ứng ester hoá', mucDo: 'van_dung', sao: 2, kienThuc: [], vai: 'moi' }))[i]!
-const GIAI = { chot: 'n(CH₃COOH) = 6 : 60 = 0,1 mol ⇒ m(ester lí thuyết) = 0,1 × 88 = 8,8 gam ⇒ H = 4,4 : 8,8 × 100% = 50%.' }
+// Lời giải đúng CẤU TRÚC KHO (chot + vì sao từng phương án); chỉ số viết Unicode như kho — app phải tự vẽ <sub> (luật 28/09). Số liệu đã tính lại:
+// 6 : 60 = 0,1 mol · 0,1 · 88 = 8,8 g · 4,4 : 8,8 = 50% · 4,4 : 17,6 = 25% · 5,5 : 8,8 = 62,5% · 6,6 : 8,8 = 75%.
+const GIAI = {
+  chot: 'Hiệu suất H = khối lượng sản phẩm thực tế : khối lượng sản phẩm lí thuyết × 100%. Tính lí thuyết theo chất hết (ethanol dư ⇒ theo CH₃COOH).',
+  tungPa: {
+    A: { dung: false, viSao: '25% = 4,4 : 17,6 — nhầm khối lượng CH₃COOC₂H₅ lí thuyết thành gấp đôi.' },
+    B: { dung: true, viSao: 'n(CH₃COOH) = 6 : 60 = 0,1 mol ⇒ m(CH₃COOC₂H₅) lí thuyết = 0,1 · 88 = 8,8 gam ⇒ H = 4,4 : 8,8 × 100% = 50%.' },
+    C: { dung: false, viSao: '62,5% ứng với 5,5 gam ester (5,5 : 8,8), không đúng số liệu đề.' },
+    D: { dung: false, viSao: '75% ứng với 6,6 gam ester (6,6 : 8,8), không đúng số liệu đề.' },
+  },
+}
+// Câu Phần III (trả lời ngắn): 9 : 60 = 0,15 mol · 0,15 · 88 = 13,2 g · 13,2 · 75% = 9,9 g.
+const CAU_TLN = { qid: 'TLN1', maDe: 'DH-B6-TLN', version: '1', group: 'gt1', phan: 'III', text: 'Đun nóng 9 gam acetic acid với ethanol dư (xúc tác H₂SO₄ đặc), hiệu suất phản ứng ester hoá đạt 75%. Tính khối lượng ethyl acetate thu được (gam).', choices: [], ideas: [], hinhAnh: [], dang: 'HSE', tenDang: 'Hiệu suất phản ứng ester hoá', mucDo: 'van_dung', sao: 2, kienThuc: [], vai: 'moi' }
+const GIAI_TLN = { chot: 'Tính sản phẩm theo hiệu suất thì NHÂN H; tính ngược nguyên liệu thì CHIA H.', buoc: ['n(CH₃COOH) = 9 : 60 = 0,15 mol', 'm(CH₃COOC₂H₅) lí thuyết = 0,15 · 88 = 13,2 gam', 'm(CH₃COOC₂H₅) thực tế = 13,2 · 75% = 9,9 gam'], ketQua: '9,9' }
 const hoSoDao: DaoProfile = { nickname: 'Lửa Nhỏ', pet: 'lua_phuong', choice: false, cap: 7, exp: 120, wallet: 0, mastery: [] } as DaoProfile
 let soLanTraLoi = 0
 function traLoiDao(d: Record<string, unknown>): Record<string, unknown> {
   soLanTraLoi++
   const omni = (o: Record<string, unknown>) => ({ nhanTocDo: 'thuong', msLam: 62_000, msKyVong: 85_000, luot: false, chacMaSai: false, loiNhan: null, ...o })
+  if (man === 'dao-tln') return { correct: true, answer: '9,9', traLoi: d.answer, solution: GIAI_TLN, reward: 4, stage: 1, omni: omni({}) }
   if (man === 'dao-cham') return { correct: true, answer: 'B', traLoi: d.answer, solution: GIAI, reward: 4, stage: 1, omni: omni({ nhanTocDo: 'cham', msLam: 204_000, loiNhan: chuDungNhungCham(204_000, 85_000) }) }
   if (man === 'dao-chac-sai') return { correct: false, answer: 'B', traLoi: d.answer, solution: GIAI, reward: 0, stage: 0, omni: omni({ chacMaSai: true, loiNhan: CHU_CHAC_MA_SAI }) }
   const tram = soLanTraLoi >= 3
@@ -111,7 +125,7 @@ const callDao = async (action: string, data: Record<string, unknown> = {}): Prom
     action === 'hoa2-sanh' ? SANH
     : action === 'resume' ? { questions: [] }
     : action === 'sync' ? { remaining: 0 }
-    : action === 'start' ? { id: 'P1', questions: [0, 1, 2, 3].map(cauDao), theLuc: { con: 26, tong: 40 }, dao: { con: 26 }, doan: { con: 4 } }
+    : action === 'start' ? { id: 'P1', questions: man === 'dao-tln' ? [CAU_TLN, cauDao(1)] : [0, 1, 2, 3].map(cauDao), theLuc: { con: 26, tong: 40 }, dao: { con: 26 }, doan: { con: 4 } }
     : action === 'answer' ? traLoiDao(data)
     : action === 'hoa2-omni-tram-xong' ? { cau: { ...cauDao(4), mucDo: 'hieu' }, viTri: 3 }
     : action === 'hoa2-cau-da-lam' ? { cau: [] }
@@ -145,6 +159,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/ph/ke-hoach')) return tra({ ok: true, canhBao: [] })
   if (u.pathname.endsWith('/game-v2/hoa2-sanh')) return tra(man === 'sanh-cho' ? SANH_CHO : SANH)
   if (u.pathname.endsWith('/hs/luyen-nen')) return tra(CAU_NEN)
+  if (u.pathname.endsWith('/hs/luyen-nen/nop')) return tra({ ok: true, dung: true, dapAn: '0,1', giai: ['M(CO₂) = 12 + 2 · 16 = 44 g/mol', 'n(CO₂) = m : M = 4,4 : 44 = 0,1 mol'], meo: 'n = m : M; nhớ cộng đủ nguyên tử khối theo chỉ số trong công thức (CO₂ có 2 nguyên tử O).' })
   return tra({ ok: true })
 }
 
