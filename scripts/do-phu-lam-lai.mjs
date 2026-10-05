@@ -17,14 +17,14 @@ const DATABASE = 'd2e6d322-374a-45d7-83a3-9fac486b23f1'
 export const HANG_MUC_DO = { NB: 0, 'Nhận biết': 0, biet: 0, TH: 1, 'Thông hiểu': 1, hieu: 1, VD: 2, 'Vận dụng': 2, van_dung: 2, VDC: 3, 'Vận dụng cao': 3, van_dung_cao: 3 }
 export const bacMuc = (m) => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m] : null)
 const chuoi = (v) => (v == null ? '' : String(v))
-/** Khối từ mã tờ / mã câu — chép đúng `khoiCuaMaDe` của src/lib/khoi-cau.ts (test đối chiếu); danh sách mã ⇒ khối cao nhất. */
+/** Khối từ mã tờ / mã câu — chép đúng `khoiCuaMaDe` của src/lib/khoi-cau.ts (test đối chiếu); danh sách mã nhiều khối KHÁC nhau ⇒ null (mâu thuẫn — luật thầy 05/10). */
 export function khoiCuaMaDe(ma) {
-  let cao = null
+  const s = new Set()
   for (const p of chuoi(ma).normalize('NFC').trim().split(/[\s,;|]+/)) {
     const m = /^[A-Za-zĐđ]{1,6}-(10|11|12)(?![0-9])(?:-|$)/.exec(p) ?? /^(10|11|12)-/.exec(p)
-    if (m) { const k = Number(m[1]); if (cao === null || k > cao) cao = k }
+    if (m) s.add(Number(m[1]))
   }
-  return cao
+  return s.size === 1 ? [...s][0] : null
 }
 /** Khối ở đầu tên lớp / cột `lop` — chép đúng `khoiCuaLop`. */
 export const khoiCuaLop = (v) => { const m = /^(?:lớp\s*|khối\s*)?(10|11|12)(?![0-9])/i.exec(chuoi(v).normalize('NFC').trim()); return m ? Number(m[1]) : null }

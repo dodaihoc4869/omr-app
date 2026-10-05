@@ -813,7 +813,8 @@ describe('Khối của biến thể = khối câu gốc (cổng khối đọc đ
     const c11 = sinhBienThe('CAN_BANG.HANG_SO_K.TINH_HANG_SO', 'k', 'I', 'hieu', { maDe: '11-C1-B1', lop: '11' })!
     expect(c11.maDe).toBe('11-C1-B1'); expect(c11.lop).toBe('11'); expect(khoiCuaCau(c11)).toBe(11)
     const tron = sinhBienThe('CAN_BANG.HANG_SO_K.TINH_HANG_SO', 'k', 'I', 'hieu')!
-    expect(tron.maDe).toBe(''); expect(tron.bienThe.khoiGoc).toBeNull(); expect(khoiCuaCau(tron)).toBeNull()
+    expect(tron.maDe).toBe(''); expect(tron.bienThe.khoiGoc).toBeNull()
+    expect(khoiCuaCau(tron)).toBe(11) // luật khối 05/10 bản cuối: tờ không ghi khối ⇒ CHƯƠNG cứu (CAN_BANG ⇒ 11); vẫn không phát vì không có câu gốc (khoiGoc null)
     expect(tron.tenDang).toBe('Hằng số cân bằng — tính hằng số')
   })
   it('apBienThe: cùng khối ⇒ có câu (qid ảo, maDe gốc); khác khối / qid ảo lệch khối / Phần II / tự luận / không bộ sinh ⇒ null', () => {
@@ -837,8 +838,13 @@ describe('Khối của biến thể = khối câu gốc (cổng khối đọc đ
     expect(apBienThe(g11, `${g11.qid}~bt0`, 12)).toBeNull() // cauHopKhoi bản cũ cho qua (11 ≤ 12) — biến thể thì không
     expect(apBienThe(g11, `${g11.qid}~bt0`, null)).toBeNull()
     const khongKhoi = { ...goc('', 'III', 'CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG'), qid: 'cau-khong-ma-7' }
-    expect(khoiCuaCau(khongKhoi)).toBeNull()
-    for (const k of [10, 11, 12] as const) expect(apBienThe(khongKhoi, 'cau-khong-ma-7~bt0', k)).toBeNull()
+    // Luật khối 05/10 bản cuối: tờ không ghi khối ⇒ CHƯƠNG cứu (CARBOHYDRATE ⇒ 12) — chỉ em lớp 12 nhận, lớp 10/11 không.
+    expect(khoiCuaCau(khongKhoi)).toBe(12)
+    for (const k of [10, 11] as const) expect(apBienThe(khongKhoi, 'cau-khong-ma-7~bt0', k)).toBeNull()
+    // Nguồn khối MÂU THUẪN (mã tờ 11, cột lớp 12) ⇒ không rõ ⇒ không em nào nhận.
+    const mauThuan = { ...goc('DH-11-C1', 'III', 'CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG'), lop: '12' } as PrivateQuestion
+    expect(khoiCuaCau(mauThuan)).toBeNull()
+    for (const k of [10, 11, 12] as const) expect(apBienThe(mauThuan, `${mauThuan.qid}~bt0`, k)).toBeNull()
     // Khối chỉ nằm ở `lop` (dòng D1) vẫn được tính, và biến thể mang theo đúng khối đó.
     const theoLop = { ...khongKhoi, lop: '12' } as PrivateQuestion
     const q = apBienThe(theoLop, 'cau-khong-ma-7~bt0', 12)!
