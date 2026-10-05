@@ -46,6 +46,7 @@ import { ghiCauBoTro } from './cau-bo-tro'
 import { chayTuHoanThien, dsCauNghi, gvTongV2, gvXuLyCauNghi } from './tu-hoan-thien'
 import { gvNutThatDs, gvNutThatGo, hsLoiGo } from './ban-go-nut-that'
 import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsDocLoiGiai,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import { duongMaySoan } from './hoc-lieu-may-soan'
 import {hsCauKiem,hsGuiThay,hsLuyenNen,hsLuyenNenNop,hsThangGo,thayDayNen} from './thang-tu-go'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
@@ -3735,6 +3736,8 @@ const boXuLy = {
       if (p === '/kho/loi-giai/viec') return ra(await layViec(env, b))
       if (p === '/kho/loi-giai/nop') return ra(await nopHoSo(env, b))
       if (p === '/kho/loi-giai/tong') return ra(await tongHang(env))
+      // HỌC LIỆU MÁY SOẠN 05/10 (hoc-lieu-may-soan.ts): nộp bản khác + ý Đ–S đã qua hai lượt, xem hàng câu em đã sai — cùng cổng mã bí mật ở trên.
+      if (p.startsWith('/kho/may-soan/')) return ra(await duongMaySoan(env, p, b))
       if (p === '/gv/loi-giai/cho-duyet') return ra(await gvChoDuyet(env, b))
       // BÀN GỠ NÚT THẮT (v2, 02/10 — server/src/ban-go-nut-that.ts): thẻ em vướng gom theo (câu, bước) + kèm riêng; thầy gỡ một bước.
       if (p === '/gv/nut-that/ds') return ra(await gvNutThatDs(env, b))

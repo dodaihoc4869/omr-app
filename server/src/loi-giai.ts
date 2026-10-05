@@ -10,6 +10,11 @@
 //   học sinh ──/hs/loi-giai──▶ chỉ khi ca đã CÔNG BỐ (hoặc em đã tự làm câu ở chỗ luyện) + hồ sơ đã duyệt + băm còn khớp đề hiện tại.
 //
 // Bảng CHỈ-THÊM, dựng tại chỗ (CI không chạy migration — mẫu bi-a.ts); bản ghi tay: server/migration-2909-loi-giai.sql.
+//
+// 05/10 — HỌC LIỆU MÁY SOẠN (thầy: "làm tất nhé, tôi ko duyệt gì cả"; server/src/hoc-lieu-may-soan.ts + may-soan-kiem.ts + cau-y-ds.ts):
+//   · mỗi việc trong lô mang `can` (soạn hồ sơ? mấy bản khác? mấy ý Đ–S mới?) + `daCo` (học liệu đã có); máy soạn nộp học liệu qua /kho/may-soan/nop-bo-tro;
+//   · hàng phát CÂU EM ĐÃ SAI chưa có bản khác trước (nâng `loi_giai_viec` + việc "chỉ học liệu" ở `may_soan_viec`), rồi thứ tự cũ;
+//   · cờ đáp án: máy TỰ XỬ (giải lại độc lập) — còn lệch ⇒ câu vào `cau_nghi_dap_an`, danh sách sửa kho tách riêng `nghiTuXu` (không báo thầy).
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -24,6 +29,8 @@ import {
 import { BO_CHIA_KHOA } from '../../src/lib/loi-giai-bo'
 import { docBoTro } from './cau-bo-tro'
 import { damBaoBangNutThat } from './nut-that'
+import { canVaDaCoChoViec, damBaoBangMaySoan, ghiNghiTuXu, lamMoiHangEmSai } from './hoc-lieu-may-soan'
+import { CAN_RONG, coTuXuNghi } from './may-soan-kiem'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -178,50 +185,92 @@ export async function napHangTuKho(env: Env, b: Obj) {
 
 /**
  * NHẬN MỘT LÔ VIỆC cho một luồng máy soạn: các câu CÙNG CHƯƠNG (đọc bộ chìa khoá một lần), ưu tiên cao trước.
- * Nhận bằng MỘT câu UPDATE có mã lượt ⇒ 4 luồng gọi cùng lúc không bao giờ nhận trùng câu.
- * Chỉ phát chương đã có bộ chìa khoá; câu chương chưa có bộ nằm chờ.
+ * Nhận bằng UPDATE có mã lượt (mỗi hàng một câu lệnh nguyên tử, cùng mã lượt) ⇒ 4 luồng gọi cùng lúc không bao giờ nhận trùng câu.
+ * Việc hồ sơ chỉ phát ở chương đã có bộ chìa khoá; câu chương chưa có bộ nằm chờ.
+ * 05/10: hai hàng gộp theo ưu tiên — `loi_giai_viec` (soạn hồ sơ; câu em đã sai được nâng lên đầu) và `may_soan_viec` (câu em đã sai, đã có hồ sơ
+ * hoặc chương chưa có bộ ⇒ chỉ soạn học liệu). Mỗi việc kèm `can` + `daCo` + chữ đề kho (`deTho`, `bang`, `kieuKho`, `phan`) cho bản khác / ý mới.
+ * `boTro: false` ⇒ y như trước (chỉ hồ sơ, không đụng hàng học liệu).
  */
-export async function layViec(env: Env, b: Obj) {
+export async function layViec(env: Env, b: Obj): Promise<Obj> {
   await damBaoBangLoiGiai(env)
+  await damBaoBangMaySoan(env)
   const nay = Date.now()
   const so = Math.min(20, Math.max(1, Number(b.so ?? 12) || 12))
   const lop = str(b.lop)
   const boCo = Object.keys(BO_CHIA_KHOA)
-  await env.DB.prepare("UPDATE loi_giai_viec SET trang_thai = 'cho', ma_luot = NULL WHERE trang_thai = 'dang' AND nhan_luc < ?")
-    .bind(new Date(nay - PHUT_GIU_VIEC * 60_000).toISOString()).run()
-  const dieuKien = `trang_thai = 'cho' AND bo IN (SELECT value FROM json_each(?))${lop ? ' AND lop = ?' : ''}${str(b.bo) ? ' AND bo = ?' : ''}`
-  const thamSo = [JSON.stringify(boCo), ...(lop ? [lop] : []), ...(str(b.bo) ? [str(b.bo)] : [])]
-  const dau = await env.DB.prepare(`SELECT bo FROM loi_giai_viec WHERE ${dieuKien} ORDER BY uu_tien DESC LIMIT 1`).bind(...thamSo).first<Obj>()
+  const boTro = b.boTro !== false
+  const han = new Date(nay - PHUT_GIU_VIEC * 60_000).toISOString()
+  // Từng câu lệnh riêng (mỗi câu tự nguyên tử) — không gói lô: 4 luồng gọi cùng lúc thì không lồng giao dịch.
+  await env.DB.prepare("UPDATE loi_giai_viec SET trang_thai = 'cho', ma_luot = NULL WHERE trang_thai = 'dang' AND nhan_luc < ?").bind(han).run()
+  await env.DB.prepare("UPDATE may_soan_viec SET trang_thai = 'cho', ma_luot = NULL WHERE trang_thai = 'dang' AND nhan_luc < ?").bind(han).run()
+  // Câu EM ĐÃ SAI chưa có bản khác lên đầu hàng (≤ 1 lần / 15 phút; `lamMoi` ⇒ ngay). Lỗi ⇒ bỏ qua, hàng chạy thứ tự cũ.
+  if (boTro) await lamMoiHangEmSai(env, nay, b.lamMoi === true).catch(() => null)
+  const locLop = lop ? ' AND lop = ?' : '', thamLop = lop ? [lop] : []
+  const locBo = str(b.bo) ? ' AND bo = ?' : '', thamBo = str(b.bo) ? [str(b.bo)] : []
+  const dauHs = await env.DB.prepare(`SELECT bo, uu_tien FROM loi_giai_viec WHERE trang_thai = 'cho' AND bo IN (SELECT value FROM json_each(?))${locLop}${locBo} ORDER BY uu_tien DESC LIMIT 1`)
+    .bind(JSON.stringify(boCo), ...thamLop, ...thamBo).first<Obj>()
+  const dauHl = boTro ? await env.DB.prepare(`SELECT bo, uu_tien FROM may_soan_viec WHERE trang_thai = 'cho'${locLop}${locBo} ORDER BY uu_tien DESC LIMIT 1`)
+    .bind(...thamLop, ...thamBo).first<Obj>() : null
+  const dau = dauHs && (!dauHl || Number(dauHs.uu_tien) >= Number(dauHl.uu_tien)) ? dauHs : dauHl
   if (!dau) return { ok: true, het: true, viec: [] }
   const bo = str(dau.bo)
-  const maLuot = crypto.randomUUID()
-  await env.DB.prepare(
-    `UPDATE loi_giai_viec SET trang_thai = 'dang', ma_luot = ?, nhan_luc = ?, so_lan = so_lan + 1
-     WHERE bam IN (SELECT bam FROM loi_giai_viec WHERE trang_thai = 'cho' AND bo = ?${lop ? ' AND lop = ?' : ''} ORDER BY uu_tien DESC, qid LIMIT ?)`,
-  ).bind(maLuot, new Date(nay).toISOString(), bo, ...(lop ? [lop] : []), so).run()
-  const nhan = (await env.DB.prepare('SELECT * FROM loi_giai_viec WHERE ma_luot = ? ORDER BY uu_tien DESC, qid').bind(maLuot).all<Obj>()).results ?? []
+  // Ứng viên của chương ở hai hàng, xếp chung theo ưu tiên ⇒ số câu nhận ở mỗi hàng.
+  const ung = (await env.DB.prepare(
+    `SELECT 'hs' AS k, uu_tien FROM loi_giai_viec WHERE trang_thai = 'cho' AND bo = ?${locLop}${BO_CHIA_KHOA[bo] ? '' : ' AND 0'}
+     UNION ALL SELECT 'hl' AS k, uu_tien FROM may_soan_viec WHERE trang_thai = 'cho' AND bo = ?${locLop}${boTro ? '' : ' AND 0'}
+     ORDER BY uu_tien DESC LIMIT ?`,
+  ).bind(bo, ...thamLop, bo, ...thamLop, so).all<Obj>()).results ?? []
+  const nHs = ung.filter((x) => x.k === 'hs').length, nHl = ung.length - nHs
+  const maLuot = crypto.randomUUID(), nhanLuc = new Date(nay).toISOString()
+  const nhanO = (bang: string, n: number) => env.DB.prepare(
+    `UPDATE ${bang} SET trang_thai = 'dang', ma_luot = ?, nhan_luc = ?, so_lan = so_lan + 1
+     WHERE bam IN (SELECT bam FROM ${bang} WHERE trang_thai = 'cho' AND bo = ?${locLop} ORDER BY uu_tien DESC, qid LIMIT ?)`,
+  ).bind(maLuot, nhanLuc, bo, ...thamLop, n)
+  // Mỗi hàng MỘT câu UPDATE có điều kiện 'cho' (nguyên tử) ⇒ luồng khác chen giữa hai câu cũng không nhận trùng.
+  if (nHs) await nhanO('loi_giai_viec', nHs).run()
+  if (nHl) await nhanO('may_soan_viec', nHl).run()
+  const nhan = nHs ? (await env.DB.prepare('SELECT * FROM loi_giai_viec WHERE ma_luot = ? ORDER BY uu_tien DESC, qid').bind(maLuot).all<Obj>()).results ?? [] : []
+  const daCoHs = new Set(nhan.map((v) => str(v.bam)))
+  const nhanHl = nHl ? ((await env.DB.prepare('SELECT * FROM may_soan_viec WHERE ma_luot = ? ORDER BY uu_tien DESC, qid').bind(maLuot).all<Obj>()).results ?? [])
+    .filter((v) => !daCoHs.has(str(v.bam))) : []
   const boNho = new Map<string, unknown>()
-  const viec: unknown[] = []
-  for (const v of nhan) {
+  const hien: { v: Obj; hoSo: boolean; c: CauKho; vao: NonNullable<ReturnType<typeof dauVao>> }[] = []
+  for (const [v, hoSo] of [...nhan.map((x) => [x, true] as const), ...nhanHl.map((x) => [x, false] as const)]) {
     const qid = str(v.qid), bam = str(v.bam)
     const ht = await cauHienTai(env, qid, str(v.ma_de), boNho).catch(() => null)
     if (!ht || ht.bam !== bam) {
       // Đề đã sửa sau khi vào hàng: băm cũ không còn câu nào dùng ⇒ bỏ việc (móc nạp đề đã xếp băm mới).
-      await env.DB.prepare("UPDATE loi_giai_viec SET trang_thai = 'bo', loi = 'đề đã đổi' WHERE bam = ?").bind(bam).run()
+      await env.DB.prepare(`UPDATE ${hoSo ? 'loi_giai_viec' : 'may_soan_viec'} SET trang_thai = 'bo', loi = 'đề đã đổi' WHERE bam = ?`).bind(bam).run()
       continue
     }
     const vao = dauVao(ht.c, bam)
-    if (vao) viec.push({ ...vao, ghiChuThay: str(v.loi) || undefined })
+    if (vao) hien.push({ v, hoSo, c: ht.c, vao })
   }
-  return { ok: true, het: false, maLuot, bo: BO_CHIA_KHOA[bo], viec }
+  const can = await canVaDaCoChoViec(env, hien.map((x) => ({ bam: x.vao.bam, dang: x.vao.dang, kieuKho: x.c.kieu, hoSo: x.hoSo })), boTro)
+    .catch((): Awaited<ReturnType<typeof canVaDaCoChoViec>> => new Map())
+  // Việc "chỉ học liệu" mà lúc nhận đã không còn gì cần soạn (đủ bản khác / câu vừa vào diện nghi) ⇒ đóng ngay, không phát.
+  const thua = hien.filter((x) => !x.hoSo && can.has(x.vao.bam) && !can.get(x.vao.bam)!.can.banKhac && !can.get(x.vao.bam)!.can.yDs)
+  for (const x of thua) await env.DB.prepare("UPDATE may_soan_viec SET trang_thai = 'xong', ma_luot = NULL, loi = 'đã đủ học liệu lúc nhận' WHERE bam = ?").bind(x.vao.bam).run()
+  // Cả lô chỉ toàn việc thừa ⇒ nhận lô kế (không trả lô rỗng — máy soạn sẽ tưởng hết việc). Hữu hạn: mỗi vòng đóng ít nhất một việc.
+  if (thua.length && thua.length === hien.length) return layViec(env, { ...b, lamMoi: false })
+  const viec = hien.filter((x) => !thua.includes(x)).map(({ v, hoSo, c, vao }) => ({
+    ...vao, ghiChuThay: hoSo ? str(v.loi) || undefined : undefined,
+    phan: c.phan, deTho: c.de, ...(c.bang ? { bang: c.bang } : {}), kieuKho: c.kieu ?? '', soLan: Number(v.so_lan ?? 0),
+    can: can.get(vao.bam)?.can ?? { ...CAN_RONG, hoSo }, daCo: can.get(vao.bam)?.daCo ?? { banKhac: [], yDs: [] },
+  }))
+  return { ok: true, het: false, maLuot, bo: BO_CHIA_KHOA[bo] ?? { ma: bo || 'CHUA_GAN', chuong: '(chương chưa có bộ chìa khoá — chỉ soạn học liệu)', KEYS: {}, TRAPS_THEM: {} }, viec }
 }
 
 /** NỘP MỘT HỒ SƠ. Máy chủ tự dựng lại đầu vào TỪ KHO rồi kiểm 6 khoá — không tin gì máy soạn gửi ngoài chính hồ sơ. */
 export async function nopHoSo(env: Env, b: Obj) {
   await damBaoBangLoiGiai(env)
   const qid = str(b.qid), bam = str(b.bam)
-  const hoSo = b.hoSo
-  if (!qid || !bam || !hoSo || typeof hoSo !== 'object') return { ok: false, error: 'Thiếu qid / bam / hoSo' }
+  const hoSoTho = b.hoSo
+  if (!qid || !bam || !hoSoTho || typeof hoSoTho !== 'object') return { ok: false, error: 'Thiếu qid / bam / hoSo' }
+  // Học liệu thêm (bản khác, ý mới) KHÔNG BAO GIỜ nằm trong hồ sơ: hồ sơ xuống máy em qua "Hỏi thầy" ⇒ đáp án bản khác sẽ lộ trước khi em làm.
+  // Máy soạn nộp riêng qua /kho/may-soan/nop-bo-tro; lỡ có trong hồ sơ thì bỏ ở đây.
+  const { songSinh: _ss, song_sinh: _ss2, yMoi: _ym, boTro: _bt, ...hoSo } = hoSoTho as Obj
+  void _ss; void _ss2; void _ym; void _bt
   const ht = await cauHienTai(env, qid)
   if (!ht) return { ok: false, error: 'Không thấy câu trong kho' }
   if (ht.bam !== bam) return { ok: false, error: 'Đề đã đổi sau khi nhận việc (băm lệch) — bỏ hồ sơ này', loi: ['KHOÁ VÂN TAY'] }
@@ -240,11 +289,13 @@ export async function nopHoSo(env: Env, b: Obj) {
     return { ok: false, loi, canhBao }
   }
   // Trường định danh lấy từ KHO, không lấy từ máy soạn: khung chọn bộ chìa khoá theo `bo`.
-  const gon: Obj = { ...gonHoSo(hoSo as Obj), qid, bam, dang: vao.dang, bo: vao.bo }
+  const gon: Obj = { ...gonHoSo(hoSo), qid, bam, dang: vao.dang, bo: vao.bo }
   const co = (gon.co as { loai: string }[]) ?? []
   const soCoDapAn = co.filter((c) => c.loai === 'dapAn').length
-  // Máy duyệt: đã qua 6 khoá ở trên + không còn cờ đáp án. Cờ đáp án ⇒ chờ (không hiện với học sinh), để cuối đợt báo thầy.
+  // Máy duyệt: đã qua 6 khoá ở trên + không còn cờ đáp án. Cờ đáp án ⇒ chờ (không hiện với học sinh).
+  // 05/10 (thầy: "tôi ko duyệt gì cả"): cờ đã qua máy TỰ XỬ (`tuXu` — giải lại độc lập vẫn lệch đáp án kho) ⇒ câu vào diện nghi đáp án ngay, không báo thầy.
   const daDuyet = soCoDapAn === 0
+  const tuXuNghi = soCoDapAn > 0 && coTuXuNghi(co)
   const khoa = `giai/${bam}.json`
   await env.DE.put(khoa, JSON.stringify(gon))
   await env.DB.batch([
@@ -261,7 +312,15 @@ export async function nopHoSo(env: Env, b: Obj) {
       daDuyet ? nay : null, daDuyet ? GHI_CHU_MAY_DUYET : null),
     env.DB.prepare("UPDATE loi_giai_viec SET trang_thai = 'xong', ma_luot = NULL, loi = NULL WHERE bam = ?").bind(bam),
   ])
-  return { ok: true, bam, sach: laHoSoSach(gon), daDuyet, canhBao, kichThuoc: JSON.stringify(gon).length }
+  let soCauNghi = 0
+  if (tuXuNghi) {
+    const tx = (co as Obj[]).find((c) => c.loai === 'dapAn' && c.tuXu && typeof c.tuXu === 'object')?.tuXu as Obj | undefined
+    const kq = str(tx?.ketQua)
+    const ghi = `${kq === 'lech' ? `giải lại độc lập ra ${str(tx?.giaiLai) || '?'}` : kq === 'khong_chac' ? 'giải lại độc lập báo mơ hồ / không chắc' : 'không giải lại được'}`
+      + ` · đáp án kho ${ht.c.dapAn} — hồ sơ ẩn, câu loại khỏi kênh tự động`
+    soCauNghi = await ghiNghiTuXu(env, bam, qid, ghi).catch(() => 0)
+  }
+  return { ok: true, bam, sach: laHoSoSach(gon), daDuyet, canhBao, kichThuoc: JSON.stringify(gon).length, ...(tuXuNghi ? { nghiDapAn: true, soCauNghi } : {}) }
 }
 
 /** Tổng quan hàng việc theo chương (máy soạn in ra; màn thầy hiện). */
@@ -269,7 +328,9 @@ export async function tongHang(env: Env) {
   await damBaoBangLoiGiai(env)
   const viec = (await env.DB.prepare('SELECT bo, lop, trang_thai, COUNT(*) n FROM loi_giai_viec GROUP BY bo, lop, trang_thai').all<Obj>()).results ?? []
   const hs = (await env.DB.prepare('SELECT bo, lop, trang_thai, COUNT(*) n FROM loi_giai GROUP BY bo, lop, trang_thai').all<Obj>()).results ?? []
-  return { ok: true, viec, hoSo: hs, boCo: Object.keys(BO_CHIA_KHOA) }
+  // 05/10: việc "chỉ học liệu" (câu em đã sai đã có hồ sơ) — bảng chưa có ⇒ rỗng.
+  const hocLieu = (await env.DB.prepare('SELECT bo, lop, trang_thai, COUNT(*) n FROM may_soan_viec GROUP BY bo, lop, trang_thai').all<Obj>().catch(() => ({ results: [] as Obj[] }))).results ?? []
+  return { ok: true, viec, hoSo: hs, hocLieu, boCo: Object.keys(BO_CHIA_KHOA) }
 }
 
 // ---------------------------------------------------------------- thầy duyệt theo đề
@@ -373,6 +434,8 @@ export async function gvDuyet(env: Env, b: Obj) {
  * DANH SÁCH SỬA KHO do phiên chốt đề xuất (cờ `loiDe` / `hienThi` có `sua`), đúng khuôn `docs/ra-soat-hien-thi-de-2809/sua-tung-cau.json`
  * để công cụ áp dụng sẵn có ghi qua `/kho/day` (kiểm ca mở, đọc lại, lùi được). Cờ `dapAn` đã chốt "đáp án kho sai" trả riêng: đổi đáp án là đổi điểm thật.
  * Cờ `dapAn` phiên chốt chưa kết luận (không có `chot`) trả ở `chuaChot` — cuối đợt Boss báo thầy cả hai danh sách.
+ * 05/10 (thầy: "tôi ko duyệt gì cả"): cờ `dapAn` đã qua máy TỰ XỬ (`tuXu`: giải lại độc lập vẫn lệch) trả RIÊNG ở `nghiTuXu` — câu đã vào diện nghi
+ * đáp án (`cau_nghi_dap_an`), loại khỏi kênh tự động; KHÔNG nằm trong hai danh sách báo thầy. Hai danh sách cũ chỉ còn hồ sơ nộp theo đường cũ.
  */
 export async function gvSuaKho(env: Env, b: Obj) {
   await damBaoBangLoiGiai(env)
@@ -381,7 +444,7 @@ export async function gvSuaKho(env: Env, b: Obj) {
     `SELECT q.qid, q.ma_de, l.co_json FROM loi_giai l JOIN loi_giai_cau q ON q.bam = l.bam
      WHERE (l.co_json LIKE '%"sua"%' OR l.co_json LIKE '%"chot"%' OR l.so_co_dap_an > 0) ${maDe ? 'AND q.ma_de = ?' : ''} ORDER BY q.ma_de, q.qid`,
   ).bind(...(maDe ? [maDe] : [])).all<Obj>()
-  const sua: Obj[] = [], dapAnSai: Obj[] = [], chuaChot: Obj[] = []
+  const sua: Obj[] = [], dapAnSai: Obj[] = [], chuaChot: Obj[] = [], nghiTuXu: Obj[] = []
   for (const row of r.results ?? []) {
     let co: Obj[] = []
     try { co = JSON.parse(str(row.co_json) || '[]') } catch { co = [] }
@@ -389,10 +452,13 @@ export async function gvSuaKho(env: Env, b: Obj) {
     for (const c of co) {
       const su = c.sua as Obj | undefined
       if (su && typeof su === 'object') sua.push({ qid, maDe: str(row.ma_de), phan: m?.[1] ?? '', so: Number(m?.[2] ?? 0), truong: str(su.truong), truoc: String(su.truoc ?? ''), sau: String(su.sau ?? ''), lyDo: str(c.ghi), loai: [c.loai === 'hienThi' ? 'hien-thi' : 'loi-de'] })
-      if (c.loai === 'dapAn') (str(c.chot) ? dapAnSai : chuaChot).push({ qid, maDe: str(row.ma_de), ghi: str(c.ghi), ...(str(c.chot) ? { chot: str(c.chot) } : {}) })
+      if (c.loai !== 'dapAn') continue
+      const tx = c.tuXu && typeof c.tuXu === 'object' ? (c.tuXu as Obj) : null
+      if (tx) nghiTuXu.push({ qid, maDe: str(row.ma_de), ghi: str(c.ghi), ketQua: str(tx.ketQua), giaiLai: str(tx.giaiLai), ...(str(c.chot) ? { chot: str(c.chot) } : {}) })
+      else (str(c.chot) ? dapAnSai : chuaChot).push({ qid, maDe: str(row.ma_de), ghi: str(c.ghi), ...(str(c.chot) ? { chot: str(c.chot) } : {}) })
     }
   }
-  return { ok: true, sua, dapAnSai, chuaChot }
+  return { ok: true, sua, dapAnSai, chuaChot, nghiTuXu }
 }
 
 /** Đề thầy sắp giao ⇒ câu của đề lên đầu hàng (mục 5.6: ưu tiên 1). */
