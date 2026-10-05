@@ -22,6 +22,12 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "cho chọn hs theo điểm danh nữa" ⇒ chọn nhanh các em có mặt theo điểm danh buổi học | bằng chứng: ảnh gv-bai-hom-nay-theo-diem-danh-1440; máy chủ xong 9e82611 (lệnh chỉ-đọc gan-day: buổi gần đây kể cả đã đóng + SBD có mặt; buoiGanDay ở app thầy; test 4/4 + test buổi học cũ 12/12); giao diện đã giao làn C1, máy chủ tick làm chắc đã giao làn B1
 - [x] "hãy thiết kế tính tế đồng điệu với giao diện hiện tại nhé" ⇒ dùng lại đúng lớp CSS/token/thành phần đang có (h2-*, cd-*, m3), không màn mới kiểu khác, không đổi bố cục cũ | bằng chứng: check:mau sạch; ảnh docs/omni-0510/anh-build/
 
+- [x] "Lời giải hiển thị đúng chuẩn chưa?" (thầy hỏi 05/10 sau khi xem ảnh) ⇒ soát cách hiện lời giải theo chuẩn app | bằng chứng: CHƯA đúng chuẩn 28/09 — chỉ số Unicode (CO₂, Fe³⁺) vẽ bằng phông dự phòng ở Đảo 2.0, Đoàn, hộp câu nền (có sẵn trên main; "Câu đã làm" đã đúng). Sửa a3f30fab (src/lib/chi-so-ro.ts); test omni-3-chi-so-ro-0510 + omni-3-cau-nen-chi-so-0510; game 540 test: 3 đỏ đều có trong nền
+- [x] "hiển thị lại cho tôi xem" ⇒ ảnh lời giải hiện đúng (Đảo + câu nền sau khi nộp), chụp đúng khung nhìn | bằng chứng: hs-dao-loi-giai-trac-nghiem-390, hs-dao-loi-giai-tra-loi-ngan-390, hs-tram-cau-nen-loi-giai-390 (docs/omni-0510/anh-build/)
+- [x] "Khi tích chọn bạn chỉ lấy 3 phần trắc nghiệm, đúng sai trả lời ngắn làm tự động giao" ⇒ tick bài chỉ giao -TN/-DS/-TLN | bằng chứng: gộp C1 d9ea2096 (475f173b); dòng "Tự giao: …" thay ô tích; ảnh gv-bai-hom-nay-theo-diem-danh-1440; 56/56 test tick + nghiệm thu
+- [x] "bỏ phần ví dụ minh họa và các dạng trọng tâm nhé" ⇒ không bao giờ giao -VD, -DT (cả bài mới lẫn bài cũ ôn lại), bỏ ô tích thêm | bằng chứng: bai-hom-nay.ts laMaToKhongGiao (-VD/-DT/-TL/-VDMH/-DTTT + tên), máy chủ bai-da-day.ts lưới an toàn ở maDe + phamVi; test omni-3-tick-bai-0510
+- [ ] "Làm thêm 6 bước tính toán" ⇒ bộ sinh câu nền: bao_toan_electron, lap_he_phuong_trinh, cong_thuc_phan_tu, hang_so_can_bang, bien_thien_enthalpy, nang_luong_lien_ket (kiểm chéo độc lập) | bằng chứng: (chưa có)
+
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
 
 - [x] 1. Tick bài ⇒ chiến dịch đúng tờ, đúng hạn tự tính, dòng xác nhận đúng 6 con số; tick lần hai không tạo thêm | bằng chứng: OMNI-3-build-status.md mục 2
