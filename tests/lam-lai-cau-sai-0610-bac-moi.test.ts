@@ -600,20 +600,41 @@ describe('A4 · cổng cuối của em loại câu NGHI sai đáp án (lý do `n
     expect(so()).toBe(truoc)
   })
 
-  it('Đảo: MỌI câu còn lại của kế hoạch đều nghi ⇒ "hết câu hôm nay" (không báo "chưa tải được câu", không log lỗi tải); không nghi ⇒ câu ra bình thường', async () => {
+  it('KẾ HOẠCH: câu nghi là câu TẠM HOÃN (như câu ca bảo vệ) — không đếm "còn N câu", rương mở được khi xong các câu còn lại; mọi câu đều nghi ⇒ "Hôm nay em xong rồi" (không báo "chưa tải được câu", không log lỗi tải)', async () => {
     const Q8: CauThu = { qid: 'Q8', maDe: TO11, phan: 'II', dang: 'D8', mucDo: 'TH', correct: 'DDSS' }
     const loi = vi.spyOn(console, 'error').mockImplementation(() => {})
+    // (1) Kế hoạch = Q2 (câu sai ⇒ câu anh em A2) + Q8 (câu mới). Q8 nghi: kế hoạch còn 1 việc; làm xong A2 ⇒ hết việc và rương MỞ. Đối chứng không nghi: 2 việc, rương chưa mở.
     for (const coNghi of [false, true]) {
-      const { d, env } = dung([Q8], ['Q8'])
+      const { d, env } = dung([Q2, A2, Q8], ['Q2', 'Q8'])
       if (coNghi) { await damBaoBangTuHoanThien(env); nghi(d, 'Q8') }
+      ghi(d, 'Q2', 0, luc('2026-10-05', '10:00'))
       vi.setSystemTime(luc('2026-10-06'))
       const r = await dao(env)
       expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
-      if (coNghi) {
-        expect(r.questions).toEqual([])
-        expect(r.lyDo).toBe('xong_ke_hoach')
-        expect(String(r.message)).not.toContain('Chưa tải được')
-      } else expect(r.questions.map((q: { qid: string }) => q.qid)).toEqual(['Q8'])
+      expect(r.theLuc, coNghi ? 'có nghi' : 'không nghi').toEqual(coNghi ? { con: 1, tong: 1 } : { con: 2, tong: 2 })
+      expect((r.questions as { qid: string }[]).map((q) => q.qid).sort()).toEqual(coNghi ? ['A2'] : ['A2', 'Q8'])
+      const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'A2', answer: 'SDDS' })
+      expect(t.correct).toBe(true)
+      if (!coNghi) { expect((await em(env, '/game-v2/hoa2-ruong-mo', {})).ok).toBe(false); continue }
+      const sau = await dao(env)
+      expect(sau.lyDo).toBe('xong_ke_hoach')
+      expect(String(sau.message)).toContain('Hôm nay em xong rồi')
+      expect(sau.theLuc).toEqual({ con: 0, tong: 1 })
+      const ruong = await em(env, '/game-v2/hoa2-ruong-mo', {})
+      expect(ruong.ok, JSON.stringify(ruong).slice(0, 300)).toBe(true)
+    }
+    // (2) Mọi câu của kế hoạch đều nghi.
+    {
+      const { d, env } = dung([Q8], ['Q8'])
+      await damBaoBangTuHoanThien(env); nghi(d, 'Q8')
+      vi.setSystemTime(luc('2026-10-06'))
+      const r = await dao(env)
+      expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
+      expect(r.questions).toEqual([])
+      expect(r.lyDo).toBe('xong_ke_hoach')
+      expect(String(r.message)).toContain('Hôm nay em xong rồi')
+      expect(String(r.message)).not.toContain('Chưa tải được')
+      expect(r.theLuc).toEqual({ con: 0, tong: 0 })
     }
     expect(loi.mock.calls.filter((c) => String(c[0]).includes('nap-cau-game'))).toEqual([])
     loi.mockRestore()

@@ -3,14 +3,13 @@
 // Luật chơi giữ nguyên; chỉ đổi NGUỒN CÂU: Đảo nhận câu mới + câu ôn Đúng–sai, Đoàn nhận câu ôn Trắc nghiệm/Trả lời ngắn,
 // đúng kế hoạch ngày đã chốt (`layKeHoachHomNay`). Đảo khoá khi còn câu ôn hôm nay ở Đoàn.
 import { phuNeuCan } from './hang-chua-loi'
-import { tachSongSinh } from './loi-hoc-luat'
 import { apLamLaiKhac, batDauLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
 import { refLamLai, type LamLaiRef } from './lam-lai-so'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
-import { chanKhacKhoiEm, docCauNghiDem } from './chan-khac-khoi'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type HoSoDangTho, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHangEm, docHoSo2, docHoSoDangCaLop, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidCanNhanNo, qidGoc, sanh2, thuSucThem, type HoSo2, type LanLamCoNguon, type MetaCau } from './srs2-d1'
@@ -251,15 +250,6 @@ export function lyDoLuotRong(khoa: readonly string[], hs: Pick<HoSo2, 'meta'>, c
   if (qs.every((q) => lyDoKhongPhucVu(hs.meta.get(q)) !== null || boQua?.tuLuan.has(q))) return 'xong'
   return 'chua_nap_duoc'
 }
-/**
- * 06/10 (cổng cuối loại câu NGHI sai đáp án — chan-khac-khoi.ts): mọi câu còn lại của kế hoạch đều đang nghi ⇒ lượt rỗng là do cổng, không phải lỗi tải. Đệm 60 s đã nóng
- * (cổng vừa đọc) ⇒ không thêm truy vấn. Dùng để nói "hết câu hôm nay" thay vì "chưa tải được câu" + nhật ký máy cho từng em.
- */
-async function conToanCauNghi(env: Env, khoa: readonly string[]): Promise<boolean> {
-  if (!khoa.length) return false
-  const nghi = await docCauNghiDem(env)
-  return nghi.size > 0 && khoa.every((k) => nghi.has(tachSongSinh(qidGoc(k)).goc))
-}
 /** Lời báo hết câu có nhắc câu tạm hoãn vì ca (không lộ câu nào). */
 const loiTamHoan = (n: number): string => (n > 0 ? ` Còn ${n} câu đang dùng cho ca kiểm tra, để dành hôm khác.` : '')
 
@@ -274,13 +264,12 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const dangChoSom = env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0
       AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).first<Row>().catch(() => null)
   const hdSom = hoSoDangSom(env, sbd)
-  void docCauNghiDem(env) // 06/10: danh sách câu nghi đáp án cho cổng cuối — đọc SỚM, cùng đợt với kế hoạch (đệm 60 s; không bao giờ ném) ⇒ cổng không thêm đợt nối tiếp
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   const tamHoan = kh.tamHoan?.ca ?? 0
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
   if (kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
   // OMNI 3: ngày chưa có câu nào mà em đang ở chế độ chờ bài mới (`hs.omni` chỉ có khi OMNI bật cho em) ⇒ lời báo "chờ thầy giao bài mới".
-  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
+  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong || kh.tamHoan?.nghi ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
   const dangCho = await dangChoSom
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
@@ -303,8 +292,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const nhanSom = batDauNhanNo(env, sbd, hs)
   const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua, { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan] }, nhanSom.khiCoLuot), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
-    let lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
-    if (lyDo === 'chua_nap_duoc' && !boQua.loiLo && await conToanCauNghi(env, kh.conDao)) lyDo = 'xong'
+    const lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.`, ...tomTat }
     if (lyDo === 'chua_nap_duoc') {
       logChuaNap('dao', sbd, kh.conDao, hs, boQua)
@@ -342,7 +330,6 @@ export async function startDao2CoVe(env: Env, sbd: string, b: Row, nowMs: number
 /** Phiên câu riêng của em cho MỘT chặng Đoàn (gọi nội bộ từ `taoNguoi`). Chặng ít câu ôn thì ngắn lại, không độn câu. */
 export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const hdSom = hoSoDangSom(env, sbd)
-  void docCauNghiDem(env) // 06/10: như startDao2 — đọc sớm danh sách câu nghi cho cổng cuối
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
   if (!kh.conDoan.length) return { ok: true, questions: [], lyDo: 'xong_on_hom_nay', message: kh.conDao.length ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : `Hôm nay em không còn câu ôn nào.${loiTamHoan(kh.tamHoan?.ca ?? 0)} Mai quay lại hộ tống nhé.` }
   // Câu đã nằm trong một phiên Đoàn chưa chốt hết của hôm nay thì không phát lại ở phiên khác.
@@ -366,8 +353,7 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   if (!chon.length) { const lai = new Set(chanCa); for (const q of chanBia) lai.add(q); chon = await napLuot(env, hs, kh.conDoan, lai, suc, SO_CAU_CHANG, false, boQua, lamLai, nhanSom.khiCoLuot) } // phiên cũ bỏ dở: phát lại
   chon = await chanKhacKhoiEm(env, 'doan2', { sbd, meta: hs.meta }, chon, { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
-    let lyDo = lyDoLuotRong(kh.conDoan, hs, chanCa, chanBia, boQua)
-    if (lyDo === 'chua_nap_duoc' && !boQua.loiLo && await conToanCauNghi(env, kh.conDoan)) lyDo = 'xong'
+    const lyDo = lyDoLuotRong(kh.conDoan, hs, chanCa, chanBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_on_hom_nay', message: kh.conDao.length ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : `Hôm nay em không còn câu ôn nào.${loiTamHoan(kh.tamHoan?.ca ?? 0)} Mai quay lại hộ tống nhé.` }
     if (lyDo === 'chua_nap_duoc') {
       logChuaNap('doan', sbd, kh.conDoan, hs, boQua)

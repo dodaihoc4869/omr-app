@@ -13,7 +13,7 @@ import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { D1PreparedStatement, D1Result, Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
-import { chanMetaKhacKhoi, docKhoiEmCong } from './chan-khac-khoi'
+import { chanMetaKhacKhoi, docCauNghiDem, docKhoiEmCong } from './chan-khac-khoi'
 import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import {
@@ -918,9 +918,10 @@ export interface KeHoachDaChot {
   /**
    * Câu còn lại TẠM HOÃN hôm nay (sửa lỗi 29/09 "Đảo báo nhầm ca kiểm tra", rương kẹt 42/46): đã bỏ khỏi `dao/doan/con*` và `tong`.
    * `ca` = đang bảo vệ cho ca kiểm tra chưa công bố (`protectedQuestions`), `kho` = đã rút khỏi kho / JSON không nạp được,
-   * `tuLuan` (30/09) = chỉ mục nay xem là câu tự luận (không phục vụ, lặng lẽ bỏ). Vắng = không có câu nào.
+   * `tuLuan` (30/09) = chỉ mục nay xem là câu tự luận (không phục vụ, lặng lẽ bỏ), `nghi` (06/10) = đang NGHI sai đáp án (`cau_nghi_dap_an` — cổng cuối của em cũng không phát câu ấy,
+   * nên bỏ khỏi kế hoạch để em không kẹt "còn N câu" / rương không mở được tới khi thầy chốt câu nghi). Vắng = không có câu nào.
    */
-  tamHoan?: { ca: number; kho: number; tuLuan?: number }
+  tamHoan?: { ca: number; kho: number; tuLuan?: number; nghi?: number }
   /** OMNI 3 (chỉ khi OMNI bật): qid câu ÔN BÀI CŨ của kế hoạch hôm nay (bảng phụ `srs2_ke_hoach_omni`) — Sảnh đếm "Hôm nay ôn bài cũ: N câu". */
   onBaiCu?: string[]
 }
@@ -990,8 +991,9 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
   // 29/09 (cao điểm 20h–24h): tập câu bảo vệ ca thi (dùng chung mọi em, đệm 5 s trong isolate) đọc SONG SONG với kế hoạch — trước: một đợt D1 nối tiếp sau kế hoạch.
   // `chanTruoc` (chỉ-thêm 30/09): nơi gọi đã bắt đầu đọc tập ấy (Sảnh cần lại cho Thử sức thêm) ⇒ dùng chung, không đọc hai lần.
   const chanSom = chanTruoc ?? protectedQuestions(env).catch(() => new Set<string>())
+  const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch (đệm 60 s trong isolate; không bao giờ ném)
   const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc)
-  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom), hs: r.hs }
+  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom), hs: r.hs }
 }
 
 /** Câu CÒN LẠI không phục vụ được vì kho: đã rút / JSON không nạp được (`kho`) hay chỉ mục nay xem là tự luận (`tuLuan`). Câu bị ca khoá KHÔNG tính ở đây. */
@@ -1000,19 +1002,20 @@ export const lyDoKhongPhucVu = (m: MetaCau | undefined): 'kho' | 'tuLuan' | null
  * Bỏ câu CÒN LẠI đang bị ca khoá / đã rút khỏi kho / tự luận (30/09) khỏi kế hoạch (câu đã làm giữ nguyên) — thể lực, rương, trần Bi-a đều theo `tong` sau khi bỏ.
  * Lỗi đọc bảo vệ ⇒ không bỏ câu ca (nơi phát câu vẫn tự chặn). Không ghi gì vào `srs2_ke_hoach`.
  */
-export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>, chanSom?: Promise<Set<string>>): Promise<KeHoachDaChot> {
+export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>, chanSom?: Promise<Set<string>>, nghiSom?: Promise<ReadonlySet<string>>): Promise<KeHoachDaChot> {
   if (!kh.conDao.length && !kh.conDoan.length) return kh
-  const chan = await (chanSom ?? protectedQuestions(env).catch(() => new Set<string>()))
-  let ca = 0, kho = 0, tuLuan = 0
+  // 06/10: câu đang NGHI sai đáp án cũng tạm hoãn (cổng cuối của em không phát — chan-khac-khoi.ts): không bỏ khỏi kế hoạch thì "còn N câu" mãi, rương không mở. Đọc đệm 60 s, lỗi ⇒ rỗng.
+  const [chan, nghi] = await Promise.all([chanSom ?? protectedQuestions(env).catch(() => new Set<string>()), nghiSom ?? docCauNghiDem(env)])
+  let ca = 0, kho = 0, tuLuan = 0, nghiSo = 0
   const bo = new Set<string>()
   for (const k of [...kh.conDao, ...kh.conDoan]) {
     const q = qidGoc(k), m = hs.meta.get(q)
     const ly = lyDoKhongPhucVu(m)
-    if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(m!.group)) { bo.add(k); ca++ }
+    if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(m!.group)) { bo.add(k); ca++ } else if (nghi.has(tachSongSinh(q).goc)) { bo.add(k); nghiSo++ }
   }
   if (!bo.size) return kh
   const dao = kh.dao.filter((k) => !bo.has(k)), doan = kh.doan.filter((k) => !bo.has(k))
-  return { ...kh, dao, doan, tong: dao.length + doan.length, conDao: kh.conDao.filter((k) => !bo.has(k)), conDoan: kh.conDoan.filter((k) => !bo.has(k)), tamHoan: { ca, kho, ...(tuLuan ? { tuLuan } : {}) } }
+  return { ...kh, dao, doan, tong: dao.length + doan.length, conDao: kh.conDao.filter((k) => !bo.has(k)), conDoan: kh.conDoan.filter((k) => !bo.has(k)), tamHoan: { ca, kho, ...(tuLuan ? { tuLuan } : {}), ...(nghiSo ? { nghi: nghiSo } : {}) } }
 }
 
 /**
@@ -1479,9 +1482,10 @@ const cungMang = (a: readonly string[], b: readonly string[]): boolean => a.leng
 export async function thuSucThem(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const ngay = ngayVnCua(nowMs)
   const chanSom = protectedQuestions(env).catch(() => new Set<string>())
+  const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch
   const [goc, ruong] = await Promise.all([layKeHoachChot(env, sbd, nowMs, undefined, chanSom), docRuongHomNay(env, sbd, ngay)])
   const hs = goc.hs
-  const kh = await tamHoanCauKhoa(env, goc.kh, hs, chanSom)
+  const kh = await tamHoanCauKhoa(env, goc.kh, hs, chanSom, nghiSom)
   const t = tinhThuSucThem(kh, hs, !!ruong, await chanSom)
   if (!t.duoc) return { ok: false, ma: t.lyDo, error: LOI_THU_SUC[t.lyDo!] }
   const cd = hs.chienDich!
