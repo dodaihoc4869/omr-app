@@ -17,6 +17,10 @@ export function BangRutThuDaDung({ rt, dang, loi, tenCua, onChayLai }: { rt: Rut
   const hien = moHet ? dong : dong.slice(0, 12)
   const tong = rt ? Object.keys(rt.kq.theoEm).length : 0
   const khongCau = rt ? Object.entries(rt.kq.theoEm).filter(([, ds]) => ds.length === 0).map(([s]) => s) : []
+  // Em được BÙ câu từ kho (thầy 05/10): chưa làm đúng đủ câu ⇒ câu khác trong kho ca cùng mức độ; bù nhiều trước.
+  const emBu = rt ? Object.entries(rt.kq.bu ?? {}).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])) : []
+  const [moBu, setMoBu] = useState(false)
+  const hienBu = moBu ? emBu : emBu.slice(0, 12)
   return (
     <section data-khoi="rut-thu-da-dung" aria-label="Xem trước phân bổ" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k2)', padding: 'var(--k4)', borderRadius: 'var(--bo-2)', background: 'var(--the)' }}>
       <div className="flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
@@ -25,7 +29,7 @@ export function BangRutThuDaDung({ rt, dang, loi, tenCua, onChayLai }: { rt: Rut
           Chạy thử lại
         </button>
       </div>
-      <div style={NHAN_NHO}>Kiểm chứng câu đã đúng · Chạy thử — chưa phát cho em. Mỗi em chỉ nhận câu chính em đã tự làm đúng trong các chiến dịch.</div>
+      <div style={NHAN_NHO}>Kiểm chứng câu đã đúng · Chạy thử — chưa phát cho em. Mỗi em nhận câu chính em đã tự làm đúng trong các chiến dịch; thiếu thì bù câu khác trong kho ca cùng mức độ.</div>
       {dang && !rt ? (
         <div style={NHAN_NHO} role="status">Đang chạy thử bộ câu cho từng em…</div>
       ) : loi && !rt ? (
@@ -39,15 +43,26 @@ export function BangRutThuDaDung({ rt, dang, loi, tenCua, onChayLai }: { rt: Rut
           </div>
           {khongCau.length > 0 && (
             <div style={{ ...NHAN_NHO, color: 'var(--do)' }}>
-              <b style={SO}>{khongCau.length}</b> em chưa có câu nào đã làm đúng — không vào được ca này: {khongCau.map(ten).join(' · ')}
+              <b style={SO}>{khongCau.length}</b> em chưa có bộ câu vì kho ca trống — máy em sẽ nhận đề chung của ca: {khongCau.map(ten).join(' · ')}
+            </div>
+          )}
+          {emBu.length > 0 && (
+            <div data-khoi="em-bu-da-dung" style={NHAN_NHO}>
+              <b style={SO}>{emBu.length}</b> em chưa làm đúng đủ câu — đã bù câu khác trong kho cùng mức độ (câu bù không có nhãn “đã làm đúng”):{' '}
+              <span style={{ color: 'var(--muc)' }}>{hienBu.map(([s, n]) => `${ten(s)} (${n} câu bù)`).join(' · ')}</span>
+              {emBu.length > hienBu.length && (
+                <button type="button" className="tap-target" onClick={() => setMoBu(true)} style={{ ...NHAN_NHO, textDecoration: 'underline', marginLeft: 'var(--k2)' }}>
+                  Xem thêm {emBu.length - hienBu.length} em
+                </button>
+              )}
             </div>
           )}
           {dong.length === 0 ? (
-            <div style={NHAN_NHO}>Mọi em đủ câu đã làm đúng cho từng ô của ma trận.</div>
+            emBu.length === 0 && <div style={NHAN_NHO}>Mọi em đủ câu đã làm đúng cho từng ô của ma trận.</div>
           ) : (
             <>
               <div style={NHAN_NHO}>
-                <b style={SO}>{emThieu.length}</b> em thiếu câu — ô thiếu để trống, không lấp câu em chưa làm đúng:
+                <b style={SO}>{emThieu.length}</b> em vẫn thiếu câu sau khi bù vì kho ca không đủ câu cùng phần:
               </div>
               <ul data-khoi="em-thieu-da-dung" style={{ ...NHAN_NHO, color: 'var(--muc)', margin: 0, paddingLeft: 'var(--k4)' }}>
                 {hien.map((d) => (

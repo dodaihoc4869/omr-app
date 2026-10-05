@@ -371,8 +371,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             {chuPhanBo(phanBoDaDung)}
           </div>
           <OThongBao tone="xanh">
-            Em nào chưa làm đúng đủ câu ở một ô thì app lấy câu em đã đúng cùng phần, mức độ gần nhất; vẫn thiếu thì ô đó để trống — không lấp bằng câu em chưa làm đúng. Ca tự bật phòng chờ; thầy xem
-            trước em nào thiếu câu ở màn Theo dõi ca trước khi bấm Bắt đầu thi.
+            Em nào chưa làm đúng đủ câu ở một ô thì app bù câu khác trong kho ca cùng mức độ (câu bù không có nhãn “đã làm đúng”); em chưa làm đúng câu nào vẫn vào thi với đề bù đủ câu. Ca tự bật
+            phòng chờ; thầy xem trước em nào được bù bao nhiêu câu ở màn Theo dõi ca trước khi bấm Bắt đầu thi.
           </OThongBao>
         </div>
       ) : lenBang ? (

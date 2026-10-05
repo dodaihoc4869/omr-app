@@ -10,15 +10,16 @@
 //      server/src/cau-da-dung.ts). Câu đúng rồi sau đó lại sai VẪN vào nguồn (mục đích là kiểm chứng); số lần đúng/sai ghi kèm cho thầy.
 //   2. Số câu của ca chia theo TỶ LỆ ma trận 2026 (MA_TRAN_HOA_2026): trước chia số câu từng PHẦN theo 18 : 4 : 6, rồi trong mỗi phần
 //      chia theo mức độ của phần ấy — cả hai bước bằng phần dư lớn nhất ⇒ tổng luôn đúng bằng số câu ca; ca 28 câu ⇒ đúng y ma trận.
-//   3. Thiếu câu đúng ở một ô ⇒ lấy câu em đã đúng cùng PHẦN, mức độ gần nhất; vẫn thiếu ⇒ ô để TRỐNG và báo thầy. KHÔNG BAO GIỜ
-//      lấp bằng câu em chưa từng làm đúng (thầy: "chỉ chọn câu làm đúng").
+//   3. Thiếu câu đúng ở một ô (thầy 05/10: "không rút đủ câu đúng thì bù câu khác trong kho mức độ tương đương", em không bị chặn):
+//      (a) câu KHÁC trong kho ca CÙNG phần, CÙNG mức độ; (b) câu em đã đúng cùng phần, mức gần nhất; (c) câu kho cùng phần, mức gần
+//      nhất; hết sạch mới để trống. Câu bù KHÔNG mang nhãn "đã làm đúng" (không ghi sai sự thật cho em); thầy thấy số câu bù từng em.
 //   4. Bốc NGẪU NHIÊN có hạt giống (mã ca + SBD) ⇒ chấm lại tái tạo được; câu nhiều em cùng có xoay vòng theo số em đã nhận ⇒ hai em
 //      ngồi cạnh khác nhau khi kho đủ.
 //   5. Nhãn mỗi câu = nơi của LẦN ĐÚNG GẦN NHẤT + ngày + mức độ ("Ca Kiểm tra tuần 3 · 28/09 · Thông hiểu"). Không mã nội bộ.
-// GIẢ ĐỊNH ĐÃ CHỐT: "đã làm đúng ở ca nào" = nơi của lần đúng gần nhất; câu đúng rồi sai lại vẫn vào nguồn; thiếu câu thì để trống ô
-// và báo, không lấp câu chưa đúng.
+// GIẢ ĐỊNH ĐÃ CHỐT: "đã làm đúng ở ca nào" = nơi của lần đúng gần nhất; câu đúng rồi sai lại vẫn vào nguồn; thiếu câu đúng thì bù câu
+// kho mức độ tương đương (luật 3) — em chưa đúng câu nào vẫn có đủ đề.
 import { MA_TRAN_HOA_2026 } from './ma-tran-hoa-2026'
-import { bam, PHAN_V2, type PhanV2 } from './rut-de-v2'
+import { bam, PHAN_V2, type CauKhoV2, type PhanV2 } from './rut-de-v2'
 
 export const CHE_DO_DA_DUNG = 'da_dung' as const
 export type MucMaTran = 'biet' | 'hieu' | 'van_dung'
@@ -118,6 +119,15 @@ export interface CauRutDaDung {
   /** Mức của ô câu này lấp (khác `mucDo` ⇒ ô mượn mức gần nhất). */
   mucO: string
   lechMuc?: boolean
+  /** Câu BÙ từ kho (em chưa làm đúng câu này) — không nhãn "đã làm đúng". */
+  bu?: boolean
+}
+
+/** Một câu trong kho ca dùng để BÙ (luật 3) — đã bỏ tự luận và câu song sinh ở nơi gọi. */
+export interface CauKhoBu {
+  qid: string
+  phan: PhanV2
+  mucDo: string
 }
 
 export interface ThieuDaDung {
@@ -136,13 +146,17 @@ export interface DauVaoDaDung {
   seed: string
   /** Số em đã nhận mỗi câu (lượt rút trước) — rút thêm cho em vào sau vẫn xoay vòng. */
   daDung?: Record<string, number>
+  /** Kho ca để BÙ khi em không đủ câu đã đúng (luật 3). Vắng ⇒ không bù (ô thiếu để trống). */
+  khoBu?: readonly CauKhoBu[]
 }
 
 export interface KetQuaDaDung {
   phanBo: PhanBoMaTran
   theoEm: Record<string, CauRutDaDung[]>
-  /** sbd → ô để trống (em chưa làm đúng đủ câu). */
+  /** sbd → ô vẫn TRỐNG sau khi đã bù (kho ca không còn câu cùng phần). */
   thieu: Record<string, ThieuDaDung[]>
+  /** sbd → số câu BÙ từ kho (em chưa làm đúng đủ câu) — báo thầy. */
+  bu: Record<string, number>
   /** sbd → qid → nhãn hiện cho em. */
   nhan: Record<string, Record<string, string>>
   /** sbd → qid → [số lần đúng, số lần sai] (chỉ thầy xem). */
@@ -155,11 +169,17 @@ const viTriMuc = (m: string): number => {
   return i < 0 ? MUC_MA_TRAN.length : i
 }
 
+/** Kho ca (`khoTuNguon` — đã bỏ tự luận) ⇒ câu dùng để BÙ: bỏ câu song sinh (song sinh chỉ dùng chữa lỗi của chính câu gốc). */
+export function khoBuTuKho(kho: readonly Pick<CauKhoV2, 'id' | 'phan' | 'mucDo' | 'songSinhCua'>[]): CauKhoBu[] {
+  return kho.filter((c) => !c.songSinhCua).map((c) => ({ qid: c.id, phan: c.phan, mucDo: c.mucDo }))
+}
+
 /** Rút cho cả danh sách em. Tất định theo (nguồn, seed, thứ tự dsSbd đã sắp, daDung). */
 export function rutDeDaDung(dv: DauVaoDaDung): KetQuaDaDung {
   const phanBo = phanBoMaTran2026(dv.tongCau)
   const daDung: Record<string, number> = { ...(dv.daDung ?? {}) }
-  const ra: KetQuaDaDung = { phanBo, theoEm: {}, thieu: {}, nhan: {}, dem: {}, daDung }
+  const ra: KetQuaDaDung = { phanBo, theoEm: {}, thieu: {}, bu: {}, nhan: {}, dem: {}, daDung }
+  const khoBu = [...new Map((dv.khoBu ?? []).filter((c) => c && c.qid && PHAN_V2.includes(c.phan)).map((c) => [c.qid, c] as const)).values()]
   const dsSbd = [...new Set(dv.dsSbd.map((s) => String(s).trim()).filter(Boolean))].sort()
   for (const sbd of dsSbd) {
     const hat = bam(`${dv.seed}|${sbd}`)
@@ -179,54 +199,84 @@ export function rutDeDaDung(dv: DauVaoDaDung): KetQuaDaDung {
         daDung[c.qid] = (daDung[c.qid] ?? 0) + 1
         cuaP.push({ qid: c.qid, phan: p, mucDo: c.mucDo, mucO, ...(c.mucDo !== mucO ? { lechMuc: true } : {}) })
       }
-      // (1) đúng mức trước cho MỌI ô của phần — ô mượn mức không được giành câu của ô đúng mức.
+      const nhanBu = (c: CauKhoBu, mucO: MucMaTran) => {
+        chon.add(c.qid)
+        daDung[c.qid] = (daDung[c.qid] ?? 0) + 1
+        cuaP.push({ qid: c.qid, phan: p, mucDo: c.mucDo, mucO, bu: true, ...(c.mucDo !== mucO ? { lechMuc: true } : {}) })
+      }
+      const buP = khoBu.filter((c) => c.phan === p && !theoId.has(c.qid)).sort((a, b) => diem(a.qid) - diem(b.qid) || a.qid.localeCompare(b.qid))
+      const gan = (mucCau: string, m: MucMaTran) => Math.abs(viTriMuc(mucCau) - viTriMuc(m)) * 2 + (viTriMuc(mucCau) > viTriMuc(m) ? 1 : 0)
+      // (1) câu em đã đúng, ĐÚNG mức — cho MỌI ô của phần trước (ô mượn mức không giành câu của ô đúng mức).
       for (const m of MUC_MA_TRAN) {
         for (const c of dsP) {
           if (can[m] <= 0) break
           if (c.mucDo === m && !chon.has(c.qid)) { nhan(c, m); can[m]-- }
         }
       }
-      // (2) còn thiếu ⇒ câu em đã đúng cùng phần, mức độ gần nhất (hoà ⇒ mức thấp hơn trước); câu chưa gắn mức xếp cuối.
+      // (2) còn thiếu ⇒ BÙ câu khác trong kho ca CÙNG mức độ (thầy 05/10: "bù câu khác trong kho mức độ tương đương").
+      for (const m of MUC_MA_TRAN) {
+        for (const c of buP) {
+          if (can[m] <= 0) break
+          if (c.mucDo === m && !chon.has(c.qid)) { nhanBu(c, m); can[m]-- }
+        }
+      }
+      // (3) vẫn thiếu ⇒ câu em đã đúng cùng phần, mức gần nhất (hoà ⇒ mức thấp hơn trước); câu chưa gắn mức xếp cuối;
+      // (4) rồi câu kho cùng phần, mức gần nhất; (5) hết sạch ⇒ để trống và báo.
       for (const m of MUC_MA_TRAN) {
         while (can[m] > 0) {
           let best: CauDaDung | undefined
           let bk = Infinity
           for (const c of dsP) {
             if (chon.has(c.qid)) continue
-            const k = Math.abs(viTriMuc(c.mucDo) - viTriMuc(m)) * 2 + (viTriMuc(c.mucDo) > viTriMuc(m) ? 1 : 0)
+            const k = gan(c.mucDo, m)
             if (k < bk) { bk = k; best = c }
           }
           if (!best) break
           nhan(best, m)
           can[m]--
         }
-        // (3) vẫn thiếu ⇒ để TRỐNG và báo — không lấp câu em chưa từng làm đúng.
+        while (can[m] > 0) {
+          let best: CauKhoBu | undefined
+          let bk = Infinity
+          for (const c of buP) {
+            if (chon.has(c.qid)) continue
+            const k = gan(c.mucDo, m)
+            if (k < bk) { bk = k; best = c }
+          }
+          if (!best) break
+          nhanBu(best, m)
+          can[m]--
+        }
         if (can[m] > 0) thieu.push({ phan: p, mucDo: m, so: can[m] })
       }
       bo.push(...cuaP)
     }
     ra.theoEm[sbd] = bo
     if (thieu.length > 0) ra.thieu[sbd] = thieu
-    ra.nhan[sbd] = Object.fromEntries(bo.map((c) => [c.qid, theoId.get(c.qid)!.nhan]))
-    ra.dem[sbd] = Object.fromEntries(bo.map((c) => [c.qid, [theoId.get(c.qid)!.soLanDung, theoId.get(c.qid)!.soLanSai] as [number, number]]))
+    const soBu = bo.filter((c) => c.bu).length
+    if (soBu > 0) ra.bu[sbd] = soBu
+    // Câu bù: nhãn rỗng (máy em không in "Em đã làm đúng") và đúng/sai cũ 0·0.
+    ra.nhan[sbd] = Object.fromEntries(bo.map((c) => [c.qid, c.bu ? '' : theoId.get(c.qid)!.nhan]))
+    ra.dem[sbd] = Object.fromEntries(bo.map((c) => [c.qid, c.bu ? [0, 0] as [number, number] : [theoId.get(c.qid)!.soLanDung, theoId.get(c.qid)!.soLanSai] as [number, number]]))
   }
   return ra
 }
 
-/** Câu báo thầy cho một em thiếu: gộp theo phần — "An thiếu 2 câu Phần III vì chưa làm đúng đủ". */
+/** Câu báo thầy cho một em còn ô trống SAU KHI ĐÃ BÙ: gộp theo phần — "An thiếu 2 câu Phần III vì kho ca không đủ câu". */
 export function chuThieuDaDung(ten: string, ds: readonly ThieuDaDung[]): string[] {
   const theoPhan = new Map<PhanV2, number>()
   for (const t of ds) theoPhan.set(t.phan, (theoPhan.get(t.phan) ?? 0) + t.so)
-  return PHAN_V2.filter((p) => (theoPhan.get(p) ?? 0) > 0).map((p) => `${ten} thiếu ${theoPhan.get(p)} câu Phần ${p} vì chưa làm đúng đủ`)
+  return PHAN_V2.filter((p) => (theoPhan.get(p) ?? 0) > 0).map((p) => `${ten} thiếu ${theoPhan.get(p)} câu Phần ${p} vì kho ca không đủ câu`)
 }
 
 /** Gộp lượt rút thêm (em vào phòng sau) vào kết quả chạy thử — em đã có bộ GIỮ NGUYÊN. */
 export function gopKetQuaDaDung(cu: KetQuaDaDung, them: KetQuaDaDung): KetQuaDaDung {
-  const ra: KetQuaDaDung = { ...cu, theoEm: { ...cu.theoEm }, thieu: { ...cu.thieu }, nhan: { ...cu.nhan }, dem: { ...cu.dem }, daDung: { ...them.daDung } }
+  const ra: KetQuaDaDung = { ...cu, theoEm: { ...cu.theoEm }, thieu: { ...cu.thieu }, bu: { ...(cu.bu ?? {}) }, nhan: { ...cu.nhan }, dem: { ...cu.dem }, daDung: { ...them.daDung } }
   for (const [sbd, ds] of Object.entries(them.theoEm)) {
     if (ra.theoEm[sbd]) continue
     ra.theoEm[sbd] = ds
     if (them.thieu[sbd]) ra.thieu[sbd] = them.thieu[sbd]!
+    if (them.bu?.[sbd]) ra.bu[sbd] = them.bu[sbd]!
     ra.nhan[sbd] = them.nhan[sbd] ?? {}
     ra.dem[sbd] = them.dem[sbd] ?? {}
   }
@@ -241,7 +291,8 @@ export function banDoDaDung(kq: Pick<KetQuaDaDung, 'theoEm' | 'nhan' | 'dem'>): 
   for (const [sbd, ds] of Object.entries(kq.theoEm)) {
     if (ds.length === 0) continue
     bo[sbd] = ds.map((c) => c.qid)
-    daDung[sbd] = Object.fromEntries(ds.map((c) => [c.qid, kq.nhan[sbd]?.[c.qid] ?? '']))
+    // Câu BÙ (nhãn rỗng) không vào bảng nhãn — máy em chỉ in "Em đã làm đúng" cho câu thật sự đã đúng.
+    daDung[sbd] = Object.fromEntries(ds.map((c) => [c.qid, kq.nhan[sbd]?.[c.qid] ?? '']).filter(([, n]) => n))
     demDaDung[sbd] = Object.fromEntries(ds.map((c) => [c.qid, kq.dem[sbd]?.[c.qid] ?? [0, 0]]))
   }
   return { bo, daDung, demDaDung }

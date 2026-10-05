@@ -15,7 +15,7 @@ import { chuanMucDo } from './rut-de-v2'
 import { xoaDemCaBaoVe } from './game-v2-bank'
 import { docKeyBankDem } from './dem-ca-thi'
 import { khoTuNguon, type NguonV2, type PhanV2 } from '../../src/lib/rut-de-v2'
-import { banDoDaDung, rutDeDaDung, taoNhanDaDung, type CauDaDung } from '../../src/lib/rut-de-da-dung'
+import { banDoDaDung, khoBuTuKho, rutDeDaDung, taoNhanDaDung, type CauDaDung } from '../../src/lib/rut-de-da-dung'
 
 type Obj = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim())
@@ -198,8 +198,8 @@ export function nguonDaDungTrongKho(ds: readonly CauDaDungRa[], theoId: Readonly
   return ra
 }
 
-/** Em vào phòng sau khi chốt ở ca "Kiểm chứng câu đã đúng" ⇒ lấp riêng từ câu em đã đúng CÓ TRONG kho đáp án của ca.
- * Em không có câu nào dùng được ⇒ `null` (chỗ gọi chặn `thieu_bo_cau` — không phát câu em chưa từng làm đúng). */
+/** Em vào phòng sau khi chốt ở ca "Kiểm chứng câu đã đúng" ⇒ lấp riêng từ câu em đã đúng CÓ TRONG kho đáp án của ca; thiếu (kể cả em
+ * chưa đúng câu nào) ⇒ BÙ câu khác trong kho ca cùng mức độ (thầy 05/10 — em không bị chặn). Kho ca trống ⇒ `null`. */
 export async function lapBoDaDungChoEmVaoMuon(env: Env, maCa: string, sbd: string, soCauJson: unknown, nowMs: number): Promise<Obj | null> {
   if (!SBD_DUONG_JSON.test(sbd) || !env.DE) return null
   let tong = 0
@@ -216,8 +216,7 @@ export async function lapBoDaDungChoEmVaoMuon(env: Env, maCa: string, sbd: strin
   if (theoId.size === 0) return null
   const em = (await docCauDaDung(env, [sbd]))[sbd] ?? []
   const nguon = nguonDaDungTrongKho(em, theoId)
-  if (nguon.length === 0) return null
-  const kq = rutDeDaDung({ nguon: { [sbd]: nguon }, dsSbd: [sbd], tongCau: tong, seed: maCa })
+  const kq = rutDeDaDung({ nguon: { [sbd]: nguon }, dsSbd: [sbd], tongCau: tong, seed: maCa, khoBu: khoBuTuKho([...theoId.values()]) })
   const bd = banDoDaDung(kq)
   const bo = bd.bo[sbd]
   if (!bo || bo.length === 0) return null
