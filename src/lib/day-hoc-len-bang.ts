@@ -6,6 +6,7 @@ import { chuongCuaDe, thuMucCuaDe } from './cay-chon-de'
 import { laCauTuLuan } from './cau-tu-luan'
 import { laMucDayHocDacBiet } from './tach-phan-de'
 import { qidMayChuCuaIdCau } from './lich-su-cau-len-bang'
+import { khoaCau } from './khu-trung-cau'
 import type { MucDo } from './chon-em-day-hoc'
 
 export const TEN_THU_MUC_DAY_HOC = 'DẠY HỌC'
@@ -69,15 +70,20 @@ export interface CauDayHoc {
   tuLuan: boolean
 }
 
-/** Mọi câu của các đề đã tích, theo thứ tự kho (phần I → II → III), không trùng câu, KHÔNG bỏ câu tự luận. */
-export function cauTuDeChon(ds: readonly TeacherExamSource[], maChon: ReadonlySet<string>): CauDayHoc[] {
+/** Mọi câu của các đề đã tích, theo thứ tự kho (phần I → II → III), không trùng câu (cả trùng mã lẫn TRÙNG NỘI DUNG), KHÔNG bỏ câu tự luận. */
+/** `khuTrungNoiDung` = false: giữ MỌI bản (kho tra theo qid của Kiểm tra đầu giờ — em có thể đã làm đúng ở bản thứ hai). */
+export function cauTuDeChon(ds: readonly TeacherExamSource[], maChon: ReadonlySet<string>, khuTrungNoiDung = true): CauDayHoc[] {
   const ra: CauDayHoc[] = []
   const daCo = new Set<string>()
   for (const s of ds) {
     if (!maChon.has(s.maDe)) continue
     const them = (phan: CauDayHoc['phan'], q: CauGocDayHoc) => {
       if (!q || daCo.has(q.id)) return
+      // Câu TRÙNG NỘI DUNG (chép ở nhiều đề) chỉ hiện một lần (thầy 05/10) — khoá `khoaCau` (thân đề + phương án/ý).
+      const kNd = khuTrungNoiDung && String((q as { text?: string }).text ?? '').trim() ? `nd:${khoaCau(q as { text: string; choices?: string[]; ideas?: string[] })}` : ''
+      if (kNd && daCo.has(kNd)) return
       daCo.add(q.id)
+      if (kNd) daCo.add(kNd)
       ra.push({
         khoa: q.id,
         qid: qidMayChuCuaIdCau(q.id) ?? q.id,

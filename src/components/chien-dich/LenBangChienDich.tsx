@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { chuThieuNoiDung } from '../../lib/tra-cau-chieu'
 import KhungXemPhieu from '../KhungXemPhieu'
-import { chuaXong, danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
+import { chuaXong, qidCuaDong, danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
 import { hienNgay, mocHetHan } from './ngay'
@@ -122,12 +122,14 @@ export default function LenBangChienDich() {
   // Nút "Thầy chữa" trên tờ (thầy 05/10): chiến dịch ghi bằng ĐÚNG lệnh "Chữa xong" (`chua-xong` một câu) — câu quay lại Đoàn Hộ Tống của cả lớp từ hôm sau.
   const thayChuaO = useCallback(
     async (o: { qid: string }) => {
-      const r = await chuaXong(chonId, [o.qid])
+      // Câu gộp từ nhiều bản trùng nội dung ⇒ mở khoá đủ cả nhóm (bảng chiến dịch + buổi chữa đều mang `qidCung`).
+      const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
+      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid])
       if (!r.ok) return { ok: false as const, chu: r.chu }
       void tai(chonId, coMat)
       return { ok: true as const }
     },
-    [chonId, coMat, tai],
+    [chonId, coMat, tai, bang, buoi],
   )
   const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId, undefined, thayChuaO)
   const moChieu = async (dsO: OChieu[], tenBuoi: string): Promise<boolean> => {

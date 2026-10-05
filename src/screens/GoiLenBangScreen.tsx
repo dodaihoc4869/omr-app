@@ -30,7 +30,7 @@ import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
-import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
+import { baiLamTuCa, boCauTrungNoiDung, boTrungTrongBanDe, cauTuBanDe, khoaNoiDungBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
 import { rutDeChua } from '../lib/rut-de-chua'
 import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
@@ -543,14 +543,15 @@ function GoiLenBangCu() {
   const bankThem: BanDeCa = useMemo(() => {
     // Thầy tự chọn thì BỎ HẲN kho tự nạp: gộp cả hai là bảng chữa lại đầy câu
     // máy chọn, đúng chỗ thầy vừa kêu.
-    if (cachLayCau === 'theo_dang') return bankTheoDang
-    if (cachLayCau === 'btvn_gan_nhat') return bankTichTay
+    // CÂU TRÙNG NỘI DUNG (cùng câu chép ở nhiều đề) chỉ hiện MỘT lần (thầy 05/10).
+    if (cachLayCau === 'theo_dang') return boTrungTrongBanDe(bankTheoDang)
+    if (cachLayCau === 'btvn_gan_nhat') return boTrungTrongBanDe(bankTichTay)
     const san = cachLayCau === 'san' ? du?.khoChua : null
-    return {
+    return boTrungTrongBanDe({
       phanI: [...(san?.phanI ?? []), ...bankTichTay.phanI],
       phanII: [...(san?.phanII ?? []), ...bankTichTay.phanII],
       phanIII: [...(san?.phanIII ?? []), ...bankTichTay.phanIII],
-    }
+    })
   }, [du, bankTichTay, cachLayCau, bankTheoDang])
 
   /** NẠP BTVN ĐÃ GIAO CHO CA NÀY (ĐỂ CHỌN CHỮA BTVN GẦN NHẤT) */
@@ -593,12 +594,15 @@ function GoiLenBangCu() {
    * dòng cùng ghi "Phần I câu 3" là thầy đọc nhầm câu ngay trên lớp. */
   const dsCau: CauChua[] = useMemo(() => {
     // THẦY TỰ CHỌN BÀI hoặc CHỌN BTVN GẦN NHẤT ⇒ CHỈ chữa đúng những câu đó.
+    // `bankThem` đã bỏ câu trùng nội dung trong nó; dưới đây bỏ thêm câu thêm TRÙNG câu của ca (câu của ca luôn giữ) — thầy 05/10.
     if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(bankThem)
+    const khoaThem = khoaNoiDungBanDe(bankThem)
 
     const cuaCa = du ? cauTuBanDe(du.bank) : []
     const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
     const daCo = new Set(cuaCa.map((c) => c.id))
-    return [...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))]
+    const khoa = new Map([...khoaThem, ...(du ? khoaNoiDungBanDe(du.bank) : [])])
+    return boCauTrungNoiDung([...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))], khoa, daCo)
   }, [du, bankThem, cachLayCau])
   const baiLam = useMemo(() => (du ? baiLamTuCa(du.bank, du.maCa, du.luot) : []), [du])
   const dsEmCa = useMemo(() => (du ? emTuCa(du.luot, du.hoSo, dsCau, daGoiCau, vang) : []), [du, dsCau, daGoiCau, vang])

@@ -14,7 +14,7 @@ import { hoiXacNhan } from '../hop-thoai'
 import { useGhiToChieu, type GhiMotO } from '../chien-dich/ghi-to-chieu'
 import { dungToChieuDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
 import { chonLuotDauGio, ngayNganVn, TOI_DA_EM_MOI_LUOT } from '../../lib/dau-gio'
-import { cauTheoQid, locUngVienTheoKho } from '../../lib/dau-gio-kho'
+import { cauTheoQid, khoaNoiDungTheoKho, locUngVienTheoKho } from '../../lib/dau-gio-kho'
 import { chamCau, chotLuot, ghiDaChua, ketThucDauGio, layLichSuHoi, layUngVien, xemDauGio, type LichSuHoi, type LuotHoi } from '../../lib/dau-gio-api'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { BuocDiemDanh, tenNgan, useDiemDanhBuoi } from './DiemDanhBuoi'
@@ -145,7 +145,7 @@ export default function KiemTraDauGio() {
         showToast(r.chu, 'error')
         return
       }
-      const chon = chonLuotDauGio(locUngVienTheoKho(r.du.em, k), { daGoi: new Set(r.du.daGoi), cauDaDung: new Set(r.du.cauDaDung) })
+      const chon = chonLuotDauGio(locUngVienTheoKho(r.du.em, k), { daGoi: new Set(r.du.daGoi), cauDaDung: new Set(r.du.cauDaDung), khoaNoiDung: khoaNoiDungTheoKho(k) })
       if (!chon.length) {
         showToast(
           r.du.em.length ? 'Không còn em có mặt nào có câu đã làm đúng mà chưa hỏi ở đầu giờ.' : 'Mọi em có mặt đã được gọi trong buổi này.',
