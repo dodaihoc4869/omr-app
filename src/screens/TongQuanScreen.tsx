@@ -324,6 +324,8 @@ export default function TongQuanScreen() {
                 {viec.length === 0 ? (
                   <p className="gv2-nhat">Không có việc cần làm ngay.</p>
                 ) : (
+                  // Hộp cuộn (thầy 05/10): danh sách dài không đẩy cả trang xuống.
+                  <div className="gv2-viec-cuon" tabIndex={0} role="region" aria-label={`Việc cần làm · ${viec.length} việc`}>
                   <ul className="gv2-viec">
                     {viec.map((v) => {
                       const Icon = v.icon
@@ -343,6 +345,7 @@ export default function TongQuanScreen() {
                       )
                     })}
                   </ul>
+                  </div>
                 )}
               </section>
             </div>

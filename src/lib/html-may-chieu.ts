@@ -25,7 +25,7 @@ import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
 import { CSS_BO_CUC, jsBoCuc } from './bo-cuc-to-chieu'
 import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, mauHaoQuang } from './giao-dien-to-chieu'
 import type { NhanLichSuCau } from './lich-su-cau-len-bang'
-import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
+import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu, mangNutThayChua } from './to-chieu-cau-noi'
 import { CSS_LEN_BANG_MOI, jsLenBangMoi, thongKeHtml, type ThongKeLopCau } from './len-bang-moi-to-chieu'
 import { laCauTuLuan } from './cau-tu-luan'
 
@@ -109,6 +109,8 @@ export interface TuyChonMayChieu {
    * riêng (tệp đã lưu, tab riêng): khi ấy không có ai để ghi. Không có `cauNoi` thì tờ không có nút, mã phiên,
    * kiểu chữ hay script cầu nối nào. Xem `to-chieu-cau-noi.ts`. */
   cauNoi?: { maPhien: string }
+  /** Nút X "Ai sai câu này" (thầy 05/10): mặc định CÓ khi tờ có cầu nối, TRỪ tờ Dạy học (`dayHoc` hoặc `nutAiSai: false`). */
+  nutAiSai?: boolean
   /** Ngân sách buổi (phút) — chữ "Buổi: x/N phút" ở thanh dưới. Thiếu thì chỉ ghi số phút đã trôi. */
   nganSachPhut?: number
 }
@@ -337,7 +339,10 @@ function gioCuaO(o: OBang, dayHoc: boolean): { lam: number; chua: number; lam0: 
 /** Hai nút Đạt / Không đạt của một ô — chỉ khi tờ được dựng kèm `cauNoi` và ô có `qid`. Mảnh markup, CSS và JS nằm
  * ở `to-chieu-cau-noi.ts` (tờ chiếu chỉ việc đặt mảnh này ở đâu thầy muốn). TẾ NHỊ TRƯỚC LỚP: xem ghi chú ở đó. */
 function chamHtml(o: OBang, cauNoi: boolean): string {
-  return cauNoi && o.qid ? mangNutChamToChieu(khoaToChieu(o.sbd, o.qid)) : ''
+  if (!cauNoi || !o.qid) return ''
+  const khoa = khoaToChieu(o.sbd, o.qid)
+  // + nút "Thầy chữa" (thầy 05/10, mọi tờ chiếu): không gọi em nữa, câu tính là thầy đã chữa.
+  return mangNutChamToChieu(khoa) + mangNutThayChua(khoa)
 }
 
 /** MỘT ĐỢT = MỘT CÂU MỘT EM (bản vẽ Lên bảng 28/09 — bỏ đợt đôi ½ bảng): 2/3 bảng chiếu đề (+ lời giải), 1/3 cột em lên làm. */
@@ -1101,6 +1106,8 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   }
   const soDot = dot.length
   const nganSach = Math.max(0, Math.round(Number(tuyChon.nganSachPhut) || 0))
+  // Nút X "Ai sai" (thầy 05/10): chỉ khi tờ có cầu nối, TRỪ tờ Dạy học.
+  const coAiSai = !!tuyChon.cauNoi?.maPhien && !tuyChon.dayHoc && tuyChon.nutAiSai !== false
 
   // THANH DƯỚI: đợt k/n · trạng thái · nút gọi lên bảng · ghi chú · cài đặt.
   const than = `<div class="mc-thanh" id="mc-thanh">
@@ -1112,7 +1119,8 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   <span class="mc-pha" id="mc-pha"></span>
   <button type="button" id="mc-len-bang">Lên bảng</button>
   <div class="mc-phim-nhom" id="mc-phim-nhom">
-    <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
+    <button type="button" class="mc-nut-phim" data-k="C" hidden><kbd>C</kbd><span class="mc-nut-chu">Thầy chữa</span></button>
+${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kbd>X</kbd><span class="mc-nut-chu">Ai sai</span></button>\n' : ''}    <button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>
     <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>

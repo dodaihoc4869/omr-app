@@ -422,6 +422,18 @@
 }
 
 /* việc cần làm */
+/* Hộp cuộn "Việc cần làm" (thầy 05/10): cao tối đa ~5 việc, cuộn trong hộp. */
+.gv2-viec-cuon {
+  max-height: 420px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 4px;
+  border-radius: 14px;
+}
+.gv2-viec-cuon:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 2px;
+}
 .gv2-viec {
   display: flex;
   flex-direction: column;
