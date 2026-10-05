@@ -56,7 +56,7 @@ export function ketQuaTungY(chon: string, dapAn: string): (0 | 1)[] {
   const a = str(chon).trim().toUpperCase(), d = str(dapAn).trim().toUpperCase()
   return [0, 1, 2, 3].map((i) => (a[i] === 'D' || a[i] === 'S') && a[i] === d[i] ? 1 : 0)
 }
-/** qid GỐC cho OMNI (bỏ hậu tố lần-trong-ngày `#n` rồi hậu tố song sinh `~ss0|1`). */
+/** qid GỐC cho OMNI (bỏ hậu tố lần-trong-ngày `#n` rồi hậu tố song sinh `~ss0..3`). */
 export const qidGocOmni = (qid: string): string => tachSongSinh(qidGoc(str(qid))).goc
 /** Mã tờ GỐC (bỏ hậu tố phần `-TN/-DS/-TLN`). */
 export const maDeGoc = (maDe: string): string => str(maDe).trim().replace(/-(?:TN|DS|TLN)$/i, '')
@@ -73,7 +73,8 @@ export function tuanVnCua(ms: number): string {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - lui)).toISOString().slice(0, 10)
 }
 /** Bậc của mức độ câu: Nhận biết 0 · Thông hiểu 1 · Vận dụng 2 · Vận dụng cao 3 (bảng `HANG_MUC_DO` của srs2); lạ ⇒ null. */
-const bacMuc = (m: string | null | undefined): number | null => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : null)
+/** Bậc mức độ 0..3 (NB/TH/VD/VDC) hoặc null. (export 05/10: cau-anh-em.ts dùng chung bộ chọn "câu lạ cùng dạng".) */
+export const bacMuc = (m: string | null | undefined): number | null => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : null)
 
 // ---------------------------------------------------------------- phiên game (phần OMNI đọc)
 export interface RefOmni { qid: string; maDe: string; version: string; group: string; novel?: boolean; role?: string }
@@ -330,8 +331,10 @@ const DDL_OMNI_GAME = [
 export const damBaoBangOmniGame = (env: Env): Promise<void> => chayDdlMotLan(env, 'omni_game_b3', DDL_OMNI_GAME)
 
 /** Phạm vi chọn câu: tờ của BÀI ĐÃ DẠY (bai-da-day `phamViCuaEm`: bài đã tick + bài đứng trước); lớp chưa tick bài nào ⇒ tờ của các chiến dịch thầy đã giao em. */
-interface PhamViChon { coMa(maDe: string): boolean; maTo: string[] }
-async function phamViChon(env: Env, sbd: string): Promise<PhamViChon> {
+// Bộ chọn "câu lạ cùng dạng" (phạm vi · bối cảnh · hợp lệ chung · meta theo dạng · xếp ứng viên · nạp theo thứ tự) EXPORT từ 05/10 để
+// cau-anh-em.ts (làm lại câu sai bằng CÂU ANH EM) dùng lại đúng một bộ — không chép lại.
+export interface PhamViChon { coMa(maDe: string): boolean; maTo: string[] }
+export async function phamViChon(env: Env, sbd: string): Promise<PhamViChon> {
   const pv = await phamViCuaEm(env, sbd).catch(() => null)
   const goc = pv && pv.maDe.size
     ? new Set([...pv.maDe].map(maDeGoc))
@@ -339,8 +342,8 @@ async function phamViChon(env: Env, sbd: string): Promise<PhamViChon> {
   return { coMa: (m) => goc.has(maDeGoc(m)), maTo: [...goc].flatMap((g) => [g, `${g}-TN`, `${g}-DS`, `${g}-TLN`]) }
 }
 /** Bối cảnh lọc chung: câu bảo vệ ca thi (theo qid HOẶC nhóm nội dung), bài tập về nhà chưa nộp, khối em, câu đã làm (qid gốc → lần gần nhất). */
-interface BoiCanh { chan: Set<string>; khoiEm: Khoi | null; daLam: Map<string, number>; dauNgayMs: number }
-async function boiCanh(env: Env, sbd: string, nowMs: number): Promise<BoiCanh> {
+export interface BoiCanh { chan: Set<string>; khoiEm: Khoi | null; daLam: Map<string, number>; dauNgayMs: number }
+export async function boiCanh(env: Env, sbd: string, nowMs: number): Promise<BoiCanh> {
   const [ca, btvn, khoiEm, daLamTho] = await Promise.all([
     protectedQuestions(env), // lỗi ⇒ ném (thà không phát câu còn hơn lộ câu ca thi)
     docCauBtvnChuaNop(env, sbd).catch(() => new Set<string>()),
@@ -351,8 +354,8 @@ async function boiCanh(env: Env, sbd: string, nowMs: number): Promise<BoiCanh> {
   for (const [q, t] of daLamTho) { const g = qidGocOmni(q); daLam.set(g, Math.max(daLam.get(g) ?? 0, t)) }
   return { chan: new Set([...ca, ...btvn]), khoiEm, daLam, dauNgayMs: Date.parse(`${ngayVnCua(nowMs)}T00:00:00+07:00`) }
 }
-const hopLeChung = (m: MetaCau, bc: BoiCanh): boolean => !m.tuLuan && !bc.chan.has(m.qid) && !bc.chan.has(m.group) && cauHopKhoi(bc.khoiEm, m)
-const lamHomNay = (qid: string, bc: BoiCanh): boolean => (bc.daLam.get(qid) ?? -1) >= bc.dauNgayMs
+export const hopLeChung = (m: MetaCau, bc: BoiCanh): boolean => !m.tuLuan && !bc.chan.has(m.qid) && !bc.chan.has(m.group) && cauHopKhoi(bc.khoiEm, m)
+export const lamHomNay = (qid: string, bc: BoiCanh): boolean => (bc.daLam.get(qid) ?? -1) >= bc.dauNgayMs
 const laThat = (v: unknown): boolean => v === 1 || v === true || v === '1' || v === 'true'
 
 /** Dòng chỉ mục → siêu dữ liệu câu ĐƯỢC PHÉP: trong phạm vi, đã duyệt, thư mục DẠY HỌC (`de_kho_thu_muc`, thiếu ⇒ luật mã `DH-`), không tự luận. */
@@ -364,7 +367,7 @@ async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon): Promi
   return [...meta.values()].filter((m) => pv.coMa(m.maDe) && (thuMuc.get(m.maDe) ?? thuMucTheoMa(m.maDe)) === 'DAY_HOC' && !m.tuLuan)
 }
 const SQL_CHI_MUC = "SELECT qid, ma_de, json_extract(json,'$.reviewed') AS rv FROM game_v2_question"
-async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon): Promise<MetaCau[]> {
+export async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon): Promise<MetaCau[]> {
   const r = await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()
   return metaTuDong(env, r.results ?? [], pv)
 }
@@ -377,14 +380,14 @@ async function metaTheoPhamVi(env: Env, pv: PhamViChon): Promise<MetaCau[]> {
   return metaTuDong(env, rows, pv)
 }
 /** Xếp ứng viên tất định: khoảng cách bậc → hạng phụ → CHƯA GẶP trước → gặp lâu nhất trước → băm; mỗi nhóm nội dung một câu. */
-function xepUngVien(ds: readonly MetaCau[], bc: BoiCanh, khoang: (m: MetaCau) => number, muoi: string, phu: (m: MetaCau) => number = () => 0): MetaCau[] {
+export function xepUngVien(ds: readonly MetaCau[], bc: BoiCanh, khoang: (m: MetaCau) => number, muoi: string, phu: (m: MetaCau) => number = () => 0): MetaCau[] {
   const khoa = (m: MetaCau) => [khoang(m), phu(m), bc.daLam.has(m.qid) ? 1 : 0, bc.daLam.get(m.qid) ?? 0, bam32(`${muoi}|${m.qid}`)]
   const ra = [...ds].sort((a, b) => { const x = khoa(a), y = khoa(b); for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return x[i]! - y[i]!; return 0 })
   const nhom = new Set<string>()
   return ra.filter((m) => { if (nhom.has(m.group)) return false; nhom.add(m.group); return true })
 }
 /** Nạp bản đầy đủ theo thứ tự, bỏ câu vắng (đã sửa/rút) và câu tự luận; tối đa `toiDa`. */
-async function napTheoThuTu(env: Env, ds: readonly MetaCau[], toiDa: number, boNhom?: Set<string>): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
+export async function napTheoThuTu(env: Env, ds: readonly MetaCau[], toiDa: number, boNhom?: Set<string>): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
   const ra: { q: PrivateQuestion; m: MetaCau }[] = []
   let i = 0
   while (ra.length < toiDa && i < ds.length) {

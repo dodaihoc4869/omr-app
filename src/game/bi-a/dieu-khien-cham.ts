@@ -4,7 +4,7 @@
 // Chống rung khi nhấc ngón: bỏ dịch chuyển < 3 px (vùng chết), lúc nhấc lấy góc tại thời điểm ≥ 80 ms trước đó. Không đổi vật lý/luật/giao thức.
 import { nhamInfo } from './du-doan'
 import { chuanGoc, gocToi, type Diem } from './gay'
-import { A_LAN, A_TRUOT, R, VMAX, type Ban } from './vat-ly'
+import { A_LAN, A_TRUOT, R, VMAX, VMIN, type Ban } from './vat-ly'
 
 // ───────────── thanh lực ─────────────
 /** Vùng "Huỷ" ở đầu thanh: thả tay khi còn trong vùng này ⇒ KHÔNG đánh, góc giữ nguyên. */
@@ -37,7 +37,7 @@ export function quangDuongDung(v: number): number {
 export function lucChoQuangDuong(L: number): number {
   const k = (1 - 25 / 49) / (2 * A_TRUOT) + (25 / 49) / (2 * A_LAN)
   const v = Math.sqrt((Math.max(0, L) + V_DUNG * V_DUNG / (2 * A_LAN)) / k)
-  const x = (v / VMAX - 0.05) / 0.95
+  const x = (v - VMIN) / (VMAX - VMIN)
   if (x <= 0) return 0.02
   return Math.max(0.02, Math.min(1, Math.pow(x, 1 / 1.2)))
 }

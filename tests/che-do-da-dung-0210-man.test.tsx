@@ -59,7 +59,7 @@ describe('khối Bộ câu ra đề — chip "Kiểm chứng câu đã đúng"',
   })
 })
 
-describe('chạy thử / chốt — chỉ câu em đã đúng, nhãn theo kho, thiếu ⇒ báo', () => {
+describe('chạy thử / chốt — câu em đã đúng trước, thiếu ⇒ BÙ câu kho cùng mức độ (thầy 05/10), kho cạn ⇒ báo', () => {
   it('em A đủ Phần I, thiếu Phần III; câu ngoài kho ca lấy từ kho máy thầy rồi nối vào ca; câu tự luận và câu không có nội dung bị bỏ', async () => {
     loadSessionTeacherBank.mockResolvedValue([{ maDe: 'D', phanI: Array.from({ length: 12 }, (_, i) => mcq(`D-I-${i}`, i < 6 ? 'biet' : i < 9 ? 'hieu' : 'van_dung')), phanII: [], phanIII: [] }])
     docSoCauCa.mockResolvedValue({ I: 7, II: 1, III: 2 }) // 10 câu
@@ -79,22 +79,32 @@ describe('chạy thử / chốt — chỉ câu em đã đúng, nhãn theo kho, t
     const d0 = boA.find((c) => c.qid === 'D-I-0')
     if (d0) expect(rt.kq.nhan.A!['D-I-0']).toBe('Ca Kiểm tra tuần 3 · 28/09 · Nhận biết')
     expect(rt.kq.nhan.A!['NGOAI-1']).toBe('Chiến dịch Ôn chương 1 (Đảo thần thú) · 28/09 · Vận dụng')
-    expect(rt.kq.thieu.A!.reduce((n, t) => n + t.so, 0)).toBe(2) // 1 câu Phần II + 1 câu Phần III
-    expect(rt.kq.theoEm.B).toEqual([])
+    expect(rt.kq.thieu.A!.reduce((n, t) => n + t.so, 0)).toBe(2) // kho ca KHÔNG có câu Phần II/III để bù ⇒ vẫn thiếu 1 + 1
+    expect(rt.kq.bu.A).toBeUndefined() // Phần I đủ câu đã đúng, không cần bù
+    // B chưa đúng câu nào ⇒ KHÔNG bị chặn: Phần I bù đủ 7 câu từ kho ca (cùng mức độ), câu bù không có nhãn "đã làm đúng".
+    const boB = rt.kq.theoEm.B!
+    expect(boB.filter((c) => c.phan === 'I')).toHaveLength(7)
+    expect(boB.every((c) => c.bu === true && c.mucDo === c.mucO)).toBe(true)
+    expect(rt.kq.bu.B).toBe(7)
+    expect(Object.values(rt.kq.nhan.B!).every((n) => n === '')).toBe(true)
+    expect(rt.kq.thieu.B!.reduce((n, t) => n + t.so, 0)).toBe(3) // Phần II 1 + Phần III 2: kho ca không có câu
 
     render(<BangRutThuDaDung rt={rt} dang={false} loi="" tenCua={{ A: 'An', B: 'Bình' }} onChayLai={() => {}} />)
-    expect(screen.getByText('An thiếu 1 câu Phần II vì chưa làm đúng đủ')).toBeTruthy()
-    expect(screen.getByText('An thiếu 1 câu Phần III vì chưa làm đúng đủ')).toBeTruthy()
-    expect(screen.getByText(/chưa có câu nào đã làm đúng/)).toBeTruthy()
+    expect(screen.getByText('An thiếu 1 câu Phần II vì kho ca không đủ câu')).toBeTruthy()
+    expect(screen.getByText('An thiếu 1 câu Phần III vì kho ca không đủ câu')).toBeTruthy()
+    expect(screen.getByText(/đã bù câu khác trong kho cùng mức độ/)).toBeTruthy()
+    expect(screen.getByText(/Bình \(7 câu bù\)/)).toBeTruthy()
+    expect(screen.queryByText(/không vào được ca này/)).toBeNull()
 
     const chot = await chotRutDeDaDung('', 'MAT', 'CADD', ['A', 'B'], { ngay: '2026-10-02' })
     expect(chot.boTheoEm.A).toEqual(boA.map((c) => c.qid))
-    expect(chot.boTheoEm.B).toBeUndefined()
+    expect(chot.boTheoEm.B).toEqual(boB.map((c) => c.qid))
+    expect(chot.banDoDaDung.daDung.B ?? {}).toEqual({}) // câu bù không mang nhãn "đã làm đúng"
     expect(chot.banDoDaDung.daDung.A!['NGOAI-1']).toMatch(/Đảo thần thú/)
     expect(chot.banDoDaDung.demDaDung.A!['NGOAI-1']).toEqual([2, 1])
     expect(chot.soCauNoiThem).toBe(1)
     expect(noiKhoCa).toHaveBeenCalledTimes(1)
-    expect(chot.canhBao.join(' ')).toMatch(/chưa làm đúng đủ câu/)
+    expect(chot.canhBao.join(' ')).toMatch(/chưa làm đúng đủ câu — đã bù câu khác trong kho ca cùng mức độ/)
   })
 })
 

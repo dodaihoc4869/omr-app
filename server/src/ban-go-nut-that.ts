@@ -16,7 +16,8 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import { damBaoBangNutThat, type TrangThaiNut } from './nut-that'
 import { docBoTro, type BoTro } from './cau-bo-tro'
-import { phatLaiLoi, tachSongSinh, TU_NGAY, type LanLamLoi } from './loi-hoc-luat'
+import { cacQidSongSinh, phatLaiLoi, tachSongSinh, TU_NGAY, type LanLamLoi } from './loi-hoc-luat'
+import { SQL_TC } from './lam-lai-so'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -66,6 +67,17 @@ const TOI_DA_NOI_DUNG = 4000
 
 interface DongSo { sbd: string; goc: string; luc: string; ngayVn: string; ketQua: 0 | 1 | null; coHoTro: boolean; songSinh: boolean; nguon: string; chon: string }
 
+/** Câu gốc mà dòng câu anh em làm thay (`raw_json.tc`, lam-lai-so.ts); không có ⇒ ''. */
+function tcTuRaw(raw: unknown): string {
+  if (!raw) return ''
+  try {
+    const j = JSON.parse(str(raw)) as Obj
+    return typeof j.tc === 'string' ? j.tc : ''
+  } catch {
+    return ''
+  }
+}
+
 /** Đáp án em chọn đọc từ `raw_json` (`{chon}` hoặc `{traLoi}`) — như ho-so-em-chieu.ts. */
 function chonTuRaw(raw: unknown): string {
   if (!raw) return ''
@@ -78,7 +90,7 @@ function chonTuRaw(raw: unknown): string {
 }
 
 /**
- * Các lần làm (từ `TU_NGAY`) của các cặp (em, câu gốc), kể cả song sinh `<qid>~ss0|1` và hậu tố lượt game `#n`. MỘT truy vấn (danh sách
+ * Các lần làm (từ `TU_NGAY`) của các cặp (em, câu gốc), kể cả song sinh `<qid>~ss0..3` và hậu tố lượt game `#n`. MỘT truy vấn (danh sách
  * em và danh sách qid đi qua `json_each`, mỗi thứ một tham số). Bỏ sự kiện bị che (ca chưa công bố). Cột chuẩn chưa có ⇒ đọc bản cũ.
  */
 async function docSo(env: Env, cap: readonly { sbd: string; goc: string }[]): Promise<Map<string, DongSo[]>> {
@@ -86,31 +98,35 @@ async function docSo(env: Env, cap: readonly { sbd: string; goc: string }[]): Pr
   if (!cap.length) return ra
   const sbds = [...new Set(cap.map((x) => x.sbd))]
   const gocs = [...new Set(cap.map((x) => x.goc))]
-  const qids = gocs.flatMap((g) => [g, `${g}~ss0`, `${g}~ss1`])
+  const qids = gocs.flatMap(cacQidSongSinh)
   const can = new Set(cap.map((x) => `${x.sbd}|${x.goc}`))
-  // Tham số đánh số: ?1 danh sách em, ?2 danh sách qid (gốc + song sinh), ?3 mốc ngày.
-  const loc = `sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?3
-      AND (qid IN (SELECT value FROM json_each(?2)) OR (instr(qid, '#') > 0 AND substr(qid, 1, instr(qid, '#') - 1) IN (SELECT value FROM json_each(?2))))`
+  // Tham số đánh số: ?1 danh sách em, ?2 danh sách qid (gốc + song sinh), ?3 mốc ngày, ?4 (chỉ bản mới) danh sách câu gốc cho dòng "thay cho".
+  const loc = (tc: string) => `sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?3
+      AND (qid IN (SELECT value FROM json_each(?2)) OR (instr(qid, '#') > 0 AND substr(qid, 1, instr(qid, '#') - 1) IN (SELECT value FROM json_each(?2)))${tc})`
+  // 05/10 (cau-anh-em.ts): dòng CÂU ANH EM làm thay câu gốc (`raw_json.tc`) là một lượt song sinh của câu gốc — như docLanLam của em, để thẻ
+  // đóng ('xong') khi em đã sửa câu bằng câu anh em, không nằm chờ thầy chữa.
   const sqlMoi = `SELECT sbd, qid, ket_qua, luc, ngay_vn, nguon, assistance, purpose, raw_json FROM su_kien_hoc
-    WHERE ${loc} AND COALESCE(visibility, '') <> 'embargoed' ORDER BY luc`
-  const sqlCu = `SELECT sbd, qid, ket_qua, luc, ngay_vn, nguon FROM su_kien_hoc WHERE ${loc} ORDER BY luc`
+    WHERE ${loc(` OR (${SQL_TC} IS NOT NULL AND ${SQL_TC} IN (SELECT value FROM json_each(?4)))`)} AND COALESCE(visibility, '') <> 'embargoed' ORDER BY luc`
+  const sqlCu = `SELECT sbd, qid, ket_qua, luc, ngay_vn, nguon FROM su_kien_hoc WHERE ${loc('')} ORDER BY luc`
   const tham = [JSON.stringify(sbds), JSON.stringify(qids), TU_NGAY]
-  const rows = (await hoiAnToan(env, sqlMoi, ...tham)) ?? (await hoiAnToan(env, sqlCu, ...tham)) ?? []
+  const rows = (await hoiAnToan(env, sqlMoi, ...tham, JSON.stringify(gocs))) ?? (await hoiAnToan(env, sqlCu, ...tham)) ?? []
   for (const x of rows) {
     const t = tachSongSinh(str(x.qid))
-    const k = `${str(x.sbd)}|${t.goc}`
-    if (!can.has(k)) continue
     const nguon = str(x.nguon)
     const kq = x.ket_qua === null || x.ket_qua === undefined ? null : num(x.ket_qua) === 1 ? 1 : 0
     // Bỏ trống chỉ tính sai ở ca kiểm tra (kênh khác NULL có thể là "chưa làm") — đúng luật hàng chữa lỗi.
     if (kq === null && nguon !== 'thi') continue
-    const d: DongSo = {
-      sbd: str(x.sbd), goc: t.goc, luc: str(x.luc), ngayVn: str(x.ngay_vn), ketQua: kq,
+    const chung: Omit<DongSo, 'goc' | 'songSinh' | 'chon'> = {
+      sbd: str(x.sbd), luc: str(x.luc), ngayVn: str(x.ngay_vn), ketQua: kq,
       // OMNI 3: dòng lướt (purpose 'luot') không phải một lần làm — như đọc lời giải: không tính đúng, không tính sai.
-      coHoTro: str(x.assistance) === 'assisted' || str(x.purpose) === 'xem_loi_giai' || str(x.purpose) === MUC_DICH_LUOT,
-      songSinh: t.songSinh !== null, nguon, chon: chonTuRaw(x.raw_json),
+      coHoTro: str(x.assistance) === 'assisted' || str(x.purpose) === 'xem_loi_giai' || str(x.purpose) === MUC_DICH_LUOT, nguon,
     }
-    ra.set(k, [...(ra.get(k) ?? []), d])
+    const k = `${str(x.sbd)}|${t.goc}`
+    if (can.has(k)) ra.set(k, [...(ra.get(k) ?? []), { ...chung, goc: t.goc, songSinh: t.songSinh !== null, chon: chonTuRaw(x.raw_json) }])
+    const tc = tcTuRaw(x.raw_json)
+    const kTc = `${str(x.sbd)}|${tc}`
+    // Đáp án em chọn ở dòng câu anh em là của câu KHÁC ⇒ không đưa lên thẻ câu gốc.
+    if (tc && tc !== t.goc && can.has(kTc)) ra.set(kTc, [...(ra.get(kTc) ?? []), { ...chung, goc: tc, songSinh: true, chon: '' }])
   }
   return ra
 }

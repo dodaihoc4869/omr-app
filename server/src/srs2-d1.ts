@@ -7,7 +7,8 @@ import { gopDocD1 } from './doc-d1-theo-luot'
 import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
-import { tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
+import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
+import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC } from './lam-lai-so'
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { Env } from './kieu'
@@ -330,21 +331,23 @@ export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map
 /** Lần làm của em với các câu (mọi nguồn). Bỏ sự kiện CHE (ca chưa công bố); bỏ trống tính là sai; `assistance='assisted'` ⇒ có gợi ý. */
 export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = ''): Promise<LanLam[]> {
   if (!qids.length) return []
-  // Vòng học v2 (02/10): lần làm câu SONG SINH ("<gốc>~ss0|1") là lần làm của chính câu gốc (cùng cách giải, đổi số) ⇒ đọc kèm, quy về gốc.
+  // Vòng học v2 (02/10): lần làm câu SONG SINH ("<gốc>~ss0..3") là lần làm của chính câu gốc (cùng cách giải, đổi số) ⇒ đọc kèm, quy về gốc.
+  // 05/10 (lam-lai-so.ts): dòng CÂU ANH EM làm thay cho câu gốc (`raw_json.tc = gốc`) đọc kèm, coi là lượt song sinh của câu gốc.
   const goc = [...new Set(qids)]
-  const ds = JSON.stringify(goc.flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`]))
+  const ds = JSON.stringify(goc.flatMap(cacQidSongSinh)), dsGoc = JSON.stringify(goc)
   let rows: Row[]
   try {
     // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT (`SQL_LA_LAN_LAM`) — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ? AND ${SQL_LA_LAN_LAM}`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
+    rows = (await env.DB.prepare(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd = ?1', `luc >= ?4 AND ${SQL_LA_LAN_LAM}`)).bind(sbd, ds, dsGoc, tuLuc).all<Row>()).results ?? []
   } catch {
     rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   }
-  return rows.filter((x) => str(x.visibility) !== 'embargoed').map(lanLamTuDong)
+  const tap = new Set(goc)
+  return rows.filter((x) => str(x.visibility) !== 'embargoed').flatMap((x) => lanLamTuDongTc(x, lanLamTuDong, tap))
 }
 /** Một dòng sổ → lần làm (kèm `nguon` — chỉ-thêm 29/09: `dau_gio` Đạt ⇒ thành thạo ngay). */
 export const lanLamTuDong = (x: Row): LanLam => ({
-  qid: str(x.qid).replace(/~ss[01]$/, ''), ...(/~ss[01]$/.test(str(x.qid)) ? { songSinh: true as const } : {}), ngay: str(x.ngay_vn), luc: str(x.luc), dung: Number(x.ket_qua) === 1, coGoiY: str(x.assistance) === 'assisted',
+  qid: str(x.qid).replace(/~ss\d+$/, ''), ...(/~ss\d+$/.test(str(x.qid)) ? { songSinh: true as const } : {}), ngay: str(x.ngay_vn), luc: str(x.luc), dung: Number(x.ket_qua) === 1, coGoiY: str(x.assistance) === 'assisted',
   ...(x.nguon != null && str(x.nguon) ? { nguon: str(x.nguon) } : {}),
 })
 
@@ -401,8 +404,14 @@ export interface HoSo2 {
   qidSaiV2?: Set<string>
   /** Trạng thái theo luật đóng lỗi chung của các câu là lỗi. */
   loiV2?: Map<string, KetQuaLoi>
-  /** Câu nên phục vụ bằng song sinh ở lượt tới ⇒ chỉ số song sinh (0|1). */
+  /** Câu nên phục vụ bằng song sinh ở lượt tới ⇒ chỉ số song sinh (0 … TRAN_SONG_SINH − 1). */
   songSinhCho?: Map<string, number>
+  /**
+   * 05/10 "làm lại câu sai bằng bản khác" (cau-anh-em.ts, chỉ dùng khi khoá `lam_lai_khac` bật): chỉ số song sinh cho MỌI lượt trong cửa sổ lỗi
+   * (`laCuaSoLoi`) — kể cả lượt chờ kiểm sau khi em đã đúng song sinh, lúc `songSinhCho` (luật 02/10) để câu gốc ra nguyên văn.
+   * CHỈ có khoá khi có ít nhất một câu như vậy (hồ sơ không song sinh giữ nguyên khoá như trước — ảnh chụp omni-3-ke-hoach-co-tat).
+   */
+  songSinhLamLai?: Map<string, number>
   /** Học liệu bổ trợ (song sinh, câu kiểm, nhãn nền) của các câu lỗi. */
   boTro?: Map<string, BoTro>
   // ------------------------------------------------------------ OMNI 3 (05/10) — CHỈ có khi `omniBat(env, sbd)`; cờ tắt ⇒ không khoá nào dưới đây.
@@ -622,7 +631,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const cau: CauSrs[] = []
   const laMoiBo = new Set<string>()
   const loiV2 = new Map<string, KetQuaLoi>()
-  const songSinhCho = new Map<string, number>()
+  const songSinhCho = new Map<string, number>(), songSinhLamLai = new Map<string, number>()
   for (const qid of qids) {
     const m = meta.get(qid)
     if (!m || m.tuLuan) { if (!theoQid.get(qid)?.length) laMoiBo.add(qid); continue } // câu đã rút khỏi kho / câu tự luận (30/09: không vào kế hoạch, không đếm thể lực; meta vẫn giữ để tra)
@@ -630,12 +639,14 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     // VÒNG HỌC v2: câu từng sai tự làm từ 29/09 ⇒ LUẬT ĐÓNG LỖI CHUNG quyết thành thạo / hẹn; lượt làm lại ưu tiên câu song sinh.
     let t = t0
     if (qidSaiMoiKenh.has(qid)) {
-      const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => songSinhDuDuLieu(m.phan, ss) ? [i] : [])
+      // Chỉ chỗ < CHO_SONG_SINH: qid ảo phát ra phải nằm trong danh sách đọc sổ (`cacQidSongSinh`), không thì lượt làm rơi khỏi lịch sử câu gốc.
+      const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => i < CHO_SONG_SINH && songSinhDuDuLieu(m.phan, ss) ? [i] : [])
       const soSS = ssDungDuoc.length
       const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoV2)
       t = ap.t
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
       if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!)
+      if (soSS > 0 && laCuaSoLoi(ap.loi.trangThai)) songSinhLamLai.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!) // 05/10 bậc 1 (cau-anh-em.ts)
     }
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
@@ -672,7 +683,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     ? [...new Set(dsDangChay.flatMap((c) => c.qids))].flatMap((q) => theoQid.get(q) ?? [])
     : dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
   return {
-    chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro,
+    chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro, ...(songSinhLamLai.size ? { songSinhLamLai } : {}),
     ...(omni ? { chienDichHet: dsDangChay, onBaiCu, omni: { bat: true, cheDoCho: !dangChay && !!phamVi && phamVi.baiDaTick.length > 0, onBaiCuSo: onBaiCu.length }, phamVi: phamVi ?? null } : {}),
   }
 }
@@ -834,7 +845,9 @@ export async function docHoSoDangCaLop(env: Env, dsSbd: readonly string[]): Prom
 
 /** Hạng theo dạng của MỘT em từ hồ sơ dạng + lần làm trong chiến dịch (bỏ lượt có gợi ý). Tính lại mỗi lần lập kế hoạch ⇒ tự cập nhật mỗi sáng. */
 export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly LanLam[], meta: ReadonlyMap<string, MetaCau>, qidsChienDich: readonly string[], tuLuc = ''): { hangTheoDang: Record<string, HangEm>; hangChung: HangEm } {
-  const tk = gopThongKeDang(hoSoDang, lanLam.map((x) => ({ dang: meta.get(x.qid)?.dang ?? null, luc: x.luc, dung: x.dung, coGoiY: x.coGoiY })), tuLuc)
+  // 05/10: lượt câu anh em quy về câu gốc (`cauAnhEm`) mà câu anh em cũng thuộc chiến dịch ⇒ đã đếm dưới qid thật (cùng dạng) — bỏ bản quy về để không đếm đôi.
+  const tapCd = new Set(qidsChienDich)
+  const tk = gopThongKeDang(hoSoDang, lanLam.filter((x) => !x.cauAnhEm || !tapCd.has(x.cauAnhEm)).map((x) => ({ dang: meta.get(x.qid)?.dang ?? null, luc: x.luc, dung: x.dung, coGoiY: x.coGoiY })), tuLuc)
   const dangCan = [...new Set(qidsChienDich.map((q) => meta.get(q)?.dang).filter((d): d is string => !!d))]
   return tinhHangTheoDang(tk, dangCan)
 }
@@ -878,13 +891,18 @@ const lanThu = (k: string): number => Number(/#(\d+)$/.exec(k)?.[1] ?? 1)
 
 /** Số lần em đã làm mỗi câu hôm nay trong game. */
 async function docDemHomNay(env: Env, sbd: string, ngay: string): Promise<Map<string, number>> {
-  const r = await env.DB.prepare("SELECT qid, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game' GROUP BY qid").bind(sbd, ngay).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // 05/10: đọc kèm `tc` (câu anh em làm THAY câu gốc — lam-lai-so.ts); CSDL chưa có cột raw_json ⇒ truy vấn cũ.
+  const r = await env.DB.prepare(`SELECT qid, ${SQL_TC} AS tc, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game' GROUP BY qid, ${SQL_TC}`).bind(sbd, ngay).all<Row>()
+    .catch(() => env.DB.prepare("SELECT qid, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game' GROUP BY qid").bind(sbd, ngay).all<Row>())
+    .catch(() => ({ results: [] as Row[] }))
   // Kế hoạch giữ qid gốc, sổ giữ qid biến thể. Cộng vào cùng nhiệm vụ để làm xong
   // câu cuối thì hạ cầu ngay; không sửa lịch sử, điểm hay điều kiện thành thạo.
   const dem = new Map<string, number>()
   for (const x of r.results ?? []) {
-    const q = tachSongSinh(str(x.qid)).goc
-    dem.set(q, (dem.get(q) ?? 0) + (Number(x.n) || 0))
+    const q = tachSongSinh(str(x.qid)).goc, n = Number(x.n) || 0
+    dem.set(q, (dem.get(q) ?? 0) + n)
+    const tc = str(x.tc)
+    if (tc && tc !== q) dem.set(tc, (dem.get(tc) ?? 0) + n) // câu anh em ⇒ tính cho nhiệm vụ của câu gốc nó thay
   }
   return dem
 }

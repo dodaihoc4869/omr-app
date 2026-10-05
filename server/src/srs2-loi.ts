@@ -39,8 +39,10 @@ export interface LanLam {
   luc: string
   dung: boolean
   coGoiY: boolean
-  /** Vòng học v2 (02/10): lần làm CÂU SONG SINH của câu này (qid sổ "<gốc>~ss0|1", đã quy về gốc). */
+  /** Vòng học v2 (02/10): lần làm CÂU SONG SINH của câu này (qid sổ "<gốc>~ss0..3", đã quy về gốc) — hoặc lần làm CÂU ANH EM thay cho câu này (05/10). */
   songSinh?: true
+  /** 05/10 (lam-lai-so.ts): lần làm này là dòng sổ của CÂU ANH EM (qid thật ở đây) quy về câu gốc nó thay — để thống kê gộp không đếm đôi. */
+  cauAnhEm?: string
   /**
    * Nguồn trong sổ (`su_kien_hoc.nguon`, chỉ-thêm 29/09). `'dau_gio'` (Kiểm tra đầu giờ) ĐÚNG ⇒ thầy xác nhận: thành thạo NGAY kể cả
    * câu 2 sao. Vắng ⇒ như nguồn thường.

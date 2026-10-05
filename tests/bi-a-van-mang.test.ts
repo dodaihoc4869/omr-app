@@ -264,7 +264,8 @@ describe('Máy em (VanMang) + phòng đấu thật — đánh đôi 2 người +
     for (let vong = 0; vong < 900 && !A.v!.S.over; vong++) {
       await b.chay([A, B], 1000, rand, () => !!A.v!.S.over)
       // chủ bàn (ghế 0) rớt 40 giây ⇒ máy B (ghế người nhỏ nhất còn nối) chạy A.I thay; A vào lại ⇒ A lại là máy chủ bàn
-      if (!daRot && A.v!.S.soCu >= 6 && !A.v!.S.over) {
+      // rớt đúng lúc tới lượt A.I (không chờ câu hỏi) ⇒ kiểm được A.I vẫn đánh qua máy B, không phụ thuộc diễn biến từng cú
+      if (!daRot && A.v!.S.soCu >= 6 && !A.v!.S.over && trong.includes(A.v!.S.cur) && !A.v!.S.cho.length) {
         daRot = true
         const aiTruoc = trong.reduce((n, i) => n + (b.soCu[i] ?? 0), 0)
         A.rot(); await b.bom()

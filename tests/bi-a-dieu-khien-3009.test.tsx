@@ -96,7 +96,7 @@ describe('vạch vàng "đủ tới bi" — đối chiếu lõi vật lý THẬT
     return ev.firstHit
   }
   it('quãng đường giải tích khớp mô phỏng một bi (sai số < 1 %)', () => {
-    for (const p of [0.05, 0.1, 0.15]) {
+    for (const p of [0.03, 0.06, 0.085]) { // thầy 05/10 nhân đôi lực tối đa ⇒ lực nhỏ hơn để bi còn dừng trên bàn
       const st: Ban = { balls: [biMoi('cue', 250, 880)] }, c = st.balls[0]!
       danhBi(c, 0, -1, p, 0, 0)
       const ev = suKienMoi()

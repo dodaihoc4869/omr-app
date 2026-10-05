@@ -1,10 +1,11 @@
 // AI ĐÃ LÀM SAI CÂU NÀY (thầy 05/10: nút X trên tờ chiếu — "hiển thị ra toàn bộ học sinh đã làm sai câu đó, giờ nào, ca nào, làm trong bao lâu").
 // Lệnh thầy `POST /gv/ai-sai-cau {qids: string[]}` (các bản cùng nội dung của MỘT câu; ≤ 20). CHỈ ĐỌC sổ `su_kien_hoc`:
-//   · lượt TỰ LÀM sai (ket_qua = 0, hoặc bỏ trống ở ca thi), mọi kênh, kể cả câu song sinh (`<qid>~ss0|1`); bỏ sự kiện "đọc lời giải";
+//   · lượt TỰ LÀM sai (ket_qua = 0, hoặc bỏ trống ở ca thi), mọi kênh, kể cả câu song sinh (`<qid>~ss0..3`); bỏ sự kiện "đọc lời giải";
 //   · mỗi lượt: em · lúc · nơi ("Ca <tên ca>" / Đoàn / Bi-a / Lên bảng / Đầu giờ / BTVN…) · số giây làm (sổ có thì lấy; lượt game thì ƯỚC TÍNH, `uocTinh`);
 //   · xếp theo em (tên), trong một em mới trước; tối đa 300 lượt. Chỉ thầy (mã bí mật). Đọc theo chỉ mục `idx_skh_qid` (migration-su-kien-hoc-qid-0510.sql).
 import type { Env } from './kieu'
 import { loaiGameCua } from './dau-gio'
+import { cacQidSongSinh } from './loi-hoc-luat'
 import { tenNguonNgan } from '../../src/lib/dau-gio'
 
 type Row = Record<string, unknown>
@@ -59,8 +60,8 @@ export async function aiSaiCau(env: Env, b: Row): Promise<Row> {
        AND (s.ket_qua = 0 OR (s.ket_qua IS NULL AND s.nguon = 'thi'))
        ${moi ? "AND COALESCE(s.purpose, '') <> 'xem_loi_giai'" : ''}
      ORDER BY s.luc DESC LIMIT ${TOI_DA_LUOT_AI_SAI + 1}`
-  // Câu gốc + hai câu song sinh (`~ss0`, `~ss1`) — danh sách đúng, để đọc theo chỉ mục (không LIKE).
-  const bind = [JSON.stringify(qids.flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`]))]
+  // Câu gốc + mọi câu song sinh (`~ss0` … `~ss3`, `cacQidSongSinh`) — danh sách đúng, để đọc theo chỉ mục (không LIKE).
+  const bind = [JSON.stringify(qids.flatMap(cacQidSongSinh))]
   let rows: Row[]
   try { rows = (await env.DB.prepare(sql(true)).bind(...bind).all<Row>()).results ?? [] } catch {
     rows = (await env.DB.prepare(sql(false)).bind(...bind).all<Row>()).results ?? []

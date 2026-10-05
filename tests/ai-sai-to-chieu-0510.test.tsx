@@ -26,6 +26,15 @@ const o = (sbd: string, qid = `Q-${sbd}`): OBang => ({
   cau: { phan: 'I', id: qid, text: 'Câu ngắn', luaChon: ['A', 'B', 'C', 'D'], dapAn: 'A', buoc: [] } as unknown as OBang['cau'],
 })
 
+describe('tờ dựng: lớp bảng "Ai sai" không trùng thẻ lần làm', () => {
+  it('(05/10, lỗi chồng thẻ) thẻ "Sai" trong lịch sử lần làm là .mc-lanlam.mc-sai — bảng nổi dùng .mc-aisai; không quy tắc nào nhắm .mc-sai trơn', () => {
+    const h = taoHtmlMayChieu([o('A')], { cauNoi: { maPhien: MA } })
+    const css = [...new JSDOM(h).window.document.querySelectorAll('style')].map((x) => x.textContent).join('')
+    expect(css.match(/(^|[^\w.-])\.mc-sai(?![-\w])/g) ?? []).toEqual([])
+    expect(css).toContain('.mc-aisai{position:fixed')
+  })
+})
+
 describe('tờ dựng: nút X', () => {
   it('có cầu nối ⇒ có nút X; không cầu nối / Dạy học / nutAiSai:false ⇒ không dựng nút (không thêm thuộc tính nào lên body)', () => {
     const co = (h: string) => !!new JSDOM(h).window.document.querySelector('#mc-phim-nhom [data-k="X"]')
@@ -70,7 +79,7 @@ describe('tờ chạy thật — nút X', () => {
     const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
     expect(m).toHaveLength(1)
     expect(m[0]).toMatchObject({ khoa: 'A|Q-A', maPhien: MA })
-    const panel = t.doc.querySelector('.mc-sai')!
+    const panel = t.doc.querySelector('.mc-aisai')!
     expect(panel.classList.contains('mc-mo')).toBe(true)
     t.tuCha({
       type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
