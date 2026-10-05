@@ -94,8 +94,9 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
   let banKhac = new Map<string, PrivateQuestion>()
   if (choBanKhac.length) {
     try {
-      const khoiEm = khoiDaLocCua(hs.meta) ?? await docKhoiEmCong(env, bc.sbd).catch(() => null)
-      banKhac = await chonBanKhacMoi(env, choBanKhac, hs.banKhacTiep, khoiEm ?? null)
+      const khoiDaBiet = khoiDaLocCua(hs.meta) // null = em chưa rõ khối (đã lọc rồi ⇒ không đọc lại); undefined = hồ sơ chưa qua bộ lọc khối
+      const khoiEm = khoiDaBiet !== undefined ? khoiDaBiet : await docKhoiEmCong(env, bc.sbd).catch(() => null)
+      banKhac = await chonBanKhacMoi(env, choBanKhac, hs.banKhacTiep, khoiEm)
     } catch (e) { console.error('[cau-anh-em] không chọn được bản khác bằng mã / ý Đ–S mới (rơi xuống bậc 2):', e instanceof Error ? e.message : e) }
   }
   const ra: CauLuot[] = []
