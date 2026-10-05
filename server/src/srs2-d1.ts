@@ -844,7 +844,9 @@ export async function docHoSoDangCaLop(env: Env, dsSbd: readonly string[]): Prom
 
 /** Hạng theo dạng của MỘT em từ hồ sơ dạng + lần làm trong chiến dịch (bỏ lượt có gợi ý). Tính lại mỗi lần lập kế hoạch ⇒ tự cập nhật mỗi sáng. */
 export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly LanLam[], meta: ReadonlyMap<string, MetaCau>, qidsChienDich: readonly string[], tuLuc = ''): { hangTheoDang: Record<string, HangEm>; hangChung: HangEm } {
-  const tk = gopThongKeDang(hoSoDang, lanLam.map((x) => ({ dang: meta.get(x.qid)?.dang ?? null, luc: x.luc, dung: x.dung, coGoiY: x.coGoiY })), tuLuc)
+  // 05/10: lượt câu anh em quy về câu gốc (`cauAnhEm`) mà câu anh em cũng thuộc chiến dịch ⇒ đã đếm dưới qid thật (cùng dạng) — bỏ bản quy về để không đếm đôi.
+  const tapCd = new Set(qidsChienDich)
+  const tk = gopThongKeDang(hoSoDang, lanLam.filter((x) => !x.cauAnhEm || !tapCd.has(x.cauAnhEm)).map((x) => ({ dang: meta.get(x.qid)?.dang ?? null, luc: x.luc, dung: x.dung, coGoiY: x.coGoiY })), tuLuc)
   const dangCan = [...new Set(qidsChienDich.map((q) => meta.get(q)?.dang).filter((d): d is string => !!d))]
   return tinhHangTheoDang(tk, dangCan)
 }

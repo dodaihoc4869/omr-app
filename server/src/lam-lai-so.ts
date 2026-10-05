@@ -44,7 +44,8 @@ const gocCua = (qid: string): string => /^(.*)~ss\d+$/.exec(qid)?.[1] ?? qid
 
 /**
  * Một dòng sổ (đã SELECT thêm cột `tc`) → các lần làm: của CHÍNH qid dòng (quy song sinh về gốc) khi gốc ấy thuộc tập đang hỏi, và thêm một
- * lần làm SONG SINH của câu gốc `tc` khi `tc` thuộc tập đang hỏi. Dòng không có `tc` (sổ cũ, truy vấn lùi) ⇒ y hệt `lanLamGoc`.
+ * lần làm SONG SINH của câu gốc `tc` khi `tc` thuộc tập đang hỏi (mang `cauAnhEm` = qid thật — thống kê gộp bỏ bản này khi qid thật cũng được đếm).
+ * Dòng không có `tc` (sổ cũ, truy vấn lùi) ⇒ y hệt `lanLamGoc`.
  */
 export function lanLamTuDongTc(x: Row, lanLamGoc: (x: Row) => LanLam, tapGoc: ReadonlySet<string>): LanLam[] {
   const ra: LanLam[] = []
@@ -52,7 +53,7 @@ export function lanLamTuDongTc(x: Row, lanLamGoc: (x: Row) => LanLam, tapGoc: Re
   const goc = gocCua(qid)
   if (tapGoc.has(goc)) ra.push(lanLamGoc(x))
   const tc = x.tc == null ? '' : String(x.tc)
-  if (tc && tc !== goc && tapGoc.has(tc)) ra.push({ ...lanLamGoc(x), qid: tc, songSinh: true })
+  if (tc && tc !== goc && tapGoc.has(tc)) ra.push({ ...lanLamGoc(x), qid: tc, songSinh: true, cauAnhEm: goc })
   return ra
 }
 

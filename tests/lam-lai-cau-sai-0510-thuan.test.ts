@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest'
 import { cacQidSongSinh, tachSongSinh, TRAN_SONG_SINH } from '../server/src/loi-hoc-luat'
 import { locBoTro } from '../server/src/cau-bo-tro'
 import { apHoanVi, apXaoTheoRef, chonVeGoc, doiLoiGiai, dungKhoi, hoanViXao, khoiCanCo, laCuaSoLoi, lanLamTuDongTc, loiGiaiXaoDuoc, rawLamLai, rawSo, xaoCau, xaoDuoc } from '../server/src/lam-lai-so'
-import { lanLamTuDong } from '../server/src/srs2-d1'
+import { hangTuHoSo, lanLamTuDong, type MetaCau } from '../server/src/srs2-d1'
+import { hangTuTiLe } from '../server/src/srs2-loi'
 import { grade, type PrivateQuestion } from '../src/game/than-thu-v2/core'
 
 const cauI = (them: Partial<PrivateQuestion> = {}): PrivateQuestion => ({
@@ -127,12 +128,23 @@ describe('sổ — raw của lượt làm lại và mapper `tc`', () => {
     const dong = (x: Record<string, unknown>) => lanLamTuDongTc(x, lanLamTuDong, tap)
     expect(dong({ qid: 'A1', tc: 'Q1', ngay_vn: '2026-10-05', luc: 'x', ket_qua: 1 })).toEqual([
       { qid: 'A1', ngay: '2026-10-05', luc: 'x', dung: true, coGoiY: false },
-      { qid: 'Q1', ngay: '2026-10-05', luc: 'x', dung: true, coGoiY: false, songSinh: true },
+      { qid: 'Q1', ngay: '2026-10-05', luc: 'x', dung: true, coGoiY: false, songSinh: true, cauAnhEm: 'A1' },
     ])
-    expect(dong({ qid: 'A9', tc: 'Q1', ngay_vn: 'n', luc: 'x', ket_qua: 0 })).toEqual([{ qid: 'Q1', ngay: 'n', luc: 'x', dung: false, coGoiY: false, songSinh: true }])
+    expect(dong({ qid: 'A9', tc: 'Q1', ngay_vn: 'n', luc: 'x', ket_qua: 0 })).toEqual([{ qid: 'Q1', ngay: 'n', luc: 'x', dung: false, coGoiY: false, songSinh: true, cauAnhEm: 'A9' }])
     expect(dong({ qid: 'Q1~ss2', ngay_vn: 'n', luc: 'x', ket_qua: 1 })).toEqual([{ qid: 'Q1', ngay: 'n', luc: 'x', dung: true, coGoiY: false, songSinh: true }])
     expect(dong({ qid: 'Q1', tc: null, ngay_vn: 'n', luc: 'x', ket_qua: 1 })).toEqual([{ qid: 'Q1', ngay: 'n', luc: 'x', dung: true, coGoiY: false }])
     expect(dong({ qid: 'Z', tc: 'Z', ngay_vn: 'n', luc: 'x', ket_qua: 1 })).toEqual([])
+  })
+  it('hạng theo dạng KHÔNG đếm đôi một lượt câu anh em (câu anh em cũng thuộc chiến dịch); câu anh em ngoài chiến dịch ⇒ lượt quy về vẫn đếm', () => {
+    const meta = new Map(['Q1', 'A1', 'X1'].map((q) => [q, { dang: 'D' }])) as unknown as Map<string, MetaCau>
+    const lan = [
+      { qid: 'X1', ngay: '2026-10-05', luc: '2026-10-05T01:00:00.000Z', dung: true, coGoiY: false },
+      { qid: 'A1', ngay: '2026-10-05', luc: '2026-10-05T02:00:00.000Z', dung: false, coGoiY: false },
+      { qid: 'Q1', ngay: '2026-10-05', luc: '2026-10-05T02:00:00.000Z', dung: false, coGoiY: false, songSinh: true as const, cauAnhEm: 'A1' },
+    ]
+    expect(hangTuTiLe(1 / 2)).not.toBe(hangTuTiLe(1 / 3)) // đếm đôi thì hạng đổi — phép thử có nghĩa
+    expect(hangTuHoSo([], lan, meta, ['Q1', 'A1', 'X1']).hangTheoDang.D).toBe(hangTuTiLe(1 / 2))
+    expect(hangTuHoSo([], lan.filter((x) => x.qid !== 'A1'), meta, ['Q1', 'X1']).hangTheoDang.D).toBe(hangTuTiLe(1 / 2))
   })
 })
 
