@@ -21,6 +21,7 @@ import { phamViCuaEm } from './bai-da-day'
 import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
+import { laYdMoi } from './lam-lai-so'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { HANG_MUC_DO } from './srs2-loi'
 import { chuaBatDau, docChienDichCuaEm, docHangEm, docMetaCau, doiThuTuMetGio, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
@@ -235,7 +236,7 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
       luot,
       ...(luot ? { purpose: MUC_DICH_LUOT } : ve ? { purpose: MUC_DICH_VE } : {}),
       raw: { ms: msLam, tt: tuTin, td: nhan },
-      ...(dv.cau.phan === 'II' ? { subitem: ketQuaTungY(dv.chon, dv.cau.correct) } : {}),
+      ...(dv.cau.phan === 'II' && !laYdMoi(dv.cau.qid) ? { subitem: ketQuaTungY(dv.chon, dv.cau.correct) } : {}), // bộ ý Đ–S MỚI (`~yd`, 06/10): ý khác ý gốc ⇒ không ghi từng ý theo ma trận Q của câu gốc
     }
     return { omni, luot, ve, so }
   } catch (e) {
@@ -252,7 +253,7 @@ function dangSauLuot(hs: HoSoOmniEm, qc: QCau, kn: readonly string[], dv: DauVao
   if (quanSat) {
     // Đúng mà em chọn "Chưa chắc" ⇒ nghi đoán: xác suất đoán mò nhân 2 (kẹp ≤ 0,5) cho quan sát ấy (omni-p-vkn `phatLaiEm`).
     const gCho = (g: number, dung: boolean) => (dung && tuTin === 'chua_chac' ? Math.min(0.5, 2 * g) : g)
-    if (dv.cau.phan === 'II' && qc.vknY?.length === 4) {
+    if (dv.cau.phan === 'II' && qc.vknY?.length === 4 && !laYdMoi(dv.cau.qid)) {
       const y = ketQuaTungY(dv.chon, dv.cau.correct)
       qc.vknY.forEach((knY, i) => { if (knY.length) P = capNhatHoi(P, knY, y[i] === 1, gCho(TS.G.Y, y[i] === 1), hs.sEm, TS.T) })
     } else {
@@ -331,7 +332,7 @@ async function coCauNenCho(env: Env, nhan: string): Promise<boolean> {
 }
 
 /** Gọi lại `answer` cho câu đã chấm (mạng chập chờn): dựng lại phần ghi sổ từ kết quả đã lưu ⇒ việc phụ chạy lại ghi ĐÚNG dòng như lần đầu. Kết quả cũ không có `omni` ⇒ undefined (y hệt cờ tắt). */
-export function soOmniTuKetQuaCu(cu: Row, b: Row, cau: Pick<PrivateQuestion, 'phan' | 'correct'>, phien: Pick<PhienOmni, 've'>): SoOmni | undefined {
+export function soOmniTuKetQuaCu(cu: Row, b: Row, cau: Pick<PrivateQuestion, 'phan' | 'correct'> & { qid?: string }, phien: Pick<PhienOmni, 've'>): SoOmni | undefined {
   const o = cu.omni as Partial<KetQuaOmniTraLoi> | undefined
   if (!laObj(o)) return undefined
   const luot = o.luot === true
@@ -340,7 +341,7 @@ export function soOmniTuKetQuaCu(cu: Row, b: Row, cau: Pick<PrivateQuestion, 'ph
     luot,
     ...(luot ? { purpose: MUC_DICH_LUOT } : phien.ve === 1 ? { purpose: MUC_DICH_VE } : {}),
     raw: { ms: o.msLam ?? null, tt: docTuTin(b.tuTin), td: o.nhanTocDo ?? null },
-    ...(cau.phan === 'II' && typeof cu.traLoi === 'string' ? { subitem: ketQuaTungY(cu.traLoi, dapAn) } : {}),
+    ...(cau.phan === 'II' && !laYdMoi(cau.qid) && typeof cu.traLoi === 'string' ? { subitem: ketQuaTungY(cu.traLoi, dapAn) } : {}),
   }
 }
 /** Trường THÊM vào kết quả `answer` (chỉ khi OMNI bật): `omni`, và `luot: true` / `ve: true` khi có. */

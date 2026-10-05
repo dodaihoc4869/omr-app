@@ -8,7 +8,7 @@
 // (`phatLaiLoi`). Lịch sử của S vẫn là của S (dòng ấy đồng thời là một lần làm S).
 // Ref phiên (JSON `game_v2_session.questions[]`, chỉ máy chủ): `tc` thay cho câu gốc · `xt` hoán vị bản xáo (xt[vị trí mới] = chỉ số gốc) · `nv` nguyên văn.
 import type { LanLam } from './srs2-loi'
-import type { TrangThaiLoi } from './loi-hoc-luat'
+import { loaiQidAo, type TrangThaiLoi } from './loi-hoc-luat'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { hashSeed, seededPermutation } from '../../src/lib/exam-shuffle'
 import { khoiCuaCau, khoiCuaLop, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'
@@ -56,6 +56,23 @@ export function lanLamTuDongTc(x: Row, lanLamGoc: (x: Row) => LanLam, tapGoc: Re
   if (tc && tc !== goc && tapGoc.has(tc)) ra.push({ ...lanLamGoc(x), qid: tc, songSinh: true, cauAnhEm: goc })
   return ra
 }
+
+// ---------------------------------------------------------------- bản khác BẰNG MÃ / Ý Đ–S MỚI (06/10): qid ảo `~bt<k>` · `~yd<k>`
+/**
+ * Hai bậc mới của thang (ban-khac-ao.ts) phát qid ảo `<Q>~bt<k>` (biến thể bằng mã) / `<Q>~yd<k>` (bộ ý Đúng–Sai mới) mà sổ ghi dưới CHÍNH qid ảo ấy kèm
+ * `raw_json.tc = Q` ⇒ `lanLamTuDongTc` đọc ra một lượt SONG SINH của Q với `cauAnhEm` = qid ảo. Hàm thuần: từ các lần làm đã quy về câu gốc, SỐ THỨ TỰ KẾ TIẾP
+ * của mỗi loại (= lớn nhất đã làm + 1, 0 nếu chưa) — hạt giống của bản mới là qid ảo ⇒ mỗi lần làm một bản MỚI, không lặp lại bản em đã làm.
+ */
+export function tiepBanKhacMoi(lan: readonly { cauAnhEm?: string }[]): { bt: number; yd: number } {
+  const ra = { bt: 0, yd: 0 }
+  for (const x of lan) {
+    const t = x.cauAnhEm ? loaiQidAo(x.cauAnhEm) : null
+    if (t && (t.loai === 'bt' || t.loai === 'yd')) ra[t.loai] = Math.max(ra[t.loai], t.k + 1)
+  }
+  return ra
+}
+/** qid ảo của bộ ý Đ–S mới (`~yd`)? OMNI không gán kết quả TỪNG Ý của bộ ý mới vào ma trận Q của câu gốc (ý khác ý gốc) — chỉ tính cả câu. */
+export const laYdMoi = (qid: unknown): boolean => /~yd\d+(?:#\d+)?$/.test(typeof qid === 'string' ? qid : '')
 
 // ---------------------------------------------------------------- luật khối của câu anh em (thầy 05/10)
 /**

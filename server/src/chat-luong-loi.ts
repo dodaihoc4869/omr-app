@@ -57,10 +57,10 @@ export function chuanSoNgay(v: unknown): number {
   return Number.isInteger(n) && n >= 1 && n <= SO_NGAY_TOI_DA ? n : SO_NGAY_MAC_DINH
 }
 
-/** qid ⇒ câu gốc: bỏ `#n` (lượt lặp của game), `~ssN` (song sinh, N bất kỳ) ⇒ câu gốc. */
+/** qid ⇒ câu gốc: bỏ `#n` (lượt lặp của game), `~ssN` (song sinh, N bất kỳ), `~btN` (biến thể bằng mã) và `~ydN` (bộ ý Đ–S mới, 06/10) ⇒ câu gốc. */
 export function gocCua(qid: unknown): { goc: string; songSinh: boolean } {
   const q = str(qid).trim().replace(/#\d+$/, '')
-  const m = /^(.*)~ss(\d+)$/.exec(q)
+  const m = /^(.*)~(?:ss|bt|yd)(\d+)$/.exec(q)
   return m && m[1] ? { goc: m[1], songSinh: true } : { goc: q, songSinh: false }
 }
 

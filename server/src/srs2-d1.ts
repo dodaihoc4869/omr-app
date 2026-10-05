@@ -8,7 +8,7 @@ import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
 import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
-import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC } from './lam-lai-so'
+import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC, tiepBanKhacMoi } from './lam-lai-so'
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { D1PreparedStatement, D1Result, Env } from './kieu'
@@ -422,6 +422,11 @@ export interface HoSo2 {
    * CHỈ có khoá khi có ít nhất một câu như vậy (hồ sơ không song sinh giữ nguyên khoá như trước — ảnh chụp omni-3-ke-hoach-co-tat).
    */
   songSinhLamLai?: Map<string, number>
+  /**
+   * 06/10 (ban-khac-ao.ts): với câu trong cửa sổ lỗi em ĐÃ làm bản khác bằng mã (`~bt`) / bằng bộ ý Đ–S mới (`~yd`) — số thứ tự KẾ TIẾP của từng loại (lớn nhất đã làm + 1),
+   * đọc từ các lần làm quy về câu gốc (`LanLam.cauAnhEm`). Chỉ có khoá khi có ít nhất một câu như vậy (chưa làm bản nào ⇒ vắng ⇒ 0) — hồ sơ cũ giữ nguyên khoá.
+   */
+  banKhacTiep?: Map<string, { bt: number; yd: number }>
   /** Học liệu bổ trợ (song sinh, câu kiểm, nhãn nền) của các câu lỗi. */
   boTro?: Map<string, BoTro>
   // ------------------------------------------------------------ OMNI 3 (05/10) — CHỈ có khi `omniBat(env, sbd)`; cờ tắt ⇒ không khoá nào dưới đây.
@@ -657,6 +662,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const laMoiBo = new Set<string>()
   const loiV2 = new Map<string, KetQuaLoi>()
   const songSinhCho = new Map<string, number>(), songSinhLamLai = new Map<string, number>()
+  const banKhacTiep = new Map<string, { bt: number; yd: number }>()
   for (const qid of qids) {
     const m = meta.get(qid)
     if (!m || m.tuLuan) { if (!theoQid.get(qid)?.length) laMoiBo.add(qid); continue } // câu đã rút khỏi kho / câu tự luận (30/09: không vào kế hoạch, không đếm thể lực; meta vẫn giữ để tra)
@@ -672,6 +678,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
       if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!)
       if (soSS > 0 && laCuaSoLoi(ap.loi.trangThai)) songSinhLamLai.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!) // 05/10 bậc 1 (cau-anh-em.ts)
+      if (laCuaSoLoi(ap.loi.trangThai)) { const tiep = tiepBanKhacMoi(theoQid.get(qid) ?? []); if (tiep.bt || tiep.yd) banKhacTiep.set(qid, tiep) } // 06/10 bậc biến thể bằng mã / ý Đ–S mới (ban-khac-ao.ts)
     }
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
@@ -709,7 +716,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     ? [...new Set(dsDangChay.flatMap((c) => c.qids))].flatMap((q) => theoQid.get(q) ?? [])
     : dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
   return {
-    chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro, ...(songSinhLamLai.size ? { songSinhLamLai } : {}),
+    chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro, ...(songSinhLamLai.size ? { songSinhLamLai } : {}), ...(banKhacTiep.size ? { banKhacTiep } : {}),
     ...(omni ? { chienDichHet: dsDangChay, onBaiCu, omni: { bat: true, cheDoCho: !dangChay && !!phamVi && phamVi.baiDaTick.length > 0, onBaiCuSo: onBaiCu.length }, phamVi: phamVi ?? null } : {}),
   }
 }

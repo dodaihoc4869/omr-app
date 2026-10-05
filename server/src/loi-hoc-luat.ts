@@ -140,9 +140,23 @@ export const CHO_SONG_SINH = 2 * TRAN_SONG_SINH
 /** qid gốc + MỌI qid ảo song sinh ("<gốc>~ss0" … "~ss7") — danh sách đúng để đọc sổ theo chỉ mục (không LIKE). Dùng chung mọi nơi, không tự viết `~ss0`/`~ss1`. */
 export const cacQidSongSinh = (goc: string): string[] => [goc, ...Array.from({ length: CHO_SONG_SINH }, (_, i) => `${goc}~ss${i}`)]
 
-/** qid song sinh: "<gốc>~ss<i>" (i = 0 … CHO_SONG_SINH − 1). Câu game có hậu tố lượt lặp "#n" — bỏ trước. */
+/**
+ * qid ẢO của câu sai (làm lại bằng bản khác): "<gốc>~ss<i>" song sinh (i = 0 … CHO_SONG_SINH − 1) · "<gốc>~bt<k>" BIẾN THỂ BẰNG MÃ (bien-the-sinh.ts, 06/10)
+ * · "<gốc>~yd<k>" bộ ý ĐÚNG–SAI MỚI (cau-y-ds.ts, 06/10); k = số lần em đã làm bản khác loại ấy của câu gốc (đếm từ sổ). Câu game có hậu tố lượt lặp "#n" — bỏ trước.
+ * `songSinh` là chỉ số CHỈ khi qid là `~ss` (chỉ số bản trong `cau_bo_tro`); với `~bt` / `~yd` là `k` — nơi cần phân biệt dùng `loaiQidAo`.
+ * MỌI nơi đọc sổ rồi quy về câu gốc bằng hàm này (OMNI, hồ sơ lỗi, tự hoàn thiện, nút thắt, chất lượng) tự coi `~bt` / `~yd` là lượt làm của câu gốc, như song sinh.
+ */
 export function tachSongSinh(qid: string): { goc: string; songSinh: number | null } {
   const q = qid.replace(/#\d+$/, '')
-  const m = /^(.*)~ss(\d+)$/.exec(q)
+  const m = /^(.*)~(?:ss|bt|yd)(\d+)$/.exec(q)
   return m ? { goc: m[1]!, songSinh: Number(m[2]) } : { goc: q, songSinh: null }
 }
+/** Loại qid ảo: 'ss' song sinh · 'bt' biến thể bằng mã · 'yd' ý Đúng–Sai mới; qid thường ⇒ null. `k` = số thứ tự sau hậu tố. */
+export type LoaiQidAo = 'ss' | 'bt' | 'yd'
+export function loaiQidAo(qid: string): { goc: string; loai: LoaiQidAo; k: number } | null {
+  const m = /^(.*)~(ss|bt|yd)(\d+)$/.exec(qid.replace(/#\d+$/, ''))
+  return m ? { goc: m[1]!, loai: m[2] as LoaiQidAo, k: Number(m[3]) } : null
+}
+/** qid ảo của bản khác bằng mã (biến thể) / bộ ý Đ–S mới thứ k của câu gốc. */
+export const qidBienThe = (goc: string, k: number): string => `${goc}~bt${k}`
+export const qidYDsMoi = (goc: string, k: number): string => `${goc}~yd${k}`

@@ -4,11 +4,16 @@
 // Câu sai Q tới lượt làm lại (cửa sổ lỗi `laCuaSoLoi`: lỗi mở / chờ kiểm / kiểm duy trì theo luật chung `phatLaiLoi` — `HoSo2.loiV2`) lấy bậc đầu tiên có sẵn:
 //   1. SONG SINH (sẵn có: hang-chua-loi `phuNeuCan` trong `napLuot`, qid ảo "<Q>~ss0..3", trần TRAN_SONG_SINH = 4). Thêm ở đây: lượt chờ kiểm SAU khi
 //      em đã đúng song sinh (luật 02/10 để câu gốc ra nguyên văn) vẫn là song sinh, xoay bản kế (`HoSo2.songSinhLamLai`).
+//   1b. (06/10, ban-khac-ao.ts) BẢN KHÁC "ẢO", câu chưa có song sinh: Phần I/III có bộ sinh theo dạng ⇒ BIẾN THỂ BẰNG MÃ (qid ảo "<Q>~bt<k>", đáp án tính bằng mã,
+//      hạt giống = qid ảo ⇒ chấm / resume sinh lại đúng câu); Phần II ⇒ bộ 4 ý Đúng–Sai MỚI của đúng đề dẫn (qid ảo "<Q>~yd<k>", kho `cau_y_ds`; kho rỗng / thiếu ý ⇒ rơi xuống).
+//      Sổ ghi dưới CHÍNH qid ảo + `raw_json.tc = Q` ⇒ lượt SONG SINH của Q (như câu anh em). k = số thứ tự kế tiếp đếm từ sổ (`HoSo2.banKhacTiep`).
 //   2. CÂU ANH EM: một câu THẬT khác trong kho: cùng `dang`, cùng phần, cùng `mucDo` (không có ⇒ mức kề), KHÁC nhóm nội dung, ĐÚNG KHỐI của em,
 //      em chưa gặp (hết ⇒ gặp lâu nhất > NGAY_GAP_LAI ngày), hợp lệ chung (không câu bảo vệ ca thi / BTVN chưa nộp / tự luận, trong phạm vi em),
 //      không bị chặn ở lượt này (câu Bi-a đang giữ, câu đang phát ở phiên khác, câu thầy chặn trong game), không nằm trong kế hoạch hôm nay, không
 //      làm hôm nay. DÙNG LẠI bộ chọn "câu lạ cùng dạng" của omni-game.ts. Tất định theo (em, ngày, Q). Phản hồi là câu thật qua `publicQuestion`
 //      (không đáp án), vai 'on_lai' sẵn có. Sổ ghi dưới qid câu anh em + `raw_json.tc = Q` (lam-lai-so.ts) ⇒ phát lại lỗi của Q coi là lượt song sinh.
+//      Nguồn: DẠY HỌC trong phạm vi em (như trước); THIẾU ⇒ (06/10) kho TU LUYỆN cùng dạng, cùng phần, cùng mức (nới kề), ĐÚNG KHỐI, em CHƯA gặp, không tự luận,
+//      không câu ca bảo vệ / BTVN chưa nộp (không giới hạn phạm vi đã dạy — kho luyện tập). Câu đang NGHI sai đáp án (`cau_nghi_dap_an`) không bao giờ thành câu anh em.
 //   3. BẢN XÁO: Phần I xáo 4 phương án, Phần II xáo 4 ý (đáp án + ảnh + lý do từng phương án/ý theo); tất định theo em + lần; hoán vị chỉ nằm trong
 //      JSON phiên ở máy chủ (`xt`), máy em KHÔNG nhận; chấm theo thứ tự đã xáo (`apXaoTheoRef`), sổ ghi đáp án em chọn QUY VỀ khung gốc + `xt: 1`.
 //      Phần III: KHÔNG xáo được; "câu kiểm đi trước khi nhập đáp số" cần giao diện mới (câu kiểm hiện chỉ có trong khung lời giải SAU khi nộp;
@@ -23,13 +28,17 @@
 // Vòng phụ thuộc: tệp này nhập omni-game (có I/O) nên CHỈ srs2-game.ts nhập nó; game-v2.ts / game-v2-doan.ts chỉ nhập phần thuần lam-lai-so.ts.
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
-import { khoiCuaMaDe } from '../../src/lib/khoi-cau'
+import { khoiCuaCau, khoiCuaMaDe } from '../../src/lib/khoi-cau'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
 import { bacMuc, boiCanh, docChiMucTheoDang, hopLeChung, lamHomNay, metaTheoDang, napTheoThuTu, phamViChon, xepUngVien, type BoiCanh, type PhamViChon } from './omni-game'
-import { ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
+import { docMetaCau, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
 import { napDayDuMem } from './game-v2-bank'
+import { thuMucCuaMaDe } from './kho-thu-muc'
+import { chonBanKhacMoi } from './ban-khac-ao'
+import { coBoSinh } from './bien-the-sinh'
+import { docCauNghiDem, docKhoiEmCong, khoiDaLocCua } from './chan-khac-khoi'
 import { readGameScope } from './game-v2-reports'
 import { laCauTuLuan } from './cam-tu-luan'
 import { apXaoTheoRef, dungKhoi, khoiCanCo, laCuaSoLoi, xaoCau, type LamLaiRef } from './lam-lai-so'
@@ -79,12 +88,25 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
   const ngay = ngayVnCua(bc.nowMs)
   let chung: Promise<ChungAnhEm> | null = null // phạm vi + bối cảnh đọc MỘT lần cho cả lượt, và chỉ khi có câu cần
   const daDung = new Set(ds.map((x) => tachSongSinh(x.q.qid).goc)), nhomDung = new Set(ds.map((x) => x.m.group))
+  // Bậc 1b (06/10): câu chưa có song sinh dùng được ⇒ biến thể bằng mã (Phần I/III có bộ sinh) / bộ ý Đ–S mới (Phần II) — MỘT lần cho cả lượt (một truy vấn cho mọi câu Phần II).
+  // Khối em lấy từ hồ sơ đã lọc khối (0 truy vấn); chưa lọc lần nào ⇒ đọc một lần. Lỗi gì ⇒ rơi xuống bậc 2 (không làm hỏng lượt).
+  const choBanKhac = ds.filter((x) => can.has(x) && phuNeuCan(x.q, hs.songSinhLamLai, hs.boTro).qid === x.q.qid).map((x) => x.q)
+  let banKhac = new Map<string, PrivateQuestion>()
+  if (choBanKhac.length) {
+    try {
+      const khoiEm = khoiDaLocCua(hs.meta) ?? await docKhoiEmCong(env, bc.sbd).catch(() => null)
+      banKhac = await chonBanKhacMoi(env, choBanKhac, hs.banKhacTiep, khoiEm ?? null)
+    } catch (e) { console.error('[cau-anh-em] không chọn được bản khác bằng mã / ý Đ–S mới (rơi xuống bậc 2):', e instanceof Error ? e.message : e) }
+  }
   const ra: CauLuot[] = []
   for (const x of ds) {
     if (!can.has(x)) { ra.push(x); continue }
     // Bậc 1: lượt luật 02/10 để câu gốc nguyên văn (chờ kiểm, đã đúng song sinh) ⇒ vẫn song sinh, bản kế. Phần II / song sinh thiếu dữ kiện ⇒ không phủ.
     const ss = phuNeuCan(x.q, hs.songSinhLamLai, hs.boTro)
     if (ss.qid !== x.q.qid) { ra.push({ ...x, q: ss }); continue }
+    // Bậc 1b: bản khác bằng mã / ý Đ–S mới (qid ảo `~bt<k>` / `~yd<k>`; sổ ghi dưới qid ảo + `tc = Q`).
+    const bk = banKhac.get(x.q.qid)
+    if (bk) { ra.push({ q: bk, m: x.m, lamLai: { tc: x.q.qid } }); continue }
     // Bậc 2: câu anh em.
     const ae = await chonCauAnhEm(env, bc, x.m, (chung ??= som?.chung ?? chungAnhEm(env, bc, chan)), daDung, nhomDung, som?.chiMuc)
       .catch((e: unknown) => { console.error('[cau-anh-em] không chọn được câu anh em (rơi xuống bậc 3/4):', e instanceof Error ? e.message : e); return null })
@@ -101,20 +123,25 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
 
 /** Đọc chung cho cả lượt (một lần): phạm vi, bối cảnh, kế hoạch, câu bị chặn; đệm meta theo dạng + lớp của tờ (nhiều câu lỗi cùng dạng/tờ ⇒ không đọc lại). */
 interface ChungAnhEm { pv: PhamViChon; bc: BoiCanh; keHoach: Set<string>; chan: Set<string>; theoDang: Map<string, Promise<MetaCau[]>>; lopTo: Map<string, string | null>
+  /** 06/10: câu đang NGHI sai đáp án (đệm 60 s trong isolate, đọc CÙNG đợt phạm vi/bối cảnh) — không thành câu anh em. */
+  nghi: ReadonlySet<string>
+  /** 06/10 (A3): meta kho TU LUYỆN theo dạng (kèm `lop` của tờ), đọc khi DẠY HỌC không còn ứng viên. */
+  theoDangTL: Map<string, Promise<{ meta: MetaCau[]; lopTo: Map<string, string> }>>
   /** Tối ưu 05/10: `lop` của MỌI tờ ứng viên một dạng (tập cha của tờ cần kiểm khối), đọc CÙNG đợt meta của dạng ấy. */
   lopSom: { ma: ReadonlySet<string>; p: Promise<Map<string, string>> }[] }
 async function chungAnhEm(env: Env, bc: BoiCanhLamLai, chan: ReadonlySet<string>): Promise<ChungAnhEm> {
   // `boiCanh` ném khi không đọc được tập câu bảo vệ ca thi ⇒ không chọn câu anh em (thà không phát còn hơn lộ câu ca thi).
-  const [pv, boi, pham] = await Promise.all([
+  const [pv, boi, pham, nghi] = await Promise.all([
     phamViChon(env, bc.sbd),
     boiCanh(env, bc.sbd, bc.nowMs),
     readGameScope(env, bc.sbd).catch(() => null), // câu thầy chặn trong game (`answer` từ chối câu này ⇒ em kẹt) — lỗi đọc ⇒ không thêm
+    docCauNghiDem(env, bc.nowMs), // câu nghi sai đáp án (không ném: lỗi/bảng chưa có ⇒ rỗng)
   ])
   return {
     pv, bc: boi,
     keHoach: new Set((bc.keHoach ?? []).map((k) => tachSongSinh(qidGoc(k)).goc)),
     chan: new Set([...chan, ...(Array.isArray(pham?.blocked) ? pham.blocked.map(String) : [])]),
-    theoDang: new Map(), lopTo: new Map(), lopSom: [],
+    theoDang: new Map(), lopTo: new Map(), lopSom: [], nghi, theoDangTL: new Map(),
   }
 }
 
@@ -129,8 +156,13 @@ const coSongSinh = (chon: ReadonlyMap<string, number> | undefined, boTro: HoSo2[
   const i = chon?.get(q)
   return i !== undefined && i >= 0 && !!boTro?.get(q)?.songSinh[i]
 }
+/** Câu CHẮC đi bậc 1b (biến thể bằng mã): Phần I/III, dạng có bộ sinh, khối câu = khối em đã biết ⇒ không cần đọc sớm cho câu anh em (rơi xuống bậc 2 thì đọc như cũ). */
+const chacBienThe = (hs: Pick<HoSo2, 'meta'>, q: string): boolean => {
+  const m = hs.meta.get(q), khoi = khoiDaLocCua(hs.meta)
+  return !!m && (m.phan === 'I' || m.phan === 'III') && !!m.dang && coBoSinh(m.dang) && khoi != null && khoiCuaCau(m) === khoi
+}
 export function batDauLamLaiKhac(env: Env, hs: HoSo2, qids: readonly string[], bc: BoiCanhLamLai, chan: ReadonlySet<string>): DocSomLamLai | undefined {
-  const can = qids.filter((q) => tachSongSinh(q).songSinh === null && canBanKhac(hs, q) && !coSongSinh(hs.songSinhCho, hs.boTro, q) && !coSongSinh(hs.songSinhLamLai, hs.boTro, q))
+  const can = qids.filter((q) => tachSongSinh(q).songSinh === null && canBanKhac(hs, q) && !coSongSinh(hs.songSinhCho, hs.boTro, q) && !coSongSinh(hs.songSinhLamLai, hs.boTro, q) && !chacBienThe(hs, q))
   if (!can.length) return undefined
   const chiMuc = new Map<string, Promise<Record<string, unknown>[]>>()
   for (const q of can) { const d = hs.meta.get(q)?.dang; if (d && !chiMuc.has(d)) chiMuc.set(d, docChiMucTheoDang(env, d)) }
@@ -141,11 +173,13 @@ export function batDauLamLaiKhac(env: Env, hs: HoSo2, qids: readonly string[], b
 
 /**
  * Câu anh em của Q: cùng dạng + cùng phần, khoảng cách bậc mức ≤ 1 (cùng mức xếp trước), khác nhóm nội dung, ĐÚNG KHỐI (`khoiCanCo`), không trùng
- * câu/nhóm đã có trong lượt hay kế hoạch hôm nay, không bị chặn, hợp lệ chung (`hopLeChung` ⇒ `cauHopKhoi`), chưa làm hôm nay, chưa gặp hoặc gặp quá
- * NGAY_GAP_LAI ngày. Xếp tất định (`xepUngVien`, muối em|ngày|Q) rồi nạp bản đầy đủ của câu đầu còn trong kho. Không có ⇒ null.
+ * câu/nhóm đã có trong lượt hay kế hoạch hôm nay, không bị chặn, hợp lệ chung (`hopLeChung` ⇒ `cauHopKhoi`), chưa làm hôm nay, không nghi sai đáp án.
+ * Nguồn 1 — DẠY HỌC trong phạm vi em: chưa gặp hoặc gặp quá NGAY_GAP_LAI ngày. Nguồn 2 (06/10) — kho TU LUYỆN khi nguồn 1 không còn ứng viên: CHƯA gặp.
+ * Xếp tất định (`xepUngVien`, muối em|ngày|Q) rồi nạp bản đầy đủ của câu đầu còn trong kho. Không có ⇒ null.
  */
 async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Promise<ChungAnhEm>, daDung: ReadonlySet<string>, nhomDung: ReadonlySet<string>, chiMucSom?: DocSomLamLai['chiMuc']): Promise<{ q: PrivateQuestion; m: MetaCau } | null> {
   if (!m.dang) return null
+  const dang = m.dang
   const chung = await chungP
   const { pv, bc, keHoach, chan } = chung
   const khoi = khoiCanCo(bc.khoiEm, m)
@@ -153,30 +187,62 @@ async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Pro
   const bacQ = bacMuc(m.mucDo)
   const khoang = (x: MetaCau): number => { if (bacQ == null) return 0; const b = bacMuc(x.mucDo); return b == null ? 9 : Math.abs(b - bacQ) }
   const lauRoi = (x: MetaCau): boolean => !bc.daLam.has(x.qid) || bc.daLam.get(x.qid)! <= lb.nowMs - NGAY_GAP_LAI * NGAY_MS
-  let theoDang = chung.theoDang.get(m.dang)
+  const chuaGap = (x: MetaCau): boolean => !bc.daLam.has(x.qid)
+  const muoi = `${lb.sbd}|${ngayVnCua(lb.nowMs)}|${m.qid}`
+  /** Lọc chung của mọi nguồn (trừ luật khối đầy đủ cần `lop` của tờ — ở `chonTuUng`). */
+  const hopLe = (x: MetaCau, daGap: (y: MetaCau) => boolean): boolean =>
+    x.qid !== m.qid && x.phan === m.phan && x.group !== m.group && !daDung.has(x.qid) && !nhomDung.has(x.group) && !keHoach.has(x.qid)
+    && !chan.has(x.qid) && !chan.has(x.group) && !chung.nghi.has(x.qid.split('~')[0]!) && hopLeChung(x, bc) && !lamHomNay(x.qid, bc) && khoang(x) <= 1 && daGap(x)
+    && [khoiCuaMaDe(x.maDe), khoiCuaMaDe(x.qid)].every((k) => k === null || k === khoi) // lọc nhanh: mã tờ/qid không lệch khối; đủ luật `dungKhoi` (kèm `lop` của tờ) ở `chonTuUng`
+  /** Ứng viên đã qua lọc nhanh ⇒ luật `dungKhoi` (đọc `lop` của tờ nếu chưa có) ⇒ xếp ⇒ nạp bản đầy đủ câu đầu còn trong kho. */
+  const chonTuUng = async (truoc: readonly MetaCau[]): Promise<{ q: PrivateQuestion; m: MetaCau } | null> => {
+    if (!truoc.length) return null
+    const canDoc = [...new Set(truoc.map((x) => x.maDe))].filter((ma) => !chung.lopTo.has(ma))
+    if (canDoc.length) {
+      // Lượt đọc sớm PHỦ đủ tờ cần ⇒ dùng nó (cùng bảng, không ghi nào xen giữa ⇒ cùng số; lỗi đọc ⇒ ném như cũ); không thì đọc như cũ.
+      const som = chung.lopSom.find((x) => canDoc.every((ma) => x.ma.has(ma)))
+      const doc = await (som ? som.p : docLopTo(env, canDoc))
+      for (const ma of canDoc) chung.lopTo.set(ma, doc.get(ma) ?? null)
+    }
+    const ung = truoc.filter((x) => dungKhoi(x, chung.lopTo.get(x.maDe), khoi))
+    if (!ung.length) return null
+    const thu = xepUngVien(ung, bc, khoang, muoi)
+    const [chon] = await napTheoThuTu(env, thu.slice(0, SO_THU_NAP), 1)
+    return chon ?? null
+  }
+  // Nguồn 1: DẠY HỌC trong phạm vi em.
+  let theoDang = chung.theoDang.get(dang)
   if (!theoDang) {
     // Tối ưu 05/10: chỉ mục dạng đọc sớm (nếu có) + `lop` của mọi tờ ứng viên đọc CÙNG đợt meta (trước: một đợt riêng sau khi lọc).
     const khiCoMaTo = (maTo: string[]): void => { const p = docLopTo(env, maTo); p.catch(() => {}); chung.lopSom.push({ ma: new Set(maTo), p }) }
-    theoDang = metaTheoDang(env, m.dang, pv, { chiMuc: chiMucSom?.get(m.dang), khiCoMaTo })
-    chung.theoDang.set(m.dang, theoDang)
+    theoDang = metaTheoDang(env, dang, pv, { chiMuc: chiMucSom?.get(dang), khiCoMaTo })
+    chung.theoDang.set(dang, theoDang)
   }
-  const truoc = (await theoDang).filter((x) =>
-    x.qid !== m.qid && x.phan === m.phan && x.group !== m.group && !daDung.has(x.qid) && !nhomDung.has(x.group) && !keHoach.has(x.qid)
-    && !chan.has(x.qid) && !chan.has(x.group) && hopLeChung(x, bc) && !lamHomNay(x.qid, bc) && khoang(x) <= 1 && lauRoi(x)
-    && [khoiCuaMaDe(x.maDe), khoiCuaMaDe(x.qid)].every((k) => k === null || k === khoi)) // lọc nhanh: mã tờ/qid không lệch khối; đủ luật `dungKhoi` (kèm `lop` của tờ) ngay dưới
-  if (!truoc.length) return null
-  const canDoc = [...new Set(truoc.map((x) => x.maDe))].filter((ma) => !chung.lopTo.has(ma))
-  if (canDoc.length) {
-    // Lượt đọc sớm PHỦ đủ tờ cần ⇒ dùng nó (cùng bảng, không ghi nào xen giữa ⇒ cùng số; lỗi đọc ⇒ ném như cũ); không thì đọc như cũ.
-    const som = chung.lopSom.find((x) => canDoc.every((ma) => x.ma.has(ma)))
-    const doc = await (som ? som.p : docLopTo(env, canDoc))
-    for (const ma of canDoc) chung.lopTo.set(ma, doc.get(ma) ?? null)
-  }
-  const ung = truoc.filter((x) => dungKhoi(x, chung.lopTo.get(x.maDe), khoi))
-  if (!ung.length) return null
-  const thu = xepUngVien(ung, bc, khoang, `${lb.sbd}|${ngayVnCua(lb.nowMs)}|${m.qid}`)
-  const [chon] = await napTheoThuTu(env, thu.slice(0, SO_THU_NAP), 1)
-  return chon ?? null
+  const dayHoc = await chonTuUng((await theoDang).filter((x) => hopLe(x, lauRoi)))
+  if (dayHoc) return dayHoc
+  // Nguồn 2 (06/10, A3): DẠY HỌC thiếu ⇒ kho TU LUYỆN cùng dạng — cùng luật khối / mức / khác nhóm, em CHƯA gặp, không tự luận, không câu ca bảo vệ (`hopLeChung`).
+  let tl = chung.theoDangTL.get(dang)
+  if (!tl) { tl = metaTuLuyenTheoDang(env, dang, chiMucSom?.get(dang)); chung.theoDangTL.set(dang, tl) }
+  const kho = await tl
+  for (const x of kho.meta) if (!chung.lopTo.has(x.maDe)) chung.lopTo.set(x.maDe, kho.lopTo.get(x.maDe) ?? null) // `lop` của tờ đã đọc cùng đợt ⇒ `chonTuUng` không đọc lại
+  return chonTuUng(kho.meta.filter((x) => hopLe(x, chuaGap)))
+}
+
+/**
+ * Meta kho TU LUYỆN của một dạng (A3, 06/10): chỉ mục dạng (đã đọc sớm nếu có) → tờ có thư mục `TU_LUYEN` (`de_kho_thu_muc`; thiếu dòng ⇒ luật mã `DH-` = DẠY HỌC) mà câu đã duyệt
+ * → meta đầy đủ + cột `lop` của các tờ (luật khối). KHÔNG giới hạn phạm vi đã dạy (kho luyện tập). Không có ⇒ rỗng; lỗi đọc ⇒ NÉM (nơi gọi rơi xuống bậc 3/4 — không phát câu chưa kiểm được).
+ */
+async function metaTuLuyenTheoDang(env: Env, dang: string, chiMucSom?: Promise<Record<string, unknown>[]>): Promise<{ meta: MetaCau[]; lopTo: Map<string, string> }> {
+  const rows = await (chiMucSom ?? docChiMucTheoDang(env, dang))
+  const laThat = (v: unknown): boolean => v === 1 || v === true || v === '1' || v === 'true'
+  const hop = rows.filter((x) => laThat(x.rv))
+  if (!hop.length) return { meta: [], lopTo: new Map() }
+  const maTo = [...new Set(hop.map((x) => String(x.ma_de)))]
+  const [thuMuc, lopTo] = await Promise.all([thuMucCuaMaDe(env, maTo), docLopTo(env, maTo)])
+  const tl = new Set(maTo.filter((ma) => thuMuc.get(ma) === 'TU_LUYEN'))
+  if (!tl.size) return { meta: [], lopTo }
+  const meta = await docMetaCau(env, [...new Set(hop.filter((x) => tl.has(String(x.ma_de))).map((x) => String(x.qid)))], [...tl])
+  return { meta: [...meta.values()].filter((x) => tl.has(x.maDe) && !x.tuLuan), lopTo }
 }
 
 /**
