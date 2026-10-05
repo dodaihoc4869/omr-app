@@ -127,6 +127,33 @@ const MAN = [
       await chup(t, 'hs-tram-cau-nen-loi-giai-390')
     }
   }],
+  // ── CẨN THẬN (06/10): chỉ cho em `canThan` — ô "Soát lại đơn vị và số liệu" (câu Phần III) + thẻ "Em biết câu này. Sai vì bước nào?" (sau lượt chắc-mà-sai) ──
+  ...[['dt', [390, 844], '390'], ['pc', [1440, 900], '1440']].flatMap(([hau, kho, ten]) => [
+    [`dao-can-than-soat-${hau}`, kho, async (t) => {
+      await lenDuong(t)
+      await t.locator('.dao2-giay input').first().fill('9,9')
+      await t.waitForTimeout(300)
+      await t.getByRole('switch', { name: 'Soát lại đơn vị và số liệu' }).first().waitFor({ timeout: 20000 })
+      await chup(t, `hs-can-than-soat-lai-${ten}`)
+      await t.getByRole('switch', { name: 'Soát lại đơn vị và số liệu' }).first().click()
+      await t.waitForTimeout(400)
+      await chup(t, `hs-can-than-soat-lai-da-chon-${ten}`)
+    }],
+    [`dao-can-than-the-${hau}`, kho, async (t) => {
+      await lenDuong(t)
+      await chotDapAn(t, /^C\./)
+      await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
+      await t.getByRole('group', { name: 'Em biết câu này. Sai vì bước nào?' }).first().waitFor({ timeout: 20000 })
+      await t.waitForTimeout(900)
+      await t.getByRole('group', { name: 'Em biết câu này. Sai vì bước nào?' }).first().scrollIntoViewIfNeeded()
+      await t.waitForTimeout(300)
+      await chup(t, `hs-can-than-the-buoc-sai-${ten}`)
+      await t.getByRole('button', { name: 'Tính hiệu suất phản ứng' }).first().click()
+      await t.getByText('Đã ghi lại lựa chọn của em').first().waitFor({ timeout: 20000 })
+      await t.waitForTimeout(300)
+      await chup(t, `hs-can-than-the-buoc-sai-da-ghi-${ten}`)
+    }],
+  ]),
   ['de-thu', [390, 844], async (t) => {
     await t.getByRole('button', { name: 'Nộp đề thử' }).first().waitFor({ timeout: 20000 }).catch(() => {})
     await t.waitForTimeout(1200)
