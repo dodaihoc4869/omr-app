@@ -64,7 +64,8 @@ async function docEm(env: Env, sbd: string): Promise<HocPhiEm & { lanNop: LanNop
 }
 
 async function coEm(env: Env, sbd: string): Promise<boolean> {
-  return !!(await env.DB.prepare('SELECT 1 AS co FROM hoc_sinh WHERE sbd = ?').bind(sbd).first())
+  // Cùng nguồn với màn Học sinh (`/em/danh-sach` đọc `danh_sach`) — `hoc_sinh` thiếu em chưa từng đăng nhập.
+  return !!(await env.DB.prepare('SELECT 1 AS co FROM danh_sach WHERE sbd = ?').bind(sbd).first())
 }
 
 /** Mọi em CÓ ghi gì về học phí (mức riêng hoặc ít nhất một lần nộp). Em không có trong danh sách này = mức chuẩn, chưa nộp. */
@@ -159,7 +160,7 @@ async function napSo(env: Env, b: Obj, nowMs: number) {
   }
   if (loi.length) return { ok: false, error: `Dữ liệu nạp sai: ${loi.slice(0, 10).join('; ')}` }
   const sbds = items.map((x) => chuoi(x.sbd))
-  const coTrongDs = new Set(((await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))').bind(JSON.stringify(sbds)).all<Obj>()).results ?? []).map((x) => chuoi(x.sbd)))
+  const coTrongDs = new Set(((await env.DB.prepare('SELECT sbd FROM danh_sach WHERE sbd IN (SELECT value FROM json_each(?))').bind(JSON.stringify(sbds)).all<Obj>()).results ?? []).map((x) => chuoi(x.sbd)))
   const daNap = new Set(((await env.DB.prepare('SELECT DISTINCT sbd FROM hoc_phi_nop WHERE nguon = ? UNION SELECT sbd FROM hoc_phi WHERE ghi_chu LIKE ?').bind(nguon, `%[${nguon}]%`).all<Obj>()).results ?? []).map((x) => chuoi(x.sbd)))
   const luc = new Date(nowMs).toISOString(), ngay = ngayVnCuaMs(nowMs)
   const lenh: D1PreparedStatement[] = []

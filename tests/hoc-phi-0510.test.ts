@@ -2,7 +2,7 @@
 // HỌC PHÍ (thầy 05/10) — lõi thuần (src/lib/hoc-phi.ts) + máy chủ thật trên D1 sqlite (server/src/hoc-phi.ts):
 //   · em không có dòng ⇒ 4.500.000 đ, chưa nộp; nộp từng lần cộng dồn; không vượt số còn thiếu; mã lần nộp chống ghi đôi;
 //   · mức riêng (miễn giảm / 0 = không thu) không thấp hơn số đã nộp; xoá lần nhập nhầm; nạp sổ Excel chạy lại không ghi đôi;
-//   · chỉ thầy gọi được.
+//   · chỉ thầy gọi được; "có em" = có trong `danh_sach` (cùng nguồn màn Học sinh), KHÔNG đòi `hoc_sinh` (em chưa đăng nhập vẫn nộp được).
 import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
@@ -52,9 +52,15 @@ describe('máy chủ học phí (D1 thật)', () => {
   const dung = () => {
     const d = taoD1That()
     const env = d.env as unknown as Env
-    for (const s of ['10001', '10002', '10003']) d.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)').run(s, `Em ${s}`, '2011', '10', '2026-10-01')
+    for (const s of ['10001', '10002', '10003']) d.sql.prepare('INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)').run(s, `Em ${s}`, '2011', '10', '2026-10-01')
     return { d, env, g: (duong: string, body: Record<string, unknown> = {}, thay = true) => goiWorker(worker, env, duong, body, thay) }
   }
+
+  it('em chỉ có trong danh_sach (chưa từng đăng nhập, không có ở hoc_sinh) vẫn ghi được', async () => {
+    const { d, g } = dung()
+    expect(d.sql.prepare("SELECT COUNT(*) AS n FROM hoc_sinh WHERE sbd = '10001'").get()).toEqual({ n: 0 })
+    expect((await g('/gv/hoc-phi/nop', { sbd: '10001', soTien: 1000, id: 'lan-9000-aaaa' })).ok).toBe(true)
+  })
 
   it('chỉ thầy', async () => {
     const { g } = dung()
