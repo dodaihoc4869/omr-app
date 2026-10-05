@@ -70,6 +70,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'doc_loi_giai',
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
+  // Học liệu máy soạn 05/10 (migration-0510-y-ds.sql): kho ý Đúng–Sai mới (học liệu) + hàng "chỉ học liệu" (như loi_giai_viec) ⇒ GIỮ.
+  'cau_y_ds', 'may_soan_viec',
   // HỌC PHÍ (hoc-phi.ts, migration-0510-hoc-phi.sql): sổ thu tiền của trung tâm — dữ liệu tài chính thật ⇒ GIỮ.
   'hoc_phi', 'hoc_phi_nop',
   // GĐ5: nhật ký hiệu chỉnh luật + câu nghi sai đáp án (dữ liệu vận hành máy, không phải tiến độ game) ⇒ GIỮ.
