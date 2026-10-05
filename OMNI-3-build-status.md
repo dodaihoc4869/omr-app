@@ -112,3 +112,9 @@ Phần đầu Sảnh trông thô ở cả hai bản (OMNI và `main`) là giới
 Làn gộp đêm 05/10: 5 thước đo (7ddb522d), máy soạn (3e21f7e2, kèm main 3cdabd43), thang 4 bậc (3684980f), bộ sinh biến thể (a790af0e, giải tay 14/14), chuyển màn (b165d375), chặn khác khối (55a73326 + f90479a0), khởi động app (f2945eaa), main 558c4a4c (96aa8369). CHƯA gộp: tối ưu máy chủ (đợt sau).
 
 Lùi: `git revert -m 1 <commit gộp PR>` rồi đẩy main (Actions đẩy lại Pages + Worker). Tắt OMNI không cần lùi mã: Cài đặt OMNI hoặc xoá dòng `cau_hinh` khoa = 'omni'. Bảng mới chỉ-thêm để nguyên.
+
+### 9b. Đã lên bản sống + đợt 2 (tối ưu máy chủ)
+
+- OMNI 3 ĐÃ LÊN 06/10 00:03 giờ VN: PR #150 (main 3620f437), Actions run 37341470213 thành công, Worker `950a961d-0522-4f2b-9361-9e9dfec0dc2d`; 4 migration chỉ-thêm thành công (37343466562, 37344425340, 37344934295, 37345471742 — bật OMNI: rows_written 2).
+- Đợt 2 = làn tối ưu máy chủ (gộp d709d431): chỉ `server/` + test + `docs/toi-uu-0510/MAY-CHU.md`. Đợt D1 (main → sau): mở app tắt 54→23 · bật 53→28; chơi tắt 67→31 · bật 66→38; 2 test ngân sách hết đỏ (chốt đáp án câu đúng 2 đợt ≤ 7; Sảnh lần 2: 2 ≤ 3). OMNI bật chưa đạt 2× (cổng khối đọc thêm). Sảnh lần đầu +15–40 ms CPU (chưa rõ nguyên nhân, theo dõi).
+- vitest toàn bộ d709d431: 14 179 test, 149 dòng trùng nền + 9 tên phụ thuộc giờ chạy (00:05–00:25 giờ VN) — chạy lại cùng giờ trên main 3cdabd43 (trước OMNI) ra đúng 9 tên đó ⇒ có sẵn, không do đợt này.
