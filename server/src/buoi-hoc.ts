@@ -133,6 +133,26 @@ export async function gvBuoiHoc(env: Env, b: Row, nowMs: number = Date.now()): P
     return { ok: true, buoi: r.map((x) => ({ ...buoiRa(x, nowMs), soCoMat: soEm.get(str(x.id)) ?? 0 })) }
   }
 
+  if (action === 'gan-day') {
+    // OMNI 3 (05/10, thầy: "cho chọn hs theo điểm danh nữa"): các buổi GẦN ĐÂY (còn mở hoặc đã đóng) kèm danh sách SBD em CÓ MẶT từng buổi —
+    // app thầy chọn nhanh em giao bài theo điểm danh (bước tick bài). CHỈ ĐỌC, không trả bí mật/mã buổi. Mới nhất trước, tối đa 12 buổi.
+    const soNgay = Math.min(30, Math.max(1, Math.floor(Number(b.soNgay)) || 7))
+    const lopLoc = str(b.lop).slice(0, 40)
+    const tu = new Date(nowMs - soNgay * 86_400_000).toISOString()
+    const r =
+      (await hoi(
+        env,
+        `SELECT id, ten, lop, mo_luc, het_han, dong_luc FROM buoi_hoc WHERE mo_luc >= ?${lopLoc ? ' AND lop = ?' : ''} ORDER BY mo_luc DESC LIMIT 12`,
+        ...(lopLoc ? [tu, lopLoc] : [tu]),
+      )) ?? []
+    const co = r.length
+      ? ((await hoi(env, "SELECT buoi_id, sbd FROM buoi_hoc_diem_danh WHERE trang_thai = 'co_mat' AND buoi_id IN (SELECT value FROM json_each(?)) ORDER BY sbd", JSON.stringify(r.map((x) => str(x.id))))) ?? [])
+      : []
+    const theoBuoi = new Map<string, string[]>()
+    for (const x of co) theoBuoi.set(str(x.buoi_id), [...(theoBuoi.get(str(x.buoi_id)) ?? []), str(x.sbd)])
+    return { ok: true, buoi: r.map((x) => { const coMat = theoBuoi.get(str(x.id)) ?? []; return { ...buoiRa(x, nowMs), soCoMat: coMat.length, coMat } }) }
+  }
+
   const id = str(b.id)
   if (!id) return { ok: false, error: 'Thiếu mã buổi học.' }
   const buoi = await docBuoi(env, id)
