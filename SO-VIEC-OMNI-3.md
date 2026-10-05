@@ -15,6 +15,8 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [ ] "giữ nguyên mọi giao diện hiện tại nhé" (thầy nhắn giữa lúc build) | bằng chứng: (chưa có)
 - [ ] "bạn chỉ sửa câu chữ cần thiết" | bằng chứng: (chưa có)
 - [ ] "thêm những mục cần thiết đồng bộ với giao diện hiện tại nhé để học sinh không cảm thấy thay đổi nhiều" | bằng chứng: (chưa có)
+- [ ] "Làm luôn công cụ duyệt vi kỹ năng cho chương đang dạy, tự động chuẩn xác luôn nhé. Ko cần tôi." | bằng chứng: (chưa có)
+- [ ] "Bạn hãy làm mọi thứ tôi chỉ chữa bài hs cần chữa" ⇒ câu nền cho các nhãn hay sai cũng tự động (sinh câu có đáp án tính bằng mã, kiểm chéo) | bằng chứng: (chưa có)
 - [ ] "hãy thiết kế tính tế đồng điệu với giao diện hiện tại nhé" ⇒ dùng lại đúng lớp CSS/token/thành phần đang có (h2-*, cd-*, m3), không màn mới kiểu khác, không đổi bố cục cũ | bằng chứng: (chưa có)
 
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
