@@ -37,6 +37,10 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "Mục hỏi thầy theo thuật toán mới có tác dụng gì." (thầy 05/10) ⇒ giải thích bằng mã thật (không đoán) | bằng chứng: server/src/omni-p-vkn.ts (MS_SAU_DOC_LOI_GIAI 12 h, lượt có hỗ trợ không là quan sát), omni-d1.ts (chứng chỉ chỉ đếm lượt tự làm), loi-giai.ts (dòng xem_loi_giai); giao diện nút không đổi (diff main…HEAD không thêm chỗ Hỏi thầy nào)
 - [x] "Phần các câu cần chữa có thay đổi gì không?" ⇒ so main vs nhánh OMNI, nêu đúng chỗ đổi/không đổi | bằng chứng: OMNI tắt ⇒ thẻ "Cần thầy dạy lại" y nguyên; bật ⇒ "Cần thầy chữa" 3 nhóm (CanThayChuaOmni.tsx, omni-bang.ts NHOM_CAN_THAY_CHUA); luật vào danh sách (sai ≥ 4, lần cuối sai) không đổi (ho-so-nam-kt.ts); Buổi chữa chỉ đổi nguồn câu "Mở ca chốt" (BuoiChua.tsx); báo cáo ca thi (ca-thi/) không đổi. Sửa lỗi chữ tràn "…đơn chức2 em" (nguyên nhân gốc: luật chung `.cd-ds-cau li b:last-child { nowrap }` bắt nhầm tên câu) — đo hộp trong Chromium trước/sau, test bảng 35/35
 - [x] "Rồi cho tôi xem ảnh app hs và gv có những thay đổi gì" ⇒ ảnh app thật trước/sau cho học sinh + thầy | bằng chứng: docs/omni-0510/anh-build/ 24 ảnh (thêm Bảng chiến dịch OMNI tắt/bật, thẻ Cần thầy chữa cuộn xuống, Cài đặt OMNI; màn thầy chụp trong khung app thầy thật); chup.mjs: lỗi trang 0, tràn ngang 0
+- [x] (tự phát sinh khi soát ảnh) Nút "Hỏi thầy" trong Đảo 2.0 chữ vàng trên nền kem, như bị khoá — lỗi có từ trước OMNI (dao.css kiểu kính tối cho Đảo cũ) | bằng chứng: 27f515ac; đối chiếu bản build thật (do-app-hs --kham); test Đảo 13/13
+- [x] (tự phát sinh) Máy hẹp: công tắc Trợ giúp không chữ đứng cạnh chip "Chưa chắc" có chữ | bằng chứng: dcce6550; chỉ khi có chip (OMNI bật)
+- [x] (tự phát sinh) Đề thử: thanh nộp nổi trong suốt, chữ câu hiện xuyên qua | bằng chứng: 93e41039; test đề thử + Đảo 96/96
+- [x] (tự phát sinh) Trang chụp: màn thầy thiếu khung app thầy (mất màu bảng nhiệt), Đảo thiếu dao.css (nút mất nền), số xem trước Bài 3 lệch | bằng chứng: 77b2f450, dcce6550
 
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
 
