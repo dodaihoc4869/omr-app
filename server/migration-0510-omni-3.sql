@@ -37,6 +37,11 @@ CREATE TABLE IF NOT EXISTS de_kho_thu_muc (ma_de TEXT PRIMARY KEY, thu_muc TEXT 
 CREATE TABLE IF NOT EXISTS omni_vkn (id TEXT PRIMARY KEY, ma_dang TEXT NOT NULL, ten TEXT NOT NULL, ten_loi TEXT, nhan_nen TEXT, thu_tu INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS omni_vkn_dang ON omni_vkn(ma_dang, thu_tu);
 CREATE TABLE IF NOT EXISTS omni_q (qid TEXT NOT NULL, y INTEGER NOT NULL DEFAULT -1, vkn_json TEXT NOT NULL, nguon TEXT NOT NULL, duyet_luc TEXT, PRIMARY KEY (qid, y));
+-- A.I Đỗ Đại Học tự gắn vi kỹ năng (omni-gan-vkn.ts SQL_BANG_GAN_VKN, cũng tạo lúc chạy): phiên bản gắn từng câu · nhật ký thay đổi Q · câu nghi của kiểm định tuần
+CREATE TABLE IF NOT EXISTS omni_q_gan (qid TEXT PRIMARY KEY, phien_ban TEXT NOT NULL, ban_cau TEXT, nguon_nhan TEXT NOT NULL, do_tin REAL NOT NULL, ly_do_json TEXT, luc TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS omni_q_nhat_ky (id INTEGER PRIMARY KEY AUTOINCREMENT, qid TEXT NOT NULL, y INTEGER NOT NULL DEFAULT -1, luc TEXT NOT NULL, loai TEXT NOT NULL, cu TEXT, moi TEXT, vkn_them TEXT, ly_do TEXT, ban_cau TEXT);
+CREATE INDEX IF NOT EXISTS omni_q_nhat_ky_qid ON omni_q_nhat_ky(qid, loai);
+CREATE TABLE IF NOT EXISTS omni_q_nghi (qid TEXT PRIMARY KEY, so_lan INTEGER NOT NULL, so_sai INTEGER NOT NULL, ty_le_sai REAL NOT NULL, ghi_chu TEXT, luc TEXT NOT NULL);
 -- Hồ sơ (ĐỆM)
 CREATE TABLE IF NOT EXISTS omni_em (sbd TEXT PRIMARY KEY, n_vung INTEGER NOT NULL DEFAULT 0, n_sai_vung INTEGER NOT NULL DEFAULT 0, s_uoc REAL NOT NULL,
   tau REAL NOT NULL DEFAULT 0, n_tau INTEGER NOT NULL DEFAULT 0, khung_gio_json TEXT, gio_hoc TEXT, muc_tieu REAL NOT NULL DEFAULT 8, cursor TEXT, phien_ban TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL);
@@ -46,6 +51,8 @@ CREATE TABLE IF NOT EXISTS omni_p_vkn (sbd TEXT NOT NULL, vkn_id TEXT NOT NULL, 
 CREATE TABLE IF NOT EXISTS omni_beta_cau (qid TEXT PRIMARY KEY, beta REAL NOT NULL, n INTEGER NOT NULL, cap_nhat_luc TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS omni_du_bao (sbd TEXT NOT NULL, pham_vi TEXT NOT NULL, ky_vong REAL NOT NULL, p8 REAL NOT NULL, sai_so REAL NOT NULL, s_dung REAL NOT NULL,
   con_duong TEXT, con_thieu_json TEXT, so_bang_chung INTEGER NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (sbd, pham_vi));
+-- Kế hoạch ngày nhiều bài ĐÃ CHỐT (ĐỆM, lập lại từ sổ; đúng câu lệnh srs2-d1.ts LENH_TAO_BANG_KE_HOACH_OMNI, cũng tạo lúc chạy)
+CREATE TABLE IF NOT EXISTS srs2_ke_hoach_omni (sbd TEXT NOT NULL, ngay TEXT NOT NULL, chien_dich_json TEXT, on_bai_cu_json TEXT, met_gio TEXT, cap_nhat_luc TEXT, PRIMARY KEY (sbd, ngay));
 -- Sự kiện gốc / ghi nhận (chỉ-thêm)
 CREATE TABLE IF NOT EXISTS omni_chung_chi (sbd TEXT NOT NULL, chien_dich_id TEXT NOT NULL, cap_luc TEXT NOT NULL, do_tin REAL NOT NULL, diem_ca_chot REAL, ma_ca TEXT, PRIMARY KEY (sbd, chien_dich_id));
 CREATE TABLE IF NOT EXISTS omni_xac_nhan (sbd TEXT NOT NULL, ma_dang TEXT NOT NULL, ket TEXT NOT NULL, luc TEXT NOT NULL, nguoi TEXT, PRIMARY KEY (sbd, ma_dang, luc));
