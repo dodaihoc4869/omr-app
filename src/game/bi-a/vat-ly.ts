@@ -5,7 +5,9 @@
 // u = 0 ⇒ LĂN (ma sát lăn rất nhỏ). Xoáy ngang wz ⇒ đập băng bật lệch; bi va bi có ma sát ⇒ bi mục tiêu lệch nhẹ, truyền xoáy.
 import { XEP, type KiHieu } from './nguyen-to'
 
-export const W = 500, H = 900, R = 21, T = 26, D2 = (2 * R) * (2 * R), HS = 1 / 240, VMAX = 2600
+export const W = 500, H = 900, R = 21, T = 26, D2 = (2 * R) * (2 * R), HS = 1 / 240, VMAX = 5200 // thầy 05/10: lực đánh gấp đôi (cũ 2600)
+/** Quãng tối đa bi đi trong một bước con (px) — bi nhanh hơn thì chia nhỏ bước để không xuyên bi/băng. 11 ⇒ mọi tốc độ ≤ 2640 vẫn đúng 1 bước như cũ. */
+const BUOC_CON = 11
 /** Gia tốc trọng trường (đv/s²), giảm tốc khi TRƯỢT và khi LĂN — xuất ra để tính vạch "đủ tới bi" (dieu-khien-cham.ts); số không đổi. */
 export const G0 = 3862, A_TRUOT = 0.2 * G0, A_LAN = 0.02 * G0
 const MU_BI = 0.06, MU_BANG = 0.2, GIAM_WZ = 24, E_BI = 0.95, KW = 5 / (2 * R)
@@ -24,8 +26,10 @@ export interface Ban { balls: Bi[] }
 export interface SuKienCu { firstHit: KiHieu | null; potted: MaBi[]; cuePotted: boolean; rails: number }
 export type Moc = (k: 'bi' | 'bang' | 'lo', a: Bi, b: Bi | Lo | null, v?: number) => void
 
-/** Tốc độ bi cái theo lực p (0–1). */
-export const tocDo = (p: number): number => VMAX * (0.05 + 0.95 * Math.pow(p, 1.2))
+/** Tốc độ bi cái ở lực nhỏ nhất (giữ như cũ ⇒ cú chạm nhẹ không đổi khi tăng lực tối đa). */
+export const VMIN = 130
+/** Tốc độ bi cái theo lực p (0–1): VMIN … VMAX. */
+export const tocDo = (p: number): number => VMIN + (VMAX - VMIN) * Math.pow(p, 1.2)
 /** Đánh bi cái: hướng (dx, dy), lực p, xoáy sx (ngang, phải +), sy (trên +); điểm chạm lệch tâm 0,5R·(sx, sy). */
 export function danhBi(c: Bi, dx: number, dy: number, p: number, sx: number, sy: number): void { danhBiV(c, dx, dy, tocDo(p), sx, sy) }
 /** Như `danhBi` nhưng nhận THẲNG tốc độ v (đấu online: máy người đánh gửi v đã tính, máy khác khỏi gọi `pow`). */
@@ -80,7 +84,15 @@ function dapBang(b: Bi, Nx: number, Ny: number): boolean {
 /** Một bước mô phỏng HS giây. `hook` nhận va chạm để phát tiếng/hiệu ứng (null khi mô phỏng thử của A.I, Mắt thần). */
 export function step(st: Ban, ev: SuKienCu, hook: Moc | null): void {
   const B = st.balls
-  for (const b of B) { if (b.on && (b.vx || b.vy)) { b.x += b.vx * HS; b.y += b.vy * HS } }
+  let v2 = 0
+  for (const b of B) if (b.on) v2 = Math.max(v2, b.vx * b.vx + b.vy * b.vy)
+  const n = v2 * HS * HS > BUOC_CON * BUOC_CON ? Math.ceil(Math.sqrt(v2) * HS / BUOC_CON) : 1
+  for (let k = 0; k < n; k++) buocCon(B, ev, hook, HS / n)
+  maSat(B)
+}
+/** Di chuyển + va bi + va băng trong h giây. */
+function buocCon(B: Bi[], ev: SuKienCu, hook: Moc | null, h: number): void {
+  for (const b of B) { if (b.on && (b.vx || b.vy)) { b.x += b.vx * h; b.y += b.vy * h } }
   for (let i = 0; i < B.length; i++) {
     const a = B[i]!
     if (!a.on) continue
@@ -102,7 +114,10 @@ export function step(st: Ban, ev: SuKienCu, hook: Moc | null): void {
       }
     }
   }
-  for (const b of B) { if (b.on) thanhBan(b, ev, hook) }
+  for (const b of B) { if (b.on) thanhBan(b, ev, hook, h) }
+}
+/** Ma sát trượt/lăn/xoáy cho một bước HS. */
+function maSat(B: Bi[]): void {
   for (const b of B) {
     if (!b.on) continue
     const ux = b.vx + R * b.wy, uy = b.vy - R * b.wx, us2 = ux * ux + uy * uy
@@ -118,7 +133,7 @@ export function step(st: Ban, ev: SuKienCu, hook: Moc | null): void {
     if (!b.vx && !b.vy && us2 <= 1) { b.wx = 0; b.wy = 0 }
   }
 }
-function thanhBan(b: Bi, ev: SuKienCu, hook: Moc | null): void {
+function thanhBan(b: Bi, ev: SuKienCu, hook: Moc | null, h: number): void {
   const x = b.x, y = b.y
   let dap = false
   const m2b = (y < CM || y > H - CM || Math.abs(y - H / 2) < SM), m2d = (x < CM || x > W - CM)
@@ -141,7 +156,7 @@ function thanhBan(b: Bi, ev: SuKienCu, hook: Moc | null): void {
     }
     if (b.x < 0 || b.x > W || b.y < 0 || b.y > H) {
       const dx = best.x - b.x, dy = best.y - b.y, d = bd || 1
-      b.vx += dx / d * 1800 * HS; b.vy += dy / d * 1800 * HS
+      b.vx += dx / d * 1800 * h; b.vy += dy / d * 1800 * h
       if (bd > 70) roiLo(b, best, ev, hook)
     }
   }
