@@ -4,7 +4,12 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { guiThay, luyenNen, nopLuyenNen, thangGo, type CauNen, type KetQuaNopNen, type KiemKhung, type SuKienKhung, type ThangGo } from '../../lib/loi-giai-api'
 import OSoTraLoi from '../OSoTraLoi'
+import { ChemText } from '../../lib/chem-format'
+import { chiSoRo } from '../../lib/chi-so-ro'
 import './loi-giai.css'
+
+/** Chữ câu nền có công thức hoá học (đề, phương án, đáp án, các bước, mẹo). */
+const Hoa = ({ t }: { t: string }) => <ChemText text={chiSoRo(t)} />
 
 export const TEN_BAC: Record<number, string> = { 1: 'Nhìn lại lựa chọn', 2: 'Đọc lời giải từng bước', 3: 'Làm lại câu tương tự', 4: 'Luyện kiến thức nền', 5: 'Gửi thầy' }
 const CHU_TOI_THIEU = 10
@@ -76,12 +81,12 @@ export function HopLuyenNen({ nhan, ten, qid, onDong }: { nhan: string; ten: str
                 ) : (
                   <div className="lg-nen-cau">
                     <p className="lg-nen-so">Câu {i + 1}/{ds.length}</p>
-                    <p>{c.de}</p>
+                    <p><Hoa t={c.de} /></p>
                     {c.kieu === 'tn' && c.pa ? (
                       <div className="lg-nen-pa" role="group" aria-label="Chọn đáp án">
                         {Object.entries(c.pa).map(([k, t]) => (
                           <button key={k} type="button" className="lg-loc-nut" aria-pressed={traLoi === k} disabled={!!kq || dangNop}
-                            onClick={() => { setTraLoi(k); void nop(k) }}><b>{k}.</b> {t}</button>
+                            onClick={() => { setTraLoi(k); void nop(k) }}><b>{k}.</b> <Hoa t={t} /></button>
                         ))}
                       </div>
                     ) : (
@@ -95,9 +100,9 @@ export function HopLuyenNen({ nhan, ten, qid, onDong }: { nhan: string; ten: str
                     {kq && !kq.ok && <p className="lg-loi" role="status">{kq.loi}</p>}
                     {kq && kq.ok && (
                       <div className={kq.dung ? 'lg-kq lg-kq--dung' : 'lg-kq lg-kq--sai'} role="status">
-                        <p><b>{kq.dung ? 'Đúng rồi.' : 'Chưa đúng.'}</b> Đáp án: {kq.dapAn}</p>
-                        {kq.giai.length > 0 && <ol className="lg-chu-buoc">{kq.giai.map((g, j) => <li key={j}>{g}</li>)}</ol>}
-                        {kq.meo && <p><b>Mẹo:</b> {kq.meo}</p>}
+                        <p><b>{kq.dung ? 'Đúng rồi.' : 'Chưa đúng.'}</b> Đáp án: <Hoa t={kq.dapAn} /></p>
+                        {kq.giai.length > 0 && <ol className="lg-chu-buoc">{kq.giai.map((g, j) => <li key={j}><Hoa t={g} /></li>)}</ol>}
+                        {kq.meo && <p><b>Mẹo:</b> <Hoa t={kq.meo} /></p>}
                         <button type="button" className="lg-nut lg-nut--chinh" onClick={tiep}>{i + 1 < ds.length ? 'Câu tiếp' : 'Xem kết quả'}</button>
                       </div>
                     )}

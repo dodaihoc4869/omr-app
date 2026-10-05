@@ -30,6 +30,7 @@ import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
 import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
+import {chiSoRo,chiSoRoSau} from '../../../lib/chi-so-ro'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -116,16 +117,16 @@ export interface TheCauAiProps{cau:CauDao2;stt:number;traLoi:string;khoa:boolean
 export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi,nhan}:TheCauAiProps){
  const goiY=docGoiY(q.goiY,q.phan),gach=goiY?.gach??[],goc=useRef<HTMLDivElement>(null)
  useGachPhuongAn(goc,gach)
- const chung={stt,onZoom,text:q.text,table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'thi' as const}
- const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:q.choices as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
+ const chung={stt,onZoom,text:chiSoRo(q.text),table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'thi' as const}
+ const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:(q.choices as string[]).map(chiSoRo) as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
    selected:(/^[ABCD]$/.test(traLoi)?traLoi:null) as 'A'|'B'|'C'|'D'|null,onSelect:v=>{if(!khoa&&!gach.includes(v))onTraLoi(v)}}
-  :q.phan==='II'?{...chung,phan:'II',ideas:q.ideas as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
+  :q.phan==='II'?{...chung,phan:'II',ideas:(q.ideas as string[]).map(chiSoRo) as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
    selected:Array.from({length:4},(_,i)=>(traLoi[i]==='D'||traLoi[i]==='S'?traLoi[i]:null) as 'D'|'S'|null),onSelect:(i,v)=>{if(!khoa){const a=(traLoi||'----').padEnd(4,'-').split('');a[i]=v;onTraLoi(a.join(''))}}}
   :{...chung,phan:'III',selected:traLoi,khoaO:khoa,onChange:v=>{if(!khoa)onTraLoi(v)}}
  return <section className="dao2-giay m3" aria-label={nhan??`Ải ${stt}`}>
   {typeof q.nhanNo==='string'&&q.nhanNo&&<p className="dao2-nhan-no" data-khoi="nhan-no">{q.nhanNo}</p>}
   {goiY&&<p className="dao2-bua">{BUA}<span><b>Bùa Trợ giảng:</b> {goiY.gach?`${chuGach(goiY.gach)} đã cháy thành tro.`:'mở trước Kiến thức cốt lõi của câu này.'}<small>Đúng nhờ Bùa chưa tính Thành thạo — câu sẽ quay lại để em tự làm.</small></span></p>}
-  {goiY?.cotLoi&&<div className="loi-giai-chot lg-chot dao2-cot-loi" data-cot-loi=""><div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div><ChemText text={goiY.cotLoi}/></div>}
+  {goiY?.cotLoi&&<div className="loi-giai-chot lg-chot dao2-cot-loi" data-cot-loi=""><div className="loi-giai-nhan-nho">Kiến thức cốt lõi</div><ChemText text={chiSoRo(goiY.cotLoi)}/></div>}
   <div ref={goc} className="dao2-giay-cau" data-gach={gach.join('')||undefined} onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')onHinhLoi?.()}}><TheCau {...pc}/></div>
  </section>
 }
@@ -143,10 +144,10 @@ export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao',nhan
  const ngang=useNgang(),goc=useRef<HTMLElement>(null),moLoiGiai=!!phanHoi.omni?.chacMaSai
  useEffect(()=>{if(tuCuon&&(ngang||moLoiGiai))goc.current?.querySelector('.loi-giai')?.scrollIntoView?.({block:'start',behavior:'smooth'})},[ngang,stt,tuCuon,moLoiGiai])
  const em=(phanHoi.traLoi||traLoiMay).trim(),dap=phanHoi.answer.trim(),vai=docVai(q.vai)
- const chung={stt,onZoom,text:q.text,table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'xem_lai' as const,loiGiai:loiGiaiChoTheCau(phanHoi.solution,q.phan,dap)}
- const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:q.choices as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
+ const chung={stt,onZoom,text:chiSoRo(q.text),table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'xem_lai' as const,loiGiai:loiGiaiChoTheCau(chiSoRoSau(phanHoi.solution),q.phan,dap)}
+ const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:(q.choices as string[]).map(chiSoRo) as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
    selected:(/^[ABCD]$/.test(em)?em:null) as 'A'|'B'|'C'|'D'|null,correct:(/^[ABCD]$/.test(dap)?dap:undefined) as 'A'|'B'|'C'|'D'|undefined}
-  :q.phan==='II'?{...chung,phan:'II',ideas:q.ideas as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
+  :q.phan==='II'?{...chung,phan:'II',ideas:(q.ideas as string[]).map(chiSoRo) as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
    selected:Array.from({length:4},(_,i)=>(em[i]==='D'||em[i]==='S'?em[i]:null) as 'D'|'S'|null),correct:dapAnDungSai(dap)}
   :{...chung,phan:'III',selected:em||null,correct:dap}
  return <section ref={goc} className="dao2-the-giai m3" aria-label={nhan?`Lời giải ${nhan.toLocaleLowerCase('vi')}`:`Lời giải ải ${stt}`} data-mo-loi-giai={moLoiGiai?'':undefined}>

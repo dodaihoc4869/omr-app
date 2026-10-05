@@ -5,6 +5,7 @@ import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
 import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import type { ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
+import { chiSoRo, chiSoRoSau } from '../../lib/chi-so-ro'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from '../../components/QuestionMedia'
 import { LoiGiaiCauSai } from '../../components/KhoiCauSai'
@@ -23,7 +24,7 @@ export function DeBai({ q, onZoom }: { q: Question; onZoom: (src: string) => voi
     <>
       {q.thanCauImg
         ? <button type="button" onClick={() => onZoom(q.thanCauImg!)} title="Bấm để phóng to"><img decoding="async" src={q.thanCauImg} alt="Đề bài" /></button>
-        : <div className="dh-de"><ChemText text={tachDongTheoY(q.text)} /></div>}
+        : <div className="dh-de"><ChemText text={tachDongTheoY(chiSoRo(q.text))} /></div>}
       <BangSoLieu table={q.table} />
       {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt="Hình của câu" onZoom={onZoom} />}
       <HinhTaiViTri hinhAnh={hinh} viTri="sau_de" onZoom={onZoom} nhan="câu của em" />
@@ -69,7 +70,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             return (
               <button key={chu} type="button" disabled={khoa || chay} aria-pressed={chon === chu} data-kq={kq(chu)} className={chay ? 'dh2-chay' : undefined} onClick={() => { if (!chay) onChon(chu) }}>
                 <i>{chu}</i>
-                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`))} />}
+                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chiSoRo(chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`)))} />}
                   <HinhTaiViTri hinhAnh={hinh} viTri={`sau_pa_${chu}`} onZoom={onZoom} nhan={`phương án ${chu}`} /></span>
                 {chay && <span className="dh2-an"> (đã cháy thành tro — phương án sai, không chọn được)</span>}
               </button>
@@ -84,7 +85,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             const dat = (gt: 'D' | 'S') => { const a = (chon || '----').padEnd(4, '-').split(''); a[i] = gt; onChon(a.join('')) }
             return (
               <div key={i}>
-                <span><small>Ý {'abcd'[i]}</small>{q.ideaImgs?.[i] ? <img decoding="async" src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} /> : <ChemText text={y} />}</span>
+                <span><small>Ý {'abcd'[i]}</small>{q.ideaImgs?.[i] ? <img decoding="async" src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} /> : <ChemText text={chiSoRo(y)} />}</span>
                 <div className="dh-ds">
                   <button type="button" disabled={khoa} aria-pressed={v === 'D'} onClick={() => dat('D')}>Đúng</button>
                   <button type="button" disabled={khoa} aria-pressed={v === 'S'} onClick={() => dat('S')}>Sai</button>
@@ -103,7 +104,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
           {expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}
           <details open={!ketQua.correct}>
             <summary>Lời giải</summary>
-            <LoiGiaiCauSai hoaHoc c={{ text: q.text, phan: q.phan, dapAnDung: ketQua.answer, loiGiai: ketQua.solution }} qid={q.qid} nguon="doan" />
+            <LoiGiaiCauSai hoaHoc c={{ text: chiSoRo(q.text), phan: q.phan, dapAnDung: ketQua.answer, loiGiai: chiSoRoSau(ketQua.solution) }} qid={q.qid} nguon="doan" />
             <HinhTaiViTri hinhAnh={ketQua.solutionImages ?? []} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom} />
           </details>
         </div>
