@@ -22,14 +22,23 @@ export function thayTrongChuoi(s: string, cu: string, moi: string): string {
   return s.replace(new RegExp(`(?<![0-9])${cu}(?![0-9])`, 'g'), moi)
 }
 
-async function cacCot(env: Env): Promise<{ bang: string; cot: string }[]> {
-  const bang = (await env.DB.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' AND name NOT LIKE 'd1_%'").all<Obj>()).results ?? []
+async function cacCot(env: Env, chiBang?: string): Promise<{ bang: string; cot: string }[]> {
+  // MỘT câu cho cả kho (dữ liệu thật ~250 bảng / 845 cột: gọi pragma từng bảng mất 2–3 phút); hỏng ⇒ lùi về từng bảng.
+  const loc = "m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%' AND m.name NOT LIKE 'd1_%'" + (chiBang ? ' AND m.name = ?' : '')
   const ra: { bang: string; cot: string }[] = []
+  const nhan = (rows: Obj[]) => { for (const r of rows) { const t = String(r.bang ?? ''), n = String(r.cot ?? ''); if (tenAnToan(t) && tenAnToan(n) && cotChu(String(r.kieu ?? ''))) ra.push({ bang: t, cot: n }) } }
+  try {
+    const q = env.DB.prepare(`SELECT m.name AS bang, p.name AS cot, p.type AS kieu FROM sqlite_master m JOIN pragma_table_info(m.name) p WHERE ${loc} ORDER BY m.name, p.cid`)
+    nhan((await (chiBang ? q.bind(chiBang) : q).all<Obj>()).results ?? [])
+    return ra
+  } catch { /* lùi về từng bảng */ }
+  const q = env.DB.prepare(`SELECT m.name AS name FROM sqlite_master m WHERE ${loc}`)
+  const bang = (await (chiBang ? q.bind(chiBang) : q).all<Obj>()).results ?? []
   for (const b of bang) {
     const t = String(b.name ?? '')
     if (!tenAnToan(t)) continue
     const cot = (await env.DB.prepare(`SELECT name, type FROM pragma_table_info('${t}')`).all<Obj>()).results ?? []
-    for (const c of cot) { const n = String(c.name ?? ''); if (tenAnToan(n) && cotChu(String(c.type ?? ''))) ra.push({ bang: t, cot: n }) }
+    nhan(cot.map((c) => ({ bang: t, cot: c.name, kieu: c.type })))
   }
   return ra
 }
@@ -40,9 +49,9 @@ export async function doiSbd(env: Env, b: Obj): Promise<Obj> {
   if (cu === moi) return { ok: false, error: 'Số báo danh mới trùng số cũ' }
   const caMo = await env.DB.prepare("SELECT ma_ca FROM ca WHERE trang_thai = 'mo' LIMIT 1").first<Obj>().catch(() => null)
   if (caMo) return { ok: false, error: `Đang có ca thi mở (${String(caMo.ma_ca)}) — đổi số báo danh sau khi đóng ca` }
-  const tatCa = await cacCot(env)
-  if (b.lietKeCot === true) return { ok: true, cot: tatCa.map((x) => `${x.bang}.${x.cot}`) }
   const chon = String(b.cot ?? '').trim()
+  const tatCa = await cacCot(env, chon && b.lietKeCot !== true ? chon.split('.')[0] : undefined)
+  if (b.lietKeCot === true) return { ok: true, cot: tatCa.map((x) => `${x.bang}.${x.cot}`) }
   const cot = chon ? tatCa.filter((x) => `${x.bang}.${x.cot}` === chon) : tatCa
   if (chon && cot.length === 0) return { ok: false, error: `Không có cột ${chon}` }
   const bang: DongDoiSbd[] = []
