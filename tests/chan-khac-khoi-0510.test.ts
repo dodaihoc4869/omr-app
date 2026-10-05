@@ -45,12 +45,19 @@ describe('phanTichKhoiCau — mọi nguồn phải KHỚP (mâu thuẫn ⇒ null
   it.each([
     [{ qid: 'DH-10-C1-B1-I-1', maDe: 'DH-11-C1-B1' }, [10, 11]],
     [{ maDe: 'DH-11-C2', lop: '10' }, [10, 11]],
-    [{ maDe: 'DH-12-C1', dang: 'CAN_BANG.CAN_BANG.NHAN_DANG' }, [11, 12]],
+    [{ qid: 'Q1', dang: 'CAN_BANG.CAN_BANG.NHAN_DANG', chuong: 'Carbohydrate' }, [11, 12]], // chỉ có chương mà hai chương hai khối
     [{ maDe: 'DH-11-C1', nhom: '10 · DẠY HỌC/C1' }, [10, 11]],
     [{ maDe: 'DH-11-C1,DH-10-C1' }, [10, 11]],
   ])('mâu thuẫn %j ⇒ null', (c, cacKhoi) => {
     expect(phanTichKhoiCau(c)).toEqual({ khoi: null, tinhTrang: 'mau_thuan', cacKhoi })
     expect(khoiCuaCau(c)).toBeNull()
+  })
+  it('chương CHỈ cứu câu tờ không có khối — đề ôn khối 12 có câu kiến thức lớp 10/11 vẫn là câu kho khối 12 (không mâu thuẫn)', () => {
+    expect(phanTichKhoiCau({ maDe: 'DH-12-C1', dang: 'CAN_BANG.CAN_BANG.NHAN_DANG' })).toEqual({ khoi: 12, tinhTrang: 'ro', cacKhoi: [12] })
+    expect(phanTichKhoiCau({ qid: '12-KT-C1-D1-I-3', maDe: '12-KT-C1-D1', chuong: 'Phản ứng oxi hoá – khử' })).toEqual({ khoi: 12, tinhTrang: 'ro', cacKhoi: [12] })
+    expect(cauHopKhoi(11, { maDe: 'DH-12-C1', dang: 'CAN_BANG.CAN_BANG.NHAN_DANG' })).toBe(false) // em lớp 11 vẫn không nhận câu kho khối 12
+    expect(cauHopKhoi(12, { maDe: 'DH-12-C1', dang: 'CAN_BANG.CAN_BANG.NHAN_DANG' })).toBe(true)
+    expect(khoiCuaCau({ qid: '100-III-5', maDe: '100', dang: 'CARBOHYDRATE.X.Y' })).toBe(12) // tờ không có khối: chương cứu
   })
   it('không rõ: không nguồn nào đọc ra', () => {
     for (const c of [{ qid: 'Q1', maDe: 'D1' }, { qid: 'HS1', maDe: 'DH-B1', dang: 'HSE' }, '100-I-1', {}, null]) expect(phanTichKhoiCau(c).tinhTrang, JSON.stringify(c)).toBe('khong_ro')
@@ -72,7 +79,7 @@ describe('cauHopKhoi / lyDoChanKhoi — ĐÚNG khối, lý do chặn', () => {
     expect(lyDoChanKhoi(null, { maDe: 'DH-11-C1' })).toBe('em_khong_ro')
     expect(lyDoChanKhoi(undefined, { maDe: 'DH-11-C1' })).toBe('em_khong_ro')
   })
-  it('tính chất trên 3 000 câu ngẫu nhiên (hạt 0510): hợp ⇔ mọi nguồn đọc được cùng MỘT khối và khối ấy = khối em', () => {
+  it('tính chất trên 3 000 câu ngẫu nhiên (hạt 0510): hợp ⇔ mọi nguồn đọc được (chương chỉ khi tờ/mã câu/cột lớp không nói khối) cùng MỘT khối và khối ấy = khối em', () => {
     const r = mulberry32(510)
     const chuong: Record<Khoi, string[]> = { 10: [], 11: [], 12: [] }
     for (const [ma, k] of Object.entries(KHOI_THEO_MA_CHUONG)) chuong[k].push(`${ma}.X.Y`)
@@ -87,7 +94,8 @@ describe('cauHopKhoi / lyDoChanKhoi — ĐÚNG khối, lý do chặn', () => {
         ...(kLop ? { lop: String(kLop) } : {}),
         ...(kChuong ? { dang: chon(chuong[kChuong]) } : {}),
       }
-      const doc = new Set(nguon.filter((x): x is Khoi => x !== null))
+      const chinh = new Set([kMa, kQid, kLop].filter((x): x is Khoi => x !== null))
+      const doc = chinh.size ? chinh : new Set([kChuong].filter((x): x is Khoi => x !== null))
       const mongDoi = e !== null && doc.size === 1 && doc.has(e)
       expect(cauHopKhoi(e, c), `#${i} em ${e} câu ${JSON.stringify(c)}`).toBe(mongDoi)
     }

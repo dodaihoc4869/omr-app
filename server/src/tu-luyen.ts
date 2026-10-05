@@ -418,7 +418,7 @@ export async function tuLuyenNguon(env: Env, sbd: string): Promise<Obj> {
     // Chế độ 2: nguồn dạng đang dùng (thẻ ghi rõ). null ⇒ thật sự không thể (tài khoản chưa có lớp).
     dangCauSai: kieu2 ? { kieu: kieu2, nhan: NHAN_NGUON_DANG[kieu2] } : { kieu: '', nhan: '', loi: LOI_KHONG_LOP },
     // Chế độ 4: kho trống ⇒ rút từ toàn kho lớp ≤ khối em; không rõ khối ⇒ khoá có lý do.
-    tuDo: kcs.ds.length ? { kieu: 'cau_sai', nhan: 'Theo câu sai của em' } : khoiEm !== null ? { kieu: 'toan_kho', nhan: `Toàn kho lớp ${khoiEm} trở xuống` } : { kieu: '', nhan: '', loi: LOI_KHONG_LOP },
+    tuDo: kcs.ds.length ? { kieu: 'cau_sai', nhan: 'Theo câu sai của em' } : khoiEm !== null ? { kieu: 'toan_kho', nhan: `Toàn kho lớp ${khoiEm}` } : { kieu: '', nhan: '', loi: LOI_KHONG_LOP },
     dangNenLuyen: nenLuyen,
     dangThi,
   }
@@ -533,7 +533,7 @@ async function chayCheDo(env: Env, sbd: string, t: ThamSo, rut: boolean): Promis
       }
     }
     const tk = await ungVienToanKho(env, khoiEm, loc)
-    const nguonDang = { kieu: 'toan_kho', nhan: khoiEm !== null ? `Toàn kho lớp ${khoiEm} trở xuống` : '' }
+    const nguonDang = { kieu: 'toan_kho', nhan: khoiEm !== null ? `Toàn kho lớp ${khoiEm}` : '' }
     if (!tk.ds.length) return { ...rong(tk.loi), nguonDang }
     if (!rut) return { dsCau: [], tongToiDa: tk.ds.length, tieuDe: '', meta, loi: '', nguonDang }
     const dsCau = tron(tk.ds, Math.random).slice(0, Math.min(t.soCau, tk.ds.length))

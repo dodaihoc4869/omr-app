@@ -548,7 +548,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     yeu: 'Em chưa có câu sai từ 29/09 — lấy các dạng em làm đúng ít nhất (mỗi dạng đã làm ít nhất 3 lần).',
     chuong: 'Em chưa có câu sai và chưa đủ số liệu — lấy các dạng của chương em đang học trong chiến dịch.',
     pho_bien: 'Em chưa có câu sai và chưa có chiến dịch — lấy các dạng có nhiều câu nhất của lớp em.',
-    toan_kho: 'Em chưa có câu sai từ 29/09 — rút từ toàn kho lớp em trở xuống.',
+    toan_kho: 'Em chưa có câu sai từ 29/09 — rút từ toàn kho lớp em.',
   }
   const oNguon = nguonXt?.nhan ? (
     <div className="tlu-nguon" role="status">
@@ -707,7 +707,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
           <>
             {nhanXt}
             {thanhChon(soCau4, setSoCau4, 1, Math.min(50, tongXt?.tong ?? 0))}
-            <p className="tlu-ghi">{nguonXt?.kieu === 'toan_kho' ? 'Rút ngẫu nhiên từ toàn kho lớp em trở xuống.' : 'Rút từ kho câu cùng chuyên đề với các câu em từng sai.'}</p>
+            <p className="tlu-ghi">{nguonXt?.kieu === 'toan_kho' ? 'Rút ngẫu nhiên từ toàn kho lớp em.' : 'Rút từ kho câu cùng chuyên đề với các câu em từng sai.'}</p>
           </>
         )}
         {!(cheDo === 1 && n1Kho === 0) && (
