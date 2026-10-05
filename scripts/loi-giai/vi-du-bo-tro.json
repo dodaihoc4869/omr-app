@@ -1,0 +1,64 @@
+{
+ "_ghiChu": "Ba ví dụ ĐÚNG KHUÔN tệp bo-tro/<tệp>.json. Tệp thật chỉ có qid, bam (chép từ vao/) và songSinh HOẶC yMoi, đúng số mục vao.can yêu cầu. Ví dụ dưới chỉ ghi 1–2 bản cho gọn.",
+ "viDuPhanIII_doiSo": {
+  "qid": "<qid trong vao>",
+  "bam": "<bam trong vao>",
+  "songSinh": [
+   {
+    "kieu": "so",
+    "cach": "doi_so",
+    "de": "Để điều chế isoamyl acetate trong phòng thí nghiệm, một học sinh đun nóng 5,00 mL acetic acid (D = 1,05 g/mL) với 10,00 mL isoamyl alcohol (CH3)2CHCH2CH2OH (D = 0,81 g/mL), có H2SO4 đặc làm xúc tác, thu được 7,00 mL isoamyl acetate (D = 0,88 g/mL). Tính hiệu suất của phản ứng (làm tròn đến hàng đơn vị).",
+    "dap_an": "54",
+    "buoc": [
+     "n(acetic acid) = 5,00 × 1,05 / 60 = 0,0875 mol; n(isoamyl alcohol) = 10,00 × 0,81 / 88 ≈ 0,092 mol ⇒ acid hết trước, tính theo acid.",
+     "n(isoamyl acetate) = 7,00 × 0,88 / 130 ≈ 0,0474 mol.",
+     "H = 0,0474 / 0,0875 × 100% ≈ 54%."
+    ],
+    "chot": "Đổi thể tích ra mol, so chất thiếu rồi mới tính hiệu suất theo chất thiếu.",
+    "phepTinh": [
+     { "ten": "n acetic acid (mol)", "bieuThuc": "5.00*1.05/60", "ketQua": 0.0875, "lamTron": 4 },
+     { "ten": "n isoamyl alcohol (mol)", "bieuThuc": "10.00*0.81/88", "ketQua": 0.092, "lamTron": 3 },
+     { "ten": "n isoamyl acetate (mol)", "bieuThuc": "7.00*0.88/130", "ketQua": 0.0474, "lamTron": 4 },
+     { "ten": "Hiệu suất (%)", "bieuThuc": "7.00*0.88/130/(5.00*1.05/60)*100", "ketQua": 54, "lamTron": 0, "laDapSo": true }
+    ]
+   }
+  ]
+ },
+ "viDuPhanI_lyThuyet": {
+  "qid": "<qid trong vao>",
+  "bam": "<bam trong vao>",
+  "songSinh": [
+   {
+    "kieu": "ly_thuyet",
+    "cach": "dao_chieu",
+    "de": "Khi tổng hợp ethyl acetate trong phòng thí nghiệm, dùng nhóm hóa chất nào sau đây cho hiệu suất thấp nhất?",
+    "pa": {
+     "A": "Acetic acid nguyên chất; ethanol nguyên chất; dung dịch H2SO4 98%",
+     "B": "Acetic acid nguyên chất; cồn 96o; dung dịch H2SO4 98%",
+     "C": "Dung dịch CH3COOH 5%; cồn 90o; dung dịch HCl 36,5%",
+     "D": "Acetic acid nguyên chất; ethanol nguyên chất; dung dịch HCl 36,5%"
+    },
+    "dap_an": "C",
+    "buoc": [
+     "Ester hoá là phản ứng thuận nghịch; nước làm cân bằng chuyển theo chiều nghịch.",
+     "Nhóm C mang nhiều nước nhất (giấm 5%, cồn 90o, HCl đặc vẫn chứa nhiều nước) và không có chất hút nước ⇒ hiệu suất thấp nhất."
+    ],
+    "chot": "Càng nhiều nước, cân bằng ester hoá càng lùi về chất đầu."
+   }
+  ]
+ },
+ "viDuPhanII_yMoi": {
+  "qid": "<qid trong vao>",
+  "bam": "<bam trong vao>",
+  "yMoi": [
+   { "t": "Isoamyl acetate có nhiệt độ sôi cao hơn isoamyl alcohol.", "d": "D", "lyDo": "Theo bảng: 142,0 °C so với 131,1 °C." },
+   { "t": "Trong phễu chiết, lớp isoamyl acetate nằm dưới lớp nước.", "d": "S", "lyDo": "Khối lượng riêng 0,88 g/mL nhỏ hơn nước nên lớp ester ở trên." },
+   { "t": "H2SO4 đặc vừa làm xúc tác vừa hút nước, giúp cân bằng chuyển theo chiều tạo ester.", "d": "D", "lyDo": "H2SO4 đặc hút nước nên cân bằng ester hoá chuyển theo chiều thuận." },
+   { "t": "Lắp ống sinh hàn khi đun giúp hơi các chất ngưng tụ và chảy trở lại bình phản ứng.", "d": "D", "lyDo": "Sinh hàn hồi lưu giữ các chất dễ bay hơi lại trong hệ khi đun." },
+   { "t": "Phản ứng giữa acetic acid và isoamyl alcohol là phản ứng một chiều.", "d": "S", "lyDo": "Ester hoá là phản ứng thuận nghịch." },
+   { "t": "Acetic acid còn dư tan nhiều vào lớp nước khi chiết.", "d": "D", "lyDo": "Acetic acid tan vô hạn trong nước nên phần lớn chuyển sang lớp nước." },
+   { "t": "Lớp ester tách ra sau khi chiết là isoamyl acetate tinh khiết.", "d": "S", "lyDo": "Lớp ester còn lẫn alcohol, acid và nước, phải làm khô rồi chưng cất." },
+   { "t": "Có thể thay H2SO4 đặc bằng dung dịch NaOH để làm xúc tác cho phản ứng.", "d": "S", "lyDo": "NaOH trung hoà acid và thuỷ phân ester, không xúc tác ester hoá." }
+  ]
+ }
+}
