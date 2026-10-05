@@ -6,6 +6,8 @@
 import type {LoiGiaiCauTruc} from '../../../data/examContent'
 import {chuanHoaLoiGiaiCau} from '../../../lib/chuan-hoa-loi-giai'
 import type {CauDao} from '../dao/kieu'
+import {docSanhOmni} from '../../../lib/omni-hs'
+import type {SanhOmni} from '../../../../server/src/omni-kieu'
 
 /** Số ải tối đa của một chuyến thám hiểm (máy chủ `SO_CAU_CHUYEN`). */
 export const SO_AI_CHUYEN=6
@@ -36,7 +38,9 @@ export const chuGach=(g:readonly string[])=>g.length===2?`phương án ${g[0]} v
 // ───────────── hoa2-sanh ─────────────
 export interface ChienDich2{id:string;ten:string;hanNop:string;D:number|null;tong:number;coXat:number;thanhThao:number;canDayLai:number;thanhThaoTangTu:string|null}
 export interface Ruong2{daLam:number;tong:number;moDuoc:boolean;daMo:boolean;vang:number|null}
-export interface Sanh2{ngay:string;chienDich:ChienDich2|null;theLuc:{con:number;tong:number}|null;huyetChien:boolean;dao:{con:number}|null;doan:{con:number}|null;khoaDao:boolean;loiKhoaDao:string;ruong:Ruong2|null;canChonThu:boolean}
+export interface Sanh2{ngay:string;chienDich:ChienDich2|null;theLuc:{con:number;tong:number}|null;huyetChien:boolean;dao:{con:number}|null;doan:{con:number}|null;khoaDao:boolean;loiKhoaDao:string;ruong:Ruong2|null;canChonThu:boolean
+ /** OMNI 3 (05/10): CHỈ có khi công tắc `omni` áp cho em (đo msLam, chip Chưa chắc, Trạm hồi phục, vé, đề thử). Vắng ⇒ Đảo y hệt hôm nay. */
+ omni?:SanhOmni}
 const so=(x:unknown):number|null=>typeof x==='number'&&Number.isFinite(x)&&x>=0?Math.floor(x):null
 const chuoi=(x:unknown)=>typeof x==='string'?x.trim():''
 const vat=(x:unknown):Record<string,unknown>|null=>x&&typeof x==='object'&&!Array.isArray(x)?x as Record<string,unknown>:null
@@ -50,7 +54,8 @@ export function docSanh2(raw:unknown):Sanh2|null{
  const con=(x:unknown)=>{const o=vat(x),n=so(o?.con);return n===null?null:{con:n}}
  const theLuc=so(tl?.con)!==null&&so(tl?.tong)!==null?{con:so(tl!.con)!,tong:so(tl!.tong)!}:null
  const ruong:Ruong2|null=ru&&so(ru.daLam)!==null&&so(ru.tong)!==null?{daLam:so(ru.daLam)!,tong:so(ru.tong)!,moDuoc:ru.moDuoc===true,daMo:ru.daMo===true,vang:so(qua?.vang)}:null
- return {ngay:chuoi(r.ngay),chienDich,theLuc,huyetChien:r.huyetChien===true,dao:con(r.dao),doan:con(r.doan),khoaDao:r.khoaDao===true,loiKhoaDao:chuoi(r.loiKhoaDao),ruong,canChonThu:r.canChonThu===true}}
+ const omni=docSanhOmni(r.omni)
+ return {ngay:chuoi(r.ngay),chienDich,theLuc,huyetChien:r.huyetChien===true,dao:con(r.dao),doan:con(r.doan),khoaDao:r.khoaDao===true,loiKhoaDao:chuoi(r.loiKhoaDao),ruong,canChonThu:r.canChonThu===true,...(omni?{omni}:{})}}
 /** Gộp phần tóm tắt mà `start` trả kèm (`theLuc`, `dao`, `doan`) vào sanh đang có — số mới hơn, không gọi thêm. */
 export function gopTomTat(s:Sanh2|null,raw:unknown):Sanh2|null{
  const r=vat(raw);if(!s||!r)return s

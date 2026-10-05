@@ -10,10 +10,14 @@ import DongHanh from '../bat-linh/DongHanh'
 //                                        rương đã mở (hoặc kế hoạch rỗng) + máy chủ cho ⇒ nút phụ "Thử sức thêm (không bắt buộc)" (thầy 30/09).
 // Mọi con số lấy từ máy chủ (`hoa2-sanh`, thần thú/EXP/chuỗi ngày từ /hs/ke-hoach-ngay) — không tự tính, không bịa.
 // Dải "Vào thi" chỉ hiện khi có ca kiểm tra đang mở; bấm là vào đúng luồng PhongVaoThi → ExamTakeScreen có sẵn.
+// OMNI 3 (05/10): khi `hoa2-sanh` có `omni` — vài DÒNG NHỎ trong thẻ chiến dịch + nút PHỤ cạnh "Thử sức thêm" (khối OMNI ngay trên XongHomNay). Vắng ⇒ y hệt cũ.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro, type ReactNode } from 'react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
-import { moRuong, thuSucThem, type KetQuaSanh, type SanhHoa2 } from './api'
+import { goiBangToken, moRuong, omniDoiThuTu, thuSucThem, type KetQuaSanh, type SanhHoa2 } from './api'
+import { CHU_CHO_BAI_MOI, GOI_Y_VE, NUT_DE_MAI, NUT_LAM_LUON, chuChungChi, chuConDangDe8, chuDangVung, chuDeThu, chuMetGio, chuOnBaiCu, chuSoY, chuVe } from '../../lib/omni-chu'
+import { datViecOmniDao, type ViecOmniDao } from '../../lib/omni-hs'
+import type { SanhOmni } from '../../../server/src/omni-kieu'
 import { useBoCucNgang, type BoCucNgang } from './bo-cuc-ngang'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
 import BanDoHanhTrinh from '../bat-linh/BanDoHanhTrinh'
@@ -256,6 +260,7 @@ function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
           </span>
           {cd.thanhThao === 0 && cd.thanhThaoTangTu && <span className="h2-cd-phu"> (tăng từ {ngayThang(cd.thanhThaoTangTu)})</span>}
         </span>
+        {s.omni && <DongOmniChienDich o={s.omni} cdId={cd.id} lop="h2-cd-phu" />}
       </span>
     </div>
   )
@@ -387,8 +392,114 @@ function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onT
   )
 }
 
+// ═══════════════════ OMNI 3 (05/10 · docs/hop-dong-omni-3.md mục A) ═══════════════════
+// Thầy lệnh 05/10: "giữ nguyên mọi giao diện hiện tại … thêm những mục cần thiết đồng bộ với giao diện hiện tại". Mọi phần dưới đây là DÒNG CHỮ
+// hoặc NÚT PHỤ nằm trong thẻ/khung SẴN CÓ, dùng đúng lớp h2-* đang có; chữ lấy từ src/lib/omni-chu.ts (một nguồn). Chỉ vẽ khi `hoa2-sanh`
+// có `omni` — cờ tắt ⇒ không thêm một phần tử nào, DOM y hệt trước.
+
+/** 'YYYY-MM-DD' ⇒ '05/10' (luật A1.6); chữ khác (máy chủ đã viết sẵn) giữ nguyên. */
+const ngayNgan = (d: string): string => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? ngayThang(d) : d)
+
+/** Dòng nhỏ trong THẺ CHIẾN DỊCH sẵn có: "Dạng vững a/b · Sơ ý …" · "Còn N dạng cần vững để chạm mốc 8" (có chứng chỉ ⇒ dòng chứng chỉ gần nhất)
+ *  · nhiều bài song song ⇒ thẻ giữ bài hạn gần nhất + "Đang luyện thêm: <bài kia>". */
+function DongOmniChienDich({ o, cdId, lop }: { o: SanhOmni; cdId: string; lop: string }) {
+  const dong1 = [o.dangVung.b > 0 ? chuDangVung(o.dangVung.a, o.dangVung.b) : null, chuSoY(o.sEm, o.sMucTieu)].filter(Boolean).join(' · ')
+  const cc = o.chungChi[0]
+  const dong2 = cc ? chuChungChi(cc.ten, cc.doTin, ngayNgan(cc.ngay)) : chuConDangDe8(o.conDangDe8)
+  const coThe = o.baiDangLuyen.some((b) => b.id === cdId)
+  const them = o.baiDangLuyen.filter((b, i) => (coThe ? b.id !== cdId : i > 0)).map((b) => b.ten)
+  return (
+    <>
+      {dong1 && <span className={lop} data-khoi="omni-dang-vung">{dong1}</span>}
+      {dong2 && <span className={lop} data-khoi="omni-moc-8">{dong2}</span>}
+      {them.length > 0 && <span className={lop} data-khoi="omni-luyen-them">Đang luyện thêm: {them.join(', ')}</span>}
+    </>
+  )
+}
+
+/** Cạnh nút "Thử sức thêm" sẵn có: nút PHỤ cùng dáng — "Vé thử thách c/t" (hết vé ⇒ nút mờ) và "Đề thử …" (khi máy chủ cho).
+ *  Bấm ⇒ mở Đảo y như nút Đảo; Đảo đọc khoá `game-v2:omni-dao` MỘT lần: vé ⇒ `start` kèm `ve: 'auto'`, đề thử ⇒ luồng đề thử của Đảo. */
+function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: () => void }) {
+  const o = s.omni
+  if (!o) return null
+  const mo = (viec: ViecOmniDao) => {
+    datViecOmniDao(viec)
+    onKhamPhaDao()
+  }
+  return (
+    <>
+      {o.ve.tong > 0 && (
+        <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="ve-thu-thach" disabled={o.ve.con <= 0} onClick={o.ve.con > 0 ? () => mo('ve') : undefined}>
+          <span className="h2-nut-dao-chu">
+            <span className="h2-nut-dao-lon">{chuVe(o.ve.con, o.ve.tong)}</span>
+            <span className="h2-nut-thu-suc-phu">{GOI_Y_VE}</span>
+          </span>
+        </button>
+      )}
+      {o.deThu.duoc && (
+        <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="de-thu" onClick={() => mo('de-thu')}>
+          <span className="h2-nut-dao-chu">
+            <span className="h2-nut-dao-lon">{chuDeThu(o.deThu.soCau, o.deThu.phut)}</span>
+          </span>
+        </button>
+      )}
+    </>
+  )
+}
+
+/** Giờ này em hay sai nhanh hơn lúc học tốt nhất: MỘT dòng + hai nút nhỏ "Để mai" / "Làm luôn" (máy chủ xếp lại kế hoạch ⇒ tải lại Sảnh). */
+function TheMetGio({ s, token, onTaiLai, ngang = false }: { s: SanhHoa2; token: string; onTaiLai: () => void; ngang?: boolean }) {
+  const [dangGoi, setDangGoi] = useState(false)
+  const [daQuyet, setDaQuyet] = useState(false)
+  const [loi, setLoi] = useState('')
+  const mg = s.omni?.metGio
+  if (!mg) return null
+  const chon = async (quyet: 'de_mai' | 'lam_luon') => {
+    if (dangGoi) return
+    setDangGoi(true)
+    setLoi('')
+    try {
+      await omniDoiThuTu(goiBangToken(token), quyet)
+      setDaQuyet(true)
+      onTaiLai()
+    } catch (e) {
+      setLoi(e instanceof Error ? e.message : 'Chưa đổi được thứ tự câu. Em thử lại.')
+    } finally {
+      setDangGoi(false)
+    }
+  }
+  const than = (
+    <>
+      <p className={ngang ? 'h2-ng-phu' : 'h2-tam-chu'} data-khoi="met-gio">{chuMetGio(mg.tiLe, mg.tiLeTot)}</p>
+      {mg.coTheDoi && !daQuyet && (
+        <div className="h2-omni-hang">
+          <button type="button" className="h2-nut-phu" disabled={dangGoi} aria-busy={dangGoi} onClick={() => void chon('de_mai')}>{NUT_DE_MAI}</button>
+          <button type="button" className="h2-nut-phu" disabled={dangGoi} aria-busy={dangGoi} onClick={() => void chon('lam_luon')}>{NUT_LAM_LUON}</button>
+        </div>
+      )}
+      {loi && <p className="h2-loi" role="alert">{loi}</p>}
+    </>
+  )
+  return ngang ? <section className="h2-ng-the h2-omni-khoi" aria-label="Giờ học hôm nay">{than}</section> : than
+}
+
+/** "Hôm nay em tiến thêm gì" (2–5 dòng máy chủ viết sẵn, chỉ khi xong kế hoạch) nối dưới lời mừng / rương sẵn có. */
+function DongNhatKy({ s, lop }: { s: SanhHoa2; lop: string }) {
+  const nk = s.omni?.nhatKy
+  if (!nk?.length) return null
+  return (
+    <>
+      {nk.map((d, i) => (
+        <p key={i} className={lop} data-khoi="nhat-ky">
+          {d}
+        </p>
+      ))}
+    </>
+  )
+}
+
 /** Hết kế hoạch hôm nay: lời mừng + Rương Bát Linh (HS-XongHomNay.dc.html). */
-function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null }) {
+function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them = null }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null; /** OMNI 3: nút phụ đặt ngay sau "Thử sức thêm" (vắng ⇒ không có gì). */ them?: ReactNode }) {
   const [dangMo, setDangMo] = useState(false)
   const [loi, setLoi] = useState('')
   const [vangVuaNhan, setVangVuaNhan] = useState<number | null>(null)
@@ -481,9 +592,11 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
         </div>
         {s.tamGiuCa > 0 && <p className="h2-ng-phu" data-khoi="tam-giu-ca">{chuTamGiu(s.tamGiuCa)}</p>}
         {tinRuong}
+        <DongNhatKy s={s} lop="h2-ng-phu" />
         {tinLoi}
         {nutMo}
         <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
+        {them}
       </section>
     )
   }
@@ -516,23 +629,27 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
         {s.tamGiuCa > 0 && <p className="h2-xong-phu" data-khoi="tam-giu-ca">{chuTamGiu(s.tamGiuCa)}</p>}
         {mai && <p className="h2-xong-phu">Kế hoạch ngày mai sẵn lúc 00:00 {thuNgayThang(mai)}: câu đến lịch ôn lại và câu mới.</p>}
         {tinRuong}
+        <DongNhatKy s={s} lop="h2-xong-phu" />
         {tinLoi}
       </section>
       {nutMo}
       <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
+      {them}
     </>
   )
 }
 
+/** OMNI 3 · chế độ chờ bài mới (thầy chưa tick bài mới): dòng "chưa có câu" đổi thành "Hôm nay ôn bài cũ: N câu" / "Đang ôn bài cũ, chờ thầy giao bài mới." */
+const chuChoBaiMoi = (s: SanhHoa2): string | null => (s.omni?.choBaiMoi ? (s.omni.onBaiCu > 0 ? chuOnBaiCu(s.omni.onBaiCu) : CHU_CHO_BAI_MOI) : null)
 /** Kế hoạch hôm nay không còn câu: câu tạm giữ vì ca kiểm tra (30/09) ⇒ nói rõ, khỏi tưởng lỗi. */
 const chuKhongConCau = (s: SanhHoa2): string =>
-  s.tamGiuCa > 0 ? `Có ${s.tamGiuCa} câu hôm nay đang tạm giữ vì lớp đang có ca kiểm tra. Câu sẽ tự mở lại sau khi ca kết thúc.` : 'Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.'
+  s.tamGiuCa > 0 ? `Có ${s.tamGiuCa} câu hôm nay đang tạm giữ vì lớp đang có ca kiểm tra. Câu sẽ tự mở lại sau khi ca kết thúc.` : chuChoBaiMoi(s) ?? 'Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.'
 /** Dòng nhỏ dưới số câu kế hoạch ở màn xong: câu tạm giữ vì ca kiểm tra. */
 const chuTamGiu = (n: number): string => `+${n} câu tạm giữ vì ca kiểm tra, mở lại sau ca`
 
 /** Chưa có chiến dịch đang chạy: chiến dịch sắp bắt đầu (thầy 28/09) ⇒ báo ngày; không thì câu cũ. */
 const chuChuaCoChienDich = (s: SanhHoa2): string =>
-  s.sapBatDau ? `Chiến dịch ${s.sapBatDau.ten} bắt đầu ${thuNgayThang(s.sapBatDau.batDau)}. Tới ngày đó bản đồ sẽ mở đảo mới ở đây.` : 'Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.'
+  s.sapBatDau ? `Chiến dịch ${s.sapBatDau.ten} bắt đầu ${thuNgayThang(s.sapBatDau.batDau)}. Tới ngày đó bản đồ sẽ mở đảo mới ở đây.` : chuChoBaiMoi(s) ?? 'Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.'
 
 function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   const xong = s.theLuc.tong > 0 && s.theLuc.con === 0
@@ -541,7 +658,7 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
     <>
       {xong ? (
         <>
-          <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} />
+          <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} them={<NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />} />
           <NutBia p={p} s={s} />
         </>
       ) : trong ? (
@@ -549,10 +666,16 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <>
             <p className="h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p>
             <NutThuSucThem s={s} token={p.token} onTaiLai={p.onTaiLai} />
+            <NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />
           </>
-        ) : null
+        ) : (
+          <NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />
+        )
       ) : (
-        <NutViec p={p} s={s} />
+        <>
+          <NutViec p={p} s={s} />
+          <TheMetGio s={s} token={p.token} onTaiLai={p.onTaiLai} />
+        </>
       )}
       {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
         <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
@@ -723,6 +846,7 @@ function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
           <Thanh nhan="Thành thạo" co={cd.thanhThao} tong={cd.tong} mau="vang" />
         </span>
         {cd.thanhThao === 0 && cd.thanhThaoTangTu && <span className="h2-ng-phu h2-ng-an-thap">Thành thạo bắt đầu tăng từ {thuNgayThang(cd.thanhThaoTangTu)}.</span>}
+        {s.omni && <DongOmniChienDich o={s.omni} cdId={cd.id} lop="h2-ng-phu h2-ng-an-thap" />}
       </span>
     </section>
   )
@@ -829,10 +953,16 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <>
             <p className="h2-ng-the h2-tam-chu" data-khoi={s.tamGiuCa > 0 ? 'tam-giu-ca' : undefined}>{chuKhongConCau(s)}</p>
             <NutThuSucThem s={s} token={p.token} onTaiLai={p.onTaiLai} />
+            <NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />
           </>
-        ) : null
+        ) : (
+          <NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />
+        )
       ) : (
-        <NutViec p={p} s={s} />
+        <>
+          <NutViec p={p} s={s} />
+          <TheMetGio s={s} token={p.token} onTaiLai={p.onTaiLai} ngang />
+        </>
       )}
       {!xong && s.ruong.tong > 0 && <TheRuongNgang r={s.ruong} />}
       <span className="h2-ng-dan" aria-hidden="true" />
@@ -918,7 +1048,7 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
         </div>
         <section className="h2-ng-trai" data-xong={xong ? 'true' : 'false'} aria-label={xong ? 'Kế hoạch hôm nay' : 'Bản đồ Bát Linh'}>
           {s && xong ? (
-            <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} ngang thu={p.thu} />
+            <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} ngang thu={p.thu} them={<NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />} />
           ) : (
             <>
               <DongHanh thu={chonThu ? null : p.thu} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
