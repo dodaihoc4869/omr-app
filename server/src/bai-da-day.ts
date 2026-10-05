@@ -19,6 +19,7 @@ import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { laCauTuLuan } from './cam-tu-luan'
+import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
 import { docChienDichCuaEm, docChienDichKemBatDau, ngayVnCua, noCuCaLop } from './srs2-d1'
@@ -41,6 +42,13 @@ const docMang = (v: unknown): string[] => {
   }
 }
 const NGAY = /^\d{4}-\d{2}-\d{2}$/
+/**
+ * LƯỚI AN TOÀN (thầy 05/10: "Khi tích chọn bạn chỉ lấy 3 phần trắc nghiệm, đúng sai trả lời ngắn làm tự động giao bỏ phần ví dụ minh họa và các dạng
+ * trọng tâm nhé."): tờ mang nhãn mục dạy học / tự luận (-VD, -DT, -TL — `laMaDeTuLuan`; dạng dài -VDMH, -DTTT) KHÔNG BAO GIỜ vào bài tick lẫn phạm vi,
+ * kể cả khi app cũ còn gửi. Cùng luật app thầy (`laMaToKhongGiao`, src/lib/bai-hom-nay.ts). Thuần.
+ */
+export const laMaToKhongGiao = (maDe: string): boolean => laMaDeTuLuan(maDe) || /(?:^|-)(?:VDMH|DTTT)(?:-|$)/i.test(String(maDe ?? ''))
+export const CHU_BAI_CHUA_CO_TO_TU_GIAO = 'Bài này chưa có tờ Trắc nghiệm / Đúng sai / Trả lời ngắn.'
 /** Trần số tờ của một bài và số bài `phamVi` mỗi lệnh (chặn thân lệnh vô lý). */
 const TOI_DA_TO_MOI_BAI = 60
 const TOI_DA_BAI_TRUOC = 300
@@ -275,8 +283,8 @@ async function docDauVaoBai(env: Env, b: Row, nowMs: number, canBai: boolean): P
   if (canBai && !khoaBai) return { loi: 'Chưa chọn bài.' }
   if (canBai && !tenBai) return { loi: 'Thiếu tên bài.' }
   if (canBai && (b.viTri == null || b.viTri === '' || !Number.isFinite(viTriSo))) return { loi: 'Thiếu vị trí của bài trong cây.' }
-  const maDe = mangChuoi(b.maDe)
-  if (!maDe.length) return { loi: 'Bài chưa có tờ nào để giao.' }
+  const maDe = mangChuoi(b.maDe).filter((m) => !laMaToKhongGiao(m))
+  if (!maDe.length) return { loi: CHU_BAI_CHUA_CO_TO_TU_GIAO }
   if (maDe.length > TOI_DA_TO_MOI_BAI) return { loi: `Một bài tối đa ${TOI_DA_TO_MOI_BAI} tờ.` }
   const hanNop = str(b.hanNop).trim() || null
   if (hanNop && !NGAY.test(hanNop)) return { loi: 'Hạn nộp phải là ngày dạng YYYY-MM-DD.' }
@@ -298,7 +306,7 @@ async function docDauVaoBai(env: Env, b: Row, nowMs: number, canBai: boolean): P
     const k = str(o.khoaBai).trim()
     const v = Number(o.viTri)
     if (!k || k === khoaBai || !Number.isFinite(v)) continue
-    phamVi.push({ khoaBai: k, tenBai: str(o.tenBai).replace(/\s+/g, ' ').trim() || k, viTri: Math.floor(v), maDe: mangChuoi(o.maDe).slice(0, TOI_DA_TO_MOI_BAI) })
+    phamVi.push({ khoaBai: k, tenBai: str(o.tenBai).replace(/\s+/g, ' ').trim() || k, viTri: Math.floor(v), maDe: mangChuoi(o.maDe).filter((m) => !laMaToKhongGiao(m)).slice(0, TOI_DA_TO_MOI_BAI) })
   }
   return { lop, khoaBai, tenBai, viTri: Number.isFinite(viTriSo) ? Math.floor(viTriSo) : 0, maDe, em, soEmLop: emLop.length, theLuc, hanNop, nguoi: str(b.nguoi).trim().slice(0, 60) || null, phamVi }
 }
@@ -562,6 +570,7 @@ async function danhSach(env: Env, b: Row, nowMs: number): Promise<Record<string,
 /**
  * `POST /gv/bai-da-day` — action:
  *   danh-sach {lop}                                  ⇒ { ok, bai: [{khoaBai, tenBai, viTri, tickLuc, chienDichId, trangThai:'dang_luyen'|'da_day', hanNop, conNgay, chungChi:{dat,tong}}], choBaiMoi: {soNgay}|null }
+ *   (maDe[] và phamVi[].maDe: mã -VD / -DT / -TL bị bỏ trước khi tính / giao — `laMaToKhongGiao`; còn 0 tờ ⇒ { ok:false, error: CHU_BAI_CHUA_CO_TO_TU_GIAO })
  *   xem-truoc {lop, khoaBai, tenBai, viTri, maDe[], theLucNgay?, hanNop?} ⇒ { ok, soCau, soTuLuan, hanNop, D, luotCan, sucChua, duLuot, tongEm, duDiem8, quaTai:[{sbd,ten}], theLucNgay }
  *   tick {lop, khoaBai, tenBai, viTri, maDe[], phamVi:[{khoaBai,tenBai,viTri,maDe[]}], hanNop?, theLucNgay?, nguoi?} ⇒ { ok, chienDichId, hanNop, daCo }
  *   bo-tick {lop, khoaBai}                          ⇒ { ok, chienDich: 'da_huy'|'da_dong'|null }

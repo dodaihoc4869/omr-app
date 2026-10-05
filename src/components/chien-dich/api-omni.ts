@@ -73,7 +73,8 @@ export interface DauVaoBai {
   khoaBai: string
   tenBai: string
   viTri: number
-  /** Mã tờ ĐÃ TÁCH PHẦN của bài (…-TN / -DS / -TLN, mục đặc biệt giữ nguyên mã) — không gồm "Ví dụ minh hoạ" trừ khi thầy tích. */
+  /** Mã tờ TỰ GIAO của bài: CHỈ tờ phần Trắc nghiệm / Đúng sai / Trả lời ngắn (…-TN / -DS / -TLN hoặc tờ chưa tách một phần) — không bao giờ có
+   *  Ví dụ minh hoạ hay Các dạng toán trọng tâm (thầy 05/10; máy chủ cũng tự bỏ -VD/-DT/-TL). */
   maDe: string[]
   hanNop?: string
   theLucNgay?: number
