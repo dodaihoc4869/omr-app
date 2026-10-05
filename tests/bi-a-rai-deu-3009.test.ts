@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // THẦY LỆNH 30/09: "Bi a cũng rải luôn câu ôn lại đúng theo tỷ lệ trần của bi a luôn".
 // Cùng ngày PR #108 bật RẢI ĐỀU (câu mới/ngày dừng đúng quota, thể lực dư dành cho ôn) ⇒ kế hoạch ngày có thể nhỏ. Luật Bi-a mới:
 //   (1) trần = floor(40% TOÀN BỘ kế hoạch ngày) — cả câu mới lẫn câu ôn lại (nợ, củng cố, duy trì) — chia theo đúng tỉ lệ mới : ôn của kế hoạch;
@@ -20,7 +21,7 @@ import type { Env } from '../server/src/kieu'
 const NGAY = 86_400_000
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, dang: string, correct: string) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['k'], correct, reviewed: true, solution: { chot: `Cốt lõi ${qid}` },
   })
 }
@@ -233,7 +234,7 @@ describe('[rải đều bật] ẢNH THẦY 30/09: vào bàn, chưa trả lời 
 })
 
 describe('[rải đều bật] Câu đã làm có câu em trả lời trong Bi-a (bản của tests/bi-a-cau-da-lam.test.ts)', () => {
-  const cauI = (qid: string, ma = 'DE1') => JSON.stringify({ qid, maDe: ma, version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: `Cốt lõi ${qid}` } })
+  const cauI = (qid: string, ma = 'DE1') => JSON.stringify({ qid, maDe: ma, lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: `Cốt lõi ${qid}` } })
   async function dung(o: { caSai?: boolean } = {}) {
     const d = taoD1That(); const env = d.env as unknown as Env
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn An','12A1','mk1','x')")

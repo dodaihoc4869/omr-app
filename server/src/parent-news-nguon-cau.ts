@@ -11,6 +11,7 @@ import { chuoiLoiGiai } from './goi-cu'
 import { protectedQuestions, readScope } from './game-v2-bank'
 import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { laCauTuLuan } from './cam-tu-luan'
@@ -189,6 +190,7 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
     }
   }
 
+  { const giu = new Set((await chanKhacKhoiEm(env, 'ph_bai_hang_ngay', { khoiEm }, [...kho.values()])).map((q) => q.qid)); for (const q of [...kho.keys()]) if (!giu.has(q)) kho.delete(q) } // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   const chonTuKho = () => chonCauChoPhuHuynh({
     soCan, seed, toiHan, suKienGanDay, dangDaHoc, nhomGanDay, lichSuNhan,
     dangYeu: dangYeuEm.map((d) => ({ maDang: d.maDang, bac: d.bac })),

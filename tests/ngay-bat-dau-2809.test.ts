@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // NGÀY BẮT ĐẦU CHIẾN DỊCH (thầy 28/09: "cho tôi thêm đặt thời gian bắt đầu chiến dịch nhé").
 // Máy chủ chạy THẬT trên SQLite lược đồ thật (`_d1-that`). Bảng phụ `chien_dich_bat_dau` tạo lúc chạy (không ALTER `chien_dich`).
 import { describe, expect, it } from 'vitest'
@@ -13,7 +14,7 @@ const T0 = Date.parse('2026-09-30T02:00:00Z') // 09:00 VN 30/09
 const GIO = 3_600_000
 const NGAY = 24 * GIO
 const cau = (qid: string) => JSON.stringify({
-  qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [],
+  qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [],
   hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' },
 })
 

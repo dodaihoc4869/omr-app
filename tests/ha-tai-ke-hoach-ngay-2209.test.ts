@@ -25,22 +25,24 @@ function dem(d: D1That): () => number {
 }
 
 /** Em có: 2 câu tới hạn ôn (sai 5 ngày trước), 1 BTVN chưa nộp, 1 bài Mẹ giao chưa nộp, 1 ca thi sắp tới (câu ôn thi ứng viên). */
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): mã tờ/mã câu ghi khối như kho thật (`12-…`) ⇒ cổng khối đọc khối
+// ngay từ mã câu, KHÔNG tốn truy vấn làm giàu (mã lạ kiểu `DE1` mới phải hỏi `de_kho.lop` — +1 truy vấn).
 async function truong(): Promise<D1That> {
   const d = taoD1That()
   d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Em S1','12','x')").run()
-  d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',3,'kho/DE1.json',0,'v1')").run()
-  d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
-  for (const q of ['DE1-I-1', 'DE1-I-2', 'DE1-I-3']) {
+  d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('12-DE1','12-DE1','12',3,'kho/DE1.json',0,'v1')").run()
+  d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('12-DE1','v1','x')").run()
+  for (const q of ['12-DE1-I-1', '12-DE1-I-2', '12-DE1-I-3']) {
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-      .run('DE1', q, 'v1', `g-${q}`, 'ES.A.X', JSON.stringify({ qid: q, maDe: 'DE1', phan: 'I', text: 'Đề', choices: ['A', 'B'], ideas: [], correct: 'A', sao: 1 }))
+      .run('12-DE1', q, 'v1', `g-${q}`, 'ES.A.X', JSON.stringify({ qid: q, maDe: '12-DE1', phan: 'I', text: 'Đề', choices: ['A', 'B'], ideas: [], correct: 'A', sao: 1 }))
   }
-  d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES('BT1','CA0','DE1',3,?,?,0,'x')").run(iso(Date.now() - 2 * D), iso(Date.now() + 3 * D))
+  d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES('BT1','CA0','12-DE1',3,?,?,0,'x')").run(iso(Date.now() - 2 * D), iso(Date.now() + 3 * D))
   d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,thu_hoi) VALUES('BT1|S1','BT1','S1',0)").run()
   d.sql.prepare("INSERT INTO mom_bai(sbd,id,title,created_at,question_count,bank_key,started_at,submitted_at) VALUES('S1','M1','Bài Mẹ giao',?,5,'k',NULL,NULL)").run(iso(Date.now() - D))
   d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cong_bo,bank_r2,loai,lop,thoi_gian_phut,bat_dau,het_han_vao,cap_nhat_luc) VALUES('CA1','Ca 1','mo','ca_lop_xong','de/CA1.json','thi','12',45,?,?,'x')")
     .run(iso(Date.now() + 20 * H), iso(Date.now() + 22 * H))
   d.objects.set('de/CA1.json', { phanI: [{ id: 'BV1', text: 'Đề bảo vệ', choices: ['A', 'B'], correct: 'A', dang: { ma: 'ES.A.X', ten: 'Dạng' }, mucDo: 'biet', kienThuc: [] }] })
-  await ghiSuKien(d.env, ['DE1-I-1', 'DE1-I-2', 'DE1-I-3'].map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B0', sbd: 'S1', qid: q, lan: i + 1, ketQua: 0 as const, luc: iso(Date.now() - 5 * D) })))
+  await ghiSuKien(d.env, ['12-DE1-I-1', '12-DE1-I-2', '12-DE1-I-3'].map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B0', sbd: 'S1', qid: q, lan: i + 1, ketQua: 0 as const, luc: iso(Date.now() - 5 * D) })))
   return d
 }
 

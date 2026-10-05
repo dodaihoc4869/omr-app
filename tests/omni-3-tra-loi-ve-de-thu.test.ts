@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // OMNI 3 · LÀN B3 — `start` + vé thử thách (mã dạng / 'auto'), lời báo chế độ chờ bài mới, ĐỀ THỬ NỬA (lập 14 câu lạ, chấm khi nộp) trên D1 thật.
 // Lớp D1 OMNI, phạm vi đã dạy (bai-da-day) và hạng em (srs2-d1 docHangEm) là của làn khác ⇒ TIÊM bằng vi.mock (không phụ thuộc con số stub).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -69,23 +70,23 @@ interface CauFx { maDe: string; qid: string; phan: Phan; dang: string; mucDo: st
 const dapAn = (phan: Phan, i: number) => (phan === 'I' ? 'ABCD'[i % 4]! : phan === 'II' ? ['DSDS', 'SSDD', 'DDSS'][i % 3]! : String(i + 1))
 const CAU: CauFx[] = [
   // Bài 1 (chiến dịch đang luyện): dạng D1, D2 mức thấp
-  ...[1, 2, 3, 4].map((i) => ({ maDe: 'DH-B1', qid: `B1-${i}`, phan: 'I' as Phan, dang: 'D1', mucDo: i <= 2 ? 'NB' : 'TH', correct: 'B' })),
-  ...[5, 6].map((i) => ({ maDe: 'DH-B1', qid: `B1-${i}`, phan: 'I' as Phan, dang: 'D2', mucDo: 'NB', correct: 'B' })),
+  ...[1, 2, 3, 4].map((i) => ({ maDe: 'DH-B1', lop: '12', qid: `B1-${i}`, phan: 'I' as Phan, dang: 'D1', mucDo: i <= 2 ? 'NB' : 'TH', correct: 'B' })),
+  ...[5, 6].map((i) => ({ maDe: 'DH-B1', lop: '12', qid: `B1-${i}`, phan: 'I' as Phan, dang: 'D2', mucDo: 'NB', correct: 'B' })),
   // Bài 2 (bài cũ — trong phạm vi đã dạy, ngoài chiến dịch): D1 Vận dụng ×4, D1 Vận dụng cao ×1, D2 Vận dụng ×3
-  ...[1, 2, 3, 4].map((i) => ({ maDe: 'DH-B2', qid: `B2-${i}`, phan: 'I' as Phan, dang: 'D1', mucDo: 'VD', correct: 'C' })),
-  { maDe: 'DH-B2', qid: 'B2-5', phan: 'I', dang: 'D1', mucDo: 'VDC', correct: 'C' },
-  ...[6, 7, 8].map((i) => ({ maDe: 'DH-B2', qid: `B2-${i}`, phan: 'I' as Phan, dang: 'D2', mucDo: 'VD', correct: 'C' })),
+  ...[1, 2, 3, 4].map((i) => ({ maDe: 'DH-B2', lop: '12', qid: `B2-${i}`, phan: 'I' as Phan, dang: 'D1', mucDo: 'VD', correct: 'C' })),
+  { maDe: 'DH-B2', lop: '12', qid: 'B2-5', phan: 'I', dang: 'D1', mucDo: 'VDC', correct: 'C' },
+  ...[6, 7, 8].map((i) => ({ maDe: 'DH-B2', lop: '12', qid: `B2-${i}`, phan: 'I' as Phan, dang: 'D2', mucDo: 'VD', correct: 'C' })),
   // Tờ TU LUYỆN (không mã DH-): D1 Vận dụng — KHÔNG được ra vé
-  ...[1, 2].map((i) => ({ maDe: 'TL-X', qid: `TL-${i}`, phan: 'I' as Phan, dang: 'D1', mucDo: 'VD', correct: 'C' })),
+  ...[1, 2].map((i) => ({ maDe: 'TL-X', lop: '12', qid: `TL-${i}`, phan: 'I' as Phan, dang: 'D1', mucDo: 'VD', correct: 'C' })),
   // Bài 3 (đề thử): 12 câu Phần I (D3), 3 câu Phần II (D4), 5 câu Phần III (D5)
-  ...Array.from({ length: 12 }, (_, i) => ({ maDe: 'DH-B3', qid: `B3-I-${i}`, phan: 'I' as Phan, dang: i % 2 ? 'D3' : 'D6', mucDo: 'TH', correct: dapAn('I', i) })),
-  ...Array.from({ length: 3 }, (_, i) => ({ maDe: 'DH-B3', qid: `B3-II-${i}`, phan: 'II' as Phan, dang: 'D4', mucDo: 'TH', correct: dapAn('II', i) })),
-  ...Array.from({ length: 5 }, (_, i) => ({ maDe: 'DH-B3', qid: `B3-III-${i}`, phan: 'III' as Phan, dang: 'D5', mucDo: 'VD', correct: dapAn('III', i) })),
+  ...Array.from({ length: 12 }, (_, i) => ({ maDe: 'DH-B3', lop: '12', qid: `B3-I-${i}`, phan: 'I' as Phan, dang: i % 2 ? 'D3' : 'D6', mucDo: 'TH', correct: dapAn('I', i) })),
+  ...Array.from({ length: 3 }, (_, i) => ({ maDe: 'DH-B3', lop: '12', qid: `B3-II-${i}`, phan: 'II' as Phan, dang: 'D4', mucDo: 'TH', correct: dapAn('II', i) })),
+  ...Array.from({ length: 5 }, (_, i) => ({ maDe: 'DH-B3', lop: '12', qid: `B3-III-${i}`, phan: 'III' as Phan, dang: 'D5', mucDo: 'VD', correct: dapAn('III', i) })),
 ]
 const theoQid = new Map(CAU.map((c) => [c.qid, c]))
 function cauJson(c: CauFx) {
   return JSON.stringify({
-    qid: c.qid, maDe: c.maDe, version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Câu ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [],
+    qid: c.qid, maDe: c.maDe, lop: '12', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Câu ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [],
     ideas: c.phan === 'II' ? ['a', 'b', 'c', 'd'] : [], hinhAnh: [], dang: c.dang, tenDang: `Dạng ${c.dang}`, mucDo: c.mucDo, sao: 1, kienThuc: ['k'], correct: c.correct,
     reviewed: true, solution: { chot: `Lời giải ${c.qid}` },
   })

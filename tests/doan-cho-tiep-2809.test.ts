@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // GAME HÓA 2.0 · ĐOÀN HỘ TỐNG — thầy 28/09 "làm được 1 câu rồi máy tự đánh", "thời gian xem đáp án quá ngắn":
 // phòng CHỈ MỘT người thật ⇒ hiệp kế CHỜ em bấm "ĐÁNH TIẾP" (lệnh `doan-tiep`), có hạn chờ an toàn; phòng ≥ 2 người thật giữ nhịp cũ.
 // Chạy trên SQLITE THẬT (tests/_d1-that.ts). Cờ phòng `choEmBamTiep` do `doan-mo` đặt khi em ở chế độ Hóa 2.0 — ở đây bật thẳng trong JSON phòng.
@@ -29,7 +30,7 @@ function dungTruong(): D1That {
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',?,?,0,'v1')").run(KHO.length, 'kho/DE1.json')
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   for (const c of KHO) {
-    const q = { qid: c.qid, maDe: 'DE1', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Đề ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: c.phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
+    const q = { qid: c.qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Đề ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: c.phan === 'II' ? ['ý a', 'ý b', 'ý c', 'ý d'] : [],
       hinhAnh: [], dang: c.dang, tenDang: 'Dạng', mucDo: 'biet', sao: 1, kienThuc: ['K1'], correct: c.correct, solution: `LG-${c.qid}`, reviewed: true }
     d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
   }

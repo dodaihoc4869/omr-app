@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // VIỆC `on_thi` MANG DANH SÁCH CÂU (server/src/ke-hoach-ngay.ts + ke-hoach-ngay-d1.ts): câu lấy từ hồ sơ của em, lệnh lấy đề PHỤC VỤ ĐƯỢC, và cùng luồng
 // `/hs/cau-theo-qid` + `/hs/on-lai/nop` với on_lai (nên LamCauOn dùng chung). SQLite thật, lược đồ thật + mọi migration.
 import { describe, it, expect, vi } from 'vitest'
@@ -21,7 +22,7 @@ vi.mock('../server/src/game-v2-auth', async (orig) => ({
 const H = 3_600_000
 const D = 24 * H
 const cauKho = (qid: string) => ({
-  qid, maDe: 'x', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 1,
+  qid, maDe: 'x', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 1,
   kienThuc: ['K1'], correct: 'B', solution: 'Giải', reviewed: true,
 })
 function themCau(d: D1That, maDe: string, cau: string[], daXoa = 0) {

@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // P02 — PHẠM VI HỌC CÁ NHÂN: T01 (phạm vi từng em), T02 (đủ MỌI nền), T03 (kho thiếu nhãn/thu hồi), T11 (bảo vệ bản sao).
 // Test gọi CODE SẢN PHẨM THẬT: server/src/pham-vi-hoc.ts + bảng `learner_scope` trên D1 THẬT (node:sqlite,
 // đúng `server/schema.sql` + mọi `server/migration-*.sql`), và đối chiếu với vị từ bảo vệ THẬT của
@@ -194,12 +195,12 @@ describe('P02 — cổng phạm vi của KẾ HOẠCH NGÀY (đường tự đ�
   /** Dựng kho nhỏ: Q1 (nhãn SK1, đã duyệt), Q2 (KHÔNG nhãn), Q3 (chưa duyệt). */
   function dungKho() {
     const d = taoD1That()
-    for (const sbd of ['A', 'B']) d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES(?,'x','x')").run(sbd)
+    for (const sbd of ['A', 'B']) d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES(?,'x','12','x')").run(sbd)
     d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',3,'kho/DE1.json',0,'v1')").run()
     d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
     const them = (qid: string, kienThuc: string[], reviewed: boolean) =>
       d.sql.prepare('INSERT OR REPLACE INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-        .run('DE1', qid, 'v1', `cg-${qid}`, 'D1', JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `cg-${qid}`, phan: 'I', text: qid, choices: ['A. a', 'B. b'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'biet', sao: 1, kienThuc, correct: 'A', solution: null, reviewed }))
+        .run('DE1', qid, 'v1', `cg-${qid}`, 'D1', JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `cg-${qid}`, phan: 'I', text: qid, choices: ['A. a', 'B. b'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'biet', sao: 1, kienThuc, correct: 'A', solution: null, reviewed }))
     them('Q1', ['SK1'], true)
     them('Q2', [], true)
     them('Q3', ['SK1'], false)
@@ -253,11 +254,11 @@ describe('T01 — END-TO-END qua KÊNH GAME: `readScope` thật (hàm route game
   /** Kho 1 câu Phần I + 1 sự kiện học của S1 ở BTVN (nguồn khác ca thi và game) ⇒ câu vào được pool game. */
   function dungGame() {
     const d = taoD1That()
-    d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+    d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run()
     d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',1,'kho/DE1.json',0,'v1')").run()
     d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
     const q = {
-      qid: 'DE1-I-1', maDe: 'DE1', version: 'v1', group: 'cg-1', phan: 'I', text: 'Câu 1.',
+      qid: 'DE1-I-1', maDe: 'DE1', lop: '12', version: 'v1', group: 'cg-1', phan: 'I', text: 'Câu 1.',
       choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1',
       mucDo: 'biet', sao: 1, kienThuc: ['SK1'], correct: 'A', solution: null, reviewed: true,
     }

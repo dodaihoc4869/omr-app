@@ -54,12 +54,15 @@ function giaLap(o: { dk?: unknown; lichSu?: unknown[]; nop?: unknown } = {}) {
 }
 
 describe('Máy chủ: /luyen-de/dieu-kien — chỉ đọc, cùng luật với cổng start', () => {
-  it('hàm thuần: cờ BẬT cần quyền thầy; khối < 12 khoá; cờ TẮT ⇒ em tự xác nhận', () => {
+  it('hàm thuần: cờ BẬT cần quyền thầy; khối < 12 hoặc KHÔNG RÕ khối ⇒ khoá (luật 05/10); cờ TẮT ⇒ em khối 12 tự xác nhận', () => {
     expect(dieuKienLuyenDe({ coBat: true, coQuyen: false, khoi: 12 })).toEqual({ trangThai: 'khoa', lyDo: LOI_CAN_QUYEN_THAY })
     expect(dieuKienLuyenDe({ coBat: true, coQuyen: true, khoi: 11 })).toEqual({ trangThai: 'khoa', lyDo: LOI_KHOI_12 })
     expect(dieuKienLuyenDe({ coBat: false, coQuyen: false, khoi: 10 })).toEqual({ trangThai: 'khoa', lyDo: LOI_KHOI_12 })
     expect(dieuKienLuyenDe({ coBat: true, coQuyen: true, khoi: 12 })).toEqual({ trangThai: 'mo', lyDo: '' })
-    expect(dieuKienLuyenDe({ coBat: false, coQuyen: false, khoi: null })).toEqual({ trangThai: 'can_xac_nhan', lyDo: LOI_CHUA_HOC_XONG })
+    expect(dieuKienLuyenDe({ coBat: false, coQuyen: false, khoi: 12 })).toEqual({ trangThai: 'can_xac_nhan', lyDo: LOI_CHUA_HOC_XONG })
+    // SỬA CÓ CHỦ Ý 05/10 (trước: khối không rõ ⇒ 'can_xac_nhan'). LUẬT THẦY (nguyên văn): "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11,
+    // bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé" ⇒ Bộ đề khối 12 chỉ mở cho em ĐÚNG khối 12; em chưa rõ khối ⇒ khoá.
+    expect(dieuKienLuyenDe({ coBat: false, coQuyen: false, khoi: null })).toEqual({ trangThai: 'khoa', lyDo: LOI_KHOI_12 })
   })
   it('trả trạng thái + lịch sử, không ghi gì, không rút đề', async () => {
     const sql: string[] = []

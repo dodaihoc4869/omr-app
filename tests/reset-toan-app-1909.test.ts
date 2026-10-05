@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // RESET TOÀN APP — MỘT LẦN, CHẠY THEO LỆNH (server/src/reset-toan-app.ts) — chạy trên SQLite THẬT với lược đồ thật + mọi migration.
 // Thiết kế 21/09 (thầy): xoá BTVN/Mẹ giao/game/EXP (chọn lại thú) nhưng GIỮ sổ + hồ sơ mạnh yếu (su_kien_hoc, nam_kt_cau, nam_kt_dang, tien_do_hs, qid_da_lam) VÀ toàn bộ CA THI đã thi (14 bảng).
 // Không có mốc cố định: job chạy khi có CỜ LÊN ĐẠN; cửa sổ tự chạy + đóng băng = 60 phút kể từ lúc lên đạn.
@@ -525,7 +526,7 @@ describe('CA THI VÀ HỒ SƠ ĐƯỢC GIỮ, BTVN/Mẹ giao/game TRỐNG: kế 
   const BAY_GIO = Date.parse('2026-09-20T07:00:00.000Z')
   const iso = (ms: number) => new Date(ms).toISOString()
   const cauKho = (qid: string) => ({
-    qid, maDe: 'x', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 2,
+    qid, maDe: 'x', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang: 'ES.A.X', tenDang: 'Dạng', mucDo: 'biet', sao: 2,
     kienThuc: ['K1'], correct: 'B', solution: 'Giải', reviewed: true,
   })
   function themCau(d: D1That, maDe: string, cau: string[]) {

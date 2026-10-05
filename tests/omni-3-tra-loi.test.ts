@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // OMNI 3 · LÀN B3 — ĐƯỜNG TRẢ LỜI (`answer`) trên D1 thật (node:sqlite, đủ migration): cờ tắt y hệt hôm nay; lướt; chắc-mà-sai; P dạng; Phần II từng ý;
 // Trạm hồi phục (đúng 3 sai liền, một lần/chuyến, không Đoàn) + `hoa2-omni-tram-xong`; lệnh hoa2-omni-* khi cờ tắt; Đoàn chuyển msLam/tuTin.
 // Lớp D1 OMNI (omni-d1.ts) là STUB của làn khác ⇒ TIÊM bằng vi.mock (test không phụ thuộc con số stub).
@@ -79,7 +80,7 @@ const CAU: { qid: string; phan: Phan; dang: string; mucDo: string; correct: stri
 ]
 function cauJson(c: (typeof CAU)[number]) {
   return JSON.stringify({
-    qid: c.qid, maDe: 'DH-B1', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Câu ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [],
+    qid: c.qid, maDe: 'DH-B1', lop: '12', version: 'v1', group: `g-${c.qid}`, phan: c.phan, text: `Câu ${c.qid}`, choices: c.phan === 'I' ? ['a', 'b', 'c', 'd'] : [],
     ideas: c.phan === 'II' ? ['a', 'b', 'c', 'd'] : [], hinhAnh: [], dang: c.dang, tenDang: `Dạng ${c.dang}`, mucDo: c.mucDo, sao: 1, kienThuc: ['k'], correct: c.correct,
     reviewed: true, solution: { chot: `Cốt lõi ${c.qid}` },
   })

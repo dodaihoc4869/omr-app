@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // CACHE API `caches.default` cho kho câu theo dạng (Boss 22/09, tốc độ tối đa — LỚP 2 trên demKhoDang, game-v2-bank.ts
 // readScope): demKhoDang (một isolate) → caches.default (cả colo) → D1. Node không có `caches` toàn cục — polyfill BỘ
 // NHỚ ở đây để bài test chạy ĐÚNG đường mã thật (không nhánh test riêng), rồi tháo lại sau mỗi test.
@@ -23,9 +24,9 @@ function dungKho(d: D1That, maDe: string, dang: string, soCau: number) {
   const them = d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
   for (let i = 1; i <= soCau; i++) {
     const qid = `${maDe}-q${i}`
-    them.run(maDe, qid, 'v', `g-${maDe}-${i}`, dang, JSON.stringify({ qid, maDe, version: 'v', group: `g-${maDe}-${i}`, phan: 'I', text: `Câu ${i}`, choices: ['A', 'B'], ideas: [], correct: 'A', dang, tenDang: 'T', mucDo: 'biet', sao: 1, kienThuc: ['K'], reviewed: true }))
+    them.run(maDe, qid, 'v', `g-${maDe}-${i}`, dang, JSON.stringify({ qid, maDe, lop: '12', version: 'v', group: `g-${maDe}-${i}`, phan: 'I', text: `Câu ${i}`, choices: ['A', 'B'], ideas: [], correct: 'A', dang, tenDang: 'T', mucDo: 'biet', sao: 1, kienThuc: ['K'], reviewed: true }))
   }
-  d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+  d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','x','12','x')").run()
 }
 
 describe('readScope · caches.default (kho câu theo dạng)', () => {

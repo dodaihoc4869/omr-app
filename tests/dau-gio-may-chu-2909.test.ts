@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // KIỂM TRA ĐẦU GIỜ (đặc tả docs/DAC-TA-KIEM-TRA-DAU-GIO-SO-NO-2909.md mục B + nghiệm thu E.3) — máy chủ `server/src/dau-gio.ts` trên D1 thật (node:sqlite, đủ migration)
 // + phần thuần `src/lib/dau-gio.ts`. Khoá: ≤ 6 em/lượt; không trùng câu trong lượt; KHÔNG lặp câu cũ của em qua các buổi; chỉ câu em đã làm ĐÚNG (lần gần nhất);
 // em hết câu ⇒ bỏ qua; Gọi thêm không trùng em đã gọi; Kết thúc ⇒ em chưa chấm không ghi gì; chấm idempotent (buổi + em + câu), sổ nguon='dau_gio' 1/0;
@@ -28,6 +29,9 @@ async function fixture(soEm = 3) {
   const d = taoD1That()
   const em = Array.from({ length: soEm }, (_, i) => `S${i + 1}`)
   d.sql.exec(`INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES ${em.map((s, i) => `('${s}','Học Sinh ${i + 1}','12','mk','x')`).join(',')}`)
+  // LUẬT THẦY 05/10: ứng viên đầu giờ chỉ câu ĐÚNG khối em, câu không rõ khối bị chặn ⇒ câu giả ghi khối 12 (như em) trong `cau_hoi`.
+  const ch = d.sql.prepare("INSERT INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES(?,'DE1','12','x')")
+  for (const q of ['Q1', 'Q2', 'Q3', 'Q-DUNG', 'Q-SUA', 'Q-NO', 'Q-CHE', 'KHONG-LAM', 'CHUA', ...Array.from({ length: 12 }, (_, i) => `R-S${i + 1}`)]) ch.run(q)
   const env = d.env
   const mo = (await gvBuoiHoc(env, { action: 'mo', lop: '' }, T0)) as any
   await gvBuoiHoc(env, { action: 'them-em', id: mo.buoi.id, sbd: em }, T0)
@@ -242,7 +246,7 @@ describe('đầu cuối với Sổ nợ (phatLaiCau / kế hoạch ngày)', () =
   const TA = Date.parse('2026-09-30T01:00:00Z') // 08:00 VN 30/09 — đầu giờ
   const NGAY = 86_400_000
   const cauJson = (qid: string, sao = 0) =>
-    JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'x', tungPa: {} } })
+    JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'TH', sao, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'x', tungPa: {} } })
   async function fx() {
     const d = taoD1That()
     const env = d.env

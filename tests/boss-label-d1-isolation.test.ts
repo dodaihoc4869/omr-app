@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 import { it, expect } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { daHocDang } from './_pham-vi-ca-nhan'
@@ -10,7 +11,7 @@ it('actual parent D1 source uses only requested learner history and preserves au
  d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','One','12','x'),('S2','Two','12','x'); INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('D','D','12',5,'kho/D.json',0,'v1'); INSERT INTO game_v2_index VALUES('D','v1','x')")
  const specs=[['00-scope',['A','B'],'van_dung'],['eA',['A'],'van_dung'],['eB',['B'],'van_dung'],['a',['A'],'hieu'],['b',['B'],'hieu'],['forbidden',['NOT-LEARNED'],'hieu']] as const
  for(const [qid,kt,muc] of specs){
-  const q={qid,maDe:'D',version:'v',group:'g-'+qid,phan:'I',text:`Nội dung ${qid}.`,choices:['A. a','B. b','C. c','D. d'],ideas:[],hinhAnh:[],dang:ma,mucDo:muc,kienThuc:kt,correct:'B',reviewed:true,solution:'',sao:1}
+  const q={qid,maDe:'D', lop: '12',version:'v',group:'g-'+qid,phan:'I',text:`Nội dung ${qid}.`,choices:['A. a','B. b','C. c','D. d'],ideas:[],hinhAnh:[],dang:ma,mucDo:muc,kienThuc:kt,correct:'B',reviewed:true,solution:'',sao:1}
   d.sql.prepare('INSERT INTO game_v2_question VALUES(?,?,?,?,?,?)').run('D',qid,'v',q.group,ma,JSON.stringify(q))
  }
  for(const sbd of ['S1','S2']){

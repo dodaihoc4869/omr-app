@@ -3,6 +3,9 @@
 // em tự đổi sang lớp cao hơn được, component không nhận lớp của em, kho đề rút câu (chế độ 2/3/4) không lọc khối.
 // Khoá: (1) bộ lọc thuần `khac-phuc-khoi.ts`; (2) KHOẢNH KHẮC THẬT: render hai component với danh mục giả 10/11/12 ⇒ em khối 11 KHÔNG thấy nút Lớp 12 và không có bài lớp 12; mặc định = khối em;
 // (3) nguồn đề khối cao bị bỏ; (4) khối em không rõ ⇒ như cũ (không chặn); (5) các nơi gọi có truyền lớp.
+// SỬA CÓ CHỦ Ý 05/10 — LUẬT THẦY (nguyên văn): "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
+// ⇒ thay luật 21/09 "khối em HOẶC THẤP hơn; không rõ ⇒ không chặn": CHỈ lớp/đề ĐÚNG khối em (lớp 10 cũng bị chặn với em khối 11); lớp/đề không đọc ra khối ⇒ bỏ;
+//   khối em không rõ (chưa xếp lớp) ⇒ không lớp/đề nào. Giao diện KHÔNG đổi — chỉ dữ liệu (danh sách lớp/bài) đổi.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
@@ -34,6 +37,7 @@ vi.mock('../src/lib/exam-db', async (goc) => ({
 import KhoiKhacPhuc3CheDo from '../src/components/KhoiKhacPhuc3CheDo'
 import ModalKhacPhucCauSai from '../src/components/ModalKhacPhucCauSai'
 import { cacLopHienThi, duocChonLop, khoiEmTuLop, lopEmDuocChon, lopMacDinhCuaEm, nguonHopKhoi } from '../src/lib/khac-phuc-khoi'
+import { danhMucDangBai } from '../src/lib/exam-api'
 
 const doc = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8')
 const boChuThich = (m: string) => m.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
@@ -47,13 +51,13 @@ describe('bộ lọc thuần khac-phuc-khoi.ts', () => {
     expect(khoiEmTuLop('Lớp 10')).toBe(10)
     for (const x of ['', '  ', undefined, null, 'A1', '9', '120', {}]) expect(khoiEmTuLop(x), String(x)).toBeNull()
   })
-  it('danh mục em ĐƯỢC CHỌN: khối 11 ⇒ chỉ lớp 10, 11; khối 10 ⇒ chỉ lớp 10; khối 12 ⇒ đủ; không rõ ⇒ đủ; lớp lạ giữ lại; không sửa đầu vào', () => {
+  it('danh mục em ĐƯỢC CHỌN (luật 05/10): CHỈ lớp đúng khối em; lớp lạ bỏ; không rõ khối ⇒ rỗng; không sửa đầu vào', () => {
     const ds = [{ lop: '10' }, { lop: '11' }, { lop: '12' }, { lop: 'Chuyên đề' }]
     const goc = JSON.stringify(ds)
-    expect(lopEmDuocChon(11, ds).map((l) => l.lop)).toEqual(['10', '11', 'Chuyên đề'])
-    expect(lopEmDuocChon(10, ds).map((l) => l.lop)).toEqual(['10', 'Chuyên đề'])
-    expect(lopEmDuocChon(12, ds)).toHaveLength(4)
-    expect(lopEmDuocChon(null, ds)).toHaveLength(4)
+    expect(lopEmDuocChon(11, ds).map((l) => l.lop)).toEqual(['11'])
+    expect(lopEmDuocChon(10, ds).map((l) => l.lop)).toEqual(['10'])
+    expect(lopEmDuocChon(12, ds).map((l) => l.lop)).toEqual(['12'])
+    expect(lopEmDuocChon(null, ds)).toEqual([])
     expect(lopEmDuocChon(11, 'x' as never)).toEqual([])
     expect(JSON.stringify(ds)).toBe(goc)
   })
@@ -67,22 +71,22 @@ describe('bộ lọc thuần khac-phuc-khoi.ts', () => {
     expect(lopMacDinhCuaEm(null, [{ lop: '10' }, { lop: '11' }])).toBe('11')
     expect(lopMacDinhCuaEm(11, [])).toBe('')
   })
-  it('nút lớp hiện ra + chặn chọn tay: khối 11 ⇒ ["10","11"], không chọn được 12; không rõ ⇒ đủ ba', () => {
-    expect(cacLopHienThi(11)).toEqual(['10', '11'])
+  it('nút lớp hiện ra + chặn chọn tay (luật 05/10): khối 11 ⇒ ["11"], không chọn được 10 hay 12; không rõ khối ⇒ không nút nào', () => {
+    expect(cacLopHienThi(11)).toEqual(['11'])
     expect(cacLopHienThi(10)).toEqual(['10'])
-    expect(cacLopHienThi(12)).toEqual(['10', '11', '12'])
-    expect(cacLopHienThi(null)).toEqual(['10', '11', '12'])
+    expect(cacLopHienThi(12)).toEqual(['12'])
+    expect(cacLopHienThi(null)).toEqual([])
     expect(duocChonLop(11, '12')).toBe(false)
     expect(duocChonLop(11, '11')).toBe(true)
-    expect(duocChonLop(11, '10')).toBe(true)
-    expect(duocChonLop(null, '12')).toBe(true)
-    expect(duocChonLop(11, 'Chuyên đề')).toBe(true)
+    expect(duocChonLop(11, '10')).toBe(false)
+    expect(duocChonLop(null, '12')).toBe(false)
+    expect(duocChonLop(11, 'Chuyên đề')).toBe(false)
   })
-  it('nguồn đề: bỏ đề khối CAO hơn (mã tờ hoặc nhóm), giữ đề khối thấp / bằng / không rõ; đúng thứ tự', () => {
+  it('nguồn đề (luật 05/10): CHỈ đề đúng khối em (mã tờ hoặc nhóm); đề khối khác / không rõ khối bị bỏ; em không rõ khối ⇒ rỗng; đúng thứ tự', () => {
     const ds = [{ maDe: 'DH-12-C2-B6-TN' }, { maDe: 'DB-11-B8-D1' }, { maDe: 'DH-10-I-1' }, { maDe: 'de-thay-dat-ten' }, { maDe: 'x', nhom: '12 · DẠNG BÀI/Este' }]
-    expect(nguonHopKhoi(11, ds).map((d) => d.maDe)).toEqual(['DB-11-B8-D1', 'DH-10-I-1', 'de-thay-dat-ten'])
-    expect(nguonHopKhoi(null, ds)).toHaveLength(5)
-    expect(nguonHopKhoi(12, ds)).toHaveLength(5)
+    expect(nguonHopKhoi(11, ds).map((d) => d.maDe)).toEqual(['DB-11-B8-D1'])
+    expect(nguonHopKhoi(null, ds)).toEqual([])
+    expect(nguonHopKhoi(12, ds).map((d) => d.maDe)).toEqual(['DH-12-C2-B6-TN', 'x'])
   })
 })
 
@@ -90,21 +94,23 @@ describe('KhoiKhacPhuc3CheDo — chế độ "Luyện dạng bài" theo khối e
   const ve = (lop?: string) => render(<KhoiKhacPhuc3CheDo sbd="000001" hoTen="Em Thử" dsLichSu={[]} scriptUrl="http://may-chu-gia" initialCheDo={3} lop={lop} />)
   const nutLop = () => screen.queryAllByRole('button').filter((b) => /^Lớp \d\d$/.test((b.textContent || '').trim()))
 
-  it('em khối 11: chỉ có nút Lớp 10 và Lớp 11 (KHÔNG có Lớp 12); mặc định Lớp 11; bài hiện ra là bài lớp 11', async () => {
+  it('em khối 11 (luật 05/10): CHỈ nút Lớp 11 (KHÔNG Lớp 10, KHÔNG Lớp 12); mặc định Lớp 11; bài hiện ra là bài lớp 11', async () => {
     const { container } = ve('11')
     await screen.findByText('Lớp 11')
     await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-MOT-A'))
-    expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 10', 'Lớp 11'])
+    expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 11'])
     expect(screen.queryByText('Lớp 12')).toBeNull()
+    expect(screen.queryByText('Lớp 10')).toBeNull()
     expect(container.textContent).not.toContain('BAI-MUOI-HAI-A')
+    expect(container.textContent).not.toContain('BAI-MUOI-A')
     expect(nutLop().find((b) => b.textContent!.trim() === 'Lớp 11')!.className).toContain('bg-blue-500') // đang chọn
-    expect(nutLop().find((b) => b.textContent!.trim() === 'Lớp 10')!.className).not.toContain('bg-blue-500')
   })
-  it('em khối 11 bấm Lớp 10 thì sang bài lớp 10; vẫn không thể sang lớp 12', async () => {
+  it('em khối 11 (luật 05/10): không có đường sang bài lớp 10 hay lớp 12', async () => {
     const { container } = ve('11')
     await screen.findByText('Lớp 11')
-    nutLop().find((b) => b.textContent!.trim() === 'Lớp 10')!.click()
-    await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-A'))
+    await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-MOT-A'))
+    expect(nutLop().some((b) => b.textContent!.trim() !== 'Lớp 11')).toBe(false)
+    expect(container.textContent).not.toContain('BAI-MUOI-A')
     expect(screen.queryByText('Lớp 12')).toBeNull()
   })
   it('em khối 10: chỉ Lớp 10, mặc định Lớp 10', async () => {
@@ -113,16 +119,20 @@ describe('KhoiKhacPhuc3CheDo — chế độ "Luyện dạng bài" theo khối e
     expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 10'])
     expect(container.textContent).not.toContain('BAI-MUOI-MOT-A')
   })
-  it('em khối 12 ("12 - Tinh Hoa") ⇒ đủ ba lớp, mặc định Lớp 12', async () => {
+  it('em khối 12 ("12 - Tinh Hoa") ⇒ CHỈ Lớp 12 (luật 05/10), mặc định Lớp 12', async () => {
     const { container } = ve('12 - Tinh Hoa')
     await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-HAI-A'))
-    expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 10', 'Lớp 11', 'Lớp 12'])
+    expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 12'])
+    expect(container.textContent).not.toContain('BAI-MUOI-MOT-A')
   })
-  it('KHÔNG rõ khối em (không truyền lớp / lớp rỗng) ⇒ như cũ: đủ ba lớp, mặc định Lớp 12 (không biết ⇒ không kết tội)', async () => {
+  it('KHÔNG rõ khối em (không truyền lớp / lớp rỗng) ⇒ (luật 05/10) không nút lớp, không bài nào', async () => {
     for (const lop of [undefined, '']) {
+      vi.mocked(danhMucDangBai).mockClear()
       const { container, unmount } = ve(lop)
-      await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-HAI-A'))
-      expect(nutLop()).toHaveLength(3)
+      await waitFor(() => expect(vi.mocked(danhMucDangBai)).toHaveBeenCalled())
+      await waitFor(() => expect(container.textContent).not.toContain('Đang tải danh mục dạng bài'))
+      expect(nutLop()).toHaveLength(0)
+      for (const b of ['BAI-MUOI-A', 'BAI-MUOI-MOT-A', 'BAI-MUOI-HAI-A']) expect(container.textContent).not.toContain(b)
       unmount()
     }
   })
@@ -133,18 +143,28 @@ describe('ModalKhacPhucCauSai — "Luyện dạng bài" theo khối em', () => {
   const ve = (lop?: string) => render(<ModalKhacPhucCauSai isOpen onClose={() => {}} dsCauSai={CAU_SAI} hoTen="Em Thử" sbd="000001" tieuDeCa="Ca thử" cheDoMacDinh={3} lop={lop} />)
   const nutLop = () => screen.queryAllByRole('button').filter((b) => /^Lớp \d\d$/.test((b.textContent || '').trim()))
 
-  it('em khối 11: chỉ Lớp 10 và Lớp 11; mặc định Lớp 11 (bài lớp 11 hiện, bài lớp 12 KHÔNG hiện)', async () => {
+  it('em khối 11 (luật 05/10): CHỈ Lớp 11; mặc định Lớp 11 (bài lớp 11 hiện, bài lớp 10 / 12 KHÔNG hiện)', async () => {
     const { container } = ve('11')
     await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-MOT-A'))
-    expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 10', 'Lớp 11'])
+    expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 11'])
     expect(container.textContent).not.toContain('BAI-MUOI-HAI-A')
+    expect(container.textContent).not.toContain('BAI-MUOI-A')
     expect(nutLop().find((b) => b.textContent!.trim() === 'Lớp 11')!.className).toContain('bg-blue-600')
   })
-  it('khối 12 ⇒ đủ ba, mặc định Lớp 12; không rõ khối ⇒ như cũ (đủ ba, mặc định Lớp 12)', async () => {
-    for (const lop of ['12', undefined, '']) {
-      const { container, unmount } = ve(lop)
+  it('khối 12 ⇒ CHỈ Lớp 12, mặc định Lớp 12; không rõ khối ⇒ không nút lớp, không bài (luật 05/10)', async () => {
+    {
+      const { container, unmount } = ve('12')
       await waitFor(() => expect(container.textContent).toContain('BAI-MUOI-HAI-A'))
-      expect(nutLop()).toHaveLength(3)
+      expect(nutLop().map((b) => b.textContent!.trim())).toEqual(['Lớp 12'])
+      unmount()
+    }
+    for (const lop of [undefined, '']) {
+      vi.mocked(danhMucDangBai).mockClear()
+      const { container, unmount } = ve(lop)
+      await waitFor(() => expect(vi.mocked(danhMucDangBai)).toHaveBeenCalled())
+      await new Promise((r) => setTimeout(r, 30))
+      expect(nutLop()).toHaveLength(0)
+      for (const b of ['BAI-MUOI-A', 'BAI-MUOI-MOT-A', 'BAI-MUOI-HAI-A']) expect(container.textContent).not.toContain(b)
       unmount()
     }
   })

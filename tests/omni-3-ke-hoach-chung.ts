@@ -50,6 +50,11 @@ export function taoKhoOmni(soCau: Record<string, number> = {}, soEm = 3): KhoOmn
   }
   // câu tự luận: không bao giờ vào kế hoạch / ôn bài cũ
   st.run('DH-B1', 'DH-B1-TL', 'v1', 'g-DH-B1-TL', 'DH-B1.D0', cauJson('DH-B1-TL', 'DH-B1', 1, { text: 'Trình bày cách điều chế (tự luận)', tuLuan: true }))
+  // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): câu không rõ khối bị chặn ⇒ mọi câu giả ghi khối 12 (như em 12A1) ở `cau_hoi`
+  // (nguồn khối của kho, `chuyen_de` rỗng ⇒ không đổi gì khác) — KHÔNG ghi vào JSON câu để ảnh chụp "cờ tắt y hệt bản cũ" (omni-3-ke-hoach-co-tat) giữ nguyên.
+  const ch = d.sql.prepare("INSERT OR IGNORE INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES(?,?,'12','x')")
+  for (const [maDe, ds] of theoTo) for (const q of ds) ch.run(q, maDe)
+  ch.run('DH-B1-TL', 'DH-B1')
   d.sql.exec(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_hoa_2','{"bat":true,"lop":["12A1"]}','x')`)
   return { d, env, qids: (maDe) => [...(theoTo.get(maDe) ?? [])] }
 }

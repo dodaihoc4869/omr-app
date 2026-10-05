@@ -437,17 +437,24 @@ describe('LUẬT KHỐI trong chính hàm chọn (Boss 21/09, P0 khối 11 nhậ
       const { evidence, attempts, mastery } = trangThai(r)
       const ra = chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, opt(LUOT[i % 3]!, { khoiEm, cap: 1 + Math.floor(r() * 60) }))
       expect(ra.length, `#${i} lượt rỗng khi kho còn câu`).toBeGreaterThan(0)
-      for (const x of ra) expect(khoiCau(x.q), `#${i} em khối ${khoiEm} nhận ${x.q.qid} (${x.role})`).toBeLessThanOrEqual(khoiEm)
+      // SỬA CÓ CHỦ Ý 05/10 — LUẬT THẦY (nguyên văn): "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
+      // ⇒ không chỉ "không cao hơn" (luật 21/09) mà ĐÚNG khối em: em khối 11 cũng không nhận câu khối 10.
+      for (const x of ra) expect(khoiCau(x.q), `#${i} em khối ${khoiEm} nhận ${x.q.qid} (${x.role})`).toBe(khoiEm)
     }
   })
-  it('em khối 12, khoiEm bỏ trống hoặc null ⇒ KHÔNG lọc: kết quả Y HỆT nhau và Y HỆT trước khi có luật khối (tương thích ngược)', () => {
+  it('LUẬT THẦY 05/10: em khối 12 ⇒ CHỈ câu khối 12; khoiEm null (em chưa rõ khối) ⇒ RỖNG; khoiEm bỏ trống (hàm thuần gọi thẳng) ⇒ không lọc như cũ', () => {
+    // SỬA CÓ CHỦ Ý 05/10 (trước: "em khối 12, khoiEm bỏ trống hoặc null ⇒ KHÔNG lọc: kết quả Y HỆT nhau"). LUẬT THẦY (nguyên văn):
+    // "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
+    // ⇒ khối 12 không còn nhận câu khối 10/11; em không rõ khối không được phát câu tự động nào. Nơi gọi ở máy chủ luôn truyền khối em (+ cổng cuối chan-khac-khoi.ts).
     const r = mulberry32(2111)
     for (let i = 0; i < 300; i++) {
       const { evidence, attempts, mastery } = trangThai(r)
       const goc = opt(LUOT[i % 3]!, { cap: 1 + Math.floor(r() * 60) })
-      const a = chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, goc).map((x) => x.q.qid)
-      expect(chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, { ...goc, khoiEm: null }).map((x) => x.q.qid)).toEqual(a)
-      expect(chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, { ...goc, khoiEm: 12 }).map((x) => x.q.qid)).toEqual(a)
+      expect(chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, goc).length, `#${i} bỏ trống khoiEm`).toBeGreaterThan(0)
+      expect(chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, { ...goc, khoiEm: null }), `#${i} em chưa rõ khối`).toEqual([])
+      const k12 = chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, { ...goc, khoiEm: 12 })
+      expect(k12.length, `#${i} em khối 12`).toBeGreaterThan(0)
+      for (const x of k12) expect(khoiCau(x.q), `#${i} em khối 12 nhận ${x.q.qid}`).toBe(12)
     }
   })
   it('kho CHỈ còn câu khối 12 mà em khối 11 ⇒ trả RỖNG (thà không có lượt còn hơn câu khối cao); em khối 12 cùng kho vẫn đủ 6 câu', () => {

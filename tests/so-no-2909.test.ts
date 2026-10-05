@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // SỔ NỢ + ĐAN XEN (thầy chốt 29/09, docs/DAC-TA-KIEM-TRA-DAU-GIO-SO-NO-2909.md mục A, B4, E1–E2; hợp đồng docs/so-no-2909/HOP-DONG.md).
 import { describe, expect, it } from 'vitest'
 import {
@@ -260,7 +261,7 @@ const T0 = Date.parse('2026-09-30T07:59:00Z') // 14:59 VN 30/09
 const NGAY = 86_400_000
 function cauJson(qid: string, phan: 'I' | 'II' | 'III', mucDo: string, sao = 0) {
   return JSON.stringify({
-    qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+    qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: `Câu ${qid}`, choices: phan === 'I' ? ['a', 'b', 'c', 'd'] : [], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo, sao, kienThuc: ['k'], correct: phan === 'I' ? 'B' : phan === 'II' ? 'DSDS' : '4', reviewed: true, solution: { chot: 'x', tungPa: {} },
   })
 }

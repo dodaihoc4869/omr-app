@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Regression: reward receipts, daily caps, verified assignments and earnings.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { docChuoiTruoc, docExpHomNay, ghiKhoanExpGame, ghiTiepSuc } from '../server/src/exp-d1'
@@ -13,7 +14,7 @@ const ngay = '2026-09-23'
 function fixture() {
   const d = taoD1That()
   serialiseD1(d.env)
-  d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','Fixture','x')").run()
+  d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Fixture','12','x')").run()
   d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({tu:'2026-09-01T00:00:00Z',toanBo:true}))
   d.sql.prepare("INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES('S1',0,?,'x')").run(JSON.stringify({pet:'dat_quy',choice:false,legacy:null,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:'2026-09-01T00:00:00Z',luatCap:2}))
   return d
@@ -106,7 +107,7 @@ it('canonical MOM key overrides forged client key and knowledge metadata',async(
   vi.useFakeTimers();vi.setSystemTime(now)
   const d=fixture()
   d.sql.exec("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE','Đề','12',1,'k',0,'v'); INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE','v','x')")
-  const q={qid:'DE-I-1',maDe:'DE',version:'v',group:'g1',phan:'I',text:'Đề thật',choices:['a','b','c','d'],ideas:[],hinhAnh:[],dang:'ES.A',tenDang:'Ester',mucDo:'biet',sao:0,kienThuc:['K'],correct:'B',solution:'Lời giải riêng',reviewed:true}
+  const q={qid:'DE-I-1',maDe:'DE',lop:'12',version:'v',group:'g1',phan:'I',text:'Đề thật',choices:['a','b','c','d'],ideas:[],hinhAnh:[],dang:'ES.A',tenDang:'Ester',mucDo:'biet',sao:0,kienThuc:['K'],correct:'B',solution:'Lời giải riêng',reviewed:true}
   d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE',q.qid,'v','g1','ES.A',JSON.stringify(q))
   d.sql.prepare("INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn) VALUES('before','S1',?,'btvn','B',1,1,'2026-09-01T05:00:00Z','2026-09-01')").run(q.qid)
   await mom(d.env,'create',{sbd:'S1',id:'canonical',dsCau:[{id:q.qid,dapAn:'A',dang:'FAKE',_khoaXacMinh:1}]})

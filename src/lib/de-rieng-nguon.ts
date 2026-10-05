@@ -489,14 +489,15 @@ export function locKhoToanBoTheoChuyenDeCa(khoToanBo: TeacherExamSource[], bankG
   return khoToanBo.map((s) => ({ ...s, phanI: s.phanI.filter(hop), phanII: s.phanII.filter(hop), phanIII: s.phanIII.filter(hop) }))
 }
 
-/** LỌC KHO BÙ THEO KHỐI CỦA CA (Code 1 yêu cầu 21/09 — cùng luật khối với mọi kênh rút câu khác).
+/** LỌC KHO BÙ THEO KHỐI CỦA CA (Code 1 yêu cầu 21/09 — cùng luật khối với mọi kênh rút câu khác; LUẬT THẦY 05/10: phần MÁY TỰ BÙ chỉ câu ĐÚNG khối ca).
  *
- * BÙ KHO lấy từ CẢ kho máy thầy nên có thể bù câu KHỐI CAO HƠN vào đề của ca khối thấp (ca lớp 11 nhận câu lớp 12). Chỉ giữ câu HỢP KHỐI: khối câu đọc từ mã tờ
- * (`maDe` của nguồn) VÀ mã câu (`id`) như `khoiCuaCau` — khối cao hơn khối ca ⇒ bỏ; không rõ khối ca (ca không ghi lớp) hoặc không rõ khối câu ⇒ GIỮ (không đoán).
+ * BÙ KHO lấy từ CẢ kho máy thầy nên có thể bù câu KHÁC KHỐI vào đề của ca (ca lớp 11 nhận câu lớp 10/12). Chỉ giữ câu ĐÚNG KHỐI: khối câu đọc từ mã tờ
+ * (`maDe`, `nhom` của nguồn), mã câu (`id`) và chương (`dang`/`chuyenDe`) như `khoiCuaCau` — khác khối ca, không rõ hoặc mâu thuẫn khối ⇒ bỏ; không rõ khối ca
+ * (ca không ghi lớp) ⇒ KHÔNG bù câu nào (thầy 05/10: "chặn chuẩn 100% không được rút nhầm kho khác khối"; trước đây giữ hết).
  * Chỉ áp cho phần BÙ; kho gốc của ca (thầy chọn lúc mở ca) và câu hỏi-lại-câu-đã-sai không đụng. Hàm thuần. */
 export function locKhoBuTheoKhoi(kho: TeacherExamSource[], khoiCa: Khoi | null | undefined): TeacherExamSource[] {
-  if (!khoiCa) return kho
-  const hop = (s: TeacherExamSource) => (q: { id: string }) => cauHopKhoi(khoiCa, { maDe: s.maDe, id: q.id })
+  if (!khoiCa) return kho.map((s) => ({ ...s, phanI: [], phanII: [], phanIII: [] }))
+  const hop = (s: TeacherExamSource) => (q: { id: string; dang?: unknown; chuyenDe?: unknown }) => cauHopKhoi(khoiCa, { maDe: s.maDe, nhom: s.nhom, id: q.id, dang: q.dang ?? null, chuyenDe: q.chuyenDe ?? null })
   return kho.map((s) => ({ ...s, phanI: s.phanI.filter(hop(s)), phanII: s.phanII.filter(hop(s)), phanIII: s.phanIII.filter(hop(s)) }))
 }
 
@@ -536,6 +537,7 @@ export async function dungDeRiengChoCa(
     lopCa ? danhSachEm(url, mat).catch(() => null) : Promise.resolve(null),
   ])
   const { dsCa, boQua, namQuet, nguonNam, soCaThuMuc } = nguonCaTruoc
+  { const k = khoiCuaEm({ lop: lopCa }); if (k) for (const ca of dsCa) ca.saiCua = Object.fromEntries(Object.entries(ca.saiCua).map(([s, ds]) => [s, ds.filter((q) => cauHopKhoi(k, q))])) } // LUẬT THẦY 05/10: câu sai ca trước MÁY kéo vào hỏi lại chỉ câu ĐÚNG khối lớp (ca không ghi lớp ⇒ câu sai của chính em ở ca thầy dựng, giữ như thầy giao)
   const ghiChu: GhiChuBienBan[] = []
   const coMat = new Set(dsSbd)
   // Sắp theo SBD: thứ tự máy chủ trả danh sách lớp không phải là đầu vào của thuật toán.
@@ -662,7 +664,7 @@ export async function dungDeRiengChoCa(
     // Lọc về đúng chuyên đề ca (vá 19/09) TRƯỚC khi bù — xem
     // `locKhoToanBoTheoChuyenDeCa`. `bank` ở đây là kho GỐC của ca (trước khi
     // nối câu khắc phục), đúng những chuyên đề thầy đã chọn lúc mở ca.
-    // Rồi lọc KHỐI của ca (`lopCa` rỗng ⇒ không rõ khối ⇒ không lọc): ca lớp 11 không được bù câu lớp 12.
+    // Rồi lọc KHỐI của ca (LUẬT THẦY 05/10: chỉ câu ĐÚNG khối ca; `lopCa` không đọc ra khối ⇒ không bù câu nào): ca lớp 11 không được bù câu lớp 10/12.
     const khoToanBo = locKhoBuTheoKhoi(locKhoToanBoTheoChuyenDeCa(khoToanBoGoc, bank), khoiCuaEm({ lop: lopCa }))
     const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id)), ...daGapCaLop])
     const bu: TeacherExamSource = { maDe: `${maCa}-bu-kho`, ...chonCauBuKho(khoToanBo, daCo, { I: thieuI, II: thieuII, III: thieuIII }) }

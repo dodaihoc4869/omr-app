@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // THỬ SỨC THÊM (thầy chốt 30/09): chiến dịch bật "Rải đều câu mới" ⇒ em chăm làm xong kế hoạch hôm nay rất sớm (thật: SBD 11084 chỉ 8/49 lượt).
 // Nút "Thử sức thêm (không bắt buộc)": xong kế hoạch + đã mở rương ⇒ lấy TRƯỚC một lô câu mới của NGÀY MAI = min(quota ngày mai theo rải đều, trần − tong).
 // D1 thật = node:sqlite (mẫu tests/srs2-rai-deu-d1-3009.test.ts, tests/sanh2-tam-giu-3009.test.ts).
@@ -19,7 +20,7 @@ const HAN = '2026-10-05' // D = 7 tính từ 29/09 ⇒ ngày giao câu mới cu�
 const ngayCua = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 
 function cauJson(qid: string) {
-  return JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' } })
+  return JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' } })
 }
 function dung(soCau = 120) {
   const d = taoD1That()

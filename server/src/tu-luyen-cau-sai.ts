@@ -18,6 +18,7 @@ import { cauLuyenTuBoCau } from '../../src/lib/bai-tap-pdf'
 import { laCauTuLuan } from './cam-tu-luan'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
+import { chanKhacKhoiEm } from './chan-khac-khoi'
 
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v))
@@ -354,7 +355,7 @@ export async function docKhoCauSai(env: Env, sbd: string): Promise<KhoCauSai> {
     const qids = [...cu.qids, qid]
     theoNhom.set(khoa, moiHon ? { qid, q: nd.q, lanSai: gop, kho: laCauKho(nd.q), qids } : { ...cu, lanSai: gop, qids })
   }
-  const tatCa = [...theoNhom.values()]
+  const tatCa = await chanKhacKhoiEm(env, 'tu_luyen_kho_sai', sbd, [...theoNhom.values()], { cauCua: (c) => c.q }) // LUẬT THẦY 05/10: câu sai cũ KHÁC khối em không vào kho câu sai (chế độ 1, 2, 4)
   if (!tatCa.length) return rong(LOI_KHO_CAU_SAI_TRONG)
   const tt = await docKhacPhuc(env, sbd)
   const ds: CauSaiKho[] = []

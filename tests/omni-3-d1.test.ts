@@ -69,7 +69,7 @@ function dung(tuy: { omni?: unknown; hoa2?: unknown } = {}): { d: D1That; env: E
 interface CauTuy { maDe?: string; phan?: 'I' | 'II' | 'III'; dang?: string | null; tenDang?: string; mucDo?: string; kienThuc?: string[]; text?: string; reviewed?: boolean; tuLuan?: boolean }
 function themCau(d: D1That, qid: string, t: CauTuy = {}) {
   const phan = t.phan ?? 'I', dang = t.dang === undefined ? 'D1' : t.dang
-  const json = { qid, maDe: t.maDe ?? 'DE1', version: 'v1', group: `g-${qid}`, phan, text: t.text ?? `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
+  const json = { qid, maDe: t.maDe ?? 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan, text: t.text ?? `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: phan === 'II' ? ['a', 'b', 'c', 'd'] : [],
     dang, tenDang: t.tenDang ?? (dang ? `Dạng ${dang}` : ''), mucDo: t.mucDo ?? 'Thông hiểu', kienThuc: t.kienThuc ?? [], correct: phan === 'II' ? 'DSDS' : phan === 'III' ? '12' : 'B',
     solution: { chot: 'LOI-GIAI-BI-MAT' }, reviewed: t.reviewed ?? true, ...(t.tuLuan ? { tuLuan: true } : {}), hinhAnh: [] }
   d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(t.maDe ?? 'DE1', qid, 'v1', `g-${qid}`, dang, JSON.stringify(json))

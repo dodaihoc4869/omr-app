@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em, em/câu không rõ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12.
 // POST /hs/cau-theo-qid — nội dung câu để em LÀM đúng các câu việc on_lai đã chọn. LUẬT ĐỎ: không đáp án, không lời giải, không dò kho.
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
@@ -20,7 +21,7 @@ const LOI_GIAI_BI_MAT = 'LOI-GIAI-BI-MAT-XYZ'
 const H = 3_600_000
 
 const cauKho = (qid: string, o: Record<string, unknown> = {}) => ({
-  qid, maDe: 'x', version: 'v-bi-mat', group: `g-${qid}`, phan: 'II', text: `Xét các phát biểu về ${qid}.`, choices: [], ideas: ['ý a', 'ý b', 'ý c', 'ý d'],
+  qid, maDe: 'x', lop: '12', version: 'v-bi-mat', group: `g-${qid}`, phan: 'II', text: `Xét các phát biểu về ${qid}.`, choices: [], ideas: ['ý a', 'ý b', 'ý c', 'ý d'],
   hinhAnh: [{ viTri: 'truoc_de', url: 'a.png' }, { viTri: 'sau_loi_giai', url: 'ANH-LOI-GIAI.png' }], dang: 'ES.A.X', tenDang: 'Tên dạng', mucDo: 'hieu', sao: 1,
   kienThuc: ['k1'], correct: DAP_AN_BI_MAT, solution: LOI_GIAI_BI_MAT, reviewed: true, truongLa: 'TRUONG-LA-BI-MAT', ...o,
 })
@@ -30,7 +31,7 @@ function themCau(d: D1That, maDe: string, cau: ReturnType<typeof cauKho>[]) {
   d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,'v1','x')").run(maDe)
   for (const c of cau) d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(maDe, c.qid, 'v', c.group, c.dang, JSON.stringify({ ...c, maDe }))
 }
-const themHs = (d: D1That, sbd: string) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES(?,'x','x')").run(sbd)
+const themHs = (d: D1That, sbd: string) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES(?,'x','12','x')").run(sbd)
 async function daGap(d: D1That, sbd: string, qids: string[]) {
   const r = await ghiSuKien(d.env, qids.map((q, i) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd, qid: q, lan: i + 1, ketQua: 0 as const, luc: new Date(Date.now() - 48 * H).toISOString() })))
   expect(r.ok).toBe(true)
@@ -176,7 +177,8 @@ describe('chi phí', () => {
     const r = await goi(d, { sbd: 'S1', qid: ['DE1-II-A', 'DE1-II-B', 'DE1-II-C'] })
     expect(r.ok).toBe(true)
     // 1 (em thật + đã gặp) + 1 (nội dung) + 1 (protectedQuestions: danh sách ca; không ca bảo vệ nên không đọc R2)
-    expect(d.soLenh.prepare - truoc).toBe(3)
+    // + 1 (LUẬT THẦY 05/10 "chặn chuẩn 100% không được rút nhầm kho khác khối": cổng cuối đọc khối em `hoc_sinh`; câu tự đọc ra khối ⇒ không cần truy vấn làm giàu)
+    expect(d.soLenh.prepare - truoc).toBe(4)
     expect(docR2).toBe(0)
   })
 })

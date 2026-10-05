@@ -24,7 +24,8 @@ function themCau(d: D1That, maDe: string, lop: string, cau: ReturnType<typeof ca
   d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES(?,?,?,?,?,0,'v1')").run(maDe, maDe, lop, cau.length, `kho/${maDe}.json`)
   d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,'v1','x')").run(maDe)
   for (const c of cau) {
-    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(maDe, c.qid, 'v', c.group, c.dang, JSON.stringify({ ...c, maDe }))
+    // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): câu không rõ khối bị chặn ⇒ câu giả mang khối của tờ (`lop`, như `de_kho.lop`).
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(maDe, c.qid, 'v', c.group, c.dang, JSON.stringify({ lop, ...c, maDe }))
   }
 }
 

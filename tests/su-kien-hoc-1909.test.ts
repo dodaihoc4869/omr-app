@@ -1,4 +1,5 @@
 // @vitest-environment node
+// LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // GĐ 0 — SỔ SỰ KIỆN HỌC (DE-XUAT-CA-NHAN-HOA-1909.md mục 1.1, nghiệm thu GĐ 0).
 //
 // Chạy trên SQLite THẬT với lược đồ THẬT (xem `_d1-that.ts`): câu SQL `json_each`,
@@ -250,7 +251,7 @@ describe('mỗi điểm ghi ghi ĐÚNG số dòng và idempotent', () => {
 
   it('bài Mom (submit): ghi câu có mã thật; câu cau_N không định danh được thì KHÔNG ghi; điểm vẫn do gradeMom', async () => {
     const d = taoD1That()
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','mk','x')").run()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','12','mk','x')").run()
     const token = await gameToken(d.env, 'S1')
     const dsCau = [{ id: 'DE1-I-1', dapAn: 'A', chuyenDe: 'ES' }, { id: 'DE1-III-1', dapAn: '0.39', chuyenDe: 'Hoá học' }, { id: 'cau_3', dapAn: 'B' }]
     await mom(d.env, 'create', { sbd: 'S1', id: 'M1', dsCau }, {noiBo:true})
@@ -275,13 +276,13 @@ describe('mỗi điểm ghi ghi ĐÚNG số dòng và idempotent', () => {
 
   it('game (answer): ghi đúng/sai với ma_dang; câu có trợ giúp KHÔNG ghi; trả lời lặp không đẻ dòng', async () => {
     const d = taoD1That()
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('1','Em','mk','x')").run()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('1','Em','12','mk','x')").run()
     const q = (i: number) => ({ id: `D-I-${i}`, text: `Đề ${i}`, choices: ['A', 'B', 'C', 'D'], correct: 'B', dang: { ma: 'AA.BB.CC', ten: 'Dạng' }, mucDo: 'biet', kienThuc: ['K1'], loiGiai: { chot: 'Giải' } })
     d.objects.set('kho/D.json', { phanI: [q(0), q(1)], phanII: [], phanIII: [] })
     d.sql.exec(`INSERT INTO ca(ma_ca,trang_thai,cong_bo,cap_nhat_luc) VALUES('CA','dong','ngay','1');
       INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,nop_luc,trang_thai,cap_nhat_luc) VALUES('CA|1|1','CA','1',1,'x','2026-09-01T00:00:00.000Z','da_nop','x');
       INSERT INTO chi_tiet_cau(khoa,ma_ca,sbd,lan_thu,phan,so_cau,qid,dung_sai,cap_nhat_luc) VALUES('CA|1|1|I|1','CA','1',1,'I',1,'D-I-0',0,'x'),('CA|1|1|I|2','CA','1',1,'I',2,'D-I-1',0,'x');
-      INSERT INTO de_kho(ma_de,r2_khoa,cap_nhat_luc,da_xoa) VALUES('D','kho/D.json','1',0);`)
+      INSERT INTO de_kho(ma_de,r2_khoa,cap_nhat_luc,da_xoa) VALUES('DH-12-D','kho/D.json','1',0);`) // LUẬT THẦY 05/10: game chỉ phát câu ĐÚNG khối em ⇒ mã tờ ghi khối 12 (như kho thật)
     await syncIndex(d.env)
     const token = await gameToken(d.env, '1')
     const start = (await gameV2(d.env, 'start', { token, mode: 'repair' })) as { id: string }
@@ -295,7 +296,7 @@ describe('mỗi điểm ghi ghi ĐÚNG số dòng và idempotent', () => {
 
   it('luyện đề (submit): ghi đúng số câu của đề, nộp lại không ghi thêm', async () => {
     const d = taoD1That()
-    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('S1','Em','mk','x')").run()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em','12','mk','x')").run()
     const token = await gameToken(d.env, 'S1')
     const nguon = [{
       maDe: 'L',
