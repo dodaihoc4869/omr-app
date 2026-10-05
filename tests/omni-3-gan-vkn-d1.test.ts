@@ -105,6 +105,18 @@ describe('ganVknChoMaDe — ghi ma trận Q của các tờ', () => {
     expect(d2.dem('omni_q')).toBe(5 + 1) // câu Phần II (5 dòng) + dòng 'thay' có sẵn
   })
 
+  it('câu đã sửa nội dung (băm hiện tại khác) ⇒ KHÔNG dùng dòng cau_bo_tro qid_mau cũ — lùi về dò mẫu', async () => {
+    const d = taoD1That()
+    const nay = new Date(NAY).toISOString()
+    napCau(d, 'DH-S', { qid: 'DH-S-III-1', phan: 'III', text: 'Lên men glucose với hiệu suất 75% (đề đã sửa).', correct: '7,5', solution: { buoc: ['m = 10 · 75% = 7,5 gam.'] } })
+    d.sql.prepare('INSERT INTO loi_giai_cau (qid, bam, ma_de, dang, lop, bo, cap_nhat_luc) VALUES (?,?,?,?,?,?,?)').run('DH-S-III-1', 'bam-moi', 'DH-S', 'tln', '12', 'HOA', nay)
+    d.sql.prepare('INSERT INTO cau_bo_tro (bam, qid_mau, song_sinh_json, cau_kiem_json, nhan_nen_json, buoc_json, cap_nhat_luc) VALUES (?,?,?,?,?,?,?)')
+      .run('bam-cu', 'DH-S-III-1', '[]', '[]', JSON.stringify([{ buoc: 0, nen: 'ti_khoi_khi' }]), '[]', nay)
+    const kq = await ganVknChoMaDe(d.env, ['DH-S'], NAY)
+    expect(kq.theoNguon).toEqual({ mau: 1 })
+    expect(ca(d, 'DH-S-III-1')!.vkn).toEqual(['dang:HOA.DANG.MAU', 'nen:hieu_suat'])
+  })
+
   it('tờ không có câu ⇒ 0; vi kỹ năng riêng của dạng khớp kienThuc được đưa vào', async () => {
     const d = taoD1That()
     expect(await ganVknChoMaDe(d.env, ['KHONG-CO'], NAY)).toEqual({ soCau: 0, soGhi: 0, theoNguon: {} })
@@ -123,6 +135,7 @@ function chuanBiDem(d: D1That) {
   t('DE-TU-LUYEN', 2)
   t('DH-12-D', 1)
   t('KHAC-E', 1, 'I'); t('KHAC-E', 1, 'III')
+  t('DH-12-F', 1, 'I'); t('DH-12-F', 1, 'III')
   const nay = new Date(NAY).toISOString()
   const bai = d.sql.prepare('INSERT INTO bai_da_day (id, lop, khoa_bai, ten_bai, vi_tri, ma_to_json, tick_luc, nguoi, chien_dich_id, bo_tick_luc) VALUES (?,?,?,?,?,?,?,?,?,?)')
   bai.run('b1', '12A1', 'B1', 'Bài 1', 1, JSON.stringify(['DH-12-A-TN']), '2026-10-01T03:00:00.000Z', 'thay', null, null)
@@ -131,6 +144,7 @@ function chuanBiDem(d: D1That) {
   const tm = d.sql.prepare('INSERT INTO de_kho_thu_muc (ma_de, thu_muc, cap_nhat_luc) VALUES (?,?,?)')
   tm.run('DH-12-D', 'TU_LUYEN', nay) // mã DH- nhưng thầy xếp vào TU LUYỆN
   tm.run('KHAC-E-TN', 'DAY_HOC', nay) // chỉ phần trắc nghiệm của tờ này thuộc DẠY HỌC
+  tm.run('DH-12-F-TN', 'TU_LUYEN', nay) // tờ DH- có dòng tách phần: phần TN sang TU LUYỆN, phần chưa có dòng theo luật lùi DH- ⇒ DẠY HỌC
 }
 const daGan = (d: D1That) => (d.sql.prepare('SELECT qid FROM omni_q_gan ORDER BY qid').all() as Row[]).map((x) => String(x.qid))
 
@@ -145,9 +159,9 @@ describe('chayGanVknDem — việc đêm', () => {
     expect(r2).toMatchObject({ soCau: 2, xong: false })
     expect(daGan(d)).toEqual(['DH-12-A-I-1', 'DH-12-A-I-2', 'DH-12-B-III-1', 'DH-12-B-III-2']) // rồi phần trắc nghiệm của bài tick trước
     const r3 = await chayGanVknDem(d.env, NAY + 120_000, { toiDa: 5 })
-    expect(r3).toMatchObject({ soCau: 2, xong: true })
-    expect(daGan(d)).toEqual(['DH-12-A-I-1', 'DH-12-A-I-2', 'DH-12-A-III-1', 'DH-12-B-III-1', 'DH-12-B-III-2', 'KHAC-E-I-1'])
-    expect(d.dem('omni_q', "qid LIKE 'DE-TU-LUYEN%' OR qid LIKE 'DH-12-D%' OR qid = 'KHAC-E-III-1'")).toBe(0)
+    expect(r3).toMatchObject({ soCau: 3, xong: true })
+    expect(daGan(d)).toEqual(['DH-12-A-I-1', 'DH-12-A-I-2', 'DH-12-A-III-1', 'DH-12-B-III-1', 'DH-12-B-III-2', 'DH-12-F-III-1', 'KHAC-E-I-1'])
+    expect(d.dem('omni_q', "qid LIKE 'DE-TU-LUYEN%' OR qid LIKE 'DH-12-D%' OR qid = 'KHAC-E-III-1' OR qid = 'DH-12-F-I-1'")).toBe(0)
     const ct = JSON.parse(String((d.sql.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').get(KHOA_CON_TRO_GAN) as Row).gia_tri))
     expect(ct).toMatchObject({ pb: PHIEN_BAN_GAN, ngay: '2026-10-06', xong: true })
     const r4 = await chayGanVknDem(d.env, NAY + 180_000, { toiDa: 5 })
@@ -162,7 +176,7 @@ describe('chayGanVknDem — việc đêm', () => {
     const d = taoD1That()
     chuanBiDem(d)
     await chayGanVknDem(d.env, NAY, { toiDa: 50 })
-    expect(daGan(d)).toHaveLength(6)
+    expect(daGan(d)).toHaveLength(7)
     d.sql.prepare("UPDATE omni_q_gan SET phien_ban = 'gan-vkn-cu' WHERE qid = 'DH-12-B-III-1'").run()
     d.sql.prepare("UPDATE game_v2_question SET version = 'v2', json = replace(json, 'tính hiệu suất', 'tính pH') WHERE qid = 'DH-12-B-III-2'").run()
     d.sql.prepare("DELETE FROM omni_q WHERE qid = 'DH-12-A-I-1'").run()

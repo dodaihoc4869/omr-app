@@ -554,38 +554,50 @@ function cauKhoTuGame(maDe: string, j: Row): Parameters<typeof bamCau>[0] | null
   const tho = { qid: j.qid, phan: j.phan, de: j.text, pa: j.phan === 'I' ? j.choices : undefined, y: j.phan === 'II' ? j.ideas : undefined, dap_an: j.correct, bang: j.table, hinh: j.hinhAnh }
   return cauTrongGoi(maDe, { cau: [tho] })[0] ?? null
 }
-/** Nhãn bước của các câu: (1) băm nội dung qua loi_giai_cau, (2) băm tính lại từ nội dung câu, (3) qid_mau. Bảng chưa có ⇒ rỗng. */
+/**
+ * Nhãn bước của các câu (cau_bo_tro theo BĂM nội dung câu):
+ *   (1) câu có dòng loi_giai_cau ⇒ băm HIỆN TẠI của câu = loi_giai_cau.bam ⇒ chỉ dùng cau_bo_tro của băm đó (không có ⇒ không có nhãn bước:
+ *       dòng qid_mau cũ có thể là nội dung trước khi sửa câu);
+ *   (2) câu chưa có dòng loi_giai_cau (tờ nạp trước khi có bảng) ⇒ tự băm lại nội dung câu đúng như `bamCau` lúc nạp đề (đọc kèm ảnh, từng lô 20 câu);
+ *   (3) vẫn không thấy ⇒ dòng cau_bo_tro có qid_mau = qid. Bảng chưa có ⇒ rỗng.
+ */
 async function docBoTroGan(env: Env, cau: readonly CauDoc[]): Promise<Map<string, BoTroGan>> {
   const ra = new Map<string, BoTroGan>()
   if (!cau.length) return ra
   const co = (x: BoTroGan) => x.nhanNen.length > 0 || x.buoc.length > 0
-  const qids = cau.map((c) => c.qid)
-  const r1 = await env.DB.prepare(`SELECT l.qid AS qid, b.nhan_nen_json, b.buoc_json FROM loi_giai_cau l JOIN cau_bo_tro b ON b.bam = l.bam WHERE l.qid IN (SELECT value FROM json_each(?))`)
-    .bind(dsJson(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
-  for (const x of r1.results ?? []) { const b = boTroTuDong(x, 'bam'); if (co(b)) ra.set(str(x.qid), b) }
-  const thieu = cau.filter((c) => !ra.has(c.qid))
-  if (!thieu.length) return ra
+  const r1 = await env.DB.prepare(`SELECT l.qid AS qid, b.nhan_nen_json, b.buoc_json, b.bam AS co_bo_tro FROM loi_giai_cau l LEFT JOIN cau_bo_tro b ON b.bam = l.bam
+    WHERE l.qid IN (SELECT value FROM json_each(?))`).bind(dsJson(cau.map((c) => c.qid))).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const coBam = new Set<string>()
+  for (const x of r1.results ?? []) {
+    coBam.add(str(x.qid))
+    if (x.co_bo_tro == null) continue
+    const b = boTroTuDong(x, 'bam')
+    if (co(b)) ra.set(str(x.qid), b)
+  }
+  const chuaBam = cau.filter((c) => !coBam.has(c.qid)).map((c) => c.qid)
+  if (!chuaBam.length) return ra
   const coBang = await env.DB.prepare('SELECT 1 AS co FROM cau_bo_tro LIMIT 1').first<Row>().catch(() => null)
   if (!coBang) return ra
-  // (2) Băm lại nội dung câu (kèm ảnh) đúng như lúc nạp đề (`bamCau`) — câu ở tờ khác cùng nội dung dùng chung học liệu.
-  const day = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)')
-    .bind(dsJson(thieu.map((c) => c.qid))).all<Row>().catch(() => ({ results: [] as Row[] }))
   const bamQ = new Map<string, string>()
-  for (const x of day.results ?? []) {
-    const qid = str(x.qid)
-    if (bamQ.has(qid)) continue
-    try {
-      const j = JSON.parse(str(x.json))
-      const k = laObj(j) ? cauKhoTuGame(str(x.ma_de), j) : null
-      if (k) bamQ.set(qid, await bamCau(k))
-    } catch { /* câu hỏng: bỏ */ }
+  for (let i = 0; i < chuaBam.length; i += 20) {
+    const day = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)')
+      .bind(JSON.stringify(chuaBam.slice(i, i + 20))).all<Row>().catch(() => ({ results: [] as Row[] }))
+    for (const x of day.results ?? []) {
+      const qid = str(x.qid)
+      if (bamQ.has(qid)) continue
+      try {
+        const j = JSON.parse(str(x.json))
+        const k = laObj(j) ? cauKhoTuGame(str(x.ma_de), j) : null
+        if (k) bamQ.set(qid, await bamCau(k))
+      } catch { /* câu hỏng: bỏ */ }
+    }
   }
   if (bamQ.size) {
     const r2 = await env.DB.prepare('SELECT bam, nhan_nen_json, buoc_json FROM cau_bo_tro WHERE bam IN (SELECT value FROM json_each(?))').bind(dsJson([...bamQ.values()])).all<Row>().catch(() => ({ results: [] as Row[] }))
     const theoBam = new Map((r2.results ?? []).map((x) => [str(x.bam), boTroTuDong(x, 'bam_tinh')]))
     for (const [q, b] of bamQ) { const v = theoBam.get(b); if (v && co(v)) ra.set(q, v) }
   }
-  const conThieu = thieu.filter((c) => !ra.has(c.qid)).map((c) => c.qid)
+  const conThieu = chuaBam.filter((q) => !ra.has(q))
   if (conThieu.length) {
     const r3 = await env.DB.prepare('SELECT qid_mau, nhan_nen_json, buoc_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each(?))').bind(dsJson(conThieu)).all<Row>().catch(() => ({ results: [] as Row[] }))
     for (const x of r3.results ?? []) { const b = boTroTuDong(x, 'qid_mau'); if (co(b) && !ra.has(str(x.qid_mau))) ra.set(str(x.qid_mau), b) }
@@ -722,10 +734,14 @@ async function toDayHocUuTien(env: Env): Promise<string[]> {
   for (const x of pv.results ?? []) docMang(x.ma_de_json).forEach((m) => them(str(m)))
   const thuMuc = new Map<string, string>()
   for (const x of tm.results ?? []) thuMuc.set(str(x.ma_de), str(x.thu_muc))
-  const gocCoDong = new Map<string, string[]>()
-  for (const [m, t] of thuMuc) { const g = tachMaTo(m).goc; gocCoDong.set(g, [...(gocCoDong.get(g) ?? []), t]) }
+  const gocCoDong = new Set([...thuMuc.keys()].map((m) => tachMaTo(m).goc))
   for (const [m, t] of [...thuMuc].sort((a, b) => (a[0] < b[0] ? -1 : 1))) if (t === 'DAY_HOC') them(m)
-  for (const g of (kho.results ?? []).map((x) => str(x.ma_de)).sort()) if (!gocCoDong.has(g) && g.toUpperCase().startsWith('DH-')) them(g)
+  // Thiếu dòng thư mục ⇒ luật lùi mã "DH-" (kho-thu-muc.ts thuMucTheoMa) — xét TỪNG mã: cả tờ, hoặc từng phần chưa có dòng khi tờ đã có dòng tách phần.
+  for (const g of (kho.results ?? []).map((x) => str(x.ma_de)).sort()) {
+    if (!g.toUpperCase().startsWith('DH-') || thuMuc.has(g)) continue
+    if (!gocCoDong.has(g)) them(g)
+    else for (const h of ['TN', 'DS', 'TLN']) if (!thuMuc.has(`${g}-${h}`)) them(`${g}-${h}`)
+  }
   return ra
 }
 /**
