@@ -25,7 +25,7 @@ import { docHoSo2, layKeHoachHomNay } from '../server/src/srs2-d1' // nạp srs2
 import { THAM_SO_OMNI, type HoSoOmniEm } from '../server/src/omni-kieu'
 import { THAM_SO_GOC, type ThamSoLuat } from '../server/src/loi-hoc-luat'
 import {
-  LENH_OMNI_CAN_THAN, LUA_CHON_BUOC_TOI_DA, MA_EM_CHUA_RO, canThanTu, damBaoBangCanThan, ghiBuocSai, luaChonBuocSai, nhanMocDuyTri, phanCanThanChoTraLoi, sEmDeXet, tenBuocChoEm,
+  LENH_OMNI_CAN_THAN, LUA_CHON_BUOC_TOI_DA, MA_EM_CHUA_RO, TRAN_BUOC_SAI_NGAY, canThanTu, damBaoBangCanThan, ghiBuocSai, luaChonBuocSai, nhanMocDuyTri, phanCanThanChoTraLoi, sEmDeXet, tenBuocChoEm,
 } from '../server/src/omni-can-than'
 import { RESET_HOA2 } from '../server/src/reset-hoa2'
 import { RESET_2109 } from '../server/src/reset-toan-app'
@@ -155,6 +155,16 @@ describe('(c) ghi sổ riêng omni_buoc_sai (D1 thật)', () => {
     await damBaoBangCanThan(k.env)
     expect(Number((k.d.sql.prepare('SELECT COUNT(*) AS n FROM omni_buoc_sai').get() as { n: number }).n)).toBe(0)
     expect(soHoc()).toBe(truoc)
+  })
+  it('trần TRAN_BUOC_SAI_NGAY dòng/em/ngày: lệnh dồn dập không làm đầy bảng; ngày khác / em khác vẫn ghi được', async () => {
+    const k = taoKhoOmni()
+    const dem = (sbd: string) => Number((k.d.sql.prepare('SELECT COUNT(*) AS n FROM omni_buoc_sai WHERE sbd = ?').get(sbd) as { n: number }).n)
+    for (let i = 0; i < TRAN_BUOC_SAI_NGAY; i++) expect(await ghiBuocSai(k.env, 'S1', { qid: `Q${i}`, ma: 'chua_ro' }, T0)).toEqual({ ok: true, daGhi: true })
+    expect(dem('S1')).toBe(TRAN_BUOC_SAI_NGAY)
+    expect(await ghiBuocSai(k.env, 'S1', { qid: 'QMOI', ma: 'chua_ro' }, T0)).toEqual({ ok: true, daGhi: false }) // quá trần ngày
+    expect(dem('S1')).toBe(TRAN_BUOC_SAI_NGAY)
+    expect(await ghiBuocSai(k.env, 'S1', { qid: 'QMOI', ma: 'chua_ro' }, T0 + 86_400_000)).toEqual({ ok: true, daGhi: true }) // ngày mai
+    expect(await ghiBuocSai(k.env, 'S2', { qid: 'QMOI', ma: 'chua_ro' }, T0)).toEqual({ ok: true, daGhi: true }) // em khác
   })
   it('bảng mới xếp GIỮ ở cả hai job reset (học tập của em — không bao giờ bị xoá)', () => {
     expect(RESET_HOA2.bangGiu).toContain('omni_buoc_sai')

@@ -105,10 +105,12 @@ export const LENH_TAO_BANG_CAN_THAN: readonly string[] = [
   'CREATE TABLE IF NOT EXISTS omni_buoc_sai (sbd TEXT NOT NULL, qid TEXT NOT NULL, ngay TEXT NOT NULL, ma_vkn TEXT NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (sbd, qid, ngay))',
 ]
 export const damBaoBangCanThan = (env: Env): Promise<void> => chayDdlMotLan(env, 'omni_can_than_0610', LENH_TAO_BANG_CAN_THAN)
+/** Trần số dòng `omni_buoc_sai` của MỘT em trong MỘT ngày (chắc-mà-sai thật chỉ vài lượt/ngày; trần chặn máy gửi lệnh dồn dập làm đầy bảng). */
+export const TRAN_BUOC_SAI_NGAY = 200
 const MA_QID_HOP_LE = /^[\w.-]{1,80}$/
 const MA_BUOC_HOP_LE = /^(?:chua_ro|[\w.:#-]{1,100})$/
 /**
- * `hoa2-omni-buoc-sai {qid, ma}` — em bấm một bước ở thẻ "Em biết câu này. Sai vì bước nào?" (hoặc "Em chưa rõ"): ghi MỘT dòng `omni_buoc_sai`. KHÔNG chấm, KHÔNG đổi
+ * `hoa2-omni-buoc-sai {qid, ma}` — em bấm một bước ở thẻ "Em biết câu này. Sai vì bước nào?" (hoặc "Em chưa rõ"): ghi MỘT dòng `omni_buoc_sai` (tối đa TRAN_BUOC_SAI_NGAY dòng/em/ngày). KHÔNG chấm, KHÔNG đổi
  * sổ học, KHÔNG đổi P/EXP. `qid` quy về câu GỐC (bỏ `#n`, `~ss…`). Dòng đã có (cùng em, câu, ngày) ⇒ giữ lựa chọn đầu, `daGhi:false`. Nơi gọi đã kiểm OMNI bật cho em.
  */
 export async function ghiBuocSai(env: Env, sbd: string, b: Record<string, unknown>, nowMs: number): Promise<Record<string, unknown>> {
@@ -118,6 +120,7 @@ export async function ghiBuocSai(env: Env, sbd: string, b: Record<string, unknow
   if (!MA_BUOC_HOP_LE.test(ma)) return { ok: false, error: 'Bước em chọn không hợp lệ.' }
   await damBaoBangCanThan(env)
   const ngay = new Date(nowMs + 7 * 3_600_000).toISOString().slice(0, 10)
-  const r = await env.DB.prepare('INSERT OR IGNORE INTO omni_buoc_sai (sbd, qid, ngay, ma_vkn, luc) VALUES (?,?,?,?,?)').bind(sbd, qid, ngay, ma, new Date(nowMs).toISOString()).run()
+  const r = await env.DB.prepare('INSERT OR IGNORE INTO omni_buoc_sai (sbd, qid, ngay, ma_vkn, luc) SELECT ?,?,?,?,? WHERE (SELECT COUNT(*) FROM omni_buoc_sai WHERE sbd = ? AND ngay = ?) < ?')
+    .bind(sbd, qid, ngay, ma, new Date(nowMs).toISOString(), sbd, ngay, TRAN_BUOC_SAI_NGAY).run()
   return { ok: true, daGhi: Number(r.meta?.changes ?? 0) > 0 }
 }
