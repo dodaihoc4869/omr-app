@@ -22,6 +22,7 @@ import type { ChiTietCauRow } from './exam-api'
 import { chuanChuyenDe, type BaiLam, type CauChua, type EmGoi, type PhanDe } from './phan-cong'
 import type { BaiLamCoGiay } from './do-kho-cau'
 import type { MucDo } from './goi-len-bang'
+import { khoaCau } from './khu-trung-cau'
 
 /** Bản đề CÓ đáp án của ca. `boTheoEm` chỉ còn để đọc lại ca mở trước 05/09;
  * ca mở từ nay không ghi trường đó nữa. */
@@ -85,6 +86,45 @@ export function cauTuBanDe(bank: BanDeCa, dichSo: Partial<Record<PhanDe, number>
     })
   }
   return ra
+}
+
+/** KHOÁ NỘI DUNG từng câu của một bộ đề (id ⇒ `khoaCau`: thân đề + phương án/ý). id trùng ⇒ giữ câu đầu. */
+export function khoaNoiDungBanDe(bank: BanDeCa): Map<string, string> {
+  const ra = new Map<string, string>()
+  for (const q of [...bank.phanI, ...bank.phanII, ...bank.phanIII] as { id: string; text: string; choices?: string[]; ideas?: string[] }[]) {
+    if (!ra.has(q.id) && String(q.text ?? '').trim()) ra.set(q.id, khoaCau(q))
+  }
+  return ra
+}
+
+/** Bỏ câu TRÙNG NỘI DUNG trong MỘT bộ đề (giữ câu đứng trước; câu không có thân đề thì giữ). Không trùng gì ⇒ trả lại đúng đối tượng cũ. */
+export function boTrungTrongBanDe<T extends BanDeCa>(bank: T): T {
+  const daThay = new Set<string>()
+  let bo = 0
+  const loc = <Q extends { text: string; choices?: string[]; ideas?: string[] }>(ds: Q[]): Q[] =>
+    ds.filter((q) => {
+      if (!String(q.text ?? '').trim()) return true
+      const k = khoaCau(q)
+      if (daThay.has(k)) { bo++; return false }
+      daThay.add(k)
+      return true
+    })
+  const ra = { ...bank, phanI: loc(bank.phanI), phanII: loc(bank.phanII), phanIII: loc(bank.phanIII) }
+  return bo ? ra : bank
+}
+
+/** CÂU TRÙNG NỘI DUNG chỉ hiện MỘT lần (thầy 05/10): giữ câu đứng trước, bỏ câu sau có cùng nội dung. `giuHet` = các id luôn giữ
+ * (câu của chính ca: vị trí gắn với bài làm của em, không được bỏ) — câu thêm trùng nội dung với chúng thì bị bỏ. */
+export function boCauTrungNoiDung(ds: readonly CauChua[], khoa: ReadonlyMap<string, string>, giuHet: ReadonlySet<string> = new Set()): CauChua[] {
+  const daThay = new Set<string>()
+  for (const c of ds) if (giuHet.has(c.id)) daThay.add(khoa.get(c.id) ?? `id:${c.id}`)
+  return ds.filter((c) => {
+    if (giuHet.has(c.id)) return true
+    const k = khoa.get(c.id) ?? `id:${c.id}`
+    if (daThay.has(k)) return false
+    daThay.add(k)
+    return true
+  })
 }
 
 /** LƯỢT MỚI NHẤT của mỗi em. Em thi lại có nhiều dòng cùng SBD; chữa bài phải
