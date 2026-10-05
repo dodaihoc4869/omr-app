@@ -501,11 +501,12 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 /* OMNI 3 · ĐỀ THỬ: CHỈ bố cục — danh sách thẻ câu giấy của Đảo (dọc như ải), rộng tối đa 760 px cho dễ đọc; màu/nút dùng lại lớp sẵn có. */
 .dao2 .dao2-de-thu{display:flex;flex-direction:column;gap:12px;max-width:760px}
 .dao2 .dao2-de-thu-cau{display:flex;flex-direction:column;gap:6px}
-/* NÚT "HỎI THẦY" TRÊN THẺ GIẤY SÁNG CỦA ĐẢO 2.0 (05/10): dao.css tô nút kiểu "kính tối + chữ vàng" (--dao-kinh/--dao-vang) cho Đảo cũ nền tối
- * ⇒ trên thẻ lời giải sáng của Đảo 2.0 chữ vàng trên nền kem gần như không đọc được, trông như nút bị khoá (bản build thật, ảnh chụp 05/10).
- * Đặc hiệu 0,4,1 thắng `.dao.dao button.lg-nut--hoi` (0,3,1) bất kể tệp nào nạp trước. Chỉ đổi màu; cỡ, chữ, vị trí giữ nguyên. */
-.dao.dao2.dao-v2 button.lg-nut--hoi{--nut-nen:rgb(214,240,238);--nut-chu:rgb(10,90,96);--nut-bong:inset 0 0 0 1px rgb(150,210,210)}
+/* NÚT "HỎI THẦY" CỦA ĐẢO 2.0 = ĐÚNG MÀU CHUẨN của nút Hỏi thầy mọi màn khác (loi-giai.css: --m3-tertiary-container / --m3-on-tertiary-container;
+ * thầy 05/10: "giữ nguyên mọi màu… thêm thì phải đồng bộ đúng chuẩn"). dao.css tô nút kiểu kính tối + chữ vàng cho Đảo cũ nền tối ⇒ trên thẻ
+ * lời giải sáng của Đảo 2.0 thành chữ vàng trên nền kem, như nút bị khoá (đo trên bản build thật). Đặc hiệu 0,4,1 thắng `.dao.dao button.lg-nut--hoi`. */
+.dao.dao2.dao-v2 button.lg-nut--hoi{--nut-nen:var(--m3-tertiary-container);--nut-chu:var(--m3-on-tertiary-container);--nut-bong:none}
 /* ĐỀ THỬ (05/10): thanh nộp NỔI ở đáy suốt lúc làm (data-noi) — nút còn khoá có nền gần trong suốt (--d2-tat-nen) và dòng "Đã làm n/N câu"
  * không có nền ⇒ chữ thẻ câu bên dưới hiện xuyên qua, đè lên nhau (ảnh chụp 05/10). Ở ải thường thanh chỉ nổi khi đã chọn đáp án nên không gặp.
- * Cho thanh một tấm nền mờ đục như thẻ; chữ, nút, vị trí giữ nguyên. */
-.dao2 .dao2-de-thu[data-pha="lam"] > .dao2-chan[data-noi]{background:var(--d2-bot);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:18px;padding:8px 10px 10px;box-shadow:0 6px 18px -8px var(--d2-bong-dao)}
+ * Cho thanh tấm nền KÍNH chuẩn của Đảo 2.0 (--d2-kinh + viền --d2-kinh-vien, đúng bộ màu chip Trợ giúp/Chưa chắc ngay trên — thầy 05/10:
+ * "thêm thì phải đồng bộ đúng chuẩn"); chữ, nút, vị trí giữ nguyên. */
+.dao2 .dao2-de-thu[data-pha="lam"] > .dao2-chan[data-noi]{background:var(--d2-kinh);box-shadow:inset 0 0 0 1px var(--d2-kinh-vien);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:18px;padding:8px 10px 10px}

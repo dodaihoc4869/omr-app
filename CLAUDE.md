@@ -20,6 +20,7 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 
 ## Chữ và giao diện
 - TRƯỚC khi đặt chữ mới hoặc báo xong một màn: đọc `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md` (bảng từ chuẩn 3 app + 10 mục tự soát giao diện). Con số nào cũng có nhãn; một khái niệm một từ; không mã nội bộ trên màn học sinh/phụ huynh.
+- MÀU (thầy 05/10: "giữ nguyên mọi màu sắc các lớp trong 3 app hiện tại, bạn thêm thì phải đồng bộ đúng chuẩn"): không đổi/xoá màu đang có; thứ thêm mới chỉ dùng biến màu chuẩn đã có của đúng app (token M3, bảng màu app thầy, biến game). Trước khi đẩy: `npm run kiem:mau-giu` (so origin/main) phải 0 vi phạm.
 - KHÔNG rút câu TỰ LUẬN ở bất kỳ kênh rút đề tự động nào (dùng `src/lib/cau-tu-luan.ts`); riêng Gọi lên bảng thầy chọn gì hiện đúng thế.
 
 ## Bản đồ nhanh

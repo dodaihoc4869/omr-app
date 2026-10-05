@@ -41,6 +41,8 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] (tự phát sinh) Máy hẹp: công tắc Trợ giúp không chữ đứng cạnh chip "Chưa chắc" có chữ | bằng chứng: dcce6550; chỉ khi có chip (OMNI bật)
 - [x] (tự phát sinh) Đề thử: thanh nộp nổi trong suốt, chữ câu hiện xuyên qua | bằng chứng: 93e41039; test đề thử + Đảo 96/96
 - [x] (tự phát sinh) Trang chụp: màn thầy thiếu khung app thầy (mất màu bảng nhiệt), Đảo thiếu dao.css (nút mất nền), số xem trước Bài 3 lệch | bằng chứng: 77b2f450, dcce6550
+- [x] "Tôi muốn giữ nguyên mọi màu sắc các lớp trong 3 app hiện tại" (thầy 05/10) ⇒ không đổi màu nào đang có ở 3 app | bằng chứng: scripts/kiem-mau-giu-nguyen.mjs (npm run kiem:mau-giu) so origin/main: 46 tệp src/ đổi · 0 khai báo màu bị đổi/xoá; tự thử 5 kiểu vi phạm đều bắt được (thoát 1), hoàn nguyên thoát 0; server/src + public: 0 dòng màu đổi; luật ghi vào CLAUDE.md + chuẩn mục 8; đã báo 4 làn tối ưu
+- [x] "bạn thêm thì phải đồng bộ đúng chuẩn nhé" ⇒ mọi màu OMNI/sửa mới thêm phải dùng biến màu chuẩn đang có của đúng app (không màu tự chế); soát toàn bộ phần thêm so main | bằng chứng: phần OMNI của các làn chỉ dùng biến (0 màu thô); màu tự chế DUY NHẤT là của điều phối (nút Hỏi thầy Đảo, 27f515ac) ⇒ đổi sang đúng biến của nút Hỏi thầy mọi màn (--m3-tertiary-container / --m3-on-tertiary-container), đo trên bản build thật: nền rgb(225,241,211) = biến chuẩn, chữ rgb(35,76,41) = biến chuẩn; thanh nộp Đề thử dùng bộ kính chuẩn Đảo 2.0 (--d2-kinh, --d2-kinh-vien) như chip ngay trên; test Đảo 35/35
 
 ## Định nghĩa hoàn thành (chép từ đặc tả mục 9 — vạch đích, không đổi)
 

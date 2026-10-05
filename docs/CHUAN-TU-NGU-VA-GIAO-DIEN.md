@@ -75,7 +75,7 @@ Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-
 5. **Không tràn, không nhảy**: 360 / 390 / 768 / 1280 / 1440 không cuộn ngang; chữ dài (tên 30 ký tự, tên dạng 2 dòng) không vỡ khung; ảnh/khối có kích thước giữ chỗ (không xô lệch khi tải xong).
 6. **Chuyển động**: ≤ 250 ms, có mục đích; tôn trọng `prefers-reduced-motion`.
 7. **Chữ trên nút/nhãn** theo Phần A; không emoji; biểu tượng luôn kèm chữ hoặc `aria-label`.
-8. **Màu**: chỉ token M3 (`npm run check:mau`); màu không phải kênh thông tin duy nhất (kèm chữ/biểu tượng).
+8. **Màu**: chỉ token M3 (`npm run check:mau`); màu không phải kênh thông tin duy nhất (kèm chữ/biểu tượng). Thầy 05/10: giữ nguyên mọi màu đang có của 3 app, thêm gì phải đồng bộ biến chuẩn — `npm run kiem:mau-giu` (không đổi/xoá màu đang có, không màu thô mới, không biến màu "ma").
 9. **Hành động không hoàn tác được**: một bước xác nhận nói THẬT hậu quả; kết quả báo đúng theo máy chủ.
 10. **Bằng chứng**: ảnh Chromium thật 390 + 1440, sáng + tối; đếm lỗi tương phản/đích chạm/tràn = 0 ghi vào sổ việc.
 
