@@ -282,6 +282,22 @@
 }
 
 /* ---- tấm "Cần thầy dạy lại" ---- */
+.cd-ds-cau-cuon {
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 4px 0 12px;
+  padding: 0 12px;
+  border: 1px solid var(--bts-luoi);
+  border-radius: 14px;
+}
+.cd-ds-cau-cuon:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+.cd-ds-cau-cuon .cd-ds-cau li:last-child {
+  border-bottom: 0;
+}
 .cd-ds-cau {
   display: flex;
   flex-direction: column;

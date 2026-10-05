@@ -7,6 +7,7 @@ import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
+import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
@@ -433,7 +434,7 @@ async function bang(env: Env, id: string, nowMs: number) {
       soCauTon, soCauCanTruoc,
     }
   })
-  const canDayLai = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
+  let canDayLai: { qid: string; stt: number; dang: string | undefined; mucDo: string | null; soEm: number; phan?: string; cau?: Record<string, unknown>; qidCung?: string[] }[] = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
     .filter((x) => x.soEm > 0).sort((a, b) => b.soEm - a.soEm)
   if (canDayLai.length) {
     const qidList = canDayLai.map((x) => x.qid)
@@ -466,6 +467,10 @@ async function bang(env: Env, id: string, nowMs: number) {
         } catch {}
       }
     }
+    // Câu trùng nội dung (chép ở nhiều đề) ⇒ một dòng; số em = em cần dạy lại ở BẤT KỲ bản nào (không đếm đôi một em).
+    const nhom = await nhomCauTrung(env, cd.qids)
+    canDayLai = gopCauTrung(canDayLai, nhom).map((x) => ({ ...x, soEm: cd.sbd.filter((s) => x.qidCung.some((q) => tt.get(s)!.get(q)!.catTia)).length }))
+      .sort((a, b) => b.soEm - a.soEm)
   }
   const tong = cd.qids.length * Math.max(1, cd.sbd.length)
   // SỔ NỢ (29/09): em có nợ cũ (ngoài chiến dịch này) vượt trần 50% nhiều ngày ⇒ dòng báo thầy. Lỗi đọc ⇒ không báo.
@@ -502,6 +507,45 @@ async function bang(env: Env, id: string, nowMs: number) {
  * Dòng báo "Em X còn N câu nợ cũ — cần ≈ K ngày" (thầy chốt 29/09): em có nợ cũ cần ≥ NGUONG_BAO_NO_NGAY ngày để trả hết trong trần 50%
  * thể lực/ngày. Xếp em cần nhiều ngày nhất trước.
  */
+/** KHOÁ NỘI DUNG (cùng `khoaCau` của app: thân đề + phương án/ý). Thân đề rỗng ⇒ không gộp (khoá theo qid). */
+function khoaNoiDungJson(qid: string, q: Record<string, unknown> | null): string {
+  if (!q || !String(q.text ?? '').trim()) return `qid:${qid}`
+  const mang = (v: unknown) => (Array.isArray(v) ? v.map((t) => String(t ?? '')) : undefined)
+  return khoaCau({ text: String(q.text), choices: mang(q.choices), ideas: mang(q.ideas) })
+}
+
+/** CÂU TRÙNG NỘI DUNG trong một chiến dịch (thầy 05/10: "những câu trùng nội dung khi gọi lên bảng thì chỉ hiện 1 lần"): qid ⇒ MỌI qid cùng
+ * nội dung (giữ thứ tự của chiến dịch; bản đầu là bản đại diện). Một truy vấn; lỗi đọc ⇒ mỗi câu một nhóm (không gộp gì). */
+export async function nhomCauTrung(env: Env, qids: readonly string[]): Promise<Map<string, string[]>> {
+  const khoa = new Map<string, string>()
+  const rows = (await env.DB.prepare('SELECT qid, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify([...new Set(qids)])).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
+  for (const r of rows) {
+    const q = str(r.qid)
+    if (khoa.has(q)) continue
+    let j: Record<string, unknown> | null = null
+    try { j = JSON.parse(str(r.json)) as Record<string, unknown> } catch { j = null }
+    khoa.set(q, khoaNoiDungJson(q, j))
+  }
+  const nhom = new Map<string, string[]>()
+  for (const q of qids) {
+    const k = khoa.get(q) ?? `qid:${q}`
+    nhom.set(k, [...(nhom.get(k) ?? []), q])
+  }
+  const ra = new Map<string, string[]>()
+  for (const ds of nhom.values()) for (const q of ds) ra.set(q, ds)
+  return ra
+}
+
+/** Gộp các dòng cùng nhóm nội dung (giữ dòng đứng trước) — mỗi dòng mang `qidCung` = cả nhóm để "Chữa xong" / "Thầy chữa" mở khoá đủ các bản. */
+export function gopCauTrung<T extends { qid: string }>(ds: readonly T[], nhom: ReadonlyMap<string, string[]>): (T & { qidCung: string[] })[] {
+  const theoDaiDien = new Map<string, T & { qidCung: string[] }>()
+  for (const x of ds) {
+    const cung = nhom.get(x.qid) ?? [x.qid]
+    if (!theoDaiDien.has(cung[0]!)) theoDaiDien.set(cung[0]!, { ...x, qidCung: [...cung] })
+  }
+  return [...theoDaiDien.values()]
+}
+
 export async function dongNoCu(env: Env, noCu: ReadonlyMap<string, NoCuEm>, theLucNgay: number, tenSan?: ReadonlyMap<string, string>): Promise<{ sbd: string; ten: string; soCau: number; luot: number; soNgay: number; cau: string }[]> {
   const ds = [...noCu].map(([sbd, n]) => ({ sbd, ...n, soNgay: soNgayTraNo(n.luot, theLucNgay) })).filter((x) => x.soNgay >= NGUONG_BAO_NO_NGAY)
   if (!ds.length) return []
@@ -527,8 +571,16 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
     const m = meta.get(q)
     return { qid: q, stt: cd.qids.indexOf(q) + 1, dang: m?.tenDang ?? m?.dang ?? 'Chưa gắn dạng', phan: m?.phan ?? 'I', mucDo: m?.mucDo ?? null, soChuaThanhThao: chua.length, soCanDayLai: dayLai.length, diemChua: chua.length + 2 * dayLai.length, emSua: [...dayLai, ...chua.filter((s) => !dayLai.includes(s))] }
   })
-  const theoDang = new Map<string, (typeof cau)[number]>()
-  for (const c of cau) {
+  // Câu trùng nội dung ⇒ xét MỘT bản (bản đứng trước), mang `qidCung` cả nhóm; số em gộp theo em (không đếm đôi).
+  const nhom = await nhomCauTrung(env, cd.qids)
+  const cauGop = gopCauTrung(cau, nhom).map((c) => {
+    if (c.qidCung.length < 2) return c
+    const chua = em.filter((s) => c.qidCung.some((q) => !tt.get(s)!.get(q)!.thanhThao))
+    const dayLai = em.filter((s) => c.qidCung.some((q) => tt.get(s)!.get(q)!.catTia))
+    return { ...c, soChuaThanhThao: chua.length, soCanDayLai: dayLai.length, diemChua: chua.length + 2 * dayLai.length, emSua: [...dayLai, ...chua.filter((s) => !dayLai.includes(s))] }
+  })
+  const theoDang = new Map<string, (typeof cauGop)[number]>()
+  for (const c of cauGop) {
     if (c.diemChua <= 0) continue
     const cu = theoDang.get(c.dang)
     if (!cu || c.diemChua > cu.diemChua) theoDang.set(c.dang, c)

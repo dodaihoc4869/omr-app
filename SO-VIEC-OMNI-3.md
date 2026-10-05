@@ -8,7 +8,7 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "giải thích toàn bộ 1 vòng thuật toán cho tôi trước khi build nhé" | bằng chứng: trả lời 12 bước + mục 1 của đặc tả, commit aa95c68
 - [ ] "THỰC THI LUÔN" (build theo `DAC-TA-BUILD-OMNI-3-0510.md`) | bằng chứng: (chưa có)
 - [ ] "Thay từ máy bằng A.i Đỗ Đại Học" | bằng chứng: (chưa có)
-- [ ] "giao cho nhiều agent làm nhất có thể để tăng tốc nhé" | bằng chứng: đang chạy 5 agent máy chủ song song (A1 lõi thuần · A2 kế hoạch nhiều bài · B1 tick bài + thư mục + Tu luyện · B2 D1 + API thầy/PH · B3 đường trả lời + game), mỗi agent một worktree; 3 agent giao diện (thầy · học sinh · PH + chữ) chờ khảo sát giao diện xong
+- [ ] "giao cho nhiều agent làm nhất có thể để tăng tốc nhé" | bằng chứng: 9 agent song song, mỗi agent một worktree — máy chủ A1 lõi thuần · A2 kế hoạch nhiều bài · B1 tick bài + thư mục + Tu luyện · B2 D1 + API thầy/PH · B3 đường trả lời + game · D1 A.I gắn vi kỹ năng + câu nền tự sinh; giao diện C1 thầy · C2 học sinh · C3 phụ huynh + chuẩn chữ (C3 đã gộp ac389aa)
 - [ ] "khi buidl xong hết nhắn tôi trước khi đẩy nhé" — KHÔNG gộp main, KHÔNG deploy Worker/Pages, KHÔNG migration --remote trước khi thầy cho | bằng chứng: (chưa có)
 - [ ] "tôi chỉ phải làm bước cuối cùng là chữa bài học sinh cần thầy chữa" ⇒ danh sách "Cần thầy chữa" + "Chữa xong" | bằng chứng: (chưa có)
 - [ ] "build thành công luôn lần đầu" ⇒ qua đủ cổng mục 8 của đặc tả | bằng chứng: (chưa có)
@@ -48,3 +48,9 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [ ] Toàn vitest bản cuối so nền, build, check:mau, kiem-sw | bằng chứng: (chưa có)
 - [ ] Ảnh chụp app thật sau build (390×844, 1440×900) | bằng chứng: (chưa có)
 - [ ] `OMNI-3-build-status.md` (nhật ký app) + dòng Nhật ký DIEU-PHOI.md | bằng chứng: (chưa có)
+- [x] Phần trăm OMNI viết liền "6%" cho đồng điệu app (128 chỗ viết liền / 12 chỗ có cách) | bằng chứng: d7cb031, test phụ huynh 9/9
+- [x] Bộ chụp ảnh nghiệm thu `scripts/chup-omni-3/` (component thật + máy chủ giả, chặn mọi yêu cầu ra ngoài) | bằng chứng: ac9e858; chạy thử 4 ảnh, 0 lỗi trang, 0 tràn ngang
+- [x] Gộp main mới (13 commit) vào nhánh tính năng | bằng chứng: 8fa147a, không xung đột, tsc máy chủ + app EXIT 0, đã push nhánh tính năng
+- [x] Mã câu nền tự sinh phải khớp luật id của thầy `/^[\w.-]{1,80}$/` ⇒ `sinh.<nhãn>.<số>` | bằng chứng: đã báo làn D1
+- [x] Gộp làn A1 lõi thuần | bằng chứng: 2a02088; 4 tệp tests/omni-3-loi*.test.ts 96/96 trên nhánh gộp; số vàng 8,66 · 88%; phát lại 12 thứ tự y hệt
+- [!] PHÁT HIỆN cần thầy quyết (không tự hạ ngưỡng): chứng chỉ ĐỦ K∧C∧M chậm hơn con số đã báo. Chỉ điều kiện mô hình: 58/60 em ≤ 7 ngày. Đủ ba điều kiện, 14 ngày: sơ ý 6% ⇒ 36/40 em; sơ ý 10% ⇒ 1/40. Làn A1 đo thêm: đủ ba điều kiện trong 7 ngày chỉ 33–48% em (S 6%). Khai oan 0 ở mọi ô. Con số 91–99% ≤ 7 ngày báo trước đây chỉ tính điều kiện mô hình.

@@ -146,6 +146,8 @@ export type NhipEm = 'vuot' | 'dung' | 'tre12' | 'tre3'
 
 export interface CauCanDayLai {
   qid: string
+  /** Mọi qid CÙNG NỘI DUNG trong chiến dịch (câu chép ở nhiều đề, gộp một dòng — thầy 05/10); chữa xong gửi đủ cả nhóm. */
+  qidCung?: string[]
   stt: number
   dang: string
   soEm: number
@@ -192,6 +194,8 @@ export interface EmTen {
 
 export interface CauBuoiChua {
   qid: string
+  /** Mọi qid CÙNG NỘI DUNG trong chiến dịch (câu chép ở nhiều đề, gộp một dòng — thầy 05/10); chữa xong gửi đủ cả nhóm. */
+  qidCung?: string[]
   stt: number
   dang: string
   phan: 'I' | 'II' | 'III'
@@ -248,6 +252,9 @@ export const doiRaiDeu = (id: string, bat: boolean) => goiChienDich<{ id: string
 export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', { id })
 export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
 export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', coMat && coMat.length ? { id, coMat } : { id })
+/** Mọi qid cần mở khoá của một dòng (bản đại diện + bản trùng nội dung). */
+export const qidCuaDong = (c: { qid: string; qidCung?: string[] }): string[] => (c.qidCung?.length ? c.qidCung : [c.qid])
+
 export const chuaXong = (id: string, qids?: string[]) => goiChienDich<KetQuaChuaXong>('chua-xong', qids && qids.length ? { id, qids } : { id })
 
 // ---------------------------------------------------------------- SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, máy chủ `srs2-sua.ts`)
