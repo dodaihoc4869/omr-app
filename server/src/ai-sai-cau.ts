@@ -20,7 +20,8 @@ export const TRAN_GIAY_UOC_TINH = 900
 /**
  * GIÂY ƯỚC TÍNH cho lượt game (thầy 05/10: "chỗ làm trong chưa hiển thị"): game không đo giờ làm từng câu, nhưng mỗi lần trả lời có mốc
  * `at` chính xác ⇒ giây ≈ at(lần này) − at(lần trả lời liền trước trong cùng lượt) (câu đầu lượt: − lúc mở lượt). Ngoài 1..900 giây ⇒ null.
- * Khoá: `${session}|${ms}` (ms = mốc trả lời, cũng là `luc` của sự kiện sổ). Một truy vấn lượt + một truy vấn các lần trả lời.
+ * Khoá: `${session}|${ms}` (ms = mốc trả lời, cũng là `luc` của sự kiện sổ). Dòng `game_v2_attempt.json` là KẾT QUẢ trả về em (`{attempt:{at,…},…}`)
+ * ⇒ mốc nằm ở `$.attempt.at`. Một truy vấn lượt + một truy vấn các lần trả lời.
  */
 async function giayUocTinhGame(env: Env, dong: readonly { sbd: string; phien: string }[]): Promise<Map<string, number>> {
   const ra = new Map<string, number>()
@@ -29,7 +30,7 @@ async function giayUocTinhGame(env: Env, dong: readonly { sbd: string; phien: st
   const sbd = [...new Set(dong.map((x) => x.sbd))]
   const [rS, rA] = await env.DB.batch([
     env.DB.prepare("SELECT id, json_extract(json, '$.created') AS tao FROM game_v2_session WHERE id IN (SELECT value FROM json_each(?))").bind(JSON.stringify(phien)),
-    env.DB.prepare("SELECT session, json_extract(json, '$.at') AS at FROM game_v2_attempt WHERE sbd IN (SELECT value FROM json_each(?1)) AND session IN (SELECT value FROM json_each(?2))").bind(JSON.stringify(sbd), JSON.stringify(phien)),
+    env.DB.prepare("SELECT session, COALESCE(json_extract(json, '$.attempt.at'), json_extract(json, '$.at')) AS at FROM game_v2_attempt WHERE sbd IN (SELECT value FROM json_each(?1)) AND session IN (SELECT value FROM json_each(?2))").bind(JSON.stringify(sbd), JSON.stringify(phien)),
   ])
   const tao = new Map(((rS?.results ?? []) as Row[]).map((x) => [str(x.id), Number(x.tao)]))
   const theoPhien = new Map<string, number[]>()
