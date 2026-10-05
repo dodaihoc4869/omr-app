@@ -495,16 +495,9 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 }
 /* OMNI 3 (05/10) · chip "Chưa chắc" cạnh chip Trợ giúp: máy hẹp (≤ 400 px) vẫn giữ chữ — hai công tắc trơn đứng cạnh nhau không phân biệt được. */
 @media (max-width:400px){.dao2 .dao2-tro[data-khoi="chua-chac"] .dao2-tro-chu{display:inline}}
-/* Có chip "Chưa chắc" (OMNI bật) thì chip Trợ giúp cạnh nó cũng giữ chữ: một công tắc trơn không chữ đứng cạnh công tắc có chữ, em không biết
-   nó là gì (ảnh chụp 05/10). Hàng này đã xuống dòng nút chốt nên đủ chỗ. OMNI tắt ⇒ không có chip ⇒ y như cũ. */
-@media (max-width:400px){.dao2 .dao2-chan-hang:has([data-khoi="chua-chac"]) .dao2-tro-chu{display:inline}}
 /* OMNI 3 · ĐỀ THỬ: CHỈ bố cục — danh sách thẻ câu giấy của Đảo (dọc như ải), rộng tối đa 760 px cho dễ đọc; màu/nút dùng lại lớp sẵn có. */
 .dao2 .dao2-de-thu{display:flex;flex-direction:column;gap:12px;max-width:760px}
 .dao2 .dao2-de-thu-cau{display:flex;flex-direction:column;gap:6px}
-/* NÚT "HỎI THẦY" CỦA ĐẢO 2.0 = ĐÚNG MÀU CHUẨN của nút Hỏi thầy mọi màn khác (loi-giai.css: --m3-tertiary-container / --m3-on-tertiary-container;
- * thầy 05/10: "giữ nguyên mọi màu… thêm thì phải đồng bộ đúng chuẩn"). dao.css tô nút kiểu kính tối + chữ vàng cho Đảo cũ nền tối ⇒ trên thẻ
- * lời giải sáng của Đảo 2.0 thành chữ vàng trên nền kem, như nút bị khoá (đo trên bản build thật). Đặc hiệu 0,4,1 thắng `.dao.dao button.lg-nut--hoi`. */
-.dao.dao2.dao-v2 button.lg-nut--hoi{--nut-nen:var(--m3-tertiary-container);--nut-chu:var(--m3-on-tertiary-container);--nut-bong:none}
 /* ĐỀ THỬ (05/10): thanh nộp NỔI ở đáy suốt lúc làm (data-noi) — nút còn khoá có nền gần trong suốt (--d2-tat-nen) và dòng "Đã làm n/N câu"
  * không có nền ⇒ chữ thẻ câu bên dưới hiện xuyên qua, đè lên nhau (ảnh chụp 05/10). Ở ải thường thanh chỉ nổi khi đã chọn đáp án nên không gặp.
  * Cho thanh tấm nền KÍNH chuẩn của Đảo 2.0 (--d2-kinh + viền --d2-kinh-vien, đúng bộ màu chip Trợ giúp/Chưa chắc ngay trên — thầy 05/10:
