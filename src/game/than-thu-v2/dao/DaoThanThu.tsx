@@ -1,4 +1,5 @@
 import {lazy,Suspense,useCallback,useEffect,useRef,useState} from 'react'
+import {boNap,lazyNapTruoc} from '../../../components/hoa2/nap-truoc-man'
 import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {ReactNode} from 'react'
 import type {BattleAnswer} from '../learning-battle'
@@ -18,7 +19,10 @@ import './dao.css'
 
 const ManShopThat=lazy(()=>import('./ManShopThat')) // nạp lười: chỉ tải khi em bấm Cửa hàng (và chỉ có nút khi máy chủ báo shopBat)
 // GAME HÓA 2.0 (cờ `game_hoa_2`, `hoa2-sanh` trả `cheDo2:true`): màn Đảo = 4 màn thiết kế mới ở ../dao2/ — nạp lười, cờ tắt không tải mã này.
-const Dao2=lazy(()=>import('../dao2/Dao2'))
+// 05/10: nạp lười kiểu `lazyNapTruoc` (components/hoa2/nap-truoc-man.ts) — Sảnh 2.0 nạp trước lúc rảnh ⇒ mở Đảo là vẽ thẳng bản đồ, không treo màn chờ.
+const Dao2=lazyNapTruoc(boNap(()=>import('../dao2/Dao2')))
+/** Game.tsx `napTruocDao` gọi: nạp sẵn mảnh Đảo 2.0. */
+export const napTruocDao2=()=>Dao2.napTruoc()
 
 interface Luot{id:string;cau:CauDao[]}
 const THONG_BAO_TRONG='Đảo chưa có câu hợp với phần em đã học. Em làm Bài tập về nhà trước, rồi quay lại lên đường nhé.'
