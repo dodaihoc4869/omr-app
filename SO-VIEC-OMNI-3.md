@@ -28,7 +28,7 @@ Mở 05/10/2026. Đặc tả: `DAC-TA-BUILD-OMNI-3-0510.md` (thắng mọi tệp
 - [x] "bỏ phần ví dụ minh họa và các dạng trọng tâm nhé" ⇒ không bao giờ giao -VD, -DT (cả bài mới lẫn bài cũ ôn lại), bỏ ô tích thêm | bằng chứng: bai-hom-nay.ts laMaToKhongGiao (-VD/-DT/-TL/-VDMH/-DTTT + tên), máy chủ bai-da-day.ts lưới an toàn ở maDe + phamVi; test omni-3-tick-bai-0510
 - [x] "Làm thêm 6 bước tính toán" ⇒ bộ sinh câu nền: bao_toan_electron, lap_he_phuong_trinh, cong_thuc_phan_tu, hang_so_can_bang, bien_thien_enthalpy, nang_luong_lien_ket (kiểm chéo độc lập) | bằng chứng: gộp ac234db2 (00cef6d0); 93/93; 6 câu mẫu điều phối tính tay khớp (9,916 L · 30% · C₇H₈O · Kc 250 · −902 kJ · −2 880 kJ)
 
-- [ ] "Làm luôn bộ sinh câu bảo toàn điện tích nhé" (thầy 05/10) ⇒ bộ sinh câu nền bao_toan_dien_tich, ion cùng tồn tại được, đáp án kiểm chéo độc lập ⇒ 27/29 bước | bằng chứng: (chưa có)
+- [x] "Làm luôn bộ sinh câu bảo toàn điện tích nhé" (thầy 05/10) ⇒ bộ sinh câu nền bao_toan_dien_tich, ion cùng tồn tại được, đáp án kiểm chéo độc lập ⇒ 27/29 bước | bằng chứng: 1995aeb6; omni-3-cau-nen-sinh 100/100 + chỉ số + nghiệm thu 103/103; tsc máy chủ sạch; 3 mẫu tính tay khớp (0,35 · 27,4 · 0,05)
 
 - [ ] "Tối ưu code cho tinh gọn" (thầy 05/10) ⇒ gọn mã OMNI: bỏ trùng lặp, mã chết, gộp hàm trùng | bằng chứng: (chưa có)
 - [ ] "tối ưu luôn cho máy chủ" ⇒ giảm số vòng D1 tuần tự + ms CPU ở lệnh nóng (hoa2-sanh, start, answer, việc đêm) | bằng chứng: (chưa có)
