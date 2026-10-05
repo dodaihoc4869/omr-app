@@ -408,8 +408,11 @@ export interface HoSo2 {
    * câu chưa gặp → câu đã gặp chưa tới lịch; trong mỗi nhóm bài gần nhất (vị trí lớn nhất) trước.
    */
   onBaiCu?: CauSrs[]
-  /** HỢP ĐỒNG (làn game đọc `hs.omni?.cheDoCho`): OMNI bật; chế độ chờ bài mới (không chiến dịch đang chạy và lớp đã có bài tick); số ứng viên ôn bài cũ. */
-  omni?: { bat: true; cheDoCho: boolean; onBaiCuSo: number }
+  /**
+   * HỢP ĐỒNG (làn game đọc `hs.omni?.cheDoCho`): OMNI bật; chế độ chờ bài mới (không chiến dịch đang chạy và lớp đã có bài tick); số ứng viên ôn bài cũ.
+   * `bat` LUÔN là `true` khi có khoá này (cờ tắt ⇒ không có khoá `omni`); khai kiểu `boolean` để mã làn game (`o.bat !== false`, srs2-game.ts) vẫn biên dịch.
+   */
+  omni?: { bat: boolean; cheDoCho: boolean; onBaiCuSo: number }
   /** Phạm vi đã dạy của em lúc đọc (null = lớp chưa tick bài ⇒ không lọc theo phạm vi, chỉ lọc TU LUYỆN). */
   phamVi?: PhamViLop | null
 }
@@ -659,7 +662,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     : dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
   return {
     chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro,
-    ...(omni ? { chienDichHet: dsDangChay, onBaiCu, omni: { bat: true as const, cheDoCho: !dangChay && !!phamVi && phamVi.baiDaTick.length > 0, onBaiCuSo: onBaiCu.length }, phamVi: phamVi ?? null } : {}),
+    ...(omni ? { chienDichHet: dsDangChay, onBaiCu, omni: { bat: true, cheDoCho: !dangChay && !!phamVi && phamVi.baiDaTick.length > 0, onBaiCuSo: onBaiCu.length }, phamVi: phamVi ?? null } : {}),
   }
 }
 
