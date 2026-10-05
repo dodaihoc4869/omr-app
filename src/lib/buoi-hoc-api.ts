@@ -2,6 +2,7 @@
 //   THẦY (mã bí mật, qua `goiLenh`):
 //     POST /gv/buoi-hoc {action:'mo', lop?, ten?, kemLop?}   → TrangThaiBuoi (mở buổi mới)
 //     POST /gv/buoi-hoc {action:'dang-mo'}                   → { buoi: BuoiHoc[] } (buổi còn mở, nối tiếp khi mở lại app)
+//     POST /gv/buoi-hoc {action:'gan-day', soNgay?, lop?}    → { buoi: (BuoiHoc & {coMat: sbd[]})[] } (buổi gần đây kể cả đã đóng — chọn em giao bài theo điểm danh, OMNI 3)
 //     POST /gv/buoi-hoc {action:'xem'|'dong', id, kemLop?}   → TrangThaiBuoi
 //     POST /gv/buoi-hoc {action:'them-em', id, sbd[]} / {action:'bot-em', id, sbd} → TrangThaiBuoi
 //     POST /gv/buoi-hoc/suc-hoc {sbd[], cau[]}               → { em: {sbd: SucHocEm} }  (ĐỌC-CHỈ)
@@ -94,6 +95,23 @@ export async function buoiDangMo(): Promise<KetQuaLenh<BuoiHoc[]>> {
   const r = await goiLenh('/gv/buoi-hoc', { action: 'dang-mo' }, KHONG_CO_LENH)
   if (!r.ok) return r
   return { ok: true, du: (Array.isArray(r.du.buoi) ? r.du.buoi : []).map(docBuoi).filter((x): x is BuoiHoc => !!x) }
+}
+
+/** Buổi gần đây kèm SBD em CÓ MẶT (OMNI 3, 05/10 — chọn em giao bài theo điểm danh). */
+export interface BuoiGanDay extends BuoiHoc {
+  coMat: string[]
+}
+export async function buoiGanDay(lop = '', soNgay = 7): Promise<KetQuaLenh<BuoiGanDay[]>> {
+  const r = await goiLenh('/gv/buoi-hoc', { action: 'gan-day', lop, soNgay }, KHONG_CO_LENH)
+  if (!r.ok) return r
+  const ra: BuoiGanDay[] = []
+  for (const x of Array.isArray(r.du.buoi) ? r.du.buoi : []) {
+    const b = docBuoi(x)
+    if (!b) continue
+    const coMat = [...new Set(Array.isArray(doiTuong(x).coMat) ? (doiTuong(x).coMat as unknown[]).map(chu).filter(Boolean) : [])]
+    ra.push({ ...b, soCoMat: coMat.length, coMat })
+  }
+  return { ok: true, du: ra }
 }
 
 const dem = (v: unknown) => {

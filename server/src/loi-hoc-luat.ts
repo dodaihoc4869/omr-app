@@ -28,7 +28,7 @@ export interface LanLamLoi {
   luc: string // ISO
   ngayVn: string // YYYY-MM-DD
   ketQua: 0 | 1 | null
-  coHoTro: boolean // assistance khác none/rỗng, hoặc purpose = xem_loi_giai
+  coHoTro: boolean // assistance khác none/rỗng, hoặc purpose không phải một lần làm (xem_loi_giai · luot — OMNI 3)
   songSinh: boolean // làm câu song sinh (qid "<gốc>~ss0|1") thay vì câu gốc
   nguon: string
 }

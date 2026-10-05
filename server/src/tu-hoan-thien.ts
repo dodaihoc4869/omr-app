@@ -9,6 +9,7 @@
 import type { Env } from './kieu'
 import { damBaoBangThamSoEm, thamSoRieng, TY_LE_CHUNG_MAC_DINH } from './ca-nhan-hoa-v2'
 import { phatLaiLoi, tachSongSinh, cachNgay, THAM_SO_GOC, TU_NGAY, type LanLamLoi, type ThamSoLuat } from './loi-hoc-luat'
+import { MUC_DICH_LUOT } from './omni-kieu'
 
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
@@ -82,7 +83,8 @@ async function docSoGon(env: Env): Promise<{ theo: Map<string, LanLamLoi[]>; doc
   let rows: Row[]
   try { rows = (await env.DB.prepare(sql(true)).bind(TU_NGAY).all<Row>()).results ?? [] } catch { rows = (await env.DB.prepare(sql(false)).bind(TU_NGAY).all<Row>()).results ?? [] }
   for (const x of rows) {
-    if (str(x.purpose) === 'xem_loi_giai' || str(x.visibility) === 'embargoed') continue
+    // OMNI 3: dòng lướt (purpose 'luot') không phải một lần làm — bỏ như dòng đọc lời giải.
+    if (str(x.purpose) === 'xem_loi_giai' || str(x.purpose) === MUC_DICH_LUOT || str(x.visibility) === 'embargoed') continue
     if (x.ket_qua == null && str(x.nguon) !== 'thi') continue
     const t = tachSongSinh(str(x.qid))
     const k = `${str(x.sbd)}|${t.goc}`
