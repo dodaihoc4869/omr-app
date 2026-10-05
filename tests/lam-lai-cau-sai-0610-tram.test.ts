@@ -177,3 +177,25 @@ describe('Trạm hồi phục · câu thay ải là câu LỖI ⇒ bản khác (
     for (const k of ['tc', 'xt', 'nv']) expect(k in ref, `phiên có khoá ${k}`).toBe(false)
   })
 })
+
+describe('Vé thử thách · câu LỖI đang trong cửa sổ lỗi (đã đóng, chưa tới lịch ⇒ không nằm trong kế hoạch hôm nay) không ra NGUYÊN VĂN', () => {
+  /** Q7 đang CHỜ KIỂM (sai 04/10, đúng một lần 05/10; lần đúng thứ hai phải cách lần sai ≥ 3 ngày) ⇒ trong cửa sổ lỗi nhưng chưa tới lịch (không nằm trong kế hoạch hôm nay); chỉ còn Q7 làm ứng viên của dạng D1. */
+  async function veVoiQ7(tat: boolean) {
+    const { d, env } = dung([...CHUYEN, Q7, ...ANH_EM.slice(0, 2)], tat)
+    if (tat) xoaDemCauHinh(env)
+    ghi(d, 'Q7', 0, luc('2026-10-04', '10:00'))
+    ghi(d, 'Q7', 1, luc('2026-10-05', '10:00'))
+    vi.setSystemTime(luc('2026-10-06'))
+    await em(env, '/game-v2/choose', { pet: 'dat_quy' })
+    return { d, env, r: await em(env, '/game-v2/start', { mode: 'adventure', ve: 'D1' }) }
+  }
+  it('khoá bật ⇒ vé không có Q7 (không câu nào đủ điều kiện ⇒ báo không có câu, vé còn nguyên); khoá tắt ⇒ y hôm nay: Q7 vào vé', async () => {
+    const bat = await veVoiQ7(false)
+    expect((bat.r.questions ?? []).map((x: { qid: string }) => x.qid), JSON.stringify(bat.r).slice(0, 300)).not.toContain('Q7')
+    expect(bat.r).toMatchObject({ ok: false, lyDo: 'khong_co_cau' })
+    expect((bat.d.sql.prepare('SELECT COUNT(*) AS n FROM omni_ve').get() as { n: number }).n, 'không câu để thử ⇒ vé không bị trừ').toBe(0)
+    const tat = await veVoiQ7(true)
+    expect(tat.r.ok, JSON.stringify(tat.r).slice(0, 300)).toBe(true)
+    expect((tat.r.questions ?? []).map((x: { qid: string }) => x.qid)).toContain('Q7')
+  })
+})

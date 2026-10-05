@@ -21,7 +21,7 @@ import { phamViCuaEm } from './bai-da-day'
 import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
-import { apLamLaiKhac } from './cau-anh-em'
+import { apLamLaiKhac, canBanKhac, lamLaiKhacBat } from './cau-anh-em'
 import { apXaoTheoRef, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { HANG_MUC_DO } from './srs2-loi'
@@ -511,6 +511,9 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
   const daDung = await docVeDaDung(env, sbd, tuan)
   if (daDung >= TS.VE_MOI_TUAN) return hetVe()
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
+  // 06/10 (làn A'): vé đo bậc CAO HƠN bằng câu em chưa vững — câu LỖI đang trong cửa sổ lỗi (chờ kiểm / đã đóng, chưa tới lịch nên không nằm trong kế hoạch hôm nay) không phải
+  // câu để đo và không được ra NGUYÊN VĂN ⇒ bỏ khỏi ứng viên (câu lỗi quay lại qua thang làm lại ở Đảo / Đoàn / Bi-a / Trạm). Khoá `lam_lai_khac` tắt ⇒ y hôm nay.
+  const boCauLoi = await lamLaiKhacBat(env).catch(() => false)
   const dsDang = ve === 'auto' ? await dangTuDongChoVe(env, sbd, nowMs) : [{ ma: ve, ten: '' }]
   if (!dsDang.length) return { ok: false, lyDo: 'khong_co_dang', error: 'Chưa có dạng nào cần thử thách thêm trong bài đang luyện.' }
   const [pv, bc] = await Promise.all([phamViChon(env, sbd), boiCanh(env, sbd, nowMs)])
@@ -522,7 +525,7 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
     if (dich > 3) continue // đã vững mức cao nhất của dạng
     const ung = (await metaTheoDang(env, d.ma, pv)).filter((m) => {
       const b = bacMuc(m.mucDo)
-      return b != null && b >= dich && hopLeChung(m, bc) && !trongKeHoach.has(m.qid) && !lamHomNay(m.qid, bc)
+      return b != null && b >= dich && hopLeChung(m, bc) && !trongKeHoach.has(m.qid) && !lamHomNay(m.qid, bc) && !(boCauLoi && canBanKhac(hs, m.qid))
     })
     const day = await chanKhacKhoiEm(env, 'omni_ve', { sbd, khoiEm: bc.khoiEm }, await napTheoThuTu(env, xepUngVien(ung, bc, (m) => bacMuc(m.mucDo)! - dich, `${sbd}|${homNay}|ve`), TS.VE_SO_CAU, new Set()), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối
     if (!day.length) continue
