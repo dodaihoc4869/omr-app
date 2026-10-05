@@ -2,7 +2,7 @@
 // Thầy 05/10: "giữ nguyên mọi giao diện hiện tại… thêm những mục cần thiết đồng bộ với giao diện hiện tại". Khoá:
 // (1) vắng `omni` (hoặc `omni` không có số thật) ⇒ thẻ Y HỆT bản trước OMNI — so NGUYÊN HTML chụp từ mã chưa sửa (commit f189d2b);
 // (2) có `omni` ⇒ đúng sáu dòng, đúng thứ tự, nằm cuối CÙNG thẻ, lớp sẵn có; bỏ ô OMNI thì phần cũ của thẻ không đổi một ký tự;
-// (3) khoảng cách tới 8 chỉ khi đã hiệu chuẩn (≥ 3 ca chốt); độ tin không bao giờ 100 %; không thẻ mới khi không có chiến dịch;
+// (3) khoảng cách tới 8 chỉ khi đã hiệu chuẩn (≥ 3 ca chốt); độ tin không bao giờ 100%; không thẻ mới khi không có chiến dịch;
 // (4) không chữ game, không chữ A.I trên màn phụ huynh; (5) lớp đọc chặt từng trường.
 // Tệp .ts (không JSX) để lọt mẫu cổng `tests/omni-3-*.test.ts` của đặc tả mục 8.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -70,15 +70,15 @@ describe('OMNI 3 · thẻ "Chiến dịch của con" (app phụ huynh)', () => {
     expect(the.outerHTML).toBe(MOC)
   })
 
-  it('CÓ omni ⇒ sáu dòng đúng thứ tự, cuối CÙNG thẻ, lớp sẵn có; bỏ ô OMNI thì phần cũ y hệt; không chữ game / A.I / 100 %', async () => {
+  it('CÓ omni ⇒ sáu dòng đúng thứ tự, cuối CÙNG thẻ, lớp sẵn có; bỏ ô OMNI thì phần cũ y hệt; không chữ game / A.I / 100%', async () => {
     hoc2 = { ...HOC2, omni: OMNI }
     const the = await moTheChienDich()
     const o = the.querySelector('[data-vung="chien-dich-omni"]') as HTMLElement
     expect([...o.children].map((x) => x.textContent)).toEqual([
       'Con còn 1,1 điểm tới 8',
       'Dạng cần vững: Hiệu suất ester hoá, Hỗn hợp ester',
-      'Sơ ý của con: 6 % (mục tiêu dưới 7 %)',
-      'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91 % · điểm ca chốt 8,5',
+      'Sơ ý của con: 6% (mục tiêu dưới 7%)',
+      'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5',
       'Giờ học con chọn: 20:30',
       'Cần thầy chữa: 1 chỗ',
     ])
@@ -99,7 +99,7 @@ describe('OMNI 3 · thẻ "Chiến dịch của con" (app phụ huynh)', () => {
     hoc2 = { ...HOC2, omni: { ...OMNI, hieuChuan: { soCaChot: 2, du: false }, canThayChua: 0, gioHoc: null } }
     const the = await moTheChienDich()
     const chu = [...the.querySelector('[data-vung="chien-dich-omni"]')!.children].map((x) => x.textContent)
-    expect(chu).toEqual(['Dạng cần vững: Hiệu suất ester hoá, Hỗn hợp ester', 'Sơ ý của con: 6 % (mục tiêu dưới 7 %)', 'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91 % · điểm ca chốt 8,5'])
+    expect(chu).toEqual(['Dạng cần vững: Hiệu suất ester hoá, Hỗn hợp ester', 'Sơ ý của con: 6% (mục tiêu dưới 7%)', 'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5'])
     expect(the.textContent).not.toMatch(/tới 8|mốc 8|Cần thầy chữa|Giờ học/)
   })
 
@@ -113,12 +113,12 @@ describe('OMNI 3 · thẻ "Chiến dịch của con" (app phụ huynh)', () => {
 })
 
 describe('chữ OMNI giọng phụ huynh (dùng lại src/lib/omni-chu.ts)', () => {
-  it('đã chạm mốc 8 · nhiều dạng gộp "và N dạng khác" · độ tin 1 ⇒ 99 % (không bao giờ 100 %) · không điểm ca chốt ⇒ bỏ đoạn điểm', () => {
+  it('đã chạm mốc 8 · nhiều dạng gộp "và N dạng khác" · độ tin 1 ⇒ 99% (không bao giờ 100%) · không điểm ca chốt ⇒ bỏ đoạn điểm', () => {
     const d = dongOmniPh({ ...OMNI, khoangCach8: -0.2, dangCanVung: ['Danh pháp', 'Thuỷ phân', 'Ester hoá', 'Hiệu suất', 'Đốt cháy'], sEm: null, chungChi: [{ ten: 'Bài 6', doTin: 1, ngay: '', diem: null }], gioHoc: null, canThayChua: 0 })
     expect(d.map((x) => x.chu)).toEqual([
       'Con đã chạm mốc 8 theo dự báo — chờ ca chốt xác nhận',
       'Dạng cần vững: Danh pháp, Thuỷ phân, Ester hoá và 2 dạng khác',
-      'Chứng chỉ gần nhất: Bài 6 · Sẵn sàng 8+ · độ tin 99 %',
+      'Chứng chỉ gần nhất: Bài 6 · Sẵn sàng 8+ · độ tin 99%',
     ])
     expect(d[0]!.dam).toBe(true)
     expect(dongOmniPh(OMNI_RONG)).toEqual([])
@@ -127,7 +127,7 @@ describe('chữ OMNI giọng phụ huynh (dùng lại src/lib/omni-chu.ts)', () 
   it('mục tiêu sơ ý = ngưỡng C của chứng chỉ (THAM_SO_OMNI.C_SO_Y); sơ ý vắng ⇒ không dòng', () => {
     expect(SO_Y_MUC_TIEU).toBe(THAM_SO_OMNI.C_SO_Y)
     expect(chuPhSoY(null)).toBeNull()
-    expect(chuPhSoY(0.123)).toBe('Sơ ý của con: 12 % (mục tiêu dưới 7 %)')
+    expect(chuPhSoY(0.123)).toBe('Sơ ý của con: 12% (mục tiêu dưới 7%)')
   })
 })
 

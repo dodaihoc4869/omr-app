@@ -131,14 +131,14 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
 // ---------------------------------------------------------------- OMNI 3 (05/10) — dòng thêm trong thẻ "Chiến dịch của con"
 // Thầy 05/10: "giữ nguyên mọi giao diện hiện tại… thêm những mục cần thiết đồng bộ với giao diện hiện tại". ⇒ KHÔNG thẻ mới: các dòng nằm cuối CÙNG thẻ,
 // trong một ô xám `ph3-o-xam` như ô "Tổng · Hạn nộp" ngay trên, chữ `ph3-ghi` sẵn có; dòng khoảng cách tới 8 đậm như dòng "Tổng" của ô trên.
-// Chữ: dùng lại src/lib/omni-chu.ts (một nguồn), chỉ đổi sang giọng phụ huynh ở đây; không chữ game; độ tin không bao giờ 100 % (doTinChu kẹp 99 %).
+// Chữ: dùng lại src/lib/omni-chu.ts (một nguồn), chỉ đổi sang giọng phụ huynh ở đây; không chữ game; độ tin không bao giờ 100% (doTinChu kẹp 99%).
 
 /** Mục tiêu sơ ý của chứng chỉ (điều kiện C = `THAM_SO_OMNI.C_SO_Y` ở server/src/omni-kieu.ts; app chỉ import KIỂU từ máy chủ nên ghi lại số — test khoá hai số bằng nhau). */
 export const SO_Y_MUC_TIEU = 0.07
 /** Tối đa số tên dạng ghi trên dòng "Dạng cần vững" (còn lại gộp "và N dạng khác") — dòng ngắn trên điện thoại. */
 const DANG_TOI_DA = 3
 
-/** "Sơ ý của con: 6 % (mục tiêu dưới 7 %)" — chữ chung `chuSoY` đổi sang giọng phụ huynh, cùng kiểu "nhãn: số" với các dòng khác của ô. */
+/** "Sơ ý của con: 6% (mục tiêu dưới 7%)" — chữ chung `chuSoY` đổi sang giọng phụ huynh, cùng kiểu "nhãn: số" với các dòng khác của ô. */
 export function chuPhSoY(s: number | null): string | null {
   const c = chuSoY(s, SO_Y_MUC_TIEU)
   return c && c.replace(/^Sơ ý /, 'Sơ ý của con: ')
