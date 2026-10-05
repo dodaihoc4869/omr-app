@@ -1,9 +1,10 @@
 // 5 THƯỚC ĐO CHẤT LƯỢNG SỬA LỖI THEO LỚP — app thầy (thầy 05/10: "làm tất nhé" — mục (6) của đề xuất cải thiện thuật toán: chỉnh luật theo SỐ
 // THẬT, không cảm tính). CHỈ ĐỌC: không ghi bảng nào, không tạo bảng (route dùng bản đọc `envDoc`).
 //
-// Nguồn: sổ `su_kien_hoc` của các em trong lớp (từ TU_NGAY 29/09 — như luật đóng lỗi), `loi_giai_hoi` (mốc đọc lời giải), kho câu (dạng, tờ, tự luận),
-// `cau_bo_tro` (câu có song sinh dùng được), tham số luật (chung `v2_tham_so` + riêng em `v2_tham_so_em`). Hàm THUẦN `tinhChatLuongLoi` (test không cần
-// D1) + `gvChatLuongLoi` (lệnh `/gv/chat-luong-loi {lop?, soNgay?}`: một lô truy vấn theo SBD của MỘT lớp — không quét cả bảng).
+// Nguồn: sổ `su_kien_hoc` của các em trong lớp (từ đầu cửa sổ − 60 ngày, không sớm hơn TU_NGAY 29/09 — như luật đóng lỗi), `loi_giai_hoi` (mốc đọc lời
+// giải), kho câu (dạng, tờ, tự luận), `cau_bo_tro` (câu có song sinh dùng được), tham số luật (chung `v2_tham_so` + riêng em `v2_tham_so_em`).
+// Hàm THUẦN `tinhChatLuongLoi` (test không cần D1) + `gvChatLuongLoi` (lệnh `/gv/chat-luong-loi {lop?, soNgay?}`: hai lô SELECT theo SBD của MỘT lớp —
+// không quét cả bảng, phần sổ đọc không phình theo thời gian).
 //
 // LƯỢT TỰ LÀM (luật đóng lỗi `loi-hoc-luat.ts`): không hỗ trợ (assistance khác 'assisted'), không phải dòng đọc lời giải / lướt, em không đọc lời giải câu
 // đó (hay câu gốc mà nó thay thế) trong 12 giờ trước. Bỏ trống chỉ tính sai ở ca thi (kênh khác: chưa làm ⇒ không phải một lượt làm).
@@ -23,7 +24,8 @@
 //    (`dongNgay`); trả TRUNG VỊ. n = số lần đóng.
 // 4. cauLaCungDang — chuyển giao, định nghĩa của OMNI (omni-p-vkn `phatLaiEm`, như `nCauLaDung`/`nTuLam`): quan sát độc lập = lượt ĐẦU TIÊN của câu trong
 //    ngày, tự làm (không lướt, không dòng đọc lời giải, có kết quả, assistance 'none'), không trong 12 giờ sau dòng đọc lời giải của câu; câu LẠ = em chưa
-//    có dòng sổ nào của câu gốc trước đó (kể cả trước 29/09); CÙNG DẠNG = `dang` trùng dạng của một câu em đã tự làm sai trước đó: tỉ lệ ĐÚNG. n = số quan sát.
+//    có dòng sổ nào của câu gốc trước đó (kể cả phần sổ cũ không đọc chi tiết — tra riêng theo (em, câu)); CÙNG DẠNG = `dang` trùng dạng của một câu em đã
+//    tự làm sai trước đó: tỉ lệ ĐÚNG. n = số quan sát.
 // 5. lapNguyenVan — lượt làm (mọi lượt, kể cả có hỗ trợ) trong CỬA SỔ LỖI của câu (trạng thái phatLaiLoi trước lượt là mở / chờ kiểm) mà đề là NGUYÊN VĂN
 //    câu đã sai: có cờ `raw_json.nv` ⇒ theo cờ (1 = nguyên văn); không cờ ⇒ cùng qid gốc, không song sinh, không câu thay thế, không bản xáo (`raw_json.xt = 1`).
 //    `dat` = số lượt lặp nguyên văn, n = số lượt làm lại trong cửa sổ lỗi.
@@ -86,11 +88,11 @@ export interface DongSoCl {
 }
 
 export interface DauVaoChatLuong {
-  /** Dòng sổ từ TU_NGAY của các em trong lớp (đã bỏ dòng che — ca chưa công bố). */
+  /** Dòng sổ của các em trong lớp, từ TU_NGAY hoặc muộn hơn (đã bỏ dòng che — ca chưa công bố). */
   dong: readonly DongSoCl[]
   homNay: string
   soNgay?: number
-  /** `${sbd}|${qid gốc}` đã có dòng sổ TRƯỚC TU_NGAY (để biết câu "chưa từng gặp"). */
+  /** `${sbd}|${qid gốc}` đã có dòng sổ TRƯỚC phần sổ trong `dong` (để biết câu "chưa từng gặp"). */
   daGapTruoc?: ReadonlySet<string>
   /** `${sbd}|${qid gốc}` ⇒ mốc ISO em đọc lời giải (`loi_giai_hoi`). */
   docLoiGiai?: ReadonlyMap<string, readonly string[]>
@@ -343,56 +345,71 @@ export function thamSoEmTu(json: unknown): ThamSoLuat | null {
 
 interface LopGv { tenLop: string; khoi: string; soEm: number; sbd: string[] }
 
-/** 5 thước đo của MỘT lớp: một lô SELECT theo SBD của lớp (gộp bằng `gopDocD1`) + siêu dữ liệu câu. */
+/** Sổ chi tiết đọc từ (đầu cửa sổ − 60 ngày), không sớm hơn 29/09: đủ cho lượt kiểm 30 ngày và lịch sử lỗi dẫn tới nó — phần sổ đọc KHÔNG phình theo thời gian. */
+export const NGAY_DOC_TRUOC_CUA_SO = 60
+const chia = <T>(ds: readonly T[], n: number): T[][] => Array.from({ length: Math.ceil(ds.length / n) }, (_, i) => ds.slice(i * n, (i + 1) * n))
+
+/**
+ * 5 thước đo của MỘT lớp. Hai lô SELECT theo SBD của lớp (mỗi lô gộp bằng `gopDocD1` thành MỘT lượt D1, không quét cả bảng):
+ *   1. sổ chi tiết từ `tuDoc` (chỉ mục idx_skh_em_ngay) + mốc đọc lời giải + tham số luật (riêng em, chung);
+ *   2. siêu dữ liệu câu (kho), câu có song sinh (`cau_bo_tro`), và "đã gặp trước `tuDoc` chưa" CHỈ cho câu có thể là câu lạ (lần đầu thấy trong cửa sổ).
+ */
 export async function chatLuongCuaLop(env0: Env, lop: LopGv, homNay: string, soNgay: number): Promise<{ kq: KetQuaChatLuong; soTruyVan: number }> {
   // Mọi SELECT phát cùng lúc ⇒ `gopDocD1` gộp thành MỘT lô D1 (lỗi một câu — bảng/cột chưa có — không làm mất các câu khác).
   const env: Env = { ...env0, DB: gopDocD1(env0.DB) }
   const sbds = [...new Set(lop.sbd.map(str).filter(Boolean))]
+  const tuCuaSo = congNgayVn(homNay, -(chuanSoNgay(soNgay) - 1))
+  const lui = congNgayVn(tuCuaSo, -NGAY_DOC_TRUOC_CUA_SO)
+  const tuDoc = lui > TU_NGAY ? lui : TU_NGAY
   let soTruyVan = 0
   const hoi = (sql: string, ...bien: unknown[]): Promise<Row[]> => {
     soTruyVan++
     return env.DB.prepare(sql).bind(...bien).all<Row>().then((r) => r.results ?? [])
   }
   const ds = dsJson(sbds)
-  let rows: Row[] = [], gap: Row[] = [], doc: Row[] = [], tsRieng: Row[] = []
+  let rows: Row[] = [], doc: Row[] = [], tsRieng: Row[] = []
   let tsChung: ThamSoLuat = THAM_SO_GOC
   if (sbds.length) {
     soTruyVan++ // docThamSo
-    ;[rows, gap, doc, tsRieng, tsChung] = await Promise.all([
+    ;[rows, doc, tsRieng, tsChung] = await Promise.all([
       // D1 cũ thiếu cột CNH-1.0 ⇒ lùi câu SQL không có cột mới (như `docLanLam`).
-      hoi(SQL_SO(true), ds, TU_NGAY).catch(() => hoi(SQL_SO(false), ds, TU_NGAY)).catch(() => [] as Row[]),
-      // Câu đã gặp TRƯỚC 29/09 (chỉ mục phủ idx_skh_em_ngay_qid — không đọc dòng).
-      hoi('SELECT DISTINCT sbd, qid FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn < ?', ds, TU_NGAY).catch(() => [] as Row[]),
-      hoi('SELECT sbd, qid, luc FROM loi_giai_hoi WHERE sbd IN (SELECT value FROM json_each(?)) AND luc >= ?', ds, `${TU_NGAY}T00:00:00`).catch(() => [] as Row[]),
+      hoi(SQL_SO(true), ds, tuDoc).catch(() => hoi(SQL_SO(false), ds, tuDoc)).catch(() => [] as Row[]),
+      hoi('SELECT sbd, qid, luc FROM loi_giai_hoi WHERE sbd IN (SELECT value FROM json_each(?)) AND luc >= ?', ds, `${tuDoc}T00:00:00`).catch(() => [] as Row[]),
       hoi('SELECT sbd, tham_so_json FROM v2_tham_so_em WHERE sbd IN (SELECT value FROM json_each(?))', ds).catch(() => [] as Row[]),
       docThamSo(env),
     ])
   }
   const dong = rows.map(dongSangCl)
-  const daGapTruoc = new Set(gap.map((x) => `${str(x.sbd)}|${gocCua(x.qid).goc}`))
   const docLoiGiai = new Map<string, string[]>()
   for (const x of doc) { const k = `${str(x.sbd)}|${gocCua(x.qid).goc}`; docLoiGiai.set(k, [...(docLoiGiai.get(k) ?? []), str(x.luc)]) }
   const tsEm = new Map<string, ThamSoLuat>()
   for (const x of tsRieng) { const t = thamSoEmTu(x.tham_so_json); if (t) tsEm.set(str(x.sbd), t) }
 
   // Siêu dữ liệu câu (dạng, tờ ⇒ khối, phần, tự luận) + câu có song sinh dùng được — cho câu gốc của mọi dòng (kể cả câu được thay thế).
+  // Câu có thể là CÂU LẠ = câu gốc mà dòng đầu tiên của em (trong phần sổ đã đọc) nằm trong cửa sổ ⇒ chỉ những câu này cần hỏi "đã gặp trước tuDoc chưa".
   const qids = new Set<string>()
   const qidSai = new Set<string>()
+  const dauTien = new Map<string, string>()
   for (const x of dong) {
     const g = gocCua(x.qid).goc, tc = x.tc ? gocCua(x.tc).goc : ''
     if (g) qids.add(g)
     if (tc) { qids.add(tc); qidSai.add(tc) }
     if (g && (x.ketQua !== 1)) qidSai.add(g)
+    const k = `${x.sbd}|${g}`, n = dauTien.get(k)
+    if (n === undefined || x.ngayVn < n) dauTien.set(k, x.ngayVn)
   }
-  const dsSai = [...qidSai]
-  const LO_BO_TRO = 400
-  const loBoTro = Array.from({ length: Math.ceil(dsSai.length / LO_BO_TRO) }, (_, i) => dsSai.slice(i * LO_BO_TRO, (i + 1) * LO_BO_TRO))
+  const ungVienLa = [...new Set([...dauTien].filter(([, n]) => n >= tuCuaSo).map(([k]) => k.slice(k.indexOf('|') + 1)))]
+  // Bản song sinh của câu cũng là "đã gặp câu ấy" (chỉ mục idx_skh_em_qid_ngay: tra đúng (em, câu), không đọc dòng thừa).
+  const loLa = chia(ungVienLa, 300).map((lo) => lo.flatMap((q) => [q, `${q}~ss0`, `${q}~ss1`, `${q}~ss2`, `${q}~ss3`]))
+  const loBoTro = chia([...qidSai], 400)
   soTruyVan += Math.ceil(qids.size / 800) + loBoTro.length
-  const [kho, boTroLo] = await Promise.all([
+  const [kho, boTroLo, gapLo] = await Promise.all([
     docCauKho(env, [...qids]).catch(() => new Map<string, CauKho>()),
     // Cùng nguồn với kế hoạch ngày (`docBoTroLoi` ⇒ `boTroTheoQid`; lỗi đọc ⇒ rỗng = coi như không có song sinh, như luật đang chạy).
     Promise.all(loBoTro.map((lo) => boTroTheoQid(env, lo))),
+    Promise.all(loLa.map((lo) => hoi('SELECT DISTINCT sbd, qid FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?)) AND ngay_vn < ?', ds, JSON.stringify(lo), tuDoc).catch(() => [] as Row[]))),
   ])
+  const daGapTruoc = new Set(gapLo.flat().map((x) => `${str(x.sbd)}|${gocCua(x.qid).goc}`))
   const coSS = new Set<string>()
   for (const m of boTroLo) for (const [q, bt] of m) {
     const phan = kho.get(q)?.phan ?? phanTuQid(q, 'I')

@@ -170,32 +170,37 @@ describe('khối của lớp (cauHopKhoi) + câu tự luận', () => {
 })
 
 // ---------------------------------------------------------------- lệnh qua Worker thật
+const I1 = 'DH-11-C1-B1-I-1', I2 = 'DH-11-C1-B1-I-2', I3 = 'DH-11-C1-B1-I-3', I4 = 'DH-11-C1-B1-I-4', I5 = 'DH-11-C1-B1-I-5', K12 = 'DH-12-C1-B1-I-1'
+/** D1 thật + đồng hồ giả (`nowIso`): hai lớp (11A1: S1, S2 · 12 - Tinh Hoa: T1), kho câu dạng D1 (I3 tự luận, K12 thuộc khối 12), bảng loi_giai_hoi. */
+function dungD1(nowIso: string) {
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(nowIso))
+  const d1 = taoD1That()
+  const env = d1.env as unknown as Env
+  const hs = d1.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, lop, ten_lop, mat_khau, cap_nhat_luc) VALUES (?,?,?,?,?,?)')
+  hs.run('S1', 'Trần An', '11', '11A1', 'mk', 'x')
+  hs.run('S2', 'Lê Bình', '11', '11A1', 'mk', 'x')
+  hs.run('T1', 'Phạm Chi', '12', '12 - Tinh Hoa', 'mk', 'x')
+  const cau = (maDe: string, qid: string, o: Record<string, unknown> = {}) =>
+    d1.sql.prepare('INSERT INTO game_v2_question (ma_de, qid, version, content_group, dang, json) VALUES (?,?,?,?,?,?)')
+      .run(maDe, qid, 'v1', `g-${qid}`, 'D1', JSON.stringify({ qid, maDe, phan: 'I', dang: 'D1', mucDo: 'Thông hiểu', ...o }))
+  for (const q of [I1, I2, I4, I5]) cau('DH-11-C1-B1', q)
+  cau('DH-11-C1-B1', I3, { tuLuan: true })
+  cau('DH-12-C1-B1', K12)
+  d1.sql.exec('CREATE TABLE IF NOT EXISTS loi_giai_hoi (sbd TEXT NOT NULL, qid TEXT NOT NULL, nguon TEXT, luc TEXT NOT NULL, co_ho_so INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (sbd, qid, luc))')
+  let n = 0
+  const sk = (sbd: string, qid: string, luc: string, kq: 0 | 1 | null, o: { assistance?: string; visibility?: string } = {}) =>
+    d1.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, ket_qua, luc, ngay_vn, assistance, visibility) VALUES (?,?,?,?,?,?,?,?,?,?)')
+      .run(`k${++n}`, sbd, qid, 'game', 'm', kq, luc, luc.slice(0, 10), o.assistance ?? 'none', o.visibility ?? null)
+  return { d1, env, sk }
+}
+
 describe('máy chủ /gv/chat-luong-loi (Worker thật, D1 thật)', () => {
   afterEach(() => { vi.useRealTimers() })
 
   it('chỉ thầy; danh sách lớp + lớp mặc định; số của lớp chỉ tính câu đúng khối; cửa sổ soNgay; KHÔNG ghi gì', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] })
-    vi.setSystemTime(new Date('2026-10-20T03:00:00Z')) // 10:00 Thứ Ba 20/10/2026 giờ VN
-    const d1 = taoD1That()
-    const env = d1.env as unknown as Env
-    const hs = d1.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, lop, ten_lop, mat_khau, cap_nhat_luc) VALUES (?,?,?,?,?,?)')
-    hs.run('S1', 'Trần An', '11', '11A1', 'mk', 'x')
-    hs.run('S2', 'Lê Bình', '11', '11A1', 'mk', 'x')
-    hs.run('T1', 'Phạm Chi', '12', '12 - Tinh Hoa', 'mk', 'x')
-    const cau = (maDe: string, qid: string, dang: string, o: Record<string, unknown> = {}) =>
-      d1.sql.prepare('INSERT INTO game_v2_question (ma_de, qid, version, content_group, dang, json) VALUES (?,?,?,?,?,?)')
-        .run(maDe, qid, 'v1', `g-${qid}`, dang, JSON.stringify({ qid, maDe, phan: 'I', dang, mucDo: 'Thông hiểu', ...o }))
-    cau('DH-11-C1-B1', 'DH-11-C1-B1-I-1', 'D1')
-    cau('DH-11-C1-B1', 'DH-11-C1-B1-I-2', 'D1')
-    cau('DH-11-C1-B1', 'DH-11-C1-B1-I-3', 'D1', { tuLuan: true })
-    cau('DH-12-C1-B1', 'DH-12-C1-B1-I-1', 'D1')
-    d1.sql.exec('CREATE TABLE IF NOT EXISTS loi_giai_hoi (sbd TEXT NOT NULL, qid TEXT NOT NULL, nguon TEXT, luc TEXT NOT NULL, co_ho_so INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (sbd, qid, luc))')
-    d1.sql.prepare("INSERT INTO loi_giai_hoi (sbd, qid, nguon, luc) VALUES ('S2', 'DH-11-C1-B1-I-1', 'on_lai', '2026-10-11T02:00:00.000Z')").run()
-    let n = 0
-    const sk = (sbd: string, qid: string, luc: string, kq: 0 | 1 | null, o: { assistance?: string; visibility?: string } = {}) =>
-      d1.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, ket_qua, luc, ngay_vn, assistance, visibility) VALUES (?,?,?,?,?,?,?,?,?,?)')
-        .run(`k${++n}`, sbd, qid, 'game', 'm', kq, luc, luc.slice(0, 10), o.assistance ?? 'none', o.visibility ?? null)
-    const I1 = 'DH-11-C1-B1-I-1', I2 = 'DH-11-C1-B1-I-2', I3 = 'DH-11-C1-B1-I-3', K12 = 'DH-12-C1-B1-I-1'
+    const { d1, env, sk } = dungD1('2026-10-20T03:00:00Z') // 10:00 Thứ Ba 20/10/2026 giờ VN
+    d1.sql.prepare("INSERT INTO loi_giai_hoi (sbd, qid, nguon, luc) VALUES ('S2', ?, 'on_lai', '2026-10-11T02:00:00.000Z')").run(I1)
     // S1: I1 sai 08/10 → đúng 09/10 (làm lại #1 đúng) → đúng 11/10 (đóng: 3 ngày). Câu khối 12 sai hai lần ⇒ bỏ. I2 lần đầu 12/10 đúng ⇒ câu lạ cùng dạng.
     sk('S1', I1, '2026-10-08T01:00:00.000Z', 0); sk('S1', I1, '2026-10-09T01:00:00.000Z', 1); sk('S1', I1, '2026-10-11T01:00:00.000Z', 1)
     sk('S1', K12, '2026-10-08T02:00:00.000Z', 0); sk('S1', K12, '2026-10-09T02:00:00.000Z', 0)
@@ -239,5 +244,17 @@ describe('máy chủ /gv/chat-luong-loi (Worker thật, D1 thật)', () => {
     // Lớp không có ⇒ lớp đầu danh sách, `chon` nói rõ.
     expect((await goiWorker(worker, env, '/gv/chat-luong-loi', { lop: 'Lớp lạ' }, true)).chon).toBe('12 - Tinh Hoa')
     expect(thayDoi()).toEqual(truoc) // chỉ đọc: không một dòng ghi, không tạo bảng
+  })
+
+  it('sổ chi tiết chỉ đọc từ (đầu cửa sổ − 60 ngày); câu đã gặp ở phần sổ cũ hơn vẫn KHÔNG là câu lạ (tra riêng theo em + câu)', async () => {
+    const { env, sk } = dungD1('2027-01-20T03:00:00Z') // cửa sổ 07/01–20/01/2027 ⇒ sổ chi tiết từ 08/11/2026
+    sk('S1', I2, '2026-10-10T01:00:00.000Z', 1) // gặp I2 từ tháng 10 (ngoài phần đọc chi tiết)
+    sk('S1', I5, '2026-10-01T01:00:00.000Z', 0) // lỗi tháng 10 — ngoài phần đọc chi tiết
+    sk('S1', I1, '2027-01-10T01:00:00.000Z', 0); sk('S1', I1, '2027-01-11T01:00:00.000Z', 1) // lỗi + làm lại ĐÚNG
+    sk('S1', I2, '2027-01-12T01:00:00.000Z', 1) // đã gặp 10/10/2026 ⇒ không lạ
+    sk('S1', I4, '2027-01-13T01:00:00.000Z', 1) // lần đầu gặp, cùng dạng câu đã sai ⇒ câu lạ ĐÚNG
+    sk('S1', I5, '2027-01-14T01:00:00.000Z', 1) // đã gặp 01/10/2026 ⇒ không lạ; lỗi cũ ngoài phần đọc ⇒ không phải lượt làm lại
+    const r = await goiWorker(worker, env, '/gv/chat-luong-loi', { lop: '11A1' }, true)
+    expect(r.ketQua).toMatchObject({ tuNgay: '2027-01-07', denNgay: '2027-01-20', lamLaiDau: { dat: 1, n: 1 }, cauLaCungDang: { dat: 1, n: 1 }, soEmCoLuot: 1 })
   })
 })
