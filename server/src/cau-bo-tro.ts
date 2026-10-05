@@ -1,11 +1,12 @@
 // HỌC LIỆU BỔ TRỢ TỪNG CÂU — Vòng học khép kín v2. Kho đề mang thêm 3 trường (chỉ thêm, GĐ1 soạn bằng máy + Python kiểm):
-//   · `song_sinh`: 2 câu cùng cách giải, đổi số liệu ({de, pa?, dap_an, buoc, gia_tri_dung}) — làm lại kín không nhớ đáp án.
+//   · `song_sinh`: tối đa TRAN_SONG_SINH (4, từ 05/10 — trước 2) câu cùng cách giải, đổi số liệu ({de, pa?, dap_an, buoc, gia_tri_dung}) — làm lại kín không nhớ đáp án.
 //   · `cau_kiem`: câu hỏi kiểm từng bước lời giải ({buoc, kieu: so|chon, hoi, dap_an|lua_chon+dung, sai_so}) — đọc lời giải chủ động.
 //   · `nhan_nen`: nhãn kiến thức nền của từng bước ({buoc, nen}) — hỏng bước nào thì luyện nền đó.
 // Đọc gói R2 mỗi lần em làm thì quá chậm ⇒ lúc NẠP ĐỀ (mọi đường nạp đi qua `dayDeKho` → móc này) chép 3 trường vào bảng `cau_bo_tro`
 // theo BĂM nội dung câu (bản trùng ở nhiều đề dùng chung một dòng). Bảng CHỈ THÊM, tự tạo lần đầu dùng; bản SQL: migration-0210-v2.sql.
 import type { D1PreparedStatement, Env } from './kieu'
 import { bamCau, cauTrongGoi } from '../../src/lib/loi-giai-kiem'
+import { TRAN_SONG_SINH } from './loi-hoc-luat'
 
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
@@ -56,7 +57,7 @@ export function damBaoBangBoTro(env: Env): Promise<void> {
 /** Lọc học liệu bổ trợ của một câu kho thô (dữ liệu máy soạn — chỉ giữ trường đúng kiểu). */
 export function locBoTro(c: Obj): { songSinh: SongSinh[]; cauKiem: CauKiem[]; nhanNen: NhanNen[]; buoc: string[] } {
   const ss = Array.isArray(c.song_sinh) ? c.song_sinh.filter((x): x is Obj => laObj(x) && typeof x.de === 'string' && x.dap_an != null) : []
-  const songSinh = ss.slice(0, 2).map((x) => ({
+  const songSinh = ss.slice(0, TRAN_SONG_SINH).map((x) => ({
     de: String(x.de), dap_an: String(x.dap_an),
     ...(laObj(x.pa) ? { pa: Object.fromEntries(Object.entries(x.pa).map(([k, v]) => [k, String(v)])) } : {}),
     ...(Array.isArray(x.buoc) ? { buoc: x.buoc.map(String) } : {}),

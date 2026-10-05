@@ -29,7 +29,7 @@ export interface LanLamLoi {
   ngayVn: string // YYYY-MM-DD
   ketQua: 0 | 1 | null
   coHoTro: boolean // assistance khác none/rỗng, hoặc purpose không phải một lần làm (xem_loi_giai · luot — OMNI 3)
-  songSinh: boolean // làm câu song sinh (qid "<gốc>~ss0|1") thay vì câu gốc
+  songSinh: boolean // làm câu song sinh (qid "<gốc>~ss0..3") hoặc CÂU ANH EM (05/10: sổ ghi `raw_json.tc = <gốc>`) thay vì câu gốc
   nguon: string
 }
 
@@ -129,9 +129,14 @@ function maxNgay(a: string, b: string): string {
   return a > b ? a : b
 }
 
-/** qid song sinh: "<gốc>~ss0" / "<gốc>~ss1". Câu game có hậu tố lượt lặp "#n" — bỏ trước. */
+/** Trần số câu song sinh mỗi câu (05/10 "làm lại câu sai bằng bản khác", bậc 1: nâng 2 → 4 — đề xuất 2.7 đã chốt). */
+export const TRAN_SONG_SINH = 4
+/** qid gốc + MỌI qid ảo song sinh ("<gốc>~ss0" … "~ss3") — danh sách đúng để đọc sổ theo chỉ mục (không LIKE). Dùng chung mọi nơi, không tự viết `~ss0`/`~ss1`. */
+export const cacQidSongSinh = (goc: string): string[] => [goc, ...Array.from({ length: TRAN_SONG_SINH }, (_, i) => `${goc}~ss${i}`)]
+
+/** qid song sinh: "<gốc>~ss<i>" (i = 0 … TRAN_SONG_SINH − 1). Câu game có hậu tố lượt lặp "#n" — bỏ trước. */
 export function tachSongSinh(qid: string): { goc: string; songSinh: number | null } {
   const q = qid.replace(/#\d+$/, '')
-  const m = /^(.*)~ss([01])$/.exec(q)
+  const m = /^(.*)~ss(\d+)$/.exec(q)
   return m ? { goc: m[1]!, songSinh: Number(m[2]) } : { goc: q, songSinh: null }
 }

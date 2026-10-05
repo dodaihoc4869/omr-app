@@ -7,6 +7,7 @@
 //     (src/lib/rut-de-v2.ts) và gộp vào bản đồ bằng MỘT câu `json_patch` — không cắt theo băm im lặng.
 import type { Env } from './kieu'
 import { docBangSongSinh, songSinhDuDuLieu } from './cau-bo-tro'
+import { cacQidSongSinh } from './loi-hoc-luat'
 import { docHoSo2, type HoSo2 } from './srs2-d1'
 import { ngayVn } from './su-kien-hoc'
 import { xoaDemCaBaoVe } from './game-v2-bank'
@@ -150,7 +151,7 @@ export async function loiDenHan(env: Env, b: Obj): Promise<Obj> {
     }
   }))
   // Câu đã gặp: bó về kho ca + câu gốc của lỗi + câu song sinh (luật "lý thuyết quay lại sau 30 ngày" cần đúng các câu ấy).
-  const loc = qids ? [...new Set([...qids, ...Object.values(em).flatMap((x) => x.flatMap((l) => [l.qid, `${l.qid}~ss0`, `${l.qid}~ss1`]))])] : null
+  const loc = qids ? [...new Set([...qids, ...Object.values(em).flatMap((x) => x.flatMap((l) => cacQidSongSinh(l.qid)))])] : null
   const daGap = await docDaGap(env, ds, ngay, loc)
   return { ok: true, ngay, em, daGap, ...(hong.length ? { hong: hong.sort() } : {}) }
 }

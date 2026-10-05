@@ -70,7 +70,7 @@ export function apLuatChung(t: TrangThaiCau, lan: readonly LanLam[], docLuc: rea
   return { t: { ...t, laMoi: false, thanhThao: true }, loi }
 }
 
-/** Chọn song sinh cho lượt tới: xen kẽ ss0/ss1 theo số lần em đã làm song sinh. */
+/** Chọn song sinh cho lượt tới: xoay vòng ss0 → ss1 → … (đủ `soSongSinh` bản, trần TRAN_SONG_SINH = 4) theo số lần em đã làm song sinh / câu anh em. */
 export function chonSongSinh(lan: readonly LanLam[], soSongSinh: number): number {
   if (soSongSinh <= 0) return -1
   return lan.filter((x) => x.songSinh).length % soSongSinh

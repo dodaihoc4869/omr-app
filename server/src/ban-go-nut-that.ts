@@ -16,7 +16,7 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import { damBaoBangNutThat, type TrangThaiNut } from './nut-that'
 import { docBoTro, type BoTro } from './cau-bo-tro'
-import { phatLaiLoi, tachSongSinh, TU_NGAY, type LanLamLoi } from './loi-hoc-luat'
+import { cacQidSongSinh, phatLaiLoi, tachSongSinh, TU_NGAY, type LanLamLoi } from './loi-hoc-luat'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -78,7 +78,7 @@ function chonTuRaw(raw: unknown): string {
 }
 
 /**
- * Các lần làm (từ `TU_NGAY`) của các cặp (em, câu gốc), kể cả song sinh `<qid>~ss0|1` và hậu tố lượt game `#n`. MỘT truy vấn (danh sách
+ * Các lần làm (từ `TU_NGAY`) của các cặp (em, câu gốc), kể cả song sinh `<qid>~ss0..3` và hậu tố lượt game `#n`. MỘT truy vấn (danh sách
  * em và danh sách qid đi qua `json_each`, mỗi thứ một tham số). Bỏ sự kiện bị che (ca chưa công bố). Cột chuẩn chưa có ⇒ đọc bản cũ.
  */
 async function docSo(env: Env, cap: readonly { sbd: string; goc: string }[]): Promise<Map<string, DongSo[]>> {
@@ -86,7 +86,7 @@ async function docSo(env: Env, cap: readonly { sbd: string; goc: string }[]): Pr
   if (!cap.length) return ra
   const sbds = [...new Set(cap.map((x) => x.sbd))]
   const gocs = [...new Set(cap.map((x) => x.goc))]
-  const qids = gocs.flatMap((g) => [g, `${g}~ss0`, `${g}~ss1`])
+  const qids = gocs.flatMap(cacQidSongSinh)
   const can = new Set(cap.map((x) => `${x.sbd}|${x.goc}`))
   // Tham số đánh số: ?1 danh sách em, ?2 danh sách qid (gốc + song sinh), ?3 mốc ngày.
   const loc = `sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn >= ?3
