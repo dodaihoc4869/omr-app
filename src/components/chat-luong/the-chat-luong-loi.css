@@ -42,6 +42,11 @@
 .clg-loi {
   margin-top: 12px;
 }
+/* Đang đổi lớp: số cũ giữ chỗ, mờ đi (không đổi màu — chỉ độ mờ), không bấm vào được. */
+.clg-than[data-dang-tai] {
+  opacity: 0.5;
+  pointer-events: none;
+}
 .clg-chu-thich {
   margin: 8px 0 0;
 }

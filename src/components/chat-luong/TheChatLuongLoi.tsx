@@ -55,7 +55,7 @@ export function dongCuaLop(k: ChatLuongLop, nToiThieu: number): DongDo[] {
     phu: nd.du ? `${soVi(nd.n)} lỗi đã khắc phục` : thieu(nd.n, 'lỗi đã khắc phục'),
   })
   const la = k.cauLaCungDang
-  ds.push({ khoa: 'cau-la', nhan: 'Câu chưa gặp, cùng dạng với câu đã sai: làm đúng', giaTri: tl(la), phu: la.du ? `trên ${soVi(la.n)} lượt` : thieu(la.n, 'lượt') })
+  ds.push({ khoa: 'cau-la', nhan: 'Câu lạ cùng dạng câu đã sai: làm đúng', giaTri: tl(la), phu: la.du ? `trên ${soVi(la.n)} lượt · câu em chưa từng gặp` : thieu(la.n, 'lượt câu em chưa từng gặp') })
   const nv = k.lapNguyenVan
   ds.push({
     khoa: 'nguyen-van',
@@ -115,11 +115,18 @@ export default function TheChatLuongLoi({ soNgay = 14 }: { soNgay?: number }) {
           Chất lượng sửa lỗi · {du.soNgay} ngày
         </h2>
       </div>
-      <p className="gv2-phu clg-phu-de">
-        {tenLopHien(k.tenLop)} · <span className="gv2-so">{soVi(k.soEm)}</span> em ·{' '}
-        <span className="gv2-so">
-          {ngayNgan(k.tuNgay)}–{ngayNgan(k.denNgay)}
-        </span>
+      {/* Dòng phụ là vùng báo trạng thái: đổi lớp ⇒ "Đang tính…" ở ĐÂY, các dòng số cũ giữ chỗ (mờ) — thẻ không co lại, màn không nhảy. */}
+      <p className="gv2-phu clg-phu-de" aria-live="polite">
+        {dangDoi ? (
+          `Đang tính số liệu ${tenLopTrongCau(dangTai || k.tenLop)}…`
+        ) : (
+          <>
+            {tenLopHien(k.tenLop)} · <span className="gv2-so">{soVi(k.soEm)}</span> em ·{' '}
+            <span className="gv2-so">
+              {ngayNgan(k.tuNgay)}–{ngayNgan(k.denNgay)}
+            </span>
+          </>
+        )}
       </p>
       {du.lop.length > 1 && (
         <div className="clg-lop" role="group" aria-label="Chọn lớp">
@@ -143,7 +150,7 @@ export default function TheChatLuongLoi({ soNgay = 14 }: { soNgay?: number }) {
           })}
         </div>
       )}
-      {loi ? (
+      {loi && (
         <div className="gv2-loi clg-loi" role="alert">
           <span>
             Chưa tính được số liệu {tenLopTrongCau(loi.lop)}: {loi.chu}
@@ -152,27 +159,26 @@ export default function TheChatLuongLoi({ soNgay = 14 }: { soNgay?: number }) {
             Thử lại
           </button>
         </div>
-      ) : dangDoi ? (
-        <p className="gv2-nhat clg-trang-thai" role="status">
-          Đang tính số liệu {dangTai ? tenLopTrongCau(dangTai) : 'của lớp'}…
-        </p>
-      ) : rongHet(k) ? (
-        <p className="gv2-nhat clg-trang-thai">
-          Chưa có lượt làm lại câu sai nào trong {du.soNgay} ngày qua — số liệu hiện khi các em làm lại câu đã sai.
-        </p>
-      ) : (
-        <dl className="clg-ds">
-          {dongCuaLop(k, du.nToiThieu).map((d) => (
-            <div key={d.khoa} className="clg-dong" data-do={d.khoa}>
-              <dt className="gv2-nhan">{d.nhan}</dt>
-              <dd className="clg-gia-tri">
-                {d.giaTri !== null ? <span className="gv2-so gv2-so-lon">{d.giaTri}</span> : <span className="gv2-dam">Chưa đủ dữ liệu</span>}
-                <span className="gv2-phu">{d.phu}</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
       )}
+      <div className="clg-than" data-dang-tai={dangDoi ? '' : undefined}>
+        {rongHet(k) ? (
+          <p className="gv2-nhat clg-trang-thai">
+            Chưa có lượt làm lại câu sai nào trong {du.soNgay} ngày qua — số liệu hiện khi các em làm lại câu đã sai.
+          </p>
+        ) : (
+          <dl className="clg-ds">
+            {dongCuaLop(k, du.nToiThieu).map((d) => (
+              <div key={d.khoa} className="clg-dong" data-do={d.khoa}>
+                <dt className="gv2-nhan">{d.nhan}</dt>
+                <dd className="clg-gia-tri">
+                  {d.giaTri !== null ? <span className="gv2-so gv2-so-lon">{d.giaTri}</span> : <span className="gv2-dam">Chưa đủ dữ liệu</span>}
+                  <span className="gv2-phu">{d.phu}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
       <p className="gv2-phu clg-chu-thich">
         Chỉ tính lượt tự làm (không trợ giúp, không xem lời giải 12 giờ trước) và câu đúng khối của lớp
         {k.boKhacKhoi > 0 ? ` — đã bỏ ${soVi(k.boKhacKhoi)} câu khác khối` : ''}. Câu song sinh và câu thay thế tính là làm lại câu gốc.

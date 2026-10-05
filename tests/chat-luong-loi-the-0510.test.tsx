@@ -38,7 +38,7 @@ describe('thẻ Chất lượng sửa lỗi', () => {
       ['Đã khắc phục, kiểm lại sau 14 ngày: sai lại', '18%trên 22 lượt kiểm'], // 4/22
       ['Đã khắc phục, kiểm lại sau 30 ngày: sai lại', 'Chưa đủ dữ liệumới 3 lượt kiểm, cần từ 10'],
       ['Từ lần sai cuối tới khi khắc phục (trung vị)', '4,5 ngày31 lỗi đã khắc phục'],
-      ['Câu chưa gặp, cùng dạng với câu đã sai: làm đúng', '70%trên 40 lượt'], // 28/40
+      ['Câu lạ cùng dạng câu đã sai: làm đúng', '70%trên 40 lượt · câu em chưa từng gặp'], // 28/40
       ['Lượt làm lại phải lặp nguyên văn câu đã sai', '12 lượttrên 48 lượt làm lại · 25%'],
     ])
     expect(the.textContent).toContain('Chỉ tính lượt tự làm (không trợ giúp, không xem lời giải 12 giờ trước) và câu đúng khối của lớp — đã bỏ 3 câu khác khối.')
@@ -86,12 +86,19 @@ describe('thẻ Chất lượng sửa lỗi', () => {
     }
   })
 
-  it('đổi lớp lỗi ⇒ báo ngay trong thẻ + Thử lại (không mất thẻ)', async () => {
-    m.goi.mockResolvedValueOnce(tra('12A1')).mockResolvedValueOnce({ ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }).mockResolvedValueOnce(tra('11B'))
+  it('đổi lớp: đang tính ⇒ số cũ giữ chỗ (thẻ không co, màn không nhảy); lỗi ⇒ báo ngay trong thẻ + Thử lại (không mất thẻ)', async () => {
+    let xong: (v: unknown) => void = () => {}
+    m.goi.mockResolvedValueOnce(tra('12A1')).mockImplementationOnce(() => new Promise((r) => { xong = r })).mockResolvedValueOnce(tra('11B'))
     render(<TheChatLuongLoi />)
     const the = await screen.findByRole('region', { name: 'Chất lượng sửa lỗi · 14 ngày' })
     fireEvent.click(within(the).getByRole('button', { name: '11B' }))
+    expect(the.textContent).toContain('Đang tính số liệu lớp 11B…')
+    expect(the.querySelectorAll('.clg-dong')).toHaveLength(6)
+    expect(the.querySelector('.clg-than')?.hasAttribute('data-dang-tai')).toBe(true)
+    expect(within(the).getByRole('button', { name: '12A1' }).hasAttribute('disabled')).toBe(true)
+    await act(async () => { xong({ ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }) })
     const loi = await within(the).findByRole('alert')
+    expect(the.querySelector('.clg-than')?.hasAttribute('data-dang-tai')).toBe(false)
     expect(loi.textContent).toContain('Chưa tính được số liệu lớp 11B: Không nối được máy chủ.')
     fireEvent.click(within(loi).getByRole('button', { name: 'Thử lại' }))
     await waitFor(() => expect(the.textContent).toContain('Lớp 11B · 30 em'))
