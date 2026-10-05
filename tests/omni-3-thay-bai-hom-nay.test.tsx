@@ -1,7 +1,8 @@
 // OMNI 3 · C1 — BƯỚC "BÀI HÔM NAY" trong bảng Dạy học (thầy chốt 05/10; hợp đồng docs/hop-dong-omni-3.md mục B `/gv/bai-da-day`).
 // Khoá: chỉ hiện khi công tắc OMNI bật; lớp = lớp buổi đang mở; cây DẠY HỌC của khối, mỗi bài một chip trạng thái; chọn bài ⇒ `xem-truoc`
-// ⇒ thẻ xác nhận ĐỦ 6 con số (ẩn ô "ca chốt ≥ 8" khi null) + cảnh báo quá tải; "Giao Bài <số> cho <lớp>" ⇒ `tick` đúng maDe (bỏ "Ví dụ minh hoạ",
-// có ô tích để thêm) và phamVi (mọi bài đứng TRƯỚC kèm tờ); sửa hạn nộp / số lượt; "Bỏ tick" hỏi lại rồi gọi `bo-tick`; dòng chờ bài mới.
+// ⇒ thẻ xác nhận ĐỦ 6 con số (ẩn ô "ca chốt ≥ 8" khi null) + cảnh báo quá tải; "Giao Bài <số> cho <lớp>" ⇒ `tick` đúng maDe (thầy 05/10: CHỈ tờ
+// Trắc nghiệm / Đúng sai / Trả lời ngắn TỰ GIAO, không ô tích, bỏ hẳn Ví dụ minh hoạ + Các dạng toán trọng tâm) và phamVi (mọi bài đứng TRƯỚC, cùng luật
+// tờ); sửa hạn nộp / số lượt; "Bỏ tick" hỏi lại rồi gọi `bo-tick`; dòng chờ bài mới.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
@@ -21,7 +22,19 @@ import DayHocLenBang from '../src/components/day-hoc/DayHocLenBang'
 import { dungCay } from '../src/lib/cay-chon-de'
 import { locDeDayHoc } from '../src/lib/day-hoc-len-bang'
 import { tachNhieuTheoPhan } from '../src/lib/tach-phan-de'
-import { chuChoBaiMoi, dsBaiCuaKhoi, khoaBaiCua, maDeMacDinh, phamViTruoc, tenNganBai, trangThaiBai } from '../src/lib/bai-hom-nay'
+import {
+  chuChoBaiMoi,
+  chuTuGiao,
+  dsBaiCuaKhoi,
+  khoaBaiCua,
+  laMaToKhongGiao,
+  laToKhongGiao,
+  maDeMacDinh,
+  phamViTruoc,
+  tenNganBai,
+  trangThaiBai,
+  type ToBai,
+} from '../src/lib/bai-hom-nay'
 import { hienHanNop } from '../src/components/chien-dich/ngay'
 
 let soCau = 0
@@ -37,6 +50,9 @@ const KHO: TeacherExamSource[] = [
   to('DH-12-C1-B3-VD', 'Bài 3. Xà phòng và chất giặt rửa · VÍ DỤ MINH HOẠ', 1),
   to('DH-12-C1-B3-DT', 'Bài 3. Xà phòng và chất giặt rửa · CÁC DẠNG TOÁN TRỌNG TÂM', 1),
   to('DH-11-C2-B3', 'Bài 3. Ammonia', 2, 0, '11 · DẠY HỌC/C2 - Nitrogen'),
+  // Bài chỉ có hai mục không giao ⇒ không có tờ tự giao nào.
+  to('DH-11-C2-B4-VD', 'Bài 4. Nitric acid · VÍ DỤ MINH HOẠ', 1, 0, '11 · DẠY HỌC/C2 - Nitrogen'),
+  to('DH-11-C2-B4-DT', 'Bài 4. Nitric acid · CÁC DẠNG TOÁN TRỌNG TÂM', 1, 0, '11 · DẠY HỌC/C2 - Nitrogen'),
   to('KT-12-C1', 'Đề kiểm tra chương 1', 3, 0, '12 · C1 - Ester lipid'),
 ]
 khoGia.ds = KHO
@@ -115,17 +131,40 @@ describe('phần thuần (src/lib/bai-hom-nay.ts)', () => {
       ['DH-12-C1-B2', 'Bài 2. Lipid', 2],
       ['DH-12-C1-B3', 'Bài 3. Xà phòng và chất giặt rửa', 3],
     ])
-    expect(dsBaiCuaKhoi(dungCay(kho), '11').map((b) => b.khoaBai)).toEqual(['DH-11-C2-B3'])
+    expect(dsBaiCuaKhoi(dungCay(kho), '11').map((b) => b.khoaBai)).toEqual(['DH-11-C2-B3', 'DH-11-C2-B4'])
     expect(dsBaiCuaKhoi(dungCay(kho), '10')).toEqual([])
     expect(khoaBaiCua({ khoa: 'DẠY HỌC/12/x/Bài lạ', laMa: ['A-1', 'B-2'] })).toBe('DẠY HỌC/12/x/Bài lạ')
   })
-  it('tờ mặc định bỏ "Ví dụ minh hoạ"; phạm vi = mọi bài đứng trước kèm tờ (cũng bỏ Ví dụ minh hoạ)', () => {
-    expect(maDeMacDinh(ds[2]!)).toEqual(['DH-12-C1-B3-DT', 'DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'])
+  it('tờ TỰ GIAO chỉ ba phần Trắc nghiệm / Đúng sai / Trả lời ngắn (bỏ hẳn Ví dụ minh hoạ + Các dạng toán trọng tâm); phạm vi = mọi bài đứng trước, cùng luật', () => {
+    expect(maDeMacDinh(ds[2]!)).toEqual(['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'])
+    expect(ds[2]!.to.filter((t) => !t.tuDong).map((t) => t.maDe)).toEqual(['DH-12-C1-B3-VD', 'DH-12-C1-B3-DT'])
+    expect(ds[1]!.to.map((t) => [t.maDe, t.phan, t.tuDong])).toEqual([['DH-12-C1-B2', 'I', true]]) // tờ chưa tách, chỉ có Phần I
     expect(phamViTruoc(ds, 3)).toEqual([
       { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, maDe: ['DH-12-C1-B1-TN', 'DH-12-C1-B1-DS'] },
       { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, maDe: ['DH-12-C1-B2'] },
     ])
     expect(phamViTruoc(ds, 1)).toEqual([])
+  })
+  it('dòng "Tự giao": cộng câu theo phần (I → II → III), phần 0 câu bỏ khỏi dòng; mục không giao nhận theo mã (-VD/-DT/-TL/-VDMH/-DTTT) lẫn theo tên', () => {
+    const to = (maDe: string, nhan: string, soCau: number, phan: ToBai['phan']): ToBai => ({ maDe, nhan, soCau, phan, tuDong: phan !== null })
+    const bai = {
+      to: [
+        to('DH-12-C2-B6-D1-TN', 'Trắc nghiệm · D1', 12, 'I'),
+        to('DH-12-C2-B6-D2-TN', 'Trắc nghiệm · D2', 10, 'I'),
+        to('DH-12-C2-B6-D1-DS', 'Đúng sai', 6, 'II'),
+        to('DH-12-C2-B6-D1-TLN', 'Trả lời ngắn', 4, 'III'),
+        to('DH-12-C2-B6-VDMH', 'Ví dụ minh hoạ', 3, 'I'), // mã dạng dài ⇒ không giao dù có phần
+        to('DH-12-C2-B6-X', 'Các dạng toán trọng tâm', 5, 'I'), // nhận theo tên
+      ],
+    }
+    expect(maDeMacDinh(bai)).toEqual(['DH-12-C2-B6-D1-TN', 'DH-12-C2-B6-D2-TN', 'DH-12-C2-B6-D1-DS', 'DH-12-C2-B6-D1-TLN'])
+    expect(chuTuGiao(bai)).toBe('Tự giao: Trắc nghiệm · 22 câu · Đúng sai · 6 câu · Trả lời ngắn · 4 câu')
+    expect(chuTuGiao({ to: bai.to.filter((t) => t.phan !== 'II') })).toBe('Tự giao: Trắc nghiệm · 22 câu · Trả lời ngắn · 4 câu')
+    expect(chuTuGiao({ to: bai.to.slice(4) })).toBeNull()
+    expect(['X-VD', 'X-DT', 'X-TL', 'X-VDMH', 'X-DTTT', 'X-VD-TN'].map(laMaToKhongGiao)).toEqual([true, true, true, true, true, true])
+    expect(['X-TN', 'X-DS', 'X-TLN', 'DH-12-C1-B2'].map(laMaToKhongGiao)).toEqual([false, false, false, false])
+    expect(laToKhongGiao({ maDe: 'X-9', nhan: 'VÍ DỤ MINH HỌA' })).toBe(true)
+    expect(laToKhongGiao({ maDe: 'X-9', nhan: 'Trắc nghiệm' })).toBe(false)
   })
   it('chip trạng thái + tên ngắn + dòng chờ bài mới (từ ngày chờ thứ 3)', () => {
     expect(trangThaiBai({ trangThai: 'da_day', tickLuc: '2026-09-22T03:00:00Z', conNgay: null, chungChi: { dat: 38, tong: 44 } }, false).chu).toBe('Đã dạy 22/09 · chứng chỉ 38/44')
@@ -175,12 +214,12 @@ describe('màn: bước Bài hôm nay', () => {
     expect(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' })).toBeTruthy()
   })
 
-  it('chọn bài ⇒ "Bài hôm nay" + xem-truoc (bỏ Ví dụ minh hoạ) ⇒ thẻ xác nhận ĐỦ 6 con số + cảnh báo quá tải; tick gửi đúng maDe + phamVi', async () => {
+  it('chọn bài ⇒ "Bài hôm nay" + xem-truoc (chỉ Trắc nghiệm / Đúng sai / Trả lời ngắn) ⇒ thẻ xác nhận ĐỦ 6 con số + cảnh báo quá tải; tick gửi đúng maDe + phamVi', async () => {
     const buoc = await moBuoc()
     fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
     expect(dong(buoc, 'DH-12-C1-B3').textContent).toContain('Bài hôm nay')
     await waitFor(() => expect(lenh('xem-truoc').length).toBe(1))
-    expect(lenh('xem-truoc')[0]).toEqual({ action: 'xem-truoc', lop: '12A1', khoaBai: 'DH-12-C1-B3', tenBai: 'Bài 3. Xà phòng và chất giặt rửa', viTri: 3, maDe: ['DH-12-C1-B3-DT', 'DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'] })
+    expect(lenh('xem-truoc')[0]).toEqual({ action: 'xem-truoc', lop: '12A1', khoaBai: 'DH-12-C1-B3', tenBai: 'Bài 3. Xà phòng và chất giặt rửa', viTri: 3, maDe: ['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'] })
 
     const the = (await screen.findByText('Câu rút được')).closest('[data-khoi="xac-nhan-tick"]') as HTMLElement
     const o = (k: string) => (the.querySelector(`[data-so-tick="${k}"]`) as HTMLElement).textContent ?? ''
@@ -203,9 +242,13 @@ describe('màn: bước Bài hôm nay', () => {
     // Chữ chuẩn A2: app thầy không dùng chữ "thể lực".
     expect(buoc.textContent).not.toMatch(/thể lực/i)
 
-    // Ô tích thêm "Ví dụ minh hoạ" ⇒ xem trước lại với tờ ấy.
-    fireEvent.click(within(the).getByRole('checkbox', { name: /Ví dụ minh hoạ/ }))
-    await waitFor(() => expect(lenh('xem-truoc').at(-1)!.maDe).toEqual(['DH-12-C1-B3-VD', 'DH-12-C1-B3-DT', 'DH-12-C1-B3-TN', 'DH-12-C1-B3-DS']))
+    expect(the.querySelector('[data-khoi="qua-tai"]')?.textContent).toContain('Gợi ý: lùi hạn nộp hoặc tăng số lượt mỗi ngày')
+    // Thầy 05/10: ba phần TỰ GIAO là dòng tĩnh (phần 0 câu — ở đây Trả lời ngắn — bỏ khỏi dòng) + ghi chú; KHÔNG còn ô tích tờ nào.
+    const tuGiao = the.querySelector('[data-khoi="tu-giao"]') as HTMLElement
+    expect(tuGiao.textContent).toContain('Tự giao: Trắc nghiệm · 2 câu · Đúng sai · 1 câu')
+    expect(tuGiao.textContent).not.toContain('Trả lời ngắn')
+    expect(tuGiao.textContent).toContain('Không giao Ví dụ minh hoạ và Các dạng toán trọng tâm.')
+    expect(within(the).queryAllByRole('checkbox')).toHaveLength(0)
 
     fireEvent.click(within(the).getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
     await waitFor(() => expect(lenh('tick')).toHaveLength(1))
@@ -215,7 +258,7 @@ describe('màn: bước Bài hôm nay', () => {
       khoaBai: 'DH-12-C1-B3',
       tenBai: 'Bài 3. Xà phòng và chất giặt rửa',
       viTri: 3,
-      maDe: ['DH-12-C1-B3-VD', 'DH-12-C1-B3-DT', 'DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'],
+      maDe: ['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'],
       phamVi: [
         { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, maDe: ['DH-12-C1-B1-TN', 'DH-12-C1-B1-DS'] },
         { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, maDe: ['DH-12-C1-B2'] },
@@ -224,6 +267,20 @@ describe('màn: bước Bài hôm nay', () => {
     // Giao xong: nạp lại trạng thái lớp, thẻ xác nhận đóng.
     await waitFor(() => expect(lenh('danh-sach').length).toBeGreaterThanOrEqual(2))
     await waitFor(() => expect(document.querySelector('[data-khoi="xac-nhan-tick"]')).toBeNull())
+  })
+
+  it('bài chỉ có Ví dụ minh hoạ / Các dạng toán trọng tâm ⇒ không có dòng "Tự giao", báo "Bài này chưa có tờ …" một lần, nút giao khoá, không gọi xem-truoc', async () => {
+    co = { bat: true, lop: [], sbd: [] }
+    const buoc = await moBuoc()
+    fireEvent.change(within(buoc).getByLabelText('Lớp'), { target: { value: '11B' } })
+    await waitFor(() => expect(dong(buoc, 'DH-11-C2-B4')).toBeTruthy())
+    fireEvent.click(within(dong(buoc, 'DH-11-C2-B4')).getByRole('radio'))
+    const the = buoc.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement
+    expect(the.querySelector('[data-khoi="tu-giao"]')!.textContent).toBe('Không giao Ví dụ minh hoạ và Các dạng toán trọng tâm.')
+    expect(within(the).getAllByText('Bài này chưa có tờ Trắc nghiệm / Đúng sai / Trả lời ngắn.')).toHaveLength(1)
+    expect((within(the).getByRole('button', { name: 'Giao Bài 4 cho 11B' }) as HTMLButtonElement).disabled).toBe(true)
+    await new Promise((r) => setTimeout(r, 400)) // quá nhịp chờ gõ của xem trước
+    expect(lenh('xem-truoc')).toHaveLength(0)
   })
 
   it('"Sửa hạn nộp hoặc số lượt/ngày": hai ô như màn Giao chiến dịch ⇒ xem-truoc + tick mang hanNop / theLucNgay', async () => {

@@ -2,7 +2,8 @@
 // CHỈ hiện khi công tắc OMNI bật (`/gv/omni co-doc`); tắt / máy chủ chưa có lệnh ⇒ bảng Dạy học y như cũ (thầy lệnh 05/10: giữ nguyên giao diện).
 // Chọn lớp (lớp của buổi đang mở nếu OMNI áp cho lớp ấy, không thì thầy chọn) → cây DẠY HỌC của khối (CHỌN MỘT BÀI; mỗi bài một chip trạng thái
 // từ `/gv/bai-da-day danh-sach`) → `xem-truoc` ⇒ thẻ xác nhận 6 con số + cảnh báo quá tải → nút chính "Giao Bài <số> cho <lớp>" ⇒ `tick`
-// (tờ đã tách phần của bài trừ "Ví dụ minh hoạ" — có ô tích để thêm; phạm vi = mọi bài đứng TRƯỚC trong cây cùng khối kèm tờ của chúng).
+// (TỰ GIAO đúng ba phần Trắc nghiệm / Đúng sai / Trả lời ngắn của bài — thầy 05/10, KHÔNG ô tích, bỏ hẳn Ví dụ minh hoạ và Các dạng toán trọng tâm;
+// phạm vi = mọi bài đứng TRƯỚC trong cây cùng khối kèm tờ tự giao của chúng).
 // Bài đã tick: "Bỏ tick" (hỏi lại, nói thật hậu quả). Lớp chờ bài mới từ 3 ngày ⇒ một dòng nhỏ ở đầu bảng (`DongChoBaiMoi`).
 // CHỌN EM NHẬN BÀI (thầy nhắn 05/10: "cho thêm chỗ chọn giao cho hs nhé (bạn bê luôn cái chọn hs ở chiến dịch cũ, cho chọn hs theo điểm danh nữa)"):
 // trong thẻ xác nhận, BÊ NGUYÊN khối "Chọn em nhận chiến dịch" của màn Giao (`ChonEmGiao` + `useDsEmGiao`, mặc định cả lớp của bài) + hàng chip
@@ -17,7 +18,10 @@ import { dungCay } from '../../lib/cay-chon-de'
 import { locDeDayHoc } from '../../lib/day-hoc-len-bang'
 import { TEN_AI } from '../../lib/omni-chu'
 import {
+  CHU_BAI_CHUA_CO_TO_TU_GIAO,
+  CHU_KHONG_GIAO_MUC_DAY_HOC,
   chuChoBaiMoi,
+  chuTuGiao,
   dsBaiCuaKhoi,
   khoiCuaTenLop,
   maDeMacDinh,
@@ -185,9 +189,9 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
       .filter((c) => c.chon.length > 0)
   }, [tt, dsBuoi, dsEm, lop])
 
-  // CHỌN MỘT BÀI + tờ vào bài luyện + sửa hạn nộp / số lượt.
+  // CHỌN MỘT BÀI (tờ tự giao suy từ bài, không ô tích) + sửa hạn nộp / số lượt.
   const [chon, setChon] = useState<BaiCay | null>(null)
-  const [toChon, setToChon] = useState<Set<string>>(new Set())
+  const maDeTuGiao = useMemo(() => (chon ? maDeMacDinh(chon) : []), [chon])
   const [moSua, setMoSua] = useState(false)
   const [hanSua, setHanSua] = useState('')
   const [theLucChu, setTheLucChu] = useState('')
@@ -199,19 +203,11 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   }, [lop])
   const chonBai = (b: BaiCay) => {
     setChon(b)
-    setToChon(new Set(maDeMacDinh(b)))
     setMoSua(false)
     setHanSua('')
     setTheLucChu('')
     setLoiGiao('')
   }
-  const doiTo = (maDe: string) =>
-    setToChon((cu) => {
-      const m = new Set(cu)
-      if (m.has(maDe)) m.delete(maDe)
-      else m.add(maDe)
-      return m
-    })
   const nTheLuc = Math.floor(Number(theLucChu))
   const theLucSua = theLucChu.trim() && Number.isFinite(nTheLuc) && nTheLuc >= 1 ? Math.min(LUOT_TOI_DA, nTheLuc) : undefined
   const loiTheLuc = theLucChu.trim() && !theLucSua ? 'Số lượt phải là số nguyên từ 1' : ''
@@ -219,7 +215,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
 
   const dauVao: DauVaoBai | null = useMemo(() => {
     if (!chon || !lop) return null
-    const maDe = chon.to.filter((t) => toChon.has(t.maDe)).map((t) => t.maDe)
+    const maDe = maDeTuGiao
     if (!maDe.length) return null
     // Có danh sách em ⇒ gửi đúng em đã chọn (0 em ⇒ chưa đủ đầu vào); chưa có ⇒ hành vi cũ: máy chủ giao cả lớp.
     if (coDanhSachEm && !sbdChon.length) return null
@@ -233,7 +229,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
       ...(theLucSua ? { theLucNgay: theLucSua } : {}),
       ...(coDanhSachEm ? { sbd: sbdChon } : {}),
     }
-  }, [chon, lop, toChon, hanSua, hanHopLe, theLucSua, coDanhSachEm, sbdChon])
+  }, [chon, lop, maDeTuGiao, hanSua, hanHopLe, theLucSua, coDanhSachEm, sbdChon])
 
   // XEM TRƯỚC: mỗi lần đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const [xem, setXem] = useState<XemTruocTick | null>(null)
@@ -353,8 +349,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     tickTheoKhoa,
     chon,
     chonBai,
-    toChon,
-    doiTo,
+    maDeTuGiao,
     moSua,
     setMoSua,
     hanSua,
@@ -533,9 +528,10 @@ function NapDsEm({ onCo }: { onCo: (ds: EmLop[]) => void }) {
 
 /** Thẻ XÁC NHẬN TRƯỚC KHI GIAO: tờ vào bài luyện, 6 con số có nhãn, cảnh báo quá tải, nút chính + nút sửa hạn nộp / số lượt. */
 function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: XemTruocTick | null }) {
-  const { lop, toChon, doiTo, moSua, setMoSua, hanSua, setHanSua, theLucChu, setTheLucChu, theLucSua, loiTheLuc, hanHopLe, homNay, dauVao, loiXem, dangXem, giao, dangGiao, loiGiao } = bhn
+  const { lop, maDeTuGiao, moSua, setMoSua, hanSua, setHanSua, theLucChu, setTheLucChu, theLucSua, loiTheLuc, hanHopLe, homNay, dauVao, loiXem, dangXem, giao, dangGiao, loiGiao } = bhn
   const { dsEm, chonEm, setChonEm, emLop, coDanhSachEm, sbdChon, chipBuoi } = bhn
   const ten = tenNganBai(chon.tenBai)
+  const tuGiao = chuTuGiao(chon)
   const quaTai = xem?.quaTai ?? []
   const pct = xem && xem.sucChua > 0 ? Math.round((100 * xem.luotCan) / xem.sucChua) : null
   return (
@@ -544,21 +540,11 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
         <h3>Xác nhận trước khi giao · {chon.tenBai}</h3>
       </div>
 
-      <div role="group" aria-label={`Tờ của ${ten} vào bài luyện`}>
-        <p className="dh-phu">Tờ vào bài luyện (câu tự luận tự bỏ):</p>
-        <ul className="dh-chip-ds">
-          {chon.to.map((t) => (
-            <li key={t.maDe} style={{ maxWidth: '100%' }}>
-              <label className="dh-them-o">
-                <input type="checkbox" checked={toChon.has(t.maDe)} onChange={() => doiTo(t.maDe)} />
-                <span>
-                  {t.nhan} · {t.soCau} câu
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
-        {chon.to.some((t) => t.laViDu && !toChon.has(t.maDe)) && <p className="dh-phu">“Ví dụ minh hoạ” mặc định không vào bài luyện (dùng khi dạy) — tích để thêm.</p>}
+      {/* Thầy 05/10: ba phần Trắc nghiệm / Đúng sai / Trả lời ngắn TỰ GIAO (dòng tĩnh, không ô tích); Ví dụ minh hoạ và Các dạng toán trọng tâm không bao giờ giao. */}
+      <div data-khoi="tu-giao">
+        {/* Bài không còn tờ tự giao ⇒ chỉ một lời báo (khối lỗi bên dưới), không nhắc hai chỗ. */}
+        {tuGiao && <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{tuGiao}</p>}
+        <p className="dh-phu">{CHU_KHONG_GIAO_MUC_DAY_HOC}</p>
       </div>
 
       {/* BÊ NGUYÊN khối "Chọn em nhận chiến dịch" của màn Giao (thầy nhắn 05/10) + chọn theo điểm danh. Chưa có danh sách em ⇒ giao cả lớp như cũ. */}
@@ -596,9 +582,9 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
 
       {!dauVao ? (
         // Chưa chọn em ⇒ lời báo đã nằm NGAY CẠNH bộ chọn em (không nhắc hai chỗ).
-        toChon.size > 0 && coDanhSachEm && !sbdChon.length ? null : (
+        maDeTuGiao.length > 0 && coDanhSachEm && !sbdChon.length ? null : (
           <p className="dh-loi" role="alert">
-            {toChon.size === 0 ? 'Chọn ít nhất một tờ để giao.' : !hanHopLe ? 'Hạn nộp phải từ hôm nay trở đi.' : 'Chưa đủ thông tin để xem trước.'}
+            {maDeTuGiao.length === 0 ? CHU_BAI_CHUA_CO_TO_TU_GIAO : !hanHopLe ? 'Hạn nộp phải từ hôm nay trở đi.' : 'Chưa đủ thông tin để xem trước.'}
           </p>
         )
       ) : loiXem && !dangXem ? (
@@ -666,8 +652,8 @@ function TheXacNhan({ bhn, chon, xem }: { bhn: BaiHomNay; chon: BaiCay; xem: Xem
       {xem && quaTai.length > 0 && (
         <p className="dh-loi" role="alert" data-khoi="qua-tai">
           {quaTai.length} em quá tải ngay từ ngày đầu: {quaTai.slice(0, TOI_DA_TEN_QUA_TAI).map((e) => e.ten).join(', ')}
-          {quaTai.length > TOI_DA_TEN_QUA_TAI ? ` và ${quaTai.length - TOI_DA_TEN_QUA_TAI} em nữa` : ''}. Gợi ý: bỏ bớt tờ ở trên, lùi hạn nộp hoặc tăng số lượt mỗi
-          ngày. Vẫn giao được.
+          {quaTai.length > TOI_DA_TEN_QUA_TAI ? ` và ${quaTai.length - TOI_DA_TEN_QUA_TAI} em nữa` : ''}. Gợi ý: lùi hạn nộp hoặc tăng số lượt mỗi ngày. Vẫn giao
+          được.
         </p>
       )}
 

@@ -40,6 +40,8 @@ const NGAY = 86_400_000
 const LOP = '12 - Tinh Hoa'
 const B6 = 'DH-12-C2-B6'
 const MA_B6 = [`${B6}-TN`, `${B6}-DS`, `${B6}-TLN`, `${B6}-DT`]
+/** Tờ thật sự vào bài (thầy 05/10: chỉ Trắc nghiệm / Đúng sai / Trả lời ngắn — máy chủ tự bỏ -VD / -DT / -TL kể cả khi app cũ còn gửi). */
+const MA_B6_GIAO = [`${B6}-TN`, `${B6}-DS`, `${B6}-TLN`]
 const TEN_B6 = 'Bài 6. Tinh bột và cellulose'
 const BAI_TRUOC = [
   { khoaBai: 'B4', tenBai: 'Bài 4. Glucose và fructose', viTri: 4, maDe: ['DH-12-C2-B4-TN'] },
@@ -84,9 +86,9 @@ describe('xem-truoc — dòng xác nhận, không ghi gì', () => {
   it('đủ 6 con số; hạn tự tính D ∈ [7,14] từ lượt cần của em trung vị; không tạo chiến dịch, không ghi bảng', async () => {
     const { d, env } = dung()
     const r = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, maDe: MA_B6 }, T0)
-    // 9 câu dùng được: bỏ 1 câu Phần III tự luận + 2 câu tờ "-DT" (luật tự luận chung cau-tu-luan.ts coi mã -VD/-DT/-TL là mục dạy học/tự luận)
-    // ⇒ soTuLuan 3; em mới: 18 lượt; thể lực mặc định 40 ⇒ D nhỏ nhất với 18 ≤ 0,8 × D × 40 là 7.
-    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 3, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
+    // 9 câu dùng được: tờ "-DT" bị bỏ NGAY ở đầu vào (lưới an toàn 05/10 — chỉ Trắc nghiệm / Đúng sai / Trả lời ngắn) ⇒ chỉ còn 1 câu Phần III tự luận
+    // bị bỏ ⇒ soTuLuan 1; em mới: 18 lượt; thể lực mặc định 40 ⇒ D nhỏ nhất với 18 ≤ 0,8 × D × 40 là 7.
+    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 1, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
     expect([d.dem('chien_dich'), d.dem('bai_da_day'), d.dem('pham_vi_lop')]).toEqual([0, 0, 0])
   })
   it('thể lực lớp đọc từ cau_hinh.the_luc_lop; thể lực quá thấp ⇒ D = 14 và danh sách em quá tải có tên', async () => {
@@ -139,13 +141,13 @@ describe('tick — tạo đúng một chiến dịch theo bài', () => {
     const cd = chienDich(d, id)
     expect(cd).toMatchObject({ ten: 'Bài 6 · Tinh bột và cellulose', lop: LOP, han_nop: '2026-10-11', the_luc_ngay: 40, huyet_chien: 1, trang_thai: 'dang_chay' })
     expect(JSON.parse(String(cd.sbd_json))).toEqual(['S1', 'S2', 'S3'])
-    expect(JSON.parse(String(cd.ma_de_json))).toEqual([B6, `${B6}-DT`])
+    expect(JSON.parse(String(cd.ma_de_json))).toEqual([B6]) // tờ -DT app gửi kèm đã bị bỏ trước khi tạo chiến dịch
     expect(JSON.parse(String(cd.qid_json))).toEqual(QID_B6)
     expect(d.sql.prepare('SELECT rai_deu FROM chien_dich_tuy_chon WHERE id = ?').get(id)).toEqual({ rai_deu: 1 })
     const coBangBatDau = (d.sql.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'table' AND name = 'chien_dich_bat_dau'").get() as { n: number }).n
     if (coBangBatDau) expect(d.dem('chien_dich_bat_dau')).toBe(0) // bắt đầu hôm nay ⇒ không cần dòng ngày bắt đầu (bảng phụ tạo lúc chạy có thể chưa có)
     const dong = d.sql.prepare('SELECT lop, khoa_bai, ten_bai, vi_tri, ma_to_json, nguoi, chien_dich_id, bo_tick_luc FROM bai_da_day').all()
-    expect(dong).toEqual([{ lop: LOP, khoa_bai: 'B6', ten_bai: TEN_B6, vi_tri: 6, ma_to_json: JSON.stringify(MA_B6), nguoi: 'thầy Học', chien_dich_id: id, bo_tick_luc: null }])
+    expect(dong).toEqual([{ lop: LOP, khoa_bai: 'B6', ten_bai: TEN_B6, vi_tri: 6, ma_to_json: JSON.stringify(MA_B6_GIAO), nguoi: 'thầy Học', chien_dich_id: id, bo_tick_luc: null }])
     expect(d.sql.prepare('SELECT khoa_bai, nguon, vi_tri FROM pham_vi_lop ORDER BY vi_tri').all()).toEqual([
       { khoa_bai: 'B4', nguon: 'truoc', vi_tri: 4 }, { khoa_bai: 'B5', nguon: 'truoc', vi_tri: 5 }, { khoa_bai: 'B6', nguon: 'tick', vi_tri: 6 },
     ])
@@ -183,7 +185,7 @@ describe('tick — tạo đúng một chiến dịch theo bài', () => {
     d.sql.prepare("UPDATE bai_da_day SET tick_luc = ? WHERE id = 'giu'").run(new Date(T0 - 5 * 60_000).toISOString())
     const r = await tickB6(env)
     expect(r).toMatchObject({ ok: true, daCo: false, hanNop: '2026-10-11' })
-    expect(d.sql.prepare('SELECT id, chien_dich_id, ma_to_json FROM bai_da_day').all()).toEqual([{ id: 'giu', chien_dich_id: r.chienDichId, ma_to_json: JSON.stringify(MA_B6) }])
+    expect(d.sql.prepare('SELECT id, chien_dich_id, ma_to_json FROM bai_da_day').all()).toEqual([{ id: 'giu', chien_dich_id: r.chienDichId, ma_to_json: JSON.stringify(MA_B6_GIAO) }])
     expect(d.dem('chien_dich')).toBe(1)
   })
   it('hạn và thể lực thầy đặt ⇒ dùng nguyên', async () => {
@@ -203,6 +205,32 @@ describe('tick — tạo đúng một chiến dịch theo bài', () => {
     expect((await gvBaiDaDay(env, { action: 'tick', lop: 'Lớp ma', khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, maDe: MA_B6 }, T0)).ok).toBe(false)
     expect((await gvBaiDaDay(env, { action: 'khong-co' }, T0)).ok).toBe(false)
   })
+  it('lưới an toàn 05/10: app gửi kèm tờ -VD / -DT / -TL (ở bài tick lẫn phamVi) ⇒ máy chủ bỏ trước khi tính / giao; chỉ còn tờ ấy ⇒ từ chối, không ghi gì', async () => {
+    const { d, env } = dung()
+    const phamVi = [
+      { khoaBai: 'B4', tenBai: 'Bài 4. Glucose và fructose', viTri: 4, maDe: ['DH-12-C2-B4-TN', 'DH-12-C2-B4-VD', 'DH-12-C2-B4-DT'] },
+      { khoaBai: 'B5', tenBai: 'Bài 5. Saccharose và maltose', viTri: 5, maDe: ['DH-12-C2-B5-VDMH', 'DH-12-C2-B5-TL', 'DH-12-C2-B5-DS'] },
+    ]
+    const xem = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, maDe: [...MA_B6, `${B6}-VD`] }, T0)
+    expect(xem).toMatchObject({ ok: true, soCau: 9, soTuLuan: 1 }) // tờ -VD/-DT không góp câu nào, kể cả vào số câu tự luận đã bỏ
+    const r = await tickB6(env, { maDe: [`${B6}-VD`, ...MA_B6, `${B6}-VDMH`], phamVi })
+    expect(r).toMatchObject({ ok: true, daCo: false })
+    expect(JSON.parse(String(chienDich(d, String(r.chienDichId)).qid_json))).toEqual(QID_B6)
+    expect(d.sql.prepare('SELECT ma_to_json FROM bai_da_day').get()).toEqual({ ma_to_json: JSON.stringify(MA_B6_GIAO) })
+    expect(d.sql.prepare('SELECT khoa_bai, ma_de_json FROM pham_vi_lop ORDER BY vi_tri').all()).toEqual([
+      { khoa_bai: 'B4', ma_de_json: JSON.stringify(['DH-12-C2-B4-TN']) },
+      { khoa_bai: 'B5', ma_de_json: JSON.stringify(['DH-12-C2-B5-DS']) },
+      { khoa_bai: 'B6', ma_de_json: JSON.stringify(MA_B6_GIAO) },
+    ])
+    // Bài chỉ có Ví dụ minh hoạ / Các dạng toán trọng tâm ⇒ cùng một lời ở cả xem-truoc lẫn tick; không ghi dòng nào.
+    const chiMucDayHoc = { lop: LOP, khoaBai: 'B9', tenBai: 'Bài 9. Thử', viTri: 9, maDe: ['DH-12-C3-B9-VD', 'DH-12-C3-B9-DT', 'DH-12-C3-B9-DTTT'] }
+    for (const action of ['xem-truoc', 'tick']) {
+      expect(await gvBaiDaDay(env, { action, ...chiMucDayHoc }, T0), action).toEqual({ ok: false, error: 'Bài này chưa có tờ Trắc nghiệm / Đúng sai / Trả lời ngắn.' })
+    }
+    expect(d.dem('bai_da_day', "khoa_bai = 'B9'")).toBe(0)
+    expect(d.dem('chien_dich')).toBe(1)
+  })
+
   it('bảng chưa có (CI không chạy migration) ⇒ tick tự tạo bảng', async () => {
     const { d, env } = dung()
     d.sql.exec('DROP TABLE bai_da_day; DROP TABLE pham_vi_lop')
@@ -287,7 +315,7 @@ describe('phạm vi đã dạy + lớp của em', () => {
     expect(await phamViLop(env, LOP)).toBeNull()
     const r = await tickB6(env)
     const pv = await phamViLop(env, LOP)
-    expect([...pv!.maDe].sort()).toEqual(['DH-12-C2-B4', 'DH-12-C2-B5', B6, `${B6}-DT`])
+    expect([...pv!.maDe].sort()).toEqual(['DH-12-C2-B4', 'DH-12-C2-B5', B6]) // tờ -DT app gửi kèm không vào phạm vi (lưới an toàn 05/10)
     expect(pv!.baiDaTick).toEqual([{ khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, chienDichId: r.chienDichId, tickLuc: new Date(T0).toISOString() }])
     expect(pv!.baiTheoMaDe.get('DH-12-C2-B5')).toEqual({ khoaBai: 'B5', tenBai: 'Bài 5. Saccharose và maltose', viTri: 5 })
     const r7 = await gvBaiDaDay(env, {
@@ -295,12 +323,12 @@ describe('phạm vi đã dạy + lớp của em', () => {
       phamVi: [...BAI_TRUOC, { khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, maDe: [`${B6}-TN`] }],
     }, T0 + 3 * NGAY)
     expect(r7).toMatchObject({ ok: true, daCo: false })
-    expect(d.sql.prepare("SELECT nguon, ma_de_json FROM pham_vi_lop WHERE khoa_bai = 'B6'").get()).toEqual({ nguon: 'tick', ma_de_json: JSON.stringify(MA_B6) })
+    expect(d.sql.prepare("SELECT nguon, ma_de_json FROM pham_vi_lop WHERE khoa_bai = 'B6'").get()).toEqual({ nguon: 'tick', ma_de_json: JSON.stringify(MA_B6_GIAO) })
     const pv7 = await phamViLop(env, LOP)
     expect(pv7!.maDe.has('DH-12-C2-B7')).toBe(true)
     expect(pv7!.baiDaTick.map((b) => b.khoaBai)).toEqual(['B6', 'B7'])
     await gvBaiDaDay(env, { action: 'bo-tick', lop: LOP, khoaBai: 'B7' }, T0 + 4 * NGAY)
-    expect([...(await phamViLop(env, LOP))!.maDe].sort()).toEqual(['DH-12-C2-B4', 'DH-12-C2-B5', B6, `${B6}-DT`])
+    expect([...(await phamViLop(env, LOP))!.maDe].sort()).toEqual(['DH-12-C2-B4', 'DH-12-C2-B5', B6])
     await gvBaiDaDay(env, { action: 'bo-tick', lop: LOP, khoaBai: 'B6' }, T0 + 4 * NGAY)
     expect(await phamViLop(env, LOP)).toBeNull()
   })

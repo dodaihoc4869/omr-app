@@ -1,11 +1,16 @@
 // BÀI HÔM NAY (OMNI 3 · tick bài đã dạy — DAC-TA-BUILD-OMNI-3-0510.md mục 1 bước 1, prompt-tick-bai-tu-giao.md mục A) — phần THUẦN của bước
 // "Bài hôm nay" trong bảng Dạy học: lấy danh sách bài của MỘT khối từ cây DẠY HỌC (`dungCay` trên `locDeDayHoc` — thứ tự cây = thứ tự SGK),
-// khoá bài ổn định, tờ vào bài luyện (mặc định bỏ "Ví dụ minh hoạ"), phạm vi = mọi bài đứng TRƯỚC, chữ trạng thái từng bài.
-// Không IO, không đọc đồng hồ (nơi gọi đưa `homNay`). Có test (`tests/omni-3-thay-bai-hom-nay.test.tsx`).
+// khoá bài ổn định, tờ TỰ GIAO (thầy 05/10: "Khi tích chọn bạn chỉ lấy 3 phần trắc nghiệm, đúng sai trả lời ngắn làm tự động giao bỏ phần ví dụ
+// minh họa và các dạng trọng tâm nhé." ⇒ CHỈ tờ phần Trắc nghiệm / Đúng sai / Trả lời ngắn, không ô tích), phạm vi = mọi bài đứng TRƯỚC (cùng luật tờ),
+// chữ trạng thái từng bài. Không IO, không đọc đồng hồ (nơi gọi đưa `homNay`). Có test (`tests/omni-3-thay-bai-hom-nay.test.tsx`).
+import { laMaDeTuLuan } from './cau-tu-luan'
 import { tongCau, type Nut } from './cay-chon-de'
-import { goMaDeTachRa } from './tach-phan-de'
+import { goMaDeTachRa, PHAN_DE_TACH, TEN_PHAN_TACH, type PhanDe } from './tach-phan-de'
 
-export const NHAN_VI_DU = 'Ví dụ minh hoạ'
+/** Dòng ghi chú dưới dòng "Tự giao: …" của thẻ xác nhận. */
+export const CHU_KHONG_GIAO_MUC_DAY_HOC = 'Không giao Ví dụ minh hoạ và Các dạng toán trọng tâm.'
+/** Bài không còn tờ nào tự giao được — cùng lời máy chủ (`/gv/bai-da-day`, bai-da-day.ts). */
+export const CHU_BAI_CHUA_CO_TO_TU_GIAO = 'Bài này chưa có tờ Trắc nghiệm / Đúng sai / Trả lời ngắn.'
 /** Nhắc thầy từ ngày chờ thứ 3 (prompt tick bài mục D3): "Lớp 12A1: 3 ngày chưa có bài mới". */
 export const NGAY_NHAC_CHO_BAI_MOI = 3
 
@@ -13,8 +18,12 @@ export const NGAY_NHAC_CHO_BAI_MOI = 3
 export interface ToBai {
   maDe: string
   nhan: string
+  /** Số câu của tờ (tờ đã tách phần: số câu của phần ấy). */
   soCau: number
-  laViDu: boolean
+  /** Phần của tờ: hậu tố -TN / -DS / -TLN, hoặc tờ chưa tách chỉ có câu của MỘT phần. Ví dụ minh hoạ / Các dạng toán trọng tâm / tờ rỗng ⇒ null. */
+  phan: PhanDe | null
+  /** Tự giao khi tick: tờ phần Trắc nghiệm / Đúng sai / Trả lời ngắn có câu — không bao giờ là Ví dụ minh hoạ hay Các dạng toán trọng tâm. */
+  tuDong: boolean
 }
 /** Một bài trong cây DẠY HỌC của khối. */
 export interface BaiCay {
@@ -28,7 +37,25 @@ export interface BaiCay {
   to: ToBai[]
 }
 
-const laTenViDu = (n: Pick<Nut, 'nhan' | 'maDe'>) => n.nhan === NHAN_VI_DU || /-(?:VD|VDMH)$/i.test(goMaDeTachRa(n.maDe ?? '').goc)
+/** Mã tờ KHÔNG tự giao: nhãn mục dạy học / tự luận (-VD, -DT, -TL — `laMaDeTuLuan`, cau-tu-luan.ts) và dạng dài -VDMH, -DTTT. Máy chủ dùng cùng luật. */
+export const laMaToKhongGiao = (maDe: string): boolean => laMaDeTuLuan(maDe) || /(?:^|-)(?:VDMH|DTTT)(?:-|$)/i.test(String(maDe ?? ''))
+/** Chữ hoa không dấu (so tên bền với "HOẠ" / "HỌA", NFC / NFD). */
+const khongDau = (s: string): string => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'D').toUpperCase()
+const TEN_MUC_KHONG_GIAO = ['VI DU MINH HOA', 'DANG TOAN TRONG TAM']
+/** Tờ "Ví dụ minh hoạ" / "Các dạng toán trọng tâm" (theo mã hoặc theo tên đã chuẩn hoá) — không bao giờ tự giao. */
+export function laToKhongGiao(t: { maDe?: string | null; nhan?: string | null }): boolean {
+  if (laMaToKhongGiao(String(t.maDe ?? '').trim())) return true
+  const ten = khongDau(String(t.nhan ?? ''))
+  return TEN_MUC_KHONG_GIAO.some((x) => ten.includes(x))
+}
+/** Phần của một lá: hậu tố tách phần, không có thì phần DUY NHẤT có câu; mục không giao / tờ rỗng / nhiều phần ⇒ null. */
+function phanCuaLa(l: Pick<Nut, 'maDe' | 'nhan' | 'soCau'>): PhanDe | null {
+  if (laToKhongGiao(l)) return null
+  const p = goMaDeTachRa(String(l.maDe ?? '')).phan
+  if (p) return l.soCau[p] > 0 ? p : null
+  const co = PHAN_DE_TACH.filter((k) => l.soCau[k] > 0)
+  return co.length === 1 ? co[0]! : null
+}
 
 /** Mã gốc của bài: bỏ hậu tố phần (-TN/-DS/-TLN), mục đặc biệt (-VD/-VDMH/-DT/-DTTT) và đuôi cắt bài lớn (-D1, -D2). */
 export function maGocBai(maDe: string): string {
@@ -69,19 +96,35 @@ export function dsBaiCuaKhoi(cay: readonly Nut[], khoi: string): BaiCay[] {
     for (const bai of dsBai) {
       const to: ToBai[] = bai.con
         .filter((l) => !!l.maDe)
-        .map((l) => ({ maDe: l.maDe!, nhan: l.nhan, soCau: tongCau(l.soCau), laViDu: laTenViDu(l) }))
+        .map((l) => {
+          const phan = phanCuaLa(l)
+          return { maDe: l.maDe!, nhan: l.nhan, soCau: tongCau(l.soCau), phan, tuDong: phan !== null }
+        })
       ra.push({ khoaBai: khoaBaiCua(bai), tenBai: bai.nhan, viTri: ra.length + 1, chuong: chuong.tang === 'bai' ? '' : chuong.nhan, soCau: tongCau(bai.soCau), to })
     }
   }
   return ra
 }
 
-/** Tờ vào bài luyện mặc định: mọi tờ trừ "Ví dụ minh hoạ" (thầy tích thêm được). */
+/** Tờ TỰ GIAO của bài (không ô tích): CHỈ tờ phần Trắc nghiệm / Đúng sai / Trả lời ngắn — bỏ hẳn Ví dụ minh hoạ và Các dạng toán trọng tâm. */
 export function maDeMacDinh(bai: Pick<BaiCay, 'to'>): string[] {
-  return bai.to.filter((t) => !t.laViDu).map((t) => t.maDe)
+  return bai.to.filter((t) => t.tuDong && t.phan !== null && !laToKhongGiao(t)).map((t) => t.maDe)
 }
 
-/** Phạm vi đã dạy gửi kèm `tick`: mọi bài đứng TRƯỚC bài này trong cây cùng khối, kèm tờ của chúng (bỏ "Ví dụ minh hoạ" như bài luyện). */
+/** Ba phần tự giao của bài, thứ tự I → II → III, cộng số câu mọi tờ cùng phần; phần 0 câu bị bỏ. */
+export function phanTuGiao(bai: Pick<BaiCay, 'to'>): { phan: PhanDe; ten: string; soCau: number }[] {
+  const tu = new Set(maDeMacDinh(bai))
+  return PHAN_DE_TACH.map((p) => ({ phan: p, ten: TEN_PHAN_TACH[p], soCau: bai.to.filter((t) => tu.has(t.maDe) && t.phan === p).reduce((n, t) => n + t.soCau, 0) })).filter(
+    (x) => x.soCau > 0,
+  )
+}
+/** "Tự giao: Trắc nghiệm · 22 câu · Đúng sai · 6 câu · Trả lời ngắn · 4 câu" (phần 0 câu bỏ khỏi dòng); không phần nào ⇒ null. */
+export function chuTuGiao(bai: Pick<BaiCay, 'to'>): string | null {
+  const ds = phanTuGiao(bai)
+  return ds.length ? `Tự giao: ${ds.map((x) => `${x.ten} · ${x.soCau} câu`).join(' · ')}` : null
+}
+
+/** Phạm vi đã dạy gửi kèm `tick`: mọi bài đứng TRƯỚC bài này trong cây cùng khối, kèm tờ TỰ GIAO của chúng (cùng luật `maDeMacDinh`). */
 export function phamViTruoc(dsBai: readonly BaiCay[], viTri: number): { khoaBai: string; tenBai: string; viTri: number; maDe: string[] }[] {
   return dsBai.filter((b) => b.viTri < viTri).map((b) => ({ khoaBai: b.khoaBai, tenBai: b.tenBai, viTri: b.viTri, maDe: maDeMacDinh(b) }))
 }
