@@ -1,0 +1,49 @@
+# THAY CÂU Ở CA "KIỂM CHỨNG CÂU ĐÃ ĐÚNG" (thầy 06/10) — ĐỘ PHỦ + TẢI TRÊN D1 THẬT (CHỈ ĐỌC, chỉ in SỐ ĐẾM — repo công khai, nhật ký ai cũng đọc được).
+# Chạy ĐÚNG hàm máy chủ `cauThayDaDung` cho vài em mẫu: bao nhiêu câu em đã đúng được thay số / thay bằng câu cùng dạng / giữ nguyên, bao nhiêu giây và truy vấn D1 mỗi em.
+# Bấm tay (workflow_dispatch) hoặc tự chạy khi đẩy nhánh KHÁC main có sửa các tệp dưới đây.
+name: Thay câu đã đúng — độ phủ và tải (chỉ đọc, chỉ đếm)
+on:
+  workflow_dispatch:
+    inputs:
+      so_em:
+        description: 'Số em mẫu (1–60)'
+        required: false
+        default: '12'
+  push:
+    paths: ['.github/workflows/do-phu-thay-so-0610.yml', 'scripts/do-phu-thay-so-0610.ts', 'server/src/cau-thay-so.ts', 'server/src/cau-anh-em.ts']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: do-phu-thay-so-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bộ đo chỉ có đường đọc (lớp mỏng chặn mọi lệnh không phải SELECT)
+        run: |
+          grep -q "CHỈ ĐỌC: chặn câu không phải SELECT" scripts/do-phu-thay-so-0610.ts
+          grep -q "CHỈ ĐỌC: chặn run()" scripts/do-phu-thay-so-0610.ts
+          echo "OK: chỉ đọc"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cài gói (để gói bộ đo bằng esbuild)
+        run: npm ci --ignore-scripts
+      - name: "ĐO thay câu cho em mẫu (D1 thật, chỉ đọc, chỉ in số đếm)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          SO_EM: ${{ github.event.inputs.so_em || '12' }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/do-phu-thay-so-0610.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-phu.mjs --log-level=warning
+          timeout 1300 node --no-warnings /tmp/do-phu.mjs "$SO_EM" || echo "(thoát mã $?)"
