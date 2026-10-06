@@ -44,6 +44,7 @@ import { cuaVaoCa } from '../lib/cua-vao-ca'
 import { trangThaiCa } from './LichSuCaScreen'
 import KhoiThoiGianCa from '../components/KhoiThoiGianCa'
 import TamPhuChieuMa, { gopEmDaVao } from '../components/TamPhuChieuMa'
+import { moTaCaChieuMa } from '../lib/mo-ta-ca-chieu-ma'
 import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
@@ -2391,6 +2392,14 @@ export default function ExamMonitorScreen() {
           onDong={() => setChieuMa(false)}
           lop={chiTiet.ca.lop || ''}
           link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
+          kiemTraGi={moTaCaChieuMa({
+            phamViHoiLai: (chiTiet.ca as { phamViHoiLai?: string }).phamViHoiLai,
+            deRieng: (chiTiet.ca as { deRieng?: boolean }).deRieng === true || caCanDeRieng,
+            lenBang: chiTiet.ca.lenBang === true,
+            thoiGianPhut: chiTiet.ca.thoiGianPhut,
+            // Số câu mỗi phần của CA (mẫu số); ca không lưu thì đếm câu trong đề đã gộp (ca "lấy trọn kho").
+            soCau: soCauCa ?? (teacherBank ? { I: teacherBank.reduce((a, b) => a + b.phanI.length, 0), II: teacherBank.reduce((a, b) => a + b.phanII.length, 0), III: teacherBank.reduce((a, b) => a + b.phanIII.length, 0) } : null),
+          })}
           hoiPhongCho={async () => {
             // Tự làm mới 5 giây (thầy 28/09) — cùng lệnh chiTietCa của màn này; chỉ tên em đã vào.
             const ct = await chiTietCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)

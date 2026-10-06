@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { dinhDangMa } from '../lib/them-phut-api'
 import { duongQr, taoQr } from '../lib/ma-qr'
+import KiemTraGi from './chieu-ma/KiemTraGi'
+import type { MoTaCaChieuMa } from '../lib/mo-ta-ca-chieu-ma'
 import './chieu-ma.css'
 
 /** Một em đã vào (phòng chờ hoặc đã nhận đề). CHỈ tên — không điểm, không đáp án, không lý do gì. */
@@ -31,6 +33,8 @@ export interface ChuTamPhu {
 export const CHU_VAO_THI: ChuTamPhu = { tenMa: 'Mã ca', vungMa: 'Mã vào thi', nhanMa: 'MÃ VÀO THI', tenHop: 'Chiếu mã vào thi', danhSach: 'Đã vào phòng chờ', chuRong: 'Chưa em nào vào. Màn tự cập nhật mỗi 5 giây.', aria: 'Mã QR vào thi' }
 /** Nhịp tự làm mới danh sách em đã vào (thầy 28/09: "tự động cập nhật 5 giây một lần"). */
 export const NHIP_PHONG_CHO_MS = 5000
+/** Bố cục "Ca này kiểm tra gì": cột trái chỉ đủ chỗ cho chừng này chip tên; còn lại gộp "+ N em" (số đếm vẫn đủ ở trên). */
+const TOI_DA_CHIP_KIEM_TRA = 10
 
 /** Gộp em đứng ở phòng chờ + em đã nhận đề thành MỘT danh sách (không trùng SBD). Chỉ lấy tên. */
 export function gopEmDaVao(dsCho: readonly { sbd: string; hoTen: string }[] | undefined, luot: readonly { sbd: string; hoTen?: string }[] | undefined): EmDaVao[] {
@@ -62,6 +66,7 @@ export default function TamPhuChieuMa({
   hoiPhongCho,
   chu: chuTam = CHU_VAO_THI,
   chuPhuMa,
+  kiemTraGi,
 }: {
   maCa: string
   tenCa: string
@@ -75,6 +80,8 @@ export default function TamPhuChieuMa({
   chu?: ChuTamPhu
   /** Dòng nhỏ dưới mã (vd "Mã đổi mỗi phút"). */
   chuPhuMa?: string
+  /** Có ⇒ bố cục "Ca này kiểm tra gì" (Chiếu mã của ca kiểm tra). Vắng ⇒ y như cũ (điểm danh buổi học không đổi). */
+  kiemTraGi?: MoTaCaChieuMa
 }) {
   const nutDong = useRef<HTMLButtonElement>(null)
   const [pc, setPc] = useState<PhongChoChieu | null>(null)
@@ -141,6 +148,75 @@ export default function TamPhuChieuMa({
   const qr = taoQr(pc?.link || link || diaChi)
   const ve = qr ? duongQr(qr) : null
   const soVao = pc ? pc.em.length : soEmCho
+
+  if (kiemTraGi) {
+    const lopHien = lop && !tenCa.includes(lop) ? lop : ''
+    return (
+      <div className="ca-chieu cm km" role="dialog" aria-modal="true" aria-label={chuTam.tenHop}>
+        <div className="km-dau">
+          <div className="km-dau-trai">
+            <span className="km-nhan-ca">CA KIỂM TRA</span>
+            {tenCa && <h2 className="km-ten-ca">{tenCa}</h2>}
+            {lopHien && <span className="km-lop">Lớp {lopHien}</span>}
+          </div>
+          <button ref={nutDong} type="button" className="km-dong" aria-label="Đóng" onClick={onDong}>
+            <X size={22} aria-hidden="true" /> Đóng <small>(Esc)</small>
+          </button>
+        </div>
+        <div className="km-than">
+          <section className="km-khung km-trai" aria-label={chuTam.vungMa}>
+            <p className="km-nhan-ma">{chuTam.nhanMa}</p>
+            <div className="km-ma" aria-label={`${chuTam.tenMa} ${maCa}`} aria-live="polite">
+              {dinhDangMa(maCa)}
+            </div>
+            {chuPhuMa && <p className="km-phu-ma">{chuPhuMa}</p>}
+            <div className="km-vao">
+              {ve && (
+                <svg className="km-qr" viewBox={`0 0 ${ve.canh} ${ve.canh}`} role="img" aria-label={chuTam.aria} shapeRendering="crispEdges">
+                  <rect width={ve.canh} height={ve.canh} className="km-qr-nen" />
+                  <path d={ve.d} className="km-qr-o" />
+                </svg>
+              )}
+              <p className="km-huong-dan">
+                Quét mã QR, hoặc mở <b>{diaChi}</b> rồi nhập mã.
+              </p>
+            </div>
+            <hr />
+            <div className="km-cho-dau">
+              <h2>{chuTam.danhSach}</h2>
+              {matKetNoi && (
+                <span className="cm-mat" role="status" title="Mất kết nối — đang thử lại">
+                  mất kết nối
+                </span>
+              )}
+              <p className="km-cho-dem" role="status">
+                <b>{soVao ?? 0}</b>
+                {pc?.siSo ? <span> / {pc.siSo} em</span> : <span> em</span>}
+              </p>
+            </div>
+            {pc && pc.siSo ? (
+              <div className="km-vach" role="progressbar" aria-label="Em đã vào trên sĩ số" aria-valuemin={0} aria-valuemax={pc.siSo} aria-valuenow={Math.min(pc.em.length, pc.siSo)}>
+                <i style={{ width: `${Math.min(100, (pc.em.length / pc.siSo) * 100)}%` }} />
+              </div>
+            ) : null}
+            {pc && pc.em.length === 0 && <p className="km-rong">{chuTam.chuRong}</p>}
+            {pc && pc.em.length > 0 && (
+              <ul className="km-chip-ds">
+                {pc.em.slice(0, TOI_DA_CHIP_KIEM_TRA).map((e) => (
+                  <li key={e.sbd} className={moi.has(e.sbd) ? 'cm-moi' : undefined}>
+                    {tenChip(e)}
+                  </li>
+                ))}
+                {pc.em.length > TOI_DA_CHIP_KIEM_TRA && <li>+ {pc.em.length - TOI_DA_CHIP_KIEM_TRA} em</li>}
+              </ul>
+            )}
+            {!pc && !matKetNoi && coHoi && <p className="km-rong">Đang lấy danh sách…</p>}
+          </section>
+          <KiemTraGi mo={kiemTraGi} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="ca-chieu cm" role="dialog" aria-modal="true" aria-label={chuTam.tenHop}>
