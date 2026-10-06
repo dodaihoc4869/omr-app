@@ -15,6 +15,7 @@ import { xoaDemCaBaoVe } from './game-v2-bank'
 import { xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { docKeyBankDem } from './dem-ca-thi'
 import { khoTuNguon, rutDeV2, banDoTuKetQua, type HoSoEmV2, type LoiEmV2, type NguonV2, type PhanV2 } from '../../src/lib/rut-de-v2'
+import { tapCamEmVaoMuon } from '../../src/lib/khong-rut-cau-sai'
 
 type Obj = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim())
@@ -215,10 +216,29 @@ export async function loiDenHan(env: Env, b: Obj): Promise<Obj> {
   // Câu đã gặp: bó về kho ca + câu gốc của lỗi + câu song sinh (luật "lý thuyết quay lại sau 30 ngày" cần đúng các câu ấy).
   const loc = qids ? [...new Set([...qids, ...Object.values(em).flatMap((x) => x.flatMap((l) => cacQidSongSinh(l.qid)))])] : null
   const daGap = await docDaGap(env, ds, ngay, loc)
-  return { ok: true, ngay, em, daGap, ...(Object.keys(canDayLai).length ? { canDayLai } : {}), ...(hong.length ? { hong: hong.sort() } : {}) }
+  // Bảng nhóm nội dung của các qid ca hỏi: máy thầy cần để KHÔNG rút hai bản trùng vào cùng một bộ (06/10).
+  const nhomTrung = qids ? Object.fromEntries(await docNhomTheoQid(env, qids).catch(() => new Map<string, string>())) : {}
+  return { ok: true, ngay, em, daGap, ...(Object.keys(nhomTrung).length ? { nhomTrung } : {}), ...(Object.keys(canDayLai).length ? { canDayLai } : {}), ...(hong.length ? { hong: hong.sort() } : {}) }
 }
 
 // ---------------------------------------------------------------- /vao-thi: lấp riêng cho em vào sau
+
+/** Qid em đã gặp ở các ca KHÁC (bản đồ bộ đề `bo_theo_em_json`), ca mới nhất trước. Lỗi đọc ⇒ rỗng (không chặn em vào thi). */
+async function docQidCaTruoc(env: Env, sbd: string, maCa: string): Promise<string[]> {
+  const r = await env.DB.prepare(
+    `SELECT json_extract(bo_theo_em_json, ?) AS bo FROM ca
+      WHERE ma_ca <> ? AND json_valid(bo_theo_em_json) AND json_type(bo_theo_em_json, ?) = 'array'
+      ORDER BY cap_nhat_luc DESC LIMIT 40`,
+  ).bind(`$.bo."${sbd}"`, maCa, `$.bo."${sbd}"`).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const ra: string[] = []
+  const thay = new Set<string>()
+  for (const x of r.results ?? []) {
+    try {
+      for (const q of JSON.parse(chuoi(x.bo)) as unknown[]) if (typeof q === 'string' && !thay.has(q)) { thay.add(q); ra.push(q) }
+    } catch { /* bỏ ca hỏng */ }
+  }
+  return ra
+}
 
 /** Em vào phòng sau khi chốt (bản đồ chưa có em) ⇒ rút bằng thang lấp ngay tại đây và GỘP vào bản đồ (một câu `json_patch`,
  * chỉ khi bản đồ chưa có em và đang ở dạng mới). Thiếu dữ liệu (không có kho đáp án / số câu) ⇒ `null` — chỗ gọi quyết định. */
@@ -246,7 +266,14 @@ export async function lapBoChoEmVaoMuon(env: Env, maCa: string, sbd: string, soC
   ])
   // Ca "Không rút câu sai" (pham_vi_hoi_lai = 'khong', thầy 05/10): em vào muộn cũng KHÔNG có ô chữa lỗi — chỉ câu mới em chưa gặp.
   const khongLoi = chuoi(caRow?.pham_vi_hoi_lai) === 'khong'
-  const hoSo: HoSoEmV2 = { loi: hs && !khongLoi ? loiTuHoSo(hs) : [], daGap: daGap[sbd] ?? {} }
+  let hoSo: HoSoEmV2 = { loi: hs && !khongLoi ? loiTuHoSo(hs) : [], daGap: daGap[sbd] ?? {} }
+  if (khongLoi) {
+    // 06/10: CÙNG luật với đề chuẩn bị sẵn (src/lib/khong-rut-cau-sai.ts): cấm cứng câu ca trước, cấm mềm 30 ngày; ngoài ra coi là câu mới.
+    const caTruoc = await docQidCaTruoc(env, sbd, maCa)
+    const cam = tapCamEmVaoMuon({ caTruoc, daGap: daGap[sbd] ?? {}, ngay, trongPool: new Set(kho.map((c) => c.id)) })
+    const giu = new Set(cam)
+    hoSo = { loi: [], daGap: Object.fromEntries(Object.entries(daGap[sbd] ?? {}).filter(([q]) => giu.has(q))), camCung: caTruoc }
+  }
   // Ca "Kiểm tra điểm yếu" = ca đề riêng mở ở chế độ lên bảng (KhoiRutDe 02/10).
   const cheDo = Number(caRow?.de_rieng ?? 0) === 1 && Number(caRow?.len_bang ?? 0) === 1 ? 'diem_yeu' : 'ca'
   // 06/10: câu trùng nội dung khác mã là MỘT câu — bộ của em không có hai bản, bản trùng của câu em vừa làm không ra như câu mới.

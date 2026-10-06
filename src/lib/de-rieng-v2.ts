@@ -35,6 +35,8 @@ export interface RutThuCa {
   /** Câu NGOÀI kho ca (câu gốc của lỗi lấy từ cả kho máy thầy, câu song sinh dựng từ máy chủ) — nối vào kho ca lúc chốt. */
   cauNgoai: Record<string, CauNgoai>
   hoSo: Record<string, HoSoEmV2>
+  /** qid → nhóm nội dung (câu trùng nội dung khác mã là một câu) — máy chủ trả cùng hồ sơ lỗi. */
+  nhomTrung?: Record<string, string>
   kho: CauKhoV2[]
   khoCa: CauKhoV2[]
   /** Em không đọc được hồ sơ lỗi — rút như em chưa có lỗi nào (vẫn đủ câu). */
@@ -98,7 +100,7 @@ async function docHoSoVaCauNgoai(
   ngay: string,
   ng: NguonRut,
   cauNgoai: Record<string, CauNgoai>,
-): Promise<{ hoSo: Record<string, HoSoEmV2>; hong: string[] }> {
+): Promise<{ hoSo: Record<string, HoSoEmV2>; hong: string[]; nhomTrung: Record<string, string> }> {
   const r = await loiDenHanTheoEm(url, mat, dsSbd, ngay, ng.khoCa.map((c) => c.id))
   const coTrongKho = new Set(ng.khoCa.map((c) => c.id))
   const canGoc = new Set<string>()
@@ -133,7 +135,7 @@ async function docHoSoVaCauNgoai(
       daGap: r.daGap[sbd] ?? {},
     }
   }
-  return { hoSo, hong: r.hong }
+  return { hoSo, hong: r.hong, nhomTrung: r.nhomTrung }
 }
 
 /** Kho dùng để rút = kho ca + câu ngoài kho (đã lọc tự luận bằng `khoTuNguon`). Câu song sinh mang đúng mức/dạng câu gốc. */
@@ -163,11 +165,11 @@ export async function chayThuRutDeCa(
   const ng = await napNguon(maCa)
   const cauNgoai: Record<string, CauNgoai> = {}
   const mocDoc = new Date().toISOString() // TRƯỚC khi đọc: lượt làm xen giữa lúc đọc vẫn bị bắt ở lần kiểm sau
-  const { hoSo, hong } = await docHoSoVaCauNgoai(url, mat, ds, ngay, ng, cauNgoai)
+  const { hoSo, hong, nhomTrung } = await docHoSoVaCauNgoai(url, mat, ds, ngay, ng, cauNgoai)
   const kho = khoDayDu(ng.khoCa, cauNgoai)
   const t0 = performance.now()
-  const kq = rutDeV2({ kho, soCau: ng.soCau, dsSbd: ds, hoSo, ngay, cheDo: tuyChon.cheDo, seed: maCa })
-  const rt: RutThuCa = { maCa, ngay, cheDo: tuyChon.cheDo, kq, cauNgoai, hoSo, kho, khoCa: ng.khoCa, hongHoSo: hong, lucRut: new Date().toISOString(), mocDoc, msThuatToan: performance.now() - t0 }
+  const kq = rutDeV2({ kho, soCau: ng.soCau, dsSbd: ds, hoSo, ngay, cheDo: tuyChon.cheDo, seed: maCa, nhomTrung })
+  const rt: RutThuCa = { maCa, ngay, cheDo: tuyChon.cheDo, kq, cauNgoai, hoSo, nhomTrung, kho, khoCa: ng.khoCa, hongHoSo: hong, lucRut: new Date().toISOString(), mocDoc, msThuatToan: performance.now() - t0 }
   nho.set(maCa, rt)
   return rt
 }
@@ -224,10 +226,10 @@ export async function chotRutDeCa(
   if (them.length > 0) {
     const ng: NguonRut = { bank: (await loadSessionTeacherBank(maCa)) ?? [], soCau: { I: 0, II: 0, III: 0 }, khoCa: rt.khoCa }
     const cauNgoai = { ...rt.cauNgoai }
-    const { hoSo, hong } = await docHoSoVaCauNgoai(url, mat, them, ngay, ng, cauNgoai)
+    const { hoSo, hong, nhomTrung } = await docHoSoVaCauNgoai(url, mat, them, ngay, ng, cauNgoai)
     const kho = khoDayDu(rt.khoCa, cauNgoai)
     const kqThem = rutDeV2({ kho, soCau: { I: rt.kq.mucTieu.I.length, II: rt.kq.mucTieu.II.length, III: rt.kq.mucTieu.III.length }, mucTieu: rt.kq.mucTieu, dsSbd: them, hoSo, ngay, cheDo: rt.cheDo, seed: maCa, daDung: rt.kq.daDung })
-    rt = { ...rt, kq: gopKetQuaV2(rt.kq, kqThem), cauNgoai, kho, hoSo: { ...rt.hoSo, ...hoSo }, hongHoSo: [...rt.hongHoSo, ...hong] }
+    rt = { ...rt, kq: gopKetQuaV2(rt.kq, kqThem), cauNgoai, kho, hoSo: { ...rt.hoSo, ...hoSo }, nhomTrung: { ...rt.nhomTrung, ...nhomTrung }, hongHoSo: [...rt.hongHoSo, ...hong] }
     nho.set(maCa, rt)
   }
 

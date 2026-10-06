@@ -66,6 +66,8 @@ export interface HoSoEmV2 {
   loi: LoiEmV2[]
   /** qid → ngày VN gần nhất em gặp câu (mọi kênh). */
   daGap?: Record<string, string>
+  /** Ca "Không rút câu sai": câu em đã gặp ở các ca kiểm tra trước (cấm cứng). Hết câu mới thì nới câu cấm mềm trước, câu này sau cùng. */
+  camCung?: readonly string[]
 }
 
 export interface CauRutV2 {
@@ -304,6 +306,7 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
     const thieu: OThieuV2[] = []
     const ngayGap = (id: string): number | null => (daGap[id] ? soNgayGiua(daGap[id], dv.ngay) : null)
     const chuaGap = (id: string) => !daGap[id]
+    const camCung = new Set(hs?.camCung ?? [])
     /** Lý thuyết đã gặp < 30 ngày ⇒ chưa được quay lại. */
     const camLyThuyet = (c: CauKhoV2) => {
       const n = ngayGap(c.id)
@@ -345,7 +348,7 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
       for (const c of ds ?? []) {
         if (daChon(c.id) || !loc(c)) continue
         const n = ngayGap(c.id) ?? 0
-        const k = (camLyThuyet(c) ? -1e6 : 0) + n
+        const k = (camLyThuyet(c) ? -1e6 : 0) - (camCung.has(c.id) ? 5e5 : 0) + n
         if (k > bk) { bk = k; best = c }
       }
       return best

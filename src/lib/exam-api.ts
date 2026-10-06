@@ -491,9 +491,9 @@ export async function loiDenHanTheoEm(
   dsSbd: string[],
   ngay: string,
   qids?: string[],
-): Promise<{ em: Record<string, LoiDenHanEm[]>; daGap: Record<string, Record<string, string>>; hong: string[] }> {
+): Promise<{ em: Record<string, LoiDenHanEm[]>; daGap: Record<string, Record<string, string>>; hong: string[]; nhomTrung: Record<string, string> }> {
   const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
-  const ra = { em: {} as Record<string, LoiDenHanEm[]>, daGap: {} as Record<string, Record<string, string>>, hong: [] as string[] }
+  const ra = { em: {} as Record<string, LoiDenHanEm[]>, daGap: {} as Record<string, Record<string, string>>, hong: [] as string[], nhomTrung: {} as Record<string, string> }
   if (ds.length === 0) return ra
   const base = await layDiaChiMayChu(scriptUrl)
   if (!base) throw new Error('Máy này chưa có địa chỉ máy chủ mới')
@@ -513,10 +513,11 @@ export async function loiDenHanTheoEm(
         HAN_GIAY,
       )
       if (!res.ok) throw new Error(res.status === 404 ? 'Máy chủ chưa có lệnh lỗi đến hạn' : `Máy chủ trả lỗi HTTP ${res.status}`)
-      const r = (await res.json()) as { ok?: boolean; error?: string; em?: Record<string, LoiDenHanEm[]>; daGap?: Record<string, Record<string, string>>; hong?: string[] }
+      const r = (await res.json()) as { ok?: boolean; error?: string; em?: Record<string, LoiDenHanEm[]>; daGap?: Record<string, Record<string, string>>; hong?: string[]; nhomTrung?: Record<string, string> }
       if (!r.ok) throw new Error(r.error || 'Không đọc được lỗi đến hạn')
       Object.assign(ra.em, r.em ?? {})
       Object.assign(ra.daGap, r.daGap ?? {})
+      Object.assign(ra.nhomTrung, r.nhomTrung ?? {})
       ra.hong.push(...(r.hong ?? []))
     }
   }
