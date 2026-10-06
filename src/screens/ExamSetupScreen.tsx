@@ -41,6 +41,7 @@ import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
 import CaDaMo from '../components/ca-thi/CaDaMo'
 import TamPhuChieuMa, { gopEmDaVao } from '../components/TamPhuChieuMa'
+import { moTaCaChieuMa } from '../lib/mo-ta-ca-chieu-ma'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
@@ -447,6 +448,14 @@ export default function ExamSetupScreen() {
             diaChi={opened.joinLink.replace(/^https?:\/\//, '').split('?')[0]!}
             soEmCho={null}
             onDong={() => setChieuMaMo(false)}
+            kiemTraGi={moTaCaChieuMa({
+              phamViHoiLai: chuan2026 ? undefined : boRut?.phamViHoiLai,
+              deRieng: deRiengBat,
+              lenBang,
+              thoiGianPhut: chuan2026 ? 50 : thoiGianPhut,
+              // Số câu mỗi phần: chế độ rút/chuẩn 2026 ⇒ số đã chốt; lấy nguyên đề ⇒ đếm câu trong đề đã chọn.
+              soCau: soCauRaDe ?? { I: selectedSources.reduce((a, b) => a + b.phanI.length, 0), II: selectedSources.reduce((a, b) => a + b.phanII.length, 0), III: selectedSources.reduce((a, b) => a + b.phanIII.length, 0) },
+            })}
             hoiPhongCho={async () => {
               // Cùng lệnh danh sách em của ca mà màn Theo dõi ca gọi (chiTietCa) — chỉ lấy TÊN em đã vào, không điểm.
               const ct = await chiTietCa((await layDiaChiMayChu(scriptUrl)) || scriptUrl.trim(), maBiMat.trim(), opened.maCa)
