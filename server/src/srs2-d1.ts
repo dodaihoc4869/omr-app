@@ -26,6 +26,7 @@ import {
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { protectedQuestions } from './game-v2-bank'
 import { docCauTuJson, jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
+import { docNhomTheoQid } from './nhom-noi-dung'
 // OMNI 3 (05/10) — mọi hành vi mới CHỈ khi `omniBat(env, sbd)`; cờ tắt ⇒ mọi đường dưới đây y hệt trước (khoá: tests/omni-3-ke-hoach-co-tat.test.ts).
 import type { PhamViLop } from './bai-da-day'
 import type { ThuMuc } from './kho-thu-muc'
@@ -1041,6 +1042,13 @@ export interface KeHoachDaChot {
    * nên bỏ khỏi kế hoạch để em không kẹt "còn N câu" / rương không mở được tới khi thầy chốt câu nghi). Vắng = không có câu nào.
    */
   tamHoan?: { ca: number; kho: number; tuLuan?: number; nghi?: number }
+  /**
+   * 06/10: số câu CÒN LẠI đã được em TỰ làm hôm nay ở kênh KHÁC game (Lên bảng / Đầu giờ / ca đã công bố / luyện…; kể cả bản trùng nội dung) ⇒ KHÔNG phục vụ lại ở Đảo/Đoàn/Bi-a.
+   * Khác `tamHoan`: câu vẫn nằm trong `dao/doan/tong` và tính là ĐÃ XONG (`tong − con`) ⇒ Rương Bát Linh không kẹt. Vắng = không có câu nào.
+   */
+  daLamKenhKhac?: number
+  /** 06/10: số câu bị bỏ khỏi kế hoạch (cả `tong`) vì TRÙNG NỘI DUNG (`content_group`) với câu đứng trước / câu đã làm trong game hôm nay. Vắng = không có. */
+  boTrungNoiDung?: number
   /** OMNI 3 (chỉ khi OMNI bật): qid câu ÔN BÀI CŨ của kế hoạch hôm nay (bảng phụ `srs2_ke_hoach_omni`) — Sảnh đếm "Hôm nay ôn bài cũ: N câu". */
   onBaiCu?: string[]
 }
@@ -1112,7 +1120,7 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
   const chanSom = chanTruoc ?? protectedQuestions(env).catch(() => new Set<string>())
   const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch (đệm 60 s trong isolate; không bao giờ ném)
   const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc)
-  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom), hs: r.hs }
+  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom, sbd), hs: r.hs }
 }
 
 /** Câu CÒN LẠI không phục vụ được vì kho: đã rút / JSON không nạp được (`kho`) hay chỉ mục nay xem là tự luận (`tuLuan`). Câu bị ca khoá KHÔNG tính ở đây. */
@@ -1121,10 +1129,11 @@ export const lyDoKhongPhucVu = (m: MetaCau | undefined): 'kho' | 'tuLuan' | null
  * Bỏ câu CÒN LẠI đang bị ca khoá / đã rút khỏi kho / tự luận (30/09) khỏi kế hoạch (câu đã làm giữ nguyên) — thể lực, rương, trần Bi-a đều theo `tong` sau khi bỏ.
  * Lỗi đọc bảo vệ ⇒ không bỏ câu ca (nơi phát câu vẫn tự chặn). Không ghi gì vào `srs2_ke_hoach`.
  */
-export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>, chanSom?: Promise<Set<string>>, nghiSom?: Promise<ReadonlySet<string>>): Promise<KeHoachDaChot> {
+export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>, chanSom?: Promise<Set<string>>, nghiSom?: Promise<ReadonlySet<string>>, sbd?: string): Promise<KeHoachDaChot> {
   if (!kh.conDao.length && !kh.conDoan.length) return kh
-  // 06/10: câu đang NGHI sai đáp án cũng tạm hoãn (cổng cuối của em không phát — chan-khac-khoi.ts): không bỏ khỏi kế hoạch thì "còn N câu" mãi, rương không mở. Đọc đệm 60 s, lỗi ⇒ rỗng.
-  const [chan, nghi] = await Promise.all([chanSom ?? protectedQuestions(env).catch(() => new Set<string>()), nghiSom ?? docCauNghiDem(env)])
+  // 06/10: câu nghi sai đáp án cũng tạm hoãn (cổng cuối của em không phát — chan-khac-khoi.ts): không bỏ khỏi kế hoạch thì "còn N câu" mãi, rương không mở. Đọc đệm 60 s, lỗi ⇒ rỗng.
+  // 06/10: câu em đã TỰ làm hôm nay ở kênh khác game (`docQidDaLamKenhKhac`) đọc CÙNG đợt (chỉ khi biết em là ai).
+  const [chan, nghi, daKhac] = await Promise.all([chanSom ?? protectedQuestions(env).catch(() => new Set<string>()), nghiSom ?? docCauNghiDem(env), sbd ? docQidDaLamKenhKhac(env, sbd, kh.ngay) : Promise.resolve(new Set<string>())])
   let ca = 0, kho = 0, tuLuan = 0, nghiSo = 0
   const bo = new Set<string>()
   for (const k of [...kh.conDao, ...kh.conDoan]) {
@@ -1132,9 +1141,59 @@ export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2
     const ly = lyDoKhongPhucVu(m)
     if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(m!.group)) { bo.add(k); ca++ } else if (nghi.has(tachSongSinh(q).goc)) { bo.add(k); nghiSo++ }
   }
-  if (!bo.size) return kh
-  const dao = kh.dao.filter((k) => !bo.has(k)), doan = kh.doan.filter((k) => !bo.has(k))
-  return { ...kh, dao, doan, tong: dao.length + doan.length, conDao: kh.conDao.filter((k) => !bo.has(k)), conDoan: kh.conDoan.filter((k) => !bo.has(k)), tamHoan: { ca, kho, ...(tuLuan ? { tuLuan } : {}), ...(nghiSo ? { nghi: nghiSo } : {}) } }
+  // 06/10 — KÊNH KHÁC + TRÙNG NỘI DUNG (chỉ đụng câu còn lại phục vụ được; không ghi D1; câu không có nhóm ⇒ khác mọi câu).
+  const conTheoThuTu = [...kh.conDoan, ...kh.conDao].filter((k) => !bo.has(k)) // ôn nợ (Đoàn) đứng trước câu Đảo — cùng thứ tự `tatCa` của Bi-a
+  const xongKhac = new Set<string>(), trung = new Set<string>()
+  if (conTheoThuTu.length) {
+    const nhomDaKhac = new Set<string>()
+    if (daKhac.size) for (const g of (await docNhomTheoQid(env, [...daKhac])).values()) nhomDaKhac.add(g)
+    const nhomCua = (q: string): string => hs.meta.get(q)?.group ?? ''
+    // Người giữ chỗ của từng nhóm: câu đã xong (game hoặc kênh khác) trước, rồi câu còn lại theo thứ tự ưu tiên.
+    const giu = new Map<string, string>()
+    const conSet = new Set([...kh.conDao, ...kh.conDoan])
+    for (const k of [...kh.doan, ...kh.dao]) { const q = qidGoc(k), g = nhomCua(q); if (g && !conSet.has(k) && !giu.has(g)) giu.set(g, q) }
+    for (const k of conTheoThuTu) {
+      const q = qidGoc(k), g = nhomCua(q)
+      if (daKhac.has(q) || (g && nhomDaKhac.has(g))) { xongKhac.add(k); if (g && !giu.has(g)) giu.set(g, q) }
+    }
+    for (const k of conTheoThuTu) {
+      if (xongKhac.has(k)) continue
+      const q = qidGoc(k), g = nhomCua(q)
+      if (!g) continue
+      const chu = giu.get(g)
+      if (chu === undefined) giu.set(g, q)
+      else if (chu !== q) trung.add(k) // cùng nội dung với câu đứng trước / câu đã làm ⇒ không đưa thêm (cùng qid lần 2 `#2` thì KHÔNG phải trùng)
+    }
+  }
+  if (!bo.size && !xongKhac.size && !trung.size) return kh
+  const boHet = new Set([...bo, ...trung]) // bỏ hẳn khỏi kế hoạch hôm nay (tong giảm)
+  const dao = kh.dao.filter((k) => !boHet.has(k)), doan = kh.doan.filter((k) => !boHet.has(k))
+  const con = (ds: readonly string[]) => ds.filter((k) => !boHet.has(k) && !xongKhac.has(k))
+  return {
+    ...kh, dao, doan, tong: dao.length + doan.length, conDao: con(kh.conDao), conDoan: con(kh.conDoan),
+    ...(bo.size ? { tamHoan: { ca, kho, ...(tuLuan ? { tuLuan } : {}), ...(nghiSo ? { nghi: nghiSo } : {}) } } : {}),
+    ...(xongKhac.size ? { daLamKenhKhac: xongKhac.size } : {}),
+    ...(trung.size ? { boTrungNoiDung: trung.size } : {}),
+  }
+}
+
+/**
+ * 06/10: qid GỐC (song sinh/`~bt`/`~yd` quy về gốc — `tachSongSinh`) em đã TỰ làm trong ngày `ngay` ở kênh KHÁC `game` (Lên bảng, Kiểm tra đầu giờ, luyện, ca kiểm tra…).
+ * Cùng luật "tự làm" của hàng chữa lỗi (`docQidSaiV2`): bỏ lượt đọc lời giải/lướt/chẩn đoán, lượt có hỗ trợ, sự kiện bị che; ca thi chỉ tính khi ca ĐÃ công bố
+ * (không lộ câu ca chưa công bố); kết quả bỏ trống chỉ tính ở ca thi (kênh khác NULL = chưa làm). Lỗi đọc ⇒ rỗng (không bỏ câu nào).
+ */
+export async function docQidDaLamKenhKhac(env: Env, sbd: string, ngay: string): Promise<Set<string>> {
+  const sql = (day: boolean) => `SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND COALESCE(nguon, '') <> 'game' AND COALESCE(qid, '') <> ''
+      AND (ket_qua IS NOT NULL OR nguon = 'thi')
+      AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))
+      ${day ? `AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed'` : ''}`
+  const ra = new Set<string>()
+  let rows: Row[]
+  try { rows = (await env.DB.prepare(sql(true)).bind(sbd, ngay).all<Row>()).results ?? [] } catch {
+    try { rows = (await env.DB.prepare(sql(false)).bind(sbd, ngay).all<Row>()).results ?? [] } catch { return ra }
+  }
+  for (const x of rows) { const q = tachSongSinh(str(x.qid)).goc; if (q) ra.add(q) }
+  return ra
 }
 
 /**
@@ -1615,7 +1674,7 @@ export async function thuSucThem(env: Env, sbd: string, nowMs: number): Promise<
   const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch
   const [goc, ruong] = await Promise.all([layKeHoachChot(env, sbd, nowMs, undefined, chanSom), docRuongHomNay(env, sbd, ngay)])
   const hs = goc.hs
-  const kh = await tamHoanCauKhoa(env, goc.kh, hs, chanSom, nghiSom)
+  const kh = await tamHoanCauKhoa(env, goc.kh, hs, chanSom, nghiSom, sbd)
   const t = tinhThuSucThem(kh, hs, !!ruong, await chanSom)
   if (!t.duoc) return { ok: false, ma: t.lyDo, error: LOI_THU_SUC[t.lyDo!] }
   const cd = hs.chienDich!
@@ -1725,6 +1784,6 @@ export async function doiThuTuMetGio(env: Env, sbd: string, nowMs: number, quyet
     }
   }
   await ghiQuyetMetGio(env, sbd, ngay, quyet, nowMs).catch(() => undefined)
-  const hien = await tamHoanCauKhoa(env, kh, hs, chanSom)
+  const hien = await tamHoanCauKhoa(env, kh, hs, chanSom, undefined, sbd)
   return { ok: true, theLuc: { con: hien.conDao.length + hien.conDoan.length, tong: hien.tong }, dao: { con: hien.conDao.length }, doan: { con: hien.conDoan.length } }
 }

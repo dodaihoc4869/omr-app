@@ -66,6 +66,8 @@ export interface HoSoEmV2 {
   loi: LoiEmV2[]
   /** qid → ngày VN gần nhất em gặp câu (mọi kênh). */
   daGap?: Record<string, string>
+  /** Ca "Không rút câu sai": câu em đã gặp ở các ca kiểm tra trước (cấm cứng). Hết câu mới thì nới câu cấm mềm trước, câu này sau cùng. */
+  camCung?: readonly string[]
 }
 
 export interface CauRutV2 {
@@ -103,6 +105,12 @@ export interface DauVaoRutV2 {
   daDung?: Record<string, number>
   /** Mức độ từng ô; vắng ⇒ tính theo tỉ lệ mức độ của kho. */
   mucTieu?: Record<PhanV2, string[]>
+  /**
+   * 06/10 — qid → `content_group` (băm nội dung). Hai câu khác mã cùng nhóm là MỘT câu: (a) lần gặp của câu này tính cho cả nhóm (bản trùng của câu em vừa làm
+   * không ra như câu mới); (b) bộ câu của MỘT em không có hai câu cùng nhóm (giữ câu được chọn trước). Câu vắng trong bảng này ⇒ coi là khác mọi câu (không đoán).
+   * Không truyền ⇒ y như cũ. Luật đóng lỗi KHÔNG đổi theo nhóm.
+   */
+  nhomTrung?: Record<string, string>
 }
 
 export interface KetQuaRutV2 {
@@ -264,6 +272,17 @@ export function loiDungDuoc(loi: readonly LoiEmV2[], ngay: string, cheDo: 'ca' |
   return [...denHan.sort(xep), ...them.sort(xep)].filter((l) => (da.has(l.qid) ? false : (da.add(l.qid), true)))
 }
 
+/** Mốc "đã gặp" gộp theo nhóm nội dung: mọi câu trong `nhomTrung` cùng nhóm với một câu đã gặp nhận MAX ngày của nhóm. Không có nhóm ⇒ trả nguyên `daGap`. Thuần. */
+function gopDaGapNhom(daGap: Record<string, string>, nhomTrung: Record<string, string> | undefined): Record<string, string> {
+  if (!nhomTrung) return daGap
+  const max = new Map<string, string>()
+  for (const [q, n] of Object.entries(daGap)) { const g = nhomTrung[q]; if (g && n > (max.get(g) ?? '')) max.set(g, n) }
+  if (max.size === 0) return daGap
+  const ra: Record<string, string> = { ...daGap }
+  for (const [q, g] of Object.entries(nhomTrung)) { const n = max.get(g); if (n && n > (ra[q] ?? '')) ra[q] = n }
+  return ra
+}
+
 /** Rút cho cả danh sách em. Tất định theo (kho, hồ sơ, seed, thứ tự dsSbd đã sắp). */
 export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
   const cm = dungChiMuc(dv.kho)
@@ -277,13 +296,17 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
 
   for (const sbd of dsSbd) {
     const hs = dv.hoSo[sbd]
-    const daGap = hs?.daGap ?? {}
+    const nhomCua = (id: string): string => dv.nhomTrung?.[id] ?? ''
+    const daGap = gopDaGapNhom(hs?.daGap ?? {}, dv.nhomTrung)
+    const chonNhom = new Set<string>() // nhóm nội dung đã có câu trong bộ của em này
+    const daChon = (id: string): boolean => chon.has(id) || (nhomCua(id) !== '' && chonNhom.has(nhomCua(id)))
     const hatEm = bam(`${dv.seed}|${sbd}`)
     const chon = new Set<string>()
     const bo: CauRutV2[] = []
     const thieu: OThieuV2[] = []
     const ngayGap = (id: string): number | null => (daGap[id] ? soNgayGiua(daGap[id], dv.ngay) : null)
     const chuaGap = (id: string) => !daGap[id]
+    const camCung = new Set(hs?.camCung ?? [])
     /** Lý thuyết đã gặp < 30 ngày ⇒ chưa được quay lại. */
     const camLyThuyet = (c: CauKhoV2) => {
       const n = ngayGap(c.id)
@@ -294,7 +317,7 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
       let best: CauKhoV2 | undefined
       let bd = Infinity
       for (const c of ds ?? []) {
-        if (chon.has(c.id) || !loc(c)) continue
+        if (daChon(c.id) || !loc(c)) continue
         const d = diem(c)
         if (d < bd) { bd = d; best = c }
       }
@@ -302,6 +325,7 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
     }
     const nhan = (c: CauKhoV2, phan: PhanV2, mucO: string, bac: BacLap, goc?: string) => {
       chon.add(c.id)
+      if (nhomCua(c.id) !== '') chonNhom.add(nhomCua(c.id))
       daDung[c.id] = (daDung[c.id] ?? 0) + 1
       bo.push({ qid: c.id, phan, mucDo: c.mucDo, bac, ...(goc ? { goc } : {}), ...(c.mucDo !== mucO ? { lechMuc: true } : {}) })
     }
@@ -310,7 +334,7 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
       let bk = Infinity
       let bd = Infinity
       for (const c of ds ?? []) {
-        if (chon.has(c.id) || !loc(c)) continue
+        if (daChon(c.id) || !loc(c)) continue
         const k = Math.abs(viTriMuc(c.mucDo) - viTriMuc(m))
         const d = diem(c)
         if (k < bk || (k === bk && d < bd)) { bk = k; bd = d; best = c }
@@ -322,9 +346,9 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
       let best: CauKhoV2 | undefined
       let bk = -Infinity
       for (const c of ds ?? []) {
-        if (chon.has(c.id) || !loc(c)) continue
+        if (daChon(c.id) || !loc(c)) continue
         const n = ngayGap(c.id) ?? 0
-        const k = (camLyThuyet(c) ? -1e6 : 0) + n
+        const k = (camLyThuyet(c) ? -1e6 : 0) - (camCung.has(c.id) ? 5e5 : 0) + n
         if (k > bk) { bk = k; best = c }
       }
       return best
@@ -359,9 +383,9 @@ export function rutDeV2(dv: DauVaoRutV2): KetQuaRutV2 {
       for (const l of loiTheoPhan.get(p) ?? []) {
         if (daXep >= tran || con.length === 0) { chuaXep++; continue }
         const goc = cm.theoId.get(l.qid)
-        const dsSS = (cm.songSinhCua.get(l.qid) ?? []).filter((c) => c.phan === p && !chon.has(c.id) && !camLyThuyet(c))
+        const dsSS = (cm.songSinhCua.get(l.qid) ?? []).filter((c) => c.phan === p && !daChon(c.id) && !camLyThuyet(c))
         const ss = dsSS.find((c) => c.id === `${l.qid}~ss${l.songSinh ?? -1}`) ?? dsSS[0]
-        const gocDung = !!goc && goc.phan === p && !chon.has(goc.id) && !camLyThuyet(goc) && !(l.nenSongSinh && ss)
+        const gocDung = !!goc && goc.phan === p && !daChon(goc.id) && !camLyThuyet(goc) && !(l.nenSongSinh && ss)
         const thang: { c: CauKhoV2 | undefined; bac: BacLap }[] = dv.cheDo === 'diem_yeu'
           ? [{ c: ss, bac: 'song_sinh' }, { c: gocDung ? goc : undefined, bac: 'muc_dich' }]
           : [{ c: gocDung ? goc : undefined, bac: 'muc_dich' }, { c: ss, bac: 'song_sinh' }]

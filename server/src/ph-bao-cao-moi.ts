@@ -78,7 +78,7 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   omniP.catch(() => {})
   const [hs, khTho] = await Promise.all([pHs, docKeHoachDaChot(envDoc, sbd, nowMs)])
   // Phản biện #108: cùng một con số với Sảnh/rương của con — câu còn lại đang dùng cho ca kiểm tra / đã rút khỏi kho / tự luận bị bỏ khỏi "hôm nay" (CHỈ ĐỌC, không ghi).
-  const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hs) : null
+  const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hs, undefined, undefined, sbd) : null
   const ra: Row = { ok: true, cheDo2: true, ngay }
   const cd = hs.chienDich
   if (cd) {
