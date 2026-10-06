@@ -19,6 +19,7 @@ import type { CauDaLamMuc, ChiTietCau, LanLam } from './api'
 import { NHAN_NGUON_LAN } from './api'
 import { NHAN_PHAN, NHAN_TRANG_THAI, NHAN_TU_LUAN, chuDS, nhanMucDo, tachDungSai, traLoiNganDung, chuLanLamTuLuan } from './cau-chuyen'
 import { gioThuNgay, ngayThang } from './thoi-gian'
+import { NHAN_COT_LOI, NHAN_LOI_GIAI } from '../../lib/nhan-loi-giai'
 
 export interface MucIn {
   muc: CauDaLamMuc
@@ -211,11 +212,11 @@ export function cauPdfHtml(m: MucIn): string {
   if (cuoi) phan.push(`<div class="pdfc-phu">${cuoi}</div>`)
 
   // LỜI GIẢI → KIẾN THỨC CỐT LÕI → từng phương án/ý ✓✗ (hoặc các bước + kết quả).
-  const lgh: string[] = ['<div class="pdfc-lgn">LỜI GIẢI</div>']
+  const lgh: string[] = [`<div class="pdfc-lgn">${NHAN_LOI_GIAI}</div>`]
   if (lg.thieu && !anhViTri(ct, 'sau_loi_giai')) {
     lgh.push(`<div class="pdfc-ghi">${thoat(CHUA_CO_LOI_GIAI)} Đáp án: <b>${chuHtml(de.phan === 'II' ? (tachDungSai(ct.dapAn) ?? []).map(chuDS).join(' · ') : ct.dapAn)}</b></div>`)
   } else {
-    if (lg.chot.trim()) lgh.push(`<div class="pdfc-chot"><div class="pdfc-chotn">KIẾN THỨC CỐT LÕI</div><div class="pdfc-chott">${chuHtml(lg.chot)}</div></div>`)
+    if (lg.chot.trim()) lgh.push(`<div class="pdfc-chot"><div class="pdfc-chotn">${NHAN_COT_LOI.toUpperCase()}</div><div class="pdfc-chott">${chuHtml(lg.chot)}</div></div>`)
     if (lg.lyDo && (de.phan === 'I' || de.phan === 'II')) {
       const dungI = ct.dapAn.trim().toUpperCase()
       const dungII = tachDungSai(ct.dapAn)
@@ -270,9 +271,9 @@ export const CSS_PDF = `
 .pdfc-o-ds{margin-left:6px;font-weight:600;color:rgb(68 71 70);white-space:nowrap}
 .pdfc-cau[data-chi-de] .pdfc-ghi{margin-top:6px;font-size:14px}
 .pdfc-lg{padding:12px 14px;border-radius:12px;background:rgb(233 238 246)}
-.pdfc-lgn{font-size:12px;font-weight:700;letter-spacing:.1em;color:rgb(11 87 208);margin-bottom:8px}
-.pdfc-chot{margin-bottom:8px;padding:6px 10px;border-left:3px solid rgb(11 87 208);background:rgb(240 244 249);border-radius:0 8px 8px 0}
-.pdfc-chotn{font-size:11px;font-weight:700;letter-spacing:.08em;color:rgb(11 87 208);margin-bottom:2px}
+.pdfc-lgn{font-size:13px;font-weight:700;letter-spacing:.1em;color:rgb(0 74 119);margin-bottom:8px}
+.pdfc-chot{margin-bottom:8px;padding:6px 10px;background:rgb(240 244 249);border-radius:8px}
+.pdfc-chotn{font-size:12px;font-weight:700;letter-spacing:.08em;color:rgb(0 74 119);margin-bottom:2px}
 .pdfc-chott{font-size:14px;font-weight:700;line-height:1.5}
 .pdfc-ly{display:grid;grid-template-columns:18px 22px minmax(0,1fr);gap:8px;align-items:baseline;padding:4px 0;font-size:13px;line-height:1.5}
 .pdfc-d{width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}

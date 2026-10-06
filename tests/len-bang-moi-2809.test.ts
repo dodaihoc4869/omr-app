@@ -141,8 +141,8 @@ describe('LUẬT 6 — lời giải dưới đề, hiện dần bằng Space', (
     expect(g.querySelector('.mc-giai-dem')!.textContent).toMatch(/^Lời giải · Space: hiện tiếp · 3\//)
     expect(g.querySelectorAll('.mc-buoc-cu').length).toBeGreaterThan(0)
     const sang = () => [...t.doc.querySelectorAll('.mc-vung-de .mc-pa.mc-y-sang .mc-ky')].map((k) => k.textContent)
-    expect(sang()).toEqual(['A']) // mục 3 = lý do phương án A ⇒ dòng A của đề sáng
-    t.phim(' ')
+    // SỬA CÓ CHỦ Ý 06/10: dòng "Đáp án" không còn là mục 1 (chuẩn: LỜI GIẢI → Kiến thức cốt lõi → từng phương án).
+    // Mục 1 = cốt lõi, mục 2 = lý do A, mục 3 = lý do B ⇒ dòng B của đề sáng.
     expect(sang()).toEqual(['B'])
     expect([...t.doc.querySelectorAll('.mc-vung-de .mc-pa.mc-pa-dung .mc-ky')].map((k) => k.textContent)).toEqual(['B'])
     t.phim('g')

@@ -36,6 +36,10 @@ export function thongKeHtml(t: ThongKeLopCau | null | undefined): string {
 
 // ───────────────────────── CSS ─────────────────────────
 export const CSS_LEN_BANG_MOI = `
+/* MÀU KHỐI LỜI GIẢI — chuẩn hiển thị của app: ô nền nhạt bo đều (KHÔNG viền trái nhấn), nhãn LỜI GIẢI / Kiến thức cốt lõi đủ tương phản 4,5:1 trở lên.
+   Sáng: nhãn rgb(120 53 15) trên nền rgb(254 243 199) (khoảng 8:1). Tối: nhãn rgb(252 211 77) trên nền rgb(58 42 20) (khoảng 9:1). Test tương phản: tests/loi-giai-chuan-in-0610.test.ts */
+:root{--mc-ll-nen:rgb(254 243 199);--mc-ll-vien:rgb(253 230 138);--mc-ll-nhan:rgb(120 53 15);--mc-ll-chu:var(--mc-chu,rgb(34 38 43));--mc-ll-chot:rgb(255 251 235);--mc-ll-chon:rgb(16 185 129 / .16);--mc-ll-dung:rgb(4 120 87);--mc-ll-sai:rgb(190 18 60)}
+:root[data-projector="dark"],:root[data-projector="matte-dark"]{--mc-ll-nen:rgb(58 42 20);--mc-ll-vien:rgb(120 53 15);--mc-ll-nhan:rgb(252 211 77);--mc-ll-chu:var(--mc-chu,rgb(244 239 228));--mc-ll-chot:rgb(43 33 24);--mc-ll-chon:rgb(52 211 153 / .18);--mc-ll-dung:rgb(110 231 183);--mc-ll-sai:rgb(253 164 175)}
 /* ═══ LÊN BẢNG — BẢN VẼ MỚI 28/09 ═══ */
 :root{--u:min(1vw,1.777778vh);--mc-den:rgb(0,0,0);--mc-vang-noi:rgb(255,210,122);--mc-thanh2:rgb(27,26,23)}
 /* 1 · CHỮ CỐ ĐỊNH: đề = phương án = lời giải = --mc-co (không co, không bậc chữ) cho cả dạy học, đầu giờ và chiến dịch */
@@ -50,7 +54,7 @@ body.mc .mc-pa-chu{overflow-wrap:normal}
 body.mc .mc-pa-chu:has(.mt){white-space:nowrap}
 /* 6 · LỜI GIẢI NẰM DƯỚI ĐỀ — hiển thị chuẩn như trong app */
 body.mc-bc .mc-vung-de>.mc-giai{position:static;inset:auto;overflow:visible;margin:.6em 0 0;padding:0;background:transparent;border:0;z-index:auto}
-body.mc-bc .mc-vung-de>.mc-giai .sol-box{display:block;margin:12px 0;padding:16px 20px;background:rgba(254,243,199,.6);border:1.5px solid rgb(253,230,138);border-left:5px solid rgb(217,119,6);border-radius:16px;box-shadow:0 3px 12px rgba(180,83,9,.08);color:var(--mc-muc,rgb(30,41,59));font-size:var(--mc-co,28px)!important}
+body.mc-bc .mc-vung-de>.mc-giai .sol-box{display:block;margin:12px 0;padding:16px 20px;background:var(--mc-ll-nen);border:1.5px solid var(--mc-ll-vien);border-radius:16px;box-shadow:none;color:var(--mc-ll-chu);font-size:var(--mc-co,28px)!important}
 /* Lời giải hiển thị theo hàng ngang, cân đối, đẹp mắt, không bị ép thành 4 cột dọc */
 body.mc .mc-giai .sol-box .sol-text,
 body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-text{display:flex!important;flex-direction:column!important;width:100%!important;gap:10px!important;padding:4px 0!important}
@@ -63,7 +67,7 @@ body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa .sol-dau{flex-shrink:0!importan
 body.mc .mc-giai .sol-box .sol-pa .sol-ly,
 body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa .sol-ly{flex:1 1 auto!important;min-width:0!important;overflow-wrap:break-word!important}
 body.mc .mc-giai .sol-box .sol-pa.chon,
-body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa.chon{background:rgba(16,185,129,.12)!important;border-left:5px solid rgb(5,150,105)!important;font-weight:700!important}
+body.mc-bc .mc-vung-de>.mc-giai .sol-box .sol-pa.chon{background:var(--mc-ll-chon)!important;font-weight:700!important}
 /* Cỡ chữ lời giải chiếu lên bảng ĐỀU NHAU, GIỐNG NHAU và BẰNG VỚI KÍCH THƯỚC CỦA ĐỀ: var(--mc-co, 28px) */
 body.mc-bc .mc-vung-de>.mc-giai .sol-box,
 body.mc-bc .mc-vung-de>.mc-giai .sol-box *,

@@ -1,4 +1,5 @@
 import {experimentHtml,experimentOriginal} from './experiments/render'
+import { NHAN_COT_LOI, NHAN_KET_QUA, NHAN_LOI_GIAI, NHAN_LOI_GIAI_NGAN } from './nhan-loi-giai'
 import { tachDongTheoY } from './tach-dong-cau'
 // DỰNG PHIẾU THÀNH MỘT TRANG WEB ĐỌC ĐƯỢC, BẤM VÀO CÂU LÀ HIỆN LỜI GIẢI.
 //
@@ -970,16 +971,19 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
 }
 .q-card.mo .sol-box { opacity: 1; transform: none; }
 .sol-label {
-  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
-  color: #92400e; margin-bottom: 4px;
+  font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+  color: #78350f; margin-bottom: 4px; /* #78350f trên nền kem: tương phản ≈ 9:1 */
 }
+/* Nhãn mở khối "LỜI GIẢI": chữ lớn hơn các nhãn con, như chuẩn của app. */
+.sol-label.sol-tieu { font-size: 13px; letter-spacing: 0.1em; margin-bottom: 8px; }
 .sol-label + .sol-label, .sol-text + .sol-label, .sol-step + .sol-label, .sol-dap + .sol-label { margin-top: 12px; }
-.sol-dap { font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 12px; }
+.sol-dap { font-size: 14px; font-weight: 600; color: #78350f; margin-top: 12px; }
+.sol-tieu + .sol-dap { margin-top: 0; }
 .sol-dap b { font-size: 16px; font-weight: 900; color: #451a03; letter-spacing: normal; }
-.sol-text { font-size: 12px; line-height: 1.625; color: #78350f; overflow-wrap: break-word; }
+.sol-text { font-size: 13px; line-height: 1.625; color: #78350f; overflow-wrap: break-word; }
 .sol-text strong { color: #78350f; }
 .sol-cot-loi { font-weight: 700; font-size: 14px; line-height: 1.625; color: #451a03; margin-bottom: 12px; }
-.sol-pa { padding: 4px 0; font-size: 12px; line-height: 1.625; color: #78350f; display: flex; align-items: flex-start; gap: 6px; }
+.sol-pa { padding: 4px 0; font-size: 13px; line-height: 1.625; color: #78350f; display: flex; align-items: flex-start; gap: 6px; }
 .sol-pa + .sol-pa { border-top: 1px solid rgba(253, 230, 138, 0.4); }
 .sol-pa strong { color: #78350f; flex-shrink: 0; }
 .sol-pa.chon { font-weight: 700; }
@@ -987,7 +991,7 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
 .sol-dau.dung { color: #047857; }
 .sol-dau.sai { color: #be123c; }
 .sol-ly { flex: 1; min-width: 0; }
-.sol-step { font-size: 12px; line-height: 1.625; color: #78350f; padding-left: 18px; text-indent: -18px; }
+.sol-step { font-size: 13px; line-height: 1.625; color: #78350f; padding-left: 18px; text-indent: -18px; }
 .sol-ket { font-size: 14px; font-weight: 800; color: #451a03; }
 /* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy
    trắng mực đen; đặt trên nền kem của ô lời giải sẽ thấy một vệt lệch màu. */
@@ -1426,19 +1430,28 @@ export function oGiaiHtml(c: CauLuyen): string {
   let lyDo = c.lyDo
   let buoc = c.buoc
   let ketQua = c.ketQua
+  let chotLaNgan = false
 
   if (!chot && (!lyDo || lyDo.length === 0) && (!buoc || buoc.length === 0)) {
     const rawAny = (c as any).loiGiai || (c as any).giaiThich || (c as any).explanation || (c as any).huongDanGiai || (c as any).loiGiaiChiTiet || (c as any).noiDung || (c as any).viSao
     if (rawAny) {
       const ch = chuanHoaLoiGiaiCau(rawAny, c.phan, c.dapAn)
       chot = ch.chot || (typeof rawAny === 'string' ? rawAny : '')
-      if (ch.lyDo && ch.lyDo.length > 0) lyDo = ch.lyDo
+            if (ch.lyDo && ch.lyDo.length > 0) lyDo = ch.lyDo
       if (ch.buoc && ch.buoc.length > 0) buoc = ch.buoc
       if (ch.ketQua && !ketQua) ketQua = ch.ketQua
+      // Không tách được cấu trúc (không phương án, không bước): một đoạn chữ ⇒ "Lời giải ngắn" như app.
+      chotLaNgan = !(ch.lyDo && ch.lyDo.length > 0) && !(ch.buoc && ch.buoc.length > 0)
     }
   }
 
-  const khoi: string[] = [`<div class="sol-dap">Đáp án: <b>${chuHtml(dapAnChu(c))}</b></div>`]
+  // Chuẩn hiển thị của app: nhãn LỜI GIẢI mở khối, rồi Kiến thức cốt lõi, rồi từng
+  // phương án/ý ✓ ✗, rồi (Phần III) các bước và Kết quả. Dòng "Đáp án" KHÔNG chen
+  // lên đầu khối: nó là dòng tóm tắt riêng (class sol-dap) đặt SAU phần giải thích
+  // (Phần III: ngay trước Kết quả để Kết quả luôn đứng cuối) — em vẫn dò được đáp án
+  // mà không đọc đáp số trước khi đọc lý lẽ.
+  const khoi: string[] = [`<div class="sol-label sol-tieu">${NHAN_LOI_GIAI}</div>`]
+  const dongDapAn = `<div class="sol-dap">Đáp án: <b>${chuHtml(dapAnChu(c))}</b></div>`
 
   const dungKhoa = c.phan === 'II' ? CHU_Y.filter((_, i) => ysDung(c.dapAn)[i]) : [(c.dapAn || '').trim().toUpperCase()]
   let coGiai = false
@@ -1447,7 +1460,7 @@ export function oGiaiHtml(c: CauLuyen): string {
   // từng phương án.
   const chuChot = chot ? chuHtml(chot).trim() : ''
   if (chuChot && !chuChot.includes('[object Object]')) {
-    khoi.push(`<div class="sol-label">Kiến thức cốt lõi</div><div class="sol-text sol-cot-loi">${chuChot}</div>`)
+    khoi.push(`<div class="sol-label">${chotLaNgan ? NHAN_LOI_GIAI_NGAN : NHAN_COT_LOI}</div><div class="sol-text sol-cot-loi">${chuChot}</div>`)
     coGiai = true
   }
   if (lyDo && lyDo.length > 0) {
@@ -1466,8 +1479,10 @@ export function oGiaiHtml(c: CauLuyen): string {
     khoi.push(`<div class="sol-label">Làm từng bước</div>${ds}`)
     coGiai = true
   }
+  // Phần I/II: dòng đáp án sau phần giải thích. Phần III: trước Kết quả (Kết quả cuối).
+  khoi.push(dongDapAn)
   if (ketQua) {
-    khoi.push(`<div class="sol-label">Kết quả</div><div class="sol-text sol-ket">${chuHtml(ketQua)}</div>`)
+    khoi.push(`<div class="sol-label">${NHAN_KET_QUA}</div><div class="sol-text sol-ket">${chuHtml(ketQua)}</div>`)
     coGiai = true
   }
 
