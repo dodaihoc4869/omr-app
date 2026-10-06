@@ -187,7 +187,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
-        '**/ChuyenBay-*.{js,css}',
+        '**/{ChuyenBay,BanNguyenTo}-*.{js,css}',
           '**/404.html',
           // Trang đo tốc độ (02/10): luôn đi thẳng ra mạng để đo đúng, không lưu trên máy.
           '**/cai-kiem-toc-do.html',
