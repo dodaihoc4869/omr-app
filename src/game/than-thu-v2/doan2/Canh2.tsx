@@ -17,10 +17,19 @@ interface Props {
 }
 
 const R_DONG_HO = 21, C_DONG_HO = 2 * Math.PI * R_DONG_HO
-/** Chỗ đứng của bạn trong cảnh (theo % khung tranh 390×340): em đứng trước, to nhất; bạn đứng sau, nhỏ hơn. */
-const CHO_BAN = [{ left: '1.5%', top: '44%', width: '16%' }, { left: '30%', top: '44%', width: '14.5%' }, { left: '17%', top: '37%', width: '13%' }]
-/** Quái phục kích: ô đầu to nhất đứng trước; tối đa 3 con trên tranh. */
-const CHO_QUAI = [{ x: 300, y: 290, s: 1 }, { x: 354, y: 296, s: .72 }, { x: 330, y: 262, s: .55 }]
+/* THÚ + QUÁI GIỮA ĐƯỜNG (06/10): cỡ nhân --thu-quai-co (thu-quai.css) = 1,2 so với bản cũ; chân sprite nằm trên dải đường lát đá (cả khung tranh `.dh2-ve` được
+   nâng lên theo --thu-quai-day trong doan2.css ⇒ chân quái hàng đầu ở đúng dòng 290/340 của tranh = giữa đường). */
+/** Chỗ đứng trong cảnh (theo % khung tranh 390×340; `bottom` = khoảng từ đáy tranh tới CHÂN thú). Em đứng trước, to nhất, nửa trái, chừa ngọc Linh Tâm (x 40–53 %);
+ *  bạn đứng sau (chân cao hơn), nhỏ hơn, xếp so le — không chồng lên em quá nửa. */
+const CO = 1.2 // = --thu-quai-co
+const CHO_EM = { left: '1%', bottom: '14.7%' } // bề rộng em đặt ở doan2.css (.dh-thu-em: 33 % × --thu-quai-co, chặn theo chiều cao cảnh để đầu không chui dưới HUD)
+const CHO_BAN = [
+  { left: '0%', bottom: '40%', width: `${16 * CO}%` },
+  { left: '25%', bottom: '45%', width: `${14.5 * CO}%` },
+  { left: '13%', bottom: '52%', width: `${13 * CO}%` },
+]
+/** Quái phục kích (toạ độ SVG 390×340; y = chân quái): ô đầu to nhất đứng trước nửa phải; hai con sau cao hơn, nhỏ hơn, so le. Tối đa 3 con. */
+const CHO_QUAI = [{ x: 292, y: 290, s: 1 * CO }, { x: 344, y: 282, s: .75 * CO }, { x: 316, y: 262, s: .58 * CO }]
 
 export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
   const em = xem.ghe.find(g => g.laEm), ban = xem.ghe.filter(g => !g.laEm)
@@ -39,11 +48,11 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
           <XeLinhTam hp={tran.linhTam.hp} toiDa={tran.linhTam.toiDa} />
           {/* Quái phục kích (hiệp thường) — thanh Máu trên con đứng đầu */}
           {!tran.laTrum && [...quai].reverse().map((q, i) => { const c = CHO_QUAI[quai.length - 1 - i]!; return <g key={q.ma} transform={`translate(${c.x} ${c.y}) scale(${c.s})`}><QuaiSonThuy loai={q.loai} size={96} x={-48} y={-88}/></g> })}
-          {!tran.laTrum && dau && <g><rect x="271" y="212" width="58" height="6" rx="3" fill="rgba(0,0,0,.4)" /><rect x="271" y="212" width={Math.round(58 * Math.max(0, Math.min(1, dau.hp / 24)))} height="6" rx="3" fill="rgb(255,92,138)" /></g>}
+          {!tran.laTrum && dau && <g><rect x="263" y="184" width="58" height="6" rx="3" fill="rgba(0,0,0,.4)" /><rect x="263" y="184" width={Math.round(58 * Math.max(0, Math.min(1, dau.hp / 24)))} height="6" rx="3" fill="rgb(255,92,138)" /></g>}
           {donEm && <path d="M250 250 l16 -8 l-6 10 l14 -2 l-16 10 l6 -8 z" fill="rgb(255,224,138)" />}
         </svg>
         {tran.laTrum && <div className="dh2-trum"><TrumHinh loai={tran.loaiTrum[soTrum] ?? ''} size={150} className="dh-noi" /></div>}
-        {em && <ThuHinh pet={em.pet} cap={em.cap} camXuc={xem.cau?.ketQua ? (xem.cau.ketQua.correct ? 'dung' : 'sai') : mo ? 'nghi' : 'quyet-tam'} className="dh-noi dh-thu-em" style={{ left: '9%', top: '52%', width: '33%', aspectRatio: '1' }} />}
+        {em && <ThuHinh pet={em.pet} cap={em.cap} camXuc={xem.cau?.ketQua ? (xem.cau.ketQua.correct ? 'dung' : 'sai') : mo ? 'nghi' : 'quyet-tam'} className="dh-noi dh-thu-em" style={{ ...CHO_EM, aspectRatio: '1' }} />}
         {ban.slice(0, CHO_BAN.length).map((g, i) => <ThuHinh key={g.ghe} pet={g.pet} cap={g.cap} className="dh-noi-2" style={{ ...CHO_BAN[i], aspectRatio: '1', animationDelay: `${i * .4}s` }} />)}
         {donEm && (
           <div className="dh2-sat-thuong" aria-label={`Đòn của em hiệp ${vua!.hiep}: ${donEm.satThuong} sát thương`}>
@@ -56,11 +65,12 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
             {quai.map(q => <li key={q.ma} className="dh2-kinh">{tenQuai} · Máu {Math.max(0, q.hp)}/{HP_QUAI}</li>)}
           </ul>
         )}
-        <span className="dh2-kinh dh2-nhan-canh dh2-nhan-mau">Máu Linh Tâm {tran.linhTam.hp}/{tran.linhTam.toiDa}</span>
-        {tran.laTrum
-          ? <span className="dh2-kinh dh2-nhan-canh dh2-nhan-o">Trùm · giáp 4 đoạn</span>
-          : oPhucKich !== null && <span className="dh2-kinh dh2-nhan-canh dh2-nhan-o" data-vung="o-phuc-kich">Ổ phục kích còn {oPhucKich}</span>}
       </div>
+      {/* Hai nhãn đáy cảnh nằm ngoài khung tranh (khung tranh được nâng lên giữa đường): luôn ở sát đáy cảnh, DƯỚI dải đường, không đè thú/quái. */}
+      <span className="dh2-kinh dh2-nhan-canh dh2-nhan-mau">Máu Linh Tâm {tran.linhTam.hp}/{tran.linhTam.toiDa}</span>
+      {tran.laTrum
+        ? <span className="dh2-kinh dh2-nhan-canh dh2-nhan-o">Trùm · giáp 4 đoạn</span>
+        : oPhucKich !== null && <span className="dh2-kinh dh2-nhan-canh dh2-nhan-o" data-vung="o-phuc-kich">Ổ phục kích còn {oPhucKich}</span>}
 
       <header className="dh2-hud">
         <div className="dh2-kinh dh2-hud-hiep">

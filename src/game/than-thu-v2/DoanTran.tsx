@@ -58,13 +58,14 @@ function ThanhHiep({ hiep, soHiep, ketThuc, con, giay, hien, onRoi }: { hiep: nu
 }
 
 // Vị trí thần thú trong cảnh (theo % chiều cao cảnh): em đứng trước, to nhất; bạn đứng sau, nhỏ hơn.
-const CHO_BAN = [{ left: '0%', bottom: '44%', height: '46%' }, { left: '54%', bottom: '34%', height: '46%' }, { left: '30%', bottom: '58%', height: '38%' }]
+// Giữa đường (06/10, thu-quai.css): cỡ × --thu-quai-co (1,2); chân em ở đáy khung .dh-doi (đã đặt ở --thu-quai-day % chiều cao cảnh), bạn đứng sau, cao hơn, so le.
+const CHO_BAN = [{ left: '0%', bottom: '40%', height: '48%' }, { left: '54%', bottom: '30%', height: '48%' }, { left: '30%', bottom: '54%', height: '40%' }]
 function DoiHinh({ ghe }: { ghe: GheXem[] }) {
   const em = ghe.find(g => g.laEm), ban = ghe.filter(g => !g.laEm)
   return (
     <div className="dh-doi">
       {ban.map((g, i) => <ThuHinh key={g.ghe} pet={g.pet} cap={g.cap} className="dh-noi-2" style={{ ...CHO_BAN[i], aspectRatio: '1', animationDelay: `${i * .4}s` }} />)}
-      {em && <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi dh-thu-em" style={{ left: '14%', bottom: '0%', height: '66%', aspectRatio: '1' }} />}
+      {em && <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi dh-thu-em" style={{ left: '14%', bottom: '0%', height: '72%', aspectRatio: '1' }} />}
     </div>
   )
 }
@@ -106,7 +107,7 @@ export default function DoanTran(p: Props) {
         {tran.quai.slice(0, 3).map((q, i) => (
           <div key={q.ma} className="dh-noi-2" style={{ animationDelay: `${i * .5}s` }}>
             <div className="dh-mau"><i style={{ width: `${Math.round(q.hp * 100 / 24)}%` }} /></div>
-            <QuaiHinh loai={q.loai} size={i === 0 ? 72 : 58} />
+            <QuaiHinh loai={q.loai} size={i === 0 ? 86 : 70} />
           </div>
         ))}
       </div>

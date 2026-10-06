@@ -30,7 +30,7 @@
     background:rgb(27,21,84);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18),0 14px 30px rgba(0,0,0,.35)}
   .dh2 .dh2-tran .dh2-cot-trai>.dh2-canh.dh2-canh-trum{background:rgb(27,12,64)} /* nền = màu trời đỉnh tranh ⇒ phần trời phía trên liền mạch */
   /* (nền khung = màu trời ở đỉnh tranh) Tranh giữ đúng tỉ lệ 390×340 (toạ độ thú/quái theo % tranh), co theo chiều nào chật hơn, đứng giữa đáy khung. */
-  .dh2 .dh2-tran .dh2-cot-trai .dh2-ve{left:50%;right:auto;width:min(100cqw,calc(100cqh * 390 / 340));translate:-50% 0}
+  .dh2 .dh2-tran .dh2-cot-trai .dh2-ve{left:50%;right:auto;width:min(100cqw,calc(100cqh * 390 / 340));translate:-50% 0;bottom:max(0px,calc(var(--thu-quai-day) * 1cqh - 50 / 390 * min(100cqw,114.7cqh)))} /* thú + quái giữa đường (thu-quai.css): chân quái hàng đầu cách đáy cảnh --thu-quai-day % */
   .dh2 .dh2-tran .dh2-hud{top:16px;left:16px;right:16px}
   .dh2 .dh2-tran .dh2-hang{top:78px;left:16px;right:16px}
   .dh2 .dh2-tran .dh2-hud-hiep{height:56px}
@@ -74,7 +74,7 @@
   .dh2 .dh2-sanh .dh-ban-do{flex:1 1 auto;height:auto;min-height:300px}
   .dh2 .dh2-sanh .dh-ban-do-nhan{left:20px;top:20px;height:34px;padding:0 16px;border-radius:17px;font-size:14px}
   .dh2 .dh2-sanh .dh-ban-do-gop{left:20px;right:20px;bottom:18px;padding:10px 14px;font-size:14px}
-  .dh2 .dh2-sanh .dh-ban-do .dh-thu-chinh{left:24px;bottom:64px}
+  .dh2 .dh2-sanh .dh-ban-do .dh-thu-chinh{left:14%;bottom:max(76px,calc(var(--thu-quai-day) * 1% + 24px))}
   .dh2 .dh2-sanh .dh-chang,.dh2 .dh2-sanh .dh-muc,.dh2 .dh2-sanh .dh-hai-the{flex-shrink:0}
 
   /* ───── Kết chặng: tranh thắng trái, cầu + phần thưởng + nút chính phải ───── */

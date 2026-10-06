@@ -32,11 +32,14 @@
 
 /* ───── Trong trận ───── */
 .dh2 .dh-khung.dh2-tran{gap:8px} /* 28/09 lần 2: bớt khe để đề lớn nhất */
-.dh2-canh{position:relative;flex:0 0 auto;height:clamp(216px,30vh,284px);margin:calc(-1 * max(10px,env(safe-area-inset-top))) -16px 0;overflow:hidden;background:rgb(27,21,84)}
+.dh2-canh{position:relative;flex:0 0 auto;height:clamp(236px,34vh,310px);margin:calc(-1 * max(10px,env(safe-area-inset-top))) -16px 0;overflow:hidden;container-type:size;background:rgb(27,21,84)}
 .dh2-canh.dh2-canh-trum{background:rgb(27,12,64)}
-.dh2-ve{position:absolute;left:0;right:0;bottom:0;aspect-ratio:390/340}
+/* THÚ + QUÁI GIỮA ĐƯỜNG (06/10, thu-quai.css): chân quái hàng đầu ở dòng 290/340 của tranh (cách đáy tranh 50/390 bề rộng tranh) phải cách đáy CẢNH --thu-quai-day %
+   chiều cao cảnh ⇒ nâng cả tranh (xe + thú + quái) lên đúng phần thiếu; không bao giờ hạ thấp hơn bản cũ (max 0). Màn dọc: tranh rộng = bề rộng cảnh (màn ngang: min(bề rộng, cao × 390/340), xem doan2-ngang.css). */
+.dh2-ve{position:absolute;left:0;right:0;bottom:max(0px,calc(var(--thu-quai-day) * 1cqh - 50 / 390 * 100cqw));aspect-ratio:390/340}
 .dh2-ve>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .dh2-ve>.dh-thu{position:absolute}
+.dh2-ve>.dh-thu-em{z-index:2;width:min(calc(33% * var(--thu-quai-co)),50cqh)} /* em đứng trước, che bạn đứng sau (không che ngọc Linh Tâm: em nằm nửa trái) */
 .dh2-vong-mau{transition:stroke-dasharray .3s ease-out}
 .dh2-trum{position:absolute;right:3%;top:44%;width:42%;display:flex;justify-content:center}
 .dh2-trum>svg{width:100%;height:auto}
@@ -163,8 +166,8 @@
 @keyframes dh2-noi{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
 
 @media (max-width:380px){.dh2 .dh-pa button{min-height:52px;font-size:15px}.dh2 .dh-de{font-size:15.5px}.dh2 .dh2-nut-chinh{font-size:18px}.dh2 .dh-nut-vang{font-size:17px;letter-spacing:.02em}.dh2-thang-tieu-de{font-size:26px}}
-@media (max-height:780px){.dh2-canh{height:clamp(200px,28vh,236px)}.dh2 .dh-don button{min-height:52px}.dh2 .dh2-nut-chinh{min-height:52px}}
-@media (max-height:700px){.dh2-canh{height:clamp(200px,34vh,236px)}.dh2 .dh-pa button{min-height:48px}}
+@media (max-height:780px){.dh2-canh{height:clamp(220px,31vh,260px)}.dh2 .dh-don button{min-height:52px}.dh2 .dh2-nut-chinh{min-height:52px}}
+@media (max-height:700px){.dh2-canh{height:clamp(220px,33vh,250px)}.dh2 .dh-pa button{min-height:48px}}
 
 /* ───── Tấm phủ TUNG CHƯỞNG (2.0): cùng bố cục/thời lượng với bản cũ — nền biển đêm + tia vàng, dải chiêu vàng chữ nâu Baloo, số vàng có nhãn,
    bảng "Vì sao" kính mờ. Chỉ khi DoanTungChuong nhận cheDo2 (lớp .dh2-chuong). Chuyển động rút về ≤ 300 ms (hiệu ứng tia giữ nguyên). ───── */
