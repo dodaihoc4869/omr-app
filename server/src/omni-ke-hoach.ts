@@ -3,6 +3,7 @@
 import { THAM_SO_OMNI, type HoSoOmniEm, type QCau, type ThamSoOmni } from './omni-kieu'
 import { trongSoCau } from './du-bao-diem'
 import { vknCaCau, vknCuaY } from './omni-p-vkn'
+import { tiLeNgayOnBaiCu, type TiLeMotPhan } from './omni-on-bai-cu'
 
 /** Trọng số mọi câu ứng viên (qid → số ≥ 0) = trongSoCau (du-bao-diem.ts) với sơ ý riêng của em. Kế hoạch xếp câu mới / ôn bài cũ theo số này (giảm dần). */
 export function trongSoCacCau(hs: HoSoOmniEm, cau: readonly QCau[], ts: ThamSoOmni = THAM_SO_OMNI): Record<string, number> {
@@ -36,9 +37,12 @@ export function dangDaVung(hs: HoSoOmniEm, cau: readonly QCau[], ts: ThamSoOmni 
   }
   return ra.sort()
 }
-/** Tỉ lệ trần "ôn bài cũ" theo ngày thứ mấy của bài (1 = ngày giao): ngày 4–5 ⇒ DAN_XEN_TI_LE, còn lại ON_BAI_CU_TI_LE. */
-export function tiLeOnBaiCu(ngayThuCuaBai: number | null, ts: ThamSoOmni = THAM_SO_OMNI): number {
-  return ngayThuCuaBai != null && (ts.DAN_XEN_NGAY as readonly number[]).includes(ngayThuCuaBai) ? ts.DAN_XEN_TI_LE : ts.ON_BAI_CU_TI_LE
+/**
+ * Tỉ lệ trần "ôn bài cũ" theo ngày thứ mấy của bài (1 = ngày giao): ngày 4–5 ⇒ DAN_XEN_TI_LE, còn lại ON_BAI_CU_TI_LE.
+ * `rieng` (thầy 06/10, `cau_hinh.on_bai_cu_ti_le` của lớp — omni-on-bai-cu.ts): tỉ lệ thầy đặt cho lớp; vắng / null ⇒ y hệt hằng cũ.
+ */
+export function tiLeOnBaiCu(ngayThuCuaBai: number | null, ts: ThamSoOmni = THAM_SO_OMNI, rieng?: TiLeMotPhan | null): number {
+  return tiLeNgayOnBaiCu(ngayThuCuaBai, rieng, ts)
 }
 /** Thể lực ngày ở chế độ chờ bài mới: max(CHO_THE_LUC_SAN, round(CHO_THE_LUC_TI_LE × thể lực lớp)). */
 export function theLucCho(theLucLop: number, ts: ThamSoOmni = THAM_SO_OMNI): number {

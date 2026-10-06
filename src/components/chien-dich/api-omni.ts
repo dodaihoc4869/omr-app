@@ -4,6 +4,7 @@
 // Cách gọi y hệt `/gv/chien-dich` (api.ts): `goiLenh` + mã thầy, KHÔNG ném lỗi — trả `KetQuaLenh` với MỘT câu nói thật (màn hiện đúng câu ấy).
 // Máy chủ đang dựng song song ⇒ mọi hàm ĐỌC KỸ hình dạng câu trả lời: sai dạng = lỗi `khong_doc_duoc` (màn ẩn phần OMNI, màn cũ y nguyên).
 import type { BangOmni, CanThayChua, CoOmni, Phan, TrangThaiSprt, Vkn } from '../../../server/src/omni-kieu'
+import type { OnBaiCuXem } from '../../../server/src/omni-on-bai-cu'
 import { goiLenh, type KetQuaLenh } from '../../lib/goi-lenh-thay'
 
 export const DUONG_BAI_DA_DAY = '/gv/bai-da-day'
@@ -67,6 +68,13 @@ export interface DanhSachBaiDaDay {
   /** Lớp đang chờ bài mới (qua hạn bài gần nhất, chưa tick bài mới) — `soNgay` ngày. */
   choBaiMoi: { soNgay: number } | null
 }
+/** Bài đứng TRƯỚC bài sắp giao trong cây DẠY HỌC của khối, kèm tờ tự giao của nó (`tick` ghi vào phạm vi đã dạy; `xem-truoc` dùng để đếm kho ôn bài cũ). */
+export interface BaiPhamVi {
+  khoaBai: string
+  tenBai: string
+  viTri: number
+  maDe: string[]
+}
 /** Đầu vào chung của `xem-truoc` và `tick`. */
 export interface DauVaoBai {
   lop: string
@@ -80,12 +88,8 @@ export interface DauVaoBai {
   theLucNgay?: number
   /** Em nhận bài (thầy chọn — bộ chọn em của màn Giao / theo điểm danh, 05/10). Vắng ⇒ máy chủ giao cả lớp như cũ. */
   sbd?: string[]
-}
-export interface BaiPhamVi {
-  khoaBai: string
-  tenBai: string
-  viTri: number
-  maDe: string[]
+  /** Bài đứng trước (06/10): gửi kèm `xem-truoc` để máy chủ đếm kho ôn bài cũ cho dòng "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%". Vắng ⇒ không có dòng ấy (như trước). */
+  phamVi?: BaiPhamVi[]
 }
 export interface XemTruocTick {
   soCau: number
@@ -104,6 +108,8 @@ export interface XemTruocTick {
   duDiem8: number | null
   quaTai: { sbd: string; ten: string }[]
   theLucNgay: number
+  /** Dòng "Ôn bài cũ" (06/10, máy chủ tính; chỉ-thêm): vắng ⇒ không dòng (máy chủ cũ / lỗi / kho 0). */
+  onBaiCu?: OnBaiCuXem
 }
 export interface KetQuaTick {
   chienDichId: string
@@ -140,11 +146,20 @@ export async function baiDaDayDanhSach(lop: string): Promise<KetQuaLenh<DanhSach
   return { ok: true, du: { bai, choBaiMoi: cho } }
 }
 
+/** Đọc khối `onBaiCu` của `xem-truoc` CHẶT: thiếu / sai kiểu / kho 0 ⇒ null (không dòng, màn y hệt trước). */
+export function docOnBaiCuXem(x: unknown): OnBaiCuXem | null {
+  if (!laHo(x) || !laHo(x.tiLe)) return null
+  const toiDaMoiEm = so(x.toiDaMoiEm), khoCau = so(x.khoCau), phuPhanTram = so(x.phuPhanTram), soBai = so(x.soBai), thuong = so(x.tiLe.thuong), cuoi = so(x.tiLe.cuoi)
+  if (toiDaMoiEm === null || khoCau === null || phuPhanTram === null || soBai === null || thuong === null || cuoi === null || khoCau <= 0) return null
+  return { toiDaMoiEm: Math.round(toiDaMoiEm), khoCau: Math.round(khoCau), phuPhanTram: Math.round(phuPhanTram), soBai: Math.round(soBai), tiLe: { thuong, cuoi } }
+}
+
 export async function baiDaDayXemTruoc(dv: DauVaoBai): Promise<KetQuaLenh<XemTruocTick>> {
   const r = await goiBai('xem-truoc', { ...dv })
   if (!r.ok) return r
   const d = r.du
   if (so(d.soCau) === null || so(d.luotCan) === null || so(d.sucChua) === null) return saiDang()
+  const onBaiCu = docOnBaiCuXem(d.onBaiCu)
   return {
     ok: true,
     du: {
@@ -160,6 +175,7 @@ export async function baiDaDayXemTruoc(dv: DauVaoBai): Promise<KetQuaLenh<XemTru
       duDiem8: so(d.duDiem8) === null ? null : soNguyen(d.duDiem8),
       quaTai: Array.isArray(d.quaTai) ? d.quaTai.filter(laHo).map((e) => ({ sbd: chu(e.sbd), ten: chu(e.ten) || chu(e.sbd) })) : [],
       theLucNgay: soNguyen(d.theLucNgay),
+      ...(onBaiCu ? { onBaiCu } : {}),
     },
   }
 }
@@ -228,6 +244,13 @@ export async function docCauHinhOmni(): Promise<KetQuaLenh<CauHinhOmni>> {
 }
 export async function luuCauHinhOmni(ch: { theLucLop?: Record<string, number>; maTran?: MaTranThi }): Promise<KetQuaLenh<Ho>> {
   return goiOmni('cau-hinh-luu', { ...ch })
+}
+/** Lưu tỉ lệ ôn bài cũ của MỘT lớp (06/10; `thuong` = ngày thường, `cuoi` = ngày thứ 4–5 của bài; số 0–0,6). Máy chủ chưa có lệnh / từ chối ⇒ lời thật của máy chủ. */
+export async function luuTiLeOnBaiCu(lop: string, thuong: number, cuoi: number): Promise<KetQuaLenh<{ lop: string; tiLe: { thuong: number; cuoi: number } }>> {
+  const r = await goiOmni('on-bai-cu-luu', { lop, thuong, cuoi })
+  if (!r.ok) return r
+  const t = laHo(r.du.tiLe) ? r.du.tiLe : {}
+  return { ok: true, du: { lop: chu(r.du.lop) || lop, tiLe: { thuong: so(t.thuong) ?? thuong, cuoi: so(t.cuoi) ?? cuoi } } }
 }
 
 // ---------------------------------------------------------------- /gv/omni — Bảng bài
