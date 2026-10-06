@@ -52,7 +52,7 @@ Hai kết luận không thể bỏ: (a) **sơ ý là nút cổ chai**, không ph
 
 ## 2. PHẠM VI KHO VÀ PHẠM VI HỌC (luật cứng)
 
-- **DẠY HỌC** (mã `DH-…` hoặc thư mục "DẠY HỌC"; `laDeDayHoc` `src/lib/day-hoc-len-bang.ts`): nguồn duy nhất của tick bài, game Đảo/Đoàn/Bi-a, Thử sức thêm, vé, Trạm hồi phục (câu nền `cau_nen`), ôn bài cũ. **Chỉ câu của bài đã tick của lớp.**
+- **DẠY HỌC** (mã `DH-…` hoặc thư mục "DẠY HỌC"; `laDeDayHoc` `src/lib/day-hoc-len-bang.ts`): nguồn duy nhất của tick bài, game Đảo/Đoàn/Bi-a, Thử sức thêm, vé, Trạm hồi phục (câu nền `cau_nen`), ôn bài cũ. **Chỉ câu của bài đã tick của lớp.** *(Ngoại lệ 06/10, thầy: "chiến dịch đang chạy mà em báo hôm nay chưa có câu nào": câu của chiến dịch ĐANG CHẠY — câu thầy giao thẳng — luôn vào kế hoạch Đảo/Đoàn dù tờ thuộc TU LUYỆN hoặc bài chưa tick; luật lọc chỉ áp cho nợ cũ, duy trì, câu sai ca / Lên bảng và ôn bài cũ. Xem OMNI-3-build-status.md mục 15.)*
 - **TU LUYỆN** (mọi tờ còn lại, thư mục ảo suy từ `nhom`, không ghi đè): chỉ Tu luyện (câu rút thêm/câu mới) và ca kiểm tra (gồm ca chốt nửa lạ, đề thử nửa ngày 6). Mở ca kiểm tra vẫn chọn mọi thư mục.
 - Máy chủ biết thư mục qua `de_kho_thu_muc` (đồng bộ từ app thầy, ≤ 1 lần/ngày); thiếu ⇒ TU_LUYEN trừ mã `DH-`.
 

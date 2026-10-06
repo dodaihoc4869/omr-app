@@ -370,7 +370,8 @@ Thầy 06/10 ~21:05 (kèm ảnh app em lúc 21:03: "Hôm nay chưa có câu nào
 Hồ sơ em: **câu chiến dịch 439** (trước sửa: 0) · câu mới 95–262 · đến lịch ôn 20–65 · kế hoạch lập lại: **Đảo 30–91 · Đoàn 0–44** (trước: 0 · 0), 14/14 em có câu (trần 91 = thể lực chiến dịch). Dòng chốt hôm nay: 10 em TRỐNG + 1 em có 82 câu (mở app trước khi OMNI lên) + 3 em chưa mở ⇒ sau phát hành 10 em kia tự lập lại khi mở app.
 
 ### 15e. Phát hành
-PR `dodaihoc4869/omr-app#168` (gộp cùng đợt 7 của §14) → main. Lùi: `git revert -m 1 <mã commit gộp>`. Mã commit gộp, run Actions, mã Pages / Worker, kết quả kiểm sau phát hành: xem dòng cuối "Nhật ký" của `DIEU-PHOI.md`.
+PR `dodaihoc4869/omr-app#168` (gộp cùng đợt 7 của §14) → main `e5386512`. Lùi: `git revert -m 1 e5386512`.
+Phát hành thật 06/10 22:10 giờ VN (run Actions **37483249126**, main `f1fbc518` đã chứa `e5386512`; check:mau · npm test · build · Pages · Worker đều thành công): Pages `b0791f9c` · Worker version `7ad54003-0493-4a7b-86e5-ec31040d9fbf` (bản lùi Worker: `52e30105-49fe-46be-8a02-b9669ce8ebf8`, của run 37478606562). Kiểm sau phát hành: `/nhip` mức tốt; `POST /ca/cau-thay-so` 200 `ok:true bat:true` (trước phát hành: 404). Run 37482233097 (riêng `e5386512`) bị huỷ vì phiên khác gộp #169 ngay sau — theo luật concurrency, không phải lỗi.
 
 ### 15f. Việc ghi nhận, CHƯA làm (hỏi thầy)
 Câu SAI ở ca thi / Lên bảng / tự làm thuộc kho TU LUYỆN cũng không vào kế hoạch Đảo/Đoàn khi OMNI bật (đúng đặc tả OMNI 3: "game chỉ câu DẠY HỌC") — trái nguyên tắc 02/10 "mọi câu sai phải được xử lý triệt để". Chờ thầy chọn: giữ như đặc tả hay cho câu sai kho TU LUYỆN vào nợ như trước OMNI.
