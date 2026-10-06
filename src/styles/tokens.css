@@ -47,6 +47,8 @@
   --cam-nen: #fffbeb;
   --tim: #6366f1;
   --tim-nen: #eef2ff;
+  /* nhãn khối LỜI GIẢI / Kiến thức cốt lõi (ngoài `.m3`): ≥ 4,5 trên --the-2 và --the; khoá ở tests/loi-giai-chuan-react.test.ts */
+  --lg-nhan: #4338ca;
   --gap: #dc2626; /* CHỈ một việc: đồng hồ làm bài còn dưới 5 phút (GIAO-DIEN-LAM-BAI.md) */
 
   /* màu phong cách Google Material 3 */
@@ -375,6 +377,7 @@
     --cam-nen: #2d2411;
     --tim: #818cf8;
     --tim-nen: #1e1f3d;
+    --lg-nhan: #a5b4fc;
 
     --gg-xanh: #8ab4f8;
     --gg-do: #f28b82;
