@@ -12,6 +12,7 @@ import type { CauLuyen } from '../../lib/bai-tap-pdf'
 import type { OBang } from '../../lib/html-may-chieu'
 import { qidMayChuCuaIdCau } from '../../lib/lich-su-cau-len-bang'
 import { phanTichKhoiCau } from '../../lib/khoi-cau'
+import { laCauTuLuan } from '../../lib/cau-tu-luan'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { noiDungTuCauGoc, type NoiDungCau } from '../../lib/thoi-gian-len-bang'
 import { saoTuMucDo } from './tinh'
@@ -63,6 +64,16 @@ export function traChinhXac<T>(tra: ReadonlyMap<string, T>, qid: string): T | un
 }
 
 /** Đếm từ/hình/bước của câu (cho ước lượng thời gian); không tra được ⇒ undefined (rơi về giờ theo sao). */
+/** Câu mà BẢNG đã bị dẹt thành chữ (thầy 06/10: "Chất | palmitic acid | … Hàm lượng (%) | 5% | …"): đề có ≥ 3 dấu ` | ` (có khoảng trắng hai bên) mà câu KHÔNG có bảng thật.
+ * Bản này hỏng — tờ chiếu lấy bản đúng của máy chủ (kho có bảng dạng hàng/cột) thay cho bản dẹt trên máy thầy. */
+export function laBangDet(q: unknown): boolean {
+  if (!q || typeof q !== 'object') return false
+  const o = q as Record<string, unknown>
+  const co = (v: unknown) => Array.isArray(v) && v.length > 0
+  if (co(o.table) || co(o.bang)) return false
+  return typeof o.text === 'string' && o.text.split(' | ').length - 1 >= 3
+}
+
 export function noiDungCua(tra: ReadonlyMap<string, CauGoc>, qid: string): NoiDungCau | undefined {
   const g = traChinhXac(tra, qid)
   return g ? noiDungTuCauGoc(g.phan, g.q) : undefined
@@ -137,7 +148,7 @@ export async function napNoiDungChoToChieu(
   tra: ReadonlyMap<string, CauGoc>,
   hoiMayChu: (qids: string[]) => Promise<NoiDungCauMayChu | null>,
 ): Promise<{ ds: OChieu[]; soBoKhoi: number; khoiDich: number[] }> {
-  const canHoi = [...new Set(ds.filter((o) => !o.cauGoc && !traChinhXac(tra, o.qid)).map((o) => o.qid))]
+  const canHoi = [...new Set(ds.filter((o) => { if (o.cauGoc) return false; const g = traChinhXac(tra, o.qid); return !g || laBangDet(g.q) }).map((o) => o.qid))]
   const nguyen = { ds: [...ds], soBoKhoi: 0, khoiDich: [] as number[] }
   if (!canHoi.length) return nguyen
   const r = await hoiMayChu(canHoi).catch(() => null)
@@ -173,6 +184,7 @@ export async function dungToChieu(
   ])
   const thieu = new Set<string>()
   const boKhoi = new Set<string>()
+  const boTuLuan = new Set<string>()
   const oGhi = new Map<string, OGhiToChieu>()
   const khoiDich = tuyChon.khoiDich ?? []
   const dsGiu = ds.filter((o) => {
@@ -180,7 +192,7 @@ export async function dungToChieu(
     boKhoi.add(o.qid)
     return false
   })
-  const dsO: OBang[] = dsGiu.map((o) => {
+  const dsO: OBang[] = dsGiu.flatMap((o): OBang[] => {
     // Nội dung ĐÚNG mã: nội dung máy chủ gửi kèm, rồi Ngân hàng đề khớp nguyên mã. Không có ⇒ dòng thay thế (đếm vào `soThieu`), KHÔNG đoán câu khác.
     let goc: CauGoc | undefined
     if (o.cauGoc) {
@@ -205,6 +217,9 @@ export async function dungToChieu(
       thieu.add(o.qid)
     }
 
+    // THẦY 06/10: "câu tự luận tuyệt đối loại bỏ" — tờ chiếu chữa KHÔNG BAO GIỜ có câu tự luận. Câu Phần III không tra được nội dung thì không biết có phải tự luận không ⇒ cũng bỏ (đếm vào `thieu`).
+    if (cl && cl.phan === 'III' && laCauTuLuan({ phan: 'III', text: cl.text, dapAn: cl.dapAn }, 'III')) { boTuLuan.add(o.qid); return [] }
+    if (!cl && o.phan === 'III') { thieu.add(o.qid); return [] }
     const cau: CauLuyen = cl ?? {
       id: o.qid,
       phan: o.phan,
@@ -223,7 +238,7 @@ export async function dungToChieu(
     }
     const coNut = !!maPhien && !!o.sbd && !!goc && !!cau.chuyenDe
     if (coNut) oGhi.set(khoaToChieu(o.sbd, o.qid), { sbd: o.sbd, hoTen: o.ten, qid: o.qid, chuyenDe: cau.chuyenDe })
-    return {
+    return [{
       sbd: o.sbd,
       hoTen: o.ten,
       ...(coNut ? { qid: o.qid } : {}),
@@ -233,7 +248,7 @@ export async function dungToChieu(
       mucDo: o.mucDo ?? undefined,
       cau,
       viSao: o.viSao,
-    }
+    }]
   })
   const html = taoHtmlMayChieu(dsO, {
     tenBuoi,
