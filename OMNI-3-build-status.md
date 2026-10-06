@@ -120,3 +120,29 @@ Lùi: `git revert -m 1 <commit gộp PR>` rồi đẩy main (Actions đẩy lạ
 - vitest toàn bộ d709d431: 14 179 test, 149 dòng trùng nền + 9 tên phụ thuộc giờ chạy (00:05–00:25 giờ VN) — chạy lại cùng giờ trên main 3cdabd43 (trước OMNI) ra đúng 9 tên đó ⇒ có sẵn, không do đợt này.
 - Đợt 2 ĐÃ LÊN 06/10 00:33 giờ VN: PR #151 (main d6903f8c), Actions run 37347411056 thành công, Worker `a67d3030-184b-4494-814f-1e48bf0ff015`. Máy chủ tự báo "ban" ~10 phút sau đẩy rồi về "tot" (00:44).
 - Lùi từng đợt: #151 `git revert -m 1 d6903f8c` · #150 `git revert -m 1 3620f437` · #149 `git revert -m 1 558c4a4c`, rồi đẩy main (Actions đẩy lại). Tắt OMNI không cần lùi mã: Cài đặt OMNI ở app thầy.
+
+## 10. Đợt 3 (06/10 sáng) — gộp làn A, A′, B, D + Bài hôm nay làm lại: nghiệm thu bản sạch `968f079c`
+
+Lệnh thầy: "Làm nốt đi tất cả rồi đẩy luôn lên app nhé"; "Sửa lại toàn bộ chỗ này cho hiện đại siêu đẹp mắt và tích chọn được nhiều lớp, sắp xếp bài theo đúng thứ tự từ bé tới lớn…"; "Làm cho màn hình xoay ngang và máy tính nữa nhé". Gốc `main` d6903f8c (#151). Worktree mới tại đúng commit; mọi số là kết quả lệnh chạy trong phiên.
+
+| Kiểm | Lệnh | Kết quả | Đạt |
+|---|---|---|---|
+| vitest toàn bộ, lượt 2 (máy yên tĩnh) | `npx vitest run --reporter=json` → so TÊN với nền d709d431 | 14 344 test · 141 đỏ / 61 tệp + 9 tệp lỗi nạp · **0 tên đỏ mới** | Đạt |
+| vitest toàn bộ, lượt 1 | như trên | 144 đỏ: 3 tên mới đều CHẬP CHỜN, lượt 2 xanh (bảng dưới) | Đạt có ghi chú |
+| Kiểu | `tsc -b` · `tsc --noEmit -p server` | 0 lỗi · 0 lỗi | Đạt |
+| Build + service worker | `npm run build` · `kiem:sw` | thành công · 13/13 | Đạt |
+| Màu | `check:mau` · `kiem:mau-giu` (so origin/main) | sạch · 30 tệp src/ đổi, 0 vi phạm | Đạt |
+| Lộ đáp án | `kiem:lo-dap-an` | 9/9 | Đạt |
+| Cổng điểm ảnh 9 màn học sinh | `do-app-hs.mjs --kich=anh` (OMNI tắt, bật `--omni=1`) vs `anh-final` / `anh-final-omni` + `so-anh.mjs` | 9/9 trùng khít · 9/9 trùng khít (0 điểm ảnh lệch, cả 7-doan-tran) | Đạt |
+| Worker đóng gói | `wrangler deploy --dry-run` | thành công: 3 238 KiB, nén 842 KiB | Đạt |
+| Kiểm ca thi mở (chỉ đọc) | workflow `kiem-ca-mo` run 37395505740 (07:44 giờ VN) | so_ca_mo = 0 · so_luot_dang_lam = 0 | Đạt |
+
+Ba tên đỏ chập chờn của lượt 1 (cả ba xanh ở lượt 2):
+- `tests/doan-het-cau-2809` "đi một mình (1 em + bạn máy)…": nguyên nhân gốc — mã chặng `ma` sinh bằng `crypto.getRandomValues` làm hạt giống (`hatGiong: ma`, game-v2-doan.ts), bạn máy đáp đúng/sai theo `rut(hatGiong, 'may|hiệp|ghế') < TI_LE_MAY_DUNG` ⇒ chỉ một phần hạt giống cho "3 sao" mà test khẳng định cứng. Tái hiện: chạy riêng 14 lượt — bản này đỏ 3/14, `main` đỏ 2/14. Có sẵn từ trước, không do đợt này (không sửa trong đợt này; sửa đúng = ghim hạt giống trong test).
+- `tests/tu-ngu-cum6-2109` (quá 5 000 ms) và `tests/shop-man-2109` (tiêu điểm sau mua xong): đỏ chỉ ở lượt chạy toàn bộ đầu; mã nguồn hai màn này (Võ đài, Cửa hàng) KHÔNG nằm trong thay đổi của đợt; chạy riêng xanh (3 lượt dưới 8 vòng lặp ép CPU: 60/60 test mỗi lượt, gồm cả tệp Đoàn may mắn xanh).
+
+Gộp (đã nối trên nhánh `claude/gracious-heisenberg-hoe97n`): làn B Cẩn thận (d9314c02), làn A′ thang ở Trạm/Vé/Bi-a/Tu luyện (5303f3a1), làn A bậc `~bt`/`~yd` (4ca6c119), bước Bài hôm nay làm lại (5d3e97c4 + 8d8a0ea1 + 8e7a2d30), sửa ngân sách D1 `cau-theo-qid` (f4b7ef09), làn D tốc độ (69157d51; D3 đã gỡ) + sửa test lane D (968f079c), bước kiểm ca thi mở (fb474aa9). Không migration; bảng chỉ-thêm `omni_buoc_sai` tạo lúc chạy. Commit sau `968f079c` chỉ là tài liệu.
+
+CHƯA làm (nói thẳng): chẩn đoán câu nền chèn vào chuyến (A′), Trạm/chẩn đoán xếp theo `omni_buoc_sai`, xoay vòng song sinh, ghim phiên bản `~bt`, chip "Đã tính vào phạm vi" cho Bài 1–5, kho ý Đúng–Sai còn rỗng tới khi chạy `node scripts/loi-giai/may-soan.mjs --lop tat-ca`. Tốc độ: đo trên máy chủ giả (đăng nhập → Sảnh 1905 → 1454 ms), chưa đo trên D1 thật; luồng NDJSON có thể bị gom đệm ở rìa — kiểm `curl -N`, công tắc khẩn `TAT_KEM_SANH`.
+
+Lùi: `git revert -m 1 <commit gộp PR đợt 3>` rồi đẩy main (Actions đẩy lại Pages + Worker). Tắt riêng: thang làm lại `cau_hinh` khoá `lam_lai_khac` = `{"bat":false}`; đăng nhập kèm Sảnh `TAT_KEM_SANH`; cả OMNI ở Cài đặt OMNI. Bản Worker trước đợt này: `a67d3030-184b-4494-814f-1e48bf0ff015`.
