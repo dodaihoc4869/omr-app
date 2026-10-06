@@ -103,8 +103,16 @@ export function datLai() {
 export async function traLoi(duong: string, body: Obj): Promise<Obj> {
   const lenh = duong.startsWith('/game-v2/') ? duong.slice(9) : ''
   switch (duong) {
-    case '/hs/dang-nhap':
-      return { ok: true, token: 'tk-gia', sbd: body.sbd, hoTen: 'Học Sinh Thử', lop: '12A0', namSinh: '2008' }
+    case '/hs/dang-nhap': {
+      const dn = { ok: true, token: 'tk-gia', sbd: body.sbd, hoTen: 'Học Sinh Thử', lop: '12A0', namSinh: '2008' }
+      // Máy chủ mới (D1 06/10): máy em xin `kemSanh` ⇒ trả THEO LUỒNG (NDJSON): dòng 1 = đăng nhập, dòng 2 = `{sanh}` (phản hồi hoa2-sanh). Máy em cũ không xin ⇒ y như trước.
+      // (Playwright không phát được thân theo từng nhịp: máy chủ giả trả cả hai dòng một lúc — trong máy chủ giả thời gian xử lý của mọi lệnh bằng nhau nên đo ra như nhau.)
+      if (body.kemSanh === true) {
+        kichBan.lanSanh++
+        return { __ndjson: [dn, { sanh: { ...sanh(), serverNow: bayGio(), nhipDeNghi: 1 } }] }
+      }
+      return dn
+    }
     case '/hs/ke-hoach-ngay':
       return { ok: true, ngay: '2026-09-30', viec: [], nganSach: { mucTieuCau: 20 }, tienBo: { daLamCau: 12, soCauHienThi: 12, dat: false, toiThieuCau: 20, conThieu: 8 }, thanThu: { pet: 'lua_phuong', cap: 7, nickname: 'Lửa Nhỏ', shopBat: true }, exp: { homNay: 40, expConThieu: 120, ongNghiem: 620 }, doanMo: true, capNhatLuc: new Date().toISOString() }
     case '/hs/tu-luyen/nguon':

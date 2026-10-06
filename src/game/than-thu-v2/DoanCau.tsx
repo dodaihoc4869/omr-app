@@ -14,6 +14,7 @@ import type { Question } from './core'
 import type { KetQuaCau } from './doan-kieu'
 import OSoTraLoi from '../../components/OSoTraLoi'
 import XemLaiChuan from './doan2/XemLaiChuan'
+import TheBuocSai2 from './doan2/TheBuocSai2'
 
 const CHU = ['A', 'B', 'C', 'D'] as const
 
@@ -43,17 +44,20 @@ export function duDapAn(q: Question, chon: string): boolean {
  *  - `xemLaiChuan`: đã có kết quả ⇒ thay cả thẻ bằng khối xem lại CHUẨN của app (`TheCau` xem_lai + `chuanHoaLoiGiaiCau`), số trên đầu thẻ = `stt`. */
 /** `cuoi` (OMNI 3, 05/10): phần thêm đặt TRONG thẻ câu, sau phương án/ô đáp số (chip "Chưa chắc") — không chiếm hàng dưới thẻ, nên thẻ câu
  *  và các nút đòn giữ đúng bố cục đang chạy (thầy 05/10: "app của học sinh giữ nguyên mọi thứ giao diện"). */
-export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number }; cuoi?: ReactNode }
+export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number }; cuoi?: ReactNode; /** CẨN THẬN (c) (chỉ-thêm): ghi lựa chọn ở thẻ "Sai vì bước nào?" (chỉ có khi OMNI bật); vắng ⇒ không thẻ. */ onBuocSai?: (qid: string, ma: string) => Promise<void> }
 
-export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan, cuoi }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
+export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan, cuoi, onBuocSai }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
   const hinh = q.hinhAnh as HinhAnh[]
   // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`expCau`; máy chủ cũ: `reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
   const cheDo = useCheDoHieuUng()
+  // CẨN THẬN (c): thẻ nằm TRONG thẻ câu nhưng NGOÀI hộp kết quả (hộp ấy có nền sáng riêng); chỉ khi có `ketQua.buocSai` và nơi gọi đưa `onBuocSai`.
+  const theBuocSai = ketQua?.buocSai && onBuocSai ? <TheBuocSai2 key={ketQua.buocSai.qid} lua={ketQua.buocSai.lua} onChon={ma => onBuocSai(ketQua.buocSai!.qid, ma)} /> : null
   const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward, expCau: ketQua.expCau }) : 0
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>
       <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{ketQua.loiNhan && <small data-khoi="omni-loi-nhan">{ketQua.loiNhan}</small>}{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
+      {theBuocSai}
       <XemLaiChuan q={q} chon={chon} dapAn={ketQua.answer} solution={ketQua.solution} solutionImages={ketQua.solutionImages} stt={xemLaiChuan.stt} onZoom={onZoom} />
     </section>
   )
@@ -112,6 +116,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
           </details>
         </div>
       )}
+      {theBuocSai}
     </section>
   )
 }

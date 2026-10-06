@@ -114,11 +114,11 @@ describe('bang — BangOmni đủ trường', () => {
     expect(b.sanSang.S5).toBeNull()
     expect(b.hieuChuan).toEqual({ soCaChot: 0, du: false })
   })
-  it('Cần thầy chữa đủ BA loại: nút thắt (gom theo câu, kèm nền yếu nhất), câu rời kế hoạch, sơ ý cao', async () => {
+  it('Cần thầy chữa đủ BA loại, THỨ TỰ (thầy 06/10): câu rời kế hoạch lên ĐẦU, rồi nút thắt (gom theo câu, kèm nền yếu nhất), rồi sơ ý cao', async () => {
     const { env, id } = await dungBang()
     const b = (await gvOmni(env, { action: 'bang', chienDichId: id }, T0)) as unknown as BangOmni
-    expect(b.canThayChua.map((c) => c.loai)).toEqual(['nut_that', 'cat_tia', 'so_y'])
-    const [nut, cat, soY] = b.canThayChua
+    expect(b.canThayChua.map((c) => c.loai)).toEqual(['cat_tia', 'nut_that', 'so_y'])
+    const [cat, nut, soY] = b.canThayChua
     expect(nut).toMatchObject({ loai: 'nut_that', tieuDe: 'Câu 2 · Este — công thức', soEm: 2, qids: ['A2'], sbd: ['S1', 'S2'], vkn: 'nen:ti_le_mol_phuong_trinh' })
     expect(nut!.phu).toContain('bước 2')
     expect(cat).toMatchObject({ loai: 'cat_tia', tieuDe: 'Câu 5 · Este — thuỷ phân', soEm: 1, qids: ['A5'], sbd: ['S3'] })

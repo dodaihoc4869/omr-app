@@ -89,6 +89,8 @@ export const THAM_SO_OMNI = Object.freeze({
   /** CHỨNG CHỈ "Sẵn sàng 8+" — bốn điều kiện K ∧ C ∧ M ∧ T. */
   K_P_VKN: 0.95,
   C_SO_Y: 0.07,
+  /** CHƯƠNG TRÌNH "CẨN THẬN" (đặc tả 4.6): S_em (đủ dữ liệu) > C_SO_Y ⇒ mốc ôn duy trì (14/30 ngày) × hệ số này; ô "Soát lại…" + thẻ "Sai vì bước nào?" hiện cho em. */
+  CAN_THAN_HE_SO_MOC: 0.7,
   M_P8: 0.9,
   T_CA_CHOT: 8.0,
   MUC_TIEU: 8.0,
@@ -313,7 +315,13 @@ export interface KetQuaOmniTraLoi {
   dang?: { ma: string; ten: string; pTruoc: number; pSau: number; nTuLam: number; nNgay: number }
   /** Một dòng chữ dưới kết quả (đúng nhưng chậm / lướt / chưa chắc…); null ⇒ không thêm dòng. */
   loiNhan: string | null
+  /** CHƯƠNG TRÌNH "CẨN THẬN" (chỉ-thêm, CHỈ có khi `true`): OMNI bật ∧ Sơ ý của em (số hiện ở Sảnh, hồ sơ TRƯỚC lượt này) > ngưỡng. Vắng ⇒ không có ô/thẻ nào thêm. */
+  canThan?: boolean
+  /** Thẻ "Em biết câu này. Sai vì bước nào?" (chỉ-thêm; CHỈ khi `canThan` ∧ `chacMaSai`): các bước của câu (đã lọc mã nội bộ); em bấm ⇒ `hoa2-omni-buoc-sai` ghi sổ, không chấm. */
+  buocSai?: { lua: LuaChonBuocSai[] }
 }
+/** Một lựa chọn của thẻ "Sai vì bước nào?": `ma` = mã vi kỹ năng (gửi lại khi bấm; KHÔNG hiện trên màn em), `ten` = tên bước đã lọc mã nội bộ. */
+export interface LuaChonBuocSai { ma: string; ten: string }
 /** Phần OMNI thêm vào `hoa2-sanh`. */
 export interface SanhOmni {
   bat: true
@@ -330,6 +338,8 @@ export interface SanhOmni {
   metGio: { khung: KhungGio; tiLe: number; tiLeTot: number; coTheDoi: boolean } | null
   nhatKy: string[] | null
   deThu: { duoc: boolean; soCau: number; phut: number }
+  /** CHƯƠNG TRÌNH "CẨN THẬN" (chỉ-thêm, CHỈ có khi `true`): OMNI bật ∧ Sơ ý của em (đúng số `sEm` ở trên, đủ dữ liệu) > `sMucTieu`. Vắng ⇒ app em y hệt hôm nay. */
+  canThan?: boolean
 }
 /** Phần OMNI thêm vào `/ph/hoc-2`. */
 export interface PhOmni {

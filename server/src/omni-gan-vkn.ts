@@ -842,7 +842,7 @@ export async function kiemDinhQTuan(env: Env, nowMs = Date.now()): Promise<Recor
     const tuan = tuanCua(ngayVnCua(nowMs)), nay = new Date(nowMs).toISOString()
     const daChay = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_KIEM_Q_TUAN).first<Row>().catch(() => null)
     if (str(daChay?.gia_tri) === tuan) return { ok: true, chay: false, lyDo: 'da_chay_tuan_nay', tuan }
-    const LOC = `ket_qua IS NOT NULL AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed' AND qid NOT LIKE 'nen:%' AND instr(qid, '~ss') = 0`
+    const LOC = `ket_qua IS NOT NULL AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed' AND qid NOT LIKE 'nen:%' AND instr(qid, '~ss') = 0 AND instr(qid, '~bt') = 0 AND instr(qid, '~yd') = 0`
     const ung = await env.DB.prepare(`SELECT qid, COUNT(*) AS n FROM su_kien_hoc WHERE ${LOC} GROUP BY qid HAVING COUNT(*) >= ? ORDER BY n DESC, qid LIMIT ?`)
       .bind(K.LUOT_TOI_THIEU, K.CAU_TOI_DA).all<Row>().catch(() => ({ results: [] as Row[] }))
     const qids = (ung.results ?? []).map((x) => str(x.qid))

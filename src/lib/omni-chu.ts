@@ -51,6 +51,16 @@ export function chuTram(tenLoi: string | null, coCauNen: boolean): string {
     : `${loi} ${TEN_AI} đổi ải tiếp theo dễ hơn một bậc. Không mất Máu.`
 }
 
+// ---------------------------------------------------------------- CHƯƠNG TRÌNH "CẨN THẬN" (đặc tả 4.6; thầy 06/10) — CHỈ hiện cho em máy chủ báo `canThan` (Sơ ý > 7%)
+/** (b) Ô một chạm trước khi nộp câu Phần III — chữ đúng đặc tả; KHÔNG bắt buộc, không chặn nút nộp. */
+export const CHU_SOAT_LAI = 'Soát lại đơn vị và số liệu'
+export const GOI_Y_SOAT_LAI = 'Đọc lại đề một lượt: đơn vị đã đổi đúng chưa, số liệu đã chép đúng chưa. Chạm khi em đã soát xong — không bắt buộc, không trừ gì cả.'
+/** (c) Thẻ sau lượt chắc-mà-sai ở câu em đã vững: em chạm MỘT bước (hoặc "Em chưa rõ") — ghi lại, không chấm. */
+export const TIEU_DE_BUOC_SAI = 'Em biết câu này. Sai vì bước nào?'
+export const NUT_EM_CHUA_RO = 'Em chưa rõ'
+export const CHU_DA_GHI_BUOC_SAI = 'Đã ghi lại lựa chọn của em. Không chấm điểm.'
+export const CHU_LOI_GHI_BUOC_SAI = 'Chưa ghi được lựa chọn. Em chạm lại nhé.'
+
 // ---------------------------------------------------------------- Sảnh (dòng thêm trong thẻ chiến dịch sẵn có)
 export function chuDangVung(a: number, b: number): string {
   return `Dạng vững ${a}/${b}`

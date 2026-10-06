@@ -29,7 +29,7 @@ export default function NutGiaoTheoBai({ className = 'gv2-nut-vien' }: { classNa
     setScreen('goilenbang')
   }
   return (
-    <button type="button" className={className} onClick={mo} title={`Tick bài vừa dạy ⇒ ${TEN_AI} tự giao luyện theo bài (Lên bảng › Dạy học › Bài hôm nay)`}>
+    <button type="button" className={className} onClick={mo} title={`Tick bài vừa dạy ⇒ ${TEN_AI} tự giao luyện theo bài (Chữa trên lớp › Dạy học › Bài hôm nay)`}>
       Giao theo bài
     </button>
   )

@@ -14,7 +14,7 @@ import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
-import { chanKhacKhoiEm } from './chan-khac-khoi'
+import { chanKhacKhoiEm, tapCauNghiTuJson } from './chan-khac-khoi'
 import { ghiSnapshot, quyetDinhSnapshot } from './cau-snapshot'
 // CỔNG PHẠM VI CÁ NHÂN (CNH-1.0 P02) áp cho ĐƯỜNG ĐỌC CÂU DÙNG CHUNG (`/hs/cau-theo-qid` + `/hs/on-lai/nop`):
 // trước đây chỉ kế hoạch ngày lọc phạm vi; đường này phục vụ theo qid nên phải qua CÙNG cổng, nếu không thì
@@ -135,17 +135,27 @@ export function cauCongKhai(q: PrivateQuestion) {
  * đúng 3 truy vấn D1 (em có thật + đã gặp; nội dung; đề bảo vệ), không R2. Trả câu RIÊNG (có đáp án) — NƠI GỌI phải tự lược sạch
  * (`cauCongKhai`) trước khi ra đường công khai. `loi` có giá trị thì KHÔNG có câu nào (SBD lạ, hoặc không kiểm được đề bảo vệ: đóng cửa).
  */
-export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepThem?: ReadonlySet<string>): Promise<{ loi?: string; cau: PrivateQuestion[]; khongCo: string[]; snapshotBat: boolean }> {
+export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepThem?: ReadonlySet<string>): Promise<{ loi?: string; cau: PrivateQuestion[]; khongCo: string[]; snapshotBat: boolean; nghi?: ReadonlySet<string> }> {
   if (sbd.length > 40) return { loi: KHONG_TIM_THAY, cau: [], khongCo: xin, snapshotBat: false }
   // Truy vấn 1: em có thật không, và trong các qid xin, em đã từng gặp những câu nào. (Em có thật = như `laHocSinhThat`.)
-  const r = await env.DB.prepare(
+  // 06/10 (làn A, câu NGHI sai đáp án): cổng cuối của em loại câu đang 'nghi' ⇒ danh sách câu nghi đọc GỘP vào chính truy vấn này (thêm MỘT cột, không thêm truy vấn — giữ ngân sách 4 truy vấn
+  // của `tests/cau-theo-qid-1909.test.ts`). Bảng chưa có / lỗi ⇒ chạy lại không cột ấy (cổng tự đọc như thường, đệm 60 s).
+  const sqlTruyVan1 = (kemNghi: boolean) =>
     `SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?) OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?)
                  THEN 1 ELSE 0 END AS co,
             (SELECT json_group_array(qid) FROM (SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)))) AS da_gap,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = 'cau_snapshot') AS co_snapshot,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = 'pham_vi_hoc') AS co_pham_vi,
-            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngan_sach_luot') AS co_ngan_sach`,
-  ).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<{ co: number; da_gap: string | null; co_snapshot: string | null; co_pham_vi: string | null; co_ngan_sach: string | null }>()
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngan_sach_luot') AS co_ngan_sach${kemNghi ? `,
+            (SELECT json_group_array(qid) FROM (SELECT qid FROM cau_nghi_dap_an WHERE trang_thai = 'nghi' LIMIT 5000)) AS nghi` : ''}`
+  type Dong1 = { co: number; da_gap: string | null; co_snapshot: string | null; co_pham_vi: string | null; co_ngan_sach: string | null; nghi?: string | null }
+  const hoi1 = (kemNghi: boolean) => env.DB.prepare(sqlTruyVan1(kemNghi)).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<Dong1>()
+  let r: Dong1 | null
+  try {
+    r = await hoi1(true)
+  } catch {
+    r = await hoi1(false)
+  }
   // CỜ SNAPSHOT ĐỌC GỘP VÀO CHÍNH TRUY VẤN NÀY (P01/T34): thêm một cột chứ KHÔNG thêm một truy vấn, giữ đúng
   // ngân sách truy vấn mà `tests/cau-theo-qid-1909.test.ts` (mục "chi phí") đang khoá.
   const batSnapshot = String(r?.co_snapshot ?? '').trim() === 'bat'
@@ -224,7 +234,7 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
 
   // `khongCo` tính SAU mọi cửa (kể cả bộ chọn) ⇒ máy em biết đúng câu nào KHÔNG nhận được trong lượt này.
   const co = new Set(loc2.map((c) => c.qid))
-  return { cau: loc2, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot }
+  return { cau: loc2, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot, nghi: tapCauNghiTuJson(r?.nghi) }
 }
 
 /**
@@ -304,7 +314,7 @@ export async function hsCauTheoQid(env: Env, b: Record<string, unknown>): Promis
   if (b.qid.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần xin tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
   const r = await layCauChoEm(env, sbd, donQid(b.qid))
   if (r.loi) return { ok: false, error: r.loi }
-  const cau = await chanKhacKhoiEm(env, 'on_lai', sbd, r.cau) // LUẬT THẦY 05/10: cổng cuối — câu khác khối em không ra máy em (gộp vào `khongCo`)
+  const cau = await chanKhacKhoiEm(env, 'on_lai', sbd, r.cau, r.nghi ? { nghiSan: r.nghi } : {}) // LUẬT THẦY 05/10: cổng cuối — câu khác khối em không ra máy em (gộp vào `khongCo`); câu NGHI đã đọc sẵn ở truy vấn 1
   const boKhoi = r.cau.filter((q) => !cau.includes(q)).map((q) => q.qid)
   // CHỐT ẢNH CHỤP TRƯỚC KHI TRẢ CÂU RA (T34). Lỗi ghi không chặn việc giao câu (xem chú thích hàm trên).
   await ghiSnapshotKhiGiao(env, sbd, cau, r.snapshotBat)

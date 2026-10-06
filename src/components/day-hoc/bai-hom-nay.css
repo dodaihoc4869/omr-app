@@ -1,0 +1,591 @@
+/* BƯỚC "BÀI HÔM NAY" — kiểu dáng mới (thầy 06/10: "hiện đại siêu đẹp mắt … giao diện siêu đẹp đồng bộ"). Mọi lớp bắt đầu bằng `bhn-`.
+ * Màu CHỈ qua biến app thầy (`--bts-*`, có sẵn bản sáng + tối), không mã màu thô (npm run check:mau); không đổi màu lớp nào đang có.
+ * Khoảng cách 4/8/12/16; đích chạm ≥ 44 px; số tabular-nums; chuyển động chỉ transform/opacity. Dùng lại lớp `cd-*` của ô chọn em (màn Giao) cho ô chọn lớp. */
+.bhn {
+  gap: 16px;
+}
+
+/* ---- chọn lớp ---- */
+.bhn-lop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.bhn-nhan {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bts-chu-phu);
+}
+.bhn-chon-lop .cd-o-chon {
+  min-height: 52px;
+  border-radius: 14px;
+  background: var(--bts-mat-2);
+}
+.bhn-chon-lop .cd-the-chon {
+  min-height: 32px;
+  color: var(--bts-duong);
+}
+/* Ít dòng (3 khối + vài lớp) ⇒ tấm xổ xuống đủ cao để thấy hết, không phải cuộn. */
+.bhn-chon-lop .cd-cay {
+  max-height: min(440px, 60vh);
+}
+/* Tấm xổ xuống nằm TRONG luồng, ngay dưới ô: ô cao nhiều dòng khi chọn nhiều lớp (nhất là điện thoại) thì tấm không đè lên thẻ lớp đã chọn. */
+.bhn-chon-lop .cd-tam-chon {
+  position: static;
+}
+.bhn-khoi-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0;
+}
+.bhn-khoi-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--bts-duong-nhat);
+  color: var(--bts-duong);
+  font-size: 13px;
+  font-weight: 700;
+}
+.bhn-trong {
+  margin: 0;
+  padding: 20px 16px;
+  border: 1px dashed var(--bts-vien);
+  border-radius: 16px;
+  background: var(--bts-mat-2);
+  color: var(--bts-chu-phu);
+  font-size: 14px;
+  text-align: center;
+}
+.bhn-cho {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---- cây bài: mỗi chương một thẻ ---- */
+.bhn-cay {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.bhn-chuong {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--bts-vien);
+  border-radius: 16px;
+  background: var(--bts-mat);
+}
+.bhn-chuong-dau {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--bts-vien);
+  background: var(--bts-mat-2);
+}
+.bhn-chuong-dau h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.bhn-chuong-dem {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bts-chu-phu);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bhn-tien {
+  grid-column: 1 / -1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--bts-xam-o);
+}
+.bhn-tien > i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--bts-la);
+}
+.bhn-bai-ds {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+
+/* ---- một dòng bài ---- */
+.bhn-bai {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 12px;
+  padding: 2px 10px 2px 6px;
+  border-radius: 12px;
+}
+.bhn-bai:hover {
+  background: var(--bts-mat-2);
+}
+.bhn-bai--chon,
+.bhn-bai--chon:hover {
+  background: var(--bts-duong-nhat);
+  box-shadow: inset 0 0 0 2px var(--bts-duong);
+}
+.bhn-bai-chon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 8px 4px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.bhn-bai--xong .bhn-bai-chon {
+  cursor: default;
+}
+.bhn-bai-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.bhn-bai-radio:focus-visible + .bhn-bai-so {
+  outline: 3px solid var(--bts-duong);
+  outline-offset: 2px;
+}
+.bhn-bai-so {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--bts-xam-o);
+  color: var(--bts-chu-phu);
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.bhn-bai[data-trang-thai='da_day'] .bhn-bai-so {
+  background: var(--bts-la-nhat);
+  color: var(--bts-la);
+}
+.bhn-bai[data-trang-thai='dang_luyen'] .bhn-bai-so {
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+}
+.bhn-bai[data-trang-thai='hom_nay'] .bhn-bai-so,
+.bhn-bai-so--lon {
+  background: var(--bts-duong);
+  color: var(--bts-mat);
+}
+.bhn-bai-so--lon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  font-size: 18px;
+}
+.bhn-bai-chu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.bhn-bai-ten {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.bhn-bai--xong .bhn-bai-ten {
+  color: var(--bts-chu-phu);
+}
+.bhn-bai-chu small {
+  font-size: 12.5px;
+  color: var(--bts-chu-mo);
+  font-variant-numeric: tabular-nums;
+}
+.bhn-bai-phai {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* ---- nhiều lớp: chấm trạng thái từng lớp + "Sửa em / Bỏ tick theo lớp" ---- */
+.bhn-bai-lop {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 4px 10px 52px;
+}
+.bhn-cham-ds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bhn-cham {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: 999px;
+  background: var(--bts-xam-o);
+  color: var(--bts-chu-phu);
+  font-size: 12px;
+  font-weight: 700;
+}
+.bhn-cham::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.bhn-cham--xanh {
+  background: var(--bts-la-nhat);
+  color: var(--bts-la);
+}
+.bhn-cham--vang {
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+}
+.bhn-cham--duong {
+  background: var(--bts-duong-nhat);
+  color: var(--bts-duong);
+}
+.bhn-cham-nut {
+  display: inline-flex;
+}
+.bhn-nut-link {
+  min-height: 28px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--bts-duong);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.bhn-nut-link:focus-visible {
+  outline: 3px solid var(--bts-duong);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.bhn-chi-tiet ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bhn-chi-tiet-hang {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: var(--bts-mat);
+}
+.bhn-chi-tiet-ten {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  font-weight: 600;
+}
+.bhn-chi-tiet-nut {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ---- thẻ xác nhận ---- */
+.bhn-xn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--bts-duong);
+  border-radius: 18px;
+  background: var(--bts-mat-2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bts-duong) 14%, transparent);
+}
+.bhn-xn-dau {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.bhn-xn-ten {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.bhn-xn-ten h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.bhn-xn-ten p {
+  margin: 0;
+}
+.bhn-xn-lop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.bhn-lop-the {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--bts-duong-nhat);
+  color: var(--bts-duong);
+  font-size: 13px;
+  font-weight: 700;
+}
+.bhn-tu-giao {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-left: 4px solid var(--bts-duong);
+  border-radius: 12px;
+  background: var(--bts-mat);
+}
+.bhn-tu-giao p {
+  margin: 0;
+}
+.bhn-xem-ds {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bhn-xem-lop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 14px;
+  background: var(--bts-mat);
+}
+.bhn-xem-dau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.bhn-xem-dau b {
+  font-size: 15px;
+}
+.bhn-xem-tom {
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+}
+.bhn-xem-dau {
+  list-style: none;
+}
+summary.bhn-xem-dau {
+  cursor: pointer;
+}
+summary.bhn-xem-dau::-webkit-details-marker {
+  display: none;
+}
+.bhn-xem-mui {
+  margin-left: auto;
+  color: var(--bts-duong);
+  font-size: 14px;
+}
+.bhn-xem-chi-tiet[open] > summary {
+  margin-bottom: 12px;
+}
+.bhn-xem-chi-tiet[open] .bhn-xem-mui {
+  transform: rotate(180deg);
+}
+.bhn-hanh-dong {
+  align-items: center;
+}
+
+/* ---- điện thoại hẹp (390 px): dòng bài xuống hàng, chip + nút nằm dưới tên ---- */
+@media (max-width: 560px) {
+  .bhn-bai {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bhn-bai-phai {
+    justify-content: flex-start;
+    padding: 0 4px 10px 52px;
+  }
+  .bhn-chuong-dau {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bhn-xn {
+    padding: 12px;
+  }
+}
+
+/* ================= BỐ CỤC THEO BỀ NGANG THẬT CỦA KHUNG (thầy 06/10: "làm cho màn hình xoay ngang và máy tính nữa") =================
+ * Dùng container query `bhn` đặt trên `.bhn-ngoai` (không phụ thuộc thanh bên 88 / 264 px hay bề rộng tối đa 1100 px của vỏ app thầy). Trình duyệt không hiểu
+ * `@container` ⇒ giữ nguyên bố cục xếp dọc (điện thoại dọc) — vẫn dùng được.
+ *   < 760 px   xếp dọc, một cột bài (điện thoại dọc)
+ *   ≥ 760 px   cây bài chia 2 cột theo chương (không xé thẻ chương) — xoay ngang, máy tính bảng; thẻ xác nhận nằm dưới cây
+ *   ≥ 920 px   HAI CỘT: trái = chọn lớp + cây bài, phải = thẻ xác nhận DÍNH theo cuộn (nút Giao luôn thấy) — máy tính
+ * Cao ≤ 520 px khi xoay ngang: gọn khoảng cách (điện thoại nằm ngang chỉ cao ~ 360–430 px). */
+/* Khung chứa (container) là `.bhn-ngoai`: container query chỉ đổi kiểu của phần tử CON của khung chứa, nên lưới hai cột đặt ở `.bhn-khung` bên trong. */
+.bhn-ngoai {
+  container: bhn / inline-size;
+  min-width: 0;
+}
+.bhn-khung {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.bhn-cot-trai {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.bhn-cot-phai {
+  min-width: 0;
+}
+.bhn-lop {
+  max-width: 760px;
+}
+/* Ô "chờ chọn bài" chỉ hiện khi thẻ xác nhận có cột riêng (máy tính); xếp dọc thì chưa chọn bài là chưa có gì ở dưới (y như trước). */
+.bhn-cho-chon {
+  display: none;
+}
+
+@container bhn (min-width: 760px) {
+  .bhn-cay {
+    display: block;
+    columns: 340px 2;
+    column-gap: 12px;
+  }
+  .bhn-chuong {
+    margin-bottom: 12px;
+    break-inside: avoid;
+  }
+}
+@container bhn (min-width: 920px) {
+  .bhn-khung {
+    grid-template-columns: minmax(0, 1fr) clamp(360px, 40cqw, 460px);
+    align-items: start;
+    gap: 20px;
+  }
+  .bhn-cot-phai {
+    position: sticky;
+    top: 12px;
+    /* chừa 4 px quanh thẻ để vòng viền ngoài (box-shadow) không bị cắt bởi thanh cuộn của cột */
+    margin: -4px;
+    padding: 4px;
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .bhn-cho-chon {
+    display: block;
+    padding: 28px 20px;
+  }
+  /* Cột trái chỉ còn ~ 520–800 px: một cột bài cho dễ đọc tên bài; chỉ khi cột trái đủ rộng (≥ 2 × 440 px) mới chia hai cột. */
+  .bhn-cay {
+    columns: 440px 2;
+  }
+  /* Nút Giao luôn thấy dù thẻ dài hơn màn hình: thanh nút dính đáy cột. */
+  .bhn-hanh-dong {
+    position: sticky;
+    bottom: -16px;
+    margin: 0 -16px -16px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--bts-vien);
+    border-radius: 0 0 18px 18px;
+    background: var(--bts-mat-2);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .bhn,
+  .bhn-khung,
+  .bhn-cot-trai {
+    gap: 10px;
+  }
+  .bhn-chuong-dau {
+    padding: 8px 12px 6px;
+  }
+  .bhn-bai-ds {
+    padding: 4px;
+  }
+  .bhn-bai-chon {
+    min-height: 48px;
+    padding: 4px;
+  }
+  .bhn-bai-so {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .bhn-xn {
+    gap: 10px;
+    padding: 12px;
+  }
+  .bhn-chon-lop .cd-cay {
+    max-height: 46vh;
+  }
+  .bhn-chon-lop .cd-o-chon {
+    min-height: 44px;
+    padding: 4px 4px 4px 8px;
+  }
+  .bhn-chon-lop .cd-the-chon {
+    min-height: 28px;
+    font-size: 12px;
+  }
+  .bhn-trong {
+    padding: 12px;
+  }
+}

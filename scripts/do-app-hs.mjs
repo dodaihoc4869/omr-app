@@ -229,11 +229,13 @@ async function mayChuGia(ctx, goc) {
         body = JSON.parse(r.request().postData() || '{}')
       } catch {}
       const tl = await GIA.traLoi(u.pathname, body)
-      const than = JSON.stringify(tl)
+      // Thân theo luồng (NDJSON) — máy chủ mới trả khi đăng nhập xin kèm Sảnh (may-chu-gia.ts `__ndjson`); còn lại JSON một khối.
+      const laLuong = Array.isArray(tl.__ndjson)
+      const than = laLuong ? tl.__ndjson.map((x) => JSON.stringify(x)).join('\n') + '\n' : JSON.stringify(tl)
       NHAT_KY.push([Date.now(), u.pathname + (body.action ? '#' + body.action : ''), than.length])
       // Yêu cầu trả lời giả KHÔNG chịu mạng giả lập của CDP (đo: 13 ms) ⇒ tự trễ đúng Slow 4G: 1 RTT + thời gian máy chủ + thân / băng thông.
       if (TRE_API) await new Promise((ok) => setTimeout(ok, SLOW4G.latency + MAY_CHU_MS + (than.length / 5 / SLOW4G.downloadThroughput) * 1000))
-      return r.fulfill({ status: 200, contentType: 'application/json', headers: cors, body: than })
+      return r.fulfill({ status: 200, contentType: laLuong ? 'application/x-ndjson' : 'application/json', headers: cors, body: than })
     },
   )
 }

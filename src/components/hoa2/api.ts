@@ -56,6 +56,9 @@ export interface BiaTrenSanh { con: number; tong: number; giaoHuu: { mo: boolean
 /** Kết quả đọc `hoa2-sanh`: cờ tắt · em chưa chọn thần thú · có dữ liệu Sảnh. */
 export type KetQuaSanh = { cheDo2: false } | { cheDo2: true; canChonThu: true } | { cheDo2: true; canChonThu?: false; sanh: SanhHoa2 }
 
+/** CẨN THẬN (đặc tả 4.6; chỉ-thêm): `hoa2-sanh` báo `omni.canThan` (OMNI bật ∧ Sơ ý > 7%)? Cổng học sinh dùng để bật ô "Soát lại đơn vị và số liệu" ở Làm câu ôn. Vắng / lỗi ⇒ false. */
+export const canThanTuSanh = (kq: KetQuaSanh | null | undefined): boolean => !!kq && kq.cheDo2 && 'sanh' in kq && kq.sanh.omni?.canThan === true
+
 /** Số "Chuỗi N ngày" trên Sảnh: ưu tiên số máy chủ tính từ sổ học (`sanh.chuoiNgay`); máy chủ cũ / chưa có Sảnh ⇒ `duPhong` (số kế hoạch ngày cũ). */
 export function chuoiNgaySanh(kq: KetQuaSanh | null | undefined, duPhong: number): number {
   const n = kq && kq.cheDo2 && 'sanh' in kq ? kq.sanh.chuoiNgay : null
@@ -393,6 +396,12 @@ export async function omniTramXong(goi: GoiLenhHoa2, session: string): Promise<{
   const cau = laCauCongKhai(o.cau) && choPhepCauChoEm(o.cau, 'game-v2/hoa2-omni-tram-xong') ? o.cau : null
   const viTri = laSo(o.viTri) && o.viTri >= 0 ? Math.floor(o.viTri) : null
   return cau && viTri !== null ? { cau, viTri } : { cau: null, viTri: null }
+}
+
+/** CẨN THẬN (c): em chạm một bước ở thẻ "Em biết câu này. Sai vì bước nào?" (hoặc "Em chưa rõ") ⇒ máy chủ ghi sổ riêng `omni_buoc_sai`, KHÔNG chấm. Lỗi ⇒ NÉM câu của máy chủ. */
+export async function omniBuocSai(goi: GoiLenhHoa2, qid: string, ma: string): Promise<{ daGhi: boolean }> {
+  const o = vatOmni(await goi('hoa2-omni-buoc-sai', { qid, ma }))
+  return { daGhi: o.daGhi === true }
 }
 
 /** Đề thử nửa (14 câu lạ, 25 phút): câu CÔNG KHAI (không đáp án) + hạn nộp của máy chủ. */

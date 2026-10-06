@@ -503,3 +503,9 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
  * Cho thanh tấm nền KÍNH chuẩn của Đảo 2.0 (--d2-kinh + viền --d2-kinh-vien, đúng bộ màu chip Trợ giúp/Chưa chắc ngay trên — thầy 05/10:
  * "thêm thì phải đồng bộ đúng chuẩn"); chữ, nút, vị trí giữ nguyên. */
 .dao2 .dao2-de-thu[data-pha="lam"] > .dao2-chan[data-noi]{background:var(--d2-kinh);box-shadow:inset 0 0 0 1px var(--d2-kinh-vien);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:18px;padding:8px 10px 10px}
+/* OMNI 3 · CẨN THẬN (b)(c) (06/10): CHỈ bố cục, màu/nút dùng lại lớp + biến sẵn có. (b) chip "Soát lại đơn vị và số liệu" cạnh chip Chưa chắc — máy hẹp (≤ 400 px) vẫn giữ chữ.
+ * (c) thẻ "Em biết câu này. Sai vì bước nào?" dùng thẻ kính `dao2-het-tran` + nút viền `dao2-nut-vien`; các bước xếp hàng, tên dài xuống dòng. */
+@media (max-width:400px){.dao2 .dao2-tro[data-khoi="soat-lai"] .dao2-tro-chu{display:inline}}
+.dao2 .dao2-buoc-sai{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.dao.dao2 .dao2-buoc-sai button.dao2-nut-vien{flex:1 1 auto;min-width:0;height:auto;padding:8px 14px;line-height:1.3;text-align:center}
+.dao.dao2 .dao2-buoc-sai button.dao2-nut-vien[aria-pressed="true"]{--nut-chu:var(--d2-xanh-chu);--nut-bong:inset 0 0 0 2px var(--d2-xanh-chu)}

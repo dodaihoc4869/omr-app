@@ -97,7 +97,7 @@ export default function CongTacOmni() {
       <TheNoiDung>
         <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k2)' }}>OMNI (theo lớp)</h2>
         <p style={{ marginBottom: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>
-          Thầy tick bài vừa dạy ở Lên bảng › Dạy học › Bài hôm nay; {TEN_AI} tự giao luyện theo bài, lập Bảng bài, chấm Chứng chỉ Sẵn sàng 8+ và gom danh sách Cần thầy
+          Thầy tick bài vừa dạy ở Chữa trên lớp › Dạy học › Bài hôm nay (hoặc bấm Giao theo bài ở Chiến dịch luyện); {TEN_AI} tự giao luyện theo bài, lập Bảng bài, chấm Chứng chỉ Sẵn sàng 8+ và gom danh sách Cần thầy
           chữa. Bật theo lớp để chạy thử trước. Đang: <b data-trang-thai-omni>{loiDoc && !co ? 'chưa đọc được' : chuTrangThaiOmni(co)}</b>.
         </p>
         <div role="radiogroup" aria-label="OMNI (theo lớp)" className="cd-cong-tac">

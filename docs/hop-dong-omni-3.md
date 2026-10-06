@@ -19,7 +19,8 @@ omni: {
   choBaiMoi: boolean, onBaiCu: number,     // chế độ chờ bài mới / số câu ôn bài cũ hôm nay
   metGio: { khung, tiLe, tiLeTot, coTheDoi } | null,
   nhatKy: string[] | null,                 // 2–5 dòng "Hôm nay em tiến thêm gì" (chỉ khi xong kế hoạch)
-  deThu: { duoc, soCau: 14, phut: 25 }
+  deThu: { duoc, soCau: 14, phut: 25 },
+  canThan?: true                           // CHƯƠNG TRÌNH "CẨN THẬN" (mục A·2): CHỈ có khi OMNI bật ∧ Sơ ý (đúng số `sEm` ở trên, đủ dữ liệu) > 7 %. Vắng ⇒ app em y hệt hôm nay.
 }
 ```
 
@@ -35,7 +36,9 @@ omni: {
   chacMaSai: boolean,     // client mở lời giải từng bước ngay
   tram?: { vkn, ten, tenLoi, nhan, coCauNen, chu },   // 3 câu sai liền: client mở câu nền SẴN CÓ (/hs/luyen-nen {nhan}); không có câu nền ⇒ chỉ báo chữ
   dang?: { ma, ten, pTruoc, pSau, nTuLam, nNgay },
-  loiNhan: string | null  // một dòng thêm dưới kết quả (đúng nhưng chậm / lướt / chưa chắc / chắc mà sai)
+  loiNhan: string | null, // một dòng thêm dưới kết quả (đúng nhưng chậm / lướt / chưa chắc / chắc mà sai)
+  canThan?: true,         // CẨN THẬN (mục A·2): CHỈ có khi hồ sơ OMNI TRƯỚC lượt này có Sơ ý > 7 % (đủ dữ liệu). Vắng ⇒ không ô/thẻ nào thêm.
+  buocSai?: { lua: [{ ma, ten }] }  // CẨN THẬN (c): CHỈ khi `canThan` ∧ `chacMaSai` ∧ tra được ≥ 1 tên bước; `ten` đã lọc mã nội bộ, ≤ 3 mục; `ma` gửi lại khi em chạm
 }
 ```
 - `msLam` do máy em đo từ lúc câu hiện tới lúc bấm chọn; máy chủ kẹp [0, 900 000]; chỉ dùng để THA (lướt), không phạt, không cộng thưởng.
@@ -54,6 +57,17 @@ Sau Trạm hồi phục: đổi ải KẾ TIẾP chưa làm của chuyến bằn
 ### `hoa2-omni-de-thu` `{}` → `{ ok, id, cau: CâuCôngKhai[14], phut: 25, hetLuc: ISO }` | `{ ok:false, lyDo }`
 ### `hoa2-omni-de-thu-nop` `{ id, traLoi: {qid: string}, msLam?: {qid: number} }` → `{ ok, diem, dung, tong, cau:[{ qid, dung, traLoi, dapAn, loiGiai }] }`
 Đề thử nửa: 14 câu lạ (DẠY HỌC, bài cũ + bài đang luyện), 25 phút, chấm khi nộp cả bài; ghi sổ nguồn `luyen`, mã nguồn `de_thu:<id>`, purpose `de_thu`.
+
+### CHƯƠNG TRÌNH "CẨN THẬN" (đặc tả 4.6; `server/src/omni-can-than.ts`) — mục A·2
+`canThan` (chỉ-thêm, CHỈ khi `true`) = **OMNI bật cho em ∧ Sơ ý của em > 7 %** (`THAM_SO_OMNI.C_SO_Y`, nghiêm ngặt). "Sơ ý của em" = đúng số em thấy ở Sảnh: ĐỦ DỮ LIỆU (≥ `S_AO` = 10 lượt ở câu đã vững) mới có — prior 0,08 đã lớn hơn 0,07 nên em chưa làm gì KHÔNG bị coi là sơ ý. Nơi báo: `hoa2-sanh` → `omni.canThan` (cờ lúc mở Đảo / Đoàn / Làm câu ôn) và `answer`/`doan-nop` → `omni.canThan` (hồ sơ trước lượt). `start`/`resume` không có khối `omni` (không thêm lượt đọc hồ sơ); app em lấy cờ từ Sảnh. Vắng cờ ⇒ app em KHÔNG đổi gì (DOM y hệt).
+Ba việc khi `canThan`:
+- (a) **Mốc kiểm duy trì × 0,7** của luật đóng lỗi (`loi-hoc-luat.ts` `mocDuyTri`, [14, 30] ⇒ [10, 21]; làm tròn, ≥ 3 ngày, tăng dần; mốc riêng của em cũng nhân): `docHoSo2(env, sbd, homNay, omniSom?, canThanSom?)` — `canThanSom` do `layKeHoachChot` đưa vào LÚC LẬP kế hoạch ngày (dùng lại lượt đọc hồ sơ OMNI đã bắt đầu sẵn — KHÔNG thêm truy vấn D1). Kế hoạch đã chốt / nơi không có hồ sơ (phụ huynh, thầy, "Câu đã làm") ⇒ mốc chuẩn. Hằng số hẹn "ôn duy trì sau thành thạo" của srs2 (`HEN_DUY_TRI` 30 / 14 ngày) KHÔNG đổi.
+- (b) **Ô "Soát lại đơn vị và số liệu"** trước khi nộp câu Phần III (một chạm, KHÔNG bắt buộc, không chặn nút nộp, không gửi gì lên máy chủ) — phía máy em: Đảo 2.0, Đoàn Hộ Tống, Làm câu ôn. Không có ở màn thi thật, đề thử.
+- (c) **Thẻ "Em biết câu này. Sai vì bước nào?"** sau lượt chắc-mà-sai ở câu vững (`omni.buocSai`): em chạm một bước hoặc "Em chưa rõ" ⇒ `hoa2-omni-buoc-sai`.
+`canThan` sai / OMNI tắt / chưa đủ dữ liệu ⇒ mọi thứ y hệt hôm nay.
+
+### `hoa2-omni-buoc-sai` `{ qid, ma }` → `{ ok, daGhi }`
+Ghi MỘT dòng bảng chỉ-thêm `omni_buoc_sai(sbd, qid, ngay, ma_vkn, luc)` (khoá chính `(sbd, qid, ngay)`; `qid` quy về câu GỐC; `ma` = mã bước trong `buocSai.lua` hoặc `chua_ro`). Gọi lại cùng câu cùng ngày giữ lựa chọn đầu (`daGhi:false`). KHÔNG chấm, KHÔNG ghi sổ học `su_kien_hoc`, không đổi P/EXP/Máu. OMNI tắt ⇒ `{ ok:false, error }`. Bảng tạo lúc chạy (`CREATE TABLE IF NOT EXISTS`), xếp GIỮ ở cả hai job reset.
 
 ### Câu nền của Trạm hồi phục: dùng NGUYÊN lệnh có sẵn `/hs/luyen-nen {token, nhan}` và `/hs/luyen-nen/nop {token, id, traLoi, qid}`.
 
@@ -83,4 +97,4 @@ omni: { khoangCach8: number|null, hieuChuan:{soCaChot, du}, dangCanVung: string[
 `khoangCach8` chỉ hiện cho phụ huynh khi `hieuChuan.du` (≥ 3 ca chốt, sai số trung bình ≤ 0,6 điểm).
 
 ## D. Bảng mới (chỉ-thêm) — `server/migration-0510-omni-3.sql`
-`bai_da_day` · `pham_vi_lop` · `de_kho_thu_muc` · `omni_vkn` · `omni_q` · `omni_em` · `omni_p_vkn` · `omni_beta_cau` · `omni_du_bao` · `omni_chung_chi` · `omni_xac_nhan` · `omni_ca_chot` · `omni_lo_dien` · `omni_ve` · `omni_de_thu`. Không ALTER bảng cũ: thời lượng, tự tin, nhãn tốc độ ghi trong `su_kien_hoc.raw_json` (`{chon, ms, tt, td}`); lướt ghi `purpose = 'luot'`, `ket_qua = NULL`.
+`bai_da_day` · `pham_vi_lop` · `de_kho_thu_muc` · `omni_vkn` · `omni_q` · `omni_em` · `omni_p_vkn` · `omni_beta_cau` · `omni_du_bao` · `omni_chung_chi` · `omni_xac_nhan` · `omni_ca_chot` · `omni_lo_dien` · `omni_ve` · `omni_de_thu`. Bảng chỉ-thêm của Chương trình Cẩn thận (06/10, tạo lúc chạy, không có trong tệp migration): `omni_buoc_sai(sbd, qid, ngay, ma_vkn, luc)`. Không ALTER bảng cũ: thời lượng, tự tin, nhãn tốc độ ghi trong `su_kien_hoc.raw_json` (`{chon, ms, tt, td}`); lướt ghi `purpose = 'luot'`, `ket_qua = NULL`.

@@ -4,7 +4,8 @@
 import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { dongBoTro, docBangSongSinh, songSinhDuDuLieu, type BoTro, type SongSinh } from './cau-bo-tro'
-import { tachSongSinh } from './loi-hoc-luat'
+import { loaiQidAo, tachSongSinh } from './loi-hoc-luat'
+import { phuQidAoMoi } from './ban-khac-ao'
 
 type Obj = Record<string, unknown>
 
@@ -59,8 +60,13 @@ export async function boTroTheoQid(env: Env, qids: readonly string[]): Promise<M
   return ra
 }
 
-/** Câu gốc (đã nạp) → câu song sinh theo qid ảo đã yêu cầu; không có song sinh ⇒ null. */
+/**
+ * Câu gốc (đã nạp) → câu theo qid ảo đã yêu cầu; không có bản ⇒ null. `~ss<i>` song sinh (cau_bo_tro); 06/10: `~bt<k>` biến thể bằng mã · `~yd<k>` bộ ý Đ–S mới
+ * (ban-khac-ao.ts) — MỘT chỗ giải qid ảo cho `docCauTheoRef` (chấm / resume / Đoàn) và `napDayDuMem` (nạp lại lượt chờ).
+ */
 export async function phuSongSinhTheoQid(env: Env, goc: PrivateQuestion, qidAo: string): Promise<PrivateQuestion | null> {
+  const l = loaiQidAo(qidAo)
+  if (l && l.loai !== 'ss') return phuQidAoMoi(env, goc, qidAo)
   const t = tachSongSinh(qidAo)
   if (t.songSinh === null) return goc
   const bt = (await boTroTheoQid(env, [t.goc])).get(t.goc)

@@ -1,5 +1,6 @@
 // "CẦN THẦY CHỮA" (OMNI 3 · đặc tả mục 0: việc DUY NHẤT còn lại của thầy) — phần thân thẻ "Cần thầy dạy lại" sẵn có của Bảng chiến dịch khi Bảng bài
-// OMNI có số. Đủ BA nhóm, cùng kiểu dòng `cd-ds-cau` đang dùng: (1) vi kỹ năng có thẻ nút thắt · (2) câu sai từ 4 lần đã rời kế hoạch · (3) em sơ ý cao.
+// OMNI có số. Đủ BA nhóm, cùng kiểu dòng `cd-ds-cau` đang dùng, THỨ TỰ theo `NHOM_CAN_THAY_CHUA` (omni-bang.ts; thầy 06/10): (1) câu sai từ 4 lần đã rời
+// kế hoạch — lên ĐẦU thẻ · (2) vi kỹ năng có thẻ nút thắt · (3) em sơ ý cao.
 // "Chữa xong" giữ ĐÚNG lệnh cũ `/gv/chien-dich {action:'chua-xong', id, qids}` (api.ts `chuaXong`), hỏi lại nói thật hậu quả như nút cũ.
 import { useState } from 'react'
 import type { CanThayChua } from '../../../server/src/omni-kieu'

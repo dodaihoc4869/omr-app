@@ -5,6 +5,7 @@
 import { phuNeuCan } from './hang-chua-loi'
 import { apLamLaiKhac, batDauLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
 import { refLamLai, type LamLaiRef } from './lam-lai-so'
+import { tachSongSinh } from './loi-hoc-luat'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
@@ -12,7 +13,7 @@ import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type HoSoDangTho, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
-import { coGoiY, docHangEm, docHoSo2, docHoSoDangCaLop, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidCanNhanNo, qidGoc, sanh2, thuSucThem, type HoSo2, type LanLamCoNguon, type MetaCau } from './srs2-d1'
+import { coGoiY, docChienDichThoCuaEm, docHangEm, docHoSo2, docHoSoDangCaLop, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, lyDoKhongPhucVu, ngayVnCua, qidCanNhanNo, qidGoc, sanh2, thuSucThem, type HoSo2, type LanLamCoNguon, type MetaCau } from './srs2-d1'
 import { ghiLoiMay } from './nhat-ky-may'
 import { omniBat } from './omni-d1'
 import { hoa2OmniAction, LENH_OMNI_HOA2, startVe } from './omni-game'
@@ -188,7 +189,14 @@ function cauGiuTuPhien(phien: readonly Row[]): Set<string> {
     try { da = JSON.parse(str(x.da) || '[]') } catch { da = [] }
     const daTraLoi = new Set((Array.isArray(da) ? da : []).map((q) => str(q)))
     const qs = (JSON.parse(str(x.json)) as { questions?: RefPhien[] }).questions ?? []
-    for (const q of qs) if (!daTraLoi.has(q.qid)) ra.add(q.qid)
+    for (const q of qs) {
+      if (daTraLoi.has(q.qid)) continue
+      ra.add(q.qid)
+      // 06/10 (làn A'): câu anh em / bản song sinh đang GIỮ thay một câu lỗi ⇒ câu gốc cũng đang giữ (Bi-a ⇄ Đảo ⇄ Đoàn không phát lại câu lỗi dưới dạng khác khi bản thay còn chưa trả lời).
+      if (q.tc) ra.add(q.tc)
+      const goc = tachSongSinh(q.qid).goc
+      if (goc !== q.qid) ra.add(goc)
+    }
   }
   return ra
 }
@@ -269,7 +277,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
   if (kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
   // OMNI 3: ngày chưa có câu nào mà em đang ở chế độ chờ bài mới (`hs.omni` chỉ có khi OMNI bật cho em) ⇒ lời báo "chờ thầy giao bài mới".
-  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
+  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong || kh.tamHoan?.nghi ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
   const dangCho = await dangChoSom
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
@@ -399,9 +407,10 @@ export type NguonLanLam = NguonNhan
  * Gắn nguồn cho từng lần trong `lichSu` của các câu đã liệt kê (một truy vấn sổ, `docLichSuCoNguon`) và nhãn nợ `nhan`
  * ("Sai 2 lần · Ca 26/09 · Lên bảng 28/09") cho câu chưa thành thạo. Lỗi đọc ⇒ để trống nguồn (không làm hỏng danh sách).
  */
-async function ganNguonLanLam(env: Env, sbd: string, cau: Record<string, unknown>[], hs: HoSo2): Promise<void> {
+async function ganNguonLanLam(env: Env, sbd: string, cau: Record<string, unknown>[], hs: HoSo2, lichSuSom?: Promise<Map<string, LanLamCoNguon[]> | null> | null): Promise<void> {
   if (!cau.length) return
-  const ls = await docLichSuCoNguon(env, sbd, cau.map((c) => str(c.qid))).catch(() => null)
+  // `lichSuSom` (chỉ "Câu đã làm"): lượt đọc lịch sử đã bắt đầu từ lúc hồ sơ biết tập câu, cho CẢ tập — mỗi câu chỉ lấy đúng dòng của nó nên kết quả y hệt đọc riêng từng danh sách này.
+  const ls = await (lichSuSom ?? docLichSuCoNguon(env, sbd, cau.map((c) => str(c.qid)))).catch(() => null)
   for (const c of cau) {
     const goc = c.lichSu as TrangThaiCau['lichSu']
     const coNguon = ls ? ganNguonDuoi(goc, ls.get(str(c.qid))) : null
@@ -417,8 +426,15 @@ async function ganNguonLanLam(env: Env, sbd: string, cau: Record<string, unknown
 /** Danh sách câu em ĐÃ làm trong mọi chiến dịch + câu ôn ngoài chiến dịch em đã làm (câu chưa làm không hiện). */
 async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const homNay = ngayVnCua(nowMs)
-  const hs = await docHoSo2(env, sbd, homNay)
-  const cds = (await env.DB.prepare("SELECT id, ten, han_nop, qid_json FROM chien_dich WHERE trang_thai <> 'da_huy' AND EXISTS (SELECT 1 FROM json_each(chien_dich.sbd_json) WHERE value = ?) ORDER BY tao_luc DESC").bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
+  // Tối ưu vòng 2 (06/10): trước 7 đợt D1 nối tiếp (OMNI bật 8): hồ sơ (3–4 đợt) → đọc lại bảng chiến dịch → đọc JSON đầy đủ của từng câu để xét tự luận → đọc lịch sử có nguồn.
+  // Nay: (1) lịch sử có nguồn đọc NGAY khi hồ sơ biết tập câu (cùng đợt với meta/lần làm); (2) danh sách chiến dịch lấy từ đệm chiến dịch hồ sơ vừa đọc (không thêm lượt D1);
+  // (3) cờ tự luận lấy từ `hs.meta.tuLuan` — CHÍNH cờ đã loại câu tự luận khỏi `tt` ở hồ sơ, cùng phép `laCauTuLuan` trên chính câu trong chỉ mục (chạy-lại bằng D1 thật:
+  // tests/d1-runtime-meta-tu-luan-3009) — thay cho đọc lại cả JSON câu. Kết quả y hệt (khoá: tests/cau-da-lam-sau-gop-0610 + `DO_SO` của tests/do-toi-uu-0510-may-chu).
+  let lichSuSom: Promise<Map<string, LanLamCoNguon[]> | null> | null = null
+  const hs = await docHoSo2(env, sbd, homNay, undefined, undefined, (qids) => {
+    lichSuSom = docLichSuCoNguon(env, sbd, qids).catch(() => null)
+  })
+  const cds = await docChienDichThoCuaEm(env, sbd)
   const chienDich = cds.map((c) => ({ id: str(c.id), ten: str(c.ten), hanNop: str(c.han_nop), qids: (JSON.parse(str(c.qid_json) || '[]') as string[]).map(String) }))
   const cau: Record<string, unknown>[] = []
   const daCo = new Set<string>()
@@ -462,9 +478,9 @@ async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<st
   if (taiLop.length) chienDich.push({ id: NHOM_CAU_SAI_TAI_LOP, ten: 'Câu sai khi lên bảng', hanNop: '', qids: taiLop })
   // 30/09 LUẬT TỰ LUẬN CHẶT (thầy: "Lọc cẩn thận những câu tự luận này"): câu tự luận em CHƯA trả lời ⇒ ẨN; em đã trả lời (lịch sử cũ) ⇒ vẫn hiện
   // nhưng mang `tuLuan: true` (máy em ghi "Câu tự luận — không chấm tự động" thay đúng/sai), KHÔNG tính sai, không hẹn ôn, không nhãn nợ.
-  const tl = await phanLoaiTuLuanDaLam(env, sbd, cau.map((c) => ({ qid: str(c.qid), m: hs.meta.get(str(c.qid)) })))
+  const tl = await phanLoaiTuLuanTheoMeta(env, sbd, cau, hs)
   const hienThi = cau.filter((c) => !tl.tuLuan.has(str(c.qid)) || tl.daTraLoi.has(str(c.qid)))
-  await ganNguonLanLam(env, sbd, hienThi, hs)
+  await ganNguonLanLam(env, sbd, hienThi, hs, lichSuSom)
   for (const c of hienThi) {
     if (!tl.tuLuan.has(str(c.qid))) continue
     c.tuLuan = true
@@ -473,6 +489,25 @@ async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<st
     delete c.nhan
   }
   return { ok: true, chienDich: chienDich.map(({ qids, ...c }) => ({ ...c, tong: qids.length })), cau: hienThi }
+}
+
+/**
+ * Như `phanLoaiTuLuanDaLam` nhưng cờ tự luận lấy từ `hs.meta` (đã đọc ở hồ sơ, `MetaCau.tuLuan`) thay vì đọc lại JSON ĐẦY ĐỦ của từng câu (hàng trăm câu × vài KB mỗi lần mở màn).
+ * Câu `tt` của hồ sơ vốn KHÔNG chứa câu tự luận (hồ sơ bỏ chúng trước khi dựng `tt`) ⇒ trong thực tế tập tự luận rỗng; nếu có (lệch dữ liệu) vẫn xử đúng như hàm cũ:
+ * tự luận em đã trả lời thì hiện kèm `tuLuan: true`, chưa trả lời thì ẩn.
+ */
+async function phanLoaiTuLuanTheoMeta(env: Env, sbd: string, cau: readonly Record<string, unknown>[], hs: Pick<HoSo2, 'meta'>): Promise<{ tuLuan: Set<string>; daTraLoi: Set<string> }> {
+  const tuLuan = new Set<string>(), daTraLoi = new Set<string>()
+  for (const c of cau) { const q = str(c.qid); if (hs.meta.get(q)?.tuLuan) tuLuan.add(q) }
+  if (!tuLuan.size) return { tuLuan, daTraLoi }
+  try {
+    const r = await env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND ket_qua IS NOT NULL AND qid IN (SELECT value FROM json_each(?))').bind(sbd, JSON.stringify([...tuLuan])).all<Row>()
+    for (const x of r.results ?? []) daTraLoi.add(str(x.qid))
+  } catch (e) {
+    // như hàm cũ: lỗi đọc sổ ⇒ giữ tập tự luận đã xác định, `daTraLoi` rỗng ⇒ câu tự luận bị ẨN (hướng an toàn)
+    console.error('[cau-da-lam] chưa phân loại được câu tự luận:', e instanceof Error ? e.message : e)
+  }
+  return { tuLuan, daTraLoi }
 }
 
 /**

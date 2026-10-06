@@ -3,7 +3,7 @@
 // nhớ "chạm chip Chưa chắc lần đầu trong ngày" và cửa vào Đảo từ Sảnh (vé thử thách, đề thử) bằng khoá đọc MỘT lần như `game-v2:man-dau`.
 // Cờ OMNI tắt ⇒ máy chủ không gửi `omni` ⇒ mọi hàm đọc trả null, thân lệnh không thêm trường nào: app y hệt hôm nay.
 // Chữ hiển thị KHÔNG viết ở đây — một nguồn `src/lib/omni-chu.ts`.
-import { CAC_KHUNG_GIO, THAM_SO_OMNI, type KetQuaOmniTraLoi, type KhungGio, type NhanTocDo, type SanhOmni, type TramHoiPhuc } from '../../server/src/omni-kieu'
+import { CAC_KHUNG_GIO, THAM_SO_OMNI, type KetQuaOmniTraLoi, type KhungGio, type LuaChonBuocSai, type NhanTocDo, type SanhOmni, type TramHoiPhuc } from '../../server/src/omni-kieu'
 
 const vat = (x: unknown): Record<string, unknown> | null => (x && typeof x === 'object' && !Array.isArray(x) ? (x as Record<string, unknown>) : null)
 const chuCo = (x: unknown): string | null => (typeof x === 'string' && x.trim() ? x.trim() : null)
@@ -45,6 +45,8 @@ export function docSanhOmni(x: unknown): SanhOmni | null {
     metGio,
     nhatKy: nhatKy.length ? nhatKy : null,
     deThu: { duoc: dt?.duoc === true && soCauThu > 0, soCau: soCauThu || THAM_SO_OMNI.DE_THU.soCau, phut: soNguyen(dt?.phut) || THAM_SO_OMNI.DE_THU.phut },
+    // CẨN THẬN (chỉ-thêm): CHỈ khi máy chủ gửi đúng `true` — vắng / sai kiểu ⇒ không trường ⇒ app em y hệt hôm nay.
+    ...(o.canThan === true ? { canThan: true } : {}),
   }
 }
 
@@ -60,11 +62,24 @@ export function docTram(x: unknown): TramHoiPhuc | null {
   return { vkn: chuCo(o.vkn), ten: chuCo(o.ten), tenLoi: chuCo(o.tenLoi), nhan, coCauNen: o.coCauNen === true && !!nhan, chu }
 }
 
+/** Đọc CHẶT các bước của thẻ "Sai vì bước nào?": tối đa 4 mục có `ma` + `ten` là chữ; không mục hợp lệ ⇒ null (không dựng thẻ). */
+export function docBuocSai(x: unknown): { lua: LuaChonBuocSai[] } | null {
+  const o = vat(x)
+  const lua = (Array.isArray(o?.lua) ? o!.lua : [])
+    .map(vat)
+    .filter((b): b is Record<string, unknown> => !!b && !!chuCo(b.ma) && !!chuCo(b.ten))
+    .map((b) => ({ ma: chuCo(b.ma)!, ten: chuCo(b.ten)! }))
+    .slice(0, 4)
+  return lua.length ? { lua } : null
+}
+
 /** Đọc CHẶT phần `omni` của phản hồi trả lời. Vắng / sai dạng ⇒ null ⇒ màn kết quả y hệt hôm nay. */
 export function docKetQuaOmni(x: unknown): KetQuaOmniTraLoi | null {
   const o = vat(x)
   if (!o) return null
   const tram = docTram(o.tram)
+  // CẨN THẬN (c): thẻ chỉ có khi máy chủ báo `canThan === true` ∧ lượt chắc-mà-sai (`buocSai` chỉ đi cùng hai điều ấy ở máy chủ; máy em kiểm lại).
+  const buocSai = o.canThan === true && o.chacMaSai === true ? docBuocSai(o.buocSai) : null
   return {
     nhanTocDo: NHAN_TOC_DO.includes(o.nhanTocDo as NhanTocDo) ? (o.nhanTocDo as NhanTocDo) : null,
     msLam: soHuuHan(o.msLam),
@@ -73,6 +88,8 @@ export function docKetQuaOmni(x: unknown): KetQuaOmniTraLoi | null {
     chacMaSai: o.chacMaSai === true,
     ...(tram ? { tram } : {}),
     loiNhan: chuCo(o.loiNhan),
+    ...(o.canThan === true ? { canThan: true } : {}),
+    ...(buocSai ? { buocSai } : {}),
   }
 }
 

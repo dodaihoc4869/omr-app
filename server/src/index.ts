@@ -65,6 +65,7 @@ import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2, laLenhCongSongSong } from './game-v2'
+import { kemSanhBiTat, luongDangNhapKemSanh, sanhKemDangNhap } from './dang-nhap-kem-sanh'
 import { RAO_GHI } from './doc-d1-theo-luot'
 import { shopBatCho } from './game-v2-shop'
 import { xoaDemCaBaoVe, xoaDemSync } from './game-v2-bank'
@@ -3461,6 +3462,17 @@ const boXuLy = {
         const result = await G.hsDangNhap(env, b, daDoc)
         if (result.ok && !result.chuaCoMatKhau) {
           try { result.token = await gameToken(env, String(result.sbd), 'matKhau' in daDoc ? daDoc.matKhau : undefined) } catch { /* Game must not block academic login. */ }
+          // Tối ưu vòng 2 (06/10, dang-nhap-kem-sanh.ts): máy em xin `kemSanh` ⇒ trả lời THEO LUỒNG: dòng 1 = đăng nhập (đi ngay), dòng 2 = Sảnh của em khi xong (bớt một vòng
+          // mạng, KHÔNG làm chậm các lệnh còn lại của máy em). Lỗi / quá hạn ⇒ dòng 2 là null. Công tắc khẩn: env.TAT_KEM_SANH.
+          if (b.kemSanh === true && typeof result.token === 'string' && result.token && !kemSanhBiTat(env)) {
+            const token = result.token
+            return luongDangNhapKemSanh(
+              { ...result, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() },
+              () => sanhKemDangNhap(() => gameV2(env, 'hoa2-sanh', { token }, ctx), (r) => ({ ...r, serverNow: Date.now(), nhipDeNghi: nhipDeNghi() })),
+              JSON_HEADERS,
+              ctx,
+            )
+          }
         }
         return ra(result)
       }
