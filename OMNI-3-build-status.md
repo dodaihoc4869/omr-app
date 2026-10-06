@@ -203,3 +203,43 @@ Lùi: `git revert -m 1 <commit gộp PR đợt 4>` rồi đẩy main (Actions đ
 - Tồn: (1) ba câu `DH-10-C1-B2-III-23`, `DH-10-C1-B2-III-24`, `DB-11-B2-D6-III-3` — đáp số dạng a.10ⁿ ("1,1.10²³", "1,3.10²³", "1,3.10⁻³") mà phép tính cuối của máy chỉ ra phần a nên khoá số từ chối 3 lần ⇒ việc về `truot`; cần sửa bộ kiểm khoá số cho dạng a.10ⁿ hoặc nhập hồ sơ tay; (2) 26 hồ sơ chờ duyệt có sẵn từ trước (máy đề nghị sửa chữ trong đề: 53 chỗ; 1 chỗ giữ đáp án kho `DH-12-C3-B10-II-22`) — không đổi trong lượt này.
 - Nhịp máy chủ đo sống: trong lúc chạy (12:35, 12:56) và sau khi chạy xong (10 mẫu, 13:52–13:56 giờ VN) đều HTTP 200, "tot".
 - Chạy lại sau này: lệnh trên (hàng "câu em đã sai chưa có bản khác" tự làm mới ≤ 15 phút một lần; đề mới nạp tự vào hàng). Hướng dẫn: `docs/loi-giai-a/HUONG-DAN-CHAY.md`.
+
+## 12. Đợt 5 (06/10 chiều) — Đoàn MỘT người thật có Trạm hồi phục + bỏ dòng "câu này sẽ quay lại sớm" khi chọn Chưa chắc: nghiệm thu bản sạch `83525bc0` (+ test đầu-cuối `d7cd2940`, hợp đồng `ea9cf4c8`)
+
+Lệnh thầy: "Khi chọn chưa chắc bỏ dòng gợi ý câu này sẽ quay lại sớm"; "Làm sai 3 câu liên tiếp có cho vào trạm hồi phục không? Tôi làm thử chiến dịch sai 3 câu liên tiếp trong đoàn không thấy về trạm hồi phục". Gốc `main` 0f50359f. Không đổi schema, không đụng dữ liệu.
+
+**Trả lời thầy:** Trạm hồi phục là của chuyến Đảo VÀ chặng Đoàn chơi MỘT mình (đặc tả gốc: "Đoàn nhiều người không có trạm: đồng hồ hiệp chung"). Gốc lỗi: `phienMoTram` (omni-game.ts) loại MỌI phiên Đoàn, kể cả Đoàn một mình ⇒ thầy thử trong Đoàn không bao giờ thấy. Nay: Đoàn một người thật có Trạm; Đoàn nhiều người vẫn không (có chủ ý, theo đặc tả).
+
+Cách mở (giống Đảo, trừ hai chỗ nói ở dưới): 3 câu SAI TỰ LÀM liền trong một chặng · câu ĐÚNG hoặc câu có tiếp sức/gợi ý cắt chuỗi · câu sai quá nhanh bị tính "lướt" (tối đa 3 lượt/ngày, ngưỡng < max(3 giây, 10 % thời gian kỳ vọng) kẹp [3, 8] giây) thì BỎ QUA, không tính và không cắt · tối đa 1 Trạm/chặng · cần OMNI bật cho em. Khác Đảo: (1) Đoàn chỉ mở khi CÓ 3 câu nền (ải kế đã chia sẵn cho cả đội nên không đổi được bằng câu dễ hơn — không gọi `hoa2-omni-tram-xong`); không có ⇒ không mở và không đánh dấu phiên; (2) thẻ nằm dưới kết quả câu thứ ba, nút "Làm 3 câu nền" mở hộp "Luyện kiến thức nền" của thang tự gỡ (`/hs/luyen-nen`). Máu Linh Tâm không đổi.
+
+| Kiểm | Lệnh | Kết quả | Đạt |
+|---|---|---|---|
+| Tái hiện lỗi thầy gặp | `tests/omni-3-doan-tram-may-chu-0610.test.ts` (Worker thật + D1 thật, Hoá 2.0 + OMNI bật; `doan-mo → doan-xem → doan-nop`) chạy trên bản ĐANG CHẠY main 0f50359f | ĐỎ 2/2: "câu sai thứ ba liền phải có Trạm: expected undefined to be truthy" | Tái hiện đúng |
+| Cùng lệnh sau sửa | như trên trên 83525bc0 | XANH 2/2 (Trạm ở câu thứ ba; hai câu đầu không; sau Trạm không có Trạm thứ hai; phiên `tram:1`; thẻ Trạm không mang đáp án; câu đúng giữa chừng cắt chuỗi; chặng thật có hiệp 4 là Trùm — hiệp không có câu riêng của em — test đi qua nó bằng `doan-tiep`) | Đạt |
+| Test mới khác | `omni-3-tra-loi` (+4 ca Đoàn: một mình mở / luật chuỗi / không câu nền / cờ giả bị từ chối) · `omni-3-doan-tram-0610` (thẻ, vắng ⇒ không thẻ, `coCauNen` false, OMNI tắt, CSS không màu thô, hộp nằm trên lớp phủ Đoàn) | 23/23 · 6/6 | Đạt |
+| vitest toàn bộ (bản sạch 83525bc0) | `npx vitest run --reporter=json` → so TÊN với nền đợt 3 (`final2-do.s2`) và hai nền khác | 14 414 test (+10 mới) · 141 đỏ / 61 tệp + 9 tệp lỗi nạp = 150 tên, TRÙNG KHÍT tập nền đợt 3; 0 tên mới; hai test chập chờn đã sửa ở đợt 4 nay xanh | Đạt |
+| Kiểu | `tsc -b` · `tsc -p server/tsconfig.json --noEmit` · test mới qua `tsc --strict` | 0 lỗi · 0 lỗi · 0 lỗi | Đạt |
+| Build + service worker | `npm run build` (đồng hồ + mã phiên bản ghim) · `kiem:sw` | 517 tệp dist · 13/13 | Đạt |
+| Màu | `check:mau` · `kiem:mau-giu` (so origin/main) | sạch · 7 tệp src/ đổi, 0 vi phạm (thẻ Trạm chỉ dùng biến `--the-2`, `--vien-dam`, `--muc` có sẵn) | Đạt |
+| Lộ đáp án | `kiem:lo-dap-an` | 9/9 | Đạt |
+| Cổng điểm ảnh, OMNI tắt (9 màn) | `do-app-hs.mjs --kich=anh` vs `anh-cuoi` + `so-anh.mjs` | 9/9 trùng khít (0 điểm ảnh lệch) | Đạt |
+| Cổng điểm ảnh, OMNI bật + Chắc/Chưa chắc (11 ảnh) | `--omni=1 --them=chac` vs `anh-chac` | 10/11 trùng khít; khác DUY NHẤT ảnh `7b-doan-chua-chac` (64 085 điểm ảnh, vùng x 52–667, y 886–1033 = bóng báo "Đã chọn: Chưa chắc" ngắn lại do bỏ vế "câu này sẽ quay lại sớm") — đổi chữ có chủ ý theo lệnh thầy; nền so ảnh đã cập nhật | Đạt |
+| Ảnh thật 360 px | `scripts/chup-omni-3` cảnh `doan-tram` (lỗi trang 0, tràn ngang 0) | `docs/omni-0510/anh-build/hs-doan-tram-*`: thẻ đọc rõ trên thẻ giấy; hộp câu nền nằm TRÊN lớp phủ Đoàn | Đạt |
+| Worker đóng gói | `wrangler deploy --dry-run` | thành công: 3 260,37 KiB, nén 849,07 KiB (đợt 4 đã lên: 3 259,56 / 848,90) | Đạt |
+| Kiểm ca thi mở (chỉ đọc) | workflow `kiem-ca-mo` run 37431714583 (14:46 giờ VN) | so_ca_mo = 0 · so_luot_dang_lam = 0 | Đạt |
+
+Việc của đợt: máy chủ `server/src/omni-game.ts` (`phienMoTram(phien, doanMotMinh)`, `docTruocOmni`, `xetOmniTraLoi` + cổng "Đoàn phải có câu nền"), `game-v2.ts` (chỉ tin cờ `motMinh` khi là lệnh NỘI BỘ của Đoàn), `game-v2-doan.ts` (`doan-nop` đặt `motMinh: choEmMotMinh(phong)`); máy em `doan2/TheTram2.tsx` (mới), `DoanCau.tsx`, `DoanHoTong.tsx`, `doan-kieu.ts`, `doan2/doan2.css`; chữ `omni-chu.ts` (`BONG_CHUA_CHAC` = "Đã chọn: Chưa chắc", `NUT_LAM_CAU_NEN` dùng chung); hợp đồng `docs/hop-dong-omni-3.md`; bảng chuẩn từ ngữ.
+
+Còn nguyên (nói thẳng): (1) dòng KẾT QUẢ sau khi nộp ĐÚNG mà em đã chọn Chưa chắc vẫn là "Đúng. Em chọn "Chưa chắc" nên câu này sẽ quay lại sớm cho chắc hẳn." (`CHU_DUNG_CHUA_CHAC`) — chữ khác, lúc khác, thầy chưa nói bỏ; (2) Trạm ở Đoàn chưa thử trên em thật (không dùng mật khẩu em) — đã chứng minh bằng test đầu-cuối trên Worker thật + D1 thật và ảnh trình duyệt thật, cần thầy hoặc một em thử lại cảnh "chặng Đoàn một mình, sai 3 câu liền" (chú ý: bấm sai quá nhanh sẽ thành "lướt" và không tính).
+
+Lùi: `git revert -m 1 <commit gộp PR #157>` rồi đẩy main (Actions đẩy lại Pages + Worker). Không có công tắc riêng cho Trạm ở Đoàn — tắt cả Trạm bằng Cài đặt OMNI (OMNI tắt ⇒ y hệt cũ). Bản Worker trước đợt này `25850a01-f721-4029-bed5-6db8d43342bb`.
+
+### 12b. Đã lên bản sống (06/10)
+
+- ĐÃ LÊN 06/10 15:10 giờ VN (08:10 UTC): Actions run 37432674474 trên main `efc515c8` thành công (check:mau · npm test · build · Pages · Worker; 15 phút 50 giây). Pages `3873f698`; Worker `372416ea-f5a8-4efc-b7f6-89d786395b34` (khởi động 24 ms; tải lên 3 259,88 KiB / nén 849,03 KiB).
+- LƯU Ý đẩy chung: PR #157 gộp lúc 14:46 giờ VN (main `076687ba`) và có run đẩy riêng 37431811558; run ấy bị HUỶ lúc 14:56 vì phiên khác gộp PR #158 (`claude/tong-hop-0610`, main `efc515c8`) — workflow huỷ run cũ khi có đẩy mới. Run 37432674474 vì thế đẩy CẢ HAI cùng lúc: mã của đợt này + toàn bộ nội dung PR #158 (66 tệp: lời giải chuẩn, thú/quái giữa đường, bản nguyên tố, chiếu mã…; phiên đó chịu trách nhiệm về phần của họ, đợt này không kiểm riêng phần ấy). Mã của đợt này nguyên vẹn trên main (`doanMotMinh`, `TheTram2.tsx`, `BONG_CHUA_CHAC` đều có); ảnh `doan-tram` chụp lại trên main `efc515c8` vẫn đúng (thẻ đọc rõ, hộp câu nền nằm trên lớp phủ Đoàn).
+- Ca thi mở kiểm hai lần: 14:46 giờ VN (run 37431714583, main 0f50359f) và LẠI 14:56 ngay sau khi run kia bị huỷ (run 37432839389, main efc515c8) — cả hai so_ca_mo = 0, so_luot_dang_lam = 0; run đẩy kết thúc 15:10.
+- Kiểm sống không cần mật khẩu em (15:11 giờ VN): POST `/hs/ca-dang-mo` HTTP 200, `nhipDeNghi.muc` = "tot"; POST `/gv/buoi-hoc`, `/gv/omni/cai-dat` không mã ⇒ 403 "Sai mã bí mật". Gói Pages sống KHÔNG kiểm trực tiếp được (máy chủ trung gian của phiên chặn pages.dev) — đã kiểm gói dựng sạch cùng mã: có "Làm 3 câu nền" (Dao2, DoanHoTong, omni-chu), có "Đã chọn: Chưa chắc", không còn "Chưa chắc · câu này sẽ quay lại sớm".
+- Nhịp máy chủ sau đẩy: 20 mẫu trong 5 phút (15 giây một mẫu, 15:12–15:17 giờ VN): 20/20 HTTP 200, 20/20 "tot".
+- CHƯA kiểm được từ phiên đám mây (không thử mật khẩu em): Trạm ở Đoàn trên em thật — cần thầy hoặc một em thử cảnh "chặng Đoàn một mình, sai 3 câu liền" (đừng bấm quá nhanh: sai nhanh = "lướt", không tính). Công tắc khẩn: OMNI ở Cài đặt OMNI (tắt cả Trạm); không có công tắc riêng cho Trạm ở Đoàn.
+- Lùi: `git revert -m 1 076687ba` rồi đẩy main (có thể xung đột nhẹ ở `doan2.css` / `DoanHoTong.tsx` với PR #158 — giải tay, giữ phần của #158); Worker trước lượt đẩy này `25850a01-f721-4029-bed5-6db8d43342bb`.
