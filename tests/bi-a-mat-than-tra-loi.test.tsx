@@ -76,7 +76,9 @@ describe('Luôn bật Mắt thần', () => {
     const sw = await screen.findByRole('switch', { name: /Luôn bật Mắt thần/ }) as HTMLInputElement
     expect(sw.checked).toBe(false)
     fireEvent.click(sw)
-    expect(sw.checked).toBe(true)
+    // `useSyncExternalStore` đăng ký nghe kho trong effect thụ động: bấm sát lúc Sảnh vừa vẽ (máy tải nặng) thì kho đã ghi "bật" (localStorage ngay dưới) nhưng lần vẽ lại
+    // của công tắc đến sau một nhịp ⇒ chờ nó, đừng đọc `checked` ngay (đọc ngay đỏ ~1/4 lượt khi máy tải 4 lò, cả trên bản đang chạy).
+    await waitFor(() => expect(sw.checked).toBe(true))
     expect(localStorage.getItem(KHOA_LUON_MAT_THAN)).toBe('1')
   })
 })
