@@ -329,3 +329,27 @@
 .dh2 .dh-buoc-sai-nut{display:flex;flex-wrap:wrap;gap:8px}
 .dh2 .dh-buoc-sai-nut .dh-xin{align-self:auto;height:auto;padding:8px 14px;line-height:1.3;text-align:center}
 .dh2 .dh-buoc-sai small{font-size:12px;opacity:.85}
+
+/* ═══ OMNI 3 · NÚT CHẮC / CHƯA CHẮC + SOÁT LẠI TRÊN THẺ GIẤY (thầy 06/10: "Nút chưa chắc với chắc đổi màu dễ nhìn hơn nhé, và bấm nó chưa phản hồi") ═══
+ * Gốc lỗi: `.dh2 .dh-xin` (phía trên) vẽ cho nền TỐI — chữ hồng nhạt, nền hồng 14 % — còn các nút này nằm TRONG thẻ câu nền giấy sáng ⇒ gần như tàng hình, bật/tắt gần như không đổi màu.
+ * CHỈ trong `.dh-cuoi-tin` (phần cuối thẻ câu): nền giấy đậm một nấc + viền + chữ MỰC; BẬT = nền đặc (Chưa chắc: vàng game · Chắc / Soát lại: xanh game) + dấu, nảy nhẹ lúc bật;
+ * bấm xuống thì thu nhỏ; bóng báo "Đã chọn: …" nổi TRÊN hàng nút (không ăn chỗ của thẻ). "Cần tiếp sức" (nút phụ trên nền tối, NGOÀI thẻ) KHÔNG đổi.
+ * Màu CHỈ qua biến: thẻ giấy (--muc, --the, --the-2, --vien-dam) và game (--dh-vang, --dh-xanh), bóng đổ bằng color-mix. Độ ưu tiên cao hơn lớp `bat-linh` (game-toan-bo.css) và bản sáng/tối ở trên. */
+.dh .dh-cuoi-tin{display:contents}
+.dh .dh-chac{position:relative;display:inline-flex;flex-shrink:0;align-self:center;gap:10px}
+html:root .dh .dh-cuoi-tin button.dh-xin[type=button]{min-height:44px;padding:0 20px;border-radius:22px;background:var(--the-2);box-shadow:inset 0 0 0 2px var(--vien-dam);color:var(--muc);font-size:14px;font-weight:800;touch-action:manipulation;transition:transform .12s ease,background-color .12s ease,box-shadow .12s ease}
+html:root .dh .dh-cuoi-tin button.dh-xin[type=button]:active{transform:scale(.94)}
+html:root .dh .dh-cuoi-tin button.dh-xin[type=button]:focus-visible{outline:3px solid var(--muc);outline-offset:2px}
+html:root .dh .dh-cuoi-tin button.dh-xin[type=button][aria-pressed=true]{animation:dh-chac-nay .3s ease}
+html:root .dh .dh-cuoi-tin button.dh-xin[type=button][aria-pressed=true]::before{content:"✓ ";content:"✓ " / ""}
+html:root .dh .dh-cuoi-tin button.dh-xin[data-vung=chua-chac][aria-pressed=true]{background:var(--dh-vang);box-shadow:inset 0 0 0 2px var(--muc),0 4px 12px color-mix(in srgb,var(--dh-vang) 55%,transparent);color:var(--muc)}
+html:root .dh .dh-cuoi-tin button.dh-xin[data-vung=chua-chac][aria-pressed=true]::before{content:"? ";content:"? " / ""}
+html:root .dh .dh-cuoi-tin button.dh-xin:is([data-vung=chac],[data-vung=soat-lai])[aria-pressed=true]{background:var(--dh-xanh);box-shadow:inset 0 0 0 2px var(--muc),0 4px 12px color-mix(in srgb,var(--dh-xanh) 50%,transparent);color:var(--muc)}
+@keyframes dh-chac-nay{0%{transform:scale(.9)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
+.dh .dh-chac-bong{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);z-index:6;width:max-content;max-width:min(280px,80vw);padding:7px 12px;border-radius:12px;background:var(--muc);color:var(--the);font-size:12.5px;font-weight:700;line-height:1.3;text-align:center;pointer-events:none;box-shadow:0 6px 16px color-mix(in srgb,var(--muc) 35%,transparent);animation:dh-chac-bong-vao .16s ease}
+@keyframes dh-chac-bong-vao{from{opacity:0;transform:translate(-50%,6px)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){
+  html:root .dh .dh-cuoi-tin button.dh-xin[type=button]{transition:none}
+  html:root .dh .dh-cuoi-tin button.dh-xin[type=button][aria-pressed=true]{animation:none}
+  .dh .dh-chac-bong{animation:none}
+}

@@ -101,6 +101,10 @@ const MAN = [
   ['dao-chip', [390, 844], async (t) => {
     await lenDuong(t)
     await chup(t, 'hs-dao-cau-co-chip-chua-chac-390')
+    // Thầy 06/10 ("Nút chưa chắc … đổi màu dễ nhìn hơn, bấm chưa phản hồi"): BẬT ⇒ hổ phách + dòng trạng thái.
+    await t.getByRole('switch', { name: 'Chưa chắc' }).click()
+    await t.waitForTimeout(500)
+    await chup(t, 'hs-dao-chua-chac-bat-390')
   }],
   ['dao-cham', [390, 844], async (t) => {
     await lenDuong(t)

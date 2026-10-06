@@ -15,7 +15,8 @@ import Canh2 from './doan2/Canh2'
 import BuaTroGiang from './doan2/BuaTroGiang'
 import XemLaiChuan from './doan2/XemLaiChuan'
 import type { GoiYM3 } from './doan2/kieu2'
-import { CHIP_CHUA_CHAC, CHU_SOAT_LAI, GOI_Y_CHIP_CHUA_CHAC, GOI_Y_SOAT_LAI } from '../../lib/omni-chu'
+import { CHU_SOAT_LAI, GOI_Y_CHIP_CHUA_CHAC, GOI_Y_SOAT_LAI } from '../../lib/omni-chu'
+import NutTuTin from './NutTuTin'
 
 export interface CauVuaLam { q: Question; chon: string; ketQua: KetQuaCau | null; /** Chỉ-thêm: hiệp của câu (để biết câu này đã là "câu vừa rồi" chưa). */ hiep?: number }
 export interface LoiGiaiTrum { hiep: number; de: Question; answer: string; solution: unknown }
@@ -207,12 +208,12 @@ export default function DoanTran(p: Props) {
         cuoi={(p.onChuaChac || p.onSoatLai) && mo && !tran.laTrum && !cau?.daChot && !cau?.rut ? (
           // OMNI 3 · chip "Chưa chắc" TRONG thẻ câu, dưới phương án cuối (05/10): đặt thành hàng riêng dưới thẻ thì màn Đoàn (vừa khít máy)
           // phải ép thẻ câu ngắn lại, phương án C/D bị che — thầy: "app của học sinh giữ nguyên mọi thứ giao diện".
-          <>
-            {p.onChuaChac && <button type="button" className="dh-xin" data-vung="chua-chac" aria-pressed={!!p.chuaChac} title={GOI_Y_CHIP_CHUA_CHAC} style={{ minHeight: 44 }} onClick={() => p.onChuaChac!(!p.chuaChac)}>{CHIP_CHUA_CHAC}</button>}
-            {/* CẨN THẬN (b): cùng kiểu chip "Chưa chắc", chỉ câu Phần III, không bắt buộc (không chặn nút chốt, không gửi gì) */}
+          <div className="dh-cuoi-tin">
+            {p.onChuaChac && <NutTuTin key={`${tran.hiep}|${cau?.qid ?? ''}`} chuaChac={!!p.chuaChac} onChuaChac={p.onChuaChac} />}
+            {/* CẨN THẬN (b): cùng kiểu chip trên thẻ giấy, chỉ câu Phần III, không bắt buộc (không chặn nút chốt, không gửi gì) */}
             {p.onSoatLai && p.de?.phan === 'III' && <button type="button" className="dh-xin" data-vung="soat-lai" aria-pressed={!!p.soatLai} title={GOI_Y_SOAT_LAI} style={{ minHeight: 44 }} onClick={() => p.onSoatLai!(!p.soatLai)}>{CHU_SOAT_LAI}</button>}
             {p.goiYChip && p.onChuaChac && <div className="dh-cho" data-vung="goi-y-chua-chac" style={{ fontSize: 12 }}>{GOI_Y_CHIP_CHUA_CHAC}</div>}
-          </>
+          </div>
         ) : undefined} />
     )
   }

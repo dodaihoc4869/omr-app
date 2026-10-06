@@ -509,3 +509,11 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 .dao2 .dao2-buoc-sai{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .dao.dao2 .dao2-buoc-sai button.dao2-nut-vien{flex:1 1 auto;min-width:0;height:auto;padding:8px 14px;line-height:1.3;text-align:center}
 .dao.dao2 .dao2-buoc-sai button.dao2-nut-vien[aria-pressed="true"]{--nut-chu:var(--d2-xanh-chu);--nut-bong:inset 0 0 0 2px var(--d2-xanh-chu)}
+
+/* OMNI 3 · công tắc "Chưa chắc" (thầy 06/10: "Nút chưa chắc với chắc đổi màu dễ nhìn hơn nhé, và bấm nó chưa phản hồi"): BẬT ⇒ màu HỔ PHÁCH (khác công tắc "Trợ giúp" màu ngọc, nhìn là biết đang chọn
+ * "Chưa chắc") cả viền, nền, chữ và nút gạt; bấm xuống thì thu nhỏ; dòng "Đã đánh dấu chưa chắc…" hiện bên dưới. Màu qua biến --d2-* (hợp sáng/tối). */
+.dao2 .dao2-tro[data-khoi="chua-chac"][data-bat]{background:color-mix(in srgb,var(--d2-cam) 22%,transparent);box-shadow:inset 0 0 0 2px var(--d2-cam);color:var(--d2-am-chu)}
+.dao2 .dao2-tro[data-khoi="chua-chac"] .dao2-tro-gat:checked{background:var(--d2-vang-chu)}
+.dao2 .dao2-tro[data-khoi="chua-chac"]{transition:background-color .2s,box-shadow .2s,transform .12s}
+.dao2 .dao2-tro[data-khoi="chua-chac"]:active{transform:scale(.96)}
+@media (prefers-reduced-motion:reduce){.dao2 .dao2-tro[data-khoi="chua-chac"]{transition:none}}

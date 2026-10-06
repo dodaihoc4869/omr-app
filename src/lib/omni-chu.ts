@@ -41,6 +41,11 @@ export const CHU_CHAC_MA_SAI = 'Em chắc mà sai — đây là chỗ đáng xem
 /** Nút/chip tự tin trên thẻ câu (mặc định = Chắc; chạm chip trước khi chọn đáp án ⇒ Chưa chắc). */
 export const CHIP_CHUA_CHAC = 'Chưa chắc'
 export const GOI_Y_CHIP_CHUA_CHAC = `Chạm "Chưa chắc" trước khi chọn nếu em còn phân vân — giúp ${TEN_AI} chọn đúng câu cho em hơn. Không trừ gì cả.`
+/** Hai nút Chắc / Chưa chắc của màn Đoàn (thầy 06/10: "Nút chưa chắc với chắc đổi màu dễ nhìn hơn nhé, và bấm nó chưa phản hồi"): nhãn nút Chắc, câu hỏi cho đọc màn hình, bóng báo ngay khi bấm. */
+export const CHIP_CHAC = 'Chắc'
+export const HOI_CHAC = 'Em có chắc đáp án này không?'
+export const BONG_CHAC = 'Đã chọn: Chắc'
+export const BONG_CHUA_CHAC = 'Đã chọn: Chưa chắc · câu này sẽ quay lại sớm'
 
 // ---------------------------------------------------------------- Trạm hồi phục
 export const TIEU_DE_TRAM = 'Trạm hồi phục'
