@@ -1,0 +1,156 @@
+[
+ {
+  "qid": "12-C2-B4-D2-II-14",
+  "maDe": "12-C2-B4-D2",
+  "phan": "II",
+  "so": 14,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "phenolpthalein",
+  "sau": "phenolphthalein",
+  "lyDo": "Đề viết sai chính tả phenolpthalein, đúng là phenolphthalein."
+ },
+ {
+  "qid": "DB-12-B4-D2-II-26",
+  "maDe": "DB-12-B4-D2",
+  "phan": "II",
+  "so": 26,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "phenolpthalein",
+  "sau": "phenolphthalein",
+  "lyDo": "Đề viết sai chính tả phenolpthalein, đúng là phenolphthalein."
+ },
+ {
+  "qid": "DB-10-B1-D2-III-10",
+  "maDe": "DB-10-B1-D2",
+  "phan": "III",
+  "so": 10,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "1,28Aovà",
+  "sau": "1,28Ao và",
+  "lyDo": "Đề dính chữ: \"1,28Aovà\" thiếu cách, kí hiệu Å in thành \"Ao\"."
+ },
+ {
+  "qid": "DH-10-C1-B1-III-34",
+  "maDe": "DH-10-C1-B1",
+  "phan": "III",
+  "so": 34,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "1,28Aovà",
+  "sau": "1,28Ao và",
+  "lyDo": "Đề dính chữ: \"1,28Aovà\" thiếu cách, kí hiệu Å in thành \"Ao\"."
+ },
+ {
+  "qid": "DB-10-B1-D2-III-10",
+  "maDe": "DB-10-B1-D2",
+  "phan": "III",
+  "so": 10,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "Lấy π = 3,14.",
+  "sau": "Lấy π = 3,14; số Avogadro 6,022.10²³.",
+  "lyDo": "Đề không cho số Avogadro mà lời giải cần N_A = 6,022.10²³."
+ },
+ {
+  "qid": "DH-10-C1-B1-III-34",
+  "maDe": "DH-10-C1-B1",
+  "phan": "III",
+  "so": 34,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "Lấy π = 3,14.",
+  "sau": "Lấy π = 3,14; số Avogadro 6,022.10²³.",
+  "lyDo": "Đề không cho số Avogadro mà lời giải cần N_A = 6,022.10²³."
+ },
+ {
+  "qid": "DB-10-B1-D2-III-11",
+  "maDe": "DB-10-B1-D2",
+  "phan": "III",
+  "so": 11,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "(Kết quả làm tròn đến hàng phần mười.)",
+  "sau": "(Cho Nₐ = 6,022×10²³; tính r theo đơn vị Å, 1 Å = 10⁻⁸ cm. Kết quả làm tròn đến hàng phần mười.)",
+  "lyDo": "Đề không cho số Avogadro, π và đơn vị của bán kính; lời giải cần N_A = 6,022.10²³, π ≈ 3,14 và r tính theo Å (1 Å = 10⁻⁸ cm)."
+ },
+ {
+  "qid": "DB-12-B1-P1-D2-III-116",
+  "maDe": "DB-12-B1-P1-D2",
+  "phan": "III",
+  "so": 116,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "salicylic acid methanol methyl salicylate",
+  "sau": "salicylic acid + methanol ⇌ methyl salicylate + H₂O",
+  "lyDo": "Đề mất dấu + và mũi tên cân bằng trong phương trình ester hoá."
+ },
+ {
+  "qid": "DH-12-C1-B1-P1-III-45",
+  "maDe": "DH-12-C1-B1-P1",
+  "phan": "III",
+  "so": 45,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "salicylic acid methanol methyl salicylate",
+  "sau": "salicylic acid + methanol ⇌ methyl salicylate + H₂O",
+  "lyDo": "Đề mất dấu + và mũi tên cân bằng trong phương trình ester hoá."
+ },
+ {
+  "qid": "DH-10-C2-B5-III-21",
+  "maDe": "DH-10-C2-B5",
+  "phan": "III",
+  "so": 21,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "Zₐ = 6, ZB = 14, ZC = 19, ZD = 20",
+  "sau": "ZA = 6, ZB = 14, ZC = 19, ZD = 20",
+  "lyDo": "Đề in \"Zₐ = 6\" (chỉ số a thấp) cho nguyên tố A; các nguyên tố kia là ZB, ZC, ZD ⇒ viết đồng nhất chữ thường như kho (kho không dùng thẻ HTML trong đề)."
+ },
+ {
+  "qid": "DH-11-C2-B7-I-55",
+  "maDe": "DH-11-C2-B7",
+  "phan": "I",
+  "so": 55,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "… (e) Thành phần chính",
+  "sau": "…\n(e) Thành phần chính",
+  "lyDo": "Phát biểu (e) dính liền dòng với (d): xuống dòng bằng kí tự xuống dòng như mọi đề khác trong kho (đề tương đương DB-11-B8-D3-I-11 đã sửa kiểu này)."
+ },
+ {
+  "qid": "DH-11-C2-B8-III-5",
+  "maDe": "DH-11-C2-B8",
+  "phan": "III",
+  "so": 5,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "2SO₂+O₂V²tOo⁵2SO₃ (d)",
+  "sau": "2SO₂+O₂ ⇌(V₂O₅, t°) 2SO₃\n(4)",
+  "lyDo": "Đề bị vỡ công thức: phản ứng (3) mất mũi tên và điều kiện (V₂O₅, t°); ý (4) bị in thành (d). Xuống dòng bằng kí tự xuống dòng như kho."
+ },
+ {
+  "qid": "DB-10-B8-D2-II-32",
+  "maDe": "DB-10-B8-D2",
+  "phan": "II",
+  "so": 32,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "vào trong một cốc nước có chứa phenolphtalein",
+  "sau": "vào hai cốc nước riêng biệt, mỗi cốc có chứa phenolphtalein",
+  "lyDo": "Đề in \"một cốc nước\" nhưng nói \"cả hai cốc\" và đáp án kho SSSD chỉ khớp khi có HAI cốc riêng, mỗi cốc một kim loại."
+ },
+ {
+  "qid": "DB-10-B8-D2-II-32",
+  "maDe": "DB-10-B8-D2",
+  "phan": "II",
+  "so": 32,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "màu hồng trong cả hai cốc",
+  "sau": "màu hồng chỉ trong cốc chứa calcium",
+  "lyDo": "Đề in \"màu hồng trong cả hai cốc\" thì không phân biệt được hai kim loại; phải là chỉ cốc chứa calcium hồng thì các ý a–d mới khớp đáp án kho."
+ }
+]
