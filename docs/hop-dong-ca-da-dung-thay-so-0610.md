@@ -18,7 +18,7 @@ Câu lý thuyết KHÔNG BAO GIỜ thay số. Câu thay không trùng câu nào 
 
 ## 2. Lệnh máy chủ — `POST /ca/cau-thay-so` (thầy, mã bí mật; `server/src/cau-thay-so.ts`)
 
-Vào: `{ sbd: [≤ 4 em], seed: <mã ca>, ngay?: 'YYYY-MM-DD', cau: { <sbd>: [{ qid, phan, mucDo, dang, lyThuyet, bu }] } }` — `cau` là bộ câu ĐÃ rút của em (`bu` = câu bù: không thay, chỉ để khỏi chọn trùng).
+Vào: `{ sbd: [≤ 2 em], seed: <mã ca>, ngay?: 'YYYY-MM-DD', cau: { <sbd>: [{ qid, phan, mucDo, dang, lyThuyet, bu }] } }` — `cau` là bộ câu ĐÃ rút của em (`bu` = câu bù: không thay, chỉ để khỏi chọn trùng).
 
 Ra: `{ ok, bat, em: { <sbd>: { <qid câu em đã đúng>: { cach: 'ss'|'bt'|'ae', kieu: 'thay_so'|'cung_dang', id, phan, mucDo, dang, maDe?, cau? } } }, dem: { ss, bt, ae, giu }, loi: [sbd] }`.
 - `cau` (chỉ `ss`/`bt`) = câu đổi số **CÓ ĐÁP ÁN** — chỉ về máy thầy để nối vào kho ca (như câu song sinh của `/ca/loi-den-han`); `ae` chỉ có `id` + `maDe` (nội dung lấy trong kho máy thầy).
@@ -28,7 +28,7 @@ Ra: `{ ok, bat, em: { <sbd>: { <qid câu em đã đúng>: { cach: 'ss'|'bt'|'ae'
 
 ## 3. Máy thầy (`src/lib/de-rieng-da-dung.ts`)
 
-`chayThuRutDeDaDung` (Xem trước phân bổ) và `chotRutDeDaDung` (Bắt đầu): rút như trước (`rutDeDaDung`) → gọi `/ca/cau-thay-so` theo lô 4 em, 3 lô song song → `apThayVaoKetQua` (đổi qid trong bộ câu, nhãn, đếm đúng/sai cũ đi theo qid mới) → câu thay có nội dung dùng được vào `cauNgoai` → lúc chốt nối vào kho ca (`noiKhoCa` + kho đáp án) như câu ngoài kho đã có.
+`chayThuRutDeDaDung` (Xem trước phân bổ) và `chotRutDeDaDung` (Bắt đầu): rút như trước (`rutDeDaDung`) → gọi `/ca/cau-thay-so` theo lô 2 em, 3 lô song song → `apThayVaoKetQua` (đổi qid trong bộ câu, nhãn, đếm đúng/sai cũ đi theo qid mới) → câu thay có nội dung dùng được vào `cauNgoai` → lúc chốt nối vào kho ca (`noiKhoCa` + kho đáp án) như câu ngoài kho đã có.
 Mọi lỗi (máy chủ cũ 404, mạng, công tắc tắt, em lỗi đọc, nội dung câu thay thiếu / lệch id / lệch phần, nối kho hỏng) ⇒ **giữ nguyên câu em đã đúng**, ca không bị chặn, và nói ra: bảng Xem trước phân bổ (khối `thay-cau-da-dung`) + cảnh báo lúc Bắt đầu + `bienBan.daDung.thay` (`trangThai`, `thaySo`, `cungDang`, `lyThuyet`, `giuNguyen`, `emGiuNguyen`, `khongDung`, `emLoi`, `cungDangTheoEm`).
 
 ## 4. Em vào MUỘN (sau khi chốt) — `lapBoDaDungChoEmVaoMuon`
@@ -45,3 +45,11 @@ Không khoá mới trong gói đề: nhãn câu thay là **cả câu** nằm tro
 
 ## 7. Kiểm
 `tests/che-do-da-dung-thay-so-0610.test.ts` (lõi thuần + máy chủ trên D1 thật: song sinh, biến thể, câu anh em, luật khối, công tắc, em vào muộn) · `tests/che-do-da-dung-thay-so-0610-man.test.tsx` (máy thầy, dự phòng, bảng, báo cáo, nhãn trên màn thi). Thử đột biến 9 luật trong phiên 06/10: đều có test bắt.
+
+## 8. Đo thật trên D1 (06/10, chỉ đọc, chỉ đếm — `scripts/do-phu-thay-so-0610.ts`, workflow `do-phu-thay-so-0610`, run 37471402499)
+12 em mẫu (có mặt trong chiến dịch còn hiệu lực, rải đều theo số báo danh), mỗi em rút bộ 28 câu từ câu em ĐÃ ĐÚNG rồi hỏi đúng hàm máy chủ `cauThayDaDung`: tổng **335 câu** →
+**thay số 99 (29,6 %: song sinh 97 · biến thể 2) · thay bằng câu cùng dạng 229 (68,4 %) · giữ nguyên 7 (2,1 %)**.
+Theo loại (câu lý thuyết là ƯỚC LƯỢNG bằng `dangCua` trên JSON kho game — máy thầy dùng nhãn kho `kieu` nên có thể lệch): lý thuyết 211 câu → cùng dạng 210, giữ nguyên 1 · tính toán 124 câu → thay số 99 (80 %), cùng dạng 19, giữ nguyên 6.
+Theo phần: Phần I 215 (thay số 34 · cùng dạng 180 · giữ 1) · Phần II 48 (cùng dạng 46 · giữ 2) · Phần III 72 (thay số 65 · cùng dạng 3 · giữ 4).
+**Tải**: mỗi em trung vị **143** truy vấn D1, lớn nhất **249** (qua API REST: 30,9 giây trung vị, 52,6 lớn nhất — độ trễ REST ~0,2 giây/truy vấn; trong Worker với D1 gắn trực tiếp nhanh hơn nhiều) ⇒ lượt gọi tối đa **2 em** (≈ 500 truy vấn, dưới trần 1000 của một lần chạy Worker; 4 em có thể chạm 996).
+Độ phủ "thay số" thấp ở Phần I vì đa số câu Phần I em đã đúng là câu lý thuyết (không đổi số được) — đúng ý thầy: lý thuyết thay theo cách thay câu lý thuyết.

@@ -136,7 +136,7 @@ for (const p of ['I', 'II', 'III'] as const) ra(`Phần ${p}: ${chuDem(TONG[p])}
 if (giay.length) {
   const xep = (a: number[]) => [...a].sort((x, y) => x - y)
   const g = xep(giay), q = xep(truyVan)
-  ra(`GIÂY mỗi em: trung vị ${g[Math.floor(g.length / 2)]!.toFixed(1)} · lớn nhất ${g.at(-1)!.toFixed(1)} · TRUY VẤN D1 mỗi em: trung vị ${q[Math.floor(q.length / 2)]} · lớn nhất ${q.at(-1)} (trần Worker 1000/lượt; lượt gọi tối đa 4 em)`)
+  ra(`GIÂY mỗi em: trung vị ${g[Math.floor(g.length / 2)]!.toFixed(1)} · lớn nhất ${g.at(-1)!.toFixed(1)} · TRUY VẤN D1 mỗi em: trung vị ${q[Math.floor(q.length / 2)]} · lớn nhất ${q.at(-1)} (trần Worker 1000 truy vấn phụ mỗi lượt gọi; lượt gọi tối đa 2 em)`)
 }
 ra(`tổng truy vấn D1 của cả lượt đo: ${soTruyVan}`)
 process.exit(0)

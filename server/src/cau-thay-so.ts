@@ -19,7 +19,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { bam, type PhanV2 } from '../../src/lib/rut-de-v2'
 import type { Khoi } from '../../src/lib/khoi-cau'
-import { thayDaDungBat } from './cau-da-dung'
+import { docDaGapAo, thayDaDungBat } from './cau-da-dung'
 import type { BoTro } from './cau-bo-tro'
 import { apSongSinh, boTroTheoQid } from './song-sinh-game'
 import { SO_THU_BIEN_THE, bienTheTheoQid } from './ban-khac-ao'
@@ -28,17 +28,21 @@ import { qidBienThe } from './loi-hoc-luat'
 import { docMetaCau, ngayVnCua, type MetaCau } from './srs2-d1'
 import { napDayDuMem } from './game-v2-bank'
 import { docKhoiCacEmCong } from './chan-khac-khoi'
+import { chuanMucDo, type CauSongSinhRa } from './rut-de-v2'
+
 /** Nhập trễ: cau-anh-em.ts kéo theo omni-game / srs2-game (vòng nạp với tệp này nếu nhập tĩnh — như game-v2-bank.ts nhập trễ chan-doan-buoc-sai). */
 const lanAnhEm = () => import('./cau-anh-em')
-import { chuanMucDo, docDaGap, type CauSongSinhRa } from './rut-de-v2'
 
 type Obj = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim())
 const SBD_HOP_LE = /^[A-Za-z0-9_-]{1,64}$/
 const HINH_HOP_LE = /^(sau_de|cuoi_cau|sau_pa_[ABCD]|sau_y_[abcd])$/
 
-/** Số em tối đa mỗi lượt gọi: phần câu anh em đọc cỡ trăm truy vấn mỗi em ⇒ giữ lượt gọi dưới giới hạn truy vấn phụ của một lần chạy Worker. */
-export const TOI_DA_EM_CAU_THAY = 4
+/**
+ * Số em tối đa mỗi lượt gọi. ĐO THẬT 06/10 (12 em mẫu, D1 thật, scripts/do-phu-thay-so-0610.ts): mỗi em trung vị 143 truy vấn D1, lớn nhất 249 (phần câu anh em đọc theo từng dạng)
+ * ⇒ 2 em ≤ ~500 truy vấn, dưới trần 1000 truy vấn phụ của một lần chạy Worker (4 em có thể chạm 996).
+ */
+export const TOI_DA_EM_CAU_THAY = 2
 /** Số câu tối đa mỗi em (đề ca ≤ 40 câu; dư ra bị bỏ). */
 export const TOI_DA_CAU_MOI_EM = 60
 /** Số hạt `~bt<k>` liền nhau được xét cho MỖI câu (bỏ hạt em đã làm; thử sinh tối đa SO_THU_BIEN_THE hạt còn lại). */
@@ -129,15 +133,12 @@ async function thayChoMotEm(env: Env, sbd: string, ds: readonly YeuCauThay[], ct
     const ok = ss.map((s, i) => (apSongSinh(khungCau(x.qid, x.phan), s, i) ? i : -1)).filter((i) => i >= 0)
     if (ok.length > 0) ssDung.set(x.qid, ok)
   }
-  // Câu tính toán chưa có song sinh ⇒ thử biến thể bằng mã nếu dạng có bộ sinh.
-  const btCan = tinhToan.filter((x) => !ssDung.has(x.qid) && x.dang && coBoSinh(x.dang) && meta.has(x.qid))
+  // Câu tính toán chưa có song sinh ⇒ thử biến thể bằng mã nếu dạng (theo kho game — nguồn đúng của bộ sinh) có bộ sinh.
+  const dangKho = (x: YeuCauThay): string => chuoi(meta.get(x.qid)?.dang) || x.dang
+  const btCan = tinhToan.filter((x) => !ssDung.has(x.qid) && dangKho(x) && coBoSinh(dangKho(x)) && meta.has(x.qid))
   const hatBt = new Map(btCan.map((x) => [x.qid, 1 + (bam(`${ctx.seed}|${sbd}|${x.qid}|bt`) % 40)] as const))
-  // MỘT truy vấn: em đã gặp những qid ảo nào (song sinh có thể dùng + các hạt biến thể xét).
-  const qidXet = [
-    ...[...ssDung].flatMap(([q, is]) => is.map((i) => `${q}~ss${i}`)),
-    ...btCan.flatMap((x) => Array.from({ length: SO_HAT_BIEN_THE }, (_, j) => qidBienThe(x.qid, hatBt.get(x.qid)! + j))),
-  ]
-  const daGap = qidXet.length > 0 ? ((await docDaGap(env, [sbd], ctx.ngay, qidXet).catch(() => ({} as Record<string, Record<string, string>>)))[sbd] ?? {}) : {}
+  // MỘT truy vấn (chỉ khi có gì để xét): em đã gặp những qid ảo nào (song sinh có thể dùng + các hạt biến thể xét).
+  const daGap = ssDung.size > 0 || btCan.length > 0 ? await docDaGapAo(env, sbd, ctx.ngay) : {}
   // (1a) song sinh
   for (const x of tinhToan) {
     const dung = ssDung.get(x.qid)

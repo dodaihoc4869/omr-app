@@ -18,7 +18,6 @@ import { docKeyBankDem } from './dem-ca-thi'
 import { khoTuNguon, type NguonV2, type PhanV2 } from '../../src/lib/rut-de-v2'
 import { apThayVaoKetQua, banDoDaDung, khoBuTuKho, rutDeDaDung, taoNhanDaDung, timThayTrongKho, type CauDaDung } from '../../src/lib/rut-de-da-dung'
 import { docCauHinhDem } from './cau-hinh-dem'
-import { docDaGap } from './rut-de-v2'
 
 type Obj = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim())
@@ -35,6 +34,21 @@ export async function thayDaDungBat(env: Env): Promise<boolean> {
 }
 const GIO_VN_MS = 7 * 3_600_000
 const ngayVnTu = (ms: number): string => new Date(ms + GIO_VN_MS).toISOString().slice(0, 10)
+
+/**
+ * Các qid ẢO (`<gốc>~ss<i>` / `~bt<k>` / `~yd<k>`) em đã làm → ngày VN gần nhất — MỘT truy vấn theo em, KHÔNG liệt kê qid cần xét: sổ game ghi lượt lặp thành "<qid>#<n>"
+ * nên so khớp đúng từng qid sẽ bỏ sót; ở đây bỏ hậu tố "#n" rồi gộp (em đã làm bản nào thì bản ấy được coi là ĐÃ GẶP). Lỗi đọc ⇒ rỗng (coi như chưa gặp bản nào — không chặn).
+ */
+export async function docDaGapAo(env: Env, sbd: string, ngay: string): Promise<Record<string, string>> {
+  const r = await env.DB.prepare("SELECT qid, MAX(ngay_vn) AS ngay FROM su_kien_hoc WHERE sbd = ? AND qid LIKE '%~%' GROUP BY qid").bind(sbd).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  const ra: Record<string, string> = {}
+  for (const x of r.results ?? []) {
+    const q = chuoi(x.qid).replace(/#\d+$/, '')
+    const d = chuoi(x.ngay)
+    if (q && d && d <= ngay && d > (ra[q] ?? '')) ra[q] = d
+  }
+  return ra
+}
 
 /** Lần làm được tính là "tự làm": không hỗ trợ, không chỉ đọc lời giải, không phải lượt LƯỚT (OMNI 3, `SQL_LA_LAN_LAM`), không thuộc ca chưa công bố. */
 const TU_LAM_MOI = `COALESCE(assistance,'') <> 'assisted' AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'') <> 'embargoed' AND qid NOT LIKE 'nen:%'`
@@ -225,8 +239,8 @@ async function thayTuKhoCa(env: Env, kq: ReturnType<typeof rutDeDaDung>, kho: Re
     const dung = new Set((kq.theoEm[sbd] ?? []).filter((c) => !c.bu).map((c) => c.qid))
     const ung = sinh.filter((c) => dung.has(c.songSinhCua!))
     if (ung.length === 0) return kq
-    const daGap = await docDaGap(env, [sbd], ngayVnTu(nowMs), ung.map((c) => c.id)).catch(() => ({} as Record<string, Record<string, string>>))
-    return apThayVaoKetQua(kq, timThayTrongKho(kq, ung, maCa, daGap, lyThuyet), lyThuyet)
+    const daGap = await docDaGapAo(env, sbd, ngayVnTu(nowMs))
+    return apThayVaoKetQua(kq, timThayTrongKho(kq, ung, maCa, { [sbd]: daGap }, lyThuyet), lyThuyet)
   } catch (e) {
     console.error('[cau-da-dung] em vào muộn: không thay được câu từ kho ca (giữ nguyên câu):', e instanceof Error ? e.message : e)
     return kq

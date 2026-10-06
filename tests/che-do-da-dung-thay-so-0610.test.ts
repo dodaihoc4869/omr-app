@@ -233,6 +233,15 @@ describe('/ca/cau-thay-so — câu TÍNH TOÁN thay bằng bản đổi số (so
     ghi(d, 'Q1~ss1', 0, '2026-10-04')
     expect((await goi()).em.S1.Q1.id).toBe('Q1~ss0') // gặp hết ⇒ bản gặp lâu nhất (01/10)
   })
+  it('lượt lặp của game ghi "<qid>#n" vẫn được coi là ĐÃ LÀM bản ấy; bản làm sau ngày chốt không tính', async () => {
+    const { d, env } = dung(KHO)
+    await themSongSinh(d, env, 'Q1', [ssI(0), ssI(1)])
+    ghi(d, 'Q1~ss1#3', 1, '2026-10-02')
+    const goi = () => thayGoi(env, { sbd: ['S1'], cau: { S1: [yc('Q1', 'I', 'hieu', 'D1')] } })
+    expect((await goi()).em.S1.Q1.id).toBe('Q1~ss0')
+    ghi(d, 'Q1~ss0', 1, '2026-12-31') // ngày sau ngày chốt đề: không phải "đã gặp" lúc rút
+    expect((await goi()).em.S1.Q1.id).toBe('Q1~ss0')
+  })
   it('song sinh thiếu dữ liệu (thiếu phương án / đáp án không phải A–D) KHÔNG được dùng; còn bản tốt thì dùng bản tốt', async () => {
     const { d, env } = dung(KHO)
     const hong = { ...ssI(5), pa: { A: '1', B: '2', D: '4' } }
@@ -352,9 +361,9 @@ describe('/ca/cau-thay-so — công tắc · giới hạn · mã bí mật · l�
   it('không mã bí mật ⇒ từ chối; quá số em mỗi lượt ⇒ lỗi rõ; danh sách rỗng ⇒ ok rỗng', async () => {
     const { env } = dung(KHO)
     expect((await thayGoi(env, { sbd: ['S1'], cau: {} }, false)).ok).toBe(false)
-    const nhieu = await thayGoi(env, { sbd: ['E1', 'E2', 'E3', 'E4', 'E5'], cau: {} })
+    const nhieu = await thayGoi(env, { sbd: ['E1', 'E2', 'E3'], cau: {} })
     expect(nhieu.ok).toBe(false)
-    expect(String(nhieu.error)).toMatch(/Tối đa 4 em/)
+    expect(String(nhieu.error)).toMatch(/Tối đa 2 em/)
     expect(await thayGoi(env, { sbd: [], cau: {} })).toMatchObject({ ok: true, em: {} })
   })
   it('công tắc cau_hinh.da_dung_thay_so = {"bat":false} ⇒ bat:false, không thay gì; xoá công tắc ⇒ bật lại', async () => {

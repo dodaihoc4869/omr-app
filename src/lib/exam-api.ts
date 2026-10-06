@@ -596,9 +596,9 @@ export interface KetQuaThayEm {
   loi: string[]
 }
 
-/** SỐ EM MỖI LƯỢT gọi `/ca/cau-thay-so` (khớp `TOI_DA_EM_CAU_THAY` của máy chủ) — phần câu anh em đọc nhiều bảng cho mỗi em. */
-const EM_MOI_LUOT_THAY = 4
-/** Hạn chờ MỘT lượt `/ca/cau-thay-so` (giây): lượt có câu anh em của 4 em mất vài chục giây. */
+/** SỐ EM MỖI LƯỢT gọi `/ca/cau-thay-so` (khớp `TOI_DA_EM_CAU_THAY` của máy chủ: ~140–250 truy vấn D1 mỗi em, đo thật 06/10). */
+const EM_MOI_LUOT_THAY = 2
+/** Hạn chờ MỘT lượt `/ca/cau-thay-so` (giây): lượt có câu anh em của 2 em mất vài giây đến vài chục giây. */
 const HAN_GIAY_THAY = 90
 
 /**

@@ -281,6 +281,16 @@ describe('giao diện thầy — bảng Xem trước phân bổ + báo cáo cu�
   })
 })
 
+describe('màn Theo dõi — nối tiến độ và thông báo thay câu', () => {
+  it('chạy thử truyền tiến độ vào bảng; Bắt đầu báo số câu đã thay (mã nguồn)', async () => {
+    const ma = (await import('../src/screens/ExamMonitorScreen.tsx?raw')).default
+    expect(ma).toContain('tienDoThay={tienDoThay}')
+    expect(ma).toContain('{ tienDo: (xong, tong) => setTienDoThay({ xong, tong }) }')
+    expect(ma).toContain('dd.soCauThay.thaySo + dd.soCauThay.cungDang > 0')
+    expect(ma).toContain('setTienDoThay(null)')
+  })
+})
+
 describe('màn thi của em — nhãn câu thay in nguyên văn, nhãn câu cũ vẫn "Em đã làm đúng: …"', () => {
   it('in đúng lời thầy cho câu thay số; câu lý thuyết có lời riêng; không lộ đáp án', () => {
     const the = (nhan: string) => render(<TheCau cheDo="thi" phan="I" stt={3} text="Câu hỏi thử" choices={['1', '2', '3', '4']} choicePerm={[0, 1, 2, 3]} selected={null} onSelect={() => {}} daDungO={{ nhan }} />).container.querySelector('[data-da-dung="1"]')!.textContent
