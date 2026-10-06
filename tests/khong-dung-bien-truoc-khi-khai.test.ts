@@ -43,11 +43,8 @@ const DA_RA_SOAT: Record<string, string[]> = {
   // `boDo` đã có giá trị. Máy soi tĩnh không biết luật cẩu riêng của vitest nên
   // vẫn kêu; đã đọc tay và xác nhận an toàn.
   'tests/cau-noi-ddh.test.ts': ['boDo'],
-  // Đã đọc tay 14/09, cả hai chỗ đều chạy SAU khi dựng xong, không phải lúc dựng:
-  //   · `raCauHoiMoi` gọi trong `batDauLeoThap` — hàm gắn vào nút bấm.
-  //   · `xuLyTraLoi` gọi trong `setInterval` bên trong `useEffect`.
-  // Cùng một dáng với `ExamTakeScreen.tsx` ngay đầu danh sách này.
-  'src/components/ThanThuHoaHocGame.tsx': ['raCauHoiMoi', 'setTinTienHoa', 'setViecVuaLam', 'xuLyTraLoiRef'],
+  // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): đã bỏ dòng của `src/components/ThanThuHoaHocGame.tsx` (game Thần thú v1, đã xoá) —
+  // không bỏ thì phép kiểm "danh sách KHÔNG phình ra" đỏ vì tệp không còn để oxlint báo.
 }
 
 interface Nhan {

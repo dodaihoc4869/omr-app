@@ -50,7 +50,7 @@ describe('tin máy chủ gửi học sinh', () => {
 describe('khoá nguồn màn học sinh', () => {
   const TEP = [
     'src/screens/StudentPortalScreen.tsx', 'src/screens/ExamTakeScreen.tsx', 'src/screens/PhieuScreen.tsx',
-    'src/components/KhoiBaiLuyen.tsx', 'src/components/KhungLoiGiaiGame.tsx', 'src/components/xem-diem/KetQuaSauNop.tsx',
+    'src/components/KhoiBaiLuyen.tsx', 'src/components/xem-diem/KetQuaSauNop.tsx', // 06/10 gọn mã lần 2: bỏ KhungLoiGiaiGame.tsx (game Thần thú v1, đã xoá)
     'src/components/InfographicHuongDan.tsx', // TheBoNao + TheThuThachRieng đã XOÁ cùng Bộ não A.I (28/09)
     'server/src/khien-mat.ts', 'server/src/game-v2-hap-thu.ts', 'server/src/game-v2-doan-the.ts', 'server/src/ph-giao-them.ts',
   ]

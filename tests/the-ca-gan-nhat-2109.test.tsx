@@ -1,10 +1,10 @@
 // THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" ở đầu Bảng nhiệm vụ phụ huynh (thầy lệnh 21/09; mẫu ph-3, Boss soát ĐẠT). Luật công bố đứng đầu: ca chưa công bố ⇒ thẻ trung tính, KHÔNG điểm/số câu/phần.
+// GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): thẻ vẽ `TheCaGanNhatCua` (xem-diem/TheCaGanNhat.tsx) — "lô dọn" ghi ở docs/ph-toi-gian-2109.md — đã xoá; đã gỡ khối "vẽ thẻ" + `it` soi nguồn tệp ấy. Còn hàm thuần `chonTheCaGanNhat` (lib, đang dùng) + `it` soi BangNhiemVu.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, configure, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
-import TheCaGanNhatCua from '../src/components/xem-diem/TheCaGanNhat'
 import { chonTheCaGanNhat, tenCaThe, type CaChuaCongBo, type CaDaCongBo } from '../src/lib/the-ca-gan-nhat'
 
 configure({ asyncUtilTimeout: 8000 })
@@ -26,7 +26,6 @@ const CA_MOI: CaDaCongBo = { maCa: 'CA-2', tenCa: 'Kiểm tra 45 phút · Ester 
 const CA_CU: CaDaCongBo = { maCa: 'CA-1', tenCa: 'Kiểm tra 60 phút · Ancol – phenol', nopLuc: '2026-09-12T02:12:00Z', tong: 6.75, diemI: 3, diemII: 2.5, diemIII: 1.25, soCauDung: 27, tongCau: 40 }
 const CHUA_LOP: CaChuaCongBo = { maCa: 'CA-3', tenCa: 'Kiểm tra 20 phút · Amin', nopLuc: '2026-09-20T03:00:00Z', congBo: 'ca_lop_xong', soEmDaNop: 27, soEmDaVao: 32 }
 const CHUA_KHONG: CaChuaCongBo = { maCa: 'CA-4', tenCa: 'Kiểm tra 10 phút · Polime', nopLuc: '2026-09-20T04:00:00Z', congBo: 'khong', soEmDaNop: 1, soEmDaVao: 32 }
-const CAM = /thần thú|EXP|khiên|Đoàn|Đảo|Võ đài|hạng|\bMáy\b/i
 
 beforeEach(() => {
   mocks.ls = { ok: true, items: [], chuaCongBo: [] }
@@ -100,64 +99,8 @@ describe('chonTheCaGanNhat — chọn ca + luật công bố (thuần)', () => {
   })
 })
 
-describe('TheCaGanNhatCua — vẽ thẻ', () => {
-  it('đã công bố: điểm/10 to, tên ca, giờ nộp, "đúng 21/28 câu", so với lần trước của CON, ba phần có SỐ ĐIỂM, "Xem báo cáo ca này"; MỘT nút bấm được', () => {
-    const onMo = vi.fn()
-    const { container } = render(<TheCaGanNhatCua the={chonTheCaGanNhat([CA_CU, CA_MOI], [])} onMo={onMo} />)
-    const nut = screen.getByRole('button', { name: /Ca kiểm tra gần nhất của con: Kiểm tra 45 phút · Ester – lipid, 7,5 trên 10 điểm, đúng 21 trên 28 câu\. Xem báo cáo ca này\./ })
-    const chu = container.textContent || ''
-    for (const m of [/7,5/, /trên 10 điểm/, /Kiểm tra 45 phút · Ester – lipid/, /Nộp 09:12/, /Con làm đúng 21\/28 câu/, /\+0,75 điểm so với lần trước của con \(6,75\)/, /Phần I3,75điểm/, /Phần II2,75điểm/, /Phần III1điểm/, /Đã có điểm/, /Xem báo cáo ca này/]) expect(chu).toMatch(m)
-    expect(container.querySelectorAll('button').length).toBe(1) // cả thẻ là MỘT nút
-    expect(chu).not.toMatch(CAM)
-    fireEvent.click(nut)
-    expect(onMo).toHaveBeenCalledTimes(1)
-  })
-
-  it('ca đầu tiên ⇒ chip "Đây là ca đầu tiên của con nên chưa có lần trước để so"; ss vắng ⇒ không chip so sánh', () => {
-    const { container, rerender } = render(<TheCaGanNhatCua the={chonTheCaGanNhat([CA_CU], [])} onMo={() => {}} />)
-    expect(container.textContent).toContain('Đây là ca đầu tiên của con nên chưa có lần trước để so')
-    rerender(<TheCaGanNhatCua the={chonTheCaGanNhat([CA_MOI], [{ ...CHUA_LOP, nopLuc: '2026-09-10T03:00:00Z' }])} onMo={() => {}} />)
-    expect(container.querySelector('.xd-ss')).toBeNull()
-  })
-
-  it('thiếu số câu / thiếu điểm phần ⇒ ẩn dòng và ẩn ô phần (không số bịa)', () => {
-    const { container } = render(<TheCaGanNhatCua the={chonTheCaGanNhat([{ ...CA_MOI, soCauDung: null, diemI: null, diemII: null, diemIII: null }], [])} onMo={() => {}} />)
-    expect(container.textContent).not.toMatch(/Con làm đúng|Phần I/)
-    expect(container.querySelector('.xd-tcg__phan')).toBeNull()
-    expect(container.textContent).toMatch(/7,5/)
-  })
-
-  it('CHƯA công bố: thẻ trung tính — "Chưa có điểm", KHÔNG điểm, KHÔNG số câu, KHÔNG phần; chờ cả lớp nói 27/32 em; thầy chưa công bố nói thật', () => {
-    const a = render(<TheCaGanNhatCua the={chonTheCaGanNhat([CA_CU, CA_MOI], [CHUA_LOP])} onMo={() => {}} />)
-    const ca = a.container.textContent || ''
-    expect(ca).toMatch(/Chờ cả lớp nộp/)
-    expect(ca).toMatch(/Điểm hiện khi cả lớp nộp xong \(27\/32 em đã nộp\)/)
-    expect(ca).toMatch(/Chưa có điểm/)
-    expect(ca).not.toMatch(/7,5|6,75|Con làm đúng|Phần I|trên 10/)
-    expect(a.container.querySelector('.xd-tcg__phan')).toBeNull()
-    a.unmount()
-    const mo = vi.fn()
-    const b = render(<TheCaGanNhatCua the={chonTheCaGanNhat([CA_CU, CA_MOI], [CHUA_KHONG])} onMo={mo} />)
-    expect(b.container.textContent).toMatch(/Thầy chưa công bố điểm/)
-    expect(b.container.textContent).toMatch(/Con đã nộp bài lúc 11:00/) // 04:00Z = 11:00 giờ Việt Nam
-    expect(b.container.textContent).not.toMatch(/7,5|6,75|Con làm đúng|Phần I|trên 10|\d+\/\d+ em/)
-    // Ca CHƯA công bố: KHÔNG có gì để mở (một màn một nút, 21/09) ⇒ thẻ là nhóm trung tính, KHÔNG phải nút, không dải "Xem báo cáo ca này".
-    expect(b.container.querySelector('button')).toBeNull()
-    const nhom = screen.getByRole('group', { name: /Ca kiểm tra gần nhất của con: .*Thầy chưa công bố điểm\.$/ })
-    expect(nhom.getAttribute('aria-label')).not.toMatch(/\d,\d|trên 10|Xem báo cáo/)
-    expect(b.container.textContent).not.toMatch(/Xem báo cáo ca này|Xem tất cả về con/)
-    fireEvent.click(nhom)
-    expect(mo).not.toHaveBeenCalled()
-  })
-
-  it('null ⇒ không vẽ gì', () => {
-    const { container } = render(<TheCaGanNhatCua the={null} onMo={() => {}} />)
-    expect(container.innerHTML).toBe('')
-  })
-})
-
 // ĐÃ GỠ 21/09 (app phụ huynh MỚI): describe "Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU…" (3 test trên ParentPortalScreen). Thẻ ca gần nhất của màn chính mới + bảng khoá ở tests/ph-moi-man-2109.test.tsx.
-// `TheCaGanNhatCua` / `chonTheCaGanNhat` còn ở đây như hàm/khối riêng (chưa xoá — lô dọn).
+// GỌN MÃ 06/10 (lần 2): `TheCaGanNhatCua` đã xoá (xem ghi chú đầu tệp).
 
 describe('khoá nguồn', () => {
   it('CardCaThiGanNhat.tsx mồ côi ĐÃ XOÁ; thẻ mới chỉ nằm ở vai phụ huynh (`laPh && theCaGanNhat`) và đứng sau khối tiến độ', () => {
@@ -166,13 +109,5 @@ describe('khoá nguồn', () => {
     expect(b).toContain('{laPh && theCaGanNhat}')
     expect(b.indexOf('data-vung="tien-do"')).toBeLessThan(b.indexOf('{laPh && theCaGanNhat}'))
     expect(b.indexOf('{laPh && theCaGanNhat}')).toBeLessThan(b.indexOf('{duLieu.trong ? (')) // (thẻ Thử thách riêng đã gỡ 28/09)
-  })
-  it('ca đã công bố: cả thẻ là MỘT <button> ≥ 48 px (dải "Xem báo cáo ca này" 52 px); ca chưa công bố: <div role="group"> (không nút); không lồng nút/liên kết, dùng bộ xd-* và biến m3', () => {
-    const t = doc('src/components/xem-diem/TheCaGanNhat.tsx')
-    expect((t.match(/<button/g) || []).length).toBe(1) // chỉ nhánh ĐÃ công bố có nút
-    expect(t).toContain('role="group"')
-    expect(t).not.toMatch(/<a\s/)
-    expect(doc('src/components/xem-diem/xem-diem.css')).toMatch(/\.xd-tcg__duoi \{[^}]*min-height: 52px/)
-    expect(t).toContain("import { ChipCongBo, SoSanh } from './thanh-phan'")
   })
 })

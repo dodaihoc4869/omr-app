@@ -53,9 +53,9 @@ describe('TheTienBo truyền cờ xuống; chỉ màn HS/PH bật', () => {
     expect(t).toContain('anNhanNangLuc = false')
     expect(t).toContain('anNhanNangLuc={anNhanNangLuc}')
   })
-  it('modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor, BaoCaoMotEm) KHÔNG bật', () => {
+  // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): đã gỡ dòng soi `xem-diem-gv/BaoCaoMotEm.tsx` (bị báo cáo chi tiết mới `ca-thi/BaoCaoChiTiet.tsx` thay và xoá); hai dòng còn lại giữ NGUYÊN.
+  it('modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor) KHÔNG bật', () => {
     expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toMatch(/<TheTienBo[\s\S]*?anNhanNangLuc\s*\/>/)
-    expect(doc('src/components/xem-diem-gv/BaoCaoMotEm.tsx')).not.toContain('anNhanNangLuc')
     expect(doc('src/screens/ExamMonitorScreen.tsx')).not.toContain('anNhanNangLuc')
   })
   it('báo cáo HỌC SINH bản mới (28/09, thay modal cũ đã xoá): không dùng thẻ có nhãn, màn KHÔNG in nhãn xếp loại hay hạng', () => {

@@ -5,7 +5,6 @@ import {EXPANDED} from '../src/lib/experiments/expanded'
 import {renderScene} from '../src/lib/experiments/scene'
 import {experimentHtml,experimentOriginal} from '../src/lib/experiments/render'
 import {MomQuestionStem} from '../src/components/MomQuestionMedia'
-import {ThanCauGame} from '../src/components/CauHoiTrongGame'
 import TheCau from '../src/components/TheCau'
 import {napCanhThiNghiem} from '../src/components/ExperimentDemo'
 const text='Khi cho glucose phản ứng với Cu(OH)₂ trong môi trường kiềm đun nóng, hiện tượng nào sau đây sẽ xảy ra?'
@@ -13,8 +12,9 @@ describe('shared experiment catalogue',()=>{
  // Máy yếu 29/09: catalog cảnh nạp lười — nạp trước (như máy em sau lần gặp câu có cảnh đầu tiên) rồi mới dựng tĩnh.
  beforeAll(async()=>{await napCanhThiNghiem()})
  it('has no broken references or duplicate scenes per question',()=>{for(const ids of Object.values(EXPANDED)){expect(new Set(ids).size).toBe(ids.length);for(const id of ids)expect(SCENES[id],id).toBeDefined()}})
- it('shows the same observed reaction in exams, Mom exercises and game questions',()=>{
- const variants=[renderToStaticMarkup(<TheCau phan="I" stt={1} text={text} choices={['A','B','C','D']} choicePerm={[0,1,2,3]} selected={null} cheDo="thi"/>),renderToStaticMarkup(<MomQuestionStem q={{text}}/>),renderToStaticMarkup(<ThanCauGame c={{cau:text,phuongAn:[]}}/>)];
+ // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): bỏ biến thể `ThanCauGame` — CauHoiTrongGame.tsx (game Thần thú v1) đã xoá; câu trong game v2 dựng bằng `TheCau`, đã nằm ở biến thể đầu.
+ it('shows the same observed reaction in exams and Mom exercises',()=>{
+ const variants=[renderToStaticMarkup(<TheCau phan="I" stt={1} text={text} choices={['A','B','C','D']} choicePerm={[0,1,2,3]} selected={null} cheDo="thi"/>),renderToStaticMarkup(<MomQuestionStem q={{text}}/>)];
  for(const h of variants){expect(h).toContain('Cu₂O');expect(h).toContain('đỏ gạch');expect(h).toContain('class="ex-demo" open')}
  })
  it('does not apply the heated-glucose reaction to modified or unspecified experiments',()=>{expect(experimentHtml(text.replace('đun nóng','ở nhiệt độ thường'))).toBe('');expect(experimentHtml('Lắp đặt thí nghiệm như hình vẽ.')).toBe('')})

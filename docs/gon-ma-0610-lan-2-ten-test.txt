@@ -1,0 +1,419 @@
+# PHỤ LỤC · gọn mã lần 2 (06/10/2026) — TÊN CÁC TEST BỊ GỠ (402 test xoá hẳn + 3 tên cũ của test được đổi tên = 405 tên) · đối chiếu docs/gon-ma-0610-lan-2.md mục 5
+# Định dạng: <tệp test> | <trạng thái ở NỀN: xanh | ĐỎ NỀN> | <tên test đầy đủ = describe + it>
+# Nền = lượt chạy toàn bộ vitest ở worktree sạch tại a0d10318 (14.480 test); tên lấy từ báo cáo JSON của chính lượt đó (không gõ tay).
+# 20 tệp xoá nguyên (323 test) đứng trước; 12 tệp chỉ gỡ khối (82 test) đứng sau. Test đổi tên (3) không nằm ở đây: xem mục 5.2.
+#
+# ===== A. TỆP TEST XOÁ NGUYÊN (20 tệp · 323 test) =====
+tests/anh-bang-vao-game-1609.test.ts | xanh | màn chiến đấu thật sự vẽ ảnh và bảng ra cả HAI màn hỏi (leo tháp và săn boss) đều dựng thân câu bằng `ThanCauGame`
+tests/anh-bang-vao-game-1609.test.ts | xanh | màn chiến đấu thật sự vẽ ảnh và bảng ra cả hai màn đều dựng phương án bằng `NoiDungPhuongAn` — không in chuỗi trơ
+tests/anh-bang-vao-game-1609.test.ts | xanh | màn chiến đấu thật sự vẽ ảnh và bảng ra khung câu dùng lại đúng bộ hiển thị của thẻ câu thi, không tự nghĩ kiểu mới
+tests/anh-bang-vao-game-1609.test.ts | xanh | ảnh của câu vào game BẢNG BIỂU giữ nguyên hàng cột, không tự điền ô trống
+tests/anh-bang-vao-game-1609.test.ts | xanh | ảnh của câu vào game PHƯƠNG ÁN CHỈ CÓ ẢNH vẫn chơi được — trước đây vứt cả câu
+tests/anh-bang-vao-game-1609.test.ts | xanh | ảnh của câu vào game VỊ TRÍ ẢNH LÀ CHUỖI, không phải số — ép Number() là mất sạch vị trí
+tests/anh-bang-vao-game-1609.test.ts | xanh | ảnh của câu vào game `choiceImgs` thắng ảnh `sau_pa_*` khi có cả hai
+tests/anh-bang-vao-game-1609.test.ts | xanh | ảnh của câu vào game thiếu CẢ chữ LẪN ảnh ở một phương án thì vẫn phải bỏ — không bịa ra phương án
+tests/anh-bang-vao-game-1609.test.ts | xanh | ảnh của câu vào game ẢNH PHƯƠNG ÁN nằm ở phương án, KHÔNG dồn lên thân câu
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) có lịch sử ⇒ khối "Tiến bộ qua các ca" (nhãn "Chỉ so với chính em ấy") dựng bằng thẻ TheTienBo dùng chung, và mục lục có "Tiến bộ"
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) không đưa hàm lấy lịch sử, hoặc em chưa nộp ⇒ KHÔNG tải gì và không có khối
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) kết quả về SAU khi thầy đã đóng trang (gỡ) thì không cập nhật gì (không lỗi)
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) lỗi mạng hoặc máy chủ không trả ⇒ ẨN khối (không thông báo lỗi chặn trang, không mục lục), phần còn lại của trang vẫn đủ
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) đang tải ⇒ dòng chờ có vai trò status, CHƯA có mục trong mục lục; tải xong ⇒ dòng chờ biến mất
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) điểm ca ĐANG XEM luôn có mặt trong biểu đồ dù lịch sử máy chủ chưa kịp có ca này
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang) đổi sang em khác khi lượt tải của em trước CHƯA về ⇒ tải lại cho em mới, và kết quả muộn của em trước KHÔNG đè lên
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · ba phần + ô từng câu có bảng chấm: mỗi phần mở ra được, ô câu có tên "Câu n: đúng/sai/đúng một phần/bỏ trống", KHÔNG chỉ dựa vào màu (có biểu tượng), có chú giải
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · ba phần + ô từng câu không có bảng chấm: ba phần chỉ có thanh (không mở ra), không hứa "chạm để xem", và nói thật vì sao thiếu câu
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · ba phần + ô từng câu không có phần nào (chưa có bảng điểm) ⇒ ẨN mục Ba phần
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · ba phần + ô từng câu mỗi phần có điểm/trần điểm, thanh, "đúng x/y câu"; Phần II nói đúng trọn + đúng một phần
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · chuNopLuc giờ 24, múi giờ Việt Nam, thứ viết hoa chữ đầu; mốc hỏng ⇒ null
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · câu cần xem lại câu không có đề (máy chưa có kho) không bị tính là "thiếu lời giải" và không có nút lời giải
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · câu cần xem lại có số giây của em nhưng lớp chưa đủ số để lấy trung bình ⇒ chỉ nói giây của em, không in "trung bình" trống
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · câu cần xem lại không câu nào cần xem lại ⇒ ẨN mục
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · câu cần xem lại không lộ mã nội bộ (qid) và không emoji
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · câu cần xem lại lời giải: chỉ có nút "Xem lời giải" ở câu kho CÓ lời giải; câu thiếu thì không có nút và đầu mục nói số câu chưa có
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · câu cần xem lại thẻ câu: số câu + phần + dạng, chip Sai / Bỏ trống / Đúng nhưng làm lâu, đề, "Em ấy chọn" + "Đáp án"; giây làm + trung bình lớp
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · em chưa có báo cáo chờ thi lại / bị khoá chưa điểm: câu riêng; có số lần rời màn thì nêu số + thời gian
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · em chưa có báo cáo đang làm ⇒ "Chưa có báo cáo" + câu nói rõ; còn nút quay lại và hai nút việc tiếp; không mục lục, không điểm
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · khung trang chỉ MỘT nút chính ("Xem toàn cảnh em này") + một nút phụ; bấm gọi đúng hàm
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · khung trang là hộp thoại phủ kín có tên em; thanh trên: nút quay lại 48 px + "Báo cáo · tên" + dòng phụ (ca, lớp, SBD, số phút)
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · khung trang thiếu tên ⇒ dùng "SBD …"; nút quay lại và phím Esc đều đóng; cuộn nền bị khoá khi mở và trả lại khi đóng
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · kết quả + so với cả lớp hạng KHÔNG xuất hiện ở đâu khác ngoài mục "So với cả lớp"
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · kết quả + so với cả lớp không có dữ liệu so sánh ⇒ ẨN cả mục (và mục lục không có "So với lớp")
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · kết quả + so với cả lớp kết quả: điểm trên 10, "Em ấy làm đúng 21/28 câu", thời gian làm (ca cho 45 phút), giờ nộp 24 giờ theo múi giờ Việt Nam
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · kết quả + so với cả lớp so với cả lớp: nhãn "Chỉ thầy thấy mục này", điểm em ấy, trung bình lớp, +0,7 cao hơn (mũi tên + dấu + chữ), hạng, dạng làm tốt hơn
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · kết quả + so với cả lớp thiếu số câu / thời gian / giờ nộp ⇒ bỏ đúng dòng đó, không in "0" hay "null"
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · kết quả + so với cả lớp thấp hơn ⇒ dấu − và "thấp hơn trung bình lớp"; bằng ⇒ "bằng trung bình lớp"; một dạng ⇒ "Dạng em ấy…"; không dạng ⇒ không nhắc dạng
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · mục lục chỉ liệt kê mục CÓ mặt; bấm mục không đổi địa chỉ trang (chặn mặc định) mà cuộn tới mục
+tests/bao-cao-mot-em-trang-2109.test.tsx | xanh | GV-2 · theo dạng bài mỗi dạng: tên, "Trong ca này đúng a/b câu", nhãn "Cần ôn thêm" chỉ ở dạng vấp; không mã dạng, không bậc bịa
+tests/dau-truong-chan-ly.test.ts | xanh | ba ghép một CHÍN quân một sao ra MỘT quân ba sao, trong đúng một lần gọi
+tests/dau-truong-chan-ly.test.ts | xanh | ba ghép một ba quân một sao ra một quân hai sao
+tests/dau-truong-chan-ly.test.ts | xanh | ba ghép một bốn quân ra một hai sao và còn lại một quân lẻ
+tests/dau-truong-chan-ly.test.ts | xanh | ba ghép một ghép KHÔNG làm mất giá trị: tổng quy ra quân một sao giữ nguyên
+tests/dau-truong-chan-ly.test.ts | xanh | ba ghép một hai quân thì không ghép, và quân khác id không bị gộp nhầm
+tests/dau-truong-chan-ly.test.ts | xanh | bộ quân cờ lên sao nhân đúng 1,8 lần, và chỉ tới ba sao
+tests/dau-truong-chan-ly.test.ts | xanh | bộ quân cờ mọi id là duy nhất, và quân nào cũng có một dòng kiến thức Hoá thật
+tests/dau-truong-chan-ly.test.ts | xanh | bộ quân cờ quân đắt hơn thì mạnh hơn ở CẢ BA chỉ số
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ EM RỚT MẠNG giữa ván thì đội hình vòng trước vẫn đánh tiếp
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ MÁU KHÔNG NHẬN TỪ MÁY EM: mọi người đều bắt đầu ở máu khởi đầu
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ MÃ PHÒNG khác thì ván khác — không phải ván nào cũng y hệt
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ MỌI MÁY RA CÙNG MỘT VÁN: chạy lại mười lần ra y hệt
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ NỘP HAI MƯƠI QUÂN cũng chỉ ra trận được số ô cho phép
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ ghế trống được máy lấp cho đủ sáu, ván chạy được với một người thật
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ quân BỊA RA bị loại bỏ, không làm hỏng ván
+tests/dau-truong-chan-ly.test.ts | xanh | chạy lại ván từ sổ nộp của máy chủ vòng chạy được chỉ tính khi MỌI ghế đã nộp
+tests/dau-truong-chan-ly.test.ts | xanh | cửa hàng CẤP 2 KHÔNG BAO GIỜ ra quân 3 hay 4 vàng — đo trên 3000 ô
+tests/dau-truong-chan-ly.test.ts | xanh | cửa hàng cấp càng cao thì cơ hội ra quân 4 vàng càng lớn, không cấp nào tụt
+tests/dau-truong-chan-ly.test.ts | xanh | cửa hàng cấp đội lên đúng theo kinh nghiệm và dừng ở cấp tối đa
+tests/dau-truong-chan-ly.test.ts | xanh | cửa hàng luôn quay đủ năm ô và ô nào cũng là quân có thật
+tests/dau-truong-chan-ly.test.ts | xanh | cửa hàng mọi bảng tỉ lệ cộng lại đúng 100
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh TƯƠNG KHẮC ĐỔI ĐƯỢC KẾT CỤC: cùng một quân, đổi hệ địch là đổi bên thắng
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh TẤT ĐỊNH: chạy lại mười lần ra y hệt
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh giáp giảm sát thương theo công thức 100/(100+giáp), không âm
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh ra trận đúng số quân bằng CẤP ĐỘI, và chọn quân mạnh nhất trong kho
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh thua càng sâu vòng càng mất nhiều máu, và quân địch sống càng nhiều càng đau
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh đội trống luôn thua đội có quân
+tests/dau-truong-chan-ly.test.ts | xanh | giao tranh đội đông hơn và mạnh hơn thì thắng
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu CẢ VÁN TẤT ĐỊNH: cùng mã phòng thì hai máy ra cùng một bảng hạng
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu MÁY KHÔNG ĂN GIAN: chỉ mua bằng vàng nó có, không bao giờ âm vàng
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu biệt danh của máy KHÔNG mượn số báo danh của em nào
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu không ai bị mất máu khi ván đã kết thúc
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu lấp ghế cho đủ sáu, và người thật vẫn đứng đầu danh sách
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu mã phòng khác nhau thì hạt giống khác nhau
+tests/dau-truong-chan-ly.test.ts | xanh | phòng đấu một ván chạy tới khi còn đúng một người, và bảng hạng đủ sáu chỗ
+tests/dau-truong-chan-ly.test.ts | xanh | vàng và lãi chuỗi THUA cũng được thưởng y như chuỗi thắng — có đường gỡ
+tests/dau-truong-chan-ly.test.ts | xanh | vàng và lãi cứ 10 vàng ăn 1 lãi, chặn ở mức tối đa
+tests/dau-truong-chan-ly.test.ts | xanh | vàng và lãi không có vàng để dành thì chỉ được vàng nền
+tests/dau-truong-chan-ly.test.ts | ĐỎ NỀN | bộ quân cờ sáu hệ đều có đủ bốn bậc giá — không hệ nào bị bỏ đói
+tests/dau-truong-chan-ly.test.ts | ĐỎ NỀN | giao tranh nhật ký ghi lại được và có nêu loại tương khắc
+tests/than-thu-3d.test.ts | xanh | Chiêu thức bay ra thật bắn rồi thì chạy, và tự tắt sau khi hết 1,5 giây
+tests/than-thu-3d.test.ts | xanh | Chiêu thức bay ra thật bắn đè lên nhau thì bắt đầu lại, không chồng hai chiêu
+tests/than-thu-3d.test.ts | xanh | Chiêu thức bay ra thật chưa bắn thì không chạy và không hiện
+tests/than-thu-3d.test.ts | xanh | Chiêu thức bay ra thật dispose trả hết geometry và material
+tests/than-thu-3d.test.ts | xanh | Chiêu thức bay ra thật dồn lực giảm dần về 0 rồi thôi
+tests/than-thu-3d.test.ts | xanh | Chiêu thức bay ra thật đi đủ ba pha: dồn lực → bay → nổ, và nổ ĐÚNG MỘT LẦN
+tests/than-thu-3d.test.ts | xanh | Dọn bộ nhớ GPU donBoThanThu3D gọi dispose CHO TỪNG geometry và material
+tests/than-thu-3d.test.ts | xanh | Dọn bộ nhớ GPU dựng rồi dọn 30 lần không tích luỹ rác
+tests/than-thu-3d.test.ts | xanh | Mô hình 3D theo 12 hình thái CẤP SAU NGẦU HƠN CẤP TRƯỚC — không cấp nào nghèo đi, mốc nào cũng giàu thêm
+tests/than-thu-3d.test.ts | xanh | Mô hình 3D theo 12 hình thái cấp 1 là TRỨNG: không thân, không sừng, không cánh, không đuôi
+tests/than-thu-3d.test.ts | xanh | Mô hình 3D theo 12 hình thái không hai cấp nào nhìn y hệt nhau — cỡ thú tăng nghiêm ngặt
+tests/than-thu-3d.test.ts | xanh | Mô hình 3D theo 12 hình thái miệng nằm phía trước thú — chiêu bắn ra đằng trước, không bắn vào mặt em
+tests/than-thu-3d.test.ts | xanh | Mô hình 3D theo 12 hình thái mốc xuất hiện đuôi, cánh, vòng xoay theo bậc tiến hoá
+tests/than-thu-3d.test.ts | xanh | mauTuChuoi chuỗi hỏng thì về xám, không ném lỗi
+tests/than-thu-3d.test.ts | xanh | mauTuChuoi đọc được rgb và rgba của kho
+tests/than-thu-3d.test.ts | ĐỎ NỀN | Chiêu thức bay ra thật mỗi hệ một hình dạng đạn — sáu hệ không được giống nhau
+tests/than-thu-3d.test.ts | ĐỎ NỀN | Mô hình 3D theo 12 hình thái cấp nào cũng dựng được, cho cả sáu thần thú
+tests/than-thu-3d.test.ts | ĐỎ NỀN | Mô hình 3D theo 12 hình thái màu thân lấy đúng từ thần thú, mỗi hệ một màu
+tests/than-thu-am-thanh.test.ts | xanh | Bật tắt tiếng bật lại thì kêu tiếp
+tests/than-thu-am-thanh.test.ts | xanh | Bật tắt tiếng tắt rồi thì không dựng thêm lớp nào
+tests/than-thu-am-thanh.test.ts | xanh | Chưởng cuồng nộ phải to hơn hẳn chưởng thường có hạ âm, vỡ dải rộng và đuôi vang — chưởng thường không có
+tests/than-thu-am-thanh.test.ts | xanh | Chưởng cuồng nộ phải to hơn hẳn chưởng thường nhiều lớp hơn gấp nhiều lần
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần hệ axit: ít nhất ba lớp và có hốc cộng hưởng
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần hệ dien: ít nhất ba lớp và có hốc cộng hưởng
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần hệ hoa: ít nhất ba lớp và có hốc cộng hưởng
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần hệ huuco: ít nhất ba lớp và có hốc cộng hưởng
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần hệ khi: ít nhất ba lớp và có hốc cộng hưởng
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần hệ kiem: ít nhất ba lớp và có hốc cộng hưởng
+tests/than-thu-am-thanh.test.ts | xanh | Mỗi tiếng kêu là nhiều lớp chồng nhau, không phải một bộ dao động trần sáu hệ không hệ nào trùng dấu vân lớp với hệ nào
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | TEN_LY_DO mọi lý do bỏ câu đều có chữ hiện ra được cho em đọc
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | bacTheoMucDo "vận dụng cao" phải ra bậc 3, không bị "vận dụng" nuốt mất
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | bacTheoMucDo chưa gắn mức độ thì về mặc định bậc 2
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | bacTheoMucDo đọc đúng bốn mức thầy gắn, không phân biệt dấu và hoa thường
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi bỏ câu phần II và phần III, có đếm lý do
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi bỏ câu thiếu phương án hoặc phương án rỗng
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi bỏ câu trùng qid, giữ bản đầu
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi bỏ câu đáp án đúng không phải A/B/C/D
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi giữ câu có hình ảnh — gom ảnh đúng cấu trúc
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi gom đúng danh sách chuyên đề và dạng em đã đụng
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi không có lời giải thì nói rõ em đã chọn gì, không bịa lời giải
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi tổng số câu vào + bỏ = tổng đầu vào, không rơi câu nào im lặng
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi đáp án đúng luôn trỏ đúng phương án, thử cả bốn chữ cái
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | doiCauSaiThanhCauChoi đổi được câu phần I đủ điều kiện
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | locTheoBac lấy đúng bậc khi có; hết bậc thì trả cả kho chứ không trả rỗng
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | tenDangCua chưa gắn dạng thì rỗng, không bịa tên
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | tenDangCua dạng là chuỗi thuần thì lấy làm tên
+tests/than-thu-cau-hoi-cua-em.test.ts | xanh | tenDangCua ưu tiên mã dạng máy chủ trả, tên đi kèm
+tests/than-thu-chon-mot-lan.test.tsx | xanh | Chọn rồi thì KHÔNG đổi được không còn nút đổi thần thú nào trên màn
+tests/than-thu-chon-mot-lan.test.tsx | xanh | Chọn rồi thì KHÔNG đổi được mã nguồn không còn hàm đổi thú tự do
+tests/than-thu-chon-mot-lan.test.tsx | xanh | Hồ sơ: rỗng nghĩa là chưa chọn hồ sơ mặc định KHÔNG gán sẵn thần thú nào
+tests/than-thu-chon-mot-lan.test.tsx | xanh | Hồ sơ: rỗng nghĩa là chưa chọn id lạ thì về rỗng chứ không im lặng đổi sang con khác
+tests/than-thu-chon-mot-lan.test.tsx | xanh | Màn chọn lần đầu chưa chọn thì hiện màn chọn và KHÔNG có tab nào bấm được
+tests/than-thu-chon-mot-lan.test.tsx | ĐỎ NỀN | Chọn rồi thì KHÔNG đổi được màn hình nói rõ hệ nào khắc em, hệ nào em khắc
+tests/than-thu-chon-mot-lan.test.tsx | ĐỎ NỀN | Hồ sơ: rỗng nghĩa là chưa chọn hồ sơ cũ đã có thần thú thì giữ nguyên, không bắt chọn lại
+tests/than-thu-chon-mot-lan.test.tsx | ĐỎ NỀN | Màn chọn lần đầu bày đủ sáu con, mỗi con nói rõ khắc ai và bị ai khắc
+tests/than-thu-chon-mot-lan.test.tsx | ĐỎ NỀN | Màn chọn lần đầu bấm chọn thì vào game, và hồ sơ ghi lại mốc chọn
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Khối cấp độ phải ăn khớp sau khi trộn CÙNG CẤP thì lấy ống đầy hơn — chưa bên nào nạp, không cộng khống gì
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Khối cấp độ phải ăn khớp sau khi trộn KHÁC CẤP thì KHÔNG cộng khống ống nghiệm — chỗ EXP ấy đã hoá thành cấp
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Khối cấp độ phải ăn khớp sau khi trộn thanh EXP và hình thái tính lại theo đúng cấp đã chọn
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Những gì đã đúng thì phải giữ nguyên hai bản y hệt nhau thì KHÔNG gọi mạng
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Những gì đã đúng thì phải giữ nguyên máy chủ chưa có gì thì máy này thắng và phải đẩy lên
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Những gì đã đúng thì phải giữ nguyên sổ EXP vẫn lấy bên lớn hơn từng nguồn, dù bên nào thắng
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Những gì đã đúng thì phải giữ nguyên trộn xong mà khác bản máy chủ thì PHẢI đẩy lên
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Những gì đã đúng thì phải giữ nguyên tầng tháp và số câu đã thanh tẩy vẫn lấy bên lớn hơn
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Sổ EXP rỗng cả hai bên — cấp thú phải phá thế hoà CẤP KHÔNG BAO GIỜ TỤT — quét đủ 12 × 12 cặp
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Sổ EXP rỗng cả hai bên — cấp thú phải phá thế hoà HAI CHIỀU RA CÙNG MỘT CẤP — không phụ thuộc máy nào mở trước
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Sổ EXP rỗng cả hai bên — cấp thú phải phá thế hoà MÁY CHỦ cấp cao hơn: máy này phải nhận cấp của máy chủ
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Sổ EXP rỗng cả hai bên — cấp thú phải phá thế hoà MÁY NÀY cấp cao hơn: giữ cấp của máy này và phải đẩy lên
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Thước đo tiến trình cùng cấp thì xét tiếp tổng sổ EXP, rồi tầng tháp
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Thước đo tiến trình cấp thú đứng ĐẦU — để không bao giờ tụt cấp
+tests/than-thu-dong-bo-cap-do.test.ts | xanh | Thước đo tiến trình y hệt nhau thì ngang, và phép so ĐỐI XỨNG
+tests/than-thu-dong-bo-cap-do.test.ts | ĐỎ NỀN | Những gì đã đúng thì phải giữ nguyên bên nào đã chốt thần thú thì giữ — chọn một lần, không đổi
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ hỏi HỎNG thì vẫn bày nút chọn (không khoá em khi mất mạng) NHƯNG có cảnh báo
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ hỏi hỏng thì bảo em CHỜ, không giục em bấm nút nào
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ màn KHÔNG nối máy chủ thì bày nút chọn ngay, không bắt chờ
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ máy chủ trả về RỖNG thì mới bày nút chọn
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Dựng lại vẫn đồng bộ được (StrictMode) lượt gắn thứ hai KHÔNG vứt kết quả máy chủ
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Hỏi xong mà máy chủ không có thú thì phải NÓI RA máy chủ trả về rỗng thì nói thẳng là chưa có thú nào của em
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Máy tự đồng bộ, không còn nút bấm không bày nút Đồng bộ ngay nào nữa
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Máy tự đồng bộ, không còn nút bấm máy chủ nhỉnh hơn thì nuốt lại lần nữa cho hai bên bằng nhau
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Máy tự đồng bộ, không còn nút bấm quay lại tab là kéo bản máy chủ về và đẩy ngược lên
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Máy tự đồng bộ, không còn nút bấm rời tab thì đẩy nốt NGAY, không chờ hết 2,5 giây
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Máy tự đồng bộ, không còn nút bấm vòng tự động hỏng thì hiện lý do, không treo ở "đang đồng bộ"
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Thanh đồng bộ hiện ra màn hỏng thì in LÝ DO NGUYÊN VĂN của máy chủ, không nuốt
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Thanh đồng bộ hiện ra màn màn không nối máy chủ thì nói thẳng, không giả vờ đã đồng bộ
+tests/than-thu-dong-bo-hien-ra.test.tsx | xanh | Thanh đồng bộ hiện ra màn nuốt xong bản máy chủ thì báo ĐÃ ĐỒNG BỘ
+tests/than-thu-dong-bo-hien-ra.test.tsx | ĐỎ NỀN | Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ đang hỏi máy chủ thì hiện màn chờ, KHÔNG hiện nút chọn
+tests/than-thu-dong-bo-hien-ra.test.tsx | ĐỎ NỀN | Hỏi xong mà máy chủ không có thú thì phải NÓI RA máy chủ CÓ thú thì không hiện câu ấy — vì màn chọn biến mất luôn
+tests/than-thu-dong-bo-man.test.tsx | xanh | Nuốt bản máy chủ khi mở game không truyền hàm đồng bộ thì game chạy y như cũ
+tests/than-thu-dong-bo-man.test.tsx | xanh | Nuốt bản máy chủ khi mở game máy chủ có thú cấp cao hơn thì màn hình đổi theo
+tests/than-thu-dong-bo-man.test.tsx | xanh | Nuốt bản máy chủ khi mở game máy chủ lỗi thì game vẫn chạy bằng bản trong máy
+tests/than-thu-dong-bo-man.test.tsx | xanh | Nuốt bản máy chủ khi mở game máy này đang cao hơn thì KHÔNG bị máy chủ kéo tụt
+tests/than-thu-dong-bo-man.test.tsx | xanh | Đẩy lên máy chủ KHÔNG đẩy trước khi nuốt xong bản máy chủ
+tests/than-thu-dong-bo-man.test.tsx | xanh | Đẩy lên máy chủ gộp nhiều thay đổi liên tiếp thành một lần đẩy
+tests/than-thu-dong-bo-man.test.tsx | xanh | Đẩy lên máy chủ máy chủ từ chối vì có bản nhỉnh hơn thì máy này NUỐT LẠI
+tests/than-thu-dong-bo-man.test.tsx | xanh | Đẩy lên máy chủ đẩy hỏng vì mất mạng thì game không vỡ
+tests/than-thu-dong-bo-man.test.tsx | ĐỎ NỀN | Nuốt bản máy chủ khi mở game máy chủ chưa có gì thì giữ nguyên bản trong máy
+tests/than-thu-dong-bo.test.ts | xanh | Dữ liệu hỏng từ máy chủ máy chủ trả rác thì không vỡ, coi như hồ sơ mặc định
+tests/than-thu-dong-bo.test.ts | xanh | Hoà giải theo tổng EXP KHÔNG dùng đồng hồ — bản có mốc mới hơn mà ít EXP vẫn thua
+tests/than-thu-dong-bo.test.ts | xanh | Hoà giải theo tổng EXP bằng nhau thì giữ bản máy này, không nháy giao diện
+tests/than-thu-dong-bo.test.ts | xanh | Hoà giải theo tổng EXP máy chủ nhiều EXP hơn thì máy chủ thắng
+tests/than-thu-dong-bo.test.ts | xanh | Hoà giải theo tổng EXP máy này nhiều EXP hơn thì máy này thắng và đẩy lên
+tests/than-thu-dong-bo.test.ts | xanh | KHÔNG LÀM TỤT TIẾN TRÌNH TỪNG DÒNG sổ EXP lấy bên lớn hơn, không lấy nguyên một bên
+tests/than-thu-dong-bo.test.ts | xanh | KHÔNG LÀM TỤT TIẾN TRÌNH máy chủ thắng nhưng tầng tháp của máy này cao hơn thì GIỮ tầng cao
+tests/than-thu-dong-bo.test.ts | xanh | KHÔNG LÀM TỤT TIẾN TRÌNH số câu đã thanh tẩy cũng lấy bên lớn hơn
+tests/than-thu-dong-bo.test.ts | xanh | KHÔNG LÀM TỤT TIẾN TRÌNH trộn 200 cặp ngẫu nhiên: không cặp nào làm tụt một con số chỉ-tăng
+tests/than-thu-dong-bo.test.ts | xanh | KHÔNG LÀM TỤT TIẾN TRÌNH trộn xong tổng EXP không bao giờ nhỏ hơn cả hai bên
+tests/than-thu-dong-bo.test.ts | xanh | Máy chủ chưa có gì máy này thắng và phải đẩy lên
+tests/than-thu-dong-bo.test.ts | xanh | Máy chủ chưa có gì undefined cũng vậy
+tests/than-thu-dong-bo.test.ts | xanh | khacBan — chỉ đẩy lên khi thật sự khác bản giống hệt máy chủ thì KHÔNG đẩy lên vô ích
+tests/than-thu-dong-bo.test.ts | xanh | khacBan — chỉ đẩy lên khi thật sự khác hai bản y hệt thì không khác
+tests/than-thu-dong-bo.test.ts | xanh | khacBan — chỉ đẩy lên khi thật sự khác lệch một dòng sổ là khác
+tests/than-thu-dong-bo.test.ts | xanh | khacBan — chỉ đẩy lên khi thật sự khác lệch ống EXP là khác
+tests/than-thu-dong-bo.test.ts | xanh | tongExpCuaHoSo cộng đủ năm nguồn
+tests/than-thu-dong-bo.test.ts | xanh | tongExpCuaHoSo hồ sơ mới là 0
+tests/than-thu-dong-bo.test.ts | ĐỎ NỀN | Thần thú đã chọn không bị xoá máy chủ thắng nhưng chưa chọn thú thì lấy thú của máy này
+tests/than-thu-dong-bo.test.ts | ĐỎ NỀN | Thần thú đã chọn không bị xoá máy này chưa chọn, máy chủ đã chọn thì nuốt thú của máy chủ
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức DANH PHÁP 2018 — không còn axit / bazơ / este / ancol / anđehit
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức DANH PHÁP 2018 — tên nguyên tố trong phương án dùng tên mới
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức MỌI PHƯƠNG TRÌNH CÂN BẰNG — 0 phương trình lệch
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức MỌI câu có đúng 4 phương án và đáp án nằm trong khoảng
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức bậc khó tăng theo tầng
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức bộ đếm nguyên tử tự nó phải đúng trước đã
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức không câu nào trùng đề bài
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức mọi câu có chuyên đề, và phủ được nhiều chuyên đề
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức mọi câu có giải thích ĐỦ DÀI — không chỉ nhắc lại đáp án
+tests/than-thu-kho-cau-hoi.test.ts | xanh | kho câu hỏi tháp tri thức đủ 60 câu, chia ba bậc
+tests/than-thu-khung-ve.test.ts | xanh | khungVeThanThu bộ số hộp bao không bị sửa vu vơ
+tests/than-thu-khung-ve.test.ts | xanh | khungVeThanThu hình nằm trọn trong khung, chừa ít nhất 3 điểm ảnh mỗi mép
+tests/than-thu-khung-ve.test.ts | xanh | khungVeThanThu hình được canh giữa khung theo cả hai chiều
+tests/than-thu-khung-ve.test.ts | xanh | khungVeThanThu khung bé tí cũng không ra bán kính âm hay bằng 0
+tests/than-thu-khung-ve.test.ts | xanh | khungVeThanThu khung to hơn thì thú vẽ to hơn, không bao giờ nhỏ đi
+tests/than-thu-khung-ve.test.ts | xanh | khungVeThanThu đuôi vươn sang trái xa hơn thân sang phải — tâm vẽ phải lệch phải
+tests/than-thu-loi-giai.test.tsx | xanh | Bộ đổi câu KHÔNG được ép lời giải thành chuỗi giữ nguyên lời giải thô, và giaiThich không bao giờ là JSON
+tests/than-thu-loi-giai.test.tsx | xanh | KhungLoiGiaiGame KHÔNG in một ký tự ngoặc nhọn nào ra màn hình
+tests/than-thu-loi-giai.test.tsx | xanh | KhungLoiGiaiGame dựng đủ: đáp án, LỜI GIẢI, kiến thức cốt lõi, lý do từng phương án (khối chuẩn, 06/10)
+tests/than-thu-loi-giai.test.tsx | xanh | KhungLoiGiaiGame hết giờ thì nói hết giờ, không nói em chọn gì
+tests/than-thu-loi-giai.test.tsx | xanh | KhungLoiGiaiGame kho thiếu lời giải thì NÓI LÀ THIẾU, không bịa
+tests/than-thu-loi-giai.test.tsx | xanh | KhungLoiGiaiGame đọc được cả khoá camelCase (tungPa / viSao)
+tests/than-thu-loi-giai.test.tsx | xanh | Leo tháp: dừng lại cho em đọc, không tự nhảy câu màn đấu không in JSON ra bất cứ đâu
+tests/than-thu-loi-giai.test.tsx | xanh | Leo tháp: dừng lại cho em đọc, không tự nhảy câu trả lời xong thì hiện nút đi tiếp, và câu hỏi biến mất
+tests/than-thu-loi-giai.test.tsx | xanh | Săn Boss Câu Sai: lời giải cũng phải ra chữ trả lời xong hiện khung lời giải chuẩn, không JSON
+tests/than-thu-loi-giai.test.tsx | xanh | docCoDoiChieu — lệch đáp án phải cờ hoá chữ thô không phải JSON thì không cờ bừa
+tests/than-thu-loi-giai.test.tsx | xanh | docCoDoiChieu — lệch đáp án phải cờ hoá câu lệch hiện cảnh báo trên màn
+tests/than-thu-loi-giai.test.tsx | xanh | docCoDoiChieu — lệch đáp án phải cờ hoá hai đáp án khác nhau thì cờ, dù không ghi trang_thai
+tests/than-thu-loi-giai.test.tsx | xanh | docCoDoiChieu — lệch đáp án phải cờ hoá khớp thì không cờ
+tests/than-thu-loi-giai.test.tsx | xanh | docCoDoiChieu — lệch đáp án phải cờ hoá trang_thai lệch thì cờ
+tests/than-thu-long-canh.test.ts | xanh | Bọc lông nhiều lớp CHỈ lớp sát da đổ bóng — mười mấy lớp cùng đổ bóng là mười mấy lần vẽ bóng
+tests/than-thu-long-canh.test.ts | xanh | Bọc lông nhiều lớp lớp ngoài phình ra hơn lớp trong
+tests/than-thu-long-canh.test.ts | xanh | Bọc lông nhiều lớp ngưỡng alpha TĂNG NGHIÊM NGẶT ra ngoài — đó là cái làm sợi thon thành ngọn
+tests/than-thu-long-canh.test.ts | xanh | Bọc lông nhiều lớp rác gom đủ: mỗi lớp một material, cộng tấm vân đã nhân bản
+tests/than-thu-long-canh.test.ts | xanh | Bọc lông nhiều lớp rủ lông: ngọn đi xa, gốc gần như đứng yên
+tests/than-thu-long-canh.test.ts | xanh | Bọc lông nhiều lớp đủ số lớp, mọi lớp DÙNG CHUNG một geometry
+tests/than-thu-long-canh.test.ts | xanh | Sáu khung cảnh KHÔNG có nền trắng: mỗi hệ một màu trời và một màu sương mù riêng
+tests/than-thu-long-canh.test.ts | xanh | Sáu khung cảnh KHÔNG đạo cụ nào đứng chắn trước mặt thú
+tests/than-thu-long-canh.test.ts | xanh | Sáu khung cảnh capNhat chạy 200 khung hình không ném lỗi và hạt có di chuyển
+tests/than-thu-long-canh.test.ts | xanh | Sáu khung cảnh donCanhNen gọi dispose cho TỪNG geometry, material, texture
+tests/than-thu-long-canh.test.ts | xanh | Sáu khung cảnh hệ nào cũng dựng được, và SÁU TÊN CẢNH KHÁC NHAU
+tests/than-thu-long-canh.test.ts | xanh | Thú đứng trên sàn, mặt không bị lông nuốt MẮT nhô hẳn ra trước mặt lông, cả sáu thần thú
+tests/than-thu-long-canh.test.ts | xanh | Thú đứng trên sàn, mặt không bị lông nuốt có lông từ cấp 2 (đầu, thân, hai tai), trứng thì không
+tests/than-thu-long-canh.test.ts | xanh | Thú đứng trên sàn, mặt không bị lông nuốt miệng bắn chiêu nằm trước cả mặt lông
+tests/than-thu-long-canh.test.ts | xanh | Thú đứng trên sàn, mặt không bị lông nuốt số lớp lông ép được, để máy yếu còn hạ xuống
+tests/than-thu-long-canh.test.ts | xanh | Thú đứng trên sàn, mặt không bị lông nuốt đầu là nhóm riêng từ cấp 2 — trứng thì đầu chính là thân
+tests/than-thu-long-canh.test.ts | xanh | Tấm vân sợi lông sinh được kể cả khi máy không cho ngữ cảnh canvas
+tests/than-thu-long-canh.test.ts | xanh | Tấm vân sợi lông số lớp theo máy luôn ít nhất 2
+tests/than-thu-long-canh.test.ts | ĐỎ NỀN | Thú đứng trên sàn, mặt không bị lông nuốt chanY nằm dưới thân và KHÔNG bộ phận nào chui xuống dưới nó quá một chút
+tests/than-thu-man-dau.test.tsx | xanh | Canvas thần thú trong màn đấu màn đấu gọi đúng tên chiêu của thần thú đang chọn
+tests/than-thu-man-dau.test.tsx | xanh | Canvas thần thú trong màn đấu tab Đảo Thần Thú có đúng một canvas
+tests/than-thu-man-dau.test.tsx | xanh | Canvas thần thú trong màn đấu vào tháp và khiêu chiến thì canvas thần thú hiện ra trong màn đấu
+tests/than-thu-man-dau.test.tsx | xanh | Câu hỏi lấy từ chính bài làm của em em chưa có câu sai nào thì cũng nói rõ đang dùng kho chung
+tests/than-thu-man-dau.test.tsx | xanh | Câu hỏi lấy từ chính bài làm của em không lấy được câu sai thì NÓI LÀ ĐANG MƯỢN KHO CHUNG, không giả vờ
+tests/than-thu-man-dau.test.tsx | xanh | Câu hỏi lấy từ chính bài làm của em nói rõ chuyên đề đã nhận ra, không giấu số câu bị bỏ
+tests/than-thu-man-dau.test.tsx | xanh | Câu hỏi lấy từ chính bài làm của em tháp hỏi bằng câu của em, không phải câu kho chung
+tests/than-thu-man-dau.test.tsx | xanh | Săn Boss Câu Sai — không có nút tự khai EXP nữa cùng một câu không trả EXP lần hai — bấm lại đúng cũng không cộng thêm
+tests/than-thu-man-dau.test.tsx | xanh | Săn Boss Câu Sai — không có nút tự khai EXP nữa không còn nút "Quy đổi câu đã sửa"
+tests/than-thu-man-dau.test.tsx | xanh | Săn Boss Câu Sai — không có nút tự khai EXP nữa trả lời SAI thì không được EXP và quái vẫn còn
+tests/than-thu-man-dau.test.tsx | xanh | Săn Boss Câu Sai — không có nút tự khai EXP nữa trả lời ĐÚNG thì hạ quái, số quái còn lại giảm một
+tests/than-thu-ong-nghiem.test.tsx | xanh | Hồ sơ có bể thứ nhất hồ sơ cũ chưa có trường ống thì về 0, không ra NaN
+tests/than-thu-ong-nghiem.test.tsx | xanh | Hồ sơ có bể thứ nhất hồ sơ mới có ống rỗng
+tests/than-thu-ong-nghiem.test.tsx | xanh | Hồ sơ có bể thứ nhất ống trong máy vượt trần thì cắt về trần
+tests/than-thu-ong-nghiem.test.tsx | xanh | Hồ sơ có bể thứ nhất ống âm thì về 0
+tests/than-thu-ong-nghiem.test.tsx | xanh | Mã nguồn: không còn đường tắt vào thần thú không còn hàm cộng thẳng EXP cho thú ngoài napVaoThu
+tests/than-thu-ong-nghiem.test.tsx | xanh | Nạp tinh lực: chuyển chỗ, không sinh EXP TỔNG EXP BẢO TOÀN — nạp không làm sinh ra hay mất đi điểm nào
+tests/than-thu-ong-nghiem.test.tsx | xanh | Nạp tinh lực: chuyển chỗ, không sinh EXP bấm nạp hai lần liên tiếp không nhân đôi EXP
+tests/than-thu-ong-nghiem.test.tsx | xanh | Nạp tinh lực: chuyển chỗ, không sinh EXP bấm nạp thì ống về 0 và thần thú lên cấp
+tests/than-thu-ong-nghiem.test.tsx | xanh | Nạp tinh lực: chuyển chỗ, không sinh EXP ống rỗng thì nút nạp bị khoá
+tests/than-thu-ong-nghiem.test.tsx | xanh | Việc học chỉ đổ vào ỐNG nút rót không sinh EXP khi không có việc học mới
+tests/than-thu-ong-nghiem.test.tsx | xanh | Việc học chỉ đổ vào ỐNG rót việc học thì ống đầy lên, thanh cấp độ KHÔNG đổi
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống nghiệm vẽ đúng mức chia cho 0 không làm vỡ
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống nghiệm vẽ đúng mức vẽ ra SVG, không dùng tệp ảnh
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống nghiệm vẽ đúng mức đang rót thì mực về đáy
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống nghiệm vẽ đúng mức ống càng nhiều EXP thì mặt nước càng cao
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống đầy: KHÔNG BAO GIỜ mất EXP đã kiếm nạp xong rót tiếp thì lấy được đúng phần còn lại — tổng không hụt
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống đầy: KHÔNG BAO GIỜ mất EXP đã kiếm rót nhiều hơn trần thì chỉ nhận vừa đủ, phần còn lại GIỮ cho lần sau
+tests/than-thu-ong-nghiem.test.tsx | xanh | Ống đầy: KHÔNG BAO GIỜ mất EXP đã kiếm ống đã đầy sẵn thì báo cho em nạp trước, không đánh dấu ca nào
+tests/than-thu-san-khau.test.ts | xanh | Chưởng cuồng nộ khác hẳn chưởng thường chỉ cuồng nộ mới có chớp loá và sóng loang mặt đất
+tests/than-thu-san-khau.test.ts | xanh | Chưởng cuồng nộ khác hẳn chưởng thường cuồng nộ có quầng nộ lúc dồn lực, chưởng thường thì không
+tests/than-thu-san-khau.test.ts | xanh | Chưởng cuồng nộ khác hẳn chưởng thường rung máy quay mạnh hơn gấp đôi
+tests/than-thu-san-khau.test.ts | xanh | Khớp khung khi thẻ co giãn đổi tỷ lệ khung thì khoảng lùi máy quay đổi theo
+tests/than-thu-san-khau.test.ts | xanh | Lớp chữ không được nuốt cú chạm của sân khấu hai nút chiêu bật lại nhận chạm, nếu không thì bấm chiêu cũng chết theo
+tests/than-thu-san-khau.test.ts | xanh | Lớp chữ không được nuốt cú chạm của sân khấu lớp nội dung sân khấu cho chạm xuyên qua khi đang dựng 3D
+tests/than-thu-san-khau.test.ts | xanh | Vũng acid và sóng loang bám mặt sàn không lơ lửng ngang mõm thú
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ bieton: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ dat: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ ductin: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ khi: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ lua: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ nuoc: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ sangy: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-san-khau.test.ts | xanh | Đường chưởng nằm gọn trong sân khấu hệ tinhyeu: mọi thứ hiện ra đều trong tầm nhìn
+tests/than-thu-sau-he.test.ts | xanh | Bảng khắc chế sáu hệ KHÔNG có cặp hai chiều — một cặp chỉ được một chiều
+tests/than-thu-sau-he.test.ts | xanh | Bảng khắc chế sáu hệ không hệ nào bất bại, không hệ nào thua sạch
+tests/than-thu-sau-he.test.ts | xanh | Bảng khắc chế sáu hệ không hệ nào tự khắc chính mình
+tests/than-thu-sau-he.test.ts | xanh | Cân bằng — đo, không nói miệng mọi hệ đều có hệ số bù, và hệ số nằm trong khoảng hợp lý
+tests/than-thu-sau-he.test.ts | xanh | Cân bằng — đo, không nói miệng sau khi nhân hệ số bù, chênh lệch dưới 1,05 lần
+tests/than-thu-sau-he.test.ts | xanh | Sáu thần thú con nào cũng có đủ lore: mô tả, hai chiêu, nguyên tố gốc
+tests/than-thu-sau-he.test.ts | xanh | tinhHeSoTuongKhac tra đúng hai chiều cặp trung tính nói thẳng là không có tương tác, không bịa bằng chứng
+tests/than-thu-sau-he.test.ts | xanh | tinhHeSoTuongKhac tra đúng hai chiều khắc chế 1,5 · bị khắc 0,7 · trung tính 1,0
+tests/than-thu-sau-he.test.ts | xanh | tinhHeSoTuongKhac tra đúng hai chiều đánh chính hệ mình luôn trung tính
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Bảng khắc chế sáu hệ mọi cặp đều nêu được phản ứng thật làm bằng chứng
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Bảng khắc chế sáu hệ thắng + thua + trung tính luôn bằng đúng 5 đối thủ
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Bảng khắc chế sáu hệ đúng sáu hệ, tên đủ cả hai kiểu
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Cân bằng — đo, không nói miệng bảng thô LỆCH — ghi lại để không ai tưởng nó cân sẵn
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Cân bằng — đo, không nói miệng hệ khắc được nhiều thì chỉ số gốc phải thấp hơn
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Cân bằng — đo, không nói miệng lực chiến thật sự đổi theo hệ
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Sáu thần thú id trong bản ghi khớp khoá, và màu chỉ dùng rgb
+tests/than-thu-sau-he.test.ts | ĐỎ NỀN | Sáu thần thú đúng sáu con, mỗi hệ đúng một con
+tests/thap-999-va-sao.test.ts | xanh | 999 trùm TÁM hệ trùm đều xuất hiện cân bằng
+tests/thap-999-va-sao.test.ts | xanh | 999 trùm cứ 50 tầng một tầng canh
+tests/thap-999-va-sao.test.ts | xanh | 999 trùm tên trùm không phải một cái lặp 999 lần
+tests/thap-999-va-sao.test.ts | xanh | 999 trùm tầng 999 ứng cấp 120 — thang tầng và thang cấp khớp nhau
+tests/thap-999-va-sao.test.ts | xanh | Cân bằng 999 tầng TẦNG NÀO CŨNG TỐN ~5 CÂU — không phải tầng 25 trở đi là một câu
+tests/thap-999-va-sao.test.ts | xanh | Cân bằng 999 tầng hệ số tiến hoá không nổ tung ở cấp 120
+tests/thap-999-va-sao.test.ts | xanh | Cân bằng 999 tầng sai 5 câu là kiệt sức, ở mọi tầng
+tests/thap-999-va-sao.test.ts | xanh | Không lặp câu ba lượt leo liên tiếp, 30 câu, KHÔNG câu nào lặp
+tests/thap-999-va-sao.test.ts | xanh | Không lặp câu chuyên đề được rải đều, không dồn một chỗ
+tests/thap-999-va-sao.test.ts | xanh | Không lặp câu kho chỉ 5 câu thì vẫn leo được, và NÓI RA là đang lặp
+tests/thap-999-va-sao.test.ts | xanh | Không lặp câu sổ cắt còn 300 dòng, không phình vô hạn
+tests/thap-999-va-sao.test.ts | xanh | Không lặp câu sổ rác từ máy chủ không làm vỡ
+tests/thap-999-va-sao.test.ts | xanh | Không lặp câu trộn sổ hai máy: không bên nào đè bên nào
+tests/thap-999-va-sao.test.ts | xanh | Tầng càng cao câu càng khó cách cũ (lọc theo bậc mức độ) cho thang PHẲNG — đây là lỗi đang sửa
+tests/thap-999-va-sao.test.ts | xanh | Tầng càng cao câu càng khó mục tiêu sao chạy đủ từ 0 tới 2 trên 999 tầng
+tests/thap-999-va-sao.test.ts | xanh | Tầng càng cao câu càng khó sao trung bình tăng theo tầng, không nấc nào tụt
+# ===== B. TEST BỊ GỠ KHỎI TỆP CÒN LẠI (12 tệp · 82 test) =====
+tests/an-nhan-nang-luc-hs-ph-2109.test.tsx | xanh | TheTienBo truyền cờ xuống; chỉ màn HS/PH bật modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor, BaoCaoMotEm) KHÔNG bật   [ĐỔI TÊN, test còn nguyên nội dung — xem mục C]
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · TÍNH LƯỜI (màn tự làm mới suốt giờ kiểm tra — Boss soát 21/09) bấm mở ⇒ tính đúng MỘT lượt; vẽ lại nhiều lần với cùng khoá ⇒ không tính lại; khoá đổi (có em nộp thêm…) ⇒ tính lại đúng một lượt nữa
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · TÍNH LƯỜI (màn tự làm mới suốt giờ kiểm tra — Boss soát 21/09) ca đang mở + khối gập: dòng tóm tắt lấy từ phần rẻ, phần nặng KHÔNG được tính
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · TÍNH LƯỜI (màn tự làm mới suốt giờ kiểm tra — Boss soát 21/09) ca đã đóng (mở sẵn): tính một lượt lúc dựng
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · TÍNH LƯỜI (màn tự làm mới suốt giờ kiểm tra — Boss soát 21/09) chưa ai nộp ⇒ không tính gì
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · TÍNH LƯỜI (màn tự làm mới suốt giờ kiểm tra — Boss soát 21/09) gập rồi mở lại với cùng khoá vẫn hiện đủ (tính lại là được, nhưng không được hỏng)
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · em cần thầy để ý không em nào cần để ý ⇒ nói rõ mốc, không để trống im lặng
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · em cần thầy để ý mỗi em là MỘT nút; chạm ⇒ mở báo cáo của em đó trong ca; lý do bằng số; em thiếu tên thì hiện "SBD …"
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · gập/mở theo trạng thái ca ca đang mở (moSan=false): chỉ một nút 48+ px kèm tóm tắt điểm trung bình và số em đã nộp; nội dung chưa dựng; bấm ⇒ mở, bấm lại ⇒ gập
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · gập/mở theo trạng thái ca ca đã đóng (moSan=true): mở sẵn, thấy đủ các khối
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · gập/mở theo trạng thái ca chưa ai nộp ⇒ không vẽ gì (không khối rỗng)
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa "Nhiều em chọn" chỉ nêu đáp án + số em; Phần II đọc thành "a Đ · b S …"; không suy diễn lý do
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa bốn số có nhãn; KHÔNG lặp "đã vào/đã nộp" (thẻ ca bên cạnh đã có)
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa chuDapAn: chỉ Phần II 4 ký tự mới đổi; chỗ trống là "–"
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa câu sai đều do bỏ trống (không có đáp án sai đông nhất) ⇒ không hiện dòng "Nhiều em chọn"
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa có đáp án nhưng chưa dạng nào đủ ba lượt ⇒ câu khác, không nói "máy chưa có đáp án"
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa dạng dưới 60% có nhãn "Cả lớp còn vấp"; dạng từ 60% trở lên thì không
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa không emoji, không mã nội bộ (qid) trên màn
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa máy chưa có đáp án: ẩn "Ba phần" và "Câu sai nhiều nhất"; dạng nói thật vì sao chưa tính; phổ điểm + em cần để ý vẫn có
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa số liệu thiếu (không nên xảy ra khi đã có bài nộp) ⇒ "—", không in 0 giả
+tests/bao-cao-ca-khoi-2109.test.tsx | xanh | GV-1 · số hiện ra và không bịa thiếu thời gian trung bình ⇒ ẩn thẻ đó, không hiện "0 phút"
+tests/bao-cao-may-chu-2109.test.tsx | xanh | BaoCaoCaLopKhoi có layMayChu KHÔNG có layMayChu ⇒ hành vi cũ nguyên: tinh chạy đồng bộ khi mở, không dòng "Đang lấy"
+tests/bao-cao-may-chu-2109.test.tsx | xanh | BaoCaoCaLopKhoi có layMayChu chờ máy chủ ⇒ dòng "Đang lấy báo cáo…" (không tính nặng ở máy); có số ⇒ vẽ số của máy chủ, KHÔNG gọi tinh
+tests/bao-cao-may-chu-2109.test.tsx | xanh | BaoCaoCaLopKhoi có layMayChu gỡ khối trước khi máy chủ trả lời ⇒ không cập nhật gì sau khi gỡ (không cảnh báo)
+tests/bao-cao-may-chu-2109.test.tsx | xanh | BaoCaoCaLopKhoi có layMayChu khoá đổi (có bài nộp mới) ⇒ hỏi lại và GIỮ bản cũ trong lúc chờ (không nhấp nháy); khoá không đổi ⇒ không hỏi lại
+tests/bao-cao-may-chu-2109.test.tsx | xanh | BaoCaoCaLopKhoi có layMayChu máy chủ trả null / ném lỗi ⇒ RƠI VỀ số tính ở máy (tinh được gọi đúng một lần), màn vẫn vẽ
+tests/experiment-catalog.test.tsx | xanh | shared experiment catalogue shows the same observed reaction in exams, Mom exercises and game questions   [ĐỔI TÊN, test còn nguyên nội dung — xem mục C]
+tests/loi-giai-chuan-react.test.tsx | xanh | Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức cốt lõi, đúng thứ tự KhungLoiGiaiGame (Leo tháp, Săn câu sai)
+tests/loi-giai-chuan-react.test.tsx | xanh | Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức cốt lõi, đúng thứ tự màn tổ chiếu + khung dự phòng + báo cáo thầy dùng khối chuẩn (không còn nhãn cũ)   [ĐỔI TÊN, test còn nguyên nội dung — xem mục C]
+tests/ten-than-thu-1609.test.ts | xanh | tên sáu bậc tiến hoá con nào cũng có đúng sáu bậc, khớp số mốc `CAP_BAC`
+tests/ten-than-thu-1609.test.ts | xanh | âm chưởng tối thượng — sáu hệ sáu tiếng, và chỉ kêu đúng lúc TRẢ LỜI ĐÚNG mà trùm chưa chết thì KHÔNG phát tiếng tối thượng
+tests/ten-than-thu-1609.test.ts | xanh | âm chưởng tối thượng — sáu hệ sáu tiếng, và chỉ kêu đúng lúc `chuongToiThuong` có nhánh riêng cho từng hệ, không dùng chung một tiếng
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | tên sáu thần thú CHIÊU TỐI THƯỢNG đúng sáu tên trong ảnh thầy gửi
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | tên sáu thần thú DANH HIỆU mang một CÔNG THỨC THẬT, không phải chữ kêu suông
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | tên sáu thần thú TÊN mang CẢ HAI nửa: một thuật ngữ Hoá và một tên thần thú
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | tên sáu thần thú không con nào trùng tên hay trùng danh hiệu con nào
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | tên sáu thần thú kỹ năng thường cũng là một quá trình Hoá, không phải chữ fantasy trơn
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | tên sáu thần thú đủ sáu con, mỗi hệ đúng một con
+tests/ten-than-thu-1609.test.ts | ĐỎ NỀN | âm chưởng tối thượng — sáu hệ sáu tiếng, và chỉ kêu đúng lúc mỗi nhánh nêu đúng tên chiêu của nó trong chú thích — đọc mã là biết tiếng nào
+tests/than-thu-hinh-thai.test.ts | xanh | hồ sơ lưu expToiDa luôn tính lại theo cấp, không tin số cũ trong máy
+tests/than-thu-hinh-thai.test.ts | xanh | hồ sơ lưu hồ sơ mặc định bắt đầu bằng thanh 160 (đường cấp mới)
+tests/than-thu-hinh-thai.test.ts | xanh | hồ sơ lưu hồ sơ rác hoặc thiếu trường thì trộn về mặc định, không ra NaN
+tests/than-thu-hinh-thai.test.ts | xanh | không bịa dữ liệu CHƯA THI CA NÀO thì KHÔNG có buff từ điểm — không lấy 7.0
+tests/than-thu-hinh-thai.test.ts | xanh | không bịa dữ liệu KHÔNG còn nút cho EXP miễn phí
+tests/than-thu-hinh-thai.test.ts | xanh | không bịa dữ liệu cấp tiến hoá cao hơn thì mạnh hơn, suốt cả 12 cấp
+tests/than-thu-hinh-thai.test.ts | xanh | không bịa dữ liệu game KHÔNG nhận số báo danh và họ tên nữa
+tests/than-thu-hinh-thai.test.ts | xanh | không bịa dữ liệu mã nguồn KHÔNG còn bảng xếp hạng bịa
+tests/than-thu-hinh-thai.test.ts | xanh | không bịa dữ liệu điểm cao hơn thì lực chiến cao hơn
+tests/than-thu-hinh-thai.test.ts | xanh | tương khắc nguyên tố — không còn là mã chết component có THỰC SỰ gọi tương khắc
+tests/than-thu-hinh-thai.test.ts | ĐỎ NỀN | tương khắc nguyên tố — không còn là mã chết bị khắc thì yếu đi, cùng hệ thì hoà, không quan hệ thì trung tính
+tests/than-thu-hinh-thai.test.ts | ĐỎ NỀN | tương khắc nguyên tố — không còn là mã chết cặp khắc chế phải có phản ứng thật đỡ lưng
+tests/than-thu-so-exp.test.tsx | xanh | Bảng tóm tắt nằm trong thẻ Buff Sức Mạnh đủ năm dòng nhiệm vụ, có cột cộng và cột trừ
+tests/than-thu-so-exp.test.tsx | xanh | Popup lấp lánh bấm nền là tắt ngay
+tests/than-thu-so-exp.test.tsx | xanh | Popup lấp lánh bật ra khi quy đổi việc học xong
+tests/than-thu-so-exp.test.tsx | xanh | Popup lấp lánh hiện số EXP, tên nhiệm vụ và việc vừa làm
+tests/than-thu-so-exp.test.tsx | xanh | Popup lấp lánh không có tin thì không vẽ gì
+tests/than-thu-so-exp.test.tsx | xanh | Quy đổi ghi vào ĐÚNG nguồn bài gia đình giao chưa nộp thì KHÔNG tính
+tests/than-thu-so-exp.test.tsx | xanh | Quy đổi ghi vào ĐÚNG nguồn ca thi, bài tập và MOM vào ba dòng riêng, tổng sổ khớp ống
+tests/than-thu-so-exp.test.tsx | xanh | Quy đổi ghi vào ĐÚNG nguồn cùng một bài gia đình giao không quy đổi hai lần
+tests/than-thu-so-exp.test.tsx | xanh | Quy đổi ghi vào ĐÚNG nguồn nạp vào thần thú KHÔNG xoá sổ — sổ là lịch sử, không phải số dư
+tests/than-thu-so-exp.test.tsx | xanh | Quy đổi ghi vào ĐÚNG nguồn ống đầy thì sổ CHỈ ghi phần rót được — không vênh với ống
+tests/than-thu-so-exp.test.tsx | xanh | Sổ EXP đọc từ máy hồ sơ cũ chưa có sổ thì về sổ rỗng, không ra NaN
+tests/than-thu-to-chieu.test.ts | xanh | Vẽ thú ra ảnh id lạ thì trả chuỗi rỗng, KHÔNG ném lỗi
+tests/than-thu-to-chieu.test.ts | xanh | Vẽ thú ra ảnh máy không dựng được canvas thì trả rỗng, không ném lỗi
+tests/than-thu-to-chieu.test.ts | xanh | Đọc hồ sơ cho tờ chiếu EM CHƯA CHỌN THẦN THÚ thì trả null — không dựng con mặc định
+tests/than-thu-to-chieu.test.ts | xanh | Đọc hồ sơ cho tờ chiếu MÁY CHỦ TREO thì bỏ qua sau hạn chờ, không đợi mãi
+tests/than-thu-to-chieu.test.ts | xanh | Đọc hồ sơ cho tờ chiếu hồ sơ rác không làm vỡ — về null hoặc về hồ sơ đã vá, không ném lỗi
+tests/than-thu-to-chieu.test.ts | xanh | Đọc hồ sơ cho tờ chiếu lấy đúng tên thú, cấp, hình thái, tầng tháp, số câu đã thanh tẩy
+tests/than-thu-to-chieu.test.ts | xanh | Đọc hồ sơ cho tờ chiếu máy chủ NÉM LỖI thì nuốt, trả null — không làm hỏng tờ chiếu
+tests/than-thu-to-chieu.test.ts | xanh | Đọc hồ sơ cho tờ chiếu máy chủ không trả gì thì trả null
+tests/than-thu-to-chieu.test.ts | xanh | Ảnh 3D — cùng một nguồn với mục Thần Thú dựng ảnh cho cả sáu thần thú, mọi cấp, đều không ném lỗi
+tests/than-thu-to-chieu.test.ts | xanh | Ảnh 3D — cùng một nguồn với mục Thần Thú id lạ thì trả rỗng, không ném lỗi
+tests/than-thu-to-chieu.test.ts | xanh | Ảnh 3D — cùng một nguồn với mục Thần Thú máy KHÔNG dựng được WebGL thì trả rỗng để chỗ gọi lùi về canvas 2D
+tests/the-ca-gan-nhat-2109.test.tsx | xanh | TheCaGanNhatCua — vẽ thẻ CHƯA công bố: thẻ trung tính — "Chưa có điểm", KHÔNG điểm, KHÔNG số câu, KHÔNG phần; chờ cả lớp nói 27/32 em; thầy chưa công bố nói thật
+tests/the-ca-gan-nhat-2109.test.tsx | xanh | TheCaGanNhatCua — vẽ thẻ ca đầu tiên ⇒ chip "Đây là ca đầu tiên của con nên chưa có lần trước để so"; ss vắng ⇒ không chip so sánh
+tests/the-ca-gan-nhat-2109.test.tsx | xanh | TheCaGanNhatCua — vẽ thẻ null ⇒ không vẽ gì
+tests/the-ca-gan-nhat-2109.test.tsx | xanh | TheCaGanNhatCua — vẽ thẻ thiếu số câu / thiếu điểm phần ⇒ ẩn dòng và ẩn ô phần (không số bịa)
+tests/the-ca-gan-nhat-2109.test.tsx | xanh | TheCaGanNhatCua — vẽ thẻ đã công bố: điểm/10 to, tên ca, giờ nộp, "đúng 21/28 câu", so với lần trước của CON, ba phần có SỐ ĐIỂM, "Xem báo cáo ca này"; MỘT nút bấm được
+tests/the-ca-gan-nhat-2109.test.tsx | xanh | khoá nguồn ca đã công bố: cả thẻ là MỘT <button> ≥ 48 px (dải "Xem báo cáo ca này" 52 px); ca chưa công bố: <div role="group"> (không nút); không lồng nút/liên kết, dùng bộ xd-* và biến m3
+tests/tu-ngu-cum4-2109.test.ts | xanh | Học sinh / phụ huynh: không còn "ca thi", "bài thi", "Lịch sử thi", "phòng thi" trong chữ hiện ra src/components/ThanThuHoaHocGame.tsx
+tests/tu-ngu-cum4-2109.test.ts | xanh | Học sinh / phụ huynh: không còn "ca thi", "bài thi", "Lịch sử thi", "phòng thi" trong chữ hiện ra src/components/xem-diem/TheCaGanNhat.tsx
+tests/tu-ngu-cum8-2109.test.ts | xanh | cụm 8 · "Máy" làm chủ ngữ tự động ⇒ "A.I Đỗ Đại Học" src/components/KhungLoiGiaiGame.tsx: có "Thầy Đỗ Đại Học tự giải ra một đáp án", hết "Máy tự giải ra một đáp án"
+# ===== C. TEST ĐỔI TÊN (3) — chỉ sửa tiêu đề cho khỏi nhắc tệp đã xoá; ruột test giữ NGUYÊN =====
+tests/an-nhan-nang-luc-hs-ph-2109.test.tsx | TheTienBo truyền cờ xuống; chỉ màn HS/PH bật modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor, BaoCaoMotEm) KHÔNG bật
+    ⇒ tên mới: TheTienBo truyền cờ xuống; chỉ màn HS/PH bật modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor) KHÔNG bật
+tests/experiment-catalog.test.tsx | shared experiment catalogue shows the same observed reaction in exams, Mom exercises and game questions
+    ⇒ tên mới: shared experiment catalogue shows the same observed reaction in exams and Mom exercises
+tests/loi-giai-chuan-react.test.tsx | Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức cốt lõi, đúng thứ tự màn tổ chiếu + khung dự phòng + báo cáo thầy dùng khối chuẩn (không còn nhãn cũ)
+    ⇒ tên mới: Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức cốt lõi, đúng thứ tự màn tổ chiếu + khung dự phòng dùng khối chuẩn (không còn nhãn cũ)
