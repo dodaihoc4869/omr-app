@@ -160,6 +160,27 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     for (let i = 1; i < cau.length; i++) expect(cau[i - 1]!.diemChua).toBeGreaterThanOrEqual(cau[i]!.diemChua)
   })
 
+  it('(thầy 06/10) buổi chữa: chữa xong ⇒ dạng đã chữa KHÔNG xếp lại, buổi sau tới các dạng còn lại; chữa hết ⇒ rỗng', async () => {
+    const { env } = fixture()
+    const id = await giao(env, '2026-10-04', T0 - 6 * NGAY)
+    const NOW = Date.parse('2026-10-05T02:00:00Z')
+    const buoi = async () => (await gvChienDich(env, { action: 'buoi-chua', id }, NOW)) as { cau: { qid: string; dang: string }[]; daChuaTruoc: number }
+    const b1 = await buoi()
+    expect(b1.cau).toHaveLength(3)
+    expect(b1.daChuaTruoc).toBe(0)
+    // Chữa câu đầu — không em nào "cần dạy lại" (ca trước đây không để lại dấu gì nên câu cứ đứng đầu mãi)
+    await gvChienDich(env, { action: 'chua-xong', id, qids: [b1.cau[0]!.qid] }, NOW)
+    const b2 = await buoi()
+    expect(b2.cau.map((c) => c.dang)).toEqual(b1.cau.slice(1).map((c) => c.dang))
+    expect(b2.daChuaTruoc).toBe(1)
+    // Chữa nốt: gọi lại (idempotent) rồi hết sạch
+    await gvChienDich(env, { action: 'chua-xong', id, qids: b2.cau.map((c) => c.qid) }, NOW)
+    await gvChienDich(env, { action: 'chua-xong', id, qids: b2.cau.map((c) => c.qid) }, NOW)
+    const b3 = await buoi()
+    expect(b3.cau).toHaveLength(0)
+    expect(b3.daChuaTruoc).toBe(3)
+  })
+
   it('đồng hồ sức chứa: tỉ lệ = khối lượng em giữa lớp / (D × thể lực)', async () => {
     const { env } = fixture()
     const r = await gvChienDich(env, { action: 'suc-chua', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-04' }, T0)
