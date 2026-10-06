@@ -1,0 +1,38 @@
+# KIỂM CÂU SQL "HUỶ CHIẾN DỊCH ⇒ THU HỒI" TRÊN D1 THẬT (CHỈ ĐỌC) — thầy 06/10: "hủy chiến dịch thì những học sinh đã phân phải đc thu hồi hết".
+# Máy chủ nuốt lỗi của hai câu GHI lúc huỷ (huỷ vẫn thành công) nên cần một lần cho D1 thật chạy phần ĐỌC tương đương để biết cú pháp được D1 chấp nhận (scripts/kiem-sql-thu-hoi-0610.sql).
+# Chỉ in các CON SỐ (đếm) — KHÔNG in mã chiến dịch / tên em / mã câu: repo công khai, nhật ký chạy ai cũng đọc được.
+# Bấm tay (workflow_dispatch), hoặc tự chạy khi đẩy nhánh có sửa hai tệp này.
+name: Kiểm SQL thu hồi khi huỷ chiến dịch (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/kiem-sql-thu-hoi-0610.yml', 'scripts/kiem-sql-thu-hoi-0610.sql']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: kiem-sql-thu-hoi-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tệp SQL chỉ có SELECT
+        run: |
+          if grep -v '^\s*--' scripts/kiem-sql-thu-hoi-0610.sql | grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|TRUNCATE|PRAGMA)\b'; then echo "Tệp có lệnh không chỉ-đọc — dừng."; exit 1; fi
+          echo "OK: chỉ SELECT"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chạy câu đọc tương đương trên D1 thật (chỉ đọc)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          SQL=$(grep -v '^\s*--' ../scripts/kiem-sql-thu-hoi-0610.sql | tr '\n' ' ')
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL"
