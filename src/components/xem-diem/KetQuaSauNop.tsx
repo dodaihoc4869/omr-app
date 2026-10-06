@@ -42,7 +42,7 @@ export interface KetQuaSauNopProps {
   daVao?: number
   onXemBaoCao?: () => void
   onVe?: () => void
-  /** (ca thi 28/09) Ô từng câu — CHỈ vẽ khi đã công bố. Bấm câu sai/bỏ trống ⇒ `onXemBaoCao` (báo cáo có lời giải của luồng cũ). */
+  /** (ca thi 28/09) Ô từng câu — CHỈ vẽ khi đã công bố. Bấm câu chưa đúng trọn (sai · bỏ trống · đúng một phần) ⇒ `onXemBaoCao` (báo cáo có lời giải của luồng cũ). */
   cau?: OCauKq[]
   /** Chưa công bố: số câu em đã làm / tổng câu (không phải số câu đúng). */
   soDaLam?: number | null
