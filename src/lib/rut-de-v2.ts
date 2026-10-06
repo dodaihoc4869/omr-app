@@ -140,8 +140,9 @@ export function soNgayGiua(tu: string, den: string): number {
   if (!Number.isFinite(a) || !Number.isFinite(b)) return 0
   return Math.round((b - a) / MS_NGAY)
 }
-export const laQidSongSinh = (qid: string): boolean => /~ss\d+$/.test(qid)
-export const gocCuaSongSinh = (qid: string): string => qid.replace(/~ss\d+$/, '')
+// 06/10: "~bt<k>" (biến thể bằng mã, server/src/bien-the-sinh.ts) cũng là câu đổi số của câu gốc — ca "Kiểm chứng câu đã đúng" nối nó vào kho ca như song sinh.
+export const laQidSongSinh = (qid: string): boolean => /~(?:ss|bt)\d+$/.test(qid)
+export const gocCuaSongSinh = (qid: string): string => qid.replace(/~(?:ss|bt)\d+$/, '')
 
 /** Mức độ từng ô theo tỉ lệ mức độ của kho (chia phần dư lớn nhất) — cùng cho mọi em ⇒ ma trận cả lớp như nhau. */
 export function mucTieuTheoKho(kho: readonly CauKhoV2[], soCau: Record<PhanV2, number>): Record<PhanV2, string[]> {

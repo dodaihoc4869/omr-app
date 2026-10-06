@@ -16,13 +16,25 @@ import { chuanMucDo } from './rut-de-v2'
 import { xoaDemCaBaoVe } from './game-v2-bank'
 import { docKeyBankDem } from './dem-ca-thi'
 import { khoTuNguon, type NguonV2, type PhanV2 } from '../../src/lib/rut-de-v2'
-import { banDoDaDung, khoBuTuKho, rutDeDaDung, taoNhanDaDung, type CauDaDung } from '../../src/lib/rut-de-da-dung'
+import { apThayVaoKetQua, banDoDaDung, khoBuTuKho, rutDeDaDung, taoNhanDaDung, timThayTrongKho, type CauDaDung } from '../../src/lib/rut-de-da-dung'
+import { docCauHinhDem } from './cau-hinh-dem'
+import { docDaGap } from './rut-de-v2'
 
 type Obj = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v).trim())
 const SBD_DUONG_JSON = /^[A-Za-z0-9_-]{1,64}$/
 /** Tối đa em mỗi lượt `/ca/cau-da-dung` (máy thầy chia lô — như `/ca/loi-den-han`). */
 export const TOI_DA_EM_CAU_DA_DUNG = 20
+
+/** Công tắc THAY CÂU (thầy 06/10 — cau-thay-so.ts): câu em đã đúng được thay bằng bản đổi số / câu anh em. Vắng dòng / JSON hỏng ⇒ BẬT; chỉ `{"bat":false}` mới tắt. */
+export const KHOA_THAY_DA_DUNG = 'da_dung_thay_so'
+export async function thayDaDungBat(env: Env): Promise<boolean> {
+  const v = await docCauHinhDem(env, KHOA_THAY_DA_DUNG).catch(() => null)
+  if (v == null) return true
+  try { const o = JSON.parse(v) as unknown; return !(o && typeof o === 'object' && !Array.isArray(o) && (o as Obj).bat === false) } catch { return true }
+}
+const GIO_VN_MS = 7 * 3_600_000
+const ngayVnTu = (ms: number): string => new Date(ms + GIO_VN_MS).toISOString().slice(0, 10)
 
 /** Lần làm được tính là "tự làm": không hỗ trợ, không chỉ đọc lời giải, không phải lượt LƯỚT (OMNI 3, `SQL_LA_LAN_LAM`), không thuộc ca chưa công bố. */
 const TU_LAM_MOI = `COALESCE(assistance,'') <> 'assisted' AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'') <> 'embargoed' AND qid NOT LIKE 'nen:%'`
@@ -199,6 +211,28 @@ export function nguonDaDungTrongKho(ds: readonly CauDaDungRa[], theoId: Readonly
   return ra
 }
 
+/**
+ * THAY CÂU cho em VÀO MUỘN (thầy 06/10): máy chủ không nối được câu mới vào kho ca (việc của máy thầy lúc Bắt đầu) ⇒ chỉ thay bằng câu đổi số ĐÃ NẰM SẴN trong kho ca
+ * (máy thầy nối cho em khác cùng câu gốc), ưu tiên bản em chưa làm; câu lý thuyết không thay số. Không có bản sẵn / công tắc tắt / lỗi đọc ⇒ giữ nguyên câu em đã đúng
+ * (nhãn "Em đã làm đúng") — em vào muộn không bao giờ bị chặn vì việc thay câu.
+ */
+async function thayTuKhoCa(env: Env, kq: ReturnType<typeof rutDeDaDung>, kho: ReturnType<typeof khoTuNguon>, maCa: string, sbd: string, nowMs: number): Promise<ReturnType<typeof rutDeDaDung>> {
+  try {
+    if (!(await thayDaDungBat(env))) return kq
+    const sinh = kho.filter((c) => c.songSinhCua)
+    if (sinh.length === 0) return kq
+    const lyThuyet = new Set(kho.filter((c) => c.lyThuyet).map((c) => c.id))
+    const dung = new Set((kq.theoEm[sbd] ?? []).filter((c) => !c.bu).map((c) => c.qid))
+    const ung = sinh.filter((c) => dung.has(c.songSinhCua!))
+    if (ung.length === 0) return kq
+    const daGap = await docDaGap(env, [sbd], ngayVnTu(nowMs), ung.map((c) => c.id)).catch(() => ({} as Record<string, Record<string, string>>))
+    return apThayVaoKetQua(kq, timThayTrongKho(kq, ung, maCa, daGap, lyThuyet), lyThuyet)
+  } catch (e) {
+    console.error('[cau-da-dung] em vào muộn: không thay được câu từ kho ca (giữ nguyên câu):', e instanceof Error ? e.message : e)
+    return kq
+  }
+}
+
 /** Em vào phòng sau khi chốt ở ca "Kiểm chứng câu đã đúng" ⇒ lấp riêng từ câu em đã đúng CÓ TRONG kho đáp án của ca; thiếu (kể cả em
  * chưa đúng câu nào) ⇒ BÙ câu khác trong kho ca cùng mức độ (thầy 05/10 — em không bị chặn). Kho ca trống ⇒ `null`. */
 export async function lapBoDaDungChoEmVaoMuon(env: Env, maCa: string, sbd: string, soCauJson: unknown, nowMs: number): Promise<Obj | null> {
@@ -213,11 +247,13 @@ export async function lapBoDaDungChoEmVaoMuon(env: Env, maCa: string, sbd: strin
   if (tong === 0) return null
   const key = (await docKeyBankDem(env, maCa).catch(() => ({ giaTri: null }))).giaTri as NguonV2 | null
   if (!key || typeof key !== 'object') return null
-  const theoId = new Map(khoTuNguon([key]).filter((c) => !c.songSinhCua).map((c) => [c.id, c]))
+  const kho = khoTuNguon([key])
+  const theoId = new Map(kho.filter((c) => !c.songSinhCua).map((c) => [c.id, c]))
   if (theoId.size === 0) return null
   const em = (await docCauDaDung(env, [sbd]))[sbd] ?? []
   const nguon = nguonDaDungTrongKho(em, theoId)
-  const kq = rutDeDaDung({ nguon: { [sbd]: nguon }, dsSbd: [sbd], tongCau: tong, seed: maCa, khoBu: khoBuTuKho([...theoId.values()]) })
+  const kq0 = rutDeDaDung({ nguon: { [sbd]: nguon }, dsSbd: [sbd], tongCau: tong, seed: maCa, khoBu: khoBuTuKho([...theoId.values()]) })
+  const kq = await thayTuKhoCa(env, kq0, kho, maCa, sbd, nowMs)
   const bd = banDoDaDung(kq)
   const bo = bd.bo[sbd]
   if (!bo || bo.length === 0) return null

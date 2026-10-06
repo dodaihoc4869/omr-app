@@ -567,6 +567,87 @@ export async function cauDaDungTheoEm(scriptUrl: string, secret: string, dsSbd: 
   return ra
 }
 
+/** Một câu trong đề của em gửi lên `/ca/cau-thay-so` (xem server/src/cau-thay-so.ts). `bu` = câu bù: không thay, chỉ để khỏi chọn trùng. */
+export interface YeuCauThayEm {
+  qid: string
+  phan: 'I' | 'II' | 'III'
+  mucDo: string
+  dang: string
+  lyThuyet: boolean
+  bu: boolean
+}
+/** Bản thay của MỘT câu em đã đúng như `/ca/cau-thay-so` trả về. `cau` (có ĐÁP ÁN — chỉ ở máy thầy) là câu đổi số để nối vào kho ca; `ae` chỉ có `id` + `maDe` (nội dung lấy từ kho máy thầy). */
+export interface BanThayEm {
+  cach: 'ss' | 'bt' | 'ae'
+  kieu: 'thay_so' | 'cung_dang'
+  id: string
+  phan: 'I' | 'II' | 'III'
+  mucDo: string
+  dang: string
+  maDe?: string
+  cau?: { id: string; phan: 'I' | 'II' | 'III'; text: string; choices?: string[]; correct: string } & QuestionMedia
+}
+export interface KetQuaThayEm {
+  /** Công tắc máy chủ (`cau_hinh.da_dung_thay_so`): false ⇒ máy chủ chủ động không thay câu nào. */
+  bat: boolean
+  em: Record<string, Record<string, BanThayEm>>
+  dem: { ss: number; bt: number; ae: number; giu: number }
+  /** Em máy chủ không tìm được bản thay vì lỗi (giữ nguyên câu cũ). */
+  loi: string[]
+}
+
+/** SỐ EM MỖI LƯỢT gọi `/ca/cau-thay-so` (khớp `TOI_DA_EM_CAU_THAY` của máy chủ) — phần câu anh em đọc nhiều bảng cho mỗi em. */
+const EM_MOI_LUOT_THAY = 4
+/** Hạn chờ MỘT lượt `/ca/cau-thay-so` (giây): lượt có câu anh em của 4 em mất vài chục giây. */
+const HAN_GIAY_THAY = 90
+
+/**
+ * KIỂM CHỨNG CÂU ĐÃ ĐÚNG — THAY CÂU (thầy 06/10): hỏi máy chủ bản đổi số / câu anh em cho từng câu em đã đúng trong đề (`cau`: sbd → câu trong đề của em).
+ * Chia lô EM_MOI_LUOT_THAY em, 3 lô song song. Máy chủ chưa có lệnh (404) / lỗi ⇒ NÉM LỖI (nơi gọi giữ nguyên câu em đã đúng và nói ra). `tienDo` báo số em đã xong.
+ */
+export async function cauThayTheoEm(
+  scriptUrl: string,
+  secret: string,
+  maCa: string,
+  cau: Record<string, YeuCauThayEm[]>,
+  tuyChon: { ngay?: string; tienDo?: (xong: number, tong: number) => void } = {},
+): Promise<KetQuaThayEm> {
+  const ds = Object.keys(cau).filter((s) => (cau[s] ?? []).some((c) => !c.bu))
+  const ra: KetQuaThayEm = { bat: true, em: {}, dem: { ss: 0, bt: 0, ae: 0, giu: 0 }, loi: [] }
+  if (ds.length === 0) return ra
+  const base = await layDiaChiMayChu(scriptUrl)
+  if (!base) throw new Error('Máy này chưa có địa chỉ máy chủ mới')
+  const lo: string[][] = []
+  for (let i = 0; i < ds.length; i += EM_MOI_LUOT_THAY) lo.push(ds.slice(i, i + EM_MOI_LUOT_THAY))
+  let chiSo = 0
+  let xong = 0
+  const chay = async () => {
+    while (chiSo < lo.length) {
+      const phan = lo[chiSo++]!
+      const res = await fetchCoHan(
+        `${base}/ca/cau-thay-so`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
+          body: JSON.stringify({ secret: secret.trim(), sbd: phan, seed: maCa, ...(tuyChon.ngay ? { ngay: tuyChon.ngay } : {}), cau: Object.fromEntries(phan.map((s) => [s, cau[s] ?? []])) }),
+        },
+        HAN_GIAY_THAY,
+      )
+      if (!res.ok) throw new Error(res.status === 404 ? 'Máy chủ chưa có lệnh thay câu đã làm đúng' : `Máy chủ trả lỗi HTTP ${res.status}`)
+      const r = (await res.json()) as { ok?: boolean; error?: string; bat?: boolean; em?: KetQuaThayEm['em']; dem?: Partial<KetQuaThayEm['dem']>; loi?: string[] }
+      if (!r.ok) throw new Error(r.error || 'Không tìm được câu thay cho câu em đã làm đúng')
+      if (r.bat === false) ra.bat = false
+      Object.assign(ra.em, r.em ?? {})
+      for (const k of ['ss', 'bt', 'ae', 'giu'] as const) ra.dem[k] += Number(r.dem?.[k]) || 0
+      ra.loi.push(...(r.loi ?? []))
+      xong += phan.length
+      tuyChon.tienDo?.(xong, ds.length)
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(3, lo.length) }, chay))
+  return ra
+}
+
 /** THẦY BẤM BẮT ĐẦU THI. Từ giây đó máy em mới xin đề và đồng hồ mới chạy.
  * Bấm lần hai giữ mốc lần đầu — không kéo dài giờ của em đã vào. */
 export async function batDauThi(
