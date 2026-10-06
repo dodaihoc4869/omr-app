@@ -536,7 +536,15 @@ export default function ModalKhacPhucCauSai({
               {dsCauSai.length > 0 && <>
               {/* THẺ 1: LÀM LẠI CÁC CÂU SAI */}
               <div
+                role="button"
+                tabIndex={0}
+                aria-pressed={cheDo === 1}
                 onClick={() => setCheDo(1)}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter' && e.key !== ' ') return
+                  e.preventDefault()
+                  setCheDo(1)
+                }}
                 className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-4 ${
                   cheDo === 1
                     ? 'border-blue-500 bg-blue-50/50 shadow-sm'
@@ -563,7 +571,15 @@ export default function ModalKhacPhucCauSai({
 
               {/* THẺ 2: LUYỆN THÊM DẠNG CÂU SAI */}
               <div
+                role="button"
+                tabIndex={coKhoDe ? 0 : -1}
+                aria-pressed={cheDo === 2}
                 onClick={() => coKhoDe && setCheDo(2)}
+                onKeyDown={(e) => {
+                  if (!coKhoDe || (e.key !== 'Enter' && e.key !== ' ')) return
+                  e.preventDefault()
+                  setCheDo(2)
+                }}
                 aria-disabled={!coKhoDe}
                 className={`p-4 rounded-2xl border-2 transition flex items-start gap-4 ${
                   !coKhoDe
@@ -664,7 +680,20 @@ export default function ModalKhacPhucCauSai({
                         return (
                           <div
                             key={ca.maCa}
+                            role="button"
+                            tabIndex={0}
+                            aria-pressed={daTick}
                             onClick={() => {
+                              setCaChonCheDo2((prev) => {
+                                const moi = new Set(prev)
+                                if (moi.has(ca.maCa)) moi.delete(ca.maCa)
+                                else moi.add(ca.maCa)
+                                return moi
+                              })
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key !== 'Enter' && e.key !== ' ') return
+                              e.preventDefault()
                               setCaChonCheDo2((prev) => {
                                 const moi = new Set(prev)
                                 if (moi.has(ca.maCa)) moi.delete(ca.maCa)
@@ -679,12 +708,9 @@ export default function ModalKhacPhucCauSai({
                             }`}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <input
-                                type="checkbox"
-                                checked={daTick}
-                                onChange={() => {}}
-                                className="w-4 h-4 rounded text-blue-600 accent-blue-600 cursor-pointer pointer-events-none"
-                              />
+                              <span className="w-4 h-4 rounded-full border-2 border-blue-500 flex items-center justify-center text-blue-600" aria-hidden="true">
+                                {daTick ? <CheckCircle2 className="w-4 h-4" /> : null}
+                              </span>
                               <span className="text-xs font-semibold truncate">
                                 {ca.tenCa}
                               </span>
@@ -723,6 +749,7 @@ export default function ModalKhacPhucCauSai({
                 ) : tongToiDaCheDo2 > 0 ? (
                   <div className="space-y-2">
                     <input
+                      aria-label="Số câu rút luyện tập"
                       type="range"
                       min={1}
                       max={tongToiDaCheDo2}
@@ -919,6 +946,7 @@ export default function ModalKhacPhucCauSai({
                         {tongToiDaCheDo4 > 0 ? (
                           <div className="space-y-2">
                             <input
+                              aria-label="Số câu rút theo bài học"
                               type="range"
                               min={1}
                               max={tongToiDaCheDo4}

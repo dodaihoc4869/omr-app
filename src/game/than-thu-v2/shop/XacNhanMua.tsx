@@ -52,7 +52,7 @@ export default function XacNhanMua({ viec, dangGui, loi, onXacNhan, onDeSau }: X
   }
   const laMua = viec.loai === 'mua'
   return (
-    <div className="ps-phu" onClick={(e) => e.target === e.currentTarget && !dangGui && onDeSau()}>
+    <div role="presentation" className="ps-phu" onClick={(e) => e.target === e.currentTarget && !dangGui && onDeSau()}>
       <div ref={goc} className="ps-to ps-kinh" role="dialog" aria-modal="true" aria-labelledby={idChu} data-viec={viec.loai} onKeyDown={phim}>
         {viec.loai === 'mua' ? (
           <div className={`ps-to-dau ps-bac-${viec.mon.bac}`}>

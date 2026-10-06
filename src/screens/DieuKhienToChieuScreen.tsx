@@ -168,7 +168,7 @@ export default function DieuKhienToChieuScreen() {
       bao(`Chuyển sang đợt ${thamSo.dot + 1}`)
     } else if (loai === 'CHAM' && thamSo?.khoa) {
       setDaCham((cu) => ({ ...cu, [thamSo.khoa]: Boolean(thamSo.dat) }))
-      bao(thamSo.dat ? 'Đã chấm ĐẠT (+1 sao) 🎉' : 'Đã chấm Chưa đạt')
+      bao(thamSo.dat ? 'Đã chấm Đạt · +1 sao' : 'Đã chấm Chưa đạt')
     } else if (loai === 'BUOC_TIEP') {
       bao('Hiện bước tiếp / Cuộn')
     }
@@ -213,6 +213,7 @@ export default function DieuKhienToChieuScreen() {
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1">Mã PIN hoặc Mã phiên</label>
               <input
+                aria-label="Mã PIN hoặc mã phiên"
                 type="text"
                 value={maNhap}
                 onChange={(e) => setMaNhap(e.target.value)}
@@ -309,7 +310,7 @@ export default function DieuKhienToChieuScreen() {
             <div className="flex items-center gap-1.5">
               {oHienTai?.sao ? (
                 <span className="inline-flex items-center text-xs font-bold text-amber-500">
-                  <Flame size={14} fill="currentColor" /> {oHienTai.sao}⭐
+                  <Flame size={14} fill="currentColor" /> {oHienTai.sao} sao
                 </span>
               ) : null}
               {daGhiO !== undefined && (

@@ -203,7 +203,6 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
                 fontFamily: 'var(--sans)',
                 fontSize: 'var(--cx-2)',
                 color: 'var(--muc)',
-                outline: 'none',
                 width: '100%',
               }}
             />

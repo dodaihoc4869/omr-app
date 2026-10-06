@@ -126,7 +126,7 @@ export default function BangTinPhuHuynh({
     )
   ) : (
     <>
-      <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN')}</span></div>
+      <div className="flex flex-wrap justify-between gap-2 text-xs news-muted"><span>Ngày {report.day.split('-').reverse().join('/')}</span><span>Cập nhật {new Date(report.updatedAt).toLocaleTimeString('vi-VN', { hour12: false })}</span></div>
 
     {/* ĐIỂM CA GẦN NHẤT — NHẤP NHÁY TO MÀU ĐẸP CHUẨN GOOGLE ĐẦU BẢNG TIN */}
     {latestCa && (

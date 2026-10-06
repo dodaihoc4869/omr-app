@@ -52,7 +52,7 @@
   color: var(--m3-on-surface-variant);
 }
 .m3 .thi-tien-do { position: absolute; right: 0; bottom: 0; left: 0; height: 4px; background: var(--m3-primary-container); }
-.m3 .thi-tien-do-day { height: 4px; border-radius: 0 999px 999px 0; background: var(--m3-primary); transition: width 140ms cubic-bezier(0.2, 0, 0, 1); }
+.m3 .thi-tien-do-day { height: 4px; border-radius: 0 999px 999px 0; background: var(--m3-primary); }
 @media (prefers-reduced-motion: reduce) { .m3 .thi-tien-do-day { transition: none; } }
 
 /* ── DẢI CÂU CHƯA LÀM (DaiCauChuaLamM3.tsx): ô ≥ 48 px; số đầu = câu kế tiếp; từ 880 px lưới câu cột trái thay thế ── */

@@ -38,7 +38,7 @@ const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--
 function gio(iso: string): string {
   if (!iso) return ''
   const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, banks, showToast, moSan = false }: KhoiCauHoiEmProps) {

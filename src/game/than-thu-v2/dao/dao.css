@@ -34,11 +34,11 @@
 .dao button.dao-nut-vang{--nut-nen:linear-gradient(180deg,rgb(255,224,138) 0%,var(--dao-vang) 42%,var(--dao-vang-dam) 100%);--nut-chu:var(--dao-vang-chu);--nut-bong:0 10px 26px rgba(255,170,40,.42),inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(160,90,0,.35);
  position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:60px;padding:0 20px;border-radius:30px;font-size:19px;font-weight:800;letter-spacing:.04em;transition:transform .12s}
 .dao .dao-nut-vang>span{position:relative}
-.dao .dao-nut-vang::before{content:"";position:absolute;top:0;bottom:0;left:-40%;width:34%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:dao-loe 3.2s ease-in-out infinite}
+.dao .dao-nut-vang::before{content:"";position:absolute;top:0;bottom:0;left:0;width:34%;transform:translateX(-120%) skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:dao-loe 3.2s ease-in-out infinite}
 .dao button.dao-nut-vang:active{--nut-dich:translateY(2px) scale(.985)}
 .dao button.dao-nut-vang:disabled{opacity:.6;cursor:default}
 .dao .dao-nut-vang:focus-visible,.dao button:focus-visible,.dao input:focus-visible{outline:3px solid var(--dao-nhan);outline-offset:2px}
-@keyframes dao-loe{0%,55%{left:-40%}85%,100%{left:120%}}
+@keyframes dao-loe{0%,55%{transform:translateX(-120%) skewX(-20deg)}85%,100%{transform:translateX(360%) skewX(-20deg)}}
 
 /* ───── 1. CHỌN BẠN ĐỒNG HÀNH ───── */
 .dao-chon{--the-rong:min(64vw,250px,30vh);display:flex;flex-direction:column;gap:12px;min-height:min(100dvh,844px);padding:max(14px,4.4vh) 0 16px}
@@ -70,9 +70,9 @@
 .dao .dao-chon-ta{font-size:13px;line-height:1.4;color:var(--dao-the-chu-mo)}
 .dao .dao-chon-ta b{color:var(--dao-the-chu)}.dao .dao-chon-ta .dao-chon-no-chu{color:var(--dao-cuong-no)}
 .dao .dao-chon-cham{display:flex;justify-content:center;margin-top:-6px}
-.dao .dao-chon-cham button{display:flex;align-items:center;justify-content:center;height:28px;padding:0 4px}
-.dao .dao-chon-cham i{display:block;width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.3);transition:width .2s,background .2s}
-.dao .dao-chon-cham [aria-current] i{width:22px;background:var(--dao-vang)}
+.dao .dao-chon-cham button{display:flex;align-items:center;justify-content:center;min-width:44px;height:44px;padding:0 11px}
+.dao .dao-chon-cham i{display:block;width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.3);transition:background .2s,transform .2s}
+.dao .dao-chon-cham [aria-current] i{transform:scaleX(2.75);background:var(--dao-vang)}
 .dao .dao-chon-ten-o{display:flex;gap:10px;padding:0 16px}
 .dao .dao-chon-ten-o input{flex:1;min-width:0;height:56px;padding:0 16px;border:0;border-radius:18px;background:var(--dao-kinh);box-shadow:inset 0 0 0 1px var(--dao-kinh-vien);color:var(--dao-chu);font:inherit;font-size:16px}
 .dao .dao-chon-ten-o input::placeholder{color:var(--dao-chu-mo);opacity:1}
@@ -86,18 +86,18 @@
 .dao .dao-chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:17px;font-size:13px;font-weight:800;white-space:nowrap}
 .dao .dao-chip-lua{background:rgba(255,138,92,.22);box-shadow:inset 0 0 0 1px rgba(255,138,92,.55);color:rgb(255,194,166)}.dao .dao-chip-lua svg{color:rgb(255,138,92)}
 .dao .dao-chip-exp{background:rgba(255,209,102,.16);box-shadow:inset 0 0 0 1px rgba(255,209,102,.5);color:rgb(255,224,138)}
-.dao button.dao-nut-nho{--nut-nen:var(--dao-vang);--nut-chu:var(--dao-vang-chu);flex-shrink:0;min-height:40px;padding:0 16px;border-radius:20px;font-size:14px;font-weight:800}
+.dao button.dao-nut-nho{--nut-nen:var(--dao-vang);--nut-chu:var(--dao-vang-chu);flex-shrink:0;min-height:44px;padding:0 16px;border-radius:22px;font-size:14px;font-weight:800}
 .dao button.dao-nut-nho-mo{--nut-nen:var(--dao-kinh);--nut-chu:var(--dao-chu);--nut-bong:inset 0 0 0 1px var(--dao-kinh-vien)}
 .dao button.dao-nut-nho:disabled{opacity:.55;cursor:default}
 .dao .dao-thanh{height:6px;border-radius:999px;background:var(--dao-vach);overflow:hidden}
-.dao .dao-thanh i{display:block;height:100%;border-radius:999px;background:var(--mau,var(--dao-vang));transition:width .5s ease}
+.dao .dao-thanh i{display:block;height:100%;border-radius:999px;background:var(--mau,var(--dao-vang))}
 
 /* ───── 2. HÒN ĐẢO CỦA EM ───── */
 .dao .dao-nha{display:flex;flex-direction:column;gap:14px;padding:max(18px,4vh) 16px 0}
 .dao .dao-nha-dau{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .dao .dao-nha-dau .dao-nhan{letter-spacing:.24em}
 .dao .dao-nha-dau h2{display:flex;align-items:center;gap:6px;font-size:24px;font-weight:800;line-height:1.2;color:var(--dao-chu);overflow-wrap:anywhere}
-.dao button.dao-nha-but{--nut-chu:var(--dao-chu-nhat);display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;flex-shrink:0}
+.dao button.dao-nha-but{--nut-chu:var(--dao-chu-nhat);display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;flex-shrink:0}
 .dao .dao-nha-chip{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
 .dao .dao-nha-doi-ten{display:flex;gap:6px;margin-top:4px}
 .dao .dao-nha-doi-ten input{flex:1;min-width:0;width:100%;height:40px;padding:0 12px;border:0;border-radius:14px;background:var(--dao-kinh);box-shadow:inset 0 0 0 1px var(--dao-kinh-vien);color:var(--dao-chu);font:inherit;font-size:16px}
@@ -193,7 +193,7 @@
 /* ───── 3. CHUYẾN THÁM HIỂM ───── */
 .dao .dao-tham{display:flex;flex-direction:column;gap:10px;padding:max(10px,2vh) 12px 0}
 .dao .dao-tham-dau{display:flex;align-items:flex-start;gap:4px}
-.dao button.dao-tham-ve{--nut-chu:var(--dao-chu-mo);--nut-nen:var(--dao-kinh);flex-shrink:0;display:flex;align-items:center;justify-content:center;width:36px;height:36px;margin-top:2px;border-radius:50%}
+.dao button.dao-tham-ve{--nut-chu:var(--dao-chu-mo);--nut-nen:var(--dao-kinh);flex-shrink:0;display:flex;align-items:center;justify-content:center;width:44px;height:44px;margin-top:2px;border-radius:50%}
 .dao .dao-dai{position:relative;flex:1;display:flex;justify-content:space-between;height:50px;margin:0;padding:0 10px;list-style:none}
 .dao .dao-dai::before,.dao .dao-dai::after{content:"";position:absolute;left:22px;right:22px;top:18px;height:4px;border-radius:999px;background:rgba(255,255,255,.16)}
 .dao .dao-dai::after{right:auto;width:calc((100% - 44px)*var(--dai-tile,0));background:linear-gradient(90deg,rgb(125,255,176),rgb(255,255,255))}
@@ -207,7 +207,7 @@
 .dao .dao-dai li small{position:absolute;top:38px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--dao-chu-nhat);white-space:nowrap}
 .dao .dao-dai li:first-child small{left:0;transform:none}.dao .dao-dai li:last-child small{left:auto;right:0;transform:none}
 .dao .dao-dai li[data-trang="dang"] small{color:rgb(255,255,255)}.dao .dao-dai li[data-vai="thu_thach"] small{color:var(--dao-vang)}
-.dao .dao-san{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:8;height:clamp(128px,20vh,268px);transition:height .18s ease,border-radius .18s ease;border-radius:28px;overflow:hidden;background:radial-gradient(100% 90% at 30% 40%,rgb(44,52,120) 0%,rgb(28,26,84) 50%,rgb(13,8,40) 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 14px 30px rgba(0,0,0,.45)}
+.dao .dao-san{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:8;height:clamp(128px,20vh,268px);transition:border-radius .18s ease;border-radius:28px;overflow:hidden;background:radial-gradient(100% 90% at 30% 40%,rgb(44,52,120) 0%,rgb(28,26,84) 50%,rgb(13,8,40) 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 14px 30px rgba(0,0,0,.45)}
 .dao .dao-san[data-no]{background:radial-gradient(100% 90% at 30% 40%,rgb(122,42,16) 0%,rgb(58,20,48) 50%,rgb(13,8,40) 100%)}
 /* ───── GHIM KHUNG TRẬN (thầy lệnh 21/09): khung trận DÍNH ngay dưới mép trên (chừa tai thỏ), nền đặc, nổi trên thẻ câu; phần câu hỏi cuộn bên dưới, không bao giờ chui lên che khung.
    THU GỌN (~104 px) khi màn thấp (≤ 700 px, useKhungGon) hoặc đã cuộn > 40 px: hai hình nhỏ + hai thanh máu + số máu, ẩn chữ phụ; đổi cỡ ≤ 200 ms, tôn trọng giảm chuyển động.
@@ -243,13 +243,13 @@
 .dao .dao-san-quai[data-ha] svg{opacity:.35;transform:scaleY(.6);transform-origin:50% 100%}
 .dao .dao-quai-bong{fill:rgba(0,0,0,.35)}.dao .dao-quai-than{fill:rgb(126,214,160);stroke:rgb(40,110,84);stroke-width:3}.dao .dao-quai-sang{fill:none;stroke:rgba(255,255,255,.7);stroke-width:4;stroke-linecap:round}.dao .dao-quai-mat{fill:rgb(20,40,50)}.dao .dao-quai-mieng{fill:none;stroke:rgb(20,40,50);stroke-width:3;stroke-linecap:round}
 .dao .dao-san-mau{width:120px;height:8px;border-radius:999px;background:rgba(0,0,0,.5);overflow:hidden}
-.dao .dao-san-mau i{display:block;height:100%;background:linear-gradient(90deg,rgb(125,255,176),rgb(127,233,255));transition:width .5s ease}
+.dao .dao-san-mau i{display:block;height:100%;background:linear-gradient(90deg,rgb(125,255,176),rgb(127,233,255))}
 .dao .dao-san-mau-quai{width:100px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}.dao .dao-san-mau-quai i{background:linear-gradient(90deg,rgb(255,61,61),rgb(255,184,77))}
 .dao .dao-san-so{position:absolute;z-index:3;font-size:34px;font-weight:800;line-height:1;color:rgb(255,224,138);text-shadow:0 2px 0 rgb(122,60,0),0 0 16px rgba(255,170,40,.9);animation:dao-noi 1.6s ease-out both;pointer-events:none}
 .dao .dao-san-so[data-phia="quai"]{right:34px;top:54%}.dao .dao-san-so[data-phia="thu"]{left:22%;top:30%;color:rgb(255,180,171);text-shadow:0 2px 0 rgb(90,20,20)}
 .dao .dao-san-hoi{position:absolute;left:12%;top:26%;z-index:3;font-size:20px;font-weight:800;color:rgb(125,255,176);animation:dao-noi 1.6s ease-out both;pointer-events:none}
 .dao .dao-san-ta{position:absolute;left:14px;bottom:10px;z-index:2;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700}
-.dao button.dao-san-tieng{--nut-nen:rgba(8,14,40,.55);--nut-chu:var(--dao-chu-mo);position:absolute;right:10px;bottom:8px;z-index:2;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%}
+.dao button.dao-san-tieng{--nut-nen:rgba(8,14,40,.55);--nut-chu:var(--dao-chu-mo);position:absolute;right:6px;bottom:6px;z-index:2;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%}
 @keyframes dao-xoay{to{transform:rotate(360deg)}}
 @keyframes dao-bung{0%{transform:translateY(-50%) rotate(-3deg) scale(.6);opacity:0}100%{transform:translateY(-50%) rotate(-3deg) scale(1);opacity:1}}
 @keyframes dao-danh{0%{transform:none}25%{transform:translate(-6%,2%) scale(1.06,.92)}50%{transform:translate(16%,-8%) rotate(6deg)}100%{transform:none}}

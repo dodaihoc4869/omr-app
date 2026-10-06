@@ -166,11 +166,11 @@ export default function ThanhThangGo({ qid, kiem, lanTai, layDang }: { qid: stri
       {moGui && tg.coTheGui && (
         <form className="lg-gui" onSubmit={(e) => { e.preventDefault(); void gui() }}>
           <label htmlFor={`${id}-b`}>Bước em chưa hiểu</label>
-          <select id={`${id}-b`} className="lg-o" value={buoc} onChange={(e) => setBuoc(Number(e.target.value))}>
+          <select id={`${id}-b`} aria-labelledby={`${id}-t`} className="lg-o" value={buoc} onChange={(e) => setBuoc(Number(e.target.value))}>
             {kiem.buoc.map((t, i) => <option key={i} value={i}>Bước {i + 1}: {ngan(t)}</option>)}
           </select>
           <label htmlFor={`${id}-v`}>Em hiểu đến đâu, vướng ở chỗ nào? (ít nhất {CHU_TOI_THIEU} chữ)</label>
-          <textarea id={`${id}-v`} className="lg-o" rows={3} value={viet} maxLength={1000} onChange={(e) => setViet(e.target.value)} />
+          <textarea id={`${id}-v`} aria-label="Chỗ em chưa hiểu" className="lg-o" rows={3} value={viet} maxLength={1000} onChange={(e) => setViet(e.target.value)} />
           <span className="lg-dem-chu" aria-live="polite">{soChu}/{CHU_TOI_THIEU} chữ</span>
           <button type="submit" className="lg-nut lg-nut--chinh" disabled={!duChu || dangGui}>{dangGui ? 'Đang gửi…' : 'Gửi thầy bước này'}</button>
         </form>

@@ -157,12 +157,12 @@ describe('C3 · tab BTVN ở cổng học sinh (/hs)', () => {
     expect(goi).toHaveBeenCalledTimes(2)
   })
 
-  it('đang mở phiếu của một bài: CHỈ nút bài ấy tắt và ghi "Đang mở..."', () => {
+  it('đang mở phiếu của một bài: CHỈ nút bài ấy tắt và ghi "Đang mở…"', () => {
     const ds = [BT({ maBtvn: 'X', maCa: 'X', tenBtvn: 'Bài X' }), BT({ maBtvn: 'Y', maCa: 'Y', tenBtvn: 'Bài Y' })]
     render(<BtvnM3 dangTai={false} ds={ds} now={NOW} dangMoId="X" ngayGio={() => ''} onMo={() => {}} onTaiLai={() => {}} />)
     const nut = (ten: string) => within(screen.getByLabelText(ten)).getByRole('button') as HTMLButtonElement
     expect(nut('Bài X').disabled).toBe(true)
-    expect(nut('Bài X').textContent).toContain('Đang mở...')
+    expect(nut('Bài X').textContent).toContain('Đang mở…')
     expect(nut('Bài Y').disabled).toBe(false)
   })
 })

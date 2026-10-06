@@ -424,7 +424,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                 <p className="ct-ghi">
                   SBD <span className="mono">{p.sbdEm}</span>
                   {p.lopCa ? ` · ${p.lopCa}` : ''}
-                  {em?.nopLuc ? ` · nộp lúc ${new Date(em.nopLuc).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' })}` : ''}
+                  {em?.nopLuc ? ` · nộp lúc ${new Date(em.nopLuc).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })}` : ''}
                 </p>
                 )}
                 <div className="ct-hang-nut" style={{ marginTop: 10 }}>

@@ -626,7 +626,7 @@ function LamBaiNgangDu(p: LamBaiNgangProps) {
       </aside>
 
       {moPhim && (
-        <div className="lb-phu" onClick={() => setMoPhim(false)}>
+        <div role="presentation" className="lb-phu" onClick={() => setMoPhim(false)}>
           <div className="lb-hop" role="dialog" aria-modal="true" aria-label="Phím tắt khi làm bài" onClick={(e) => e.stopPropagation()}>
             <div className="lb-hop-dau">
               <h2>Phím tắt khi làm bài</h2>

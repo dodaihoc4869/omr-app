@@ -1847,12 +1847,12 @@ table.ct-bang {
 .ct input[type='checkbox'].ct-sw:checked::before {
   width: 24px;
   height: 24px;
-  left: 22px;
+  transform: translate(16px, -50%);
   background: var(--gvm-tren-dac);
 }
 @media (prefers-reduced-motion: no-preference) {
   .ct input[type='checkbox'].ct-sw::before {
-    transition: left 160ms ease, width 160ms ease, height 160ms ease;
+    transition: transform 160ms ease;
   }
 }
 .ct input[type='checkbox'].ct-sw:disabled {

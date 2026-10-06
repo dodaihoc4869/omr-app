@@ -136,9 +136,14 @@
 .ps *::after {
   box-sizing: border-box;
 }
-/* đích tiêu điểm lập trình của cả màn (tabindex -1): không phải điều khiển nên không vẽ viền */
+/* Đích tiêu điểm lập trình của cả màn (tabindex -1), không phải điều khiển. */
+/* soi-bo-qua: G03 màn chỉ nhận focus để trình đọc màn hình thông báo tiêu đề */
 .ps:focus {
   outline-style: none;
+}
+.ps:focus-visible {
+  outline: 3px solid var(--ps-vang);
+  outline-offset: -3px;
 }
 .ps::before {
   content: '';

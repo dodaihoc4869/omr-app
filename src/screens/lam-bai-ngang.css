@@ -61,7 +61,8 @@
 @container lb-de (max-width: 560px) { .lb-tab-dai { display: none; } }
 
 .lb-de-cuon-boc { position: relative; flex: 1; min-height: 0; }
-.lb-de { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 16px 40vh 20px; outline: none; }
+.lb-de { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 16px 40vh 20px; }
+.lb-de:focus-visible { outline: 3px solid var(--lb-xd); outline-offset: -3px; }
 .lb-de > * { max-width: 860px; margin-left: auto; margin-right: auto; }
 .lb-de > * + * { margin-top: var(--k5, 20px); }
 /* Đầu phần dính trong khung đề: ở đây không có thanh trên 56 px. */
@@ -72,7 +73,7 @@
 /* ---------------------------------------------------------------- THANH KÉO */
 .lb-keo { position: relative; display: grid; place-items: center; cursor: col-resize; touch-action: none; outline: none; }
 .lb-keo::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--lb-mat-2); }
-.lb-keo-num { position: relative; display: grid; align-content: center; justify-items: center; gap: 4px; width: 8px; height: 64px; border-radius: 4px; background: var(--lb-vien); transition: background-color 140ms, height 140ms; }
+.lb-keo-num { position: relative; display: grid; align-content: center; justify-items: center; gap: 4px; width: 8px; height: 64px; border-radius: 4px; background: var(--lb-vien); transition: background-color 140ms; }
 .lb-keo-num i { display: block; width: 3px; height: 3px; border-radius: 50%; background: var(--lb-mat); }
 .lb-keo:hover .lb-keo-num, .lb-keo:focus-visible .lb-keo-num, .lb-khung[data-dang-keo] .lb-keo-num { height: 96px; background: var(--lb-xd); }
 .lb-keo:focus-visible .lb-keo-num { box-shadow: 0 0 0 3px var(--lb-xd-nen); }
@@ -101,7 +102,7 @@
 .lb-tien-dong span { font-size: 13px; font-weight: 600; color: var(--lb-chu-2); }
 .lb-tien-dong b { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .lb-thanh { height: 8px; overflow: hidden; border-radius: 4px; background: var(--lb-mat-2); }
-.lb-thanh i { display: block; height: 100%; border-radius: 4px; background: var(--lb-xl); transition: width 200ms; }
+.lb-thanh i { display: block; height: 100%; border-radius: 4px; background: var(--lb-xl); }
 .lb-chip { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; font-weight: 600; color: var(--lb-chu-2); font-variant-numeric: tabular-nums; }
 .lb-chip span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .lb-chip-co { color: var(--lb-hp-chu); }
@@ -245,9 +246,10 @@
 
 .lb-gon-than { position: relative; flex: 1; min-height: 0; }
 .lb-gon-de {
-  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; outline: none;
+  position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain;
   padding: 8px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
 }
+.lb-gon-de:focus-visible { outline: 3px solid var(--lb-xd); outline-offset: -3px; }
 /* MỘT câu một lần: mọi khối khác (câu khác, đầu phần) ẩn — tên phần đã có trên thanh. */
 .lb-gon-de > :not([data-gon-hien]) { display: none !important; }
 .lb-gon-de > * { max-width: 1180px; margin-left: auto; margin-right: auto; }

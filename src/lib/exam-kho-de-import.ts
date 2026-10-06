@@ -286,7 +286,7 @@ export function parseKhoDeJsonText(raw: string): KhoDeParseResult {
   try {
     data = JSON.parse(raw)
   } catch {
-    return { ok: false, errors: ['Không đọc được JSON — kiểm tra lại cú pháp (dấu phẩy, ngoặc, dấu nháy kép...)'] }
+    return { ok: false, errors: ['Không đọc được JSON. Kiểm tra dấu phẩy, ngoặc và dấu nháy kép.'] }
   }
   return parseKhoDeJson(data)
 }

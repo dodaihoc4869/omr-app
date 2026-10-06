@@ -77,7 +77,6 @@ export default function LichSuCaEm({ sbd, scriptUrl = '', banDau = null, onVe }:
           </button>
           <h1 className="h2-cdl-tieu">Lịch sử ca kiểm tra</h1>
         </div>
-        <p className="h2-cdl-tom">Bấm một ca đã công bố để xem báo cáo chi tiết và lời giải từng câu.</p>
       </header>
 
       <main className="h2-cdl-ds h2-lsc-ds" aria-busy={dangTai && !ls}>

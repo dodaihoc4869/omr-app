@@ -90,6 +90,7 @@ export default function KhoaMayThayScreen({ onMoDuoc }: { onMoDuoc: () => void }
 
       <div className="flex flex-col w-full" style={{ gap: 'var(--k2, 8px)', maxWidth: 380 }}>
         <input
+          aria-label="Mã bí mật của thầy"
           type="password"
           value={ma}
           onChange={(e) => setMa(e.target.value)}
@@ -136,17 +137,6 @@ export default function KhoaMayThayScreen({ onMoDuoc }: { onMoDuoc: () => void }
         )}
       </div>
 
-      <div
-        style={{
-          fontFamily: 'var(--sans)',
-          fontSize: 'var(--cx-1)',
-          color: 'var(--nhat)',
-          textAlign: 'center',
-          maxWidth: 380,
-        }}
-      >
-        Em học sinh và phụ huynh mở app bằng đúng link Thầy gửi, không phải ở đây.
-      </div>
     </div>
   )
 }

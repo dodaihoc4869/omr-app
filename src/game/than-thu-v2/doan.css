@@ -43,12 +43,12 @@
 .dh-sao{fill:rgba(255,255,255,.16)}
 .dh-sao-sang{fill:rgb(255,209,102);filter:drop-shadow(0 0 8px rgba(255,209,102,.9))}
 .dh-mau{height:6px;border-radius:999px;background:rgba(0,0,0,.45);overflow:hidden}
-.dh-mau>i{display:block;height:100%;border-radius:999px;transition:width .5s ease}
+.dh-mau>i{display:block;height:100%;border-radius:999px}
 
 /* ───── 1. SẢNH ───── */
 .dh-dau{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .dh-dau h1{margin:2px 0 0;font-size:24px;font-weight:800;line-height:1.15}
-.dh .dh-nut-dong{flex-shrink:0;height:34px;min-width:34px;padding:0 10px;border-radius:18px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font-size:13px;font-weight:700}
+.dh .dh-nut-dong{flex-shrink:0;height:44px;min-width:44px;padding:0 12px;border-radius:22px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font-size:13px;font-weight:700}
 .dh-ban-do{position:relative;height:250px;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,rgb(27,42,102) 0%,rgb(22,34,79) 55%,rgb(15,42,58) 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 14px 30px rgba(0,0,0,.35)}
 .dh-ban-do>svg{position:absolute;inset:0;width:100%;height:100%}
 .dh-ban-do .dh-trang{position:absolute;right:-30px;top:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,224,138,.4) 0%,rgba(255,224,138,0) 68%)}
@@ -206,7 +206,7 @@
 .dh-y em{font-style:normal;font-size:12px;font-weight:800;white-space:nowrap}
 .dh-y em.dh-xong{color:rgb(29,107,58)}.dh-y em.dh-nghi{color:rgb(138,106,0)}
 .dh-ds{display:flex;gap:6px;flex-shrink:0}
-.dh .dh-ds button{min-width:52px;height:38px;padding:0 12px;border-radius:19px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1.5px rgb(185,176,154);font-size:13px;font-weight:800;color:rgb(58,63,71)}
+.dh .dh-ds button{min-width:52px;height:44px;padding:0 12px;border-radius:22px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1.5px rgb(185,176,154);font-size:13px;font-weight:800;color:rgb(58,63,71)}
 .dh .dh-ds button[aria-pressed=true]{background:rgb(20,83,45);color:rgb(255,255,255);box-shadow:none}
 .dh .dh-ds button.dh-chot-y{background:rgb(26,86,219);color:rgb(255,255,255);box-shadow:none}
 .dh .dh-ds button.dh-chot-y:disabled{background:rgb(217,208,186);color:rgb(107,102,88)} /* giữ chỗ khi chưa chọn (không nở hàng khi chọn) */
@@ -226,7 +226,7 @@
 .dh .dh-don button[aria-pressed=true]{background:linear-gradient(180deg,rgb(255,233,160),rgb(255,181,46));color:rgb(58,34,0);box-shadow:0 8px 18px rgba(255,180,40,.4),inset 0 2px 0 rgba(255,255,255,.6)}
 .dh .dh-don button[aria-pressed=true] small{color:rgb(90,58,0)}
 .dh .dh-don button:disabled{opacity:.4}
-.dh .dh-xin{flex-shrink:0;align-self:center;min-height:36px;padding:0 16px;border-radius:18px;background:rgba(255,181,154,.14);box-shadow:inset 0 0 0 1px rgba(255,181,154,.55);font-size:12.5px;font-weight:700;color:rgb(255,208,189)}
+.dh .dh-xin{flex-shrink:0;align-self:center;min-height:44px;padding:0 16px;border-radius:22px;background:rgba(255,181,154,.14);box-shadow:inset 0 0 0 1px rgba(255,181,154,.55);font-size:12.5px;font-weight:700;color:rgb(255,208,189)}
 .dh .dh-xin[aria-pressed=true]{background:rgba(255,181,154,.3);color:rgb(255,255,255)}
 .dh-cho{flex-shrink:0;text-align:center;font-size:13px;color:rgb(223,232,255);padding:4px 0}
 .dh-tin-hieu{display:flex;gap:8px;flex-shrink:0}
@@ -288,7 +288,7 @@
 .dh .dh-the-goi-y button:disabled{opacity:.4}
 .dh-tam-chan{display:flex;align-items:center;gap:12px;font-size:12px;line-height:1.45;color:rgb(201,214,242)}
 .dh-tam-chan b{color:var(--dh-lam)}
-.dh .dh-tam-chan button{flex-shrink:0;width:auto;min-height:42px}
+.dh .dh-tam-chan button{flex-shrink:0;width:auto;min-height:44px}
 .dh-the-nhan{padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgba(127,233,255,.2),rgba(127,233,255,.08));box-shadow:inset 0 0 0 1.5px rgba(127,233,255,.55);font-size:13.5px;line-height:1.45;flex-shrink:0}
 .dh-the-nhan small{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--dh-lam);margin-bottom:2px}
 
@@ -347,7 +347,7 @@
 .dh-chuong.dh-tinh .dh-chuong-chop,.dh-chuong.dh-tinh .dh-chuong-tia-nen{display:none}
 @media (prefers-reduced-motion:reduce){.dh-chuong .dh-chuong-chop,.dh-chuong .dh-chuong-tia-nen{display:none}}
 @media (max-width:380px){.dh .dh-pa button{font-size:13px;gap:7px;padding:6px 8px 6px 7px}.dh .dh-pa button>i{width:25px;height:25px;font-size:12px}.dh-de{font-size:15px}}
-@media (max-height:780px){.dh-canh{height:clamp(124px,22vh,176px)}.dh .dh-don button{min-height:54px}.dh .dh-pa button{min-height:42px}}
+@media (max-height:780px){.dh-canh{height:clamp(124px,22vh,176px)}.dh .dh-don button{min-height:54px}.dh .dh-pa button{min-height:44px}}
 /* GHIM KHUNG TRẬN (thầy lệnh 21/09): trong trận Đoàn khung trận (hiệp + cảnh + đồng đội) ĐÃ đứng yên theo thiết kế — chỉ thẻ câu cuộn BÊN TRONG. Màn thấp (≤ 700 px cao) thu gọn cảnh còn ~108 px để thẻ câu còn chỗ. */
 @media (max-height:700px){.dh-tran .dh-canh{height:clamp(96px,16vh,108px)}.dh-tran .dh-hiep{gap:5px}}
 

@@ -56,7 +56,7 @@ export function giayConLai(hetGioLucIso: string): number {
 export function gioNgan(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
-  const gio = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  const gio = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
   const homNay = new Date(gioMayChu())
   const cungNgay = d.getFullYear() === homNay.getFullYear() && d.getMonth() === homNay.getMonth() && d.getDate() === homNay.getDate()
   return cungNgay ? gio : `${gio} ngày ${d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}`

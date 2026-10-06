@@ -243,7 +243,7 @@ export function parseExamText(raw: string, imageMap: Record<string, string> = {}
   const { maDe, p1Start, p2Start, p3Start } = findSectionBounds(lines)
   const errors: string[] = []
 
-  if (!maDe) errors.push('Không tìm thấy dòng "Mã đề: ..." ở đầu văn bản')
+  if (!maDe) errors.push('Không tìm thấy dòng "Mã đề: …" ở đầu văn bản')
   if (p1Start < 0) errors.push('Không tìm thấy tiêu đề "Phần I"')
   if (p2Start < 0) errors.push('Không tìm thấy tiêu đề "Phần II"')
   if (p3Start < 0) errors.push('Không tìm thấy tiêu đề "Phần III"')
@@ -274,7 +274,7 @@ export function parseExamText(raw: string, imageMap: Record<string, string> = {}
     if (!q.choices.every((c) => c)) warnings.push(`Phần I câu ${i + 1}: thiếu 1 hoặc nhiều lựa chọn A/B/C/D`)
   })
   source.phanIII.forEach((q, i) => {
-    if (!q.correct) warnings.push(`Phần III câu ${i + 1}: chưa có dòng đáp án "=> ..."`)
+    if (!q.correct) warnings.push(`Phần III câu ${i + 1}: chưa có dòng đáp án "=> …"`)
   })
 
   return { source, errors: [], warnings }

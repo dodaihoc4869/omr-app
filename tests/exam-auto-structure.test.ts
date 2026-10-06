@@ -126,6 +126,6 @@ describe('autoStructureRawExam', () => {
   it('tìm thấy tiêu đề Phần nhưng không nhận diện được câu nào bên trong -> báo rõ để thầy tự xuống dòng thủ công', () => {
     const raw = 'MÃ ĐỀ: 1\nPHẦN I\nnội dung không có số thứ tự câu nào cả, không tách được câu\nPHẦN II\n1. y\nPHẦN III\n1. z'
     const { notes } = autoStructureRawExam(raw, 'de.pdf')
-    expect(notes.join(' ')).toMatch(/Phần I: tìm thấy tiêu đề nhưng KHÔNG nhận diện được câu nào/)
+    expect(notes.join(' ')).toMatch(/Phần I: tìm thấy tiêu đề nhưng chưa nhận diện được câu nào/)
   })
 })

@@ -21,7 +21,7 @@ export default function DoanTiepSuc({ goiY, ban, loi, onChon, onDong, cheDo2 = f
     return () => window.removeEventListener('keydown', phim)
   }, [cheDo2])
   return (
-    <div className={cheDo2 ? 'dh-tam-nen dh2-tam-nen' : 'dh-tam-nen'} data-che-do={cheDo2 ? '2' : undefined} onClick={onDong}>
+    <div role="presentation" className={cheDo2 ? 'dh-tam-nen dh2-tam-nen' : 'dh-tam-nen'} data-che-do={cheDo2 ? '2' : undefined} onClick={onDong}>
       <section className={cheDo2 ? 'dh-tam dh2-tam' : 'dh-tam'} role="dialog" aria-label={`Tiếp sức cho ${goiY.ten}`} onClick={e => e.stopPropagation()}>
         <div className="dh-tam-dau">
           <ThuHinh pet={goiY.pet} cap={goiY.cap} size={46} />

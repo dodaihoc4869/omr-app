@@ -1098,7 +1098,20 @@ export default function KhoiKhacPhuc3CheDo({
                 return (
                   <div
                     key={item.maCa}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isSelected}
                     onClick={() => {
+                      setCacCaChon((prev) => {
+                        const s = new Set(prev)
+                        if (s.has(item.maCa)) s.delete(item.maCa)
+                        else s.add(item.maCa)
+                        return s
+                      })
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Enter' && e.key !== ' ') return
+                      e.preventDefault()
                       setCacCaChon((prev) => {
                         const s = new Set(prev)
                         if (s.has(item.maCa)) s.delete(item.maCa)
@@ -1219,7 +1232,20 @@ export default function KhoiKhacPhuc3CheDo({
                       return (
                         <div
                           key={ca.maCa}
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={daTick}
                           onClick={() => {
+                            setCaChonCheDo2((prev) => {
+                              const moi = new Set(prev)
+                              if (moi.has(ca.maCa)) moi.delete(ca.maCa)
+                              else moi.add(ca.maCa)
+                              return moi
+                            })
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key !== 'Enter' && e.key !== ' ') return
+                            e.preventDefault()
                             setCaChonCheDo2((prev) => {
                               const moi = new Set(prev)
                               if (moi.has(ca.maCa)) moi.delete(ca.maCa)
@@ -1234,12 +1260,7 @@ export default function KhoiKhacPhuc3CheDo({
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <input
-                              type="checkbox"
-                              checked={daTick}
-                              onChange={() => {}}
-                              className="w-4 h-4 rounded text-blue-500 accent-blue-500 cursor-pointer pointer-events-none"
-                            />
+                            <span className="text-blue-500" aria-hidden="true">{daTick ? <CheckSquare size={16} /> : <Square size={16} />}</span>
                             <span className="text-xs font-semibold truncate">
                               {ca.tenCa}
                             </span>
@@ -1279,6 +1300,7 @@ export default function KhoiKhacPhuc3CheDo({
                   </strong>
                 </div>
                 <input
+                  aria-label="Số câu rút luyện tập"
                   type="range"
                   min={1}
                   max={tongToiDaCheDo2}
@@ -1343,7 +1365,7 @@ export default function KhoiKhacPhuc3CheDo({
             )}
             <span>
               {dangTaiKho2
-                ? 'Đang tải kho...'
+                ? 'Đang tải kho…'
                 : tongToiDaCheDo2 > 0
                 ? vaiTro === 'ph'
                   ? `Giao bài dạng câu sai cho con (${soCauCheDo2} câu)`
@@ -1360,7 +1382,7 @@ export default function KhoiKhacPhuc3CheDo({
           {dangTaiDm ? (
             <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
               <RefreshCw size={16} className="animate-spin text-blue-500" />
-              Đang tải danh mục dạng bài...
+              Đang tải danh mục dạng bài…
             </div>
           ) : (
             <>
@@ -1394,6 +1416,7 @@ export default function KhoiKhacPhuc3CheDo({
                     2. Chọn Bài học SGK:
                   </label>
                   <select
+                    aria-label="Bài học sách giáo khoa"
                     value={baiChon}
                     onChange={(e) => handleChonBai(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1440,7 +1463,20 @@ export default function KhoiKhacPhuc3CheDo({
                       return (
                         <div
                           key={d.ma}
+                          role="button"
+                          tabIndex={0}
+                          aria-pressed={isSelected}
                           onClick={() => {
+                            setCacDangChon((prev) => {
+                              const s = new Set(prev)
+                              if (s.has(d.ma)) s.delete(d.ma)
+                              else s.add(d.ma)
+                              return s
+                            })
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key !== 'Enter' && e.key !== ' ') return
+                            e.preventDefault()
                             setCacDangChon((prev) => {
                               const s = new Set(prev)
                               if (s.has(d.ma)) s.delete(d.ma)
@@ -1480,6 +1516,7 @@ export default function KhoiKhacPhuc3CheDo({
                     </strong>
                   </div>
                   <input
+                    aria-label="Số câu muốn luyện theo dạng"
                     type="range"
                     min={Math.min(5, tongToiDaCheDo3)}
                     max={tongToiDaCheDo3}
@@ -1516,7 +1553,7 @@ export default function KhoiKhacPhuc3CheDo({
           {dangTaiKho2 ? (
             <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
               <RefreshCw size={16} className="animate-spin text-blue-500" />
-              Đang tải dữ liệu kho câu...
+              Đang tải dữ liệu kho câu…
             </div>
           ) : loiKho2 && tongToiDaCheDo4 === 0 ? (
             <div className="p-3.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-xs flex items-center gap-2">
@@ -1581,6 +1618,7 @@ export default function KhoiKhacPhuc3CheDo({
                     </strong>
                   </div>
                   <input
+                    aria-label="Số câu muốn luyện theo bài học"
                     type="range"
                     min={Math.min(1, tongToiDaCheDo4)}
                     max={tongToiDaCheDo4}
@@ -1654,13 +1692,8 @@ export default function KhoiKhacPhuc3CheDo({
                   return (
                     <div
                       key={m.id}
-                      onClick={() => {
-                        if (daNop && onXemKetQuaMom) {
-                          onXemKetQuaMom(m)
-                        }
-                      }}
                       className={`p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 transition flex items-center justify-between gap-3 ${
-                        daNop ? 'hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer' : ''
+                        daNop ? 'hover:border-blue-300 dark:hover:border-blue-700' : ''
                       }`}
                     >
                       <div className="min-w-0 flex-1">
@@ -1675,6 +1708,7 @@ export default function KhoiKhacPhuc3CheDo({
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
+                            hour12: false,
                           })}
                         </span>
                       </div>
@@ -1731,7 +1765,14 @@ export default function KhoiKhacPhuc3CheDo({
                   return (
                     <div
                       key={h.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => setCurrentTest(h)}
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter' && e.key !== ' ') return
+                        e.preventDefault()
+                        setCurrentTest(h)
+                      }}
                       className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-blue-300 dark:hover:border-blue-700 transition flex items-center justify-between gap-3 cursor-pointer"
                     >
                       <div className="min-w-0 flex-1">
@@ -1745,6 +1786,7 @@ export default function KhoiKhacPhuc3CheDo({
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
+                            hour12: false,
                           })}
                         </span>
                       </div>

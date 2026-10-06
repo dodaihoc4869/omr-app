@@ -44,12 +44,9 @@ describe('Tab Học sinh', () => {
     expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 
-  // Dòng chỉ đường đổi khi thầy chốt hai nút mỗi em (05/09): không còn "chạm
-  // một em" chung chung, mà nói thẳng hai nút đó mở ra cái gì.
-  it('có dòng chỉ đường nói rõ hai nút của mỗi em mở ra cái gì', () => {
-    expect(maHocSinh).toContain('Mỗi em có các nút')
-    expect(maHocSinh).toContain('chuyên đề mạnh–yếu')
-    expect(maHocSinh).toContain('điểm và hạng lớp')
+  it('không còn hộp hướng dẫn quản lý dài', () => {
+    expect(maHocSinh).not.toContain('Hướng dẫn quản lý học sinh theo lớp')
+    expect(maHocSinh).not.toContain('Mỗi em có các nút')
   })
 
   // Thầy cho gỡ mục giao bài tập. Code GIỮ NGUYÊN để gắn lại được, nhưng màn

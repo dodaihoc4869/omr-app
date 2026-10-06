@@ -436,7 +436,7 @@ export default function LamBaiNgangGon(p: LamBaiNgangProps) {
       </div>
 
       {moBang && (
-        <div className="lb-gon-phu" onClick={() => setMoBang(false)}>
+        <div role="presentation" className="lb-gon-phu" onClick={() => setMoBang(false)}>
           <div className="lb-gon-bang" role="dialog" aria-modal="true" aria-label="Chọn câu" onClick={(e) => e.stopPropagation()}>
             {phanCo.map((ph) => (
               <div key={ph} className="lb-gon-bang-phan">

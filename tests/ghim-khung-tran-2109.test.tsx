@@ -130,11 +130,11 @@ describe('CSS — ghim khung trận Đảo (dao.css)', () => {
   const css = doc('src/game/than-thu-v2/dao/dao.css')
   const dong = (goc: string) => css.split('\n').find((l) => l.startsWith(goc))!
 
-  it('.dao-san: sticky ngay dưới mép trên (chừa tai thỏ), z-index nổi trên thẻ câu, nền đặc, chuyển cỡ ≤ 200 ms', () => {
+  it('.dao-san: sticky ngay dưới mép trên (chừa tai thỏ), z-index nổi trên thẻ câu, nền đặc, không chuyển động thuộc tính bố cục', () => {
     const l = dong('.dao .dao-san{position:sticky')
     expect(l).toContain('top:max(8px,env(safe-area-inset-top,0px))')
     expect(l).toMatch(/z-index:8/)
-    expect(l).toMatch(/transition:height \.18s/)
+    expect(l).not.toMatch(/transition:[^}]*height/)
     expect(l).toMatch(/background:radial-gradient/) // nền đặc (gradient không trong suốt)
     expect(l).not.toMatch(/rgba\([^)]*,0?\.\d+\)\s*0%/) // không nền trong suốt ở gốc gradient
     const s = (l.match(/z-index:(\d+)/) ?? [])[1]

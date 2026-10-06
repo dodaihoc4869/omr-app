@@ -155,7 +155,7 @@ body.mc .mc-thanh .mc-buoc button{width:calc(var(--u)*2.5);height:calc(var(--u)*
 body.mc .mc-thanh .mc-pha,body.mc .mc-thanh .mc-thanh-phu,body.mc .mc-thanh #mc-cai-btn,body.mc .mc-thanh #mc-len-bang{font-size:max(13px,calc(var(--u)*1.15));font-weight:700}
 body.mc .mc-thanh #mc-len-bang{min-height:calc(var(--u)*2.5)}
 .mc-phim-nhom{display:flex;align-items:center;gap:calc(var(--u)*.5);flex:none}
-.mc-nut-phim{display:inline-flex;align-items:center;gap:.4em;height:calc(var(--u)*2.8);min-height:36px;padding:0 .75em;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--mc-bang-chu);font:700 max(13px,calc(var(--u)*1.15)) var(--mc-sans);white-space:nowrap;cursor:pointer;transition:all .15s ease}
+.mc-nut-phim{display:inline-flex;align-items:center;gap:.4em;height:calc(var(--u)*2.8);min-height:36px;padding:0 .75em;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--mc-bang-chu);font:700 max(13px,calc(var(--u)*1.15)) var(--mc-sans);white-space:nowrap;cursor:pointer;transition:background-color .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease}
 .mc-nut-phim:hover{background:rgba(255,255,255,.18)}
 .mc-nut-phim kbd{font:inherit;font-size:.82em;font-weight:800;background:var(--mc-bang-chu);color:var(--mc-thanh2);border-radius:.25em;padding:0 .35em;min-width:1.3em;text-align:center}
 .mc-nut-phim.mc-bat{background:var(--mc-bang-chu);color:var(--mc-thanh2)}

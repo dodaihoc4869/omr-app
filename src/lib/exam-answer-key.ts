@@ -92,7 +92,7 @@ function parsePhanII(section: string): { map: Record<number, string>; warnings: 
   )
 
   if (cauNumbers.length === 0) {
-    if (tokens.length > 0) warnings.push('Phần II: không đọc được số thứ tự câu từ dòng tiêu đề "Câu ..." dù có thấy đáp án a)/b)/c)/d) — thầy kiểm tra lại vùng đáp án.')
+    if (tokens.length > 0) warnings.push('Phần II: không đọc được số thứ tự câu từ dòng tiêu đề "Câu …" dù có thấy đáp án a)/b)/c)/d) — thầy kiểm tra lại vùng đáp án.')
     return { map, warnings }
   }
 
@@ -120,7 +120,7 @@ function parsePhanIII(section: string): { map: Record<number, string>; warnings:
     : []
 
   if (cauNumbers.length === 0) {
-    if (answerValues.length > 0) warnings.push('Phần III: không đọc được số thứ tự câu từ dòng tiêu đề "Câu ..." dù có thấy đáp án số — thầy kiểm tra lại vùng đáp án.')
+    if (answerValues.length > 0) warnings.push('Phần III: không đọc được số thứ tự câu từ dòng tiêu đề "Câu …" dù có thấy đáp án số — thầy kiểm tra lại vùng đáp án.')
     return { map, warnings }
   }
 

@@ -498,11 +498,6 @@
   border-radius: 5px;
   transform-origin: left center;
 }
-@media (prefers-reduced-motion: no-preference) {
-  .cd-ray > div {
-    transition: width 200ms var(--motion-standard, ease);
-  }
-}
 .cd-ray--xanh {
   background: var(--bts-la);
 }

@@ -450,3 +450,6 @@
 .tlu-lam-luoi .ldct-phan + .ldct-phan {
   margin-top: 8px;
 }
+@media (prefers-reduced-motion: reduce) {
+  .ldct-gioi-thieu[data-bo-cuc] { animation: none; }
+}
