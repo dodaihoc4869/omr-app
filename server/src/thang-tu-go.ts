@@ -10,6 +10,7 @@
 //   Thiếu điều kiện nào thì trả đúng câu chỉ việc còn thiếu ("Em đọc nốt bước 3", "Em thử câu tương tự này trước"…).
 // Mọi chấm ở MÁY CHỦ: đáp án câu kiểm / câu nền không xuống máy em trước khi em trả lời. Bước đánh số từ 0 (như `cau_kiem.buoc`,
 // `nut_that.buoc`, `loi_go.buoc`); chữ hiển thị cộng 1. Bảng `cau_nen` CHỈ THÊM, tự tạo lần đầu dùng; bản SQL: migration-0210-v2.sql.
+import { docKhoiEmCong } from './chan-khac-khoi'
 import { docNguongLuot } from './ca-nhan-hoa-v2'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
@@ -59,6 +60,13 @@ export const TEN_NEN: Readonly<Record<string, string>> = {
   nang_luong_lien_ket: 'Năng lượng liên kết', dien_phan_faraday: 'Điện phân (định luật Faraday)', the_dien_cuc_pin: 'Thế điện cực, pin điện',
   toc_do_phan_ung: 'Tốc độ phản ứng', dung_dich_pha_loang: 'Pha loãng dung dịch', tinh_chat_hoa_hoc: 'Tính chất hoá học', lam_tron_ket_qua: 'Làm tròn kết quả',
 }
+/** KHỐI TỐI THIỂU của từng nhãn nền (thầy 06/10: em khối 10 nhận câu "Đốt cháy chất hữu cơ X — tìm công thức phân tử" của khối 11). Chương trình 2018.
+ * Nhãn không có trong bảng = dùng được từ khối 10. Em chưa rõ khối ⇒ chỉ nhãn khối 10. */
+export const KHOI_TOI_THIEU_NEN: Readonly<Record<string, 10 | 11 | 12>> = {
+  cong_thuc_phan_tu: 11, do_bat_bao_hoa: 11, bao_toan_nguyen_to: 11, ph_nong_do_ion: 11, hang_so_can_bang: 11, bao_toan_dien_tich: 11,
+  dien_phan_faraday: 12, the_dien_cuc_pin: 12,
+}
+export const nenHopKhoi = (nhan: string, khoiEm: number | null | undefined): boolean => (KHOI_TOI_THIEU_NEN[nhan] ?? 10) <= (khoiEm ?? 10)
 export const tenNen = (nhan: string) => TEN_NEN[nhan] ?? 'Kiến thức nền của bước này'
 const NHAN_HOP_LE = /^[a-z][a-z0-9_]{1,39}$/
 
@@ -284,7 +292,8 @@ export async function tinhCong(env: Env, sbd: string, qid: string, tuy: { dang?:
 
   // Kiến thức nền đang vướng: bước hỏng câu kiểm nhiều nhất có nhãn nền (khác "khac") và ngân hàng có câu của nhãn đó.
   const nhanCua = (i: number) => bt.nhanNen.find((x) => x.buoc === i)?.nen
-  const ungVien = xepHong.map(([i]) => nhanCua(i)).filter((x): x is string => !!x && x !== 'khac' && NHAN_HOP_LE.test(x))
+  const khoiEmNen = await docKhoiEmCong(env, sbd).catch(() => null)
+  const ungVien = xepHong.map(([i]) => nhanCua(i)).filter((x): x is string => !!x && x !== 'khac' && NHAN_HOP_LE.test(x) && nenHopKhoi(x, khoiEmNen))
   let nhanNenVuong: string | undefined
   if (ungVien.length) {
     const co = await env.DB.prepare('SELECT DISTINCT nhan FROM cau_nen WHERE nhan IN (SELECT value FROM json_each(?))').bind(JSON.stringify(ungVien)).all<Obj>().catch(() => ({ results: [] as Obj[] }))
@@ -353,6 +362,7 @@ export async function hsLuyenNen(env: Env, b: Obj) {
   const sbd = await gameIdentity(env, b)
   const nhan = str(b.nhan)
   if (!NHAN_HOP_LE.test(nhan)) return { ok: false, error: 'Thiếu kiến thức nền cần luyện.' }
+  if (!nenHopKhoi(nhan, await docKhoiEmCong(env, sbd).catch(() => null))) return { ok: false, error: 'Phần kiến thức này chưa thuộc khối của em.' }
   if (await coCaDangMo(env, sbd, Date.now())) return { ok: false, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở. Làm xong ca kiểm tra rồi luyện nhé.' }
   const r = await env.DB.prepare('SELECT id, muc, kieu, de, pa_json FROM cau_nen WHERE nhan = ? ORDER BY muc, id LIMIT 80').bind(nhan).all<Obj>()
   const ds = r.results ?? []
@@ -396,6 +406,7 @@ export async function hsLuyenNenNop(env: Env, b: Obj) {
   if (await coCaDangMo(env, sbd, nay)) return { ok: false, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở. Làm xong ca kiểm tra rồi luyện nhé.' }
   const c = await env.DB.prepare('SELECT * FROM cau_nen WHERE id = ?').bind(id).first<Obj>()
   if (!c) return { ok: false, error: 'Không tìm thấy câu này.' }
+  if (!nenHopKhoi(str(c.nhan), await docKhoiEmCong(env, sbd).catch(() => null))) return { ok: false, error: 'Phần kiến thức này chưa thuộc khối của em.' }
   const dung = chamCauNen({ kieu: str(c.kieu), dap_an: str(c.dap_an), gia_tri_dung: str(c.gia_tri_dung) }, traLoi)
   const qidNen = `nen:${id}`
   const cho = goc(b.qid).slice(0, 80) || 'nen'
