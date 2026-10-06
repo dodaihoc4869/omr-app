@@ -356,3 +356,15 @@ html:root .dh .dh-cuoi-tin button.dh-xin:is([data-vung=chac],[data-vung=soat-lai
   html:root .dh .dh-cuoi-tin button.dh-xin[type=button][aria-pressed=true]{animation:none}
   .dh .dh-chac-bong{animation:none}
 }
+
+/* ═══ OMNI 3 · THẺ TRẠM HỒI PHỤC Ở ĐOÀN MỘT MÌNH (thầy 06/10: "sai 3 câu liên tiếp trong đoàn không thấy về trạm hồi phục") ═══
+ * Thẻ dùng khung `dh-buoc-sai` SẴN CÓ (cột, khoảng cách); nút "Làm 3 câu nền" vẽ như chip Chắc / Chưa chắc ở trên: `.dh2 .dh-xin` gốc vẽ cho nền TỐI nên tàng hình trên thẻ giấy sáng ⇒
+ * nền giấy đậm một nấc + viền + chữ MỰC, bấm xuống thì thu nhỏ. Hộp câu nền (`lg-hop-nen`, z-index 100003 của lớp lời giải) phải nằm TRÊN lớp phủ Đoàn (z-index 2147483000):
+ * cổng ra document.body mang lớp `dh-tram-hop`. Màu CHỈ qua biến đã có của thẻ giấy (--muc, --the-2, --vien-dam). */
+html:root .dh .dh-tram button.dh-xin[type=button]{min-height:44px;padding:0 20px;border-radius:22px;background:var(--the-2);box-shadow:inset 0 0 0 2px var(--vien-dam);color:var(--muc);font-size:14px;font-weight:800;touch-action:manipulation;transition:transform .12s ease}
+html:root .dh .dh-tram button.dh-xin[type=button]:active{transform:scale(.94)}
+html:root .dh .dh-tram button.dh-xin[type=button]:focus-visible{outline:3px solid var(--muc);outline-offset:2px}
+.dh-tram-hop .lg-hop-nen{z-index:2147483200}
+@media (prefers-reduced-motion:reduce){
+  html:root .dh .dh-tram button.dh-xin[type=button]{transition:none}
+}

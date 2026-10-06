@@ -564,7 +564,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // Tối ưu 05/10: dòng câu đọc sẵn cùng đợt với phiên (`truoc.cau`, cùng điều kiện tra) — bản xáo áp lên đúng câu gốc ấy như cũ.
     const qGoc=await currentQuestion(env,ref,truoc.cau),q=apXaoTheoRef(qGoc,ref)
     // Đọc OMNI (thời gian kỳ vọng, số lượt lướt hôm nay, hồ sơ, ma trận Q, lượt của chuyến) bắt đầu ngay khi biết câu — song song phần kiểm phạm vi / bản chấm cũ.
-    const omniDoc=omniSom?som(omniSom.then(bat=>bat?docTruocOmni(env,sbd,id,session,q,Date.now()):null)):null
+    // 06/10: Đoàn MỘT NGƯỜI THẬT (lệnh `answer` NỘI BỘ của game-v2-doan.ts `doan-nop` báo `motMinh`) được mở Trạm hồi phục; chỉ tin cờ khi đúng là lệnh nội bộ của Đoàn.
+    const doanMotMinh=!!session.doan&&laGoiNoiBoDoan(b)&&(b as {motMinh?:unknown}).motMinh===true
+    const omniDoc=omniSom?som(omniSom.then(bat=>bat?docTruocOmni(env,sbd,id,session,q,Date.now(),doanMotMinh):null)):null
     const blocked=await truoc.blocked
     const control=await truoc.control;if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
     for(const key of control.blocked)blocked.add(key)
@@ -632,7 +634,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const attempt:Attempt={id:receipt,session:id,qid,group:q.group,dang:q.dang,mucDo:q.mucDo,correct:laCD?chamCauChanDoan(q,String(b.answer??'')):grade(q,String(b.answer??'')),assisted:b.assisted===true||!!(ref as {goiY?:unknown}).goiY,at:Date.now(),novel:ref.novel}
     // OMNI 3: xét lướt / chắc-mà-sai / P dạng / Trạm hồi phục (omni-game.ts). Lỗi đọc ⇒ null ⇒ lượt chấm như cờ tắt.
     const docOmni=omniDoc?await omniDoc:null
-    const omni=docOmni?await xetOmniTraLoi(env,{sbd,phien:session,qidPhien:qid,cau:qGoc,chon:chonVeGoc(ref,q.phan,submitted),dung:attempt.correct,hoTro:attempt.assisted,b,nowMs:attempt.at,doc:docOmni}):null
+    const omni=docOmni?await xetOmniTraLoi(env,{sbd,phien:session,qidPhien:qid,cau:qGoc,chon:chonVeGoc(ref,q.phan,submitted),dung:attempt.correct,hoTro:attempt.assisted,b,nowMs:attempt.at,doc:docOmni,...(doanMotMinh?{doanMotMinh:true}:{})}):null
     // Lướt (sai quá nhanh, ≤ 3 lượt/ngày): KHÔNG đổi mastery của hồ sơ game (bỏ `advance`), không thưởng nấc.
     // 06/10: câu CHẨN ĐOÁN cũng không đổi mastery theo dạng (câu nền không thuộc dạng nào của kho — không sinh khoá dạng lạ trong báo cáo tiến bộ game).
     const masteryCu=p.mastery.find(m=>m.key===(q.dang??q.group))

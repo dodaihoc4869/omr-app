@@ -15,6 +15,7 @@ import type { KetQuaCau } from './doan-kieu'
 import OSoTraLoi from '../../components/OSoTraLoi'
 import XemLaiChuan from './doan2/XemLaiChuan'
 import TheBuocSai2 from './doan2/TheBuocSai2'
+import TheTram2 from './doan2/TheTram2'
 
 const CHU = ['A', 'B', 'C', 'D'] as const
 
@@ -52,12 +53,15 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
   const cheDo = useCheDoHieuUng()
   // CẨN THẬN (c): thẻ nằm TRONG thẻ câu nhưng NGOÀI hộp kết quả (hộp ấy có nền sáng riêng); chỉ khi có `ketQua.buocSai` và nơi gọi đưa `onBuocSai`.
   const theBuocSai = ketQua?.buocSai && onBuocSai ? <TheBuocSai2 key={ketQua.buocSai.qid} lua={ketQua.buocSai.lua} onChon={ma => onBuocSai(ketQua.buocSai!.qid, ma)} /> : null
+  // TRẠM HỒI PHỤC (06/10): em đi một mình và vừa sai câu thứ ba liền ⇒ thẻ Trạm ngay dưới kết quả (cùng chỗ với thẻ "Sai vì bước nào?"); vắng `ketQua.tram` ⇒ không thẻ.
+  const theTram = ketQua?.tram ? <TheTram2 key={ketQua.tram.qid} tram={ketQua.tram.du} qid={ketQua.tram.qid} /> : null
   const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward, expCau: ketQua.expCau }) : 0
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>
       <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{ketQua.loiNhan && <small data-khoi="omni-loi-nhan">{ketQua.loiNhan}</small>}{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
       {theBuocSai}
+      {theTram}
       <XemLaiChuan q={q} chon={chon} dapAn={ketQua.answer} solution={ketQua.solution} solutionImages={ketQua.solutionImages} stt={xemLaiChuan.stt} onZoom={onZoom} />
     </section>
   )
@@ -117,6 +121,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
         </div>
       )}
       {theBuocSai}
+      {theTram}
     </section>
   )
 }

@@ -27,6 +27,8 @@ import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ParentPortalScreen from '../../src/screens/ParentPortalScreen'
 import Dao2 from '../../src/game/than-thu-v2/dao2/Dao2'
+import DoanHoTong from '../../src/game/than-thu-v2/DoanHoTong'
+import type { DoanXem } from '../../src/game/than-thu-v2/doan-kieu'
 import { datViecOmniDao } from '../../src/lib/omni-hs'
 import DayHocLenBang from '../../src/components/day-hoc/DayHocLenBang'
 import BangChienDich from '../../src/components/chien-dich/BangChienDich'
@@ -195,6 +197,34 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   return tra({ ok: true })
 }
 
+// ---------------------------------------------------------------- ĐOÀN MỘT MÌNH · TRẠM HỒI PHỤC (06/10; thầy: "sai 3 câu liên tiếp trong đoàn không thấy về trạm hồi phục"): `?man=doan-tram`
+// Component THẬT `DoanHoTong` + `call` giả: phòng Hóa 2.0 MỘT người thật, câu Phần I; chốt đáp án sai ⇒ `doan-nop` trả `omni.tram` (có câu nền), như máy chủ khi đây là câu sai thứ ba liền.
+const gheD: DoanXem['ghe'] = [
+  { ghe: 0, ten: 'Minh', pet: 2, cap: 32, laMay: false, roi: false, laEm: true, trangThai: 'dang_lam', tinHieu: null },
+  { ghe: 1, ten: 'Thu Hà', pet: 1, cap: 30, laMay: false, roi: false, laEm: false, trangThai: 'da_chot', tinHieu: null },
+]
+
+const tranD = { tenChang: 'Đèo Hoàng Hôn', hiep: 3, soHiep: 8, laTrum: false, ketThuc: false, thang: null, linhTam: { hp: 80, toiDa: 100 }, quai: [{ ma: 5, loai: 'bun_acid', hp: 9 }], trumVoGiap: [],
+  nangLuong: 2, daNhanTiepSuc: 0, giay: 40, moSauMs: 0, conMs: 26000, tenQuai: ['Bùn Acid', 'Khói Oxi Hoá'], loaiQuai: ['bun_acid', 'khoi_oxi_hoa'], tenTrum: ['Chúa tể Kết Tủa', 'Bá chủ Ăn Mòn'], loaiTrum: ['chua_te_ket_tua', 'ba_chu_an_mon'] } as DoanXem['tran']
+
+const deD = { qid: 'Q1', maDe: 'D', version: 'v', group: 'g', phan: 'I' as const, text: 'Thuỷ phân hoàn toàn 8,8 gam ethyl acetate bằng NaOH dư. Khối lượng muối là', choices: ['4,1 gam', '8,2 gam', '9,6 gam', '6,8 gam'], ideas: [], hinhAnh: [], dang: 'ES', tenDang: 'Thuỷ phân ester', mucDo: 'hieu', sao: 2, kienThuc: [] }
+
+const xemD = (de: typeof deD, o: Partial<DoanXem> = {}): DoanXem => ({ ma: 'DH2', revision: 5, laChu: true, batDau: true, ghe: gheD, gioMayChu: 0, tran: tranD, cau: { qid: de.qid, nhan: 'toi_han_on', de } as DoanXem['cau'], ...o })
+
+const OMNI_D = { bat: true, baiDangLuyen: [], dangVung: { a: 0, b: 0 }, conDangDe8: null, sEm: null, sMucTieu: 0.07, chungChi: [], ve: { con: 2, tong: 2 }, choBaiMoi: false, onBaiCu: 0, metGio: null, nhatKy: null, deThu: { duoc: false, soCau: 14, phut: 25 } }
+
+const omniKqD = (o: object) => ({ nhanTocDo: 'thuong', msLam: 40_000, msKyVong: 60_000, luot: false, chacMaSai: false, loiNhan: null, ...o })
+
+const TRAM_D = { vkn: 'nen:cb', ten: 'Cân bằng hệ số', tenLoi: 'cân bằng hệ số', nhan: 'can_bang', coCauNen: true, chu: chuTram('cân bằng hệ số', true) }
+const callDoan = async (lenh: string, _b: Record<string, unknown> = {}): Promise<unknown> => {
+  const x = xemD(deD)
+  return lenh === 'hoa2-sanh' ? { ok: true, cheDo2: true, doan: { con: 4 }, dao: { con: 28 }, omni: OMNI_D }
+    : lenh === 'doan-xem' ? { ok: true, doan: x }
+      : lenh === 'doan-nop' ? { ok: true, doan: xemD(deD, { revision: 6, cau: { qid: deD.qid, daChot: true, hanhDong: 'danh', ketQua: null } as DoanXem['cau'] }),
+        ketQuaCau: { correct: false, answer: 'B', solution: { chot: 'Muối là CH3COONa' } }, omni: omniKqD({ tram: TRAM_D }) }
+        : { ok: true }
+}
+
 function manSanh(du: Record<string, unknown>) {
   return h(SanhBanDo, {
     ketQua: docSanh(du) as KetQuaSanh, loi: '', dangTai: false, thu: { index: 2, cap: 7, ten: 'Lửa Nhỏ' }, exp: { homNay: 22, conThieu: 160 },
@@ -207,6 +237,7 @@ const con =
   man === 'ph' ? h(ParentPortalScreen)
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
+  : man === 'doan-tram' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 2, cap: 32, onDong: noop, onVeBangNhiemVu: noop } as never))
   : man === 'de-thu' ? (datViecOmniDao('de-thu'), h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })) // đúng đường app thật: nút Đề thử ở Sảnh ⇒ Đảo mở màn đề thử trong khung `.dao2`
   : man === 'gv-bai' || man === 'gv-bai-nhieu-lop' || man === 'gv-bai-ngang-may-tinh' || man === 'gv-giao-cho' || man === 'gv-bai-da-day-truoc' ? h(DayHocLenBang)
   // ĐƯỜNG ĐI thật tới "Bài hôm nay" (thầy 06/10 "Tôi không thấy chỗ này"): Game Hóa 2.0 bật ⇒ thanh bên "Chữa trên lớp" → thẻ "Dạy học"; và "Chiến dịch luyện" → nút "Giao theo bài".

@@ -95,10 +95,12 @@ export interface PhienOmni {
 /** OMNI xét lượt trả lời của phiên này? Phiên Hoá 2.0 của Đảo/Đoàn. KHÔNG Bi-a (máy Bi-a chưa gửi thời lượng/tự tin — giữ nguyên hành vi). */
 export const phienXetOmni = (s: Pick<PhienOmni, 'hoa2' | 'bia'>): boolean => s.hoa2 === 1 && !s.bia
 /**
- * Trạm hồi phục mở được trong phiên này? CHỈ chuyến Đảo (không Đoàn, không Bi-a, không Linh Tâm, không chuyến vé).
- * Đoàn — kể cả Đoàn một người — KHÔNG mở trạm: lượt trả lời nội bộ của Đoàn không biết chắc số người trong phòng và trận Đoàn chạy theo hiệp đếm giờ.
+ * Trạm hồi phục mở được trong phiên này? Chuyến Đảo; ĐOÀN chỉ khi phòng có MỘT NGƯỜI THẬT (`doanMotMinh` — game-v2-doan.ts `choEmMotMinh`: phòng Hóa 2.0 còn đúng một
+ * người thật, hiệp kế chờ em bấm "ĐÁNH TIẾP" nên không đồng hồ nào chạy trong lúc em làm câu nền). Không Bi-a, không Linh Tâm, không chuyến vé.
+ * 06/10 (thầy: "Tôi làm thử chiến dịch sai 3 câu liên tiếp trong đoàn không thấy về trạm hồi phục"): trước đó loại MỌI phiên Đoàn — lệch đặc tả gốc
+ * ("chuyến Đảo / chặng Đoàn một mình có Trạm; Đoàn nhiều người không"). `doanMotMinh` chỉ do máy chủ đặt trên lệnh `answer` nội bộ của Đoàn (game-v2.ts kiểm `laGoiNoiBoDoan`).
  */
-export const phienMoTram = (s: PhienOmni): boolean => s.hoa2 === 1 && s.mode === 'adventure' && !s.doan && !s.bia && !s.guardian && s.ve !== 1
+export const phienMoTram = (s: PhienOmni, doanMotMinh = false): boolean => s.hoa2 === 1 && s.mode === 'adventure' && (!s.doan || doanMotMinh) && !s.bia && !s.guardian && s.ve !== 1
 
 /** Một lượt đã trả lời trong phiên (`game_v2_attempt`). `luot` = lượt lướt (kết quả mang `luot: true`). */
 export interface LuotPhien { qid: string; dung: boolean; hoTro: boolean; luot: boolean; at: number }
@@ -161,7 +163,7 @@ export function docSomOmniTraLoi(env: Env, sbd: string, action: string, b: Row):
   const phien = str(b.session)
   if (phien) bo(() => docLuotPhien(env, sbd, phien))
 }
-export function docTruocOmni(env: Env, sbd: string, phienId: string, phien: PhienOmni, cau: Pick<Question, 'qid' | 'phan' | 'mucDo'>, nowMs: number): DocTruocOmni {
+export function docTruocOmni(env: Env, sbd: string, phienId: string, phien: PhienOmni, cau: Pick<Question, 'qid' | 'phan' | 'mucDo'>, nowMs: number, doanMotMinh = false): DocTruocOmni {
   const goc = qidGocOmni(cau.qid)
   const p = <T>(f: () => Promise<T>): Promise<T | null> => { try { return batLoi(f()) } catch (e) { return batLoi(Promise.reject(e)) } }
   return {
@@ -169,7 +171,7 @@ export function docTruocOmni(env: Env, sbd: string, phienId: string, phien: Phie
     soLuot: p(() => soLuotHomNay(env, sbd, nowMs)),
     hoSo: p(() => hoSoOmniEm(env, sbd, nowMs)),
     q: p(() => qCuaCau(env, [goc])),
-    luotPhien: phienMoTram(phien) && !phien.tram ? p(() => docLuotPhien(env, sbd, phienId)) : Promise.resolve(null),
+    luotPhien: phienMoTram(phien, doanMotMinh) && !phien.tram ? p(() => docLuotPhien(env, sbd, phienId)) : Promise.resolve(null),
   }
 }
 
@@ -197,6 +199,8 @@ export interface DauVaoOmniTraLoi {
   b: Row
   nowMs: number
   doc: DocTruocOmni
+  /** Lệnh `answer` NỘI BỘ của Đoàn báo phòng chỉ còn một người thật (game-v2.ts đã kiểm nguồn gọi) ⇒ Đoàn được mở Trạm (chỉ khi có câu nền). */
+  doanMotMinh?: boolean
 }
 
 /**
@@ -224,11 +228,13 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
     const chacMaSai = !dv.dung && !luot && tuTin === 'chac' && !!hs && knMoi.length > 0 && knMoi.every((k) => pCua(k) >= TS.P_VUNG_DO_SO_Y)
     const dang = hs && qc && dv.cau.dang && knCau.length && !laQidChanDoan(dv.cau.qid) ? dangSauLuot(hs, qc, knCau, dv, luot, tuTin) : null // 06/10: câu chẩn đoán không hiện "P dạng"
     let tram: TramHoiPhuc | null = null
-    if (!dv.dung && !luot && !dv.hoTro && phienMoTram(dv.phien) && !dv.phien.tram) {
+    if (!dv.dung && !luot && !dv.hoTro && phienMoTram(dv.phien, dv.doanMotMinh) && !dv.phien.tram) {
       const truoc = await dv.doc.luotPhien
       if (truoc) {
         const chuoi = chuoiSaiLienCuoi([...truoc.filter((x) => x.qid !== dv.qidPhien), { qid: dv.qidPhien, dung: false, hoTro: false, luot: false }])
         if (chuoi.length >= TS.TRAM_SAI_LIEN) tram = await taoTram(env, chuoi.slice(-TS.TRAM_SAI_LIEN), hs, dv.sbd, dv.nowMs).catch((e: unknown) => { console.error('[omni-game] chưa dựng được Trạm hồi phục:', e instanceof Error ? e.message : e); return null })
+        // Đoàn: ải kế đã chia sẵn cho cả đội nên KHÔNG đổi được bằng câu dễ hơn ⇒ Trạm ở Đoàn chỉ có nghĩa khi có 3 câu nền để làm; không có ⇒ không mở (không đánh dấu, chuỗi sai còn đó).
+        if (tram && dv.phien.doan && !tram.coCauNen) tram = null
       }
     }
     const loiNhan = luot ? CHU_LUOT

@@ -56,7 +56,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const [dangChot, setDangChot] = useState(false)
   const [chon, setChon] = useState(''), [hanhDong, setHanhDong] = useState<HanhDong>('danh'), [yChon, setYChon] = useState<Record<number, 'D' | 'S'>>({})
   // OMNI 3 (05/10): `hoa2-sanh` có `omni` ⇒ `doan-nop` thêm `msLam` (từ lúc câu hiện tới lúc chốt) + `tuTin` khi chip "Chưa chắc" bật. Tắt ⇒ y hệt cũ.
-  // Trạm hồi phục KHÔNG mở trong Đoàn nhiều người (hợp đồng mục A).
+  // Trạm hồi phục: CHỈ khi em đi MỘT mình (phòng nhiều người không có — hợp đồng mục A); máy chủ quyết, máy em chỉ vẽ thẻ khi `omni.tram` về.
   const [omniBat, setOmniBat] = useState(false), [chuaChac, setChuaChac] = useState(false), [goiYChip, setGoiYChip] = useState(false), mocCau = useRef(0)
   // CẨN THẬN (đặc tả 4.6): `hoa2-sanh` báo `omni.canThan` (Sơ ý > 7%) ⇒ chip "Soát lại đơn vị và số liệu" ở câu Phần III + thẻ "Sai vì bước nào?" sau lượt chắc-mà-sai. Vắng ⇒ y hệt hôm nay.
   const [canThan, setCanThan] = useState(false), [soatLai, setSoatLai] = useState(false)
@@ -178,7 +178,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     const om = omniBat ? docKetQuaOmni((r as { omni?: unknown }).omni ?? (r.ketQuaCau as { omni?: unknown } | undefined)?.omni) : null
     // CẨN THẬN (c): thẻ "Sai vì bước nào?" đi CÙNG kết quả câu (sống/chết theo `ketQuaCau` / `cauVuaLam`); docKetQuaOmni chỉ trả `buocSai` khi máy chủ báo canThan ∧ chắc-mà-sai.
     const qidCau = xem.cau?.qid ?? deHienTai?.qid
-    const them = { ...(om?.loiNhan ? { loiNhan: om.loiNhan } : {}), ...(om?.buocSai && qidCau ? { buocSai: { qid: qidCau, lua: om.buocSai.lua } } : {}) }
+    // TRẠM HỒI PHỤC (06/10): phòng MỘT người thật, sai câu thứ ba liền ⇒ máy chủ trả `omni.tram` (Đoàn chỉ mở khi có câu nền; máy em kiểm lại `coCauNen`); thẻ nằm ở quãng nghỉ cùng kết quả câu, hiệp kế vẫn chờ em bấm "ĐÁNH TIẾP".
+    const them = { ...(om?.loiNhan ? { loiNhan: om.loiNhan } : {}), ...(om?.buocSai && qidCau ? { buocSai: { qid: qidCau, lua: om.buocSai.lua } } : {}), ...(om?.tram?.coCauNen && qidCau ? { tram: { qid: qidCau, du: om.tram } } : {}) }
     const kq = r.ketQuaCau ? (Object.keys(them).length ? { ...r.ketQuaCau, ...them } : r.ketQuaCau) : null
     // Đi một mình thì chốt xong hiệp giải NGAY và máy chủ đã sang hiệp mới: kết quả này thuộc hiệp cũ, chỉ hiện ở quãng nghỉ (cauVuaLam).
     if (r.doan?.tran?.hiep === tran.hiep) setKetQuaCau(kq)
