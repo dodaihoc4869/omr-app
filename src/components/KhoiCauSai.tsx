@@ -15,10 +15,9 @@ import ExperimentDemo from './ExperimentDemo'
 // Máy chủ vẫn trả đủ cả ba (`hsCauSai` đọc kho đề rồi gắn kèm). Lỗi nằm ở chỗ
 // vẽ, nên sửa ở chỗ vẽ — và sửa MỘT lần cho cả ba app.
 import { useState } from 'react'
-import { ChemText } from '../lib/chem-format'
-import { chuanHoaLoiGiaiCau, CHUA_CO_LOI_GIAI } from '../lib/chuan-hoa-loi-giai'
 import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
 import NutHoiThay from './loi-giai/NutHoiThay'
+import KhoiLoiGiaiChuan, { loiGiaiChuanTuKho } from './loi-giai/KhoiLoiGiaiChuan'
 
 export interface CauSaiHienThi {
   qid?: string
@@ -285,51 +284,15 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
   )
 }
 
-/** HỘP LỜI GIẢI CHUẨN — cùng một khuôn ở mọi báo cáo. */
-export function LoiGiaiCauSai({ c, hoaHoc = false, qid, nguon }: { c: Omit<CauSaiHienThi, 'loiGiai'> & {loiGiai?: unknown}; hoaHoc?: boolean; /** Có qid ⇒ thêm nút "Hỏi thầy" (lời giải từng bước) dưới hộp — chỉ truyền ở chỗ LUYỆN TẬP, không truyền trong màn thi. */ qid?: string | null; nguon?: string }) {
-  const lg = chuanHoaLoiGiaiCau(c.loiGiai, (c.phan as 'I' | 'II' | 'III') || 'I', c.dapAnDung || '')
+/** HỘP LỜI GIẢI CHUẨN — cùng một khuôn ở mọi báo cáo: khối `KhoiLoiGiaiChuan` (LỜI GIẢI → Kiến thức cốt lõi → từng phương án/ý ✓ ✗ → bước → kết quả). */
+export function LoiGiaiCauSai({ c, qid, nguon }: { c: Omit<CauSaiHienThi, 'loiGiai'> & {loiGiai?: unknown}; /** Giữ cho chỗ gọi cũ — khối chuẩn luôn vẽ công thức hoá học. */ hoaHoc?: boolean; /** Có qid ⇒ thêm nút "Hỏi thầy" (lời giải từng bước) dưới hộp — chỉ truyền ở chỗ LUYỆN TẬP, không truyền trong màn thi. */ qid?: string | null; nguon?: string }) {
+  const phan = ((['I', 'II', 'III'] as const).find((p) => p === String(c.phan)) ?? 'I')
+  const lg = loiGiaiChuanTuKho(c.loiGiai, phan, c.dapAnDung || '')
   return (
-    <div className="readable-solution p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
-      <div className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-        Đáp án: <strong className="text-base font-black text-amber-950 dark:text-amber-100">{lg.ketQua || c.dapAnDung || '—'}</strong>
-      </div>
-      {lg.thieu && (
-        <div className="text-xs italic leading-relaxed text-amber-900/80 dark:text-amber-200/80">{CHUA_CO_LOI_GIAI}</div>
-      )}
-      {lg.chot && (
-        <div>
-          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">KIẾN THỨC CỐT LÕI</div>
-          <div className="text-xs sm:text-sm font-bold leading-relaxed text-amber-950 dark:text-amber-100">{hoaHoc ? <ChemText text={lg.chot}/> : lg.chot}</div>
-        </div>
-      )}
-      {lg.lyDo && lg.lyDo.length > 0 && (
-        <div>
-          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">
-            {String(c.phan) === 'II' ? 'VÌ SAO ĐÚNG / SAI TỪNG Ý' : 'VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN'}
-          </div>
-          <div className="space-y-1 text-xs leading-relaxed">
-            {lg.lyDo.map((p) => (
-              <div key={p.khoa} className="flex items-start gap-1.5 py-0.5 border-t border-amber-200/40 dark:border-amber-800/40 first:border-t-0">
-                <strong className="text-amber-900 dark:text-amber-200">{p.khoa}.</strong>
-                <span className={`font-bold ${(hoaHoc && c.phan === 'II' && /^[DS]{4}$/.test(c.dapAnDung || '') ? c.dapAnDung?.['abcd'.indexOf(p.khoa.toLowerCase())] === 'D' : p.dung) ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{(hoaHoc && c.phan === 'II' && /^[DS]{4}$/.test(c.dapAnDung || '') ? c.dapAnDung?.['abcd'.indexOf(p.khoa.toLowerCase())] === 'D' : p.dung) ? '✓' : '✗'}</span>
-                <span className="text-amber-900 dark:text-amber-200">{hoaHoc ? <ChemText text={p.ly}/> : p.ly}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {lg.buoc && lg.buoc.length > 0 && (
-        <div>
-          <div className="text-[10px] font-extrabold tracking-wider uppercase text-amber-800 dark:text-amber-400 mb-1">LÀM TỪNG BƯỚC</div>
-          <div className="space-y-1 text-xs">
-            {lg.buoc.map((b, i) => (
-              <div key={i}>{i + 1}. {hoaHoc ? <ChemText text={b}/> : b}</div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div data-loi-giai-chuan="1">
+      <KhoiLoiGiaiChuan phan={phan} loiGiai={lg} correct={c.dapAnDung || ''} />
       {/* Hỏi thầy chỉ khi hộp lời giải có nội dung (thầy lệnh 30/09). */}
-      {qid && !lg.thieu && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon />}
+      {qid && lg && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon />}
     </div>
   )
 }

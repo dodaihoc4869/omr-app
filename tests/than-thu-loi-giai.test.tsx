@@ -96,7 +96,7 @@ describe('Bộ đổi câu KHÔNG được ép lời giải thành chuỗi', () 
 })
 
 describe('KhungLoiGiaiGame', () => {
-  it('dựng đủ bốn khối: đáp án, kiến thức cốt lõi, vì sao từng phương án', () => {
+  it('dựng đủ: đáp án, LỜI GIẢI, kiến thức cốt lõi, lý do từng phương án (khối chuẩn, 06/10)', () => {
     render(
       <KhungLoiGiaiGame loiGiaiTho={LOI_GIAI_KHO} dapAnDung={2} daChon={0} phuongAn={PA} />,
     )
@@ -104,7 +104,7 @@ describe('KhungLoiGiaiGame', () => {
     expect(screen.getByText('Em chọn: A')).toBeTruthy()
     expect(screen.getByText('Kiến thức cốt lõi')).toBeTruthy()
     expect(screen.getByText(/Van der Waals xuất hiện giữa cả nguyên tử lẫn phân tử/)).toBeTruthy()
-    expect(screen.getByText('Vì sao chọn / không chọn')).toBeTruthy()
+    expect(screen.getByText('LỜI GIẢI')).toBeTruthy() // khối chuẩn thay tiêu đề "Vì sao chọn / không chọn" (sửa có chủ ý)
     expect(screen.getByText(/Thiếu vế phân tử/)).toBeTruthy()
     expect(screen.getByText(/Thiếu vế nguyên tử/)).toBeTruthy()
     expect(screen.getByText(/Đúng định nghĩa đầy đủ/)).toBeTruthy()
@@ -144,7 +144,7 @@ describe('KhungLoiGiaiGame', () => {
 
   it('kho thiếu lời giải thì NÓI LÀ THIẾU, không bịa', () => {
     render(<KhungLoiGiaiGame loiGiaiTho={undefined} dapAnDung={2} daChon={0} phuongAn={PA} />)
-    expect(screen.getByText(/chưa có lời giải|Thầy bổ sung/)).toBeTruthy()
+    expect(screen.getByText(/Thầy chưa nhập lời giải cho câu này/)).toBeTruthy()
   })
 })
 
@@ -187,7 +187,7 @@ describe('Leo tháp: dừng lại cho em đọc, không tự nhảy câu', () =>
         screen.queryByText('Câu tiếp theo →') ?? screen.queryByText(/Lên tầng/) ?? screen.queryByText('Về Đảo Thần Thú'),
       ).toBeTruthy(),
     )
-    expect(screen.getByText('Vì sao chọn / không chọn')).toBeTruthy()
+    expect(screen.getByText('LỜI GIẢI')).toBeTruthy() // khối chuẩn thay tiêu đề "Vì sao chọn / không chọn" (sửa có chủ ý)
     // Khung bốn nút trả lời đã biến mất — không bấm nhầm khi đang đọc.
     expect(screen.queryByText('⚡ CÂU HỎI KÍCH HOẠT TUYỆT KỸ')).toBeNull()
   })
@@ -199,7 +199,7 @@ describe('Leo tháp: dừng lại cho em đọc, không tự nhảy câu', () =>
     fireEvent.click(screen.getByText(/Khiêu Chiến Tầng/))
     await waitFor(() => expect(screen.getByText(/^A\.$/)).toBeTruthy())
     fireEvent.click(screen.getByText(/^A\.$/).parentElement!)
-    await waitFor(() => expect(screen.getByText('Vì sao chọn / không chọn')).toBeTruthy())
+    await waitFor(() => expect(screen.getByText('LỜI GIẢI')).toBeTruthy())
     const chu = container.textContent ?? ''
     expect(chu).not.toContain('"chot"')
     expect(chu).not.toContain('tung_pa')
@@ -215,7 +215,7 @@ describe('Săn Boss Câu Sai: lời giải cũng phải ra chữ', () => {
     fireEvent.click(screen.getByText('Khiêu chiến quái tiếp theo'))
     await waitFor(() => expect(screen.getByText(/^A\.$/)).toBeTruthy())
     fireEvent.click(screen.getByText(/^A\.$/).parentElement!)
-    await waitFor(() => expect(screen.getByText('Vì sao chọn / không chọn')).toBeTruthy())
+    await waitFor(() => expect(screen.getByText('LỜI GIẢI')).toBeTruthy())
     const chu = container.textContent ?? ''
     expect(chu).not.toContain('"viSao"')
     expect(chu).not.toContain('tungPa')

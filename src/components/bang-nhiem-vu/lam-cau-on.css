@@ -116,19 +116,7 @@
 .lco-loi-giai { display: flex; flex-direction: column; gap: var(--k2, 8px); }
 .lco-dap-an-dung { margin: 0; font-size: var(--bnv-cx-2); }
 
-/* Hộp LỜI GIẢI dùng chung (LoiGiaiCauSai của KhoiCauSai, cũng dùng ở game/báo cáo) viết màu bằng lớp Tailwind cũ (amber/emerald/rose)
- * và các biến thể `dark:` không chạy khi tối theo hệ thống ⇒ trong màn này vẽ lại bằng vai trò M3, KHÔNG sửa component chung.
- * `!important` vì index.css có luật toàn cục `.readable-solution { background: … !important }`; bộ chọn dài hơn một bậc để thắng
- * cả `.m3 .bg-amber-50/80…` của m3-tuong-thich.css. */
-.lco .lco-loi-giai .readable-solution {
-  border: 0 !important; border-radius: var(--m3-bo-16); box-shadow: none !important;
-  background: var(--m3-surface-container-high) !important; color: var(--m3-on-surface) !important;
-}
-.lco .lco-loi-giai .readable-solution [class*='text-amber'] { color: var(--m3-on-surface) !important; }
-.lco .lco-loi-giai .readable-solution [class*='uppercase'] { color: var(--m3-on-surface-variant) !important; }
-.lco .lco-loi-giai .readable-solution [class*='border-amber'] { border-color: var(--m3-outline) !important; }
-.lco .lco-loi-giai .readable-solution .text-emerald-700 { color: var(--m3-tertiary) !important; }
-.lco .lco-loi-giai .readable-solution .text-rose-700 { color: var(--m3-error) !important; }
+/* Hộp LỜI GIẢI = KhoiLoiGiaiChuan (lớp `.loi-giai` — dưới `.m3` đã mặc màu M3 ở m3/the-cau.css), không cần vẽ lại ở đây. */
 
 /* thanh dưới dính: số câu còn thiếu + nút Nộp / Xong. DÍNH (sticky) trong vùng cuộn của sheet, KHÔNG dùng position:fixed: sheet có
  * hoạt ảnh `animate-google-fade` để lại `transform` ⇒ mọi con `fixed` bám vào hộp của sheet và trôi theo nội dung (đo được: cách đáy
