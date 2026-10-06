@@ -208,9 +208,12 @@
   min-width: 0;
 }
 .bhn-bai-ten {
+  display: -webkit-box;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.35;
@@ -458,6 +461,131 @@ summary.bhn-xem-dau::-webkit-details-marker {
     grid-template-columns: minmax(0, 1fr);
   }
   .bhn-xn {
+    padding: 12px;
+  }
+}
+
+/* ================= BỐ CỤC THEO BỀ NGANG THẬT CỦA KHUNG (thầy 06/10: "làm cho màn hình xoay ngang và máy tính nữa") =================
+ * Dùng container query `bhn` đặt trên `.bhn-ngoai` (không phụ thuộc thanh bên 88 / 264 px hay bề rộng tối đa 1100 px của vỏ app thầy). Trình duyệt không hiểu
+ * `@container` ⇒ giữ nguyên bố cục xếp dọc (điện thoại dọc) — vẫn dùng được.
+ *   < 760 px   xếp dọc, một cột bài (điện thoại dọc)
+ *   ≥ 760 px   cây bài chia 2 cột theo chương (không xé thẻ chương) — xoay ngang, máy tính bảng; thẻ xác nhận nằm dưới cây
+ *   ≥ 920 px   HAI CỘT: trái = chọn lớp + cây bài, phải = thẻ xác nhận DÍNH theo cuộn (nút Giao luôn thấy) — máy tính
+ * Cao ≤ 520 px khi xoay ngang: gọn khoảng cách (điện thoại nằm ngang chỉ cao ~ 360–430 px). */
+/* Khung chứa (container) là `.bhn-ngoai`: container query chỉ đổi kiểu của phần tử CON của khung chứa, nên lưới hai cột đặt ở `.bhn-khung` bên trong. */
+.bhn-ngoai {
+  container: bhn / inline-size;
+  min-width: 0;
+}
+.bhn-khung {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.bhn-cot-trai {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.bhn-cot-phai {
+  min-width: 0;
+}
+.bhn-lop {
+  max-width: 760px;
+}
+/* Ô "chờ chọn bài" chỉ hiện khi thẻ xác nhận có cột riêng (máy tính); xếp dọc thì chưa chọn bài là chưa có gì ở dưới (y như trước). */
+.bhn-cho-chon {
+  display: none;
+}
+
+@container bhn (min-width: 760px) {
+  .bhn-cay {
+    display: block;
+    columns: 340px 2;
+    column-gap: 12px;
+  }
+  .bhn-chuong {
+    margin-bottom: 12px;
+    break-inside: avoid;
+  }
+}
+@container bhn (min-width: 920px) {
+  .bhn-khung {
+    grid-template-columns: minmax(0, 1fr) clamp(360px, 40cqw, 460px);
+    align-items: start;
+    gap: 20px;
+  }
+  .bhn-cot-phai {
+    position: sticky;
+    top: 12px;
+    /* chừa 4 px quanh thẻ để vòng viền ngoài (box-shadow) không bị cắt bởi thanh cuộn của cột */
+    margin: -4px;
+    padding: 4px;
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .bhn-cho-chon {
+    display: block;
+    padding: 28px 20px;
+  }
+  /* Cột trái chỉ còn ~ 520–800 px: một cột bài cho dễ đọc tên bài; chỉ khi cột trái đủ rộng (≥ 2 × 440 px) mới chia hai cột. */
+  .bhn-cay {
+    columns: 440px 2;
+  }
+  /* Nút Giao luôn thấy dù thẻ dài hơn màn hình: thanh nút dính đáy cột. */
+  .bhn-hanh-dong {
+    position: sticky;
+    bottom: -16px;
+    margin: 0 -16px -16px;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--bts-vien);
+    border-radius: 0 0 18px 18px;
+    background: var(--bts-mat-2);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .bhn,
+  .bhn-khung,
+  .bhn-cot-trai {
+    gap: 10px;
+  }
+  .bhn-chuong-dau {
+    padding: 8px 12px 6px;
+  }
+  .bhn-bai-ds {
+    padding: 4px;
+  }
+  .bhn-bai-chon {
+    min-height: 48px;
+    padding: 4px;
+  }
+  .bhn-bai-so {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .bhn-xn {
+    gap: 10px;
+    padding: 12px;
+  }
+  .bhn-chon-lop .cd-cay {
+    max-height: 46vh;
+  }
+  .bhn-chon-lop .cd-o-chon {
+    min-height: 44px;
+    padding: 4px 4px 4px 8px;
+  }
+  .bhn-chon-lop .cd-the-chon {
+    min-height: 28px;
+    font-size: 12px;
+  }
+  .bhn-trong {
     padding: 12px;
   }
 }

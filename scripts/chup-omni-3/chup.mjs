@@ -254,6 +254,55 @@ const MAN = [
     await t.waitForTimeout(500)
     await chupVung(t, '[data-khoi="chon-lop-giao"]', 'gv-bai-moi-8-dien-thoai-o-chon-lop-xo-xuong-390', 1100)
   }],
+  // ── Bước "Bài hôm nay" XOAY NGANG + MÁY TÍNH (thầy 06/10): hai cột (cây bài trái, thẻ xác nhận dính phải), cây chia cột, gọn chiều cao khi nằm ngang ──
+  ['gv-bai-ngang-may-tinh', [1440, 900], async (t) => {
+    const tieuDe = t.getByRole('heading', { name: 'Bài hôm nay' }).first()
+    const toiDauBuoc = async () => {
+      await tieuDe.evaluate((e) => e.scrollIntoView({ block: 'start' }))
+      await t.evaluate(() => window.scrollBy(0, -24))
+      await t.waitForTimeout(500)
+    }
+    await tieuDe.waitFor({ timeout: 30000 })
+    await t.locator('[data-bai="DH-12-C3-B8"]').waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1200)
+    await t.getByRole('button', { name: /Chọn lớp/ }).click()
+    await t.getByRole('checkbox', { name: /^12 - Tinh Hoa/ }).click()
+    await t.getByRole('checkbox', { name: /^12 - Nhóm 10 điểm/ }).click()
+    await t.getByRole('button', { name: 'Xong' }).click()
+    await t.waitForTimeout(1200)
+    // 1 · máy tính xách tay 1440×900, chưa chọn bài: ô chờ ở cột phải
+    await toiDauBuoc()
+    await chup(t, 'gv-bai-ngang-1-may-tinh-1440x900-chua-chon-bai')
+    // 2 · chọn Bài 6: thẻ xác nhận hiện NGAY cột phải (không phải cuộn xuống cuối cây)
+    await t.locator('[data-bai="DH-12-C2-B6"] label').first().click()
+    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(1500)
+    await chup(t, 'gv-bai-ngang-2-may-tinh-1440x900-chon-bai-6-the-ben-phai')
+    // 3 · cuộn xuống: thẻ xác nhận DÍNH theo, nút Giao luôn thấy
+    await t.evaluate(() => window.scrollBy(0, 640))
+    await t.waitForTimeout(600)
+    await chup(t, 'gv-bai-ngang-3-may-tinh-cuon-xuong-the-van-dinh')
+    // 4 · màn lớn 1920×1080
+    await t.setViewportSize({ width: 1920, height: 1080 })
+    await toiDauBuoc()
+    await chup(t, 'gv-bai-ngang-4-man-lon-1920x1080')
+    // 5 · máy tính bảng nằm ngang 1024×768: xếp dọc, cây chia 2 cột; thẻ xác nhận nằm dưới
+    await t.setViewportSize({ width: 1024, height: 768 })
+    await toiDauBuoc()
+    await chup(t, 'gv-bai-ngang-5-may-tinh-bang-ngang-1024x768')
+    // 6 · điện thoại nằm ngang 844×390: gọn chiều cao, cây chia 2 cột
+    await t.setViewportSize({ width: 844, height: 390 })
+    await toiDauBuoc()
+    await chup(t, 'gv-bai-ngang-6-dien-thoai-ngang-844x390')
+    await t.evaluate(() => window.scrollBy(0, 260))
+    await t.waitForTimeout(500)
+    await chup(t, 'gv-bai-ngang-7-dien-thoai-ngang-cuon-giua-cay')
+    // 7 · điện thoại ngang: chọn một bài khác ⇒ thẻ xác nhận nằm dưới cây ⇒ trang tự cuộn mượt tới đầu thẻ
+    await t.locator('[data-bai="DH-12-C3-B8"] label').first().click()
+    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(1800)
+    await chup(t, 'gv-bai-ngang-8-dien-thoai-ngang-tu-cuon-toi-the-xac-nhan')
+  }],
   ['gv-chien-dich', [1440, 900], async (t) => {
     await t.getByRole('heading', { name: 'Chiến dịch luyện' }).first().waitFor({ timeout: 30000 })
     await t.getByRole('button', { name: /Giao theo bài/ }).first().waitFor({ timeout: 20000 })

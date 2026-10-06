@@ -609,52 +609,67 @@ export function BuocBaiHomNay({ bhn, kho, soBuoc = 4 }: { bhn: BaiHomNay; kho: T
         </div>
       </div>
 
-      <div className="bhn-lop">
-        <span className="bhn-nhan">Lớp nhận bài</span>
-        <ChonLopGiao dsLop={lopChonDuoc} chon={lopChon} onDoi={bhn.setLopChon} />
-        {lopChon.length > 0 && khoi && (
-          <p className="bhn-khoi-meta">
-            <span className="bhn-khoi-chip">Cây Dạy học · Khối {khoi}</span>
-            {lopChon.length > 1 && <span className="dh-phu">{lopChon.length} lớp đang chọn — bài tick ở dưới sẽ giao lần lượt cho từng lớp chưa có bài.</span>}
-          </p>
-        )}
-      </div>
-
-      {!lopChon.length ? (
-        <p className="bhn-trong">Chọn lớp để xem cây bài Dạy học của khối và trạng thái từng bài.</p>
-      ) : !khoi ? (
-        <p className="bhn-trong">Chưa nhận ra khối của lớp {lop} (tên lớp cần bắt đầu bằng 10, 11 hoặc 12).</p>
-      ) : !kho ? (
-        <p className="bhn-trong" aria-busy="true">
-          Đang đọc kho đề…
-        </p>
-      ) : dsBai.length === 0 ? (
-        <p className="bhn-trong">Kho chưa có bài Dạy học của khối {khoi}. Vào Ngân hàng câu hỏi → Đồng bộ ngay để nạp đề.</p>
-      ) : (
-        <>
-          {loiDs.length > 0 ? (
-            <div className="dh-hang">
-              <p className="dh-loi" role="alert">
-                {loiDs.join(' · ')}
-              </p>
-              <button type="button" className="m3-nut-vien dh-nut-nho" onClick={() => void taiDs()}>
-                Thử lại
-              </button>
+      {/* Hai cột khi đủ rộng (máy tính): trái = chọn lớp + cây bài, phải = thẻ xác nhận DÍNH theo cuộn; hẹp / điện thoại: xếp dọc, thẻ nằm dưới cây bài (bai-hom-nay.css, @container bhn). */}
+      <div className="bhn-ngoai">
+        <div className="bhn-khung">
+          <div className="bhn-cot-trai">
+            <div className="bhn-lop">
+              <span className="bhn-nhan">Lớp nhận bài</span>
+              <ChonLopGiao dsLop={lopChonDuoc} chon={lopChon} onDoi={bhn.setLopChon} />
+              {lopChon.length > 0 && khoi && (
+                <p className="bhn-khoi-meta">
+                  <span className="bhn-khoi-chip">Cây Dạy học · Khối {khoi}</span>
+                  {lopChon.length > 1 && <span className="dh-phu">{lopChon.length} lớp đang chọn — bài tick ở dưới sẽ giao lần lượt cho từng lớp chưa có bài.</span>}
+                </p>
+              )}
             </div>
-          ) : dangTaiDs && lopChon.every((l) => !dsTheoLop[l]) ? (
-            <p className="dh-phu" aria-busy="true">
-              Đang đọc trạng thái các bài…
-            </p>
-          ) : null}
-          <div className="bhn-cay" data-khoi="cay-bai" role="radiogroup" aria-label={`Bài vừa dạy · ${lopChon.length > 1 ? 'các lớp' : 'lớp'} ${lopChon.join(', ')}`}>
-            {theoChuong.map((g) => (
-              <ChuongBai key={g.chuong || '_'} bhn={bhn} g={g} />
-            ))}
-          </div>
-        </>
-      )}
 
-      {chon && <TheXacNhan bhn={bhn} chon={chon} />}
+            {!lopChon.length ? (
+              <p className="bhn-trong">Chọn lớp để xem cây bài Dạy học của khối và trạng thái từng bài.</p>
+            ) : !khoi ? (
+              <p className="bhn-trong">Chưa nhận ra khối của lớp {lop} (tên lớp cần bắt đầu bằng 10, 11 hoặc 12).</p>
+            ) : !kho ? (
+              <p className="bhn-trong" aria-busy="true">
+                Đang đọc kho đề…
+              </p>
+            ) : dsBai.length === 0 ? (
+              <p className="bhn-trong">Kho chưa có bài Dạy học của khối {khoi}. Vào Ngân hàng câu hỏi → Đồng bộ ngay để nạp đề.</p>
+            ) : (
+              <>
+                {loiDs.length > 0 ? (
+                  <div className="dh-hang">
+                    <p className="dh-loi" role="alert">
+                      {loiDs.join(' · ')}
+                    </p>
+                    <button type="button" className="m3-nut-vien dh-nut-nho" onClick={() => void taiDs()}>
+                      Thử lại
+                    </button>
+                  </div>
+                ) : dangTaiDs && lopChon.every((l) => !dsTheoLop[l]) ? (
+                  <p className="dh-phu" aria-busy="true">
+                    Đang đọc trạng thái các bài…
+                  </p>
+                ) : null}
+                <div className="bhn-cay" data-khoi="cay-bai" role="radiogroup" aria-label={`Bài vừa dạy · ${lopChon.length > 1 ? 'các lớp' : 'lớp'} ${lopChon.join(', ')}`}>
+                  {theoChuong.map((g) => (
+                    <ChuongBai key={g.chuong || '_'} bhn={bhn} g={g} />
+                  ))}
+                </div>
+              </>
+            )}
+
+          </div>
+          <aside className="bhn-cot-phai" aria-label="Xác nhận trước khi giao" data-khoi="bai-hom-nay-the">
+            {chon ? (
+              <TheXacNhan key={chon.khoaBai} bhn={bhn} chon={chon} />
+            ) : (
+              <p className="bhn-trong bhn-cho-chon" data-khoi="cho-chon-bai">
+                Chọn một bài ở cây bên trái: thẻ xác nhận hiện ngay ở đây — số câu rút được, hạn nộp, lượt cần và nút Giao.
+              </p>
+            )}
+          </aside>
+        </div>
+      </div>
       {bhn.suaCd && (
         <Suspense fallback={null}>
           <SuaChienDich
@@ -755,6 +770,21 @@ function CanhBaoQuaTai({ xem, lop, kemLop }: { xem: XemTruocTick; lop: string; k
 
 /** Thẻ XÁC NHẬN TRƯỚC KHI GIAO: tờ vào bài luyện, các lớp nhận, 6 con số có nhãn (mỗi lớp), cảnh báo quá tải, nút chính + nút sửa hạn nộp / số lượt. */
 function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
+  const goc = useRef<HTMLDivElement>(null)
+  // Vừa chọn bài (thẻ dựng MỚI cho mỗi bài — `key` ở nơi gọi): hai cột ⇒ thẻ dính bên phải, đã thấy sẵn, không cuộn; xếp dọc ⇒ thẻ nằm dưới cây bài (có thể cách hàng trăm px)
+  // ⇒ cuộn mượt tới đầu thẻ (tôn trọng "giảm chuyển động"). Môi trường không có `scrollIntoView` (test) ⇒ bỏ qua.
+  useEffect(() => {
+    const el = goc.current
+    if (!el || typeof el.scrollIntoView !== 'function') return
+    try {
+      const r = el.getBoundingClientRect()
+      if (r.top >= 0 && r.top < window.innerHeight * 0.7) return
+      const giam = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      el.scrollIntoView({ behavior: giam ? 'auto' : 'smooth', block: 'start' })
+    } catch {
+      /* chỉ là tiện: lỗi ⇒ không cuộn */
+    }
+  }, [])
   const { lopChon, maDeTuGiao, moSua, setMoSua, hanSua, setHanSua, theLucChu, setTheLucChu, theLucSua, loiTheLuc, hanHopLe, homNay, dauVaoLop, xemTheoLop, loiXemTheoLop, dangXem, giao, dangGiao, loiGiao } = bhn
   const { dsEm, chonEm, setChonEm, emLop, coDanhSachEm, sbdChon, chipBuoi, emTheoLop } = bhn
   const ten = tenNganBai(chon.tenBai)
@@ -771,7 +801,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
   const xem1 = lopDauTien ? xemTheoLop[lopDauTien] : undefined
   const loiXem1 = lopDauTien ? loiXemTheoLop[lopDauTien] : undefined
   return (
-    <div className="bhn-xn" data-khoi="xac-nhan-tick" aria-live="polite">
+    <div className="bhn-xn" data-khoi="xac-nhan-tick" aria-live="polite" ref={goc}>
       <div className="bhn-xn-dau">
         <span className="bhn-bai-so bhn-bai-so--lon" aria-hidden="true">
           {so ?? '•'}

@@ -20,7 +20,7 @@ const KHO_MAC_DINH: TeacherExamSource[] = [
 ]
 // ── Cảnh "nhiều lớp" (thầy 06/10, ảnh app thật): cây Khối 12 như kho của thầy — chương 3 nhập ĐẢO thứ tự (Bài 10, 11, 11, 8, 9, 9) để thấy cây đã sắp lại; 5 lớp
 // 12 - Lớp Thường / 12 - Nhóm 10 điểm / 12 - Tinh Hoa / 11 / 10 (+ "Chưa xếp lớp" không vào ô chọn). Số câu giống ảnh. Không dữ liệu học sinh thật.
-const LA_NHIEU_LOP = new URLSearchParams(globalThis.location?.search ?? '').get('man') === 'gv-bai-nhieu-lop'
+const LA_NHIEU_LOP = ['gv-bai-nhieu-lop', 'gv-bai-ngang-may-tinh'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('man') ?? '')
 const chuong = (n: number, ten: string) => `12 · DẠY HỌC/C${n} - ${ten}`
 const bai = (ma: string, ten: string, soCau: number, c: string) => to(ma, ten, Math.round(soCau * 0.7), Math.round(soCau * 0.2), c, soCau - Math.round(soCau * 0.7) - Math.round(soCau * 0.2))
 const KHO_NHIEU_LOP: TeacherExamSource[] = [

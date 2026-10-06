@@ -2,6 +2,8 @@
 // Khoá: (1) hàm thuần chọn lớp theo khối / chia em về lớp / chip gộp nhiều lớp; (2) ô chọn lớp xếp khối 10 · 11 · 12, chọn nhiều lớp CÙNG KHỐI, khối khác ⇒ chọn lại từ đầu;
 // (3) cây bài theo số bài tăng dần; (4) giao nhiều lớp: danh-sach / xem-truoc / tick MỖI LỚP MỘT LỆNH (máy chủ giữ nguyên), lớp đã có bài bị bỏ qua, một lớp lỗi không chặn lớp khác.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
@@ -321,5 +323,62 @@ describe('màn: giao Bài cho nhiều lớp', () => {
     expect(hop.textContent).toContain('lớp 12 - Lớp Thường')
     fireEvent.click(within(hop).getByRole('button', { name: 'Bỏ tick' }))
     await waitFor(() => expect(lenh('bo-tick')).toEqual([{ action: 'bo-tick', lop: '12 - Lớp Thường', khoaBai: 'DH-12-C1-B1' }]))
+  })
+})
+
+describe('bố cục máy tính / xoay ngang (thầy 06/10: "làm cho màn hình xoay ngang và máy tính nữa")', () => {
+  it('cột phải (aside) chứa ô chờ chọn bài, chọn bài xong thì chứa thẻ xác nhận', async () => {
+    const buoc = await moBuoc()
+    const aside = buoc.querySelector('aside[data-khoi="bai-hom-nay-the"]') as HTMLElement
+    expect(aside.querySelector('[data-khoi="cho-chon-bai"]')).toBeTruthy()
+    expect(aside.querySelector('[data-khoi="xac-nhan-tick"]')).toBeNull()
+    fireEvent.click(within(dong(buoc, 'DH-12-C3-B8')).getByRole('radio'))
+    await waitFor(() => expect(aside.querySelector('[data-khoi="xac-nhan-tick"]')).toBeTruthy())
+    expect(aside.querySelector('[data-khoi="cho-chon-bai"]')).toBeNull()
+  })
+
+  it('xếp dọc: chọn bài ⇒ cuộn MƯỢT tới đầu thẻ xác nhận (nằm dưới cây); thẻ đã thấy sẵn (hai cột, dính) ⇒ không cuộn; giảm chuyển động ⇒ cuộn tức thì; mỗi bài một lần', async () => {
+    const cuon = vi.fn()
+    const gocCuon = (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView
+    const gocMedia = window.matchMedia
+    ;(Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = cuon
+    let top = 2000
+    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return { top: this.getAttribute('data-khoi') === 'xac-nhan-tick' ? top : 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) } as DOMRect
+    })
+    try {
+      const buoc = await moBuoc()
+      fireEvent.click(within(dong(buoc, 'DH-12-C3-B8')).getByRole('radio'))
+      await waitFor(() => expect(cuon).toHaveBeenCalledTimes(1))
+      expect(cuon).toHaveBeenLastCalledWith({ behavior: 'smooth', block: 'start' })
+      // Thẻ đã nằm trong tầm nhìn (cột phải dính) ⇒ chọn bài khác không cuộn.
+      cuon.mockClear()
+      top = 100
+      fireEvent.click(within(dong(buoc, 'DH-12-C3-B9')).getByRole('radio'))
+      await waitFor(() => expect(buoc.querySelector('[data-khoi="xac-nhan-tick"]')?.textContent).toContain('Bài 9. Amino acid'))
+      expect(cuon).not.toHaveBeenCalled()
+      // Giảm chuyển động ⇒ cuộn tức thì.
+      window.matchMedia = ((q: string) => ({ matches: /reduce/.test(q), media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia
+      top = 2000
+      fireEvent.click(within(dong(buoc, 'DH-12-C3-B10')).getByRole('radio'))
+      await waitFor(() => expect(cuon).toHaveBeenCalledTimes(1))
+      expect(cuon).toHaveBeenLastCalledWith({ behavior: 'auto', block: 'start' })
+    } finally {
+      rect.mockRestore()
+      window.matchMedia = gocMedia
+      if (gocCuon) (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = gocCuon
+      else delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView
+    }
+  })
+
+  it('kiểu dáng: khung chứa của container query là .bhn-ngoai (container query KHÔNG đổi kiểu chính khung chứa ⇒ lưới hai cột đặt ở .bhn-khung con); có ngưỡng hai cột và gọn khi nằm ngang thấp', () => {
+    const css = readFileSync(resolve(process.cwd(), 'src/components/day-hoc/bai-hom-nay.css'), 'utf8')
+    const khoi = (sel: string) => css.match(new RegExp(`${sel.replace('.', '\\.')}\\s*\\{([^}]*)\\}`))?.[1] ?? ''
+    expect(khoi('.bhn-ngoai')).toMatch(/container:\s*bhn\s*\/\s*inline-size/)
+    expect(khoi('.bhn-khung')).not.toMatch(/container/)
+    expect(css).toMatch(/@container bhn \(min-width: 760px\)/)
+    expect(css).toMatch(/@container bhn \(min-width: 920px\)/)
+    expect(css).toMatch(/@media \(orientation: landscape\) and \(max-height: 520px\)/)
+    expect(css).toMatch(/position:\s*sticky/)
   })
 })

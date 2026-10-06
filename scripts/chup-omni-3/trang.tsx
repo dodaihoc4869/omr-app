@@ -208,7 +208,7 @@ const con =
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'de-thu' ? (datViecOmniDao('de-thu'), h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })) // đúng đường app thật: nút Đề thử ở Sảnh ⇒ Đảo mở màn đề thử trong khung `.dao2`
-  : man === 'gv-bai' || man === 'gv-bai-nhieu-lop' ? h(DayHocLenBang)
+  : man === 'gv-bai' || man === 'gv-bai-nhieu-lop' || man === 'gv-bai-ngang-may-tinh' ? h(DayHocLenBang)
   // ĐƯỜNG ĐI thật tới "Bài hôm nay" (thầy 06/10 "Tôi không thấy chỗ này"): Game Hóa 2.0 bật ⇒ thanh bên "Chữa trên lớp" → thẻ "Dạy học"; và "Chiến dịch luyện" → nút "Giao theo bài".
   : man === 'gv-len-bang' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(GoiLenBangScreen))
   : man === 'gv-chien-dich' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(ChienDichScreen))
@@ -218,7 +218,7 @@ const con =
   : man === 'gv-tong-quan' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(TongQuanScreen)) // màn đầu app thầy khi Game Hóa 2.0 bật
   : manSanh(SANH)
 // Màn thầy: dựng ĐÚNG khung App.tsx (thanh bên trái thật + khung nội dung) để bố cục, màu như app thầy thật.
-const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bai-nhieu-lop': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat', 'gv-tong-quan': 'tongquan', 'gv-len-bang': 'goilenbang', 'gv-chien-dich': 'chiendich' }
+const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bai-nhieu-lop': 'goilenbang', 'gv-bai-ngang-may-tinh': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat', 'gv-tong-quan': 'tongquan', 'gv-len-bang': 'goilenbang', 'gv-chien-dich': 'chiendich' }
 const manThay = MAN_THAY[man]
 if (manThay) useAppStore.setState({ screen: manThay as never })
 createRoot(document.getElementById('root')!).render(
