@@ -3,6 +3,7 @@
 // (mã câu, mã tờ ở game_v2_question, `de_kho.lop`) nói là khối CAO hơn khối em, hoặc không đọc ra khối. Kèm kênh (nguon), số em, mẫu SBD, mã tờ, đầu đề câu.
 import type { Env } from './kieu'
 import { khoiCuaCau, khoiCuaLop, type Khoi } from '../../src/lib/khoi-cau'
+import { KHOI_TOI_THIEU_NEN } from './thang-tu-go'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -30,8 +31,11 @@ export async function quetKhoi(env: Env, b: Row, nowMs = Date.now()): Promise<Re
   const lot: Row[] = []
   for (const x of r) {
     const qid = str(x.qid), m = meta.get(qid)
-    const k = khoiCuaCau({ qid, ...(m ? { maDe: m.maDe, lop: lopTo.get(m.maDe) ?? '' } : {}) })
-    if (k !== null && k <= khoi) continue
+    // Câu nền sinh bằng mã (`nen:sinh.<nhãn>.<số>`) không mang khối trong mã: khối = khối tối thiểu của NHÃN (thang-tu-go.ts).
+    const nhanNen = /^nen:sinh\.([a-z0-9_]+)\./.exec(qid)?.[1]
+    const k = nhanNen ? (KHOI_TOI_THIEU_NEN[nhanNen] ?? 10) : khoiCuaCau({ qid, ...(m ? { maDe: m.maDe, lop: lopTo.get(m.maDe) ?? '' } : {}) })
+    if (nhanNen ? k! <= khoi : k !== null && k <= khoi) continue
+    if (/^nen:yds\./.test(qid)) continue // câu chẩn đoán hai ý Đ/S: đã lọc theo `lop` của câu lỗi lúc sinh
     lot.push({ qid, kenh: str(x.nguon), khoiCau: k, maDe: m?.maDe ?? null, lopTo: m ? lopTo.get(m.maDe) ?? null : null, soEm: Number(x.so_em), mauSbd: str(x.mau_sbd), soLuot: Number(x.so_luot), dau: m?.text ?? null })
   }
   lot.sort((a, c) => Number(c.soLuot) - Number(a.soLuot))
