@@ -1,7 +1,7 @@
 // GAME HÓA 2.0 · GIAO CHIẾN DỊCH (bản vẽ GV-GiaoChienDich): điền sẵn tờ đề + lớp của ca, hạn nộp +7 ngày 23:59, thể lực 40,
 // Quá tải hôm nay tới 80 (tên cũ Huyết Chiến). Đổi đầu vào ⇒ gọi lại `suc-chua`; nút chính ⇒ `tao`. Thầy 28/09: thể lực gõ số bất kì + nút gạt Tự động; bỏ rút câu / lùi hạn.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, configure, fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
@@ -13,6 +13,9 @@ vi.mock('../src/lib/exam-db', () => ({
 }))
 
 import GiaoChienDich from '../src/components/chien-dich/GiaoChienDich'
+
+// `waitFor` mặc định 1 000 ms quá ngắn khi máy tải nặng (đỏ ở lượt chạy toàn bộ: `tao` chưa kịp ghi sau cú bấm, cả test mới 1 420 ms) — cùng ngân sách 6 s với các test nặng khác (bi-a-mat-than-tra-loi…).
+configure({ asyncUtilTimeout: 6000 })
 
 // 10:00 giờ Việt Nam Chủ Nhật 27/09/2026 ⇒ hạn nộp mặc định Chủ Nhật 04/10/2026
 const NOW = Date.UTC(2026, 8, 27, 3, 0, 0)

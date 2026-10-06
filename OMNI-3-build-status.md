@@ -183,3 +183,13 @@ Việc của đợt (commit trên nhánh `claude/gracious-heisenberg-hoe97n`, g�
 CHƯA làm (nói thẳng): kho ý Đúng–Sai trên bản sống còn RỖNG ⇒ nhánh "chìa khoá + 2 ý Đ/S" của chẩn đoán chưa chèn câu nào (chỉ nhánh câu nền sinh bằng mã chạy) cho tới khi chạy `node scripts/loi-giai/may-soan.mjs --lop tat-ca`; 105 tệp (24 112 dòng, chỉ test/công cụ nhập, không vào gói) và 1 546 chữ `export` chỉ dùng nội bộ để nguyên — xoá cần xoá 22 test, sửa 73 test: chờ thầy quyết; ôn bài cũ (a)(b)(c) chờ thầy nói "làm"; ngưỡng chứng chỉ 8+ chờ thầy; đăng nhập thật NDJSON, thẻ Cẩn thận, thang làm lại, câu chẩn đoán và nút Chắc / Chưa chắc trên em thật chưa kiểm được từ phiên đám mây (không dùng mật khẩu em) — cần thầy hoặc một em dùng thử.
 
 Lùi: `git revert -m 1 <commit gộp PR đợt 4>` rồi đẩy main (Actions đẩy lại Pages + Worker). Tắt riêng: chẩn đoán `cau_hinh` khoá `chan_doan_buoc_sai` = `{"bat":false}`; thang làm lại khoá `lam_lai_khac` = `{"bat":false}`; đăng nhập kèm Sảnh `TAT_KEM_SANH`; cả OMNI ở Cài đặt OMNI. Bản Worker trước đợt này `1e17cf25-3045-41c5-a3e1-f53d0f9dec0a`.
+
+### 11b. Đã lên bản sống (06/10)
+
+- ĐÃ LÊN 06/10 11:42 giờ VN (04:42 UTC): PR #154 (main 02bd30bc), Actions run 37413831815 thành công (check:mau · npm test · build · Pages · Worker; 14 phút 51 giây). Pages `4cd12e66`; Worker `25850a01-f721-4029-bed5-6db8d43342bb` (khởi động 21 ms; tải lên 3 259,56 KiB / nén 848,90 KiB — khớp bản đóng gói thử 3 260 / 849).
+- Ca thi mở kiểm LẠI ngay trước khi gộp: 11:27 giờ VN, run 37413770362 — so_ca_mo = 0, so_luot_dang_lam = 0 (lần trước đó 11:25, run 37413609699).
+- Kiểm sống không cần mật khẩu em (11:43 giờ VN): `/hs/ca-dang-mo` HTTP 200, `nhipDeNghi.muc` = "tot"; `/gv/buoi-hoc`, `/gv/omni/cai-dat` không mã ⇒ 403 "Sai mã bí mật"; `/hs/dang-nhap` thiếu số báo danh kèm `kemSanh:true` ⇒ HTTP 200 JSON thường.
+- Nhịp máy chủ sau đẩy: 20 mẫu trong 10 phút (30 giây một mẫu, 11:43–11:53 giờ VN): 20/20 HTTP 200; 19 mẫu "tot", 1 mẫu "ban" thoáng qua (11:46; các mẫu sau trở lại "tot"), 1 lượt chậm 4,6 s (11:52, vẫn "tot"). Mức "ban" tính theo p95 thời gian trả lời trong 2 phút của MỘT isolate (`suc-khoe-may.ts`, > 1,5 s) — dao động thoáng qua, không thấy kéo dài.
+- Hai test chập chờn của lượt 2 đã sửa sau đợt (chỉ test, commit 623f1dc7; ghi chú ở sổ việc OMNI 3).
+- CHƯA kiểm được từ phiên đám mây (không thử mật khẩu em): đăng nhập thật theo luồng NDJSON, câu chẩn đoán, nút Chắc / Chưa chắc, thẻ Cẩn thận và thang làm lại trên em thật. Cần thầy hoặc một em dùng thử; công tắc khẩn: chẩn đoán `chan_doan_buoc_sai`, thang `lam_lai_khac`, đăng nhập kèm Sảnh `TAT_KEM_SANH`.
+- Lùi: `git revert -m 1 02bd30bc` rồi đẩy main (Actions đẩy lại Pages + Worker); Worker trước đợt này `1e17cf25-3045-41c5-a3e1-f53d0f9dec0a`.
