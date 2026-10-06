@@ -556,10 +556,9 @@ const LENH_BANG_DA_CHUA = [
   'CREATE TABLE IF NOT EXISTS buoi_chua_em_da_chua (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, qid TEXT NOT NULL, dang TEXT NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (chien_dich_id, sbd, qid))',
 ]
 const tenDangCau = (m: { tenDang?: unknown; dang?: unknown } | undefined): string => String(m?.tenDang ?? m?.dang ?? 'Chưa gắn dạng')
-/** Dạng mà MỌI em trong `em` đã được chữa (em rỗng ⇒ không dạng nào). */
-async function docDangDaChua(env: Env, id: string, em: readonly string[]): Promise<Set<string>> {
+/** Dạng → các em ĐÃ được chữa dạng đó (mọi em, không chỉ em có mặt). */
+async function docEmDaChuaTheoDang(env: Env, id: string): Promise<Map<string, Set<string>>> {
   await chayDdlMotLan(env, 'buoi_chua_em_da_chua', LENH_BANG_DA_CHUA)
-  if (!em.length) return new Set()
   const r = await env.DB.prepare('SELECT dang, sbd FROM buoi_chua_em_da_chua WHERE chien_dich_id = ?').bind(id).all<Row>()
   const theoDang = new Map<string, Set<string>>()
   for (const x of r.results ?? []) {
@@ -568,7 +567,12 @@ async function docDangDaChua(env: Env, id: string, em: readonly string[]): Promi
     if (!t) { t = new Set(); theoDang.set(d, t) }
     t.add(str(x.sbd))
   }
+  return theoDang
+}
+/** Dạng mà MỌI em trong `em` đã được chữa (em rỗng ⇒ không dạng nào). */
+function dangDaChuaHet(theoDang: ReadonlyMap<string, ReadonlySet<string>>, em: readonly string[]): Set<string> {
   const xong = new Set<string>()
+  if (!em.length) return xong
   for (const [d, t] of theoDang) if (em.every((s) => t.has(s))) xong.add(d)
   return xong
 }
@@ -593,10 +597,20 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
     return { ...c, soChuaThanhThao: chua.length, soCanDayLai: dayLai.length, diemChua: chua.length + 2 * dayLai.length, emSua: [...dayLai, ...chua.filter((s) => !dayLai.includes(s))] }
   })
   const theoDang = new Map<string, (typeof cauGop)[number]>()
-  const dangDaChua = await docDangDaChua(env, cd.id, em).catch(() => new Set<string>())
-  for (const c of cauGop) {
-    if (c.diemChua <= 0) continue
-    if (dangDaChua.has(c.dang)) continue // dạng đã chữa ở buổi trước: để buổi này tới dạng khác
+  const emDaChua = await docEmDaChuaTheoDang(env, cd.id).catch(() => new Map<string, Set<string>>())
+  const dangDaChua = dangDaChuaHet(emDaChua, em)
+  for (const c0 of cauGop) {
+    if (c0.diemChua <= 0) continue
+    if (dangDaChua.has(c0.dang)) continue // dạng đã chữa ở buổi trước: để buổi này tới dạng khác
+    // Lớp có em đã chữa dạng này và em chưa chữa: câu chỉ tính cho em CHƯA chữa (thầy 06/10) — em đã chữa không bị gọi sửa lại.
+    const daChuaDang = emDaChua.get(c0.dang)
+    let c = c0
+    if (daChuaDang?.size) {
+      const dayLaiGiu = c0.emSua.slice(0, Math.max(0, c0.soCanDayLai)).filter((s) => !daChuaDang.has(s))
+      const emSuaMoi = c0.emSua.filter((s) => !daChuaDang.has(s))
+      if (emSuaMoi.length === 0) continue
+      c = { ...c0, emSua: emSuaMoi, soChuaThanhThao: emSuaMoi.length, soCanDayLai: dayLaiGiu.length, diemChua: emSuaMoi.length + 2 * dayLaiGiu.length }
+    }
     const cu = theoDang.get(c.dang)
     if (!cu || c.diemChua > cu.diemChua) theoDang.set(c.dang, c)
   }
