@@ -1,3 +1,4 @@
+import { htmlKhoiLoiGiaiChuan } from '../lib/html-khoi-loi-giai-chuan'
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
@@ -483,6 +484,8 @@ export default function StudentPortalScreen() {
         chot: lgChuan.chot,
         lyDo: lgChuan.lyDo,
         buoc: lgChuan.buoc,
+        ketQua: lgChuan.ketQua,
+        phan: String(cau.phan || 'I'),
         chuyenDe: cau.chuyenDe || 'Chuyên đề ôn tập',
       })
     }
@@ -571,44 +574,8 @@ export default function StudentPortalScreen() {
                 .join('')}
             </div>
 
-            <!-- HỘP LỜI GIẢI ĐÚNG CHUẨN ẢNH 4 (MÀU KEM / HỔ PHÁCH) -->
-            <div style="padding: 22px 24px; background: rgb(255, 253, 245); border: 1.5px solid rgb(253, 230, 138); border-radius: 20px; box-shadow: 0 4px 14px rgba(217,119,6,0.06);">
-              <div style="font-size: 16px; color: rgb(120, 53, 15); font-weight: 700; margin-bottom: 12px;">
-                Đáp án: <b style="font-size: 18px; font-weight: 900; color: rgb(120, 53, 15); letter-spacing: 0.04em;">${c.dapAnDung}</b>
-              </div>
-              ${c.chot ? `
-                <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 6px;">
-                  KIẾN THỨC CỐT LÕI
-                </div>
-                <div style="font-size: 15px; font-weight: 800; line-height: 1.65; color: rgb(59, 29, 5); margin-bottom: 14px;">
-                  ${c.chot}
-                </div>
-              ` : ''}
-              ${c.lyDo && c.lyDo.length > 0 ? `
-                <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(146, 64, 14); margin-top: 10px; margin-bottom: 8px;">
-                  VÌ SAO CHỌN / KHÔNG CHỌN TỪNG PHƯƠNG ÁN
-                </div>
-                <div style="font-size: 14px; line-height: 1.65; color: rgb(120, 53, 15);">
-                  ${c.lyDo.map((l: any) => `
-                    <div style="padding: 6px 0; border-top: 1px dashed rgba(146, 64, 14, 0.18);">
-                      <strong style="color: rgb(120, 53, 15);">${l.khoa}.</strong>
-                      <span style="font-weight: 800; color: ${l.dung ? 'rgb(22, 163, 74)' : 'rgb(220, 38, 38)'}; margin: 0 4px;">
-                        ${l.dung ? '✓' : '✗'}
-                      </span>
-                      <span>${l.ly}</span>
-                    </div>
-                  `).join('')}
-                </div>
-              ` : ''}
-              ${c.buoc && c.buoc.length > 0 ? `
-                <div style="font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(146, 64, 14); margin-top: 14px; margin-bottom: 6px;">
-                  LÀM TỪNG BƯỚC
-                </div>
-                <div style="font-size: 14px; line-height: 1.65; color: rgb(120, 53, 15);">
-                  ${c.buoc.map((b: string, bIdx: number) => `<div style="margin-bottom: 4px;">${bIdx + 1}. ${b}</div>`).join('')}
-                </div>
-              ` : ''}
-            </div>
+            <!-- KHỐI LỜI GIẢI CHUẨN (src/lib/html-khoi-loi-giai-chuan.ts): LỜI GIẢI → Kiến thức cốt lõi → từng phương án ✓ ✗ → bước → kết quả -->
+            ${htmlKhoiLoiGiaiChuan(c)}
           </div>
         `
           )

@@ -12,6 +12,7 @@ import { NutXd, ThanhTrenXd } from '../xem-diem/thanh-phan'
 import TheTienBo, { type CaLichSu } from '../TheTienBo'
 import { ChemText } from '../../lib/chem-format'
 import { chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
+import KhoiLoiGiaiChuan, { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { soVn } from '../../lib/ket-qua-sau-nop'
 import { chuGiay } from '../../lib/bao-cao-ca-lop'
 import type { BaoCaoMotEm, CauXemLai, KetQuaCau, PhanChiTiet } from '../../lib/bao-cao-mot-em'
@@ -227,33 +228,17 @@ function DangEm({ bc }: { bc: BaoCaoMotEm }) {
 }
 
 function LoiGiaiKho({ c }: { c: CauXemLai }) {
-  const lg = chuanHoaLoiGiaiCau(c.loiGiai, c.phan, c.dapAnDung)
-  if (lg.thieu) return null // kho chưa có lời giải: không bày nút trống (đầu mục có nói số câu chưa có)
+  const phan = (['I', 'II', 'III'] as const).find((p) => p === String(c.phan)) ?? 'I'
+  const lg = loiGiaiChuanTuKho(c.loiGiai, phan, c.dapAnDung)
+  if (!lg) return null // kho chưa có lời giải: không bày nút trống (đầu mục có nói số câu chưa có)
   return (
     <details className="xd-giai">
       <summary>
         Xem lời giải <ChevronDown className="xd-i" aria-hidden="true" />
       </summary>
       <div className="xd-giai__noi-dung">
-        {lg.chot && (
-          <p>
-            <ChemText text={lg.chot} />
-          </p>
-        )}
-        {lg.buoc && lg.buoc.length > 0 && (
-          <ol>
-            {lg.buoc.map((b, i) => (
-              <li key={i}>
-                <ChemText text={b} />
-              </li>
-            ))}
-          </ol>
-        )}
-        {lg.ketQua && (
-          <p>
-            <ChemText text={lg.ketQua} />
-          </p>
-        )}
+        {/* khối LỜI GIẢI chuẩn: LỜI GIẢI → Kiến thức cốt lõi → từng phương án/ý ✓ ✗ → bước → kết quả */}
+        <KhoiLoiGiaiChuan phan={phan} loiGiai={lg} correct={c.dapAnDung} />
       </div>
     </details>
   )
