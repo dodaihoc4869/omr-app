@@ -251,7 +251,8 @@ describe('mã chạy: MỌI vòng tự gọi máy chủ của app thầy đi qua
     const tep: string[] = []
     const NHIEU = ['ClassListScreen', 'CaiDatScreen', 'CauHoiScreen', 'ExamHubScreen', 'ExamMonitorScreen', 'ExamSetupScreen', 'GoiLenBangScreen', 'HomNay', 'KhoaAppScreen', 'KhoaMayThayScreen', 'LichSuCaScreen', 'NganHangDeScreen', 'PhanCongScreen', 'PhieuScreen', 'PhieuV3', 'ToanCanhEmScreen']
     for (const f of readdirSync(resolve(__dirname, '../src/screens'))) if (/\.tsx?$/.test(f) && NHIEU.some((n) => f.startsWith(n))) tep.push(`src/screens/${f}`)
-    for (const d of ['bang-tin', 'bang-tin-san', 'xem-diem-gv', 'btvn-da-giao']) for (const f of readdirSync(resolve(__dirname, '../src/components', d))) if (/\.tsx?$/.test(f)) tep.push(`src/components/${d}/${f}`)
+    // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): bỏ thư mục 'xem-diem-gv' (xoá nguyên thư mục — báo cáo thầy nay ở ca-thi/); còn 43 tệp, ngưỡng > 20 giữ NGUYÊN.
+    for (const d of ['bang-tin', 'bang-tin-san', 'btvn-da-giao']) for (const f of readdirSync(resolve(__dirname, '../src/components', d))) if (/\.tsx?$/.test(f)) tep.push(`src/components/${d}/${f}`)
     expect(tep.length).toBeGreaterThan(20)
     // bộ đếm GIAO DIỆN (không gọi máy chủ): đồng hồ đếm ngược khoá app · số lăn của Bảng tin sàn (1 giây, chỉ vẽ)
     const CHO_PHEP: Record<string, number> = { 'src/screens/KhoaAppScreen.tsx': 1, 'src/components/bang-tin-san/hooks.ts': 1 }

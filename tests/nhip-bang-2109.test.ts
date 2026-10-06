@@ -37,12 +37,10 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
 }
 /** Chỉ hỏi tệp tĩnh của Pages (không chạm D1). */
 const CHI_TEP_TINH = ['src/lib/bao-hiem-ban-moi.ts', 'src/lib/cap-nhat-app.ts']
-/** Ngoài lệnh KHẨN: EscortRoom chỉ còn đồng hồ 1 s; luồng thi thật cần Boss soát; mã chết không chạy trên app. */
+/** Ngoài lệnh KHẨN: EscortRoom chỉ còn đồng hồ 1 s; luồng thi thật cần Boss soát. (06/10 gọn mã lần 2, docs/gon-ma-0610-lan-2.md: hai dòng "MÃ CHẾT" DauTruongChanLy.tsx / ThanThuHoaHocGame.tsx đã bỏ cùng hai tệp.) */
 const NGOAI_LENH: Record<string, string> = {
   'src/game/than-thu-v2/EscortRoom.tsx': 'đồng hồ 1 s (vòng hỏi phòng đã chuyển sang batVongTrucTiep)',
   'src/screens/ExamTakeScreen.tsx': 'LUỒNG THI THẬT — cần Boss soát, đã lệch pha chuKyLechPhaMs',
-  'src/components/DauTruongChanLy.tsx': 'MÃ CHẾT (chỉ ThanThuHoaHocGame nhập)',
-  'src/components/ThanThuHoaHocGame.tsx': 'MÃ CHẾT (không được nhập ở đâu)',
 }
 /** Làn của app thầy (Code 4) — có thể đổi; chỉ cho phép tồn tại. */
 // + màn Chiếu mã vào thi (28/09): 5 giây/lần hỏi danh sách em đã vào, dừng khi tab ẩn / đóng màn — chỉ chạy khi thầy đang chiếu.

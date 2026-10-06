@@ -48,3 +48,16 @@ Huỷ hai lần: không lỗi, kết quả như nhau (`nhaTick` lần hai = fals
 ## Lùi
 
 `git revert` commit đợt này. Dữ liệu do huỷ ghi (không có xoá): cờ `thuHoiLuc` trong JSON lượt (vô hại, lượt hết hạn sau 2 giờ) và `bai_da_day.bo_tick_luc` của bài gắn chiến dịch đã huỷ — khôi phục bài: `UPDATE bai_da_day SET bo_tick_luc = NULL WHERE chien_dich_id = '<mã chiến dịch>'`.
+
+## Tự soát khi thầy báo "em vẫn làm câu của chiến dịch đã huỷ" (chỉ đọc, chỉ in số — repo công khai nên KHÔNG in tên / mã em / mã câu)
+
+Bấm tay trong Actions (nhánh bất kỳ; tệp ở `.github/workflows/` + `scripts/`), đọc D1 thật bằng `wrangler d1 execute --remote`:
+
+| Workflow | Trả lời câu hỏi |
+|---|---|
+| `kiem-chien-dich-cua-em-0610` | em của chiến dịch huỷ gần nhất còn nằm trong chiến dịch NÀO khác (mọi trạng thái), đã làm bao nhiêu câu của từng chiến dịch, bao nhiêu câu trong kế hoạch hôm nay thuộc từng chiến dịch — thường là câu trả lời: em còn một chiến dịch khác CHƯA huỷ / quá hạn chưa kết thúc |
+| `kiem-sau-huy-to-0610` | các lần làm SAU lúc huỷ, gom theo tờ đề: thuộc tờ / câu của chính chiến dịch đã huỷ (`to_cua_cd_huy`, `cau_cua_cd_huy` — phần rò thật), hay thuộc chiến dịch đang chạy / quá hạn |
+| `kiem-ke-hoach-huy-0610` | kế hoạch ngày của em trong từng chiến dịch đã huỷ: còn ghi mã chiến dịch huỷ không, còn bao nhiêu câu của nó (Đảo / Đoàn), bảng phụ OMNI còn nhắc không |
+| `kiem-sql-thu-hoi-0610` | cú pháp D1 của các câu thu hồi + số chiến dịch huỷ / JSON hỏng / lượt đã có cờ |
+
+Đo ngày 06/10 (xem `OMNI-3-build-status.md` §13c): rò thật chỉ thấy ở chiến dịch huỷ 29/09 (4 câu/ngày trong kế hoạch 04–05/10, trước bản vá); chiến dịch amine huỷ 06/10: 0 câu; câu em đang làm là của một chiến dịch Chương 1–2 khác còn chạy.

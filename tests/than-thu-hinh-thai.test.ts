@@ -14,25 +14,9 @@ import {
   EXP_BAN_DAU, thanhExp, thanhExpCu, nhanExp, tongExpToiDinh, NGUON_EXP, BANG_NGUON_EXP,
 } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { TRAN_EXP_GAME_NGAY } from '../src/lib/hap-thu-ngay'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import {
-  DANH_SACH_THAN_THU, tinhLucChienPet, tinhHeSoTuongKhac, vaHoSo,
-  layHoSoThanThuMacDinh,
-} from '../src/game/than-thu-hoa-hoc/he-thong-pet'
 
-/**
- * Đọc MÃ, bỏ chú thích.
- *
- * Cổng phải soi mã chứ không soi lời văn: chính dòng chú thích giải thích
- * "đã bỏ chuỗi bịa X" lại chứa chuỗi X, và làm cổng đỏ oan.
- */
-function chiMa(duong: string): string {
-  return readFileSync(resolve(__dirname, duong), 'utf8')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .split('\n').filter((d) => !d.trim().startsWith('//')).join('\n')
-}
-const MA_COMPONENT = () => chiMa('../src/components/ThanThuHoaHocGame.tsx')
+// GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): game Thần thú v1 đã bị than-thu-v2 thay và bị xoá (ThanThuHoaHocGame.tsx, he-thong-pet.ts…).
+// Đã gỡ ĐÚNG ba khối phụ thuộc chúng — 'không bịa dữ liệu', 'hồ sơ lưu', 'tương khắc nguyên tố'; hai khối còn lại khoá `hinh-thai` + `kinh-nghiem` (mã còn sống) giữ NGUYÊN.
 
 describe('mười hai hình thái', () => {
   it('đúng 120 cấp, tên không trùng một cái nào', () => {
@@ -264,114 +248,5 @@ describe('kinh nghiệm', () => {
     expect(tongThap).toBe(474_575)
     expect(tongThap / duong).toBeLessThan(1)
     expect(tongThap / TRAN_EXP_GAME_NGAY).toBeGreaterThan(1200)
-  })
-})
-
-describe('không bịa dữ liệu', () => {
-  it('CHƯA THI CA NÀO thì KHÔNG có buff từ điểm — không lấy 7.0', () => {
-    const khong = tinhLucChienPet({ capDo: 1, capTienHoa: 1, diemTrungBinh: null, tyLeBtvn: 0 })
-    const bay = tinhLucChienPet({ capDo: 1, capTienHoa: 1, diemTrungBinh: 7.0, tyLeBtvn: 0 })
-    expect(khong.cp).toBeLessThan(bay.cp)
-  })
-
-  it('điểm cao hơn thì lực chiến cao hơn', () => {
-    const a = tinhLucChienPet({ capDo: 5, capTienHoa: 5, diemTrungBinh: 5, tyLeBtvn: 0.5 })
-    const b = tinhLucChienPet({ capDo: 5, capTienHoa: 5, diemTrungBinh: 9, tyLeBtvn: 0.5 })
-    expect(b.cp).toBeGreaterThan(a.cp)
-  })
-
-  it('cấp tiến hoá cao hơn thì mạnh hơn, suốt cả 12 cấp', () => {
-    let truoc = 0
-    for (let c = 1; c <= 12; c++) {
-      const k = tinhLucChienPet({ capDo: c, capTienHoa: c as 1, diemTrungBinh: 8, tyLeBtvn: 1 })
-      expect(k.cp, `cấp ${c}`).toBeGreaterThan(truoc)
-      truoc = k.cp
-    }
-  })
-
-  it('mã nguồn KHÔNG còn bảng xếp hạng bịa', () => {
-    const s = MA_COMPONENT()
-    for (const bia of ['Chiến Binh Nhiệt Nhôm', 'Thần Đồng Halogen', 'cp * 0.88', 'cp * 0.76',
-      'Bảng Xếp Hạng Thần Thú Cả Lớp', 'Bậc Thầy Hóa Học']) {
-      expect(s.includes(bia), `còn chuỗi bịa "${bia}"`).toBe(false)
-    }
-  })
-
-  it('game KHÔNG nhận số báo danh và họ tên nữa', () => {
-    const ma = MA_COMPONENT()
-    expect(/\bauth\./.test(ma), 'còn đọc auth').toBe(false)
-    expect(/\bsbd\b/i.test(ma), 'còn nhắc sbd').toBe(false)
-    expect(/\bhoTen\b/.test(ma), 'còn nhắc hoTen').toBe(false)
-  })
-
-  it('KHÔNG còn nút cho EXP miễn phí', () => {
-    const s = MA_COMPONENT()
-    expect(s.includes('Nạp Tinh Thể Não Lực')).toBe(false)
-    expect(s.includes('+35 EXP')).toBe(false)
-  })
-})
-
-describe('hồ sơ lưu', () => {
-  it('hồ sơ rác hoặc thiếu trường thì trộn về mặc định, không ra NaN', () => {
-    for (const rac of [null, undefined, 42, 'hỏng', {}, { capDo: -9 }, { exp: 'x' }]) {
-      const h = vaHoSo(rac)
-      expect(Number.isFinite(h.exp)).toBe(true)
-      expect(Number.isFinite(h.expToiDa)).toBe(true)
-      expect(h.capDo).toBeGreaterThanOrEqual(1)
-      expect(h.capDo).toBeLessThanOrEqual(12)
-      // Rỗng = CHƯA CHỌN, hợp lệ từ 15-09 (mỗi em chọn thú một lần ở màn đầu).
-      // Khác rỗng thì bắt buộc phải là một thần thú có thật.
-      if (h.idThanhThuChon !== '') expect(DANH_SACH_THAN_THU[h.idThanhThuChon]).toBeDefined()
-    }
-  })
-
-  it('expToiDa luôn tính lại theo cấp, không tin số cũ trong máy', () => {
-    const h = vaHoSo({ capDo: 4, exp: 10, expToiDa: 999999 })
-    expect(h.expToiDa).toBe(thanhExp(4))
-  })
-
-  it('hồ sơ mặc định bắt đầu bằng thanh 160 (đường cấp mới)', () => {
-    expect(layHoSoThanThuMacDinh().expToiDa).toBe(100) // SỬA CÓ CHỦ Ý 29/09 v5 (luật v4: 90)
-    expect(layHoSoThanThuMacDinh().capDo).toBe(1)
-  })
-})
-
-describe('tương khắc nguyên tố — không còn là mã chết', () => {
-  /**
-   * BẢN 4 HỆ CŨ CÓ HAI CHIỀU SAI HOÁ HỌC, sửa khi mở lên sáu hệ 15-09:
-   *   · cũ ghi `hoa > khi` mà không có phản ứng nào đỡ. Thật ra ngược: CO₂ dập
-   *     tắt đám cháy, nên `khi > hoa`.
-   *   · cũ ghi `khi > kiem` với ghi chú "kiềm hấp thụ khí halogen" — chính câu
-   *     ghi chú ấy nói ngược lại điều nó khẳng định. Cl₂ + 2NaOH → NaCl +
-   *     NaClO + H₂O là BASE ăn khí, nên `kiem > khi`.
-   *   · cũ ghi `axit > hoa` ("ăn mòn kim loại, dập phản ứng nhiệt") — mơ hồ,
-   *     không có phương trình. Bỏ, để hai hệ này trung tính.
-   * Bảng đầy đủ sáu hệ và bằng chứng từng cặp: `tests/than-thu-sau-he.test.ts`.
-   */
-  it('cặp khắc chế phải có phản ứng thật đỡ lưng', () => {
-    // Trung hoà — cặp duy nhất của bản cũ đúng chiều, giữ nguyên.
-    expect(tinhHeSoTuongKhac('kiem', 'axit').heSo).toBe(1.5)
-    // Hai chiều đã sửa cho đúng hoá học.
-    expect(tinhHeSoTuongKhac('khi', 'hoa').heSo).toBe(1.5)
-    expect(tinhHeSoTuongKhac('kiem', 'khi').heSo).toBe(1.5)
-    // Mỗi cặp khắc chế đều phải nêu được phản ứng.
-    expect(tinhHeSoTuongKhac('kiem', 'axit').banChung).toContain('→')
-    expect(tinhHeSoTuongKhac('khi', 'hoa').banChung.length).toBeGreaterThan(20)
-  })
-
-  it('bị khắc thì yếu đi, cùng hệ thì hoà, không quan hệ thì trung tính', () => {
-    expect(tinhHeSoTuongKhac('hoa', 'khi').heSo).toBe(0.7)
-    expect(tinhHeSoTuongKhac('hoa', 'hoa').heSo).toBe(1.0)
-    // Acid và hoả không còn khắc nhau — trung tính, và nói thẳng là không có.
-    expect(tinhHeSoTuongKhac('axit', 'hoa').heSo).toBe(1.0)
-    expect(tinhHeSoTuongKhac('axit', 'hoa').banChung).toBe('')
-  })
-
-  it('component có THỰC SỰ gọi tương khắc', () => {
-    const s = MA_COMPONENT()
-    expect(s.includes('tinhHeSoTuongKhac(')).toBe(true)
-    // và sát thương không còn cắm cứng
-    expect(s.includes('const satThuong = 45')).toBe(false)
-    expect(s.includes('const satThuongBoss = 30')).toBe(false)
   })
 })

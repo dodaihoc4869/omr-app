@@ -42,7 +42,8 @@ describe('.btn-google-primary: chữ đạt 4,5:1 ở cả nền sáng lẫn n�
 describe('nút tự đặt nền khác (!bg-*) KHÔNG bị đổi chữ (game, cổng học sinh)', () => {
   it('mọi nơi dùng `btn-google-primary` cùng `!bg-` đều nằm ngoài luật (bộ chọn :not([class*="!bg-"]))', () => {
     const c = (p: string) => doc(p)
-    const dong = [...c('src/screens/StudentPortalScreen.tsx').matchAll(/className="[^"]*btn-google-primary[^"]*"/g), ...c('src/components/ThanThuHoaHocGame.tsx').matchAll(/className="[^"]*btn-google-primary[^"]*"/g)].map((m) => m[0])
+    // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): bỏ nguồn ThanThuHoaHocGame.tsx (game Thần thú v1, đã xoá); cổng học sinh một mình vẫn đủ 6 nút nền riêng — ngưỡng ≥ 6 giữ NGUYÊN.
+    const dong = [...c('src/screens/StudentPortalScreen.tsx').matchAll(/className="[^"]*btn-google-primary[^"]*"/g)].map((m) => m[0])
     const rieng = dong.filter((d) => d.includes('!bg-'))
     expect(rieng.length).toBeGreaterThanOrEqual(6) // rose ×3, purple ×2, amber, emerald… : còn giữ nền riêng
     for (const d of rieng) expect(d.includes("!bg-")).toBe(true)

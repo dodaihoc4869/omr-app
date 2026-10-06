@@ -1,0 +1,37 @@
+# MỌI CHIẾN DỊCH CỦA EM CÓ CHIẾN DỊCH "AMINE" ĐÃ HUỶ (CHỈ ĐỌC, chỉ in SỐ ĐẾM + mã tờ đề) — thầy 06/10: "Tôi hủy một chiến dịch amine. Nhưng học sinh vẫn làm câu của chiến dịch".
+# Đọc D1 thật (scripts/kiem-chien-dich-cua-em-0610.sql): em ấy còn chiến dịch nào khác (chưa huỷ) và đã làm bao nhiêu câu của từng chiến dịch. KHÔNG in tên chiến dịch / mã em / mã câu: repo công khai.
+# Bấm tay (workflow_dispatch) hoặc tự chạy khi đẩy nhánh có sửa hai tệp này.
+name: Mọi chiến dịch của em có chiến dịch amine đã huỷ (chỉ đọc, chỉ đếm)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/kiem-chien-dich-cua-em-0610.yml', 'scripts/kiem-chien-dich-cua-em-0610.sql']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: kiem-chien-dich-cua-em-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tệp SQL chỉ có SELECT
+        run: |
+          if grep -v '^\s*--' scripts/kiem-chien-dich-cua-em-0610.sql | grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|TRUNCATE|PRAGMA)\b'; then echo "Tệp có lệnh không chỉ-đọc — dừng."; exit 1; fi
+          echo "OK: chỉ SELECT"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chạy câu đọc tương đương trên D1 thật (chỉ đọc)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          SQL=$(grep -v '^\s*--' ../scripts/kiem-chien-dich-cua-em-0610.sql | tr '\n' ' ')
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$SQL"
