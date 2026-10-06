@@ -5,6 +5,7 @@
 import type { Env } from './kieu'
 import { chanKhacKhoiLop } from './chan-khac-khoi'
 import { noiDungCauChienDich } from './noi-dung-cau-chien-dich'
+import { thuHoiKhiHuy } from './thu-hoi-chien-dich'
 import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -395,7 +396,10 @@ async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy
   const r = await env.DB.prepare('UPDATE chien_dich SET trang_thai = ?, dong_luc = ? WHERE id = ?').bind(trangThai, new Date(nowMs).toISOString(), id).run()
   xoaDemChienDich()
   if (!r.meta.changes) throw new Error('Không tìm thấy chiến dịch.')
-  return { ok: true }
+  if (trangThai !== 'da_huy') return { ok: true }
+  // HUỶ ⇒ THU HỒI HẾT phần đã phân (thầy 06/10, thu-hoi-chien-dich.ts): nợ do chiến dịch sinh ra không quay lại (đọc ở `docHoSo2`), lượt game em đang mở bỏ câu của chiến dịch, bài tick gắn chiến dịch nhả dấu.
+  // Kết thúc (`dong`) KHÔNG đổi: nợ của chiến dịch vẫn theo em.
+  return { ok: true, thuHoi: await thuHoiKhiHuy(env, id, nowMs) }
 }
 
 // ---------------------------------------------------------------- bảng chiến dịch

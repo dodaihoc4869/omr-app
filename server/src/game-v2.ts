@@ -15,6 +15,7 @@ import {gameIdentity,parentPass} from './game-v2-auth'
 import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
 import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
 import {chanKhacKhoiEm} from './chan-khac-khoi'
+import {qidThuHoiTrongLuot} from './thu-hoi-chien-dich'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
@@ -50,7 +51,7 @@ import {LENH_BIA,biaAction,batDauBiaChoSanh,docCoBia} from './bi-a'
 import {expMotCau,expMotCauGame} from './exp-hoc-tap'
 export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number;ngayNghi?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4;/** Luật v5: EXP tràn hôm nay + luỹ kế. */tranV5?:TranV5;/** Dấu vết trước khi sang v5 (để lùi). */truocV5?:TruocV5}
 type Row={revision:number;json:string}
-type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:({qid:string;maDe:string;version:string;group:string;novel:boolean;role?:string}&LamLaiRef)[];created:number;/** Game Hóa 2.0 / Bi-a / OMNI 3 (vé thử thách, Trạm hồi phục) — chỉ đọc ở `answer`. */hoa2?:number;bia?:number;ve?:number;tram?:number}
+type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:({qid:string;maDe:string;version:string;group:string;novel:boolean;role?:string}&LamLaiRef)[];created:number;/** Game Hóa 2.0 / Bi-a / OMNI 3 (vé thử thách, Trạm hồi phục) — chỉ đọc ở `answer`. */hoa2?:number;bia?:number;ve?:number;tram?:number;/** Huỷ chiến dịch (thầy 06/10, thu-hoi-chien-dich.ts): ISO lúc huỷ SỚM NHẤT ảnh hưởng lượt này — chỉ có khi lượt chứa câu của chiến dịch bị huỷ. */thuHoiLuc?:string}
 const now=()=>new Date().toISOString()
 /** Lỗi hết trần câu trong ngày, mang mã `het_tran` để màn game hiện lời cạnh nút và nút Về đảo (index.ts đưa `ma` vào phản hồi). */
 const hetTran=(n:number)=>Object.assign(new Error(`Em đã hoàn thành ${n} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`),{ma:'het_tran'})
@@ -541,6 +542,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
     // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
     const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
+    for(const q of await qidThuHoiTrongLuot(env,sbd,session))tuLuan.add(q) // THU HỒI KHI HUỶ (06/10): câu của chiến dịch đã huỷ không trả lại cho em làm nốt (lượt không cờ ⇒ rỗng, không truy vấn)
     // 29/09: câu THẬT SỰ đổi đề/đáp án (hoặc bị rút) giữa lượt ⇒ BỎ câu ấy khỏi lượt trả về như câu tự luận (em làm nốt các câu còn lại, `complete` cũng không đòi) — em không kẹt.
     for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(!q||laCauTuLuan(q))continue;if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(apXaoTheoRef(q,ref)))} // 05/10: bản xáo phát lại y hệt lúc phát
     if(!qs.length)return {ok:true,questions:[]}
@@ -556,6 +558,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(session.doan&&!laGoiNoiBoDoan(b))throw new Error('Câu này thuộc chặng Đoàn Hộ Tống. Em trả lời ngay trong trận nhé.')
     if(Date.now()-session.created>2*3600000)throw new Error('Lượt học đã hết hạn. Em mở lượt mới.')
     const ref=session.questions.find(q=>q.qid===qid);if(!ref)throw new Error('Câu không thuộc lượt học.')
+    // THU HỒI KHI HUỶ (thầy 06/10, thu-hoi-chien-dich.ts): lượt có cờ `thuHoiLuc` mà câu này thuộc chiến dịch ĐÃ HUỶ ⇒ đóng như câu rút khỏi kho (`cau_doi`: máy em tự sang câu kế, không tính sai). Lượt không cờ: không thêm truy vấn.
+    if(session.thuHoiLuc&&(await qidThuHoiTrongLuot(env,sbd,{thuHoiLuc:session.thuHoiLuc,questions:[ref]})).has(qid))throw loiCauDoi()
     // GAME HÓA 2.0: câu thứ 41 trở đi trong ngày (Huyết Chiến) không rơi vật phẩm. v5 (thầy chốt 29/09, điểm 5): Huyết Chiến VẪN có EXP (bỏ trần EXP theo ngày).
     const hoa2=(session as {hoa2?:number}).hoa2===1
     // OMNI 3 (làn B3): cờ hỏi SONG SONG với câu — chỉ phiên Hoá 2.0 Đảo/Đoàn (không Bi-a). Cờ tắt ⇒ mọi thứ dưới đây y hệt hôm nay.
@@ -688,6 +692,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const done=r.results.map(x=>JSON.parse(x.json) as {attempt:Attempt})
     // CẤM RÚT TỰ LUẬN (21/09): câu tự luận còn sót trong lượt cũ không được đòi em làm; chỉ đếm các câu rút được.
     const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await truoc.khoi,truoc.cauPhien)
+    for(const q of await qidThuHoiTrongLuot(env,sbd,session))tuLuan.add(q) // THU HỒI KHI HUỶ (06/10): câu của chiến dịch đã huỷ (máy em đã bỏ qua) không bị đòi
     // 29/09: câu chưa làm mà nay đã đổi đề/đáp án hoặc bị rút (máy em đã tự bỏ qua) cũng không bị đòi — chỉ tra khi còn thiếu, nên lượt đủ câu không tốn thêm truy vấn.
     const daLam=new Set(done.map(x=>x.attempt.qid))
     for(const ref of session.questions)if(!tuLuan.has(ref.qid)&&!daLam.has(ref.qid)&&!await docCauTheoRef(env,ref))tuLuan.add(ref.qid)

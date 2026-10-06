@@ -4,7 +4,7 @@
 // Số liệu lớp lấy từ `danh-sach` có `thongKe` (máy chủ cũ không gửi ⇒ ô số hiện "—"). "Xem bảng" / "Mở buổi chữa" mở đúng chiến dịch ở Chữa trên lớp.
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
-import { danhSachThongKe, doiRaiDeu, dongChienDich, huyChienDich, type ChienDichTom } from './api'
+import { danhSachThongKe, doiRaiDeu, dongChienDich, huyChienDich, loiBaoDaHuy, type ChienDichTom, type KetQuaThuHoi } from './api'
 import { KHOA_CHON_CHIEN_DICH } from './LenBangChienDich'
 import { hienNgay, phanTram } from './ngay'
 import SuaChienDich from './SuaChienDich'
@@ -87,7 +87,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
       viec === 'huy'
         ? {
             tieuDe: 'Huỷ chiến dịch?',
-            noiDung: `"${c.ten}" sẽ dừng hẳn: học sinh không nhận câu của chiến dịch này nữa.`,
+            noiDung: `"${c.ten}" sẽ dừng hẳn: học sinh không nhận câu của chiến dịch này nữa — câu chưa làm được thu hồi ngay, kể cả lượt em đang mở. Kết quả đã làm vẫn giữ.`,
             nhanDongY: 'Huỷ chiến dịch',
             nhanKhong: 'Giữ lại',
             nguyHiem: true,
@@ -107,7 +107,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
       showToast(r.chu, 'warn')
       return
     }
-    showToast(viec === 'huy' ? 'Đã huỷ chiến dịch' : 'Đã kết thúc chiến dịch', 'success')
+    showToast(viec === 'huy' ? loiBaoDaHuy((r.du as { thuHoi?: KetQuaThuHoi }).thuHoi) : 'Đã kết thúc chiến dịch', 'success')
     void tai()
   }
 
