@@ -67,7 +67,14 @@ export async function docKhoiCacEmCong(env: Env, sbds: readonly string[]): Promi
   const doc = (cot: string) => env.DB.prepare(`SELECT sbd, ${cot} FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(ds)).all<Row>().then((r) => r.results ?? [])
   const rows = await doc('lop, ten_lop').catch(() => doc('lop')).catch(() => [] as Row[])
   for (const r of rows) ra.set(str(r.sbd), khoiCuaEm({ lop: r.lop, tenLop: r.ten_lop }))
+  // 06/10 (thầy: "em khối 10 rút câu khối 11 — triệt để 100%"): lớp trống/không đọc ra khối ⇒ lấy khối từ SBD 5 chữ số (10xxx/11xxx/12xxx — mọi em thật đều theo quy ước này).
+  for (const s of ds) if (!ra.get(s)) { const k = khoiTuSbd(s); if (k) ra.set(s, k) }
   return ra
+}
+/** Khối theo quy ước SBD của trung tâm: 5 chữ số bắt đầu 10/11/12. Không khớp ⇒ null. */
+export function khoiTuSbd(sbd: string): Khoi | null {
+  const m = /^(10|11|12)\d{3}$/.exec(sbd.trim())
+  return m ? (Number(m[1]) as Khoi) : null
 }
 export async function docKhoiEmCong(env: Env, sbd: string): Promise<Khoi | null> {
   return (await docKhoiCacEmCong(env, [sbd])).get(sbd) ?? null
