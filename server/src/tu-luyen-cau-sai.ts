@@ -271,8 +271,9 @@ async function docLanSai(env: Env, sbd: string): Promise<LanSai[]> {
     FROM su_kien_hoc s
     LEFT JOIN ca c ON s.nguon = 'thi' AND c.ma_ca = s.ma_nguon
     LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
-    WHERE s.sbd = ? AND s.ngay_vn >= ? AND s.luc >= ? AND s.nguon IN ('thi', 'game', 'luyen') AND COALESCE(s.qid, '') <> ''
+    WHERE s.sbd = ? AND s.ngay_vn >= ? AND s.luc >= ? AND s.nguon IN ('thi', 'game', 'luyen') AND COALESCE(s.qid, '') <> '' AND s.qid NOT LIKE 'nen:%'
       AND ((s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1) OR (s.nguon IN ('game', 'luyen') AND s.ket_qua = 0))`
+  // 06/10: `qid NOT LIKE 'nen:%'` — câu CHẨN ĐOÁN bước sai trong chuyến (chan-doan-buoc-sai.ts, qid `nen:…`, không có trong kho) không vào kho câu sai của Tu luyện.
   // Hai nguồn đọc SONG SONG (một đợt D1).
   const [r, tl] = await Promise.all([
     env.DB.prepare(sql(true)).bind(sbd, MOC_CAU_SAI_NGAY, MOC_CAU_SAI_ISO).all<Row>()

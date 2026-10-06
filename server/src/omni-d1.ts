@@ -23,7 +23,8 @@ import { xetChungChi } from './omni-chung-chi'
 import { dangDaVung } from './omni-ke-hoach'
 import { xetMetGio } from './omni-met-gio'
 import { canThanTu } from './omni-can-than'
-import { goiYQ, qMacDinh, vknMacDinh } from './omni-q'
+import { goiYQ, qMacDinh, vknMacDinh, vknNen } from './omni-q'
+import { nhanQidChanDoan } from './lam-lai-so'
 import { betaTuMau, msKyVong } from './omni-toc-do'
 import { lopCuaEm, phamViCuaEm, type PhamViLop } from './bai-da-day'
 import { cheDo2, chuaBatDau, dauNgayVn, docChienDichCuaEm, docChienDichKemBatDau, docCoHoa2, docHoSo2, docKeHoachDaChot, docQuyetMetGio, ngayVnCua, qidGoc, type ChienDich, type CoHoa2, type HoSo2 } from './srs2-d1'
@@ -346,7 +347,10 @@ async function qTuKho(env: Env, qids: readonly string[], kho: ReadonlyMap<string
     const chuyenDe = c ? c.chuyenDe : chuyenDeCua(maDang, h?.chuyenDe)
     const d = dong.get(q)
     let qc: QCau
-    if (d && d.thay.size) qc = qTuDongQ(q, phan, maDang, mucDo, d.thay, 'thay', chuyenDe)
+    // 06/10 (chan-doan-buoc-sai.ts): câu CHẨN ĐOÁN sinh bằng mã `nen:sinh.<nhãn>.<số>` kiểm ĐÚNG MỘT vi kỹ năng `nen:<nhãn>` ⇒ quan sát của nó cập nhật P của bước ấy.
+    const nhanCd = nhanQidChanDoan(q)
+    if (nhanCd) qc = { qid: q, phan, maDang, mucDo, vkn: [vknNen(nhanCd)], nguon: 'mac_dinh' }
+    else if (d && d.thay.size) qc = qTuDongQ(q, phan, maDang, mucDo, d.thay, 'thay', chuyenDe)
     else if (d && d.goiY.size) qc = qTuDongQ(q, phan, maDang, mucDo, d.goiY, 'goi_y', chuyenDe)
     else if (c) qc = goiYQ({ qid: q, phan, maDang, mucDo, chuyenDe, kienThuc: c.kienThuc, ...(c.kienThucY ? { kienThucY: c.kienThucY } : {}), ...(nhanNen.get(q) ? { nhanNen: nhanNen.get(q) } : {}) }, (maDang && vknDang.get(maDang)) || [], TEN_NEN)
     else qc = qMacDinh(q, phan, maDang, mucDo, chuyenDe)

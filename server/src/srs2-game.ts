@@ -4,6 +4,7 @@
 // đúng kế hoạch ngày đã chốt (`layKeHoachHomNay`). Đảo khoá khi còn câu ôn hôm nay ở Đoàn.
 import { phuNeuCan } from './hang-chua-loi'
 import { apLamLaiKhac, batDauLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
+import { batDauChanDoan } from './chan-doan-buoc-sai'
 import { refLamLai, type LamLaiRef } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
 import type { Env } from './kieu'
@@ -81,6 +82,8 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   // Tối ưu 05/10: phần ĐỌC của thang làm lại (công tắc, phạm vi + bối cảnh, chỉ mục câu cùng dạng) chạy CÙNG đợt nạp câu khi lượt có câu chắc cần
   // câu anh em (cau-anh-em.ts `batDauLamLaiKhac`) — trước: 4–5 đợt nối tiếp sau khi nạp xong. `apLamLaiKhac` quyết y hệt.
   const lamLaiSom = lamLai ? batDauLamLaiKhac(env, hs, luot.map((x) => x.qid), lamLai, chan) : undefined
+  // 06/10 (1): dữ liệu CHẨN ĐOÁN BƯỚC SAI (ma trận Q, P, bước em tự khai, ý Đ–S) đọc CÙNG đợt nạp câu — chỉ khi nơi gọi bật và lượt có câu lỗi đủ điều kiện (chan-doan-buoc-sai.ts).
+  const chanDoanSom = lamLai?.chanDoan ? batDauChanDoan(env, hs, luot.map((x) => x.qid), lamLai.sbd, lamLai.nowMs) : undefined
   const day = await napCau(env, hs, luot.map((x) => x.qid), luot.length, chan, boQua)
   const theo = new Map(day.map((x) => [x.q.qid, x]))
   const xep = danXenLuot(luot.filter((x) => theo.has(x.qid)), suc, { trumKho: trumKho && theo.size === co })
@@ -88,7 +91,7 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   const ds = xep.map((x) => { const c = theo.get(x.qid)!; return { ...c, q: phuNeuCan(c.q, hs.songSinhCho, hs.boTro) } })
   // 05/10 thang làm lại (cau-anh-em.ts): câu lỗi trong cửa sổ lỗi mà vẫn ra nguyên văn ⇒ song sinh bản kế / câu anh em cùng dạng / bản xáo / nguyên văn (đếm).
   // Câu anh em cũng tránh `chan` của lượt. Không `lamLai` (hoặc khoá `lam_lai_khac` tắt) ⇒ y hệt hôm nay.
-  return lamLai ? apLamLaiKhac(env, hs, ds, lamLai, chan, lamLaiSom) : ds
+  return lamLai ? apLamLaiKhac(env, hs, ds, lamLai, chan, lamLaiSom, chanDoanSom ?? (lamLai.chanDoan ? Promise.resolve(null) : undefined)) : ds
 }
 /** Sức em (hạng chung) cho đan xen; lỗi đọc ⇒ trung bình. */
 export async function sucEmHomNay(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: Promise<Map<string, HoSoDangTho[]>>): Promise<SucEm> {
@@ -298,7 +301,8 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const chan = new Set([...chanCa, ...giuBia])
   const boQua = boQuaMoi()
   const nhanSom = batDauNhanNo(env, sbd, hs)
-  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua, { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan] }, nhanSom.khiCoLuot), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
+  // 06/10 (1): bật chẩn đoán bước sai cho chuyến Đảo (không chèn vào ải Trùm — câu cuối khi chuyến đủ SO_CAU_CHUYEN ải).
+  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua, { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan], chanDoan: { boCuoiKhiDu: SO_CAU_CHUYEN } }, nhanSom.khiCoLuot), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
     const lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
     if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.`, ...tomTat }
@@ -356,7 +360,7 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   for (const q of chanBia) chan.add(q)
   const boQua = boQuaMoi()
   const nhanSom = batDauNhanNo(env, sbd, hs)
-  const lamLai: BoiCanhLamLai = { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan] }
+  const lamLai: BoiCanhLamLai = { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan], chanDoan: {} } // 06/10 (1): chẩn đoán bước sai cũng ở chặng Đoàn (Đoàn không có ải Trùm trong câu riêng)
   let chon = await napLuot(env, hs, kh.conDoan, chan, suc, SO_CAU_CHANG, false, boQua, lamLai, nhanSom.khiCoLuot)
   if (!chon.length) { const lai = new Set(chanCa); for (const q of chanBia) lai.add(q); chon = await napLuot(env, hs, kh.conDoan, lai, suc, SO_CAU_CHANG, false, boQua, lamLai, nhanSom.khiCoLuot) } // phiên cũ bỏ dở: phát lại
   chon = await chanKhacKhoiEm(env, 'doan2', { sbd, meta: hs.meta }, chon, { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em

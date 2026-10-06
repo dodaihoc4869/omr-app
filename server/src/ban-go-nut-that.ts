@@ -22,7 +22,7 @@ import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { ngayVn } from './su-kien-hoc'
-import { MUC_DICH_LUOT } from './omni-kieu'
+import { MUC_DICH_CHAN_DOAN, MUC_DICH_LUOT } from './omni-kieu'
 import { cauTrongGoi, chuHtml, deHtml, type CauKho } from '../../src/lib/loi-giai-kiem'
 
 type Obj = Record<string, unknown>
@@ -111,6 +111,8 @@ async function docSo(env: Env, cap: readonly { sbd: string; goc: string }[]): Pr
   const tham = [JSON.stringify(sbds), JSON.stringify(qids), TU_NGAY]
   const rows = (await hoiAnToan(env, sqlMoi, ...tham, JSON.stringify(gocs))) ?? (await hoiAnToan(env, sqlCu, ...tham)) ?? []
   for (const x of rows) {
+    // 06/10: dòng CÂU CHẨN ĐOÁN bước sai (chan-doan-buoc-sai.ts — purpose 'chan_doan', tc = câu lỗi) không phải một lần làm của câu lỗi.
+    if (str(x.purpose) === MUC_DICH_CHAN_DOAN) continue
     const t = tachSongSinh(str(x.qid))
     const nguon = str(x.nguon)
     const kq = x.ket_qua === null || x.ket_qua === undefined ? null : num(x.ket_qua) === 1 ? 1 : 0

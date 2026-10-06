@@ -22,7 +22,7 @@ import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
 import { apLamLaiKhac, canBanKhac, lamLaiKhacBat } from './cau-anh-em'
-import { apXaoTheoRef, laYdMoi, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
+import { apXaoTheoRef, laQidChanDoan, laYdMoi, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { HANG_MUC_DO } from './srs2-loi'
 import { chuaBatDau, docChienDichCuaEm, docHangEm, docMetaCau, doiThuTuMetGio, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
@@ -222,7 +222,7 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
     const knCau = qc ? [...new Set(qc.vkn)] : []
     const knMoi = qc ? [...new Set([...qc.vkn, ...(qc.vknY ?? []).flat()])] : []
     const chacMaSai = !dv.dung && !luot && tuTin === 'chac' && !!hs && knMoi.length > 0 && knMoi.every((k) => pCua(k) >= TS.P_VUNG_DO_SO_Y)
-    const dang = hs && qc && dv.cau.dang && knCau.length ? dangSauLuot(hs, qc, knCau, dv, luot, tuTin) : null
+    const dang = hs && qc && dv.cau.dang && knCau.length && !laQidChanDoan(dv.cau.qid) ? dangSauLuot(hs, qc, knCau, dv, luot, tuTin) : null // 06/10: câu chẩn đoán không hiện "P dạng"
     let tram: TramHoiPhuc | null = null
     if (!dv.dung && !luot && !dv.hoTro && phienMoTram(dv.phien) && !dv.phien.tram) {
       const truoc = await dv.doc.luotPhien
@@ -236,7 +236,8 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
         : dv.dung && tuTin === 'chua_chac' ? CHU_DUNG_CHUA_CHAC
           : chacMaSai ? CHU_CHAC_MA_SAI : null
     // CẨN THẬN (omni-can-than.ts): hồ sơ TRƯỚC lượt này có Sơ ý > ngưỡng ⇒ `canThan` (+ thẻ "Sai vì bước nào?" khi chắc-mà-sai); không ⇒ không thêm trường nào.
-    const canThan = await phanCanThanChoTraLoi({ canThan: canThanTu(true, hs), chacMaSai, vkn: knMoi, tenVkn: (ids) => vknTheoId(env, ids) })
+    // 06/10: câu CHẨN ĐOÁN bước sai tự là phép kiểm một bước (làm sai đã ghi bước sai cho câu lỗi) ⇒ không hiện thêm thẻ "Sai vì bước nào?".
+    const canThan = await phanCanThanChoTraLoi({ canThan: canThanTu(true, hs), chacMaSai: chacMaSai && !laQidChanDoan(dv.cau.qid), vkn: knMoi, tenVkn: (ids) => vknTheoId(env, ids) })
     const omni: KetQuaOmniTraLoi = { nhanTocDo: nhan, msLam, msKyVong: Math.round(kyVong), luot, chacMaSai, ...(tram ? { tram } : {}), ...(dang ? { dang } : {}), loiNhan, ...canThan }
     const so: SoOmni = {
       luot,

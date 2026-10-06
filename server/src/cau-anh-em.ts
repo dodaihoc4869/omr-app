@@ -42,6 +42,7 @@ import { docCauNghiDem, docKhoiEmCong, khoiDaLocCua } from './chan-khac-khoi'
 import { readGameScope } from './game-v2-reports'
 import { laCauTuLuan } from './cam-tu-luan'
 import { apXaoTheoRef, dungKhoi, khoiCanCo, laCuaSoLoi, xaoCau, type LamLaiRef } from './lam-lai-so'
+import { batDauChanDoan, chonChanDoanTrongLuot, type DuLieuChanDoan } from './chan-doan-buoc-sai'
 
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
@@ -62,8 +63,12 @@ export async function lamLaiKhacBat(env: Env): Promise<boolean> {
 
 // ---------------------------------------------------------------- kiểu
 export interface CauLuot { q: PrivateQuestion; m: MetaCau; lamLai?: LamLaiRef }
-/** Bối cảnh một lượt (chuyến Đảo / chặng Đoàn): em, lúc, các khoá của kế hoạch hôm nay (câu anh em không được trùng câu sẽ phát). */
-export interface BoiCanhLamLai { sbd: string; nowMs: number; keHoach?: readonly string[] }
+/**
+ * Bối cảnh một lượt (chuyến Đảo / chặng Đoàn): em, lúc, các khoá của kế hoạch hôm nay (câu anh em không được trùng câu sẽ phát).
+ * `chanDoan` (06/10, chan-doan-buoc-sai.ts — CHỈ kế hoạch ngày Đảo / Đoàn truyền): bật CHẨN ĐOÁN BƯỚC SAI trước lượt làm lại đầu tiên của câu lỗi; `boCuoiKhiDu` = số câu
+ * của chuyến đủ (Đảo 6) ⇒ câu cuối là ải Trùm, không chèn. Vắng (Bi-a, Tu luyện, Trạm, vé) ⇒ không chẩn đoán — y hệt hôm nay.
+ */
+export interface BoiCanhLamLai { sbd: string; nowMs: number; keHoach?: readonly string[]; chanDoan?: { boCuoiKhiDu?: number } }
 
 /** Q đang trong cửa sổ lỗi ⇒ lượt làm lại phải là BẢN KHÁC (không nguyên văn nếu còn bậc 1–3). */
 export function canBanKhac(hs: Pick<HoSo2, 'loiV2'>, qid: string): boolean {
@@ -82,9 +87,17 @@ async function docLopTo(env: Env, maDe: readonly string[]): Promise<Map<string, 
  * `chan`: câu/nhóm bị chặn ở lượt này (ca thi, Bi-a đang giữ, đang phát ở phiên khác) — câu anh em cũng tránh. Công tắc tắt ⇒ trả y nguyên (đường hôm
  * nay). Lỗi đọc khi chọn câu anh em ⇒ rơi xuống bậc 3/4 cho câu ấy (không làm hỏng lượt).
  */
-export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: PrivateQuestion; m: MetaCau }[], bc: BoiCanhLamLai, chan: ReadonlySet<string> = new Set(), som?: DocSomLamLai): Promise<CauLuot[]> {
-  const can = new Set(ds.filter((x) => tachSongSinh(x.q.qid).songSinh === null && canBanKhac(hs, x.q.qid)))
-  if (!can.size || !(await (som?.bat ?? lamLaiKhacBat(env)))) return [...ds]
+export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: PrivateQuestion; m: MetaCau }[], bc: BoiCanhLamLai, chan: ReadonlySet<string> = new Set(), som?: DocSomLamLai, cdSom?: Promise<DuLieuChanDoan | null>): Promise<CauLuot[]> {
+  const can0 = new Set(ds.filter((x) => tachSongSinh(x.q.qid).songSinh === null && canBanKhac(hs, x.q.qid)))
+  // 06/10 (1) CHẨN ĐOÁN BƯỚC SAI (chan-doan-buoc-sai.ts, chỉ khi nơi gọi bật `bc.chanDoan`): lượt làm lại ĐẦU TIÊN của câu lỗi trong cửa sổ lỗi ⇒ THAY bằng một câu chẩn đoán
+  // (cùng chỗ trong lượt — không thêm câu). Dữ liệu đọc sớm cùng đợt nạp câu (`cdSom`, srs2-game `napLuot`); không có câu ứng viên / OMNI tắt ⇒ không đọc gì.
+  const cdP = bc.chanDoan ? (cdSom ?? batDauChanDoan(env, hs, ds.map((x) => tachSongSinh(x.q.qid).goc), bc.sbd, bc.nowMs)) : undefined
+  if (!can0.size && !cdP) return [...ds]
+  const [bat, du] = await Promise.all([can0.size ? (som?.bat ?? lamLaiKhacBat(env)) : Promise.resolve(false), cdP ?? Promise.resolve(null)])
+  const chanDoan = du ? chonChanDoanTrongLuot(du, ds, hs, bc.sbd, bc.chanDoan?.boCuoiKhiDu) : new Map<number, CauLuot>()
+  if (!chanDoan.size && (!can0.size || !bat)) return [...ds]
+  // Câu đã nhận câu chẩn đoán KHÔNG đi thang ở lượt này (lượt làm lại dời sang lần phát kế); khoá `lam_lai_khac` tắt ⇒ thang không chạy cho câu nào.
+  const can = new Set(bat ? [...can0].filter((x) => !chanDoan.has(ds.indexOf(x))) : [])
   const ngay = ngayVnCua(bc.nowMs)
   let chung: Promise<ChungAnhEm> | null = null // phạm vi + bối cảnh đọc MỘT lần cho cả lượt, và chỉ khi có câu cần
   const daDung = new Set(ds.map((x) => tachSongSinh(x.q.qid).goc)), nhomDung = new Set(ds.map((x) => x.m.group))
@@ -100,7 +113,9 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
     } catch (e) { console.error('[cau-anh-em] không chọn được bản khác bằng mã / ý Đ–S mới (rơi xuống bậc 2):', e instanceof Error ? e.message : e) }
   }
   const ra: CauLuot[] = []
-  for (const x of ds) {
+  for (const [i, x] of ds.entries()) {
+    const cd = chanDoan.get(i)
+    if (cd) { ra.push(cd); continue }
     if (!can.has(x)) { ra.push(x); continue }
     // Bậc 1: lượt luật 02/10 để câu gốc nguyên văn (chờ kiểm, đã đúng song sinh) ⇒ vẫn song sinh, bản kế. Phần II / song sinh thiếu dữ kiện ⇒ không phủ.
     const ss = phuNeuCan(x.q, hs.songSinhLamLai, hs.boTro)

@@ -30,7 +30,7 @@ import { docCauTuJson, jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import type { PhamViLop } from './bai-da-day'
 import type { ThuMuc } from './kho-thu-muc'
 import { dangDaVung, theLucCho, tiLeOnBaiCu, trongSoCacCau } from './omni-ke-hoach'
-import { KHOA_THE_LUC_LOP, SQL_LA_LAN_LAM, THAM_SO_OMNI, type QCau } from './omni-kieu'
+import { KHOA_THE_LUC_LOP, MUC_DICH_CHAN_DOAN, SQL_LA_LAN_LAM, SQL_LA_LAN_LAM_GIU_CHAN_DOAN, THAM_SO_OMNI, type QCau } from './omni-kieu'
 // Mô-đun các làn khác (omni-d1, bai-da-day, kho-thu-muc, srs2-gv) nạp LƯỜI bằng import động: chúng import ngược srs2-d1 (srs2-gv → bi-a → srs2-game →
 // omni-game → srs2-d1) — import tĩnh tạo vòng khiến `vi.mock(..., importOriginal)` của test làn khác nhận nhầm bản gốc; cờ tắt cũng không nạp gì thêm.
 const lanOmniD1 = () => import('./omni-d1')
@@ -355,9 +355,11 @@ export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map
 /**
  * Phần ĐỌC KÈM của `docLanLam` (06/10, chỉ-thêm): CHỈ nơi truyền vào mới nhận; mọi nơi khác nhận đúng `LanLam[]` như cũ (không đổi hình lần làm).
  * `songSinh`: (2b) từng lần em làm BẢN song sinh của câu gốc — chỗ `~ss<i>` + lúc — để xoay vòng "bản lâu chưa phục vụ nhất" (`chonBanSongSinh`).
+ * `chanDoan`: (1) mốc (lúc) em làm CÂU CHẨN ĐOÁN thay chỗ lượt làm lại của câu gốc (dòng purpose 'chan_doan', `raw_json.tc` = gốc) — để biết câu lỗi đã được chẩn
+ * đoán trong cửa sổ lỗi hiện tại chưa (chan-doan-buoc-sai.ts). Dòng ấy KHÔNG BAO GIỜ vào `LanLam[]` (không phải một lần làm của câu gốc).
  */
-export interface BenLanLam { songSinh: Map<string, { i: number; luc: string }[]> }
-export const benLanLamMoi = (): BenLanLam => ({ songSinh: new Map() })
+export interface BenLanLam { songSinh: Map<string, { i: number; luc: string }[]>; chanDoan: Map<string, string[]> }
+export const benLanLamMoi = (): BenLanLam => ({ songSinh: new Map(), chanDoan: new Map() })
 
 /** Lần làm của em với các câu (mọi nguồn). Bỏ sự kiện CHE (ca chưa công bố); bỏ trống tính là sai; `assistance='assisted'` ⇒ có gợi ý. */
 export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = '', ben?: BenLanLam): Promise<LanLam[]> {
@@ -368,8 +370,9 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
   const ds = JSON.stringify(goc.flatMap(cacQidSongSinh)), dsGoc = JSON.stringify(goc)
   let rows: Row[]
   try {
-    // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT (`SQL_LA_LAN_LAM`) — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
-    rows = (await env.DB.prepare(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd = ?1', `luc >= ?4 AND ${SQL_LA_LAN_LAM}`)).bind(sbd, ds, dsGoc, tuLuc).all<Row>()).results ?? []
+    // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
+    // 06/10 (1): GIỮ dòng câu chẩn đoán (purpose 'chan_doan') trong CÙNG truy vấn để tách thành mốc "đã chẩn đoán" (`ben.chanDoan`) — không vào lần làm (`lanLamTuDongTc` bỏ).
+    rows = (await env.DB.prepare(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon, purpose', 'sbd = ?1', `luc >= ?4 AND ${SQL_LA_LAN_LAM_GIU_CHAN_DOAN}`)).bind(sbd, ds, dsGoc, tuLuc).all<Row>()).results ?? []
   } catch {
     rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   }
@@ -377,6 +380,11 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
   const hien = rows.filter((x) => str(x.visibility) !== 'embargoed')
   if (ben) {
     for (const x of hien) {
+      if (x.purpose === MUC_DICH_CHAN_DOAN) {
+        const q = str(x.tc)
+        if (q && tap.has(q)) ben.chanDoan.set(q, [...(ben.chanDoan.get(q) ?? []), str(x.luc)])
+        continue
+      }
       const m = /^(.*)~ss(\d+)$/.exec(str(x.qid))
       if (!m || !tap.has(m[1]!)) continue
       const ds = ben.songSinh.get(m[1]!) ?? []
@@ -458,6 +466,11 @@ export interface HoSo2 {
    * đọc từ các lần làm quy về câu gốc (`LanLam.cauAnhEm`). Chỉ có khoá khi có ít nhất một câu như vậy (chưa làm bản nào ⇒ vắng ⇒ 0) — hồ sơ cũ giữ nguyên khoá.
    */
   banKhacTiep?: Map<string, { bt: number; yd: number }>
+  /**
+   * 06/10 (1, chan-doan-buoc-sai.ts): câu lỗi em ĐÃ làm câu chẩn đoán bước sai SAU lần sai tự làm cuối (tức là trong cửa sổ lỗi hiện tại) ⇒ lượt tới của câu ấy là
+   * lượt làm lại thật (không chẩn đoán lại). Đọc từ dòng purpose 'chan_doan' (`raw_json.tc`) CÙNG truy vấn lần làm. Chỉ có khoá khi khác rỗng (hồ sơ cũ giữ nguyên khoá).
+   */
+  chanDoanXong?: Set<string>
   /** Học liệu bổ trợ (song sinh, câu kiểm, nhãn nền) của các câu lỗi. */
   boTro?: Map<string, BoTro>
   // ------------------------------------------------------------ OMNI 3 (05/10) — CHỈ có khi `omniBat(env, sbd)`; cờ tắt ⇒ không khoá nào dưới đây.
@@ -692,6 +705,13 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     if (!ls) { ls = []; theoQid.set(x.qid, ls) }
     ls.push(x)
   }
+  // 06/10 (1): câu đã được chẩn đoán SAU lần sai tự làm cuối (lượt sai không hỗ trợ — kể cả lượt bản khác) ⇒ cửa sổ lỗi hiện tại đã chẩn đoán xong.
+  const chanDoanXong = new Set<string>()
+  for (const [q, mocCd] of ben.chanDoan) {
+    let saiCuoi = ''
+    for (const x of theoQid.get(q) ?? []) if (!x.dung && !x.coGoiY && x.luc > saiCuoi) saiCuoi = x.luc
+    if (mocCd.some((l) => l > saiCuoi)) chanDoanXong.add(q)
+  }
   { const thayGiao = new Set([...ds.flatMap((c) => c.qids), ...qidSaiCa.keys()]); await chanMetaKhacKhoi(env, 'hoa2_ho_so', await khoiEmP, meta, (q) => thayGiao.has(q)) } // LUẬT THẦY 05/10: câu khác khối em ⇒ như đã rút khỏi kho của RIÊNG em (kế hoạch, Đảo/Đoàn/Bi-a, "Câu đã làm", báo cáo); em chưa rõ khối ⇒ chỉ giữ câu thầy giao trực tiếp (chiến dịch, câu sai ca thầy dựng)
   const thamSoDung = omni && canThanSom ? nhanMocDuyTri(thamSoV2, await canThanSom.catch(() => false)) : thamSoV2 // CẨN THẬN (a): em canThan ⇒ mốc × 0,7
   const tt = new Map<string, TrangThaiCau>()
@@ -755,7 +775,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     ? [...new Set(dsDangChay.flatMap((c) => c.qids))].flatMap((q) => theoQid.get(q) ?? [])
     : dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
   return {
-    chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro, ...(songSinhLamLai.size ? { songSinhLamLai } : {}), ...(banKhacTiep.size ? { banKhacTiep } : {}),
+    chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai, sapBatDau: chienDichSapBatDau(ds, homNay), qidSaiTaiLop, chienDichCuCuaCau, theLucNoCu: theLucChienDichVuaDong(ds, homNay), laMoiBo, qidSaiV2, loiV2, songSinhCho, boTro, ...(songSinhLamLai.size ? { songSinhLamLai } : {}), ...(banKhacTiep.size ? { banKhacTiep } : {}), ...(chanDoanXong.size ? { chanDoanXong } : {}),
     ...(omni ? { chienDichHet: dsDangChay, onBaiCu, omni: { bat: true, cheDoCho: !dangChay && !!phamVi && phamVi.baiDaTick.length > 0, onBaiCuSo: onBaiCu.length }, phamVi: phamVi ?? null } : {}),
   }
 }

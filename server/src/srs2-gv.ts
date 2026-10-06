@@ -127,7 +127,8 @@ export async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readon
   try {
     // 05/10: đọc kèm câu SONG SINH ("<gốc>~ss0..3") và CÂU ANH EM làm thay câu gốc (`raw_json.tc`, lam-lai-so.ts) — như `docLanLam` của em,
     // để Bảng chiến dịch thấy câu đã sửa bằng bản khác. CSDL cũ (thiếu cột) ⇒ truy vấn lùi như trước.
-    rows = (await env.DB.prepare(sqlQidHoacTc('sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon', 'sbd IN (SELECT value FROM json_each(?1))'))
+    // 06/10: đọc kèm `purpose` ⇒ dòng câu CHẨN ĐOÁN (purpose 'chan_doan', tc = câu lỗi) không thành lượt của câu lỗi (`lanLamTuDongTc` bỏ).
+    rows = (await env.DB.prepare(sqlQidHoacTc('sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon, purpose', 'sbd IN (SELECT value FROM json_each(?1))'))
       .bind(JSON.stringify(sbd), JSON.stringify(qids.flatMap(cacQidSongSinh)), JSON.stringify(qids)).all<Row>()).results ?? []
   } catch {
     rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`)

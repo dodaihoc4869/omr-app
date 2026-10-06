@@ -1,6 +1,9 @@
 import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuSongSinhTheoQid } from './song-sinh-game'
+import { laQidChanDoan } from './lam-lai-so'
+/** 06/10: giải mã câu chẩn đoán bước sai — nhập trễ (chan-doan-buoc-sai.ts kéo theo omni-d1 / thang-tu-go: tránh vòng nạp với tệp nền này). */
+const lanChanDoan = () => import('./chan-doan-buoc-sai')
 import {DemTTL} from './dem-chung'
 import {dbGoc} from './cau-hinh-dem'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
@@ -82,6 +85,8 @@ const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_
 /** Câu ĐẦY ĐỦ (bản mới nhất: lời giải mới nhất) theo tham chiếu của lượt (ma_de, qid, version), chỉ khi tờ còn và chỉ mục khớp nguồn.
  *  Chỉ mục lệch (kho vừa ghi, chưa đồng bộ) ⇒ đồng bộ đúng tờ đó rồi tra lại. `null` ⇒ câu thật sự đổi đề/đáp án hoặc tờ đã rút. */
 export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:string;btv?:unknown}):Promise<PrivateQuestion|null>{
+  // 06/10 (1): câu CHẨN ĐOÁN bước sai (qid `nen:…`, không có trong kho) ⇒ sinh lại bằng mã / đọc lại kho ý; nội dung khác lúc phát ⇒ null (câu đổi). Nhập trễ (tránh vòng nạp).
+  if(laQidChanDoan(ref.qid))return (await lanChanDoan()).giaiCauChanDoan(env,ref).catch(()=>null)
   // Vòng học v2 (02/10): qid ảo song sinh "<gốc>~ss0|1" ⇒ câu gốc (cùng mã đề, phiên bản) phủ đề/đáp án song sinh.
   // 06/10 (2c): `btv` của ref = phiên bản bộ sinh biến thể `~bt` lúc phát (vắng ⇒ 1; lạ ⇒ lùi câu gốc — ban-khac-ao.ts).
   const ss=tachSongSinh(ref.qid);if(ss.songSinh!==null){const goc=await docCauTheoRef(env,{maDe:ref.maDe,version:ref.version,qid:ss.goc});return goc?phuSongSinhTheoQid(env,goc,ref.qid,ref.btv):null}
@@ -223,6 +228,13 @@ export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQue
  *  29/09: câu vắng mà tờ của nó đang lệch chỉ mục ⇒ đồng bộ đúng các tờ đó rồi tra lại phần vắng (version tất định nên câu không đổi vẫn khớp). */
 export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;version:string;btv?:unknown}[]):Promise<Map<string,PrivateQuestion>>{
   const theo=new Map<string,PrivateQuestion>();if(!ds.length)return theo
+  // 06/10 (1): tham chiếu câu CHẨN ĐOÁN (qid `nen:…`) giải riêng (chan-doan-buoc-sai.ts — sinh lại / kho ý), phần còn lại nạp như cũ.
+  if(ds.some(q=>laQidChanDoan(q.qid))){
+    const ra=await napDayDuMem(env,ds.filter(q=>!laQidChanDoan(q.qid)))
+    const cd=await lanChanDoan()
+    for(const q of ds)if(laQidChanDoan(q.qid)){const v=await cd.giaiCauChanDoan(env,q).catch(()=>null);if(v)ra.set(`${q.maDe}|${q.qid}|${q.version}`,v)}
+    return ra
+  }
   // Vòng học v2 (02/10): tham chiếu song sinh ⇒ nạp câu gốc cùng lô rồi phủ (khoá Map giữ qid ảo). 06/10 (2c): `btv` = phiên bản bộ sinh của tham chiếu `~bt`.
   const ao=ds.filter(q=>tachSongSinh(q.qid).songSinh!==null)
   if(ao.length){
