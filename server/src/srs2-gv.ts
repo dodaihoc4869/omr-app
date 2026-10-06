@@ -619,10 +619,13 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
   const daGiaiMau = new Map<string, number>()
   const deXuat = chon.map((c) => {
     const cungDang = cd.qids.filter((q) => (meta.get(q)?.tenDang ?? meta.get(q)?.dang ?? 'Chưa gắn dạng') === c.dang)
+    const daChuaDangNay = emDaChua.get(c.dang)
     const giaiMau = [...em].filter((s) => tt.get(s)!.get(c.qid)!.thanhThao)
-      .sort((a, b) => (daGiaiMau.get(a) ?? 0) - (daGiaiMau.get(b) ?? 0) || cungDang.filter((q) => tt.get(b)!.get(q)!.thanhThao).length - cungDang.filter((q) => tt.get(a)!.get(q)!.thanhThao).length)[0] ?? null
+      .sort((a, b) => (daGiaiMau.get(a) ?? 0) - (daGiaiMau.get(b) ?? 0) || cungDang.filter((q) => tt.get(b)!.get(q)!.thanhThao).length - cungDang.filter((q) => tt.get(a)!.get(q)!.thanhThao).length)[0]
+      // Chưa em nào thành thạo câu này: em ĐÃ được thầy chữa dạng này (và không còn trong danh sách cần sửa) đứng ra giải mẫu (thầy 06/10).
+      ?? [...em].filter((s) => daChuaDangNay?.has(s) && !c.emSua.includes(s)).sort((a, b) => (daGiaiMau.get(a) ?? 0) - (daGiaiMau.get(b) ?? 0))[0] ?? null
     if (giaiMau) daGiaiMau.set(giaiMau, (daGiaiMau.get(giaiMau) ?? 0) + 1)
-    return { ...c, giaiMau: giaiMau ? { sbd: giaiMau, ten: ten.get(giaiMau) ?? giaiMau } : null, emSua: c.emSua.map((s) => ({ sbd: s, ten: ten.get(s) ?? s })) }
+    return { ...c, soEmDaChua: daChuaDangNay ? em.filter((s) => daChuaDangNay.has(s)).length : 0, giaiMau: giaiMau ? { sbd: giaiMau, ten: ten.get(giaiMau) ?? giaiMau } : null, emSua: c.emSua.map((s) => ({ sbd: s, ten: ten.get(s) ?? s })) }
   })
   // Dòng buổi chữa KHÔNG mang nội dung câu (06/10): đoạn đính nội dung cũ ở đây chọn cột `phan` không có trong `game_v2_question` nên chưa bao giờ chạy được; nội dung do lệnh `noi-dung-cau` trả
   // khi thầy mở tờ chiếu (đúng mã câu, qua cổng khối) — không làm nặng lệnh này, và máy thầy không còn phải đoán nội dung câu.

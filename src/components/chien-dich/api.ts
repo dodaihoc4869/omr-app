@@ -202,6 +202,8 @@ export interface CauBuoiChua {
   soChuaThanhThao: number
   soCanDayLai: number
   diemChua: number
+  /** Số em có mặt ĐÃ được chữa dạng này ở buổi trước (thầy 06/10). Máy chủ cũ không trả ⇒ vắng. */
+  soEmDaChua?: number
   giaiMau: EmTen | null
   emSua: EmTen[]
 }
