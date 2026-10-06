@@ -21,8 +21,19 @@ export const PHIEN_BAN_OMNI = 'omni3-0510-v1'
  * mai quay lại như chưa làm). Dòng lướt ghi `ket_qua = NULL`. Chỉ sinh ra khi OMNI bật cho em ⇒ cờ tắt không có dòng nào như vậy.
  */
 export const MUC_DICH_LUOT = 'luot'
-/** Đoạn SQL dùng chung cho mọi bộ đọc sổ: bỏ dòng "đọc lời giải trước khi làm" và dòng lướt. Cột `purpose` có thể vắng ở D1 cũ ⇒ nơi gọi tự lùi. */
-export const SQL_LA_LAN_LAM = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot')"
+/**
+ * `purpose` của CÂU CHẨN ĐOÁN BƯỚC SAI (06/10, chan-doan-buoc-sai.ts — chỉ-thêm): câu nền / chìa khoá + 2 ý Đ/S đứng THAY CHỖ lượt làm lại của một câu lỗi
+ * (`raw_json.tc` = câu lỗi, `raw_json.cd = 1`, qid `nen:…`). KHÔNG phải một lần làm của câu lỗi (luật đóng lỗi, srs2, năng lực, hồ sơ nắm… bỏ qua như lướt —
+ * qua `SQL_LA_LAN_LAM`), nhưng LÀ một quan sát OMNI cho vi kỹ năng nó kiểm (P cập nhật như câu thường). Chỉ sinh khi OMNI bật cho em ⇒ cờ tắt không có dòng nào.
+ */
+export const MUC_DICH_CHAN_DOAN = 'chan_doan'
+/**
+ * Đoạn SQL dùng chung cho mọi bộ đọc sổ: bỏ dòng "đọc lời giải trước khi làm", dòng lướt và (06/10) dòng câu chẩn đoán. Cột `purpose` có thể vắng ở D1 cũ ⇒ nơi gọi tự lùi.
+ * Sổ trước 06/10 không có dòng 'chan_doan' ⇒ mọi bộ đọc cũ ra y hệt.
+ */
+export const SQL_LA_LAN_LAM = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan')"
+/** Như `SQL_LA_LAN_LAM` nhưng GIỮ dòng câu chẩn đoán — CHỈ cho `docLanLam` (srs2-d1.ts), nơi tách dòng ấy ra thành mốc "đã chẩn đoán" và không đưa vào lần làm. */
+export const SQL_LA_LAN_LAM_GIU_CHAN_DOAN = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot')"
 
 /** Tên A.I làm chủ ngữ trên mọi chữ MỚI của OMNI ở cả ba app (thầy lệnh 05/10: "Thay từ máy bằng A.i Đỗ Đại Học"). Chữ "máy" chỉ THIẾT BỊ giữ nguyên. */
 export const TEN_AI = 'A.I Đỗ Đại Học'

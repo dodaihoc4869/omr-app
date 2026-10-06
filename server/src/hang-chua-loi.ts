@@ -70,10 +70,30 @@ export function apLuatChung(t: TrangThaiCau, lan: readonly LanLam[], docLuc: rea
   return { t: { ...t, laMoi: false, thanhThao: true }, loi }
 }
 
-/** Chọn song sinh cho lượt tới: xoay vòng ss0 → ss1 → … (đủ `soSongSinh` bản, trần TRAN_SONG_SINH = 4) theo số lần em đã làm song sinh / câu anh em. */
+/**
+ * (CŨ — giữ để tương thích, không còn dùng trong kế hoạch) Chọn song sinh cho lượt tới: xoay vòng ss0 → ss1 → … theo SỐ lần em đã làm song sinh / câu anh em.
+ * Lỗi của cách đếm: lượt câu anh em / biến thể / ý Đ–S (cũng là `songSinh`) chen giữa ⇒ nhảy cóc một bản; bản dùng được đổi ⇒ lệch chỉ số ⇒ có thể lặp
+ * bản vừa ra trước khi ra hết. Thay bằng `chonBanSongSinh` (06/10).
+ */
 export function chonSongSinh(lan: readonly LanLam[], soSongSinh: number): number {
   if (soSongSinh <= 0) return -1
   return lan.filter((x) => x.songSinh).length % soSongSinh
+}
+
+/**
+ * (2b, 06/10) XOAY VÒNG SONG SINH theo "BẢN LÂU CHƯA PHỤC VỤ NHẤT": các lượt làm lại LIÊN TIẾP của cùng (em, câu) đi qua ĐỦ các bản dùng được, không lặp bản vừa ra
+ * trước khi ra hết. `dungDuoc` = chỗ (`~ss<i>`) dùng được theo thứ tự; `daLam` = các lần em ĐÃ LÀM bản song sinh (đọc từ sổ `su_kien_hoc`: qid `<gốc>~ss<i>` + lúc).
+ * Luật (thuần, tất định, không cột mới): chỗ CHƯA làm lần nào trước (theo thứ tự chỗ) ⇒ hết ⇒ chỗ có lần làm GẦN NHẤT cũ nhất; hoà ⇒ chỗ đứng trước.
+ * Tương thích: em chỉ làm song sinh theo thứ tự ⇒ đúng dãy cũ ss0 → ss1 → … → ss0; lượt câu anh em / biến thể chen giữa KHÔNG làm nhảy cóc. Không chỗ nào ⇒ −1.
+ * "Phục vụ" = đã làm (sổ chỉ ghi lượt đã nộp): bản đã phát mà em bỏ dở (chưa nộp) được phát lại — em chưa thấy đáp án của nó.
+ */
+export function chonBanSongSinh(dungDuoc: readonly number[], daLam: readonly { i: number; luc: string }[]): number {
+  if (!dungDuoc.length) return -1
+  const cuoi = new Map<number, string>()
+  for (const x of daLam) { const c = cuoi.get(x.i); if (c === undefined || x.luc > c) cuoi.set(x.i, x.luc) }
+  let tot = dungDuoc[0]!, totLuc = cuoi.get(tot) ?? ''
+  for (const i of dungDuoc) { const l = cuoi.get(i) ?? ''; if (l < totLuc) { tot = i; totLuc = l } }
+  return tot
 }
 
 /** Học liệu bổ trợ (song sinh, câu kiểm, nhãn nền) của các câu lỗi — một lượt đọc. */

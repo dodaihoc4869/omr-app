@@ -63,10 +63,11 @@ export async function boTroTheoQid(env: Env, qids: readonly string[]): Promise<M
 /**
  * Câu gốc (đã nạp) → câu theo qid ảo đã yêu cầu; không có bản ⇒ null. `~ss<i>` song sinh (cau_bo_tro); 06/10: `~bt<k>` biến thể bằng mã · `~yd<k>` bộ ý Đ–S mới
  * (ban-khac-ao.ts) — MỘT chỗ giải qid ảo cho `docCauTheoRef` (chấm / resume / Đoàn) và `napDayDuMem` (nạp lại lượt chờ).
+ * `btv` (2c, 06/10): phiên bản bộ sinh của tham chiếu `~bt` (khoá `btv` của ref phiên); vắng ⇒ 1. Chỉ `~bt` dùng.
  */
-export async function phuSongSinhTheoQid(env: Env, goc: PrivateQuestion, qidAo: string): Promise<PrivateQuestion | null> {
+export async function phuSongSinhTheoQid(env: Env, goc: PrivateQuestion, qidAo: string, btv?: unknown): Promise<PrivateQuestion | null> {
   const l = loaiQidAo(qidAo)
-  if (l && l.loai !== 'ss') return phuQidAoMoi(env, goc, qidAo)
+  if (l && l.loai !== 'ss') return phuQidAoMoi(env, goc, qidAo, btv)
   const t = tachSongSinh(qidAo)
   if (t.songSinh === null) return goc
   const bt = (await boTroTheoQid(env, [t.goc])).get(t.goc)
