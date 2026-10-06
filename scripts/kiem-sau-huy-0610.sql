@@ -29,7 +29,14 @@ SELECT
       AND COALESCE(json_extract(g.json, '$.bia'), 0) = 1
       AND s.sbd IN (SELECT value FROM json_each(c.sbd_json)) AND s.qid IN (SELECT value FROM json_each(c.qid_json))) AS luot_moi_bia,
   (SELECT COUNT(*) FROM su_kien_hoc s WHERE s.nguon <> 'game' AND s.luc > c.dong_luc
-      AND s.sbd IN (SELECT value FROM json_each(c.sbd_json)) AND s.qid IN (SELECT value FROM json_each(c.qid_json))) AS lan_lam_sau_huy_kenh_khac
+      AND s.sbd IN (SELECT value FROM json_each(c.sbd_json)) AND s.qid IN (SELECT value FROM json_each(c.qid_json))) AS lan_lam_sau_huy_kenh_khac,
+  -- LÀM LẠI BẰNG BẢN KHÁC: câu lỗi được phát lại qua bản song sinh / biến thể (qid ảo `<câu>~ss0`, `~bt1`, `~yd2`) hoặc câu ANH EM (raw_json.tc = câu lỗi) — vẫn là "câu của chiến dịch" với em
+  (SELECT COUNT(*) FROM su_kien_hoc s WHERE s.nguon = 'game' AND s.luc > c.dong_luc AND instr(s.qid, '~') > 0
+      AND s.sbd IN (SELECT value FROM json_each(c.sbd_json)) AND substr(s.qid, 1, instr(s.qid, '~') - 1) IN (SELECT value FROM json_each(c.qid_json))) AS lan_sau_huy_ban_khac,
+  (SELECT COUNT(*) FROM su_kien_hoc s WHERE s.nguon = 'game' AND s.luc > c.dong_luc AND json_valid(s.raw_json) AND json_extract(s.raw_json, '$.tc') IS NOT NULL
+      AND s.sbd IN (SELECT value FROM json_each(c.sbd_json)) AND json_extract(s.raw_json, '$.tc') IN (SELECT value FROM json_each(c.qid_json))) AS lan_sau_huy_cau_anh_em,
+  (SELECT COUNT(*) FROM su_kien_hoc s WHERE s.nguon = 'game' AND s.luc > c.dong_luc AND s.sbd IN (SELECT value FROM json_each(c.sbd_json))) AS lan_game_sau_huy_tong,
+  (SELECT COUNT(*) FROM su_kien_hoc s WHERE s.nguon = 'game' AND s.luc > c.dong_luc AND s.ket_qua = 0 AND s.sbd IN (SELECT value FROM json_each(c.sbd_json))) AS lan_game_sai_sau_huy_tong
 FROM chien_dich c
 WHERE c.trang_thai = 'da_huy' AND COALESCE(c.dong_luc, '') >= '2026-09-29' AND json_valid(c.sbd_json) AND json_valid(c.qid_json)
 ORDER BY c.tao_luc
