@@ -6,7 +6,7 @@ import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
-import { apLuatChung, chonSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
+import { apLuatChung, chonBanSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
 import { canThanTu, nhanMocDuyTri } from './omni-can-than'
 import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
 import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC, tiepBanKhacMoi } from './lam-lai-so'
@@ -352,8 +352,15 @@ export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map
   return ra
 }
 
+/**
+ * Phần ĐỌC KÈM của `docLanLam` (06/10, chỉ-thêm): CHỈ nơi truyền vào mới nhận; mọi nơi khác nhận đúng `LanLam[]` như cũ (không đổi hình lần làm).
+ * `songSinh`: (2b) từng lần em làm BẢN song sinh của câu gốc — chỗ `~ss<i>` + lúc — để xoay vòng "bản lâu chưa phục vụ nhất" (`chonBanSongSinh`).
+ */
+export interface BenLanLam { songSinh: Map<string, { i: number; luc: string }[]> }
+export const benLanLamMoi = (): BenLanLam => ({ songSinh: new Map() })
+
 /** Lần làm của em với các câu (mọi nguồn). Bỏ sự kiện CHE (ca chưa công bố); bỏ trống tính là sai; `assistance='assisted'` ⇒ có gợi ý. */
-export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = ''): Promise<LanLam[]> {
+export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = '', ben?: BenLanLam): Promise<LanLam[]> {
   if (!qids.length) return []
   // Vòng học v2 (02/10): lần làm câu SONG SINH ("<gốc>~ss0..3") là lần làm của chính câu gốc (cùng cách giải, đổi số) ⇒ đọc kèm, quy về gốc.
   // 05/10 (lam-lai-so.ts): dòng CÂU ANH EM làm thay cho câu gốc (`raw_json.tc = gốc`) đọc kèm, coi là lượt song sinh của câu gốc.
@@ -367,7 +374,17 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
     rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
   }
   const tap = new Set(goc)
-  return rows.filter((x) => str(x.visibility) !== 'embargoed').flatMap((x) => lanLamTuDongTc(x, lanLamTuDong, tap))
+  const hien = rows.filter((x) => str(x.visibility) !== 'embargoed')
+  if (ben) {
+    for (const x of hien) {
+      const m = /^(.*)~ss(\d+)$/.exec(str(x.qid))
+      if (!m || !tap.has(m[1]!)) continue
+      const ds = ben.songSinh.get(m[1]!) ?? []
+      ds.push({ i: Number(m[2]), luc: str(x.luc) })
+      ben.songSinh.set(m[1]!, ds)
+    }
+  }
+  return hien.flatMap((x) => lanLamTuDongTc(x, lanLamTuDong, tap))
 }
 /** Một dòng sổ → lần làm (kèm `nguon` — chỉ-thêm 29/09: `dau_gio` Đạt ⇒ thành thạo ngay). */
 export const lanLamTuDong = (x: Row): LanLam => ({
@@ -656,7 +673,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const maDeCua = omni ? new Map<string, Set<string>>() : undefined
   // "Bài cũ" = phần phạm vi ngoài bài đang luyện ⇒ cần lớp ĐÃ tick bài (hợp đồng bai-da-day: phạm vi khác null ⇔ có bài tick; phạm vi rỗng bài tick ⇒ không ôn bài cũ).
   const onBaiCuP = omni && phamVi && phamVi.baiDaTick.length > 0 ? docPhamViOnBaiCu(env, sbd, phamVi, dsDangChay).catch(() => null) : Promise.resolve(null)
-  const [meta, lanLam, moc, boTro, phamViOn] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? [], maDeCua), docLanLam(env, sbd, qids, tuLuc), docMocDayLai(env, sbd), docBoTroLoi(env, [...qidSaiMoiKenh.keys()].filter((q) => nguonTheoQid.has(q))), onBaiCuP])
+  const ben = benLanLamMoi() // 06/10 (2b): lần làm từng bản song sinh (xoay vòng bản lâu chưa phục vụ nhất) — đọc CÙNG truy vấn lần làm, không thêm lượt D1
+  const [meta, lanLam, moc, boTro, phamViOn] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? [], maDeCua), docLanLam(env, sbd, qids, tuLuc, ben), docMocDayLai(env, sbd), docBoTroLoi(env, [...qidSaiMoiKenh.keys()].filter((q) => nguonTheoQid.has(q))), onBaiCuP])
   // OMNI 3 — LỌC PHẠM VI: câu được vào kế hoạch khi có ÍT NHẤT một tờ DẠY HỌC (và, khi lớp đã tick bài, tờ ấy thuộc phạm vi đã dạy).
   let trongPhamVi: ((qid: string) => boolean) | null = null
   if (omni && maDeCua) {
@@ -695,8 +713,10 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
       const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoDung)
       t = ap.t
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
-      if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!)
-      if (soSS > 0 && laCuaSoLoi(ap.loi.trangThai)) songSinhLamLai.set(qid, ssDungDuoc[chonSongSinh(theoQid.get(qid) ?? [], soSS)]!) // 05/10 bậc 1 (cau-anh-em.ts)
+      // 06/10 (2b): bản song sinh của lượt tới = bản LÂU CHƯA PHỤC VỤ NHẤT theo sổ (`chonBanSongSinh`) — trước: số lượt song sinh mod số bản (nhảy cóc / lặp bản khi lượt câu anh em chen giữa).
+      const banTiep = soSS > 0 ? chonBanSongSinh(ssDungDuoc, ben.songSinh.get(qid) ?? []) : -1
+      if (ap.loi.nenSongSinh && soSS > 0) songSinhCho.set(qid, banTiep)
+      if (soSS > 0 && laCuaSoLoi(ap.loi.trangThai)) songSinhLamLai.set(qid, banTiep) // 05/10 bậc 1 (cau-anh-em.ts)
       if (laCuaSoLoi(ap.loi.trangThai)) { const tiep = tiepBanKhacMoi(theoQid.get(qid) ?? []); if (tiep.bt || tiep.yd) banKhacTiep.set(qid, tiep) } // 06/10 bậc biến thể bằng mã / ý Đ–S mới (ban-khac-ao.ts)
     }
     tt.set(qid, t)
