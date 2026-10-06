@@ -231,6 +231,21 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     expect(q1sau.diemChua).toBe(1 + 2)
   })
 
+  it('(thầy 06/10) em đã chữa dạng đó đứng ra giải mẫu khi chưa em nào thành thạo câu', async () => {
+    const { env } = fixture()
+    const id = await giao(env, '2026-10-04', T0 - 6 * NGAY)
+    const NOW = Date.parse('2026-10-05T02:00:00Z')
+    type Cau = { qid: string; giaiMau: { sbd: string } | null; emSua: { sbd: string }[] }
+    const buoi = async () => (await gvChienDich(env, { action: 'buoi-chua', id }, NOW)) as { cau: Cau[] }
+    await ghiSuKien(env, ['S1', 'S2'].flatMap((s) => [1, 2, 3, 4].map((k) => suKien(s, 'Q1', T0 - (6 - k) * NGAY, false))))
+    const truoc = await buoi()
+    expect(truoc.cau.find((c) => c.qid === 'Q1')!.giaiMau).toBeNull() // cả hai em đều sai nhiều lần
+    await gvChienDich(env, { action: 'chua-xong', id, qids: truoc.cau.map((c) => c.qid), coMat: ['S1'] }, NOW)
+    const sau = (await buoi()).cau.find((c) => c.qid === 'Q1')!
+    expect(sau.emSua.map((e) => e.sbd)).toEqual(['S2'])
+    expect(sau.giaiMau?.sbd).toBe('S1')
+  })
+
   it('đồng hồ sức chứa: tỉ lệ = khối lượng em giữa lớp / (D × thể lực)', async () => {
     const { env } = fixture()
     const r = await gvChienDich(env, { action: 'suc-chua', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-04' }, T0)

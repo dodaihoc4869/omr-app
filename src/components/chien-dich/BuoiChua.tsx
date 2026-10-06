@@ -277,6 +277,7 @@ export default function BuoiChua({
                     <span className="cd-vs-day" style={{ width: `${(100 * 2 * d.cau.soCanDayLai) / maxDiem}%` }} />
                   </span>
                   {d.cau.soChuaThanhThao} em chưa thành thạo
+                  {(d.cau.soEmDaChua ?? 0) > 0 && ` · ${d.cau.soEmDaChua} em đã chữa dạng này`}
                   {d.cau.soCanDayLai > 0 && (
                     <>
                       {' · '}
