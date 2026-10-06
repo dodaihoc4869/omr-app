@@ -45,10 +45,12 @@ export const GOI_Y_CHIP_CHUA_CHAC = `Chạm "Chưa chắc" trước khi chọn n
 export const CHIP_CHAC = 'Chắc'
 export const HOI_CHAC = 'Em có chắc đáp án này không?'
 export const BONG_CHAC = 'Đã chọn: Chắc'
-export const BONG_CHUA_CHAC = 'Đã chọn: Chưa chắc · câu này sẽ quay lại sớm'
+export const BONG_CHUA_CHAC = 'Đã chọn: Chưa chắc' // thầy 06/10: "Khi chọn chưa chắc bỏ dòng gợi ý câu này sẽ quay lại sớm" ⇒ chỉ báo đã chọn, không hứa lịch ôn
 
 // ---------------------------------------------------------------- Trạm hồi phục
 export const TIEU_DE_TRAM = 'Trạm hồi phục'
+/** Nút mở hộp 3 câu nền của Trạm (Đảo: dao2/TramHoiPhuc.tsx; Đoàn một mình: doan2/TheTram2.tsx). */
+export const NUT_LAM_CAU_NEN = 'Làm 3 câu nền'
 export function chuTram(tenLoi: string | null, coCauNen: boolean): string {
   const loi = tenLoi ? `3 câu em vừa sai đều vướng ở bước ${tenLoi}.` : '3 câu vừa rồi khó với em.'
   return coCauNen

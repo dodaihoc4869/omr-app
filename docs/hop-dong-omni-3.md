@@ -46,6 +46,7 @@ omni: {
 - Phần II: máy chủ ghi kết quả từng ý vào sổ (`subitem_json`).
 
 ### `doan-nop` (có sẵn, Đoàn) → thân thêm `msLam?`, `tuTin?` (chuyển vào `answer` nội bộ). Trạm hồi phục KHÔNG mở trong Đoàn nhiều người.
+**Đoàn MỘT người thật (06/10)**: phòng Hóa 2.0 còn đúng một người thật (`choEmMotMinh`, hiệp kế chờ em bấm ĐÁNH TIẾP, không đồng hồ) CÓ Trạm. `doan-nop` đặt cờ `motMinh` vào `answer` nội bộ (máy chủ đặt, `game-v2.ts` chỉ tin khi đúng là lệnh nội bộ của Đoàn); kết quả `ketQuaCau.omni.tram` (cùng hình với chuyến Đảo: `chu`, `coCauNen`, `nhan`, `tenLoi`). Luật đếm như Đảo (3 câu sai TỰ LÀM liền; lướt không tính; câu đúng hoặc có tiếp sức cắt chuỗi; tối đa 1 Trạm/chặng). Khác Đảo: Đoàn chỉ mở khi CÓ câu nền (ải kế đã chia sẵn cho cả đội nên không đổi bằng câu dễ hơn; không gọi `hoa2-omni-tram-xong`); máy em vẽ thẻ `TheTram2` dưới kết quả câu, nút "Làm 3 câu nền" mở hộp câu nền (`/hs/luyen-nen`).
 
 ### `hoa2-omni-tram-xong` `{ session }` → `{ ok, cau: (câu công khai + vai) | null, viTri: number | null }`
 Sau Trạm hồi phục: đổi ải KẾ TIẾP chưa làm của chuyến bằng câu cùng dạng thấp hơn một bậc (nếu có). Không có câu thay ⇒ `cau: null`.

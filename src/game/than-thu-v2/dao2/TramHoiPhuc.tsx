@@ -6,10 +6,10 @@
 import {useState} from 'react'
 import {createPortal} from 'react-dom'
 import {HopLuyenNen} from '../../../components/loi-giai/ThanhThangGo'
-import {TIEU_DE_TRAM} from '../../../lib/omni-chu'
+import {NUT_LAM_CAU_NEN,TIEU_DE_TRAM} from '../../../lib/omni-chu'
 import type {TramHoiPhuc} from '../../../../server/src/omni-kieu'
 
-export const NUT_LAM_CAU_NEN='Làm 3 câu nền'
+export {NUT_LAM_CAU_NEN} // nhãn nay ở omni-chu.ts (Đoàn dùng chung); giữ xuất lại cho nơi đang nhập từ đây
 export interface TheTramProps{
  tram:TramHoiPhuc
  /** Câu em vừa sai (lệnh nộp câu nền ghi kèm). */
