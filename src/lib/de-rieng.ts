@@ -19,6 +19,7 @@ import { PHAN_DE, locTheoYeuCau, type CauUngVien, type PhanDe, type YeuCauRut } 
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN as SO_CA_HOI_LAI, soCauLapCan, type CauHinhDeRieng } from './cau-hinh-de-rieng'
 import { noiTapCam, sinhBoMotO, type CamTheoEm } from './de-rieng-tran-trung'
 import { CAU_HINH_TRAN_TRUNG_MAC_DINH } from './de-rieng-cau-hinh'
+import { camKhongRutCauSai } from './khong-rut-cau-sai' // MỘT quy tắc "câu đã gặp" cho cả đề chuẩn bị sẵn lẫn em vào muộn (06/10)
 
 /** Một ca đã chấm, rút gọn còn đúng phần thuật toán cần. Ca gần nhất đứng
  * ĐẦU mảng — chỗ gọi sắp xếp trước, ở đây không đoán lại theo ngày. */
@@ -62,17 +63,6 @@ export function cauDaGapCuaEm(dsCa: CaTruocDaCham[], sbd: string): Map<string, C
   return ra
 }
 
-/** TẬP CẤM CỦA MỘT EM ở chế độ Không rút câu sai, trong kho một phần.
- * Câu đã gặp ở ca kiểm tra đứng TRƯỚC (mới nhất → cũ nhất), câu vừa làm trong tuần
- * ở nguồn khác (BTVN, game — `lam` của hồ sơ ôn) đứng SAU: kho mỏng thì nới nhóm
- * đó trước, rồi mới tới câu ca kiểm tra cũ nhất. */
-function camKhongRutCauSai(daGap: Map<string, CaTruocDaCham>, lamTuan: string[], trongPool: Set<string>, daCo: Set<string>): string[] {
-  const ra: string[] = []
-  for (const q of daGap.keys()) if (trongPool.has(q) && !daCo.has(q)) ra.push(q)
-  for (const q of lamTuan) if (trongPool.has(q) && !daCo.has(q) && !daGap.has(q)) ra.push(q)
-  return ra
-}
-
 /** Câu trong đề em mà em ĐÃ GẶP ở ca kiểm tra trước (chỉ xảy ra khi kho thiếu):
  * qid → 'dd/mm' của ca gần nhất em gặp. Rỗng = đề mới hoàn toàn. */
 function daLamLaiTrongDe(qids: string[], daGap: Map<string, CaTruocDaCham>): Record<string, string> {
@@ -110,7 +100,7 @@ export interface HoSoOnEm {
    * BTVN/game/bài mẹ giao) — không hỏi lại nữa. Vắng mặt trong `sai` KHÔNG đủ để
    * coi là đã khắc phục: sổ có chỗ thưa, suy vậy là bỏ hỏi lại im lặng. */
   daKhacPhuc: string[]
-  /** qid em có làm trong 7 ngày qua ở MỌI nguồn, MỚI NHẤT đứng đầu. */
+  /** qid em có làm trong cửa sổ gần đây (mặc định 7 ngày; ca Không rút câu sai xin 30) ở MỌI nguồn, MỚI NHẤT đứng đầu. */
   lam: string[]
 }
 
@@ -672,7 +662,7 @@ export function dungDeRieng(y: YeuCauDeRieng): KetQuaDeRieng {
       // KHÔNG RÚT CÂU SAI: cấm MỌI câu em đã gặp ở ca kiểm tra trước. Kho mỏng
       // thì `noiTapCam` nới từ cuối mảng — câu làm LÂU NHẤT trước — và đếm lại.
       const trongPool = new Set(idsPool)
-      const cam = y.dsSbd.map((sbd, e) => camKhongRutCauSai(daGapCuaEm[e]!, y.hoSo?.[sbd]?.lam ?? [], trongPool, boSan[e]!))
+      const cam = y.dsSbd.map((sbd, e) => camKhongRutCauSai(daGapCuaEm[e]!.keys(), y.hoSo?.[sbd]?.lam ?? [], trongPool, boSan[e]!))
       if (cam.some((c) => c.length > 0)) camTheoEm = { cam }
     } else if (y.hoSo) {
       const trongPool = new Set(idsPool)
@@ -890,7 +880,7 @@ export function dungDeRiengLuotHai(h: YeuCauLuotHai): KetQuaLuotHai {
       const bo = new Set((batBuoc[p] ?? []).slice(0, canP))
       const trongPool = new Set(ids)
       const lam = daGap
-        ? camKhongRutCauSai(daGap, h.hoSoVang?.[sbd]?.lam ?? [], trongPool, bo)
+        ? camKhongRutCauSai(daGap.keys(), h.hoSoVang?.[sbd]?.lam ?? [], trongPool, bo)
         : (h.hoSoVang?.[sbd]?.lam ?? []).filter((q) => trongPool.has(q) && !bo.has(q))
       const noi = noiTapCam(ids, canP, 1, [bo], [lam])
       const cam = noi.cam[0]!

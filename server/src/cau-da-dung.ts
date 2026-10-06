@@ -51,10 +51,10 @@ export async function docDaGapAo(env: Env, sbd: string, ngay: string): Promise<R
 }
 
 /** Lần làm được tính là "tự làm": không hỗ trợ, không chỉ đọc lời giải, không phải lượt LƯỚT (OMNI 3, `SQL_LA_LAN_LAM`), không thuộc ca chưa công bố. */
-const TU_LAM_MOI = `COALESCE(assistance,'') <> 'assisted' AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'') <> 'embargoed' AND qid NOT LIKE 'nen:%'`
+export const TU_LAM_MOI = `COALESCE(assistance,'') <> 'assisted' AND ${SQL_LA_LAN_LAM} AND COALESCE(visibility,'') <> 'embargoed' AND qid NOT LIKE 'nen:%'`
 // Sổ CŨ chưa có cột assistance/purpose/visibility (migration-2309 chưa chạy trên bản thật — 05/10: lỗi "no such column: assistance") ⇒ lọc
 // được gì lọc nấy: câu nền, và câu ca thi chỉ tính khi ca đã công bố (thay cho cờ che 'embargoed').
-const TU_LAM_CU = `qid NOT LIKE 'nen:%' AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
+export const TU_LAM_CU = `qid NOT LIKE 'nen:%' AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`
 
 /** Tên kênh thân thiện (bảng từ chuẩn) cho nguồn không phải ca thi / game. */
 const TEN_KENH: Record<string, string> = {

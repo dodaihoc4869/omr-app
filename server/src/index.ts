@@ -22,6 +22,7 @@ import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop, trangThaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
+import { coLuotMoi } from './ca-co-luot-moi'
 import {notifications,deliverNotices} from './notifications'
 import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
 import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
@@ -102,6 +103,7 @@ import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
 import { aiSaiCau } from './ai-sai-cau'
 import { doiSbd } from './doi-sbd'
+import { quetKhoi } from './quet-khoi'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 // OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
@@ -3659,6 +3661,7 @@ const boXuLy = {
       if (p === '/gv/chua-nop') return ra(await gvChuaNop(envDoc, b))
       if (p === '/gv/can-giup') return ra(await gvCanGiup(envDoc, b))
       if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(envDoc, b))
+      if (p === '/gv/quet-khoi') return ra(await quetKhoi(envDoc, b)) // 06/10: CHỈ ĐỌC — câu lọt khối trong sổ làm của em khối `khoi`
       if (p === '/gv/tim-em') return ra(await gvTimEm(envDoc, b))
       if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(envDoc, b))
       // GỌI LÊN BẢNG (thầy lệnh 21/09): em đã làm câu này chưa, đúng hay sai, quét HẾT lịch sử (KHÔNG áp mốc 12:00). ĐỌC-CHỈ, ≤ 200 cặp, 2 truy vấn (docs/hop-dong-lich-su-cau-len-bang-2109.md).
@@ -3727,6 +3730,8 @@ const boXuLy = {
       // RÚT ĐỀ v2 (02/10, server/src/rut-de-v2.ts): chốt Bắt đầu MỘT lệnh (mốc + bản đồ); lỗi đến hạn theo em cho máy thầy chạy thử.
       if (p === '/ca/chot-bat-dau') return ra({ ...(await chotBatDau(env, b)), chot: true })
       if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
+      // CA KIỂM TRA (06/10, server/src/ca-co-luot-moi.ts): em nào có lượt tự làm MỚI kể từ lúc chạy thử — để Bắt đầu thi rút lại bằng hồ sơ mới.
+      if (p === '/ca/co-luot-moi') return ra(await coLuotMoi(env, b))
       // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10, server/src/cau-da-dung.ts): câu em đã tự làm đúng trong các chiến dịch, kèm nhãn nơi · ngày · mức độ.
       if (p === '/ca/cau-da-dung') return ra(await cauDaDung(env, b))
       // KIỂM CHỨNG CÂU ĐÃ ĐÚNG — THAY CÂU (thầy 06/10, server/src/cau-thay-so.ts): bản đổi số (song sinh / biến thể) hoặc câu anh em cho từng câu em đã đúng.

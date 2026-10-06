@@ -304,15 +304,13 @@ describe('Em CHƯA RÕ khối (chưa xếp lớp): kênh tự động không đ�
     const t = await tuLuyenRut(d.env, 'SX', { cheDo: 4, mucDo: ['ngau_nhien'], soCau: 10 }) as Record<string, any>
     expect(((t.cau ?? []) as unknown[]).length).toBe(0)
   })
-  it('Hoá 2.0: chiến dịch thầy giao trực tiếp cho em VẪN vào kế hoạch (tờ thầy chọn); nợ từ nguồn khác (Lên bảng, game…) KHÔNG vào', async () => {
+  it('Hoá 2.0 (đổi 06/10 theo lệnh thầy "tuyệt đối không rút nhầm khối"): em CHƯA RÕ khối không nhận gì — kể cả chiến dịch thầy giao trực tiếp', async () => {
     const d = await dungKho()
     batHoa2(d)
     const r = await gvChienDich(d.env, { action: 'tao', ten: 'Riêng em SX', maDe: [TO_LA], sbd: ['SX'], hanNop: '2026-10-20', theLucNgay: 60, raiDeu: false }, T0 - 2 * MOT_NGAY)
     expect(r.ok, JSON.stringify(r).slice(0, 300)).toBe(true)
     await ghiSai(d, 'SX', mauMoiTo(2).filter((q) => !q.startsWith(TO_LA)), T0 - 3 * MOT_NGAY, { nguon: ['len_bang', 'game'] })
     const { kh } = await layKeHoachHomNay(d.env, 'SX', T0)
-    const tatCa = [...kh.dao, ...kh.doan]
-    expect(tatCa.length).toBeGreaterThan(0)
-    expect(tatCa.filter((q) => !q.startsWith(`${TO_LA}-`))).toEqual([])
+    expect([...kh.dao, ...kh.doan]).toEqual([])
   })
 })
