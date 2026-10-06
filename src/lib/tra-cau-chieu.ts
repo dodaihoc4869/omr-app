@@ -25,5 +25,5 @@ export function chuThieuNoiDung(soCau: number): string | null {
 
 /** Dòng báo mềm khi tờ chiếu của chiến dịch BỎ câu khác khối lớp (thầy 06/10: "tờ chữa phải loại bỏ hết câu nhầm khối"); 0 câu ⇒ `null`. Nhãn + đơn vị, nói thật. */
 export function chuBoCauKhacKhoi(soCau: number): string | null {
-  return soCau > 0 ? `${soCau} câu khác khối lớp đã được bỏ khỏi tờ chiếu` : null
+  return soCau > 0 ? `${soCau} câu thuộc khối khác đã được bỏ khỏi tờ chiếu` : null
 }

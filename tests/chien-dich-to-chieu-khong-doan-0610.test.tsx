@@ -106,7 +106,7 @@ describe('cauKhacKhoiLop — lớp phòng thủ thứ hai (cổng chính ở má
   })
   it('lời báo: 0 ⇒ không hiện; ≥ 1 ⇒ có nhãn + đơn vị', () => {
     expect(chuBoCauKhacKhoi(0)).toBeNull()
-    expect(chuBoCauKhacKhoi(3)).toBe('3 câu khác khối lớp đã được bỏ khỏi tờ chiếu')
+    expect(chuBoCauKhacKhoi(3)).toBe('3 câu thuộc khối khác đã được bỏ khỏi tờ chiếu')
   })
 })
 
@@ -195,7 +195,7 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
     expect(html).not.toContain('CÂU LỚP MƯỜI') // không câu khối 10 nào (tờ khối 10 nằm trong ngân hàng) thế chỗ câu của chiến dịch
     expect(html).toContain('Nội dung câu hỏi 4') // C: không có nội dung đúng mã ⇒ dòng thay thế, KHÔNG câu mượn
     expect(html).not.toContain('Nội dung câu hỏi 9') // D bị bỏ
-    expect(toast).toHaveBeenCalledWith('1 câu khác khối lớp đã được bỏ khỏi tờ chiếu', 'warn')
+    expect(toast).toHaveBeenCalledWith('1 câu thuộc khối khác đã được bỏ khỏi tờ chiếu', 'warn')
     expect(toast).toHaveBeenCalledWith('1 câu chưa tra được nội dung đề — tờ chiếu sẽ hiện dòng thay thế', 'warn')
   })
 
@@ -216,7 +216,7 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
     // D mang mã khối 10 trong chiến dịch khối 11: lớp phòng thủ máy thầy bỏ luôn dù máy chủ cũ không báo
     expect(html).not.toContain('Nội dung câu hỏi 9')
     await waitFor(() => expect(toast).toHaveBeenCalledWith('2 câu chưa tra được nội dung đề — tờ chiếu sẽ hiện dòng thay thế', 'warn'))
-    expect(toast).toHaveBeenCalledWith('1 câu khác khối lớp đã được bỏ khỏi tờ chiếu', 'warn')
+    expect(toast).toHaveBeenCalledWith('1 câu thuộc khối khác đã được bỏ khỏi tờ chiếu', 'warn')
   })
 
   it('MỌI câu bị chặn ⇒ không mở tờ rỗng; nói thật vì sao', async () => {
