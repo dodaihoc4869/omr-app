@@ -248,7 +248,8 @@ describe('màn: bước Bài hôm nay', () => {
 
   it('lớp = lớp của buổi đang mở; cây DẠY HỌC khối 12 có chip trạng thái; dòng chờ bài mới ở đầu bảng', async () => {
     const buoc = await moBuoc()
-    expect((within(buoc).getByLabelText('Lớp') as HTMLSelectElement).value).toBe('12A1')
+    // Ô chọn lớp (ô tick xổ xuống theo khối, thầy 06/10): lớp của buổi đang mở được chọn sẵn, hiện thành thẻ có sĩ số.
+    expect(within(within(buoc).getByRole('group', { name: 'Lớp đã chọn' })).getByText('12A1 · 44 em')).toBeTruthy()
     expect(lenh('danh-sach').at(-1)).toMatchObject({ lop: '12A1' })
     expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy 22/09 · chứng chỉ 38/44')
     expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đang luyện · còn 2 ngày')
@@ -319,7 +320,8 @@ describe('màn: bước Bài hôm nay', () => {
   it('bài chỉ có Ví dụ minh hoạ / Các dạng toán trọng tâm ⇒ không có dòng "Tự giao", báo "Bài này chưa có tờ …" một lần, nút giao khoá, không gọi xem-truoc', async () => {
     co = { bat: true, lop: [], sbd: [] }
     const buoc = await moBuoc()
-    fireEvent.change(within(buoc).getByLabelText('Lớp'), { target: { value: '11B' } })
+    fireEvent.click(within(buoc).getByRole('button', { name: /Chọn lớp/ }))
+    fireEvent.click(await screen.findByRole('checkbox', { name: /^11B/ })) // lớp khối 11 ⇒ chọn lại từ đầu chỉ lớp ấy (cây bài mỗi khối một khác)
     await waitFor(() => expect(dong(buoc, 'DH-11-C2-B4')).toBeTruthy())
     fireEvent.click(within(dong(buoc, 'DH-11-C2-B4')).getByRole('radio'))
     const the = buoc.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement

@@ -204,6 +204,109 @@ export function chuChoBaiMoi(lop: string, choBaiMoi: { soNgay: number } | null |
   return `Lớp ${lop.trim()}: ${n} ngày chưa có bài mới`
 }
 
+// ---------------------------------------------------------------- NHIỀU LỚP (thầy 06/10: "tích chọn được nhiều lớp", "chỗ chọn lớp xếp theo khối 10, 11, 12")
+// Máy chủ giữ NGUYÊN: mỗi lớp một lệnh `danh-sach` / `xem-truoc` / `tick` riêng; nhiều lớp = gọi lần lượt từng lớp. Cây bài mỗi KHỐI một khác ⇒ mỗi lần chỉ chọn lớp CÙNG KHỐI.
+
+/** Một dòng lớp của bộ chọn: tên + khối ('10' | '11' | '12') + sĩ số. */
+export interface LopChonDuoc {
+  tenLop: string
+  khoi: string
+  soEm: number
+}
+
+/** Khối của một dòng lớp: cột khối (nếu đọc được) rồi tên lớp; không rõ ⇒ ''. */
+export const khoiCuaDongLop = (l: { tenLop: string; khoi?: string }): string => khoiCuaTenLop(l.khoi ?? '') || khoiCuaTenLop(l.tenLop)
+
+/** Các lớp biết khối, xếp khối 10 → 11 → 12, trong khối theo tên (số học). Lớp không rõ khối ("Chưa xếp lớp") bị bỏ — cây bài cần khối. Trùng tên lấy dòng đầu. */
+export function lopTheoKhoi(dsLop: readonly { tenLop: string; khoi?: string; soEm?: number }[]): LopChonDuoc[] {
+  const thay = new Set<string>()
+  const ra: LopChonDuoc[] = []
+  for (const l of dsLop) {
+    const ten = l.tenLop.trim()
+    const khoi = khoiCuaDongLop({ tenLop: ten, khoi: l.khoi })
+    if (!ten || !khoi || thay.has(ten)) continue
+    thay.add(ten)
+    ra.push({ tenLop: ten, khoi, soEm: Number.isFinite(l.soEm) ? Number(l.soEm) : 0 })
+  }
+  return ra.sort((a, b) => Number(a.khoi) - Number(b.khoi) || soTen.compare(a.tenLop, b.tenLop))
+}
+
+/** Tên gọn của lớp để làm nhãn nhỏ ("12 - Tinh Hoa" → "Tinh Hoa"; "12A1" và "11" giữ nguyên). */
+export function tenGonLop(tenLop: string): string {
+  const m = /^\s*(?:10|11|12)\s*[-–—:·]\s*(.+)$/.exec(tenLop)
+  return m ? m[1]!.trim() : tenLop.trim()
+}
+
+const khoiDauTien = (dsLop: readonly { tenLop: string; khoi: string }[], chon: readonly string[]): string => (chon.length ? (dsLop.find((l) => l.tenLop === chon[0])?.khoi ?? '') : '')
+const theoThuTuLop = (dsLop: readonly { tenLop: string }[], tap: ReadonlySet<string>): string[] => dsLop.filter((l) => tap.has(l.tenLop)).map((l) => l.tenLop)
+
+/**
+ * Tick / bỏ tick MỘT lớp. Tick lớp thuộc KHỐI KHÁC với các lớp đang chọn ⇒ chọn lại từ đầu, chỉ lớp ấy (`doiKhoi` = true để báo thầy).
+ * Kết quả luôn theo thứ tự `dsLop`. Lớp không có trong `dsLop` ⇒ giữ nguyên.
+ */
+export function doiChonLop(dsLop: readonly { tenLop: string; khoi: string }[], chon: readonly string[], lop: string, nhan: boolean): { chon: string[]; doiKhoi: boolean } {
+  const dong = dsLop.find((l) => l.tenLop === lop)
+  if (!dong) return { chon: [...chon], doiKhoi: false }
+  const kc = khoiDauTien(dsLop, chon)
+  if (nhan && kc && kc !== dong.khoi) return { chon: [lop], doiKhoi: true }
+  const tap = new Set(chon)
+  if (nhan) tap.add(lop)
+  else tap.delete(lop)
+  return { chon: theoThuTuLop(dsLop, tap), doiKhoi: false }
+}
+/** Tick / bỏ tick CẢ KHỐI: tick ⇒ mọi lớp của khối (bỏ lớp khối khác); bỏ tick ⇒ bỏ mọi lớp của khối ấy. */
+export function doiChonKhoi(dsLop: readonly { tenLop: string; khoi: string }[], chon: readonly string[], khoi: string, nhan: boolean): { chon: string[]; doiKhoi: boolean } {
+  const cua = dsLop.filter((l) => l.khoi === khoi).map((l) => l.tenLop)
+  if (!nhan) return { chon: chon.filter((l) => !cua.includes(l)), doiKhoi: false }
+  const kc = khoiDauTien(dsLop, chon)
+  return { chon: cua, doiKhoi: !!kc && kc !== khoi }
+}
+
+/** Một em của bộ chọn em (`useDsEmGiao`). */
+export interface EmCuaLop {
+  sbd: string
+  khoi: string
+  tenLop: string
+}
+/** Em thuộc lớp: cùng tên lớp, hoặc lớp gọi theo khối trần ("11") — đúng luật cũ của bước một lớp. */
+export const emThuocLop = (e: Pick<EmCuaLop, 'khoi' | 'tenLop'>, lop: string): boolean => e.khoi === lop || e.tenLop === lop
+
+/**
+ * Chia các em ĐÃ CHỌN về từng lớp để gọi `tick` mỗi lớp một lần: em thuộc lớp nào thì về lớp ấy; em ngoài các lớp đã chọn (thầy thêm tay) về lớp ĐẦU — y
+ * hành vi một lớp cũ (gửi mọi em đã chọn kèm lớp). Thứ tự em theo `dsEm`. Mọi lớp đều có khoá (có thể rỗng).
+ */
+export function chiaEmTheoLop(dsLop: readonly string[], dsEm: readonly EmCuaLop[], sbdChon: readonly string[]): Map<string, string[]> {
+  const ra = new Map<string, string[]>(dsLop.map((l) => [l, []]))
+  if (!dsLop.length) return ra
+  const chon = new Set(sbdChon)
+  for (const e of dsEm) {
+    if (!chon.has(e.sbd)) continue
+    const lop = dsLop.find((l) => emThuocLop(e, l)) ?? dsLop[0]!
+    ra.get(lop)!.push(e.sbd)
+  }
+  return ra
+}
+
+export interface TrangThaiNhieuLop {
+  kieu: KieuTrangThaiBai
+  chu: string
+  /** Số lớp (trong các lớp đang chọn) đã tick bài này. */
+  soLopDaGiao: number
+  tong: number
+}
+/**
+ * Chip của MỘT bài qua các lớp đang chọn (mỗi phần tử = tick của một lớp, null = chưa tick). Một lớp ⇒ y chip cũ (`trangThaiBai`). Nhiều lớp:
+ * chưa lớp nào ⇒ "Chưa dạy" / "Bài hôm nay"; có lớp đang luyện ⇒ "Đang luyện · k/n lớp"; còn lại ⇒ "Đã dạy · k/n lớp".
+ */
+export function trangThaiNhieuLop(theoLop: readonly (TickTom | null | undefined)[], dangChon: boolean): TrangThaiNhieuLop {
+  const n = theoLop.length
+  const co = theoLop.filter((t): t is TickTom => !!t)
+  if (n <= 1 || co.length === 0) return { ...trangThaiBai(co[0], dangChon), soLopDaGiao: co.length, tong: n }
+  return co.some((t) => t.trangThai === 'dang_luyen')
+    ? { kieu: 'dang_luyen', chu: `Đang luyện · ${co.length}/${n} lớp`, soLopDaGiao: co.length, tong: n }
+    : { kieu: 'da_day', chu: `Đã dạy · ${co.length}/${n} lớp`, soLopDaGiao: co.length, tong: n }
+}
+
 /** Khoá phiên (sessionStorage): nút "Giao theo bài" ở mục Chiến dịch luyện nhờ mục Lên bảng mở sẵn thẻ Dạy học (bước Bài hôm nay). Đọc một lần rồi xoá. */
 export const KHOA_MO_THE_DAY_HOC = 'ddh.moTheDayHoc'
 /** Đọc (và xoá) yêu cầu mở sẵn thẻ Dạy học. Máy chặn bộ nhớ / không có ⇒ false (mở thẻ thứ nhất như cũ). */
