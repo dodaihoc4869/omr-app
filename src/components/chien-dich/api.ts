@@ -213,6 +213,8 @@ export interface BuoiChuaMayChu {
   hetHan: boolean
   soEm: number
   lop: { coXat: number; thanhThao: number }
+  /** Số DẠNG đã chữa ở các buổi trước (máy chủ bỏ các dạng này khi xếp buổi mới). Máy chủ cũ không gửi ⇒ 0. */
+  daChuaTruoc?: number
   cau: CauBuoiChua[]
 }
 
