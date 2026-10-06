@@ -15,7 +15,7 @@ import { traoExpKetChang } from '../server/src/game-v2-doan-exp'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import {
-  moChang, giaiHiep, tomTatChang, khungNhinHiep, boQuaHiepTrong, khoanKetChang, thuongTheoSoCau, hiepLaTrum,
+  moChang, giaiHiep, tomTatChang, khungNhinHiep, boQuaHiepTrong, khoanKetChang, thuongKetChang, thuongTheoSoCau, hiepLaTrum,
   CHAN, HP_QUAI, SO_CAU_RIENG_CHANG, type Chang, type NopHiep, type TomTatChang,
 } from '../src/game/than-thu-v2/doan-core'
 import { taoD1That, type D1That } from './_d1-that'
@@ -234,20 +234,40 @@ describe('máy chủ · cả đoàn hết câu riêng trước hiệp 8', () => 
   })
 })
 
+/** GHIM HẠT GIỐNG CHẶNG (sửa test chập chờn, 06/10). Mã chặng = 'DH' + 4 byte ngẫu nhiên (`hex(4)` trong game-v2-doan.ts) và CHÍNH NÓ là hạt giống của chặng;
+ *  bạn máy đáp đúng khi `rut(hạt giống, …) < TI_LE_MAY_DUNG` (0,75) nên số sao của chặng "đi một mình" phụ thuộc hạt giống. Trước đây test khẳng định cứng "3 sao" với
+ *  mã ngẫu nhiên ⇒ chạy riêng 14 lượt đỏ 3/14 (bản này) và 2/14 (main). Test này kiểm đường đi của chặng ngắn + khoản thắng theo 2/6 câu, KHÔNG kiểm độ chính xác của
+ *  bạn máy ⇒ ghim hạt giống, mỗi hạt giống có kết quả đã đo: DH00000001 ⇒ về đích đủ máu (3 sao); DH00000002 ⇒ bạn máy sai ở hiệp trùm 8, Linh Tâm mất 16 máu (2 sao). */
+const HAT_GIONG_CHANG: readonly { ma: string; byte: readonly number[]; sao: number }[] = [
+  { ma: 'DH00000001', byte: [0, 0, 0, 1], sao: 3 },
+  { ma: 'DH00000002', byte: [0, 0, 0, 2], sao: 2 },
+]
+/** Ghim `crypto.getRandomValues` (chỉ cho lệnh mở chặng): gọi `.mockRestore()` ngay sau đó. */
+const ghimByteNgauNhien = (byte: readonly number[]) =>
+  vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(((a: Uint8Array) => { for (let i = 0; i < a.length; i++) a[i] = byte[i % byte.length]!; return a }) as never)
+
 describe('máy chủ · đi một mình (1 em + bạn máy) chỉ có 2 câu', () => {
-  it('chặng ngắn lại 1 · 2 · 4 · 8 và kết thúc, không kẹt; khoản thắng chặng theo 2/6 câu ôn', async () => {
-    const d = dungTruong(); await coSo(d)
-    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ tu: '2026-09-01T00:00:00.000Z', dsSbd: ['S1'] }))
-    const ma = (await goi(d, 'S1', 'mo')).doan.ma as string
-    catCau(d, ma, 0, 2); troi(DEM_NGUOC_MS)
-    expect(await choiHet(d, ma, ['S1'])).toEqual([1, 2, 4, 8])
-    const k = (await goi(d, 'S1', 'xem', { ma })).doan.ketChang
-    expect(k.cuaEm).toMatchObject({ soCau: 2, soHiepGiuKhien: 0 })
-    const dong = d.sql.prepare("SELECT exp, ghi_chu FROM exp_so WHERE sbd='S1' AND loai='doan_chang'").all() as { exp: number; ghi_chu: string }[]
-    expect(k).toMatchObject({ thang: true, sao: 3 }) // Linh Tâm không bị quái của hiệp trống đánh ⇒ về đích đủ máu
-    expect(dong).toEqual([{ exp: 5, ghi_chu: 'Thắng chặng 3 sao +5 EXP (2/6 câu ôn)' }])
-    expect(k.expChang.find((x: any) => x.loai === 'doan_chang')).toMatchObject({ exp: 5 })
-  })
+  for (const h of HAT_GIONG_CHANG) {
+    it(`chặng ngắn lại 1 · 2 · 4 · 8 và kết thúc, không kẹt; khoản thắng chặng theo 2/6 câu ôn — hạt giống ${h.ma} (${h.sao} sao)`, async () => {
+      const d = dungTruong(); await coSo(d)
+      d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('exp_moi',?,'x')").run(JSON.stringify({ tu: '2026-09-01T00:00:00.000Z', dsSbd: ['S1'] }))
+      const ghim = ghimByteNgauNhien(h.byte)
+      let ma: string
+      try { ma = (await goi(d, 'S1', 'mo')).doan.ma as string } finally { ghim.mockRestore() }
+      expect(ma).toBe(h.ma)
+      catCau(d, ma, 0, 2); troi(DEM_NGUOC_MS)
+      expect(await choiHet(d, ma, ['S1'])).toEqual([1, 2, 4, 8])
+      const k = (await goi(d, 'S1', 'xem', { ma })).doan.ketChang
+      expect(k.cuaEm).toMatchObject({ soCau: 2, soHiepGiuKhien: 0 })
+      const dong = d.sql.prepare("SELECT exp, ghi_chu FROM exp_so WHERE sbd='S1' AND loai='doan_chang'").all() as { exp: number; ghi_chu: string }[]
+      // Số sao theo hạt giống (đã đo); khoản thắng chặng = thưởng theo sao × 2/6 câu ôn (hàm thuần đã có test riêng ở trên) — 3 sao ⇒ 5 EXP.
+      const exp = thuongTheoSoCau(thuongKetChang(h.sao, true), 2)
+      expect(k).toMatchObject({ thang: true, sao: h.sao })
+      expect(dong).toEqual([{ exp, ghi_chu: `Thắng chặng ${h.sao} sao +${exp} EXP (2/6 câu ôn)` }])
+      expect(k.expChang.find((x: any) => x.loai === 'doan_chang')).toMatchObject({ exp })
+      if (h.sao === 3) expect(exp).toBe(5)
+    })
+  }
   it('Hóa 2.0 (chờ em bấm ĐÁNH TIẾP): hiệp trống không bắt em bấm tiếp từng hiệp — nhảy thẳng tới trùm', async () => {
     const d = dungTruong(); await coSo(d)
     const ma = (await goi(d, 'S1', 'mo')).doan.ma as string

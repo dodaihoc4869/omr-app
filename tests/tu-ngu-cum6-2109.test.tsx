@@ -76,7 +76,7 @@ describe('cụm 6 · Võ đài (G10–G13)', () => {
     expect(within(hop).getByRole('button', { name: 'Xác nhận Tung chưởng' }).textContent).toContain('Dùng chiêu này')
     expect(hop.textContent).toContain('Tốn 2 năng lượng')
     expect(document.body.textContent).not.toContain('Thực hiện')
-  })
+  }, 20_000) // test nặng nhất tệp: nhiều `getByRole` (quét cả cây DOM). Đo riêng 0,55 s nhưng lượt chạy TOÀN BỘ dưới tải nặng từng chạm trần 5 s mặc định (06/10, đỏ chập chờn) ⇒ nới thời gian CHỜ (không đổi khẳng định nào)
 })
 
 describe('cụm 6 · Khiên (G21): tên ngắn + một dòng nói ĐÚNG tác dụng trong mã', () => {

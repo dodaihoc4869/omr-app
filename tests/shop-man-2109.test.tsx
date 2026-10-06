@@ -334,7 +334,10 @@ describe('(c) chống bấm đúp: MỘT lần ghi, cùng khoá', () => {
     fireEvent.click(mo)
     fireEvent.click(nut(c, 'mua-that'))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-    expect(c.contains(document.activeElement)).toBe(true)
+    // Trả tiêu điểm nằm trong `useEffect([phu])` của ManShop — chạy SAU lần commit làm hộp biến mất, không đồng bộ với nó. `waitFor` trả về ngay khi hộp biến mất nên máy tải nặng
+    // có thể tới đây trước khi effect chạy (đo 06/10: lặp 400 lần dưới tải CPU nặng ⇒ đỏ chập chờn đúng dòng này) ⇒ CHỜ trạng thái cuối thay vì khẳng định ngay. Vẫn khẳng định cứng:
+    // cuối cùng tiêu điểm phải ở TRONG màn, không rơi ra thân trang.
+    await waitFor(() => expect(c.contains(document.activeElement)).toBe(true))
     expect(document.activeElement).not.toBe(document.body)
   })
 
