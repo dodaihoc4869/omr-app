@@ -12,7 +12,7 @@
 // "Theo điểm danh:" (buổi đang mở + tối đa 3 buổi gần nhất của từng lớp, `buoiGanDay`) + chip "Cả lớp". Gửi `sbd` (chia về đúng lớp của em) trong CẢ `xem-truoc` lẫn
 // `tick`; chưa có danh sách em ⇒ giữ hành vi cũ (giao cả lớp, không gửi `sbd`). Bài đã tick: "Đã giao N em" + "Sửa em" (hộp sửa chiến dịch sẵn có).
 // Chữ: bảng A2 (app thầy dùng "lượt/ngày", không "thể lực"); chủ ngữ chữ MỚI là "A.I Đỗ Đại Học" (omni-chu.ts). Kiểu dáng: `bai-hom-nay.css` (chỉ biến màu --bts-*).
-import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
@@ -199,7 +199,9 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   const daDienEm = useRef<Set<string>>(new Set())
   const emCuaLop = useCallback((l: string) => new Set(dsEm.filter((e) => emThuocLop(e, l)).map((e) => e.sbd)), [dsEm])
   const emLop = useMemo(() => [...new Set(lopChon.flatMap((l) => dsEm.filter((e) => emThuocLop(e, l)).map((e) => e.sbd)))], [dsEm, lopChon])
-  useEffect(() => {
+  // `useLayoutEffect` (không phải `useEffect`): ô "Giao cho" hiện ngay khi danh sách em về, nên phần tích sẵn em phải xong TRƯỚC lần vẽ đầu — nếu không, một khung hình
+  // đầu hiện "0 / N em" + dòng "Chọn ít nhất 1 em." rồi mới nhảy sang "N / N em" (và test bắt được lúc máy tải nặng).
+  useLayoutEffect(() => {
     // Danh sách về / đổi lớp ⇒ tích sẵn em của lớp MỚI chọn đúng MỘT lần (như màn Giao tích theo lớp của ca); bỏ lớp ⇒ bỏ em của lớp ấy.
     if (!dsEm.length) return
     const da = daDienEm.current
