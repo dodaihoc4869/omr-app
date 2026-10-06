@@ -70,6 +70,36 @@ describe('xếp buổi chữa (thuần)', () => {
     expect(mot.vuotNganSach).toBe(true)
   })
 
+  it('(thầy 06/10) LỚP ĐÔNG 111 em: giữ ĐỦ các câu (không chỉ còn 1 câu / 115 phút), chỉ xếp lượt cho số em vừa giờ; tờ chiếu có đủ đợt', async () => {
+    const dsEm = Array.from({ length: 111 }, (_, i) => E(String(i + 1).padStart(3, '0')))
+    const cauDong = Array.from({ length: 6 }, (_, i) => cau(i + 1, `Dạng ${i + 1}`, dsEm.slice(i * 10, i * 10 + 30).map((e) => e.sbd), dsEm.slice(i * 10, i * 10 + 2).map((e) => e.sbd), i % 2 ? '001' : null))
+    const kq = xepBuoiChua(cauDong, dsEm, () => 180)
+    expect(kq.dong).toHaveLength(6)
+    expect(kq.boCau).toHaveLength(0)
+    expect(kq.tongGiay).toBeLessThanOrEqual(90 * 60)
+    expect(kq.vuotNganSach).toBe(true)
+    expect(kq.tongGiayDayDu).toBeGreaterThan(90 * 60)
+    expect(kq.soEmCoLuot).toBeGreaterThan(0)
+    expect(kq.soEmCoLuot).toBeLessThan(111)
+    // em cần dạy lại luôn có lượt ở câu của mình
+    expect(kq.dong[0]!.sua.slice(0, 2).map((e) => e.sbd)).toEqual(['001', '002'])
+    // Mở tờ máy chiếu: mỗi câu một đợt, đủ 6 đợt
+    const { dungToChieu } = await import('../src/components/chien-dich/to-chieu')
+    const { html } = await dungToChieu(oChieuTuDong(kq.dong), 'Buổi chữa', new Map(), 'PHIEN-DONG')
+    expect((html.match(/data-dot="\d+"/g) ?? []).length).toBe(6)
+  })
+
+  it('(thầy 06/10) lớp nhỏ không đổi: một câu vẫn bị bỏ khi bỏ câu cứu được giờ; bảng chữa đo theo khung chứa, ô xếp dọc ở cột phải khi hẹp', async () => {
+    const kq = xepBuoiChua(DU.cau, LOP, () => 40 * 60)
+    expect(kq.dong).toHaveLength(2)
+    expect(kq.vuotNganSach).toBe(false)
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync('src/components/chien-dich/chien-dich.css', 'utf8')
+    expect(css).toContain('@container bang-chua (min-width: 880px)')
+    expect(css).toMatch(/\.cd-hang-chua > :not\(\.cd-hang-so\) \{\s*grid-column: 2;/)
+    expect(css).not.toMatch(/@media \(min-width: 1000px\) \{\s*\.cd-hang-chua/)
+  })
+
   it('chữ người sửa gọn: quá 3 em ⇒ "+N em"; ca chốt không trùng, tối đa 25', () => {
     expect(chuNguoiSua(['1', '2', '3'].map(E))).toBe('Sửa: Em 1, Em 2, Em 3')
     expect(chuNguoiSua(['1', '2', '3', '4', '5'].map(E))).toBe('Sửa: Em 1, Em 2 +3 em')

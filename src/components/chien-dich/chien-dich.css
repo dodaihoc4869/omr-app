@@ -343,10 +343,29 @@
 .cd-hang-chua--dau {
   display: none;
 }
-@media (min-width: 1000px) {
+/* Hẹp (điện thoại, máy tính bảng dọc, hoặc khung có thanh bên): số thứ tự nằm cột trái, MỌI ô còn lại xếp dọc ở cột phải.
+   Trước đây 7 ô chảy vào lưới 2 cột nên ô thứ 3, 5… rơi vào cột 32 px và chữ bị bẻ từng ký tự. */
+.cd-hang-chua .cd-hang-so {
+  grid-column: 1;
+  grid-row: 1;
+}
+.cd-hang-chua > :not(.cd-hang-so) {
+  grid-column: 2;
+}
+/* Bảng chữa đo theo BỀ RỘNG KHUNG CHỨA (không theo cửa sổ): cửa sổ ≥ 1000 px mà có thanh bên + lề thì khung vẫn hẹp. */
+.cd-bang-chua {
+  container-type: inline-size;
+  container-name: bang-chua;
+}
+@container bang-chua (min-width: 880px) {
   .cd-hang-chua {
     grid-template-columns: 32px minmax(0, 1.5fr) minmax(0, 1.3fr) 64px minmax(0, 1.6fr) 72px 104px;
     align-items: baseline;
+  }
+  .cd-hang-chua .cd-hang-so,
+  .cd-hang-chua > :not(.cd-hang-so) {
+    grid-column: auto;
+    grid-row: auto;
   }
   .cd-hang-chua--dau {
     display: grid;
