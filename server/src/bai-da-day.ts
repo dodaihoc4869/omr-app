@@ -23,7 +23,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
-import { docBatDauMap, docChienDichCuaEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop } from './srs2-d1'
+import { docBatDauMap, docChienDichCuaEm, docChienDichDangChayCuaCacEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop } from './srs2-d1'
 import { congNgay, khoiLuongCan, soNgayConLai, soNgayGiua } from './srs2-loi'
 import { KHOA_THE_LUC_LOP, SQL_LA_LAN_LAM, THAM_SO_OMNI } from './omni-kieu'
 import { cacQidSongSinh } from './loi-hoc-luat'
@@ -31,6 +31,12 @@ import { soNgayHanBai } from './omni-ke-hoach'
 import { hoSoOmniNhieuEm, omniBat, qCuaCau } from './omni-d1'
 import { duBaoDiem } from './du-bao-diem'
 import { xetChungChi } from './omni-chung-chi'
+// 06/10 — dòng "Ôn bài cũ" của thẻ xác nhận (xem-truoc): kho đếm thật (không cắt trần ứng viên), đúng khối, bỏ câu của chiến dịch đang chạy.
+import { khoiCuaLop, type Khoi } from '../../src/lib/khoi-cau'
+import { chanMetaKhacKhoi, docKhoiChungCacEm } from './chan-khac-khoi'
+import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
+import { docTiLeHieuLucCuaLop } from './omni-on-bai-cu-d1'
+import { chiaCauTheoBai, xemOnBaiCu, type TiLeOnBaiCu } from './omni-on-bai-cu'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -414,19 +420,89 @@ async function demDuDiem8(env: Env, dv: DauVaoBai, qids: readonly string[], D: n
   }
 }
 
+// ---------------------------------------------------------------- dòng "Ôn bài cũ" của thẻ xác nhận (thầy 06/10)
+interface NhomKho { khoaBai: string; viTri: number; qids: string[] }
+/** Chờ tối đa ngần này ms để đếm kho ôn bài cũ cho dòng xác nhận; quá hạn ⇒ không có dòng (thẻ không bị chậm). */
+export const HAN_KHO_ON_BAI_CU_MS = 4_000
+/** Kho ôn bài cũ theo bài của (khối, danh sách tờ) — đệm 5 phút trong isolate như câu phạm vi của em (`demCauPhamVi`, srs2-d1.ts). */
+const demKhoOnBaiCu = new DemTTL<NhomKho[]>(5 * 60_000, 16, 200_000)
+
+/**
+ * KHO ÔN BÀI CŨ theo bài — ĐẾM THẬT, không cắt trần ứng viên của kế hoạch ngày (`TRAN_UNG_VIEN_ON_BAI_CU`): câu hợp lệ (đã duyệt, không tự luận — `cauCuaToChiTiet`, bỏ trùng giữa
+ * các tờ, bài gần nhất giữ) của các tờ DẠY HỌC trong `toBai` (mã tờ gốc → bài), ĐÚNG KHỐI `khoi` (cùng cổng `chanMetaKhacKhoi` mà ứng viên của em đi qua). Bài gần nhất trước.
+ */
+async function docKhoOnBaiCuTheoBai(env: Env, toBai: ReadonlyMap<string, { khoaBai: string; viTri: number }>, khoi: Khoi): Promise<NhomKho[]> {
+  const ds = [...toBai.keys()].sort((a, b) => toBai.get(b)!.viTri - toBai.get(a)!.viTri || (a < b ? -1 : a > b ? 1 : 0))
+  if (!ds.length) return []
+  const khoa = `${khoi}|${ds.map((m) => `${m}=${toBai.get(m)!.khoaBai}`).join('|')}`
+  const co = demKhoOnBaiCu.doc(khoa, Date.now())
+  if (co) return co
+  const thuMuc = await thuMucCuaMaDe(env, ds).catch(() => new Map(ds.map((m) => [m, thuMucTheoMa(m)] as const))) // lỗi đọc ⇒ luật lùi ("DH-" là DẠY HỌC), như `thuMucAnToan` của kế hoạch ngày
+  const dayHoc = ds.filter((m) => thuMuc.get(m) === 'DAY_HOC')
+  if (!dayHoc.length) return []
+  const { qids, theoTo } = await cauCuaToChiTiet(env, dayHoc)
+  const chia = chiaCauTheoBai(dayHoc, qids, theoTo, (m) => toBai.get(m)!.khoaBai, new Set())
+  // Cổng khối y hệt ứng viên của em (`docHoSo2`): câu khác khối / không rõ khối / mâu thuẫn khối bị bỏ (mã tờ + mã câu; cần D1 chỉ cho câu không đọc ra khối).
+  const meta = new Map<string, unknown>(qids.map((q) => [q, { qid: q, maDe: chia.toCua.get(q) ?? '' }]))
+  await chanMetaKhacKhoi(env, 'xem_truoc_on_bai_cu', khoi, meta)
+  const viTriCua = new Map([...toBai.values()].map((b) => [b.khoaBai, b.viTri] as const))
+  const nhom = chia.khoa.map((k, i) => ({ khoaBai: k, viTri: viTriCua.get(k) ?? 0, qids: chia.nhom[i]!.filter((q) => meta.has(q)) })).filter((n) => n.qids.length > 0)
+  demKhoOnBaiCu.ghi(khoa, Date.now(), nhom, nhom.reduce((s, n) => s + n.qids.length, 1))
+  return nhom
+}
+
+/**
+ * Phần ĐỌC của dòng "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%": kho X (câu hợp lệ của các bài đứng trước trong phạm vi) + số bài + tỉ lệ đang áp cho lớp. "Bài đứng trước" =
+ * phạm vi đã dạy HIỆN CÓ của lớp ∪ các bài đứng trước bài sắp giao mà app thầy gửi kèm (`phamVi`), bỏ tờ của chính bài sắp giao (sau khi giao nó là chiến dịch đang chạy); câu của chiến dịch
+ * đang chạy (của em được giao) và câu của bài sắp giao bị bỏ — đúng như ứng viên ôn bài cũ của em. KHÔNG BAO GIỜ ném lỗi: lỗi / không có bài trước / không rõ khối ⇒ null.
+ */
+async function docKhoChoXem(env: Env, dv: DauVaoBai, ctP: Promise<{ qids: string[] }>, nowMs: number): Promise<{ khoCau: number; soBai: number; tiLe: TiLeOnBaiCu } | null> {
+  try {
+    const goc = (m: string) => tachMaTo(m).goc
+    const toMoi = new Set(dv.maDe.map(goc))
+    const toBai = new Map<string, { khoaBai: string; viTri: number }>()
+    const pv = await phamViLop(env, dv.lop)
+    for (const [m, b] of pv?.baiTheoMaDe ?? []) toBai.set(m, { khoaBai: b.khoaBai, viTri: b.viTri })
+    for (const b of dv.phamVi) for (const m of b.maDe) { const g = goc(m); if (g && !toBai.has(g)) toBai.set(g, { khoaBai: b.khoaBai, viTri: b.viTri }) }
+    for (const [m, b] of [...toBai]) if (toMoi.has(m) || (dv.khoaBai && b.khoaBai === dv.khoaBai)) toBai.delete(m)
+    if (!toBai.size) return null
+    const sbd = dv.em.map((e) => e.sbd)
+    const khoi = khoiCuaLop(dv.lop) ?? (await docKhoiChungCacEm(env, sbd).catch(() => null))
+    if (!khoi) return null
+    const [nhom, dangChay, ct, tiLe] = await Promise.all([docKhoOnBaiCuTheoBai(env, toBai, khoi), docChienDichDangChayCuaCacEm(env, sbd, ngayVnCua(nowMs)), ctP, docTiLeHieuLucCuaLop(env, dv.lop)])
+    const loai = new Set([...ct.qids, ...dangChay.flatMap((c) => c.qids)])
+    let khoCau = 0, soBai = 0
+    for (const n of nhom) {
+      const con = n.qids.filter((q) => !loai.has(q)).length
+      khoCau += con
+      if (con > 0) soBai++
+    }
+    return { khoCau, soBai, tiLe }
+  } catch {
+    return null
+  }
+}
+
 // ---------------------------------------------------------------- các action
 async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string, unknown>> {
   const dv = await docDauVaoBai(env, b, nowMs, false)
   if ('loi' in dv) return { ok: false, error: dv.loi }
   if (!dv.em.length) return { ok: false, error: `Lớp ${dv.lop} chưa có học sinh nào.` }
   const homNay = ngayVnCua(nowMs)
-  const [han, ct, cb] = await Promise.all([tinhHan(env, dv, nowMs), cauCuaToChiTiet(env, dv.maDe), docCauBai(env, dv.maDe)])
+  const ctP = cauCuaToChiTiet(env, dv.maDe)
+  const khoP = docKhoChoXem(env, dv, ctP, nowMs) // chạy SONG SONG phần cũ (không thêm đợt D1); không bao giờ từ chối
+  const [han, ct, cb] = await Promise.all([tinhHan(env, dv, nowMs), ctP, docCauBai(env, dv.maDe)])
   if ('loi' in han) return { ok: false, error: han.loi }
   // Lượt cần TỪNG em — cùng công thức đồng hồ sức chứa (khoiLuongCan của câu chiến dịch mới + lượt nợ cũ ngoài các câu này).
   const sbd = dv.em.map((e) => e.sbd)
   const [tt, noCu] = await Promise.all([trangThaiLop(env, sbd, ct.qids, han.hanNop, new Date(nowMs).toISOString()), noCuCaLop(env, sbd, homNay, ct.qids)])
   const sucChua = han.D * dv.theLuc
   const quaTai = dv.em.filter((e) => khoiLuongCan(tt.get(e.sbd)?.values() ?? []) + (noCu.get(e.sbd)?.luot ?? 0) > sucChua).map((e) => ({ sbd: e.sbd, ten: e.ten }))
+  // (a) Dòng "Ôn bài cũ" — N = Σ ngày ⌊thể lực × tỉ lệ⌋ trong D ngày (đúng hàm kế hoạch ngày), X = kho đếm thật, Y = phủ. Chỉ-thêm: kho 0 / lỗi / quá chậm ⇒ KHÔNG có trường (app: không dòng).
+  // Lần đầu (đệm 5 phút còn lạnh) kho phải đọc mọi câu của các bài trước — nếu quá HAN_KHO_ON_BAI_CU_MS thì bỏ dòng, KHÔNG làm chậm thẻ xác nhận (việc đọc vẫn chạy tiếp để đệm sẵn cho lần sau).
+  let hen: ReturnType<typeof setTimeout> | undefined
+  const kho = await Promise.race([khoP, new Promise<null>((xong) => { hen = setTimeout(() => xong(null), HAN_KHO_ON_BAI_CU_MS) })]).finally(() => clearTimeout(hen))
+  const onBaiCu = kho ? xemOnBaiCu({ soNgay: han.D, theLuc: dv.theLuc, khoCau: kho.khoCau, soBai: kho.soBai, tiLe: kho.tiLe }) : null
   return {
     ok: true,
     soCau: ct.qids.length, soTuLuan: cb.soTuLuan,
@@ -436,6 +512,7 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
     soEmChon: dv.em.length, duLuot: dv.em.length - quaTai.length, tongEm: dv.soEmLop,
     duDiem8: await demDuDiem8(env, dv, ct.qids, han.D, nowMs),
     quaTai, theLucNgay: dv.theLuc,
+    ...(onBaiCu ? { onBaiCu } : {}),
   }
 }
 
@@ -613,7 +690,11 @@ async function danhSach(env: Env, b: Row, nowMs: number): Promise<Record<string,
  * `POST /gv/bai-da-day` — action:
  *   danh-sach {lop}                                  ⇒ { ok, bai: [{khoaBai, tenBai, viTri, tickLuc, chienDichId, trangThai:'dang_luyen'|'da_day', hanNop, conNgay, chungChi:{dat,tong}}], choBaiMoi: {soNgay}|null }
  *   (maDe[] và phamVi[].maDe: mã -VD / -DT / -TL bị bỏ trước khi tính / giao — `laMaToKhongGiao`; còn 0 tờ ⇒ { ok:false, error: CHU_BAI_CHUA_CO_TO_TU_GIAO })
- *   xem-truoc {lop, khoaBai, tenBai, viTri, maDe[], theLucNgay?, hanNop?} ⇒ { ok, soCau, soTuLuan, hanNop, D, luotCan, sucChua, duLuot, tongEm, duDiem8, quaTai:[{sbd,ten}], theLucNgay }
+ *   xem-truoc {lop, khoaBai, tenBai, viTri, maDe[], theLucNgay?, hanNop?, phamVi?:[{khoaBai,tenBai,viTri,maDe[]}]} ⇒ { ok, soCau, soTuLuan, hanNop, D, luotCan, sucChua, duLuot, tongEm, duDiem8, quaTai:[{sbd,ten}], theLucNgay,
+ *     onBaiCu?: { toiDaMoiEm, khoCau, phuPhanTram, soBai, tiLe:{thuong,cuoi} } }
+ *   (06/10 `onBaiCu`, chỉ-thêm — dòng "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%" của thẻ xác nhận: N = Σ ngày 1..D ⌊thể lực × tỉ lệ ngày⌋ theo tỉ lệ của lớp
+ *    (`cau_hinh.on_bai_cu_ti_le`), X = câu hợp lệ đúng khối của các bài đứng trước (phạm vi hiện có của lớp ∪ `phamVi` gửi kèm; bỏ tờ bài sắp giao, câu chiến dịch đang chạy;
+ *    đếm thật, không cắt trần ứng viên), Y = min(100, làm tròn(N / X × 100)). Kho 0 / lỗi / không rõ khối ⇒ KHÔNG có trường.)
  *   tick {lop, khoaBai, tenBai, viTri, maDe[], phamVi:[{khoaBai,tenBai,viTri,maDe[]}], hanNop?, theLucNgay?, nguoi?} ⇒ { ok, chienDichId, hanNop, daCo }
  *   bo-tick {lop, khoaBai}                          ⇒ { ok, chienDich: 'da_huy'|'da_dong'|null }
  * Chọn em được giao (thầy 05/10): `sbd[]` ở xem-truoc/tick — bỏ trùng, bỏ SBD không có trong danh sách học sinh hoặc đã khoá; còn 0 em ⇒
