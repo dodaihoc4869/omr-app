@@ -15,7 +15,7 @@
 // THUẦN: không IO, không đồng hồ, không ngẫu nhiên. Máy soạn (qua scripts/loi-giai/kiem.bundle.mjs) và máy chủ (lúc nhận) dùng CÙNG hàm;
 // máy chủ không tin máy soạn — dựng câu gốc từ KHO (`cauGocTuKho`) rồi kiểm lại từng mục + bằng chứng hai lượt (`kiem.d2`).
 // Chữ học sinh đọc (đề, phương án, ý, lời giải bản khác) viết như đề KHO (H2SO4, Fe^3+, \ce{…}); không thẻ HTML, không từ nội bộ.
-import { loaiCau, tinhBieuThuc, type CauKho, type DangLoiGiai } from '../../src/lib/loi-giai-kiem'
+import { loaiCau, saiSoLamTron, tinhBieuThuc, type CauKho, type DangLoiGiai } from '../../src/lib/loi-giai-kiem'
 import { docBangSongSinh, songSinhDuDuLieu, type SongSinh } from './cau-bo-tro'
 
 type Obj = Record<string, unknown>
@@ -190,7 +190,7 @@ function kiemPhepTinhBan(ds: unknown, noi: string, loi: string[]): PhepTinhBan[]
     if (typeof p.ketQua !== 'number' || !Number.isFinite(p.ketQua)) { loi.push(`${noi}: "${ten}" ketQua không phải số`); return }
     try {
       const v = tinhBieuThuc(chuoi(p.bieuThuc))
-      if (Math.abs(v - p.ketQua) > 0.5 * 10 ** -d + 1e-9) { loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`); return }
+      if (Math.abs(v - p.ketQua) > saiSoLamTron(p.ketQua, d)) { loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`); return }
     } catch (e) { loi.push(`${noi}: "${ten}" ${(e as Error).message}`); return }
     ra.push({ ...(chuoi(p.ten).trim() ? { ten } : {}), bieuThuc: chuoi(p.bieuThuc), ketQua: p.ketQua, lamTron: d, ...(p.laDapSo === true ? { laDapSo: true } : {}) })
   })

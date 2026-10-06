@@ -14,6 +14,7 @@
 // Chỉ ba dạng: trắc nghiệm (I), Đúng/Sai (II), trả lời ngắn (III). Tự luận bỏ (thầy chốt 29/09; luật chung `cau-tu-luan.ts`).
 
 import { chuoiDapAn, laCauTuLuan, laMaDeTuLuan, type PhanCau } from './cau-tu-luan'
+import { docSoPhanIII } from './doc-so-phan-iii'
 
 export const KHUON_HO_SO = '1.2'
 export type DangLoiGiai = 'tn' | 'ds' | 'tln'
@@ -225,16 +226,19 @@ export function dauVao(c: CauKho, bam: string): DauVao | null {
 
 // ---------------------------------------------------------------- máy tính an toàn
 
-/** Tính biểu thức chỉ gồm số (dấu chấm thập phân), + − × ÷ và ngoặc. Kí tự lạ ⇒ ném lỗi. KHÔNG dùng eval. */
+/**
+ * Tính biểu thức chỉ gồm số (dấu chấm thập phân; số khoa học viết `6.02e23`, `1.3e-3` — 06/10, cho đáp số dạng a.10ⁿ), + − × ÷ và ngoặc.
+ * Kí tự lạ ⇒ ném lỗi. KHÔNG dùng eval.
+ */
 export function tinhBieuThuc(bt: string): number {
   const s = bt.replace(/\s+/g, '')
-  if (!/^[0-9.+\-*/()]+$/.test(s)) throw new Error('biểu thức có kí tự lạ: ' + bt)
+  if (!/^[0-9.+\-*/()eE]+$/.test(s)) throw new Error('biểu thức có kí tự lạ: ' + bt)
   let i = 0
   const so = (): number => {
     if (s[i] === '(') { i++; const v = cong(); if (s[i] !== ')') throw new Error('thiếu ngoặc đóng: ' + bt); i++; return v }
     if (s[i] === '-') { i++; return -so() }
     if (s[i] === '+') { i++; return so() }
-    const m = /^\d+(\.\d+)?|^\.\d+/.exec(s.slice(i))
+    const m = /^(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?/.exec(s.slice(i))
     if (!m) throw new Error('biểu thức hỏng: ' + bt)
     i += m[0].length
     return Number(m[0])
@@ -280,6 +284,18 @@ const TRUONG_BUOC = ['qid', 'bam', 'dang', 'ten', 'keys', 'dung', 'y', 'ket', 'n
 
 interface PhepTinh { ten?: unknown; bieuThuc?: unknown; ketQua?: unknown; lamTron?: unknown; laDapSo?: unknown }
 
+/**
+ * Sai số làm tròn cho phép giữa kết quả máy tính ra và con số ghi (`ketQua` ghi với `d` chữ số). Cỡ thường: ± 0,5·10^−d như cũ.
+ * Số CỠ KHOA HỌC (≥ 10¹² hoặc < 10⁻⁸ — `d` tối đa 8 nên với số nhỏ hơn 10⁻⁸ "chữ số thập phân" không thể là của chính số ấy; vd 1,2.10²³ · 1,6.10⁻¹⁹): `d` là
+ * số chữ số thập phân của PHẦN a ⇒ sai số theo bậc luỹ thừa 10 của chính số đó (sai số tuyệt đối ± 0,5·10^−d không bao giờ thoả cho số cỡ 10²³).
+ * Số lớn / nhỏ dạng thường trong [10⁻⁸; 10¹²) (vd 1237500000 kJ) KHÔNG đổi luật.
+ */
+export function saiSoLamTron(ketQua: number, d: number): number {
+  const a = Math.abs(ketQua)
+  if (a >= 1e12 || (a > 0 && a < 1e-8)) return 0.5 * Math.pow(10, Math.floor(Math.log10(a)) - d) + a * 1e-9
+  return 0.5 * Math.pow(10, -d) + 1e-9
+}
+
 function kiemPhepTinh(ds: unknown, noi: string, loi: string[]): number {
   if (!Array.isArray(ds)) { loi.push(`${noi}: phepTinh không phải mảng`); return 0 }
   for (const p of ds as PhepTinh[]) {
@@ -287,9 +303,8 @@ function kiemPhepTinh(ds: unknown, noi: string, loi: string[]): number {
     try {
       const v = tinhBieuThuc(chuoi(p?.bieuThuc))
       const d = Number(p?.lamTron ?? 2)
-      const sai = 0.5 * Math.pow(10, -d) + 1e-9
       if (typeof p?.ketQua !== 'number') loi.push(`${noi}: "${ten}" ketQua không phải số`)
-      else if (Math.abs(v - p.ketQua) > sai) loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`)
+      else if (Math.abs(v - p.ketQua) > saiSoLamTron(p.ketQua, d)) loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`)
     } catch (e) { loi.push(`${noi}: "${ten}" ${(e as Error).message}`) }
   }
   return ds.length
@@ -308,7 +323,13 @@ function chuTrongHoSo(h: Obj): string[] {
 }
 
 const chuanKet = (s: string) => s.replace(/\s+/g, ' ').replace(/[-—]/g, '–').trim()
-const soTuChu = (s: string) => Number(s.trim().replace(',', '.'))
+/** Đáp số kho → số. Hiểu cả kí hiệu khoa học ("1,1.10²³", "1,3.10⁻³", "6,02×10^23") bằng hàm chung của Phần III (`docSoPhanIII`); không phải số thuần ⇒ NaN. */
+export const soTuChu = (s: string): number => {
+  const r = docSoPhanIII(s.trim())
+  return r && !r.donVi ? Number(r.so) : Number.NaN
+}
+/** Hai con số của khoá số coi là khớp: sai số tuyệt đối 1e-9 hoặc tương đối 1e-9 (số cỡ 10²³ không thể khớp tuyệt đối). */
+const khopSo = (x: number, y: number): boolean => Math.abs(x - y) <= Math.max(1e-9, Math.abs(x) * 1e-9)
 
 /**
  * KIỂM MỘT HỒ SƠ đối chiếu ĐẦU VÀO LẤY TỪ KHO (không lấy từ máy soạn gửi lên).
@@ -398,7 +419,7 @@ export function kiemHoSo(vao: DauVao, hoSo: unknown, bo: BoChiaKhoa): { loi: str
     if (!ket.startsWith('Đáp số')) loi.push('tln: ket phải mở đầu "Đáp số"')
     const cuoi = Array.isArray(h.phepTinh) ? (h.phepTinh as PhepTinh[]).filter((p) => p?.laDapSo).pop() : undefined
     if (!cuoi) loi.push('KHOÁ SỐ: thiếu phép tính laDapSo')
-    else if (!(Math.abs(soTuChu(vao.dapAn.kq) - Number(cuoi.ketQua)) < 1e-9)) loi.push(`KHOÁ SỐ: phép tính cuối ra ${chuoi(cuoi.ketQua)} ≠ đáp số ${vao.dapAn.kq}`)
+    else if (!khopSo(soTuChu(vao.dapAn.kq), Number(cuoi.ketQua))) loi.push(`KHOÁ SỐ: phép tính cuối ra ${chuoi(cuoi.ketQua)} ≠ đáp số ${vao.dapAn.kq}`)
   }
 
   // khoá 4: con số
