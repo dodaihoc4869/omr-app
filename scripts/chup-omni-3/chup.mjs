@@ -106,6 +106,24 @@ const MAN = [
     await t.waitForTimeout(500)
     await chup(t, 'hs-dao-chua-chac-bat-390')
   }],
+  // ĐOÀN MỘT MÌNH · Trạm hồi phục (06/10): chốt đáp án sai ⇒ thẻ Trạm dưới kết quả câu (quãng nghỉ) ⇒ "Làm 3 câu nền" ⇒ hộp câu nền phải NỔI TRÊN lớp phủ Đoàn.
+  ['doan-tram', [360, 740], async (t) => {
+    await t.locator('.dh2').first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(900)
+    await t.getByRole('button', { name: /9,6 gam/ }).first().click()
+    await t.waitForTimeout(250)
+    await t.getByRole('button', { name: /CHỐT ĐÒN ĐÁNH/ }).first().click()
+    await t.getByText('Trạm hồi phục', { exact: false }).first().waitFor({ timeout: 20000 })
+    await t.waitForTimeout(800)
+    await t.getByText('Trạm hồi phục', { exact: false }).first().scrollIntoViewIfNeeded()
+    await t.waitForTimeout(300)
+    await chup(t, 'hs-doan-tram-360')
+    await chupPhan(t, '[data-khoi="tram-hoi-phuc"]', 'hs-doan-tram-the-360')
+    await t.getByRole('button', { name: 'Làm 3 câu nền' }).first().click()
+    await t.getByRole('dialog', { name: /Luyện kiến thức nền/ }).waitFor({ timeout: 20000 })
+    await t.waitForTimeout(900)
+    await chup(t, 'hs-doan-tram-cau-nen-360')
+  }],
   ['dao-cham', [390, 844], async (t) => {
     await lenDuong(t)
     await chotDapAn(t, /^B\./)

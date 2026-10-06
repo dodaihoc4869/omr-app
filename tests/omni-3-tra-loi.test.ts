@@ -1,7 +1,7 @@
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 // OMNI 3 · LÀN B3 — ĐƯỜNG TRẢ LỜI (`answer`) trên D1 thật (node:sqlite, đủ migration): cờ tắt y hệt hôm nay; lướt; chắc-mà-sai; P dạng; Phần II từng ý;
-// Trạm hồi phục (đúng 3 sai liền, một lần/chuyến, không Đoàn) + `hoa2-omni-tram-xong`; lệnh hoa2-omni-* khi cờ tắt; Đoàn chuyển msLam/tuTin.
+// Trạm hồi phục (đúng 3 sai liền, một lần/chuyến; Đoàn CHỈ khi một người thật — 06/10) + `hoa2-omni-tram-xong`; lệnh hoa2-omni-* khi cờ tắt; Đoàn chuyển msLam/tuTin.
 // Lớp D1 OMNI (omni-d1.ts) là STUB của làn khác ⇒ TIÊM bằng vi.mock (test không phụ thuộc con số stub).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoD1That } from './_d1-that'
@@ -355,7 +355,7 @@ describe('OMNI 3 · B3 — Trạm hồi phục', () => {
     // giao vi kỹ năng của Q3, Q5, Q6 = {dang:D1}; nhãn nen:mol chỉ ở Q3 ⇒ vẫn là nen:* nhiều nhất ⇒ nen:mol
     expect(r6.omni.tram).toMatchObject({ vkn: 'nen:mol', nhan: 'mol', coCauNen: false, chu: chuTram('đổi khối lượng ra số mol', false) })
   })
-  it('Đoàn (kể cả gọi nội bộ) và chuyến vé ⇒ không mở trạm', async () => {
+  it('Đoàn (lệnh nội bộ KHÔNG báo một mình = nhiều người thật) và chuyến vé ⇒ không mở trạm', async () => {
     const { d, env, token } = await dung()
     tiem.bat = true
     datQ()
@@ -369,6 +369,74 @@ describe('OMNI 3 · B3 — Trạm hồi phục', () => {
     expect(cuoi.omni.tram).toBeUndefined()
     expect(cuoi.ve).toBe(true) // máy em không trừ Máu ở chuyến vé
     expect(dongSo(d, 'Q6', 'VE')).toMatchObject({ ket_qua: 0, purpose: 'probe' }) // sổ ghi thật
+  })
+  // 06/10 (thầy: "Tôi làm thử chiến dịch sai 3 câu liên tiếp trong đoàn không thấy về trạm hồi phục"): đặc tả gốc cho Trạm ở "chặng Đoàn một mình" (Đoàn nhiều người không có).
+  const doanNoiBo = (env: Env, token: string, q: string, them: Record<string, unknown> = {}) =>
+    gameV2(env, 'answer', danhDau({ token, session: 'DOAN', qid: q, answer: 'A', msLam: 40_000, ...them })) as Promise<KQ>
+  const phienDoan = (d: Awaited<ReturnType<typeof dung>>['d']) => JSON.parse(String((d.sql.prepare("SELECT json FROM game_v2_session WHERE id = 'DOAN'").get() as { json: string }).json)) as Record<string, unknown>
+  it('Đoàn MỘT NGƯỜI THẬT (lệnh nội bộ báo motMinh) ⇒ đúng 3 câu sai liền mở Trạm có câu nền; một lần/chặng; JSON phiên tram:1; sổ vẫn ghi thật', async () => {
+    const { d, env, token } = await dung()
+    tiem.bat = true
+    datQ()
+    d.sql.exec("INSERT INTO cau_nen(id,nhan,muc,kieu,de,dap_an,cap_nhat_luc) VALUES('n1','mol',1,'so','Tính số mol của 4,4 gam CO2','0,1','x')")
+    moPhien(d, 'DOAN', ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'], { doan: 1 })
+    const ds: KQ[] = []
+    for (const q of ['Q1', 'Q2', 'Q3', 'Q4']) { toi(); ds.push(await doanNoiBo(env, token, q, { motMinh: true })) }
+    expect(ds.every((r) => r.ok === true && r.correct === false)).toBe(true)
+    expect(ds[0]!.omni.tram).toBeUndefined()
+    expect(ds[1]!.omni.tram).toBeUndefined()
+    expect(ds[2]!.omni.tram).toEqual({ vkn: 'nen:mol', ten: 'Tính số mol', tenLoi: 'đổi khối lượng ra số mol', nhan: 'mol', coCauNen: true, chu: chuTram('đổi khối lượng ra số mol', true) })
+    expect(ds[3]!.omni.tram).toBeUndefined() // tối đa một trạm/chặng
+    expect(phienDoan(d).tram).toBe(1)
+    expect((d.sql.prepare("SELECT COUNT(*) AS n FROM su_kien_hoc WHERE ma_nguon = 'DOAN' AND ket_qua = 0").get() as { n: number }).n).toBe(4)
+  })
+  it('Đoàn một mình: câu đúng cắt chuỗi, lướt không tính, câu có tiếp sức (assisted) cắt chuỗi — chỉ SAI TỰ LÀM liền nhau mới mở', async () => {
+    const { d, env, token } = await dung()
+    tiem.bat = true
+    datQ()
+    d.sql.exec("INSERT INTO cau_nen(id,nhan,muc,kieu,de,dap_an,cap_nhat_luc) VALUES('n1','mol',1,'so','Tính số mol của 4,4 gam CO2','0,1','x')")
+    moPhien(d, 'DOAN', ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'], { doan: 1 })
+    toi(); await doanNoiBo(env, token, 'Q1', { motMinh: true })
+    toi(); const dung2 = await gameV2(env, 'answer', danhDau({ token, session: 'DOAN', qid: 'Q2', answer: 'B', msLam: 40_000, motMinh: true })) as KQ // đúng ⇒ cắt chuỗi
+    expect(dung2.correct).toBe(true)
+    toi(); await doanNoiBo(env, token, 'Q3', { motMinh: true })
+    toi(); const tro = await doanNoiBo(env, token, 'Q4', { motMinh: true, assisted: true }) // tiếp sức: cắt chuỗi (assisted do máy chủ đặt từ thẻ; ở đây ép qua thân nội bộ)
+    toi(); const luot = await doanNoiBo(env, token, 'Q5', { motMinh: true, msLam: 1000 })
+    expect(luot.luot).toBe(true) // lướt: không tính, không cắt
+    toi(); const r6 = await doanNoiBo(env, token, 'Q6', { motMinh: true })
+    expect([tro.omni.tram, luot.omni.tram, r6.omni.tram].every((t) => t === undefined)).toBe(true) // chưa đủ ba sai liền tự làm
+    expect(phienDoan(d).tram).toBeUndefined()
+  })
+  it('Đoàn một mình nhưng KHÔNG có câu nền ⇒ không mở trạm (ải kế của Đoàn không đổi được bằng câu dễ hơn), không đánh dấu phiên, chuỗi sai còn đó', async () => {
+    const { d, env, token } = await dung()
+    tiem.bat = true
+    datQ() // không INSERT cau_nen ⇒ coCauNen false
+    moPhien(d, 'DOAN', ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'], { doan: 1 })
+    const ds: KQ[] = []
+    for (const q of ['Q1', 'Q2', 'Q3', 'Q4']) { toi(); ds.push(await doanNoiBo(env, token, q, { motMinh: true })) }
+    expect(ds.map((r) => r.omni.tram)).toEqual([undefined, undefined, undefined, undefined])
+    expect(phienDoan(d).tram).toBeUndefined()
+    // đảo vẫn mở trạm không câu nền (đổi ải kế) như cũ — chỉ Đoàn đòi có câu nền
+    moPhien(d, 'P1', ['Q1', 'Q2', 'Q3', 'Q4'])
+    let cuoi: KQ = {}
+    for (const q of ['Q1', 'Q2', 'Q3']) { toi(); cuoi = await traLoi(env, token, 'P1', q, 'A', { msLam: 40_000 }) }
+    expect(cuoi.omni.tram).toMatchObject({ coCauNen: false })
+  })
+  it('motMinh do máy em tự gửi (không qua lệnh nội bộ của Đoàn) ⇒ lệnh bị từ chối, không có trạm; Đảo bỏ qua cờ motMinh', async () => {
+    const { d, env, token } = await dung()
+    tiem.bat = true
+    datQ()
+    d.sql.exec("INSERT INTO cau_nen(id,nhan,muc,kieu,de,dap_an,cap_nhat_luc) VALUES('n1','mol',1,'so','Tính số mol của 4,4 gam CO2','0,1','x')")
+    moPhien(d, 'DOAN', ['Q1', 'Q2', 'Q3'], { doan: 1 })
+    toi()
+    await expect(gameV2(env, 'answer', { token, session: 'DOAN', qid: 'Q1', answer: 'A', msLam: 40_000, motMinh: true })).rejects.toThrow(/chặng Đoàn/)
+    expect(dongSo(d, 'Q1', 'DOAN')).toBeUndefined() // không ghi sổ
+    // Đảo: cờ motMinh vô nghĩa — vẫn đúng luật 3 sai liền
+    moPhien(d, 'P1', ['Q1', 'Q2', 'Q3', 'Q4'])
+    const ds: KQ[] = []
+    for (const q of ['Q1', 'Q2', 'Q3']) { toi(); ds.push(await traLoi(env, token, 'P1', q, 'A', { msLam: 40_000, motMinh: true })) }
+    expect(ds[0]!.omni.tram).toBeUndefined()
+    expect(ds[2]!.omni.tram).toMatchObject({ nhan: 'mol', coCauNen: true })
   })
   it('hoa2-omni-tram-xong: đổi ải KẾ TIẾP bằng câu cùng dạng thấp hơn một bậc; `answer` chấm được câu mới; gọi lại trả đúng câu đã đổi', async () => {
     const { d, env, token } = await dung()
