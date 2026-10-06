@@ -9,7 +9,8 @@
 // Dùng: node do-kh-trong.mjs [số em mẫu]. Thử cục bộ: OMR_D1_CHE_DO=local (D1 giả trong bộ nhớ, nạp mẫu bằng OMR_D1_SEED).
 import { writeSync } from 'node:fs'
 import '../server/src/index' // nạp theo ĐÚNG thứ tự của Worker thật (các tệp máy chủ nhập vòng nhau)
-import { docHoSo2, tamHoanCauKhoa, tuyChonKeHoachOmni, ngayVnCua, type KeHoachDaChot } from '../server/src/srs2-d1'
+import { docHoSo2, docMetaCau, tamHoanCauKhoa, tuyChonKeHoachOmni, ngayVnCua, type KeHoachDaChot } from '../server/src/srs2-d1'
+import { thuMucCuaMaDe } from '../server/src/kho-thu-muc'
 import { lapKeHoachNgay } from '../server/src/srs2-loi'
 import { protectedQuestions } from '../server/src/game-v2-bank'
 import { docCauNghiDem } from '../server/src/chan-khac-khoi'
@@ -92,6 +93,31 @@ ra(`em của chiến dịch: ${dsEm.length} · lấy mẫu ${mau.length}`)
 const [chan, nghi] = await Promise.all([protectedQuestions(env).catch(() => new Set<string>()), docCauNghiDem(env, nowMs)])
 ra(`câu bảo vệ ca thi: ${chan.size} · câu nghi sai đáp án: ${nghi.size}`)
 
+// ---- PHẠM VI (bộ lọc `trongPhamVi` của docHoSo2, OMNI 3): câu chiến dịch chỉ vào kế hoạch khi có ÍT NHẤT một tờ DẠY HỌC (và, khi lớp đã tick bài, tờ ấy thuộc phạm vi đã dạy).
+const qidsCd = [...new Set(parse(cd.qid_json))]
+const maDeCua = new Map<string, Set<string>>()
+const metaCd = await docMetaCau(env, qidsCd, parse(cd.ma_de_json), maDeCua)
+const toCd = [...new Set([...maDeCua.values()].flatMap((s) => [...s]))]
+const thuMucCd = await thuMucCuaMaDe(env, toCd)
+const laDayHoc = (m: string): boolean => thuMucCd.get(m) === 'DAY_HOC'
+const coToDayHoc = qidsCd.filter((q) => [...(maDeCua.get(q) ?? [])].some(laDayHoc)).length
+ra(`câu chiến dịch: ${qidsCd.length} · có trong kho (meta) ${metaCd.size} · tự luận ${[...metaCd.values()].filter((m) => m.tuLuan).length} · tờ chứa câu ${toCd.length} (DẠY HỌC ${toCd.filter(laDayHoc).length} · TU LUYỆN ${toCd.length - toCd.filter(laDayHoc).length} · mã DH- ${toCd.filter((m) => /^DH-/i.test(m)).length})`)
+ra(`câu có ≥ 1 tờ DẠY HỌC: ${coToDayHoc}/${qidsCd.length} · câu KHÔNG có tờ DẠY HỌC nào: ${qidsCd.length - coToDayHoc}`)
+try {
+  const t = await hoi('SELECT COUNT(*) AS n, MAX(cap_nhat_luc) AS moi FROM de_kho_thu_muc WHERE ma_de IN (SELECT value FROM json_each(?))', [JSON.stringify(toCd)])
+  ra(`dòng thư mục (de_kho_thu_muc) của các tờ ấy: ${String(t[0]?.n ?? 0)}/${toCd.length} · cập nhật gần nhất ${String(t[0]?.moi ?? '—').slice(0, 16)}`)
+} catch (e) { ra(`de_kho_thu_muc: lỗi đọc ${String(e).slice(0, 80)}`) }
+const lopCd = String(cd.lop ?? '').trim()
+try {
+  const b = await hoi('SELECT khoa_bai, tick_luc, bo_tick_luc, chien_dich_id FROM bai_da_day WHERE lop = ? ORDER BY tick_luc DESC LIMIT 60', [lopCd])
+  const dang = b.filter((x) => x.bo_tick_luc == null)
+  const boMoi = b.map((x) => String(x.bo_tick_luc ?? '')).sort().pop() ?? ''
+  ra(`bài đã tick của lớp (bai_da_day): ${b.length} dòng · đang tick ${dang.length} · tick gần nhất ${String(b[0]?.tick_luc ?? '—').slice(0, 16)} · bỏ tick gần nhất ${boMoi.slice(0, 16) || '—'}`)
+  const pv = await hoi('SELECT COUNT(*) AS n FROM pham_vi_lop WHERE lop = ?', [lopCd])
+  ra(`dòng phạm vi lớp (pham_vi_lop): ${String(pv[0]?.n ?? 0)}`)
+} catch (e) { ra(`bai_da_day: lỗi đọc ${String(e).slice(0, 80)}`) }
+
+const nhomPv = new Map<string, number>(), nhomTrongPv = new Map<string, number>()
 const nhomChot = new Map<string, number>(), nhomHs = new Map<string, number>(), nhomLap = new Map<string, number>(), nhomHoan = new Map<string, number>()
 let i = 0
 for (const sbd of mau) {
@@ -106,6 +132,11 @@ for (const sbd of mau) {
     const moi = hs.cau.filter((c) => hs.tt.get(c.qid)?.laMoi).length
     const denHan = hs.cau.filter((c) => (hs.tt.get(c.qid)?.henOn ?? '9') <= homNay).length
     dem(nhomHs, `${hs.chienDich?.id === cdId ? 'đang_chạy=chiến_dịch_này' : hs.chienDich ? 'đang_chạy=chiến_dịch_KHÁC' : 'không_có_chiến_dịch_đang_chạy'}${hs.omni?.bat ? '·OMNI' : ''}`)
+    const pv = hs.phamVi ?? null
+    dem(nhomPv, !hs.omni?.bat ? 'OMNI_tắt' : !pv ? 'phạm_vi=null(lớp chưa tick bài)' : `phạm_vi_có(${pv.baiDaTick.length} bài tick · ${pv.maDe.size} tờ)`)
+    const trongPv = qidsCd.filter((q) => metaCd.has(q) && [...(maDeCua.get(q) ?? [])].some((m) => laDayHoc(m) && (!pv || pv.maDe.has(m)))).length
+    dem(nhomTrongPv, trongPv === 0 ? 'câu_chiến_dịch_trong_phạm_vi=0' : 'câu_chiến_dịch_trong_phạm_vi>0')
+    ra(`  · phạm vi: ${!hs.omni?.bat ? 'OMNI tắt' : !pv ? 'null' : `${pv.baiDaTick.length} bài tick/${pv.maDe.size} tờ`} · câu chiến dịch trong phạm vi ${trongPv}/${qidsCd.length} · hs.cau ${hs.cau.length} · tt chiến dịch ${hs.ttChienDich.length} · ôn bài cũ ${hs.onBaiCu?.length ?? 0} · cheDoCho ${hs.omni?.cheDoCho ? 'có' : 'không'}`)
     const tc = hs.omni?.bat ? await tuyChonKeHoachOmni(env, sbd, nowMs, hs).catch(() => null) : null
     const lap = lapKeHoachNgay(hs.cau, hs.tt, tc ?? { homNay, hanNop: hs.chienDich?.hanNop ?? null })
     dem(nhomLap, lap.dao.length + lap.doan.length === 0 ? 'lập_lại_ra_TRỐNG' : 'lập_lại_ra_có_câu')
@@ -125,6 +156,8 @@ for (const sbd of mau) {
 ra('--- TỔNG HỢP (số đếm)')
 ra(`dòng kế hoạch chốt hôm nay: ${chuMap(nhomChot)}`)
 ra(`hồ sơ em: ${chuMap(nhomHs)}`)
+ra(`phạm vi của em: ${chuMap(nhomPv)}`)
+ra(`câu chiến dịch trong phạm vi: ${chuMap(nhomTrongPv)}`)
 ra(`lập lại bây giờ: ${chuMap(nhomLap)}`)
 ra(`tạm hoãn: ${chuMap(nhomHoan)}`)
 ra(`tổng truy vấn D1: ${soTruyVan}`)
