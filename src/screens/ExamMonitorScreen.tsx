@@ -1203,6 +1203,7 @@ export default function ExamMonitorScreen() {
             demSai = {}
             await luuDeRiengCa(chiTiet.ca.maCa, v2.boTheoEm, {}, v2.lapTheoEm, bienBan)
             setRutThu(docRutThu(chiTiet.ca.maCa) ?? null)
+            if (v2.soEmCapNhat > 0) showToast(`Đã cập nhật đề của ${v2.soEmCapNhat} em theo bài các em vừa làm.`, 'success')
             if (v2.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${v2.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
             if (v2.soCauNoiThem > 0) showToast(`Đã nối ${v2.soCauNoiThem} câu ngoài kho (câu sai cũ, câu song sinh) vào đề ca này.`, 'success')
             for (const c of v2.canhBao) showToast(c, 'warn')

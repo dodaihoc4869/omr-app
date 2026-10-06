@@ -11,6 +11,7 @@ import { taoChiTietCau } from './chi-tiet-cau'
 import { docDeRiengCa, loadExamSources, loadSessionTeacherBank, docSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { mergeAndStrip, mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { CAU_HINH_DE_RIENG_MAC_DINH, SO_CA_BOC_NGAU_NHIEN, type CauHinhDeRieng } from './cau-hinh-de-rieng'
+import { SO_NGAY_CAM_MEM } from './khong-rut-cau-sai'
 import { cauDaGapCuaEm, demLanSai, docHoSoOnEm, dungDeRieng, dungDeRiengLuotHai, type CaTruocDaCham, type EmThieuLap, type HoSoOnEm, type YeuCauDeRieng } from './de-rieng'
 import { dungUngVien } from './rut-de'
 import { chuanChuyenDe } from './goi-len-bang'
@@ -345,7 +346,7 @@ export interface KetQuaDocHoSoOn {
  * KHÔNG BAO GIỜ NÉM LỖI. Đây là lớp thông tin THÊM lên trên `banDoSaiCa`; nó
  * hỏng thì ca vẫn phải mở được với đúng bộ đề bản cũ sẽ rút. Lô nào hỏng thì chỉ
  * các em trong lô đó đi luật cũ. Hợp đồng: `docs/hop-dong-ho-so-on-ca-1909.md`. */
-export async function docHoSoOnCa(url: string, mat: string, dsSbd: string[], maCa: string, ngayCa: string, soCa: 1 | 3 = 1): Promise<KetQuaDocHoSoOn> {
+export async function docHoSoOnCa(url: string, mat: string, dsSbd: string[], maCa: string, ngayCa: string, soCa: 1 | 3 = 1, soNgayLam?: number): Promise<KetQuaDocHoSoOn> {
   const LO = 20
   const ds = [...new Set(dsSbd.map((x) => String(x || '').trim()).filter(Boolean))]
   const hoSo: Record<string, HoSoOnEm> = {}
@@ -355,7 +356,7 @@ export async function docHoSoOnCa(url: string, mat: string, dsSbd: string[], maC
   for (let i = 0; i < ds.length; i += LO) {
     const lo = ds.slice(i, i + LO)
     try {
-      const em = await hoSoOnCa(url, mat, lo, maCa, ngayCa, soCa)
+      const em = await (soNgayLam ? hoSoOnCa(url, mat, lo, maCa, ngayCa, soCa, soNgayLam) : hoSoOnCa(url, mat, lo, maCa, ngayCa, soCa)) // không truyền đối số thừa khi dùng cửa sổ mặc định
       soLoDuoc += 1
       // Chỉ nhận em CÓ TRONG LÔ đã hỏi: máy chủ trả thừa SBD lạ thì bỏ.
       for (const sbd of lo) if (sbd in em) hoSo[sbd] = docHoSoOnEm(em[sbd])
@@ -553,11 +554,13 @@ export async function dungDeRiengChoCa(
   // hỏng ⇒ `hoSo` là `undefined` ⇒ `dungDeRieng` chạy đúng bản trước.
   const ngayCa = tuyChon.ngayCa ?? ngayVnCua(Date.now())
   const soCaHoSo = ch.PHAM_VI_HOI_LAI === 'ba_ca' ? 3 : 1
+  // Ca Không rút câu sai: cấm mềm 30 ngày (khong-rut-cau-sai.ts); các chế độ khác giữ cửa sổ 7 ngày của máy chủ.
+  const soNgayLamHoSo = ch.PHAM_VI_HOI_LAI === 'khong' ? SO_NGAY_CAM_MEM : undefined
   // Hồ sơ của em VẮNG là một lượt RIÊNG (chia lô 20 như cũ), chạy song song: nó
   // hỏng thì chỉ em vắng đi luật cũ, không kéo em có mặt theo — và ngược lại.
   const [docHoSo, docHoSoVang] = await Promise.all([
-    docHoSoOnCa(url, mat, dsSbd, maCa, ngayCa, soCaHoSo),
-    dsSbdVang.length > 0 ? docHoSoOnCa(url, mat, dsSbdVang, maCa, ngayCa, soCaHoSo) : Promise.resolve<KetQuaDocHoSoOn>({ hoSo: undefined, soEmHong: 0, loi: '' }),
+    docHoSoOnCa(url, mat, dsSbd, maCa, ngayCa, soCaHoSo, soNgayLamHoSo),
+    dsSbdVang.length > 0 ? docHoSoOnCa(url, mat, dsSbdVang, maCa, ngayCa, soCaHoSo, soNgayLamHoSo) : Promise.resolve<KetQuaDocHoSoOn>({ hoSo: undefined, soEmHong: 0, loi: '' }),
   ])
   // KHAI RA, không im lặng.
   if (!docHoSo.hoSo) ghiChu.push({ loai: 'canh_bao', loi: `hồ sơ ôn chưa đọc được (${docHoSo.loi || 'máy chủ chưa có lệnh'}) — rút đúng luật cũ, không phải lỗi ca` })
