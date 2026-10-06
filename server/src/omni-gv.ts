@@ -1,5 +1,7 @@
 // OMNI 3 — LỆNH THẦY `POST /gv/omni` (sau cổng `laThay`). action:
 //   co-doc · co-luu {co} · cau-hinh-doc · cau-hinh-luu {theLucLop?, maTran?}
+//   on-bai-cu-doc {lop?}               ⇒ { ok, macDinh:{thuong,cuoi}, lop:{<lớp>:{thuong,cuoi}}, hieuLuc?:{thuong,cuoi}, toiDa, buoc }  (06/10: tỉ lệ ôn bài cũ — `cau_hinh.on_bai_cu_ti_le`)
+//   on-bai-cu-luu {lop, thuong, cuoi}  ⇒ { ok, lop, tiLe:{thuong,cuoi} }  (số 0–0,6; ngày thường / ngày đan xen 4–5 của bài; chỉ ghi phần của LỚP ấy, giữ lớp khác)
 //   bang {chienDichId}                 ⇒ BangOmni (omni-kieu.ts)
 //   xac-nhan {sbd, maDang, ket:'vung'|'day_lai', nguoi?}  ⇒ { ok } (ghi omni_xac_nhan, chỉ-thêm)
 //   q-lo {chienDichId?|maDang?, sau?}  ⇒ { ok, cau:[{qid, stt, de, phan, maDang, tenDang, goiY:string[], vknY?:string[][]}], vkn: Vkn[], conLai }
@@ -27,6 +29,7 @@ import { docMocThemCaLop } from './srs2-d1'
 import { NGUONG_CAT_TIA } from './srs2-loi'
 import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
 import { phanTram, soP } from '../../src/lib/omni-chu'
+import { BUOC_TI_LE_ON_BAI_CU, KHOA_ON_BAI_CU_TI_LE, TI_LE_ON_BAI_CU_TOI_DA, docCauHinhTiLe, tiLeHieuLuc, tiLeHopLe, tiLeRiengCuaLop } from './omni-on-bai-cu'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -46,6 +49,8 @@ export async function gvOmni(env: Env, b: Record<string, unknown>, nowMs = Date.
     if (action === 'co-luu') return await coLuu(env, b, nowMs)
     if (action === 'cau-hinh-doc') return await cauHinhDoc(env)
     if (action === 'cau-hinh-luu') return await cauHinhLuu(env, b, nowMs)
+    if (action === 'on-bai-cu-doc') return await onBaiCuDoc(env, b)
+    if (action === 'on-bai-cu-luu') return await onBaiCuLuu(env, b, nowMs)
     if (action === 'bang') return await bang(env, str(b.chienDichId ?? b.id).trim(), nowMs)
     if (action === 'xac-nhan') return await xacNhan(env, b, nowMs)
     if (action === 'q-lo') return await qLo(env, b)
@@ -125,6 +130,40 @@ async function cauHinhLuu(env: Env, b: Row, nowMs: number) {
   }
   xoaDemOmni()
   return ra
+}
+
+// ---------------------------------------------------------------- tỉ lệ ôn bài cũ theo lớp (thầy 06/10)
+/** Đọc tỉ lệ ôn bài cũ: mặc định chung + từng lớp thầy đã đặt (đầy đủ hai số, trường thiếu ⇒ hằng cũ) + số của MỘT lớp nếu có `lop`. KHÔNG đệm (đọc thẳng `cau_hinh`). */
+async function onBaiCuDoc(env: Env, b: Row) {
+  const ch = docCauHinhTiLe(await docCauHinhTho(env, KHOA_ON_BAI_CU_TI_LE))
+  const lop = str(b.lop).trim()
+  return {
+    ok: true,
+    macDinh: tiLeHieuLuc(ch.macDinh),
+    lop: Object.fromEntries(Object.keys(ch.lop).map((k) => [k, tiLeHieuLuc(tiLeRiengCuaLop(ch, k))])),
+    ...(lop ? { hieuLuc: tiLeHieuLuc(tiLeRiengCuaLop(ch, lop)) } : {}),
+    toiDa: TI_LE_ON_BAI_CU_TOI_DA,
+    buoc: BUOC_TI_LE_ON_BAI_CU,
+  }
+}
+/**
+ * Lưu tỉ lệ ôn bài cũ của MỘT lớp: `thuong` (ngày thường) và `cuoi` (ngày đan xen — ngày thứ 4–5 của bài) là SỐ trong [0; 0,6]; sai kiểu / ngoài khoảng ⇒ từ chối, không ghi.
+ * Đọc–sửa–ghi thẳng `cau_hinh.on_bai_cu_ti_le`: giữ `mac_dinh` và các lớp khác, chỉ thay phần của lớp này. Ghi xong xoá đệm cờ (isolate này thấy ngay; isolate khác ≤ 15 s).
+ * Kế hoạch hôm nay ĐÃ CHỐT của từng em giữ nguyên; tỉ lệ mới áp cho kế hoạch được lập sau lúc lưu.
+ */
+async function onBaiCuLuu(env: Env, b: Row, nowMs: number) {
+  const lop = str(b.lop).trim()
+  if (!lop) return { ok: false, error: 'Chưa chọn lớp.' }
+  if (lop.length > 80) return { ok: false, error: 'Tên lớp quá dài.' }
+  const thuong = tiLeHopLe(b.thuong)
+  const cuoi = tiLeHopLe(b.cuoi)
+  if (thuong === null || cuoi === null) return { ok: false, error: `Tỉ lệ ôn bài cũ phải là số từ 0 đến ${Math.round(TI_LE_ON_BAI_CU_TOI_DA * 100)} %.` }
+  const lamTron = (x: number): number => Math.round(x * 10_000) / 10_000
+  const ch = docCauHinhTiLe(await docCauHinhTho(env, KHOA_ON_BAI_CU_TI_LE))
+  const tiLe = { thuong: lamTron(thuong), cuoi: lamTron(cuoi) }
+  const coMacDinh = ch.macDinh.thuong !== undefined || ch.macDinh.cuoi !== undefined
+  await ghiCauHinh(env, KHOA_ON_BAI_CU_TI_LE, { ...(coMacDinh ? { mac_dinh: ch.macDinh } : {}), lop: { ...ch.lop, [lop]: tiLe } }, nowMs)
+  return { ok: true, lop, tiLe }
 }
 
 // ---------------------------------------------------------------- tiện ích chung

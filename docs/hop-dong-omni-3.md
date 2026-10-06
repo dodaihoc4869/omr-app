@@ -84,16 +84,24 @@ lần làm của câu lỗi; là quan sát OMNI của bước nó kiểm); sai �
 | action | thân | trả |
 |---|---|---|
 | `danh-sach` | `{lop}` | `{ ok, bai:[{khoaBai,tenBai,viTri,tickLuc,chienDichId,trangThai,hanNop,conNgay,chungChi:{dat,tong}}], choBaiMoi:{soNgay}|null }` |
-| `xem-truoc` | `{lop,khoaBai,tenBai,viTri,maDe[],theLucNgay?,hanNop?}` | `{ ok, soCau, soTuLuan, hanNop, D, luotCan, sucChua, duLuot, tongEm, duDiem8, quaTai:[{sbd,ten}], theLucNgay }` |
+| `xem-truoc` | `{lop,khoaBai,tenBai,viTri,maDe[],theLucNgay?,hanNop?,sbd?,phamVi?:[{khoaBai,tenBai,viTri,maDe[]}]}` | `{ ok, soCau, soTuLuan, hanNop, D, luotCan, sucChua, duLuot, tongEm, duDiem8, quaTai:[{sbd,ten}], theLucNgay, onBaiCu?: { toiDaMoiEm, khoCau, phuPhanTram, soBai, tiLe:{thuong,cuoi} } }` |
 | `tick` | `{lop,khoaBai,tenBai,viTri,maDe[],phamVi:[{khoaBai,tenBai,viTri,maDe[]}],hanNop?,theLucNgay?,nguoi?}` | `{ ok, chienDichId, hanNop, daCo }` |
 | `bo-tick` | `{lop,khoaBai}` | `{ ok, chienDich:'da_huy'|'da_dong'|null }` |
 
 `maDe` = mã tờ đã tách phần (`…-TN`, `…-DS`, `…-TLN`) của bài, không gồm "Ví dụ minh hoạ" trừ khi thầy tích. `phamVi` = mọi bài đứng TRƯỚC bài này trong cây SGK cùng khối (để máy chủ biết bài cũ).
 
+**`onBaiCu` (06/10, chỉ-thêm, tuỳ chọn) — dòng thẻ xác nhận "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%"** (`server/src/omni-on-bai-cu.ts`, `bai-da-day.ts`). `xem-truoc` nhận thêm `phamVi` (như `tick`; vắng ⇒ chỉ tính phạm vi đã ghi của lớp). Trả: `toiDaMoiEm` N = Σ ngày 1..D ⌊lượt/ngày × tỉ lệ ngày⌋ (D = hạn tự tính 7–14 hoặc hạn thầy đặt; tỉ lệ ngày 4–5 của bài = `tiLe.cuoi`, còn lại `tiLe.thuong`; đúng phép tính `lapKeHoachNgay`); `khoCau` X = câu hợp lệ ĐÚNG KHỐI của các bài đứng trước (phạm vi hiện có của lớp ∪ `phamVi`, tờ DẠY HỌC, đã duyệt, không tự luận, bỏ tờ của bài sắp giao và câu của chiến dịch đang chạy của các em được giao; ĐẾM THẬT, không cắt trần ứng viên 800); `phuPhanTram` Y = min(100, làm tròn(N / X × 100)); `soBai` = số bài trước có câu; `tiLe` = tỉ lệ đang áp cho lớp. **Trường VẮNG** khi kho 0, không rõ khối, lỗi đọc, hoặc đếm quá `HAN_KHO_ON_BAI_CU_MS` (4 s) — app không hiện dòng (màn y hệt cũ).
+
+### Ôn bài cũ — cấu hình `cau_hinh` (06/10, chỉ-thêm, không schema mới)
+- `on_bai_cu_deu` = `{"bat":false}` ⇒ ôn bài cũ y hệt trước 06/10 (ứng viên "bài gần nhất trước, cắt 800", thứ tự nhóm → bài gần nhất). Vắng / JSON hỏng / khác ⇒ BẬT: ứng viên cắt trần công bằng giữa các bài (vòng r lấy câu thứ r của mỗi bài), thứ tự trong mỗi nhóm (đã gặp tới lịch → chưa gặp → đã gặp chưa tới lịch) xen kẽ BÀI (bài đứng đầu vòng đầu xoay theo ngày, tất định) rồi xen kẽ DẠNG trong bài. Trần ôn mỗi ngày ⌊thể lực × tỉ lệ⌋, thứ tự ưu tiên nợ → câu mới → củng cố → duy trì → ôn bài cũ, hạng theo dạng / trọng số OMNI (khi có) và các cổng khối / tự luận GIỮ NGUYÊN (công bằng chỉ là thứ tự hoà trong cùng hạng / trọng số).
+- `on_bai_cu_ti_le` = `{ "mac_dinh": {"thuong":0.2,"cuoi":0.4}, "lop": { "<tên lớp>": {"thuong":x,"cuoi":y} } }`: `thuong` = ngày thường, `cuoi` = các ngày đan xen (`DAN_XEN_NGAY`, ngày thứ 4–5 của bài). Số ngoài [0; 0,6] hoặc sai kiểu ⇒ bỏ qua TỪNG trường (dùng `mac_dinh` rồi hằng cũ 0,2 / 0,4); vắng ⇒ y hệt cũ. Áp cho kế hoạch ngày được LẬP sau khi lưu (kế hoạch đã chốt trong ngày giữ nguyên).
+- Hai khoá nằm trong nhóm cờ đọc kèm của `cau-hinh-dem.ts` (đệm 15 s) ⇒ không thêm vòng D1 ở Sảnh / kế hoạch ngày.
+- Lệnh thầy `POST /gv/omni`: `on-bai-cu-doc {lop?}` ⇒ `{ ok, macDinh:{thuong,cuoi}, lop:{<lớp>:{thuong,cuoi}}, hieuLuc?:{thuong,cuoi}, toiDa:0.6, buoc:0.05 }`; `on-bai-cu-luu {lop, thuong, cuoi}` ⇒ `{ ok, lop, tiLe }` (số 0–0,6, ghi phần của lớp ấy, giữ lớp khác + `mac_dinh`; sai ⇒ `{ ok:false, error:'Tỉ lệ ôn bài cũ phải là số từ 0 đến 60 %.' }`).
+
 ### `POST /kho/thu-muc` `{ ds:[{maDe, thuMuc:'DAY_HOC'|'TU_LUYEN'}] }` → `{ ok, daGhi }`
 
 ### `POST /gv/omni` — xem `server/src/omni-gv.ts`
-`co-doc` · `co-luu {co}` · `cau-hinh-doc` · `cau-hinh-luu {theLucLop?, maTran?}` · `bang {chienDichId}` ⇒ `BangOmni` · `xac-nhan {sbd, maDang, ket}` · `q-lo {chienDichId?|maDang?, sau?}` · `q-duyet {ds, vknMoi?}` · `ca-chot {chienDichId}` ⇒ `{ ok, qids, soLa, soCu }` · `gan-ca-chot {chienDichId, maCa}`.
+`co-doc` · `co-luu {co}` · `cau-hinh-doc` · `cau-hinh-luu {theLucLop?, maTran?}` · `on-bai-cu-doc {lop?}` · `on-bai-cu-luu {lop, thuong, cuoi}` · `bang {chienDichId}` ⇒ `BangOmni` · `xac-nhan {sbd, maDang, ket}` · `q-lo {chienDichId?|maDang?, sau?}` · `q-duyet {ds, vknMoi?}` · `ca-chot {chienDichId}` ⇒ `{ ok, qids, soLa, soCu }` · `gan-ca-chot {chienDichId, maCa}`.
 
 "Chữa xong" dùng NGUYÊN lệnh có sẵn `/gv/chien-dich {action:'chua-xong', id, qids}`.
 

@@ -6,6 +6,7 @@ const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
 
 import DsChienDichDaGiao, { chuHan, trangThaiHien } from '../src/components/chien-dich/DsChienDichDaGiao'
+import { loiBaoDaHuy } from '../src/components/chien-dich/api'
 import { KHOA_CHON_CHIEN_DICH } from '../src/components/chien-dich/LenBangChienDich'
 import { useAppStore } from '../src/store/appStore'
 
@@ -101,5 +102,34 @@ describe('khung Chiến dịch đã giao', () => {
     expect(confirm).not.toHaveBeenCalled()
     await waitFor(() => expect(goi.mock.calls.filter(([, b]) => b.action === 'huy')).toHaveLength(1))
     await waitFor(() => expect(goi.mock.calls.filter(([, b]) => b.action === 'danh-sach').length).toBeGreaterThanOrEqual(2))
+  })
+  it('HUỶ = thu hồi hết (thầy 06/10): hộp xác nhận nói rõ, lời báo sau huỷ có số em được thu hồi (có nhãn); bài tích được nhả thì báo thêm; máy chủ cũ không trả thuHoi ⇒ lời cũ', async () => {
+    goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
+      if (b.action === 'danh-sach') return { ok: true, du: { ok: true, homNay: '2026-09-28', chienDich: [CD] } }
+      if (b.action === 'huy') return { ok: true, du: { ok: true, thuHoi: { soEm: 3, soLuotDangMo: 1, nhaTick: true } } }
+      return { ok: false, loai: 'tu_choi', chu: 'lạ' }
+    })
+    render(<DsChienDichDaGiao />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Huỷ' }))
+    const hop = await screen.findByRole('alertdialog', { name: 'Huỷ chiến dịch?' })
+    expect(hop.textContent).toContain('câu chưa làm được thu hồi ngay')
+    expect(hop.textContent).toContain('Kết quả đã làm vẫn giữ')
+    fireEvent.click(within(hop).getByRole('button', { name: 'Huỷ chiến dịch' }))
+    await waitFor(() => expect(useAppStore.getState().toast?.text).toBe('Đã huỷ chiến dịch — câu chưa làm đã thu hồi khỏi 3 em; bài này không còn tính là đã dạy'))
+    expect(useAppStore.getState().toast?.kind).toBe('success')
+  })
+  it('máy chủ cũ (huy chỉ trả ok) ⇒ lời báo cũ, không số em', async () => {
+    render(<DsChienDichDaGiao />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Huỷ' }))
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Huỷ chiến dịch' }))
+    await waitFor(() => expect(useAppStore.getState().toast?.text).toBe('Đã huỷ chiến dịch'))
+  })
+})
+
+describe('loiBaoDaHuy', () => {
+  it('có nhãn "em"; 0 em / thiếu / rác ⇒ lời ngắn; chỉ nhắc bài khi bài được nhả', () => {
+    expect(loiBaoDaHuy({ soEm: 1, soLuotDangMo: 0, nhaTick: false })).toBe('Đã huỷ chiến dịch — câu chưa làm đã thu hồi khỏi 1 em')
+    expect(loiBaoDaHuy({ soEm: 12, nhaTick: true })).toBe('Đã huỷ chiến dịch — câu chưa làm đã thu hồi khỏi 12 em; bài này không còn tính là đã dạy')
+    for (const x of [undefined, null, {}, { soEm: 0 }, { soEm: 'x' as unknown as number }, { soEm: -3 }]) expect(loiBaoDaHuy(x)).toBe('Đã huỷ chiến dịch')
   })
 })

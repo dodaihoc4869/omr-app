@@ -8,7 +8,7 @@ import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonBanSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
 import { canThanTu, nhanMocDuyTri } from './omni-can-than'
-import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, type KetQuaLoi } from './loi-hoc-luat'
+import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
 import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC, tiepBanKhacMoi } from './lam-lai-so'
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
@@ -31,6 +31,9 @@ import type { PhamViLop } from './bai-da-day'
 import type { ThuMuc } from './kho-thu-muc'
 import { dangDaVung, theLucCho, tiLeOnBaiCu, trongSoCacCau } from './omni-ke-hoach'
 import { KHOA_THE_LUC_LOP, MUC_DICH_CHAN_DOAN, SQL_LA_LAN_LAM, SQL_LA_LAN_LAM_GIU_CHAN_DOAN, THAM_SO_OMNI, type QCau } from './omni-kieu'
+// 06/10 — ÔN BÀI CŨ chia đều theo bài/dạng + tỉ lệ theo lớp (omni-on-bai-cu.ts thuần, omni-on-bai-cu-d1.ts đọc cấu hình; công tắc `on_bai_cu_deu` = {"bat":false} ⇒ y hệt cũ).
+import { capCongBang, chiaCauTheoBai, xepCongBang, type TiLeMotPhan } from './omni-on-bai-cu'
+import { docTiLeRiengCuaLop, onBaiCuDeuBat } from './omni-on-bai-cu-d1'
 // Mô-đun các làn khác (omni-d1, bai-da-day, kho-thu-muc, srs2-gv) nạp LƯỜI bằng import động: chúng import ngược srs2-d1 (srs2-gv → bi-a → srs2-game →
 // omni-game → srs2-d1) — import tĩnh tạo vòng khiến `vi.mock(..., importOriginal)` của test làn khác nhận nhầm bản gốc; cờ tắt cũng không nạp gì thêm.
 const lanOmniD1 = () => import('./omni-d1')
@@ -177,7 +180,17 @@ export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau 
  * đợi bằng timer riêng, KHÔNG dùng chung Promise I/O), lọc em bằng tập sbd dựng sẵn. Thầy tạo / đóng / huỷ / sửa chiến dịch hay đặt ngày bắt đầu ⇒ `xoaDemChienDich()` ngay (isolate ấy); isolate khác trễ ≤ 15 s.
  * Lỗi đọc ⇒ rỗng như cũ và KHÔNG đệm.
  */
-type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; bd: Map<string, string>; rd: Map<string, number> }
+/**
+ * Chiến dịch ĐÃ HUỶ từ 29/09 (thầy 06/10: "hủy chiến dịch thì những học sinh đã phân phải đc thu hồi hết") — chỉ giữ thứ đủ để THU HỒI nợ do chiến dịch ấy sinh ra
+ * (`docHoSo2`, nguồn thứ 4): tập em, tập câu, mốc giao, lúc huỷ. Đọc CÙNG câu đọc danh sách chiến dịch (đệm 15 s) ⇒ không thêm lượt D1.
+ */
+export interface ChienDichDaHuy { id: string; qids: ReadonlySet<string>; taoLuc: string; dongLuc: string }
+/** Dòng thô của chiến dịch đã huỷ trong đệm: tập em / tập câu CHỈ đọc (parse) khi có em thật sự thuộc chiến dịch ấy — danh sách đã huỷ chỉ dài thêm theo thời gian. */
+interface DongDaHuy { id: string; taoLuc: string; dongLuc: string; sbdJson: string; qidJson: string }
+const tapChuoiJson = (v: unknown): Set<string> => { let a: unknown = []; try { a = JSON.parse(str(v) || '[]') } catch { /* JSON hỏng ⇒ tập rỗng */ } return new Set((Array.isArray(a) ? a : []).filter((x): x is string => typeof x === 'string')) }
+const qidDaHuyMemo = new WeakMap<DongDaHuy, Set<string>>()
+const qidCuaDaHuy = (c: DongDaHuy): Set<string> => { let t = qidDaHuyMemo.get(c); if (!t) { t = tapChuoiJson(c.qidJson); qidDaHuyMemo.set(c, t) } return t }
+type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; huy: DongDaHuy[]; bd: Map<string, string>; rd: Map<string, number> }
 type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
 const demChienDich = new DemTTL<OChienDich>(15_000, 2)
 export function xoaDemChienDich(): void { demChienDich.xoa() }
@@ -192,16 +205,19 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
   // Không JOIN: bảng `chien_dich_bat_dau` tạo lúc chạy, có thể chưa có ⇒ lỗi riêng câu phụ, danh sách vẫn đúng (hành vi cũ).
   try {
     const giaTri = await Promise.all([
-      env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY tao_luc DESC").all<Row>().catch(() => { loi = true; return { results: [] as Row[] } }),
+      // 06/10: kèm chiến dịch ĐÃ HUỶ từ 29/09 (cùng MỘT câu đọc, tách ở dưới) — để thu hồi nợ do chiến dịch bị huỷ sinh ra (`docChienDichKemDaHuy`). `ds` vẫn CHỈ chưa huỷ như cũ.
+      env.DB.prepare(`SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' OR (trang_thai = 'da_huy' AND COALESCE(dong_luc, '') >= '${TU_NGAY}') ORDER BY tao_luc DESC`).all<Row>().catch(() => { loi = true; return { results: [] as Row[] } }),
       // bảng tạo lúc chạy: chưa có (chưa ai đặt ngày bắt đầu) là BÌNH THƯỜNG ⇒ rỗng, vẫn đệm (`ghiBatDau` xoá đệm khi tạo)
       env.DB.prepare("SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
       // rải đều (30/09): bảng tạo lúc chạy, chưa có = mọi chiến dịch BẬT ⇒ rỗng (`ghiRaiDeu` xoá đệm khi đổi)
       env.DB.prepare("SELECT id, rai_deu FROM chien_dich_tuy_chon WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
     ]).then(([r, bd, rd]) => {
       if (loi && demChienDich.doc('ds', Date.now()) === o) demChienDich.xoaKhoa('ds')
+      const dong = r.results ?? []
       return {
         // đúng ngữ nghĩa `json_each(sbd_json) … value = ?`: chỉ phần tử CHUỖI trùng khớp tuyệt đối
-        ds: (r.results ?? []).map((row) => { let a: unknown = []; try { a = JSON.parse(str(row.sbd_json) || '[]') } catch { /* sbd_json hỏng ⇒ không em nào */ } return { row, sbd: new Set((Array.isArray(a) ? a : []).filter((x): x is string => typeof x === 'string')) } }),
+        ds: dong.filter((row) => str(row.trang_thai) !== 'da_huy').map((row) => ({ row, sbd: tapChuoiJson(row.sbd_json) })),
+        huy: dong.filter((row) => str(row.trang_thai) === 'da_huy').map((row): DongDaHuy => ({ id: str(row.id), taoLuc: str(row.tao_luc), dongLuc: str(row.dong_luc), sbdJson: str(row.sbd_json), qidJson: str(row.qid_json) })),
         bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
         rd: new Map((rd.results ?? []).map((x) => [str(x.id), Number(x.rai_deu)])),
       }
@@ -210,9 +226,20 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
     return giaTri
   } finally { o.dangDoc = false; if (!o.ds && demChienDich.doc('ds', Date.now()) === o) demChienDich.xoaKhoa('ds') }
 }
+/**
+ * Chiến dịch CHƯA HUỶ của em (như `docChienDichCuaEm`) + chiến dịch ĐÃ HUỶ từ 29/09 có em — MỘT lần đọc đệm, không thêm lượt D1. Phần đã huỷ chỉ để `docHoSo2` THU HỒI nợ do
+ * chiến dịch ấy sinh ra (thầy 06/10); mọi nơi khác vẫn không thấy chiến dịch đã huỷ.
+ */
+export async function docChienDichKemDaHuyCuaEm(env: Env, sbd: string): Promise<{ ds: ChienDich[]; daHuy: ChienDichDaHuy[] }> {
+  const { ds, huy, bd, rd } = await docMoiChienDich(env)
+  return {
+    ds: ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null })),
+    // Tiền lọc rẻ trên JSON thô (em xuất hiện dưới dạng chuỗi có nháy) rồi mới parse đúng chiến dịch có em — em thường không thuộc chiến dịch đã huỷ nào ⇒ gần như không tốn gì.
+    daHuy: huy.filter((c) => c.sbdJson.includes(JSON.stringify(sbd)) && tapChuoiJson(c.sbdJson).has(sbd)).map((c): ChienDichDaHuy => ({ id: c.id, qids: qidCuaDaHuy(c), taoLuc: c.taoLuc, dongLuc: c.dongLuc })),
+  }
+}
 export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDich[]> {
-  const { ds, bd, rd } = await docMoiChienDich(env)
-  return ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null }))
+  return (await docChienDichKemDaHuyCuaEm(env, sbd)).ds
 }
 /**
  * Dòng `chien_dich` THÔ (chưa huỷ, mới giao trước) của các chiến dịch có em — từ CÙNG danh sách đệm 15 s mà `docChienDichCuaEm` / `docHoSo2` vừa đọc ⇒ không thêm lượt D1
@@ -254,6 +281,20 @@ export const chienDichDangChayHet = (ds: readonly ChienDich[], homNay: string): 
     .filter(([c]) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay))
     .sort(([a, i], [b, j]) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : a.batDau < b.batDau ? -1 : a.batDau > b.batDau ? 1 : i - j))
     .map(([c]) => c)
+/**
+ * Chiến dịch ĐANG CHẠY (chưa huỷ/đóng, còn hạn, đã tới ngày bắt đầu — hạn gần trước) có ÍT NHẤT một trong các em `sbd` — từ CÙNG danh sách đệm 15 s của `docChienDichCuaEm`,
+ * đọc MỘT lần cho cả lớp (gọi `docChienDichCuaEm` từng em song song: mỗi lượt chờ tối đa 240 ms rồi tự đọc lại ⇒ 40 em = 40 lần đọc). Thầy 06/10: dòng "Ôn bài cũ" của thẻ
+ * xác nhận bỏ câu của chiến dịch đang chạy khỏi kho. Lỗi đọc ⇒ rỗng.
+ */
+export async function docChienDichDangChayCuaCacEm(env: Env, sbd: readonly string[], homNay: string): Promise<ChienDich[]> {
+  try {
+    const { ds, bd, rd } = await docMoiChienDich(env)
+    const tap = new Set(sbd)
+    return chienDichDangChayHet(ds.filter((x) => [...x.sbd].some((s) => tap.has(s))).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null })), homNay)
+  } catch {
+    return []
+  }
+}
 /** Chiến dịch SẮP bắt đầu gần nhất của em (chưa tới ngày bắt đầu) — Sảnh HS báo ngày, KHÔNG phát câu. */
 export const chienDichSapBatDau = (ds: readonly ChienDich[], homNay: string): ChienDich | null =>
   ds.filter((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && chuaBatDau(c, homNay)).sort((a, b) => (a.batDau < b.batDau ? -1 : a.batDau > b.batDau ? 1 : 0))[0] ?? null
@@ -567,15 +608,17 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
 // ---------------------------------------------------------------- OMNI 3: phạm vi đã dạy + ôn bài cũ (chỉ khi `omniBat`)
 /** Trần số câu phạm vi xét làm ứng viên ôn bài cũ mỗi lần đọc (bài gần nhất trước) — chặn chi phí đọc sổ/meta khi lớp đã học nhiều bài. */
 export const TRAN_UNG_VIEN_ON_BAI_CU = 800
+/** `theoTo[tờ]` = số câu tờ ấy góp (sau bỏ trùng), cùng thứ tự `maDe` ⇒ chia được câu về từng bài (06/10, chia ôn bài cũ đều). */
+interface CauPhamVi { qids: string[]; theoTo: Record<string, number> }
 /** Câu hợp lệ của các tờ trong phạm vi (dùng chung mọi em của lớp, đổi chậm) — đệm 5 phút trong isolate; khoá = danh sách tờ theo thứ tự đọc. */
-const demCauPhamVi = new DemTTL<string[]>(5 * 60_000, 64, 400_000)
-async function cauCuaToPhamVi(env: Env, maDe: readonly string[]): Promise<string[]> {
+const demCauPhamVi = new DemTTL<CauPhamVi>(5 * 60_000, 64, 400_000)
+async function cauCuaToPhamVi(env: Env, maDe: readonly string[]): Promise<CauPhamVi> {
   const khoa = maDe.join('|')
   const co = demCauPhamVi.doc(khoa, Date.now())
   if (co) return co
-  const { qids } = await (await lanGv()).cauCuaToChiTiet(env, maDe)
-  demCauPhamVi.ghi(khoa, Date.now(), qids, qids.length + 1)
-  return qids
+  const { qids, theoTo } = await (await lanGv()).cauCuaToChiTiet(env, maDe)
+  demCauPhamVi.ghi(khoa, Date.now(), { qids, theoTo }, qids.length + 1)
+  return { qids, theoTo }
 }
 /** Thư mục của các tờ; lỗi đọc ⇒ luật lùi (mã "DH-" là DẠY HỌC, còn lại TU LUYỆN). */
 async function thuMucAnToan(env: Env, maDe: readonly string[]): Promise<Map<string, ThuMuc>> {
@@ -587,32 +630,40 @@ async function thuMucAnToan(env: Env, maDe: readonly string[]): Promise<Map<stri
  * Câu phạm vi xét làm ứng viên ÔN BÀI CŨ: câu hợp lệ (đã duyệt, không tự luận — `cauCuaToChiTiet`) của các tờ DẠY HỌC trong phạm vi, bài gần nhất trước,
  * bỏ câu của chiến dịch đang chạy; kèm thư mục các tờ phạm vi, siêu dữ liệu và TOÀN BỘ sổ của em trên các câu ấy (không mốc — ôn bài cũ không có hạn).
  */
-async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangChay: readonly ChienDich[]): Promise<{ thuMuc: Map<string, ThuMuc>; qids: string[]; meta: Map<string, MetaCau>; lanLam: LanLam[] }> {
+async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangChay: readonly ChienDich[]): Promise<{ thuMuc: Map<string, ThuMuc>; qids: string[]; meta: Map<string, MetaCau>; lanLam: LanLam[]; baiCua?: Map<string, string> }> {
   const viTri = (m: string) => phamVi.baiTheoMaDe.get(m)?.viTri ?? -1
   const toPhamVi = [...phamVi.maDe].sort((a, b) => viTri(b) - viTri(a) || (a < b ? -1 : a > b ? 1 : 0))
   // Thư mục và câu các tờ phạm vi đọc SONG SONG (một đợt); câu chỉ ở tờ không phải DẠY HỌC bị lọc sau theo mọi tờ chứa câu.
   const pThuMuc = thuMucAnToan(env, toPhamVi)
-  const pCau = toPhamVi.length ? cauCuaToPhamVi(env, toPhamVi) : Promise.resolve([] as string[])
+  const pCau: Promise<CauPhamVi> = toPhamVi.length ? cauCuaToPhamVi(env, toPhamVi) : Promise.resolve({ qids: [], theoTo: {} })
+  // 06/10 — công tắc chia ôn bài cũ ĐỀU (`cau_hinh.on_bai_cu_deu`; vắng ⇒ BẬT). Đọc KÈM câu đọc nhóm cờ đầu request (cau-hinh-dem.ts NHOM_CO) ⇒ không thêm vòng / đợt D1.
+  const pDeu = onBaiCuDeuBat(env)
+  pDeu.catch(() => {})
   // Tối ưu 05/10: ứng viên chỉ phụ thuộc câu phạm vi + chiến dịch đang chạy (KHÔNG phụ thuộc thư mục) ⇒ siêu dữ liệu + sổ của chúng bắt đầu ngay khi có câu phạm vi
   // (câu phạm vi có đệm 5 phút ⇒ thường CÙNG đợt với thư mục; trước: chờ thư mục xong). Thư mục chỉ chọn tờ ưu tiên + lọc sau như cũ; không tờ DẠY HỌC ⇒ bỏ kết quả.
   const chay = new Set(dangChay.flatMap((c) => c.qids))
-  const pUng = pCau.then((cau) => cau.filter((q) => !chay.has(q)).slice(0, TRAN_UNG_VIEN_ON_BAI_CU))
-  const pDoc = pUng.then((ung) => {
+  // Công tắc TẮT ⇒ đúng như trước 06/10: `.slice(0, 800)` trên danh sách bài-gần-nhất-trước. BẬT ⇒ cắt trần CÔNG BẰNG: vòng r lấy câu thứ r của mỗi bài (bài gần nhất trước,
+  // mỗi bài giữ thứ tự gốc) — mọi bài trong phạm vi đều có mặt khi trần ≥ số bài; chưa chạm trần ⇒ cùng tập câu như cũ. `baiCua` (qid → khoá bài) dùng xếp thứ tự ở `docHoSo2`.
+  const pUng = Promise.all([pCau, pDeu]).then(([kho, deu]): { ung: string[]; baiCua?: Map<string, string> } => {
+    if (!deu) return { ung: kho.qids.filter((q) => !chay.has(q)).slice(0, TRAN_UNG_VIEN_ON_BAI_CU) }
+    const chia = chiaCauTheoBai(toPhamVi, kho.qids, kho.theoTo, (m) => phamVi.baiTheoMaDe.get(m)?.khoaBai ?? '', chay)
+    return { ung: capCongBang(chia.nhom, TRAN_UNG_VIEN_ON_BAI_CU), baiCua: chia.baiCua }
+  })
+  const pDoc = pUng.then(({ ung }) => {
     if (!ung.length) return null
     const tho = docMetaCauTho(env, ung), lanLam = docLanLam(env, sbd, ung, '')
     tho.catch(() => {}); lanLam.catch(() => {})
     return { tho, lanLam }
   })
   pDoc.catch(() => {})
-  const [thuMuc, cauPhamVi] = await Promise.all([pThuMuc, pCau])
+  const [thuMuc, , { ung, baiCua }] = await Promise.all([pThuMuc, pCau, pUng])
   const dayHoc = new Set(toPhamVi.filter((m) => thuMuc.get(m) === 'DAY_HOC'))
   if (!dayHoc.size) return { thuMuc, qids: [], meta: new Map(), lanLam: [] }
-  const ung = cauPhamVi.filter((q) => !chay.has(q)).slice(0, TRAN_UNG_VIEN_ON_BAI_CU)
   if (!ung.length) return { thuMuc, qids: [], meta: new Map(), lanLam: [] }
   const maDeCua = new Map<string, Set<string>>()
   const doc = (await pDoc)!
   const [meta, lanLam] = await Promise.all([doc.tho.then((rows) => metaCauTuDong(rows, [...dayHoc], maDeCua)), doc.lanLam])
-  return { thuMuc, qids: ung.filter((q) => [...(maDeCua.get(q) ?? [])].some((m) => dayHoc.has(m))), meta, lanLam }
+  return { thuMuc, qids: ung.filter((q) => [...(maDeCua.get(q) ?? [])].some((m) => dayHoc.has(m))), meta, lanLam, ...(baiCua ? { baiCua } : {}) }
 }
 
 /**
@@ -631,7 +682,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const omniP = omniSom ?? omniBatEm(env, sbd)
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
-  const [ds, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi] = await Promise.all([docChienDichCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP])
+  const [{ ds, daHuy }, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi] = await Promise.all([docChienDichKemDaHuyCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP])
   // OMNI 3: mọi chiến dịch đang chạy, hạn gần trước; cờ tắt ⇒ một chiến dịch (giao gần nhất) như cũ.
   const dsDangChay = omni ? chienDichDangChayHet(ds, homNay) : []
   const dangChay = omni ? (dsDangChay[0] ?? null) : chienDichDangChay(ds, homNay)
@@ -669,8 +720,12 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   // VÒNG HỌC v2 — NGUỒN THỨ 4 (thầy 02/10: "đảm bảo tất cả các câu sai phải được xử lý triệt để", "chỉ tính từ 29/09"): câu sai TỰ LÀM ở
   // MỌI kênh từ 29/09 mà 3 nguồn trên chưa kéo ⇒ nợ. Câu không có trong kho game / tự luận bị `docMetaCau` loại như mọi nguồn.
   const qidSaiV2 = new Set<string>()
+  // THU HỒI KHI HUỶ (thầy 06/10: "hủy chiến dịch thì những học sinh đã phân phải đc thu hồi hết"): huỷ = như chưa từng giao ⇒ câu em làm SAI từ lúc ĐƯỢC GIAO chiến dịch đã huỷ
+  // (lần sai sớm nhất ≥ mốc giao của em; không chặn trên — lượt đang làm dở sau khi huỷ cũng không thành nợ) KHÔNG quay lại làm nợ. Nợ có từ trước chiến dịch, nợ do chiến dịch
+  // khác (nguồn chiến dịch xét trước) / ca thi / Lên bảng / đầu giờ (nguồn 2–3) giữ nguyên; sổ làm bài không đụng. Kết thúc (`dong`) KHÁC huỷ: nợ vẫn theo em.
+  const daThuHoi = (q: string, luc: string): boolean => daHuy.some((c) => c.qids.has(q) && luc >= mocTinhCua(c.taoLuc, mocThem.get(c.id)))
   for (const [q, luc] of qidSaiMoiKenh) {
-    if (nguonTheoQid.has(q)) continue
+    if (nguonTheoQid.has(q) || daThuHoi(q, luc)) continue
     nguonTheoQid.set(q, 'cu')
     tuLucTheoQid.set(q, luc)
     qidSaiV2.add(q)
@@ -766,7 +821,12 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
       // câu đã gặp tới lịch → câu chưa gặp → câu đã gặp chưa tới lịch; trong nhóm giữ thứ tự bài gần nhất trước
       ung.push({ c: { qid: q, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon: 'on_bai_cu', ...(m.sao ? { sao: m.sao } : {}) }, nhom: t.laMoi ? 1 : t.henOn && t.henOn <= homNay ? 0 : 2, i })
     })
-    onBaiCu = ung.sort((a, b) => a.nhom - b.nhom || a.i - b.i).map((x) => x.c)
+    // 06/10 — công tắc chia đều BẬT (`baiCua` có mặt): giữ nguyên thứ tự NHÓM, trong mỗi nhóm các bài xen kẽ vòng tròn (xoay theo ngày), trong mỗi bài các dạng xen kẽ
+    // (`xepCongBang`, tất định theo `homNay`) ⇒ mọi tiền tố độ dài k phủ min(k, số bài) bài. TẮT ⇒ đúng như cũ: nhóm → bài gần nhất trước.
+    const baiCua = phamViOn.baiCua
+    onBaiCu = baiCua
+      ? xepCongBang(ung, { nhom: (x) => x.nhom, bai: (x) => baiCua.get(x.c.qid) ?? '', dang: (x) => x.c.dang ?? '' }, homNay).map((x) => x.c)
+      : ung.sort((a, b) => a.nhom - b.nhom || a.i - b.i).map((x) => x.c)
   }
   const chienDichCuCuaCau = new Map<string, { ten: string; hanNop: string }>()
   for (const [q, c] of cdCuaQid) if (c.trangThai === 'da_dong' || c.hanNop < homNay) chienDichCuCuaCau.set(q, { ten: c.ten, hanNop: c.hanNop })
@@ -1170,6 +1230,14 @@ export async function theLucLopCuaEm(env: Env, sbd: string): Promise<number | nu
     return Number.isFinite(n) && n > 0 ? Math.floor(n) : null
   } catch { return null }
 }
+/**
+ * Tỉ lệ ôn bài cũ THẦY ĐÃ ĐẶT cho lớp của em (thầy 06/10, `cau_hinh.on_bai_cu_ti_le`): lớp qua `lopCuaEm` (đệm 30 s, đã nóng vì `docHoSo2` vừa đọc phạm vi), cấu hình đệm 15 s
+ * (đọc KÈM câu đọc nhóm cờ ⇒ không thêm vòng D1). Không có cấu hình hợp lệ ⇒ null ⇒ `tiLeOnBaiCu` dùng đúng hằng cũ (20 % thường / 40 % ngày 4–5 của bài).
+ */
+export async function tiLeOnBaiCuRiengCuaEm(env: Env, sbd: string): Promise<TiLeMotPhan | null> {
+  const lop = await lanBaiDaDay().then((m) => m.lopCuaEm(env, sbd)).catch(() => null)
+  return docTiLeRiengCuaLop(env, lop)
+}
 /** Phần ĐỒNG BỘ của tuỳ chọn kế hoạch OMNI: mọi chiến dịch đang chạy (thể lực = max, Huyết Chiến gấp đôi nếu có bài cho phép) + ứng viên ôn bài cũ. */
 export function tuyChonGocOmni(hoSo: HoSo2, ngay: string): TuyChonKeHoach {
   const ds = hoSo.chienDichHet ?? (hoSo.chienDich ? [hoSo.chienDich] : [])
@@ -1196,12 +1264,13 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
     return { tiLeNo: tiLeNoRieng(noDenHan, nk.nhipNgay), ...(onVaoDaoRieng(nk.luotDao, nk.luotDoan) ? { onVaoDao: true } : {}) }
   }
   const cauQ = [...hoSo.cau.filter((c) => (c.nguon ?? 'chien_dich') === 'chien_dich'), ...(hoSo.onBaiCu ?? [])]
-  const [r, hang, hsOmni, q, theLucLop] = await Promise.all([
+  const [r, hang, hsOmni, q, theLucLop, tiLeRieng] = await Promise.all([
     rieng().catch(() => ({})),
     docHangEm(env, sbd, hoSo, som?.hd).catch(() => null),
     lanOmniD1().then((m) => m.hoSoOmniEm(env, sbd, nowMs)).catch(() => null),
     cauQ.length ? lanOmniD1().then((m) => m.qCuaCau(env, cauQ.map((c) => c.qid))).catch(() => null) : Promise.resolve(null),
     hoSo.omni?.cheDoCho ? theLucLopCuaEm(env, sbd).catch(() => null) : Promise.resolve(null),
+    tiLeOnBaiCuRiengCuaEm(env, sbd).catch(() => null), // 06/10 (c): tỉ lệ ôn bài cũ thầy đặt cho lớp của em — lớp + cấu hình đã đệm ⇒ thường 0 truy vấn
   ])
   let trongSoCau: Record<string, number> | undefined
   let dangVung: string[] = []
@@ -1222,7 +1291,7 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
     onBaiCu,
     ...(trongSoCau ? { trongSoCau } : {}),
     ...(dangVung.length ? { dangVung } : {}),
-    tiLeOnBaiCu: tiLeOnBaiCu(cd ? soNgayGiua(cd.batDau, ngay) + 1 : null),
+    tiLeOnBaiCu: tiLeOnBaiCu(cd ? soNgayGiua(cd.batDau, ngay) + 1 : null, THAM_SO_OMNI, tiLeRieng),
     ...(hoSo.omni?.cheDoCho ? { cheDoCho: { theLuc: theLucCho(theLucLop ?? THAM_SO_OMNI.THE_LUC_MAC_DINH) } } : {}),
   }
 }

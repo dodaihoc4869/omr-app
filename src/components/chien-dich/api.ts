@@ -246,7 +246,15 @@ export const danhSachThongKe = () => goiChienDich<DanhSachChienDich>('danh-sach'
 export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lop: string; khoi?: string; tenLop?: string }[] }>('ds-em', {})
 export const tinhSucChua = (dv: DauVaoGiao) => goiChienDich<SucChua>('suc-chua', { ...dv })
 export const taoChienDich = (dv: DauVaoGiao & { ten: string }) => goiChienDich<{ id: string; soCau: number; soEm: number }>('tao', { ...dv })
-export const huyChienDich = (id: string) => goiChienDich<{ ok: true }>('huy', { id })
+/** Kết quả thu hồi máy chủ báo khi HUỶ (thầy 06/10: huỷ = thu hồi hết phần đã phân): số em của chiến dịch, số lượt game đang mở đã thu hồi, bài tích gắn chiến dịch đã nhả chưa. */
+export interface KetQuaThuHoi { soEm: number; soLuotDangMo: number; nhaTick: boolean }
+export const huyChienDich = (id: string) => goiChienDich<{ ok: true; thuHoi?: KetQuaThuHoi }>('huy', { id })
+/** Lời báo sau khi HUỶ chiến dịch: nói rõ câu chưa làm đã thu hồi khỏi bao nhiêu em (có nhãn); bài tích gắn chiến dịch được nhả thì báo bài không còn tính là đã dạy. Máy chủ cũ không trả `thuHoi` ⇒ lời cũ. */
+export function loiBaoDaHuy(thuHoi?: Partial<KetQuaThuHoi> | null): string {
+  const soEm = Math.max(0, Math.floor(Number(thuHoi?.soEm) || 0))
+  if (!soEm) return 'Đã huỷ chiến dịch'
+  return `Đã huỷ chiến dịch — câu chưa làm đã thu hồi khỏi ${soEm} em${thuHoi?.nhaTick ? '; bài này không còn tính là đã dạy' : ''}`
+}
 /** Công tắc rải đều câu mới trên chiến dịch đang chạy (thầy 30/09) — có hiệu lực từ kế hoạch ngày kế tiếp. */
 export const doiRaiDeu = (id: string, bat: boolean) => goiChienDich<{ id: string; raiDeu: boolean }>('rai-deu', { id, bat })
 export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', { id })
