@@ -153,7 +153,6 @@ export interface CauCanDayLai {
   soEm: number
   mucDo?: string | null
   phan?: 'I' | 'II' | 'III'
-  cau?: any
 }
 
 /** Một dòng báo nợ cũ: "Em X còn N câu nợ cũ — cần ≈ K ngày để trả hết" (máy chủ viết sẵn ở `cau`). */
@@ -205,7 +204,6 @@ export interface CauBuoiChua {
   diemChua: number
   giaiMau: EmTen | null
   emSua: EmTen[]
-  cau?: any
 }
 
 export interface BuoiChuaMayChu {
@@ -256,6 +254,46 @@ export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiCh
 export const qidCuaDong = (c: { qid: string; qidCung?: string[] }): string[] => (c.qidCung?.length ? c.qidCung : [c.qid])
 
 export const chuaXong = (id: string, qids?: string[]) => goiChienDich<KetQuaChuaXong>('chua-xong', qids && qids.length ? { id, qids } : { id })
+
+/** Nội dung ĐÚNG mã câu của chiến dịch cho tờ chiếu (máy chủ `noi-dung-cau`, đã qua cổng khối lớp — thầy 06/10). */
+export interface NoiDungCauMayChu {
+  /** Khối của lớp / chiến dịch (rỗng ⇒ lớp chưa rõ khối, máy chủ giữ hết). */
+  khoiDich: number[]
+  /** Mã câu ⇒ câu theo khuôn Ngân hàng đề của thầy (dựng tờ bằng đúng đường có sẵn). */
+  cau: Record<string, Record<string, unknown>>
+  /** Mã câu BỊ CHẶN vì khác khối lớp / mâu thuẫn khối — phải bỏ khỏi tờ. */
+  boKhoi: string[]
+  /** Mã câu máy chủ không có nội dung dùng được (không thuộc chiến dịch, hỏng, tự luận…) — tờ hiện dòng thay thế. */
+  khongCo: string[]
+}
+/** Mỗi lượt xin bấy nhiêu mã (máy chủ trần 120): lô nhỏ ⇒ lời đáp nhẹ, câu có ảnh lớn không dồn một lượt. */
+export const SO_QID_MOI_LO_NOI_DUNG = 40
+/**
+ * Hỏi nội dung các câu `qids` của chiến dịch `id`, chia lô. Có ít nhất một lô trả về ⇒ ok (lô lỗi: mã của lô ấy vào `khongCo`); mọi lô đều lỗi / máy chủ chưa có lệnh ⇒ lỗi
+ * (nơi gọi dùng Ngân hàng đề trên máy, không đoán).
+ */
+export async function docNoiDungCau(id: string, qids: readonly string[]): Promise<KetQuaLenh<NoiDungCauMayChu>> {
+  const ra: NoiDungCauMayChu = { khoiDich: [], cau: {}, boKhoi: [], khongCo: [] }
+  const ds = [...new Set(qids.filter(Boolean))]
+  let loi: KetQuaLenh<NoiDungCauMayChu> | null = null
+  let coLo = false
+  for (let i = 0; i < ds.length; i += SO_QID_MOI_LO_NOI_DUNG) {
+    const lo = ds.slice(i, i + SO_QID_MOI_LO_NOI_DUNG)
+    const r = await goiChienDich<Partial<NoiDungCauMayChu>>('noi-dung-cau', { id, qids: lo })
+    if (!r.ok) {
+      loi ??= r
+      ra.khongCo.push(...lo)
+      continue
+    }
+    coLo = true
+    if (Array.isArray(r.du.khoiDich)) ra.khoiDich = r.du.khoiDich.filter((k): k is number => typeof k === 'number')
+    if (r.du.cau && typeof r.du.cau === 'object') Object.assign(ra.cau, r.du.cau)
+    if (Array.isArray(r.du.boKhoi)) ra.boKhoi.push(...r.du.boKhoi.map(String))
+    if (Array.isArray(r.du.khongCo)) ra.khongCo.push(...r.du.khongCo.map(String))
+  }
+  if (!coLo && loi) return loi
+  return { ok: true, du: ra }
+}
 
 // ---------------------------------------------------------------- SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, máy chủ `srs2-sua.ts`)
 export const DUONG_SUA_CHIEN_DICH = '/gv/chien-dich/sua'

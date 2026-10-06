@@ -1,9 +1,10 @@
 // THUẬT TOÁN 2.0 — LỆNH CỦA THẦY `/gv/chien-dich` (nằm SAU cổng `laThay`).
-//   action: co-doc | co-luu | bia-co-doc | bia-co-luu | danh-sach | suc-chua | tao | dong | huy | bang | buoi-chua | chua-xong
+//   action: co-doc | co-luu | bia-co-doc | bia-co-luu | danh-sach | suc-chua | tao | dong | huy | bang | buoi-chua | noi-dung-cau | chua-xong
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
 import { chanKhacKhoiLop } from './chan-khac-khoi'
+import { noiDungCauChienDich } from './noi-dung-cau-chien-dich'
 import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -36,6 +37,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
     if (action === 'rai-deu') return await doiRaiDeu(env, str(b.id), b.bat !== false, nowMs, str(b.nguoi)) // await để lỗi "không tìm thấy" về { ok:false }
     if (action === 'bang') return bang(env, str(b.id), nowMs)
     if (action === 'buoi-chua') return buoiChua(env, str(b.id), nowMs, mangChuoi(b.coMat))
+    if (action === 'noi-dung-cau') return noiDungCauChienDich(env, await docMot(env, str(b.id)), mangChuoi(b.qids)) // nội dung ĐÚNG mã câu cho tờ chiếu, qua cổng khối (06/10)
     if (action === 'chua-xong') return chuaXong(env, str(b.id), mangChuoi(b.qids), nowMs)
     return { ok: false, error: 'Hành động không hợp lệ.' }
   } catch (e) {
@@ -442,40 +444,12 @@ async function bang(env: Env, id: string, nowMs: number) {
       soCauTon, soCauCanTruoc,
     }
   })
-  let canDayLai: { qid: string; stt: number; dang: string | undefined; mucDo: string | null; soEm: number; phan?: string; cau?: Record<string, unknown>; qidCung?: string[] }[] = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
+  let canDayLai: { qid: string; stt: number; dang: string | undefined; mucDo: string | null; soEm: number; phan: string; qidCung?: string[] }[] = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length, phan: meta.get(q)?.phan ?? 'I' }))
     .filter((x) => x.soEm > 0).sort((a, b) => b.soEm - a.soEm)
   canDayLai = await chanKhacKhoiLop(env, 'can_day_lai', { lop: cd.lop, sbd: cd.sbd }, canDayLai, { cauCua: (x) => x.qid }) // LUẬT THẦY 05/10: "Cần thầy dạy lại" / "Chiếu cả N câu lên bảng" chỉ câu ĐÚNG khối lớp
   if (canDayLai.length) {
-    const qidList = canDayLai.map((x) => x.qid)
-    const rows = (await env.DB.prepare('SELECT qid, phan, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qidList)).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
-    const cauMap = new Map<string, Row>()
-    for (const r of rows) cauMap.set(str(r.qid), r)
-    for (const item of canDayLai as (typeof canDayLai[number] & { phan?: string; cau?: Record<string, unknown> })[]) {
-      const r = cauMap.get(item.qid)
-      if (r) {
-        try {
-          const q = JSON.parse(str(r.json))
-          item.phan = q.phan || 'I'
-          item.cau = {
-            id: item.qid,
-            phan: q.phan || 'I',
-            text: q.text || '',
-            choices: q.choices,
-            ideas: q.ideas,
-            correct: q.correct,
-            explanation: q.explanation || q.huongDanGiai || q.loiGiaiChiTiet,
-            loiGiai: q.loiGiai || q.solution,
-            thanCauImg: q.thanCauImg,
-            imageDataUrl: q.imageDataUrl,
-            hinhAnh: q.hinhAnh,
-            table: q.table,
-            chuyenDe: q.chuyenDe,
-            dang: q.dang ? { ma: q.dang, ten: q.tenDang || q.dang } : null,
-            mucDo: q.mucDo || item.mucDo,
-          }
-        } catch {}
-      }
-    }
+    // Dòng KHÔNG mang nội dung câu (06/10): đoạn đính nội dung cũ chọn cột `phan` mà `game_v2_question` không có nên chưa bao giờ chạy được (lỗi bị nuốt) và máy thầy phải đoán
+    // nội dung từ Ngân hàng đề ⇒ lẫn câu lớp 10 vào tờ chữa lớp 11. Nội dung do lệnh `noi-dung-cau` trả khi thầy mở tờ chiếu (đúng mã câu, qua cổng khối); `phan` lấy từ `meta` ở trên.
     // Câu trùng nội dung (chép ở nhiều đề) ⇒ một dòng; số em = em cần dạy lại ở BẤT KỲ bản nào (không đếm đôi một em).
     const nhom = await nhomCauTrung(env, cd.qids)
     canDayLai = gopCauTrung(canDayLai, nhom).map((x) => ({ ...x, soEm: cd.sbd.filter((s) => x.qidCung.some((q) => tt.get(s)!.get(q)!.catTia)).length }))
@@ -604,38 +578,8 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
     if (giaiMau) daGiaiMau.set(giaiMau, (daGiaiMau.get(giaiMau) ?? 0) + 1)
     return { ...c, giaiMau: giaiMau ? { sbd: giaiMau, ten: ten.get(giaiMau) ?? giaiMau } : null, emSua: c.emSua.map((s) => ({ sbd: s, ten: ten.get(s) ?? s })) }
   })
-  if (deXuat.length) {
-    const qidList = deXuat.map((x) => x.qid)
-    const rows = (await env.DB.prepare('SELECT qid, phan, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qidList)).all<Row>().catch(() => ({ results: [] as Row[] }))).results ?? []
-    const cauMap = new Map<string, Row>()
-    for (const r of rows) cauMap.set(str(r.qid), r)
-    for (const item of deXuat as (typeof deXuat[number] & { phan?: string; cau?: Record<string, unknown> })[]) {
-      const r = cauMap.get(item.qid)
-      if (r) {
-        try {
-          const q = JSON.parse(str(r.json))
-          item.phan = q.phan || 'I'
-          item.cau = {
-            id: item.qid,
-            phan: q.phan || 'I',
-            text: q.text || '',
-            choices: q.choices,
-            ideas: q.ideas,
-            correct: q.correct,
-            explanation: q.explanation || q.huongDanGiai || q.loiGiaiChiTiet,
-            loiGiai: q.loiGiai || q.solution,
-            thanCauImg: q.thanCauImg,
-            imageDataUrl: q.imageDataUrl,
-            hinhAnh: q.hinhAnh,
-            table: q.table,
-            chuyenDe: q.chuyenDe,
-            dang: q.dang ? { ma: q.dang, ten: q.tenDang || q.dang } : null,
-            mucDo: q.mucDo || item.mucDo,
-          }
-        } catch {}
-      }
-    }
-  }
+  // Dòng buổi chữa KHÔNG mang nội dung câu (06/10): đoạn đính nội dung cũ ở đây chọn cột `phan` không có trong `game_v2_question` nên chưa bao giờ chạy được; nội dung do lệnh `noi-dung-cau` trả
+  // khi thầy mở tờ chiếu (đúng mã câu, qua cổng khối) — không làm nặng lệnh này, và máy thầy không còn phải đoán nội dung câu.
   const tong = cd.qids.length * Math.max(1, em.length)
   let coXat = 0, thanhThao = 0
   for (const s of em) for (const t of tt.get(s)!.values()) { if (!t.laMoi) coXat++; if (t.thanhThao) thanhThao++ }

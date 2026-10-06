@@ -7,15 +7,16 @@
 // (`/gv/omni ca-chot`) cho nút "Mở ca chốt".
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
-import { chuThieuNoiDung } from '../../lib/tra-cau-chieu'
+import { chuBoCauKhacKhoi, chuThieuNoiDung } from '../../lib/tra-cau-chieu'
+import { khoiCuaLop } from '../../lib/khoi-cau'
 import KhungXemPhieu from '../KhungXemPhieu'
-import { chuaXong, qidCuaDong, danhSach, docBang, docBuoiChua, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
+import { chuaXong, qidCuaDong, danhSach, docBang, docBuoiChua, docNoiDungCau, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
 import { caChotOmni, docBangOmniCua, docCoOmni, omniApChoLop, type GoiCaChotOmni } from './api-omni'
 import type { BangOmni } from '../../../server/src/omni-kieu'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
 import { hienNgay, mocHetHan } from './ngay'
-import { dungToChieu, napBangTra, type CauGoc, type OChieu } from './to-chieu'
+import { dungToChieu, napBangTra, napNoiDungChoToChieu, type CauGoc, type OChieu } from './to-chieu'
 import { useGhiToChieu } from './ghi-to-chieu'
 import './chien-dich.css'
 
@@ -180,7 +181,25 @@ export default function LenBangChienDich() {
     setDangChieu(true)
     try {
       const ma = moPhien()
-      const { html: h, soThieu, o } = await dungToChieu(dsO, tenBuoi, await layTra(), ma)
+      const bangTra = await layTra()
+      // NỘI DUNG ĐÚNG MÃ CÂU (thầy 06/10: tờ chữa lớp 11 lẫn câu lớp 10): Ngân hàng đề trên máy khớp NGUYÊN mã; thiếu thì hỏi máy chủ — nội dung đã qua cổng khối lớp, và câu
+      // máy chủ báo khác khối lớp bị BỎ khỏi tờ. Không còn đoán nội dung theo đuôi mã / số thứ tự.
+      const np = await napNoiDungChoToChieu(dsO, bangTra, async (qids) => {
+        const r = await docNoiDungCau(chonId, qids)
+        return r.ok ? r.du : null
+      })
+      const khoiLop = khoiCuaLop(bang?.chienDich.lop ?? buoi?.chienDich.lop)
+      const khoiDich = np.khoiDich.length ? np.khoiDich : khoiLop !== null ? [khoiLop] : []
+      const hetCau = (soBo: number) => {
+        const baoBo = chuBoCauKhacKhoi(soBo)
+        showToast(baoBo ? `${baoBo} — không còn câu nào để chiếu` : 'Chưa có câu nào để chiếu lên bảng', 'warn')
+        return false
+      }
+      if (!np.ds.length) return hetCau(np.soBoKhoi)
+      const { html: h, soThieu, soBoKhoi, o } = await dungToChieu(np.ds, tenBuoi, bangTra, ma, { khoiDich })
+      if (np.ds.length === soBoKhoi) return hetCau(np.soBoKhoi + soBoKhoi)
+      const baoBo = chuBoCauKhacKhoi(np.soBoKhoi + soBoKhoi)
+      if (baoBo) showToast(baoBo, 'warn')
       const bao = chuThieuNoiDung(soThieu)
       if (bao) showToast(bao, 'warn')
       ganO(ma, o)
