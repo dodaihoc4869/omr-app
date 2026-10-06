@@ -1,3 +1,4 @@
+import KhoiLoiGiaiChuan from '../components/loi-giai/KhoiLoiGiaiChuan'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
@@ -480,31 +481,19 @@ export default function DieuKhienToChieuScreen() {
               </div>
             )}
 
-            {oHienTai?.kienThucCotLoi && (
-              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800">
-                <span className="text-xs font-bold text-amber-800 dark:text-amber-300 block mb-0.5">
-                  Kiến thức cốt lõi:
-                </span>
-                <p className="text-xs text-amber-900 dark:text-amber-200 font-medium">
-                  <ChemText text={oHienTai.kienThucCotLoi} />
-                </p>
-              </div>
-            )}
-
-            <div>
-              <span className="text-xs font-bold text-slate-600 dark:text-slate-400 block mb-1">
-                Hướng dẫn giải:
-              </span>
-              <div
-                className="text-xs leading-relaxed text-slate-700 dark:text-slate-200 font-serif whitespace-pre-wrap"
-              >
-                {oHienTai?.loiGiai || oHienTai?.huongDan ? (
+            {/* KHỐI LỜI GIẢI CHUẨN (06/10): LỜI GIẢI → Kiến thức cốt lõi → hướng dẫn giải (chữ của thầy); không có gì ⇒ "Thầy chưa nhập lời giải…" */}
+            <KhoiLoiGiaiChuan
+              phan="III"
+              loiGiai={oHienTai?.kienThucCotLoi ? { chot: oHienTai.kienThucCotLoi } : undefined}
+              explanation={oHienTai?.loiGiai || oHienTai?.huongDan || undefined}
+              giuDong
+            >
+              {oHienTai?.kienThucCotLoi && (oHienTai?.loiGiai || oHienTai?.huongDan) ? (
+                <div className="lg-chu whitespace-pre-wrap">
                   <ChemText text={oHienTai.loiGiai || oHienTai.huongDan || ''} />
-                ) : (
-                  <p className="text-slate-400 italic">Chưa có bản ghi lời giải chi tiết cho câu này.</p>
-                )}
-              </div>
-            </div>
+                </div>
+              ) : null}
+            </KhoiLoiGiaiChuan>
           </div>
         )}
 

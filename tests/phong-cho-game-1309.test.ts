@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-describe('Phòng chờ thi · Chuyến bay hóa học', () => {
+describe('Phòng chờ thi · Bắn nguyên tố', () => {
   const tepExamTake = readFileSync(resolve(__dirname, '../src/screens/ExamTakeScreen.tsx'), 'utf8')
   const tepPhongCho = readFileSync(resolve(__dirname, '../src/components/PhongChoGame.tsx'), 'utf8')
 
@@ -20,7 +20,7 @@ describe('Phòng chờ thi · Chuyến bay hóa học', () => {
   it('Phòng chờ giữ thông báo và nối mini-game cục bộ đã duyệt', () => {
     expect(tepPhongCho).toContain('Đang chờ Thầy bấm bắt đầu')
     expect(tepPhongCho).toContain('Điểm chơi chỉ để vui trong lúc chờ.')
-    expect(tepPhongCho).toContain('<ChuyenBay')
+    expect(tepPhongCho).toContain('<BanNguyenTo')
     expect(tepPhongCho).toContain('loiCho')
 
   })

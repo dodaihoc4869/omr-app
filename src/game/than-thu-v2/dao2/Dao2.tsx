@@ -27,6 +27,7 @@ import {omniBuocSai,omniTramXong} from '../../../components/hoa2/api'
 import type {LuaChonBuocSai,TramHoiPhuc} from '../../../../server/src/omni-kieu'
 import {LOI_KHOA_DAO_MAC_DINH,SO_AI_CHUYEN,THONG_BAO_TRONG_2,docGoiY,docGoiYPhien,docSanh2,docSoChuyenXong,ghepGoiY,ghiSoChuyenXong,gopTomTat,henOnCua,nhoGoiYPhien,soChuyen,vungTheoDang} from './dao2-core'
 import type {CauDao2,Sanh2} from './dao2-core'
+import '../thu-quai.css'
 import './dao2.css'
 
 interface Luot2{id:string;cau:CauDao2[];luc:number;/** OMNI 3: chuyến của vé thử thách (chốt lúc soạn, câu thay ở Trạm không làm đổi). */ve?:boolean}

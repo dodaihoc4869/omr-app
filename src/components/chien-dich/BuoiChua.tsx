@@ -244,7 +244,7 @@ export default function BuoiChua({
         {kq.dong.length === 0 ? (
           <p className="cd-phu">Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.</p>
         ) : (
-          <div role="table" aria-label="Câu chữa xếp sẵn">
+          <div role="table" aria-label="Câu chữa xếp sẵn" className="cd-bang-chua">
             <div className="cd-the-dau">
               <h2>Câu chữa xếp sẵn · điểm chữa cao trước</h2>
               <span className="cd-phu">Điểm chữa = số em chưa thành thạo + 2 × số em cần dạy lại</span>
@@ -310,7 +310,11 @@ export default function BuoiChua({
           Cách xếp: điểm chữa = số em chưa thành thạo + 2 × số em cần thầy dạy lại · mỗi dạng 1 câu đại diện · tổng ≤ {phut(kq.nganSachGiay)} phút · mỗi em có mặt ≥ 1 lượt.
           {kq.boCau.length > 0 && ` Đã bỏ bớt ${kq.boCau.length} câu điểm chữa thấp cho vừa giờ (Câu ${kq.boCau.map((c) => c.stt).join(', ')}).`}
         </p>
-        {kq.vuotNganSach && <p className="cd-loi">Lớp đông: cho mỗi em một lượt thì buổi chữa cần {phut(kq.tongGiay)} phút, vượt {phut(kq.nganSachGiay)} phút.</p>}
+        {kq.vuotNganSach && (
+          <p className="cd-loi">
+            Lớp đông: cho mỗi em một lượt thì buổi chữa cần {phut(kq.tongGiayDayDu)} phút, vượt {phut(kq.nganSachGiay)} phút. Đã giữ {kq.dong.length} câu; {kq.soEmCoLuot}/{kq.soEmCoMat} em có lượt lên bảng, các em còn lại theo dõi và chữa chung cả lớp.
+          </p>
+        )}
       </section>
 
       <p className="cd-phu" aria-live="polite">

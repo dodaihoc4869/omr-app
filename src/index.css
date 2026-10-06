@@ -217,40 +217,55 @@ body {
   height: calc(56px + env(safe-area-inset-top)) !important;
 }
 
-/* Ô LỜI GIẢI (THIẾT KẾ LẠI Ô LỜI GIẢI — 2026-09-02): KHÔNG nghiêng cả khối;
- * câu chốt in đậm trên cùng; mỗi phương án/ý một dòng có kẻ mảnh; Phần III
- * bước đánh số tròn + kết quả xanh. Chỉ dùng biến tokens.css. */
+/* Ô LỜI GIẢI (THIẾT KẾ LẠI Ô LỜI GIẢI — 2026-09-02; CHUẨN HIỂN THỊ 06/10): MỘT diện mạo cho mọi màn, CÓ hay KHÔNG có lớp `.m3`.
+ * Khối ngoài = nền chìm trung tính (--the-2), bo 16, KHÔNG viền trái cong; nhãn LỜI GIẢI / Kiến thức cốt lõi dùng --lg-nhan (≥ 4,5:1 sáng + tối).
+ * Ô câu chốt giữ thanh trái vuông trên nền thẻ. Dưới `.m3` các quy tắc `.m3 .loi-giai…` (m3/the-cau.css) vẫn đè màu M3.
+ * KHÔNG nghiêng cả khối; mỗi phương án/ý một dòng có kẻ mảnh; Phần III bước đánh số tròn + kết quả xanh. Chỉ dùng biến tokens.css. */
 .loi-giai {
-  background: var(--cam-nen);
-  border-left: 3px solid var(--cam);
-  border-radius: var(--bo-1);
+  background: var(--the-2);
+  border: 0;
+  border-radius: var(--bo-3);
   padding: var(--k4) var(--k5);
   margin-top: var(--k4);
+}
+.loi-giai > :last-child {
+  margin-bottom: 0; /* hết khoảng trống thừa dưới cùng */
 }
 .loi-giai-nhan,
 .lg-nhan {
   font: 700 var(--cx-1) / 1 var(--sans);
   letter-spacing: 0.1em;
-  color: var(--cam);
+  color: var(--lg-nhan);
   margin-bottom: var(--k3);
 }
 .loi-giai-chot,
 .lg-chot {
-  font: 800 var(--cx-3) / 1.6 var(--serif);
+  font: 700 var(--cx-2) / 1.6 var(--serif);
   font-style: normal; /* BỎ nghiêng — nghiêng khó đọc */
   color: var(--muc);
   margin-bottom: var(--k4);
   padding: var(--k2) var(--k3);
-  border-left: 3px solid var(--cam);
-  background: var(--the-2);
+  border-left: 3px solid var(--lg-nhan);
+  background: var(--the);
   border-radius: 0 var(--bo-1) var(--bo-1) 0;
+}
+.loi-giai-chot:last-child,
+.lg-chot:last-child {
+  margin-bottom: 0;
 }
 .loi-giai-nhan-nho {
   font: 700 var(--cx-1) / 1 var(--sans);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--cam);
+  color: var(--lg-nhan);
   margin-bottom: var(--k1);
+}
+/* chữ đã qua tachDongTheoY (màn phụ huynh): giữ xuống dòng ngắt theo ý (a), (1)… */
+.loi-giai[data-giu-dong] .lg-chu,
+.loi-giai[data-giu-dong] .lg-chot,
+.loi-giai[data-giu-dong] .lg-buoc li,
+.loi-giai[data-giu-dong] .lg-ket-qua {
+  white-space: pre-line;
 }
 .lg-y {
   display: grid;

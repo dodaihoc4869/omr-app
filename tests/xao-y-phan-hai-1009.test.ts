@@ -132,8 +132,11 @@ describe('CA CŨ VÀ MỌI CHỖ KHÁC KHÔNG ĐƯỢC ĐỔI HÀNH VI', () => {
   it('LỜI GIẢI TỪNG Ý đi theo ĐÚNG thứ tự đang hiện, không lệch nhãn', () => {
     // Ý hiện ở vị trí b) mà lời giải in nhãn b) của ý gốc thứ hai là em đọc nhầm
     // hẳn sang lời giải của ý khác.
-    expect(THE_CAU).toContain("const k = (['a', 'b', 'c', 'd'] as const)[i]")
-    expect(THE_CAU).toContain("ma={`${'abcd'[viTri]})`}")
+    // 06/10: ô LỜI GIẢI của TheCau nay do KhoiLoiGiaiChuan vẽ (sửa có chủ ý) — luật không đổi, chỉ đổi nơi giữ mã
+    const KHOI = fs.readFileSync(path.join(process.cwd(), 'src/components/loi-giai/KhoiLoiGiaiChuan.tsx'), 'utf8')
+    expect(KHOI).toContain("const k = (['a', 'b', 'c', 'd'] as const)[i]")
+    expect(KHOI).toContain("ma={`${'abcd'[viTri]})`}")
+    expect(THE_CAU).toContain('yPerm={props.phan === \'II\' ? props.yPerm : undefined}')
   })
 })
 

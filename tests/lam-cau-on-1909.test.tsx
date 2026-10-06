@@ -68,7 +68,7 @@ describe('lấy đề', () => {
     expect(screen.getByText('Phần I · Trắc nghiệm', { selector: '.lco-the:nth-child(1) *' })).toBeTruthy()
     expect(screen.getByText('Danh pháp este')).toBeTruthy()
     // Chưa nộp: không chữ nào của phần đáp án/lời giải
-    expect(document.body.textContent).not.toMatch(/Đáp án đúng|KIẾN THỨC CỐT LÕI|Em chọn|Chưa đúng/)
+    expect(document.body.textContent).not.toMatch(/Đáp án đúng|Kiến thức cốt lõi|Em chọn|Chưa đúng/)
     expect(within(the(0)).getAllByRole('radio').length).toBe(4)
     expect(the(1).querySelectorAll('.lco-y').length).toBe(4)
     expect(within(the(2)).getByRole('textbox')).toBeTruthy()
@@ -177,7 +177,7 @@ describe('nộp', () => {
     expect(within(the(0)).getByText('Chưa đúng')).toBeTruthy()
     expect(within(the(0)).getByText('Đáp án đúng')).toBeTruthy()
     expect(within(the(0)).getByText('Em chọn')).toBeTruthy()
-    expect(within(the(0)).getByText('KIẾN THỨC CỐT LÕI')).toBeTruthy()
+    expect(within(the(0)).getByText('Kiến thức cốt lõi')).toBeTruthy()
     // ô đáp án của câu đã chấm KHOÁ (nộp lại giữ kết quả lần đầu)
     for (const r of within(the(0)).getAllByRole('radio')) expect((r as HTMLInputElement).disabled).toBe(true)
     // câu chưa trả lời: "chưa được tính", KHÔNG phải sai, vẫn sửa được
@@ -233,7 +233,7 @@ describe('nộp', () => {
     await screen.findByText('Đúng 0/1 câu đã chấm')
     expect(the(3).getAttribute('data-trang-thai')).toBe('chua')
     expect(within(the(3)).getByText('Chưa trả lời — chưa được tính')).toBeTruthy()
-    expect(within(the(3)).queryByText('KIẾN THỨC CỐT LÕI')).toBeNull()
+    expect(within(the(3)).queryByText('Kiến thức cốt lõi')).toBeNull()
     expect((within(the(3)).getAllByRole('radio')[0] as HTMLInputElement).disabled).toBe(false)
   })
 
@@ -245,7 +245,7 @@ describe('nộp', () => {
     fireEvent.click(nutNop())
     expect((await screen.findByRole('alert')).textContent).toBe('Chưa ghi được sổ, em nộp lại.')
     expect((within(the(0)).getAllByRole('radio')[1] as HTMLInputElement).checked).toBe(true)
-    expect(document.body.textContent).not.toMatch(/Đáp án đúng|KIẾN THỨC CỐT LÕI/)
+    expect(document.body.textContent).not.toMatch(/Đáp án đúng|Kiến thức cốt lõi/)
     traNop = () => ({ ok: true, ketQua: [KQ1], chuaLam: [], tienBo: null, exp: 0 })
     fireEvent.click(nutNop())
     await screen.findByText('Đúng 0/1 câu đã chấm')

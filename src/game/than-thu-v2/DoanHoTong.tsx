@@ -23,6 +23,7 @@ import { docKetQuaOmni, lanDauChamChip, thanOmniTraLoi } from '../../lib/omni-hs
 import { omniBuocSai } from '../../components/hoa2/api'
 import KetChang2 from './doan2/KetChang2'
 import './doan.css'
+import './thu-quai.css'
 import './doan2/doan2.css'
 import './doan2/doan2-ngang.css'
 import '../../components/hoa2/phong-baloo'

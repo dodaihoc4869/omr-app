@@ -2,10 +2,10 @@ import { Component, lazy, Suspense, type ReactNode } from 'react'
 import LogoHocSinh from './LogoHocSinh'
 import { laManThi } from './m3'
 import './phong-cho/phong-cho.css'
-const ChuyenBay = lazy(() => import('./phong-cho/ChuyenBay'))
+const BanNguyenTo = lazy(() => import('./phong-cho/BanNguyenTo'))
 
 /** Mảnh game tải lỗi chỉ thay ô chơi; màn chờ và vòng nhận lệnh vào bài vẫn sống. */
-class DuPhongChuyenBay extends Component<{ children: ReactNode }, { loi: boolean }> {
+class DuPhongGame extends Component<{ children: ReactNode }, { loi: boolean }> {
   state = { loi: false }
   static getDerivedStateFromError() { return { loi: true } }
   render() {
@@ -36,7 +36,7 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
         </div>}
         {loiCho && <div className="pc-error" role="status">{loiCho}</div>}
       </div>
-      <DuPhongChuyenBay><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị chuyến bay…</div>}><ChuyenBay /></Suspense></DuPhongChuyenBay>
+      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><BanNguyenTo /></Suspense></DuPhongGame>
       <p className="pc-assurance">Điểm chơi chỉ để vui trong lúc chờ.</p>
     </div>
   </section>

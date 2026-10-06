@@ -138,8 +138,10 @@ describe('TheCau.tsx: chỉ thêm đúng một dòng nạp CSS; mọi chuỗi m�
   it('không đụng logic / chuỗi khoá (xao-y-phan-hai, danh-dau-cau-hoi-lai, ba-loi-0609)', () => {
     const t = doc('src/components/TheCau.tsx')
     expect(t).toContain("import './m3/the-cau.css'")
-    expect(t).toContain("const k = (['a', 'b', 'c', 'd'] as const)[i]")
-    expect(t).toContain("ma={`${'abcd'[viTri]})`}")
+    // 06/10: ô LỜI GIẢI do KhoiLoiGiaiChuan vẽ (sửa có chủ ý) — chuỗi khoá chuyển sang tệp đó
+    const khoi = doc('src/components/loi-giai/KhoiLoiGiaiChuan.tsx')
+    expect(khoi).toContain("const k = (['a', 'b', 'c', 'd'] as const)[i]")
+    expect(khoi).toContain("ma={`${'abcd'[viTri]})`}")
     expect(t).toContain('{props.cauHoiLai && <DaiHoiLai')
     expect(t).toContain('minHeight: 44')
     expect(t).toContain('inputMode="decimal"')

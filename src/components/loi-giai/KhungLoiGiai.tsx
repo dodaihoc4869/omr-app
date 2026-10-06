@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { baoDocLoiGiai, guiCauKiem, type CauChoKhung, type HoSoLoiGiai, type KiemKhung, type LoiGiaiChu, type SuKienKhung } from '../../lib/loi-giai-api'
 import ThanhThangGo from './ThanhThangGo'
+import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './KhoiLoiGiaiChuan'
 import './loi-giai.css'
 
 export const DUONG_KHUNG = `${import.meta.env.BASE_URL}loi-giai/khung.html`
@@ -14,6 +15,13 @@ export const DUONG_KHUNG = `${import.meta.env.BASE_URL}loi-giai/khung.html`
 const DS_DUNG_SAI = (da: string) => /^[DS]{4}$/.test(da) ? da.split('').map((x, i) => `${'abcd'[i]} ${x === 'D' ? 'Đúng' : 'Sai'}`).join(' · ') : da
 
 function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
+  const kyTu = lg.tung.map((x) => x.id)
+  const dap = (lg.dapAn || lg.ketQua || '').trim().toUpperCase().replace(/Đ/g, 'D')
+  const phan: 'I' | 'II' | 'III' = kyTu.length > 0 && kyTu.every((k) => /^[a-d]$/.test(k)) ? 'II' : /^[DS]{4}$/.test(dap) && kyTu.length === 0 ? 'II' : kyTu.length > 0 || /^[A-D]$/.test(dap) ? 'I' : 'III'
+  const loiGiai = chuanSangCauTruc(
+    { chot: lg.chot, lyDo: lg.tung.length ? lg.tung.map((x) => ({ khoa: x.id, dung: x.dung, ly: x.viSao })) : null, buoc: lg.buoc.length ? lg.buoc : null, ketQua: lg.ketQua, thieu: false },
+    phan,
+  )
   return (
     <div className="lg-van">
       <p className="lg-chu-bao">Thầy Đỗ Đại Học đang soạn lời giải từng bước cho câu này. Em xem tạm lời giải ngắn dưới đây.</p>
@@ -25,15 +33,8 @@ function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
         </ul>
       )}
       <p className="lg-chu-dap-an"><b>Đáp án:</b> {DS_DUNG_SAI(lg.ketQua || lg.dapAn)}</p>
-      {lg.chot && <p><b>Điểm mấu chốt:</b> {lg.chot}</p>}
-      {lg.tung.length > 0 && (
-        <ul className="lg-chu-tung">
-          {lg.tung.map((x) => <li key={x.id}><b>{x.id}. {x.dung ? 'Đúng' : 'Sai'}:</b> {x.viSao}</li>)}
-        </ul>
-      )}
-      {lg.buoc.length > 0 && (
-        <ol className="lg-chu-buoc">{lg.buoc.map((b, i) => <li key={i}>{b}</li>)}</ol>
-      )}
+      {/* khối LỜI GIẢI chuẩn: LỜI GIẢI → Kiến thức cốt lõi → từng phương án/ý ✓ ✗ → bước → kết quả */}
+      <KhoiLoiGiaiChuan phan={phan} loiGiai={loiGiai} correct={lg.dapAn} />
     </div>
   )
 }

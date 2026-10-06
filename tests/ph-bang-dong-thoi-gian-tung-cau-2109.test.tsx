@@ -554,12 +554,14 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     fireEvent.click(r1.querySelector('button')!)
     await waitFor(() => expect(r1.querySelector('[data-vung="loi-giai-ct"]')).toBeTruthy())
     const lg = r1.querySelector('[data-vung="loi-giai-ct"]') as HTMLElement
-    expect(lg.querySelector('.phm-lg-chot')!.textContent).toMatch(/^Chốt: Acetylene/)
-    const buoc = [...lg.querySelectorAll('.phm-lg-buoc li')]
+    // CHUẨN HIỂN THỊ 06/10 (sửa có chủ ý): khối LỜI GIẢI chuẩn — nhãn LỜI GIẢI → Kiến thức cốt lõi → bước đánh số → kết quả (lớp `.loi-giai`, `.lg-*`)
+    expect(lg.querySelector('.lg-nhan')!.textContent).toBe('LỜI GIẢI')
+    expect(lg.querySelector('.lg-chot .loi-giai-nhan-nho')!.textContent).toBe('Kiến thức cốt lõi')
+    expect(lg.querySelector('.lg-chot')!.textContent).toMatch(/^Kiến thức cốt lõiAcetylene/)
+    const buoc = [...lg.querySelectorAll('.lg-buoc li')]
     expect(buoc).toHaveLength(2)
-    expect(buoc.map((b) => b.querySelector('i')!.textContent)).toEqual(['1', '2'])
     expect(buoc[0]!.textContent).toContain('Tính số mol')
-    expect(lg.querySelector('.phm-lg-ket')!.textContent).toBe('Kết quả: 92,3%')
+    expect(lg.querySelector('.lg-ket-qua')).toBeNull() // đáp án Phần III chỉ hiện khi có dữ liệu Phần III; ở đây câu Phần I
     expect(lg.querySelector('.katex, sub, .chem')).toBeTruthy() // công thức C₂H₂ do bộ hiện công thức sẵn có dựng (chỉ số dưới), không chữ "$C_2H_2$" thô
     expect(r1.textContent).not.toMatch(/\{"|\$C_2H_2\$/)
     cleanup()
@@ -637,9 +639,9 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     const pa = [...r0.querySelectorAll('.phm-pa li > span')].map((x) => x.textContent!)
     expect(pa).toEqual(['1 phát biểu. (a) và (b) đúng.', 'Chỉ (a), (b) và (c)', '(1) và (3)', '4'])
     expect(pa.some((x) => x.includes('\n'))).toBe(false)
-    const chot = r0.querySelector('.phm-lg-chot')!.textContent!.split('\n')
+    const chot = r0.querySelector('.lg-chot')!.textContent!.split('\n')
     expect(chot.length).toBeGreaterThanOrEqual(5) // lời giải: Chốt tách (a)…(e)
-    expect(r0.querySelector('.phm-lg-buoc li span')!.textContent!.split('\n').length).toBeGreaterThanOrEqual(2)
+    expect(r0.querySelector('.lg-buoc li')!.textContent!.split('\n').length).toBeGreaterThanOrEqual(2)
     // (1)…(4) và đề không có ý
     cleanup()
     const raw2 = nhan(PH_APPLE)
@@ -658,15 +660,18 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
   it('khoá nguồn ngắt dòng: MỌI chỗ TungCau in ĐỀ / LỜI GIẢI qua tachDongTheoY (PHƯƠNG ÁN là chỗ duy nhất không) (một nguồn với TheCau, không regex mới) + CSS pre-line cho các khối ấy', () => {
     const tsx = fs.readFileSync(path.join(process.cwd(), 'src/components/ph-moi/bang/TungCau.tsx'), 'utf8').replace(/\/\/.*$/gm, '')
     const dung = [...tsx.matchAll(/<ChemText text=\{([^{}]*)\}/g)].map((m) => m[1]!)
-    expect(dung.length).toBeGreaterThanOrEqual(6)
+    expect(dung.length).toBeGreaterThanOrEqual(2)
     // ĐỀ + các dòng LỜI GIẢI đều qua tachDongTheoY; PHƯƠNG ÁN (`chu`) là chỗ DUY NHẤT không tách
     const khong = dung.filter((d) => !/^tachDongTheoY\(/.test(d))
     expect(khong).toEqual(['chu'])
     expect(dung.filter((d) => /^tachDongTheoY\(/.test(d))).toHaveLength(dung.length - 1)
+    // LỜI GIẢI vẽ bằng khối chuẩn (06/10): MỌI đoạn chữ của nó qua tachDongTheoY nhờ prop `tach`, và giữ dòng bằng `giuDong` (index.css pre-line)
+    expect(tsx).toMatch(/<KhoiLoiGiaiTuCT[^>]*tach=\{tachDongTheoY\}/)
     expect(tsx).toContain("from '../../../lib/tach-dong-cau'")
     expect(tsx).not.toMatch(/\.replace\(\/[^/]*\((?:1|a)\)/) // không tự viết regex tách ý
     const css = fs.readFileSync(path.join(process.cwd(), 'src/components/ph-moi/bang/TungCau.css'), 'utf8')
-    for (const lop of ['.phm-cau__de', '.phm-loi-giai p', '.phm-lg-chot', '.phm-lg-ket', '.phm-lg-buoc li > span']) expect(css, lop).toContain(lop)
+    for (const lop of ['.phm-cau__de']) expect(css, lop).toContain(lop)
+    expect(fs.readFileSync(path.join(process.cwd(), 'src/index.css'), 'utf8')).toMatch(/\.loi-giai\[data-giu-dong\] \.lg-chot[\s\S]*white-space: pre-line/)
     expect(css).not.toContain('.phm-pa li > span') // phương án không pre-line
     expect(css).toMatch(/white-space: pre-line/)
   })
@@ -687,7 +692,7 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     expect(li[2]!.querySelector('em')).toBeNull()
     expect(li[2]!.hasAttribute('data-chon')).toBe(false)
     const loi = r1.querySelector('.phm-loi-giai')!
-    expect(loi.querySelector('h4')!.textContent).toBe('Lời giải ngắn')
+    expect(loi.querySelector('.lg-nhan')!.textContent).toBe('LỜI GIẢI') // khối chuẩn; lời giải chỉ có chữ ⇒ một khối chữ
     expect(loi.textContent).toContain('Phản ứng ester hoá giữa acid acetic và ethanol')
     expect(r1.querySelector('.phm-cau__de')!.textContent).toContain('Đun nóng')
   })

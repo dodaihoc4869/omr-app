@@ -69,6 +69,8 @@ export interface KetQuaBuoiChua {
   soEmCoLuot: number
   /** Tổng vẫn vượt ngân sách dù chỉ còn một câu (lớp quá đông) — màn phải nói thật. */
   vuotNganSach: boolean
+  /** Giờ cần nếu CHO ĐỦ mọi em có mặt một lượt (cùng bộ câu đã giữ). Lớp nhỏ = `tongGiay`. */
+  tongGiayDayDu: number
   /** Câu máy chủ đề xuất nhưng bỏ bớt cho vừa giờ. */
   boCau: CauBuoiChua[]
 }
@@ -85,6 +87,9 @@ export const GIAY_MOI_EM_SUA = 60
  *  1. Mỗi câu: em giải mẫu (máy chủ chọn, nếu có mặt) + tối đa `toiDaSuaDau` em sửa: em cần dạy lại câu ấy trước, rồi em chưa có lượt.
  *  2. Em có mặt chưa có lượt nào ⇒ vào câu em ấy chưa thành thạo đang ít người nhất (không có thì câu ít người nhất).
  *  3. Tổng giờ > ngân sách (90 phút) ⇒ bỏ câu điểm chữa thấp nhất rồi xếp lại, còn ít nhất một câu.
+ *  4. LỚP ĐÔNG (thầy 06/10: lớp 111 em chỉ ra 1 câu / 115 phút): nếu CHỈ MỘT câu mà mỗi em một lượt đã vượt ngân sách thì bỏ câu không cứu được giờ
+ *     (em được dồn lại vào câu còn lại) ⇒ GIỮ ĐỦ các câu (bỏ chỉ khi giờ giải mẫu + em cần dạy lại đã vượt), chỉ xếp lượt cho số em chưa có lượt VỪA giờ;
+ *     em còn lại không có lượt trong buổi này (`soEmCoLuot < soEmCoMat`, `vuotNganSach` = true, `tongGiayDayDu` = giờ nếu cho đủ mọi em).
  *  Thuần và tất định: cùng đầu vào ra cùng bảng. */
 export function xepBuoiChua(cau: readonly CauBuoiChua[], coMat: readonly EmTen[], uocGiay: (c: CauBuoiChua) => number, tuy: TuyChonXep = {}): KetQuaBuoiChua {
   const nganSachGiay = tuy.nganSachGiay ?? CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT * 60
@@ -98,7 +103,7 @@ export function xepBuoiChua(cau: readonly CauBuoiChua[], coMat: readonly EmTen[]
   }
   const coMatSet = new Set(dsCoMat.map((e) => e.sbd))
 
-  const xep = (dsCau: readonly CauBuoiChua[]): DongBuoiChua[] => {
+  const xep = (dsCau: readonly CauBuoiChua[], toiDaEmThem?: number): DongBuoiChua[] => {
     const dong = dsCau.map((c) => ({ cau: c, giaiMau: c.giaiMau && coMatSet.has(c.giaiMau.sbd) ? c.giaiMau : null, sua: [] as EmTen[], giay: 0 }))
     const coLuot = new Set(dong.flatMap((d) => (d.giaiMau ? [d.giaiMau.sbd] : [])))
     for (const d of dong) {
@@ -113,8 +118,11 @@ export function xepBuoiChua(cau: readonly CauBuoiChua[], coMat: readonly EmTen[]
         coLuot.add(e.sbd)
       }
     }
+    let daThem = 0
     for (const e of dsCoMat) {
       if (coLuot.has(e.sbd) || !dong.length) continue
+      if (toiDaEmThem !== undefined && daThem >= toiDaEmThem) break
+      daThem++
       const nguoi = (d: DongBuoiChua) => d.sua.length + (d.giaiMau ? 1 : 0)
       const ungVien = dong.filter((d) => d.cau.emSua.some((x) => x.sbd === e.sbd))
       const tap = ungVien.length ? ungVien : dong
@@ -130,10 +138,23 @@ export function xepBuoiChua(cau: readonly CauBuoiChua[], coMat: readonly EmTen[]
   let dsCau = [...cau]
   let dong = xep(dsCau)
   const tong = (ds: DongBuoiChua[]) => ds.reduce((s, d) => s + d.giay, 0)
-  while (tong(dong) > nganSachGiay && dsCau.length > 1) {
-    dsCau = dsCau.slice(0, -1)
-    dong = xep(dsCau)
+  // Lớp đông: một câu mà đủ mọi em đã vượt giờ ⇒ bỏ câu vô ích (em dồn lại vào câu còn lại, tổng giờ không giảm) — xếp theo giờ giải mẫu + lượt thêm vừa giờ.
+  const lopDong = dsCau.length > 0 && tong(xep(dsCau.slice(0, 1))) > nganSachGiay
+  if (!lopDong) {
+    while (tong(dong) > nganSachGiay && dsCau.length > 1) {
+      dsCau = dsCau.slice(0, -1)
+      dong = xep(dsCau)
+    }
+  } else {
+    let co = xep(dsCau, 0)
+    while (tong(co) > nganSachGiay && dsCau.length > 1) {
+      dsCau = dsCau.slice(0, -1)
+      co = xep(dsCau, 0)
+    }
+    const conLai = Math.max(0, nganSachGiay - tong(co))
+    dong = xep(dsCau, Math.floor(conLai / giaySua))
   }
+  const tongDayDu = lopDong ? tong(xep(dsCau)) : tong(dong)
   const coLuot = new Set(dong.flatMap((d) => [...(d.giaiMau ? [d.giaiMau.sbd] : []), ...d.sua.map((e) => e.sbd)]))
   return {
     dong,
@@ -141,7 +162,8 @@ export function xepBuoiChua(cau: readonly CauBuoiChua[], coMat: readonly EmTen[]
     nganSachGiay,
     soEmCoMat: dsCoMat.length,
     soEmCoLuot: dsCoMat.filter((e) => coLuot.has(e.sbd)).length,
-    vuotNganSach: tong(dong) > nganSachGiay,
+    vuotNganSach: tongDayDu > nganSachGiay,
+    tongGiayDayDu: tongDayDu,
     boCau: cau.slice(dsCau.length),
   }
 }

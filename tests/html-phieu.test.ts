@@ -163,10 +163,13 @@ describe('oGiaiHtml — lời giải gộp một chỗ', () => {
     expect(h).not.toContain('q-nut-giai')
   })
 
-  it('luôn mở đầu bằng đáp án', () => {
-    const h = oGiaiHtml(C({ dapAn: 'B' }))
-    expect(h).toContain('Đáp án')
+  // SỬA CÓ CHỦ Ý 06/10 (chuẩn hiển thị lời giải): khối mở đầu bằng nhãn LỜI GIẢI; dòng đáp án vẫn có nhưng
+  // đứng SAU phần giải thích, không chen lên đầu khối.
+  it('mở đầu bằng nhãn LỜI GIẢI; dòng đáp án vẫn hiện, đứng sau phần giải thích', () => {
+    const h = oGiaiHtml(C({ dapAn: 'B', chot: 'x' }))
     expect(h).toContain('sol-dap">Đáp án: <b>B</b>')
+    expect(h.indexOf('>LỜI GIẢI<')).toBeLessThan(h.indexOf('Kiến thức cốt lõi'))
+    expect(h.indexOf('Kiến thức cốt lõi')).toBeLessThan(h.indexOf('sol-dap'))
   })
 
   it('gộp ĐỦ kiến thức cốt lõi, các bước và kết quả — không còn mục lời giải riêng ở cuối', () => {

@@ -179,12 +179,13 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 .dao2 .dao2-ai-nhan{margin:0;min-width:0;text-align:center;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--d2-onlai-chu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dao2 .dao2-ai-nhan span{font-weight:600;letter-spacing:0;color:var(--d2-chu-mo)}
 /* cảnh rừng sương */
-.dao2 .dao2-canh{position:relative;height:clamp(150px,24vh,210px);border-radius:22px;overflow:hidden;isolation:isolate}
+.dao2 .dao2-canh{position:relative;height:clamp(170px,27vh,236px);border-radius:22px;overflow:hidden;isolation:isolate}
 .dao2 .dao2-canh-nen{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
-.dao2 .dao2-quai{position:absolute;right:6%;bottom:22px;width:clamp(88px,28%,124px)}
+/* THÚ + QUÁI GIỮA ĐƯỜNG (06/10, thu-quai.css): chân cách đáy cảnh --thu-quai-day % chiều cao cảnh (dải đường lát đá 62–90 %), cỡ × --thu-quai-co; thú nửa trái, quái nửa phải, hai bên quanh trục giữa. */
+.dao2 .dao2-quai{position:absolute;right:7%;bottom:calc(var(--thu-quai-day) * 1%);width:calc(clamp(88px,28%,124px) * var(--thu-quai-co))}
 .dao2 .dao2-quai svg{display:block;width:100%;height:auto}
 .dao2 .dao2-quai[data-ha]{opacity:.35}
-.dao2 .dao2-canh-thu{position:absolute;left:3%;bottom:34px;width:clamp(96px,34%,140px);height:auto;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
+.dao2 .dao2-canh-thu{position:absolute;left:6%;bottom:calc(var(--thu-quai-day) * 1%);width:calc(clamp(96px,34%,140px) * var(--thu-quai-co));height:auto;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
 .dao2 .dao2-canh[data-no] .dao2-canh-thu{filter:drop-shadow(0 0 14px rgba(255,92,138,.8))}
 .dao2 .dao2-cuong-no,.dao2 .dao2-chuoi{position:absolute;left:10px;top:62px;max-width:calc(100% - 20px);margin:0;padding:4px 12px;border-radius:14px;font-size:13px;font-weight:800;line-height:1.3}
 .dao2 .dao2-cuong-no{background:linear-gradient(90deg,rgb(214,40,90),rgb(214,110,10));color:rgb(255,255,255);box-shadow:0 0 14px rgba(255,92,138,.5)}
@@ -371,8 +372,8 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
  .dao2 .dao2-tien-do-nhan li{flex:0 0 auto;min-width:30px;text-align:center;font-size:13px;font-weight:700;color:var(--d2-chu-mo)}
  .dao2 .dao2-tien-do-nhan li:first-child{text-align:left}.dao2 .dao2-tien-do-nhan li:last-child{text-align:right}
  .dao2 .dao2-tien-do-nhan li[data-vai="on_lai"]{color:var(--d2-onlai-chu)}.dao2 .dao2-tien-do-nhan li[data-vai="trum"]{color:var(--d2-vang-chu)}
- .dao2 .dao2-canh-thu{left:6%;bottom:48px;width:clamp(140px,32%,300px)}
- .dao2 .dao2-quai{right:8%;bottom:40px;width:clamp(120px,26%,240px)}
+ .dao2 .dao2-canh-thu{left:8%;bottom:calc(var(--thu-quai-day) * 1%);width:calc(clamp(140px,32%,300px) * var(--thu-quai-co))}
+ .dao2 .dao2-quai{right:9%;bottom:calc(var(--thu-quai-day) * 1%);width:calc(clamp(120px,26%,240px) * var(--thu-quai-co))}
  .dao2 .dao2-mau-quai{right:14px;top:14px;padding:8px 14px;font-size:14px}
  .dao2 .dao2-mau-quai .dao2-vach{width:180px;height:8px}
  .dao2 .dao2-mau-thu{left:14px;bottom:12px;padding:8px 14px;font-size:14px}
@@ -410,8 +411,8 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
  .dao2{--d2-dinh:8px}
  .dao2 .dao2-bd,.dao2 .dao2-ai,.dao2 .dao2-xong{min-height:0}
  .dao2 .dao2-canh{min-height:140px}
- .dao2 .dao2-canh-thu{bottom:36px;width:clamp(90px,26%,160px)}
- .dao2 .dao2-quai{bottom:30px;width:clamp(80px,22%,140px)}
+ .dao2 .dao2-canh-thu{bottom:calc(var(--thu-quai-day) * 1%);width:calc(clamp(90px,26%,160px) * var(--thu-quai-co))}
+ .dao2 .dao2-quai{bottom:calc(var(--thu-quai-day) * 1%);width:calc(clamp(80px,22%,140px) * var(--thu-quai-co))}
  .dao.dao2 button.dao2-nut-vang,.dao.dao2 button.dao2-nut-chot,.dao.dao2 button.dao2-nut-xanh{min-height:52px;font-size:16px}
  .dao2 .dao2-ket-qua{min-height:0}
  .dao2 .dao2-ket-qua img{width:56px;height:56px}
@@ -491,7 +492,7 @@ html.may-yeu .dao2 .dao2-3d-bot,html.may-yeu .dao2 .dao2-3d-cuon,html.may-yeu .d
 /* CẢNH TRẬN DÍNH ĐẦU MÀN (29/09, thầy: "phần bài tập trượt xuống dưới chỗ thú tung chưởng, lúc nào cũng nhìn được thú"): điện thoại dọc ⇒ cảnh trận
  * position:sticky ở mép trên, thẻ câu cuộn trượt BÊN DƯỚI cảnh; cảnh thấp lại một chút để đề còn đủ chỗ. Máy ngang/máy tính đã có bố cục hai cột riêng. */
 @media (max-width:1023px) and (orientation:portrait){
- .dao2 .dao2-canh{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;height:clamp(130px,22vh,190px);box-shadow:0 10px 18px -8px rgba(0,0,0,.55)}
+ .dao2 .dao2-canh{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;height:clamp(160px,25vh,215px);box-shadow:0 10px 18px -8px rgba(0,0,0,.55)}
 }
 /* OMNI 3 (05/10) · chip "Chưa chắc" cạnh chip Trợ giúp: máy hẹp (≤ 400 px) vẫn giữ chữ — hai công tắc trơn đứng cạnh nhau không phân biệt được. */
 @media (max-width:400px){.dao2 .dao2-tro[data-khoi="chua-chac"] .dao2-tro-chu{display:inline}}
