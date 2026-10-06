@@ -218,7 +218,7 @@ export async function dungToChieu(
     }
 
     // THẦY 06/10: "câu tự luận tuyệt đối loại bỏ" — tờ chiếu chữa KHÔNG BAO GIỜ có câu tự luận. Câu Phần III không tra được nội dung thì không biết có phải tự luận không ⇒ cũng bỏ (đếm vào `thieu`).
-    if (cl && cl.phan === 'III' && laCauTuLuan({ phan: 'III', text: cl.text, dapAn: cl.dapAn }, 'III')) { boTuLuan.add(o.qid); return [] }
+    if (cl && laCauTuLuan({ phan: cl.phan, text: cl.text, dapAn: cl.dapAn, ...(cl.phan === 'I' ? { choices: cl.luaChon ?? [] } : cl.phan === 'II' ? { ideas: cl.luaChon ?? [] } : {}) }, cl.phan)) { boTuLuan.add(o.qid); return [] }
     if (!cl && o.phan === 'III') { thieu.add(o.qid); return [] }
     const cau: CauLuyen = cl ?? {
       id: o.qid,

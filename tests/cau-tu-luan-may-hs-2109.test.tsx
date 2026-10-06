@@ -178,9 +178,16 @@ describe('Phiếu / rút đề — hopLeDeRut cùng dùng định nghĩa chung',
   })
 })
 
-describe('Gọi lên bảng của thầy KHÔNG dùng lớp này', () => {
-  it('màn Gọi lên bảng + tờ chiếu không import cau-tu-luan-may-hs / cau-tu-luan', () => {
-    for (const t of ['src/screens/GoiLenBangScreen.tsx', 'src/lib/phan-cau-len-bang.ts']) {
+// 06/10 (thầy đổi luật): tự luận CHỈ hiện ở Gọi lên bảng phần DẠY HỌC. Phần Dạy học (`DayHocLenBang`, phan-cau-len-bang) vẫn KHÔNG lọc tự luận;
+// phần còn lại của màn Gọi lên bảng (chữa bài / chiến dịch / chọn kho) PHẢI bỏ tự luận bằng `boTuLuanKhoiBanDe`.
+describe('Gọi lên bảng phần Dạy học KHÔNG dùng lớp lọc tự luận; phần còn lại có', () => {
+  it('màn Gọi lên bảng ngoài Dạy học bỏ tự luận', () => {
+    const nguon = fs.readFileSync(path.join(process.cwd(), 'src/screens/GoiLenBangScreen.tsx'), 'utf8')
+    expect(nguon).toMatch(/boTuLuanKhoiBanDe/)
+    expect(nguon).toMatch(/dayHoc \? b : boTuLuanKhoiBanDe\(b\)/)
+  })
+  it('thẻ Dạy học + phân công dạy học không import cau-tu-luan-may-hs / cau-tu-luan', () => {
+    for (const t of ['src/components/day-hoc/DayHocLenBang.tsx', 'src/lib/phan-cau-len-bang.ts']) {
       const f = path.join(process.cwd(), t)
       if (!fs.existsSync(f)) continue
       const nguon = fs.readFileSync(f, 'utf8')
