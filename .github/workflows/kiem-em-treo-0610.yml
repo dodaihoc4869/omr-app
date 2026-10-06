@@ -1,0 +1,33 @@
+# VIỆC #48 — VÌ SAO `chan-doan-em` CỦA TÀI KHOẢN THỬ 12121212 TREO > 5 PHÚT? (CHỈ ĐỌC, chỉ in SỐ ĐẾM theo bảng — repo công khai)
+# So số dòng mỗi bảng có cột sbd giữa em treo và em nhanh (scripts/kiem-em-treo-0610.sh). Bấm tay hoặc tự chạy khi đẩy nhánh KHÁC main có sửa hai tệp này.
+name: Em treo chẩn đoán — số dòng từng bảng (chỉ đọc, chỉ đếm)
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/kiem-em-treo-0610.yml', 'scripts/kiem-em-treo-0610.sh']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: kiem-em-treo-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tệp chỉ có lệnh đọc
+        run: |
+          if grep -v '^\s*#' scripts/kiem-em-treo-0610.sh | grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|TRUNCATE)\b'; then echo "Tệp có lệnh không chỉ-đọc — dừng."; exit 1; fi
+          echo "OK: chỉ đọc"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm số dòng từng bảng cho em treo và em nhanh (chỉ đọc)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: bash scripts/kiem-em-treo-0610.sh
