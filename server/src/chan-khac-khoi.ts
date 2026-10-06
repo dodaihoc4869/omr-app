@@ -152,6 +152,8 @@ export interface TuyChonCong<T> {
   thayGiao?: (x: T) => boolean
   /** Làm giàu nguồn khối từ D1: 'khi_khong_ro' (mặc định cổng em — chỉ câu tự thân không đọc ra khối), 'luon' (mặc định cổng lớp), 'khong'. */
   lamGiau?: 'luon' | 'khi_khong_ro' | 'khong'
+  /** CỔNG EM: tập qid câu đang NGHI mà nơi gọi ĐÃ đọc sẵn bằng một truy vấn của riêng nó (thêm cột, không thêm truy vấn — giữ ngân sách D1 của lệnh, vd `/hs/cau-theo-qid`). Vắng ⇒ cổng tự đọc (`docCauNghiDem`, đệm 60 s). */
+  nghiSan?: ReadonlySet<string>
 }
 
 /** Cổng THUẦN (không IO): giữ phần tử ĐÚNG khối, GIỮ NGUYÊN thứ tự; đếm + ghi console. `vai = 'lop'` ⇒ luật B (giữ câu không rõ khối; lớp chưa rõ khối ⇒ giữ hết). */
@@ -204,6 +206,19 @@ export function docCauNghiDem(env: Env, nowMs: number = Date.now()): Promise<Rea
   demNghi.set(k, { at: nowMs, p })
   return p
 }
+/**
+ * Đổi chuỗi JSON `["qid", …]` (cột `json_group_array(qid)` nơi gọi gộp vào truy vấn có sẵn) thành tập qid GỐC câu nghi — cùng phép chuẩn hoá với `docCauNghiDem`.
+ * Không phải chuỗi JSON mảng ⇒ `undefined` (nơi gọi không đọc được ⇒ cổng tự đọc như thường, KHÔNG coi là "không có câu nghi nào").
+ */
+export function tapCauNghiTuJson(j: unknown): ReadonlySet<string> | undefined {
+  if (typeof j !== 'string') return undefined
+  try {
+    const m = JSON.parse(j) as unknown
+    return Array.isArray(m) ? new Set(m.filter((x): x is string => typeof x === 'string').map((x) => qidGocKhoi(x)).filter(Boolean)) : undefined
+  } catch {
+    return undefined
+  }
+}
 /** Khối em mà `chanMetaKhacKhoi` đã ghi cho `meta` của hồ sơ này (cùng hồ sơ ⇒ 0 truy vấn); chưa lọc lần nào ⇒ undefined. */
 export function khoiDaLocCua(meta: object): Khoi | null | undefined {
   return DA_LOC.get(meta)?.khoi
@@ -230,7 +245,7 @@ export async function chanKhacKhoiEm<T>(env: Env, kenh: string, em: string | EmC
   const cauCua = tuyChon.cauCua ?? ((x: T) => x as unknown)
   // Hồ sơ Hoá 2.0 đã lọc (`chanMetaKhacKhoi`): câu được giữ vì thầy giao trực tiếp ở bước hồ sơ cũng được giữ ở cổng cuối (em chưa rõ khối).
   const tc: TuyChonCong<T> = !tuyChon.thayGiao && daLoc?.thayGiao.size ? { ...tuyChon, thayGiao: (x) => daLoc.thayGiao.has(qidGocKhoi(qidCua(cauCua(x)))) } : tuyChon
-  const [them, nghi] = await Promise.all([nguonThem(env, ds, tap, tc, 'khi_khong_ro'), tap.length && !KENH_GIU_CAU_NGHI.has(kenh) ? docCauNghiDem(env) : Promise.resolve(RONG)]) // câu nghi: cùng đợt với nguồn khối (không thêm đợt nối tiếp)
+  const [them, nghi] = await Promise.all([nguonThem(env, ds, tap, tc, 'khi_khong_ro'), tap.length && !KENH_GIU_CAU_NGHI.has(kenh) ? (tuyChon.nghiSan ?? docCauNghiDem(env)) : Promise.resolve(RONG)]) // câu nghi: nơi gọi đã đọc sẵn (`nghiSan`) hoặc cùng đợt với nguồn khối (không thêm đợt nối tiếp)
   return congKhoi('em', kenh, tap, ds, tc, them, nghi)
 }
 
