@@ -146,3 +146,12 @@ Gộp (đã nối trên nhánh `claude/gracious-heisenberg-hoe97n`): làn B Cẩ
 CHƯA làm (nói thẳng): chẩn đoán câu nền chèn vào chuyến (A′), Trạm/chẩn đoán xếp theo `omni_buoc_sai`, xoay vòng song sinh, ghim phiên bản `~bt`, chip "Đã tính vào phạm vi" cho Bài 1–5, kho ý Đúng–Sai còn rỗng tới khi chạy `node scripts/loi-giai/may-soan.mjs --lop tat-ca`. Tốc độ: đo trên máy chủ giả (đăng nhập → Sảnh 1905 → 1454 ms), chưa đo trên D1 thật; luồng NDJSON có thể bị gom đệm ở rìa — kiểm `curl -N`, công tắc khẩn `TAT_KEM_SANH`.
 
 Lùi: `git revert -m 1 <commit gộp PR đợt 3>` rồi đẩy main (Actions đẩy lại Pages + Worker). Tắt riêng: thang làm lại `cau_hinh` khoá `lam_lai_khac` = `{"bat":false}`; đăng nhập kèm Sảnh `TAT_KEM_SANH`; cả OMNI ở Cài đặt OMNI. Bản Worker trước đợt này: `a67d3030-184b-4494-814f-1e48bf0ff015`.
+
+### 10b. Đã lên bản sống (06/10)
+
+- ĐÃ LÊN 06/10 08:34 giờ VN (01:34 UTC): PR #152 (main 973875d2), Actions run 37398491975 thành công (check:mau · npm test · build · Pages · Worker). Pages `b3ad07b4`; Worker `1e17cf25-3045-41c5-a3e1-f53d0f9dec0a` (khởi động 38 ms; tải lên 3 237,77 KiB / nén 841,84 KiB — đúng bằng bản đóng gói thử). Không migration.
+- Ca thi mở kiểm LẠI ngay trước khi gộp: 08:18 giờ VN, run 37398426014 — so_ca_mo = 0, so_luot_dang_lam = 0.
+- Kiểm sống không cần mật khẩu em: `/hs/ca-dang-mo` HTTP 200, `nhipDeNghi.muc` = "tot"; `/gv/buoi-hoc`, `/gv/omni/cai-dat` không mã ⇒ 403 "Sai mã bí mật"; `/hs/dang-nhap` thiếu số báo danh kèm `kemSanh:true` ⇒ HTTP 200 JSON thường (đường lỗi y hệt cũ, không luồng).
+- Nhịp máy chủ sau đẩy: 20 mẫu trong 10 phút (30 giây một mẫu, 08:35–08:45 giờ VN): 20 mẫu HTTP 200 và `nhipDeNghi.muc` = "tot", 0 bất thường (đợt trước từng báo "ban" ~10 phút sau đẩy; lần này không thấy).
+- CHƯA kiểm được từ phiên đám mây (không thử mật khẩu em): đăng nhập thật theo luồng NDJSON (`curl -N`), thẻ Cẩn thận/thang làm lại trên em thật. Cần thầy hoặc một em dùng thử; công tắc khẩn nếu đăng nhập chậm hơn trước: biến môi trường `TAT_KEM_SANH`.
+- Lùi: `git revert -m 1 973875d2` rồi đẩy main (Actions đẩy lại Pages + Worker); Worker trước đợt này `a67d3030-184b-4494-814f-1e48bf0ff015`.
