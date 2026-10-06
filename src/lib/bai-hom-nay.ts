@@ -216,6 +216,16 @@ export function trangThaiBai(tick: TickTom | null | undefined, dangChon: boolean
   return { kieu: 'chua_day', chu: 'Chưa dạy' }
 }
 
+/**
+ * Dòng "Ôn bài cũ" của thẻ xác nhận (thầy 06/10: "chọn Bài 6 thì tổng số câu ôn của Bài 1–5 khi hết hạn khoảng bao nhiêu, có giúp học sinh ôn trọn vẹn không"):
+ * "Ôn bài cũ: tối đa 96 câu/em · kho 310 câu · phủ ≈ 31%". Tối đa = số câu ôn bài cũ nhiều nhất MỘT em được xếp trong cả hạn nộp; kho = số câu hợp lệ của các bài đứng
+ * trước; phủ = tối đa / kho (không quá 100%). Kho 0 / số hỏng / vắng ⇒ null (không hiện dòng — không chia cho 0).
+ */
+export function chuOnBaiCu(x: { toiDaMoiEm: number; khoCau: number; phuPhanTram: number } | null | undefined): string | null {
+  if (!x || !(x.khoCau > 0) || !Number.isFinite(x.toiDaMoiEm) || !Number.isFinite(x.phuPhanTram)) return null
+  return `Ôn bài cũ: tối đa ${Math.round(x.toiDaMoiEm)} câu/em · kho ${Math.round(x.khoCau)} câu · phủ ≈ ${Math.round(x.phuPhanTram)}%`
+}
+
 /** Dòng nhắc ở đầu bảng Dạy học khi lớp chờ bài mới từ 3 ngày; chưa tới ngưỡng / không chờ ⇒ null. */
 export function chuChoBaiMoi(lop: string, choBaiMoi: { soNgay: number } | null | undefined): string | null {
   const n = choBaiMoi?.soNgay

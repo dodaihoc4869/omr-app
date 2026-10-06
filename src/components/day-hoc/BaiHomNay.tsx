@@ -16,6 +16,7 @@ import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
+import { TI_LE_ON_BAI_CU_TOI_DA, xemOnBaiCu } from '../../../server/src/omni-on-bai-cu'
 import { dungCay } from '../../lib/cay-chon-de'
 import { locDeDayHoc } from '../../lib/day-hoc-len-bang'
 import { TEN_AI } from '../../lib/omni-chu'
@@ -24,6 +25,7 @@ import {
   CHU_KHONG_GIAO_MUC_DAY_HOC,
   chiaEmTheoLop,
   chuChoBaiMoi,
+  chuOnBaiCu,
   chuTuGiao,
   dsBaiCuaKhoi,
   emThuocLop,
@@ -50,6 +52,7 @@ import {
   baiDaDayTick,
   baiDaDayXemTruoc,
   docCoOmni,
+  luuTiLeOnBaiCu,
   type BaiDaTick,
   type DanhSachBaiDaDay,
   type DauVaoBai,
@@ -297,6 +300,8 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   const loiTheLuc = theLucChu.trim() && !theLucSua ? 'Số lượt phải là số nguyên từ 1' : ''
   const hanHopLe = !hanSua || (laNgay(hanSua) && hanSua >= homNay)
 
+  // Bài đứng TRƯỚC bài đang chọn (cùng luật phạm vi của `tick`): gửi kèm `xem-truoc` để máy chủ đếm kho cho dòng "Ôn bài cũ" (thầy 06/10). Bài đầu tiên (không bài trước) ⇒ không gửi.
+  const phamViChon = useMemo(() => (chon ? phamViTruoc(dsBai, chon.viTri) : []), [chon, dsBai])
   // ĐẦU VÀO từng lớp: chỉ lớp CHƯA có bài này; có danh sách em ⇒ gửi đúng em đã chọn của lớp ấy (0 em ⇒ bỏ qua lớp); chưa có ⇒ hành vi cũ: máy chủ giao cả lớp.
   const dauVaoLop = useMemo(() => {
     if (!chon || !lopChon.length || !maDeTuGiao.length) return []
@@ -316,11 +321,12 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
           ...(hanSua && hanHopLe ? { hanNop: hanSua } : {}),
           ...(theLucSua ? { theLucNgay: theLucSua } : {}),
           ...(sbd ? { sbd } : {}),
+          ...(phamViChon.length ? { phamVi: phamViChon } : {}),
         },
       })
     }
     return ra
-  }, [chon, lopChon, maDeTuGiao, hanSua, hanHopLe, theLucSua, coDanhSachEm, emTheoLop, tickTheoLop])
+  }, [chon, lopChon, maDeTuGiao, hanSua, hanHopLe, theLucSua, coDanhSachEm, emTheoLop, tickTheoLop, phamViChon])
 
   // XEM TRƯỚC từng lớp: mỗi lần đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const [xemTheoLop, setXemTheoLop] = useState<Record<string, XemTruocTick>>({})
@@ -328,6 +334,8 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   const [dangXem, setDangXem] = useState(false)
   const luotXem = useRef(0)
   const khoaXem = JSON.stringify(dauVaoLop.map((x) => x.dauVao))
+  // Hỏi lại `xem-truoc` dù đầu vào không đổi (vừa lưu tỉ lệ ôn bài cũ ⇒ số máy chủ tính theo tỉ lệ mới).
+  const [lanXemLai, setLanXemLai] = useState(0)
   useEffect(() => {
     const l = ++luotXem.current
     if (!dauVaoLop.length) {
@@ -353,7 +361,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     }, CHO_XEM_MS)
     return () => clearTimeout(hen)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [khoaXem])
+  }, [khoaXem, lanXemLai])
 
   // GIAO (tick) — thẻ xác nhận chính là bước hỏi lại; giao xong vẫn "Bỏ tick" được (luật C8: hoàn tác thay vì hỏi thêm). Nhiều lớp: LẦN LƯỢT từng lớp chưa có bài.
   const [dangGiao, setDangGiao] = useState(false)
@@ -472,6 +480,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     xemTheoLop,
     loiXemTheoLop,
     dangXem,
+    xemLai: () => setLanXemLai((n) => n + 1),
     giao,
     dangGiao,
     loiGiao,
@@ -872,6 +881,94 @@ function CanhBaoQuaTai({ xem, lop, kemLop }: { xem: XemTruocTick; lop: string; k
   )
 }
 
+/** Trần ô nhập tỉ lệ ôn bài cũ trên màn (phần trăm): khớp trần máy chủ 0,6. */
+const TOI_DA_PHAN_TRAM = Math.round(TI_LE_ON_BAI_CU_TOI_DA * 100)
+/** Số nguyên phần trăm 0–60 của một ô nhập; rỗng / chữ / lẻ / ngoài khoảng ⇒ null. */
+const docPhanTram = (s: string): number | null => {
+  const t = s.trim()
+  if (!/^\d{1,2}$/.test(t)) return null
+  const n = Number(t)
+  return n >= 0 && n <= TOI_DA_PHAN_TRAM ? n : null
+}
+
+/**
+ * DÒNG "ÔN BÀI CŨ" + ô chỉnh tỉ lệ của MỘT lớp (thầy 06/10): "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%" — số do MÁY CHỦ tính (`xem-truoc`, khối `onBaiCu`); thầy đổi
+ * tỉ lệ thì dòng tính lại NGAY bằng cùng hàm máy chủ dùng (`xemOnBaiCu`), bấm "Lưu tỉ lệ cho lớp …" mới ghi (`on-bai-cu-luu`) rồi hỏi lại máy chủ. Máy chủ cũ / lỗi / kho 0 ⇒ không có
+ * khối `onBaiCu` ⇒ KHÔNG vẽ gì (thẻ y hệt trước). Tỉ lệ mới áp cho kế hoạch được lập sau lúc lưu — kế hoạch hôm nay đã chốt của từng em giữ nguyên (nói thật ở dòng phụ).
+ * Chữ: "Ôn bài cũ" (bảng A2); nút = động từ + kết quả; đích chạm ≥ 44 px (lớp `dh-nut`); màu CHỈ biến `--bts-*` có sẵn.
+ */
+function OnBaiCuTheoLop({ bhn, lop, xem }: { bhn: Pick<BaiHomNay, 'xemLai'>; lop: string; xem: XemTruocTick }) {
+  const ob = xem.onBaiCu
+  const showToast = useAppStore((s) => s.showToast)
+  const idMoTa = useId()
+  const goc = ob ? { thuong: Math.round(ob.tiLe.thuong * 100), cuoi: Math.round(ob.tiLe.cuoi * 100) } : { thuong: 0, cuoi: 0 }
+  const [luuRoi, setLuuRoi] = useState<{ thuong: number; cuoi: number } | null>(null)
+  const nen = luuRoi ?? goc
+  const [thuong, setThuong] = useState(String(goc.thuong))
+  const [cuoi, setCuoi] = useState(String(goc.cuoi))
+  const [dangLuu, setDangLuu] = useState(false)
+  const [loi, setLoi] = useState('')
+  if (!ob) return null
+  const t = docPhanTram(thuong)
+  const c = docPhanTram(cuoi)
+  const hopLe = t !== null && c !== null
+  const daDoi = hopLe && (t !== nen.thuong || c !== nen.cuoi)
+  // Tính lại bằng đúng hàm máy chủ (cùng D, lượt/ngày, kho, số bài); ô nhập chưa hợp lệ ⇒ giữ số máy chủ gần nhất.
+  const dong = (hopLe ? xemOnBaiCu({ soNgay: xem.D, theLuc: xem.theLucNgay, khoCau: ob.khoCau, soBai: ob.soBai, tiLe: { thuong: t / 100, cuoi: c / 100 } }) : null) ?? ob
+  const luu = async () => {
+    if (!daDoi || dangLuu || t === null || c === null) return
+    setDangLuu(true)
+    setLoi('')
+    const r = await luuTiLeOnBaiCu(lop, t / 100, c / 100)
+    setDangLuu(false)
+    if (!r.ok) {
+      setLoi(r.chu)
+      return
+    }
+    setLuuRoi({ thuong: t, cuoi: c })
+    showToast(`Đã lưu tỉ lệ ôn bài cũ của lớp ${lop}: ngày thường ${t} %, ngày thứ 4–5 của bài ${c} %`, 'success')
+    bhn.xemLai()
+  }
+  const nhapSai = !hopLe
+  return (
+    <div className="bhn-on-cu" data-khoi="on-bai-cu" data-lop={lop}>
+      <p className="bhn-on-cu-dong" data-khoi="on-bai-cu-dong">
+        {chuOnBaiCu(dong)}
+      </p>
+      <div className="bhn-on-cu-tl" role="group" aria-label={`Tỉ lệ ôn bài cũ của lớp ${lop}`} aria-describedby={idMoTa}>
+        <span className="bhn-on-cu-nhan">Ôn bài cũ:</span>
+        <label className="bhn-on-cu-o">
+          ngày thường
+          <span className="bhn-on-cu-vao">
+            <input type="number" inputMode="numeric" min={0} max={TOI_DA_PHAN_TRAM} step={5} value={thuong} aria-invalid={t === null} onChange={(e) => setThuong(e.target.value)} />%
+          </span>
+        </label>
+        <label className="bhn-on-cu-o">
+          ngày thứ 4–5 của bài
+          <span className="bhn-on-cu-vao">
+            <input type="number" inputMode="numeric" min={0} max={TOI_DA_PHAN_TRAM} step={5} value={cuoi} aria-invalid={c === null} onChange={(e) => setCuoi(e.target.value)} />%
+          </span>
+        </label>
+        <button type="button" className="m3-nut-vien dh-nut" disabled={!daDoi || dangLuu} onClick={() => void luu()}>
+          {dangLuu ? 'Đang lưu…' : `Lưu tỉ lệ cho lớp ${lop}`}
+        </button>
+      </div>
+      <small id={idMoTa} className={nhapSai ? 'dh-phu bhn-on-cu-sai' : 'dh-phu'} data-khoi="on-bai-cu-phu">
+        {nhapSai
+          ? `Nhập số nguyên từ 0 đến ${TOI_DA_PHAN_TRAM}.`
+          : daDoi
+            ? 'Chưa lưu — số trên dòng là số sẽ có sau khi lưu.'
+            : 'Phần lượt mỗi ngày tối đa dành ôn bài cũ, sau khi em làm xong nợ và câu mới. Kế hoạch hôm nay đã chốt của từng em giữ nguyên.'}
+      </small>
+      {loi && (
+        <p className="dh-loi" role="alert">
+          {loi}
+        </p>
+      )}
+    </div>
+  )
+}
+
 /** Thẻ XÁC NHẬN TRƯỚC KHI GIAO: tờ vào bài luyện, các lớp nhận, 6 con số có nhãn (mỗi lớp), cảnh báo quá tải, nút chính + nút sửa hạn nộp / số lượt. */
 function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
   const goc = useRef<HTMLDivElement>(null)
@@ -966,6 +1063,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
           <>
             <LuoiSo xem={xem1} hanSua={hanSua} theLucSua={theLucSua} dangXem={dangXem} />
             <CanhBaoQuaTai xem={xem1} lop={lopDauTien!} kemLop={false} />
+            <OnBaiCuTheoLop key={`${lopDauTien}|${xem1.onBaiCu?.tiLe.thuong}|${xem1.onBaiCu?.tiLe.cuoi}`} bhn={bhn} lop={lopDauTien!} xem={xem1} />
           </>
         )
       ) : (
@@ -1009,6 +1107,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
                   </p>
                 )}
                 {x && <CanhBaoQuaTai xem={x} lop={l} kemLop />}
+                {x && <OnBaiCuTheoLop key={`${l}|${x.onBaiCu?.tiLe.thuong}|${x.onBaiCu?.tiLe.cuoi}`} bhn={bhn} lop={l} xem={x} />}
               </li>
             )
           })}

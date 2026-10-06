@@ -394,6 +394,85 @@
 .bhn-tu-giao p {
   margin: 0;
 }
+/* ---- dòng "Ôn bài cũ" + ô chỉnh tỉ lệ (thầy 06/10): màu CHỈ biến `--bts-*` có sẵn; đích chạm ≥ 44 px (ô nhập + lớp `dh-nut`); số tabular-nums ---- */
+.bhn-on-cu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 14px;
+  border-left: 4px solid var(--bts-duong);
+  border-radius: 12px;
+  background: var(--bts-mat);
+}
+.bhn-on-cu-dong {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  text-wrap: pretty; /* khổ hẹp: không để "≈" dính cuối dòng trên còn con số rơi một mình xuống dòng dưới */
+}
+.bhn-on-cu .bhn-on-cu-sai {
+  color: var(--bts-do); /* ô nhập sai: dòng phụ đỏ (kèm viền đỏ ở ô) — màu lỗi chuẩn của app thầy */
+  font-weight: 600;
+}
+.bhn-on-cu-tl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
+  min-width: 0;
+}
+.bhn-on-cu-nhan {
+  align-self: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bts-chu-phu);
+}
+.bhn-on-cu-o {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+}
+.bhn-on-cu-vao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--bts-chu);
+  font-size: 15px;
+  font-weight: 600;
+}
+.bhn-on-cu-vao input {
+  width: 80px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 12px;
+  background: var(--bts-mat-2);
+  color: var(--bts-chu);
+  font: inherit;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color-scheme: light dark;
+}
+.bhn-on-cu-vao input[aria-invalid='true'] {
+  border-color: var(--bts-do);
+}
+.bhn-on-cu-vao input:focus-visible {
+  outline: 3px solid var(--bts-duong);
+  outline-offset: 2px;
+}
+/* Vỏ thầy (vo-thay.css) ép ô nhập/nút trong nội dung xuống 40 px ở màn ≥ 880 px (mật độ bản vẽ, độ đặc hiệu 0-3-1) — riêng ô chỉnh tỉ lệ giữ ≥ 44 px
+   theo CHUẨN (mục 3 tự soát giao diện: đích chạm ≥ 44 px) ở MỌI khổ, nên chọn kỹ hơn một bậc. Chỉ đổi chiều cao, không đổi màu. */
+.vo-thay .giua-noi-dung .bhn-on-cu .bhn-on-cu-vao input,
+.vo-thay .giua-noi-dung .bhn-on-cu button {
+  min-height: 44px;
+}
 .bhn-xem-ds {
   display: flex;
   flex-direction: column;

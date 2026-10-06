@@ -283,7 +283,20 @@ describe('màn: bước Bài hôm nay', () => {
     fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
     expect(dong(buoc, 'DH-12-C1-B3').textContent).toContain('Bài hôm nay')
     await waitFor(() => expect(lenh('xem-truoc').length).toBe(1))
-    expect(lenh('xem-truoc')[0]).toEqual({ action: 'xem-truoc', lop: '12A1', khoaBai: 'DH-12-C1-B3', tenBai: 'Bài 3. Xà phòng và chất giặt rửa', viTri: 3, maDe: ['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'] })
+    // SỬA CÓ CHỦ Ý 06/10 (dòng "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%"): `xem-truoc` nay gửi kèm `phamVi` — bài đứng TRƯỚC, đúng danh sách `tick` gửi (dưới) —
+    // để máy chủ đếm kho ôn bài cũ của các bài ấy. Bài đầu tiên (không bài trước) ⇒ không gửi (xem test "dòng Ôn bài cũ").
+    expect(lenh('xem-truoc')[0]).toEqual({
+      action: 'xem-truoc',
+      lop: '12A1',
+      khoaBai: 'DH-12-C1-B3',
+      tenBai: 'Bài 3. Xà phòng và chất giặt rửa',
+      viTri: 3,
+      maDe: ['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'],
+      phamVi: [
+        { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, maDe: ['DH-12-C1-B1-TN', 'DH-12-C1-B1-DS'] },
+        { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, maDe: ['DH-12-C1-B2'] },
+      ],
+    })
 
     const the = (await screen.findByText('Câu rút được')).closest('[data-khoi="xac-nhan-tick"]') as HTMLElement
     const o = (k: string) => (the.querySelector(`[data-so-tick="${k}"]`) as HTMLElement).textContent ?? ''
