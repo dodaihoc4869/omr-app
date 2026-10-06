@@ -62,10 +62,29 @@ const quet = (thu) => {
 quet('src')
 for (const m of readFileSync('index.html', 'utf8').matchAll(/(--[\w-]+)\s*:/g)) dinh.add(m[1])
 
+// TỆP MÃ CHẾT ĐÃ XOÁ NGUYÊN TỆP — ngoại lệ ĐÓNG (06/10, thầy giao "gọn mã"; liệt kê đủ đường dẫn, KHÔNG glob). Cổng này so VĂN BẢN từng tệp với mốc nên xoá cả tệp bị tính là
+// "xoá màu đang có"; nhưng các tệp dưới đây KHÔNG nằm trong gói của app nào (máy quét `scripts/quet-to-mo-coi.mjs`: không có đường từ src/main.tsx · src/sw.ts · server/src/index.ts;
+// bằng chứng từng tệp + từng test gỡ ở docs/gon-ma-0610-lan-2.md) ⇒ xoá chúng không đổi màu nào của ba app. CHỈ áp cho trạng thái D (xoá) của đúng các đường dẫn này; thêm tệp vào đây phải có
+// bằng chứng ấy. Khi mốc origin/main đã không còn các tệp này thì danh sách vô hại, xoá lúc nào cũng được.
+const DA_XOA_MA_CHET = new Set([
+  // game Thần thú v1 (đã bị than-thu-v2 thay)
+  'src/components/ThanThuHoaHocGame.tsx', 'src/components/ThanThu3D.tsx', 'src/components/DauTruongChanLy.tsx', 'src/components/CauHoiTrongGame.tsx',
+  'src/components/KhungLoiGiaiGame.tsx', 'src/components/OngNghiemExp.tsx', 'src/components/PopupThuongExp.tsx', 'src/lib/anh-than-thu.ts',
+  'src/game/than-thu-hoa-hoc/am-thanh-pet.ts', 'src/game/than-thu-hoa-hoc/can-bang-thap.ts', 'src/game/than-thu-hoa-hoc/canh-3d-chung.ts', 'src/game/than-thu-hoa-hoc/canh-nen-3d.ts',
+  'src/game/than-thu-hoa-hoc/cau-hoi-cua-em.ts', 'src/game/than-thu-hoa-hoc/chieu-thuc-3d.ts', 'src/game/than-thu-hoa-hoc/dang-than-thu.ts', 'src/game/than-thu-hoa-hoc/dau-truong-chan-ly.ts',
+  'src/game/than-thu-hoa-hoc/dong-bo.ts', 'src/game/than-thu-hoa-hoc/dung-than-thu-3d.ts', 'src/game/than-thu-hoa-hoc/he-thong-pet.ts', 'src/game/than-thu-hoa-hoc/kho-cau-hoi.ts',
+  'src/game/than-thu-hoa-hoc/long-thu-3d.ts', 'src/game/than-thu-hoa-hoc/rut-cau-thap.ts', 'src/game/than-thu-hoa-hoc/tan-hu-vo-3d.ts', 'src/game/than-thu-hoa-hoc/tuong-khac.ts',
+  'src/game/than-thu-hoa-hoc/ve-than-thu.ts',
+  // báo cáo xem điểm cũ của thầy (đã bị ca-thi/BaoCaoChiTiet thay) + thẻ ca gần nhất PH cũ
+  'src/components/xem-diem-gv/BaoCaoCaLop.tsx', 'src/components/xem-diem-gv/BaoCaoMotEm.tsx', 'src/components/xem-diem-gv/xem-diem-gv.css', 'src/components/xem-diem/TheCaGanNhat.tsx',
+])
+
 const loi = []
 let soTep = 0
+let soMaChet = 0
 for (const [trangThai, f, f2] of doi) {
   const ten = f2 ?? f
+  if (trangThai.startsWith('D') && DA_XOA_MA_CHET.has(f)) { soMaChet++; continue }
   soTep++
   const cu = trangThai.startsWith('A') ? '' : (() => { try { return git('show', `${MOC}:${f}`) } catch { return '' } })()
   let moi = ''
@@ -80,6 +99,6 @@ for (const [trangThai, f, f2] of doi) {
     for (const m of gt.matchAll(/var\(\s*(--[\w-]+)/g)) if (!dinh.has(m[1])) loi.push(`BIẾN MÀU chưa định nghĩa · ${ten} · ${k}`)
   }
 }
-console.log(`kiem-mau-giu-nguyen · mốc ${MOC} · ${soTep} tệp src/ đổi · ${loi.length} vi phạm`)
+console.log(`kiem-mau-giu-nguyen · mốc ${MOC} · ${soTep} tệp src/ đổi · ${loi.length} vi phạm` + (soMaChet ? ` · ${soMaChet} tệp mã chết đã xoá nguyên tệp (ngoại lệ đóng, không tính)` : ''))
 for (const l of loi) console.log('  ' + l)
 process.exit(loi.length ? 1 : 0)
