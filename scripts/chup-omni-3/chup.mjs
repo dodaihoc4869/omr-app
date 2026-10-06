@@ -249,6 +249,10 @@ const MAN = [
     await t.setViewportSize({ width: 390, height: 844 })
     await t.waitForTimeout(800)
     await chupVung(t, vung, 'gv-bai-moi-7-dien-thoai-390', 1700)
+    // Điện thoại: tấm xổ xuống nằm trong luồng, ngay dưới ô (không đè thẻ lớp đã chọn dù ô cao nhiều dòng).
+    await t.getByRole('button', { name: /Chọn lớp/ }).click()
+    await t.waitForTimeout(500)
+    await chupVung(t, '[data-khoi="chon-lop-giao"]', 'gv-bai-moi-8-dien-thoai-o-chon-lop-xo-xuong-390', 1100)
   }],
   ['gv-chien-dich', [1440, 900], async (t) => {
     await t.getByRole('heading', { name: 'Chiến dịch luyện' }).first().waitFor({ timeout: 30000 })

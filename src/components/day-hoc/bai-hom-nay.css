@@ -30,6 +30,10 @@
 .bhn-chon-lop .cd-cay {
   max-height: min(440px, 60vh);
 }
+/* Tấm xổ xuống nằm TRONG luồng, ngay dưới ô: ô cao nhiều dòng khi chọn nhiều lớp (nhất là điện thoại) thì tấm không đè lên thẻ lớp đã chọn. */
+.bhn-chon-lop .cd-tam-chon {
+  position: static;
+}
 .bhn-khoi-meta {
   display: flex;
   flex-wrap: wrap;
