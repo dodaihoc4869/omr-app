@@ -10,6 +10,7 @@ import { docBangSongSinh, songSinhDuDuLieu } from './cau-bo-tro'
 import { cacQidSongSinh } from './loi-hoc-luat'
 import { docHoSo2, type HoSo2 } from './srs2-d1'
 import { ngayVn } from './su-kien-hoc'
+import { docNhomTheoQid, docQidCungNhom } from './nhom-noi-dung'
 import { xoaDemCaBaoVe } from './game-v2-bank'
 import { xoaDemPhongCho } from './phong-cho-dong-thoi'
 import { docKeyBankDem } from './dem-ca-thi'
@@ -79,13 +80,31 @@ const chuanPhan = (v: unknown): PhanV2 | undefined => (v === 'I' || v === 'II' |
 /** Câu song sinh dựng thành câu đề (CÓ đáp án — chỉ đi về máy thầy / kho đáp án của ca). Phần I: 4 phương án; Phần III: giá trị đúng. */
 export interface CauSongSinhRa { id: string; phan: PhanV2; text: string; choices?: string[]; correct: string; table?: string[][]; hinhAnh?: { src: string; viTri: string }[] }
 
-/** Lỗi dùng được của một em từ hồ sơ hàng chữa lỗi: mọi lỗi CÒN VIỆC (có hạn) + meta câu gốc + câu song sinh lượt tới. */
+/**
+ * Câu em đang "Cần thầy dạy lại" (`catTia`: sai ≥ 4 lần, lần cuối vẫn sai) mà thầy CHƯA bấm "Chữa xong" và em chưa thành thạo (06/10).
+ * Câu ấy đã bị gỡ khỏi kế hoạch game ⇒ ca kiểm tra cũng KHÔNG được rút nó vào ô chữa lỗi (rút mà em chưa được dạy lại = ép em sai lần nữa).
+ * "Chữa xong" ghi mốc dạy lại ⇒ `phatLaiCau` đưa `catTia` về false ⇒ câu hết bị giữ ở đây và được rút lại như lỗi thường.
+ */
+const dangCanDayLai = (hs: Pick<HoSo2, 'tt'>, qid: string): boolean => { const t = hs.tt.get(qid); return !!t && t.catTia && !t.thanhThao }
+
+/** Qid lỗi (đến hạn, không tự luận) đang bị giữ vì "Cần thầy dạy lại" — số này thầy vẫn thấy ở `/ca/loi-den-han` (`canDayLai`), không mất thông tin. */
+export function loiCanDayLai(hs: Pick<HoSo2, 'loiV2' | 'meta' | 'tt'>): string[] {
+  const ra: string[] = []
+  for (const [qid, k] of hs.loiV2 ?? []) {
+    if (k.trangThai === 'khong_loi' || !k.denHan || hs.meta.get(qid)?.tuLuan) continue
+    if (dangCanDayLai(hs, qid)) ra.push(qid)
+  }
+  return ra
+}
+
+/** Lỗi dùng được của một em từ hồ sơ hàng chữa lỗi: mọi lỗi CÒN VIỆC (có hạn) + meta câu gốc + câu song sinh lượt tới. Không có câu "Cần thầy dạy lại" (xem `dangCanDayLai`). */
 export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa })[] {
   const ra: (LoiEmV2 & { cauSongSinh?: CauSongSinhRa })[] = []
   for (const [qid, k] of hs.loiV2 ?? []) {
     if (k.trangThai === 'khong_loi' || !k.denHan) continue
     const m = hs.meta.get(qid)
     if (m?.tuLuan) continue // không bao giờ rút câu tự luận
+    if (dangCanDayLai(hs, qid)) continue // 06/10: chưa được thầy dạy lại ⇒ không vào ô chữa lỗi của ca
     const phan = chuanPhan(m?.phan)
     const ssK = hs.songSinhCho?.get(qid)
     const ss = ssK !== undefined ? hs.boTro?.get(qid)?.songSinh?.[ssK] : undefined
@@ -116,22 +135,61 @@ export function loiTuHoSo(hs: HoSo2): (LoiEmV2 & { cauSongSinh?: CauSongSinhRa }
   return ra
 }
 
-/** Câu em đã gặp (mọi kênh) — sbd → qid → ngày VN gần nhất. MỘT truy vấn cho cả lô. `qids` (tuỳ chọn) bó về các câu đang xét. */
+/**
+ * Câu em đã gặp (mọi kênh) — sbd → qid → ngày VN gần nhất. MỘT truy vấn cho cả lô. `qids` (tuỳ chọn) bó về các câu đang xét.
+ * 06/10: câu TRÙNG NỘI DUNG khác mã (cùng `content_group`) là MỘT câu ⇒ mọi qid cùng nhóm nhận MAX ngày gặp trong nhóm (bản trùng của câu em vừa làm
+ * không ra như "câu mới"). Câu không có nhóm (thiếu bản ghi) giữ nguyên theo qid. Có `qids` ⇒ chỉ trả đúng các qid được hỏi (kể cả bản trùng chưa từng làm).
+ */
 export async function docDaGap(env: Env, dsSbd: readonly string[], ngay: string, qids?: readonly string[] | null): Promise<Record<string, Record<string, string>>> {
   const ra: Record<string, Record<string, string>> = {}
   if (dsSbd.length === 0) return ra
   const tu = new Date(Date.parse(`${ngay}T00:00:00Z`) - NGAY_NHIN_LAI * 86_400_000).toISOString().slice(0, 10)
-  const locQid = qids && qids.length > 0
+  const locQid = !!qids && qids.length > 0
+  const hoi = locQid ? new Set(qids) : null
+  // Có bó qid: nạp thêm các bản trùng của chúng để thấy lần gặp ở bản kia.
+  const nhomCua = new Map<string, string>()
+  let tim: string[] | null = locQid ? [...hoi!] : null
+  if (locQid) {
+    for (const [q, g] of await docNhomTheoQid(env, tim!)) nhomCua.set(q, g)
+    const dong = await docQidCungNhom(env, new Set(nhomCua.values()))
+    for (const [g, ds] of dong) for (const q of ds) nhomCua.set(q, g)
+    tim = [...new Set([...tim!, ...[...dong.values()].flat()])]
+  }
   const r = await env.DB.prepare(
     `SELECT sbd, qid, MAX(ngay_vn) AS ngay FROM su_kien_hoc
       WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ?${locQid ? ' AND qid IN (SELECT value FROM json_each(?))' : ''}
       GROUP BY sbd, qid`,
-  ).bind(JSON.stringify(dsSbd), tu, ...(locQid ? [JSON.stringify(qids)] : [])).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  ).bind(JSON.stringify(dsSbd), tu, ...(locQid ? [JSON.stringify(tim)] : [])).all<Obj>().catch(() => ({ results: [] as Obj[] }))
   for (const x of r.results ?? []) {
     const s = chuoi(x.sbd)
     ;(ra[s] ??= {})[chuoi(x.qid)] = chuoi(x.ngay)
   }
-  return ra
+  // Không bó qid: nhóm của các câu vừa thấy trong sổ (cộng các bản trùng của chúng).
+  if (!locQid) {
+    const thay = [...new Set(Object.values(ra).flatMap((m) => Object.keys(m)))]
+    for (const [q, g] of await docNhomTheoQid(env, thay)) nhomCua.set(q, g)
+    const dong = await docQidCungNhom(env, new Set(nhomCua.values()))
+    for (const [g, ds] of dong) for (const q of ds) nhomCua.set(q, g)
+    return gopDaGapTheoNhom(ra, nhomCua, dong, null)
+  }
+  const dong = new Map<string, string[]>()
+  for (const [q, g] of nhomCua) dong.set(g, [...(dong.get(g) ?? []), q])
+  const gop = gopDaGapTheoNhom(ra, nhomCua, dong, hoi)
+  // Chỉ giữ qid được hỏi (bản trùng nạp thêm chỉ để tính mốc).
+  for (const s of Object.keys(gop)) for (const q of Object.keys(gop[s]!)) if (!hoi!.has(q)) delete gop[s]![q]
+  return gop
+}
+
+/** Gộp mốc "đã gặp" theo nhóm nội dung: mọi qid cùng nhóm nhận MAX ngày. `gioiHan` ≠ null ⇒ chỉ thêm khoá cho qid trong tập đó. Thuần. */
+function gopDaGapTheoNhom(
+  daGap: Record<string, Record<string, string>>, nhomCua: ReadonlyMap<string, string>, dong: ReadonlyMap<string, string[]>, gioiHan: ReadonlySet<string> | null,
+): Record<string, Record<string, string>> {
+  for (const m of Object.values(daGap)) {
+    const max = new Map<string, string>()
+    for (const [q, n] of Object.entries(m)) { const g = nhomCua.get(q); if (g && n > (max.get(g) ?? '')) max.set(g, n) }
+    for (const [g, n] of max) for (const q of dong.get(g) ?? []) if (!gioiHan || gioiHan.has(q) || q in m) m[q] = n
+  }
+  return daGap
 }
 
 /** `/ca/loi-den-han` {sbd:[...], ngay?, qids?} → {em: {sbd: [{qid, denHan, trangThai, ...}]}, daGap: {sbd: {qid: ngày}}}. */
@@ -142,10 +200,14 @@ export async function loiDenHan(env: Env, b: Obj): Promise<Obj> {
   const ngay = laNgay(b.ngay) ? b.ngay : ngayVn(Date.now())
   const qids = Array.isArray(b.qids) ? b.qids.map(chuoi).filter(Boolean) : null
   const em: Record<string, ReturnType<typeof loiTuHoSo>> = {}
+  const canDayLai: Record<string, string[]> = {}
   const hong: string[] = []
   await Promise.all(ds.map(async (sbd) => {
     try {
-      em[sbd] = loiTuHoSo(await docHoSo2(env, sbd, ngay))
+      const hs = await docHoSo2(env, sbd, ngay)
+      em[sbd] = loiTuHoSo(hs)
+      const giu = loiCanDayLai(hs) // câu "Cần thầy dạy lại" không rút vào ca nhưng thầy vẫn phải thấy (06/10)
+      if (giu.length) canDayLai[sbd] = giu.sort()
     } catch {
       hong.push(sbd) // KHÔNG nuốt: máy thầy báo em nào chưa đọc được hồ sơ
     }
@@ -153,7 +215,7 @@ export async function loiDenHan(env: Env, b: Obj): Promise<Obj> {
   // Câu đã gặp: bó về kho ca + câu gốc của lỗi + câu song sinh (luật "lý thuyết quay lại sau 30 ngày" cần đúng các câu ấy).
   const loc = qids ? [...new Set([...qids, ...Object.values(em).flatMap((x) => x.flatMap((l) => cacQidSongSinh(l.qid)))])] : null
   const daGap = await docDaGap(env, ds, ngay, loc)
-  return { ok: true, ngay, em, daGap, ...(hong.length ? { hong: hong.sort() } : {}) }
+  return { ok: true, ngay, em, daGap, ...(Object.keys(canDayLai).length ? { canDayLai } : {}), ...(hong.length ? { hong: hong.sort() } : {}) }
 }
 
 // ---------------------------------------------------------------- /vao-thi: lấp riêng cho em vào sau
@@ -187,7 +249,9 @@ export async function lapBoChoEmVaoMuon(env: Env, maCa: string, sbd: string, soC
   const hoSo: HoSoEmV2 = { loi: hs && !khongLoi ? loiTuHoSo(hs) : [], daGap: daGap[sbd] ?? {} }
   // Ca "Kiểm tra điểm yếu" = ca đề riêng mở ở chế độ lên bảng (KhoiRutDe 02/10).
   const cheDo = Number(caRow?.de_rieng ?? 0) === 1 && Number(caRow?.len_bang ?? 0) === 1 ? 'diem_yeu' : 'ca'
-  const kq = rutDeV2({ kho, soCau: sc, dsSbd: [sbd], hoSo: { [sbd]: hoSo }, ngay, cheDo, seed: maCa })
+  // 06/10: câu trùng nội dung khác mã là MỘT câu — bộ của em không có hai bản, bản trùng của câu em vừa làm không ra như câu mới.
+  const nhomTrung = Object.fromEntries(await docNhomTheoQid(env, kho.map((c) => c.id)))
+  const kq = rutDeV2({ kho, soCau: sc, dsSbd: [sbd], hoSo: { [sbd]: hoSo }, ngay, cheDo, seed: maCa, nhomTrung })
   const bd = banDoTuKetQua(kq)
   const bo = bd.bo[sbd]
   if (!bo || bo.length === 0) return null
