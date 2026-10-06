@@ -4,12 +4,15 @@
 --   lap_sau_khi_huy : 1 nếu bản ghi kế hoạch được LẬP sau lúc huỷ
 --   dao_thuoc_cd_huy / doan_thuoc_cd_huy : số câu của kế hoạch (Đảo / Đoàn) nằm trong tập câu của chiến dịch đã huỷ
 --   cd_huy_trong_phu: bảng phụ OMNI còn nhắc chiến dịch đã huỷ
+--   ten_co_amin / han_nop / so_em / so_cau / ma_de : nhận diện chiến dịch KHÔNG in tên — tên có chữ "amin" (1/0), hạn nộp, số em, số câu, các tờ đề (mã tờ là mã kho, không phải dữ liệu em)
 WITH huy AS (
-  SELECT row_number() OVER (ORDER BY tao_luc) AS stt, id, sbd_json, qid_json, tao_luc, dong_luc
+  SELECT row_number() OVER (ORDER BY tao_luc) AS stt, id, sbd_json, qid_json, tao_luc, dong_luc, han_nop, ma_de_json,
+    CASE WHEN lower(ten) LIKE '%amin%' THEN 1 ELSE 0 END AS ten_co_amin
   FROM chien_dich WHERE trang_thai = 'da_huy' AND COALESCE(dong_luc, '') >= '2026-09-29' AND json_valid(sbd_json) AND json_valid(qid_json)
 )
 SELECT
   h.stt AS stt, h.tao_luc AS tao_luc, h.dong_luc AS dong_luc, k.ngay AS ngay,
+  h.ten_co_amin AS ten_co_amin, h.han_nop AS han_nop, (SELECT COUNT(*) FROM json_each(h.sbd_json)) AS so_em, (SELECT COUNT(*) FROM json_each(h.qid_json)) AS so_cau, h.ma_de_json AS ma_de,
   CASE WHEN k.chien_dich_id = h.id THEN 1 ELSE 0 END AS dang_gan_cd_huy,
   CASE WHEN k.chien_dich_id IS NULL THEN 1 ELSE 0 END AS khong_cd,
   CASE WHEN k.tao_luc > h.dong_luc THEN 1 ELSE 0 END AS lap_sau_khi_huy,
