@@ -1,0 +1,33 @@
+# RÀ SOÁT CHỈ ĐỌC: tờ chữa của chiến dịch (thầy 06/10 — "mở câu chữa các chiến dịch đã xong của lớp 11 vẫn còn lẫn rất nhiều các câu thuộc lớp 10").
+# Đọc D1 thật (không ghi), in CHỈ SỐ ĐẾM: (1) bao nhiêu câu mã khối khác nằm trong danh sách câu của các chiến dịch, theo khối lớp; (2) bao nhiêu câu thật đổi được sang khuôn Ngân hàng đề
+# bằng hàm của lệnh `noi-dung-cau` (và có chuyên đề). Không in mã chiến dịch / mã câu / đề / đáp án / tên em: repo công khai, nhật ký chạy ai cũng đọc được.
+# Bấm tay (workflow_dispatch) hoặc "Re-run" — mỗi lần đọc D1 lại từ đầu.
+name: Rà soát nội dung câu của chiến dịch (chỉ đọc)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: kiem-noi-dung-cau-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Gộp tệp rà soát (hàm thuần + hàm đổi câu của máy chủ) thành một tệp node
+        run: npx -y esbuild@0.25.5 scripts/kiem-noi-dung-cau-0610.mjs --bundle --platform=node --format=esm --target=node22 --outfile=/tmp/kiem-noi-dung-cau.mjs --log-level=warning
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc D1 (chỉ đọc) và in số đếm
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node /tmp/kiem-noi-dung-cau.mjs
