@@ -1938,6 +1938,11 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
     if (Array.isArray(bankObj.phanIII)) pIII = bankObj.phanIII
   }
 
+  // THẦY 06/10 "cấm toàn bộ": câu nối thêm vào ca KHÔNG BAO GIỜ là tự luận (máy thầy đã lọc; máy chủ chặn thêm một lớp, khuôn công khai chỉ xét được chữ đề / phần).
+  pI = pI.filter((c) => !laCauTuLuan(c, 'I'))
+  pII = pII.filter((c) => !laCauTuLuan(c, 'II'))
+  pIII = pIII.filter((c) => !laCauTuLuan(c, 'III'))
+
   const dapAnMap = new Map<string, string>()
   const keyObj = b.keyBank as Record<string, unknown> | undefined
   if (keyObj && typeof keyObj === 'object') {
