@@ -208,6 +208,29 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     expect(d.sql.prepare("SELECT sbd FROM srs2_day_lai WHERE qid = 'Q1' ORDER BY sbd").all()).toEqual([{ sbd: 'S1' }, { sbd: 'S2' }])
   })
 
+  it('(thầy 06/10) lớp có em ĐÃ chữa và em CHƯA chữa: câu chỉ tính cho em chưa chữa (em đã chữa không bị gọi sửa lại)', async () => {
+    const { env } = fixture()
+    const id = await giao(env, '2026-10-04', T0 - 6 * NGAY)
+    const NOW = Date.parse('2026-10-05T02:00:00Z')
+    type Cau = { qid: string; dang: string; soChuaThanhThao: number; soCanDayLai: number; diemChua: number; emSua: { sbd: string }[] }
+    const buoi = async (coMat?: string[]) => (await gvChienDich(env, { action: 'buoi-chua', id, ...(coMat ? { coMat } : {}) }, NOW)) as { cau: Cau[]; daChuaTruoc: number }
+    await ghiSuKien(env, ['S1', 'S2'].flatMap((s) => [1, 2, 3, 4].map((k) => suKien(s, 'Q1', T0 - (6 - k) * NGAY, false))))
+    const truoc = await buoi()
+    const q1 = truoc.cau.find((c) => c.qid === 'Q1')!
+    expect(q1.emSua.map((e) => e.sbd).sort()).toEqual(['S1', 'S2'])
+    await gvChienDich(env, { action: 'chua-xong', id, qids: truoc.cau.map((c) => c.qid), coMat: ['S1'] }, NOW)
+    const sau = await buoi() // cả hai em có mặt: S1 đã chữa, S2 chưa
+    expect(sau.cau.length).toBeGreaterThan(0)
+    for (const c of sau.cau) {
+      expect(c.emSua.map((e) => e.sbd)).not.toContain('S1')
+      expect(c.soChuaThanhThao).toBe(c.emSua.length)
+    }
+    const q1sau = sau.cau.find((c) => c.qid === 'Q1')!
+    expect(q1sau.emSua.map((e) => e.sbd)).toEqual(['S2'])
+    expect(q1sau.soCanDayLai).toBe(1)
+    expect(q1sau.diemChua).toBe(1 + 2)
+  })
+
   it('đồng hồ sức chứa: tỉ lệ = khối lượng em giữa lớp / (D × thể lực)', async () => {
     const { env } = fixture()
     const r = await gvChienDich(env, { action: 'suc-chua', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-04' }, T0)
