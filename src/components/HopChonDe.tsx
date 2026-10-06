@@ -20,7 +20,6 @@ import { bamTich, dungCay, khoiCuaDe, locCay, moiMaTrongCay, tongCau, tongDaChon
 import { dungCayTheoMucDich, KHOA_THU_MUC_TU_LUYEN } from '../lib/cay-muc-dich'
 
 export { khoiCuaDe }
-export const KHOI_CO_THE = ['10', '11', '12'] as const
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }

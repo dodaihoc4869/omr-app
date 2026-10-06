@@ -33,29 +33,6 @@ export function ManHinhAnh({ src, alt, onClose }: { src: string; alt: string; on
   )
 }
 
-/** Đề bài: có ảnh cắt từ PDF gốc thì LUÔN ưu tiên hiện ảnh — đúng nguyên tắc
- * "lớp chữ chỉ để định vị, không dùng để hiển thị" (lớp chữ PDF vỡ công thức
- * ÂM THẦM, ảnh thì không). Không có ảnh (đề gõ tay, hoặc cắt ảnh thất bại) ->
- * hiện lại bằng chữ (ChemText) như trước. */
-export function StemOrText({ img, text }: { img?: string; text: string }) {
-  if (img) return <ZoomableImage src={img} alt="Đề bài (ảnh cắt từ file gốc)" />
-  return (
-    <div className="cau-de">
-      <ChemText text={text} />
-    </div>
-  )
-}
-
-/** Phương án A/B/C/D hoặc ý a/b/c/d — có ảnh thì hiện ảnh, không có thì hiện chữ. */
-export function ChoiceOrText({ img, text }: { img?: string; text: string }) {
-  if (img) return <img decoding="async" src={img} alt="Phương án (ảnh cắt từ file gốc)" className="max-h-14 w-auto" />
-  return (
-    <span className="flex-1 pa-noi-dung">
-      <ChemText text={text} />
-    </span>
-  )
-}
-
 /** Bảng số liệu đơn giản — bảng HTML thật, cuộn ngang trong khung riêng,
  * chữ sans 13px không co nhỏ hơn. */
 export function BangSoLieu({ table }: { table?: string[][] }) {

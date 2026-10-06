@@ -18,8 +18,6 @@ export const CHU_CHE: Record<LyDoChe, string> = {
   chua_nop: 'Con đã làm · kết quả hiện sau khi con nộp bài',
   chua_cong_bo: 'Con đã làm · kết quả hiện sau khi Thầy công bố điểm',
 }
-/** "Chưa công bố" (lọc) gồm cả hai lý do che. */
-export const chuMocChe = (che: LyDoChe): string => (che === 'chua_nop' ? 'chưa nộp bài' : 'chờ Thầy công bố')
 
 /** Tên mốc trên dòng thời gian: tên máy chủ ghép sẵn (ca, tên bài) nếu có, không thì nhãn theo nguồn; ôn lại/gói thêm số câu. */
 export function tenMoc(m: Pick<MocThoiGian, 'nguon' | 'ten' | 'soCau'>): string {

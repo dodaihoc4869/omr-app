@@ -20,7 +20,6 @@ export const BtXuong = (p: P) => <Net {...p}><path d="M12 5v14" /><path d="M6 13
 export const BtPhai = (p: P) => <Net {...p}><path d="M9 6l6 6-6 6" /></Net>
 export const BtTrai = (p: P) => <Net {...p}><path d="M15 6l-6 6 6 6" /></Net>
 export const BtLenGon = (p: P) => <Net {...p}><path d="M6 15l6-6 6 6" /></Net>
-export const BtAi = (p: P) => <Net {...p}><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" /><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" /></Net>
 export const BtDongHo = (p: P) => <Net {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Net>
 export const BtBia = (p: P) => <Net {...p}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></Net>
 export const BtSao = (p: P) => <Net {...p}><path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z" /></Net>
