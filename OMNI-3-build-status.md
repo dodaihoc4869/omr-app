@@ -193,3 +193,13 @@ Lùi: `git revert -m 1 <commit gộp PR đợt 4>` rồi đẩy main (Actions đ
 - Hai test chập chờn của lượt 2 đã sửa sau đợt (chỉ test, commit 623f1dc7; ghi chú ở sổ việc OMNI 3).
 - CHƯA kiểm được từ phiên đám mây (không thử mật khẩu em): đăng nhập thật theo luồng NDJSON, câu chẩn đoán, nút Chắc / Chưa chắc, thẻ Cẩn thận và thang làm lại trên em thật. Cần thầy hoặc một em dùng thử; công tắc khẩn: chẩn đoán `chan_doan_buoc_sai`, thang `lam_lai_khac`, đăng nhập kèm Sảnh `TAT_KEM_SANH`.
 - Lùi: `git revert -m 1 02bd30bc` rồi đẩy main (Actions đẩy lại Pages + Worker); Worker trước đợt này `1e17cf25-3045-41c5-a3e1-f53d0f9dec0a`.
+
+### 11c. Máy soạn đẩy kho (06/10 chiều, lệnh thầy "Chạy máy soạn đề đẩy kho")
+
+- Chạy `node scripts/loi-giai/may-soan.mjs --mot-lan --lop tat-ca` trên phiên đám mây, 12:27–13:50 giờ VN (4 luồng, 12 câu/lô, 57 lô nộp thật; mã bí mật chỉ đọc từ biến môi trường, không in, không truyền cho phiên soạn con). Kiểm ca thi mở trước khi chạy: 12:24 giờ VN, run 37418298485 — 0 ca mở, 0 lượt đang làm. Thử 1 lô không nộp (`--thu`) và soát tay mẫu trước.
+- Kết quả: hồ sơ lời giải đạt 91, trượt 9 (ba câu số khoa học bị khoá số từ chối, xem dưới); học liệu thêm 498 câu, 0 lỗi — bản khác lưu 1 188 / 1 226 đề xuất, ý Đúng–Sai lưu 1 381 / 1 387; hồ sơ chờ 96 → 0, hồ sơ đã duyệt 7 049 → 7 140, học liệu xong 0 → 391. Cờ đáp án tự xử: khớp 0, nghi 0. 62,7 triệu token (tính cả đọc bộ nhớ đệm), 284 phút máy cộng dồn 4 luồng.
+- Soát mẫu của tôi (không phải toàn bộ): 14 ý Đ–S + 8 bản khác tính toán, tính lại bằng tay = 22/22 đúng; mọi mục đã qua hai lượt độc lập (soạn + kiểm mù) và kiểm lại ở máy chủ trước khi nối vào `cau_bo_tro` / `cau_y_ds` (chỉ-thêm).
+- Tác động lên app (chưa kiểm trên em thật): kho ý Đúng–Sai từ RỖNG thành 1 381 ý ⇒ nhánh "chìa khoá + 2 ý Đ/S" của chẩn đoán bước sai có dữ liệu (câu lý thuyết Phần I cùng dạng, đúng khối, đề không hình); 1 188 bản khác vào `cau_bo_tro` ⇒ thang làm lại có thêm bản song sinh. Tắt riêng: `chan_doan_buoc_sai` / `lam_lai_khac`.
+- Tồn: (1) ba câu `DH-10-C1-B2-III-23`, `DH-10-C1-B2-III-24`, `DB-11-B2-D6-III-3` — đáp số dạng a.10ⁿ ("1,1.10²³", "1,3.10²³", "1,3.10⁻³") mà phép tính cuối của máy chỉ ra phần a nên khoá số từ chối 3 lần ⇒ việc về `truot`; cần sửa bộ kiểm khoá số cho dạng a.10ⁿ hoặc nhập hồ sơ tay; (2) 26 hồ sơ chờ duyệt có sẵn từ trước (máy đề nghị sửa chữ trong đề: 53 chỗ; 1 chỗ giữ đáp án kho `DH-12-C3-B10-II-22`) — không đổi trong lượt này.
+- Nhịp máy chủ đo sống: trong lúc chạy (12:35, 12:56) và sau khi chạy xong (10 mẫu, 13:52–13:56 giờ VN) đều HTTP 200, "tot".
+- Chạy lại sau này: lệnh trên (hàng "câu em đã sai chưa có bản khác" tự làm mới ≤ 15 phút một lần; đề mới nạp tự vào hàng). Hướng dẫn: `docs/loi-giai-a/HUONG-DAN-CHAY.md`.
