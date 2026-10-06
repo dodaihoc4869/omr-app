@@ -1,9 +1,9 @@
 // XEM ĐIỂM BẢN 2 · GV-1 nối MÁY CHỦ: bộ đọc `/gv/bao-cao-ca` (src/lib/bao-cao-may-chu.ts) + khối vẽ khi có `layMayChu` (lấy từ máy chủ, rơi về số tính ở máy).
 // Hợp đồng: docs/hop-dong-xem-diem-v2-2109.md mục 4 (Code 3). Thân thật của máy chủ đi qua bộ đọc ở tests/bao-cao-may-chu-hai-phia-2109.test.ts.
+// GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): khối vẽ `BaoCaoCaLopKhoi` (xem-diem-gv/BaoCaoCaLop.tsx) đã bị báo cáo chi tiết mới `ca-thi/BaoCaoChiTiet.tsx` thay và bị xoá — đã gỡ khối "BaoCaoCaLopKhoi có layMayChu"; các khối đọc máy chủ ở lib còn nguyên.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
-import BaoCaoCaLopKhoi from '../src/components/xem-diem-gv/BaoCaoCaLop'
-import { KHOANG_DIEM, type BaoCaoCaLop } from '../src/lib/bao-cao-ca-lop'
+import { cleanup } from '@testing-library/react'
+import { KHOANG_DIEM } from '../src/lib/bao-cao-ca-lop'
 import { docBaoCaoCaLopMayChu, docBaoCaoEmMayChu, GIAM_DIEM_NEU, layBaoCaoCaLopMayChu, layBaoCaoEmMayChu, type EmRoiMan } from '../src/lib/bao-cao-may-chu'
 import { readFileSync } from 'node:fs'
 
@@ -146,66 +146,6 @@ describe('layBaoCaoCaLopMayChu — POST /gv/bao-cao-ca', () => {
     expect(await layBaoCaoCaLopMayChu('C1')).toBeNull()
     dat(() => ({ ok: true, status: 200, json: async () => ({ ok: true, tongQuan: 'hỏng' }) }))
     expect(await layBaoCaoCaLopMayChu('C1')).toBeNull()
-  })
-})
-
-// ────────────── khối vẽ ──────────────
-const LOCAL: BaoCaoCaLop = {
-  nop: 2, daVao: 2, chuaNop: 0, tb: 4, cao: 5, thap: 3, phutTB: null, pho: KHOANG_DIEM.map(([, , nhan]) => ({ nhan, soEm: 0 })), baPhan: [], dang: [], cauSai: [], emCanYY: [], coBangCham: false,
-}
-describe('BaoCaoCaLopKhoi có layMayChu', () => {
-  const ve = (layMayChu: () => Promise<BaoCaoCaLop | null>, khoa = 'k1') => {
-    const tinh = vi.fn(() => LOCAL)
-    const cau = (k: string) => <BaoCaoCaLopKhoi tomTat={{ nop: 5, tb: 6.9 }} tinh={tinh} khoa={k} phutDe={45} moSan onMoEm={() => {}} layMayChu={layMayChu} />
-    const r = render(cau(khoa))
-    return { ...r, tinh, veLai: (k: string) => r.rerender(cau(k)) }
-  }
-  it('chờ máy chủ ⇒ dòng "Đang lấy báo cáo…" (không tính nặng ở máy); có số ⇒ vẽ số của máy chủ, KHÔNG gọi tinh', async () => {
-    let xong!: (b: BaoCaoCaLop | null) => void
-    const cho = new Promise<BaoCaoCaLop | null>((r) => { xong = r })
-    const { tinh } = ve(() => cho)
-    expect(screen.getByText(/Đang lấy báo cáo/)).toBeTruthy()
-    await act(async () => xong(docBaoCaoCaLopMayChu(THAN(), ROI)))
-    await waitFor(() => expect(screen.queryByText(/Đang lấy báo cáo/)).toBeNull())
-    expect(screen.getByText('Tính chất amin')).toBeTruthy() // dạng vấp từ máy chủ
-    expect(tinh).not.toHaveBeenCalled()
-  })
-  it('máy chủ trả null / ném lỗi ⇒ RƠI VỀ số tính ở máy (tinh được gọi đúng một lần), màn vẫn vẽ', async () => {
-    const a = ve(async () => null)
-    await waitFor(() => expect(a.container.querySelector('[data-khoi="tong-quan-lop"]')).toBeTruthy())
-    expect(a.tinh).toHaveBeenCalledTimes(1)
-    cleanup()
-    const b = ve(async () => { throw new Error('hỏng') })
-    await waitFor(() => expect(b.container.querySelector('[data-khoi="tong-quan-lop"]')).toBeTruthy())
-    expect(b.tinh).toHaveBeenCalledTimes(1)
-  })
-  it('khoá đổi (có bài nộp mới) ⇒ hỏi lại và GIỮ bản cũ trong lúc chờ (không nhấp nháy); khoá không đổi ⇒ không hỏi lại', async () => {
-    const goi = vi.fn(async () => docBaoCaoCaLopMayChu(THAN(), ROI))
-    const r = ve(goi)
-    await waitFor(() => expect(r.container.querySelector('[data-khoi="tong-quan-lop"]')).toBeTruthy())
-    expect(goi).toHaveBeenCalledTimes(1)
-    r.veLai('k1')
-    expect(goi).toHaveBeenCalledTimes(1)
-    goi.mockImplementation(() => new Promise(() => {})) // lần hỏi sau chưa về
-    r.veLai('k2')
-    expect(goi).toHaveBeenCalledTimes(2)
-    expect(r.container.querySelector('[data-khoi="tong-quan-lop"]')).toBeTruthy()
-    expect(screen.queryByText(/Đang lấy báo cáo/)).toBeNull()
-  })
-  it('gỡ khối trước khi máy chủ trả lời ⇒ không cập nhật gì sau khi gỡ (không cảnh báo)', async () => {
-    let xong!: (b: BaoCaoCaLop | null) => void
-    const loi = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const r = ve(() => new Promise<BaoCaoCaLop | null>((res) => { xong = res }))
-    r.unmount()
-    await act(async () => xong(LOCAL))
-    expect(loi).not.toHaveBeenCalled()
-    loi.mockRestore()
-  })
-  it('KHÔNG có layMayChu ⇒ hành vi cũ nguyên: tinh chạy đồng bộ khi mở, không dòng "Đang lấy"', () => {
-    const tinh = vi.fn(() => LOCAL)
-    render(<BaoCaoCaLopKhoi tomTat={{ nop: 2, tb: 4 }} tinh={tinh} khoa="k" phutDe={45} moSan onMoEm={() => {}} />)
-    expect(tinh).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText(/Đang lấy báo cáo/)).toBeNull()
   })
 })
 

@@ -87,8 +87,9 @@ describe('Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức
     expect(man).not.toContain('ĐÚNG CHUẨN ẢNH 4')
     expect(man).not.toContain('rgb(255, 253, 245)')
   })
-  it('màn tổ chiếu + khung dự phòng + báo cáo thầy dùng khối chuẩn (không còn nhãn cũ)', () => {
-    for (const t of ['src/screens/DieuKhienToChieuScreen.tsx', 'src/components/loi-giai/KhungLoiGiai.tsx', 'src/components/xem-diem-gv/BaoCaoMotEm.tsx']) {
+  // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): bỏ `xem-diem-gv/BaoCaoMotEm.tsx` khỏi danh sách (tệp bị xoá — báo cáo thầy nay là `ca-thi/BaoCaoChiTiet.tsx`).
+  it('màn tổ chiếu + khung dự phòng dùng khối chuẩn (không còn nhãn cũ)', () => {
+    for (const t of ['src/screens/DieuKhienToChieuScreen.tsx', 'src/components/loi-giai/KhungLoiGiai.tsx']) {
       const s = doc(t)
       expect(s, t).toContain('KhoiLoiGiaiChuan')
       expect(s, t).not.toMatch(/Điểm mấu chốt|Kiến thức cốt lõi:|Hướng dẫn giải:/)

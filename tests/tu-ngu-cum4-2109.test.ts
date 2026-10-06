@@ -32,7 +32,7 @@ const TEP_HS_PH = [
   'src/components/ca-thi/CauCanChua.tsx',
   'src/lib/bao-cao-cua-em.ts',
   'src/components/InfographicHuongDan.tsx',
-  'src/components/xem-diem/TheCaGanNhat.tsx', // thay CardCaThiGanNhat.tsx (mồ côi, đã xoá 21/09)
+  // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ TheCaGanNhat.tsx (thẻ PH cũ, "lô dọn" ở docs/ph-toi-gian-2109.md, đã xoá).
   'src/components/BieuDoTienBoGoogle.tsx',
   // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ ThanThuHoaHocGame.tsx (game Thần thú v1, đã xoá).
 ]
