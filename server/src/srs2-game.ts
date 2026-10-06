@@ -50,12 +50,6 @@ export function goiYCho(q: PrivateQuestion, t: TrangThaiCau | undefined, khoa: s
   return cotLoi ? { cotLoi } : null
 }
 
-/** Câu thứ mấy em làm trong game hôm nay (đếm cả câu này): quá 40 ⇒ không rơi EXP, không rơi vật phẩm (luật Huyết Chiến). */
-export async function soCauGameHomNay(env: Env, sbd: string, nowMs: number): Promise<number> {
-  const r = await env.DB.prepare("SELECT COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game'").bind(sbd, ngayVnCua(nowMs)).first<{ n: number }>().catch(() => null)
-  return Number(r?.n) || 0
-}
-
 /** `tc`/`xt`/`nv` (05/10, cau-anh-em.ts): làm lại câu sai bằng bản khác — chỉ ở JSON phiên máy chủ (chấm, ghi sổ), KHÔNG xuống máy em. */
 export interface RefPhien extends LamLaiRef { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
 

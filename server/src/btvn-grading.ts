@@ -25,13 +25,6 @@ export function answerText(v: unknown): string {
   return String(v).trim().toUpperCase().replace(/Đ/g, 'D')
 }
 
-export function cleanShortAnswer(s: string): string {
-  return String(s ?? '')
-    .replace(/[‐‑‒–—―−－]/g, '-')
-    .replace(/\s+/g, '')
-    .replace(/,/g, '.')
-}
-
 export function isAnswerCorrect(v: string, d: string, phan: 'I' | 'II' | 'III' | string): boolean {
   if (!v || !d) return false
   const cleanV = String(v).trim().toUpperCase().replace(/Đ/g, 'D')

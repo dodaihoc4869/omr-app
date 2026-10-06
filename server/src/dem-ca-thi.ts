@@ -133,8 +133,3 @@ export function nhoCongBo(maCa: string, congBo: unknown): void {
 export function doanCongBoNgay(maCa: string): boolean {
   return goiYCongBo.get(maCa) === 'ngay'
 }
-
-/** Chỉ cho phép kiểm: xoá sạch đệm. */
-export function xoaDemCaThi(): void {
-  theoR2 = new WeakMap(); goiYCongBo.clear()
-}
