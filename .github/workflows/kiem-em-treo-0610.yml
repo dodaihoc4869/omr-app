@@ -4,7 +4,7 @@ name: Em treo chẩn đoán — số dòng từng bảng (chỉ đọc, chỉ đ
 on:
   workflow_dispatch:
   push:
-    paths: ['.github/workflows/kiem-em-treo-0610.yml', 'scripts/kiem-em-treo-0610.sh']
+    paths: ['.github/workflows/kiem-em-treo-0610.yml', 'scripts/kiem-em-treo-0610.sh', 'scripts/do-treo-0610.ts']
     branches-ignore: [main]
 permissions:
   contents: read
@@ -14,7 +14,7 @@ concurrency:
 jobs:
   kiem:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - name: Tệp chỉ có lệnh đọc
@@ -26,7 +26,24 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cài gói (để gói bộ đo bằng esbuild)
+        run: npm ci --ignore-scripts
+      - name: "ĐO TỪNG BƯỚC chanDoanEm trên D1 thật — em nhanh rồi em treo (chỉ đọc; lớp mỏng chặn mọi lệnh không phải SELECT)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/do-treo-0610.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-treo.mjs --log-level=warning
+          echo '=== EM NHANH (11000) ==='
+          OMR_GIOI_HAN_MS=60000 timeout 90 node --no-warnings /tmp/do-treo.mjs 11000 || echo "(thoát mã $?)"
+          echo '=== EM TREO (12121212) ==='
+          OMR_GIOI_HAN_MS=150000 timeout 170 node --no-warnings /tmp/do-treo.mjs 12121212 || echo "(thoát mã $?)"
       - name: Đếm số dòng từng bảng cho em treo và em nhanh (chỉ đọc)
+        continue-on-error: true
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
