@@ -242,11 +242,16 @@ export default function BuoiChua({
 
       <section className="cd-the" aria-label="Bảng câu buổi chữa">
         {kq.dong.length === 0 ? (
-          <p className="cd-phu">Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.</p>
+          <p className="cd-phu">
+            {(du.daChuaTruoc ?? 0) > 0
+              ? `Đã chữa hết các dạng của chiến dịch này (${du.daChuaTruoc} dạng). Không còn câu nào cần chữa thêm.`
+              : 'Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.'}
+          </p>
         ) : (
           <div role="table" aria-label="Câu chữa xếp sẵn" className="cd-bang-chua">
             <div className="cd-the-dau">
               <h2>Câu chữa xếp sẵn · điểm chữa cao trước</h2>
+              {(du.daChuaTruoc ?? 0) > 0 && <span className="cd-phu" data-khoi="da-chua-truoc">Đã chữa {du.daChuaTruoc} dạng ở buổi trước; buổi này xếp tiếp các dạng còn lại.</span>}
               <span className="cd-phu">Điểm chữa = số em chưa thành thạo + 2 × số em cần dạy lại</span>
             </div>
             <div className="cd-hang-chua cd-hang-chua--dau" role="row">
@@ -308,7 +313,7 @@ export default function BuoiChua({
         <p className="cd-phu">
           <span className="cd-cham cd-vs-chua" aria-hidden="true" /> Em chưa thành thạo (1 điểm/em) · <span className="cd-cham cd-vs-day" aria-hidden="true" /> Em cần dạy lại (2 điểm/em).
           Cách xếp: điểm chữa = số em chưa thành thạo + 2 × số em cần thầy dạy lại · mỗi dạng 1 câu đại diện · tổng ≤ {phut(kq.nganSachGiay)} phút · mỗi em có mặt ≥ 1 lượt.
-          {kq.boCau.length > 0 && ` Đã bỏ bớt ${kq.boCau.length} câu điểm chữa thấp cho vừa giờ (Câu ${kq.boCau.map((c) => c.stt).join(', ')}).`}
+          {kq.boCau.length > 0 && ` Còn ${kq.boCau.length} câu điểm chữa thấp chưa vừa giờ buổi này (Câu ${kq.boCau.map((c) => c.stt).join(', ')}): bấm “Chữa xong” khi chữa hết, các câu ấy tự xếp thành buổi chữa tiếp theo.`}
         </p>
         {kq.vuotNganSach && (
           <p className="cd-loi">

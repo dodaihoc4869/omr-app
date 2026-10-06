@@ -276,6 +276,7 @@ export default function LenBangChienDich() {
 
       {bang && bang.hetHan && buoi && (
         <BuoiChua
+          key={buoi.cau.map((c) => c.qid).join('|')}
           du={buoi}
           dsEm={bang.em.map((e) => ({ sbd: e.sbd, ten: e.ten }))}
           coMat={coMat}
@@ -289,7 +290,11 @@ export default function LenBangChienDich() {
             setCoMat(sbd)
             void tai(chonId, sbd)
           }}
-          onDaChua={() => void taiDs()}
+          onDaChua={() => {
+            // Chữa xong ⇒ xếp LẠI buổi (máy chủ bỏ dạng vừa chữa, tới các dạng còn lại) + nạp lại danh sách chiến dịch.
+            void tai(chonId, coMat)
+            void taiDs()
+          }}
           caChotOmni={goiCaChot}
         />
       )}
