@@ -15,7 +15,11 @@ type Row = Record<string, unknown>
 
 export const TOI_DA_EM_MOT_LUOT = 20
 export const SO_NGAY_CUA_SO_LAM = 7
+/** Ca "Không rút câu sai" (thầy 06/10) xin cửa sổ dài hơn qua `soNgayLam`; chặn ở đây, các chế độ khác vẫn 7 ngày. */
+export const SO_NGAY_CUA_SO_LAM_TOI_DA = 30
 export const TOI_DA_LAM_MOI_EM = 400
+/** Cửa sổ dài thì nhiều câu hơn: trần riêng, vẫn cắt phần CŨ nhất. */
+export const TOI_DA_LAM_MOI_EM_CUA_SO_DAI = 1500
 const MOT_NGAY_MS = 86_400_000
 
 export interface HoSoOnCaEm {
@@ -36,6 +40,8 @@ export async function hoSoOnCa(env: Env, b: Record<string, unknown>, now: number
   const maCa = typeof b.maCa === 'string' ? b.maCa.trim() : ''
   const ngayCa = laNgay(b.ngayCa) ? b.ngayCa : ngayVn(now)
   const soCa = Number(b.soCa) === 3 ? 3 : 1
+  const soNgayLam = Math.min(SO_NGAY_CUA_SO_LAM_TOI_DA, Math.max(SO_NGAY_CUA_SO_LAM, Math.floor(Number(b.soNgayLam)) || SO_NGAY_CUA_SO_LAM))
+  const tranLam = soNgayLam > SO_NGAY_CUA_SO_LAM ? TOI_DA_LAM_MOI_EM_CUA_SO_DAI : TOI_DA_LAM_MOI_EM
 
   try {
     const sbd = JSON.stringify(ds)
@@ -64,11 +70,11 @@ export async function hoSoOnCa(env: Env, b: Record<string, unknown>, now: number
                LEFT JOIN nam_kt_cau k ON k.sbd = b.sbd AND k.qid = b.qid
               WHERE b.sbd IN (SELECT value FROM json_each(?)) AND b.ma_ca IN (SELECT value FROM json_each(?))`,
           ).bind(sbd, JSON.stringify(dsCa)).all<Row>(),
-      // 3. Câu em ĐÃ THẤY trong cửa sổ [ngayCa − 7 ngày, ngayCa]: mọi nguồn, mọi kết quả; mới nhất trước, hoà thì qid tăng dần.
+      // 3. Câu em ĐÃ THẤY trong cửa sổ [ngayCa − soNgayLam (mặc định 7) ngày, ngayCa]: mọi nguồn, mọi kết quả; mới nhất trước, hoà thì qid tăng dần.
       env.DB.prepare(
         `SELECT sbd, qid, MAX(luc) AS luc FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ? AND ngay_vn <= ?
           GROUP BY sbd, qid ORDER BY luc DESC, qid ASC`,
-      ).bind(sbd, lui(ngayCa, -SO_NGAY_CUA_SO_LAM), ngayCa).all<Row>(),
+      ).bind(sbd, lui(ngayCa, -soNgayLam), ngayCa).all<Row>(),
     ])
 
     const em: Record<string, HoSoOnCaEm> = {}
@@ -93,7 +99,7 @@ export async function hoSoOnCa(env: Env, b: Record<string, unknown>, now: number
     }
     for (const x of r3.results ?? []) {
       const e = em[String(x.sbd)]
-      if (e && e.lam.length < TOI_DA_LAM_MOI_EM) e.lam.push(String(x.qid)) // đã sắp mới nhất trước: cắt phần CŨ nhất
+      if (e && e.lam.length < tranLam) e.lam.push(String(x.qid)) // đã sắp mới nhất trước: cắt phần CŨ nhất
     }
     for (const [s, sai] of await chanKhacKhoiTheoEm(env, 'ho_so_on_ca', new Map(Object.entries(em).map(([k, e]) => [k, e.sai])), { cauCua: (x) => ({ qid: x.qid, ma_dang: x.maDang }) })) em[s]!.sai = sai // LUẬT THẦY 05/10: câu sai cũ máy gợi ý hỏi lại chỉ câu ĐÚNG khối em (+1 truy vấn khối em; +1 truy vấn nguồn khối chỉ khi có mã câu không đọc ra khối)
     return { ok: true, em }

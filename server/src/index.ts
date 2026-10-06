@@ -22,6 +22,7 @@ import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop, trangThaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
+import { coLuotMoi } from './ca-co-luot-moi'
 import {notifications,deliverNotices} from './notifications'
 import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
 import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
@@ -3726,6 +3727,8 @@ const boXuLy = {
       // RÚT ĐỀ v2 (02/10, server/src/rut-de-v2.ts): chốt Bắt đầu MỘT lệnh (mốc + bản đồ); lỗi đến hạn theo em cho máy thầy chạy thử.
       if (p === '/ca/chot-bat-dau') return ra({ ...(await chotBatDau(env, b)), chot: true })
       if (p === '/ca/loi-den-han') return ra(await loiDenHan(env, b))
+      // CA KIỂM TRA (06/10, server/src/ca-co-luot-moi.ts): em nào có lượt tự làm MỚI kể từ lúc chạy thử — để Bắt đầu thi rút lại bằng hồ sơ mới.
+      if (p === '/ca/co-luot-moi') return ra(await coLuotMoi(env, b))
       // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10, server/src/cau-da-dung.ts): câu em đã tự làm đúng trong các chiến dịch, kèm nhãn nơi · ngày · mức độ.
       if (p === '/ca/cau-da-dung') return ra(await cauDaDung(env, b))
       // HỌC PHÍ (thầy 05/10, server/src/hoc-phi.ts): sổ thu từng em — danh sách, một em, ghi một lần nộp, sửa mức riêng, xoá lần nhập nhầm, nạp sổ Excel.
