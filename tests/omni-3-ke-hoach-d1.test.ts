@@ -70,8 +70,10 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     expect(hs.chienDichHet?.map((c) => c.id)).toEqual(['CD1', 'CD2'])
     for (const c of hs.cau) if (c.nguon === 'chien_dich') expect(c.cd).toBe(c.qid.startsWith('DH-B1') ? 'CD1' : 'CD2')
     expect(hs.cau.filter((c) => c.nguon === 'chien_dich').length).toBe(12 + 10)
-    // không câu bài 3 (chưa tick) / TU LUYỆN dù em từng sai (nợ) — vẫn có trạng thái để "Câu đã làm" hiện đủ
-    expect(hs.cau.some((c) => c.qid.startsWith('DH-B3') || c.qid.startsWith('KHO-A'))).toBe(false)
+    // không câu bài 3 (chưa tick) dù em từng sai (nợ); câu TU LUYỆN: CHỈ KHO-A-4 (em SAI ngoài chiến dịch từ 29/09 ⇒ nợ, 07/10 việc 14d) vào — KHO-A-0 (chỉ sai trước 29/09) và
+    // KHO-A-1 (đã vững) vẫn lọc. Mọi câu vẫn có trạng thái để "Câu đã làm" hiện đủ.
+    expect(hs.cau.some((c) => c.qid.startsWith('DH-B3'))).toBe(false)
+    expect(hs.cau.filter((c) => c.qid.startsWith('KHO-A')).map((c) => [c.qid, c.nguon])).toEqual([['KHO-A-4', 'no_cu']])
     for (const q of ['DH-B3-0', 'DH-B3-1', 'KHO-A-0', 'KHO-A-4']) { expect(hs.tt.has(q), q).toBe(true); expect(hs.meta.has(q), q).toBe(true) }
     // nợ cũ / duy trì của bài trong phạm vi vẫn vào
     expect(hs.cau.find((c) => c.qid === 'DH-B0-1')?.nguon).toBe('no_cu')
@@ -83,12 +85,12 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     const hs2 = await docHoSo2(k.env, 'S2', HOM_NAY)
     expect('omni' in hs2 || 'chienDichHet' in hs2 || 'onBaiCu' in hs2).toBe(false)
   })
-  it('lớp CHƯA tick bài (phạm vi null): không lọc theo phạm vi, chỉ lọc TU LUYỆN; không ôn bài cũ, không chế độ chờ', async () => {
+  it('lớp CHƯA tick bài (phạm vi null): không lọc theo phạm vi, TU LUYỆN chỉ lọc khi KHÔNG có lịch sử sai (KHO-A-4 em sai ⇒ nợ vào); không ôn bài cũ, không chế độ chờ', async () => {
     const k = await dungKichBanHaiChienDich()
     gia.omni = new Set(['S1'])
     const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
     expect(hs.cau.some((c) => c.qid.startsWith('DH-B3'))).toBe(true)
-    expect(hs.cau.some((c) => c.qid.startsWith('KHO-A'))).toBe(false)
+    expect(hs.cau.filter((c) => c.qid.startsWith('KHO-A')).map((c) => c.qid)).toEqual(['KHO-A-4'])
     expect(hs.onBaiCu).toEqual([])
     expect(hs.omni).toEqual({ bat: true, cheDoCho: false, onBaiCuSo: 0 })
   })
@@ -99,7 +101,9 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     const s = await sanh2(k.env, 'S1', T_SANG)
     const { kh, hs } = await layKeHoachHomNay(k.env, 'S1', T_SANG + 1000)
     const ds = tatCa(kh)
-    expect(ds.every((q) => q.startsWith('DH-B0') || q.startsWith('DH-B1') || q.startsWith('DH-B2'))).toBe(true)
+    // 07/10 (việc 14d): ngoài phạm vi chỉ còn ngoại lệ NỢ câu SAI chỉ ở tờ TU LUYỆN (KHO-A-4: em sai ngoài chiến dịch từ 29/09); bài 3 (chưa tick) vẫn không vào
+    expect(ds.every((q) => q.startsWith('DH-B0') || q.startsWith('DH-B1') || q.startsWith('DH-B2') || q === 'KHO-A-4')).toBe(true)
+    expect(ds).toContain('KHO-A-4')
     // CD1: D = 3 ⇒ mọi câu mới còn lại (8) vào hôm nay; CD2 tắt rải đều ⇒ câu mới lấp lượt dư
     const moiCd1 = ds.filter((q) => q.startsWith('DH-B1') && hs.tt.get(q)!.laMoi)
     expect(moiCd1).toHaveLength(8)
@@ -314,7 +318,8 @@ describe('OMNI 3 · mô phỏng D1 nhiều ngày: bài 2 tick ngày 4, bài 3 kh
         const sang = lucVn(ngay, 8)
         const { kh } = await layKeHoachHomNay(k.env, s, sang)
         const ds = tatCa(kh)
-        expect(ds.some((q) => q.startsWith('DH-B3') || q.startsWith('KHO-A')), `${s} ${ngay}`).toBe(false)
+        // 07/10 (việc 14d): câu TU LUYỆN em từng SAI (kho[0], từ 30/09) là NỢ ⇒ được vào kế hoạch; mọi câu TU LUYỆN khác và bài 3 (chưa tick) vẫn không bao giờ vào
+        expect(ds.some((q) => q.startsWith('DH-B3') || (q.startsWith('KHO-A') && q !== kho[0])), `${s} ${ngay}`).toBe(false)
         if (ngay < '2026-10-04') expect(ds.some((q) => q.startsWith('DH-B2'))).toBe(false)
         if (kh.huyetChien) soNgayHuyetChien++
         expect(kh.tong).toBeLessThanOrEqual(kh.huyetChien ? 24 : 12)

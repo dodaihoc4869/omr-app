@@ -60,27 +60,31 @@ function chotTrongTuSang(k: KhoOmni): void {
 beforeEach(() => { gia.omni = new Set(); gia.phamVi = null; gia.dangVung = [] })
 
 describe('(A) câu của chiến dịch ĐANG CHẠY luôn vào kế hoạch — kể cả tờ TU LUYỆN / bài chưa tick', () => {
-  it('lớp CHƯA tick bài, chiến dịch giao tay trên tờ TU LUYỆN: mọi câu chiến dịch vào `cau` (nguon chien_dich, cd); câu TU LUYỆN NGOÀI chiến dịch vẫn bị lọc', async () => {
+  it('lớp CHƯA tick bài, chiến dịch giao tay trên tờ TU LUYỆN: mọi câu chiến dịch vào `cau` (nguon chien_dich, cd); câu TU LUYỆN NGOÀI chiến dịch: nợ câu SAI vào, câu em chưa sai không vào', async () => {
     const k = dungKho()
-    await lam(k.env, 'S1', 'KHO-C-0', lucVn('2026-10-02'), false) // nợ TU LUYỆN ngoài mọi chiến dịch ⇒ vẫn không vào kế hoạch (luật OMNI 3 giữ nguyên)
+    // 07/10 (thầy duyệt, việc 14d): em SAI câu TU LUYỆN ngoài mọi chiến dịch ⇒ NỢ ⇒ vào kế hoạch (trước 07/10 bộ lọc OMNI 3 loại luôn — xem tests/omni-3-cau-sai-tu-luyen-0710.test.ts)
+    await lam(k.env, 'S1', 'KHO-C-0', lucVn('2026-10-02'), false)
     const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
     expect(hs.chienDich?.id).toBe('CDT')
     const cd = hs.cau.filter((c) => c.nguon === 'chien_dich')
     expect(cd).toHaveLength(18)
     expect(cd.every((c) => c.cd === 'CDT')).toBe(true)
-    expect(hs.cau.some((c) => c.qid === 'KHO-C-0')).toBe(false)
+    expect(hs.cau.find((c) => c.qid === 'KHO-C-0')?.nguon).toBe('no_cu')
+    expect(hs.cau.filter((c) => c.qid.startsWith('KHO-C-')).map((c) => c.qid)).toEqual(['KHO-C-0']) // câu KHO-C em chưa sai: không vào
     expect(hs.tt.has('KHO-C-0') && hs.meta.has('KHO-C-0')).toBe(true) // vẫn có trạng thái để "Câu đã làm" hiện đủ
   })
-  it('lớp ĐÃ tick bài khác (phạm vi có DH-B1): câu chiến dịch TU LUYỆN vẫn vào; câu bài chưa tick ngoài chiến dịch vẫn loại', async () => {
+  it('lớp ĐÃ tick bài khác (phạm vi có DH-B1): câu chiến dịch TU LUYỆN vẫn vào; nợ câu SAI tờ TU LUYỆN vào; câu bài chưa tick ngoài chiến dịch vẫn loại', async () => {
     const k = dungKho()
     gia.phamVi = {
       lop: '12A1', maDe: new Set(['DH-B1']), baiTheoMaDe: new Map([['DH-B1', { khoaBai: 'DH-B1', tenBai: 'Bài 1', viTri: 1 }]]),
       baiDaTick: [{ khoaBai: 'DH-B1', tenBai: 'Bài 1', viTri: 1, chienDichId: null, tickLuc: '2026-10-01T01:00:00.000Z' }],
     }
     await lam(k.env, 'S1', 'KHO-C-1', lucVn('2026-10-02'), false)
+    await lam(k.env, 'S1', 'DH-B3-1', lucVn('2026-10-02'), false) // tờ DẠY HỌC của bài CHƯA tick (DH-B3): em sai vẫn không vào
     const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
     expect(hs.cau.filter((c) => c.nguon === 'chien_dich')).toHaveLength(18)
-    expect(hs.cau.some((c) => c.qid === 'KHO-C-1')).toBe(false)
+    expect(hs.cau.find((c) => c.qid === 'KHO-C-1')?.nguon).toBe('no_cu')
+    expect(hs.cau.some((c) => c.qid === 'DH-B3-1')).toBe(false)
   })
   it('kế hoạch hôm nay có câu của chiến dịch; mọi câu trong kế hoạch thuộc chiến dịch', async () => {
     const k = dungKho()

@@ -674,7 +674,8 @@ async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangCh
  *    `chienDich` = chiến dịch hạn gần nhất, `chienDichHet` = tất cả;
  *  - LỌC PHẠM VI: câu không có tờ nào DẠY HỌC (thư mục `de_kho_thu_muc`, luật lùi "DH-") — hoặc, khi lớp đã tick bài, không có tờ DẠY HỌC nào trong phạm
  *    vi đã dạy — KHÔNG vào `cau` (vẫn ở `meta`/`tt` để "Câu đã làm" hiện đủ). Không bao giờ có câu của bài chưa tick trong kế hoạch — TRỪ câu của chiến dịch
- *    ĐANG CHẠY (thầy giao thẳng, 06/10: chiến dịch trên tờ TU LUYỆN từng bị lọc hết ⇒ kế hoạch trống) luôn vào kế hoạch;
+ *    ĐANG CHẠY (thầy giao thẳng, 06/10: chiến dịch trên tờ TU LUYỆN từng bị lọc hết ⇒ kế hoạch trống) luôn vào kế hoạch; và (thầy duyệt 07/10, việc 14d) NỢ câu SAI mà câu
+ *    CHỈ ở tờ TU LUYỆN (không tờ DẠY HỌC nào chứa) cũng vào kế hoạch — bộ lọc vẫn áp cho duy trì, nợ chiến dịch cũ không có lịch sử sai, tờ DẠY HỌC bài chưa tick;
  *  - ÔN BÀI CŨ: `onBaiCu` (xem HoSo2), `omni` = { bat, cheDoCho, onBaiCuSo }.
  * CẨN THẬN (a) (omni-can-than.ts, đặc tả 4.6; chỉ-thêm): `canThanSom` = nơi gọi ĐÃ có hồ sơ OMNI (lúc LẬP kế hoạch ngày — `layKeHoachChot`) cho biết em có `canThan`
  * không; ĐÚNG ⇒ mốc kiểm duy trì của luật đóng lỗi × 0,7. Vắng / OMNI tắt / sai ⇒ mốc y hệt hôm nay (KHÔNG đọc thêm D1 ở đây).
@@ -726,6 +727,9 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   // (lần sai sớm nhất ≥ mốc giao của em; không chặn trên — lượt đang làm dở sau khi huỷ cũng không thành nợ) KHÔNG quay lại làm nợ. Nợ có từ trước chiến dịch, nợ do chiến dịch
   // khác (nguồn chiến dịch xét trước) / ca thi / Lên bảng / đầu giờ (nguồn 2–3) giữ nguyên; sổ làm bài không đụng. Kết thúc (`dong`) KHÁC huỷ: nợ vẫn theo em.
   const daThuHoi = (q: string, luc: string): boolean => daHuy.some((c) => c.qids.has(q) && luc >= mocTinhCua(c.taoLuc, mocThem.get(c.id)))
+  // 07/10 (thầy duyệt "Làm tất 123", việc 14d): câu có LỊCH SỬ SAI thật — ca đã công bố, Lên bảng / đầu giờ, tự làm từ 29/09 (lần sai thuộc chiến dịch đã huỷ KHÔNG tính: thu hồi).
+  // Dùng ở bộ lọc phạm vi bên dưới: NỢ câu sai chỉ ở kho TU LUYỆN vẫn vào kế hoạch ("mọi câu sai phải được xử lý triệt để", thầy 02/10).
+  const coLichSuSai = (q: string): boolean => qidSaiCa.has(q) || qidSaiLop.has(q) || (qidSaiMoiKenh.has(q) && !daThuHoi(q, qidSaiMoiKenh.get(q)!))
   for (const [q, luc] of qidSaiMoiKenh) {
     if (nguonTheoQid.has(q) || daThuHoi(q, luc)) continue
     nguonTheoQid.set(q, 'cu')
@@ -747,6 +751,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const [meta, lanLam, moc, boTro, phamViOn] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? [], maDeCua), docLanLam(env, sbd, qids, tuLuc, ben), docMocDayLai(env, sbd), docBoTroLoi(env, [...qidSaiMoiKenh.keys()].filter((q) => nguonTheoQid.has(q))), onBaiCuP])
   // OMNI 3 — LỌC PHẠM VI: câu được vào kế hoạch khi có ÍT NHẤT một tờ DẠY HỌC (và, khi lớp đã tick bài, tờ ấy thuộc phạm vi đã dạy).
   let trongPhamVi: ((qid: string) => boolean) | null = null
+  // 07/10 (việc 14d): câu CHỈ ở tờ TU LUYỆN (không tờ DẠY HỌC nào chứa nó). Tờ DẠY HỌC của bài CHƯA tick KHÔNG thuộc nhóm này — bộ lọc "bài chưa tick" giữ nguyên.
+  let chiOTuLuyen: ((qid: string) => boolean) | null = null
   if (omni && maDeCua) {
     const thuMuc = new Map<string, ThuMuc>(phamViOn?.thuMuc ?? [])
     const can = new Set<string>()
@@ -754,6 +760,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     if (can.size) for (const [k, v] of await thuMucAnToan(env, [...can])) thuMuc.set(k, v)
     // `thuMucAnToan` trả đủ mọi mã đã hỏi (thiếu dòng ⇒ luật lùi "DH-"); vắng khoá (không thể xảy ra) ⇒ coi là ngoài phạm vi.
     trongPhamVi = (q) => [...(maDeCua.get(q) ?? [])].some((m) => thuMuc.get(m) === 'DAY_HOC' && (!phamVi || phamVi.maDe.has(m)))
+    chiOTuLuyen = (q) => { const tap = maDeCua.get(q); return !!tap && tap.size > 0 && ![...tap].some((m) => thuMuc.get(m) === 'DAY_HOC') }
   }
   const theoQid = new Map<string, LanLam[]>()
   // Thêm tại chỗ: tránh sao chép cả lịch sử O(n²) cho câu đã luyện nhiều lần.
@@ -801,7 +808,9 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     if (!nguon) continue // câu chiến dịch cũ em chưa từng gặp: không kéo sang
     // OMNI 3 — ngoài phạm vi / chỉ ở TU LUYỆN: vẫn trong meta/tt, KHÔNG vào kế hoạch. NGOẠI LỆ (thầy 06/10 21:03, chiến dịch giao tay trên 16 tờ TU LUYỆN báo "hôm nay chưa có câu nào"):
     // câu của chiến dịch ĐANG CHẠY là câu THẦY GIAO THẲNG ⇒ luôn vào kế hoạch, bất kể thư mục / bài đã tick (bộ lọc chỉ áp cho nợ cũ, duy trì, ca sai, ôn bài cũ).
-    if (nguon !== 'chien_dich' && trongPhamVi && !trongPhamVi(qid)) continue
+    // NGOẠI LỆ 2 (thầy duyệt 07/10, việc 14d "câu SAI ở ca thi / Lên bảng / tự làm thuộc kho TU LUYỆN không vào Đảo/Đoàn"): NỢ (câu em sai, chưa đóng lỗi) mà câu CHỈ ở tờ TU LUYỆN
+    // vẫn vào kế hoạch. Giữ nguyên bộ lọc cho: duy trì (câu đã vững), nợ chiến dịch cũ KHÔNG có lịch sử sai, câu của tờ DẠY HỌC bài chưa tick, ôn bài cũ và câu mới.
+    if (nguon !== 'chien_dich' && trongPhamVi && !trongPhamVi(qid) && !(nguon === 'no_cu' && coLichSuSai(qid) && chiOTuLuyen?.(qid))) continue
     const cd = nguon === 'chien_dich' ? cdTheoQid.get(qid) : undefined
     cau.push({ qid, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon, ...(m.sao ? { sao: m.sao } : {}), ...(cd ? { cd } : {}) })
   }
