@@ -325,3 +325,52 @@ Phát hiện lúc làm 13c: ~11:00Z (18:00 giờ VN, ngay sau ca thi lớp 12) `
 - Dữ liệu cùng cỡ: sổ 735 dòng (12121212) so với 684 (11000); không bảng nào trong 91 bảng có cột sbd lệch cả nghìn lần. 12121212 không thuộc lớp nào (`hoc_sinh.lop` rỗng) ⇒ không đi qua bước prior lớp; ảnh chụp OMNI đêm phủ 261/261 em (lớp 12: 126 · lớp 11: 88 · lớp 10: 46 · không lớp: 1) nên cũng không có bước tính lại hàng loạt.
 - Máy chủ sống sau đợt 11:30Z: 12121212 trả HTTP 200 trong 6,1–6,7 s (11000: 1,8 s), `ok:true`, 102 câu trong hồ sơ — KHÔNG treo.
 Kết luận: lần treo 11:00Z không tái hiện được trên mã hiện tại. Giả thuyết còn lại (chưa kiểm chứng): (a) tắc tạm thời ở D1 / Worker đúng lúc ca thi lớp 12 ghi nặng (em 11000 cùng khoảng ấy vẫn nhanh nên không phải nghẽn chung); (b) lỗi của mã TRƯỚC 11:30Z đã mất khi đợt 6b + 6c' đổi đường đọc chiến dịch / lập kế hoạch; (c) khác biệt môi trường Worker (R2 / Durable Object / D1 sessions) mà bộ đo Node không có. KHÔNG sửa mã vì chưa có nguyên nhân gốc. Nếu tái diễn: chạy ngay workflow `kiem-em-treo-0610` (bấm tay) + xem `wrangler tail`; khi cần thì thêm bộ đếm giờ từng bước vào `chanDoanEm`.
+
+## 14. Đợt 7 (06/10 tối) — ca "Kiểm chứng câu đã đúng": câu em đã đúng được THAY bằng câu thay số / câu cùng dạng, ghi rõ nhãn
+
+Thầy 06/10 (~19:30 giờ VN): *"Toi muốn mở ca thi chọn câu đúng được thay bằng câu thay số của câu đúng đó (ghi rõ câu này thay số của câu em đã đúng ở...) Các câu lý thuyết thì bạn xử lý theo cách thay thế câu lý thuyết và cũng ghi rõ nhé."*
+**Giả định (chưa hỏi lại thầy):** "ca thi chọn câu đúng" = chế độ đề **Kiểm chứng câu đã đúng** (PR #133); "cách thay thế câu lý thuyết" = **câu anh em** của thang làm lại câu sai (cùng dạng, cùng mức hoặc kề, khác nhóm nội dung, đúng khối, em chưa gặp — `DE-XUAT-LAM-LAI-CAU-SAI-0510.md` bậc 2). Hợp đồng đầy đủ: `docs/hop-dong-ca-da-dung-thay-so-0610.md`.
+
+### 14a. Làm gì
+- **Câu tính toán** (Phần I/III) ⇒ bản ĐỔI SỐ của chính câu đã đúng: song sinh `<gốc>~ss<i>` (ưu tiên bản em CHƯA làm) → biến thể bằng mã `<gốc>~bt<k>` (dạng có bộ sinh, đúng khối). Nhãn trên máy em: **"Câu này thay số của câu em đã đúng ở <nơi · dd/mm · mức>"**.
+- **Câu lý thuyết, Phần II, câu chưa có bản đổi số** ⇒ **câu anh em**. Nhãn: **"Câu lý thuyết này thay cho câu em đã đúng ở … (cùng dạng bài, nội dung khác)"** (lý thuyết) / **"Câu này thay cho câu em đã đúng ở … (cùng dạng bài, nội dung khác)"** (còn lại). Câu lý thuyết KHÔNG BAO GIỜ thay số.
+- **Không thay được** (máy chủ cũ, công tắc `cau_hinh.da_dung_thay_so` = {"bat":false}, hết câu, nội dung thiếu ở máy thầy, không nối được kho ca) ⇒ **giữ nguyên câu như trước** ("Em đã làm đúng: …"), ca không bao giờ bị chặn, và nói ra ở bảng Xem trước phân bổ + cảnh báo lúc Bắt đầu.
+- Máy chủ: lệnh mới `/ca/cau-thay-so` (chỉ đọc, ≤ 2 em/lượt) = `server/src/cau-thay-so.ts` + `chonAnhEmChoCaDaDung` (cau-anh-em.ts, dùng lại ĐÚNG bộ chọn câu anh em); em vào muộn (`/vao-thi`) thay bằng câu đổi số ĐÃ có sẵn trong kho ca. Máy thầy: chạy thử + chốt có bước thay, câu thay nối vào kho ca (kho đáp án) như câu song sinh của rút đề v2; Bắt đầu giữa lúc chạy thử còn dở thì ĐỢI lượt đó (không chạy lại cả lớp). Giao diện: khối "Thay câu đã làm đúng: N câu thay số · M câu thay bằng câu cùng dạng (trong đó L câu lý thuyết) · K câu giữ nguyên văn" + tiến độ + báo cáo cuối bài; từ chuẩn thêm vào `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`.
+- Không khoá mới trong gói đề: nhãn câu thay là CẢ CÂU nằm trong `daDung[sbd][qid]` ⇒ máy em đang cache bản cũ vẫn in được ("Em đã làm đúng: Câu này thay số của …"); `daDungCuaEm` giữ nhãn tới 260 ký tự. Không migration, không đổi bảng.
+
+### 14b. Đo thật trên D1 (chỉ đọc, chỉ đếm; workflow `do-phu-thay-so-0610`, run 37471402499, 12 em mẫu, 335 câu)
+**Thay số 99 (29,6 %: song sinh 97 · biến thể 2) · thay bằng câu cùng dạng 229 (68,4 %) · giữ nguyên 7 (2,1 %).** Lý thuyết (ước lượng bằng `dangCua`) 211 câu → cùng dạng 210; tính toán 124 câu → thay số 99 (80 %). Phần III: 65/72 thay số. **Tải:** mỗi em trung vị 143 truy vấn D1, lớn nhất 249 ⇒ giảm trần lượt gọi từ 4 xuống **2 em** (≈ 500 truy vấn, dưới trần 1000/lượt của Worker; 4 em có thể chạm 996).
+
+### 14c. Kiểm
+- Test mới 47: `tests/che-do-da-dung-thay-so-0610.test.ts` (31 — lõi thuần + máy chủ trên D1 sqlite thật qua Worker: song sinh, biến thể, câu anh em, luật khối, câu bù, công tắc, em vào muộn) + `tests/che-do-da-dung-thay-so-0610-man.test.tsx` (16 — máy thầy, dự phòng, bảng, báo cáo, nhãn màn thi). **Thử đột biến 9 luật** (lý thuyết không thay số · câu bù không bị thay · nhận nhãn thay · em vào muộn bỏ lý thuyết · ưu tiên bản chưa gặp · công tắc · chặn trùng qid · câu anh em không trùng đề · kiểm id/phần của bản thay): đều có test bắt (lần đầu sót một luật — kiểm id/phần lệch — đã thêm test, bắt được).
+- **Toàn bộ vitest (nhánh cuối `6b6df570`): 14 298 test (= 14 251 + 47 mới), 109 đỏ / 62 tệp — ĐÚNG tập tên đỏ của main sạch `1ea25768` (14 251 test, 109 đỏ, 62 tệp): 0 tên đỏ mới, 0 tên đỏ biến mất** (lần chạy đầu thấy thêm 2 tên: một test của chính tôi do tôi sửa tệp giữa lúc chạy, một test hộp thoại chập chờn dưới tải — cả hai xanh khi chạy lại).
+- tsc app + server 0 lỗi · check:mau sạch · kiem:mau-giu 0 vi phạm · build 1 phút 36 · kiem:sw 13/13 · Worker dry-run 3 298 KiB (+13 KiB).
+
+## 15. Đợt 8 (06/10 tối) — chiến dịch giao tay trên tờ TU LUYỆN báo "hôm nay chưa có câu nào" (LỖI DO BẢN OMNI 3 SÁNG NAY — đã sửa)
+
+Thầy 06/10 ~21:05 (kèm ảnh app em lúc 21:03: "Hôm nay chưa có câu nào trong kế hoạch của em"): *"#cd22009otTH chiến dịch này đang chạy nhưng trên app học sinh báo hôm nay em chưa có câu nào"*.
+
+### 15a. Nguyên nhân gốc (đo trên D1 THẬT, chỉ đọc, chỉ in số đếm — `scripts/do-ke-hoach-trong-0610.ts`, workflow `do-ke-hoach-trong-0610`, runs 37477003382 · 37478144472 · 37480203916)
+- Chiến dịch: 14 em · 441 câu · lớp "12 - Nhóm 10 điểm" · hạn 12/10 · thể lực 91/ngày · giao 29/09 · đang chạy. 441 câu thuộc **16 tờ đều ở thư mục TU LUYỆN** (0 tờ DẠY HỌC, 0 mã "DH-"; bảng `de_kho_thu_muc` có đủ 16/16 dòng); lớp CHƯA tick bài nào (`bai_da_day` 0 dòng ⇒ phạm vi null).
+- Bộ lọc phạm vi OMNI 3 trong `docHoSo2` (`trongPhamVi`: "chỉ câu có ≥ 1 tờ DẠY HỌC") loại CẢ 441 câu khỏi `hs.cau` — kể cả câu chiến dịch thầy giao thẳng ⇒ không còn câu nào để lập kế hoạch ⇒ kế hoạch chốt TRỐNG (12/12 em mẫu: hồ sơ 0 câu chiến dịch, lập lại bây giờ cũng 0). Kế hoạch ngày chỉ chốt MỘT lần và chỉ lập lại khi TẬP chiến dịch đổi ⇒ kế hoạch trống ĐỨNG NGUYÊN CẢ NGÀY.
+- Dòng thời gian (kế hoạch chốt của 14 em): 29/09–05/10 mọi em đều có câu (trung bình 51–91 câu/ngày); **06/10: 11 em đã mở app, 10 em kế hoạch TRỐNG** — đúng từ lúc bản OMNI 3 lên sáng nay và OMNI bật cho lớp (bảng phụ `srs2_ke_hoach_omni` chỉ có dòng từ 06/10).
+- Bán kính: 4 chiến dịch đang chạy; 3 chiến dịch còn lại (111 + 87 + 43 em) toàn câu DẠY HỌC, kế hoạch hôm nay đều có câu (92/92, 77/77, 32/32) ⇒ CHỈ MỘT chiến dịch / 14 em bị.
+- Khoảng hở của test OMNI 3: chỉ có kịch bản chiến dịch trên tờ DẠY HỌC của bài đã tick; chưa có chiến dịch giao tay trên tờ TU LUYỆN.
+
+### 15b. Sửa (`server/src/srs2-d1.ts`, không migration, không đổi bảng)
+- **(A) `docHoSo2`**: câu nguồn `chien_dich` (chiến dịch ĐANG CHẠY — câu THẦY GIAO THẲNG) miễn bộ lọc phạm vi / thư mục: luôn vào kế hoạch dù tờ thuộc TU LUYỆN hay bài chưa tick. Nợ cũ, duy trì, câu sai ca / Lên bảng, ôn bài cũ vẫn lọc đúng đặc tả OMNI 3; chiến dịch ĐÃ ĐÓNG cũng không được miễn.
+- **(B) `layKeHoachChotOmni`**: kế hoạch đã chốt TRỐNG (không câu nào, kể cả đã làm) mà hồ sơ nay có câu chiến dịch và kế hoạch lập lại (tuỳ chọn gốc, thuần) ra ≥ 1 câu ⇒ LẬP LẠI bằng đúng đường "tập chiến dịch đổi" sẵn có (giữ câu đã làm, so-và-ghi `ghiKeHoachNeuChuaDoi`). Tự chữa lúc em mở app — 10 em đã bị chốt trống sáng nay không phải chờ sang mai. Đánh giá + thử tối đa 1 lần / 3 phút / em / isolate (`DemTTL`), nên em HẾT câu thật (chiến dịch đã vững hết) không bị tính lại mỗi lượt gọi.
+
+### 15c. Kiểm
+- Test mới `tests/omni-3-chien-dich-tu-luyen-0610.test.ts` (7, D1 sqlite thật qua Worker): câu chiến dịch TU LUYỆN vào kế hoạch khi lớp chưa tick / đã tick bài khác; câu TU LUYỆN NGOÀI chiến dịch và chiến dịch đã đóng vẫn bị lọc; chốt trống từ sáng ⇒ lập lại (dòng chốt + bảng phụ ghi đúng, lần gọi sau giữ nguyên); em hết câu thật ⇒ không ghi D1 (kể cả sau 5 phút); lập lại ra trống nữa ⇒ chỉ thử lại sau 3 phút. **Thử đột biến 5 luật, cả 5 có test bắt** (bỏ miễn lọc ⇒ 6 test đỏ; bỏ nhánh lập lại ⇒ 2; bỏ bộ nhớ 3 phút ⇒ 1; luôn coi lập lại được ⇒ 1; bỏ điều kiện "chốt trống" ⇒ 1).
+- 51 tệp test chạm kế hoạch/hồ sơ (`docHoSo2` · `layKeHoachHomNay` · `sanh2` · `tamHoanCauKhoa` · `lapKeHoachNgay`): 746 xanh, 11 đỏ — ĐÚNG 11 test đỏ ấy cũng đỏ trên main sạch db38a524 và trên main cũ 1ea25768 (`bi-a-may-chu` 9 · `mom-qid-chong-trung-1909` 1 · `sua-chien-dich-2809` 1): không do đợt này.
+- tsc app + server 0 lỗi.
+
+### 15d. Kiểm lại trên D1 THẬT với mã đã sửa (workflow chạy mã của nhánh, chỉ đọc, chỉ đếm — run 37480739247, 14/14 em của chiến dịch)
+Hồ sơ em: **câu chiến dịch 439** (trước sửa: 0) · câu mới 95–262 · đến lịch ôn 20–65 · kế hoạch lập lại: **Đảo 30–91 · Đoàn 0–44** (trước: 0 · 0), 14/14 em có câu (trần 91 = thể lực chiến dịch). Dòng chốt hôm nay: 10 em TRỐNG + 1 em có 82 câu (mở app trước khi OMNI lên) + 3 em chưa mở ⇒ sau phát hành 10 em kia tự lập lại khi mở app.
+
+### 15e. Phát hành
+PR `dodaihoc4869/omr-app#168` (gộp cùng đợt 7 của §14) → main. Lùi: `git revert -m 1 <mã commit gộp>`. Mã commit gộp, run Actions, mã Pages / Worker, kết quả kiểm sau phát hành: xem dòng cuối "Nhật ký" của `DIEU-PHOI.md`.
+
+### 15f. Việc ghi nhận, CHƯA làm (hỏi thầy)
+Câu SAI ở ca thi / Lên bảng / tự làm thuộc kho TU LUYỆN cũng không vào kế hoạch Đảo/Đoàn khi OMNI bật (đúng đặc tả OMNI 3: "game chỉ câu DẠY HỌC") — trái nguyên tắc 02/10 "mọi câu sai phải được xử lý triệt để". Chờ thầy chọn: giữ như đặc tả hay cho câu sai kho TU LUYỆN vào nợ như trước OMNI.
