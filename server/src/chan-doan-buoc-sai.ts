@@ -29,7 +29,7 @@ import { khoiCuaCau, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { khoiDaLocCua } from './chan-khac-khoi'
-import { TEN_NEN, chamCauNen } from './thang-tu-go'
+import { TEN_NEN, chamCauNen, nenHopKhoi } from './thang-tu-go'
 import { coBoSinh as coBoSinhNen, sinhCauNen, soCauKhongGian, type CauNenSinh } from './omni-cau-nen-sinh'
 import { hoSoOmniEm, qCuaCau } from './omni-d1'
 import { THAM_SO_OMNI, type QCau } from './omni-kieu'
@@ -202,7 +202,7 @@ export function taoCauChanDoan(du: DuLieuChanDoan, goc: string, q: PrivateQuesti
   const lop = (q as unknown as Row).lop
   const qc = du.q.get(goc)
   const kn = qc ? [...new Set([...qc.vkn, ...(qc.vknY ?? []).flat()])] : []
-  const nen = kn.filter((k) => k.startsWith('nen:') && !daDung.has(k)).filter((k) => { const nh = k.slice(4); return NHAN_HOP_LE.test(nh) && coBoSinhNen(nh) && soCauKhongGian(nh) > 0 })
+  const nen = kn.filter((k) => k.startsWith('nen:') && !daDung.has(k)).filter((k) => { const nh = k.slice(4); return NHAN_HOP_LE.test(nh) && coBoSinhNen(nh) && soCauKhongGian(nh) > 0 && nenHopKhoi(nh, khoiCuaCau(q)) })
   if (nen.length) {
     const k = chonBuocTuKhai(du.khai, nen, pCua) ?? [...nen].sort((a, b) => pCua(a) - pCua(b) || (a < b ? -1 : a > b ? 1 : 0))[0]!
     const nhan = k.slice(4)
