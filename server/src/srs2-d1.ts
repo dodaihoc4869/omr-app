@@ -673,7 +673,8 @@ async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangCh
  *  - đọc MỌI chiến dịch đang chạy (hạn gần trước): câu mỗi chiến dịch mang hạn + mốc tính lần làm của CHÍNH nó, nguồn chien_dich, `cd`;
  *    `chienDich` = chiến dịch hạn gần nhất, `chienDichHet` = tất cả;
  *  - LỌC PHẠM VI: câu không có tờ nào DẠY HỌC (thư mục `de_kho_thu_muc`, luật lùi "DH-") — hoặc, khi lớp đã tick bài, không có tờ DẠY HỌC nào trong phạm
- *    vi đã dạy — KHÔNG vào `cau` (vẫn ở `meta`/`tt` để "Câu đã làm" hiện đủ). Không bao giờ có câu của bài chưa tick trong kế hoạch;
+ *    vi đã dạy — KHÔNG vào `cau` (vẫn ở `meta`/`tt` để "Câu đã làm" hiện đủ). Không bao giờ có câu của bài chưa tick trong kế hoạch — TRỪ câu của chiến dịch
+ *    ĐANG CHẠY (thầy giao thẳng, 06/10: chiến dịch trên tờ TU LUYỆN từng bị lọc hết ⇒ kế hoạch trống) luôn vào kế hoạch;
  *  - ÔN BÀI CŨ: `onBaiCu` (xem HoSo2), `omni` = { bat, cheDoCho, onBaiCuSo }.
  * CẨN THẬN (a) (omni-can-than.ts, đặc tả 4.6; chỉ-thêm): `canThanSom` = nơi gọi ĐÃ có hồ sơ OMNI (lúc LẬP kế hoạch ngày — `layKeHoachChot`) cho biết em có `canThan`
  * không; ĐÚNG ⇒ mốc kiểm duy trì của luật đóng lỗi × 0,7. Vắng / OMNI tắt / sai ⇒ mốc y hệt hôm nay (KHÔNG đọc thêm D1 ở đây).
@@ -798,7 +799,9 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
     if (!nguon) continue // câu chiến dịch cũ em chưa từng gặp: không kéo sang
-    if (trongPhamVi && !trongPhamVi(qid)) continue // OMNI 3 — ngoài phạm vi / chỉ ở TU LUYỆN: vẫn trong meta/tt, KHÔNG vào kế hoạch
+    // OMNI 3 — ngoài phạm vi / chỉ ở TU LUYỆN: vẫn trong meta/tt, KHÔNG vào kế hoạch. NGOẠI LỆ (thầy 06/10 21:03, chiến dịch giao tay trên 16 tờ TU LUYỆN báo "hôm nay chưa có câu nào"):
+    // câu của chiến dịch ĐANG CHẠY là câu THẦY GIAO THẲNG ⇒ luôn vào kế hoạch, bất kể thư mục / bài đã tick (bộ lọc chỉ áp cho nợ cũ, duy trì, ca sai, ôn bài cũ).
+    if (nguon !== 'chien_dich' && trongPhamVi && !trongPhamVi(qid)) continue
     const cd = nguon === 'chien_dich' ? cdTheoQid.get(qid) : undefined
     cau.push({ qid, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon, ...(m.sao ? { sao: m.sao } : {}), ...(cd ? { cd } : {}) })
   }
@@ -1355,6 +1358,21 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
   }
 }
 /**
+ * 06/10 21:03 — KẾ HOẠCH ĐÃ CHỐT TRỐNG nay lập được: thầy báo chiến dịch đang chạy mà em thấy "Hôm nay chưa có câu nào". Nguyên nhân: bộ lọc phạm vi OMNI từng loại hết câu của
+ * chiến dịch giao tay trên tờ TU LUYỆN ⇒ hồ sơ không có câu ⇒ kế hoạch chốt TRỐNG và đứng nguyên cả ngày (chỉ đổi khi tập chiến dịch đổi). Hồ sơ nay đã có câu chiến dịch
+ * ⇒ chốt trống mà `lapKeHoachNgay` (tuỳ chọn gốc, thuần — không đọc D1) ra ≥ 1 câu thì LẬP LẠI một lần. Đánh giá + thử tối đa 1 lần / 3 phút / em / isolate
+ * (em hết câu thật — chiến dịch xong hết — không bị tính lại mỗi lượt gọi).
+ */
+const demLapLaiChotTrong = new DemTTL<true>(3 * 60_000, 2_000)
+function chotTrongLapDuoc(kh: Pick<KeHoachDaChot, 'dao' | 'doan'>, hoSo: HoSo2, sbd: string, ngay: string, nowMs: number): boolean {
+  if (kh.dao.length + kh.doan.length > 0 || !hoSo.cau.some((c) => c.nguon === 'chien_dich')) return false
+  const khoa = `${sbd}|${ngay}`
+  if (demLapLaiChotTrong.doc(khoa, nowMs)) return false
+  demLapLaiChotTrong.ghi(khoa, nowMs, true)
+  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChonGocOmni(hoSo, ngay))
+  return lap.dao.length + lap.doan.length > 0
+}
+/**
  * Kế hoạch HÔM NAY khi OMNI bật — cùng luật chốt của đường cũ (lập một lần, đọc lại; câu hỏng thay tại chỗ; ngày hạn bổ sung câu sai trong ngày), khác:
  * nhiều bài song song + ôn bài cũ + chế độ chờ (`tuyChonKeHoachOmni`); kế hoạch đã chốt mà TẬP chiến dịch đổi (thầy vừa tick bài / bài hết hạn) ⇒ lập lại
  * GIỮ câu đã làm (như đổi `chien_dich_id`), quota câu mới trừ phần đã làm theo TỪNG bài; tập + câu ôn bài cũ lưu ở `srs2_ke_hoach_omni`.
@@ -1370,7 +1388,7 @@ async function layKeHoachChotOmni(env: Env, sbd: string, nowMs: number, hoSo: Ho
     const onLuu = luu?.onBaiCu ?? []
     const tapLuu = luu?.chienDich ?? (kh.chienDichId ? [kh.chienDichId] : [])
     const onSaiLuat = kh.conDoan.some((k) => hoSo.tt.get(qidGoc(k))?.laMoi)
-    if (!cungTap(tapLuu, tapCd) || (kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat) {
+    if (!cungTap(tapLuu, tapCd) || (kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat || chotTrongLapDuoc(kh, hoSo, sbd, ngay, nowMs)) {
       const xongDao = kh.dao.filter((k) => !kh.conDao.includes(k))
       const xongDoan = kh.doan.filter((k) => !kh.conDoan.includes(k))
       const xong = new Set([...xongDao, ...xongDoan].map(qidGoc))
