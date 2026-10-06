@@ -70,6 +70,12 @@ Ba việc khi `canThan`:
 Ghi MỘT dòng bảng chỉ-thêm `omni_buoc_sai(sbd, qid, ngay, ma_vkn, luc)` (khoá chính `(sbd, qid, ngay)`; `qid` quy về câu GỐC; `ma` = mã bước trong `buocSai.lua` hoặc `chua_ro`). Gọi lại cùng câu cùng ngày giữ lựa chọn đầu (`daGhi:false`). KHÔNG chấm, KHÔNG ghi sổ học `su_kien_hoc`, không đổi P/EXP/Máu. OMNI tắt ⇒ `{ ok:false, error }`. Bảng tạo lúc chạy (`CREATE TABLE IF NOT EXISTS`), xếp GIỮ ở cả hai job reset.
 
 ### Câu nền của Trạm hồi phục: dùng NGUYÊN lệnh có sẵn `/hs/luyen-nen {token, nhan}` và `/hs/luyen-nen/nop {token, id, traLoi, qid}`.
+06/10: Trạm chọn tên lỗi / nhãn câu nền theo bước em ĐÃ TỰ KHAI (`omni_buoc_sai`, 14 ngày) nếu bước ấy thuộc vi kỹ năng của 3 câu sai; không có ⇒ như cũ (`omni-buoc-sai-uu-tien.ts`).
+
+### CHẨN ĐOÁN BƯỚC SAI trước lượt làm lại (06/10 — `server/src/chan-doan-buoc-sai.ts`, ghi chú `docs/chan-doan-buoc-sai-0610.md`)
+KHÔNG lệnh mới, KHÔNG trường mới xuống máy em: `start` (Đảo / chặng Đoàn) có thể trả MỘT câu chẩn đoán (câu thường, vai `on_lai`, qid `nen:sinh.<nhãn>.<số>` hoặc
+`nen:yds.<băm>.<stt>.<stt>`) ĐÚNG CHỖ lượt làm lại đầu tiên của câu lỗi; `answer` / `doan-nop` chấm như câu thường. Sổ: purpose `chan_doan`, raw `{tc, cd: 1}` (không phải
+lần làm của câu lỗi; là quan sát OMNI của bước nó kiểm); sai ⇒ một dòng `omni_buoc_sai`. Công tắc `cau_hinh` khoá `chan_doan_buoc_sai` (`{"bat":false}` ⇒ y hệt cũ).
 
 ## B. Giáo viên (sau cổng mã thầy)
 

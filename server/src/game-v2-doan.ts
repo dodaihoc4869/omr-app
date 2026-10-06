@@ -76,6 +76,7 @@ export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 /** `an` = dạng của câu này em ĐÃ KHẮC PHỤC XONG (ấn thạch sáng) → kỹ năng ở hiệp này là biến thể ấn (×1,25). */
 interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; phan?: string; mucDo?: string | null; an?: boolean; /** Nhãn nợ (Sổ nợ 29/09): "Sai 2 lần · Ca 26/09". */ nhanNo?: string; goiY?: { gach?: string[]; cotLoi?: string }
   /** 05/10 (cau-anh-em.ts): hoán vị BẢN XÁO của câu làm lại (chỉ máy chủ; `answer` chấm theo đúng hoán vị này qua ref phiên). */ xt?: number[]
+  /** 06/10 (2c): phiên bản bộ sinh của biến thể `~bt` lúc phát (chỉ máy chủ) — hiển thị sinh lại đúng câu đã phát. Vắng ⇒ phiên bản 1. */ btv?: number
   /** M6 (23/09): số từ của đề + phương án/ý, và có hình/bảng hay không — nguồn cho THỜI GIAN ĐỌC
    *  của hạn hiệp (`giayDocThem` trong doan-core). Thiếu ⇒ hạn y hệt bản cũ. */
   soTu?: number; coHinh?: boolean }
@@ -217,7 +218,7 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
 }
 
 // ───────────────────────── Câu hỏi ─────────────────────────
-async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version' | 'xt'>): Promise<PrivateQuestion | null> {
+async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version' | 'xt' | 'btv'>): Promise<PrivateQuestion | null> {
   // 29/09: chỉ mục lệch nguồn ⇒ tự đồng bộ đúng tờ rồi tra lại (version tất định: câu không đổi vẫn khớp); null = câu đổi đề/đáp án hoặc đã rút.
   const q = await docCauTheoRef(env, ref)
   // CẤM RÚT TỰ LUẬN (21/09): phòng tạo trước lệnh cấm còn ghim câu tự luận ⇒ coi như câu đã rút khỏi kho (đường `rut: true` sẵn có, hiệp không bị tính sai).
@@ -253,7 +254,7 @@ async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Prom
   } catch { coHoSo = false }
   const nhan = (q: Question): NhanCau => !coHoSo ? 'vua_suc' : toiHan.has(q.qid) ? 'toi_han_on' : q.dang && dangYeu.has(q.dang) ? 'dang_yeu' : daGap.has(q.qid) ? 'vua_suc' : 'cau_moi'
   const thuTu: NhanCau[] = ['toi_han_on', 'dang_yeu', 'cau_moi', 'vua_suc']
-  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q), ...((q as { goiY?: CauRef['goiY'] }).goiY ? { goiY: (q as { goiY?: CauRef['goiY'] }).goiY } : {}), ...((q as { nhanNo?: string }).nhanNo ? { nhanNo: (q as { nhanNo?: string }).nhanNo } : {}), ...((q as { xt?: number[] }).xt ? { xt: (q as { xt?: number[] }).xt } : {}) } })) // `xt` (05/10): hoán vị bản xáo từ `startDoan2` nội bộ
+  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q), ...((q as { goiY?: CauRef['goiY'] }).goiY ? { goiY: (q as { goiY?: CauRef['goiY'] }).goiY } : {}), ...((q as { nhanNo?: string }).nhanNo ? { nhanNo: (q as { nhanNo?: string }).nhanNo } : {}), ...((q as { xt?: number[] }).xt ? { xt: (q as { xt?: number[] }).xt } : {}), ...((q as { btv?: number }).btv !== undefined ? { btv: (q as { btv?: number }).btv } : {}) } })) // `xt` (05/10): hoán vị bản xáo từ `startDoan2` nội bộ; `btv` (06/10, 2c): phiên bản bộ sinh `~bt`
     .sort((a, b) => thuTu.indexOf(a.ref.nhan) - thuTu.indexOf(b.ref.nhan) || a.i - b.i).map(x => x.ref)
 }
 

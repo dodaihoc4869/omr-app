@@ -13,7 +13,7 @@ import { NUT_NOP_DE_THU } from '../src/game/than-thu-v2/dao2/DeThu'
 import { learningBattle } from '../src/game/than-thu-v2/learning-battle'
 import { luyenNen } from '../src/lib/loi-giai-api'
 import { KHOA_OMNI_DAO, docKetQuaOmni, thanOmniTraLoi } from '../src/lib/omni-hs'
-import { CHIP_CHUA_CHAC, CHU_CHAC_MA_SAI, CHU_LUOT, GOI_Y_CHIP_CHUA_CHAC, TIEU_DE_TRAM, chuTram, diemChu } from '../src/lib/omni-chu'
+import { BONG_CHUA_CHAC, CHIP_CHUA_CHAC, CHU_CHAC_MA_SAI, CHU_LUOT, GOI_Y_CHIP_CHUA_CHAC, TIEU_DE_TRAM, chuTram, diemChu } from '../src/lib/omni-chu'
 import type { CauDao2 } from '../src/game/than-thu-v2/dao2/dao2-core'
 import type { DaoKetQua, DaoProfile } from '../src/game/than-thu-v2/dao/kieu'
 
@@ -99,8 +99,11 @@ describe('Đảo 2.0 · OMNI bật: msLam + chip Chưa chắc', () => {
     await screen.findByText(/^ẢI 2\/2/)
     const chip2 = screen.getByRole('switch', { name: CHIP_CHUA_CHAC }) as HTMLInputElement
     expect(chip2.checked).toBe(false) // đặt lại mỗi câu
-    fireEvent.click(chip2); fireEvent.click(chip2) // bật rồi tắt: cùng ngày ⇒ không hiện gợi ý lần hai
+    fireEvent.click(chip2) // bật: cùng ngày ⇒ không hiện gợi ý lần hai, nhưng có DÒNG TRẠNG THÁI (thầy 06/10: "bấm nó chưa phản hồi") — màu hổ phách + dòng này
     expect(screen.queryByText(GOI_Y_CHIP_CHUA_CHAC)).toBeNull()
+    expect(m.container.querySelector('[data-khoi="dang-chua-chac"]')?.textContent).toBe(BONG_CHUA_CHAC)
+    fireEvent.click(chip2) // tắt: dòng trạng thái mất
+    expect(m.container.querySelector('[data-khoi="dang-chua-chac"]')).toBeNull()
     chot()
     await screen.findByRole('button', { name: 'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN' })
     const b2 = m.than('answer', 1)!

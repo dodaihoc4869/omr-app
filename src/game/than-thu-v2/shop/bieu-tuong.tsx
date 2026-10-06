@@ -47,14 +47,6 @@ export function BtTu({ c = 20 }: { c?: number }) {
     </svg>
   )
 }
-export function BtMat({ c = 18 }: { c?: number }) {
-  return (
-    <svg width={c} height={c} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <circle cx="12" cy="12" r="3" fill="currentColor" />
-    </svg>
-  )
-}
 export function BtCanhBao({ c = 20 }: { c?: number }) {
   return (
     <svg width={c} height={c} viewBox="0 0 24 24" aria-hidden="true" focusable="false">

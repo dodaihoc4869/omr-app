@@ -45,15 +45,6 @@ export const BO_CUC_TO_CHIEU = {
 
 export type BacBoCuc = 1 | 2 | 3 | 4 | 5
 
-/** Tên hiển thị của từng bậc — dùng chung cảnh báo lúc xếp buổi và ghi chú trên tờ. */
-export const TEN_BAC_BO_CUC: Record<BacBoCuc, string> = {
-  1: 'hai em, mỗi em nửa bảng',
-  2: 'một em, đề chiếm 2/3 bảng',
-  3: 'một em, 2/3 bảng, phương án chia cột và hình thu nhỏ',
-  4: 'một em, 2/3 bảng (bậc cũ — đã bỏ 28/09)',
-  5: 'một em, 2/3 bảng (bậc cũ — đã bỏ 28/09)',
-}
-
 export interface CauHinhLeoBac {
   /** Cỡ chữ chuẩn (px) — điểm bắt đầu. */
   coChuan: number

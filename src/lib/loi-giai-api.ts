@@ -60,18 +60,6 @@ export function coLoiGiai(qid: string): Promise<boolean> {
   })
 }
 
-export type KetQuaLoiGiai = { ok: true; hoSo: HoSoLoiGiai; cau: CauChoKhung } | { ok: false; loi: string }
-
-export async function taiLoiGiai(qid: string): Promise<KetQuaLoiGiai> {
-  const token = docTokenHs()
-  if (!token) return { ok: false, loi: 'Em đăng nhập lại để mở lời giải.' }
-  const j = await goiHs('/hs/loi-giai', { token, qid })
-  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
-  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.') }
-  if (j.coLoiGiai !== true) return { ok: false, loi: 'Câu này chưa có lời giải từng bước.' }
-  return { ok: true, hoSo: j.hoSo as HoSoLoiGiai, cau: j.cau as CauChoKhung }
-}
-
 // ---------------------------------------------------------------- nút "Hỏi thầy" (mọi câu luyện tập, trừ lúc kiểm tra)
 
 /** Lời giải chữ của kho — hiện khi câu chưa có hồ sơ từng bước (máy chủ đã đẩy câu lên đầu hàng soạn). */
@@ -214,4 +202,3 @@ export const gvXemLoiGiai = (qid: string) => goiThay('/gv/loi-giai/xem', { qid }
 export const gvDuyetLoiGiai = (b: { quyet: 'duyet' | 'tra_lai'; bam?: string[]; maDe?: string; caLoSach?: boolean; ghiChu?: string }) =>
   goiThay('/gv/loi-giai/duyet', b) as Promise<{ ok: boolean; error?: string; soCau?: number }>
 export const gvSoanGap = (maDe: string) => goiThay('/gv/loi-giai/soan-gap', { maDe }) as Promise<{ ok: boolean; error?: string; soCau?: number }>
-export const gvTongHang = () => goiThay('/kho/loi-giai/tong', {}) as Promise<{ ok: boolean; viec?: { bo: string; lop: string; trang_thai: string; n: number }[]; hoSo?: { bo: string; lop: string; trang_thai: string; n: number }[] }>

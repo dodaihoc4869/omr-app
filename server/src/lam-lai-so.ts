@@ -12,6 +12,7 @@ import { loaiQidAo, type TrangThaiLoi } from './loi-hoc-luat'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { hashSeed, seededPermutation } from '../../src/lib/exam-shuffle'
 import { khoiCuaCau, khoiCuaLop, khoiCuaMaDe, type Khoi } from '../../src/lib/khoi-cau'
+import { MUC_DICH_CHAN_DOAN } from './omni-kieu'
 
 type Row = Record<string, unknown>
 type Obj = Record<string, unknown>
@@ -48,6 +49,8 @@ const gocCua = (qid: string): string => /^(.*)~ss\d+$/.exec(qid)?.[1] ?? qid
  * Dòng không có `tc` (sổ cũ, truy vấn lùi) ⇒ y hệt `lanLamGoc`.
  */
 export function lanLamTuDongTc(x: Row, lanLamGoc: (x: Row) => LanLam, tapGoc: ReadonlySet<string>): LanLam[] {
+  // 06/10 (1): dòng CÂU CHẨN ĐOÁN (purpose 'chan_doan', `tc` = câu lỗi) KHÔNG phải một lần làm của câu lỗi (không tính cho luật đóng lỗi), cũng không phải của chính nó.
+  if (x.purpose === MUC_DICH_CHAN_DOAN) return []
   const ra: LanLam[] = []
   const qid = x.qid == null ? '' : String(x.qid)
   const goc = gocCua(qid)
@@ -91,8 +94,27 @@ export function dungKhoi(x: { maDe: string; qid: string }, lopTo: string | null 
   return nguon.some((k) => k !== null) && nguon.every((k) => k === null || k === khoi)
 }
 // ---------------------------------------------------------------- ref phiên
-/** Khoá "làm lại" trong ref câu của JSON phiên (máy chủ) — KHÔNG xuống máy em. */
-export interface LamLaiRef { tc?: string; xt?: number[]; nv?: 1 }
+/**
+ * Khoá "làm lại" trong ref câu của JSON phiên (máy chủ) — KHÔNG xuống máy em.
+ * `btv` (2c, 06/10): PHIÊN BẢN bộ sinh của biến thể bằng mã `~bt` lúc phát (bien-the-sinh.ts `BT_PHIEN_BAN` / `BANG_PHIEN_BAN_BT`) — chấm / resume / Đoàn giải đúng
+ * bộ sinh ấy dù bộ sinh sau này đổi. Vắng (ref cũ) ⇒ phiên bản 1. KHÔNG ghi vào sổ (`rawLamLai` bỏ qua — dòng sổ y hệt hôm nay).
+ * `cd` (1, 06/10): câu này là CÂU CHẨN ĐOÁN bước sai đứng THAY CHỖ lượt làm lại của câu lỗi `tc` (chan-doan-buoc-sai.ts) — sổ ghi `raw_json.cd = 1` + purpose 'chan_doan'.
+ */
+export interface LamLaiRef { tc?: string; xt?: number[]; nv?: 1; btv?: number; cd?: 1 }
+
+// ---------------------------------------------------------------- CÂU CHẨN ĐOÁN bước sai (1, 06/10 — chan-doan-buoc-sai.ts)
+/**
+ * qid câu chẩn đoán (không có dòng trong kho game — giải bằng mã / kho ý khi chấm): `nen:sinh.<nhãn>.<số>` = câu nền SINH BẰNG MÃ (omni-cau-nen-sinh.ts, đúng
+ * mã câu của bảng `cau_nen`) · `nen:yds.<băm 16>.<stt1>.<stt2>` = chìa khoá + 2 ý Đ/S của kho ý (cau-y-ds.ts). Tiền tố `nen:` (như câu nền của Trạm) ⇒ mọi bộ
+ * đọc đang bỏ câu nền (`qid NOT LIKE 'nen:%'`, chat-luong-loi …) tự bỏ dòng chẩn đoán. Thuần.
+ */
+export const laQidChanDoan = (qid: unknown): boolean => typeof qid === 'string' && /^nen:(?:sinh\.[a-z][a-z0-9_]{1,39}\.\d{1,6}|yds\.[0-9a-f]{16}\.\d{1,4}\.\d{1,4})$/.test(qid)
+/** Nhãn nền của câu chẩn đoán SINH BẰNG MÃ (`nen:sinh.<nhãn>.<số>`); qid khác ⇒ null. Thuần. */
+export function nhanQidChanDoan(qid: unknown): string | null {
+  if (!laQidChanDoan(qid)) return null
+  const m = /^nen:sinh\.([a-z][a-z0-9_]{1,39})\.\d+$/.exec(qid as string)
+  return m ? m[1]! : null
+}
 /** Phần ghi vào ref phiên của một câu lượt. */
 export const refLamLai = (x: { lamLai?: LamLaiRef }): LamLaiRef => (x.lamLai ? { ...x.lamLai } : {})
 
@@ -220,13 +242,14 @@ export function chonVeGoc(ref: Pick<LamLaiRef, 'xt'> | null | undefined, phan: s
   return chon
 }
 
-/** Phần "làm lại" của `raw` khi ghi sổ: đáp án em chọn (quy về khung gốc nếu xáo) + `tc` / `xt: 1` / `nv: 1`. Rỗng khi không có gì. */
+/** Phần "làm lại" của `raw` khi ghi sổ: đáp án em chọn (quy về khung gốc nếu xáo) + `tc` / `xt: 1` / `nv: 1` / `cd: 1` (câu chẩn đoán). Rỗng khi không có gì. */
 export function rawLamLai(ref: LamLaiRef | null | undefined, phan: string, chon?: string): Record<string, unknown> {
   const ra: Record<string, unknown> = {}
   if (chon) ra.chon = chonVeGoc(ref, phan, chon)
   if (ref?.tc) ra.tc = ref.tc
   if (laHoanVi(ref?.xt)) ra.xt = 1
   if (ref?.nv) ra.nv = 1
+  if (ref?.cd) ra.cd = 1
   return ra
 }
 /** Khối `raw` cho `ghiSuKien`: gộp phần làm lại với phần OMNI; rỗng ⇒ KHÔNG có khoá `raw` (dòng sổ y hệt hôm nay). */

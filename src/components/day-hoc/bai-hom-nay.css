@@ -589,3 +589,82 @@ summary.bhn-xem-dau::-webkit-details-marker {
     padding: 12px;
   }
 }
+
+/* ---- "Giao cho": cả lớp · theo em · theo điểm danh (thầy 06/10) — ngay dưới ô chọn lớp ---- */
+.bhn-giao-cho {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 16px;
+  background: var(--bts-mat);
+}
+.bhn-giao-cho .cd-buoc-dau {
+  margin: 0;
+}
+/* Ba nút chọn cách giao: MỘT hàng nút lớn (đích chạm ≥ 44 px), nút đang chọn đặc màu chính, nút còn lại viền nhạt; hẹp ⇒ xếp dọc. */
+.bhn-che-do {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.bhn-che-do-nut {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 14px;
+  background: var(--bts-mat-2);
+  color: var(--bts-chu);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+.bhn-che-do-nut b {
+  font-size: 14px;
+  font-weight: 700;
+}
+.bhn-che-do-nut small {
+  color: var(--bts-chu-phu);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.bhn-che-do-nut:active {
+  transform: scale(0.97);
+}
+.bhn-che-do-nut[aria-checked='true'] {
+  background: var(--bts-duong-nhat);
+  border-color: var(--bts-duong);
+  box-shadow: inset 0 0 0 1px var(--bts-duong);
+  color: var(--bts-duong);
+}
+.bhn-che-do-nut[aria-checked='true'] small {
+  color: var(--bts-duong);
+}
+.bhn-che-do-nut:focus-visible {
+  outline: 3px solid var(--bts-duong);
+  outline-offset: 2px;
+}
+.bhn-che-do-chu {
+  margin: 0;
+}
+@media (max-width: 520px) {
+  .bhn-che-do {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- chip "Đã dạy" chỉ vì đứng trước bài đang chọn (chưa giao): nét đứt = dự kiến ---- */
+.bhn-chip--du-kien {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--bts-la);
+  border: 0;
+}

@@ -183,8 +183,25 @@ export interface TickTom {
   chungChi: { dat: number; tong: number } | null
 }
 
-/** Chip trạng thái của một bài: "Đã dạy dd/mm · chứng chỉ a/b" · "Đang luyện · còn N ngày" · "Bài hôm nay" (đang chọn, chưa tick) · "Chưa dạy". */
-export function trangThaiBai(tick: TickTom | null | undefined, dangChon: boolean): { kieu: KieuTrangThaiBai; chu: string } {
+/**
+ * BÀI ĐỨNG TRƯỚC thuộc phạm vi đã dạy (thầy 06/10: "khi tôi chọn bài nào thì những bài trước hiện đã dạy"). Khớp luật phạm vi của máy chủ (`dungPhamVi`: bài đã tick ∪ mọi bài
+ * đứng trước bài đã tick XA NHẤT của lớp): 'tick' = đứng trước bài đã tick xa nhất của lớp (đã là phạm vi thật); 'xem' = chỉ đứng trước bài thầy ĐANG CHỌN (sẽ thành phạm vi khi giao —
+ * hiện nét đứt); null = không thuộc phạm vi.
+ */
+export type NguonPhamVi = 'tick' | 'xem' | null
+/** Vị trí (trong cây khối, từ 1) của bài đã tick xa nhất; chưa tick bài nào / không thấy bài trong cây ⇒ 0. */
+export function viTriTickXaNhat(dsBai: readonly Pick<BaiCay, 'khoaBai' | 'viTri'>[], khoaDaTick: Iterable<string>): number {
+  const tap = new Set(khoaDaTick)
+  return dsBai.reduce((m, b) => (tap.has(b.khoaBai) && b.viTri > m ? b.viTri : m), 0)
+}
+/** Bài ở vị trí `viTriBai` có đứng trước bài đã tick xa nhất (`viTriTickXa`, 0 = chưa tick) hoặc trước bài đang chọn xem (`viTriXem`, 0 = chưa chọn) không. Tick được ưu tiên hơn xem. */
+export const nguonPhamVi = (viTriBai: number, viTriTickXa: number, viTriXem: number): NguonPhamVi => (viTriBai < viTriTickXa ? 'tick' : viTriXem > 0 && viTriBai < viTriXem ? 'xem' : null)
+
+/**
+ * Chip trạng thái của một bài: "Đã dạy dd/mm · chứng chỉ a/b" · "Đang luyện · còn N ngày" · "Bài hôm nay" (đang chọn, chưa tick) · "Đã dạy" (chưa tick nhưng đứng trước bài đã tick / đang chọn —
+ * `nguon`; `duKien` = mới đứng trước bài đang chọn xem) · "Chưa dạy".
+ */
+export function trangThaiBai(tick: TickTom | null | undefined, dangChon: boolean, nguon: NguonPhamVi = null): { kieu: KieuTrangThaiBai; chu: string; duKien?: boolean } {
   if (tick?.trangThai === 'dang_luyen') {
     const con = tick.conNgay
     return { kieu: 'dang_luyen', chu: typeof con === 'number' && con >= 0 ? `Đang luyện · còn ${con} ngày` : 'Đang luyện' }
@@ -194,7 +211,9 @@ export function trangThaiBai(tick: TickTom | null | undefined, dangChon: boolean
     const cc = tick.chungChi && tick.chungChi.tong > 0 ? ` · chứng chỉ ${tick.chungChi.dat}/${tick.chungChi.tong}` : ''
     return { kieu: 'da_day', chu: `Đã dạy${ngay ? ` ${ngay}` : ''}${cc}` }
   }
-  return dangChon ? { kieu: 'hom_nay', chu: 'Bài hôm nay' } : { kieu: 'chua_day', chu: 'Chưa dạy' }
+  if (dangChon) return { kieu: 'hom_nay', chu: 'Bài hôm nay' }
+  if (nguon) return { kieu: 'da_day', chu: 'Đã dạy', ...(nguon === 'xem' ? { duKien: true } : {}) }
+  return { kieu: 'chua_day', chu: 'Chưa dạy' }
 }
 
 /** Dòng nhắc ở đầu bảng Dạy học khi lớp chờ bài mới từ 3 ngày; chưa tới ngưỡng / không chờ ⇒ null. */
@@ -293,15 +312,24 @@ export interface TrangThaiNhieuLop {
   /** Số lớp (trong các lớp đang chọn) đã tick bài này. */
   soLopDaGiao: number
   tong: number
+  /** Chip "Đã dạy" chỉ vì bài đứng trước bài đang chọn xem (chưa giao) — vẽ nét đứt. */
+  duKien?: boolean
 }
 /**
- * Chip của MỘT bài qua các lớp đang chọn (mỗi phần tử = tick của một lớp, null = chưa tick). Một lớp ⇒ y chip cũ (`trangThaiBai`). Nhiều lớp:
- * chưa lớp nào ⇒ "Chưa dạy" / "Bài hôm nay"; có lớp đang luyện ⇒ "Đang luyện · k/n lớp"; còn lại ⇒ "Đã dạy · k/n lớp".
+ * Chip của MỘT bài qua các lớp đang chọn (mỗi phần tử = tick của một lớp, null = chưa tick; `nguon[i]` = bài có đứng trước bài đã tick / đang chọn của lớp i không). Một lớp ⇒ y chip cũ
+ * (`trangThaiBai`). Nhiều lớp: chưa lớp nào tick ⇒ "Bài hôm nay" / "Đã dạy" (hoặc "Đã dạy · k/n lớp" khi chỉ k lớp coi bài này là bài trước) / "Chưa dạy"; có lớp đang luyện ⇒
+ * "Đang luyện · k/n lớp"; còn lại ⇒ "Đã dạy · k/n lớp".
  */
-export function trangThaiNhieuLop(theoLop: readonly (TickTom | null | undefined)[], dangChon: boolean): TrangThaiNhieuLop {
+export function trangThaiNhieuLop(theoLop: readonly (TickTom | null | undefined)[], dangChon: boolean, nguon: readonly NguonPhamVi[] = []): TrangThaiNhieuLop {
   const n = theoLop.length
   const co = theoLop.filter((t): t is TickTom => !!t)
-  if (n <= 1 || co.length === 0) return { ...trangThaiBai(co[0], dangChon), soLopDaGiao: co.length, tong: n }
+  if (n <= 1) return { ...trangThaiBai(co[0], dangChon, nguon[0] ?? null), soLopDaGiao: co.length, tong: n }
+  if (co.length === 0) {
+    if (dangChon) return { kieu: 'hom_nay', chu: 'Bài hôm nay', soLopDaGiao: 0, tong: n }
+    const truoc = theoLop.map((_, i) => nguon[i] ?? null).filter((x): x is 'tick' | 'xem' => !!x)
+    if (!truoc.length) return { kieu: 'chua_day', chu: 'Chưa dạy', soLopDaGiao: 0, tong: n }
+    return { kieu: 'da_day', chu: truoc.length === n ? 'Đã dạy' : `Đã dạy · ${truoc.length}/${n} lớp`, soLopDaGiao: 0, tong: n, ...(truoc.every((x) => x === 'xem') ? { duKien: true } : {}) }
+  }
   return co.some((t) => t.trangThai === 'dang_luyen')
     ? { kieu: 'dang_luyen', chu: `Đang luyện · ${co.length}/${n} lớp`, soLopDaGiao: co.length, tong: n }
     : { kieu: 'da_day', chu: `Đã dạy · ${co.length}/${n} lớp`, soLopDaGiao: co.length, tong: n }

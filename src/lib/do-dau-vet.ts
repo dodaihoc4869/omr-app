@@ -309,12 +309,6 @@ export function xepLoaiKenh(d: DiemKenh): XepLoaiKenh {
   return 'tat_han'
 }
 
-export const TEN_XEP_LOAI: Record<XepLoaiKenh, string> = {
-  khoa_mot_minh: 'đủ chuẩn khoá một mình',
-  gop_phieu: 'chỉ góp phiếu',
-  tat_han: 'tắt hẳn',
-}
-
 /** Một dòng nhật ký ở trang /do — đủ số để thầy đọc là biết chuyện gì xảy ra. */
 export interface DongNhatKy {
   luc: number

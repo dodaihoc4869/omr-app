@@ -320,11 +320,6 @@ export function chiaTrang(cao: number[], caoToiDa: number, khe = 14): number[][]
   return trang
 }
 
-/** HTML đầy đủ của tờ (để xem thử / kiểm) — các trang nối nhau. */
-export function htmlToPdf(tt: ThongTinIn, ds: MucIn[]): string {
-  return `<div class="pdfc-goc"><div class="pdfc-trang">${dauPdfHtml(tt, ds.length)}${ds.map(tt.chiDe ? cauChiDePdfHtml : cauPdfHtml).join('')}<div class="pdfc-chan"><span>${thoat(chanTrangPdf(tt))}</span><span>Trang 1/1</span></div></div></div>`
-}
-
 async function choPhong(): Promise<void> {
   const f = (document as Document & { fonts?: FontFaceSet }).fonts
   if (!f) return

@@ -40,34 +40,3 @@ export function seededPermutation(n: number, seed: number): number[] {
   }
   return arr
 }
-
-export function applyPermutation<T>(items: T[], perm: number[]): T[] {
-  return perm.map((origIndex) => items[origIndex])
-}
-
-/** Ánh xạ ngược: từ chỉ số đã xáo → chỉ số gốc (để nộp bài quy về đúng câu gốc chấm điểm). */
-export function invertPermutation(perm: number[]): number[] {
-  const inv = new Array(perm.length)
-  perm.forEach((origIndex, shuffledIndex) => {
-    inv[origIndex] = shuffledIndex
-  })
-  return inv
-}
-
-export interface StudentShuffleSeeds {
-  phanIQuestionSeed: number
-  phanIChoiceSeeds: number[] // 1 seed riêng mỗi câu, để đáp án A/B/C/D xáo độc lập từng câu
-  phanIISeed: number
-  phanIIISeed: number
-}
-
-/** Sinh trọn bộ seed xáo cho 1 học sinh trong 1 ca — tái tạo được 100% từ (mãCa, sbd). */
-export function makeStudentShuffleSeeds(sessionCode: string, sbd: string, phanIQuestions: number): StudentShuffleSeeds {
-  const base = hashSeed(`${sessionCode}:${sbd}`)
-  return {
-    phanIQuestionSeed: base ^ 0x11111111,
-    phanIChoiceSeeds: Array.from({ length: phanIQuestions }, (_, i) => (base ^ 0x22222222) + i * 97),
-    phanIISeed: base ^ 0x33333333,
-    phanIIISeed: base ^ 0x44444444,
-  }
-}

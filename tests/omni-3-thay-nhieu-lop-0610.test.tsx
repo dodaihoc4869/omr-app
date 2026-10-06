@@ -96,6 +96,18 @@ describe('hàm thuần: chọn lớp theo khối, chia em về lớp, chip gộp
     expect(trangThaiNhieuLop([daDay, dangLuyen], false)).toMatchObject({ kieu: 'dang_luyen', chu: 'Đang luyện · 2/2 lớp' })
     expect(trangThaiNhieuLop([], false)).toMatchObject({ kieu: 'chua_day', soLopDaGiao: 0, tong: 0 })
   })
+  it('bài đứng TRƯỚC bài đã tick / đang chọn (thầy 06/10): một lớp ⇒ "Đã dạy"; nhiều lớp ⇒ "Đã dạy" khi mọi lớp coi là bài trước, "Đã dạy · k/n lớp" khi chỉ k lớp; chỉ dự kiến ⇒ nét đứt; tick thật và "Bài hôm nay" thắng', () => {
+    expect(trangThaiNhieuLop([null], false, ['tick'])).toMatchObject({ kieu: 'da_day', chu: 'Đã dạy', soLopDaGiao: 0, tong: 1 })
+    expect(trangThaiNhieuLop([null], false, ['xem'])).toMatchObject({ kieu: 'da_day', chu: 'Đã dạy', duKien: true })
+    expect(trangThaiNhieuLop([null, null], false, ['tick', 'tick'])).toMatchObject({ kieu: 'da_day', chu: 'Đã dạy', soLopDaGiao: 0, tong: 2 })
+    expect(trangThaiNhieuLop([null, null, null], false, ['tick', null, 'tick'])).toMatchObject({ kieu: 'da_day', chu: 'Đã dạy · 2/3 lớp' })
+    expect(trangThaiNhieuLop([null, null], false, ['xem', 'xem']).duKien).toBe(true)
+    expect(trangThaiNhieuLop([null, null], false, ['tick', 'xem']).duKien).toBeUndefined() // có lớp đã là phạm vi thật ⇒ không nét đứt
+    expect(trangThaiNhieuLop([null, null], false, [null, null])).toMatchObject({ kieu: 'chua_day', chu: 'Chưa dạy' })
+    expect(trangThaiNhieuLop([null, null], true, ['tick', null])).toMatchObject({ kieu: 'hom_nay', chu: 'Bài hôm nay' })
+    const daDay: TickTom = { trangThai: 'da_day', tickLuc: '2026-09-22T03:00:00Z', conNgay: null, chungChi: null }
+    expect(trangThaiNhieuLop([daDay, null], false, [null, 'tick'])).toMatchObject({ kieu: 'da_day', chu: 'Đã dạy · 1/2 lớp', soLopDaGiao: 1 }) // có lớp tick thật ⇒ đếm theo tick
+  })
 })
 
 // ---------------------------------------------------------------- màn: Dạy học nhiều lớp
@@ -227,6 +239,24 @@ describe('màn: cây bài đúng thứ tự', () => {
 })
 
 describe('màn: giao Bài cho nhiều lớp', () => {
+  it('thầy 06/10: lớp A đã giao Bài 8, lớp B chưa ⇒ Bài 1, 2 hiện "Đã dạy · 1/2 lớp" (chấm: lớp A đã dạy, lớp B chưa dạy); Bài 9, 10 vẫn "Chưa dạy"; bài chưa tick thật không có nút Sửa em / Bỏ tick', async () => {
+    daTick = { '12 - Lớp Thường': ['DH-12-C3-B8'], '12 - Tinh Hoa': [] }
+    const buoc = await moBuoc()
+    moTam(buoc)
+    await tichLop(/^12 - Lớp Thường/)
+    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy · 1/2 lớp'))
+    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã dạy · 1/2 lớp')
+    expect(dong(buoc, 'DH-12-C1-B1').getAttribute('data-trang-thai')).toBe('da_day')
+    expect(dong(buoc, 'DH-12-C3-B9').textContent).toContain('Chưa dạy')
+    const cham = [...dong(buoc, 'DH-12-C1-B1').querySelectorAll('.bhn-cham-ds li[data-lop]')].map((li) => [li.getAttribute('data-lop'), li.getAttribute('aria-label')])
+    expect(cham).toEqual([
+      ['12 - Lớp Thường', '12 - Lớp Thường: Đã dạy'],
+      ['12 - Tinh Hoa', '12 - Tinh Hoa: Chưa dạy'],
+    ])
+    expect(within(dong(buoc, 'DH-12-C1-B1')).queryByRole('button', { name: /Sửa em \/ Bỏ tick theo lớp/ })).toBeNull()
+    expect(within(dong(buoc, 'DH-12-C3-B8')).getByRole('button', { name: /Sửa em \/ Bỏ tick theo lớp/ })).toBeTruthy() // Bài 8 tick thật ở lớp Thường
+  })
+
   it('chip bài gộp qua lớp ("Đã dạy · 2/3 lớp"), chấm từng lớp; chọn bài ⇒ xem-truoc TỪNG LỚP chưa có bài, sbd chia đúng lớp; "Giao Bài 8 cho 3 lớp" ⇒ 3 lệnh tick lần lượt cùng phamVi', async () => {
     const buoc = await moBuoc()
     moTam(buoc)

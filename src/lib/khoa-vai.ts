@@ -54,12 +54,6 @@ export const DUONG_APP: Record<VaiApp, string> = {
   ph: '/ph',
 }
 
-export const TEN_APP: Record<VaiApp, string> = {
-  gv: 'Thầy — quản lý',
-  hs: 'Học sinh',
-  ph: 'Phụ huynh',
-}
-
 /** Vai của đường đang mở, quy về ba mã ngắn. `null` khi đường không nói vai
  * (gồm cả `/` trần, `/t/<mã ca>`, `/p#…`). */
 export function vaiCuaDuong(search: string, duongDan: string): VaiApp | null {

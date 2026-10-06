@@ -50,13 +50,6 @@ export interface CaDay {
   chiNop3PhutCuoi?: boolean
 }
 
-/** Gói đẩy ca: ngoài `ca` và gói đề KHÔNG đáp án, còn ngân hàng CÓ đáp án để
- * Worker trả ngay cho em lúc nộp khi ca công bố điểm. Cất sau khoá riêng. */
-export interface GoiDayCa {
-  bank?: unknown
-  keyBank?: unknown
-}
-
 async function guiJson(ch: CauHinhMayChu, maBiMat: string, duong: string, than: unknown, giay: number): Promise<boolean> {
   if (!ch.BAT || !ch.URL) return false
   const bo = new AbortController()

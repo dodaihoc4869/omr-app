@@ -246,8 +246,6 @@ export const soEmCanY = (n: NhomBai | null): number => (n ? n.chuaMo + n.chamNhi
 export type EmCuaBai = NonNullable<NhomBtvn['hocSinh']>[number]
 
 const bo = (s: string): string => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0111/g, 'd').replace(/\u0110/g, 'D').toLowerCase().trim()
-/** Không dấu, không phân biệt hoa thường. */
-export const chuanTim = bo
 
 export function emKhopTim(e: { sbd: string; hoTen: string }, q: string): boolean {
   const k = bo(q)

@@ -101,6 +101,10 @@ const MAN = [
   ['dao-chip', [390, 844], async (t) => {
     await lenDuong(t)
     await chup(t, 'hs-dao-cau-co-chip-chua-chac-390')
+    // Thầy 06/10 ("Nút chưa chắc … đổi màu dễ nhìn hơn, bấm chưa phản hồi"): BẬT ⇒ hổ phách + dòng trạng thái.
+    await t.getByRole('switch', { name: 'Chưa chắc' }).click()
+    await t.waitForTimeout(500)
+    await chup(t, 'hs-dao-chua-chac-bat-390')
   }],
   ['dao-cham', [390, 844], async (t) => {
     await lenDuong(t)
@@ -193,14 +197,14 @@ const MAN = [
     await t.getByRole('heading', { name: 'Bài hôm nay' }).first().waitFor({ timeout: 30000 })
     await t.waitForTimeout(800)
     await t.locator('[data-bai="DH-12-C1-B3"] label').first().click()
-    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.getByRole('heading', { name: 'Giao cho' }).first().waitFor({ timeout: 20000 })
     await t.waitForTimeout(1200)
     await t.getByRole('heading', { name: 'Bài hôm nay' }).first().scrollIntoViewIfNeeded()
     await chup(t, 'gv-bai-hom-nay-ca-lop-1440', true)
     const chip = t.getByRole('group', { name: 'Chọn em theo điểm danh' }).getByRole('button').first()
     await chip.click()
     await t.waitForTimeout(1200)
-    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().scrollIntoViewIfNeeded()
+    await t.getByRole('heading', { name: 'Giao cho' }).first().scrollIntoViewIfNeeded()
     await chup(t, 'gv-bai-hom-nay-theo-diem-danh-1440')
   }],
   // ── ĐƯỜNG ĐI tới "Bài hôm nay" (thầy 06/10: "Tôi không thấy chỗ này"): thanh bên "Chữa trên lớp" → thẻ "Dạy học" → bước "Bài hôm nay" ──
@@ -213,7 +217,7 @@ const MAN = [
     await t.waitForTimeout(1200)
     await chup(t, 'gv-duong-di-2-the-day-hoc-bon-buoc-1440')
     await t.locator('[data-bai="DH-12-C1-B3"] label').first().click()
-    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.getByRole('heading', { name: 'Giao cho' }).first().waitFor({ timeout: 20000 })
     await t.setViewportSize({ width: 1440, height: 2400 }) // đủ cao để thấy nút "Giao Bài … cho …" ở cuối thẻ xác nhận
     await t.waitForTimeout(1500)
     await chup(t, 'gv-duong-di-3-chon-bai-xac-nhan-nut-giao-1440')
@@ -236,7 +240,7 @@ const MAN = [
     await t.waitForTimeout(1500)
     await chupVung(t, vung, 'gv-bai-moi-3-ba-lop-chip-gop-1440', 1500)
     await t.locator('[data-bai="DH-12-C2-B6"] label').first().click()
-    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.getByRole('heading', { name: 'Giao cho' }).first().waitFor({ timeout: 20000 })
     await t.waitForTimeout(1800)
     await chupPhan(t, '[data-khoi="xac-nhan-tick"]', 'gv-bai-moi-4-chon-bai-6-xac-nhan-3-lop-1440')
     await t.locator('[data-khoi="xem-theo-lop"] details').first().locator('summary').click()
@@ -253,6 +257,48 @@ const MAN = [
     await t.getByRole('button', { name: /Chọn lớp/ }).click()
     await t.waitForTimeout(500)
     await chupVung(t, '[data-khoi="chon-lop-giao"]', 'gv-bai-moi-8-dien-thoai-o-chon-lop-xo-xuong-390', 1100)
+  }],
+  // ── Ô "GIAO CHO" ngay dưới ô chọn lớp (thầy 06/10: "chỗ chọn lớp cho thêm mục chọn theo em, giao theo điểm danh"): ba cách Cả lớp · Theo em · Theo điểm danh ──
+  ['gv-giao-cho', [1440, 900], async (t) => {
+    const vung = '.bhn-lop'
+    await t.getByRole('heading', { name: 'Giao cho' }).first().waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1200)
+    await t.setViewportSize({ width: 1440, height: 1800 })
+    await chupVung(t, vung, 'gv-giao-cho-1-ca-lop-1440', 520)
+    await t.getByRole('radio', { name: /^Theo em/ }).click()
+    await t.waitForTimeout(500)
+    await chupVung(t, vung, 'gv-giao-cho-2-theo-em-1440', 640)
+    await t.getByRole('radio', { name: /^Theo điểm danh/ }).click()
+    await t.waitForTimeout(500)
+    await chupVung(t, vung, 'gv-giao-cho-3-theo-diem-danh-1440', 560)
+    await t.getByRole('group', { name: 'Chọn em theo điểm danh' }).getByRole('button').first().click()
+    await t.waitForTimeout(500)
+    await chupVung(t, vung, 'gv-giao-cho-4-chon-buoi-diem-danh-1440', 560)
+    await t.emulateMedia({ colorScheme: 'dark' })
+    await t.waitForTimeout(400)
+    await chupVung(t, vung, 'gv-giao-cho-5-che-do-toi-1440', 560)
+    await t.emulateMedia({ colorScheme: 'light' })
+    await t.setViewportSize({ width: 390, height: 844 })
+    await t.waitForTimeout(700)
+    await chupVung(t, vung, 'gv-giao-cho-6-dien-thoai-390', 1100)
+    await t.getByRole('radio', { name: /^Cả lớp/ }).click()
+    await t.waitForTimeout(400)
+    await chupVung(t, vung, 'gv-giao-cho-7-dien-thoai-ca-lop-390', 900)
+  }],
+  // ── Bài đứng TRƯỚC bài đã chọn/giao hiện "Đã dạy" (thầy 06/10, ảnh app thật: Bài 8 Amine là Bài hôm nay mà mọi bài trước vẫn "Chưa dạy") ──
+  ['gv-bai-da-day-truoc', [1440, 900], async (t) => {
+    const vung = 'section[data-khoi="bai-hom-nay"]'
+    await t.getByRole('heading', { name: 'Bài hôm nay' }).first().waitFor({ timeout: 30000 })
+    await t.locator('[data-bai="DH-12-C3-B8"]').waitFor({ timeout: 30000 })
+    await t.waitForTimeout(1200)
+    await t.setViewportSize({ width: 1440, height: 2400 })
+    await chupVung(t, vung, 'gv-bai-truoc-1-chua-chon-bai-1440', 1500)
+    await t.locator('[data-bai="DH-12-C3-B8"] label').first().click()
+    await t.waitForTimeout(1500)
+    await chupVung(t, vung, 'gv-bai-truoc-2-chon-bai-8-bai-truoc-da-day-1440', 1500)
+    await t.setViewportSize({ width: 390, height: 844 })
+    await t.waitForTimeout(800)
+    await chupVung(t, '[data-khoi="cay-bai"]', 'gv-bai-truoc-3-dien-thoai-390', 1500)
   }],
   // ── Bước "Bài hôm nay" XOAY NGANG + MÁY TÍNH (thầy 06/10): hai cột (cây bài trái, thẻ xác nhận dính phải), cây chia cột, gọn chiều cao khi nằm ngang ──
   ['gv-bai-ngang-may-tinh', [1440, 900], async (t) => {
@@ -275,7 +321,7 @@ const MAN = [
     await chup(t, 'gv-bai-ngang-1-may-tinh-1440x900-chua-chon-bai')
     // 2 · chọn Bài 6: thẻ xác nhận hiện NGAY cột phải (không phải cuộn xuống cuối cây)
     await t.locator('[data-bai="DH-12-C2-B6"] label').first().click()
-    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.getByRole('heading', { name: 'Giao cho' }).first().waitFor({ timeout: 20000 })
     await t.waitForTimeout(1500)
     await chup(t, 'gv-bai-ngang-2-may-tinh-1440x900-chon-bai-6-the-ben-phai')
     // 3 · cuộn xuống: thẻ xác nhận DÍNH theo, nút Giao luôn thấy
@@ -299,7 +345,7 @@ const MAN = [
     await chup(t, 'gv-bai-ngang-7-dien-thoai-ngang-cuon-giua-cay')
     // 7 · điện thoại ngang: chọn một bài khác ⇒ thẻ xác nhận nằm dưới cây ⇒ trang tự cuộn mượt tới đầu thẻ
     await t.locator('[data-bai="DH-12-C3-B8"] label').first().click()
-    await t.getByRole('heading', { name: 'Chọn em nhận chiến dịch' }).first().waitFor({ timeout: 20000 })
+    await t.getByRole('heading', { name: 'Giao cho' }).first().waitFor({ timeout: 20000 })
     await t.waitForTimeout(1800)
     await chup(t, 'gv-bai-ngang-8-dien-thoai-ngang-tu-cuon-toi-the-xac-nhan')
   }],

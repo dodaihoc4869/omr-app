@@ -31,7 +31,6 @@
 //   · MỘT EM MỘT LẦN. Sàn 20 em nghĩa là 20 em KHÁC NHAU, không phải một em
 //     lên bốn lượt.
 import type { CauChua } from './phan-cong'
-import { chuanChuyenDe } from './phan-cong'
 import { CAU_HINH_LEN_BANG_MAC_DINH, HOC_NHIEU, nganSachGiay, type CauHinhLenBang } from './len-bang-cau-hinh'
 import { giayBienGhepDoi, thoiGianCau, type NoiDungCau } from './thoi-gian-len-bang'
 import type { BacBoCuc } from './bo-cuc-to-chieu'
@@ -566,6 +565,3 @@ export function bangChuBuoiChua(kq: KetQuaBuoiChua, tenNguon: string): string {
   for (const c of kq.canhBao) d.push('', `⚠ ${c}`)
   return d.join('\n')
 }
-
-/** Chuyên đề của câu, chuẩn hoá — dùng chung với `phan-cong.ts`. */
-export const chuanCd = chuanChuyenDe

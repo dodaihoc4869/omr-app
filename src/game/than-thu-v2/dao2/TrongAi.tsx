@@ -8,7 +8,7 @@ import {SoExpCau,useCheDoHieuUng} from '../../../components/exp-cau/ExpCau'
 import {expCauGame} from '../../../lib/hieu-ung-exp-cau'
 import {useEffect,useLayoutEffect,useRef,useState} from 'react'
 import type {ReactNode} from 'react'
-import {CHIP_CHUA_CHAC,CHU_SOAT_LAI,GOI_Y_CHIP_CHUA_CHAC,GOI_Y_SOAT_LAI} from '../../../lib/omni-chu'
+import {BONG_CHUA_CHAC,CHIP_CHUA_CHAC,CHU_SOAT_LAI,GOI_Y_CHIP_CHUA_CHAC,GOI_Y_SOAT_LAI} from '../../../lib/omni-chu'
 import TheCau from '../../../components/TheCau'
 import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {TheCauProps} from '../../../components/TheCau'
@@ -266,7 +266,8 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
      <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
     </div>
     {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}
-    {goiYChip&&onChuaChac&&<small className="dao2-tro-ghi" data-khoi="goi-y-chua-chac">{GOI_Y_CHIP_CHUA_CHAC}</small>}</>
+    {goiYChip&&onChuaChac&&<small className="dao2-tro-ghi" data-khoi="goi-y-chua-chac">{GOI_Y_CHIP_CHUA_CHAC}</small>}
+    {chuaChac&&onChuaChac&&!goiYChip&&<small className="dao2-tro-ghi" data-khoi="dang-chua-chac" role="status">{BONG_CHUA_CHAC}</small>}</>
     :<>{theBuocSai}{tram}<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button></>}</>}
   </div>
   </div>

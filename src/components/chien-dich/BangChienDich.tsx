@@ -93,9 +93,6 @@ export function thongTinNhip(e: EmBang, soCauCanTruoc: number, soCauMoiNgay: num
   }
 }
 
-export const chuTre = (e: EmBang, soCauCanTruoc = 0, soCauMoiNgay = 1): string =>
-  thongTinNhip(e, soCauCanTruoc, soCauMoiNgay).chu
-
 /**
  * Thứ tự em trong bảng chiến dịch (thầy 03/10: "Ưu tiên không làm lên đầu xong mới đến số câu tồn cao nhất"):
  * 1. Ưu tiên học sinh "Không làm" lên đầu tiên (chưa làm câu nào từ khi giao chiến dịch).

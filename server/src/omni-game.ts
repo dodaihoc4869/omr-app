@@ -22,7 +22,7 @@ import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
 import { apLamLaiKhac, canBanKhac, lamLaiKhacBat } from './cau-anh-em'
-import { apXaoTheoRef, laYdMoi, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
+import { apXaoTheoRef, laQidChanDoan, laYdMoi, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { HANG_MUC_DO } from './srs2-loi'
 import { chuaBatDau, docChienDichCuaEm, docHangEm, docMetaCau, doiThuTuMetGio, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
@@ -33,6 +33,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { damBaoCauNenTuDong } from './omni-cau-nen-sinh'
 import { LENH_OMNI_CAN_THAN, canThanTu, ghiBuocSai, phanCanThanChoTraLoi } from './omni-can-than'
+import { chonBuocTuKhai, docBuocSaiGanDay } from './omni-buoc-sai-uu-tien'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -221,13 +222,13 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
     const knCau = qc ? [...new Set(qc.vkn)] : []
     const knMoi = qc ? [...new Set([...qc.vkn, ...(qc.vknY ?? []).flat()])] : []
     const chacMaSai = !dv.dung && !luot && tuTin === 'chac' && !!hs && knMoi.length > 0 && knMoi.every((k) => pCua(k) >= TS.P_VUNG_DO_SO_Y)
-    const dang = hs && qc && dv.cau.dang && knCau.length ? dangSauLuot(hs, qc, knCau, dv, luot, tuTin) : null
+    const dang = hs && qc && dv.cau.dang && knCau.length && !laQidChanDoan(dv.cau.qid) ? dangSauLuot(hs, qc, knCau, dv, luot, tuTin) : null // 06/10: câu chẩn đoán không hiện "P dạng"
     let tram: TramHoiPhuc | null = null
     if (!dv.dung && !luot && !dv.hoTro && phienMoTram(dv.phien) && !dv.phien.tram) {
       const truoc = await dv.doc.luotPhien
       if (truoc) {
         const chuoi = chuoiSaiLienCuoi([...truoc.filter((x) => x.qid !== dv.qidPhien), { qid: dv.qidPhien, dung: false, hoTro: false, luot: false }])
-        if (chuoi.length >= TS.TRAM_SAI_LIEN) tram = await taoTram(env, chuoi.slice(-TS.TRAM_SAI_LIEN), hs).catch((e: unknown) => { console.error('[omni-game] chưa dựng được Trạm hồi phục:', e instanceof Error ? e.message : e); return null })
+        if (chuoi.length >= TS.TRAM_SAI_LIEN) tram = await taoTram(env, chuoi.slice(-TS.TRAM_SAI_LIEN), hs, dv.sbd, dv.nowMs).catch((e: unknown) => { console.error('[omni-game] chưa dựng được Trạm hồi phục:', e instanceof Error ? e.message : e); return null })
       }
     }
     const loiNhan = luot ? CHU_LUOT
@@ -235,7 +236,8 @@ export async function xetOmniTraLoi(env: Env, dv: DauVaoOmniTraLoi): Promise<Omn
         : dv.dung && tuTin === 'chua_chac' ? CHU_DUNG_CHUA_CHAC
           : chacMaSai ? CHU_CHAC_MA_SAI : null
     // CẨN THẬN (omni-can-than.ts): hồ sơ TRƯỚC lượt này có Sơ ý > ngưỡng ⇒ `canThan` (+ thẻ "Sai vì bước nào?" khi chắc-mà-sai); không ⇒ không thêm trường nào.
-    const canThan = await phanCanThanChoTraLoi({ canThan: canThanTu(true, hs), chacMaSai, vkn: knMoi, tenVkn: (ids) => vknTheoId(env, ids) })
+    // 06/10: câu CHẨN ĐOÁN bước sai tự là phép kiểm một bước (làm sai đã ghi bước sai cho câu lỗi) ⇒ không hiện thêm thẻ "Sai vì bước nào?".
+    const canThan = await phanCanThanChoTraLoi({ canThan: canThanTu(true, hs), chacMaSai: chacMaSai && !laQidChanDoan(dv.cau.qid), vkn: knMoi, tenVkn: (ids) => vknTheoId(env, ids) })
     const omni: KetQuaOmniTraLoi = { nhanTocDo: nhan, msLam, msKyVong: Math.round(kyVong), luot, chacMaSai, ...(tram ? { tram } : {}), ...(dang ? { dang } : {}), loiNhan, ...canThan }
     const so: SoOmni = {
       luot,
@@ -305,14 +307,18 @@ export function chonViKyNangTram(vknTungCau: readonly (readonly string[])[], pCu
 }
 /**
  * TRẠM HỒI PHỤC từ 3 câu sai liền: chỗ vướng = `chonViKyNangTram` trên ma trận Q của 3 câu và P (hồ sơ TRƯỚC lượt này).
+ * 06/10 (lệnh thầy "Làm chuẩn đoán bước sai"): em ĐÃ TỰ KHAI bước sai (bảng `omni_buoc_sai` — thẻ Cẩn thận (c) hoặc câu chẩn đoán em làm sai) ⇒ bước
+ * khai ƯU TIÊN nếu nó nằm trong vi kỹ năng của ba câu (luật chọn + cửa sổ 14 ngày: omni-buoc-sai-uu-tien.ts `chonBuocTuKhai`); không có khai khớp ⇒ y hệt cũ.
+ * Bước ấy quyết tên lỗi VÀ nhãn câu nền (máy em mở `/hs/luyen-nen {nhan}` ⇒ 3–5 câu nền ĐÚNG bước em khai). Đọc bảng lỗi ⇒ [] ⇒ luật cũ.
  * `nhan` = phần sau `nen:` (vi kỹ năng `dang:*` ⇒ null; mã kiểu khác ⇒ nhãn nền của danh mục). Tên lỗi = `vknTheoId(...).tenLoi ?? ten`.
  * `coCauNen` = ngân hàng `cau_nen` có câu của nhãn (bảng chưa có ⇒ false). Máy em mở NGUYÊN luồng `/hs/luyen-nen {nhan}` sẵn có.
  */
-async function taoTram(env: Env, qids: readonly string[], hs: HoSoOmniEm | null): Promise<TramHoiPhuc> {
+async function taoTram(env: Env, qids: readonly string[], hs: HoSoOmniEm | null, sbd: string, nowMs: number): Promise<TramHoiPhuc> {
   const goc = qids.map(qidGocOmni)
-  const qm = await qCuaCau(env, goc)
+  const [qm, tuKhai] = await Promise.all([qCuaCau(env, goc), docBuocSaiGanDay(env, sbd, nowMs)])
   const pCua = (k: string) => hs?.vkn[k]?.p ?? TS.P0
-  const vkn = chonViKyNangTram(goc.map((q) => { const c = qm.get(q); return c ? [...c.vkn, ...(c.vknY ?? []).flat()] : [] }), pCua)
+  const vknTungCau = goc.map((q) => { const c = qm.get(q); return c ? [...c.vkn, ...(c.vknY ?? []).flat()] : [] })
+  const vkn = chonBuocTuKhai(tuKhai, vknTungCau.flat(), pCua) ?? chonViKyNangTram(vknTungCau, pCua)
   const tt = vkn ? (await vknTheoId(env, [vkn])).get(vkn) : undefined
   const nhan = !vkn ? null : vkn.startsWith(TIEN_TO_NEN) ? vkn.slice(TIEN_TO_NEN.length) || null : vkn.startsWith(TIEN_TO_DANG) ? null : str(tt?.nhanNen).trim() || null
   // OMNI 3 (điều phối 05/10, thầy: "Bạn hãy làm mọi thứ tôi chỉ chữa bài hs cần chữa"): nhãn tính toán thiếu câu nền ⇒ A.I Đỗ Đại Học tự sinh
@@ -605,7 +611,7 @@ async function tramXong(env: Env, sbd: string, b: Row, nowMs: number): Promise<R
 async function traCauDaDoi(env: Env, s: PhienOmni): Promise<Record<string, unknown>> {
   const viTri = s.tramXong!.viTri, r = s.questions[viTri]
   if (!r) return { ok: true, cau: null, viTri: null }
-  const q = (await napDayDuMem(env, [{ maDe: r.maDe, qid: r.qid, version: r.version }])).get(`${r.maDe}|${r.qid}|${r.version}`)
+  const q = (await napDayDuMem(env, [{ maDe: r.maDe, qid: r.qid, version: r.version, ...(r.btv !== undefined ? { btv: r.btv } : {}) }])).get(`${r.maDe}|${r.qid}|${r.version}`) // 06/10 (2c): `~bt` theo đúng phiên bản bộ sinh lúc phát
   return q ? { ok: true, cau: { ...publicQuestion(apXaoTheoRef(q, r)), vai: r.role }, viTri } : { ok: true, cau: null, viTri: null } // 06/10: bản xáo phát lại y hệt lúc phát
 }
 async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, nowMs: number): Promise<{ q: PrivateQuestion; m: MetaCau; moi: boolean; lamLai?: LamLaiRef } | null> {
