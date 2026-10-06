@@ -157,7 +157,7 @@ export default function LenBangChienDich() {
     async (o: { qid: string }) => {
       // Câu gộp từ nhiều bản trùng nội dung ⇒ mở khoá đủ cả nhóm (bảng chiến dịch + buổi chữa đều mang `qidCung`).
       const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
-      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid])
+      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid], coMat) // chỉ em có mặt buổi này (chữa lớp này không làm lớp kia mất câu)
       if (!r.ok) return { ok: false as const, chu: r.chu }
       void tai(chonId, coMat)
       return { ok: true as const }
@@ -295,6 +295,7 @@ export default function LenBangChienDich() {
 
       {bang && bang.hetHan && buoi && (
         <BuoiChua
+          key={buoi.cau.map((c) => c.qid).join('|')}
           du={buoi}
           dsEm={bang.em.map((e) => ({ sbd: e.sbd, ten: e.ten }))}
           coMat={coMat}
@@ -308,7 +309,11 @@ export default function LenBangChienDich() {
             setCoMat(sbd)
             void tai(chonId, sbd)
           }}
-          onDaChua={() => void taiDs()}
+          onDaChua={() => {
+            // Chữa xong ⇒ xếp LẠI buổi (máy chủ bỏ dạng vừa chữa, tới các dạng còn lại) + nạp lại danh sách chiến dịch.
+            void tai(chonId, coMat)
+            void taiDs()
+          }}
           caChotOmni={goiCaChot}
         />
       )}

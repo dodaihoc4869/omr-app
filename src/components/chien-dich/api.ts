@@ -211,6 +211,8 @@ export interface BuoiChuaMayChu {
   hetHan: boolean
   soEm: number
   lop: { coXat: number; thanhThao: number }
+  /** Số DẠNG đã chữa ở các buổi trước (máy chủ bỏ các dạng này khi xếp buổi mới). Máy chủ cũ không gửi ⇒ 0. */
+  daChuaTruoc?: number
   cau: CauBuoiChua[]
 }
 
@@ -253,7 +255,9 @@ export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiCh
 /** Mọi qid cần mở khoá của một dòng (bản đại diện + bản trùng nội dung). */
 export const qidCuaDong = (c: { qid: string; qidCung?: string[] }): string[] => (c.qidCung?.length ? c.qidCung : [c.qid])
 
-export const chuaXong = (id: string, qids?: string[]) => goiChienDich<KetQuaChuaXong>('chua-xong', qids && qids.length ? { id, qids } : { id })
+/** `coMat` (Buổi chữa): chỉ các em có mặt được mở khoá + ghi "đã chữa" — chữa lớp này không làm lớp kia mất câu. Vắng ⇒ cả chiến dịch. */
+export const chuaXong = (id: string, qids?: string[], coMat?: string[]) =>
+  goiChienDich<KetQuaChuaXong>('chua-xong', { id, ...(qids && qids.length ? { qids } : {}), ...(coMat && coMat.length ? { coMat } : {}) })
 
 /** Nội dung ĐÚNG mã câu của chiến dịch cho tờ chiếu (máy chủ `noi-dung-cau`, đã qua cổng khối lớp — thầy 06/10). */
 export interface NoiDungCauMayChu {
