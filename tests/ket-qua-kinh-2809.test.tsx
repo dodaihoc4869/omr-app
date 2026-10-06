@@ -19,11 +19,14 @@ describe('KetQuaSauNop kính (ca thi 28/09)', () => {
     const { container } = render(<KetQuaSauNop kieu="da_cong_bo" tenCa="KT" gioNop="09:08 · Thứ Hai 28/09/2026" diem={7.5} phan={PHAN} dung={1} tong={4} cau={CAU} onXemBaoCao={onXem} />)
     expect(container.querySelector('.kq-kinh')).toBeTruthy()
     expect(screen.getByRole('img', { name: 'Câu 1 Phần I: đúng' })).toBeTruthy()
-    expect(screen.getByRole('img', { name: 'Câu 1 Phần II: đúng một phần' })).toBeTruthy()
+    // 06/10 (thầy: hiển thị câu sai phải chính xác tuyệt đối): câu Phần II ĐÚNG MỘT PHẦN cũng là câu CHƯA đúng trọn — hệ thống ghi nó vào hàng ôn lại
+    // (`dung_sai = 0`) nên ô của nó bấm được để xem lời giải, và khối "đã lo cho em" đếm nó. Trước đây chỉ đếm sai + bỏ trống nên nói THIẾU câu.
+    fireEvent.click(screen.getByRole('button', { name: /Câu 1 Phần II: đúng một phần/ }))
     fireEvent.click(screen.getByRole('button', { name: /Câu 2 Phần I: sai/ }))
     fireEvent.click(screen.getByRole('button', { name: /Câu 1 Phần III: bỏ trống/ }))
-    expect(onXem).toHaveBeenCalledTimes(2)
-    expect(container.textContent).toContain('2 câu sai hoặc bỏ trống')
+    expect(onXem).toHaveBeenCalledTimes(3)
+    expect(container.textContent).toContain('3 câu chưa đúng trọn (1 sai, 1 bỏ trống, 1 đúng một phần)')
+    expect(container.textContent).not.toContain('câu sai hoặc bỏ trống')
   })
   for (const kieu of ['ca_lop', 'khong'] as const) {
     it(`chưa công bố (${kieu}): "Em đã nộp bài" + câu đã làm; KHÔNG điểm, KHÔNG ô đúng/sai dù màn cha lỡ truyền`, () => {

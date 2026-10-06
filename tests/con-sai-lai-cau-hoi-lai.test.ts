@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { dungCauSai } from '../src/lib/phieu-du-lieu'
+import { dongCauSaiLai } from '../src/lib/loai-cau-chua-dung'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
 import type { TeacherExamSource } from '../src/data/examContent'
 
@@ -82,11 +83,15 @@ describe('màn ca thi có nút báo em còn sai lại', () => {
   })
 
   it('SỐ LẦN SAI đếm CÙNG MỘT KIỂU với nhãn trong báo cáo', () => {
-    // Màn ca thi: `(lapEm[r.qid] ?? 0) + 1`. Báo cáo: `truoc + 1` trong
-    // `dungCauSai`. Hai chỗ lệch nhau là thầy đọc một số, phụ huynh đọc số khác.
-    expect(MAN).toContain('soLanSai: (lapEm[r.qid] ?? 0) > 0 ? (lapEm[r.qid] ?? 0) + 1 : 0,')
-    const ra = dungCauSai([row('q1', 1, false, 'B', 'C', 'Ester – lipid')], BANK, true, { lapCua: { q1: 2 } })
+    // Màn ca thi: `truoc + 1`. Báo cáo: `truoc + 1` trong `dungCauSai`. Hai chỗ lệch nhau là thầy đọc một số, phụ huynh đọc số khác.
+    // 06/10: màn ca thi dựng dòng bằng MỘT hàm dùng chung `dongCauSaiLai` (loai-cau-chua-dung.ts) — cùng chỗ ấy xử lý Phần II bỏ trống "----"
+    // và câu đúng một phần; số lần sai vẫn là `truoc + 1` khi biết, 0 khi máy không giữ số lần sai cũ (không bịa 1).
+    expect(MAN).toContain('.map((r) => dongCauSaiLai(r, lapEm[r.qid] ?? 0))')
+    const r1 = row('q1', 1, false, 'B', 'C', 'Ester – lipid')
+    const ra = dungCauSai([r1], BANK, true, { lapCua: { q1: 2 } })
     expect(ra[0].soLanSai).toBe(3)
+    expect(dongCauSaiLai(r1 as never, 2).soLanSai).toBe(ra[0].soLanSai) // màn ca thi và báo cáo CÙNG một số
+    expect(dongCauSaiLai(r1 as never, 0).soLanSai).toBe(0)
   })
 
   it('CÂU ĐÃ SỬA ĐƯỢC không bị đếm nhầm vào nhóm còn sai', () => {

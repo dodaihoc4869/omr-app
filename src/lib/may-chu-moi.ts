@@ -317,6 +317,8 @@ export async function nopMoi(
   dapAn: unknown,
   integrity: unknown,
   giayCau?: Record<string, number>,
+  /** Khoá ĐÚNG lượt cần nộp (`maCa|sbd|lanThu`). Thiếu ⇒ máy chủ nhận lượt MỚI NHẤT của em. Chỉ truyền khi gửi nốt bài của lượt CŨ — nếu không bài cũ đè lên lượt mới. */
+  khoaLuot?: string,
 ): Promise<{ ok: boolean; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number } | null> {
   const r = await goiWorker<{ ok: boolean; lyDo?: string; daNhan?: boolean; nopLuc?: string; congBo?: string; keyBank?: unknown; boSung?: number }>(ch, '/nop', {
     maCa,
@@ -324,6 +326,7 @@ export async function nopMoi(
     dapAn,
     integrity,
     giayCau,
+    ...(khoaLuot ? { khoaLuot } : {}),
   }, nhipNong(ch))
   if (!r) return null
   if (!r.ok && (r.lyDo === 'khong_tim_thay' || r.lyDo === 'thieu')) {

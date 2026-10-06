@@ -2,7 +2,7 @@
 // THUẦN: nhận số đã chấm sẵn (ScoreResult của luật chấm chính thức) + mốc giờ, trả chữ/số để VẼ. KHÔNG chấm, KHÔNG đổi luật công bố, KHÔNG đụng đáp án.
 // Không xếp hạng, không nhãn năng lực (bỏ `classify`), chỉ so với LẦN TRƯỚC CỦA CHÍNH EM. Số nào không có thì trả null — màn cha ẩn khối đó, không bịa.
 import { gioDayDu } from './ngay-gio-24'
-import type { ScoreResult } from '../engine/score'
+import type { GradedItem, ScoreResult, StudentAnswers } from '../engine/score'
 
 /** Ba trạng thái công bố (luật `CongBoDiem`): thầy đã công bố · chờ cả lớp nộp · thầy chưa công bố. */
 export type TrangThaiCongBo = 'da_cong_bo' | 'ca_lop' | 'khong'
@@ -84,3 +84,35 @@ export function soSanhLanTruoc(ls: readonly DiemCaTruoc[], maCaNay: string, ngay
 
 /** "09:12 · Thứ Bảy 19/09/2026" giờ Việt Nam; mốc sai ⇒ chuỗi rỗng. */
 export const chuGioNop = (nop: unknown): string => gioDayDu(nop, '')
+
+/** Trạng thái MỘT câu trên lưới "Từng câu": đúng · sai · đúng một phần (chỉ Phần II) · bỏ trống (em không trả lời gì ở câu đó). */
+export type KqMotCau = 'dung' | 'sai' | 'mot_phan' | 'trong'
+
+export interface OKqCau {
+  phan: 'I' | 'II' | 'III'
+  so: number
+  kq: KqMotCau
+}
+
+const traLoiTrong = (v: GradedItem<string> | undefined): boolean => !v || v.value === null || String(v.value).trim() === ''
+
+/**
+ * Lưới "Từng câu" từ điểm ĐÃ chấm + bài làm. Phân biệt bỏ trống với sai bằng CHÍNH bài làm (câu em không trả lời gì),
+ * không dựa vào cờ chấm — chấm trực tuyến không bao giờ đặt cờ `EMPTY` nên bản cũ gộp cả câu bỏ trống vào "sai"
+ * (thầy 06/10: hiển thị câu sai phải chính xác tuyệt đối). Phần II: đúng cả bốn ý = đúng; có ý đúng mà chưa đủ = đúng một phần;
+ * bỏ trống cả bốn ý = bỏ trống; còn lại = sai.
+ */
+export function luoiTungCau(score: ScoreResult, traLoi: Pick<StudentAnswers, 'phanI' | 'phanII' | 'phanIII'>): OKqCau[] {
+  const ra: OKqCau[] = []
+  score.phanI.items.forEach((it, i) => ra.push({ phan: 'I', so: i + 1, kq: it.correct ? 'dung' : traLoiTrong(traLoi.phanI[i] as GradedItem<string>) ? 'trong' : 'sai' }))
+  score.phanII.items.forEach((it, i) => {
+    const y = traLoi.phanII[i] ?? []
+    const troNg = y.length === 0 || y.every((a) => !a || a.value === null)
+    ra.push({ phan: 'II', so: i + 1, kq: it.correct ? 'dung' : troNg ? 'trong' : (it.yDung ?? 0) > 0 ? 'mot_phan' : 'sai' })
+  })
+  score.phanIII.items.forEach((it, i) => ra.push({ phan: 'III', so: i + 1, kq: it.correct ? 'dung' : traLoiTrong(traLoi.phanIII[i]) ? 'trong' : 'sai' }))
+  return ra
+}
+
+/** Số câu CHƯA ĐÚNG TRỌN trên lưới (sai + bỏ trống + đúng một phần) — đúng tập câu hệ thống đưa vào hàng ôn lại (`dung_sai = 0`). */
+export const demChuaDungTron = (cau: readonly { kq: KqMotCau }[]): number => cau.filter((c) => c.kq !== 'dung').length

@@ -2,8 +2,8 @@ import { Component, lazy, memo, startTransition, Suspense, useCallback, useEffec
 import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
-import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
+import { giaiBoCauEm, lamPhangBo, LoiBoCauError } from '../lib/bo-cau-chuan'
 import { taoLinkPhieu } from '../lib/phieu-link'
 import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
 import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
@@ -65,7 +65,7 @@ import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSyste
 import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock, Maximize } from 'lucide-react'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import KetQuaSauNop from '../components/xem-diem/KetQuaSauNop'
-import { chuGioNop, phanTuDiem, soSanhLanTruoc, thoiGianLam, tongDungTong } from '../lib/ket-qua-sau-nop'
+import { chuGioNop, luoiTungCau, phanTuDiem, soSanhLanTruoc, thoiGianLam, tongDungTong } from '../lib/ket-qua-sau-nop'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
 import NutDiuMat from '../components/NutDiuMat'
@@ -678,7 +678,10 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
       }
     }
     if (!keyBank || !attempt) return null
-    return boCauTuBaiLam(keyBank, attempt.maCa, attempt.sbd, attempt.answers, attempt.giayCau, keyBank.soCau)
+    // KHÔNG còn `assignment` (mở lại app sau nộp): bộ câu CHUẨN — bản ghi trong tờ đáp án nếu có, rồi luật hash nếu khớp bài làm, cuối cùng mới dựng từ bài làm
+    // (bo-cau-chuan.ts). Lỗi (bộ câu không khớp bài làm / thiếu câu trong kho) ⇒ null: không chấm, không hiện điểm đoán.
+    const bc = giaiBoCauEm(keyBank, attempt.maCa, attempt.sbd, { dapAn: attempt.answers, giayCau: attempt.giayCau }, lamPhangBo(keyBank.boTheoEm)[attempt.sbd])
+    return bc.loi ? null : bc.qids
   }, [assignment, keyBank, attempt])
 
   // Gộp cả 3 phần thành 1 danh sách phẳng, đánh số liên tục 1..tổng (đúng số
@@ -1192,9 +1195,11 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
       const daNop = b.luot.dapAn ?? { phanI: {}, phanII: {}, phanIII: {} }
       const soCauCa = (b.bank.soCau ?? b.soCau) as SoCauMoiPhan | undefined
-      const boEm = (b.boCuaEm && b.boCuaEm.length > 0)
-        ? b.boCuaEm
-        : boCauTuBaiLam(b.bank, ma, sb, daNop, b.luot.giayCau, soCauCa)
+      // Bộ câu CHUẨN (bo-cau-chuan.ts): máy chủ gửi `boCuaEm` (D1 sống / dòng chi tiết đã ghi) thì dùng đúng nó; không có thì luật hash nếu khớp bài làm,
+      // cuối cùng mới dựng từ bài làm theo `soCau` của ca. Lỗi ⇒ không chấm lại ở máy em — màn dùng điểm ĐÃ GHI trên máy chủ (xem bên dưới).
+      const bankBc = { ...b.bank, soCau: soCauCa }
+      const bc = giaiBoCauEm(bankBc, ma, sb, { dapAn: daNop, giayCau: b.luot.giayCau }, b.boCuaEm && b.boCuaEm.length > 0 ? b.boCuaEm : undefined)
+      const boEm = bc.loi ? null : bc.qids
       const bankCoBo = boEm && boEm.length > 0 ? { ...b.bank, boTheoEm: { [sb]: boEm }, soCau: soCauCa } : b.bank
 
       const pCtc = dungPhieuTuCtcMayChu(b, ma, sb, hoTen, bankCoBo)
@@ -1248,7 +1253,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         // Mở lại app sau khi nộp: KHÔNG còn `assignment` để đối chiếu, nên dựng
         // bộ câu từ chính bài đã nộp. Thiếu tham số này là chấm theo bộ câu rút
         // lại bằng hạt giống — sai hẳn với ca đề riêng.
-        const gr = gradeFromKeyBank(bankCoBo, ma, sb, daNop, boEm)
+        if (bc.loi) throw new LoiBoCauError(bc.loi)
+        const gr = { ...gradeFromKeyBank(bankCoBo, ma, sb, daNop, boEm), boCau: bc }
         if (typeof b.tong === 'number') {
           gr.score.total = b.tong
           if (typeof b.diemI === 'number') gr.score.phanIScore = b.diemI
@@ -1257,24 +1263,31 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         }
         setGraded(gr)
       } catch {
+        // KHÔNG chấm lại được ở máy em (khoá đáp án hỏng, bộ câu không khớp bài làm…): hiện ĐIỂM ĐÃ GHI trên máy chủ, không lưới từng câu.
+        // Bản cũ dựng một đối tượng thiếu `phanI/II/III` nên màn kết quả NỔ ngay khi vẽ (`phanTuDiem` đọc `score.phanI.items`) — em thấy màn lỗi thay vì điểm.
         if (typeof b.tong === 'number') {
+          const so = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0)
+          const rongPhan = { items: [], cents: 0 }
           setGraded({
             score: {
+              phanI: rongPhan,
+              phanII: rongPhan,
+              phanIII: rongPhan,
+              totalCents: Math.round(b.tong * 100),
               total: b.tong,
-              phanIScore: typeof b.diemI === 'number' ? b.diemI : 0,
-              phanIIScore: typeof b.diemII === 'number' ? b.diemII : 0,
-              phanIIIScore: typeof b.diemIII === 'number' ? b.diemIII : 0,
-              totalMax: 10,
-              phanIMax: 4.5,
-              phanIIMax: 4.0,
-              phanIIIMax: 1.5,
-            } as any,
-            answers: daNop,
-            keys: {} as any,
-            phanI: [],
-            phanII: [],
-            phanIII: [],
-          } as any)
+              phanIScore: so(b.diemI),
+              phanIIScore: so(b.diemII),
+              phanIIIScore: so(b.diemIII),
+              quota: { I: 0, II: 0, III: 0 },
+              remainingFlags: 0,
+              crossSumOk: true,
+            },
+            key: { madeThi: ma, phanI: [], phanII: [], phanIII: [] },
+            studentAnswers: { sbd: sb, madeThi: ma, phanI: [], phanII: [], phanIII: [] },
+            wrongPhanI: [],
+            wrongPhanII: [],
+            wrongPhanIII: [],
+          })
         } else {
           setGraded(null)
         }
@@ -1467,7 +1480,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // (thầy duyệt thi lại) → gửi nốt bài cũ trước, không để mất.
       if (existing?.submitted && existing.pendingSubmit && kq.cach !== 'khoi_phuc') {
         try {
-          await submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? idTb)
+          // KHOÁ ĐÚNG LƯỢT CŨ: máy chủ vừa mở lượt mới cho em; không có khoá thì `/nop` nhận lượt MỚI NHẤT và bài cũ ĐÈ lên lượt mới (đóng nó bằng đáp án cũ).
+          // Có khoá: lượt cũ còn mở thì nhận bài; đã đóng thì máy chủ cất làm BÀI BỔ SUNG chờ thầy duyệt (không mất, không đè).
+          await submitAnswers(url, existing.maCa, existing.sbd, existing.maDe, existing.answers, existing.integrity, existing.lanThu ?? 1, existing.idThietBi ?? idTb, existing.giayCau, `${existing.maCa}|${existing.sbd}|${existing.lanThu ?? 1}`)
         } catch {
           // vẫn mở lượt mới — máy chủ đã ghi trạng thái lượt cũ theo cách của nó
         }
@@ -2319,8 +2334,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       // (26/9/9) kèm `soCau` 8/2/2 nhưng KHÔNG kèm `boTheoEm`, nên thiếu tham
       // số này là chấm em theo 8 câu em chưa từng thấy — đúng chỗ làm điểm
       // popup của ca 234641 ra 2,56 trong khi bài được 5,69.
-      const boEm = boCauCuaEm ?? boCauTuBaiLam(kb, done.maCa, done.sbd, done.answers, done.giayCau, kb.soCau)
+      // MỘT NƠI quyết bộ câu (bo-cau-chuan.ts): `boCauCuaEm` là đúng bộ câu máy em đã bày ra; lỗi (câu của em không còn trong tờ đáp án,
+      // hoặc bộ câu không khớp bài làm) ⇒ ném và rơi xuống `catch` bên dưới — KHÔNG hiện, KHÔNG gửi một điểm đoán.
+      const bc = giaiBoCauEm(kb, done.maCa, done.sbd, { dapAn: done.answers, giayCau: done.giayCau }, boCauCuaEm ?? lamPhangBo(kb.boTheoEm)[done.sbd])
+      if (bc.loi) throw new LoiBoCauError(bc.loi)
+      const boEm = bc.qids
       const g = gradeFromKeyBank(kb, done.maCa, done.sbd, done.answers, boEm)
+      g.boCau = bc
       setGraded(g)
       // Không tự bật popup cũ đè màn hình — nút xem điểm sẽ sáng lên cho em bấm mở báo cáo full màn hình
       // MẪU SỐ máy em vừa chia. `gradeFromKeyBank` cắt đề theo `kb.soCau`, thiếu
@@ -3173,13 +3193,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               /* Ca thi 28/09 (e): ô từng câu CHỈ khi đã có điểm (graded = đã công bố); chưa công bố chỉ số câu đã làm. */
               cau={
                 graded
-                  ? (['I', 'II', 'III'] as const).flatMap((ph) =>
-                      (ph === 'I' ? graded.score.phanI : ph === 'II' ? graded.score.phanII : graded.score.phanIII).items.map((it, i) => ({
-                        phan: ph,
-                        so: i + 1,
-                        kq: it.correct ? ('dung' as const) : it.flag === 'EMPTY' ? ('trong' as const) : ph === 'II' && (it.yDung ?? 0) > 0 ? ('mot_phan' as const) : ('sai' as const),
-                      })),
-                    )
+                  ? luoiTungCau(graded.score, graded.studentAnswers) // đúng · sai · đúng một phần · BỎ TRỐNG (đọc từ chính bài làm — ket-qua-sau-nop.ts)
                   : undefined
               }
               soDaLam={soDaLam}

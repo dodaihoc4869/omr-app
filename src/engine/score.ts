@@ -309,9 +309,14 @@ export function scorePhanIII(
   if (answers.length !== key.length) {
     throw new Error(`Phần III: số câu trả lời (${answers.length}) khác số câu đáp án (${key.length})`)
   }
+  // KHOÁ HỢP LỆ = KHOÁ MÀ CHÍNH LUẬT CHẤM ĐỌC ĐƯỢC. Bản cũ chỉ nhận số trần (regex) nên khoá có ĐƠN VỊ / % ("12 g/mol", "5 mol", "50 %",
+  // "1,2375×10⁹ kJ") ném lỗi ⇒ CẢ BÀI không chấm được, trong khi `khopPhanIII` (luật chung cho BTVN, ôn lại, game…) đọc và chấm đúng những khoá ấy.
+  // Nay: khoá hợp lệ ⇔ số trần như cũ HOẶC `khopPhanIII(khoá, khoá)` (khoá tự khớp chính nó). Chữ, phân số, rỗng vẫn bị từ chối — bài nào có khoá ấy
+  // KHÔNG được chấm (nói to), không để câu đó âm thầm chấm sai mọi em.
   key.forEach((v, i) => {
     const daChuan = normalizeNumericAnswer(v)
-    if (!DAP_AN_SO_HOP_LE.test(daChuan) || !Number.isFinite(Number(daChuan))) {
+    const soTran = DAP_AN_SO_HOP_LE.test(daChuan) && Number.isFinite(Number(daChuan))
+    if (!soTran && !khopPhanIII(v, v)) {
       throw new Error('Phần III câu ' + (i + 1) + ': khóa đáp án không hợp lệ')
     }
   })

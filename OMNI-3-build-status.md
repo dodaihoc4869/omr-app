@@ -375,3 +375,59 @@ Phát hành thật 06/10 22:10 giờ VN (run Actions **37483249126**, main `f1fb
 
 ### 15f. Việc ghi nhận, CHƯA làm (hỏi thầy)
 Câu SAI ở ca thi / Lên bảng / tự làm thuộc kho TU LUYỆN cũng không vào kế hoạch Đảo/Đoàn khi OMNI bật (đúng đặc tả OMNI 3: "game chỉ câu DẠY HỌC") — trái nguyên tắc 02/10 "mọi câu sai phải được xử lý triệt để". Chờ thầy chọn: giữ như đặc tả hay cho câu sai kho TU LUYỆN vào nợ như trước OMNI.
+
+## 16. Đợt 9 (06/10 đêm) — QUÉT TOÀN BỘ ĐƯỜNG CHẤM ĐIỂM LÚC HỌC SINH NỘP BÀI + hiển thị "câu sai" chính xác tuyệt đối
+
+Thầy 06/10: *"sau khi đẩy bản này lên máy chủ, bạn hãy quét toàn bộ mục chấm điểm của phần mở ca thi khi học sinh nộp bài, tối ưu tuyệt đối phần chấm điểm chính xác hoàn hảo và sửa mọi lỗi nếu phát hiện ra, không được phép chấm sai cho bất kì bài kiểm tra nào, tối ưu tốt nhất phần này, đặc biệt là phần hiển thị những câu học sinh sai (trong rút câu đúng) phải chính xác tuyệt đối để hs không bị ảnh hưởng. phần hiển thị học sinh rút câu sai cũng vậy, tối ưu mọi ngôn từ"*. Hợp đồng lệnh + luật: `docs/hop-dong-cham-diem-ca-0610.md`.
+
+### 16a. Đường chấm và 11 lỗi tìm được (đọc mã + dựng lại bằng test trên D1 sqlite THẬT)
+Đường: `/vao-thi` → `/luu-tam` → `/nop` (máy chủ chỉ cất bài thô, KHÔNG chấm) → điểm do `scoreStudent` (xu; hạn mức 450/400/150; Phần II 0/10/25/50/100% theo số ý đúng; Phần III `khopPhanIII`, biên 1e-4 loại trừ) tính ở máy thầy (Theo dõi tự `ghiDiem` → `/cham-diem`), ở `/ca/cham-lai`, và trước đây cả ở máy em (`sendFeedback`). Điểm đã lưu là điểm ghi bởi ba nơi ấy — nên mọi lệch giữa ba lõi chấm là một ca chấm sai.
+
+| # | Lỗi (nơi) | Hậu quả | Sửa |
+|---|---|---|---|
+| L1 | Chấm lại ca ở máy chủ chỉ đọc bản đồ đề riêng trong tờ đáp án R2 (bản chụp lúc mở ca), KHÔNG đọc D1 sống | em vào muộn / em thi lại rơi về luật hash ⇒ chấm theo bộ câu của người khác rồi GHI ĐÈ điểm đúng | `chamLaiMotCa(…, boD1)`: D1 sống thắng theo từng em |
+| L2 | `assignStudentQuestions` âm thầm BÙ câu từ kho khi bộ câu thiếu / lạ (ở cả máy em, máy thầy, máy chủ) | câu bù em chưa từng thấy bị tính "bỏ trống" ⇒ điểm thấp oan, và lọt bảng "câu sai" | `giaiBoCauEm` (`src/lib/bo-cau-chuan.ts`): bộ ghi lệch bài làm / thiếu câu trong kho ⇒ LỖI `bai_lam_ngoai_bo` / `thieu_trong_kho`, không chấm đoán; bù được thì nói (`bo_duoc_bu_N`) |
+| L3 | `taoChiTietCau` tự đổi sang "dựng từ bài làm" khi bài lệch luật hash, còn điểm tính trên bộ khác | điểm và bảng chi tiết nằm trên HAI bộ câu | một hàm cho điểm + chi tiết; `taoBaiGhiDiem` lấy đúng bộ của lần chấm; lỗi ⇒ không gửi gói rỗng đè chi tiết đang có |
+| L4 | `danhGiaLuot` (chấm lúc đọc: lịch sử, "câu sai" của em) là bộ chấm THỨ HAI — so CHUỖI Phần III, bù câu theo thứ tự kho, thêm cả câu trong bản đồ mà kho không còn | câu Phần III ĐÚNG ("0,540" với khoá "0,54", "–1", "5 mol") bị ghi SAI vào `chi_tiet_cau` / `ban_do_sai` / `su_kien_hoc` ⇒ em bị hỏi lại câu đã đúng | lớp mỏng gọi `chamLuotTuNganHang` (cùng lõi); không chấm được ⇒ trả rỗng, không ghi bịa |
+| L5 | `guiNhanXet` (máy em gửi) ghi thẳng `diem` / `diemPhan` máy em gửi vào `luot.tong`, `diem_i/ii/iii` | máy em chấm lệch ⇒ số lệch thành ĐIỂM CHÍNH THỨC; ai có mã thiết bị đặt được điểm tuỳ ý; thiếu `diem` ⇒ điểm bị xoá trống | máy chủ TỰ chấm lại lượt đã nộp; không chấm được ⇒ giữ điểm đang có; số máy em chỉ để đối chiếu |
+| L6 | `capNhatKeyBank` và `/ca/nap-day-du` `put` nguyên gói TRẦN (chốt đáp án, kho sửa, vá nền gửi `mergeKeepAnswers` không kèm `soCau` / `boTheoEm`) | tờ đáp án mất `soCau`, `boTheoEm`, câu nối thêm; gói hỏng ghi "null" xoá sạch tờ đáp án; máy em mở lại sau nộp dựng bộ "bù cho đủ CẢ KHO" ⇒ mẫu số phình, điểm loãng | `hopNhatKeyBank` (giữ thứ tự cũ, đáp án mới thắng, giữ `soCau` / `boTheoEm`), từ chối gói hỏng, bù `soCau` từ D1 khi trả tờ đáp án cho em |
+| L7 | `scorePhanIII` ném lỗi nếu khoá có đơn vị / % ("12 g/mol", "50 %", "1,2375×10⁹ kJ") | CẢ BÀI không chấm được, trong khi `khopPhanIII` (luật chung BTVN, ôn lại, game) chấm đúng các khoá ấy | khoá hợp lệ ⇔ số trần hoặc `khopPhanIII(khoá, khoá)`; khoá chữ / phân số / rỗng vẫn bị từ chối (nói to) |
+| L8 | `/cham-diem` không dọn dòng `ban_do_sai` của câu nay đã ĐÚNG (chỉ `/ca/cham-lai` dọn) | em bị hỏi lại đúng câu mình đã làm đúng | mọi lần chấm đều dọn |
+| L9 | máy em gửi nốt bài của lượt CŨ không kèm khoá lượt ⇒ `/nop` nhận lượt MỚI NHẤT | bài cũ đè lên lượt thi lại | `khoaLuot` (`maCa\|sbd\|lanThu`) từ máy em tới `/nop` |
+| L10 | máy em mở lại app sau nộp: bộ câu rút lại bằng hash; nhánh dự phòng dựng đối tượng thiếu `phanI/II/III` | điểm hiện lệch; màn kết quả NỔ khi máy em không chấm lại được | bộ câu chuẩn; nhánh dự phòng hiện điểm ĐÃ GHI trên máy chủ |
+| L11 | lưới "Từng câu": chấm trực tuyến không bao giờ đặt cờ `EMPTY` nên câu bỏ trống bị gộp vào "sai"; Phần II bỏ trống ghi "----" nên in "em chọn: ----" | hiển thị sai loại câu | `luoiTungCau` / `loaiCauChuaDung` đọc từ chính bài làm (xem 16b) |
+
+### 16b. Hiển thị câu chưa đúng — ba loại, số cộng khớp
+`loaiCauChuaDung` (`src/lib/loai-cau-chua-dung.ts`): **sai** (có trả lời mà sai) · **bỏ trống** (không trả lời gì; Phần II bỏ trống cả bốn ý được ghi `----`, không phải chuỗi rỗng) · **đúng một phần** (chỉ Phần II). Cả ba đều là câu CHƯA ĐÚNG TRỌN: bảng chấm ghi `dung_sai = 0` và hệ thống đưa vào hàng ôn lại — nên mọi nơi đếm "câu sai" phải đếm cả ba. Chữ mới:
+
+| Nơi | Trước | Sau |
+|---|---|---|
+| Máy em, sau nộp: khối "đã lo cho em" | "2 câu sai hoặc bỏ trống sẽ vào hàng ôn lại" (thiếu câu Phần II đúng một phần) | "3 câu chưa đúng trọn (1 sai, 1 bỏ trống, 1 đúng một phần) sẽ vào hàng ôn lại của em, bắt đầu từ ngày mai"; bấm ô nào chưa đúng cũng mở lời giải |
+| Máy thầy, rút câu ĐÚNG: khối "Sai lại câu đã làm đúng" | "Sai 4/14 câu em đã làm đúng trước đây (kể cả câu thay số…)" | "Chưa đúng 4/14 câu em đã làm đúng trước đây (2 sai · 1 bỏ trống · 1 đúng một phần) · kể cả câu thay số / câu cùng dạng của câu đó"; từng câu thêm "(bỏ trống)" / "(đúng một phần)"; dữ liệu cũ thiếu loại ⇒ không bịa phân loại |
+| Máy thầy, rút câu SAI: báo cáo "đã sửa / còn sai" | "em chọn: ----" (Phần II bỏ trống) | "bỏ trống"; Phần II một phần thêm "(đúng một phần)"; bài không chấm được ⇒ "Chưa chấm được bài này: <lý do>" thay cho điểm đoán |
+| Phụ huynh: câu nên xem lại | "Con chọn ----" | "Con bỏ trống · Đáp án đúng …"; "Con chọn DS-S (đúng một phần) · Đáp án đúng DSDS" |
+| Dòng "cách tính điểm" của phiếu | "Phần II: đúng 2/4 câu, được 2,20 trên 4,00" (không cộng ra) | "Phần II: đúng trọn 1/3 câu, 1 câu đúng một phần, được … trên …"; nhắc câu bỏ trống Phần II đúng chỗ |
+
+### 16c. Công cụ đo mới (chỉ đọc)
+- `POST /ca/kiem-cham {maCa}` — chấm lại tại chỗ từng em đã nộp bằng lõi hiện hành rồi ĐỐI CHIẾU với D1: điểm lượt, tổng ≠ tổng ba phần, dòng `chi_tiet_cau` lệch / thiếu / thừa, `ban_do_sai` oan / thừa, em không có dòng chi tiết, bộ câu lấy từ đâu, và `cach_cu_chi_diem_lech` (nếu chạy chấm lại bằng cách CŨ thì bao nhiêu em lệch). Trả chỉ số đếm + mẫu ≤ 25 dòng (số báo danh + mã câu); không trả đáp án đúng, không trả bài làm; soi được cả ca đang mở.
+- `POST /ca/cham-lai {maCa, xemTruoc:true}` — bảng cũ → mới, không ghi.
+
+### 16d. Kiểm
+- Test mới: `tests/bo-cau-chuan-0610.test.ts` (39) · `tests/cham-diem-tuyet-doi-0610.test.ts` (29, D1 sqlite thật qua Worker) · `tests/hien-thi-cau-chua-dung-0610.test.tsx` (8).
+- Cập nhật CÓ CHỦ Ý 5 test cũ khoá chữ / gói giả (ý bảo vệ giữ nguyên, ghi lý do tại chỗ): `cham-theo-bai-lam-1009` (gom bộ câu máy chủ + giây câu), `co-may-chu-toi-may-em-1109` (tham số `khoaLuot`), `mau-so-cham-phai-khop-0909` (bộ câu do `giaiBoCauEm`), `reset-toan-app-1909` (gói đáp án rỗng HỢP LỆ thay `{x:1}`), `ket-qua-kinh-2809` (câu đúng một phần cũng chưa đúng trọn).
+- **Kiểm đột biến**: 68 điểm làm hỏng cố ý (đảo thứ tự hợp nhất, bỏ lỗi bộ câu, bỏ D1 sống, so chuỗi Phần III, tin điểm máy em, bỏ dọn bản đồ sai oan, mất `soCau`, đếm thiếu loại…). Lượt 1: 13 điểm SỐNG SÓT (đo dòng thiếu / thừa của công cụ kiểm, chấm cả lượt đang làm, nối câu mới khi hợp nhất, đường `/ca/nap-day-du`, bộ câu của `taoBaiGhiDiem`, chữ phụ huynh, khối "đã lo cho em", gói nộp bù…) ⇒ bổ sung test đúng cho 13 điểm ấy ⇒ lượt 2: **0 sống sót** (68/68 bị bắt); mọi tệp gốc khôi phục nguyên vẹn (băm SHA-256 trước/sau).
+- tsc app + server 0 lỗi · `check:mau` sạch · `kiem:mau-giu` 0 vi phạm (14 tệp src đổi) · build đạt, `kiem-sw` 13/13.
+- Toàn bộ vitest: 1 054 tệp · 14 431 test: 14 272 xanh · 112 đỏ · 47 bỏ qua (+ 9 tệp lỗi nạp). So với nền main: **không có test đỏ mới do đợt này** — lần chạy đầu có 1 test do đợt này làm đỏ (`con-sai-lai-cau-hoi-lai`, khoá chữ cũ của cách dựng dòng "câu em còn sai") đã sửa thành khoá hàm dùng chung và chạy lại xanh. Phần đỏ còn lại là nền: 109 dòng nền đều vẫn đỏ (0 dòng nền hoá xanh), cộng 9 tệp lỗi nạp do môi trường phiên này (không có Chromium của Playwright · `node:sqlite` không đóng gói được ở môi trường client · 1 tệp "No test suite") — ĐỎ Y HỆT trên main sạch `b510447e` (cây làm việc sạch, chạy riêng 9 tệp) — và 2 test phụ thuộc giờ/tải: `dao-bao-nham-ca-2909` (đỏ cả trên main sạch; nghi do cộng 40 phút vắt qua 00:00 giờ VN lúc chạy gần nửa đêm) và `dao-tham-hiem-het-tran-2109` (xanh khi chạy riêng, đỏ lúc chạy dồn)..
+
+### 16e. Việc ghi nhận, CHƯA làm (không nằm trên đường chấm điểm ca thi hoặc cần thầy quyết)
+- Phiếu HTML ôn (`chamTaiCho` trong `html-phieu.ts`) so Phần III bằng số thực: ở đúng biên chênh 1e-4 (vd khoá 0,1234 · em gõ 0,1235) phiếu nói ĐÚNG còn luật chính thức (BigInt, loại trừ biên) nói SAI. Chỉ là phiếu tự dò của em, không ghi điểm ca. (Không sửa ở đợt này vì không phải điểm ca; sửa được bằng cách nhúng phép so BigInt như luật chính thức — hỏi thầy nếu muốn đồng bộ.)
+- `ca_lop_xong` chỉ đếm lượt `da_nop`, không đếm `khoa` ⇒ công bố sớm/muộn, không ảnh hưởng điểm.
+- Máy em hiện chữ cái đáp án theo thứ tự đã xáo; báo cáo thầy / phụ huynh nêu chữ theo đề gốc (điểm đúng, chỉ khác nhãn).
+- Mã chết `gradedPopup` trong `ExamTakeScreen.tsx` (không còn chỗ nào bật) — gọn ở đợt gọn mã sau.
+- Điểm ĐÃ LƯU của học sinh thật chỉ ĐO, KHÔNG tự sửa hàng loạt (luật CLAUDE.md): kết quả đo ở 16f; sửa chỉ khi thầy duyệt danh sách.
+
+### 16f. Đo trên D1 THẬT sau phát hành (chỉ đọc, chỉ đếm — `/ca/kiem-cham`)
+(ghi bổ sung ngay sau phát hành — số đếm theo từng loại lệch, KHÔNG nêu tên em; danh sách đỏ gửi thầy duyệt trước khi sửa điểm đã lưu.)
+
+### 16g. Phát hành
+(ghi bổ sung ngay sau phát hành: PR, mã gộp, run Actions, mã Pages / Worker, bản lùi.)

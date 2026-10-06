@@ -27,7 +27,7 @@ import { loiKhongTimThayCa } from '../lib/cau-chu-ca'
 import { CHU_LY_DO_THIEU } from '../lib/de-rieng'
 import { CAU_HINH_DE_RIENG_MAC_DINH, docPhamViHoiLai, laCaDaDung } from '../lib/cau-hinh-de-rieng'
 import { chayThuRutDeDaDung, chotRutDeDaDung, docRutThuDaDung, type RutThuDaDung } from '../lib/de-rieng-da-dung'
-import { xepSaiLaiDaDung, type EmSaiLaiDaDung } from '../lib/rut-de-da-dung'
+import { dongCauSaiLai, loaiCauChuaDung, xepSaiLaiDaDung, type EmSaiLaiDaDung } from '../lib/rut-de-da-dung'
 import { BangRutThuDaDung, KhoiSaiLaiDaDung } from '../components/ca-thi/KhoiDaDung'
 import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
 import { chayThuRutDeCa, chotRutDeCa, docRutThu, type RutThuCa } from '../lib/de-rieng-v2'
@@ -208,6 +208,8 @@ interface HangEm {
   moiNhat: LuotThiRow
   cacLuotCu: LuotThiRow[]
   graded: GradedSubmission | null
+  /** Vì sao KHÔNG chấm được tại máy (khoá đáp án hỏng, bộ câu không khớp bài làm…). Rỗng = chấm được. Có lỗi thì điểm hiện là điểm ĐÃ GHI, không phải số đoán. */
+  loiCham?: string
   /** Điểm hiện ra: chấm tại máy (ưu tiên) hoặc điểm đã ghi trên Sheet. */
   diem: number | null
   /** CA ĐỀ RIÊNG TỪNG EM (DE-RIENG-TUNG-EM mục 6): ba con số của riêng em này,
@@ -218,7 +220,7 @@ interface HangEm {
     daSua: number
     saiLai: number
     /** Câu hỏi lại mà em VẪN SAI, kèm sai lần thứ mấy. Đây là thứ thầy cần. */
-    saiLaiChiTiet: { phan: 'I' | 'II' | 'III'; soCau: number; qid: string; chuyenDe: string; soLanSai: number; dapAnDung: string; dapAnChon: string }[]
+    saiLaiChiTiet: { phan: 'I' | 'II' | 'III'; soCau: number; qid: string; chuyenDe: string; soLanSai: number; dapAnDung: string; dapAnChon: string; motPhan?: boolean }[]
     /** Câu hỏi lại em đã làm đúng — tin tốt, cũng phải đếm được. */
     daSuaChiTiet: { phan: 'I' | 'II' | 'III'; soCau: number; qid: string; chuyenDe: string }[]
   } | null
@@ -560,11 +562,14 @@ export default function ExamMonitorScreen() {
       const moiNhat = arr[0]
       const hs = classList.find((c) => c.sbd === sbd)
       let graded: GradedSubmission | null = null
+      let loiCham = ''
       if (teacherBank && moiNhat.dapAn && (moiNhat.trangThai === 'da_nop' || moiNhat.trangThai === 'khoa')) {
         try {
-          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa, boTheoEmDung)
-        } catch {
+          // Kèm giây từng câu để bộ câu chuẩn kiểm được "em để lại dấu vết ở câu nào" (bo-cau-chuan.ts).
+          graded = gradeSubmissionFull(teacherBank, chiTiet.ca.maCa, sbd, moiNhat.dapAn, soCauCa, boTheoEmDung, moiNhat.giayCau)
+        } catch (e) {
           graded = null
+          loiCham = e instanceof Error ? e.message : 'Không chấm được bài này'
         }
       }
       // Ba con số câu lặp, đếm từ ĐÚNG bảng chấm của em, không ước lượng.
@@ -584,7 +589,7 @@ export default function ExamMonitorScreen() {
         (chiTiet.lapTheoEm?.[sbd]?.length ? Object.fromEntries(chiTiet.lapTheoEm[sbd].map((q) => [q, 0])) : undefined)
       if (lapEm && teacherBank && moiNhat.dapAn && graded) {
         try {
-          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
+          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau, graded.boCau?.qids ?? null)
           const cua = rows.filter((r) => typeof lapEm[r.qid] === 'number')
           lap = {
             tong: cua.length,
@@ -594,17 +599,9 @@ export default function ExamMonitorScreen() {
             // tính với nhãn trong báo cáo (`dungCauSai`), không đếm kiểu khác.
             saiLaiChiTiet: cua
               .filter((r) => r.dungSai === false)
-              // `soLanSai` = 0 nghĩa là máy này không giữ số lần sai cũ. In số
-              // 1 vào đó là bịa: em có thể đã sai câu này ba lần rồi.
-              .map((r) => ({
-                phan: r.phan,
-                soCau: r.soCau,
-                qid: r.qid,
-                chuyenDe: r.chuyenDe || '',
-                soLanSai: (lapEm[r.qid] ?? 0) > 0 ? (lapEm[r.qid] ?? 0) + 1 : 0,
-                dapAnDung: r.dapAnDung || '',
-                dapAnChon: r.dapAnChon || '',
-              })),
+              // Dựng dòng ở một nơi (loai-cau-chua-dung.ts): `soLanSai` = 0 khi máy không giữ số lần sai cũ (không bịa 1); Phần II bỏ trống "----" đổi về rỗng
+              // để dòng hiện "bỏ trống"; Phần II đúng một phần đánh dấu riêng để không lẫn với sai hẳn.
+              .map((r) => dongCauSaiLai(r, lapEm[r.qid] ?? 0)),
             daSuaChiTiet: cua.filter((r) => r.dungSai).map((r) => ({ phan: r.phan, soCau: r.soCau, qid: r.qid, chuyenDe: r.chuyenDe || '' })),
           }
         } catch {
@@ -616,7 +613,7 @@ export default function ExamMonitorScreen() {
       const nhanEm = chiTiet.daDungTheoEm?.[sbd]
       if (nhanEm && Object.keys(nhanEm).length > 0 && teacherBank && moiNhat.dapAn && graded) {
         try {
-          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
+          const rows = taoChiTietCau(mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung), chiTiet.ca.maCa, sbd, moiNhat.dapAn, moiNhat.giayCau, graded.boCau?.qids ?? null)
           const cua = rows.filter((r) => r.qid in nhanEm)
           const demEm = chiTiet.demDaDungTheoEm?.[sbd] ?? {}
           daDung = {
@@ -625,7 +622,7 @@ export default function ExamMonitorScreen() {
             tong: cua.length,
             sai: cua
               .filter((r) => r.dungSai !== true)
-              .map((r) => ({ soCau: r.soCau, phan: r.phan, qid: r.qid, nhan: nhanEm[r.qid] ?? '', soLanDung: demEm[r.qid]?.[0], soLanSai: demEm[r.qid]?.[1] })),
+              .map((r) => ({ soCau: r.soCau, phan: r.phan, qid: r.qid, nhan: nhanEm[r.qid] ?? '', soLanDung: demEm[r.qid]?.[0], soLanSai: demEm[r.qid]?.[1], loai: loaiCauChuaDung(r) })),
           }
         } catch {
           daDung = null
@@ -639,6 +636,7 @@ export default function ExamMonitorScreen() {
         moiNhat,
         cacLuotCu: arr.slice(1),
         graded,
+        ...(loiCham ? { loiCham } : {}),
         diem: graded ? graded.score.total : moiNhat.tong,
         lap,
         daDung,
@@ -674,7 +672,7 @@ export default function ExamMonitorScreen() {
       let rows: ChiTietCauRow[] | null = null
       if (bank && chiTiet && e.graded && e.moiNhat.dapAn) {
         try {
-          rows = taoChiTietCau(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.dapAn, e.moiNhat.giayCau)
+          rows = taoChiTietCau(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.dapAn, e.moiNhat.giayCau, e.graded.boCau?.qids ?? null)
         } catch {
           rows = null
         }
@@ -788,7 +786,16 @@ export default function ExamMonitorScreen() {
     const bank = mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung)
     const can = dsEm.filter((e) => e.graded && !daGhiRef.current.has(`${e.sbd}:${e.moiNhat.lanThu}:${e.moiNhat.nopLuc}`))
     if (can.length === 0) return
-    const bai = can.map((e) => taoBaiGhiDiem(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded!, e.moiNhat.giayCau))
+    // Từng em MỘT: em nào không dựng được dòng chi tiết (bộ câu không khớp…) thì BỎ QUA — không ghi gói rỗng đè mất chi tiết đang có, và không làm sập màn.
+    const bai: ReturnType<typeof taoBaiGhiDiem>[] = []
+    for (const e of can) {
+      try {
+        bai.push(taoBaiGhiDiem(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.lanThu, e.moiNhat.dapAn!, e.graded!, e.moiNhat.giayCau))
+      } catch {
+        /* em này giữ nguyên điểm đã ghi; màn đã nói lý do ở dòng của em */
+      }
+    }
+    if (bai.length === 0) return
     let huy = false
     // MẪU SỐ đã dùng để chấm — lấy từ CHÍNH bank vừa gộp, không lấy `soCauCa`
     // thô, để con số khai lên máy chủ đúng bằng con số đã chia. Xem `ghiDiem`.
@@ -1613,6 +1620,7 @@ export default function ExamMonitorScreen() {
                                     phần đáp án đúng giữ màu chữ thường. */}
                                 đúng: {c.dapAnDung || '—'} · em chọn:{' '}
                                 <b style={{ color: 'var(--do)' }}>{c.dapAnChon || 'bỏ trống'}</b>
+                                {c.motPhan && ' (đúng một phần)'}
                               </span>
                             </div>
                           ))}
@@ -2302,6 +2310,12 @@ export default function ExamMonitorScreen() {
                           {e.diem === null ? '—' : e.diem.toFixed(2)}
                         </span>
                         {e.diem !== null && <span style={NHAN_NHO}>{classify(e.diem)}</span>}
+                        {/* KHÔNG CHẤM ĐƯỢC CHÍNH XÁC ⇒ nói thẳng lý do, KHÔNG đoán điểm: số hiện trên là điểm đã ghi (hoặc dấu —). */}
+                        {e.loiCham && (
+                          <span className="block" role="status" style={{ ...NHAN_NHO, color: 'var(--cam)' }}>
+                            Chưa chấm được bài này: {e.loiCham}
+                          </span>
+                        )}
                         {/* CA ĐỀ RIÊNG: câu hỏi lại của riêng em này. Luôn kèm
                             chữ, không dùng riêng màu. */}
                         {e.lap && e.lap.tong > 0 && (

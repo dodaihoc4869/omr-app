@@ -128,12 +128,15 @@ describe('`gomCa` phải dựng bộ câu TỪ BÀI LÀM', () => {
     expect(GOM).toContain("for (const k of Object.keys(l.giayCau ?? {})) cu.add(k)")
   })
 
-  it('ca CÓ `boTheoEm` đã lưu thì dùng bản đã lưu — đó là bản chốt lúc phát đề', () => {
-    expect(GOM).toContain('const boTheoEm = rieng?.boTheoEm ?? boTuBaiLam')
+  it('ca CÓ `boTheoEm` đã lưu thì dùng bản đã lưu — đó là bản chốt lúc phát đề; BẢN ĐỒ MÁY CHỦ (D1 sống) thắng theo từng em', () => {
+    expect(GOM).toContain('const boTheoEmMay = rieng?.boTheoEm ?? boTuBaiLam')
+    // 06/10: em vào muộn / thi lại chỉ có ở D1 — bản lưu ở máy này không có họ (trước đây họ rơi về hash và bị chấm theo bộ câu của người khác).
+    expect(GOM).toContain('const boTheoEm = ct.boTheoEmCa ? { ...boTheoEmMay, ...hopNhatBo(null, ct.boTheoEmCa) } : boTheoEmMay')
   })
 
   it('CẢ HAI đường chấm và dựng phiếu đều dùng bộ ấy, không còn `rieng?.boTheoEm` trần', () => {
-    expect(GOM).toContain('gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, boTheoEm)')
+    // 06/10: chấm kèm `giayCau` để bộ câu chuẩn kiểm được dấu vết em ĐÃ XEM câu nào.
+    expect(GOM).toContain('gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, boTheoEm, moiNhat.giayCau)')
     expect(GOM).toContain('mergeKeepAnswers(bank, sc, boTheoEm)')
     expect(GOM).not.toContain('rieng?.boTheoEm)')
   })

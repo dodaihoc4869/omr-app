@@ -9,7 +9,8 @@ import { assignStudentQuestions } from './exam-assign'
 import type { BaiGhiDiem, ChiTietCauRow } from './exam-api'
 import type { AnswerRecord } from './exam-db'
 import type { GradedSubmission } from './exam-grade'
-import { boCauTuBaiLam, type SoCauMoiPhan } from './bo-cau-tu-bai-lam'
+import type { SoCauMoiPhan } from './bo-cau-tu-bai-lam'
+import { giaiBoCauEm, lamPhangBo, LoiBoCauError } from './bo-cau-chuan'
 
 type KeyBankLike = {
   phanI: TeacherMcqQuestion[]
@@ -30,7 +31,14 @@ function giayCua(giayCau: Record<string, number> | null | undefined, qid: string
   return Math.round(v)
 }
 
-export function taoChiTietCau(
+/**
+ * BỘ CÂU + DÒNG CHI TIẾT của một em. MỘT NƠI quyết bộ câu (`giaiBoCauEm`, bo-cau-chuan.ts) — cùng bộ với chấm điểm, nên điểm và bảng chi tiết
+ * không bao giờ dựng trên hai bộ câu khác nhau (bản cũ tự đổi sang "dựng từ bài làm" ngay tại đây khi bài làm lệch luật hash, còn điểm vẫn tính theo hash).
+ *
+ * `boCuaEm` do chỗ gọi đã CHỐT (máy em: đúng bộ câu vừa bày ra; máy thầy: bộ chuẩn đã dùng để chấm) thì dùng thẳng, không xét lại.
+ * Ném `LoiBoCauError` khi bộ câu không khớp bài làm / thiếu câu trong kho: THÀ KHÔNG CÓ DÒNG còn hơn dòng sai.
+ */
+export function taoChiTietCauHoacLoi(
   bank: KeyBankLike,
   maCa: string,
   sbd: string,
@@ -38,45 +46,13 @@ export function taoChiTietCau(
   giayCau: Record<string, number> | null | undefined,
   boCuaEm?: string[] | null,
 ): ChiTietCauRow[] {
-  let bo = boCuaEm
-  if (!bo || bo.length === 0) {
-    const rawBo = bank.boTheoEm as Record<string, unknown> | undefined
-    const boMap = (rawBo && typeof rawBo === 'object' && rawBo.bo && typeof rawBo.bo === 'object' && !Array.isArray(rawBo.bo)
-      ? rawBo.bo
-      : rawBo) as Record<string, string[]> | undefined
-    const rieng = boMap?.[sbd] ?? (bank.boTheoEm as Record<string, string[]> | undefined)?.[sbd]
-    if (rieng && rieng.length > 0) {
-      bo = rieng
-    } else {
-      // Kiểm tra xem bài làm có câu nào nằm ngoài bộ câu mặc định của assignStudentQuestions không
-      const asgMacDinh = assignStudentQuestions({ ...bank, soCau: bank.soCau ?? undefined }, maCa, sbd)
-      const qidMacDinh = new Set([
-        ...asgMacDinh.phanI.map((x) => x.qid),
-        ...asgMacDinh.phanII.map((x) => x.qid),
-        ...asgMacDinh.phanIII.map((x) => x.qid),
-      ])
-      const coDau =
-        (answers &&
-          (Object.keys(answers.phanI || {}).length > 0 ||
-            Object.keys(answers.phanII || {}).length > 0 ||
-            Object.keys(answers.phanIII || {}).length > 0)) ||
-        (giayCau && Object.keys(giayCau).length > 0)
-      if (coDau) {
-        const dauVet = [
-          ...Object.keys(answers?.phanI || {}),
-          ...Object.keys(answers?.phanII || {}),
-          ...Object.keys(answers?.phanIII || {}),
-          ...Object.keys(giayCau || {}),
-        ]
-        const coCauNgoai = dauVet.some((q) => !qidMacDinh.has(q))
-        if (coCauNgoai) {
-          bo = boCauTuBaiLam(bank, maCa, sbd, answers, giayCau, bank.soCau)
-        }
-      }
-    }
+  let qids: string[] | null = boCuaEm && boCuaEm.length > 0 ? boCuaEm : null
+  if (!qids) {
+    const boCau = giaiBoCauEm(bank as Parameters<typeof giaiBoCauEm>[0], maCa, sbd, { dapAn: answers, giayCau }, lamPhangBo(bank.boTheoEm)[sbd])
+    if (boCau.loi) throw new LoiBoCauError(boCau.loi)
+    qids = boCau.qids
   }
-
-  const kho = bo && bo.length > 0 ? { ...bank, boTheoEm: { [sbd]: bo }, soCau: bank.soCau ?? undefined } : { ...bank, soCau: bank.soCau ?? undefined }
+  const kho = qids ? { ...bank, boTheoEm: { [sbd]: qids }, soCau: bank.soCau ?? undefined } : { ...bank, soCau: bank.soCau ?? undefined }
   const asg = assignStudentQuestions(kho, maCa, sbd)
   const rows: ChiTietCauRow[] = []
   // MỘT NGUỒN SỰ THẬT: luật so đáp án Phần III là `khopPhanIII` (src/lib/cham-so.ts) — y hệt bộ chấm điểm.
@@ -101,6 +77,23 @@ export function taoChiTietCau(
   return rows
 }
 
+/** Như `taoChiTietCauHoacLoi` nhưng KHÔNG ném: bộ câu lỗi ⇒ trả MẢNG RỖNG (các chỗ gom báo cáo bỏ qua em ấy, không hỏng cả bảng). Chỗ GHI điểm phải dùng bản ném. */
+export function taoChiTietCau(
+  bank: KeyBankLike,
+  maCa: string,
+  sbd: string,
+  answers: AnswerRecord,
+  giayCau: Record<string, number> | null | undefined,
+  boCuaEm?: string[] | null,
+): ChiTietCauRow[] {
+  try {
+    return taoChiTietCauHoacLoi(bank, maCa, sbd, answers, giayCau, boCuaEm)
+  } catch (e) {
+    if (e instanceof LoiBoCauError) return []
+    throw e
+  }
+}
+
 /** Gói 1 lượt để gửi ghiDiem: điểm từng phần + tổng (từ engine chấm) + chi tiết câu. */
 export function taoBaiGhiDiem(
   bank: KeyBankLike,
@@ -118,6 +111,8 @@ export function taoBaiGhiDiem(
     lanThu,
     idThietBi,
     diem: { I: graded.score.phanIScore, II: graded.score.phanIIScore, III: graded.score.phanIIIScore, tong: graded.score.total },
-    cau: taoChiTietCau(bank, maCa, sbd, answers, giayCau, boCuaEm),
+    // Dùng bản NÉM LỖI: chấm xong mà không dựng được dòng chi tiết thì KHÔNG được gửi gói rỗng (máy chủ xoá dòng cũ rồi ghi lại — mất sạch chi tiết đã có).
+    // Bộ câu mặc định = bộ chuẩn `graded` đã dùng để chấm ⇒ điểm và dòng chi tiết cùng một bộ.
+    cau: taoChiTietCauHoacLoi(bank, maCa, sbd, answers, giayCau, boCuaEm ?? graded.boCau?.qids ?? null),
   }
 }

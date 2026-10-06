@@ -3,7 +3,8 @@
 // Hai trạng thái sau KHÔNG nhận, KHÔNG vẽ điểm/đáp án/lời giải — kể cả khi màn cha lỡ truyền: nhánh không đọc `diem`/`phan`.
 // Chỉ VẼ khối kết quả; luật chấm, luật công bố, đường nộp, cảnh báo rời màn nằm nguyên ở màn cha. Khối "A.I Đỗ Đại Học đã lo" chưa vẽ (thiếu dữ liệu máy chủ ⇒ ẩn, không bịa).
 import { FileText } from 'lucide-react'
-import type { PhanKetQua, TrangThaiCongBo } from '../../lib/ket-qua-sau-nop'
+import { demChuaDungTron, type KqMotCau, type PhanKetQua, type TrangThaiCongBo } from '../../lib/ket-qua-sau-nop'
+import { chuDemLoai } from '../../lib/loai-cau-chua-dung'
 import { KetQuaSoLon, NutXd, PhanGon, ThanhTrenXd, TrangThaiChuaCoDiem } from './thanh-phan'
 import './ket-qua-kinh.css'
 
@@ -11,10 +12,13 @@ import './ket-qua-kinh.css'
 export interface OCauKq {
   phan: 'I' | 'II' | 'III'
   so: number
-  kq: 'dung' | 'sai' | 'mot_phan' | 'trong'
+  kq: KqMotCau
 }
 const TEN_PHAN_O = { I: 'Phần I', II: 'Phần II', III: 'Phần III' } as const
 const CHU_O = { dung: 'đúng', sai: 'sai', mot_phan: 'đúng một phần', trong: 'bỏ trống' } as const
+
+/** "1 sai, 2 bỏ trống, 1 đúng một phần" — chỉ nêu loại có mặt; dùng chung bộ đếm với app thầy (loai-cau-chua-dung.ts). */
+const chiTietChuaDungTron = (cau: readonly { kq: KqMotCau }[]): string => chuDemLoai(cau.map((c) => ({ loai: c.kq === 'dung' ? undefined : c.kq })), ', ')
 
 export interface KetQuaSauNopProps {
   kieu: TrangThaiCongBo
@@ -77,7 +81,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
             {coDiem && p.cau && p.cau.length > 0 && (
               <section className="kq-the" aria-labelledby="kq-h-cau">
                 <h3 id="kq-h-cau">
-                  Từng câu{p.onXemBaoCao && p.cau.some((c) => c.kq === 'sai' || c.kq === 'trong') ? <span style={{ fontWeight: 600, fontSize: 12.5, color: 'var(--k-chu2)' }}> · bấm câu đỏ xem lời giải</span> : null}
+                  Từng câu{p.onXemBaoCao && p.cau.some((c) => c.kq !== 'dung') ? <span style={{ fontWeight: 600, fontSize: 12.5, color: 'var(--k-chu2)' }}> · bấm câu chưa đúng để xem lời giải</span> : null}
                 </h3>
                 {(['I', 'II', 'III'] as const).map((ph) => {
                   const ds = p.cau!.filter((c) => c.phan === ph)
@@ -87,7 +91,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
                       <div className="kq-nhom">{TEN_PHAN_O[ph]}</div>
                       <div className="kq-cau">
                         {ds.map((c) =>
-                          (c.kq === 'sai' || c.kq === 'trong') && p.onXemBaoCao ? (
+                          c.kq !== 'dung' && p.onXemBaoCao ? (
                             <button key={c.so} type="button" className={c.kq} onClick={p.onXemBaoCao} aria-label={`Câu ${c.so} ${TEN_PHAN_O[ph]}: ${CHU_O[c.kq]} — xem lời giải`}>
                               {c.so}
                             </button>
@@ -103,14 +107,14 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
                 })}
               </section>
             )}
-            {coDiem && p.cau && p.cau.some((c) => c.kq === 'sai' || c.kq === 'trong') && (
+            {coDiem && p.cau && demChuaDungTron(p.cau) > 0 && (
               <section className="kq-the" aria-labelledby="kq-h-ai">
                 <h3 id="kq-h-ai">Thầy Đỗ Đại Học đã lo cho em</h3>
                 <div className="kq-ai">
                   <div>
                     <i />
                     <span>
-                      <b className="xd-so">{p.cau.filter((c) => c.kq === 'sai' || c.kq === 'trong').length} câu sai hoặc bỏ trống</b> sẽ vào hàng ôn lại của em, bắt đầu từ ngày mai.
+                      <b className="xd-so">{demChuaDungTron(p.cau)} câu chưa đúng trọn</b> ({chiTietChuaDungTron(p.cau)}) sẽ vào hàng ôn lại của em, bắt đầu từ ngày mai.
                     </span>
                   </div>
                 </div>

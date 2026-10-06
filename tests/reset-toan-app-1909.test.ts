@@ -503,7 +503,8 @@ describe('sau reset: tài khoản còn nguyên, mọi lệnh chạy khi hồ sơ
     expect(d.sql.prepare("SELECT ma_ca FROM ca WHERE ma_ca='CA-MOI-2'").get()).toBeTruthy()
     expect(await goiWorker(worker, d.env, '/ca/nhieu', { ca: [{ maCa: 'CA-MA' }] }, true)).toMatchObject({ ok: false, maCaDaDung: true })
     // Ca còn trong bảng: capNhatKeyBank/noiKhoCa/publish KHÔNG bị chặn dù mã nằm trong tập.
-    expect(await capNhatKeyBank(d.env, { maCa: 'CA-CU-1', keyBank: { x: 1 } })).toMatchObject({ ok: true })
+    // 06/10: `capNhatKeyBank` nay TỪ CHỐI gói không có đủ ba mảng câu (trước đây ghi "null"/gói giả xoá sạch tờ đáp án) ⇒ dùng gói rỗng HỢP LỆ để thử đúng ý "không bị chặn".
+    expect(await capNhatKeyBank(d.env, { maCa: 'CA-CU-1', keyBank: { phanI: [], phanII: [], phanIII: [] } })).toMatchObject({ ok: true })
     expect(d.objects.has('key/CA-CU-1.json')).toBe(true)
     expect((await noiKhoCa(d.env, { maCa: 'CA-CU-1', bank: [] })).maCaDaDung).toBeUndefined()
     expect((await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-CU-1', tenCa: 'Cũ', trangThai: 'dong' }, keyBank: { phanI: [] } }, true)).maCaDaDung).toBeUndefined()

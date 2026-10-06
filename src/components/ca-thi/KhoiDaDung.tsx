@@ -3,7 +3,7 @@
 //                          đã THAY SỐ / thay bằng câu cùng dạng / giữ nguyên văn.
 //   · KhoiSaiLaiDaDung   — "Sai lại câu đã làm đúng": em SAI NHIỀU câu đã làm đúng NHẤT lên đầu, mỗi câu kèm nhãn đã đúng ở đâu, mức độ gì.
 import { useState } from 'react'
-import { chuNhanBaoCao, chuPhanBo, chuThieuDaDung, thongKeThay, type EmSaiLaiDaDung } from '../../lib/rut-de-da-dung'
+import { chuChiTietChuaDung, chuHauToLoai, chuNhanBaoCao, chuPhanBo, chuThieuDaDung, thongKeThay, type EmSaiLaiDaDung } from '../../lib/rut-de-da-dung'
 import type { RutThuDaDung } from '../../lib/de-rieng-da-dung'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -185,7 +185,8 @@ export function KhoiSaiLaiDaDung({ ds, soEmDaCham }: { ds: readonly EmSaiLaiDaDu
                 {e.hoTen || `Số báo danh ${e.sbd}`} <span style={{ ...NHAN_NHO, ...SO }}>· Số báo danh {e.sbd}</span>
               </div>
               <div style={{ ...NHAN_NHO, ...SO }}>
-                Sai <b style={{ color: 'var(--do)' }}>{e.sai.length}</b>/{e.tong} câu em đã làm đúng trước đây (kể cả câu thay số / câu cùng dạng của câu đó)
+                Chưa đúng <b style={{ color: 'var(--do)' }}>{e.sai.length}</b>/{e.tong} câu em đã làm đúng trước đây
+                {chuChiTietChuaDung(e.sai) ? ` (${chuChiTietChuaDung(e.sai)})` : ''} · kể cả câu thay số / câu cùng dạng của câu đó
               </div>
               <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
                 {e.sai.map((c) => (
@@ -194,6 +195,7 @@ export function KhoiSaiLaiDaDung({ ds, soEmDaCham }: { ds: readonly EmSaiLaiDaDu
                       Câu {c.soCau} Phần {c.phan}
                     </b>{' '}
                     · {chuNhanBaoCao(c.nhan)}
+                    {chuHauToLoai(c.loai)}
                     {typeof c.soLanDung === 'number' && c.soLanDung > 0 && (
                       <span style={{ ...SO, color: 'var(--nhat)' }}>
                         {' '}
