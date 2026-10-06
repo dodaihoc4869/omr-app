@@ -34,7 +34,7 @@ const TEP_HS_PH = [
   'src/components/InfographicHuongDan.tsx',
   'src/components/xem-diem/TheCaGanNhat.tsx', // thay CardCaThiGanNhat.tsx (mồ côi, đã xoá 21/09)
   'src/components/BieuDoTienBoGoogle.tsx',
-  'src/components/ThanThuHoaHocGame.tsx',
+  // 06/10 gọn mã lần 2 (docs/gon-ma-0610-lan-2.md): bỏ ThanThuHoaHocGame.tsx (game Thần thú v1, đã xoá).
 ]
 // "phòng thi" của khung bao MÀN THI THẬT (aria "Đóng phòng thi", "Đang mở phòng thi…") thuộc luồng thi: không đụng.
 const NGOAI_LE = /Đóng phòng thi|Đang mở phòng thi/

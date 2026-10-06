@@ -8,7 +8,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import KhoiLoiGiaiChuan, { KhoiLoiGiaiTuCT, loiGiaiChuanTuKho } from '../src/components/loi-giai/KhoiLoiGiaiChuan'
 import { LoiGiaiCauSai } from '../src/components/KhoiCauSai'
-import KhungLoiGiaiGame from '../src/components/KhungLoiGiaiGame'
 import TheCauChiTiet from '../src/components/TheCauChiTiet'
 import { htmlKhoiLoiGiaiChuan } from '../src/lib/html-khoi-loi-giai-chuan'
 import type { CauSaiChiTiet } from '../src/lib/phieu-du-lieu'
@@ -71,7 +70,7 @@ describe('Mỗi nơi đã chuyển đều có nhãn LỜI GIẢI + Kiến thức
     expect(tangDan(viTri(h, 'LỜI GIẢI', 'Kiến thức cốt lõi', 'Đúng B'))).toBe(true)
   }
   it('LoiGiaiCauSai (game, LamCauOn, báo cáo)', () => kiem(renderToStaticMarkup(<LoiGiaiCauSai c={{ phan: 'I', dapAnDung: 'B', loiGiai: kho }} />)))
-  it('KhungLoiGiaiGame (Leo tháp, Săn câu sai)', () => kiem(renderToStaticMarkup(<KhungLoiGiaiGame loiGiaiTho={kho} dapAnDung={1} daChon={0} phuongAn={['a', 'b', 'c', 'd']} />)))
+  // GỌN MÃ 06/10 (lần 2, docs/gon-ma-0610-lan-2.md): đã gỡ `it('KhungLoiGiaiGame (Leo tháp, Săn câu sai)')` — KhungLoiGiaiGame.tsx (game Thần thú v1) bị xoá.
   it('KhoiLoiGiaiTuCT (phụ huynh: TungCau, ManChiTietCa) có lý do từng phương án', () => {
     kiem(renderToStaticMarkup(<KhoiLoiGiaiTuCT ct={{ chot: 'Cu(OH)2 màu xanh', buoc: [], ketQua: '', lyDo: [{ khoa: 'A', dung: false, ly: 'Sai A' }, { khoa: 'B', dung: true, ly: 'Đúng B' }] }} dapAn="B" />))
   })
