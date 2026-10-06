@@ -16,6 +16,12 @@
 //   4. Bốc NGẪU NHIÊN có hạt giống (mã ca + SBD) ⇒ chấm lại tái tạo được; câu nhiều em cùng có xoay vòng theo số em đã nhận ⇒ hai em
 //      ngồi cạnh khác nhau khi kho đủ.
 //   5. Nhãn mỗi câu = nơi của LẦN ĐÚNG GẦN NHẤT + ngày + mức độ ("Ca Kiểm tra tuần 3 · 28/09 · Thông hiểu"). Không mã nội bộ.
+//   6. (thầy 06/10) Câu em đã đúng KHÔNG ra nguyên văn nữa — thay bằng BẢN KHÁC để em không làm theo trí nhớ đáp án, và GHI RÕ trên câu:
+//        · câu tính toán có bản đổi số (song sinh / biến thể bằng mã) ⇒ "Câu này thay số của câu em đã đúng ở <nhãn>";
+//        · câu lý thuyết (và Phần II, câu chưa có bản đổi số) ⇒ CÂU ANH EM cùng dạng, cùng mức, nội dung khác, em chưa gặp (cách làm lại câu sai —
+//          server/src/cau-anh-em.ts) ⇒ "Câu lý thuyết này thay cho câu em đã đúng ở <nhãn> (cùng dạng bài, nội dung khác)";
+//        · không tìm được bản thay ⇒ giữ nguyên câu em đã đúng như trước ("Em đã làm đúng: <nhãn>") — không bao giờ để trống ô.
+//      Phần việc tìm bản thay nằm ở máy chủ (`/ca/cau-thay-so`, server/src/cau-thay-so.ts) vì cần sổ học của em; hàm thuần ở đây chỉ ÁP kết quả vào bộ câu.
 // GIẢ ĐỊNH ĐÃ CHỐT: "đã làm đúng ở ca nào" = nơi của lần đúng gần nhất; câu đúng rồi sai lại vẫn vào nguồn; thiếu câu đúng thì bù câu
 // kho mức độ tương đương (luật 3) — em chưa đúng câu nào vẫn có đủ đề.
 import { MA_TRAN_HOA_2026 } from './ma-tran-hoa-2026'
@@ -92,8 +98,38 @@ export function taoNhanDaDung(noi: string, ngay: string, mucDo: string): string 
   return [String(noi ?? '').trim(), ngayNgan(ngay), TEN_MUC_DO_CAU[mucDo] ?? ''].filter(Boolean).join(' · ')
 }
 
-/** Chữ đầy đủ máy em in dưới số câu. */
-export const chuNhanDaDung = (nhan: string): string => `Em đã làm đúng: ${String(nhan ?? '').trim()}`
+// ---------------------------------------------------------------- nhãn câu THAY (thầy 06/10)
+
+/** Cách một câu trong đề thay cho câu em đã đúng: `thay_so` = bản đổi số (song sinh / biến thể bằng mã) · `cung_dang` = câu anh em (cùng dạng, nội dung khác). */
+export type KieuThay = 'thay_so' | 'cung_dang'
+
+/**
+ * Nhãn HIỆN CHO EM của câu đã được thay — là CẢ CÂU (máy em in nguyên văn, không thêm "Em đã làm đúng:"):
+ *   thay_so   → "Câu này thay số của câu em đã đúng ở Ca Kiểm tra tuần 3 · 28/09 · Thông hiểu"
+ *   cung_dang → "Câu này thay cho câu em đã đúng ở … (cùng dạng bài, nội dung khác)" · câu lý thuyết: "Câu lý thuyết này thay cho câu em đã đúng ở …"
+ * Vì sao cả câu nằm trong chuỗi nhãn: máy em đang cache bản cũ vẫn in được (thành "Em đã làm đúng: Câu này thay số của …" — dài nhưng đủ nghĩa, không mất nhãn);
+ * không thêm khoá mới vào gói đề của em (đường `/vao-thi` giữ nguyên).
+ */
+export function nhanThay(kieu: KieuThay, lyThuyet: boolean, nhanGoc: string): string {
+  const noi = String(nhanGoc ?? '').trim()
+  const o = noi ? `ở ${noi}` : 'trước đây'
+  if (kieu === 'thay_so') return `Câu này thay số của câu em đã đúng ${o}`
+  return `${lyThuyet ? 'Câu lý thuyết này' : 'Câu này'} thay cho câu em đã đúng ${o} (cùng dạng bài, nội dung khác)`
+}
+const MAU_NHAN_THAY = /^Câu (?:lý thuyết )?này (?:thay số của|thay cho) câu em đã đúng /
+/** Nhãn này là nhãn câu ĐÃ THAY (nhãn câu nguyên văn bắt đầu bằng tên nơi: "Ca …", "Chiến dịch …", "Ôn lại"… — không bao giờ bằng "Câu này"). */
+export const laNhanThay = (nhan: unknown): boolean => typeof nhan === 'string' && MAU_NHAN_THAY.test(nhan.trim())
+
+/** Chữ đầy đủ máy em in dưới số câu: câu nguyên văn "Em đã làm đúng: <nhãn>"; câu đã thay in đúng nhãn thay (xem `nhanThay`). */
+export const chuNhanDaDung = (nhan: string): string => {
+  const n = String(nhan ?? '').trim()
+  return laNhanThay(n) ? n : `Em đã làm đúng: ${n}`
+}
+/** Dòng nhãn trong báo cáo cuối bài của thầy: "đã làm đúng: <nơi>" cho câu nguyên văn; câu đã thay in cả nhãn thay (nó đã nói nơi). */
+export const chuNhanBaoCao = (nhan: string): string => {
+  const n = String(nhan ?? '').trim()
+  return laNhanThay(n) ? n : `đã làm đúng: ${n || 'không rõ nơi'}`
+}
 
 // ---------------------------------------------------------------- rút
 
@@ -113,6 +149,7 @@ export interface CauDaDung {
 }
 
 export interface CauRutDaDung {
+  /** qid CÂU TRONG ĐỀ: sau khi áp bản thay (`apThayVaoKetQua`) là qid của câu thay, `goc` giữ qid câu em đã đúng. */
   qid: string
   phan: PhanV2
   mucDo: string
@@ -121,6 +158,10 @@ export interface CauRutDaDung {
   lechMuc?: boolean
   /** Câu BÙ từ kho (em chưa làm đúng câu này) — không nhãn "đã làm đúng". */
   bu?: boolean
+  /** Câu này THAY cho câu em đã đúng `goc` (thầy 06/10) theo cách `thay`; `lyThuyet` = câu em đã đúng là câu lý thuyết. */
+  goc?: string
+  thay?: KieuThay
+  lyThuyet?: boolean
 }
 
 /** Một câu trong kho ca dùng để BÙ (luật 3) — đã bỏ tự luận và câu song sinh ở nơi gọi. */
@@ -262,6 +303,112 @@ export function rutDeDaDung(dv: DauVaoDaDung): KetQuaDaDung {
   return ra
 }
 
+// ---------------------------------------------------------------- ÁP BẢN THAY VÀO BỘ CÂU (thầy 06/10)
+
+/** Bản thay của MỘT câu em đã đúng: `id` = qid câu thay trong đề (qid ảo "<gốc>~ss<i>" / "<gốc>~bt<k>" hoặc qid thật của câu anh em). */
+export interface BanThay {
+  id: string
+  kieu: KieuThay
+}
+/** sbd → qid câu em đã đúng → bản thay. */
+export type ThayTheoEm = Record<string, Record<string, BanThay>>
+
+/**
+ * Áp bản thay lên kết quả rút: câu nào em đã đúng (KHÔNG phải câu bù) và có bản thay ⇒ qid trong đề đổi thành qid bản thay, `goc` giữ qid cũ, nhãn đổi thành
+ * nhãn thay (`nhanThay`, dựng từ nhãn nơi · ngày · mức của câu gốc), đếm đúng/sai TRƯỚC ca của câu gốc đi theo qid mới. Không đổi ô (phần, mức) và không đổi
+ * `daDung` (đếm xoay vòng theo qid gốc). Bản thay trùng một qid đã có trong đề của em ⇒ bỏ bản thay đó (đề không bao giờ có hai câu giống nhau).
+ * `lyThuyet` = tập qid câu gốc là câu LÝ THUYẾT (chỉ để chọn lời nhãn). Thuần, không đổi đầu vào.
+ */
+export function apThayVaoKetQua(kq: KetQuaDaDung, thay: ThayTheoEm, lyThuyet: ReadonlySet<string> = new Set()): KetQuaDaDung {
+  const ra: KetQuaDaDung = { ...kq, theoEm: { ...kq.theoEm }, nhan: { ...kq.nhan }, dem: { ...kq.dem } }
+  for (const [sbd, ds] of Object.entries(kq.theoEm)) {
+    const t = thay[sbd]
+    if (!t) continue
+    const dung = new Set(ds.map((c) => c.qid))
+    const nhanEm = { ...(kq.nhan[sbd] ?? {}) }
+    const demEm = { ...(kq.dem[sbd] ?? {}) }
+    ra.theoEm[sbd] = ds.map((c) => {
+      const b = c.bu ? undefined : t[c.qid]
+      if (!b || typeof b.id !== 'string' || !b.id || dung.has(b.id) || (b.kieu !== 'thay_so' && b.kieu !== 'cung_dang')) return c
+      dung.add(b.id)
+      const ly = lyThuyet.has(c.qid)
+      nhanEm[b.id] = nhanThay(b.kieu, ly, nhanEm[c.qid] ?? '')
+      if (demEm[c.qid]) demEm[b.id] = demEm[c.qid]!
+      delete nhanEm[c.qid]
+      delete demEm[c.qid]
+      return { ...c, qid: b.id, goc: c.qid, thay: b.kieu, ...(ly ? { lyThuyet: true } : {}) }
+    })
+    ra.nhan[sbd] = nhanEm
+    ra.dem[sbd] = demEm
+  }
+  return ra
+}
+
+export interface ThongKeThay {
+  /** Số câu đã được thay bằng bản đổi số (song sinh / biến thể bằng mã). */
+  thaySo: number
+  /** Số câu đã được thay bằng câu anh em (cùng dạng, nội dung khác) — trong đó `lyThuyet` là câu lý thuyết. */
+  cungDang: number
+  lyThuyet: number
+  /** Số câu em đã đúng mà KHÔNG tìm được bản thay ⇒ giữ nguyên câu cũ (có nhãn "Em đã làm đúng"). */
+  giuNguyen: number
+  /** Số câu bù (em chưa làm đúng câu ấy) — không thuộc diện thay. */
+  bu: number
+  /** Số em có ít nhất một câu giữ nguyên. */
+  emGiuNguyen: number
+  theoEm: Record<string, { thaySo: number; cungDang: number; giuNguyen: number }>
+}
+
+/** Đếm cách thay trên kết quả (đã hoặc chưa áp bản thay) — số liệu cho thầy (bảng Xem trước phân bổ, biên bản lúc rút). */
+export function thongKeThay(kq: Pick<KetQuaDaDung, 'theoEm'>): ThongKeThay {
+  const ra: ThongKeThay = { thaySo: 0, cungDang: 0, lyThuyet: 0, giuNguyen: 0, bu: 0, emGiuNguyen: 0, theoEm: {} }
+  for (const [sbd, ds] of Object.entries(kq.theoEm)) {
+    const e = { thaySo: 0, cungDang: 0, giuNguyen: 0 }
+    for (const c of ds) {
+      if (c.bu) ra.bu++
+      else if (c.thay === 'thay_so') e.thaySo++
+      else if (c.thay === 'cung_dang') { e.cungDang++; if (c.lyThuyet) ra.lyThuyet++ }
+      else e.giuNguyen++
+    }
+    ra.thaySo += e.thaySo
+    ra.cungDang += e.cungDang
+    ra.giuNguyen += e.giuNguyen
+    if (e.giuNguyen > 0) ra.emGiuNguyen++
+    ra.theoEm[sbd] = e
+  }
+  return ra
+}
+
+/**
+ * Bản thay lấy từ KHO CA (đường em VÀO MUỘN, server): câu em đã đúng nào có câu đổi số của nó đã nằm sẵn trong kho ca (máy thầy nối lúc Bắt đầu cho em khác)
+ * ⇒ dùng bản đó (`songSinhCua` = câu gốc). Câu lý thuyết không đổi số ⇒ bỏ qua. Ưu tiên bản em CHƯA gặp (`daGap`: sbd → qid → ngày gặp gần nhất); gặp hết ⇒ bản
+ * gặp lâu nhất. Chọn tất định theo (mã ca, em, câu gốc). Không có bản nào trong kho ⇒ không thay (câu giữ nguyên, có nhãn "Em đã làm đúng").
+ */
+export function timThayTrongKho(
+  kq: Pick<KetQuaDaDung, 'theoEm'>,
+  kho: readonly { id: string; songSinhCua?: string }[],
+  seed: string,
+  daGap: Readonly<Record<string, Readonly<Record<string, string>>>> = {},
+  lyThuyet: ReadonlySet<string> = new Set(),
+): ThayTheoEm {
+  const theoGoc = new Map<string, string[]>()
+  for (const x of kho) if (x.songSinhCua) theoGoc.set(x.songSinhCua, [...(theoGoc.get(x.songSinhCua) ?? []), x.id])
+  const ra: ThayTheoEm = {}
+  for (const [sbd, ds] of Object.entries(kq.theoEm)) {
+    for (const c of ds) {
+      if (c.bu || c.thay || lyThuyet.has(c.qid)) continue
+      const ung = [...(theoGoc.get(c.qid) ?? [])].sort()
+      if (ung.length === 0) continue
+      const gap = daGap[sbd] ?? {}
+      const chua = ung.filter((id) => !gap[id])
+      const pool = chua.length > 0 ? chua : [[...ung].sort((a, b) => (gap[a] ?? '').localeCompare(gap[b] ?? '') || a.localeCompare(b))[0]!]
+      const id = pool[bam(`${seed}|${sbd}|${c.qid}`) % pool.length]!
+      ;(ra[sbd] ??= {})[c.qid] = { id, kieu: 'thay_so' }
+    }
+  }
+  return ra
+}
+
 /** Câu báo thầy cho một em còn ô trống SAU KHI ĐÃ BÙ: gộp theo phần — "An thiếu 2 câu Phần III vì kho ca không đủ câu". */
 export function chuThieuDaDung(ten: string, ds: readonly ThieuDaDung[]): string[] {
   const theoPhan = new Map<PhanV2, number>()
@@ -298,14 +445,14 @@ export function banDoDaDung(kq: Pick<KetQuaDaDung, 'theoEm' | 'nhan' | 'dem'>): 
   return { bo, daDung, demDaDung }
 }
 
-/** Nhãn "đã làm đúng" của MỘT em, đọc phòng thủ: qid → nhãn (chuỗi ≤ 160 ký tự). */
+/** Nhãn "đã làm đúng" của MỘT em, đọc phòng thủ: qid → nhãn (chuỗi ≤ 260 ký tự — nhãn câu đã thay là cả câu, xem `nhanThay`). */
 export function daDungCuaEm(v: unknown): Record<string, string> {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
   const ra: Record<string, string> = {}
   for (const [q, n] of Object.entries(v as Record<string, unknown>)) {
     const qid = String(q ?? '').trim()
     if (!qid || typeof n !== 'string' || !n.trim()) continue
-    ra[qid] = n.trim().slice(0, 160)
+    ra[qid] = n.trim().slice(0, 260) // nhãn câu thay là cả câu (nhãn nơi + lời giải thích) — dài hơn nhãn nơi cũ
   }
   return ra
 }

@@ -245,6 +245,29 @@ async function chonCauAnhEm(env: Env, lb: BoiCanhLamLai, m: MetaCau, chungP: Pro
   return chonTuUng(kho.meta.filter((x) => hopLe(x, chuaGap)))
 }
 
+/**
+ * CA "KIỂM CHỨNG CÂU ĐÃ ĐÚNG" (thầy 06/10: "Các câu lý thuyết thì bạn xử lý theo cách thay thế câu lý thuyết"): câu ANH EM của từng câu em đã đúng mà không có bản đổi số (câu lý thuyết,
+ * Phần II, câu chưa có song sinh / biến thể) — ĐÚNG bộ chọn của thang làm lại câu sai (`chonCauAnhEm`: cùng dạng, cùng phần, cùng mức hoặc kề, khác nhóm nội dung, ĐÚNG KHỐI, em chưa gặp,
+ * không câu ca bảo vệ / BTVN chưa nộp / nghi sai đáp án, trong phạm vi em; hết thì kho TU LUYỆN). Đọc chung MỘT lần cho cả em; các câu chọn lần lượt, câu đã chọn + câu có sẵn trong đề
+ * (`trongDe`: cả câu em đã đúng lẫn câu bù) không bị chọn lại, kể cả cùng nhóm nội dung. Câu nào không có ⇒ vắng trong Map (nơi gọi giữ nguyên câu). Lỗi đọc ở MỘT câu ⇒ riêng câu ấy bỏ;
+ * không đọc được phần chung (tập câu bảo vệ ca thi) ⇒ rỗng cả em — thà giữ câu cũ còn hơn phát câu chưa kiểm được. Không đụng công tắc `lam_lai_khac` (công tắc riêng của ca: cau-thay-so.ts).
+ */
+export async function chonAnhEmChoCaDaDung(env: Env, sbd: string, nowMs: number, cho: readonly MetaCau[], trongDe: readonly Pick<MetaCau, 'qid' | 'group'>[]): Promise<Map<string, { q: PrivateQuestion; m: MetaCau }>> {
+  const ra = new Map<string, { q: PrivateQuestion; m: MetaCau }>()
+  if (!cho.length) return ra
+  const bc: BoiCanhLamLai = { sbd, nowMs }
+  const chungP = chungAnhEm(env, bc, new Set())
+  try { await chungP } catch (e) { console.error('[cau-anh-em] ca đã đúng: không đọc được phần chung, giữ nguyên câu:', e instanceof Error ? e.message : e); return ra }
+  const daDung = new Set(trongDe.map((x) => tachSongSinh(x.qid).goc)), nhomDung = new Set(trongDe.map((x) => x.group))
+  for (const m of cho) {
+    try {
+      const ae = await chonCauAnhEm(env, bc, m, chungP, daDung, nhomDung)
+      if (ae) { ra.set(m.qid, ae); daDung.add(ae.m.qid); nhomDung.add(ae.m.group) }
+    } catch (e) { console.error('[cau-anh-em] ca đã đúng: không chọn được câu anh em cho một câu (giữ nguyên câu ấy):', e instanceof Error ? e.message : e) }
+  }
+  return ra
+}
+
 /** Trần số câu TU LUYỆN (chưa gặp) của một dạng được nạp meta mỗi lượt — dạng lớn có hàng trăm câu; chọn mẫu tất định theo (em, ngày, dạng) để nhẹ D1. */
 export const TRAN_UNG_VIEN_TU_LUYEN = 200
 /**

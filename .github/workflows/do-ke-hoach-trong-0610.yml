@@ -1,0 +1,55 @@
+# VIỆC (14) 06/10 — "chiến dịch #cd22009otTH đang chạy nhưng trên app học sinh báo hôm nay em chưa có câu nào": VÌ SAO KẾ HOẠCH HÔM NAY TRỐNG?
+# CHỈ ĐỌC, chỉ in SỐ ĐẾM (repo công khai, nhật ký ai cũng đọc được: không số báo danh, không tên em, không mã câu, không tên chiến dịch).
+# Chạy ĐÚNG mã máy chủ (docHoSo2, lapKeHoachNgay, tamHoanCauKhoa) cho vài em của chiến dịch khớp mẫu; lớp mỏng chặn mọi lệnh không phải SELECT.
+# Bấm tay (workflow_dispatch) hoặc tự chạy khi đẩy nhánh KHÁC main có sửa các tệp dưới đây.
+name: Kế hoạch hôm nay trống — đo từng em của một chiến dịch (chỉ đọc, chỉ đếm)
+on:
+  workflow_dispatch:
+    inputs:
+      mau:
+        description: 'Mẫu khớp mã hoặc tên chiến dịch'
+        required: false
+        default: '22009otTH'
+      so_em:
+        description: 'Số em mẫu (1–80)'
+        required: false
+        default: '12'
+  push:
+    paths: ['.github/workflows/do-ke-hoach-trong-0610.yml', 'scripts/do-ke-hoach-trong-0610.ts']
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: do-ke-hoach-trong-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bộ đo chỉ có đường đọc (lớp mỏng chặn mọi lệnh không phải SELECT)
+        run: |
+          grep -q "CHỈ ĐỌC: chặn câu không phải SELECT" scripts/do-ke-hoach-trong-0610.ts
+          grep -q "CHỈ ĐỌC: chặn run()" scripts/do-ke-hoach-trong-0610.ts
+          echo "OK: chỉ đọc"
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Cài gói (để gói bộ đo bằng esbuild)
+        run: npm ci --ignore-scripts
+      - name: "ĐO kế hoạch hôm nay của em trong chiến dịch (D1 thật, chỉ đọc, chỉ in số đếm)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          OMR_CD_MAU: ${{ github.event.inputs.mau || '22009otTH' }}
+          SO_EM: ${{ github.event.inputs.so_em || '12' }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/do-ke-hoach-trong-0610.ts --bundle --platform=node --format=esm --target=node22 --external:node:sqlite --outfile=/tmp/do-kh.mjs --log-level=warning
+          OMR_GIOI_HAN_MS=1500000 timeout 1600 node --no-warnings /tmp/do-kh.mjs "$SO_EM" || echo "(thoát mã $?)"

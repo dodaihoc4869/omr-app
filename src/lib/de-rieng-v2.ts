@@ -55,9 +55,16 @@ export const boRutThu = (maCa: string): void => void nho.delete(maCa)
 
 /** Dựng câu song sinh thành câu đề CÓ đáp án (chỉ nằm ở máy thầy + kho đáp án của ca). */
 function cauTuSongSinh(l: LoiDenHanEm, goc?: { mucDo?: unknown; chuyenDe?: string; dang?: unknown }): CauNgoai | null {
-  const ss = l.cauSongSinh
+  return l.cauSongSinh ? cauNgoaiTuBanDoiSo(l.cauSongSinh, goc, l.mucDo) : null
+}
+
+/**
+ * Câu đổi số (song sinh `~ss`, biến thể bằng mã `~bt`) do máy chủ dựng ⇒ câu đề CÓ đáp án để nối vào kho ca. Mức / chuyên đề / dạng đi theo CÂU GỐC (`goc`), vắng mức thì
+ * dùng `mucDoDuPhong`. Phần I cần đúng 4 phương án và đáp án A–D; Phần III cần đáp số; Phần II không có bản đổi số ⇒ null.
+ */
+export function cauNgoaiTuBanDoiSo(ss: NonNullable<LoiDenHanEm['cauSongSinh']>, goc?: { mucDo?: unknown; chuyenDe?: string; dang?: unknown }, mucDoDuPhong?: string): CauNgoai | null {
   if (!ss || !ss.id || !ss.text) return null
-  const them = { ...(goc?.mucDo ? { mucDo: goc.mucDo } : l.mucDo ? { mucDo: l.mucDo } : {}), ...(goc?.chuyenDe ? { chuyenDe: goc.chuyenDe } : {}), ...(goc?.dang ? { dang: goc.dang } : {}),
+  const them = { ...(goc?.mucDo ? { mucDo: goc.mucDo } : mucDoDuPhong ? { mucDo: mucDoDuPhong } : {}), ...(goc?.chuyenDe ? { chuyenDe: goc.chuyenDe } : {}), ...(goc?.dang ? { dang: goc.dang } : {}),
     ...(ss.table ? { table: ss.table } : {}), ...(ss.hinhAnh?.length ? { hinhAnh: ss.hinhAnh } : {}) }
   if (ss.phan === 'I' && Array.isArray(ss.choices) && ss.choices.length === 4 && /^[ABCD]$/.test(ss.correct)) {
     return { phan: 'I', cau: { id: ss.id, text: ss.text, choices: ss.choices as [string, string, string, string], correct: ss.correct as 'A', ...them } as TeacherMcqQuestion }

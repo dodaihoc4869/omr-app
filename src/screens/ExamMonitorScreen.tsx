@@ -401,6 +401,8 @@ export default function ExamMonitorScreen() {
   const [rutThu, setRutThu] = useState<RutThuCa | null>(null)
   const [dangRutThu, setDangRutThu] = useState(false)
   const [loiRutThu, setLoiRutThu] = useState('')
+  /** Ca "Kiểm chứng câu đã đúng": tiến độ bước tìm câu thay (thầy 06/10) — "đã xong / tổng số em", rỗng khi không chạy. */
+  const [tienDoThay, setTienDoThay] = useState<{ xong: number; tong: number } | null>(null)
   const [tenEmLop, setTenEmLop] = useState<Record<string, string>>({})
   // KIỂM CHỨNG CÂU ĐÃ ĐÚNG (02/10): kết quả chạy thử riêng của chế độ này (src/lib/de-rieng-da-dung.ts).
   const [rutThuDaDung, setRutThuDaDung] = useState<RutThuDaDung | null>(null)
@@ -1117,12 +1119,13 @@ export default function ExamMonitorScreen() {
       }
       setTenEmLop(ten)
       if (ds.size === 0) { setRutThu(null); return }
-      if (laCaDaDungNay) setRutThuDaDung(await chayThuRutDeDaDung(scriptUrl.trim(), secret.trim(), maCaNay, [...ds]))
+      if (laCaDaDungNay) setRutThuDaDung(await chayThuRutDeDaDung(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { tienDo: (xong, tong) => setTienDoThay({ xong, tong }) }))
       else setRutThu(await chayThuRutDeCa(scriptUrl.trim(), secret.trim(), maCaNay, [...ds], { cheDo: cheDoRutV2 }))
     } catch (e) {
       setLoiRutThu(e instanceof Error ? e.message : 'lỗi không rõ')
     } finally {
       setDangRutThu(false)
+      setTienDoThay(null)
     }
   }
   useEffect(() => {
@@ -1186,7 +1189,8 @@ export default function ExamMonitorScreen() {
             await luuDeRiengCa(chiTiet.ca.maCa, dd.boTheoEm, {}, {}, bienBan)
             setRutThuDaDung(docRutThuDaDung(chiTiet.ca.maCa) ?? null)
             if (dd.soEmRutThem > 0) showToast(`Đã rút thêm bộ câu cho ${dd.soEmRutThem} em vào phòng sau lượt chạy thử.`, 'success')
-            if (dd.soCauNoiThem > 0) showToast(`Đã nối ${dd.soCauNoiThem} câu em đã làm đúng (ngoài kho ca) vào đề ca này.`, 'success')
+            if (dd.soCauNoiThem > 0) showToast(`Đã nối ${dd.soCauNoiThem} câu (câu thay và câu em đã làm đúng nằm ngoài kho ca) vào đề ca này.`, 'success')
+            if (dd.soCauThay.thaySo + dd.soCauThay.cungDang > 0) showToast(`Đã thay câu em đã làm đúng: ${dd.soCauThay.thaySo} câu thay số · ${dd.soCauThay.cungDang} câu thay bằng câu cùng dạng${dd.soCauThay.giuNguyen > 0 ? ` · ${dd.soCauThay.giuNguyen} câu giữ nguyên văn` : ''}.`, 'success')
             for (const c of dd.canhBao) showToast(c, 'warn')
           } catch (e) {
             showToast(`Chưa rút được đề "Kiểm chứng câu đã đúng" (${e instanceof Error ? e.message : 'lỗi không rõ'}) — ca chưa bắt đầu, thầy bấm lại.`, 'error')
@@ -1451,6 +1455,7 @@ export default function ExamMonitorScreen() {
               dang={dangRutThu || (canRutThu && daRutThuRef.current !== `${chiTiet.ca.maCa}|da_dung`)}
               loi={canRutThu ? loiRutThu : teacherBank && soCauCa ? loiRutThu : 'máy này chưa có bản đề có đáp án hoặc số câu mỗi phần của ca'}
               tenCua={tenEmLop}
+              tienDoThay={tienDoThay}
               onChayLai={() => void chayRutThu()}
             />
           )}
