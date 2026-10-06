@@ -14,6 +14,7 @@ import type { Env } from './kieu'
 import { assignStudentQuestions } from '../../src/lib/exam-assign'
 import { boCauTuBaiLam } from '../../src/lib/bo-cau-tu-bai-lam'
 import { hopNhatBo, lamPhangBo, LoiBoCauError } from '../../src/lib/bo-cau-chuan'
+import { khopPhanIII } from '../../src/lib/cham-so'
 import { chamBaiMotEm, chamTheoBoCauDaChon, docNguonChamLai, type KetQuaDocNguon, type NguonChamLai } from './cham-lai-ca'
 import type { SoCauBaPhan } from '../../src/engine/score'
 
@@ -25,6 +26,7 @@ type MaLech =
   | 'diem_chua_co' // đã nộp, chấm được, mà luot.tong trống
   | 'tong_khac_tong_phan' // luot.tong ≠ I + II + III
   | 'dong_lech' // chi_tiet_cau.dung_sai ≠ tính lại
+  | 'dap_an_dung_lech' // chi_tiet_cau.dap_an_dung ≠ đáp án đúng của khoá hiện hành (khoá bị đổi sau khi chấm, hoặc khoá bổ sung sai)
   | 'dong_thieu' // câu có trong bộ câu mà chi_tiet_cau không có
   | 'dong_thua' // chi_tiet_cau có câu ngoài bộ câu
   | 'em_khong_co_dong' // đã nộp mà không có dòng chi tiết nào
@@ -38,6 +40,23 @@ interface Mau {
   qid?: string
   luu?: number | string | null
   moi?: number | string | null
+}
+
+/** Hai chuỗi đáp án đúng là MỘT đáp án? Bằng chữ sau trim (không phân hoa/thường), hoặc Phần III bằng nhau theo số học. */
+function cungDapAn(a: string, b: string): boolean {
+  const x = a.trim()
+  const y = String(b ?? '').trim()
+  if (x.toUpperCase() === y.toUpperCase()) return true
+  // Phần II có thể được ghi "DSDS" hoặc "D,S,D,S": bỏ dấu ngăn rồi so.
+  const dang2 = (v: string): string | null => (/^[DSds\s,;|/-]+$/.test(v) ? v.toUpperCase().replace(/[^DS-]/g, '') : null)
+  const x2 = dang2(x)
+  const y2 = dang2(y)
+  if (x2 !== null && y2 !== null) return x2 === y2
+  try {
+    return khopPhanIII(x, y)
+  } catch {
+    return false
+  }
 }
 
 function cents(x: number | null | undefined): number | null {
@@ -73,6 +92,9 @@ export interface KetQuaKiemCham {
     soCauCa: SoCauBaPhan
     /** Số em có bộ câu ghi ở D1 sống mà KHÔNG có trong bản chụp R2 (em vào muộn / thi lại). */
     emChiCoOD1: number
+    /** Số câu nối thêm tờ đáp án R2 đã MẤT mà `kho_ca_them` còn đáp án — kiểm chấm đã bổ sung vào bộ nhớ để chấm được (0 = tờ đủ). */
+    boSungTuKhoCaThem: number
+    boQuaKhoCaThem: number
   }
   soEmDaNop: number
   soEmChamDuoc: number
@@ -94,6 +116,7 @@ const MA_LECH: MaLech[] = [
   'diem_chua_co',
   'tong_khac_tong_phan',
   'dong_lech',
+  'dap_an_dung_lech',
   'dong_thieu',
   'dong_thua',
   'em_khong_co_dong',
@@ -103,20 +126,24 @@ const MA_LECH: MaLech[] = [
 ]
 
 export async function kiemChamCa(env: Env, maCa: string): Promise<KetQuaKiemChamRoute> {
-  const n = await docNguonChamLai(env, maCa, { boQuaCongCaDaXong: true })
+  const n = await docNguonChamLai(env, maCa, { boQuaCongCaDaXong: true, boSungKhoCaThem: true })
   if (n.ok !== true) return n
   const { ca, nh, dsLuot } = n
   const soCau: SoCauBaPhan = n.soCauCa && n.soCauCa.I + n.soCauCa.II + n.soCauCa.III > 0 ? n.soCauCa : nh.soCau ?? { I: nh.phanI.length, II: nh.phanII.length, III: nh.phanIII.length }
 
   // CHỈ ĐỌC các bảng đã ghi, để đối chiếu.
-  const rCt = await env.DB.prepare('SELECT sbd, lan_thu, phan, so_cau, qid, dung_sai FROM chi_tiet_cau WHERE ma_ca = ?').bind(maCa).all<Record<string, unknown>>()
+  const rCt = await env.DB.prepare('SELECT sbd, lan_thu, phan, so_cau, qid, dung_sai, dap_an_dung FROM chi_tiet_cau WHERE ma_ca = ?').bind(maCa).all<Record<string, unknown>>()
   const rBd = await env.DB.prepare('SELECT sbd, qid FROM ban_do_sai WHERE ma_ca = ?').bind(maCa).all<Record<string, unknown>>()
   const dongTheoEm = new Map<string, Map<string, number | null>>() // `${sbd}|${lan}` → qid → dung_sai
+  const dapAnDungDaGhi = new Map<string, Map<string, string>>() // `${sbd}|${lan}` → qid → dap_an_dung
   for (const x of rCt.results ?? []) {
     const k = `${String(x.sbd ?? '')}|${Number(x.lan_thu) || 1}`
     const m = dongTheoEm.get(k) ?? new Map<string, number | null>()
     m.set(String(x.qid ?? ''), x.dung_sai === null || x.dung_sai === undefined ? null : Number(x.dung_sai))
     dongTheoEm.set(k, m)
+    const dd = dapAnDungDaGhi.get(k) ?? new Map<string, string>()
+    dd.set(String(x.qid ?? ''), String(x.dap_an_dung ?? ''))
+    dapAnDungDaGhi.set(k, dd)
   }
   const bdTheoEm = new Map<string, Set<string>>()
   for (const x of rBd.results ?? []) {
@@ -195,6 +222,15 @@ export async function kiemChamCa(env: Env, maCa: string): Promise<KetQuaKiemCham
         else if ((daGhi.get(qid) ?? 0) !== dung) danh('dong_lech', { qid, luu: daGhi.get(qid) ?? 0, moi: dung })
       }
       for (const qid of daGhi.keys()) if (!tinhLai.has(qid)) danh('dong_thua', { qid })
+      // Đáp án đúng ĐÃ GHI ở dòng chi tiết ↔ đáp án đúng của khoá hiện hành: lệch nghĩa là khoá bị đổi sau khi chấm (hoặc khoá bổ sung từ `kho_ca_them` sai).
+      // Chỉ nêu mã câu, KHÔNG nêu đáp án.
+      const ddGhi = dapAnDungDaGhi.get(`${sbd}|${moiNhat.lanThu}`)
+      if (ddGhi) {
+        for (const c of kq.cau) {
+          const da = ddGhi.get(c.qid)
+          if (da !== undefined && da.trim() !== '' && !cungDapAn(da, c.dapAnDung)) danh('dap_an_dung_lech', { qid: c.qid })
+        }
+      }
     }
 
     // ban_do_sai: oan (em làm đúng) / thừa (ngoài bộ câu).
@@ -227,6 +263,8 @@ export async function kiemChamCa(env: Env, maCa: string): Promise<KetQuaKiemCham
       khoCau: { I: nh.phanI.length, II: nh.phanII.length, III: nh.phanIII.length },
       soCauCa: soCau,
       emChiCoOD1,
+      boSungTuKhoCaThem: n.soBoSungKhoCaThem,
+      boQuaKhoCaThem: n.soBoQuaKhoCaThem,
     },
     soEmDaNop: daNop,
     soEmChamDuoc: chamDuoc,

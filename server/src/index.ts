@@ -62,6 +62,7 @@ import { doiTenHocSinh } from './doi-ten-hoc-sinh'
 import { capNhatTrangThaiToChieu, guiLenhToChieu, layLenhMoiToChieu, layPhienToChieu, taoHoacCapNhatPhienToChieu } from './to-chieu-remote'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
 import {kiemChamCa} from './kiem-cham'
+import {phucHoiKeyCa} from './key-bank-bo-sung'
 import {buSoCauChoKeyBank, hopNhatKeyBank} from './key-bank-hop-nhat'
 import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
@@ -3799,6 +3800,19 @@ const boXuLy = {
         const maCa = String(b.maCa ?? '').trim()
         if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
         return ra(await kiemChamCa(envDoc, maCa))
+      }
+      // PHỤC HỒI TỜ ĐÁP ÁN từ bảng `kho_ca_them` (câu nối thêm mà tờ R2 đã mất — thầy 06/10: "không được phép chấm sai"): mặc định CHỈ XEM TRƯỚC.
+      // `ghi: true` mới ghi, và chỉ THÊM câu (không xoá / không đổi câu có sẵn), sao lưu tờ cũ trước, không chạy khi ca đang mở. Xem key-bank-bo-sung.ts.
+      if (p === '/ca/phuc-hoi-key') {
+        const maCa = String(b.maCa ?? '').trim()
+        if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+        const ca = await env.DB.prepare('SELECT trang_thai, bat_dau_thi_luc, bat_dau, thoi_gian_phut FROM ca WHERE ma_ca = ?')
+          .bind(maCa)
+          .first<{ trang_thai: string; bat_dau_thi_luc: string | null; bat_dau: string | null; thoi_gian_phut: number | null }>()
+        if (!ca) return ra({ ok: false, lyDo: 'khong_co_ca', error: 'Không có ca này' })
+        const kq = await phucHoiKeyCa(env, maCa, { ghi: b.ghi === true, dangMo: caDangChay(ca) })
+        if (kq.daGhi === true) xoaDemCaBaoVe()
+        return ra(kq)
       }
       // BÀI BỔ SUNG (01/10): đáp án tới sau khi lượt đóng — thầy xem rồi Nhận (gộp + chấm lại ca) hoặc Bỏ.
       if (p === '/bo-sung/ds') return ra(await dsBaiBoSung(env, b))

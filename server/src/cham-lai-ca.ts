@@ -27,6 +27,7 @@ import { caDaXong, docTrangThaiCongBo } from './cong-bo-diem'
 import { assignStudentQuestions } from '../../src/lib/exam-assign'
 import { giaiBoCauEm, hopNhatBo, LoiBoCauError, type BoCauChuan } from '../../src/lib/bo-cau-chuan'
 import { khopPhanIII } from '../../src/lib/cham-so'
+import { boSungKeyTuKhoCaThem, docKhoCaThem } from './key-bank-bo-sung'
 import { scoreStudent, type AnswerKey, type Choice, type DS, type GradedItem, type ScoreResult, type SoCauBaPhan, type StudentAnswers } from '../../src/engine/score'
 import type { SoCauMoiPhan, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../../src/data/examContent'
 
@@ -358,6 +359,9 @@ export interface NguonChamLai {
   boD1: unknown
   soEmDaVao: number
   soEmDaNop: number
+  /** Số câu NỐI THÊM đã bổ sung vào `nh` từ bảng `kho_ca_them` (chỉ khi gọi với `boSungKhoCaThem`; xem key-bank-bo-sung.ts). 0 = tờ đáp án R2 đủ. */
+  soBoSungKhoCaThem: number
+  soBoQuaKhoCaThem: number
 }
 
 export type KetQuaDocNguon =
@@ -380,7 +384,12 @@ export type KetQuaChuanBiChamLai =
  *   · Chưa cất ngân hàng đáp án lên R2 ⇒ TỪ CHỐI — không có khóa thì không chấm được.
  * CHỈ ĐỌC — không ghi gì.
  */
-export async function docNguonChamLai(env: Env, maCa: string, tuyChon: { boQuaCongCaDaXong?: boolean } = {}): Promise<KetQuaDocNguon> {
+export async function docNguonChamLai(
+  env: Env,
+  maCa: string,
+  /** `boSungKhoCaThem`: thêm vào tờ đáp án (CHỈ trong bộ nhớ) các câu nối thêm mà R2 đã mất nhưng `kho_ca_them` còn đáp án — dành cho công cụ kiểm chỉ-đọc. */
+  tuyChon: { boQuaCongCaDaXong?: boolean; boSungKhoCaThem?: boolean } = {},
+): Promise<KetQuaDocNguon> {
   const ca = await env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa).first<DongCa>()
   if (!ca) return { ok: false, lyDo: 'khong_co_ca', error: 'Không có ca này' }
 
@@ -403,6 +412,16 @@ export async function docNguonChamLai(env: Env, maCa: string, tuyChon: { boQuaCo
   if (!nh || !Array.isArray(nh.phanI) || !Array.isArray(nh.phanII) || !Array.isArray(nh.phanIII)) {
     return { ok: false, lyDo: 'dap_an_hong', error: 'Ngân hàng đáp án của ca sai khuôn' }
   }
+  let soBoSungKhoCaThem = 0
+  let soBoQuaKhoCaThem = 0
+  if (tuyChon.boSungKhoCaThem) {
+    const bs = boSungKeyTuKhoCaThem(nh, await docKhoCaThem(env, maCa))
+    if (bs) {
+      nh = bs.giaTri as unknown as NganHangDapAn
+      soBoSungKhoCaThem = bs.soBoSung
+      soBoQuaKhoCaThem = bs.soBoQua
+    }
+  }
 
   const r = await env.DB.prepare(
     'SELECT sbd, ho_ten, lan_thu, trang_thai, dap_an_json, giay_cau_json, diem_i, diem_ii, diem_iii, tong FROM luot WHERE ma_ca = ?',
@@ -423,7 +442,7 @@ export async function docNguonChamLai(env: Env, maCa: string, tuyChon: { boQuaCo
     diem: { I: soHoacNull(l.diem_i), II: soHoacNull(l.diem_ii), III: soHoacNull(l.diem_iii), tong: soHoacNull(l.tong) },
   }))
 
-  return { ok: true, ca, nh, dsLuot, soCauCa: docJson(ca.so_cau_json) as SoCauBaPhan | null, boD1: docJson(ca.bo_theo_em_json), soEmDaVao, soEmDaNop }
+  return { ok: true, ca, nh, dsLuot, soCauCa: docJson(ca.so_cau_json) as SoCauBaPhan | null, boD1: docJson(ca.bo_theo_em_json), soEmDaVao, soEmDaNop, soBoSungKhoCaThem, soBoQuaKhoCaThem }
 }
 
 /**
