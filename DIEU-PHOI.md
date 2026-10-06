@@ -2,7 +2,7 @@
 
 Lập 19/09/2026 bởi phiên **0.Planer** (điều phối). Mọi phiên làm việc trong `omr-app` đọc tệp này TRƯỚC khi sửa gì, và cập nhật dòng của mình khi đổi trạng thái.
 
-- 07/10 06:35 (VN) · Codex · NGHIỆM THU đồng bộ giao diện 3 app trên nền `2822a7b9`: quét tĩnh 880 tệp 0 lỗi/0 cảnh báo; Chromium 24 tổ hợp `/gv` `/hs` `/ph` × 360/390/768/1440 × sáng/tối đạt 0 tràn ngang, 0 thiếu nhãn, 0 vùng chạm nhỏ, 0 lỗi trang; giữ bảng màu hiện tại, chuẩn hoá vùng chạm/tiêu điểm/ảnh/giảm chuyển động/giờ 24 tiếng/thuật ngữ và bỏ hướng dẫn trùng. tsc, build:cf, màu, SW 13/13, hiển thị 18/18 đạt; 96/96 test giao diện thay đổi đạt. Full vitest so song song với nền có 8 test đặc tả cũ đã cập nhật và chạy lại xanh; test `rut-de-v2-0210-may-thay` timeout giống hệt trên nền. Chuẩn bị đẩy main; lùi bằng `git revert <commit phát hành>`.
+- 07/10 06:53 (VN) · Codex · ĐÃ PHÁT HÀNH đồng bộ giao diện 3 app `6ee37a70`: Actions `37547464768` thành công; Pages `e453a892`, Worker `1d352341-9633-4dac-a675-295d0c446546` (khởi động 32 ms). Quét tĩnh 880 tệp 0 lỗi/0 cảnh báo; Chromium 24 tổ hợp `/gv` `/hs` `/ph` × 360/390/768/1440 × sáng/tối đạt 0 tràn ngang, 0 thiếu nhãn, 0 vùng chạm nhỏ, 0 lỗi trang; giữ bảng màu hiện tại, chuẩn hoá vùng chạm/tiêu điểm/ảnh/giảm chuyển động/giờ 24 tiếng/thuật ngữ và bỏ hướng dẫn trùng. tsc, build:cf, màu, SW 13/13, hiển thị 18/18 đạt; 96/96 test giao diện thay đổi đạt. Full vitest so song song với nền có 8 test đặc tả cũ đã cập nhật và chạy lại xanh; test `rut-de-v2-0210-may-thay` timeout giống hệt trên nền. Mạng workspace bị Pages trả 403 nên xác nhận sống bằng log Cloudflare trong Actions. Lùi: `git revert 6ee37a70` rồi đẩy main.
 
 ## Cách nói chuyện với nhau
 
