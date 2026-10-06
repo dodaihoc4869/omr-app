@@ -11,7 +11,7 @@ import { writeSync } from 'node:fs'
 import '../server/src/index' // nạp theo ĐÚNG thứ tự của Worker thật (các tệp máy chủ nhập vòng nhau)
 import { docHoSo2, docMetaCau, tamHoanCauKhoa, tuyChonKeHoachOmni, ngayVnCua, type KeHoachDaChot } from '../server/src/srs2-d1'
 import { thuMucCuaMaDe } from '../server/src/kho-thu-muc'
-import { lapKeHoachNgay } from '../server/src/srs2-loi'
+import { congNgay, lapKeHoachNgay } from '../server/src/srs2-loi'
 import { protectedQuestions } from '../server/src/game-v2-bank'
 import { docCauNghiDem } from '../server/src/chan-khac-khoi'
 
@@ -116,6 +116,33 @@ try {
   const pv = await hoi('SELECT COUNT(*) AS n FROM pham_vi_lop WHERE lop = ?', [lopCd])
   ra(`dòng phạm vi lớp (pham_vi_lop): ${String(pv[0]?.n ?? 0)}`)
 } catch (e) { ra(`bai_da_day: lỗi đọc ${String(e).slice(0, 80)}`) }
+
+// ---- DÒNG THỜI GIAN: kế hoạch đã chốt của các em của chiến dịch theo ngày (có câu / trống) — kế hoạch trống bắt đầu từ ngày nào?
+try {
+  const tu = congNgay(homNay, -9)
+  const kh = await hoi('SELECT ngay, COUNT(*) AS n, SUM(CASE WHEN tong > 0 THEN 1 ELSE 0 END) AS co, SUM(CASE WHEN tong = 0 THEN 1 ELSE 0 END) AS trong, CAST(AVG(tong) AS INTEGER) AS tb FROM srs2_ke_hoach WHERE ngay >= ? AND sbd IN (SELECT value FROM json_each(?)) GROUP BY ngay ORDER BY ngay', [tu, JSON.stringify(dsEm)])
+  for (const x of kh) ra(`  kế hoạch chốt ${String(x.ngay)}: ${String(x.n)} em · có câu ${String(x.co)} · TRỐNG ${String(x.trong)} · trung bình ${String(x.tb)} câu`)
+  const om = await hoi('SELECT ngay, COUNT(*) AS n FROM srs2_ke_hoach_omni WHERE ngay >= ? AND sbd IN (SELECT value FROM json_each(?)) GROUP BY ngay ORDER BY ngay', [tu, JSON.stringify(dsEm)])
+  ra(`  dòng kế hoạch OMNI (chỉ có khi OMNI bật cho em): ${om.map((x) => `${String(x.ngay).slice(5)}=${String(x.n)}`).join(' · ') || '—'}`)
+} catch (e) { ra(`dòng thời gian: lỗi đọc ${String(e).slice(0, 80)}`) }
+
+// ---- BÁN KÍNH ẢNH HƯỞNG: MỌI chiến dịch đang chạy — câu có tờ DẠY HỌC không? lớp có tick bài không? kế hoạch hôm nay của các em của nó.
+try {
+  const dc = await hoi("SELECT id, lop, sbd_json, qid_json, ma_de_json, han_nop FROM chien_dich WHERE trang_thai = 'dang_chay' ORDER BY han_nop LIMIT 40", [])
+  ra(`MỌI chiến dịch đang chạy: ${dc.length}`)
+  for (const [k, c] of dc.entries()) {
+    const qs = [...new Set(parse(c.qid_json))], ems = [...new Set(parse(c.sbd_json))]
+    const mc = new Map<string, Set<string>>()
+    const mt = await docMetaCau(env, qs, parse(c.ma_de_json), mc)
+    const tos = [...new Set([...mc.values()].flatMap((x) => [...x]))]
+    const tm = await thuMucCuaMaDe(env, tos)
+    const coDh = qs.filter((q) => [...(mc.get(q) ?? [])].some((m) => tm.get(m) === 'DAY_HOC')).length
+    const lopC = String(c.lop ?? '').trim()
+    const tk = lopC ? await hoi('SELECT COUNT(*) AS n, SUM(CASE WHEN bo_tick_luc IS NULL THEN 1 ELSE 0 END) AS dang FROM bai_da_day WHERE lop = ?', [lopC]).catch(() => [] as Row[]) : []
+    const kk = await hoi('SELECT COUNT(*) AS n, SUM(CASE WHEN tong > 0 THEN 1 ELSE 0 END) AS co, SUM(CASE WHEN tong = 0 THEN 1 ELSE 0 END) AS trong FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))', [homNay, JSON.stringify(ems)])
+    ra(`  cd#${k + 1}${String(c.id) === cdId ? ' (CHIẾN DỊCH ĐANG ĐO)' : ''}: em ${ems.length} · câu ${qs.length} (có trong kho ${mt.size}) · câu có ≥ 1 tờ DẠY HỌC ${coDh} · tờ ${tos.length} · hạn ${String(c.han_nop)} · lớp có tick đang hiệu lực ${String(tk[0]?.dang ?? 0)}/${String(tk[0]?.n ?? 0)} · kế hoạch hôm nay: ${String(kk[0]?.n ?? 0)} dòng (có câu ${String(kk[0]?.co ?? 0)} · TRỐNG ${String(kk[0]?.trong ?? 0)})`)
+  }
+} catch (e) { ra(`bán kính: lỗi đọc ${String(e).slice(0, 100)}`) }
 
 const nhomPv = new Map<string, number>(), nhomTrongPv = new Map<string, number>()
 const nhomChot = new Map<string, number>(), nhomHs = new Map<string, number>(), nhomLap = new Map<string, number>(), nhomHoan = new Map<string, number>()
