@@ -102,6 +102,7 @@ import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
 import { aiSaiCau } from './ai-sai-cau'
 import { doiSbd } from './doi-sbd'
+import { quetKhoi } from './quet-khoi'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 // OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
@@ -3659,6 +3660,7 @@ const boXuLy = {
       if (p === '/gv/chua-nop') return ra(await gvChuaNop(envDoc, b))
       if (p === '/gv/can-giup') return ra(await gvCanGiup(envDoc, b))
       if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(envDoc, b))
+      if (p === '/gv/quet-khoi') return ra(await quetKhoi(envDoc, b)) // 06/10: CHỈ ĐỌC — câu lọt khối trong sổ làm của em khối `khoi`
       if (p === '/gv/tim-em') return ra(await gvTimEm(envDoc, b))
       if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(envDoc, b))
       // GỌI LÊN BẢNG (thầy lệnh 21/09): em đã làm câu này chưa, đúng hay sai, quét HẾT lịch sử (KHÔNG áp mốc 12:00). ĐỌC-CHỈ, ≤ 200 cặp, 2 truy vấn (docs/hop-dong-lich-su-cau-len-bang-2109.md).

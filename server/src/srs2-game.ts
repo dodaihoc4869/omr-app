@@ -281,7 +281,9 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
     // 05/10: câu anh em (`tc`) đứng thay câu gốc của kế hoạch; lượt có câu anh em / bản xáo nạp lại theo ref phiên (cau-anh-em.ts), còn lại như cũ.
     if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === (r.tc ?? r.qid)))) {
       const day = await napLaiLuotCho(env, hs, cu.questions, SO_CAU_CHUYEN, () => napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set()))
-      if (day.length === cu.questions.length) return { ok: true, id: str(dangCho.id), questions: day.map(({ q }, i) => ({ ...publicQuestion(q), vai: cu.questions[i]!.role, ...(cu.questions[i]!.goiY ? { goiY: cu.questions[i]!.goiY } : {}), ...(cu.questions[i]!.nhanNo ? { nhanNo: cu.questions[i]!.nhanNo } : {}) })), ...tomTat }
+      // 06/10: lượt chờ lưu từ trước cũng QUA CỔNG KHỐI — câu khác khối em ⇒ bỏ cả lượt, rút lượt mới (đã lọc).
+      const hopKhoi = day.length === cu.questions.length && (await chanKhacKhoiEm(env, 'dao2_luot_cho', { sbd, meta: hs.meta }, day, { cauCua: (x) => x.q })).length === day.length
+      if (hopKhoi) return { ok: true, id: str(dangCho.id), questions: day.map(({ q }, i) => ({ ...publicQuestion(q), vai: cu.questions[i]!.role, ...(cu.questions[i]!.goiY ? { goiY: cu.questions[i]!.goiY } : {}), ...(cu.questions[i]!.nhanNo ? { nhanNo: cu.questions[i]!.nhanNo } : {}) })), ...tomTat }
     }
   }
   // 29/09 (cao điểm): câu bảo vệ ca thi (đệm 5 s, thường đã có từ bước kế hoạch), câu Bi-a đang giữ và sức em là ba việc độc lập ⇒ SONG SONG (trước: nối tiếp).

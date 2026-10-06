@@ -768,7 +768,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     for (const x of theoQid.get(q) ?? []) if (!x.dung && !x.coGoiY && x.luc > saiCuoi) saiCuoi = x.luc
     if (mocCd.some((l) => l > saiCuoi)) chanDoanXong.add(q)
   }
-  { const thayGiao = new Set([...ds.flatMap((c) => c.qids), ...qidSaiCa.keys()]); await chanMetaKhacKhoi(env, 'hoa2_ho_so', await khoiEmP, meta, (q) => thayGiao.has(q)) } // LUẬT THẦY 05/10: câu khác khối em ⇒ như đã rút khỏi kho của RIÊNG em (kế hoạch, Đảo/Đoàn/Bi-a, "Câu đã làm", báo cáo); em chưa rõ khối ⇒ chỉ giữ câu thầy giao trực tiếp (chiến dịch, câu sai ca thầy dựng)
+  { await chanMetaKhacKhoi(env, 'hoa2_ho_so', await khoiEmP, meta) /* 06/10: KHÔNG miễn câu chiến dịch/câu sai cho em chưa rõ khối — khối em đã có SBD cứu, còn không rõ thì không phát gì */ } // LUẬT THẦY 05/10: câu khác khối em ⇒ như đã rút khỏi kho của RIÊNG em (kế hoạch, Đảo/Đoàn/Bi-a, "Câu đã làm", báo cáo); em chưa rõ khối ⇒ chỉ giữ câu thầy giao trực tiếp (chiến dịch, câu sai ca thầy dựng)
   const thamSoDung = omni && canThanSom ? nhanMocDuyTri(thamSoV2, await canThanSom.catch(() => false)) : thamSoV2 // CẨN THẬN (a): em canThan ⇒ mốc × 0,7
   const tt = new Map<string, TrangThaiCau>()
   const cau: CauSrs[] = []
@@ -1508,7 +1508,9 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
     // thì LẬP LẠI theo chiến dịch hiện tại — giữ các câu đã làm hôm nay (vẫn trừ vào thể lực), thêm câu mới của kế hoạch.
     // Kế hoạch đã chốt có câu ÔN (Đoàn) mà theo luật hiện tại là câu MỚI (thầy 28/09: bỏ câu ôn lấy từ lịch sử trước chiến dịch) ⇒ cũng lập lại.
     const onSaiLuat = kh.conDoan.some((k) => hoSo.tt.get(qidGoc(k))?.laMoi)
-    if ((kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat) {
+    // 06/10: kế hoạch đã chốt còn câu mà hồ sơ KHÔNG còn (cổng khối đã xoá khỏi siêu dữ liệu của em, hoặc câu rút khỏi kho) ⇒ lập lại bằng câu hợp lệ.
+    const saiKhoi = [...kh.conDao, ...kh.conDoan].some((k) => !hoSo.meta.has(qidGoc(k)))
+    if ((kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat || saiKhoi) {
       const xongDao = kh.dao.filter((k) => !kh.conDao.includes(k))
       const xongDoan = kh.doan.filter((k) => !kh.conDoan.includes(k))
       // Câu MỚI của kế hoạch hôm nay em đã làm: lần làm đầu tiên (từ mốc chiến dịch) rơi đúng hôm nay ⇒ quota rải đều hôm nay trừ đi phần này.
