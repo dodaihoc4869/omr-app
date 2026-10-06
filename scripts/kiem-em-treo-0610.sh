@@ -8,7 +8,7 @@ d1() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1"; }
 KT=$(d1 "SELECT m.name AS name FROM sqlite_master m WHERE m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%' AND EXISTS (SELECT 1 FROM pragma_table_info(m.name) p WHERE p.name = 'sbd') ORDER BY m.name" \
   | python3 -c "import sys,json; d=json.load(sys.stdin); print(' '.join(r['name'] for r in d[0]['results']))")
 echo "bảng có cột sbd: $(echo "$KT" | wc -w)"
-# Gom 10 bảng một lệnh (một lệnh quá dài / một bảng lỗi làm hỏng cả lệnh ⇒ in lỗi của đúng cụm đó, các cụm khác vẫn chạy).
+# Gom 4 bảng một lệnh (D1 giới hạn số vế UNION trong một lệnh) (một lệnh quá dài / một bảng lỗi làm hỏng cả lệnh ⇒ in lỗi của đúng cụm đó, các cụm khác vẫn chạy).
 echo 'bang | em_treo | em_nhanh'
 SQL=""; N=0
 chay_cum() {
@@ -29,7 +29,7 @@ except Exception as e:
 for t in $KT; do
   SQL="$SQL SELECT '$t' AS bang, (SELECT COUNT(*) FROM \"$t\" WHERE sbd = '12121212') AS em_treo, (SELECT COUNT(*) FROM \"$t\" WHERE sbd = '11000') AS em_nhanh UNION ALL"
   N=$((N+1))
-  if [ $((N % 10)) -eq 0 ]; then chay_cum; SQL=""; fi
+  if [ $((N % 4)) -eq 0 ]; then chay_cum; SQL=""; fi
 done
 chay_cum
 echo '--- chiến dịch có em treo (cờ 1/0)'
