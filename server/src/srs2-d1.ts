@@ -215,6 +215,19 @@ export async function docChienDichCuaEm(env: Env, sbd: string): Promise<ChienDic
   return ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null }))
 }
 /**
+ * Dòng `chien_dich` THÔ (chưa huỷ, mới giao trước) của các chiến dịch có em — từ CÙNG danh sách đệm 15 s mà `docChienDichCuaEm` / `docHoSo2` vừa đọc ⇒ không thêm lượt D1
+ * (trước: "Câu đã làm" đọc lại bảng `chien_dich` bằng một câu `json_each(sbd_json)` riêng, nối tiếp SAU hồ sơ — một đợt D1 thừa). Cùng ngữ nghĩa câu cũ
+ * (`trang_thai <> 'da_huy'`, em là phần tử CHUỖI của `sbd_json`, `ORDER BY tao_luc DESC`). Lỗi đọc ⇒ rỗng như câu cũ (không bao giờ ném lỗi).
+ */
+export async function docChienDichThoCuaEm(env: Env, sbd: string): Promise<Row[]> {
+  try {
+    const { ds } = await docMoiChienDich(env)
+    return ds.filter((x) => x.sbd.has(sbd)).map((x) => x.row)
+  } catch {
+    return []
+  }
+}
+/**
  * SỬA CHIẾN DỊCH (thầy 28/09, `srs2-sua.ts`): em được THÊM vào chiến dịch đang chạy chỉ tính lần làm TỪ LÚC ĐƯỢC THÊM (như em giao từ đầu).
  * Bảng `chien_dich_em` (tạo lúc chạy, chỉ-thêm) có thể chưa có ⇒ rỗng: mốc = lúc giao chiến dịch như cũ.
  */
@@ -583,7 +596,7 @@ async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangCh
  * CẨN THẬN (a) (omni-can-than.ts, đặc tả 4.6; chỉ-thêm): `canThanSom` = nơi gọi ĐÃ có hồ sơ OMNI (lúc LẬP kế hoạch ngày — `layKeHoachChot`) cho biết em có `canThan`
  * không; ĐÚNG ⇒ mốc kiểm duy trì của luật đóng lỗi × 0,7. Vắng / OMNI tắt / sai ⇒ mốc y hệt hôm nay (KHÔNG đọc thêm D1 ở đây).
  */
-export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>): Promise<HoSo2> {
+export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>, khiCoQids?: (qids: readonly string[]) => void): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   const omniP = omniSom ?? omniBatEm(env, sbd)
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
@@ -633,6 +646,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     qidSaiV2.add(q)
   }
   const qids = [...nguonTheoQid.keys()]
+  // Nơi gọi (chỉ "Câu đã làm") biết tập câu từ đây ⇒ bắt đầu các lượt ĐỌC của riêng nó CÙNG đợt với meta/lần làm bên dưới (trước: nối tiếp sau cả hồ sơ). Lỗi của nó không làm hỏng hồ sơ.
+  if (khiCoQids) { try { khiCoQids(qids) } catch { /* chỉ là tăng tốc */ } }
   const khoiEmP = docKhoiEmCong(env, sbd).catch(() => null) // LUẬT THẦY 05/10 (chan-khac-khoi.ts): khối em đọc CÙNG ĐỢT lượt đọc chính dưới (gopDocD1 gộp — không thêm vòng D1)
   // Sự kiện trước mốc sớm nhất vốn bị loại bên dưới: lọc ngay trong D1, giảm dữ liệu truyền/parse.
   // Vẫn xét mốc riêng từng câu sau khi đọc; có câu thiếu mốc thì giữ cận rỗng để không bỏ lịch sử.

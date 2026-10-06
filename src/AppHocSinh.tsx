@@ -10,15 +10,15 @@
 //   · Đã đăng nhập ⇒ tải mảnh cổng ngay (index.html đã nạp trước + đã hỏi sớm lệnh Sảnh), Sảnh có số sớm hơn một vòng mạng.
 // Cây phần tử, chữ, lớp CSS y như khi App.tsx dựng cổng: ChanLoi → Suspense(ChoManEm) → BatLinhShell vai="hs" → màn. App.tsx VẪN giữ nhánh
 // cổng học sinh (phép kiểm dựng thẳng <App/>) — hai nhánh cùng một cây.
-import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import BatLinhShell from './components/bat-linh/BatLinhShell'
 import ChanLoi from './components/ChanLoi'
 import { LogoDoc } from './components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './screens/DangNhapHocSinh'
 import { layDiaChiMayChu } from './lib/dia-chi-may-chu'
-import { hsDangNhapApi, hsDatMatKhauApi } from './lib/hs-dang-nhap-api'
-import { batDauHoiSom } from './lib/hoi-som'
-import { docPhienHs, ghiPhienHs, type ThongTinHs } from './lib/phien-hoc-sinh'
+import { hsDangNhapKemSanhApi, hsDatMatKhauApi } from './lib/hs-dang-nhap-api'
+import { batDauHoiSom, diaChiDangDung } from './lib/hoi-som'
+import { docPhienHs, ghiPhienHs, type KemDangNhap, type ThongTinHs } from './lib/phien-hoc-sinh'
 import { danhDauAppHocSinh } from './lib/pwa-install'
 
 /** Tải mảnh cổng; hỏng (mạng chập) thì chờ 0,8 giây thử lại một lần (như App.tsx). Thiếu mảnh vì đang mở bản cũ ⇒ batLoiThieuManh() lo. */
@@ -57,7 +57,8 @@ if (phienLucMo) {
 /** Chỗ giữ màn khi mảnh cổng đang về — đúng nền app, không chữ, không nhấp nháy (= ChoManEm của App.tsx). */
 const ChoManEm = () => <div className="min-h-screen" style={{ background: 'var(--nen)' }} />
 
-const API_DANG_NHAP: ApiDangNhapHs = { dangNhap: hsDangNhapApi, datMatKhau: hsDatMatKhauApi }
+// Đăng nhập XIN KÈM SẢNH (D1 06/10, server/src/dang-nhap-kem-sanh.ts): máy chủ trả sẵn phản hồi `hoa2-sanh` trong phản hồi đăng nhập ⇒ Sảnh có số ngay, bớt một vòng mạng.
+const API_DANG_NHAP: ApiDangNhapHs = { dangNhap: hsDangNhapKemSanhApi, datMatKhau: hsDatMatKhauApi }
 
 export default function AppHocSinh() {
   // Màn cổng dựng ở đâu: máy đã đăng nhập lúc mở ⇒ bản `lazy` (chờ mảnh dưới Suspense như App.tsx); em vừa đăng nhập ⇒ CHÍNH component của mảnh
@@ -65,6 +66,18 @@ export default function AppHocSinh() {
   // từ đăng nhập sang cổng trong cùng một component). Chọn MỘT lần, giữ suốt phiên trang (đăng xuất do cổng tự vẽ lại màn đăng nhập).
   const [Cong, setCong] = useState<ComponentType | null>(() => (docPhienHs() ? StudentPortalScreen : null))
   const coPhien = Cong !== null
+  // Em VỪA đăng nhập: Sảnh luôn mở từ ĐẦU TRANG. Trước đây lượt vẽ đầu của cổng là màn chờ ngắn ⇒ trình duyệt tự kéo vị trí cuộn của màn đăng nhập (hơi dài trên máy nhỏ) về 0.
+  // Nay Sảnh có thể có số ngay lượt đầu (đính kèm trong lệnh đăng nhập) ⇒ trang không ngắn lại, vị trí cuộn cũ bị giữ nguyên, Sảnh mở lệch xuống. Kéo về 0 trước khi vẽ cho khỏi lệch.
+  const vuaDangNhap = useRef(false)
+  useLayoutEffect(() => {
+    if (!coPhien || !vuaDangNhap.current) return
+    vuaDangNhap.current = false
+    try {
+      window.scrollTo(0, 0)
+    } catch {
+      /* máy chặn cuộn: bỏ qua */
+    }
+  }, [coPhien])
   useEffect(() => {
     // Tên app + manifest + nhớ vai — như StudentPortalScreen làm lúc dựng (màn đăng nhập trước đây nằm trong cổng).
     danhDauAppHocSinh()
@@ -82,13 +95,17 @@ export default function AppHocSinh() {
       clearTimeout(id)
     }
   }, [coPhien])
-  const daDangNhap = async (t: ThongTinHs) => {
+  const daDangNhap = async (t: ThongTinHs, kem?: KemDangNhap) => {
     ghiPhienHs(t) // máy chặn lưu ⇒ ném lỗi ⇒ form báo lỗi, ở lại màn đăng nhập (như cũ)
-    // Hỏi sớm lệnh Sảnh NGAY (địa chỉ vừa dùng để đăng nhập, đã nhớ trong máy) — song song với lúc chạy mảnh cổng.
-    void layDiaChiMayChu('').then((goc) => batDauHoiSom(goc, t)).catch(() => {})
+    // Hỏi sớm lệnh Sảnh NGAY (địa chỉ vừa dùng để đăng nhập, đã nhớ trong máy) — song song với lúc chạy mảnh cổng. Máy chủ đã đính kèm phản hồi Sảnh vào
+    // lệnh đăng nhập (`kem.sanh`) ⇒ ghi nó TRƯỚC lượt vẽ cổng (địa chỉ vừa dùng đã biết ⇒ không chờ đọc IndexedDB), lượt vẽ đầu của Sảnh nhận số ngay.
+    const gocBiet = diaChiDangDung()
+    if (gocBiet) batDauHoiSom(gocBiet, t, kem)
+    else void layDiaChiMayChu('').then((goc) => batDauHoiSom(goc, t, kem)).catch(() => {})
     // Mảnh cổng (đã tải + chạy sẵn trong lúc em gõ) — nút giữ vòng quay tới khi có, không chớp màn trống giữa hai màn. Tải hỏng ⇒ bản `lazy`
     // nhận đúng lỗi ấy, ChanLoi báo như cũ.
     const m = await layCong().catch(() => null)
+    vuaDangNhap.current = true
     setCong(() => (m ? m.default : StudentPortalScreen))
   }
   return (

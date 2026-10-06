@@ -13,6 +13,15 @@ export interface ThongTinHs {
   token?: string
 }
 
+/** Phần máy chủ đính kèm phản hồi đăng nhập (D1 06/10, server/src/dang-nhap-kem-sanh.ts): hiện chỉ Sảnh — phản hồi `hoa2-sanh` của em (`sanh` có sẵn hoặc `sanhHua` đang về). KHÔNG nằm trong
+ *  phiên đã cất (`ThongTinHs`): chỉ đi từ form đăng nhập tới `batDauHoiSom` (hoi-som.ts) rồi bỏ. */
+export interface KemDangNhap {
+  /** Phản hồi `hoa2-sanh` đã có sẵn (máy chủ trả MỘT khối JSON). */
+  sanh?: unknown
+  /** Phản hồi `hoa2-sanh` ĐANG VỀ theo luồng (không bao giờ bị từ chối; `null` = không có ⇒ Sảnh tự hỏi như cũ). */
+  sanhHua?: Promise<unknown>
+}
+
 /** Phiên đã cất — đọc ĐÚNG như StudentPortalScreen đọc lúc dựng (vỏ và cổng cùng một kết luận). Máy chặn lưu / hỏng ⇒ null. */
 export function docPhienHs(): ThongTinHs | null {
   try {
