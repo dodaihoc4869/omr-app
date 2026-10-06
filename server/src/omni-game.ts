@@ -610,7 +610,7 @@ async function tramXong(env: Env, sbd: string, b: Row, nowMs: number): Promise<R
 async function traCauDaDoi(env: Env, s: PhienOmni): Promise<Record<string, unknown>> {
   const viTri = s.tramXong!.viTri, r = s.questions[viTri]
   if (!r) return { ok: true, cau: null, viTri: null }
-  const q = (await napDayDuMem(env, [{ maDe: r.maDe, qid: r.qid, version: r.version }])).get(`${r.maDe}|${r.qid}|${r.version}`)
+  const q = (await napDayDuMem(env, [{ maDe: r.maDe, qid: r.qid, version: r.version, ...(r.btv !== undefined ? { btv: r.btv } : {}) }])).get(`${r.maDe}|${r.qid}|${r.version}`) // 06/10 (2c): `~bt` theo đúng phiên bản bộ sinh lúc phát
   return q ? { ok: true, cau: { ...publicQuestion(apXaoTheoRef(q, r)), vai: r.role }, viTri } : { ok: true, cau: null, viTri: null } // 06/10: bản xáo phát lại y hệt lúc phát
 }
 async function timCauThapHon(env: Env, sbd: string, s: PhienOmni, cu: RefOmni, nowMs: number): Promise<{ q: PrivateQuestion; m: MetaCau; moi: boolean; lamLai?: LamLaiRef } | null> {

@@ -18,7 +18,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { khoiCuaCau, type Khoi } from '../../src/lib/khoi-cau'
-import { apBienThe, coBoSinh } from './bien-the-sinh'
+import { BT_PHIEN_BAN, apBienTheTheoPhienBan, coBoSinh, phienBanBt } from './bien-the-sinh'
 import { docYDsTheoQid, type YDs } from './cau-y-ds'
 import { loaiQidAo, qidBienThe, qidYDsMoi } from './loi-hoc-luat'
 
@@ -31,12 +31,20 @@ export const SO_Y_MOT_NHOM = 4
 /**
  * Biến thể bằng mã của câu gốc theo qid ảo `<gốc>~bt<k>` (tất định: hạt giống = qid ảo). Không có bộ sinh theo dạng / Phần II / tự luận / khối em và khối câu không rõ
  * hoặc khác nhau / không lắp được ⇒ null. `version` + `group` giữ của câu gốc (xem đầu tệp).
+ * `btv` (2c, 06/10) = phiên bản bộ sinh của tham chiếu (bien-the-sinh.ts `BANG_PHIEN_BAN_BT`; vắng ⇒ 1 = bộ hiện tại). Phiên bản lạ ⇒ null ở đây (nơi giải mã
+ * `phuQidAoMoi` lùi về câu gốc).
  */
-export function bienTheTheoQid(goc: PrivateQuestion, qidAo: string, khoiEm: Khoi | null): PrivateQuestion | null {
+export function bienTheTheoQid(goc: PrivateQuestion, qidAo: string, khoiEm: Khoi | null, btv: unknown = BT_PHIEN_BAN): PrivateQuestion | null {
   if (!goc || (goc.phan !== 'I' && goc.phan !== 'III') || typeof goc.dang !== 'string' || !coBoSinh(goc.dang)) return null
-  const bt = apBienThe(goc, qidAo, khoiEm) // tự kiểm: không tự luận, khối em = khối câu gốc (cả hai rõ), qid ảo không lệch khối, cổng kiểm của máy
+  const kq = apBienTheTheoPhienBan(goc, qidAo, khoiEm, btv) // tự kiểm: không tự luận, khối em = khối câu gốc (cả hai rõ), qid ảo không lệch khối, cổng kiểm của máy
+  const bt = 'q' in kq ? kq.q : null
   return bt ? { ...bt, version: goc.version, group: goc.group } : null
 }
+/**
+ * (2c) Tham chiếu `~bt` mang PHIÊN BẢN LẠ (không có trong bảng đăng ký — vd tham chiếu của bản máy chủ mới hơn sau khi lùi bản) ⇒ LÙI VỀ CÂU GỐC: giữ qid ảo (để lượt
+ * chấm / resume khớp đúng ref của phiên) nhưng nội dung + đáp án là của câu gốc trong kho. Không ném lỗi, không sinh "đoán" bằng bộ sinh khác.
+ */
+export const luiVeCauGoc = (goc: PrivateQuestion, qidAo: string): PrivateQuestion => ({ ...goc, qid: qidAo })
 
 // ---------------------------------------------------------------- bậc Ý ĐÚNG–SAI MỚI
 /** Kiến thức cốt lõi (`chot`) của lời giải câu gốc — cùng đề dẫn nên dùng lại cho bộ ý mới; không có ⇒ ''. */
@@ -77,13 +85,14 @@ export function apYDsMoi(goc: PrivateQuestion, qidAo: string, nhom: readonly YDs
 /**
  * Câu của qid ảo `~bt<k>` / `~yd<k>` từ CÂU GỐC đã nạp (`goc`). Qid không phải hai loại này ⇒ null. Đọc D1 chỉ khi là `~yd` (một truy vấn nối qid → băm → ý).
  * Khối em lúc chấm = khối câu gốc (lúc phát đã đòi em cùng khối câu gốc); không rõ khối câu ⇒ null.
+ * `btv` (2c, 06/10): phiên bản bộ sinh của tham chiếu `~bt` (ref phiên); vắng ⇒ 1; số lạ ⇒ `luiVeCauGoc` (không ném, không chấm theo câu sinh lệch).
  */
-export async function phuQidAoMoi(env: Env, goc: PrivateQuestion, qidAo: string): Promise<PrivateQuestion | null> {
+export async function phuQidAoMoi(env: Env, goc: PrivateQuestion, qidAo: string, btv?: unknown): Promise<PrivateQuestion | null> {
   const t = loaiQidAo(qidAo)
   if (!t || (t.loai !== 'bt' && t.loai !== 'yd') || !goc || laCauTuLuan(goc)) return null
   const khoi = khoiCuaCau(goc)
   if (khoi === null) return null
-  if (t.loai === 'bt') return bienTheTheoQid(goc, qidAo, khoi)
+  if (t.loai === 'bt') return phienBanBt(btv) === null ? luiVeCauGoc(goc, qidAo) : bienTheTheoQid(goc, qidAo, khoi, btv)
   if (goc.phan !== 'II') return null
   const ys = (await docYDsTheoQid(env, [t.goc], { lop: String(khoi), khoiEm: khoi })).get(t.goc) ?? []
   const nhom = nhomYDs(ys, t.k)

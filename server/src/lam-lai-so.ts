@@ -91,8 +91,12 @@ export function dungKhoi(x: { maDe: string; qid: string }, lopTo: string | null 
   return nguon.some((k) => k !== null) && nguon.every((k) => k === null || k === khoi)
 }
 // ---------------------------------------------------------------- ref phiên
-/** Khoá "làm lại" trong ref câu của JSON phiên (máy chủ) — KHÔNG xuống máy em. */
-export interface LamLaiRef { tc?: string; xt?: number[]; nv?: 1 }
+/**
+ * Khoá "làm lại" trong ref câu của JSON phiên (máy chủ) — KHÔNG xuống máy em.
+ * `btv` (2c, 06/10): PHIÊN BẢN bộ sinh của biến thể bằng mã `~bt` lúc phát (bien-the-sinh.ts `BT_PHIEN_BAN` / `BANG_PHIEN_BAN_BT`) — chấm / resume / Đoàn giải đúng
+ * bộ sinh ấy dù bộ sinh sau này đổi. Vắng (ref cũ) ⇒ phiên bản 1. KHÔNG ghi vào sổ (`rawLamLai` bỏ qua — dòng sổ y hệt hôm nay).
+ */
+export interface LamLaiRef { tc?: string; xt?: number[]; nv?: 1; btv?: number }
 /** Phần ghi vào ref phiên của một câu lượt. */
 export const refLamLai = (x: { lamLai?: LamLaiRef }): LamLaiRef => (x.lamLai ? { ...x.lamLai } : {})
 

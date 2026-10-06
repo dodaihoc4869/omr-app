@@ -81,9 +81,10 @@ export async function dongBoCacTo(env:Env,maDes:readonly string[]):Promise<numbe
 const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`
 /** Câu ĐẦY ĐỦ (bản mới nhất: lời giải mới nhất) theo tham chiếu của lượt (ma_de, qid, version), chỉ khi tờ còn và chỉ mục khớp nguồn.
  *  Chỉ mục lệch (kho vừa ghi, chưa đồng bộ) ⇒ đồng bộ đúng tờ đó rồi tra lại. `null` ⇒ câu thật sự đổi đề/đáp án hoặc tờ đã rút. */
-export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:string}):Promise<PrivateQuestion|null>{
+export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:string;btv?:unknown}):Promise<PrivateQuestion|null>{
   // Vòng học v2 (02/10): qid ảo song sinh "<gốc>~ss0|1" ⇒ câu gốc (cùng mã đề, phiên bản) phủ đề/đáp án song sinh.
-  const ss=tachSongSinh(ref.qid);if(ss.songSinh!==null){const goc=await docCauTheoRef(env,{...ref,qid:ss.goc});return goc?phuSongSinhTheoQid(env,goc,ref.qid):null}
+  // 06/10 (2c): `btv` của ref = phiên bản bộ sinh biến thể `~bt` lúc phát (vắng ⇒ 1; lạ ⇒ lùi câu gốc — ban-khac-ao.ts).
+  const ss=tachSongSinh(ref.qid);if(ss.songSinh!==null){const goc=await docCauTheoRef(env,{maDe:ref.maDe,version:ref.version,qid:ss.goc});return goc?phuSongSinhTheoQid(env,goc,ref.qid,ref.btv):null}
   const tra=()=>env.DB.prepare(SQL_THEO_REF).bind(ref.maDe,ref.qid,ref.version).first<{json:string}>()
   let row=await tra()
   if(!row&&await dongBoCacTo(env,[ref.maDe]))row=await tra()
@@ -220,15 +221,15 @@ export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQue
 }
 /** Như `doDayDu` nhưng KHÔNG ném: nạp bản đầy đủ của nhiều câu trong MỘT truy vấn, trả Map khoá `maDe|qid|version` (câu vắng = đã sửa/rút khỏi kho). Tối ưu 28/09: bỏ N+1 của `napCau`.
  *  29/09: câu vắng mà tờ của nó đang lệch chỉ mục ⇒ đồng bộ đúng các tờ đó rồi tra lại phần vắng (version tất định nên câu không đổi vẫn khớp). */
-export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;version:string}[]):Promise<Map<string,PrivateQuestion>>{
+export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;version:string;btv?:unknown}[]):Promise<Map<string,PrivateQuestion>>{
   const theo=new Map<string,PrivateQuestion>();if(!ds.length)return theo
-  // Vòng học v2 (02/10): tham chiếu song sinh ⇒ nạp câu gốc cùng lô rồi phủ (khoá Map giữ qid ảo).
+  // Vòng học v2 (02/10): tham chiếu song sinh ⇒ nạp câu gốc cùng lô rồi phủ (khoá Map giữ qid ảo). 06/10 (2c): `btv` = phiên bản bộ sinh của tham chiếu `~bt`.
   const ao=ds.filter(q=>tachSongSinh(q.qid).songSinh!==null)
   if(ao.length){
     const thuong=ds.filter(q=>tachSongSinh(q.qid).songSinh===null)
-    const goc=await napDayDuMem(env,[...thuong,...ao.map(q=>({...q,qid:tachSongSinh(q.qid).goc}))])
+    const goc=await napDayDuMem(env,[...thuong,...ao.map(q=>({maDe:q.maDe,version:q.version,qid:tachSongSinh(q.qid).goc}))])
     for(const q of thuong){const v=goc.get(`${q.maDe}|${q.qid}|${q.version}`);if(v)theo.set(`${q.maDe}|${q.qid}|${q.version}`,v)}
-    for(const q of ao){const g=goc.get(`${q.maDe}|${tachSongSinh(q.qid).goc}|${q.version}`);const v=g?await phuSongSinhTheoQid(env,g,q.qid):null;if(v)theo.set(`${q.maDe}|${q.qid}|${q.version}`,v)}
+    for(const q of ao){const g=goc.get(`${q.maDe}|${tachSongSinh(q.qid).goc}|${q.version}`);const v=g?await phuSongSinhTheoQid(env,g,q.qid,q.btv):null;if(v)theo.set(`${q.maDe}|${q.qid}|${q.version}`,v)}
     return theo
   }
   const tra=async(xs:readonly {maDe:string;qid:string;version:string}[])=>{

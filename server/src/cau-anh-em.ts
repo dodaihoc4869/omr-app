@@ -30,14 +30,14 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { khoiCuaCau, khoiCuaMaDe } from '../../src/lib/khoi-cau'
 import { docCauHinhDem } from './cau-hinh-dem'
-import { tachSongSinh } from './loi-hoc-luat'
+import { loaiQidAo, tachSongSinh } from './loi-hoc-luat'
 import { phuNeuCan } from './hang-chua-loi'
 import { bacMuc, bam32, boiCanh, docChiMucTheoDang, hopLeChung, lamHomNay, metaTheoDang, napTheoThuTu, phamViChon, xepUngVien, type BoiCanh, type PhamViChon } from './omni-game'
 import { docMetaCau, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
 import { napDayDuMem } from './game-v2-bank'
 import { thuMucCuaMaDe } from './kho-thu-muc'
 import { chonBanKhacMoi } from './ban-khac-ao'
-import { coBoSinh } from './bien-the-sinh'
+import { BT_PHIEN_BAN, coBoSinh } from './bien-the-sinh'
 import { docCauNghiDem, docKhoiEmCong, khoiDaLocCua } from './chan-khac-khoi'
 import { readGameScope } from './game-v2-reports'
 import { laCauTuLuan } from './cam-tu-luan'
@@ -106,8 +106,9 @@ export async function apLamLaiKhac(env: Env, hs: HoSo2, ds: readonly { q: Privat
     const ss = phuNeuCan(x.q, hs.songSinhLamLai, hs.boTro)
     if (ss.qid !== x.q.qid) { ra.push({ ...x, q: ss }); continue }
     // Bậc 1b: bản khác bằng mã / ý Đ–S mới (qid ảo `~bt<k>` / `~yd<k>`; sổ ghi dưới qid ảo + `tc = Q`).
+    // 06/10 (2c): ref `~bt` mang phiên bản bộ sinh (`btv`) ⇒ chấm / resume / Đoàn sinh lại ĐÚNG bộ sinh lúc phát.
     const bk = banKhac.get(x.q.qid)
-    if (bk) { ra.push({ q: bk, m: x.m, lamLai: { tc: x.q.qid } }); continue }
+    if (bk) { ra.push({ q: bk, m: x.m, lamLai: { tc: x.q.qid, ...(loaiQidAo(bk.qid)?.loai === 'bt' ? { btv: BT_PHIEN_BAN } : {}) } }); continue }
     // Bậc 2: câu anh em.
     const ae = await chonCauAnhEm(env, bc, x.m, (chung ??= som?.chung ?? chungAnhEm(env, bc, chan)), daDung, nhomDung, som?.chiMuc)
       .catch((e: unknown) => { console.error('[cau-anh-em] không chọn được câu anh em (rơi xuống bậc 3/4):', e instanceof Error ? e.message : e); return null })
@@ -255,7 +256,7 @@ async function metaTuLuyenTheoDang(env: Env, dang: string, daLam: ReadonlyMap<st
  */
 export async function napLaiLuotCho(env: Env, hs: Pick<HoSo2, 'meta'>, refs: readonly ({ qid: string; maDe: string; version: string; group: string } & LamLaiRef)[], toiDa: number, napCu: () => Promise<{ q: PrivateQuestion; m: MetaCau }[]>): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
   if (!refs.some((r) => r.tc || r.xt || r.nv)) return napCu()
-  const day = await napDayDuMem(env, refs.map((r) => ({ maDe: r.maDe, qid: r.qid, version: r.version })))
+  const day = await napDayDuMem(env, refs.map((r) => ({ maDe: r.maDe, qid: r.qid, version: r.version, ...(r.btv !== undefined ? { btv: r.btv } : {}) })))
   const ra: { q: PrivateQuestion; m: MetaCau }[] = []
   for (const r of refs) {
     const q = day.get(`${r.maDe}|${r.qid}|${r.version}`)

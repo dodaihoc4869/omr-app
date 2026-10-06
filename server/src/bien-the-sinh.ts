@@ -24,6 +24,26 @@ export type { Phan, MucDo } from './bien-the/chung'
 /** Đổi khi đổi luật sinh/lắp (vào `bienThe.phienBan` để nơi lưu biết câu sinh theo bản nào). */
 export const PHIEN_BAN_BIEN_THE = 'bt-0510.1'
 
+// ---------------------------------------------------------------- GHIM PHIÊN BẢN tham chiếu `~bt` (2c, 06/10)
+// Tham chiếu `<Q>~bt<k>` KHÔNG lưu nội dung biến thể: chấm / resume / Đoàn SINH LẠI từ (câu gốc, qid ảo). Bộ sinh đổi (thêm mẫu, đổi luật lắp…) mà sinh lại
+// bằng bộ MỚI ⇒ tham chiếu đã phát ra đề/đáp án KHÁC lúc phát ⇒ chấm sai. Nên: tham chiếu phát ra mang SỐ PHIÊN BẢN bộ sinh (khoá `btv` của ref phiên —
+// lam-lai-so.ts `LamLaiRef`, chỉ ở JSON phiên máy chủ, không xuống máy em) và giải mã ĐÚNG bộ sinh của số ấy qua BẢNG ĐĂNG KÝ dưới đây.
+//   · Tham chiếu CŨ (phát trước 06/10) không có số ⇒ phiên bản 1 (= bộ sinh hiện tại, `PHIEN_BAN_BIEN_THE` 'bt-0510.1').
+//   · Số lạ (không có trong bảng — vd phiên bản của bản máy chủ mới hơn rồi lùi bản) ⇒ nơi giải mã LÙI VỀ CÂU GỐC (ban-khac-ao.ts `phuQidAoMoi`):
+//     không ném lỗi, không chấm theo một câu sinh lệch.
+// MUỐN ĐỔI BỘ SINH: KHÔNG sửa bản đang có tại chỗ (test khoá phiên bản 1 sẽ đỏ — tests/chan-doan-buoc-sai-0610-bt-phien-ban.test.ts). Đóng băng bản cũ
+// (giữ mã / mẫu của nó) thành mục cũ của `BANG_PHIEN_BAN_BT`, thêm bộ mới với số kế tiếp, rồi tăng `BT_PHIEN_BAN`.
+/** Phiên bản bộ sinh mà MỌI tham chiếu `~bt` mới phát ra mang (`btv`). */
+export const BT_PHIEN_BAN = 1
+/** Một bộ sinh đã đăng ký: mã phiên bản (ghi trong `bienThe.phienBan`) + hàm phủ biến thể lên câu gốc (cùng hợp đồng `apBienThe`). */
+export interface BoSinhBt { ma: string; ap: (goc: PrivateQuestion, qidAo: string, khoiEm: Khoi | null, hatGiong?: string) => PrivateQuestion | null }
+/** Số phiên bản tham chiếu đọc được: vắng (tham chiếu cũ) ⇒ 1; số nguyên có trong bảng ⇒ chính nó; còn lại (số lạ, sai kiểu) ⇒ null. */
+export function phienBanBt(v: unknown): number | null {
+  if (v === undefined || v === null || v === '') return 1
+  const n = typeof v === 'number' ? v : typeof v === 'string' && /^\d+$/.test(v.trim()) ? Number(v.trim()) : NaN
+  return Number.isInteger(n) && Object.prototype.hasOwnProperty.call(BANG_PHIEN_BAN_BT, n) ? n : null
+}
+
 const CAC_HO: readonly HoDe[] = [...HO_CARBOHYDRATE, ...HO_ESTER, ...HO_KIM_LOAI, ...HO_LOP_11]
 
 /** Thông tin câu gốc mà biến thể kế thừa (đều tuỳ chọn). `maDe` = mã tờ câu gốc — nguồn khối của biến thể. `text` chỉ để chọn mẫu gần câu gốc nhất. */
@@ -266,4 +286,15 @@ export function apBienThe(goc: PrivateQuestion, qidAo: string, khoiEm: Khoi | nu
   const q = { ...cau, qid: qidAo, solution: { ...(cau.solution as Record<string, unknown>), bien_the_cua: goc.qid, ho: bienThe.ho, mau: bienThe.mau } } as PrivateQuestion
   if (khoiCuaCau(q) !== khoiGoc || !cauHopKhoi(khoiEm, q)) return null
   return q
+}
+
+/** BẢNG ĐĂNG KÝ phiên bản bộ sinh (2c — xem đầu tệp). Thêm phiên bản mới ở đây; không xoá / sửa mục cũ (tham chiếu đã phát vẫn giải theo mục ấy). */
+export const BANG_PHIEN_BAN_BT: Readonly<Record<number, BoSinhBt>> = Object.freeze({
+  1: { ma: PHIEN_BAN_BIEN_THE, ap: apBienThe },
+})
+/** Phủ biến thể theo ĐÚNG phiên bản bộ sinh của tham chiếu (`btv`; vắng ⇒ 1). Phiên bản lạ ⇒ `{ la: true }` (nơi gọi lùi về câu gốc). */
+export function apBienTheTheoPhienBan(goc: PrivateQuestion, qidAo: string, khoiEm: Khoi | null, btv?: unknown): { q: PrivateQuestion | null } | { la: true } {
+  const pb = phienBanBt(btv)
+  if (pb === null) return { la: true }
+  return { q: BANG_PHIEN_BAN_BT[pb]!.ap(goc, qidAo, khoiEm) }
 }

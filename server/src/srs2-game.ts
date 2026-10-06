@@ -378,8 +378,9 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   })
   const id = crypto.randomUUID()
   await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
-  // Kết quả này CHỈ đi nội bộ tới Đoàn (`taoNguoi` → `ganNhan`), không xuống máy em: kèm hoán vị `xt` để Đoàn hiển thị đúng bản xáo đã chấm (cau-anh-em.ts).
-  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), role: 'toi_han', ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}), ...(refs[i]!.xt ? { xt: refs[i]!.xt } : {}) })), soCauThieu: Math.max(0, SO_CAU_CHANG - chon.length) }
+  // Kết quả này CHỈ đi nội bộ tới Đoàn (`taoNguoi` → `ganNhan`), không xuống máy em: kèm hoán vị `xt` để Đoàn hiển thị đúng bản xáo đã chấm (cau-anh-em.ts),
+  // và (06/10, 2c) phiên bản bộ sinh `btv` của biến thể `~bt` để Đoàn sinh lại đúng câu đã phát.
+  return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), role: 'toi_han', ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}), ...(refs[i]!.xt ? { xt: refs[i]!.xt } : {}), ...(refs[i]!.btv !== undefined ? { btv: refs[i]!.btv } : {}) })), soCauThieu: Math.max(0, SO_CAU_CHANG - chon.length) }
 }
 
 // ---------------------------------------------------------------- lệnh hoa2-* của app học sinh
