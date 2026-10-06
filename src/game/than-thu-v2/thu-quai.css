@@ -1,0 +1,9 @@
+/* THÚ + QUÁI GIỮA ĐƯỜNG (thầy lệnh 06/10: "điều chỉnh thú và quái ra giữa đường và phóng to hơn một chút, ở mọi màn đảo và đoàn").
+   MỘT bộ số dùng chung cho Đảo thần thú và Đoàn Hộ Tống — màn nào đặt sprite thú/quái cũng đọc các biến này, không tự gõ số riêng.
+   Đo trên ảnh nền thật public/bat-linh/canh-ho-tong*.webp (cảnh thác nước + đường lát đá, cùng tỉ lệ 3:2): dải đường lát đá nằm từ ~62 % đến ~90 %
+   chiều cao cảnh (giữa đường ≈ 76 %). Khung sprite đặt chân ở 82 % chiều cao cảnh (hình thú có ~15 % trong suốt dưới chân ⇒ chân nhìn thấy ≈ 76–78 % = giữa đường), thân vươn lên phía trên ⇒ trục dọc của sprite nằm gọn trong dải đường,
+   không dính đáy, không sát mép.
+   --thu-quai-day : khoảng từ ĐÁY cảnh tới CHÂN sprite, tính bằng % chiều cao cảnh (số trơn, dùng calc(var(--thu-quai-day) * 1%)).
+   --thu-quai-co  : hệ số phóng sprite so với cỡ cũ (+20 %, giữ tỉ lệ).
+   --thu-quai-day-min/max : dải cho phép của --thu-quai-day (= 100 − 90 và 100 − 62), test hợp đồng đọc các số này. */
+:root{--thu-quai-day:18;--thu-quai-co:1.2;--thu-quai-day-min:10;--thu-quai-day-max:38}
