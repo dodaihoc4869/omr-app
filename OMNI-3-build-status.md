@@ -155,3 +155,31 @@ Lùi: `git revert -m 1 <commit gộp PR đợt 3>` rồi đẩy main (Actions đ
 - Nhịp máy chủ sau đẩy: 20 mẫu trong 10 phút (30 giây một mẫu, 08:35–08:45 giờ VN): 20 mẫu HTTP 200 và `nhipDeNghi.muc` = "tot", 0 bất thường (đợt trước từng báo "ban" ~10 phút sau đẩy; lần này không thấy).
 - CHƯA kiểm được từ phiên đám mây (không thử mật khẩu em): đăng nhập thật theo luồng NDJSON (`curl -N`), thẻ Cẩn thận/thang làm lại trên em thật. Cần thầy hoặc một em dùng thử; công tắc khẩn nếu đăng nhập chậm hơn trước: biến môi trường `TAT_KEM_SANH`.
 - Lùi: `git revert -m 1 973875d2` rồi đẩy main (Actions đẩy lại Pages + Worker); Worker trước đợt này `a67d3030-184b-4494-814f-1e48bf0ff015`.
+
+## 11. Đợt 4 (06/10 trưa) — chẩn đoán bước sai, ba việc nhỏ, gọn mã, test chập chờn, chip "Đã dạy" + ô "Giao cho", nút Chắc / Chưa chắc: nghiệm thu bản sạch `13bd7724`
+
+Lệnh thầy: "Làm chuẩn đoán bước sai, còn nhỏ, gọn mã, test chập chờn"; "khi tôi chọn bài nào thì những bài trước hiện đã dạy, chỗ chọn lớp cho thêm mục chọn theo em (giao theo em) giao theo điểm danh nữa"; "Nút chưa chắc với chắc đổi màu dễ nhìn hơn nhé, và bấm nó chưa phản hồi". Gốc `main` 10c882dd (đợt 3 + ghi sổ). Mã nghiệm thu `13bd7724`; sau đó chỉ thêm tệp `.md`.
+
+| Kiểm | Lệnh | Kết quả | Đạt |
+|---|---|---|---|
+| vitest toàn bộ, lượt 1 (f82e498a, trước sửa khung hình) | `npx vitest run --reporter=json` → so TÊN với nền đợt 3 (141 đỏ) và nền d709d431 (158 đỏ) | 14 404 test · 142 đỏ / 62 tệp + 9 tệp lỗi nạp · 1 tên mới: ô "Giao cho" hiện "0 / 5 em" — LỖI THẬT, đã sửa (13bd7724) | Đạt sau sửa |
+| vitest toàn bộ, lượt 2 (13bd7724) | như trên | 14 404 test · 143 đỏ / 63 tệp + 9 tệp lỗi nạp · tên "Giao cho" xanh; 2 tên mới đều CHẬP CHỜN (bảng dưới), không do đợt | Đạt có ghi chú |
+| Kiểu | `tsc -b` · `tsc -p server/tsconfig.json --noEmit` | 0 lỗi · 0 lỗi | Đạt |
+| Build + service worker | `npm run build` · `kiem:sw` | thành công · 13/13 | Đạt |
+| Màu | `check:mau` · `kiem:mau-giu` (so origin/main) | sạch · 40 tệp src/ đổi, 0 vi phạm | Đạt |
+| Lộ đáp án | `kiem:lo-dap-an` | 9/9 | Đạt |
+| Cổng điểm ảnh 9 màn học sinh, OMNI tắt | `do-app-hs.mjs --kich=anh` vs `anh-cuoi` + `so-anh.mjs` | 9/9 trùng khít (0 điểm ảnh lệch) | Đạt |
+| Cổng điểm ảnh, OMNI bật + hai ảnh nút Chắc / Chưa chắc | `--omni=1 --them=chac` vs `anh-chac` | 11/11 trùng khít ở lượt 2; lượt 1 chỉ khác chữ số đồng hồ hiệp ở màn Đoàn (hai lượt cùng một bản dựng cũng khác nhau đúng vùng đó ⇒ nhiễu thời gian, không phải đổi mã) | Đạt |
+| Gọn mã không đổi gói | dựng có đồng hồ + mã phiên bản ghim, hai worktree sạch dc44c76b (trước) ↔ fe2c4398 (sau gộp làn gọn mã) | dist 517 tệp trùng sha256 (diff 0 dòng); Worker `index.js` trùng `c1601ffa…` | Đạt |
+| Worker đóng gói | `wrangler deploy --dry-run` | thành công: 3 260 KiB, nén 849 KiB (đợt 3: 3 238 / 842; thêm mã chẩn đoán) | Đạt |
+| Kiểm ca thi mở (chỉ đọc) | workflow `kiem-ca-mo` run 37413609699 (11:25 giờ VN) | so_ca_mo = 0 · so_luot_dang_lam = 0 | Đạt |
+
+Hai tên đỏ chập chờn của lượt 2 (xanh ở lượt 1, xanh khi chạy riêng 11/11; chưa sửa — việc riêng, chỉ sửa test):
+- `tests/bi-a-mat-than-tra-loi` "Sảnh có công tắc (role switch…) — bật là nhớ": ĐỎ CẢ Ở BẢN ĐANG CHẠY (main 10c882dd) khi máy tải 4 lò (1/4 lượt) ⇒ có sẵn từ trước đợt.
+- `tests/chien-dich-giao` "bấm nút chính ⇒ `tao`…": `waitFor` mặc định 1 000 ms hết giờ khi máy tải (cả test 1 420 ms); màn Giao chiến dịch không đổi trong đợt (chỉ gỡ export chết ở BangChienDich / btvn-da-giao / kho-de-giao).
+
+Việc của đợt (commit trên nhánh `claude/gracious-heisenberg-hoe97n`, gộp từ hai làn agent): (1) chẩn đoán bước sai de66e8e5 · (2a) cd11435e · (2b) da9ea341 · (2c) 839cfe66 · (3) gọn mã df6fb9b4 + 4c68c43a + f2ce276a + 71ddf1fd (0 tệp mồ côi; gỡ 76 khai báo export chết ở 36 tệp, ròng −531 dòng) · (4) test chập chờn 88234bfd · (5)(6) chip "Đã dạy" + ô "Giao cho" 50db6f52 · (7) nút Chắc / Chưa chắc 5591dd7e · sửa khung hình "0 / N em" 13bd7724. Thiết kế chẩn đoán: `docs/chan-doan-buoc-sai-0610.md`.
+
+CHƯA làm (nói thẳng): kho ý Đúng–Sai trên bản sống còn RỖNG ⇒ nhánh "chìa khoá + 2 ý Đ/S" của chẩn đoán chưa chèn câu nào (chỉ nhánh câu nền sinh bằng mã chạy) cho tới khi chạy `node scripts/loi-giai/may-soan.mjs --lop tat-ca`; 105 tệp (24 112 dòng, chỉ test/công cụ nhập, không vào gói) và 1 546 chữ `export` chỉ dùng nội bộ để nguyên — xoá cần xoá 22 test, sửa 73 test: chờ thầy quyết; ôn bài cũ (a)(b)(c) chờ thầy nói "làm"; ngưỡng chứng chỉ 8+ chờ thầy; đăng nhập thật NDJSON, thẻ Cẩn thận, thang làm lại, câu chẩn đoán và nút Chắc / Chưa chắc trên em thật chưa kiểm được từ phiên đám mây (không dùng mật khẩu em) — cần thầy hoặc một em dùng thử.
+
+Lùi: `git revert -m 1 <commit gộp PR đợt 4>` rồi đẩy main (Actions đẩy lại Pages + Worker). Tắt riêng: chẩn đoán `cau_hinh` khoá `chan_doan_buoc_sai` = `{"bat":false}`; thang làm lại khoá `lam_lai_khac` = `{"bat":false}`; đăng nhập kèm Sảnh `TAT_KEM_SANH`; cả OMNI ở Cài đặt OMNI. Bản Worker trước đợt này `1e17cf25-3045-41c5-a3e1-f53d0f9dec0a`.
