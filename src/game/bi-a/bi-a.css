@@ -129,10 +129,10 @@
 /* bàn + thanh lực (dọc) */
 .bia[data-bo-cuc='doc'] .bia-ban{padding:0 48px 0 4px}
 .bia[data-bo-cuc='doc'][data-tay='trai'] .bia-ban{padding:0 4px 0 48px}
-.bia[data-bo-cuc='doc'] .bia-luc{right:7px;top:50%;bottom:auto;height:var(--bia-cao-ban,calc(100% - 8px));transform:translateY(-50%)}
+.bia[data-bo-cuc='doc'] .bia-luc{right:7px;top:50%;bottom:auto;height:min(var(--bia-cao-ban,calc(100% - 8px)),clamp(170px,36vh,280px));transform:translateY(-50%)}
 .bia[data-bo-cuc='doc'][data-tay='trai'] .bia-luc{right:auto;left:7px}
 .bia-dk{position:relative;display:flex;align-items:center;gap:8px;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));flex:none}
-.bia-dk .bia-banh-xe[data-doc]{flex:1}
+.bia-dk .bia-banh-xe[data-doc]{flex:1 1 0;max-width:240px;margin-inline:auto}
 /* thanh lực: rãnh tối, lớp màu xanh → vàng → đỏ lộ theo lực (clip-path), vùng Huỷ 8 % ở đầu, vạch vàng "đủ tới bi", núm trắng, số % cạnh núm */
 .bia-luc{position:absolute;z-index:4;width:24px;border-radius:12px;background:linear-gradient(90deg,var(--b-ranh-1),var(--b-ranh-2) 50%,var(--b-ranh-1));border:1px solid var(--b-kim-vien);box-shadow:inset 0 0 0 2px var(--b-kim-sang),inset 0 2px 8px rgb(22,62,62 / .18),0 2px 5px rgb(22,62,62 / .08);touch-action:none;cursor:ns-resize;user-select:none;-webkit-user-select:none;--p:0;--vach:0}
 .bia-luc::before{content:"";position:absolute;inset:0 -10px}
@@ -228,9 +228,9 @@
 .bia[data-bo-cuc='ngang'] .bia-nut-mat{top:calc(var(--an-t) + 52px)}
 .bia[data-bo-cuc='ngang'] .bia-nut-am{top:calc(var(--an-t) + 104px)}
 .bia[data-bo-cuc='ngang'] .bia-nut-them{top:calc(var(--an-t) + 156px)}
-.bia[data-bo-cuc='ngang'] .bia-banh-xe{top:calc(var(--an-t) + 208px);bottom:var(--an-d)}
+.bia[data-bo-cuc='ngang'] .bia-banh-xe{top:calc(var(--an-t) + 208px);bottom:auto;height:min(190px,calc(100% - var(--an-t) - 208px - var(--an-d)))}
 .bia[data-bo-cuc='ngang'] .bia-nut-xoay{position:absolute;z-index:6;right:calc(var(--an-p) + 1px);top:var(--an-t)}
-.bia[data-bo-cuc='ngang'] .bia-luc{right:calc(var(--an-p) + 7px);top:calc(var(--an-t) + 58px);bottom:calc(var(--an-d) + 4px)}
+.bia[data-bo-cuc='ngang'] .bia-luc{right:calc(var(--an-p) + 7px);top:50%;bottom:auto;height:clamp(150px,56%,230px);transform:translateY(-50%)}
 .bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-nut-sanh,.bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-nut-mat,.bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-nut-am,.bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-nut-them,.bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-banh-xe{left:auto;right:calc(var(--an-p) + 2px)}
 .bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-nut-xoay{right:auto;left:calc(var(--an-tr) + 1px)}
 .bia[data-bo-cuc='ngang'][data-tay='trai'] .bia-luc{right:auto;left:calc(var(--an-tr) + 7px)}
@@ -276,7 +276,7 @@
 .bia[data-bo-cuc='pc'] .bia-dk{grid-area:dk;flex-direction:column;align-items:center;gap:10px;padding:0;min-height:0}
 .bia[data-bo-cuc='pc'] .bia-dk .bia-nut-xoay{order:0}
 .bia[data-bo-cuc='pc'] .bia-dk .bia-nut-them{order:1}
-.bia[data-bo-cuc='pc'] .bia-dk .bia-luc{order:2;position:relative;flex:1;min-height:180px;margin:0 0 4px}
+.bia[data-bo-cuc='pc'] .bia-dk .bia-luc{order:2;position:relative;flex:0 1 260px;min-height:150px;margin:0 0 4px}
 .bia[data-bo-cuc='pc'] .bia-luc .num-luc,.bia[data-bo-cuc='pc'] .bia-luc .vach span{right:auto;left:calc(100% + 6px)}
 .bia[data-bo-cuc='pc'] .bia-dk .bia-banh-xe{order:3;width:52px;flex:none}
 .bia[data-bo-cuc='pc'] .bia-ten-banh{padding:4px}

@@ -35,3 +35,19 @@ describe('bánh xe mảnh, vùng chạm ≥ 44 px', () => {
     expect(luat('.bia-banh-xe .thanh{')).toMatch(/overflow:hidden/)
   })
 })
+
+describe('thanh lực và bánh xe NGẮN, ba bố cục (thầy 06/10: "cho ngắn lại, dễ chơi cả màn ngang máy tính và màn dọc")', () => {
+  it('dọc: thanh lực không dài quá 280 px', () => {
+    expect(luat(".bia[data-bo-cuc='doc'] .bia-luc{")).toMatch(/clamp\(170px,36vh,280px\)/)
+  })
+  it('ngang: thanh lực giữa màn, ≤ 230 px (không chạy suốt chiều cao); bánh xe ≤ 190 px', () => {
+    expect(luat(".bia[data-bo-cuc='ngang'] .bia-luc{")).toMatch(/top:50%;bottom:auto;height:clamp\(150px,56%,230px\)/)
+    expect(luat(".bia[data-bo-cuc='ngang'] .bia-banh-xe{")).toMatch(/height:min\(190px,/)
+  })
+  it('máy tính: thanh lực ≤ 260 px (không giãn hết cột)', () => {
+    expect(luat(".bia[data-bo-cuc='pc'] .bia-dk .bia-luc{")).toMatch(/flex:0 1 260px/)
+  })
+  it('dọc: bánh xe ngang ≤ 240 px, nằm giữa hàng dưới', () => {
+    expect(luat('.bia-dk .bia-banh-xe[data-doc]{')).toMatch(/max-width:240px;margin-inline:auto/)
+  })
+})
