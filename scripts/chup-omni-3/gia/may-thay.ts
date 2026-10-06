@@ -20,7 +20,7 @@ const KHO_MAC_DINH: TeacherExamSource[] = [
 ]
 // ── Cảnh "nhiều lớp" (thầy 06/10, ảnh app thật): cây Khối 12 như kho của thầy — chương 3 nhập ĐẢO thứ tự (Bài 10, 11, 11, 8, 9, 9) để thấy cây đã sắp lại; 5 lớp
 // 12 - Lớp Thường / 12 - Nhóm 10 điểm / 12 - Tinh Hoa / 11 / 10 (+ "Chưa xếp lớp" không vào ô chọn). Số câu giống ảnh. Không dữ liệu học sinh thật.
-const LA_NHIEU_LOP = ['gv-bai-nhieu-lop', 'gv-bai-ngang-may-tinh'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('man') ?? '')
+const LA_NHIEU_LOP = ['gv-bai-nhieu-lop', 'gv-bai-ngang-may-tinh', 'gv-giao-cho', 'gv-bai-da-day-truoc'].includes(new URLSearchParams(globalThis.location?.search ?? '').get('man') ?? '')
 const chuong = (n: number, ten: string) => `12 · DẠY HỌC/C${n} - ${ten}`
 const bai = (ma: string, ten: string, soCau: number, c: string) => to(ma, ten, Math.round(soCau * 0.7), Math.round(soCau * 0.2), c, soCau - Math.round(soCau * 0.7) - Math.round(soCau * 0.2))
 const KHO_NHIEU_LOP: TeacherExamSource[] = [
@@ -126,13 +126,16 @@ const TICK_NHIEU: Record<string, { khoaBai: string; tenBai: string; trangThai: '
   ],
   '12 - Nhóm 10 điểm': [{ khoaBai: 'DH-12-C1-B1A', tenBai: 'Bài 1. Ester – Lipid (Phần 1)', trangThai: 'da_day', ngay: '2026-09-22', con: null, tong: 18 }],
 }
+const EM_LOP_THUONG = EM_NHIEU.filter((e) => e.tenLop === '12 - Lớp Thường').map((e) => e.sbd)
+const buoiLopThuong = (id: string, ngay: string, ds: string[]) => ({ id, ten: `Buổi ${ngay}`, lop: '12 - Lớp Thường', moLuc: `${ngay}T11:00:00Z`, hetHan: '', dongLuc: `${ngay}T13:00:00Z`, dangMo: false, coMat: ds })
 function traLoiNhieuLop(duong: string, b: Record<string, unknown>): KQ | null {
   const du = (o: Record<string, unknown>): KQ => ({ ok: true, du: { ok: true, ...o } })
   if (duong === '/gv/lop') return du({ lop: LOP_NHIEU })
   if (duong === '/gv/omni' && b.action === 'co-doc') return du({ co: { bat: true, lop: [], sbd: [] } })
   if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return du({ buoi: [{ ...BUOI, ten: 'Buổi học 05/10 · 12 - Lớp Thường', lop: '12 - Lớp Thường' }] })
-  if (duong === '/gv/buoi-hoc' && b.action === 'gan-day') return du({ buoi: [] })
-  if (duong === '/gv/buoi-hoc') return du({ buoi: { ...BUOI, ten: 'Buổi học 05/10 · 12 - Lớp Thường', lop: '12 - Lớp Thường' }, ma: '482915', doiMaLuc: Date.now() + 40_000, coMat: [], siSo: 44, lopEm: [] })
+  // Điểm danh của lớp đang mở (để ô "Giao cho › Theo điểm danh" có chip buổi): buổi đang mở + hai buổi gần đây, em có mặt lấy từ chính danh sách em của lớp.
+  if (duong === '/gv/buoi-hoc' && b.action === 'gan-day') return du({ buoi: [{ ...buoiLopThuong('BH-9', '2026-10-05', EM_LOP_THUONG.slice(0, 38)), dangMo: true }, buoiLopThuong('BH-8', '2026-10-03', EM_LOP_THUONG.slice(2, 42)), buoiLopThuong('BH-6', '2026-09-29', EM_LOP_THUONG.slice(0, 41))] })
+  if (duong === '/gv/buoi-hoc') return du({ buoi: { ...BUOI, ten: 'Buổi học 05/10 · 12 - Lớp Thường', lop: '12 - Lớp Thường' }, ma: '482915', doiMaLuc: Date.now() + 40_000, coMat: EM_LOP_THUONG.slice(0, 38).map((sbd, i) => ({ sbd, hoTen: sbd, luc: `2026-10-05T11:${String(i % 60).padStart(2, '0')}:00Z`, cach: 'ma' })), siSo: 44, lopEm: [] })
   if (duong === '/gv/chien-dich' && b.action === 'ds-em') return du({ em: EM_NHIEU })
   if (duong === '/gv/bai-da-day' && b.action === 'danh-sach')
     return du({
