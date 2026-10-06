@@ -27,22 +27,12 @@ let huaCong: ReturnType<typeof napCong> | null = null
 /** Lượt tải mảnh cổng đã XONG (thành hay hỏng) — mốc KaTeX, xem `huaManEmSom`. */
 let baoCongXong: () => void = () => {}
 const congXong = new Promise<void>((r) => (baoCongXong = r))
-/** Component cổng ĐÃ tải xong (null = chưa về / hỏng): lượt dựng đầu của máy đã đăng nhập dùng thẳng, không treo Suspense. */
-let congDaVe: ComponentType | null = null
 const layCong = () => {
   if (!huaCong) {
     huaCong = napCong()
-    huaCong.then((m) => { congDaVe = m.default; baoCongXong() }, baoCongXong)
+    huaCong.then(baoCongXong, baoCongXong)
   }
   return huaCong
-}
-/**
- * main.tsx hỏi trước khi dựng React: máy ĐÃ đăng nhập ⇒ chờ mảnh cổng về rồi mới dựng. Dựng sớm thì lượt vẽ đầu phải treo Suspense (màn chờ trống) rồi React 19 còn GIỮ màn chờ
- * cho đủ 300 ms kể từ lúc nó hiện mới cho vẽ cổng (react-dom: `globalMostRecentFallbackTime + FALLBACK_THROTTLE_MS`) — trong lúc mảnh cổng vốn đã nạp trước (index.html) và chỉ còn chạy mã.
- * Máy chưa đăng nhập (màn đăng nhập) không chờ gì. Mảnh hỏng ⇒ vẫn dựng (lazy báo lỗi như cũ).
- */
-export function sanSangVeDau(): Promise<unknown> | null {
-  return docPhienHs() ? layCong().catch(() => {}) : null
 }
 /** Máy ĐÃ đăng nhập lúc mở: cổng là màn đầu ⇒ `lazy` + Suspense (ChoManEm) như App.tsx. */
 const StudentPortalScreen = lazy(layCong)
@@ -74,7 +64,7 @@ export default function AppHocSinh() {
   // Màn cổng dựng ở đâu: máy đã đăng nhập lúc mở ⇒ bản `lazy` (chờ mảnh dưới Suspense như App.tsx); em vừa đăng nhập ⇒ CHÍNH component của mảnh
   // đã tải xong — dựng thẳng trong cùng lượt vẽ, không treo Suspense một nhịp (không chớp nền trống giữa màn đăng nhập và cổng: bản cũ đổi
   // từ đăng nhập sang cổng trong cùng một component). Chọn MỘT lần, giữ suốt phiên trang (đăng xuất do cổng tự vẽ lại màn đăng nhập).
-  const [Cong, setCong] = useState<ComponentType | null>(() => (docPhienHs() ? (congDaVe ?? StudentPortalScreen) : null))
+  const [Cong, setCong] = useState<ComponentType | null>(() => (docPhienHs() ? StudentPortalScreen : null))
   const coPhien = Cong !== null
   // Em VỪA đăng nhập: Sảnh luôn mở từ ĐẦU TRANG. Trước đây lượt vẽ đầu của cổng là màn chờ ngắn ⇒ trình duyệt tự kéo vị trí cuộn của màn đăng nhập (hơi dài trên máy nhỏ) về 0.
   // Nay Sảnh có thể có số ngay lượt đầu (đính kèm trong lệnh đăng nhập) ⇒ trang không ngắn lại, vị trí cuộn cũ bị giữ nguyên, Sảnh mở lệch xuống. Kéo về 0 trước khi vẽ cho khỏi lệch.

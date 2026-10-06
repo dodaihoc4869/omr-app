@@ -103,7 +103,7 @@ khoaVaiVaoUrl(import.meta.env.BASE_URL)
 // của thầy); mọi đường khác dựng App.tsx như cũ. Bắt đầu tải NGAY (index.html đã nạp trước đúng nhóm mảnh của đường vào — vite.config.ts
 // `napTruocManEm`), dựng React khi mảnh về. Tính SAU khi chuẩn hoá + khoá vai vào đường dẫn ⇒ cùng kết luận với App.tsx. Mảnh gốc tải hỏng
 // thì thử lại một lần; thiếu mảnh vì đang mở bản cũ thì `batLoiThieuManh()` (dưới) tự tải lại trang.
-type GocApp = { default: ComponentType; huaManEmSom: () => Promise<unknown> | null; sanSangVeDau?: () => Promise<unknown> | null }
+type GocApp = { default: ComponentType; huaManEmSom: () => Promise<unknown> | null }
 const thuLai = <T,>(nap: () => Promise<T>): Promise<T> => nap().catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(nap))
 // Link riêng CŨ (`/hs/<token>?vai=hocsinh`…) App.tsx chặn bằng màn "link đã ngừng dùng" TRƯỚC nhánh cổng ⇒ đi App.tsx như cũ.
 const laCongHocSinh = docDuongVao(location.search, location.pathname).vai === 'hocsinh' && !laLinkAppCu(location.search, location.pathname)
@@ -210,19 +210,12 @@ if (laCongHocSinh && typeof navigator !== 'undefined' && navigator.serviceWorker
 batBaoHiemBanMoi()
 
 const goc = createRoot(document.getElementById('root')!)
-void napGoc.then(async ({ default: App, sanSangVeDau }) => {
-  // Cổng học sinh, máy ĐÃ đăng nhập: chờ mảnh cổng về rồi mới dựng (khỏi treo Suspense + 300 ms giữ màn chờ của React 19) — xem AppHocSinh.sanSangVeDau.
-  try {
-    const cho = sanSangVeDau?.()
-    if (cho) await cho
-  } catch {
-    /* chỉ là tăng tốc: lỗi ⇒ dựng như cũ */
-  }
+void napGoc.then(({ default: App }) =>
   goc.render(
     <StrictMode>
       <App />
     </StrictMode>,
-  )
-})
+  ),
+)
 
 startAppPresence()
