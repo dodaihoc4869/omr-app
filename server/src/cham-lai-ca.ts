@@ -375,7 +375,7 @@ export type KetQuaDocNguon =
     }
 
 export type KetQuaChuanBiChamLai =
-  | ({ ok: true; soEmDaVao: number; soEmDaNop: number } & KetQuaChamLaiMotCa)
+  | ({ ok: true; soEmDaVao: number; soEmDaNop: number; soBoSungKhoCaThem: number } & KetQuaChamLaiMotCa)
   | Extract<KetQuaDocNguon, { ok: false }>
 
 /**
@@ -449,9 +449,9 @@ export async function docNguonChamLai(
  * Chuẩn bị chấm lại một ca CŨ: đọc nguyên liệu rồi gọi hàm thuần. Lượt chưa nộp nằm lại, không ghi gì:
  * chỗ gọi chỉ ghi phần `bai` trả về.
  */
-export async function chuanBiChamLaiCa(env: Env, maCa: string): Promise<KetQuaChuanBiChamLai> {
-  const n = await docNguonChamLai(env, maCa)
+export async function chuanBiChamLaiCa(env: Env, maCa: string, tuyChon: { boSungKhoCaThem?: boolean } = {}): Promise<KetQuaChuanBiChamLai> {
+  const n = await docNguonChamLai(env, maCa, { boSungKhoCaThem: tuyChon.boSungKhoCaThem === true })
   if (n.ok !== true) return n
   const kq = chamLaiMotCa(maCa, String(n.ca.ten_ca ?? ''), n.nh, n.dsLuot, n.soCauCa, n.boD1)
-  return { ok: true, soEmDaVao: n.soEmDaVao, soEmDaNop: n.soEmDaNop, ...kq }
+  return { ok: true, soEmDaVao: n.soEmDaVao, soEmDaNop: n.soEmDaNop, soBoSungKhoCaThem: n.soBoSungKhoCaThem, ...kq }
 }

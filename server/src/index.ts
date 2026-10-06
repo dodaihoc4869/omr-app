@@ -2771,7 +2771,10 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
 async function chamLaiCaRoute(env: Env, b: Record<string, unknown>): Promise<Response> {
   const maCa = String(b.maCa ?? '').trim()
   if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
-  const cb = await chuanBiChamLaiCa(env, maCa)
+  const xemTruoc = b.xemTruoc === true
+  // XEM TRƯỚC được bổ sung đáp án câu nối thêm từ `kho_ca_them` TRONG BỘ NHỚ (để thầy thấy bảng cũ → mới của ca mà tờ đáp án R2 đã mất câu);
+  // GHI thì chỉ dùng tờ đáp án R2 thật — phải `/ca/phuc-hoi-key` trước, không thì em thiếu câu vào `tuChoi` và không bị ghi gì. Xem key-bank-bo-sung.ts.
+  const cb = await chuanBiChamLaiCa(env, maCa, { boSungKhoCaThem: xemTruoc })
   if (cb.ok !== true) return ra(cb)
   const baoCao = {
     maCa: cb.maCa,
@@ -2783,9 +2786,13 @@ async function chamLaiCaRoute(env: Env, b: Record<string, unknown>): Promise<Res
     soDoi: cb.soDoi,
     tuChoi: cb.tuChoi,
     canhBao: cb.canhBao,
+    ...(cb.soBoSungKhoCaThem > 0 ? { canPhucHoiKey: cb.soBoSungKhoCaThem } : {}),
   }
   // XEM TRƯỚC (`xemTruoc: true`): chấm lại nhưng KHÔNG ghi gì — thầy thấy bảng cũ → mới trước khi quyết. Chỉ đọc.
-  if (b.xemTruoc === true) return ra({ ok: true, xemTruoc: true, ...baoCao, soGhi: 0, soSeGhi: cb.bai.length })
+  if (xemTruoc) {
+    const thua = await lapDonBanDoSaiThua(env, maCa, cb.bai)
+    return ra({ ok: true, xemTruoc: true, ...baoCao, soGhi: 0, soSeGhi: cb.bai.length, soSeDonBanDoSaiThua: thua.soDong, soEmSeDonBanDoSaiThua: thua.soEm, boQuaDonNhieuLuot: thua.boQuaNhieuLuot })
+  }
   // Không em nào nộp (hoặc chấm lỗi hết) ⇒ không ghi gì; vẫn trả bảng đối chiếu cho thầy thấy.
   if (cb.bai.length === 0) return ra({ ok: true, ...baoCao, soGhi: 0 })
   const ghi = await chamDiem(env, { maCa, bai: cb.bai })
@@ -2806,7 +2813,48 @@ async function chamLaiCaRoute(env: Env, b: Record<string, unknown>): Promise<Res
   }
   for (let i = 0; i < don.length; i += 100) await env.DB.batch(don.slice(i, i + 100))
 
-  return ra({ ok: true, ...baoCao, soGhi: cb.bai.length, soCauGhi: Number(j?.soCau) || 0, soDonCauSai: don.length })
+  // DỌN `ban_do_sai` THỪA: dòng của em mà câu KHÔNG thuộc bộ câu của em (bản chấm cũ bù câu lạ rồi ghi "sai") — em bị hỏi lại câu chưa từng được giao.
+  // Chỉ em có ĐÚNG MỘT lượt trong ca (nhiều lượt thì câu sai của lượt trước vẫn hợp lệ — không đụng).
+  const thua = await lapDonBanDoSaiThua(env, maCa, cb.bai)
+  for (let i = 0; i < thua.lenh.length; i += 100) await env.DB.batch(thua.lenh.slice(i, i + 100))
+
+  return ra({ ok: true, ...baoCao, soGhi: cb.bai.length, soCauGhi: Number(j?.soCau) || 0, soDonCauSai: don.length, soDonBanDoSaiThua: thua.soDong, soEmDonBanDoSaiThua: thua.soEm, boQuaDonNhieuLuot: thua.boQuaNhieuLuot })
+}
+
+/**
+ * LẬP LỆNH DỌN `ban_do_sai` THỪA của các em vừa được chấm lại: dòng (ca, em, câu) mà câu NGOÀI bộ câu của em. Trả số dòng sẽ xoá (đếm trước bằng SELECT) và các lệnh xoá.
+ * Em có từ HAI lượt trở lên trong ca bị bỏ qua (`boQuaNhieuLuot`): dòng của lượt trước có thể hợp lệ. Bộ câu rỗng ⇒ bỏ qua (không bao giờ xoá sạch).
+ */
+export async function lapDonBanDoSaiThua(
+  env: Env,
+  maCa: string,
+  bai: { sbd: string; cau: { qid: string }[] }[],
+): Promise<{ lenh: D1PreparedStatement[]; soDong: number; soEm: number; boQuaNhieuLuot: number }> {
+  const ra0 = { lenh: [] as D1PreparedStatement[], soDong: 0, soEm: 0, boQuaNhieuLuot: 0 }
+  if (bai.length === 0) return ra0
+  const rLuot = await env.DB.prepare('SELECT sbd, COUNT(*) AS n FROM luot WHERE ma_ca = ? GROUP BY sbd').bind(maCa).all<{ sbd: string; n: number }>()
+  const nLuot = new Map((rLuot.results ?? []).map((x) => [String(x.sbd), Number(x.n) || 0]))
+  const ungVien: { sbd: string; json: string }[] = []
+  for (const x of bai) {
+    if ((nLuot.get(x.sbd) ?? 1) > 1) { ra0.boQuaNhieuLuot++; continue }
+    const qids = [...new Set(x.cau.map((c) => c.qid).filter(Boolean))]
+    if (qids.length === 0) continue
+    ungVien.push({ sbd: x.sbd, json: JSON.stringify(qids) })
+  }
+  for (let i = 0; i < ungVien.length; i += 100) {
+    const nhom = ungVien.slice(i, i + 100)
+    const dem = await env.DB.batch(
+      nhom.map((u) => env.DB.prepare('SELECT COUNT(*) AS n FROM ban_do_sai WHERE ma_ca = ? AND sbd = ? AND qid NOT IN (SELECT value FROM json_each(?))').bind(maCa, u.sbd, u.json)),
+    )
+    nhom.forEach((u, k) => {
+      const n = Number(((dem[k]?.results ?? [])[0] as { n?: number } | undefined)?.n) || 0
+      if (n === 0) return
+      ra0.soDong += n
+      ra0.soEm++
+      ra0.lenh.push(env.DB.prepare('DELETE FROM ban_do_sai WHERE ma_ca = ? AND sbd = ? AND qid NOT IN (SELECT value FROM json_each(?))').bind(maCa, u.sbd, u.json))
+    })
+  }
+  return ra0
 }
 
 /** BẢNG MẠNH–YẾU CỦA MỘT EM — nguồn của rút câu sai và gọi lên bảng. */
