@@ -393,8 +393,6 @@ export function rutDsDangBai(khoDangBai: TeacherExamSource[], soCauRut: number, 
 // để máy chủ và máy em dùng CHUNG một luật: bộ lọc nhiều lựa chọn (Ngẫu nhiên | 2 sao | 1 sao | Lý thuyết | Bài tập),
 // sao theo `hopSao`, thể loại theo `dang`/`kieu`; rồi xáo bằng `sort(() => Math.random() - 0.5)` và cắt đúng số câu.
 
-export type LuaChonTuDo = 'ngau_nhien' | 'sao_2' | 'sao_1' | 'ly_thuyet' | 'bai_tap'
-
 /** Câu có khớp bộ lọc tự do không — y hệt `khopBoLocCheDo4` của khối cũ. Rỗng hoặc có 'ngau_nhien' ⇒ mọi câu. */
 export function khopBoLocTuDo(cacMucDoChon: ReadonlySet<string>, cand: { sao?: any; dang?: any; kieu?: any }): boolean {
   const isNgauNhien = cacMucDoChon.has('ngau_nhien') || cacMucDoChon.size === 0

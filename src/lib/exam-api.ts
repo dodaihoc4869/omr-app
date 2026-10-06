@@ -1353,25 +1353,6 @@ export async function listSubmissions(scriptUrl: string, maCa: string): Promise<
 // PHỤ HUYNH — đăng ký, xem nhận xét sau khi nộp, theo dõi làm bài thời gian thực
 // ============================================================================
 
-export interface ParentFeedbackItem {
-  maCa: string
-  maDe: string
-  thoiGianNop: string
-  diem: number
-  xepLoai: string
-  cauSai: string // JSON stringify {phanI:number[], phanII:number[], phanIII:number[]}
-}
-
-export interface ParentFeedbackResult {
-  found: boolean
-  sdt?: string
-  hoTenPhuHuynh?: string
-  sbd?: string
-  lop?: string
-  hoTenHocSinh?: string
-  items?: ParentFeedbackItem[]
-}
-
 export async function sendParentFeedback(
   scriptUrl: string,
   sbd: string,
@@ -1444,35 +1425,10 @@ export async function pushExamStatus(
   }
 }
 
-export interface ParentStatus {
-  found: boolean
-  hoTenHocSinh?: string
-  sbd?: string
-  status: {
-    maCa: string
-    lop: string
-    dangLam: boolean
-    batDauLuc: string
-    daLamCauHoi: number
-    tongCauHoi: number
-    soLanRoiApp: number
-    blocked: boolean
-    capNhatLuc: string
-  } | null
-}
-
 // ============================================================================
 // HỌC SINH — đăng ký hồ sơ 1 lần (SBD + họ tên + năm sinh), dùng để tự điền
 // sẵn SBD lúc vào thi và để nhắn tin cho thầy có tên hiển thị rõ ràng.
 // ============================================================================
-
-export interface StudentProfile {
-  found: boolean
-  sbd?: string
-  hoTen?: string
-  namSinh?: string
-  lop?: string
-}
 
 /** Xoá đăng ký hồ sơ học sinh (theo SBD) — dùng khi đăng ký nhầm, cho đăng ký lại từ đầu. */
 export async function deleteStudentRegistration(scriptUrl: string, secret: string, sbd: string): Promise<void> {
@@ -1511,30 +1467,11 @@ export async function sendTeacherMessage(scriptUrl: string, secret: string, sbd:
   if (!result.ok) throw new Error(result.error || 'Gửi tin nhắn thất bại')
 }
 
-export interface TeacherMessage {
-  id: string
-  sbd: string
-  noiDung: string
-  thoiGian: string
-  daXem: boolean
-}
-
 // ============================================================================
 // QUẢN LÝ ĐĂNG KÝ (chỉ thầy dùng) — xem + xoá phụ huynh/học sinh đã đăng ký.
 // Phụ huynh/học sinh KHÔNG có nút tự xoá trong app của họ — đăng ký xong là
 // cố định, chỉ thầy xoá được ở màn này để cho đăng ký lại.
 // ============================================================================
-
-export interface RegisteredParent {
-  sdt: string
-  hoTenPhuHuynh: string
-  sbd: string
-  lop: string
-  hoTenHocSinh: string
-  dangKyLuc: string
-  token?: string
-  trangThai?: string
-}
 
 export interface RegisteredStudent {
   sbd: string
@@ -1569,50 +1506,11 @@ export async function listRegisteredStudents(scriptUrl: string, secret: string):
   }))
 }
 
-export interface FeedbackSummary {
-  sbd: string
-  maCa: string
-  maDe: string
-  thoiGianNop: string
-  diem: number
-  xepLoai: string
-}
-
 // ============================================================================
 // BA VAI TRÒ — TOKEN & DUYỆT HỒ SƠ (BA-APP.md đợt 1)
 // Máy em/phụ huynh vào bằng link riêng /hs/<token> · /ph/<token>. Máy chủ tra
 // token ra SBD; app KHÔNG bao giờ tự khai mình là SBD nào.
 // ============================================================================
-
-export interface HoSoHocSinhToken {
-  ok: boolean
-  found: boolean
-  sbd?: string
-  hoTen?: string
-  namSinh?: string
-  lop?: string
-  trangThai?: string
-  error?: string
-}
-
-export interface HoSoPhuHuynhToken {
-  ok: boolean
-  found: boolean
-  sdt?: string
-  hoTenPhuHuynh?: string
-  sbd?: string
-  lop?: string
-  hoTenHocSinh?: string
-  trangThai?: string
-  error?: string
-}
-
-export type LoaiHoSo = 'hs' | 'ph'
-
-export interface HoSoChoDuyet {
-  hocSinh: RegisteredStudent[]
-  phuHuynh: RegisteredParent[]
-}
 
 // ============================================================================
 // HỒ SƠ HỌC SINH (BA-APP.md đợt 2) — chuyên đề mạnh/yếu + lịch sử ca thi.

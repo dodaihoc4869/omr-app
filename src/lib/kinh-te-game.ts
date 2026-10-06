@@ -40,9 +40,6 @@ export const BANG_TONG_EXP_V5: readonly number[] = Object.freeze([
 
 const nguyenKhongAm = (x: unknown): number => (typeof x === 'number' && Number.isFinite(x) ? Math.max(0, Math.floor(x)) : 0)
 
-/** Số ngày đạt tối thiểu để lên cấp `cap` (cấp ≤ 1 ⇒ 0; cấp > 120 ⇒ như 120). */
-export const ngayDatCanChoCap = (cap: number): number => BANG_NGAY_CAP[Math.min(CAP_CUOI, Math.max(1, Math.round(Number(cap) || 1)))] ?? 0
-
 /** Cấp cao nhất mà `soNgayDat` ngày đạt CHO PHÉP (chưa xét EXP): c lớn nhất có D(c) ≤ số ngày. */
 export function capChoPhepTheoNgay(soNgayDat: number): number {
   const n = nguyenKhongAm(soNgayDat)

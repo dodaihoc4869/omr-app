@@ -280,11 +280,6 @@ export async function docKhoiVaLopCacEm(env:Env,sbds:readonly string[]):Promise<
   return {khoi,lop}
 }
 export async function docKhoiEm(env:Env,sbd:string):Promise<Khoi|null>{return (await docKhoiCacEm(env,[sbd])).get(sbd)??null}
-/** Khối THẤP NHẤT trong nhóm em (đội Đoàn lẫn khối: câu chung phải hợp với MỌI thành viên). Không em nào rõ khối ⇒ null. */
-export async function docKhoiThapNhat(env:Env,sbds:readonly string[]):Promise<Khoi|null>{
-  let ra:Khoi|null=null;for(const k of (await docKhoiCacEm(env,sbds)).values())if(k!==null&&(ra===null||k<ra))ra=k
-  return ra
-}
 export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:CauPool[];missing:number}> {
   // Tối ưu 05/10: bốn lượt ĐỌC đầu (chi tiết câu ca thi, lượt đã nộp, hồ sơ nguồn khác, sổ nguồn khác) chỉ phụ thuộc em ⇒ bắt đầu CÙNG đợt
   // (trước: bốn đợt nối tiếp). Xử lý + bắt lỗi vẫn theo đúng thứ tự cũ (hai lượt đầu ném như cũ; hai lượt sau lỗi ⇒ bỏ qua như cũ).

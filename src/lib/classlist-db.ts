@@ -50,11 +50,6 @@ export async function loadClassListMeta(): Promise<ClassListDBSchema['meta'] | u
   return db.get(META_STORE, 'config')
 }
 
-export async function findStudentBySbd(sbd: string): Promise<ClassListRow | undefined> {
-  const db = await getDb()
-  return db.get(STORE, sbd)
-}
-
 /** Đổi TÊN một em trong danh sách lớp cất ở máy thầy (chỉ sau khi máy chủ đã đổi thật). Không đụng em khác, không xoá/ghi lại cả danh sách.
  *  Trả `false` nếu máy này không có em đó. */
 export async function doiTenEmTrongDanhSachLop(sbd: string, hoTen: string): Promise<boolean> {

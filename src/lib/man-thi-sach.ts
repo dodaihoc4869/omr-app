@@ -38,13 +38,6 @@ export const HO_CUA_KENH: Record<MaKenh, HoKenh> = {
   phim_chup: 'do_truc_tiep',
 }
 
-export const TEN_HO: Record<HoKenh, string> = {
-  che_man: 'màn bị che',
-  luong_chinh: 'luồng chính nghẽn',
-  vat_ly: 'chuyển động máy',
-  do_truc_tiep: 'số đo trực tiếp',
-}
-
 export function soHoKhacNhau(nhom: PhieuKenh[]): number {
   return new Set(nhom.map((p) => HO_CUA_KENH[p.kenh])).size
 }
@@ -102,18 +95,6 @@ export const TI_LE_CO_MAN_CHOT = 0.72
 
 // ------------------------------------------------------------- MỨC NGẶT
 export type MucNgat = 'rat_ngat' | 'ngat' | 'binh_thuong'
-
-export const TEN_MUC_NGAT: Record<MucNgat, string> = {
-  rat_ngat: 'Rất ngặt',
-  ngat: 'Ngặt',
-  binh_thuong: 'Bình thường',
-}
-
-export const MO_TA_MUC_NGAT: Record<MucNgat, string> = {
-  rat_ngat: 'Cửa sổ nổi · thu nhỏ màn · thoát toàn màn · dấu vết chụp đều khoá ngay lần đầu.',
-  ngat: 'Như Rất ngặt, nhưng cửa sổ nổi lần đầu chỉ cảnh báo.',
-  binh_thuong: 'Giữ nguyên hành vi cũ: chỉ đếm rời app, tín hiệu mới chỉ ghi nhật ký.',
-}
 
 /** Ca mở trước bản này không có cột MucNgat ⇒ Bình thường, đúng hành vi cũ,
  * không đổi điểm ca đã gửi phụ huynh. */

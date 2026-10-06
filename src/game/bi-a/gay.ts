@@ -4,7 +4,6 @@
 import { R } from './vat-ly'
 
 export interface Diem { x: number; y: number }
-export const DAI_GAY = 400
 /** Khoảng đầu gậy tới tâm bi cái (đúng như lúc vẽ): gậy lùi theo lực. */
 export const dauGay = (luc: number): number => R + 6 + Math.max(0, Math.min(1, luc)) * 80
 

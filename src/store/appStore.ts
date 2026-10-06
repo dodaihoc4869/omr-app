@@ -4,7 +4,7 @@
 // phiên làm việc độc lập.
 import { create } from 'zustand'
 import type { AnswerKey, StudentAnswers } from '../engine/score'
-import { isReviewFlag, scoreStudent, type ScoreResult } from '../engine/score'
+import { scoreStudent, type ScoreResult } from '../engine/score'
 import type { ClassListRow } from '../lib/sheet-gviz'
 
 export type ScreenId =
@@ -134,19 +134,3 @@ export const useAppStore = create<AppState>((set) => ({
   showToast: (text, kind = 'success') => set({ toast: { text, kind } }),
   clearToast: () => set({ toast: null }),
 }))
-
-export function sheetHasUnreviewedFlag(sheet: ScannedSheet): boolean {
-  if (sheet.reviewed) return false
-  if (!sheet.sbdKnown) return true
-  const a = sheet.answers
-  const review = a.phanI.some((x) => isReviewFlag(x.flag)) ||
-    a.phanII.some((q) => q.some((x) => isReviewFlag(x.flag))) ||
-    a.phanIII.some((x) => isReviewFlag(x.flag))
-  return review
-}
-
-export function countUnreviewed(sheets: ScannedSheet[]): number {
-  return sheets.filter(sheetHasUnreviewedFlag).length
-}
-
-export const useSheets = () => useAppStore((s) => s.sheets)

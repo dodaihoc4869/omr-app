@@ -56,8 +56,6 @@ export const GIAY_CHO_PHAN_HOI = 8
 export const SO_LAN_BAT_TAY = 15
 export const NHIP_BAT_TAY_MS = 400
 
-export type KetQuaGhiToChieu = 'da_ghi' | 'loi'
-
 /** Khoá của một ô em × câu — CHUNG với bảng buổi chữa (`ketQuaBuoi`, `daGhiKhoa`). */
 export function khoaToChieu(sbd: string, qid: string): string {
   return `${sbd}|${qid}`

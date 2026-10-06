@@ -587,9 +587,6 @@ export function batDauBiaChoSanh(env: Env, sbd: string, nowMs: number): () => Pr
   }
 }
 
-/** Ngày VN hiện tại — xuất lại cho test. */
-export const ngayBia = (nowMs: number): string => ngayVnCua(nowMs)
-
 // ---------------------------------------------------------------- ĐẤU VỚI BẠN (GĐ2, đặc tả 6.2, 6.3, 8.2)
 // Sảnh chỉ làm việc "giấy tờ" (tạo bàn, mã bàn, mời, có mặt, xếp câu cho ghế) rồi cấp VÉ KÝ; mọi thứ trong ván do phòng đấu `BanBiA` giữ.
 const HAN_VE_MS = 2 * 3_600_000
