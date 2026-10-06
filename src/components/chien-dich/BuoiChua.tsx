@@ -122,7 +122,7 @@ export default function BuoiChua({
 
   const chua = async () => {
     setDangChua(true)
-    const r = await chuaXong(du.chienDich.id, kq.dong.flatMap((d) => qidCuaDong(d.cau)))
+    const r = await chuaXong(du.chienDich.id, kq.dong.flatMap((d) => qidCuaDong(d.cau)), coMat)
     setDangChua(false)
     setHoiChua(false)
     if (!r.ok) {

@@ -181,6 +181,33 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     expect(b3.daChuaTruoc).toBe(3)
   })
 
+  it('(thầy 06/10) NHIỀU LỚP trong một chiến dịch: chữa xong cho lớp A không làm lớp B mất câu; mở khoá chỉ cho em có mặt', async () => {
+    const { d, env } = fixture()
+    const id = await giao(env, '2026-10-04', T0 - 6 * NGAY)
+    const NOW = Date.parse('2026-10-05T02:00:00Z')
+    const buoi = async (coMat?: string[]) => (await gvChienDich(env, { action: 'buoi-chua', id, ...(coMat ? { coMat } : {}) }, NOW)) as { cau: { qid: string; dang: string }[]; daChuaTruoc: number }
+    // S1 = lớp A, S2 = lớp B. Cả hai cần dạy lại Q1 (sai ≥ 4 lần).
+    await ghiSuKien(env, ['S1', 'S2'].flatMap((s) => [1, 2, 3, 4].map((k) => suKien(s, 'Q1', T0 - (6 - k) * NGAY, false))))
+    const a1 = await buoi(['S1'])
+    expect(a1.cau.length).toBeGreaterThanOrEqual(3)
+    await gvChienDich(env, { action: 'chua-xong', id, qids: a1.cau.map((c) => c.qid), coMat: ['S1'] }, NOW)
+    // lớp A: các dạng đã chữa không xếp lại; mở khoá chỉ cho S1
+    const a2 = await buoi(['S1'])
+    expect(a2.cau).toHaveLength(0)
+    expect(a2.daChuaTruoc).toBe(a1.cau.length)
+    expect(d.sql.prepare("SELECT sbd FROM srs2_day_lai WHERE qid = 'Q1' ORDER BY sbd").all()).toEqual([{ sbd: 'S1' }])
+    // lớp B CHƯA chữa: vẫn thấy ĐỦ các câu như trước (không bị mất vì lớp A đã chữa)
+    const b1 = await buoi(['S2'])
+    expect(b1.cau.map((c) => c.qid).sort()).toEqual(a1.cau.map((c) => c.qid).sort())
+    expect(b1.daChuaTruoc).toBe(0)
+    // cả hai lớp cùng có mặt: dạng chỉ bị bỏ khi MỌI em có mặt đã chữa ⇒ vẫn đủ câu cho em S2
+    expect((await buoi()).cau).toHaveLength(a1.cau.length)
+    // lớp B chữa xong thì cả hai lớp đều hết
+    await gvChienDich(env, { action: 'chua-xong', id, qids: b1.cau.map((c) => c.qid), coMat: ['S2'] }, NOW)
+    expect((await buoi()).cau).toHaveLength(0)
+    expect(d.sql.prepare("SELECT sbd FROM srs2_day_lai WHERE qid = 'Q1' ORDER BY sbd").all()).toEqual([{ sbd: 'S1' }, { sbd: 'S2' }])
+  })
+
   it('đồng hồ sức chứa: tỉ lệ = khối lượng em giữa lớp / (D × thể lực)', async () => {
     const { env } = fixture()
     const r = await gvChienDich(env, { action: 'suc-chua', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-04' }, T0)

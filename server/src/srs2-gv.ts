@@ -37,7 +37,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
     if (action === 'rai-deu') return await doiRaiDeu(env, str(b.id), b.bat !== false, nowMs, str(b.nguoi)) // await để lỗi "không tìm thấy" về { ok:false }
     if (action === 'bang') return bang(env, str(b.id), nowMs)
     if (action === 'buoi-chua') return buoiChua(env, str(b.id), nowMs, mangChuoi(b.coMat))
-    if (action === 'chua-xong') return chuaXong(env, str(b.id), mangChuoi(b.qids), nowMs)
+    if (action === 'chua-xong') return chuaXong(env, str(b.id), mangChuoi(b.qids), nowMs, mangChuoi(b.coMat))
     return { ok: false, error: 'Hành động không hợp lệ.' }
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) }
@@ -569,17 +569,30 @@ export async function dongNoCu(env: Env, noCu: ReadonlyMap<string, NoCuEm>, theL
 }
 
 // ---------------------------------------------------------------- buổi chữa
-/** DẠNG ĐÃ CHỮA của chiến dịch (thầy 06/10: "sau khi chữa xong 11 câu thì những câu còn lại chữa thế nào"). Chỉ-thêm, tạo tại chỗ.
- *  "Chữa xong" ghi mỗi câu vừa chữa; lần xếp sau BỎ dạng đã chữa (mỗi dạng một câu đại diện) ⇒ buổi sau tự tới các dạng còn lại.
+/** DẠNG ĐÃ CHỮA THEO TỪNG EM (thầy 06/10: "sau khi chữa xong 11 câu thì những câu còn lại chữa thế nào" + "chữa nhiều lớp thì không thể chữa lớp này xong
+ *  lại chữa câu tiếp theo cho lớp kia"). Chỉ-thêm, tạo tại chỗ. Một chiến dịch gộp NHIỀU lớp; thầy chữa từng lớp (chọn "em có mặt"):
+ *  "Chữa xong" ghi (em có mặt × câu vừa chữa); lần xếp sau chỉ BỎ dạng mà MỌI em đang có mặt đã được chữa ⇒ lớp kia chưa chữa vẫn thấy đủ câu,
+ *  còn lớp vừa chữa tự tới các dạng còn lại. (Bản 06/10 đầu ghi theo cả chiến dịch ⇒ chữa xong lớp A làm lớp B mất câu — đã sửa.)
  *  Trước đây câu chỉ có em "chưa thành thạo" (không ai cần dạy lại) không để lại dấu gì ⇒ vẫn đứng đầu mãi, các câu bị bỏ bớt không bao giờ tới lượt. */
 const LENH_BANG_DA_CHUA = [
-  'CREATE TABLE IF NOT EXISTS buoi_chua_da_chua (chien_dich_id TEXT NOT NULL, qid TEXT NOT NULL, dang TEXT NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (chien_dich_id, qid))',
+  'CREATE TABLE IF NOT EXISTS buoi_chua_em_da_chua (chien_dich_id TEXT NOT NULL, sbd TEXT NOT NULL, qid TEXT NOT NULL, dang TEXT NOT NULL, luc TEXT NOT NULL, PRIMARY KEY (chien_dich_id, sbd, qid))',
 ]
 const tenDangCau = (m: { tenDang?: unknown; dang?: unknown } | undefined): string => String(m?.tenDang ?? m?.dang ?? 'Chưa gắn dạng')
-async function docDangDaChua(env: Env, id: string): Promise<Set<string>> {
-  await chayDdlMotLan(env, 'buoi_chua_da_chua', LENH_BANG_DA_CHUA)
-  const r = await env.DB.prepare('SELECT DISTINCT dang FROM buoi_chua_da_chua WHERE chien_dich_id = ?').bind(id).all<Row>()
-  return new Set((r.results ?? []).map((x) => str(x.dang)))
+/** Dạng mà MỌI em trong `em` đã được chữa (em rỗng ⇒ không dạng nào). */
+async function docDangDaChua(env: Env, id: string, em: readonly string[]): Promise<Set<string>> {
+  await chayDdlMotLan(env, 'buoi_chua_em_da_chua', LENH_BANG_DA_CHUA)
+  if (!em.length) return new Set()
+  const r = await env.DB.prepare('SELECT dang, sbd FROM buoi_chua_em_da_chua WHERE chien_dich_id = ?').bind(id).all<Row>()
+  const theoDang = new Map<string, Set<string>>()
+  for (const x of r.results ?? []) {
+    const d = str(x.dang)
+    let t = theoDang.get(d)
+    if (!t) { t = new Set(); theoDang.set(d, t) }
+    t.add(str(x.sbd))
+  }
+  const xong = new Set<string>()
+  for (const [d, t] of theoDang) if (em.every((s) => t.has(s))) xong.add(d)
+  return xong
 }
 /** Điểm chữa của câu = số em chưa thành thạo + 2 × số em cần thầy dạy lại. Mỗi dạng một câu đại diện (điểm cao nhất). */
 async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
@@ -602,7 +615,7 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
     return { ...c, soChuaThanhThao: chua.length, soCanDayLai: dayLai.length, diemChua: chua.length + 2 * dayLai.length, emSua: [...dayLai, ...chua.filter((s) => !dayLai.includes(s))] }
   })
   const theoDang = new Map<string, (typeof cauGop)[number]>()
-  const dangDaChua = await docDangDaChua(env, cd.id).catch(() => new Set<string>())
+  const dangDaChua = await docDangDaChua(env, cd.id, em).catch(() => new Set<string>())
   for (const c of cauGop) {
     if (c.diemChua <= 0) continue
     if (dangDaChua.has(c.dang)) continue // dạng đã chữa ở buổi trước: để buổi này tới dạng khác
@@ -657,21 +670,24 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
   return { ok: true, chienDich: { id: cd.id, ten: cd.ten, hanNop: cd.hanNop, lop: cd.lop }, hetHan: cd.hanNop < ngayVnCua(nowMs), soEm: em.length, lop: { coXat: coXat / tong, thanhThao: thanhThao / tong }, daChuaTruoc: dangDaChua.size, cau: deXuat }
 }
 
-/** "Chữa xong": câu đã chữa trên lớp ⇒ đếm sai về 0 cho em đang cần dạy lại câu đó; câu vào Đoàn Hộ Tống từ hôm sau. */
-async function chuaXong(env: Env, id: string, qids: string[], nowMs: number) {
+/** "Chữa xong": câu đã chữa trên lớp ⇒ đếm sai về 0 cho em đang cần dạy lại câu đó; câu vào Đoàn Hộ Tống từ hôm sau.
+ *  `coMat` (buổi chữa, 06/10): CHỈ các em có mặt buổi này được mở khoá + ghi "đã chữa"; vắng ⇒ cả chiến dịch (nút ở Bảng chiến dịch như cũ). */
+async function chuaXong(env: Env, id: string, qids: string[], nowMs: number, coMat: string[] = []) {
   const cd = await docMot(env, id)
+  const emChua = coMat.length ? cd.sbd.filter((s) => coMat.includes(s)) : cd.sbd
   const ds = qids.length ? qids.filter((q) => cd.qids.includes(q)) : cd.qids
   const tt = await trangThaiLop(env, cd.sbd, ds, cd.hanNop, cd.mocBatDau, undefined, await docMocThemCaLop(env, cd.id))
   const luc = new Date(nowMs).toISOString()
   const lenh: ReturnType<Env['DB']['prepare']>[] = []
-  for (const s of cd.sbd) for (const q of ds) if (tt.get(s)!.get(q)!.catTia) lenh.push(env.DB.prepare('INSERT OR IGNORE INTO srs2_day_lai (sbd, qid, luc, chien_dich_id) VALUES (?,?,?,?)').bind(s, q, luc, cd.id))
+  for (const s of emChua) for (const q of ds) if (tt.get(s)!.get(q)!.catTia) lenh.push(env.DB.prepare('INSERT OR IGNORE INTO srs2_day_lai (sbd, qid, luc, chien_dich_id) VALUES (?,?,?,?)').bind(s, q, luc, cd.id))
   for (let i = 0; i < lenh.length; i += 50) await env.DB.batch(lenh.slice(i, i + 50))
   // Ghi dạng đã chữa cho lần xếp sau (lỗi ghi không chặn "Chữa xong").
   try {
-    await chayDdlMotLan(env, 'buoi_chua_da_chua', LENH_BANG_DA_CHUA)
+    await chayDdlMotLan(env, 'buoi_chua_em_da_chua', LENH_BANG_DA_CHUA)
     const meta = await docMetaCau(env, ds, cd.maDe)
+    const dsEm = JSON.stringify(emChua)
     for (let i = 0; i < ds.length; i += 50) {
-      await env.DB.batch(ds.slice(i, i + 50).map((q) => env.DB.prepare('INSERT OR IGNORE INTO buoi_chua_da_chua (chien_dich_id, qid, dang, luc) VALUES (?,?,?,?)').bind(cd.id, q, tenDangCau(meta.get(q)), luc)))
+      await env.DB.batch(ds.slice(i, i + 50).map((q) => env.DB.prepare('INSERT OR IGNORE INTO buoi_chua_em_da_chua (chien_dich_id, sbd, qid, dang, luc) SELECT ?, value, ?, ?, ? FROM json_each(?)').bind(cd.id, q, tenDangCau(meta.get(q)), luc, dsEm)))
     }
   } catch (e) {
     console.error('[chua-xong] không ghi được dạng đã chữa:', e instanceof Error ? e.message : e)

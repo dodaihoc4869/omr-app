@@ -156,7 +156,7 @@ export default function LenBangChienDich() {
     async (o: { qid: string }) => {
       // Câu gộp từ nhiều bản trùng nội dung ⇒ mở khoá đủ cả nhóm (bảng chiến dịch + buổi chữa đều mang `qidCung`).
       const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
-      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid])
+      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid], coMat) // chỉ em có mặt buổi này (chữa lớp này không làm lớp kia mất câu)
       if (!r.ok) return { ok: false as const, chu: r.chu }
       void tai(chonId, coMat)
       return { ok: true as const }

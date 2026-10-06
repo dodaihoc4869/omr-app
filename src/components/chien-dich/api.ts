@@ -257,7 +257,9 @@ export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiCh
 /** Mọi qid cần mở khoá của một dòng (bản đại diện + bản trùng nội dung). */
 export const qidCuaDong = (c: { qid: string; qidCung?: string[] }): string[] => (c.qidCung?.length ? c.qidCung : [c.qid])
 
-export const chuaXong = (id: string, qids?: string[]) => goiChienDich<KetQuaChuaXong>('chua-xong', qids && qids.length ? { id, qids } : { id })
+/** `coMat` (Buổi chữa): chỉ các em có mặt được mở khoá + ghi "đã chữa" — chữa lớp này không làm lớp kia mất câu. Vắng ⇒ cả chiến dịch. */
+export const chuaXong = (id: string, qids?: string[], coMat?: string[]) =>
+  goiChienDich<KetQuaChuaXong>('chua-xong', { id, ...(qids && qids.length ? { qids } : {}), ...(coMat && coMat.length ? { coMat } : {}) })
 
 // ---------------------------------------------------------------- SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, máy chủ `srs2-sua.ts`)
 export const DUONG_SUA_CHIEN_DICH = '/gv/chien-dich/sua'
