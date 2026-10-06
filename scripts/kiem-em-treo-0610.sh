@@ -38,3 +38,34 @@ d1 "SELECT trang_thai, tao_luc, han_nop, (SELECT COUNT(*) FROM json_each(sbd_jso
 import sys,json
 for r in json.load(sys.stdin)[0]['results']: print(r)
 "
+
+# Bước 4 — ảnh chụp hồ sơ OMNI ban đêm (omni_em) phủ bao nhiêu em của từng lớp hôm nay? Thiếu ảnh ⇒ `thoCuaLop` (omni-d1.ts) PHÁT LẠI sổ của mọi em thiếu trong chính request.
+echo '--- ảnh chụp OMNI theo lớp (em không khoá): số em · có ảnh hôm nay (06/10) · có ảnh bất kỳ ngày · số dòng sổ su_kien_hoc của cả lớp'
+d1 "SELECT COALESCE(h.lop, '(không lớp)') AS lop, COUNT(*) AS so_em,
+  SUM(CASE WHEN EXISTS (SELECT 1 FROM omni_em o WHERE o.sbd = h.sbd AND o.cap_nhat_luc = '2026-10-05T17:00:00.000Z' AND o.phien_ban = 'omni3-0510-v1') THEN 1 ELSE 0 END) AS co_anh_hom_nay,
+  SUM(CASE WHEN EXISTS (SELECT 1 FROM omni_em o WHERE o.sbd = h.sbd) THEN 1 ELSE 0 END) AS co_anh_bat_ky,
+  (SELECT COUNT(*) FROM su_kien_hoc s WHERE s.sbd IN (SELECT h2.sbd FROM hoc_sinh h2 WHERE COALESCE(h2.lop, '(không lớp)') = COALESCE(h.lop, '(không lớp)') AND COALESCE(h2.trang_thai, '') <> 'khoa')) AS dong_so_ca_lop
+  FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') <> 'khoa' GROUP BY COALESCE(h.lop, '(không lớp)') ORDER BY so_em DESC LIMIT 12" \
+  | python3 -c "
+import sys,json
+d=json.load(sys.stdin)[0]
+for r in d['results']: print(r)
+print('sql_duration_ms=%s rows_read=%s' % (d['meta']['timings']['sql_duration_ms'], d['meta']['rows_read']))
+"
+echo '--- các ngày chụp ảnh OMNI trong omni_em (số em mỗi ngày, mỗi phiên bản)'
+d1 "SELECT cap_nhat_luc, phien_ban, COUNT(*) AS so_em FROM omni_em GROUP BY cap_nhat_luc, phien_ban ORDER BY cap_nhat_luc DESC LIMIT 6" \
+  | python3 -c "
+import sys,json
+for r in json.load(sys.stdin)[0]['results']: print(r)
+"
+echo '--- con trỏ việc đêm OMNI (cau_hinh.omni_dem_con_tro)'
+d1 "SELECT gia_tri FROM cau_hinh WHERE khoa = 'omni_dem_con_tro'" | python3 -c "
+import sys,json
+for r in json.load(sys.stdin)[0]['results']: print(r)
+" || true
+echo '--- lớp và số dòng sổ của em treo / em nhanh'
+d1 "SELECT s.sbd AS sbd_treo_hoac_nhanh, (SELECT lop FROM hoc_sinh h WHERE h.sbd = s.sbd) AS lop, COUNT(*) AS dong_so, MIN(s.luc) AS dau, MAX(s.luc) AS cuoi FROM su_kien_hoc s WHERE s.sbd IN ('12121212', '11000') GROUP BY s.sbd" \
+  | python3 -c "
+import sys,json
+for r in json.load(sys.stdin)[0]['results']: print(r)
+"
