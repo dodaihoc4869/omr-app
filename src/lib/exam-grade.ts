@@ -6,6 +6,7 @@ import type { SoCauMoiPhan, TeacherExamSource, TeacherMcqQuestion, TeacherShortA
 import type { AnswerKey, Choice, DS, GradedItem, StudentAnswers } from '../engine/score'
 import { scoreStudent, type ScoreResult } from '../engine/score'
 import { assignStudentQuestions } from './exam-assign'
+import { giaiBoCauEm, lamPhangBo, LoiBoCauError, type BoCauChuan } from './bo-cau-chuan'
 import type { AnswerRecord } from './exam-db'
 
 function mergeTeacherSources(sources: TeacherExamSource[], soCau?: SoCauMoiPhan) {
@@ -26,6 +27,8 @@ export interface GradedSubmission {
   wrongPhanI: number[]
   wrongPhanII: number[]
   wrongPhanIII: number[]
+  /** Bộ câu CHUẨN đã dùng để chấm (nguồn + cảnh báo). Có khi chấm qua `gradeSubmissionFull`; chỗ dựng chi tiết câu dùng lại đúng `qids` này để điểm và bảng chi tiết cùng một bộ câu. */
+  boCau?: BoCauChuan
 }
 
 type KeyBankLike = {
@@ -34,8 +37,8 @@ type KeyBankLike = {
   phanIII: TeacherShortAnswerQuestion[]
   /** Số câu mỗi phần của ca (màn Rút đề ghi). Thiếu ⇒ luật 18/4/6 cũ. */
   soCau?: SoCauMoiPhan
-  /** Ca đề riêng từng em: sbd → qid. Thiếu ⇒ cắt theo luật hash như cũ. */
-  boTheoEm?: Record<string, string[]>
+  /** Ca đề riêng từng em: sbd → qid (hoặc dạng gói `{ bo: { sbd: qid[] } }`). Thiếu ⇒ cắt theo luật hash như cũ. */
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>
 }
 
 /** BỘ CÂU CỦA EM — nguồn sự thật cho cả chấm điểm lẫn màn xem lại.
@@ -112,7 +115,14 @@ export function gradeSubmissionFull(
   /** CA ĐỀ RIÊNG TỪNG EM: bản đồ sbd → qid của ca. Thiếu ⇒ cắt câu theo luật
    * hash như mọi ca thường, không đổi một chữ nào của ca cũ. Truyền nhầm bản
    * đồ của ca khác là chấm sai, nên chỗ gọi phải lấy đúng bản cất theo mã ca. */
-  boTheoEm?: Record<string, string[]>,
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>,
+  /** Giây từng câu của lượt — dấu vết em ĐÃ XEM câu nào, để kiểm bộ câu khớp bài làm. Thiếu thì chỉ xét câu đã trả lời. */
+  giayCau?: Record<string, number> | null,
 ): GradedSubmission {
-  return gradeFromKeyBank({ ...mergeTeacherSources(teacherSources, soCau), boTheoEm }, maCa, sbd, submitted)
+  const bank = { ...mergeTeacherSources(teacherSources, soCau), boTheoEm }
+  // MỘT NƠI quyết bộ câu của em (bo-cau-chuan.ts): có bản ghi thì dùng đúng nó và KHÔNG bù câu lạ; bản ghi không khớp bài làm
+  // hoặc thiếu câu trong kho ⇒ ném `LoiBoCauError` (chỗ gọi giữ điểm cũ, không ghi đè bằng số đoán).
+  const boCau = giaiBoCauEm(bank, maCa, sbd, { dapAn: submitted, giayCau }, lamPhangBo(boTheoEm)[sbd])
+  if (boCau.loi) throw new LoiBoCauError(boCau.loi)
+  return { ...gradeFromKeyBank(bank, maCa, sbd, submitted, boCau.qids), boCau }
 }

@@ -25,7 +25,7 @@
 import type { Env, DongCa } from './kieu'
 import { caDaXong, docTrangThaiCongBo } from './cong-bo-diem'
 import { assignStudentQuestions } from '../../src/lib/exam-assign'
-import { boCauTuBaiLam } from '../../src/lib/bo-cau-tu-bai-lam'
+import { giaiBoCauEm, hopNhatBo, LoiBoCauError, type BoCauChuan } from '../../src/lib/bo-cau-chuan'
 import { khopPhanIII } from '../../src/lib/cham-so'
 import { scoreStudent, type AnswerKey, type Choice, type DS, type GradedItem, type ScoreResult, type SoCauBaPhan, type StudentAnswers } from '../../src/engine/score'
 import type { SoCauMoiPhan, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../../src/data/examContent'
@@ -106,8 +106,10 @@ export interface KetQuaChamLaiMotCa {
   soDoi: number
   /** Gói để `/cham-diem` ghi — MỘT phần tử cho mỗi em đã nộp. */
   bai: GoiGhiDiem[]
-  /** Em không chấm lại được (khóa đáp án hỏng / bài làm sai khuôn) — nói thẳng, KHÔNG ghi đè. */
+  /** Em không chấm lại được (khóa đáp án hỏng / bộ câu không khớp bài làm / bài làm sai khuôn) — nói thẳng, KHÔNG ghi đè. */
   tuChoi: { sbd: string; viSao: string }[]
+  /** Em chấm được nhưng bộ câu có điểm cần để ý (vd bộ được bù câu, hash lệch bài làm) — để thầy soi, không chặn ghi. */
+  canhBao: { sbd: string; ma: string[] }[]
 }
 
 /** Đếm số câu mỗi phần của ngân hàng khi ca không khai `soCau`. */
@@ -122,41 +124,53 @@ function giayCua(giayCau: Record<string, number> | null | undefined, qid: string
   return Math.round(v)
 }
 
-/**
- * DỰNG LẠI BỘ CÂU CỦA MỖI EM TỪ BÀI LÀM khi ngân hàng không có `boTheoEm`.
- *
- * Ca đề riêng rút 8 câu từ kho 26 câu: không có bản đồ thì `assignStudentQuestions` rút lại bằng
- * hạt giống trên KHO HIỆN TẠI và ra một bộ KHÁC HẲN bộ em đã làm — sai điểm mà không báo gì (đã dính
- * ca 890691: cả 28 em tụt điểm). Đây là cùng luật `gomCa` đang dùng ở máy thầy, và cùng hàm
- * `boCauTuBaiLam` mà app dùng.
- */
-function dungBoTuBaiLam(maCa: string, nh: NganHangDapAn, dsLuot: LuotChoCham[], soCau: SoCauBaPhan): Record<string, string[]> {
-  const ra: Record<string, string[]> = {}
-  for (const l of dsLuot) {
-    if (!l.dapAn) continue
-    ra[l.sbd] = boCauTuBaiLam(nh, maCa, l.sbd, l.dapAn, l.giayCau, soCau)
-  }
-  return ra
-}
-
 interface BankDaChuan {
   phanI: TeacherMcqQuestion[]
   phanII: TeacherTrueFalseQuestion[]
   phanIII: TeacherShortAnswerQuestion[]
   soCau: SoCauBaPhan
-  boTheoEm: Record<string, string[]>
+}
+
+/** Kết quả chấm MỘT em: điểm, dòng chi tiết từng câu, và bộ câu đã dùng (nguồn + cảnh báo). */
+export interface KetQuaChamMotEm {
+  score: ScoreResult
+  cau: DongChiTietCau[]
+  boCau: BoCauChuan
 }
 
 /**
- * CHẤM MỘT EM bằng ĐÚNG lõi chấm của app (`assignStudentQuestions` + `scoreStudent`) và dựng luôn
- * dòng chi tiết câu. Ném lỗi khi khóa đáp án hỏng — chỗ gọi bắt lấy và TỪ CHỐI ghi.
+ * CHẤM MỘT EM bằng ĐÚNG lõi chấm của app (`giaiBoCauEm` → `assignStudentQuestions` → `scoreStudent`) và dựng luôn
+ * dòng chi tiết câu. MỘT hàm cho mọi đường chấm ở máy chủ: chấm lại cả ca, kiểm chấm chỉ-đọc, và chấm lúc đọc
+ * (`danhGiaLuot`) — trước đây `danhGiaLuot` là bộ chấm THỨ HAI (so chuỗi Phần III, bù câu theo thứ tự kho), hai bộ lệch nhau.
  *
- * PHẦN III dùng `khopPhanIII` (một luật với điểm). `chi-tiet-cau.ts` của app hiện còn so CHUỖI đã
- * chuẩn hoá ở chỗ này nên "0,540" ≠ "0,54" — LỆCH với `scoreStudent`; đường chấm lại KHÔNG lặp lại
- * lỗi ấy, đã báo để chủ tệp sửa (xem chú thích ở đầu tệp).
+ * `boGhi` = bộ câu ĐÃ GHI cho em (D1 sống ưu tiên, rồi bản đồ trong tờ đáp án). Bộ câu không khớp dấu vết bài làm, hoặc có
+ * câu không còn trong kho đáp án ⇒ ném `LoiBoCauError` (chỗ gọi TỪ CHỐI, không ghi đè điểm). Khóa đáp án hỏng ⇒ ném lỗi của `scoreStudent`.
+ *
+ * PHẦN III dùng `khopPhanIII` (một luật với điểm).
  */
-function chamMotEm(bank: BankDaChuan, maCa: string, sbd: string, answers: BaiLamEm, giayCau: Record<string, number> | null): { score: ScoreResult; cau: DongChiTietCau[] } {
-  const asg = assignStudentQuestions(bank, maCa, sbd)
+export function chamBaiMotEm(
+  bank: BankDaChuan,
+  maCa: string,
+  sbd: string,
+  answers: BaiLamEm,
+  giayCau: Record<string, number> | null,
+  boGhi?: readonly string[] | null,
+): KetQuaChamMotEm {
+  const boCau = giaiBoCauEm(bank, maCa, sbd, { dapAn: answers, giayCau }, boGhi)
+  if (boCau.loi) throw new LoiBoCauError(boCau.loi)
+  // Chỉ bộ câu CỦA EM NÀY đi vào `assignStudentQuestions` — không để bản đồ cả lớp lọt vào và đổi nghĩa.
+  const asg = assignStudentQuestions({ ...bank, boTheoEm: boCau.qids ? { [sbd]: boCau.qids } : undefined }, maCa, sbd)
+  return { ...chamTheoBoCauDaChon(asg, maCa, sbd, answers, giayCau), boCau }
+}
+
+/** Phần SAU khi đã có bộ câu: điểm + dòng chi tiết. Tách ra để công cụ kiểm chấm dựng lại được đúng cách chấm CŨ mà không chép logic. */
+export function chamTheoBoCauDaChon(
+  asg: ReturnType<typeof assignStudentQuestions>,
+  maCa: string,
+  sbd: string,
+  answers: BaiLamEm,
+  giayCau: Record<string, number> | null,
+): { score: ScoreResult; cau: DongChiTietCau[] } {
   const key: AnswerKey = {
     madeThi: maCa,
     phanI: asg.phanI.map((a) => (a.question as TeacherMcqQuestion).correct),
@@ -196,7 +210,10 @@ function chamMotEm(bank: BankDaChuan, maCa: string, sbd: string, answers: BaiLam
 /**
  * CHẤM LẠI MỘT CA — HÀM THUẦN. Mỗi em lấy LƯỢT NỘP MỚI NHẤT (giống màn Chi tiết ca): lượt `dang_lam`
  * chưa có bài thì BỎ QUA, nên chấm lại giữa ca cũng không đụng em đang làm.
- * Lượt nào chấm lỗi (khóa đáp án hỏng…) thì vào `tuChoi`, KHÔNG ghi đè điểm cũ.
+ * Lượt nào chấm lỗi (khóa đáp án hỏng, bộ câu không khớp bài làm…) thì vào `tuChoi`, KHÔNG ghi đè điểm cũ.
+ *
+ * `boD1` = bản đồ đề riêng SỐNG ở D1 (`ca.bo_theo_em_json`): em vào muộn / em thi lại chỉ có ở đó, KHÔNG có trong bản chụp
+ * `nh.boTheoEm` của tờ đáp án (cất lúc mở ca). D1 sống THẮNG bản chụp theo từng em.
  */
 export function chamLaiMotCa(
   maCa: string,
@@ -204,12 +221,11 @@ export function chamLaiMotCa(
   nh: NganHangDapAn,
   dsLuot: LuotChoCham[],
   soCauCa?: SoCauBaPhan | null,
+  boD1?: unknown,
 ): KetQuaChamLaiMotCa {
   const soCau = soCauCa && soCauCa.I + soCauCa.II + soCauCa.III > 0 ? soCauCa : nh.soCau ?? demSoCau(nh)
-  // Bản đồ câu của ca đề riêng: bản đã chốt lúc phát đề (trong ngân hàng); thiếu thì dựng lại từ bài làm.
-  const boTheoEm: Record<string, string[]> =
-    (nh.boTheoEm as Record<string, string[]> | undefined) ?? dungBoTuBaiLam(maCa, nh, dsLuot, soCau)
-  const bank: BankDaChuan = { ...nh, soCau, boTheoEm }
+  const bank: BankDaChuan = { ...nh, soCau }
+  const boHieuLuc = hopNhatBo(nh.boTheoEm, boD1)
 
   const theoSbd = new Map<string, LuotChoCham[]>()
   for (const l of dsLuot) {
@@ -221,17 +237,19 @@ export function chamLaiMotCa(
   const em: DoiDiemMotEm[] = []
   const bai: GoiGhiDiem[] = []
   const tuChoi: KetQuaChamLaiMotCa['tuChoi'] = []
+  const canhBao: KetQuaChamLaiMotCa['canhBao'] = []
   let soDoi = 0
   theoSbd.forEach((arr, sbd) => {
     const moiNhat = [...arr].sort((a, b) => b.lanThu - a.lanThu)[0]!
     if (!moiNhat.dapAn || (moiNhat.trangThai !== 'da_nop' && moiNhat.trangThai !== 'khoa')) return
-    let kq: ReturnType<typeof chamMotEm>
+    let kq: KetQuaChamMotEm
     try {
-      kq = chamMotEm(bank, maCa, sbd, moiNhat.dapAn, moiNhat.giayCau)
+      kq = chamBaiMotEm(bank, maCa, sbd, moiNhat.dapAn, moiNhat.giayCau, boHieuLuc[sbd])
     } catch (e) {
       tuChoi.push({ sbd, viSao: e instanceof Error ? e.message : 'Không chấm được' })
       return
     }
+    if (kq.boCau.canhBao.length > 0) canhBao.push({ sbd, ma: kq.boCau.canhBao })
     const moi: DiemBaPhan = {
       I: kq.score.phanIScore,
       II: kq.score.phanIIScore,
@@ -244,7 +262,65 @@ export function chamLaiMotCa(
     bai.push({ sbd, lanThu: moiNhat.lanThu, hoTen: moiNhat.hoTen, diem: { I: moi.I!, II: moi.II!, III: moi.III!, tong: moi.tong! }, cau: kq.cau })
   })
 
-  return { maCa, tenCa, soCau, em, soDoi, bai, tuChoi }
+  return { maCa, tenCa, soCau, em, soDoi, bai, tuChoi, canhBao }
+}
+
+// ---------------------------------------------------------------------------
+// CHẤM LÚC ĐỌC — dùng cho `danhGiaLuot` (goi-cu.ts): em xem lịch sử / câu sai khi ca chưa có dòng chi tiết.
+
+/** Chuẩn hoá một gói đề CÓ ĐÁP ÁN đọc từ R2 (`key/…` hoặc `de/…`) về `NganHangDapAn`: id lấy từ `id` hoặc `qid`. Gói không có mảng câu ⇒ null. */
+function chuanHoaNganHang(bData: unknown): NganHangDapAn | null {
+  if (!bData || typeof bData !== 'object') return null
+  const o = bData as Record<string, unknown>
+  const lay = <T>(x: unknown): T[] =>
+    (Array.isArray(x) ? x : [])
+      .filter((q): q is Record<string, unknown> => !!q && typeof q === 'object')
+      .map((q) => ({ ...q, id: String(q.id ?? q.qid ?? '') }))
+      .filter((q) => q.id !== '') as unknown as T[]
+  const phanI = lay<TeacherMcqQuestion>(o.phanI)
+  const phanII = lay<TeacherTrueFalseQuestion>(o.phanII)
+  const phanIII = lay<TeacherShortAnswerQuestion>(o.phanIII)
+  if (phanI.length + phanII.length + phanIII.length === 0) return null
+  return { phanI, phanII, phanIII, soCau: (o.soCau as SoCauMoiPhan | undefined) ?? undefined, boTheoEm: (o.boTheoEm as NganHangDapAn['boTheoEm']) ?? undefined }
+}
+
+/** Bài làm đọc từ `luot.dap_an_json`; chấp nhận cả dạng cũ phẳng (cả đối tượng là bản đồ Phần I). */
+function chuanHoaBaiLamLinhHoat(v: unknown): BaiLamEm | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  const coPhan = 'phanI' in o || 'phanII' in o || 'phanIII' in o
+  const obj = (x: unknown) => (x && typeof x === 'object' && !Array.isArray(x) ? x : {})
+  return {
+    phanI: (coPhan ? obj(o.phanI) : obj(o)) as BaiLamEm['phanI'],
+    phanII: obj(o.phanII) as BaiLamEm['phanII'],
+    phanIII: obj(o.phanIII) as BaiLamEm['phanIII'],
+  }
+}
+
+/**
+ * CHẤM MỘT LƯỢT TỪ GÓI ĐỀ + BÀI LÀM, đúng lõi `chamBaiMotEm` (cùng luật Phần III, cùng bộ câu chuẩn).
+ * Trả `null` khi KHÔNG chấm được chính xác: gói không có đáp án (gói công khai), khóa hỏng, bộ câu không khớp bài làm,
+ * bài làm sai khuôn — chỗ gọi khi ấy KHÔNG ghi gì (không bịa dòng chi tiết).
+ */
+export function chamLuotTuNganHang(
+  bData: unknown,
+  caRow: Record<string, unknown> | null,
+  dapAnObj: unknown,
+  sbd: string,
+  maCa: string,
+  giayCau: Record<string, number> | null = null,
+): KetQuaChamMotEm | null {
+  const nh = chuanHoaNganHang(bData)
+  const dapAn = chuanHoaBaiLamLinhHoat(dapAnObj)
+  if (!nh || !dapAn) return null
+  const soCauD1 = docJson(caRow?.so_cau_json) as SoCauBaPhan | null
+  const soCau: SoCauBaPhan = soCauD1 && soCauD1.I + soCauD1.II + soCauD1.III > 0 ? soCauD1 : nh.soCau ?? demSoCau(nh)
+  const boHieuLuc = hopNhatBo(nh.boTheoEm, docJson(caRow?.bo_theo_em_json))
+  try {
+    return chamBaiMotEm({ ...nh, soCau } as BankDaChuan, maCa, sbd, dapAn, giayCau, boHieuLuc[sbd])
+  } catch {
+    return null
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -272,8 +348,20 @@ function docBaiLam(v: unknown): BaiLamEm | null {
   }
 }
 
-export type KetQuaChuanBiChamLai =
-  | ({ ok: true; soEmDaVao: number; soEmDaNop: number } & KetQuaChamLaiMotCa)
+/** Nguyên liệu ĐÃ ĐỌC của một ca đã xong — dùng chung cho chấm lại (ghi) và kiểm chấm (chỉ đọc). */
+export interface NguonChamLai {
+  ca: DongCa
+  nh: NganHangDapAn
+  dsLuot: LuotChoCham[]
+  soCauCa: SoCauBaPhan | null
+  /** Bản đồ đề riêng SỐNG ở D1 (`ca.bo_theo_em_json`), chưa làm phẳng. */
+  boD1: unknown
+  soEmDaVao: number
+  soEmDaNop: number
+}
+
+export type KetQuaDocNguon =
+  | ({ ok: true } & NguonChamLai)
   | {
       ok: false
       lyDo: 'khong_co_ca' | 'ca_chua_xong' | 'chua_noi_r2' | 'chua_co_dap_an' | 'dap_an_hong'
@@ -282,20 +370,25 @@ export type KetQuaChuanBiChamLai =
       soEmDaNop?: number
     }
 
+export type KetQuaChuanBiChamLai =
+  | ({ ok: true; soEmDaVao: number; soEmDaNop: number } & KetQuaChamLaiMotCa)
+  | Extract<KetQuaDocNguon, { ok: false }>
+
 /**
  * Đọc một ca CŨ đủ dữ liệu để chấm lại. CỔNG AN TOÀN:
  *   · Ca chưa xong (chưa đóng và còn em chưa nộp) ⇒ TỪ CHỐI — "ca cũ" nghĩa là đã xong.
  *   · Chưa cất ngân hàng đáp án lên R2 ⇒ TỪ CHỐI — không có khóa thì không chấm được.
- * Lượt chưa nộp nằm lại, không ghi gì: chỗ gọi chỉ ghi phần `bai` trả về.
+ * CHỈ ĐỌC — không ghi gì.
  */
-export async function chuanBiChamLaiCa(env: Env, maCa: string): Promise<KetQuaChuanBiChamLai> {
+export async function docNguonChamLai(env: Env, maCa: string, tuyChon: { boQuaCongCaDaXong?: boolean } = {}): Promise<KetQuaDocNguon> {
   const ca = await env.DB.prepare('SELECT * FROM ca WHERE ma_ca = ?').bind(maCa).first<DongCa>()
   if (!ca) return { ok: false, lyDo: 'khong_co_ca', error: 'Không có ca này' }
 
   const t = (await docTrangThaiCongBo(env, [maCa])).get(maCa)
   const soEmDaVao = t?.soEmDaVao ?? 0
   const soEmDaNop = t?.soEmDaNop ?? 0
-  if (!caDaXong(String(ca.trang_thai ?? ''), soEmDaVao, soEmDaNop)) {
+  // Cổng "ca đã xong" bảo vệ ĐƯỜNG GHI (không chấm lại giữa giờ thi). Kiểm chấm chỉ-đọc được bỏ qua cổng này để soi cả ca đang mở.
+  if (!tuyChon.boQuaCongCaDaXong && !caDaXong(String(ca.trang_thai ?? ''), soEmDaVao, soEmDaNop)) {
     return { ok: false, lyDo: 'ca_chua_xong', error: 'Ca chưa xong — chỉ chấm lại được ca đã đóng hoặc đã đủ lớp nộp', soEmDaVao, soEmDaNop }
   }
   if (!env.DE) return { ok: false, lyDo: 'chua_noi_r2', error: 'Chưa nối R2 — chưa đọc được ngân hàng đáp án' }
@@ -330,7 +423,16 @@ export async function chuanBiChamLaiCa(env: Env, maCa: string): Promise<KetQuaCh
     diem: { I: soHoacNull(l.diem_i), II: soHoacNull(l.diem_ii), III: soHoacNull(l.diem_iii), tong: soHoacNull(l.tong) },
   }))
 
-  const soCauCa = docJson(ca.so_cau_json) as SoCauBaPhan | null
-  const kq = chamLaiMotCa(maCa, String(ca.ten_ca ?? ''), nh, dsLuot, soCauCa)
-  return { ok: true, soEmDaVao, soEmDaNop, ...kq }
+  return { ok: true, ca, nh, dsLuot, soCauCa: docJson(ca.so_cau_json) as SoCauBaPhan | null, boD1: docJson(ca.bo_theo_em_json), soEmDaVao, soEmDaNop }
+}
+
+/**
+ * Chuẩn bị chấm lại một ca CŨ: đọc nguyên liệu rồi gọi hàm thuần. Lượt chưa nộp nằm lại, không ghi gì:
+ * chỗ gọi chỉ ghi phần `bai` trả về.
+ */
+export async function chuanBiChamLaiCa(env: Env, maCa: string): Promise<KetQuaChuanBiChamLai> {
+  const n = await docNguonChamLai(env, maCa)
+  if (n.ok !== true) return n
+  const kq = chamLaiMotCa(maCa, String(n.ca.ten_ca ?? ''), n.nh, n.dsLuot, n.soCauCa, n.boD1)
+  return { ok: true, soEmDaVao: n.soEmDaVao, soEmDaNop: n.soEmDaNop, ...kq }
 }

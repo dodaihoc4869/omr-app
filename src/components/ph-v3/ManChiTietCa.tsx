@@ -9,6 +9,7 @@ import { chuThoiGian, gioVn, ngayDayDuVn, soVn } from '../../lib/ph-moi/dinh-dan
 import { taiBaoCaoCa } from '../../lib/ph-v3/api'
 import type { BaoCaoCa, CauXemLai } from '../../lib/ph-v3/du-lieu'
 import { chuCongBoCa } from '../ph-moi/nhan'
+import { chuKetQuaCau } from '../../lib/ph-v3/chu-ket-qua-cau'
 import { KhoiLoiGiaiTuCT } from '../loi-giai/KhoiLoiGiaiChuan'
 import { BtKhoa, BtLen, BtLenGon, BtTrai, BtXuong } from './BieuTuong'
 import { DangTai, The, TheLoi } from './dung-chung'
@@ -127,12 +128,6 @@ function CauXemLaiThe({ sbd, ds }: { sbd: string; ds: CauXemLai[] }) {
   )
 }
 
-function chuKetQua(c: CauXemLai): string {
-  if (c.laDungNhungLau) return 'Con làm đúng nhưng lâu hơn thường lệ'
-  const dung = c.dapAnDung ? ` · Đáp án đúng ${c.dapAnDung}` : ''
-  return c.dapAnChon ? `Con chọn ${c.dapAnChon}${dung}` : `Con bỏ trống${dung}`
-}
-
 function DongCau({ sbd, c }: { sbd: string; c: CauXemLai }) {
   const [mo, setMo] = useState(false)
   const [ct, setCt] = useState<{ kieu: 'tai' } | { kieu: 'loi' } | { kieu: 'ok'; ct: Extract<ChiTietCau, { kieu: 'ok' }> } | null>(null)
@@ -151,7 +146,7 @@ function DongCau({ sbd, c }: { sbd: string; c: CauXemLai }) {
         <span className="ph3-cau__so"><span>Phần {c.phan}</span><b>{c.soCau ?? '·'}</b></span>
         <span className="ph3-cau__giua">
           <b>{c.de ? <ChemText text={c.de} /> : `Câu ${c.soCau ?? ''}`}</b>
-          <span>{chuKetQua(c)}</span>
+          <span>{chuKetQuaCau(c)}</span>
         </span>
         <button type="button" className="ph3-cau__nut" aria-expanded={mo} aria-controls={idVung} onClick={bam}>
           {mo ? <><BtLenGon co={16} day={2.5} /><span className="ph3-an">Thu gọn</span></> : 'Lời giải'}

@@ -26,6 +26,7 @@ import { taoLinkPhieu } from './phieu-link'
 import { BAN_PHIEU_BT, type GoiPhieuBaiTap } from '../components/NutPhieuHtml'
 import { gomLinkPhieu, type DongLinkPhieu } from './link-phieu-ca'
 import { gradeSubmissionFull, type GradedSubmission } from './exam-grade'
+import { hopNhatBo } from './bo-cau-chuan'
 import { docDeRiengCa, docSoCauCa, loadExamSources, loadSessionTeacherBank, luuSoCauCa, saveSessionTeacherBank } from './exam-db'
 import { loadClassList } from './classlist-db'
 
@@ -380,7 +381,10 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
       ...buCho(cu, khoIII, sc?.III ?? khoIII.length, `${ma}:${l.sbd}:phanIII:bu`),
     ]
   }
-  const boTheoEm = rieng?.boTheoEm ?? boTuBaiLam
+  // BẢN ĐỒ MÁY CHỦ (D1 sống) THẮNG bản lưu ở máy này: em vào muộn / em thi lại chỉ có ở D1, KHÔNG có trong bản lưu lúc bấm Bắt đầu — thiếu em
+  // nào là em ấy rơi về luật hash và bị chấm theo bộ câu của người khác (cùng luật với màn Theo dõi: `chiTiet.boTheoEmCa ?? local`).
+  const boTheoEmMay = rieng?.boTheoEm ?? boTuBaiLam
+  const boTheoEm = ct.boTheoEmCa ? { ...boTheoEmMay, ...hopNhatBo(null, ct.boTheoEmCa) } : boTheoEmMay
 
   const dsLop = await loadClassList().catch(() => [])
   const theoSbd = new Map<string, LuotThiRow[]>()
@@ -396,7 +400,7 @@ export async function gomCa(url: string, mat: string, maCa: string): Promise<CaD
     if (!moiNhat.dapAn || (moiNhat.trangThai !== 'da_nop' && moiNhat.trangThai !== 'khoa')) return
     let graded: GradedSubmission | null = null
     try {
-      graded = gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, boTheoEm)
+      graded = gradeSubmissionFull(bank!, ct.ca.maCa, sbd, moiNhat.dapAn, sc, boTheoEm, moiNhat.giayCau)
     } catch {
       graded = null
     }

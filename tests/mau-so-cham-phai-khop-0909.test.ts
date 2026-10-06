@@ -224,7 +224,10 @@ describe('máy khách khai mẫu số ở MỌI chỗ ghi điểm', () => {
       // Bốn tham số = bank, maCa, sbd, bài làm. Phải có tham số thứ NĂM.
       expect(g.split(',').length).toBeGreaterThanOrEqual(5)
     }
-    expect(man).toContain("import { boCauTuBaiLam } from '../lib/bo-cau-tu-bai-lam'")
+    // 06/10: bộ câu của em nay do MỘT hàm quyết (`giaiBoCauEm`, bo-cau-chuan.ts — bản ghi → hash nếu khớp bài làm → dựng từ bài làm, và TỪ CHỐI khi lệch)
+    // thay cho gọi `boCauTuBaiLam` trực tiếp. Ý của chốt vẫn y nguyên: máy em không để `gradeFromKeyBank` tự rút lại bộ câu.
+    expect(man).toContain("import { giaiBoCauEm, lamPhangBo, LoiBoCauError } from '../lib/bo-cau-chuan'")
+    expect(man).not.toMatch(/boCauTuBaiLam\(/)
   })
 
   it('màn Ca thi khai theo CHÍNH bank đã gộp, không theo soCauCa thô', () => {

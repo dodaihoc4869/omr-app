@@ -459,6 +459,9 @@ export function daDungCuaEm(v: unknown): Record<string, string> {
 
 // ---------------------------------------------------------------- kết thúc bài: em sai lại câu đã làm đúng
 
+export { dongCauSaiLai, loaiCauChuaDung, type LoaiChuaDung } from './loai-cau-chua-dung'
+import { chuDemLoai, chuLoaiChuaDung, type LoaiChuaDung } from './loai-cau-chua-dung'
+
 export interface CauSaiLaiDaDung {
   soCau: number
   phan: 'I' | 'II' | 'III'
@@ -466,7 +469,14 @@ export interface CauSaiLaiDaDung {
   nhan: string
   soLanDung?: number
   soLanSai?: number
+  /** Thiếu ở dữ liệu cũ ⇒ chỉ hiện "sai" như trước, không đoán. */
+  loai?: LoaiChuaDung
 }
+
+/** "1 sai · 2 bỏ trống · 1 đúng một phần" cho một em — chỉ nêu loại có mặt. Có câu THIẾU loại (dữ liệu cũ) ⇒ rỗng: các số trong ngoặc phải cộng ĐÚNG bằng số câu nêu ở ngoài. */
+export const chuChiTietChuaDung = (sai: readonly CauSaiLaiDaDung[]): string => (sai.every((c) => c.loai) ? chuDemLoai(sai) : '')
+/** Hậu tố sau nhãn câu: " (bỏ trống)" · " (đúng một phần)"; câu sai thường hoặc thiếu loại ⇒ rỗng. */
+export const chuHauToLoai = (l: LoaiChuaDung | undefined): string => (l === 'trong' || l === 'mot_phan' ? ` (${chuLoaiChuaDung(l)})` : '')
 export interface EmSaiLaiDaDung {
   sbd: string
   hoTen: string

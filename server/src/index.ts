@@ -61,6 +61,8 @@ import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import { doiTenHocSinh } from './doi-ten-hoc-sinh'
 import { capNhatTrangThaiToChieu, guiLenhToChieu, layLenhMoiToChieu, layPhienToChieu, taoHoacCapNhatPhienToChieu } from './to-chieu-remote'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
+import {kiemChamCa} from './kiem-cham'
+import {buSoCauChoKeyBank, hopNhatKeyBank} from './key-bank-hop-nhat'
 import { catBaiBoSung, dsBaiBoSung, xuLyBaiBoSung } from './bai-bo-sung'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
@@ -617,11 +619,11 @@ async function nop(env: Env, b: Record<string, unknown>): Promise<Response> {
   // `cong_bo` đọc trong chính batch dưới đây.
   const keySom = maCa && env.DE && doanCongBoNgay(maCa) ? docKeyBankDem(env, maCa).catch(() => null) : null
   const kq = await batchGop(env, [
-    ...(maCa ? [env.DB.prepare('SELECT cong_bo, chi_nop_3_phut_cuoi FROM ca WHERE ma_ca = ?').bind(maCa)] : []),
+    ...(maCa ? [env.DB.prepare('SELECT cong_bo, chi_nop_3_phut_cuoi, so_cau_json FROM ca WHERE ma_ca = ?').bind(maCa)] : []),
     capNhat(kiemGio),
     docLuot(),
   ], maCa ? [false, true, false] : [true, false])
-  const ca = maCa ? ((kq[0]?.results ?? [])[0] as { cong_bo?: unknown; chi_nop_3_phut_cuoi?: unknown } | undefined) ?? null : null
+  const ca = maCa ? ((kq[0]?.results ?? [])[0] as { cong_bo?: unknown; chi_nop_3_phut_cuoi?: unknown; so_cau_json?: unknown } | undefined) ?? null : null
   if (maCa) nhoCongBo(maCa, ca?.cong_bo)
   let doi = Number(kq[maCa ? 1 : 0]?.meta?.changes ?? 0)
   let sau = ((kq[maCa ? 2 : 1]?.results ?? [])[0] ?? null) as DongLuot | null
@@ -691,7 +693,7 @@ function raCoKeyBank(dau: Record<string, unknown>, cb: Record<string, unknown> &
 async function congBoSauNop(
   env: Env,
   maCa: string,
-  ca: { cong_bo?: unknown } | null,
+  ca: { cong_bo?: unknown; so_cau_json?: unknown } | null,
   keySom: Promise<{ giaTri: unknown; tho: string | null } | null> | null,
 ): Promise<Record<string, unknown> & { __keyTho?: string | null }> {
   const congBo = String(ca?.cong_bo ?? 'khong')
@@ -700,7 +702,10 @@ async function congBoSauNop(
   // Đệm isolate + hỏi R2 CÓ ĐIỀU KIỆN mỗi lần (dem-ca-thi.ts): tươi như đọc thẳng, không tải lại thân khi tờ đáp án không đổi.
   const k = (await keySom) ?? (await docKeyBankDem(env, maCa).catch(() => null))
   if (!k || k.giaTri === null) return { congBo, keyBank: null }
-  return { congBo, keyBank: k.giaTri, __keyTho: k.tho }
+  // TỜ ĐÁP ÁN THIẾU `soCau` (bị ghi đè trước đây) ⇒ bù từ D1 (`ca.so_cau_json`, đã đọc cùng câu truy vấn — không tốn thêm vòng). Thiếu mẫu số thì máy em mở lại app
+  // dựng bộ câu "bù cho đủ cả kho" và chấm loãng điểm. Chỉ BÙ khi thiếu; nối thẳng vào chuỗi JSON nguyên văn (khỏi stringify lại cả tờ đáp án).
+  const bu = buSoCauChoKeyBank(k.giaTri, k.tho, ca?.so_cau_json)
+  return bu ? { congBo, keyBank: bu.giaTri, __keyTho: bu.tho } : { congBo, keyBank: k.giaTri, __keyTho: k.tho }
 }
 
 /**
@@ -1652,7 +1657,14 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   // Khoá `key/<maCa>.json` KHÔNG dùng chung với `de/<maCa>.json`. Cái sau phục
   // vụ công khai cho máy em ở `GET /de/:maCa` và TUYỆT ĐỐI không được có đáp án.
   if (b.keyBank && env.DE) {
-    await env.DE.put(`key/${maCa}.json`, JSON.stringify(b.keyBank))
+    // Hợp nhất với tờ đáp án đang giữ (không ghi đè mù — mất `soCau` / `boTheoEm` / câu nối thêm làm chấm sai): key-bank-hop-nhat.ts.
+    let cuKey: unknown = null
+    try {
+      const o = await env.DE.get(`key/${maCa}.json`)
+      if (o?.body) cuKey = await new Response(o.body).json()
+    } catch { cuKey = null }
+    const hopKey = hopNhatKeyBank(cuKey, b.keyBank)
+    if (hopKey) await env.DE.put(`key/${maCa}.json`, JSON.stringify(hopKey))
   }
 
   await env.DB.prepare('UPDATE ca SET sinh_tai_d1 = 1, cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run()
@@ -2660,6 +2672,13 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
       )
     }
 
+    // DỌN DÒNG SAI OAN: câu lượt này chấm ĐÚNG mà bản đồ còn ghi sai (do lượt chấm trước / chấm lúc đọc ghi nhầm) thì xoá — nếu không em bị hỏi lại
+    // đúng câu mình đã làm đúng. Chỉ đúng (ca, em, câu) của lượt này; chấm lại ca (`chamLaiCaRoute`) từng tự dọn riêng, nay mọi lần chấm đều dọn.
+    const qidDung = [...new Set(dsCau.filter((c) => c.dungSai === true).map((c) => String(c.qid ?? '').trim()).filter(Boolean))]
+    if (qidDung.length > 0) {
+      cau.push(env.DB.prepare('DELETE FROM ban_do_sai WHERE ma_ca = ? AND sbd = ? AND qid IN (SELECT value FROM json_each(?))').bind(maCa, sbd, JSON.stringify(qidDung)))
+    }
+
     // CÂU ĐÃ LÀM — hợp tập, không bao giờ bớt.
     for (const c of dsCau) {
       const qid = String(c.qid ?? '').trim()
@@ -2762,7 +2781,10 @@ async function chamLaiCaRoute(env: Env, b: Record<string, unknown>): Promise<Res
     em: cb.em,
     soDoi: cb.soDoi,
     tuChoi: cb.tuChoi,
+    canhBao: cb.canhBao,
   }
+  // XEM TRƯỚC (`xemTruoc: true`): chấm lại nhưng KHÔNG ghi gì — thầy thấy bảng cũ → mới trước khi quyết. Chỉ đọc.
+  if (b.xemTruoc === true) return ra({ ok: true, xemTruoc: true, ...baoCao, soGhi: 0, soSeGhi: cb.bai.length })
   // Không em nào nộp (hoặc chấm lỗi hết) ⇒ không ghi gì; vẫn trả bảng đối chiếu cho thầy thấy.
   if (cb.bai.length === 0) return ra({ ok: true, ...baoCao, soGhi: 0 })
   const ghi = await chamDiem(env, { maCa, bai: cb.bai })
@@ -3772,6 +3794,12 @@ const boXuLy = {
       if (p === '/cham-diem') return chamDiem(env, b)
       // CHẤM LẠI MỘT CA CŨ bằng luật chấm hiện hành rồi ghi lại D1 (thầy chốt 23/09 — việc còn lại của MỤC 3).
       if (p === '/ca/cham-lai') return chamLaiCaRoute(env, b)
+      // KIỂM CHẤM MỘT CA — CHỈ ĐỌC (thầy 06/10): đối chiếu điểm + chi tiết câu + bản đồ câu sai đã ghi với kết quả chấm lại; trả số đếm và mẫu, KHÔNG ghi gì.
+      if (p === '/ca/kiem-cham') {
+        const maCa = String(b.maCa ?? '').trim()
+        if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+        return ra(await kiemChamCa(envDoc, maCa))
+      }
       // BÀI BỔ SUNG (01/10): đáp án tới sau khi lượt đóng — thầy xem rồi Nhận (gộp + chấm lại ca) hoặc Bỏ.
       if (p === '/bo-sung/ds') return ra(await dsBaiBoSung(env, b))
       if (p === '/bo-sung/xu-ly') {

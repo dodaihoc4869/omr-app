@@ -8,6 +8,7 @@
 // LUẬT: mọi số trong gói này phải lấy từ dữ liệu đã chấm. Thiếu thì để null và
 // trang báo cáo GIẤU HẲN mục đó — không có mục nào được đoán, không có mục nào
 // hiện ra với số 0 giả.
+import { loaiCauChuaDung } from './loai-cau-chua-dung'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { CaCuaEm, ChiTietCauRow, ChuyenDeEm, HoSoEm } from './exam-api'
 import { ducKetKienThuc, thongKeLamBai, tinHieuLamBai, type DucKetChuyenDe, type ThongKeLamBai, type TinHieuLamBai } from './phan-tich-lam-bai'
@@ -482,8 +483,13 @@ export function dongCachTinhDiem(
     const cua = rows.filter((r) => r.phan === p)
     if (cua.length === 0) continue
     const dung = cua.filter((r) => r.dungSai === true).length
-    if (cua.some((r) => r.dungSai !== true && !String(r.dapAnChon ?? '').trim())) coBoTrong = true
-    manh.push(`Phần ${p} ${TEN_PHAN_DAI[p]}: đúng ${dung}/${cua.length} câu, được ${soVi(diemPhan[p])} trên ${soVi(tranPhan[p])}`)
+    // Bỏ trống nhận ra bằng `loaiCauChuaDung` (Phần II bỏ trống được ghi "----", không phải chuỗi rỗng) và câu Phần II ĐÚNG MỘT PHẦN được nêu riêng:
+    // điểm Phần II có tính phần ý đúng (1 ý 10% · 2 ý 25% · 3 ý 50% trần câu), nên "đúng 2/4 câu, được 2,20" mà không nói câu một phần thì cộng không ra.
+    const chuaDung = cua.filter((r) => r.dungSai !== true)
+    if (chuaDung.some((r) => loaiCauChuaDung(r) === 'trong')) coBoTrong = true
+    const motPhan = p === 'II' ? chuaDung.filter((r) => loaiCauChuaDung(r) === 'mot_phan').length : 0
+    const demDung = p === 'II' ? `đúng trọn ${dung}/${cua.length} câu${motPhan > 0 ? `, ${motPhan} câu đúng một phần` : ''}` : `đúng ${dung}/${cua.length} câu`
+    manh.push(`Phần ${p} ${TEN_PHAN_DAI[p]}: ${demDung}, được ${soVi(diemPhan[p])} trên ${soVi(tranPhan[p])}`)
   }
   if (manh.length === 0) return ''
   const tong = diemPhan.I + diemPhan.II + diemPhan.III

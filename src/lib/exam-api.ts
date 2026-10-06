@@ -39,6 +39,8 @@ export interface KeyBank {
    * phải ép kiểu `(kb as { soCau?: … })` — ép kiểu thì trình biên dịch hết cửa
    * nhắc, và đó là cách một con số quan trọng lặng lẽ bị bỏ quên. */
   soCau?: SoCauMoiPhan
+  /** Bản đồ đề riêng từng em (sbd → qid, hoặc gói `{ bo: {...} }`) — CHỈ khi tờ đáp án ở máy chủ còn mang nó; có thể thiếu (bị ghi đè trước đây). Bộ câu chuẩn (`bo-cau-chuan.ts`) đọc nó rồi mới tới luật hash. */
+  boTheoEm?: Record<string, string[]> | Record<string, unknown>
 }
 
 export interface SessionConfig {
@@ -1224,6 +1226,8 @@ export async function submitAnswers(
   lanThu = 1,
   idThietBi = '',
   giayCau?: Record<string, number>,
+  /** Chỉ khi gửi nốt bài của lượt CŨ sau khi máy chủ đã mở lượt mới (thầy cho thi lại): khoá đúng lượt cũ để bài cũ không đè lượt mới. */
+  khoaLuot?: string,
 ): Promise<{ keyBank: KeyBank | null; congBo: CongBoDiem; boSung?: number }> {
   // THỬ LẠI ĐƯỢC (T5) — và CHỈ vì T4 đã có khoá chống trùng `maCa|sbd|lanThu`.
   // Trước T4, một lượt nộp hết hạn ở máy em nhưng đã tới nơi ở máy chủ sẽ bị ghi
@@ -1238,7 +1242,7 @@ export async function submitAnswers(
   //
   // Vẫn gọi Apps Script sau: điểm và đáp án công bố ngay do bên đó tính.
   const chMoi = await layCauHinhMayChu()
-  const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau)
+  const daCat = await nopMoi(chMoi, maCa, sbd, dapAn, integrity, giayCau, khoaLuot)
 
   // MÁY CHỦ MỚI ĐÃ TRẢ LỜI ĐỦ ⇒ THÔI GỌI APPS SCRIPT.
   //
