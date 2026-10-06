@@ -199,3 +199,8 @@ export function locCauRutDuoc<T>(ds: readonly T[], phanMacDinh?: PhanCau): { giu
 export function chuBaoBoTuLuan(soBo: number): string {
   return soBo > 0 ? `Đã bỏ ${soBo} câu tự luận (chỉ rút câu trắc nghiệm, đúng sai, trả lời ngắn)` : ''
 }
+
+/** Bỏ MỌI câu tự luận khỏi một bản đề thầy (`phanI/phanII/phanIII`). Luật thầy 06/10: tự luận CHỈ hiện ở Gọi lên bảng phần DẠY HỌC; mọi chỗ khác dùng hàm này. */
+export function boTuLuanKhoiBanDe<T extends { phanI: unknown[]; phanII: unknown[]; phanIII: unknown[] }>(b: T): T {
+  return { ...b, phanI: b.phanI.filter((q) => !laCauTuLuan(q, 'I')), phanII: b.phanII.filter((q) => !laCauTuLuan(q, 'II')), phanIII: b.phanIII.filter((q) => !laCauTuLuan(q, 'III')) }
+}

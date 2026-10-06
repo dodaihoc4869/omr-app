@@ -1,5 +1,6 @@
 import NhomCaThuGon from '../components/NhomCaThuGon'
 import { phanCongDayHoc } from '../lib/phan-cong-day-hoc'
+import { boTuLuanKhoiBanDe } from '../lib/cau-tu-luan'
 import { hashSeed } from '../lib/exam-shuffle'
 import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu } from '../lib/to-chieu-cau-noi'
 import { aiSaiQuaMayChu, thayChuaQuaMayChu, traAiSai } from '../components/chien-dich/ghi-to-chieu'
@@ -597,15 +598,17 @@ function GoiLenBangCu() {
   const dsCau: CauChua[] = useMemo(() => {
     // THẦY TỰ CHỌN BÀI hoặc CHỌN BTVN GẦN NHẤT ⇒ CHỈ chữa đúng những câu đó.
     // `bankThem` đã bỏ câu trùng nội dung trong nó; dưới đây bỏ thêm câu thêm TRÙNG câu của ca (câu của ca luôn giữ) — thầy 05/10.
-    if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(bankThem)
+    // THẦY 06/10: câu tự luận CHỈ hiện ở Gọi lên bảng phần DẠY HỌC; chữa bài / chiến dịch / chọn kho ở đây bỏ hết câu tự luận.
+    const loc = <B extends { phanI: unknown[]; phanII: unknown[]; phanIII: unknown[] }>(b: B): B => (dayHoc ? b : boTuLuanKhoiBanDe(b))
+    if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(loc(bankThem))
     const khoaThem = khoaNoiDungBanDe(bankThem)
 
-    const cuaCa = du ? cauTuBanDe(du.bank) : []
+    const cuaCa = du ? cauTuBanDe(loc(du.bank)) : []
     const dich = { I: du?.bank.phanI.length ?? 0, II: du?.bank.phanII.length ?? 0, III: du?.bank.phanIII.length ?? 0 }
     const daCo = new Set(cuaCa.map((c) => c.id))
     const khoa = new Map([...khoaThem, ...(du ? khoaNoiDungBanDe(du.bank) : [])])
-    return boCauTrungNoiDung([...cuaCa, ...cauTuBanDe(bankThem, dich).filter((c) => !daCo.has(c.id))], khoa, daCo)
-  }, [du, bankThem, cachLayCau])
+    return boCauTrungNoiDung([...cuaCa, ...cauTuBanDe(loc(bankThem), dich).filter((c) => !daCo.has(c.id))], khoa, daCo)
+  }, [du, bankThem, cachLayCau, dayHoc])
   const baiLam = useMemo(() => (du ? baiLamTuCa(du.bank, du.maCa, du.luot) : []), [du])
   const dsEmCa = useMemo(() => (du ? emTuCa(du.luot, du.hoSo, dsCau, daGoiCau, vang) : []), [du, dsCau, daGoiCau, vang])
   const dsEm = useMemo(() => {
