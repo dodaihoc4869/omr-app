@@ -1,0 +1,49 @@
+/* Mini-game "Bắn nguyên tố" của phòng chờ. Màu theo bản vẽ đã duyệt; sáng/tối đi theo .pc-room như phong-cho.css. */
+.pc-room {
+  --pc-bn-pill: rgb(255, 254, 247); --pc-bn-pill-ink: rgb(39, 81, 79); --pc-bn-dan: rgb(214, 165, 72); --pc-bn-dim: rgba(246, 247, 242, .82);
+  --pc-bn-xanh-duong: rgb(86, 142, 196); --pc-bn-hong: rgb(204, 102, 110); --pc-bn-luc: rgb(57, 115, 98); --pc-bn-vang: rgb(201, 150, 60);
+  --pc-bn-binh: rgba(255, 254, 247, .9); --pc-bn-binh-vien: rgb(39, 81, 79); --pc-bn-bong: rgba(31, 57, 55, .18); --pc-bn-may: rgba(255, 254, 247, .55); --pc-bn-doi: rgb(176, 203, 168);
+}
+:root[data-giao-dien='toi'] .pc-room {
+  --pc-bn-pill: rgb(40, 62, 62); --pc-bn-pill-ink: rgb(232, 242, 229); --pc-bn-dan: rgb(244, 214, 140); --pc-bn-dim: rgba(19, 30, 32, .8);
+  --pc-bn-xanh-duong: rgb(122, 180, 226); --pc-bn-hong: rgb(232, 140, 146); --pc-bn-luc: rgb(120, 184, 152); --pc-bn-vang: rgb(226, 184, 106);
+  --pc-bn-binh: rgba(222, 238, 232, .9); --pc-bn-binh-vien: rgb(232, 242, 229); --pc-bn-bong: rgba(0, 0, 0, .3); --pc-bn-may: rgba(222, 238, 240, .14); --pc-bn-doi: rgb(48, 77, 64);
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-giao-dien='sang']) .pc-room {
+  --pc-bn-pill: rgb(40, 62, 62); --pc-bn-pill-ink: rgb(232, 242, 229); --pc-bn-dan: rgb(244, 214, 140); --pc-bn-dim: rgba(19, 30, 32, .8);
+  --pc-bn-xanh-duong: rgb(122, 180, 226); --pc-bn-hong: rgb(232, 140, 146); --pc-bn-luc: rgb(120, 184, 152); --pc-bn-vang: rgb(226, 184, 106);
+  --pc-bn-binh: rgba(222, 238, 232, .9); --pc-bn-binh-vien: rgb(232, 242, 229); --pc-bn-bong: rgba(0, 0, 0, .3); --pc-bn-may: rgba(222, 238, 240, .14); --pc-bn-doi: rgb(48, 77, 64);
+}
+}
+.pc-bn { box-sizing: border-box; padding: 9px 9px 12px; border-radius: 20px; background: var(--pc-card); border: 1px solid var(--pc-line); display: flex; flex-direction: column; gap: 10px; }
+.pc-bn-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.pc-bn-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--pc-muted); }
+.pc-bn h2 { margin: 2px 0 0; font-size: 19px; font-weight: 800; line-height: 1.2; }
+.pc-bn-score { text-align: right; }
+.pc-bn-score span { display: block; font-size: 11px; color: var(--pc-muted); }
+.pc-bn-score strong { display: block; font-size: 22px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.pc-bn-scene { position: relative; height: 352px; border-radius: 16px; overflow: hidden; background: var(--pc-sky-bottom); }
+.pc-bn-scene canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.pc-bn-scene canvas:active { cursor: grabbing; }
+.pc-bn-combo { position: absolute; left: 10px; top: 10px; font-size: 13px; font-weight: 700; padding: 5px 12px; border-radius: 30px; background: var(--pc-bn-pill); color: var(--pc-bn-pill-ink); border: 1px solid var(--pc-line); pointer-events: none; }
+.pc-room .pc-bn-pause { position: absolute; right: 8px; top: 8px; width: 44px; height: 44px; min-height: 44px; border-radius: 50%; border: 1px solid var(--pc-line); background: var(--pc-bn-pill); color: var(--pc-bn-pill-ink); display: grid; place-items: center; padding: 0; }
+.pc-bn-bottom { position: absolute; left: 10px; right: 10px; bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 600; color: var(--pc-bn-pill-ink); pointer-events: none; }
+.pc-bn-bottom > span { padding: 4px 10px; border-radius: 30px; background: var(--pc-bn-pill); opacity: .94; }
+.pc-bn-bottom > span.pc-bn-dots { display: flex; align-items: center; gap: 5px; padding: 6px 10px; }
+.pc-bn-dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--pc-bn-pill-ink); display: block; }
+.pc-bn-dots i.pc-bn-dot-on { background: var(--pc-accent); }
+.pc-bn-phu { position: absolute; inset: 0; background: var(--pc-bn-dim); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 0 28px; }
+.pc-bn-phu strong { font-size: 21px; font-weight: 800; color: var(--pc-ink); }
+.pc-bn-phu p { margin: 0; font-size: 14px; line-height: 1.45; color: var(--pc-ink); max-width: 250px; }
+.pc-room .pc-bn-phu button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 150px; height: 48px; padding: 0 24px; border-radius: 24px; border: 0; background: var(--pc-accent); color: rgb(255, 255, 255); font-weight: 700; font-size: 16px; }
+.pc-bn-fact { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--pc-soft); min-height: 44px; }
+.pc-bn-fact-icon { width: 34px; height: 34px; border-radius: 50%; background: var(--pc-card); display: grid; place-items: center; flex: none; color: var(--pc-accent); }
+.pc-bn-fact div { min-width: 0; }
+.pc-bn-fact strong { display: block; font-size: 13px; font-weight: 700; }
+.pc-bn-fact p { margin: 0; font-size: 12.5px; line-height: 1.35; color: var(--pc-muted); }
+.pc-bn-dk { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pc-bn-dk > span { font-size: 12.5px; color: var(--pc-muted); flex: 1; min-width: 0; }
+.pc-bn-dk > div { display: flex; gap: 8px; }
+.pc-room .pc-bn-dk button { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--pc-line); background: var(--pc-card); color: var(--pc-ink); display: grid; place-items: center; }
+.pc-bn-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; color: var(--pc-ink); background: var(--pc-soft); text-align: center; padding: 0 20px; }
