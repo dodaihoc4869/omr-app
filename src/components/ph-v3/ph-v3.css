@@ -281,11 +281,6 @@ i[data-mau="vong-tim"] { background: var(--ph3-vong-tim); }
 .ph3-pa li[data-chon] { background: var(--ph3-ho-nen); color: var(--ph3-ho-dam); font-weight: 600; }
 .ph3-pa li[data-dung] { background: var(--ph3-xl-nen); color: var(--ph3-xl-dam); font-weight: 600; }
 .ph3-pa li em { font-style: normal; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-.ph3-lg { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 14px; background: var(--ph3-mat); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
-.ph3-lg > b { font-size: 13px; font-weight: 700; color: var(--ph3-xl); }
-.ph3-lg ol { display: flex; flex-direction: column; gap: 6px; }
-.ph3-lg ol li { display: flex; gap: 8px; }
-.ph3-lg ol i { font-style: normal; font-weight: 700; color: var(--ph3-chu-3); flex-shrink: 0; }
 
 /* nhịp 14 ngày */
 .ph3-nhip { display: flex; flex-direction: column; gap: 6px; }

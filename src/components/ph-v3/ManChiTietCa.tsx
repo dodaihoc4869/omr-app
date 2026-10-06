@@ -9,6 +9,7 @@ import { chuThoiGian, gioVn, ngayDayDuVn, soVn } from '../../lib/ph-moi/dinh-dan
 import { taiBaoCaoCa } from '../../lib/ph-v3/api'
 import type { BaoCaoCa, CauXemLai } from '../../lib/ph-v3/du-lieu'
 import { chuCongBoCa } from '../ph-moi/nhan'
+import { KhoiLoiGiaiTuCT } from '../loi-giai/KhoiLoiGiaiChuan'
 import { BtKhoa, BtLen, BtLenGon, BtTrai, BtXuong } from './BieuTuong'
 import { DangTai, The, TheLoi } from './dung-chung'
 import { chuThay, TEN_PHAN } from './tien-ich'
@@ -160,23 +161,18 @@ function DongCau({ sbd, c }: { sbd: string; c: CauXemLai }) {
         <div id={idVung} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {ct?.kieu === 'tai' && <p className="ph3-ghi" role="status">Đang mở lời giải…</p>}
           {ct?.kieu === 'ok' && <ChiTiet ct={ct.ct} conChon={c.dapAnChon} />}
-          {ct?.kieu === 'loi' && (c.loiGiai ? <LoiGiaiNgan chu={c.loiGiai} /> : <p className="ph3-ghi">Chưa mở được lời giải câu này. Anh/chị thử lại sau ít phút.</p>)}
+          {ct?.kieu === 'loi' && (c.loiGiai ? <LoiGiaiNgan chu={c.loiGiai} dapAn="" /> : <p className="ph3-ghi">Chưa mở được lời giải câu này. Anh/chị thử lại sau ít phút.</p>)}
         </div>
       )}
     </li>
   )
 }
 
-/** Lời giải dự phòng từ báo cáo ca: có thể là chuỗi JSON có cấu trúc ⇒ đọc bằng bộ chuẩn chung (không in JSON thô); đọc hỏng ⇒ nói chưa có. */
-function LoiGiaiNgan({ chu: tho }: { chu: string }) {
-  const chu = docLoiGiai(tho).loiGiai
-  if (!chu) return <p className="ph3-ghi">Câu này chưa có lời giải để xem.</p>
-  return (
-    <div className="ph3-lg">
-      <b>Lời giải</b>
-      <span><ChemText text={tachDongTheoY(chu)} /></span>
-    </div>
-  )
+/** Lời giải dự phòng từ báo cáo ca: có thể là chuỗi JSON có cấu trúc ⇒ đọc bằng bộ chuẩn chung (không in JSON thô); đọc hỏng ⇒ nói chưa có. Vẽ bằng khối LỜI GIẢI chuẩn. */
+function LoiGiaiNgan({ chu: tho, dapAn }: { chu: string; dapAn: string }) {
+  const { loiGiai, loiGiaiCT } = docLoiGiai(tho)
+  if (!loiGiai) return <p className="ph3-ghi">Câu này chưa có lời giải để xem.</p>
+  return <KhoiLoiGiaiTuCT ct={loiGiaiCT} chuNgan={loiGiai} dapAn={dapAn} tach={tachDongTheoY} />
 }
 
 function ChiTiet({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; conChon: string }) {
@@ -203,18 +199,11 @@ function ChiTiet({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; con
         </ul>
       )}
       {ct.loiGiaiCT ? (
-        <div className="ph3-lg" data-vung="loi-giai-ct">
-          <b>Lời giải</b>
-          {ct.loiGiaiCT.chot && <span><strong>Chốt: </strong><ChemText text={tachDongTheoY(ct.loiGiaiCT.chot)} /></span>}
-          {ct.loiGiaiCT.buoc.length > 0 && (
-            <ol>
-              {ct.loiGiaiCT.buoc.map((b, i) => <li key={i}><i>{i + 1}.</i><span><ChemText text={tachDongTheoY(b)} /></span></li>)}
-            </ol>
-          )}
-          {ct.loiGiaiCT.ketQua && <span><strong>Kết quả: </strong><ChemText text={tachDongTheoY(ct.loiGiaiCT.ketQua)} /></span>}
+        <div data-vung="loi-giai-ct">
+          <KhoiLoiGiaiTuCT ct={ct.loiGiaiCT} dapAn={ct.dapAn} tach={tachDongTheoY} />
         </div>
       ) : ct.loiGiai ? (
-        <LoiGiaiNgan chu={ct.loiGiai} />
+        <LoiGiaiNgan chu={ct.loiGiai} dapAn={ct.dapAn} />
       ) : (
         <p className="ph3-ghi">Câu này chưa có lời giải để xem.</p>
       )}

@@ -260,6 +260,13 @@ body {
   color: var(--lg-nhan);
   margin-bottom: var(--k1);
 }
+/* chữ đã qua tachDongTheoY (màn phụ huynh): giữ xuống dòng ngắt theo ý (a), (1)… */
+.loi-giai[data-giu-dong] .lg-chu,
+.loi-giai[data-giu-dong] .lg-chot,
+.loi-giai[data-giu-dong] .lg-buoc li,
+.loi-giai[data-giu-dong] .lg-ket-qua {
+  white-space: pre-line;
+}
 .lg-y {
   display: grid;
   grid-template-columns: 22px 26px minmax(0, 1fr);

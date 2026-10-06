@@ -6,13 +6,30 @@
 import type { ReactNode } from 'react'
 import type { LoiGiaiCauTruc } from '../../data/examContent'
 import { ChemText } from '../../lib/chem-format'
-import { loiGiaiChoTheCau } from '../hoa2/cau-chuyen'
+import { chuanHoaLoiGiaiCau, type LoiGiaiCauTrucChuan } from '../../lib/chuan-hoa-loi-giai'
 
 type Chu = 'A' | 'B' | 'C' | 'D'
 
+/** Dạng đã chuẩn hoá (`chuanHoaLoiGiaiCau`: chot/lyDo/buoc/ketQua) → `LoiGiaiCauTruc` mà khối đọc. Kho thiếu ⇒ undefined. */
+export function chuanSangCauTruc(lg: LoiGiaiCauTrucChuan, phan: 'I' | 'II' | 'III'): LoiGiaiCauTruc | undefined {
+  if (lg.thieu) return undefined
+  const ra: LoiGiaiCauTruc = { chot: lg.chot }
+  if (lg.lyDo && phan === 'I') {
+    ra.tungPa = {}
+    for (const p of lg.lyDo) if (/^[A-D]$/.test(p.khoa)) ra.tungPa[p.khoa as Chu] = { dung: p.dung, viSao: p.ly }
+  }
+  if (lg.lyDo && phan === 'II') {
+    ra.tungY = {}
+    for (const p of lg.lyDo) if (/^[a-d]$/.test(p.khoa)) ra.tungY[p.khoa as 'a' | 'b' | 'c' | 'd'] = { dung: p.dung, viSao: p.ly }
+  }
+  if (lg.buoc) ra.buoc = lg.buoc
+  if (phan === 'III' && lg.ketQua) ra.ketQua = lg.ketQua
+  return ra
+}
+
 /** Lời giải THÔ của kho (object / chuỗi JSON / chữ) → dạng có cấu trúc; kho thiếu ⇒ undefined. */
 export function loiGiaiChuanTuKho(tho: unknown, phan: 'I' | 'II' | 'III', dapAn: string): LoiGiaiCauTruc | undefined {
-  return loiGiaiChoTheCau(tho, phan, dapAn)
+  return chuanSangCauTruc(chuanHoaLoiGiaiCau(tho, phan, dapAn), phan)
 }
 
 /** Một dòng lý do: dấu ✓/✗ (theo đáp án ĐANG CHẤM) · mã A./a) · lý do. */
@@ -48,11 +65,13 @@ export interface KhoiLoiGiaiChuanProps {
   phuongAn?: readonly string[]
   /** Phần I: chữ gốc phương án em đã chọn — dòng đó ghi "em đã chọn ý này" nếu sai. */
   daChon?: string
+  /** Giữ xuống dòng có sẵn trong chữ (đã qua `tachDongTheoY`): thêm `white-space: pre-line` (index.css). */
+  giuDong?: boolean
   /** Chèn thêm vào cuối khối (vd. hình sau lời giải). */
   children?: ReactNode
 }
 
-export default function KhoiLoiGiaiChuan({ phan, loiGiai: lg, explanation: text, correct, choicePerm, yPerm, phuongAn, daChon, children }: KhoiLoiGiaiChuanProps) {
+export default function KhoiLoiGiaiChuan({ phan, loiGiai: lg, explanation: text, correct, choicePerm, yPerm, phuongAn, daChon, giuDong, children }: KhoiLoiGiaiChuanProps) {
   const coChot = !!lg?.chot && typeof lg.chot === 'string' && !lg.chot.includes('[object Object]') && !!lg.chot.trim()
   const coGi = !!lg?.chot || !!text?.trim() || !!(lg?.buoc && lg.buoc.length > 0) || !!lg?.tungPa || !!lg?.tungY
   const dapAnChu = typeof correct === 'string' ? correct : ''
@@ -60,7 +79,7 @@ export default function KhoiLoiGiaiChuan({ phan, loiGiai: lg, explanation: text,
   const dsII = (typeof correct === 'string' ? [...correct.toUpperCase().replace(/Đ/g, 'D')] : [...(correct ?? [])]).map((x) => (x === 'D' || x === 'S' ? x : null))
   const coDsII = dsII.length === 4 && dsII.every(Boolean)
   return (
-    <div className="loi-giai">
+    <div className="loi-giai" data-giu-dong={giuDong ? '1' : undefined}>
       <div className="loi-giai-nhan lg-nhan">LỜI GIẢI</div>
       {!coGi && <div className="lg-chu">Thầy chưa nhập lời giải cho câu này.</div>}
       {coChot && (
@@ -90,25 +109,39 @@ export default function KhoiLoiGiaiChuan({ phan, loiGiai: lg, explanation: text,
           })}
         </div>
       )}
-      {lg && phan === 'III' && (
-        <>
-          {lg.buoc && lg.buoc.length > 0 && (
-            <ol className="lg-buoc">
-              {lg.buoc.map((b, i) => (
-                <li key={i}>
-                  <ChemText text={b} />
-                </li>
-              ))}
-            </ol>
-          )}
-          {(lg.ketQua || dapAnChu) && (
-            <div className="lg-ket-qua">
-              <ChemText text={lg.ketQua || dapAnChu} />
-            </div>
-          )}
-        </>
+      {lg?.buoc && lg.buoc.length > 0 && (
+        <ol className="lg-buoc">
+          {lg.buoc.map((b, i) => (
+            <li key={i}>
+              <ChemText text={b} />
+            </li>
+          ))}
+        </ol>
+      )}
+      {lg && phan === 'III' && (lg.ketQua || dapAnChu) && (
+        <div className="lg-ket-qua">
+          <ChemText text={lg.ketQua || dapAnChu} />
+        </div>
       )}
       {children}
     </div>
   )
+}
+
+/** Lời giải dạng `LoiGiaiCT` của phụ huynh (src/lib/ph-moi/du-lieu.ts: chot, buoc, ketQua, lyDo) hoặc chữ ngắn → khối chuẩn.
+ * Không có cả hai ⇒ null (nơi gọi tự nói "chưa có lời giải"). `tach` = hàm ngắt dòng theo ý (tachDongTheoY) áp lên MỌI đoạn chữ. */
+export function KhoiLoiGiaiTuCT({ ct, chuNgan, dapAn, tach }: { ct: { chot: string; buoc: string[]; ketQua: string; lyDo: { khoa: string; dung: boolean; ly: string }[] } | null; chuNgan?: string; dapAn: string; tach?: (s: string) => string }) {
+  const t = tach ?? ((x: string) => x)
+  if (!ct) {
+    if (!chuNgan?.trim()) return null
+    return <KhoiLoiGiaiChuan phan="I" explanation={t(chuNgan)} giuDong={!!tach} />
+  }
+  const dapChuan = dapAn.trim().toUpperCase().replace(/Đ/g, 'D')
+  const kyTu = ct.lyDo.map((l) => l.khoa)
+  const phan: 'I' | 'II' | 'III' = kyTu.length > 0 && kyTu.every((k) => /^[a-d]$/.test(k)) ? 'II' : kyTu.length > 0 || /^[A-D]$/.test(dapChuan) ? 'I' : /^[DS]{4}$/.test(dapChuan) ? 'II' : 'III'
+  const lg = chuanSangCauTruc(
+    { chot: t(ct.chot), lyDo: ct.lyDo.length ? ct.lyDo.map((l) => ({ ...l, ly: t(l.ly) })) : null, buoc: ct.buoc.length ? ct.buoc.map(t) : null, ketQua: t(ct.ketQua), thieu: false },
+    phan,
+  )
+  return <KhoiLoiGiaiChuan phan={phan} loiGiai={lg} correct={phan === 'III' ? '' : dapChuan} giuDong={!!tach} />
 }

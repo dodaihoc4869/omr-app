@@ -12,6 +12,7 @@ import type { CauChe, CauHomNay, CauThuong, ChiTietCau, LyDoChe, PhMoi } from '.
 import { CHU_CHE, NHAN_NGUON } from '../nhan'
 import { BtCheo, BtDongHo, BtKhoa, BtMui, BtMuiXuong, BtTich } from './bieu-tuong'
 import { Chip } from './dung-chung'
+import { KhoiLoiGiaiTuCT } from '../../loi-giai/KhoiLoiGiaiChuan'
 import { GOP_ID, SO_CAU_XEM_TRUOC, chuKetQuaChe, chuNguongLamLau, laChe, laLamLau, laLamLauThuong, laNhomChe, gopNhomThua, laSai, lyDoCheNhom, soOChe, tachChuCai, type NhomCau } from './nhom-cau'
 import { dangCheDoMayYeu } from '../../../lib/may-yeu'
 
@@ -424,42 +425,11 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
           })}
         </ul>
       )}
-      {ct.loiGiaiCT ? (
-        // Lời giải CÓ CẤU TRÚC (máy chủ gửi chuỗi JSON, du-lieu.ts đã đọc bằng bộ chuẩn chung): dòng Chốt, các bước đánh số, dòng Kết quả — không bao giờ in JSON thô.
-        <div className="phm-loi-giai" data-vung="loi-giai-ct">
-          <h4>Lời giải</h4>
-          {ct.loiGiaiCT.chot && (
-            <p className="phm-lg-chot">
-              <b>Chốt: </b>
-              <ChemText text={tachDongTheoY(ct.loiGiaiCT.chot)} />
-            </p>
-          )}
-          {ct.loiGiaiCT.buoc.length > 0 && (
-            <ol className="phm-lg-buoc">
-              {ct.loiGiaiCT.buoc.map((b, i) => (
-                <li key={i}>
-                  <i aria-hidden="true">{i + 1}</i>
-                  <span>
-                    <span className="phm-sr">Bước {i + 1}: </span>
-                    <ChemText text={tachDongTheoY(b)} />
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-          {ct.loiGiaiCT.ketQua && (
-            <p className="phm-lg-ket">
-              <b>Kết quả: </b>
-              <ChemText text={tachDongTheoY(ct.loiGiaiCT.ketQua)} />
-            </p>
-          )}
-        </div>
-      ) : ct.loiGiai ? (
-        <div className="phm-loi-giai">
-          <h4>Lời giải ngắn</h4>
-          <p>
-            <ChemText text={tachDongTheoY(ct.loiGiai)} />
-          </p>
+      {ct.loiGiaiCT || ct.loiGiai ? (
+        // CHUẨN HIỂN THỊ 06/10: khối LỜI GIẢI chuẩn (LỜI GIẢI → Kiến thức cốt lõi → từng phương án ✓ ✗ → bước → kết quả) — không bao giờ in JSON thô.
+        // Chữ qua tachDongTheoY (ngắt theo ý (a), (1)…) + `giuDong`; thiếu cấu trúc ⇒ chữ ngắn trong cùng khối.
+        <div className="phm-loi-giai" data-vung={ct.loiGiaiCT ? 'loi-giai-ct' : undefined}>
+          <KhoiLoiGiaiTuCT ct={ct.loiGiaiCT} chuNgan={ct.loiGiai} dapAn={ct.dapAn} tach={tachDongTheoY} />
         </div>
       ) : (
         <p className="phm-tc-ghi">Câu này chưa có lời giải để xem.</p>

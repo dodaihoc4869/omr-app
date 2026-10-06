@@ -14,6 +14,7 @@ import ExperimentDemo,{ExperimentOriginal} from './ExperimentDemo'
 // hiện là em nộp trước biết đáp án rồi nhắn cho bạn chưa nộp.
 import { useEffect, useRef, useState } from 'react'
 import { ChemText } from '../lib/chem-format'
+import KhoiLoiGiaiChuan, { chuanSangCauTruc } from './loi-giai/KhoiLoiGiaiChuan'
 import { TEN_MUC_DO, TEN_PHAN, type MucDo } from '../lib/phan-tich-lam-bai'
 import type { CauSaiChiTiet } from '../lib/phieu-du-lieu'
 
@@ -44,12 +45,6 @@ export const CSS_THE_CAU = `
 .bc-pa.dung{border-color:var(--p-xanh)}
 .bc-pa.chon{border-color:var(--p-do)}
 .bc-co{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;white-space:nowrap}
-.bc-giai{margin-top:11px;border-left:3px solid var(--p-tim);padding:2px 0 2px 12px}
-.bc-giai-chot{font-family:var(--serif);font-size:14px;font-weight:800;line-height:1.55}
-.bc-giai-nhan{display:block;font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--p-nhat);margin-bottom:2px}
-.bc-giai-y{font-size:13px;margin-top:7px;line-height:1.6;color:var(--p-muc)}
-.bc-buoc{font-size:13px;margin-top:5px;padding-left:16px;position:relative;line-height:1.6}
-.bc-buoc::before{content:'';position:absolute;left:3px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--p-tim)}
 /* Ô tick của tấm trượt Hỏi bài Thầy — thẻ câu ở báo cáo không dựng ô này. */
 .bc-tick{flex:0 0 auto;width:24px;height:24px;border-radius:7px;border:1.5px solid var(--p-mo);background:none;
   display:grid;place-items:center;padding:0;cursor:pointer}
@@ -122,6 +117,8 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
   const nhanPhan = TEN_PHAN[c.phan] ?? c.phan
   const coAnh = Boolean(c.anhThanCau || c.hinh?.length || c.anhLuaChon?.some(Boolean))
   const coGiai = !anLoiGiai && (c.chot || c.lyDo || c.buoc)
+  const phanChuan = (['I', 'II', 'III'] as const).find((p) => p === c.phan) ?? 'I'
+  const loiGiaiChuan = chuanSangCauTruc({ chot: typeof c.chot === 'string' && !c.chot.includes('[object Object]') ? c.chot.trim() : '', lyDo: c.lyDo ?? null, buoc: c.buoc ?? null, ketQua: c.ketQua ?? '', thieu: false }, phanChuan)
   return (
     <div style={tick ? { display: 'flex', alignItems: 'flex-start', gap: 10 } : undefined}>
       {tick && (
@@ -261,30 +258,7 @@ export default function TheCauChiTiet({ c, stt, mauSo, anLoiGiai = false, tick, 
               )}
 
               {coGiai && (
-                <div className="bc-giai">
-                  {c.chot && typeof c.chot === 'string' && !c.chot.includes('[object Object]') && c.chot.trim() && (
-                    <div className="bc-giai-chot">
-                      <span className="bc-giai-nhan">Kiến thức cốt lõi</span>
-                      <ChemText text={c.chot} />
-                    </div>
-                  )}
-                  {c.lyDo?.map((l) => (
-                    <div key={l.khoa} className="bc-giai-y">
-                      <b style={{ color: l.dung ? 'var(--p-xanh)' : 'var(--p-do)' }}>{l.khoa}.</b> <ChemText text={l.ly} />
-                    </div>
-                  ))}
-                  {c.buoc?.map((b, i) => (
-                    <div key={i} className="bc-buoc">
-                      <ChemText text={b} />
-                    </div>
-                  ))}
-
-                  {c.ketQua && (
-                    <div className="bc-giai-y" style={{ fontWeight: 700 }}>
-                      Kết quả: <ChemText text={c.ketQua} />
-                    </div>
-                  )}
-                </div>
+                <KhoiLoiGiaiChuan phan={phanChuan} loiGiai={loiGiaiChuan} correct={c.dapAnDung} />
               )}
 
               {anLoiGiai && (

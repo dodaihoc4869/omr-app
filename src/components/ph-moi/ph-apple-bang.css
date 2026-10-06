@@ -321,7 +321,8 @@
 .phm-pa li[data-dung] em { color: var(--phm-tren-dat-nen); }
 .phm-pa li[data-chon] em { color: var(--phm-do); }
 .phm-pa em .phm-i { width: 13px; height: 13px; stroke-width: 2.6; }
-.phm-loi-giai { margin-top: 10px; padding: 13px 15px 14px; border-radius: 15px; background: color-mix(in srgb, var(--phm-nhan-nen) 42%, var(--phm-the)); }
+.phm-loi-giai { margin-top: 10px; } /* diện mạo do khối chuẩn `.loi-giai` (index.css) lo */
+.phm-loi-giai > .loi-giai { margin-top: 0; }
 .phm-loi-giai h4 { font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-nhan); margin-bottom: 4px; }
 .phm-loi-giai p { font-size: 0.9375rem; line-height: 1.47; }
 .phm-them { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 8px; min-height: 50px; padding: 6px 12px 6px 18px; border-top: 1px solid var(--phm-vach); font-size: 1.0625rem; line-height: 1.294; color: var(--phm-nhan); }
