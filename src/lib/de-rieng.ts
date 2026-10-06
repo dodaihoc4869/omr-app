@@ -981,11 +981,3 @@ export function viTriCauLap(qidTrongDe: string[], qidLap: string[]): number[] {
   })
   return ra
 }
-
-/** Trộn thứ tự một danh sách qid theo seed của em — để hai em không những khác
- * bộ câu mà còn khác thứ tự. Chỉ dùng khi chỗ gọi cần thứ tự riêng; đường phát
- * đề chính lấy thứ tự theo kho nên câu lặp đã nằm rải sẵn. */
-export function tronTheoEm(qids: string[], maCa: string, sbd: string): string[] {
-  const perm = seededPermutation(qids.length, hashSeed(`${maCa}:${sbd}:thu-tu`))
-  return perm.map((i) => qids[i])
-}

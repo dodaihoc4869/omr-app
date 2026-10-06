@@ -30,29 +30,6 @@ export interface TuyChonThu {
   onQuyenChuyenDong?: (cho: boolean) => void
 }
 
-/** Trạng thái quyền cảm biến chuyển động. `khong_ho_tro` = máy tính, hoặc trình
- * duyệt không có `DeviceMotionEvent`. */
-export type QuyenChuyenDong = 'chua_hoi' | 'cho' | 'tu_choi' | 'khong_ho_tro'
-
-interface CoRequestPermission {
-  requestPermission?: () => Promise<'granted' | 'denied' | 'default'>
-}
-
-/** iOS 13+ bắt gọi trong một cử chỉ chạm — nút "Tôi đã hiểu" chính là cử chỉ đó.
- *
- * Em từ chối là MỘT TÍN HIỆU, không phải ngõ cụt: chỗ gọi ghi lại và hiện nhãn
- * vàng cho thầy, chứ không im lặng bỏ qua kênh 8. */
-export async function xinQuyenChuyenDong(): Promise<QuyenChuyenDong> {
-  if (typeof DeviceMotionEvent === 'undefined') return 'khong_ho_tro'
-  const d = DeviceMotionEvent as unknown as CoRequestPermission
-  if (typeof d.requestPermission !== 'function') return 'cho'
-  try {
-    return (await d.requestPermission()) === 'granted' ? 'cho' : 'tu_choi'
-  } catch {
-    return 'tu_choi'
-  }
-}
-
 /** Gắn cả tám kênh. Trả về hàm gỡ — gọi khi rời màn, kẻo gia tốc kế chạy mãi. */
 export function thuTinHieu(o: TuyChonThu): () => void {
   const bo: (() => void)[] = []

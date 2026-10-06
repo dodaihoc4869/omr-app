@@ -38,29 +38,6 @@ import { CHO_BAC_2, SO_CAU_MAC_DINH, hangUuTien, nhanhCoChe } from './cau-hinh-c
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
 import { hopDang, LOC_DANG_MAC_DINH, type LocDang } from './dang-cau'
 
-/** Nhãn gắn lên MỘT câu chữa. Đúng một, không phải mảng: một câu chữa phục vụ
- * một câu sai để nhãn hiện ra không mập mờ. Chiều ngược lại mới là một–nhiều. */
-export interface NhanChua {
-  qid: string
-  soCau: number
-  phan: 'I' | 'II' | 'III'
-  /** Mã dạng của CÂU SAI. Câu chữa bậc 1 phải trùng đúng mã này. */
-  maDang: string
-  /** Tên dạng cho người đọc. Phiếu hiện TÊN, không hiện mã — mã là thứ nội bộ
-   * (v4 mục 6). */
-  tenDang: string
-  /** 1 = trùng đúng mã. 2 = cùng chuyên đề và cùng cơ chế, khác việc phải làm. */
-  bac: 1 | 2
-  /** CHÍNH CÂU EM LÀM SAI, đưa lại vào phiếu để em làm lại — thầy chốt 07/09:
-   * "câu nào chưa có câu chữa thì lấy lại câu sai đó, phân tích lỗi sai của em".
-   * Thà cho em làm lại đúng câu đó còn hơn để trống chỗ ấy. */
-  laLamLai?: true
-  /** Em đã chọn phương án nào. */
-  daChon?: string
-  /** Vì sao phương án em chọn là sai — lấy từ lời giải của chính câu đó. */
-  viSaoSai?: string
-}
-
 export interface SuatThieu {
   soCau: number
   /** BẮT BUỘC có phần. Số câu đánh lại từ 1 ở mỗi phần, nên "câu 2" trần là hai
@@ -443,18 +420,6 @@ export function rutDeChua(yc: YeuCauRutChua): KetQuaRutChua {
   }
 
   return ra
-}
-
-/** Bảng đối chiếu đầu phiếu: câu sai → những câu chữa nào (vị trí trong phiếu,
- * tính từ 1). Câu sai không có câu chữa vẫn phải có dòng, kèm lý do. */
-export function bangDoiChieu(kq: KetQuaRutChua, daXep: CauSaiCanChua[]): { cauSai: CauSaiCanChua; viTri: number[]; vi?: string }[] {
-  return daXep.map((s) => {
-    const viTri = kq.cau.map((c, i) => (c.chuaCho?.qid === s.qid ? i + 1 : 0)).filter((n) => n > 0)
-    // Dò theo `qid`, KHÔNG theo `soCau`: số câu đánh lại từ 1 ở mỗi phần nên
-    // dò theo số là gán lý do của câu 2 phần II vào câu 2 phần I.
-    const t = kq.thieu.find((x) => x.qid === s.qid)
-    return viTri.length > 0 && !t ? { cauSai: s, viTri } : { cauSai: s, viTri, vi: t?.vi ?? 'chưa tới suất trong phiếu này' }
-  })
 }
 
 // ---------------------------------------------------------------------------

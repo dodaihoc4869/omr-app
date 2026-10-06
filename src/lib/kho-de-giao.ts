@@ -38,7 +38,6 @@ export const KHO_DE_GIAO = {
   LICH_LAP_DUNG: [3, 7, 14],
 } as const
 
-export type TrangThaiCauGiao = 'chua_gap' | 'da_gap' | 'thong_thao'
 export type TrangThaiEmGiao = 'dang_hoc' | 'hoan_thanh' | 'ket_thuc_luoi'
 
 /** Cấu hình "giao kho đề theo tuần" (thầy dựng ở màn Giao đề theo tuần; lưu trong `cau_hinh`). */

@@ -59,9 +59,3 @@ export function thongKeKho(kho: KhoDoKhoLuu): { soCa: number; soQid: number; ge5
   const dem = (n: number) => ks.filter((q) => kho.muc[q].soLuot >= n).length
   return { soCa: kho.daDuyet.length, soQid: ks.length, ge5: dem(5), ge8: dem(8), ge10: dem(10), ge30: dem(30) }
 }
-
-/** Câu ca này sắp chữa mà kho chưa biết gì — để màn nói thật là N2 đang trống,
- * chứ không im lặng rơi hết về N3. */
-export function qidChuaCoLichSu(kho: KhoDoKhoLuu, dsQid: string[]): string[] {
-  return dsQid.filter((q) => !kho.muc[q] || kho.muc[q].soLuot === 0)
-}

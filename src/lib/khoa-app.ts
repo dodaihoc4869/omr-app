@@ -50,7 +50,6 @@ export const CHO_TOI_DA_GIAY = 1800
  * dạy nào thầy đóng mở app liên tục. */
 export type NacHoiLai = 'moi_lan_mo' | 'sau_15_phut' | 'sau_60_phut'
 export const HOI_LAI_MAC_DINH: NacHoiLai = 'moi_lan_mo'
-export const PHUT_CUA_NAC: Record<NacHoiLai, number> = { moi_lan_mo: 0, sau_15_phut: 15, sau_60_phut: 60 }
 export const TEN_NAC: Record<NacHoiLai, string> = {
   moi_lan_mo: 'Mỗi lần mở app',
   sau_15_phut: 'Sau 15 phút không dùng',
