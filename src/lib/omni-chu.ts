@@ -36,7 +36,7 @@ export const CHU_LUOT = 'Câu này em bấm nhanh quá nên chưa tính. Mai là
 export function chuDungNhungCham(msLam: number, msThuong: number): string {
   return `Đúng nhưng chậm: em mất ${thoiLuongChu(msLam)}, mức thường của em ${thoiLuongChu(msThuong)}. Dạng này chưa tính vững — mai gặp câu tương tự để làm nhanh hơn.`
 }
-export const CHU_DUNG_CHUA_CHAC = 'Đúng. Em chọn "Chưa chắc" nên câu này sẽ quay lại sớm cho chắc hẳn.'
+export const CHU_DUNG_CHUA_CHAC = 'Đúng. Em chọn "Chưa chắc" — xem lại lời giải để chắc hơn.' // thầy 06/10 ("tự làm luôn hết", sau "bỏ dòng gợi ý câu này sẽ quay lại sớm"): bỏ lời hứa lịch ôn, chỉ nói việc em làm được ngay
 export const CHU_CHAC_MA_SAI = 'Em chắc mà sai — đây là chỗ đáng xem nhất hôm nay. Mở lời giải từng bước bên dưới.'
 /** Nút/chip tự tin trên thẻ câu (mặc định = Chắc; chạm chip trước khi chọn đáp án ⇒ Chưa chắc). */
 export const CHIP_CHUA_CHAC = 'Chưa chắc'

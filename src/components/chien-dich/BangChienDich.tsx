@@ -136,7 +136,6 @@ export function nguoiGiaiMau(cau: readonly CauCanDayLai[], em: readonly EmBang[]
       sbd: e?.sbd ?? '',
       ten: e?.ten ?? 'Cả lớp',
       viSao: `${c.soEm} em cần thầy dạy lại`,
-      cauGoc: c.cau,
     }
   })
 }

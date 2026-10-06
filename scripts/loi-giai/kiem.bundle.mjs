@@ -622,7 +622,7 @@ function dauVao(c, bam) {
 }
 function tinhBieuThuc(bt) {
   const s = bt.replace(/\s+/g, "");
-  if (!/^[0-9.+\-*/()]+$/.test(s)) throw new Error("biểu thức có kí tự lạ: " + bt);
+  if (!/^[0-9.+\-*/()eE]+$/.test(s)) throw new Error("biểu thức có kí tự lạ: " + bt);
   let i = 0;
   const so = () => {
     if (s[i] === "(") {
@@ -640,7 +640,7 @@ function tinhBieuThuc(bt) {
       i++;
       return so();
     }
-    const m = /^\d+(\.\d+)?|^\.\d+/.exec(s.slice(i));
+    const m = /^(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?/.exec(s.slice(i));
     if (!m) throw new Error("biểu thức hỏng: " + bt);
     i += m[0].length;
     return Number(m[0]);
@@ -694,6 +694,11 @@ var BIEU_TUONG = [
 ];
 var THE_DUOC = /* @__PURE__ */ new Set(["b", "i", "sub", "sup", "br"]);
 var TRUONG_BUOC = ["qid", "bam", "dang", "ten", "keys", "dung", "y", "ket", "nho", "phepTinh", "tuongTu", "co"];
+function saiSoLamTron(ketQua, d) {
+  const a = Math.abs(ketQua);
+  if (a >= 1e12 || a > 0 && a < 1e-8) return 0.5 * Math.pow(10, Math.floor(Math.log10(a)) - d) + a * 1e-9;
+  return 0.5 * Math.pow(10, -d) + 1e-9;
+}
 function kiemPhepTinh(ds, noi, loi) {
   if (!Array.isArray(ds)) {
     loi.push(`${noi}: phepTinh không phải mảng`);
@@ -704,9 +709,8 @@ function kiemPhepTinh(ds, noi, loi) {
     try {
       const v = tinhBieuThuc(chuoi2(p?.bieuThuc));
       const d = Number(p?.lamTron ?? 2);
-      const sai = 0.5 * Math.pow(10, -d) + 1e-9;
       if (typeof p?.ketQua !== "number") loi.push(`${noi}: "${ten}" ketQua không phải số`);
-      else if (Math.abs(v - p.ketQua) > sai) loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`);
+      else if (Math.abs(v - p.ketQua) > saiSoLamTron(p.ketQua, d)) loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`);
     } catch (e) {
       loi.push(`${noi}: "${ten}" ${e.message}`);
     }
@@ -728,7 +732,11 @@ function chuTrongHoSo(h) {
   return ra.filter((x) => typeof x === "string");
 }
 var chuanKet = (s) => s.replace(/\s+/g, " ").replace(/[-—]/g, "–").trim();
-var soTuChu = (s) => Number(s.trim().replace(",", "."));
+var soTuChu = (s) => {
+  const r = docSoPhanIII(s.trim());
+  return r && !r.donVi ? Number(r.so) : Number.NaN;
+};
+var khopSo = (x, y) => Math.abs(x - y) <= Math.max(1e-9, Math.abs(x) * 1e-9);
 function kiemHoSo(vao, hoSo, bo) {
   const loi = [];
   const canhBao = [];
@@ -810,7 +818,7 @@ function kiemHoSo(vao, hoSo, bo) {
     if (!ket.startsWith("Đáp số")) loi.push('tln: ket phải mở đầu "Đáp số"');
     const cuoi = Array.isArray(h.phepTinh) ? h.phepTinh.filter((p) => p?.laDapSo).pop() : void 0;
     if (!cuoi) loi.push("KHOÁ SỐ: thiếu phép tính laDapSo");
-    else if (!(Math.abs(soTuChu(vao.dapAn.kq) - Number(cuoi.ketQua)) < 1e-9)) loi.push(`KHOÁ SỐ: phép tính cuối ra ${chuoi2(cuoi.ketQua)} ≠ đáp số ${vao.dapAn.kq}`);
+    else if (!khopSo(soTuChu(vao.dapAn.kq), Number(cuoi.ketQua))) loi.push(`KHOÁ SỐ: phép tính cuối ra ${chuoi2(cuoi.ketQua)} ≠ đáp số ${vao.dapAn.kq}`);
   }
   const soPhep = kiemPhepTinh(h.phepTinh, "phepTinh", loi);
   const tt = h.tuongTu;
@@ -2664,7 +2672,7 @@ function kiemPhepTinhBan(ds, noi, loi) {
     }
     try {
       const v = tinhBieuThuc(chuoi3(p.bieuThuc));
-      if (Math.abs(v - p.ketQua) > 0.5 * 10 ** -d + 1e-9) {
+      if (Math.abs(v - p.ketQua) > saiSoLamTron(p.ketQua, d)) {
         loi.push(`KHOÁ SỐ ${noi}: "${ten}" máy tính ra ${v.toFixed(d + 2)} ≠ ghi ${p.ketQua}`);
         return;
       }
@@ -3042,7 +3050,9 @@ export {
   nhanBanKhacNop,
   nhanYMoiNop,
   qidGocMaySoan,
+  saiSoLamTron,
   soTrongChu,
+  soTuChu,
   tangCau,
   thieuBanKhac,
   tinhBieuThuc,
