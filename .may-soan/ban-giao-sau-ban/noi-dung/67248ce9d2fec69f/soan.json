@@ -1,0 +1,114 @@
+{
+ "qid": "10-C1-B1-I-1",
+ "bam": "67248ce9d2fec69f",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Thí nghiệm bắn phá lá vàng mỏng bằng hạt alpha của Rutherford giúp phát hiện ra thành phần nào của nguyên tử?",
+   "pa": {
+    "A": "Electron.",
+    "B": "Hạt nhân nguyên tử.",
+    "C": "Neutron.",
+    "D": "Lớp vỏ electron."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Hầu hết hạt alpha xuyên thẳng qua lá vàng, một số ít bị bật ngược lại.",
+    "Điều đó chứng tỏ nguyên tử có phần mang điện dương, nhỏ và đặc ở tâm: hạt nhân."
+   ],
+   "chot": "Lá vàng bị hạt alpha bắn phá cho thấy hạt nhân nguyên tử.",
+   "phepTinh": []
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây đúng về tia âm cực?",
+   "pa": {
+    "A": "Là chùm hạt mang điện tích dương.",
+    "B": "Không bị lệch hướng trong điện trường.",
+    "C": "Là chùm electron chuyển động từ cực âm sang cực dương.",
+    "D": "Là chùm hạt neutron."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Tia âm cực bị lệch về phía bản cực dương trong điện trường nên mang điện tích âm.",
+    "Đó là chùm hạt electron phát ra từ cực âm."
+   ],
+   "chot": "Tia âm cực là chùm electron.",
+   "phepTinh": []
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Trong ống tia âm cực của J.J. Thomson, khi đặt chùm tia vào điện trường giữa hai bản cực thì chùm tia bị lệch như thế nào?",
+   "pa": {
+    "A": "Lệch về phía bản cực âm.",
+    "B": "Lệch về phía bản cực dương.",
+    "C": "Không bị lệch.",
+    "D": "Lệch theo hướng bất kì, không theo bản cực nào."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Các hạt mang điện tích âm bị bản cực dương hút.",
+    "Chùm tia âm cực bị lệch về phía bản cực dương nên gồm các hạt mang điện âm."
+   ],
+   "chot": "Hạt mang điện âm lệch về phía bản cực dương.",
+   "phepTinh": []
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Nhà khoa học nào đã phát hiện ra hạt nhân nguyên tử thông qua thí nghiệm bắn phá lá vàng bằng hạt alpha?",
+   "pa": {
+    "A": "J.J. Thomson.",
+    "B": "J. Dalton.",
+    "C": "J. Chadwick.",
+    "D": "E. Rutherford."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Thí nghiệm bắn phá lá vàng bằng hạt alpha do Rutherford và cộng sự thực hiện.",
+    "Thomson tìm ra electron, Chadwick tìm ra neutron."
+   ],
+   "chot": "Rutherford gắn với thí nghiệm lá vàng và hạt nhân.",
+   "phepTinh": []
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Hạt nào sau đây được phát hiện khi nghiên cứu sự phóng điện qua ống tia âm cực?",
+   "pa": {
+    "A": "Electron.",
+    "B": "Proton.",
+    "C": "Neutron.",
+    "D": "Hạt nhân nguyên tử."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Tia âm cực phát ra từ cực âm của ống phóng điện.",
+    "Tia này gồm các hạt mang điện âm, nhẹ: electron."
+   ],
+   "chot": "Ống tia âm cực dẫn tới electron.",
+   "phepTinh": []
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Thí nghiệm của J. Chadwick (1932) phát hiện ra hạt nào sau đây?",
+   "pa": {
+    "A": "Electron.",
+    "B": "Proton.",
+    "C": "Neutron.",
+    "D": "Hạt nhân nguyên tử."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Chadwick dùng hạt alpha bắn phá beryllium và thu được một loại hạt không mang điện.",
+    "Hạt đó có khối lượng xấp xỉ proton: neutron."
+   ],
+   "chot": "Chadwick phát hiện neutron.",
+   "phepTinh": []
+  }
+ ]
+}

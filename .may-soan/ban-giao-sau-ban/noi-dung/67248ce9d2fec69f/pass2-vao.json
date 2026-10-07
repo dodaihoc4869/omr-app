@@ -1,0 +1,81 @@
+{
+  "cau": {
+    "de": "",
+    "loai": "goc",
+    "dang": "tn"
+  },
+  "muc": [
+    {
+      "id": "67248ce9d2fec69f_ss1",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "thí nghiệm ống tia âm cực của j.j. thomson năm 1897 đã không chứng minh được điều nào sau đây?",
+      "pa": {
+        "A": "Electron có khối lượng tương đương khối lượng hạt nhân nguyên tử.",
+        "B": "Tia âm cực bị lệch về phía bản cực dương khi đặt trong điện trường ngoài.",
+        "C": "Electron mang điện tích âm.",
+        "D": "Electron là thành phần cấu tạo có trong nguyên tử của nhiều nguyên tố khác nhau."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss2",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "nhà khoa học r.a. millikan đã đo được chính xác điện tích hạt electron thông qua thí nghiệm nào?",
+      "pa": {
+        "A": "Nghiên cứu sự phóng điện qua ống tia âm cực ở áp suất thấp.",
+        "B": "Theo dõi chuyển động cân bằng của các giọt dầu tích điện trong điện trường giữa hai bản kim loại.",
+        "C": "Bắn hạt alpha vào lá vàng mỏng và ghi nhận góc lệch của hạt.",
+        "D": "Phân tích quang phổ phát xạ của nguyên tử hydrogen."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss3",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "điều nào sau đây mô tả đúng kết luận từ thí nghiệm bắn phá lá vàng của rutherford (1911)?",
+      "pa": {
+        "A": "Nguyên tử là một quả cầu đặc nhỏ tích điện dương, trong đó electron phân bố đều khắp.",
+        "B": "Các electron sắp xếp trên những quỹ đạo năng lượng xác định, không bức xạ khi chuyển động.",
+        "C": "Nguyên tử có hạt nhân rất nhỏ tích điện dương; phần lớn khối lượng tập trung ở hạt nhân, electron chuyển động xung quanh.",
+        "D": "Hạt nhân nguyên tử gồm proton và electron sắp xếp xen kẽ nhau tạo nên điện tích dương."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss4",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "nhà khoa học j. chadwick đã phát hiện ra hạt nơtron vào năm 1932 thông qua thí nghiệm nào?",
+      "pa": {
+        "A": "Phân tích quang phổ vạch phát xạ của nguyên tử hydrogen.",
+        "B": "Nghiên cứu sự phóng điện qua ống tia âm cực ở áp suất thấp.",
+        "C": "Quan sát chuyển động cân bằng của giọt dầu tích điện trong điện trường.",
+        "D": "Bắn hạt alpha vào hạt nhân berylli và phát hiện bức xạ trung hoà điện có khối lượng gần bằng proton."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss5",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "phát biểu nào sau đây về các nhà khoa học và đóng góp của họ trong nghiên cứu cấu tạo nguyên tử là đúng?",
+      "pa": {
+        "A": "J.J. Thomson phát hiện ra electron năm 1897 nhờ nghiên cứu tia âm cực trong ống phóng điện.",
+        "B": "E. Rutherford phát hiện ra hạt electron khi bắn hạt alpha vào lá vàng mỏng.",
+        "C": "N. Bohr xác định điện tích hạt electron bằng thí nghiệm giọt dầu trong điện trường.",
+        "D": "H. Becquerel đề xuất mô hình nguyên tử hành tinh sau khi phân tích quang phổ của hydrogen."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss6",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "phát biểu nào sau đây về lịch sử khám phá cấu tạo nguyên tử là sai?",
+      "pa": {
+        "A": "Becquerel phát hiện hiện tượng phóng xạ tự nhiên (1896) trước khi Thomson công bố phát hiện electron (1897).",
+        "B": "Mô hình hành tinh nguyên tử của Rutherford được xây dựng dựa trên kết quả thí nghiệm bắn phá lá vàng năm 1911.",
+        "C": "Thomson đề xuất mô hình nguyên tử có hạt nhân nhỏ tích điện dương nằm ở trung tâm, electron chuyển động xung quanh.",
+        "D": "Bohr giải thích thành công quang phổ vạch của hydrogen bằng mô hình nguyên tử với các quỹ đạo electron xác định (1913)."
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Neutron có khối lượng xấp xỉ proton; các phương án khác sai",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "D",
+  "lyDo": "Proton nằm trong hạt nhân; electron mới chuyển động tạo lớp vỏ",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "A",
+  "lyDo": "Electron mang điện âm",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "D",
+  "lyDo": "Hạt nhân gồm proton và neutron, không chứa electron",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "Lớp vỏ gồm các electron, mang điện âm",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "B",
+  "lyDo": "Khối lượng electron nhỏ hơn proton rất nhiều, nên B sai",
+  "chac": true
+ }
+]

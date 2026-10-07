@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "A",
+  "lyDo": "1 amu = 1,661.10^-27 kg.",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "C",
+  "lyDo": "1 amu = 1,661.10^-24 g.",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "B",
+  "lyDo": "1,661.10^-27 kg là 1 amu; electron 9,109.10^-31 kg, hạt α ≈ 4 amu, 1 mol C-12 là 12 g.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "1 amu = 1/12 khối lượng nguyên tử C-12.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "D",
+  "lyDo": "1 amu = 1,661.10^-27 kg, không phải 10^-24 kg.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "B",
+  "lyDo": "Proton ≈ 1 amu; electron ≈ 0,00055, hạt α ≈ 4, H2O ≈ 18 amu.",
+  "chac": true
+ }
+]

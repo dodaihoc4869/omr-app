@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "B",
+  "lyDo": "Hầu hết xuyên thẳng nên nguyên tử có phần lớn thể tích là khoảng trống; C sai",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "D",
+  "lyDo": "Hạt nhân rất nhỏ so với nguyên tử; B sai",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "C",
+  "lyDo": "Nếu đặc khít thì hầu hết hạt alpha bị cản/lệch",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "Lực đẩy tĩnh điện giữa alpha (+) và hạt nhân (+) khi lại gần",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "Hạt nhân chiếm thể tích rất nhỏ, kết luận này sai",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "D",
+  "lyDo": "Alpha đi qua vùng trống, không đến gần hạt nhân",
+  "chac": true
+ }
+]

@@ -1,0 +1,192 @@
+{
+ "qid": "10-C1-B1-I-21",
+ "bam": "eb8151c3d060f94a",
+ "songSinh": [
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Nguyên tử iron (sắt) có 26 electron ở vỏ nguyên tử. Biết điện tích của một proton là +1,6.10⁻¹⁹ C. Điện tích hạt nhân của nguyên tử iron là",
+   "pa": {
+    "A": "+16,25.10⁻¹⁹ C.",
+    "B": "+26.10⁻¹⁹ C.",
+    "C": "+41,6.10⁻¹⁹ C.",
+    "D": "+1,6.10⁻¹⁹ C."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Nguyên tử trung hoà về điện nên số proton = số electron = 26.",
+    "Điện tích hạt nhân = 26 × 1,6.10⁻¹⁹ = 41,6.10⁻¹⁹ C, mang dấu dương."
+   ],
+   "chot": "Điện tích hạt nhân = số proton × điện tích một proton, dấu dương.",
+   "phepTinh": [
+    {
+     "ten": "Điện tích hạt nhân (.10⁻¹⁹ C)",
+     "bieuThuc": "26*1.6",
+     "ketQua": 41.6,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "26 proton x 1,6.10^-19 = 41,6.10^-19 C",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Nguyên tử copper (đồng) có 29 electron ở vỏ nguyên tử. Biết điện tích của một proton là +1,6.10⁻¹⁹ C. Điện tích hạt nhân của nguyên tử copper là",
+   "pa": {
+    "A": "+29.10⁻¹⁹ C.",
+    "B": "+46,4.10⁻¹⁹ C.",
+    "C": "+18,1.10⁻¹⁹ C.",
+    "D": "+1,6.10⁻¹⁹ C."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Số proton = số electron = 29.",
+    "Điện tích hạt nhân = 29 × 1,6.10⁻¹⁹ = 46,4.10⁻¹⁹ C, dấu dương."
+   ],
+   "chot": "Hạt nhân chỉ mang điện dương, bằng số proton nhân điện tích một proton.",
+   "phepTinh": [
+    {
+     "ten": "Điện tích hạt nhân (.10⁻¹⁹ C)",
+     "bieuThuc": "29*1.6",
+     "ketQua": 46.4,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "29 x 1,6 = 46,4",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Nguyên tử silver (bạc) có 47 electron ở vỏ nguyên tử. Biết điện tích của một proton là +1,6.10⁻¹⁹ C. Điện tích hạt nhân của nguyên tử silver là",
+   "pa": {
+    "A": "+75,2.10⁻¹⁹ C.",
+    "B": "+29,4.10⁻¹⁹ C.",
+    "C": "+47.10⁻¹⁹ C.",
+    "D": "+1,6.10⁻¹⁹ C."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Số proton = số electron = 47.",
+    "Điện tích hạt nhân = 47 × 1,6.10⁻¹⁹ = 75,2.10⁻¹⁹ C, dấu dương."
+   ],
+   "chot": "Nhân số proton với điện tích một proton và giữ dấu dương.",
+   "phepTinh": [
+    {
+     "ten": "Điện tích hạt nhân (.10⁻¹⁹ C)",
+     "bieuThuc": "47*1.6",
+     "ketQua": 75.2,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "47 x 1,6 = 75,2",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Nguyên tử aluminium (nhôm) có 13 electron ở vỏ nguyên tử. Biết điện tích của một proton là +1,6.10⁻¹⁹ C. Điện tích hạt nhân của nguyên tử aluminium là",
+   "pa": {
+    "A": "+13.10⁻¹⁹ C.",
+    "B": "+8,1.10⁻¹⁹ C.",
+    "C": "+1,6.10⁻¹⁹ C.",
+    "D": "+20,8.10⁻¹⁹ C."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Số proton = số electron = 13.",
+    "Điện tích hạt nhân = 13 × 1,6.10⁻¹⁹ = 20,8.10⁻¹⁹ C, dấu dương."
+   ],
+   "chot": "Điện tích hạt nhân bằng tổng điện tích các proton, luôn dương.",
+   "phepTinh": [
+    {
+     "ten": "Điện tích hạt nhân (.10⁻¹⁹ C)",
+     "bieuThuc": "13*1.6",
+     "ketQua": 20.8,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "13 x 1,6 = 20,8",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Nguyên tử zinc (kẽm) có 30 electron ở vỏ nguyên tử. Biết điện tích của một proton là +1,6.10⁻¹⁹ C. Điện tích hạt nhân của nguyên tử zinc là",
+   "pa": {
+    "A": "+30.10⁻¹⁹ C.",
+    "B": "+18,75.10⁻¹⁹ C.",
+    "C": "+48,0.10⁻¹⁹ C.",
+    "D": "+1,6.10⁻¹⁹ C."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Số proton = số electron = 30.",
+    "Điện tích hạt nhân = 30 × 1,6.10⁻¹⁹ = 48,0.10⁻¹⁹ C, dấu dương."
+   ],
+   "chot": "Số electron ở vỏ cho biết số proton; nhân với điện tích một proton.",
+   "phepTinh": [
+    {
+     "ten": "Điện tích hạt nhân (.10⁻¹⁹ C)",
+     "bieuThuc": "30*1.6",
+     "ketQua": 48,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "30 x 1,6 = 48,0",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Nguyên tử lead (chì) có 82 electron ở vỏ nguyên tử. Biết điện tích của một proton là +1,6.10⁻¹⁹ C. Điện tích hạt nhân của nguyên tử lead là",
+   "pa": {
+    "A": "+82.10⁻¹⁹ C.",
+    "B": "+131,2.10⁻¹⁹ C.",
+    "C": "+51,25.10⁻¹⁹ C.",
+    "D": "+1,6.10⁻¹⁹ C."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Số proton = số electron = 82.",
+    "Điện tích hạt nhân = 82 × 1,6.10⁻¹⁹ = 131,2.10⁻¹⁹ C, dấu dương."
+   ],
+   "chot": "Điện tích hạt nhân = số proton × 1,6.10⁻¹⁹ C và mang dấu dương.",
+   "phepTinh": [
+    {
+     "ten": "Điện tích hạt nhân (.10⁻¹⁹ C)",
+     "bieuThuc": "82*1.6",
+     "ketQua": 131.2,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "82 x 1,6 = 131,2",
+    "chac": true
+   }
+  }
+ ]
+}

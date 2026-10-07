@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "A",
+  "lyDo": "Nguyên tử gồm hạt nhân và vỏ, phần lớn là khoảng rỗng; B, C, D sai (hạt nhân gồm proton, neutron; có 3 loại hạt cơ bản).",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "C",
+  "lyDo": "Electron nằm ở vỏ, không nằm trong hạt nhân.",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "B",
+  "lyDo": "Hạt nhân mang điện dương; A sai (electron không ở hạt nhân), C, D sai.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "D",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "Nguyên tử trung hòa vì số proton bằng số electron; A, B, D sai.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "Nguyên tử lớn hơn hạt nhân rất nhiều (~10^4–10^5 lần đường kính).",
+  "chac": true
+ }
+]

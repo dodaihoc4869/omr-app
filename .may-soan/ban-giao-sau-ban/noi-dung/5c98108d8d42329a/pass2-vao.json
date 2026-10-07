@@ -1,0 +1,45 @@
+{
+  "cau": {
+    "de": "",
+    "loai": "goc",
+    "dang": "tln"
+  },
+  "muc": [
+    {
+      "id": "5c98108d8d42329a_ss1",
+      "loai": "ban_khac",
+      "dang": "tln",
+      "de": "Cho các protein sau: insulin (có ở tuyến tụy); keratin (có ở tóc, móng); collagen (có ở da, sụn); myosin (có ở cơ bắp) và fibroin (có ở tơ tằm). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss2",
+      "loai": "ban_khac",
+      "dang": "tln",
+      "de": "Cho các protein sau: pepsin (có ở dạ dày); globulin (có ở máu); keratin (có ở tóc, móng); fibrin (có ở tơ huyết) và elastin (có ở mô liên kết). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss3",
+      "loai": "ban_khac",
+      "dang": "tln",
+      "de": "Cho các protein sau: albumin (có ở lòng trắng trứng); pepsin (có ở dạ dày); amylase (có ở tuyến nước bọt); keratin (có ở tóc, móng); fibrin (có ở tơ huyết) và collagen (có ở da, sụn). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss4",
+      "loai": "ban_khac",
+      "dang": "tln",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); insulin (có ở tuyến tụy); pepsin (có ở dạ dày); lipase (có ở ruột non); keratin (có ở tóc, móng) và myosin (có ở cơ bắp). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss5",
+      "loai": "ban_khac",
+      "dang": "tln",
+      "de": "Cho các protein sau: amylase (có ở tuyến nước bọt); insulin (có ở tuyến tụy); collagen (có ở da, sụn); fibroin (có ở tơ tằm) và elastin (có ở mô liên kết). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss6",
+      "loai": "ban_khac",
+      "dang": "tln",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); globulin (có ở máu); lipase (có ở ruột non); keratin (có ở tóc, móng); myosin (có ở cơ bắp) và fibrin (có ở tơ huyết). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    }
+  ]
+}

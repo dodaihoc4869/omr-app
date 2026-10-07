@@ -1,0 +1,110 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Phát biểu nào sau đây đúng?",
+  "pa": {
+   "A": "Nguyên tử có cấu trúc rỗng, gồm vỏ nguyên tử và hạt nhân nguyên tử.",
+   "B": "Hạt nhân nguyên tử cấu tạo bởi các hạt proton và electron.",
+   "C": "Vỏ nguyên tử được cấu tạo từ các hạt proton và neutron.",
+   "D": "Nguyên tử được cấu thành từ hai loại hạt cơ bản là proton và electron."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Nguyên tử gồm hạt nhân rất nhỏ ở tâm và vỏ electron bao quanh, phần lớn thể tích là khoảng trống.",
+   "Hạt nhân gồm proton và neutron; vỏ gồm electron; nguyên tử có ba loại hạt cơ bản."
+  ],
+  "chot": "Hạt nhân gồm proton và neutron, vỏ gồm electron, nguyên tử có cấu trúc rỗng."
+ },
+ {
+  "id": "ss2",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Phát biểu nào sau đây không đúng?",
+  "pa": {
+   "A": "Hạt nhân nằm ở tâm nguyên tử và mang điện tích dương.",
+   "B": "Vỏ nguyên tử gồm các electron chuyển động xung quanh hạt nhân.",
+   "C": "Trong nguyên tử, các electron nằm bên trong hạt nhân.",
+   "D": "Nguyên tử trung hòa về điện."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Hạt nhân chứa proton (dương) và neutron (không mang điện) nên mang điện dương.",
+   "Electron chuyển động ở vỏ, bên ngoài hạt nhân, nên ý C sai."
+  ],
+  "chot": "Electron ở vỏ nguyên tử, không nằm trong hạt nhân."
+ },
+ {
+  "id": "ss3",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Phát biểu nào sau đây đúng?",
+  "pa": {
+   "A": "Hạt nhân nguyên tử chứa các hạt electron và neutron.",
+   "B": "Hạt nhân nguyên tử mang điện tích dương.",
+   "C": "Nguyên tử mang điện tích dương.",
+   "D": "Vỏ nguyên tử mang điện tích dương."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Hạt nhân gồm proton mang điện dương và neutron không mang điện nên mang điện dương.",
+   "Vỏ chứa electron mang điện âm; nguyên tử trung hòa về điện."
+  ],
+  "chot": "Hạt nhân mang điện dương, vỏ mang điện âm, cả nguyên tử trung hòa."
+ },
+ {
+  "id": "ss4",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Phát biểu nào sau đây không đúng?",
+  "pa": {
+   "A": "Nguyên tử gồm hạt nhân và lớp vỏ electron.",
+   "B": "Proton và neutron nằm trong hạt nhân nguyên tử.",
+   "C": "Trong nguyên tử trung hòa, số proton bằng số electron.",
+   "D": "Hạt nhân nguyên tử chứa các hạt electron mang điện âm."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Hạt nhân chỉ chứa proton và neutron.",
+   "Electron mang điện âm nằm ở vỏ nguyên tử nên ý D sai."
+  ],
+  "chot": "Hạt nhân chỉ gồm proton và neutron, không có electron."
+ },
+ {
+  "id": "ss5",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Phát biểu nào sau đây đúng?",
+  "pa": {
+   "A": "Hạt nhân chiếm gần hết thể tích nguyên tử.",
+   "B": "Electron là hạt cấu tạo nên hạt nhân nguyên tử.",
+   "C": "Nguyên tử trung hòa về điện vì số proton bằng số electron.",
+   "D": "Neutron là hạt mang điện tích âm."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Proton mang điện dương, electron mang điện âm, độ lớn điện tích bằng nhau.",
+   "Số proton bằng số electron nên nguyên tử trung hòa về điện."
+  ],
+  "chot": "Nguyên tử trung hòa vì số proton bằng số electron."
+ },
+ {
+  "id": "ss6",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Phát biểu nào sau đây không đúng?",
+  "pa": {
+   "A": "Nguyên tử có kích thước xấp xỉ kích thước hạt nhân.",
+   "B": "Hạt nhân tập trung hầu hết khối lượng nguyên tử.",
+   "C": "Các electron chuyển động xung quanh hạt nhân.",
+   "D": "Hạt nhân nguyên tử được cấu tạo từ proton và neutron."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Kích thước nguyên tử cỡ 10^-10 m, hạt nhân cỡ 10^-14 m đến 10^-15 m.",
+   "Nguyên tử lớn hơn hạt nhân hàng chục nghìn lần nên ý A sai."
+  ],
+  "chot": "Kích thước nguyên tử lớn hơn kích thước hạt nhân rất nhiều lần."
+ }
+]

@@ -1,0 +1,40 @@
+{
+  "tra": [
+    {
+      "id": "5c98108d8d42329a_ss1",
+      "d": "1",
+      "lyDo": "Protein hình cầu tan trong nước: insulin (cầu ✓). Keratin (sợi ✗), collagen (sợi ✗), myosin (sợi ✗), fibroin (sợi ✗). → 1 protein.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss2",
+      "d": "2",
+      "lyDo": "Protein cầu tan trong nước: pepsin (cầu ✓), globulin (cầu ✓). Keratin (sợi ✗), fibrin (sợi ✗), elastin (sợi ✗). → 2 protein.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss3",
+      "d": "3",
+      "lyDo": "Protein cầu: albumin (cầu ✓), pepsin (cầu ✓), amylase (cầu ✓). Keratin (sợi ✗), fibrin (sợi ✗), collagen (sợi ✗). → 3 protein.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss4",
+      "d": "4",
+      "lyDo": "Protein cầu: hemoglobin (cầu ✓), insulin (cầu ✓), pepsin (cầu ✓), lipase (cầu ✓). Keratin (sợi ✗), myosin (sợi ✗). → 4 protein.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss5",
+      "d": "2",
+      "lyDo": "Protein cầu: amylase (cầu ✓), insulin (cầu ✓). Collagen (sợi ✗), fibroin (sợi ✗), elastin (sợi ✗). → 2 protein.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss6",
+      "d": "3",
+      "lyDo": "Protein cầu: hemoglobin (cầu ✓), globulin (cầu ✓), lipase (cầu ✓). Keratin (sợi ✗), myosin (sợi ✗), fibrin (sợi ✗). → 3 protein.",
+      "chac": true
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+ "qid": "10-C1-B1-I-3",
+ "bam": "fe25daf99d26cc88",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng của E. Rutherford (1911) dẫn đến phát hiện ra thành phần nào của nguyên tử?",
+   "pa": {
+    "A": "Electron.",
+    "B": "Neutron.",
+    "C": "Hạt nhân nguyên tử.",
+    "D": "Photon."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Phần lớn hạt α xuyên thẳng qua lá vàng, một số rất ít bị lệch hoặc bật ngược lại.",
+    "Điều đó chứng tỏ nguyên tử có một hạt nhân mang điện dương, rất nhỏ và nặng."
+   ],
+   "chot": "Hạt α bị bật ngược chứng tỏ có hạt nhân nhỏ, mang điện dương.",
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Thí nghiệm lá vàng của Rutherford phát hiện hạt nhân nguyên tử",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Hạt nào sau đây không mang điện?",
+   "pa": {
+    "A": "Neutron.",
+    "B": "Electron.",
+    "C": "Proton.",
+    "D": "Hạt nhân nguyên tử."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Electron mang điện tích âm, proton mang điện tích dương.",
+    "Hạt nhân chứa proton nên mang điện dương; neutron không mang điện."
+   ],
+   "chot": "Neutron là hạt duy nhất trong ba loại hạt cơ bản không mang điện.",
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "Neutron không mang điện",
+    "chac": true
+   }
+  }
+ ]
+}

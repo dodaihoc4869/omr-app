@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "A",
+  "lyDo": "1 Å = 10^-10 m; 1 pm = 10^-12 m.",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "D",
+  "lyDo": "1 Å = 10^-10 m = 100 pm, nên 1 Å = 10^-12 m là sai.",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "B",
+  "lyDo": "1 nm = 10^-9 m = 10 Å = 1000 pm.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "0,5 Å = 0,5.100 = 50 pm.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "120 pm = 1,2 Å.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "D",
+  "lyDo": "1 pm = 0,01 Å, không phải 100 Å.",
+  "chac": true
+ }
+]

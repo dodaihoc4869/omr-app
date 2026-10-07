@@ -1,0 +1,40 @@
+{
+  "tra": [
+    {
+      "id": "67248ce9d2fec69f_ss1",
+      "d": "A",
+      "lyDo": "Thomson 1897 chứng minh electron mang điện âm, bị lệch trong điện trường (B,C,D đúng). A sai: Thomson không đo được khối lượng electron so với hạt nhân; điều này được xác định sau đó và electron nhẹ hơn hạt nhân ~1800 lần.",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss2",
+      "d": "B",
+      "lyDo": "Millikan thí nghiệm giọt dầu (1909): giọt dầu tích điện lơ lửng trong điện trường giữa hai bản → đo điện tích electron = 1,6×10⁻¹⁹ C.",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss3",
+      "d": "C",
+      "lyDo": "Rutherford 1911: phần lớn hạt alpha xuyên qua, một số lệch lớn → hạt nhân nhỏ tích điện dương tập trung phần lớn khối lượng, electron chuyển động xung quanh.",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss4",
+      "d": "D",
+      "lyDo": "Chadwick 1932: bắn hạt α vào hạt nhân Be → phát ra bức xạ trung hoà điện, khối lượng ≈ proton → đó là nơtron.",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss5",
+      "d": "A",
+      "lyDo": "A đúng: Thomson phát hiện electron 1897 qua tia âm cực. B sai (Rutherford phát hiện hạt nhân, không phải electron). C sai (Millikan đo điện tích, không phải Bohr). D sai (Becquerel phóng xạ, không phải mô hình nguyên tử hành tinh).",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss6",
+      "d": "C",
+      "lyDo": "C sai: Thomson đề xuất mô hình bánh pudding (electron nhúng trong khối tích điện dương), không phải mô hình hành tinh. Mô hình hành tinh là của Rutherford (1911).",
+      "chac": true
+    }
+  ]
+}

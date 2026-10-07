@@ -1,0 +1,127 @@
+{
+  "qid": "10-C1-B1-I-1",
+  "bam": "67248ce9d2fec69f",
+  "songSinh": [
+    {
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "thí nghiệm ống tia âm cực của j.j. thomson năm 1897 đã không chứng minh được điều nào sau đây?",
+      "pa": {
+        "A": "Electron có khối lượng tương đương khối lượng hạt nhân nguyên tử.",
+        "B": "Tia âm cực bị lệch về phía bản cực dương khi đặt trong điện trường ngoài.",
+        "C": "Electron mang điện tích âm.",
+        "D": "Electron là thành phần cấu tạo có trong nguyên tử của nhiều nguyên tố khác nhau."
+      },
+      "dap_an": "A",
+      "buoc": [
+        "Xác định nội dung: câu hỏi hỏi điều Thomson không chứng minh được qua ống tia âm cực.",
+        "Liệt kê những gì Thomson đã chứng minh được: electron tích điện âm, bị lệch về cực dương, có trong nguyên tử nhiều nguyên tố.",
+        "Nhận ra phương án sai thực tế: Thomson đo được tỉ số e/m rất lớn, nghĩa là electron rất nhẹ so với hạt nhân, không hề tương đương."
+      ],
+      "chot": "Thí nghiệm ống tia âm cực của Thomson chứng minh electron tích điện âm nhưng không cho thấy electron có khối lượng ngang hạt nhân nguyên tử.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss1"
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "nhà khoa học r.a. millikan đã đo được chính xác điện tích hạt electron thông qua thí nghiệm nào?",
+      "pa": {
+        "A": "Nghiên cứu sự phóng điện qua ống tia âm cực ở áp suất thấp.",
+        "B": "Theo dõi chuyển động cân bằng của các giọt dầu tích điện trong điện trường giữa hai bản kim loại.",
+        "C": "Bắn hạt alpha vào lá vàng mỏng và ghi nhận góc lệch của hạt.",
+        "D": "Phân tích quang phổ phát xạ của nguyên tử hydrogen."
+      },
+      "dap_an": "B",
+      "buoc": [
+        "Nhận diện nhà khoa học: R.A. Millikan – nổi tiếng với thí nghiệm giọt dầu (1909).",
+        "Nguyên lý: cân bằng lực trọng trường và lực điện tác dụng lên giọt dầu tích điện để suy ra điện tích.",
+        "Loại các phương án sai: A (Thomson – ống âm cực), C (Rutherford – lá vàng), D (Bohr – quang phổ H)."
+      ],
+      "chot": "Millikan xác định chính xác điện tích electron (1909) bằng cách cân bằng giọt dầu tích điện trong điện trường.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss2"
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "doi_nhieu",
+      "de": "điều nào sau đây mô tả đúng kết luận từ thí nghiệm bắn phá lá vàng của rutherford (1911)?",
+      "pa": {
+        "A": "Nguyên tử là một quả cầu đặc nhỏ tích điện dương, trong đó electron phân bố đều khắp.",
+        "B": "Các electron sắp xếp trên những quỹ đạo năng lượng xác định, không bức xạ khi chuyển động.",
+        "C": "Nguyên tử có hạt nhân rất nhỏ tích điện dương; phần lớn khối lượng tập trung ở hạt nhân, electron chuyển động xung quanh.",
+        "D": "Hạt nhân nguyên tử gồm proton và electron sắp xếp xen kẽ nhau tạo nên điện tích dương."
+      },
+      "dap_an": "C",
+      "buoc": [
+        "Nhớ lại kết quả thí nghiệm: đa số hạt alpha xuyên thẳng, một số lệch nhỏ, rất ít hạt bật ngược lại.",
+        "Suy luận của Rutherford: nguyên tử chủ yếu là khoảng trống; tồn tại hạt nhân nhỏ, đặc, tích điện dương.",
+        "Đối chiếu từng phương án: A là mô hình Thomson (1904), B là mô hình Bohr (1913), D sai hoàn toàn; chỉ C khớp kết luận của Rutherford."
+      ],
+      "chot": "Thí nghiệm bắn phá lá vàng chứng minh nguyên tử có hạt nhân nhỏ đặc tích điện dương, electron chuyển động ở vùng không gian còn lại.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss3"
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "nhà khoa học j. chadwick đã phát hiện ra hạt nơtron vào năm 1932 thông qua thí nghiệm nào?",
+      "pa": {
+        "A": "Phân tích quang phổ vạch phát xạ của nguyên tử hydrogen.",
+        "B": "Nghiên cứu sự phóng điện qua ống tia âm cực ở áp suất thấp.",
+        "C": "Quan sát chuyển động cân bằng của giọt dầu tích điện trong điện trường.",
+        "D": "Bắn hạt alpha vào hạt nhân berylli và phát hiện bức xạ trung hoà điện có khối lượng gần bằng proton."
+      },
+      "dap_an": "D",
+      "buoc": [
+        "Nhận diện nhà khoa học: J. Chadwick – phát hiện nơtron năm 1932.",
+        "Nguyên lý thí nghiệm: hạt alpha bắn vào berylli → tạo ra bức xạ không bị lệch trong điện trường → không mang điện, khối lượng ≈ proton → đó là nơtron.",
+        "Loại các phương án sai: A (Bohr – quang phổ), B (Thomson – ống âm cực), C (Millikan – giọt dầu)."
+      ],
+      "chot": "Chadwick khám phá nơtron (1932) khi bắn hạt alpha vào hạt nhân berylli và nhận ra bức xạ thu được trung hoà điện, có khối lượng gần bằng proton.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss4"
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "dung_sai",
+      "de": "phát biểu nào sau đây về các nhà khoa học và đóng góp của họ trong nghiên cứu cấu tạo nguyên tử là đúng?",
+      "pa": {
+        "A": "J.J. Thomson phát hiện ra electron năm 1897 nhờ nghiên cứu tia âm cực trong ống phóng điện.",
+        "B": "E. Rutherford phát hiện ra hạt electron khi bắn hạt alpha vào lá vàng mỏng.",
+        "C": "N. Bohr xác định điện tích hạt electron bằng thí nghiệm giọt dầu trong điện trường.",
+        "D": "H. Becquerel đề xuất mô hình nguyên tử hành tinh sau khi phân tích quang phổ của hydrogen."
+      },
+      "dap_an": "A",
+      "buoc": [
+        "Kiểm tra từng phương án với kiến thức lịch sử: A – Thomson + ống tia âm cực → electron (đúng).",
+        "B sai: Rutherford thí nghiệm lá vàng để tìm ra hạt nhân, không phải electron. C sai: Millikan mới dùng giọt dầu, không phải Bohr. D sai: Becquerel phát hiện phóng xạ tự nhiên, không đề xuất mô hình hành tinh.",
+        "Chọn phương án duy nhất đúng."
+      ],
+      "chot": "Chỉ Thomson dùng ống tia âm cực tìm ra electron; các phương án còn lại gán nhầm thí nghiệm cho nhà khoa học khác.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss5"
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "phát biểu nào sau đây về lịch sử khám phá cấu tạo nguyên tử là sai?",
+      "pa": {
+        "A": "Becquerel phát hiện hiện tượng phóng xạ tự nhiên (1896) trước khi Thomson công bố phát hiện electron (1897).",
+        "B": "Mô hình hành tinh nguyên tử của Rutherford được xây dựng dựa trên kết quả thí nghiệm bắn phá lá vàng năm 1911.",
+        "C": "Thomson đề xuất mô hình nguyên tử có hạt nhân nhỏ tích điện dương nằm ở trung tâm, electron chuyển động xung quanh.",
+        "D": "Bohr giải thích thành công quang phổ vạch của hydrogen bằng mô hình nguyên tử với các quỹ đạo electron xác định (1913)."
+      },
+      "dap_an": "C",
+      "buoc": [
+        "Kiểm tra lần lượt từng phát biểu: A đúng (Becquerel 1896, Thomson 1897). B đúng (Rutherford 1911). D đúng (Bohr 1913).",
+        "Kiểm tra C: Thomson đề xuất mô hình bánh nho khô (1904) – electron nhúng trong khối cầu tích điện dương đều đặn, không có hạt nhân ở trung tâm.",
+        "Mô hình hạt nhân nhỏ ở trung tâm là của Rutherford (1911), không phải Thomson – vậy C là phát biểu sai."
+      ],
+      "chot": "Mô hình hạt nhân nhỏ ở trung tâm là của Rutherford (1911); Thomson chỉ đề xuất mô hình bánh nho khô năm 1904.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss6"
+    }
+  ],
+  "dang": "tn"
+}

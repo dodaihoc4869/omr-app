@@ -1,0 +1,108 @@
+{
+ "qid": "10-C1-B1-I-19",
+ "bam": "b3589bf4b84797ad",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Để đo kích thước nguyên tử, người ta thường dùng đơn vị picomet (pm) hay angstron (Å). Cách đổi đơn vị đúng là",
+   "pa": {
+    "A": "1 Å = 10⁻¹⁰ m.",
+    "B": "1 pm = 10⁻¹⁰ m.",
+    "C": "1 Å = 10 pm.",
+    "D": "1 pm = 1 Å."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "1 Å = 10⁻¹⁰ m và 1 pm = 10⁻¹² m.",
+    "Suy ra 1 Å = 100 pm."
+   ],
+   "chot": "1 Å = 10⁻¹⁰ m, 1 pm = 10⁻¹² m, 1 Å = 100 pm."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Để đo kích thước nguyên tử, người ta thường dùng đơn vị picomet (pm) hay angstron (Å). Cách đổi đơn vị không đúng là",
+   "pa": {
+    "A": "1 pm = 10⁻¹² m.",
+    "B": "1 Å = 100 pm.",
+    "C": "1 Å = 10⁻¹⁰ m.",
+    "D": "1 Å = 10⁻¹² m."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "1 pm = 10⁻¹² m và 1 Å = 10⁻¹⁰ m.",
+    "1 Å = 10⁻¹⁰ / 10⁻¹² = 100 pm; ý D lẫn Å với pm nên sai."
+   ],
+   "chot": "10⁻¹² m là picomet, 10⁻¹⁰ m mới là angstron."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Cách đổi đơn vị đúng là",
+   "pa": {
+    "A": "1 nm = 1 Å.",
+    "B": "1 nm = 10 Å.",
+    "C": "1 nm = 10⁻¹² m.",
+    "D": "1 nm = 100 pm."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "1 nm = 10⁻⁹ m và 1 Å = 10⁻¹⁰ m nên 1 nm = 10 Å.",
+    "1 nm = 1000 pm, không phải 100 pm."
+   ],
+   "chot": "1 nm = 10 Å = 1000 pm = 10⁻⁹ m."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Bán kính một nguyên tử là 0,5 Å. Giá trị đó tính theo pm là",
+   "pa": {
+    "A": "5 pm.",
+    "B": "50 pm.",
+    "C": "500 pm.",
+    "D": "0,05 pm."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "1 Å = 100 pm.",
+    "0,5 Å = 0,5 × 100 = 50 pm."
+   ],
+   "chot": "Từ Å sang pm nhân với 100."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Độ dài một liên kết là 120 pm. Giá trị nào sau đây bằng độ dài đó?",
+   "pa": {
+    "A": "12 nm.",
+    "B": "1,2 Å.",
+    "C": "120 mm.",
+    "D": "1,2 μm."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "1 Å = 100 pm nên 1 pm = 0,01 Å.",
+    "120 pm = 120 × 0,01 = 1,2 Å."
+   ],
+   "chot": "Từ pm sang Å chia cho 100."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Cách đổi đơn vị không đúng là",
+   "pa": {
+    "A": "1 Å = 100 pm.",
+    "B": "1 nm = 1000 pm.",
+    "C": "1 pm = 10⁻¹² m.",
+    "D": "1 pm = 100 Å."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "1 pm = 10⁻¹² m nhỏ hơn 1 Å = 10⁻¹⁰ m.",
+    "Vì vậy 1 Å = 100 pm, còn 1 pm = 0,01 Å; ý D sai."
+   ],
+   "chot": "pm nhỏ hơn Å 100 lần."
+  }
+ ]
+}

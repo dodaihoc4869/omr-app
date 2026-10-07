@@ -1,0 +1,110 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Electron được tìm ra năm 1897 khi nghiên cứu tia âm cực. Nhà bác học nào sau đây là người tìm ra electron?",
+  "pa": {
+   "A": "E. Rutherford.",
+   "B": "J.J. Thomson.",
+   "C": "J. Chadwick.",
+   "D": "Newton."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Thomson nghiên cứu tia âm cực năm 1897 và xác định đó là chùm hạt mang điện âm.",
+   "Các hạt này là electron."
+  ],
+  "chot": "Thomson tìm ra electron (1897)."
+ },
+ {
+  "id": "ss2",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Neutron được tìm ra năm 1932. Nhà bác học nào sau đây là người tìm ra neutron?",
+  "pa": {
+   "A": "J.J. Thomson.",
+   "B": "E. Rutherford.",
+   "C": "J. Chadwick.",
+   "D": "Newton."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Chadwick bắn hạt α vào beryllium năm 1932 và phát hiện hạt không mang điện.",
+   "Hạt đó là neutron."
+  ],
+  "chot": "Chadwick tìm ra neutron (1932)."
+ },
+ {
+  "id": "ss3",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng (1911) giúp tìm ra",
+  "pa": {
+   "A": "electron.",
+   "B": "neutron.",
+   "C": "hạt nhân nguyên tử.",
+   "D": "tia X."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Một số ít hạt α bị lệch hoặc bật ngược lại khi gặp lá vàng.",
+   "Điều đó chứng tỏ trong nguyên tử có hạt nhân rất nhỏ, mang điện dương."
+  ],
+  "chot": "Thí nghiệm lá vàng của Rutherford tìm ra hạt nhân nguyên tử."
+ },
+ {
+  "id": "ss4",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Trong thí nghiệm bắn hạt α vào lá vàng mỏng, phần lớn hạt α xuyên thẳng qua lá vàng. Điều đó chứng tỏ nguyên tử",
+  "pa": {
+   "A": "phần lớn là khoảng trống.",
+   "B": "có cấu trúc đặc khít.",
+   "C": "chỉ gồm các electron.",
+   "D": "mang điện tích dương."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Hạt α đi thẳng qua nên gặp rất ít vật cản trong nguyên tử.",
+   "Vậy phần lớn thể tích nguyên tử là khoảng trống, hạt nhân rất nhỏ."
+  ],
+  "chot": "Phần lớn hạt α đi thẳng ⇒ nguyên tử phần lớn là khoảng trống."
+ },
+ {
+  "id": "ss5",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Hạt α dùng để bắn phá lá vàng mỏng là hạt nhân của nguyên tố nào sau đây?",
+  "pa": {
+   "A": "Hydrogen.",
+   "B": "Lithium.",
+   "C": "Carbon.",
+   "D": "Helium."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Hạt α gồm 2 proton và 2 neutron.",
+   "Hạt nhân có 2 proton là hạt nhân helium."
+  ],
+  "chot": "Hạt α là hạt nhân helium."
+ },
+ {
+  "id": "ss6",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Trong thí nghiệm năm 1911 của Rutherford, chùm hạt nào được bắn vào lá vàng mỏng?",
+  "pa": {
+   "A": "Hạt α.",
+   "B": "Electron.",
+   "C": "Neutron.",
+   "D": "Proton."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Rutherford dùng chùm hạt α mang điện dương.",
+   "Quan sát sự lệch của chùm hạt này sau lá vàng để suy ra cấu tạo nguyên tử."
+  ],
+  "chot": "Thí nghiệm lá vàng dùng chùm hạt α."
+ }
+]

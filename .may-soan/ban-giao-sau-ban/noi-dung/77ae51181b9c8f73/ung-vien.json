@@ -1,0 +1,138 @@
+{
+ "qid": "10-C1-B1-I-24",
+ "bam": "77ae51181b9c8f73",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Trong thí nghiệm bắn phá lá vàng, rất ít hạt alpha bị bật ngược trở lại. Điều đó chứng tỏ trong nguyên tử có",
+   "pa": {
+    "A": "một vùng rỗng rất lớn chiếm gần hết thể tích.",
+    "B": "lớp vỏ electron mang điện tích dương.",
+    "C": "một phần tử mang điện dương, kích thước rất nhỏ nhưng khối lượng lớn.",
+    "D": "các electron đứng yên và đặc khít."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Hạt alpha mang điện dương bị bật ngược nghĩa là bị đẩy mạnh bởi điện tích cùng dấu.",
+    "Chỉ rất ít hạt bị bật ngược nên phần tử đó nhỏ, và phải có khối lượng lớn mới đẩy được hạt alpha trở lại."
+   ],
+   "chot": "Bật ngược cho thấy hạt nhân dương, nhỏ và nặng.",
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Hạt nhân mang điện dương, nhỏ, khối lượng lớn",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Vì sao chỉ rất ít hạt alpha bị bật ngược trở lại khi bắn vào lá vàng?",
+   "pa": {
+    "A": "Vì hạt nhân có kích thước rất nhỏ nên hiếm khi hạt alpha đi đến gần hạt nhân.",
+    "B": "Vì hạt nhân có kích thước rất lớn nên hạt alpha khó đi vào.",
+    "C": "Vì electron nhiều nên che chắn hạt nhân.",
+    "D": "Vì lá vàng rất dày nên hạt alpha bị giữ lại."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Hạt alpha chỉ bị bật ngược khi đến rất gần hạt nhân.",
+    "Hạt nhân nhỏ so với nguyên tử nên chỉ rất ít hạt alpha đến đủ gần."
+   ],
+   "chot": "Hạt nhân nhỏ nên bật ngược là hiếm.",
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "Hạt nhân rất nhỏ nên ít alpha đến gần",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây rút ra từ thí nghiệm bắn phá lá vàng của Rutherford là đúng?",
+   "pa": {
+    "A": "Hạt nhân nguyên tử mang điện tích âm.",
+    "B": "Electron chiếm phần lớn khối lượng nguyên tử.",
+    "C": "Nguyên tử là khối cầu đặc mang điện dương phân bố đều.",
+    "D": "Hạt nhân mang điện tích dương và tập trung gần hết khối lượng nguyên tử."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Hạt alpha dương bị đẩy ngược nên hạt nhân mang điện dương.",
+    "Hạt alpha bị bật ngược cần vật cản rất nặng nên hạt nhân tập trung gần hết khối lượng."
+   ],
+   "chot": "Hạt nhân: dương, nhỏ, chứa gần hết khối lượng.",
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Kết luận Rutherford: hạt nhân dương, tập trung gần hết khối lượng",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Hạt alpha bị bật ngược trở lại khi gần hạt nhân chủ yếu do lực nào?",
+   "pa": {
+    "A": "Lực hút giữa hạt alpha và hạt nhân.",
+    "B": "Lực đẩy tĩnh điện giữa hạt alpha và hạt nhân vì cùng mang điện dương.",
+    "C": "Lực hút của electron lên hạt alpha.",
+    "D": "Lực hấp dẫn giữa hạt alpha và lá vàng."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Hạt alpha và hạt nhân cùng mang điện dương.",
+    "Hai điện tích cùng dấu đẩy nhau, lực đẩy tĩnh điện đủ mạnh làm hạt alpha bật ngược."
+   ],
+   "chot": "Cùng dấu thì đẩy: alpha bị hạt nhân dương đẩy ngược.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Lực đẩy tĩnh điện cùng dấu dương",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Hạt alpha có khối lượng lớn mà vẫn bị bật ngược trở lại sau khi gần một hạt trong nguyên tử vàng. Điều này cho thấy hạt đó có khối lượng",
+   "pa": {
+    "A": "rất nhỏ, tương đương electron.",
+    "B": "không đáng kể.",
+    "C": "không liên quan đến việc bật ngược.",
+    "D": "rất lớn so với hạt alpha."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Vật nhẹ không thể đẩy ngược một vật nặng hơn nó.",
+    "Hạt alpha bị bật ngược nên hạt nhân phải rất nặng, chứa gần hết khối lượng nguyên tử."
+   ],
+   "chot": "Bật ngược chứng tỏ hạt nhân rất nặng.",
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Hạt đó có khối lượng rất lớn so với alpha",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Kết luận nào về điện tích và kích thước của hạt nhân được rút ra từ hiện tượng hạt alpha bật ngược?",
+   "pa": {
+    "A": "Mang điện tích âm, kích thước nhỏ.",
+    "B": "Mang điện tích dương, kích thước rất nhỏ so với nguyên tử.",
+    "C": "Mang điện tích dương, chiếm gần hết thể tích nguyên tử.",
+    "D": "Không mang điện, kích thước lớn."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Alpha dương bị đẩy ngược nên hạt nhân mang điện dương.",
+    "Chỉ rất ít hạt bật ngược nên hạt nhân rất nhỏ so với nguyên tử."
+   ],
+   "chot": "Hạt nhân mang điện dương và rất nhỏ.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Hạt nhân dương, rất nhỏ so với nguyên tử; C sai",
+    "chac": true
+   }
+  }
+ ]
+}

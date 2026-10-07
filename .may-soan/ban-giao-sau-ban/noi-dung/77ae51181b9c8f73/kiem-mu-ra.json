@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Hạt nhân mang điện dương, nhỏ, khối lượng lớn",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "A",
+  "lyDo": "Hạt nhân rất nhỏ nên ít alpha đến gần",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "Kết luận Rutherford: hạt nhân dương, tập trung gần hết khối lượng",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "Lực đẩy tĩnh điện cùng dấu dương",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "D",
+  "lyDo": "Hạt đó có khối lượng rất lớn so với alpha",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "B",
+  "lyDo": "Hạt nhân dương, rất nhỏ so với nguyên tử; C sai",
+  "chac": true
+ }
+]

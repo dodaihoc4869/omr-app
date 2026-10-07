@@ -1,0 +1,138 @@
+{
+ "qid": "10-C1-B1-I-13",
+ "bam": "23dfad2585b7702d",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây đúng khi nói về hạt neutron?",
+   "pa": {
+    "A": "Mang điện tích dương.",
+    "B": "Nằm ở lớp vỏ nguyên tử.",
+    "C": "Có khối lượng xấp xỉ khối lượng của hạt proton.",
+    "D": "Mang điện tích âm."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Neutron không mang điện và nằm trong hạt nhân.",
+    "Khối lượng neutron xấp xỉ 1 amu, gần bằng proton."
+   ],
+   "chot": "Neutron: trong hạt nhân, không mang điện, nặng như proton.",
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Neutron có khối lượng xấp xỉ proton; các phương án khác sai",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Phát biểu nào sau đây sai khi nói về hạt proton?",
+   "pa": {
+    "A": "Nằm trong hạt nhân nguyên tử.",
+    "B": "Mang điện tích +1.",
+    "C": "Có khối lượng xấp xỉ 1 amu.",
+    "D": "Chuyển động xung quanh hạt nhân tạo thành lớp vỏ."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Proton nằm trong hạt nhân, mang điện +1, nặng khoảng 1 amu.",
+    "Hạt chuyển động xung quanh hạt nhân là electron."
+   ],
+   "chot": "Electron mới chuyển động quanh hạt nhân.",
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Proton nằm trong hạt nhân; electron mới chuyển động tạo lớp vỏ",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Phát biểu nào sau đây đúng khi nói về hạt electron?",
+   "pa": {
+    "A": "Mang điện tích âm.",
+    "B": "Nằm trong hạt nhân nguyên tử.",
+    "C": "Có khối lượng xấp xỉ 1 amu.",
+    "D": "Không mang điện tích."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Electron mang điện tích −1 và nằm ở lớp vỏ.",
+    "Khối lượng của electron chỉ khoảng 0,00055 amu."
+   ],
+   "chot": "Electron mang điện âm, ở lớp vỏ.",
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "Electron mang điện âm",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Phát biểu nào sau đây sai khi nói về hạt nhân nguyên tử?",
+   "pa": {
+    "A": "Nằm ở tâm nguyên tử.",
+    "B": "Mang điện tích dương.",
+    "C": "Chứa gần như toàn bộ khối lượng nguyên tử.",
+    "D": "Chứa các hạt electron."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Hạt nhân nằm ở tâm, mang điện dương và chiếm gần hết khối lượng nguyên tử.",
+    "Electron chuyển động ở lớp vỏ, ngoài hạt nhân."
+   ],
+   "chot": "Hạt nhân không chứa electron.",
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Hạt nhân gồm proton và neutron, không chứa electron",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Phát biểu nào sau đây đúng khi nói về lớp vỏ nguyên tử?",
+   "pa": {
+    "A": "Gồm các hạt proton.",
+    "B": "Gồm các hạt electron.",
+    "C": "Gồm các hạt neutron.",
+    "D": "Mang điện tích dương."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Lớp vỏ do các electron chuyển động quanh hạt nhân tạo thành.",
+    "Electron mang điện âm nên lớp vỏ mang điện âm."
+   ],
+   "chot": "Lớp vỏ nguyên tử gồm các electron.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Lớp vỏ gồm các electron, mang điện âm",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Phát biểu nào sau đây sai khi nói về hạt electron?",
+   "pa": {
+    "A": "Mang điện tích −1.",
+    "B": "Có khối lượng xấp xỉ khối lượng của hạt proton.",
+    "C": "Chuyển động xung quanh hạt nhân.",
+    "D": "Có khối lượng nhỏ hơn rất nhiều so với hạt proton."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Electron mang điện −1 và chuyển động quanh hạt nhân.",
+    "Khối lượng electron nhỏ hơn proton khoảng hai nghìn lần nên B sai."
+   ],
+   "chot": "Electron nhẹ hơn proton rất nhiều.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Khối lượng electron nhỏ hơn proton rất nhiều, nên B sai",
+    "chac": true
+   }
+  }
+ ]
+}

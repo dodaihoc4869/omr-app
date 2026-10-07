@@ -1,47 +1,164 @@
 {
-  "tong_cau_kho_D1": 14828,
-  "cau_da_co_song_sinh": [
-    {
-      "qid": "10-C1-B1-I-1",
-      "bam": "67248ce9d2fec69f",
-      "phan": "I",
-      "dang": "tn",
-      "loai": "ly_thuyet",
-      "so_ban_khac": 6,
-      "so_y_moi": 0,
-      "kiem_2luot": "PASS"
-    },
-    {
-      "qid": "12-C3-B9-D2-I-43",
-      "bam": "54ede2e3b61a3ee5",
-      "phan": "I",
-      "dang": "tn",
-      "loai": "bai_tap",
-      "so_ban_khac": 6,
-      "so_y_moi": 0,
-      "kiem_2luot": "PASS"
-    },
-    {
-      "qid": "12-KT-C6-D5-II-4",
-      "bam": "2c8b26e16e0fef33",
-      "phan": "II",
-      "dang": "ds",
-      "loai": "bai_tap",
-      "so_ban_khac": 0,
-      "so_y_moi": 24,
-      "kiem_2luot": "PASS"
-    },
-    {
-      "qid": "12-C3-B10-D2-III-3",
-      "bam": "5c98108d8d42329a",
-      "phan": "III",
-      "dang": "tln",
-      "loai": "ly_thuyet",
-      "so_ban_khac": 6,
-      "so_y_moi": 0,
-      "kiem_2luot": "PASS"
-    }
-  ],
-  "phan_tram_phu": "0.0270%",
-  "ghi_chu_phu": "Gói mẫu 4/14.828 câu — pipeline đã chứng minh khả năng; cần chạy toàn bộ"
+ "10-C1-B1-I-14": {
+  "bam": "168098bfb3a037b4",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-13": {
+  "bam": "23dfad2585b7702d",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-23": {
+  "bam": "312396fc19d65df3",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-22": {
+  "bam": "3c91d1ad6918f6e5",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-17": {
+  "bam": "41ad7e27427ad327",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-11": {
+  "bam": "51dabb490a943801",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-16": {
+  "bam": "547f2a36fed81a4a",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-1": {
+  "bam": "67248ce9d2fec69f",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-20": {
+  "bam": "6d32e6a153f69a13",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-18": {
+  "bam": "72321533a5f8bf59",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-24": {
+  "bam": "77ae51181b9c8f73",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-10": {
+  "bam": "af63959aa4d5ac12",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-19": {
+  "bam": "b3589bf4b84797ad",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-12": {
+  "bam": "be0cc22108bf1da2",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-2": {
+  "bam": "cafd9b4a6ed05cff",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-21": {
+  "bam": "eb8151c3d060f94a",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-25": {
+  "bam": "ecf56515ca54fcfe",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-15": {
+  "bam": "fb2d75b4bc300f0c",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ }
 }

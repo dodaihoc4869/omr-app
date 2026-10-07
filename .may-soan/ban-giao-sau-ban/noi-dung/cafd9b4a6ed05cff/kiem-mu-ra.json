@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "B",
+  "lyDo": "J.J. Thomson tìm ra electron (1897).",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "C",
+  "lyDo": "J. Chadwick tìm ra neutron (1932).",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "C",
+  "lyDo": "Thí nghiệm Rutherford 1911 tìm ra hạt nhân nguyên tử.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "Phần lớn hạt α xuyên thẳng nên nguyên tử phần lớn là khoảng trống.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "D",
+  "lyDo": "Hạt α là hạt nhân helium (He2+).",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "Rutherford bắn chùm hạt α vào lá vàng.",
+  "chac": true
+ }
+]

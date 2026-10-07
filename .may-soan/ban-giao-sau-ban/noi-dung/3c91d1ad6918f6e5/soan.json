@@ -1,0 +1,108 @@
+{
+ "qid": "10-C1-B1-I-22",
+ "bam": "3c91d1ad6918f6e5",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Trong ống tia âm cực, hai bản điện cực đặt song song: bản trên mang điện dương, bản dưới mang điện âm. Chùm tia âm cực sẽ lệch về phía nào và vì sao?",
+   "pa": {
+    "A": "Lệch về bản dưới vì hạt tạo nên tia mang điện dương.",
+    "B": "Lệch về bản trên vì hạt tạo nên tia mang điện âm.",
+    "C": "Không lệch vì hạt tạo nên tia không mang điện.",
+    "D": "Lệch về bản dưới vì hạt tạo nên tia mang điện âm."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Tia âm cực là chùm electron, mang điện tích âm.",
+    "Điện tích trái dấu hút nhau nên chùm tia bị bản mang điện dương hút, tức lệch về bản trên."
+   ],
+   "chot": "Hạt mang điện âm bị hút về phía bản mang điện dương."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây về tia âm cực là đúng?",
+   "pa": {
+    "A": "Tia âm cực chỉ xuất hiện khi cathode làm bằng một kim loại nhất định.",
+    "B": "Tia âm cực là chùm hạt mang điện tích dương.",
+    "C": "Tia âm cực không bị lệch trong điện trường.",
+    "D": "Tia âm cực là chùm hạt electron chuyển động từ cathode sang anode."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Tia âm cực phát ra từ cathode và đi về phía anode.",
+    "Thomson xác định đó là chùm hạt mang điện tích âm (electron); tia bị lệch trong điện trường và không phụ thuộc kim loại làm cathode."
+   ],
+   "chot": "Tia âm cực là chùm electron đi từ cathode sang anode."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây không đúng khi nói về thí nghiệm của J.J. Thomson với ống tia âm cực?",
+   "pa": {
+    "A": "Tia âm cực là chùm hạt proton mang điện tích dương.",
+    "B": "Tia âm cực bị lệch khi đặt trong điện trường.",
+    "C": "Hạt tạo nên tia âm cực là electron.",
+    "D": "Tia âm cực bị lệch về phía bản cực dương."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Tia âm cực bị lệch về bản cực dương nên hạt tạo nên tia mang điện tích âm.",
+    "Hạt mang điện âm đó là electron, vậy nói tia âm cực là chùm proton mang điện dương là sai."
+   ],
+   "chot": "Tia âm cực mang điện âm nên không thể là proton."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Thí nghiệm về tia âm cực của J.J. Thomson dẫn đến việc phát hiện ra hạt nào trong nguyên tử?",
+   "pa": {
+    "A": "Proton.",
+    "B": "Neutron.",
+    "C": "Electron.",
+    "D": "Hạt nhân nguyên tử."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Tia âm cực bị lệch về bản cực dương nên gồm các hạt mang điện tích âm.",
+    "Hạt mang điện âm này được gọi là electron."
+   ],
+   "chot": "Thomson phát hiện electron nhờ tia âm cực."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Khi thay cathode của ống tia âm cực bằng một kim loại khác (ví dụ copper), tia âm cực thu được như thế nào?",
+   "pa": {
+    "A": "Biến thành chùm hạt mang điện tích dương.",
+    "B": "Vẫn là chùm electron, bản chất không thay đổi.",
+    "C": "Không còn xuất hiện tia âm cực.",
+    "D": "Trở thành chùm hạt không mang điện."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Electron có trong nguyên tử của mọi nguyên tố.",
+    "Vì vậy đổi kim loại làm cathode thì tia âm cực vẫn là chùm electron."
+   ],
+   "chot": "Tia âm cực là electron, không phụ thuộc vật liệu làm cathode."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Vì sao chùm tia âm cực bị lệch về phía bản cực dương khi đặt giữa hai bản điện cực?",
+   "pa": {
+    "A": "Vì hạt tạo nên tia mang điện dương và bị bản cực dương hút.",
+    "B": "Vì hạt tạo nên tia không mang điện và bị bản cực dương hút.",
+    "C": "Vì hạt tạo nên tia mang điện âm và bị bản cực âm hút.",
+    "D": "Vì hạt tạo nên tia mang điện âm và bị bản cực dương hút."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Hai điện tích trái dấu thì hút nhau, cùng dấu thì đẩy nhau.",
+    "Tia lệch về bản cực dương nên hạt tạo nên tia mang điện âm."
+   ],
+   "chot": "Lệch về bản dương nghĩa là hạt mang điện âm."
+  }
+ ]
+}

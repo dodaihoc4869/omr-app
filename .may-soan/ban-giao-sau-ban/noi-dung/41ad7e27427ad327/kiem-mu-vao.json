@@ -1,0 +1,110 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Thông tin nào sau đây sai?",
+  "pa": {
+   "A": "Proton mang điện tích dương, nằm trong hạt nhân.",
+   "B": "Neutron không mang điện, nằm trong hạt nhân.",
+   "C": "Electron mang điện tích âm, chuyển động ở vỏ nguyên tử.",
+   "D": "Neutron mang điện tích dương, nằm ở vỏ nguyên tử."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Neutron không mang điện và nằm trong hạt nhân.",
+   "Ý D sai cả về điện tích lẫn vị trí."
+  ],
+  "chot": "Proton (+) và neutron (không mang điện) ở hạt nhân, electron (−) ở vỏ."
+ },
+ {
+  "id": "ss2",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Thông tin nào sau đây đúng?",
+  "pa": {
+   "A": "Electron mang điện tích âm, nằm ở lớp vỏ nguyên tử.",
+   "B": "Proton không mang điện, nằm trong hạt nhân.",
+   "C": "Neutron mang điện tích âm, nằm trong hạt nhân.",
+   "D": "Proton mang điện tích dương, nằm ở lớp vỏ nguyên tử."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Electron mang điện âm và chuyển động trong vỏ nguyên tử.",
+   "Proton mang điện dương và nằm trong hạt nhân; neutron không mang điện."
+  ],
+  "chot": "Electron mang điện âm ở lớp vỏ."
+ },
+ {
+  "id": "ss3",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Thông tin nào sau đây sai?",
+  "pa": {
+   "A": "Proton mang điện tích dương, khối lượng gần bằng 1 amu.",
+   "B": "Neutron không mang điện, khối lượng gần bằng 1 amu.",
+   "C": "Electron mang điện tích âm, khối lượng gần bằng 1 amu.",
+   "D": "Nguyên tử trung hòa về điện."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Proton và neutron có khối lượng gần bằng 1 amu.",
+   "Electron có khối lượng gần bằng 0 amu nên ý C sai."
+  ],
+  "chot": "Chỉ proton và neutron có khối lượng gần 1 amu, electron gần 0 amu."
+ },
+ {
+  "id": "ss4",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Thông tin nào sau đây đúng?",
+  "pa": {
+   "A": "Hạt nhân nguyên tử mang điện tích âm.",
+   "B": "Hạt nhân nguyên tử gồm proton và neutron, mang điện tích dương.",
+   "C": "Electron nằm trong hạt nhân nguyên tử.",
+   "D": "Neutron mang điện tích dương."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Hạt nhân chứa proton (dương) và neutron (không mang điện).",
+   "Vì vậy hạt nhân mang điện dương, còn electron ở vỏ."
+  ],
+  "chot": "Hạt nhân gồm proton và neutron, mang điện dương."
+ },
+ {
+  "id": "ss5",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Thông tin nào sau đây sai?",
+  "pa": {
+   "A": "Điện tích của proton và electron có độ lớn bằng nhau, trái dấu.",
+   "B": "Neutron không mang điện.",
+   "C": "Nguyên tử có kích thước lớn hơn nhiều so với hạt nhân.",
+   "D": "Khối lượng của electron gần bằng khối lượng của proton."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Điện tích proton là +1, electron là −1 (đơn vị điện tích nguyên tố).",
+   "Electron nhẹ hơn proton khoảng 1837 lần nên ý D sai."
+  ],
+  "chot": "Khối lượng electron chỉ bằng khoảng 1/1837 khối lượng proton."
+ },
+ {
+  "id": "ss6",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Thông tin nào sau đây đúng?",
+  "pa": {
+   "A": "Proton mang điện tích âm, nằm trong hạt nhân.",
+   "B": "Electron mang điện tích dương, nằm ở vỏ nguyên tử.",
+   "C": "Neutron không mang điện, nằm trong hạt nhân.",
+   "D": "Electron có khối lượng gần bằng 1 amu."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Neutron là hạt không mang điện và nằm trong hạt nhân.",
+   "Proton mang điện dương, electron mang điện âm và có khối lượng gần bằng 0 amu."
+  ],
+  "chot": "Neutron không mang điện và nằm trong hạt nhân."
+ }
+]

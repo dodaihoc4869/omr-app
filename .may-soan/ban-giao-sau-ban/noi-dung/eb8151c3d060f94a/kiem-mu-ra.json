@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "26 proton x 1,6.10^-19 = 41,6.10^-19 C",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "B",
+  "lyDo": "29 x 1,6 = 46,4",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "A",
+  "lyDo": "47 x 1,6 = 75,2",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "D",
+  "lyDo": "13 x 1,6 = 20,8",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "30 x 1,6 = 48,0",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "B",
+  "lyDo": "82 x 1,6 = 131,2",
+  "chac": true
+ }
+]

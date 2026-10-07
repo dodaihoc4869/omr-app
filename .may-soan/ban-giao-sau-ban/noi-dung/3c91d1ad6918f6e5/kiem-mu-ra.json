@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "B",
+  "lyDo": "Tia mang điện âm bị hút về bản dương (bản trên)",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "D",
+  "lyDo": "Tia âm cực là chùm electron đi từ cathode sang anode; các phương án khác sai",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "A",
+  "lyDo": "Tia âm cực là chùm electron, không phải proton",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "C",
+  "lyDo": "Thomson phát hiện electron",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "Bản chất tia âm cực không phụ thuộc kim loại làm cathode",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "D",
+  "lyDo": "Hạt mang điện âm bị bản cực dương hút",
+  "chac": true
+ }
+]

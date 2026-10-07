@@ -1,0 +1,45 @@
+{
+ "banKhac": [
+  {
+   "de": "Năm 1897, J. J. Thomson đã phát hiện ra hạt nào khi nghiên cứu tia âm cực?",
+   "dap_an": "A",
+   "pa": {
+    "A": "Electron.",
+    "B": "Neutron.",
+    "C": "Proton.",
+    "D": "Hạt nhân nguyên tử."
+   }
+  },
+  {
+   "de": "Nhà khoa học nào đã phát hiện ra neutron vào năm 1932?",
+   "dap_an": "B",
+   "pa": {
+    "A": "J. J. Thomson.",
+    "B": "J. Chadwick.",
+    "C": "E. Rutherford.",
+    "D": "N. Bohr."
+   }
+  },
+  {
+   "de": "Phát biểu nào sau đây về neutron là sai?",
+   "dap_an": "C",
+   "pa": {
+    "A": "Neutron là hạt không mang điện.",
+    "B": "Neutron có mặt trong hạt nhân của hầu hết các nguyên tử.",
+    "C": "Neutron có khối lượng nhỏ hơn nhiều so với khối lượng proton.",
+    "D": "Neutron có khối lượng xấp xỉ khối lượng proton."
+   }
+  },
+  {
+   "de": "Năm 1932, J. Chadwick bắn phá Beryllium bằng các hạt α và phát hiện ra hạt nào sau đây?",
+   "dap_an": "D",
+   "pa": {
+    "A": "Electron.",
+    "B": "Proton.",
+    "C": "Hạt α.",
+    "D": "Neutron."
+   }
+  }
+ ],
+ "yDs": []
+}

@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Electron: m ≈ 0,00055 amu, q = −1",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "A",
+  "lyDo": "Proton: m ≈ 1 amu, q = +1",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "Electron có m ≈ 0,00055 amu và q = −1, nên D sai",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "Neutron: m ≈ 1 amu, không mang điện",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "Proton và neutron cùng khoảng 1 amu",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần",
+  "chac": true
+ }
+]

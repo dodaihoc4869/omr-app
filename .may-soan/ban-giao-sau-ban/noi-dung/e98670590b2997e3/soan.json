@@ -1,0 +1,162 @@
+{
+ "qid": "10-C1-B1-I-30",
+ "bam": "e98670590b2997e3",
+ "songSinh": [
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Khối lượng nguyên tử sodium (Na) là 38,1749.10⁻²⁷ kg.\nCho 1 amu = 1,6605.10⁻²⁷ kg.\nKhối lượng của sodium theo amu là",
+   "pa": {
+    "A": "63,39.10⁻⁵⁴.",
+    "B": "22,99.",
+    "C": "23,00.",
+    "D": "0,0435."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Khối lượng theo amu = 38,1749.10⁻²⁷ : 1,6605.10⁻²⁷.",
+    "= 22,99 amu."
+   ],
+   "chot": "Lấy khối lượng tính bằng kg chia cho giá trị 1 amu tính bằng kg.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng (amu)",
+     "bieuThuc": "38.1749/1.6605",
+     "ketQua": 22.99,
+     "lamTron": 2,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Khối lượng nguyên tử aluminium (Al) là 44,8003.10⁻²⁷ kg.\nCho 1 amu = 1,6605.10⁻²⁷ kg.\nKhối lượng của aluminium theo amu là",
+   "pa": {
+    "A": "74,39.10⁻⁵⁴.",
+    "B": "27,00.",
+    "C": "0,0371.",
+    "D": "26,98."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Khối lượng theo amu = 44,8003.10⁻²⁷ : 1,6605.10⁻²⁷.",
+    "= 26,98 amu."
+   ],
+   "chot": "Lấy khối lượng tính bằng kg chia cho giá trị 1 amu tính bằng kg.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng (amu)",
+     "bieuThuc": "44.8003/1.6605",
+     "ketQua": 26.98,
+     "lamTron": 2,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Khối lượng nguyên tử silicon (Si) là 46,6434.10⁻²⁷ kg.\nCho 1 amu = 1,6605.10⁻²⁷ kg.\nKhối lượng của silicon theo amu là",
+   "pa": {
+    "A": "28,09.",
+    "B": "77,45.10⁻⁵⁴.",
+    "C": "28,00.",
+    "D": "0,0356."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Khối lượng theo amu = 46,6434.10⁻²⁷ : 1,6605.10⁻²⁷.",
+    "= 28,09 amu."
+   ],
+   "chot": "Lấy khối lượng tính bằng kg chia cho giá trị 1 amu tính bằng kg.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng (amu)",
+     "bieuThuc": "46.6434/1.6605",
+     "ketQua": 28.09,
+     "lamTron": 2,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Khối lượng nguyên tử potassium (K) là 64,9256.10⁻²⁷ kg.\nCho 1 amu = 1,6605.10⁻²⁷ kg.\nKhối lượng của potassium theo amu là",
+   "pa": {
+    "A": "107,81.10⁻⁵⁴.",
+    "B": "39,00.",
+    "C": "39,10.",
+    "D": "0,0256."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Khối lượng theo amu = 64,9256.10⁻²⁷ : 1,6605.10⁻²⁷.",
+    "= 39,10 amu."
+   ],
+   "chot": "Lấy khối lượng tính bằng kg chia cho giá trị 1 amu tính bằng kg.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng (amu)",
+     "bieuThuc": "64.9256/1.6605",
+     "ketQua": 39.1,
+     "lamTron": 2,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Khối lượng nguyên tử calcium (Ca) là 66,5528.10⁻²⁷ kg.\nCho 1 amu = 1,6605.10⁻²⁷ kg.\nKhối lượng của calcium theo amu là",
+   "pa": {
+    "A": "110,51.10⁻⁵⁴.",
+    "B": "40,00.",
+    "C": "0,0249.",
+    "D": "40,08."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Khối lượng theo amu = 66,5528.10⁻²⁷ : 1,6605.10⁻²⁷.",
+    "= 40,08 amu."
+   ],
+   "chot": "Lấy khối lượng tính bằng kg chia cho giá trị 1 amu tính bằng kg.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng (amu)",
+     "bieuThuc": "66.5528/1.6605",
+     "ketQua": 40.08,
+     "lamTron": 2,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Khối lượng nguyên tử sulfur (S) là 53,2356.10⁻²⁷ kg.\nCho 1 amu = 1,6605.10⁻²⁷ kg.\nKhối lượng của sulfur theo amu là",
+   "pa": {
+    "A": "32,06.",
+    "B": "88,40.10⁻⁵⁴.",
+    "C": "32,00.",
+    "D": "0,0312."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Khối lượng theo amu = 53,2356.10⁻²⁷ : 1,6605.10⁻²⁷.",
+    "= 32,06 amu."
+   ],
+   "chot": "Lấy khối lượng tính bằng kg chia cho giá trị 1 amu tính bằng kg.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng (amu)",
+     "bieuThuc": "53.2356/1.6605",
+     "ketQua": 32.06,
+     "lamTron": 2,
+     "laDapSo": true
+    }
+   ]
+  }
+ ]
+}

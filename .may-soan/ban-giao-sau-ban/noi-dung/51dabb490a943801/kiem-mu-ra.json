@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "A",
+  "lyDo": "Neutron có điện tích 0, electron −1",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "C",
+  "lyDo": "Electron −1, proton +1",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "B",
+  "lyDo": "Proton +1 và electron −1 trái dấu",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "D",
+  "lyDo": "Neutron không mang điện",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "A",
+  "lyDo": "Electron có điện tích tương đối −1",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "C",
+  "lyDo": "Proton có điện tích tương đối +1",
+  "chac": true
+ }
+]

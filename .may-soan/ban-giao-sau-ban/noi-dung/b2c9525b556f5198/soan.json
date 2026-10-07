@@ -1,0 +1,168 @@
+{
+ "qid": "10-C1-B1-I-29",
+ "bam": "b2c9525b556f5198",
+ "songSinh": [
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Hạt nhân của một nguyên tử magnesium (Mg) có 12 proton và 12 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử magnesium là",
+   "pa": {
+    "A": "20,1.10⁻²⁷ kg.",
+    "B": "24,0.10⁻²⁷ kg.",
+    "C": "80,4.10⁻²⁷ kg.",
+    "D": "40,2.10⁻²⁷ kg."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Khối lượng proton: 12 × 1,673.10⁻²⁷ = 20,076.10⁻²⁷ kg.",
+    "Khối lượng neutron: 12 × 1,675.10⁻²⁷ = 20,1.10⁻²⁷ kg.",
+    "Tổng: 40,176.10⁻²⁷ ≈ 40,2.10⁻²⁷ kg."
+   ],
+   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
+     "bieuThuc": "12*1.673+12*1.675",
+     "ketQua": 40.2,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Hạt nhân của một nguyên tử aluminium (Al) có 13 proton và 14 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử aluminium là",
+   "pa": {
+    "A": "45,2.10⁻²⁷ kg.",
+    "B": "21,7.10⁻²⁷ kg.",
+    "C": "23,5.10⁻²⁷ kg.",
+    "D": "27,0.10⁻²⁷ kg."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Khối lượng proton: 13 × 1,673.10⁻²⁷ = 21,749.10⁻²⁷ kg.",
+    "Khối lượng neutron: 14 × 1,675.10⁻²⁷ = 23,45.10⁻²⁷ kg.",
+    "Tổng: 45,199.10⁻²⁷ ≈ 45,2.10⁻²⁷ kg."
+   ],
+   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
+     "bieuThuc": "13*1.673+14*1.675",
+     "ketQua": 45.2,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Hạt nhân của một nguyên tử potassium (K) có 19 proton và 20 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử potassium là",
+   "pa": {
+    "A": "31,8.10⁻²⁷ kg.",
+    "B": "33,5.10⁻²⁷ kg.",
+    "C": "65,3.10⁻²⁷ kg.",
+    "D": "39,0.10⁻²⁷ kg."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Khối lượng proton: 19 × 1,673.10⁻²⁷ = 31,787.10⁻²⁷ kg.",
+    "Khối lượng neutron: 20 × 1,675.10⁻²⁷ = 33,5.10⁻²⁷ kg.",
+    "Tổng: 65,287.10⁻²⁷ ≈ 65,3.10⁻²⁷ kg."
+   ],
+   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
+     "bieuThuc": "19*1.673+20*1.675",
+     "ketQua": 65.3,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Hạt nhân của một nguyên tử calcium (Ca) có 20 proton và 20 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử calcium là",
+   "pa": {
+    "A": "20,0.10⁻²⁷ kg.",
+    "B": "40,0.10⁻²⁷ kg.",
+    "C": "33,5.10⁻²⁷ kg.",
+    "D": "67,0.10⁻²⁷ kg."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Khối lượng proton: 20 × 1,673.10⁻²⁷ = 33,46.10⁻²⁷ kg.",
+    "Khối lượng neutron: 20 × 1,675.10⁻²⁷ = 33,5.10⁻²⁷ kg.",
+    "Tổng: 66,96.10⁻²⁷ ≈ 67,0.10⁻²⁷ kg."
+   ],
+   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
+     "bieuThuc": "20*1.673+20*1.675",
+     "ketQua": 67,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Hạt nhân của một nguyên tử chlorine (Cl) có 17 proton và 18 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử chlorine là",
+   "pa": {
+    "A": "28,4.10⁻²⁷ kg.",
+    "B": "58,6.10⁻²⁷ kg.",
+    "C": "35,0.10⁻²⁷ kg.",
+    "D": "18,0.10⁻²⁷ kg."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Khối lượng proton: 17 × 1,673.10⁻²⁷ = 28,441.10⁻²⁷ kg.",
+    "Khối lượng neutron: 18 × 1,675.10⁻²⁷ = 30,15.10⁻²⁷ kg.",
+    "Tổng: 58,591.10⁻²⁷ ≈ 58,6.10⁻²⁷ kg."
+   ],
+   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
+     "bieuThuc": "17*1.673+18*1.675",
+     "ketQua": 58.6,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Hạt nhân của một nguyên tử oxygen (O) có 8 proton và 8 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử oxygen là",
+   "pa": {
+    "A": "13,4.10⁻²⁷ kg.",
+    "B": "16,0.10⁻²⁷ kg.",
+    "C": "26,8.10⁻²⁷ kg.",
+    "D": "8,0.10⁻²⁷ kg."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Khối lượng proton: 8 × 1,673.10⁻²⁷ = 13,384.10⁻²⁷ kg.",
+    "Khối lượng neutron: 8 × 1,675.10⁻²⁷ = 13,4.10⁻²⁷ kg.",
+    "Tổng: 26,784.10⁻²⁷ ≈ 26,8.10⁻²⁷ kg."
+   ],
+   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
+   "phepTinh": [
+    {
+     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
+     "bieuThuc": "8*1.673+8*1.675",
+     "ketQua": 26.8,
+     "lamTron": 1,
+     "laDapSo": true
+    }
+   ]
+  }
+ ]
+}

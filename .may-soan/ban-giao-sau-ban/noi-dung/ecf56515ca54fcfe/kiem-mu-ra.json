@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "A",
+  "lyDo": "Nguyên tử trung hoà: số e = số p",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "Số khối = số proton + số neutron",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "Hạt nhân gồm proton và neutron, không chứa electron",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "Điện tích hạt nhân = +Z; O và N có Z khác nhau",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "Số electron bằng số proton, không phải số neutron",
+  "chac": true
+ }
+]

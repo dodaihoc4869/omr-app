@@ -1,0 +1,116 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Hạt nào sau đây bị lệch hướng trong trường điện?",
+  "pa": {
+   "A": "Neutron.",
+   "B": "Nguyên tử helium.",
+   "C": "Electron.",
+   "D": "Nguyên tử oxygen."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Hạt mang điện chịu lực của điện trường nên bị lệch.",
+   "Neutron và nguyên tử trung hoà không mang điện; electron mang điện âm."
+  ],
+  "chot": "Chỉ hạt mang điện mới bị lệch trong trường điện.",
+  "phepTinh": []
+ },
+ {
+  "id": "ss2",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Thành phần nào sau đây không bị lệch hướng trong trường điện?",
+  "pa": {
+   "A": "Electron.",
+   "B": "Neutron.",
+   "C": "Tia α.",
+   "D": "Proton."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Electron, proton và tia α đều mang điện nên bị lệch.",
+   "Neutron không mang điện nên không bị lệch."
+  ],
+  "chot": "Neutron không mang điện nên đi thẳng.",
+  "phepTinh": []
+ },
+ {
+  "id": "ss3",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Hạt nào sau đây bị lệch về phía bản cực dương trong điện trường?",
+  "pa": {
+   "A": "Tia âm cực.",
+   "B": "Tia α.",
+   "C": "Neutron.",
+   "D": "Proton."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Bản cực dương hút hạt mang điện âm.",
+   "Tia âm cực là chùm electron mang điện âm; tia α và proton mang điện dương, neutron không mang điện."
+  ],
+  "chot": "Hạt mang điện âm lệch về bản cực dương.",
+  "phepTinh": []
+ },
+ {
+  "id": "ss4",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Hạt nào sau đây bị lệch về phía bản cực âm trong điện trường?",
+  "pa": {
+   "A": "Neutron.",
+   "B": "Electron.",
+   "C": "Nguyên tử neon.",
+   "D": "Proton."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Bản cực âm hút hạt mang điện dương.",
+   "Proton mang điện dương; electron lệch phía ngược lại; neutron và nguyên tử neon không mang điện."
+  ],
+  "chot": "Hạt mang điện dương lệch về bản cực âm.",
+  "phepTinh": []
+ },
+ {
+  "id": "ss5",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Dãy gồm các hạt đều không bị lệch hướng trong trường điện là",
+  "pa": {
+   "A": "neutron, proton.",
+   "B": "electron, neutron.",
+   "C": "neutron, nguyên tử oxygen.",
+   "D": "proton, nguyên tử oxygen."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Neutron và nguyên tử oxygen đều không mang điện.",
+   "Proton và electron mang điện nên các dãy còn lại có hạt bị lệch."
+  ],
+  "chot": "Hạt không mang điện thì không bị lệch.",
+  "phepTinh": []
+ },
+ {
+  "id": "ss6",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Dãy gồm các hạt đều bị lệch hướng trong trường điện là",
+  "pa": {
+   "A": "electron, proton.",
+   "B": "neutron, proton.",
+   "C": "electron, nguyên tử hydrogen.",
+   "D": "neutron, nguyên tử hydrogen."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Electron và proton đều mang điện nên bị lệch.",
+   "Neutron và nguyên tử hydrogen không mang điện nên không bị lệch."
+  ],
+  "chot": "Dãy đúng chỉ gồm các hạt mang điện.",
+  "phepTinh": []
+ }
+]

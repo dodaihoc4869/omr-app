@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Electron mang điện nên bị lệch; neutron và nguyên tử trung hoà thì không",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "B",
+  "lyDo": "Neutron không mang điện nên không lệch",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "A",
+  "lyDo": "Tia âm cực là electron mang điện âm nên lệch về cực dương",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "D",
+  "lyDo": "Proton mang điện dương nên lệch về cực âm",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "Neutron và nguyên tử oxygen đều trung hoà nên không lệch",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "Electron và proton đều mang điện nên bị lệch",
+  "chac": true
+ }
+]
