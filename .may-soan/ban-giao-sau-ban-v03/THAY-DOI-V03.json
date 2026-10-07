@@ -1,0 +1,59 @@
+{
+  "phienBan": "0.3",
+  "taoLuc": "2026-10-07T03:43:54.114Z",
+  "phienSession": "e72dc258-9785-5f2f-9a07-8d16d3b02a30",
+  "thayDoiTuV02": [
+    {
+      "_id": "67248ce9d2fec69f_ss2",
+      "mo_ta": "Viết lại hoàn toàn: bỏ Millikan, hỏi kết luận Thomson không rút ra từ tia âm cực. Đáp B."
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss3",
+      "mo_ta": "Viết lại hoàn toàn: bỏ Rutherford, hỏi nhận xét SAI về tia âm cực. Đáp C."
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss4",
+      "mo_ta": "Viết lại hoàn toàn: bỏ Chadwick, hỏi phát biểu ĐÚNG về thí nghiệm Thomson. Đáp D."
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss6",
+      "mo_ta": "Sửa phương án B: tách biệt 1909 (thí nghiệm Geiger-Marsden) với 1911 (mô hình Rutherford công bố)."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss5",
+      "mo_ta": "Thay casein (insoluble theo Sigma C3400) bằng trypsin (enzim tuyến tụy, tan trong nước). Đáp=6 giữ nguyên."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y16",
+      "mo_ta": "Sửa t: viết rõ \"SO₃ hấp thụ vào H₂SO₄ đặc → oleum, sau đó pha loãng\" thay vì nhầm đặc=oleum."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y13",
+      "mo_ta": "Thêm Zn=65 g/mol, F=96500 C/mol vào phần t (học sinh nhìn thấy)."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y19",
+      "mo_ta": "Thêm Zn=65,S=32,O=16 g/mol vào t."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y20",
+      "mo_ta": "Thêm Zn=65,O=16 g/mol, C=1mol/L vào t."
+    },
+    {
+      "_id": "54ede2e3b61a3ee5_ss1..ss6",
+      "mo_ta": "buoc[0]: viết lại rõ ràng — \"Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide VÀ 2 COOH tự do\". ss6 thêm \"làm tròn 2 chữ số\" vào de."
+    }
+  ],
+  "checksum": {
+    "tn-I-soan-v03": "42c1a08ff1293abd",
+    "tn-I-ra-v03": "9342d8fe1e2c2929",
+    "tln-III-soan-v03": "c898e13c328b3b26",
+    "tln-III-ra-v03": "cd90074832af2baa",
+    "ds-II-soan-v03": "fd90cfee6656b21f",
+    "ds-II-ra-v03": "f198c465ac9b2ec7",
+    "bai-tap-soan-v03": "c9703a2bd5b61a89",
+    "bai-tap-ra-v03": "8029c9e603781fd1"
+  },
+  "gioiHan": "Chưa khai PASS toàn gói. Chưa nạp D1.",
+  "khongThayDoi": "Thomson ss1,ss5; Protein ss1,ss2,ss3,ss4,ss6; Zinc y1-y12,y14-y15,y17-y18,y21-y24; Gly đáp số (giữ nguyên)."
+}

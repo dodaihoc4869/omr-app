@@ -1,0 +1,91 @@
+{
+  "qid": "12-C3-B10-D2-III-3",
+  "bam": "5c98108d8d42329a",
+  "dang": "tln",
+  "songSinh": [
+    {
+      "_id": "5c98108d8d42329a_ss1",
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "Cho các protein sau: albumin (có ở lòng trắng trứng); keratin (có ở tóc, móng); collagen (có ở da, sụn); myosin (có ở cơ bắp) và fibroin (có ở tơ tằm). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?",
+      "dap_an": "1",
+      "buoc": [
+        "Albumin là protein hình cầu (globular) → tan trong nước tạo dung dịch keo. → 1 protein tan.",
+        "Keratin, collagen, myosin, fibroin đều là protein hình sợi (fibrous) → không tan trong nước.",
+        "Đếm số protein tan được: 1."
+      ],
+      "chot": "Trong 5 protein: chỉ albumin là protein cầu, tan trong nước. → 1.",
+      "phepTinh": []
+    },
+    {
+      "_id": "5c98108d8d42329a_ss2",
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); albumin (có ở lòng trắng trứng); pepsin (enzim tiêu hóa dạ dày); amylase (enzim tiêu hóa tinh bột); lipase (enzim tiêu hóa chất béo) và fibroin (có ở tơ tằm). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?",
+      "dap_an": "5",
+      "buoc": [
+        "Hemoglobin, albumin, pepsin, amylase, lipase là protein hình cầu → tan trong nước. → 5 protein tan.",
+        "Fibroin là protein hình sợi → không tan trong nước. → 1 protein không tan.",
+        "Đếm số protein tan được: 5."
+      ],
+      "chot": "Trong 6 protein: 5 protein cầu tan trong nước (hemoglobin, albumin, pepsin, amylase, lipase). → 5.",
+      "phepTinh": []
+    },
+    {
+      "_id": "5c98108d8d42329a_ss3",
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "Cho các protein sau: albumin (có ở lòng trắng trứng); pepsin (enzim tiêu hóa dạ dày); amylase (enzim tiêu hóa tinh bột); keratin (có ở tóc, móng); fibrin (có ở máu đông) và collagen (có ở da, sụn). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?",
+      "dap_an": "3",
+      "buoc": [
+        "Albumin, pepsin, amylase là protein hình cầu → tan trong nước. → 3 protein tan.",
+        "Keratin, fibrin, collagen là protein hình sợi → không tan trong nước. → 3 protein không tan.",
+        "Đếm số protein tan được: 3."
+      ],
+      "chot": "Trong 6 protein: albumin, pepsin, amylase tan trong nước; keratin, fibrin, collagen không tan. → 3.",
+      "phepTinh": []
+    },
+    {
+      "_id": "5c98108d8d42329a_ss4",
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); amylase (enzim tiêu hóa tinh bột); pepsin (enzim tiêu hóa dạ dày); lipase (enzim tiêu hóa chất béo); keratin (có ở tóc, móng) và myosin (có ở cơ bắp). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?",
+      "dap_an": "4",
+      "buoc": [
+        "Hemoglobin, amylase, pepsin, lipase là protein hình cầu → tan trong nước. → 4 protein tan.",
+        "Keratin, myosin là protein hình sợi → không tan trong nước. → 2 protein không tan.",
+        "Đếm số protein tan được: 4."
+      ],
+      "chot": "Trong 6 protein: hemoglobin, amylase, pepsin, lipase tan trong nước; keratin, myosin không tan. → 4.",
+      "phepTinh": []
+    },
+    {
+      "_id": "5c98108d8d42329a_ss5",
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); albumin (có ở lòng trắng trứng); pepsin (enzim tiêu hóa dạ dày); amylase (enzim tiêu hóa tinh bột); lipase (enzim tiêu hóa chất béo) và trypsin (enzim tiêu hóa protein ở tuyến tụy). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?",
+      "dap_an": "6",
+      "buoc": [
+        "Hemoglobin, albumin, pepsin, amylase, lipase là protein hình cầu → tan trong nước. → 5 protein tan.",
+        "Trypsin là enzim tiêu hóa protein do tuyến tụy tiết ra, là protein hình cầu → tan trong nước. → +1 protein tan.",
+        "Tổng cộng: 6 protein đều tan trong nước."
+      ],
+      "chot": "Cả 6 protein (hemoglobin, albumin, pepsin, amylase, lipase, trypsin) đều là protein hình cầu, tan trong nước tạo dung dịch keo. → 6.",
+      "phepTinh": []
+    },
+    {
+      "_id": "5c98108d8d42329a_ss6",
+      "kieu": "ly_thuyet",
+      "cach": "doi_chat",
+      "de": "Cho các protein sau: keratin (có ở tóc, móng); collagen (có ở da, sụn); myosin (có ở cơ bắp); fibrin (có ở máu đông); fibroin (có ở tơ tằm) và elastin (có ở mô liên kết). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?",
+      "dap_an": "0",
+      "buoc": [
+        "Keratin, collagen, myosin, fibrin, fibroin, elastin đều là protein hình sợi (fibrous).",
+        "Protein hình sợi không tan trong nước, không tạo dung dịch keo.",
+        "Đếm số protein tan được: 0."
+      ],
+      "chot": "Toàn bộ 6 protein đều là protein sợi, không protein nào tan trong nước. → 0.",
+      "phepTinh": []
+    }
+  ]
+}

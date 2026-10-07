@@ -1,0 +1,40 @@
+{
+  "tra": [
+    {
+      "id": "67248ce9d2fec69f_ss1",
+      "d": "A",
+      "lyDo": "Thomson 1897 chứng minh tia âm cực gồm các hạt mang điện âm (B,C,D đúng). A sai: Thomson không xác định khối lượng electron so với proton (điều đó được làm rõ sau đó; electron nhẹ hơn proton khoảng 1836 lần, không phải 1800 lần so với \"hạt nhân\" chung chung).",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss2",
+      "d": "B",
+      "lyDo": "Thomson đo tỉ lệ e/m của tia âm cực (không đo khối lượng tuyệt đối). B sai: khối lượng electron nhỏ hơn nguyên tử H khoảng 1836 lần — điều này không phải kết quả trực tiếp từ thí nghiệm tia âm cực, mà được xác định sau đó qua các nghiên cứu bổ sung. A, C, D là kết luận đúng được rút ra từ thí nghiệm Thomson.",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss3",
+      "d": "C",
+      "lyDo": "C sai: tia âm cực (dòng electron) bị lệch trong cả điện trường lẫn từ trường (lực Lorentz); không đi thẳng trong mọi điều kiện. A, B, D đều là nhận xét đúng từ thí nghiệm Thomson.",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss4",
+      "d": "D",
+      "lyDo": "D đúng: Thomson đo e/m với nhiều vật liệu cathode và nhiều loại khí → e/m không đổi → electron là hạt phổ quát. A sai (Millikan 1909 đo điện tích, không phải Thomson). B sai (không phụ thuộc khí). C sai (không phụ thuộc khí).",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss5",
+      "d": "A",
+      "lyDo": "A đúng: Thomson phát hiện electron 1897 qua tia âm cực. B sai (Rutherford phát hiện hạt nhân, không phải electron). C sai (Millikan đo điện tích, không phải Bohr). D sai (Becquerel phóng xạ, không phải mô hình nguyên tử hành tinh).",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss6",
+      "d": "C",
+      "lyDo": "C sai: mô hình Thomson (bánh pudding) không giải thích được tán xạ hạt alpha ở góc lớn, là bằng chứng dẫn đến mô hình hạt nhân Rutherford (1911). B đúng: Mô hình Rutherford công bố 1911 dựa trên thí nghiệm Geiger–Marsden 1909–1910.",
+      "chac": true
+    }
+  ]
+}

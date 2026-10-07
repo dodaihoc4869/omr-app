@@ -1,0 +1,54 @@
+{
+  "qid": "10-C1-B1-I-1",
+  "bam": "67248ce9d2fec69f",
+  "ma_de": "10-C1-B1",
+  "dang": "tn",
+  "lop": "10",
+  "bo": "NGUYEN_TU",
+  "json": {
+    "qid": "10-C1-B1-I-1",
+    "maDe": "10-C1-B1",
+    "version": "dd7addab3dbb7cae0fb42bdd9b1675fe",
+    "group": "7f9af8873932632b085074a2cfed63f7ecaab398d7bd4be2d0169ee68c4a7685",
+    "phan": "I",
+    "text": "Nhà khoa học J.J. Thomson đã phát hiện ra hạt electron thông qua hiện tượng (hoặc thí nghiệm) nào sau đây?",
+    "choices": [
+      "Phóng xạ tự nhiên.",
+      "Bắn phá lá vàng bằng hạt alpha.",
+      "Nghiên cứu sự phóng điện qua ống tia âm cực.",
+      "Phân tích quang phổ phát xạ của hydrogen."
+    ],
+    "ideas": [],
+    "hinhAnh": [],
+    "dang": "NGUYEN_TU.MO_HINH.NEU_HIEN_TUONG",
+    "tenDang": "Mô hình nguyên tử — nêu hiện tượng",
+    "mucDo": "biet",
+    "sao": 0,
+    "kienThuc": [],
+    "family": null,
+    "correct": "C",
+    "solution": {
+      "chot": "Thomson (1897) nghiên cứu sự phóng điện trong ống tia âm cực, thấy tia bị lệch về bản cực dương, từ đó tìm ra electron.",
+      "tungPa": {
+        "A": {
+          "dung": false,
+          "viSao": "Phóng xạ tự nhiên do Becquerel phát hiện, không phải thí nghiệm tìm ra electron."
+        },
+        "B": {
+          "dung": false,
+          "viSao": "Bắn phá lá vàng bằng hạt alpha là thí nghiệm của Rutherford tìm ra hạt nhân."
+        },
+        "C": {
+          "dung": true,
+          "viSao": "Thomson dùng ống tia âm cực, thấy tia lệch về bản cực dương nên gồm các hạt mang điện âm: electron."
+        },
+        "D": {
+          "dung": false,
+          "viSao": "Quang phổ phát xạ của hydrogen liên quan mô hình Bohr, không phải cách phát hiện electron."
+        }
+      },
+      "buoc": []
+    },
+    "reviewed": true
+  }
+}

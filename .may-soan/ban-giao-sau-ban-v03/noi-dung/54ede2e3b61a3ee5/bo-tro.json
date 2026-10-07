@@ -1,0 +1,240 @@
+{
+  "qid": "12-C3-B9-D2-I-43",
+  "bam": "54ede2e3b61a3ee5",
+  "ungVien": [
+    {
+      "kieu": "so",
+      "cach": "doi_so",
+      "de": "Thủy phân hoàn toàn 0,15 mol Gly-Ala-Glu cần vừa đủ 200 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "3,00.",
+        "B": "2,25.",
+        "C": "1,50.",
+        "D": "0,75."
+      },
+      "dap_an": "A",
+      "buoc": [
+        "Phân tích Gly-Ala-Glu nguyên vẹn: có 2 liên kết peptide (–CO–NH–) và 2 nhóm –COOH tự do (1 ở đầu C-terminal + 1 ở mạch bên của Glu). Tổng: n(KOH) = 2 (thủy phân liên kết) + 2 (trung hòa –COOH) = 4 × n(peptide).",
+        "n(KOH) = 4 × 0,15 = 0,60 mol",
+        "x = 0,60 / 0,2 = 3,00 M"
+      ],
+      "chot": "Gly-Ala-Glu: 2 lk peptide + 2 -COOH tự do (đầu C + Glu mạch bên) → n(KOH) = 4·n(peptide) = 2+2.",
+      "phepTinh": [
+        {
+          "ten": "n(KOH) (mol)",
+          "bieuThuc": "4*0.15",
+          "ketQua": 0.6,
+          "lamTron": 2
+        },
+        {
+          "ten": "x (M)",
+          "bieuThuc": "0.60/0.2",
+          "ketQua": 3,
+          "lamTron": 2,
+          "laDapSo": true
+        }
+      ],
+      "_id": "54ede2e3b61a3ee5_ss1",
+      "kiem": {
+        "d2": "A",
+        "lyDo2": "Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide và 2 -COOH tự do → n(KOH) = 4·n(peptide). Gly-Ala-Glu là tripeptide có 2 liên kết peptide. Glu có thêm 1 nhóm -COOH tự do. n(KOH) = (2+1+1)×0,15 = 4×0,15 = 0,6 mol. x = 0,6/0,2 = 3,00 M → A.",
+        "chac": true
+      }
+    },
+    {
+      "kieu": "so",
+      "cach": "doi_so",
+      "de": "Thủy phân hoàn toàn 0,2 mol Gly-Ala-Glu cần vừa đủ 250 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "2,40.",
+        "B": "3,20.",
+        "C": "1,60.",
+        "D": "0,80."
+      },
+      "dap_an": "B",
+      "buoc": [
+        "Phân tích Gly-Ala-Glu nguyên vẹn: có 2 liên kết peptide (–CO–NH–) và 2 nhóm –COOH tự do (1 ở đầu C-terminal + 1 ở mạch bên của Glu). Tổng: n(KOH) = 2 (thủy phân liên kết) + 2 (trung hòa –COOH) = 4 × n(peptide).",
+        "n(KOH) = 4 × 0,2 = 0,80 mol",
+        "x = 0,80 / 0,25 = 3,20 M"
+      ],
+      "chot": "Gly-Ala-Glu: 2 lk peptide + 2 -COOH tự do (đầu C + Glu mạch bên) → n(KOH) = 4·n(peptide) = 2+2.",
+      "phepTinh": [
+        {
+          "ten": "n(KOH) (mol)",
+          "bieuThuc": "4*0.2",
+          "ketQua": 0.8,
+          "lamTron": 2
+        },
+        {
+          "ten": "x (M)",
+          "bieuThuc": "0.80/0.25",
+          "ketQua": 3.2,
+          "lamTron": 2,
+          "laDapSo": true
+        }
+      ],
+      "_id": "54ede2e3b61a3ee5_ss2",
+      "kiem": {
+        "d2": "B",
+        "lyDo2": "Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide và 2 -COOH tự do → n(KOH) = 4·n(peptide). n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,2 = 0,8 mol. x = 0,8/0,25 = 3,20 M → B.",
+        "chac": true
+      }
+    },
+    {
+      "kieu": "so",
+      "cach": "doi_so",
+      "de": "Thủy phân hoàn toàn 0,5 mol Gly-Ala-Glu cần vừa đủ 200 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "7,50.",
+        "B": "5,00.",
+        "C": "10,00.",
+        "D": "2,50."
+      },
+      "dap_an": "C",
+      "buoc": [
+        "Phân tích Gly-Ala-Glu nguyên vẹn: có 2 liên kết peptide (–CO–NH–) và 2 nhóm –COOH tự do (1 ở đầu C-terminal + 1 ở mạch bên của Glu). Tổng: n(KOH) = 2 (thủy phân liên kết) + 2 (trung hòa –COOH) = 4 × n(peptide).",
+        "n(KOH) = 4 × 0,5 = 2,00 mol",
+        "x = 2,00 / 0,2 = 10,00 M"
+      ],
+      "chot": "Gly-Ala-Glu: 2 lk peptide + 2 -COOH tự do (đầu C + Glu mạch bên) → n(KOH) = 4·n(peptide) = 2+2.",
+      "phepTinh": [
+        {
+          "ten": "n(KOH) (mol)",
+          "bieuThuc": "4*0.5",
+          "ketQua": 2,
+          "lamTron": 2
+        },
+        {
+          "ten": "x (M)",
+          "bieuThuc": "2.00/0.2",
+          "ketQua": 10,
+          "lamTron": 2,
+          "laDapSo": true
+        }
+      ],
+      "_id": "54ede2e3b61a3ee5_ss3",
+      "kiem": {
+        "d2": "C",
+        "lyDo2": "Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide và 2 -COOH tự do → n(KOH) = 4·n(peptide). n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,5 = 2,0 mol. x = 2,0/0,2 = 10,00 M → C.",
+        "chac": true
+      }
+    },
+    {
+      "kieu": "so",
+      "cach": "doi_so",
+      "de": "Thủy phân hoàn toàn 0,1 mol Gly-Ala-Glu cần vừa đủ 400 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "0,75.",
+        "B": "0,50.",
+        "C": "0,25.",
+        "D": "1,00."
+      },
+      "dap_an": "D",
+      "buoc": [
+        "Phân tích Gly-Ala-Glu nguyên vẹn: có 2 liên kết peptide (–CO–NH–) và 2 nhóm –COOH tự do (1 ở đầu C-terminal + 1 ở mạch bên của Glu). Tổng: n(KOH) = 2 (thủy phân liên kết) + 2 (trung hòa –COOH) = 4 × n(peptide).",
+        "n(KOH) = 4 × 0,1 = 0,40 mol",
+        "x = 0,40 / 0,4 = 1,00 M"
+      ],
+      "chot": "Gly-Ala-Glu: 2 lk peptide + 2 -COOH tự do (đầu C + Glu mạch bên) → n(KOH) = 4·n(peptide) = 2+2.",
+      "phepTinh": [
+        {
+          "ten": "n(KOH) (mol)",
+          "bieuThuc": "4*0.1",
+          "ketQua": 0.4,
+          "lamTron": 2
+        },
+        {
+          "ten": "x (M)",
+          "bieuThuc": "0.40/0.4",
+          "ketQua": 1,
+          "lamTron": 2,
+          "laDapSo": true
+        }
+      ],
+      "_id": "54ede2e3b61a3ee5_ss4",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide và 2 -COOH tự do → n(KOH) = 4·n(peptide). n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,1 = 0,4 mol. x = 0,4/0,4 = 1,00 M → D.",
+        "chac": true
+      }
+    },
+    {
+      "kieu": "so",
+      "cach": "doi_so",
+      "de": "Thủy phân hoàn toàn 0,4 mol Gly-Ala-Glu cần vừa đủ 500 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "3,20.",
+        "B": "2,40.",
+        "C": "1,60.",
+        "D": "0,80."
+      },
+      "dap_an": "A",
+      "buoc": [
+        "Phân tích Gly-Ala-Glu nguyên vẹn: có 2 liên kết peptide (–CO–NH–) và 2 nhóm –COOH tự do (1 ở đầu C-terminal + 1 ở mạch bên của Glu). Tổng: n(KOH) = 2 (thủy phân liên kết) + 2 (trung hòa –COOH) = 4 × n(peptide).",
+        "n(KOH) = 4 × 0,4 = 1,60 mol",
+        "x = 1,60 / 0,5 = 3,20 M"
+      ],
+      "chot": "Gly-Ala-Glu: 2 lk peptide + 2 -COOH tự do (đầu C + Glu mạch bên) → n(KOH) = 4·n(peptide) = 2+2.",
+      "phepTinh": [
+        {
+          "ten": "n(KOH) (mol)",
+          "bieuThuc": "4*0.4",
+          "ketQua": 1.6,
+          "lamTron": 2
+        },
+        {
+          "ten": "x (M)",
+          "bieuThuc": "1.60/0.5",
+          "ketQua": 3.2,
+          "lamTron": 2,
+          "laDapSo": true
+        }
+      ],
+      "_id": "54ede2e3b61a3ee5_ss5",
+      "kiem": {
+        "d2": "A",
+        "lyDo2": "Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide và 2 -COOH tự do → n(KOH) = 4·n(peptide). n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,4 = 1,6 mol. x = 1,6/0,5 = 3,20 M → A.",
+        "chac": true
+      }
+    },
+    {
+      "kieu": "so",
+      "cach": "doi_so",
+      "de": "Thủy phân hoàn toàn 0,25 mol Gly-Ala-Glu cần vừa đủ 300 mL dung dịch KOH xM. Giá trị của x (làm tròn đến 2 chữ số thập phân) là",
+      "pa": {
+        "A": "2,50.",
+        "B": "3,33.",
+        "C": "1,67.",
+        "D": "0,83."
+      },
+      "dap_an": "B",
+      "buoc": [
+        "Phân tích Gly-Ala-Glu nguyên vẹn: có 2 liên kết peptide (–CO–NH–) và 2 nhóm –COOH tự do (1 ở đầu C-terminal + 1 ở mạch bên của Glu). Tổng: n(KOH) = 2 (thủy phân liên kết) + 2 (trung hòa –COOH) = 4 × n(peptide).",
+        "n(KOH) = 4 × 0,25 = 1,00 mol",
+        "x = 1,00 / 0,3 = 3,33 M"
+      ],
+      "chot": "Gly-Ala-Glu: 2 lk peptide + 2 -COOH tự do (đầu C + Glu mạch bên) → n(KOH) = 4·n(peptide) = 2+2.",
+      "phepTinh": [
+        {
+          "ten": "n(KOH) (mol)",
+          "bieuThuc": "4*0.25",
+          "ketQua": 1,
+          "lamTron": 2
+        },
+        {
+          "ten": "x (M)",
+          "bieuThuc": "1.00/0.3",
+          "ketQua": 3.33,
+          "lamTron": 2,
+          "laDapSo": true
+        }
+      ],
+      "_id": "54ede2e3b61a3ee5_ss6",
+      "kiem": {
+        "d2": "B",
+        "lyDo2": "Gly-Ala-Glu nguyên vẹn có 2 liên kết peptide và 2 -COOH tự do → n(KOH) = 4·n(peptide). n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,25 = 1,0 mol. x = 1,0/0,3 ≈ 3,33 M → B. Làm tròn 2 chữ số: x ≈ 3,33 M.",
+        "chac": true
+      }
+    }
+  ]
+}
