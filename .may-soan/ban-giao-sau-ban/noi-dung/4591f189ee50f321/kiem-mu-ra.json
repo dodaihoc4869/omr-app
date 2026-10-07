@@ -8,7 +8,7 @@
  {
   "id": "ss2",
   "d": "B",
-  "lyDo": "Lớp vỏ nguyên tử chỉ chứa electron.",
+  "lyDo": "Lớp vỏ chỉ chứa electron.",
   "chac": true
  },
  {
@@ -20,7 +20,7 @@
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "Lớp vỏ chỉ chứa electron mang điện âm; proton và neutron ở hạt nhân.",
+  "lyDo": "Lớp vỏ chỉ có electron mang điện âm; B, C, D đều sai.",
   "chac": true
  },
  {
@@ -32,7 +32,7 @@
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
+  "lyDo": "Hạt nhân gồm proton và neutron, không chứa electron nên D không đúng.",
   "chac": true
  }
 ]

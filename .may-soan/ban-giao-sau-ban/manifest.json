@@ -1,13 +1,13 @@
 {
  "phienBan": "0.1",
- "luc": "2026-10-07T10:49:43.182Z",
+ "luc": "2026-10-07T10:59:45.537Z",
  "nguon": "https://omr.ttadodaihoc.workers.dev",
  "ghi_chu": "Ứng viên đã tự kiểm hai lượt AI. Chưa được Codex kiểm độc lập. Chưa nạp D1.",
- "so_bam": 39,
+ "so_bam": 36,
  "thong_ke": {
   "tong": 36,
-  "duSauBangChung": 30,
-  "motPhan": 6,
+  "duSauBangChung": 29,
+  "motPhan": 7,
   "chuaCo": 0
  },
  "checkpoint": {

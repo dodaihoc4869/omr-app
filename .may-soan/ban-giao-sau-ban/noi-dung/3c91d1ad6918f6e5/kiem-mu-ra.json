@@ -2,19 +2,19 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Hạt electron mang điện âm bị bản dương (bản trên) hút nên lệch lên trên.",
+  "lyDo": "Tia âm cực là chùm electron (âm) nên bị hút về bản dương (bản trên).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai (điện âm), C sai (bị lệch).",
+  "lyDo": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai, C sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Tia âm cực là chùm electron mang điện âm, không phải proton; B, C, D đều đúng.",
+  "lyDo": "Tia âm cực là chùm electron mang điện âm, không phải proton; B, C, D đúng.",
   "chac": true
  },
  {
@@ -26,13 +26,13 @@
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "Tia âm cực luôn là chùm electron, không phụ thuộc vật liệu cathode.",
+  "lyDo": "Bản chất tia là electron, không phụ thuộc kim loại làm cathode.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Hạt mang điện âm bị bản cực dương hút nên lệch về phía đó.",
+  "lyDo": "Hạt mang điện âm nên bị bản cực dương hút.",
   "chac": true
  }
 ]

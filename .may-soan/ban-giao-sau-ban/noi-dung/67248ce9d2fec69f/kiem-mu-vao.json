@@ -2,12 +2,12 @@
  {
   "id": "ss1",
   "loai": "ban_khac",
-  "de": "Thí nghiệm bắn phá lá vàng mỏng bằng hạt alpha của Rutherford giúp phát hiện ra thành phần nào của nguyên tử?",
+  "de": "Tia âm cực trong thí nghiệm ống phóng điện bị lệch về phía cực dương khi đặt trong điện trường. Điều này chứng tỏ tia âm cực mang điện tích gì?",
   "pa": {
-   "A": "Electron.",
-   "B": "Hạt nhân nguyên tử.",
-   "C": "Neutron.",
-   "D": "Lớp vỏ electron."
+   "A": "Điện tích dương.",
+   "B": "Điện tích âm.",
+   "C": "Không mang điện.",
+   "D": "Vừa dương vừa âm."
   }
  },
  {
@@ -35,12 +35,12 @@
  {
   "id": "ss4",
   "loai": "ban_khac",
-  "de": "Nhà khoa học nào đã phát hiện ra hạt nhân nguyên tử thông qua thí nghiệm bắn phá lá vàng bằng hạt alpha?",
+  "de": "Khi dùng các kim loại khác nhau làm catode trong ống phóng điện, tỉ số điện tích/khối lượng (e/m) của tia âm cực không thay đổi. J.J. Thomson kết luận điều gì từ kết quả này?",
   "pa": {
-   "A": "J.J. Thomson.",
-   "B": "J. Dalton.",
-   "C": "J. Chadwick.",
-   "D": "E. Rutherford."
+   "A": "Mỗi kim loại có electron đặc trưng riêng.",
+   "B": "Electron là hạt có trong tất cả các nguyên tử.",
+   "C": "Khối lượng nguyên tử không phụ thuộc kim loại.",
+   "D": "Điện tích hạt nhân bằng nhau ở mọi kim loại."
   }
  },
  {
@@ -57,11 +57,11 @@
  {
   "id": "ss6",
   "loai": "ban_khac",
-  "de": "Thí nghiệm của J. Chadwick (1932) phát hiện ra hạt nào sau đây?",
+  "de": "Trong ống phóng điện, tia âm cực truyền thẳng khi không có điện trường và từ trường. Khi bật điện trường, tia bị lệch. Hạt tạo nên tia âm cực được J.J. Thomson đặt tên là gì?",
   "pa": {
-   "A": "Electron.",
-   "B": "Proton.",
-   "C": "Neutron.",
+   "A": "Proton.",
+   "B": "Neutron.",
+   "C": "Electron.",
    "D": "Hạt nhân nguyên tử."
   }
  }

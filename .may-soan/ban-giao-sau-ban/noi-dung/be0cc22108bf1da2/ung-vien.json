@@ -108,7 +108,7 @@
    "chot": "Proton và neutron nặng xấp xỉ nhau.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Proton và neutron đều ≈ 1 amu.",
+    "lyDo2": "Proton và neutron cùng m ≈ 1 amu.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Electron nhẹ hơn proton rất nhiều.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Electron nhỏ hơn proton khoảng 1840 lần.",
+    "lyDo2": "Khối lượng electron ≈ 1/1836 khối lượng proton, nhỏ hơn rất nhiều.",
     "chac": true
    }
   }

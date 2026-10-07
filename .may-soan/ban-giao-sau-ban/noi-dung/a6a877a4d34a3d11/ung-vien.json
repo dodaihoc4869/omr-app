@@ -36,14 +36,14 @@
    ],
    "kiem": {
     "d2": "A",
-    "lyDo2": "n = 0,35·40 = 14; p + e = 26 nên Z = 13",
+    "lyDo2": "n = 0,35*40 = 14; 2Z = 40-14 = 26 nên Z = 13",
     "chac": true
    }
   },
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Oxygen cần cho sự hô hấp của người và động vật.\nBiết nguyên tử oxygen có tổng số hạt là 24 trong đó số hạt không mang điện chiếm 33,33%.\nSố đơn vị điện tích hạt nhân của nguyên tử oxygen là",
+   "de": "Oxygen cần cho sự hô hấp của người và động vật.\nBiết nguyên tử oxygen có tổng số hạt là 24 trong đó số hạt không mang điện chiếm xấp xỉ 33,33%.\nSố đơn vị điện tích hạt nhân của nguyên tử oxygen là",
    "pa": {
     "A": "16.",
     "B": "8.",
@@ -74,14 +74,14 @@
    ],
    "kiem": {
     "d2": "B",
-    "lyDo2": "n = 0,3333·24 = 8; p + e = 16 nên Z = 8",
+    "lyDo2": "n = 24/3 = 8; 2Z = 16 nên Z = 8",
     "chac": true
    }
   },
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Phosphorus có trong phân bón và trong xương, răng.\nBiết nguyên tử phosphorus có tổng số hạt là 46 trong đó số hạt không mang điện chiếm 34,78%.\nSố đơn vị điện tích hạt nhân của nguyên tử phosphorus là",
+   "de": "Phosphorus có trong phân bón và trong xương, răng.\nBiết nguyên tử phosphorus có tổng số hạt là 46 trong đó số hạt không mang điện chiếm xấp xỉ 34,78%.\nSố đơn vị điện tích hạt nhân của nguyên tử phosphorus là",
    "pa": {
     "A": "16.",
     "B": "30.",
@@ -112,14 +112,14 @@
    ],
    "kiem": {
     "d2": "C",
-    "lyDo2": "n = 0,3478·46 = 16; p + e = 30 nên Z = 15",
+    "lyDo2": "n = 0,3478*46 = 16; 2Z = 30 nên Z = 15",
     "chac": true
    }
   },
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Iron là thành phần của hemoglobin trong máu.\nBiết nguyên tử iron có tổng số hạt là 82 trong đó số hạt không mang điện chiếm 36,59%.\nSố đơn vị điện tích hạt nhân của nguyên tử iron là",
+   "de": "Iron là thành phần của hemoglobin trong máu.\nBiết nguyên tử iron có tổng số hạt là 82 trong đó số hạt không mang điện chiếm xấp xỉ 36,59%.\nSố đơn vị điện tích hạt nhân của nguyên tử iron là",
    "pa": {
     "A": "30.",
     "B": "52.",
@@ -150,7 +150,7 @@
    ],
    "kiem": {
     "d2": "D",
-    "lyDo2": "n = 0,3659·82 = 30; p + e = 52 nên Z = 26",
+    "lyDo2": "n = 0,3659*82 = 30; 2Z = 52 nên Z = 26",
     "chac": true
    }
   }

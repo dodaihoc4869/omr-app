@@ -8,31 +8,31 @@
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Nguyên tử trung hoà về điện; neutron không mang điện nên D sai.",
+  "lyDo": "Nguyên tử trung hoà về điện; các phương án khác sai (có neutron không mang điện).",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Hạt nhân gồm proton và neutron nên mang điện dương, A sai.",
+  "lyDo": "Hạt nhân mang điện tích dương nên A sai; B, C, D đúng.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Điện tích hạt nhân bị điện tích electron trung hoà nên nguyên tử không mang điện.",
+  "lyDo": "Tổng điện tích proton bằng tổng điện tích electron nên nguyên tử không mang điện.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Nguyên tử trung hoà nên số electron bằng số proton = 11.",
+  "lyDo": "Nguyên tử trung hoà: số electron = số proton = 11.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Mất electron thì số proton lớn hơn số electron nên thành ion dương.",
+  "lyDo": "Mất electron (âm) thì dư điện tích dương, thành ion dương.",
   "chac": true
  }
 ]

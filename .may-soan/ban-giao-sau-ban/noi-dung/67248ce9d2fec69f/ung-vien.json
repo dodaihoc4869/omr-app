@@ -4,28 +4,6 @@
  "songSinh": [
   {
    "kieu": "ly_thuyet",
-   "cach": "doi_nhieu",
-   "de": "Thí nghiệm bắn phá lá vàng mỏng bằng hạt alpha của Rutherford giúp phát hiện ra thành phần nào của nguyên tử?",
-   "pa": {
-    "A": "Electron.",
-    "B": "Hạt nhân nguyên tử.",
-    "C": "Neutron.",
-    "D": "Lớp vỏ electron."
-   },
-   "dap_an": "B",
-   "buoc": [
-    "Hầu hết hạt alpha xuyên thẳng qua lá vàng, một số ít bị bật ngược lại.",
-    "Điều đó chứng tỏ nguyên tử có phần mang điện dương, nhỏ và đặc ở tâm: hạt nhân."
-   ],
-   "chot": "Lá vàng bị hạt alpha bắn phá cho thấy hạt nhân nguyên tử.",
-   "kiem": {
-    "d2": "B",
-    "lyDo2": "Rutherford bắn hạt alpha vào lá vàng, phát hiện hạt nhân nguyên tử.",
-    "chac": true
-   }
-  },
-  {
-   "kieu": "ly_thuyet",
    "cach": "dung_sai",
    "de": "Phát biểu nào sau đây đúng về tia âm cực?",
    "pa": {
@@ -42,7 +20,7 @@
    "chot": "Tia âm cực là chùm electron.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Tia âm cực là chùm electron đi từ cực âm sang cực dương, bị lệch về phía bản dương.",
+    "lyDo2": "Tia âm cực là chùm electron mang điện âm, đi từ cực âm sang cực dương, bị lệch trong điện trường.",
     "chac": true
    }
   },
@@ -64,29 +42,7 @@
    "chot": "Hạt mang điện âm lệch về phía bản cực dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Chùm electron mang điện âm nên lệch về phía bản cực dương.",
-    "chac": true
-   }
-  },
-  {
-   "kieu": "ly_thuyet",
-   "cach": "doi_chat",
-   "de": "Nhà khoa học nào đã phát hiện ra hạt nhân nguyên tử thông qua thí nghiệm bắn phá lá vàng bằng hạt alpha?",
-   "pa": {
-    "A": "J.J. Thomson.",
-    "B": "J. Dalton.",
-    "C": "J. Chadwick.",
-    "D": "E. Rutherford."
-   },
-   "dap_an": "D",
-   "buoc": [
-    "Thí nghiệm bắn phá lá vàng bằng hạt alpha do Rutherford và cộng sự thực hiện.",
-    "Thomson tìm ra electron, Chadwick tìm ra neutron."
-   ],
-   "chot": "Rutherford gắn với thí nghiệm lá vàng và hạt nhân.",
-   "kiem": {
-    "d2": "D",
-    "lyDo2": "E. Rutherford làm thí nghiệm lá vàng và phát hiện hạt nhân.",
+    "lyDo2": "Tia âm cực mang điện âm nên bị hút về bản cực dương.",
     "chac": true
    }
   },
@@ -108,29 +64,7 @@
    "chot": "Ống tia âm cực dẫn tới electron.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Ống tia âm cực của Thomson (1897) phát hiện electron.",
-    "chac": true
-   }
-  },
-  {
-   "kieu": "ly_thuyet",
-   "cach": "doi_chat",
-   "de": "Thí nghiệm của J. Chadwick (1932) phát hiện ra hạt nào sau đây?",
-   "pa": {
-    "A": "Electron.",
-    "B": "Proton.",
-    "C": "Neutron.",
-    "D": "Hạt nhân nguyên tử."
-   },
-   "dap_an": "C",
-   "buoc": [
-    "Chadwick dùng hạt alpha bắn phá beryllium và thu được một loại hạt không mang điện.",
-    "Hạt đó có khối lượng xấp xỉ proton: neutron."
-   ],
-   "chot": "Chadwick phát hiện neutron.",
-   "kiem": {
-    "d2": "C",
-    "lyDo2": "Chadwick phát hiện neutron năm 1932.",
+    "lyDo2": "Nghiên cứu phóng điện qua ống tia âm cực phát hiện ra electron (Thomson, 1897).",
     "chac": true
    }
   }

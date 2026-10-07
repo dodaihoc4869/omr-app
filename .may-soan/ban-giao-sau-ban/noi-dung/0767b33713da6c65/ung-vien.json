@@ -20,7 +20,7 @@
    "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Số đơn vị điện tích hạt nhân = Z = 92 (chỉ số dưới của U).",
+    "lyDo2": "Số đơn vị điện tích hạt nhân = Z = chỉ số dưới = 92.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Z = 79 (chỉ số dưới của Au).",
+    "lyDo2": "Z = chỉ số dưới = 79.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Z = 47 (chỉ số dưới của Ag).",
+    "lyDo2": "Z = chỉ số dưới = 47.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Z = 80 (chỉ số dưới của Hg).",
+    "lyDo2": "Z = chỉ số dưới = 80.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Z = 50 (chỉ số dưới của Sn).",
+    "lyDo2": "Z = chỉ số dưới = 50.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Z = 30 (chỉ số dưới của Zn).",
+    "lyDo2": "Z = chỉ số dưới = 30.",
     "chac": true
    }
   }

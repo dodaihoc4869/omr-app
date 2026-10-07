@@ -20,7 +20,7 @@
    "chot": "Neutron: 0; electron: −1.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Neutron không mang điện (0), electron −1.",
+    "lyDo2": "Neutron 0, electron −1.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Proton và electron mang điện trái dấu.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Proton +1 và electron −1 trái dấu; các cặp còn lại không trái dấu (neutron = 0, hai electron cùng −1).",
+    "lyDo2": "Proton +1 và electron −1 trái dấu; các cặp còn lại không trái dấu.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Neutron có điện tích 0.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Neutron không mang điện; tia âm cực là dòng electron (−1).",
+    "lyDo2": "Neutron không mang điện; tia âm cực là chùm electron (−1).",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Electron mang điện −1.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Electron có điện tích −1; proton +1, neutron 0, hạt nhân mang điện dương.",
+    "lyDo2": "Electron −1; proton +1, neutron 0, hạt nhân dương.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Proton mang điện +1.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Proton +1; neutron 0, electron −1, nguyên tử trung hòa.",
+    "lyDo2": "Proton +1; neutron 0, electron −1, nguyên tử trung hoà.",
     "chac": true
    }
   }

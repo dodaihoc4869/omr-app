@@ -105,6 +105,38 @@
      "laDapSo": true
     }
    ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Trong nguyên tử carbon (C), số hạt mang điện tích dương là 6, số hạt không mang điện là 6.\nSố hạt electron trong C là bao nhiêu?",
+   "pa": {
+    "A": "6.",
+    "B": "7.",
+    "C": "12.",
+    "D": "14."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Số proton = số hạt mang điện dương = 6. Nguyên tử trung hòa → số electron = số proton = 6."
+   ],
+   "chot": "Số electron bằng số proton."
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Trong nguyên tử silicon (Si), số hạt mang điện tích dương là 14, số hạt không mang điện là 14.\nSố hạt electron trong Si là bao nhiêu?",
+   "pa": {
+    "A": "14.",
+    "B": "15.",
+    "C": "28.",
+    "D": "42."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Số proton = 14. Nguyên tử trung hòa → electron = proton = 14."
+   ],
+   "chot": "Số electron bằng số proton."
   }
  ]
 }

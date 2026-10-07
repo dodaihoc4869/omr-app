@@ -133,6 +133,46 @@
      "laDapSo": true
     }
    ]
+  },
+  {
+   "kieu": "tinh",
+   "cach": "tinh_phan_tram",
+   "de": "Lithium (Li) là kim loại nhẹ nhất dùng trong pin điện thoại.\nNguyên tử Li có 3 electron và 4 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử lithium (xét nguyên tử gồm electron, proton và neutron)?\n\n(Cho: mp = 1,6726×10⁻²⁷ kg; mn = 1,6749×10⁻²⁷ kg; me = 9,1094×10⁻³¹ kg)",
+   "pa": {
+    "A": "42,82%.",
+    "B": "57,17%.",
+    "C": "0,023%.",
+    "D": "42,81%."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "m(p) = 3×1,6726×10⁻²⁷ = 5,0178×10⁻²⁷ kg",
+    "m(n) = 4×1,6749×10⁻²⁷ = 6,6997×10⁻²⁷ kg",
+    "m(e) = 3×9,1094×10⁻³¹ = 2,733×10⁻³⁰ ≈ 0,0027×10⁻²⁷ kg",
+    "m(tổng) = 5,0178 + 6,6997 + 0,0027 = 11,7202 (×10⁻²⁷ kg)",
+    "%m(p) = 5,0178/11,7202 × 100% ≈ 42,82%"
+   ],
+   "chot": "% khối lượng proton = m(p)/m(tổng) × 100%."
+  },
+  {
+   "kieu": "tinh",
+   "cach": "tinh_phan_tram",
+   "de": "Boron (B) là nguyên tố quan trọng trong sản xuất thủy tinh chịu nhiệt.\nNguyên tử B có 5 electron và 6 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử boron?\n\n(Cho: mp = 1,6726×10⁻²⁷ kg; mn = 1,6749×10⁻²⁷ kg; me = 9,1094×10⁻³¹ kg)",
+   "pa": {
+    "A": "45,41%.",
+    "B": "54,57%.",
+    "C": "0,025%.",
+    "D": "45,42%."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "m(p) = 5×1,6726×10⁻²⁷ = 8,3630×10⁻²⁷ kg",
+    "m(n) = 6×1,6749×10⁻²⁷ = 10,0494×10⁻²⁷ kg",
+    "m(e) = 5×9,1094×10⁻³¹ ≈ 0,0046×10⁻²⁷ kg",
+    "m(tổng) = 8,3630 + 10,0494 + 0,0046 = 18,4170 (×10⁻²⁷ kg)",
+    "%m(p) = 8,3630/18,4170 × 100% ≈ 45,41%"
+   ],
+   "chot": "% khối lượng proton = m(p)/m(tổng) × 100%."
   }
  ]
 }

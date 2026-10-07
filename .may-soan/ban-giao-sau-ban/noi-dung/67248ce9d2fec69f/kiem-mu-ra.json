@@ -1,38 +1,20 @@
 [
  {
   "id": "ss1",
-  "d": "B",
-  "lyDo": "Rutherford bắn hạt alpha vào lá vàng, phát hiện hạt nhân nguyên tử.",
+  "d": "C",
+  "lyDo": "Tia âm cực là chùm electron mang điện âm, đi từ cực âm sang cực dương, bị lệch trong điện trường.",
   "chac": true
  },
  {
   "id": "ss2",
-  "d": "C",
-  "lyDo": "Tia âm cực là chùm electron đi từ cực âm sang cực dương, bị lệch về phía bản dương.",
+  "d": "B",
+  "lyDo": "Tia âm cực mang điện âm nên bị hút về bản cực dương.",
   "chac": true
  },
  {
   "id": "ss3",
-  "d": "B",
-  "lyDo": "Chùm electron mang điện âm nên lệch về phía bản cực dương.",
-  "chac": true
- },
- {
-  "id": "ss4",
-  "d": "D",
-  "lyDo": "E. Rutherford làm thí nghiệm lá vàng và phát hiện hạt nhân.",
-  "chac": true
- },
- {
-  "id": "ss5",
   "d": "A",
-  "lyDo": "Ống tia âm cực của Thomson (1897) phát hiện electron.",
-  "chac": true
- },
- {
-  "id": "ss6",
-  "d": "C",
-  "lyDo": "Chadwick phát hiện neutron năm 1932.",
+  "lyDo": "Nghiên cứu phóng điện qua ống tia âm cực phát hiện ra electron (Thomson, 1897).",
   "chac": true
  }
 ]

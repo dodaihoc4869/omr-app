@@ -133,6 +133,58 @@
      "laDapSo": true
     }
    ]
+  },
+  {
+   "kieu": "so",
+   "cach": "he_phuong_trinh",
+   "de": "Nguyên tử của nguyên tố Y có tổng số hạt cơ bản là 36.\nSố hạt không mang điện bằng số hạt mang điện âm.\nSố proton của nguyên tử nguyên tố Y là",
+   "pa": {
+    "A": "12.",
+    "B": "11.",
+    "C": "24.",
+    "D": "36."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Gọi p = số proton, n = số neutron, e = số electron = p (nguyên tử trung hòa).",
+    "p + n + e = 36 và n = e = p → 3p = 36 → p = 12."
+   ],
+   "phepTinh": [
+    {
+     "ten": "p",
+     "bieuThuc": "36/3",
+     "ketQua": 12,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "chot": "n = p = e → 3p = tổng."
+  },
+  {
+   "kieu": "so",
+   "cach": "he_phuong_trinh",
+   "de": "Nguyên tử của nguyên tố Z có tổng số hạt cơ bản là 54.\nSố hạt không mang điện bằng số hạt mang điện âm.\nSố proton của nguyên tử nguyên tố Z là",
+   "pa": {
+    "A": "17.",
+    "B": "18.",
+    "C": "27.",
+    "D": "54."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Gọi p = số proton, n = số neutron, e = p.",
+    "p + n + e = 54 và n = p → 3p = 54 → p = 18."
+   ],
+   "phepTinh": [
+    {
+     "ten": "p",
+     "bieuThuc": "54/3",
+     "ketQua": 18,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "chot": "n = p = e → 3p = tổng."
   }
  ]
 }

@@ -20,7 +20,7 @@
    "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Điện tích hạt nhân = Z = 13 nên +13.",
+    "lyDo2": "Al có Z = 13 nên điện tích hạt nhân +13",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Z = 17 nên điện tích hạt nhân +17.",
+    "lyDo2": "Cl có Z = 17 nên điện tích hạt nhân +17",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Z = 26 nên điện tích hạt nhân +26.",
+    "lyDo2": "Fe có Z = 26 nên điện tích hạt nhân +26",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Z = 29 nên điện tích hạt nhân +29.",
+    "lyDo2": "Cu có Z = 29 nên điện tích hạt nhân +29",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Z = 19 nên điện tích hạt nhân +19.",
+    "lyDo2": "K có Z = 19 nên điện tích hạt nhân +19",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Z = 9 nên điện tích hạt nhân +9.",
+    "lyDo2": "F có Z = 9 nên điện tích hạt nhân +9",
     "chac": true
    }
   }

@@ -42,7 +42,7 @@
    "chot": "Hạt ở lớp vỏ là electron.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Lớp vỏ nguyên tử chỉ chứa electron.",
+    "lyDo2": "Lớp vỏ chỉ chứa electron.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Lớp vỏ gồm các electron mang điện tích âm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Lớp vỏ chỉ chứa electron mang điện âm; proton và neutron ở hạt nhân.",
+    "lyDo2": "Lớp vỏ chỉ có electron mang điện âm; B, C, D đều sai.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Electron chỉ có ở lớp vỏ, không có trong hạt nhân.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
+    "lyDo2": "Hạt nhân gồm proton và neutron, không chứa electron nên D không đúng.",
     "chac": true
    }
   }

@@ -110,11 +110,11 @@
  "10-C1-B1-I-1": {
   "bam": "67248ce9d2fec69f",
   "phan": "I",
-  "soBanCauTruc": 6,
-  "soDaKiem": 6,
+  "soBanCauTruc": 3,
+  "soDaKiem": 3,
   "soYCauTruc": 0,
   "soYDaKiem": 0,
-  "trangThai": "du"
+  "trangThai": "mot_phan"
  },
  "10-C1-B1-I-34": {
   "bam": "6ce1c88d3b6fc775",

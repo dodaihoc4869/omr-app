@@ -35,6 +35,70 @@
     "Neutron không mang điện nên điện tích bằng 0."
    ],
    "chot": "Neutron là hạt không mang điện."
+  },
+  {
+   "kieu": "nhan_biet",
+   "cach": "so_sanh",
+   "de": "Khối lượng của neutron so với proton là bao nhiêu?",
+   "pa": {
+    "A": "Gần bằng khối lượng proton.",
+    "B": "Gần bằng khối lượng electron.",
+    "C": "Bằng đúng một nửa khối lượng proton.",
+    "D": "Lớn hơn khối lượng proton khoảng 1.836 lần."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "mp ≈ 1,673×10⁻²⁷ kg; mn ≈ 1,675×10⁻²⁷ kg — xấp xỉ nhau."
+   ],
+   "chot": "Khối lượng neutron xấp xỉ bằng khối lượng proton."
+  },
+  {
+   "kieu": "nhan_biet",
+   "cach": "ly_giai",
+   "de": "Vì sao neutron khó phát hiện bằng điện trường hoặc từ trường?",
+   "pa": {
+    "A": "Neutron không mang điện nên không bị lệch bởi điện trường hoặc từ trường.",
+    "B": "Neutron mang điện tích quá nhỏ để đo được.",
+    "C": "Khối lượng neutron quá lớn so với proton.",
+    "D": "Neutron không có khối lượng."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Hạt không mang điện không tương tác với điện/từ trường."
+   ],
+   "chot": "Neutron trung hòa về điện → không lệch trong điện trường hay từ trường."
+  },
+  {
+   "kieu": "nhan_biet",
+   "cach": "lich_su",
+   "de": "Neutron được J. Chadwick phát hiện vào năm nào?",
+   "pa": {
+    "A": "1897.",
+    "B": "1911.",
+    "C": "1932.",
+    "D": "1964."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Năm 1932: Chadwick bắn hạt α vào Be, phát hiện neutron."
+   ],
+   "chot": "Neutron được phát hiện năm 1932 bởi J. Chadwick."
+  },
+  {
+   "kieu": "nhan_biet",
+   "cach": "vi_tri",
+   "de": "Trong cấu trúc nguyên tử, neutron nằm ở vị trí nào?",
+   "pa": {
+    "A": "Trong lớp vỏ electron.",
+    "B": "Bên ngoài hạt nhân.",
+    "C": "Trong hạt nhân.",
+    "D": "Xung quanh hạt nhân theo quỹ đạo."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Hạt nhân gồm proton và neutron. Electron ở lớp vỏ ngoài."
+   ],
+   "chot": "Neutron nằm trong hạt nhân cùng với proton."
   }
  ]
 }

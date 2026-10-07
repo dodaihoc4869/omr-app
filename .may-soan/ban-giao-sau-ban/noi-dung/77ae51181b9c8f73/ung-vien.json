@@ -20,7 +20,7 @@
    "chot": "Bật ngược cho thấy hạt nhân dương, nhỏ và nặng.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Bật ngược chứng tỏ có hạt nhân mang điện dương, nhỏ nhưng khối lượng lớn; A giải thích hạt đi xuyên chứ không phải bật ngược.",
+    "lyDo2": "Bật ngược do va vào hạt nhân: dương, rất nhỏ, khối lượng lớn; A giải thích hạt xuyên qua chứ không phải bật ngược.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt nhân nhỏ nên bật ngược là hiếm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Hạt nhân rất nhỏ nên xác suất hạt alpha đến gần hạt nhân rất thấp.",
+    "lyDo2": "Hạt nhân rất nhỏ nên xác suất hạt alpha đến gần/va trúng hạt nhân rất thấp.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt nhân: dương, nhỏ, chứa gần hết khối lượng.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Mô hình Rutherford: hạt nhân mang điện dương, tập trung gần hết khối lượng; A, B, C sai.",
+    "lyDo2": "Mô hình Rutherford: hạt nhân mang điện dương, chứa gần hết khối lượng; các phương án khác sai.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Cùng dấu thì đẩy: alpha bị hạt nhân dương đẩy ngược.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt alpha và hạt nhân cùng mang điện dương nên đẩy nhau tĩnh điện.",
+    "lyDo2": "Alpha mang điện dương, hạt nhân dương nên lực đẩy tĩnh điện làm bật ngược.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Bật ngược chứng tỏ hạt nhân rất nặng.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nặng hơn alpha mới làm alpha bật ngược, nên khối lượng rất lớn so với alpha.",
+    "lyDo2": "Hạt nặng hơn alpha nhiều mới làm alpha bật ngược (hạt nhân Au khối lượng khoảng 197 so với 4).",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Hạt nhân mang điện dương và rất nhỏ.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân mang điện dương, kích thước rất nhỏ so với nguyên tử.",
+    "lyDo2": "Hạt nhân dương, kích thước rất nhỏ so với nguyên tử.",
     "chac": true
    }
   }

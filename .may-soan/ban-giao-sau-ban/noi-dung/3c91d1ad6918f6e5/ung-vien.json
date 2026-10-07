@@ -20,7 +20,7 @@
    "chot": "Hạt mang điện âm bị hút về phía bản mang điện dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt electron mang điện âm bị bản dương (bản trên) hút nên lệch lên trên.",
+    "lyDo2": "Tia âm cực là chùm electron (âm) nên bị hút về bản dương (bản trên).",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Tia âm cực là chùm electron đi từ cathode sang anode.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai (điện âm), C sai (bị lệch).",
+    "lyDo2": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai, C sai.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Tia âm cực mang điện âm nên không thể là proton.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Tia âm cực là chùm electron mang điện âm, không phải proton; B, C, D đều đúng.",
+    "lyDo2": "Tia âm cực là chùm electron mang điện âm, không phải proton; B, C, D đúng.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Tia âm cực là electron, không phụ thuộc vật liệu làm cathode.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Tia âm cực luôn là chùm electron, không phụ thuộc vật liệu cathode.",
+    "lyDo2": "Bản chất tia là electron, không phụ thuộc kim loại làm cathode.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Lệch về bản dương nghĩa là hạt mang điện âm.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt mang điện âm bị bản cực dương hút nên lệch về phía đó.",
+    "lyDo2": "Hạt mang điện âm nên bị bản cực dương hút.",
     "chac": true
    }
   }

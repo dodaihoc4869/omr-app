@@ -20,7 +20,7 @@
    "chot": "Chỉ hạt mang điện mới bị lệch trong trường điện.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Chỉ electron mang điện; neutron và nguyên tử trung hòa không lệch.",
+    "lyDo2": "Chỉ electron mang điện; neutron và nguyên tử trung hoà điện nên không lệch.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt mang điện âm lệch về bản cực dương.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Tia âm cực là chùm electron (điện tích âm) lệch về cực dương; tia α, proton lệch về cực âm, neutron không lệch.",
+    "lyDo2": "Tia âm cực là chùm electron mang điện âm nên lệch về cực dương; tia α và proton lệch về cực âm, neutron không lệch.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Hạt mang điện dương lệch về bản cực âm.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Proton mang điện dương nên lệch về cực âm; electron lệch về cực dương; neutron và nguyên tử neon không lệch.",
+    "lyDo2": "Proton mang điện dương nên lệch về cực âm; neutron và nguyên tử neon không lệch, electron lệch về cực dương.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Hạt không mang điện thì không bị lệch.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Neutron và nguyên tử oxygen đều trung hòa điện nên không lệch; các dãy còn lại có proton hoặc electron.",
+    "lyDo2": "Neutron và nguyên tử oxygen đều trung hoà điện; các dãy còn lại có proton hoặc electron.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Dãy đúng chỉ gồm các hạt mang điện.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Electron và proton đều mang điện nên đều lệch; neutron và nguyên tử hydrogen trung hòa.",
+    "lyDo2": "Electron và proton đều mang điện nên đều lệch; các dãy còn lại có neutron hoặc nguyên tử trung hoà.",
     "chac": true
    }
   }

@@ -2,7 +2,7 @@
  {
   "id": "ss1",
   "d": "A",
-  "lyDo": "Neutron không mang điện (0), electron −1.",
+  "lyDo": "Neutron 0, electron −1.",
   "chac": true
  },
  {
@@ -14,25 +14,25 @@
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "Proton +1 và electron −1 trái dấu; các cặp còn lại không trái dấu (neutron = 0, hai electron cùng −1).",
+  "lyDo": "Proton +1 và electron −1 trái dấu; các cặp còn lại không trái dấu.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Neutron không mang điện; tia âm cực là dòng electron (−1).",
+  "lyDo": "Neutron không mang điện; tia âm cực là chùm electron (−1).",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "A",
-  "lyDo": "Electron có điện tích −1; proton +1, neutron 0, hạt nhân mang điện dương.",
+  "lyDo": "Electron −1; proton +1, neutron 0, hạt nhân dương.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "C",
-  "lyDo": "Proton +1; neutron 0, electron −1, nguyên tử trung hòa.",
+  "lyDo": "Proton +1; neutron 0, electron −1, nguyên tử trung hoà.",
   "chac": true
  }
 ]
