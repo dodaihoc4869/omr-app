@@ -512,3 +512,22 @@ Việc còn nợ ghi nhận (không thuộc đợt này): `tests/du-lieu-len-ban
 - **Hai giai đoạn trên máy chủ sống** (đối chiếu giờ từng lô với Actions): (a) đến 10:30 giờ VN máy chủ chạy một bản có LUẬT MỚI chưa vào `main` — mục chỉ được lưu khi lượt kiểm mù trả `chac: true`, câu cần tới 6 bản khác (mã ở nhánh `codex/sau-song-sinh-0710` / `claude/laughing-bohr-1ixzp4`, commit 4c6c0f1f; tài liệu `docs/song-sinh-sau-ban-0710.md` của nhánh đó): 7 lô đầu bị bỏ TOÀN BỘ (76 bản khác + 500 ý Đ–S, đều "kiểm mù chưa chắc chắn") và việc bị tính hết lượt thử; (b) 10:30:36 (run 704, gộp PR #191) máy chủ được phát hành lại từ `main` `cfee419c` — luật mới KHÔNG còn trên máy chủ sống — 6 lô sau lưu bình thường: **18 bản khác + 278 ý Đ–S** (34 bản khác bỏ vì "câu đã đủ 4 bản").
 - **Hệ quả: 19 việc học liệu bị đánh dấu 'trượt'** (đã thử 3 lần ở giai đoạn (a); trước lần chạy chỉ có 1 việc trượt) và KHÔNG có API mở lại (làm mới hàng và lần nộp đều bỏ qua việc 'trượt'). Mã câu: `DH-10-C2-B5-II-15, -16, -19` · `DH-10-C2-B6-II-6, -13, -15` · `DH-10-C2-B6-III-10, -11, -15` · `DH-12-C2-B7-D1-I-18, -II-3, -II-4, -III-6` · `DH-12-C2-B7-D2-I-15, -I-16, -I-17, -II-3, -II-4, -III-5`. Muốn máy soạn làm tiếp các câu này: đặt lại 19 việc về `cho` trong bảng `may_soan_viec` (ghi trực tiếp vào hàng việc — em chưa làm, chờ thầy / Boss cho phép) rồi chạy lại `may-soan.mjs`.
 - Lưu ý cho phiên song sinh: bản máy chủ có luật mới của họ bị ghi đè khi `main` phát hành lúc 10:30; muốn máy chủ sống chạy luật mới phải gộp nhánh vào `main` (hoặc phát hành lại sau #191). Em không chạy lại máy soạn khi chưa rõ máy chủ sống đang theo luật nào.
+
+## 20. Sự cố 07/10 16:43 — app thầy báo HTTP 403 "Sai mã bí mật" (em không phát hành gì)
+
+- **Triệu chứng:** màn Tổng quan báo "Danh sách ca: Máy chủ trả lỗi HTTP 403 · Chiến dịch: Sai mã bí mật"; `/ca/danh-sach`, `/gv/chien-dich`, `/kho/loi-giai/tong` đều 403 với mã cũ của phiên Claude; `/khoe` vẫn `coMat:true`.
+- **Gốc (đo, không đoán):** lịch sử phiên bản Worker `omr` qua API Cloudflare, workflow chỉ đọc `kiem-phien-ban-worker-0710.yml` (Actions 37603803016 + 37604556769; không in thư điện tử hay mã nào):
+
+| Giờ VN | Việc | Bản | Nguồn |
+|---|---|---|---|
+| 16:05:58 | **cập nhật secret `MA_BI_MAT`** ("Updated secret: MA_BI_MAT") | `6fae7061` | trang Cloudflare (dash) |
+| 16:08:34 | ghi đè bằng bản nhánh `claude/laughing-bohr-1ixzp4` | `bd57e3a1` | wrangler (workflow `deploy-worker-lay-cau-0710`) |
+| 16:09:38 | main @942cc787 (push) | `d47d69e3` | wrangler (`deploy.yml`) |
+| 16:28:57 | ghi đè lần 2 bằng bản nhánh laughing-bohr | `453f7a34` | wrangler |
+| 16:56:49 | ghi đè bằng bản nhánh `fix/prompt-ky-nang-toan-bai` | `69a8a20d` | wrangler (workflow `deploy-worker-vong-chua`) |
+| 16:58:33 | main @161eabb5 (push, Actions 37603987229) — **bản sống hiện tại** | `86735e21` | wrangler (`deploy.yml`, có kiểm ca mở) |
+
+- **Kết luận:** 403 do mã bí mật trên Cloudflare đổi lúc 16:05:58 (mọi bản sau mang mã mới); app thầy và phiên Claude còn giữ mã cũ. Worker về `main` lúc 16:58 mà mã cũ vẫn 403 ⇒ việc bản nhánh ghi đè là sự cố RIÊNG (bản sống thiếu code của main tổng cộng ~31 phút: 16:08:34–16:09:38, 16:28:57–16:58:33), không phải gốc của 403.
+- **Đã làm:** (a) xác nhận Worker + Pages đã về `main` (do push 161eabb5): `/khoe` ok, kiểm ca thi mở đạt (0 ca) lúc 16:52 và trong run 37603987229; (b) chốt chặn `git merge-base --is-ancestor origin/main HEAD` cho `deploy-worker-lay-cau-0710.yml` và `deploy-worker-vong-chua.yml`; (c) luật "Worker sống chỉ từ main" + việc đổi `MA_BI_MAT` ghi vào DIEU-PHOI.md. Em KHÔNG đổi, đoán hay đặt lại mã.
+- **Còn lại (việc của thầy):** nhập mã hiện tại vào app thầy (Cài đặt → "Mã bí mật kho đề" → Lưu) và đổi biến `OMR_MA_BI_MAT` của môi trường Claude. Nếu thầy không phải người đổi lúc 16:05:58 ⇒ xem nhật ký kiểm toán (Audit logs) của tài khoản Cloudflare. Không workflow GitHub nào dùng mã này (chỉ dùng khoá Cloudflare).
+- **Hệ quả:** lệnh GHI dữ liệu thật của phiên Claude (`tu-sua-kho`, máy soạn, mở lại 19 việc học liệu trượt ở §19b) tạm dừng tới khi môi trường có mã mới.
