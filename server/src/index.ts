@@ -1505,7 +1505,9 @@ async function ghiDiemMoi(env: Env, b: Record<string, unknown>): Promise<Respons
   }
   if (cau.length === 0) return ra({ ok: false, error: 'Không có dòng nào hợp lệ' })
   for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
-  return ra({ ok: true, soDong: cau.length })
+  // Trả daGhi để client (exam-api.ts) nhận biết lượt đã ghi — thống nhất hợp đồng với Apps Script.
+  const daGhi = bai.map((x) => String(x.sbd ?? '')).filter(Boolean)
+  return ra({ ok: true, soDong: cau.length, daGhi, tuChoi: [] })
 }
 
 function soHoacNull(v: unknown): number | null {

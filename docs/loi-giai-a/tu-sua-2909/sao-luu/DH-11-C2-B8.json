@@ -1493,5 +1493,63 @@
     "chuong": "C2 - Nitrogen và Surful"
    }
   }
+ },
+ "DH-11-C2-B8-III-5": {
+  "luc": "2026-10-07T02:42:28.202Z",
+  "cau": {
+   "phan": "III",
+   "so": 5,
+   "de": "Quá trình sản xuất sulfuric acid trong công nghiệp được thực hiện dựa trên các phản ứng sau:\n(1) S+O₂ →(t°) SO₂\n(2) 4FeS₂+11O₂ →(t°) 2Fe₂O₃+8SO₂\n(3) 2SO₂+O₂V²tOo⁵2SO₃ (d) H₂SO₄+SO₃→H₂S₂O₇\nLiệt kê đáp án thành một dãy số theo thứ tự tăng dần các phản ứng xảy ra đồng thời quá trình oxi hóa và quá trình khử.",
+   "dap_an": "123",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "hieu",
+   "bai": "Bài 8. Sulfuric acid và muối sulfate",
+   "loi_giai": {
+    "chot": "Phản ứng có đồng thời quá trình oxi hoá và quá trình khử chính là phản ứng oxi hoá – khử: (1), (2), (3); còn (4) chỉ là phản ứng kết hợp. Đáp án 123.",
+    "buoc": [
+     "(1) S tăng từ 0 lên +4, O giảm từ 0 xuống −2: là phản ứng oxi hoá – khử.",
+     "(2) S và Fe đều bị oxi hoá, O bị khử: là phản ứng oxi hoá – khử.",
+     "(3) S tăng từ +4 lên +6, O bị khử: là phản ứng oxi hoá – khử.",
+     "(4) Không nguyên tố nào đổi số oxi hoá.",
+     "Vậy các phản ứng là 1, 2, 3."
+    ],
+    "ket_qua": "123",
+    "dap_an_de": "123",
+    "dap_an_tu_giai": "123",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "bay": null,
+    "ly_do": "Phản ứng có đồng thời quá trình oxi hoá và quá trình khử chính là phản ứng oxi hoá – khử: (1), (2), (3); còn (4) chỉ là phản ứng kết hợp. Đáp án 123."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.SO_SANH",
+    "ten": "Sản xuất sulfuric acid — so sánh"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
  }
 }

@@ -2412,11 +2412,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   // Đã nộp mà chưa có đáp án → hỏi lại máy chủ: ngay khi vào màn "Đã nộp" và
-  // mỗi 20 giây khi màn hình đang mở (chế độ "khi cả lớp nộp xong", hoặc em
-  // mở lại link sau khi đã nộp). Server tự quyết đã được phép xem hay chưa.
+  // mỗi nhịp khi màn hình đang mở (cả ba chế độ: ngay/ca_lop_xong/khong).
+  // Server tự quyết đã được phép xem hay chưa — client không tự chặn theo congBo.
+  // Bỏ early-return khi congBo='khong': nếu không poll thì màn đang mở không nhận
+  // được công bố khi thầy bật sau. nhipCho thích nghi: 4s khi ca_lop_xong, 15s còn lại.
   useEffect(() => {
     if (phase !== 'submitted' || keyBank || !attempt || attempt.pendingSubmit) return
-    if (congBo === 'khong') return
     const url = scriptUrlRef.current.trim()
     if (!url) return
     let dung = false
