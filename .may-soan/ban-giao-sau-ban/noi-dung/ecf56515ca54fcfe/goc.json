@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Nguyên tử có cấu trúc rỗng ở giữa là hạt nhân mang điện tích dương và lớp vỏ electron mang điện tích âm."
+   ],
+   [
+    "B",
+    "Nguyên tử luôn trung hoà về điện nên số hạt proton bằng số hạt neutron."
+   ],
+   [
+    "C",
+    "Khối lượng nguyên tử tập trung phần lớn ở hạt nhân nguyên tử."
+   ],
+   [
+    "D",
+    "Các nguyên tử khác nhau có số electron khác nhau."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

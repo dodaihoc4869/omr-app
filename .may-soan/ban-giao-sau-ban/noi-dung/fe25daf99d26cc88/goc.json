@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Electron."
+   ],
+   [
+    "B",
+    "Neutron."
+   ],
+   [
+    "C",
+    "Proton."
+   ],
+   [
+    "D",
+    "Photon."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

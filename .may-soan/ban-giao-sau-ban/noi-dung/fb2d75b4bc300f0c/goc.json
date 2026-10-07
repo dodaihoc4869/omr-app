@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Nguyên tử được cấu thành từ các loại hạt cơ bản là proton, neutron và electron."
+   ],
+   [
+    "B",
+    "Nguyên tử có cấu trúc đặc khít, gồm vỏ nguyên tử và hạt nhân nguyên tử."
+   ],
+   [
+    "C",
+    "Hạt nhân nguyên tử cấu tạo bởi các hạt proton và hạt neutron."
+   ],
+   [
+    "D",
+    "Vỏ nguyên tử được cấu tạo từ các hạt electron."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

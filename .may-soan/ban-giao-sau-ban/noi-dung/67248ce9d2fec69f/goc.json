@@ -9,5 +9,27 @@
   "B": "S",
   "C": "D",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Phóng xạ tự nhiên."
+   ],
+   [
+    "B",
+    "Bắn phá lá vàng bằng hạt alpha."
+   ],
+   [
+    "C",
+    "Nghiên cứu sự phóng điện qua ống tia âm cực."
+   ],
+   [
+    "D",
+    "Phân tích quang phổ phát xạ của hydrogen."
+   ]
+  ],
+  "dapAn": "C"
  }
 }

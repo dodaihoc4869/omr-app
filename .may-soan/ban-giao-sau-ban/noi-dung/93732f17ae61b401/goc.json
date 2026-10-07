@@ -9,5 +9,27 @@
   "B": "S",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Khối lượng riêng của hạt nhân lớn hơn khối lượng riêng của nguyên tử."
+   ],
+   [
+    "B",
+    "Bán kính nguyên tử bằng bán kính hạt nhân."
+   ],
+   [
+    "C",
+    "Bán kính nguyên tử bằng tổng bán kính của các hạt electron, proton và neutron."
+   ],
+   [
+    "D",
+    "Trong nguyên tử, các hạt electron, proton và neutron xếp khít nhau thành một khối bền chặt."
+   ]
+  ],
+  "dapAn": "A"
  }
 }

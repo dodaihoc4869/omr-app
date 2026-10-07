@@ -9,5 +9,27 @@
   "B": "S",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "1 mol X chứa số lượng nguyên tử bằng số lượng nguyên tử trong 1 mol nguyên tử hydrogen."
+   ],
+   [
+    "B",
+    "1 mol X chứa số lượng nguyên tử bằng số lượng nguyên tử trong 1/12 mol carbon."
+   ],
+   [
+    "C",
+    "1 mol X có khối lượng bằng khối lượng 1 mol hydrogen."
+   ],
+   [
+    "D",
+    "1 mol X có khối lượng bằng 1/12 khối lượng 1 mol carbon."
+   ]
+  ],
+  "dapAn": "A"
  }
 }

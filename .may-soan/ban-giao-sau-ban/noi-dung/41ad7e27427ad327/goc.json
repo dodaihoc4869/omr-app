@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Proton mang điện tích dương, nằm trong hạt nhân, khối lượng gần bằng 1 amu."
+   ],
+   [
+    "B",
+    "Electron mang điện âm, nằm trong hạt nhân, khối lượng gần bằng 0 amu."
+   ],
+   [
+    "C",
+    "Neutron không mang điện, khối lượng gần bằng 1 amu."
+   ],
+   [
+    "D",
+    "Nguyên tử trung hòa điện, có kích thước lớn hơn nhiều so với hạt nhân nhưng có khối lượng gần bằng khối lượng hạt nhân."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

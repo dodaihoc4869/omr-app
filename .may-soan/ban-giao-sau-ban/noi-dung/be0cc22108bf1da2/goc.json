@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "proton, m ≈ 0,00055 amu, q = +1."
+   ],
+   [
+    "B",
+    "neutron, m ≈ 1 amu, q = 0."
+   ],
+   [
+    "C",
+    "electron, m ≈ 1 amu, q = –1."
+   ],
+   [
+    "D",
+    "proton, m ≈ 1 amu, q = –1."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

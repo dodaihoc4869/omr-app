@@ -9,5 +9,27 @@
   "B": "S",
   "C": "D",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "lớp vỏ chứa hạt electron và hạt nhân chứa hạt proton."
+   ],
+   [
+    "B",
+    "lớp vỏ chứa hạt proton và hạt nhân chứa hạt neutron, electron."
+   ],
+   [
+    "C",
+    "lớp vỏ chứa hạt electron và hạt nhân chứa hạt proton, neutron."
+   ],
+   [
+    "D",
+    "lớp vỏ chứa hạt neutron và hạt nhân chứa hạt proton, electron."
+   ]
+  ],
+  "dapAn": "C"
  }
 }

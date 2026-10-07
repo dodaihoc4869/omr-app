@@ -180,12 +180,17 @@ async function kiemMu(dirLo, viecMu) {
 function luuGoi(bam, ten, vao, btRaw, traLuotMu, hopLe) {
   const dir = path.join(THU_MUC_BAN_GIAO, 'noi-dung', bam)
   fs.mkdirSync(dir, { recursive: true })
-  ghiJson(path.join(dir, 'goc.json'), { qid: vao.qid, bam, dang: vao.dang, phan: vao.phan, deTho: vao.deTho, dapAn: vao.dapAn })
+  ghiJson(path.join(dir, 'goc.json'), { qid: vao.qid, bam, dang: vao.dang, phan: vao.phan, deTho: vao.deTho, dapAn: vao.dapAn, ...(vao.mc ? { mc: vao.mc } : {}) })
   ghiJson(path.join(dir, 'da-co.json'), vao.daCo ?? { banKhac: [], yDs: [] })
   if (btRaw) ghiJson(path.join(dir, 'soan.json'), btRaw)
-  // kiem-mu-vao / kiem-mu-ra
+  // kiem-mu-vao / kiem-mu-ra — chỉ lưu trường sạch (không đáp án, không giải thích)
   if (traLuotMu !== null) {
-    const muVao = (btRaw?.songSinh ?? btRaw?.yMoi ?? []).map((m, i) => ({ id: `ss${i + 1}`, ...m }))
+    const KHOA_CAM = new Set(['dap_an','dapAn','correct','buoc','chot','phepTinh','kiem','lyDo','lyDo2','diem','kq'])
+    const muVao = [
+      ...(btRaw?.songSinh ?? []).map((s, i) => ({ id: `ss${i + 1}`, loai: 'ban_khac', ...(s.dang ? { dang: s.dang } : {}), de: s.de, ...(s.pa ? { pa: s.pa } : {}), ...(s.bang ? { bang: s.bang } : {}) })),
+      ...(btRaw?.yMoi ?? []).map((y, i) => ({ id: `y${i + 1}`, loai: 'y', dang: 'ds', t: y.t })),
+    ]
+    if (muVao.some((m) => Object.keys(m).some((k) => KHOA_CAM.has(k)))) throw new Error(`luuGoi: kiem-mu-vao vẫn còn khóa cấm — kiểm tra soan.json bam ${bam}`)
     ghiJson(path.join(dir, 'kiem-mu-vao.json'), muVao)
     ghiJson(path.join(dir, 'kiem-mu-ra.json'), traLuotMu ?? [])
   }

@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "một căn phòng nhỏ (khoảng 4 m)."
+   ],
+   [
+    "B",
+    "một sân vận động lớn (khoảng 400 m)."
+   ],
+   [
+    "C",
+    "một tòa nhà 3 tầng (khoảng 10 m)."
+   ],
+   [
+    "D",
+    "một thành phố (khoảng 40 km)."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

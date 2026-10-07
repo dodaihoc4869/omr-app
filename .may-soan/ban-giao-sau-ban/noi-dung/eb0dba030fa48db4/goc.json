@@ -9,5 +9,27 @@
   "B": "S",
   "C": "D",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Lớp vỏ nguyên tử R có 26 electron."
+   ],
+   [
+    "B",
+    "Hạt nhân nguyên tử R có 26 proton."
+   ],
+   [
+    "C",
+    "Hạt nhân nguyên tử R có 26 neutron."
+   ],
+   [
+    "D",
+    "Nguyên tử R trung hòa về điện."
+   ]
+  ],
+  "dapAn": "C"
  }
 }

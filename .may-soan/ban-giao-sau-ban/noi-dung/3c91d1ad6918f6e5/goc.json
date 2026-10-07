@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Tia âm cực là chùm sáng không mang điện."
+   ],
+   [
+    "B",
+    "Tia âm cực là chùm các hạt mang điện tích âm."
+   ],
+   [
+    "C",
+    "Tia âm cực là chùm các hạt mang điện tích dương."
+   ],
+   [
+    "D",
+    "Tia âm cực có khối lượng rất lớn."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "các hạt electron ở lớp vỏ rất cứng và đẩy hạt alpha lại."
+   ],
+   [
+    "B",
+    "hạt nhân có kích thước vô cùng nhỏ, nhưng lại chứa gần như toàn bộ khối lượng của nguyên tử và mang điện tích dương (cùng dấu với hạt alpha)."
+   ],
+   [
+    "C",
+    "lá vàng có cấu tạo đặc khít, không có không gian trống."
+   ],
+   [
+    "D",
+    "hạt nhân mang điện tích âm nên hút hạt alpha rồi đẩy nó ra."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

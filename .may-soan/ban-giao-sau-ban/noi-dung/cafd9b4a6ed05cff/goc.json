@@ -9,5 +9,27 @@
   "B": "D",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "J.J. Thomson (Tôm-xơn)."
+   ],
+   [
+    "B",
+    "E. Rutherford (Rơ-dơ-pho)."
+   ],
+   [
+    "C",
+    "J. Chadwick (Chat-uých)."
+   ],
+   [
+    "D",
+    "Newton (Niu-tơn)."
+   ]
+  ],
+  "dapAn": "B"
  }
 }

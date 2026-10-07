@@ -9,5 +9,27 @@
   "B": "S",
   "C": "S",
   "D": "D"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Nằm trong hạt nhân nguyên tử."
+   ],
+   [
+    "B",
+    "Không mang điện tích."
+   ],
+   [
+    "C",
+    "Có khối lượng xấp xỉ bằng khối lượng của hạt proton."
+   ],
+   [
+    "D",
+    "Có khối lượng xấp xỉ bằng khối lượng của hạt electron."
+   ]
+  ],
+  "dapAn": "D"
  }
 }

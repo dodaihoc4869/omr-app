@@ -9,5 +9,27 @@
   "B": "S",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "không mang điện."
+   ],
+   [
+    "B",
+    "mang điện tích dương."
+   ],
+   [
+    "C",
+    "mang điện tích âm."
+   ],
+   [
+    "D",
+    "có thể mang điện hoặc không mang điện."
+   ]
+  ],
+  "dapAn": "A"
  }
 }

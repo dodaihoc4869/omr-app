@@ -9,5 +9,27 @@
   "B": "S",
   "C": "S",
   "D": "D"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Khối lượng của nguyên tử bằng khối lượng của hạt nhân."
+   ],
+   [
+    "B",
+    "Khối lượng proton nặng gấp 1/1837 khối lượng của neutron."
+   ],
+   [
+    "C",
+    "Khối lượng của electron bằng khối lượng của neutron."
+   ],
+   [
+    "D",
+    "Khối lượng của electron rất nhỏ và không đáng kể so với khối lượng của proton và neutron."
+   ]
+  ],
+  "dapAn": "D"
  }
 }

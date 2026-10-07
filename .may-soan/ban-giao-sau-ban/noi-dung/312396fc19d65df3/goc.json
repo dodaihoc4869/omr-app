@@ -9,5 +9,27 @@
   "B": "S",
   "C": "S",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "nguyên tử có cấu tạo rỗng, phần lớn không gian trong nguyên tử là trống rỗng."
+   ],
+   [
+    "B",
+    "hạt nhân nguyên tử mang điện tích dương, cùng dấu với hạt alpha."
+   ],
+   [
+    "C",
+    "lớp vỏ electron mang điện tích âm đã hút các hạt alpha."
+   ],
+   [
+    "D",
+    "kích thước của hạt nhân nguyên tử rất lớn."
+   ]
+  ],
+  "dapAn": "A"
  }
 }

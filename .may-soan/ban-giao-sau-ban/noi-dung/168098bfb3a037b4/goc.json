@@ -9,5 +9,27 @@
   "B": "S",
   "C": "D",
   "D": "S"
+ },
+ "mc": {
+  "hoi": "Chọn đáp án",
+  "o": [
+   [
+    "A",
+    "Tia α."
+   ],
+   [
+    "B",
+    "Proton."
+   ],
+   [
+    "C",
+    "Nguyên tử hydrogen."
+   ],
+   [
+    "D",
+    "Tia âm cực."
+   ]
+  ],
+  "dapAn": "C"
  }
 }
