@@ -45,7 +45,7 @@ if (process.argv.includes('--live')) {
     if (!r.ok) throw new Error('Một đường giao diện sống chưa trả thành công.')
     if (path === '/sw-version.json' && !Number.isFinite((await r.json()).builtAt)) throw new Error('Thiếu phiên bản service worker.')
   }
-  for (const [path, status] of [['/hs/chua-cau-sai/co',401],['/gv/chua-cau-sai/hang-chieu',403]]) {
+  for (const [path, status] of [['/hs/chua-cau-sai/danh-sach',401],['/gv/chua-cau-sai/hang-chieu',403]]) {
     const r = await fetch(`https://omr.ttadodaihoc.workers.dev${path}`, { method:'POST', headers:{'content-type':'application/json'}, body:'{}', signal:AbortSignal.timeout(30000) })
     if (r.status !== status) throw new Error(`Đường vòng chữa sống chưa đúng cổng quyền (${r.status}).`)
   }
