@@ -1,12 +1,9 @@
-# KIỂM LỊCH SỬ PHIÊN BẢN WORKER (CHỈ ĐỌC) — sự cố 07/10: app thầy báo HTTP 403 "Sai mã bí mật" sau khi Worker sống bị ghi đè bằng bản của nhánh khác.
+# KIỂM LỊCH SỬ PHIÊN BẢN WORKER (CHỈ ĐỌC) — dùng khi app báo lỗi lạ mà chưa rõ ai đổi gì (mẫu: sự cố 07/10, HTTP 403 "Sai mã bí mật" do secret MA_BI_MAT đổi từ trang Cloudflare, không do lượt phát hành nào).
 # Chỉ GET danh sách phiên bản + lần phát hành của Worker `omr` để biết ai / lúc nào / bằng đường nào (upload · secret · rollback…) đổi bản sống.
 # KHÔNG in thư điện tử, mã người dùng, mã bí mật: repo công khai, nhật ký chạy ai cũng đọc.
 name: Kiểm lịch sử phiên bản Worker (chỉ đọc)
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/kiem-phien-ban-0710]
-    paths: ['.github/workflows/kiem-phien-ban-worker-0710.yml']
 permissions:
   contents: read
 jobs:
