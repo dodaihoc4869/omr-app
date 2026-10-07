@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "A",
-  "lyDo": "1 amu = 1,661.10^-27 kg.",
+  "lyDo": "1 amu = 1,661.10⁻²⁷ kg.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "1 amu = 1,661.10^-24 g.",
+  "lyDo": "1,661.10⁻²⁷ kg = 1,661.10⁻²⁴ g.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "1,661.10^-27 kg là 1 amu; electron 9,109.10^-31 kg, hạt α ≈ 4 amu, 1 mol C-12 là 12 g.",
+  "lyDo": "1,661.10⁻²⁷ kg là 1 amu; electron ~9,109.10⁻³¹ kg, 1 mol C-12 là 12 g, hạt α ~6,64.10⁻²⁷ kg.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "1 amu = 1/12 khối lượng nguyên tử C-12.",
+  "lyDo": "Định nghĩa: 1 amu = 1/12 khối lượng một nguyên tử carbon-12; B, C, D sai.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "D",
-  "lyDo": "1 amu = 1,661.10^-27 kg, không phải 10^-24 kg.",
+  "lyDo": "1 amu = 1,661.10⁻²⁴ g = 1,661.10⁻²⁷ kg, nên D (10⁻²⁴ kg) sai.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "Proton ≈ 1 amu; electron ≈ 0,00055, hạt α ≈ 4, H2O ≈ 18 amu.",
+  "lyDo": "Khối lượng proton ≈ 1,007 amu, gần 1 amu nhất; electron ≈ 0,00055, α ≈ 4, nước ≈ 18.",
   "chac": true
  }
 ]

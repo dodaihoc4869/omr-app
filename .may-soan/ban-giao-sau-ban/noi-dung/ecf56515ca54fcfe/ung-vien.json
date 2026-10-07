@@ -20,7 +20,7 @@
    "chot": "Khối lượng nguyên tử tập trung ở hạt nhân vì electron rất nhẹ.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần",
+    "lyDo2": "Khối lượng electron nhỏ hơn proton khoảng 1836 lần, không gần bằng nên C sai; A, B, D đúng.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Nguyên tử trung hoà: số electron bằng số proton.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Nguyên tử trung hoà: số e = số p",
+    "lyDo2": "Nguyên tử trung hoà nên số electron bằng số proton; B, C, D đều sai.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Số khối = số proton + số neutron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Số khối = số proton + số neutron",
+    "lyDo2": "Số khối bằng tổng số proton và neutron, không phải electron nên D sai; A, B, C đúng.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Hạt nhân mang điện dương, electron ở lớp vỏ.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân gồm proton và neutron, không chứa electron",
+    "lyDo2": "Hạt nhân chứa proton (+) và neutron (không mang điện), mang điện dương, không chứa electron nên B sai.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Điện tích hạt nhân = +Z, Z là số proton.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Điện tích hạt nhân = +Z; O và N có Z khác nhau",
+    "lyDo2": "Điện tích hạt nhân là +Z với Z là số proton; O (Z=8) và N (Z=7) khác số proton nên A sai; B, D sai.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Trung hoà điện: số electron bằng số proton, không liên quan neutron.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Số electron bằng số proton, không phải số neutron",
+    "lyDo2": "Số electron bằng số proton, không nhất thiết bằng số neutron nên A sai; B, C, D đúng.",
     "chac": true
    }
   }

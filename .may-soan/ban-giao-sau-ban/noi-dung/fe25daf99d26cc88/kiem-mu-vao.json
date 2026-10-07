@@ -1,38 +1,24 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Thí nghiệm nào dưới đây dẫn đến việc phát hiện ra hạt nhân nguyên tử?",
   "pa": {
    "A": "Thí nghiệm nghiên cứu tia âm cực của J. J. Thomson.",
    "B": "Thí nghiệm bắn hạt α vào lá vàng mỏng của E. Rutherford và cộng sự.",
    "C": "Thí nghiệm bắn hạt α vào Beryllium của J. Chadwick.",
    "D": "Thí nghiệm xác định điện tích electron bằng giọt dầu của R. Millikan."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Rutherford bắn hạt α vào lá vàng mỏng: đa số hạt α đi thẳng, một số ít bị lệch mạnh.",
-   "Kết quả cho thấy nguyên tử có phần mang điện dương, rất nhỏ và nặng ở tâm, gọi là hạt nhân."
-  ],
-  "chot": "Hạt nhân được phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng."
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Khi bắn phá Beryllium bằng các hạt α, J. Chadwick quan sát được một loại hạt mới. Điện tích của hạt này bằng:",
   "pa": {
    "A": "+1.",
    "B": "−1.",
    "C": "0.",
    "D": "+2."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Hạt mới được phát hiện năm 1932 là neutron.",
-   "Neutron không mang điện nên điện tích bằng 0."
-  ],
-  "chot": "Neutron là hạt không mang điện."
+  }
  }
 ]

@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "26 proton x 1,6.10^-19 = 41,6.10^-19 C",
+  "lyDo": "Z = 26 proton; 26 × 1,6.10⁻¹⁹ = 41,6.10⁻¹⁹ C",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "B",
-  "lyDo": "29 x 1,6 = 46,4",
+  "lyDo": "Z = 29 proton; 29 × 1,6 = 46,4 (.10⁻¹⁹ C)",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "47 x 1,6 = 75,2",
+  "lyDo": "Z = 47 proton; 47 × 1,6 = 75,2 (.10⁻¹⁹ C)",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "13 x 1,6 = 20,8",
+  "lyDo": "Z = 13 proton; 13 × 1,6 = 20,8 (.10⁻¹⁹ C)",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "30 x 1,6 = 48,0",
+  "lyDo": "Z = 30 proton; 30 × 1,6 = 48,0 (.10⁻¹⁹ C)",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "82 x 1,6 = 131,2",
+  "lyDo": "Z = 82 proton; 82 × 1,6 = 131,2 (.10⁻¹⁹ C)",
   "chac": true
  }
 ]

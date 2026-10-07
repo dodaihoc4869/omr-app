@@ -20,7 +20,7 @@
    "chot": "Hạt nhân được phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Rutherford bắn hạt alpha vào lá vàng phát hiện hạt nhân",
+    "lyDo2": "Hạt nhân được Rutherford phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng mỏng (2018 SGK cũng nêu vậy).",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Neutron là hạt không mang điện.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Hạt Chadwick phát hiện là neutron, không mang điện",
+    "lyDo2": "Hạt Chadwick phát hiện là neutron, không mang điện (điện tích 0).",
     "chac": true
    }
   }

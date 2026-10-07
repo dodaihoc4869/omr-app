@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "1 mol của bất kỳ chất nào đều chứa cùng số hạt (N_A); A, D sai khối lượng; C sai số hạt",
+  "lyDo": "1 mol bất kì chất nào chứa cùng số hạt (NA); A, D sai vì khối lượng kim loại khác H và C; C sai vì gấp 12 lần.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "1 mol nguyên tử nào cũng chứa số nguyên tử bằng nhau, nên C sai; A, B, D đúng",
+  "lyDo": "1 mol mọi nguyên tử đều chứa số nguyên tử bằng nhau nên C sai; A, B, D đúng.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "M(Al) = 27 g/mol nên 1 mol Al nặng 27 g; A, B, C sai",
+  "lyDo": "Khối lượng 1 mol Al = 27 g; A sai (kg), B sai (không nhân 27), C sai (số nguyên tử bằng nhau).",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "2 mol có số nguyên tử gấp đôi 1 mol H; B, D sai số hạt; C sai khối lượng",
+  "lyDo": "2 mol chứa 2NA nguyên tử, gấp đôi 1 mol H; B, D sai số hạt; C sai vì khối lượng kim loại khác H.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "D",
-  "lyDo": "1 mol nguyên tử nào cũng chứa N_A nguyên tử; A, B, C sai",
+  "lyDo": "1 mol nguyên tử của bất kì nguyên tố nào đều chứa NA nguyên tử; khối lượng thì khác nhau.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Z là kim loại nên khối lượng 1 mol khác 1 mol C; A là phát biểu sai; B, C, D đúng",
+  "lyDo": "Z là kim loại nên khối lượng mol khác carbon (12 g/mol) nên A sai; B, C, D đúng.",
   "chac": true
  }
 ]

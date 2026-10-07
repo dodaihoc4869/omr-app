@@ -1,116 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Nguyên tử trung hoà về điện vì",
   "pa": {
    "A": "số hạt neutron bằng số hạt proton.",
    "B": "số hạt proton bằng số hạt electron.",
    "C": "số hạt neutron bằng số hạt electron.",
    "D": "tổng số hạt proton và neutron bằng số hạt electron."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Proton mang điện +1, electron mang điện −1, neutron không mang điện.",
-   "Điện tích dương và âm triệt tiêu khi số proton bằng số electron."
-  ],
-  "chot": "Số proton bằng số electron nên nguyên tử không mang điện.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng về nguyên tử?",
   "pa": {
    "A": "Luôn mang điện tích dương.",
    "B": "Luôn mang điện tích âm.",
    "C": "Trung hoà về điện.",
    "D": "Chỉ gồm các hạt mang điện."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Nguyên tử có neutron không mang điện nên D sai.",
-   "Tổng điện tích dương của hạt nhân bằng tổng điện tích âm của electron nên nguyên tử trung hoà."
-  ],
-  "chot": "Nguyên tử trung hoà về điện.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây sai khi nói về nguyên tử?",
   "pa": {
    "A": "Hạt nhân mang điện tích âm.",
    "B": "Nguyên tử trung hoà về điện.",
    "C": "Nguyên tử gồm hạt nhân và lớp vỏ electron.",
    "D": "Electron chuyển động xung quanh hạt nhân."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Hạt nhân gồm proton mang điện dương và neutron không mang điện, nên hạt nhân mang điện dương.",
-   "Ba phát biểu còn lại đúng."
-  ],
-  "chot": "Hạt nhân mang điện dương, không phải điện âm.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Hạt nhân nguyên tử mang điện tích dương, còn toàn bộ nguyên tử thì",
   "pa": {
    "A": "mang điện tích âm.",
    "B": "mang điện tích dương.",
    "C": "mang điện tích bằng điện tích hạt nhân.",
    "D": "không mang điện."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Điện tích dương của hạt nhân được cân bằng bởi điện tích âm của các electron ở lớp vỏ.",
-   "Vì vậy cả nguyên tử không mang điện."
-  ],
-  "chot": "Điện tích hạt nhân bị electron ở vỏ trung hoà.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có 11 proton. Số electron của nguyên tử này là",
   "pa": {
    "A": "10.",
    "B": "12.",
    "C": "11.",
    "D": "22."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Nguyên tử trung hoà về điện nên số electron bằng số proton.",
-   "Có 11 proton thì có 11 electron."
-  ],
-  "chot": "Trong nguyên tử, số electron bằng số proton.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Khi nguyên tử mất bớt electron thì nó trở thành hạt mang điện tích",
   "pa": {
    "A": "dương.",
    "B": "âm.",
    "C": "bằng không.",
    "D": "vừa dương vừa âm."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Ban đầu số proton bằng số electron.",
-   "Mất electron thì số proton nhiều hơn số electron nên hạt mang điện dương."
-  ],
-  "chot": "Mất electron thì mang điện dương.",
-  "phepTinh": []
+  }
  }
 ]

@@ -2,19 +2,19 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "J.J. Thomson tìm ra electron (1897).",
+  "lyDo": "J.J. Thomson tìm ra electron năm 1897 (tia âm cực).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "J. Chadwick tìm ra neutron (1932).",
+  "lyDo": "J. Chadwick tìm ra neutron năm 1932.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "C",
-  "lyDo": "Thí nghiệm Rutherford 1911 tìm ra hạt nhân nguyên tử.",
+  "lyDo": "Thí nghiệm hạt α bắn lá vàng (1911) tìm ra hạt nhân nguyên tử.",
   "chac": true
  },
  {
@@ -32,7 +32,7 @@
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Rutherford bắn chùm hạt α vào lá vàng.",
+  "lyDo": "Rutherford dùng chùm hạt α bắn vào lá vàng mỏng.",
   "chac": true
  }
 ]

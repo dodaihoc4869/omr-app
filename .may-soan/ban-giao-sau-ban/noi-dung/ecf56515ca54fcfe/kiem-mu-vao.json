@@ -1,110 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "Proton mang điện tích dương.",
    "B": "Neutron không mang điện.",
    "C": "Electron có khối lượng gần bằng khối lượng proton.",
    "D": "Trong nguyên tử trung hoà, số electron bằng số proton."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Khối lượng electron rất nhỏ, chỉ bằng khoảng 1/1840 khối lượng proton.",
-   "Vậy nói electron có khối lượng gần bằng proton là sai."
-  ],
-  "chot": "Khối lượng nguyên tử tập trung ở hạt nhân vì electron rất nhẹ."
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng?",
   "pa": {
    "A": "Trong nguyên tử, số electron bằng số proton.",
    "B": "Neutron mang điện tích âm.",
    "C": "Khối lượng electron lớn hơn khối lượng proton.",
    "D": "Electron nằm trong hạt nhân nguyên tử."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Nguyên tử trung hoà về điện nên điện tích dương của proton cân bằng điện tích âm của electron.",
-   "Vì vậy số electron bằng số proton; các ý còn lại đều sai về điện tích, khối lượng hoặc vị trí hạt."
-  ],
-  "chot": "Nguyên tử trung hoà: số electron bằng số proton."
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "Hạt nhân nguyên tử mang điện tích dương.",
    "B": "Nguyên tử trung hoà về điện.",
    "C": "Khối lượng electron rất nhỏ so với khối lượng proton.",
    "D": "Số khối bằng tổng số proton và số electron."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Số khối A bằng tổng số proton và số neutron trong hạt nhân.",
-   "Electron không nằm trong hạt nhân nên không tính vào số khối."
-  ],
-  "chot": "Số khối = số proton + số neutron."
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "Nguyên tử gồm hạt nhân và lớp vỏ electron.",
    "B": "Hạt nhân nguyên tử mang điện tích âm vì chứa electron.",
    "C": "Proton và neutron có khối lượng gần bằng nhau.",
    "D": "Electron chuyển động xung quanh hạt nhân."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Hạt nhân gồm proton mang điện dương và neutron không mang điện.",
-   "Electron nằm ở lớp vỏ, không ở hạt nhân, nên hạt nhân mang điện dương."
-  ],
-  "chot": "Hạt nhân mang điện dương, electron ở lớp vỏ."
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng?",
   "pa": {
    "A": "Nguyên tử oxygen và nguyên tử nitrogen có cùng số proton.",
    "B": "Electron mang điện tích dương.",
    "C": "Điện tích hạt nhân của nguyên tử bằng +Z, với Z là số proton.",
    "D": "Neutron mang điện tích âm."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Neutron không mang điện nên điện tích hạt nhân chỉ do proton quyết định.",
-   "Mỗi proton mang một đơn vị điện tích dương nên điện tích hạt nhân là +Z."
-  ],
-  "chot": "Điện tích hạt nhân = +Z, Z là số proton."
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "Nguyên tử trung hoà về điện nên số electron luôn bằng số neutron.",
    "B": "Điện tích hạt nhân bằng tổng điện tích các proton.",
    "C": "Khối lượng electron nhỏ hơn rất nhiều so với khối lượng proton.",
    "D": "Proton và neutron nằm trong hạt nhân."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Nguyên tử trung hoà về điện nhờ số electron bằng số proton.",
-   "Số neutron không liên quan đến sự trung hoà điện, nên nói số electron luôn bằng số neutron là sai."
-  ],
-  "chot": "Trung hoà điện: số electron bằng số proton, không liên quan neutron."
+  }
  }
 ]

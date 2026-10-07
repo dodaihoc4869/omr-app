@@ -2,13 +2,13 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Rutherford bắn hạt alpha vào lá vàng phát hiện hạt nhân",
+  "lyDo": "Hạt nhân được Rutherford phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng mỏng (2018 SGK cũng nêu vậy).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện",
+  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện (điện tích 0).",
   "chac": true
  }
 ]

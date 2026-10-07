@@ -1,110 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Một amu có khối lượng bằng bao nhiêu kilogam?",
   "pa": {
    "A": "1,661.10⁻²⁷ kg.",
    "B": "1,661.10⁻²⁴ kg.",
    "C": "9,109.10⁻³¹ kg.",
    "D": "1,661.10⁻³⁰ kg."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "1 amu bằng 1/12 khối lượng một nguyên tử carbon-12.",
-   "Giá trị này là 1,661.10⁻²⁴ g, tức 1,661.10⁻²⁷ kg."
-  ],
-  "chot": "1 amu = 1,661.10⁻²⁴ g = 1,661.10⁻²⁷ kg."
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Một amu có khối lượng bằng bao nhiêu gam?",
   "pa": {
    "A": "9,109.10⁻²⁸ g.",
    "B": "1,661.10⁻²⁷ g.",
    "C": "1,661.10⁻²⁴ g.",
    "D": "1,661.10⁻²¹ g."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "1 amu = 1,661.10⁻²⁷ kg.",
-   "Đổi sang gam: 1,661.10⁻²⁷ × 1000 = 1,661.10⁻²⁴ g."
-  ],
-  "chot": "Nhớ 1 amu = 1,661.10⁻²⁴ g."
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Khối lượng 1,661.10⁻²⁷ kg là khối lượng của",
   "pa": {
    "A": "một electron.",
    "B": "một amu.",
    "C": "một mol nguyên tử carbon-12.",
    "D": "một hạt α."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Khối lượng electron cỡ 9,109.10⁻³¹ kg, hạt α cỡ 6,64.10⁻²⁷ kg.",
-   "1 amu = 1,661.10⁻²⁷ kg; một mol carbon-12 nặng 12 g."
-  ],
-  "chot": "1,661.10⁻²⁷ kg chính là khối lượng của 1 amu."
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng về amu?",
   "pa": {
    "A": "1 amu bằng 1/12 khối lượng một nguyên tử carbon-12.",
    "B": "1 amu bằng khối lượng một nguyên tử oxygen.",
    "C": "1 amu bằng khối lượng một electron.",
    "D": "1 amu bằng khối lượng một nguyên tử carbon-12."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Amu được định nghĩa bằng 1/12 khối lượng một nguyên tử carbon-12.",
-   "Nguyên tử carbon-12 nặng 12 amu; nguyên tử oxygen nặng khoảng 16 amu; electron nặng gần 0 amu."
-  ],
-  "chot": "1 amu = 1/12 khối lượng nguyên tử carbon-12."
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "1 amu bằng 1,661.10⁻²⁷ kg.",
    "B": "1 amu bằng 1,661.10⁻²⁴ g.",
    "C": "Amu là đơn vị khối lượng nguyên tử.",
    "D": "1 amu bằng 1,661.10⁻²⁴ kg."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "1 amu = 1,661.10⁻²⁴ g.",
-   "Đổi sang kg phải chia 1000, được 1,661.10⁻²⁷ kg nên ý D sai."
-  ],
-  "chot": "Đổi g sang kg nhớ chia 1000: 1,661.10⁻²⁴ g = 1,661.10⁻²⁷ kg."
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Khối lượng của một amu gần bằng khối lượng của hạt nào sau đây?",
   "pa": {
    "A": "Một electron.",
    "B": "Một proton.",
    "C": "Một hạt α.",
    "D": "Một phân tử nước."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Proton có khối lượng cỡ 1,673.10⁻²⁷ kg, gần bằng 1,661.10⁻²⁷ kg của 1 amu.",
-   "Electron nhẹ hơn nhiều; hạt α nặng khoảng 4 amu; phân tử nước nặng khoảng 18 amu."
-  ],
-  "chot": "Proton (và neutron) có khối lượng gần bằng 1 amu."
+  }
  }
 ]

@@ -1,164 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có đường kính khoảng 100 pm, hạt nhân của nó có đường kính khoảng 0,02 pm. Tỉ lệ giữa đường kính nguyên tử và đường kính hạt nhân là",
   "pa": {
    "A": "500.",
    "B": "5000.",
    "C": "50000.",
    "D": "0,0002."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Tỉ lệ cần tìm = đường kính nguyên tử : đường kính hạt nhân = 100 : 0,02.",
-   "100 / 0,02 = 5000."
-  ],
-  "chot": "Chia đường kính nguyên tử cho đường kính hạt nhân, cùng đơn vị đo.",
-  "phepTinh": [
-   {
-    "ten": "Tỉ lệ đường kính",
-    "bieuThuc": "100/0.02",
-    "ketQua": 5000,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss2",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có đường kính khoảng 200 pm, hạt nhân của nó có đường kính khoảng 0,008 pm. Tỉ lệ giữa đường kính nguyên tử và đường kính hạt nhân là",
   "pa": {
    "A": "2500.",
    "B": "250000.",
    "C": "25000.",
    "D": "0,00004."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Tỉ lệ cần tìm = 200 : 0,008.",
-   "200 / 0,008 = 25000."
-  ],
-  "chot": "Lấy đường kính lớn chia đường kính nhỏ; đổi cho đúng bậc 10 của số thập phân.",
-  "phepTinh": [
-   {
-    "ten": "Tỉ lệ đường kính",
-    "bieuThuc": "200/0.008",
-    "ketQua": 25000,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss3",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có đường kính khoảng 150 pm, hạt nhân của nó có đường kính khoảng 0,05 pm. Tỉ lệ giữa đường kính nguyên tử và đường kính hạt nhân là",
   "pa": {
    "A": "30000.",
    "B": "300.",
    "C": "0,0003.",
    "D": "3000."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Tỉ lệ cần tìm = 150 : 0,05.",
-   "150 / 0,05 = 3000."
-  ],
-  "chot": "Tỉ lệ đường kính nguyên tử so với hạt nhân là thương của hai đường kính.",
-  "phepTinh": [
-   {
-    "ten": "Tỉ lệ đường kính",
-    "bieuThuc": "150/0.05",
-    "ketQua": 3000,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss4",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có đường kính khoảng 120 pm, hạt nhân của nó có đường kính khoảng 0,006 pm. Tỉ lệ giữa đường kính nguyên tử và đường kính hạt nhân là",
   "pa": {
    "A": "20000.",
    "B": "2000.",
    "C": "200000.",
    "D": "0,00005."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Tỉ lệ cần tìm = 120 : 0,006.",
-   "120 / 0,006 = 20000."
-  ],
-  "chot": "Chia đường kính nguyên tử cho đường kính hạt nhân, không đảo ngược phép chia.",
-  "phepTinh": [
-   {
-    "ten": "Tỉ lệ đường kính",
-    "bieuThuc": "120/0.006",
-    "ketQua": 20000,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss5",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có đường kính khoảng 300 pm, hạt nhân của nó có đường kính khoảng 0,01 pm. Tỉ lệ giữa đường kính nguyên tử và đường kính hạt nhân là",
   "pa": {
    "A": "3000.",
    "B": "30000.",
    "C": "300000.",
    "D": "0,00003."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Tỉ lệ cần tìm = 300 : 0,01.",
-   "300 / 0,01 = 30000."
-  ],
-  "chot": "Hai đường kính cùng đơn vị thì tỉ lệ chỉ là thương của hai con số.",
-  "phepTinh": [
-   {
-    "ten": "Tỉ lệ đường kính",
-    "bieuThuc": "300/0.01",
-    "ketQua": 30000,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss6",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Một nguyên tử có đường kính khoảng 180 pm, hạt nhân của nó có đường kính khoảng 0,012 pm. Tỉ lệ giữa đường kính nguyên tử và đường kính hạt nhân là",
   "pa": {
    "A": "1500.",
    "B": "150000.",
    "C": "15000.",
    "D": "150."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Tỉ lệ cần tìm = 180 : 0,012.",
-   "180 / 0,012 = 15000."
-  ],
-  "chot": "Tỉ lệ đường kính = đường kính nguyên tử chia đường kính hạt nhân.",
-  "phepTinh": [
-   {
-    "ten": "Tỉ lệ đường kính",
-    "bieuThuc": "180/0.012",
-    "ketQua": 15000,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  }
 ]

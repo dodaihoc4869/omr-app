@@ -20,7 +20,7 @@
    "chot": "1 Å = 10⁻¹⁰ m, 1 pm = 10⁻¹² m, 1 Å = 100 pm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "1 Å = 10^-10 m; 1 pm = 10^-12 m.",
+    "lyDo2": "1 Å = 10⁻¹⁰ m; 1 pm = 10⁻¹² m nên B, C, D sai.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "10⁻¹² m là picomet, 10⁻¹⁰ m mới là angstron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "1 Å = 10^-10 m = 100 pm, nên 1 Å = 10^-12 m là sai.",
+    "lyDo2": "1 Å = 10⁻¹⁰ m (không phải 10⁻¹² m); các phương án A, B, C đều đúng.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "1 nm = 10 Å = 1000 pm = 10⁻⁹ m.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "1 nm = 10^-9 m = 10 Å = 1000 pm.",
+    "lyDo2": "1 nm = 10⁻⁹ m = 10 Å = 1000 pm; A, C, D sai.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Từ Å sang pm nhân với 100.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "0,5 Å = 0,5.100 = 50 pm.",
+    "lyDo2": "0,5 Å = 0,5 × 100 pm = 50 pm.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Từ pm sang Å chia cho 100.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "120 pm = 1,2 Å.",
+    "lyDo2": "120 pm = 1,2 Å (100 pm = 1 Å); 12 nm, 120 mm, 1,2 μm đều sai.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "pm nhỏ hơn Å 100 lần.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "1 pm = 0,01 Å, không phải 100 Å.",
+    "lyDo2": "1 Å = 100 pm nên 1 pm = 0,01 Å, không phải 100 Å; A, B, C đúng.",
     "chac": true
    }
   }

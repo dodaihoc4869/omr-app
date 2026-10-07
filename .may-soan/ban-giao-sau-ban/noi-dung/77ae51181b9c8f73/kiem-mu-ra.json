@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Hạt nhân mang điện dương, nhỏ, khối lượng lớn",
+  "lyDo": "Bật ngược chứng tỏ có hạt nhân mang điện dương, nhỏ nhưng khối lượng lớn; A giải thích hạt đi xuyên chứ không phải bật ngược.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "A",
-  "lyDo": "Hạt nhân rất nhỏ nên ít alpha đến gần",
+  "lyDo": "Hạt nhân rất nhỏ nên xác suất hạt alpha đến gần hạt nhân rất thấp.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Kết luận Rutherford: hạt nhân dương, tập trung gần hết khối lượng",
+  "lyDo": "Mô hình Rutherford: hạt nhân mang điện dương, tập trung gần hết khối lượng; A, B, C sai.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "Lực đẩy tĩnh điện cùng dấu dương",
+  "lyDo": "Hạt alpha và hạt nhân cùng mang điện dương nên đẩy nhau tĩnh điện.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "D",
-  "lyDo": "Hạt đó có khối lượng rất lớn so với alpha",
+  "lyDo": "Hạt nặng hơn alpha mới làm alpha bật ngược, nên khối lượng rất lớn so với alpha.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "Hạt nhân dương, rất nhỏ so với nguyên tử; C sai",
+  "lyDo": "Hạt nhân mang điện dương, kích thước rất nhỏ so với nguyên tử.",
   "chac": true
  }
 ]

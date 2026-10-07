@@ -20,7 +20,7 @@
    "chot": "Hạt nhân nhỏ nhưng chứa gần như toàn bộ khối lượng nguyên tử.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Khối lượng nguyên tử tập trung ở hạt nhân; A, C, D sai.",
+    "lyDo2": "Khối lượng electron rất nhỏ nên khối lượng nguyên tử tập trung ở hạt nhân; A, C sai, D sai vì nguyên tử trung hòa.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Phần lớn thể tích nguyên tử là khoảng không gian electron chuyển động.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Hạt nhân rất nhỏ, vỏ chiếm gần hết thể tích; C sai.",
+    "lyDo2": "Hạt nhân rất nhỏ so với nguyên tử, không chiếm phần lớn thể tích nên C sai; A, B, D đúng.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Proton mang điện dương, electron mang điện âm, neutron không mang điện.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Neutron không mang điện.",
+    "lyDo2": "Neutron không mang điện nên A không đúng; B, C, D đúng.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Electron nhẹ, mang điện âm, nằm ở lớp vỏ.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Khối lượng electron rất nhỏ (~1/1840 proton).",
+    "lyDo2": "Electron mang điện âm, nằm ở vỏ, khối lượng ~1/1836 proton nên D đúng.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Hạt nhân nhỏ hơn nguyên tử cỡ một vạn lần về bán kính.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Hạt nhân nhỏ hơn nguyên tử cỡ 10^4-10^5 lần; các ý khác sai.",
+    "lyDo2": "Bán kính hạt nhân ~10^-5 lần bán kính nguyên tử; nguyên tử có nhiều khoảng rỗng nên B, C, D sai.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Điện tích hạt nhân do proton quyết định và luôn dương.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Hạt nhân mang điện dương, bằng tổng điện tích proton; neutron không mang điện.",
+    "lyDo2": "Hạt nhân gồm proton (+) và neutron (không mang điện) nên điện tích hạt nhân bằng tổng điện tích proton; A, B, D sai.",
     "chac": true
    }
   }

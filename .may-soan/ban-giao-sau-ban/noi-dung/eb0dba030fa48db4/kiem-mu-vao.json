@@ -1,110 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Nguyên tử R có điện tích lớp vỏ nguyên tử là −28,8.10⁻¹⁹ C (cho điện tích một electron là −1,6.10⁻¹⁹ C). Điều khẳng định nào sau đây là không chính xác?",
   "pa": {
    "A": "Lớp vỏ nguyên tử R có 18 electron.",
    "B": "Hạt nhân nguyên tử R có 16 proton.",
    "C": "Nguyên tử R trung hòa về điện.",
    "D": "Điện tích hạt nhân của R là +28,8.10⁻¹⁹ C."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Số electron = 28,8 / 1,6 = 18.",
-   "Nguyên tử trung hòa nên số proton = 18, không phải 16."
-  ],
-  "chot": "Số proton bằng số electron, tính từ điện tích lớp vỏ."
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Nguyên tử R có điện tích lớp vỏ nguyên tử là −32,0.10⁻¹⁹ C (cho điện tích một electron là −1,6.10⁻¹⁹ C). Điều khẳng định nào sau đây là chính xác?",
   "pa": {
    "A": "Lớp vỏ nguyên tử R có 16 electron.",
    "B": "Nguyên tử R mang điện tích âm.",
    "C": "Hạt nhân nguyên tử R mang điện tích âm.",
    "D": "Hạt nhân nguyên tử R có 20 proton."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Số electron = 32,0 / 1,6 = 20.",
-   "Nguyên tử trung hòa nên hạt nhân có 20 proton, mang điện tích dương."
-  ],
-  "chot": "Hạt nhân mang điện dương; số proton bằng số electron."
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Nguyên tử R có điện tích lớp vỏ nguyên tử là −38,4.10⁻¹⁹ C (cho điện tích một electron là −1,6.10⁻¹⁹ C). Điều khẳng định nào sau đây là không chính xác?",
   "pa": {
    "A": "Nguyên tử R mang điện tích âm.",
    "B": "Lớp vỏ nguyên tử R có 24 electron.",
    "C": "Hạt nhân nguyên tử R có 24 proton.",
    "D": "Điện tích hạt nhân của R là +38,4.10⁻¹⁹ C."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Số electron = 38,4 / 1,6 = 24, số proton cũng bằng 24.",
-   "Nguyên tử trung hòa về điện, không mang điện tích âm."
-  ],
-  "chot": "Nguyên tử luôn trung hòa; chỉ lớp vỏ mang điện âm."
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Nguyên tử R có điện tích lớp vỏ nguyên tử là −46,4.10⁻¹⁹ C (cho điện tích một electron là −1,6.10⁻¹⁹ C). Điều khẳng định nào sau đây là không chính xác?",
   "pa": {
    "A": "Lớp vỏ nguyên tử R có 29 electron.",
    "B": "Nguyên tử R trung hòa về điện.",
    "C": "Hạt nhân nguyên tử R có 23 proton.",
    "D": "Điện tích hạt nhân của R là +46,4.10⁻¹⁹ C."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Số electron = 46,4 / 1,6 = 29.",
-   "Nguyên tử trung hòa nên số proton = 29, không phải 23."
-  ],
-  "chot": "Số proton bằng số electron, tính từ điện tích lớp vỏ."
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Nguyên tử R có điện tích lớp vỏ nguyên tử là −27,2.10⁻¹⁹ C (cho điện tích một electron là −1,6.10⁻¹⁹ C). Điều khẳng định nào sau đây là chính xác?",
   "pa": {
    "A": "Nguyên tử R mang điện tích −27,2.10⁻¹⁹ C.",
    "B": "Hạt nhân nguyên tử R có 17 proton.",
    "C": "Lớp vỏ nguyên tử R có 27 electron.",
    "D": "Hạt nhân nguyên tử R mang điện tích −27,2.10⁻¹⁹ C."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Số electron = 27,2 / 1,6 = 17.",
-   "Nguyên tử trung hòa nên hạt nhân có 17 proton; điện tích hạt nhân là +27,2.10⁻¹⁹ C."
-  ],
-  "chot": "Số electron = |điện tích lớp vỏ| / 1,6.10⁻¹⁹; số proton bằng số electron."
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Nguyên tử R có điện tích lớp vỏ nguyên tử là −30,4.10⁻¹⁹ C (cho điện tích một electron là −1,6.10⁻¹⁹ C). Điều khẳng định nào sau đây là không chính xác?",
   "pa": {
    "A": "Lớp vỏ nguyên tử R có 19 electron.",
    "B": "Hạt nhân nguyên tử R có 19 proton.",
    "C": "Nguyên tử R trung hòa về điện.",
    "D": "Điện tích hạt nhân của R là −30,4.10⁻¹⁹ C."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Số electron = 30,4 / 1,6 = 19, số proton cũng bằng 19.",
-   "Hạt nhân mang điện dương: +30,4.10⁻¹⁹ C, không phải âm."
-  ],
-  "chot": "Điện tích hạt nhân dương, cùng độ lớn với điện tích lớp vỏ."
+  }
  }
 ]

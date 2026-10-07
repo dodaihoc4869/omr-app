@@ -20,7 +20,7 @@
    "chot": "Thomson tìm ra electron (1897).",
    "kiem": {
     "d2": "B",
-    "lyDo2": "J.J. Thomson tìm ra electron (1897).",
+    "lyDo2": "J.J. Thomson tìm ra electron năm 1897 (tia âm cực).",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Chadwick tìm ra neutron (1932).",
    "kiem": {
     "d2": "C",
-    "lyDo2": "J. Chadwick tìm ra neutron (1932).",
+    "lyDo2": "J. Chadwick tìm ra neutron năm 1932.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Thí nghiệm lá vàng của Rutherford tìm ra hạt nhân nguyên tử.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Thí nghiệm Rutherford 1911 tìm ra hạt nhân nguyên tử.",
+    "lyDo2": "Thí nghiệm hạt α bắn lá vàng (1911) tìm ra hạt nhân nguyên tử.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Thí nghiệm lá vàng dùng chùm hạt α.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Rutherford bắn chùm hạt α vào lá vàng.",
+    "lyDo2": "Rutherford dùng chùm hạt α bắn vào lá vàng mỏng.",
     "chac": true
    }
   }

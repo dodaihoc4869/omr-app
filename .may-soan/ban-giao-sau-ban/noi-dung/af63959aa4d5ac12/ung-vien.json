@@ -20,7 +20,7 @@
    "chot": "Số proton bằng số electron nên nguyên tử không mang điện.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Số proton (+) bằng số electron (−) nên nguyên tử trung hoà",
+    "lyDo2": "Nguyên tử trung hoà vì số proton (+) bằng số electron (−).",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Nguyên tử trung hoà về điện.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Nguyên tử trung hoà về điện; neutron không mang điện nên D sai",
+    "lyDo2": "Nguyên tử trung hoà về điện; neutron không mang điện nên D sai.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt nhân mang điện dương, không phải điện âm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Hạt nhân mang điện dương, nên A sai",
+    "lyDo2": "Hạt nhân gồm proton và neutron nên mang điện dương, A sai.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Điện tích hạt nhân bị electron ở vỏ trung hoà.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Nguyên tử trung hoà, không mang điện",
+    "lyDo2": "Điện tích hạt nhân bị điện tích electron trung hoà nên nguyên tử không mang điện.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Trong nguyên tử, số electron bằng số proton.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Số electron = số proton = 11",
+    "lyDo2": "Nguyên tử trung hoà nên số electron bằng số proton = 11.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Mất electron thì mang điện dương.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Mất electron thì dư điện tích dương, thành ion dương",
+    "lyDo2": "Mất electron thì số proton lớn hơn số electron nên thành ion dương.",
     "chac": true
    }
   }

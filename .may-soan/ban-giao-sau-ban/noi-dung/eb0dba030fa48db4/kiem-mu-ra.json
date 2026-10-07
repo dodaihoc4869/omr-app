@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "28,8/1,6 = 18 e = 18 p; 'có 16 proton' sai.",
+  "lyDo": "28,8/1,6 = 18 electron = 18 proton (trung hòa), nên 'có 16 proton' sai.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "32,0/1,6 = 20 e, nguyên tử trung hòa, hạt nhân 20 proton; D đúng.",
+  "lyDo": "32,0/1,6 = 20 electron nên hạt nhân có 20 proton; A, B, C đều sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "24 e, 24 p, nguyên tử trung hòa nên 'mang điện âm' sai.",
+  "lyDo": "Nguyên tử trung hòa về điện (24 e = 24 p), nên 'mang điện tích âm' là sai; B, C, D đúng.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "C",
-  "lyDo": "46,4/1,6 = 29 e = 29 p; 'có 23 proton' sai.",
+  "lyDo": "46,4/1,6 = 29 electron nên 29 proton, không phải 23; A, B, D đúng.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "27,2/1,6 = 17 e = 17 p; B đúng, các ý khác sai.",
+  "lyDo": "27,2/1,6 = 17 electron nên 17 proton; A, C, D sai.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Hạt nhân 19 p mang điện +30,4.10^-19 C, không phải âm.",
+  "lyDo": "30,4/1,6 = 19 e = 19 p; điện tích hạt nhân là +30,4.10⁻¹⁹ C, không phải âm nên D sai; A, B, C đúng.",
   "chac": true
  }
 ]

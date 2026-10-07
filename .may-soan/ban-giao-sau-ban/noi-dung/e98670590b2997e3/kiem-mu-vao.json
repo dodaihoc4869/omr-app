@@ -1,164 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Khối lượng nguyên tử aluminium (Al) là 44,8036.10⁻²⁷ kg. Cho 1 amu = 1,6605.10⁻²⁷ kg. Khối lượng của aluminium theo amu là",
   "pa": {
    "A": "26,982",
    "B": "0,0371",
    "C": "74,396.10⁻⁵⁴",
    "D": "27,000"
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Đổi từ kg sang amu: chia khối lượng cho 1,6605.10⁻²⁷ kg/amu.",
-   "m = 44,8036.10⁻²⁷ / 1,6605.10⁻²⁷ ≈ 26,982 amu."
-  ],
-  "chot": "Khối lượng theo amu = khối lượng theo kg chia cho giá trị của 1 amu.",
-  "phepTinh": [
-   {
-    "ten": "Khối lượng theo amu",
-    "bieuThuc": "44.8036/1.6605",
-    "ketQua": 26.982,
-    "lamTron": 3,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss2",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Khối lượng nguyên tử chlorine (Cl) là 58,0660.10⁻²⁷ kg. Cho 1 amu = 1,6605.10⁻²⁷ kg. Khối lượng của chlorine theo amu là",
   "pa": {
    "A": "35,000",
    "B": "96,419.10⁻⁵⁴",
    "C": "0,0286",
    "D": "34,969"
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Đổi từ kg sang amu: chia khối lượng cho 1,6605.10⁻²⁷ kg/amu.",
-   "m = 58,0660.10⁻²⁷ / 1,6605.10⁻²⁷ ≈ 34,969 amu."
-  ],
-  "chot": "Khối lượng theo amu = khối lượng theo kg chia cho giá trị của 1 amu.",
-  "phepTinh": [
-   {
-    "ten": "Khối lượng theo amu",
-    "bieuThuc": "58.066/1.6605",
-    "ketQua": 34.969,
-    "lamTron": 3,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss3",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Khối lượng nguyên tử calcium (Ca) là 66,3586.10⁻²⁷ kg. Cho 1 amu = 1,6605.10⁻²⁷ kg. Khối lượng của calcium theo amu là",
   "pa": {
    "A": "40,000",
    "B": "39,963",
    "C": "110,19.10⁻⁵⁴",
    "D": "0,0250"
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Đổi từ kg sang amu: chia khối lượng cho 1,6605.10⁻²⁷ kg/amu.",
-   "m = 66,3586.10⁻²⁷ / 1,6605.10⁻²⁷ ≈ 39,963 amu."
-  ],
-  "chot": "Khối lượng theo amu = khối lượng theo kg chia cho giá trị của 1 amu.",
-  "phepTinh": [
-   {
-    "ten": "Khối lượng theo amu",
-    "bieuThuc": "66.3586/1.6605",
-    "ketQua": 39.963,
-    "lamTron": 3,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss4",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Khối lượng nguyên tử iron (Fe) là 92,8801.10⁻²⁷ kg. Cho 1 amu = 1,6605.10⁻²⁷ kg. Khối lượng của iron theo amu là",
   "pa": {
    "A": "154,23.10⁻⁵⁴",
    "B": "56,000",
    "C": "55,935",
    "D": "0,0179"
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Đổi từ kg sang amu: chia khối lượng cho 1,6605.10⁻²⁷ kg/amu.",
-   "m = 92,8801.10⁻²⁷ / 1,6605.10⁻²⁷ ≈ 55,935 amu."
-  ],
-  "chot": "Khối lượng theo amu = khối lượng theo kg chia cho giá trị của 1 amu.",
-  "phepTinh": [
-   {
-    "ten": "Khối lượng theo amu",
-    "bieuThuc": "92.8801/1.6605",
-    "ketQua": 55.935,
-    "lamTron": 3,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss5",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Khối lượng nguyên tử copper (Cu) là 104,4953.10⁻²⁷ kg. Cho 1 amu = 1,6605.10⁻²⁷ kg. Khối lượng của copper theo amu là",
   "pa": {
    "A": "62,930",
    "B": "173,51.10⁻⁵⁴",
    "C": "63,000",
    "D": "0,0159"
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Đổi từ kg sang amu: chia khối lượng cho 1,6605.10⁻²⁷ kg/amu.",
-   "m = 104,4953.10⁻²⁷ / 1,6605.10⁻²⁷ ≈ 62,930 amu."
-  ],
-  "chot": "Khối lượng theo amu = khối lượng theo kg chia cho giá trị của 1 amu.",
-  "phepTinh": [
-   {
-    "ten": "Khối lượng theo amu",
-    "bieuThuc": "104.4953/1.6605",
-    "ketQua": 62.93,
-    "lamTron": 3,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss6",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Khối lượng nguyên tử sulfur (S) là 53,0895.10⁻²⁷ kg. Cho 1 amu = 1,6605.10⁻²⁷ kg. Khối lượng của sulfur theo amu là",
   "pa": {
    "A": "88,155.10⁻⁵⁴",
    "B": "0,0313",
    "C": "32,000",
    "D": "31,972"
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Đổi từ kg sang amu: chia khối lượng cho 1,6605.10⁻²⁷ kg/amu.",
-   "m = 53,0895.10⁻²⁷ / 1,6605.10⁻²⁷ ≈ 31,972 amu."
-  ],
-  "chot": "Khối lượng theo amu = khối lượng theo kg chia cho giá trị của 1 amu.",
-  "phepTinh": [
-   {
-    "ten": "Khối lượng theo amu",
-    "bieuThuc": "53.0895/1.6605",
-    "ketQua": 31.972,
-    "lamTron": 3,
-    "laDapSo": true
-   }
-  ]
+  }
  }
 ]

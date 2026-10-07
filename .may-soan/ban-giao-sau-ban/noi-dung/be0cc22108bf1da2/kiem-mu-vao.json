@@ -1,116 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Trường hợp nào sau đây ghi đúng khối lượng và điện tích của hạt electron?",
   "pa": {
    "A": "m ≈ 1 amu, q = –1.",
    "B": "m ≈ 0,00055 amu, q = 0.",
    "C": "m ≈ 0,00055 amu, q = –1.",
    "D": "m ≈ 1 amu, q = 0."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Electron rất nhẹ, khối lượng khoảng 0,00055 amu.",
-   "Electron mang điện tích −1."
-  ],
-  "chot": "Electron: m ≈ 0,00055 amu, q = −1.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Trường hợp nào sau đây ghi đúng khối lượng và điện tích của hạt proton?",
   "pa": {
    "A": "m ≈ 1 amu, q = +1.",
    "B": "m ≈ 0,00055 amu, q = 0.",
    "C": "m ≈ 1 amu, q = 0.",
    "D": "m ≈ 0,00055 amu, q = –1."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Proton có khối lượng khoảng 1 amu.",
-   "Proton mang điện tích +1."
-  ],
-  "chot": "Proton: m ≈ 1 amu, q = +1.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Trường hợp nào sau đây ghi sai về hạt cơ bản của nguyên tử?",
   "pa": {
    "A": "neutron, m ≈ 1 amu, q = 0.",
    "B": "proton, m ≈ 1 amu, q = +1.",
    "C": "electron, m ≈ 0,00055 amu, q = –1.",
    "D": "electron, m ≈ 1 amu, q = +1."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "A, B, C đều khớp với số liệu của neutron, proton, electron.",
-   "Electron nhẹ hơn proton rất nhiều và mang điện âm nên D sai cả hai thông số."
-  ],
-  "chot": "Electron nhẹ và mang điện âm.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Hạt cơ bản nào có khối lượng xấp xỉ 1 amu và không mang điện?",
   "pa": {
    "A": "Electron.",
    "B": "Neutron.",
    "C": "Proton.",
    "D": "Hạt nhân nguyên tử."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Electron nhẹ (≈ 0,00055 amu) và mang điện âm.",
-   "Proton nặng ≈ 1 amu nhưng mang điện dương; chỉ neutron nặng ≈ 1 amu và trung hoà."
-  ],
-  "chot": "Neutron: ≈ 1 amu, không mang điện.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Hai hạt nào sau đây có khối lượng xấp xỉ bằng nhau?",
   "pa": {
    "A": "Proton và electron.",
    "B": "Neutron và electron.",
    "C": "Proton và neutron.",
    "D": "Hạt nhân và electron."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Proton và neutron đều có khối lượng khoảng 1 amu.",
-   "Khối lượng electron nhỏ hơn hàng nghìn lần."
-  ],
-  "chot": "Proton và neutron nặng xấp xỉ nhau.",
-  "phepTinh": []
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "So với khối lượng của hạt proton, khối lượng của hạt electron",
   "pa": {
    "A": "nhỏ hơn rất nhiều.",
    "B": "xấp xỉ bằng nhau.",
    "C": "lớn hơn rất nhiều.",
    "D": "chính xác bằng 1 amu."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Proton có khối lượng ≈ 1 amu, electron ≈ 0,00055 amu.",
-   "Electron nhẹ hơn proton khoảng hai nghìn lần."
-  ],
-  "chot": "Electron nhẹ hơn proton rất nhiều.",
-  "phepTinh": []
+  }
  }
 ]

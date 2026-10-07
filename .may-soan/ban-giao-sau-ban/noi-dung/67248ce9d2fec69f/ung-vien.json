@@ -20,7 +20,7 @@
    "chot": "Lá vàng bị hạt alpha bắn phá cho thấy hạt nhân nguyên tử.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Rutherford bắn hạt alpha vào lá vàng phát hiện hạt nhân nguyên tử",
+    "lyDo2": "Rutherford bắn hạt alpha vào lá vàng, phát hiện hạt nhân nguyên tử.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Tia âm cực là chùm electron.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Tia âm cực là chùm electron đi từ cực âm sang cực dương",
+    "lyDo2": "Tia âm cực là chùm electron đi từ cực âm sang cực dương, bị lệch về phía bản dương.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt mang điện âm lệch về phía bản cực dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Tia âm cực mang điện âm nên lệch về bản cực dương",
+    "lyDo2": "Chùm electron mang điện âm nên lệch về phía bản cực dương.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Rutherford gắn với thí nghiệm lá vàng và hạt nhân.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Rutherford phát hiện hạt nhân",
+    "lyDo2": "E. Rutherford làm thí nghiệm lá vàng và phát hiện hạt nhân.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Ống tia âm cực dẫn tới electron.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Ống tia âm cực dẫn đến phát hiện electron",
+    "lyDo2": "Ống tia âm cực của Thomson (1897) phát hiện electron.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Chadwick phát hiện neutron.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Chadwick phát hiện neutron năm 1932",
+    "lyDo2": "Chadwick phát hiện neutron năm 1932.",
     "chac": true
    }
   }
