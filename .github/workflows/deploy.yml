@@ -53,12 +53,14 @@ jobs:
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
 
-      - name: Đẩy lên Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ env.CF_TOKEN_SACH }}
-          accountId: ${{ env.CF_ACC_SACH }}
-          command: pages deploy dist --project-name=omr-app --branch=main
+      - name: Kiểm ca thi và áp schema vòng chữa trước khi đổi bản sống
+        run: |
+          node scripts/kiem-phat-hanh-chua.mjs
+          node scripts/ap-migration-chua.mjs --remote
+          node scripts/kiem-phat-hanh-chua.mjs --schema
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
 
       - name: Đẩy lên Cloudflare Worker (Máy chủ)
         uses: cloudflare/wrangler-action@v3
@@ -67,3 +69,10 @@ jobs:
           accountId: ${{ env.CF_ACC_SACH }}
           command: deploy
           workingDirectory: server
+
+      - name: Đẩy lên Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: pages deploy dist --project-name=omr-app --branch=main

@@ -2,6 +2,8 @@
 name: Áp schema vòng chữa câu sai
 on:
   workflow_dispatch:
+  push:
+    branches: [codex/ap-schema-vong-chua-0710]
 permissions:
   contents: read
 concurrency:
@@ -20,7 +22,10 @@ jobs:
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
       - name: Áp phần schema thiếu và kiểm trigger
-        run: node scripts/ap-migration-chua.mjs --remote
+        run: |
+          node scripts/kiem-phat-hanh-chua.mjs
+          node scripts/ap-migration-chua.mjs --remote
+          node scripts/kiem-phat-hanh-chua.mjs --schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
