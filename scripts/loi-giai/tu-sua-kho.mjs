@@ -10,6 +10,9 @@
 //   viec 'dapAn'    — đổi `dap_an` từ `truoc` sang `sau` (chỉ khi kho đang đúng bằng `truoc`);
 //   viec 'xepY'     — xếp lại khoá `y` về a, b, c, d (dây chuyền lời giải ghép đáp án theo thứ tự khoá).
 //   viec 'tuLuan'   — đánh dấu câu là tự luận (`kieu: 'tu_luan'` + cờ `can_xem`): kênh tự động không rút, không chấm máy (câu Phần III đáp án là công thức).
+//   viec 'loiGiai'  — (07/10) đáp án kho đã chốt đổi nhưng CHỮ LỜI GIẢI lưu trong câu còn ghi đáp án cũ: { dapAn (đáp án kho mong đợi), truoc?: {trường: giá trị cũ mong đợi},
+//                     sau: {chot | buoc | ket_qua | tung_y | tung_pa | dap_an_de | dap_an_tu_giai: giá trị mới} } — chỉ ghi đè các trường nêu trong `sau`, không đổi đề / đáp án
+//                     (băm hồ sơ không đổi). `--lui` khôi phục cả `loi_giai`.
 // AN TOÀN: sao lưu nguyên câu (trừ dữ liệu ảnh, không bao giờ bị sửa) vào docs/loi-giai-a/tu-sua-2909/sao-luu/<mã đề>.json
 // TRƯỚC khi ghi, không bao giờ ghi đè bản sao lưu đầu tiên của một câu; có ca thi mở / chưa công bố ⇒ DỪNG; đọc lại sau khi ghi.
 // Chỉ mục câu dựng lại đúng như /kho/chi-muc-lay trả (giữ lớp, chuyên đề, mức độ; tờ DB- vẫn rỗng). Băm câu đổi ⇒ máy chủ
@@ -93,6 +96,20 @@ function apViec(c, v) {
     c.y = Object.fromEntries(dung.map((x) => [x, c.y[x]]))
     return `xếp ý ${k.join('')} → ${dung.join('')}`
   }
+  if (v.viec === 'loiGiai') {
+    // 07/10: đáp án kho đã được chốt đổi nhưng CHỮ LỜI GIẢI lưu trong câu (`loi_giai`) còn ghi đáp án cũ ⇒ em thấy lời giải mâu thuẫn đáp án sau khi trả lời.
+    // Chỉ ghi đè các trường nêu trong `sau` (chot, buoc, ket_qua, tung_y, tung_pa, dap_an_de, dap_an_tu_giai, ghi_chu); KHÔNG đổi đáp án / đề (băm hồ sơ không đổi).
+    // `dapAn` = đáp án kho mong đợi (khác ⇒ dừng, tránh ghi lời giải đè lên câu đã đổi đáp án lần nữa); `truoc` (tuỳ chọn) = giá trị cũ mong đợi của từng trường.
+    if (c.dap_an !== v.dapAn) throw new Error(`đáp án kho là ${JSON.stringify(c.dap_an)}, không phải ${JSON.stringify(v.dapAn)}`)
+    const lg = c.loi_giai
+    if (!lg || typeof lg !== 'object') throw new Error('câu chưa có loi_giai')
+    const bang = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+    const khac = Object.keys(v.sau).filter((k) => !bang(lg[k], v.sau[k]))
+    if (!khac.length) return null
+    for (const k of Object.keys(v.truoc ?? {})) if (!bang(lg[k], v.truoc[k])) throw new Error(`loi_giai.${k} không còn là bản dự kiến`)
+    for (const k of khac) lg[k] = v.sau[k]
+    return `loi_giai: sửa ${khac.join(', ')}`
+  }
   if (v.viec !== 'thay') throw new Error('việc lạ: ' + v.viec)
   const cu = docTruong(c, v.truong)
   if (typeof cu !== 'string') throw new Error(`không có trường ${v.truong}`)
@@ -145,7 +162,7 @@ async function main() {
       const g = (await goi('/kho/lay', { maDe })).j
       for (const [q, goc] of cs) {
         const c = timCau(g, goc.phan, goc.so)
-        for (const k of ['de', 'pa', 'y', 'dap_an', 'bang', 'kieu', 'can_xem']) { if (k in goc) c[k] = goc[k]; else if (k === 'kieu' || k === 'can_xem') delete c[k] }
+        for (const k of ['de', 'pa', 'y', 'dap_an', 'bang', 'kieu', 'can_xem', 'loi_giai']) { if (k in goc) c[k] = goc[k]; else if (k === 'kieu' || k === 'can_xem') delete c[k] }
         console.log(`${THAT ? '' : '[thử] '}lùi ${q}`)
         if (THAT) ghiNhatKy(`| ${new Date().toISOString().slice(11, 19)} | ${q} | LÙI về bản sao lưu | yêu cầu lùi |`)
       }
