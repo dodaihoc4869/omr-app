@@ -1,0 +1,84 @@
+{
+  "peptide": [
+    {
+      "i": 1,
+      "nPeptide": "3/20",
+      "vLit": "1/5",
+      "xExact": "3",
+      "xRounded": 3.0,
+      "uniqueAnswer": [
+        "A"
+      ],
+      "providedAnswer": "A",
+      "pass": true
+    },
+    {
+      "i": 2,
+      "nPeptide": "1/5",
+      "vLit": "1/4",
+      "xExact": "16/5",
+      "xRounded": 3.2,
+      "uniqueAnswer": [
+        "B"
+      ],
+      "providedAnswer": "B",
+      "pass": true
+    },
+    {
+      "i": 3,
+      "nPeptide": "1/2",
+      "vLit": "1/5",
+      "xExact": "10",
+      "xRounded": 10.0,
+      "uniqueAnswer": [
+        "C"
+      ],
+      "providedAnswer": "C",
+      "pass": true
+    },
+    {
+      "i": 4,
+      "nPeptide": "1/10",
+      "vLit": "2/5",
+      "xExact": "1",
+      "xRounded": 1.0,
+      "uniqueAnswer": [
+        "D"
+      ],
+      "providedAnswer": "D",
+      "pass": true
+    },
+    {
+      "i": 5,
+      "nPeptide": "2/5",
+      "vLit": "1/2",
+      "xExact": "16/5",
+      "xRounded": 3.2,
+      "uniqueAnswer": [
+        "A"
+      ],
+      "providedAnswer": "A",
+      "pass": true
+    },
+    {
+      "i": 6,
+      "nPeptide": "1/4",
+      "vLit": "3/10",
+      "xExact": "10/3",
+      "xRounded": 3.33,
+      "uniqueAnswer": [
+        "B"
+      ],
+      "providedAnswer": "B",
+      "pass": true
+    }
+  ],
+  "zincNumerics": {
+    "y13": 19300.0,
+    "y17": 600.0,
+    "y18": 540.0,
+    "y19": 4.8,
+    "y20": 200.0
+  },
+  "scope": "Independent arithmetic, not scientific certification"
+}

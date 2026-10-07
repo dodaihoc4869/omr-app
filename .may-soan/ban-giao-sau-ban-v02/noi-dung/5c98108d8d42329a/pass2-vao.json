@@ -1,0 +1,31 @@
+{
+  "phien": "e72dc258-pass2-protein-v02",
+  "nhiem_vu": "Giải mù từng bản — không có đáp án gốc, chỉ nhìn đề",
+  "qid": "12-C3-B10-D2-III-3",
+  "cau": [
+    {
+      "id": "5c98108d8d42329a_ss1",
+      "de": "Cho các protein sau: albumin (có ở lòng trắng trứng); keratin (có ở tóc, móng); collagen (có ở da, sụn); myosin (có ở cơ bắp) và fibroin (có ở tơ tằm). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss2",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); albumin (có ở lòng trắng trứng); pepsin (enzim tiêu hóa dạ dày); amylase (enzim tiêu hóa tinh bột); lipase (enzim tiêu hóa chất béo) và fibroin (có ở tơ tằm). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss3",
+      "de": "Cho các protein sau: albumin (có ở lòng trắng trứng); pepsin (enzim tiêu hóa dạ dày); amylase (enzim tiêu hóa tinh bột); keratin (có ở tóc, móng); fibrin (có ở máu đông) và collagen (có ở da, sụn). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss4",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); amylase (enzim tiêu hóa tinh bột); pepsin (enzim tiêu hóa dạ dày); lipase (enzim tiêu hóa chất béo); keratin (có ở tóc, móng) và myosin (có ở cơ bắp). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss5",
+      "de": "Cho các protein sau: hemoglobin (có ở máu); albumin (có ở lòng trắng trứng); pepsin (enzim tiêu hóa dạ dày); amylase (enzim tiêu hóa tinh bột); lipase (enzim tiêu hóa chất béo) và casein (có ở sữa bò). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    },
+    {
+      "id": "5c98108d8d42329a_ss6",
+      "de": "Cho các protein sau: keratin (có ở tóc, móng); collagen (có ở da, sụn); myosin (có ở cơ bắp); fibrin (có ở máu đông); fibroin (có ở tơ tằm) và elastin (có ở mô liên kết). Có bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?"
+    }
+  ]
+}

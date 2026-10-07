@@ -1,0 +1,142 @@
+{
+  "phienBan": "0.2",
+  "taoLuc": "2026-10-07T03:14:29.532Z",
+  "phienSession": "e72dc258-9785-5f2f-9a07-8d16d3b02a30",
+  "tomTat": "Sửa 4 nhóm theo yêu cầu Codex trong bao-cao-codex-gui-claude.zip",
+  "mucThayDoi": [
+    {
+      "_id": "54ede2e3b61a3ee5_ss1",
+      "nhom": "Gly-Ala-Glu",
+      "loai": "sua_giai_thich",
+      "mo_ta": "buoc[0]: đổi từ \"4 nhóm -COOH mỗi phân tử peptide\" thành \"2 lk peptide + 2 -COOH tự do\". Đáp số A=3,00M không đổi."
+    },
+    {
+      "_id": "54ede2e3b61a3ee5_ss2",
+      "nhom": "Gly-Ala-Glu",
+      "loai": "sua_giai_thich",
+      "mo_ta": "buoc[0] sửa. Đáp số B=3,20M không đổi."
+    },
+    {
+      "_id": "54ede2e3b61a3ee5_ss3",
+      "nhom": "Gly-Ala-Glu",
+      "loai": "sua_giai_thich",
+      "mo_ta": "buoc[0] sửa. Đáp số C=10,00M không đổi."
+    },
+    {
+      "_id": "54ede2e3b61a3ee5_ss4",
+      "nhom": "Gly-Ala-Glu",
+      "loai": "sua_giai_thich",
+      "mo_ta": "buoc[0] sửa. Đáp số D=1,00M không đổi."
+    },
+    {
+      "_id": "54ede2e3b61a3ee5_ss5",
+      "nhom": "Gly-Ala-Glu",
+      "loai": "sua_giai_thich",
+      "mo_ta": "buoc[0] sửa. Đáp số A=3,20M không đổi."
+    },
+    {
+      "_id": "54ede2e3b61a3ee5_ss6",
+      "nhom": "Gly-Ala-Glu",
+      "loai": "sua_giai_thich",
+      "mo_ta": "buoc[0] sửa. Đáp số B=3,33M không đổi."
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss1",
+      "nhom": "Thomson",
+      "loai": "sua_ly_do_pass2",
+      "mo_ta": "pass2-ra lyDo ss1: thay \"electron nhẹ hơn hạt nhân ~1800 lần\" bằng \"nhẹ hơn proton khoảng 1836 lần\". Đáp A không đổi."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss1",
+      "nhom": "Protein",
+      "loai": "viet_lai_hoan_toan",
+      "mo_ta": "Bỏ insulin (ít tan ở pH trung tính). Đổi protein: albumin+keratin+collagen+myosin+fibroin. Đáp=1 (giữ nguyên)."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss2",
+      "nhom": "Protein",
+      "loai": "viet_lai_hoan_toan",
+      "mo_ta": "Bỏ globulin (không xác minh được). Đổi protein: hemoglobin+albumin+pepsin+amylase+lipase+fibroin. Đáp 2→5 (sửa vi phạm cổng)."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss3",
+      "nhom": "Protein",
+      "loai": "giu_nguyen",
+      "mo_ta": "Không thay đổi. albumin+pepsin+amylase+keratin+fibrin+collagen. Đáp=3."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss4",
+      "nhom": "Protein",
+      "loai": "viet_lai_hoan_toan",
+      "mo_ta": "Bỏ insulin. Đổi protein: hemoglobin+amylase+pepsin+lipase+keratin+myosin. Đáp=4 (giữ nguyên)."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss5",
+      "nhom": "Protein",
+      "loai": "viet_lai_hoan_toan",
+      "mo_ta": "Bỏ insulin. Đổi protein: hemoglobin+albumin+pepsin+amylase+lipase+casein. Đáp 2→6 (sửa vi phạm cổng)."
+    },
+    {
+      "_id": "5c98108d8d42329a_ss6",
+      "nhom": "Protein",
+      "loai": "viet_lai_hoan_toan",
+      "mo_ta": "Bỏ globulin+hemoglobin+lipase. Đổi protein: keratin+collagen+myosin+fibrin+fibroin+elastin. Đáp 3→0 (sửa vi phạm cổng)."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y16",
+      "nhom": "Zinc",
+      "loai": "sua_phat_bieu",
+      "mo_ta": "Phát biểu: đổi từ \"SO3 hấp thụ vào nước\" thành \"hấp thụ vào H2SO4 đặc (oleum)\". Đáp D giữ nguyên (phát biểu mới đúng). Giải mù lại."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y6",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: thêm ghi chú Na₂ZnO₂ = zincate SGK phổ thông, tương đương [Zn(OH)₄]²⁻ trong dung dịch."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y21",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: thêm ghi chú tương đương Na₂ZnO₂ và [Zn(OH)₄]²⁻."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y23",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: ghi chú Na₂[Zn(OH)₄] hay Na₂ZnO₂·2H₂O."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y24",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: ghi chú tương đương Na₂ZnO₂·2H₂O."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y13",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: bổ sung quy ước M(Zn)=65, F=96500 C/mol."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y19",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: bổ sung quy ước M(ZnS)=97, M(O₂)=32."
+    },
+    {
+      "_id": "2c8b26e16e0fef33_y20",
+      "nhom": "Zinc",
+      "loai": "sua_ly_do",
+      "mo_ta": "lyDo: bổ sung quy ước M(ZnO)=81, C=1mol/L."
+    },
+    {
+      "_id": "pass2-vao-zinc",
+      "nhom": "Zinc",
+      "loai": "sua_dau_vao_pass2",
+      "mo_ta": "Đề dẫn đầy đủ từ cau-goc.json (3 giai đoạn, ZnSO4, điện cực trơ) thay vì chỉ tiêu đề."
+    }
+  ],
+  "gioiHan": "Chưa khai PASS — chờ Codex kiểm lại. Chưa nạp D1.",
+  "khongThayDoi": "Tất cả ý còn lại của zinc (y1-y15, y17-y24 trừ y16, y19, y20), Thomson ss2-ss6, câu gốc."
+}

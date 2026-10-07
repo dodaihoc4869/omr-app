@@ -1,0 +1,41 @@
+{
+  "phien": "e72dc258-pass2-protein-v02",
+  "tra": [
+    {
+      "id": "5c98108d8d42329a_ss1",
+      "d": "1",
+      "lyDo": "Albumin (lòng trắng trứng) là protein hình cầu, tan trong nước tạo dung dịch keo. Keratin (tóc, móng), collagen (da, sụn), myosin (cơ bắp), fibroin (tơ tằm) là protein hình sợi → không tan. Đếm protein tan: 1.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss2",
+      "d": "5",
+      "lyDo": "Hemoglobin (máu), albumin (trứng), pepsin (enzim dạ dày), amylase (enzim tinh bột), lipase (enzim chất béo) đều là protein hình cầu → tan trong nước. Fibroin (tơ tằm) là protein sợi → không tan. Đếm protein tan: 5.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss3",
+      "d": "3",
+      "lyDo": "Albumin (trứng), pepsin (enzim dạ dày), amylase (enzim tinh bột) là protein cầu → tan trong nước. Keratin (tóc, móng), fibrin (máu đông), collagen (da, sụn) là protein sợi → không tan. Đếm protein tan: 3.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss4",
+      "d": "4",
+      "lyDo": "Hemoglobin (máu), amylase (enzim tinh bột), pepsin (enzim dạ dày), lipase (enzim chất béo) là protein cầu → tan trong nước. Keratin (tóc, móng), myosin (cơ bắp) là protein sợi → không tan. Đếm protein tan: 4.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss5",
+      "d": "6",
+      "lyDo": "Hemoglobin, albumin, pepsin, amylase, lipase đều là protein cầu → tan trong nước. Casein (sữa bò) tồn tại dạng micelle trong sữa, tan trong nước tạo dung dịch keo. Tất cả 6 protein đều tan trong nước. Đếm: 6.",
+      "chac": true
+    },
+    {
+      "id": "5c98108d8d42329a_ss6",
+      "d": "0",
+      "lyDo": "Keratin (tóc, móng), collagen (da, sụn), myosin (cơ bắp), fibrin (máu đông), fibroin (tơ tằm), elastin (mô liên kết) tất cả đều là protein hình sợi (fibrous). Protein sợi không tan trong nước. Đếm protein tan: 0.",
+      "chac": true
+    }
+  ]
+}

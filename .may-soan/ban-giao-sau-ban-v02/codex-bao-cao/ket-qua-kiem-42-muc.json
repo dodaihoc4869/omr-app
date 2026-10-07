@@ -1,0 +1,548 @@
+{
+  "inputSha256": "91266b1eb703d8167ca076b022fa6b9b14ed18e7c971990df8970af233327178",
+  "candidates": 42,
+  "sourceQids": 4,
+  "sourceHashMatches": 4,
+  "structureAccepted": 39,
+  "structureRejected": 3,
+  "published": 0,
+  "decision": "CHUA_DAT_NGHIEM_THU",
+  "limits": [
+    "Chưa đối chiếu phiên bản câu gốc D1 hiện tại; đã khớp ánh xạ qid/bam trong lần quét trước.",
+    "Bằng chứng đáp án khớp 42/42 và đầu vào không có khóa đáp án, nhưng gói không có log/định danh phiên để kiểm chứng hai lượt được chạy tách biệt.",
+    "Không dùng số 39/42 cấu trúc để suy ra số đạt chuyên môn hoặc số được phát hành."
+  ],
+  "items": [
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y1",
+      "index": 1,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y2",
+      "index": 2,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y3",
+      "index": 3,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y4",
+      "index": 4,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y5",
+      "index": 5,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y6",
+      "index": 6,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Chuẩn hóa dạng zincate trong dung dịch: dùng [Zn(OH)4]2− và nước khi cần, hoặc nêu rõ quy ước/phạm vi của Na2ZnO2.",
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y7",
+      "index": 7,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y8",
+      "index": 8,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y9",
+      "index": 9,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y10",
+      "index": 10,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y11",
+      "index": 11,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y12",
+      "index": 12,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y13",
+      "index": 13,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Số học đúng với Zn=65, S=32, O=16 và F=96500; cần nêu quy ước để tránh sai do khác số liệu nguyên tử.",
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y14",
+      "index": 14,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y15",
+      "index": 15,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y16",
+      "index": 16,
+      "structureAccepted": true,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Phần giải thích phương pháp tiếp xúc bỏ bước hấp thụ SO3 vào H2SO4 đặc/oleum, thay bằng nước trực tiếp; cần viết đúng công nghệ.",
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y17",
+      "index": 17,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y18",
+      "index": 18,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y19",
+      "index": 19,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Số học đúng với Zn=65, S=32, O=16 và F=96500; cần nêu quy ước để tránh sai do khác số liệu nguyên tử.",
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y20",
+      "index": 20,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Số học đúng với Zn=65, S=32, O=16 và F=96500; cần nêu quy ước để tránh sai do khác số liệu nguyên tử.",
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y21",
+      "index": 21,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Chuẩn hóa dạng zincate trong dung dịch: dùng [Zn(OH)4]2− và nước khi cần, hoặc nêu rõ quy ước/phạm vi của Na2ZnO2.",
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y22",
+      "index": 22,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y23",
+      "index": 23,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "id": "2c8b26e16e0fef33_y24",
+      "index": 24,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Giải mù phải chạy lại với đầy đủ đề dẫn gốc: ZnSO4, điện cực trơ và ba giai đoạn đang bị lược trong pass2-vao."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "id": "54ede2e3b61a3ee5_ss1",
+      "index": 1,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Câu đầu lời giải đếm bốn nhóm COOH trong phân tử peptide là sai: Gly-Ala-Glu có hai nhóm COOH tự do và hai liên kết peptide. Giữ hệ số KOH=4 nhưng sửa cơ sở hóa học.",
+        "Đã tính độc lập: x=4*n(peptide)/(V_mL/1000), đúng một phương án sau làm tròn."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "id": "54ede2e3b61a3ee5_ss2",
+      "index": 2,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Câu đầu lời giải đếm bốn nhóm COOH trong phân tử peptide là sai: Gly-Ala-Glu có hai nhóm COOH tự do và hai liên kết peptide. Giữ hệ số KOH=4 nhưng sửa cơ sở hóa học.",
+        "Đã tính độc lập: x=4*n(peptide)/(V_mL/1000), đúng một phương án sau làm tròn."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "id": "54ede2e3b61a3ee5_ss3",
+      "index": 3,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Câu đầu lời giải đếm bốn nhóm COOH trong phân tử peptide là sai: Gly-Ala-Glu có hai nhóm COOH tự do và hai liên kết peptide. Giữ hệ số KOH=4 nhưng sửa cơ sở hóa học.",
+        "Đã tính độc lập: x=4*n(peptide)/(V_mL/1000), đúng một phương án sau làm tròn."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "id": "54ede2e3b61a3ee5_ss4",
+      "index": 4,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Câu đầu lời giải đếm bốn nhóm COOH trong phân tử peptide là sai: Gly-Ala-Glu có hai nhóm COOH tự do và hai liên kết peptide. Giữ hệ số KOH=4 nhưng sửa cơ sở hóa học.",
+        "Đã tính độc lập: x=4*n(peptide)/(V_mL/1000), đúng một phương án sau làm tròn."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "id": "54ede2e3b61a3ee5_ss5",
+      "index": 5,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Câu đầu lời giải đếm bốn nhóm COOH trong phân tử peptide là sai: Gly-Ala-Glu có hai nhóm COOH tự do và hai liên kết peptide. Giữ hệ số KOH=4 nhưng sửa cơ sở hóa học.",
+        "Đã tính độc lập: x=4*n(peptide)/(V_mL/1000), đúng một phương án sau làm tròn."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "id": "54ede2e3b61a3ee5_ss6",
+      "index": 6,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_loi_giai",
+      "findings": [
+        "Câu đầu lời giải đếm bốn nhóm COOH trong phân tử peptide là sai: Gly-Ala-Glu có hai nhóm COOH tự do và hai liên kết peptide. Giữ hệ số KOH=4 nhưng sửa cơ sở hóa học.",
+        "Đã tính độc lập: x=4*n(peptide)/(V_mL/1000), đúng một phương án sau làm tròn.",
+        "Nên nêu rõ làm tròn nồng độ đến hai chữ số thập phân trong đề."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "id": "5c98108d8d42329a_ss1",
+      "index": 1,
+      "structureAccepted": true,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Insulin: chưa có điều kiện pH/môi trường để kết luận tan trong nước.",
+        "Không dùng quy tắc tuyệt đối protein hình cầu đều tan trong nước; giải thích phải có phạm vi."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "id": "5c98108d8d42329a_ss2",
+      "index": 2,
+      "structureAccepted": false,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Globulin: không được suy tan trong nước chỉ từ dạng hình cầu; cần loại/điều kiện cụ thể.",
+        "bản khác 2: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số",
+        "Không dùng quy tắc tuyệt đối protein hình cầu đều tan trong nước; giải thích phải có phạm vi."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "id": "5c98108d8d42329a_ss3",
+      "index": 3,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Không dùng quy tắc tuyệt đối protein hình cầu đều tan trong nước; giải thích phải có phạm vi."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "id": "5c98108d8d42329a_ss4",
+      "index": 4,
+      "structureAccepted": true,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Insulin: chưa có điều kiện pH/môi trường để kết luận tan trong nước.",
+        "Không dùng quy tắc tuyệt đối protein hình cầu đều tan trong nước; giải thích phải có phạm vi."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "id": "5c98108d8d42329a_ss5",
+      "index": 5,
+      "structureAccepted": false,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Insulin: chưa có điều kiện pH/môi trường để kết luận tan trong nước.",
+        "bản khác 5: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số",
+        "Không dùng quy tắc tuyệt đối protein hình cầu đều tan trong nước; giải thích phải có phạm vi."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "id": "5c98108d8d42329a_ss6",
+      "index": 6,
+      "structureAccepted": false,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Globulin: không được suy tan trong nước chỉ từ dạng hình cầu; cần loại/điều kiện cụ thể.",
+        "bản khác 6: đáp số 3 trùng đáp số gốc / bản khác — học sinh nhớ được số",
+        "Không dùng quy tắc tuyệt đối protein hình cầu đều tan trong nước; giải thích phải có phạm vi."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "id": "67248ce9d2fec69f_ss1",
+      "index": 1,
+      "structureAccepted": true,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Lý do kiểm mù so khối lượng electron với hạt nhân khoảng 1800 lần: chỉ gần đúng khi so với proton/hạt nhân H, không phải mọi hạt nhân.",
+        "Đề đang viết thường đầu câu và tên riêng; cần chuẩn hóa hình thức."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "id": "67248ce9d2fec69f_ss2",
+      "index": 2,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_pham_vi",
+      "findings": [
+        "Đổi sang kiến thức Millikan/Rutherford/Chadwick: cùng chương nhưng chưa chứng minh tương đương mục tiêu câu gốc Thomson.",
+        "Đề đang viết thường đầu câu và tên riêng; cần chuẩn hóa hình thức."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "id": "67248ce9d2fec69f_ss3",
+      "index": 3,
+      "structureAccepted": true,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Đổi sang kiến thức Millikan/Rutherford/Chadwick: cùng chương nhưng chưa chứng minh tương đương mục tiêu câu gốc Thomson.",
+        "Tách năm thí nghiệm tán xạ lá vàng 1909 khỏi năm mô hình Rutherford 1911; sửa chữ để tránh mơ hồ lịch sử.",
+        "Đề đang viết thường đầu câu và tên riêng; cần chuẩn hóa hình thức."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "id": "67248ce9d2fec69f_ss4",
+      "index": 4,
+      "structureAccepted": true,
+      "contentStatus": "can_sua_pham_vi",
+      "findings": [
+        "Đổi sang kiến thức Millikan/Rutherford/Chadwick: cùng chương nhưng chưa chứng minh tương đương mục tiêu câu gốc Thomson.",
+        "Đề đang viết thường đầu câu và tên riêng; cần chuẩn hóa hình thức."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "id": "67248ce9d2fec69f_ss5",
+      "index": 5,
+      "structureAccepted": true,
+      "contentStatus": "noi_dung_tam_dat",
+      "findings": [
+        "Đề đang viết thường đầu câu và tên riêng; cần chuẩn hóa hình thức."
+      ],
+      "releaseApproved": false
+    },
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "id": "67248ce9d2fec69f_ss6",
+      "index": 6,
+      "structureAccepted": true,
+      "contentStatus": "can_sua",
+      "findings": [
+        "Tách năm thí nghiệm tán xạ lá vàng 1909 khỏi năm mô hình Rutherford 1911; sửa chữ để tránh mơ hồ lịch sử.",
+        "Đề đang viết thường đầu câu và tên riêng; cần chuẩn hóa hình thức."
+      ],
+      "releaseApproved": false
+    }
+  ]
+}

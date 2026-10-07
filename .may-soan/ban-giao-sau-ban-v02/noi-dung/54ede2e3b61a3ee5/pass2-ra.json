@@ -1,0 +1,40 @@
+{
+  "tra": [
+    {
+      "id": "54ede2e3b61a3ee5_ss1",
+      "d": "A",
+      "lyDo": "Gly-Ala-Glu là tripeptide có 2 liên kết peptide. Glu có thêm 1 nhóm -COOH tự do. n(KOH) = (2+1+1)×0,15 = 4×0,15 = 0,6 mol. x = 0,6/0,2 = 3,00 M → A.",
+      "chac": true
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss2",
+      "d": "B",
+      "lyDo": "n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,2 = 0,8 mol. x = 0,8/0,25 = 3,20 M → B.",
+      "chac": true
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss3",
+      "d": "C",
+      "lyDo": "n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,5 = 2,0 mol. x = 2,0/0,2 = 10,00 M → C.",
+      "chac": true
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss4",
+      "d": "D",
+      "lyDo": "n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,1 = 0,4 mol. x = 0,4/0,4 = 1,00 M → D.",
+      "chac": true
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss5",
+      "d": "A",
+      "lyDo": "n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,4 = 1,6 mol. x = 1,6/0,5 = 3,20 M → A.",
+      "chac": true
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss6",
+      "d": "B",
+      "lyDo": "n(KOH) = 4·n(peptide): 2 liên kết peptide + 2 -COOH tự do (đầu C và Glu mạch bên). n(KOH) = 4×0,25 = 1,0 mol. x = 1,0/0,3 ≈ 3,33 M → B.",
+      "chac": true
+    }
+  ]
+}

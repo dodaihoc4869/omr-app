@@ -1,0 +1,149 @@
+{
+  "phien": "e72dc258-pass2-zinc-v02",
+  "tra": [
+    {
+      "id": "2c8b26e16e0fef33_y1",
+      "d": "D",
+      "lyDo": "ZnS: S(-2) → SO₂: S(+4) → S bị oxi hóa từ -2 lên +4.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y2",
+      "d": "S",
+      "lyDo": "Zn trong ZnS là +2, Zn trong ZnO cũng là +2 → số oxi hóa Zn không đổi, Zn không bị oxi hóa.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y3",
+      "d": "D",
+      "lyDo": "2ZnS + 3O₂ → 2ZnO + 2SO₂ → tỉ lệ ZnS:O₂ = 2:3.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y4",
+      "d": "S",
+      "lyDo": "Sphalerite có thành phần chính là ZnS, không phải ZnO.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y5",
+      "d": "S",
+      "lyDo": "ZnO + H₂SO₄ → ZnSO₄ + H₂O: số oxi hóa Zn(+2), S(+6) không đổi trước và sau → không phải phản ứng oxi hóa khử.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y6",
+      "d": "D",
+      "lyDo": "ZnO + H₂SO₄ → ZnSO₄ + H₂O; ZnO + 2NaOH → Na₂ZnO₂ + H₂O (Na₂ZnO₂ hay sodium zincate, viết tắt theo quy ước phổ thông; trong dung dịch tồn tại dạng [Zn(OH)₄]²⁻) → ZnO là oxide lưỡng tính.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y7",
+      "d": "D",
+      "lyDo": "ZnO + H₂SO₄ → ZnSO₄ + H₂O → tỉ lệ ZnO:H₂SO₄ = 1:1.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y8",
+      "d": "S",
+      "lyDo": "Dùng HCl → tạo ZnCl₂, không phải ZnSO₄.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y9",
+      "d": "D",
+      "lyDo": "Điện phân ZnSO₄: cathode: Zn²⁺ + 2e⁻ → Zn (Zn²⁺ bị khử).",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y10",
+      "d": "S",
+      "lyDo": "Zn bám vào cathode (điện cực âm), không phải anode.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y11",
+      "d": "D",
+      "lyDo": "Zn²⁺ bị khử liên tục ở cathode → nồng độ Zn²⁺ giảm theo thời gian.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y12",
+      "d": "S",
+      "lyDo": "Điện phân ZnSO₄: anode: H₂O → ½O₂ + 2H⁺ + 2e⁻ → H⁺ sinh ra → nồng độ H₂SO₄ tăng, không giảm.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y13",
+      "d": "D",
+      "lyDo": "Quy ước: M(Zn)=65 g/mol, F=96500 C/mol. n(Zn)=6,5/65=0,1 mol; Q=n×z×F=0,1×2×96500=19300 C.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y14",
+      "d": "S",
+      "lyDo": "Điện phân ZnSO₄ với anode trơ: tại anode xảy ra oxi hóa nước → O₂, anode không bị hòa tan.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y15",
+      "d": "D",
+      "lyDo": "SO₂ + H₂O → H₂SO₃ → mưa acid; SO₂ là khí độc.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y16",
+      "d": "D",
+      "lyDo": "Phương pháp tiếp xúc: 2SO₂ + O₂ →(V₂O₅,t°)→ 2SO₃; SO₃ được hấp thụ vào H₂SO₄ đặc tạo oleum (H₂S₂O₇), sau đó pha loãng thành H₂SO₄. Phát biểu \"hấp thụ vào H₂SO₄ đặc thay vì hòa tan trực tiếp vào nước\" là Đúng.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y17",
+      "d": "D",
+      "lyDo": "m(Zn) = 2 tấn × 40% × 75% = 0,6 tấn = 600 kg.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y18",
+      "d": "S",
+      "lyDo": "m(Zn) = 1000 kg × 60% × 90% = 540 kg ≠ 600 kg.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y19",
+      "d": "D",
+      "lyDo": "Quy ước: M(ZnS)=97 g/mol, M(O₂)=32 g/mol. n(ZnS)=9700/97=100 mol; n(O₂)=3/2×100=150 mol; m(O₂)=150×32=4800 g=4,8 kg.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y20",
+      "d": "S",
+      "lyDo": "Quy ước: M(ZnO)=81 g/mol, C(H₂SO₄)=1 mol/L. n(ZnO)=16200/81=200 mol; n(H₂SO₄)=200 mol; V=200/1=200 L. Đề cho V=19,6 L (≠200 L) → Sai.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y21",
+      "d": "D",
+      "lyDo": "Zn + 2NaOH → Na₂ZnO₂ + H₂↑ (kẽm tan trong NaOH đặc nóng, giải phóng H₂; Na₂ZnO₂ là zincate viết theo SGK phổ thông, tương đương [Zn(OH)₄]²⁻ trong dung dịch loãng).",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y22",
+      "d": "S",
+      "lyDo": "E°(Zn²⁺/Zn) = -0,76 V < E°(Fe²⁺/Fe) = -0,44 V → Zn hoạt động hơn Fe → Fe không đẩy được Zn khỏi dung dịch ZnSO₄.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y23",
+      "d": "D",
+      "lyDo": "Zn(OH)₂ + 2HCl → ZnCl₂ + 2H₂O; Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] (hay viết Na₂ZnO₂·2H₂O theo quy ước SGK) → hydroxide lưỡng tính.",
+      "chac": true
+    },
+    {
+      "id": "2c8b26e16e0fef33_y24",
+      "d": "S",
+      "lyDo": "Khi NaOH dư, Zn(OH)₂ tan: Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] (hay Na₂ZnO₂·2H₂O). Kết tủa trắng tan hoàn toàn → không còn kết tủa trắng.",
+      "chac": true
+    }
+  ]
+}

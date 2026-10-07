@@ -1,0 +1,326 @@
+[
+  {
+    "qid": "12-KT-C6-D5-II-4",
+    "bam": "2c8b26e16e0fef33",
+    "field": "yMoi",
+    "total": 24,
+    "structure": {
+      "accepted": 24,
+      "errors": [],
+      "rejected": []
+    },
+    "ingestion": {
+      "accepted": 24,
+      "rejected": []
+    },
+    "blind": {
+      "issues": [],
+      "fullLeadRetained": false
+    },
+    "items": [
+      {
+        "index": 1,
+        "id": "2c8b26e16e0fef33_y1",
+        "answer": "D"
+      },
+      {
+        "index": 2,
+        "id": "2c8b26e16e0fef33_y2",
+        "answer": "S"
+      },
+      {
+        "index": 3,
+        "id": "2c8b26e16e0fef33_y3",
+        "answer": "D"
+      },
+      {
+        "index": 4,
+        "id": "2c8b26e16e0fef33_y4",
+        "answer": "S"
+      },
+      {
+        "index": 5,
+        "id": "2c8b26e16e0fef33_y5",
+        "answer": "S"
+      },
+      {
+        "index": 6,
+        "id": "2c8b26e16e0fef33_y6",
+        "answer": "D"
+      },
+      {
+        "index": 7,
+        "id": "2c8b26e16e0fef33_y7",
+        "answer": "D"
+      },
+      {
+        "index": 8,
+        "id": "2c8b26e16e0fef33_y8",
+        "answer": "S"
+      },
+      {
+        "index": 9,
+        "id": "2c8b26e16e0fef33_y9",
+        "answer": "D"
+      },
+      {
+        "index": 10,
+        "id": "2c8b26e16e0fef33_y10",
+        "answer": "S"
+      },
+      {
+        "index": 11,
+        "id": "2c8b26e16e0fef33_y11",
+        "answer": "D"
+      },
+      {
+        "index": 12,
+        "id": "2c8b26e16e0fef33_y12",
+        "answer": "S"
+      },
+      {
+        "index": 13,
+        "id": "2c8b26e16e0fef33_y13",
+        "answer": "D"
+      },
+      {
+        "index": 14,
+        "id": "2c8b26e16e0fef33_y14",
+        "answer": "S"
+      },
+      {
+        "index": 15,
+        "id": "2c8b26e16e0fef33_y15",
+        "answer": "D"
+      },
+      {
+        "index": 16,
+        "id": "2c8b26e16e0fef33_y16",
+        "answer": "D"
+      },
+      {
+        "index": 17,
+        "id": "2c8b26e16e0fef33_y17",
+        "answer": "D"
+      },
+      {
+        "index": 18,
+        "id": "2c8b26e16e0fef33_y18",
+        "answer": "S"
+      },
+      {
+        "index": 19,
+        "id": "2c8b26e16e0fef33_y19",
+        "answer": "D"
+      },
+      {
+        "index": 20,
+        "id": "2c8b26e16e0fef33_y20",
+        "answer": "S"
+      },
+      {
+        "index": 21,
+        "id": "2c8b26e16e0fef33_y21",
+        "answer": "D"
+      },
+      {
+        "index": 22,
+        "id": "2c8b26e16e0fef33_y22",
+        "answer": "S"
+      },
+      {
+        "index": 23,
+        "id": "2c8b26e16e0fef33_y23",
+        "answer": "D"
+      },
+      {
+        "index": 24,
+        "id": "2c8b26e16e0fef33_y24",
+        "answer": "S"
+      }
+    ]
+  },
+  {
+    "qid": "12-C3-B9-D2-I-43",
+    "bam": "54ede2e3b61a3ee5",
+    "field": "songSinh",
+    "total": 6,
+    "structure": {
+      "accepted": 6,
+      "errors": [],
+      "rejected": []
+    },
+    "ingestion": {
+      "accepted": 6,
+      "rejected": []
+    },
+    "blind": {
+      "issues": [],
+      "fullLeadRetained": false
+    },
+    "items": [
+      {
+        "index": 1,
+        "id": "54ede2e3b61a3ee5_ss1",
+        "answer": "A"
+      },
+      {
+        "index": 2,
+        "id": "54ede2e3b61a3ee5_ss2",
+        "answer": "B"
+      },
+      {
+        "index": 3,
+        "id": "54ede2e3b61a3ee5_ss3",
+        "answer": "C"
+      },
+      {
+        "index": 4,
+        "id": "54ede2e3b61a3ee5_ss4",
+        "answer": "D"
+      },
+      {
+        "index": 5,
+        "id": "54ede2e3b61a3ee5_ss5",
+        "answer": "A"
+      },
+      {
+        "index": 6,
+        "id": "54ede2e3b61a3ee5_ss6",
+        "answer": "B"
+      }
+    ]
+  },
+  {
+    "qid": "12-C3-B10-D2-III-3",
+    "bam": "5c98108d8d42329a",
+    "field": "songSinh",
+    "total": 6,
+    "structure": {
+      "accepted": 3,
+      "errors": [
+        "bản khác 2: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số",
+        "bản khác 5: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số",
+        "bản khác 6: đáp số 3 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+      ],
+      "rejected": [
+        {
+          "i": 1,
+          "lyDo": "bản khác 2: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+        },
+        {
+          "i": 4,
+          "lyDo": "bản khác 5: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+        },
+        {
+          "i": 5,
+          "lyDo": "bản khác 6: đáp số 3 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+        }
+      ]
+    },
+    "ingestion": {
+      "accepted": 3,
+      "rejected": [
+        {
+          "i": 1,
+          "lyDo": "bản khác 2: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+        },
+        {
+          "i": 4,
+          "lyDo": "bản khác 5: đáp số 2 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+        },
+        {
+          "i": 5,
+          "lyDo": "bản khác 6: đáp số 3 trùng đáp số gốc / bản khác — học sinh nhớ được số"
+        }
+      ]
+    },
+    "blind": {
+      "issues": [],
+      "fullLeadRetained": false
+    },
+    "items": [
+      {
+        "index": 1,
+        "id": "5c98108d8d42329a_ss1",
+        "answer": "1"
+      },
+      {
+        "index": 2,
+        "id": "5c98108d8d42329a_ss2",
+        "answer": "2"
+      },
+      {
+        "index": 3,
+        "id": "5c98108d8d42329a_ss3",
+        "answer": "3"
+      },
+      {
+        "index": 4,
+        "id": "5c98108d8d42329a_ss4",
+        "answer": "4"
+      },
+      {
+        "index": 5,
+        "id": "5c98108d8d42329a_ss5",
+        "answer": "2"
+      },
+      {
+        "index": 6,
+        "id": "5c98108d8d42329a_ss6",
+        "answer": "3"
+      }
+    ]
+  },
+  {
+    "qid": "10-C1-B1-I-1",
+    "bam": "67248ce9d2fec69f",
+    "field": "songSinh",
+    "total": 6,
+    "structure": {
+      "accepted": 6,
+      "errors": [],
+      "rejected": []
+    },
+    "ingestion": {
+      "accepted": 6,
+      "rejected": []
+    },
+    "blind": {
+      "issues": [],
+      "fullLeadRetained": false
+    },
+    "items": [
+      {
+        "index": 1,
+        "id": "67248ce9d2fec69f_ss1",
+        "answer": "A"
+      },
+      {
+        "index": 2,
+        "id": "67248ce9d2fec69f_ss2",
+        "answer": "B"
+      },
+      {
+        "index": 3,
+        "id": "67248ce9d2fec69f_ss3",
+        "answer": "C"
+      },
+      {
+        "index": 4,
+        "id": "67248ce9d2fec69f_ss4",
+        "answer": "D"
+      },
+      {
+        "index": 5,
+        "id": "67248ce9d2fec69f_ss5",
+        "answer": "A"
+      },
+      {
+        "index": 6,
+        "id": "67248ce9d2fec69f_ss6",
+        "answer": "C"
+      }
+    ]
+  }
+]

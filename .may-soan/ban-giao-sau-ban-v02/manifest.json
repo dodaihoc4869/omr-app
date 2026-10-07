@@ -1,0 +1,61 @@
+{
+  "phienBan": "0.2",
+  "taoLuc": "2026-10-07T02:59:02.276Z",
+  "phienSession": "e72dc258-9785-5f2f-9a07-8d16d3b02a30",
+  "moHinh": "claude-sonnet-4-6",
+  "ghiChu": "Gói v0.2 theo yêu cầu Codex: sửa Gly-Ala-Glu buoc[0], thiết kế lại protein 6 bản (đáp 1/5/3/4/6/0), sửa zinc ý 16 + zincate + hằng số, sửa Thomson ss1 lyDo. Giải mù lại toàn bộ nhóm thay đổi. Chưa nạp D1. Chưa khai PASS — chờ Codex kiểm lại.",
+  "thayDoiTuV01": [
+    {
+      "nhom": "Gly-Ala-Glu (54ede2e3b61a3ee5)",
+      "ids": [
+        "tất cả 6 _ss"
+      ],
+      "mo_ta": "Sửa buoc[0]: đổi từ \"4 nhóm COOH mỗi phân tử peptide\" (sai) sang giải thích đúng 2 liên kết peptide + 2 COOH tự do."
+    },
+    {
+      "nhom": "Protein (5c98108d8d42329a)",
+      "ids": [
+        "ss1",
+        "ss2",
+        "ss4",
+        "ss5",
+        "ss6"
+      ],
+      "mo_ta": "Viết lại hoàn toàn: bỏ insulin/globulin, đổi đáp số từ {1,2,3,4,2,3} (sai cổng) sang {1,5,3,4,6,0} (6 đáp khác nhau ≠ 2)."
+    },
+    {
+      "nhom": "Zinc (2c8b26e16e0fef33)",
+      "ids": [
+        "y16",
+        "y6",
+        "y21",
+        "y23",
+        "y24",
+        "y13",
+        "y19",
+        "y20"
+      ],
+      "mo_ta": "Sửa ý 16: hấp thụ SO3 vào H2SO4 đặc (không phải nước). Chuẩn hóa zincate. Thêm quy ước hằng số vào ý 13/19/20. Rebuild pass2-vao với đề dẫn đầy đủ."
+    },
+    {
+      "nhom": "Thomson (67248ce9d2fec69f)",
+      "ids": [
+        "ss1"
+      ],
+      "mo_ta": "Sửa pass2-ra lyDo ss1: \"nhẹ hơn proton 1836 lần\" thay vì \"nhẹ hơn hạt nhân ~1800 lần\"."
+    }
+  ],
+  "soCau": 4,
+  "soLuocDuyet": 2,
+  "loTrinh": "hai-luot",
+  "checksum": {
+    "tn-I-soan-v02": "b4fa30e06271",
+    "tn-bai-tap-soan-v02": "599a4fbf0110",
+    "tln-III-soan-v02": "c4da55bff9bb",
+    "ds-II-soan-v02": "2d48fd43b5d9",
+    "tn-I-ra-v02": "1b55d9376871",
+    "tn-bai-tap-ra-v02": "53d8baf3f45d",
+    "tln-III-ra-v02": "8c6ac1472064",
+    "ds-II-ra-v02": "5f8fec19d176"
+  }
+}
