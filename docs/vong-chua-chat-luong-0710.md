@@ -1,5 +1,7 @@
 # Vòng chữa câu sai: vận hành toàn trường và nghiệm thu chất lượng
 
+**Mốc mới nhất14:43VN ngày07/10:** máy soạn tự kiểm đã phát hành nguồn **afd15234**, Actions37587516607 thành công; Worker930a44f3-131f-4716-b549-701d5b352533 và Pagesec433d8c đọc lại cùng nguồn. Full14.768 kiểm/108 lỗi nền/0 tên lỗi mới; không ghi toàn repo xanh. Backfill toàn trường hoàn tất, hiện1/1.370 câu mở có bộ đủ dùng. Thầy không duyệt từng câu. Chạy toàn hàng cần máy Claude đã đăng nhập; chưa nghiệm thu thương mại hoặc90%. Quy trình và lời nhắn thực thi ở `docs/hoc-lieu-vong-chua-tu-dong-0710.md`.
+
 Phạm vi đã được thầy chọn: **tất cả học sinh**. Đích học tập: em hiểu chỗ sai, giải thích được quan hệ đúng, vận dụng vào bài mới và tự làm được bản tương đương ở lần gặp lại thứ hai. 90% là mục tiêu cần đo bằng học sinh thật; kiểm thử phần mềm không chứng minh tỷ lệ này.
 
 ## Luồng đã triển khai trong PR
@@ -36,7 +38,7 @@ Bằng chứng hiểu bước cần câu kiểm lý do và câu chuyển giao m�
 2. Màn riêng của thầy có câu vừa làm, đáp án em gửi, số vòng hỗ trợ và các bước đã hiểu. Tờ chiếu chỉ có đề gốc, bảng/ảnh/lựa chọn và quan hệ cần nối. Không chiếu tên em, đáp án sai cá nhân hoặc bảng xếp hạng; lời gỡ chỉ mở khi thầy bấm. Mỗi nhóm một tờ, có khoảng trống viết bảng.
 3. Với câu tổng hợp, thầy chọn bước cần gỡ từ bằng chứng trước khi mở tờ. Với lỗi bước đã xác định, app chọn đúng bước. Thầy bấm **Thầy chữa** ngay trên tờ. Chỉ những em có mặt trong buổi được mở lại bước; các em vắng giữ hàng chữa. App tự chia lô tối đa sáu em để nằm trong ngân sách D1; mất mạng giữa lô thì thử lại bằng đúng receipt đã lưu.
 4. Xác nhận buổi chữa không biến thành “đã hiểu” hoặc “đã tự sửa”. Chỉ bước vừa chữa được đặt lại để em tự kiểm lý do, làm một bước mới, chuyển giao, ghép bài và kiểm chứng sau ít nhất 24 giờ; bước đã hiểu ở đúng bản được giữ. Học sinh mở lại câu đang chữa để tiếp tục. Kết quả gặp thứ ba không sửa lại KPI gặp thứ hai đã thất bại.
-5. Hết câu mới thì lưu lý do trong hàng chuẩn bị học liệu, không hỏi lại câu đã lộ và không bắt thầy nhắn riêng cho em. Khi nội dung bổ sung được duyệt đúng phiên bản, em mở lại là hệ thống tự tiếp, giữ bằng chứng/đáp án/ngày giao cũ. Chuẩn bị và duyệt học liệu là công việc chuyên môn dùng chung trước buổi, không phải chữa tay từng em.
+5. Hết câu mới thì lưu lý do trong hàng chuẩn bị học liệu, không hỏi lại câu đã lộ và không bắt thầy nhắn riêng cho em. Khi nội dung bổ sung đã qua kiểm độc lập đúng phiên bản, em mở lại là hệ thống tự tiếp, giữ bằng chứng/đáp án/ngày giao cũ. Máy soạn chuẩn bị và kiểm học liệu dùng chung; thầy không duyệt từng câu.
 
 API giáo viên: `POST /gv/chua-cau-sai/hang-chieu` và `POST /gv/chua-cau-sai/da-chua-tren-lop`. Lệnh ghi xác minh buổi còn mở, điểm danh từ máy chủ, nhóm câu/bước, revision và phạm vi sử dụng; lưu `chua_loi_chua_lop` cùng thay đổi tiến độ/hàng chữa trong một batch. Receipt lớp chỉ ghi đã chữa; không ghi điểm đạt hoặc EXP.
 
@@ -47,7 +49,7 @@ API giáo viên: `POST /gv/chua-cau-sai/hang-chieu` và `POST /gv/chua-cau-sai/d
 
 | Vấn đề | Hợp đồng |
 |---|---|
-| Danh tính | SBD từ token, không từ body/query của học sinh. Mọi route giáo viên ở sau `laThay`. |
+| Danh tính | SBD từ token, không từ body/query của học sinh. Route giáo viên ở sau `laThay`; route máy soạn riêng dùng cổng mã bí mật giáo viên. |
 | Thi đang diễn ra | Chặn cấp câu/chấm/gợi ý khi em đang có ca kiểm tra; không kiểm được lịch thi thì dừng và giữ tiến độ. |
 | Bảo vệ kho | Câu gốc qua đường phục vụ câu dùng chung, kiểm khối/phạm vi/câu nghi sai/bảo vệ; đổi version hoặc content group thì không chấm bằng đáp án mới. |
 | Chấm | Số theo bộ chấm Phần III chung; Phần II toàn bài đủ bốn ý; không chấm tự luận bằng so chuỗi hoặc mô hình. |
@@ -62,9 +64,9 @@ API giáo viên: `POST /gv/chua-cau-sai/hang-chieu` và `POST /gv/chua-cau-sai/d
 
 ## Học liệu và độ phủ
 
-Học liệu được nhập tại màn vận hành giáo viên. JSON phải có đúng version câu gốc, 1–8 bước theo thứ tự và tiên quyết; mục tiêu/đại lượng/lý do/điều kiện/mối nối; chẩn đoán và câu phân biệt giả thuyết; gợi ý 1/2/3; ít nhất hai câu kiểm lý do, hai câu kiểm lại, hai câu chuyển giao; ít nhất hai bản ghép và hai bản kiểm chứng mới. Bộ kiểm cấu trúc từ chối sai kiểu JSON, đáp án không chấm được, thiếu ý, lý do chỉ là phép tính, trùng nội dung hoặc bản toàn bài thiếu kỹ năng. Phần I/II/III toàn bài giữ định dạng câu gốc. Ảnh/bảng/đề và các lựa chọn gốc được giữ khi học sinh xem lại.
+Máy soạn nhận hàng qua `/kho/may-soan/vong-chua-viec`, nạp qua `/kho/may-soan/nop-vong-chua`; màn vận hành nhập tay vẫn dùng được khi cần. JSON phải có đúng version câu gốc, 1–8 bước theo thứ tự và tiên quyết; mục tiêu/đại lượng/lý do/điều kiện/mối nối; chẩn đoán và câu phân biệt giả thuyết; gợi ý 1/2/3; ít nhất hai câu kiểm lý do, hai câu kiểm lại, hai câu chuyển giao; ít nhất hai bản ghép và hai bản kiểm chứng mới. Bộ kiểm cấu trúc từ chối sai kiểu JSON, đáp án không chấm được, thiếu ý, lý do chỉ là phép tính, trùng nội dung hoặc bản toàn bài thiếu kỹ năng. Phần I/II/III toàn bài giữ định dạng câu gốc. Ảnh/bảng/đề và các lựa chọn gốc được giữ khi học sinh xem lại.
 
-Học liệu cần người duyệt chuyên môn kiểm đáp án, nhiễu, độ khó, điều kiện áp dụng và tính tương đương. Kiểm cấu trúc không thay thế việc này. Mẫu kỹ thuật đầy đủ ở `tests/_chua-cau-sai-fixture.ts::hocLieuMau`; đây là dữ liệu tổng hợp cho kiểm thử, **không được đăng nguyên mẫu làm học liệu cho kho thật**. Thầy lấy đúng đề/lời giải/version qua nút “Lấy đề gốc để soạn”, chuẩn bị theo cấu trúc và duyệt rồi nhập. Câu chưa đủ học liệu chuyển về hàng ưu tiên theo số em ảnh hưởng và hạn đo; không đưa câu chưa được kiểm cho em làm.
+Theo lệnh thầy “tôi không duyệt gì cả”, máy thực hiện ba phiên riêng: soạn → tự giải mù toàn bộ đề → soát khoa học, nhiễu, độ khó, điều kiện áp dụng và tính tương đương. Máy chủ kiểm lại bằng chứng từng đề và ghi provenance **máy kiểm độc lập · v1**. Kiểm cấu trúc hoặc hai đáp án khớp nhau chưa đủ chứng nhận chất lượng; hai phiên máy vẫn có thể cùng sai. Mẫu kỹ thuật đầy đủ ở `tests/_chua-cau-sai-fixture.ts::hocLieuMau` là dữ liệu tổng hợp, **không được đăng nguyên mẫu làm học liệu cho kho thật**. Câu chưa đủ học liệu nằm trong hàng ưu tiên theo số em ảnh hưởng; không tự điền đạt để lấp hàng. Quy trình và lệnh chạy ở `docs/hoc-lieu-vong-chua-tu-dong-0710.md`.
 
 Không tự duyệt học liệu bằng tên thầy. Không sinh câu mới trong đường chấm, không đổi câu đang học khi bản học liệu mới được duyệt. Phiên dùng ảnh chụp đã lưu. Muốn bổ sung câu cho một bước hết bài mới: duyệt phần bổ sung dùng chung; em mở lại thì tự tiếp, bước đã hiểu giữ đúng nội dung cũ.
 

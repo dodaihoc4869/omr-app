@@ -28,8 +28,9 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-          CHUA_RELEASE_SHA: 7cfe9466fb5fb4bf6ba80d6fa913967bf9ab5711
-        run: node scripts/kiem-phat-hanh-chua.mjs --schema --live
+        run: |
+          export CHUA_RELEASE_SHA=$(node -p 'JSON.parse(require("fs").readFileSync("docs/phat-hanh-vong-chua-0710.json","utf8")).sha')
+          node scripts/kiem-phat-hanh-chua.mjs --schema --live
       - name: Nạp đúng mẫu đã giải độc lập, đọc lại bằng chứng
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
