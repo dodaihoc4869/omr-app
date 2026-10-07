@@ -154,7 +154,13 @@ async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GI
     },
     giay,
   )
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  if (!res.ok) {
+    // 403 TRÊN LỆNH CỦA THẦY (body có `secret`) = máy chủ từ chối mã bí mật. Nói thẳng việc cần làm (07/10: thầy đổi mã ở Cloudflare, màn chỉ hiện "HTTP 403").
+    // Lệnh công khai của em (không `secret`) giữ nguyên câu cũ — 403 ở đó là lý do khác, không được gán cho mã bí mật.
+    const coMa = typeof (body as { secret?: unknown } | null)?.secret === 'string' && (body as { secret: string }).secret !== ''
+    if (res.status === 403 && coMa) throw new Error(`Máy chủ trả lỗi HTTP 403 — mã bí mật trên máy này chưa đúng. Vào Cài đặt (mục Kết nối máy chủ), nhập lại mã rồi bấm Lưu.`)
+    throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  }
   const r = await res.json()
   // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
   // màn hình không phải nhớ gọi.

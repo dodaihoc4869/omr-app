@@ -71,6 +71,7 @@ import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
+import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
 import { veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { moManGameNhanh, napManCauDaLam, napManGame, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
@@ -880,6 +881,9 @@ export default function StudentPortalScreen() {
   // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
   const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
+  // PHIÊN CŨ KHÔNG CÒN DÙNG ĐƯỢC (07/10: mã bí mật máy chủ đổi ⇒ token cất trong máy bị từ chối "Phiên game không hợp lệ"; nút Thử lại gửi lại đúng token hỏng):
+  // máy chủ nói token hỏng / hết hạn / mật khẩu đã đổi ⇒ đăng xuất, màn đăng nhập hiện một dòng giải thích.
+  useTuDangXuatKhiPhienHong(!!auth?.token, hoa2.loi, dangXuat)
   // CẨN THẬN (đặc tả 4.6): `hoa2-sanh` báo `omni.canThan` (OMNI bật ∧ Sơ ý > 7%) ⇒ câu ôn Phần III có ô "Soát lại đơn vị và số liệu". Vắng ⇒ y hệt hôm nay.
   const canThanSanh = canThanTuSanh(hoa2.ketQua)
   // MÁY YẾU (30/09, số đo docs/do-toi-uu-app-hs-3009.md): màn toàn màn hình (game, Câu đã làm, Tu luyện…) che kín Sảnh nhưng ~55 hoạt ảnh
