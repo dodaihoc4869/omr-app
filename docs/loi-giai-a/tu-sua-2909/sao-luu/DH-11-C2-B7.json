@@ -1464,5 +1464,79 @@
     "chuong": "C2 - Nitrogen và Surful"
    }
   }
+ },
+ "DH-11-C2-B7-I-55": {
+  "luc": "2026-10-07T02:42:20.369Z",
+  "cau": {
+   "phan": "I",
+   "so": 55,
+   "de": "Cho các phát biểu sau:\n(a) Trong tự nhiên, sulfur tồn tại chủ yếu ở dạng muối sulfide và muối sulfate của một số kim loại.\n(b) Là một phi kim khá hoạt động nên trong tự nhiên không tìm thấy sulfur đơn chất.\n(c) Trứng gà ung có mùi thối đặc trưng một phần là do các hợp chất của sulfur có trong trứng phân hủy gây ra.\n(d) Nguyên tố sulfur có mặt trong một số loại thực vật, đặc biệt là các loại rau quả có mùi mạnh như hành tây, sầu riêng, … (e) Thành phần chính của quặng pyrite là hợp chất của sulfur và chì (lead, Pb).\nSố phát biểu đúng là",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Nitrogen – sulfur",
+   "muc_do": "van_dung",
+   "bai": "Bài 7. Sulfur và sulfur dioxide",
+   "pa": {
+    "A": "2.",
+    "B": "3.",
+    "C": "4.",
+    "D": "5."
+   },
+   "loi_giai": {
+    "chot": "(a), (c), (d) đúng; (b) sai vì có mỏ sulfur đơn chất ở vùng núi lửa; (e) sai vì pyrite là FeS₂, hợp chất của sulfur với iron. Vậy có 3 phát biểu đúng.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Có tới ba phát biểu đúng, không phải hai."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: các phát biểu (a), (c), (d) đúng."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Phát biểu (b) và (e) đều sai nên không thể là bốn."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Có hai phát biểu sai nên không thể là năm."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu đếm số phát biểu đúng về sự tồn tại của sulfur trong tự nhiên.",
+    "bay": "Ý (b) và (e) đều sai: sulfur đơn chất có trong tự nhiên và pyrite là hợp chất của sulfur với SẮT chứ không phải chì."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "đếm mệnh đề đúng, không phải tính",
+   "dang": {
+    "ma": "NITROGEN_SULFUR.SAN_XUAT_H2SO4.CHON_PHAT_BIEU",
+    "ten": "Sản xuất sulfuric acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-11-B8-D3",
+    "ten": "Điều chế sulfuric acid",
+    "lop": "11",
+    "bai": "DB-11-B8",
+    "tenBai": "Sulfuric acid và muối sulfate",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Nitrogen và Surful"
+   }
+  }
  }
 }

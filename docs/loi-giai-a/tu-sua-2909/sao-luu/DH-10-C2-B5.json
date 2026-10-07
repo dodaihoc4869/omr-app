@@ -288,5 +288,62 @@
     "chuong": "C2 - Bảng tuần hoàn"
    }
   }
+ },
+ "DH-10-C2-B5-III-21": {
+  "luc": "2026-10-07T02:42:13.030Z",
+  "cau": {
+   "phan": "III",
+   "so": 21,
+   "de": "Cho: Zₐ = 6, ZB = 14, ZC = 19, ZD = 20. Có mấy nguyên tố cùng thuộc nhóm A?",
+   "dap_an": "2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "hieu",
+   "bai": "Bài 5. Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+   "loi_giai": {
+    "chot": "A là C (nhóm IVA), B là Si (nhóm IVA), C là K (nhóm IA), D là Ca (nhóm IIA). Chỉ carbon và silicon cùng nhóm IVA nên có 2 nguyên tố.",
+    "buoc": [
+     "Z = 6 là C, cấu hình 2s²2p² nên thuộc nhóm IVA.",
+     "Z = 14 là Si, cấu hình 3s²3p² nên thuộc nhóm IVA.",
+     "Z = 19 là K thuộc nhóm IA; Z = 20 là Ca thuộc nhóm IIA.",
+     "Chỉ có C và Si cùng một nhóm, tức 2 nguyên tố."
+    ],
+    "ket_qua": "2",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "2",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Câu xác định nhóm của bốn nguyên tố rồi đếm số nguyên tố cùng một nhóm.",
+    "bay": "Câu hỏi là mấy nguyên tố cùng chung một nhóm A với nhau, không phải đếm số nguyên tố thuộc nhóm A."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_DONG_PHAN",
+    "ten": "Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B5-D1",
+    "ten": "Mối liên hệ giữa cấu hình electron và vị trí, tính chất của nguyên tố trong bảng tuần hoàn",
+    "lop": "10",
+    "bai": "DB-10-B5",
+    "tenBai": "Cấu tạo của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   }
+  }
  }
 }
