@@ -98,8 +98,15 @@ async function one(v){
     }finally{fs.rmSync(review,{recursive:true,force:true})}
   }finally{fs.rmSync(blind,{recursive:true,force:true})}
 }
+const daThuFile=path.join(save,'da-thu.json')
+function docDaThu(){try{const d=JSON.parse(fs.readFileSync(daThuFile,'utf8'));return typeof d==='object'&&!Array.isArray(d)?d:{}}catch{return{}}}
+function ghiDaThu(dem){fs.writeFileSync(daThuFile,JSON.stringify(dem),{mode:0o600})}
 async function main(){
-  const daLam=[]
+  // dem: {qid: số lần thất bại}. Câu ≥3 lần thất bại được bỏ qua (thêm vào daLam ngay từ đầu)
+  const dem=argv.includes('--reset-da-thu') ? {} : docDaThu()
+  const boQua=Object.entries(dem).filter(([,n])=>n>=3).map(([q])=>q)
+  const daLam=[...boQua]
+  if(boQua.length) console.error(`Bỏ qua ${boQua.length} câu (≥3 lần thất bại): ${boQua.slice(0,3).join(', ')}…`)
   let dat=0,truot=0
   for(;;){
     if(daLam.length>=5000){console.log(JSON.stringify({dat,truot,hetHangTrongLuot:false,datGioiHanLuot:true}));break}
@@ -107,11 +114,17 @@ async function main(){
     if(!viec.length){
       console.log(JSON.stringify({dat,truot,hetHangTrongLuot:!coNguonChuaHoTro,coNguonChuaHoTro:!!coNguonChuaHoTro}))
       if(motLan||thu) break
-      // Chương trình nền hỏi lại; không phải lệnh chờ của agent.
-      await new Promise(resolve=>setTimeout(resolve,300000));daLam.length=0;continue
+      await new Promise(resolve=>setTimeout(resolve,300000))
+      const boQua2=Object.entries(docDaThu()).filter(([,n])=>n>=3).map(([q])=>q)
+      daLam.length=0;daLam.push(...boQua2);continue
     }
     const v=viec[0];daLam.push(v.cau.qid)
-    try{await one(v);dat++}catch(e){truot++;console.log(JSON.stringify({qid:v.cau.qid,dat:false,lyDo:e.message}))}
+    try{await one(v);dat++}catch(e){
+      truot++
+      console.log(JSON.stringify({qid:v.cau.qid,dat:false,lyDo:e.message}))
+      // Ghi nhận thất bại; khi ≥3 lần, lần chạy sau sẽ bỏ qua
+      const d2=docDaThu();d2[v.cau.qid]=(d2[v.cau.qid]||0)+1;ghiDaThu(d2)
+    }
     if(thu) break
   }
 }
