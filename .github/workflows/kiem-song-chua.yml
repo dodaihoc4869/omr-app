@@ -40,7 +40,15 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           node --input-type=module <<'JS'
-          import {query} from './scripts/kiem-phat-hanh-chua.mjs';
+          // Kiểm chỉ đọc không dùng cổng dừng phát hành khi đang có ca thi.
+          const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
+          async function query(sql){
+            if(!/^SELECT\b/i.test(sql.trim()))throw Error('Chỉ cho phép SELECT trong lượt kiểm.');
+            const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query`,{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(30000)});
+            const j=await r.json();
+            if(!r.ok||!j.success||j.result?.some(x=>!x.success))throw Error('Chưa đọc được dữ liệu thật.');
+            return j.result.flatMap(x=>x.results??[]);
+          }
           const values=await query("SELECT khoa,gia_tri FROM cau_hinh WHERE khoa IN ('chua_cau_sai_v1','chua_cau_sai_phat_hanh_0710')");
           const config=JSON.parse(values.find(x=>x.khoa==='chua_cau_sai_v1')?.gia_tri??'{}');
           const receipt=JSON.parse(values.find(x=>x.khoa==='chua_cau_sai_phat_hanh_0710')?.gia_tri??'{}');
@@ -52,6 +60,20 @@ jobs:
           console.log(JSON.stringify((await query("SELECT (SELECT COUNT(*) FROM tu_luyen_luot t JOIN hoc_sinh h ON h.sbd=t.sbd WHERE EXISTS(SELECT 1 FROM tu_luyen_cham_cau c WHERE c.luot_id=t.id AND c.sbd=t.sbd AND c.luc>=1790614800000) OR EXISTS(SELECT 1 FROM tu_luyen_cau c WHERE c.luot_id=t.id AND c.sbd=t.sbd AND c.nop_luc>=1790614800000)) AS soLuotTuCanRa,(SELECT COUNT(DISTINCT luot_id) FROM chua_loi_tu_receipt) AS soLuotTuCoReceipt"))[0]));
           console.log(JSON.stringify((await query("SELECT COUNT(*) AS soDot,COUNT(DISTINCT sbd) AS soEm,COUNT(DISTINCT qid_chuan) AS soCau,(SELECT COUNT(*) FROM chua_loi_tu_receipt) AS soReceiptTu,(SELECT COUNT(*) FROM chua_loi_hoc_lieu WHERE trang_thai='du_dung') AS soHocLieuDaDuyet FROM chua_loi_dot WHERE dong_luc IS NULL"))[0]));
           console.log(JSON.stringify(await query("SELECT trang_thai_day AS trangThai,COUNT(*) AS soDot FROM chua_loi_dot WHERE dong_luc IS NULL GROUP BY trang_thai_day")));
+          console.log(JSON.stringify((await query("SELECT COUNT(DISTINCT e.qid_chuan) AS soCauMo,COUNT(DISTINCT CASE WHEN EXISTS(SELECT 1 FROM chua_loi_hoc_lieu h JOIN game_v2_question q ON q.qid=h.qid_chuan JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE h.qid_chuan=e.qid_chuan AND h.content_version=e.phien_ban_cau AND h.content_version=q.version AND h.trang_thai='du_dung' AND COALESCE(d.da_xoa,0)=0) THEN e.qid_chuan END) AS soCauPhuDungBan FROM chua_loi_dot e WHERE e.dong_luc IS NULL"))[0]));
+          const now=Date.now(),cohort=String(config.cohortId??'').replaceAll("'","''");
+          const k=(await query(`SELECT COUNT(*) AS giao,COUNT(DISTINCT sbd) AS soHs,SUM(CASE WHEN chot_do_luc>0 AND chot_do_luc<=${now} THEN 1 ELSE 0 END) AS mauSo,SUM(CASE WHEN chot_do_luc>0 AND chot_do_luc<=${now} AND ket_qua_gap2='dung_tu_lam' AND EXISTS(SELECT 1 FROM chua_loi_nop n JOIN chua_loi_item i ON i.id=n.item_id JOIN chua_loi_phien p ON p.id=n.phien_id WHERE n.id=receipt_gap2 AND n.nop_luc<=chot_do_luc AND n.dung=1 AND n.co_ho_tro=0 AND i.loai='kiem_chung' AND p.lan_gap_lai=2 AND n.pending=0) THEN 1 ELSE 0 END) AS tuSo FROM chua_loi_dot WHERE cohort_id='${cohort}'`))[0];
+          console.log(JSON.stringify({kpi:{...k,mauSo:k.mauSo??0,tuSo:k.tuSo??0,phanTram:k.mauSo?Math.round(k.tuSo/k.mauSo*1000)/10:null}}));
+          console.log(JSON.stringify((await query("SELECT (SELECT COUNT(*) FROM chua_loi_phien) AS soPhienChua,(SELECT COUNT(*) FROM chua_loi_nop WHERE pending=0) AS soLanNopDaChot"))[0]));
+          async function cf(path){
+            const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/${path}`,{headers:{authorization:`Bearer ${token}`},signal:AbortSignal.timeout(30000)});
+            const j=await r.json();if(!r.ok||!j.success)throw Error('Chưa đọc được bản sống.');return j.result;
+          }
+          const deployment=await cf('workers/scripts/omr/deployments'),active=(deployment.deployments??deployment)[0]?.versions;
+          if(!active?.length||active.length!==1||active[0].percentage!==100)throw Error('Worker chưa chạy một bản 100%.');
+          const version=await cf(`workers/scripts/omr/versions/${active[0].version_id}`),pages=(await cf('pages/projects/omr-app')).canonical_deployment;
+          const workerCommit=(version.annotations??version.metadata?.annotations)?.['workers/tag'],pagesCommit=pages?.deployment_trigger?.metadata?.commit_hash;
+          console.log(JSON.stringify({workerCommit,pagesCommit,cungBan:workerCommit===pagesCommit,pagesThanhCong:pages?.latest_stage?.status==='success',dungMocReceipt:workerCommit===(receipt.releaseHienTai??receipt.release),docLuc:new Date().toISOString()}));
           const workers=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/workers/scripts`,{headers:{authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`},signal:AbortSignal.timeout(30000)});
           const w=await workers.json();
           if(!workers.ok||!w.success||!Array.isArray(w.result))throw Error('Chưa đọc được trạng thái công cụ giao tạm.');
