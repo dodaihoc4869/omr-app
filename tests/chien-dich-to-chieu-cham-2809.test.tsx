@@ -206,7 +206,7 @@ describe('Buổi chữa hiện lại kết quả', () => {
         ketQua={{ '01|DE-A-I-17': 'dat', '03|DE-A-I-44': 'khong_dat', '01|KHAC': 'dat' }}
         dangChieu={false}
         onChieu={vi.fn(async () => true)}
-        onDoiCoMat={vi.fn()}
+        onMoDiemDanh={vi.fn()}
         onDaChua={vi.fn()}
       />,
     )

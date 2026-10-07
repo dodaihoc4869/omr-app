@@ -15,10 +15,9 @@ import HopXacNhan from '../HopXacNhan'
 import { chuaXong, qidCuaDong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
 import type { GoiCaChotOmni } from './api-omni'
 import type { BangKetQua } from './ghi-to-chieu'
-import HopChon from './HopChon'
 import { congNgay, hienHanNop, hienNgay } from './ngay'
 import { noiDungCua, type CauGoc, type OChieu } from './to-chieu'
-import { cauCaChot, CHU_HANG, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
+import { cauCaChot, CHU_HANG, chuNguoiSua, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
 import './chien-dich.css'
 
 /** Khoá phiên màn Mở ca kiểm tra đọc để chọn sẵn câu của ca chốt (nguồn: `lib/ca-chot-chien-dich.ts`). */
@@ -51,7 +50,7 @@ export default function BuoiChua({
   ketQua = {},
   dangChieu,
   onChieu,
-  onDoiCoMat,
+  onMoDiemDanh,
   onDaChua,
   caChotOmni = null,
 }: {
@@ -67,7 +66,8 @@ export default function BuoiChua({
   ketQua?: BangKetQua
   dangChieu: boolean
   onChieu: (ds: OChieu[], tenBuoi: string) => Promise<boolean>
-  onDoiCoMat: (sbd: string[]) => void
+  /** Quay lại bước mã điểm danh để lấy lại danh sách có mặt từ máy chủ. */
+  onMoDiemDanh: () => void
   onDaChua: () => void
   /** OMNI 3: câu ca chốt 50/50 từ `/gv/omni ca-chot` (màn cha đọc sẵn). Vắng ⇒ "Mở ca chốt" dùng danh sách cũ. */
   caChotOmni?: GoiCaChotOmni | null
@@ -77,8 +77,6 @@ export default function BuoiChua({
   const [hoiChua, setHoiChua] = useState(false)
   const [dangChua, setDangChua] = useState(false)
   const [daChua, setDaChua] = useState<{ soLuot: number; ngayOnLai: string } | null>(null)
-  const [moCoMat, setMoCoMat] = useState(false)
-  const [chonCoMat, setChonCoMat] = useState<Set<string>>(new Set())
   // OMNI 3: gói ca chốt 50/50 (màn cha đọc sẵn khi OMNI áp cho lớp của chiến dịch). null ⇒ danh sách cũ.
   const goiOmni = caChotOmni
 
@@ -162,12 +160,9 @@ export default function BuoiChua({
               type="button"
               className="m3-nut-chu cd-nut-nho"
               style={{ padding: '0 8px', display: 'inline-flex', verticalAlign: 'baseline' }}
-              onClick={() => {
-                setChonCoMat(new Set(emCoMat.map((e) => e.sbd)))
-                setMoCoMat(true)
-              }}
+              onClick={onMoDiemDanh}
             >
-              Đổi điểm danh
+              Cập nhật điểm danh bằng mã
             </button>
           </p>
         </div>
@@ -352,39 +347,6 @@ export default function BuoiChua({
         />
       )}
 
-      {moCoMat && (
-        <HopChon
-          tieuDe="Điểm danh buổi chữa"
-          moTa="Bỏ tích em vắng. Sau khi chốt, hệ thống quét lại lịch sử và chỉ chọn em có mặt đã tự làm đúng câu."
-          nhanXacNhan={`Xếp lại cho ${chonCoMat.size} em`}
-          xacNhanDuoc={chonCoMat.size > 0}
-          onXacNhan={() => {
-            setMoCoMat(false)
-            onDoiCoMat(dsEm.map((e) => e.sbd).filter((sbd) => chonCoMat.has(sbd)))
-          }}
-          onDong={() => setMoCoMat(false)}
-        >
-          <div className="cd-hop-ds">
-            {sapTheoTen(dsEm).map((e) => (
-              <label key={e.sbd} className="cd-tich">
-                <input
-                  type="checkbox"
-                  checked={chonCoMat.has(e.sbd)}
-                  onChange={() =>
-                    setChonCoMat((cu) => {
-                      const s = new Set(cu)
-                      if (s.has(e.sbd)) s.delete(e.sbd)
-                      else s.add(e.sbd)
-                      return s
-                    })
-                  }
-                />
-                <span>{e.ten}</span>
-              </label>
-            ))}
-          </div>
-        </HopChon>
-      )}
     </>
   )
 }

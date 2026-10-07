@@ -161,6 +161,22 @@
   font-size: 13px;
   color: var(--bts-chu-phu);
 }
+.cd-the--hanh-dong {
+  align-items: flex-start;
+}
+@media (min-width: 720px) {
+  .cd-the--hanh-dong {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cd-the--hanh-dong > div {
+    min-width: 0;
+  }
+  .cd-the--hanh-dong > button {
+    flex: 0 0 auto;
+  }
+}
 .cd-nhan-buoc {
   font-size: 12px;
   font-weight: 800;

@@ -1583,7 +1583,7 @@ export default function ExamMonitorScreen() {
                 </button>
 
                 {moSaiLai && (
-                  <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                  <div className="ca-hop-cuon ca-sai-lai-cuon flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                     {bienBanLap && <BangBienBanLap bb={bienBanLap} tenCua={(sbd) => dsEm.find((e) => e.sbd === sbd)?.hoTen || ''} />}
                     {!bienBanLap && tongKetLap.soEmCoLap === 0 && (
                       <div style={{ ...NHAN_NHO, color: 'var(--cam)', lineHeight: 1.6 }}>
@@ -2190,7 +2190,7 @@ export default function ExamMonitorScreen() {
                 "SBD 10038" thay vì tên con. Danh sách lớp có sẵn tên, chỉ cần
                 một nút kéo sang. Nút chỉ hiện khi thật sự có em thiếu tên. */}
             {veThieuTen()}
-            <div id="ca-bang-em" className="ca-bang" role="tabpanel" aria-labelledby={`ca-tab-${tabHieu}`}>
+            <div id="ca-bang-em" className="ca-bang ca-hop-cuon ca-bang--cuon" role="tabpanel" aria-labelledby={`ca-tab-${tabHieu}`}>
             {tabHieu === 'cho' ? (
               emChoVao.length === 0 ? (
                 <div className="ca-rong">Chưa em nào đứng ở phòng chờ.</div>

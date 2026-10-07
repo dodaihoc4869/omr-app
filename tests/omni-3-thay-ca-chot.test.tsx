@@ -2,7 +2,7 @@
 // Khoá: OMNI áp cho lớp ⇒ câu lấy từ `/gv/omni {action:'ca-chot'}` thay danh sách cũ (gói ghi `omni: true`); màn Mở ca tạo xong ca từ gói ấy ⇒ gọi
 // thêm MỘT lệnh `gan-ca-chot {chienDichId, maCa}` (không đổi màn). OMNI tắt / lỗi ⇒ đúng đường cũ, không gọi gì thêm.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
 const m = vi.hoisted(() => ({ goi: vi.fn(), publish: vi.fn(), address: vi.fn(), save: vi.fn() }))
@@ -66,7 +66,7 @@ describe('Buổi chữa: nút "Mở ca chốt"', () => {
         tra={new Map()}
         dangChieu={false}
         onChieu={vi.fn(async () => true)}
-        onDoiCoMat={vi.fn()}
+        onMoDiemDanh={vi.fn()}
         onDaChua={vi.fn()}
         caChotOmni={caChotOmni}
       />,
@@ -97,6 +97,22 @@ describe('màn Lên bảng: chiến dịch hết hạn ⇒ đọc sẵn gói ca 
   const BANG = { chienDich: { ...DS.chienDich[0] }, homNay: '2026-10-05', hetHan: true, lop: { coXat: 0.9, thanhThao: 0.5, huyetChien: 0, canDayLaiCau: 0, canDayLaiLuot: 0 }, dang: ['Thuỷ phân'], em: [{ sbd: '01', ten: 'Em 01', coXat: 1, thanhThao: 1, canDayLai: 0, treNhip: 0, huyetChien: false, theoDang: {} }], canDayLai: [] }
   const mock = (co: Record<string, unknown>) =>
     m.goi.mockImplementation(async (d: string, b: Record<string, unknown>) => {
+      if (d === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 1, sbd: ['01'] }] } }
+      if (d === '/gv/buoi-hoc' && b.action === 'dang-mo')
+        return { ok: true, du: { ok: true, buoi: [{ id: 'BH-OMNI', ten: 'Buổi chữa · Bài 6 · Tinh bột', lop: '12A1', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true, soCoMat: 1 }] } }
+      if (d === '/gv/buoi-hoc' && b.action === 'xem')
+        return {
+          ok: true,
+          du: {
+            ok: true,
+            buoi: { id: 'BH-OMNI', ten: 'Buổi chữa · Bài 6 · Tinh bột', lop: '12A1', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true },
+            ma: '482915',
+            doiMaLuc: Date.now() + 60_000,
+            coMat: [{ sbd: '01', hoTen: 'Em 01', luc: '2026-10-05T08:01:00Z', cach: 'ma' }],
+            siSo: 1,
+            lopEm: [{ sbd: '01', hoTen: 'Em 01', tenLop: '12A1' }],
+          },
+        }
       if (d === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true, du: { ok: true, ...DS } }
       if (d === '/gv/chien-dich' && b.action === 'bang') return { ok: true, du: { ok: true, ...BANG } }
       if (d === '/gv/chien-dich' && b.action === 'buoi-chua') return { ok: true, du: { ok: true, ...BUOI } }
@@ -107,16 +123,14 @@ describe('màn Lên bảng: chiến dịch hết hạn ⇒ đọc sẵn gói ca 
   it('OMNI bật cho lớp 12A1 ⇒ `ca-chot {chienDichId}` và nút "Mở ca chốt · 28 câu"', async () => {
     mock({ bat: true, lop: ['12A1'], sbd: [] })
     render(<LenBangChienDich />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh 1 học sinh' }))
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chốt 1 em có mặt' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Xếp buổi chữa cho 1 em có mặt' }))
     expect(await screen.findByRole('button', { name: 'Mở ca chốt · 28 câu' })).toBeTruthy()
     expect(m.goi).toHaveBeenCalledWith('/gv/omni', { action: 'ca-chot', chienDichId: 'cd-1' })
   })
   it('OMNI không áp cho lớp ⇒ không hỏi `ca-chot`, nút dùng danh sách cũ', async () => {
     mock({ bat: true, lop: ['11B'], sbd: [] })
     render(<LenBangChienDich />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh 1 học sinh' }))
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chốt 1 em có mặt' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Xếp buổi chữa cho 1 em có mặt' }))
     expect(await screen.findByRole('button', { name: 'Mở ca chốt · 2 câu' })).toBeTruthy()
     await waitFor(() => expect(m.goi.mock.calls.some(([d, b]) => d === '/gv/omni' && b.action === 'co-doc')).toBe(true))
     expect(m.goi.mock.calls.some(([, b]) => b.action === 'ca-chot')).toBe(false)

@@ -119,7 +119,7 @@ describe('màn Buổi chữa', () => {
       tra: new Map(),
       dangChieu: false,
       onChieu: vi.fn(async () => true),
-      onDoiCoMat: vi.fn(),
+      onMoDiemDanh: vi.fn(),
       onDaChua: vi.fn(),
       ...them,
     }
@@ -187,13 +187,10 @@ describe('màn Buổi chữa', () => {
     expect(thay.ten).toBe('Thầy chữa')
   })
 
-  it('"Đổi em có mặt" xếp lại cho em có mặt; "Mở ca chốt" ghi sẵn câu rồi mở màn Mở ca', () => {
+  it('"Cập nhật điểm danh bằng mã" quay lại nguồn có mặt; "Mở ca chốt" ghi sẵn câu rồi mở màn Mở ca', () => {
     const { p } = ve()
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi điểm danh' }))
-    const hop = screen.getByRole('dialog')
-    fireEvent.click(within(hop).getByRole('checkbox', { name: 'Em 06' }))
-    fireEvent.click(within(hop).getByRole('button', { name: 'Xếp lại cho 5 em' }))
-    expect(p.onDoiCoMat).toHaveBeenCalledWith(['01', '02', '03', '04', '05'])
+    fireEvent.click(screen.getByRole('button', { name: 'Cập nhật điểm danh bằng mã' }))
+    expect(p.onMoDiemDanh).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Mở ca chốt · 4 câu' }))
     expect(JSON.parse(sessionStorage.getItem(KHOA_CA_CHOT) ?? '{}').qids).toEqual(['DE-A-I-17', 'DE-A-I-44', 'DE-A-I-23', 'DE-A-I-9'])

@@ -5,7 +5,7 @@
 // `dungToChieu` đoán từ Ngân hàng đề trên máy: khớp đuôi mã (`id.endsWith(khoá)`) + khoá theo số thứ tự (`3`, `III-3`, `q3`, `cau-3`…). Câu của chiến dịch không có trên máy
 // ⇒ bị thay bằng MỘT CÂU KHÁC của tờ đầu tiên trong ngân hàng (ở đây: tờ khối 10). Nay: chỉ nội dung ĐÚNG mã (máy chủ qua cổng khối, hoặc ngân hàng khớp NGUYÊN mã).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 const { goi, toast, nguonMay } = vi.hoisted(() => ({ goi: vi.fn(), toast: vi.fn(), nguonMay: { ds: [] as unknown[] } }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
@@ -169,6 +169,25 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
 
   function dungMay(noiDungCau: (b: Record<string, unknown>) => unknown) {
     goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
+      if (_d === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '11 - Tinh Hoa', khoi: '11', soEm: 2, sbd: ['Trần Bảo', 'Lê Chi'] }] } }
+      if (_d === '/gv/buoi-hoc' && b.action === 'dang-mo')
+        return { ok: true, du: { ok: true, buoi: [{ id: 'BH-11', ten: 'Buổi chữa · Ôn tổng hợp', lop: '11 - Tinh Hoa', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true, soCoMat: 2 }] } }
+      if (_d === '/gv/buoi-hoc' && b.action === 'xem')
+        return {
+          ok: true,
+          du: {
+            ok: true,
+            buoi: { id: 'BH-11', ten: 'Buổi chữa · Ôn tổng hợp', lop: '11 - Tinh Hoa', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true },
+            ma: '482915',
+            doiMaLuc: Date.now() + 60_000,
+            coMat: [
+              { sbd: 'Trần Bảo', hoTen: 'Trần Bảo', luc: '2026-10-05T08:01:00Z', cach: 'ma' },
+              { sbd: 'Lê Chi', hoTen: 'Lê Chi', luc: '2026-10-05T08:02:00Z', cach: 'ma' },
+            ],
+            siSo: 2,
+            lopEm: [],
+          },
+        }
       if (b.action === 'danh-sach') return { ok: true, du: { ok: true, homNay: '2026-10-05', chienDich: [CD] } }
       if (b.action === 'bang') return { ok: true, du: { ok: true, chienDich: CD, homNay: '2026-10-05', hetHan: true, lop: { coXat: 0.9, thanhThao: 0.4, huyetChien: 0, canDayLaiCau: 0, canDayLaiLuot: 0 }, dang: ['Dạng A'], em: EM, canDayLai: [], noCu: [] } }
       if (b.action === 'buoi-chua') return { ok: true, du: { ok: true, chienDich: { id: 'cd-11', ten: 'Ôn tổng hợp', hanNop: '2026-10-04', lop: '11 - Tinh Hoa' }, hetHan: true, soEm: 2, lop: { coXat: 0.9, thanhThao: 0.4 }, cau: [cauBc(A, 2), cauBc(B, 1), cauBc(C, 4), cauBc(D, 9)] } }
@@ -177,8 +196,7 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
     })
   }
   const diemDanh = async () => {
-    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh 2 học sinh' }))
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chốt 2 em có mặt' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Xếp buổi chữa cho 2 em có mặt' }))
   }
   const moTo = async () => {
     render(<LenBangChienDich />)
@@ -208,6 +226,9 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
     nguonMay.ds = [TO_10, TO_11_MAY]
     dungMay(() => ({}))
     goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
+      if (_d === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '11 - Tinh Hoa', khoi: '11', soEm: 2, sbd: ['Trần Bảo', 'Lê Chi'] }] } }
+      if (_d === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [{ id: 'BH-11', ten: 'Buổi chữa · Ôn tổng hợp', lop: '11 - Tinh Hoa', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true, soCoMat: 2 }] } }
+      if (_d === '/gv/buoi-hoc' && b.action === 'xem') return { ok: true, du: { ok: true, buoi: { id: 'BH-11', ten: 'Buổi chữa · Ôn tổng hợp', lop: '11 - Tinh Hoa', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true }, ma: '482915', doiMaLuc: Date.now() + 60_000, coMat: [{ sbd: 'Trần Bảo', hoTen: 'Trần Bảo', luc: '2026-10-05T08:01:00Z', cach: 'ma' }, { sbd: 'Lê Chi', hoTen: 'Lê Chi', luc: '2026-10-05T08:02:00Z', cach: 'ma' }], siSo: 2, lopEm: [] } }
       if (b.action === 'noi-dung-cau') return { ok: false, loai: 'chua_co_lenh', chu: 'Máy chủ chưa có lệnh' }
       if (b.action === 'danh-sach') return { ok: true, du: { ok: true, homNay: '2026-10-05', chienDich: [CD] } }
       if (b.action === 'bang') return { ok: true, du: { ok: true, chienDich: CD, homNay: '2026-10-05', hetHan: true, lop: { coXat: 0.9, thanhThao: 0.4, huyetChien: 0, canDayLaiCau: 0, canDayLaiLuot: 0 }, dang: ['Dạng A'], em: EM, canDayLai: [], noCu: [] } }

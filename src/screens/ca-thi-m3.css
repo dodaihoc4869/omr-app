@@ -125,6 +125,34 @@
   display: flex;
   flex-direction: column;
 }
+.ca-hop-cuon {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vien-dam) transparent;
+}
+.ca-hop-cuon::-webkit-scrollbar {
+  width: 8px;
+}
+.ca-hop-cuon::-webkit-scrollbar-thumb {
+  border-radius: var(--bo-tron);
+  background: var(--vien-dam);
+}
+.ca-bang--cuon {
+  max-height: clamp(360px, 62vh, 760px);
+  padding: 0 10px;
+  border: 1px solid var(--vien);
+  border-radius: var(--bo-2);
+  background: var(--m3-surface-container-lowest);
+}
+.ca-sai-lai-cuon {
+  max-height: clamp(260px, 46vh, 540px);
+  padding: 10px;
+  border: 1px solid var(--vien);
+  border-radius: var(--bo-2);
+  background: var(--m3-surface-container-lowest);
+}
 .ca-bang-dau {
   display: none;
 }
@@ -237,6 +265,9 @@
 @container ca-trai (min-width: 600px) {
   .ca-bang-dau {
     display: grid;
+    position: sticky;
+    z-index: 1;
+    top: 0;
     grid-template-columns: var(--ca-cot);
     gap: 12px;
     padding: 10px 4px;
@@ -245,6 +276,7 @@
     font-weight: 800;
     letter-spacing: 0.08em;
     color: var(--m3-on-surface-variant);
+    background: var(--m3-surface-container-lowest);
   }
   .ca-bang-dau > span:last-child {
     text-align: right;
@@ -261,6 +293,15 @@
   }
   .ca-o-gian {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 899px) {
+  .ca-bang--cuon {
+    max-height: 58vh;
+  }
+  .ca-sai-lai-cuon {
+    max-height: 42vh;
   }
 }
 
