@@ -1,6 +1,7 @@
 // VÒNG CHỮA CÂU SAI — route handler (đặc tả §10, 07/10/2026).
 // Các endpoint:
 //   POST /chua-cau-sai/mo-dot        — mở/lấy đợt lỗi của (sbd, qid)
+//   POST /chua-cau-sai/phat-item     — lấy item hiện tại (hoặc tạo mới)
 //   POST /chua-cau-sai/nop-item      — nộp kết quả một item
 //   POST /chua-cau-sai/xin-goi-y     — xin gợi ý (tăng mức hỗ trợ)
 //   GET  /chua-cau-sai/tien-do       — tiến độ đợt hiện tại
@@ -20,7 +21,8 @@ import {
 import {
   COHORT_PILOT,
   type TrangThaiDay, type PhienResponse, type ItemCongKhai,
-  type BuocTienDo, type CauHinhChuaCauSai,
+  type BuocTienDo, type CauHinhChuaCauSai, type LoaiItem,
+  type HocLieuChua, type ProbeRef, type NoiDungTrucTiep, type KieuItem,
 } from './chua-cau-sai-kieu'
 
 type Obj = Record<string, unknown>
@@ -250,5 +252,224 @@ export async function thongKeKpi(env: Env, searchParams: URLSearchParams): Promi
     kpiPhanTram: kpi,
     mucTieu: 90,
     datMucTieu: kpi != null && kpi >= 90,
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Helpers nội bộ: tạo/trả ItemCongKhai từ học liệu
+// ---------------------------------------------------------------------------
+
+const TRANG_THAI_DONG: readonly TrangThaiDay[] = ['thieu_hoc_lieu', 'tam_khoa', 'can_thay', 'da_tu_sua', 'cau_thay_doi']
+
+function noiDungTuProbe(p: ProbeRef): NoiDungTrucTiep | null {
+  return p.noiDungTrucTiep ?? null
+}
+
+function xayItemCK(id: string, loai: LoaiItem, buocSo: number | undefined, tieuDe: string, nd: NoiDungTrucTiep): ItemCongKhai {
+  return {
+    id,
+    loai,
+    buocSo,
+    tieuDe,
+    kieu: nd.kieu,
+    hoi: nd.hoi,
+    luaChon: nd.luaChon ?? null,
+    donVi: nd.donVi,
+  }
+}
+
+function probeJsonDapAn(nd: NoiDungTrucTiep): string {
+  return JSON.stringify({ dapAn: nd.dapAn, kieu: nd.kieu })
+}
+
+function itemCKTuRow(row: Obj): ItemCongKhai | null {
+  try {
+    const pr = JSON.parse(str(row.probe_ref) || '{}') as { kieu?: KieuItem; hoi?: string; luaChon?: unknown; donVi?: string }
+    if (!pr.hoi) return null
+    return {
+      id: str(row.id),
+      loai: str(row.loai) as LoaiItem,
+      buocSo: row.buoc_so != null ? Number(row.buoc_so) : undefined,
+      tieuDe: str(row.tieu_de),
+      kieu: (pr.kieu ?? 'tu_nhap') as KieuItem,
+      hoi: pr.hoi,
+      luaChon: Array.isArray(pr.luaChon) ? pr.luaChon as { ky: string; noi: string }[] : null,
+      donVi: pr.donVi,
+    }
+  } catch {
+    return null
+  }
+}
+
+async function taoItemMoi(
+  env: Env,
+  sbd: string,
+  dotId: string,
+  phienId: string,
+  tt: TrangThaiDay,
+  hocLieu: HocLieuChua,
+  tienDoArr: BuocTienDo[],
+): Promise<ItemCongKhai | null> {
+  let probe: ProbeRef | null = null
+  let loai: LoaiItem = 'chan_doan'
+  let buocSo: number | undefined
+  let tieuDe = ''
+
+  if (tt === 'can_chan_doan') {
+    const buoc = hocLieu.buoc.find((b, i) => !tienDoArr[i]?.receiptChanDoan)
+    if (!buoc || !buoc.chanDoan.length) return null
+    probe = buoc.chanDoan[0]
+    loai = 'chan_doan'
+    buocSo = buoc.thuTu
+    tieuDe = buoc.tieuDe
+  } else if (tt === 'dang_chua_buoc') {
+    const bIdx = tienDoArr.findIndex((td) => td.trangThai === 'dang_kiem' || td.trangThai === 'chua_kiem')
+    const buoc = bIdx >= 0 ? hocLieu.buoc[bIdx] : null
+    if (!buoc) return null
+    const bTd = tienDoArr[bIdx]
+    if (!bTd?.receiptChanDoan && buoc.chanDoan.length) {
+      probe = buoc.chanDoan[0]; loai = 'chan_doan'
+    } else if (!bTd?.receiptLyDo && buoc.hieuBuoc?.kiemLyDo.length) {
+      probe = buoc.hieuBuoc.kiemLyDo[0]; loai = 'kiem_ly_do'
+    } else if (!bTd?.receiptChuyenGiao && buoc.kiemLai.length) {
+      probe = buoc.kiemLai[0]; loai = 'kiem_lai'
+    } else if (buoc.hieuBuoc?.chuyenGiao.length) {
+      probe = buoc.hieuBuoc.chuyenGiao[0]; loai = 'chuyen_giao'
+    }
+    buocSo = buoc.thuTu
+    tieuDe = buoc.tieuDe
+  } else if (tt === 'dang_ghep_bai') {
+    if (!hocLieu.banGhepBai.length) return null
+    probe = hocLieu.banGhepBai[0] as ProbeRef
+    loai = 'ghep_bai'
+    tieuDe = 'Ghép lại cả bài'
+  } else if (tt === 'dang_kiem_chung') {
+    if (!hocLieu.banKiemChung.length) return null
+    probe = hocLieu.banKiemChung[0] as ProbeRef
+    loai = 'kiem_chung'
+    tieuDe = 'Kiểm chứng'
+  }
+
+  if (!probe) return null
+  const nd = noiDungTuProbe(probe)
+  if (!nd) return null  // không có nội dung inline → thiếu học liệu đầy đủ
+
+  const itemId = crypto.randomUUID()
+  const now = nowMs()
+  const probeRef = JSON.stringify({
+    kieu: nd.kieu, hoi: nd.hoi, luaChon: nd.luaChon, donVi: nd.donVi,
+    dapAn: nd.dapAn,  // server-only
+  })
+
+  await env.DB.prepare(`
+    INSERT OR IGNORE INTO chua_loi_item
+      (id, dot_id, phien_id, sbd, loai, buoc_so, tieu_de, probe_ref, trang_thai, tao_luc, cap_nhat_luc)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?)
+  `).bind(itemId, dotId, phienId, sbd, loai, buocSo ?? null, tieuDe, probeRef, 'chua_nop', now, now).run()
+
+  return xayItemCK(itemId, loai, buocSo, tieuDe, nd)
+}
+
+// ---------------------------------------------------------------------------
+// POST /hs/chua-cau-sai/phat-item
+// ---------------------------------------------------------------------------
+export async function phatItem(env: Env, body: Obj): Promise<Response> {
+  const sbd = await gameIdentity(env, body).catch(() => '')
+  if (!sbd) return loi('CAN_DANG_NHAP', 'Vui lòng đăng nhập lại.', 401)
+
+  const dotId = str(body.dotId)
+  if (!dotId) return loi('THIEU_THAM_SO', 'Thiếu dotId.', 400)
+
+  const dot = await env.DB
+    .prepare('SELECT * FROM chua_loi_dot WHERE id = ? AND sbd = ?')
+    .bind(dotId, sbd).first<Obj>().catch(() => null)
+  if (!dot) return loi('KHONG_TIM_THAY', 'Không tìm thấy đợt.', 404)
+
+  const tt = str(dot.trang_thai_day) as TrangThaiDay
+  const q = str(dot.qid_chuan)
+  const { hocLieu } = await docHocLieu(env, q)
+
+  const phien = await env.DB
+    .prepare('SELECT id, tien_do_json FROM chua_loi_phien WHERE dot_id = ? AND sbd = ? ORDER BY tao_luc DESC LIMIT 1')
+    .bind(dotId, sbd).first<{ id: string; tien_do_json: string }>().catch(() => null)
+  const phienId = phien?.id ?? ''
+  const tienDoArr: BuocTienDo[] = phien
+    ? (JSON.parse(str(phien.tien_do_json) || '[]') as BuocTienDo[])
+    : hocLieu ? khoiTaoTienDo(hocLieu) : []
+  const td = hocLieu ? tinhTienDo(hocLieu, tienDoArr) : { soBuocDaQua: 0, soBuocCanKiem: 0 }
+
+  const base = {
+    ok: true, dotId,
+    trangThai: tt,
+    tienDo: td,
+    lanGapLai: num(dot.lan_gap_lai),
+    denHan: str(dot.den_han) || undefined,
+    lyDoThieu: str(dot.ly_do_thieu) || undefined,
+  }
+
+  if (TRANG_THAI_DONG.includes(tt) || tt === 'cho_gap_lai_2') {
+    return Response.json(base)
+  }
+
+  if (!hocLieu) {
+    return Response.json({ ...base, trangThai: 'thieu_hoc_lieu' as TrangThaiDay })
+  }
+
+  // Kiểm item đang mở chưa nộp
+  const itemMo = await env.DB
+    .prepare("SELECT * FROM chua_loi_item WHERE dot_id = ? AND sbd = ? AND trang_thai = 'chua_nop' ORDER BY tao_luc ASC LIMIT 1")
+    .bind(dotId, sbd).first<Obj>().catch(() => null)
+  if (itemMo) {
+    const ick = itemCKTuRow(itemMo)
+    if (ick) return Response.json({ ...base, item: ick })
+  }
+
+  // Tạo item mới
+  const item = await taoItemMoi(env, sbd, dotId, phienId, tt, hocLieu, tienDoArr)
+  if (!item) {
+    return Response.json({ ...base, trangThai: 'thieu_hoc_lieu' as TrangThaiDay, lyDoThieu: 'Chưa có probe cho bước này.' })
+  }
+
+  return Response.json({ ...base, item })
+}
+
+// ---------------------------------------------------------------------------
+// POST /hs/chua-cau-sai/xin-goi-y
+// ---------------------------------------------------------------------------
+export async function xinGoiY(env: Env, body: Obj): Promise<Response> {
+  const sbd = await gameIdentity(env, body).catch(() => '')
+  if (!sbd) return loi('CAN_DANG_NHAP', 'Vui lòng đăng nhập lại.', 401)
+
+  const dotId = str(body.dotId)
+  const itemId = str(body.itemId)
+  if (!dotId || !itemId) return loi('THIEU_THAM_SO', 'Thiếu dotId/itemId.', 400)
+
+  const item = await env.DB
+    .prepare('SELECT * FROM chua_loi_item WHERE id = ? AND sbd = ?')
+    .bind(itemId, sbd).first<Obj>().catch(() => null)
+  if (!item) return loi('KHONG_TIM_THAY', 'Không tìm thấy item.', 404)
+  if (str(item.trang_thai) !== 'chua_nop') return loi('DA_NOP', 'Item đã nộp rồi.', 409)
+
+  // Đọc hỗ trợ từ học liệu dựa trên buoc_so
+  const dot = await env.DB
+    .prepare('SELECT qid_chuan FROM chua_loi_dot WHERE id = ? AND sbd = ?')
+    .bind(dotId, sbd).first<{ qid_chuan: string }>().catch(() => null)
+  const { hocLieu } = dot ? await docHocLieu(env, str(dot.qid_chuan)) : { hocLieu: null }
+  const buocSo = item.buoc_so != null ? Number(item.buoc_so) : undefined
+  const buoc = hocLieu && buocSo != null ? hocLieu.buoc[buocSo] : null
+
+  // Chọn gợi ý mức thấp nhất chưa dùng (mức 1 → 2 → 3)
+  const mucDaGoiY = num(item.muc_ho_tro_cao_nhat)
+  const mucMoi = Math.min(mucDaGoiY + 1, 3)
+  const goiY = buoc?.hoTro.find((h) => h.muc === mucMoi)
+
+  await env.DB.prepare('UPDATE chua_loi_item SET muc_ho_tro_cao_nhat = ?, cap_nhat_luc = ? WHERE id = ?')
+    .bind(mucMoi, nowMs(), itemId).run()
+
+  return Response.json({
+    ok: true,
+    mucHoTro: mucMoi,
+    noiDungGoiY: goiY?.noiDung ?? null,
+    dacBiet: mucMoi >= 3 ? 'Mức hỗ trợ cao nhất — nếu vẫn chưa hiểu hãy hỏi thầy.' : undefined,
   })
 }

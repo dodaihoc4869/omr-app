@@ -6,6 +6,7 @@
 // v3 (30/09): không thẻ nào "Đang khoá" vì kho câu sai trống (máy chủ tự dự phòng); bộ đếm "Đã khắc phục X/Y câu sai"; công tắc
 // "Chấm từng câu" (nhớ theo máy) ⇒ mỗi câu bấm Kiểm tra, máy chủ chấm + khoá câu, hiện đúng/sai + lời giải + nút Câu tiếp.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+const ManChuaCauSai = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
 import TheCau from '../TheCau'
 import { hoiXacNhan } from '../hop-thoai'
 import '../m3'
@@ -414,7 +415,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const veChon = () => { setBai(null); setKetQua(null); setLoi('') }
 
   // ================================================================== KẾT QUẢ
-  if (ketQua) return <ManKetQua boCuc={boCuc} kq={ketQua.nop} cau={ketQua.cau} onVe={onVe} onLuyenTiep={() => { setKetQua(null); setBai(null); setThePhu('luyen') }} onTongHop={() => { veChon(); setThePhu('tong-hop') }} />
+  if (ketQua) return <ManKetQua boCuc={boCuc} kq={ketQua.nop} cau={ketQua.cau} token={token} onVe={onVe} onLuyenTiep={() => { setKetQua(null); setBai(null); setThePhu('luyen') }} onTongHop={() => { veChon(); setThePhu('tong-hop') }} />
 
   // ================================================================== ĐANG LÀM
   if (bai) {
@@ -1022,8 +1023,9 @@ function TheCauXem({ cau: c, kq, stt, onHoi }: { cau: CauCongKhai; kq: KetQuaCau
   return <TheCau {...chung} phan="III" selected={kq?.traLoi ?? ''} correct={kq?.dapAn || undefined} />
 }
 
-function ManKetQua({ boCuc, kq, cau, onVe, onLuyenTiep, onTongHop }: { boCuc: BoCuc; kq: KetQuaNop; cau: CauCongKhai[]; onVe: () => void; onLuyenTiep: () => void; onTongHop: () => void }) {
+function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { boCuc: BoCuc; kq: KetQuaNop; cau: CauCongKhai[]; token: string; onVe: () => void; onLuyenTiep: () => void; onTongHop: () => void }) {
   const [loc, setLoc] = useState<LocXem>('tat')
+  const [chuaQid, setChuaQid] = useState<string | null>(null)
   const theoQid = useMemo(() => new Map(kq.cau.map((k) => [k.qid, k])), [kq])
   const tiLe = kq.soCau ? Math.round((100 * kq.soDung) / kq.soCau) : 0
   const ds = cau.map((c, i) => ({ c, i, k: theoQid.get(c.qid) })).filter((x) => loc === 'tat' || (loc === 'sai' ? !x.k?.dung : !!x.k?.dung))
@@ -1081,10 +1083,28 @@ function ManKetQua({ boCuc, kq, cau, onVe, onLuyenTiep, onTongHop }: { boCuc: Bo
             <TheCauXem cau={c} kq={k} stt={i + 1} />
           )}
           {k?.khacPhuc && <p className="tlu-khac-phuc" data-dung={k.dung ? 'true' : 'false'}>{k.khacPhuc}</p>}
+          {!k?.dung && !k?.anDapAn && (
+            <button type="button" className="tlu-nut-chua" onClick={() => setChuaQid(c.qid)}>
+              Sửa từng bước
+            </button>
+          )}
         </article>
       ))}
     </div>
   )
+  if (chuaQid) {
+    const cauSai = cau.find((c) => c.qid === chuaQid)
+    return (
+      <Suspense fallback={<div className="tlu" style={{ padding: '2rem', textAlign: 'center' }}>Đang tải…</div>}>
+        <ManChuaCauSai
+          token={token}
+          qid={chuaQid}
+          tenCau={cauSai ? `Câu ${(cau.indexOf(cauSai) + 1)} · ${cauSai.tenDang ?? ''}`.trim() : undefined}
+          onVe={() => setChuaQid(null)}
+        />
+      </Suspense>
+    )
+  }
   const nut = (
     <div className="tlu-hang-nut">
       <button type="button" className="tlu-nut-chinh" onClick={onLuyenTiep}>Luyện lượt mới</button>

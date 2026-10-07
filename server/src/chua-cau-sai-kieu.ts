@@ -54,6 +54,16 @@ export type MucKetLuan = 'gia_thuyet' | 'co_bang_chung' | 'chua_xac_dinh'
 // ---------------------------------------------------------------------------
 // Ref câu kiểm (ProbeRef) — máy chủ giữ đầy đủ; máy em chỉ nhận ID opaque
 // ---------------------------------------------------------------------------
+
+/** Nội dung nhúng trực tiếp trong học liệu — thay thế tra R2 khi soạn bài nhanh. */
+export interface NoiDungTrucTiep {
+  hoi: string
+  kieu: KieuItem   // định nghĩa bên dưới
+  dapAn: string    // máy chủ giữ, KHÔNG gửi xuống client
+  luaChon?: { ky: string; noi: string }[]
+  donVi?: string
+}
+
 export interface ProbeRef {
   qid: string
   phienBan: string
@@ -63,6 +73,8 @@ export interface ProbeRef {
   kyNang: string[]
   /** Có phải bản tương đương đã kiểm để dùng ở gặp lại 2 không. */
   laTuongDuong: boolean
+  /** Nội dung nhúng — nếu có thì dùng thay tra R2 (server-only). */
+  noiDungTrucTiep?: NoiDungTrucTiep
 }
 
 export interface VariantRef extends ProbeRef {
@@ -151,10 +163,13 @@ export const CAU_HINH_MAC_DINH: CauHinhChuaCauSai = {
 }
 
 // ---------------------------------------------------------------------------
-// Payload công khai của item (gửi máy em, đặc tả §10.2)
+// Kiểu nhập của item (định nghĩa trước NoiDungTrucTiep dùng ở ProbeRef trên)
 // ---------------------------------------------------------------------------
 export type KieuItem = 'so' | 'chon' | 'ds' | 'chon_ly_do' | 'tu_nhap'
 
+// ---------------------------------------------------------------------------
+// Payload công khai của item (gửi máy em, đặc tả §10.2)
+// ---------------------------------------------------------------------------
 export interface ItemCongKhai {
   id: string          // opaque item ID
   loai: LoaiItem

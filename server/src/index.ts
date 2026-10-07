@@ -92,7 +92,7 @@ import { gvHocPhi } from './hoc-phi'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
-import { moDot as chuaMoDot, nopItem as chuaNopItem, tienDo as chuaTienDo, thongKeKpi as chuaThongKe } from './chua-cau-sai'
+import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, tienDo as chuaTienDo, thongKeKpi as chuaThongKe } from './chua-cau-sai'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
@@ -3662,7 +3662,9 @@ const boXuLy = {
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
       // VÒNG CHỮA CÂU SAI (07/10, server/src/chua-cau-sai.ts): đặc tả §10; SBD từ token.
       if (p === '/hs/chua-cau-sai/mo-dot') return ra(await chuaMoDot(env, b))
+      if (p === '/hs/chua-cau-sai/phat-item') return ra(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return ra(await chuaNopItem(env, b))
+      if (p === '/hs/chua-cau-sai/xin-goi-y') return ra(await chuaXinGoiY(env, b))
       if (p === '/hs/chua-cau-sai/tien-do') return ra(await chuaTienDo(env, url.searchParams))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
