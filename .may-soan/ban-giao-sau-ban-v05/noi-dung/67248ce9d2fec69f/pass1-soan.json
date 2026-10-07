@@ -1,0 +1,129 @@
+{
+  "qid": "10-C1-B1-I-1",
+  "bam": "67248ce9d2fec69f",
+  "songSinh": [
+    {
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "thí nghiệm ống tia âm cực của j.j. thomson năm 1897 đã không chứng minh được điều nào sau đây?",
+      "pa": {
+        "A": "Electron có khối lượng tương đương khối lượng hạt nhân nguyên tử.",
+        "B": "Tia âm cực bị lệch về phía bản cực dương khi đặt trong điện trường ngoài.",
+        "C": "Electron mang điện tích âm.",
+        "D": "Electron là thành phần cấu tạo có trong nguyên tử của nhiều nguyên tố khác nhau."
+      },
+      "dap_an": "A",
+      "buoc": [
+        "Xác định nội dung: câu hỏi hỏi điều Thomson không chứng minh được qua ống tia âm cực.",
+        "Liệt kê những gì Thomson đã chứng minh được: electron tích điện âm, bị lệch về cực dương, có trong nguyên tử nhiều nguyên tố.",
+        "Nhận ra phương án sai thực tế: Thomson đo được tỉ số e/m rất lớn, nghĩa là electron rất nhẹ so với hạt nhân, không hề tương đương."
+      ],
+      "chot": "Thí nghiệm ống tia âm cực của Thomson chứng minh electron tích điện âm nhưng không cho thấy electron có khối lượng ngang hạt nhân nguyên tử.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss1"
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss2",
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "Từ thí nghiệm ống tia âm cực, J.J. Thomson kết luận rằng electron là hạt cơ bản có điện tích âm. Phát biểu nào sau đây về electron KHÔNG phải kết luận rút ra từ thí nghiệm đó?",
+      "pa": {
+        "A": "Tia âm cực bị lệch về phía bản tích điện dương → electron mang điện tích âm.",
+        "B": "Electron có khối lượng tương đương khối lượng nguyên tử hydrogen.",
+        "C": "Tỉ lệ e/m của tia âm cực không phụ thuộc vào vật liệu làm cathode.",
+        "D": "Electron là thành phần cấu tạo chung của mọi nguyên tử vật chất."
+      },
+      "dap_an": "B",
+      "buoc": [
+        "Thomson đo tỉ lệ e/m, không đo khối lượng tuyệt đối của electron.",
+        "Khối lượng electron (m_e ≈ 9,11×10⁻³¹ kg) nhỏ hơn khối lượng nguyên tử H khoảng 1836 lần; kết luận này đến từ nghiên cứu sau.",
+        "B sai: Thomson không kết luận electron nặng bằng nguyên tử hydrogen."
+      ],
+      "chot": "Thí nghiệm tia âm cực cho biết electron mang điện âm, tỉ lệ e/m cố định, có trong mọi nguyên tử. Không cho biết khối lượng tuyệt đối bằng H.",
+      "phepTinh": []
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss3",
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "Trong thí nghiệm ống tia âm cực của Thomson, nhận xét nào sau đây về tia âm cực là SAI?",
+      "pa": {
+        "A": "Tia âm cực bị lệch về phía bản tích điện dương trong điện trường ngoài.",
+        "B": "Tỉ lệ điện tích/khối lượng (e/m) của tia âm cực như nhau dù dùng cathode bằng kim loại nào.",
+        "C": "Tia âm cực đi theo đường thẳng trong mọi điều kiện và không bị từ trường làm lệch hướng.",
+        "D": "Khi không có điện trường hay từ trường ngoài, tia âm cực truyền thẳng từ cathode sang anode."
+      },
+      "dap_an": "C",
+      "buoc": [
+        "Tia âm cực (dòng electron) bị lệch hướng trong cả điện trường lẫn từ trường ngoài.",
+        "C sai: tia âm cực không \"đi thẳng trong mọi điều kiện\" — bị lực Lorentz làm lệch.",
+        "A, B, D là những quan sát đúng từ thí nghiệm Thomson."
+      ],
+      "chot": "Tia âm cực bị lệch trong điện trường (hướng về bản +) và từ trường; không đi thẳng tuyệt đối trong mọi điều kiện.",
+      "phepTinh": []
+    },
+    {
+      "_id": "67248ce9d2fec69f_ss4",
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "Phát biểu nào sau đây về thí nghiệm tia âm cực của Thomson (1897) là ĐÚNG?",
+      "pa": {
+        "A": "Thomson đo trực tiếp điện tích của electron bằng thí nghiệm giọt dầu tích điện.",
+        "B": "Tia âm cực chỉ xuất hiện khi dùng hydrogen làm khí trong ống phóng điện.",
+        "C": "Tỉ lệ e/m của tia âm cực thay đổi tùy theo loại khí chứa trong ống.",
+        "D": "Tỉ lệ điện tích/khối lượng (e/m) của tia âm cực không phụ thuộc vào vật liệu cathode hay loại khí trong ống."
+      },
+      "dap_an": "D",
+      "buoc": [
+        "Thomson đo tỉ lệ e/m với nhiều kim loại cathode khác nhau và nhiều loại khí khác nhau → e/m luôn như nhau.",
+        "A sai: thí nghiệm giọt dầu là của Millikan (1909), không phải Thomson.",
+        "B và C sai: tia âm cực xuất hiện với nhiều loại khí; e/m không phụ thuộc khí hay cathode.",
+        "D đúng: đây là kết luận cốt lõi của Thomson."
+      ],
+      "chot": "Tỉ lệ e/m của tia âm cực không đổi dù thay vật liệu cathode hay khí trong ống → electron là hạt phổ quát.",
+      "phepTinh": []
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "dung_sai",
+      "de": "phát biểu nào sau đây về các nhà khoa học và đóng góp của họ trong nghiên cứu cấu tạo nguyên tử là đúng?",
+      "pa": {
+        "A": "J.J. Thomson phát hiện ra electron năm 1897 nhờ nghiên cứu tia âm cực trong ống phóng điện.",
+        "B": "E. Rutherford phát hiện ra hạt electron khi bắn hạt alpha vào lá vàng mỏng.",
+        "C": "N. Bohr xác định điện tích hạt electron bằng thí nghiệm giọt dầu trong điện trường.",
+        "D": "H. Becquerel đề xuất mô hình nguyên tử hành tinh sau khi phân tích quang phổ của hydrogen."
+      },
+      "dap_an": "A",
+      "buoc": [
+        "Kiểm tra từng phương án với kiến thức lịch sử: A – Thomson + ống tia âm cực → electron (đúng).",
+        "B sai: Rutherford thí nghiệm lá vàng để tìm ra hạt nhân, không phải electron. C sai: Millikan mới dùng giọt dầu, không phải Bohr. D sai: Becquerel phát hiện phóng xạ tự nhiên, không đề xuất mô hình hành tinh.",
+        "Chọn phương án duy nhất đúng."
+      ],
+      "chot": "Chỉ Thomson dùng ống tia âm cực tìm ra electron; các phương án còn lại gán nhầm thí nghiệm cho nhà khoa học khác.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss5"
+    },
+    {
+      "kieu": "ly_thuyet",
+      "cach": "dao_chieu",
+      "de": "phát biểu nào sau đây về lịch sử khám phá cấu tạo nguyên tử là sai?",
+      "pa": {
+        "A": "Becquerel phát hiện hiện tượng phóng xạ tự nhiên (1896) trước khi Thomson công bố phát hiện electron (1897).",
+        "B": "Mô hình nguyên tử Rutherford, công bố năm 1911, dựa trên thí nghiệm tán xạ hạt alpha của Geiger và Marsden (thực hiện 1909–1910).",
+        "C": "Thomson đề xuất mô hình nguyên tử có hạt nhân nhỏ tích điện dương nằm ở trung tâm, electron chuyển động xung quanh.",
+        "D": "Bohr giải thích thành công quang phổ vạch của hydrogen bằng mô hình nguyên tử với các quỹ đạo electron xác định (1913)."
+      },
+      "dap_an": "C",
+      "buoc": [
+        "A đúng: Becquerel công bố phát hiện phóng xạ tự nhiên năm 1896, một năm trước khi Thomson công bố phát hiện electron năm 1897 — thứ tự lịch sử chính xác.",
+        "B đúng: Geiger và Marsden thực hiện thí nghiệm bắn hạt alpha vào lá vàng năm 1909–1910; Rutherford dùng kết quả đó để công bố mô hình hạt nhân nguyên tử vào năm 1911.",
+        "C sai: Thomson đề xuất mô hình bánh pudding (plum-pudding) — electron nhúng rải rác trong khối cầu tích điện dương đều, hoàn toàn không có hạt nhân nhỏ tập trung ở trung tâm. Mô hình nguyên tử có hạt nhân là của Rutherford (1911), không phải Thomson.",
+        "D đúng: Bohr (1913) đề xuất các quỹ đạo electron xác định và giải thích thành công quang phổ vạch của hydrogen bằng điều kiện lượng tử hóa mô men động lượng."
+      ],
+      "chot": "Mô hình hạt nhân nhỏ ở trung tâm là của Rutherford (1911); Thomson chỉ đề xuất mô hình bánh nho khô năm 1904.",
+      "phepTinh": [],
+      "_id": "67248ce9d2fec69f_ss6"
+    }
+  ],
+  "dang": "tn"
+}

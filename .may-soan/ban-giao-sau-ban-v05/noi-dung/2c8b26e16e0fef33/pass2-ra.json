@@ -1,0 +1,149 @@
+{
+  "phien": "e72dc258-pass2-zinc-v05",
+  "tra": [
+    {
+      "id": "2c8b26e16e0fef33_y1",
+      "d": "D",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 1: ZnS → ZnO + SO₂. Trong ZnS, S có số OXH −2; trong SO₂, S có số OXH +4 → S bị oxi hóa từ −2 lên +4. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y2",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 1: ZnS → ZnO. Zn trong ZnS có số OXH +2; trong ZnO cũng +2 → Zn không thay đổi số OXH, không bị oxi hóa. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y3",
+      "d": "D",
+      "chac": true,
+      "lyDo": "Phương trình cân bằng giai đoạn 1: 2ZnS + 3O₂ → 2ZnO + 2SO₂ → tỉ lệ ZnS:O₂ = 2:3. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y4",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Dẫn: sphalerite chứa ZnS (zinc sulfide), không phải ZnO (zinc oxide). Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y5",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 2: ZnO + H₂SO₄ → ZnSO₄ + H₂O. Không có nguyên tố nào thay đổi số OXH → không phải phản ứng oxi hóa–khử. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y6",
+      "d": "D",
+      "chac": true,
+      "lyDo": "ZnO phản ứng được với H₂SO₄ (tính base) và với NaOH (tính acid) → lưỡng tính. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y7",
+      "d": "D",
+      "chac": true,
+      "lyDo": "ZnO + H₂SO₄ → ZnSO₄ + H₂O, hệ số mỗi chất = 1 → tỉ lệ mol 1:1. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y8",
+      "d": "S",
+      "chac": true,
+      "lyDo": "ZnO + 2HCl → ZnCl₂ + H₂O. Sản phẩm là ZnCl₂, không phải ZnSO₄ như quy trình yêu cầu. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y9",
+      "d": "D",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 3: điện phân ZnSO₄. Tại cathode (cực âm): Zn²⁺ + 2e⁻ → Zn — ion Zn²⁺ nhận 2e⁻, bị khử. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y10",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 3: Zn²⁺ bị khử thành Zn tại cathode (cực âm), không phải anode. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y11",
+      "d": "D",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 3: Zn²⁺ liên tục bị khử thành Zn bám cathode → lượng Zn²⁺ trong dung dịch giảm dần theo thời gian. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y12",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 3: điện cực trơ, tổng phản ứng 2ZnSO₄ + 2H₂O → 2Zn + O₂ + 2H₂SO₄ → H₂SO₄ được sinh ra, nồng độ H₂SO₄ tăng, không giảm. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y13",
+      "d": "D",
+      "chac": true,
+      "lyDo": "n(Zn) = 6,5/65 = 0,1 mol; Q = n·n_e·F = 0,1×2×96500 = 19300 C. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y14",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Dẫn giai đoạn 3: điện cực TRƠ (graphite/Pt). Điện cực trơ không bị hòa tan; tại anode chỉ xảy ra oxi hóa nước: 2H₂O → O₂ + 4H⁺ + 4e⁻. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y15",
+      "d": "D",
+      "chac": true,
+      "lyDo": "SO₂ sinh ra ở giai đoạn 1 là khí độc. SO₂ + H₂O → H₂SO₃; H₂SO₃ tích lũy làm giảm pH nước mưa → mưa acid. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y16",
+      "d": "D",
+      "chac": true,
+      "lyDo": "SO₂ từ giai đoạn 1 → oxi hóa thành SO₃ (xúc tác V₂O₅) → hấp thụ vào H₂SO₄ đặc tạo oleum → pha loãng thu H₂SO₄. Đây là nguyên lý phương pháp tiếp xúc sản xuất H₂SO₄. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y17",
+      "d": "D",
+      "chac": true,
+      "lyDo": "m(Zn thu được) = 2000 kg × 40% × 75% = 600 kg. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y18",
+      "d": "S",
+      "chac": true,
+      "lyDo": "m(Zn thu được) = 1000 × 60% × 90% = 540 kg ≠ 600 kg. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y19",
+      "d": "D",
+      "chac": true,
+      "lyDo": "n(ZnS) = 9700/97 = 100 mol. Phương trình 2ZnS + 3O₂ → tỉ lệ 2:3 → n(O₂) = 150 mol → m(O₂) = 150×32 = 4800 g = 4,8 kg. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y20",
+      "d": "S",
+      "chac": true,
+      "lyDo": "n(ZnO) = 16200/81 = 200 mol → cần 200 mol H₂SO₄ (tỉ lệ 1:1) → V = 200/1 = 200 L, không phải 19,6 L. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y21",
+      "d": "D",
+      "chac": true,
+      "lyDo": "Zn + 2NaOH (đặc) → Na₂ZnO₂ + H₂↑. Kẽm là kim loại lưỡng tính, tan trong kiềm đặc nóng. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y22",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Trong dãy điện hóa, Zn hoạt động mạnh hơn Fe → Fe không thể khử Zn²⁺ ra khỏi dung dịch ZnSO₄. Phát biểu SAI."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y23",
+      "d": "D",
+      "chac": true,
+      "lyDo": "Zn(OH)₂ + 2HCl → ZnCl₂ + 2H₂O (tính base); Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] (tính acid) → lưỡng tính. Phát biểu ĐÚNG."
+    },
+    {
+      "id": "2c8b26e16e0fef33_y24",
+      "d": "S",
+      "chac": true,
+      "lyDo": "Ban đầu: Zn²⁺ + 2OH⁻ → Zn(OH)₂↓ (trắng). Khi NaOH dư: Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] (tan). Kết tủa KHÔNG bền khi có NaOH dư. Phát biểu SAI."
+    }
+  ]
+}

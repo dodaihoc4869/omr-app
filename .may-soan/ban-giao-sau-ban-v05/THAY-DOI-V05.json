@@ -1,0 +1,16 @@
+{
+  "version": "v0.5",
+  "date": "2026-10-07",
+  "session": "e72dc258-9785-5f2f-9a07-8d16d3b02a30",
+  "thay_doi": [
+    "Gly ss6: pass2-ra d=\"B\" (d_tho=\"3,33\"), kiem.d2=\"B\" — ánh xạ kết quả số → mã lựa chọn",
+    "Gly chot tất cả 6 bản: n(KOH)=(2+2)·n(peptide)=4·n(peptide) (thứ tự đúng)",
+    "Zinc pass2-vao: cau.de khôi phục đề đầy đủ 3 giai đoạn + điện cực trơ",
+    "Zinc pass2-ra: giải mù lại 24 ý với bối cảnh đầy đủ từ cau.de"
+  ],
+  "giu_nguyen": [
+    "Thomson 6 bản",
+    "Protein 6 bản",
+    "Gly ss1-ss5 nội dung"
+  ]
+}
