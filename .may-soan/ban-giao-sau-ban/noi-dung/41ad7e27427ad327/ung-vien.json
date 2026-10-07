@@ -20,7 +20,7 @@
    "chot": "Proton (+) và neutron (không mang điện) ở hạt nhân, electron (−) ở vỏ.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Neutron không mang điện và nằm trong hạt nhân, nên D sai.",
+    "lyDo2": "Neutron không mang điện và nằm trong hạt nhân nên D sai; A, B, C đúng.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Electron mang điện âm ở lớp vỏ.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Electron mang điện âm, ở vỏ nguyên tử; B, C, D đều sai.",
+    "lyDo2": "Electron mang điện âm, ở lớp vỏ: đúng; B, C, D sai về điện tích hoặc vị trí.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Chỉ proton và neutron có khối lượng gần 1 amu, electron gần 0 amu.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Electron có khối lượng rất nhỏ (~1/1840 amu), không gần 1 amu.",
+    "lyDo2": "Khối lượng electron rất nhỏ (~1/1840 amu), không gần 1 amu nên C sai.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Hạt nhân gồm proton và neutron, mang điện dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân gồm proton và neutron, mang điện dương; A, C, D sai.",
+    "lyDo2": "Hạt nhân gồm proton và neutron, mang điện dương: đúng; A, C, D sai.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Khối lượng electron chỉ bằng khoảng 1/1837 khối lượng proton.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần, D sai.",
+    "lyDo2": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần nên D sai; A, B, C đúng.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Neutron không mang điện và nằm trong hạt nhân.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Neutron không mang điện, nằm trong hạt nhân; A, B, D sai.",
+    "lyDo2": "Neutron không mang điện, nằm trong hạt nhân: đúng; A, B, D sai.",
     "chac": true
    }
   }

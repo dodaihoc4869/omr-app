@@ -2,25 +2,25 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Khối lượng electron nhỏ hơn rất nhiều (~1/1836) so với proton nên C sai.",
+  "lyDo": "Khối lượng electron nhỏ hơn rất nhiều (~1/1836) so với proton nên C sai; A, B, D đúng.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "A",
-  "lyDo": "Nguyên tử trung hoà: số electron = số proton; B, C, D đều sai.",
+  "lyDo": "Nguyên tử trung hoà nên số electron = số proton; B, C, D đều sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Số khối = số proton + số neutron, không phải số electron.",
+  "lyDo": "Số khối = số proton + số neutron, không phải proton + electron nên D sai.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "Hạt nhân gồm proton và neutron, mang điện dương, không chứa electron.",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron, mang điện dương nên B sai.",
   "chac": true
  },
  {
@@ -32,7 +32,7 @@
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Số electron bằng số proton, không nhất thiết bằng số neutron.",
+  "lyDo": "Số electron bằng số proton, không nhất thiết bằng số neutron nên A sai.",
   "chac": true
  }
 ]

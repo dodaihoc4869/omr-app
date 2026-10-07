@@ -1,20 +1,38 @@
 [
  {
   "id": "ss1",
-  "d": "C",
-  "lyDo": "Tia âm cực là chùm electron đi từ cực âm sang cực dương; A, D sai, B sai vì bị lệch trong điện trường.",
+  "d": "B",
+  "lyDo": "Tia lệch về cực dương nên mang điện tích âm.",
   "chac": true
  },
  {
   "id": "ss2",
-  "d": "B",
-  "lyDo": "Electron mang điện âm nên lệch về phía bản cực dương.",
+  "d": "C",
+  "lyDo": "Tia âm cực là chùm electron đi từ cực âm sang cực dương; A, B, D sai.",
   "chac": true
  },
  {
   "id": "ss3",
+  "d": "B",
+  "lyDo": "Chùm electron mang điện âm bị hút về bản cực dương.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "e/m không đổi với mọi kim loại catode nên electron có trong mọi nguyên tử.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
   "d": "A",
-  "lyDo": "Thomson phát hiện electron qua ống tia âm cực; proton, neutron, hạt nhân do người khác phát hiện bằng thí nghiệm khác.",
+  "lyDo": "Electron được phát hiện từ tia âm cực.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "C",
+  "lyDo": "Thomson gọi hạt tạo nên tia âm cực là electron.",
   "chac": true
  }
 ]

@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Bật ngược cần va chạm với phần tử dương, rất nhỏ, khối lượng lớn (hạt nhân); A giải thích hạt đi xuyên chứ không phải bật ngược.",
+  "lyDo": "Bật ngược do va chạm/đẩy với hạt nhân: điện dương, nhỏ, nặng (vùng rỗng giải thích hạt đi xuyên, không phải bật ngược).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "A",
-  "lyDo": "Hạt nhân rất nhỏ so với nguyên tử nên hiếm hạt alpha đến gần để bị bật ngược.",
+  "lyDo": "Hạt nhân rất nhỏ nên xác suất hạt alpha tới gần hạt nhân rất thấp.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Rutherford: hạt nhân mang điện dương, tập trung gần hết khối lượng nguyên tử.",
+  "lyDo": "Rutherford: hạt nhân mang điện dương, tập trung gần hết khối lượng; các phương án khác sai.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "Hạt alpha và hạt nhân cùng mang điện dương nên đẩy nhau tĩnh điện.",
+  "lyDo": "Alpha và hạt nhân cùng mang điện dương nên đẩy tĩnh điện.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "D",
-  "lyDo": "Hạt nặng như alpha bị bật ngược chỉ khi va vào hạt có khối lượng rất lớn so với nó.",
+  "lyDo": "Hạt alpha nặng mà bị bật ngược thì hạt va chạm phải có khối lượng rất lớn so với alpha.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "Bật ngược do đẩy: hạt nhân mang điện dương; hiếm xảy ra nên kích thước rất nhỏ so với nguyên tử.",
+  "lyDo": "Hạt nhân mang điện dương, kích thước rất nhỏ so với nguyên tử.",
   "chac": true
  }
 ]

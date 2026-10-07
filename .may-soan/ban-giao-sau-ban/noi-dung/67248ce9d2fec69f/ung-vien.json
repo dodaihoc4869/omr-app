@@ -4,6 +4,27 @@
  "songSinh": [
   {
    "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Tia âm cực trong thí nghiệm ống phóng điện bị lệch về phía cực dương khi đặt trong điện trường. Điều này chứng tỏ tia âm cực mang điện tích gì?",
+   "pa": {
+    "A": "Điện tích dương.",
+    "B": "Điện tích âm.",
+    "C": "Không mang điện.",
+    "D": "Vừa dương vừa âm."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Tia bị hút về cực dương nên mang điện âm."
+   ],
+   "chot": "Tia âm cực mang điện tích âm.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Tia lệch về cực dương nên mang điện tích âm.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
    "cach": "dung_sai",
    "de": "Phát biểu nào sau đây đúng về tia âm cực?",
    "pa": {
@@ -20,7 +41,7 @@
    "chot": "Tia âm cực là chùm electron.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Tia âm cực là chùm electron đi từ cực âm sang cực dương; A, D sai, B sai vì bị lệch trong điện trường.",
+    "lyDo2": "Tia âm cực là chùm electron đi từ cực âm sang cực dương; A, B, D sai.",
     "chac": true
    }
   },
@@ -42,7 +63,28 @@
    "chot": "Hạt mang điện âm lệch về phía bản cực dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Electron mang điện âm nên lệch về phía bản cực dương.",
+    "lyDo2": "Chùm electron mang điện âm bị hút về bản cực dương.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Khi dùng các kim loại khác nhau làm catode trong ống phóng điện, tỉ số điện tích/khối lượng (e/m) của tia âm cực không thay đổi. J.J. Thomson kết luận điều gì từ kết quả này?",
+   "pa": {
+    "A": "Mỗi kim loại có electron đặc trưng riêng.",
+    "B": "Electron là hạt có trong tất cả các nguyên tử.",
+    "C": "Khối lượng nguyên tử không phụ thuộc kim loại.",
+    "D": "Điện tích hạt nhân bằng nhau ở mọi kim loại."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "e/m không đổi → electron giống nhau ở mọi nguyên tử."
+   ],
+   "chot": "Electron là hạt cấu thành chung của mọi nguyên tử.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "e/m không đổi với mọi kim loại catode nên electron có trong mọi nguyên tử.",
     "chac": true
    }
   },
@@ -64,7 +106,28 @@
    "chot": "Ống tia âm cực dẫn tới electron.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Thomson phát hiện electron qua ống tia âm cực; proton, neutron, hạt nhân do người khác phát hiện bằng thí nghiệm khác.",
+    "lyDo2": "Electron được phát hiện từ tia âm cực.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Trong ống phóng điện, tia âm cực truyền thẳng khi không có điện trường và từ trường. Khi bật điện trường, tia bị lệch. Hạt tạo nên tia âm cực được J.J. Thomson đặt tên là gì?",
+   "pa": {
+    "A": "Proton.",
+    "B": "Neutron.",
+    "C": "Electron.",
+    "D": "Hạt nhân nguyên tử."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Tia âm cực là dòng các hạt electron."
+   ],
+   "chot": "Hạt tạo nên tia âm cực là electron.",
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Thomson gọi hạt tạo nên tia âm cực là electron.",
     "chac": true
    }
   }

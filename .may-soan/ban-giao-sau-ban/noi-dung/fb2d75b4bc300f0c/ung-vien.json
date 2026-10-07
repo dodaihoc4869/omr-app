@@ -42,7 +42,7 @@
    "chot": "Electron ở vỏ nguyên tử, không nằm trong hạt nhân.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Electron nằm ở vỏ, ngoài hạt nhân, nên C sai.",
+    "lyDo2": "Electron nằm ở vỏ, bên ngoài hạt nhân nên C sai; A, B, D đúng.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt nhân mang điện dương, vỏ mang điện âm, cả nguyên tử trung hòa.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân chứa proton mang điện dương và neutron không mang điện nên mang điện dương; A, C, D sai.",
+    "lyDo2": "Hạt nhân gồm proton (+) và neutron (không mang điện) nên mang điện dương; A sai (không có electron), C và D sai (nguyên tử trung hòa, vỏ mang điện âm).",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Hạt nhân chỉ gồm proton và neutron, không có electron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
+    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron; A, B, C đúng.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Kích thước nguyên tử lớn hơn kích thước hạt nhân rất nhiều lần.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Kích thước nguyên tử lớn hơn hạt nhân rất nhiều (~10^4–10^5 lần) nên A sai.",
+    "lyDo2": "Nguyên tử lớn hơn hạt nhân khoảng 10^4 lần nên A sai; B, C, D đúng.",
     "chac": true
    }
   }

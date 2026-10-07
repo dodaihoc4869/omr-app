@@ -14,7 +14,7 @@
    },
    "dap_an": "B",
    "buoc": [
-    "Số proton = 2 × 1 + 16 = 18; phân tử trung hoà nên số electron cũng là 18.",
+    "Số proton = 2 * 1 + 16 = 18; phân tử trung hoà nên số electron cũng là 18.",
     "Số neutron = 16 (nguyên tử H không có neutron).",
     "Tổng = 18 + 18 + 16 = 52."
    ],
@@ -36,7 +36,7 @@
    ],
    "kiem": {
     "d2": "B",
-    "lyDo2": "H2S: p = 2+16 = 18, e = 18, n = 16 → 52",
+    "lyDo2": "p=2+16=18, e=18, n=16 → 52",
     "chac": true
    }
   },
@@ -74,7 +74,7 @@
    ],
    "kiem": {
     "d2": "C",
-    "lyDo2": "HCl: p = 1+17 = 18, e = 18, n = 18 → 54",
+    "lyDo2": "p=1+17=18, e=18, n=18 → 54",
     "chac": true
    }
   },
@@ -90,8 +90,8 @@
    },
    "dap_an": "D",
    "buoc": [
-    "Số proton = 6 + 2 × 8 = 22; phân tử trung hoà nên số electron cũng là 22.",
-    "Số neutron = 6 + 2 × 8 = 22.",
+    "Số proton = 6 + 2 * 8 = 22; phân tử trung hoà nên số electron cũng là 22.",
+    "Số neutron = 6 + 2 * 8 = 22.",
     "Tổng = 22 + 22 + 22 = 66."
    ],
    "chot": "Cộng hạt của từng nguyên tử, nhớ electron bằng proton.",
@@ -112,7 +112,7 @@
    ],
    "kiem": {
     "d2": "D",
-    "lyDo2": "CO2: p = 6+16 = 22, e = 22, n = 6+16 = 22 → 66",
+    "lyDo2": "p=6+16=22, e=22, n=6+16=22 → 66",
     "chac": true
    }
   },
@@ -150,7 +150,81 @@
    ],
    "kiem": {
     "d2": "A",
-    "lyDo2": "HF: p = 1+9 = 10, e = 10, n = 10 → 30",
+    "lyDo2": "p=1+9=10, e=10, n=10 → 30",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Tổng số electron, proton và neutron trong một phân tử O₂ là bao nhiêu?\nBiết nguyên tử O có 8 proton và 8 neutron.",
+   "pa": {
+    "A": "16.",
+    "B": "48.",
+    "C": "24.",
+    "D": "32."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Mỗi nguyên tử O: 8 proton + 8 neutron + 8 electron = 24 hạt.",
+    "2 nguyên tử O: 2 * 24 = 48 hạt."
+   ],
+   "chot": "Tính tổng hạt từng nguyên tử rồi cộng lại.",
+   "phepTinh": [
+    {
+     "ten": "O",
+     "bieuThuc": "8+8+8",
+     "ketQua": 24,
+     "lamTron": 0
+    },
+    {
+     "ten": "Tổng",
+     "bieuThuc": "2*24",
+     "ketQua": 48,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "p=16, e=16, n=16 → 48",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Tổng số electron, proton và neutron trong một phân tử N₂ là bao nhiêu?\nBiết nguyên tử N có 7 proton và 7 neutron.",
+   "pa": {
+    "A": "28.",
+    "B": "21.",
+    "C": "42.",
+    "D": "14."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Nguyên tử N: 7 proton + 7 neutron + 7 electron = 21 hạt.",
+    "2 nguyên tử N: 2 * 21 = 42 hạt."
+   ],
+   "chot": "Tính tổng hạt từng nguyên tử rồi cộng lại.",
+   "phepTinh": [
+    {
+     "ten": "N",
+     "bieuThuc": "7+7+7",
+     "ketQua": 21,
+     "lamTron": 0
+    },
+    {
+     "ten": "Tổng",
+     "bieuThuc": "2*21",
+     "ketQua": 42,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "p=14, e=14, n=14 → 42",
     "chac": true
    }
   }

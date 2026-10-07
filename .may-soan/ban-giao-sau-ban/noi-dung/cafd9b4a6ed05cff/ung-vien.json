@@ -20,7 +20,7 @@
    "chot": "Thomson tìm ra electron (1897).",
    "kiem": {
     "d2": "B",
-    "lyDo2": "J.J. Thomson tìm ra electron năm 1897 qua tia âm cực.",
+    "lyDo2": "J.J. Thomson tìm ra electron năm 1897 từ tia âm cực.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Thí nghiệm lá vàng của Rutherford tìm ra hạt nhân nguyên tử.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Thí nghiệm bắn hạt α vào lá vàng giúp tìm ra hạt nhân nguyên tử.",
+    "lyDo2": "Thí nghiệm lá vàng của Rutherford (1911) tìm ra hạt nhân nguyên tử.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Phần lớn hạt α đi thẳng ⇒ nguyên tử phần lớn là khoảng trống.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Phần lớn hạt α xuyên thẳng nên nguyên tử phần lớn là khoảng trống.",
+    "lyDo2": "Phần lớn hạt α xuyên thẳng nên nguyên tử có nhiều khoảng trống.",
     "chac": true
    }
   },

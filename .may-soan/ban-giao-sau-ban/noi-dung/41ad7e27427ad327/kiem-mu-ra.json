@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "D",
-  "lyDo": "Neutron không mang điện và nằm trong hạt nhân, nên D sai.",
+  "lyDo": "Neutron không mang điện và nằm trong hạt nhân nên D sai; A, B, C đúng.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "A",
-  "lyDo": "Electron mang điện âm, ở vỏ nguyên tử; B, C, D đều sai.",
+  "lyDo": "Electron mang điện âm, ở lớp vỏ: đúng; B, C, D sai về điện tích hoặc vị trí.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "C",
-  "lyDo": "Electron có khối lượng rất nhỏ (~1/1840 amu), không gần 1 amu.",
+  "lyDo": "Khối lượng electron rất nhỏ (~1/1840 amu), không gần 1 amu nên C sai.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "Hạt nhân gồm proton và neutron, mang điện dương; A, C, D sai.",
+  "lyDo": "Hạt nhân gồm proton và neutron, mang điện dương: đúng; A, C, D sai.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "D",
-  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần, D sai.",
+  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần nên D sai; A, B, C đúng.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "C",
-  "lyDo": "Neutron không mang điện, nằm trong hạt nhân; A, B, D sai.",
+  "lyDo": "Neutron không mang điện, nằm trong hạt nhân: đúng; A, B, D sai.",
   "chac": true
  }
 ]

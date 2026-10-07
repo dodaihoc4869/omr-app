@@ -2,7 +2,7 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Tia âm cực là chùm electron (điện âm) nên bị hút về bản dương (bản trên).",
+  "lyDo": "Tia âm cực gồm hạt mang điện âm (electron) nên bị hút về bản dương (bản trên).",
   "chac": true
  },
  {
@@ -14,13 +14,13 @@
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Câu hỏi tìm phát biểu không đúng: tia âm cực là chùm electron, không phải proton mang điện dương.",
+  "lyDo": "Câu hỏi tìm phát biểu không đúng: tia âm cực là chùm electron mang điện âm, không phải proton.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "C",
-  "lyDo": "Thí nghiệm tia âm cực của Thomson phát hiện ra electron.",
+  "lyDo": "Thomson phát hiện electron qua tia âm cực.",
   "chac": true
  },
  {
@@ -32,7 +32,7 @@
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Hạt mang điện âm (electron) bị bản cực dương hút nên lệch về phía đó.",
+  "lyDo": "Hạt mang điện âm bị bản cực dương hút nên lệch về phía đó.",
   "chac": true
  }
 ]

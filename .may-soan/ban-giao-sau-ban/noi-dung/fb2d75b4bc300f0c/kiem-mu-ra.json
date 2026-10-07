@@ -8,19 +8,19 @@
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Electron nằm ở vỏ, ngoài hạt nhân, nên C sai.",
+  "lyDo": "Electron nằm ở vỏ, bên ngoài hạt nhân nên C sai; A, B, D đúng.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "Hạt nhân chứa proton mang điện dương và neutron không mang điện nên mang điện dương; A, C, D sai.",
+  "lyDo": "Hạt nhân gồm proton (+) và neutron (không mang điện) nên mang điện dương; A sai (không có electron), C và D sai (nguyên tử trung hòa, vỏ mang điện âm).",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron; A, B, C đúng.",
   "chac": true
  },
  {
@@ -32,7 +32,7 @@
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Kích thước nguyên tử lớn hơn hạt nhân rất nhiều (~10^4–10^5 lần) nên A sai.",
+  "lyDo": "Nguyên tử lớn hơn hạt nhân khoảng 10^4 lần nên A sai; B, C, D đúng.",
   "chac": true
  }
 ]

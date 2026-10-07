@@ -14,7 +14,7 @@
    },
    "dap_an": "A",
    "buoc": [
-    "Số neutron = 40 × 35 / 100 = 14.",
+    "Số neutron = 40 * 35 / 100 = 14.",
     "Số hạt mang điện = 40 − 14 = 26, gồm proton và electron bằng nhau.",
     "Số proton = 26 / 2 = 13 nên số đơn vị điện tích hạt nhân là 13."
    ],
@@ -36,7 +36,7 @@
    ],
    "kiem": {
     "d2": "A",
-    "lyDo2": "n = 0,35×40 = 14; 2p = 26 nên p = 13.",
+    "lyDo2": "n = 0,35.40 = 14; p+e = 26 nên Z = 13",
     "chac": true
    }
   },
@@ -52,7 +52,7 @@
    },
    "dap_an": "B",
    "buoc": [
-    "Số neutron = 24 × 33,33 / 100 ≈ 8.",
+    "Số neutron = 24 * 33,33 / 100 ≈ 8.",
     "Số hạt mang điện = 24 − 8 = 16, gồm proton và electron bằng nhau.",
     "Số proton = 16 / 2 = 8 nên số đơn vị điện tích hạt nhân là 8."
    ],
@@ -74,7 +74,7 @@
    ],
    "kiem": {
     "d2": "B",
-    "lyDo2": "n = 24/3 = 8; 2p = 16 nên p = 8.",
+    "lyDo2": "n = 24/3 = 8; p+e = 16 nên Z = 8",
     "chac": true
    }
   },
@@ -90,7 +90,7 @@
    },
    "dap_an": "C",
    "buoc": [
-    "Số neutron = 46 × 34,78 / 100 ≈ 16.",
+    "Số neutron = 46 * 34,78 / 100 ≈ 16.",
     "Số hạt mang điện = 46 − 16 = 30, gồm proton và electron bằng nhau.",
     "Số proton = 30 / 2 = 15 nên số đơn vị điện tích hạt nhân là 15."
    ],
@@ -112,7 +112,7 @@
    ],
    "kiem": {
     "d2": "C",
-    "lyDo2": "n = 0,3478×46 = 16; 2p = 30 nên p = 15.",
+    "lyDo2": "n = 16 (16/46 = 34,78%); p+e = 30 nên Z = 15",
     "chac": true
    }
   },
@@ -128,7 +128,7 @@
    },
    "dap_an": "D",
    "buoc": [
-    "Số neutron = 82 × 36,59 / 100 ≈ 30.",
+    "Số neutron = 82 * 36,59 / 100 ≈ 30.",
     "Số hạt mang điện = 82 − 30 = 52, gồm proton và electron bằng nhau.",
     "Số proton = 52 / 2 = 26 nên số đơn vị điện tích hạt nhân là 26."
    ],
@@ -150,7 +150,81 @@
    ],
    "kiem": {
     "d2": "D",
-    "lyDo2": "n = 0,3659×82 = 30; 2p = 52 nên p = 26.",
+    "lyDo2": "n = 30 (30/82 = 36,59%); p+e = 52 nên Z = 26",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Sodium có trong muối ăn và là kim loại phổ biến trong tự nhiên.\nBiết nguyên tử sodium có tổng số hạt là 34 trong đó số hạt không mang điện chiếm xấp xỉ 35,29%.\nSố đơn vị điện tích hạt nhân của nguyên tử Sodium là",
+   "pa": {
+    "A": "9.",
+    "B": "10.",
+    "C": "11.",
+    "D": "12."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Số neutron = 34 * 35,29% ≈ 12.",
+    "Số hạt còn lại: 34 − 12 = 22 = 2 * số proton → số proton = 11."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = số proton.",
+   "phepTinh": [
+    {
+     "ten": "n",
+     "bieuThuc": "34*0.3529",
+     "ketQua": 12,
+     "lamTron": 0
+    },
+    {
+     "ten": "p",
+     "bieuThuc": "(34-12)/2",
+     "ketQua": 11,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "n = 12 (12/34 = 35,29%); p+e = 22 nên Z = 11",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Silicon (Si) được dùng trong sản xuất chất bán dẫn và pin mặt trời.\nBiết nguyên tử silicon có tổng số hạt là 42 trong đó số hạt không mang điện chiếm xấp xỉ 33,33%.\nSố đơn vị điện tích hạt nhân của nguyên tử Silicon là",
+   "pa": {
+    "A": "12.",
+    "B": "13.",
+    "C": "14.",
+    "D": "15."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Số neutron = 42 * 33,33% ≈ 14.",
+    "Số hạt còn lại: 42 − 14 = 28 = 2 * số proton → số proton = 14."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = số proton.",
+   "phepTinh": [
+    {
+     "ten": "n",
+     "bieuThuc": "42*0.3333",
+     "ketQua": 14,
+     "lamTron": 0
+    },
+    {
+     "ten": "p",
+     "bieuThuc": "(42-14)/2",
+     "ketQua": 14,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "n = 42/3 = 14; p+e = 28 nên Z = 14",
     "chac": true
    }
   }

@@ -20,7 +20,7 @@
    "chot": "Số proton bằng số electron, tính từ điện tích lớp vỏ.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "28,8/1,6 = 18 electron nên 18 proton; B nói 16 proton là sai, A, C, D đúng.",
+    "lyDo2": "28,8/1,6 = 18 electron nên hạt nhân có 18 proton, không phải 16; B sai.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt nhân mang điện dương; số proton bằng số electron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "32,0/1,6 = 20 electron nên 20 proton; D đúng, A sai (16), B sai (nguyên tử trung hòa), C sai (hạt nhân mang điện dương).",
+    "lyDo2": "32,0/1,6 = 20 electron nên 20 proton; nguyên tử trung hòa, hạt nhân mang điện dương; chỉ D đúng.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Nguyên tử luôn trung hòa; chỉ lớp vỏ mang điện âm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "38,4/1,6 = 24 electron nên 24 proton, hạt nhân +38,4.10^-19 C; B, C, D đúng; A sai vì nguyên tử trung hòa.",
+    "lyDo2": "38,4/1,6 = 24 electron = 24 proton, nguyên tử trung hòa, không mang điện âm; A sai.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Số proton bằng số electron, tính từ điện tích lớp vỏ.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "46,4/1,6 = 29 electron nên 29 proton; C nói 23 proton là sai; A, B, D đúng.",
+    "lyDo2": "46,4/1,6 = 29 electron nên 29 proton, không phải 23; C sai.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Số electron = |điện tích lớp vỏ| / 1,6.10⁻¹⁹; số proton bằng số electron.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "27,2/1,6 = 17 electron nên 17 proton; B đúng; A sai (trung hòa), C sai (17 e), D sai (hạt nhân dương).",
+    "lyDo2": "27,2/1,6 = 17 electron nên 17 proton; A, C, D sai.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Điện tích hạt nhân dương, cùng độ lớn với điện tích lớp vỏ.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "30,4/1,6 = 19 electron nên 19 proton; A, B, C đúng; D sai vì điện tích hạt nhân là +30,4.10^-19 C, không phải âm.",
+    "lyDo2": "30,4/1,6 = 19 electron = 19 proton; điện tích hạt nhân là +30,4.10⁻¹⁹ C, không phải âm; D sai.",
     "chac": true
    }
   }

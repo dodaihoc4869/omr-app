@@ -64,7 +64,7 @@
    "chot": "1,661.10⁻²⁷ kg chính là khối lượng của 1 amu.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "1,661.10⁻²⁷ kg là 1 amu; electron ≈ 9,109.10⁻³¹ kg, hạt α ≈ 6,64.10⁻²⁷ kg, một mol C-12 là 12 g.",
+    "lyDo2": "1,661.10⁻²⁷ kg là khối lượng 1 amu; electron ≈ 9,109.10⁻³¹ kg, 1 mol C-12 = 12 g, hạt α ≈ 4 amu.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "1 amu = 1/12 khối lượng nguyên tử carbon-12.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Định nghĩa: 1 amu = 1/12 khối lượng một nguyên tử C-12; các phương án khác sai.",
+    "lyDo2": "Định nghĩa: 1 amu = 1/12 khối lượng một nguyên tử C-12; B, C, D sai.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Đổi g sang kg nhớ chia 1000: 1,661.10⁻²⁴ g = 1,661.10⁻²⁷ kg.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "1 amu = 1,661.10⁻²⁴ g chứ không phải 1,661.10⁻²⁴ kg; A, B, C đúng.",
+    "lyDo2": "1 amu = 1,661.10⁻²⁴ g = 1,661.10⁻²⁷ kg, nên 1,661.10⁻²⁴ kg là sai.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Proton (và neutron) có khối lượng gần bằng 1 amu.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Proton ≈ 1,673.10⁻²⁷ kg ≈ 1 amu; electron nhỏ hơn nhiều, hạt α ≈ 4 amu, phân tử nước ≈ 18 amu.",
+    "lyDo2": "Proton ≈ 1,007 amu ≈ 1 amu; electron ≈ 1/1840 amu, hạt α ≈ 4 amu, H2O ≈ 18 amu.",
     "chac": true
    }
   }

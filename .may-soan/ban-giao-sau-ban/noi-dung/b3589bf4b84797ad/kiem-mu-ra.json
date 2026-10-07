@@ -2,7 +2,7 @@
  {
   "id": "ss1",
   "d": "A",
-  "lyDo": "1 Å = 10⁻¹⁰ m; 1 pm = 10⁻¹² m nên B, C, D sai.",
+  "lyDo": "1 Å = 10⁻¹⁰ m; 1 pm = 10⁻¹² m nên 1 Å = 100 pm.",
   "chac": true
  },
  {
@@ -14,7 +14,7 @@
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "1 nm = 10⁻⁹ m = 10 Å = 1000 pm; A, C, D sai.",
+  "lyDo": "1 nm = 10⁻⁹ m = 10 Å = 1000 pm.",
   "chac": true
  },
  {
@@ -26,13 +26,13 @@
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "120 pm = 1,2 Å (100 pm = 1 Å); 12 nm, 120 mm, 1,2 μm đều sai.",
+  "lyDo": "120 pm = 1,2 Å (12 nm = 12000 pm, 120 mm và 1,2 μm đều khác).",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "1 pm = 0,01 Å, không phải 100 Å; A, B, C đúng.",
+  "lyDo": "1 pm = 0,01 Å, không phải 100 Å; A, B, C đều đúng.",
   "chac": true
  }
 ]

@@ -20,7 +20,7 @@
    "chot": "Alpha xuyên thẳng cho thấy nguyên tử có cấu tạo rỗng.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hầu hết hạt alpha xuyên thẳng vì nguyên tử phần lớn là khoảng trống; C sai vì hạt nhân rất nhỏ so với nguyên tử.",
+    "lyDo2": "Hạt alpha xuyên thẳng vì nguyên tử phần lớn là khoảng trống; C sai vì hạt nhân chiếm thể tích rất nhỏ.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt nhân nhỏ, nguyên tử chủ yếu là khoảng trống.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân rất nhỏ so với nguyên tử; A, B sai, C sai vì electron nhẹ hơn alpha nhiều.",
+    "lyDo2": "Hầu hết alpha đi thẳng ⇒ hạt nhân rất nhỏ so với nguyên tử; A, B sai, C sai (electron nhẹ hơn alpha).",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Không có khoảng trống thì alpha không thể xuyên thẳng.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Nếu đặc khít thì hạt alpha phần lớn bị cản hoặc lệch.",
+    "lyDo2": "Nếu nguyên tử đặc khít thì hầu hết alpha bị chặn hoặc lệch; A, B, D trái với giả thiết đặc khít.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Alpha lệch là do bị hạt nhân dương đẩy.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Hạt nhân mang điện dương đẩy hạt alpha (dương) khi lại gần.",
+    "lyDo2": "Alpha mang điện dương bị hạt nhân dương đẩy khi lại gần hạt nhân nên lệch; B, C, D sai.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Alpha xuyên thẳng loại trừ ý hạt nhân chiếm gần hết thể tích.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân chiếm gần hết thể tích là sai; các ý còn lại suy ra được.",
+    "lyDo2": "Hạt nhân chiếm gần hết thể tích là sai, không thể rút ra; A, C, D đều rút ra được.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Không đến gần hạt nhân thì alpha không bị lệch.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt alpha qua vùng trống, không đến gần hạt nhân nên không lệch.",
+    "lyDo2": "Alpha đi qua vùng trống, không đến gần hạt nhân nên không lệch; A, B, C sai.",
     "chac": true
    }
   }

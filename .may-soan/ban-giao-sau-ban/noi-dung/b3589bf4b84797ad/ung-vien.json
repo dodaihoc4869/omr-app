@@ -20,7 +20,7 @@
    "chot": "1 Å = 10⁻¹⁰ m, 1 pm = 10⁻¹² m, 1 Å = 100 pm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "1 Å = 10⁻¹⁰ m; 1 pm = 10⁻¹² m nên B, C, D sai.",
+    "lyDo2": "1 Å = 10⁻¹⁰ m; 1 pm = 10⁻¹² m nên 1 Å = 100 pm.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "1 nm = 10 Å = 1000 pm = 10⁻⁹ m.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "1 nm = 10⁻⁹ m = 10 Å = 1000 pm; A, C, D sai.",
+    "lyDo2": "1 nm = 10⁻⁹ m = 10 Å = 1000 pm.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Từ pm sang Å chia cho 100.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "120 pm = 1,2 Å (100 pm = 1 Å); 12 nm, 120 mm, 1,2 μm đều sai.",
+    "lyDo2": "120 pm = 1,2 Å (12 nm = 12000 pm, 120 mm và 1,2 μm đều khác).",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "pm nhỏ hơn Å 100 lần.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "1 pm = 0,01 Å, không phải 100 Å; A, B, C đúng.",
+    "lyDo2": "1 pm = 0,01 Å, không phải 100 Å; A, B, C đều đúng.",
     "chac": true
    }
   }
