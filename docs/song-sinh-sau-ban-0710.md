@@ -26,7 +26,7 @@ Mỗi bản mới phải qua kiểm định dạng, kiểm lời giải, giải 
 
 ## Vận hành
 
-Sau khi Worker chứa `/kho/may-soan/nap-toan-kho` đã được phát hành, trên máy có Claude CLI đã đăng nhập hoặc có `ANTHROPIC_API_KEY`, cùng `OMR_MA_BI_MAT` hợp lệ:
+Sau khi Worker chứa `/kho/may-soan/nap-toan-kho` đã được phát hành, trên máy có Claude CLI đã đăng nhập theo gói Claude của thầy, cùng `OMR_MA_BI_MAT` hợp lệ:
 
 ```sh
 node scripts/loi-giai/may-soan.mjs --nap-song-sinh-toan-kho --lop tat-ca --mot-lan
@@ -34,7 +34,7 @@ node scripts/loi-giai/may-soan.mjs --nap-song-sinh-toan-kho --lop tat-ca --mot-l
 
 Chỉ nạp hàng học liệu, không dùng `--nap-hang` để lập lại chỉ mục kho. Việc đang xử lý, lượt thử và trạng thái trượt được giữ nguyên. Câu chưa ánh xạ, JSON lỗi và câu đang nghi đáp án phải được giải quyết trước khi chứng nhận hoàn thành. Bản lịch sử không được tự đánh dấu đã kiểm; nếu đủ sáu bản cấu trúc nhưng thiếu bằng chứng, cần kiểm lại các bản đó.
 
-Khóa bí mật chỉ đặt trong môi trường hoặc GitHub Actions Secrets, không ghi vào mã, báo cáo hay chat. Đăng nhập GitHub trên trình duyệt không thay thế khóa AI hoặc mã máy chủ. Runner hiện dùng Claude CLI, chưa dùng OpenAI API.
+Khóa bí mật chỉ đặt trong môi trường hoặc GitHub Actions Secrets, không ghi vào mã, báo cáo hay chat. Đăng nhập GitHub trên trình duyệt không thay thế khóa AI hoặc mã máy chủ. Theo yêu cầu mới, không dùng khóa AI API: chỉ dùng Claude CLI đã đăng nhập theo gói. Đọc `docs/dac-ta-claude-song-sinh-sau-ban-0710.md` để giao Claude soạn và xuất gói cho Codex kiểm lại; runner hiện có tự nộp, không dùng thẳng cho chế độ chỉ soạn.
 
 ## Quét sau khi nạp
 
