@@ -169,14 +169,18 @@ describe('MỌI NHỊP GỌI MẠNG TRONG CA đều phải có chốt và lệch
   //   · Lưu tạm        — mọi máy tự lưu theo cùng chu kỳ     (đã lệch pha)
   //   · Báo sống       — mọi máy báo trạng thái theo nhịp    (đã lệch pha)
   //   · Hỏi đáp án     — cả lớp nộp xong cùng ngồi hỏi điểm  (chữa 10/09)
-  it('nhịp HỎI ĐÁP ÁN sau khi nộp: có chốt `dangHoi` và lệch pha', () => {
+  it('nhịp HỎI ĐÁP ÁN sau khi nộp: có chốt `dangHoi`, lệch pha, và nhịp thích nghi theo trạng thái công bố', () => {
     const khoi = MAN.slice(MAN.indexOf('const hoi = async () => {'), MAN.indexOf('const trySend'))
     expect(khoi).toContain('if (dung || dangHoi || document.hidden) return')
     expect(khoi).toContain('dangHoi = true')
     expect(khoi).toContain('dangHoi = false')
-    expect(MAN).toContain('setInterval(() => void hoi(), chuKyLechPhaMs(20000))')
-    // Nhịp trần 20 giây không lệch pha là cả lớp hỏi cùng một khoảnh khắc.
+    // Nhịp phải dùng lệch pha, không cố định — tránh cả lớp hỏi cùng một khoảnh khắc.
+    expect(MAN).toContain('setInterval(() => void hoi(), chuKyLechPhaMs(nhipCho))')
+    // Nhịp thích nghi: ngắn hơn khi cả lớp đã nộp xong (ca_lop_xong), dài hơn khi chờ thầy công bố.
+    expect(MAN).toContain("const nhipCho = congBo === 'ca_lop_xong' ? 4000 : 15000")
+    // Không hardcode 20s — không lệch pha là bệnh cũ.
     expect(MAN).not.toContain('setInterval(hoi, 20000)')
+    expect(MAN).not.toContain('chuKyLechPhaMs(20000)')
   })
 
   it('lưu tạm và báo sống VẪN lệch pha — không được vô tình gỡ', () => {
