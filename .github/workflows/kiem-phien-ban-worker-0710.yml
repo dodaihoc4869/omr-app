@@ -1,0 +1,43 @@
+# KIỂM LỊCH SỬ PHIÊN BẢN WORKER (CHỈ ĐỌC) — sự cố 07/10: app thầy báo HTTP 403 "Sai mã bí mật" sau khi Worker sống bị ghi đè bằng bản của nhánh khác.
+# Chỉ GET danh sách phiên bản + lần phát hành của Worker `omr` để biết ai / lúc nào / bằng đường nào (upload · secret · rollback…) đổi bản sống.
+# KHÔNG in thư điện tử, mã người dùng, mã bí mật: repo công khai, nhật ký chạy ai cũng đọc.
+name: Kiểm lịch sử phiên bản Worker (chỉ đọc)
+on:
+  push:
+    branches: [claude/kiem-phien-ban-0710]
+    paths: ['.github/workflows/kiem-phien-ban-worker-0710.yml']
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Liệt kê phiên bản và lần phát hành của Worker omr (chỉ GET)
+        env:
+          TOKEN: ${{ env.CF_TOKEN_SACH }}
+          ACC: ${{ env.CF_ACC_SACH }}
+        run: |
+          base="https://api.cloudflare.com/client/v4/accounts/$ACC/workers/scripts/omr"
+          for p in versions deployments; do
+            echo "== $p"
+            curl -sS -m 60 -H "Authorization: Bearer $TOKEN" "$base/$p?per_page=40" -o /tmp/$p.json || echo "(lỗi gọi $p)"
+            node -e '
+              const fs = require("fs"); const p = process.argv[1];
+              let j; try { j = JSON.parse(fs.readFileSync("/tmp/" + p + ".json", "utf8")) } catch (e) { console.log("không đọc được JSON", p); process.exit(0) }
+              if (j.success === false) { console.log("API báo lỗi:", JSON.stringify((j.errors || []).map(e => e.message)).slice(0, 300)); process.exit(0) }
+              const r = j.result; const arr = Array.isArray(r) ? r : (r && (r.items || r.deployments)) || [];
+              const ann = (a) => { const o = a || {}; return { dau: o["workers/triggered_by"], tag: String(o["workers/tag"] || "").slice(0, 12), msg: String(o["workers/message"] || "").slice(0, 70) } };
+              for (const x of arr.slice(0, 40)) {
+                const m = x.metadata || {};
+                const v = Array.isArray(x.versions) ? x.versions.map(v => String(v.version_id).slice(0, 8) + ":" + v.percentage).join(",") : "";
+                console.log(JSON.stringify({ so: x.number, id: String(x.id).slice(0, 8), luc: m.created_on || x.created_on, nguon: m.source || x.source, ...ann(x.annotations), v }));
+              }
+            ' $p
+          done
