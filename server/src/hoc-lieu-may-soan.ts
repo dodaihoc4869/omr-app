@@ -445,6 +445,7 @@ export async function xuatCauChoSinh(env: Env, b: Obj): Promise<Obj> {
 }
 
 export async function duongMaySoan(env: Env, p: string, b: Obj): Promise<Obj> {
+  if (p === '/kho/may-soan/phien-ban') return { ok: true, v: '0710b', routes: ['xuat-cau-cho-sinh', 'nap-toan-kho', 'nop-bo-tro', 'nop-y-ds', 'hang-em-sai'] }
   if (p === '/kho/may-soan/nap-toan-kho') return napSongSinhToanKho(env, b)
   if (p === '/kho/may-soan/xuat-cau-cho-sinh') return xuatCauChoSinh(env, b)
   if (p === '/kho/may-soan/nop-bo-tro') return nopBoTro(env, b)
