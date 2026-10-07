@@ -8,6 +8,7 @@ permissions:
   actions: read
 concurrency:
   group: phat-hanh
+  cancel-in-progress: true
 jobs:
   bat:
     runs-on: ubuntu-latest
@@ -31,6 +32,10 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm công cụ giao gần D1 trước khi dùng dữ liệu thật
+        run: |
+          npx vitest run tests/chua-giao-van-hanh.test.ts tests/chua-d1-van-hanh.test.ts --reporter=dot
+          npx vitest run --config vitest.config.d1.ts tests/d1-runtime-chua-cau-sai.test.ts --reporter=dot
       - name: Bật toàn trường và đồng bộ câu sai cũ
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}

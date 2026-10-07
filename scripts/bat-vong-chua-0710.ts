@@ -2,9 +2,11 @@
 import '../server/src/index'
 import { execFileSync } from 'node:child_process'
 import { taoDbVanHanh } from './chua-d1-van-hanh'
-import { dongBoTuCu, giaoPilot } from '../server/src/chua-cau-sai-thay'
+import { dongBoTuCu } from '../server/src/chua-cau-sai-thay'
 import { chuanCauHinh } from '../server/src/chua-cau-sai-cau-hinh'
 import type { Env } from '../server/src/kieu'
+import { taoGiaoGanD1 } from './chua-giao-gan-d1'
+import { raCuaSo } from './chua-giao-cua-so'
 
 const token = process.env.CLOUDFLARE_API_TOKEN, account = process.env.CLOUDFLARE_ACCOUNT_ID
 if (!token || !account) throw new Error('Thiếu cấu hình Cloudflare.')
@@ -64,13 +66,17 @@ async function main() {
   }
   n = 0
   giaiDoan = 'giao_cau_sai_cu'
-  while (!receipt.giaoXong) {
-    const r = await nhan(await giaoPilot(env, { offset: receipt.offset }))
-    if (r.ds.some((x: {ok: boolean; ma?: string}) => !x.ok && x.ma !== 'CHUA_CO_LOI')) throw new Error('Có câu chưa giao được; giữ vị trí cũ.')
-    receipt.offset = r.tiepOffset; receipt.giaoXong = !r.con
-    await luu()
-    n += r.ds.length
-    if (n % 50 === 0 || receipt.giaoXong) console.log(JSON.stringify({ soCapEmCauDaRa: n, giaoXong: receipt.giaoXong }))
+  if (!receipt.giaoXong) {
+    const gan = await taoGiaoGanD1()
+    try {
+      while (!receipt.giaoXong) {
+        const r = await raCuaSo(receipt.offset, gan.goi)
+        receipt.offset = r.tiepOffset; receipt.giaoXong = !r.con
+        await luu()
+        n += r.soCap
+        if (n % 120 === 0 || receipt.giaoXong) console.log(JSON.stringify({ soCapEmCauDaRa: n, giaoXong: receipt.giaoXong }))
+      }
+    } finally { await gan.close() }
   }
   giaiDoan = 'doc_ket_qua'
   const stats = await db.prepare('SELECT trang_thai_day AS trangThai,COUNT(*) AS soDot,COUNT(DISTINCT sbd) AS soEm FROM chua_loi_dot WHERE dong_luc IS NULL GROUP BY trang_thai_day').all()
