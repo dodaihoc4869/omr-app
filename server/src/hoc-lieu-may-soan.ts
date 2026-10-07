@@ -12,6 +12,8 @@
 //   · `ghiNghiTuXu`: hồ sơ vẫn còn cờ đáp án sau khi máy tự xử (giải lại độc lập vẫn lệch) ⇒ mọi bản cùng nội dung vào `cau_nghi_dap_an` 'nghi'
 //     (cơ chế sẵn có của tu-hoan-thien.ts — rút đề ca kiểm tra tạm bỏ câu qua `/ca/cau-nghi-dap-an`) — không đẩy việc cho thầy, không sửa đáp án kho.
 // Bảng CHỈ-THÊM `may_soan_viec` (tự tạo lúc dùng; bản SQL: server/migration-0510-y-ds.sql).
+import { viecVongChua } from './chua-hoc-lieu-viec'
+import { hocLieuThay } from './chua-cau-sai-thay'
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
@@ -328,6 +330,11 @@ export async function ghiNghiTuXu(env: Env, bam: string, qidMau: string, ghi: st
 // ---------------------------------------------------------------- định tuyến (sau cổng mã bí mật của thầy trong index.ts)
 
 export async function duongMaySoan(env: Env, p: string, b: Obj): Promise<Obj> {
+  if (p === '/kho/may-soan/vong-chua-viec') return viecVongChua(env,b)
+  if (p === '/kho/may-soan/nop-vong-chua') {
+    if (!b.kiemMay) return {ok:false,error:'Thiếu bằng chứng máy kiểm độc lập.'}
+    return (await hocLieuThay(env,{luu:true,hocLieu:b.hocLieu,kiemMay:b.kiemMay})).json() as Promise<Obj>
+  }
   if (p === '/kho/may-soan/nop-bo-tro') return nopBoTro(env, b)
   if (p === '/kho/may-soan/nop-y-ds') return nopYDs(env, b)
   if (p === '/kho/may-soan/hang-em-sai') return hangEmSai(env, b)

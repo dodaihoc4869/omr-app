@@ -1,0 +1,39 @@
+name: Nạp mẫu chữa đã tính độc lập
+on:
+  push:
+    branches: [codex/hoc-lieu-chua-tu-dong]
+    paths: [.github/workflows/nap-hoc-lieu-chua.yml, scripts/nap-hoc-lieu-hieu-suat.ts, scripts/loi-giai/soan-mau-hieu-suat.ts, scripts/loi-giai/kiem-doc-lap-hieu-suat.ts]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nap-hoc-lieu-chua
+  cancel-in-progress: false
+jobs:
+  nap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24,cache: npm}
+      - run: npm ci
+      - run: npx vitest run tests/chua-hoc-lieu-hieu-suat.test.ts tests/chua-hoc-lieu-kiem-may.test.ts
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm ca thi, schema và đúng bản sống trước khi ghi học liệu
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          CHUA_RELEASE_SHA: 7cfe9466fb5fb4bf6ba80d6fa913967bf9ab5711
+        run: node scripts/kiem-phat-hanh-chua.mjs --schema --live
+      - name: Nạp đúng mẫu đã giải độc lập, đọc lại bằng chứng
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          npx esbuild scripts/nap-hoc-lieu-hieu-suat.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/chua-nap-hoc-lieu.mjs --log-level=warning
+          node /tmp/chua-nap-hoc-lieu.mjs

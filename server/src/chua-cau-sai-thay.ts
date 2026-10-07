@@ -2,6 +2,7 @@
 import type { Env } from './kieu'
 import { chuanCauHinh, docCauHinh, xoaDemChua } from './chua-cau-sai-cau-hinh'
 import { kiemTinhDayDu } from './chua-cau-sai-hoc-lieu'
+import { kiemBangMay } from './chua-hoc-lieu-kiem-may'
 import { giaoDotCuaEm } from './chua-cau-sai'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -62,6 +63,7 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
         { status: 422 },
       )
     const goc = JSON.parse(root.json)
+    if (b.kiemMay !== undefined && goc.reviewed !== true) return Response.json({ok:false,mo:'Câu gốc chưa được kiểm nội dung.'},{status:422})
     if (
       [...h.banGhepBai, ...h.banKiemChung].some(
         (p) =>
@@ -82,7 +84,10 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
         },
         { status: 422 },
       )
-    if (b.duyetChuyenMon !== true || !str(b.nguoiDuyet).trim())
+    const laMay = b.kiemMay !== undefined
+    const loiMay = laMay ? await kiemBangMay(h,b.kiemMay) : []
+    if (loiMay.length) return Response.json({ok:false,mo:'Học liệu chưa qua kiểm máy độc lập.',loiHocLieu:loiMay},{status:422})
+    if (!laMay && (b.duyetChuyenMon !== true || !str(b.nguoiDuyet).trim()))
       return Response.json(
         {
           ok: false,
@@ -112,6 +117,7 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
         },
         { status: 422 },
       )
+    const hocLieuJson=JSON.stringify({...h,...(laMay ? {kiemMay:b.kiemMay} : {})})
     const hash = await crypto.subtle.digest(
       'SHA-256',
       new TextEncoder().encode(JSON.stringify(h)),
@@ -127,8 +133,8 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
         bam,
         h.contentVersion,
         h.qidGoc,
-        JSON.stringify(h),
-        str(b.nguoiDuyet).trim().slice(0, 100),
+        hocLieuJson,
+        laMay ? 'máy kiểm độc lập · v1' : str(b.nguoiDuyet).trim().slice(0, 100),
         bam,
         now,
         now,

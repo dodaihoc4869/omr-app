@@ -34,3 +34,6 @@ bo-nao/20*/
 bo-nao/lan-cuoi.json
 bo-nao/CHAY-NGAY.txt
 .may-soan/
+
+# Hồ sơ soạn vòng chữa có đáp án riêng, không đưa lên repo công khai.
+.may-soan-vong-chua/
