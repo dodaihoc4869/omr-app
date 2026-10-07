@@ -138,6 +138,7 @@ export interface HocLieuChua {
 // ---------------------------------------------------------------------------
 export interface CauHinhChuaCauSai {
   bat: boolean
+  tatCa: boolean   // true = mở cho toàn bộ học sinh (bỏ qua lop/sbd)
   lop: string[]
   sbd: string[]
   dongBoTuLuyen: boolean
@@ -151,6 +152,7 @@ export interface CauHinhChuaCauSai {
 
 export const CAU_HINH_MAC_DINH: CauHinhChuaCauSai = {
   bat: false,
+  tatCa: false,
   lop: [],
   sbd: [],
   dongBoTuLuyen: true,
