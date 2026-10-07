@@ -251,6 +251,12 @@ describe('nối vào màn thi (khoá bằng nguồn)', () => {
     expect(the).toContain("style={{ padding: '6px var(--k5)', background: 'var(--the-2)', color: 'var(--nhat)', fontSize: 13, lineHeight: 1.5 }}") // ô cũ nguyên vẹn (cổng màu giữ nguyên)
   })
 
+  it('điện thoại xoay ngang, câu CHIA ĐÔI (lam-bai-ngang.css): câu gốc có trần cao + cuộn riêng, nếu không ép thân câu còn ~33 px (đo bằng trình duyệt thật, có đối chứng)', () => {
+    const css = doc('src/components/dai-cau-thay.css')
+    expect(css).toMatch(/\.lb-gon-de\[data-chia\] \.thi-thay-goc \{[^}]*max-height: 38vh;[^}]*overflow-y: auto;/)
+    expect(doc('src/screens/lam-bai-ngang.css')).toMatch(/\.lb-gon-de\[data-chia\] \.the-cau > \* \{ flex: none; \}/) // lý do cần trần: mọi khối ngoài thân thẻ là flex: none
+  })
+
   it('nút "Xem lại sau" không còn thò xuống đè ô ghi chú: cao 36 px, vùng chạm 48 px bằng ::after', () => {
     const css = doc('src/screens/man-thi-m3.css')
     expect(css).toMatch(/\.m3 \.thi-cau-dau \{[^}]*min-height: 0; height: 36px/) // phải kèm min-height: 0, nếu không luật chung `.m3 button { min-height: 48px }` ép lại 48 px

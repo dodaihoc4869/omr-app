@@ -17,6 +17,7 @@ Giả định đã dùng: "câu gốc" = câu em ĐÃ LÀM ĐÚNG mà câu thay 
 - Nút **Xem lại sau** thu về 36 px thẳng hàng với chip số câu (trước 48 px, thò xuống 8 px đè ô ghi chú); vùng chạm vẫn ≥ 48 px (`::after` 36 + 2×6) — `src/screens/man-thi-m3.css`.
 - Bấm **Xem câu gốc** → khung **Câu gốc em đã làm đúng** bung dưới hai dòng (đề · bảng · hình · phương án A–D / ý a–d), cuối khung `Chỉ để đối chiếu, không tính điểm.`; nút thành **Ẩn câu gốc**. Tải một lần, nhớ cả phiên (`ExamTakeScreen`: ref + một hàm bền `layCauGoc`, nên thẻ `memo` không vẽ lại cả đề).
 - Báo thật: `Đang tải câu gốc…` · `Chưa có câu gốc để xem ở lúc này. Em cứ làm câu bên dưới.` (máy chủ không có câu / đề đang bảo vệ…) · `Chưa tải được câu gốc lúc này.` + **Tải lại** (lỗi không được nhớ).
+- Điện thoại xoay ngang (chế độ ngang gọn, câu chia đôi): khung câu gốc có trần cao 38vh + cuộn riêng để không ép thân câu (đo: 148 px / thân câu còn 86 px; không trần thì còn 33 px).
 - Chữ đầy đủ `Câu này thay số của câu em đã đúng ở …` vẫn là chữ LƯU trong ca và hiện ở báo cáo cuối bài của thầy; máy em tách nó bằng `tachNhanThay` nên ca đã mở trước 07/10 cũng hiện bản gọn.
 
 ## 2. Dữ liệu — khoá `~goc:<qid câu thay>` trong bản đồ nhãn của em

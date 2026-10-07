@@ -935,7 +935,7 @@ export async function vaoThi(
  * `null` ⇒ máy chủ trả lời rõ là không phát được câu ấy (chưa có trong kho, đề còn bảo vệ…) — không phải sự cố, em cứ làm câu thay.
  * Ném lỗi ⇒ không hỏi được (mạng, máy chủ bận) — nơi gọi cho em bấm lại; KHÔNG nhớ kết quả lỗi. */
 export async function layCauGocQuaMayChu(scriptUrl: string, maCa: string, sbd: string, qidGoc: string): Promise<CauGocCongKhai | null> {
-  await xongNapDiaChi()
+  // KHÔNG chờ lượt nạp địa chỉ lúc khởi động ở đây: đây không phải lượt gọi ĐẦU TIÊN của em (em đã vào thi xong) — luật "đúng 3 chỗ được chờ" (tests/co-may-chu-toi-may-em-1109.test.ts).
   const goc = await layCauHinhMayChu()
   const diaChi = await layDiaChiMayChu(scriptUrl)
   if (!diaChi) throw new Error('Máy này chưa có địa chỉ máy chủ.')

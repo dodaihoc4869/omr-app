@@ -118,7 +118,7 @@
   padding: 0;
   list-style: none;
   font-family: var(--serif);
-  font-size: 14px;
+  font-size: 15px; /* chữ thân ≥ 15 px trên điện thoại (chuẩn C9) */
   line-height: 1.6;
 }
 .thi-thay-pa > li {
@@ -172,6 +172,14 @@
 .m3 .thi-thay-goc {
   background: var(--m3-surface);
   box-shadow: inset 0 0 0 1px var(--m3-outline-variant);
+}
+
+/* chế độ NGANG GỌN, câu CHIA ĐÔI (lam-bai-ngang.css): thẻ có chiều cao cố định, mọi khối ngoài thân thẻ là `flex: none` ⇒ câu gốc bung ra phải có trần cao và cuộn riêng,
+ * nếu không nó chiếm hết chỗ của thân câu (đề + phương án). Chế độ một cột: cả khung đã cuộn nên không cần trần. */
+.lb-gon-de[data-chia] .thi-thay-goc {
+  max-height: 38vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* ảnh thay chữ của phương án / ý (công thức cấu tạo, sơ đồ): nhỏ, không tràn ô */
