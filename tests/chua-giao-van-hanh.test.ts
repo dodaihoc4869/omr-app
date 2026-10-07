@@ -1,9 +1,11 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import worker from '../scripts/chua-giao-worker'
-import { raCuaSo } from '../scripts/chua-giao-cua-so'
+import { raCuaSo, raDanhSach } from '../scripts/chua-giao-cua-so'
+import { docCacCapGiao } from '../scripts/chua-giao-danh-sach'
+import { giaoPilot } from '../server/src/chua-cau-sai-thay'
 import { taoD1That } from './_d1-that'
-import { seedChua } from './_chua-cau-sai-fixture'
+import { seedChua, Q } from './_chua-cau-sai-fixture'
 import type { EnvGiao } from '../scripts/chua-giao-van-hanh'
 const KEY = 'a'.repeat(64)
 function request(offset: unknown = 0, key = KEY) {
@@ -59,6 +61,33 @@ describe('Cửa giao tạm cạnh D1', () => {
     expect(r.status).toBe(503)
     expect(await r.json()).toEqual({ ok: false })
   })
+  it('cặp chọn từ sổ dùng cùng hàm giao, không lộ danh tính và không ghi kết quả học', async () => {
+    const d = await dung(), before = d.dem('su_kien_hoc')
+    const request = () => new Request('https://test/giao',{method:'POST',headers:{authorization:`Bearer ${KEY}`},body:JSON.stringify({sbd:'HS1',qid:Q})})
+    const initial = d.sql.prepare('SELECT id,giao_luc,chot_do_luc FROM chua_loi_dot').all()
+    expect(await (await worker.fetch(request(),d.env)).json()).toEqual({ok:true,soCap:1})
+    expect(await (await worker.fetch(request(),d.env)).json()).toEqual({ok:true,soCap:1})
+    expect(d.sql.prepare('SELECT id,giao_luc,chot_do_luc FROM chua_loi_dot').all()).toEqual(initial)
+    expect(d.dem('su_kien_hoc')).toBe(before)
+  })
+  it('tập chọn một lần trùng giaoPilot, loại hỗ trợ/chẩn đoán/chưa công bố/không có em', async () => {
+    const d = await dung()
+    const insert = d.sql.prepare("INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn,assistance,visibility,purpose,raw_json) VALUES(?,?,?,?,?,1,0,?,?,?,?,?,?)")
+    const add = (id: string, qid: string, sbd='HS1', nguon='game', ngay='2026-10-07', assistance='none', visibility='released', purpose='repair', raw='{}') => insert.run(id,sbd,qid,nguon,'G-THU',ngay+'T01:00:00Z',ngay,assistance,visibility,purpose,raw)
+    add('valid-new',Q+'-MOI')
+    add('alias',Q+'~ss0','HS1','game','2026-10-07','none','released','repair',JSON.stringify({tc:Q}))
+    add('assisted',Q+'-GOIY','HS1','game','2026-10-07','hint')
+    add('diagnostic',Q+'-CD','HS1','game','2026-10-07','none','released','chan_doan')
+    add('embargo',Q+'-KHOA','HS1','game','2026-10-07','none','embargoed')
+    add('old',Q+'-CU','HS1','game','2026-09-28')
+    add('unknown',Q+'-X','KHONG-CO-EM')
+    add('thi',Q+'-THI','HS1','thi')
+    add('luyen',Q+'-LUYEN','HS1','luyen')
+    const selected = await docCacCapGiao(d.env)
+    expect(selected).toEqual([{sbd:'HS1',qid:Q},{sbd:'HS1',qid:Q+'-MOI'}])
+    const native = await (await giaoPilot(d.env,{offset:0})).json()
+    expect(native.ds.map((x: {sbd:string;qid:string})=>({sbd:x.sbd,qid:x.qid}))).toEqual(selected)
+  })
 })
 describe('Checkpoint cửa sổ giao', () => {
   it('kết quả về lệch thứ tự vẫn chỉ chốt sau khi đủ sáu lô', async () => {
@@ -93,5 +122,17 @@ describe('Checkpoint cửa sổ giao', () => {
     await expect(raCuaSo(0, async offset => ({ ok: true, soCap: 2, tiepOffset: offset, con: true }))).rejects.toThrow('giữ checkpoint')
     await expect(raCuaSo(0, async offset => ({ ok: true, soCap: 0, tiepOffset: offset, con: true }))).rejects.toThrow('giữ checkpoint')
     await expect(raCuaSo(0, async offset => ({ ok: true, soCap: offset === 0 ? 0 : 2, tiepOffset: offset + (offset === 0 ? 0 : 2), con: offset !== 0 }))).rejects.toThrow('giữ checkpoint')
+  })
+  it('48 cặp đã chọn chỉ chốt sau tất cả thành công, lỗi giữ checkpoint', async () => {
+    const ds = Array.from({length:48},(_,i)=>i)
+    expect(await raDanhSach(ds,async ()=>({ok:true,soCap:1}))).toBe(48)
+    let done = 0
+    await expect(raDanhSach(ds,async i=>{
+      await new Promise(r=>setTimeout(r,1)); done++
+      if(i===24)throw Error('mạng lỗi')
+      return {ok:true,soCap:1}
+    })).rejects.toThrow('giữ checkpoint')
+    expect(done).toBe(48)
+    await expect(raDanhSach(ds,async ()=>({ok:true,soCap:0}))).rejects.toThrow('giữ checkpoint')
   })
 })

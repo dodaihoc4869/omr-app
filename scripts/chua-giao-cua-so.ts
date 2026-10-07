@@ -1,4 +1,10 @@
 export type KetQuaGiao = { ok: true; soCap: number; tiepOffset: number; con: boolean }
+export async function raDanhSach<T>(ds: T[], goi: (cap: T) => Promise<{ ok: true; soCap: number }>) {
+  const rs = await Promise.allSettled(ds.map(goi))
+  if (rs.some(r => r.status !== 'fulfilled' || !r.value.ok || r.value.soCap !== 1))
+    throw new Error('Danh sách chưa giao đủ; giữ checkpoint.')
+  return ds.length
+}
 // Mỗi yêu cầu dùng đúng giaoPilot LIMIT 2. Chỉ chốt khi cả cửa sổ đã trả xong.
 export async function raCuaSo(offset: number, goi: (offset: number) => Promise<KetQuaGiao>, soLuong = 6) {
   const rs = await Promise.allSettled(Array.from({ length: soLuong }, (_, i) => goi(offset + i * 2)))

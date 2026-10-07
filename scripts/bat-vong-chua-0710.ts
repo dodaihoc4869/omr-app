@@ -6,7 +6,8 @@ import { dongBoTuCu } from '../server/src/chua-cau-sai-thay'
 import { chuanCauHinh } from '../server/src/chua-cau-sai-cau-hinh'
 import type { Env } from '../server/src/kieu'
 import { taoGiaoGanD1 } from './chua-giao-gan-d1'
-import { raCuaSo } from './chua-giao-cua-so'
+import { raDanhSach } from './chua-giao-cua-so'
+import { docCacCapGiao } from './chua-giao-danh-sach'
 
 const token = process.env.CLOUDFLARE_API_TOKEN, account = process.env.CLOUDFLARE_ACCOUNT_ID
 if (!token || !account) throw new Error('Thiếu cấu hình Cloudflare.')
@@ -67,13 +68,17 @@ async function main() {
   n = 0
   giaiDoan = 'giao_cau_sai_cu'
   if (!receipt.giaoXong) {
+    const caps = await docCacCapGiao(env)
+    receipt.giaoSoCapDaChon = caps.length
+    receipt.giaoChonLuc = new Date().toISOString()
+    await luu()
     const gan = await taoGiaoGanD1()
     try {
       while (!receipt.giaoXong) {
-        const r = await raCuaSo(receipt.offset, gan.goi, 24)
-        receipt.offset = r.tiepOffset; receipt.giaoXong = !r.con
+        const soCap = await raDanhSach(caps.slice(receipt.offset, receipt.offset + 48), gan.goi)
+        receipt.offset += soCap; receipt.giaoXong = receipt.offset >= caps.length
         await luu()
-        n += r.soCap
+        n += soCap
         if (n % 240 === 0 || receipt.giaoXong) console.log(JSON.stringify({ soCapEmCauDaRa: n, giaoXong: receipt.giaoXong }))
       }
     } finally { await gan.close() }

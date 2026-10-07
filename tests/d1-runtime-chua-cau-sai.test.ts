@@ -246,4 +246,19 @@ describe('Đồng bộ Tu luyện theo lô trên workerd/D1', () => {
     for (const row of before.results) expect(once.results).toContainEqual(row)
     expect(await E.DB.prepare('SELECT COUNT(*) AS n FROM su_kien_hoc').first()).toEqual(events)
   })
+  it('cặp chọn sẵn chạy native trên workerd dưới 50 lệnh, retry giữ ngày giao', async () => {
+    let lenh = 0
+    const db = new Proxy(E.DB,{get(target,key){
+      if(key==='prepare')return (sql:string)=>{lenh++;return target.prepare(sql)}
+      const value = Reflect.get(target,key)
+      return typeof value==='function'?value.bind(target):value
+    }})
+    const e={...E,DB:db,CHUA_KEY:'a'.repeat(64),CHUA_HAN:String(Date.now()+60000)}
+    const request=()=>new Request('https://test/giao',{method:'POST',headers:{authorization:`Bearer ${e.CHUA_KEY}`},body:JSON.stringify({sbd:'HS1',qid:Q})})
+    const before=await E.DB.prepare('SELECT id,giao_luc,chot_do_luc FROM chua_loi_dot ORDER BY id').all()
+    expect(await (await giaoWorker.fetch(request(),e)).json()).toEqual({ok:true,soCap:1})
+    expect(lenh).toBeLessThanOrEqual(50)
+    expect(await (await giaoWorker.fetch(request(),e)).json()).toEqual({ok:true,soCap:1})
+    expect((await E.DB.prepare('SELECT id,giao_luc,chot_do_luc FROM chua_loi_dot ORDER BY id').all()).results).toEqual(before.results)
+  })
 })

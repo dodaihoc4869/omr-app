@@ -4,7 +4,7 @@ import { randomBytes } from 'node:crypto'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve, join } from 'node:path'
-import type { KetQuaGiao } from './chua-giao-cua-so'
+import type { CapGiao } from './chua-giao-danh-sach'
 
 export async function taoGiaoGanD1() {
   const account = process.env.CLOUDFLARE_ACCOUNT_ID!, token = process.env.CLOUDFLARE_API_TOKEN!
@@ -55,13 +55,13 @@ export async function taoGiaoGanD1() {
       if (i < 11) await new Promise(r => setTimeout(r, 2000))
     }
     if (!locked) throw new Error('Cổng vận hành chưa khoá.')
-    console.log('Worker giao tạm đã khoá; dùng cùng luật máy chủ, tối đa hai cặp/yêu cầu.')
+    console.log('Worker giao tạm đã khoá; cùng luật máy chủ, một cặp đã chọn/yêu cầu.')
     return {
       close,
-      async goi(offset: number): Promise<KetQuaGiao> {
+      async goi(cap: CapGiao): Promise<{ ok: true; soCap: number }> {
         for (let i = 0; i < 4; i++) {
           try {
-            const r = await fetch(url, { method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' }, body: JSON.stringify({ offset }), signal: AbortSignal.timeout(60000) })
+            const r = await fetch(url, { method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' }, body: JSON.stringify(cap), signal: AbortSignal.timeout(60000) })
             // Ca thi mở/cờ tắt: dừng, không tự bật lại và không retry như lỗi mạng.
             if (r.status === 409 || r.status === 401) throw new Error('DUNG_VAN_HANH')
             const j = await r.json()
