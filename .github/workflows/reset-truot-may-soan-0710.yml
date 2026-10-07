@@ -1,0 +1,50 @@
+# Đặt lại 19 việc học liệu 'truot' về 'cho' trong D1 (07/10/2026)
+# Nguyên nhân: code nhánh song sinh (yêu cầu chac:true) tạm lên server 10:17–10:35 → 19 câu hết 3 lần thử → truot
+# Lệnh an toàn: CHỈ đổi trang_thai + so_lan, KHÔNG xoá dữ liệu
+name: Đặt lại việc máy soạn bị trượt (0710)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dat-lai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm trước (đếm 'truot')
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server
+          npx -y wrangler@latest d1 execute omr --remote \
+            --command "SELECT trang_thai, COUNT(*) n FROM may_soan_viec GROUP BY trang_thai"
+      - name: Đặt lại truot → cho
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server
+          npx -y wrangler@latest d1 execute omr --remote \
+            --command "UPDATE may_soan_viec SET trang_thai = 'cho', so_lan = 0, loi = NULL WHERE trang_thai = 'truot'"
+      - name: Kiểm sau (xác nhận đã reset)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server
+          npx -y wrangler@latest d1 execute omr --remote \
+            --command "SELECT trang_thai, COUNT(*) n FROM may_soan_viec GROUP BY trang_thai"
