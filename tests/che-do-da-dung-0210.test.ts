@@ -189,6 +189,8 @@ function dungD1() {
 describe('/ca/cau-da-dung — câu em đã TỰ làm đúng trong chiến dịch, kèm nhãn', () => {
   it('05/10 — sổ CŨ thiếu cột assistance/purpose/visibility (bản thật) ⇒ vẫn chạy, không lỗi D1', async () => {
     const { d, env } = dungD1()
+    // D1 trước CNH-1 cũng chưa có trigger giao chữa 0710 phụ thuộc các cột này.
+    d.sql.exec('DROP TRIGGER IF EXISTS chua_giao_sai_sau_ghi; DROP TRIGGER IF EXISTS chua_giao_sai_sau_cong_bo')
     for (const c of ['assistance', 'purpose', 'visibility']) d.sql.exec(`ALTER TABLE su_kien_hoc DROP COLUMN ${c}`)
     const r = await goiWorker(worker, env, '/ca/cau-da-dung', { sbd: ['S1'] }, true)
     expect(r.ok).toBe(true)

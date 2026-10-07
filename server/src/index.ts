@@ -93,7 +93,9 @@ import { gvHocPhi } from './hoc-phi'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
-import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, tienDo as chuaTienDo, thongKeKpi as chuaThongKe } from './chua-cau-sai'
+import { tinhNangBat as tinhNangChuaBat } from './chua-cau-sai-cau-hinh'
+import { cauHinhThay, hocLieuThay, giaoPilot, hangThay, dongBoTuCu, hangHocLieu } from './chua-cau-sai-thay'
+import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, tienDo as chuaTienDo, thongKeKpi as chuaThongKe, guiThay as chuaGuiThay, danhSach as chuaDanhSach } from './chua-cau-sai'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
@@ -192,6 +194,8 @@ async function traLoiNopBtvn(nop:()=>Promise<Response>):Promise<Response> {
     throw e
   }
 }
+
+async function raChua(res: Response): Promise<Response> { return ra(await res.json(), res.status) }
 
 function laThay(req: Request, env: Env, body: Record<string, unknown>): boolean {
   const gui = String(body.secret ?? req.headers.get('x-ma-bi-mat') ?? '').trim()
@@ -3664,11 +3668,14 @@ const boXuLy = {
       // Độc lập: chỉ ghi `tu_luyen_luot`/`tu_luyen_cau`; không EXP, không su_kien_hoc, không kế hoạch ngày.
       if (p.startsWith('/hs/tu-luyen/')) return ra(await tuLuyen(env, p.slice('/hs/tu-luyen/'.length), b))
       // VÒNG CHỮA CÂU SAI (07/10, server/src/chua-cau-sai.ts): đặc tả §10; SBD từ token.
-      if (p === '/hs/chua-cau-sai/mo-dot') return ra(await chuaMoDot(env, b))
-      if (p === '/hs/chua-cau-sai/phat-item') return ra(await chuaPhatItem(env, b))
-      if (p === '/hs/chua-cau-sai/nop-item') return ra(await chuaNopItem(env, b))
-      if (p === '/hs/chua-cau-sai/xin-goi-y') return ra(await chuaXinGoiY(env, b))
-      if (p === '/hs/chua-cau-sai/tien-do') return ra(await chuaTienDo(env, url.searchParams))
+      if (p === '/hs/chua-cau-sai/co') { const sbd=await gameIdentity(env,b); return ra({ok:await tinhNangChuaBat(env,{sbd})}) }
+      if (p === '/hs/chua-cau-sai/gui-thay') return raChua(await chuaGuiThay(env,b))
+      if (p === '/hs/chua-cau-sai/danh-sach') return raChua(await chuaDanhSach(env,b))
+      if (p === '/hs/chua-cau-sai/mo-dot') return raChua(await chuaMoDot(env, b))
+      if (p === '/hs/chua-cau-sai/phat-item') return raChua(await chuaPhatItem(env, b))
+      if (p === '/hs/chua-cau-sai/nop-item') return raChua(await chuaNopItem(env, b))
+      if (p === '/hs/chua-cau-sai/xin-goi-y') return raChua(await chuaXinGoiY(env, b))
+      if (p === '/hs/chua-cau-sai/tien-do') return raChua(await chuaTienDo(env, b))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
@@ -3797,7 +3804,13 @@ const boXuLy = {
       // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
       if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
       // THỐNG KÊ KPI vòng chữa câu sai (07/10, server/src/chua-cau-sai.ts).
-      if (p === '/gv/chua-cau-sai/thong-ke') return ra(await chuaThongKe(env, url.searchParams))
+      if (p === '/gv/chua-cau-sai/cau-hinh') return raChua(await cauHinhThay(env,b))
+      if (p === '/gv/chua-cau-sai/hoc-lieu') return raChua(await hocLieuThay(env,b))
+      if (p === '/gv/chua-cau-sai/hang-hoc-lieu') return raChua(await hangHocLieu(env))
+      if (p === '/gv/chua-cau-sai/giao-pilot') return raChua(await giaoPilot(env,b))
+      if (p === '/gv/chua-cau-sai/dong-bo-tu-cu') return raChua(await dongBoTuCu(env,b))
+      if (p === '/gv/chua-cau-sai/hang-thay') return raChua(await hangThay(env,b))
+      if (p === '/gv/chua-cau-sai/thong-ke') return raChua(await chuaThongKe(env, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))
       if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
       // BUỔI CHỮA TỐI NAY (B6, docs/hop-dong-buoi-chua-de-xuat-2109.md): số liệu thô ĐỌC-CHỈ, ≤ 12 truy vấn.

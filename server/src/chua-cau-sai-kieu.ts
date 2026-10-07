@@ -1,6 +1,7 @@
 // KIỂU DÙNG CHUNG — vòng chữa câu sai (07/10/2026, đặc tả §6, §7, §8).
 // Tệp này được import cả ở máy chủ lẫn bundle frontend (qua src/lib/chua-cau-sai-api.ts).
 // KHÔNG đặt logic chấm, đáp án, rubric hay ref riêng vào đây.
+import type { HinhAnh } from '../../src/data/examContent'
 
 /** Cờ thử nghiệm — khoá trong bảng `cau_hinh`. */
 export const KHOA_CHUA_CAU_SAI = 'chua_cau_sai_v1'
@@ -58,10 +59,13 @@ export type MucKetLuan = 'gia_thuyet' | 'co_bang_chung' | 'chua_xac_dinh'
 /** Nội dung nhúng trực tiếp trong học liệu — thay thế tra R2 khi soạn bài nhanh. */
 export interface NoiDungTrucTiep {
   hoi: string
-  kieu: KieuItem   // định nghĩa bên dưới
-  dapAn: string    // máy chủ giữ, KHÔNG gửi xuống client
+  kieu: KieuItem // định nghĩa bên dưới
+  dapAn: string // máy chủ giữ, KHÔNG gửi xuống client
   luaChon?: { ky: string; noi: string }[]
   donVi?: string
+  bang?: string[][]
+  y?: string[]
+  hinhAnh?: HinhAnh[]
 }
 
 export interface ProbeRef {
@@ -73,6 +77,8 @@ export interface ProbeRef {
   kyNang: string[]
   /** Có phải bản tương đương đã kiểm để dùng ở gặp lại 2 không. */
   laTuongDuong: boolean
+  /** Chỉ dùng để xác nhận một giả thuyết; không gửi xuống máy em. */
+  dapAnSai?: string[]
   /** Nội dung nhúng — nếu có thì dùng thay tra R2 (server-only). */
   noiDungTrucTiep?: NoiDungTrucTiep
 }
@@ -115,13 +121,18 @@ export interface BuocChua {
   tieuDe: string
   tienQuyet: string[]
   viKyNang: string[]
-  yApDung?: number[]  // chỉ số ý Phần II, 0..3
+  yApDung?: number[] // chỉ số ý Phần II, 0..3
   chanDoan: ProbeRef[]
   phanBiet: ProbeRef[]
   kiemLai: ProbeRef[]
-  hieuBuoc?: HieuBuoc  // bắt buộc với học liệu mới; thiếu = thiếu độ phủ
+  hieuBuoc?: HieuBuoc // bắt buộc với học liệu mới; thiếu = thiếu độ phủ
   hoTro: { muc: 1 | 2 | 3; noiDung: string; viDuRef?: string }[]
-  loiThuongGap: { ma: string; loai: LoaiLoi; tinHieu: string; probeXacNhan: string }[]
+  loiThuongGap: {
+    ma: string
+    loai: LoaiLoi
+    tinHieu: string
+    probeXacNhan: string
+  }[]
 }
 
 export interface HocLieuChua {
@@ -138,19 +149,21 @@ export interface HocLieuChua {
 // ---------------------------------------------------------------------------
 export interface CauHinhChuaCauSai {
   bat: boolean
+  phamVi?: 'pilot' | 'tat_ca'
   lop: string[]
   sbd: string[]
   dongBoTuLuyen: boolean
-  kiemLaiSauGio: number   // giờ tối thiểu trước gặp lại 2 (mặc định 24)
-  chanDoanToiDa: number   // số probe chẩn đoán mỗi lượt (mặc định 4)
-  vongHoTroToiDaMoiBuoc: number  // số vòng giải thích→bài mới (mặc định 2)
-  phutToiDaMotLuot: number  // giới hạn tải nhận thức (mặc định 10)
-  cuaSoDoNgay: number     // cửa sổ đo KPI (mặc định 7)
+  kiemLaiSauGio: number // giờ tối thiểu trước gặp lại 2 (mặc định 24)
+  chanDoanToiDa: number // số probe chẩn đoán mỗi lượt (mặc định 4)
+  vongHoTroToiDaMoiBuoc: number // số vòng giải thích→bài mới (mặc định 2)
+  phutToiDaMotLuot: number // giới hạn tải nhận thức (mặc định 10)
+  cuaSoDoNgay: number // cửa sổ đo KPI (mặc định 7)
   cohortId: string
 }
 
 export const CAU_HINH_MAC_DINH: CauHinhChuaCauSai = {
   bat: false,
+  phamVi: 'pilot',
   lop: [],
   sbd: [],
   dongBoTuLuyen: true,
@@ -171,7 +184,7 @@ export type KieuItem = 'so' | 'chon' | 'ds' | 'chon_ly_do' | 'tu_nhap'
 // Payload công khai của item (gửi máy em, đặc tả §10.2)
 // ---------------------------------------------------------------------------
 export interface ItemCongKhai {
-  id: string          // opaque item ID
+  id: string // opaque item ID
   loai: LoaiItem
   buocSo?: number
   tieuDe: string
@@ -179,6 +192,9 @@ export interface ItemCongKhai {
   hoi: string
   luaChon: { ky: string; noi: string }[] | null
   donVi?: string
+  bang?: string[][]
+  y?: string[]
+  hinhAnh?: HinhAnh[]
   // Không có đáp án, rubric, ref riêng
 }
 
@@ -199,7 +215,7 @@ export interface BuocTienDo {
   tieuDe: string
   trangThai: TrangThaiBuoc
   maLoiDaXacNhan?: string
-  mucHoTroCaoNhat: number   // 0-3
+  mucHoTroCaoNhat: number // 0-3
   receiptChanDoan?: string
   receiptLyDo?: string
   receiptChuyenGiao?: string
@@ -227,10 +243,18 @@ export interface PhienResponse {
 export interface PhanHoiItem {
   itemId: string
   dung: boolean
-  phanGiuDuoc?: string  // phần em đã làm đúng
-  diemlech?: string     // điểm lệch cụ thể
-  giaThiet?: string     // câu hỏi kiểm tiếp (chưa lộ đáp án)
+  phanGiuDuoc?: string // phần em đã làm đúng
+  diemlech?: string // điểm lệch cụ thể
+  giaThiet?: string // câu hỏi kiểm tiếp (chưa lộ đáp án)
   hanhDongTiep?: string // việc em tự làm
+  dieuCanHieu?: Pick<
+    HieuBuoc,
+    | 'mucTieu'
+    | 'yNghiaDaiLuong'
+    | 'viSaoCanBuoc'
+    | 'dieuKienApDung'
+    | 'noiVoiBuocSau'
+  >
 }
 
 // ---------------------------------------------------------------------------

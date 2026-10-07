@@ -7,6 +7,8 @@
 // "Chấm từng câu" (nhớ theo máy) ⇒ mỗi câu bấm Kiểm tra, máy chủ chấm + khoá câu, hiện đúng/sai + lời giải + nút Câu tiếp.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 const ManChuaCauSai = lazy(() => import('../chua-cau-sai/ManChuaCauSai'))
+import ChoChuaCuaEm from '../chua-cau-sai/ChoChuaCuaEm'
+import { apiCoChua } from '../../lib/chua-cau-sai-api'
 import TheCau from '../TheCau'
 import { hoiXacNhan } from '../hop-thoai'
 import '../m3'
@@ -881,6 +883,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         </main>
       ) : (
         <main className="tlu-than" key="luyen">
+          <ChoChuaCuaEm token={token} />
           {khoa && <p className="tlu-bao" data-kieu="khoa" role="status">Em đang có ca kiểm tra mở nên Tu luyện tạm khoá. Làm xong ca kiểm tra rồi luyện tiếp nhé.</p>}
           {dangTaiNguon && !nguon ? (
             <div className="tlu-luoi-che-do" aria-busy="true" role="status" aria-label="Đang tải">
@@ -1025,6 +1028,8 @@ function TheCauXem({ cau: c, kq, stt, onHoi }: { cau: CauCongKhai; kq: KetQuaCau
 
 function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { boCuc: BoCuc; kq: KetQuaNop; cau: CauCongKhai[]; token: string; onVe: () => void; onLuyenTiep: () => void; onTongHop: () => void }) {
   const [loc, setLoc] = useState<LocXem>('tat')
+  const [coChua,setCoChua] = useState(false)
+  useEffect(()=>{let song=true;void apiCoChua(token).then(x=>{if(song)setCoChua(x)});return()=>{song=false}},[token])
   const [chuaQid, setChuaQid] = useState<string | null>(null)
   const theoQid = useMemo(() => new Map(kq.cau.map((k) => [k.qid, k])), [kq])
   const tiLe = kq.soCau ? Math.round((100 * kq.soDung) / kq.soCau) : 0
@@ -1083,7 +1088,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
             <TheCauXem cau={c} kq={k} stt={i + 1} />
           )}
           {k?.khacPhuc && <p className="tlu-khac-phuc" data-dung={k.dung ? 'true' : 'false'}>{k.khacPhuc}</p>}
-          {!k?.dung && !k?.anDapAn && (
+          {coChua && !k?.dung && !k?.anDapAn && (
             <button type="button" className="tlu-nut-chua" onClick={() => setChuaQid(c.qid)}>
               Sửa từng bước
             </button>

@@ -2,6 +2,7 @@
 // Đặt ở MỌI chỗ em làm câu ngoài giờ kiểm tra. KHÔNG đặt trong màn thi (ExamTakeScreen); máy chủ còn chặn thêm: em đang có ca kiểm tra mở,
 // hoặc câu thuộc đề của ca chưa công bố ⇒ trả lời lý do, không trả lời giải. Có hồ sơ từng bước ⇒ mở khung; chưa có ⇒ báo "thầy đang soạn" (thầy chốt 29/09: không hiện lời giải ngắn).
 // `onHoi`: gọi khi lời giải đã mở (game dùng để tính câu này là "có trợ giúp" — không nhận thưởng).
+import NutChuaTungBuoc from '../chua-cau-sai/NutChuaTungBuoc'
 import { useState } from 'react'
 import { docTokenHs, hoiThay, type CauChoKhung, type HoSoLoiGiai, type KiemKhung } from '../../lib/loi-giai-api'
 import KhungLoiGiai from './KhungLoiGiai'
@@ -30,6 +31,7 @@ export default function NutHoiThay({ qid, nguon, onHoi, gon = false }: { qid?: s
       <button type="button" className="lg-nut lg-nut--hoi" onClick={bam} disabled={dangTai} aria-label="Hỏi thầy: xem lời giải câu này">
         {dangTai ? 'Đang mở…' : 'Hỏi thầy'}
       </button>
+      <NutChuaTungBuoc qid={qid} />
       {loi && <span className="lg-loi" role="status">{loi}</span>}
       {mo && <KhungLoiGiai hoSo={mo.hoSo} cau={mo.cau} kiem={mo.kiem} nguon={nguon} onDong={() => setMo(null)} />}
     </div>

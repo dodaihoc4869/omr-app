@@ -33,7 +33,7 @@ export const MUC_DICH_CHAN_DOAN = 'chan_doan'
  */
 export const SQL_LA_LAN_LAM = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc')"
 /** Như `SQL_LA_LAN_LAM` nhưng GIỮ dòng câu chẩn đoán — CHỈ cho `docLanLam` (srs2-d1.ts), nơi tách dòng ấy ra thành mốc "đã chẩn đoán" và không đưa vào lần làm. */
-export const SQL_LA_LAN_LAM_GIU_CHAN_DOAN = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot')"
+export const SQL_LA_LAN_LAM_GIU_CHAN_DOAN = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chua_buoc')"
 
 /** Tên A.I làm chủ ngữ trên mọi chữ MỚI của OMNI ở cả ba app (thầy lệnh 05/10: "Thay từ máy bằng A.i Đỗ Đại Học"). Chữ "máy" chỉ THIẾT BỊ giữ nguyên. */
 export const TEN_AI = 'A.I Đỗ Đại Học'

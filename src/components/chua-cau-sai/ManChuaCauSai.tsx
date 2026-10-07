@@ -1,395 +1,644 @@
-// MÀN CHỮA CÂU SAI — vòng chữa từng bước (đặc tả §11, 07/10/2026).
-// Điểm nối: ManTuLuyen (sau kết quả sai), Đảo/Đoàn/Bi-a (§11.3–11.4).
-// UX §11.6–11.9: một việc mỗi màn, tiến độ thực, không hứa % giả, không EXP.
-import { useState, useEffect, useRef, useCallback, useId } from 'react'
+// Một việc mỗi màn; receipt bất biến, phản hồi do em chủ động đọc và tiếp tục.
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  apiMoDot, apiPhatItem, apiNopItem, apiXinGoiY,
-  type KetQuaDot, type ItemCongKhai, type TrangThaiChua,
+  apiMoDot,
+  apiPhatItem,
+  apiNopItem,
+  apiXinGoiY,
+  apiGuiThay,
+  type KetQuaDot,
+  type KetQuaNop,
+  type ItemCongKhai,
 } from '../../lib/chua-cau-sai-api'
+import { ChemText } from '../../lib/chem-format'
+import OSoTraLoi from '../OSoTraLoi'
+import { sinhMaNgauNhien } from '../../lib/thiet-bi'
+import { khopPhanIII } from '../../lib/cham-so'
+import TheCau from '../TheCau'
+import { BangSoLieu, ZoomableImage } from '../QuestionMedia'
+import '../tu-luyen/tu-luyen.css'
 import './chua-cau-sai.css'
-
-// ---------------------------------------------------------------------------
-// Props
-// ---------------------------------------------------------------------------
 export interface PropsChuaCauSai {
   token: string
-  /** qid câu sai muốn chữa */
   qid: string
-  /** Tên/tiêu đề câu để hiển thị trong header */
   tenCau?: string
-  /** Gọi khi học sinh thoát */
   onVe: () => void
 }
-
-// ---------------------------------------------------------------------------
-// Icon nội bộ (inline SVG nhỏ — không import thêm file)
-// ---------------------------------------------------------------------------
-function IcoVe() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
-      <path d="M12.5 5L7.5 10L12.5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+const tenPha: Record<string, string> = {
+  chan_doan: 'Tìm chỗ vướng',
+  phan_biet: 'Hiểu cách em đang nghĩ',
+  kiem_ly_do: 'Vì sao cách này đúng?',
+  kiem_lai: 'Em tự làm một bước',
+  chuyen_giao: 'Thử điều vừa hiểu với bài mới',
+  ghep_bai: 'Nối lại cả bài',
+  kiem_chung: 'Lần gặp lại 2 · Tự làm bản mới',
 }
-function IcoBuoc({ so, da }: { so: number; da: boolean }) {
-  return (
-    <span className="ccs-buoc-so" data-da={da ? 'true' : 'false'} aria-hidden="true">
-      {da ? '✓' : so + 1}
-    </span>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Nhãn trạng thái thân thiện
-// ---------------------------------------------------------------------------
-function nhanTrangThai(tt: TrangThaiChua): string {
-  switch (tt) {
-    case 'can_chan_doan': return 'Tìm chỗ vướng'
-    case 'dang_chua_buoc': return 'Đang gỡ từng bước'
-    case 'dang_ghep_bai': return 'Ghép lại cả bài'
-    case 'cho_gap_lai_2': return 'Hẹn kiểm lại'
-    case 'dang_kiem_chung': return 'Kiểm chứng'
-    case 'da_tu_sua': return 'Đã tự sửa'
-    case 'can_thay': return 'Cần thầy'
-    case 'thieu_hoc_lieu': return 'Chưa có bài luyện'
-    case 'tam_khoa': return 'Tạm khóa'
-    case 'cau_thay_doi': return 'Câu đã đổi'
-    default: return tt
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Component nhập liệu theo kiểu item
-// ---------------------------------------------------------------------------
-function OInputItem({
-  item, giaTri, onChange, onSubmit, disabled,
+function Nhap({
+  item,
+  value,
+  onChange,
+  khoa,
 }: {
   item: ItemCongKhai
-  giaTri: string
+  value: string
   onChange: (v: string) => void
-  onSubmit: () => void
-  disabled: boolean
+  khoa: boolean
 }) {
-  const id = useId()
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey && giaTri.trim()) onSubmit()
+  const chung = {
+    cheDo: 'thi' as const,
+    stt: 1,
+    text: item.hoi,
+    table: item.bang,
+    hinhAnh: item.hinhAnh,
   }
-
-  if (item.kieu === 'chon' && item.luaChon?.length) {
+  if (item.kieu === 'ds' && item.y?.length === 4)
     return (
-      <fieldset className="ccs-nhom-chon" disabled={disabled}>
-        <legend className="sr-only">Chọn đáp án</legend>
-        {item.luaChon.map((lc) => (
-          <label key={lc.ky} className="ccs-chon-muc" data-chon={giaTri === lc.ky ? 'true' : 'false'}>
-            <input type="radio" name={`ccs-chon-${id}`} value={lc.ky} checked={giaTri === lc.ky} onChange={() => onChange(lc.ky)} />
-            <span className="ccs-chon-ky">{lc.ky}</span>
-            <span className="ccs-chon-noi">{lc.noi}</span>
-          </label>
-        ))}
-      </fieldset>
-    )
-  }
-
-  if (item.kieu === 'so') {
-    return (
-      <div className="ccs-nhap-so">
-        <label htmlFor={id} className="sr-only">{item.hoi}</label>
-        <input
-          id={id}
-          type="text"
-          inputMode="decimal"
-          className="ccs-input"
-          placeholder="Nhập số..."
-          value={giaTri}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKey}
-          autoComplete="off"
+      <div className="m3">
+        <TheCau
+          {...chung}
+          phan="II"
+          ideas={item.y as [string, string, string, string]}
+          selected={Array.from({ length: 4 }, (_, i) =>
+            value[i] === 'D' ? 'D' : value[i] === 'S' ? 'S' : null,
+          )}
+          onSelect={
+            khoa
+              ? undefined
+              : (i, v) => {
+                  const a = value.padEnd(4, '-').split('')
+                  a[i] = v
+                  onChange(a.join(''))
+                }
+          }
         />
-        {item.donVi && <span className="ccs-don-vi">{item.donVi}</span>}
       </div>
     )
-  }
-
-  // Mặc định: nhập tự do
+  if (
+    item.kieu === 'chon' &&
+    item.luaChon?.length === 4 &&
+    item.luaChon.every((x, i) => x.ky === 'ABCD'[i])
+  )
+    return (
+      <div className="m3">
+        <TheCau
+          {...chung}
+          phan="I"
+          choices={
+            item.luaChon.map((x) => x.noi) as [string, string, string, string]
+          }
+          choicePerm={[0, 1, 2, 3]}
+          selected={value ? (value as 'A' | 'B' | 'C' | 'D') : null}
+          onSelect={khoa ? undefined : onChange}
+        />
+      </div>
+    )
   return (
-    <div className="ccs-nhap-so">
-      <label htmlFor={id} className="sr-only">{item.hoi}</label>
-      <input
-        id={id}
-        type="text"
-        className="ccs-input"
-        placeholder="Nhập câu trả lời..."
-        value={giaTri}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKey}
-        autoComplete="off"
-      />
+    <div className="ccs-hoi">
+      <div className="ccs-hoi-text">
+        <ChemText text={item.hoi} />
+      </div>
+      {item.bang && <BangSoLieu table={item.bang} />}
+      {item.hinhAnh?.map((h, i) => (
+        <ZoomableImage key={i} src={h.src} alt={h.alt ?? 'Hình câu hỏi'} />
+      ))}
+      {item.kieu === 'so' ? (
+        <div className="ccs-nhap-so">
+          <OSoTraLoi
+            value={value}
+            onChange={onChange}
+            disabled={khoa}
+            ariaLabel="Câu trả lời của em"
+            inputClassName="ccs-input"
+          />
+          {item.donVi && <ChemText text={item.donVi} />}
+        </div>
+      ) : (
+        <fieldset className="ccs-nhom-chon" disabled={khoa}>
+          <legend className="sr-only">Chọn câu trả lời</legend>
+          {(item.kieu === 'ds'
+            ? [
+                { ky: 'D', noi: 'Đúng' },
+                { ky: 'S', noi: 'Sai' },
+              ]
+            : (item.luaChon ?? [])
+          ).map((l) => (
+            <label
+              className="ccs-chon-muc"
+              data-chon={value === l.ky ? 'true' : 'false'}
+              key={l.ky}
+            >
+              <input
+                type="radio"
+                name={item.id}
+                value={l.ky}
+                checked={value === l.ky}
+                onChange={() => onChange(l.ky)}
+              />
+              <span className="ccs-chon-ky">{l.ky}</span>
+              <ChemText text={l.noi} />
+            </label>
+          ))}
+        </fieldset>
+      )}
     </div>
   )
 }
-
-// ---------------------------------------------------------------------------
-// Màn chính
-// ---------------------------------------------------------------------------
-export default function ManChuaCauSai({ token, qid, tenCau, onVe }: PropsChuaCauSai) {
-  const [dang, setDang] = useState<'dang_tai' | 'loi' | 'san_sang'>('dang_tai')
-  const [loiText, setLoiText] = useState('')
-  const [dotId, setDotId] = useState('')
-  const [trangThai, setTrangThai] = useState<TrangThaiChua>('thieu_hoc_lieu')
-  const [tienDo, setTienDo] = useState({ soBuocDaQua: 0, soBuocCanKiem: 0 })
-  const [lanGapLai, setLanGapLai] = useState(0)
-  const [denHan, setDenHan] = useState<string | undefined>()
-  const [_lyDoThieu, setLyDoThieu] = useState<string | undefined>()
-
-  const [item, setItem] = useState<ItemCongKhai | null>(null)
-  const [traLoi, setTraLoi] = useState('')
-  const [dangNop, setDangNop] = useState(false)
-  const [phanHoi, setPhanHoi] = useState<{ dung: boolean; diemlech?: string; giaThiet?: string } | null>(null)
-  const [goiY, setGoiY] = useState<string | null>(null)
-  const [dangGoiY, setDangGoiY] = useState(false)
-
-  const attemptRef = useRef(crypto.randomUUID())
-  const inputRef = useRef<HTMLDivElement>(null)
-
-  // Cập nhật trạng thái từ response
-  const apDung = useCallback((r: KetQuaDot) => {
-    if (r.dotId) setDotId(r.dotId)
-    if (r.trangThai) setTrangThai(r.trangThai)
-    if (r.tienDo) setTienDo(r.tienDo)
-    if (r.lanGapLai != null) setLanGapLai(r.lanGapLai)
-    if (r.denHan != null) setDenHan(r.denHan)
-    if (r.lyDoThieu != null) setLyDoThieu(r.lyDoThieu)
-    if (r.item) { setItem(r.item); setTraLoi(''); setPhanHoi(null); setGoiY(null) }
-    else setItem(null)
-  }, [])
-
-  // Khởi tạo: mở đợt
+function DeGoc({ c }: { c: NonNullable<KetQuaDot['cauGoc']> }) {
+  return (
+    <>
+      <ChemText text={c.text} />
+      {c.thanCauImg && <ZoomableImage src={c.thanCauImg} alt="Ảnh đề gốc" />}
+      {c.table && <BangSoLieu table={c.table} />}{' '}
+      {c.imageDataUrl && (
+        <ZoomableImage src={c.imageDataUrl} alt="Hình trong đề gốc" />
+      )}
+      {c.choices?.map((x, i) => (
+        <p key={`c${i}`}>
+          <strong>{'ABCD'[i]}. </strong>
+          <ChemText text={x} />
+          {c.choiceImgs?.[i] && (
+            <ZoomableImage
+              src={c.choiceImgs[i]!}
+              alt={`Phương án ${'ABCD'[i]}`}
+            />
+          )}
+        </p>
+      ))}
+      {c.ideas?.map((x, i) => (
+        <p key={`y${i}`}>
+          <strong>{'abcd'[i]}) </strong>
+          <ChemText text={x} />
+          {c.ideaImgs?.[i] && (
+            <ZoomableImage src={c.ideaImgs[i]!} alt={`Ý ${'abcd'[i]}`} />
+          )}
+        </p>
+      ))}
+      {c.hinhAnh?.map((h, i) => (
+        <ZoomableImage key={i} src={h.src} alt={h.alt ?? 'Hình câu gốc'} />
+      ))}
+    </>
+  )
+}
+type LanNop = { attemptId: string; traLoi: string; itemId: string }
+const khoaNop = (id: string) => `chua-nop:${id}`
+function docNop(id: string): LanNop | null {
+  try {
+    return JSON.parse(localStorage.getItem(khoaNop(id)) ?? 'null')
+  } catch {
+    return null
+  }
+}
+export default function ManChuaCauSai({
+  token,
+  qid,
+  tenCau,
+  onVe,
+}: PropsChuaCauSai) {
+  const [ph, setPh] = useState<KetQuaDot | null>(null),
+    [tai, setTai] = useState(true),
+    [loi, setLoi] = useState(''),
+    [tra, setTra] = useState(''),
+    [hoi, setHoi] = useState<KetQuaNop | null>(null),
+    [goi, setGoi] = useState(''),
+    [ban, setBan] = useState(false),
+    [cho, setCho] = useState<LanNop | null>(null),
+    [gui, setGui] = useState(false),
+    [lanTai, setLanTai] = useState(0)
+  const mucGoi = useRef(0)
+  const song = useRef(true),
+    buocRef = useRef<HTMLHeadingElement>(null),
+    goiRef = useRef(0)
   useEffect(() => {
-    let huỷ = false
-    setDang('dang_tai')
+    song.current = true
+    return () => {
+      song.current = false
+    }
+  }, [])
+  useEffect(() => {
+    const f = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !ban) onVe()
+    }
+    window.addEventListener('keydown', f)
+    return () => window.removeEventListener('keydown', f)
+  }, [onVe, ban])
+  const ap = useCallback((r: KetQuaDot) => {
+    setPh(r)
+    setHoi(r.phanHoiTruoc ?? null)
+    setGoi('')
+    mucGoi.current = r.item?.mucHoTro ?? 0
+    setLoi('')
+    const c = r.item && !r.phanHoiTruoc ? docNop(r.item.id) : null
+    if (r.item && r.phanHoiTruoc) {
+      try {
+        localStorage.removeItem(khoaNop(r.item.id))
+      } catch {}
+    }
+    setCho(c)
+    setTra(r.traLoiDaNop ?? c?.traLoi ?? '')
+  }, [])
+  useEffect(() => {
+    let huy = false
+    const n = ++goiRef.current
     ;(async () => {
       const r = await apiMoDot(token, qid)
-      if (huỷ) return
-      if (!r.ok) { setLoiText(r.loi ?? 'Không mở được đợt chữa.'); setDang('loi'); return }
-      apDung(r)
-      // Với trạng thái active, lấy item ngay
-      if (r.dotId && r.trangThai && !['thieu_hoc_lieu', 'tam_khoa', 'can_thay', 'da_tu_sua', 'cau_thay_doi', 'cho_gap_lai_2'].includes(r.trangThai)) {
-        const r2 = await apiPhatItem(token, r.dotId)
-        if (!huỷ) apDung(r2)
+      if (huy || n !== goiRef.current) return
+      if (!r.ok || !r.dotId) {
+        setLoi(r.loi ?? 'Chưa mở được câu chữa.')
+        setTai(false)
+        return
       }
-      if (!huỷ) setDang('san_sang')
+      const sau = await apiPhatItem(token, r.dotId)
+      if (huy || n !== goiRef.current) return
+      if (sau.ok) ap(sau)
+      else setLoi(sau.loi ?? 'Chưa tải được câu chữa.')
+      setTai(false)
     })()
-    return () => { huỷ = true }
-  }, [token, qid, apDung])
-
-  // Nộp bài
-  const nopBai = async () => {
-    if (!item || !traLoi.trim() || dangNop) return
-    setDangNop(true)
-    const aid = attemptRef.current
-    const r = await apiNopItem(token, dotId, item.id, traLoi.trim(), aid)
-    setDangNop(false)
-    if (!r.ok) { setLoiText(r.loi ?? 'Lỗi nộp bài.'); return }
-    setPhanHoi({ dung: !!r.dung, diemlech: r.diemlech, giaThiet: r.giaThiet })
-    // Sau khi nộp, tải item tiếp
-    attemptRef.current = crypto.randomUUID()
-    setTimeout(async () => {
-      const r2 = await apiPhatItem(token, dotId)
-      apDung(r2)
-    }, 800)
+    return () => {
+      huy = true
+    }
+  }, [token, qid, ap, lanTai])
+  const tiep = async (tiepDoan = false) => {
+    if (!ph?.dotId || ban) return
+    setBan(true)
+    const r = await apiPhatItem(token, ph.dotId, true, tiepDoan)
+    if (!song.current) return
+    setBan(false)
+    if (r.ok) {
+      ap(r)
+      requestAnimationFrame(() => buocRef.current?.focus())
+    } else setLoi(r.loi ?? 'Chưa tải được bước tiếp.')
   }
-
-  // Xin gợi ý
-  const xinGoiYCb = async () => {
-    if (!item || dangGoiY) return
-    setDangGoiY(true)
-    const r = await apiXinGoiY(token, dotId, item.id)
-    setDangGoiY(false)
-    if (!r.ok) { setLoiText(r.loi ?? 'Không xin được gợi ý.'); return }
-    setGoiY(r.noiDungGoiY ?? 'Xem lại bước tính...')
-  }
-
-  // =========== RENDER ===========
-
-  if (dang === 'dang_tai') {
-    return (
-      <div className="ccs" role="status" aria-live="polite">
-        <div className="ccs-dang-tai">Đang tải…</div>
-      </div>
+  const nop = async () => {
+    if (!ph?.item || !ph.dotId || ban || hoi) return
+    const payload = cho ?? {
+      attemptId: sinhMaNgauNhien(),
+      traLoi: tra.trim(),
+      itemId: ph.item.id,
+    }
+    if (
+      !payload.traLoi ||
+      (payload.traLoi.includes('-') && ph.item.kieu === 'ds')
     )
-  }
-
-  if (dang === 'loi') {
-    return (
-      <div className="ccs">
-        <header className="ccs-dau">
-          <button type="button" className="ccs-ve" onClick={onVe} aria-label="Về"><IcoVe /></button>
-          <h1 className="ccs-tieu">Chữa câu sai</h1>
-        </header>
-        <main className="ccs-than">
-          <p className="ccs-loi" role="alert">{loiText}</p>
-          <button type="button" className="ccs-nut-chinh" onClick={onVe}>Quay lại</button>
-        </main>
-      </div>
+      return
+    setCho(payload)
+    try {
+      localStorage.setItem(khoaNop(payload.itemId), JSON.stringify(payload))
+    } catch {
+      /* giữ trong bộ nhớ nếu trình duyệt không cho ghi */
+    }
+    setBan(true)
+    setLoi('')
+    const r = await apiNopItem(
+      token,
+      ph.dotId,
+      payload.itemId,
+      payload.traLoi,
+      payload.attemptId,
     )
+    if (!song.current) return
+    setBan(false)
+    if (!r.ok) {
+      if (r.ma === 'CAU_TRA_LOI_CHUA_HOP_LE') {
+        setCho(null)
+        try {
+          localStorage.removeItem(khoaNop(payload.itemId))
+        } catch {}
+      }
+      setLoi(r.loi ?? 'Chưa lưu được. Em thử gửi lại đúng câu trả lời này.')
+      return
+    }
+    try {
+      localStorage.removeItem(khoaNop(payload.itemId))
+    } catch {}
+    setCho(null)
+    setHoi(r)
   }
-
-  // Tiêu đề bước
-  const buocText = item?.tieuDe
-    ? `Bước ${(item.buocSo ?? 0) + 1}/${tienDo.soBuocCanKiem || 1} · ${item.tieuDe}`
-    : nhanTrangThai(trangThai)
-
-  // Màn trạng thái đóng
-  const mangThongBao = (msg: string, ctaLabel?: string, ctaClick?: () => void) => (
-    <div className="ccs">
-      <header className="ccs-dau">
-        <button type="button" className="ccs-ve" onClick={onVe} aria-label="Về"><IcoVe /></button>
-        <h1 className="ccs-tieu">{tenCau ?? 'Câu sai'}</h1>
-      </header>
-      <main className="ccs-than">
-        <p className="ccs-thong-bao">{msg}</p>
-        {ctaLabel && ctaClick && (
-          <button type="button" className="ccs-nut-chinh" onClick={ctaClick}>{ctaLabel}</button>
-        )}
-        <button type="button" className="ccs-nut-phu" onClick={onVe}>Về danh sách</button>
-      </main>
-    </div>
-  )
-
-  if (trangThai === 'thieu_hoc_lieu') {
-    return mangThongBao('Câu này chưa có bài luyện — thầy đang soạn. Em sẽ thấy thông báo khi sẵn sàng.')
-  }
-  if (trangThai === 'tam_khoa') {
-    return mangThongBao('Đang có ca kiểm tra — tính năng tạm khóa, em quay lại sau khi ca kết thúc.')
-  }
-  if (trangThai === 'cau_thay_doi') {
-    return mangThongBao('Câu này đã được cập nhật, không thể chữa lượt cũ. Em luyện câu mới.')
-  }
-  if (trangThai === 'can_thay') {
-    return mangThongBao('Bước này em đã thử hết cách — thầy sẽ giúp trực tiếp. Thầy nhận được bằng chứng bế tắc của em rồi.')
-  }
-  if (trangThai === 'da_tu_sua') {
-    return (
-      <div className="ccs">
-        <header className="ccs-dau">
-          <button type="button" className="ccs-ve" onClick={onVe} aria-label="Về"><IcoVe /></button>
-          <h1 className="ccs-tieu">{tenCau ?? 'Câu sai'}</h1>
-        </header>
-        <main className="ccs-than ccs-than-xong">
-          <div className="ccs-xong-icon" aria-hidden="true">✓</div>
-          <h2 className="ccs-xong-tieu">Em đã tự sửa được!</h2>
-          <p className="ccs-xong-mo">
-            {lanGapLai >= 2
-              ? 'Em vừa tự giải một bản mới mà không cần gợi ý — lỗi này đã được đóng.'
-              : 'Em đã gỡ xong các bước. Còn một lượt kiểm lại sau khi nghỉ ngơi để chắc chắn.'}
-          </p>
-          {denHan && (
-            <p className="ccs-xong-hen">Lịch kiểm lại: {denHan}</p>
-          )}
-          <button type="button" className="ccs-nut-chinh" onClick={onVe}>Xong lượt chữa</button>
-        </main>
-      </div>
+  const xin = async () => {
+    if (!ph?.item || !ph.dotId || ban || hoi || cho) return
+    setBan(true)
+    const r = await apiXinGoiY(
+      token,
+      ph.dotId,
+      ph.item.id,
+      Math.min(3, mucGoi.current + 1),
     )
+    if (!song.current) return
+    setBan(false)
+    if (r.ok) {
+      setGoi(r.noiDungGoiY ?? '')
+      mucGoi.current = r.mucHoTro ?? mucGoi.current
+    } else setLoi(r.loi ?? 'Chưa mở được gợi ý.')
   }
-  if (trangThai === 'cho_gap_lai_2') {
-    return mangThongBao(
-      `Em đã gỡ xong các bước! ${denHan ? `Lịch kiểm lại: ${denHan}` : 'Em sẽ kiểm lại sau ít nhất 24 giờ — để trí nhớ củng cố.'}`,
-    )
+  const guiThay = async () => {
+    if (!ph?.dotId || ban) return
+    setBan(true)
+    const r = await apiGuiThay(token, ph.dotId)
+    if (!song.current) return
+    setBan(false)
+    if (r.ok) setGui(true)
+    else setLoi(r.loi ?? 'Chưa gửi được. Em thử lại.')
   }
-
-  // Màn chữa tích cực (can_chan_doan, dang_chua_buoc, dang_ghep_bai, dang_kiem_chung)
+  const tt = ph?.trangThai,
+    phanHoi = hoi ?? ph?.phanHoiTruoc
+  const nhanCho =
+    tt === 'cho_gap_lai_2'
+      ? 'Em đã ghép lại được cả bài'
+      : tt === 'da_tu_sua'
+        ? 'Em đã tự làm được bản mới'
+        : tt === 'can_thay'
+          ? 'Cùng thầy gỡ chỗ còn vướng'
+          : tt === 'thieu_hoc_lieu'
+            ? 'Cần thêm bài luyện đúng chỗ'
+            : tt === 'tam_khoa'
+              ? 'Tiến độ đang được giữ'
+              : tt === 'cau_thay_doi'
+                ? 'Câu đã được cập nhật'
+                : ''
+  const dong = !ph?.item || !!nhanCho
   return (
-    <div className="ccs">
+    <div className="tlu ccs" aria-label="Chữa câu sai">
       <header className="ccs-dau">
-        <button type="button" className="ccs-ve" onClick={onVe} aria-label="Về"><IcoVe /></button>
+        <button
+          className="ccs-ve"
+          type="button"
+          onClick={onVe}
+          disabled={ban}
+          aria-label="Quay lại"
+        >
+          ←
+        </button>
         <div className="ccs-dau-giua">
-          <span className="ccs-nhan-trang-thai">{nhanTrangThai(trangThai)}</span>
-          <h1 className="ccs-tieu">{tenCau ?? 'Câu sai'}</h1>
-        </div>
-      </header>
-
-      {/* Tiến độ bước */}
-      {tienDo.soBuocCanKiem > 0 && (
-        <div className="ccs-tien-do" aria-label="Tiến độ chữa bước">
-          {Array.from({ length: tienDo.soBuocCanKiem }).map((_, i) => (
-            <IcoBuoc key={i} so={i} da={i < tienDo.soBuocDaQua} />
-          ))}
-          <span className="ccs-tien-do-chu">
-            {tienDo.soBuocDaQua}/{tienDo.soBuocCanKiem} bước đã kiểm
+          <h1 className="ccs-tieu">{tenCau ?? 'Cùng gỡ câu này'}</h1>
+          <span className="ccs-nhan-trang-thai">
+            Hiểu chỗ vướng · Tự sửa · Thử bản mới
           </span>
         </div>
-      )}
-
-      <main className="ccs-than" ref={inputRef}>
-        {item ? (
+      </header>
+      <main className="ccs-than">
+        {tai ? (
+          <p role="status">Đang tìm đúng bước để cùng em sửa…</p>
+        ) : (
           <>
-            {/* Tiêu đề bước */}
-            <p className="ccs-buoc-text">{buocText}</p>
-
-            {/* Câu hỏi */}
-            <div className="ccs-hoi" role="group" aria-label="Câu hỏi">
-              <p className="ccs-hoi-text">{item.hoi}</p>
-              <OInputItem
-                item={item}
-                giaTri={traLoi}
-                onChange={setTraLoi}
-                onSubmit={nopBai}
-                disabled={dangNop || !!phanHoi?.dung}
-              />
-            </div>
-
-            {/* Gợi ý */}
-            {goiY && (
-              <div className="ccs-goi-y" role="status">
-                <p className="ccs-goi-y-nhan">Gợi ý:</p>
-                <p className="ccs-goi-y-noi">{goiY}</p>
-              </div>
+            {ph?.tienDoChiTiet && ph.tienDoChiTiet.length > 0 && (
+              <ol className="ccs-lo-trinh" aria-label="Những bước đã kiểm">
+                {ph.tienDoChiTiet.map((x, i) => (
+                  <li
+                    key={x.buocId}
+                    data-da={x.trangThai === 'co_bang_chung_hieu_trong_phien'}
+                  >
+                    <span aria-hidden="true">
+                      {x.trangThai === 'co_bang_chung_hieu_trong_phien'
+                        ? '✓'
+                        : i + 1}
+                    </span>
+                    {x.tieuDe}
+                  </li>
+                ))}
+              </ol>
             )}
-
-            {/* Phản hồi sau nộp */}
-            {phanHoi && (
-              <div className="ccs-phan-hoi" data-dung={phanHoi.dung ? 'true' : 'false'} role="status" aria-live="polite">
-                {phanHoi.dung ? (
-                  <p>✓ Đúng rồi!</p>
-                ) : (
+            {ph?.cauGoc && (
+              <details className="ccs-cau-goc">
+                <summary>Xem lại đề gốc</summary>
+                <DeGoc c={ph.cauGoc} />
+              </details>
+            )}
+            {ph?.loiThay && (
+              <aside className="ccs-goi-y">
+                <strong>Thầy cùng em gỡ</strong>
+                <ChemText text={ph.loiThay} />
+              </aside>
+            )}
+            {ph?.canNghi ? (
+              <section>
+                <h2 ref={buocRef} tabIndex={-1}>
+                  Mình nghỉ một chút nhé
+                </h2>
+                <p>
+                  Những bước em đã hiểu đã được lưu. Em chọn tiếp một đoạn ngắn
+                  hoặc quay lại sau.
+                </p>
+                <button
+                  className="ccs-nut-chinh"
+                  onClick={() => void tiep(true)}
+                  disabled={ban}
+                >
+                  Em muốn tiếp thêm một đoạn
+                </button>
+              </section>
+            ) : dong ? (
+              <section>
+                <h2 ref={buocRef} tabIndex={-1}>
+                  {nhanCho || 'Chữa câu sai'}
+                </h2>
+                {tt === 'cho_gap_lai_2' && (
                   <>
-                    <p>Chưa đúng.</p>
-                    {phanHoi.diemlech && <p className="ccs-diemlech">{phanHoi.diemlech}</p>}
+                    <p>
+                      Hôm nay em đã sửa từng bước và ghép lại cả bài. Lần sau,
+                      em sẽ tự thử một bản mới.
+                    </p>
+                    <p>
+                      Hẹn em:{' '}
+                      {ph?.denHan
+                        ? new Date(ph.denHan).toLocaleString('vi-VN')
+                        : 'sau ít nhất 24 giờ'}
+                      .
+                    </p>
+                    <button
+                      className="ccs-nut-phu"
+                      onClick={() => void tiep()}
+                      disabled={ban}
+                    >
+                      Kiểm tra đã đến giờ chưa
+                    </button>
                   </>
                 )}
-              </div>
+                {tt === 'da_tu_sua' && (
+                  <p>
+                    Em vừa giải bản mới mà không cần gợi ý. Lịch ôn chung sẽ
+                    kiểm tra tiếp ở những ngày khác để xác nhận đã khắc phục bền
+                    vững.
+                  </p>
+                )}
+                {['thieu_hoc_lieu', 'can_thay', 'cau_thay_doi'].includes(
+                  tt ?? '',
+                ) && (
+                  <>
+                    <p>
+                      Các bước em đã làm được vẫn được giữ. Thầy có thể xem câu
+                      trả lời và bước đang vướng để giúp em tiếp.
+                    </p>
+                    <button
+                      className="ccs-nut-phu"
+                      disabled={ban || gui}
+                      onClick={() => void guiThay()}
+                    >
+                      {gui
+                        ? 'Đã gửi yêu cầu cho thầy'
+                        : 'Nhờ thầy giúp câu này'}
+                    </button>
+                  </>
+                )}
+                {tt === 'tam_khoa' && (
+                  <p>
+                    Câu hiện chưa được phép luyện. Em có thể quay lại sau; tiến
+                    độ vẫn được lưu.
+                  </p>
+                )}
+              </section>
+            ) : (
+              ph?.item && (
+                <>
+                  <p className="ccs-ghi">
+                    {ph.item.loai === 'kiem_chung'
+                      ? `Lần gặp lại ${ph.lanGapLai ?? 2} · Tự làm bản mới`
+                      : (tenPha[ph.item.loai] ?? 'Cùng sửa một bước')}
+                  </p>
+                  <h2 className="ccs-buoc-text" tabIndex={-1} ref={buocRef}>
+                    {ph.item.tieuDe}
+                  </h2>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      void nop()
+                    }}
+                  >
+                    <Nhap
+                      item={ph.item}
+                      value={tra}
+                      onChange={setTra}
+                      khoa={ban || !!phanHoi || !!cho}
+                    />
+                    {goi && (
+                      <aside className="ccs-goi-y" role="status">
+                        <strong>Một gợi mở</strong>
+                        <ChemText text={goi} />
+                      </aside>
+                    )}
+                    {phanHoi && (
+                      <section
+                        className="ccs-phan-hoi"
+                        data-dung={phanHoi.dung}
+                        role="status"
+                        aria-live="polite"
+                      >
+                        <h3>
+                          {phanHoi.dung
+                            ? 'Bước này em làm được rồi'
+                            : 'Ta đã thấy chỗ cần gỡ'}
+                        </h3>
+                        {[
+                          phanHoi.phanGiuDuoc,
+                          phanHoi.giaThiet,
+                          phanHoi.diemlech,
+                          phanHoi.hanhDongTiep,
+                        ]
+                          .filter(Boolean)
+                          .map((t, i) => (
+                            <p key={i}>
+                              <ChemText text={t!} />
+                            </p>
+                          ))}
+                        {phanHoi.dieuCanHieu && (
+                          <details>
+                            <summary>Hiểu bước này trong bài</summary>
+                            {phanHoi.dieuCanHieu &&
+                              Object.values(phanHoi.dieuCanHieu).map((t, i) => (
+                                <p key={i}>
+                                  <ChemText text={t} />
+                                </p>
+                              ))}
+                          </details>
+                        )}
+                      </section>
+                    )}
+                    <div className="ccs-hang-nut">
+                      {phanHoi ? (
+                        <button
+                          type="button"
+                          className="ccs-nut-chinh"
+                          disabled={ban}
+                          onClick={() => void tiep()}
+                        >
+                          Em sẵn sàng · Tiếp tục
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="submit"
+                            className="ccs-nut-chinh"
+                            disabled={
+                              ban ||
+                              !tra.trim() ||
+                              (ph.item.kieu === 'so' &&
+                                !khopPhanIII(tra, tra)) ||
+                              (ph.item.kieu === 'ds' && tra.includes('-'))
+                            }
+                          >
+                            {ban
+                              ? 'Đang lưu…'
+                              : cho
+                                ? 'Gửi lại câu trả lời đã giữ'
+                                : 'Kiểm tra cách em làm'}
+                          </button>
+                          {!['ghep_bai', 'kiem_chung'].includes(
+                            ph.item.loai,
+                          ) && (
+                            <button
+                              type="button"
+                              className="ccs-nut-phu"
+                              disabled={ban || !!cho}
+                              onClick={() => void xin()}
+                            >
+                              Gợi mở cho em
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </form>
+                  <button
+                    className="ccs-nut-phu"
+                    type="button"
+                    disabled={ban || gui}
+                    onClick={() => void guiThay()}
+                  >
+                    {gui ? 'Đã gửi yêu cầu cho thầy' : 'Nhờ thầy giúp bước này'}
+                  </button>
+                </>
+              )
             )}
-
-            {/* Lỗi */}
-            {loiText && <p className="ccs-loi" role="alert">{loiText}</p>}
-
-            {/* Nút hành động */}
-            <div className="ccs-hang-nut">
-              {!phanHoi?.dung && (
-                <button
-                  type="button"
-                  className="ccs-nut-chinh"
-                  disabled={!traLoi.trim() || dangNop}
-                  onClick={nopBai}
-                >
-                  {dangNop ? 'Đang kiểm…' : 'Nộp'}
-                </button>
-              )}
-              {!phanHoi && !goiY && (
-                <button type="button" className="ccs-nut-phu" disabled={dangGoiY} onClick={xinGoiYCb}>
-                  {dangGoiY ? '…' : 'Xin gợi ý'}
-                </button>
-              )}
-              {phanHoi?.dung && (
-                <p className="ccs-ghi">Đang tải bước tiếp…</p>
-              )}
-            </div>
           </>
-        ) : (
-          <div className="ccs-dang-tai" role="status">Đang tải câu…</div>
         )}
+        {gui && (
+          <p className="ccs-ghi" role="status">
+            Đã gửi yêu cầu cho thầy, kèm câu trả lời và những bước em đã hiểu.
+            Em mở lại câu này để xem lời thầy gỡ; tiến độ của em vẫn được giữ.
+          </p>
+        )}
+        {loi && (
+          <div className="ccs-loi" role="alert">
+            <p>{loi}</p>
+            {!tai && (
+              <button
+                className="ccs-nut-phu"
+                onClick={() =>
+                  ph?.dotId ? void tiep() : setLanTai((x) => x + 1)
+                }
+                disabled={ban}
+              >
+                Tải lại tiến độ
+              </button>
+            )}
+          </div>
+        )}
+        <button
+          type="button"
+          className="ccs-nut-phu"
+          onClick={onVe}
+          disabled={ban}
+        >
+          Nghỉ ở đây · Giữ tiến độ
+        </button>
       </main>
     </div>
   )

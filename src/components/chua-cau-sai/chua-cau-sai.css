@@ -325,3 +325,28 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* Thao tác có chủ ý: 48px, bàn phím, không tự chuyển câu hoặc ép thời gian. */
+.ccs { min-height: 100dvh; }
+.ccs-ve, .ccs-nut-chinh, .ccs-nut-phu, .ccs-chon-muc { min-height: 48px; }
+.ccs-ve { min-width: 48px; justify-content: center; }
+.ccs :focus-visible { outline: 3px solid var(--tlu-nhan); outline-offset: 3px; }
+.ccs-lo-trinh { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.ccs-lo-trinh li { display: flex; gap: .5rem; align-items: center; font-size: .85rem; padding: .5rem .75rem; border: 1px solid var(--tlu-vien); border-radius: 1rem; }
+.ccs-lo-trinh li[data-da='true'] { border-color: var(--tlu-ngoc); color: var(--tlu-ngoc); }
+.ccs-cau-goc { padding: .75rem; border: 1px solid var(--tlu-vien); border-radius: .75rem; }
+.ccs-cau-goc summary { min-height: 48px; display: list-item; cursor: pointer; }
+.ccs form { display: grid; gap: 1rem; }
+.ccs .ccs-hoi-text { white-space: pre-wrap; }
+.ccs-kpi { color: var(--muc); }
+.ccs-kpi textarea { display: block; width: 100%; min-height: 180px; }
+@media (prefers-reduced-motion: reduce) { .ccs *, .ccs *::before, .ccs *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+.ccs-phu { position: fixed; inset: 0; z-index: 10000; overflow-y: auto; background: var(--nen); }
+.ccs-kpi form { display: grid; gap: .75rem; padding: 1rem 0; }
+.ccs-kpi label { display: block; }
+.ccs-kpi input:not([type='checkbox']) { display: block; width: 100%; }
+.ccs-kpi button, .ccs-kpi input, .ccs-kpi summary { min-height: 48px; }
+.ccs-kpi pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ccs-hop { position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: 100dvh; margin: 0; border: 0; padding: 0; overscroll-behavior: contain; background: var(--nen); }
+.ccs-hop::backdrop { background: var(--nen); }
+.ccs-kpi { --tlu-nen: var(--nen); --tlu-nen-2: var(--the); --tlu-chu: var(--muc); --tlu-chu-phu: var(--nhat); --tlu-vien: var(--vien); --tlu-ngoc: var(--xanh); --tlu-do: var(--do); }

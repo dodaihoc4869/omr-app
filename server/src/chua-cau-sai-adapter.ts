@@ -1,124 +1,144 @@
-// ADAPTER TRẠNG THÁI LỖI — vòng chữa câu sai (07/10/2026, đặc tả §9.3).
-//
-// Hai track riêng biệt (KHÔNG trộn):
-//   - Track lỗi học: `TrangThaiLoi` từ `phatLaiLoi` (loi-hoc-luat.ts) — sổ su_kien_hoc.
-//   - Track dạy:    `TrangThaiDay`  từ bảng chua_loi_dot.trang_thai_day.
-//
-// Adapter này ĐỌC track lỗi, cấp dữ liệu đầu vào cho FSM dạy mà KHÔNG sửa track lỗi.
+// Một luật đóng lỗi cho các kênh; đọc theo lô để kho sai không tạo N lượt D1.
 import type { Env } from './kieu'
 import {
-  phatLaiLoi, tachSongSinh, TU_NGAY,
-  type KetQuaLoi, type LanLamLoi, type ThamSoLuat, THAM_SO_GOC,
+  phatLaiLoi,
+  tachSongSinh,
+  TU_NGAY,
+  THAM_SO_GOC,
+  type KetQuaLoi,
+  type LanLamLoi,
+  type ThamSoLuat,
 } from './loi-hoc-luat'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { docThamSo } from './tu-hoan-thien'
+import { docThamSoEm } from './ca-nhan-hoa-v2'
 import type { TrangThaiDay } from './chua-cau-sai-kieu'
-
 export interface TrangThaiLoiDau {
   qidChuan: string
   loiHoc: KetQuaLoi
-  /** Thời điểm sai đầu (ms) — NULL nếu không có lần sai đã công bố. */
   moLuc: number | null
-  /** Thời điểm sai cuối (ms). */
   saiCuoiLuc: number | null
 }
-
-/** Chuẩn hoá qid về dạng gốc (bỏ ~ss, ~bt, prefix tc:). */
 export function qidChuan(qid: string): string {
-  const sans = tachSongSinh(qid).goc
-  return sans.startsWith('tc:') ? sans.slice(3) : sans
+  const q = tachSongSinh(qid).goc
+  return q.startsWith('tc:') ? q.slice(3) : q
 }
-
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
-
-/**
- * Lấy trạng thái lỗi học hiện tại của (sbd, qidGoc) bằng cách đọc sổ su_kien_hoc.
- * Trả `null` nếu không có lần sai TỰ LÀM đã công bố từ 29/09.
- */
+export async function docLuatChua(env: Env, sbd: string): Promise<ThamSoLuat> {
+  return (await docThamSoEm(env, sbd)) ?? (await docThamSo(env))
+}
+export async function docNhieuTrangThaiLoiDau(
+  env: Env,
+  sbd: string,
+  qids: string[],
+  homNay: string,
+  thamSo?: ThamSoLuat,
+): Promise<Map<string, TrangThaiLoiDau>> {
+  const goc = [...new Set(qids.map(qidChuan))],
+    ra = new Map<string, TrangThaiLoiDau>()
+  if (!goc.length) return ra
+  const ds = JSON.stringify(goc)
+  const aliasRows = await env.DB.prepare(
+    `SELECT a.qid AS qid,b.qid AS goc FROM game_v2_question b JOIN game_v2_question a ON a.content_group=b.content_group AND a.content_group<>'' WHERE b.qid IN (SELECT value FROM json_each(?))`,
+  )
+    .bind(ds)
+    .all<{ qid: string; goc: string }>()
+  const alias = new Map<string, Set<string>>()
+  for (const q of goc) alias.set(q, new Set([q]))
+  for (const x of aliasRows.results ?? []) alias.get(x.goc)?.add(x.qid)
+  const roots = [...new Set([...alias.values()].flatMap((x) => [...x]))],
+    tat = JSON.stringify(
+      roots.flatMap((q) => [q, ...[0, 1, 2, 3].map((i) => `${q}~ss${i}`)]),
+    ),
+    tcList = JSON.stringify(roots)
+  const [r, docs, materials, ts] = await Promise.all([
+    env.DB.prepare(
+      `SELECT s.qid,s.nguon,s.luc,s.ngay_vn,s.ket_qua,s.assistance,json_extract(s.raw_json,'$.tc') AS tc FROM su_kien_hoc s WHERE s.sbd=? AND s.ngay_vn>=? AND ${SQL_LA_LAN_LAM} AND COALESCE(s.visibility,'')<>'embargoed'
+   AND (s.qid IN (SELECT value FROM json_each(?)) OR json_extract(s.raw_json,'$.tc') IN (SELECT value FROM json_each(?)))
+   AND (s.nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=s.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')}))
+   AND (s.nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=s.ma_nguon AND ld.sbd=s.sbd AND ld.status='submitted'))`,
+    )
+      .bind(sbd, TU_NGAY, tat, tcList)
+      .all<Row>(),
+    env.DB.prepare(
+      'SELECT qid,luc FROM loi_giai_hoi WHERE sbd=? AND co_ho_so=1 AND luc>=?',
+    )
+      .bind(sbd, `${TU_NGAY}T00:00:00`)
+      .all<{ qid: string; luc: string }>(),
+    env.DB.prepare(
+      "SELECT DISTINCT qid_chuan AS qid FROM chua_loi_hoc_lieu WHERE qid_chuan IN (SELECT value FROM json_each(?)) AND trang_thai='du_dung'",
+    )
+      .bind(ds)
+      .all<{ qid: string }>(),
+    thamSo ? Promise.resolve(thamSo) : docLuatChua(env, sbd),
+  ])
+  const lan = new Map<string, LanLamLoi[]>(),
+    ss = new Set((materials.results ?? []).map((x) => x.qid))
+  for (const x of r.results ?? []) {
+    const q = qidChuan(str(x.qid)),
+      tc = qidChuan(str(x.tc))
+    const keys = goc.filter(
+      (k) => alias.get(k)?.has(q) || alias.get(k)?.has(tc),
+    )
+    for (const k of keys) {
+      const ds = lan.get(k) ?? []
+      ds.push({
+        luc: str(x.luc),
+        ngayVn: str(x.ngay_vn),
+        ketQua: x.ket_qua == null ? null : (Number(x.ket_qua) as 0 | 1),
+        coHoTro: !['', 'none'].includes(str(x.assistance)),
+        songSinh: (tc !== '' && str(x.qid) !== tc) || str(x.qid) !== q,
+        nguon: str(x.nguon),
+      })
+      lan.set(k, ds)
+    }
+  }
+  for (const q of goc) {
+    const ds = lan.get(q) ?? [],
+      doc = (docs.results ?? [])
+        .filter((x) => alias.get(q)?.has(qidChuan(x.qid)))
+        .map((x) => x.luc),
+      tham = ts ?? THAM_SO_GOC
+    const loiHoc = phatLaiLoi(
+      ds,
+      doc,
+      ss.has(q) || ds.some((x) => x.songSinh),
+      homNay,
+      tham,
+    )
+    const sai = ds
+      .filter((x) => !x.coHoTro && x.ketQua !== 1)
+      .map((x) => Date.parse(x.luc))
+      .filter(Number.isFinite)
+    if (sai.length)
+      ra.set(q, {
+        qidChuan: q,
+        loiHoc,
+        moLuc: Math.min(...sai),
+        saiCuoiLuc: Math.max(...sai),
+      })
+  }
+  return ra
+}
 export async function docTrangThaiLoiDau(
   env: Env,
   sbd: string,
-  qidGoc: string,
+  qid: string,
   homNay: string,
-  ts: ThamSoLuat = THAM_SO_GOC,
+  ts?: ThamSoLuat,
 ): Promise<TrangThaiLoiDau | null> {
-  const q = qidChuan(qidGoc)
-  // Bao gồm câu song sinh (tachSongSinh về gốc)
-  const SQL_NGUON_CA = SQL_DA_CONG_BO('c')
-
-  // Lấy tất cả lần làm sổ cho (sbd, câu gốc / song sinh) từ TU_NGAY
-  const sql = `
-    SELECT s.luc, s.ket_qua, s.ngay_vn, COALESCE(s.assistance,'') AS assistance,
-           COALESCE(s.purpose,'') AS purpose, s.qid, s.nguon
-    FROM su_kien_hoc s
-    WHERE s.sbd = ?
-      AND s.ngay_vn >= ?
-      AND COALESCE(s.qid,'') <> ''
-      AND ${SQL_LA_LAN_LAM}
-      AND COALESCE(s.visibility,'') <> 'embargoed'
-      AND (s.nguon <> 'thi' OR EXISTS (
-            SELECT 1 FROM ca c WHERE c.ma_ca = s.ma_nguon
-              AND c.trang_thai <> 'da_xoa' AND ${SQL_NGUON_CA}))
-  `
-  let rows: Row[] = []
-  try {
-    rows = (await env.DB.prepare(sql).bind(sbd, TU_NGAY).all<Row>()).results ?? []
-  } catch { return null }
-
-  // Lọc chỉ câu gốc và song sinh của nó
-  const lan: LanLamLoi[] = []
-  let moLuc: number | null = null
-  let saiCuoiLuc: number | null = null
-
-  for (const x of rows) {
-    const qRaw = str(x.qid)
-    const qGoc = tachSongSinh(qRaw).goc
-    if (qGoc !== q) continue
-
-    const isSongSinh = qRaw !== qGoc
-    const coHoTro = str(x.assistance) === 'assisted'
-    const kq = x.ket_qua == null ? null : Number(x.ket_qua) as 0 | 1 | null
-    const luc = str(x.luc)
-    const ngayVn = str(x.ngay_vn)
-
-    lan.push({ luc, ngayVn, ketQua: kq, coHoTro, songSinh: isSongSinh, nguon: str(x.nguon) })
-
-    if (!coHoTro && (kq === 0 || kq === null)) {
-      const ms = Date.parse(luc)
-      if (moLuc == null || ms < moLuc) moLuc = ms
-      if (saiCuoiLuc == null || ms > saiCuoiLuc) saiCuoiLuc = ms
-    }
-  }
-
-  if (moLuc == null) return null  // chưa từng sai tự làm
-
-  // Đọc mốc em đã xem lời giải câu này
-  let docLuc: string[] = []
-  try {
-    const r = await env.DB.prepare(
-      'SELECT luc FROM loi_giai_hoi WHERE sbd = ? AND qid = ? AND luc >= ?',
-    ).bind(sbd, q, `${TU_NGAY}T00:00:00`).all<{ luc: string }>()
-    docLuc = (r.results ?? []).map((x) => x.luc)
-  } catch { /* bảng chưa tạo */ }
-
-  const coSongSinh = false  // FSM dạy kiểm riêng khi cần
-  const loiHoc = phatLaiLoi(lan, docLuc, coSongSinh, homNay, ts)
-
-  return { qidChuan: q, loiHoc, moLuc, saiCuoiLuc }
+  return (
+    (await docNhieuTrangThaiLoiDau(env, sbd, [qid], homNay, ts)).get(
+      qidChuan(qid),
+    ) ?? null
+  )
 }
-
-/**
- * Map `TrangThaiLoi` → `TrangThaiDay` ban đầu khi mở đợt mới.
- * Chỉ dùng lúc TẠO đợt; sau đó FSM dạy tự chuyển trạng thái.
- */
 export function trangThaiDayBanDau(
-  loiHoc: KetQuaLoi,
+  loi: KetQuaLoi,
   coHocLieu: boolean,
 ): TrangThaiDay {
-  if (loiHoc.trangThai === 'dong' || loiHoc.trangThai === 'khong_loi') {
-    return 'da_tu_sua'
-  }
-  if (!coHocLieu) return 'thieu_hoc_lieu'
-  return 'can_chan_doan'
+  if (['dong', 'khong_loi'].includes(loi.trangThai)) return 'da_tu_sua'
+  return coHocLieu ? 'can_chan_doan' : 'thieu_hoc_lieu'
 }

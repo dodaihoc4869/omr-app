@@ -171,7 +171,8 @@ export const BANG_GIU: readonly string[] = [
   // LỜI GIẢI TỪNG BƯỚC (loi-giai.ts, 29/09): hồ sơ lời giải thầy duyệt + chỉ mục câu + hàng soạn — HỌC LIỆU, không phải tiến độ game ⇒ GIỮ.
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
   // Em đọc lời giải thế nào (migration-0210-doc-loi-giai.sql, GĐ1 v2 02/10) — hồ sơ học tập của em ⇒ GIỮ (như sổ su_kien_hoc).
-  'doc_loi_giai',
+  'doc_loi_giai', 'loi_giai_hoi',
+  'chua_loi_dot', 'chua_loi_phien', 'chua_loi_item', 'chua_loi_nop', 'chua_loi_hoc_lieu', 'chua_loi_thay', 'chua_loi_trai_nghiem', 'chua_loi_tu_receipt',
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
   // Học liệu máy soạn 05/10 (migration-0510-y-ds.sql): kho ý Đúng–Sai mới (học liệu) + hàng "chỉ học liệu" (như loi_giai_viec) ⇒ GIỮ.

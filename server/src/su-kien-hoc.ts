@@ -24,9 +24,9 @@ export const MUC_DICH_XEM_LOI_GIAI = 'xem_loi_giai'
 // `dau_gio` = Kiểm tra đầu giờ của mục Lên bảng (server/src/dau-gio.ts, 29/09): Đạt 1 / Chưa đạt 0, mã nguồn = mã buổi học.
 // `nen` = câu luyện kiến thức nền của thang tự gỡ (server/src/thang-tu-go.ts, v2 02/10): qid 'nen:<id>', mã nguồn = câu đang gỡ, luôn `assisted`.
 // `tu_luyen` = item trong vòng chữa câu sai (server/src/chua-cau-sai.ts, 07/10): maNguon = 'tu_luyen:<luotId>', raw.tc = Q khi hiển thị S, KHÔNG tăng EXP.
-export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng' | 'dau_gio' | 'nen' | 'tu_luyen'
+export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng' | 'dau_gio' | 'nen' | 'tu_luyen' | 'chua_loi'
 
-export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng', 'dau_gio', 'nen', 'tu_luyen']
+export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng', 'dau_gio', 'nen', 'tu_luyen', 'chua_loi']
 
 /** Hỗ trợ đã cấp cho lần làm này (CNH-1.0 04 §2). */
 export type Assistance = 'none' | 'assisted' | 'unknown'
@@ -303,6 +303,16 @@ const CHON_TU_JSON_MOI = `SELECT json_extract(j.value,'$.k'), json_extract(j.val
 
 const SQL_BO_QUA_TRUNG = `INSERT OR IGNORE INTO su_kien_hoc (${COT}) ${CHON_TU_JSON}`
 const SQL_BO_QUA_TRUNG_MOI = `INSERT OR IGNORE INTO su_kien_hoc (${COT_MOI}) ${CHON_TU_JSON_MOI}`
+
+/** Lệnh sổ chung đi cùng batch nghiệp vụ. Cổng SQL chỉ được tạo bởi máy chủ. */
+export function lenhGhiSuKienNguyenTu(env: Env, ds: SuKien[], cong?: { sql: string; params: unknown[] }) {
+  const rows = ds.map(e => dongJson(e, ngayVn(new Date(e.luc)))).filter(Boolean)
+  const json = JSON.stringify(rows)
+  const sql = cong
+    ? SQL_BO_QUA_TRUNG_MOI.replace('json_each(?)', `json_each(CASE WHEN (${cong.sql}) THEN ? ELSE '[]' END)`)
+    : SQL_BO_QUA_TRUNG_MOI
+  return env.DB.prepare(sql).bind(...(cong?.params ?? []), json)
+}
 
 const SQL_TRANH_TRUNG_LO = `INSERT OR IGNORE INTO su_kien_hoc (${COT}) ${CHON_TU_JSON}
  WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc x

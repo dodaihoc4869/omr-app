@@ -1,0 +1,26 @@
+# Schema chỉ thêm, ba tệp cố định đã soát. Không bật tính năng hoặc đọc/xuất dữ liệu học sinh.
+name: Áp schema vòng chữa câu sai
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: phat-hanh
+jobs:
+  chay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Áp phần schema thiếu và kiểm trigger
+        run: node scripts/ap-migration-chua.mjs --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
