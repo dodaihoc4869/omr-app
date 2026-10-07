@@ -76,3 +76,10 @@ jobs:
           apiToken: ${{ env.CF_TOKEN_SACH }}
           accountId: ${{ env.CF_ACC_SACH }}
           command: pages deploy dist --project-name=omr-app --branch=main
+
+      - name: Kiểm Worker và Pages sống cùng commit
+        run: node scripts/kiem-phat-hanh-chua.mjs --schema --live
+        env:
+          CHUA_RELEASE_SHA: ${{ github.sha }}
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}

@@ -36,6 +36,6 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          node scripts/kiem-phat-hanh-chua.mjs --schema
+          node scripts/kiem-phat-hanh-chua.mjs --schema --live
           npx esbuild scripts/bat-vong-chua-0710.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/chua-bat.mjs --log-level=warning
           node /tmp/chua-bat.mjs
