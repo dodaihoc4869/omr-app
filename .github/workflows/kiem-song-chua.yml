@@ -41,6 +41,7 @@ jobs:
         run: |
           node --input-type=module <<'JS'
           // Kiểm chỉ đọc không dùng cổng dừng phát hành khi đang có ca thi.
+          import {laCauTuLuan} from './scripts/xet-tu-luan-doc.bundle.mjs';
           const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
           async function query(sql){
             if(!/^SELECT\b/i.test(sql.trim()))throw Error('Chỉ cho phép SELECT trong lượt kiểm.');
@@ -61,6 +62,10 @@ jobs:
           console.log(JSON.stringify((await query("SELECT COUNT(*) AS soDot,COUNT(DISTINCT sbd) AS soEm,COUNT(DISTINCT qid_chuan) AS soCau,(SELECT COUNT(*) FROM chua_loi_tu_receipt) AS soReceiptTu,(SELECT COUNT(*) FROM chua_loi_hoc_lieu WHERE trang_thai='du_dung') AS soHocLieuDaDuyet FROM chua_loi_dot WHERE dong_luc IS NULL"))[0]));
           console.log(JSON.stringify(await query("SELECT trang_thai_day AS trangThai,COUNT(*) AS soDot FROM chua_loi_dot WHERE dong_luc IS NULL GROUP BY trang_thai_day")));
           console.log(JSON.stringify((await query("SELECT COUNT(DISTINCT e.qid_chuan) AS soCauMo,COUNT(DISTINCT CASE WHEN EXISTS(SELECT 1 FROM chua_loi_hoc_lieu h JOIN game_v2_question q ON q.qid=h.qid_chuan JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE h.qid_chuan=e.qid_chuan AND h.content_version=e.phien_ban_cau AND h.content_version=q.version AND h.trang_thai='du_dung' AND COALESCE(d.da_xoa,0)=0) THEN e.qid_chuan END) AS soCauPhuDungBan FROM chua_loi_dot e WHERE e.dong_luc IS NULL"))[0]));
+          // Cùng phép chọn nguồn và bộ loại tự luận với viecVongChua; chỉ in số đếm.
+          const roots=await query("SELECT q.json,EXISTS(SELECT 1 FROM chua_loi_hoc_lieu h WHERE h.qid_chuan=q.qid AND h.content_version=q.version AND h.trang_thai='du_dung') AS coHocLieu FROM chua_loi_dot e JOIN game_v2_question q ON q.qid=e.qid_chuan JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE e.dong_luc IS NULL AND COALESCE(d.da_xoa,0)=0 GROUP BY q.qid");
+          const ready=roots.map(x=>({cau:JSON.parse(x.json),coHocLieu:x.coHocLieu===1})).filter(x=>x.cau.reviewed===true&&!laCauTuLuan(x.cau));
+          console.log(JSON.stringify({nguonMaySoan:{soCauCoNguonHienTai:roots.length,soCauDuDieuKien:ready.length,soCauCanSoan:ready.filter(x=>!x.coHocLieu).length}}));
           const now=Date.now(),cohort=String(config.cohortId??'').replaceAll("'","''");
           const k=(await query(`SELECT COUNT(*) AS giao,COUNT(DISTINCT sbd) AS soHs,SUM(CASE WHEN chot_do_luc>0 AND chot_do_luc<=${now} THEN 1 ELSE 0 END) AS mauSo,SUM(CASE WHEN chot_do_luc>0 AND chot_do_luc<=${now} AND ket_qua_gap2='dung_tu_lam' AND EXISTS(SELECT 1 FROM chua_loi_nop n JOIN chua_loi_item i ON i.id=n.item_id JOIN chua_loi_phien p ON p.id=n.phien_id WHERE n.id=receipt_gap2 AND n.nop_luc<=chot_do_luc AND n.dung=1 AND n.co_ho_tro=0 AND i.loai='kiem_chung' AND p.lan_gap_lai=2 AND n.pending=0) THEN 1 ELSE 0 END) AS tuSo FROM chua_loi_dot WHERE cohort_id='${cohort}'`))[0];
           console.log(JSON.stringify({kpi:{...k,mauSo:k.mauSo??0,tuSo:k.tuSo??0,phanTram:k.mauSo?Math.round(k.tuSo/k.mauSo*1000)/10:null}}));
