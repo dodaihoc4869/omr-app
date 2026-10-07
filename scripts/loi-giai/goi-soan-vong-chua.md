@@ -6,7 +6,7 @@ Xuất `hoc-lieu.json`: `{schemaVersion:1,qidGoc:cau.qid,contentVersion:cau.vers
 
 Tách 1–8 bước theo cách giải thật; mỗi bước vừa sức trong khoảng 1–2 phút. Mỗi bước có:
 
-- `id`, `thuTu` bắt đầu 0, `tieuDe` gần gũi, `tienQuyet` là id bước trước, `viKyNang` là các kỹ năng cụ thể; phần II ghi `yApDung` (0–3) để đúng từng ý.
+- `id`, `thuTu` bắt đầu 0, `tieuDe` gần gũi, `viKyNang` là các kỹ năng cụ thể; phần II ghi `yApDung` (0–3) để đúng từng ý. **`tienQuyet` — bắt buộc là MẢNG chuỗi** (không phải chuỗi đơn, không phải null): bước 0 dùng `[]`; bước 1 trở đi dùng `["id_buoc_truoc"]`. Ví dụ: bước 0 → `"tienQuyet":[]`; bước 1 → `"tienQuyet":["b0"]`; bước 2 → `"tienQuyet":["b1"]`.
 - `chanDoan`: tối thiểu 1 câu nhỏ định vị bước mắc; `phanBiet`: tối thiểu 1 câu kiểm lại giả thuyết sai; `kiemLai`: tối thiểu 2 câu mới độc lập. Các câu phải đủ dữ kiện và kiểm đúng kỹ năng bước này.
 - `hoTro`: 3 mức `{muc:1|2|3,noiDung}`: gợi ý nhìn dữ kiện → giải thích vì sao → ví dụ có số/chất khác, dẫn tự làm. Không tiết lộ đáp án của câu kiểm sắp xuất hiện.
 - `loiThuongGap`: `{ma,loai,tinHieu,probeXacNhan}`; `loai` là doc_de/kien_thuc/phuong_phap/tinh_toan. Một đáp án sai chỉ là giả thuyết; câu xác nhận phải phân biệt với đoán, thiếu đọc hoặc lỗi tính.
