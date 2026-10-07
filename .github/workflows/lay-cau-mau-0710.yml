@@ -1,6 +1,6 @@
 name: Lấy câu mẫu D1 cho pipeline soạn song sinh
 # Workflow tạm thời: chỉ đọc D1, không deploy gì.
-# Commit kết quả vào nhánh claude/laughing-bohr-1ixzp4.
+# Commit kết quả vào nhánh claude/laughing-bohr-1ixzp4 (--force để bypass .gitignore).
 on:
   workflow_dispatch:
 permissions:
@@ -45,11 +45,11 @@ jobs:
           console.log('Lay duoc', rows.length, 'cau:', JSON.stringify(dangs));
           fs.writeFileSync('.may-soan/cau-mau-d1.json', JSON.stringify(rows, null, 2));
           "
-      - name: Commit câu mẫu vào nhánh claude/laughing-bohr-1ixzp4
+      - name: Commit câu mẫu vào nhánh (force qua .gitignore)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .may-soan/cau-mau-d1.json
+          git add --force .may-soan/cau-mau-d1.json
           git diff --cached --quiet && echo "Khong co thay doi" || \
-            git commit -m "ci: câu mẫu D1 $(date -u '+%d/%m %H:%M') [skip ci]"
+            git commit -m "ci: câu mẫu D1 $(date -u '+%d/%m/%Y %H:%M') [skip ci]"
           git push origin HEAD:claude/laughing-bohr-1ixzp4
