@@ -75,6 +75,10 @@ describe('Checkpoint cửa sổ giao', () => {
     const r = await raCuaSo(100, async offset => ({ ok: true, soCap: offset < 104 ? 2 : offset === 104 ? 1 : 0, tiepOffset: offset + (offset < 104 ? 2 : offset === 104 ? 1 : 0), con: offset < 104 }))
     expect(r).toEqual({ tiepOffset: 105, con: false, soCap: 5 })
   })
+  it('24 lô độc lập vẫn chốt đúng 48 cặp liên tục', async () => {
+    const r = await raCuaSo(100, async offset => ({ok:true,soCap:2,tiepOffset:offset+2,con:true}), 24)
+    expect(r).toEqual({tiepOffset:148,con:true,soCap:48})
+  })
   it('lỗi giữa cửa sổ đợi các lô còn lại xong rồi giữ checkpoint cũ', async () => {
     let completed = 0
     await expect(raCuaSo(100, async offset => {

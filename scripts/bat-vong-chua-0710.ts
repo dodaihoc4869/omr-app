@@ -70,11 +70,11 @@ async function main() {
     const gan = await taoGiaoGanD1()
     try {
       while (!receipt.giaoXong) {
-        const r = await raCuaSo(receipt.offset, gan.goi)
+        const r = await raCuaSo(receipt.offset, gan.goi, 24)
         receipt.offset = r.tiepOffset; receipt.giaoXong = !r.con
         await luu()
         n += r.soCap
-        if (n % 120 === 0 || receipt.giaoXong) console.log(JSON.stringify({ soCapEmCauDaRa: n, giaoXong: receipt.giaoXong }))
+        if (n % 240 === 0 || receipt.giaoXong) console.log(JSON.stringify({ soCapEmCauDaRa: n, giaoXong: receipt.giaoXong }))
       }
     } finally { await gan.close() }
   }

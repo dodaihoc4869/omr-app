@@ -1,4 +1,7 @@
 {
   "runId": 37577856730,
-  "sha": "7cfe9466fb5fb4bf6ba80d6fa913967bf9ab5711"
+  "sha": "7cfe9466fb5fb4bf6ba80d6fa913967bf9ab5711",
+  "workerGiaoCuRunId": 37581879394,
+  "workerGiaoCuAttempt": 1,
+  "workerGiaoCuSha": "5dccdbb2cc6b2a68eba1f5cc5528d648f47d784d"
 }
