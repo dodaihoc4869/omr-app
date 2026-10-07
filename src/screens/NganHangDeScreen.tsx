@@ -682,7 +682,7 @@ export default function NganHangDeScreen() {
               <NutChinh variant="phu" onClick={() => xoaTrenMayNay(hoiXoa.s.maDe)} disabled={dangXoa}>
                 Chỉ xoá trên máy này
               </NutChinh>
-              <div style={NHAN_NHO}>Kho trên Apps Script vẫn giữ. Bấm Đồng bộ là đề về lại máy.</div>
+              <div style={NHAN_NHO}>Kho trên máy chủ vẫn giữ. Bấm Đồng bộ là đề về lại máy.</div>
             </div>
 
             <div className="flex flex-col" style={{ gap: 'var(--k1)' }}>

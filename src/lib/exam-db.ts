@@ -450,7 +450,7 @@ export function coMaBiMatPhien(): boolean {
   return maBiMatPhien !== null && maBiMatPhien !== ''
 }
 
-/** Mã bí mật kho đề (khớp MA_BI_MAT trong Apps Script) — chỉ trên máy thầy. */
+/** Mã bí mật của thầy (khớp MA_BI_MAT của máy chủ Cloudflare) — chỉ trên máy thầy. */
 export async function saveTeacherSecret(secret: string): Promise<void> {
   const db = await getDb()
   await db.put(STORE_SETTINGS, secret, 'teacherSecret')
