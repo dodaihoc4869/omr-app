@@ -67,7 +67,7 @@ jobs:
         with:
           apiToken: ${{ env.CF_TOKEN_SACH }}
           accountId: ${{ env.CF_ACC_SACH }}
-          command: deploy
+          command: deploy --tag=${{ github.sha }}
           workingDirectory: server
 
       - name: Đẩy lên Cloudflare Pages
