@@ -38,8 +38,8 @@ export async function tinhNangBat(
 ): Promise<boolean> {
   const cfg = await docCauHinh(env)
   if (!cfg.bat) return false
-  // Không giới hạn → mở toàn bộ
-  if (cfg.lop.length === 0 && cfg.sbd.length === 0) return true
+  // Không có phạm vi → đóng (không mở toàn trường khi thiếu allowlist)
+  if (cfg.lop.length === 0 && cfg.sbd.length === 0) return false
   if (opts.sbd && cfg.sbd.includes(opts.sbd)) return true
   if (opts.lop && cfg.lop.includes(opts.lop)) return true
   return false

@@ -3503,6 +3503,8 @@ const boXuLy = {
     if (req.method === 'GET' && (p.startsWith('/t/') || p.startsWith('/d/'))) {
       return Response.redirect(`https://omr-app-b3u.pages.dev${p}`, 302)
     }
+    // KPI vòng chữa câu sai — GET (UI thầy dùng fetch không body)
+    if (req.method === 'GET' && p === '/gv/chua-cau-sai/thong-ke') return chuaThongKe(env, url.searchParams)
     if (req.method !== 'POST') return ra({ ok: false, error: 'Chỉ nhận POST' }, 405)
 
     try {
@@ -3665,7 +3667,7 @@ const boXuLy = {
       if (p === '/hs/chua-cau-sai/phat-item') return ra(await chuaPhatItem(env, b))
       if (p === '/hs/chua-cau-sai/nop-item') return ra(await chuaNopItem(env, b))
       if (p === '/hs/chua-cau-sai/xin-goi-y') return ra(await chuaXinGoiY(env, b))
-      if (p === '/hs/chua-cau-sai/tien-do') return ra(await chuaTienDo(env, url.searchParams))
+      if (p === '/hs/chua-cau-sai/tien-do') return chuaTienDo(env, b)
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
