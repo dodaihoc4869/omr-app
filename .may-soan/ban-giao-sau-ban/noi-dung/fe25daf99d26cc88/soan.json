@@ -55,18 +55,18 @@
   {
    "kieu": "ly_thuyet",
    "cach": "dao_chieu",
-   "de": "Vì sao neutron khó phát hiện bằng điện trường hoặc từ trường?",
+   "de": "Điện tích của neutron bằng bao nhiêu?",
    "pa": {
-    "A": "Neutron không mang điện nên không bị lệch bởi điện trường hoặc từ trường.",
-    "B": "Neutron mang điện tích quá nhỏ để đo được.",
-    "C": "Khối lượng neutron quá lớn so với proton.",
-    "D": "Neutron không có khối lượng."
+    "A": "Bằng 0.",
+    "B": "+1,6×10⁻¹⁹ C.",
+    "C": "−1,6×10⁻¹⁹ C.",
+    "D": "Bằng điện tích proton nhưng trái dấu."
    },
    "dap_an": "A",
    "buoc": [
-    "Hạt không mang điện không tương tác với điện/từ trường."
+    "Neutron là hạt trung hoà điện, có điện tích bằng 0."
    ],
-   "chot": "Neutron trung hòa về điện → không lệch trong điện trường hay từ trường."
+   "chot": "Neutron là hạt không mang điện, điện tích bằng 0."
   },
   {
    "kieu": "ly_thuyet",

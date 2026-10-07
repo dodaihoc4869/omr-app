@@ -2,7 +2,7 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Tia lệch về cực dương nên mang điện tích âm.",
+  "lyDo": "Lệch về cực dương nên tia mang điện tích âm.",
   "chac": true
  },
  {
@@ -14,25 +14,25 @@
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "Chùm electron mang điện âm bị hút về bản cực dương.",
+  "lyDo": "Chùm electron mang điện âm nên lệch về bản cực dương.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "e/m không đổi với mọi kim loại catode nên electron có trong mọi nguyên tử.",
+  "lyDo": "e/m không đổi với mọi kim loại catode nên electron có mặt trong mọi nguyên tử; các phương án khác không phải kết luận của Thomson.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "A",
-  "lyDo": "Electron được phát hiện từ tia âm cực.",
+  "lyDo": "Nghiên cứu ống tia âm cực dẫn đến phát hiện electron.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "C",
-  "lyDo": "Thomson gọi hạt tạo nên tia âm cực là electron.",
+  "lyDo": "J.J. Thomson phát hiện electron.",
   "chac": true
  }
 ]

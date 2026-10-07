@@ -19,7 +19,7 @@
    "chot": "Tia âm cực mang điện tích âm.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Tia lệch về cực dương nên mang điện tích âm.",
+    "lyDo2": "Lệch về cực dương nên tia mang điện tích âm.",
     "chac": true
    }
   },
@@ -63,7 +63,7 @@
    "chot": "Hạt mang điện âm lệch về phía bản cực dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Chùm electron mang điện âm bị hút về bản cực dương.",
+    "lyDo2": "Chùm electron mang điện âm nên lệch về bản cực dương.",
     "chac": true
    }
   },
@@ -84,7 +84,7 @@
    "chot": "Electron là hạt cấu thành chung của mọi nguyên tử.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "e/m không đổi với mọi kim loại catode nên electron có trong mọi nguyên tử.",
+    "lyDo2": "e/m không đổi với mọi kim loại catode nên electron có mặt trong mọi nguyên tử; các phương án khác không phải kết luận của Thomson.",
     "chac": true
    }
   },
@@ -106,14 +106,14 @@
    "chot": "Ống tia âm cực dẫn tới electron.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Electron được phát hiện từ tia âm cực.",
+    "lyDo2": "Nghiên cứu ống tia âm cực dẫn đến phát hiện electron.",
     "chac": true
    }
   },
   {
    "kieu": "ly_thuyet",
    "cach": "doi_chat",
-   "de": "Trong ống phóng điện, tia âm cực truyền thẳng khi không có điện trường và từ trường. Khi bật điện trường, tia bị lệch. Hạt tạo nên tia âm cực được J.J. Thomson đặt tên là gì?",
+   "de": "J.J. Thomson trong thí nghiệm ống phóng điện đã phát hiện ra hạt nào?",
    "pa": {
     "A": "Proton.",
     "B": "Neutron.",
@@ -122,12 +122,12 @@
    },
    "dap_an": "C",
    "buoc": [
-    "Tia âm cực là dòng các hạt electron."
+    "Thomson nghiên cứu tia âm cực và xác định chúng là dòng các hạt mang điện âm, nhỏ hơn nguyên tử — gọi là electron."
    ],
-   "chot": "Hạt tạo nên tia âm cực là electron.",
+   "chot": "Thomson phát hiện electron qua thí nghiệm tia âm cực.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Thomson gọi hạt tạo nên tia âm cực là electron.",
+    "lyDo2": "J.J. Thomson phát hiện electron.",
     "chac": true
    }
   }

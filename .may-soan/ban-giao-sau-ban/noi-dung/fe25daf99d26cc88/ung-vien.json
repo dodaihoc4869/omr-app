@@ -20,7 +20,7 @@
    "chot": "Hạt nhân được phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Rutherford bắn hạt α vào lá vàng mỏng dẫn đến phát hiện hạt nhân.",
+    "lyDo2": "Rutherford bắn hạt α vào lá vàng mỏng phát hiện hạt nhân.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Neutron là hạt không mang điện.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Hạt Chadwick phát hiện là neutron, không mang điện (điện tích 0).",
+    "lyDo2": "Hạt Chadwick phát hiện là neutron, không mang điện.",
     "chac": true
    }
   },
@@ -63,28 +63,28 @@
    "chot": "Khối lượng neutron xấp xỉ bằng khối lượng proton.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Khối lượng neutron (1,675.10^-27 kg) gần bằng proton (1,673.10^-27 kg).",
+    "lyDo2": "Khối lượng neutron (1,675×10⁻²⁷ kg) gần bằng proton (1,673×10⁻²⁷ kg).",
     "chac": true
    }
   },
   {
    "kieu": "ly_thuyet",
    "cach": "dao_chieu",
-   "de": "Vì sao neutron khó phát hiện bằng điện trường hoặc từ trường?",
+   "de": "Điện tích của neutron bằng bao nhiêu?",
    "pa": {
-    "A": "Neutron không mang điện nên không bị lệch bởi điện trường hoặc từ trường.",
-    "B": "Neutron mang điện tích quá nhỏ để đo được.",
-    "C": "Khối lượng neutron quá lớn so với proton.",
-    "D": "Neutron không có khối lượng."
+    "A": "Bằng 0.",
+    "B": "+1,6×10⁻¹⁹ C.",
+    "C": "−1,6×10⁻¹⁹ C.",
+    "D": "Bằng điện tích proton nhưng trái dấu."
    },
    "dap_an": "A",
    "buoc": [
-    "Hạt không mang điện không tương tác với điện/từ trường."
+    "Neutron là hạt trung hoà điện, có điện tích bằng 0."
    ],
-   "chot": "Neutron trung hòa về điện → không lệch trong điện trường hay từ trường.",
+   "chot": "Neutron là hạt không mang điện, điện tích bằng 0.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Neutron không mang điện nên không bị lệch trong điện trường/từ trường.",
+    "lyDo2": "Neutron không mang điện.",
     "chac": true
    }
   },
@@ -105,7 +105,7 @@
    "chot": "Thí nghiệm Chadwick: bắn hạt α vào Beryllium → phát hiện neutron.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Chadwick bắn hạt α vào Beryllium năm 1932.",
+    "lyDo2": "Chadwick bắn phá Beryllium bằng hạt α phát hiện neutron.",
     "chac": true
    }
   },

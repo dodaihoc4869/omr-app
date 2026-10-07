@@ -2,31 +2,31 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Rutherford bắn hạt α vào lá vàng mỏng dẫn đến phát hiện hạt nhân.",
+  "lyDo": "Rutherford bắn hạt α vào lá vàng mỏng phát hiện hạt nhân.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện (điện tích 0).",
+  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Khối lượng neutron (1,675.10^-27 kg) gần bằng proton (1,673.10^-27 kg).",
+  "lyDo": "Khối lượng neutron (1,675×10⁻²⁷ kg) gần bằng proton (1,673×10⁻²⁷ kg).",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "Neutron không mang điện nên không bị lệch trong điện trường/từ trường.",
+  "lyDo": "Neutron không mang điện.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "Chadwick bắn hạt α vào Beryllium năm 1932.",
+  "lyDo": "Chadwick bắn phá Beryllium bằng hạt α phát hiện neutron.",
   "chac": true
  },
  {
