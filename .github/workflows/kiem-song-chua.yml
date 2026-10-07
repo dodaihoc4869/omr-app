@@ -23,9 +23,10 @@ jobs:
               console.log(JSON.stringify({path,status:r.status,type:r.headers.get('content-type'),server:r.headers.get('server'),cache:r.headers.get('cf-cache-status'),url:r.url,app:text.includes('startup-retry'),size:text.length}));
             }
           }
-          for(const path of ['/hs/chua-cau-sai/danh-sach','/gv/chua-cau-sai/hang-chieu']) {
+          for(const [path,expected] of [['/hs/chua-cau-sai/danh-sach',401],['/gv/chua-cau-sai/hang-chieu',403],['/kho/may-soan/vong-chua-viec',403],['/kho/may-soan/nop-vong-chua',403]]) {
             const r=await fetch('https://omr.ttadodaihoc.workers.dev'+path,{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(20000)});
             console.log(JSON.stringify({path,status:r.status}));
+            if(r.status!==expected)throw Error('Đường sống chưa giữ đúng cổng quyền.');
           }
           JS
       - name: Làm sạch khoá để đọc trạng thái D1
