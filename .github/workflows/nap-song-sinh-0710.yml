@@ -16,10 +16,21 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Kiểm secret OMR_MA_BI_MAT
+        env:
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+        run: |
+          if [ -z "$OMR_MA_BI_MAT" ]; then
+            echo "DỪNG: Secret OMR_MA_BI_MAT chưa được đặt trong repo Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "Secret OMR_MA_BI_MAT: có giá trị (${#OMR_MA_BI_MAT} ký tự) ✓"
       - name: Nạp 216 ứng viên vào D1 qua Worker endpoint
         env:
           OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
-        run: node scripts/nap-song-sinh-0710.mjs 2>&1 | tee /tmp/ket-qua-nap.log
+        run: |
+          set -o pipefail
+          node scripts/nap-song-sinh-0710.mjs 2>&1 | tee /tmp/ket-qua-nap.log
       - name: Upload kết quả nạp
         uses: actions/upload-artifact@v4
         if: always()
@@ -34,11 +45,13 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
-      - name: Kiểm độ phủ thực tế từ D1
+      - name: Kiểm độ phủ thực tế từ D1 (36 bam duy nhất)
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-        run: node scripts/kiem-phu-sau-nap-0710.mjs
+        run: |
+          set -o pipefail
+          node scripts/kiem-phu-sau-nap-0710.mjs
       - name: Upload kết quả kiểm độ phủ
         uses: actions/upload-artifact@v4
         if: always()
