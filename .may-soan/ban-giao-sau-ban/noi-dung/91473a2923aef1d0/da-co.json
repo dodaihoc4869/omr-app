@@ -1,0 +1,25 @@
+{
+ "banKhac": [
+  {
+   "de": "Tổng số electron, proton và neutron trong một phân tử NH₃ là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ được tạo nên từ 1 proton và 1 electron, nguyên tử N có 7 proton và 7 neutron.",
+   "dap_an": "D",
+   "pa": {
+    "A": "23.",
+    "B": "20.",
+    "C": "17.",
+    "D": "27."
+   }
+  },
+  {
+   "de": "Tổng số electron, proton và neutron trong một phân tử CH₄ là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ được tạo nên từ 1 proton và 1 electron, nguyên tử C có 6 proton và 6 neutron.",
+   "dap_an": "A",
+   "pa": {
+    "A": "26.",
+    "B": "20.",
+    "C": "16.",
+    "D": "10."
+   }
+  }
+ ],
+ "yDs": []
+}

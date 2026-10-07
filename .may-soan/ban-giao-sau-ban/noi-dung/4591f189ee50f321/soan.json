@@ -1,0 +1,108 @@
+{
+ "qid": "10-C1-B1-I-4",
+ "bam": "4591f189ee50f321",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây về cấu tạo nguyên tử là SAI?",
+   "pa": {
+    "A": "Hạt nhân nằm ở tâm nguyên tử.",
+    "B": "Electron chuyển động xung quanh hạt nhân.",
+    "C": "Proton nằm ở lớp vỏ nguyên tử.",
+    "D": "Neutron nằm trong hạt nhân nguyên tử."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Proton và neutron đều nằm trong hạt nhân ở tâm nguyên tử.",
+    "Chỉ electron ở lớp vỏ, nên phát biểu proton nằm ở lớp vỏ là sai."
+   ],
+   "chot": "Lớp vỏ chỉ chứa electron; proton và neutron ở hạt nhân."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Hạt nào sau đây nằm ở lớp vỏ nguyên tử?",
+   "pa": {
+    "A": "Proton.",
+    "B": "Electron.",
+    "C": "Neutron.",
+    "D": "Proton và neutron."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Proton và neutron nằm trong hạt nhân.",
+    "Electron chuyển động xung quanh hạt nhân, tạo thành lớp vỏ nguyên tử."
+   ],
+   "chot": "Hạt ở lớp vỏ là electron."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Hạt nhân của hầu hết các nguyên tử gồm các hạt:",
+   "pa": {
+    "A": "proton và electron.",
+    "B": "neutron và electron.",
+    "C": "electron, proton và neutron.",
+    "D": "proton và neutron."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Electron không nằm trong hạt nhân mà ở lớp vỏ.",
+    "Hạt nhân gồm proton và neutron."
+   ],
+   "chot": "Hạt nhân gồm proton và neutron, không có electron."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây về lớp vỏ nguyên tử là đúng?",
+   "pa": {
+    "A": "Lớp vỏ chứa các electron mang điện tích âm.",
+    "B": "Lớp vỏ chứa các proton mang điện tích dương.",
+    "C": "Lớp vỏ gồm proton và electron.",
+    "D": "Lớp vỏ chứa các neutron không mang điện."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Lớp vỏ chỉ có electron, mang điện tích âm.",
+    "Proton và neutron nằm trong hạt nhân nên các phát biểu còn lại sai."
+   ],
+   "chot": "Lớp vỏ gồm các electron mang điện tích âm."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Hạt neutron không mang điện nằm ở vị trí nào của nguyên tử?",
+   "pa": {
+    "A": "Lớp vỏ nguyên tử.",
+    "B": "Cả lớp vỏ và hạt nhân.",
+    "C": "Hạt nhân nguyên tử.",
+    "D": "Khoảng trống giữa lớp vỏ và hạt nhân."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Lớp vỏ chỉ chứa electron.",
+    "Neutron cùng với proton tạo nên hạt nhân nguyên tử."
+   ],
+   "chot": "Neutron nằm trong hạt nhân cùng proton."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Phát biểu nào sau đây về nguyên tử là KHÔNG đúng?",
+   "pa": {
+    "A": "Nguyên tử trung hoà về điện.",
+    "B": "Hạt nhân mang điện tích dương.",
+    "C": "Số proton bằng số electron trong nguyên tử.",
+    "D": "Hạt nhân nguyên tử chứa electron."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Hạt nhân gồm proton (mang điện dương) và neutron nên mang điện dương.",
+    "Số proton bằng số electron nên nguyên tử trung hoà; electron nằm ở lớp vỏ, không ở hạt nhân."
+   ],
+   "chot": "Electron chỉ có ở lớp vỏ, không có trong hạt nhân."
+  }
+ ]
+}

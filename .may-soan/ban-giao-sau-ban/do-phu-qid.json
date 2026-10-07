@@ -1,4 +1,13 @@
 {
+ "10-C1-B1-I-41": {
+  "bam": "0767b33713da6c65",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
  "10-C1-B1-I-14": {
   "bam": "168098bfb3a037b4",
   "phan": "I",
@@ -26,6 +35,15 @@
   "soYDaKiem": 0,
   "trangThai": "du"
  },
+ "10-C1-B1-I-33": {
+  "bam": "2679d42be85fd9f3",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
  "10-C1-B1-I-23": {
   "bam": "312396fc19d65df3",
   "phan": "I",
@@ -46,6 +64,15 @@
  },
  "10-C1-B1-I-17": {
   "bam": "41ad7e27427ad327",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-4": {
+  "bam": "4591f189ee50f321",
   "phan": "I",
   "soBanCauTruc": 6,
   "soDaKiem": 6,
@@ -89,6 +116,15 @@
   "soYDaKiem": 0,
   "trangThai": "du"
  },
+ "10-C1-B1-I-34": {
+  "bam": "6ce1c88d3b6fc775",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
  "10-C1-B1-I-20": {
   "bam": "6d32e6a153f69a13",
   "phan": "I",
@@ -116,8 +152,53 @@
   "soYDaKiem": 0,
   "trangThai": "du"
  },
+ "10-C1-B1-I-32": {
+  "bam": "792677f09421fce2",
+  "phan": "I",
+  "soBanCauTruc": 4,
+  "soDaKiem": 4,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "mot_phan"
+ },
+ "10-C1-B1-I-39": {
+  "bam": "91473a2923aef1d0",
+  "phan": "I",
+  "soBanCauTruc": 4,
+  "soDaKiem": 4,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "mot_phan"
+ },
+ "10-C1-B1-I-31": {
+  "bam": "93732f17ae61b401",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-37": {
+  "bam": "a6a877a4d34a3d11",
+  "phan": "I",
+  "soBanCauTruc": 4,
+  "soDaKiem": 4,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "mot_phan"
+ },
  "10-C1-B1-I-10": {
   "bam": "af63959aa4d5ac12",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-40": {
+  "bam": "afcac0a3a6c5c4c3",
   "phan": "I",
   "soBanCauTruc": 6,
   "soDaKiem": 6,
@@ -161,8 +242,35 @@
   "soYDaKiem": 0,
   "trangThai": "du"
  },
+ "10-C1-B1-I-38": {
+  "bam": "cdedf2be3ad309a8",
+  "phan": "I",
+  "soBanCauTruc": 4,
+  "soDaKiem": 4,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "mot_phan"
+ },
+ "10-C1-B1-I-36": {
+  "bam": "e8c167fa285e3fe2",
+  "phan": "I",
+  "soBanCauTruc": 4,
+  "soDaKiem": 4,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "mot_phan"
+ },
  "10-C1-B1-I-30": {
   "bam": "e98670590b2997e3",
+  "phan": "I",
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
+  "soYCauTruc": 0,
+  "soYDaKiem": 0,
+  "trangThai": "du"
+ },
+ "10-C1-B1-I-35": {
+  "bam": "eb0dba030fa48db4",
   "phan": "I",
   "soBanCauTruc": 6,
   "soDaKiem": 6,

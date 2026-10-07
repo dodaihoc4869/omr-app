@@ -1,0 +1,138 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Tổng số electron, proton và neutron trong một phân tử H₂S là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ được tạo nên từ 1 proton và 1 electron, nguyên tử S có 16 proton và 16 neutron.",
+  "pa": {
+   "A": "34.",
+   "B": "52.",
+   "C": "36.",
+   "D": "68."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Số proton = 2 × 1 + 16 = 18; phân tử trung hoà nên số electron cũng là 18.",
+   "Số neutron = 16 (nguyên tử H không có neutron).",
+   "Tổng = 18 + 18 + 16 = 52."
+  ],
+  "chot": "Cộng hạt của từng nguyên tử, nhớ electron bằng proton và H không có neutron.",
+  "phepTinh": [
+   {
+    "ten": "Số proton",
+    "bieuThuc": "2*1+16",
+    "ketQua": 18,
+    "lamTron": 0
+   },
+   {
+    "ten": "Tổng số hạt",
+    "bieuThuc": "(2*1+16)*2+16",
+    "ketQua": 52,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss2",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Tổng số electron, proton và neutron trong một phân tử HCl là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ được tạo nên từ 1 proton và 1 electron, nguyên tử Cl có 17 proton và 18 neutron.",
+  "pa": {
+   "A": "36.",
+   "B": "18.",
+   "C": "54.",
+   "D": "72."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Số proton = 1 + 17 = 18; phân tử trung hoà nên số electron cũng là 18.",
+   "Số neutron = 18 (nguyên tử H không có neutron).",
+   "Tổng = 18 + 18 + 18 = 54."
+  ],
+  "chot": "Cộng hạt của từng nguyên tử, nhớ electron bằng proton và H không có neutron.",
+  "phepTinh": [
+   {
+    "ten": "Số proton",
+    "bieuThuc": "1+17",
+    "ketQua": 18,
+    "lamTron": 0
+   },
+   {
+    "ten": "Tổng số hạt",
+    "bieuThuc": "(1+17)*2+18",
+    "ketQua": 54,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss3",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Tổng số electron, proton và neutron trong một phân tử CO₂ là bao nhiêu?\nBiết trong phân tử này, nguyên tử C có 6 proton và 6 neutron, nguyên tử O có 8 proton và 8 neutron.",
+  "pa": {
+   "A": "44.",
+   "B": "22.",
+   "C": "88.",
+   "D": "66."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Số proton = 6 + 2 × 8 = 22; phân tử trung hoà nên số electron cũng là 22.",
+   "Số neutron = 6 + 2 × 8 = 22.",
+   "Tổng = 22 + 22 + 22 = 66."
+  ],
+  "chot": "Cộng hạt của từng nguyên tử, nhớ electron bằng proton.",
+  "phepTinh": [
+   {
+    "ten": "Số proton",
+    "bieuThuc": "6+2*8",
+    "ketQua": 22,
+    "lamTron": 0
+   },
+   {
+    "ten": "Tổng số hạt",
+    "bieuThuc": "(6+2*8)*3",
+    "ketQua": 66,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss4",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Tổng số electron, proton và neutron trong một phân tử HF là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ được tạo nên từ 1 proton và 1 electron, nguyên tử F có 9 proton và 10 neutron.",
+  "pa": {
+   "A": "30.",
+   "B": "20.",
+   "C": "19.",
+   "D": "40."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Số proton = 1 + 9 = 10; phân tử trung hoà nên số electron cũng là 10.",
+   "Số neutron = 10 (nguyên tử H không có neutron).",
+   "Tổng = 10 + 10 + 10 = 30."
+  ],
+  "chot": "Cộng hạt của từng nguyên tử, nhớ electron bằng proton và H không có neutron.",
+  "phepTinh": [
+   {
+    "ten": "Số proton",
+    "bieuThuc": "1+9",
+    "ketQua": 10,
+    "lamTron": 0
+   },
+   {
+    "ten": "Tổng số hạt",
+    "bieuThuc": "(1+9)*2+10",
+    "ketQua": 30,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ }
+]

@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Proton nằm trong hạt nhân, không ở lớp vỏ",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "B",
+  "lyDo": "Lớp vỏ chỉ chứa electron",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "Hạt nhân gồm proton và neutron",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "Lớp vỏ chứa electron mang điện âm",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "Neutron nằm trong hạt nhân",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "D",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron",
+  "chac": true
+ }
+]

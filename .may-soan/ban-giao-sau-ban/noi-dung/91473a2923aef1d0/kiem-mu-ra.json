@@ -1,0 +1,26 @@
+[
+ {
+  "id": "ss1",
+  "d": "B",
+  "lyDo": "p = 18, e = 18, n = 16, tổng 52",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "C",
+  "lyDo": "p = 18, e = 18, n = 18, tổng 54",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "p = 22, e = 22, n = 22, tổng 66",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "p = 10, e = 10, n = 10, tổng 30",
+  "chac": true
+ }
+]

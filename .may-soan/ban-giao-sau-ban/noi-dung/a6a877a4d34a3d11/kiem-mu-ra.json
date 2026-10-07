@@ -1,0 +1,26 @@
+[
+ {
+  "id": "ss1",
+  "d": "A",
+  "lyDo": "n = 35%·40 = 14; 2p = 26 nên p = 13",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "B",
+  "lyDo": "n = 8; 2p = 16 nên p = 8",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "C",
+  "lyDo": "n = 34,78%·46 = 16; 2p = 30 nên p = 15",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "D",
+  "lyDo": "n = 36,59%·82 = 30; 2p = 52 nên p = 26",
+  "chac": true
+ }
+]

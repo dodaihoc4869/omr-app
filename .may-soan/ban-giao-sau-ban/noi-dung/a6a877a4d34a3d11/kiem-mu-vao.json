@@ -1,0 +1,138 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Aluminium được dùng làm khung cửa và vỏ lon nước giải khát.\nBiết nguyên tử aluminium có tổng số hạt là 40 trong đó số hạt không mang điện chiếm 35%.\nSố đơn vị điện tích hạt nhân của nguyên tử aluminium là",
+  "pa": {
+   "A": "13.",
+   "B": "14.",
+   "C": "26.",
+   "D": "27."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Số neutron = 40 × 35 / 100 = 14.",
+   "Số hạt mang điện = 40 − 14 = 26, gồm proton và electron bằng nhau.",
+   "Số proton = 26 / 2 = 13 nên số đơn vị điện tích hạt nhân là 13."
+  ],
+  "chot": "Tách hạt không mang điện ra trước, phần còn lại chia đôi cho proton và electron.",
+  "phepTinh": [
+   {
+    "ten": "Số neutron",
+    "bieuThuc": "40*35/100",
+    "ketQua": 14,
+    "lamTron": 0
+   },
+   {
+    "ten": "Số proton",
+    "bieuThuc": "(40-14)/2",
+    "ketQua": 13,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss2",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Oxygen cần cho sự hô hấp của người và động vật.\nBiết nguyên tử oxygen có tổng số hạt là 24 trong đó số hạt không mang điện chiếm 33,33%.\nSố đơn vị điện tích hạt nhân của nguyên tử oxygen là",
+  "pa": {
+   "A": "16.",
+   "B": "8.",
+   "C": "24.",
+   "D": "12."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Số neutron = 24 × 33,33 / 100 ≈ 8.",
+   "Số hạt mang điện = 24 − 8 = 16, gồm proton và electron bằng nhau.",
+   "Số proton = 16 / 2 = 8 nên số đơn vị điện tích hạt nhân là 8."
+  ],
+  "chot": "Tách hạt không mang điện ra trước, phần còn lại chia đôi cho proton và electron.",
+  "phepTinh": [
+   {
+    "ten": "Số neutron",
+    "bieuThuc": "24*33.33/100",
+    "ketQua": 8,
+    "lamTron": 0
+   },
+   {
+    "ten": "Số proton",
+    "bieuThuc": "(24-8)/2",
+    "ketQua": 8,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss3",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Phosphorus có trong phân bón và trong xương, răng.\nBiết nguyên tử phosphorus có tổng số hạt là 46 trong đó số hạt không mang điện chiếm 34,78%.\nSố đơn vị điện tích hạt nhân của nguyên tử phosphorus là",
+  "pa": {
+   "A": "16.",
+   "B": "30.",
+   "C": "15.",
+   "D": "31."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Số neutron = 46 × 34,78 / 100 ≈ 16.",
+   "Số hạt mang điện = 46 − 16 = 30, gồm proton và electron bằng nhau.",
+   "Số proton = 30 / 2 = 15 nên số đơn vị điện tích hạt nhân là 15."
+  ],
+  "chot": "Tách hạt không mang điện ra trước, phần còn lại chia đôi cho proton và electron.",
+  "phepTinh": [
+   {
+    "ten": "Số neutron",
+    "bieuThuc": "46*34.78/100",
+    "ketQua": 16,
+    "lamTron": 0
+   },
+   {
+    "ten": "Số proton",
+    "bieuThuc": "(46-16)/2",
+    "ketQua": 15,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss4",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Iron là thành phần của hemoglobin trong máu.\nBiết nguyên tử iron có tổng số hạt là 82 trong đó số hạt không mang điện chiếm 36,59%.\nSố đơn vị điện tích hạt nhân của nguyên tử iron là",
+  "pa": {
+   "A": "30.",
+   "B": "52.",
+   "C": "56.",
+   "D": "26."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Số neutron = 82 × 36,59 / 100 ≈ 30.",
+   "Số hạt mang điện = 82 − 30 = 52, gồm proton và electron bằng nhau.",
+   "Số proton = 52 / 2 = 26 nên số đơn vị điện tích hạt nhân là 26."
+  ],
+  "chot": "Tách hạt không mang điện ra trước, phần còn lại chia đôi cho proton và electron.",
+  "phepTinh": [
+   {
+    "ten": "Số neutron",
+    "bieuThuc": "82*36.59/100",
+    "ketQua": 30,
+    "lamTron": 0
+   },
+   {
+    "ten": "Số proton",
+    "bieuThuc": "(82-30)/2",
+    "ketQua": 26,
+    "lamTron": 0,
+    "laDapSo": true
+   }
+  ]
+ }
+]

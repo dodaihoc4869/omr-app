@@ -1,0 +1,108 @@
+{
+ "qid": "10-C1-B1-I-41",
+ "bam": "0767b33713da6c65",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Số đơn vị điện tích hạt nhân của nguyên tử ²³⁸₉₂U là",
+   "pa": {
+    "A": "238.",
+    "B": "146.",
+    "C": "92.",
+    "D": "184."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Kí hiệu ²³⁸₉₂U có số khối 238 và số proton 92.",
+    "Số đơn vị điện tích hạt nhân bằng số proton nên là 92."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Số đơn vị điện tích hạt nhân của nguyên tử ¹⁹⁷₇₉Au là",
+   "pa": {
+    "A": "79.",
+    "B": "197.",
+    "C": "158.",
+    "D": "118."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Kí hiệu ¹⁹⁷₇₉Au có số khối 197 và số proton 79.",
+    "Số đơn vị điện tích hạt nhân bằng số proton nên là 79."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Số đơn vị điện tích hạt nhân của nguyên tử ¹⁰⁷₄₇Ag là",
+   "pa": {
+    "A": "107.",
+    "B": "60.",
+    "C": "94.",
+    "D": "47."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Kí hiệu ¹⁰⁷₄₇Ag có số khối 107 và số proton 47.",
+    "Số đơn vị điện tích hạt nhân bằng số proton nên là 47."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Số đơn vị điện tích hạt nhân của nguyên tử ²⁰¹₈₀Hg là",
+   "pa": {
+    "A": "201.",
+    "B": "80.",
+    "C": "121.",
+    "D": "160."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Kí hiệu ²⁰¹₈₀Hg có số khối 201 và số proton 80.",
+    "Số đơn vị điện tích hạt nhân bằng số proton nên là 80."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Số đơn vị điện tích hạt nhân của nguyên tử ¹¹⁹₅₀Sn là",
+   "pa": {
+    "A": "69.",
+    "B": "119.",
+    "C": "50.",
+    "D": "100."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Kí hiệu ¹¹⁹₅₀Sn có số khối 119 và số proton 50.",
+    "Số đơn vị điện tích hạt nhân bằng số proton nên là 50."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Số đơn vị điện tích hạt nhân của nguyên tử ⁶⁵₃₀Zn là",
+   "pa": {
+    "A": "35.",
+    "B": "60.",
+    "C": "65.",
+    "D": "30."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Kí hiệu ⁶⁵₃₀Zn có số khối 65 và số proton 30.",
+    "Số đơn vị điện tích hạt nhân bằng số proton nên là 30."
+   ],
+   "chot": "Số đơn vị điện tích hạt nhân = Z, chỉ số dưới bên trái kí hiệu."
+  }
+ ]
+}

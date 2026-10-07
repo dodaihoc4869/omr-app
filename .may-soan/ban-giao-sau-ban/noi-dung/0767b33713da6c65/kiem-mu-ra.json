@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "Z = 92",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "A",
+  "lyDo": "Z = 79",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "Z = 47",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "Z = 80",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "Z = 50",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "D",
+  "lyDo": "Z = 30",
+  "chac": true
+ }
+]

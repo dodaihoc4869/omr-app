@@ -1,0 +1,138 @@
+{
+ "qid": "10-C1-B1-I-40",
+ "bam": "afcac0a3a6c5c4c3",
+ "songSinh": [
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Điện tích hạt nhân của nguyên tử aluminium có kí hiệu ²⁷₁₃Al là",
+   "pa": {
+    "A": "+27.",
+    "B": "+14.",
+    "C": "+40.",
+    "D": "+13."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Kí hiệu ²⁷₁₃Al có số khối 27, số proton 13.",
+    "Điện tích hạt nhân bằng số proton kèm dấu dương nên là +13."
+   ],
+   "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Z = 13 nên điện tích hạt nhân +13",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Điện tích hạt nhân của nguyên tử chlorine có kí hiệu ³⁵₁₇Cl là",
+   "pa": {
+    "A": "+35.",
+    "B": "+18.",
+    "C": "+17.",
+    "D": "+52."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Kí hiệu ³⁵₁₇Cl có số khối 35, số proton 17.",
+    "Điện tích hạt nhân bằng số proton kèm dấu dương nên là +17."
+   ],
+   "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Z = 17 nên +17",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Điện tích hạt nhân của nguyên tử iron có kí hiệu ⁵⁶₂₆Fe là",
+   "pa": {
+    "A": "+56.",
+    "B": "+26.",
+    "C": "+30.",
+    "D": "+82."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Kí hiệu ⁵⁶₂₆Fe có số khối 56, số proton 26.",
+    "Điện tích hạt nhân bằng số proton kèm dấu dương nên là +26."
+   ],
+   "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Z = 26 nên +26",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Điện tích hạt nhân của nguyên tử copper có kí hiệu ⁶⁴₂₉Cu là",
+   "pa": {
+    "A": "+29.",
+    "B": "+64.",
+    "C": "+35.",
+    "D": "+93."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Kí hiệu ⁶⁴₂₉Cu có số khối 64, số proton 29.",
+    "Điện tích hạt nhân bằng số proton kèm dấu dương nên là +29."
+   ],
+   "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "Z = 29 nên +29",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Điện tích hạt nhân của nguyên tử potassium có kí hiệu ³⁹₁₉K là",
+   "pa": {
+    "A": "+39.",
+    "B": "+19.",
+    "C": "+20.",
+    "D": "+58."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Kí hiệu ³⁹₁₉K có số khối 39, số proton 19.",
+    "Điện tích hạt nhân bằng số proton kèm dấu dương nên là +19."
+   ],
+   "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Z = 19 nên +19",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_chat",
+   "de": "Điện tích hạt nhân của nguyên tử fluorine có kí hiệu ¹⁹₉F là",
+   "pa": {
+    "A": "+19.",
+    "B": "+10.",
+    "C": "+28.",
+    "D": "+9."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Kí hiệu ¹⁹₉F có số khối 19, số proton 9.",
+    "Điện tích hạt nhân bằng số proton kèm dấu dương nên là +9."
+   ],
+   "chot": "Điện tích hạt nhân = +Z, với Z là chỉ số dưới bên trái kí hiệu.",
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Z = 9 nên +9",
+    "chac": true
+   }
+  }
+ ]
+}

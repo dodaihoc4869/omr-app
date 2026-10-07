@@ -1,0 +1,25 @@
+{
+ "banKhac": [
+  {
+   "de": "Nguyên tử của nguyên tố X có tổng số hạt cơ bản là 80.\nSố hạt không mang điện gấp 1,2 lần số hạt mang điện âm.\nSố proton của nguyên tử nguyên tố X là",
+   "dap_an": "A",
+   "pa": {
+    "A": "25.",
+    "B": "30.",
+    "C": "55.",
+    "D": "80."
+   }
+  },
+  {
+   "de": "Nguyên tử của nguyên tố X có tổng số hạt cơ bản là 62.\nSố hạt không mang điện gấp 1,1 lần số hạt mang điện âm.\nSố proton của nguyên tử nguyên tố X là",
+   "dap_an": "C",
+   "pa": {
+    "A": "22.",
+    "B": "42.",
+    "C": "20.",
+    "D": "62."
+   }
+  }
+ ],
+ "yDs": []
+}

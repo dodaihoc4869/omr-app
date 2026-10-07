@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "D",
+  "lyDo": "Z = 13 nên điện tích hạt nhân +13",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "C",
+  "lyDo": "Z = 17 nên +17",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "B",
+  "lyDo": "Z = 26 nên +26",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "Z = 29 nên +29",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "Z = 19 nên +19",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "D",
+  "lyDo": "Z = 9 nên +9",
+  "chac": true
+ }
+]
