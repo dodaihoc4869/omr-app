@@ -36,6 +36,8 @@ Nguồn đọc ngày 07/10 có **793 câu gốc hợp lệ** trong đợt lỗi 
 
 Môi trường Codex hiện không có Claude Code, khóa API hoặc máy soạn được cấu hình. Việc hoàn tất toàn hàng cần chạy máy soạn ở nơi đã đăng nhập; phần mềm không tự giả bằng chứng kiểm để lấp chỗ trống. Khi chưa đọc lại đủ độ phủ và kết quả học sinh, trạng thái nghiệm thu thương mại và mục tiêu 90% vẫn **chưa đạt**.
 
-Kiểm cục bộ: 102 kiểm thử liên quan đạt, 9 kiểm thử workerd/D1 đạt, TypeScript và build đạt. Workflow trên CI và kết quả nạp D1 cần đọc lại trước khi báo đã phát hành/đã nạp.
+Kiểm cục bộ: 103 kiểm thử liên quan đạt, 9 kiểm thử workerd/D1 đạt, TypeScript và build đạt. Workflow trên CI và kết quả nạp D1 cần đọc lại trước khi báo đã phát hành/đã nạp.
 
 Mẫu đã nạp production: Actions37586139922/job112676589229 thành công07:15:21UTC; đọc lại đủ28 probe,3 bước,4 bản toàn bài và provenance máy. Độ phủ đọc lúc đó là1 câu; chưa phải hoàn tất793 câu nguồn hoặc các câu bổ sung khi backfill tiếp tục.
+
+Đã kiểm thêm luồng ba bước bằng học sinh tổng hợp trên SQLite: sai chẩn đoán → chọn câu xác nhận sai → phản hồi đúng lỗi đơn vị → tự trả lời câu mới/lý do/chuyển giao → ghép bài → chờ24h → giải độc lập bản gặp lần hai; đủ3 bước và chỉ sau bài mới mới đóng lỗi. Bộ giải dùng dữ kiện công khai, không đọc đáp án phiên. Đây là mô phỏng kỹ thuật, không phải tỷ lệ học sinh thật.
