@@ -1,40 +1,16 @@
 // Bảng vận hành pilot: phạm vi, giao đủ mẫu số, độ phủ và hàng giúp đỡ thật.
 import { useEffect, useState } from 'react'
-import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
-import { loadTeacherSecret } from '../../lib/exam-db'
+import {
+  goiChuaThay as goi,
+  KHOA_MO_CAU_CAN_CHUA,
+} from '../../lib/chua-cau-sai-thay-api'
+import { useAppStore } from '../../store/appStore'
 import './chua-cau-sai.css'
 type Obj = Record<string, any>
-async function goi(lenh: string, body: Obj = {}): Promise<Obj> {
-  const [goc, secret] = await Promise.all([
-    layDiaChiMayChu(),
-    loadTeacherSecret(),
-  ])
-  if (!goc || !secret) throw new Error('Cần cấu hình kết nối giáo viên.')
-  const dk = new AbortController(),
-    hen = setTimeout(() => dk.abort(), 20000)
-  try {
-    const r = await fetch(`${goc}/gv/chua-cau-sai/${lenh}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ ...body, secret }),
-      signal: dk.signal,
-    })
-    const j = await r.json()
-    if (!r.ok || !j.ok)
-      throw new Error(
-        [j.mo ?? j.error ?? 'Chưa lưu được', ...(j.loiHocLieu ?? [])].join(
-          '\n',
-        ),
-      )
-    return j
-  } finally {
-    clearTimeout(hen)
-  }
-}
 export default function KpiChuaCauSai() {
+  const setScreen = useAppStore((s) => s.setScreen)
   const [k, setK] = useState<Obj | null>(null),
     [cfg, setCfg] = useState<Obj | null>(null),
-    [hang, setHang] = useState<Obj[]>([]),
     [choLieu, setChoLieu] = useState<Obj[]>([]),
     [deSoan, setDeSoan] = useState<Obj | null>(null),
     [loi, setLoi] = useState(''),
@@ -47,14 +23,11 @@ export default function KpiChuaCauSai() {
     [h, setH] = useState(''),
     [nguoi, setNguoi] = useState(''),
     [duyet, setDuyet] = useState(false),
-    [traThay, setTraThay] = useState<Record<string, string>>({}),
-    [buocThay, setBuocThay] = useState<Record<string, string>>({}),
     [thongBao, setThongBao] = useState('')
   const tai = async () => {
-    const [a, b, c, d] = await Promise.all([
+    const [a, b, d] = await Promise.all([
       goi('thong-ke'),
       goi('cau-hinh'),
-      goi('hang-thay'),
       goi('hang-hoc-lieu'),
     ])
     setK(a)
@@ -64,17 +37,15 @@ export default function KpiChuaCauSai() {
     setSbd(b.cauHinh.sbd.join(', '))
     setBat(b.cauHinh.bat)
     setTatCa(b.cauHinh.phamVi === 'tat_ca')
-    setHang(c.ds)
     setChoLieu(d.ds)
   }
   useEffect(() => {
     let song = true
     ;(async () => {
       try {
-        const [a, b, c, d] = await Promise.all([
+        const [a, b, d] = await Promise.all([
           goi('thong-ke'),
           goi('cau-hinh'),
-          goi('hang-thay'),
           goi('hang-hoc-lieu'),
         ])
         if (!song) return
@@ -85,7 +56,6 @@ export default function KpiChuaCauSai() {
         setSbd(b.cauHinh.sbd.join(', '))
         setBat(b.cauHinh.bat)
         setTatCa(b.cauHinh.phamVi === 'tat_ca')
-        setHang(c.ds)
         setChoLieu(d.ds)
       } catch (e) {
         if (song) setLoi((e as Error).message)
@@ -368,80 +338,19 @@ export default function KpiChuaCauSai() {
           </details>
         )}
       </details>
-      <h3>Học sinh đang cần giúp</h3>
-      {hang.length === 0 ? (
-        <p>Chưa có yêu cầu đang chờ.</p>
-      ) : (
-        hang.map((x) => (
-          <article key={x.dotId}>
-            <strong>
-              {x.hoTen ?? x.sbd} · {x.qid}
-            </strong>
-            <p>{x.lyDoThieu || 'Em đang cần gỡ bước còn vướng.'}</p>
-            {x.baiLam?.map((n: Obj, i: number) => (
-              <p key={i}>
-                {n.cau.hoi} → Em trả lời: {n.traLoi} (
-                {n.dung ? 'đúng' : 'chưa đúng'}
-                {n.coHoTro ? ', có hỗ trợ' : ''})
-              </p>
-            ))}
-            <label>
-              Lời thầy gỡ
-              <textarea
-                value={traThay[x.dotId] ?? ''}
-                onChange={(e) =>
-                  setTraThay((v) => ({ ...v, [x.dotId]: e.target.value }))
-                }
-              />
-            </label>
-            <label>
-              Bước cần luyện tiếp
-              <select
-                value={buocThay[x.dotId] ?? ''}
-                onChange={(e) =>
-                  setBuocThay((v) => ({ ...v, [x.dotId]: e.target.value }))
-                }
-              >
-                <option value="">Chỉ gửi lời gỡ</option>
-                {(JSON.parse(x.bangChung).tienDo ?? []).map((t: Obj) => (
-                  <option value={t.buocId} key={t.buocId}>
-                    {t.tieuDe}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              disabled={ban || !traThay[x.dotId]?.trim()}
-              onClick={() =>
-                void lam(async () => {
-                  await goi('hang-thay', {
-                    dotId: x.dotId,
-                    loiGo: traThay[x.dotId],
-                    moLai: !!buocThay[x.dotId],
-                    buocId: buocThay[x.dotId],
-                  })
-                })
-              }
-            >
-              Gửi lời gỡ và cho em tiếp
-            </button>
-            <details>
-              <summary>Xem bằng chứng bước và câu trả lời</summary>
-              <pre>{JSON.stringify(JSON.parse(x.bangChung), null, 2)}</pre>
-            </details>
-            <button
-              disabled={ban}
-              onClick={() =>
-                void lam(async () => {
-                  await goi('hang-thay', { xong: true, dotId: x.dotId })
-                })
-              }
-            >
-              Đã xem yêu cầu
-            </button>
-          </article>
-        ))
-      )}
+      <h3>Chữa bước cuối trên lớp</h3>
+      <p>
+        {k?.canThay ?? 0} bước còn mắc. Các em cùng lớp, cùng bước được gom ở
+        mục chiếu lên bảng.
+      </p>
+      <button
+        onClick={() => {
+          sessionStorage.setItem(KHOA_MO_CAU_CAN_CHUA, '1')
+          setScreen('goilenbang')
+        }}
+      >
+        Mở Chiếu lên bảng → Câu cần chữa
+      </button>
       <button disabled={ban} onClick={() => void lam(async () => {})}>
         {ban ? 'Đang xử lý…' : 'Làm mới số liệu'}
       </button>

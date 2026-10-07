@@ -143,10 +143,38 @@ try {
       true,
       'Đóng khung phải trả tiêu điểm về nút mở',
     )
+    await page.getByRole('button', { name: 'Mở tờ chữa chung' }).click()
+    const to = page.frameLocator('.lop-xem-phieu iframe')
+    await to
+      .locator('.mc-than')
+      .getByText('Cùng nối lại: Khối lượng mol')
+      .waitFor()
+    assert.equal(
+      await to.locator('.mc-cham').count(),
+      0,
+      'Không chấm cá nhân trên tờ chữa chung',
+    )
+    assert.equal(
+      await to.getByText('Tên riêng của học sinh').count(),
+      0,
+      'Không chiếu tên riêng',
+    )
+    assert.equal(
+      await to.locator('.mc-giai').isVisible(),
+      false,
+      'Giữ lời gỡ đóng trước khi chữa',
+    )
+    await to.locator('#mc-thanh [data-k="C"]').click()
+    await page.getByText('Đã ghi chữa chung: 1').waitFor()
+    await page.screenshot({
+      path: `${out}/chua-lop-${width}.png`,
+      fullPage: true,
+    })
+    assert.equal(errors.length, 0, errors.join('\n'))
     await page.close()
   }
   console.log(
-    'PASS: 360/430/1280px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; mất mạng retry nguyên payload; phản hồi không tự biến mất.',
+    'PASS: 360/430/1280px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; retry nguyên payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
   )
 } finally {
   await browser?.close()

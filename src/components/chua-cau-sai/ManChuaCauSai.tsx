@@ -5,7 +5,6 @@ import {
   apiPhatItem,
   apiNopItem,
   apiXinGoiY,
-  apiGuiThay,
   type KetQuaDot,
   type KetQuaNop,
   type ItemCongKhai,
@@ -202,7 +201,6 @@ export default function ManChuaCauSai({
     [goi, setGoi] = useState(''),
     [ban, setBan] = useState(false),
     [cho, setCho] = useState<LanNop | null>(null),
-    [gui, setGui] = useState(false),
     [lanTai, setLanTai] = useState(0)
   const mucGoi = useRef(0)
   const song = useRef(true),
@@ -329,15 +327,6 @@ export default function ManChuaCauSai({
       mucGoi.current = r.mucHoTro ?? mucGoi.current
     } else setLoi(r.loi ?? 'Chưa mở được gợi ý.')
   }
-  const guiThay = async () => {
-    if (!ph?.dotId || ban) return
-    setBan(true)
-    const r = await apiGuiThay(token, ph.dotId)
-    if (!song.current) return
-    setBan(false)
-    if (r.ok) setGui(true)
-    else setLoi(r.loi ?? 'Chưa gửi được. Em thử lại.')
-  }
   const tt = ph?.trangThai,
     phanHoi = hoi ?? ph?.phanHoiTruoc
   const nhanCho =
@@ -459,24 +448,18 @@ export default function ManChuaCauSai({
                     vững.
                   </p>
                 )}
-                {['thieu_hoc_lieu', 'can_thay', 'cau_thay_doi'].includes(
-                  tt ?? '',
-                ) && (
-                  <>
-                    <p>
-                      Các bước em đã làm được vẫn được giữ. Thầy có thể xem câu
-                      trả lời và bước đang vướng để giúp em tiếp.
-                    </p>
-                    <button
-                      className="ccs-nut-phu"
-                      disabled={ban || gui}
-                      onClick={() => void guiThay()}
-                    >
-                      {gui
-                        ? 'Đã gửi yêu cầu cho thầy'
-                        : 'Nhờ thầy giúp câu này'}
-                    </button>
-                  </>
+                {tt === 'can_thay' && (
+                  <p role="status">
+                    Bước còn mắc đã được xếp vào buổi chữa trên lớp, kèm các
+                    bước em đã hiểu. Em không cần gửi riêng cho thầy. Sau buổi
+                    chữa, mở lại câu này để tự kiểm bước vừa gỡ.
+                  </p>
+                )}
+                {['thieu_hoc_lieu', 'cau_thay_doi'].includes(tt ?? '') && (
+                  <p>
+                    Các bước em đã làm được vẫn được giữ. Hệ thống đang chờ học
+                    liệu mới đã được kiểm; em có thể tiếp tục chữa câu khác.
+                  </p>
                 )}
                 {tt === 'tam_khoa' && (
                   <p>
@@ -596,24 +579,10 @@ export default function ManChuaCauSai({
                       )}
                     </div>
                   </form>
-                  <button
-                    className="ccs-nut-phu"
-                    type="button"
-                    disabled={ban || gui}
-                    onClick={() => void guiThay()}
-                  >
-                    {gui ? 'Đã gửi yêu cầu cho thầy' : 'Nhờ thầy giúp bước này'}
-                  </button>
                 </>
               )
             )}
           </>
-        )}
-        {gui && (
-          <p className="ccs-ghi" role="status">
-            Đã gửi yêu cầu cho thầy, kèm câu trả lời và những bước em đã hiểu.
-            Em mở lại câu này để xem lời thầy gỡ; tiến độ của em vẫn được giữ.
-          </p>
         )}
         {loi && (
           <div className="ccs-loi" role="alert">

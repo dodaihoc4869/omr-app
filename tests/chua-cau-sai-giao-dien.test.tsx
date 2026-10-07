@@ -37,6 +37,23 @@ beforeEach(() => {
   api.apiCoChua.mockResolvedValue(false)
 })
 describe('Trải nghiệm sửa từng bước', () => {
+  it('vòng tự chữa không có nút gửi riêng; bước cuối đã vào buổi chữa trên lớp', async () => {
+    api.apiPhatItem.mockResolvedValue({
+      ...ph,
+      trangThai: 'can_thay',
+      item: null,
+    })
+    render(<Man token="t" qid="Q" onVe={() => {}} />)
+    expect(
+      await screen.findByText(
+        /Bước còn mắc đã được xếp vào buổi chữa trên lớp/,
+      ),
+    ).toBeTruthy()
+    expect(
+      screen.queryByRole('button', { name: /Nhờ thầy|Gửi thầy/ }),
+    ).toBeNull()
+    expect(api.apiGuiThay).not.toHaveBeenCalled()
+  })
   it('mất mạng lúc mở đầu có thể tải lại và bắt đầu đúng phiên', async () => {
     api.apiMoDot
       .mockResolvedValueOnce({ ok: false, loi: 'Chưa kết nối được' })

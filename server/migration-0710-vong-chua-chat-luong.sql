@@ -35,3 +35,9 @@ CREATE TABLE IF NOT EXISTS chua_loi_tu_receipt (
 );
 ALTER TABLE chua_loi_thay ADD COLUMN loi_go TEXT NOT NULL DEFAULT '';
 ALTER TABLE chua_loi_thay ADD COLUMN doc_luc INTEGER NOT NULL DEFAULT 0;
+-- Xác nhận chữa chung, chống ghi đôi khi thầy mất mạng; không phải receipt tự làm.
+CREATE TABLE IF NOT EXISTS chua_loi_chua_lop (
+  request_id TEXT PRIMARY KEY, request_hash TEXT NOT NULL,
+  buoi_id TEXT NOT NULL, nhom_id TEXT NOT NULL, dot_json TEXT NOT NULL,
+  response_json TEXT NOT NULL, luc INTEGER NOT NULL
+);

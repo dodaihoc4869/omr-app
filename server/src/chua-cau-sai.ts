@@ -322,6 +322,60 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
     const cam = await kiemAnh(env, sbd, dot, a)
     if (cam) return cam
   }
+  // Bổ sung bài mới là việc chuẩn bị học liệu chung; thầy không mở lại riêng từng em.
+  if (
+    a &&
+    ph &&
+    dot.trang_thai_day === 'thieu_hoc_lieu' &&
+    ['het_cau_moi_sau_chua_lop', 'het_cau_moi_trong_phien'].includes(
+      str(dot.ly_do_thieu),
+    )
+  ) {
+    const h = await docHocLieu(env, str(dot.qid_chuan))
+    const idBuoc = a.hocLieu.buoc[a.buoc]?.id
+    const giuDuoc = a.tienDo
+      .filter((t) => t.trangThai === 'co_bang_chung_hieu_trong_phien')
+      .every(
+        (t) =>
+          JSON.stringify(a!.hocLieu.buoc.find((x) => x.id === t.buocId)) ===
+          JSON.stringify(h.hocLieu?.buoc.find((x) => x.id === t.buocId)),
+      )
+    if (
+      h.hocLieu?.contentVersion === a.version &&
+      giuDuoc &&
+      JSON.stringify(a.hocLieu.buoc.map((x) => x.id)) ===
+        JSON.stringify(h.hocLieu.buoc.map((x) => x.id))
+    ) {
+      const moi = structuredClone(a)
+      moi.hocLieu = h.hocLieu
+      moi.buoc = idBuoc
+        ? h.hocLieu.buoc.findIndex((x) => x.id === idBuoc)
+        : h.hocLieu.buoc.length
+      if (moi.buoc >= 0 && chonProbe(moi)) {
+        const now = Date.now()
+        await env.DB.batch([
+          env.DB.prepare(
+            "UPDATE chua_loi_dot SET trang_thai_day=?,ly_do_thieu='',revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=? AND trang_thai_day='thieu_hoc_lieu'",
+          ).bind(
+            moi.pha === 'kiem_chung'
+              ? 'dang_kiem_chung'
+              : moi.pha === 'ghep_bai'
+                ? 'dang_ghep_bai'
+                : 'dang_chua_buoc',
+            now,
+            dot.id,
+            num(dot.revision),
+          ),
+          env.DB.prepare(
+            'UPDATE chua_loi_phien SET snapshot_json=?,revision=revision+1,cap_nhat_luc=? WHERE id=? AND changes()=1',
+          ).bind(JSON.stringify(moi), now, ph.id),
+        ])
+        dot = (await docDot(env, sbd, str(dot.id)))!
+        ph = await docPhien(env, sbd, str(dot.id))
+        a = ph ? docAnh(ph) : null
+      }
+    }
+  }
   if (
     [
       'thieu_hoc_lieu',
@@ -449,12 +503,15 @@ export async function phatItem(env: Env, b: Obj): Promise<Response> {
     a.batDauDoan = now
   }
   const p = chonProbe(a)
-  if (!p)
-    return loi(
-      'THIEU_HOC_LIEU',
-      'Đã dùng hết câu mới ở bước này. Thầy cần bổ sung học liệu; không hỏi lại câu đã lộ.',
-      409,
+  if (!p) {
+    await env.DB.prepare(
+      "UPDATE chua_loi_dot SET trang_thai_day='thieu_hoc_lieu',ly_do_thieu='het_cau_moi_trong_phien',revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=?",
     )
+      .bind(now, dot.id, num(dot.revision))
+      .run()
+    dot = (await docDot(env, sbd, str(dot.id)))!
+    return traPhien(env, dot, ph, a)
+  }
   const id = crypto.randomUUID(),
     pub = congKhai(id, a, p),
     stt = a.soItem
@@ -720,7 +777,7 @@ export async function nopItem(env: Env, b: Obj): Promise<Response> {
       ...(ket.canThay
         ? [
             env.DB.prepare(
-              `INSERT OR IGNORE INTO chua_loi_thay(dot_id,sbd,qid,bang_chung_json,gui_luc) SELECT ?,?,?,?,? WHERE ${cong}`,
+              `INSERT INTO chua_loi_thay(dot_id,sbd,qid,bang_chung_json,gui_luc) SELECT ?,?,?,?,? WHERE ${cong} ON CONFLICT(dot_id) DO UPDATE SET trang_thai='cho_thay',bang_chung_json=excluded.bang_chung_json,gui_luc=excluded.gui_luc,loi_go='',doc_luc=0`,
             ).bind(
               dotId,
               sbd,
@@ -788,7 +845,7 @@ export async function xinGoiY(env: Env, b: Obj): Promise<Response> {
   if (!g || item.loai === 'kiem_chung' || item.loai === 'ghep_bai')
     return loi(
       'KHONG_CO_GOI_Y',
-      'Bài tổng hợp dùng để tự kiểm. Em có thể nộp cách mình nghĩ hoặc gửi thầy.',
+      'Bài tổng hợp dùng để tự kiểm. Em nộp cách mình nghĩ; chỗ còn mắc sẽ được xếp vào buổi chữa trên lớp.',
       409,
     )
   if (muc > num(item.muc_ho_tro_cao_nhat) + 1)
@@ -885,11 +942,17 @@ export async function guiThay(env: Env, b: Obj): Promise<Response> {
   if (sbd instanceof Response) return sbd
   const dot = await docDot(env, sbd, str(b.dotId))
   if (!dot) return loi('KHONG_TIM_THAY', 'Không tìm thấy đợt.', 404)
+  if (dot.trang_thai_day !== 'can_thay')
+    return loi(
+      'CHUA_DEN_BUOC_CUOI',
+      'Em tiếp tục tự gỡ bước đang học. Chỗ còn mắc sau vòng tự chữa mới được xếp vào buổi chữa trên lớp.',
+      409,
+    )
   const ph = await docPhien(env, sbd, str(dot.id)),
     a = ph ? docAnh(ph) : null,
     now = Date.now()
   await env.DB.prepare(
-    `INSERT INTO chua_loi_thay(dot_id,sbd,qid,bang_chung_json,gui_luc) VALUES(?,?,?,?,?) ON CONFLICT(dot_id) DO UPDATE SET trang_thai='cho_thay',bang_chung_json=excluded.bang_chung_json,gui_luc=excluded.gui_luc`,
+    `INSERT OR IGNORE INTO chua_loi_thay(dot_id,sbd,qid,bang_chung_json,gui_luc) VALUES(?,?,?,?,?)`,
   )
     .bind(
       dot.id,

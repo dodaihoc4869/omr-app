@@ -4,6 +4,7 @@ import { env } from 'cloudflare:test'
 import type { Env } from '../server/src/kieu'
 import { seedChua, Q } from './_chua-cau-sai-fixture'
 import { moDot, phatItem, nopItem } from '../server/src/chua-cau-sai'
+import { hangChieu, daChuaTrenLop } from '../server/src/chua-cau-sai-chieu'
 const E = { ...(env as unknown as Env), MA_BI_MAT: 'bi-mat-test-cuc-bo' } as Env
 let token = '',
   dotId = '',
@@ -102,5 +103,73 @@ describe('Vòng chữa trên workerd/D1', () => {
     const j = (await r.json()) as any
     expect(j.receiptId).toBe(JSON.parse(n.response_json).receiptId)
     expect(j.idempotent).toBe(true)
+  })
+  it('8 xác nhận Thầy chữa cùng lúc chỉ mở bước một lần và giữ một receipt lớp', async () => {
+    for (let i = 0; i < 15; i++) {
+      const p = (await (
+        await phatItem(E, { token, dotId, tiep: true })
+      ).json()) as any
+      if (p.trangThai === 'can_thay') break
+      expect(p.item).toBeTruthy()
+      const row = await E.DB.prepare(
+        'SELECT probe_ref FROM chua_loi_item WHERE id=?',
+      )
+        .bind(p.item.id)
+        .first<any>()
+      const probe = JSON.parse(row.probe_ref)
+      const r = await nopItem(E, {
+        token,
+        dotId,
+        itemId: p.item.id,
+        attemptId: `runtime-class-${i}`,
+        traLoi:
+          p.item.loai === 'ghep_bai' ? '999' : probe.noiDungTrucTiep.dapAn,
+      })
+      expect(r.status).toBe(200)
+    }
+    const now = Date.now()
+    await E.DB.batch([
+      E.DB.prepare(
+        "INSERT INTO buoi_hoc(id,ten,lop,bi_mat,mo_luc,het_han,cap_nhat_luc) VALUES('runtime-buoi','Chữa','12','x',?,?,?)",
+      ).bind(
+        new Date(now).toISOString(),
+        new Date(now + 3600000).toISOString(),
+        new Date(now).toISOString(),
+      ),
+      E.DB.prepare(
+        "INSERT INTO buoi_hoc_diem_danh(buoi_id,sbd,luc,cach,trang_thai,cap_nhat_luc) VALUES('runtime-buoi','HS1','x','thay','co_mat','x')",
+      ),
+    ])
+    const g = ((await (await hangChieu(E, { lop: '12' })).json()) as any).ds[0]
+    expect(g).toBeTruthy()
+    const b = {
+      requestId: 'runtime-chua-lop-123456',
+      buoiId: 'runtime-buoi',
+      nhomId: g.id,
+      buocId: 'm',
+      dot: g.em.map((e: any) => ({ dotId: e.dotId, revision: e.revision })),
+    }
+    const rs = await Promise.all(
+      Array.from({ length: 8 }, () => daChuaTrenLop(E, b)),
+    )
+    expect(rs.every((r) => r.status === 200)).toBe(true)
+    const ds = await Promise.all(rs.map((r) => r.json()))
+    expect(ds.every((r) => JSON.stringify(r) === JSON.stringify(ds[0]))).toBe(
+      true,
+    )
+    expect(
+      (
+        await E.DB.prepare(
+          'SELECT COUNT(*) AS n FROM chua_loi_chua_lop',
+        ).first<any>()
+      ).n,
+    ).toBe(1)
+    const dot = await E.DB.prepare(
+      'SELECT revision,trang_thai_day FROM chua_loi_dot WHERE id=?',
+    )
+      .bind(dotId)
+      .first<any>()
+    expect(dot.revision).toBe(g.em[0].revision + 1)
+    expect(dot.trang_thai_day).toBe('dang_chua_buoc')
   })
 })

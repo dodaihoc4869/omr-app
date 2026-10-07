@@ -1,9 +1,8 @@
 // Các route chỉ đặt sau cổng laThay trong Worker. Học liệu không bao giờ đi route học sinh.
 import type { Env } from './kieu'
 import { chuanCauHinh, docCauHinh, xoaDemChua } from './chua-cau-sai-cau-hinh'
-import { docHocLieu, kiemTinhDayDu } from './chua-cau-sai-hoc-lieu'
+import { kiemTinhDayDu } from './chua-cau-sai-hoc-lieu'
 import { giaoDotCuaEm } from './chua-cau-sai'
-import { chonProbe, type AnhPhien } from './chua-cau-sai-phien'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import type { HocLieuChua } from './chua-cau-sai-kieu'
@@ -224,138 +223,14 @@ export async function dongBoTuCu(env: Env, b: Obj): Promise<Response> {
   return Response.json({ ok: true, con: true, cursor: row.id })
 }
 export async function hangThay(env: Env, b: Obj): Promise<Response> {
-  if (b.moLai === true && str(b.dotId)) {
-    const dot = await env.DB.prepare('SELECT * FROM chua_loi_dot WHERE id=?')
-      .bind(str(b.dotId))
-      .first<any>()
-    const ph = await env.DB.prepare(
-      'SELECT * FROM chua_loi_phien WHERE dot_id=? ORDER BY lan_gap_lai DESC,so_luot DESC LIMIT 1',
+  if (b.moLai === true || str(b.loiGo) || b.xong === true)
+    return Response.json(
+      {
+        ok: false,
+        mo: 'Chữa bước cuối tại Lên bảng → Câu cần chữa; bấm Thầy chữa trên tờ để các em có mặt tiếp tục tự kiểm.',
+      },
+      { status: 422 },
     )
-      .bind(str(b.dotId))
-      .first<any>()
-    if (!dot || !ph || !str(b.loiGo).trim())
-      return Response.json(
-        { ok: false, mo: 'Cần phiên đã lưu và lời thầy gỡ cụ thể.' },
-        { status: 422 },
-      )
-    if (
-      !(await env.DB.prepare('SELECT dot_id FROM chua_loi_thay WHERE dot_id=?')
-        .bind(dot.id)
-        .first())
-    )
-      return Response.json(
-        { ok: false, mo: 'Yêu cầu giúp đỡ chưa có trong hàng thầy.' },
-        { status: 404 },
-      )
-    let a: AnhPhien
-    try {
-      a = JSON.parse(ph.snapshot_json)
-    } catch {
-      return Response.json(
-        { ok: false, mo: 'Phiên chưa có ảnh chụp.' },
-        { status: 422 },
-      )
-    }
-    const h = await docHocLieu(env, dot.qid_chuan),
-      id = str(b.buocId)
-    if (
-      !h.hocLieu ||
-      h.hocLieu.contentVersion !== a.version ||
-      !h.hocLieu.buoc.some((x) => x.id === id)
-    )
-      return Response.json(
-        {
-          ok: false,
-          mo: 'Cần học liệu đã duyệt đúng phiên bản và bước cần gỡ.',
-        },
-        { status: 422 },
-      )
-    for (const td of a.tienDo.filter(
-      (x) =>
-        x.buocId !== id && x.trangThai === 'co_bang_chung_hieu_trong_phien',
-    )) {
-      if (
-        JSON.stringify(a.hocLieu.buoc.find((x) => x.id === td.buocId)) !==
-        JSON.stringify(h.hocLieu.buoc.find((x) => x.id === td.buocId))
-      )
-        return Response.json(
-          {
-            ok: false,
-            mo: 'Bước đã hiểu đổi nội dung. Cần giữ bản đã kiểm thay vì mang bằng chứng cũ sang bước khác.',
-          },
-          { status: 422 },
-        )
-    }
-    a.hocLieu = h.hocLieu
-    a.buoc = h.hocLieu.buoc.findIndex((x) => x.id === id)
-    a.pha = 'kiem_ly_do'
-    a.phanHoi = null
-    a.batDauDoan = Date.now()
-    a.soChanDoan = 0
-    a.tienDo = h.hocLieu.buoc.map(
-      (x, i) =>
-        a.tienDo.find((t) => t.buocId === x.id) ?? {
-          buocId: x.id,
-          thuTu: i,
-          tieuDe: x.tieuDe,
-          trangThai: 'chua_kiem',
-          mucHoTroCaoNhat: 0,
-          soVongHoTro: 0,
-        },
-    )
-    const td = a.tienDo[a.buoc]
-    td.receiptLyDo = undefined
-    td.receiptChuyenGiao = undefined
-    td.soVongHoTro = 0
-    td.trangThai = 'can_ho_tro_tiep'
-    if (!chonProbe(a))
-      return Response.json(
-        {
-          ok: false,
-          mo: 'Bước này hết câu mới. Bổ sung và duyệt học liệu trước khi cho em tiếp.',
-        },
-        { status: 422 },
-      )
-    const now = Date.now()
-    const rs = await env.DB.batch([
-      env.DB.prepare(
-        "UPDATE chua_loi_dot SET trang_thai_day='dang_chua_buoc',ho_tro_cuoi_luc=?,revision=revision+1,cap_nhat_luc=? WHERE id=? AND revision=?",
-      ).bind(now, now, dot.id, dot.revision),
-      env.DB.prepare(
-        'UPDATE chua_loi_phien SET snapshot_json=?,tien_do_json=?,item_hien_tai=NULL,revision=revision+1,cap_nhat_luc=? WHERE id=? AND changes()=1',
-      ).bind(JSON.stringify(a), JSON.stringify(a.tienDo), now, ph.id),
-      env.DB.prepare(
-        "UPDATE chua_loi_thay SET loi_go=?,trang_thai='da_tra_loi',xu_ly_luc=?,doc_luc=0 WHERE dot_id=? AND changes()=1",
-      ).bind(str(b.loiGo).trim().slice(0, 10000), now, str(b.dotId)),
-    ])
-    if (!rs[1]?.meta.changes)
-      return Response.json(
-        { ok: false, mo: 'Tiến độ vừa đổi. Thầy tải lại trước khi gỡ tiếp.' },
-        { status: 409 },
-      )
-  }
-
-  if (b.moLai !== true && str(b.loiGo).trim() && str(b.dotId)) {
-    const r = await env.DB.prepare(
-      "UPDATE chua_loi_thay SET loi_go=?,trang_thai='da_tra_loi',xu_ly_luc=?,doc_luc=0 WHERE dot_id=?",
-    )
-      .bind(str(b.loiGo).trim().slice(0, 10000), Date.now(), str(b.dotId))
-      .run()
-    if (!r.meta.changes)
-      return Response.json(
-        {
-          ok: false,
-          mo: 'Yêu cầu này chưa tồn tại. Thầy tải lại hàng giúp đỡ.',
-        },
-        { status: 404 },
-      )
-  }
-  if (b.xong === true && str(b.dotId))
-    await env.DB.prepare(
-      "UPDATE chua_loi_thay SET trang_thai='da_xem',xu_ly_luc=? WHERE dot_id=?",
-    )
-      .bind(Date.now(), str(b.dotId))
-      .run()
   const rows = await env.DB.prepare(
     `SELECT t.dot_id AS dotId,t.sbd,h.ho_ten AS hoTen,t.qid,t.bang_chung_json AS bangChung,t.gui_luc AS guiLuc,d.trang_thai_day AS trangThai,d.ly_do_thieu AS lyDoThieu FROM chua_loi_thay t LEFT JOIN hoc_sinh h ON h.sbd=t.sbd JOIN chua_loi_dot d ON d.id=t.dot_id WHERE t.trang_thai='cho_thay' ORDER BY t.gui_luc ASC LIMIT 100`,
   ).all()

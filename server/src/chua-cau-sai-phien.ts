@@ -162,7 +162,7 @@ export function nhanSauNop(
         ? 'Bài này đúng sau khi được giúp, nên chưa tính là tự sửa độc lập.'
         : 'Bài tổng hợp còn vướng. Các bước em đã chứng minh vẫn được giữ.'
       ph.hanhDongTiep =
-        'Gửi thầy bài làm và những bước đã kiểm để cùng gỡ chỗ còn vướng.'
+        'Chỗ còn mắc được xếp vào buổi chữa trên lớp. Sau buổi chữa, em sẽ tự kiểm lại bằng câu mới.'
     }
   } else if (b && td) {
     td.trangThai = 'dang_kiem'
@@ -224,7 +224,13 @@ export function nhanSauNop(
         coHoTro && dung
           ? 'Em làm được sau gợi ý. Ta giảm hỗ trợ rồi thử câu khác để biết em đã tự làm được.'
           : 'Cần chỉnh thêm một quan hệ ở bước này.'
-      ph.hanhDongTiep = b.hieuBuoc?.viSaoCanBuoc
+      ph.hanhDongTiep = [
+        b.hieuBuoc?.dieuKienApDung,
+        b.hoTro.find((x) => x.muc === 3)?.noiDung,
+        'Giữ quan hệ vừa sửa rồi tự thử một câu khác, không nhìn lại ví dụ.',
+      ]
+        .filter(Boolean)
+        .join(' ')
       n.pha = 'kiem_ly_do'
       if (td.soVongHoTro >= n.cfg.vongHoTroToiDaMoiBuoc) {
         td.trangThai = 'chuyen_thay'

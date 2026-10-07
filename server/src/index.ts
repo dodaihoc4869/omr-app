@@ -94,6 +94,7 @@ import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import { tuLuyen } from './tu-luyen'
 import { tinhNangBat as tinhNangChuaBat } from './chua-cau-sai-cau-hinh'
+import { hangChieu, daChuaTrenLop } from './chua-cau-sai-chieu'
 import { cauHinhThay, hocLieuThay, giaoPilot, hangThay, dongBoTuCu, hangHocLieu } from './chua-cau-sai-thay'
 import { moDot as chuaMoDot, phatItem as chuaPhatItem, nopItem as chuaNopItem, xinGoiY as chuaXinGoiY, tienDo as chuaTienDo, thongKeKpi as chuaThongKe, guiThay as chuaGuiThay, danhSach as chuaDanhSach } from './chua-cau-sai'
 import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
@@ -3811,6 +3812,8 @@ const boXuLy = {
       if (p === '/gv/chua-cau-sai/hang-hoc-lieu') return raChua(await hangHocLieu(env))
       if (p === '/gv/chua-cau-sai/giao-pilot') return raChua(await giaoPilot(env,b))
       if (p === '/gv/chua-cau-sai/dong-bo-tu-cu') return raChua(await dongBoTuCu(env,b))
+      if (p === '/gv/chua-cau-sai/hang-chieu') return raChua(await hangChieu(env,b))
+      if (p === '/gv/chua-cau-sai/da-chua-tren-lop') return raChua(await daChuaTrenLop(env,b))
       if (p === '/gv/chua-cau-sai/hang-thay') return raChua(await hangThay(env,b))
       if (p === '/gv/chua-cau-sai/thong-ke') return raChua(await chuaThongKe(env, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))

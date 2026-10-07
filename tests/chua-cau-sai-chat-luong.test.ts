@@ -306,6 +306,10 @@ describe('Phạm vi toàn trường và hàng giúp đỡ', () => {
   it('yêu cầu em gửi thật sự vào hàng thầy và giáo viên đọc được bằng quyền riêng', async () => {
     const d = await dung(),
       id = await mo(d)
+    for (const tra of ['40', 'A', 'A']) {
+      const p = await phat(d, id)
+      await nop(d, id, p.item, tra)
+    }
     const r = await goiWorker(worker, d.env, '/hs/chua-cau-sai/gui-thay', {
       token: d.token,
       dotId: id,
@@ -500,21 +504,38 @@ describe('Ranh giới dữ liệu và phục hồi', () => {
     )
     expect(d.dem('chua_loi_item')).toBe(0)
   })
-  it('thầy gỡ tiếp sau gặp 2 sai, em hoàn thành gặp 3; KPI gặp 2 giữ thất bại', async () => {
+  it('chữa chung trên lớp sau gặp 2 sai, em hoàn thành gặp 3; KPI gặp 2 giữ thất bại', async () => {
     const d = await dung(),
       id = await mo(d)
     await sua(d, id)
     vi.setSystemTime(T + 86400001)
     let r = await phat(d, id)
     await nop(d, id, r.item, '172')
-    const { hangThay } = await import('../server/src/chua-cau-sai-thay')
+    const { hangChieu, daChuaTrenLop } =
+      await import('../server/src/chua-cau-sai-chieu')
+    d.sql
+      .prepare(
+        "INSERT INTO buoi_hoc(id,ten,lop,bi_mat,mo_luc,het_han,cap_nhat_luc) VALUES('buoi-kiem','Chữa','12','x',?,?,?)",
+      )
+      .run(
+        new Date(T).toISOString(),
+        new Date(T + 3 * 86400000).toISOString(),
+        new Date(T).toISOString(),
+      )
+    d.sql
+      .prepare(
+        "INSERT INTO buoi_hoc_diem_danh(buoi_id,sbd,luc,cach,trang_thai,cap_nhat_luc) VALUES('buoi-kiem','HS1','x','thay','co_mat','x')",
+      )
+      .run()
+    const g = (await (await hangChieu(d.env, { lop: '12' })).json()).ds[0]
     expect(
       (
-        await hangThay(d.env, {
-          dotId: id,
-          moLai: true,
+        await daChuaTrenLop(d.env, {
+          requestId: crypto.randomUUID(),
+          buoiId: 'buoi-kiem',
+          nhomId: g.id,
           buocId: 'm',
-          loiGo: 'Em giữ phép cộng đúng, kiểm kỹ chỉ số ngoài ngoặc.',
+          dot: g.em.map((e: any) => ({ dotId: e.dotId, revision: e.revision })),
         })
       ).status,
     ).toBe(200)
