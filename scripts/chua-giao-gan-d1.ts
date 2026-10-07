@@ -46,13 +46,13 @@ export async function taoGiaoGanD1() {
     const url = `https://${name}.${subdomain}.workers.dev/giao`
     // Không token phải bị chặn trước mọi truy vấn D1.
     let locked = false
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 30; i++) {
       try {
         const anon = await fetch(url, { method: 'POST', body: '{}', signal: AbortSignal.timeout(10000) })
         if (anon.status === 401) { locked = true; break }
         if (anon.status !== 404 && anon.status < 500) throw new Error('CONG_KHONG_KHOA')
       } catch (e) { if (e instanceof Error && e.message === 'CONG_KHONG_KHOA') throw e }
-      if (i < 11) await new Promise(r => setTimeout(r, 2000))
+      if (i < 29) await new Promise(r => setTimeout(r, 2000))
     }
     if (!locked) throw new Error('Cổng vận hành chưa khoá.')
     console.log('Worker giao tạm đã khoá; cùng luật máy chủ, một cặp đã chọn/yêu cầu.')
