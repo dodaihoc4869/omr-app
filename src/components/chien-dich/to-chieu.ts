@@ -17,6 +17,7 @@ import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { noiDungTuCauGoc, type NoiDungCau } from '../../lib/thoi-gian-len-bang'
 import { saoTuMucDo } from './tinh'
 import type { NoiDungCauMayChu } from './api'
+import type { KetQuaLenh } from '../../lib/goi-lenh-thay'
 
 export type CauGoc = { phan: 'I' | 'II' | 'III'; q: TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion }
 
@@ -159,6 +160,32 @@ export async function napNoiDungChoToChieu(
     soBoKhoi: canHoi.filter((q) => bo.has(q)).length,
     khoiDich: r.khoiDich,
   }
+}
+
+/** Lỗi của MỘT lệnh thầy (nhánh `ok: false` của `KetQuaLenh`). */
+export type LoiLenhThay = Extract<KetQuaLenh<unknown>, { ok: false }>
+
+/** Lỗi này có phải "máy chủ TỪ CHỐI mã bí mật" không — nơi gọi DỪNG và nói rõ thay vì dựng tờ toàn dòng thay thế. */
+export function laLoiMaBiMat(l: LoiLenhThay): boolean {
+  return l.loai === 'tu_choi' && /mã bí mật/i.test(l.chu)
+}
+
+/**
+ * HỎI NỘI DUNG CÂU CHO TỜ CHIẾU, có thử lại: mạng chập chờn / quá hạn ⇒ hỏi lại MỘT lần (máy chủ từ chối `tu_choi` thì hỏi lại cũng vô ích — không thử).
+ * Lỗi cuối cùng ghi vào `ghiLoi` để nơi gọi nói THẬT lý do (07/10: mã bí mật cũ ⇒ tờ chiếu thành "Nội dung câu hỏi N" mà thầy không biết vì sao). Trả `null` khi vẫn lỗi.
+ */
+export async function hoiNoiDungChoToChieu(
+  doc: (qids: string[]) => Promise<KetQuaLenh<NoiDungCauMayChu>>,
+  qids: string[],
+  ghiLoi: (l: LoiLenhThay) => void,
+): Promise<NoiDungCauMayChu | null> {
+  let r = await doc(qids)
+  if (!r.ok && r.loai !== 'tu_choi') r = await doc(qids)
+  if (!r.ok) {
+    ghiLoi(r)
+    return null
+  }
+  return r.du
 }
 
 /** Tuỳ chọn dựng tờ. `khoiDich` = khối của lớp / chiến dịch: dòng có mã khác khối bị bỏ (phòng thủ thêm); rỗng / vắng ⇒ không chặn. */

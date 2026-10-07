@@ -20,7 +20,7 @@ vi.mock('../src/components/KhungXemPhieu', () => ({ default: ({ html }: { html: 
 
 import type { TeacherExamSource } from '../src/data/examContent'
 import LenBangChienDich from '../src/components/chien-dich/LenBangChienDich'
-import { cauKhacKhoiLop, dungBangTra, dungToChieu, napNoiDungChoToChieu, noiDungCua, traChinhXac, type OChieu } from '../src/components/chien-dich/to-chieu'
+import { cauKhacKhoiLop, dungBangTra, dungToChieu, hoiNoiDungChoToChieu, laLoiMaBiMat, napNoiDungChoToChieu, noiDungCua, traChinhXac, type OChieu } from '../src/components/chien-dich/to-chieu'
 import { chuBoCauKhacKhoi, timCauTheoId } from '../src/lib/tra-cau-chieu'
 import { cauChoThay } from '../server/src/noi-dung-cau-chien-dich'
 import { useAppStore } from '../src/store/appStore'
@@ -227,5 +227,86 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
     await waitFor(() => expect(toast).toHaveBeenCalled())
     expect(screen.queryByTestId('to-chieu')).toBeNull()
     expect(toast.mock.calls.map((c) => c[0]).join(' | ')).toContain('không còn câu nào để chiếu')
+  })
+
+  // 07/10: thầy đổi mã bí mật ở Cloudflare, máy chiếu của lớp vẫn gửi mã cũ ⇒ `noi-dung-cau` bị từ chối ⇒ tờ toàn "Nội dung câu hỏi N" chiếu lên bảng mà thầy không biết vì sao.
+  it('máy chủ TỪ CHỐI mã bí mật ⇒ KHÔNG mở tờ toàn dòng thay thế; báo thật lý do + chỉ chỗ nhập lại; không hỏi lại vô ích', async () => {
+    nguonMay.ds = [TO_10, TO_11_MAY]
+    dungMay(() => ({}))
+    const goiCu = goi.getMockImplementation()!
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) =>
+      b.action === 'noi-dung-cau' ? { ok: false, loai: 'tu_choi', chu: 'Sai mã bí mật — mã trên máy này không còn đúng với máy chủ. Vào Cài đặt → Kết nối máy chủ, nhập lại mã bí mật rồi bấm Lưu.' } : goiCu(d, b),
+    )
+    render(<LenBangChienDich />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở tờ máy chiếu' }))
+    await waitFor(() => expect(toast).toHaveBeenCalledWith(expect.stringContaining('Sai mã bí mật'), 'error'))
+    expect(toast.mock.calls.map((c) => c[0]).join(' | ')).toContain('Cài đặt')
+    expect(screen.queryByTestId('to-chieu')).toBeNull()
+    expect(goi.mock.calls.filter(([, b]) => b.action === 'noi-dung-cau')).toHaveLength(1)
+  })
+
+  it('mạng chập chờn lần đầu, lần hai được ⇒ tờ có nội dung THẬT của máy chủ, không dòng thay thế', async () => {
+    nguonMay.ds = [TO_10, TO_11_MAY]
+    dungMay((b) => ({ khoiDich: [11], cau: { [B]: cauChoThay({ qid: B, phan: 'I', text: 'NỘI DUNG SAU LẦN HỎI LẠI', choices: ['a', 'b', 'c', 'd'], correct: 'A' }, 'Este – Lipit'), [C]: cauChoThay({ qid: C, phan: 'I', text: 'CÂU BỐN SAU LẦN HỎI LẠI', choices: ['a', 'b', 'c', 'd'], correct: 'B' }, 'Este – Lipit') }, boKhoi: [D], khongCo: [] }))
+    const goiCu = goi.getMockImplementation()!
+    let lan = 0
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) => {
+      if (b.action === 'noi-dung-cau' && ++lan === 1) return { ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }
+      return goiCu(d, b)
+    })
+    const html = await moTo()
+    expect(goi.mock.calls.filter(([, b]) => b.action === 'noi-dung-cau')).toHaveLength(2)
+    expect(html).toContain('NỘI DUNG SAU LẦN HỎI LẠI')
+    expect(html).toContain('CÂU BỐN SAU LẦN HỎI LẠI')
+    expect(html).not.toContain('Nội dung câu hỏi')
+  })
+
+  it('mạng hỏng cả hai lần ⇒ tờ VẪN mở bằng dòng thay thế + báo số câu thiếu (giữ quyết định Boss 21/09), không báo lỗi mã bí mật', async () => {
+    nguonMay.ds = [TO_10, TO_11_MAY]
+    dungMay(() => ({}))
+    const goiCu = goi.getMockImplementation()!
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) => (b.action === 'noi-dung-cau' ? { ok: false, loai: 'cham', chu: 'Máy chủ trả lời chậm — thử lại sau ít phút.' } : goiCu(d, b)))
+    const html = await moTo()
+    expect(goi.mock.calls.filter(([, b]) => b.action === 'noi-dung-cau')).toHaveLength(2)
+    expect(html).toContain('Nội dung câu hỏi')
+    await waitFor(() => expect(toast).toHaveBeenCalledWith(expect.stringMatching(/câu chưa tra được nội dung đề/), 'warn'))
+    expect(toast.mock.calls.map((c) => c[0]).join(' | ')).not.toContain('mã bí mật')
+  })
+})
+
+describe('hoiNoiDungChoToChieu + laLoiMaBiMat (thuần)', () => {
+  const OK = { ok: true as const, du: { khoiDich: [11], cau: {}, boKhoi: [], khongCo: [] } }
+  it('lần đầu được ⇒ trả nội dung, hỏi đúng một lần, không ghi lỗi', async () => {
+    const doc = vi.fn(async () => OK)
+    const ghi = vi.fn()
+    expect(await hoiNoiDungChoToChieu(doc, ['a'], ghi)).toBe(OK.du)
+    expect(doc).toHaveBeenCalledTimes(1)
+    expect(ghi).not.toHaveBeenCalled()
+  })
+  it('mạng / quá hạn ⇒ thử lại một lần; được thì không ghi lỗi', async () => {
+    const doc = vi.fn().mockResolvedValueOnce({ ok: false, loai: 'mang', chu: 'x' }).mockResolvedValueOnce(OK)
+    const ghi = vi.fn()
+    expect(await hoiNoiDungChoToChieu(doc, ['a'], ghi)).toBe(OK.du)
+    expect(doc).toHaveBeenCalledTimes(2)
+    expect(ghi).not.toHaveBeenCalled()
+  })
+  it('hỏng cả hai lần ⇒ null + ghi lỗi cuối cùng', async () => {
+    const doc = vi.fn(async () => ({ ok: false as const, loai: 'cham' as const, chu: 'chậm' }))
+    const ghi = vi.fn()
+    expect(await hoiNoiDungChoToChieu(doc, ['a'], ghi)).toBeNull()
+    expect(doc).toHaveBeenCalledTimes(2)
+    expect(ghi).toHaveBeenCalledWith({ ok: false, loai: 'cham', chu: 'chậm' })
+  })
+  it('máy chủ từ chối (`tu_choi`) ⇒ KHÔNG thử lại, ghi lỗi', async () => {
+    const doc = vi.fn(async () => ({ ok: false as const, loai: 'tu_choi' as const, chu: 'Sai mã bí mật' }))
+    const ghi = vi.fn()
+    expect(await hoiNoiDungChoToChieu(doc, ['a'], ghi)).toBeNull()
+    expect(doc).toHaveBeenCalledTimes(1)
+    expect(ghi).toHaveBeenCalledTimes(1)
+  })
+  it('laLoiMaBiMat: chỉ đúng khi máy chủ TỪ CHỐI và câu nhắc tới mã bí mật', () => {
+    expect(laLoiMaBiMat({ ok: false, loai: 'tu_choi', chu: 'Sai mã bí mật — vào Cài đặt' })).toBe(true)
+    expect(laLoiMaBiMat({ ok: false, loai: 'tu_choi', chu: 'Lệnh bang đang dựng.' })).toBe(false)
+    expect(laLoiMaBiMat({ ok: false, loai: 'mang', chu: 'Sai mã bí mật' })).toBe(false)
   })
 })
