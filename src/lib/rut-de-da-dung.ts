@@ -131,6 +131,45 @@ export const chuNhanBaoCao = (nhan: string): string => {
   return laNhanThay(n) ? n : `đã làm đúng: ${n || 'không rõ nơi'}`
 }
 
+/** Nhãn câu thay TÁCH thành phần (đọc cả nhãn đã lưu ở ca cũ — định dạng `nhanThay` không đổi): `noi` = "nơi · dd/mm · mức", rỗng khi nhãn ghi "trước đây". Không phải nhãn thay ⇒ null. */
+export interface NhanThayTach { kieu: KieuThay; lyThuyet: boolean; noi: string }
+const TACH_NHAN_THAY = /^Câu (lý thuyết )?này (thay số của|thay cho) câu em đã đúng (?:ở (.+?)|trước đây)(?: \(cùng dạng bài, nội dung khác\))?$/
+export function tachNhanThay(nhan: unknown): NhanThayTach | null {
+  if (typeof nhan !== 'string') return null
+  const m = TACH_NHAN_THAY.exec(nhan.trim())
+  if (!m) return null
+  const thaySo = m[2] === 'thay số của'
+  return { kieu: thaySo ? 'thay_so' : 'cung_dang', lyThuyet: !!m[1], noi: (m[3] ?? '').trim() }
+}
+/**
+ * Dòng ĐẬM NGẮN của ô ghi chú câu thay trên máy em (thầy 07/10: "rút gọn ý nghĩa của phần ghi chú"); nơi · ngày · mức đi dòng phụ bên dưới.
+ * Chữ lưu trong ca (`nhanThay`) và báo cáo của thầy giữ nguyên câu đầy đủ — chỉ máy em hiện bản gọn.
+ */
+export function chuNganNhanThay(t: Pick<NhanThayTach, 'kieu' | 'lyThuyet'>): string {
+  if (t.kieu === 'thay_so') return 'Thay số từ câu em đã đúng'
+  return t.lyThuyet ? 'Thay cho câu lý thuyết em đã đúng' : 'Thay cho câu em đã đúng'
+}
+
+/**
+ * CÂU GỐC của câu thay (thầy 07/10: nút "Xem câu gốc" để em đối chiếu kiến thức): máy thầy ghi vào CHÍNH bản đồ nhãn của em thêm khoá "~goc:<qid câu thay>" → qid câu gốc
+ * em đã đúng. Không phải qid thật nên không bao giờ trùng một câu trong đề; máy chủ cất/cắt bản đồ này nguyên văn (không cần sửa đường cất), máy em cũ bỏ qua.
+ * Chỉ MAPPING (qid → qid, vài chục byte một câu) — nội dung công khai của câu gốc máy em xin riêng ở `/hs/cau-goc`, không đi trong gói đề của cả lớp.
+ */
+export const TIEN_TO_GOC = '~goc:'
+export const khoaGoc = (qidThay: string): string => `${TIEN_TO_GOC}${qidThay}`
+export const laKhoaGoc = (khoa: string): boolean => khoa.startsWith(TIEN_TO_GOC)
+/** qid câu gốc của câu thay `qidThay` trong bản đồ nhãn của em (thiếu ⇒ rỗng). */
+export function gocCuaCauThay(daDung: Readonly<Record<string, string>> | null | undefined, qidThay: string): string {
+  const v = daDung?.[khoaGoc(qidThay)]
+  return typeof v === 'string' ? v.trim() : ''
+}
+/** Mọi qid câu gốc có trong bản đồ nhãn của em (không trùng) — máy chủ chỉ phát nội dung công khai cho đúng những qid này. */
+export function cacCauGocCuaEm(daDung: Readonly<Record<string, unknown>> | null | undefined): string[] {
+  const ra = new Set<string>()
+  for (const [k, v] of Object.entries(daDung ?? {})) if (laKhoaGoc(k) && typeof v === 'string' && v.trim()) ra.add(v.trim())
+  return [...ra]
+}
+
 // ---------------------------------------------------------------- rút
 
 /** Một câu em đã tự làm đúng (máy chủ `/ca/cau-da-dung` trả, máy thầy gắn phần/mức theo kho đề). */
@@ -440,6 +479,8 @@ export function banDoDaDung(kq: Pick<KetQuaDaDung, 'theoEm' | 'nhan' | 'dem'>): 
     bo[sbd] = ds.map((c) => c.qid)
     // Câu BÙ (nhãn rỗng) không vào bảng nhãn — máy em chỉ in "Em đã làm đúng" cho câu thật sự đã đúng.
     daDung[sbd] = Object.fromEntries(ds.map((c) => [c.qid, kq.nhan[sbd]?.[c.qid] ?? '']).filter(([, n]) => n))
+    // Câu THAY (đã áp bản thay): kèm khoá "~goc:<qid câu thay>" → qid câu gốc em đã đúng, để máy em có nút "Xem câu gốc" (thầy 07/10). Câu bù / nguyên văn: không có.
+    for (const c of ds) if (c.goc && daDung[sbd]![c.qid]) daDung[sbd]![khoaGoc(c.qid)] = c.goc // `goc` chỉ có ở câu đã THAY (apThayVaoKetQua đặt cùng `thay`)
     demDaDung[sbd] = Object.fromEntries(ds.map((c) => [c.qid, kq.dem[sbd]?.[c.qid] ?? [0, 0]]))
   }
   return { bo, daDung, demDaDung }

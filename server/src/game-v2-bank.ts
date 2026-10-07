@@ -167,21 +167,25 @@ async function docQidDeBaoVe(env: Env, bankR2: string, khoa: string): Promise<re
 /** Thầy xác nhận 29/09/2026: chỉ khoá đề của ca từ hôm nay trở đi. Ca ĐÃ ĐÓNG có giờ bắt đầu (không có thì mốc cập nhật) TRƯỚC mốc này
  *  thì bỏ, không khoá câu nữa. Ca trước mốc mà vẫn đang MỞ thì vẫn khoá như cũ (còn em có thể đang làm). */
 export const MOC_KHOA_CA='2026-09-28T17:00:00.000Z'
-export async function protectedQuestions(env:Env):Promise<Set<string>> {
-  const now=Date.now()
-  const nong=demCaBaoVe.doc('current',now);if(nong)return new Set(nong)
+/** Các ca ĐANG BẢO VỆ đề (mở / chưa công bố / còn làm được) — phần chọn ca tách khỏi `protectedQuestions` NGUYÊN VĂN (cùng truy vấn, cùng bộ lọc) để `protectedQuestionsTruCa` dùng chung. */
+async function caDangBaoVe(env:Env,now:number):Promise<Row[]> {
   const all=await env.DB.prepare(`SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') submitted,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) active
     FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca`).bind(new Date(now).toISOString(),MOC_KHOA_CA).all<Row>()
-  const r={results:all.results.filter(ca=>{
+  return all.results.filter(ca=>{
     const released=ca.cong_bo==='ngay'||ca.cong_bo==='ca_lop_xong'&&(ca.trang_thai==='dong'||Number(ca.entered)>0&&Number(ca.submitted)>=Number(ca.entered))
     const entryEnd=Date.parse(str(ca.het_han_vao));const homeworkEnd=Date.parse(str(ca.han_nop))
     const end=ca.loai==='baitap'?homeworkEnd:entryEnd+Number(ca.thoi_gian_phut)*60000
     const canStillTest=ca.trang_thai==='mo'&&(!Number.isFinite(end)||end>=now||Number(ca.active)>0||Date.parse(str(ca.bat_dau))>now)
     return !released||canStillTest
-  })}
+  })
+}
+export async function protectedQuestions(env:Env):Promise<Set<string>> {
+  const now=Date.now()
+  const nong=demCaBaoVe.doc('current',now);if(nong)return new Set(nong)
+  const r={results:await caDangBaoVe(env,now)}
   // Trả BẢN SAO ở mọi lối ra: nơi gọi (game-v2.ts `start`/`resume`/`answer`) `.add()` câu riêng của từng em vào tập này; trả thẳng tập trong đệm là ghi bẩn đệm dùng chung, câu của em A rò sang em B.
   const fingerprint=await hash(r.results);const cached=protectionCache.get('current')
   if(cached?.fingerprint===fingerprint){demCaBaoVe.ghi('current',now,new Set(cached.blocked));return new Set(cached.blocked)}
@@ -195,6 +199,16 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   }))
   for(const ds of tapTheoCa)for(const x of ds)blocked.add(x)
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});demCaBaoVe.ghi('current',now,new Set(blocked));return blocked
+}
+/** Như `protectedQuestions` nhưng KHÔNG tính đề của ca `boQuaMaCa` (thầy 07/10 — nút "Xem câu gốc" của ca "Kiểm chứng câu đã đúng": câu gốc em đã đúng có thể nằm trong
+ *  chính đề của ca ấy ở bản của em khác, ca đang mở nên bị coi "đang bảo vệ" — nhưng với em xin xem thì đó là câu em ĐÃ LÀM ĐÚNG trước đây, không phải đề lộ sớm). Đề của CÁC ca khác vẫn bảo vệ.
+ *  KHÔNG đệm (chỉ gọi khi câu xin đã dính tập bảo vệ chung, hiếm); từng đề đọc qua đệm theo (bank_r2, cap_nhat_luc) như hàm gốc. Không kiểm được ⇒ ném lỗi (nơi gọi đóng cửa). */
+export async function protectedQuestionsTruCa(env:Env,boQuaMaCa:string):Promise<Set<string>> {
+  const cas=(await caDangBaoVe(env,Date.now())).filter(ca=>ca.bank_r2&&str(ca.ma_ca)!==boQuaMaCa)
+  const tap=await Promise.all(cas.map(ca=>docQidDeBaoVe(env,str(ca.bank_r2),`${str(ca.bank_r2)}|${str(ca.cap_nhat_luc)}`)))
+  const blocked=new Set<string>()
+  for(const ds of tap)for(const x of ds)blocked.add(x)
+  return blocked
 }
 /** CÂU THÔ của kho (mỗi câu có `qid`) đang được bảo vệ cho ca chưa công bố / còn làm được — theo qid HOẶC NHÓM NỘI DUNG
  *  (bản chép cùng nội dung ở tờ DB-/DH- mang qid khác). Dùng cho kênh trả đáp án/lời giải ngoài game (BTVN…).

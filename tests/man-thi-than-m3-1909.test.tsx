@@ -181,7 +181,12 @@ describe('nối vào màn thi (khoá nguồn) và CSS', () => {
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|position:\s*fixed|z-index/)
     for (const m of css.replace(/@media[^{]*\{/g, '').matchAll(/([^{}]+)\{/g)) for (const b of m[1].split(',')) expect(b.trim().startsWith('.m3 '), b).toBe(true)
     expect(css).toMatch(/\.thi-dai-chua-lam-o button \{[^}]*min-width: 48px; height: 48px/)
-    expect(css).toMatch(/\.m3 \.thi-cau-dau \{[^}]*min-width: 48px; height: 48px/) // nút "Xem lại sau" ≥ 48 px
+    // nút "Xem lại sau" (thầy 07/10: không đè ô ghi chú câu thay): hình nhìn thấy cao 36 px, VÙNG CHẠM vẫn ≥ 48 px nhờ ::after (36 + 2×6) và rộng ≥ 48 px
+    const nut = css.match(/\.m3 \.thi-cau-dau \{[^}]*min-width: 48px; min-height: 0; height: (\d+)px/) // `min-height: 0` thắng luật chung `.m3 button { min-height: 48px }`
+    const vung = css.match(/\.m3 \.thi-cau-dau::after \{[^}]*inset: -(\d+)px -(\d+)px/)
+    expect(nut, 'nút Xem lại sau: min-width 48 + chiều cao').not.toBeNull()
+    expect(vung, 'vùng chạm ::after').not.toBeNull()
+    expect(Number(nut![1]) + 2 * Number(vung![1])).toBeGreaterThanOrEqual(48)
     expect(css).toMatch(/\.m3 \.thi-cau-dau\[aria-pressed='true'\] \{/)
     expect(css).toMatch(/\.m3 \.thi-o-cau-co \{[^}]*background: var\(--m3-primary\); color: var\(--m3-on-primary\)/) // dấu cờ có nền riêng: nhìn rõ trên ô sáng lẫn tối
     expect(css).toMatch(/@media \(min-width: 880px\) \{ \.m3 \.thi-dai-chua-lam \{ display: none; \} \}/)
