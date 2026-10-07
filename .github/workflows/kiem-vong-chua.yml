@@ -5,11 +5,16 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: kiem-chua-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   kiem:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Lấy mốc màu main trên bản checkout PR
+        run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
       - uses: actions/setup-node@v4
         with: {node-version: 24, cache: npm}
       - run: npm ci
