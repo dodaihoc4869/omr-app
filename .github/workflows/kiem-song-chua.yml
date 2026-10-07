@@ -16,9 +16,10 @@ jobs:
         run: |
           node --input-type=module <<'JS'
           for(const host of ['https://omr-app-b3u.pages.dev']) {
-            for(const path of ['/','/hs','/ph','/sw-version.json']) {
-              const r=await fetch(host+path+'?kiem='+Date.now(),{signal:AbortSignal.timeout(20000)});
-              console.log(JSON.stringify({host,path,status:r.status,type:r.headers.get('content-type')}));
+            for(const path of ['/','/hs','/hs/','/ph','/gv','/index.html','/_redirects','/sw-version.json','/hs?kiem='+Date.now()]) {
+              const r=await fetch(host+path,{signal:AbortSignal.timeout(20000)});
+              const text=await r.text();
+              console.log(JSON.stringify({path,status:r.status,type:r.headers.get('content-type'),server:r.headers.get('server'),cache:r.headers.get('cf-cache-status'),url:r.url,app:text.includes('startup-retry'),size:text.length}));
             }
           }
           for(const path of ['/hs/chua-cau-sai/danh-sach','/gv/chua-cau-sai/hang-chieu']) {
