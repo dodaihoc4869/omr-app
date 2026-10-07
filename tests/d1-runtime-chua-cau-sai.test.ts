@@ -2,7 +2,9 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { env } from 'cloudflare:test'
 import type { Env } from '../server/src/kieu'
-import { seedChua, Q } from './_chua-cau-sai-fixture'
+import { seedChua, Q, hocLieuMau } from './_chua-cau-sai-fixture'
+import {hocLieuThay} from '../server/src/chua-cau-sai-thay'
+import {bamDeMu,probeDuyNhat} from '../server/src/chua-hoc-lieu-kiem-may'
 import { moDot, phatItem, nopItem } from '../server/src/chua-cau-sai'
 import { hangChieu, daChuaTrenLop } from '../server/src/chua-cau-sai-chieu'
 import { dongBoTuLuyen } from '../server/src/chua-cau-sai-tu-luyen'
@@ -224,6 +226,23 @@ describe('Đồng bộ Tu luyện theo lô trên workerd/D1', () => {
     expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM chua_loi_tu_receipt WHERE luot_id=?').bind(id).first<any>()).n).toBe(2)
     expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM su_kien_hoc WHERE ma_nguon=?').bind(id).first<any>()).n).toBe(2)
   })
+  it('nạp học liệu kiểm máy thật giữ bằng chứng, idempotent và không gắn tên thầy',async()=>{
+    const h=hocLieuMau()
+    h.buoc[0].tieuDe='Khối lượng mol · kiểm máy'
+    const kiemMay={phienBan:1,luotSoan:'D1-soan-0001',luotKiem:'D1-kiem-0001',tra:await Promise.all(probeDuyNhat(h).map(async p=>({qid:p.qid,phienBan:p.phienBan,bamDe:await bamDeMu(p),dapAn:p.noiDungTrucTiep!.dapAn,lyDo:'Đã giải riêng và cộng đúng các nguyên tử trong công thức.',chac:true}))),chuyenMon:{dungKhoaHoc:true,tuongDuong:true,dungDoKho:true,duBuoc:true,lyDo:'Đủ dữ kiện khối lượng nguyên tử, cùng kỹ năng cộng nguyên tử khối, bốn bản đều mới và giữ độ khó.'}}
+    const bad=structuredClone(kiemMay);bad.tra[0].dapAn='999'
+    expect((await hocLieuThay(E,{luu:true,hocLieu:h,kiemMay:bad})).status).toBe(422)
+    const first=await hocLieuThay(E,{luu:true,hocLieu:h,kiemMay}),receipt=await first.json() as any
+    expect(first.status).toBe(200)
+    const row=await E.DB.prepare('SELECT hoc_lieu_json,nguoi_duyet FROM chua_loi_hoc_lieu WHERE bam=?').bind(receipt.bam).first<any>()
+    expect(row.nguoi_duyet).toBe('máy kiểm độc lập · v1')
+    expect(JSON.parse(row.hoc_lieu_json).kiemMay.tra).toHaveLength(kiemMay.tra.length)
+    kiemMay.luotKiem='D1-kiem-0002'
+    const again=await (await hocLieuThay(E,{luu:true,hocLieu:h,kiemMay})).json() as any
+    expect(again.bam).toBe(receipt.bam)
+    expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM chua_loi_hoc_lieu WHERE bam=?').bind(receipt.bam).first<any>()).n).toBe(1)
+  })
+
   it('cửa giao tạm chạy native trên workerd, hai cặp dưới 50 lệnh và retry giữ mẫu số', async () => {
     await E.DB.prepare("UPDATE cau_hinh SET gia_tri=? WHERE khoa='chua_cau_sai_v1'").bind(JSON.stringify({bat:true,phamVi:'tat_ca'})).run()
     let lenh = 0

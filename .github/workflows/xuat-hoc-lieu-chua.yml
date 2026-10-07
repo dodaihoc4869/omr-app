@@ -1,0 +1,31 @@
+name: Đọc nguồn học liệu vòng chữa (không ghi D1)
+on:
+  push:
+    branches: [codex/hoc-lieu-chua-tu-dong]
+    paths: [.github/workflows/xuat-hoc-lieu-chua.yml, scripts/xuat-hoc-lieu-chua.mjs]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - name: Làm sạch khoá để đọc nguồn
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Chỉ xuất câu gốc và học liệu, không xuất dữ liệu học sinh
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/xuat-hoc-lieu-chua.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nguon-hoc-lieu-chua
+          path: /tmp/nguon-hoc-lieu-chua.json
+          retention-days: 3
