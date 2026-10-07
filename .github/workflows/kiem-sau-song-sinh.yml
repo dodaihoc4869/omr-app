@@ -1,0 +1,41 @@
+name: Kiểm độ phủ sáu câu song sinh (chỉ đọc)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/kiem-sau-song-sinh.yml'
+      - 'scripts/loi-giai/kiem-sau-ban-0710.ts'
+permissions:
+  contents: read
+jobs:
+  kiem:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Kiểm thử cổng báo cáo
+        run: npx vitest run tests/kiem-sau-ban-0710.test.ts --reporter=dot
+      - name: Làm sạch cấu hình Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Dựng chương trình chỉ đọc
+        run: npx esbuild scripts/loi-giai/kiem-sau-ban-0710.ts --bundle --platform=node --format=esm --outfile=/tmp/kiem-sau-ban.mjs
+      - name: Quét kho thật — còn thiếu thì cổng kiểm đỏ
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node /tmp/kiem-sau-ban.mjs /tmp/do-phu-sau-ban.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: do-phu-sau-ban
+          path: /tmp/do-phu-sau-ban.json
+          if-no-files-found: warn

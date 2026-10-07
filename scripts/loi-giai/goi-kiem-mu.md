@@ -28,3 +28,6 @@ Chương trình Hoá học phổ thông 2018 của Việt Nam (SGK hiện hành,
 1. Mở từng tệp `vao/`, mở ảnh nếu có, giải từng mục từ đầu (tính ra giấy nháp trong đầu, kiểm lại phép tính).
 2. Ghi `ra/<tệp>.json` bằng công cụ Write. Không có công cụ nào khác; không viết script.
 3. Trả lời cuối đúng 1 dòng: số mục đã giải / số mục "?".
+
+## Kiểm định từng mục
+Tự giải lại từ dữ kiện đề, không đoán theo đáp án hay suy từ các mục khác. Kiểm đơn vị, điều kiện phản ứng, giới hạn vật lý và mức làm tròn. Với lý thuyết, kiểm từng phương án, các từ tuyệt đối và khả năng nhiều đáp án đúng. Phải viết lý do cho từng kết luận; nếu thiếu dữ kiện hoặc không chắc, ghi `chac: false` và nêu lý do, không cố chọn để đủ số lượng.

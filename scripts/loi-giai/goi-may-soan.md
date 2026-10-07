@@ -1,5 +1,7 @@
 # Việc: soạn HỒ SƠ LỜI GIẢI cho một lô câu Hoá (khuôn 1.2)
 
+Chỉ xử lý câu Phần I, II và III thuộc lý thuyết hoặc tính toán; tuyệt đối không sinh học liệu cho câu tự luận. Mục tiêu mỗi câu là sáu bản khác đã kiểm; Phần II cần 24 ý mới để tạo sáu bộ bốn ý không trùng nhau. Không tính việc chỉ xáo đáp án hoặc sửa vài chữ là bản khác đạt chuẩn.
+
 Bạn soạn lời giải từng bước cho học sinh luyện thi (chương trình Hoá phổ thông 2018 của Việt Nam; tên chất theo IUPAC tiếng Anh như đề: ethyl acetate, glucose, saccharose…). Mỗi câu ra MỘT tệp JSON. Khung trình bày cố định của app vẽ tệp ấy. Bạn chỉ viết dữ liệu: không viết HTML ngoài các thẻ cho phép, không viết JavaScript.
 
 ## Thư mục làm việc (đã có sẵn)
@@ -63,7 +65,7 @@ Mục đích: học sinh làm lại câu sai bằng một BẢN KHÁC (không h�
 - KHÔNG ghi các chữ "song sinh", "biến thể", "bản khác", "câu gốc", "đề gốc" trong đề / phương án / lời giải (học sinh đọc).
 - Không trùng `vao.daCo.banKhac` (các bản đã có).
 
-**`can.yDs = n > 0` (Phần II): viết từ `min(8, n)` tới `n` ý MỚI vào `yMoi`,** cùng đề dẫn `vao.de` (+ bảng, hình) — ngoài 4 ý gốc và `vao.daCo.yDs`. Mỗi ý `{ "t": "<phát biểu>", "d": "D" | "S", "lyDo": "<lí do 1 dòng>" }`:
+**`can.yDs = n > 0` (Phần II): viết ĐÚNG `n` ý MỚI vào `yMoi`,** cùng đề dẫn `vao.de` (+ bảng, hình) — ngoài 4 ý gốc và `vao.daCo.yDs`. Mỗi ý `{ "t": "<phát biểu>", "d": "D" | "S", "lyDo": "<lí do 1 dòng>" }`:
 - Mỗi giá trị Đúng / Sai chiếm ít nhất 1/4 số ý (kho lệch một phía thì học sinh đoán được).
 - Chỉ viết ý mà Đ/S là CHẮC theo SGK Hoá chương trình 2018 và dữ kiện trong đề. Ý mơ hồ, phụ thuộc quy ước / cách hiểu, hoặc cần dữ kiện ngoài đề ⇒ KHÔNG viết.
 - Ý phải đọc độc lập (không "ý trên", "câu a"), chữ thường như đề kho, không thẻ HTML; `lyDo` một dòng, nói bản chất.

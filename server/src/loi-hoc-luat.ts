@@ -29,7 +29,7 @@ export interface LanLamLoi {
   ngayVn: string // YYYY-MM-DD
   ketQua: 0 | 1 | null
   coHoTro: boolean // assistance khác none/rỗng, hoặc purpose không phải một lần làm (xem_loi_giai · luot — OMNI 3)
-  songSinh: boolean // làm câu song sinh (qid "<gốc>~ss0..3") hoặc CÂU ANH EM (05/10: sổ ghi `raw_json.tc = <gốc>`) thay vì câu gốc
+  songSinh: boolean // làm câu song sinh (qid "<gốc>~ss<i>") hoặc CÂU ANH EM (05/10: sổ ghi `raw_json.tc = <gốc>`) thay vì câu gốc
   nguon: string
 }
 
@@ -129,15 +129,15 @@ function maxNgay(a: string, b: string): string {
   return a > b ? a : b
 }
 
-/** Trần số câu song sinh mỗi câu (05/10 "làm lại câu sai bằng bản khác", bậc 1: nâng 2 → 4 — đề xuất 2.7 đã chốt). */
-export const TRAN_SONG_SINH = 4
+/** Mục tiêu số câu song sinh dùng được mỗi câu (thầy 07/10: ít nhất sáu bản, không sinh tự luận). */
+export const TRAN_SONG_SINH = 6
 /**
- * Số CHỖ của mảng song sinh một câu (qid ảo "~ss0" … "~ss7"): gói đề ghi ≤ 4 bản; máy soạn (hoc-lieu-may-soan.ts) NỐI thêm tới khi đủ 4 bản DÙNG
- * ĐƯỢC mà vẫn giữ nguyên chỗ các bản cũ (kể cả bản không dùng được) ⇒ mảng có thể dài tới 8. Đọc sổ phải phủ đủ mọi chỗ, nếu không lượt làm bản ở
- * chỗ ≥ 4 sẽ rơi khỏi lịch sử câu gốc.
+ * Số CHỖ dự phòng của mảng song sinh một câu (qid ảo "~ss0" … "~ss11"): máy soạn NỐI thêm tới khi đủ sáu bản DÙNG
+ * ĐƯỢC mà vẫn giữ nguyên chỗ các bản cũ (kể cả bản không dùng được). Đọc sổ phải phủ đủ mọi chỗ, nếu không lượt làm bản ở
+ * chỗ ≥ 6 sẽ rơi khỏi lịch sử câu gốc. Không đổi chỉ số hoặc cắt các bản lịch sử khi nâng mục tiêu.
  */
 export const CHO_SONG_SINH = 2 * TRAN_SONG_SINH
-/** qid gốc + MỌI qid ảo song sinh ("<gốc>~ss0" … "~ss7") — danh sách đúng để đọc sổ theo chỉ mục (không LIKE). Dùng chung mọi nơi, không tự viết `~ss0`/`~ss1`. */
+/** qid gốc + các qid ảo song sinh trong số chỗ dự phòng — danh sách để đọc sổ theo chỉ mục (không LIKE). Dùng chung mọi nơi, không tự viết `~ss0`/`~ss1`. */
 export const cacQidSongSinh = (goc: string): string[] => [goc, ...Array.from({ length: CHO_SONG_SINH }, (_, i) => `${goc}~ss${i}`)]
 
 /**

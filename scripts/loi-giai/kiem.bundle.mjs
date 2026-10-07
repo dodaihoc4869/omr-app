@@ -2521,7 +2521,7 @@ var BO_CHIA_KHOA = {
 };
 
 // server/src/loi-hoc-luat.ts
-var TRAN_SONG_SINH = 4;
+var TRAN_SONG_SINH = 6;
 var CHO_SONG_SINH = 2 * TRAN_SONG_SINH;
 
 // server/src/cau-bo-tro.ts
@@ -2538,7 +2538,7 @@ function thieuBangSongSinh(ss) {
   return nhacBang && !docBangSongSinh(ss.bang) && !anhDe && !bangTrongChu;
 }
 function songSinhDuDuLieu(phan, ss) {
-  if (!ss.de?.trim() || thieuBangSongSinh(ss)) return false;
+  if (!ss || typeof ss.de !== "string" || typeof ss.dap_an !== "string" || !ss.de.trim() || thieuBangSongSinh(ss)) return false;
   if (phan === "I") return ["A", "B", "C", "D"].every((k) => typeof ss.pa?.[k] === "string" && ss.pa[k].trim()) && /^[ABCD]$/.test(ss.dap_an.trim());
   return phan === "III" && /^-?\d+(,\d+)?$/.test(ss.dap_an.trim());
 }
@@ -2546,9 +2546,9 @@ function songSinhDuDuLieu(phan, ss) {
 // server/src/may-soan-kiem.ts
 var laObj2 = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
 var chuoi3 = (x) => (typeof x === "string" ? x : typeof x === "number" && Number.isFinite(x) ? String(x) : "").normalize("NFC");
-var SO_BAN_KHAC_TOI_DA = 4;
-var Y_DS_DU = 8;
-var Y_DS_MUC_TIEU = 12;
+var SO_BAN_KHAC_TOI_DA = TRAN_SONG_SINH;
+var Y_DS_DU = 4 * SO_BAN_KHAC_TOI_DA;
+var Y_DS_MUC_TIEU = Y_DS_DU;
 var Y_DS_TRAN = 24;
 var CACH_BAN_KHAC = ["doi_so", "doi_chat", "dao_chieu", "dung_sai", "doi_nhieu"];
 var CAN_RONG = { hoSo: true, banKhac: 0, kieuBan: "tu_chon", yDs: 0 };
@@ -2607,6 +2607,7 @@ function cauGocTuKho(c, bam) {
 }
 function cauGocTuVao(v) {
   if (!laObj2(v)) return null;
+  if (laCauTuLuan({ kieu: v.kieuKho ?? v.kieu, tuLuan: v.tuLuan, tu_luan: v.tu_luan, phan: v.phan, qid: v.qid, maDe: v.maDe ?? v.ma_de })) return null;
   const dang = chuoi3(v.dang);
   if (dang !== "tn" && dang !== "ds" && dang !== "tln") return null;
   const y = Array.isArray(v.y) ? v.y.filter(laObj2).map((x) => ({ id: chuoi3(x.id), t: chuoi3(x.t) })) : [];
@@ -2614,6 +2615,13 @@ function cauGocTuVao(v) {
   const phanTho = chuoi3(v.phan);
   const phan = phanTho === "I" || phanTho === "II" || phanTho === "III" ? phanTho : dang === "tn" ? "I" : dang === "ds" ? "II" : "III";
   const dapAn = dang === "tn" ? chuoi3(laObj2(v.mc) ? v.mc.dapAn : "") || (y.find((x) => chuoi3(da[x.id]) === "D")?.id ?? "") : dang === "ds" ? y.map((x) => chuoi3(da[x.id])).join("") : chuoi3(da.kq);
+  if (laCauTuLuan({
+    phan,
+    de: chuoi3(v.deTho) || boHtml(chuoi3(v.de)),
+    dap_an: dapAn,
+    ...dang === "tn" ? { pa: Object.fromEntries(y.map((x) => [x.id, x.t])) } : {},
+    ...dang === "ds" ? { y: Object.fromEntries(y.map((x) => [x.id, x.t])) } : {}
+  })) return null;
   return {
     qid: chuoi3(v.qid),
     bam: chuoi3(v.bam),
@@ -2633,7 +2641,7 @@ function kieuBanCua(kieuKho) {
 }
 function tinhCan(o) {
   const kieuBan = kieuBanCua(o.kieuKho);
-  if (o.boTro === false || o.nghi) return { hoSo: o.hoSo, banKhac: 0, kieuBan, yDs: 0 };
+  if (o.boTro === false || o.nghi || laCauTuLuan({ kieu: o.kieuKho })) return { hoSo: o.hoSo, banKhac: 0, kieuBan, yDs: 0 };
   return {
     hoSo: o.hoSo,
     kieuBan,
@@ -2687,6 +2695,7 @@ function kiemPhepTinhBan(ds, noi, loi) {
 function kiemBanKhacMot(goc, x, i) {
   const noi = `bản khác ${i + 1}`;
   if (!laObj2(x)) return { loi: [`${noi}: không phải đối tượng JSON`] };
+  if (laCauTuLuan({ kieu: goc.kieu })) return { loi: [`${noi}: không sinh song sinh cho câu tự luận`] };
   if (goc.phan !== "I" && goc.phan !== "III") return { loi: [`${noi}: chỉ câu Phần I / III có bản khác`] };
   const loi = [];
   const kieu = chuoi3(x.kieu).trim();
@@ -2828,6 +2837,7 @@ function kiemBanKhac(goc, can, ds, daCo = DA_CO_RONG, batBuocSo = true) {
 function kiemYMoiMot(_goc, x, i) {
   const noi = `ý mới ${i + 1}`;
   if (!laObj2(x)) return { loi: [`${noi}: không phải đối tượng JSON`] };
+  if (laCauTuLuan({ kieu: _goc.kieu })) return { loi: [`${noi}: không sinh ý mới cho câu tự luận`] };
   const loi = [];
   const t = chuoi3(x.t).trim();
   if (t.length < 10) loi.push(`${noi}: chữ của ý rỗng hoặc quá ngắn`);
@@ -2935,19 +2945,20 @@ function khopMu(dang, deXuat, m, la4Y = false) {
   const v = soDapAn(a), w = soDapAn(deXuat);
   return Number.isFinite(w) && Math.abs(v - w) <= 0.5 * 10 ** -soLe(deXuat) + 1e-9;
 }
-var lyDoBoMu = (m, deXuat) => !m ? "lượt kiểm mù không trả lời mục này" : m.d.includes("?") || m.chac === false ? `lượt kiểm mù báo mơ hồ / không chắc${m.lyDo ? ": " + m.lyDo.slice(0, 160) : ""}` : `lượt kiểm mù ra ${m.d} ≠ ${deXuat}`;
+var lyDoBoMu = (m, deXuat) => !m ? "lượt kiểm mù không trả lời mục này" : m.d.includes("?") || m.chac === false ? `lượt kiểm mù báo mơ hồ / không chắc${m.lyDo ? ": " + m.lyDo.slice(0, 160) : ""}` : m.chac !== true ? "lượt kiểm mù chưa xác nhận chắc chắn (cần chac: true)" : !chuoi3(m.lyDo).trim() ? "lượt kiểm mù thiếu lí do giải độc lập" : `lượt kiểm mù ra ${m.d} ≠ ${deXuat}`;
+var coBangChungMu = (m) => m?.chac === true && !!chuoi3(m.lyDo).trim();
 function ghepHaiLuot(goc, hopLe, tra) {
   const theo = new Map((tra ?? []).map((t) => [t.id, t]));
   const songSinh = [], yMoi = [];
   const boSongSinh = [], boY = [];
   hopLe.songSinh.forEach((s, i) => {
     const m = theo.get(`ss${i + 1}`);
-    if (khopMu(goc.dang, s.dap_an, m)) songSinh.push({ ...s, kiem: { d2: m.d, ...m.lyDo ? { lyDo2: m.lyDo.slice(0, 300) } : {} } });
+    if (coBangChungMu(m) && khopMu(goc.dang, s.dap_an, m)) songSinh.push({ ...s, kiem: { d2: m.d, lyDo2: m.lyDo.trim().slice(0, 300), chac: true } });
     else boSongSinh.push({ i, lyDo: lyDoBoMu(m, s.dap_an) });
   });
   hopLe.yMoi.forEach((y, i) => {
     const m = theo.get(`y${i + 1}`);
-    if (khopMu("ds", y.d, m)) yMoi.push({ ...y, kiem: { d2: chuanDs(m.d), ...m.lyDo ? { lyDo2: m.lyDo.slice(0, 300) } : {} } });
+    if (coBangChungMu(m) && khopMu("ds", y.d, m)) yMoi.push({ ...y, kiem: { d2: chuanDs(m.d), lyDo2: m.lyDo.trim().slice(0, 300), chac: true } });
     else boY.push({ i, lyDo: lyDoBoMu(m, y.d) });
   });
   return { songSinh, yMoi, boSongSinh, boY };
@@ -2982,7 +2993,15 @@ function nhanBanKhacNop(goc, ds, daCo) {
       bo.push({ i, lyDo: "chưa qua hai lượt khớp (thiếu kiem.d2 hoặc lệch đáp án)" });
       return;
     }
-    qua.push({ i, x, kiem: { d2: chuoi3(k.d2).slice(0, 40), ...chuoi3(k.lyDo2).trim() ? { lyDo2: chuoi3(k.lyDo2).trim().slice(0, 300) } : {} } });
+    if (k.chac !== true) {
+      bo.push({ i, lyDo: "lượt kiểm mù chưa xác nhận chắc chắn (cần kiem.chac: true)" });
+      return;
+    }
+    if (!chuoi3(k.lyDo2).trim()) {
+      bo.push({ i, lyDo: "lượt kiểm mù thiếu lí do giải độc lập (kiem.lyDo2)" });
+      return;
+    }
+    qua.push({ i, x, kiem: { d2: chuoi3(k.d2).slice(0, 40), lyDo2: chuoi3(k.lyDo2).trim().slice(0, 300), chac: true } });
   });
   const r = kiemBanKhac(goc, { ...CAN_RONG, banKhac: SO_BAN_KHAC_TOI_DA }, qua.map((q) => q.x), daCo, false);
   r.bo.forEach((b) => bo.push({ i: qua[b.i].i, lyDo: b.lyDo }));
@@ -2997,7 +3016,15 @@ function nhanYMoiNop(goc, ds, daCo) {
       bo.push({ i, lyDo: "chưa qua hai lượt khớp (thiếu kiem.d2 hoặc lệch Đ/S)" });
       return;
     }
-    qua.push({ i, x, kiem: { d2: chuanDs(k.d2), ...chuoi3(k.lyDo2).trim() ? { lyDo2: chuoi3(k.lyDo2).trim().slice(0, 300) } : {} } });
+    if (k.chac !== true) {
+      bo.push({ i, lyDo: "lượt kiểm mù chưa xác nhận chắc chắn (cần kiem.chac: true)" });
+      return;
+    }
+    if (!chuoi3(k.lyDo2).trim()) {
+      bo.push({ i, lyDo: "lượt kiểm mù thiếu lí do giải độc lập (kiem.lyDo2)" });
+      return;
+    }
+    qua.push({ i, x, kiem: { d2: chuanDs(k.d2), lyDo2: chuoi3(k.lyDo2).trim().slice(0, 300), chac: true } });
   });
   const r = kiemYMoi(goc, { ...CAN_RONG, yDs: Y_DS_MUC_TIEU }, qua.map((q) => q.x), daCo, false);
   r.bo.forEach((b) => bo.push({ i: qua[b.i].i, lyDo: b.lyDo }));

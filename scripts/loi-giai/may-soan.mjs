@@ -5,6 +5,7 @@
 //   node scripts/loi-giai/may-soan.mjs --mot-lan       # làm hết hàng hiện có rồi dừng
 //   node scripts/loi-giai/may-soan.mjs --de 12-KT-C1-D4 --mot-lan   # đề sắp giao: đưa lên đầu hàng rồi soạn
 //   node scripts/loi-giai/may-soan.mjs --nap-hang      # LẦN ĐẦU: xếp cả kho cũ vào hàng (đề mới nạp thì tự vào hàng)
+//   node scripts/loi-giai/may-soan.mjs --nap-song-sinh-toan-kho --lop tat-ca --mot-lan # nạp hàng học liệu rồi sinh phần còn thiếu
 //   node scripts/loi-giai/may-soan.mjs --tong          # xem hàng việc theo chương
 //   node scripts/loi-giai/may-soan.mjs --hang-em-sai   # xem hàng câu EM ĐÃ SAI chưa có bản khác (làm mới ngay)
 //   Tuỳ chọn: --luong 4 · --lop 12 (--lop tat-ca = mọi lớp) · --so 12 (câu mỗi lô) · --model <tên> · --thu (1 lô 3 câu, không nộp)
@@ -15,8 +16,8 @@
 // gói giao việc, bộ kiểm) ⇒ `claude -p` soạn + tự kiểm ⇒ máy này kiểm lại ⇒ nộp; máy chủ kiểm lần nữa với đáp án KHO rồi mới lưu.
 //
 // 05/10 (thầy: "làm tất nhé, tôi ko duyệt gì cả, tôi chỉ chữa câu học sinh cần chữa thôi nhé") — KHÔNG BƯỚC NÀO CHỜ THẦY DUYỆT:
-//   1. lượt SOẠN (claude -p #1): hồ sơ lời giải ra/ + HỌC LIỆU THÊM bo-tro/ theo `vao.can` của máy chủ — tới 4 BẢN KHÁC (Phần I/III: song sinh đổi
-//      số cho câu tính toán, biến thể lí thuyết cho câu lí thuyết) và 8–12 Ý ĐÚNG–SAI MỚI cùng đề dẫn (Phần II);
+//   1. lượt SOẠN (claude -p #1): hồ sơ lời giải ra/ + HỌC LIỆU THÊM bo-tro/ theo `vao.can` của máy chủ — tới 6 BẢN KHÁC (Phần I/III: song sinh đổi
+//      số cho câu tính toán, biến thể lí thuyết cho câu lí thuyết) và 24 Ý ĐÚNG–SAI MỚI cùng đề dẫn (Phần II);
 //   2. phiên CHỐT (như 29/09) cho hồ sơ có cờ đáp án;
 //   3. lượt KIỂM MÙ (claude -p #2, thư mục TẠM riêng ngoài thư mục lô, chỉ đọc/ghi): tự giải từng bản khác, từng ý mới và câu gốc còn cờ đáp án —
 //      KHÔNG thấy đáp án đề xuất, đáp án kho, lời giải hay hồ sơ;
@@ -82,6 +83,7 @@ function dungLo(lo, luong) {
   fs.mkdirSync(path.join(dir, 'bo-tro'), { recursive: true })
   const tep = []
   lo.viec.forEach((v, i) => {
+    if (!cauGocTuVao(v)) throw new Error(`Từ chối câu ngoài phạm vi sinh (tự luận / đầu vào hỏng): ${v.qid}`)
     const ten = `${String(i + 1).padStart(2, '0')}-${v.qid}.json`
     const hinh = (v.hinh || []).map((h, j) => {
       const m = /^data:image\/(png|jpe?g|gif|webp);base64,(.+)$/.exec(h.duLieu || '')
@@ -315,6 +317,18 @@ async function motLuong(luong, dem) {
 }
 
 async function main() {
+  if (co('--nap-song-sinh-toan-kho')) {
+    let sau = '', daQuet = 0, vaoHang = 0
+    for (;;) {
+      const r = await goi('/kho/may-soan/nap-toan-kho', { sau, so: 100, lop: LOP })
+      if (!r.ok) throw new Error('Không nạp được hàng song sinh toàn kho: ' + r.error)
+      daQuet += r.daQuet; vaoHang += r.vaoHang
+      console.log(`[${gio()}] hàng song sinh: quét ${daQuet} câu · thêm ${vaoHang} việc${r.chuaAnhXa ? ` · ${r.chuaAnhXa} câu kho chưa có ánh xạ (chưa được nạp)` : ''}`)
+      if (r.tiep == null) break
+      if (r.tiep === sau) throw new Error('Con trỏ nạp hàng không tiến')
+      sau = r.tiep
+    }
+  }
   if (co('--tong')) {
     const t = await goi('/kho/loi-giai/tong', {})
     if (!t.ok) return console.log('Lỗi:', t.error)
