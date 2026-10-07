@@ -2,7 +2,7 @@
 // Khoá: OMNI áp cho lớp ⇒ câu lấy từ `/gv/omni {action:'ca-chot'}` thay danh sách cũ (gói ghi `omni: true`); màn Mở ca tạo xong ca từ gói ấy ⇒ gọi
 // thêm MỘT lệnh `gan-ca-chot {chienDichId, maCa}` (không đổi màn). OMNI tắt / lỗi ⇒ đúng đường cũ, không gọi gì thêm.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
 const m = vi.hoisted(() => ({ goi: vi.fn(), publish: vi.fn(), address: vi.fn(), save: vi.fn() }))
@@ -60,7 +60,7 @@ describe('Buổi chữa: nút "Mở ca chốt"', () => {
       <BuoiChua
         du={BUOI}
         dsEm={[E('01'), E('02')]}
-        coMat={[]}
+        coMat={['01', '02']}
         canDayLai={[]}
         homNay="2026-10-05"
         tra={new Map()}
@@ -107,12 +107,16 @@ describe('màn Lên bảng: chiến dịch hết hạn ⇒ đọc sẵn gói ca 
   it('OMNI bật cho lớp 12A1 ⇒ `ca-chot {chienDichId}` và nút "Mở ca chốt · 28 câu"', async () => {
     mock({ bat: true, lop: ['12A1'], sbd: [] })
     render(<LenBangChienDich />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh 1 học sinh' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chốt 1 em có mặt' }))
     expect(await screen.findByRole('button', { name: 'Mở ca chốt · 28 câu' })).toBeTruthy()
     expect(m.goi).toHaveBeenCalledWith('/gv/omni', { action: 'ca-chot', chienDichId: 'cd-1' })
   })
   it('OMNI không áp cho lớp ⇒ không hỏi `ca-chot`, nút dùng danh sách cũ', async () => {
     mock({ bat: true, lop: ['11B'], sbd: [] })
     render(<LenBangChienDich />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh 1 học sinh' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chốt 1 em có mặt' }))
     expect(await screen.findByRole('button', { name: 'Mở ca chốt · 2 câu' })).toBeTruthy()
     await waitFor(() => expect(m.goi.mock.calls.some(([d, b]) => d === '/gv/omni' && b.action === 'co-doc')).toBe(true))
     expect(m.goi.mock.calls.some(([, b]) => b.action === 'ca-chot')).toBe(false)

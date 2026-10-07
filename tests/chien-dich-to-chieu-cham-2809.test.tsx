@@ -199,7 +199,7 @@ describe('Buổi chữa hiện lại kết quả', () => {
       <BuoiChua
         du={DU}
         dsEm={['01', '02', '03'].map(E)}
-        coMat={[]}
+        coMat={['01', '02', '03']}
         canDayLai={[]}
         homNay="2026-10-05"
         tra={new Map()}

@@ -11,7 +11,7 @@ import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { khoaCau } from '../../src/lib/khu-trung-cau'
-import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
+import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, HANG_MUC_DO, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 import { cacQidSongSinh } from './loi-hoc-luat'
@@ -576,12 +576,49 @@ function dangDaChuaHet(theoDang: ReadonlyMap<string, ReadonlySet<string>>, em: r
   for (const [d, t] of theoDang) if (em.every((s) => t.has(s))) xong.add(d)
   return xong
 }
+
+export interface UngVienGiaiMau {
+  sbd: string
+  /** Chỉ đếm lượt đúng không dùng gợi ý của chính câu / nhóm câu trùng nội dung. */
+  soLanDung: number
+  hang: HangEm
+  /** Hạng năng lực của em cao hơn mức độ câu. */
+  vuotMuc: boolean
+}
+
+const BAC_HANG: Record<HangEm, number> = { L1: 0, L2: 1, L3: 2, L4: 3 }
+
+/**
+ * Chọn em chữa mẫu SAU ĐIỂM DANH. Điều kiện cứng: đã tự làm đúng câu ít nhất một lần.
+ * Xếp: số lần đúng giảm dần → vượt mức độ câu → hạng năng lực → ít được gọi hơn → SBD để tất định.
+ */
+export function chonEmGiaiMau(ungVien: readonly UngVienGiaiMau[], daGoi: ReadonlyMap<string, number> = new Map()): UngVienGiaiMau | null {
+  return [...ungVien]
+    .filter((x) => x.soLanDung > 0)
+    .sort((a, b) =>
+      b.soLanDung - a.soLanDung
+      || Number(b.vuotMuc) - Number(a.vuotMuc)
+      || BAC_HANG[b.hang] - BAC_HANG[a.hang]
+      || (daGoi.get(a.sbd) ?? 0) - (daGoi.get(b.sbd) ?? 0)
+      || a.sbd.localeCompare(b.sbd, 'vi'),
+    )[0] ?? null
+}
+
 /** Điểm chữa của câu = số em chưa thành thạo + 2 × số em cần thầy dạy lại. Mỗi dạng một câu đại diện (điểm cao nhất). */
 async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
   const cd = await docMot(env, id)
+  // Không có danh sách điểm danh: vẫn trả câu để tương thích máy thầy cũ, nhưng TUYỆT ĐỐI không xếp sẵn học sinh chữa mẫu.
+  const daDiemDanh = coMat.length > 0
   const em = coMat.length ? cd.sbd.filter((s) => coMat.includes(s)) : cd.sbd
-  const them = await docMocThemCaLop(env, cd.id)
-  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, em, cd.qids, cd.hanNop, cd.mocBatDau, undefined, them), tenEm(env, em), docMetaCau(env, cd.qids, cd.maDe)])
+  const [lanTho, ten, meta, hoSoDang, them] = await Promise.all([
+    lanLamCaLop(env, em, cd.qids),
+    tenEm(env, em),
+    docMetaCau(env, cd.qids, cd.maDe),
+    docHoSoDangCaLop(env, em),
+    docMocThemCaLop(env, cd.id),
+  ])
+  const tt = await trangThaiLop(env, em, cd.qids, cd.hanNop, cd.mocBatDau, lanTho, them)
+  const hang = new Map(em.map((s) => [s, hangTuHoSo(hoSoDang.get(s) ?? [], lanTho.get(s) ?? [], meta, cd.qids, mocTinhCua(cd.mocBatDau, them.get(s)))] as const))
   const cau = cd.qids.map((q) => {
     const chua = em.filter((s) => !tt.get(s)!.get(q)!.thanhThao)
     const dayLai = em.filter((s) => tt.get(s)!.get(q)!.catTia)
@@ -615,17 +652,26 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
     if (!cu || c.diemChua > cu.diemChua) theoDang.set(c.dang, c)
   }
   const chon = [...theoDang.values()].sort((a, b) => b.diemChua - a.diemChua)
-  // Người giải mẫu: em thành thạo nhiều câu nhất trong dạng đó (không trùng một em cho mọi câu nếu còn em khác).
+  // Người giải mẫu: chỉ em ĐÃ ĐIỂM DANH và ĐÃ TỰ LÀM ĐÚNG chính câu này; không dùng em chữa sai làm người giải mẫu.
   const daGiaiMau = new Map<string, number>()
   const deXuat = chon.map((c) => {
-    const cungDang = cd.qids.filter((q) => (meta.get(q)?.tenDang ?? meta.get(q)?.dang ?? 'Chưa gắn dạng') === c.dang)
     const daChuaDangNay = emDaChua.get(c.dang)
-    const giaiMau = [...em].filter((s) => tt.get(s)!.get(c.qid)!.thanhThao)
-      .sort((a, b) => (daGiaiMau.get(a) ?? 0) - (daGiaiMau.get(b) ?? 0) || cungDang.filter((q) => tt.get(b)!.get(q)!.thanhThao).length - cungDang.filter((q) => tt.get(a)!.get(q)!.thanhThao).length)[0]
-      // Chưa em nào thành thạo câu này: em ĐÃ được thầy chữa dạng này (và không còn trong danh sách cần sửa) đứng ra giải mẫu (thầy 06/10).
-      ?? [...em].filter((s) => daChuaDangNay?.has(s) && !c.emSua.includes(s)).sort((a, b) => (daGiaiMau.get(a) ?? 0) - (daGiaiMau.get(b) ?? 0))[0] ?? null
-    if (giaiMau) daGiaiMau.set(giaiMau, (daGiaiMau.get(giaiMau) ?? 0) + 1)
-    return { ...c, soEmDaChua: daChuaDangNay ? em.filter((s) => daChuaDangNay.has(s)).length : 0, giaiMau: giaiMau ? { sbd: giaiMau, ten: ten.get(giaiMau) ?? giaiMau } : null, emSua: c.emSua.map((s) => ({ sbd: s, ten: ten.get(s) ?? s })) }
+    const qids = new Set(c.qidCung?.length ? c.qidCung : [c.qid])
+    const bacCau = HANG_MUC_DO[c.mucDo ?? ''] ?? 1
+    const maDang = meta.get(c.qid)?.dang ?? null
+    const giaiMau = daDiemDanh ? chonEmGiaiMau(em.map((s) => {
+      const hs = hang.get(s)
+      const hangEm = (maDang ? hs?.hangTheoDang[maDang] : undefined) ?? hs?.hangChung ?? 'L2'
+      const soLanDung = (lanTho.get(s) ?? []).filter((x) => qids.has(x.qid) && x.dung && !x.coGoiY).length
+      return { sbd: s, soLanDung, hang: hangEm, vuotMuc: BAC_HANG[hangEm] > bacCau }
+    }), daGiaiMau) : null
+    if (giaiMau) daGiaiMau.set(giaiMau.sbd, (daGiaiMau.get(giaiMau.sbd) ?? 0) + 1)
+    return {
+      ...c,
+      soEmDaChua: daChuaDangNay ? em.filter((s) => daChuaDangNay.has(s)).length : 0,
+      giaiMau: giaiMau ? { ...giaiMau, ten: ten.get(giaiMau.sbd) ?? giaiMau.sbd } : null,
+      emSua: c.emSua.map((s) => ({ sbd: s, ten: ten.get(s) ?? s })),
+    }
   })
   // Dòng buổi chữa KHÔNG mang nội dung câu (06/10): đoạn đính nội dung cũ ở đây chọn cột `phan` không có trong `game_v2_question` nên chưa bao giờ chạy được; nội dung do lệnh `noi-dung-cau` trả
   // khi thầy mở tờ chiếu (đúng mã câu, qua cổng khối) — không làm nặng lệnh này, và máy thầy không còn phải đoán nội dung câu.
@@ -659,4 +705,3 @@ async function chuaXong(env: Env, id: string, qids: string[], nowMs: number, coM
   }
   return { ok: true, soLuot: lenh.length, ngayOnLai: congNgay(ngayVnCua(nowMs), 1) }
 }
-

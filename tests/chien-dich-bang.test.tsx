@@ -308,7 +308,7 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
     expect(chonMacDinh([])).toBe('')
   })
 
-  it('đang chạy ⇒ Bảng chiến dịch; chọn chiến dịch hết hạn nộp ⇒ TỰ chuyển Buổi chữa (`buoi-chua`)', async () => {
+  it('đang chạy ⇒ Bảng chiến dịch; hết hạn ⇒ bắt buộc điểm danh rồi mới gọi `buoi-chua` với đúng em có mặt', async () => {
     goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
       if (b.action === 'danh-sach') return { ok: true, du: { ok: true, ...DS } }
       if (b.action === 'bang' && b.id === 'cd-2') return { ok: true, du: { ok: true, ...bang(EM, { chienDich: { ...bang(EM).chienDich, id: 'cd-2', ten: 'Amine', hanNop: '2026-10-10' } }) } }
@@ -332,8 +332,16 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
     expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua')).toBe(false)
 
     fireEvent.change(screen.getByLabelText('Chiến dịch'), { target: { value: 'cd-1' } })
+    expect(await screen.findByRole('heading', { name: 'Điểm danh buổi chữa' })).toBeTruthy()
+    expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1')).toBe(false)
+    expect(screen.queryByRole('button', { name: 'Mở tờ máy chiếu' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Điểm danh 2 học sinh' }))
+    const hop = screen.getByRole('dialog')
+    fireEvent.click(within(hop).getByRole('checkbox', { name: 'Lê Chi' }))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Chốt 1 em có mặt' }))
     expect(await screen.findByRole('heading', { name: 'Buổi chữa · Ester – Lipid · 12A1' })).toBeTruthy()
-    expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1')).toBe(true)
+    expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1' && Array.isArray(b.coMat) && b.coMat.length === 1 && b.coMat[0] === 'Trần Bảo')).toBe(true)
     expect(screen.getByRole('button', { name: 'Mở tờ máy chiếu' })).toBeTruthy()
     // Thầy lệnh 28/09: xoá khối "Gọi lên bảng theo một ca kiểm tra (cách cũ)".
     expect(screen.queryByRole('button', { name: /cách cũ/ })).toBeNull()

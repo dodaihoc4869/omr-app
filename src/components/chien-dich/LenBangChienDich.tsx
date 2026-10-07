@@ -15,7 +15,9 @@ import { caChotOmni, docBangOmniCua, docCoOmni, omniApChoLop, type GoiCaChotOmni
 import type { BangOmni } from '../../../server/src/omni-kieu'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
+import HopChon from './HopChon'
 import { hienNgay, mocHetHan } from './ngay'
+import { sapTheoTen } from './tinh'
 import { dungToChieu, hoiNoiDungChoToChieu, laLoiMaBiMat, napBangTra, napNoiDungChoToChieu, type CauGoc, type LoiLenhThay, type OChieu } from './to-chieu'
 import { useGhiToChieu } from './ghi-to-chieu'
 import './chien-dich.css'
@@ -48,7 +50,10 @@ export default function LenBangChienDich() {
   const [omni, setOmni] = useState<BangOmni | null>(null)
   const [goiCaChot, setGoiCaChot] = useState<GoiCaChotOmni | null>(null)
   const [buoi, setBuoi] = useState<BuoiChuaMayChu | null>(null)
-  const [coMat, setCoMat] = useState<string[]>([])
+  /** null = chưa điểm danh; mảng = danh sách thầy đã chốt cho buổi chữa. */
+  const [coMat, setCoMat] = useState<string[] | null>(null)
+  const [moDiemDanh, setMoDiemDanh] = useState(false)
+  const [chonDiemDanh, setChonDiemDanh] = useState<Set<string>>(new Set())
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(false)
   const [nowMs, setNowMs] = useState(() => Date.now())
@@ -96,7 +101,7 @@ export default function LenBangChienDich() {
     if (l !== luotOmni.current) return
     setGoiCaChot(r.ok ? r.du : null)
   }, [])
-  const tai = useCallback(async (id: string, dsCoMat: string[]) => {
+  const tai = useCallback(async (id: string, dsCoMat: string[] | null) => {
     if (!id) return
     const l = ++luot.current
     setDangTai(true)
@@ -117,6 +122,12 @@ export default function LenBangChienDich() {
       void napCaChot(id, b.du.chienDich.lop)
     }
     if (b.du.hetHan) {
+      // Chưa điểm danh: dừng ở cổng điểm danh, không gọi lệnh xếp và không lộ bất kỳ tên chữa mẫu nào.
+      if (dsCoMat === null) {
+        setBuoi(null)
+        setDangTai(false)
+        return
+      }
       const bc = await docBuoiChua(id, dsCoMat)
       if (l !== luot.current) return
       if (!bc.ok) {
@@ -133,8 +144,9 @@ export default function LenBangChienDich() {
     setGoiCaChot(null)
     setBang(null)
     setBuoi(null)
-    setCoMat([])
-    void tai(chonId, [])
+    setCoMat(null)
+    setMoDiemDanh(false)
+    void tai(chonId, null)
   }, [chonId, tai])
 
   // Qua 23:59 ngày hạn nộp trong lúc màn đang mở ⇒ tự nạp lại (máy chủ trả hetHan ⇒ chuyển Buổi chữa).
@@ -157,7 +169,7 @@ export default function LenBangChienDich() {
     async (o: { qid: string }) => {
       // Câu gộp từ nhiều bản trùng nội dung ⇒ mở khoá đủ cả nhóm (bảng chiến dịch + buổi chữa đều mang `qidCung`).
       const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
-      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid], coMat) // chỉ em có mặt buổi này (chữa lớp này không làm lớp kia mất câu)
+      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid], coMat ?? []) // buổi chữa: chỉ em có mặt; bảng đang chạy: giữ luật cả chiến dịch
       if (!r.ok) return { ok: false as const, chu: r.chu }
       void tai(chonId, coMat)
       return { ok: true as const }
@@ -296,12 +308,37 @@ export default function LenBangChienDich() {
         </section>
       )}
 
+      {bang && bang.hetHan && coMat === null && !dangTai && !loi && (
+        <section className="cd-the" data-khoi="diem-danh-buoi-chua">
+          <div className="cd-the-dau">
+            <div>
+              <p className="cd-duong-dan">Bước bắt buộc trước khi xếp người lên bảng</p>
+              <h2>Điểm danh buổi chữa</h2>
+            </div>
+            <span className="cd-chip-muc cd-chip-muc--xam">Chưa xếp học sinh</span>
+          </div>
+          <p className="cd-phu">Sau khi chốt danh sách có mặt, hệ thống mới quét lịch sử từng câu và chọn em đã tự làm đúng. Không có em đủ điều kiện thì câu đó để thầy chữa.</p>
+          <div>
+            <button
+              type="button"
+              className="m3-nut-chinh"
+              onClick={() => {
+                setChonDiemDanh(new Set(bang.em.map((e) => e.sbd)))
+                setMoDiemDanh(true)
+              }}
+            >
+              Điểm danh {bang.em.length} học sinh
+            </button>
+          </div>
+        </section>
+      )}
+
       {bang && bang.hetHan && buoi && (
         <BuoiChua
           key={buoi.cau.map((c) => c.qid).join('|')}
           du={buoi}
           dsEm={bang.em.map((e) => ({ sbd: e.sbd, ten: e.ten }))}
-          coMat={coMat}
+          coMat={coMat ?? []}
           canDayLai={bang.canDayLai}
           homNay={bang.homNay}
           tra={tra}
@@ -319,6 +356,40 @@ export default function LenBangChienDich() {
           }}
           caChotOmni={goiCaChot}
         />
+      )}
+
+      {moDiemDanh && bang && (
+        <HopChon
+          tieuDe="Điểm danh buổi chữa"
+          moTa="Bỏ tích học sinh vắng. Chỉ học sinh trong danh sách này và đã tự làm đúng câu mới có thể được gọi chữa mẫu."
+          nhanXacNhan={`Chốt ${chonDiemDanh.size} em có mặt`}
+          xacNhanDuoc={chonDiemDanh.size > 0}
+          onXacNhan={() => {
+            const dsCoMat = bang.em.map((e) => e.sbd).filter((sbd) => chonDiemDanh.has(sbd))
+            setMoDiemDanh(false)
+            setCoMat(dsCoMat)
+            void tai(chonId, dsCoMat)
+          }}
+          onDong={() => setMoDiemDanh(false)}
+        >
+          <div className="cd-hop-ds">
+            {sapTheoTen(bang.em.map((e) => ({ sbd: e.sbd, ten: e.ten }))).map((e) => (
+              <label key={e.sbd} className="cd-tich">
+                <input
+                  type="checkbox"
+                  checked={chonDiemDanh.has(e.sbd)}
+                  onChange={() => setChonDiemDanh((cu) => {
+                    const moi = new Set(cu)
+                    if (moi.has(e.sbd)) moi.delete(e.sbd)
+                    else moi.add(e.sbd)
+                    return moi
+                  })}
+                />
+                <span>{e.ten}</span>
+              </label>
+            ))}
+          </div>
+        </HopChon>
       )}
 
       {html && (

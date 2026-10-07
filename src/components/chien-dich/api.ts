@@ -191,6 +191,13 @@ export interface EmTen {
   ten: string
 }
 
+export interface EmGiaiMau extends EmTen {
+  /** Số lượt đúng không dùng gợi ý của chính câu / nhóm câu trùng nội dung. */
+  soLanDung?: number
+  hang?: HangEm
+  vuotMuc?: boolean
+}
+
 export interface CauBuoiChua {
   qid: string
   /** Mọi qid CÙNG NỘI DUNG trong chiến dịch (câu chép ở nhiều đề, gộp một dòng — thầy 05/10); chữa xong gửi đủ cả nhóm. */
@@ -204,7 +211,7 @@ export interface CauBuoiChua {
   diemChua: number
   /** Số em có mặt ĐÃ được chữa dạng này ở buổi trước (thầy 06/10). Máy chủ cũ không trả ⇒ vắng. */
   soEmDaChua?: number
-  giaiMau: EmTen | null
+  giaiMau: EmGiaiMau | null
   emSua: EmTen[]
 }
 
@@ -261,7 +268,8 @@ export function loiBaoDaHuy(thuHoi?: Partial<KetQuaThuHoi> | null): string {
 export const doiRaiDeu = (id: string, bat: boolean) => goiChienDich<{ id: string; raiDeu: boolean }>('rai-deu', { id, bat })
 export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', { id })
 export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
-export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', coMat && coMat.length ? { id, coMat } : { id })
+/** Chỉ xếp buổi sau khi thầy đã điểm danh; danh sách có mặt được gửi tường minh lên máy chủ. */
+export const docBuoiChua = (id: string, coMat: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', { id, coMat })
 /** Mọi qid cần mở khoá của một dòng (bản đại diện + bản trùng nội dung). */
 export const qidCuaDong = (c: { qid: string; qidCung?: string[] }): string[] => (c.qidCung?.length ? c.qidCung : [c.qid])
 

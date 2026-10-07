@@ -18,7 +18,7 @@ import type { BangKetQua } from './ghi-to-chieu'
 import HopChon from './HopChon'
 import { congNgay, hienHanNop, hienNgay } from './ngay'
 import { noiDungCua, type CauGoc, type OChieu } from './to-chieu'
-import { cauCaChot, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
+import { cauCaChot, CHU_HANG, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
 import './chien-dich.css'
 
 /** Khoá phiên màn Mở ca kiểm tra đọc để chọn sẵn câu của ca chốt (nguồn: `lib/ca-chot-chien-dich.ts`). */
@@ -26,15 +26,17 @@ export { KHOA_CA_CHOT }
 
 export function oChieuTuDong(dong: readonly DongBuoiChua[]): OChieu[] {
   return dong.map((d) => {
-    const nguoi = d.giaiMau ?? d.sua[0] ?? null
+    const nguoi = d.giaiMau
     return {
       qid: d.cau.qid,
       stt: d.cau.stt,
       phan: d.cau.phan,
       mucDo: d.cau.mucDo,
       sbd: nguoi?.sbd ?? '',
-      ten: nguoi?.ten ?? 'Cả lớp',
-      viSao: d.giaiMau ? 'Giải mẫu' : 'Chưa em nào thành thạo — thầy giải mẫu cùng em',
+      ten: nguoi?.ten ?? 'Thầy chữa',
+      viSao: nguoi
+        ? `Đã tự làm đúng ${nguoi.soLanDung ?? 1} lần${nguoi.vuotMuc ? ' · năng lực vượt mức câu' : ''}`
+        : 'Không có học sinh có mặt đã tự làm đúng câu này — thầy chữa',
     }
   })
 }
@@ -56,7 +58,7 @@ export default function BuoiChua({
   du: BuoiChuaMayChu
   /** Mọi em của chiến dịch (để chọn em có mặt). */
   dsEm: EmTen[]
-  /** SBD em có mặt; rỗng = cả lớp. */
+  /** SBD em đã được thầy điểm danh có mặt. */
   coMat: string[]
   canDayLai: CauCanDayLai[]
   homNay: string
@@ -80,7 +82,7 @@ export default function BuoiChua({
   // OMNI 3: gói ca chốt 50/50 (màn cha đọc sẵn khi OMNI áp cho lớp của chiến dịch). null ⇒ danh sách cũ.
   const goiOmni = caChotOmni
 
-  const emCoMat = useMemo(() => (coMat.length ? dsEm.filter((e) => coMat.includes(e.sbd)) : dsEm), [dsEm, coMat])
+  const emCoMat = useMemo(() => dsEm.filter((e) => coMat.includes(e.sbd)), [dsEm, coMat])
   const kq = useMemo(
     () =>
       xepBuoiChua(du.cau, emCoMat, (c) =>
@@ -155,7 +157,7 @@ export default function BuoiChua({
             {du.chienDich.lop ? ` · ${du.chienDich.lop}` : ''}
           </h1>
           <p className="cd-so">
-            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')} · có mặt {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
+            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')} · đã điểm danh {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
             <button
               type="button"
               className="m3-nut-chu cd-nut-nho"
@@ -165,7 +167,7 @@ export default function BuoiChua({
                 setMoCoMat(true)
               }}
             >
-              Đổi em có mặt
+              Đổi điểm danh
             </button>
           </p>
         </div>
@@ -290,7 +292,13 @@ export default function BuoiChua({
                   {d.cau.diemChua}
                 </span>
                 <span role="cell">
-                  {d.giaiMau ? `Giải mẫu: ${d.giaiMau.ten}` : 'Thầy giải mẫu'}
+                  {d.giaiMau ? (
+                    <>
+                      Giải mẫu: {d.giaiMau.ten}
+                      {typeof d.giaiMau.soLanDung === 'number' && ` · đúng ${d.giaiMau.soLanDung} lần`}
+                      {d.giaiMau.vuotMuc && ` · ${d.giaiMau.hang ? CHU_HANG[d.giaiMau.hang] : 'năng lực'} vượt mức câu`}
+                    </>
+                  ) : 'Thầy chữa'}
                   {d.sua.length > 0 ? ` · ${chuNguoiSua(d.sua)}` : ''}
                   {ketQuaCua(d).map(({ em, kq }) => (
                     <span key={em.sbd} className={`cd-ket-qua cd-ket-qua--${kq === 'dat' ? 'dat' : 'khong'}`} data-ket-qua={`${em.sbd}|${d.cau.qid}`}>
@@ -346,13 +354,13 @@ export default function BuoiChua({
 
       {moCoMat && (
         <HopChon
-          tieuDe="Em có mặt hôm nay"
-          moTa="Bỏ tích em vắng: buổi chữa xếp lại để mỗi em có mặt có ít nhất một lượt lên bảng."
+          tieuDe="Điểm danh buổi chữa"
+          moTa="Bỏ tích em vắng. Sau khi chốt, hệ thống quét lại lịch sử và chỉ chọn em có mặt đã tự làm đúng câu."
           nhanXacNhan={`Xếp lại cho ${chonCoMat.size} em`}
           xacNhanDuoc={chonCoMat.size > 0}
           onXacNhan={() => {
             setMoCoMat(false)
-            onDoiCoMat(chonCoMat.size === dsEm.length ? [] : [...chonCoMat])
+            onDoiCoMat(dsEm.map((e) => e.sbd).filter((sbd) => chonCoMat.has(sbd)))
           }}
           onDong={() => setMoCoMat(false)}
         >

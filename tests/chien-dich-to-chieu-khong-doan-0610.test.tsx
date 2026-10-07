@@ -5,7 +5,7 @@
 // `dungToChieu` đoán từ Ngân hàng đề trên máy: khớp đuôi mã (`id.endsWith(khoá)`) + khoá theo số thứ tự (`3`, `III-3`, `q3`, `cau-3`…). Câu của chiến dịch không có trên máy
 // ⇒ bị thay bằng MỘT CÂU KHÁC của tờ đầu tiên trong ngân hàng (ở đây: tờ khối 10). Nay: chỉ nội dung ĐÚNG mã (máy chủ qua cổng khối, hoặc ngân hàng khớp NGUYÊN mã).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
 const { goi, toast, nguonMay } = vi.hoisted(() => ({ goi: vi.fn(), toast: vi.fn(), nguonMay: { ds: [] as unknown[] } }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
@@ -176,15 +176,20 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
       return { ok: false, loai: 'tu_choi', chu: 'lệnh lạ' }
     })
   }
+  const diemDanh = async () => {
+    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh 2 học sinh' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chốt 2 em có mặt' }))
+  }
   const moTo = async () => {
     render(<LenBangChienDich />)
+    await diemDanh()
     fireEvent.click(await screen.findByRole('button', { name: 'Mở tờ máy chiếu' }))
     return (await screen.findByTestId('to-chieu')).textContent ?? ''
   }
 
   it('hỏi máy chủ CHỈ câu máy không có đúng mã; tờ: câu trên máy + câu máy chủ gửi + dòng thay thế; câu khác khối bị BỎ; KHÔNG câu khối 10 nào thế chỗ câu khối 11; báo thầy hai dòng', async () => {
     nguonMay.ds = [TO_10, TO_11_MAY]
-    dungMay((b) => ({ khoiDich: [11], cau: { [B]: cauChoThay({ qid: B, phan: 'I', text: 'NỘI DUNG TỪ MÁY CHỦ SỐ MỘT', choices: ['a', 'b', 'c', 'd'], correct: 'A', solution: { chot: 'Chốt máy chủ.' } }, 'Este – Lipit') }, boKhoi: [D], khongCo: [C] }))
+    dungMay(() => ({ khoiDich: [11], cau: { [B]: cauChoThay({ qid: B, phan: 'I', text: 'NỘI DUNG TỪ MÁY CHỦ SỐ MỘT', choices: ['a', 'b', 'c', 'd'], correct: 'A', solution: { chot: 'Chốt máy chủ.' } }, 'Este – Lipit') }, boKhoi: [D], khongCo: [C] }))
     const html = await moTo()
     const hoi = goi.mock.calls.filter(([, b]) => b.action === 'noi-dung-cau')
     expect(hoi).toHaveLength(1)
@@ -223,6 +228,7 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
     nguonMay.ds = []
     dungMay((b) => ({ khoiDich: [11], cau: {}, boKhoi: b.qids, khongCo: [] }))
     render(<LenBangChienDich />)
+    await diemDanh()
     fireEvent.click(await screen.findByRole('button', { name: 'Mở tờ máy chiếu' }))
     await waitFor(() => expect(toast).toHaveBeenCalled())
     expect(screen.queryByTestId('to-chieu')).toBeNull()
@@ -238,6 +244,7 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
       b.action === 'noi-dung-cau' ? { ok: false, loai: 'tu_choi', chu: 'Sai mã bí mật — mã trên máy này không còn đúng với máy chủ. Vào Cài đặt → Kết nối máy chủ, nhập lại mã bí mật rồi bấm Lưu.' } : goiCu(d, b),
     )
     render(<LenBangChienDich />)
+    await diemDanh()
     fireEvent.click(await screen.findByRole('button', { name: 'Mở tờ máy chiếu' }))
     await waitFor(() => expect(toast).toHaveBeenCalledWith(expect.stringContaining('Sai mã bí mật'), 'error'))
     expect(toast.mock.calls.map((c) => c[0]).join(' | ')).toContain('Cài đặt')
@@ -247,7 +254,7 @@ describe('màn Buổi chữa của chiến dịch ĐÃ HẾT HẠN (lớp 11): b
 
   it('mạng chập chờn lần đầu, lần hai được ⇒ tờ có nội dung THẬT của máy chủ, không dòng thay thế', async () => {
     nguonMay.ds = [TO_10, TO_11_MAY]
-    dungMay((b) => ({ khoiDich: [11], cau: { [B]: cauChoThay({ qid: B, phan: 'I', text: 'NỘI DUNG SAU LẦN HỎI LẠI', choices: ['a', 'b', 'c', 'd'], correct: 'A' }, 'Este – Lipit'), [C]: cauChoThay({ qid: C, phan: 'I', text: 'CÂU BỐN SAU LẦN HỎI LẠI', choices: ['a', 'b', 'c', 'd'], correct: 'B' }, 'Este – Lipit') }, boKhoi: [D], khongCo: [] }))
+    dungMay(() => ({ khoiDich: [11], cau: { [B]: cauChoThay({ qid: B, phan: 'I', text: 'NỘI DUNG SAU LẦN HỎI LẠI', choices: ['a', 'b', 'c', 'd'], correct: 'A' }, 'Este – Lipit'), [C]: cauChoThay({ qid: C, phan: 'I', text: 'CÂU BỐN SAU LẦN HỎI LẠI', choices: ['a', 'b', 'c', 'd'], correct: 'B' }, 'Este – Lipit') }, boKhoi: [D], khongCo: [] }))
     const goiCu = goi.getMockImplementation()!
     let lan = 0
     goi.mockImplementation(async (d: string, b: Record<string, unknown>) => {
