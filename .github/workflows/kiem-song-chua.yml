@@ -1,0 +1,28 @@
+name: Kiểm đường sống vòng chữa (chỉ đọc)
+on:
+  push:
+    branches: [codex/kiem-song-vong-chua]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: 24}
+      - name: Chỉ in đường dẫn và mã HTTP
+        run: |
+          node --input-type=module <<'JS'
+          for(const host of ['https://omr-app-b3u.pages.dev','https://67db1817.omr-app-b3u.pages.dev']) {
+            for(const path of ['/','/hs','/ph','/sw-version.json']) {
+              const r=await fetch(host+path+'?kiem='+Date.now(),{signal:AbortSignal.timeout(20000)});
+              console.log(JSON.stringify({host,path,status:r.status,type:r.headers.get('content-type')}));
+            }
+          }
+          for(const path of ['/hs/chua-cau-sai/danh-sach','/gv/chua-cau-sai/hang-chieu']) {
+            const r=await fetch('https://omr.ttadodaihoc.workers.dev'+path,{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(20000)});
+            console.log(JSON.stringify({path,status:r.status}));
+          }
+          JS
