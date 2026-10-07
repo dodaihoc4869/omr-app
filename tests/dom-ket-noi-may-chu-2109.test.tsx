@@ -33,9 +33,12 @@ vi.mock('../src/lib/exam-db', () => ({
   saveKhoaApp: vi.fn(),
   goKhoaApp: vi.fn(),
   batKhoaApp: vi.fn(),
+  loadScriptUrlHoacMacDinh: async () => m.url.v || 'https://omr.test',
+  coMaBiMatPhien: () => false,
+  datMaBiMatPhien: vi.fn(),
 }))
 vi.mock('../src/lib/exam-sync', () => ({ dongBoNganHang: async () => ({ moi: [], capNhat: [], loi: [], canXem: [] }), capNhatCaDaMo: async () => 0, caDungDe: async () => [] }))
-vi.mock('../src/lib/exam-api', () => ({ capNhatKeyBank: vi.fn(), luuDe: vi.fn(), xoaDe: vi.fn(), dungChiMuc: vi.fn(async () => 0), xoaDeTrenKho: vi.fn(), maCaConTrenMayChu: vi.fn(async () => null) }))
+vi.mock('../src/lib/exam-api', () => ({ lichSuLenBang: vi.fn(async () => ({ soNgay: 1, theoEm: {} })), capNhatKeyBank: vi.fn(), luuDe: vi.fn(), xoaDe: vi.fn(), dungChiMuc: vi.fn(async () => 0), xoaDeTrenKho: vi.fn(), maCaConTrenMayChu: vi.fn(async () => null) }))
 vi.mock('../src/store/appStore', () => ({
   useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ setScreen: m.setScreen, showToast: m.toast }),
 }))
