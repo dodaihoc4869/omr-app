@@ -20,6 +20,7 @@ import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
+import {hsCauGoc} from './cau-goc'
 import {hsOnLaiNop, trangThaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
 import { coLuotMoi } from './ca-co-luot-moi'
@@ -3645,6 +3646,8 @@ const boXuLy = {
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
+      // "Xem câu gốc" của ca Kiểm chứng câu đã đúng (thầy 07/10): chỉ nội dung CÔNG KHAI của câu gốc gắn với đề của chính em — xem server/src/cau-goc.ts
+      if (p === '/hs/cau-goc') return ra(await hsCauGoc(env, b))
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
       // LỜI GIẢI TỪNG BƯỚC (phương án A, 29/09): cổng công bố + hồ sơ đã duyệt + băm khớp đề hiện tại — xem server/src/loi-giai.ts
       if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))

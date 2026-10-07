@@ -291,13 +291,19 @@ describe('màn Theo dõi — nối tiến độ và thông báo thay câu', () =
   })
 })
 
-describe('màn thi của em — nhãn câu thay in nguyên văn, nhãn câu cũ vẫn "Em đã làm đúng: …"', () => {
-  it('in đúng lời thầy cho câu thay số; câu lý thuyết có lời riêng; không lộ đáp án', () => {
-    const the = (nhan: string) => render(<TheCau cheDo="thi" phan="I" stt={3} text="Câu hỏi thử" choices={['1', '2', '3', '4']} choicePerm={[0, 1, 2, 3]} selected={null} onSelect={() => {}} daDungO={{ nhan }} />).container.querySelector('[data-da-dung="1"]')!.textContent
-    expect(the(nhanThay('thay_so', false, NHAN_T1))).toBe(`Câu này thay số của câu em đã đúng ở ${NHAN_T1}`)
+describe('màn thi của em — câu thay hiện nhãn GỌN (chữ đầy đủ vẫn lưu trong ca), nhãn câu cũ vẫn "Em đã làm đúng: …"', () => {
+  it('thầy 07/10: dòng đậm ngắn + dòng phụ "nơi · ngày · mức"; câu lý thuyết có lời riêng; câu cũ giữ nguyên chữ; không lộ đáp án', () => {
+    const the = (nhan: string) => render(<TheCau cheDo="thi" phan="I" stt={3} text="Câu hỏi thử" choices={['1', '2', '3', '4']} choicePerm={[0, 1, 2, 3]} selected={null} onSelect={() => {}} daDungO={{ nhan }} />).container.querySelector('[data-da-dung="1"]')!
+    const doc = (e: Element) => ({ kieu: e.getAttribute('data-thay'), loai: e.querySelector('.thi-thay-loai')?.textContent ?? '', noi: e.querySelector('.thi-thay-noi')?.textContent ?? '' })
+    expect(doc(the(nhanThay('thay_so', false, NHAN_T1)))).toEqual({ kieu: 'thay_so', loai: 'Thay số từ câu em đã đúng', noi: NHAN_T1 })
     cleanup()
-    expect(the(nhanThay('cung_dang', true, NHAN_T1))).toBe(`Câu lý thuyết này thay cho câu em đã đúng ở ${NHAN_T1} (cùng dạng bài, nội dung khác)`)
+    expect(doc(the(nhanThay('cung_dang', true, NHAN_T1)))).toEqual({ kieu: 'cung_dang', loai: 'Thay cho câu lý thuyết em đã đúng', noi: NHAN_T1 })
     cleanup()
-    expect(the(NHAN_T1)).toBe(`Em đã làm đúng: ${NHAN_T1}`)
+    expect(doc(the(nhanThay('cung_dang', false, NHAN_T1)))).toEqual({ kieu: 'cung_dang', loai: 'Thay cho câu em đã đúng', noi: NHAN_T1 })
+    cleanup()
+    const cu = the(NHAN_T1)
+    expect(cu.textContent).toBe(`Em đã làm đúng: ${NHAN_T1}`) // ô cũ nguyên vẹn
+    expect(cu.getAttribute('data-thay')).toBeNull()
+    expect(cu.querySelector('button')).toBeNull() // câu nguyên văn: không có nút xem câu gốc
   })
 })

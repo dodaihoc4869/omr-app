@@ -19,6 +19,8 @@ import {
   chuNhanBaoCao,
   chuNhanDaDung,
   daDungCuaEm,
+  khoaGoc,
+  laKhoaGoc,
   laNhanThay,
   nhanThay,
   rutDeDaDung,
@@ -107,7 +109,10 @@ describe('áp bản thay vào bộ câu', () => {
     expect(bd.bo.A).not.toContain(x)
     expect(bd.daDung.A![`${x}~bt3`]).toMatch(/^Câu này thay số của câu em đã đúng ở Ca Thử · 01\/10 · /)
     expect(bd.demDaDung.A![`${x}~bt3`]).toEqual([2, 1])
-    expect(Object.keys(bd.daDung.A!).length).toBe(Object.keys(kq0.nhan.A!).filter((q) => kq0.nhan.A![q]).length)
+    // 07/10: câu THAY mang thêm khoá "~goc:<qid câu thay>" → qid câu gốc (nút "Xem câu gốc" ở máy em); khoá này không phải nhãn câu nên không tính vào số nhãn.
+    expect(Object.keys(bd.daDung.A!).filter((k) => !laKhoaGoc(k)).length).toBe(Object.keys(kq0.nhan.A!).filter((q) => kq0.nhan.A![q]).length)
+    expect(bd.daDung.A![khoaGoc(`${x}~bt3`)]).toBe(x)
+    expect(Object.keys(bd.daDung.A!).filter(laKhoaGoc)).toEqual([khoaGoc(`${x}~bt3`)]) // câu nguyên văn / câu bù không có khoá câu gốc
     expect(Object.keys(bd.daDung.B ?? {})).toEqual([]) // em B chỉ có câu bù ⇒ không nhãn
   })
   it('bản thay trùng qid đã có trong đề (câu gốc khác / câu thay đã nhận) hoặc kiểu lạ ⇒ bỏ, đề không bao giờ có hai câu giống nhau', () => {

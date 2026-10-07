@@ -78,12 +78,15 @@
 
 /* ── GÓC PHẢI TRÊN THẺ CÂU: nhãn "Mới x/4 ý" (Phần II làm dở) + nút "Xem lại sau" (KhungCauM3). Khung bọc LUÔN có mặt để thẻ không bị dựng lại khi em bấm ── */
 .m3 .thi-cau-boc { position: relative; }
-.m3 .thi-cau-goc { position: absolute; top: 8px; right: 10px; display: flex; align-items: center; gap: 6px; }
+.m3 .thi-cau-goc { position: absolute; top: 12px; right: 10px; display: flex; align-items: center; gap: 6px; }
+/* 07/10 (thầy: "xem lại sau và ghi chú câu thay đang bị chèn nhau"): nút cao 36 px thẳng hàng với chip số câu (đầu thẻ cao 48 px) — trước đây 48 px thò xuống 8 px đè ô ghi chú; vùng chạm vẫn 48 px nhờ ::after.
+ * `min-height: 0` là BẮT BUỘC: luật chung `.m3 button { min-height: 48px }` (m3.css) ép mọi nút cao ≥ 48 px, `height: 36px` đứng một mình không có tác dụng (đo bằng trình duyệt thật). */
 .m3 .thi-cau-nhan { padding: 3px 9px; border-radius: 999px; pointer-events: none; background: var(--m3-canh-bao, var(--m3-secondary-container)); color: var(--m3-tren-canh-bao, var(--m3-on-secondary-container)); font-size: 11px; font-weight: 700; }
 .m3 .thi-cau-dau {
-  display: inline-flex; align-items: center; gap: 6px; min-width: 48px; height: 48px; padding: 0 12px; border-radius: 24px; background: transparent;
+  position: relative; display: inline-flex; align-items: center; gap: 6px; min-width: 48px; min-height: 0; height: 36px; padding: 0 12px; border-radius: 18px; background: transparent;
   color: var(--m3-on-surface-variant); box-shadow: inset 0 0 0 1px var(--m3-outline); font-size: 12px; font-weight: 600;
 }
+.m3 .thi-cau-dau::after { content: ''; position: absolute; inset: -6px -2px; }
 .m3 .thi-cau-dau[aria-pressed='true'] { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); box-shadow: none; font-weight: 700; }
 /* dấu cờ trên ô số của lưới câu: chấm tròn có nền riêng nên nhìn rõ trên cả ô sáng lẫn ô tối */
 .m3 .thi-o-cau { position: relative; }
