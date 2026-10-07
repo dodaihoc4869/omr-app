@@ -49,8 +49,8 @@ jobs:
           TOAN_BO=true
           if [[ "$SU_KIEN" == push && "$MOC_TRUOC" =~ ^[a-f0-9]{40}$ && "$MOC_TRUOC" != 0000000000000000000000000000000000000000 ]]; then
             if git fetch --no-tags --depth=1 origin "$MOC_TRUOC"; then
-              git diff --name-only "$MOC_TRUOC" HEAD -- src server public package.json package-lock.json tsconfig.json tsconfig.app.json tsconfig.node.json > /tmp/chua-ma-doi.txt
-              if rg -q . /tmp/chua-ma-doi.txt; then
+              git diff --name-only "$MOC_TRUOC" HEAD -- src server public package.json package-lock.json tsconfig.json tsconfig.app.json tsconfig.node.json .github/workflows/deploy.yml > /tmp/chua-ma-doi.txt
+              if [[ -s /tmp/chua-ma-doi.txt ]]; then
                 TOAN_BO=true
               else
                 TOAN_BO=false
