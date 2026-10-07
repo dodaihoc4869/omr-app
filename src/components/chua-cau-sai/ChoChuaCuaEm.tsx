@@ -8,11 +8,43 @@ const nhan: Record<string, string> = {
   dang_ghep_bai: 'Thử ghép cả bài',
   cho_gap_lai_2: 'Hẹn tự kiểm bản mới',
   dang_kiem_chung: 'Tự làm bản mới',
-  thieu_hoc_lieu: 'Cần bổ sung bài luyện',
+  thieu_hoc_lieu: 'Đang chuẩn bị bài luyện',
   can_thay: 'Cùng thầy gỡ tiếp',
   tam_khoa: 'Đang giữ tiến độ',
   cau_thay_doi: 'Cần cập nhật học liệu',
 }
+
+function IconLoTrinh() {
+  return (
+    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+      <path d="M6.5 4.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM17.5 15.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" fill="currentColor" />
+      <path d="M8.5 6.5h4a3 3 0 0 1 3 3v0a3 3 0 0 1-3 3h-1a3 3 0 0 0-3 3v0a2 2 0 0 0 2 2h5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function IconMo() {
+  return (
+    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+      <path d="m7.5 5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+const ngayHan = (giaTri?: string) => {
+  if (!giaTri) return ''
+  const ngay = new Date(giaTri)
+  if (Number.isNaN(ngay.getTime())) return ''
+  const phan = new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh',
+  }).formatToParts(ngay)
+  const ngayTrongThang = phan.find((x) => x.type === 'day')?.value
+  const thang = phan.find((x) => x.type === 'month')?.value
+  return ngayTrongThang && thang ? `Hẹn ${ngayTrongThang}/${thang}` : ''
+}
+
 export default function ChoChuaCuaEm({ token }: { token: string }) {
   const [ds, setDs] = useState<
       { qid: string; trangThai: string; denHan?: string }[]
@@ -29,25 +61,45 @@ export default function ChoChuaCuaEm({ token }: { token: string }) {
     }
   }, [token, lan])
   if (!ds.length) return null
+  const hienThi = ds.slice(0, 12)
   return (
-    <section className="tlu-khoi">
-      <h2 className="tlu-muc">Những câu mình đang gỡ</h2>
-      <p className="tlu-ghi">
-        Tiếp đúng chỗ đang vướng, giữ những bước em đã hiểu.
-      </p>
-      {ds.slice(0, 12).map((x, i) => (
-        <button
-          type="button"
-          className="tlu-nut-phu"
-          key={x.qid}
-          onClick={() => setQid(x.qid)}
-        >
-          Câu {i + 1} · {nhan[x.trangThai] ?? 'Chữa tiếp'}
-          {x.denHan
-            ? ` · ${new Date(x.denHan).toLocaleDateString('vi-VN')}`
-            : ''}
-        </button>
-      ))}
+    <section className="tlu-khoi tlu-cho-chua" aria-labelledby="tlu-cho-chua-tieu-de">
+      <div className="tlu-cho-chua-dau">
+        <span className="tlu-cho-chua-bieu-tuong"><IconLoTrinh /></span>
+        <span className="tlu-cho-chua-gioi-thieu">
+          <h2 className="tlu-muc" id="tlu-cho-chua-tieu-de">Câu cần gỡ tiếp</h2>
+          <p className="tlu-ghi">Chọn một câu để tiếp tục từ đúng bước em đang dở.</p>
+        </span>
+        <span className="tlu-cho-chua-tom-tat" aria-label={`${hienThi.length} câu đang chờ`}>
+          <strong className="tlu-tab">{hienThi.length}</strong>
+          <span>câu đang chờ</span>
+        </span>
+      </div>
+      <div className="tlu-cho-chua-luoi">
+        {hienThi.map((x, i) => {
+          const hen = ngayHan(x.denHan)
+          const trangThai = nhan[x.trangThai] ?? 'Chữa tiếp'
+          return (
+            <button
+              type="button"
+              className="tlu-cho-chua-the"
+              data-trang-thai={x.trangThai}
+              aria-current={qid === x.qid ? 'true' : undefined}
+              aria-label={`Câu ${i + 1}: ${trangThai}${hen ? `. ${hen}` : ''}`}
+              key={x.qid}
+              onClick={() => setQid(x.qid)}
+            >
+              <span className="tlu-cho-chua-so tlu-tab">{String(i + 1).padStart(2, '0')}</span>
+              <span className="tlu-cho-chua-noi-dung">
+                <strong>Câu {i + 1}</strong>
+                <span>{trangThai}</span>
+              </span>
+              {hen && <span className="tlu-cho-chua-hen">{hen}</span>}
+              <span className="tlu-cho-chua-mo"><IconMo /></span>
+            </button>
+          )
+        })}
+      </div>
       {qid && (
         <KhungChua
           onDong={() => {

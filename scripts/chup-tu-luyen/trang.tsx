@@ -20,6 +20,7 @@ import '../../src/components/bang-nhiem-vu/sheet-m3.css'
 import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen'
+import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
 
 const man = new URLSearchParams(location.search).get('man') ?? 'tl'
 const now = Date.now()
@@ -43,6 +44,11 @@ const LOI_GIAI: Record<string, unknown> = {
   q5: { chot: 'Ester không có liên kết hydrogen liên phân tử nên sôi thấp nhất.' },
 }
 const TRA_LOI_GIA: Record<string, string> = { q1: 'A', q2: 'C', q3: 'DSDD', q4: '10,2', q5: 'B' }
+const CHUA = Array.from({ length: 12 }, (_, i) => ({
+  qid: `chua-${i + 1}`,
+  trangThai: i === 1 ? 'dang_chua_buoc' : i === 4 ? 'cho_gap_lai_2' : i === 7 ? 'dang_kiem_chung' : 'thieu_hoc_lieu',
+  ...(i === 4 ? { denHan: new Date(now + 2 * 86_400_000).toISOString() } : {}),
+}))
 
 const NGAY = 86_400_000
 const DANG = [
@@ -164,6 +170,11 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const b = init?.body ? JSON.parse(String(init.body)) : {}
     return tra(MAY_CHU[m[1]]?.(b) ?? { ok: false, error: 'không có' })
   }
+  const c = /\/hs\/chua-cau-sai\/([a-z-]+)/.exec(url)
+  if (c) {
+    await new Promise((r) => setTimeout(r, 80))
+    return tra(c[1] === 'danh-sach' ? { ok: true, ds: CHUA } : { ok: false, error: 'không có' })
+  }
   const l = /\/luyen-de\/([a-z-]+)/.exec(url)
   if (l) {
     await new Promise((r) => setTimeout(r, 120))
@@ -187,4 +198,4 @@ const con = man === 'sanh'
       onTuiDo: noop, onCuaHang: noop, onMoThanThu: noop, onChonThu: noop, onDangXuat: noop, onTaiLai: noop, onTuLuyen: noop,
     })
   : h(ManTuLuyen, { token: 'tk-gia', sbd: 'GIA', onVe: noop })
-createRoot(document.getElementById('root')!).render(con)
+createRoot(document.getElementById('root')!).render(h(BatLinhShell, { vai: 'hs' }, con))
