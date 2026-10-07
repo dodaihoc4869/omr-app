@@ -31,7 +31,7 @@ export const MUC_DICH_CHAN_DOAN = 'chan_doan'
  * Đoạn SQL dùng chung cho mọi bộ đọc sổ: bỏ dòng "đọc lời giải trước khi làm", dòng lướt và (06/10) dòng câu chẩn đoán. Cột `purpose` có thể vắng ở D1 cũ ⇒ nơi gọi tự lùi.
  * Sổ trước 06/10 không có dòng 'chan_doan' ⇒ mọi bộ đọc cũ ra y hệt.
  */
-export const SQL_LA_LAN_LAM = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan')"
+export const SQL_LA_LAN_LAM = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot', 'chan_doan', 'chua_buoc')"
 /** Như `SQL_LA_LAN_LAM` nhưng GIỮ dòng câu chẩn đoán — CHỈ cho `docLanLam` (srs2-d1.ts), nơi tách dòng ấy ra thành mốc "đã chẩn đoán" và không đưa vào lần làm. */
 export const SQL_LA_LAN_LAM_GIU_CHAN_DOAN = "COALESCE(purpose, '') NOT IN ('xem_loi_giai', 'luot')"
 
