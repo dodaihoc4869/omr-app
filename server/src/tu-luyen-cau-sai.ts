@@ -1,3 +1,5 @@
+import { tinhNangBat } from './chua-cau-sai-cau-hinh'
+import { docNhieuTrangThaiLoiDau } from './chua-cau-sai-adapter'
 // TU LUYỆN · CHẾ ĐỘ 1 "SỬA CÂU SAI" — LUẬT MỚI (thầy lệnh 30/09, Boss chuyển nguyên văn):
 //   "phần tu luyện sửa câu sai nó lấy hết câu sai ở mọi ca thi từ ngày hôm qua và chiến dịch từ ngày hôm qua cộng dồn lại xong học sinh được
 //    chọn số câu để luyện, lần luyện sau câu sẽ khác lần luyện trước, sắp xếp bốc ngẫu nhiên câu khó và dễ, nếu lần luyện sau chọn số câu nhiều
@@ -245,11 +247,11 @@ export async function docKhacPhuc(env: Env, sbd: string): Promise<Map<string, Tr
 }
 
 /** Câu lệnh GHI trạng thái (gộp vào batch của lượt nộp / chấm câu). */
-export function lenhGhiKhacPhuc(env: Env, sbd: string, qid: string, t: TrangThaiKhacPhuc) {
+export function lenhGhiKhacPhuc(env: Env, sbd: string, qid: string, t: TrangThaiKhacPhuc, cong?: {sql:string;params:(string|number)[]}) {
   return env.DB.prepare(
-    `INSERT INTO tu_luyen_khac_phuc (sbd, qid, so_dung_lien, lan_cuoi, hen_lai, da_khac_phuc_luc) VALUES (?,?,?,?,?,?)
+    `INSERT INTO tu_luyen_khac_phuc (sbd, qid, so_dung_lien, lan_cuoi, hen_lai, da_khac_phuc_luc) SELECT ?,?,?,?,?,? WHERE ${cong?.sql??'1=1'}
      ON CONFLICT(sbd, qid) DO UPDATE SET so_dung_lien = excluded.so_dung_lien, lan_cuoi = excluded.lan_cuoi, hen_lai = excluded.hen_lai, da_khac_phuc_luc = excluded.da_khac_phuc_luc`,
-  ).bind(sbd, qid, t.soDungLien, t.lanCuoi, t.henLai, t.daKhacPhucLuc)
+  ).bind(sbd, qid, t.soDungLien, t.lanCuoi, t.henLai, t.daKhacPhucLuc,...(cong?.params??[]))
 }
 
 // ------------------------------------------------------------------ KHO CÂU SAI CHUNG (chế độ 1, 2, 4)
@@ -359,11 +361,13 @@ export async function docKhoCauSai(env: Env, sbd: string): Promise<KhoCauSai> {
   const tatCa = await chanKhacKhoiEm(env, 'tu_luyen_kho_sai', sbd, [...theoNhom.values()], { cauCua: (c) => c.q }) // LUẬT THẦY 05/10: câu sai cũ KHÁC khối em không vào kho câu sai (chế độ 1, 2, 4)
   if (!tatCa.length) return rong(LOI_KHO_CAU_SAI_TRONG)
   const tt = await docKhacPhuc(env, sbd)
+  const chung=await tinhNangBat(env,{sbd})?await docNhieuTrangThaiLoiDau(env,sbd,tatCa.flatMap(c=>c.qids),ngayVnChu(Date.now())):null
   const ds: CauSaiKho[] = []
   const lichSu: KhoCauSai['lichSu'] = []
   let daKhacPhuc = 0
   for (const c of tatCa) {
-    const hl = khacPhucHieuLuc(c.qids.map((x) => tt.get(x)).find(Boolean) ?? null, saiCuoiMs(c.lanSai))
+    let hl = khacPhucHieuLuc(c.qids.map((x) => tt.get(x)).find(Boolean) ?? null, saiCuoiMs(c.lanSai))
+    if(chung){const loi=c.qids.map(q=>chung.get(q)?.loiHoc).find(Boolean);const dong=loi&&['dong','duy_tri'].includes(loi.trangThai);hl={soDungLien:loi?.ngayDung.length??0,lanCuoi:loi?.ngayDung.length?Date.parse(loi.ngayDung.at(-1)!+'T00:00:00+07:00'):0,henLai:loi?.denHan?Date.parse(loi.denHan+'T00:00:00+07:00'):null,daKhacPhucLuc:dong?Date.parse(loi.dongNgay+'T00:00:00+07:00'):null}}
     lichSu.push({ qid: c.qid, vao: Date.parse(c.lanSai[0]!.luc) || 0, khacPhucLuc: hl?.daKhacPhucLuc ?? null })
     if (hl?.daKhacPhucLuc) { daKhacPhuc++; continue }
     ds.push({ ...c, khacPhuc: hl })

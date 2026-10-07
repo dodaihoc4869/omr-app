@@ -53,6 +53,10 @@
 .bia-xem-sai b{min-width:28px;height:28px;border-radius:14px;background:rgb(255,138,138);color:rgb(58,0,8);display:grid;place-items:center;font-size:13px;padding:0 7px}
 .bia-pop-xoay p{margin:0;font-size:12px;font-weight:600;color:var(--b-mo);text-align:center;line-height:1.3}
 .bia-nut-chu{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid var(--b-vien);background:transparent;font-weight:600;font-size:13px;cursor:pointer}
+.bia-nut-chua{min-height:40px;padding:0 14px;border-radius:14px;border:1.5px solid var(--b-p1);background:transparent;color:var(--b-p1);font-weight:600;font-size:13px;cursor:pointer}
+.bia-nut-chua:hover{background:var(--b-kinh-2)}
+.bia-hang-nut-duoi{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.bia-tam-chua{padding:0;overflow:hidden}
 .bia-nut-vang,.bia-nut-xanh{min-height:52px;padding:0 20px;border:0;border-radius:20px;font-family:'Baloo 2',system-ui,sans-serif;font-weight:800;font-size:16.5px;cursor:pointer;width:100%}
 .bia-nut-vang{background:linear-gradient(180deg,var(--b-vang-1),var(--b-vang-2));color:var(--b-vang-chu);box-shadow:0 5px 0 var(--b-vang-bo)}
 .bia-nut-xanh{background:linear-gradient(180deg,var(--b-xanh-1),var(--b-xanh-2));color:rgb(255,255,255);box-shadow:0 5px 0 var(--b-xanh-bo)}

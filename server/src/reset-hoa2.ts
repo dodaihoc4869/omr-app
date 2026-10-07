@@ -57,6 +57,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung', 'khien_truoc_reset_2109', 'ph_truy_cap',
   // SỔ + HỒ SƠ của từng em (thầy 27/09: "giữ lại toàn bộ hồ sơ dữ liệu của từng học sinh"). `su_kien_hoc` là NGUỒN: hồ sơ dựng lại từ sổ.
+  'chua_loi_dot', 'chua_loi_phien', 'chua_loi_item', 'chua_loi_nop', 'chua_loi_hoc_lieu', 'chua_loi_thay', 'chua_loi_trai_nghiem', 'chua_loi_tu_receipt', 'chua_loi_chua_lop',
   'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qid_da_lam', 'skill_snapshot', 'nang_luc_cursor', 'learner_scope', 'quyen_hoc_sinh', 'cau_snapshot',
   // DẤU ĐỒNG BỘ ca (`dong_bo.ca_day_du`): app thầy CHỈ đọc danh sách ca từ D1 khi có dấu này; xoá ⇒ app quay về Google Sheet và CA CŨ HIỆN LẠI. Không phải dữ liệu ca.
   'dong_bo',
@@ -67,7 +68,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   // Lời giải từng bước (loi-giai.ts, 29/09): hồ sơ thầy duyệt + chỉ mục câu + hàng soạn — học liệu ⇒ GIỮ.
   'loi_giai', 'loi_giai_cau', 'loi_giai_viec',
   // Em đọc lời giải thế nào (migration-0210-doc-loi-giai.sql, GĐ1 v2 02/10) — hồ sơ học tập của em ⇒ GIỮ (như sổ su_kien_hoc).
-  'doc_loi_giai',
+  'doc_loi_giai', 'loi_giai_hoi',
   // Vòng học v2 (migration-0210-v2.sql): học liệu bổ trợ (học liệu ⇒ GIỮ), thẻ nút thắt + lời thầy gỡ + câu kiểm em làm (hồ sơ học tập ⇒ GIỮ).
   'cau_bo_tro', 'nut_that', 'loi_go', 'cau_kiem_lam',
   // Học liệu máy soạn 05/10 (migration-0510-y-ds.sql): kho ý Đúng–Sai mới (học liệu) + hàng "chỉ học liệu" (như loi_giai_viec) ⇒ GIỮ.

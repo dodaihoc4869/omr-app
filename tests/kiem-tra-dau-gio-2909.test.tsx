@@ -142,7 +142,7 @@ describe('thẻ Kiểm tra đầu giờ', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     render(<GoiLenBangScreen />)
     const the = screen.getAllByRole('tab').map((t) => t.textContent)
-    expect(the).toEqual(['Chiến dịch', 'Dạy học', 'Kiểm tra đầu giờ'])
+    expect(the).toEqual(['Chiến dịch', 'Dạy học', 'Kiểm tra đầu giờ', 'Câu cần chữa'])
     fireEvent.click(screen.getByRole('tab', { name: 'Kiểm tra đầu giờ' }))
     expect(await screen.findByRole('heading', { name: 'Kiểm tra đầu giờ', level: 1 })).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Điểm danh' })).toBeTruthy()

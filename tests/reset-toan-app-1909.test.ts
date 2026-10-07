@@ -43,13 +43,15 @@ const bamTatCa = (d: D1That, ds: readonly string[]) => Object.fromEntries(ds.fil
 
 /** Gieo MỖI bảng 2 dòng (điền cột NOT NULL bằng giá trị mẫu theo kiểu) để job có gì mà xoá/giữ. */
 function gieo(d: D1That, nhieuHon: Record<string, number> = {}) {
-  for (const t of bangHienCo(d)) {
+  // Bảng có khoá ngoại mới phải gieo cha trước con, giữ nguyên FK của sản phẩm.
+  const thuTu: Record<string, number> = {chua_loi_dot:-4,chua_loi_phien:-3,chua_loi_item:-2,chua_loi_nop:-1}
+  for (const t of bangHienCo(d).sort((a,b)=>(thuTu[a]??0)-(thuTu[b]??0))) {
     const cot = d.sql.prepare(`PRAGMA table_info("${t}")`).all() as { name: string; type: string; notnull: number; dflt_value: unknown; pk: number }[]
     const tuTang = cot.length > 0 && cot.filter((c) => c.pk > 0).length === 1 && cot.find((c) => c.pk > 0)!.type.toUpperCase() === 'INTEGER'
     const dung = cot.filter((c) => !(tuTang && c.pk > 0) && ((c.notnull && c.dflt_value === null) || c.pk > 0))
     const so = nhieuHon[t] ?? 2
     for (let i = 0; i < so; i++) {
-      const gt = dung.map((c) => (/INT/i.test(c.type) ? i + 1 : /REAL|FLOA|DOUB/i.test(c.type) ? i + 0.5 : `${t}-${c.name}-${i}`))
+      const gt = dung.map((c) => (t.startsWith('chua_loi_') && ['dot_id','phien_id','item_id'].includes(c.name) ? `chua_loi_${c.name.slice(0,-3)}-id-${i}` : /INT/i.test(c.type) ? i + 1 : /REAL|FLOA|DOUB/i.test(c.type) ? i + 0.5 : `${t}-${c.name}-${i}`))
       d.sql.prepare(`INSERT OR IGNORE INTO "${t}" (${dung.map((c) => `"${c.name}"`).join(',')}) VALUES (${dung.map(() => '?').join(',')})`).run(...(gt as never[]))
     }
   }

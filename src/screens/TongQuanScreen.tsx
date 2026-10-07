@@ -29,6 +29,7 @@ import {
 } from '../lib/tong-quan-gv'
 import { taiGioiHan } from '../lib/tai-gioi-han'
 import TheChatLuongLoi from '../components/chat-luong/TheChatLuongLoi'
+import KpiChuaCauSai from '../components/chua-cau-sai/KpiChuaCauSai'
 import './gv-hoa2.css'
 
 
@@ -352,6 +353,8 @@ export default function TongQuanScreen() {
 
               {/* Chất lượng sửa lỗi theo lớp (thầy 05/10): thẻ tự tải, máy chủ lỗi / chưa có lệnh ⇒ ẩn — phần cũ của màn không đổi. */}
               <TheChatLuongLoi />
+              {/* KPI vòng chữa câu sai (Phase E, 07/10): tự tải, lỗi ⇒ ẩn. */}
+              <KpiChuaCauSai />
             </div>
           </div>
         </>

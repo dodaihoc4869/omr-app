@@ -47,12 +47,14 @@ const KHONG_DOI = [...new Set([...BANG_GIU_HOA2, ...HO_SO_GIU, ...TAI_KHOAN_GIU,
 
 /** Gieo MỖI bảng 2 dòng (điền cột NOT NULL bằng giá trị mẫu theo kiểu) + dòng có nghĩa: tài khoản, ca đã đóng, ca đo tải, hồ sơ game đã chọn thú, vàng. */
 function gieo(d: D1That) {
-  for (const t of bangHienCo(d)) {
+  // Bảng có khoá ngoại mới phải gieo cha trước con, giữ nguyên FK của sản phẩm.
+  const thuTu: Record<string, number> = {chua_loi_dot:-4,chua_loi_phien:-3,chua_loi_item:-2,chua_loi_nop:-1}
+  for (const t of bangHienCo(d).sort((a,b)=>(thuTu[a]??0)-(thuTu[b]??0))) {
     const cot = d.sql.prepare(`PRAGMA table_info("${t}")`).all() as { name: string; type: string; notnull: number; dflt_value: unknown; pk: number }[]
     const tuTang = cot.length > 0 && cot.filter((c) => c.pk > 0).length === 1 && cot.find((c) => c.pk > 0)!.type.toUpperCase() === 'INTEGER'
     const dung = cot.filter((c) => !(tuTang && c.pk > 0) && ((c.notnull && c.dflt_value === null) || c.pk > 0))
     for (let i = 0; i < 2; i++) {
-      const gt = dung.map((c) => (/INT/i.test(c.type) ? i + 1 : /REAL|FLOA|DOUB/i.test(c.type) ? i + 0.5 : `${t}-${c.name}-${i}`))
+      const gt = dung.map((c) => (t.startsWith('chua_loi_') && ['dot_id','phien_id','item_id'].includes(c.name) ? `chua_loi_${c.name.slice(0,-3)}-id-${i}` : /INT/i.test(c.type) ? i + 1 : /REAL|FLOA|DOUB/i.test(c.type) ? i + 0.5 : `${t}-${c.name}-${i}`))
       d.sql.prepare(`INSERT OR IGNORE INTO "${t}" (${dung.map((c) => `"${c.name}"`).join(',')}) VALUES (${dung.map(() => '?').join(',')})`).run(...(gt as never[]))
     }
   }
