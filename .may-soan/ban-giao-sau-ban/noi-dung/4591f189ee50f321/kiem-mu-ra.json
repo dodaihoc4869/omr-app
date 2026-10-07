@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Proton nằm trong hạt nhân, không ở lớp vỏ nên C sai.",
+  "lyDo": "Proton nằm trong hạt nhân, không ở lớp vỏ nên C sai; A, B, D đúng.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "B",
-  "lyDo": "Lớp vỏ chỉ chứa electron.",
+  "lyDo": "Lớp vỏ nguyên tử chỉ chứa electron.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Hạt nhân gồm proton và neutron (hầu hết nguyên tử).",
+  "lyDo": "Hạt nhân gồm proton và neutron (không chứa electron).",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "Lớp vỏ chỉ có electron mang điện âm; B, C, D đều sai.",
+  "lyDo": "Lớp vỏ chứa electron mang điện âm; proton và neutron nằm trong hạt nhân.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Neutron nằm trong hạt nhân.",
+  "lyDo": "Neutron nằm trong hạt nhân nguyên tử.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Hạt nhân gồm proton và neutron, không chứa electron nên D không đúng.",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
   "chac": true
  }
 ]

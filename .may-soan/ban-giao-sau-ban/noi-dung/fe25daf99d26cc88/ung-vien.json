@@ -20,7 +20,7 @@
    "chot": "Hạt nhân được phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân được Rutherford phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng mỏng (2018 SGK cũng nêu vậy).",
+    "lyDo2": "Rutherford bắn hạt α vào lá vàng mỏng, phát hiện hạt nhân.",
     "chac": true
    }
   },
@@ -42,7 +42,91 @@
    "chot": "Neutron là hạt không mang điện.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Hạt Chadwick phát hiện là neutron, không mang điện (điện tích 0).",
+    "lyDo2": "Hạt Chadwick phát hiện là neutron, không mang điện.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
+   "de": "Khối lượng của neutron so với proton là bao nhiêu?",
+   "pa": {
+    "A": "Gần bằng khối lượng proton.",
+    "B": "Gần bằng khối lượng electron.",
+    "C": "Bằng đúng một nửa khối lượng proton.",
+    "D": "Lớn hơn khối lượng proton khoảng 1,836 lần."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "mp ≈ 1,673×10⁻²⁷ kg; mn ≈ 1,675×10⁻²⁷ kg — xấp xỉ nhau."
+   ],
+   "chot": "Khối lượng neutron xấp xỉ bằng khối lượng proton.",
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "Khối lượng neutron xấp xỉ proton (≈1 amu); D sai vì 1836 là tỉ số proton/electron.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Vì sao neutron khó phát hiện bằng điện trường hoặc từ trường?",
+   "pa": {
+    "A": "Neutron không mang điện nên không bị lệch bởi điện trường hoặc từ trường.",
+    "B": "Neutron mang điện tích quá nhỏ để đo được.",
+    "C": "Khối lượng neutron quá lớn so với proton.",
+    "D": "Neutron không có khối lượng."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "Hạt không mang điện không tương tác với điện/từ trường."
+   ],
+   "chot": "Neutron trung hòa về điện → không lệch trong điện trường hay từ trường.",
+   "kiem": {
+    "d2": "A",
+    "lyDo2": "Neutron trung hoà điện nên không bị lệch trong điện/từ trường.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_so",
+   "de": "Neutron được J. Chadwick phát hiện vào năm 1932 khi bắn phá nguyên tố nào bằng hạt α?",
+   "pa": {
+    "A": "Vàng (Au).",
+    "B": "Beryllium (Be).",
+    "C": "Hydro (H).",
+    "D": "Uranium (U)."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Chadwick bắn hạt α vào Be và phát hiện hạt neutron không mang điện."
+   ],
+   "chot": "Thí nghiệm Chadwick: bắn hạt α vào Beryllium → phát hiện neutron.",
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Chadwick bắn hạt α vào Beryllium năm 1932.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Trong cấu trúc nguyên tử, neutron nằm ở vị trí nào?",
+   "pa": {
+    "A": "Trong lớp vỏ electron.",
+    "B": "Bên ngoài hạt nhân.",
+    "C": "Trong hạt nhân.",
+    "D": "Xung quanh hạt nhân theo quỹ đạo."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Hạt nhân gồm proton và neutron. Electron ở lớp vỏ ngoài."
+   ],
+   "chot": "Neutron nằm trong hạt nhân cùng với proton.",
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Neutron nằm trong hạt nhân cùng proton.",
     "chac": true
    }
   }

@@ -20,7 +20,7 @@
    "chot": "Thomson tìm ra electron (1897).",
    "kiem": {
     "d2": "B",
-    "lyDo2": "J.J. Thomson tìm ra electron năm 1897 (tia âm cực).",
+    "lyDo2": "J.J. Thomson tìm ra electron năm 1897 qua tia âm cực.",
     "chac": true
    }
   },
@@ -49,7 +49,7 @@
   {
    "kieu": "ly_thuyet",
    "cach": "dao_chieu",
-   "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng (1911) giúp tìm ra",
+   "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng giúp tìm ra",
    "pa": {
     "A": "electron.",
     "B": "neutron.",
@@ -64,7 +64,7 @@
    "chot": "Thí nghiệm lá vàng của Rutherford tìm ra hạt nhân nguyên tử.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Thí nghiệm hạt α bắn lá vàng (1911) tìm ra hạt nhân nguyên tử.",
+    "lyDo2": "Thí nghiệm bắn hạt α vào lá vàng giúp tìm ra hạt nhân nguyên tử.",
     "chac": true
    }
   },
@@ -115,7 +115,7 @@
   {
    "kieu": "ly_thuyet",
    "cach": "doi_nhieu",
-   "de": "Trong thí nghiệm năm 1911 của Rutherford, chùm hạt nào được bắn vào lá vàng mỏng?",
+   "de": "Trong thí nghiệm của Rutherford, chùm hạt nào được bắn vào lá vàng mỏng?",
    "pa": {
     "A": "Hạt α.",
     "B": "Electron.",

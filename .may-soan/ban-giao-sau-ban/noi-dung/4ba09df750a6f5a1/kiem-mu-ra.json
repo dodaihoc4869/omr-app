@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Tỉ lệ nguyên tử/hạt nhân = 10^4; 2 cm x 10^4 = 20000 cm = 200 m",
+  "lyDo": "Tỉ lệ 10^-10/10^-14 = 10^4; 2 cm x 10^4 = 20000 cm = 200 m.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "5 cm x 10^4 = 50000 cm = 500 m",
+  "lyDo": "Tỉ lệ 10^4; 5 cm x 10^4 = 50000 cm = 500 m.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "1 cm x 10^4 = 10000 cm = 100 m",
+  "lyDo": "Tỉ lệ 10^4; 1 cm x 10^4 = 10000 cm = 100 m.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "C",
-  "lyDo": "3 cm x 10^4 = 30000 cm = 300 m",
+  "lyDo": "Tỉ lệ 10^4; 3 cm x 10^4 = 30000 cm = 300 m.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "6 cm x 10^4 = 60000 cm = 600 m",
+  "lyDo": "Tỉ lệ 10^4; 6 cm x 10^4 = 60000 cm = 600 m.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "8 cm x 10^4 = 80000 cm = 800 m",
+  "lyDo": "Tỉ lệ 10^4; 8 cm x 10^4 = 80000 cm = 800 m.",
   "chac": true
  }
 ]

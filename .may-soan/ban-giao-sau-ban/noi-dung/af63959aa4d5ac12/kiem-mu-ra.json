@@ -2,13 +2,13 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Nguyên tử trung hoà vì số proton (+) bằng số electron (−).",
+  "lyDo": "Trung hoà vì số proton (+) bằng số electron (−).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Nguyên tử trung hoà về điện; các phương án khác sai (có neutron không mang điện).",
+  "lyDo": "Nguyên tử trung hoà về điện; A, B sai, D sai vì có neutron không mang điện.",
   "chac": true
  },
  {
@@ -20,19 +20,19 @@
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Tổng điện tích proton bằng tổng điện tích electron nên nguyên tử không mang điện.",
+  "lyDo": "Toàn nguyên tử trung hoà, không mang điện.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Nguyên tử trung hoà: số electron = số proton = 11.",
+  "lyDo": "Số electron = số proton = 11.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Mất electron (âm) thì dư điện tích dương, thành ion dương.",
+  "lyDo": "Mất electron (−) thì còn dư điện tích dương, thành ion dương.",
   "chac": true
  }
 ]

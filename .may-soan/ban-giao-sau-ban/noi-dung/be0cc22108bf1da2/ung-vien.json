@@ -20,7 +20,7 @@
    "chot": "Electron: m ≈ 0,00055 amu, q = −1.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Electron: m ≈ 0,00055 amu, q = –1.",
+    "lyDo2": "electron: m ≈ 0,00055 amu, q = –1.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Proton: m ≈ 1 amu, q = +1.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Proton: m ≈ 1 amu, q = +1.",
+    "lyDo2": "proton: m ≈ 1 amu, q = +1.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Electron nhẹ và mang điện âm.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Electron có m ≈ 0,00055 amu, q = –1 nên D sai.",
+    "lyDo2": "electron có m ≈ 0,00055 amu, q = –1 nên D sai; A, B, C đúng.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Neutron: ≈ 1 amu, không mang điện.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Neutron: m ≈ 1 amu, không mang điện.",
+    "lyDo2": "neutron m ≈ 1 amu, không mang điện; hạt nhân mang điện dương.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Proton và neutron nặng xấp xỉ nhau.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Proton và neutron cùng m ≈ 1 amu.",
+    "lyDo2": "proton và neutron đều ≈ 1 amu.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Electron nhẹ hơn proton rất nhiều.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Khối lượng electron ≈ 1/1836 khối lượng proton, nhỏ hơn rất nhiều.",
+    "lyDo2": "m_e ≈ 0,00055 amu, nhỏ hơn proton khoảng 1840 lần.",
     "chac": true
    }
   }

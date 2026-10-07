@@ -24,7 +24,7 @@
  {
   "id": "ss3",
   "loai": "ban_khac",
-  "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng (1911) giúp tìm ra",
+  "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng giúp tìm ra",
   "pa": {
    "A": "electron.",
    "B": "neutron.",
@@ -57,7 +57,7 @@
  {
   "id": "ss6",
   "loai": "ban_khac",
-  "de": "Trong thí nghiệm năm 1911 của Rutherford, chùm hạt nào được bắn vào lá vàng mỏng?",
+  "de": "Trong thí nghiệm của Rutherford, chùm hạt nào được bắn vào lá vàng mỏng?",
   "pa": {
    "A": "Hạt α.",
    "B": "Electron.",

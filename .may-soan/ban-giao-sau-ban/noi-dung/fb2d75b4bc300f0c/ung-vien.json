@@ -20,7 +20,7 @@
    "chot": "Hạt nhân gồm proton và neutron, vỏ gồm electron, nguyên tử có cấu trúc rỗng.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Nguyên tử có cấu tạo rỗng (vỏ + hạt nhân); B sai (proton, neutron), C sai (vỏ là electron), D thiếu neutron.",
+    "lyDo2": "Nguyên tử có cấu trúc rỗng gồm vỏ và hạt nhân (đúng); B sai (hạt nhân gồm proton, neutron), C sai (vỏ là electron), D thiếu neutron.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Electron ở vỏ nguyên tử, không nằm trong hạt nhân.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Electron nằm ở vỏ, không nằm trong hạt nhân; các ý còn lại đúng.",
+    "lyDo2": "Electron nằm ở vỏ, ngoài hạt nhân, nên C sai.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt nhân mang điện dương, vỏ mang điện âm, cả nguyên tử trung hòa.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân gồm proton (+) và neutron (không mang điện) nên mang điện dương; A, C, D sai.",
+    "lyDo2": "Hạt nhân chứa proton mang điện dương và neutron không mang điện nên mang điện dương; A, C, D sai.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Hạt nhân chỉ gồm proton và neutron, không có electron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân chỉ chứa proton và neutron, không có electron; A, B, C đúng.",
+    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Nguyên tử trung hòa vì số proton bằng số electron.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Nguyên tử trung hòa vì số proton = số electron; A sai (hạt nhân rất nhỏ), B sai, D sai (neutron không mang điện).",
+    "lyDo2": "Nguyên tử trung hòa vì số proton bằng số electron; A sai (hạt nhân rất nhỏ), B sai, D sai (neutron không mang điện).",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Kích thước nguyên tử lớn hơn kích thước hạt nhân rất nhiều lần.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Nguyên tử lớn hơn hạt nhân khoảng 10^4–10^5 lần nên A sai; B, C, D đúng.",
+    "lyDo2": "Kích thước nguyên tử lớn hơn hạt nhân rất nhiều (~10^4–10^5 lần) nên A sai.",
     "chac": true
    }
   }

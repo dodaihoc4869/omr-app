@@ -14,7 +14,7 @@
    },
    "dap_an": "B",
    "buoc": [
-    "Số proton = 2 × 1 + 16 = 18; phân tử trung hoà nên số electron cũng là 18.",
+    "Số proton = 2 * 1 + 16 = 18; phân tử trung hoà nên số electron cũng là 18.",
     "Số neutron = 16 (nguyên tử H không có neutron).",
     "Tổng = 18 + 18 + 16 = 52."
    ],
@@ -80,8 +80,8 @@
    },
    "dap_an": "D",
    "buoc": [
-    "Số proton = 6 + 2 × 8 = 22; phân tử trung hoà nên số electron cũng là 22.",
-    "Số neutron = 6 + 2 × 8 = 22.",
+    "Số proton = 6 + 2 * 8 = 22; phân tử trung hoà nên số electron cũng là 22.",
+    "Số neutron = 6 + 2 * 8 = 22.",
     "Tổng = 22 + 22 + 22 = 66."
    ],
    "chot": "Cộng hạt của từng nguyên tử, nhớ electron bằng proton.",
@@ -135,8 +135,8 @@
    ]
   },
   {
-   "kieu": "tinh",
-   "cach": "dem_hat",
+   "kieu": "so",
+   "cach": "doi_so",
    "de": "Tổng số electron, proton và neutron trong một phân tử NH₃ là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ có 1 proton và 1 electron, nguyên tử N có 7 proton và 7 neutron.",
    "pa": {
     "A": "24.",
@@ -148,14 +148,37 @@
    "buoc": [
     "Nguyên tử N: 7 proton + 7 neutron + 7 electron = 21 hạt.",
     "Mỗi nguyên tử H: 1 proton + 0 neutron + 1 electron = 2 hạt.",
-    "3 nguyên tử H: 3 × 2 = 6 hạt.",
+    "3 nguyên tử H: 3 * 2 = 6 hạt.",
     "Tổng: 21 + 6 = 27 hạt."
    ],
-   "chot": "Tính tổng hạt từng nguyên tử rồi cộng lại."
+   "chot": "Tính tổng hạt từng nguyên tử rồi cộng lại.",
+   "phepTinh": [
+    {
+     "ten": "N",
+     "bieuThuc": "7+7+7",
+     "ketQua": 21,
+     "lamTron": 0,
+     "laDapSo": false
+    },
+    {
+     "ten": "3H",
+     "bieuThuc": "3*2",
+     "ketQua": 6,
+     "lamTron": 0,
+     "laDapSo": false
+    },
+    {
+     "ten": "Tổng",
+     "bieuThuc": "21+6",
+     "ketQua": 27,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ]
   },
   {
-   "kieu": "tinh",
-   "cach": "dem_hat",
+   "kieu": "so",
+   "cach": "doi_so",
    "de": "Tổng số electron, proton và neutron trong một phân tử CH₄ là bao nhiêu?\nBiết trong phân tử này, nguyên tử H chỉ có 1 proton và 1 electron, nguyên tử C có 6 proton và 6 neutron.",
    "pa": {
     "A": "26.",
@@ -166,10 +189,33 @@
    "dap_an": "A",
    "buoc": [
     "Nguyên tử C: 6 proton + 6 neutron + 6 electron = 18 hạt.",
-    "Mỗi nguyên tử H: 2 hạt. 4H: 4 × 2 = 8 hạt.",
+    "Mỗi nguyên tử H: 2 hạt. 4H: 4 * 2 = 8 hạt.",
     "Tổng: 18 + 8 = 26 hạt."
    ],
-   "chot": "Tính tổng hạt từng nguyên tử rồi cộng lại."
+   "chot": "Tính tổng hạt từng nguyên tử rồi cộng lại.",
+   "phepTinh": [
+    {
+     "ten": "C",
+     "bieuThuc": "6+6+6",
+     "ketQua": 18,
+     "lamTron": 0,
+     "laDapSo": false
+    },
+    {
+     "ten": "4H",
+     "bieuThuc": "4*2",
+     "ketQua": 8,
+     "lamTron": 0,
+     "laDapSo": false
+    },
+    {
+     "ten": "Tổng",
+     "bieuThuc": "18+8",
+     "ketQua": 26,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ]
   }
  ]
 }

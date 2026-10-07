@@ -20,5 +20,49 @@
    "C": "0.",
    "D": "+2."
   }
+ },
+ {
+  "id": "ss3",
+  "loai": "ban_khac",
+  "de": "Khối lượng của neutron so với proton là bao nhiêu?",
+  "pa": {
+   "A": "Gần bằng khối lượng proton.",
+   "B": "Gần bằng khối lượng electron.",
+   "C": "Bằng đúng một nửa khối lượng proton.",
+   "D": "Lớn hơn khối lượng proton khoảng 1,836 lần."
+  }
+ },
+ {
+  "id": "ss4",
+  "loai": "ban_khac",
+  "de": "Vì sao neutron khó phát hiện bằng điện trường hoặc từ trường?",
+  "pa": {
+   "A": "Neutron không mang điện nên không bị lệch bởi điện trường hoặc từ trường.",
+   "B": "Neutron mang điện tích quá nhỏ để đo được.",
+   "C": "Khối lượng neutron quá lớn so với proton.",
+   "D": "Neutron không có khối lượng."
+  }
+ },
+ {
+  "id": "ss5",
+  "loai": "ban_khac",
+  "de": "Neutron được J. Chadwick phát hiện vào năm 1932 khi bắn phá nguyên tố nào bằng hạt α?",
+  "pa": {
+   "A": "Vàng (Au).",
+   "B": "Beryllium (Be).",
+   "C": "Hydro (H).",
+   "D": "Uranium (U)."
+  }
+ },
+ {
+  "id": "ss6",
+  "loai": "ban_khac",
+  "de": "Trong cấu trúc nguyên tử, neutron nằm ở vị trí nào?",
+  "pa": {
+   "A": "Trong lớp vỏ electron.",
+   "B": "Bên ngoài hạt nhân.",
+   "C": "Trong hạt nhân.",
+   "D": "Xung quanh hạt nhân theo quỹ đạo."
+  }
  }
 ]

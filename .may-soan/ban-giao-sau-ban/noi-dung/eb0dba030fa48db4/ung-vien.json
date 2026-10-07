@@ -20,7 +20,7 @@
    "chot": "Số proton bằng số electron, tính từ điện tích lớp vỏ.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "28,8/1,6 = 18 electron = 18 proton (trung hòa), nên 'có 16 proton' sai.",
+    "lyDo2": "28,8/1,6 = 18 electron nên 18 proton; B nói 16 proton là sai, A, C, D đúng.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt nhân mang điện dương; số proton bằng số electron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "32,0/1,6 = 20 electron nên hạt nhân có 20 proton; A, B, C đều sai.",
+    "lyDo2": "32,0/1,6 = 20 electron nên 20 proton; D đúng, A sai (16), B sai (nguyên tử trung hòa), C sai (hạt nhân mang điện dương).",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Nguyên tử luôn trung hòa; chỉ lớp vỏ mang điện âm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Nguyên tử trung hòa về điện (24 e = 24 p), nên 'mang điện tích âm' là sai; B, C, D đúng.",
+    "lyDo2": "38,4/1,6 = 24 electron nên 24 proton, hạt nhân +38,4.10^-19 C; B, C, D đúng; A sai vì nguyên tử trung hòa.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Số proton bằng số electron, tính từ điện tích lớp vỏ.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "46,4/1,6 = 29 electron nên 29 proton, không phải 23; A, B, D đúng.",
+    "lyDo2": "46,4/1,6 = 29 electron nên 29 proton; C nói 23 proton là sai; A, B, D đúng.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Số electron = |điện tích lớp vỏ| / 1,6.10⁻¹⁹; số proton bằng số electron.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "27,2/1,6 = 17 electron nên 17 proton; A, C, D sai.",
+    "lyDo2": "27,2/1,6 = 17 electron nên 17 proton; B đúng; A sai (trung hòa), C sai (17 e), D sai (hạt nhân dương).",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Điện tích hạt nhân dương, cùng độ lớn với điện tích lớp vỏ.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "30,4/1,6 = 19 e = 19 p; điện tích hạt nhân là +30,4.10⁻¹⁹ C, không phải âm nên D sai; A, B, C đúng.",
+    "lyDo2": "30,4/1,6 = 19 electron nên 19 proton; A, B, C đúng; D sai vì điện tích hạt nhân là +30,4.10^-19 C, không phải âm.",
     "chac": true
    }
   }

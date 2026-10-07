@@ -2,7 +2,7 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Chỉ electron mang điện; neutron và nguyên tử trung hoà điện nên không lệch.",
+  "lyDo": "Electron mang điện âm nên lệch; neutron và các nguyên tử trung hoà không lệch.",
   "chac": true
  },
  {
@@ -14,25 +14,25 @@
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Tia âm cực là chùm electron mang điện âm nên lệch về cực dương; tia α và proton lệch về cực âm, neutron không lệch.",
+  "lyDo": "Tia âm cực là chùm electron (điện âm) nên lệch về bản cực dương; α, proton lệch về cực âm, neutron không lệch.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Proton mang điện dương nên lệch về cực âm; neutron và nguyên tử neon không lệch, electron lệch về cực dương.",
+  "lyDo": "Proton mang điện dương nên lệch về bản cực âm; electron lệch về cực dương, neutron và nguyên tử neon không lệch.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Neutron và nguyên tử oxygen đều trung hoà điện; các dãy còn lại có proton hoặc electron.",
+  "lyDo": "Neutron không mang điện, nguyên tử oxygen trung hoà điện nên cả hai không lệch; các dãy khác có proton hoặc electron.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Electron và proton đều mang điện nên đều lệch; các dãy còn lại có neutron hoặc nguyên tử trung hoà.",
+  "lyDo": "Electron và proton đều mang điện nên đều lệch; các dãy khác có neutron hoặc nguyên tử hydrogen trung hoà.",
   "chac": true
  }
 ]

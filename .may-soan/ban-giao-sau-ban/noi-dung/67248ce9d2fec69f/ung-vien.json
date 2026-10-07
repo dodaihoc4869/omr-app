@@ -20,7 +20,7 @@
    "chot": "Tia âm cực là chùm electron.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Tia âm cực là chùm electron mang điện âm, đi từ cực âm sang cực dương, bị lệch trong điện trường.",
+    "lyDo2": "Tia âm cực là chùm electron đi từ cực âm sang cực dương; A, D sai, B sai vì bị lệch trong điện trường.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt mang điện âm lệch về phía bản cực dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Tia âm cực mang điện âm nên bị hút về bản cực dương.",
+    "lyDo2": "Electron mang điện âm nên lệch về phía bản cực dương.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Ống tia âm cực dẫn tới electron.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Nghiên cứu phóng điện qua ống tia âm cực phát hiện ra electron (Thomson, 1897).",
+    "lyDo2": "Thomson phát hiện electron qua ống tia âm cực; proton, neutron, hạt nhân do người khác phát hiện bằng thí nghiệm khác.",
     "chac": true
    }
   }

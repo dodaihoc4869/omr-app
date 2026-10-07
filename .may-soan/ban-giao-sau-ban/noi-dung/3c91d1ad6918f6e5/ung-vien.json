@@ -20,7 +20,7 @@
    "chot": "Hạt mang điện âm bị hút về phía bản mang điện dương.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Tia âm cực là chùm electron (âm) nên bị hút về bản dương (bản trên).",
+    "lyDo2": "Tia âm cực là chùm electron (điện âm) nên bị hút về bản dương (bản trên).",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Tia âm cực là chùm electron đi từ cathode sang anode.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai, C sai.",
+    "lyDo2": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai, C sai (bị lệch).",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Tia âm cực mang điện âm nên không thể là proton.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Tia âm cực là chùm electron mang điện âm, không phải proton; B, C, D đúng.",
+    "lyDo2": "Câu hỏi tìm phát biểu không đúng: tia âm cực là chùm electron, không phải proton mang điện dương.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Thomson phát hiện electron nhờ tia âm cực.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Thomson phát hiện ra electron.",
+    "lyDo2": "Thí nghiệm tia âm cực của Thomson phát hiện ra electron.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Tia âm cực là electron, không phụ thuộc vật liệu làm cathode.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Bản chất tia là electron, không phụ thuộc kim loại làm cathode.",
+    "lyDo2": "Bản chất tia âm cực là electron, không phụ thuộc vật liệu cathode.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Lệch về bản dương nghĩa là hạt mang điện âm.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt mang điện âm nên bị bản cực dương hút.",
+    "lyDo2": "Hạt mang điện âm (electron) bị bản cực dương hút nên lệch về phía đó.",
     "chac": true
    }
   }

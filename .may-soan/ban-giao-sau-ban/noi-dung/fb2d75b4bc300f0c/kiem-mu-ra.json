@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "A",
-  "lyDo": "Nguyên tử có cấu tạo rỗng (vỏ + hạt nhân); B sai (proton, neutron), C sai (vỏ là electron), D thiếu neutron.",
+  "lyDo": "Nguyên tử có cấu trúc rỗng gồm vỏ và hạt nhân (đúng); B sai (hạt nhân gồm proton, neutron), C sai (vỏ là electron), D thiếu neutron.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Electron nằm ở vỏ, không nằm trong hạt nhân; các ý còn lại đúng.",
+  "lyDo": "Electron nằm ở vỏ, ngoài hạt nhân, nên C sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "Hạt nhân gồm proton (+) và neutron (không mang điện) nên mang điện dương; A, C, D sai.",
+  "lyDo": "Hạt nhân chứa proton mang điện dương và neutron không mang điện nên mang điện dương; A, C, D sai.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Hạt nhân chỉ chứa proton và neutron, không có electron; A, B, C đúng.",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Nguyên tử trung hòa vì số proton = số electron; A sai (hạt nhân rất nhỏ), B sai, D sai (neutron không mang điện).",
+  "lyDo": "Nguyên tử trung hòa vì số proton bằng số electron; A sai (hạt nhân rất nhỏ), B sai, D sai (neutron không mang điện).",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Nguyên tử lớn hơn hạt nhân khoảng 10^4–10^5 lần nên A sai; B, C, D đúng.",
+  "lyDo": "Kích thước nguyên tử lớn hơn hạt nhân rất nhiều (~10^4–10^5 lần) nên A sai.",
   "chac": true
  }
 ]

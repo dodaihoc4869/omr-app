@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1836 lần, không gần bằng nên C sai; A, B, D đúng.",
+  "lyDo": "Khối lượng electron nhỏ hơn rất nhiều (~1/1836) so với proton nên C sai.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "A",
-  "lyDo": "Nguyên tử trung hoà nên số electron bằng số proton; B, C, D đều sai.",
+  "lyDo": "Nguyên tử trung hoà: số electron = số proton; B, C, D đều sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Số khối bằng tổng số proton và neutron, không phải electron nên D sai; A, B, C đúng.",
+  "lyDo": "Số khối = số proton + số neutron, không phải số electron.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "Hạt nhân chứa proton (+) và neutron (không mang điện), mang điện dương, không chứa electron nên B sai.",
+  "lyDo": "Hạt nhân gồm proton và neutron, mang điện dương, không chứa electron.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Điện tích hạt nhân là +Z với Z là số proton; O (Z=8) và N (Z=7) khác số proton nên A sai; B, D sai.",
+  "lyDo": "Điện tích hạt nhân = +Ze đúng; A sai (O có Z=8, N có Z=7), B và D sai.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "A",
-  "lyDo": "Số electron bằng số proton, không nhất thiết bằng số neutron nên A sai; B, C, D đúng.",
+  "lyDo": "Số electron bằng số proton, không nhất thiết bằng số neutron.",
   "chac": true
  }
 ]

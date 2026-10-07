@@ -21,7 +21,7 @@
    "chot": "Hạt nhân gồm proton và neutron; electron ở lớp vỏ và số electron bằng số proton.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Đúng: (1),(3),(5); sai: (2) electron ở vỏ, (4) số proton không luôn bằng số neutron → 3",
+    "lyDo2": "Đúng: (1),(3),(5); sai: (2) electron ở vỏ, (4) p không luôn bằng n => 3",
     "chac": true
    }
   },
@@ -44,7 +44,7 @@
    "chot": "Proton (+), neutron (0), electron (−) và electron có khối lượng rất nhỏ.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Đúng: (2),(4); sai: (1) proton mang điện dương, (3) hạt nhân không chứa electron, (5) electron nhẹ hơn neutron → 2",
+    "lyDo2": "Đúng: (2),(4); sai: (1) p dương, (3) hạt nhân không chứa e, (5) e nhẹ hơn n => 2",
     "chac": true
    }
   },
@@ -67,7 +67,7 @@
    "chot": "Khối lượng nguyên tử tập trung ở hạt nhân vì electron rất nhẹ.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Đúng: (1),(2),(3),(5); sai: (4) khối lượng tập trung ở hạt nhân → 4",
+    "lyDo2": "Đúng: (1),(2),(3),(5); sai: (4) khối lượng tập trung ở hạt nhân => 4",
     "chac": true
    }
   },
@@ -90,7 +90,7 @@
    "chot": "Chỉ cần nhớ: số electron bằng số proton trong nguyên tử.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Chỉ (5) đúng; (1) hạt nhân gồm proton và neutron, (2) khối lượng ở hạt nhân, (3) electron mang điện âm, (4) neutron không luôn bằng proton → 1",
+    "lyDo2": "Chỉ (5) đúng; (1) hạt nhân gồm p và n, (2) khối lượng ở hạt nhân, (3) e âm, (4) n không luôn bằng p => 1",
     "chac": true
    }
   },
@@ -113,7 +113,7 @@
    "chot": "Nguyên tử rỗng; hạt nhân nhỏ nhưng chứa gần hết khối lượng.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Sai: (2) electron nhẹ hơn proton rất nhiều, (4) nguyên tử có nhiều khoảng rỗng; (1),(3),(5) đúng → 2 phát biểu sai",
+    "lyDo2": "Sai: (2) e nhẹ hơn p, (4) nguyên tử có nhiều khoảng rỗng; còn lại đúng => 2 ý sai",
     "chac": true
    }
   },
@@ -136,7 +136,7 @@
    "chot": "Hạt nhân: proton (+) và neutron (0); lớp vỏ: electron (−).",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Sai: (1) electron mang điện âm, (2) neutron ở hạt nhân, (3) khối lượng ở hạt nhân, (4) proton mang điện dương; (5) đúng → 4 phát biểu sai",
+    "lyDo2": "Sai: (1) e âm, (2) n ở hạt nhân, (3) khối lượng ở hạt nhân, (4) p mang điện dương; (5) đúng => 4 ý sai",
     "chac": true
    }
   }

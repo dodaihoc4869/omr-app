@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "D",
-  "lyDo": "Al có Z = 13 nên điện tích hạt nhân +13",
+  "lyDo": "Z = 13 nên điện tích hạt nhân +13",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Cl có Z = 17 nên điện tích hạt nhân +17",
+  "lyDo": "Z = 17 nên điện tích hạt nhân +17",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "B",
-  "lyDo": "Fe có Z = 26 nên điện tích hạt nhân +26",
+  "lyDo": "Z = 26 nên điện tích hạt nhân +26",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "Cu có Z = 29 nên điện tích hạt nhân +29",
+  "lyDo": "Z = 29 nên điện tích hạt nhân +29",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "K có Z = 19 nên điện tích hạt nhân +19",
+  "lyDo": "Z = 19 nên điện tích hạt nhân +19",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "F có Z = 9 nên điện tích hạt nhân +9",
+  "lyDo": "Z = 9 nên điện tích hạt nhân +9",
   "chac": true
  }
 ]

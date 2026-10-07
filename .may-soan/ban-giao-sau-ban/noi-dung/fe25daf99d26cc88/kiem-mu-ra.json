@@ -2,13 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Hạt nhân được Rutherford phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng mỏng (2018 SGK cũng nêu vậy).",
+  "lyDo": "Rutherford bắn hạt α vào lá vàng mỏng, phát hiện hạt nhân.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện (điện tích 0).",
+  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện.",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "A",
+  "lyDo": "Khối lượng neutron xấp xỉ proton (≈1 amu); D sai vì 1836 là tỉ số proton/electron.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "A",
+  "lyDo": "Neutron trung hoà điện nên không bị lệch trong điện/từ trường.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "Chadwick bắn hạt α vào Beryllium năm 1932.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "C",
+  "lyDo": "Neutron nằm trong hạt nhân cùng proton.",
   "chac": true
  }
 ]

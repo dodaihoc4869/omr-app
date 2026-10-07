@@ -120,7 +120,16 @@
    "buoc": [
     "Số proton = số hạt mang điện dương = 6. Nguyên tử trung hòa → số electron = số proton = 6."
    ],
-   "chot": "Số electron bằng số proton."
+   "chot": "Số electron bằng số proton.",
+   "phepTinh": [
+    {
+     "ten": "Số electron",
+     "bieuThuc": "6",
+     "ketQua": 6,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ]
   },
   {
    "kieu": "so",
@@ -136,7 +145,16 @@
    "buoc": [
     "Số proton = 14. Nguyên tử trung hòa → electron = proton = 14."
    ],
-   "chot": "Số electron bằng số proton."
+   "chot": "Số electron bằng số proton.",
+   "phepTinh": [
+    {
+     "ten": "Số electron",
+     "bieuThuc": "14",
+     "ketQua": 14,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ]
   }
  ]
 }

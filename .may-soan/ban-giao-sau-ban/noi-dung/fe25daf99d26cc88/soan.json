@@ -37,14 +37,14 @@
    "chot": "Neutron là hạt không mang điện."
   },
   {
-   "kieu": "nhan_biet",
-   "cach": "so_sanh",
+   "kieu": "ly_thuyet",
+   "cach": "dung_sai",
    "de": "Khối lượng của neutron so với proton là bao nhiêu?",
    "pa": {
     "A": "Gần bằng khối lượng proton.",
     "B": "Gần bằng khối lượng electron.",
     "C": "Bằng đúng một nửa khối lượng proton.",
-    "D": "Lớn hơn khối lượng proton khoảng 1.836 lần."
+    "D": "Lớn hơn khối lượng proton khoảng 1,836 lần."
    },
    "dap_an": "A",
    "buoc": [
@@ -53,8 +53,8 @@
    "chot": "Khối lượng neutron xấp xỉ bằng khối lượng proton."
   },
   {
-   "kieu": "nhan_biet",
-   "cach": "ly_giai",
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
    "de": "Vì sao neutron khó phát hiện bằng điện trường hoặc từ trường?",
    "pa": {
     "A": "Neutron không mang điện nên không bị lệch bởi điện trường hoặc từ trường.",
@@ -69,24 +69,24 @@
    "chot": "Neutron trung hòa về điện → không lệch trong điện trường hay từ trường."
   },
   {
-   "kieu": "nhan_biet",
-   "cach": "lich_su",
-   "de": "Neutron được J. Chadwick phát hiện vào năm nào?",
+   "kieu": "ly_thuyet",
+   "cach": "doi_so",
+   "de": "Neutron được J. Chadwick phát hiện vào năm 1932 khi bắn phá nguyên tố nào bằng hạt α?",
    "pa": {
-    "A": "1897.",
-    "B": "1911.",
-    "C": "1932.",
-    "D": "1964."
+    "A": "Vàng (Au).",
+    "B": "Beryllium (Be).",
+    "C": "Hydro (H).",
+    "D": "Uranium (U)."
    },
-   "dap_an": "C",
+   "dap_an": "B",
    "buoc": [
-    "Năm 1932: Chadwick bắn hạt α vào Be, phát hiện neutron."
+    "Chadwick bắn hạt α vào Be và phát hiện hạt neutron không mang điện."
    ],
-   "chot": "Neutron được phát hiện năm 1932 bởi J. Chadwick."
+   "chot": "Thí nghiệm Chadwick: bắn hạt α vào Beryllium → phát hiện neutron."
   },
   {
-   "kieu": "nhan_biet",
-   "cach": "vi_tri",
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
    "de": "Trong cấu trúc nguyên tử, neutron nằm ở vị trí nào?",
    "pa": {
     "A": "Trong lớp vỏ electron.",

@@ -2,7 +2,7 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Neutron không mang điện, nằm trong hạt nhân, khối lượng xấp xỉ proton (≈1 amu).",
+  "lyDo": "Neutron không mang điện, nằm trong hạt nhân, khối lượng ≈ proton (≈1 amu).",
   "chac": true
  },
  {
@@ -14,7 +14,7 @@
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Electron mang điện tích âm; nằm ở lớp vỏ, khối lượng rất nhỏ so với 1 amu.",
+  "lyDo": "Electron mang điện tích âm (−1); B, C, D đều sai.",
   "chac": true
  },
  {
@@ -26,13 +26,13 @@
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "Lớp vỏ gồm các electron, mang điện âm.",
+  "lyDo": "Lớp vỏ nguyên tử gồm các electron, mang điện âm.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "Khối lượng electron nhỏ hơn proton rất nhiều (~1/1840), nên B sai.",
+  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần, nên B sai.",
   "chac": true
  }
 ]

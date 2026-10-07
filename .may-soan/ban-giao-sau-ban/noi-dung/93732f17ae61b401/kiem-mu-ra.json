@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Khối lượng electron không đáng kể nên khối lượng nguyên tử tập trung ở hạt nhân; A, C sai, D sai vì nguyên tử trung hòa.",
+  "lyDo": "Electron rất nhẹ, proton và neutron nặng ở hạt nhân nên khối lượng tập trung ở hạt nhân; A, C sai, D sai vì nguyên tử trung hòa.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Hạt nhân rất nhỏ so với nguyên tử, không chiếm phần lớn thể tích; các phát biểu còn lại đúng.",
+  "lyDo": "Hạt nhân rất nhỏ so với nguyên tử, không chiếm phần lớn thể tích; các ý còn lại đúng.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Neutron không mang điện; B, C, D đúng.",
+  "lyDo": "Neutron không mang điện nên A sai; B, C, D đúng.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Electron mang điện âm, ở vỏ nguyên tử, khối lượng ~1/1836 proton; A, B, C sai.",
+  "lyDo": "Khối lượng electron ~1/1840 proton; A mang điện âm, B sai, C electron ở vỏ.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "A",
-  "lyDo": "Bán kính hạt nhân ~10^-5 lần bán kính nguyên tử; nguyên tử có nhiều khoảng rỗng nên B, C, D sai.",
+  "lyDo": "Bán kính hạt nhân ~10^-5 lần bán kính nguyên tử; B, C, D sai vì nguyên tử có nhiều khoảng rỗng.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "C",
-  "lyDo": "Neutron không mang điện nên điện tích hạt nhân bằng tổng điện tích proton (dương); A, B, D sai.",
+  "lyDo": "Hạt nhân gồm proton (+) và neutron (không mang điện) nên điện tích hạt nhân bằng tổng điện tích proton; A, B, D sai.",
   "chac": true
  }
 ]

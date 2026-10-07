@@ -20,7 +20,7 @@
    "chot": "Proton và neutron có khối lượng xấp xỉ nhau, electron nhẹ hơn rất nhiều.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "m_p ≈ m_n ≈ 1 amu; B, D sai (e nhẹ hơn nhiều); C sai (khối lượng nguyên tử ≈ hạt nhân).",
+    "lyDo2": "m_p ≈ m_n ≈ 1 amu; B, D sai chiều; C sai vì khối lượng nguyên tử xấp xỉ hạt nhân.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Khối lượng nguyên tử tập trung ở hạt nhân vì electron rất nhẹ.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Khối lượng nguyên tử tập trung ở hạt nhân; A, B, D sai.",
+    "lyDo2": "Khối lượng nguyên tử tập trung chủ yếu ở hạt nhân; A, B sai, D sai (electron rất nhỏ).",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Electron nhẹ hơn neutron và proton gần 2000 lần.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Câu hỏi 'không đúng': electron nhẹ hơn neutron khoảng 1840 lần nên D sai; A, B, C đúng.",
+    "lyDo2": "Electron nhỏ hơn neutron khoảng 1839 lần nên D sai; A, B, C đúng.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Electron nhẹ hơn proton khoảng 1837 lần.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "m_e ≈ 1/1837 m_p; A, C, D đảo ngược hoặc sai chất.",
+    "lyDo2": "m_e ≈ 1/1837 m_p; các phương án còn lại ngược chiều.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Khối lượng nguyên tử chủ yếu do proton và neutron quyết định.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Câu hỏi 'không đúng': khối lượng nguyên tử ≈ khối lượng hạt nhân, không bằng tổng khối lượng electron; A, B, D đúng.",
+    "lyDo2": "Khối lượng nguyên tử gồm cả proton và neutron, không bằng tổng khối lượng electron; A, B, D đúng.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Khối lượng electron không đáng kể so với khối lượng hạt nhân.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Khối lượng electron rất nhỏ, không đáng kể so với hạt nhân; A sai (hạt nhân xấp xỉ nguyên tử), C, D sai.",
+    "lyDo2": "Electron rất nhỏ so với hạt nhân; A sai (hạt nhân xấp xỉ nguyên tử), C, D sai.",
     "chac": true
    }
   }

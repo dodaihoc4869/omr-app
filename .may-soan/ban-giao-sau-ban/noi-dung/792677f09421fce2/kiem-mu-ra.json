@@ -8,19 +8,31 @@
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "Số electron = số proton = 17.",
+  "lyDo": "Nguyên tử trung hòa: số electron = số proton = 17.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Số electron = số proton = 19.",
+  "lyDo": "Nguyên tử trung hòa: số electron = số proton = 19.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "C",
-  "lyDo": "Số electron = số proton = 4.",
+  "lyDo": "Nguyên tử trung hòa: số electron = số proton = 4.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "A",
+  "lyDo": "Nguyên tử trung hòa: số electron = số proton = 6.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "Nguyên tử trung hòa: số electron = số proton = 14.",
   "chac": true
  }
 ]

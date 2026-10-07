@@ -13,7 +13,9 @@
     "D": "Vừa dương vừa âm."
    },
    "dap_an": "B",
-   "buoc": "Tia bị hút về cực dương nên mang điện âm.",
+   "buoc": [
+    "Tia bị hút về cực dương nên mang điện âm."
+   ],
    "chot": "Tia âm cực mang điện tích âm."
   },
   {
@@ -63,7 +65,9 @@
     "D": "Điện tích hạt nhân bằng nhau ở mọi kim loại."
    },
    "dap_an": "B",
-   "buoc": "e/m không đổi → electron giống nhau ở mọi nguyên tử.",
+   "buoc": [
+    "e/m không đổi → electron giống nhau ở mọi nguyên tử."
+   ],
    "chot": "Electron là hạt cấu thành chung của mọi nguyên tử."
   },
   {
@@ -95,7 +99,9 @@
     "D": "Hạt nhân nguyên tử."
    },
    "dap_an": "C",
-   "buoc": "Tia âm cực là dòng các hạt electron.",
+   "buoc": [
+    "Tia âm cực là dòng các hạt electron."
+   ],
    "chot": "Hạt tạo nên tia âm cực là electron."
   }
  ]

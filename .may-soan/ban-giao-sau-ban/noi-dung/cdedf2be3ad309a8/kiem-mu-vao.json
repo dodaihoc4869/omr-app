@@ -42,5 +42,27 @@
    "C": "15.",
    "D": "48."
   }
+ },
+ {
+  "id": "ss5",
+  "loai": "ban_khac",
+  "de": "Nguyên tử của nguyên tố Y có tổng số hạt cơ bản là 36.\nSố hạt không mang điện bằng số hạt mang điện âm.\nSố proton của nguyên tử nguyên tố Y là",
+  "pa": {
+   "A": "12.",
+   "B": "11.",
+   "C": "24.",
+   "D": "36."
+  }
+ },
+ {
+  "id": "ss6",
+  "loai": "ban_khac",
+  "de": "Nguyên tử của nguyên tố Z có tổng số hạt cơ bản là 54.\nSố hạt không mang điện bằng số hạt mang điện âm.\nSố proton của nguyên tử nguyên tố Z là",
+  "pa": {
+   "A": "17.",
+   "B": "18.",
+   "C": "27.",
+   "D": "54."
+  }
  }
 ]

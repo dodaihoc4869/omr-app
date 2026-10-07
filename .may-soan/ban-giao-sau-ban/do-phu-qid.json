@@ -155,11 +155,11 @@
  "10-C1-B1-I-32": {
   "bam": "792677f09421fce2",
   "phan": "I",
-  "soBanCauTruc": 4,
-  "soDaKiem": 4,
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
   "soYCauTruc": 0,
   "soYDaKiem": 0,
-  "trangThai": "mot_phan"
+  "trangThai": "du"
  },
  "10-C1-B1-I-39": {
   "bam": "91473a2923aef1d0",
@@ -317,10 +317,10 @@
  "10-C1-B1-I-3": {
   "bam": "fe25daf99d26cc88",
   "phan": "I",
-  "soBanCauTruc": 2,
-  "soDaKiem": 2,
+  "soBanCauTruc": 6,
+  "soDaKiem": 6,
   "soYCauTruc": 0,
   "soYDaKiem": 0,
-  "trangThai": "mot_phan"
+  "trangThai": "du"
  }
 }

@@ -20,7 +20,7 @@
    "chot": "1 mol của bất kì chất nào cũng chứa cùng một số hạt.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "1 mol bất kì chất nào chứa cùng số hạt (NA); A, D sai vì khối lượng kim loại khác H và C; C sai vì gấp 12 lần.",
+    "lyDo2": "1 mol bất kì chất nào chứa cùng số hạt (6,022.10²³); A, D sai vì khối lượng mol phụ thuộc kim loại, C sai vì gấp 12 lần.",
     "chac": true
    }
   },
@@ -43,7 +43,7 @@
    "chot": "Số hạt trong 1 mol không phụ thuộc vào loại chất.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "1 mol mọi nguyên tử đều chứa số nguyên tử bằng nhau nên C sai; A, B, D đúng.",
+    "lyDo2": "1 mol nguyên tử của mọi chất chứa số nguyên tử bằng nhau nên C sai; A, B, D đúng.",
     "chac": true
    }
   },
@@ -65,7 +65,7 @@
    "chot": "Khối lượng mol nguyên tử (g/mol) = nguyên tử khối; số hạt trong 1 mol không đổi.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Khối lượng 1 mol Al = 27 g; A sai (kg), B sai (không nhân 27), C sai (số nguyên tử bằng nhau).",
+    "lyDo2": "Al có nguyên tử khối 27 nên 1 mol Al nặng 27 g; A sai (kg), B sai, C sai (cùng số nguyên tử).",
     "chac": true
    }
   },
@@ -87,7 +87,7 @@
    "chot": "Số nguyên tử tỉ lệ thuận với số mol.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "2 mol chứa 2NA nguyên tử, gấp đôi 1 mol H; B, D sai số hạt; C sai vì khối lượng kim loại khác H.",
+    "lyDo2": "2 mol chứa gấp đôi số nguyên tử của 1 mol H; B, D sai về số nguyên tử, C sai vì khối lượng mol khác nhau (X là kim loại, khác H).",
     "chac": true
    }
   },
@@ -109,7 +109,7 @@
    "chot": "Cùng số mol thì cùng số hạt, nhưng khối lượng khác nhau.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "1 mol nguyên tử của bất kì nguyên tố nào đều chứa NA nguyên tử; khối lượng thì khác nhau.",
+    "lyDo2": "1 mol nguyên tử của mọi kim loại chứa cùng 6,022.10²³ nguyên tử; A, C sai, B sai vì M khác N nên khối lượng mol khác nhau.",
     "chac": true
    }
   },
@@ -132,7 +132,7 @@
    "chot": "Cùng 1 mol thì cùng số hạt, khác nhau ở khối lượng.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Z là kim loại nên khối lượng mol khác carbon (12 g/mol) nên A sai; B, C, D đúng.",
+    "lyDo2": "Z là kim loại nên khối lượng mol khác carbon (12 g/mol), A sai; B, C, D đúng.",
     "chac": true
    }
   }
