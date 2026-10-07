@@ -4,6 +4,24 @@ Phạm vi: Phần I, II, III, gồm lý thuyết và tính toán; dùng cùng b�
 
 Phần I/III đặt mục tiêu sáu bản khác. Phần II đặt mục tiêu 24 ý mới khác nhau, tương ứng sáu nhóm bốn ý cùng đề dẫn. Đảo lựa chọn không được coi là một bản khác mới.
 
+## Vòng xử lý câu sai hiện tại
+
+Luật mặc định của `loi-hoc-luat.ts` tính lượt tự làm từ 29/09/2026. Lượt có hỗ trợ hoặc làm trong 12 giờ sau khi đọc lời giải không được dùng để đóng lỗi.
+
+```mermaid
+flowchart TD
+  A[Tự làm sai hoặc bỏ trống] --> B[Mở lỗi và đưa vào hàng làm lại]
+  B --> C[Làm bản khác: song sinh, biến thể hoặc câu anh em]
+  C --> D{Tự làm đúng đủ điều kiện?}
+  D -->|Chưa| B
+  D -->|Đúng ở hai ngày khác nhau; lượt cuối cách lần sai ít nhất ba ngày; có lượt song sinh nếu kho có| E[Đóng lỗi]
+  E --> F[Kiểm lại sau 14 rồi 30 ngày]
+  F -->|Sai| B
+  F -->|Đúng| G[Qua mốc duy trì]
+```
+
+Nếu chưa có học liệu khác, hệ thống còn đường dùng câu gốc với lựa chọn đảo; đường này không được tính là kho đã có sáu câu song sinh chuẩn. Các mốc trên có thể được cấu hình bởi cơ chế tự hiệu chỉnh.
+
 Mỗi bản mới phải qua kiểm định dạng, kiểm lời giải, giải mù trong thư mục riêng không thấy đáp án đề xuất, khớp đáp án, xác nhận chắc chắn và có lý do giải độc lập. Thiếu bất kỳ bằng chứng nào thì không nhận. Hai lượt AI khớp nhau vẫn có thể cùng sai; đây không phải chứng nhận đúng chuyên môn tuyệt đối 100%.
 
 ## Vận hành
