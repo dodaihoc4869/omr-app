@@ -24,32 +24,46 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
-      - name: Query D1 lấy 60 câu mẫu
+      - name: Query D1 lấy câu mẫu 3 loại (tn/ds/tln)
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           mkdir -p .may-soan
-          SQL="SELECT l.qid, l.bam, l.ma_de, l.dang, l.lop, l.bo, q.json FROM loi_giai_cau l JOIN game_v2_question q ON q.qid = l.qid AND q.ma_de = l.ma_de JOIN de_kho d ON d.ma_de = l.ma_de AND d.da_xoa = 0 WHERE l.dang IN ('tn','ds','tln') ORDER BY l.qid LIMIT 60"
-          npx -y wrangler@latest d1 execute omr --remote --command "$SQL" --json \
-            > .may-soan/cau-raw-d1.json
+          BASE="SELECT l.qid, l.bam, l.ma_de, l.dang, l.lop, l.bo, q.json FROM loi_giai_cau l JOIN game_v2_question q ON q.qid = l.qid AND q.ma_de = l.ma_de JOIN de_kho d ON d.ma_de = l.ma_de AND d.da_xoa = 0"
+          npx -y wrangler@latest d1 execute omr --remote --json \
+            --command "$BASE WHERE l.dang = 'tn' ORDER BY RANDOM() LIMIT 5" \
+            > .may-soan/raw-tn.json
+          npx -y wrangler@latest d1 execute omr --remote --json \
+            --command "$BASE WHERE l.dang = 'ds' ORDER BY RANDOM() LIMIT 5" \
+            > .may-soan/raw-ds.json
+          npx -y wrangler@latest d1 execute omr --remote --json \
+            --command "$BASE WHERE l.dang = 'tln' ORDER BY RANDOM() LIMIT 5" \
+            > .may-soan/raw-tln.json
           node -e "
           const fs = require('fs');
-          const raw = JSON.parse(fs.readFileSync('.may-soan/cau-raw-d1.json','utf8'));
-          const rows = (raw[0]?.results || []).map(r => {
-            try { return { ...r, json: JSON.parse(r.json) }; }
-            catch { return null; }
-          }).filter(Boolean);
-          const dangs = {};
-          rows.forEach(r => { dangs[r.dang] = (dangs[r.dang]||0)+1; });
-          console.log('Lay duoc', rows.length, 'cau:', JSON.stringify(dangs));
-          fs.writeFileSync('.may-soan/cau-mau-d1.json', JSON.stringify(rows, null, 2));
+          function parseRaw(file) {
+            try {
+              const raw = JSON.parse(fs.readFileSync(file,'utf8'));
+              return (raw[0]?.results || []).map(r => {
+                try { return { ...r, json: JSON.parse(r.json) }; }
+                catch { return null; }
+              }).filter(Boolean);
+            } catch(e) { console.error(file, e.message); return []; }
+          }
+          const tn = parseRaw('.may-soan/raw-tn.json');
+          const ds = parseRaw('.may-soan/raw-ds.json');
+          const tln = parseRaw('.may-soan/raw-tln.json');
+          console.log('tn:', tn.length, '  ds:', ds.length, '  tln:', tln.length);
+          const all = [...tn, ...ds, ...tln];
+          fs.writeFileSync('.may-soan/cau-mau-d1.json', JSON.stringify(all, null, 2));
+          console.log('Tong:', all.length);
           "
       - name: Commit câu mẫu vào nhánh (force qua .gitignore)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --force .may-soan/cau-mau-d1.json
+          git add --force .may-soan/raw-tn.json .may-soan/raw-ds.json .may-soan/raw-tln.json .may-soan/cau-mau-d1.json
           git diff --cached --quiet && echo "Khong co thay doi" || \
-            git commit -m "ci: câu mẫu D1 $(date -u '+%d/%m/%Y %H:%M') [skip ci]"
+            git commit -m "ci: câu mẫu D1 3 loại $(date -u '+%d/%m/%Y %H:%M') [skip ci]"
           git push origin HEAD:claude/laughing-bohr-1ixzp4
