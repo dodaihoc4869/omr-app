@@ -1,0 +1,69 @@
+[
+  {
+    "results": [
+      {
+        "qid": "12-C3-B10-D2-III-3",
+        "bam": "5c98108d8d42329a",
+        "ma_de": "12-C3-B10-D2",
+        "dang": "tln",
+        "lop": "12",
+        "bo": "HOP_CHAT_N",
+        "json": "{\"qid\":\"12-C3-B10-D2-III-3\",\"maDe\":\"12-C3-B10-D2\",\"version\":\"37f142778934225dea861c8cea76782a\",\"group\":\"c2093695376d44a803ad729a394363420f60f0ba803123606ce1b86384bbd796\",\"phan\":\"III\",\"text\":\"Cho các protein sau: keratin (có ở tóc, móng); collagen (có ở da, sụn); myosin (có ở cơ bắp); hemoglobin (có ở máu) và albumin (có ở lòng trắng trứng).\\nCó bao nhiêu protein có thể tan được trong nước tạo dung dịch keo?\",\"choices\":[],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"HOP_CHAT_N.PROTEIN.DEM_DONG_PHAN\",\"tenDang\":\"Protein — đếm đồng phân\",\"mucDo\":\"biet\",\"sao\":1,\"kienThuc\":[],\"family\":null,\"correct\":\"2\",\"solution\":{\"chot\":\"Chỉ protein hình cầu (hemoglobin, albumin) tan trong nước tạo dung dịch keo; keratin, collagen, myosin hình sợi không tan.\",\"buoc\":[\"Tan (hình cầu): hemoglobin, albumin\",\"Không tan (hình sợi): keratin, collagen, myosin\",\"Thay số: Số protein tan = 2\"],\"ketQua\":\"2\"},\"reviewed\":true}"
+      },
+      {
+        "qid": "DH-11-C2-B5-III-21",
+        "bam": "b2de74b24f209ffa",
+        "ma_de": "DH-11-C2-B5",
+        "dang": "tln",
+        "lop": "11",
+        "bo": "NITROGEN_SULFUR",
+        "json": "{\"qid\":\"DH-11-C2-B5-III-21\",\"maDe\":\"DH-11-C2-B5\",\"version\":\"22b8aeb1e927f98d86b8c61b750918a3\",\"group\":\"e6666e87fb966a2a842ec14a8d3cc5efcacd46baafa343b45e19aca0066a67c9\",\"phan\":\"III\",\"text\":\"Hòa tan 28,92 gam tinh thể hydration của muối kép có dạng Fe₂(SO₄)₃.(NH₄)₂SO₄.xH₂O vào nước, rồi thêm một lượng kiềm dư vào dung dịch, đun nóng nhẹ.\\nSau phản ứng có 1,4874 L khí ở đkc thoát ra và một kết tủa màu nâu đỏ.\\nGiá trị của x là bao nhiêu?\",\"choices\":[],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"NITROGEN_SULFUR.AMMONIA_AMMONIUM.NEU_HIEN_TUONG\",\"tenDang\":\"Ammonia và muối ammonium — nêu hiện tượng\",\"mucDo\":\"van_dung\",\"sao\":2,\"kienThuc\":[],\"family\":null,\"correct\":\"24\",\"solution\":{\"chot\":\"n(NH₃) = 1,4874 : 24,79 = 0,06 mol nên n(muối kép) = 0,03 mol, M = 28,92 : 0,03 = 964. Trừ phần khan 400 + 132 = 532 còn 432, chia 18 được x = 24.\",\"buoc\":[\"n(NH₃) = 1,4874 : 24,79 = 0,06 mol.\",\"Mỗi công thức chứa 2 ion NH₄⁺ nên n(muối kép) = 0,03 mol.\",\"M = 28,92 : 0,03 = 964 g/mol.\",\"M(Fe₂(SO₄)₃) + M((NH₄)₂SO₄) = 400 + 132 = 532.\",\"18x = 964 − 532 = 432 nên x = 24.\"],\"ketQua\":\"24\"},\"reviewed\":true}"
+      },
+      {
+        "qid": "DH-10-C2-B9-D2-III-1",
+        "bam": "b951012074250a66",
+        "ma_de": "DH-10-C2-B9-D2",
+        "dang": "tln",
+        "lop": "10",
+        "bo": "BANG_TUAN_HOAN",
+        "json": "{\"qid\":\"DH-10-C2-B9-D2-III-1\",\"maDe\":\"DH-10-C2-B9-D2\",\"version\":\"9a63429f-334e-4cb1-8ff9-de7f37669feb\",\"group\":\"bf83e767409d687d24e364e3fbb83cd08dd6051263c538cb7581ee7e0828bee3\",\"phan\":\"III\",\"text\":\"Cho các nguyên tố: X (Z = 2), Y (Z = 9), T (Z = 12), M (Z = 13), A (Z = 14).\\nCó bao nhiêu nguyên tố thuộc cùng một chu kì 3?\",\"choices\":[],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"BANG_TUAN_HOAN.CAU_TRUC_BTH.DEM_DONG_PHAN\",\"tenDang\":\"Cấu trúc bảng tuần hoàn, ô, chu kì, nhóm — đếm đồng phân\",\"mucDo\":\"hieu\",\"sao\":1,\"kienThuc\":[],\"correct\":\"3\",\"solution\":{\"chot\":\"Số thứ tự chu kì bằng số lớp electron của nguyên tử.\",\"buoc\":[\"X có Z = 2 là He, chỉ một lớp nên chu kì 1.\",\"Y có Z = 9 là F, hai lớp nên chu kì 2.\",\"T, M, A có Z là 12, 13, 14 tức Mg, Al, Si, đều ba lớp nên chu kì 3.\",\"Thay số: có 3 nguyên tố thuộc chu kì 3.\"],\"ketQua\":\"3\"},\"reviewed\":true}"
+      },
+      {
+        "qid": "DH-11-C1-B2-III-26",
+        "bam": "0504a4512d2642c8",
+        "ma_de": "DH-11-C1-B2",
+        "dang": "tln",
+        "lop": "11",
+        "bo": "CAN_BANG",
+        "json": "{\"qid\":\"DH-11-C1-B2-III-26\",\"maDe\":\"DH-11-C1-B2\",\"version\":\"4f9b932ad729d9cd129d35fb84690ca8\",\"group\":\"1ed866653e39ba04c9a30a1f644b191cf351ef7efea00e1324d7bcb024b1b710\",\"phan\":\"III\",\"text\":\"Để chuẩn độ 100 mL dung dịch CH₃COOH chưa biết nồng độ đã dùng trung bình hết 150 mL dung dịch NaOH 0,1 M. Nồng độ mol của dung dịch CH₃COOH là bao nhiêu mol/L?\",\"choices\":[],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"CAN_BANG.CHUAN_DO.TINH_NONG_DO\",\"tenDang\":\"Chuẩn độ — tính nồng độ\",\"mucDo\":\"hieu\",\"sao\":1,\"kienThuc\":[],\"family\":null,\"correct\":\"0,15\",\"solution\":{\"chot\":\"n(NaOH) = 0,150 × 0,1 = 0,015 mol = n(CH₃COOH).\",\"buoc\":[\"n(NaOH) = 0,150 × 0,1 = 0,015 mol = n(CH₃COOH).\",\"C = 0,015/0,100.\",\"C = 0,15 mol/L.\"],\"ketQua\":\"0,15\"},\"reviewed\":true}"
+      },
+      {
+        "qid": "DB-12-B4-D2-III-49",
+        "bam": "bd8eccce1738d0f2",
+        "ma_de": "DB-12-B4-D2",
+        "dang": "tln",
+        "lop": "12",
+        "bo": "CARBOHYDRATE",
+        "json": "{\"qid\":\"DB-12-B4-D2-III-49\",\"maDe\":\"DB-12-B4-D2\",\"version\":\"13c296ebbc68daf6541f83331502bed0\",\"group\":\"fd70ad7597e62595e869adf4a776321eda3679f73c8dccfc63b2f3b0e6d79077\",\"phan\":\"III\",\"text\":\"Tinh bột kháng (resistant starch) là loại tinh bột không bị thuỷ phân ở ruột non mà đi đến và lên men trong ruột già, tạo ra nhiều vi khuẩn tốt giúp cải thiện sức khoẻ đường ruột. Chuối xanh thường chứa 70 - 80% tinh bột theo trọng lượng khô.\\nĐặc biệt, tỷ lệ tinh bột kháng trong chuối xanh rất cao, cao nhất trong các loại quả (48,99% khối lượng tinh bột). Một người trưởng thành cần đáp ứng ít nhất 7 gam tinh bột kháng/ngày để đảm bảo nhu cầu cơ thể.\\nTrong một ngày, một người trưởng thành cần sử dụng ít nhất bao nhiêu gam chuối xanh theo trọng lượng khô (loại chứa 75% tinh bột) để đảm bảo nhu cầu cơ thể (Kết quả làm tròn đến chữ số hàng đơn vị, chỉ làm tròn ở bước cuối cùng, không có nguồn thực phẩm khác cung cấp tinh bột kháng).\",\"choices\":[],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG\",\"tenDang\":\"Lên men — tính khối lượng\",\"mucDo\":\"van_dung\",\"sao\":1,\"kienThuc\":[],\"family\":null,\"correct\":\"19\",\"solution\":{\"chot\":\"Khối lượng chuối khô = khối lượng tinh bột kháng cần / (tỉ lệ tinh bột kháng trong tinh bột × tỉ lệ tinh bột trong chuối).\",\"buoc\":[\"m(tinh bột) = 7 / 48,99%\",\"m(chuối khô) = m(tinh bột) / 75%\",\"Thay số: m = 7 / 0,4899 / 0,75 = 19,05… ≈ 19\"],\"ketQua\":\"19 gam\"},\"reviewed\":true}"
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 9.4254
+      },
+      "duration": 9.4254,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 532660224,
+      "rows_read": 25569,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]

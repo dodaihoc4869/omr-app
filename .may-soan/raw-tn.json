@@ -1,0 +1,69 @@
+[
+  {
+    "results": [
+      {
+        "qid": "12-C3-B9-D2-I-43",
+        "bam": "54ede2e3b61a3ee5",
+        "ma_de": "12-C3-B9-D2",
+        "dang": "tn",
+        "lop": "12",
+        "bo": "HOP_CHAT_N",
+        "json": "{\"qid\":\"12-C3-B9-D2-I-43\",\"maDe\":\"12-C3-B9-D2\",\"version\":\"996605ca9a813539ba084c1b4d06e4dc\",\"group\":\"454aa0ffb9ce7d0548fd04830ac91d34fc0eccd0bf44a3f909c6babc66d71637\",\"phan\":\"I\",\"text\":\"Thủy phân hoàn toàn 0,3 mol Gly-Ala-Glu cần vừa đủ 400 mL dung dịch KOH xM. Giá trị của x là\",\"choices\":[\"4,00.\",\". 3,00.\",\". 2,50.\",\"2,25.\"],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"HOP_CHAT_N.PEPTIDE.TINH_NONG_DO\",\"tenDang\":\"Peptide — tính nồng độ\",\"mucDo\":\"hieu\",\"sao\":2,\"kienThuc\":[],\"family\":null,\"correct\":\"B\",\"solution\":{\"chot\":\"Số mol base bằng tổng số nhóm -COOH của các gốc: Gly (1) + Ala (1) + Glu (2) = 4 → n(KOH) = 4 × 0,3 = 1,2 mol; x = 1,2/0,4 = 3,00 M.\",\"tungPa\":{\"A\":{\"dung\":false,\"viSao\":\"4,00 M ứng với n(KOH) = 1,6 mol, tức đếm dư 1 nhóm -COOH.\"},\"B\":{\"dung\":true,\"viSao\":\"n(KOH) = 4 × 0,3 = 1,2 mol → x = 1,2/0,4 = 3,00.\"},\"C\":{\"dung\":false,\"viSao\":\"2,50 M ứng với 1,0 mol KOH, không khớp số nhóm -COOH.\"},\"D\":{\"dung\":false,\"viSao\":\"2,25 M ứng với 0,9 mol, tức chỉ tính 3 nhóm -COOH (bỏ sót -COOH thứ hai của Glu).\"}},\"buoc\":[\"Gly, Ala mỗi gốc có 1 -COOH; Glu có 2 -COOH ⇒ 1 mol peptide cần 4 mol KOH\",\"n(KOH) = 4 × 0,3 = 1,2 mol\",\"x = 1,2/0,4 = 3,00 M ⇒ chọn B\"]},\"reviewed\":true}"
+      },
+      {
+        "qid": "12-KT-C6-D4-I-9",
+        "bam": "bef45b9d81358a6d",
+        "ma_de": "12-KT-C6-D4",
+        "dang": "tn",
+        "lop": "12",
+        "bo": "KIM_LOAI",
+        "json": "{\"qid\":\"12-KT-C6-D4-I-9\",\"maDe\":\"12-KT-C6-D4\",\"version\":\"2ed96733a341fd7ebb63e24ad96a2644\",\"group\":\"7340e8440aa50a031b45f748471afa9ca67fca2c3cd889ecb8d8cdd805952736\",\"phan\":\"I\",\"text\":\"Cho ba kim loại được tách từ quặng của chúng theo các cách tương ứng ở bảng dưới.\\nKhả năng hoạt động hoá học của các kim loại giảm dần theo thứ tự nào sau đây?\",\"choices\":[\"X, Z, Y\",\"Y, Z, X\",\"X, Y, Z\",\"Z, Y, X\"],\"ideas\":[],\"table\":[[\"Kim loại\",\"Phương pháp tách thông dụng\"],[\"X\",\"Điện phân nóng chảy\"],[\"Y\",\"Nhiệt phân, nung nóng trực tiếp\"],[\"Z\",\"Nung nóng với carbon\"]],\"hinhAnh\":[],\"dang\":\"KIM_LOAI.DIEU_CHE.SO_SANH\",\"tenDang\":\"Tách và điều chế kim loại — so sánh\",\"mucDo\":\"hieu\",\"sao\":1,\"kienThuc\":[],\"family\":null,\"correct\":\"A\",\"solution\":{\"chot\":\"Kim loại càng mạnh thì càng khó tách: mạnh nhất phải điện phân nóng chảy, yếu nhất chỉ cần nung là oxide tự phân huỷ.\",\"tungPa\":{\"A\":{\"dung\":true,\"viSao\":\"Đúng: X mạnh nhất, rồi Z, yếu nhất là Y.\"},\"B\":{\"dung\":false,\"viSao\":\"Đặt Y đầu dãy là sai vì Y tách được chỉ bằng cách nung.\"},\"C\":{\"dung\":false,\"viSao\":\"Đặt Y trước Z là sai thứ tự hai kim loại yếu.\"},\"D\":{\"dung\":false,\"viSao\":\"Dãy này xếp theo chiều hoạt động tăng dần.\"}}},\"reviewed\":true}"
+      },
+      {
+        "qid": "11-C1-B2-D1-I-60",
+        "bam": "504e7ec77be7caff",
+        "ma_de": "11-C1-B2-D1",
+        "dang": "tn",
+        "lop": "11",
+        "bo": "CAN_BANG",
+        "json": "{\"qid\":\"11-C1-B2-D1-I-60\",\"maDe\":\"11-C1-B2-D1\",\"version\":\"0ed94ec4f9526c7388901ddb5ff23df7\",\"group\":\"5a260d56aa00152268933347a78d68b8d80ef17f2e069403cf504ac46b5023ba\",\"phan\":\"I\",\"text\":\"Nồng độ mol của cation trong dung dịch NaOH 0,10M là\",\"choices\":[\"0,10M.\",\"0,20M.\",\"0,30M.\",\"0,40M.\"],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"CAN_BANG.DIEN_LI.NHAN_DANG\",\"tenDang\":\"Sự điện li — nhận dạng\",\"mucDo\":\"hieu\",\"sao\":0,\"kienThuc\":[],\"family\":null,\"correct\":\"A\",\"solution\":{\"chot\":\"NaOH → Na⁺ + OH⁻. [Na⁺] = 0,10 M.\",\"tungPa\":{\"A\":{\"dung\":true,\"viSao\":\"Mỗi NaOH cho 1 ion Na⁺ nên [Na⁺] = 0,10 M.\"},\"B\":{\"dung\":false,\"viSao\":\"0,20 M là tổng nồng độ cả Na⁺ và OH⁻, không phải riêng cation.\"},\"C\":{\"dung\":false,\"viSao\":\"Không có hệ số nào trong phương trình phân li cho 0,30 M.\"},\"D\":{\"dung\":false,\"viSao\":\"Không có hệ số nào trong phương trình phân li cho 0,40 M.\"}},\"buoc\":[]},\"reviewed\":true}"
+      },
+      {
+        "qid": "12-C5-B16-I-52",
+        "bam": "3600584e75de4396",
+        "ma_de": "12-C5-B16",
+        "dang": "tn",
+        "lop": "12",
+        "bo": "DIEN_PHAN",
+        "json": "{\"qid\":\"12-C5-B16-I-52\",\"maDe\":\"12-C5-B16\",\"version\":\"38e4d4577fae8e59264dfe66dbac13b4\",\"group\":\"4f73a5ea4fff82e8de380a7c82f194cd9772788f2485e594b2d0f33fca946cf0\",\"phan\":\"I\",\"text\":\"Quá trình điện phân nóng chảy hỗn hợp gồm aluminium oxide (Al₂O₃) và cryolite (Na₃AlF₆) với các điện cực than chì để sản xuất nhôm (Al) trong công nghiệp có sinh ra khí CO và CO₂.\\nHãy cho biết CO và CO₂ thu được ở khu vực điện cực nào?\",\"choices\":[\"CO₂ thu được ở anode và CO thu được ở cathode\",\"CO₂ thu được ở cathode và CO thu được ở anode\",\"CO₂ và CO đều thu được ở anode\",\"CO₂ và CO đều thu được ở cathode\"],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"DIEN_PHAN.DIEN_PHAN_NC.NHAN_DANG\",\"tenDang\":\"Điện phân nóng chảy — nhận dạng\",\"mucDo\":\"hieu\",\"sao\":0,\"kienThuc\":[],\"family\":null,\"correct\":\"C\",\"solution\":{\"chot\":\"Ở anode, O²⁻ bị oxi hoá thành O₂ rồi O₂ đốt cháy anode than chì tạo cả CO và CO₂; cathode chỉ cho Al lỏng.\",\"tungPa\":{\"A\":{\"dung\":false,\"viSao\":\"Sai: cathode không sinh khí carbon.\"},\"B\":{\"dung\":false,\"viSao\":\"Sai: đảo ngược hoàn toàn.\"},\"C\":{\"dung\":true,\"viSao\":\"Đúng: cả hai khí đều sinh ở anode.\"},\"D\":{\"dung\":false,\"viSao\":\"Sai: cathode chỉ tạo nhôm lỏng.\"}}},\"reviewed\":true}"
+      },
+      {
+        "qid": "DH-10-C1-B2-I-29",
+        "bam": "290dc94c625d8d56",
+        "ma_de": "DH-10-C1-B2",
+        "dang": "tn",
+        "lop": "10",
+        "bo": "NGUYEN_TU",
+        "json": "{\"qid\":\"DH-10-C1-B2-I-29\",\"maDe\":\"DH-10-C1-B2\",\"version\":\"061c40153e2b0685bbf69a42c2cff7b7\",\"group\":\"b069aa7e9d6d7df30799168763845c5add3891e5a89b9654f9dfac4b788feeee\",\"phan\":\"I\",\"text\":\"Phát biểu nào sau đây đúng?\",\"choices\":[\"Các nguyên tử thuộc cùng một nguyên tố hóa học thì có tính chất hóa học giống nhau.\",\"Tập hợp các nguyên tử có cùng số khối đều là của cùng một nguyên tố hóa học.\",\"Nguyên tố hóa học là những nguyên tử có cùng số neutron nhưng khác nhau số proton.\",\"Các nguyên tử thuộc cùng một nguyên tố hóa học thì có tính chất vật lí giống nhau.\"],\"ideas\":[],\"hinhAnh\":[],\"dang\":\"NGUYEN_TU.DONG_VI.CHON_PHAT_BIEU\",\"tenDang\":\"Đồng vị — chọn phát biểu\",\"mucDo\":\"hieu\",\"sao\":0,\"kienThuc\":[],\"family\":null,\"correct\":\"A\",\"solution\":{\"chot\":\"Cùng nguyên tố nghĩa là cùng số proton. Số neutron và số khối có thể khác nhau giữa các đồng vị.\",\"tungPa\":{\"A\":{\"dung\":true,\"viSao\":\"Đúng: cùng nguyên tố thì cùng số proton.\"},\"B\":{\"dung\":false,\"viSao\":\"Cùng số khối mà khác Z là hai nguyên tố khác nhau.\"},\"C\":{\"dung\":false,\"viSao\":\"Nguyên tố định nghĩa theo số proton, không theo số neutron.\"},\"D\":{\"dung\":false,\"viSao\":\"Các đồng vị cùng nguyên tố nhưng khác số neutron.\"}}},\"reviewed\":true}"
+      }
+    ],
+    "success": true,
+    "meta": {
+      "served_by": "v3-prod",
+      "served_by_region": "APAC",
+      "served_by_colo": "HKG",
+      "served_by_primary": true,
+      "timings": {
+        "sql_duration_ms": 30.7586
+      },
+      "duration": 30.7586,
+      "changes": 0,
+      "last_row_id": 0,
+      "changed_db": false,
+      "size_after": 532660224,
+      "rows_read": 41115,
+      "rows_written": 0,
+      "total_attempts": 1
+    }
+  }
+]
