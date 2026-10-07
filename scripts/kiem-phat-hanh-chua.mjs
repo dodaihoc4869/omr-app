@@ -1,5 +1,6 @@
 // Cổng production chỉ đọc: chỉ in số tổng hợp, không đưa danh tính/đáp án vào Actions.
 import { readFileSync } from 'node:fs'
+import { kiemDuongPages } from './doi-pages-song.mjs'
 const token = process.env.CLOUDFLARE_API_TOKEN
 const account = process.env.CLOUDFLARE_ACCOUNT_ID
 if (!token || !account) throw new Error('Thiếu cấu hình Cloudflare.')
@@ -40,14 +41,16 @@ if (process.argv.includes('--live')) {
   const pages = await cf('pages/projects/omr-app')
   const live = pages.canonical_deployment
   if (live?.deployment_trigger?.metadata?.commit_hash !== sha || live.latest_stage?.status !== 'success') throw new Error('Pages sống khác commit hoặc chưa phát hành xong.')
-  for (const path of ['/', '/hs', '/ph', '/sw-version.json']) {
-    const r = await fetch(`https://omr-app-b3u.pages.dev${path}?chua=${sha}`, { signal: AbortSignal.timeout(30000) })
-    if (!r.ok) throw new Error(`Đường giao diện ${path} trả HTTP ${r.status}.`)
-    if (path === '/sw-version.json' && !Number.isFinite((await r.json()).builtAt)) throw new Error('Thiếu phiên bản service worker.')
+  for (const path of ['/', '/hs', '/ph', '/gv', '/sw-version.json']) {
+    await kiemDuongPages(`https://omr-app-b3u.pages.dev${path}?chua=${sha}`, { laPhienBan: path === '/sw-version.json' })
   }
   for (const [path, status] of [['/hs/chua-cau-sai/danh-sach',401],['/gv/chua-cau-sai/hang-chieu',403]]) {
     const r = await fetch(`https://omr.ttadodaihoc.workers.dev${path}`, { method:'POST', headers:{'content-type':'application/json'}, body:'{}', signal:AbortSignal.timeout(30000) })
     if (r.status !== status) throw new Error(`Đường vòng chữa sống chưa đúng cổng quyền (${r.status}).`)
   }
-  console.log(JSON.stringify({ workerCommit:sha, pagesCommit:sha, duongGiaoDienTot:4, congQuyenVongChuaTot:2 }))
+  const sauKiem = (await cf('pages/projects/omr-app')).canonical_deployment
+  const workerSauKiem = await cf('workers/scripts/omr/deployments')
+  const versionsSauKiem = (workerSauKiem.deployments ?? workerSauKiem)[0]?.versions
+  if (sauKiem?.id !== live.id || versionsSauKiem?.length !== 1 || versionsSauKiem[0].version_id !== active[0].version_id || versionsSauKiem[0].percentage !== 100) throw new Error('Bản sống thay đổi trong lúc kiểm; chưa cho bật cờ.')
+  console.log(JSON.stringify({ workerCommit:sha, pagesCommit:sha, duongGiaoDienTot:5, congQuyenVongChuaTot:2 }))
 }
