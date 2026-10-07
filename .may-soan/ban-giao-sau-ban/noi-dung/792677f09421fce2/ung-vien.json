@@ -1,0 +1,130 @@
+{
+ "qid": "10-C1-B1-I-32",
+ "bam": "792677f09421fce2",
+ "songSinh": [
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Trong nguyên tử fluorine (F), số hạt mang điện tích dương là 9, số hạt không mang điện là 10.\nSố hạt electron trong F là bao nhiêu?",
+   "pa": {
+    "A": "10.",
+    "B": "9.",
+    "C": "19.",
+    "D": "28."
+   },
+   "dap_an": "B",
+   "buoc": [
+    "Hạt mang điện dương là proton: 9 hạt.",
+    "Nguyên tử trung hòa về điện nên số electron bằng số proton = 9."
+   ],
+   "chot": "Số electron bằng số proton; neutron không liên quan.",
+   "phepTinh": [
+    {
+     "ten": "Số electron",
+     "bieuThuc": "9",
+     "ketQua": 9,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "B",
+    "lyDo2": "Số electron = số proton = 9.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Trong nguyên tử chlorine (Cl), số hạt mang điện tích dương là 17, số hạt không mang điện là 18.\nSố hạt electron trong Cl là bao nhiêu?",
+   "pa": {
+    "A": "18.",
+    "B": "35.",
+    "C": "52.",
+    "D": "17."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Hạt mang điện dương là proton: 17 hạt.",
+    "Nguyên tử trung hòa về điện nên số electron bằng số proton = 17."
+   ],
+   "chot": "Số electron bằng số proton; neutron không liên quan.",
+   "phepTinh": [
+    {
+     "ten": "Số electron",
+     "bieuThuc": "17",
+     "ketQua": 17,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Số electron = số proton = 17.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Trong nguyên tử potassium (K), số hạt mang điện tích dương là 19, số hạt không mang điện là 20.\nSố hạt electron trong K là bao nhiêu?",
+   "pa": {
+    "A": "20.",
+    "B": "39.",
+    "C": "58.",
+    "D": "19."
+   },
+   "dap_an": "D",
+   "buoc": [
+    "Hạt mang điện dương là proton: 19 hạt.",
+    "Nguyên tử trung hòa về điện nên số electron bằng số proton = 19."
+   ],
+   "chot": "Số electron bằng số proton; neutron không liên quan.",
+   "phepTinh": [
+    {
+     "ten": "Số electron",
+     "bieuThuc": "19",
+     "ketQua": 19,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "D",
+    "lyDo2": "Số electron = số proton = 19.",
+    "chac": true
+   }
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Trong nguyên tử beryllium (Be), số hạt mang điện tích dương là 4, số hạt không mang điện là 5.\nSố hạt electron trong Be là bao nhiêu?",
+   "pa": {
+    "A": "5.",
+    "B": "9.",
+    "C": "4.",
+    "D": "13."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Hạt mang điện dương là proton: 4 hạt.",
+    "Nguyên tử trung hòa về điện nên số electron bằng số proton = 4."
+   ],
+   "chot": "Số electron bằng số proton; neutron không liên quan.",
+   "phepTinh": [
+    {
+     "ten": "Số electron",
+     "bieuThuc": "4",
+     "ketQua": 4,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ],
+   "kiem": {
+    "d2": "C",
+    "lyDo2": "Số electron = số proton = 4.",
+    "chac": true
+   }
+  }
+ ]
+}

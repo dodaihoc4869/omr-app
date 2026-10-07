@@ -1,38 +1,38 @@
 [
  {
   "id": "ss1",
-  "d": "C",
-  "lyDo": "1 mol chứa N_A nguyên tử; các phương án còn lại sai",
+  "d": "B",
+  "lyDo": "1 mol của bất kỳ chất nào đều chứa cùng số hạt (N_A); A, D sai khối lượng; C sai số hạt",
   "chac": true
  },
  {
   "id": "ss2",
-  "d": "B",
-  "lyDo": "Khối lượng mol của X chưa chắc bằng của H; A, C, D đúng",
+  "d": "C",
+  "lyDo": "1 mol nguyên tử nào cũng chứa số nguyên tử bằng nhau, nên C sai; A, B, D đúng",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "1 mol có số nguyên tử bằng số nguyên tử trong 12 g C-12; A, B, C sai",
+  "lyDo": "M(Al) = 27 g/mol nên 1 mol Al nặng 27 g; A, B, C sai",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "1 mol mỗi chất cùng số nguyên tử; khối lượng Na 23 g < Mg 24 g",
+  "lyDo": "2 mol có số nguyên tử gấp đôi 1 mol H; B, D sai số hạt; C sai khối lượng",
   "chac": true
  },
  {
   "id": "ss5",
-  "d": "B",
-  "lyDo": "1 mol O2 chứa N_A phân tử; A (2N_A nguyên tử), C (32 g), D (16N_A electron) sai",
+  "d": "D",
+  "lyDo": "1 mol nguyên tử nào cũng chứa N_A nguyên tử; A, B, C sai",
   "chac": true
  },
  {
   "id": "ss6",
-  "d": "C",
-  "lyDo": "1 mol Al = 27 g khác 12 g của C-12 nên C sai; A, B, D đúng",
+  "d": "A",
+  "lyDo": "Z là kim loại nên khối lượng 1 mol khác 1 mol C; A là phát biểu sai; B, C, D đúng",
   "chac": true
  }
 ]

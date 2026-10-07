@@ -3,25 +3,37 @@
   "id": "ss1",
   "kieu": "so",
   "cach": "doi_so",
-  "de": "Hạt nhân của một nguyên tử magnesium (Mg) có 12 proton và 12 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử magnesium là",
+  "de": "Hạt nhân của một nguyên tử magnesium (Mg) có 12 proton và 13 neutron. Coi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg. Khối lượng của một nguyên tử magnesium là",
   "pa": {
    "A": "20,1.10⁻²⁷ kg.",
-   "B": "24,0.10⁻²⁷ kg.",
-   "C": "80,4.10⁻²⁷ kg.",
-   "D": "40,2.10⁻²⁷ kg."
+   "B": "21,8.10⁻²⁷ kg.",
+   "C": "41,9.10⁻²⁷ kg.",
+   "D": "41,8.10⁻²⁷ kg."
   },
-  "dap_an": "D",
+  "dap_an": "C",
   "buoc": [
-   "Khối lượng proton: 12 × 1,673.10⁻²⁷ = 20,076.10⁻²⁷ kg.",
-   "Khối lượng neutron: 12 × 1,675.10⁻²⁷ = 20,1.10⁻²⁷ kg.",
-   "Tổng: 40,176.10⁻²⁷ ≈ 40,2.10⁻²⁷ kg."
+   "Khối lượng 12 proton = 12 × 1,673 = 20,076 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng 13 neutron = 13 × 1,675 = 21,775 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng nguyên tử ≈ 20,076 + 21,775 ≈ 41,9.10⁻²⁷ kg."
   ],
   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
   "phepTinh": [
    {
+    "ten": "Khối lượng proton (10⁻²⁷ kg)",
+    "bieuThuc": "12*1.673",
+    "ketQua": 20.076,
+    "lamTron": 3
+   },
+   {
+    "ten": "Khối lượng neutron (10⁻²⁷ kg)",
+    "bieuThuc": "13*1.675",
+    "ketQua": 21.775,
+    "lamTron": 3
+   },
+   {
     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
-    "bieuThuc": "12*1.673+12*1.675",
-    "ketQua": 40.2,
+    "bieuThuc": "12*1.673+13*1.675",
+    "ketQua": 41.9,
     "lamTron": 1,
     "laDapSo": true
    }
@@ -31,25 +43,37 @@
   "id": "ss2",
   "kieu": "so",
   "cach": "doi_so",
-  "de": "Hạt nhân của một nguyên tử aluminium (Al) có 13 proton và 14 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử aluminium là",
+  "de": "Hạt nhân của một nguyên tử aluminium (Al) có 13 proton và 15 neutron. Coi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg. Khối lượng của một nguyên tử aluminium là",
   "pa": {
-   "A": "45,2.10⁻²⁷ kg.",
+   "A": "46,9.10⁻²⁷ kg.",
    "B": "21,7.10⁻²⁷ kg.",
-   "C": "23,5.10⁻²⁷ kg.",
-   "D": "27,0.10⁻²⁷ kg."
+   "C": "25,1.10⁻²⁷ kg.",
+   "D": "46,8.10⁻²⁷ kg."
   },
   "dap_an": "A",
   "buoc": [
-   "Khối lượng proton: 13 × 1,673.10⁻²⁷ = 21,749.10⁻²⁷ kg.",
-   "Khối lượng neutron: 14 × 1,675.10⁻²⁷ = 23,45.10⁻²⁷ kg.",
-   "Tổng: 45,199.10⁻²⁷ ≈ 45,2.10⁻²⁷ kg."
+   "Khối lượng 13 proton = 13 × 1,673 = 21,749 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng 15 neutron = 15 × 1,675 = 25,125 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng nguyên tử ≈ 21,749 + 25,125 ≈ 46,9.10⁻²⁷ kg."
   ],
   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
   "phepTinh": [
    {
+    "ten": "Khối lượng proton (10⁻²⁷ kg)",
+    "bieuThuc": "13*1.673",
+    "ketQua": 21.749,
+    "lamTron": 3
+   },
+   {
+    "ten": "Khối lượng neutron (10⁻²⁷ kg)",
+    "bieuThuc": "15*1.675",
+    "ketQua": 25.125,
+    "lamTron": 3
+   },
+   {
     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
-    "bieuThuc": "13*1.673+14*1.675",
-    "ketQua": 45.2,
+    "bieuThuc": "13*1.673+15*1.675",
+    "ketQua": 46.9,
     "lamTron": 1,
     "laDapSo": true
    }
@@ -59,21 +83,33 @@
   "id": "ss3",
   "kieu": "so",
   "cach": "doi_so",
-  "de": "Hạt nhân của một nguyên tử potassium (K) có 19 proton và 20 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử potassium là",
+  "de": "Hạt nhân của một nguyên tử potassium (K) có 19 proton và 20 neutron. Coi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg. Khối lượng của một nguyên tử potassium là",
   "pa": {
    "A": "31,8.10⁻²⁷ kg.",
    "B": "33,5.10⁻²⁷ kg.",
-   "C": "65,3.10⁻²⁷ kg.",
-   "D": "39,0.10⁻²⁷ kg."
+   "C": "65,2.10⁻²⁷ kg.",
+   "D": "65,3.10⁻²⁷ kg."
   },
-  "dap_an": "C",
+  "dap_an": "D",
   "buoc": [
-   "Khối lượng proton: 19 × 1,673.10⁻²⁷ = 31,787.10⁻²⁷ kg.",
-   "Khối lượng neutron: 20 × 1,675.10⁻²⁷ = 33,5.10⁻²⁷ kg.",
-   "Tổng: 65,287.10⁻²⁷ ≈ 65,3.10⁻²⁷ kg."
+   "Khối lượng 19 proton = 19 × 1,673 = 31,787 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng 20 neutron = 20 × 1,675 = 33,5 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng nguyên tử ≈ 31,787 + 33,5 ≈ 65,3.10⁻²⁷ kg."
   ],
   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
   "phepTinh": [
+   {
+    "ten": "Khối lượng proton (10⁻²⁷ kg)",
+    "bieuThuc": "19*1.673",
+    "ketQua": 31.787,
+    "lamTron": 3
+   },
+   {
+    "ten": "Khối lượng neutron (10⁻²⁷ kg)",
+    "bieuThuc": "20*1.675",
+    "ketQua": 33.5,
+    "lamTron": 1
+   },
    {
     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
     "bieuThuc": "19*1.673+20*1.675",
@@ -87,25 +123,37 @@
   "id": "ss4",
   "kieu": "so",
   "cach": "doi_so",
-  "de": "Hạt nhân của một nguyên tử calcium (Ca) có 20 proton và 20 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử calcium là",
+  "de": "Hạt nhân của một nguyên tử carbon (C) có 6 proton và 7 neutron. Coi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg. Khối lượng của một nguyên tử carbon là",
   "pa": {
-   "A": "20,0.10⁻²⁷ kg.",
-   "B": "40,0.10⁻²⁷ kg.",
-   "C": "33,5.10⁻²⁷ kg.",
-   "D": "67,0.10⁻²⁷ kg."
+   "A": "10,0.10⁻²⁷ kg.",
+   "B": "21,8.10⁻²⁷ kg.",
+   "C": "11,7.10⁻²⁷ kg.",
+   "D": "21,7.10⁻²⁷ kg."
   },
-  "dap_an": "D",
+  "dap_an": "B",
   "buoc": [
-   "Khối lượng proton: 20 × 1,673.10⁻²⁷ = 33,46.10⁻²⁷ kg.",
-   "Khối lượng neutron: 20 × 1,675.10⁻²⁷ = 33,5.10⁻²⁷ kg.",
-   "Tổng: 66,96.10⁻²⁷ ≈ 67,0.10⁻²⁷ kg."
+   "Khối lượng 6 proton = 6 × 1,673 = 10,038 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng 7 neutron = 7 × 1,675 = 11,725 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng nguyên tử ≈ 10,038 + 11,725 ≈ 21,8.10⁻²⁷ kg."
   ],
   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
   "phepTinh": [
    {
+    "ten": "Khối lượng proton (10⁻²⁷ kg)",
+    "bieuThuc": "6*1.673",
+    "ketQua": 10.038,
+    "lamTron": 3
+   },
+   {
+    "ten": "Khối lượng neutron (10⁻²⁷ kg)",
+    "bieuThuc": "7*1.675",
+    "ketQua": 11.725,
+    "lamTron": 3
+   },
+   {
     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
-    "bieuThuc": "20*1.673+20*1.675",
-    "ketQua": 67,
+    "bieuThuc": "6*1.673+7*1.675",
+    "ketQua": 21.8,
     "lamTron": 1,
     "laDapSo": true
    }
@@ -115,25 +163,37 @@
   "id": "ss5",
   "kieu": "so",
   "cach": "doi_so",
-  "de": "Hạt nhân của một nguyên tử chlorine (Cl) có 17 proton và 18 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử chlorine là",
+  "de": "Hạt nhân của một nguyên tử potassium (K) có 19 proton và 21 neutron. Coi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg. Khối lượng của một nguyên tử potassium này là",
   "pa": {
-   "A": "28,4.10⁻²⁷ kg.",
-   "B": "58,6.10⁻²⁷ kg.",
-   "C": "35,0.10⁻²⁷ kg.",
-   "D": "18,0.10⁻²⁷ kg."
+   "A": "31,8.10⁻²⁷ kg.",
+   "B": "35,2.10⁻²⁷ kg.",
+   "C": "66,9.10⁻²⁷ kg.",
+   "D": "67,0.10⁻²⁷ kg."
   },
-  "dap_an": "B",
+  "dap_an": "D",
   "buoc": [
-   "Khối lượng proton: 17 × 1,673.10⁻²⁷ = 28,441.10⁻²⁷ kg.",
-   "Khối lượng neutron: 18 × 1,675.10⁻²⁷ = 30,15.10⁻²⁷ kg.",
-   "Tổng: 58,591.10⁻²⁷ ≈ 58,6.10⁻²⁷ kg."
+   "Khối lượng 19 proton = 19 × 1,673 = 31,787 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng 21 neutron = 21 × 1,675 = 35,175 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng nguyên tử ≈ 31,787 + 35,175 ≈ 67,0.10⁻²⁷ kg."
   ],
   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
   "phepTinh": [
    {
+    "ten": "Khối lượng proton (10⁻²⁷ kg)",
+    "bieuThuc": "19*1.673",
+    "ketQua": 31.787,
+    "lamTron": 3
+   },
+   {
+    "ten": "Khối lượng neutron (10⁻²⁷ kg)",
+    "bieuThuc": "21*1.675",
+    "ketQua": 35.175,
+    "lamTron": 3
+   },
+   {
     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
-    "bieuThuc": "17*1.673+18*1.675",
-    "ketQua": 58.6,
+    "bieuThuc": "19*1.673+21*1.675",
+    "ketQua": 67,
     "lamTron": 1,
     "laDapSo": true
    }
@@ -143,25 +203,37 @@
   "id": "ss6",
   "kieu": "so",
   "cach": "doi_so",
-  "de": "Hạt nhân của một nguyên tử oxygen (O) có 8 proton và 8 neutron.\nCoi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg.\nKhối lượng của một nguyên tử oxygen là",
+  "de": "Hạt nhân của một nguyên tử chlorine (Cl) có 17 proton và 19 neutron. Coi như khối lượng của electron là không đáng kể, biết khối lượng của một proton là 1,673.10⁻²⁷ kg và một neutron là 1,675.10⁻²⁷ kg. Khối lượng của một nguyên tử chlorine này là",
   "pa": {
-   "A": "13,4.10⁻²⁷ kg.",
-   "B": "16,0.10⁻²⁷ kg.",
-   "C": "26,8.10⁻²⁷ kg.",
-   "D": "8,0.10⁻²⁷ kg."
+   "A": "60,3.10⁻²⁷ kg.",
+   "B": "28,4.10⁻²⁷ kg.",
+   "C": "31,8.10⁻²⁷ kg.",
+   "D": "60,2.10⁻²⁷ kg."
   },
-  "dap_an": "C",
+  "dap_an": "A",
   "buoc": [
-   "Khối lượng proton: 8 × 1,673.10⁻²⁷ = 13,384.10⁻²⁷ kg.",
-   "Khối lượng neutron: 8 × 1,675.10⁻²⁷ = 13,4.10⁻²⁷ kg.",
-   "Tổng: 26,784.10⁻²⁷ ≈ 26,8.10⁻²⁷ kg."
+   "Khối lượng 17 proton = 17 × 1,673 = 28,441 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng 19 neutron = 19 × 1,675 = 31,825 (đơn vị 10⁻²⁷ kg).",
+   "Khối lượng nguyên tử ≈ 28,441 + 31,825 ≈ 60,3.10⁻²⁷ kg."
   ],
   "chot": "Cộng khối lượng proton và neutron, bỏ qua electron.",
   "phepTinh": [
    {
+    "ten": "Khối lượng proton (10⁻²⁷ kg)",
+    "bieuThuc": "17*1.673",
+    "ketQua": 28.441,
+    "lamTron": 3
+   },
+   {
+    "ten": "Khối lượng neutron (10⁻²⁷ kg)",
+    "bieuThuc": "19*1.675",
+    "ketQua": 31.825,
+    "lamTron": 3
+   },
+   {
     "ten": "Khối lượng nguyên tử (10⁻²⁷ kg)",
-    "bieuThuc": "8*1.673+8*1.675",
-    "ketQua": 26.8,
+    "bieuThuc": "17*1.673+19*1.675",
+    "ketQua": 60.3,
     "lamTron": 1,
     "laDapSo": true
    }

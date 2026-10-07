@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "2 cm × 10^4 = 200 m",
+  "lyDo": "Tỉ lệ 10^-10/10^-14 = 10^4; 2 cm x 10^4 = 200 m",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "5 cm × 10^4 = 500 m",
+  "lyDo": "5 cm x 10^4 = 500 m",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "3 mm × 10^4 = 30 m",
+  "lyDo": "1 cm x 10^4 = 100 m",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "C",
-  "lyDo": "1 cm × 10^4 = 100 m",
+  "lyDo": "3 cm x 10^4 = 300 m",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "6 cm × 10^4 = 600 m",
+  "lyDo": "6 cm x 10^4 = 600 m",
   "chac": true
  },
  {
   "id": "ss6",
-  "d": "C",
-  "lyDo": "8 mm × 10^4 = 80 m",
+  "d": "D",
+  "lyDo": "8 cm x 10^4 = 800 m",
   "chac": true
  }
 ]

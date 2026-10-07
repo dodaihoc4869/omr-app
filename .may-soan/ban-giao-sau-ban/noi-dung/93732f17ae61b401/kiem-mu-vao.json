@@ -1,0 +1,110 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Phát biểu nào sau đây là đúng?",
+  "pa": {
+   "A": "Electron có khối lượng lớn hơn proton.",
+   "B": "Khối lượng nguyên tử tập trung chủ yếu ở hạt nhân.",
+   "C": "Hạt nhân chiếm phần lớn thể tích nguyên tử.",
+   "D": "Nguyên tử mang điện tích dương vì có chứa proton."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Khối lượng electron rất nhỏ (khoảng 1/1840 khối lượng proton), nên khối lượng nguyên tử gần như bằng khối lượng hạt nhân.",
+   "Hạt nhân rất nhỏ so với nguyên tử, nguyên tử trung hòa về điện."
+  ],
+  "chot": "Hạt nhân nhỏ nhưng chứa gần như toàn bộ khối lượng nguyên tử."
+ },
+ {
+  "id": "ss2",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Phát biểu nào sau đây là sai?",
+  "pa": {
+   "A": "Nguyên tử trung hòa về điện.",
+   "B": "Proton mang điện tích dương.",
+   "C": "Hạt nhân chiếm phần lớn thể tích nguyên tử.",
+   "D": "Electron chuyển động xung quanh hạt nhân."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Các phát biểu A, B, D đều đúng theo mô hình cấu tạo nguyên tử.",
+   "Bán kính hạt nhân nhỏ hơn bán kính nguyên tử khoảng 10 000 lần nên hạt nhân chiếm thể tích rất nhỏ."
+  ],
+  "chot": "Phần lớn thể tích nguyên tử là khoảng không gian electron chuyển động."
+ },
+ {
+  "id": "ss3",
+  "kieu": "ly_thuyet",
+  "cach": "dao_chieu",
+  "de": "Phát biểu nào sau đây không đúng?",
+  "pa": {
+   "A": "Neutron mang điện tích dương.",
+   "B": "Proton và neutron có khối lượng gần bằng nhau.",
+   "C": "Trong nguyên tử, số proton bằng số electron.",
+   "D": "Hạt nhân nguyên tử gồm proton và neutron."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Neutron không mang điện.",
+   "B, C, D đều là kiến thức đúng về thành phần nguyên tử."
+  ],
+  "chot": "Proton mang điện dương, electron mang điện âm, neutron không mang điện."
+ },
+ {
+  "id": "ss4",
+  "kieu": "ly_thuyet",
+  "cach": "doi_chat",
+  "de": "Phát biểu nào sau đây về electron là đúng?",
+  "pa": {
+   "A": "Electron mang điện tích dương.",
+   "B": "Khối lượng electron xấp xỉ khối lượng proton.",
+   "C": "Electron nằm trong hạt nhân nguyên tử.",
+   "D": "Khối lượng electron rất nhỏ so với khối lượng proton và neutron."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Electron mang điện tích âm và chuyển động ở lớp vỏ, ngoài hạt nhân.",
+   "Khối lượng electron chỉ bằng khoảng 1/1840 khối lượng proton."
+  ],
+  "chot": "Electron nhẹ, mang điện âm, nằm ở lớp vỏ."
+ },
+ {
+  "id": "ss5",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Phát biểu nào sau đây về kích thước nguyên tử là đúng?",
+  "pa": {
+   "A": "Bán kính hạt nhân nhỏ hơn rất nhiều so với bán kính nguyên tử.",
+   "B": "Bán kính nguyên tử gần bằng bán kính hạt nhân.",
+   "C": "Bán kính nguyên tử bằng bán kính của một electron.",
+   "D": "Các hạt trong nguyên tử xếp khít nhau nên nguyên tử không có khoảng rỗng."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Bán kính nguyên tử cỡ 10⁻¹⁰ m, bán kính hạt nhân cỡ 10⁻¹⁴ m.",
+   "Do đó nguyên tử có cấu tạo rỗng, phần lớn là khoảng không gian electron chuyển động."
+  ],
+  "chot": "Hạt nhân nhỏ hơn nguyên tử cỡ một vạn lần về bán kính."
+ },
+ {
+  "id": "ss6",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Phát biểu nào sau đây về hạt nhân nguyên tử là đúng?",
+  "pa": {
+   "A": "Hạt nhân trung hòa về điện.",
+   "B": "Điện tích hạt nhân là điện tích âm.",
+   "C": "Điện tích hạt nhân bằng tổng điện tích của các proton.",
+   "D": "Điện tích hạt nhân bằng tổng điện tích của proton và neutron."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Neutron không mang điện nên chỉ proton tạo nên điện tích hạt nhân.",
+   "Proton mang điện dương nên hạt nhân mang điện tích dương."
+  ],
+  "chot": "Điện tích hạt nhân do proton quyết định và luôn dương."
+ }
+]

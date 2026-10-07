@@ -1,18 +1,18 @@
 {
  "phienBan": "0.1",
- "luc": "2026-10-07T09:47:32.884Z",
+ "luc": "2026-10-07T09:52:31.620Z",
  "nguon": "https://omr.ttadodaihoc.workers.dev",
  "ghi_chu": "Ứng viên đã tự kiểm hai lượt AI. Chưa được Codex kiểm độc lập. Chưa nạp D1.",
- "so_bam": 21,
+ "so_bam": 27,
  "thong_ke": {
-  "tong": 18,
-  "duSauBangChung": 18,
-  "motPhan": 0,
+  "tong": 24,
+  "duSauBangChung": 23,
+  "motPhan": 1,
   "chuaCo": 0
  },
  "checkpoint": {
-  "luong1": "10-C1-B1-I-25",
-  "capNhat": "2026-10-07T09:44:53.001Z",
-  "luong2": "10-C1-B1-I-25"
+  "luong1": "10-C1-B1-I-30",
+  "capNhat": "2026-10-07T09:48:58.920Z",
+  "luong2": "10-C1-B1-I-30"
  }
 }

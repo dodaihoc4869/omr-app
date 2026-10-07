@@ -1,0 +1,25 @@
+{
+ "banKhac": [
+  {
+   "de": "Nguyên tử lithium (Li) có 3 electron và 4 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử lithium (xét nguyên tử gồm electron, proton và neutron)?\nCho biết khối lượng proton và neutron đều là 1 amu, electron là 0,00055 amu. (Kết quả làm tròn đến hàng phần mười.)",
+   "dap_an": "B",
+   "pa": {
+    "A": "42,9%.",
+    "B": "42,8%.",
+    "C": "57,1%.",
+    "D": "30,0%."
+   }
+  },
+  {
+   "de": "Nguyên tử boron (B) có 5 electron và 6 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử boron (xét nguyên tử gồm electron, proton và neutron)?\nCho biết khối lượng proton và neutron đều là 1 amu, electron là 0,00055 amu. (Kết quả làm tròn đến hàng phần mười.)",
+   "dap_an": "D",
+   "pa": {
+    "A": "45,5%.",
+    "B": "54,5%.",
+    "C": "31,3%.",
+    "D": "45,4%."
+   }
+  }
+ ],
+ "yDs": []
+}

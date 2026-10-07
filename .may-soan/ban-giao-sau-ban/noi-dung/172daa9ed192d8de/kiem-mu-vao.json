@@ -2,8 +2,8 @@
  {
   "id": "ss1",
   "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
-  "de": "Cho các phát biểu sau:\n(1) Proton mang điện tích dương.\n(2) Neutron nằm ở lớp vỏ nguyên tử.\n(3) Trong nguyên tử, số proton bằng số electron.\n(4) Khối lượng nguyên tử tập trung chủ yếu ở hạt nhân.\n(5) Hạt nhân nguyên tử gồm proton và electron.\nSố phát biểu đúng là",
+  "cach": "doi_chat",
+  "de": "Cho các phát biểu sau:\n(1) Neutron là hạt không mang điện.\n(2) Electron nằm trong hạt nhân nguyên tử.\n(3) Khối lượng nguyên tử tập trung phần lớn ở hạt nhân.\n(4) Trong hạt nhân nguyên tử, số proton luôn bằng số neutron.\n(5) Trong nguyên tử, số electron bằng số proton.\nSố phát biểu đúng là",
   "pa": {
    "A": "1.",
    "B": "2.",
@@ -12,53 +12,17 @@
   },
   "dap_an": "C",
   "buoc": [
-   "Đúng: (1), (3), (4).",
-   "Sai: (2) neutron nằm trong hạt nhân; (5) hạt nhân gồm proton và neutron.",
+   "(1) đúng; (3) đúng; (5) đúng.",
+   "(2) sai vì electron ở lớp vỏ; (4) sai vì số neutron có thể khác số proton.",
    "Có 3 phát biểu đúng."
   ],
-  "chot": "Hạt nhân gồm proton và neutron; electron ở lớp vỏ; khối lượng tập trung ở hạt nhân."
+  "chot": "Hạt nhân gồm proton và neutron; electron ở lớp vỏ và số electron bằng số proton."
  },
  {
   "id": "ss2",
   "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
-  "de": "Cho các phát biểu sau:\n(1) Electron mang điện tích dương.\n(2) Neutron không mang điện.\n(3) Khối lượng nguyên tử tập trung chủ yếu ở lớp vỏ.\n(4) Hạt nhân nguyên tử chứa electron.\n(5) Trong mọi nguyên tử, số neutron luôn bằng số proton.\nSố phát biểu đúng là",
-  "pa": {
-   "A": "1.",
-   "B": "2.",
-   "C": "3.",
-   "D": "4."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Chỉ (2) đúng.",
-   "(1) sai: electron mang điện âm; (3) sai: khối lượng tập trung ở hạt nhân; (4) sai: electron ở lớp vỏ; (5) sai: ví dụ Na có 11 proton, 12 neutron."
-  ],
-  "chot": "Xét từng phát biểu theo vị trí và điện tích của ba loại hạt."
- },
- {
-  "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
-  "de": "Cho các phát biểu sau:\n(1) Neutron không mang điện.\n(2) Proton và neutron có khối lượng xấp xỉ nhau.\n(3) Khối lượng electron rất nhỏ so với khối lượng proton.\n(4) Trong nguyên tử, số proton bằng số electron.\n(5) Hạt nhân nguyên tử gồm proton và electron.\nSố phát biểu đúng là",
-  "pa": {
-   "A": "5.",
-   "B": "3.",
-   "C": "2.",
-   "D": "4."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Bốn phát biểu (1), (2), (3), (4) đều đúng.",
-   "(5) sai vì hạt nhân gồm proton và neutron."
-  ],
-  "chot": "Hạt nhân chứa proton và neutron, không chứa electron."
- },
- {
-  "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
-  "de": "Cho các phát biểu sau:\n(1) Proton nằm ở lớp vỏ nguyên tử.\n(2) Electron mang điện tích âm.\n(3) Khối lượng nguyên tử tập trung chủ yếu ở lớp vỏ.\n(4) Neutron không mang điện.\n(5) Khối lượng electron lớn hơn nhiều khối lượng proton.\nSố phát biểu đúng là",
+  "cach": "doi_chat",
+  "de": "Cho các phát biểu sau:\n(1) Proton mang điện tích âm.\n(2) Kích thước hạt nhân nhỏ hơn rất nhiều so với kích thước nguyên tử.\n(3) Hạt nhân nguyên tử chứa electron.\n(4) Nguyên tử trung hòa về điện.\n(5) Khối lượng electron lớn hơn khối lượng neutron.\nSố phát biểu đúng là",
   "pa": {
    "A": "1.",
    "B": "2.",
@@ -67,45 +31,86 @@
   },
   "dap_an": "B",
   "buoc": [
-   "Đúng: (2), (4).",
-   "Sai: (1) proton nằm trong hạt nhân; (3) khối lượng tập trung ở hạt nhân; (5) electron nhẹ hơn proton rất nhiều."
+   "(2) đúng; (4) đúng.",
+   "(1) sai vì proton mang điện tích dương; (3) sai vì electron ở lớp vỏ; (5) sai vì electron nhẹ hơn neutron rất nhiều.",
+   "Có 2 phát biểu đúng."
   ],
-  "chot": "Proton và neutron ở hạt nhân, electron ở lớp vỏ và nhẹ hơn rất nhiều."
+  "chot": "Proton (+), neutron (0), electron (−) và electron có khối lượng rất nhỏ."
  },
  {
-  "id": "ss5",
+  "id": "ss3",
   "kieu": "ly_thuyet",
   "cach": "doi_nhieu",
-  "de": "Cho các phát biểu sau:\n(1) Hạt nhân nguyên tử mang điện tích dương.\n(2) Electron chuyển động xung quanh hạt nhân.\n(3) Neutron mang điện tích âm.\n(4) Proton nằm ở lớp vỏ nguyên tử.\n(5) Trong nguyên tử, số proton bằng số electron.\nSố phát biểu đúng là",
+  "de": "Cho các phát biểu sau:\n(1) Số khối bằng tổng số proton và số neutron.\n(2) Trong nguyên tử, điện tích hạt nhân và tổng điện tích các electron có giá trị tuyệt đối bằng nhau.\n(3) Proton mang điện tích dương.\n(4) Khối lượng nguyên tử tập trung phần lớn ở lớp vỏ.\n(5) Khối lượng electron không đáng kể so với khối lượng proton và neutron.\nSố phát biểu đúng là",
   "pa": {
-   "A": "3.",
-   "B": "1.",
-   "C": "2.",
+   "A": "1.",
+   "B": "2.",
+   "C": "3.",
+   "D": "4."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "(1), (2), (3), (5) đúng.",
+   "(4) sai vì khối lượng nguyên tử tập trung ở hạt nhân.",
+   "Có 4 phát biểu đúng."
+  ],
+  "chot": "Khối lượng nguyên tử tập trung ở hạt nhân vì electron rất nhẹ."
+ },
+ {
+  "id": "ss4",
+  "kieu": "ly_thuyet",
+  "cach": "doi_nhieu",
+  "de": "Cho các phát biểu sau:\n(1) Hạt nhân nguyên tử gồm proton và electron.\n(2) Khối lượng nguyên tử tập trung phần lớn ở lớp vỏ.\n(3) Electron mang điện tích dương.\n(4) Trong hạt nhân nguyên tử, số neutron luôn bằng số proton.\n(5) Trong nguyên tử, số electron bằng số proton.\nSố phát biểu đúng là",
+  "pa": {
+   "A": "1.",
+   "B": "2.",
+   "C": "3.",
    "D": "4."
   },
   "dap_an": "A",
   "buoc": [
-   "Đúng: (1), (2), (5).",
-   "Sai: (3) neutron không mang điện; (4) proton nằm trong hạt nhân."
+   "(5) đúng.",
+   "(1) sai vì hạt nhân gồm proton và neutron; (2) sai vì khối lượng tập trung ở hạt nhân; (3) sai vì electron mang điện tích âm; (4) sai vì số neutron có thể khác số proton.",
+   "Có 1 phát biểu đúng."
   ],
-  "chot": "Nguyên tử trung hoà vì số proton bằng số electron."
+  "chot": "Chỉ cần nhớ: số electron bằng số proton trong nguyên tử."
+ },
+ {
+  "id": "ss5",
+  "kieu": "ly_thuyet",
+  "cach": "dung_sai",
+  "de": "Cho các phát biểu sau:\n(1) Neutron không mang điện.\n(2) Electron có khối lượng lớn hơn proton.\n(3) Số khối bằng tổng số proton và số neutron.\n(4) Nguyên tử có cấu tạo đặc khít, không có khoảng rỗng.\n(5) Proton và neutron nằm trong hạt nhân nguyên tử.\nSố phát biểu sai là",
+  "pa": {
+   "A": "1.",
+   "B": "2.",
+   "C": "3.",
+   "D": "4."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "(1), (3), (5) đúng.",
+   "(2) sai vì electron nhẹ hơn proton rất nhiều; (4) sai vì nguyên tử có cấu tạo rỗng.",
+   "Có 2 phát biểu sai."
+  ],
+  "chot": "Nguyên tử rỗng; hạt nhân nhỏ nhưng chứa gần hết khối lượng."
  },
  {
   "id": "ss6",
   "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
-  "de": "Cho các phát biểu sau:\n(1) Proton mang điện tích dương.\n(2) Neutron không mang điện.\n(3) Khối lượng electron rất nhỏ so với khối lượng proton.\n(4) Khối lượng nguyên tử tập trung chủ yếu ở lớp vỏ.\n(5) Trong nguyên tử, số proton bằng số electron.\nSố phát biểu đúng là",
+  "cach": "dung_sai",
+  "de": "Cho các phát biểu sau:\n(1) Electron mang điện tích dương.\n(2) Neutron nằm ở lớp vỏ nguyên tử.\n(3) Khối lượng nguyên tử tập trung phần lớn ở lớp vỏ.\n(4) Proton không mang điện.\n(5) Trong nguyên tử, số electron bằng số proton.\nSố phát biểu sai là",
   "pa": {
-   "A": "2.",
-   "B": "3.",
-   "C": "4.",
-   "D": "5."
+   "A": "1.",
+   "B": "2.",
+   "C": "3.",
+   "D": "4."
   },
-  "dap_an": "C",
+  "dap_an": "D",
   "buoc": [
-   "Đúng: (1), (2), (3), (5).",
-   "Sai: (4) khối lượng nguyên tử tập trung chủ yếu ở hạt nhân."
+   "(5) đúng.",
+   "(1) sai vì electron mang điện tích âm; (2) sai vì neutron nằm trong hạt nhân; (3) sai vì khối lượng tập trung ở hạt nhân; (4) sai vì proton mang điện tích dương.",
+   "Có 4 phát biểu sai."
   ],
-  "chot": "Khối lượng nguyên tử gần bằng khối lượng hạt nhân vì electron quá nhẹ."
+  "chot": "Hạt nhân: proton (+) và neutron (0); lớp vỏ: electron (−)."
  }
 ]

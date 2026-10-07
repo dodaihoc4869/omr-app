@@ -1,0 +1,38 @@
+[
+ {
+  "id": "ss1",
+  "d": "C",
+  "lyDo": "p = 27 - 14 = 13.",
+  "chac": true
+ },
+ {
+  "id": "ss2",
+  "d": "A",
+  "lyDo": "p = 31 - 16 = 15.",
+  "chac": true
+ },
+ {
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "p = 35 - 18 = 17.",
+  "chac": true
+ },
+ {
+  "id": "ss4",
+  "d": "B",
+  "lyDo": "p = 39 - 20 = 19.",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "C",
+  "lyDo": "p = 23 - 12 = 11.",
+  "chac": true
+ },
+ {
+  "id": "ss6",
+  "d": "A",
+  "lyDo": "p = 45 - 24 = 21.",
+  "chac": true
+ }
+]

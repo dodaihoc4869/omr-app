@@ -1,0 +1,25 @@
+{
+ "banKhac": [
+  {
+   "de": "Trong nguyên tử sodium (Na), số hạt mang điện tích dương là 11, số hạt không mang điện là 12.\nSố hạt electron trong Na là bao nhiêu?",
+   "dap_an": "C",
+   "pa": {
+    "A": "12.",
+    "B": "23.",
+    "C": "11.",
+    "D": "34."
+   }
+  },
+  {
+   "de": "Trong nguyên tử phosphorus (P), số hạt mang điện tích dương là 15, số hạt không mang điện là 16.\nSố hạt electron trong P là bao nhiêu?",
+   "dap_an": "B",
+   "pa": {
+    "A": "16.",
+    "B": "15.",
+    "C": "31.",
+    "D": "46."
+   }
+  }
+ ],
+ "yDs": []
+}

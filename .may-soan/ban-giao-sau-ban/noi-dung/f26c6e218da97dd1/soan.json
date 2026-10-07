@@ -5,105 +5,106 @@
   {
    "kieu": "ly_thuyet",
    "cach": "doi_chat",
-   "de": "Cho 1 mol nguyên tử Fe. Phát biểu nào dưới đây đúng?",
+   "de": "Cho 1 mol kim loại Y. Phát biểu nào dưới đây đúng?",
    "pa": {
-    "A": "1 mol Fe có khối lượng bằng 1/12 khối lượng 1 mol carbon.",
-    "B": "1 mol Fe chứa 6,022.10²³ electron.",
-    "C": "1 mol Fe chứa 6,022.10²³ nguyên tử Fe.",
-    "D": "1 mol Fe có khối lượng bằng khối lượng 1 mol nguyên tử hydrogen."
-   },
-   "dap_an": "C",
-   "buoc": [
-    "1 mol chất chứa 6,022.10²³ hạt.",
-    "Mỗi nguyên tử Fe có 26 electron nên 1 mol Fe chứa nhiều hơn 6,022.10²³ electron.",
-    "Khối lượng 1 mol Fe khác khối lượng 1 mol carbon và 1 mol hydrogen."
-   ],
-   "chot": "1 mol bất kì chất nào cũng chứa 6,022.10²³ hạt của chính chất đó."
-  },
-  {
-   "kieu": "ly_thuyet",
-   "cach": "dung_sai",
-   "de": "Cho 1 mol kim loại X. Phát biểu nào dưới đây sai?",
-   "pa": {
-    "A": "1 mol X chứa số nguyên tử bằng số nguyên tử trong 12 g carbon-12.",
-    "B": "1 mol X có khối lượng bằng khối lượng 1 mol hydrogen.",
-    "C": "1 mol X chứa 6,022.10²³ nguyên tử.",
-    "D": "Khối lượng 1 mol X tính bằng gam có số trị bằng nguyên tử khối của X."
+    "A": "1 mol Y có khối lượng bằng khối lượng 1 mol nguyên tử hydrogen.",
+    "B": "1 mol Y chứa số lượng nguyên tử bằng số lượng nguyên tử trong 1 mol nguyên tử carbon.",
+    "C": "1 mol Y chứa số lượng nguyên tử bằng số lượng nguyên tử trong 12 mol nguyên tử carbon.",
+    "D": "1 mol Y có khối lượng bằng 1/12 khối lượng 1 mol nguyên tử carbon."
    },
    "dap_an": "B",
    "buoc": [
-    "Ba phát biểu A, C, D đều đúng theo định nghĩa mol và khối lượng mol.",
-    "Kim loại X có nguyên tử khối khác 1 nên khối lượng 1 mol X khác khối lượng 1 mol hydrogen."
+    "Mọi chất, ở 1 mol, đều chứa cùng số hạt là 6,022.10²³ hạt.",
+    "Vậy 1 mol Y và 1 mol nguyên tử carbon chứa số nguyên tử bằng nhau; khối lượng thì khác nhau vì nguyên tử khối khác nhau."
    ],
-   "chot": "Cùng số hạt nhưng khối lượng 1 mol mỗi chất khác nhau, tính theo nguyên tử khối."
-  },
-  {
-   "kieu": "ly_thuyet",
-   "cach": "doi_nhieu",
-   "de": "Cho 1 mol kim loại X. Phát biểu nào dưới đây đúng?",
-   "pa": {
-    "A": "1 mol X chứa 6,022.10²² nguyên tử.",
-    "B": "1 mol X có khối lượng bằng 12 g.",
-    "C": "1 mol X có khối lượng bằng khối lượng 1 mol carbon.",
-    "D": "1 mol X chứa số nguyên tử bằng số nguyên tử trong 12 g carbon-12."
-   },
-   "dap_an": "D",
-   "buoc": [
-    "Mol là lượng chất chứa 6,022.10²³ hạt, đúng bằng số nguyên tử trong 12 g carbon-12.",
-    "Khối lượng 1 mol X bằng nguyên tử khối của X tính bằng gam, không cố định là 12 g."
-   ],
-   "chot": "Mol gắn với số hạt 6,022.10²³, không gắn với khối lượng cố định."
+   "chot": "1 mol của bất kì chất nào cũng chứa cùng một số hạt."
   },
   {
    "kieu": "ly_thuyet",
    "cach": "dao_chieu",
-   "de": "Có 1 mol nguyên tử Na và 1 mol nguyên tử Mg. Phát biểu nào dưới đây đúng?",
+   "de": "Cho 1 mol kim loại X. Phát biểu nào dưới đây sai?",
    "pa": {
-    "A": "Hai lượng này chứa cùng số nguyên tử.",
-    "B": "Hai lượng này có cùng khối lượng.",
-    "C": "Lượng Mg chứa nhiều nguyên tử hơn lượng Na.",
-    "D": "Lượng Na có khối lượng lớn hơn lượng Mg."
+    "A": "1 mol X chứa 6,022.10²³ nguyên tử X.",
+    "B": "Khối lượng 1 mol X tính bằng gam có giá trị số bằng nguyên tử khối của X.",
+    "C": "1 mol X chứa số lượng nguyên tử ít hơn số lượng nguyên tử trong 1 mol nguyên tử hydrogen.",
+    "D": "1 mol X chứa số lượng nguyên tử bằng số lượng nguyên tử trong 12 g carbon-12."
    },
-   "dap_an": "A",
+   "dap_an": "C",
    "buoc": [
-    "Cùng 1 mol thì cùng chứa 6,022.10²³ nguyên tử.",
-    "Khối lượng 1 mol Na là 23 g, của Mg là 24 g nên khối lượng khác nhau và Mg nặng hơn."
+    "A, D đúng: 1 mol chứa 6,022.10²³ hạt và 12 g carbon-12 chính là 1 mol.",
+    "B đúng: khối lượng mol (g/mol) có giá trị số bằng nguyên tử khối.",
+    "C sai: 1 mol hydrogen cũng chứa 6,022.10²³ nguyên tử, bằng số nguyên tử trong 1 mol X."
    ],
-   "chot": "Cùng số mol thì cùng số hạt, còn khối lượng phụ thuộc nguyên tử khối."
+   "chot": "Số hạt trong 1 mol không phụ thuộc vào loại chất."
   },
   {
    "kieu": "ly_thuyet",
-   "cach": "doi_chat",
-   "de": "Cho 1 mol phân tử khí oxygen (O2). Phát biểu nào dưới đây đúng?",
+   "cach": "doi_nhieu",
+   "de": "Cho 1 mol nguyên tử aluminium (Al, nguyên tử khối 27). Phát biểu nào dưới đây đúng?",
    "pa": {
-    "A": "1 mol O2 chứa 6,022.10²³ nguyên tử oxygen.",
-    "B": "1 mol O2 chứa 6,022.10²³ phân tử O2.",
-    "C": "1 mol O2 có khối lượng 16 g.",
-    "D": "1 mol O2 chứa 6,022.10²³ electron."
+    "A": "1 mol Al có khối lượng 27 kg.",
+    "B": "1 mol Al chứa 27.6,022.10²³ nguyên tử.",
+    "C": "1 mol Al chứa số nguyên tử ít hơn 1 mol nguyên tử sodium.",
+    "D": "1 mol Al có khối lượng 27 g."
    },
-   "dap_an": "B",
+   "dap_an": "D",
    "buoc": [
-    "1 mol O2 chứa 6,022.10²³ phân tử O2.",
-    "Mỗi phân tử có 2 nguyên tử nên số nguyên tử oxygen gấp đôi; khối lượng 1 mol O2 là 32 g."
+    "Khối lượng 1 mol nguyên tử tính bằng gam có giá trị số bằng nguyên tử khối: 27 g.",
+    "Số nguyên tử trong 1 mol luôn là 6,022.10²³, không phụ thuộc loại nguyên tử."
    ],
-   "chot": "Mol đếm theo loại hạt được nêu: phân tử thì đếm phân tử."
+   "chot": "Khối lượng mol nguyên tử (g/mol) = nguyên tử khối; số hạt trong 1 mol không đổi."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "doi_nhieu",
+   "de": "Cho 2 mol kim loại X. Phát biểu nào dưới đây đúng?",
+   "pa": {
+    "A": "2 mol X chứa số lượng nguyên tử gấp đôi số lượng nguyên tử trong 1 mol nguyên tử hydrogen.",
+    "B": "2 mol X chứa số lượng nguyên tử bằng số lượng nguyên tử trong 1 mol nguyên tử hydrogen.",
+    "C": "2 mol X có khối lượng bằng khối lượng 2 mol nguyên tử hydrogen.",
+    "D": "2 mol X chứa 6,022.10²³ nguyên tử."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "2 mol X chứa 2 × 6,022.10²³ nguyên tử, còn 1 mol hydrogen chứa 6,022.10²³ nguyên tử.",
+    "Do đó số nguyên tử trong 2 mol X gấp đôi; khối lượng thì khác vì nguyên tử khối khác nhau."
+   ],
+   "chot": "Số nguyên tử tỉ lệ thuận với số mol."
   },
   {
    "kieu": "ly_thuyet",
    "cach": "dung_sai",
-   "de": "Cho 1 mol nguyên tử aluminium (Al). Phát biểu nào dưới đây sai?",
+   "de": "So sánh 1 mol nguyên tử kim loại M với 1 mol nguyên tử kim loại N (M khác N). Phát biểu nào dưới đây đúng?",
    "pa": {
-    "A": "1 mol Al chứa 6,022.10²³ nguyên tử Al.",
-    "B": "1 mol Al có khối lượng khoảng 27 g.",
-    "C": "1 mol Al có khối lượng bằng khối lượng 1 mol carbon-12.",
-    "D": "1 mol Al chứa số nguyên tử bằng số nguyên tử trong 1 mol Na."
+    "A": "Hai lượng này chứa số nguyên tử khác nhau.",
+    "B": "Hai lượng này có cùng khối lượng.",
+    "C": "Kim loại có khối lượng riêng lớn hơn thì chứa nhiều nguyên tử hơn trong 1 mol.",
+    "D": "Hai lượng này chứa cùng số nguyên tử."
    },
-   "dap_an": "C",
+   "dap_an": "D",
    "buoc": [
-    "1 mol bất kì chất nào cũng có 6,022.10²³ hạt nên A và D đúng.",
-    "Khối lượng 1 mol Al khoảng 27 g nên B đúng; carbon-12 là 12 g nên C sai."
+    "Mỗi mol của bất kì chất nào đều chứa 6,022.10²³ hạt.",
+    "Khối lượng thì khác nhau vì nguyên tử khối của M và N khác nhau."
    ],
-   "chot": "Số hạt trong 1 mol luôn bằng nhau; khối lượng 1 mol thì khác nhau."
+   "chot": "Cùng số mol thì cùng số hạt, nhưng khối lượng khác nhau."
+  },
+  {
+   "kieu": "ly_thuyet",
+   "cach": "dao_chieu",
+   "de": "Cho 1 mol kim loại Z. Phát biểu nào dưới đây sai?",
+   "pa": {
+    "A": "1 mol Z có khối lượng bằng khối lượng 1 mol nguyên tử carbon.",
+    "B": "1 mol Z chứa 6,022.10²³ nguyên tử Z.",
+    "C": "1 mol Z chứa số lượng nguyên tử bằng số lượng nguyên tử trong 1 mol nguyên tử oxygen.",
+    "D": "Khối lượng 1 mol Z tính bằng gam có giá trị số bằng nguyên tử khối của Z."
+   },
+   "dap_an": "A",
+   "buoc": [
+    "B, C đúng: 1 mol của mọi chất chứa 6,022.10²³ hạt.",
+    "D đúng: khối lượng mol (g/mol) có giá trị số bằng nguyên tử khối.",
+    "A sai: Z là kim loại, nguyên tử khối khác carbon (12) nên khối lượng 1 mol khác nhau."
+   ],
+   "chot": "Cùng 1 mol thì cùng số hạt, khác nhau ở khối lượng."
   }
  ]
 }

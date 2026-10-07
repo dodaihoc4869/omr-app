@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Đúng: (1),(3),(4) = 3",
+  "lyDo": "Đúng: (1),(3),(5) = 3",
   "chac": true
  },
  {
   "id": "ss2",
-  "d": "A",
-  "lyDo": "Chỉ (2) đúng = 1",
-  "chac": true
- },
- {
-  "id": "ss3",
-  "d": "D",
-  "lyDo": "Đúng: (1),(2),(3),(4); (5) sai = 4",
-  "chac": true
- },
- {
-  "id": "ss4",
   "d": "B",
   "lyDo": "Đúng: (2),(4) = 2",
   "chac": true
  },
  {
-  "id": "ss5",
+  "id": "ss3",
+  "d": "D",
+  "lyDo": "Đúng: (1),(2),(3),(5) = 4; (4) sai",
+  "chac": true
+ },
+ {
+  "id": "ss4",
   "d": "A",
-  "lyDo": "Đúng: (1),(2),(5) = 3",
+  "lyDo": "Chỉ (5) đúng = 1",
+  "chac": true
+ },
+ {
+  "id": "ss5",
+  "d": "B",
+  "lyDo": "Sai: (2),(4) = 2",
   "chac": true
  },
  {
   "id": "ss6",
-  "d": "C",
-  "lyDo": "Đúng: (1),(2),(3),(5); (4) sai = 4",
+  "d": "D",
+  "lyDo": "Sai: (1),(2),(3),(4) = 4; (5) đúng",
   "chac": true
  }
 ]

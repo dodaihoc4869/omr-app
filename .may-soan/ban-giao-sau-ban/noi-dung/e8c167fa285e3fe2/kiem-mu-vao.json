@@ -1,0 +1,138 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Nguyên tử beryllium (Be) có 4 electron và 5 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử beryllium (xét nguyên tử gồm electron, proton và neutron)?\nCho biết khối lượng proton và neutron đều là 1 amu, electron là 0,00055 amu. (Kết quả làm tròn đến hàng phần trăm.)",
+  "pa": {
+   "A": "44,44%.",
+   "B": "55,56%.",
+   "C": "44,43%.",
+   "D": "55,54%."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Số proton = số electron = 4; khối lượng proton = 4 amu.",
+   "Khối lượng nguyên tử = 4 + 5 + 4 × 0,00055 = 9,0022 amu.",
+   "Phần trăm = 4 / 9,0022 × 100 ≈ 44,43%."
+  ],
+  "chot": "Cộng cả khối lượng electron vào tổng rồi mới lấy tỉ lệ của proton.",
+  "phepTinh": [
+   {
+    "ten": "Khối lượng nguyên tử (amu)",
+    "bieuThuc": "4+5+4*0.00055",
+    "ketQua": 9.0022,
+    "lamTron": 4
+   },
+   {
+    "ten": "Phần trăm khối lượng proton",
+    "bieuThuc": "4/(4+5+4*0.00055)*100",
+    "ketQua": 44.43,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss2",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Nguyên tử fluorine (F) có 9 electron và 10 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử fluorine (xét nguyên tử gồm electron, proton và neutron)?\nCho biết khối lượng proton và neutron đều là 1 amu, electron là 0,00055 amu. (Kết quả làm tròn đến hàng phần trăm.)",
+  "pa": {
+   "A": "47,36%.",
+   "B": "47,37%.",
+   "C": "52,63%.",
+   "D": "52,62%."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Số proton = số electron = 9; khối lượng proton = 9 amu.",
+   "Khối lượng nguyên tử = 9 + 10 + 9 × 0,00055 = 19,00495 amu.",
+   "Phần trăm = 9 / 19,00495 × 100 ≈ 47,36%."
+  ],
+  "chot": "Cộng cả khối lượng electron vào tổng rồi mới lấy tỉ lệ của proton.",
+  "phepTinh": [
+   {
+    "ten": "Khối lượng nguyên tử (amu)",
+    "bieuThuc": "9+10+9*0.00055",
+    "ketQua": 19.00495,
+    "lamTron": 5
+   },
+   {
+    "ten": "Phần trăm khối lượng proton",
+    "bieuThuc": "9/(9+10+9*0.00055)*100",
+    "ketQua": 47.36,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss3",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Nguyên tử sodium (Na) có 11 electron và 12 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử sodium (xét nguyên tử gồm electron, proton và neutron)?\nCho biết khối lượng proton và neutron đều là 1 amu, electron là 0,00055 amu. (Kết quả làm tròn đến hàng phần trăm.)",
+  "pa": {
+   "A": "47,83%.",
+   "B": "52,17%.",
+   "C": "52,16%.",
+   "D": "47,81%."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Số proton = số electron = 11; khối lượng proton = 11 amu.",
+   "Khối lượng nguyên tử = 11 + 12 + 11 × 0,00055 = 23,00605 amu.",
+   "Phần trăm = 11 / 23,00605 × 100 ≈ 47,81%."
+  ],
+  "chot": "Cộng cả khối lượng electron vào tổng rồi mới lấy tỉ lệ của proton.",
+  "phepTinh": [
+   {
+    "ten": "Khối lượng nguyên tử (amu)",
+    "bieuThuc": "11+12+11*0.00055",
+    "ketQua": 23.00605,
+    "lamTron": 5
+   },
+   {
+    "ten": "Phần trăm khối lượng proton",
+    "bieuThuc": "11/(11+12+11*0.00055)*100",
+    "ketQua": 47.81,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss4",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Nguyên tử aluminium (Al) có 13 electron và 14 neutron.\nKhối lượng của các proton chiếm bao nhiêu phần trăm khối lượng nguyên tử aluminium (xét nguyên tử gồm electron, proton và neutron)?\nCho biết khối lượng proton và neutron đều là 1 amu, electron là 0,00055 amu. (Kết quả làm tròn đến hàng phần trăm.)",
+  "pa": {
+   "A": "48,15%.",
+   "B": "48,14%.",
+   "C": "51,85%.",
+   "D": "51,84%."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Số proton = số electron = 13; khối lượng proton = 13 amu.",
+   "Khối lượng nguyên tử = 13 + 14 + 13 × 0,00055 = 27,00715 amu.",
+   "Phần trăm = 13 / 27,00715 × 100 ≈ 48,14%."
+  ],
+  "chot": "Cộng cả khối lượng electron vào tổng rồi mới lấy tỉ lệ của proton.",
+  "phepTinh": [
+   {
+    "ten": "Khối lượng nguyên tử (amu)",
+    "bieuThuc": "13+14+13*0.00055",
+    "ketQua": 27.00715,
+    "lamTron": 5
+   },
+   {
+    "ten": "Phần trăm khối lượng proton",
+    "bieuThuc": "13/(13+14+13*0.00055)*100",
+    "ketQua": 48.14,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ }
+]

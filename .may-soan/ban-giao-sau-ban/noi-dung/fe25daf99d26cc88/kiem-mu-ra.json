@@ -1,14 +1,14 @@
 [
  {
   "id": "ss1",
-  "d": "C",
-  "lyDo": "Thí nghiệm lá vàng của Rutherford phát hiện hạt nhân nguyên tử",
+  "d": "B",
+  "lyDo": "Rutherford bắn hạt alpha vào lá vàng phát hiện hạt nhân",
   "chac": true
  },
  {
   "id": "ss2",
-  "d": "A",
-  "lyDo": "Neutron không mang điện",
+  "d": "C",
+  "lyDo": "Hạt Chadwick phát hiện là neutron, không mang điện",
   "chac": true
  }
 ]

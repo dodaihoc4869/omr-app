@@ -5,36 +5,36 @@
   {
    "kieu": "ly_thuyet",
    "cach": "doi_chat",
-   "de": "Thí nghiệm bắn hạt α vào lá vàng mỏng của E. Rutherford (1911) dẫn đến phát hiện ra thành phần nào của nguyên tử?",
+   "de": "Thí nghiệm nào dưới đây dẫn đến việc phát hiện ra hạt nhân nguyên tử?",
    "pa": {
-    "A": "Electron.",
-    "B": "Neutron.",
-    "C": "Hạt nhân nguyên tử.",
-    "D": "Photon."
+    "A": "Thí nghiệm nghiên cứu tia âm cực của J. J. Thomson.",
+    "B": "Thí nghiệm bắn hạt α vào lá vàng mỏng của E. Rutherford và cộng sự.",
+    "C": "Thí nghiệm bắn hạt α vào Beryllium của J. Chadwick.",
+    "D": "Thí nghiệm xác định điện tích electron bằng giọt dầu của R. Millikan."
    },
-   "dap_an": "C",
+   "dap_an": "B",
    "buoc": [
-    "Phần lớn hạt α xuyên thẳng qua lá vàng, một số rất ít bị lệch hoặc bật ngược lại.",
-    "Điều đó chứng tỏ nguyên tử có một hạt nhân mang điện dương, rất nhỏ và nặng."
+    "Rutherford bắn hạt α vào lá vàng mỏng: đa số hạt α đi thẳng, một số ít bị lệch mạnh.",
+    "Kết quả cho thấy nguyên tử có phần mang điện dương, rất nhỏ và nặng ở tâm, gọi là hạt nhân."
    ],
-   "chot": "Hạt α bị bật ngược chứng tỏ có hạt nhân nhỏ, mang điện dương."
+   "chot": "Hạt nhân được phát hiện nhờ thí nghiệm bắn hạt α vào lá vàng."
   },
   {
    "kieu": "ly_thuyet",
    "cach": "dao_chieu",
-   "de": "Hạt nào sau đây không mang điện?",
+   "de": "Khi bắn phá Beryllium bằng các hạt α, J. Chadwick quan sát được một loại hạt mới. Điện tích của hạt này bằng:",
    "pa": {
-    "A": "Neutron.",
-    "B": "Electron.",
-    "C": "Proton.",
-    "D": "Hạt nhân nguyên tử."
+    "A": "+1.",
+    "B": "−1.",
+    "C": "0.",
+    "D": "+2."
    },
-   "dap_an": "A",
+   "dap_an": "C",
    "buoc": [
-    "Electron mang điện tích âm, proton mang điện tích dương.",
-    "Hạt nhân chứa proton nên mang điện dương; neutron không mang điện."
+    "Hạt mới được phát hiện năm 1932 là neutron.",
+    "Neutron không mang điện nên điện tích bằng 0."
    ],
-   "chot": "Neutron là hạt duy nhất trong ba loại hạt cơ bản không mang điện."
+   "chot": "Neutron là hạt không mang điện."
   }
  ]
 }

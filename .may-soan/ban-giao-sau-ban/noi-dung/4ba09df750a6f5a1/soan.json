@@ -5,23 +5,23 @@
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Để hình dung về sự rỗng của nguyên tử, giả sử đường kính nguyên tử lớn gấp khoảng 10 000 lần đường kính hạt nhân. Nếu phóng to hạt nhân lên bằng một quả bóng đường kính 2 cm thì đường kính của nguyên tử sẽ tương đương với:",
+   "de": "Đường kính hạt nhân nguyên tử cỡ 10⁻¹⁴ m, đường kính nguyên tử cỡ 10⁻¹⁰ m. Để hình dung về sự rỗng của nguyên tử, nếu ta phóng to hạt nhân lên bằng kích thước của một viên bi (đường kính 2 cm), thì đường kính của nguyên tử sẽ tương đương với:",
    "pa": {
     "A": "20 m.",
     "B": "200 m.",
-    "C": "2 km.",
-    "D": "2 m."
+    "C": "2000 m.",
+    "D": "20000 m."
    },
    "dap_an": "B",
    "buoc": [
-    "Đường kính nguyên tử = 10 000 × 2 cm = 20 000 cm.",
-    "Đổi: 20 000 cm = 200 m."
+    "Tỉ lệ đường kính nguyên tử / hạt nhân = 10⁻¹⁰ / 10⁻¹⁴ = 10⁴.",
+    "Hạt nhân phóng to thành 2 cm = 0,02 m thì nguyên tử có đường kính 0,02 × 10⁴ = 200 m."
    ],
-   "chot": "Nhân tỉ lệ kích thước với đường kính đã phóng to rồi đổi về đơn vị mét.",
+   "chot": "Phóng to cùng tỉ lệ: nhân đường kính mới của hạt nhân với 10⁴.",
    "phepTinh": [
     {
-     "ten": "Đường kính nguyên tử (m)",
-     "bieuThuc": "2*10000/100",
+     "ten": "Đường kính nguyên tử sau khi phóng to (m)",
+     "bieuThuc": "0.02*(1e-10/1e-14)",
      "ketQua": 200,
      "lamTron": 0,
      "laDapSo": true
@@ -31,23 +31,23 @@
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Để hình dung về sự rỗng của nguyên tử, giả sử đường kính nguyên tử lớn gấp khoảng 10 000 lần đường kính hạt nhân. Nếu phóng to hạt nhân lên bằng một quả bóng đường kính 5 cm thì đường kính của nguyên tử sẽ tương đương với:",
+   "de": "Đường kính hạt nhân nguyên tử cỡ 10⁻¹⁴ m, đường kính nguyên tử cỡ 10⁻¹⁰ m. Để hình dung về sự rỗng của nguyên tử, nếu ta phóng to hạt nhân lên bằng kích thước của một quả bóng (đường kính 5 cm), thì đường kính của nguyên tử sẽ tương đương với:",
    "pa": {
-    "A": "50 m.",
-    "B": "5 km.",
-    "C": "5 m.",
+    "A": "5 m.",
+    "B": "50 m.",
+    "C": "5000 m.",
     "D": "500 m."
    },
    "dap_an": "D",
    "buoc": [
-    "Đường kính nguyên tử = 10 000 × 5 cm = 50 000 cm.",
-    "Đổi: 50 000 cm = 500 m."
+    "Tỉ lệ đường kính nguyên tử / hạt nhân = 10⁻¹⁰ / 10⁻¹⁴ = 10⁴.",
+    "Hạt nhân phóng to thành 5 cm = 0,05 m thì nguyên tử có đường kính 0,05 × 10⁴ = 500 m."
    ],
-   "chot": "Nhân tỉ lệ kích thước với đường kính đã phóng to rồi đổi về đơn vị mét.",
+   "chot": "Phóng to cùng tỉ lệ: nhân đường kính mới của hạt nhân với 10⁴.",
    "phepTinh": [
     {
-     "ten": "Đường kính nguyên tử (m)",
-     "bieuThuc": "5*10000/100",
+     "ten": "Đường kính nguyên tử sau khi phóng to (m)",
+     "bieuThuc": "0.05*(1e-10/1e-14)",
      "ketQua": 500,
      "lamTron": 0,
      "laDapSo": true
@@ -57,49 +57,23 @@
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Để hình dung về sự rỗng của nguyên tử, giả sử đường kính nguyên tử lớn gấp khoảng 10 000 lần đường kính hạt nhân. Nếu phóng to hạt nhân lên bằng một hạt đậu đường kính 3 mm thì đường kính của nguyên tử sẽ tương đương với:",
+   "de": "Đường kính hạt nhân nguyên tử cỡ 10⁻¹⁴ m, đường kính nguyên tử cỡ 10⁻¹⁰ m. Để hình dung về sự rỗng của nguyên tử, nếu ta phóng to hạt nhân lên bằng kích thước của một hạt đậu (đường kính 1 cm), thì đường kính của nguyên tử sẽ tương đương với:",
    "pa": {
-    "A": "30 m.",
-    "B": "300 m.",
-    "C": "3 m.",
-    "D": "3 km."
+    "A": "100 m.",
+    "B": "10 m.",
+    "C": "1000 m.",
+    "D": "10000 m."
    },
    "dap_an": "A",
    "buoc": [
-    "Đường kính nguyên tử = 10 000 × 3 mm = 30 000 mm.",
-    "Đổi: 30 000 mm = 30 m."
+    "Tỉ lệ đường kính nguyên tử / hạt nhân = 10⁻¹⁰ / 10⁻¹⁴ = 10⁴.",
+    "Hạt nhân phóng to thành 1 cm = 0,01 m thì nguyên tử có đường kính 0,01 × 10⁴ = 100 m."
    ],
-   "chot": "Nhân tỉ lệ kích thước với đường kính đã phóng to rồi đổi về đơn vị mét.",
+   "chot": "Phóng to cùng tỉ lệ: nhân đường kính mới của hạt nhân với 10⁴.",
    "phepTinh": [
     {
-     "ten": "Đường kính nguyên tử (m)",
-     "bieuThuc": "3*10000/1000",
-     "ketQua": 30,
-     "lamTron": 0,
-     "laDapSo": true
-    }
-   ]
-  },
-  {
-   "kieu": "so",
-   "cach": "doi_so",
-   "de": "Để hình dung về sự rỗng của nguyên tử, giả sử đường kính nguyên tử lớn gấp khoảng 10 000 lần đường kính hạt nhân. Nếu phóng to hạt nhân lên bằng một viên bi đường kính 1 cm thì đường kính của nguyên tử sẽ tương đương với:",
-   "pa": {
-    "A": "10 m.",
-    "B": "1 km.",
-    "C": "100 m.",
-    "D": "1 m."
-   },
-   "dap_an": "C",
-   "buoc": [
-    "Đường kính nguyên tử = 10 000 × 1 cm = 10 000 cm.",
-    "Đổi: 10 000 cm = 100 m."
-   ],
-   "chot": "Nhân tỉ lệ kích thước với đường kính đã phóng to rồi đổi về đơn vị mét.",
-   "phepTinh": [
-    {
-     "ten": "Đường kính nguyên tử (m)",
-     "bieuThuc": "1*10000/100",
+     "ten": "Đường kính nguyên tử sau khi phóng to (m)",
+     "bieuThuc": "0.01*(1e-10/1e-14)",
      "ketQua": 100,
      "lamTron": 0,
      "laDapSo": true
@@ -109,23 +83,49 @@
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Để hình dung về sự rỗng của nguyên tử, giả sử đường kính nguyên tử lớn gấp khoảng 10 000 lần đường kính hạt nhân. Nếu phóng to hạt nhân lên bằng một quả bóng đường kính 6 cm thì đường kính của nguyên tử sẽ tương đương với:",
+   "de": "Đường kính hạt nhân nguyên tử cỡ 10⁻¹⁴ m, đường kính nguyên tử cỡ 10⁻¹⁰ m. Để hình dung về sự rỗng của nguyên tử, nếu ta phóng to hạt nhân lên bằng kích thước của một quả bóng nhỏ (đường kính 3 cm), thì đường kính của nguyên tử sẽ tương đương với:",
+   "pa": {
+    "A": "30 m.",
+    "B": "3 m.",
+    "C": "300 m.",
+    "D": "3000 m."
+   },
+   "dap_an": "C",
+   "buoc": [
+    "Tỉ lệ đường kính nguyên tử / hạt nhân = 10⁻¹⁰ / 10⁻¹⁴ = 10⁴.",
+    "Hạt nhân phóng to thành 3 cm = 0,03 m thì nguyên tử có đường kính 0,03 × 10⁴ = 300 m."
+   ],
+   "chot": "Phóng to cùng tỉ lệ: nhân đường kính mới của hạt nhân với 10⁴.",
+   "phepTinh": [
+    {
+     "ten": "Đường kính nguyên tử sau khi phóng to (m)",
+     "bieuThuc": "0.03*(1e-10/1e-14)",
+     "ketQua": 300,
+     "lamTron": 0,
+     "laDapSo": true
+    }
+   ]
+  },
+  {
+   "kieu": "so",
+   "cach": "doi_so",
+   "de": "Đường kính hạt nhân nguyên tử cỡ 10⁻¹⁴ m, đường kính nguyên tử cỡ 10⁻¹⁰ m. Để hình dung về sự rỗng của nguyên tử, nếu ta phóng to hạt nhân lên bằng kích thước của một quả bóng tennis (đường kính 6 cm), thì đường kính của nguyên tử sẽ tương đương với:",
    "pa": {
     "A": "60 m.",
     "B": "600 m.",
-    "C": "6 km.",
+    "C": "6000 m.",
     "D": "6 m."
    },
    "dap_an": "B",
    "buoc": [
-    "Đường kính nguyên tử = 10 000 × 6 cm = 60 000 cm.",
-    "Đổi: 60 000 cm = 600 m."
+    "Tỉ lệ đường kính nguyên tử / hạt nhân = 10⁻¹⁰ / 10⁻¹⁴ = 10⁴.",
+    "Hạt nhân phóng to thành 6 cm = 0,06 m thì nguyên tử có đường kính 0,06 × 10⁴ = 600 m."
    ],
-   "chot": "Nhân tỉ lệ kích thước với đường kính đã phóng to rồi đổi về đơn vị mét.",
+   "chot": "Phóng to cùng tỉ lệ: nhân đường kính mới của hạt nhân với 10⁴.",
    "phepTinh": [
     {
-     "ten": "Đường kính nguyên tử (m)",
-     "bieuThuc": "6*10000/100",
+     "ten": "Đường kính nguyên tử sau khi phóng to (m)",
+     "bieuThuc": "0.06*(1e-10/1e-14)",
      "ketQua": 600,
      "lamTron": 0,
      "laDapSo": true
@@ -135,24 +135,24 @@
   {
    "kieu": "so",
    "cach": "doi_so",
-   "de": "Để hình dung về sự rỗng của nguyên tử, giả sử đường kính nguyên tử lớn gấp khoảng 10 000 lần đường kính hạt nhân. Nếu phóng to hạt nhân lên bằng một viên bi đường kính 8 mm thì đường kính của nguyên tử sẽ tương đương với:",
+   "de": "Đường kính hạt nhân nguyên tử cỡ 10⁻¹⁴ m, đường kính nguyên tử cỡ 10⁻¹⁰ m. Để hình dung về sự rỗng của nguyên tử, nếu ta phóng to hạt nhân lên bằng kích thước của một quả cầu (đường kính 8 cm), thì đường kính của nguyên tử sẽ tương đương với:",
    "pa": {
-    "A": "8 m.",
-    "B": "800 m.",
-    "C": "80 m.",
-    "D": "8 km."
+    "A": "80 m.",
+    "B": "8000 m.",
+    "C": "8 m.",
+    "D": "800 m."
    },
-   "dap_an": "C",
+   "dap_an": "D",
    "buoc": [
-    "Đường kính nguyên tử = 10 000 × 8 mm = 80 000 mm.",
-    "Đổi: 80 000 mm = 80 m."
+    "Tỉ lệ đường kính nguyên tử / hạt nhân = 10⁻¹⁰ / 10⁻¹⁴ = 10⁴.",
+    "Hạt nhân phóng to thành 8 cm = 0,08 m thì nguyên tử có đường kính 0,08 × 10⁴ = 800 m."
    ],
-   "chot": "Nhân tỉ lệ kích thước với đường kính đã phóng to rồi đổi về đơn vị mét.",
+   "chot": "Phóng to cùng tỉ lệ: nhân đường kính mới của hạt nhân với 10⁴.",
    "phepTinh": [
     {
-     "ten": "Đường kính nguyên tử (m)",
-     "bieuThuc": "8*10000/1000",
-     "ketQua": 80,
+     "ten": "Đường kính nguyên tử sau khi phóng to (m)",
+     "bieuThuc": "0.08*(1e-10/1e-14)",
+     "ketQua": 800,
      "lamTron": 0,
      "laDapSo": true
     }

@@ -1,0 +1,164 @@
+[
+ {
+  "id": "ss1",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Lớp vỏ của nguyên tử nguyên tố X có 7 electron. Điện tích hạt nhân nguyên tử X là (cho điện tích một proton là +1,602.10⁻¹⁹ C)",
+  "pa": {
+   "A": "+0,96.10⁻¹⁸ C.",
+   "B": "+1,28.10⁻¹⁸ C.",
+   "C": "+1,12.10⁻¹⁸ C.",
+   "D": "−1,28.10⁻¹⁸ C."
+  },
+  "dap_an": "C",
+  "buoc": [
+   "Nguyên tử trung hòa nên số proton bằng số electron = 7.",
+   "Điện tích hạt nhân = 7 × 1,602.10⁻¹⁹ ≈ +1,12.10⁻¹⁸ C."
+  ],
+  "chot": "Điện tích hạt nhân dương, bằng số proton nhân 1,602.10⁻¹⁹ C.",
+  "phepTinh": [
+   {
+    "ten": "Điện tích hạt nhân (.10⁻¹⁸ C)",
+    "bieuThuc": "7*1.602/10",
+    "ketQua": 1.12,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss2",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Lớp vỏ của nguyên tử nguyên tố X có 9 electron. Điện tích hạt nhân nguyên tử X là (cho điện tích một proton là +1,602.10⁻¹⁹ C)",
+  "pa": {
+   "A": "+1,44.10⁻¹⁸ C.",
+   "B": "+1,28.10⁻¹⁸ C.",
+   "C": "−1,60.10⁻¹⁸ C.",
+   "D": "+1,60.10⁻¹⁸ C."
+  },
+  "dap_an": "A",
+  "buoc": [
+   "Nguyên tử trung hòa nên số proton bằng số electron = 9.",
+   "Điện tích hạt nhân = 9 × 1,602.10⁻¹⁹ ≈ +1,44.10⁻¹⁸ C."
+  ],
+  "chot": "Điện tích hạt nhân dương, bằng số proton nhân 1,602.10⁻¹⁹ C.",
+  "phepTinh": [
+   {
+    "ten": "Điện tích hạt nhân (.10⁻¹⁸ C)",
+    "bieuThuc": "9*1.602/10",
+    "ketQua": 1.44,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss3",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Lớp vỏ của nguyên tử nguyên tố X có 13 electron. Điện tích hạt nhân nguyên tử X là (cho điện tích một proton là +1,602.10⁻¹⁹ C)",
+  "pa": {
+   "A": "+1,92.10⁻¹⁸ C.",
+   "B": "+2,24.10⁻¹⁸ C.",
+   "C": "−2,24.10⁻¹⁸ C.",
+   "D": "+2,08.10⁻¹⁸ C."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Nguyên tử trung hòa nên số proton bằng số electron = 13.",
+   "Điện tích hạt nhân = 13 × 1,602.10⁻¹⁹ ≈ +2,08.10⁻¹⁸ C."
+  ],
+  "chot": "Điện tích hạt nhân dương, bằng số proton nhân 1,602.10⁻¹⁹ C.",
+  "phepTinh": [
+   {
+    "ten": "Điện tích hạt nhân (.10⁻¹⁸ C)",
+    "bieuThuc": "13*1.602/10",
+    "ketQua": 2.08,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss4",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Lớp vỏ của nguyên tử nguyên tố X có 15 electron. Điện tích hạt nhân nguyên tử X là (cho điện tích một proton là +1,602.10⁻¹⁹ C)",
+  "pa": {
+   "A": "+2,24.10⁻¹⁸ C.",
+   "B": "+2,40.10⁻¹⁸ C.",
+   "C": "+2,56.10⁻¹⁸ C.",
+   "D": "−2,56.10⁻¹⁸ C."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Nguyên tử trung hòa nên số proton bằng số electron = 15.",
+   "Điện tích hạt nhân = 15 × 1,602.10⁻¹⁹ ≈ +2,40.10⁻¹⁸ C."
+  ],
+  "chot": "Điện tích hạt nhân dương, bằng số proton nhân 1,602.10⁻¹⁹ C.",
+  "phepTinh": [
+   {
+    "ten": "Điện tích hạt nhân (.10⁻¹⁸ C)",
+    "bieuThuc": "15*1.602/10",
+    "ketQua": 2.4,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss5",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Lớp vỏ của nguyên tử nguyên tố X có 17 electron. Điện tích hạt nhân nguyên tử X là (cho điện tích một proton là +1,602.10⁻¹⁹ C)",
+  "pa": {
+   "A": "+2,88.10⁻¹⁸ C.",
+   "B": "+2,56.10⁻¹⁸ C.",
+   "C": "−2,88.10⁻¹⁸ C.",
+   "D": "+2,72.10⁻¹⁸ C."
+  },
+  "dap_an": "D",
+  "buoc": [
+   "Nguyên tử trung hòa nên số proton bằng số electron = 17.",
+   "Điện tích hạt nhân = 17 × 1,602.10⁻¹⁹ ≈ +2,72.10⁻¹⁸ C."
+  ],
+  "chot": "Điện tích hạt nhân dương, bằng số proton nhân 1,602.10⁻¹⁹ C.",
+  "phepTinh": [
+   {
+    "ten": "Điện tích hạt nhân (.10⁻¹⁸ C)",
+    "bieuThuc": "17*1.602/10",
+    "ketQua": 2.72,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ },
+ {
+  "id": "ss6",
+  "kieu": "so",
+  "cach": "doi_so",
+  "de": "Lớp vỏ của nguyên tử nguyên tố X có 19 electron. Điện tích hạt nhân nguyên tử X là (cho điện tích một proton là +1,602.10⁻¹⁹ C)",
+  "pa": {
+   "A": "+2,88.10⁻¹⁸ C.",
+   "B": "+3,04.10⁻¹⁸ C.",
+   "C": "+3,20.10⁻¹⁸ C.",
+   "D": "−3,20.10⁻¹⁸ C."
+  },
+  "dap_an": "B",
+  "buoc": [
+   "Nguyên tử trung hòa nên số proton bằng số electron = 19.",
+   "Điện tích hạt nhân = 19 × 1,602.10⁻¹⁹ ≈ +3,04.10⁻¹⁸ C."
+  ],
+  "chot": "Điện tích hạt nhân dương, bằng số proton nhân 1,602.10⁻¹⁹ C.",
+  "phepTinh": [
+   {
+    "ten": "Điện tích hạt nhân (.10⁻¹⁸ C)",
+    "bieuThuc": "19*1.602/10",
+    "ketQua": 3.04,
+    "lamTron": 2,
+    "laDapSo": true
+   }
+  ]
+ }
+]
