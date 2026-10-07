@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { taoD1That } from './_d1-that'
-import { damBaoBangMaySoan, napSongSinhToanKho, nhanVaGhiBanKhac } from '../server/src/hoc-lieu-may-soan'
+import { damBaoBangMaySoan, napSongSinhToanKho, nhanVaGhiBanKhac, xuatCauChoSinh } from '../server/src/hoc-lieu-may-soan'
 import { thieuBanKhac } from '../server/src/may-soan-kiem'
 
 function kho() {
@@ -82,6 +82,56 @@ describe('nạp hàng song sinh toàn kho: SQL thật, chỉ hàng học liệu'
     const luu = JSON.parse((d.sql.prepare("SELECT song_sinh_json FROM cau_bo_tro WHERE bam='slots'").get() as {song_sinh_json:string}).song_sinh_json)
     expect(luu).toHaveLength(12);expect(luu.slice(0,8)).toEqual(cu)
     expect(thieuBanKhac('tn',r.tong,0)).toBe('mot_phan')
+    d.sql.close()
+  })
+})
+
+describe('xuất câu cho sinh: đọc thuần, không ghi bảng nào', () => {
+  it('phân trang đúng, trả đủ trường viec, con trỏ hợp lệ', async () => {
+    const { d, them } = kho()
+    them('a','chung'); them('b','chung'); them('c','ds','II'); them('d','so','III')
+    them('e','tl','III','12-KHO',{ correct: 'FeSO4' }) // tự luận — bị loại
+    const r1 = await xuatCauChoSinh(d.env, { so: 2 })
+    expect(r1.ok).toBe(true)
+    expect(r1.viec).toHaveLength(2)
+    expect((r1.viec as Record<string, unknown>[])[0]).toMatchObject({ qid: 'a', bam: 'chung' })
+    expect(r1.tiep).toBe('b')
+    const r2 = await xuatCauChoSinh(d.env, { so: 2, sau: r1.tiep })
+    expect(r2.viec).toHaveLength(2)
+    // Tự luận bị loại: tiep=null khi hết
+    const r3 = await xuatCauChoSinh(d.env, { so: 2, sau: r2.tiep })
+    expect(r3.viec).toHaveLength(0)
+    expect(r3.tiep).toBeNull()
+    // KHÔNG ghi bảng nào
+    expect(d.dem('may_soan_viec')).toBe(0)
+    expect(d.dem('loi_giai_viec')).toBe(0)
+    d.sql.close()
+  })
+
+  it('mỗi việc trả về có đủ can, daCo, không có maLuot', async () => {
+    const { d, them } = kho()
+    them('a','bam1'); them('b','bam2','II')
+    const { viec } = await xuatCauChoSinh(d.env, { so: 10 }) as { viec: Record<string,unknown>[] }
+    expect(viec).toHaveLength(2)
+    for (const v of viec) {
+      expect(v).toHaveProperty('can')
+      expect(v).toHaveProperty('daCo')
+      expect(v).toHaveProperty('qid')
+      expect(v).toHaveProperty('bam')
+      expect(v).toHaveProperty('dang')
+      expect(v).toHaveProperty('phan')
+      expect(v).not.toHaveProperty('maLuot')
+      expect(v).not.toHaveProperty('soLan')
+    }
+    expect(d.dem('may_soan_viec')).toBe(0)
+    d.sql.close()
+  })
+
+  it('endpoint yêu cầu cổng mã bí mật', async () => {
+    const { d, them } = kho(); them('a','a')
+    const r = await worker.fetch(new Request('https://test/kho/may-soan/xuat-cau-cho-sinh',{ method:'POST',body:'{}' }),d.env)
+    expect(r.status).toBe(403)
+    expect(d.dem('may_soan_viec')).toBe(0)
     d.sql.close()
   })
 })

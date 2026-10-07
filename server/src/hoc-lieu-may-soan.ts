@@ -25,7 +25,7 @@ import {
   type CanSoan, type CauGoc, type DaCo, type MucBo, type MucThieu,
 } from './may-soan-kiem'
 import { chuYDsTheoBam, docCauKhoHienTai, metaCua, nhanVaGhiYDs, nopYDs, type MetaGoc } from './cau-y-ds'
-import type { DangLoiGiai } from '../../src/lib/loi-giai-kiem'
+import { cauTrongGoi, dauVao, type CauKho, type DangLoiGiai } from '../../src/lib/loi-giai-kiem'
 import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 
 type Obj = Record<string, unknown>
@@ -402,8 +402,51 @@ export async function ghiNghiTuXu(env: Env, bam: string, qidMau: string, ghi: st
 
 // ---------------------------------------------------------------- định tuyến (sau cổng mã bí mật của thầy trong index.ts)
 
+/**
+ * `/kho/may-soan/xuat-cau-cho-sinh {sau?, lop?, so?}` — ĐỌC THUẦN câu kho cho runner ngoại tuyến.
+ * KHÔNG lấy lease, KHÔNG ghi bảng nào. Con trỏ qid ổn định; phân trang ≤ 50 câu mỗi lượt.
+ * Trả cùng khuôn viec[i] của layViec nhưng không có maLuot / soLan / ghiChuThay.
+ */
+export async function xuatCauChoSinh(env: Env, b: Obj): Promise<Obj> {
+  const sau = str(b.sau)
+  const lop = str(b.lop)
+  const so = Math.max(1, Math.min(50, Math.floor(Number(b.so) || 20)))
+  const ds = (await env.DB.prepare(
+    `SELECT l.qid, l.bam, l.ma_de, l.dang, l.lop, l.bo, q.json
+     FROM loi_giai_cau l JOIN game_v2_question q ON q.qid = l.qid AND q.ma_de = l.ma_de
+     JOIN de_kho d ON d.ma_de = l.ma_de AND d.da_xoa = 0
+     WHERE l.qid > ?${lop ? ' AND l.lop = ?' : ''} ORDER BY l.qid LIMIT ?`,
+  ).bind(sau, ...(lop ? [lop] : []), so).all<Obj>()).results ?? []
+
+  const hieu: { x: Obj; c: CauKho }[] = []
+  for (const x of ds) {
+    let cauRaw: unknown
+    try { cauRaw = JSON.parse(str(x.json)) } catch { continue }
+    if (laCauTuLuan(cauRaw) || !['tn', 'ds', 'tln'].includes(str(x.dang))) continue
+    // JSON D1 là câu đơn lẻ; cauTrongGoi cần khuôn gói ⇒ bọc vào { cau: [...] }.
+    const caus = cauTrongGoi(str(x.ma_de), { cau: [cauRaw] })
+    const c = caus.find((cc) => cc.qid === str(x.qid))
+    if (!c) continue
+    hieu.push({ x, c })
+  }
+
+  const canDaCo = await canVaDaCoChoViec(env, hieu.map(({ x, c }) => ({ bam: str(x.bam), dang: str(x.dang), kieuKho: c.kieu, hoSo: false })))
+
+  const viec: Obj[] = []
+  for (const { x, c } of hieu) {
+    const bam = str(x.bam)
+    const vao = dauVao(c, bam)
+    if (!vao) continue
+    const { can, daCo } = canDaCo.get(bam) ?? { can: { hoSo: false, banKhac: 0, kieuBan: 'tu_chon' as const, yDs: 0 }, daCo: { banKhac: [], yDs: [] } }
+    viec.push({ ...vao, phan: c.phan, deTho: c.de, ...(c.bang ? { bang: c.bang } : {}), kieuKho: c.kieu ?? '', can, daCo })
+  }
+
+  return { ok: true, viec, tiep: ds.length === so ? str(ds[ds.length - 1]?.qid) || null : null }
+}
+
 export async function duongMaySoan(env: Env, p: string, b: Obj): Promise<Obj> {
   if (p === '/kho/may-soan/nap-toan-kho') return napSongSinhToanKho(env, b)
+  if (p === '/kho/may-soan/xuat-cau-cho-sinh') return xuatCauChoSinh(env, b)
   if (p === '/kho/may-soan/nop-bo-tro') return nopBoTro(env, b)
   if (p === '/kho/may-soan/nop-y-ds') return nopYDs(env, b)
   if (p === '/kho/may-soan/hang-em-sai') return hangEmSai(env, b)
