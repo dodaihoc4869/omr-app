@@ -72,7 +72,7 @@ function henGioMacDinh(): string {
 function gioHienThi(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
-  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 
@@ -477,7 +477,7 @@ export default function ExamSetupScreen() {
     const t = batDauCach === 'hen' ? new Date(batDauLocal).getTime() : Date.now()
     return Number.isFinite(t) ? t : Date.now()
   })()
-  const gioMoc = (ms: number) => new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  const gioMoc = (ms: number) => new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
   const mocHetVao = hanVaoPhut > 0 ? mocMo + hanVaoPhut * 60000 : null
   const mocEmCuoi = (mocHetVao ?? mocMo) + phutCa * 60000
   const phongChoBat = phongCho || deRiengBat || dongBoGio

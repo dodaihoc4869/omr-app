@@ -29,7 +29,8 @@ export function locTuLuanKhiMoCa(nguon: TeacherExamSource[], can: SoCauMoiPhan |
   const soBoTheoPhan: SoCauMoiPhan = { I: 0, II: 0, III: 0 }
   const phanCanLoc = new Set<PhanCau>()
   for (const p of ['I', 'II', 'III'] as PhanCau[]) {
-    if (cheDo === 'luon') {
+    // THẦY 06/10 "cấm toàn bộ": cả chế độ `khi_co_cat` (thầy chọn nguyên tờ, phần vừa đủ không cắt) cũng bỏ HẾT câu tự luận — không còn ngoại lệ "bộ thầy tự chọn".
+    if (cheDo === 'luon' || cheDo === 'khi_co_cat') {
       phanCanLoc.add(p)
       continue
     }

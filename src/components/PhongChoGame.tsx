@@ -30,7 +30,7 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
         <h1>Đang chờ Thầy bấm bắt đầu</h1>
         <p>Em giữ nguyên màn hình này. Đề hiện ra ngay khi Thầy bắt đầu.</p>
         {(cho?.tenCa || cho?.lop || cho?.thoiGianPhut) && <div className="pc-session">
-          {cho.tenCa && <span>Ca thi: {cho.tenCa}</span>}
+          {cho.tenCa && <span>Ca kiểm tra: {cho.tenCa}</span>}
           {cho.lop && <span>Lớp {cho.lop}</span>}
           {cho.thoiGianPhut && <span>Bài làm trong {cho.thoiGianPhut} phút, đồng hồ chạy từ lúc đó.</span>}
         </div>}

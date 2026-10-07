@@ -194,7 +194,7 @@ export default function BanGoNutThatScreen() {
                         ) : buoi.length === 0 ? (
                           <p className="gv2-phu">Chưa có buổi học đang mở (mở ở Chữa trên lớp › Điểm danh). Thầy ghi buổi sẽ dạy vào ô dưới.</p>
                         ) : (
-                          <select id={`gnt-buoi-${n.khoa}`} className="lg-o" value={dangGo.buoiHoc} onChange={(e) => setGo({ ...dangGo, buoiHoc: e.target.value })}>
+                          <select id={`gnt-buoi-${n.khoa}`} aria-label="Buổi học sẽ dạy" className="lg-o" value={dangGo.buoiHoc} onChange={(e) => setGo({ ...dangGo, buoiHoc: e.target.value })}>
                             <option value="">Chọn buổi học</option>
                             {buoi.map((b) => <option key={b.id} value={b.id}>{b.ten}</option>)}
                           </select>
@@ -204,7 +204,7 @@ export default function BanGoNutThatScreen() {
                     <label className="gv2-nhan" htmlFor={`gnt-nd-${n.khoa}`}>
                       {dangGo.kieu === 'ngan' ? `Lời gỡ ngắn gửi ${n.soEm} em (đọc khoảng 1 phút)` : dangGo.kieu === 'sua' ? 'Chỗ cần sửa ở lời giải hoặc đề' : 'Ghi chú (tuỳ chọn)'}
                     </label>
-                    <textarea id={`gnt-nd-${n.khoa}`} className="lg-o" rows={dangGo.kieu === 'lop' ? 2 : 4} maxLength={4000} value={dangGo.noiDung} onChange={(e) => setGo({ ...dangGo, noiDung: e.target.value })} autoFocus />
+                    <textarea id={`gnt-nd-${n.khoa}`} aria-label="Nội dung gỡ nút thắt" className="lg-o" rows={dangGo.kieu === 'lop' ? 2 : 4} maxLength={4000} value={dangGo.noiDung} onChange={(e) => setGo({ ...dangGo, noiDung: e.target.value })} autoFocus />
                     <div className="lg-hang-nut">
                       <button type="submit" className="gv2-nut-chinh" disabled={dangGhi || (dangGo.kieu === 'lop' ? !dangGo.buoiHoc && !dangGo.noiDung.trim() : !dangGo.noiDung.trim())}>
                         {dangGhi ? 'Đang gửi…' : dangGo.kieu === 'ngan' ? `Gửi lời gỡ cho ${n.soEm} em` : dangGo.kieu === 'lop' ? 'Ghi dạy trên lớp' : 'Lưu ghi chú sửa'}

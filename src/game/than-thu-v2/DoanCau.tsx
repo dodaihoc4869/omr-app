@@ -25,7 +25,7 @@ export function DeBai({ q, onZoom }: { q: Question; onZoom: (src: string) => voi
   return (
     <>
       {q.thanCauImg
-        ? <button type="button" onClick={() => onZoom(q.thanCauImg!)} title="Bấm để phóng to"><img decoding="async" src={q.thanCauImg} alt="Đề bài" /></button>
+        ? <button type="button" onClick={() => onZoom(q.thanCauImg!)} title="Phóng to đề bài"><img decoding="async" loading="lazy" width={960} height={540} src={q.thanCauImg} alt="Đề bài" /></button>
         : <div className="dh-de"><ChemText text={tachDongTheoY(chiSoRo(q.text))} /></div>}
       <BangSoLieu table={q.table} />
       {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt="Hình của câu" onZoom={onZoom} />}
@@ -80,7 +80,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             return (
               <button key={chu} type="button" disabled={khoa || chay} aria-pressed={chon === chu} data-kq={kq(chu)} className={chay ? 'dh2-chay' : undefined} onClick={() => { if (!chay) onChon(chu) }}>
                 <i>{chu}</i>
-                <span>{q.choiceImgs?.[i] ? <img decoding="async" src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chiSoRo(chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`)))} />}
+                <span>{q.choiceImgs?.[i] ? <img decoding="async" loading="lazy" width={480} height={270} src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={chiSoRo(chuPhuongAn(q.choices[i] ?? '', hinh.some(h => h.viTri === `sau_pa_${chu}`)))} />}
                   <HinhTaiViTri hinhAnh={hinh} viTri={`sau_pa_${chu}`} onZoom={onZoom} nhan={`phương án ${chu}`} /></span>
                 {chay && <span className="dh2-an"> (đã cháy thành tro — phương án sai, không chọn được)</span>}
               </button>
@@ -95,7 +95,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
             const dat = (gt: 'D' | 'S') => { const a = (chon || '----').padEnd(4, '-').split(''); a[i] = gt; onChon(a.join('')) }
             return (
               <div key={i}>
-                <span><small>Ý {'abcd'[i]}</small>{q.ideaImgs?.[i] ? <img decoding="async" src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} /> : <ChemText text={chiSoRo(y)} />}</span>
+                <span><small>Ý {'abcd'[i]}</small>{q.ideaImgs?.[i] ? <img decoding="async" loading="lazy" width={480} height={270} src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} /> : <ChemText text={chiSoRo(y)} />}</span>
                 <div className="dh-ds">
                   <button type="button" disabled={khoa} aria-pressed={v === 'D'} onClick={() => dat('D')}>Đúng</button>
                   <button type="button" disabled={khoa} aria-pressed={v === 'S'} onClick={() => dat('S')}>Sai</button>

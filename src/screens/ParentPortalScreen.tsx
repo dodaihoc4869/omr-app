@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { datPassPhuHuynh } from '../lib/mom-api'
 import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import { LogoDoc } from '../components/LogoVai'
-import InfographicHuongDan from '../components/InfographicHuongDan'
 import AppPhuHuynh from '../components/ph-v3/AppPhuHuynh'
 import { tenTheoSbd } from '../lib/exam-api'
 import { loadScriptUrl } from '../lib/exam-db'
@@ -26,7 +25,6 @@ export default function ParentPortalScreen() {
   const [scriptUrl, setScriptUrl] = useState('')
   const [dangTai, setDangTai] = useState(false)
   const [thongBaoLoi, setThongBaoLoi] = useState('')
-  const [hienHuongDan, setHienHuongDan] = useState(false)
 
   useEffect(() => {
     loadScriptUrl().then(async (u) => {
@@ -67,7 +65,7 @@ export default function ParentPortalScreen() {
   async function dangNhapPhuHuynh(sbd: string, urlParam?: string, conBiet?: { hoTen: string; lop: string }) {
     const sbdSach = sbd.trim()
     if (!sbdSach) {
-      setThongBaoLoi('Vui lòng nhập Số báo danh của con')
+      setThongBaoLoi('Nhập số báo danh của con.')
       return
     }
     setDangTai(true)
@@ -142,20 +140,14 @@ export default function ParentPortalScreen() {
                 placeholder="Ví dụ: 12001, 12002…"
                 autoFocus
               />
-              <p className="ph3-vao__goi">Phụ huynh chỉ cần nhập số báo danh con được cấp tại lớp.</p>
               {thongBaoLoi && <p className="ph3-vao__loi" role="alert">{thongBaoLoi}</p>}
               <button type="submit" className="m3-nut-chinh ph3-vao__nut" disabled={!sbdInput.trim() || dangTai}>
                 {dangTai ? 'Đang tra cứu dữ liệu của con…' : 'Vào xem kết quả của con'}
               </button>
             </form>
-            <button type="button" className="ph3-vao__giup" onClick={() => setHienHuongDan(true)}>
-              Hướng dẫn đăng nhập
-            </button>
           </div>
-          <p className="ph3-vao__chan">Hệ thống Luyện thi Hoá Thầy Đỗ Đại Học · Cổng phụ huynh</p>
         </main>
       </div>
-      {hienHuongDan && <InfographicHuongDan onClose={() => setHienHuongDan(false)} vaiMacDinh="phuhuynh" />}
     </div>
   )
 }

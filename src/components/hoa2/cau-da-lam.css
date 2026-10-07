@@ -122,6 +122,9 @@
 .h2-cdl-chon select:focus-visible {
   outline: none;
 }
+.h2-cdl-chon:has(select:focus-visible) {
+  box-shadow: 0 0 0 3px var(--h2c-xanh);
+}
 /* Thẻ lọc: kiểu chung src/styles/the-loc.css (.tl-hang--mot-dong: một hàng cuộn ngang, viên 32 px, ✓ khi chọn, số đếm là huy hiệu);
    ở đây chỉ đặt bảng màu riêng của khung Câu đã làm. */
 .h2-cdl-loc {

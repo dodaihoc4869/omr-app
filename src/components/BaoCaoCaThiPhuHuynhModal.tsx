@@ -605,7 +605,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
               {dangTaiCauSai ? (
                 <div className="p-8 text-center text-slate-400 space-y-2">
                   <RefreshCw size={24} className="animate-spin mx-auto text-blue-600" />
-                  <p className="text-xs">Đang tải danh sách câu con làm sai từ hệ thống...</p>
+                  <p className="text-xs">Đang tải danh sách câu con làm sai…</p>
                 </div>
               ) : dsCauSai.length === 0 ? (
                 <div className="p-8 rounded-3xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 text-center space-y-2">

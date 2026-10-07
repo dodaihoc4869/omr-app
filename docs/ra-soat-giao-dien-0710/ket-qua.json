@@ -1,0 +1,277 @@
+{
+  "tong": {
+    "thoiDiem": "2026-10-06T23:33:12.039Z",
+    "diaChi": "http://127.0.0.1:5198",
+    "soLuot": 24,
+    "tranNgang": 0,
+    "thieuNhan": 0,
+    "loiTrang": 0,
+    "vungChamNho": 0
+  },
+  "ketQua": [
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "360",
+      "giaoDien": "light",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "360",
+      "giaoDien": "dark",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "390",
+      "giaoDien": "light",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "390",
+      "giaoDien": "dark",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "768",
+      "giaoDien": "light",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "768",
+      "giaoDien": "dark",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "1440",
+      "giaoDien": "light",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/gv",
+      "kichThuoc": "1440",
+      "giaoDien": "dark",
+      "tieuDe": "ĐỖ ĐẠI HỌC",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "360",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "360",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "390",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "390",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "768",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "768",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "1440",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/hs",
+      "kichThuoc": "1440",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Học Sinh",
+      "tranNgang": 0,
+      "dieuKhien": 4,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "360",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "360",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "390",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "390",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "768",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "768",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "1440",
+      "giaoDien": "light",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    },
+    {
+      "tuyen": "/ph",
+      "kichThuoc": "1440",
+      "giaoDien": "dark",
+      "tieuDe": "ĐĐH Phụ Huynh",
+      "tranNgang": 0,
+      "dieuKhien": 2,
+      "nho": [],
+      "thieuNhan": [],
+      "loiTrang": []
+    }
+  ]
+}

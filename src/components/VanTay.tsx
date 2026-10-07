@@ -40,10 +40,10 @@ export function chuGoc(sbd: string, hoTen: string): string {
 let dinhDangGio: Intl.DateTimeFormat | null = null
 export function gioPhutNay(luc: Date = new Date()): string {
   try {
-    dinhDangGio ??= new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    dinhDangGio ??= new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
     return dinhDangGio.format(luc)
   } catch {
-    return luc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    return luc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
   }
 }
 

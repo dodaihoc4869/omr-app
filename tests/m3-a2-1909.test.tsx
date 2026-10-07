@@ -42,6 +42,7 @@ describe('vao-thi.css', () => {
     for (const m of sach.matchAll(/([^{}@]+)\{/g)) {
       const ch = m[1].trim()
       if (!ch) continue
+      if (ch.startsWith('media ')) continue
       for (const s of ch.split(',')) expect(s.trim().startsWith('.m3 '), s).toBe(true)
     }
     expect(sach).toMatch(/--ma-vien: 0 none/)
@@ -88,7 +89,7 @@ describe('PhongChoGame (phòng chờ)', () => {
     const a = render(<PhongChoGame cho={{ thoiGianPhut: 50, tenCa: 'Ca Ancol', lop: '12A1' }} loiCho="Mất kết nối" />)
     await a.findByRole('heading', { name: /Bắn nguyên tố/ })
     const chu = a.container.textContent || ''
-    for (const s of ['Bắn nguyên tố', 'Điểm chơi', 'Đang chờ Thầy bấm bắt đầu', 'Bài làm trong 50 phút', 'Ca thi: Ca Ancol', 'Mất kết nối']) expect(chu, s).toContain(s)
+    for (const s of ['Bắn nguyên tố', 'Điểm chơi', 'Đang chờ Thầy bấm bắt đầu', 'Bài làm trong 50 phút', 'Ca kiểm tra: Ca Ancol', 'Mất kết nối']) expect(chu, s).toContain(s)
     expect(a.container.querySelector('.m3')).toBeNull()
     expect(a.container.querySelector('.pc-wait')).toBeTruthy()
     a.unmount()

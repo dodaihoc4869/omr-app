@@ -45,7 +45,9 @@ const trang = `<!doctype html><html lang="vi"><head><meta charset="utf-8">
 // Container này có sẵn Chromium ở PLAYWRIGHT_BROWSERS_PATH nhưng bản build có
 // thể lệch số hiệu với gói playwright — trỏ thẳng vào file thật khi có.
 const SAN_CO = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
-const trinh = await chromium.launch(existsSync(SAN_CO) ? { executablePath: SAN_CO } : {})
+const CHROMIUM_HE_THONG = '/usr/bin/chromium'
+const executablePath = existsSync(SAN_CO) ? SAN_CO : existsSync(CHROMIUM_HE_THONG) ? CHROMIUM_HE_THONG : undefined
+const trinh = await chromium.launch(executablePath ? { executablePath } : {})
 const trang360 = await trinh.newPage({ viewport: { width: 360, height: 800 }, deviceScaleFactor: 2 })
 await trang360.setContent(trang, { waitUntil: 'load' })
 await trang360.evaluate(() => document.fonts.ready)

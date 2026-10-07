@@ -7,7 +7,7 @@ import { OThongBao } from './DesignSystem'
 
 const gio = (iso: string) => {
   const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? '' : d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', hour12: false })
 }
 
 export default function KhungBaiBoSung({ maCa, secret }: { maCa?: string; secret?: string }) {

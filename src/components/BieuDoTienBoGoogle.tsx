@@ -346,7 +346,16 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa, anNhanNangLuc
             return (
               <div
                 key={c.maCa + idx}
+                role="button"
+                tabIndex={0}
+                aria-pressed={chonIdx === idx}
                 onClick={() => {
+                  setChonIdx(idx)
+                  if (onChonCa) onChonCa(c.maCa)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter' && e.key !== ' ') return
+                  e.preventDefault()
                   setChonIdx(idx)
                   if (onChonCa) onChonCa(c.maCa)
                 }}

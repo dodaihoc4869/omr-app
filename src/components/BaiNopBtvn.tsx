@@ -21,7 +21,7 @@ export default function BaiNopBtvn({maBtvn,sbd,onClose}:{maBtvn:string;sbd:strin
  return()=>{alive=false;clearTimeout(timer);abort.abort()}
  },[maBtvn,sbd])
  return createPortal(<dialog ref={ref} onCancel={onClose} style={{width:'min(960px,96vw)',maxHeight:'92dvh',padding:0,border:'1px solid var(--vien)',borderRadius:20,background:'var(--nen)',color:'var(--muc)'}}>
- <header style={{position:'sticky',top:0,zIndex:2,background:'var(--the)',padding:18,display:'flex',gap:16,justifyContent:'space-between',borderBottom:'1px solid var(--vien)'}}><div><b>{data?.hoTen||'Bài đã nộp'} · SBD {sbd}</b>{data&&<p>{data.soDung}/{data.soCau} câu đúng · {new Date(data.nopLuc).toLocaleString('vi-VN')}</p>}</div><button autoFocus className="btn-google-outlined" onClick={onClose}>Đóng</button></header>
+ <header style={{position:'sticky',top:0,zIndex:2,background:'var(--the)',padding:18,display:'flex',gap:16,justifyContent:'space-between',borderBottom:'1px solid var(--vien)'}}><div><b>{data?.hoTen||'Bài đã nộp'} · SBD {sbd}</b>{data&&<p>{data.soDung}/{data.soCau} câu đúng · {new Date(data.nopLuc).toLocaleString('vi-VN', { hour12: false })}</p>}</div><button autoFocus className="btn-google-outlined" onClick={onClose}>Đóng</button></header>
  <div style={{padding:18,display:'grid',gap:16}}>{error?<p role="alert">{error}</p>:!data?<p role="status">Đang tải bài đã nộp…</p>:<>
  <p>Đáp án học sinh đã chọn, đáp án đúng và lời giải của từng câu.</p>
  {(['I','II','III'] as const).map(phan=><section key={phan} style={{display:'grid',gap:14}}><h3>Phần {phan}</h3>{data.source[`phan${phan}`].map((q,i)=>{

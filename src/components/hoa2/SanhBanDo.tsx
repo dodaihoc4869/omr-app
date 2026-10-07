@@ -302,7 +302,6 @@ function DaiVaoThi({ onVaoThi }: { onVaoThi: () => void }) {
     <div className="h2-ca" role="status">
       <span className="h2-ca-chu">
         <span className="h2-ca-lon">Ca kiểm tra đang mở</span>
-        <span className="h2-ca-nho">Bấm Vào thi để làm bài kiểm tra của thầy.</span>
       </span>
       <button type="button" className="h2-nut-ca" onClick={onVaoThi}>
         Vào thi

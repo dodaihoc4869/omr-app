@@ -94,7 +94,7 @@ export default function BtvnM3({
 
       {dangTai ? (
         <div className="btm-ds" aria-busy="true" aria-live="polite">
-          <span className="btm-sr">Đang tải danh sách bài tập...</span>
+          <span className="btm-sr">Đang tải danh sách bài tập…</span>
           <div className="m3-xuong" style={{ height: 160 }} />
           <div className="m3-xuong" style={{ height: 160 }} />
         </div>
@@ -186,7 +186,7 @@ export default function BtvnM3({
                       {dangMo ? (
                         <>
                           <RefreshCw size={18} className="btm-quay" aria-hidden="true" />
-                          <span>Đang mở...</span>
+                          <span>Đang mở…</span>
                         </>
                       ) : (
                         <>

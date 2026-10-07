@@ -1639,7 +1639,7 @@ function GoiLenBangCu() {
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
-          <BookOpenCheck size={16} /> Chữa bài thi & BTVN
+          <BookOpenCheck size={16} /> Chữa bài kiểm tra & BTVN
         </button>
         <button
           type="button"
@@ -1655,7 +1655,7 @@ function GoiLenBangCu() {
       </div>
       {dayHoc ? (
         <p className="text-xs text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/60 -mt-2 leading-relaxed">
-          ✨ <strong>Thuật toán Bậc thang Sư phạm 3 Nấc</strong>: Phân công câu hỏi theo nấc nhận thức (Nấc 1: Khởi động nền tảng cho em yếu/củng cố gốc · Nấc 2: Kỹ năng chuẩn mực cho em khá · Nấc 3: Mở rộng bứt phá bản chất cho em giỏi). Đảm bảo công bằng số lượt lên bảng.
+          <strong>Bậc thang Sư phạm 3 Nấc</strong>: Phân công câu hỏi theo nấc nhận thức và cân bằng số lượt lên bảng.
         </p>
       ) : (
         <p className="text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 -mt-2 leading-relaxed">
@@ -2135,7 +2135,7 @@ function GoiLenBangCu() {
               )}
               {!tomBtvnLop && !loiHoSo && (
                 <div style={{ ...NHAN_NHO, marginTop: 6 }}>
-                  Chưa có dữ liệu bài tập về nhà cho lớp này — đang ghép em bằng bài thi và phiếu khắc phục.
+                  Chưa có dữ liệu bài tập về nhà cho lớp này — đang ghép em bằng bài kiểm tra và phiếu khắc phục.
                 </div>
               )}
               {kqBuoi.thieu && (
@@ -2194,7 +2194,7 @@ function GoiLenBangCu() {
                   style={{ gap: 6, minHeight: 40, fontSize: 'var(--cx-1)' }}
                 >
                   <MonitorPlay size={16} />
-                  <span>{dangMoMayChieu ? 'Đang mở tờ chiếu...' : 'Chiếu lên bảng ngay'}</span>
+                  <span>{dangMoMayChieu ? 'Đang mở tờ chiếu…' : 'Chiếu lên bảng ngay'}</span>
                 </button>
 
                 <button
@@ -2300,7 +2300,7 @@ function GoiLenBangCu() {
             fontSize: 'var(--cx-2)',
           }}
         >
-          <MonitorPlay size={18} /> {dangMoMayChieu ? 'Đang mở tờ chiếu...' : 'Chiếu lên bảng'}
+          <MonitorPlay size={18} /> {dangMoMayChieu ? 'Đang mở tờ chiếu…' : 'Chiếu lên bảng'}
           <span style={{ ...SO, opacity: 0.75, fontWeight: 600 }}>
             {Math.ceil(((kqBuoi && kqBuoi.dong.filter(d => d.tang === 'len_bang' && d.em).length > 0) ? kqBuoi.soEmLenBang : kq.phanCong.length) / 2)} đợt · 2 em mỗi đợt
           </span>

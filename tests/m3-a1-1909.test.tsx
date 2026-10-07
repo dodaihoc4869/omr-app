@@ -164,13 +164,13 @@ describe('ThongBaoHocSinh (chuông + tấm thông báo)', () => {
     expect(screen.queryByRole('dialog', { name: 'Thông báo của em' })).toBeNull()
   })
 
-  it('đang tải: skeleton (không spinner) + chữ "Đang đồng bộ thông báo..."; rồi trống: nguyên văn "Chưa có thông báo nào"', async () => {
+  it('đang tải: skeleton (không spinner) + chữ "Đang đồng bộ thông báo…"; rồi trống: nguyên văn "Chưa có thông báo nào"', async () => {
     let xong: (v: unknown) => void = () => {}
     const cho = new Promise((r) => (xong = r))
     vi.stubGlobal('fetch', vi.fn(async () => { await cho; return { ok: true, status: 200, json: async () => ({ ok: true, items: [], publicKey: '' }) } }))
     render(<ThongBaoHocSinh token="tok" onOpen={() => {}} />)
     fireEvent.click(screen.getByRole('button', { name: 'Thông báo, 0 chưa đọc' }))
-    expect(screen.getByText('Đang đồng bộ thông báo...')).toBeTruthy()
+    expect(screen.getByText('Đang đồng bộ thông báo…')).toBeTruthy()
     expect(document.querySelector('.m3-xuong')).toBeTruthy()
     expect(document.querySelector('.animate-spin')).toBeNull()
     xong(null)

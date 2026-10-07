@@ -56,34 +56,21 @@ describe('locTuLuanKhiMoCa (màn Mở ca)', () => {
     expect(r.nguon).toBe(sach)
     expect(r.soBo).toBe(0)
   })
-  it("'khi_co_cat' (thầy chọn nguyên tờ): phần VỪA ĐỦ số câu mỗi em (không cắt) ⇒ GIỮ NGUYÊN kể cả câu tự luận — đề thầy tự chọn", () => {
-    // mỗi em cần I=3, II=2, III=3 ⇒ đúng bằng số câu của tờ ⇒ không cắt ⇒ không lọc
+  it("'khi_co_cat' (đổi 06/10, thầy 'cấm toàn bộ'): KHÔNG còn ngoại lệ — nguyên tờ thầy chọn vừa đủ số câu cũng bỏ MỌI câu tự luận, y hệt 'luon'", () => {
     const vao = de()
     const r = locTuLuanKhiMoCa(vao, { I: 3, II: 2, III: 3 }, 'khi_co_cat')
-    expect(r.nguon).toBe(vao)
-    expect(r.soBo).toBe(0)
+    const luon = locTuLuanKhiMoCa(vao, { I: 3, II: 2, III: 3 }, 'luon')
+    expect(r.soBo).toBe(4)
+    expect(r.soBoTheoPhan).toEqual(luon.soBoTheoPhan)
+    expect(ids(r.nguon)).toEqual(ids(luon.nguon))
   })
-  it("'khi_co_cat': phần có CẮT NGẪU NHIÊN (nhiều câu hơn số cần) bị lọc, phần vừa đủ giữ nguyên — từng phần độc lập", () => {
-    const vao = de()
-    const r = locTuLuanKhiMoCa(vao, { I: 2, II: 2, III: 3 }, 'khi_co_cat') // phần I 3 > 2 ⇒ lọc; II 2 = 2 ⇒ giữ; III 3 = 3 ⇒ giữ
-    expect(ids(r.nguon)).toEqual(['DE1-I-1', 'DE1-I-3', 'DE1-II-1', 'DE1-II-2', 'DE1-III-1', 'DE1-III-2', 'DE1-III-3'])
-    expect(r.soBoTheoPhan).toEqual({ I: 1, II: 0, III: 0 })
-  })
-  it("'khi_co_cat' không ghi số câu ⇒ dùng luật 18/4/6 cũ: tờ 28 câu vừa đủ giữ nguyên; thêm một câu ⇒ có cắt ⇒ lọc", () => {
-    expect(SO_CAU_MAC_DINH_MOI_EM).toEqual({ I: 18, II: 4, III: 6 })
-    const vua = [nguon('K', Array.from({ length: 18 }, (_, i) => mcq(`K-I-${i}`)), Array.from({ length: 4 }, (_, i) => tf(`K-II-${i}`)), [...Array.from({ length: 5 }, (_, i) => sa(`K-III-${i}`)), saHoiMo('K-III-9')])]
-    const r1 = locTuLuanKhiMoCa(vua, undefined, 'khi_co_cat')
-    expect(r1.nguon).toBe(vua) // 18/4/6 đúng bằng cần ⇒ nguyên tờ
-    const thua = [nguon('K', vua[0].phanI, vua[0].phanII, [...vua[0].phanIII, sa('K-III-10')])] // 7 câu III > 6 ⇒ cắt
-    const r2 = locTuLuanKhiMoCa(thua, undefined, 'khi_co_cat')
-    expect(r2.soBoTheoPhan).toEqual({ I: 0, II: 0, III: 1 })
-    expect(r2.nguon[0].phanIII.map((q) => q.id)).toEqual(['K-III-0', 'K-III-1', 'K-III-2', 'K-III-3', 'K-III-4', 'K-III-10'])
-  })
-  it("'khi_co_cat' cộng số câu của NHIỀU tờ (kho gộp) khi so với số cần", () => {
-    const a = nguon('A', [], [], [sa('A-III-1'), saHoiMo('A-III-2')])
-    const b = nguon('B', [], [], [sa('B-III-1'), sa('B-III-2')])
-    expect(locTuLuanKhiMoCa([a, b], { I: 0, II: 0, III: 4 }, 'khi_co_cat').soBo).toBe(0) // 4 câu = 4 cần ⇒ nguyên
-    expect(locTuLuanKhiMoCa([a, b], { I: 0, II: 0, III: 3 }, 'khi_co_cat').soBo).toBe(1) // 4 > 3 ⇒ cắt ⇒ lọc
+  it("'khi_co_cat' không ghi số câu cũng lọc hết; không có tự luận ⇒ trả CHÍNH mảng vào", () => {
+    const sach = [nguon('K', Array.from({ length: 18 }, (_, i) => mcq(`K-I-${i}`)), Array.from({ length: 4 }, (_, i) => tf(`K-II-${i}`)), Array.from({ length: 6 }, (_, i) => sa(`K-III-${i}`)))]
+    expect(locTuLuanKhiMoCa(sach, undefined, 'khi_co_cat').nguon).toBe(sach)
+    const lan = [nguon('K', sach[0].phanI, sach[0].phanII, [...sach[0].phanIII, saHoiMo('K-III-9')])]
+    const r = locTuLuanKhiMoCa(lan, undefined, 'khi_co_cat')
+    expect(r.soBoTheoPhan).toEqual({ I: 0, II: 0, III: 1 })
+    expect(r.nguon[0].phanIII).toHaveLength(6)
   })
   it('chữ báo thầy khớp số đếm', () => {
     expect(chuBaoBoTuLuan(locTuLuanKhiMoCa(de(), undefined, 'luon').soBo)).toBe('Đã bỏ 4 câu tự luận (chỉ rút câu trắc nghiệm, đúng sai, trả lời ngắn)')
@@ -121,10 +108,6 @@ describe('locTuLuanKhiMoCa (màn Mở ca)', () => {
     const r2 = locTuLuanKhiMoCa([nguon('U', [], [], [sa('U-III-1'), saHoiMo('U-III-2')])], undefined, 'luon')
     expect(canhBaoThieuSauLoc(r2, undefined)).toEqual(['Phần III chỉ còn 1 câu sau khi bỏ câu tự luận, ít hơn 6 câu mỗi em phải làm — chọn thêm đề hoặc giảm số câu ở bước Rút câu.'])
     expect(canhBaoThieuSauLoc(locTuLuanKhiMoCa(vao, { I: 2, II: 2, III: 2 }, 'luon'), { I: 2, II: 2, III: 2 })).toEqual([])
-  })
-  it('vẫn dùng được chế độ khi_co_cat ở nơi khác (hàm giữ nguyên)', () => {
-    const vao = de()
-    expect(locTuLuanKhiMoCa(vao, { I: 3, II: 2, III: 3 }, 'khi_co_cat').soBo).toBe(0)
   })
 })
 
@@ -230,11 +213,11 @@ describe('taoCauGiao: câu tự luận không được gửi lên máy chủ', (
   })
 })
 
-describe('Gọi lên bảng KHÔNG đi qua các bộ lọc này (thầy tự chọn câu nào hiện câu ấy)', () => {
-  it('màn Gọi lên bảng / tờ chiếu không import cau-tu-luan, loc-tu-luan-mo-ca, chonCauBuKho', () => {
-    for (const f of ['src/screens/GoiLenBangScreen.tsx']) {
-      const ma = readFileSync(f, 'utf8')
-      expect(ma, f).not.toMatch(/cau-tu-luan|loc-tu-luan-mo-ca|chonCauBuKho|locTuLuanKhiMoCa/)
-    }
+// 06/10 (thầy): tự luận CHỈ ở Gọi lên bảng phần DẠY HỌC. Màn Gọi lên bảng ngoài Dạy học lọc bằng `boTuLuanKhoiBanDe`; chỉ `locTuLuanKhiMoCa` / `chonCauBuKho` vẫn không dùng ở màn này.
+describe('Gọi lên bảng: chỉ phần Dạy học giữ tự luận', () => {
+  it('màn Gọi lên bảng không import loc-tu-luan-mo-ca / chonCauBuKho nhưng có bộ lọc ngoài Dạy học', () => {
+    const ma = readFileSync('src/screens/GoiLenBangScreen.tsx', 'utf8')
+    expect(ma).not.toMatch(/loc-tu-luan-mo-ca|chonCauBuKho|locTuLuanKhiMoCa/)
+    expect(ma).toMatch(/boTuLuanKhoiBanDe/)
   })
 })

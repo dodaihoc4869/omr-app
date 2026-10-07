@@ -234,13 +234,13 @@ export function autoStructureRawExam(raw: string, fileName: string): AutoStructu
   const hasP2Header = /^ph[aầ]n\s*ii\b/im.test(text)
   const hasP3Header = /^ph[aầ]n\s*iii\b/im.test(text)
   if (hasP1Header && p1QuestionIdx === 0) {
-    notes.push('Phần I: tìm thấy tiêu đề nhưng KHÔNG nhận diện được câu nào bên trong — nội dung có thể vẫn bị dính liền dòng, thầy tự xuống dòng (Enter) trước mỗi "Câu ..." rồi bấm Phân tích đề lại.')
+    notes.push('Phần I: tìm thấy tiêu đề nhưng chưa nhận diện được câu nào bên trong. Thầy xuống dòng trước mỗi "Câu …" rồi bấm Phân tích đề lại.')
   }
   if (hasP2Header && p2QuestionCount === 0) {
-    notes.push('Phần II: tìm thấy tiêu đề nhưng KHÔNG nhận diện được câu nào bên trong — nội dung có thể vẫn bị dính liền dòng, thầy tự xuống dòng (Enter) trước mỗi "Câu ..." rồi bấm Phân tích đề lại.')
+    notes.push('Phần II: tìm thấy tiêu đề nhưng chưa nhận diện được câu nào bên trong. Thầy xuống dòng trước mỗi "Câu …" rồi bấm Phân tích đề lại.')
   }
   if (hasP3Header && p3QuestionCount === 0) {
-    notes.push('Phần III: tìm thấy tiêu đề nhưng KHÔNG nhận diện được câu nào bên trong — nội dung có thể vẫn bị dính liền dòng, thầy tự xuống dòng (Enter) trước mỗi "Câu ..." rồi bấm Phân tích đề lại.')
+    notes.push('Phần III: tìm thấy tiêu đề nhưng chưa nhận diện được câu nào bên trong. Thầy xuống dòng trước mỗi "Câu …" rồi bấm Phân tích đề lại.')
   }
   if (!hasP1Header || !hasP2Header || !hasP3Header) {
     const missing = [!hasP1Header && 'Phần I', !hasP2Header && 'Phần II', !hasP3Header && 'Phần III'].filter(Boolean).join(', ')

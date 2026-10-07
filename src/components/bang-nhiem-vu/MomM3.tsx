@@ -267,7 +267,7 @@ export function MomLamBaiM3({
                 <div className="mom-nhom">
                   <div className="mom-nhap">
                     <label className="mom-nhap-nhan" htmlFor={`mom-tl-${cau.id}`}>Điền câu trả lời ngắn:</label>
-                    <OSoTraLoi id={`mom-tl-${cau.id}`} inputMode="text" value={daChon || ''} onChange={(v) => datTraLoi(cau.id, v)} placeholder="Nhập đáp án số hoặc chữ..." />
+                    <OSoTraLoi id={`mom-tl-${cau.id}`} inputMode="text" value={daChon || ''} onChange={(v) => datTraLoi(cau.id, v)} placeholder="Nhập đáp án số hoặc chữ…" />
                   </div>
                 </div>
               )}

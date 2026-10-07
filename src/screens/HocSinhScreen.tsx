@@ -587,21 +587,6 @@ export default function HocSinhScreen() {
 
       <TongHocPhi tong={tongHp} phamVi={phamViHp} loc={locHocPhi} onLoc={setLocHocPhi} loi={loiHocPhi || undefined} />
 
-      {/* Hướng dẫn quản lý — 2.0 bỏ (hộp hướng dẫn dài). */}
-      {!hoa2 && (
-      <details className="gv-help hs-huong-dan">
-        <summary className="hs-huong-dan-tieu-de">
-          <Sparkles size={16} className="hs-bieu-tuong-nhan" />
-          <span>Hướng dẫn quản lý học sinh theo lớp</span>
-        </summary>
-        <div style={NHAN_NHO} className="hs-huong-dan-than">
-          Mỗi em có các nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, chuyên đề mạnh–yếu) và{' '}
-          <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp), cùng nút{' '}
-          <b style={{ color: 'var(--muc)' }}>Đặt lại mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
-        </div>
-      </details>
-      )}
-
       <TheNoiDung className="gv-directory">
         <div className="gv-filterbar flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>
           <div className="relative flex-1">

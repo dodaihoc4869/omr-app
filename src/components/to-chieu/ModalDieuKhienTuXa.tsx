@@ -165,6 +165,7 @@ export default function ModalDieuKhienTuXa({ maPhien, maPin, tieuDe, onDong }: M
         {/* Link kết nối */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <input
+            aria-label="Liên kết kết nối điều khiển từ xa"
             type="text"
             readOnly
             value={url}

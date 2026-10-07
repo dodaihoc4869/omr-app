@@ -140,6 +140,10 @@ function WinnerCard({ winner: w }: { winner: Winner }) {
             src={image}
             alt={w.nickname || PETS[pet]?.name || 'Thần thú của học sinh'}
             className={isTop1 ? 'honors-spirit-top1-animated' : 'honors-spirit-normal'}
+            width={isTop1 ? 84 : 64}
+            height={isTop1 ? 84 : 64}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <Crown size={isTop1 ? 50 : 40} className={isTop1 ? 'text-amber-400 animate-pulse' : ''} />

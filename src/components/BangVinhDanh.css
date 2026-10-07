@@ -9,6 +9,15 @@
   position: relative;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .honors *,
+  .honors *::before,
+  .honors *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .honors-heading {
   display: flex;
   align-items: center;

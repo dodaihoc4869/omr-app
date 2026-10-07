@@ -38,6 +38,9 @@
     opacity: 0;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .m3 .m3-o-ma[data-dang-go='1']::after { animation: none; }
+}
 
 /* ── phòng chờ: đầu thẻ bỏ dải gradient xanh-lục-chàm → khối primaryContainer (chữ on-primary-container) */
 .m3 .m3-phong-cho-dau {

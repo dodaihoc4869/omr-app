@@ -77,7 +77,7 @@ export default function GiaoDeTheoTuanScreen() {
       <div className="gv-page-header">
         <div>
           <h1>Giao đề theo tuần</h1>
-          <p>Chọn khối → lớp → tick em → tick nguồn đề → hạn chót. Em được tick CHỈ làm câu trong đề đã tick.</p>
+          <p>Chọn lớp, học sinh, nguồn đề và hạn nộp.</p>
         </div>
       </div>
       <TheNoiDung>
@@ -117,13 +117,13 @@ export default function GiaoDeTheoTuanScreen() {
       </TheNoiDung>
       <TheNoiDung>
         <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--k2)', fontWeight: 600 }}>
-          Hạn chót (tối thiểu 7 ngày kể từ lúc giao):
+          Hạn nộp (tối thiểu 7 ngày kể từ lúc giao):
           <input type="date" value={han} onChange={(e) => setHan(e.target.value)} />
         </label>
         <button type="button" className="m3-nut-chu m3-nut-tonal" style={{ marginTop: 'var(--k3)' }} disabled={dangLuu || chonEm.size === 0 || chonDe.size === 0 || !han} onClick={() => void luu()}>
           {dangLuu ? 'Đang lưu…' : 'Lưu lại'}
         </button>
-        {(!han || chonEm.size === 0 || chonDe.size === 0) ? <p style={{ marginTop: 'var(--k2)', color: 'var(--nhat)' }}>Cần chọn ít nhất một em, một nguồn đề và hạn chót.</p> : null}
+        {(!han || chonEm.size === 0 || chonDe.size === 0) ? <p style={{ marginTop: 'var(--k2)', color: 'var(--nhat)' }}>Chọn ít nhất một em, một nguồn đề và hạn nộp.</p> : null}
       </TheNoiDung>
     </div>
   )

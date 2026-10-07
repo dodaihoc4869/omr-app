@@ -81,7 +81,7 @@ describe('thẻ mời trên Bảng nhiệm vụ', () => {
     expect(the.tagName).toBe('BUTTON')
     expect(the.getAttribute('aria-label')).toBe('Lên đường cùng Đoàn Hộ Tống')
     expect(the.textContent).toContain('Lên đường cùng Đoàn Hộ Tống')
-    expect(the.textContent).toContain('Cả lớp cùng hộ tống Linh Tâm. Chạm để vào Sảnh.')
+    expect(the.textContent).toContain('Cả lớp cùng hộ tống Linh Tâm.')
     const lamNgay = container.querySelector('[data-vung="lam-ngay"]')!
     expect(lamNgay).toBeTruthy()
     expect(lamNgay.compareDocumentPosition(the) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -110,7 +110,7 @@ describe('thẻ mời trên Bảng nhiệm vụ', () => {
 
   it('em CHƯA chọn thần thú vẫn thấy thẻ (game tự mở màn chọn thú có lời mời) — lời phụ đổi cho đúng; cạnh thẻ "Chọn thần thú của em"', () => {
     render(goc({ duLieu: duLieu({ doanMo: true, thanThu: null }), onMoThanThu: () => {} }))
-    expect(CARD()!.textContent).toContain('Em chọn một thần thú rồi cùng cả lớp hộ tống Linh Tâm.')
+    expect(CARD()!.textContent).toContain('Chọn thần thú để cùng cả lớp hộ tống Linh Tâm.')
     expect(screen.getByRole('button', { name: 'Chọn thần thú của em' })).toBeTruthy()
   })
 

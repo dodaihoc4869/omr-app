@@ -518,9 +518,9 @@ export default function StudentPortalScreen() {
         </div>
 
         <div style="text-align: center; border-bottom: 2px solid var(--vien, rgb(226, 232, 240)); padding-bottom: 24px; margin-bottom: 28px;">
-          <div style="font-size: 24px; font-weight: 900; color: rgb(234, 67, 53); margin-bottom: 6px; letter-spacing: -0.01em;">💖 KẾT QUẢ BÀI GIA ĐÌNH GIAO</div>
+          <div style="font-size: 24px; font-weight: 900; color: rgb(234, 67, 53); margin-bottom: 6px; letter-spacing: -0.01em;">KẾT QUẢ BÀI GIA ĐÌNH GIAO</div>
           <div style="font-size: 14.5px; color: var(--nhat, rgb(100, 116, 139));">Học sinh: <strong>${auth.hoTen}</strong> (SBD: <strong>${auth.sbd}</strong>) ${auth.lop ? `· Lớp: ${auth.lop}` : ''}</div>
-          <div style="font-size: 13px; color: var(--chim, rgb(148, 163, 184)); margin-top: 4px;">Thời gian nộp: ${new Date().toLocaleString('vi-VN')}</div>
+          <div style="font-size: 13px; color: var(--chim, rgb(148, 163, 184)); margin-top: 4px;">Thời gian nộp: ${new Date().toLocaleString('vi-VN', { hour12: false })}</div>
           <div style="display: inline-block; margin-top: 18px; padding: 12px 32px; background: rgba(234, 67, 53, 0.08); border: 2px solid rgba(234, 67, 53, 0.25); border-radius: 9999px;">
             <span style="font-size: 16px; font-weight: 700; color: rgb(197, 34, 31);">Điểm số: </span>
             <span style="font-size: 32px; font-weight: 900; color: rgb(234, 67, 53);">${diem}</span>
@@ -1338,7 +1338,7 @@ export default function StudentPortalScreen() {
             {dangTaiLichSu ? (
               <div className="p-12 text-center text-slate-400 flex flex-col items-center gap-2">
                 <RefreshCw className="w-6 h-6 animate-spin text-indigo-500" />
-                <span className="text-sm">Đang tải lịch sử thi...</span>
+                <span className="text-sm">Đang tải lịch sử kiểm tra…</span>
               </div>
             ) : dsLichSu.length === 0 ? (
               <div className="p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-center">
@@ -1515,7 +1515,7 @@ export default function StudentPortalScreen() {
             {dangTaiBtvn ? (
               <div className="p-12 text-center text-slate-400 flex flex-col items-center gap-2">
                 <RefreshCw className="w-6 h-6 animate-spin text-indigo-500" />
-                <span className="text-sm">Đang tải danh sách bài tập...</span>
+                <span className="text-sm">Đang tải danh sách bài tập…</span>
               </div>
             ) : dsBtvn.length === 0 ? (
               <div className="p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-center">
@@ -1650,7 +1650,7 @@ export default function StudentPortalScreen() {
                           {dangMoBai === (bt.maBtvn || bt.maCa) ? (
                             <>
                               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                              <span>Đang mở...</span>
+                              <span>Đang mở…</span>
                             </>
                           ) : (
                             <>
@@ -1847,7 +1847,7 @@ export default function StudentPortalScreen() {
                               className="sm:w-80"
                               value={daChon || ''}
                               onChange={(v) => setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: v }))}
-                              placeholder="Nhập đáp án số hoặc chữ..."
+                              placeholder="Nhập đáp án số hoặc chữ…"
                             />
                           </div>
                         )}
@@ -2058,6 +2058,7 @@ export default function StudentPortalScreen() {
                     Mã ca kiểm tra (thường 6 chữ số)
                   </label>
                   <input
+                    aria-label="Mã ca kiểm tra"
                     type="text"
                     value={maCaVaoThi}
                     onChange={(e) => setMaCaVaoThi(e.target.value.replace(/\D/g, ''))}
@@ -2074,10 +2075,11 @@ export default function StudentPortalScreen() {
                     Mật khẩu ca kiểm tra (nếu ca có yêu cầu)
                   </label>
                   <input
+                    aria-label="Mật khẩu ca kiểm tra"
                     type="password"
                     value={matKhauCaVaoThi}
                     onChange={(e) => setMatKhauCaVaoThi(e.target.value)}
-                    placeholder="Nhập mật khẩu ca kiểm tra (để trống nếu không có)..."
+                    placeholder="Để trống nếu ca không có mật khẩu"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                   />
                 </div>

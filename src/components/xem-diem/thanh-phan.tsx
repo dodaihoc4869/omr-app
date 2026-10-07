@@ -175,6 +175,7 @@ export function PhanGon({ p }: { p: PhanKetQua }) {
 }
 
 /** Nút của bộ: chính (đúng MỘT/màn) · tonal · chữ. `href` không dùng: mọi việc là nút. */
+// soi-bo-qua: G08 `...roi` là cú pháp gom thuộc tính, không phải dấu ba chấm hiển thị
 export function NutXd({ kieu = 'chinh', rong = false, bieuTuong, children, ...roi }: { kieu?: 'chinh' | 'tonal' | 'chu'; rong?: boolean; bieuTuong?: ReactNode; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button type="button" {...roi} className={`xd-nut xd-nut--${kieu}${rong ? ' xd-nut--rong' : ''}`}>
@@ -200,4 +201,3 @@ export function ThanhTrenXd({ ten, phu, onQuayLai, quayLai = 'Quay lại' }: { t
     </header>
   )
 }
-

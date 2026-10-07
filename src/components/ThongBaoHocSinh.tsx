@@ -287,7 +287,7 @@ export default function ThongBaoHocSinh({
               <div role="status" className="m3-tb-cho">
                 <div className="m3-xuong" />
                 <div className="m3-xuong" />
-                <span>Đang đồng bộ thông báo...</span>
+                <span>Đang đồng bộ thông báo…</span>
               </div>
             )}
 

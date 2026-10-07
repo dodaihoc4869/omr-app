@@ -321,7 +321,7 @@ export default function DayHocLenBang() {
                         const h = (c.q as any).imageDataUrl || (c.q as any).hinhAnh?.[0]?.src || (c.q as any).hinh?.[0]?.du_lieu || (c.q as any).hinh?.[0]?.src
                         return h ? (
                           <div style={{ marginTop: 6 }}>
-                            <img src={h} alt="Hình câu hỏi" style={{ maxWidth: '100%', maxHeight: 240, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--vien)' }} />
+                            <img src={h} alt="Hình câu hỏi" width={640} height={360} loading="lazy" decoding="async" style={{ maxWidth: '100%', height: 'auto', maxHeight: 240, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--vien)' }} />
                           </div>
                         ) : null
                       })()}

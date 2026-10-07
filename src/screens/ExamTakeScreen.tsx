@@ -2273,7 +2273,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   const baoThayGianLan = (a: ExamAttempt) => {
     const url = scriptUrlRef.current.trim()
     if (!url) return
-    const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    const luc = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
     const lyDo = laLyDoMoi(a.integrity.lyDoKhoa)
       ? `${TEN_LY_DO_KHOA[a.integrity.lyDoKhoa as LyDoKhoaMoi]}${a.integrity.kenhBao ? ` (${a.integrity.kenhBao})` : ''}`
       : a.integrity.lyDoKhoa === 'roi_qua_lau'
@@ -2765,6 +2765,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               <div>
                 <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', marginBottom: 'var(--k2)' }}>Số báo danh</div>
                 <input
+                  aria-label="Số báo danh"
                   className="tap-target w-full"
                   style={{
                     height: 52,
@@ -2775,7 +2776,6 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     fontFamily: 'var(--serif)',
                     fontSize: 'var(--cx-3)',
                     color: 'var(--muc)',
-                    outline: 'none',
                   }}
                   placeholder="Số báo danh"
                   value={sbd}
@@ -2799,6 +2799,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     Mật khẩu ca thi (nếu ca yêu cầu)
                   </div>
                   <input
+                    aria-label="Mật khẩu ca kiểm tra"
                     className="tap-target w-full"
                     type="password"
                     style={{
@@ -2810,7 +2811,6 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                       fontFamily: 'var(--sans)',
                       fontSize: 'var(--cx-2)',
                       color: 'var(--muc)',
-                      outline: 'none',
                     }}
                     placeholder="Để trống nếu ca không đặt mật khẩu"
                     value={matKhauCa}
@@ -3140,7 +3140,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       )
     }
     const soDaLam = attempt && assignment ? flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length : null
-    const gioNop = attempt?.submittedAt ? new Date(attempt.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''
+    const gioNop = attempt?.submittedAt ? new Date(attempt.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false }) : ''
     // Số liệu cho màn kết quả sau nộp (lib/ket-qua-sau-nop.ts): chỉ đọc điểm ĐÃ chấm bằng luật chính thức; lịch sử chưa về ⇒ ẩn chip "so với lần trước".
     const phanKq = graded ? phanTuDiem(graded.score) : []
     const dungTong = tongDungTong(phanKq)
@@ -3290,7 +3290,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     {classify(graded.score.total)}
                   </div>
                 </div>
-                <button onClick={() => setGradedPopup(false)} className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 32, height: 32, background: 'var(--the-2)', color: 'var(--nhat)' }}>
+                <button type="button" aria-label="Đóng kết quả bài thi" onClick={() => setGradedPopup(false)} className="shrink-0 flex items-center justify-center rounded-full" style={{ width: 44, height: 44, background: 'var(--the-2)', color: 'var(--nhat)' }}>
                   <X size={16} />
                 </button>
               </div>
@@ -3823,7 +3823,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         style={{ height: 56, background: 'var(--the-mo)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}
       >
         <div className="absolute left-0 top-0 w-full" style={{ height: 3, background: 'var(--vien)' }}>
-          <div style={{ height: 3, width: `${total ? (daLamCount / total) * 100 : 0}%`, background: 'var(--xanh)', transitionProperty: 'width', transitionDuration: 'var(--nhanh)' }} />
+          <div style={{ height: 3, width: `${total ? (daLamCount / total) * 100 : 0}%`, background: 'var(--xanh)' }} />
         </div>
         <span className="absolute rounded-full" style={{ top: 8, right: 8, width: 6, height: 6, background: dotColor }} title={dotLabel} aria-label={dotLabel} />
         <div className="h-full flex items-center justify-between" style={{ padding: '0 var(--k4)' }}>

@@ -15,3 +15,12 @@
 .escort-hud-luot{position:sticky;top:calc(var(--spirit-dau-cao,env(safe-area-inset-top,0px)) + 8px);z-index:8;gap:2px 12px;padding:8px 14px;margin:0 0 8px;border-radius:14px;background:var(--the);color:var(--muc);box-shadow:0 0 0 1px var(--vien),0 6px 16px rgba(0,0,0,.14);font-size:14px;line-height:1.35}
 .escort-hud-luot strong{font-size:15px;font-variant-numeric:tabular-nums}
 .escort-hud-luot span{font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+
+/* Vùng chạm tối thiểu cho nút đóng trên màn cảm ứng. */
+.spirit-game .escort-menu-close,
+.spirit-game .escort-cell-menu .escort-menu-close {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+}

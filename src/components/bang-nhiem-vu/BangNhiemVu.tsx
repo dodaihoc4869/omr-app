@@ -205,7 +205,7 @@ export default function BangNhiemVu({
         </span>
         <span className="bnv-doan-chu">
           <span className="bnv-doan-ten">Lên đường cùng Đoàn Hộ Tống</span>
-          <span className="bnv-doan-phu">{chuaChonThu ? 'Em chọn một thần thú rồi cùng cả lớp hộ tống Linh Tâm.' : 'Cả lớp cùng hộ tống Linh Tâm. Chạm để vào Sảnh.'}</span>
+          <span className="bnv-doan-phu">{chuaChonThu ? 'Chọn thần thú để cùng cả lớp hộ tống Linh Tâm.' : 'Cả lớp cùng hộ tống Linh Tâm.'}</span>
         </span>
         <ChevronRight size={24} aria-hidden="true" />
       </button>

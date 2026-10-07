@@ -192,7 +192,7 @@ export default function PhieuV3({ du, laCuaEm = false, xinLink }: { du: PhieuDay
               </>
             ) : (
               <>
-                {soSai > 0 ? `Sai ${soSai} câu` : 'Bài thi đã hoàn thành'}
+                {soSai > 0 ? `Sai ${soSai} câu` : 'Bài kiểm tra đã hoàn thành'}
               </>
             )}
           </div>
