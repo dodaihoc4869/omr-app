@@ -24,7 +24,7 @@ jobs:
       - run: npx vitest run tests/chua-cau-sai-chieu.test.ts tests/chua-cau-sai-chieu-giao-dien.test.tsx tests/chua-cau-sai-chat-luong.test.ts tests/chua-cau-sai-giao-dien.test.tsx tests/chua-cau-sai-0710.test.ts tests/tu-luyen-may-chu-2909.test.ts tests/tu-luyen-kho-sai-chung-3009.test.ts tests/tu-luyen-sua-cau-sai-3009.test.ts tests/reset-toan-app-1909.test.ts tests/reset-hoa2-2709.test.ts tests/nut-hoi-thay-2909.test.tsx tests/khong-cu-phap-may-cu-2109.test.ts tests/cnh-1-0-su-kien-chuan.test.ts tests/che-do-da-dung-0210.test.ts tests/ke-ho-ca-kiem-tra-0610.test.ts
       - run: npx vitest run --config vitest.config.d1.ts tests/d1-runtime-chua-cau-sai.test.ts
       - run: npx vitest run tests/migration-chua-cli.test.ts
-      - run: npx vitest run tests/chua-d1-van-hanh.test.ts
+      - run: npx vitest run tests/chua-d1-van-hanh.test.ts tests/doi-pages-song.test.ts
       - run: npx esbuild scripts/bat-vong-chua-0710.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/chua-bat.mjs --log-level=warning
       - run: npx playwright install --with-deps chromium
       - run: node scripts/kiem-chua-trinh-duyet.mjs
