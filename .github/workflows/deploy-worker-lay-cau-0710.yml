@@ -1,0 +1,63 @@
+name: Deploy Worker và lấy câu mẫu D1 (song sinh 0710)
+# Workflow chỉ chạy theo yêu cầu thủ công: deploy Worker với endpoint
+# xuatCauChoSinh mới, rồi query D1 lấy 60 câu mẫu (tn/ds/tln) và
+# commit kết quả vào nhánh để pipeline soạn song sinh đọc.
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  deploy-va-lay-cau:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/laughing-bohr-1ixzp4
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch cấu hình Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Deploy Worker (máy chủ — endpoint xuatCauChoSinh mới)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: deploy
+          workingDirectory: server
+      - name: Query D1 lấy 60 câu mẫu (tn / ds / tln, không phải tự luận)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          mkdir -p .may-soan
+          SQL="SELECT l.qid, l.bam, l.ma_de, l.dang, l.lop, l.bo, q.json FROM loi_giai_cau l JOIN game_v2_question q ON q.qid = l.qid AND q.ma_de = l.ma_de JOIN de_kho d ON d.ma_de = l.ma_de AND d.da_xoa = 0 WHERE l.dang IN ('tn','ds','tln') ORDER BY l.qid LIMIT 60"
+          npx -y wrangler@latest d1 execute omr --remote --command "$SQL" --json \
+            > .may-soan/cau-raw-d1.json
+          node -e "
+          const fs = require('fs');
+          const raw = JSON.parse(fs.readFileSync('.may-soan/cau-raw-d1.json','utf8'));
+          const rows = (raw[0]?.results || []).map(r => {
+            try { return { ...r, json: JSON.parse(r.json) }; }
+            catch { return null; }
+          }).filter(Boolean);
+          const dangs = {};
+          rows.forEach(r => { dangs[r.dang] = (dangs[r.dang]||0)+1; });
+          console.log('Lay duoc', rows.length, 'cau:', JSON.stringify(dangs));
+          fs.writeFileSync('.may-soan/cau-mau-d1.json', JSON.stringify(rows, null, 2));
+          "
+      - name: Commit câu mẫu vào nhánh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .may-soan/cau-mau-d1.json
+          git diff --cached --quiet && echo "Khong co thay doi" || \
+            git commit -m "ci: câu mẫu D1 $(date -u '+%d/%m %H:%M') [skip ci]"
+          git push origin HEAD:claude/laughing-bohr-1ixzp4
