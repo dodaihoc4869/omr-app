@@ -28,22 +28,62 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 2}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
       - run: npm ci
 
       # CỔNG KIỂM CHẠY TRƯỚC, ghi nhận kết quả và không chặn phát hành bản mới
       - run: npm run check:mau
         continue-on-error: true
+      # Bộ toàn repo vừa chạy nếu cây mã chạy không đổi: sửa kiểm phát hành không cần lặp 15 phút.
+      # Đối chiếu toàn bộ đợt push, không chỉ commit cuối; không đọc được mốc thì chạy toàn bộ.
+      - name: Xác định thay đổi mã chạy
+        id: pham-vi
+        env:
+          MOC_TRUOC: ${{ github.event.before }}
+          SU_KIEN: ${{ github.event_name }}
+        run: |
+          TOAN_BO=true
+          if [[ "$SU_KIEN" == push && "$MOC_TRUOC" =~ ^[a-f0-9]{40}$ && "$MOC_TRUOC" != 0000000000000000000000000000000000000000 ]]; then
+            if git fetch --no-tags --depth=1 origin "$MOC_TRUOC"; then
+              git diff --name-only "$MOC_TRUOC" HEAD -- src server public package.json package-lock.json tsconfig.json tsconfig.app.json tsconfig.node.json > /tmp/chua-ma-doi.txt
+              if rg -q . /tmp/chua-ma-doi.txt; then
+                TOAN_BO=true
+              else
+                TOAN_BO=false
+              fi
+            fi
+          fi
+          echo "toan-bo=$TOAN_BO" >> "$GITHUB_OUTPUT"
+          echo "Kiểm toàn repo: $TOAN_BO"
       - run: npm test -- --run
+        if: steps.pham-vi.outputs.toan-bo == 'true'
+        timeout-minutes: 30
         continue-on-error: true
+      # Công cụ bật cờ/receipt và hợp đồng điều hướng luôn kiểm; đóng gói/PWA kiểm bằng build:cf.
+      - name: Kiểm hợp đồng vận hành và tệp kiểm thử vừa đổi
+        env:
+          MOC_TRUOC: ${{ github.event.before }}
+          TOAN_BO: ${{ steps.pham-vi.outputs.toan-bo }}
+        run: |
+          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx)
+          if [[ "$TOAN_BO" == false ]]; then
+            git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
+            while IFS= read -r TEP; do
+              if [[ "$TEP" == *.test.ts || "$TEP" == *.test.tsx ]]; then
+                if [[ " ${KIEM[*]} " != *" $TEP "* ]]; then KIEM+=("$TEP"); fi
+              fi
+            done < /tmp/chua-test-doi.txt
+          fi
+          npx vitest run "${KIEM[@]}"
 
       # KHÔNG đặt GITHUB_PAGES: cờ đó đổi địa chỉ gốc thành /omr-app/, chỉ đúng
       # cho GitHub Pages. Đặt nhầm thì pages.dev tải tài nguyên sai đường và mở
       # ra trang trắng.
-      - run: npm run build
+      - run: npm run build:cf
 
       # Secret dán thừa dòng/khoảng trắng làm wrangler hỏng ("invalid header value", run 499):
       # làm sạch một lần rồi mới đưa cho hai bước đẩy. Không in giá trị khoá.
