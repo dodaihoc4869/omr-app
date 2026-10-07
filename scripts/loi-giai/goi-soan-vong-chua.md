@@ -25,4 +25,10 @@ Chỉ điền các trường thích hợp. Trắc nghiệm đáp án A–D, tố
 
 `banGhepBai` có ít nhất 2 bản, `loai:"ghep_bai"`; `banKiemChung` có ít nhất 2 bản, `loai:"kiem_chung"`. Tất cả `laTuongDuong:true`, giữ đúng phần và độ khó của câu gốc: I là 4 phương án, II là 4 ý, III trả lời số. **Quy tắc `kyNang` bắt buộc:** trường `kyNang` của MỖI bản toàn bài phải là HỢP ĐẦY ĐỦ của mọi `viKyNang` từ TẤT CẢ các bước — không được bỏ sót một kỹ năng nào. Cách làm đúng: gộp tất cả `viKyNang` của bước 0, bước 1, bước 2,… thành một tập (loại trùng), rồi điền nguyên tập đó vào `kyNang` của từng bản toàn bài. Câu kiểm chứng độc lập phải mới cả số/chất/tình huống so với câu gốc, câu ghép và mọi câu nhỏ. Đổi mã hoặc đảo phương án của đề cũ không thành đề mới. Không tráo bài phức tạp thành một câu nền dễ hơn để ghi đạt.
 
+**Kiểm tra bắt buộc trước khi viết mỗi bản ghép/kiểm chứng — thiếu một tiêu chí thì thay bản khác:**
+1. **Hoá học hợp lệ**: mọi phản ứng, muối, chất trung gian trong bản này phải thực sự tồn tại (ví dụ: (NH₄)₃PO₄ không bền trong dd nước; không dùng).
+2. **Cùng số bước tính**: cùng số bước tính toán với câu gốc — không đơn giản hóa hay thêm bước phụ.
+3. **Giữ nguyên bẫy/trap**: nếu câu gốc có bẫy (ảnh IR, hệ số phản ứng ẩn, hiệu suất không rõ, đơn vị khác thường…), bản thay thế phải giữ đúng dạng bẫy tương tự — không bỏ bẫy để câu dễ hơn.
+4. **Cùng kỹ năng từng bước**: mỗi bước trong bản này kiểm đúng kỹ năng `viKyNang` tương ứng như câu gốc — không chuyển sang cơ chế hoá học khác loại.
+
 Không đưa đáp án vào đề hay gọi học liệu là “đã thầy duyệt”. Không tự tạo hồ sơ kiểm. Cổng ngoài sẽ giải mù từng câu và soát chuyên môn riêng; chỉ bộ đủ điều kiện mới được nạp.
