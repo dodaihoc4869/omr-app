@@ -18,7 +18,7 @@ interface ThongKeKpi {
   loi?: string
 }
 
-export default function KpiChuaCauSai({ token }: { token: string }) {
+export default function KpiChuaCauSai() {
   const [dang, setDang] = useState(true)
   const [du, setDu] = useState<ThongKeKpi | null>(null)
   const [loi, setLoi] = useState('')
@@ -30,9 +30,7 @@ export default function KpiChuaCauSai({ token }: { token: string }) {
       const goc = await layDiaChiMayChu()
       if (!goc || huy) return
       try {
-        const r = await fetch(`${goc}/gv/chua-cau-sai/thong-ke`, {
-          headers: { 'x-token': token },
-        })
+        const r = await fetch(`${goc}/gv/chua-cau-sai/thong-ke`)
         const j = (await r.json()) as ThongKeKpi
         if (!huy) { setDu(j); if (!j.ok) setLoi(j.loi ?? 'Lỗi tải thống kê.') }
       } catch {
@@ -42,7 +40,7 @@ export default function KpiChuaCauSai({ token }: { token: string }) {
       }
     })()
     return () => { huy = true }
-  }, [token])
+  }, [])
 
   if (dang) return <div className="ccs-dang-tai">Đang tải KPI…</div>
   if (loi) return <p className="ccs-loi">{loi}</p>
