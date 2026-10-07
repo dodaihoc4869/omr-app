@@ -11,6 +11,7 @@ import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import { voiHanCho } from '../lib/han-cho'
 import type { hsDangNhapApi, hsDatMatKhauApi } from '../lib/hs-dang-nhap-api'
 import type { KemDangNhap, ThongTinHs } from '../lib/phien-hoc-sinh'
+import { layGhiChuPhienHong } from '../lib/phien-hong'
 
 export interface ApiDangNhapHs {
   dangNhap: typeof hsDangNhapApi
@@ -37,7 +38,8 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
   const [matKhauInput, setMatKhauInput] = useState('')
   const [hienMatKhau, setHienMatKhau] = useState(false)
   const [dangXuLyDangNhap, setDangXuLyDangNhap] = useState(false)
-  const [loiDangNhap, setLoiDangNhap] = useState('')
+  // Vừa bị đưa về đây vì phiên cũ hỏng (mã máy chủ đổi, hết hạn, mật khẩu đã đổi) ⇒ dòng giải thích hiện MỘT lần.
+  const [loiDangNhap, setLoiDangNhap] = useState(() => layGhiChuPhienHong())
 
   // Đặt mật khẩu lần đầu
   const [chuaCoMatKhau, setChuaCoMatKhau] = useState(false)
