@@ -43,6 +43,18 @@ export async function dongBoTuLuyen(
     .bind(sbd)
     .all<{ qid: string; luc: string }>()
   const gio = (await docLuatChua(env, sbd)).gioDocLoiGiai
+  // Tối đa sáu cặp receipt/sổ trong một batch. Mỗi cặp vẫn nằm liền nhau để
+  // changes() chỉ nhìn INSERT receipt của chính nó; retry không ghi lại sổ.
+  const choGhi: ReturnType<Env['DB']['prepare']>[] = []
+  const ghiCho = async () => {
+    if (!choGhi.length) return true
+    try {
+      await env.DB.batch(choGhi.splice(0))
+      return true
+    } catch {
+      return false
+    }
+  }
   for (const r of rows.results ?? []) {
     const c = rieng.find((x) => x.qid === r.qid)
     if (!c) return false
@@ -79,17 +91,15 @@ export async function dongBoTuLuyen(
       maDang: str(c.dangMa),
       raw,
     }
-    try {
-      await env.DB.batch([
-        env.DB.prepare(
-          'INSERT OR IGNORE INTO chua_loi_tu_receipt(luot_id,qid,sbd,luc,assistance,raw_json) VALUES(?,?,?,?,?,?)',
-        ).bind(luotId, qid, sbd, t, assistance, JSON.stringify(raw)),
-        lenhGhiSuKienNguyenTu(env, [e], { sql: 'changes()=1', params: [] }),
-      ])
-    } catch {
-      return false
-    }
+    choGhi.push(
+      env.DB.prepare(
+        'INSERT OR IGNORE INTO chua_loi_tu_receipt(luot_id,qid,sbd,luc,assistance,raw_json) VALUES(?,?,?,?,?,?)',
+      ).bind(luotId, qid, sbd, t, assistance, JSON.stringify(raw)),
+      lenhGhiSuKienNguyenTu(env, [e], { sql: 'changes()=1', params: [] }),
+    )
+    if (choGhi.length === 12 && !(await ghiCho())) return false
   }
+  if (!(await ghiCho())) return false
   emCoGhi(sbd)
   return true
 }

@@ -5,6 +5,8 @@ import type { Env } from '../server/src/kieu'
 import { seedChua, Q } from './_chua-cau-sai-fixture'
 import { moDot, phatItem, nopItem } from '../server/src/chua-cau-sai'
 import { hangChieu, daChuaTrenLop } from '../server/src/chua-cau-sai-chieu'
+import { dongBoTuLuyen } from '../server/src/chua-cau-sai-tu-luyen'
+import { damBaoBangTuLuyen } from '../server/src/tu-luyen'
 const E = { ...(env as unknown as Env), MA_BI_MAT: 'bi-mat-test-cuc-bo' } as Env
 let token = '',
   dotId = '',
@@ -171,5 +173,53 @@ describe('Vòng chữa trên workerd/D1', () => {
       .first<any>()
     expect(dot.revision).toBe(g.em[0].revision + 1)
     expect(dot.trang_thai_day).toBe('dang_chua_buoc')
+  })
+})
+
+describe('Đồng bộ Tu luyện theo lô trên workerd/D1', () => {
+  const luot = 'tl_runtime_batch'
+  const T = Date.parse('2026-10-07T03:00:00Z')
+  it('13 câu qua ba batch giữ giờ/đáp án đầu; retry và dữ liệu đã có không ghi đôi sổ', async () => {
+    await damBaoBangTuLuyen(E)
+    const ds = Array.from({ length: 13 }, (_, i) => ({ qid: `DH-12-C1-B1-III-${900+i}`, dangMa: 'M', phan: 'III' }))
+    await E.DB.prepare('INSERT INTO tu_luyen_luot(id,sbd,che_do,de_rieng_json,tao_luc) VALUES(?,\'HS1\',3,?,?)').bind(luot,JSON.stringify(ds),T).run()
+    // Một câu giữa lô đã được chấm riêng và đồng bộ trước khi nộp cả bài.
+    await E.DB.prepare("INSERT INTO tu_luyen_cham_cau(luot_id,sbd,qid,tra_loi,dung,diem,luc) VALUES(?,'HS1',?,'dap-an-3',1,0,?)").bind(luot,ds[3].qid,T+3).run()
+    expect(await dongBoTuLuyen(E,'HS1',luot)).toBe(true)
+    await E.DB.batch(ds.map((q,i) => E.DB.prepare("INSERT OR IGNORE INTO tu_luyen_cham_cau(luot_id,sbd,qid,tra_loi,dung,diem,luc) VALUES(?,'HS1',?,?,?,0,?)").bind(luot,q.qid,`dap-an-${i}`,i%2,T+i)))
+    const batchGoc = E.DB.batch.bind(E.DB)
+    const kichThuoc: number[] = []
+    const db = new Proxy(E.DB, { get(target,key) {
+      if (key === 'batch') return async (statements: D1PreparedStatement[]) => { kichThuoc.push(statements.length); return batchGoc(statements) }
+      const value = Reflect.get(target,key)
+      return typeof value === 'function' ? value.bind(target) : value
+    } })
+    const e = {...E,DB:db}
+    expect(await dongBoTuLuyen(e,'HS1',luot)).toBe(true)
+    expect(kichThuoc).toEqual([12,12,2])
+    const dem = async () => (await E.DB.prepare("SELECT COUNT(*) AS n FROM su_kien_hoc WHERE nguon='tu_luyen' AND ma_nguon=?").bind(luot).first<any>()).n
+    expect(await dem()).toBe(13)
+    expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM chua_loi_tu_receipt WHERE luot_id=?').bind(luot).first<any>()).n).toBe(13)
+    const truoc = await E.DB.prepare("SELECT qid,luc,raw_json FROM su_kien_hoc WHERE nguon='tu_luyen' AND ma_nguon=? ORDER BY qid").bind(luot).all()
+    expect(await dongBoTuLuyen(e,'HS1',luot)).toBe(true)
+    expect(await dem()).toBe(13)
+    expect((await E.DB.prepare("SELECT qid,luc,raw_json FROM su_kien_hoc WHERE nguon='tu_luyen' AND ma_nguon=? ORDER BY qid").bind(luot).all()).results).toEqual(truoc.results)
+    expect(truoc.results[0].luc).toBe(new Date(T).toISOString())
+    expect(JSON.parse(String(truoc.results[0].raw_json)).traLoi).toBe('dap-an-0')
+  })
+  it('lỗi ghi sổ giữa một lô rollback cả receipt và các sự kiện trước nó', async () => {
+    const id='tl_runtime_batch_fail'
+    const ds=[{qid:'DH-12-C1-B1-III-980'},{qid:'DH-12-C1-B1-III-981'}]
+    await E.DB.prepare("INSERT INTO tu_luyen_luot(id,sbd,che_do,de_rieng_json,tao_luc) VALUES(?,'HS1',3,?,?)").bind(id,JSON.stringify(ds),T).run()
+    await E.DB.batch(ds.map(q=>E.DB.prepare("INSERT INTO tu_luyen_cham_cau(luot_id,sbd,qid,tra_loi,dung,diem,luc) VALUES(?,'HS1',?,'23',0,0,?)").bind(id,q.qid,T)))
+    await E.DB.exec("CREATE TRIGGER chua_batch_loi_test BEFORE INSERT ON su_kien_hoc WHEN NEW.ma_nguon='tl_runtime_batch_fail' AND NEW.qid='DH-12-C1-B1-III-981' BEGIN SELECT RAISE(ABORT,'loi-test'); END")
+    try {
+      expect(await dongBoTuLuyen(E,'HS1',id)).toBe(false)
+      expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM chua_loi_tu_receipt WHERE luot_id=?').bind(id).first<any>()).n).toBe(0)
+      expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM su_kien_hoc WHERE ma_nguon=?').bind(id).first<any>()).n).toBe(0)
+    } finally { await E.DB.exec('DROP TRIGGER chua_batch_loi_test') }
+    expect(await dongBoTuLuyen(E,'HS1',id)).toBe(true)
+    expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM chua_loi_tu_receipt WHERE luot_id=?').bind(id).first<any>()).n).toBe(2)
+    expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM su_kien_hoc WHERE ma_nguon=?').bind(id).first<any>()).n).toBe(2)
   })
 })
