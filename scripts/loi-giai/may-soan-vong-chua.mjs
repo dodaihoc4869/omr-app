@@ -36,10 +36,11 @@ function run(dir,prompt,maxTurns=70){
   return new Promise((resolve,reject)=>{
     const p=spawn('claude',args,{cwd:dir,env,stdio:['pipe','pipe','pipe']})
     let bytes=0
+    const timeout=setTimeout(()=>p.kill('SIGTERM'),30*60000)
     p.stdout.on('data',d=>{bytes+=d.length})
     p.stderr.on('data',()=>{})
-    p.on('error',()=>reject(Error('Không khởi động được Claude.')))
-    p.on('close',code=>code===0&&bytes>0 ? resolve() : reject(Error('Phiên soạn/kiểm chưa hoàn thành.')))
+    p.on('error',()=>{clearTimeout(timeout);reject(Error('Không khởi động được Claude.'))})
+    p.on('close',code=>{clearTimeout(timeout);code===0&&bytes>0 ? resolve() : reject(Error('Phiên soạn/kiểm chưa hoàn thành.'))})
     p.stdin.end(prompt)
   })
 }
@@ -101,9 +102,10 @@ async function main(){
   const daLam=[]
   let dat=0,truot=0
   for(;;){
-    const {viec}=await api('/kho/may-soan/vong-chua-viec',{so:1,daLam})
+    if(daLam.length>=5000){console.log(JSON.stringify({dat,truot,hetHangTrongLuot:false,datGioiHanLuot:true}));break}
+    const {viec,coNguonChuaHoTro}=await api('/kho/may-soan/vong-chua-viec',{so:1,daLam})
     if(!viec.length){
-      console.log(JSON.stringify({dat,truot,hetHangTrongLuot:true}))
+      console.log(JSON.stringify({dat,truot,hetHangTrongLuot:!coNguonChuaHoTro,coNguonChuaHoTro:!!coNguonChuaHoTro}))
       if(motLan||thu) break
       // Chương trình nền hỏi lại; không phải lệnh chờ của agent.
       await new Promise(resolve=>setTimeout(resolve,300000));daLam.length=0;continue

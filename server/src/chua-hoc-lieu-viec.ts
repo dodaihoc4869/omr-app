@@ -9,7 +9,7 @@ export async function viecVongChua(env:Env,b:Record<string,unknown>) {
     COUNT(*) AS soDot FROM chua_loi_dot e JOIN game_v2_question q ON q.qid=e.qid_chuan
     JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
     LEFT JOIN loi_giai_cau l ON l.qid=q.qid LEFT JOIN cau_bo_tro bt ON bt.bam=l.bam
-    WHERE e.dong_luc IS NULL AND COALESCE(d.da_xoa,0)=0 AND json_extract(q.json,'$.reviewed')=1
+    WHERE e.dong_luc IS NULL AND COALESCE(d.da_xoa,0)=0 AND json_extract(q.json,'$.reviewed')=1 AND COALESCE(json_extract(q.json,'$.tuLuan'),0)<>1
       AND q.qid NOT IN (SELECT value FROM json_each(?))
       AND NOT EXISTS(SELECT 1 FROM chua_loi_hoc_lieu h WHERE h.qid_chuan=q.qid AND h.content_version=q.version AND h.trang_thai='du_dung')
     GROUP BY q.qid ORDER BY soDot DESC,q.qid LIMIT ?`).bind(JSON.stringify(daLam),so*4).all<Record<string,unknown>>()
@@ -17,5 +17,5 @@ export async function viecVongChua(env:Env,b:Record<string,unknown>) {
   const viec=(r.results??[]).map(x=>({cau:parse(x.json,null) as PrivateQuestion|null,
     daCo:{songSinh:parse(x.song_sinh_json,[]),cauKiem:parse(x.cau_kiem_json,[]),nhanNen:parse(x.nhan_nen_json,[]),buoc:parse(x.buoc_json,[])}}))
     .filter(x=>x.cau?.reviewed===true && !laCauTuLuan(x.cau)).slice(0,so)
-  return {ok:true,viec}
+  return {ok:true,viec,coNguonChuaHoTro:(r.results?.length??0)>0 && viec.length===0}
 }
