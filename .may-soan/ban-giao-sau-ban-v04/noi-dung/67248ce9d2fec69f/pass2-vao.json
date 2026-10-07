@@ -1,0 +1,81 @@
+{
+  "cau": {
+    "de": "",
+    "loai": "goc",
+    "dang": "tn"
+  },
+  "muc": [
+    {
+      "id": "67248ce9d2fec69f_ss1",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "thí nghiệm ống tia âm cực của j.j. thomson năm 1897 đã không chứng minh được điều nào sau đây?",
+      "pa": {
+        "A": "Electron có khối lượng tương đương khối lượng hạt nhân nguyên tử.",
+        "B": "Tia âm cực bị lệch về phía bản cực dương khi đặt trong điện trường ngoài.",
+        "C": "Electron mang điện tích âm.",
+        "D": "Electron là thành phần cấu tạo có trong nguyên tử của nhiều nguyên tố khác nhau."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss2",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Từ thí nghiệm ống tia âm cực, J.J. Thomson kết luận rằng electron là hạt cơ bản có điện tích âm. Phát biểu nào sau đây về electron KHÔNG phải kết luận rút ra từ thí nghiệm đó?",
+      "pa": {
+        "A": "Tia âm cực bị lệch về phía bản tích điện dương → electron mang điện tích âm.",
+        "B": "Electron có khối lượng tương đương khối lượng nguyên tử hydrogen.",
+        "C": "Tỉ lệ e/m của tia âm cực không phụ thuộc vào vật liệu làm cathode.",
+        "D": "Electron là thành phần cấu tạo chung của mọi nguyên tử vật chất."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss3",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Trong thí nghiệm ống tia âm cực của Thomson, nhận xét nào sau đây về tia âm cực là SAI?",
+      "pa": {
+        "A": "Tia âm cực bị lệch về phía bản tích điện dương trong điện trường ngoài.",
+        "B": "Tỉ lệ điện tích/khối lượng (e/m) của tia âm cực như nhau dù dùng cathode bằng kim loại nào.",
+        "C": "Tia âm cực đi theo đường thẳng trong mọi điều kiện và không bị từ trường làm lệch hướng.",
+        "D": "Khi không có điện trường hay từ trường ngoài, tia âm cực truyền thẳng từ cathode sang anode."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss4",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Phát biểu nào sau đây về thí nghiệm tia âm cực của Thomson (1897) là ĐÚNG?",
+      "pa": {
+        "A": "Thomson đo trực tiếp điện tích của electron bằng thí nghiệm giọt dầu tích điện.",
+        "B": "Tia âm cực chỉ xuất hiện khi dùng hydrogen làm khí trong ống phóng điện.",
+        "C": "Tỉ lệ e/m của tia âm cực thay đổi tùy theo loại khí chứa trong ống.",
+        "D": "Tỉ lệ điện tích/khối lượng (e/m) của tia âm cực không phụ thuộc vào vật liệu cathode hay loại khí trong ống."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss5",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "phát biểu nào sau đây về các nhà khoa học và đóng góp của họ trong nghiên cứu cấu tạo nguyên tử là đúng?",
+      "pa": {
+        "A": "J.J. Thomson phát hiện ra electron năm 1897 nhờ nghiên cứu tia âm cực trong ống phóng điện.",
+        "B": "E. Rutherford phát hiện ra hạt electron khi bắn hạt alpha vào lá vàng mỏng.",
+        "C": "N. Bohr xác định điện tích hạt electron bằng thí nghiệm giọt dầu trong điện trường.",
+        "D": "H. Becquerel đề xuất mô hình nguyên tử hành tinh sau khi phân tích quang phổ của hydrogen."
+      }
+    },
+    {
+      "id": "67248ce9d2fec69f_ss6",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "phát biểu nào sau đây về lịch sử khám phá cấu tạo nguyên tử là sai?",
+      "pa": {
+        "A": "Becquerel phát hiện hiện tượng phóng xạ tự nhiên (1896) trước khi Thomson công bố phát hiện electron (1897).",
+        "B": "Mô hình nguyên tử Rutherford, công bố năm 1911, dựa trên thí nghiệm tán xạ hạt alpha của Geiger và Marsden (thực hiện 1909–1910).",
+        "C": "Thomson đề xuất mô hình nguyên tử có hạt nhân nhỏ tích điện dương nằm ở trung tâm, electron chuyển động xung quanh.",
+        "D": "Bohr giải thích thành công quang phổ vạch của hydrogen bằng mô hình nguyên tử với các quỹ đạo electron xác định (1913)."
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "version": "v0.4",
+  "date": "2026-10-07",
+  "session": "e72dc258-9785-5f2f-9a07-8d16d3b02a30",
+  "tong_ung_vien": 42,
+  "thay_doi": [
+    {
+      "loai": "loi_bat_buoc",
+      "mo_ta": "cach doi_chiet → dao_chieu cho Thomson ss2/ss3/ss4",
+      "anh_huong": "3 ứng viên"
+    },
+    {
+      "loai": "loi_bat_buoc",
+      "mo_ta": "Rebuild pass2-vao từ pass1-soan v0.4 cho 6 mục thay đổi: Thomson ss2/3/4/6, Protein ss5, Gly ss6",
+      "anh_huong": "6 ứng viên"
+    },
+    {
+      "loai": "loi_bat_buoc",
+      "mo_ta": "Giải mù lại 6 ứng viên trên pass2-vao mới (Thomson ss2→B, ss3→C, ss4→D, ss6→C; Protein ss5→6; Gly ss6→3,33)",
+      "anh_huong": "6 ứng viên"
+    },
+    {
+      "loai": "loi_bat_buoc",
+      "mo_ta": "Thomson ss6 buoc[]: sửa buoc[0] (A=Becquerel 1896), buoc[2] (C sai vì gán mô hình Rutherford cho Thomson), buoc[3] (D=Bohr 1913)",
+      "anh_huong": "1 ứng viên"
+    },
+    {
+      "loai": "nhan_xet",
+      "mo_ta": "Gly buoc[0] tất cả 6 bản: viết lại n(KOH)=(2+2)·n(peptide) thay vì n(KOH)=2+2=4n(peptide)",
+      "anh_huong": "6 ứng viên"
+    },
+    {
+      "loai": "nhan_xet",
+      "mo_ta": "Schema bo-tro: đổi ungVien → songSinh (TN/TLN) và yMoi (Đ/S)",
+      "anh_huong": "4 bo-tro"
+    }
+  ],
+  "giu_nguyen": [
+    "Nội dung 36 ứng viên không thay đổi",
+    "Zinc 24 yMoi giữ nguyên (y16 đã sửa từ v0.3)",
+    "Trypsin trong Protein ss5 giữ nguyên từ v0.3"
+  ]
+}

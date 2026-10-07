@@ -1,0 +1,81 @@
+{
+  "cau": {
+    "de": "",
+    "loai": "goc",
+    "dang": "tn"
+  },
+  "muc": [
+    {
+      "id": "54ede2e3b61a3ee5_ss1",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Thủy phân hoàn toàn 0,15 mol Gly-Ala-Glu cần vừa đủ 200 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "3,00.",
+        "B": "2,25.",
+        "C": "1,50.",
+        "D": "0,75."
+      }
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss2",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Thủy phân hoàn toàn 0,2 mol Gly-Ala-Glu cần vừa đủ 250 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "2,40.",
+        "B": "3,20.",
+        "C": "1,60.",
+        "D": "0,80."
+      }
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss3",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Thủy phân hoàn toàn 0,5 mol Gly-Ala-Glu cần vừa đủ 200 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "7,50.",
+        "B": "5,00.",
+        "C": "10,00.",
+        "D": "2,50."
+      }
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss4",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Thủy phân hoàn toàn 0,1 mol Gly-Ala-Glu cần vừa đủ 400 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "0,75.",
+        "B": "0,50.",
+        "C": "0,25.",
+        "D": "1,00."
+      }
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss5",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Thủy phân hoàn toàn 0,4 mol Gly-Ala-Glu cần vừa đủ 500 mL dung dịch KOH xM. Giá trị của x là",
+      "pa": {
+        "A": "3,20.",
+        "B": "2,40.",
+        "C": "1,60.",
+        "D": "0,80."
+      }
+    },
+    {
+      "id": "54ede2e3b61a3ee5_ss6",
+      "loai": "ban_khac",
+      "dang": "tn",
+      "de": "Thủy phân hoàn toàn 0,25 mol Gly-Ala-Glu cần vừa đủ 300 mL dung dịch KOH xM. Giá trị của x (làm tròn đến 2 chữ số thập phân) là",
+      "pa": {
+        "A": "2,50.",
+        "B": "3,33.",
+        "C": "1,67.",
+        "D": "0,83."
+      }
+    }
+  ]
+}

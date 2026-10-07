@@ -1,0 +1,41 @@
+{
+  "phien": "e72dc258-pass2-thomson-v04",
+  "tra": [
+    {
+      "id": "67248ce9d2fec69f_ss1",
+      "d": "A",
+      "lyDo": "Thomson 1897 chứng minh tia âm cực gồm các hạt mang điện âm (B,C,D đúng). A sai: Thomson không xác định khối lượng electron so với proton (điều đó được làm rõ sau đó; electron nhẹ hơn proton khoảng 1836 lần, không phải 1800 lần so với \"hạt nhân\" chung chung).",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss2",
+      "d": "B",
+      "chac": true,
+      "lyDo": "Thomson chỉ đo tỉ lệ e/m, không kết luận về khối lượng tuyệt đối. Thực tế electron nhẹ hơn nguyên tử hydrogen khoảng 1836 lần — hoàn toàn ngược với phương án B. A, C, D đều là kết luận trực tiếp từ thí nghiệm tia âm cực."
+    },
+    {
+      "id": "67248ce9d2fec69f_ss3",
+      "d": "C",
+      "chac": true,
+      "lyDo": "C sai: tia âm cực bị từ trường làm lệch hướng — đây là cơ sở để Thomson đo tỉ lệ e/m bằng cách cân bằng điện trường và từ trường. A, B, D đều đúng theo kết quả thí nghiệm."
+    },
+    {
+      "id": "67248ce9d2fec69f_ss4",
+      "d": "D",
+      "chac": true,
+      "lyDo": "D đúng: kết quả nổi bật nhất của Thomson là e/m không đổi dù thay đổi vật liệu cathode hay loại khí — chứng tỏ electron là hạt phổ quát. A sai (giọt dầu là Millikan). B sai (không phụ thuộc loại khí). C sai (e/m không đổi)."
+    },
+    {
+      "id": "67248ce9d2fec69f_ss5",
+      "d": "A",
+      "lyDo": "A đúng: Thomson phát hiện electron 1897 qua tia âm cực. B sai (Rutherford phát hiện hạt nhân, không phải electron). C sai (Millikan đo điện tích, không phải Bohr). D sai (Becquerel phóng xạ, không phải mô hình nguyên tử hành tinh).",
+      "chac": true
+    },
+    {
+      "id": "67248ce9d2fec69f_ss6",
+      "d": "C",
+      "chac": true,
+      "lyDo": "C sai: Thomson đề xuất mô hình bánh pudding — electron nhúng trong khối cầu tích điện dương đều, không có hạt nhân tập trung. Mô hình nguyên tử có hạt nhân nhỏ tích điện dương ở trung tâm là của Rutherford (1911). A đúng (Becquerel 1896 trước Thomson 1897). B đúng (thí nghiệm 1909-10, mô hình 1911). D đúng (Bohr 1913)."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": "v0.4",
+  "created": "2026-10-07",
+  "files": {
+    "noi-dung/67248ce9d2fec69f/pass1-soan.json": "336eb30efa40f973b3edf245f08770ed276cd09e1cd3845f5f5c7cec0980ae06",
+    "noi-dung/67248ce9d2fec69f/pass2-vao.json": "e53af59d5642d2390a39373b22782a8d2021cb5245a0baaed6ec4b5f66af4ded",
+    "noi-dung/67248ce9d2fec69f/pass2-ra.json": "dec0a474991c03c8ebe7c2c2d3bc52fb2614e71418755b00940d534cf9bee23c",
+    "noi-dung/67248ce9d2fec69f/bo-tro.json": "067d7668240570414684eeda5b07718077d3801e8b7891df3fce4317d695ad1a",
+    "noi-dung/54ede2e3b61a3ee5/pass1-soan.json": "208806ad3ad78fcea658bec6df59f6d109cddbedfe857cd9985936c51cb372b9",
+    "noi-dung/54ede2e3b61a3ee5/pass2-vao.json": "418d764ac400ca5cee0ef59c90bc1cb0e3621a7eb50f419f334403d11beef075",
+    "noi-dung/54ede2e3b61a3ee5/pass2-ra.json": "15516c1718860b299bc7c96e2d7b72c448c16886cd13038609915243e1ffbbdb",
+    "noi-dung/54ede2e3b61a3ee5/bo-tro.json": "80707df7b20d194b01d3068fc100197f659e3e86e08f4c1e8629abc234029e4a",
+    "noi-dung/5c98108d8d42329a/cau-goc.json": "9bc53f1fc946690c4d43eee4a39f67928992644c74c5cf2c91ac209f03fc5eec",
+    "noi-dung/5c98108d8d42329a/pass1-soan.json": "c898e13c328b3b26abe773b6cb9f828a45abd2db48f1486c912e75ec800fd583",
+    "noi-dung/5c98108d8d42329a/pass2-vao.json": "248d2316e0bed371cefcca5d143148973221cdd7c9c4564488eebafd37236a67",
+    "noi-dung/5c98108d8d42329a/pass2-ra.json": "79c625056874a96ba4d3f8e9e4da1091a7221daecda12ea68716704a0008f2da",
+    "noi-dung/5c98108d8d42329a/bo-tro.json": "cb3dacf33f54c41c53c069de1582ad2e7274cc275ab4272437ed7cc921c66344",
+    "noi-dung/2c8b26e16e0fef33/cau-goc.json": "5184b46186417cb3005ebf8c9343b68beb4ddc4d5a498276ef754f87de25e1bd",
+    "noi-dung/2c8b26e16e0fef33/pass1-soan.json": "fd90cfee6656b21f133da055ca4b5c89151c7b02e60d18aeff26c8632b2bb6f9",
+    "noi-dung/2c8b26e16e0fef33/pass2-vao.json": "06275948484ede17061391190bcda2341ed7de2521a0a810fe581f943fdcf669",
+    "noi-dung/2c8b26e16e0fef33/pass2-ra.json": "d93283dacbbff490a06a0cbc4c35e63ec8b3333b61e8eee6ac3d7cd3f67c6d68",
+    "noi-dung/2c8b26e16e0fef33/bo-tro.json": "db2ca97a0958578d3d216bc7f5fe93ca9979160119a91b5891d567f528d3fde2",
+    "noi-dung/67248ce9d2fec69f/cau-goc.json": "532045196a7b7eec937b5e48f72525128a186ebf763db8edb0f5f8d8ce54ead2",
+    "noi-dung/54ede2e3b61a3ee5/cau-goc.json": "df0b1ae82e579ee5450acfa13079a9e8c38adfbe90514ee19e17d83fe7288fc3",
+    "bo-tro/67248ce9d2fec69f.json": "067d7668240570414684eeda5b07718077d3801e8b7891df3fce4317d695ad1a",
+    "bo-tro/54ede2e3b61a3ee5.json": "80707df7b20d194b01d3068fc100197f659e3e86e08f4c1e8629abc234029e4a",
+    "bo-tro/5c98108d8d42329a.json": "cb3dacf33f54c41c53c069de1582ad2e7274cc275ab4272437ed7cc921c66344",
+    "bo-tro/2c8b26e16e0fef33.json": "db2ca97a0958578d3d216bc7f5fe93ca9979160119a91b5891d567f528d3fde2"
+  }
+}
