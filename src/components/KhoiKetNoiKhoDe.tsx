@@ -47,21 +47,21 @@ export default function KhoiKetNoiKhoDe({ showToast }: { showToast: (m: string, 
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
       <div className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)' }}>
-        Địa chỉ máy chủ và mã bí mật kho đề
+        Địa chỉ máy chủ và mã bí mật
       </div>
       <div>
         <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Địa chỉ máy chủ (bỏ trống = dùng máy chủ mới đã cấu hình)</div>
         <input style={O_NHAP} aria-label="Địa chỉ máy chủ" value={scriptUrl} onChange={(e) => setScriptUrl(e.target.value)} placeholder="https://omr.ttadodaihoc.workers.dev" />
       </div>
       <div>
-        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Mã bí mật kho đề (đúng bằng MA_BI_MAT đã đặt trong Apps Script)</div>
-        <input style={O_NHAP} type="password" aria-label="Mã bí mật kho đề" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Mã bí mật" autoComplete="off" />
+        <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Mã bí mật (đúng bằng MA_BI_MAT đã đặt ở máy chủ Cloudflare)</div>
+        <input style={O_NHAP} type="password" aria-label="Mã bí mật" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Mã bí mật" autoComplete="off" />
       </div>
       <NutChinh variant="phu" onClick={luu}>
         Lưu
       </NutChinh>
       <div style={NHAN_NHO}>
-        Mã chỉ lưu trên máy này (IndexedDB), không nằm trong code app, không gửi cho học sinh. Cách đặt MA_BI_MAT: xem đầu file <code>docs/apps-script-kiem-tra.gs</code>.
+        Mã chỉ lưu trên máy này (IndexedDB), không nằm trong code app, không gửi cho học sinh. Đổi mã: đặt lại biến MA_BI_MAT của máy chủ trên Cloudflare, rồi nhập mã mới ở đây.
       </div>
     </div>
   )
