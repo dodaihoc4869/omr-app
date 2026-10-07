@@ -27,7 +27,7 @@ const receiptKey = 'chua_cau_sai_phat_hanh_0710'
 async function nhan(r: Response) { const j = await r.json(); if (!r.ok || !j.ok) throw new Error('Chưa hoàn tất thao tác vòng chữa; giữ vị trí để thử lại.'); return j }
 async function main() {
   // Chỉ chạy sau khi workflow phát hành đúng commit thành công; kiểm thêm hai đường sống.
-  for (const [path, status] of [['/hs/chua-cau-sai/co',401],['/gv/chua-cau-sai/hang-chieu',403]] as const) {
+  for (const [path, status] of [['/hs/chua-cau-sai/danh-sach',401],['/gv/chua-cau-sai/hang-chieu',403]] as const) {
     const r = await fetch(`https://omr.ttadodaihoc.workers.dev${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
     if (r.status !== status) throw new Error('Worker sống chưa đúng hợp đồng vòng chữa.')
   }
