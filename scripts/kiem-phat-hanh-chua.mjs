@@ -54,3 +54,11 @@ if (process.argv.includes('--live')) {
   if (sauKiem?.id !== live.id || versionsSauKiem?.length !== 1 || versionsSauKiem[0].version_id !== active[0].version_id || versionsSauKiem[0].percentage !== 100) throw new Error('Bản sống thay đổi trong lúc kiểm; chưa cho bật cờ.')
   console.log(JSON.stringify({ workerCommit:sha, pagesCommit:sha, duongGiaoDienTot:5, congQuyenVongChuaTot:2 }))
 }
+if (process.argv.includes('--enabled')) {
+  const values = await query("SELECT khoa,gia_tri FROM cau_hinh WHERE khoa IN ('chua_cau_sai_v1','chua_cau_sai_phat_hanh_0710')")
+  const config = JSON.parse(values.find(x => x.khoa === 'chua_cau_sai_v1')?.gia_tri ?? '{}')
+  const receipt = JSON.parse(values.find(x => x.khoa === 'chua_cau_sai_phat_hanh_0710')?.gia_tri ?? '{}')
+  if (config.bat !== true || config.phamVi !== 'tat_ca' || config.dongBoTuLuyen !== true || receipt.tuXong !== true || receipt.giaoXong !== true || receipt.release !== process.env.CHUA_RELEASE_SHA) throw new Error('Cờ hoặc receipt đồng bộ chưa hoàn tất đúng bản phát hành.')
+  const totals = (await query('SELECT COUNT(*) AS soDot,COUNT(DISTINCT sbd) AS soEm,COUNT(DISTINCT qid_chuan) AS soCau FROM chua_loi_dot WHERE dong_luc IS NULL'))[0]
+  console.log(JSON.stringify({ bat:true, phamVi:config.phamVi, dongBoTuLuyen:true, tuCuHoanTat:true, giaoCuHoanTat:true, ...totals }))
+}
