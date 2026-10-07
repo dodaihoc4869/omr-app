@@ -22,6 +22,8 @@ node scripts/loi-giai/may-soan-vong-chua.mjs --mot-lan
 
 Chạy không có `--mot-lan` để tiếp tục hỏi hàng mới. `--thu` soạn/kiểm một câu, không nạp. Mã máy soạn cũ `may-soan.mjs` mặc định dành một luồng trong tổng số luồng hiện có cho vòng chữa mới (khi có từ hai luồng, không ở chế độ thử); không tăng tổng số luồng. `--khong-vong-chua` giữ chế độ cũ. Tất cả chế độ thống kê/nạp hàng cũ vẫn chỉ làm đúng công việc đó.
 
+`--mot-lan` là **một lượt qua toàn hàng hiện tại**, không phải một câu. Nếu phiên chạy có giới hạn thời gian, dùng `node scripts/loi-giai/may-soan-vong-chua.mjs --mot-lan --so-cau 1` để thử xử lý tối đa một câu rồi kết thúc; các cổng kiểm và nạp giữ nguyên. Giới hạn tính cả câu bị loại. Kết thúc vì giới hạn luôn ghi `hetHangTrongLuot:false`; không báo hết kho. Nếu một câu bị loại, đọc mã lỗi và sửa hồ sơ/prompt trước khi chạy lại, tránh lặp vô hạn câu ưu tiên đầu. Không cắt ngang câu đang xử lý để thay bản chạy; phiên đang chạy phải dùng bản mới ở lượt kế tiếp. Nhật ký cho biết đang soạn, giải mù, soát chuyên môn hoặc nạp; lỗi cấu trúc ghi rõ mã lỗi. Không đưa đáp án hay mã giáo viên vào nhật ký.
+
 Hồ sơ ở `.may-soan-vong-chua/` bị loại khỏi git. Thư mục kiểm mù tách riêng và được dọn sau khi sao kết quả vào hồ sơ. Luồng thiếu dữ kiện/không giải được không tự gắn nhãn đạt, còn được làm lại ở lần chạy sau.
 
 ## Lời nhắn để phiên Claude thực thi
@@ -53,3 +55,9 @@ PR200 đã merge; Actions37587516607 thành công, nguồn **afd15234332f4c14577
 Đọc độc lập sau backfill:13.460 cặp đã đồng bộ,477/477 lượt tự luyện,7.245 đợt mở/258 em/1.370 câu; công cụ giao tạm còn0. Hiện chỉ1 câu có học liệu đủ dùng. Phần mềm đã phát hành; toàn hàng học liệu vẫn chưa hoàn tất vì chưa có máy Claude đăng nhập trong phiên Codex. Chưa có kết quả học sinh thật để nghiệm thu90%.
 
 Đọc lại vận hành14:46VN: Actions37589333535 thành công,26 kiểm vận hành+9 D1 đạt, cờ tất cả/đồng bộ tự luyện và receipt lịch sử đều hoàn tất đúng nguồnafd15234. Không giao lại lịch sử hoặc tạo Worker giao mới. Kiểm độc lập37589395190 thành công: hai đường máy soạn trả403 khi không có quyền, cờ/receipt đúng và công cụ giao tạm còn0.
+
+## Sửa máy soạn sau các lượt bị dừng
+
+Prompt trên main đã làm rõ hợp các mã `viKyNang` cho mọi bản toàn bài và các trường bắt buộc của `doiChieu`, gồm `probeXacNhan.dapAnSai`. Bộ kiểm khoa học/cấu trúc giữ nguyên. Hai kiểm CLI với nhà soạn giả trả dữ liệu sai xác minh: giới hạn1 dừng sau một câu bị loại; chế độ cũ vẫn đi hết hai câu rồi kết thúc, không nạp dữ liệu sai. Cùng14 kiểm học liệu đạt, tổng16 kiểm liên quan. Đây là kiểm kỹ thuật, không phải lượt soạn/nạp thật.
+
+Đọc D1 lúc20:02VN (Actions37625381778):1.419 câu có đợt mở,2 câu được phủ đúng phiên bản;1.284 câu có nguồn trong chỉ mục hiện tại,1.276 đủ điều kiện như hàng máy soạn,1.274 còn cần soạn. Có143 câu ngoài hàng đủ điều kiện, gồm nguồn chưa khớp chỉ mục hoặc không qua điều kiện duyệt/tự luận; cần phân loại, không tự gắn đạt. Số~792 trong ảnh là mốc cũ. Worker/Pages cùngaf838669; mốc receipt vẫn cũ. Chưa có mẫu trưởng thành để đo90%.

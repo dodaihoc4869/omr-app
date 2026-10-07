@@ -11,6 +11,8 @@ import {kiemTinhDayDu,probeDuyNhat,deChoKiemMu,kiemBangMay} from './chua-kiem.bu
 const here=path.dirname(fileURLToPath(import.meta.url))
 const argv=process.argv.slice(2)
 const thu=argv.includes('--thu'),motLan=argv.includes('--mot-lan')
+const limitIndex=argv.indexOf('--so-cau'),soCauToiDa=limitIndex<0 ? 5000 : Number(argv[limitIndex+1])
+if(!Number.isSafeInteger(soCauToiDa)||soCauToiDa<1||soCauToiDa>5000)throw Error('--so-cau cần số nguyên từ 1 đến 5000.')
 const secret=(process.env.OMR_MA_BI_MAT ?? (fs.existsSync(path.join(os.homedir(),'.omr-ma-bi-mat')) ? fs.readFileSync(path.join(os.homedir(),'.omr-ma-bi-mat'),'utf8') : '')).trim()
 const host=(process.env.OMR_MAY_CHU || 'https://omr.ttadodaihoc.workers.dev').replace(/\/$/,'')
 const save=path.resolve(process.env.OMR_THU_MUC_CHUA || '.may-soan-vong-chua')
@@ -21,6 +23,7 @@ fs.mkdirSync(save,{recursive:true,mode:0o700})
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'))
 const write=(p,v)=>fs.writeFileSync(p,JSON.stringify(v,null,2),{mode:0o600})
 const digest=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex')
+const baoBuoc=(qid,buoc)=>console.log(JSON.stringify({qid,buoc,luc:new Date().toISOString()}))
 async function api(url,b){
   const r=await fetch(host+url,{method:'POST',headers:{'content-type':'application/json','x-ma-bi-mat':secret},body:JSON.stringify(b),signal:AbortSignal.timeout(60000)})
   if(!r.ok) throw Error(`Máy chủ từ chối (${r.status}).`)
@@ -69,15 +72,18 @@ async function one(v){
   anhDoc(dir,v.cau)
   fs.copyFileSync(path.join(here,'goi-soan-vong-chua.md'),path.join(dir,'yeu-cau.md'))
   // Phiên soạn chỉ có nguồn của một câu; không có mã giáo viên hay thư mục hồ sơ học sinh.
+  baoBuoc(v.cau.qid,'bat_dau_soan')
   await run(dir,'Đọc yeu-cau.md, nguon.json và anh-doc.json; dùng Read đọc từng tệp hình trước khi giải. Soạn toàn bộ học liệu vòng chữa vào hoc-lieu.json theo hợp đồng. Không tự tạo bằng chứng duyệt. Mọi câu kiểm phải tự đủ dữ kiện.')
   const h=read(path.join(dir,'hoc-lieu.json')),loi=kiemTinhDayDu(h)
-  if(loi.length || h.qidGoc!==v.cau.qid || h.contentVersion!==v.cau.version) throw Error('Bản soạn chưa đạt hợp đồng hoặc lệch câu gốc.')
+  if(loi.length)throw Error('Bản soạn chưa đạt hợp đồng: '+loi.join(', '))
+  if(h.qidGoc!==v.cau.qid || h.contentVersion!==v.cau.version)throw Error('Bản soạn lệch câu gốc hoặc phiên bản.')
   const ps=probeDuyNhat(h),vaoMu=ps.map(p=>{const de=deChoKiemMu(p);return {...de,bamDe:digest(de)}})
   // Tách thư mục, bỏ toàn bộ đáp án, lời giải, giả thuyết lỗi và học liệu đã soạn.
   const blind=fs.mkdtempSync(path.join(os.tmpdir(),'omr-chua-mu-'))
   try{
     write(path.join(blind,'de.json'),vaoMu)
     anhDoc(blind,vaoMu)
+    baoBuoc(v.cau.qid,'bat_dau_giai_mu')
     await run(blind,'Chỉ đọc de.json và các tệp hình trong anh-doc.json; đọc từng hình bằng Read. Tự giải độc lập TỪNG mục; không có đáp án tham chiếu. Ghi dap-an.json là mảng {qid,phienBan,bamDe,dapAn,lyDo,chac}. Chép đúng qid/phienBan/bamDe. Trắc nghiệm trả mã lựa chọn; Đ/S trả D/S hoặc 4 chữ; số theo yêu cầu làm tròn. Giải thích cách giải và phép tính. Thiếu dữ kiện/mơ hồ: chac=false và dapAn="?". Không phỏng đoán.',Math.min(250,30+ps.length*3))
     const tra=read(path.join(blind,'dap-an.json'))
     write(path.join(dir,'de-mu.json'),vaoMu)
@@ -88,11 +94,13 @@ async function one(v){
       write(path.join(review,'nguon.json'),v)
       write(path.join(review,'hoc-lieu.json'),h)
       anhDoc(review,{cau:v.cau,hocLieu:h})
+      baoBuoc(v.cau.qid,'bat_dau_soat_chuyen_mon')
       await run(review,'Đọc nguon.json, hoc-lieu.json và các hình trong anh-doc.json bằng Read. Soát khoa học, từng nguyên nhân sai và hỗ trợ, thứ tự tiên quyết, dữ kiện, đơn vị và đáp án. So sánh từng bản ghép/kiểm chứng với câu gốc về cách giải và độ khó. Ghi chuyen-mon.json {dungKhoaHoc,tuongDuong,dungDoKho,duBuoc,lyDo}. Chỉ true nếu tự kiểm đủ; thiếu/không chắc ghi false và lý do cụ thể. Không sửa các tệp nguồn.')
       const kiemMay={phienBan:1,luotSoan,luotKiem,tra,chuyenMon:read(path.join(review,'chuyen-mon.json'))}
       write(path.join(dir,'kiem-may.json'),kiemMay)
       const errors=await kiemBangMay(h,kiemMay)
       if(errors.length) throw Error('Bộ học liệu chưa qua kiểm: '+errors.join(', '))
+      baoBuoc(v.cau.qid,thu?'da_kiem_khong_nap':'bat_dau_nap')
       if(!thu){const receipt=await api('/kho/may-soan/nop-vong-chua',{hocLieu:h,kiemMay});write(path.join(dir,'receipt.json'),receipt)}
       console.log(JSON.stringify({qid:h.qidGoc,soProbe:ps.length,daLuu:!thu,hoSo:dir}))
     }finally{fs.rmSync(review,{recursive:true,force:true})}
@@ -102,7 +110,7 @@ async function main(){
   const daLam=[]
   let dat=0,truot=0
   for(;;){
-    if(daLam.length>=5000){console.log(JSON.stringify({dat,truot,hetHangTrongLuot:false,datGioiHanLuot:true}));break}
+    if(daLam.length>=soCauToiDa){console.log(JSON.stringify({dat,truot,hetHangTrongLuot:false,datGioiHanLuot:true,gioiHanSoCau:soCauToiDa}));break}
     const {viec,coNguonChuaHoTro}=await api('/kho/may-soan/vong-chua-viec',{so:1,daLam})
     if(!viec.length){
       console.log(JSON.stringify({dat,truot,hetHangTrongLuot:!coNguonChuaHoTro,coNguonChuaHoTro:!!coNguonChuaHoTro}))
