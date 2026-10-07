@@ -211,6 +211,9 @@ export default defineConfig({
           // Màn Tu luyện (30/09, bố cục ngang + máy tính): cả mảnh ManTuLuyen nạp LƯỜI khi em bấm cửa Tu luyện ở Sảnh — mọi việc của nó đều cần máy chủ
           // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
           '**/{ManTuLuyen,LuyenDeCauTruc}-*.{js,css}',
+          // Vòng chữa chỉ phát/chấm câu qua máy chủ: tải khung khi em mở, rồi giữ bằng kho chạy-lúc.
+          // Bộ rút phiếu chữa cũng chỉ dùng khi mở phiếu/bảng/PDF; không làm nặng lượt cài 3 cổng.
+          '**/{ManChuaCauSai,chua-cau-sai,chua-cau-sai-thay-api,rut-de-chua,ThanhSoCauChua}-*.{js,css}',
           // Màn làm bài NGANG: từ 01/10 VÀO precache (≈ 47 KB) — ngoài precache thì máy còn bản cũ sau một lượt phát hành, hay mạng yếu lúc xoay,
           // nạp mảnh hỏng và em kẹt bố cục dọc (thầy báo "xoay ngang không hoạt động").
           // Bù chỗ cho mảnh ngang (giữ trần 3000 KB): ba mảnh CHỈ màn thầy nhập (Tổng quan/Chiến dịch, Cài đặt/Học sinh, Giao/Sửa chiến dịch —

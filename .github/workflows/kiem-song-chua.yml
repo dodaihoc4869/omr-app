@@ -15,7 +15,7 @@ jobs:
       - name: Chỉ in đường dẫn và mã HTTP
         run: |
           node --input-type=module <<'JS'
-          for(const host of ['https://omr-app-b3u.pages.dev','https://67db1817.omr-app-b3u.pages.dev']) {
+          for(const host of ['https://omr-app-b3u.pages.dev']) {
             for(const path of ['/','/hs','/ph','/sw-version.json']) {
               const r=await fetch(host+path+'?kiem='+Date.now(),{signal:AbortSignal.timeout(20000)});
               console.log(JSON.stringify({host,path,status:r.status,type:r.headers.get('content-type')}));

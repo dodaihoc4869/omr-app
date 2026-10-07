@@ -42,7 +42,7 @@ if (process.argv.includes('--live')) {
   if (live?.deployment_trigger?.metadata?.commit_hash !== sha || live.latest_stage?.status !== 'success') throw new Error('Pages sống khác commit hoặc chưa phát hành xong.')
   for (const path of ['/', '/hs', '/ph', '/sw-version.json']) {
     const r = await fetch(`https://omr-app-b3u.pages.dev${path}?chua=${sha}`, { signal: AbortSignal.timeout(30000) })
-    if (!r.ok) throw new Error('Một đường giao diện sống chưa trả thành công.')
+    if (!r.ok) throw new Error(`Đường giao diện ${path} trả HTTP ${r.status}.`)
     if (path === '/sw-version.json' && !Number.isFinite((await r.json()).builtAt)) throw new Error('Thiếu phiên bản service worker.')
   }
   for (const [path, status] of [['/hs/chua-cau-sai/danh-sach',401],['/gv/chua-cau-sai/hang-chieu',403]]) {
