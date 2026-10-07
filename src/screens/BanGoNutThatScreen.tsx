@@ -73,7 +73,7 @@ export default function BanGoNutThatScreen() {
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
           <h1 className="gv2-tieu-de">Bàn gỡ nút thắt</h1>
-          <p className="gv2-phu-de">Câu em đã đọc kĩ lời giải, làm lại kín mà vẫn vướng. Các em vướng cùng một bước được gom một thẻ — thầy gỡ một lần cho cả nhóm. Thẻ xếp theo số em, mức hay gặp của dạng và hạn chiến dịch.</p>
+          <p className="gv2-phu-de">Các em vướng cùng một bước được gom thành một thẻ.</p>
         </div>
         <button type="button" className="gv2-nut-vien" onClick={() => void tai()} disabled={dangTai}>{dangTai ? 'Đang tải…' : 'Tải lại'}</button>
       </header>
@@ -126,7 +126,7 @@ export default function BanGoNutThatScreen() {
       )}
 
       {nhom.length > 0 && (
-        <ul className="lg-ds" aria-label="Thẻ nút thắt theo thứ tự ưu tiên">
+        <ul className="lg-ds gv-scroll-box" aria-label="Thẻ nút thắt theo thứ tự ưu tiên" tabIndex={0}>
           {nhom.map((n) => {
             const deMo = moDe.has(n.khoa)
             const dangGo = go?.khoa === n.khoa ? go : null

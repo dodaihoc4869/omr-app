@@ -70,7 +70,7 @@ function DiemDanhBuoiChua({ du, onChot }: { du: DuBang; onChot: (sbd: string[]) 
           </div>
           <span className="cd-chip-muc cd-chip-muc--xam">Chưa xếp học sinh</span>
         </div>
-        <p className="cd-phu">Học sinh nhập mã 6 số hoặc quét QR trên app. Hệ thống lấy danh sách có mặt từ máy chủ rồi mới quét lịch sử từng câu; không còn chọn sẵn cả lớp bằng tay.</p>
+        <p className="cd-phu">Học sinh nhập mã 6 số hoặc quét QR.</p>
       </section>
 
       <BuocDiemDanh dd={dd} idTieuDe="cd-diem-danh-ma" khoaLop />
@@ -79,7 +79,7 @@ function DiemDanhBuoiChua({ du, onChot }: { du: DuBang; onChot: (sbd: string[]) 
         <section className="cd-the cd-the--hanh-dong" aria-live="polite">
           <div>
             <b>{coMat.length}/{du.em.length} học sinh chiến dịch đã điểm danh</b>
-            <p className="cd-phu">Danh sách tự cập nhật mỗi 5 giây. Khi đủ học sinh, hệ thống lấy lại dữ liệu mới nhất từ máy chủ để xếp người chữa mẫu.</p>
+            <p className="cd-phu">Tự cập nhật mỗi 5 giây.</p>
           </div>
           <button type="button" className="m3-nut-chinh" disabled={!coMat.length || dangChot} aria-busy={dangChot} onClick={() => void chotTuMayChu()}>
             {dangChot ? 'Đang lấy danh sách có mặt…' : `Xếp buổi chữa cho ${coMat.length} em có mặt`}

@@ -244,11 +244,10 @@ export default function BuoiChua({
               : 'Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.'}
           </p>
         ) : (
-          <div role="table" aria-label="Câu chữa xếp sẵn" className="cd-bang-chua">
+          <div role="table" aria-label="Câu chữa xếp sẵn" className="cd-bang-chua cd-cuon-doc" tabIndex={0}>
             <div className="cd-the-dau">
               <h2>Câu chữa xếp sẵn · điểm chữa cao trước</h2>
               {(du.daChuaTruoc ?? 0) > 0 && <span className="cd-phu" data-khoi="da-chua-truoc">Đã chữa {du.daChuaTruoc} dạng ở buổi trước; buổi này xếp tiếp các dạng còn lại.</span>}
-              <span className="cd-phu">Điểm chữa = số em chưa thành thạo + 2 × số em cần dạy lại</span>
             </div>
             <div className="cd-hang-chua cd-hang-chua--dau" role="row">
               <span role="columnheader">#</span>

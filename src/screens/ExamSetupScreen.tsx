@@ -494,7 +494,6 @@ export default function ExamSetupScreen() {
           <div>
             <div className="ct-duong">Ca kiểm tra › Mở ca mới</div>
             <h1>Mở ca kiểm tra</h1>
-            <p>Bốn việc, đi từ trên xuống. Mọi thứ khác đã có giá trị sẵn.</p>
           </div>
           <div className="ct-hang-nut" style={{ alignItems: 'center' }}>
             <NutQuayLai onClick={() => setScreen('lichsuca')} label="Ca kiểm tra" />
@@ -520,7 +519,6 @@ export default function ExamSetupScreen() {
               <div className="so-b">1</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Đề</h3>
-                <p className="ct-ghi">Chọn một đề trong kho. Câu tự luận tự được lọc bỏ.</p>
                 <div className="ct-de-chon">
                   <div className="bia" aria-hidden="true">
                     <Library size={22} />
@@ -589,7 +587,6 @@ export default function ExamSetupScreen() {
               <div className="so-b">2</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Ai làm</h3>
-                <p className="ct-ghi">Chọn lớp, rồi chọn ai được vào.</p>
                 <div className="ct-hang-chip" role="group" aria-label="Lớp">
                   {dsLop.map((l) => {
                     const n = classList.filter((r) => chuoi(r.lop).trim() === l).length
@@ -631,7 +628,6 @@ export default function ExamSetupScreen() {
               <div className="so-b">3</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Giờ</h3>
-                <p className="ct-ghi">Thời gian làm bài · lúc bắt đầu · hạn vào phòng.</p>
                 <div className="ct-hang-chip" role="group" aria-label="Thời gian làm bài">
                   {[15, 45, 50, 90].map((ph) => (
                     <button key={ph} type="button" className="ct-chip so" aria-pressed={phutCa === ph} disabled={chuan2026} onClick={() => setThoiGianPhut(ph)}>
@@ -677,7 +673,6 @@ export default function ExamSetupScreen() {
               <div className="so-b">4</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Luật</h3>
-                <p className="ct-ghi">Khi nào em thấy điểm. "Thầy công bố sau" thì bấm Công bố điểm khi ca kết thúc.</p>
                 <div className="ct-o-luat" role="group" aria-label="Công bố điểm">
                   {LUAT.map((c) => (
                     <button key={c.id} type="button" className="ct-luat" aria-pressed={congBoDiem === c.id} onClick={() => setCongBoDiem(c.id)}>

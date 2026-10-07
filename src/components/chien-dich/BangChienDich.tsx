@@ -371,7 +371,7 @@ export default function BangChienDich({
           {dsEm.length === 0 ? (
             <p className="cd-phu">Chiến dịch chưa có em nào — kiểm tra lại lớp đã giao.</p>
           ) : (
-            <div className="cd-cuon-ngang">
+            <div className="cd-cuon-ngang cd-cuon-doc" role="region" aria-label="Tiến độ từng học sinh theo dạng" tabIndex={0}>
               <table className="cd-bang cd-nhiet" data-khoi="bang-tung-em">
                 <thead>
                   <tr>

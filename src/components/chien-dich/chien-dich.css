@@ -211,6 +211,28 @@
   overscroll-behavior-x: contain;
   min-width: 0;
 }
+.cd-cuon-doc {
+  max-height: min(64vh, 680px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bts-chu-phu) transparent;
+  border: 1px solid var(--bts-vien);
+  border-radius: 16px;
+}
+.cd-cuon-doc::-webkit-scrollbar { width: 8px; height: 8px; }
+.cd-cuon-doc::-webkit-scrollbar-thumb { background: var(--bts-chu-phu); border-radius: 999px; }
+.cd-cuon-doc:focus-visible { outline: 2px solid var(--m3-primary); outline-offset: 3px; }
+.cd-cuon-doc > .cd-bang > thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bts-mat);
+}
+@media (max-width: 800px) {
+  .cd-cuon-doc { max-height: min(58vh, 520px); border-radius: 14px; }
+}
 .cd-bang {
   width: 100%;
   border-collapse: separate;

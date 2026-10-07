@@ -7,5 +7,5 @@ import GiaoDeTheoTuanScreen from '../src/screens/GiaoDeTheoTuanScreen'
 it('dựng màn: hiện tiêu đề + lời nhắc luật, không ném lỗi', async () => {
   render(<GiaoDeTheoTuanScreen />)
   expect(await screen.findByText('Giao đề theo tuần')).toBeTruthy()
-    expect(screen.getByText(/Chọn lớp, học sinh, nguồn đề và hạn nộp/)).toBeTruthy()
+    expect(screen.queryByText(/Chọn lớp, học sinh, nguồn đề và hạn nộp/)).toBeNull()
 })

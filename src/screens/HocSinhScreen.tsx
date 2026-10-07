@@ -556,11 +556,6 @@ export default function HocSinhScreen() {
             <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--sans)' }}>
               Học sinh
             </h1>
-            {!hoa2 && (
-              <p className="hs-phu-de">
-                Quản lý học sinh theo lớp, xem báo cáo và mức độ tiến bộ
-              </p>
-            )}
           </div>
         </div>
 
@@ -670,7 +665,7 @@ export default function HocSinhScreen() {
             </div>
           </div>
         ) : (
-          <div className="gv-student-list" style={{ gap: 'var(--k2)' }}>
+          <div className="gv-student-list gv-scroll-box" style={{ gap: 'var(--k2)' }} role="region" aria-label="Danh sách học sinh" tabIndex={0}>
             {dsLoc.map((e) => {
               const khoi = khoiTuNamSinh(e.namSinh)
               return (

@@ -1627,9 +1627,6 @@ function GoiLenBangCu() {
             <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
               Gọi học sinh lên bảng
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Phân công chữa bài tập, dạy học và theo dõi lượt lên bảng
-            </p>
           </div>
         </div>
       </div>
@@ -1659,15 +1656,6 @@ function GoiLenBangCu() {
           <UserCheck size={16} /> Dạy học theo đề
         </button>
       </div>
-      {dayHoc ? (
-        <p className="text-xs text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 p-2.5 rounded-xl border border-blue-200 dark:border-blue-800/60 -mt-2 leading-relaxed">
-          <strong>Bậc thang Sư phạm 3 Nấc</strong>: Phân công câu hỏi theo nấc nhận thức và cân bằng số lượt lên bảng.
-        </p>
-      ) : (
-        <p className="text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 -mt-2 leading-relaxed">
-          <strong>Thuật toán Rút câu BTVN lên bảng (luật mới 25/09)</strong>: chọn câu theo thứ tự cả lớp <strong>sai nhiều nhất → sai ít dần → câu khó ít em làm được → câu cốt tủy</strong>; chữa đủ <strong>sàn 80 %</strong> số câu lọc ra (câu còn lại chỉ đọc đáp án); gọi <strong>mọi em ít nhất một lượt</strong>, em còn dư thì thêm lượt cân bằng — cả lớp đều được cọ sát.
-        </p>
-      )}
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
@@ -1710,7 +1698,7 @@ function GoiLenBangCu() {
         ) : dsCaLoc.length === 0 ? (
           <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Chưa có ca nào khớp.</div>
         ) : (
-          <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 300, overflowY: 'auto' }} data-hop-ca>
+          <div className="flex flex-col gv-scroll-box gv-scroll-box--compact" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)' }} data-hop-ca role="region" aria-label="Danh sách ca lấy bài làm" tabIndex={0}>
             <NhomCaThuGon ds={dsCaLoc} selected={c=>du?.maCa===c.maCa} render={(c) => {
               const chon = du?.maCa === c.maCa
               return (
@@ -1745,9 +1733,6 @@ function GoiLenBangCu() {
       {/* 2 — THÊM CÂU NGOÀI CA */}
       <TheNoiDung className="h-full">
         <div style={TIEU_DE_MUC}>2. Câu để chữa lấy ở đâu</div>
-        <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
-          Bài làm của em ở mục 1 luôn được dùng để tính câu nào cả lớp cùng sai. Mục này chỉ quyết định LẤY CÂU NÀO RA CHỮA.
-        </div>
 
         <div className="flex flex-wrap gap-2 mb-3" role="radiogroup" aria-label="Cách lấy câu để chữa">
           {(!dayHoc ? ['theo_dang', 'san', 'tu_chon', 'btvn_gan_nhat'] as const : []).map((c) => {
@@ -1781,7 +1766,7 @@ function GoiLenBangCu() {
           })}
         </div>
 
-        {dayHoc ? <p className="text-sm text-slate-500">Chọn đề dạy học bên dưới. Toàn bộ câu sẽ được phân công theo thứ tự đề.</p> : cachLayCau === 'theo_dang' ? (
+        {dayHoc ? null : cachLayCau === 'theo_dang' ? (
           <div data-theo-dang>
             <div style={{ ...NHAN_NHO, marginBottom: 'var(--k3)' }}>
               Rút từ <b>cả kho</b>, chỉ lấy câu cùng mã dạng với những câu cả lớp làm sai. Không lấy câu chuyên đề khác, không bó trong đề của ca.
@@ -1850,11 +1835,6 @@ function GoiLenBangCu() {
           )
         ) : cachLayCau === 'btvn_gan_nhat' ? (
           <div className="space-y-3 mb-3" data-btvn-gan-nhat>
-            <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
-              Chọn bài tập về nhà đã phân gần nhất cho ca <b>{du?.maCa}</b> để gọi học sinh lên bảng chữa.
-              Hệ thống áp dụng <b>Bậc thang Sư phạm 3 Nấc & Vùng phát triển gần (ZPD)</b> để gọi đúng em cần củng cố câu đó.
-            </div>
-
             {dangTaiBtvnCa ? (
               <div className="p-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
                 <RefreshCw size={15} className="animate-spin text-blue-600" />
@@ -1865,7 +1845,7 @@ function GoiLenBangCu() {
                 Chưa có bài tập về nhà nào được giao cho ca {du?.maCa}. Thầy có thể chuyển sang "Tôi tự chọn bài để chữa" để chọn đề từ kho.
               </OThongBao>
             ) : (
-              <div className="space-y-2 max-h-[280px] overflow-y-auto">
+              <div className="space-y-2 gv-scroll-box gv-scroll-box--compact" role="region" aria-label="Bài tập về nhà gần nhất" tabIndex={0}>
                 {dsBtvnCa.map((bt) => {
                   const daChon = btvnChon === bt.maBtvn
                   const tiLeNop = bt.tong > 0 ? Math.round((bt.daNop / bt.tong) * 100) : 0
@@ -1976,12 +1956,11 @@ function GoiLenBangCu() {
               {soCoMat}/{dsEmCa.length}
             </span>
           </div>
-          <div style={{ ...NHAN_NHO, marginTop: 4 }}>Bỏ tích em vắng. Bài của em vắng vẫn tính vào tỉ lệ đúng/sai của câu, chỉ là em không nhận câu nào.</div>
           <div className="relative" style={{ marginTop: 'var(--k3)' }}>
             <Search size={18} style={{ position: 'absolute', left: 14, top: 15, color: 'var(--nhat)' }} />
             <input value={timEm} onChange={(e) => setTimEm(e.target.value)} placeholder="Tìm theo tên hoặc số báo danh…" style={O_NHAP} aria-label="Tìm học sinh" />
           </div>
-          <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 320, overflowY: 'auto' }}>
+          <div className="flex flex-col gv-scroll-box gv-scroll-box--compact" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)' }} role="region" aria-label="Học sinh có mặt" tabIndex={0}>
             {dsEm.map((e) => (
               <label key={e.sbd} className="tap-target flex items-center" style={{ gap: 'var(--k3)', padding: 'var(--k2) var(--k3)', borderRadius: 'var(--bo-1)', background: e.coMat ? 'var(--xanh-nen)' : 'transparent', cursor: 'pointer' }}>
                 <input type="checkbox" checked={e.coMat} onChange={() => doiVang(e.sbd)} aria-label={`${e.hoTen || e.sbd} có mặt`} style={{ width: 20, height: 20, accentColor: 'var(--xanh)' }} />
@@ -2152,7 +2131,7 @@ function GoiLenBangCu() {
                   Hồ sơ lớp chưa lấy được ({loiHoSo}) — đang ghép em bằng dữ liệu ca này, kém chính xác hơn.
                 </div>
               )}
-              <div className="flex flex-col" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)', maxHeight: 260, overflowY: 'auto' }}>
+              <div className="flex flex-col gv-scroll-box gv-scroll-box--compact" style={{ gap: 'var(--k1)', marginTop: 'var(--k3)' }} role="region" aria-label="Phân công học sinh lên bảng" tabIndex={0}>
                 {kqBuoi.dong
                   .filter((d) => d.tang === 'len_bang')
                   .map((d, i) => (

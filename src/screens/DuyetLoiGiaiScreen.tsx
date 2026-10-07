@@ -82,7 +82,7 @@ export default function DuyetLoiGiaiScreen() {
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
           <h1 className="gv2-tieu-de">Duyệt lời giải</h1>
-          <p className="gv2-phu-de">Duyệt theo đề trước khi giao. Chỗ tranh luận về đáp án đã được máy tự chốt; câu sạch duyệt một lần cả lô. Học sinh chỉ thấy lời giải của câu đã duyệt, sau khi ca công bố kết quả.</p>
+          <p className="gv2-phu-de">Chỉ lời giải đã duyệt mới hiện cho học sinh.</p>
         </div>
       </header>
 
@@ -129,7 +129,7 @@ export default function DuyetLoiGiaiScreen() {
           {hien.length === 0 ? (
             <p className="gv2-nhat">Không có câu nào ở mục lọc này.</p>
           ) : (
-            <ul className="lg-ds">
+            <ul className="lg-ds gv-scroll-box" role="region" aria-label="Danh sách câu chờ duyệt" tabIndex={0}>
               {hien.map((c) => {
                 const tt = TRANG_THAI[c.trangThai]
                 const coHoSo = ['cho_duyet', 'da_duyet', 'tra_lai'].includes(c.trangThai)
@@ -190,7 +190,7 @@ export default function DuyetLoiGiaiScreen() {
         </>
       )}
 
-      {!kq && !dangTai && <p className="gv2-nhat">Nhập mã đề sắp giao rồi bấm “Mở đề”. Đề mới nạp tự vào hàng soạn; máy soạn trên máy thầy làm khối 12 trước.</p>}
+      {!kq && !dangTai && <p className="gv2-nhat">Nhập mã đề để duyệt.</p>}
       {xem && <KhungLoiGiai hoSo={xem.hoSo} cau={xem.cau} thay onDong={() => setXem(null)} />}
     </div>
   )

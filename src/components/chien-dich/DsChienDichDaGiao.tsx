@@ -228,10 +228,9 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                 </button>
               ))}
             </div>
-            <span className="cd-phu">Vạch cam trên thanh Đã làm qua = mức lớp cần đạt hôm nay để kịp hạn</span>
           </div>
 
-          <div className="cd-cuon-ngang">
+          <div className="cd-cuon-ngang cd-cuon-doc" role="region" aria-label="Danh sách chiến dịch đã giao" tabIndex={0}>
             <table className="cd-bang cd-bang-cd" data-khoi="bang-chien-dich">
               <thead>
                 <tr>

@@ -630,7 +630,6 @@ function TheGiaoBtvn() {
                     )
                   })}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Bấm một lớp để chọn sẵn mọi em của lớp ấy; bỏ chọn từng em ở danh sách “Theo em” bên dưới.</p>
                 {lopThay.lyDoThieu && (
                   <p data-khoi="ly-do-thieu-lop" className="text-xs text-slate-500 dark:text-slate-400">
                     Máy chủ báo: {lopThay.lyDoThieu}
@@ -661,7 +660,7 @@ function TheGiaoBtvn() {
                     {dangNap ? 'Đang lấy danh sách ca…' : 'Chưa có ca nào đã thi.'}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 gv-scroll-box gv-scroll-box--compact" role="region" aria-label="Danh sách ca đã thi" tabIndex={0}>
                     <NhomCaThuGon ds={dsCa} selected={c=>caChon.has(c.maCa)} render={(c) => {
                       const chon = caChon.has(c.maCa)
                       return (
@@ -777,7 +776,7 @@ function TheGiaoBtvn() {
 
                     {/* DANH SÁCH CUỘN HỌC SINH */}
                     {dangTaiLuot && <div className="text-xs text-slate-400 py-1 text-center">Đang tải danh sách lượt…</div>}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 gv-scroll-box gv-scroll-box--compact" role="region" aria-label="Học sinh trong ca" tabIndex={0}>
                       {dsHsHienThi.map((e) => {
                         const trongCa = dsHsTrongCa.some((h) => h.sbd === e.sbd)
                         const tich = trongCa || sbdChon.has(e.sbd)
@@ -915,7 +914,7 @@ function TheGiaoBtvn() {
                     {dsEm.length === 0 ? 'Chưa có dữ liệu học sinh.' : 'Không tìm thấy học sinh phù hợp.'}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 gv-scroll-box gv-scroll-box--compact" role="region" aria-label="Danh sách học sinh" tabIndex={0}>
                     {dsHsTheoEmHienThi.map((e) => {
                       const tich = sbdChonTheoEm.has(e.sbd)
                       const khoi = khoiTuNamSinh(e.namSinh)

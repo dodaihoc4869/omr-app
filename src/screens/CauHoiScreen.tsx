@@ -272,7 +272,8 @@ export default function CauHoiScreen() {
         </div>
       )}
 
-      <NhomCaThuGon ds={ds||[]} selected={c=>chon.has(c.maCa)} render={(c) => {
+      {ds && ds.length > 0 && <div className="gv-scroll-box" role="region" aria-label="Danh sách ca có câu hỏi" tabIndex={0}>
+      <NhomCaThuGon ds={ds} selected={c=>chon.has(c.maCa)} render={(c) => {
         const daChon = chon.has(c.maCa)
         return (
           <div
@@ -306,14 +307,7 @@ export default function CauHoiScreen() {
           </div>
         )
       }}/>
-
-      {ds && ds.length > 0 && (
-        <div style={NHAN}>
-          {laRac
-            ? 'Tích chọn ca rồi bấm Khôi phục. Ca trong thùng rác vẫn mở xem được, chỉ không hiện ở màn chính.'
-            : 'Số đỏ là số em chưa được chữa. Chạm một ca để xem từng em hỏi câu nào; tích ô vuông để bỏ ca vào thùng rác.'}
-        </div>
-      )}
+      </div>}
 
       {/* THANH HÀNH ĐỘNG dính đáy, chỉ hiện khi đã chọn — không chiếm chỗ lúc
           thầy chỉ đang xem. Nút "Khôi phục tất cả" hiện ngay cả khi chưa chọn
