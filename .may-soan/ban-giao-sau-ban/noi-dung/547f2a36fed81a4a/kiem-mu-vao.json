@@ -1,110 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng?",
   "pa": {
    "A": "Khối lượng của proton xấp xỉ khối lượng của neutron.",
    "B": "Khối lượng của electron lớn hơn khối lượng của proton.",
    "C": "Khối lượng của nguyên tử nhỏ hơn nhiều so với khối lượng của hạt nhân.",
    "D": "Khối lượng của neutron bằng 1/1837 khối lượng của proton."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Proton và neutron đều có khối lượng gần bằng 1 amu.",
-   "Electron nhẹ hơn proton khoảng 1837 lần; khối lượng nguyên tử xấp xỉ khối lượng hạt nhân."
-  ],
-  "chot": "Proton và neutron có khối lượng xấp xỉ nhau, electron nhẹ hơn rất nhiều."
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng?",
   "pa": {
    "A": "Electron có khối lượng lớn hơn neutron.",
    "B": "Khối lượng của electron bằng khối lượng của proton.",
    "C": "Khối lượng nguyên tử tập trung chủ yếu ở hạt nhân.",
    "D": "Khối lượng nguyên tử bằng tổng khối lượng các electron."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Khối lượng electron rất nhỏ so với proton và neutron.",
-   "Proton và neutron nằm trong hạt nhân nên khối lượng nguyên tử tập trung ở hạt nhân."
-  ],
-  "chot": "Khối lượng nguyên tử tập trung ở hạt nhân vì electron rất nhẹ."
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "Khối lượng của electron rất nhỏ so với khối lượng của proton.",
    "B": "Khối lượng của nguyên tử xấp xỉ khối lượng của hạt nhân.",
    "C": "Khối lượng của proton và neutron xấp xỉ nhau.",
    "D": "Khối lượng của electron xấp xỉ khối lượng của neutron."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Khối lượng electron cỡ 9,109.10^-31 kg, neutron cỡ 1,675.10^-27 kg.",
-   "Hai giá trị chênh nhau gần 2000 lần nên ý D sai."
-  ],
-  "chot": "Electron nhẹ hơn neutron và proton gần 2000 lần."
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng?",
   "pa": {
    "A": "Khối lượng của electron nặng gấp khoảng 1837 lần khối lượng của proton.",
    "B": "Khối lượng của electron bằng khoảng 1/1837 khối lượng của proton.",
    "C": "Khối lượng của proton bằng khoảng 1/1837 khối lượng của electron.",
    "D": "Khối lượng của neutron bằng khoảng 1/1837 khối lượng của electron."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Khối lượng electron cỡ 9,109.10^-31 kg, proton cỡ 1,673.10^-27 kg.",
-   "Tỉ số khối lượng electron so với proton cỡ 1/1837."
-  ],
-  "chot": "Electron nhẹ hơn proton khoảng 1837 lần."
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây không đúng?",
   "pa": {
    "A": "Khối lượng của hạt nhân xấp xỉ khối lượng của nguyên tử.",
    "B": "Khối lượng của proton lớn hơn nhiều khối lượng của electron.",
    "C": "Khối lượng của nguyên tử bằng tổng khối lượng của các electron.",
    "D": "Neutron có khối lượng xấp xỉ khối lượng của proton."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Khối lượng nguyên tử gồm khối lượng proton, neutron và electron, trong đó electron không đáng kể.",
-   "Khối lượng nguyên tử chủ yếu là khối lượng hạt nhân nên ý C sai."
-  ],
-  "chot": "Khối lượng nguyên tử chủ yếu do proton và neutron quyết định."
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng?",
   "pa": {
    "A": "Khối lượng của hạt nhân nhỏ hơn nhiều so với khối lượng của nguyên tử.",
    "B": "Khối lượng của electron không đáng kể so với khối lượng của hạt nhân.",
    "C": "Khối lượng của electron lớn hơn khối lượng của neutron.",
    "D": "Proton có khối lượng nhỏ hơn electron."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Hạt nhân chứa proton và neutron, mỗi hạt nặng gần 1 amu.",
-   "Electron nhẹ hơn khoảng 1837 lần nên khối lượng của nó không đáng kể so với hạt nhân."
-  ],
-  "chot": "Khối lượng electron không đáng kể so với khối lượng hạt nhân."
+  }
  }
 ]

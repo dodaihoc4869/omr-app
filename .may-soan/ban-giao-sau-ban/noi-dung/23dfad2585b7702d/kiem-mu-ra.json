@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Neutron có khối lượng xấp xỉ proton; các phương án khác sai",
+  "lyDo": "Neutron không mang điện, nằm trong hạt nhân, khối lượng xấp xỉ proton (≈1 amu).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "Proton nằm trong hạt nhân; electron mới chuyển động tạo lớp vỏ",
+  "lyDo": "Proton nằm trong hạt nhân; chính electron chuyển động quanh hạt nhân tạo lớp vỏ.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Electron mang điện âm",
+  "lyDo": "Electron mang điện tích âm; nằm ở vỏ, khối lượng rất nhỏ so với 1 amu.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "D",
-  "lyDo": "Hạt nhân gồm proton và neutron, không chứa electron",
+  "lyDo": "Hạt nhân chứa proton và neutron, không chứa electron.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "Lớp vỏ gồm các electron, mang điện âm",
+  "lyDo": "Lớp vỏ nguyên tử gồm các electron, mang điện âm.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "Khối lượng electron nhỏ hơn proton rất nhiều, nên B sai",
+  "lyDo": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần, nên B sai.",
   "chac": true
  }
 ]

@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Hầu hết xuyên thẳng nên nguyên tử có phần lớn thể tích là khoảng trống; C sai",
+  "lyDo": "Hầu hết hạt alpha xuyên thẳng vì nguyên tử phần lớn là khoảng trống; C sai vì hạt nhân rất nhỏ.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "Hạt nhân rất nhỏ so với nguyên tử; B sai",
+  "lyDo": "Hạt nhân rất nhỏ so với nguyên tử; A, B sai, electron nhẹ hơn alpha nên C sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "C",
-  "lyDo": "Nếu đặc khít thì hầu hết hạt alpha bị cản/lệch",
+  "lyDo": "Nếu nguyên tử đặc khít thì hạt alpha sẽ bị chặn hoặc lệch; A, B, D mâu thuẫn giả thiết.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "A",
-  "lyDo": "Lực đẩy tĩnh điện giữa alpha (+) và hạt nhân (+) khi lại gần",
+  "lyDo": "Lệch do lực đẩy tĩnh điện giữa alpha (+) và hạt nhân (+) khi lại gần; D sai vì hạt nhân mang điện dương.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "Hạt nhân chiếm thể tích rất nhỏ, kết luận này sai",
+  "lyDo": "Hạt nhân chiếm gần hết thể tích là sai (hạt nhân rất nhỏ); các ý còn lại rút ra được.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Alpha đi qua vùng trống, không đến gần hạt nhân",
+  "lyDo": "Alpha đi qua vùng trống, không đến gần hạt nhân nên không lệch; A, B, C sai.",
   "chac": true
  }
 ]

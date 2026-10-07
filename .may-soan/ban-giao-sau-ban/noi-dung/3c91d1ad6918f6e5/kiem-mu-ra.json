@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "B",
-  "lyDo": "Tia mang điện âm bị hút về bản dương (bản trên)",
+  "lyDo": "Hạt electron mang điện âm bị bản dương (bản trên) hút nên lệch lên trên.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "D",
-  "lyDo": "Tia âm cực là chùm electron đi từ cathode sang anode; các phương án khác sai",
+  "lyDo": "Tia âm cực là chùm electron đi từ cathode sang anode; A sai (không phụ thuộc kim loại), B sai (điện âm), C sai (bị lệch).",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "A",
-  "lyDo": "Tia âm cực là chùm electron, không phải proton",
+  "lyDo": "Tia âm cực là chùm electron mang điện âm, không phải proton; B, C, D đều đúng.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "C",
-  "lyDo": "Thomson phát hiện electron",
+  "lyDo": "Thomson phát hiện ra electron.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "B",
-  "lyDo": "Bản chất tia âm cực không phụ thuộc kim loại làm cathode",
+  "lyDo": "Tia âm cực luôn là chùm electron, không phụ thuộc vật liệu cathode.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Hạt mang điện âm bị bản cực dương hút",
+  "lyDo": "Hạt mang điện âm bị bản cực dương hút nên lệch về phía đó.",
   "chac": true
  }
 ]

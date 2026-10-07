@@ -1,164 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Hạt nhân của nguyên tử nguyên tố X có 27 hạt, trong đó số hạt không mang điện là 14.\nSố proton trong X là",
   "pa": {
    "A": "14.",
    "B": "27.",
    "C": "13.",
    "D": "26."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Hạt nhân gồm proton và neutron; hạt không mang điện là neutron: 14.",
-   "Số proton = 27 − 14 = 13."
-  ],
-  "chot": "Số proton bằng tổng số hạt nhân trừ số neutron.",
-  "phepTinh": [
-   {
-    "ten": "Số proton",
-    "bieuThuc": "27-14",
-    "ketQua": 13,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss2",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Hạt nhân của nguyên tử nguyên tố X có 31 hạt, trong đó số hạt không mang điện là 16.\nSố proton trong X là",
   "pa": {
    "A": "15.",
    "B": "16.",
    "C": "31.",
    "D": "30."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Hạt nhân gồm proton và neutron; hạt không mang điện là neutron: 16.",
-   "Số proton = 31 − 16 = 15."
-  ],
-  "chot": "Số proton bằng tổng số hạt nhân trừ số neutron.",
-  "phepTinh": [
-   {
-    "ten": "Số proton",
-    "bieuThuc": "31-16",
-    "ketQua": 15,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss3",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Hạt nhân của nguyên tử nguyên tố X có 35 hạt, trong đó số hạt không mang điện là 18.\nSố proton trong X là",
   "pa": {
    "A": "18.",
    "B": "35.",
    "C": "34.",
    "D": "17."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Hạt nhân gồm proton và neutron; hạt không mang điện là neutron: 18.",
-   "Số proton = 35 − 18 = 17."
-  ],
-  "chot": "Số proton bằng tổng số hạt nhân trừ số neutron.",
-  "phepTinh": [
-   {
-    "ten": "Số proton",
-    "bieuThuc": "35-18",
-    "ketQua": 17,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss4",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Hạt nhân của nguyên tử nguyên tố X có 39 hạt, trong đó số hạt không mang điện là 20.\nSố proton trong X là",
   "pa": {
    "A": "20.",
    "B": "19.",
    "C": "39.",
    "D": "38."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Hạt nhân gồm proton và neutron; hạt không mang điện là neutron: 20.",
-   "Số proton = 39 − 20 = 19."
-  ],
-  "chot": "Số proton bằng tổng số hạt nhân trừ số neutron.",
-  "phepTinh": [
-   {
-    "ten": "Số proton",
-    "bieuThuc": "39-20",
-    "ketQua": 19,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss5",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Hạt nhân của nguyên tử nguyên tố X có 23 hạt, trong đó số hạt không mang điện là 12.\nSố proton trong X là",
   "pa": {
    "A": "12.",
    "B": "23.",
    "C": "11.",
    "D": "22."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Hạt nhân gồm proton và neutron; hạt không mang điện là neutron: 12.",
-   "Số proton = 23 − 12 = 11."
-  ],
-  "chot": "Số proton bằng tổng số hạt nhân trừ số neutron.",
-  "phepTinh": [
-   {
-    "ten": "Số proton",
-    "bieuThuc": "23-12",
-    "ketQua": 11,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  },
  {
   "id": "ss6",
-  "kieu": "so",
-  "cach": "doi_so",
+  "loai": "ban_khac",
   "de": "Hạt nhân của nguyên tử nguyên tố X có 45 hạt, trong đó số hạt không mang điện là 24.\nSố proton trong X là",
   "pa": {
    "A": "21.",
    "B": "24.",
    "C": "45.",
    "D": "42."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Hạt nhân gồm proton và neutron; hạt không mang điện là neutron: 24.",
-   "Số proton = 45 − 24 = 21."
-  ],
-  "chot": "Số proton bằng tổng số hạt nhân trừ số neutron.",
-  "phepTinh": [
-   {
-    "ten": "Số proton",
-    "bieuThuc": "45-24",
-    "ketQua": 21,
-    "lamTron": 0,
-    "laDapSo": true
-   }
-  ]
+  }
  }
 ]

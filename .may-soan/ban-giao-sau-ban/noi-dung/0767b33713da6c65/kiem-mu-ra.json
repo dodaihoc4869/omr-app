@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "C",
-  "lyDo": "Z = 92",
+  "lyDo": "Số đơn vị điện tích hạt nhân = Z = 92 (chỉ số dưới của U).",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "A",
-  "lyDo": "Z = 79",
+  "lyDo": "Z = 79 (chỉ số dưới của Au).",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Z = 47",
+  "lyDo": "Z = 47 (chỉ số dưới của Ag).",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "Z = 80",
+  "lyDo": "Z = 80 (chỉ số dưới của Hg).",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Z = 50",
+  "lyDo": "Z = 50 (chỉ số dưới của Sn).",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "D",
-  "lyDo": "Z = 30",
+  "lyDo": "Z = 30 (chỉ số dưới của Zn).",
   "chac": true
  }
 ]

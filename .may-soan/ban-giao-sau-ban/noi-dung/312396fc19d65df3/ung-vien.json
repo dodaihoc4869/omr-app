@@ -20,7 +20,7 @@
    "chot": "Alpha xuyên thẳng cho thấy nguyên tử có cấu tạo rỗng.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hầu hết xuyên thẳng nên nguyên tử có phần lớn thể tích là khoảng trống; C sai",
+    "lyDo2": "Hầu hết hạt alpha xuyên thẳng vì nguyên tử phần lớn là khoảng trống; C sai vì hạt nhân rất nhỏ.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt nhân nhỏ, nguyên tử chủ yếu là khoảng trống.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân rất nhỏ so với nguyên tử; B sai",
+    "lyDo2": "Hạt nhân rất nhỏ so với nguyên tử; A, B sai, electron nhẹ hơn alpha nên C sai.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Không có khoảng trống thì alpha không thể xuyên thẳng.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Nếu đặc khít thì hầu hết hạt alpha bị cản/lệch",
+    "lyDo2": "Nếu nguyên tử đặc khít thì hạt alpha sẽ bị chặn hoặc lệch; A, B, D mâu thuẫn giả thiết.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Alpha lệch là do bị hạt nhân dương đẩy.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Lực đẩy tĩnh điện giữa alpha (+) và hạt nhân (+) khi lại gần",
+    "lyDo2": "Lệch do lực đẩy tĩnh điện giữa alpha (+) và hạt nhân (+) khi lại gần; D sai vì hạt nhân mang điện dương.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Alpha xuyên thẳng loại trừ ý hạt nhân chiếm gần hết thể tích.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Hạt nhân chiếm thể tích rất nhỏ, kết luận này sai",
+    "lyDo2": "Hạt nhân chiếm gần hết thể tích là sai (hạt nhân rất nhỏ); các ý còn lại rút ra được.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Không đến gần hạt nhân thì alpha không bị lệch.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Alpha đi qua vùng trống, không đến gần hạt nhân",
+    "lyDo2": "Alpha đi qua vùng trống, không đến gần hạt nhân nên không lệch; A, B, C sai.",
     "chac": true
    }
   }

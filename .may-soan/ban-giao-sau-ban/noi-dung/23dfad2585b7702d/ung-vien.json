@@ -20,7 +20,7 @@
    "chot": "Neutron: trong hạt nhân, không mang điện, nặng như proton.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Neutron có khối lượng xấp xỉ proton; các phương án khác sai",
+    "lyDo2": "Neutron không mang điện, nằm trong hạt nhân, khối lượng xấp xỉ proton (≈1 amu).",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Electron mới chuyển động quanh hạt nhân.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Proton nằm trong hạt nhân; electron mới chuyển động tạo lớp vỏ",
+    "lyDo2": "Proton nằm trong hạt nhân; chính electron chuyển động quanh hạt nhân tạo lớp vỏ.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Electron mang điện âm, ở lớp vỏ.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Electron mang điện âm",
+    "lyDo2": "Electron mang điện tích âm; nằm ở vỏ, khối lượng rất nhỏ so với 1 amu.",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Hạt nhân không chứa electron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân gồm proton và neutron, không chứa electron",
+    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Lớp vỏ nguyên tử gồm các electron.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Lớp vỏ gồm các electron, mang điện âm",
+    "lyDo2": "Lớp vỏ nguyên tử gồm các electron, mang điện âm.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Electron nhẹ hơn proton rất nhiều.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Khối lượng electron nhỏ hơn proton rất nhiều, nên B sai",
+    "lyDo2": "Khối lượng electron nhỏ hơn proton khoảng 1840 lần, nên B sai.",
     "chac": true
    }
   }

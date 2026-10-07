@@ -2,37 +2,37 @@
  {
   "id": "ss1",
   "d": "A",
-  "lyDo": "m(p) ≈ m(n) ≈ 1 amu; B, C, D sai.",
+  "lyDo": "m_p ≈ m_n ≈ 1 amu; B, D ngược thực tế; C sai vì khối lượng nguyên tử xấp xỉ hạt nhân.",
   "chac": true
  },
  {
   "id": "ss2",
   "d": "C",
-  "lyDo": "Khối lượng nguyên tử tập trung ở hạt nhân; A, B, D sai.",
+  "lyDo": "Khối lượng nguyên tử tập trung chủ yếu ở hạt nhân; A, B, D sai.",
   "chac": true
  },
  {
   "id": "ss3",
   "d": "D",
-  "lyDo": "Electron nhẹ hơn neutron ~1/1840 lần nên D sai; A, B, C đúng.",
+  "lyDo": "Câu hỏi 'không đúng': electron nhẹ hơn neutron ~1800 lần nên D sai; A, B, C đúng.",
   "chac": true
  },
  {
   "id": "ss4",
   "d": "B",
-  "lyDo": "m(e) ≈ 1/1837 m(p).",
+  "lyDo": "m_e ≈ 1/1837 m_p; các phương án còn lại đảo ngược hoặc sai.",
   "chac": true
  },
  {
   "id": "ss5",
   "d": "C",
-  "lyDo": "Khối lượng nguyên tử gồm cả proton, neutron, không chỉ electron; A, B, D đúng.",
+  "lyDo": "Câu hỏi 'không đúng': khối lượng nguyên tử gồm cả hạt nhân, không bằng tổng khối lượng electron; A, B, D đúng.",
   "chac": true
  },
  {
   "id": "ss6",
   "d": "B",
-  "lyDo": "Khối lượng electron không đáng kể so với hạt nhân; A, C, D sai.",
+  "lyDo": "Khối lượng electron rất nhỏ so với hạt nhân; A sai (hạt nhân ≈ nguyên tử), C, D sai.",
   "chac": true
  }
 ]

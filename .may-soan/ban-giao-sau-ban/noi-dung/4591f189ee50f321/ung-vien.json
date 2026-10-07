@@ -20,7 +20,7 @@
    "chot": "Lớp vỏ chỉ chứa electron; proton và neutron ở hạt nhân.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Proton nằm trong hạt nhân, không ở lớp vỏ",
+    "lyDo2": "Proton nằm trong hạt nhân, không ở lớp vỏ nên C sai.",
     "chac": true
    }
   },
@@ -42,7 +42,7 @@
    "chot": "Hạt ở lớp vỏ là electron.",
    "kiem": {
     "d2": "B",
-    "lyDo2": "Lớp vỏ chỉ chứa electron",
+    "lyDo2": "Lớp vỏ nguyên tử chỉ chứa electron.",
     "chac": true
    }
   },
@@ -64,7 +64,7 @@
    "chot": "Hạt nhân gồm proton và neutron, không có electron.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân gồm proton và neutron",
+    "lyDo2": "Hạt nhân gồm proton và neutron (hầu hết nguyên tử).",
     "chac": true
    }
   },
@@ -86,7 +86,7 @@
    "chot": "Lớp vỏ gồm các electron mang điện tích âm.",
    "kiem": {
     "d2": "A",
-    "lyDo2": "Lớp vỏ chứa electron mang điện âm",
+    "lyDo2": "Lớp vỏ chỉ chứa electron mang điện âm; proton và neutron ở hạt nhân.",
     "chac": true
    }
   },
@@ -108,7 +108,7 @@
    "chot": "Neutron nằm trong hạt nhân cùng proton.",
    "kiem": {
     "d2": "C",
-    "lyDo2": "Neutron nằm trong hạt nhân",
+    "lyDo2": "Neutron nằm trong hạt nhân.",
     "chac": true
    }
   },
@@ -130,7 +130,7 @@
    "chot": "Electron chỉ có ở lớp vỏ, không có trong hạt nhân.",
    "kiem": {
     "d2": "D",
-    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron",
+    "lyDo2": "Hạt nhân chứa proton và neutron, không chứa electron nên D sai.",
     "chac": true
    }
   }

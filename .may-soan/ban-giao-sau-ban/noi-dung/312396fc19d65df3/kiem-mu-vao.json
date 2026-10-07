@@ -1,110 +1,68 @@
 [
  {
   "id": "ss1",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Trong thí nghiệm của Rutherford, hầu hết hạt alpha xuyên qua lá vàng mỏng mà không bị lệch hướng vì",
   "pa": {
    "A": "lá vàng mang điện tích âm nên không đẩy hạt alpha.",
    "B": "phần lớn thể tích của nguyên tử là khoảng trống.",
    "C": "hạt nhân chiếm gần hết thể tích của nguyên tử.",
    "D": "electron hút hạt alpha đi thẳng qua nguyên tử."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Hạt alpha đi thẳng nghĩa là trên đường đi hầu như không gặp vật cản.",
-   "Vậy phần lớn thể tích nguyên tử là khoảng trống, hạt nhân rất nhỏ so với nguyên tử."
-  ],
-  "chot": "Alpha xuyên thẳng cho thấy nguyên tử có cấu tạo rỗng."
+  }
  },
  {
   "id": "ss2",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Phát biểu nào sau đây đúng khi rút ra từ việc hầu hết hạt alpha đi thẳng qua lá vàng?",
   "pa": {
    "A": "Nguyên tử có cấu tạo đặc khít.",
    "B": "Hạt nhân chiếm gần hết thể tích của nguyên tử.",
    "C": "Electron có khối lượng lớn hơn hạt alpha nên chặn hạt alpha lại.",
    "D": "Kích thước hạt nhân rất nhỏ so với kích thước nguyên tử."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Hầu hết hạt alpha không bị lệch nên chúng ít khi đến gần hạt nhân.",
-   "Điều đó chỉ xảy ra khi hạt nhân rất nhỏ so với toàn nguyên tử."
-  ],
-  "chot": "Hạt nhân nhỏ, nguyên tử chủ yếu là khoảng trống."
+  }
  },
  {
   "id": "ss3",
-  "kieu": "ly_thuyet",
-  "cach": "dao_chieu",
+  "loai": "ban_khac",
   "de": "Nếu nguyên tử có cấu tạo đặc khít thì kết quả nào sau đây phù hợp khi bắn chùm hạt alpha vào lá vàng mỏng?",
   "pa": {
    "A": "Hầu hết hạt alpha xuyên thẳng qua lá vàng.",
    "B": "Không hạt alpha nào bị cản trở.",
    "C": "Hầu hết hạt alpha bị chặn lại hoặc bị lệch hướng.",
    "D": "Mọi hạt alpha đều xuyên thẳng mà không lệch."
-  },
-  "dap_an": "C",
-  "buoc": [
-   "Nguyên tử đặc khít thì không có khoảng trống cho hạt alpha đi qua.",
-   "Hạt alpha khi đó sẽ hầu hết bị chặn lại hoặc lệch hướng, trái với kết quả thực tế."
-  ],
-  "chot": "Không có khoảng trống thì alpha không thể xuyên thẳng."
+  }
  },
  {
   "id": "ss4",
-  "kieu": "ly_thuyet",
-  "cach": "doi_nhieu",
+  "loai": "ban_khac",
   "de": "Một tỉ lệ rất nhỏ hạt alpha bị lệch hướng khi đi qua lá vàng. Nguyên nhân chủ yếu là",
   "pa": {
    "A": "lực đẩy tĩnh điện giữa hạt alpha và hạt nhân mang điện dương khi hạt alpha đi gần hạt nhân.",
    "B": "lực hút của các electron lên hạt alpha ở rất xa nguyên tử.",
    "C": "hạt alpha va chạm với các nguyên tử vàng đặc khít.",
    "D": "hạt nhân mang điện âm hút hạt alpha."
-  },
-  "dap_an": "A",
-  "buoc": [
-   "Hạt alpha mang điện dương, hạt nhân cũng mang điện dương.",
-   "Khi đi đến gần hạt nhân, hạt alpha bị lực đẩy tĩnh điện làm lệch hướng."
-  ],
-  "chot": "Alpha lệch là do bị hạt nhân dương đẩy."
+  }
  },
  {
   "id": "ss5",
-  "kieu": "ly_thuyet",
-  "cach": "dung_sai",
+  "loai": "ban_khac",
   "de": "Kết luận nào sau đây không thể rút ra từ việc hầu hết hạt alpha xuyên thẳng qua lá vàng?",
   "pa": {
    "A": "Nguyên tử có nhiều khoảng trống.",
    "B": "Hạt nhân chiếm gần hết thể tích của nguyên tử.",
    "C": "Hạt nhân có kích thước rất nhỏ so với nguyên tử.",
    "D": "Hạt alpha ít bị cản trở khi đi trong nguyên tử."
-  },
-  "dap_an": "B",
-  "buoc": [
-   "Hạt alpha đi thẳng được vì nguyên tử nhiều khoảng trống và hạt nhân nhỏ.",
-   "Nói hạt nhân chiếm gần hết thể tích thì mâu thuẫn với kết quả thí nghiệm."
-  ],
-  "chot": "Alpha xuyên thẳng loại trừ ý hạt nhân chiếm gần hết thể tích."
+  }
  },
  {
   "id": "ss6",
-  "kieu": "ly_thuyet",
-  "cach": "doi_chat",
+  "loai": "ban_khac",
   "de": "Giải thích nào sau đây đúng về việc hầu hết hạt alpha không bị lệch hướng khi qua lá vàng?",
   "pa": {
    "A": "Electron mang điện âm hút hạt alpha đi thẳng.",
    "B": "Hạt nhân hút hạt alpha nên chúng đi thẳng.",
    "C": "Hạt alpha nặng hơn cả nguyên tử vàng nên không bị cản.",
    "D": "Hạt alpha đi qua vùng không gian trống và không đến gần hạt nhân."
-  },
-  "dap_an": "D",
-  "buoc": [
-   "Hạt nhân rất nhỏ nên phần lớn hạt alpha không đến gần nó.",
-   "Chúng đi qua khoảng trống giữa hạt nhân và vỏ electron nên giữ nguyên hướng."
-  ],
-  "chot": "Không đến gần hạt nhân thì alpha không bị lệch."
+  }
  }
 ]
