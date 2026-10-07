@@ -1,0 +1,13 @@
+[
+ {
+  "qid": "DH-10-C2-B5-III-21",
+  "maDe": "DH-10-C2-B5",
+  "phan": "III",
+  "so": 21,
+  "viec": "thay",
+  "truong": "de",
+  "truoc": "cùng thuộc nhóm A",
+  "sau": "cùng thuộc một nhóm A",
+  "lyDo": "Đề thiếu chữ \"một\": đọc nguyên văn thì cả 4 nguyên tố đều thuộc nhóm A. Ý đồ ra đề là đếm nguyên tố trùng nhóm, đáp số 2 đúng với bản đã sửa."
+ }
+]
