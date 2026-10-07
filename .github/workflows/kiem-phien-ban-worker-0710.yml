@@ -3,6 +3,7 @@
 # KHÔNG in thư điện tử, mã người dùng, mã bí mật: repo công khai, nhật ký chạy ai cũng đọc.
 name: Kiểm lịch sử phiên bản Worker (chỉ đọc)
 on:
+  workflow_dispatch:
   push:
     branches: [claude/kiem-phien-ban-0710]
     paths: ['.github/workflows/kiem-phien-ban-worker-0710.yml']
