@@ -6,7 +6,7 @@
 //   · BẢN KHÁC (tối đa 4 / câu Phần I và III) — lưu vào `cau_bo_tro.song_sinh_json` (cùng chỗ song sinh của kho ⇒ game phủ như song sinh):
 //       kieu 'so'        = song sinh ĐỔI SỐ LIỆU (câu tính toán): mỗi bản một bộ số riêng, khác đề gốc; đáp án TÍNH LẠI ĐƯỢC (`phepTinh`, máy tính lại);
 //       kieu 'ly_thuyet' = biến thể lí thuyết: đổi chất cùng loại · đảo chiều hỏi · đúng↔sai · đổi phương án nhiễu.
-//   · Ý ĐÚNG–SAI MỚI (Phần II): 8–12 ý mới cùng đề dẫn (ngoài 4 ý gốc), mỗi ý Đ/S + lí do 1 dòng — lưu bảng `cau_y_ds` (server/src/cau-y-ds.ts).
+//   · Ý ĐÚNG–SAI MỚI (Phần II): 24 ý mới cùng đề dẫn (ngoài 4 ý gốc), đủ sáu bộ riêng biệt, mỗi ý Đ/S + lí do 1 dòng — lưu bảng `cau_y_ds`.
 // HAI LƯỢT ĐỘC LẬP, không người duyệt: lượt SOẠN ra nội dung + đáp án; lượt KIỂM MÙ (một `claude -p` khác, thư mục tạm riêng, KHÔNG thấy đáp án
 // đề xuất / đáp án kho / hồ sơ) tự giải từng mục ⇒ chỉ giữ mục hai lượt KHỚP; mục bị báo mơ hồ / phụ thuộc quy ước ("?") ⇒ bỏ.
 // TỰ XỬ CỜ ĐÁP ÁN: hồ sơ còn cờ `dapAn` sau phiên chốt ⇒ lượt kiểm mù giải lại CÂU GỐC: khớp đáp án kho ⇒ cờ sang `daChot` (máy duyệt như cũ);
@@ -16,18 +16,20 @@
 // máy chủ không tin máy soạn — dựng câu gốc từ KHO (`cauGocTuKho`) rồi kiểm lại từng mục + bằng chứng hai lượt (`kiem.d2`).
 // Chữ học sinh đọc (đề, phương án, ý, lời giải bản khác) viết như đề KHO (H2SO4, Fe^3+, \ce{…}); không thẻ HTML, không từ nội bộ.
 import { loaiCau, saiSoLamTron, tinhBieuThuc, type CauKho, type DangLoiGiai } from '../../src/lib/loi-giai-kiem'
+import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
+import { TRAN_SONG_SINH } from './loi-hoc-luat'
 import { docBangSongSinh, songSinhDuDuLieu, type SongSinh } from './cau-bo-tro'
 
 type Obj = Record<string, unknown>
 const laObj = (x: unknown): x is Obj => x !== null && typeof x === 'object' && !Array.isArray(x)
 const chuoi = (x: unknown): string => (typeof x === 'string' ? x : typeof x === 'number' && Number.isFinite(x) ? String(x) : '').normalize('NFC')
 
-/** Trần số bản khác DÙNG ĐƯỢC của một câu (đề xuất 2.7 đã chốt: 2 → 4). */
-export const SO_BAN_KHAC_TOI_DA = 4
-/** Câu Phần II "đã có kho ý" khi có ít nhất chừng này ý mới. */
-export const Y_DS_DU = 8
-/** Mỗi lượt soạn nhắm tới chừng này ý mới (đề xuất 8–12). */
-export const Y_DS_MUC_TIEU = 12
+/** Mục tiêu bản khác DÙNG ĐƯỢC; cùng một nguồn với lịch sử và vòng chọn bản. */
+export const SO_BAN_KHAC_TOI_DA = TRAN_SONG_SINH
+/** Phần II cần sáu bộ bốn ý riêng biệt, không tính bốn ý gốc. */
+export const Y_DS_DU = 4 * SO_BAN_KHAC_TOI_DA
+/** Mỗi lượt soạn bổ sung tới đủ sáu bộ bốn ý mới. */
+export const Y_DS_MUC_TIEU = Y_DS_DU
 /** Trần số ý mới lưu cho một câu. */
 export const Y_DS_TRAN = 24
 /** Cách làm bản khác (ghi để thống kê; `doi_so` cho kieu 'so', bốn cách còn lại cho biến thể lí thuyết). */
@@ -42,7 +44,7 @@ export interface BanKhacSoan {
 }
 export interface YMoiSoan { t: string; d: 'D' | 'S'; lyDo: string }
 /** Bằng chứng HAI LƯỢT: đáp án lượt kiểm mù tự giải ra (khớp đáp án lượt soạn mới được giữ). */
-export interface BangChung2Luot { d2: string; lyDo2?: string }
+export interface BangChung2Luot { d2: string; lyDo2: string; chac: true }
 /** Việc máy chủ giao cho một câu: soạn hồ sơ lời giải? cần mấy bản khác (kiểu nào)? cần mấy ý Đ–S mới? */
 export interface CanSoan { hoSo: boolean; banKhac: number; kieuBan: KieuBanKhac | 'tu_chon'; yDs: number }
 export const CAN_RONG: CanSoan = { hoSo: true, banKhac: 0, kieuBan: 'tu_chon', yDs: 0 }
@@ -127,6 +129,8 @@ export function cauGocTuKho(c: CauKho, bam: string): CauGoc | null {
 /** Câu gốc từ tệp `vao/<tệp>.json` của lô (máy soạn): dùng `deTho` (chữ kho) + `bang` máy chủ gửi kèm; đáp án lấy từ `dapAn` / `mc`. */
 export function cauGocTuVao(v: unknown): CauGoc | null {
   if (!laObj(v)) return null
+  // Không suy phần tự luận thành III chỉ vì tệp cũ mang dang: 'tln'.
+  if (laCauTuLuan({ kieu: v.kieuKho ?? v.kieu, tuLuan: v.tuLuan, tu_luan: v.tu_luan, phan: v.phan, qid: v.qid, maDe: v.maDe ?? v.ma_de })) return null
   const dang = chuoi(v.dang) as DangLoiGiai
   if (dang !== 'tn' && dang !== 'ds' && dang !== 'tln') return null
   const y = Array.isArray(v.y) ? (v.y as unknown[]).filter(laObj).map((x) => ({ id: chuoi(x.id), t: chuoi(x.t) })) : []
@@ -136,6 +140,10 @@ export function cauGocTuVao(v: unknown): CauGoc | null {
   const dapAn = dang === 'tn'
     ? chuoi(laObj(v.mc) ? v.mc.dapAn : '') || (y.find((x) => chuoi(da[x.id]) === 'D')?.id ?? '')
     : dang === 'ds' ? y.map((x) => chuoi(da[x.id])).join('') : chuoi(da.kq)
+  if (laCauTuLuan({ phan, de: chuoi(v.deTho) || boHtml(chuoi(v.de)), dap_an: dapAn,
+    ...(dang === 'tn' ? { pa: Object.fromEntries(y.map((x) => [x.id, x.t])) } : {}),
+    ...(dang === 'ds' ? { y: Object.fromEntries(y.map((x) => [x.id, x.t])) } : {}),
+  })) return null
   return {
     qid: chuoi(v.qid), bam: chuoi(v.bam), dang, phan, de: chuoi(v.deTho) || boHtml(chuoi(v.de)), bang: docBangSongSinh(v.bang) ?? null,
     pa: dang === 'tn' ? Object.fromEntries(y.map((x) => [x.id, x.t])) : null, y: dang === 'ds' ? y : [], dapAn, kieu: chuoi(v.kieuKho),
@@ -151,7 +159,7 @@ export function kieuBanCua(kieuKho: unknown): CanSoan['kieuBan'] {
 /** Việc giao cho một câu từ tình trạng học liệu hiện có. Câu đang nghi đáp án / tắt học liệu thêm ⇒ chỉ hồ sơ. */
 export function tinhCan(o: { dang: DangLoiGiai; kieuKho?: unknown; hoSo: boolean; soBanDung: number; soY: number; nghi?: boolean; boTro?: boolean }): CanSoan {
   const kieuBan = kieuBanCua(o.kieuKho)
-  if (o.boTro === false || o.nghi) return { hoSo: o.hoSo, banKhac: 0, kieuBan, yDs: 0 }
+  if (o.boTro === false || o.nghi || laCauTuLuan({ kieu: o.kieuKho })) return { hoSo: o.hoSo, banKhac: 0, kieuBan, yDs: 0 }
   return {
     hoSo: o.hoSo, kieuBan,
     banKhac: o.dang === 'ds' ? 0 : Math.max(0, SO_BAN_KHAC_TOI_DA - Math.max(0, o.soBanDung)),
@@ -162,7 +170,7 @@ export function tinhCan(o: { dang: DangLoiGiai; kieuKho?: unknown; hoSo: boolean
 // ---------------------------------------------------------------- hàng soạn ưu tiên câu em đã sai
 
 export type MucThieu = 'han' | 'mot_phan' | null
-/** Câu còn thiếu bản khác? 'han' = chưa có bản khác dùng được nào (Phần II: chưa có ý mới nào); 'mot_phan' = có nhưng chưa đủ 4 (Phần II: < 8 ý). */
+/** Câu còn thiếu bản khác? 'han' = chưa có; 'mot_phan' = chưa đủ sáu bản (Phần II: < 24 ý). */
 export function thieuBanKhac(dang: DangLoiGiai, soBanDung: number, soY: number): MucThieu {
   if (dang === 'ds') return soY <= 0 ? 'han' : soY < Y_DS_DU ? 'mot_phan' : null
   return soBanDung <= 0 ? 'han' : soBanDung < SO_BAN_KHAC_TOI_DA ? 'mot_phan' : null
@@ -203,6 +211,7 @@ function kiemPhepTinhBan(ds: unknown, noi: string, loi: string[]): PhepTinhBan[]
 export function kiemBanKhacMot(goc: CauGoc, x: unknown, i: number): { loi: string[]; ban?: BanKhacSoan } {
   const noi = `bản khác ${i + 1}`
   if (!laObj(x)) return { loi: [`${noi}: không phải đối tượng JSON`] }
+  if (laCauTuLuan({ kieu: goc.kieu })) return { loi: [`${noi}: không sinh song sinh cho câu tự luận`] }
   if (goc.phan !== 'I' && goc.phan !== 'III') return { loi: [`${noi}: chỉ câu Phần I / III có bản khác`] }
   const loi: string[] = []
   const kieu = chuoi(x.kieu).trim()
@@ -337,6 +346,7 @@ export function kiemBanKhac(goc: CauGoc, can: CanSoan, ds: unknown, daCo: DaCo =
 export function kiemYMoiMot(_goc: CauGoc, x: unknown, i: number): { loi: string[]; y?: YMoiSoan } {
   const noi = `ý mới ${i + 1}`
   if (!laObj(x)) return { loi: [`${noi}: không phải đối tượng JSON`] }
+  if (laCauTuLuan({ kieu: _goc.kieu })) return { loi: [`${noi}: không sinh ý mới cho câu tự luận`] }
   const loi: string[] = []
   const t = chuoi(x.t).trim()
   if (t.length < 10) loi.push(`${noi}: chữ của ý rỗng hoặc quá ngắn`)
@@ -353,7 +363,7 @@ export function kiemYMoiMot(_goc: CauGoc, x: unknown, i: number): { loi: string[
 }
 
 /**
- * Kiểm CẢ BỘ ý mới của một câu Phần II. `batBuocSo`: số ý trong [min(8, cần), cần] và mỗi giá trị Đ/S chiếm ít nhất 1/4 (kho lệch một phía thì em đoán được).
+ * Kiểm CẢ BỘ ý mới của một câu Phần II. `batBuocSo`: đủ số ý còn thiếu để đạt 24; mỗi giá trị Đ/S chiếm ít nhất 1/4.
  * Luôn: mỗi ý hợp lệ; khác 4 ý gốc, khác ý đã có, khác nhau.
  */
 export function kiemYMoi(goc: CauGoc, can: CanSoan, ds: unknown, daCo: DaCo = DA_CO_RONG, batBuocSo = true):
@@ -455,7 +465,13 @@ export function khopMu(dang: DangLoiGiai, deXuat: string, m: { d: string; chac?:
 const lyDoBoMu = (m: TraLoiMu | undefined, deXuat: string): string =>
   !m ? 'lượt kiểm mù không trả lời mục này'
     : (m.d.includes('?') || m.chac === false) ? `lượt kiểm mù báo mơ hồ / không chắc${m.lyDo ? ': ' + m.lyDo.slice(0, 160) : ''}`
+      : m.chac !== true ? 'lượt kiểm mù chưa xác nhận chắc chắn (cần chac: true)'
+        : !chuoi(m.lyDo).trim() ? 'lượt kiểm mù thiếu lí do giải độc lập'
       : `lượt kiểm mù ra ${m.d} ≠ ${deXuat}`
+
+/** Bản mới chỉ được nhận khi lượt kiểm mù xác nhận chắc chắn và có lí do giải; không thay luật hồ sơ gốc. */
+const coBangChungMu = (m: TraLoiMu | undefined): m is TraLoiMu & { chac: true; lyDo: string } =>
+  m?.chac === true && !!chuoi(m.lyDo).trim()
 
 /** Ghép lượt soạn với lượt kiểm mù: chỉ giữ mục hai lượt khớp, kèm bằng chứng `kiem` (máy chủ đòi bằng chứng này lúc nhận). */
 export function ghepHaiLuot(goc: CauGoc, hopLe: { songSinh: readonly BanKhacSoan[]; yMoi: readonly YMoiSoan[] }, tra: readonly TraLoiMu[] | null | undefined): {
@@ -466,12 +482,12 @@ export function ghepHaiLuot(goc: CauGoc, hopLe: { songSinh: readonly BanKhacSoan
   const boSongSinh: MucBo[] = [], boY: MucBo[] = []
   hopLe.songSinh.forEach((s, i) => {
     const m = theo.get(`ss${i + 1}`)
-    if (khopMu(goc.dang, s.dap_an, m)) songSinh.push({ ...s, kiem: { d2: m!.d, ...(m!.lyDo ? { lyDo2: m!.lyDo.slice(0, 300) } : {}) } })
+    if (coBangChungMu(m) && khopMu(goc.dang, s.dap_an, m)) songSinh.push({ ...s, kiem: { d2: m.d, lyDo2: m.lyDo.trim().slice(0, 300), chac: true } })
     else boSongSinh.push({ i, lyDo: lyDoBoMu(m, s.dap_an) })
   })
   hopLe.yMoi.forEach((y, i) => {
     const m = theo.get(`y${i + 1}`)
-    if (khopMu('ds', y.d, m)) yMoi.push({ ...y, kiem: { d2: chuanDs(m!.d), ...(m!.lyDo ? { lyDo2: m!.lyDo.slice(0, 300) } : {}) } })
+    if (coBangChungMu(m) && khopMu('ds', y.d, m)) yMoi.push({ ...y, kiem: { d2: chuanDs(m.d), lyDo2: m.lyDo.trim().slice(0, 300), chac: true } })
     else boY.push({ i, lyDo: lyDoBoMu(m, y.d) })
   })
   return { songSinh, yMoi, boSongSinh, boY }
@@ -523,7 +539,9 @@ export function nhanBanKhacNop(goc: CauGoc, ds: unknown, daCo: DaCo): { giu: { i
   ds.slice(0, SO_BAN_KHAC_TOI_DA * 2).forEach((x, i) => {
     const k = laObj(x) && laObj(x.kiem) ? x.kiem : null
     if (!k || !khopMu(goc.dang, chuoi((x as Obj).dap_an), { d: chuoi(k.d2) })) { bo.push({ i, lyDo: 'chưa qua hai lượt khớp (thiếu kiem.d2 hoặc lệch đáp án)' }); return }
-    qua.push({ i, x, kiem: { d2: chuoi(k.d2).slice(0, 40), ...(chuoi(k.lyDo2).trim() ? { lyDo2: chuoi(k.lyDo2).trim().slice(0, 300) } : {}) } })
+    if (k.chac !== true) { bo.push({ i, lyDo: 'lượt kiểm mù chưa xác nhận chắc chắn (cần kiem.chac: true)' }); return }
+    if (!chuoi(k.lyDo2).trim()) { bo.push({ i, lyDo: 'lượt kiểm mù thiếu lí do giải độc lập (kiem.lyDo2)' }); return }
+    qua.push({ i, x, kiem: { d2: chuoi(k.d2).slice(0, 40), lyDo2: chuoi(k.lyDo2).trim().slice(0, 300), chac: true } })
   })
   const r = kiemBanKhac(goc, { ...CAN_RONG, banKhac: SO_BAN_KHAC_TOI_DA }, qua.map((q) => q.x), daCo, false)
   r.bo.forEach((b) => bo.push({ i: qua[b.i]!.i, lyDo: b.lyDo }))
@@ -537,7 +555,9 @@ export function nhanYMoiNop(goc: CauGoc, ds: unknown, daCo: DaCo): { giu: { i: n
   ds.slice(0, Y_DS_MUC_TIEU * 2).forEach((x, i) => {
     const k = laObj(x) && laObj(x.kiem) ? x.kiem : null
     if (!k || !khopMu('ds', chuoi((x as Obj).d), { d: chuoi(k.d2) })) { bo.push({ i, lyDo: 'chưa qua hai lượt khớp (thiếu kiem.d2 hoặc lệch Đ/S)' }); return }
-    qua.push({ i, x, kiem: { d2: chuanDs(k.d2), ...(chuoi(k.lyDo2).trim() ? { lyDo2: chuoi(k.lyDo2).trim().slice(0, 300) } : {}) } })
+    if (k.chac !== true) { bo.push({ i, lyDo: 'lượt kiểm mù chưa xác nhận chắc chắn (cần kiem.chac: true)' }); return }
+    if (!chuoi(k.lyDo2).trim()) { bo.push({ i, lyDo: 'lượt kiểm mù thiếu lí do giải độc lập (kiem.lyDo2)' }); return }
+    qua.push({ i, x, kiem: { d2: chuanDs(k.d2), lyDo2: chuoi(k.lyDo2).trim().slice(0, 300), chac: true } })
   })
   const r = kiemYMoi(goc, { ...CAN_RONG, yDs: Y_DS_MUC_TIEU }, qua.map((q) => q.x), daCo, false)
   r.bo.forEach((b) => bo.push({ i: qua[b.i]!.i, lyDo: b.lyDo }))

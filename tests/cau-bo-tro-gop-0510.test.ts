@@ -1,7 +1,7 @@
 // @vitest-environment node
 // HỌC LIỆU BỔ TRỢ — nạp lại gói đề KHÔNG xoá bản khác máy soạn đã nối (điều phối 05/10, sau khi làn máy soạn gộp: `/kho/may-soan/nop-bo-tro` NỐI bản
 // khác vào `cau_bo_tro.song_sinh_json`, còn `ghiCauBoTro` lúc nạp gói từng GHI ĐÈ cả hàng). Luật gộp (`gopSongSinh`): giữ mọi chỗ cũ (qid ảo "~ssN"
-// không đổi nghĩa), chỗ của gói nhận bản gói cùng vị trí, khử trùng theo nội dung, trần 4. Kèm: đọc 4 bản (locBoTro), qid ảo ~ss0..7 (tachSongSinh).
+// không đổi nghĩa), chỗ của gói nhận bản gói cùng vị trí, khử trùng theo nội dung, trần 6. Kèm: đọc 6 bản (locBoTro), qid ảo ~ss0..11 (tachSongSinh).
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -22,7 +22,7 @@ describe('gopSongSinh (thuần)', () => {
   })
   it('gói sửa bản của chính nó ⇒ thay ĐÚNG chỗ của gói; bản máy soạn không bị thay', () => {
     expect(ten(gopSongSinh([ss('P0'), ss('P1'), noi('M2')], [ss('P0x'), ss('P1')]))).toEqual(['P0x', 'P1', 'M2'])
-    expect(ten(gopSongSinh([noi('M0'), noi('M1')], [ss('P0'), ss('P1'), ss('P2')]))).toEqual(['M0', 'M1', 'P0', 'P1']) // chỗ máy soạn giữ; gói nối sau, trần 4
+    expect(ten(gopSongSinh([noi('M0'), noi('M1')], [ss('P0'), ss('P1'), ss('P2')]))).toEqual(['M0', 'M1', 'P0', 'P1', 'P2']) // chỗ máy soạn giữ; gói nối sau, trần 6
   })
   it('khử trùng theo NỘI DUNG (đề + phương án, bỏ khoảng trắng / dấu / hoa thường / thẻ HTML); gói đổi thứ tự ⇒ chỗ cũ không đổi', () => {
     const giongM2 = { ...ss('M2'), de: '  <b>BẢN M2</b>: tính   khối lượng. ' }
@@ -30,16 +30,16 @@ describe('gopSongSinh (thuần)', () => {
     expect(ten(gopSongSinh([ss('P0'), noi('M2')], [ss('P0'), giongM2]))).toEqual(['P0', 'M2'])
     expect(ten(gopSongSinh([ss('P0'), ss('P1')], [ss('P1'), ss('P0')]))).toEqual(['P0', 'P1'])
   })
-  it('trần 4: không nối thêm khi đã đủ; KHÔNG bao giờ bỏ chỗ cũ (dài hơn 4 do máy soạn nối sau bản hỏng ⇒ giữ nguyên)', () => {
-    expect(ten(gopSongSinh([ss('P0'), ss('P1'), noi('M2'), noi('M3')], [ss('P0'), ss('P1'), ss('P2')]))).toEqual(['P0', 'P1', 'M2', 'M3'])
-    const dai = [ss('H0'), ss('H1'), noi('M2'), noi('M3'), noi('M4'), noi('M5')]
-    expect(ten(gopSongSinh(dai, [ss('H0')]))).toEqual(['H0', 'H1', 'M2', 'M3', 'M4', 'M5'])
-    expect(gopSongSinh([], [ss('A'), ss('B'), ss('C'), ss('D'), ss('E')]).length).toBe(TRAN_SONG_SINH)
+  it('trần 6: không nối thêm khi đã đủ; KHÔNG bỏ chỗ lịch sử dài hơn mục tiêu', () => {
+    expect(ten(gopSongSinh([ss('P0'), ss('P1'), noi('M2'), noi('M3'), noi('M4'), noi('M5')], [ss('P0'), ss('P1'), ss('P2')]))).toEqual(['P0', 'P1', 'M2', 'M3', 'M4', 'M5'])
+    const dai = [ss('H0'), ss('H1'), noi('M2'), noi('M3'), noi('M4'), noi('M5'), noi('M6'), noi('M7')]
+    expect(ten(gopSongSinh(dai, [ss('H0')]))).toEqual(['H0', 'H1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7'])
+    expect(gopSongSinh([], [ss('A'), ss('B'), ss('C'), ss('D'), ss('E'), ss('F'), ss('G')]).length).toBe(TRAN_SONG_SINH)
   })
-  it('đọc: locBoTro giữ 4 bản của gói; qid ảo ~ss0..~ss7 đều đọc được (mảng dài tới 8 khi máy soạn nối sau bản hỏng)', () => {
-    expect(locBoTro({ song_sinh: ['A', 'B', 'C', 'D', 'E'].map((x) => ss(x)) }).songSinh.length).toBe(4)
-    expect(CHO_SONG_SINH).toBe(8)
-    expect(cacQidSongSinh('Q')).toEqual(['Q', ...[0, 1, 2, 3, 4, 5, 6, 7].map((i) => `Q~ss${i}`)])
+  it('đọc: locBoTro giữ 6 bản của gói; danh sách qid ảo phủ 12 chỗ', () => {
+    expect(locBoTro({ song_sinh: ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((x) => ss(x)) }).songSinh.length).toBe(6)
+    expect(CHO_SONG_SINH).toBe(12)
+    expect(cacQidSongSinh('Q')).toEqual(['Q', ...Array.from({ length: 12 }, (_, i) => i).map((i) => `Q~ss${i}`)])
     expect(tachSongSinh('Q~ss7#2')).toEqual({ goc: 'Q', songSinh: 7 })
   })
 })
@@ -53,7 +53,7 @@ const thay = (d: D1That, duong: string, b: Record<string, unknown>) => goiWorker
 const dong = (d: D1That, bam: string) => d.sql.prepare('SELECT song_sinh_json, cau_kiem_json FROM cau_bo_tro WHERE bam = ?').get(bam) as { song_sinh_json: string; cau_kiem_json: string }
 
 describe('/kho/day nạp lại gói ⇒ GỘP, không ghi đè bản máy soạn đã nối', () => {
-  it('gói y hệt / gói sửa bản / gói chỉ có câu kiểm / gói thêm bản khi đã đủ 4', async () => {
+  it('gói y hệt / gói sửa bản / gói chỉ có câu kiểm / gói bổ sung bản khi còn thiếu', async () => {
     const d = taoD1That()
     const goi = (them: Record<string, unknown>) => ({ cau: [cauGoi(them)] })
     const bam = await bamCau(cauTrongGoi(DE, goi({}))[0]!)
@@ -76,7 +76,7 @@ describe('/kho/day nạp lại gói ⇒ GỘP, không ghi đè bản máy soạn
     expect(ten(JSON.parse(sau.song_sinh_json))).toEqual(['P0x', 'P1', 'M2', 'M3'])
     expect(JSON.parse(sau.cau_kiem_json)).toEqual([{ buoc: 0, kieu: 'so', hoi: 'Số mol?', dap_an: '0,1', sai_so: '0.01' }])
 
-    await nap({ song_sinh: [ss('P0x'), ss('P1'), ss('P2')] }) // đã đủ 4 ⇒ không nối thêm, không bỏ bản nào
-    expect(ten(JSON.parse(dong(d, bam).song_sinh_json))).toEqual(['P0x', 'P1', 'M2', 'M3'])
+    await nap({ song_sinh: [ss('P0x'), ss('P1'), ss('P2')] }) // còn thiếu hai ⇒ nối bản P2, giữ chỗ máy soạn
+    expect(ten(JSON.parse(dong(d, bam).song_sinh_json))).toEqual(['P0x', 'P1', 'M2', 'M3', 'P2'])
   })
 })

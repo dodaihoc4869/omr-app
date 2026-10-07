@@ -1,5 +1,5 @@
 // HỌC LIỆU BỔ TRỢ TỪNG CÂU — Vòng học khép kín v2. Kho đề mang thêm 3 trường (chỉ thêm, GĐ1 soạn bằng máy + Python kiểm):
-//   · `song_sinh`: tối đa TRAN_SONG_SINH (4, từ 05/10 — trước 2) câu cùng cách giải, đổi số liệu ({de, pa?, dap_an, buoc, gia_tri_dung}) — làm lại kín không nhớ đáp án.
+//   · `song_sinh`: mục tiêu TRAN_SONG_SINH (6, từ 07/10) bản lý thuyết / tính toán; không sinh cho tự luận.
 //   · `cau_kiem`: câu hỏi kiểm từng bước lời giải ({buoc, kieu: so|chon, hoi, dap_an|lua_chon+dung, sai_so}) — đọc lời giải chủ động.
 //   · `nhan_nen`: nhãn kiến thức nền của từng bước ({buoc, nen}) — hỏng bước nào thì luyện nền đó.
 // Đọc gói R2 mỗi lần em làm thì quá chậm ⇒ lúc NẠP ĐỀ (mọi đường nạp đi qua `dayDeKho` → móc này) chép 3 trường vào bảng `cau_bo_tro`
@@ -7,6 +7,7 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import { bamCau, cauTrongGoi } from '../../src/lib/loi-giai-kiem'
 import { TRAN_SONG_SINH } from './loi-hoc-luat'
+import { laCauTuLuan } from './cam-tu-luan'
 
 type Obj = Record<string, unknown>
 const laObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v)
@@ -31,7 +32,7 @@ export function thieuBangSongSinh(ss: SongSinh): boolean {
 
 /** Dùng chung lúc chọn, lúc phục vụ và lúc dựng đề: không đòi học sinh làm một biến thể thiếu dữ kiện. */
 export function songSinhDuDuLieu(phan: string, ss: SongSinh): boolean {
-  if (!ss.de?.trim() || thieuBangSongSinh(ss)) return false
+  if (!ss || typeof ss.de !== 'string' || typeof ss.dap_an !== 'string' || !ss.de.trim() || thieuBangSongSinh(ss)) return false
   if (phan === 'I') return ['A', 'B', 'C', 'D'].every(k => typeof ss.pa?.[k] === 'string' && ss.pa[k].trim()) && /^[ABCD]$/.test(ss.dap_an.trim())
   return phan === 'III' && /^-?\d+(,\d+)?$/.test(ss.dap_an.trim())
 }
@@ -56,7 +57,7 @@ export function damBaoBangBoTro(env: Env): Promise<void> {
 
 /** Lọc học liệu bổ trợ của một câu kho thô (dữ liệu máy soạn — chỉ giữ trường đúng kiểu). */
 export function locBoTro(c: Obj): { songSinh: SongSinh[]; cauKiem: CauKiem[]; nhanNen: NhanNen[]; buoc: string[] } {
-  const ss = Array.isArray(c.song_sinh) ? c.song_sinh.filter((x): x is Obj => laObj(x) && typeof x.de === 'string' && x.dap_an != null) : []
+  const ss = !laCauTuLuan(c) && Array.isArray(c.song_sinh) ? c.song_sinh.filter((x): x is Obj => laObj(x) && typeof x.de === 'string' && x.dap_an != null) : []
   const songSinh = ss.slice(0, TRAN_SONG_SINH).map((x) => ({
     de: String(x.de), dap_an: String(x.dap_an),
     ...(laObj(x.pa) ? { pa: Object.fromEntries(Object.entries(x.pa).map(([k, v]) => [k, String(v)])) } : {}),
@@ -122,7 +123,7 @@ export function gopSongSinh(cu: readonly Obj[], goi: readonly SongSinh[]): Obj[]
 
 /**
  * Móc nạp đề: chép học liệu bổ trợ của gói vào `cau_bo_tro`. Câu không có trường nào thì bỏ qua (không xoá dòng cũ của bản trùng).
- * Song sinh GỘP với bản đang có (`gopSongSinh`: giữ bản máy soạn đã nối, khử trùng, trần 4); câu kiểm / nhãn nền / bước theo gói như cũ.
+ * Song sinh GỘP với bản đang có (`gopSongSinh`: giữ bản máy soạn đã nối, khử trùng, mục tiêu 6); câu kiểm / nhãn nền / bước theo gói như cũ.
  */
 export async function ghiCauBoTro(env: Env, maDe: string, goi: unknown): Promise<number> {
   await damBaoBangBoTro(env)

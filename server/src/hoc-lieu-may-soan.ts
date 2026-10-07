@@ -2,7 +2,7 @@
 //
 //   · `/kho/may-soan/nop-bo-tro {qid, bam, songSinh?, yMoi?}` — máy soạn nộp bản khác + ý mới ĐÃ QUA HAI LƯỢT KHỚP (cổng mã bí mật như
 //     /kho/loi-giai/nop). Máy chủ dựng câu gốc từ KHO, kiểm lại từng mục + bằng chứng `kiem.d2`, rồi: bản khác ⇒ NỐI vào
-//     `cau_bo_tro.song_sinh_json` (các bản đã có giữ nguyên vị trí — qid ảo ~ssN trong sổ không đổi nghĩa; dừng khi đủ 4 bản dùng được; mỗi bản
+//     `cau_bo_tro.song_sinh_json` (các bản đã có giữ nguyên vị trí — qid ảo ~ssN trong sổ không đổi nghĩa; dừng khi đủ 6 bản dùng được; mỗi bản
 //     mang khối/mã tờ của câu gốc: `qid_mau`, `ma_de`, `lop`); ý ⇒ `cau_y_ds`. Không sửa / xoá gì đã có.
 //   · `/kho/may-soan/nop-y-ds` — chỉ kho ý (cau-y-ds.ts). `/kho/may-soan/hang-em-sai {lamMoi?, lop?}` — xem hàng câu em đã sai (thầy / điều phối).
 //   · HÀNG SOẠN ƯU TIÊN CÂU EM ĐÃ SAI MÀ CHƯA CÓ BẢN KHÁC (`lamMoiHangEmSai`; `layViec` gọi, ≤ 1 lần / 15 phút): sổ `su_kien_hoc` từ 29/09, lượt
@@ -15,7 +15,7 @@
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
-import { TU_NGAY, tachSongSinh } from './loi-hoc-luat'
+import { TU_NGAY, tachSongSinh, CHO_SONG_SINH } from './loi-hoc-luat'
 import { damBaoBangBoTro, docBoTro, songSinhDuDuLieu, type SongSinh } from './cau-bo-tro'
 import { damBaoBangTuHoanThien } from './tu-hoan-thien'
 import { BO_CHIA_KHOA } from '../../src/lib/loi-giai-bo'
@@ -26,6 +26,7 @@ import {
 } from './may-soan-kiem'
 import { chuYDsTheoBam, docCauKhoHienTai, metaCua, nhanVaGhiYDs, nopYDs, type MetaGoc } from './cau-y-ds'
 import type { DangLoiGiai } from '../../src/lib/loi-giai-kiem'
+import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (v === null || v === undefined ? '' : String(v)).trim()
@@ -66,26 +67,36 @@ const dungDuoc = (phan: string, ss: SongSinh): boolean => { try { return songSin
 export interface TinhTrangBoTro { soBanDung: number; banKhac: DaCo['banKhac']; soY: number; yChu: string[]; nghi: boolean }
 
 /** Băm có ít nhất một bản (cùng nội dung) đang nằm diện nghi đáp án. Bảng chưa có ⇒ rỗng. */
-async function docBamNghi(env: Env, bams: readonly string[]): Promise<Set<string>> {
+async function docBamNghi(env: Env, bams: readonly string[], nghiem = false): Promise<Set<string>> {
   const ra = new Set<string>()
   for (let i = 0; i < bams.length; i += 90) {
     const r = await env.DB.prepare(`SELECT DISTINCT q.bam FROM loi_giai_cau q JOIN cau_nghi_dap_an n ON n.qid = q.qid AND n.trang_thai = 'nghi'
-      WHERE q.bam IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(bams.slice(i, i + 90))).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+      WHERE q.bam IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(bams.slice(i, i + 90))).all<Obj>().catch((e) => { if (nghiem) throw e; return { results: [] as Obj[] } })
     for (const x of r.results ?? []) ra.add(str(x.bam))
   }
   return ra
 }
 
 /** Bản khác (mọi bản + số bản dùng được), ý Đ–S mới, diện nghi — của một nhóm câu theo băm. */
-export async function docTinhTrangBoTro(env: Env, ds: readonly { bam: string; dang: string }[]): Promise<Map<string, TinhTrangBoTro>> {
+export async function docTinhTrangBoTro(env: Env, ds: readonly { bam: string; dang: string }[], nghiem = false): Promise<Map<string, TinhTrangBoTro>> {
   const ra = new Map<string, TinhTrangBoTro>()
   const bams = [...new Set(ds.map((x) => x.bam).filter(Boolean))]
   if (!bams.length) return ra
   const dangCua = new Map(ds.map((x) => [x.bam, x.dang]))
+  const docY = async () => {
+    if (!nghiem) return chuYDsTheoBam(env, bams)
+    const y = new Map<string, string[]>()
+    for (let i = 0; i < bams.length; i += 90) {
+      const r = await env.DB.prepare('SELECT bam, noi_dung FROM cau_y_ds WHERE bam IN (SELECT value FROM json_each(?)) ORDER BY bam, stt')
+        .bind(JSON.stringify(bams.slice(i, i + 90))).all<Obj>()
+      for (const x of r.results ?? []) y.set(str(x.bam), [...(y.get(str(x.bam)) ?? []), str(x.noi_dung)])
+    }
+    return y
+  }
   const [bt, y, nghi] = await Promise.all([
-    docBoTro(env, bams).catch(() => new Map<string, { songSinh: SongSinh[] }>()),
-    chuYDsTheoBam(env, bams).catch(() => new Map<string, string[]>()),
-    docBamNghi(env, bams),
+    docBoTro(env, bams).catch((e) => { if (nghiem) throw e; return new Map<string, { songSinh: SongSinh[] }>() }),
+    docY().catch((e) => { if (nghiem) throw e; return new Map<string, string[]>() }),
+    docBamNghi(env, bams, nghiem),
   ])
   for (const b of bams) {
     const ss = bt.get(b)?.songSinh ?? []
@@ -115,6 +126,51 @@ export async function canVaDaCoChoViec(env: Env, ds: readonly { bam: string; dan
 }
 
 // ---------------------------------------------------------------- hàng soạn: câu em đã sai chưa có bản khác lên đầu
+
+/** Nạp CHỈ hàng học liệu, không lập lại chỉ mục/hồ sơ và không mở lại lượt đang làm hay đã trượt.
+ * Con trỏ qid ổn định; mỗi lượt đọc ≤ 200 câu, cùng băm dùng chung một việc. */
+export async function napSongSinhToanKho(env: Env, b: Obj): Promise<Obj> {
+  await damBaoBangMaySoan(env)
+  const sau = str(b.sau), lop = str(b.lop)
+  const so = Math.max(1, Math.min(200, Math.floor(Number(b.so) || 100)))
+  const ds = (await env.DB.prepare(`SELECT l.qid, l.bam, l.ma_de, l.dang, l.lop, l.bo, q.json
+    FROM loi_giai_cau l JOIN game_v2_question q ON q.qid = l.qid AND q.ma_de = l.ma_de
+    JOIN de_kho d ON d.ma_de = l.ma_de AND d.da_xoa = 0
+    WHERE l.qid > ? ${lop ? 'AND l.lop = ?' : ''} ORDER BY l.qid LIMIT ?`)
+    .bind(sau, ...(lop ? [lop] : []), so).all<Obj>()).results ?? []
+  let tuLuan = 0, loiJson = 0
+  const nhom = new Map<string, Obj>()
+  for (const x of ds) {
+    let cau: unknown
+    try { cau = JSON.parse(str(x.json)) } catch { loiJson++; continue }
+    if (laCauTuLuan(cau) || !['tn', 'ds', 'tln'].includes(str(x.dang))) { tuLuan++; continue }
+    if (str(x.bam) && !nhom.has(str(x.bam))) nhom.set(str(x.bam), x)
+  }
+  const tt = await docTinhTrangBoTro(env, [...nhom.values()].map((x) => ({ bam: str(x.bam), dang: str(x.dang) })), true)
+  const luc = new Date().toISOString()
+  let du = 0, nghi = 0
+  const lenh = [...nhom.values()].flatMap((x) => {
+    const t = tt.get(str(x.bam))
+    if (t?.nghi) { nghi++; return [] }
+    const thieu = thieuBanKhac(str(x.dang) as DangLoiGiai, t?.soBanDung ?? 0, t?.soY ?? 0)
+    if (!thieu) { du++; return [] }
+    return [env.DB.prepare(`INSERT INTO may_soan_viec
+      (bam,qid,ma_de,dang,lop,bo,so_em_sai,thieu,uu_tien,trang_thai,so_lan,tao_luc,cap_nhat_luc)
+      VALUES (?,?,?,?,?,?,0,?,0,'cho',0,?,?)
+      ON CONFLICT(bam) DO UPDATE SET trang_thai = 'cho', thieu = excluded.thieu, cap_nhat_luc = excluded.cap_nhat_luc
+      WHERE may_soan_viec.trang_thai = 'xong'`)
+      .bind(str(x.bam), str(x.qid), str(x.ma_de), str(x.dang), str(x.lop), str(x.bo), thieu, luc, luc)]
+  })
+  let vaoHang = 0
+  for (let i = 0; i < lenh.length; i += 100) vaoHang += (await env.DB.batch(lenh.slice(i, i + 100))).reduce((s, r) => s + (r.meta?.changes ?? 0), 0)
+  // Câu thiếu ánh xạ phải được báo, không âm thầm coi là đã phủ toàn kho.
+  const chuaAnhXa = sau ? undefined : Number((await env.DB.prepare(`SELECT COUNT(*) AS n FROM game_v2_question q
+    JOIN de_kho d ON d.ma_de = q.ma_de AND d.da_xoa = 0
+    LEFT JOIN loi_giai_cau l ON l.qid = q.qid AND l.ma_de = q.ma_de
+    WHERE l.qid IS NULL ${lop ? 'AND d.lop = ?' : ''}`).bind(...(lop ? [lop] : [])).first<Obj>())?.n ?? 0)
+  return { ok: true, daQuet: ds.length, nhom: nhom.size, vaoHang, du, nghi, tuLuan, loiJson,
+    ...(chuaAnhXa === undefined ? {} : { chuaAnhXa }), tiep: ds.length === so ? str(ds[ds.length - 1]?.qid) : null }
+}
 
 /**
  * Sổ ⇒ câu gốc → các em đã SAI TỰ LÀM từ 29/09 (mọi kênh). Bộ lọc y như `docQidSaiV2` (hang-chua-loi.ts): bỏ dòng đọc lời giải + lướt
@@ -250,16 +306,18 @@ export async function hangEmSai(env: Env, b: Obj): Promise<Obj> {
 
 // ---------------------------------------------------------------- nhận học liệu máy soạn nộp
 
-/** Nối bản khác vào `cau_bo_tro.song_sinh_json`: các bản đã có GIỮ NGUYÊN (vị trí, nội dung); thêm tới khi đủ 4 bản dùng được. */
+/** Nối bản khác vào `cau_bo_tro.song_sinh_json`: các bản đã có GIỮ NGUYÊN (vị trí, nội dung); thêm tới khi đủ 6 bản dùng được. */
 export async function nhanVaGhiBanKhac(env: Env, goc: CauGoc, meta: MetaGoc, ds: unknown): Promise<{ giu: number; bo: MucBo[]; tong: number }> {
   await damBaoBangBoTro(env)
   const daCoTat = (await docBoTro(env, [goc.bam])).get(goc.bam)?.songSinh ?? []
   const daCo: DaCo = { banKhac: daCoTat.map((x) => ({ de: String(x.de ?? ''), dap_an: String(x.dap_an ?? ''), ...(x.pa ? { pa: x.pa } : {}), ...(x.bang ? { bang: x.bang } : {}) })), yDs: [] }
   const { giu, bo } = nhanBanKhacNop(goc, ds, daCo)
   const soDung = daCoTat.filter((x) => dungDuoc(goc.phan, x)).length
-  const cho = Math.max(0, SO_BAN_KHAC_TOI_DA - soDung)
+  const cho = Math.min(Math.max(0, SO_BAN_KHAC_TOI_DA - soDung), Math.max(0, CHO_SONG_SINH - daCoTat.length))
   const them = giu.slice(0, cho)
-  for (const g of giu.slice(cho)) bo.push({ i: g.i, lyDo: `câu đã đủ ${SO_BAN_KHAC_TOI_DA} bản dùng được` })
+  for (const g of giu.slice(cho)) bo.push({ i: g.i, lyDo: soDung + cho >= SO_BAN_KHAC_TOI_DA
+    ? `câu đã đủ ${SO_BAN_KHAC_TOI_DA} bản dùng được`
+    : `đã hết ${CHO_SONG_SINH} vị trí lịch sử; giữ nguyên bản cũ, câu vẫn chưa đủ ${SO_BAN_KHAC_TOI_DA} bản dùng được` })
   bo.sort((a, b) => a.i - b.i)
   if (!them.length) return { giu: 0, bo, tong: soDung }
   const luc = new Date().toISOString()
@@ -328,6 +386,7 @@ export async function ghiNghiTuXu(env: Env, bam: string, qidMau: string, ghi: st
 // ---------------------------------------------------------------- định tuyến (sau cổng mã bí mật của thầy trong index.ts)
 
 export async function duongMaySoan(env: Env, p: string, b: Obj): Promise<Obj> {
+  if (p === '/kho/may-soan/nap-toan-kho') return napSongSinhToanKho(env, b)
   if (p === '/kho/may-soan/nop-bo-tro') return nopBoTro(env, b)
   if (p === '/kho/may-soan/nop-y-ds') return nopYDs(env, b)
   if (p === '/kho/may-soan/hang-em-sai') return hangEmSai(env, b)

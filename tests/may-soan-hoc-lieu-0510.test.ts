@@ -3,7 +3,7 @@
 //   A. Bộ kiểm thuần (server/src/may-soan-kiem.ts): 4 bản khác — trùng số liệu / trùng đề gốc / đáp số trùng / phép tính lệch ⇒ loại; ý Đ–S mới;
 //      ghép HAI LƯỢT (lệch, "?", không chắc ⇒ bỏ); tự xử cờ đáp án (khớp ⇒ daChot, hồ sơ vẫn qua bộ kiểm; lệch ⇒ tuXu).
 //   B. Máy chủ thật (SQLite): hàng soạn — câu em đã sai chưa có bản khác lên đầu, nhiều em sai trước (bỏ đọc lời giải / lướt / hỗ trợ / bị che /
-//      ca chưa công bố); lưu/đọc `cau_y_ds` + nối bản khác vào `cau_bo_tro` (chỉ mục hai lượt khớp, giữ bản cũ, trần 4); cờ đáp án tự xử ⇒ diện nghi.
+//      ca chưa công bố); lưu/đọc `cau_y_ds` + nối bản khác vào `cau_bo_tro` (chỉ mục hai lượt khớp, giữ bản cũ, trần 6); cờ đáp án tự xử ⇒ diện nghi.
 //   C. scripts/loi-giai/may-soan.mjs với `claude` GIẢ (tệp thực thi trong thư mục tạm): chế độ thử --thu (không nộp gì) và --mot-lan (nộp thật vào
 //      máy chủ thật) — chứng minh luồng hai lượt độc lập chạy đúng mà không tốn API.
 import { afterAll, describe, expect, it } from 'vitest'
@@ -86,13 +86,36 @@ const Y_DS = [
   { t: 'Isoamyl alcohol có nhiệt độ sôi thấp hơn acetic acid.', d: 'S', lyDo: 'Isoamyl alcohol sôi ở 131,1 °C, cao hơn 117,9 °C.' },
 ]
 
+// Lô đủ mục tiêu mới; giữ các fixture bốn bản / 12 ý phía trên để kiểm lượt bổ sung còn thiếu.
+const SS_TLN_6 = [...SS_TLN, ssSo(7, 14, 9), ssSo(8, 16, 10)]
+const SS_TN_6 = [...SS_TN, ...['propyl', 'butyl'].map((alcohol, i) => ({
+  kieu: 'ly_thuyet', cach: 'doi_chat',
+  de: `Để tổng hợp ${alcohol} acetate bằng ester hoá trong phòng thí nghiệm, nhóm chất nào cho hiệu suất cao nhất?`,
+  pa: { A: `Acetic acid nguyên chất; ${alcohol} alcohol nguyên chất; H2SO4 đặc`, B: `Giấm ăn; ${alcohol} alcohol nguyên chất; H2SO4 đặc`, C: `Acetic acid nguyên chất; dung dịch ${alcohol} alcohol 70%; H2SO4 đặc`, D: 'Dung dịch acetic acid 5%; alcohol loãng; HCl loãng' },
+  dap_an: 'A', buoc: BUOC_LT, chot: `Dùng chất đầu nguyên chất và H2SO4 đặc hút nước khi ester hoá ${alcohol} alcohol (${i + 1}).`,
+}))]
+const Y_DS_24 = [...Y_DS,
+  { t: 'Một mol acetic acid phản ứng theo tỉ lệ một mol isoamyl alcohol.', d: 'D', lyDo: 'Phương trình ester hoá có tỉ lệ acid:alcohol bằng 1:1.' },
+  { t: 'Ester hoá isoamyl alcohol giải phóng khí hydrogen.', d: 'S', lyDo: 'Sản phẩm phụ của ester hoá là nước, không phải hydrogen.' },
+  { t: 'Phản ứng tạo isoamyl acetate đồng thời tạo nước.', d: 'D', lyDo: 'Acid và alcohol tạo ester cùng nước.' },
+  { t: 'H2SO4 đặc bị tiêu thụ theo tỉ lệ mol bằng lượng ester tạo ra.', d: 'S', lyDo: 'H2SO4 là xúc tác, không phải chất phản ứng trong phương trình tổng quát.' },
+  { t: 'Tách nước ra khỏi hệ giúp cân bằng ester hoá chuyển theo chiều thuận.', d: 'D', lyDo: 'Giảm lượng sản phẩm nước thúc đẩy tạo ester.' },
+  { t: 'Cho thêm nước vào hệ luôn làm tăng hiệu suất tạo ester.', d: 'S', lyDo: 'Thêm nước thúc đẩy chiều thuỷ phân.' },
+  { t: 'Isoamyl acetate chứa nhóm chức ester trong phân tử.', d: 'D', lyDo: 'Phân tử có nhóm COO giữa hai gốc hydrocarbon.' },
+  { t: 'Isoamyl acetate là một hydrocarbon chỉ chứa carbon và hydrogen.', d: 'S', lyDo: 'Ester còn chứa oxygen.' },
+  { t: 'Acetic acid cung cấp phần gốc acetate của ester tạo thành.', d: 'D', lyDo: 'Nhóm CH3COO của ester có nguồn từ acetic acid.' },
+  { t: 'NaOH dư chỉ làm lớp ester tinh khiết hơn mà không phản ứng với ester.', d: 'S', lyDo: 'NaOH có thể thuỷ phân ester.' },
+  { t: 'Isoamyl acetate có thể bị thuỷ phân tạo alcohol và acid trong môi trường acid.', d: 'D', lyDo: 'Thuỷ phân trong acid là chiều nghịch của ester hoá.' },
+  { t: 'Sinh hàn hồi lưu làm biến đổi acetic acid thành isoamyl alcohol.', d: 'S', lyDo: 'Sinh hàn chỉ ngưng tụ hơi để giữ chất trong bình.' },
+]
+
 /** Câu gốc dựng từ KHO như máy chủ (qid / băm thật). */
 async function gocKho(qidKho: string, so: number) {
   const c = cauTrongGoi(DE_A, { cau: [cauThat(qidKho, so)] })[0]!
   const bam = await bamCau(c)
   return { c, bam, goc: cauGocTuKho(c, bam)!, vao: dauVao(c, bam)! }
 }
-const kiem = (d: string) => ({ d2: d })
+const kiem = (d: string) => ({ d2: d, chac: true, lyDo2: 'Giải độc lập và đối chiếu với dữ kiện đề.' })
 
 // ================================================================ A. bộ kiểm thuần
 
@@ -156,11 +179,11 @@ describe('A. bộ kiểm bản khác (song sinh đổi số / biến thể lí t
 })
 
 describe('A. bộ kiểm ý Đúng–Sai mới + hai lượt + tự xử cờ', () => {
-  it('ý mới: 8–12 ý, cân Đ/S, không trùng ý gốc, lí do 1 dòng', async () => {
+  it('ý mới: đủ 12 ý còn thiếu, cân Đ/S, không trùng ý gốc, lí do 1 dòng', async () => {
     const { goc } = await gocKho('12-KT-C1-D4-II-4', 4)
     const can = { ...CAN_RONG, yDs: 12 }
     expect(kiemYMoi(goc, can, Y_DS).loi).toEqual([])
-    expect(kiemYMoi(goc, can, Y_DS.slice(0, 7)).loi.join()).toMatch(/cần 8–12 ý mới, nộp 7/)
+    expect(kiemYMoi(goc, can, Y_DS.slice(0, 7)).loi.join()).toMatch(/cần 12–12 ý mới, nộp 7/)
     const lech = Y_DS.map((y) => ({ ...y, d: 'D' }))
     expect(kiemYMoi(goc, can, lech).loi.join()).toMatch(/cần ít nhất 3 ý Đúng và 3 ý Sai/)
     const r = kiemYMoi(goc, can, [{ t: goc.y[0]!.t, d: 'D', lyDo: 'chép ý gốc' }, { ...Y_DS[0], lyDo: 'dòng 1\ndòng 2' }, { ...Y_DS[1], d: 'X' }, ...Y_DS.slice(2)])
@@ -174,9 +197,9 @@ describe('A. bộ kiểm ý Đúng–Sai mới + hai lượt + tự xử cờ', 
   it('ý Đ–S LỆCH giữa hai lượt ⇒ loại; "?" / không chắc / thiếu trả lời ⇒ loại; khớp ⇒ giữ kèm bằng chứng', async () => {
     const { goc } = await gocKho('12-KT-C1-D4-II-4', 4)
     const tra: TraLoiMu[] = [
-      ...Y_DS.map((y, i) => ({ id: `y${i + 1}`, d: y.d === 'D' ? 'Đúng' : 'Sai', chac: true })),
+      ...Y_DS.map((y, i) => ({ id: `y${i + 1}`, d: y.d === 'D' ? 'Đúng' : 'Sai', chac: true, lyDo: y.lyDo })),
     ]
-    tra[2] = { id: 'y3', d: 'S', chac: true } // lệch (ý 3 là Đúng)
+    tra[2] = { id: 'y3', d: 'S', chac: true, lyDo: 'Lượt kiểm ra Sai.' } // lệch (ý 3 là Đúng)
     tra[4] = { id: 'y5', d: '?', lyDo: 'phụ thuộc quy ước', chac: false }
     tra[6] = { id: 'y7', d: 'S', chac: false } // đúng giá trị nhưng không chắc
     tra.pop() // ý 12 không có trả lời
@@ -196,7 +219,7 @@ describe('A. bộ kiểm ý Đúng–Sai mới + hai lượt + tự xử cờ', 
     expect(khopMu('tln', '3,36', { d: '3,4' })).toBe(false)
     expect(khopMu('ds', 'DSSD', { d: 'Đ S S Đ' }, true)).toBe(true)
     const { goc: gocTln } = await gocKho('12-KT-C1-D2-III-6', 6)
-    const gs = ghepHaiLuot(gocTln, { songSinh: SS_TLN as never, yMoi: [] }, [{ id: 'ss1', d: '54' }, { id: 'ss2', d: '52' }, { id: 'ss3', d: '64' }, { id: 'ss4', d: '57' }])
+    const gs = ghepHaiLuot(gocTln, { songSinh: SS_TLN as never, yMoi: [] }, [{ id: 'ss1', d: '54', chac: true, lyDo: 'Tính lại hiệu suất ra 54%.' }, { id: 'ss2', d: '52', chac: true, lyDo: 'Tính lại hiệu suất ra 52%.' }, { id: 'ss3', d: '64', chac: true, lyDo: 'Tính lại hiệu suất ra 64%.' }, { id: 'ss4', d: '57', chac: true, lyDo: 'Tính lại hiệu suất ra 57%.' }])
     expect(gs.songSinh.map((x) => x.dap_an)).toEqual(['54', '52', '64'])
     expect(gs.boSongSinh).toEqual([{ i: 3, lyDo: 'lượt kiểm mù ra 57 ≠ 56' }])
     const nb = nhanBanKhacNop(gocTln, [{ ...SS_TLN[0], kiem: kiem('54') }, { ...SS_TLN[1] }, { ...SS_TLN[2], kiem: kiem('99') }], { banKhac: [], yDs: [] })
@@ -228,10 +251,10 @@ describe('A. bộ kiểm ý Đúng–Sai mới + hai lượt + tự xử cờ', 
   })
 
   it('việc giao + bậc ưu tiên câu em đã sai (thuần)', () => {
-    expect(tinhCan({ dang: 'tln', kieuKho: 'bai_tap', hoSo: true, soBanDung: 1, soY: 0 })).toEqual({ hoSo: true, banKhac: 3, kieuBan: 'so', yDs: 0 })
-    expect(tinhCan({ dang: 'ds', hoSo: false, soBanDung: 0, soY: 5 })).toEqual({ hoSo: false, banKhac: 0, kieuBan: 'tu_chon', yDs: 7 })
+    expect(tinhCan({ dang: 'tln', kieuKho: 'bai_tap', hoSo: true, soBanDung: 1, soY: 0 })).toEqual({ hoSo: true, banKhac: 5, kieuBan: 'so', yDs: 0 })
+    expect(tinhCan({ dang: 'ds', hoSo: false, soBanDung: 0, soY: 5 })).toEqual({ hoSo: false, banKhac: 0, kieuBan: 'tu_chon', yDs: 19 })
     expect(tinhCan({ dang: 'tn', kieuKho: 'ly_thuyet', hoSo: true, soBanDung: 0, soY: 0, nghi: true })).toMatchObject({ banKhac: 0, yDs: 0 })
-    expect([thieuBanKhac('tn', 0, 0), thieuBanKhac('tln', 2, 0), thieuBanKhac('tln', 4, 0), thieuBanKhac('ds', 0, 3), thieuBanKhac('ds', 0, 8)]).toEqual(['han', 'mot_phan', null, 'mot_phan', null])
+    expect([thieuBanKhac('tn', 0, 0), thieuBanKhac('tln', 2, 0), thieuBanKhac('tln', 4, 0), thieuBanKhac('ds', 0, 3), thieuBanKhac('ds', 0, 8)]).toEqual(['han', 'mot_phan', 'mot_phan', 'mot_phan', 'mot_phan'])
     expect(uuTienEmSai(3, 'han')).toBeGreaterThan(uuTienEmSai(9, 'mot_phan'))
     expect(uuTienEmSai(1, 'mot_phan')).toBeGreaterThan(5000 + 3000 + 1000 + 200)
     expect(['Q-I-1#2', 'Q-I-1~ss3', 'Q-I-1~2'].map(qidGocMaySoan)).toEqual(['Q-I-1', 'Q-I-1', 'Q-I-1'])
@@ -239,7 +262,7 @@ describe('A. bộ kiểm ý Đúng–Sai mới + hai lượt + tự xử cờ', 
     const tt = (soBanDung: number, nghi = false): TinhTrangBoTro => ({ soBanDung, banKhac: [], soY: 0, yChu: [], nghi })
     const m = (bam: string, soEm: number) => ({ bam, qid: bam, maDe: '12-X', dang: 'tln', lop: '12', bo: 'ESTER', soEm })
     const hd = quyetDinhEmSai([m('a', 3), m('b', 1), m('c', 2), m('d', 5), m('e', 1), m('f', 1)],
-      new Map([['a', tt(0)], ['b', tt(0)], ['c', tt(4)], ['d', tt(0, true)], ['e', tt(0)], ['f', tt(2)]]),
+      new Map([['a', tt(0)], ['b', tt(0)], ['c', tt(6)], ['d', tt(0, true)], ['e', tt(0)], ['f', tt(2)]]),
       new Map([['b', 'cho'], ['e', 'dang']]), new Map([['c', 'cho'], ['f', 'truot']]), new Set(['ESTER']))
     expect(hd).toEqual([
       { loai: 'mo_hoc_lieu', muc: m('a', 3), thieu: 'han', uuTien: uuTienEmSai(3, 'han') },
@@ -286,7 +309,7 @@ describe('B. hàng soạn: câu em đã sai chưa có bản khác lên đầu', 
 
     const l1 = await thay(d, '/kho/loi-giai/viec', { so: 1, lop: '12' })
     expect(l1.viec).toHaveLength(1)
-    expect(l1.viec[0]).toMatchObject({ qid: QA.tln, can: { hoSo: false, banKhac: 4, kieuBan: 'so', yDs: 0 }, kieuKho: 'bai_tap', phan: 'III', daCo: { banKhac: [], yDs: [] } })
+    expect(l1.viec[0]).toMatchObject({ qid: QA.tln, can: { hoSo: false, banKhac: 6, kieuBan: 'so', yDs: 0 }, kieuKho: 'bai_tap', phan: 'III', daCo: { banKhac: [], yDs: [] } })
     expect(l1.viec[0].deTho).toContain('4,00 mL acetic acid')
     expect(d.sql.prepare('SELECT so_em_sai, thieu, uu_tien, trang_thai FROM may_soan_viec WHERE qid = ?').get(QA.tln))
       .toEqual({ so_em_sai: 3, thieu: 'han', uu_tien: uuTienEmSai(3, 'han'), trang_thai: 'dang' })
@@ -294,9 +317,9 @@ describe('B. hàng soạn: câu em đã sai chưa có bản khác lên đầu', 
     expect((d.sql.prepare('SELECT uu_tien FROM loi_giai_viec WHERE qid = ?').get(QA.tn) as { uu_tien: number }).uu_tien).toBe(9000)
 
     const l2 = await thay(d, '/kho/loi-giai/viec', { so: 1, lop: '12' })
-    expect(l2.viec[0]).toMatchObject({ qid: QA.ds, can: { hoSo: true, banKhac: 0, yDs: 12 } })
+    expect(l2.viec[0]).toMatchObject({ qid: QA.ds, can: { hoSo: true, banKhac: 0, yDs: 24 } })
     const l3 = await thay(d, '/kho/loi-giai/viec', { so: 1, lop: '12' })
-    expect(l3.viec[0]).toMatchObject({ qid: QA.tn, can: { hoSo: true, banKhac: 4, kieuBan: 'ly_thuyet', yDs: 0 } })
+    expect(l3.viec[0]).toMatchObject({ qid: QA.tn, can: { hoSo: true, banKhac: 6, kieuBan: 'ly_thuyet', yDs: 0 } })
     expect(await thay(d, '/kho/loi-giai/viec', { so: 1, lop: '12' })).toMatchObject({ ok: true, het: true })
     // `boTro: false` ⇒ y như trước: không đụng hàng học liệu, việc không xin học liệu.
     const cu = await thay(d, '/kho/loi-giai/viec', { so: 5, boTro: false, lamMoi: true })
@@ -312,13 +335,13 @@ describe('B. hàng soạn: câu em đã sai chưa có bản khác lên đầu', 
 })
 
 describe('B. việc "chỉ học liệu" đã đủ lúc nhận', () => {
-  it('đã đủ 4 bản khác ⇒ đóng việc ngay lúc nhận, phát việc kế (không trả lô rỗng)', async () => {
+  it('đã đủ 6 bản khác ⇒ đóng việc ngay lúc nhận, phát việc kế (không trả lô rỗng)', async () => {
     const d = taoD1That()
     await thay(d, '/kho/day', { maDe: DE_A, lop: '12', de: goiA(), cau: [] })
     const bam = bamCua(d, QA.tln)
     d.sql.prepare("UPDATE loi_giai_viec SET trang_thai = 'xong' WHERE qid IN (?, ?)").run(QA.tln, QA.ds)
     d.sql.prepare("INSERT INTO cau_bo_tro (bam, qid_mau, song_sinh_json, cau_kiem_json, nhan_nen_json, buoc_json, cap_nhat_luc) VALUES (?, ?, ?, '[]', '[]', '[]', 'x')")
-      .run(bam, QA.tln, JSON.stringify(SS_TLN))
+      .run(bam, QA.tln, JSON.stringify(SS_TLN_6))
     d.sql.prepare("INSERT INTO may_soan_viec (bam, qid, ma_de, dang, lop, bo, so_em_sai, thieu, uu_tien, trang_thai, so_lan, tao_luc, cap_nhat_luc) VALUES (?, ?, ?, 'tln', '12', 'ESTER', 2, 'han', 200020, 'cho', 0, 'x', 'x')")
       .run(bam, QA.tln, DE_A)
     const l = await thay(d, '/kho/loi-giai/viec', { so: 1, lop: '12' })
@@ -330,7 +353,7 @@ describe('B. việc "chỉ học liệu" đã đủ lúc nhận', () => {
 describe('B. nộp học liệu: chỉ mục hai lượt khớp; bản khác nối cau_bo_tro; ý vào cau_y_ds', () => {
   const ssKho = { de: 'Đun nóng 4,50 mL acetic acid (D = 1,05 g/mL) với 9,00 mL isoamyl alcohol (D = 0,81 g/mL), thu được 5,00 mL isoamyl acetate (D = 0,88 g/mL). Tính hiệu suất (làm tròn đến hàng đơn vị).', dap_an: '43', buoc: ['H = 43%'] }
 
-  it('bản khác: giữ bản kho ở vị trí cũ, thêm tới đủ 4 bản dùng được, mỗi bản mang khối/mã tờ câu gốc; game đọc được 4 bản', async () => {
+  it('bản khác: giữ bản kho ở vị trí cũ, thêm bốn bản thành năm, lượt sau bổ sung đủ sáu; giữ khối/mã tờ và game đọc đủ sáu', async () => {
     const d = taoD1That()
     await thay(d, '/kho/day', { maDe: DE_A, lop: '12', de: goiA({ song_sinh: [ssKho] }), cau: [] })
     const bam = bamCua(d, QA.tln)
@@ -339,21 +362,22 @@ describe('B. nộp học liệu: chỉ mục hai lượt khớp; bản khác n�
       songSinh: [{ ...SS_TLN[0], kiem: kiem('54') }, { ...SS_TLN[1], kiem: kiem('52') }, { ...SS_TLN[2], kiem: kiem('64') }, { ...SS_TLN[3], kiem: kiem('56') },
         { ...ssSo(7, 14, 9), kiem: kiem('99') }, { ...ssSo(2, 4, 3) }],
     })
-    expect(r).toMatchObject({ ok: true, banKhac: { giu: 3, tong: 4 } })
+    expect(r).toMatchObject({ ok: true, banKhac: { giu: 4, tong: 5 } })
     const bo = r.banKhac.bo as { i: number; lyDo: string }[]
-    expect(bo.map((b) => b.i)).toEqual([3, 4, 5])
-    expect(bo[0]!.lyDo).toMatch(/đã đủ 4 bản dùng được/)
+    expect(bo.map((b) => b.i)).toEqual([4, 5])
+    expect(bo[0]!.lyDo).toMatch(/chưa qua hai lượt khớp/)
     expect(bo[1]!.lyDo).toMatch(/chưa qua hai lượt khớp/)
-    expect(bo[2]!.lyDo).toMatch(/chưa qua hai lượt khớp/)
     const ss = JSON.parse((d.sql.prepare('SELECT song_sinh_json FROM cau_bo_tro WHERE bam = ?').get(bam) as { song_sinh_json: string }).song_sinh_json)
-    expect(ss).toHaveLength(4)
+    expect(ss).toHaveLength(5)
     expect(ss[0]).toEqual(ssKho)
-    expect(ss.slice(1).map((x: { dap_an: string }) => x.dap_an)).toEqual(['54', '52', '64'])
+    expect(ss.slice(1).map((x: { dap_an: string }) => x.dap_an)).toEqual(['54', '52', '64', '56'])
     expect(ss[1]).toMatchObject({ kieu: 'so', nguon: 'may_soan_2_luot', qid_mau: QA.tln, ma_de: DE_A, lop: '12', kiem: { d2: '54' } })
     const doc = (await boTroTheoQid(d.env, [QA.tln])).get(QA.tln)!
-    expect(doc.songSinh.filter((x) => songSinhDuDuLieu('III', x))).toHaveLength(4)
-    // Đủ 4 ⇒ lần nộp sau không thêm gì; băm lệch ⇒ từ chối; không mã bí mật ⇒ chặn.
-    expect(await thay(d, '/kho/may-soan/nop-bo-tro', { qid: QA.tln, bam, songSinh: [{ ...ssSo(7, 14, 10), kiem: kiem(ssSo(7, 14, 10).dap_an) }] })).toMatchObject({ banKhac: { giu: 0, tong: 4 } })
+    expect(doc.songSinh.filter((x) => songSinhDuDuLieu('III', x))).toHaveLength(5)
+    // Lượt sau bổ sung bản thứ sáu; băm lệch ⇒ từ chối; không mã bí mật ⇒ chặn.
+    expect(await thay(d, '/kho/may-soan/nop-bo-tro', { qid: QA.tln, bam, songSinh: [{ ...ssSo(7, 14, 10), kiem: kiem(ssSo(7, 14, 10).dap_an) }] })).toMatchObject({ banKhac: { giu: 1, tong: 6 } })
+    expect((await boTroTheoQid(d.env, [QA.tln])).get(QA.tln)!.songSinh.filter((x) => songSinhDuDuLieu('III', x))).toHaveLength(6)
+    expect(await thay(d, '/kho/may-soan/nop-bo-tro', { qid: QA.tln, bam, songSinh: [{ ...ssSo(8, 16, 10), kiem: kiem(ssSo(8, 16, 10).dap_an) }] })).toMatchObject({ banKhac: { giu: 0, tong: 6 } })
     expect(await thay(d, '/kho/may-soan/nop-bo-tro', { qid: QA.tln, bam: 'ffff', songSinh: [] })).toMatchObject({ ok: false, loi: ['KHOÁ VÂN TAY'] })
     expect(await em(d, '/kho/may-soan/nop-bo-tro', { qid: QA.tln, bam })).toMatchObject({ ok: false, error: 'Sai mã bí mật' })
   })
@@ -458,14 +482,14 @@ function dungClaudeGia() {
   fs.mkdirSync(bin, { recursive: true })
   const D = {
     map: { 'I-6': TEP.tn, 'II-4': TEP.ds, 'III-6': TEP.tln }, ra2: RA2,
-    boTro: { 'I-6': { songSinh: SS_TN }, 'III-6': { songSinh: SS_TLN }, 'II-4': { yMoi: Y_DS } },
+    boTro: { 'I-6': { songSinh: SS_TN_6 }, 'III-6': { songSinh: SS_TLN_6 }, 'II-4': { yMoi: Y_DS_24 } },
     coDapAn: { 'II-4': 'Ý b nghi đáp án', 'III-6': 'Kho ghi 58, tính lại ra 60' },
     chot: { 'II-4': 'Đáp án đúng là DDSD', 'III-6': 'Đáp án đúng là 60' },
     // Lượt kiểm mù: đáp án thật, cố ý lệch — I-6 ss2 (thật C), III-6 ss4 (thật 56), II-4 y3 lệch / y5 "?" / y7 không chắc; câu gốc II-4 khớp kho, III-6 lệch.
     mu: {
-      'I-6': { ss1: 'B', ss2: 'A', ss3: 'D', ss4: 'A' },
-      'III-6': { ss1: '54', ss2: '52', ss3: '64', ss4: '57', goc: '60' },
-      'II-4': { ...Object.fromEntries(Y_DS.map((y, i) => [`y${i + 1}`, y.d])), y3: 'S', y5: { d: '?', lyDo: 'mơ hồ', chac: false }, y7: { d: 'S', chac: false }, goc: 'DSSD' },
+      'I-6': { ss1: 'B', ss2: 'A', ss3: 'D', ss4: 'A', ss5: 'A', ss6: 'A' },
+      'III-6': { ss1: '54', ss2: '52', ss3: '64', ss4: '57', ss5: SS_TLN_6[4]!.dap_an, ss6: SS_TLN_6[5]!.dap_an, goc: '60' },
+      'II-4': { ...Object.fromEntries(Y_DS_24.map((y, i) => [`y${i + 1}`, y.d])), y3: 'S', y5: { d: '?', lyDo: 'mơ hồ', chac: false }, y7: { d: 'S', chac: false }, goc: 'DSSD' },
     },
   }
   fs.writeFileSync(path.join(bin, 'claude'), `#!/usr/bin/env node
@@ -551,16 +575,16 @@ describe('C. may-soan.mjs + claude giả: luồng hai lượt độc lập', () 
       const kq = await chayMaySoan(url, dungClaudeGia(), lam, ['--thu'])
       expect(kq.ma, kq.ra).toBe(0)
       expect(kq.ra).toContain('chốt 2 hồ sơ có cờ đáp án')
-      // 4 bản khác (I-6) + 4 bản khác và câu gốc (III-6) + 12 ý mới và câu gốc (II-4).
-      expect(kq.ra).toContain('lượt kiểm mù 3 câu · 22 mục')
-      expect(kq.ra).toContain('xong lô — đạt 3, trượt 0, thiếu 0 · bản khác giữ 6/8 · ý Đ–S giữ 9/12 · cờ đáp án tự xử: khớp 1, nghi 1')
+      // 6 bản khác (I-6) + 6 bản và câu gốc (III-6) + 24 ý mới và câu gốc (II-4).
+      expect(kq.ra).toContain('lượt kiểm mù 3 câu · 38 mục')
+      expect(kq.ra).toContain('xong lô — đạt 3, trượt 0, thiếu 0 · bản khác giữ 10/12 · ý Đ–S giữ 21/24 · cờ đáp án tự xử: khớp 1, nghi 1')
       const lo = thuMucLo(lam)
       kiemDocLap(lo)
       const tk = JSON.parse(fs.readFileSync(path.join(lo, 'tong-ket.json'), 'utf8'))
       const theo = Object.fromEntries((tk.cau as { qid: string }[]).map((c) => [c.qid.replace('12-THU-MS-', ''), c]))
-      expect(theo['I-6']).toMatchObject({ hoSo: 'dat', tuXu: 'khong_can', banKhac: { deXuat: 4, quaBoKiem: 4, khopHaiLuot: 3, boHaiLuot: [{ i: 1, lyDo: 'lượt kiểm mù ra A ≠ C' }] } })
-      expect(theo['III-6']).toMatchObject({ hoSo: 'dat', tuXu: 'lech', banKhac: { khopHaiLuot: 3 } })
-      expect(theo['II-4']).toMatchObject({ hoSo: 'dat', tuXu: 'khop', yDs: { deXuat: 12, quaBoKiem: 12, khopHaiLuot: 9 } })
+      expect(theo['I-6']).toMatchObject({ hoSo: 'dat', tuXu: 'khong_can', banKhac: { deXuat: 6, quaBoKiem: 6, khopHaiLuot: 5, boHaiLuot: [{ i: 1, lyDo: 'lượt kiểm mù ra A ≠ C' }] } })
+      expect(theo['III-6']).toMatchObject({ hoSo: 'dat', tuXu: 'lech', banKhac: { khopHaiLuot: 5 } })
+      expect(theo['II-4']).toMatchObject({ hoSo: 'dat', tuXu: 'khop', yDs: { deXuat: 24, quaBoKiem: 24, khopHaiLuot: 21 } })
       expect(tk.thu).toBe(true)
       // Không nộp gì: không hồ sơ, không học liệu.
       expect([d.dem('loi_giai'), d.dem('cau_y_ds'), d.dem('cau_bo_tro')]).toEqual([0, 0, 0])
@@ -577,7 +601,7 @@ describe('C. may-soan.mjs + claude giả: luồng hai lượt độc lập', () 
       const lam = path.join(TAM, 'lam-that')
       const kq = await chayMaySoan(url, dungClaudeGia(), lam, ['--mot-lan', '--luong', '1', '--so', '3'])
       expect(kq.ma, kq.ra).toBe(0)
-      expect(kq.ra).toContain('Kết thúc: đạt 3 · trượt 0 · thiếu 0 · bản khác giữ 6/8 · ý Đ–S giữ 9/12 · cờ đáp án tự xử: khớp 1, nghi 1')
+      expect(kq.ra).toContain('Kết thúc: đạt 3 · trượt 0 · thiếu 0 · bản khác giữ 10/12 · ý Đ–S giữ 21/24 · cờ đáp án tự xử: khớp 1, nghi 1')
       kiemDocLap(thuMucLo(lam))
       const q = (s: string) => `12-THU-MS-${s}`
       const tt = (s: string) => d.sql.prepare('SELECT trang_thai, so_co_dap_an FROM loi_giai WHERE bam = ?').get(bamCua(d, q(s)))
@@ -589,11 +613,11 @@ describe('C. may-soan.mjs + claude giả: luồng hai lượt độc lập', () 
       expect((d.sql.prepare('SELECT trang_thai, ghi_chu FROM cau_nghi_dap_an WHERE qid = ?').get(q('III-6')) as { ghi_chu: string }).ghi_chu).toMatch(/giải lại độc lập ra 60 · đáp án kho 58/)
       expect(await thay(d, '/gv/loi-giai/sua-kho', {})).toMatchObject({ dapAnSai: [], chuaChot: [], nghiTuXu: [expect.objectContaining({ qid: q('III-6') })] })
       const ss = (s: string) => JSON.parse((d.sql.prepare('SELECT song_sinh_json FROM cau_bo_tro WHERE bam = ?').get(bamCua(d, q(s))) as { song_sinh_json: string }).song_sinh_json) as { dap_an: string; ma_de: string }[]
-      expect(ss('I-6').map((x) => x.dap_an)).toEqual(['B', 'D', 'A'])
-      expect(ss('III-6').map((x) => x.dap_an)).toEqual(['54', '52', '64'])
+      expect(ss('I-6').map((x) => x.dap_an)).toEqual(['B', 'D', 'A', 'A', 'A'])
+      expect(ss('III-6').map((x) => x.dap_an)).toEqual(['54', '52', '64', SS_TLN_6[4]!.dap_an, SS_TLN_6[5]!.dap_an])
       expect(ss('I-6').every((x) => x.ma_de === '12-THU-MS')).toBe(true)
       const y = (await docYDs(d.env, [bamCua(d, q('II-4'))], { boNghi: false })).get(bamCua(d, q('II-4')))!
-      expect(y.map((x) => x.t)).toEqual(Y_DS.filter((_, i) => ![2, 4, 6].includes(i)).map((x) => x.t))
+      expect(y.map((x) => x.t)).toEqual(Y_DS_24.filter((_, i) => ![2, 4, 6].includes(i)).map((x) => x.t))
       expect(d.dem('loi_giai_viec', "trang_thai='xong'")).toBe(3)
     } finally {
       dong()

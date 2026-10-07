@@ -15,18 +15,18 @@ const cauI = (them: Partial<PrivateQuestion> = {}): PrivateQuestion => ({
 })
 const cauII = (them: Partial<PrivateQuestion> = {}): PrivateQuestion => ({ ...cauI(), phan: 'II', choices: [], ideas: ['y1', 'y2', 'y3', 'y4'], hinhAnh: [{ src: 'h', viTri: 'sau_y_c' }], correct: 'DSSD', solution: { chot: 'Cốt lõi', tung_y: { a: { dung: true, vi_sao: 'a' }, b: { dung: false, vi_sao: 'b' }, c: { dung: false, vi_sao: 'c' }, d: { dung: true, vi_sao: 'd' } } }, ...them })
 
-describe('bậc 1 — trần song sinh 2 → 4', () => {
-  it('TRAN_SONG_SINH = 4; qid ảo ~ss0..~ss3 đều tách được; danh sách đọc sổ phủ đủ 8 chỗ (máy soạn có thể nối sau bản hỏng)', () => {
-    expect(TRAN_SONG_SINH).toBe(4)
-    expect(cacQidSongSinh('Q1')).toEqual(['Q1', ...[0, 1, 2, 3, 4, 5, 6, 7].map((i) => `Q1~ss${i}`)])
+describe('bậc 1 — mục tiêu sáu song sinh', () => {
+  it('TRAN_SONG_SINH = 6; qid ảo cũ đều tách được; danh sách đọc sổ phủ đủ 12 chỗ (máy soạn có thể nối sau bản hỏng)', () => {
+    expect(TRAN_SONG_SINH).toBe(6)
+    expect(cacQidSongSinh('Q1')).toEqual(['Q1', ...Array.from({ length: 12 }, (_, i) => i).map((i) => `Q1~ss${i}`)])
     expect(tachSongSinh('Q1~ss3#2')).toEqual({ goc: 'Q1', songSinh: 3 })
     expect(tachSongSinh('Q1~ss2')).toEqual({ goc: 'Q1', songSinh: 2 })
     expect(tachSongSinh('Q1')).toEqual({ goc: 'Q1', songSinh: null })
     expect(lanLamTuDong({ qid: 'Q1~ss3', ngay_vn: '2026-10-05', luc: 'x', ket_qua: 1 })).toMatchObject({ qid: 'Q1', songSinh: true, dung: true })
   })
-  it('locBoTro giữ đủ 4 song sinh (bản 5 bị cắt còn 4, không còn cắt 2)', () => {
+  it('locBoTro giữ đủ sáu song sinh, giới hạn gói mới ở sáu bản', () => {
     const ss = (i: number) => ({ de: `Song sinh ${i}`, pa: { A: '1', B: '2', C: '3', D: '4' }, dap_an: 'B' })
-    expect(locBoTro({ song_sinh: [ss(0), ss(1), ss(2), ss(3), ss(4)] }).songSinh.map((x) => x.de)).toEqual(['Song sinh 0', 'Song sinh 1', 'Song sinh 2', 'Song sinh 3'])
+    expect(locBoTro({ song_sinh: [ss(0), ss(1), ss(2), ss(3), ss(4), ss(5), ss(6)] }).songSinh.map((x) => x.de)).toEqual(['Song sinh 0', 'Song sinh 1', 'Song sinh 2', 'Song sinh 3', 'Song sinh 4', 'Song sinh 5'])
   })
 })
 
