@@ -22,6 +22,7 @@ describe('nạp hàng song sinh toàn kho: SQL thật, chỉ hàng học liệu'
     them('a','chung'); them('b','chung'); them('c','ds','II'); them('d','so','III')
     them('e','tl','III','12-KHO',{ correct: 'FeSO4' })
     them('f','xoa','I','12-XOA'); them('g','11','I','11-KHO'); them('h','thieu','I','12-KHO',{},false)
+    them('i','tl-chua-anh-xa','III','12-KHO',{correct:'FeSO4'},false)
     const a = await napSongSinhToanKho(d.env,{ so: 2,lop:'12' })
     expect(a).toMatchObject({ daQuet:2,nhom:1,vaoHang:1,tiep:'b',chuaAnhXa:1 })
     const b = await napSongSinhToanKho(d.env,{ so:2,lop:'12',sau:a.tiep })

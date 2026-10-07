@@ -164,10 +164,27 @@ export async function napSongSinhToanKho(env: Env, b: Obj): Promise<Obj> {
   let vaoHang = 0
   for (let i = 0; i < lenh.length; i += 100) vaoHang += (await env.DB.batch(lenh.slice(i, i + 100))).reduce((s, r) => s + (r.meta?.changes ?? 0), 0)
   // Câu thiếu ánh xạ phải được báo, không âm thầm coi là đã phủ toàn kho.
-  const chuaAnhXa = sau ? undefined : Number((await env.DB.prepare(`SELECT COUNT(*) AS n FROM game_v2_question q
-    JOIN de_kho d ON d.ma_de = q.ma_de AND d.da_xoa = 0
-    LEFT JOIN loi_giai_cau l ON l.qid = q.qid AND l.ma_de = q.ma_de
-    WHERE l.qid IS NULL ${lop ? 'AND d.lop = ?' : ''}`).bind(...(lop ? [lop] : [])).first<Obj>())?.n ?? 0)
+  let chuaAnhXa: number | undefined
+  if (!sau) {
+    chuaAnhXa = 0
+    const daDem = new Set<string>()
+    for (let offset = 0; ; offset += 200) {
+      const chua = (await env.DB.prepare(`SELECT q.qid,q.json FROM game_v2_question q
+        JOIN de_kho d ON d.ma_de = q.ma_de AND d.da_xoa = 0
+        LEFT JOIN loi_giai_cau l ON l.qid = q.qid AND l.ma_de = q.ma_de
+        WHERE l.qid IS NULL ${lop ? 'AND d.lop = ?' : ''} ORDER BY q.qid,q.ma_de LIMIT 200 OFFSET ?`)
+        .bind(...(lop ? [lop] : []), offset).all<Obj>()).results ?? []
+      for (const x of chua) {
+        if (daDem.has(str(x.qid))) continue
+        daDem.add(str(x.qid))
+        // Cùng bộ lọc với câu đã ánh xạ; tự luận không thuộc mục tiêu sinh.
+        let cau: unknown
+        try { cau = JSON.parse(str(x.json)) } catch { loiJson++; continue }
+        if (!laCauTuLuan(cau)) chuaAnhXa++
+      }
+      if (chua.length < 200) break
+    }
+  }
   return { ok: true, daQuet: ds.length, nhom: nhom.size, vaoHang, du, nghi, tuLuan, loiJson,
     ...(chuaAnhXa === undefined ? {} : { chuaAnhXa }), tiep: ds.length === so ? str(ds[ds.length - 1]?.qid) : null }
 }
