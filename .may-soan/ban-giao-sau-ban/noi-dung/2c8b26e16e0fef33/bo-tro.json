@@ -1,0 +1,270 @@
+{
+  "qid": "12-KT-C6-D5-II-4",
+  "bam": "2c8b26e16e0fef33",
+  "yMoi": [
+    {
+      "t": "Trong phản ứng nung quặng ZnS (giai đoạn 1), lưu huỳnh bị oxi hóa từ số oxi hóa −2 lên +4.",
+      "d": "D",
+      "lyDo": "Trong ZnS lưu huỳnh có số oxi hóa −2, trong SO₂ là +4 → bị oxi hóa.",
+      "_id": "2c8b26e16e0fef33_y1",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "ZnS: S(-2) → SO₂: S(+4) → S bị oxi hóa từ -2 lên +4.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong phản ứng 2ZnS + 3O₂ → 2ZnO + 2SO₂, nguyên tử kẽm (Zn) bị oxi hóa.",
+      "d": "S",
+      "lyDo": "Zn trong ZnS và trong ZnO đều mang số oxi hóa +2, không thay đổi → Zn không bị oxi hóa.",
+      "_id": "2c8b26e16e0fef33_y2",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Zn trong ZnS là +2, Zn trong ZnO cũng là +2 → số oxi hóa Zn không đổi, Zn không bị oxi hóa.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Tỉ lệ mol ZnS : O₂ trong phương trình phản ứng giai đoạn 1 là 2 : 3.",
+      "d": "D",
+      "lyDo": "Phương trình cân bằng 2ZnS + 3O₂ → 2ZnO + 2SO₂ cho thấy tỉ lệ mol ZnS:O₂ = 2:3.",
+      "_id": "2c8b26e16e0fef33_y3",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "2ZnS + 3O₂ → 2ZnO + 2SO₂ → tỉ lệ ZnS:O₂ = 2:3.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Quặng sphalerite có thành phần chính là ZnO.",
+      "d": "S",
+      "lyDo": "Sphalerite là khoáng vật zinc sulfide (ZnS), không phải zinc oxide (ZnO).",
+      "_id": "2c8b26e16e0fef33_y4",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Sphalerite có thành phần chính là ZnS, không phải ZnO.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Phản ứng ZnO + H₂SO₄ → ZnSO₄ + H₂O (giai đoạn 2) là phản ứng oxi hóa – khử.",
+      "d": "S",
+      "lyDo": "Không có nguyên tố nào thay đổi số oxi hóa trong phản ứng này → không phải phản ứng oxi hóa – khử.",
+      "_id": "2c8b26e16e0fef33_y5",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "ZnO + H₂SO₄ → ZnSO₄ + H₂O: số oxi hóa Zn(+2), S(+6) không đổi trước và sau → không phải phản ứng oxi hóa khử.",
+        "chac": true
+      }
+    },
+    {
+      "t": "ZnO là oxide lưỡng tính, vừa phản ứng được với dung dịch H₂SO₄, vừa phản ứng được với dung dịch NaOH.",
+      "d": "D",
+      "lyDo": "ZnO + H₂SO₄ → ZnSO₄ + H₂O; ZnO + 2NaOH → Na₂ZnO₂ + H₂O — tính lưỡng tính đặc trưng của ZnO.",
+      "_id": "2c8b26e16e0fef33_y6",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "ZnO + H₂SO₄ → ZnSO₄ + H₂O; ZnO + 2NaOH → Na₂ZnO₂ + H₂O → ZnO là oxide lưỡng tính.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong giai đoạn 2, tỉ lệ mol ZnO : H₂SO₄ tham gia phản ứng là 1 : 1.",
+      "d": "D",
+      "lyDo": "ZnO + H₂SO₄ → ZnSO₄ + H₂O, hệ số mỗi chất đều bằng 1 → tỉ lệ mol 1:1.",
+      "_id": "2c8b26e16e0fef33_y7",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "ZnO + H₂SO₄ → ZnSO₄ + H₂O → tỉ lệ ZnO:H₂SO₄ = 1:1.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Giai đoạn 2 có thể dùng HCl thay cho H₂SO₄ mà vẫn thu được muối ZnSO₄.",
+      "d": "S",
+      "lyDo": "ZnO + 2HCl → ZnCl₂ + H₂O, sản phẩm là ZnCl₂ chứ không phải ZnSO₄.",
+      "_id": "2c8b26e16e0fef33_y8",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Dùng HCl → tạo ZnCl₂, không phải ZnSO₄.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong giai đoạn 3, ion Zn²⁺ bị khử tại điện cực cathode, nhận 2 electron để tạo thành Zn.",
+      "d": "D",
+      "lyDo": "Phản ứng tại cathode: Zn²⁺ + 2e⁻ → Zn (quá trình khử, Zn²⁺ giảm số oxi hóa từ +2 về 0).",
+      "_id": "2c8b26e16e0fef33_y9",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "Điện phân ZnSO₄: cathode: Zn²⁺ + 2e⁻ → Zn (Zn²⁺ bị khử).",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong giai đoạn 3, kim loại Zn bám vào điện cực anode.",
+      "d": "S",
+      "lyDo": "Zn²⁺ bị khử thành Zn tại cathode (cực âm), không phải anode.",
+      "_id": "2c8b26e16e0fef33_y10",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Zn bám vào cathode (điện cực âm), không phải anode.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong giai đoạn 3, nồng độ ion Zn²⁺ trong dung dịch giảm dần theo thời gian điện phân.",
+      "d": "D",
+      "lyDo": "Zn²⁺ liên tục bị khử thành Zn bám vào cathode → lượng Zn²⁺ trong dung dịch giảm dần.",
+      "_id": "2c8b26e16e0fef33_y11",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "Zn²⁺ bị khử liên tục ở cathode → nồng độ Zn²⁺ giảm theo thời gian.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Nồng độ H₂SO₄ trong dung dịch giảm dần trong quá trình điện phân giai đoạn 3.",
+      "d": "S",
+      "lyDo": "Tổng phản ứng 2ZnSO₄ + 2H₂O → 2Zn + O₂ + 2H₂SO₄ cho thấy H₂SO₄ được sinh ra → nồng độ tăng.",
+      "_id": "2c8b26e16e0fef33_y12",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Điện phân ZnSO₄: anode: H₂O → ½O₂ + 2H⁺ + 2e⁻ → H⁺ sinh ra → nồng độ H₂SO₄ tăng, không giảm.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Để thu được 6,5 gam Zn trong giai đoạn 3, cần truyền qua bình điện phân điện lượng tối thiểu là 19300 C.",
+      "d": "D",
+      "lyDo": "n(Zn) = 6,5/65 = 0,1 mol; Q = 0,1 × 2 × 96500 = 19300 C.",
+      "_id": "2c8b26e16e0fef33_y13",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "n(Zn) = 6,5/65 = 0,1 mol; Q = 0,1×2×96500 = 19300 C.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Điện cực anode trong giai đoạn 3 bị hòa tan dần vào dung dịch do bị oxi hóa.",
+      "d": "S",
+      "lyDo": "Điện cực trơ (graphite/Pt) không bị hòa tan; tại anode chỉ xảy ra oxi hóa nước: 2H₂O → O₂ + 4H⁺ + 4e⁻.",
+      "_id": "2c8b26e16e0fef33_y14",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Điện phân ZnSO₄ với anode trơ: tại anode xảy ra oxi hóa nước → O₂, anode không bị hòa tan.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Khí SO₂ sinh ra trong giai đoạn 1 là khí độc, khi tan vào nước mưa tạo H₂SO₃, là một nguyên nhân gây mưa acid.",
+      "d": "D",
+      "lyDo": "SO₂ + H₂O → H₂SO₃; axit này tích lũy làm giảm pH nước mưa, gây mưa acid.",
+      "_id": "2c8b26e16e0fef33_y15",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "SO₂ + H₂O → H₂SO₃ → mưa acid; SO₂ là khí độc.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Khí SO₂ thu hồi từ giai đoạn 1 có thể được oxi hóa thành SO₃ (xúc tác V₂O₅), rồi hấp thụ vào nước để sản xuất H₂SO₄.",
+      "d": "D",
+      "lyDo": "Đây là nguyên lý phương pháp tiếp xúc: 2SO₂ + O₂ → 2SO₃ (V₂O₅, t°); SO₃ + H₂O → H₂SO₄.",
+      "_id": "2c8b26e16e0fef33_y16",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "SO₂ --(V₂O₅, to)-→ SO₃; SO₃ + H₂O → H₂SO₄: quy trình tiếp xúc sản xuất H₂SO₄.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Từ 2 tấn quặng sphalerite chứa 40% kẽm, với hiệu suất toàn quá trình 75%, thu được 600 kg kẽm tinh khiết.",
+      "d": "D",
+      "lyDo": "2000 × 40% × 75% = 600 kg.",
+      "_id": "2c8b26e16e0fef33_y17",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "m(Zn) = 2 tấn × 40% × 75% = 0,6 tấn = 600 kg.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Từ 1 tấn quặng sphalerite chứa 60% kẽm, với hiệu suất 90%, sản xuất được 600 kg kẽm.",
+      "d": "S",
+      "lyDo": "1000 × 60% × 90% = 540 kg ≠ 600 kg.",
+      "_id": "2c8b26e16e0fef33_y18",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "m(Zn) = 1000 kg × 60% × 90% = 540 kg ≠ 600 kg.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong giai đoạn 1, để nung hoàn toàn 9,7 kg ZnS cần dùng tối thiểu 4,8 kg khí O₂.",
+      "d": "D",
+      "lyDo": "n(ZnS) = 9700/97 = 100 mol; tỉ lệ 2:3 → n(O₂) = 150 mol; m(O₂) = 150 × 32 = 4800 g = 4,8 kg.",
+      "_id": "2c8b26e16e0fef33_y19",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "n(ZnS) = 9700/97 = 100 mol; n(O₂) = 3/2×100 = 150 mol; m(O₂) = 150×32 = 4800 g = 4,8 kg.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Trong giai đoạn 2, để hòa tan 16,2 kg ZnO cần dùng 19,6 lít dung dịch H₂SO₄ 1M.",
+      "d": "S",
+      "lyDo": "n(ZnO) = 16200/81 = 200 mol → cần 200 mol H₂SO₄; V = 200/1 = 200 lít, không phải 19,6 lít.",
+      "_id": "2c8b26e16e0fef33_y20",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "n(ZnO) = 16200/81 = 200 mol; n(H₂SO₄) = 200 mol; V = 200/1 = 200 lít ≠ 19,6 lít.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Kim loại kẽm tan được trong dung dịch NaOH đặc nóng, giải phóng khí H₂.",
+      "d": "D",
+      "lyDo": "Zn + 2NaOH (đặc) → Na₂ZnO₂ + H₂↑; kẽm là kim loại lưỡng tính, phản ứng được với kiềm đặc.",
+      "_id": "2c8b26e16e0fef33_y21",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "Zn + 2NaOH → Na₂ZnO₂ + H₂↑ (kẽm tan trong NaOH đặc nóng, giải phóng H₂).",
+        "chac": true
+      }
+    },
+    {
+      "t": "Kẽm có thể được điều chế bằng phương pháp thủy luyện: dùng sắt (Fe) để đẩy kẽm ra khỏi dung dịch muối ZnSO₄.",
+      "d": "S",
+      "lyDo": "Zn hoạt động hơn Fe trong dãy điện hóa nên Fe không khử được Zn²⁺ từ dung dịch ZnSO₄.",
+      "_id": "2c8b26e16e0fef33_y22",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "E°(Zn²⁺/Zn) = -0,76 V < E°(Fe²⁺/Fe) = -0,44 V → Zn hoạt động hơn Fe → Fe không đẩy được Zn khỏi dung dịch ZnSO₄.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Zn(OH)₂ là hydroxide lưỡng tính, tan được trong dung dịch HCl và tan được trong dung dịch NaOH dư.",
+      "d": "D",
+      "lyDo": "Zn(OH)₂ + 2HCl → ZnCl₂ + 2H₂O; Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] (tetrahydroxozincate).",
+      "_id": "2c8b26e16e0fef33_y23",
+      "kiem": {
+        "d2": "D",
+        "lyDo2": "Zn(OH)₂ + 2HCl → ZnCl₂ + 2H₂O; Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] → hydroxide lưỡng tính.",
+        "chac": true
+      }
+    },
+    {
+      "t": "Khi thêm từ từ dung dịch NaOH đến dư vào dung dịch ZnSO₄, thu được kết tủa trắng Zn(OH)₂ không tan.",
+      "d": "S",
+      "lyDo": "Ban đầu tạo Zn(OH)₂↓ trắng, nhưng khi NaOH dư kết tủa tan: Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄].",
+      "_id": "2c8b26e16e0fef33_y24",
+      "kiem": {
+        "d2": "S",
+        "lyDo2": "Khi NaOH dư, Zn(OH)₂ tan: Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄] → kết tủa tan, không còn kết tủa trắng.",
+        "chac": true
+      }
+    }
+  ]
+}

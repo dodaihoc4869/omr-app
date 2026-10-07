@@ -1,0 +1,51 @@
+{
+  "phien_ban": "0.1.0",
+  "ngay_tao": "2026-10-07",
+  "mo_ta": "Gói mẫu pipeline song sinh 2 lượt — 4 câu đại diện (tn/ds/tln, Phần I/II/III, lý thuyết/bài tập)",
+  "ghi_chu": "CHƯA NẠP D1 — chờ Codex kiểm",
+  "tong_cau": 4,
+  "tong_ban_khac": 18,
+  "tong_y_moi": 24,
+  "cac_cau": [
+    {
+      "bam": "67248ce9d2fec69f",
+      "qid": "10-C1-B1-I-1",
+      "dang": "tn",
+      "phan": "I",
+      "loai": "ly_thuyet",
+      "so_ban_khac": 6,
+      "so_y_moi": 0,
+      "kiem_2luot": "PASS"
+    },
+    {
+      "bam": "54ede2e3b61a3ee5",
+      "qid": "12-C3-B9-D2-I-43",
+      "dang": "tn",
+      "phan": "I",
+      "loai": "bai_tap",
+      "so_ban_khac": 6,
+      "so_y_moi": 0,
+      "kiem_2luot": "PASS"
+    },
+    {
+      "bam": "2c8b26e16e0fef33",
+      "qid": "12-KT-C6-D5-II-4",
+      "dang": "ds",
+      "phan": "II",
+      "loai": "bai_tap",
+      "so_ban_khac": 0,
+      "so_y_moi": 24,
+      "kiem_2luot": "PASS"
+    },
+    {
+      "bam": "5c98108d8d42329a",
+      "qid": "12-C3-B10-D2-III-3",
+      "dang": "tln",
+      "phan": "III",
+      "loai": "ly_thuyet",
+      "so_ban_khac": 6,
+      "so_y_moi": 0,
+      "kiem_2luot": "PASS"
+    }
+  ]
+}

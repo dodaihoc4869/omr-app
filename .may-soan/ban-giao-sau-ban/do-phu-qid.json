@@ -1,0 +1,47 @@
+{
+  "tong_cau_kho_D1": 14828,
+  "cau_da_co_song_sinh": [
+    {
+      "qid": "10-C1-B1-I-1",
+      "bam": "67248ce9d2fec69f",
+      "phan": "I",
+      "dang": "tn",
+      "loai": "ly_thuyet",
+      "so_ban_khac": 6,
+      "so_y_moi": 0,
+      "kiem_2luot": "PASS"
+    },
+    {
+      "qid": "12-C3-B9-D2-I-43",
+      "bam": "54ede2e3b61a3ee5",
+      "phan": "I",
+      "dang": "tn",
+      "loai": "bai_tap",
+      "so_ban_khac": 6,
+      "so_y_moi": 0,
+      "kiem_2luot": "PASS"
+    },
+    {
+      "qid": "12-KT-C6-D5-II-4",
+      "bam": "2c8b26e16e0fef33",
+      "phan": "II",
+      "dang": "ds",
+      "loai": "bai_tap",
+      "so_ban_khac": 0,
+      "so_y_moi": 24,
+      "kiem_2luot": "PASS"
+    },
+    {
+      "qid": "12-C3-B10-D2-III-3",
+      "bam": "5c98108d8d42329a",
+      "phan": "III",
+      "dang": "tln",
+      "loai": "ly_thuyet",
+      "so_ban_khac": 6,
+      "so_y_moi": 0,
+      "kiem_2luot": "PASS"
+    }
+  ],
+  "phan_tram_phu": "0.0270%",
+  "ghi_chu_phu": "Gói mẫu 4/14.828 câu — pipeline đã chứng minh khả năng; cần chạy toàn bộ"
+}
