@@ -1,0 +1,41 @@
+# Deploy Worker từ nhánh fix/prompt-ky-nang-toan-bai — có route vong-chua-viec
+name: Deploy Worker (vong-chua-viec)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/prompt-ky-nang-toan-bai
+          fetch-depth: 0
+      # CHẶN GHI ĐÈ MÁY CHỦ SỐNG BẰNG BẢN CŨ (sự cố 07/10: hai lượt deploy từ nhánh khác đã ghi đè Worker sống bằng bản thiếu commit của main).
+      # Luật dự án (deploy.yml): bản sống chỉ lấy từ main. Nhánh phải gộp main mới nhất rồi mới được phát hành.
+      - name: Chặn phát hành khi nhánh chưa gộp main mới nhất
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "DỪNG: nhánh chưa có đủ commit của main — phát hành sẽ ghi đè máy chủ sống bằng bản cũ. Gộp main vào nhánh rồi chạy lại."
+            exit 1
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
+          command: deploy
+          workingDirectory: server

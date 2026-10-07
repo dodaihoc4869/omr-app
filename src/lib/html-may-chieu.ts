@@ -34,6 +34,8 @@ const laTuLuanChieu = (c: CauLuyen): boolean => c.phan === 'III' && laCauTuLuan(
 
 /** Một ô bảng: một em, một câu. */
 export interface OBang {
+  /** Chữa chung bước cuối: không gọi/chấm cá nhân; chỉ nút Thầy chữa. */
+  chuaCuoi?: string
   sbd: string
   hoTen: string
   /** Mã câu (qid) — CHỈ để tờ chiếu ghi kết quả Đạt / Không đạt về màn giáo viên (`cauNoi`). Thiếu thì ô
@@ -177,7 +179,7 @@ export function laCauDai(c: CauLuyen | undefined): boolean {
   return false
 }
 
-function thanCauHtml(c: CauLuyen): string {
+function thanCauHtml(c: CauLuyen, traLoiNganDaKiem = false): string {
   const khoi: string[] = []
 
   if (c.anhThanCau) {
@@ -208,7 +210,7 @@ function thanCauHtml(c: CauLuyen): string {
     })
     khoi.push(`<div class="mc-ds-pa">${o.join('')}</div>`)
   } else if (c.phan === 'III') {
-    khoi.push(laTuLuanChieu(c) ? '<div class="mc-ngan">Tự luận — em trình bày lời giải đầy đủ lên bảng.</div>' : '<div class="mc-ngan">Trả lời ngắn — em viết kết quả và trình bày các bước lên bảng.</div>')
+    khoi.push(!traLoiNganDaKiem && laTuLuanChieu(c) ? '<div class="mc-ngan">Tự luận — em trình bày lời giải đầy đủ lên bảng.</div>' : '<div class="mc-ngan">Trả lời ngắn — em viết kết quả và trình bày các bước lên bảng.</div>')
   }
 
   khoi.push(hinhTaiViTri(c, 'cuoi_cau'))
@@ -265,7 +267,7 @@ const TEN_PHAN_CAU: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng
 /** Dòng đầu của thẻ đề khi câu chiếm 2/3 bảng (bản vẽ "câu dài"): chip số câu + chip phần. Ở đợt đôi (mỗi em nửa bảng) dòng này
  * ẨN — số câu đã nằm trên thẻ tên. Hai bản cùng một chữ, CSS chọn bản nào hiện theo bố cục. */
 function dauDeHtml(o: OBang): string {
-  return `<div class="mc-de-dau"><span class="mc-de-so">Câu ${o.soCau}</span><span class="mc-de-phan">Phần ${o.cau.phan}${laTuLuanChieu(o.cau) ? ' · Tự luận' : TEN_PHAN_CAU[o.cau.phan] ? ` · ${TEN_PHAN_CAU[o.cau.phan]}` : ''}</span></div>`
+  return `<div class="mc-de-dau"><span class="mc-de-so">Câu ${o.soCau}</span><span class="mc-de-phan">Phần ${o.cau.phan}${!o.chuaCuoi && laTuLuanChieu(o.cau) ? ' · Tự luận' : TEN_PHAN_CAU[o.cau.phan] ? ` · ${TEN_PHAN_CAU[o.cau.phan]}` : ''}</span></div>`
 }
 
 /** Tên gọi ở nhãn vùng làm bài: từ cuối của họ tên ("Nguyễn Văn Minh" → "Minh"). */
@@ -341,6 +343,7 @@ function gioCuaO(o: OBang, dayHoc: boolean): { lam: number; chua: number; lam0: 
 function chamHtml(o: OBang, cauNoi: boolean): string {
   if (!cauNoi || !o.qid) return ''
   const khoa = khoaToChieu(o.sbd, o.qid)
+  if (o.chuaCuoi) return mangNutThayChua(khoa)
   // + nút "Thầy chữa" (thầy 05/10, mọi tờ chiếu): không gọi em nữa, câu tính là thầy đã chữa.
   return mangNutChamToChieu(khoa) + mangNutThayChua(khoa)
 }
@@ -352,9 +355,8 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
   const gio = gioCuaO(o, Boolean(tuyChon.dayHoc))
   return `<div class="mc-dot mc-dot-don" data-dot="${soDot}" ${secondsAttr}>
   <section class="mc-nua mc-don"${tuyChon.dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}" data-lam0="${gio.lam0}" data-chua0="${gio.chua0}">
-    <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
-    ${headerEmHtml(o, ma)}
-    <div class="mc-vung-de">${thongKeHtml(o.thongKe)}${dauDeHtml(o)}<div class="mc-than">${thanCauHtml(o.cau)}</div>
+    ${o.chuaCuoi ? '' : `<button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>${headerEmHtml(o, ma)}`}
+    <div class="mc-vung-de">${thongKeHtml(o.thongKe)}${dauDeHtml(o)}<div class="mc-than">${o.chuaCuoi ? `<p class="mc-de">${chuDeChieu(o.chuaCuoi)}</p>` : ''}${thanCauHtml(o.cau,Boolean(o.chuaCuoi))}</div>
       <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
     </div>
     <div class="mc-giai-vung">

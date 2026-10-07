@@ -5,7 +5,7 @@ import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assi
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
 import { giaiBoCauEm, lamPhangBo, LoiBoCauError } from '../lib/bo-cau-chuan'
 import { taoLinkPhieu } from '../lib/phieu-link'
-import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
+import { cauKhacPhuc, ghiPhieuKhacPhuc, lichSuEm as lichSuEmApi, tenTheoSbd, trangThaiPhongCho, vaoThi, phieuCuaEm as layBaiDaNop, layPhieu, thongDiepChan, submitAnswers, pushExamStatus, sendParentFeedback, fetchKetQua, sendStudentMessage, ghiDiem, luuTam, guiCauHoi, layCauGocQuaMayChu, CHU_KY_LUU_TAM_GIAY, NHIP_BAO_SONG_GIAY, chuKyLechPha, chuKyLechPhaMs, type KeyBank, type CongBoDiem, type KetQuaVaoThi, type ChiTietCauRow, type BaiDaNopCuaEm } from '../lib/exam-api'
 import { CongNhip, NHIP_TIM_LUU_TAM_GIAY } from '../lib/nhip-gui'
 import { goiCauHoi } from '../lib/hoi-bai'
 import TamTruotHoiBai, { type CauChon } from '../components/TamTruotHoiBai'
@@ -56,6 +56,8 @@ import ManGiuDeDoc from '../components/ManGiuDeDoc'
 import VanTay from '../components/VanTay'
 import TheCau from '../components/TheCau'
 import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
+import { gocCuaCauThay } from '../lib/rut-de-da-dung'
+import type { CauGocCongKhai, LayCauGoc } from '../lib/cau-goc'
 import { flushSync } from 'react-dom'
 import MaCaInput from '../components/MaCaInput'
 import LogoHocSinh from '../components/LogoHocSinh'
@@ -554,6 +556,34 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   useEffect(() => {
     lopRef.current = lop
   }, [lop])
+
+  // "XEM CÂU GỐC" của ca "Kiểm chứng câu đã đúng" (thầy 07/10). MỘT hàm bền cho cả màn: danh tính lượt đọc qua ref, bộ nhớ đệm trong ref ⇒ `layCauGoc` không đổi giữa các lần vẽ
+  // (thẻ câu `memo` so props, hàm nằm TRONG object `daDungO` nên phải cùng một hàm mới không vẽ lại cả đề). Chỉ nhớ câu máy chủ đã TRẢ LỜI (có câu hoặc "không có");
+  // lỗi mạng không nhớ ⇒ em bấm lại là hỏi lại. Hai thẻ cùng bấm một câu gốc chỉ hỏi một lần.
+  const luotCauGocRef = useRef<{ maCa: string; sbd: string } | null>(null)
+  useEffect(() => {
+    luotCauGocRef.current = attempt ? { maCa: attempt.maCa, sbd: attempt.sbd } : null
+  }, [attempt?.maCa, attempt?.sbd]) // eslint-disable-line react-hooks/exhaustive-deps
+  const cauGocDaCo = useRef(new Map<string, CauGocCongKhai | null>())
+  const cauGocDangHoi = useRef(new Map<string, Promise<CauGocCongKhai | null>>())
+  const layCauGoc = useCallback<LayCauGoc>((qidGoc) => {
+    const luot = luotCauGocRef.current
+    if (!luot) return Promise.reject(new Error('Chưa vào ca.'))
+    const khoa = `${luot.maCa}|${luot.sbd}|${qidGoc}`
+    if (cauGocDaCo.current.has(khoa)) return Promise.resolve(cauGocDaCo.current.get(khoa) ?? null)
+    const dangHoi = cauGocDangHoi.current.get(khoa)
+    if (dangHoi) return dangHoi
+    const p = layCauGocQuaMayChu(scriptUrlRef.current.trim(), luot.maCa, luot.sbd, qidGoc)
+      .then((c) => {
+        cauGocDaCo.current.set(khoa, c)
+        return c
+      })
+      .finally(() => {
+        cauGocDangHoi.current.delete(khoa)
+      })
+    cauGocDangHoi.current.set(khoa, p)
+    return p
+  }, [])
 
   // GỬI NỐT BÀI CÒN TỒN ĐỌNG — KHACPHUCTREOHANGLOAT.md T6 ("bài nộp không được
   // phép mất").
@@ -2382,11 +2412,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   // Đã nộp mà chưa có đáp án → hỏi lại máy chủ: ngay khi vào màn "Đã nộp" và
-  // mỗi 20 giây khi màn hình đang mở (chế độ "khi cả lớp nộp xong", hoặc em
-  // mở lại link sau khi đã nộp). Server tự quyết đã được phép xem hay chưa.
+  // mỗi nhịp khi màn hình đang mở (cả ba chế độ: ngay/ca_lop_xong/khong).
+  // Server tự quyết đã được phép xem hay chưa — client không tự chặn theo congBo.
+  // Bỏ early-return khi congBo='khong': nếu không poll thì màn đang mở không nhận
+  // được công bố khi thầy bật sau. nhipCho thích nghi: 4s khi ca_lop_xong, 15s còn lại.
   useEffect(() => {
     if (phase !== 'submitted' || keyBank || !attempt || attempt.pendingSubmit) return
-    if (congBo === 'khong') return
     const url = scriptUrlRef.current.trim()
     if (!url) return
     let dung = false
@@ -3377,7 +3408,13 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   const nhanDaLam = (qid: string) => (qid in daLamLai ? { ngay: daLamLai[qid] ?? '' } : undefined)
   // CA "KIỂM CHỨNG CÂU ĐÃ ĐÚNG" (02/10): câu em đã tự làm đúng — nhãn nơi · ngày · mức độ ngay dưới số câu.
   const daDungNhan = attempt.daDungNhan ?? {}
-  const nhanDaDung = (qid: string) => (daDungNhan[qid] ? { nhan: daDungNhan[qid]! } : undefined)
+  // Câu THAY có thêm `gocQid` (câu gốc em đã đúng) + hàm bền `layCauGoc` ⇒ thẻ có nút "Xem câu gốc"; câu nguyên văn / câu bù không có.
+  const nhanDaDung = (qid: string) => {
+    const nhan = daDungNhan[qid]
+    if (!nhan) return undefined
+    const gocQid = gocCuaCauThay(daDungNhan, qid)
+    return gocQid ? { nhan, gocQid, layCauGoc } : { nhan }
+  }
 
   let stt = 0
   const renderPhan = (phan: PhanKey) => {

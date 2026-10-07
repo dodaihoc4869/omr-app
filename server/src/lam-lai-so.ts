@@ -50,7 +50,7 @@ const gocCua = (qid: string): string => /^(.*)~ss\d+$/.exec(qid)?.[1] ?? qid
  */
 export function lanLamTuDongTc(x: Row, lanLamGoc: (x: Row) => LanLam, tapGoc: ReadonlySet<string>): LanLam[] {
   // 06/10 (1): dòng CÂU CHẨN ĐOÁN (purpose 'chan_doan', `tc` = câu lỗi) KHÔNG phải một lần làm của câu lỗi (không tính cho luật đóng lỗi), cũng không phải của chính nó.
-  if (x.purpose === MUC_DICH_CHAN_DOAN) return []
+  if (x.purpose === MUC_DICH_CHAN_DOAN || x.purpose === 'chua_buoc') return []
   const ra: LanLam[] = []
   const qid = x.qid == null ? '' : String(x.qid)
   const goc = gocCua(qid)

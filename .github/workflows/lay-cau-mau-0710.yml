@@ -1,0 +1,69 @@
+name: Lấy câu mẫu D1 cho pipeline soạn song sinh
+# Workflow tạm thời: chỉ đọc D1, không deploy gì.
+# Commit kết quả vào nhánh claude/laughing-bohr-1ixzp4 (--force để bypass .gitignore).
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  lay-cau:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/laughing-bohr-1ixzp4
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch cấu hình Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Query D1 lấy câu mẫu 3 loại (tn/ds/tln)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          mkdir -p .may-soan
+          BASE="SELECT l.qid, l.bam, l.ma_de, l.dang, l.lop, l.bo, q.json FROM loi_giai_cau l JOIN game_v2_question q ON q.qid = l.qid AND q.ma_de = l.ma_de JOIN de_kho d ON d.ma_de = l.ma_de AND d.da_xoa = 0"
+          npx -y wrangler@latest d1 execute omr --remote --json \
+            --command "$BASE WHERE l.dang = 'tn' ORDER BY RANDOM() LIMIT 5" \
+            > .may-soan/raw-tn.json
+          npx -y wrangler@latest d1 execute omr --remote --json \
+            --command "$BASE WHERE l.dang = 'ds' ORDER BY RANDOM() LIMIT 5" \
+            > .may-soan/raw-ds.json
+          npx -y wrangler@latest d1 execute omr --remote --json \
+            --command "$BASE WHERE l.dang = 'tln' ORDER BY RANDOM() LIMIT 5" \
+            > .may-soan/raw-tln.json
+          node -e "
+          const fs = require('fs');
+          function parseRaw(file) {
+            try {
+              const raw = JSON.parse(fs.readFileSync(file,'utf8'));
+              return (raw[0]?.results || []).map(r => {
+                try { return { ...r, json: JSON.parse(r.json) }; }
+                catch { return null; }
+              }).filter(Boolean);
+            } catch(e) { console.error(file, e.message); return []; }
+          }
+          const tn = parseRaw('.may-soan/raw-tn.json');
+          const ds = parseRaw('.may-soan/raw-ds.json');
+          const tln = parseRaw('.may-soan/raw-tln.json');
+          console.log('tn:', tn.length, '  ds:', ds.length, '  tln:', tln.length);
+          const all = [...tn, ...ds, ...tln];
+          fs.writeFileSync('.may-soan/cau-mau-d1.json', JSON.stringify(all, null, 2));
+          console.log('Tong:', all.length);
+          "
+      - name: Commit câu mẫu vào nhánh (force qua .gitignore)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --force .may-soan/raw-tn.json .may-soan/raw-ds.json .may-soan/raw-tln.json .may-soan/cau-mau-d1.json
+          git diff --cached --quiet && echo "Khong co thay doi" || \
+            git commit -m "ci: câu mẫu D1 3 loại $(date -u '+%d/%m/%Y %H:%M') [skip ci]"
+          git push origin HEAD:claude/laughing-bohr-1ixzp4

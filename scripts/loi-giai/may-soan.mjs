@@ -366,7 +366,16 @@ async function main() {
   }
   const dem = { dat: 0, truot: 0, thieu: 0, giay: 0, hl: {} }
   console.log(`[${gio()}] Máy soạn: ${LUONG} luồng · ${LOP ? 'khối ' + LOP : 'mọi khối'} · ${SO_CAU_LO} câu/lô · ${BO_TRO ? 'hồ sơ + học liệu thêm (hai lượt độc lập)' : 'chỉ hồ sơ'} · máy chủ ${MAY_CHU}`)
-  await Promise.all(Array.from({ length: co('--thu') ? 1 : LUONG }, (_, i) => ngu(i * 3000).then(() => motLuong(i + 1, dem))))
+  // Dành một luồng sẵn có cho vòng chữa mới: tổng số luồng không tăng, không cần thầy duyệt.
+  const chua = BO_TRO && LUONG >= 2 && !co('--thu') && !co('--khong-vong-chua')
+  const chayChua = () => new Promise((resolve) => {
+    const args = [path.join(DAY,'may-soan-vong-chua.mjs'), ...(co('--mot-lan') ? ['--mot-lan'] : []), ...(MODEL ? ['--model',MODEL] : [])]
+    const p = spawn(process.execPath,args,{cwd:GOC,stdio:['ignore','inherit','inherit'],env:process.env})
+    p.on('error',()=>{console.log('Luồng vòng chữa chưa khởi động; phần hồ sơ vẫn tiếp tục.');resolve()})
+    p.on('close',code=>{if(code!==0)console.log('Luồng vòng chữa chưa hoàn tất; không ghi nhận hết hàng.');resolve()})
+  })
+  if (chua) console.log('Một trong các luồng được dành cho chẩn đoán, gỡ sai và gặp lại lần hai.')
+  await Promise.all([...Array.from({ length: co('--thu') ? 1 : LUONG - (chua ? 1 : 0) }, (_, i) => ngu(i * 3000).then(() => motLuong(i + 1, dem))), ...(chua ? [chayChua()] : [])])
   const h = dem.hl
   const chuHl = BO_TRO ? ` · bản khác giữ ${h.giuSS ?? 0}/${h.deXuatSS ?? 0} · ý Đ–S giữ ${h.giuY ?? 0}/${h.deXuatY ?? 0} · cờ đáp án tự xử: khớp ${h.khop ?? 0}, nghi ${h.nghi ?? 0}` : ''
   console.log(`[${gio()}] Kết thúc: đạt ${dem.dat} · trượt ${dem.truot} · thiếu ${dem.thieu}${chuHl}. Nhật ký: ${path.relative(GOC, NHAT_KY)}`)

@@ -106,7 +106,7 @@ export async function biaMoCho(env: Env, sbd: string): Promise<boolean> {
  * Em đang có ca kiểm tra mở (G9: Bi-a đóng hẳn). Dùng đúng luật cổng vào thi (`quyetDinhVaoThi`) trên ca `mo` của lớp em — cùng nguồn với `/hs/ca-dang-mo`,
  * nhưng KHÔNG xét phạm vi khối/danh sách chọn (chặt hơn một chút: ca của lớp đang mở là đóng Bi-a). Lỗi đọc ⇒ coi như không có ca.
  */
-export async function coCaDangMo(env: Env, sbd: string, nowMs: number): Promise<boolean> {
+export async function coCaDangMo(env: Env, sbd: string, nowMs: number, batBuocKiemDuoc = false): Promise<boolean> {
   try {
     // Tối ưu 05/10: MỘT lượt D1 thay hai lượt nối tiếp (lớp em → ca mở của lớp). Ca `mo` (mọi lớp, thường 0–vài dòng) kèm lớp đã TRIM của ca và lớp của em;
     // lọc lớp ở đây đúng như cũ: lớp em `trim()` của JS, rỗng ⇒ không ca; so BẰNG với TRIM(COALESCE(c.lop,'')) như câu cũ.
@@ -122,7 +122,7 @@ export async function coCaDangMo(env: Env, sbd: string, nowMs: number): Promise<
       if (quyetDinhVaoThi(c as unknown as DongCa, luot, '', nowMs).ok) return true
     }
     return false
-  } catch { return false }
+  } catch (e) { if (batBuocKiemDuoc) throw e; return false }
 }
 
 // ---------------------------------------------------------------- trần 40% (rải tỉ lệ mới : ôn — thầy 30/09)

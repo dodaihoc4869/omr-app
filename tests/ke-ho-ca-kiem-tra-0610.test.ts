@@ -144,6 +144,8 @@ describe('Việc 1 — máy chủ `/ca/co-luot-moi`: em nào có lượt tự l�
 
   it('sổ cũ chưa có cột assistance/purpose ⇒ vẫn trả lời bằng luật lọc cũ (không ném lỗi)', async () => {
     const d = dung()
+    // D1 trước CNH-1 cũng chưa có trigger giao chữa 0710 phụ thuộc các cột này.
+    d.sql.exec('DROP TRIGGER IF EXISTS chua_giao_sai_sau_ghi; DROP TRIGGER IF EXISTS chua_giao_sai_sau_cong_bo')
     d.sql.exec('ALTER TABLE su_kien_hoc DROP COLUMN assistance')
     const r = (await coLuotMoi(d.env, { sbd: ['S1', 'S3'], tu: MOC })) as { ok: boolean; em: string[] }
     expect(r.ok).toBe(true)

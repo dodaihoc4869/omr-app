@@ -1104,6 +1104,22 @@
   background: var(--m3-tertiary-container, var(--m3-primary-container));
   color: var(--m3-on-tertiary-container, var(--m3-on-primary-container));
 }
+.tlu-nut-chua {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--tlu-cd-2);
+  background: transparent;
+  color: var(--tlu-cd-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.tlu-nut-chua:hover { background: var(--tlu-nen-3); color: var(--tlu-chu); }
 .tlu-muc-nho { font-size: 14px; margin-top: 12px; }
 .tlu-tong-hop.tlu-th-it { display: grid; gap: 16px; }
 @media (prefers-reduced-motion: reduce) {

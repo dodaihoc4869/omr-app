@@ -16,7 +16,7 @@ import type { BangOmni } from '../../../server/src/omni-kieu'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
 import { hienNgay, mocHetHan } from './ngay'
-import { dungToChieu, napBangTra, napNoiDungChoToChieu, type CauGoc, type OChieu } from './to-chieu'
+import { dungToChieu, hoiNoiDungChoToChieu, laLoiMaBiMat, napBangTra, napNoiDungChoToChieu, type CauGoc, type LoiLenhThay, type OChieu } from './to-chieu'
 import { useGhiToChieu } from './ghi-to-chieu'
 import './chien-dich.css'
 
@@ -184,10 +184,13 @@ export default function LenBangChienDich() {
       const bangTra = await layTra()
       // NỘI DUNG ĐÚNG MÃ CÂU (thầy 06/10: tờ chữa lớp 11 lẫn câu lớp 10): Ngân hàng đề trên máy khớp NGUYÊN mã; thiếu thì hỏi máy chủ — nội dung đã qua cổng khối lớp, và câu
       // máy chủ báo khác khối lớp bị BỎ khỏi tờ. Không còn đoán nội dung theo đuôi mã / số thứ tự.
-      const np = await napNoiDungChoToChieu(dsO, bangTra, async (qids) => {
-        const r = await docNoiDungCau(chonId, qids)
-        return r.ok ? r.du : null
-      })
+      const loiHoi: { v: LoiLenhThay | null } = { v: null }
+      const np = await napNoiDungChoToChieu(dsO, bangTra, (qids) => hoiNoiDungChoToChieu((q) => docNoiDungCau(chonId, q), qids, (l) => { loiHoi.v = l }))
+      // Máy chủ TỪ CHỐI mã bí mật ⇒ mọi câu không có trên máy sẽ thành "Nội dung câu hỏi N": DỪNG và nói thật lý do (07/10), không chiếu bảng trắng lên lớp.
+      if (loiHoi.v && laLoiMaBiMat(loiHoi.v)) {
+        showToast(`Chưa lấy được nội dung câu: ${loiHoi.v.chu}`, 'error')
+        return false
+      }
       const khoiLop = khoiCuaLop(bang?.chienDich.lop ?? buoi?.chienDich.lop)
       const khoiDich = np.khoiDich.length ? np.khoiDich : khoiLop !== null ? [khoiLop] : []
       const hetCau = (soBo: number) => {

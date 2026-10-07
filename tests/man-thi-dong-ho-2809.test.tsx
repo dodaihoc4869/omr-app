@@ -132,7 +132,8 @@ describe('ExamTakeScreen / LuyenDeChuan / StudentPortal: không còn setState gi
     expect(man).not.toMatch(/setRemaining\(|\[remaining, /)
     expect(man).toMatch(/const mocGio = useMocGio\(khoGio\)/)
     expect(man).toMatch(/taoKhoGio\(hetLucMs, gioMayChu\)/)
-    expect(man).toMatch(/if \(mocGio === 'het'\) void doSubmit\(attempt, true\)/)
+    // attemptRef.current ?? attempt: dùng ref để tránh race condition closure lúc hết giờ
+    expect(man).toMatch(/if \(mocGio === 'het'\) void doSubmit\(attemptRef\.current \?\? attempt, true\)/)
     expect(man).toMatch(/<SoDongHo kho=\{khoGio\} \/>/)
     expect(man).toMatch(/<NhanNopCho kho=\{khoGio\} \/>/)
   })

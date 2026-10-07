@@ -10,7 +10,7 @@ import { LUAT_DIEM } from '../engine/score'
 import { dongBoGioMayChu } from './gio-may-chu'
 import { chuanTenCa } from './ten-ca'
 import { cauLapCuaEm, daLamLaiCuaEm, demLapCuaEm, moGoiDeRieng } from './de-rieng-goi'
-import { layCauHinhMayChu, luuTamMoi, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi as vaoThiMoiGoc, xongNapDiaChi } from './may-chu-moi'
+import { goiWorker, layCauHinhMayChu, luuTamMoi, nhipNong, nopMoi, phongChoMoi, trangThaiMoi, vaoThiMoi as vaoThiMoiGoc, xongNapDiaChi } from './may-chu-moi'
 import { layDiaChiMayChu } from './dia-chi-may-chu'
 import { taoCaDaXacNhan } from './day-ca-may-chu-moi'
 import { taiSanAnhDe } from './anh-len-may-chu'
@@ -23,6 +23,7 @@ import { danhSachCaMoi, danhSachCaMoiThoDoiChieu, datDauDongBo, dayNhieuCaMoi, t
 import { loadTeacherSecret } from './exam-db'
 import { docPhamViHoiLaiCa } from './cau-hinh-de-rieng'
 import { daDungCuaEm } from './rut-de-da-dung'
+import { docBangCauGoc, type CauGocCongKhai } from './cau-goc'
 import { donTheoMocReset } from './don-moc-reset-giao-vien'
 
 /** Ngân hàng gộp CÓ đáp án (chỉ dùng nội bộ cho tính năng "xem điểm ngay"). */
@@ -153,7 +154,13 @@ async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GI
     },
     giay,
   )
-  if (!res.ok) throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  if (!res.ok) {
+    // 403 TRÊN LỆNH CỦA THẦY (body có `secret`) = máy chủ từ chối mã bí mật. Nói thẳng việc cần làm (07/10: thầy đổi mã ở Cloudflare, màn chỉ hiện "HTTP 403").
+    // Lệnh công khai của em (không `secret`) giữ nguyên câu cũ — 403 ở đó là lý do khác, không được gán cho mã bí mật.
+    const coMa = typeof (body as { secret?: unknown } | null)?.secret === 'string' && (body as { secret: string }).secret !== ''
+    if (res.status === 403 && coMa) throw new Error(`Máy chủ trả lỗi HTTP 403 — mã bí mật trên máy này chưa đúng. Vào Cài đặt (mục Kết nối máy chủ), nhập lại mã rồi bấm Lưu.`)
+    throw new Error(`Máy chủ trả lỗi HTTP ${res.status}`)
+  }
   const r = await res.json()
   // Mọi phản hồi có serverNow → hiệu chỉnh đồng hồ theo máy chủ ngay tại đây,
   // màn hình không phải nhớ gọi.
@@ -927,6 +934,21 @@ export async function vaoThi(
   danhTinh: DanhTinhVaoThi = { hoTen: '', namSinh: '' },
 ): Promise<KetQuaVaoThi> {
   return vaoThiQuaMayChuMoi(scriptUrl, maCa, sbd, idThietBi, canBank, danhTinh)
+}
+
+/** "XEM CÂU GỐC" (ca "Kiểm chứng câu đã đúng", thầy 07/10): xin máy chủ nội dung CÔNG KHAI (đề, phương án, bảng, hình — KHÔNG đáp án) của câu gốc em đã làm đúng,
+ * ứng với một câu THAY trong đề của CHÍNH em. Máy chủ chỉ phát câu gốc đã gắn với đề của em ở ca này (`/hs/cau-goc`).
+ * `null` ⇒ máy chủ trả lời rõ là không phát được câu ấy (chưa có trong kho, đề còn bảo vệ…) — không phải sự cố, em cứ làm câu thay.
+ * Ném lỗi ⇒ không hỏi được (mạng, máy chủ bận) — nơi gọi cho em bấm lại; KHÔNG nhớ kết quả lỗi. */
+export async function layCauGocQuaMayChu(scriptUrl: string, maCa: string, sbd: string, qidGoc: string): Promise<CauGocCongKhai | null> {
+  // KHÔNG chờ lượt nạp địa chỉ lúc khởi động ở đây: đây không phải lượt gọi ĐẦU TIÊN của em (em đã vào thi xong) — luật "đúng 3 chỗ được chờ" (tests/co-may-chu-toi-may-em-1109.test.ts).
+  const goc = await layCauHinhMayChu()
+  const diaChi = await layDiaChiMayChu(scriptUrl)
+  if (!diaChi) throw new Error('Máy này chưa có địa chỉ máy chủ.')
+  const ch = { ...goc, BAT: true, URL: diaChi }
+  const r = await goiWorker<{ ok?: boolean; cau?: unknown }>(ch, '/hs/cau-goc', { maCa, sbd, qid: [qidGoc] }, nhipNong(ch))
+  if (!r || r.ok !== true) throw new Error('Chưa lấy được câu gốc.')
+  return docBangCauGoc(r.cau)[qidGoc] ?? null
 }
 
 /** Thông điệp cho học sinh khi bị chặn — nêu rõ lý do + việc cần làm, không vòng vo. */

@@ -63,5 +63,152 @@
    "nguonDe": "DH-10-C1-B1",
    "nguonCau": "III-34"
   }
+ },
+ "DB-10-B1-D2-III-11": {
+  "luc": "2026-10-07T02:41:50.332Z",
+  "cau": {
+   "phan": "III",
+   "so": 11,
+   "de": "Calcium (Ca) là một loại khoáng chất có vai trò rất quan trọng trong cơ thể người. Trong cơ thể, calcium chiếm 1,5 – 2% trọng lượng, 99% lượng calcium tồn tại trong xương, răng, móng và 1% trong máu.\nCalcium kết hợp với phosphorus là thành phần cấu tạo cơ bản của xương và răng, làm cho xương và răng chắc khỏe. Cấu trúc của kim loại calcium được phát hiện như hình sau: Khối lượng riêng của calcium kim loại là 1,55 g/cm³.\nGiả thiết rằng, trong tinh thể calcium, các nguyên tử là những hình cầu chiếm 74% thể tích tinh thể, phần còn lại là khe rỗng.\nXác định bán kính nguyên tử calcium. Cho nguyên tử khối của calcium là 40 và công thức tính thể tích hình cầu là V=4/3πr³, trong đó r là bán kính hình cầu. (Kết quả làm tròn đến hàng phần mười.)",
+   "dap_an": "2,0",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Cấu tạo nguyên tử",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Thành phần nguyên tử (vip)",
+   "loi_giai": {
+    "chot": "V(tinh thể 1 mol) = M : D; V(phần đặc) = V(tinh thể) × 0,74; r = ∛(3V₁ : 4π).",
+    "buoc": [
+     "V tinh thể 1 mol = 40 : 1,55 cm³.",
+     "V phần đặc 1 mol = 40 : 1,55 × 0,74 cm³.",
+     "V một nguyên tử V₁ = 40 : 1,55 × 0,74 : 6,022×10²³ cm³.",
+     "r³ = 3V₁ : (4π) ⇒ r = ∛[3 × 40 : 1,55 × 0,74 : 6,022×10²³ : (4π)] = 1,963….10⁻⁸ cm.",
+     "Vậy bán kính nguyên tử calcium = 1,963… Å ≈ 2,0 Å."
+    ],
+    "ket_qua": "2,0",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "2,0",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Đáp án tính theo Å (1 Å = 10⁻⁸ cm)."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Đi ngược quy trình của câu trên: từ khối lượng riêng suy ra thể tích một nguyên tử rồi ra bán kính.",
+    "bay": "Quên nhân 74% nên thể tích nguyên tử bị thổi lên, bán kính ra lớn hơn thực tế."
+   },
+   "kienThuc": [
+    "Khối lượng riêng D = m : V.",
+    "Thể tích hình cầu V = (4/3)πr³ ⇒ r = ∛(3V : 4π).",
+    "Bán kính nguyên tử kim loại thường vào khoảng 1 – 2 Å."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "NGUYEN_TU.MO_HINH.NHAN_DANG",
+    "ten": "Mô hình nguyên tử — nhận dạng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B1-D2",
+    "ten": "Bài toán về bán kính và thể tích của nguyên tử",
+    "lop": "10",
+    "bai": "DB-10-B1",
+    "tenBai": "Thành phần nguyên tử (vip)",
+    "soBai": 1,
+    "phanBai": 0,
+    "chuong": "C1 - Nguyên Tử"
+   },
+   "nguonDe": "DH-10-C1-B1",
+   "nguonCau": "III-35",
+   "song_sinh": [
+    {
+     "de": "Potassium (K) là nguyên tố đa lượng cần cho cây trồng và giúp điều hoà nhịp tim ở người. Khối lượng riêng của potassium kim loại là 0,86 g/cm³.\nGiả thiết rằng, trong tinh thể potassium, các nguyên tử là những hình cầu chiếm 68% thể tích tinh thể, phần còn lại là khe rỗng.\nXác định bán kính nguyên tử potassium. Cho nguyên tử khối của potassium là 39, số Avogadro 6,022.10²³, lấy π = 3,14 và công thức tính thể tích hình cầu là V=4/3πr³, trong đó r là bán kính hình cầu. (Kết quả làm tròn đến hàng phần mười.)",
+     "dap_an": "2,3",
+     "buoc": [
+      "V tinh thể 1 mol = 39 : 0,86 cm³.",
+      "V phần đặc 1 mol = 39 : 0,86 × 0,68 cm³.",
+      "V một nguyên tử V₁ = 39 : 0,86 × 0,68 : 6,022×10²³ cm³.",
+      "r³ = 3V₁ : (4π) ⇒ r = ∛[3 × 39 : 0,86 × 0,68 : 6,022×10²³ : (4 × 3,14)] cm.",
+      "Vậy bán kính nguyên tử potassium = 2,30403273018… Å ≈ 2,3 Å."
+     ],
+     "gia_tri_dung": "2,30403273018"
+    },
+    {
+     "de": "Strontium (Sr) có muối được dùng tạo màu đỏ cho pháo hoa. Khối lượng riêng của strontium kim loại là 2,6 g/cm³.\nGiả thiết rằng, trong tinh thể strontium, các nguyên tử là những hình cầu chiếm 74% thể tích tinh thể, phần còn lại là khe rỗng.\nXác định bán kính nguyên tử strontium. Cho nguyên tử khối của strontium là 88, số Avogadro 6,022.10²³, lấy π = 3,14 và công thức tính thể tích hình cầu là V=4/3πr³, trong đó r là bán kính hình cầu. (Kết quả làm tròn đến hàng phần mười.)",
+     "dap_an": "2,1",
+     "buoc": [
+      "V tinh thể 1 mol = 88 : 2,6 cm³.",
+      "V phần đặc 1 mol = 88 : 2,6 × 0,74 cm³.",
+      "V một nguyên tử V₁ = 88 : 2,6 × 0,74 : 6,022×10²³ cm³.",
+      "r³ = 3V₁ : (4π) ⇒ r = ∛[3 × 88 : 2,6 × 0,74 : 6,022×10²³ : (4 × 3,14)] cm.",
+      "Vậy bán kính nguyên tử strontium = 2,1496972589… Å ≈ 2,1 Å."
+     ],
+     "gia_tri_dung": "2,1496972589"
+    }
+   ],
+   "cau_kiem": [
+    {
+     "buoc": 0,
+     "kieu": "so",
+     "hoi": "Ở bước này, thể tích 1 mol tinh thể calcium bằng bao nhiêu cm³?",
+     "dap_an": "25,81",
+     "sai_so": "0.01"
+    },
+    {
+     "buoc": 1,
+     "kieu": "so",
+     "hoi": "Ở bước này, thể tích phần đặc của 1 mol calcium bằng bao nhiêu cm³?",
+     "dap_an": "19,1",
+     "sai_so": "0.01"
+    },
+    {
+     "buoc": 2,
+     "kieu": "chon",
+     "hoi": "Thể tích một nguyên tử tính từ thể tích phần đặc 1 mol thế nào?",
+     "lua_chon": [
+      "Chia cho 6,022×10²³",
+      "Nhân với 6,022×10²³",
+      "Chia cho 40"
+     ],
+     "dung": 0
+    },
+    {
+     "buoc": 3,
+     "kieu": "chon",
+     "hoi": "Bán kính được tính từ V₁ theo công thức nào?",
+     "lua_chon": [
+      "r = ∛(3V₁ : 4π)",
+      "r = √(3V₁ : 4π)",
+      "r = 3V₁ : 4π"
+     ],
+     "dung": 0
+    }
+   ],
+   "nhan_nen": [
+    {
+     "buoc": 0,
+     "nen": "khoi_luong_rieng"
+    },
+    {
+     "buoc": 1,
+     "nen": "khoi_luong_rieng"
+    },
+    {
+     "buoc": 2,
+     "nen": "doi_mol_khoi_luong"
+    },
+    {
+     "buoc": 3,
+     "nen": "khac"
+    }
+   ]
+  }
  }
 }

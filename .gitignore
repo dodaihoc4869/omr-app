@@ -37,3 +37,6 @@ bo-nao/CHAY-NGAY.txt
 # Ngoại lệ: lưu kết quả song sinh để resume qua nhiều session
 !.may-soan/ban-giao-sau-ban/
 !.may-soan/ban-giao-sau-ban/**
+
+# Hồ sơ soạn vòng chữa có đáp án riêng, không đưa lên repo công khai.
+.may-soan-vong-chua/

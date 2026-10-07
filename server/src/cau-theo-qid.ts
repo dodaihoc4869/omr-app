@@ -36,7 +36,7 @@ const KHONG_TIM_THAY = 'Không tìm thấy học sinh'
  * Kế hoạch mà chọn qid ngoài định nghĩa này thì việc "Ôn N câu" không bao giờ xong (19/09: 12121212 có 2/3 câu chết). Hai chỗ dùng chung
  * đoạn SQL dưới và `khongBiBaoVe` để không bao giờ lệch nhau.
  */
-const TU_CHI_MUC_GAME = `FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+export const TU_CHI_MUC_GAME = `FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
       WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid IN (SELECT value FROM json_each(?))`
 

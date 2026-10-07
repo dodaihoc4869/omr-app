@@ -282,5 +282,101 @@
    "nguonDe": "12-KT-C2-D3",
    "nguonCau": "II-1"
   }
+ },
+ "DB-12-B4-D2-II-26": {
+  "luc": "2026-10-07T02:41:45.038Z",
+  "cau": {
+   "phan": "II",
+   "so": 26,
+   "de": "Một nhóm học sinh tìm hiểu về quá trình tạo acid lactic từ đường glucose thông qua lên men lactic, với giả thuyết: “Nhiệt độ càng cao thì lượng lactic acid thu được càng nhiều”. Nhóm đã thực hiện thí nghiệm như sau:\n- Chuẩn bị: dung dịch glucose 5%, chế phẩm vi sinh vật lên men lactic (lactobacillus), 5 ống nghiệm có nắp, bếp điều nhiệt.\n- Cách làm: Lấy 200 mL dung dịch glucose cho vào mỗi ống nghiệm. Thêm một ít chế phẩm vi sinh vào mỗi ống nghiệm. Đậy nắp và ủ ở các nhiệt độ: 20°C (mẫu 1), 30°C (mẫu 2), 37°C (mẫu 3), 45°C (mẫu 4), mẫu trắng không thêm vi sinh vật (mẫu trắng).\nSau 3 ngày, lấy các mẫu đem lọc sạch, để ổn định ở nhiệt độ môi trường thì thấy thể tích dung dịch trong các mẫu hầu như không thay đổi là 200 mL.\nLần lượt lấy 5 mL các mẫu: mẫu trắng và các mẫu 1; 2; 3; 4 rồi pha loãng thành 100 mL và tiến hành chuẩn độ bằng dung dịch NaOH 0,1 M với chỉ thị phenolpthalein.\nKết quả thu được như bảng sau. Biết rằng trong các mẫu chỉ có chứa C₆H₁₂O₆, CH₃CH(OH)COOH (lactic acid) và H₂O.",
+   "dap_an": "SSDD",
+   "bang": [
+    [
+     "Mẫu",
+     "Mẫu trắng",
+     "Mẫu 1",
+     "Mẫu 2",
+     "Mẫu 3",
+     "Mẫu 4"
+    ],
+    [
+     "Thể tích NaOH 0,1M (mL)",
+     "0,0",
+     "5,6",
+     "8,2",
+     "10,5",
+     "7,0"
+    ]
+   ],
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "y": {
+    "a": "Từ kết quả thí nghiệm, kết luận giả thuyết của nhóm học sinh trên là đúng.",
+    "b": "Trong mẫu trắng đã có sẵn một lượng lactic acid đáng kể.",
+    "c": "Nhiệt độ tối ưu cho quá trình lên men tạo acid lactic là 37°C.",
+    "d": "Trong thí nghiệm trên, lượng acid lactic được tạo thành nhiều nhất trong một mẫu (200 mL) là 3,78 gam."
+   },
+   "loi_giai": {
+    "chot": "Mẫu 3 dùng 10,5 mL NaOH 0,1 M cho 5 mL mẫu, tức 0,042 mol acid lactic trong 200 mL, khối lượng 3,78 gam.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: mẫu 45 độ cho ít acid hơn mẫu 37 độ nên giả thuyết bị bác bỏ."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: mẫu trắng dùng 0,0 mL NaOH nên không có acid lactic."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: mẫu 37 độ cho nhiều acid nhất."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: 0,042 mol nhân 90 bằng 3,78 gam."
+     }
+    },
+    "dap_an_de": "SSDD",
+    "dap_an_tu_giai": "SSDD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "buoc",
+     "bay"
+    ],
+    "ly_do": "Phải đọc bảng chuẩn độ rồi quy về 200 mL mới ra khối lượng acid lactic.",
+    "bay": "Mẫu 4 ở 45 độ cho ÍT acid hơn mẫu 3 ở 37 độ, nên giả thuyết càng nóng càng nhiều là SAI."
+   },
+   "kienThuc": [
+    "Acid lactic CH₃CH(OH)COOH có phân tử khối 90."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.LEN_MEN.CHON_PHAT_BIEU",
+    "ten": "Lên men — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D2",
+    "ten": "Phản ứng lên men glucose",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B4-D2",
+   "nguonCau": "II-14"
+  }
  }
 }

@@ -1,0 +1,439 @@
+[
+ {
+  "qid": "DH-12-C2-B6-III-7",
+  "maDe": "DH-12-C2-B6",
+  "phan": "III",
+  "so": 7,
+  "viec": "loiGiai",
+  "dapAn": "2",
+  "truoc": {
+   "ket_qua": "3,45",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "3,45"
+  },
+  "sau": {
+   "ket_qua": "2",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "2"
+  },
+  "lyDo": "Đáp số kho đã chốt lại 29/09 (CHOT-2909); chữ lời giải cũ vẫn ghi đáp số nhập nhầm ⇒ đồng bộ kết quả với đáp án kho."
+ },
+ {
+  "qid": "DB-12-B5-D2-III-344",
+  "maDe": "DB-12-B5-D2",
+  "phan": "III",
+  "so": 344,
+  "viec": "loiGiai",
+  "dapAn": "2",
+  "truoc": {
+   "ket_qua": "3,45",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "3,45"
+  },
+  "sau": {
+   "ket_qua": "2",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "2"
+  },
+  "lyDo": "Đáp số kho đã chốt lại 29/09 (CHOT-2909); chữ lời giải cũ vẫn ghi đáp số nhập nhầm ⇒ đồng bộ kết quả với đáp án kho."
+ },
+ {
+  "qid": "DH-12-C2-B4-III-2",
+  "maDe": "DH-12-C2-B4",
+  "phan": "III",
+  "so": 2,
+  "viec": "loiGiai",
+  "dapAn": "2",
+  "truoc": {
+   "ket_qua": "6,67",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "6,67"
+  },
+  "sau": {
+   "ket_qua": "2",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "2"
+  },
+  "lyDo": "Đáp số kho đã chốt lại 29/09 (CHOT-2909); chữ lời giải cũ vẫn ghi đáp số nhập nhầm ⇒ đồng bộ kết quả với đáp án kho."
+ },
+ {
+  "qid": "DB-12-B5-D2-III-255",
+  "maDe": "DB-12-B5-D2",
+  "phan": "III",
+  "so": 255,
+  "viec": "loiGiai",
+  "dapAn": "2",
+  "truoc": {
+   "ket_qua": "6,67",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "6,67"
+  },
+  "sau": {
+   "ket_qua": "2",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "2"
+  },
+  "lyDo": "Đáp số kho đã chốt lại 29/09 (CHOT-2909); chữ lời giải cũ vẫn ghi đáp số nhập nhầm ⇒ đồng bộ kết quả với đáp án kho."
+ },
+ {
+  "qid": "12-KT-C56-D1-III-4",
+  "maDe": "12-KT-C56-D1",
+  "phan": "III",
+  "so": 4,
+  "viec": "loiGiai",
+  "dapAn": "2",
+  "truoc": {
+   "chot": "Muốn lập pin điện hoá thì phản ứng phải tự xảy ra, tức toả năng lượng ra ngoài.",
+   "buoc": [
+    "Muốn lập pin điện hoá thì phản ứng phải tự xảy ra, tức toả năng lượng ra ngoài.",
+    "Các phản ứng (a), (b), (c), (d), (e) đều tự xảy ra ở điều kiện thường nên đều lập pin được.",
+    "Phản ứng (g) là chiều nghịch của phản ứng tổng hợp ammonia vốn toả nhiệt, nên phân huỷ ammonia cần cấp năng lượng, không tự xảy ra.",
+    "Vậy có 5 phản ứng."
+   ],
+   "ket_qua": "5",
+   "dap_an_de": "5",
+   "dap_an_tu_giai": "5"
+  },
+  "sau": {
+   "chot": "Pin điện hoá chỉ lập được từ phản ứng oxi hoá – khử xảy ra tự phát; trong sáu phản ứng chỉ (d) và (e) thoả điều kiện.",
+   "buoc": [
+    "Pin điện hoá biến năng lượng của phản ứng oxi hoá – khử xảy ra tự phát thành điện năng, nên phản ứng phải đổi số oxi hoá và tự xảy ra.",
+    "(a) tạo kết tủa AgCl, (b) tạo phức, (c) trung hoà: không nguyên tố nào đổi số oxi hoá nên không lập được pin.",
+    "(g) là phản ứng oxi hoá – khử nhưng phân huỷ NH₃ không tự xảy ra (chiều nghịch của phản ứng tổng hợp ammonia toả nhiệt), nên không lập được pin.",
+    "(d) đốt cháy ethanol và (e) Al đẩy Ag⁺ đều là phản ứng oxi hoá – khử tự xảy ra, lập được pin. Vậy có 2 phản ứng."
+   ],
+   "ket_qua": "2",
+   "dap_an_de": "2",
+   "dap_an_tu_giai": "2"
+  },
+  "lyDo": "Đáp án kho đã chốt 5 → 2 (CHOT-2909: pin chỉ lập từ phản ứng oxi hoá – khử tự xảy ra ⇒ (d), (e)); chữ lời giải cũ vẫn kết luận 5 ⇒ viết lại cho khớp."
+ },
+ {
+  "qid": "10-C1-B1-II-10",
+  "maDe": "10-C1-B1",
+  "phan": "II",
+  "so": 10,
+  "viec": "loiGiai",
+  "dapAn": "DSDS",
+  "truoc": {
+   "chot": "Khối lượng nguyên tử ≈ mₚ + mₙ + mₑ với mₚ ≈ mₙ ≈ 1 amu, mₑ ≈ 0,00055 amu (nhẹ hơn proton khoảng 1837 lần); đường kính nguyên tử lớn hơn hạt nhân hàng vạn lần.",
+   "tung_y": {
+    "a": {
+     "dung": true,
+     "vi_sao": "Đúng vì nguyên tử này chỉ có 1 proton và 1 electron, khối lượng khoảng 1 amu, nhẹ nhất trong các nguyên tử."
+    },
+    "b": {
+     "dung": false,
+     "vi_sao": "Sai vì khối lượng bằng mₚ + mₑ ≈ 1 + 0,00055 ≈ 1 amu, không có neutron nên không tới 2 amu."
+    },
+    "c": {
+     "dung": false,
+     "vi_sao": "Sai vì mₚ : mₑ = 1,673.10⁻²⁷ : 9,109.10⁻³¹ ≈ 1837, không phải 1818."
+    },
+    "d": {
+     "dung": false,
+     "vi_sao": "Sai vì đường kính nguyên tử cỡ 10⁻¹⁰ m, lớn hơn đường kính hạt nhân (cỡ 10⁻¹⁴ m) hàng vạn lần."
+    }
+   },
+   "dap_an_de": "DSSS",
+   "dap_an_tu_giai": ""
+  },
+  "sau": {
+   "chot": "Khối lượng nguyên tử ≈ mₚ + mₙ + mₑ với mₚ ≈ mₙ ≈ 1 amu, mₑ ≈ 0,00055 amu (SGK); hạt nhân ≈ 1 amu nên m(hạt nhân) : m(vỏ) ≈ 1818; đường kính nguyên tử lớn hơn hạt nhân hàng vạn lần.",
+   "tung_y": {
+    "a": {
+     "dung": true,
+     "vi_sao": "Đúng vì nguyên tử này chỉ có 1 proton và 1 electron, khối lượng khoảng 1 amu, nhẹ nhất trong các nguyên tử."
+    },
+    "b": {
+     "dung": false,
+     "vi_sao": "Sai vì khối lượng bằng mₚ + mₑ ≈ 1 + 0,00055 ≈ 1 amu, không có neutron nên không tới 2 amu."
+    },
+    "c": {
+     "dung": true,
+     "vi_sao": "Đúng vì theo SGK, hạt nhân (1 proton) ≈ 1 amu còn electron ≈ 0,00055 amu nên khối lượng hạt nhân : vỏ ≈ 1 : 0,00055 ≈ 1818 (đề nói \"khoảng\")."
+    },
+    "d": {
+     "dung": false,
+     "vi_sao": "Sai vì đường kính nguyên tử cỡ 10⁻¹⁰ m, lớn hơn đường kính hạt nhân (cỡ 10⁻¹⁴ m) hàng vạn lần."
+    }
+   },
+   "dap_an_de": "DSDS",
+   "dap_an_tu_giai": "DSDS"
+  },
+  "lyDo": "Đáp án kho đã chốt DSSS → DSDS (SGK Hoá 10 (2018): mₚ ≈ 1 amu, mₑ ≈ 0,00055 amu ⇒ tỉ lệ ≈ 1818, đề có chữ \"khoảng\" ⇒ ý c Đúng); chữ lời giải cũ vẫn bác ý c bằng 1837 ⇒ sửa cho khớp."
+ },
+ {
+  "qid": "DB-10-B1-D1-II-61",
+  "maDe": "DB-10-B1-D1",
+  "phan": "II",
+  "so": 61,
+  "viec": "loiGiai",
+  "dapAn": "DSDS",
+  "truoc": {
+   "chot": "Khối lượng nguyên tử ≈ mₚ + mₙ + mₑ với mₚ ≈ mₙ ≈ 1 amu, mₑ ≈ 0,00055 amu (nhẹ hơn proton khoảng 1837 lần); đường kính nguyên tử lớn hơn hạt nhân hàng vạn lần.",
+   "tung_y": {
+    "a": {
+     "dung": true,
+     "vi_sao": "Đúng vì nguyên tử này chỉ có 1 proton và 1 electron, khối lượng khoảng 1 amu, nhẹ nhất trong các nguyên tử."
+    },
+    "b": {
+     "dung": false,
+     "vi_sao": "Sai vì khối lượng bằng mₚ + mₑ ≈ 1 + 0,00055 ≈ 1 amu, không có neutron nên không tới 2 amu."
+    },
+    "c": {
+     "dung": false,
+     "vi_sao": "Sai vì mₚ : mₑ = 1,673.10⁻²⁷ : 9,109.10⁻³¹ ≈ 1837, không phải 1818."
+    },
+    "d": {
+     "dung": false,
+     "vi_sao": "Sai vì đường kính nguyên tử cỡ 10⁻¹⁰ m, lớn hơn đường kính hạt nhân (cỡ 10⁻¹⁴ m) hàng vạn lần."
+    }
+   },
+   "dap_an_de": "DSSS",
+   "dap_an_tu_giai": ""
+  },
+  "sau": {
+   "chot": "Khối lượng nguyên tử ≈ mₚ + mₙ + mₑ với mₚ ≈ mₙ ≈ 1 amu, mₑ ≈ 0,00055 amu (SGK); hạt nhân ≈ 1 amu nên m(hạt nhân) : m(vỏ) ≈ 1818; đường kính nguyên tử lớn hơn hạt nhân hàng vạn lần.",
+   "tung_y": {
+    "a": {
+     "dung": true,
+     "vi_sao": "Đúng vì nguyên tử này chỉ có 1 proton và 1 electron, khối lượng khoảng 1 amu, nhẹ nhất trong các nguyên tử."
+    },
+    "b": {
+     "dung": false,
+     "vi_sao": "Sai vì khối lượng bằng mₚ + mₑ ≈ 1 + 0,00055 ≈ 1 amu, không có neutron nên không tới 2 amu."
+    },
+    "c": {
+     "dung": true,
+     "vi_sao": "Đúng vì theo SGK, hạt nhân (1 proton) ≈ 1 amu còn electron ≈ 0,00055 amu nên khối lượng hạt nhân : vỏ ≈ 1 : 0,00055 ≈ 1818 (đề nói \"khoảng\")."
+    },
+    "d": {
+     "dung": false,
+     "vi_sao": "Sai vì đường kính nguyên tử cỡ 10⁻¹⁰ m, lớn hơn đường kính hạt nhân (cỡ 10⁻¹⁴ m) hàng vạn lần."
+    }
+   },
+   "dap_an_de": "DSDS",
+   "dap_an_tu_giai": "DSDS"
+  },
+  "lyDo": "Đáp án kho đã chốt DSSS → DSDS (SGK Hoá 10 (2018): mₚ ≈ 1 amu, mₑ ≈ 0,00055 amu ⇒ tỉ lệ ≈ 1818, đề có chữ \"khoảng\" ⇒ ý c Đúng); chữ lời giải cũ vẫn bác ý c bằng 1837 ⇒ sửa cho khớp."
+ },
+ {
+  "qid": "12-C8-B27-II-20",
+  "maDe": "12-C8-B27",
+  "phan": "II",
+  "so": 20,
+  "viec": "loiGiai",
+  "dapAn": "DSSS",
+  "truoc": {
+   "tung_y": {
+    "a": {
+     "dung": true,
+     "vi_sao": "Đúng: mỗi mũi tên là một lần thay phối tử."
+    },
+    "b": {
+     "dung": false,
+     "vi_sao": "Sai: Y là [Pt(NH₃)I₃]⁻ — chỉ một phối tử NH₃ và ba phối tử iodo."
+    },
+    "c": {
+     "dung": true,
+     "vi_sao": "Đúng: theo lời giải của đề, Z là [Pt(NH₃)₂I₂] — nhưng chính vì trung hoà nên nó KHÔNG dẫn điện tốt; đề chấm ý này Đúng."
+    },
+    "d": {
+     "dung": false,
+     "vi_sao": "Sai: Pt giữ số oxi hoá +2 suốt chuỗi."
+    }
+   },
+   "dap_an_de": "DSDS",
+   "dap_an_tu_giai": "DSDS"
+  },
+  "sau": {
+   "tung_y": {
+    "a": {
+     "dung": true,
+     "vi_sao": "Đúng: mỗi mũi tên là một lần thay phối tử."
+    },
+    "b": {
+     "dung": false,
+     "vi_sao": "Sai: Y là [Pt(NH₃)I₃]⁻ — chỉ một phối tử NH₃ và ba phối tử iodo."
+    },
+    "c": {
+     "dung": false,
+     "vi_sao": "Sai vì Z = [Pt(NH₃)₂I₂] là phức trung hoà, không phân li ra ion nên dung dịch không dẫn điện tốt."
+    },
+    "d": {
+     "dung": false,
+     "vi_sao": "Sai: Pt giữ số oxi hoá +2 suốt chuỗi."
+    }
+   },
+   "dap_an_de": "DSSS",
+   "dap_an_tu_giai": "DSSS"
+  },
+  "lyDo": "Đáp án kho đã chốt DSDS → DSSS (Z trung hoà, không dẫn điện tốt ⇒ ý c Sai); chữ lời giải cũ còn ghi ý c \"Đúng\" ⇒ sửa cho khớp."
+ },
+ {
+  "qid": "12-C5-B16-I-50",
+  "maDe": "12-C5-B16",
+  "phan": "I",
+  "so": 50,
+  "viec": "loiGiai",
+  "dapAn": "D",
+  "truoc": {
+   "chot": "Chỉ (a) và (d) đúng; (b) và (c) sai vì còn có trường hợp anode tan, và cathode có thể khử cả ion H⁺ của acid.",
+   "tung_pa": {
+    "A": {
+     "dung": false,
+     "vi_sao": "Sai: đếm thiếu."
+    },
+    "B": {
+     "dung": true,
+     "vi_sao": "Đúng: hai phát biểu (a) và (d)."
+    },
+    "C": {
+     "dung": false,
+     "vi_sao": "Sai: đếm thừa."
+    },
+    "D": {
+     "dung": false,
+     "vi_sao": "Sai: (b) và (c) đều sai."
+    }
+   },
+   "dap_an_de": "B",
+   "dap_an_tu_giai": "B"
+  },
+  "sau": {
+   "chot": "Cả bốn phát biểu đều đúng: với điện cực trơ ion về điện cực trái dấu; anode chỉ oxi hoá anion hoặc H₂O; cathode chỉ khử cation (kể cả H⁺) hoặc H₂O; sản phẩm thoát ra hoặc bám cathode nên khối lượng dung dịch giảm.",
+   "tung_pa": {
+    "A": {
+     "dung": false,
+     "vi_sao": "Sai: đếm thiếu, cả bốn phát biểu đều đúng."
+    },
+    "B": {
+     "dung": false,
+     "vi_sao": "Sai: đếm thiếu, cả bốn phát biểu đều đúng."
+    },
+    "C": {
+     "dung": false,
+     "vi_sao": "Sai: đếm thiếu, cả bốn phát biểu đều đúng."
+    },
+    "D": {
+     "dung": true,
+     "vi_sao": "Đúng: cả (a), (b), (c), (d) đều đúng."
+    }
+   },
+   "dap_an_de": "D",
+   "dap_an_tu_giai": "D"
+  },
+  "lyDo": "Đáp án kho đã chốt B → D (điện cực trơ ⇒ (a), (b), (c), (d) đều đúng); chữ lời giải cũ chọn B bằng cách bác (b), (c) với anode tan, trái điều kiện đề ⇒ viết lại cho khớp."
+ },
+ {
+  "qid": "12-KT-C2-D2-I-8",
+  "maDe": "12-KT-C2-D2",
+  "phan": "I",
+  "so": 8,
+  "viec": "loiGiai",
+  "dapAn": "B",
+  "truoc": {
+   "chot": "Fructose mạch hở là ketose sáu carbon: nhóm C=O nằm ở carbon số 2, còn lại là năm nhóm –OH trên khung CH₂OH-CO-CHOH-CHOH-CHOH-CH₂OH.",
+   "tung_pa": {
+    "A": {
+     "dung": true,
+     "vi_sao": "Đúng: nhóm carbonyl ở carbon số 2, đúng cấu tạo ketose."
+    },
+    "B": {
+     "dung": false,
+     "vi_sao": "Đặt nhóm carbonyl ở đầu mạch, đó là cấu tạo của aldose chứ không phải fructose."
+    },
+    "C": {
+     "dung": false,
+     "vi_sao": "Số nhóm hydroxy không khớp với công thức C₆H₁₂O₆."
+    },
+    "D": {
+     "dung": false,
+     "vi_sao": "Khung carbon sai vị trí nhóm chức so với fructose."
+    }
+   },
+   "dap_an_de": "A",
+   "dap_an_tu_giai": "A"
+  },
+  "sau": {
+   "chot": "Fructose tự nhiên là D-fructose, ketose sáu carbon: C=O ở C2; trong công thức Fischer nhóm –OH ở C3 nằm bên trái, ở C4 và C5 nằm bên phải.",
+   "tung_pa": {
+    "A": {
+     "dung": false,
+     "vi_sao": "Sai: –OH ở C5 nằm bên TRÁI nên thuộc dãy L (L-sorbose), không phải D-fructose."
+    },
+    "B": {
+     "dung": true,
+     "vi_sao": "Đúng: C=O ở C2, –OH ở C3 bên trái, C4 và C5 bên phải — đúng công thức Fischer của D-fructose."
+    },
+    "C": {
+     "dung": false,
+     "vi_sao": "Sai: –OH ở C3 nằm bên phải và ở C5 nằm bên trái, khác D-fructose."
+    },
+    "D": {
+     "dung": false,
+     "vi_sao": "Sai: –OH ở C3 bên phải, C4 bên trái — đó là D-sorbose, không phải fructose."
+    }
+   },
+   "dap_an_de": "B",
+   "dap_an_tu_giai": "B"
+  },
+  "lyDo": "Đáp án kho đã chốt A → B (tự giải từ 4 hình Fischer: B = D-fructose; A = L-sorbose; D = D-sorbose; C sai); chữ lời giải cũ chọn A và mô tả phương án khác hình ⇒ viết lại cho khớp."
+ },
+ {
+  "qid": "DB-12-B4-D3-I-152",
+  "maDe": "DB-12-B4-D3",
+  "phan": "I",
+  "so": 152,
+  "viec": "loiGiai",
+  "dapAn": "B",
+  "truoc": {
+   "chot": "Fructose mạch hở là ketose sáu carbon: nhóm C=O nằm ở carbon số 2, còn lại là năm nhóm –OH trên khung CH₂OH-CO-CHOH-CHOH-CHOH-CH₂OH.",
+   "tung_pa": {
+    "A": {
+     "dung": true,
+     "vi_sao": "Đúng: nhóm carbonyl ở carbon số 2, đúng cấu tạo ketose."
+    },
+    "B": {
+     "dung": false,
+     "vi_sao": "Đặt nhóm carbonyl ở đầu mạch, đó là cấu tạo của aldose chứ không phải fructose."
+    },
+    "C": {
+     "dung": false,
+     "vi_sao": "Số nhóm hydroxy không khớp với công thức C₆H₁₂O₆."
+    },
+    "D": {
+     "dung": false,
+     "vi_sao": "Khung carbon sai vị trí nhóm chức so với fructose."
+    }
+   },
+   "dap_an_de": "A",
+   "dap_an_tu_giai": "A"
+  },
+  "sau": {
+   "chot": "Fructose tự nhiên là D-fructose, ketose sáu carbon: C=O ở C2; trong công thức Fischer nhóm –OH ở C3 nằm bên trái, ở C4 và C5 nằm bên phải.",
+   "tung_pa": {
+    "A": {
+     "dung": false,
+     "vi_sao": "Sai: –OH ở C5 nằm bên TRÁI nên thuộc dãy L (L-sorbose), không phải D-fructose."
+    },
+    "B": {
+     "dung": true,
+     "vi_sao": "Đúng: C=O ở C2, –OH ở C3 bên trái, C4 và C5 bên phải — đúng công thức Fischer của D-fructose."
+    },
+    "C": {
+     "dung": false,
+     "vi_sao": "Sai: –OH ở C3 nằm bên phải và ở C5 nằm bên trái, khác D-fructose."
+    },
+    "D": {
+     "dung": false,
+     "vi_sao": "Sai: –OH ở C3 bên phải, C4 bên trái — đó là D-sorbose, không phải fructose."
+    }
+   },
+   "dap_an_de": "B",
+   "dap_an_tu_giai": "B"
+  },
+  "lyDo": "Đáp án kho đã chốt A → B (tự giải từ 4 hình Fischer: B = D-fructose; A = L-sorbose; D = D-sorbose; C sai); chữ lời giải cũ chọn A và mô tả phương án khác hình ⇒ viết lại cho khớp."
+ }
+]

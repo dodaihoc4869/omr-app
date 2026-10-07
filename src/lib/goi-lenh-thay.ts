@@ -44,6 +44,12 @@ export async function goiLenh(duong: string, body: unknown, chuKhongCoLenh: stri
   } catch {
     return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
   }
-  if (!res.ok || j.ok !== true) return thoat('tu_choi', String(j.error || j.loi || 'Máy chủ không đồng ý lệnh này.'))
+  if (!res.ok || j.ok !== true) {
+    const chu = String(j.error || j.loi || 'Máy chủ không đồng ý lệnh này.')
+    return thoat('tu_choi', res.status === 403 && /mã bí mật/i.test(chu) ? `${chu} — ${CHU_HUONG_DAN_MA}` : chu)
+  }
   return { ok: true, du: j }
 }
+
+/** Đuôi hướng dẫn khi máy chủ từ chối mã bí mật (07/10: thầy đổi mã ở Cloudflare, app chỉ báo "Sai mã bí mật" trơ trọi nên không biết làm gì). */
+export const CHU_HUONG_DAN_MA = 'mã trên máy này không còn đúng với máy chủ. Vào Cài đặt → Kết nối máy chủ, nhập lại mã bí mật rồi bấm Lưu.'

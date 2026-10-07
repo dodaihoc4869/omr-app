@@ -1,0 +1,193 @@
+/* Ô GHI CHÚ DƯỚI SỐ CÂU — ca "Kiểm chứng câu đã đúng" (DaiCauThay.tsx), thầy 07/10: nút "Xem lại sau" và ghi chú câu thay đang chèn nhau ⇒ ô ghi chú là MỘT khối bo tròn
+ * thụt vào hai bên, cách đầu thẻ 6 px (nút "Xem lại sau" nay cao 36 px, vùng chạm 48 px — man-thi-m3.css), dòng đậm ngắn + dòng phụ, nút nhỏ "Xem câu gốc" CÙNG ô.
+ * Chỉ dùng biến màu có sẵn (tokens + vai trò M3 dưới `.m3`); không màu mới. */
+.thi-thay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 8px;
+  margin: 6px var(--k5, 20px) 0;
+  padding: 8px 8px 8px 12px;
+  border-radius: 14px;
+  background: var(--the-2);
+  color: var(--nhat);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.thi-thay-chu {
+  display: flex;
+  flex: 1 1 15rem;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.thi-thay-loai {
+  font-weight: 700;
+  color: var(--muc);
+}
+.thi-thay-noi {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  color: var(--nhat);
+}
+
+/* nút nhỏ "Xem câu gốc": viền mảnh, 32 px nhìn thấy, vùng chạm 48 px (::after) — không chiếm chỗ, không đè ô bên cạnh */
+.thi-thay-nut {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--muc);
+  box-shadow: inset 0 0 0 1px var(--vien);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.thi-thay-nut::after {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
+.thi-thay-nut[aria-expanded='true'] {
+  background: var(--the);
+}
+.thi-thay-nut:focus-visible,
+.thi-thay-thu-lai:focus-visible {
+  outline: 2px solid var(--xanh);
+  outline-offset: 2px;
+}
+
+/* khung câu gốc: cùng ô, bung dưới hai dòng trên; chữ đề cỡ vừa, không đáp án */
+.thi-thay-goc {
+  flex: 1 1 100%;
+  margin-top: 2px;
+  padding: 10px 12px 8px;
+  border-radius: 12px;
+  background: var(--nen);
+  color: var(--muc);
+  box-shadow: inset 0 0 0 1px var(--vien);
+}
+.thi-thay-goc-tieu {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--nhat);
+}
+.thi-thay-goc-bao {
+  font-size: 13px;
+  color: var(--nhat);
+}
+.thi-thay-thu-lai {
+  display: inline;
+  padding: 0;
+  background: transparent;
+  color: var(--muc);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.thi-thay-de {
+  overflow-wrap: break-word;
+  white-space: pre-line;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.thi-thay-hinh {
+  display: block;
+  max-width: 100%;
+  margin-top: 6px;
+  border-radius: 8px;
+}
+.thi-thay-pa {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--serif);
+  font-size: 15px; /* chữ thân ≥ 15 px trên điện thoại (chuẩn C9) */
+  line-height: 1.6;
+}
+.thi-thay-pa > li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: 6px;
+  align-items: start;
+}
+.thi-thay-ma {
+  font-weight: 700;
+  color: var(--nhat);
+}
+.thi-thay-goc-chan {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--nhat);
+}
+
+/* dưới `.m3` (màn thi em): ô trắng tonal trên nền thẻ, chữ theo vai trò M3 */
+.m3 .thi-thay {
+  background: var(--m3-surface-container-lowest);
+  color: var(--m3-on-surface-variant);
+}
+.m3 .thi-thay-loai,
+.m3 .thi-thay-nut,
+.m3 .thi-thay-goc,
+.m3 .thi-thay-thu-lai {
+  color: var(--m3-on-surface);
+}
+.m3 .thi-thay-noi,
+.m3 .thi-thay-goc-tieu,
+.m3 .thi-thay-goc-bao,
+.m3 .thi-thay-ma,
+.m3 .thi-thay-goc-chan {
+  color: var(--m3-on-surface-variant);
+}
+.m3 .thi-thay-nut {
+  /* luật chung `.m3 button { min-height: 48px }` (m3.css) thắng `.thi-thay-nut` (độ ưu tiên thấp hơn) ⇒ phải nhắc lại ở đây; vùng chạm 48 px đã có ở ::after */
+  min-height: 0;
+  box-shadow: inset 0 0 0 1px var(--m3-outline);
+}
+.m3 .thi-thay-nut[aria-expanded='true'] {
+  background: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+  box-shadow: none;
+}
+.m3 .thi-thay-nut:focus-visible,
+.m3 .thi-thay-thu-lai:focus-visible {
+  outline-color: var(--m3-primary);
+}
+.m3 .thi-thay-goc {
+  background: var(--m3-surface);
+  box-shadow: inset 0 0 0 1px var(--m3-outline-variant);
+}
+
+/* chế độ NGANG GỌN, câu CHIA ĐÔI (lam-bai-ngang.css): thẻ có chiều cao cố định, mọi khối ngoài thân thẻ là `flex: none` ⇒ câu gốc bung ra phải có trần cao và cuộn riêng,
+ * nếu không nó chiếm hết chỗ của thân câu (đề + phương án). Chế độ một cột: cả khung đã cuộn nên không cần trần. */
+.lb-gon-de[data-chia] .thi-thay-goc {
+  max-height: 38vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ảnh thay chữ của phương án / ý (công thức cấu tạo, sơ đồ): nhỏ, không tràn ô */
+.thi-thay-anh-o {
+  display: block;
+  max-width: 100%;
+  max-height: 72px;
+  width: auto;
+  border-radius: 6px;
+  background: var(--giay);
+}

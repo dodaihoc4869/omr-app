@@ -21,6 +21,7 @@ import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
 import { canThanTrongSanh, coOmniTrongSanh, docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
 import { docKetQuaOmni, lanDauChamChip, thanOmniTraLoi } from '../../lib/omni-hs'
 import { omniBuocSai } from '../../components/hoa2/api'
+import { apiMoDot } from '../../lib/chua-cau-sai-api'
 import KetChang2 from './doan2/KetChang2'
 import './doan.css'
 import './thu-quai.css'
@@ -33,7 +34,7 @@ const khoaLuu = (sbd: string) => `doan:${sbd}`
 const loiCua = (e: unknown) => (e instanceof Error ? e.message : 'Chưa kết nối được. Em thử lại nhé.')
 
 /** `onRaDao` (chỉ-thêm, GAME HÓA 2.0): nút "QUA CẦU · KHÁM PHÁ ĐẢO" khi hết câu ôn. Nơi gọi chưa truyền ⇒ dùng `onDong` (về Đảo thần thú). */
-export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemVu, onRaDao }: { call: GoiDoan; sbd: string; pet: number; cap: number; onDong: () => void; onVeBangNhiemVu: () => void; onRaDao?: () => void }) {
+export default function DoanHoTong({ call, sbd, pet, cap, token, onDong, onVeBangNhiemVu, onRaDao }: { call: GoiDoan; sbd: string; pet: number; cap: number; token?: string; onDong: () => void; onVeBangNhiemVu: () => void; onRaDao?: () => void }) {
   const [xem, setXem] = useState<DoanXem | null>(null)
   // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): `hoa2-sanh` nói chế độ + số "ổ phục kích" (câu ôn còn lại hôm nay). null = cờ tắt / máy chủ cũ
   // chưa có lệnh ⇒ MỌI màn giữ giao diện cũ. `hoa2SauChang`: đọc lại SAU khi chặng kết thúc (undefined = đang đọc, null = không đọc được).
@@ -185,6 +186,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (r.doan?.tran?.hiep === tran.hiep) setKetQuaCau(kq)
     if (kq?.reward) setExpNhan(n => n + (kq.reward ?? 0))
     setCauVuaLam(deHienTai ? { q: deHienTai, chon: boTrong ? '' : chon, ketQua: kq, hiep: tran.hiep } : null)
+    // Phase D §11.3: pre-tạo dot chữa câu sai cho Đoàn (fire-and-forget, không chặn game)
+    if (token && qidCau && kq && !kq.correct) void apiMoDot(token, qidCau, 'doan').catch(() => {})
     if (laHoa2) void docLaiHoa2() // 2.0: một ổ phục kích vừa bị phá ⇒ số "Ổ phục kích còn N" đọc lại từ máy chủ, không tự trừ
   }
   const moTiepSuc = async (ghe: number) => { if (!xem) return; const r = await goi('doan-the-goi-y', { ma: xem.ma, den: ghe }); if (r?.goiY) setGoiYTiepSuc(r.goiY) }

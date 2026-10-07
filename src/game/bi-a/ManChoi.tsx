@@ -530,7 +530,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
         </section>
         {sheet && session && <TamCauBia key={sheet.ma} y={sheet} token={token} session={session} laEmDanh={sheet.nguoiDanh === v.em} tenNguoiDanh={v.ghe[sheet.nguoiDanh]!.ngan} tenLuotNay={tenLuot} tenKeTiep={v.ghe[tiepTheo(sheet.nguoiDanh, v.ghe.length)]!.ten}
           onCham={(d, ph, t) => onCham(sheet, d, ph, t)} onDong={(d) => onDongCau(sheet, d)} onAm={(k) => am.phat(k)} />}
-        {xem && !sheet && cauSai.length > 0 && <XemLaiCauSai ds={cauSai} dongTt={v.pha === 'over' ? 'Ván đã kết thúc' : `Đang lượt ${tenLuot} · tới lượt em thì tấm này tự đóng`} onDong={() => { setXem(false); v.datXemMo(false) }} />}
+        {xem && !sheet && cauSai.length > 0 && <XemLaiCauSai ds={cauSai} dongTt={v.pha === 'over' ? 'Ván đã kết thúc' : `Đang lượt ${tenLuot} · tới lượt em thì tấm này tự đóng`} onDong={() => { setXem(false); v.datXemMo(false) }} token={token} />}
         {hoiRoi && !ket && <div className="bia-che"><div className="bia-ket" role="dialog" aria-modal="true" aria-label="Rời ván">
           <h3>Rời ván?</h3>
           <p className="bia-chu-nho">{vm ? (doi ? 'A.I sẽ đánh thay ghế em; ván thôi tính Điểm bàn. ' : 'Bạn thắng ván này. ') : 'Ván này dừng lại. '}Câu em đã trả lời vẫn được tính; câu chưa trả lời trả lại kế hoạch hôm nay.</p>

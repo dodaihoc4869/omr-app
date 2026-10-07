@@ -15,6 +15,7 @@
 // ĐỘC LẬP: chỉ đọc (su_kien_hoc · cauKhacPhucGoi · deTheoDangBai · danhMucDangBai — mấy lệnh ấy đã gỡ câu của ca đang bảo vệ và câu tự luận)
 // và chỉ ghi bảng riêng `tu_luyen_*` (lượt, câu, chấm từng câu, khắc phục). KHÔNG EXP/vàng/mảnh, KHÔNG su_kien_hoc, KHÔNG kế hoạch ngày,
 // KHÔNG qid_da_lam, KHÔNG trần game — nên không ảnh hưởng chọn câu của Đảo / Đoàn / Bi-a hay chiến dịch.
+import { dongBoTuLuyen, nhanKetQuaTuLuyenChung } from './chua-cau-sai-tu-luyen'
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { docKhoiEm } from './game-v2-bank'
@@ -737,11 +738,13 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
   }
   // "Chấm từng câu": câu đã chấm trong lượt là KHOÁ — lúc nộp dùng đúng câu trả lời + kết quả đã chấm (máy em gửi khác cũng không đổi).
   const daChamCau = daNop ? new Map<string, { traLoi: string; dung: boolean; diem: number }>() : await docChamCau(env, luotId)
-  const khacPhuc = !daNop && rieng.some((c) => c.khoSai) ? await docKhacPhuc(env, sbd) : new Map<string, TrangThaiKhacPhuc>()
+  const khacPhuc = rieng.some((c) => c.khoSai) ? await docKhacPhuc(env, sbd) : new Map<string, TrangThaiKhacPhuc>()
   const nay = daNop ? Number(dong.nop_luc) || Date.now() : Date.now()
   const giay = daNop ? Number(dong.giay) || 0 : Math.max(0, Math.min(6 * 3600, Math.round(Number(b.giay) || 0)))
   const ketQua: KetQuaCau[] = []
   const ghi = []
+  const receiptNop=crypto.randomUUID()
+  const congNop={sql:"EXISTS(SELECT 1 FROM tu_luyen_luot WHERE id=? AND sbd=? AND json_extract(tham_so_json,'$.chuaReceiptNop')=?)",params:[luotId,sbd,receiptNop]}
   let soDung = 0, tongDiem = 0
   for (const c of rieng) {
     const daCham = daChamCau.get(c.qid)
@@ -751,19 +754,19 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
     const diem = daNop ? daChot.get(c.qid)?.diem ?? cham.diem : daCham ? daCham.diem : cham.diem
     // ÔN CÁCH QUÃNG: câu của kho câu sai chưa chấm từng câu ⇒ cập nhật trạng thái ngay trong batch nộp (câu đã chấm từng câu đã cập nhật lúc chấm).
     let chuKhacPhuc = ''
-    if (!daNop && c.khoSai) {
+    if (c.khoSai) {
       const goc = qidGoc(c.qid)
-      if (!daCham) {
+      if (!daNop && !daCham) {
         const moi = capNhatKhacPhuc(khacPhuc.get(goc), dung, nay, Number(c.saiCuoi) || 0)
         khacPhuc.set(goc, moi)
-        ghi.push(lenhGhiKhacPhuc(env, sbd, goc, moi))
+        ghi.push(lenhGhiKhacPhuc(env, sbd, goc, moi,congNop))
       }
       const tt = khacPhuc.get(goc)
       if (tt) chuKhacPhuc = chuSauCham(tt, dung)
     }
     if (dung) soDung++
     tongDiem += diem
-    const an = !!baoVe && baoVe.has(qidGoc(c.qid))
+    const an = !baoVe || baoVe.has(qidGoc(c.qid))
     ketQua.push({
       qid: c.qid, phan: c.phan, dung, diem, traLoi,
       dapAn: an ? '' : c.dapAn,
@@ -774,19 +777,24 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
     if (!daNop) {
       ghi.push(env.DB.prepare(
         `INSERT OR IGNORE INTO tu_luyen_cau (luot_id, sbd, che_do, qid, phan, dung, diem, tra_loi, dang_ma, dang_ten, bai, lop, sao, giay, co_goi_y, nop_luc)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-      ).bind(luotId, sbd, Number(dong.che_do), c.qid, c.phan, dung ? 1 : 0, diem, traLoi, c.dangMa, c.dangTen, c.bai, c.lop, c.sao,
-        Math.max(0, Math.min(3600, Math.round(Number(giayCauVao[c.qid]) || 0))), coGoiY.has(c.qid) ? 1 : 0, nay))
+         SELECT ?,?,?,?,?,COALESCE((SELECT dung FROM tu_luyen_cham_cau WHERE luot_id=? AND qid=?),?),COALESCE((SELECT diem FROM tu_luyen_cham_cau WHERE luot_id=? AND qid=?),?),COALESCE((SELECT tra_loi FROM tu_luyen_cham_cau WHERE luot_id=? AND qid=?),?),?,?,?,?,?,?,?,? WHERE ${congNop.sql}`,
+      ).bind(luotId, sbd, Number(dong.che_do), c.qid, c.phan,luotId,c.qid, dung ? 1 : 0,luotId,c.qid, diem,luotId,c.qid, traLoi, c.dangMa, c.dangTen, c.bai, c.lop, c.sao,
+        Math.max(0, Math.min(3600, Math.round(Number(giayCauVao[c.qid]) || 0))), coGoiY.has(c.qid) ? 1 : 0, nay,...congNop.params))
     }
   }
   const diem10 = rieng.length ? Math.round((tongDiem / rieng.length) * 1000) / 100 : 0
   if (!daNop) {
-    // Chốt trạng thái TRƯỚC (điều kiện 'dang_lam' ⇒ hai lượt nộp đồng thời chỉ một lượt ghi câu).
-    const chot = await env.DB.prepare(
-      `UPDATE tu_luyen_luot SET trang_thai = 'da_nop', nop_luc = ?, so_dung = ?, diem = ?, giay = ? WHERE id = ? AND sbd = ? AND trang_thai = 'dang_lam'`,
-    ).bind(nay, soDung, diem10, giay, luotId, sbd).run()
-    if (Number(chot.meta?.changes ?? 0) > 0 && ghi.length) await env.DB.batch(ghi)
+    // Khoá lượt + mọi câu trong MỘT batch. Marker riêng khiến lượt thua không ghi đè receipt/tiến độ.
+    try { await env.DB.batch([
+      env.DB.prepare(`UPDATE tu_luyen_luot SET trang_thai='da_nop',nop_luc=?,so_dung=?,diem=?,giay=?,tham_so_json=json_set(CASE WHEN json_valid(tham_so_json) THEN tham_so_json ELSE '{}' END,'$.chuaReceiptNop',?) WHERE id=? AND sbd=? AND trang_thai='dang_lam'`).bind(nay,soDung,diem10,giay,receiptNop,luotId,sbd),
+      ...ghi,
+      env.DB.prepare(`UPDATE tu_luyen_luot SET so_dung=(SELECT COALESCE(SUM(dung),0) FROM tu_luyen_cau WHERE luot_id=?),diem=(SELECT CASE WHEN COUNT(*)>0 THEN ROUND(SUM(diem)*10/COUNT(*),2) ELSE 0 END FROM tu_luyen_cau WHERE luot_id=?) WHERE id=? AND sbd=? AND json_extract(tham_so_json,'$.chuaReceiptNop')=?`).bind(luotId,luotId,luotId,sbd,receiptNop),
+    ]) } catch { return {ok:false,error:'Chưa lưu được lượt luyện. Câu trả lời vẫn ở máy em; em thử nộp lại.'} }
+    // Trả bản đã khoá của người thắng, gồm cả câu chấm riêng đến trong khe trước batch.
+    return tuLuyenNop(env,sbd,b)
   }
+  if (!await dongBoTuLuyen(env,sbd,luotId)) return {ok:false,error:'Kết quả đã được giữ, đang chờ đồng bộ sổ học. Em gửi lại để hoàn tất.'}
+  await nhanKetQuaTuLuyenChung(env,sbd,rieng,ketQua)
   return {
     ok: true,
     luotId,
@@ -829,8 +837,8 @@ export async function tuLuyenChamCau(env: Env, sbd: string, b: Obj): Promise<Obj
     const traLoi = str(b.traLoi).slice(0, 40)
     if (!traLoi.replace(/-/g, '').trim()) return { ok: false, error: 'Em chọn đáp án rồi mới bấm Kiểm tra nhé.' }
     const cham = chamCauTuLuyen(c.phan, c.dapAn, traLoi)
-    const r = await env.DB.prepare('INSERT OR IGNORE INTO tu_luyen_cham_cau (luot_id, sbd, qid, tra_loi, dung, diem, luc) VALUES (?,?,?,?,?,?,?)')
-      .bind(luotId, sbd, qid, traLoi, cham.dung ? 1 : 0, cham.diem, nay).run()
+    const r = await env.DB.prepare("INSERT OR IGNORE INTO tu_luyen_cham_cau (luot_id, sbd, qid, tra_loi, dung, diem, luc) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM tu_luyen_luot WHERE id=? AND sbd=? AND trang_thai='dang_lam')")
+      .bind(luotId, sbd, qid, traLoi, cham.dung ? 1 : 0, cham.diem, nay,luotId,sbd).run()
     khoaMoi = Number(r.meta?.changes ?? 0) > 0
     chot = khoaMoi ? { traLoi, dung: cham.dung, diem: cham.diem } : (await docChamCau(env, luotId)).get(qid)
     if (!chot) return { ok: false, error: 'Chưa chấm được câu này. Em thử lại.' }
@@ -854,6 +862,8 @@ export async function tuLuyenChamCau(env: Env, sbd: string, b: Obj): Promise<Obj
     ...(an ? { anDapAn: true as const } : { loiGiai: loiGiaiTuCauRieng(c) }),
     ...(chuKhacPhuc ? { khacPhuc: chuKhacPhuc } : {}),
   }
+  if (!await dongBoTuLuyen(env,sbd,luotId)) return {ok:false,error:'Câu trả lời đã được giữ, đang chờ đồng bộ sổ học. Em bấm kiểm tra lại để hoàn tất.'}
+  await nhanKetQuaTuLuyenChung(env,sbd,[c],[ketQua])
   return { ok: true, khoa: true, ketQua }
 }
 

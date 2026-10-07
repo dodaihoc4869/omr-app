@@ -1,0 +1,63 @@
+name: Bật vòng chữa cho tất cả học sinh
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/bat-vong-chua-0710]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: phat-hanh
+  cancel-in-progress: true
+jobs:
+  bat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci
+      - name: Xác nhận đúng bản đã phát hành thành công
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test -f docs/phat-hanh-vong-chua-0710.json
+          node -e 'const r=JSON.parse(require("fs").readFileSync("docs/phat-hanh-vong-chua-0710.json","utf8")); if(!Number.isSafeInteger(r.runId)||!/^[a-f0-9]{40}$/.test(r.sha))process.exit(1); require("fs").appendFileSync(process.env.GITHUB_ENV,`CHUA_RELEASE_RUN=${r.runId}\nCHUA_RELEASE_SHA=${r.sha}\n`)'
+          RUN_ID=$(node -p 'JSON.parse(require("fs").readFileSync("docs/phat-hanh-vong-chua-0710.json","utf8")).runId')
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > /tmp/chua-run.json
+          node -e 'const fs=require("fs"),r=JSON.parse(fs.readFileSync("/tmp/chua-run.json")),e=JSON.parse(fs.readFileSync("docs/phat-hanh-vong-chua-0710.json")); if(r.conclusion!=="success"||r.status!=="completed"||r.head_sha!==e.sha||r.path!==".github/workflows/deploy.yml")throw Error("Bản phát hành chưa đạt")'
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm công cụ giao gần D1 trước khi dùng dữ liệu thật
+        run: |
+          npx vitest run tests/chua-giao-van-hanh.test.ts tests/chua-d1-van-hanh.test.ts tests/chua-phat-hanh-doc-lai.test.ts --reporter=dot
+          npx vitest run --config vitest.config.d1.ts tests/d1-runtime-chua-cau-sai.test.ts --reporter=dot
+      - name: Dọn công cụ lượt trước sau khi xác minh đã dừng
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          OLD_RUN=$(node -p 'JSON.parse(require("fs").readFileSync("docs/phat-hanh-vong-chua-0710.json","utf8")).workerGiaoCuRunId')
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${OLD_RUN}" > /tmp/chua-run-cu.json
+          node -e 'const fs=require("fs"),r=JSON.parse(fs.readFileSync("/tmp/chua-run-cu.json")),m=JSON.parse(fs.readFileSync("docs/phat-hanh-vong-chua-0710.json")); if(r.status!=="completed"||r.head_sha!==m.workerGiaoCuSha||r.head_branch!=="codex/bat-vong-chua-0710"||r.run_attempt!==m.workerGiaoCuAttempt)throw Error("Lượt giao cũ chưa dừng đúng nguồn")'
+          CHUA_RUN_CAN_DON="$OLD_RUN" CHUA_ATTEMPT_CAN_DON=$(node -p 'JSON.parse(require("fs").readFileSync("docs/phat-hanh-vong-chua-0710.json","utf8")).workerGiaoCuAttempt') node scripts/don-worker-giao-tam.mjs
+      - name: Bật toàn trường và đồng bộ câu sai cũ
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          node scripts/kiem-phat-hanh-chua.mjs --schema --live
+          npx esbuild scripts/bat-vong-chua-0710.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/chua-bat.mjs --log-level=warning
+          node /tmp/chua-bat.mjs
+          node scripts/kiem-phat-hanh-chua.mjs --schema --live --enabled
+      - name: Dọn Worker giao của chính job kể cả khi bị huỷ
+        if: ${{ always() && env.CF_TOKEN_SACH != '' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/don-worker-giao-tam.mjs

@@ -153,5 +153,81 @@
    "nguonDe": "DH-10-C2-B9-D1",
    "nguonCau": "I-3"
   }
+ },
+ "DB-10-B8-D2-II-32": {
+  "luc": "2026-10-07T02:42:38.453Z",
+  "cau": {
+   "phan": "II",
+   "so": 32,
+   "de": "Nếu cho cùng một lượng magnesium (Z=12) và calcium (Z=20) vào trong một cốc nước có chứa phenolphtalein thì sau 45 phút sẽ quan sát thấy màu hồng trong cả hai cốc.",
+   "dap_an": "SSSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Bảng tuần hoàn",
+   "muc_do": "van_dung",
+   "bai": "Bài 6. Xu hướng biến đổi một số tính chất của nguyên tử các nguyên tố",
+   "y": {
+    "a": "Hai kim loại này đều thuộc cùng nhóm IIA trong bảng tuần hoàn, do đó tính chất hóa học tương tự nhau nên tốc độ phản ứng là như nhau.",
+    "b": "Phenolphtalein đóng vai trò là chất xúc tác giúp cho phản ứng giữa kim loại và nước xảy ra dễ dàng hơn.",
+    "c": "Thời gian phản ứng ở thí nghiệm trên vẫn chưa đủ để kết luận về mức độ hoạt động hóa học của hai kim loại này.",
+    "d": "Thí nghiệm chứng minh được khả năng phản ứng của calcium mạnh hơn magnesium."
+   },
+   "loi_giai": {
+    "chot": "Ca ở chu kì 4 có bán kính lớn hơn Mg nên nhường electron dễ hơn, phản ứng với nước nhanh hơn và làm phenolphthalein hồng trước; phenolphthalein chỉ là chất chỉ thị.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cùng nhóm IIA nhưng Ca hoạt động mạnh hơn Mg nên tốc độ khác nhau rõ rệt."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: phenolphthalein là chất chỉ thị màu, không phải chất xúc tác."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: quan sát cốc nào hồng trước đã đủ để kết luận Ca hoạt động mạnh hơn."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: thí nghiệm cho thấy calcium phản ứng với nước mạnh hơn magnesium."
+     }
+    },
+    "dap_an_de": "SSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 2,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Câu gắn thí nghiệm thật với xu hướng tính kim loại trong nhóm IIA.",
+    "bay": "Phenolphthalein chỉ là chất chỉ thị, không phải xúc tác; cùng nhóm IIA không có nghĩa tốc độ phản ứng như nhau."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "BANG_TUAN_HOAN.VI_TRI_TU_CAU_HINH.CHON_PHAT_BIEU",
+    "ten": "Suy vị trí từ cấu hình electron — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-10-B8-D2",
+    "ten": "Xác định vị trí của các nguyên tố thuộc cùng chu kì hoặc cùng nhóm",
+    "lop": "10",
+    "bai": "DB-10-B8",
+    "tenBai": "Định luật tuần hoàn. Ý nghĩa của bảng tuần hoàn các nguyên tố hóa học",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C2 - Bảng tuần hoàn"
+   },
+   "nguonDe": "DH-10-C2-B6",
+   "nguonCau": "II-14"
+  }
  }
 }

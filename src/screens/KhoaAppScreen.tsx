@@ -225,7 +225,7 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
                   Đặt lại bằng mã bí mật
                 </div>
                 <div>
-                  <div style={{ ...NHAN, marginBottom: 'var(--k2)' }}>Mã bí mật (lấy ở Thuộc tính tập lệnh của Apps Script)</div>
+                  <div style={{ ...NHAN, marginBottom: 'var(--k2)' }}>Mã bí mật (đúng bằng MA_BI_MAT đã đặt ở máy chủ Cloudflare)</div>
                   <input
                     className="tap-target"
                     style={O_NHAP}

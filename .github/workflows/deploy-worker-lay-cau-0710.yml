@@ -15,6 +15,17 @@ jobs:
         with:
           ref: claude/laughing-bohr-1ixzp4
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      # CHẶN GHI ĐÈ MÁY CHỦ SỐNG BẰNG BẢN CŨ. Sự cố 07/10 (giờ VN): hai lượt chạy lúc 16:08 và 16:28 đã ghi đè Worker sống bằng bản
+      # của nhánh này khi nhánh còn thiếu 69 commit của main (vòng chữa câu sai đang bật toàn trường, nút "Xem câu gốc", sửa luồng kiểm thi…).
+      # Luật dự án (deploy.yml): bản sống chỉ lấy từ main. Nhánh phải gộp main mới nhất rồi mới được phát hành.
+      - name: Chặn phát hành khi nhánh chưa gộp main mới nhất
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "DỪNG: nhánh chưa có đủ commit của main — phát hành sẽ ghi đè máy chủ sống bằng bản cũ. Gộp main vào nhánh rồi chạy lại."
+            exit 1
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 24

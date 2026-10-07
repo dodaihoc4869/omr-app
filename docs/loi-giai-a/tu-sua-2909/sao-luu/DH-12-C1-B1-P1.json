@@ -637,5 +637,131 @@
     "chuong": "C1 - Ester lipid"
    }
   }
+ },
+ "DH-12-C1-B1-P1-III-45": {
+  "luc": "2026-10-07T02:42:05.308Z",
+  "cau": {
+   "phan": "III",
+   "so": 45,
+   "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau: salicylic acid methanol methyl salicylate Để sản xuất 1,9 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,7 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+   "dap_an": "6,2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Ester – lipid",
+   "muc_do": "van_dung",
+   "bai": "Bài 1. Ester - Lipid (Phần 1)",
+   "loi_giai": {
+    "chot": "n(methyl salicylate) = 5,13×10⁶ : 152 = 33 750 mol ⇒ n(salicylic acid) = 33 750 : 0,75 = 45 000 mol.",
+    "buoc": [
+     "m(methyl salicylate) = 1,9×10⁶ × 2,7 = 5,13×10⁶ g = 5,13 tấn.",
+     "n(methyl salicylate) = 5,13×10⁶ : 152 = 33 750 mol.",
+     "Hiệu suất 75% ⇒ n(salicylic acid) = 33 750 : 0,75 = 45 000 mol.",
+     "m = 45 000 × 138 = 6,21×10⁶ g = 6,21 ≈ 6,2 tấn."
+    ],
+    "ket_qua": "6,2",
+    "dap_an_de": null,
+    "dap_an_tu_giai": "6,2",
+    "trang_thai": "khong_co_dap_an_de",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đề gốc không ghi đáp án nên không đối chiếu được."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Hiệu suất tính theo salicylic acid nên phải CHIA cho 0,75 khi đi ngược từ sản phẩm.",
+    "bay": "Nhân 0,75 thay vì chia."
+   },
+   "kienThuc": [
+    "Methyl salicylate C₈H₈O₃ có M = 152; salicylic acid C₇H₆O₃ có M = 138.",
+    "Phản ứng ester hoá theo tỉ lệ 1 : 1.",
+    "Đi ngược từ sản phẩm về nguyên liệu thì chia cho hiệu suất."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "ESTER.ESTER_HOA.TINH_KHOI_LUONG",
+    "ten": "Ester hoá — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B1-P1-D2",
+    "ten": "Phản ứng ester hóa",
+    "lop": "12",
+    "bai": "DB-12-B1-P1",
+    "tenBai": "Ester - Lipid (Phần 1)",
+    "soBai": 1,
+    "phanBai": 1,
+    "chuong": "C1 - Ester lipid"
+   },
+   "song_sinh": [
+    {
+     "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau: salicylic acid + methanol ⇌ methyl salicylate + H₂O (xúc tác H₂SO₄ đặc, t°). Để sản xuất 1,52 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 3 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 80%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+     "dap_an": "5,2",
+     "buoc": [
+      "m(methyl salicylate) = 1,52×10⁶ × 3 = 4560000 g.",
+      "n(methyl salicylate) = 4560000 : 152 = 30000 mol.",
+      "Hiệu suất 80% ⇒ n(salicylic acid) = 30000 : 0,8 = 37500 mol.",
+      "m = 37500 × 138 = 5175000 g = 5,175 ≈ 5,2 tấn."
+     ],
+     "gia_tri_dung": "5,175"
+    },
+    {
+     "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế theo phản ứng sau: salicylic acid + methanol ⇌ methyl salicylate + H₂O (xúc tác H₂SO₄ đặc, t°). Để sản xuất 2,28 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid.\nBiết mỗi tuýp thuốc chứa 2,5 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%.\nGiá trị của m là bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+     "dap_an": "6,9",
+     "buoc": [
+      "m(methyl salicylate) = 2,28×10⁶ × 2,5 = 5700000 g.",
+      "n(methyl salicylate) = 5700000 : 152 = 37500 mol.",
+      "Hiệu suất 75% ⇒ n(salicylic acid) = 37500 : 0,75 = 50000 mol.",
+      "m = 50000 × 138 = 6900000 g = 6,9 tấn."
+     ],
+     "gia_tri_dung": "6,9"
+    }
+   ],
+   "cau_kiem": [
+    {
+     "buoc": 0,
+     "kieu": "so",
+     "hoi": "Ở bước này, tổng khối lượng methyl salicylate cần là bao nhiêu gam?",
+     "dap_an": "5130000",
+     "sai_so": "0.01"
+    },
+    {
+     "buoc": 1,
+     "kieu": "so",
+     "hoi": "Số mol methyl salicylate bằng bao nhiêu?",
+     "dap_an": "33750",
+     "sai_so": "0.01"
+    },
+    {
+     "buoc": 2,
+     "kieu": "chon",
+     "hoi": "Với hiệu suất 75%, số mol salicylic acid cần dùng tính thế nào?",
+     "lua_chon": [
+      "33 750 : 0,75",
+      "33 750 × 0,75",
+      "33 750 × 2"
+     ],
+     "dung": 0
+    }
+   ],
+   "nhan_nen": [
+    {
+     "buoc": 0,
+     "nen": "doi_mol_khoi_luong"
+    },
+    {
+     "buoc": 1,
+     "nen": "doi_mol_khoi_luong"
+    },
+    {
+     "buoc": 2,
+     "nen": "hieu_suat"
+    }
+   ]
+  }
  }
 }
