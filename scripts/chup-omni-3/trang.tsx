@@ -2,7 +2,7 @@
 // (06/10) thêm cảnh CẨN THẬN: `?man=dao-can-than-soat|dao-can-than-the` (Sảnh có omni.canThan) — chip "Soát lại đơn vị và số liệu" ở câu Phần III + thẻ "Em biết câu này. Sai vì bước nào?".
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. `?man=sanh|sanh-cho|ph|dao-chip|dao-cham|dao-chac-sai|dao-tln|dao-tram|de-thu|gv-bai|gv-bang-cu|gv-bang-omni|gv-cai-dat|gv-tong-quan`.
 // Dữ liệu OMNI theo đúng hợp đồng docs/hop-dong-omni-3.md (SanhOmni, PhOmni). Các màn thêm sau khi gộp làn: dao, gv-bai, gv-bang.
-import { createElement as h } from 'react'
+import { createElement as h, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
 import '@fontsource/be-vietnam-pro/vietnamese-600.css'
@@ -50,6 +50,11 @@ import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
 import '../../src/styles/hanh-trinh-v2.css'
 import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
 import ManChuaCauSai from '../../src/components/chua-cau-sai/ManChuaCauSai'
+import ChonBanDongHanh from '../../src/game/than-thu-v2/dao/ChonBanDongHanh'
+import SoTay from '../../src/game/than-thu-v2/dao/SoTay'
+import TuiDo from '../../src/game/than-thu-v2/dao/TuiDo'
+import ManShop from '../../src/game/than-thu-v2/shop/ManShop'
+import { ShopApiGia } from '../../src/game/than-thu-v2/shop/du-lieu-mau'
 
 document.documentElement.dataset.phongCach = 'v2'
 apDungGiaoDien('sang')
@@ -58,6 +63,23 @@ const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
 const now = Date.now()
 const noop = () => {}
+// Kiểm cả các màn ngoài Hành trình; chỉ dùng IO giả và trạng thái trống/lỗi an toàn.
+const MAN_PHU = {
+  examhub: lazy(() => import('../../src/screens/ExamHubScreen')),
+  examsetup: lazy(() => import('../../src/screens/ExamSetupScreen')),
+  exammonitor: lazy(() => import('../../src/screens/ExamMonitorScreen')),
+  lichsuca: lazy(() => import('../../src/screens/LichSuCaScreen')),
+  classlist: lazy(() => import('../../src/screens/ClassListScreen')),
+  hocsinh: lazy(() => import('../../src/screens/HocSinhScreen')),
+  toancanh: lazy(() => import('../../src/screens/ToanCanhEmScreen')),
+  nganhangde: lazy(() => import('../../src/screens/NganHangDeScreen')),
+  caidat: lazy(() => import('../../src/screens/CaiDatScreen')),
+  bangonutthat: lazy(() => import('../../src/screens/BanGoNutThatScreen')),
+  duyetloigiai: lazy(() => import('../../src/screens/DuyetLoiGiaiScreen')),
+}
+const maManPhu = man.startsWith('gv-screen-') ? man.slice(10) as keyof typeof MAN_PHU : null
+const ManPhu = maManPhu ? MAN_PHU[maManPhu] : null
+if (ManPhu) useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
 try {
   localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk-gia', sbd: 'GIA' }))
   localStorage.setItem('omr_ph_sbd', '12121212')
@@ -246,8 +268,13 @@ function manSanh(du: Record<string, unknown>) {
 }
 
 const con =
-  man === 'ph' ? h(ParentPortalScreen)
+  ManPhu ? h(Suspense, { fallback: h('p', null, 'Đang tải màn hình…') }, h(ManPhu))
+  : man === 'ph' ? h(ParentPortalScreen)
   : man === 'chua' ? h(ManChuaCauSai, { token: 'tk-gia', qid: 'Q', onVe: noop })
+  : man === 'hs-chon-thu' ? h(ChonBanDongHanh, { onChon: noop })
+  : man === 'hs-so-tay' ? h('div', { className: 'dao' }, h(SoTay, { profile: hoSoDao }))
+  : man === 'hs-tui-do' ? h('div', { className: 'dao' }, h(TuiDo, { profile: hoSoDao, onDungKhien: async () => ({ ok: true }) }))
+  : man === 'hs-shop' ? h(ManShop, { api: new ShopApiGia({ tre: 0 }), pet: 2, cap: 32, tenThu: 'Lửa nhỏ', onDong: noop })
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'doan-tram' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 2, cap: 32, onDong: noop, onVeBangNhiemVu: noop } as never))
@@ -263,7 +290,7 @@ const con =
   : manSanh(SANH)
 // Màn thầy: dựng ĐÚNG khung App.tsx (thanh bên trái thật + khung nội dung) để bố cục, màu như app thầy thật.
 const MAN_THAY: Record<string, string> = { 'gv-bai': 'goilenbang', 'gv-bai-nhieu-lop': 'goilenbang', 'gv-bai-ngang-may-tinh': 'goilenbang', 'gv-giao-cho': 'goilenbang', 'gv-bai-da-day-truoc': 'goilenbang', 'gv-bang-cu': 'goilenbang', 'gv-bang-omni': 'goilenbang', 'gv-cai-dat': 'caidat', 'gv-tong-quan': 'tongquan', 'gv-len-bang': 'goilenbang', 'gv-chien-dich': 'chiendich' }
-const manThay = MAN_THAY[man]
+const manThay = maManPhu ?? MAN_THAY[man]
 if (manThay) useAppStore.setState({ screen: manThay as never })
 createRoot(document.getElementById('root')!).render(
   manThay

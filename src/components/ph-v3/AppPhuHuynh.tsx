@@ -111,7 +111,7 @@ export default function AppPhuHuynh({ sbd, hoTen, lop, onDoiSbd }: { sbd: string
   else if (tuyen.muc === 'diem') man = <ManDiemSo v={v} coNhanXet={coNhanXet} />
   else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} />
   else if (tuyen.muc === 'loi-thay') man = <ManLoiThay v={v} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao} onDaXem={daXemCanhBao} />
-  else man = <ManHomNay v={v} hoc2={hoc2} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} />
+  else man = <ManHomNay v={v} hoc2={hoc2} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} coTieuDe={false} />
 
   return (
     <div className="ph3" data-app="ph3">
@@ -135,6 +135,7 @@ export default function AppPhuHuynh({ sbd, hoTen, lop, onDoiSbd }: { sbd: string
           <button type="button" className="ph3-dieu-huong__doi" onClick={onDoiSbd}>Đổi số báo danh</button>
         </nav>
         <main className="ph3-chinh">
+          {!tuyen.maCa && tuyen.muc === 'hom-nay' && <div className="ph3-tieu-de"><h1>Hành trình của con</h1></div>}
           {!tuyen.maCa && (
             <header className="ph3-dau">
               <span className="ph3-dau__logo"><AnhLogo vai="ph" size={40} alt="Logo Đỗ Đại Học" /></span>

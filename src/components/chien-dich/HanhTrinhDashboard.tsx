@@ -109,9 +109,9 @@ export default function HanhTrinhDashboard({ lanTai = 0 }: { lanTai?: number; on
         </div>
 
         <div className="htgv-kpi" aria-label="Tóm tắt hành trình">
-          <div data-tone="xanh"><ShieldCheck aria-hidden="true" /><span>Đúng nhịp</span><b>{dangTaiBang ? '—' : dungNhip}<small>/{bang?.em.length ?? chon?.soEm ?? 0} em</small></b></div>
-          <div data-tone="do"><CircleAlert aria-hidden="true" /><span>Cần gỡ lỗi</span><b>{dangTaiBang ? '—' : canGo}<small>em</small></b></div>
-          <div data-tone="tim"><TrendingUp aria-hidden="true" /><span>Sẵn sàng nâng bậc</span><b>{dangTaiBang ? '—' : sanSang}<small>em</small></b></div>
+          <div data-tone="xanh"><ShieldCheck aria-hidden="true" /><span>Đúng nhịp</span><b>{dangTaiBang || !bang ? '—' : dungNhip}<small>/{bang?.em.length ?? chon?.soEm ?? 0} em</small></b></div>
+          <div data-tone="do"><CircleAlert aria-hidden="true" /><span>Cần gỡ lỗi</span><b>{dangTaiBang || !bang ? '—' : canGo}<small>em</small></b></div>
+          <div data-tone="tim"><TrendingUp aria-hidden="true" /><span>Sẵn sàng nâng bậc</span><b>{dangTaiBang || !bang ? '—' : sanSang}<small>em</small></b></div>
           <div data-tone="phut"><Clock3 aria-hidden="true" /><span>Thời lượng mỗi ngày</span><b>Cá nhân<small>theo nhịp học của em</small></b></div>
         </div>
 
@@ -121,17 +121,20 @@ export default function HanhTrinhDashboard({ lanTai = 0 }: { lanTai?: number; on
               <div><h2 id="htgv-em">Nhịp học hôm nay</h2></div>
               <label className="htgv-search"><Search size={17} aria-hidden="true" /><span className="cd-an-chu">Tìm học sinh</span><input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm học sinh…" /></label>
             </div>
+            <div className="htgv-table-head" aria-hidden="true"><span>Học sinh</span><span>Mục tiêu hôm nay</span><span>Mức theo dạng</span><span>Lý do</span></div>
             <div className="htgv-students" role="region" aria-label="Kế hoạch của từng học sinh" tabIndex={0}>
               {dangTaiBang ? <p className="cd-phu">Đang tính kế hoạch từng em…</p> : em.map((e) => {
                 const mt = mucTieu(e)
                 return <article key={e.sbd} className="htgv-student">
                   <span className="htgv-avatar" aria-hidden="true">{e.ten.trim().split(/\s+/).at(-1)?.[0]}</span>
-                  <span className="htgv-name"><b>{e.ten}</b><small>SBD {e.sbd} · {tenHang(hangCua(e))}</small></span>
-                  <span className="htgv-goal" data-tone={mt.tone}><b>{mt.ten}</b><small>{mt.lyDo}</small></span>
+                  <span className="htgv-name"><b>{e.ten}</b><small>SBD {e.sbd} · {e.coXat} câu đã làm</small></span>
+                  <span className="htgv-goal" data-tone={mt.tone}><b>{mt.ten}</b></span>
+                  <span className="htgv-level" data-level={hangCua(e) ?? 'unknown'}>{tenHang(hangCua(e))}</span>
+                  <span className="htgv-reason">{mt.lyDo}</span>
                   <span className="htgv-auto"><Sparkles size={15} aria-hidden="true" /> Tự tính theo nhịp</span>
                 </article>
               })}
-              {!dangTaiBang && em.length === 0 && <p className="cd-phu">Không có học sinh khớp tìm kiếm.</p>}
+              {!dangTaiBang && em.length === 0 && <p className="cd-phu">{bang ? 'Không có học sinh khớp tìm kiếm.' : 'Chưa tải được kế hoạch học sinh.'}</p>}
             </div>
           </section>
 

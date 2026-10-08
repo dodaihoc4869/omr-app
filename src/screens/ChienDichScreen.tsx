@@ -19,7 +19,7 @@ export default function ChienDichScreen() {
   }, [tuCa])
 
   return (
-    <div className="gv2-trang">
+    <div className="gv2-trang v2-journey-page">
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
           <h1 className="gv2-tieu-de">Hành trình giỏi Hóa</h1>

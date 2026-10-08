@@ -1,4 +1,3 @@
-import BieuCamThu from '../../game/than-thu-v2/BieuCamThu'
 import { Sparkles, Compass, Leaf } from 'lucide-react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 
@@ -13,14 +12,13 @@ export default function DongHanh({ thu, xong = false, onMo, tenHanhTrinh }: {
     <section className="bl-dong-hanh" aria-label="Thần thú đồng hành">
       <div className="bl-dong-hanh__dau">
         <span className="bl-eyebrow"><Compass size={15} aria-hidden="true" /> BÁT LINH</span>
-        <h1>{xong ? 'Một ngày tiến bộ' : (tenHanhTrinh || 'Hành trình giỏi Hóa')}</h1>
+        <h1>{xong ? 'Một ngày tiến bộ' : (/^Hành trình/i.test(tenHanhTrinh ?? '') ? tenHanhTrinh : 'Hành trình giỏi Hóa')}</h1>
         <p>{xong ? 'Em đã hoàn thành kế hoạch hôm nay.' : 'Vững từng bước · Chinh phục từng bậc'}</p>
       </div>
       {thu ? (
         <button type="button" className="bl-ban-dong-hanh" onClick={onMo} aria-label={`Gặp ${thu.ten}, cấp ${thu.cap}`}>
           <span className="bl-ban-dong-hanh__hao" aria-hidden="true" />
           <img src={anhThu(thu.index, thu.cap)} alt="" width={320} height={320} decoding="async" fetchPriority="high" />
-          <BieuCamThu thu={thu.index} camXuc={xong ? 'mung' : 'chao'} size={64} />
           <span className="bl-ban-dong-hanh__ten"><Sparkles size={16} aria-hidden="true" />{thu.ten}<small>Cấp {thu.cap}</small></span>
         </button>
       ) : (

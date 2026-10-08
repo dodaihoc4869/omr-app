@@ -17,21 +17,23 @@ const GIO_DAU = 5 * 60
 const GIO_CUOI = 23 * 60
 const phanTram = (x: number): string => `${Math.round(x * 100)}%`
 
-export default function ManHomNay({ v, hoc2, canhBao, onDaXem }: { v: ViewPhMoi; hoc2: Hoc2 | null; canhBao: CanhBaoThay[]; onDaXem: (id: string) => void }) {
+export default function ManHomNay({ v, hoc2, canhBao, onDaXem, coTieuDe = true }: { v: ViewPhMoi; hoc2: Hoc2 | null; canhBao: CanhBaoThay[]; onDaXem: (id: string) => void; coTieuDe?: boolean }) {
   const pm = v.pm
   return (
     <div data-vung="man-chinh-ph">
-      <div className="ph3-tieu-de">
+      {coTieuDe && <div className="ph3-tieu-de">
         <h1>Hành trình của con</h1>
         {pm?.serverNow ? <span>Cập nhật {gioVn(pm.serverNow)}</span> : null}
-      </div>
+      </div>}
       {!pm ? (
         v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />
       ) : (
         <div className="ph3-luoi">
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
-          <TienBoV2 pm={pm} />
-          <AnhHung pm={pm} hoc2={hoc2} />
+          <div className="v2-ph-overview ph3-o-du">
+            <TienBoV2 pm={pm} />
+            <AnhHung pm={pm} hoc2={hoc2} />
+          </div>
           {hoc2?.chienDich && <ChienDich cd={hoc2.chienDich} omni={hoc2.omni} />}
           <BaiTapCu pm={pm} />
           {pm.caGanNhat && <CaGanNhat pm={pm} />}
@@ -99,7 +101,7 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
   else if (soCau === 0) phu = 'Kết quả hiện ở đây ngay khi con bắt đầu học.'
 
   const vong: { ti: number | null; mau: 'vong-hp' | 'vong-xl' | 'vong-tim'; nhan: string; so: string; duoi: string }[] = []
-  if (kh) vong.push({ ti: kh.daLam / kh.tong, mau: 'vong-hp', nhan: 'Kế hoạch hôm nay', so: String(kh.daLam), duoi: ` / ${kh.tong} câu` })
+  if (kh) vong.push({ ti: kh.tong > 0 ? kh.daLam / kh.tong : null, mau: 'vong-hp', nhan: 'Kế hoạch hôm nay', so: String(kh.daLam), duoi: ` / ${kh.tong} câu` })
   else if (soCau > 0 || mucCau) vong.push({ ti: mucCau ? soCau / mucCau : null, mau: 'vong-hp', nhan: 'Câu đã làm', so: String(soCau), duoi: mucCau ? ` / ${mucCau} câu` : ' câu' })
   if (tiDung !== null && tq && mau) vong.push({ ti: tiDung, mau: 'vong-xl', nhan: 'Làm đúng', so: phanTram(tiDung), duoi: ` · ${tq.soDung}/${mau} câu` })
   if (phut !== null && phut > 0) vong.push({ ti: mucPhut ? phut / mucPhut : null, mau: 'vong-tim', nhan: 'Thời gian học', so: String(phut), duoi: mucPhut ? ` / ${mucPhut} phút` : ' phút' })
@@ -124,6 +126,8 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
         <h2>{tieuDe}</h2>
         {phu && <p className="ph3-ah__phu">{phu}</p>}
       </div>
+      {(vong.length > 0 || so.length > 0) && <details className="v2-ph-details">
+      <summary>Chi tiết hôm nay</summary>
       {vong.length > 0 && (
         <div className="ph3-ah__vong">
           <VongDongTam vong={vong} nhan={vong.map((x) => `${x.nhan} ${x.so}${x.duoi}`).join('; ')} />
@@ -144,6 +148,7 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
           ))}
         </div>
       )}
+      </details>}
     </section>
   )
 }

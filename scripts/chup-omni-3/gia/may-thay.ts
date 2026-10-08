@@ -5,7 +5,7 @@ import type { TeacherExamSource } from '../../../src/data/examContent'
 
 let soCau = 0
 const cau = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-I-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, choices: ['a', 'b', 'c', 'd'], correct: 'A' }))
-const cauII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-II-${++soCau}`, text: `Ý ${soCau} của ${maDe}`, ideas: ['a', 'b', 'c', 'd'], correct: 'DDSS' }))
+const cauII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-II-${++soCau}`, text: `Ý ${soCau} của ${maDe}`, ideas: ['a', 'b', 'c', 'd'], correct: ['D', 'D', 'S', 'S'] }))
 const cauIII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-III-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, correct: '1,5' }))
 const to = (maDe: string, nguon: string, nI: number, nII = 0, nhom = '12 · DẠY HỌC/C1 - Ester lipid', nIII = 0): TeacherExamSource =>
   ({ maDe, nhom, nguon, phanI: cau(maDe, nI), phanII: cauII(maDe, nII), phanIII: cauIII(maDe, nIII) }) as unknown as TeacherExamSource
