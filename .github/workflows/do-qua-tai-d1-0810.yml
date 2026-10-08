@@ -7,9 +7,15 @@ permissions:
 jobs:
   do:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx esbuild scripts/do-ho-so-d1-0810.ts --bundle --platform=node --format=esm --outfile=/tmp/do-ho-so.mjs
       - name: Khoá Cloudflare
         env:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -19,4 +25,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-        run: node scripts/do-qua-tai-d1-0810.mjs
+        run: node /tmp/do-ho-so.mjs

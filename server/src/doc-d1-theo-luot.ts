@@ -129,8 +129,13 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
   // Hàng rào chỉ thuộc request này: SELECT độc lập được song song; ghi chờ các đọc trước nó,
   // đọc sau ghi chờ ghi xong. Giữ nguyên CAS/lô ghi, không chặn đọc bởi đọc khác.
   let truoc: Promise<void> = Promise.resolve(), ghi: Promise<void> = Promise.resolve()
+  // Một request đã gặp quá tải phải dừng cả các bước sau; không ghi kế hoạch
+  // từ dữ liệu rỗng do tầng gọi bắt lỗi đọc. Request mới vẫn được thử bình thường.
+  let loiQuaTai: unknown = null
+  const laQuaTai = (e: unknown) => /overloaded|requests queued for too long|too many requests|SQLITE_BUSY/i.test(e instanceof Error ? e.message : String(e))
+  const nhanLoi = (e: unknown) => { if (laQuaTai(e)) loiQuaTai = e }
   function gui<T>(chay: () => Promise<T>): Promise<T> {
-    const p = truoc.then(chay)
+    const p = truoc.then(() => { if (loiQuaTai) throw loiQuaTai; return chay() }).catch(e => { nhanLoi(e); throw e })
     ghi = p.then(() => undefined, () => undefined)
     truoc = ghi
     return p
@@ -140,8 +145,9 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     const lo = ds; ds = []
     if (!lo.length) return
     const p = ghi.then(async () => {
+      if (loiQuaTai) { for (const x of lo) x.loi(loiQuaTai); return }
       // Câu nhắc bảng isolate này đã thấy "chưa có" ⇒ đi riêng, song song với lô (đệm `BANG_VANG`); lô chỉ gồm câu còn lại.
-      const motMinh = (x: Cho) => x.st.all().then(x.xong, (e: unknown) => { ghiBangVang(e); x.loi(e) })
+      const motMinh = (x: Cho) => x.st.all().then(x.xong, (e: unknown) => { nhanLoi(e); ghiBangVang(e); x.loi(e) })
       const rieng = BANG_VANG.size ? lo.filter((x) => nhacBangVang(x.sql)) : []
       const chung = rieng.length ? lo.filter((x) => !rieng.includes(x)) : lo
       const chayRieng = rieng.map(motMinh)
@@ -151,15 +157,22 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
           for (let i = 0; i < chung.length; i++) chung[i].xong(rs[i])
         }
       } catch (e) {
-        // Bảng/cột phụ chưa có: lỗi một SELECT không làm mất những SELECT hợp lệ. Nhớ bảng chưa có (lô + từng câu) cho các lô sau.
-        ghiBangVang(e)
-        await Promise.all(chung.map(motMinh))
+        nhanLoi(e)
+        // CHỈ tách lô khi bảng/cột phụ thiếu. Quá tải/mất kết nối/lỗi khác:
+        // không nhân một lô lỗi thành hàng chục truy vấn gửi lại vào D1.
+        if (/no such (?:table|column):/i.test(e instanceof Error ? e.message : String(e)) && !loiQuaTai) {
+          ghiBangVang(e)
+          await Promise.all(chung.map(motMinh))
+        } else {
+          for (const x of chung) x.loi(e)
+        }
       }
       await Promise.all(chayRieng)
     })
     truoc = Promise.all([truoc, p]).then(() => undefined)
   }
   function doc(st: D1PreparedStatement, sql = ''): Promise<D1Result> {
+    if (loiQuaTai) return Promise.reject(loiQuaTai)
     return new Promise((xong, loi) => {
       ds.push({ st, xong, loi, sql })
       if (ds.length !== 1) return
