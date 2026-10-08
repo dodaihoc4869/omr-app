@@ -1,0 +1,27 @@
+name: Kiểm dữ liệu khôi phục chiến dịch riêng (chỉ đọc)
+on:
+  push:
+    branches: [codex/kiem-khoi-phuc-0810]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Chặn câu lệnh ghi
+        run: |
+          if grep -iqE '\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|TRUNCATE|PRAGMA)\b' scripts/kiem-khoi-phuc-0810.sql; then exit 1; fi
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc dữ liệu không có danh tính học sinh
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: npx -y wrangler@4 d1 execute omr --remote --json --file=../scripts/kiem-khoi-phuc-0810.sql
