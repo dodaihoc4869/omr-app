@@ -363,8 +363,8 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
             ) : (
               <>
                 <p className="lco-day-chu">{soChuaTraLoi > 0 ? `Còn ${soChuaTraLoi} câu chưa trả lời` : 'Em đã trả lời hết các câu'}</p>
-                <button type="button" className="m3-nut-chinh" disabled={soDaTraLoi === 0 || dangNop || choMayChu} onClick={() => void nop()}>
-                  {dangNop ? 'Đang nộp…' : choMayChu ? 'Đã lưu ở máy · đang chờ máy chủ' : soDaTraLoi === 0 || soDaTraLoi === dsChuaCham.length ? 'Nộp bài' : `Nộp ${soDaTraLoi} câu đã làm`}
+                <button type="button" className="m3-nut-chinh lco-nut-kiem-tra" disabled={soDaTraLoi === 0 || dangNop || choMayChu} onClick={() => void nop()}>
+                  {dangNop ? 'Đang nộp…' : choMayChu ? 'Đã lưu ở máy · đang chờ máy chủ' : soDaTraLoi === 0 || soDaTraLoi === dsChuaCham.length ? 'Kiểm tra' : `Kiểm tra ${soDaTraLoi} câu đã làm`}
                 </button>
               </>
             )}
