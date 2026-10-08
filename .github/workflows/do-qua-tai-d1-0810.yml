@@ -1,4 +1,4 @@
-name: Đo D1 khi app học sinh quá tải (chỉ đọc)
+name: Bổ sung bảng phụ và kiểm tra hồ sơ khi D1 quá tải
 on:
   push:
     branches: [codex/do-qua-tai-d1-0810]
@@ -21,6 +21,11 @@ jobs:
           T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Bổ sung bảng phụ trống nếu thiếu
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: node scripts/bo-sung-bang-bat-dau-0810.mjs
       - name: Đo chỉ đọc
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
