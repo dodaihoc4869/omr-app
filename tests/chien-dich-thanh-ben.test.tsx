@@ -34,23 +34,22 @@ describe('thanh bên theo cờ', () => {
     expect(screen.queryByText('Thêm…')).toBeNull()
   })
 
-  // ĐỔI CÓ CHỦ Ý 28/09 (bản vẽ thầy chốt docs/ban-ve-gv-2809/GV-ThanhBen): 5 mục + đáy Kho đề · Cài đặt; bỏ "Thêm…", "Lên bảng" → "Chữa trên lớp".
-  it('cờ BẬT ⇒ "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh + vạch + đáy Kho đề · Cài đặt; ẩn 4 màn cũ', () => {
+  // ĐỔI CÓ CHỦ Ý 08/10: Chiến dịch + Chữa trên lớp dùng chung một cửa Hành trình; phần cần chữa là màn con và vẫn tô sáng đúng mục cha.
+  it('cờ BẬT ⇒ một mục Hành trình giỏi Hóa gộp chiến dịch + chữa bài; đáy Kho đề · Cài đặt; ẩn 4 màn cũ', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     const { container } = render(<ThanhBenTrai />)
     expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()
     // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): "Gỡ nút thắt" hiện cả khi cờ Hóa 2 bật, ngay sau "Chữa trên lớp" (nhóm dạy học); đáy vẫn Kho đề · Cài đặt.
-    expect(tenMuc()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Chiến dịch luyện', 'Chữa trên lớp', 'Gỡ nút thắt', 'Học sinh', 'Kho đề', 'Cài đặt'])
+    expect(tenMuc()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Hành trình giỏi Hóa', 'Gỡ nút thắt', 'Học sinh', 'Kho đề', 'Cài đặt'])
     expect(container.querySelector('.ben-trai-vach[role="separator"]')).toBeTruthy()
     expect(screen.queryByText('Thêm…')).toBeNull()
     expect(container.textContent).not.toContain('10²³')
     expect(container.textContent).toContain('Đỗ Đại Học')
     expect(container.textContent).toContain('Giáo viên')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('aria-current')).toBe('page')
-    fireEvent.click(screen.getByRole('button', { name: 'Chữa trên lớp' }))
-    expect(useAppStore.getState().screen).toBe('goilenbang')
-    fireEvent.click(screen.getByRole('button', { name: 'Chiến dịch luyện' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Hành trình giỏi Hóa' }))
     expect(useAppStore.getState().screen).toBe('chiendich')
+    expect(mucDangSang('goilenbang', true)).toBe('chiendich')
     expect(MAN_AN_KHI_HOA2).toEqual(['examhub', 'giaobtvn', 'cauhoi', 'khodegiao'])
     expect(mucDangSang('toancanh', true)).toBe('hocsinh')
     expect(mucDangSang('exammonitor', true)).toBe('lichsuca')
