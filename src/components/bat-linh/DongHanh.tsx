@@ -3,17 +3,18 @@ import { Sparkles, Compass, Leaf } from 'lucide-react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 
 /** All pet identity and level come from the student's existing server state. */
-export default function DongHanh({ thu, xong = false, onMo }: {
+export default function DongHanh({ thu, xong = false, onMo, tenHanhTrinh }: {
   thu: { index: number; cap: number; ten: string } | null
   xong?: boolean
   onMo: () => void
+  tenHanhTrinh?: string
 }) {
   return (
     <section className="bl-dong-hanh" aria-label="Thần thú đồng hành">
       <div className="bl-dong-hanh__dau">
         <span className="bl-eyebrow"><Compass size={15} aria-hidden="true" /> BÁT LINH</span>
-        <h1>{xong ? 'Một ngày tiến bộ' : 'Đảo của em'}</h1>
-        <p>{xong ? 'Em đã hoàn thành kế hoạch hôm nay.' : 'Mỗi điều hiểu thêm, một bước trưởng thành.'}</p>
+        <h1>{xong ? 'Một ngày tiến bộ' : (tenHanhTrinh || 'Hành trình giỏi Hóa')}</h1>
+        <p>{xong ? 'Em đã hoàn thành kế hoạch hôm nay.' : 'Vững từng bước · Chinh phục từng bậc'}</p>
       </div>
       {thu ? (
         <button type="button" className="bl-ban-dong-hanh" onClick={onMo} aria-label={`Gặp ${thu.ten}, cấp ${thu.cap}`}>

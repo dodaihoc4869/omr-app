@@ -7,6 +7,7 @@ export type GiaoDien = 'sang' | 'toi' | 'may'
 export const KHOA_GIAO_DIEN = 'ddh.giaoDienThay'
 
 export function docGiaoDien(): GiaoDien {
+  if (typeof document !== 'undefined' && document.documentElement.dataset.phongCach === 'v2') return 'sang'
   try {
     const v = localStorage.getItem(KHOA_GIAO_DIEN)
     return v === 'sang' || v === 'toi' ? v : 'may'
@@ -65,13 +66,20 @@ function theoDoiCssMoi(): void {
       xuLyTatCa(hienTai)
     })
   }
-  new MutationObserver(lai).observe(document.head, { childList: true })
-  document.addEventListener('load', lai, true) // <link rel=stylesheet> nạp xong
+  // Chỉ quét lại khi CSS đổi. Ảnh thần thú và script tải xong không cần duyệt
+  // hàng nghìn CSSRule lần nữa trên điện thoại.
+  new MutationObserver((records) => {
+    if (records.some(r => r.target instanceof HTMLStyleElement || [...r.addedNodes].some(n => n instanceof Element && n.matches('style,link[rel="stylesheet"]')))) lai()
+  }).observe(document.head, { childList: true, subtree: true, characterData: true })
+  document.addEventListener('load', (e) => {
+    if (e.target instanceof HTMLLinkElement && e.target.rel === 'stylesheet') lai()
+  }, true)
 }
 
 /** Áp dụng lựa chọn: thuộc tính `data-giao-dien` + color-scheme trên <html> + viết lại điều kiện media. 'may' gỡ hết. */
 export function apDungGiaoDien(v: GiaoDien): void {
   const goc = document.documentElement
+  if (goc.dataset.phongCach === 'v2') v = 'sang'
   hienTai = v
   if (v === 'may') {
     goc.removeAttribute('data-giao-dien')

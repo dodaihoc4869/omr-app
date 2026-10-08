@@ -30,6 +30,7 @@ export default function ManHomNay({ v, hoc2, canhBao, onDaXem }: { v: ViewPhMoi;
       ) : (
         <div className="ph3-luoi">
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
+          <TienBoV2 pm={pm} />
           <AnhHung pm={pm} hoc2={hoc2} />
           {hoc2?.chienDich && <ChienDich cd={hoc2.chienDich} omni={hoc2.omni} />}
           <BaiTapCu pm={pm} />
@@ -48,6 +49,25 @@ export default function ManHomNay({ v, hoc2, canhBao, onDaXem }: { v: ViewPhMoi;
       )}
     </div>
   )
+}
+
+/** Chỉ vẽ các điểm đã công bố; không nội suy một dự báo điểm từ số câu làm. */
+function TienBoV2({ pm }: { pm: PhMoi }) {
+  const diem = [...(pm.tienBo?.diem ?? [])].filter((d) => Number.isFinite(d.diem) && d.diem >= 0 && d.diem <= 10)
+    .sort((a, b) => a.ngay.localeCompare(b.ngay)).slice(-7)
+  if (diem.length < 2) return null
+  const doi = diem.at(-1)!.diem - diem.at(-2)!.diem
+  const points = diem.map((d, i) => `${18 + i * 564 / (diem.length - 1)},${154 - d.diem * 13}`)
+  return <section className="ph3-the ph3-o-du v2-ph-tien-bo" aria-label="Tiến bộ qua các ca đã công bố">
+    <div className="v2-ph-tien-bo-dau"><span><BtLen co={24} /><b>Kết quả gần đây</b></span><strong data-giam={doi < 0}>{doi > 0 ? '+' : ''}{soVn(doi)} <small>điểm so với ca trước</small></strong></div>
+    <svg viewBox="0 0 600 180" role="img" aria-label={diem.map((d) => `${d.tenCa}: ${soVn(d.diem)} điểm`).join('; ')}>
+      {[0, 5, 10].map((v) => <line key={v} x1="18" x2="582" y1={154 - v * 13} y2={154 - v * 13} className="v2-ph-luoi" />)}
+      <polygon points={`18,166 ${points.join(' ')} 582,166`} className="v2-ph-mien" />
+      <polyline points={points.join(' ')} fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
+      {diem.map((d, i) => <g key={`${d.maCa}-${i}`}><circle cx={18 + i * 564 / (diem.length - 1)} cy={154 - d.diem * 13} r="5" fill="currentColor" /><title>{d.tenCa}: {soVn(d.diem)}</title></g>)}
+    </svg>
+    <div className="v2-ph-moc">{diem.map((d, i) => <span key={`${d.maCa}-${i}`}>{d.ngay.slice(5).split('-').reverse().join('/')}<b>{soVn(d.diem)}</b></span>)}</div>
+  </section>
 }
 
 function CanhBao({ cb, nay, onDaXem }: { cb: CanhBaoThay; nay: number; onDaXem: (id: string) => void }) {

@@ -46,6 +46,13 @@ import '../../src/game/than-thu-v2/dao/dao.css'
 import { CHU_CHAC_MA_SAI, chuDungNhungCham, chuTram } from '../../src/lib/omni-chu'
 import type { DaoKetQua, DaoProfile } from '../../src/game/than-thu-v2/dao/kieu'
 import { PH_OK } from '../../tests/_ph-moi/du-lieu-mau'
+import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
+import '../../src/styles/hanh-trinh-v2.css'
+import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
+import ManChuaCauSai from '../../src/components/chua-cau-sai/ManChuaCauSai'
+
+document.documentElement.dataset.phongCach = 'v2'
+apDungGiaoDien('sang')
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -186,7 +193,12 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
   if (u.pathname.endsWith('cau-hinh.json')) return tra({ mayChuMoi: 'https://may-chu-gia.example.com' })
   if (b.action === 'tenTheoSbd') return tra({ ok: true, sbd: '12121212', hoTen: 'Nguyễn Minh Khôi', lop: '12A1', tenCa: '' })
-  if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
+  if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra({ ...PH_OK, tienBo: { diem: [{ ngay: '2026-09-15', diem: 6.75, maCa: 'CA-1', tenCa: 'Ca trước' }, { ngay: '2026-09-19', diem: 7.5, maCa: 'CA-2', tenCa: 'Ca gần nhất' }], dangTienBoNhat: [] } })
+  if (u.pathname.includes('/hs/chua-cau-sai/')) {
+    if (u.pathname.endsWith('/nop-item')) return tra({ ok: true, dung: b.traLoi === '40', diemlech: 'Cộng đủ Na, O và H: 23 + 16 + 1.' })
+    if (u.pathname.endsWith('/xin-goi-y')) return tra({ ok: true, mucHoTro: 1, noiDungGoiY: 'Một đơn vị NaOH gồm một Na, một O và một H.' })
+    return tra({ ok: true, dotId: 'D-V2', trangThai: 'can_chan_doan', cauGoc: { phan: 'III', text: 'Tính khối lượng mol NaOH. Na = 23; O = 16; H = 1.' }, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 1 }, tienDoChiTiet: [{ buocId: 'm', tieuDe: 'Khối lượng mol', trangThai: 'chua_kiem' }], item: { id: 'I-V2', loai: 'chan_doan', tieuDe: 'Khối lượng mol', kieu: 'so', hoi: 'Tính khối lượng mol NaOH. Cho Na = 23; O = 16; H = 1.', luaChon: null, donVi: 'g/mol' } })
+  }
   if (u.pathname.endsWith('/ph/hoc-2')) return tra(HOC2_PH)
   if (u.pathname.endsWith('/ph/ke-hoach')) return tra({ ok: true, canhBao: [] })
   if (u.pathname.endsWith('/game-v2/hoa2-sanh')) return tra(man === 'sanh-cho' ? SANH_CHO : SANH)
@@ -235,6 +247,7 @@ function manSanh(du: Record<string, unknown>) {
 
 const con =
   man === 'ph' ? h(ParentPortalScreen)
+  : man === 'chua' ? h(ManChuaCauSai, { token: 'tk-gia', qid: 'Q', onVe: noop })
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'doan-tram' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 2, cap: 32, onDong: noop, onVeBangNhiemVu: noop } as never))
@@ -255,5 +268,5 @@ if (manThay) useAppStore.setState({ screen: manThay as never })
 createRoot(document.getElementById('root')!).render(
   manThay
     ? h('div', { className: 'min-h-screen m3 m3-thay vo-thay' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)))
-    : con,
+    : h(BatLinhShell, { vai: man === 'ph' ? 'ph' : 'hs', children: con }),
 )

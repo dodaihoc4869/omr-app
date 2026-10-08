@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ChevronRight, History, Search, Sparkles } from 'lucide-react'
+import { ChevronRight, History, Search, Sparkles, ShieldCheck, CircleAlert, TrendingUp, Clock3, GraduationCap } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import { danhSachThongKe, docBang, type BangChienDich, type ChienDichTom, type EmBang, type HangEm } from './api'
 import { KHOA_CHON_CHIEN_DICH } from './LenBangChienDich'
@@ -98,7 +98,7 @@ export default function HanhTrinhDashboard({ lanTai = 0 }: { lanTai?: number; on
       {hanhTrinh.length > 0 && <>
         <div className="htgv-toolbar">
           <div className="htgv-khoi" role="tablist" aria-label="Chọn khối">
-            {hanhTrinh.map((c) => <button key={c.id} type="button" role="tab" aria-selected={id === c.id} onClick={() => setId(c.id)}>Khối {khoiCua(c) || c.lop || '—'}</button>)}
+            {hanhTrinh.map((c) => <button key={c.id} type="button" role="tab" aria-selected={id === c.id} onClick={() => setId(c.id)}><GraduationCap size={21} aria-hidden="true" /><span>Khối {khoiCua(c) || c.lop || '—'}<small>{c.soEm} học sinh</small></span></button>)}
           </div>
           <div className="htgv-tabs" role="navigation" aria-label="Các phần của hành trình">
             <button type="button" onClick={() => setScreen('tongquan')}>Tổng quan</button>
@@ -109,16 +109,16 @@ export default function HanhTrinhDashboard({ lanTai = 0 }: { lanTai?: number; on
         </div>
 
         <div className="htgv-kpi" aria-label="Tóm tắt hành trình">
-          <div data-tone="xanh"><span>Đúng nhịp hôm nay</span><b>{dungNhip}<small>/{bang?.em.length ?? chon?.soEm ?? 0} em</small></b></div>
-          <div data-tone="do"><span>Cần gỡ lỗi</span><b>{canGo}<small>em</small></b></div>
-          <div data-tone="tim"><span>Sẵn sàng nâng bậc</span><b>{sanSang}<small>em</small></b></div>
-          <div data-tone="phut"><span>Thời lượng mỗi ngày</span><b>Cá nhân<small>tự tính theo từng em</small></b></div>
+          <div data-tone="xanh"><ShieldCheck aria-hidden="true" /><span>Đúng nhịp</span><b>{dangTaiBang ? '—' : dungNhip}<small>/{bang?.em.length ?? chon?.soEm ?? 0} em</small></b></div>
+          <div data-tone="do"><CircleAlert aria-hidden="true" /><span>Cần gỡ lỗi</span><b>{dangTaiBang ? '—' : canGo}<small>em</small></b></div>
+          <div data-tone="tim"><TrendingUp aria-hidden="true" /><span>Sẵn sàng nâng bậc</span><b>{dangTaiBang ? '—' : sanSang}<small>em</small></b></div>
+          <div data-tone="phut"><Clock3 aria-hidden="true" /><span>Thời lượng mỗi ngày</span><b>Cá nhân<small>theo nhịp học của em</small></b></div>
         </div>
 
         <div className="htgv-grid">
           <section className="htgv-panel htgv-panel--em" aria-labelledby="htgv-em">
             <div className="htgv-panel-head">
-              <div><h2 id="htgv-em">Kế hoạch riêng hôm nay</h2><p>Máy tự cân câu, độ khó và vòng sửa sai cho từng em.</p></div>
+              <div><h2 id="htgv-em">Nhịp học hôm nay</h2></div>
               <label className="htgv-search"><Search size={17} aria-hidden="true" /><span className="cd-an-chu">Tìm học sinh</span><input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm học sinh…" /></label>
             </div>
             <div className="htgv-students" role="region" aria-label="Kế hoạch của từng học sinh" tabIndex={0}>

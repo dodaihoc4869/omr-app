@@ -207,7 +207,7 @@ export default function DayHocLenBang() {
     <div className="dh-trang" data-khoi="day-hoc-len-bang">
       <header className="dh-dau">
         <h1>Dạy học</h1>
-        <p>Điểm danh lấy danh sách em học hôm nay → chọn câu trong kho Dạy học → chiếu lên máy chiếu. App gọi em có mặt có khả năng làm đúng câu cao nhất.</p>
+        <p>Điểm danh · Chọn bài · Lên bảng</p>
         <DongChoBaiMoi bhn={bhn} />
       </header>
 
@@ -221,7 +221,7 @@ export default function DayHocLenBang() {
           </span>
           <div className="dh-buoc-ten">
             <h2 id="dh-b2">Chọn câu</h2>
-            <p>Chỉ cây thư mục Dạy học của Ngân hàng câu hỏi. Câu tự luận cũng chiếu đủ.</p>
+            <p>Kho Dạy học</p>
           </div>
           <button
             type="button"
@@ -236,7 +236,7 @@ export default function DayHocLenBang() {
           </button>
         </div>
         {maChon.size === 0 ? (
-          <p className="dh-phu">Chưa chọn bài nào. Tích tờ / bài trong cây Dạy học, rồi bỏ bớt từng câu ở danh sách hiện ra.</p>
+          <p className="dh-phu">Chọn bài để xem câu hỏi.</p>
         ) : !kho ? (
           <p className="dh-phu" aria-busy="true">
             Đang đọc kho đề…

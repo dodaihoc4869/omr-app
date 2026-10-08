@@ -1054,7 +1054,7 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
             <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} ngang thu={p.thu} them={<NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />} />
           ) : (
             <>
-              <DongHanh thu={chonThu ? null : p.thu} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
+              <DongHanh thu={chonThu ? null : p.thu} tenHanhTrinh={s?.chienDich?.ten} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
               <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><BanDoHanhTrinh s={s} /></div></details>
             </>
           )}
@@ -1123,10 +1123,15 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
       <div className="h2-fx" aria-hidden="true" />
       <div className="h2-khung">
         <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} onDoiTen={chonThu ? undefined : p.onDoiTen} />
-        <DongHanh thu={chonThu ? null : p.thu} xong={!!s && s.theLuc.tong > 0 && s.theLuc.con === 0} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
+        <DongHanh thu={chonThu ? null : p.thu} tenHanhTrinh={s?.chienDich?.ten} xong={!!s && s.theLuc.tong > 0 && s.theLuc.con === 0} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
         <div className="h2-dem" aria-hidden="true" />
         <section className="h2-tam" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
-          <div className="bl-ke-hoach"><span className="bl-eyebrow">TỪNG BƯỚC TIẾN BỘ</span><h2>Hành trình hôm nay</h2></div>
+          <div className="bl-ke-hoach"><h2>Hôm nay</h2>{s && <span className="v2-tien-do-ngay">{s.theLuc.tong - s.theLuc.con}/{s.theLuc.tong} câu</span>}</div>
+          {s && s.theLuc.tong > 0 && <div className="v2-chang-ngay" aria-label="Các chặng hôm nay">
+            <div data-xong={s.doan.con === 0}><i>1</i><b>Ôn lại</b><span>{s.doan.con > 0 ? `${s.doan.con} câu còn lại` : 'Đã xong'}</span></div>
+            <div data-xong={s.dao.con === 0}><i>2</i><b>Khám phá</b><span>{s.dao.con > 0 ? `${s.dao.con} câu còn lại` : 'Đã xong'}</span></div>
+            <div data-khoa={!s.thuSucThem?.duoc}><i>3</i><b>Nâng bậc</b><span>{s.thuSucThem?.duoc ? `${s.thuSucThem.soCau} câu tự chọn` : 'Khi đủ điều kiện'}</span></div>
+          </div>}
           {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}
           <TheCaGanNhatSanh p={p} />
           {s ? (

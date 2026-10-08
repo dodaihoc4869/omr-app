@@ -48,14 +48,14 @@ export function ThanhTren({ mocMs, nowMs, moPhong, matKetNoiLuc = null, sucKhoe 
             TRỰC TIẾP
           </span>
         )}
-        <div className="bts-doi-mau" role="group" aria-label="Giao diện màu">
+        {document.documentElement.dataset.phongCach !== 'v2' && <div className="bts-doi-mau" role="group" aria-label="Giao diện màu">
           <button type="button" aria-pressed={!toi} onClick={() => datGiaoDien('sang')}>
             Sáng
           </button>
           <button type="button" aria-pressed={toi} onClick={() => datGiaoDien('toi')}>
             Tối
           </button>
-        </div>
+        </div>}
       </div>
     </header>
   )

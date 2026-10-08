@@ -466,7 +466,7 @@ export default function ManChuaCauSai({
                     <p>
                       Hẹn em:{' '}
                       {ph?.denHan
-                        ? new Date(ph.denHan).toLocaleString('vi-VN')
+                        ? new Date(ph.denHan).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false })
                         : 'sau ít nhất 24 giờ'}
                       .
                     </p>

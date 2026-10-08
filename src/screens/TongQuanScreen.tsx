@@ -163,7 +163,7 @@ export default function TongQuanScreen() {
           </button>
           <button type="button" className="gv2-nut-chinh" onClick={() => setScreen('chiendich')}>
             <Flag size={18} aria-hidden="true" />
-            Giao chiến dịch
+            Mở hành trình
           </button>
         </div>
       </header>
@@ -203,14 +203,14 @@ export default function TongQuanScreen() {
               <section className="gv2-the" aria-labelledby="tq-cd">
                 <div className="gv2-the-dau">
                   <h2 id="tq-cd" className="gv2-the-tieu-de">
-                    Chiến dịch luyện đang chạy
+                    Hành trình đang học
                   </h2>
                   <button type="button" className="gv2-nut-chu" onClick={() => setScreen('chiendich')}>
                     Xem tất cả <ChevronRight size={16} aria-hidden="true" />
                   </button>
                 </div>
                 {dong.length === 0 ? (
-                  <p className="gv2-nhat">{du.loiCd ? 'Chưa đọc được danh sách chiến dịch.' : 'Chưa có chiến dịch nào đang chạy. Giao chiến dịch ở mục Chiến dịch luyện.'}</p>
+                  <p className="gv2-nhat">{du.loiCd ? 'Chưa tải được hành trình.' : 'Bổ sung bài để bắt đầu hành trình.'}</p>
                 ) : (
                   <ul className="gvm-cd-ds" tabIndex={0} aria-label={`Chiến dịch luyện đang chạy · ${dong.length} chiến dịch, kéo để xem thêm`}>
                     {dong.map((d) => (
@@ -248,9 +248,15 @@ export default function TongQuanScreen() {
                           )}
                         </div>
                         <div>
-                          <div className="gvm-nho">Hạn nộp</div>
-                          <div className="gv2-dam">{chuHan(d.cd.hanNop, ngayVn(now))}</div>
-                          <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
+                          {d.cd.hanhTrinh || d.cd.id.startsWith('hanh-trinh-gioi-hoa-khoi-') || /^Hành trình giỏi Hóa/i.test(d.cd.ten) ? <>
+                            <div className="gvm-nho">Kế hoạch</div>
+                            <div className="gv2-dam">Theo ngày</div>
+                            <div className="gv2-phu">Không hạn nộp</div>
+                          </> : <>
+                            <div className="gvm-nho">Hạn nộp</div>
+                            <div className="gv2-dam">{chuHan(d.cd.hanNop, ngayVn(now))}</div>
+                            <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
+                          </>}
                         </div>
                       </li>
                     ))}
