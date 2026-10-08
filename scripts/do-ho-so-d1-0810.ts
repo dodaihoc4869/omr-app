@@ -25,7 +25,7 @@ let total = 0, stop = false, blocked = 0
 let fence: Promise<unknown> = Promise.resolve()
 type Stmt = { sql: string; params: unknown[] }
 async function read(ds: Stmt[]) {
-  if (stop || total + ds.length > 100 || Date.now() - start > 65000) throw new Error('STOP_PROBE')
+  if (stop || total + ds.length > 100 || Date.now() - start > 90000) throw new Error('STOP_PROBE')
   for (const st of ds) if (!/^\s*SELECT\b/i.test(st.sql) || /;\s*\S/.test(st.sql)) {
     blocked++
     console.log('blocked_non_select')
@@ -33,24 +33,29 @@ async function read(ds: Stmt[]) {
   }
   total += ds.length
   const before = Date.now()
-  const sql = ds.map(st => noiThamSo(st.sql, st.params).replace(/;\s*$/, '')).join(';\n')
-  const response = await fetch(root, { method: 'POST', headers: { authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql }), signal: AbortSignal.timeout(20000) })
+  // REST không có hợp đồng batch giống binding Worker. Gửi lần lượt đúng SQL
+  // và params, không nội suy mảng qid lớn làm vượt giới hạn chiều dài SQL.
+  const results: any[] = []
+  for (const st of ds) {
+  const response = await fetch(root, { method: 'POST', headers: { authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql: st.sql, params: st.params }), signal: AbortSignal.timeout(20000) })
   const data = await response.json() as any
   if (!response.ok || !data.success) {
     const message = (data.errors ?? []).map((x: any) => String(x.message ?? '')).join(' ')
     const schema = /no such (?:table|column):\s*(?:main\.)?[A-Za-z_][A-Za-z_0-9.]*/i.exec(message)?.[0]
     const overloaded = /overloaded|requests queued for too long|too many requests|SQLITE_BUSY/i.test(message)
     stop = !schema
-    console.log('probe_error', JSON.stringify({status: response.status, codes: data.errors?.map((x: any) => x.code), schema, overloaded}))
+    console.log('probe_error', JSON.stringify({status: response.status, codes: data.errors?.map((x: any) => x.code), schema, overloaded, category: /SQL statement too long|too many SQL variables|malformed JSON|syntax error|no such index|too big|too long/i.exec(message)?.[0]}))
     throw new Error(schema ?? (overloaded ? 'D1 DB is overloaded' : 'STOP_PROBE'))
+  }
+  results.push(data.result[0])
   }
   for (let i = 0; i < ds.length; i++) console.log('query', JSON.stringify({
     fingerprint: createHash('sha256').update(ds[i].sql).digest('hex').slice(0, 12),
     tables: [...new Set([...ds[i].sql.matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_]\w*)/gi)].map(x => x[1]))],
-    ms: data.result[i]?.meta?.duration, rowsRead: data.result[i]?.meta?.rows_read,
-    rows: data.result[i]?.results?.length, batchHttpMs: Date.now() - before, batchSize: ds.length,
+    ms: results[i]?.meta?.duration, rowsRead: results[i]?.meta?.rows_read,
+    rows: results[i]?.results?.length, batchHttpMs: Date.now() - before, batchSize: ds.length,
   }))
-  return data.result
+  return results
 }
 function send(ds: Stmt[]) {
   const p = fence.then(() => read(ds))
