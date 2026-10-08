@@ -53,6 +53,11 @@ describe('áp chính sách mới lên chiến dịch đang chạy', () => {
     const muc = new Map(hs.cau.map((c) => [c.qid, c.mucDo]))
     expect(kh.tong).toBe(24)
     expect([...kh.dao, ...kh.doan].every((k) => ['NB', 'TH'].includes(muc.get(qidGoc(k)) ?? ''))).toBe(true)
+    const demTh = [...kh.dao, ...kh.doan].filter((k) => muc.get(qidGoc(k)) === 'TH').length
+    const sucChuaNb = hs.cau.filter((c) => c.mucDo === 'NB').length
+    expect(demTh).toBeGreaterThan(0)
+    // Kho sau cổng khối có thể thiếu NB: giữ đủ tổng 24 quan trọng hơn, chỉ vượt 20% đúng phần bất khả kháng.
+    expect(demTh).toBeLessThanOrEqual(Math.max(Math.ceil(kh.tong * .2), kh.tong - sucChuaNb))
   })
 
   it('em đã làm một câu: giữ nguyên kế hoạch 30 câu hôm nay, chính sách mới áp từ kế hoạch kế tiếp', async () => {

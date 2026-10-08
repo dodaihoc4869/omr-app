@@ -11,6 +11,10 @@
 // trọng số câu (`trongSoCau`), dạng đã vững (`dangVung`), ôn bài cũ (`onBaiCu`, `tiLeOnBaiCu`), chế độ chờ bài mới (`cheDoCho`). Vắng mọi trường mới ⇒ JSON
 // kế hoạch Y HỆT bản trước (khoá bằng tests/omni-3-ke-hoach-chot-cu.test.ts, 30 kịch bản).
 import { THAM_SO_OMNI } from './omni-kieu'
+import {
+  PHAN_BO_BAC, xepCauMoiTheoZpd,
+  type BacCauChienDich, type HoSoZpdDang,
+} from '../../src/lib/phan-bo-theo-bac'
 
 export type Phan = 'I' | 'II' | 'III'
 
@@ -245,6 +249,10 @@ export interface TuyChonKeHoach {
    * để khép kín siêu vòng lặp. Vắng ⇒ giữ nguyên hợp đồng cũ.
    */
   phanBoTheoHoSo?: boolean
+  /** ZPD 08/10: hồ sơ đủ sâu theo dạng để đổi MIX câu mới; không đổi tổng quota, câu ôn/nợ không đi qua đây. */
+  hoSoZpdTheoDang?: Readonly<Record<string, HoSoZpdDang>>
+  /** 0 = thuần ZPD · 1 = đúng phân bố nền của kho. Mặc định luyện chiến dịch = 0,35. */
+  alphaZpd?: number
   /**
    * RẢI ĐỀU CÂU MỚI THEO NGÀY (thầy chốt 30/09): bật ⇒ số câu MỚI mỗi ngày dừng đúng quota `ceil(số mới còn / (D − NGAY_DEM))`, KHÔNG đổ thêm câu mới
    * cho đủ thể lực; lượt dư dồn cho nợ / củng cố / duy trì (tỉ lệ cũ), đủ quota câu mới thì nợ tới lịch lấp nốt lượt dư (vượt trần 50 %), vẫn dư thì thôi. VẮNG ⇒ TẮT = hành vi cũ (đổ câu mới cho đầy thể lực);
@@ -450,7 +458,36 @@ export function tinhHangTheoDang(thongKe: ReadonlyMap<string, ThongKeDang>, dang
 }
 
 /** Một dòng hồ sơ dạng (`nam_kt_dang`): `soGap` câu đã gặp, `soSai` câu từng sai; `capNhatLuc` = lúc dựng hồ sơ (ISO). */
-export interface HoSoDangTho { maDang: string; soGap: number; soSai: number; capNhatLuc: string | null }
+export interface HoSoDangTho {
+  maDang: string
+  soGap: number
+  soSai: number
+  soDaKhacPhuc?: number
+  soChuaThaySai?: number
+  bac?: number
+  capNhatLuc: string | null
+}
+
+/** Hồ sơ ZPD theo dạng: bậc lấy từ hạng đang dùng trong chiến dịch; độ khắc phục lấy từ hồ sơ nắm kiến thức thật. */
+export function hoSoZpdTu(
+  hoSo: readonly HoSoDangTho[],
+  hangTheoDang: Readonly<Record<string, HangEm>>,
+  hangChung: HangEm,
+): Record<string, HoSoZpdDang> {
+  const ra: Record<string, HoSoZpdDang> = {}
+  for (const d of hoSo) {
+    if (!d.maDang || d.maDang.startsWith('CD:')) continue
+    const gap = Math.max(0, Number(d.soGap) || 0)
+    const da = Math.max(0, Number(d.soDaKhacPhuc) || 0)
+    const chuaSai = Math.max(0, Number(d.soChuaThaySai) || 0)
+    ra[d.maDang] = {
+      bacDich: BAC_HANG_EM[hangTheoDang[d.maDang] ?? hangChung] as BacCauChienDich,
+      soGap: gap,
+      tiLeKhacPhuc: gap >= PHAN_BO_BAC.SO_CAU_DU_TIN ? Math.min(1, (da + chuaSai) / gap) : null,
+    }
+  }
+  return ra
+}
 
 /**
  * Gộp thống kê theo dạng để XẾP HẠNG: hồ sơ `nam_kt_dang` (đúng = gặp − sai) + lần làm TRONG chiến dịch (sau lúc giao,
@@ -824,14 +861,23 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     chonOnBaiCu = xep.slice(0, cho ? Math.max(0, conDu) : Math.min(Math.max(0, conDu), Math.floor(tran * tiLe)))
     conDu -= chonOnBaiCu.length
   }
-  // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang` (và không có trọng số OMNI); số câu mới/ngày giữ nguyên quota.
+  // Bốc câu mới cá nhân hoá: ZPD đổi SỐ LƯỢNG theo mức trong đúng quota; thiếu hồ sơ thì giữ bộ xếp 28/09.
   const chonMoi: CauSrs[] = []
   nhom.forEach((g, i) => {
     const ds = moiXep[i]!
-    const thuTuMoi = tc.hangTheoDang && !tc.trongSoCau
-      ? bocCauMoiCaNhan(ds, layMoi[i]!, g.D > NGAY_DEM ? g.D - NGAY_DEM : 1, hangCua, nhieu ? cauChienDich.filter((c) => nhomCua(c) === i) : cauChienDich)
-      : ds
-    chonMoi.push(...thuTuMoi.slice(0, layMoi[i]! + themMoi[i]!))
+    const soCan = layMoi[i]! + themMoi[i]!
+    let thuTuMoi: CauSrs[] = ds
+    if (!tc.trongSoCau && tc.hoSoZpdTheoDang) {
+      thuTuMoi = xepCauMoiTheoZpd(
+        ds.map((c) => ({ ...c, bac: mucCaNhan(c.mucDo) as BacCauChienDich })),
+        soCan,
+        tc.hoSoZpdTheoDang,
+        tc.alphaZpd,
+      ).thuTu
+    } else if (tc.hangTheoDang && !tc.trongSoCau) {
+      thuTuMoi = bocCauMoiCaNhan(ds, layMoi[i]!, g.D > NGAY_DEM ? g.D - NGAY_DEM : 1, hangCua, nhieu ? cauChienDich.filter((c) => nhomCua(c) === i) : cauChienDich)
+    }
+    chonMoi.push(...thuTuMoi.slice(0, soCan))
   })
   const chonOn = [...no.slice(0, layNo + themNo), ...cungCo.slice(0, layCungCo), ...duyTri.slice(0, layDuyTri)]
   // Ôn bài cũ: câu chưa gặp đi với câu mới (Đảo); câu đã gặp đi như câu ôn (Phần II ⇒ Đảo, còn lại ⇒ Đoàn).

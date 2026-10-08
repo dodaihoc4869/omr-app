@@ -20,7 +20,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import {
   lapKeHoachNgay, laNo, nhanNo, khoiLuongCan, TRAN_NGAY, type NguonNhan, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   coLoThuSucThem, congNgay,
-  gopThongKeDang, tinhHangTheoDang, soNgayGiua, HANG_MUC_DO, NGAY_DEM, phanLoaiDanXen, bacThuThachTiepTheo, mucCaNhan, TEN_BAC_MUC_DO,
+  gopThongKeDang, tinhHangTheoDang, hoSoZpdTu, soNgayGiua, HANG_MUC_DO, NGAY_DEM, phanLoaiDanXen, bacThuThachTiepTheo, mucCaNhan, TEN_BAC_MUC_DO,
   type CauSrs, type HangEm, type TuyChonKeHoach, type HoSoDangTho, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -1004,12 +1004,16 @@ export async function docHoSoDangCaLop(env: Env, dsSbd: readonly string[]): Prom
   const ra = new Map<string, HoSoDangTho[]>()
   if (!dsSbd.length) return ra
   const arr = JSON.stringify([...new Set(dsSbd)])
-  const r = await env.DB.prepare("SELECT sbd, ma_dang, so_gap, so_sai, cap_nhat_luc FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?)) AND ma_dang NOT LIKE 'CD:%'").bind(arr).all<Row>()
+  const r = await env.DB.prepare("SELECT sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_chua_thay_sai, bac, cap_nhat_luc FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?)) AND ma_dang NOT LIKE 'CD:%'").bind(arr).all<Row>()
     .catch(() => env.DB.prepare("SELECT sbd, ma_dang, so_gap, so_sai FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?)) AND ma_dang NOT LIKE 'CD:%'").bind(arr).all<Row>())
     .catch(() => ({ results: [] as Row[] }))
   for (const x of r.results ?? []) {
     const k = str(x.sbd)
-    ra.set(k, [...(ra.get(k) ?? []), { maDang: str(x.ma_dang), soGap: Number(x.so_gap) || 0, soSai: Number(x.so_sai) || 0, capNhatLuc: x.cap_nhat_luc == null ? null : str(x.cap_nhat_luc) }])
+    ra.set(k, [...(ra.get(k) ?? []), {
+      maDang: str(x.ma_dang), soGap: Number(x.so_gap) || 0, soSai: Number(x.so_sai) || 0,
+      soDaKhacPhuc: Number(x.so_da_khac_phuc) || 0, soChuaThaySai: Number(x.so_chua_thay_sai) || 0,
+      bac: Number(x.bac) || 0, capNhatLuc: x.cap_nhat_luc == null ? null : str(x.cap_nhat_luc),
+    }])
   }
   return ra
 }
@@ -1024,16 +1028,21 @@ export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly La
 }
 
 /** Hạng theo dạng của em cho kế hoạch hôm nay (không chiến dịch ⇒ chỉ từ hồ sơ dạng). */
-export async function docHangEm(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: Promise<Map<string, HoSoDangTho[]>>): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm } | null> {
+export async function docHangEm(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: Promise<Map<string, HoSoDangTho[]>>): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm; hoSoZpdTheoDang: Record<string, import('../../src/lib/phan-bo-theo-bac').HoSoZpdDang> } | null> {
   const cd = hs.chienDich
   // `hoSoDangSom` (tối ưu 05/10): nơi lập kế hoạch đã bắt đầu đọc hồ sơ dạng sớm (song song lượt đọc thứ hai của hồ sơ) ⇒ dùng lại, không đọc lần nữa.
   const hoSoDang = (await (hoSoDangSom ?? docHoSoDangCaLop(env, [sbd]))).get(sbd) ?? []
   // Không chiến dịch (Sổ nợ 29/09): vẫn cần hạng CHUNG để đan xen câu nợ theo sức em — chỉ từ hồ sơ dạng.
-  if (!cd) return hangTuHoSo(hoSoDang, [], hs.meta, [], '')
+  if (!cd) {
+    const hang = hangTuHoSo(hoSoDang, [], hs.meta, [], '')
+    return { ...hang, hoSoZpdTheoDang: hoSoZpdTu(hoSoDang, hang.hangTheoDang, hang.hangChung) }
+  }
   // OMNI 3 — nhiều bài song song: dạng của MỌI bài đang chạy; lần làm đã lọc theo mốc từng bài (`lanLamChienDich`), cận dưới = mốc sớm nhất.
   const ds = hs.chienDichHet && hs.chienDichHet.length > 1 ? hs.chienDichHet : null
-  if (ds) return hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, [...new Set(ds.flatMap((c) => c.qids))], ds.reduce((m, c) => (c.mocBatDau < m ? c.mocBatDau : m), ds[0]!.mocBatDau))
-  return hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.mocBatDau)
+  const hang = ds
+    ? hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, [...new Set(ds.flatMap((c) => c.qids))], ds.reduce((m, c) => (c.mocBatDau < m ? c.mocBatDau : m), ds[0]!.mocBatDau))
+    : hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.mocBatDau)
+  return { ...hang, hoSoZpdTheoDang: hoSoZpdTu(hoSoDang, hang.hangTheoDang, hang.hangChung) }
 }
 
 // ---------------------------------------------------------------- kế hoạch ngày (chốt một lần)

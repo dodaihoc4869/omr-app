@@ -95,6 +95,22 @@ describe('phần bắt buộc cá nhân hoá', () => {
     expect([...kh.dao, ...kh.doan]).toContain(qid)
     expect([...kh.dao, ...kh.doan].filter((q) => q !== qid).map((q) => cau.find((c) => c.qid === q)!).every((c) => mucCaNhan(c.mucDo) <= 1)).toBe(true)
   })
+
+  it('ZPD đổi thật mix câu mới trong quota, giữ tổng và chặn thử thách T+1 ở 20%', () => {
+    const { cau, tt } = khoMoi(30)
+    const kh = lapKeHoachNgay(cau, tt, {
+      homNay: HOM_NAY, hanNop: HAN, tranNgay: 40, tranHuyetChien: 40, raiDeu: false,
+      ...hang('L2'),
+      hoSoZpdTheoDang: { D1: { bacDich: 1, tiLeKhacPhuc: .8, soGap: 10 } },
+      alphaZpd: .35,
+    })
+    const theo = new Map(cau.map((c) => [c.qid, c]))
+    const ds = [...kh.dao, ...kh.doan].map((q) => theo.get(q)!)
+    expect(ds).toHaveLength(30) // L2 = 75% trần 40
+    expect(ds.every((c) => mucCaNhan(c.mucDo) <= 2)).toBe(true)
+    expect(ds.filter((c) => mucCaNhan(c.mucDo) === 2).length).toBeLessThanOrEqual(Math.ceil(ds.length * .2))
+    expect(ds.filter((c) => mucCaNhan(c.mucDo) === 1).length).toBeGreaterThan(ds.filter((c) => mucCaNhan(c.mucDo) === 0).length)
+  })
 })
 
 describe('thẻ nâng bậc sau khi hoàn thành', () => {
