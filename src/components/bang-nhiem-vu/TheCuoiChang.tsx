@@ -139,10 +139,10 @@ export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangVie
 
       <footer className="tcc-day">
         <button ref={nutChinh} type="button" className="tcc-nut" onClick={veBang}>
-          Về Bảng nhiệm vụ
+          Về hôm nay
         </button>
         <button type="button" className="tcc-nut tcc-nut--dich" onClick={dong}>
-          Xem kết quả chặng
+          Thử thêm +1 bậc
         </button>
       </footer>
     </div>
