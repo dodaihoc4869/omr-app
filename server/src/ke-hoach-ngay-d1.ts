@@ -261,9 +261,11 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // Phục vụ được: `game_v2_index` có chỉ mục chưa (1 dòng) + đề đang bảo vệ (`ca`) — MỘT LẦN cho cả lượt (dưới còn 1-2 chỗ khác cần dùng lại, xem `coChiMuc`/`baoVe`).
   const pCoChiMuc = chan(tat(() => env.DB.prepare('SELECT 1 AS x FROM game_v2_index LIMIT 1').first(), null).then(Boolean))
   const pBaoVe = chan(baoVeMotLuot(env))
+  // Tối ưu 08/10: docMocHienThi khởi chạy SONG SONG với các lời hứa khác — tiết kiệm 1 round-trip D1 nối tiếp trước khi docTongHop bắt đầu.
+  const pMoc = bo.tongHop !== undefined ? null : chan(docMocHienThi(env))
   const pTongHop = bo.tongHop !== undefined
     ? Promise.resolve(bo.tongHop)
-    : chan((async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await docMocHienThi(env), now), ngay30, new Date(now).toISOString()) } catch { return null } })())
+    : chan((async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await pMoc!, now), ngay30, new Date(now).toISOString()) } catch { return null } })())
   const pRh = chan(tat(() => env.DB.prepare(`SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ngay >= ? ORDER BY ngay DESC`).bind(arr, homNay, ngayLs).all<Record<string, unknown>>(), trong()))
   const pRp = chan(tat(() => env.DB.prepare(`SELECT sbd, minutes FROM study_preferences WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong()))
   const pRk = chan(tat(() => env.DB.prepare(`SELECT sbd, id, dang FROM game_v2_task WHERE ${IN_EM} AND completed_at IS NULL`).bind(arr).all<Record<string, unknown>>(), trong()))

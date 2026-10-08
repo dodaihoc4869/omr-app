@@ -219,16 +219,16 @@ export async function cauTuKhoTheoQid(
 ): Promise<CauChamBai[]> {
   const can = new Set(qids.filter((q) => /-(III|II|I)-\d+$/.test(q)))
   const goc = [...new Set([...can].map(gocTuQid))]
-  const ra: CauChamBai[] = []
-  for (const g of goc) {
-    try {
-      ra.push(...cauTuKho(await docKho(g)).filter((c) => can.has(c.qid)))
-    } catch (e) {
+  // Tối ưu 08/10: đọc nhiều tờ kho R2 SONG SONG thay vì nối tiếp.
+  const ketQua = await Promise.all(goc.map(async (g) => {
+    try { return cauTuKho(await docKho(g)).filter((c) => can.has(c.qid)) }
+    catch (e) {
       if (e instanceof HetLuotDoc) throw e
       console.warn('[su-kien-hoc] không đọc được tờ kho', g, e instanceof Error ? e.message : e)
+      return [] as CauChamBai[]
     }
-  }
-  return ra
+  }))
+  return ketQua.flat()
 }
 
 /**

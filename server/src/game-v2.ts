@@ -93,7 +93,8 @@ function visible(p:Profile,hapThuInfo?:{tran:number;lyDo?:string|null;soCauHomNa
   // EXP tràn hôm nay (`tranHomNay`: exp, vàng, mảnh đã đổi). `ngayMoCap10` giữ cho máy em cũ (= mốc ngày của cấp kế tiếp).
   const soNgayCap=Math.max(0,expMoi?.ngayDat??0)+Math.max(0,expMoi?.ngayNghi??0),capSau=Math.min(120,Math.max(1,p.cap)+1),tranHomNay=tranV5&&tranV5.ngay===homNay?{exp:tranV5.exp,vang:tranV5.vang,manh:tranV5.manh}:{exp:0,vang:0,manh:0}
   return {...rest,ongNghiem:v4?0:p.wallet,...(v4?{choMoc:p.choMoc??0,ngayMoCap10:BANG_NGAY_CAP[capSau]??0,ngayCapSau:BANG_NGAY_CAP[capSau]??0,soNgayCap,choNgay:dangChoNgayV5(p.cap,p.exp,soNgayCap)?ngayConThieuLenCap(p.cap,soNgayCap):0,tranHomNay,expMoiVang:EXP_MOI_VANG}:{hapThuHomNay:{da:p.hapThu&&p.hapThu.ngay===homNay?p.hapThu.da:0,tran:hapThuInfo?.tran??null,lyDo:hapThuInfo?.lyDo??null,...(hapThuInfo?.soCauHomNay!==undefined?{soCauHomNay:hapThuInfo.soCauHomNay,canCau:hapThuInfo.canCau}:{})}}),expGameHomNay:{da:daExpGameHomNay(p,homNay),tran:null},khienConLai:khienConLai(p),soNgayDat:expMoi?.ngayDat??0,renKhien:{gia:VANG_REN_KHIEN,duTru:0,manh:MANH_REN_KHIEN,donVi:'vang',ngayCan:ngayDatKhien((p.khienRen?.daRen??0)+1)},ngayMoKhienQua:NGAY_DAT_MO_KHIEN_QUA,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
-async function attempts(env:Env,sbd:string){const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE sbd=? ORDER BY created_at DESC LIMIT 3000').bind(sbd).all<{json:string}>();return r.results.map(x=>(JSON.parse(x.json) as {attempt:Attempt}).attempt).reverse()}
+// Tối ưu 08/10: giới hạn 90 ngày gần nhất (FSRS không cần lịch sử xa hơn) — giảm từ 3000 dòng → vài chục trong thực tế.
+async function attempts(env:Env,sbd:string){const since=new Date(Date.now()-90*24*60*60*1000).toISOString();const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE sbd=? AND created_at>=? ORDER BY created_at DESC LIMIT 500').bind(sbd,since).all<{json:string}>();return r.results.map(x=>(JSON.parse(x.json) as {attempt:Attempt}).attempt).reverse()}
 /** Câu của lượt theo (ma_de, qid, version). Chỉ mục lệch nguồn ⇒ `docCauTheoRef` tự đồng bộ đúng tờ đó rồi tra lại (29/09); version tất định nên câu
  *  không đổi vẫn chấm được và lời giải là bản mới nhất. Câu thật sự đổi đề/đáp án hoặc bị rút ⇒ lỗi mã `cau_doi` (máy em bỏ qua câu / mở lượt mới). */
 async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string},rowSom?:Promise<{json:string}|null>|null){
@@ -215,29 +216,33 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
  * Câu trùng nội dung hôm nay, bài chưa nộp, câu bảo vệ và câu vượt sức đều bị chặn. */
 async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<string,unknown>>{
   const tNow=Date.now(),ngay=academicDay(now())
-  const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
-  const scope=await readScope(env,sbd)
+  // Tối ưu 08/10: readGameScope, readScope, demCauTrongNgay độc lập → SONG SONG.
   const dayStart=new Date(ngay+'T00:00:00+07:00').toISOString()
-  const remaining=Math.max(0,TRAN_CAU_DOAN_NGAY-await demCauTrongNgay(env,sbd,dayStart,'doan')) // trần ĐOÀN riêng (60), không tính lượt của Đảo
+  const [control,scope,soLamDoan]=await Promise.all([readGameScope(env,sbd),readScope(env,sbd),demCauTrongNgay(env,sbd,dayStart,'doan')])
+  if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
+  const remaining=Math.max(0,TRAN_CAU_DOAN_NGAY-soLamDoan) // trần ĐOÀN riêng (60), không tính lượt của Đảo
   if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_DOAN_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
-  const history=await attempts(env,sbd),mastery=await masteryTheoHoSo(env,sbd,p.mastery)
-  const blocked=await protectedQuestions(env)
+  // Tối ưu 08/10: history, mastery, protectedQuestions, qidChanHomNay, docCauBtvnChuaNop, docCauLamHomNay, docCauDaLamMoiNguon, docKhoiEm, qidToiHanOn độc lập → SONG SONG.
+  const [history,mastery,blocked,chanHomNay,chanBtvn,homNay,daLam,khoiEm,dueQids]=await Promise.all([
+    attempts(env,sbd),masteryTheoHoSo(env,sbd,p.mastery),protectedQuestions(env),
+    qidChanHomNay(env,sbd,tNow), // câu làm HÔM NAY ở nguồn khác (+ gói gia đình chưa nộp): loại ở `eligible` nhưng tách riêng để báo THẬT "hết câu mới hôm nay"
+    docCauBtvnChuaNop(env,sbd),docCauLamHomNay(env,sbd,dayStart,ngay),docCauDaLamMoiNguon(env,sbd),
+    docKhoiEm(env,sbd),qidToiHanOn(env,sbd,ngay),
+  ])
   for(const key of control.blocked)blocked.add(key)
-  const chanHomNay=await qidChanHomNay(env,sbd,tNow) // câu làm HÔM NAY ở nguồn khác (+ gói gia đình chưa nộp): loại ở `eligible` nhưng tách riêng để báo THẬT "hết câu mới hôm nay"
-  for(const x of await docCauBtvnChuaNop(env,sbd))blocked.add(x)
+  for(const x of chanBtvn)blocked.add(x)
   const daHoc=learnedQuestionFilter(scope.evidence,blocked)
   const poolHopLe=scope.pool.filter(q=>q.phan!=='II'&&q.reviewed&&!laTuLuanPool(q)&&!!q.dang&&!!q.mucDo&&daHoc(q)&&(control.types.length===0||control.types.includes(q.dang)))
   const eligible=poolHopLe.filter(q=>!chanHomNay.has(q.qid)&&!chanHomNay.has(q.group))
   for(const qid of chanHomNay)blocked.add(qid)
   // RÚT CÂU KHÔNG LẶP (thầy lệnh 21/09 ~19:35, game-v2-cau-moi.ts): CÙNG luật cá nhân hoá với Đảo Đợt 2 (chooseLuotMoi 'kham_pha'); KHÔNG lặp câu em đã làm HÔM NAY (mọi nguồn); ưu tiên câu CHƯA TỪNG làm ở đâu (mọi nguồn, mọi ngày);
   // hết câu mới ⇒ câu LÂU NHẤT chưa gặp + báo thật `hetCauMoi`; không còn gì ⇒ báo thật.
-  const homNay=await docCauLamHomNay(env,sbd,dayStart,ngay),daLam=await docCauDaLamMoiNguon(env,sbd)
   const groupByQid=new Map(scope.pool.map(q=>[q.qid,q.group]))
   for(const qid of [...homNay]){const group=groupByQid.get(qid);if(group)homNay.add(group)}
   const lucGame=new Map<string,number>();for(const a of history)lucGame.set(a.group,Math.max(lucGame.get(a.group)??-1,a.at))
   for(const [qid,luc] of daLam){const group=groupByQid.get(qid);if(group)lucGame.set(group,Math.max(lucGame.get(group)??-1,luc))}
   const {moi,cu}=tachMoiCu(eligible,homNay,daLam,new Set(lucGame.keys()))
-  const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau,khoiEm:await docKhoiEm(env,sbd),gentle:true,dueQids:await qidToiHanOn(env,sbd,ngay),seenGroups:lucGame}
+  const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau,khoiEm,gentle:true,dueQids,seenGroups:lucGame}
   const canOn=eligible.filter(q=>opt.dueQids.has(q.qid))
   const uuTienOn=canOn.length?chooseLuotMoi(canOn,scope.evidence,history,mastery,{...opt,soCau:1}):[]
   const nhomDaChon=new Set(uuTienOn.map(x=>x.q.group))
@@ -484,15 +489,16 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(!guardian&&mode==='adventure'&&!laGoiNoiBoDoan(b)&&await luotMoiBat(env))return startLuotMoi(env,sbd,p,b,action)
     // ĐOÀN nội bộ (`start` gọi từ `taoNguoi`): kho LỚP như lượt Đảo mới (cùng cờ lùi `game_luot_moi`); Linh Tâm / võ đài / repair / tower vẫn đường cũ.
     if(!guardian&&mode==='adventure'&&action==='start'&&laGoiNoiBoDoan(b)&&await luotMoiBat(env))return startDoanKhoLop(env,sbd,p)
-    const scope=await readScope(env,sbd);const blocked=await protectedQuestions(env)
-    const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
+    // Tối ưu 08/10: readScope, protectedQuestions, readGameScope độc lập → SONG SONG; sau đó qidChanHomNay, docCauBtvnChuaNop, attempts cũng SONG SONG.
+    const tNow=Date.now()
+    const [scope,blocked,control]=await Promise.all([readScope(env,sbd),protectedQuestions(env),readGameScope(env,sbd)])
+    if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
     for(const key of control.blocked)blocked.add(key)
     // GĐ 5 (Kênh 4): một đồng hồ giờ máy chủ cho cả lượt chọn; câu em đang/đã làm hôm nay ở chỗ khác không ra ở game; mốc ôn theo hồ sơ.
-    const tNow=Date.now()
-    for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
-    // Game hiện lời giải ngay ⇒ đường CŨ (Đoàn nội bộ, Linh Tâm, võ đài, repair/tower) cũng KHÔNG được rút câu nằm trong bài tập về nhà em CHƯA nộp (Code 1 rà chéo W2b).
-    for(const x of await docCauBtvnChuaNop(env,sbd))blocked.add(x)
-    const history=await attempts(env,sbd)
+    const [chanNgay,chanBtvn,history]=await Promise.all([qidChanHomNay(env,sbd,tNow),docCauBtvnChuaNop(env,sbd),attempts(env,sbd)])
+    // Game hiện lời giải ngay ⇒ đường CŨ cũng KHÔNG được rút câu nằm trong bài tập về nhà em CHƯA nộp (Code 1 rà chéo W2b).
+    for(const qid of chanNgay)blocked.add(qid)
+    for(const x of chanBtvn)blocked.add(x)
     const daHoc=learnedQuestionFilter(scope.evidence,blocked)
     const eligible=scope.pool.filter(q=>!laTuLuanPool(q)&&daHoc(q)&&(control.types.length===0||q.dang!==null&&control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
     if(guardian){
