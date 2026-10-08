@@ -24,4 +24,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-        run: npx -y wrangler@4 d1 execute omr --remote --json --file=../scripts/kiem-khoi-phuc-0810.sql
+        run: |
+          KIEM_SQL=$(tr '\n' ' ' < ../scripts/kiem-khoi-phuc-0810.sql)
+          npx -y wrangler@4 d1 execute omr --remote --json --command "$KIEM_SQL"
