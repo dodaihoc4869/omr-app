@@ -22,9 +22,12 @@ async function read(ds: Stmt[]) {
   const response = await fetch(root, { method: 'POST', headers: { authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql }), signal: AbortSignal.timeout(20000) })
   const data = await response.json() as any
   if (!response.ok || !data.success) {
-    stop = true
-    console.log('probe_error', JSON.stringify({status: response.status, codes: data.errors?.map((x: any) => x.code)}))
-    throw new Error('STOP_PROBE')
+    const message = (data.errors ?? []).map((x: any) => String(x.message ?? '')).join(' ')
+    const schema = /no such (?:table|column):\s*(?:main\.)?[A-Za-z_][A-Za-z_0-9.]*/i.exec(message)?.[0]
+    const overloaded = /overloaded|requests queued for too long|too many requests|SQLITE_BUSY/i.test(message)
+    stop = !schema
+    console.log('probe_error', JSON.stringify({status: response.status, codes: data.errors?.map((x: any) => x.code), schema, overloaded}))
+    throw new Error(schema ?? (overloaded ? 'D1 DB is overloaded' : 'STOP_PROBE'))
   }
   for (let i = 0; i < ds.length; i++) console.log('query', JSON.stringify({
     fingerprint: createHash('sha256').update(ds[i].sql).digest('hex').slice(0, 12),
@@ -54,7 +57,8 @@ const db = {
 }
 try {
   const profile = await docHoSo2({ DB: db } as any, '11010', ngayVnCua(Date.now()))
-  console.log('profile_result', JSON.stringify({ completed: true, ms: Date.now() - start, queries: total, blocked, fields: Object.keys(profile) }))
+  console.log('profile_result', JSON.stringify({ completed: !stop && blocked === 0, ms: Date.now() - start, queries: total, blocked, stopped: stop, fields: Object.keys(profile) }))
+  if (stop || blocked) process.exitCode = 1
 } catch {
   console.log('profile_result', JSON.stringify({ completed: false, ms: Date.now() - start, queries: total, blocked, stopped: stop }))
   process.exitCode = 1
