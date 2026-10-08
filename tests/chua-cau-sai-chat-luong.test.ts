@@ -280,6 +280,12 @@ describe('Vòng chữa — API, SQL thật, quyền và bằng chứng', () => {
     const h2 = hocLieuMau()
     h2.banKiemChung[0].noiDungTrucTiep = h2.banGhepBai[0].noiDungTrucTiep
     expect(kiemTinhDayDu(h2)).toContain('ban_kiem_trung_ban_ghep')
+    const h3 = hocLieuMau(), lap = h3.buoc[0].kiemLai[0]
+    h3.buoc[0].kiemLai.push({ ...lap })
+    expect(kiemTinhDayDu(h3)).toContain(`probe_${lap.qid}_ref_trung`)
+    const h4 = hocLieuMau(), trungNoiDung = h4.buoc[0].kiemLai[0]
+    h4.buoc[0].kiemLai.push({ ...trungNoiDung, qid: 'qid-khac-cung-noi-dung' })
+    expect(kiemTinhDayDu(h4)).toContain('probe_qid-khac-cung-noi-dung_noi_dung_trung')
   })
 })
 

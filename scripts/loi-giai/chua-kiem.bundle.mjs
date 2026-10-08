@@ -596,7 +596,7 @@ function tatCaProbe(h) {
   ];
 }
 function kiemTinhDayDu(v) {
-  const loi = [], h = v;
+  const loi = [], loiTrung = [], h = v;
   const chu = (x) => typeof x === "string" && !!x.trim() && x.length <= 2e4;
   const mangChu = (x) => Array.isArray(x) && x.length <= 80 && x.every(chu);
   const mang = (x) => Array.isArray(x) && x.length <= 40;
@@ -640,8 +640,15 @@ function kiemTinhDayDu(v) {
   if (h.banGhepBai.length < 2 || h.banKiemChung.length < 2)
     loi.push("thieu_ban_toan_bai");
   if (loi.length) return loi;
-  const refs = /* @__PURE__ */ new Map();
-  for (const p of tatCaProbe(h)) {
+  const refs = /* @__PURE__ */ new Map(), noiDungDaCo = /* @__PURE__ */ new Map(), doiChieuDaDung = /* @__PURE__ */ new Set();
+  const cacProbe = [
+    ...h.buoc.flatMap((b) => [
+      ...[...b.chanDoan, ...b.phanBiet, ...b.kiemLai, ...b.hieuBuoc.kiemLyDo, ...b.hieuBuoc.chuyenGiao].map((p) => ({ p, laDoiChieu: false })),
+      ...b.hieuBuoc.doiChieu.map((d) => ({ p: d.probeXacNhan, laDoiChieu: true }))
+    ]),
+    ...[...h.banGhepBai, ...h.banKiemChung].map((p) => ({ p, laDoiChieu: false }))
+  ];
+  for (const { p, laDoiChieu } of cacProbe) {
     if (!p || !chu(p.qid) || p.qid.length > 120 || !chu(p.phienBan) || !mangChu(p.kyNang) || !p.kyNang.length || !["I", "II", "III"].includes(p.phan) || p.dapAnSai !== void 0 && !mangChu(p.dapAnSai)) {
       loi.push("probe_sai_cau_truc");
       continue;
@@ -673,10 +680,13 @@ function kiemTinhDayDu(v) {
       loi.push(`probe_${p.qid}_ds_mau_thuan`);
     if (!chamProbe(p, n.dapAn))
       loi.push(`probe_${p.qid}_dap_an_khong_cham_duoc`);
-    const key = `${p.qid}@${p.phienBan}`, noi = JSON.stringify(n);
-    if (refs.has(key) && refs.get(key) !== noi)
-      loi.push(`probe_${p.qid}_ref_mau_thuan`);
-    refs.set(key, noi);
+    const key = `${p.qid}@${p.phienBan}`, noiRaw = JSON.stringify(n), noi = dauNoiDung(p), aliasHopLe = laDoiChieu && !doiChieuDaDung.has(key) && refs.get(key) === noiRaw;
+    if (refs.has(key) && !aliasHopLe) loiTrung.push(`probe_${p.qid}_ref_trung`);
+    else if (!refs.has(key)) refs.set(key, noiRaw);
+    if (noiDungDaCo.has(noi) && !(aliasHopLe && noiDungDaCo.get(noi) === key))
+      loiTrung.push(`probe_${p.qid}_noi_dung_trung`);
+    else if (!noiDungDaCo.has(noi)) noiDungDaCo.set(noi, key);
+    if (laDoiChieu && refs.has(key)) doiChieuDaDung.add(key);
   }
   if (loi.length) return [...new Set(loi)];
   const cauNho = h.buoc.flatMap((b) => [
@@ -714,7 +724,7 @@ function kiemTinhDayDu(v) {
       ))
         loi.push(`buoc_${b.id}_gia_thuyet_chua_kiem`);
   }
-  return [...new Set(loi)];
+  return [.../* @__PURE__ */ new Set([...loi, ...loiTrung])];
 }
 
 // server/src/chua-hoc-lieu-kiem-may.ts

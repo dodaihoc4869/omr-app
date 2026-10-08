@@ -22,7 +22,7 @@ export function tatCaProbe(h: HocLieuChua): ProbeRef[] {
   ]
 }
 export function kiemTinhDayDu(v: unknown): string[] {
-  const loi: string[] = [],
+  const loi: string[] = [], loiTrung: string[] = [],
     h = v as HocLieuChua
   const chu = (x: unknown): x is string =>
     typeof x === 'string' && !!x.trim() && x.length <= 20000
@@ -120,8 +120,18 @@ export function kiemTinhDayDu(v: unknown): string[] {
   if (h.banGhepBai.length < 2 || h.banKiemChung.length < 2)
     loi.push('thieu_ban_toan_bai')
   if (loi.length) return loi
-  const refs = new Map<string, string>()
-  for (const p of tatCaProbe(h)) {
+  const refs = new Map<string, string>(),
+    noiDungDaCo = new Map<string, string>(),
+    doiChieuDaDung = new Set<string>()
+  const cacProbe = [
+    ...h.buoc.flatMap((b) => [
+      ...[...b.chanDoan, ...b.phanBiet, ...b.kiemLai, ...b.hieuBuoc!.kiemLyDo, ...b.hieuBuoc!.chuyenGiao]
+        .map((p) => ({ p, laDoiChieu: false })),
+      ...b.hieuBuoc!.doiChieu.map((d) => ({ p: d.probeXacNhan, laDoiChieu: true })),
+    ]),
+    ...[...h.banGhepBai, ...h.banKiemChung].map((p) => ({ p, laDoiChieu: false })),
+  ]
+  for (const { p, laDoiChieu } of cacProbe) {
     if (
       !p ||
       !chu(p.qid) ||
@@ -191,10 +201,15 @@ export function kiemTinhDayDu(v: unknown): string[] {
     if (!chamProbe(p, n.dapAn))
       loi.push(`probe_${p.qid}_dap_an_khong_cham_duoc`)
     const key = `${p.qid}@${p.phienBan}`,
-      noi = JSON.stringify(n)
-    if (refs.has(key) && refs.get(key) !== noi)
-      loi.push(`probe_${p.qid}_ref_mau_thuan`)
-    refs.set(key, noi)
+      noiRaw = JSON.stringify(n),
+      noi = dauNoiDung(p),
+      aliasHopLe = laDoiChieu && !doiChieuDaDung.has(key) && refs.get(key) === noiRaw
+    if (refs.has(key) && !aliasHopLe) loiTrung.push(`probe_${p.qid}_ref_trung`)
+    else if (!refs.has(key)) refs.set(key, noiRaw)
+    if (noiDungDaCo.has(noi) && !(aliasHopLe && noiDungDaCo.get(noi) === key))
+      loiTrung.push(`probe_${p.qid}_noi_dung_trung`)
+    else if (!noiDungDaCo.has(noi)) noiDungDaCo.set(noi, key)
+    if (laDoiChieu && refs.has(key)) doiChieuDaDung.add(key)
   }
   if (loi.length) return [...new Set(loi)]
   const cauNho = h.buoc.flatMap((b) => [
@@ -242,7 +257,7 @@ export function kiemTinhDayDu(v: unknown): string[] {
       )
         loi.push(`buoc_${b.id}_gia_thuyet_chua_kiem`)
   }
-  return [...new Set(loi)]
+  return [...new Set([...loi, ...loiTrung])]
 }
 export async function docHocLieu(
   env: Env,
