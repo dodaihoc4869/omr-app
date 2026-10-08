@@ -26,8 +26,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: node scripts/bo-sung-bang-bat-dau-0810.mjs
-      - name: Đo chỉ đọc
+      - name: Kiểm đăng nhập và Sảnh, không làm bài
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
-        run: node /tmp/do-ho-so.mjs
+        run: node scripts/do-sanh-song-0810.mjs
