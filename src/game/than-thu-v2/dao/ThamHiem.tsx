@@ -118,7 +118,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
    <div className="dao-tham-chan" data-noi={phanHoi||!thieu||hetTran||loi?'':undefined}>
     {hetTran&&!phanHoi?<div className="dao-kinh dao-het-tran" role="alert" ref={loiNutRef}><p>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao-nut-vang" onClick={onVeDao}><span>VỀ ĐẢO</span></button></div>
     :<>{loi&&<p className="dao-loi dao-loi-nut" role="alert" ref={loiNutRef}>{loi}</p>}
-    {!phanHoi?<button type="button" className="dao-nut-xanh" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?'Chọn đáp án để tung chưởng':'Trả lời · tung chưởng'}</button>
+    {!phanHoi?<button type="button" className="dao-nut-xanh" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?'Chọn đáp án để tung chưởng':'Chốt đáp án'}</button>
     :<button type="button" className="dao-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'Đã đọc lời giải · hoàn thành chuyến':`Đã đọc lời giải · sang ải ${viTri+2}`}</button>}</>}</div>
   </>}
  </div>
