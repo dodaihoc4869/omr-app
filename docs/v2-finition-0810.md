@@ -1,8 +1,8 @@
-# Hoàn thiện V2 — bản giữ lại, chưa phát hành
+# Hoàn thiện V2 — thiết kế đồng bộ được duyệt
 
 ## Điều kiện của người dùng
 
-Chỉ đẩy lên máy chủ sau khi hoàn thiện giống V2 ở mọi lớp của ba app. Lượt này KHÔNG push main và KHÔNG chạy triển khai. Bản đang chạy là `42733af1`.
+Người dùng đã xác nhận: “Tự thiết kế theo V2 luôn nha”. Các màn con được tự thiết kế theo cùng hệ V2, không cần thêm concept riêng. Chỉ phát hành sau kiểm tra; bản trước đợt này là `42733af1`.
 
 ## Đã sửa
 
@@ -15,8 +15,8 @@ Chỉ đẩy lên máy chủ sau khi hoàn thiện giống V2 ở mọi lớp c�
 
 ## Kiểm tra
 
-- 74 kiểm thử liên quan / 8 tệp đạt, gồm 5 kiểm thử mới `tests/v2-finition-0810.test.tsx`.
-- 27 màn/trạng thái × 3 kích thước = 81 tổ hợp sau hợp nhất kết quả cuối: không lỗi JavaScript, không tràn ngang trang. Dữ liệu mô phỏng; không phải dữ liệu production.
+- Kiểm lại sau duyệt: 94 kiểm thử liên quan / 11 tệp đạt, gồm 5 kiểm thử mới `tests/v2-finition-0810.test.tsx` và các hợp đồng vận hành bắt buộc.
+- Chạy lại trọn lượt sau duyệt: 27 màn/trạng thái × 3 kích thước = 81 tổ hợp đạt; không lỗi JavaScript, không tràn ngang trang, không ảnh hỏng. Báo cáo `/workspace/anh-v2-approved/kiem-tra.json`. Dữ liệu mô phỏng; không phải dữ liệu production.
 - Ba kích thước: 390×844, 844×390, 1440×960. Thiết bị giả lập dark; app vẫn dùng màu V2 sáng.
 - Phạm vi: sảnh, hoàn thành ngày, ba màn PH và tab phụ, Hành trình, tổng quan, lên bảng, chọn bài, bảng OMNI, cài đặt, ca thi/mở ca/chi tiết ca/lịch sử, lớp, học sinh, toàn cảnh em, kho đề, gỡ nút thắt, duyệt lời giải, chọn thú, sổ tay, túi đồ, cửa hàng, sửa sai, Đoàn.
 - Màn chưa có dữ liệu hợp lệ được kiểm trạng thái trống/lỗi; không suy ra đã kiểm mọi dữ liệu hay mọi thao tác nghiệp vụ.
@@ -27,10 +27,12 @@ Chỉ đẩy lên máy chủ sau khi hoàn thiện giống V2 ở mọi lớp c�
 
 ## Chưa đủ để ký xác nhận “100% mọi lớp”
 
-- Chỉ có ba ảnh concept chính được duyệt. Các màn con chưa có ảnh đối chiếu V2 riêng. Đã hỏi người dùng chọn tự thiết kế đồng bộ hay cần bản vẽ riêng từng màn; chưa có trả lời trong lượt này.
+- Ba ảnh concept chính định hướng hệ thiết kế; người dùng đã duyệt tự thiết kế màn con. Không đồng nghĩa có ảnh đối chiếu pixel-perfect cho từng màn.
 - Không chép số mẫu “14–22 phút”, “+0,4 điểm dự báo”, “mục tiêu 8,5+” khi API chưa có dữ liệu tương ứng. Các khác biệt này có chủ ý để tránh thông tin giả.
 - Tám thần thú và sáu cấp tiến hóa vẫn giữ bộ ảnh hiện có; không coi nền đảo mới là đã vẽ lại toàn bộ bộ thú.
-- Chưa chứng nhận mọi hộp thoại/trạng thái nghiệp vụ hoặc pixel-perfect. Vì điều kiện phát hành của người dùng, giữ thay đổi tại workspace; không triển khai từng phần.
+- Chưa chứng nhận mọi hộp thoại/trạng thái nghiệp vụ hoặc pixel-perfect. Phát hành theo hệ V2 đã được duyệt, không tuyên bố kiểm hết mọi trạng thái dữ liệu.
+- Fixture cửa hàng dùng cùng bộ vẽ thú mặc phụ kiện và hình vật phẩm như cửa hàng thật; vẫn dùng dữ liệu mô phỏng, không mua vật phẩm hoặc thay đổi tài khoản thật.
+- Kiểm thêm luồng thử đồ → mở xác nhận mua → Escape: hộp thoại nằm trong viewport ở 390×844, 844×390 và 1440×960; không xác nhận mua.
 
 ## Bằng chứng ảnh local
 

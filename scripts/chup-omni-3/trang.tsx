@@ -54,6 +54,8 @@ import ChonBanDongHanh from '../../src/game/than-thu-v2/dao/ChonBanDongHanh'
 import SoTay from '../../src/game/than-thu-v2/dao/SoTay'
 import TuiDo from '../../src/game/than-thu-v2/dao/TuiDo'
 import ManShop from '../../src/game/than-thu-v2/shop/ManShop'
+import { ThuMacDo } from '../../src/game/than-thu-v2/phu-kien/ThuMacDo'
+import { HinhVatPham } from '../../src/game/than-thu-v2/phu-kien/HinhVatPham'
 import { ShopApiGia } from '../../src/game/than-thu-v2/shop/du-lieu-mau'
 
 document.documentElement.dataset.phongCach = 'v2'
@@ -274,7 +276,7 @@ const con =
   : man === 'hs-chon-thu' ? h(ChonBanDongHanh, { onChon: noop })
   : man === 'hs-so-tay' ? h('div', { className: 'dao' }, h(SoTay, { profile: hoSoDao }))
   : man === 'hs-tui-do' ? h('div', { className: 'dao' }, h(TuiDo, { profile: hoSoDao, onDungKhien: async () => ({ ok: true }) }))
-  : man === 'hs-shop' ? h(ManShop, { api: new ShopApiGia({ tre: 0 }), pet: 2, cap: 32, tenThu: 'Lửa nhỏ', onDong: noop })
+  : man === 'hs-shop' ? h(ManShop, { api: new ShopApiGia({ tre: 0 }), pet: 2, cap: 32, tenThu: 'Lửa nhỏ', onDong: noop, veThu: (o) => h(ThuMacDo, o), veHinhMon: (m) => h(HinhVatPham, { ma: m.ma }) })
   : man === 'sanh-cho' ? manSanh(SANH_CHO)
   : man.startsWith('dao-') ? h(Dao2, { sbd: 'GIA', profile: hoSoDao, call: callDao, doanMo: false, sanhDau: man.startsWith('dao-can-than') ? SANH_CAN_THAN : SANH, onMoDoan: noop, onMoSoTay: noop, onDong: noop })
   : man === 'doan-tram' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 2, cap: 32, onDong: noop, onVeBangNhiemVu: noop } as never))
