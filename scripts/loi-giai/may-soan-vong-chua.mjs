@@ -13,6 +13,8 @@ const argv=process.argv.slice(2)
 const thu=argv.includes('--thu'),motLan=argv.includes('--mot-lan')
 const limitIndex=argv.indexOf('--so-cau'),soCauToiDa=limitIndex<0 ? 5000 : Number(argv[limitIndex+1])
 if(!Number.isSafeInteger(soCauToiDa)||soCauToiDa<1||soCauToiDa>5000)throw Error('--so-cau cần số nguyên từ 1 đến 5000.')
+const songSongIndex=argv.indexOf('--song-song'),songSong=songSongIndex<0 ? 3 : Number(argv[songSongIndex+1])
+if(!Number.isSafeInteger(songSong)||songSong<1||songSong>3)throw Error('--song-song cần số nguyên từ 1 đến 3.')
 const secret=(process.env.OMR_MA_BI_MAT ?? (fs.existsSync(path.join(os.homedir(),'.omr-ma-bi-mat')) ? fs.readFileSync(path.join(os.homedir(),'.omr-ma-bi-mat'),'utf8') : '')).trim()
 const host=(process.env.OMR_MAY_CHU || 'https://omr.ttadodaihoc.workers.dev').replace(/\/$/,'')
 const save=path.resolve(process.env.OMR_THU_MUC_CHUA || '.may-soan-vong-chua')
@@ -111,15 +113,22 @@ async function main(){
   let dat=0,truot=0
   for(;;){
     if(daLam.length>=soCauToiDa){console.log(JSON.stringify({dat,truot,hetHangTrongLuot:false,datGioiHanLuot:true,gioiHanSoCau:soCauToiDa}));break}
-    const {viec,coNguonChuaHoTro}=await api('/kho/may-soan/vong-chua-viec',{so:1,daLam})
+    const conLai=soCauToiDa-daLam.length
+    const {viec,coNguonChuaHoTro}=await api('/kho/may-soan/vong-chua-viec',{so:Math.min(songSong,conLai),daLam})
     if(!viec.length){
       console.log(JSON.stringify({dat,truot,hetHangTrongLuot:!coNguonChuaHoTro,coNguonChuaHoTro:!!coNguonChuaHoTro}))
       if(motLan||thu) break
       // Chương trình nền hỏi lại; không phải lệnh chờ của agent.
       await new Promise(resolve=>setTimeout(resolve,300000));daLam.length=0;continue
     }
-    const v=viec[0];daLam.push(v.cau.qid)
-    try{await one(v);dat++}catch(e){truot++;console.log(JSON.stringify({qid:v.cau.qid,dat:false,lyDo:e.message}))}
+    const lo=viec.slice(0,conLai).filter(v=>v?.cau?.qid&&!daLam.includes(v.cau.qid))
+    for(const v of lo)daLam.push(v.cau.qid)
+    const ketQua=await Promise.allSettled(lo.map(one))
+    for(let i=0;i<ketQua.length;i++){
+      const r=ketQua[i]
+      if(r.status==='fulfilled')dat++
+      else{truot++;console.log(JSON.stringify({qid:lo[i].cau.qid,dat:false,lyDo:r.reason instanceof Error?r.reason.message:String(r.reason)}))}
+    }
     if(thu) break
   }
 }

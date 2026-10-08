@@ -355,7 +355,9 @@ async function main() {
   // Dành một luồng sẵn có cho vòng chữa mới: tổng số luồng không tăng, không cần thầy duyệt.
   const chua = BO_TRO && LUONG >= 2 && !co('--thu') && !co('--khong-vong-chua')
   const chayChua = () => new Promise((resolve) => {
-    const args = [path.join(DAY,'may-soan-vong-chua.mjs'), ...(co('--mot-lan') ? ['--mot-lan'] : []), ...(MODEL ? ['--model',MODEL] : [])]
+    // Luồng dành riêng trong máy soạn chung chỉ chiếm đúng một slot; chạy file
+    // vòng chữa trực tiếp mới mặc định dùng ba slot song song.
+    const args = [path.join(DAY,'may-soan-vong-chua.mjs'),'--song-song','1', ...(co('--mot-lan') ? ['--mot-lan'] : []), ...(MODEL ? ['--model',MODEL] : [])]
     const p = spawn(process.execPath,args,{cwd:GOC,stdio:['ignore','inherit','inherit'],env:process.env})
     p.on('error',()=>{console.log('Luồng vòng chữa chưa khởi động; phần hồ sơ vẫn tiếp tục.');resolve()})
     p.on('close',code=>{if(code!==0)console.log('Luồng vòng chữa chưa hoàn tất; không ghi nhận hết hàng.');resolve()})

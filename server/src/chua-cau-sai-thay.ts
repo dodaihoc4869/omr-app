@@ -141,7 +141,18 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
         now,
       )
       .run()
-    return Response.json({ ok: true, bam })
+    // Một bộ học liệu đã qua đủ các cổng kiểm phải mở ngay mọi vòng đang chờ
+    // đúng câu + đúng phiên bản. Không đụng vòng đã có phiên để tránh đổi bài
+    // giữa lúc học sinh đang tự gỡ.
+    const mo = await env.DB.prepare(
+      `UPDATE chua_loi_dot SET trang_thai_day='can_chan_doan',ly_do_thieu='',revision=revision+1,cap_nhat_luc=?
+       WHERE qid_chuan=? AND phien_ban_cau=? AND dong_luc IS NULL
+         AND trang_thai_day IN ('thieu_hoc_lieu','tam_khoa','cau_thay_doi')
+         AND NOT EXISTS(SELECT 1 FROM chua_loi_phien p WHERE p.dot_id=chua_loi_dot.id)`,
+    )
+      .bind(now, h.qidGoc, h.contentVersion)
+      .run()
+    return Response.json({ ok: true, bam, soDotDaMo: Number(mo.meta?.changes ?? 0) })
   }
   const rows = await env.DB.prepare(
     `SELECT qid_chuan AS qid,content_version AS version,trang_thai AS trangThai,nguoi_duyet AS nguoiDuyet,kiem_tra_luc AS luc FROM chua_loi_hoc_lieu ORDER BY kiem_tra_luc DESC LIMIT 100`,

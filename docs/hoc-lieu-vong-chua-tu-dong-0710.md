@@ -17,10 +17,12 @@ Cổng máy chủ đối chiếu SHA-256 của từng đề đầy đủ, mã/ph
 Máy cần Claude Code đã đăng nhập và mã giáo viên sẵn có (`OMR_MA_BI_MAT` hoặc `~/.omr-ma-bi-mat`). Không đưa mã này vào phiên Claude soạn/kiểm.
 
 ```
-node scripts/loi-giai/may-soan-vong-chua.mjs --mot-lan
+node scripts/loi-giai/may-soan-vong-chua.mjs --mot-lan --song-song 3
 ```
 
-Chạy không có `--mot-lan` để tiếp tục hỏi hàng mới. `--thu` soạn/kiểm một câu, không nạp. Mã máy soạn cũ `may-soan.mjs` mặc định dành một luồng trong tổng số luồng hiện có cho vòng chữa mới (khi có từ hai luồng, không ở chế độ thử); không tăng tổng số luồng. `--khong-vong-chua` giữ chế độ cũ. Tất cả chế độ thống kê/nạp hàng cũ vẫn chỉ làm đúng công việc đó.
+Chạy không có `--mot-lan` để tiếp tục hỏi hàng mới. Máy vòng chữa chạy trực tiếp mặc định xử lý tối đa ba câu song song (`--song-song 1..3`) nhưng từng câu vẫn đi đủ ba phiên soạn → giải mù → soát chuyên môn. `--thu` soạn/kiểm một lượt, không nạp. Mã máy soạn cũ `may-soan.mjs` mặc định dành đúng một luồng trong tổng số luồng hiện có cho vòng chữa mới (khi có từ hai luồng, không ở chế độ thử); không tăng tổng số luồng. `--khong-vong-chua` giữ chế độ cũ. Tất cả chế độ thống kê/nạp hàng cũ vẫn chỉ làm đúng công việc đó.
+
+Workflow **Cập nhật siêu vòng lặp theo chiến dịch** tự chạy sau mỗi lần phát hành thành công và định kỳ hai giờ. Nó chỉ bù các cặp học sinh–câu sai đã công bố còn thiếu, mở vòng đúng phiên bản khi học liệu đã qua kiểm, không sửa điểm/EXP và tự hoãn khi có ca thi mở. Workflow không tự bật lại cờ nếu thầy đã tắt hoặc thu hẹp phạm vi.
 
 `--mot-lan` là **một lượt qua toàn hàng hiện tại**, không phải một câu. Nếu phiên chạy có giới hạn thời gian, dùng `node scripts/loi-giai/may-soan-vong-chua.mjs --mot-lan --so-cau 1` để thử xử lý tối đa một câu rồi kết thúc; các cổng kiểm và nạp giữ nguyên. Giới hạn tính cả câu bị loại. Kết thúc vì giới hạn luôn ghi `hetHangTrongLuot:false`; không báo hết kho. Nếu một câu bị loại, đọc mã lỗi và sửa hồ sơ/prompt trước khi chạy lại, tránh lặp vô hạn câu ưu tiên đầu. Không cắt ngang câu đang xử lý để thay bản chạy; phiên đang chạy phải dùng bản mới ở lượt kế tiếp. Nhật ký cho biết đang soạn, giải mù, soát chuyên môn hoặc nạp; lỗi cấu trúc ghi rõ mã lỗi. Không đưa đáp án hay mã giáo viên vào nhật ký.
 

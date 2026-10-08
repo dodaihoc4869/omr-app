@@ -26,6 +26,7 @@ else{fs.writeFileSync('hoc-lieu.json','{}');process.stdin.resume();process.stdin
     daCo: {},
   }))
   let layHang = 0, nap = 0
+  const soYeuCau: number[] = []
   const server = createServer(async (req, res) => {
     let body = ''
     for await (const chunk of req) body += chunk
@@ -36,7 +37,8 @@ else{fs.writeFileSync('hoc-lieu.json','{}');process.stdin.resume();process.stdin
     if (req.url === '/kho/may-soan/vong-chua-viec') {
       layHang++
       const b = JSON.parse(body)
-      res.end(JSON.stringify({ ok: true, viec: viec.filter(v => !b.daLam.includes(v.cau.qid)).slice(0, 1) }))
+      soYeuCau.push(b.so)
+      res.end(JSON.stringify({ ok: true, viec: viec.filter(v => !b.daLam.includes(v.cau.qid)).slice(0, b.so) }))
     } else {
       nap++
       res.end(JSON.stringify({ ok: false }))
@@ -58,7 +60,7 @@ else{fs.writeFileSync('hoc-lieu.json','{}');process.stdin.resume();process.stdin
     })
     const events = r.stdout.trim().split('\n').map(x => JSON.parse(x))
     expect(r.stdout).not.toContain('local-test-only')
-    return { events, layHang, nap }
+    return { events, layHang, nap, soYeuCau }
   } finally {
     await new Promise<void>(r => server.close(() => r()))
     rmSync(dir, { recursive: true, force: true })
@@ -68,6 +70,7 @@ else{fs.writeFileSync('hoc-lieu.json','{}');process.stdin.resume();process.stdin
 it('lượt tối đa một câu dừng sau câu bị loại, không lấy câu kế hoặc nạp dữ liệu sai', async () => {
   const r = await chay(['--mot-lan', '--so-cau', '1'])
   expect(r.layHang).toBe(1)
+  expect(r.soYeuCau).toEqual([1])
   expect(r.nap).toBe(0)
   expect(r.events.at(-1)).toMatchObject({ dat: 0, truot: 1, hetHangTrongLuot: false, datGioiHanLuot: true, gioiHanSoCau: 1 })
   expect(r.events.some(x => x.buoc === 'bat_dau_soan')).toBe(true)
@@ -76,7 +79,8 @@ it('lượt tối đa một câu dừng sau câu bị loại, không lấy câu 
 
 it('không đặt giới hạn vẫn đi hết hàng trong lượt, giữ số câu bị loại và không nạp', async () => {
   const r = await chay(['--mot-lan'])
-  expect(r.layHang).toBe(3)
+  expect(r.layHang).toBe(2)
+  expect(r.soYeuCau).toEqual([3, 3])
   expect(r.nap).toBe(0)
   expect(r.events.at(-1)).toMatchObject({ dat: 0, truot: 2, hetHangTrongLuot: true })
   expect(r.events.filter(x => x.dat === false).map(x => x.qid)).toEqual(['local-1', 'local-2'])
