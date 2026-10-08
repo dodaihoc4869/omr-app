@@ -111,6 +111,7 @@ export default function HanhTrinhDashboard({ lanTai = 0 }: { lanTai?: number; on
           <div data-tone="xanh"><span>Đúng nhịp hôm nay</span><b>{dungNhip}<small>/{bang?.em.length ?? chon?.soEm ?? 0} em</small></b></div>
           <div data-tone="do"><span>Cần gỡ lỗi</span><b>{canGo}<small>em</small></b></div>
           <div data-tone="tim"><span>Sẵn sàng nâng bậc</span><b>{sanSang}<small>em</small></b></div>
+          <div data-tone="phut"><span>Thời lượng mỗi ngày</span><b>Cá nhân<small>tự tính theo từng em</small></b></div>
         </div>
 
         <div className="htgv-grid">

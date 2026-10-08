@@ -67,6 +67,16 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
    {hapThu.bao&&<p className="dao-hap-thu-bao" role="status">{hapThu.bao}</p>}
    {duTru!==null&&<p className="dao-hap-thu-du-tru" data-vung="du-tru">Dự trữ đủ <b>{duTru} ngày ăn</b> · ống nghiệm có {profile.wallet.toLocaleString('vi-VN')} EXP</p>}</section>}
 
+  <section className="dao-kinh dao-bat-linh-v2" aria-labelledby="dao-bat-linh-ten">
+   <div className="dao-bat-linh-dau"><div><small className="dao-nhan">BỘ SƯU TẬP</small><h3 id="dao-bat-linh-ten">Bát Linh</h3></div><span>8 thần thú</span></div>
+   <div className="dao-bat-linh-ds" role="list" aria-label="Toàn bộ tám thần thú">
+    {PETS.map((p,i)=><div key={p.id} role="listitem" data-dong-hanh={i===thu?'':undefined}>
+     <span><img src={anhThuTheoDang(i,i===thu?evolutionStage(profile.cap):1,true)} alt="" width="96" height="96" loading="lazy" decoding="async" draggable={false}/></span>
+     <b>{p.name}</b><small>{i===thu?'Đồng hành':p.element}</small>
+    </div>)}
+   </div>
+  </section>
+
   {tasks.map(t=><section className="dao-kinh dao-nhac" key={t.id}><p>Gia đình nhắc em ôn: <b>{t.dang}</b></p><button type="button" className="dao-nut-nho" disabled={busy} onClick={()=>onOnTheoNhac?.(t.dang)}>Ôn ngay</button></section>)}
 
   <section className="dao-chuyen" aria-labelledby="dao-chuyen-ten">

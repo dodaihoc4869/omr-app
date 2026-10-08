@@ -64,7 +64,8 @@ export const MUC_HOA2_DAY: MucDieuHuong[] = [
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 /** Ngăn kéo / rail khi Game Hóa 2.0 bật: nhóm chính + "Gỡ nút thắt" ngay sau "Chữa trên lớp" (nhóm dạy học); đáy chỉ Kho đề · Cài đặt. */
-export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH.flatMap((m) => (m.id === 'chiendich' ? [m, MUC_GO_NUT_THAT] : [m]))
+/** V2 gộp Chữa/Gỡ lỗi vào Hành trình; thanh bên chỉ giữ các việc cấp cao. */
+export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH
 const MUC_HOA2_BEN_DAY: MucDieuHuong[] = MUC_HOA2_DAY.filter((m) => m.id !== MUC_GO_NUT_THAT.id)
 
 /** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`. */

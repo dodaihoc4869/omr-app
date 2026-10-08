@@ -51,6 +51,8 @@ import './components/thanh-ben-gv2.css'
 import './components/m3/phieu-screen.css'
 import './styles/gv-mau.css'
 import './styles/teacher-modern.css'
+// Lớp V2 cuối cùng cho cả ba vai; chỉ đổi trình bày, không đổi nghiệp vụ.
+import './styles/hanh-trinh-v2.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 
 import { chuanHoaDuongDan, docDuongVao, laLinkAppCu, nhoVaiDaDung } from './lib/vai-tro'

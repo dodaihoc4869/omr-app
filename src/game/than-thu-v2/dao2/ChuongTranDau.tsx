@@ -86,12 +86,12 @@ export default function ChuongTranDau({thu,ketQua,tong,suKien}:{thu:number;ketQu
  // màu hệ thần thú chỉ cho chưởng thường; phản đòn (tím) và Cuồng nộ (hồng–vàng) lấy màu trong chuong.css
  const st={...(d.dung&&!d.cuongNo?{'--d2c-mau':mau}:{}),'--d2c-co':co,'--d2c-phong':`${MOC_CHUONG.phong}s`,'--d2c-trung':`${MOC_CHUONG.trung}s`} as CSSProperties
  return <div ref={lop} className="d2c" data-kieu={kieu} data-cuong-no={d.cuongNo?'':undefined} style={st} aria-hidden="true">
-  <i className="d2c-tu"/><i className="d2c-tu d2c-tu-2"/>
+  <i className="d2c-tu"/><i className="d2c-tu d2c-tu-2"/><i className="d2c-an"/><i className="d2c-an d2c-an-2"/>
   {[3,2,1,0].map(k=><div key={k} className="d2c-bay" style={{'--k':k} as CSSProperties}><div className="d2c-cung">
    <div className={k?'d2c-bong':'d2c-cau'}>{!k&&LAP.map(i=><i key={i} style={{'--i':i} as CSSProperties}/>)}</div>
   </div></div>)}
   <div className="d2c-no">
-   <i className="d2c-loe"/><i className="d2c-song"/><i className="d2c-song d2c-song-2"/>
+   <i className="d2c-loe"/><i className="d2c-loe d2c-loe-loi"/><i className="d2c-song"/><i className="d2c-song d2c-song-2"/>
    {TIA.map(a=><i key={`t${a}`} className="d2c-tia" style={{'--a':`${a}deg`} as CSSProperties}/>)}
    {MANH.map(a=><i key={`m${a}`} className="d2c-manh" style={{'--a':`${a}deg`} as CSSProperties}/>)}
   </div>
