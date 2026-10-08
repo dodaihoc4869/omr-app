@@ -7,11 +7,20 @@ import {
 import { useAppStore } from '../../store/appStore'
 import './chua-cau-sai.css'
 type Obj = Record<string, any>
+const NHAN_HANG: Record<string, string> = {
+  san_sang_soan: 'Sẵn sàng soạn',
+  da_co_hoc_lieu_moi: 'Đã có bộ mới · chờ đồng bộ',
+  cau_chua_duyet: 'Câu gốc chưa duyệt',
+  cau_goc_hong: 'Câu gốc lỗi dữ liệu',
+  tu_luan_khong_tu_dong: 'Tự luận · không chạy tự động',
+  thieu_cau_goc: 'Không còn câu gốc đang dùng',
+}
 export default function KpiChuaCauSai() {
   const setScreen = useAppStore((s) => s.setScreen)
   const [k, setK] = useState<Obj | null>(null),
     [cfg, setCfg] = useState<Obj | null>(null),
     [choLieu, setChoLieu] = useState<Obj[]>([]),
+    [tongChoLieu, setTongChoLieu] = useState<Record<string, Obj>>({}),
     [deSoan, setDeSoan] = useState<Obj | null>(null),
     [loi, setLoi] = useState(''),
     [ban, setBan] = useState(true),
@@ -38,6 +47,7 @@ export default function KpiChuaCauSai() {
     setBat(b.cauHinh.bat)
     setTatCa(b.cauHinh.phamVi === 'tat_ca')
     setChoLieu(d.ds)
+    setTongChoLieu(d.tongHop ?? {})
   }
   useEffect(() => {
     let song = true
@@ -57,6 +67,7 @@ export default function KpiChuaCauSai() {
         setBat(b.cauHinh.bat)
         setTatCa(b.cauHinh.phamVi === 'tat_ca')
         setChoLieu(d.ds)
+        setTongChoLieu(d.tongHop ?? {})
       } catch (e) {
         if (song) setLoi((e as Error).message)
       } finally {
@@ -302,35 +313,56 @@ export default function KpiChuaCauSai() {
         </form>
       </details>
       <details>
-        <summary>Ưu tiên chuẩn bị học liệu ({choLieu.length} nhóm câu)</summary>
-        <p>
-          Các đợt chưa kiểm học liệu cũng có mặt ở đây. Ưu tiên câu ảnh hưởng
-          nhiều em và gần hạn đo.
-        </p>
-        {choLieu.map((x, i) => (
-          <article key={i}>
+        <summary>Hàng học liệu · {choLieu.length} nhóm câu</summary>
+        <div className="ccs-hang-tom-tat" aria-label="Tóm tắt hàng học liệu">
+          <span data-loai="san-sang">
+            <strong>{tongChoLieu.san_sang_soan?.soNhomCau ?? 0}</strong>
+            Sẵn sàng soạn
+          </span>
+          <span>
+            <strong>{tongChoLieu.cau_chua_duyet?.soNhomCau ?? 0}</strong>
+            Chưa duyệt
+          </span>
+          <span>
             <strong>
-              {x.qid} · {x.soEm} em
+              {(tongChoLieu.thieu_cau_goc?.soNhomCau ?? 0) +
+                (tongChoLieu.cau_goc_hong?.soNhomCau ?? 0)}
             </strong>
-            <p>
-              {x.lyDo === 'can_kiem_hoc_lieu'
-                ? 'Cần kiểm học liệu đã duyệt'
-                : x.lyDo}{' '}
-              · {x.version}
-            </p>
-            <button
-              disabled={ban}
-              onClick={() =>
-                void lam(async () => {
-                  const r = await goi('hoc-lieu', { qid: x.qid })
-                  setDeSoan(r.cauGocRieng)
-                })
-              }
-            >
-              Lấy đề gốc để soạn
-            </button>
-          </article>
-        ))}
+            Lỗi nguồn
+          </span>
+          <span>
+            <strong>
+              {tongChoLieu.tu_luan_khong_tu_dong?.soNhomCau ?? 0}
+            </strong>
+            Không tự động
+          </span>
+        </div>
+        <div className="ccs-hang-danh-sach">
+          {choLieu.map((x, i) => (
+            <article key={`${x.qid}-${x.version}-${i}`}>
+              <div>
+                <strong>
+                  {x.qid} · {x.soEm} em
+                </strong>
+                <span>{NHAN_HANG[x.loaiHang] ?? x.lyDo}</span>
+                {x.daDoi && <span>Phiên bản mới: {x.versionMoi}</span>}
+              </div>
+              {x.loaiHang === 'san_sang_soan' && (
+                <button
+                  disabled={ban}
+                  onClick={() =>
+                    void lam(async () => {
+                      const r = await goi('hoc-lieu', { qid: x.qid })
+                      setDeSoan(r.cauGocRieng)
+                    })
+                  }
+                >
+                  Mở câu gốc
+                </button>
+              )}
+            </article>
+          ))}
+        </div>
         {deSoan && (
           <details open>
             <summary>Đề gốc và lời giải — chỉ thầy xem</summary>
