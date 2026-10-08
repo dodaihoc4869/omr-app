@@ -122,20 +122,20 @@ const TEN_MAN: Record<string, string> = {
   lichsuca: 'Ca kiểm tra',
   hocsinh: 'Học sinh',
   toancanh: 'Toàn cảnh một em',
-  goilenbang: 'Gọi lên bảng',
+  goilenbang: 'Hành trình · Cần chữa',
   giaobtvn: 'Giao bài tập về nhà',
   cauhoi: 'Học sinh hỏi',
   khodegiao: 'Giao đề theo tuần',
   caidat: 'Cài đặt',
   tongquan: 'Tổng quan',
-  chiendich: 'Chiến dịch luyện',
+  chiendich: 'Hành trình giỏi Hóa',
   duyetloigiai: 'Duyệt lời giải',
   bangonutthat: 'Bàn gỡ nút thắt',
   remotetochieu: 'Điều khiển máy chiếu',
 }
 
 /** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
-const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Chữa trên lớp', nganhangde: 'Kho đề' }
+const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Hành trình · Cần chữa', nganhangde: 'Kho đề' }
 
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 

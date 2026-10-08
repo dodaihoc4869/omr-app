@@ -9,7 +9,7 @@
 //   Bỏ nhãn "Thêm…" và dòng "6,022 · 10²³" (logo = "Đỗ Đại Học · Giáo viên"). Ẩn Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo
 //   tuần. Số đếm cạnh mục lấy từ `useSoDemGv` (màn đã tải ghi vào) — chưa biết thì không vẽ. Cờ tắt ⇒ đúng danh sách cũ.
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { CalendarDays, ClipboardCheck, FileText, Flag, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
+import { CalendarDays, ClipboardCheck, FileText, Home, Library, LifeBuoy, Map, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
 import { AnhLogo } from './LogoVai'
@@ -52,8 +52,7 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
 export const MUC_HOA2_CHINH: MucDieuHuong[] = [
   { id: 'tongquan', ten: 'Tổng quan', ngan: 'Tổng quan', icon: Home },
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
-  { id: 'chiendich', ten: 'Chiến dịch luyện', ngan: 'Chiến dịch', icon: Flag },
-  { id: 'goilenbang', ten: 'Chữa trên lớp', ngan: 'Chữa bài', icon: Presentation },
+  { id: 'chiendich', ten: 'Hành trình giỏi Hóa', ngan: 'Hành trình', icon: Map, con: ['goilenbang'] },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
 ]
 /** GAME HÓA 2.0 — hai mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). "Gỡ nút thắt" đứng ĐẦU danh sách này để điện
@@ -65,7 +64,7 @@ export const MUC_HOA2_DAY: MucDieuHuong[] = [
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 /** Ngăn kéo / rail khi Game Hóa 2.0 bật: nhóm chính + "Gỡ nút thắt" ngay sau "Chữa trên lớp" (nhóm dạy học); đáy chỉ Kho đề · Cài đặt. */
-export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH.flatMap((m) => (m.id === 'goilenbang' ? [m, MUC_GO_NUT_THAT] : [m]))
+export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH.flatMap((m) => (m.id === 'chiendich' ? [m, MUC_GO_NUT_THAT] : [m]))
 const MUC_HOA2_BEN_DAY: MucDieuHuong[] = MUC_HOA2_DAY.filter((m) => m.id !== MUC_GO_NUT_THAT.id)
 
 /** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`. */
@@ -84,8 +83,8 @@ export function mucDangSang(screen: ScreenId, hoa2 = false): ScreenId | null {
 /** Số đếm cạnh mục (2.0): chữ ngắn + nhãn đầy đủ cho trình đọc màn hình. `null` ⇒ không vẽ. */
 export function soDemMuc(id: ScreenId, so: { caMo: number | null; chienDichChay: number | null; canDayLai: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' } | null {
   if (id === 'lichsuca' && so.caMo) return { chu: `${so.caMo} mở`, nhan: `${so.caMo} ca đang mở`, tone: 'la' }
-  if (id === 'chiendich' && so.chienDichChay) return { chu: String(so.chienDichChay), nhan: `${so.chienDichChay} chiến dịch đang chạy`, tone: 'xam' }
-  if (id === 'goilenbang' && so.canDayLai) return { chu: String(so.canDayLai), nhan: `${so.canDayLai} câu cần dạy lại`, tone: 'do' }
+  if (id === 'chiendich' && so.canDayLai) return { chu: String(so.canDayLai), nhan: `${so.canDayLai} câu cần chữa trong hành trình`, tone: 'do' }
+  if (id === 'chiendich' && so.chienDichChay) return { chu: String(so.chienDichChay), nhan: `${so.chienDichChay} hành trình đang chạy`, tone: 'xam' }
   return null
 }
 

@@ -75,6 +75,7 @@ export interface SanhBanDoProps {
 }
 
 const phanTram = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
+const laTenHanhTrinh = (ten?: string | null) => !!ten && /^Hành trình giỏi Hóa/i.test(ten)
 
 /** HUD thần thú. Bản ngang: `theLuc` và `chuoiNgay` = null (Thể lực có thẻ riêng ở cột phải, Chuỗi ngày ở hàng trên — một thông tin một chỗ). */
 function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu, onDoiTen }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'onMoThanThu' | 'onDoiTen'> & { chuoiNgay: number | null; theLuc: { con: number; tong: number } | null }) {
@@ -122,12 +123,12 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu, onDoiTen }: Pick<SanhBa
       {(theLuc || chuoiNgay !== null) && (
       <span className="h2-hud-phai">
         {theLuc && (
-          <span className="h2-hud-so h2-the-luc" aria-label={`Thể lực hôm nay: còn ${theLuc.con}/${theLuc.tong} câu`}>
+          <span className="h2-hud-so h2-the-luc" aria-label={`Kế hoạch hôm nay: còn ${theLuc.con}/${theLuc.tong} câu`}>
             <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true" focusable="false">
               <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
             </svg>
             <span className="h2-chip-chu">
-              <span className="h2-nhan-nho">Thể lực</span> <b>{theLuc.con}/{theLuc.tong}</b>
+              <span className="h2-nhan-nho">Hôm nay</span> <b>{theLuc.con}/{theLuc.tong}</b>
             </span>
           </span>
         )}
@@ -236,6 +237,7 @@ function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'o
 /** Vòng Cọ xát % + tên chiến dịch + hạn nộp + Cọ xát/Thành thạo (tấm dưới, ngày thường). */
 function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
   const cd = s.chienDich!
+  const hanhTrinh = laTenHanhTrinh(cd.ten)
   const p = phanTram(cd.coXat, cd.tong)
   const chuVi = 2 * Math.PI * 25
   return (
@@ -249,8 +251,8 @@ function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
         <span className="baloo">{p}%</span>
       </span>
       <span className="h2-cd-chu">
-        <span className="h2-cd-ten baloo">Chiến dịch {cd.ten}</span>
-        {cd.hanNop && <span className="h2-cd-han">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
+        <span className="h2-cd-ten baloo">{hanhTrinh ? cd.ten : `Chiến dịch ${cd.ten}`}</span>
+        {hanhTrinh ? <span className="h2-cd-han">Tự xếp kế hoạch mới mỗi ngày theo năng lực của em</span> : cd.hanNop && <span className="h2-cd-han">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
         <span className="h2-cd-so">
           <span className="h2-so-coxat">
             Cọ xát {cd.coXat}/{cd.tong}
@@ -677,7 +679,7 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <TheMetGio s={s} token={p.token} onTaiLai={p.onTaiLai} />
         </>
       )}
-      {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
+      {s.huyetChien && !xong && !laTenHanhTrinh(s.chienDich?.ten) ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
         <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       <NutTuLuyen p={p} />
@@ -823,10 +825,11 @@ function Thanh({ nhan, co, tong, mau }: { nhan: string; co: number; tong: number
 
 function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
   const cd = s.chienDich!
+  const hanhTrinh = laTenHanhTrinh(cd.ten)
   const p = phanTram(cd.coXat, cd.tong)
   const chuVi = 2 * Math.PI * 40
   return (
-    <section className="h2-ng-the h2-ng-cd" aria-label="Chiến dịch đang mở">
+    <section className="h2-ng-the h2-ng-cd" aria-label={hanhTrinh ? 'Hành trình giỏi Hóa' : 'Chiến dịch đang mở'}>
       <span className="h2-ng-vong" role="img" aria-label={`Cọ xát ${p}%`}>
         <svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
           <circle cx="48" cy="48" r="40" stroke="rgb(40 50 110 / 0.1)" strokeWidth="9" fill="none" />
@@ -838,9 +841,9 @@ function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
         </span>
       </span>
       <span className="h2-ng-cd-chu">
-        <span className="h2-ng-nho">Chiến dịch đang mở</span>
-        <span className="h2-ng-cd-ten baloo">Chiến dịch {cd.ten}</span>
-        {cd.hanNop && <span className="h2-ng-phu">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
+        <span className="h2-ng-nho">{hanhTrinh ? 'Lộ trình riêng của em' : 'Chiến dịch đang mở'}</span>
+        <span className="h2-ng-cd-ten baloo">{hanhTrinh ? cd.ten : `Chiến dịch ${cd.ten}`}</span>
+        {hanhTrinh ? <span className="h2-ng-phu">Mỗi ngày một kế hoạch vừa sức · khó hơn khi em đã sẵn sàng</span> : cd.hanNop && <span className="h2-ng-phu">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
         <span className="h2-ng-hai-thanh">
           <Thanh nhan="Cọ xát" co={cd.coXat} tong={cd.tong} mau="ngoc" />
           <Thanh nhan="Thành thạo" co={cd.thanhThao} tong={cd.tong} mau="vang" />
@@ -855,7 +858,7 @@ function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
 function TheTheLucNgang({ s }: { s: SanhHoa2 }) {
   const { con, tong } = s.theLuc
   return (
-    <section className="h2-ng-the h2-ng-tl" aria-label="Thể lực hôm nay">
+    <section className="h2-ng-the h2-ng-tl" aria-label="Kế hoạch hôm nay">
       <span className="h2-ng-tl-o" aria-hidden="true">
         <svg width="24" height="26" viewBox="0 0 14 16" focusable="false">
           <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
@@ -863,7 +866,7 @@ function TheTheLucNgang({ s }: { s: SanhHoa2 }) {
       </span>
       <span className="h2-ng-tl-chu">
         <span className="h2-ng-tl-dau">
-          <b>Thể lực hôm nay</b>
+          <b>Kế hoạch hôm nay</b>
           <b className="h2-ng-tl-so baloo">
             {con}/{tong} câu còn lại
           </b>
@@ -930,7 +933,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   const mai = s.ngay ? ngaySau(s.ngay) : ''
   return (
     <>
-      {s.huyetChien && !xong ? (
+      {s.huyetChien && !xong && !laTenHanhTrinh(s.chienDich?.ten) ? (
         <TheHuyetChien s={s} now={p.now} />
       ) : s.chienDich ? (
         <TheChienDichNgang s={s} now={p.now} />

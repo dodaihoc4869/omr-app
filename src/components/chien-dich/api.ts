@@ -40,6 +40,9 @@ export interface ChienDichTom {
   raiDeu?: boolean
   /** Thầy CHƯA từng đặt cờ (chiến dịch giao trước khi có công tắc): máy tự bật ⇒ hiện "Bật (mặc định)". Máy chủ cũ vắng ⇒ không nhãn. */
   raiDeuMacDinh?: boolean
+  /** Hành trình dài hạn duy nhất theo khối; không dùng hạn nộp như chiến dịch cũ. */
+  hanhTrinh?: boolean
+  khoiHanhTrinh?: 10 | 11 | 12 | null
 }
 
 /** Số liệu lớp gọn của một chiến dịch — bảng "Chiến dịch đã giao" (bản vẽ GV-ChienDichDaGiao 28/09). */

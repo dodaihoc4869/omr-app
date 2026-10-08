@@ -3,9 +3,9 @@
 // Màn chỉ ghép hai thành phần của làn chiến dịch (`GiaoChienDich`, `DsChienDichDaGiao`) — không tự gọi máy chủ.
 // Mở từ Tổng quan › "Ca … chưa có chiến dịch · Giao" ⇒ khung giao mở sẵn cho đúng ca ấy (`useSoDemGv.giaoTuCa`, đọc một lần rồi xoá).
 import { useEffect, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
-import DsChienDichDaGiao from '../components/chien-dich/DsChienDichDaGiao'
+import HanhTrinhDashboard from '../components/chien-dich/HanhTrinhDashboard'
 import NutGiaoTheoBai from '../components/chien-dich/NutGiaoTheoBai'
 import { useSoDemGv, type GiaoTuCa } from '../lib/so-dem-gv'
 import './gv-hoa2.css'
@@ -23,21 +23,18 @@ export default function ChienDichScreen() {
     <div className="gv2-trang">
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
-          <h1 className="gv2-tieu-de">Chiến dịch luyện</h1>
+          <span className="htgv-eyebrow"><Sparkles size={15} aria-hidden="true" /> Tự điều chỉnh mỗi ngày</span>
+          <h1 className="gv2-tieu-de">Hành trình giỏi Hóa</h1>
+          <p className="gv2-phu-de">Thầy chỉ bổ sung bài mới; hệ thống tự xếp câu, nhịp học và vòng sửa sai riêng cho từng em.</p>
         </div>
         {!moGiao && (
           <div className="gv2-dau-nut">
-            {/* OMNI 3 (05/10): "Giao theo bài" — lối vào thứ hai của bước Bài hôm nay (chỉ khi OMNI bật; tắt ⇒ không vẽ gì). */}
-            <NutGiaoTheoBai />
-            <button type="button" className="gv2-nut-chinh" onClick={() => setMoGiao(true)}>
-              <Plus size={18} aria-hidden="true" />
-              Giao chiến dịch mới
-            </button>
+            <NutGiaoTheoBai className="gv2-nut-chinh" nhan="+ Bổ sung bài" />
           </div>
         )}
       </header>
 
-      {moGiao && (
+      {moGiao && tuCa && (
         <GiaoChienDich
           maCa={tuCa?.maCa}
           lop={tuCa?.lop}
@@ -47,7 +44,7 @@ export default function ChienDichScreen() {
         />
       )}
 
-      <DsChienDichDaGiao lanTai={lanTai} />
+      <HanhTrinhDashboard lanTai={lanTai} />
     </div>
   )
 }
