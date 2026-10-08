@@ -252,8 +252,8 @@ export default function DoanTran(p: Props) {
         : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chuyến này — câu này em tự làm nhé.</div>)}
       <button type="button" className={v2 ? 'dh-nut-lam dh2-nut-chinh dh2-baloo' : 'dh-nut-lam'} disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
         {v2
-          ? (p.dangChot ? 'ĐANG CHỐT…' : p.ban ? 'CHỜ MỘT CHÚT…' : du ? `CHỐT ĐÒN ${tenDon.toUpperCase()}${p.de!.phan === 'I' ? ` · ${p.chon}` : ''}` : boTrong ? 'CHỐT · BỎ TRỐNG + CHẮN' : 'CHỌN ĐÁP ÁN ĐỂ CHỐT ĐÒN')
-          : (p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn')}
+          ? (p.dangChot ? 'ĐANG CHỐT…' : p.ban ? 'CHỜ MỘT CHÚT…' : du ? 'CHỐT ĐÁP ÁN' : boTrong ? 'CHỐT · BỎ TRỐNG + CHẮN' : 'CHỌN ĐÁP ÁN ĐỂ CHỐT')
+          : (p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? 'Chốt đáp án' : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt')}
       </button>
     </>
   )
