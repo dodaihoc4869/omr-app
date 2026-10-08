@@ -725,12 +725,43 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     if (nhieu && tc.moiDaLamTheoCd) return Math.max(0, Math.floor(Number(tc.moiDaLamTheoCd[g.id!]) || 0))
     return i === 0 ? Math.max(0, Math.floor(tc.moiDaLamHomNay ?? 0)) : 0
   }
-  const quota = nhom.map((g, i) => {
-    const da = daMoiCua(g, i)
-    const goc = quotaCauMoi((apDungPhanBo ? moiNhomGoc[i]!.length : moiXep[i]!.length) + da, g.D)
-    const rieng = apDungPhanBo ? quotaMoiTheoHoSo(goc, tc.hangChung ?? 'L2') : goc
-    return Math.max(0, rieng - da)
+  const daMoi = nhom.map(daMoiCua)
+  const quotaGoc = nhom.map((g, i) => {
+    const da = daMoi[i]!
+    return quotaCauMoi((apDungPhanBo ? moiNhomGoc[i]!.length : moiXep[i]!.length) + da, g.D)
   })
+  const quota = nhom.map((_, i) => {
+    const da = daMoi[i]!
+    return Math.max(0, quotaGoc[i]! - da)
+  })
+  if (apDungPhanBo) {
+    // Nhiều chiến dịch rải đều phải nhân tỉ lệ trên TỔNG quota rồi mới chia lại. Nếu ceil từng chiến dịch,
+    // bốn quota nhỏ có thể cùng làm tròn lên khiến L2 gần bằng L4 (ca thật 11010: 35 câu mới vẫn thành 31 thay vì 27).
+    const rai = nhom.map((g, i) => g.raiDeu ? i : -1).filter((i) => i >= 0)
+    const tongGoc = rai.reduce((s, i) => s + quotaGoc[i]!, 0)
+    const mucTieu = quotaMoiTheoHoSo(tongGoc, tc.hangChung ?? 'L2')
+    const tongDa = rai.reduce((s, i) => s + daMoi[i]!, 0)
+    const canPhan = Math.max(0, mucTieu - tongDa)
+    const trongLuong = rai.map((i) => Math.max(0, quotaGoc[i]! - daMoi[i]!))
+    const tongTrongLuong = trongLuong.reduce((s, n) => s + n, 0)
+    const phan = rai.map((i, k) => Math.min(moiXep[i]!.length,
+      tongTrongLuong > 0 ? Math.floor(canPhan * trongLuong[k]! / tongTrongLuong) : 0))
+    let con = Math.max(0, canPhan - phan.reduce((s, n) => s + n, 0))
+    const uuTien = rai.map((i, k) => ({ i, k, le: tongTrongLuong > 0 ? (canPhan * trongLuong[k]! / tongTrongLuong) % 1 : 0 }))
+      .sort((a, b) => b.le - a.le || nhom[a.i]!.D - nhom[b.i]!.D || a.i - b.i)
+    while (con > 0) {
+      let daThem = false
+      for (const x of uuTien) {
+        if (con <= 0) break
+        if (phan[x.k]! >= moiXep[x.i]!.length) continue
+        phan[x.k] = phan[x.k]! + 1
+        con--
+        daThem = true
+      }
+      if (!daThem) break
+    }
+    rai.forEach((i, k) => { quota[i] = phan[k]! })
+  }
   // OMNI 3 (nhiều bài): câu mới BẮT BUỘC hôm nay = câu mới của bài đã tới ngày giao câu mới CUỐI (D_c ≤ 4 ⇒ quota = mọi câu mới còn lại). Chúng GIỮ CHỖ
   // trước nợ (nợ vẫn ≤ 50 %, chỉ nhường đúng phần chỗ ấy) để mọi câu mới của mỗi bài được gặp trước hạn riêng − 3; không đủ chỗ ngay cả khi không nợ ⇒
   // Huyết Chiến. Đường cũ (một `hanNop`) không có luật này.

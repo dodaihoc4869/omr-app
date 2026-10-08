@@ -42,6 +42,21 @@ describe('phần bắt buộc cá nhân hoá', () => {
     expect((['L1', 'L2', 'L3', 'L4'] as const).map(soMoi)).toEqual([6, 8, 9, 10])
   })
 
+  it('nhiều chiến dịch tính tỉ lệ trên tổng quota, không làm tròn lên riêng từng chiến dịch', () => {
+    const cau: CauSrs[] = []
+    const tt = new Map<string, TrangThaiCau>()
+    const chienDich = Array.from({ length: 4 }, (_, c) => ({ id: `CD${c}`, hanNop: '2026-10-14', theLucNgay: 40, raiDeu: true }))
+    for (let c = 0; c < 4; c++) for (let i = 0; i < 12; i++) {
+      const qid = `CD${c}-Q${i}`
+      cau.push({ qid, cd: `CD${c}`, phan: 'II', mucDo: 'NB', dang: 'D1', nguon: 'chien_dich' })
+      tt.set(qid, phatLaiCau(qid, [], '2026-10-14'))
+    }
+    // Mỗi CD quota gốc 3, tổng 12; L2 = ceil(12 × 75 %) = 9 (không phải ceil(3 × 75 %) × 4 = 12).
+    const kh = lapKeHoachNgay(cau, tt, { homNay: HOM_NAY, chienDich, ...hang('L2') })
+    expect(kh.dao.length + kh.doan.length).toBe(9)
+    expect(Object.values(kh.moiTheoCd ?? {}).reduce((s, n) => s + n, 0)).toBe(9)
+  })
+
   it.each([
     ['L1', 24, 1],
     ['L2', 30, 2],
