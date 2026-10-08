@@ -71,7 +71,7 @@ jobs:
           MOC_TRUOC: ${{ github.event.before }}
           TOAN_BO: ${{ steps.pham-vi.outputs.toan-bo }}
         run: |
-          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts)
+          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts tests/d1-qua-tai-khong-nhan-truy-van-0810.test.ts tests/cao-diem-ho-so-0110.test.ts)
           if [[ "$TOAN_BO" == false ]]; then
             git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
             while IFS= read -r TEP; do
