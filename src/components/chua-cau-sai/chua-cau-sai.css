@@ -295,17 +295,6 @@
 .ccs-kpi input,
 .ccs-kpi summary { min-height: 48px; }
 .ccs-kpi pre { overflow-wrap: anywhere; white-space: pre-wrap; }
-.ccs-hang-tom-tat { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.65rem; margin: 0.75rem 0; }
-.ccs-hang-tom-tat span { display: grid; gap: 0.15rem; padding: 0.7rem 0.8rem; border: 1px solid var(--tlu-vien); border-radius: 0.7rem; background: var(--tlu-nen-2); color: var(--tlu-chu-phu); font-size: 0.72rem; }
-.ccs-hang-tom-tat strong { color: var(--tlu-chu); font-size: 1.25rem; line-height: 1; }
-.ccs-hang-tom-tat span[data-loai='san-sang'] { border-color: color-mix(in srgb, var(--tlu-ngoc) 58%, var(--tlu-vien)); }
-.ccs-hang-tom-tat span[data-loai='san-sang'] strong { color: var(--tlu-ngoc); }
-.ccs-hang-danh-sach { max-height: min(62vh, 42rem); overflow: auto; border: 1px solid var(--tlu-vien); border-radius: 0.8rem; background: var(--tlu-nen-2); overscroll-behavior: contain; }
-.ccs-hang-danh-sach article { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem; border-bottom: 1px solid var(--tlu-vien); }
-.ccs-hang-danh-sach article:last-child { border-bottom: 0; }
-.ccs-hang-danh-sach article > div { display: grid; min-width: 0; gap: 0.15rem; }
-.ccs-hang-danh-sach article span { color: var(--tlu-chu-phu); font-size: 0.72rem; }
-.ccs-hang-danh-sach button { flex: 0 0 auto; }
 .ccs-phu { position: fixed; z-index: 10000; inset: 0; overflow-y: auto; background: var(--nen); }
 .ccs-hop { position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0; background: var(--nen); overscroll-behavior: contain; }
 .ccs-hop::backdrop { background: var(--nen); }

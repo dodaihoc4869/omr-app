@@ -51,13 +51,6 @@ import './components/thanh-ben-gv2.css'
 import './components/m3/phieu-screen.css'
 import './styles/gv-mau.css'
 import './styles/teacher-modern.css'
-// Lớp V2 cuối cùng cho cả ba vai; chỉ đổi trình bày, không đổi nghiệp vụ.
-import './styles/hanh-trinh-v2.css'
-import { apDungGiaoDien } from './lib/giao-dien-thay'
-// V2 đã được duyệt ở bảng màu sáng cho cả ba vai. Áp trước lần vẽ đầu,
-// kể cả CSS màn con nạp muộn và thiết bị đang dùng chế độ tối.
-document.documentElement.setAttribute('data-phong-cach', 'v2')
-apDungGiaoDien('sang')
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 
 import { chuanHoaDuongDan, docDuongVao, laLinkAppCu, nhoVaiDaDung } from './lib/vai-tro'

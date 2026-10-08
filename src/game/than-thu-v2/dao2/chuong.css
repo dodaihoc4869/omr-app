@@ -7,7 +7,6 @@
 .d2c[data-cuong-no]{--d2c-mau:rgb(255,92,138);--d2c-nhe:rgb(255,228,140)}
 .d2c i,.d2c-bay,.d2c-no{position:absolute;display:block}
 .d2c-tu,.d2c-bay{left:var(--xa);top:var(--ya)}
-.d2c-an{left:var(--xa);top:var(--ya)}
 .d2c-no,.d2c-do{left:var(--xb);top:var(--yb)}
 .d2c-tu,.d2c-bay,.d2c-no,.d2c i{opacity:0}
 .d2c-cau,.d2c-bong,.d2c-tu,.d2c-do,.d2c .d2c-no>i{will-change:transform,opacity}
@@ -23,12 +22,6 @@
  .d2c .d2c-tu{width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;border:3px solid var(--d2c-mau);
   box-shadow:0 0 18px var(--d2c-mau),inset 0 0 14px var(--d2c-mau);animation:d2c-tu .32s ease-in both}
  .d2c .d2c-tu-2{width:46px;height:46px;margin:-23px 0 0 -23px;border-width:2px;animation-delay:.06s;animation-duration:.26s}
- /* Ấn nguyên tố: hai vòng rune lệch chiều làm nhịp tụ lực có chiều sâu. */
- .d2c .d2c-an{width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:50%;opacity:0;
-  background:repeating-conic-gradient(from 0deg,var(--d2c-mau) 0deg 5deg,transparent 5deg 20deg);
-  -webkit-mask:radial-gradient(circle,transparent 0 54%,rgb(0,0,0) 56% 62%,transparent 64%);mask:radial-gradient(circle,transparent 0 54%,rgb(0,0,0) 56% 62%,transparent 64%);
-  filter:drop-shadow(0 0 7px var(--d2c-mau));animation:d2c-an .42s ease-out .02s both}
- .d2c .d2c-an-2{width:76px;height:76px;margin:-38px 0 0 -38px;animation-name:d2c-an-nguoc;animation-delay:.08s}
  /* 2 · bay: ngoài = trục ngang (đều), trong = vòng cung (lên chậm dần, xuống nhanh dần) */
  .d2c .d2c-bay{width:0;height:0;animation:d2c-ngang .4s cubic-bezier(.35,0,.65,1) calc(var(--d2c-phong) + var(--k)*28ms) both}
  .d2c-cung{animation:d2c-vong .4s linear calc(var(--d2c-phong) + var(--k)*28ms) both}
@@ -52,7 +45,6 @@
  .d2c .d2c-no>i{left:0;top:0}
  .d2c .d2c-loe{width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;
   background:radial-gradient(circle,var(--d2c-nhe) 0 18%,var(--d2c-mau) 42%,rgba(255,255,255,0) 70%);animation:d2c-loe .38s ease-out var(--d2c-trung) forwards}
- .d2c .d2c-loe-loi{width:52px;height:52px;margin:-26px 0 0 -26px;background:radial-gradient(circle,rgb(255,255,255) 0 28%,var(--d2c-nhe) 32%,transparent 72%);animation-duration:.24s;filter:drop-shadow(0 0 16px var(--d2c-nhe))}
  .d2c .d2c-song{width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:4px solid var(--d2c-nhe);box-shadow:0 0 12px var(--d2c-mau);
   animation:d2c-song .5s cubic-bezier(.1,.7,.3,1) var(--d2c-trung) forwards}
  .d2c .d2c-song-2{border-width:2px;border-color:var(--d2c-mau);animation-delay:calc(var(--d2c-trung) + 90ms)}
@@ -99,8 +91,6 @@
 }
 
 @keyframes d2c-tu{0%{opacity:0;transform:scale(2.3)}55%{opacity:1}100%{opacity:0;transform:scale(.35)}}
-@keyframes d2c-an{0%{opacity:0;transform:scale(1.55) rotate(-36deg)}45%{opacity:.9}100%{opacity:0;transform:scale(.45) rotate(70deg)}}
-@keyframes d2c-an-nguoc{0%{opacity:0;transform:scale(1.4) rotate(48deg)}45%{opacity:.75}100%{opacity:0;transform:scale(.35) rotate(-86deg)}}
 @keyframes d2c-ngang{0%{opacity:0;transform:translateX(0)}10%,90%{opacity:1}100%{opacity:0;transform:translateX(calc(var(--xb) - var(--xa)))}}
 @keyframes d2c-vong{0%{transform:translateY(0);animation-timing-function:cubic-bezier(.3,.6,.6,1)}
  50%{transform:translateY(calc((var(--yb) - var(--ya))/2 - var(--vong)));animation-timing-function:cubic-bezier(.4,0,.7,.4)}

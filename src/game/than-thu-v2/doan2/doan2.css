@@ -172,16 +172,6 @@
 /* ───── Tấm phủ TUNG CHƯỞNG (2.0): cùng bố cục/thời lượng với bản cũ — nền biển đêm + tia vàng, dải chiêu vàng chữ nâu Baloo, số vàng có nhãn,
    bảng "Vì sao" kính mờ. Chỉ khi DoanTungChuong nhận cheDo2 (lớp .dh2-chuong). Chuyển động rút về ≤ 300 ms (hiệu ứng tia giữ nguyên). ───── */
 .dh2 .dh2-chuong{background:radial-gradient(90% 60% at 50% 24%,rgb(47,91,217) 0%,rgb(26,44,110) 42%,rgb(7,18,41) 100%) rgb(7,18,41);color:var(--dh2-chu)}
-.dh2 .dh2-chuong::before{content:"";position:absolute;z-index:0;inset:-25%;pointer-events:none;background:conic-gradient(from 0deg,transparent,rgb(127 243 255/.1),transparent 18%,rgb(255 201 64/.12),transparent 38%);filter:blur(12px)}
-.dh2 .bl-chuong-san-dau{position:absolute;inset:0;isolation:isolate;overflow:hidden}
-.dh2 .bl-phap-tran{position:absolute;z-index:0;left:50%;top:50%;width:min(92vw,900px);height:auto;transform:translate(-50%,-50%) perspective(620px) rotateX(64deg);overflow:visible;fill:none;stroke:rgb(127 243 255/.42);stroke-width:1.5;filter:drop-shadow(0 0 8px rgb(127 243 255/.38));transform-origin:center}
-.dh2 .bl-chuong-kicker{position:absolute;z-index:8;left:max(12px,env(safe-area-inset-left));top:max(12px,env(safe-area-inset-top));font-size:12px;font-weight:800;letter-spacing:.08em;color:rgb(220,232,255);text-shadow:0 2px 5px rgb(0 0 0/.6)}
-.dh2 .dh2-chuong-vu-tru{position:absolute;z-index:1;inset:0;overflow:hidden;pointer-events:none}
-.dh2 .dh2-chuong-vong{position:absolute;left:50%;top:48%;width:min(72vw,620px);aspect-ratio:1;margin:calc(min(72vw,620px) / -2);border:2px solid rgb(127 243 255/.3);border-radius:50%;box-shadow:0 0 22px rgb(127 243 255/.18),inset 0 0 22px rgb(127 243 255/.12)}
-.dh2 .dh2-chuong-vong::before,.dh2 .dh2-chuong-vong::after{content:"";position:absolute;inset:10%;border:1px dashed rgb(255 214 107/.55);border-radius:50%}.dh2 .dh2-chuong-vong::after{inset:28%;border-style:solid;border-color:rgb(255 255 255/.24)}
-.dh2 .dh2-chuong-vong-2{width:min(46vw,400px);margin:calc(min(46vw,400px) / -2);border-color:rgb(255 214 107/.38)}
-.dh2 .dh2-chuong-hat{--goc:calc(var(--i) * 30deg);position:absolute;left:50%;top:48%;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:rgb(255,244,185);box-shadow:0 0 9px rgb(255,201,64);transform:rotate(var(--goc)) translateX(min(34vw,290px))}
-.dh2 .dh2-chuong-xung{position:absolute;z-index:2;left:74%;top:51%;width:0;height:0;pointer-events:none}.dh2 .dh2-chuong-xung>i{position:absolute;width:92px;height:92px;margin:-46px;border:3px solid rgb(255,229,152);border-radius:50%;box-shadow:0 0 20px rgb(255 142 49/.72)}.dh2 .dh2-chuong-xung>i:nth-child(2){border-color:rgb(127,243,255)}.dh2 .dh2-chuong-xung>i:nth-child(3){border-width:1px;border-style:dashed}
 .dh2 .dh2-chuong .dh-chuong-tia-nen{background:repeating-conic-gradient(from 0deg,rgba(255,214,107,.13) 0deg 6deg,rgba(255,214,107,0) 6deg 14deg)}
 .dh2 .dh2-chuong .dh-chuong-dai{height:60px;border-radius:0 18px 18px 0;background:linear-gradient(90deg,rgb(255,214,107) 0%,rgb(255,159,28) 70%,rgba(255,159,28,0));box-shadow:0 6px 0 rgba(184,101,10,.8),0 10px 24px rgba(255,159,28,.35);animation-duration:.28s}
 .dh2 .dh2-chuong .dh-chuong-dai>div{top:6px}
@@ -208,23 +198,6 @@
 .dh2 .dh2-chuong .dh-chuong-vi-sao>div>i.dh-luc{color:rgb(7,18,41);background:linear-gradient(180deg,rgb(160,250,205),rgb(91,240,165))}
 .dh2 .dh2-chuong-bo-qua{z-index:7;position:absolute;right:12px;top:max(12px,env(safe-area-inset-top));min-width:44px;min-height:44px;padding:0 18px;border-radius:22px;background:rgba(12,26,58,.72);box-shadow:inset 0 0 0 1px rgba(160,200,255,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:14px;font-weight:700;color:rgb(220,232,255);transition:transform .15s ease-out}
 .dh2 .dh2-chuong-bo-qua:active{transform:scale(.96)}
-@media (prefers-reduced-motion:no-preference){
-.dh2 .dh2-chuong::before{animation:dh2-vu-tru 3s linear infinite}
-.dh2 .dh2-chuong-vong-1{animation:dh2-vong 3s linear infinite}.dh2 .dh2-chuong-vong-2{animation:dh2-vong-nguoc 2.2s linear infinite}
-.dh2 .dh2-chuong-hat{animation:dh2-hat 1.25s ease-out calc(var(--i) * 45ms) both}
-.dh2 .dh2-chuong-xung>i{animation:dh2-xung .68s cubic-bezier(.1,.72,.2,1) .72s both}.dh2 .dh2-chuong-xung>i:nth-child(2){animation-delay:.82s}.dh2 .dh2-chuong-xung>i:nth-child(3){animation-delay:.94s}
-.dh2 .dh2-chuong .dh-chuong-dich{animation:dh2-dich-trung .55s cubic-bezier(.2,.8,.3,1) .72s both}
-.dh2 .dh2-chuong .dh-chuong-thu{filter:drop-shadow(0 12px 9px rgb(0 0 0/.45)) drop-shadow(0 0 18px rgb(127 243 255/.48));animation:dh2-thu-xuat-chieu .65s cubic-bezier(.18,.82,.25,1) both}
-.dh2 .bl-phap-tran{animation:dh2-phap-tran 4.5s linear infinite}
-}
-@keyframes dh2-vu-tru{to{transform:rotate(360deg)}}
-@keyframes dh2-vong{0%{opacity:0;transform:scale(.55) rotate(0)}24%{opacity:.75}100%{opacity:.18;transform:scale(1.15) rotate(120deg)}}
-@keyframes dh2-vong-nguoc{0%{opacity:0;transform:scale(.4) rotate(70deg)}24%{opacity:.8}100%{opacity:.08;transform:scale(1.35) rotate(-150deg)}}
-@keyframes dh2-hat{0%{opacity:0;transform:rotate(var(--goc)) translateX(10px) scale(.2)}30%{opacity:1}100%{opacity:0;transform:rotate(var(--goc)) translateX(min(42vw,360px)) scale(1.1)}}
-@keyframes dh2-xung{0%{opacity:0;transform:scale(.1)}25%{opacity:1}100%{opacity:0;transform:scale(3.2)}}
-@keyframes dh2-dich-trung{0%,100%{transform:none}32%{transform:translateX(18px) rotate(6deg) scale(1.08,.92)}58%{transform:translateX(8px) rotate(2deg)}}
-@keyframes dh2-thu-xuat-chieu{0%{transform:translateX(-12px) scale(.96)}38%{transform:translateX(0) translateY(-7px) scale(1.06)}72%{transform:translateX(10px) scale(.98)}100%{transform:none}}
-@keyframes dh2-phap-tran{from{transform:translate(-50%,-50%) perspective(620px) rotateX(64deg) rotateZ(0)}to{transform:translate(-50%,-50%) perspective(620px) rotateX(64deg) rotateZ(360deg)}}
 
 /* ───── Tấm phủ TIẾP SỨC (2.0): tấm kính biển đêm trượt lên, câu của bạn trên giấy da, ba thẻ màu 2.0 (lam · tím · ngọc), chữ Baloo. ───── */
 .dh2 .dh2-tam-nen{background:rgba(3,8,24,.62);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);overscroll-behavior:contain}

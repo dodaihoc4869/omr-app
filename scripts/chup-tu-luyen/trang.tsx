@@ -21,11 +21,6 @@ import SanhBanDo from '../../src/components/hoa2/SanhBanDo'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 import ManTuLuyen from '../../src/components/tu-luyen/ManTuLuyen'
 import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
-import '../../src/styles/hanh-trinh-v2.css'
-import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
-
-document.documentElement.dataset.phongCach = 'v2'
-apDungGiaoDien('sang')
 
 const man = new URLSearchParams(location.search).get('man') ?? 'tl'
 const now = Date.now()

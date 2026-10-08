@@ -17,23 +17,20 @@ const GIO_DAU = 5 * 60
 const GIO_CUOI = 23 * 60
 const phanTram = (x: number): string => `${Math.round(x * 100)}%`
 
-export default function ManHomNay({ v, hoc2, canhBao, onDaXem, coTieuDe = true }: { v: ViewPhMoi; hoc2: Hoc2 | null; canhBao: CanhBaoThay[]; onDaXem: (id: string) => void; coTieuDe?: boolean }) {
+export default function ManHomNay({ v, hoc2, canhBao, onDaXem }: { v: ViewPhMoi; hoc2: Hoc2 | null; canhBao: CanhBaoThay[]; onDaXem: (id: string) => void }) {
   const pm = v.pm
   return (
     <div data-vung="man-chinh-ph">
-      {coTieuDe && <div className="ph3-tieu-de">
-        <h1>Hành trình của con</h1>
+      <div className="ph3-tieu-de">
+        <h1>Hôm nay</h1>
         {pm?.serverNow ? <span>Cập nhật {gioVn(pm.serverNow)}</span> : null}
-      </div>}
+      </div>
       {!pm ? (
         v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />
       ) : (
         <div className="ph3-luoi">
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
-          <div className="v2-ph-overview ph3-o-du">
-            <TienBoV2 pm={pm} />
-            <AnhHung pm={pm} hoc2={hoc2} />
-          </div>
+          <AnhHung pm={pm} hoc2={hoc2} />
           {hoc2?.chienDich && <ChienDich cd={hoc2.chienDich} omni={hoc2.omni} />}
           <BaiTapCu pm={pm} />
           {pm.caGanNhat && <CaGanNhat pm={pm} />}
@@ -51,25 +48,6 @@ export default function ManHomNay({ v, hoc2, canhBao, onDaXem, coTieuDe = true }
       )}
     </div>
   )
-}
-
-/** Chỉ vẽ các điểm đã công bố; không nội suy một dự báo điểm từ số câu làm. */
-function TienBoV2({ pm }: { pm: PhMoi }) {
-  const diem = [...(pm.tienBo?.diem ?? [])].filter((d) => Number.isFinite(d.diem) && d.diem >= 0 && d.diem <= 10)
-    .sort((a, b) => a.ngay.localeCompare(b.ngay)).slice(-7)
-  if (diem.length < 2) return null
-  const doi = diem.at(-1)!.diem - diem.at(-2)!.diem
-  const points = diem.map((d, i) => `${18 + i * 564 / (diem.length - 1)},${154 - d.diem * 13}`)
-  return <section className="ph3-the ph3-o-du v2-ph-tien-bo" aria-label="Tiến bộ qua các ca đã công bố">
-    <div className="v2-ph-tien-bo-dau"><span><BtLen co={24} /><b>Kết quả gần đây</b></span><strong data-giam={doi < 0}>{doi > 0 ? '+' : ''}{soVn(doi)} <small>điểm so với ca trước</small></strong></div>
-    <svg viewBox="0 0 600 180" role="img" aria-label={diem.map((d) => `${d.tenCa}: ${soVn(d.diem)} điểm`).join('; ')}>
-      {[0, 5, 10].map((v) => <line key={v} x1="18" x2="582" y1={154 - v * 13} y2={154 - v * 13} className="v2-ph-luoi" />)}
-      <polygon points={`18,166 ${points.join(' ')} 582,166`} className="v2-ph-mien" />
-      <polyline points={points.join(' ')} fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
-      {diem.map((d, i) => <g key={`${d.maCa}-${i}`}><circle cx={18 + i * 564 / (diem.length - 1)} cy={154 - d.diem * 13} r="5" fill="currentColor" /><title>{d.tenCa}: {soVn(d.diem)}</title></g>)}
-    </svg>
-    <div className="v2-ph-moc">{diem.map((d, i) => <span key={`${d.maCa}-${i}`}>{d.ngay.slice(5).split('-').reverse().join('/')}<b>{soVn(d.diem)}</b></span>)}</div>
-  </section>
 }
 
 function CanhBao({ cb, nay, onDaXem }: { cb: CanhBaoThay; nay: number; onDaXem: (id: string) => void }) {
@@ -101,7 +79,7 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
   else if (soCau === 0) phu = 'Kết quả hiện ở đây ngay khi con bắt đầu học.'
 
   const vong: { ti: number | null; mau: 'vong-hp' | 'vong-xl' | 'vong-tim'; nhan: string; so: string; duoi: string }[] = []
-  if (kh) vong.push({ ti: kh.tong > 0 ? kh.daLam / kh.tong : null, mau: 'vong-hp', nhan: 'Kế hoạch hôm nay', so: String(kh.daLam), duoi: ` / ${kh.tong} câu` })
+  if (kh) vong.push({ ti: kh.daLam / kh.tong, mau: 'vong-hp', nhan: 'Kế hoạch hôm nay', so: String(kh.daLam), duoi: ` / ${kh.tong} câu` })
   else if (soCau > 0 || mucCau) vong.push({ ti: mucCau ? soCau / mucCau : null, mau: 'vong-hp', nhan: 'Câu đã làm', so: String(soCau), duoi: mucCau ? ` / ${mucCau} câu` : ' câu' })
   if (tiDung !== null && tq && mau) vong.push({ ti: tiDung, mau: 'vong-xl', nhan: 'Làm đúng', so: phanTram(tiDung), duoi: ` · ${tq.soDung}/${mau} câu` })
   if (phut !== null && phut > 0) vong.push({ ti: mucPhut ? phut / mucPhut : null, mau: 'vong-tim', nhan: 'Thời gian học', so: String(phut), duoi: mucPhut ? ` / ${mucPhut} phút` : ' phút' })
@@ -126,8 +104,6 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
         <h2>{tieuDe}</h2>
         {phu && <p className="ph3-ah__phu">{phu}</p>}
       </div>
-      {(vong.length > 0 || so.length > 0) && <details className="v2-ph-details">
-      <summary>Chi tiết hôm nay</summary>
       {vong.length > 0 && (
         <div className="ph3-ah__vong">
           <VongDongTam vong={vong} nhan={vong.map((x) => `${x.nhan} ${x.so}${x.duoi}`).join('; ')} />
@@ -148,7 +124,6 @@ function AnhHung({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
           ))}
         </div>
       )}
-      </details>}
     </section>
   )
 }
@@ -188,14 +163,13 @@ export function dongOmniPh(o: PhOmni): { khoa: string; chu: string; dam?: true }
 }
 
 function ChienDich({ cd, omni }: { cd: NonNullable<Hoc2['chienDich']>; omni?: PhOmni }) {
-  const hanhTrinh = /^Hành trình giỏi Hóa/i.test(cd.ten)
   const dangLuyen = cd.daGap - cd.thanhThao - cd.canDayLai
   const chuaGap = cd.tong - cd.daGap
   const pt = (n: number) => `${(n / cd.tong) * 100}%`
   const dongOmni = omni ? dongOmniPh(omni) : []
   return (
-    <The id="ph3-cd" className={`ph3-o-hep${hanhTrinh ? ' ph3-hanh-trinh' : ''}`} vung="chien-dich" tieuDe={hanhTrinh ? 'Hành trình giỏi Hóa' : 'Chiến dịch của con'} phu={hanhTrinh ? 'Tự điều chỉnh theo năng lực mỗi ngày' : cd.ten} bieuTuong={<BtCo />} mau="xd"
-      chip={<Chip mau="xd">{hanhTrinh ? 'Đang chạy' : `Còn ${cd.conNgay} ngày`}</Chip>}>
+    <The id="ph3-cd" className="ph3-o-hep" vung="chien-dich" tieuDe="Chiến dịch của con" phu={cd.ten} bieuTuong={<BtCo />} mau="xd"
+      chip={<Chip mau="xd">Còn {cd.conNgay} ngày</Chip>}>
       <div className="ph3-cd-ray" role="img" aria-label={`${cd.thanhThao} câu đã thành thạo, ${dangLuyen} câu đang luyện, ${cd.canDayLai} câu cần thầy dạy lại, ${chuaGap} câu chưa gặp, trên tổng ${cd.tong} câu`}>
         {cd.thanhThao > 0 && <span data-mau="xl" style={{ width: pt(cd.thanhThao) }} />}
         {dangLuyen > 0 && <span data-mau="xd" style={{ width: pt(dangLuyen) }} />}
@@ -204,12 +178,12 @@ function ChienDich({ cd, omni }: { cd: NonNullable<Hoc2['chienDich']>; omni?: Ph
       <div className="ph3-cd-chu">
         <div><i data-mau="xl" /><span><b>{cd.thanhThao}</b>câu đã thành thạo</span></div>
         <div><i data-mau="xd" /><span><b>{dangLuyen}</b>câu đang luyện</span></div>
-        <div><i data-mau="ho" /><span><b>{cd.canDayLai}</b>{hanhTrinh ? 'câu đang trong vòng gỡ lỗi' : 'câu cần thầy dạy lại'}</span></div>
+        <div><i data-mau="ho" /><span><b>{cd.canDayLai}</b>câu cần thầy dạy lại</span></div>
         <div><i /><span><b>{chuaGap}</b>câu chưa gặp</span></div>
       </div>
       <div className="ph3-o-xam">
         <b>Tổng {cd.tong} câu · con đã gặp {cd.daGap} câu</b>
-        {hanhTrinh ? <span className="ph3-dong-bt"><BtDongHo co={16} />Kế hoạch mới được tính tự động mỗi ngày</span> : <span className="ph3-dong-bt"><BtDongHo co={16} />Hạn nộp {chuHanNgay(cd.hanNop)}</span>}
+        <span className="ph3-dong-bt"><BtDongHo co={16} />Hạn nộp {chuHanNgay(cd.hanNop)}</span>
       </div>
       {dongOmni.length > 0 && (
         <div className="ph3-o-xam" data-vung="chien-dich-omni">
@@ -328,7 +302,7 @@ function HocLucNao({ pm, coChienDich }: { pm: PhMoi; coChienDich: boolean }) {
     const t = tachVn(iso)
     return t ? t.h * 60 + t.p : null
   }
-  const nhan = (m: (typeof ds)[number]): string => (m.nguon === 'luyen_dang_vap' && coChienDich ? 'Học theo hành trình riêng' : m.nguon === 'luyen_dang_vap' ? NHAN_NGUON.luyen_dang_vap : tenMoc(m))
+  const nhan = (m: (typeof ds)[number]): string => (m.nguon === 'luyen_dang_vap' && coChienDich ? 'Luyện câu trong chiến dịch' : m.nguon === 'luyen_dang_vap' ? NHAN_NGUON.luyen_dang_vap : tenMoc(m))
   return (
     <The id="ph3-gio" tieuDe="Con học lúc nào" bieuTuong={<BtDongHo />} mau="tim">
       <div className="ph3-gio" aria-hidden="true">
@@ -372,7 +346,7 @@ function AiDaLo({ pm }: { pm: PhMoi }) {
     return `Chấm và giải thích ${x.so} câu ngay khi con làm xong`
   }
   return (
-    <The id="ph3-ai" tieuDe="Hệ thống đã chuẩn bị cho con" bieuTuong="ĐH" mau="thay">
+    <The id="ph3-ai" tieuDe="Thầy Đỗ Đại Học đã lo cho con" bieuTuong="ĐH" mau="thay">
       <ul className="ph3-ai">
         {ds.map((x, i) => <li key={i}><BtTich co={20} day={2.5} /><span>{chu(x)}</span></li>)}
       </ul>

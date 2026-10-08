@@ -137,7 +137,7 @@ describe('SanhBanDo — theo bản vẽ Moi-SanhBanDo', () => {
     expect(screen.getByRole('button', { name: 'Mở thần thú của em: Lửa Nhỏ · Cấp 7' })).toBeTruthy()
     expect(container.querySelector('.h2-luc-giac img')!.getAttribute('src')).toBe('/than-thu-v2/nho/thu-2-0-be.webp')
     expect(container.querySelector('.h2-hud-phu')!.textContent).toMatch(/^\d+\/\d+ EXP · \+22 hôm nay$/)
-    expect(screen.getByLabelText('Kế hoạch hôm nay: còn 32/40 câu')).toBeTruthy()
+    expect(screen.getByLabelText('Thể lực hôm nay: còn 32/40 câu')).toBeTruthy()
     expect(container.textContent).toContain('Chuỗi 5 ngày')
     // thanh phải
     fireEvent.click(screen.getByRole('button', { name: 'Câu đã làm' }))

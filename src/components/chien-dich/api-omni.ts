@@ -62,8 +62,6 @@ export interface BaiDaTick {
   chungChi: { dat: number; tong: number } | null
   /** Số em đã giao (chiến dịch của bài) — máy chủ gửi thì dùng; vắng ⇒ null (màn lấy `chungChi.tong`). */
   soEm: number | null
-  /** Bài nằm trong Hành trình sống lâu của khối, không có hạn nộp riêng. */
-  hanhTrinh: boolean
 }
 export interface DanhSachBaiDaDay {
   bai: BaiDaTick[]
@@ -115,8 +113,7 @@ export interface XemTruocTick {
 }
 export interface KetQuaTick {
   chienDichId: string
-  hanNop: string | null
-  hanhTrinh: boolean
+  hanNop: string
   /** Bài này đã tick trước đó ⇒ giữ chiến dịch có sẵn (không tạo thêm). */
   daCo: boolean
 }
@@ -137,7 +134,6 @@ function docBaiDaTick(x: unknown): BaiDaTick | null {
     conNgay: so(x.conNgay),
     chungChi: cc,
     soEm: so(x.soEm) === null ? null : soNguyen(x.soEm),
-    hanhTrinh: x.hanhTrinh === true,
   }
 }
 
@@ -187,14 +183,14 @@ export async function baiDaDayXemTruoc(dv: DauVaoBai): Promise<KetQuaLenh<XemTru
 export async function baiDaDayTick(dv: DauVaoBai & { phamVi: BaiPhamVi[] }): Promise<KetQuaLenh<KetQuaTick>> {
   const r = await goiBai('tick', { ...dv })
   if (!r.ok) return r
-  return { ok: true, du: { chienDichId: chu(r.du.chienDichId), hanNop: chu(r.du.hanNop) || null, hanhTrinh: r.du.hanhTrinh === true, daCo: r.du.daCo === true } }
+  return { ok: true, du: { chienDichId: chu(r.du.chienDichId), hanNop: chu(r.du.hanNop), daCo: r.du.daCo === true } }
 }
 
-export async function baiDaDayBoTick(lop: string, khoaBai: string): Promise<KetQuaLenh<{ chienDich: 'da_huy' | 'da_dong' | 'hanh_trinh_giu_nguyen' | null }>> {
+export async function baiDaDayBoTick(lop: string, khoaBai: string): Promise<KetQuaLenh<{ chienDich: 'da_huy' | 'da_dong' | null }>> {
   const r = await goiBai('bo-tick', { lop, khoaBai })
   if (!r.ok) return r
   const c = r.du.chienDich
-  return { ok: true, du: { chienDich: c === 'da_huy' || c === 'da_dong' || c === 'hanh_trinh_giu_nguyen' ? c : null } }
+  return { ok: true, du: { chienDich: c === 'da_huy' || c === 'da_dong' ? c : null } }
 }
 
 // ---------------------------------------------------------------- /gv/omni — công tắc + cấu hình

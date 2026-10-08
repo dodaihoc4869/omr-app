@@ -8,7 +8,6 @@ import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import type { HocLieuChua } from './chua-cau-sai-kieu'
 import { dongBoTuLuyen } from './chua-cau-sai-tu-luyen'
-import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 type Obj = Record<string, unknown>
 const str = (v: unknown) => (typeof v === 'string' ? v : '')
 export async function cauHinhThay(env: Env, b: Obj): Promise<Response> {
@@ -162,89 +161,9 @@ export async function hocLieuThay(env: Env, b: Obj): Promise<Response> {
 }
 export async function hangHocLieu(env: Env): Promise<Response> {
   const rows = await env.DB.prepare(
-    `WITH cau_hien_tai AS (
-       SELECT q.qid,q.version,q.json FROM game_v2_question q
-       JOIN de_kho d ON d.ma_de=q.ma_de
-       JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
-       WHERE COALESCE(d.da_xoa,0)=0 GROUP BY q.qid
-     ), hang AS (
-       SELECT qid_chuan AS qid,phien_ban_cau AS version,trang_thai_day AS trangThai,ly_do_thieu AS lyDo,
-         COUNT(DISTINCT id) AS soDot,COUNT(DISTINCT sbd) AS soEm,MIN(chot_do_luc) AS hanGanNhat
-       FROM chua_loi_dot
-       WHERE dong_luc IS NULL AND trang_thai_day IN ('thieu_hoc_lieu','cau_thay_doi','tam_khoa')
-       GROUP BY qid_chuan,phien_ban_cau,trang_thai_day,ly_do_thieu
-     )
-     SELECT hang.*,c.version AS versionMoi,c.json AS cauJson,
-       EXISTS(SELECT 1 FROM chua_loi_hoc_lieu h WHERE h.qid_chuan=hang.qid AND h.content_version=c.version AND h.trang_thai='du_dung') AS coHocLieuMoi
-     FROM hang LEFT JOIN cau_hien_tai c ON c.qid=hang.qid
-     ORDER BY soEm DESC,CASE WHEN hanGanNhat IS NULL THEN 1 ELSE 0 END,hanGanNhat ASC,qid LIMIT 5000`,
-  ).all<Record<string, unknown>>()
-  const ds = (rows.results ?? []).map((x) => {
-    let cau: Record<string, unknown> | null = null
-    if (typeof x.cauJson === 'string') {
-      try {
-        cau = JSON.parse(x.cauJson) as Record<string, unknown>
-      } catch {
-        cau = null
-      }
-    }
-    const versionMoi = str(x.versionMoi)
-    const coHocLieuMoi = Number(x.coHocLieuMoi ?? 0) === 1
-    const loaiHang = !x.cauJson
-      ? 'thieu_cau_goc'
-      : !cau
-        ? 'cau_goc_hong'
-        : cau.reviewed !== true
-          ? 'cau_chua_duyet'
-          : laCauTuLuan(cau)
-            ? 'tu_luan_khong_tu_dong'
-            : coHocLieuMoi
-              ? 'da_co_hoc_lieu_moi'
-              : 'san_sang_soan'
-    return {
-      qid: str(x.qid),
-      version: str(x.version),
-      versionMoi,
-      daDoi: Boolean(versionMoi && versionMoi !== str(x.version)),
-      trangThai: str(x.trangThai),
-      lyDo: str(x.lyDo),
-      loaiHang,
-      soDot: Number(x.soDot ?? 0),
-      soEm: Number(x.soEm ?? 0),
-      hanGanNhat: x.hanGanNhat == null ? null : Number(x.hanGanNhat),
-    }
-  })
-  const thuTu: Record<string, number> = {
-    da_co_hoc_lieu_moi: 0,
-    san_sang_soan: 1,
-    cau_chua_duyet: 2,
-    cau_goc_hong: 3,
-    tu_luan_khong_tu_dong: 4,
-    thieu_cau_goc: 5,
-  }
-  ds.sort(
-    (a, b) =>
-      (thuTu[a.loaiHang] ?? 9) - (thuTu[b.loaiHang] ?? 9) ||
-      b.soEm - a.soEm ||
-      (a.hanGanNhat ?? Number.MAX_SAFE_INTEGER) -
-        (b.hanGanNhat ?? Number.MAX_SAFE_INTEGER) ||
-      a.qid.localeCompare(b.qid),
-  )
-  const tongHop: Record<
-    string,
-    { soNhomCau: number; soDot: number; soEmCau: number }
-  > = {}
-  for (const x of ds) {
-    const t = (tongHop[x.loaiHang] ??= {
-      soNhomCau: 0,
-      soDot: 0,
-      soEmCau: 0,
-    })
-    t.soNhomCau++
-    t.soDot += x.soDot
-    t.soEmCau += x.soEm
-  }
-  return Response.json({ ok: true, ds, tongHop, tongNhom: ds.length })
+    `SELECT qid_chuan AS qid,phien_ban_cau AS version,trang_thai_day AS trangThai,ly_do_thieu AS lyDo,COUNT(*) AS soDot,COUNT(DISTINCT sbd) AS soEm,MIN(chot_do_luc) AS hanGanNhat FROM chua_loi_dot WHERE dong_luc IS NULL AND trang_thai_day IN ('thieu_hoc_lieu','cau_thay_doi','tam_khoa') GROUP BY qid_chuan,phien_ban_cau,trang_thai_day,ly_do_thieu ORDER BY soEm DESC,hanGanNhat ASC LIMIT 200`,
+  ).all()
+  return Response.json({ ok: true, ds: rows.results ?? [] })
 }
 export async function giaoPilot(env: Env, b: Obj): Promise<Response> {
   const cfg = await docCauHinh(env)

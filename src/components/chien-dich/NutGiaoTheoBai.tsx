@@ -7,7 +7,7 @@ import { KHOA_MO_THE_DAY_HOC } from '../../lib/bai-hom-nay'
 import { TEN_AI } from '../../lib/omni-chu'
 import { docCoOmni } from './api-omni'
 
-export default function NutGiaoTheoBai({ className = 'gv2-nut-vien', nhan = 'Giao theo bài' }: { className?: string; nhan?: string }) {
+export default function NutGiaoTheoBai({ className = 'gv2-nut-vien' }: { className?: string }) {
   const setScreen = useAppStore((s) => s.setScreen)
   const [bat, setBat] = useState(false)
   useEffect(() => {
@@ -29,8 +29,8 @@ export default function NutGiaoTheoBai({ className = 'gv2-nut-vien', nhan = 'Gia
     setScreen('goilenbang')
   }
   return (
-    <button type="button" className={className} onClick={mo} title={`Chọn bài vừa dạy để ${TEN_AI} tự lập lại kế hoạch riêng cho từng em`}>
-      {nhan}
+    <button type="button" className={className} onClick={mo} title={`Tick bài vừa dạy ⇒ ${TEN_AI} tự giao luyện theo bài (Chữa trên lớp › Dạy học › Bài hôm nay)`}>
+      Giao theo bài
     </button>
   )
 }

@@ -1,4 +1,4 @@
-// THẺ NÂNG CAO 08/10: Sảnh (dọc + ngang) vẽ nút phụ sau phần bắt buộc, ghi rõ số câu + bậc mục tiêu + không bắt buộc.
+// THỬ SỨC THÊM (thầy chốt 30/09): Sảnh (dọc + ngang) vẽ nút PHỤ "Thử sức thêm (không bắt buộc)" + dòng "Lấy trước {n} câu mới của ngày mai"
 // ở màn xong kế hoạch và chỗ "không còn câu" — CHỈ khi máy chủ gửi `thuSucThem.duoc` với số câu dương. Bấm ⇒ gọi `hoa2-thu-suc-them` ⇒ tải lại Sảnh.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
@@ -13,9 +13,9 @@ const CD = { id: 'cd1', ten: 'Ester – Lipid', hanNop: '2026-10-05', D: 6, tong
 const GOC = { ok: true, cheDo2: true, ngay: '2026-09-30', chienDich: CD, huyetChien: false, khoaDao: false, loiKhoaDao: '' }
 const XONG_MO = { ...GOC, theLuc: { con: 0, tong: 30 }, doan: { con: 0 }, dao: { con: 0 }, ruong: { daLam: 30, tong: 30, moDuoc: true, daMo: true, qua: { vang: 20 } } }
 const TRONG = { ...GOC, theLuc: { con: 0, tong: 0 }, doan: { con: 0 }, dao: { con: 0 }, ruong: { daLam: 0, tong: 0, moDuoc: false, daMo: false } }
-const DUOC = { thuSucThem: { duoc: true, soCau: 19, mucDo: 'Vận dụng cao' } }
-const NUT = 'Thử thách nâng cao'
-const PHU = '19 câu · Vận dụng cao · không bắt buộc'
+const DUOC = { thuSucThem: { duoc: true, soCau: 19 } }
+const NUT = 'Thử sức thêm (không bắt buộc)'
+const PHU = 'Lấy trước 19 câu mới của ngày mai'
 
 function datMan(rong: number, cao: number) {
   const ngangHuong = rong > cao
@@ -40,7 +40,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 describe('docSanh đọc thuSucThem', () => {
   it('duoc + số câu dương ⇒ giữ; thiếu / soCau 0 / rác ⇒ { duoc: false, soCau: 0 }', () => {
     const lay = (x: Record<string, unknown>) => { const k = docSanh(x); return k && 'sanh' in k ? k.sanh.thuSucThem : null }
-    expect(lay({ ...XONG_MO, ...DUOC })).toEqual({ duoc: true, soCau: 19, mucDo: 'Vận dụng cao' })
+    expect(lay({ ...XONG_MO, ...DUOC })).toEqual({ duoc: true, soCau: 19 })
     expect(lay(XONG_MO)).toEqual({ duoc: false, soCau: 0 })
     expect(lay({ ...XONG_MO, thuSucThem: { duoc: true, soCau: 0 } })).toEqual({ duoc: false, soCau: 0 })
     expect(lay({ ...XONG_MO, thuSucThem: { duoc: 'true', soCau: 19 } })).toEqual({ duoc: false, soCau: 0 })
@@ -49,7 +49,7 @@ describe('docSanh đọc thuSucThem', () => {
 })
 
 describe.each([['dọc', 390, 844], ['ngang', 1280, 800]] as const)('Sảnh %s', (_ten, rong, cao) => {
-    it('xong kế hoạch, rương đã mở, máy chủ cho ⇒ ĐÚNG MỘT thẻ phụ nâng cao + số câu, không bắt buộc', () => {
+  it('xong kế hoạch, rương đã mở, máy chủ cho ⇒ ĐÚNG MỘT nút phụ "Thử sức thêm (không bắt buộc)" + dòng "Lấy trước 19 câu mới của ngày mai"', () => {
     datMan(rong, cao)
     const { container } = ve({ ...XONG_MO, ...DUOC })
     expect(container.textContent).toContain('Hôm nay em xong rồi')

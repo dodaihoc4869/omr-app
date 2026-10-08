@@ -54,9 +54,7 @@ const dat = (k: KhoOmni, khoa: string, giaTri: string) => {
 
 /** Lớp 12A1 đã tick Bài 6 hôm nay (CD6, hạn 11/10, thể lực 40) và coi Bài 1–5 là bài đã dạy; mỗi bài cũ 200 câu (5 × 200 = 1 000 > trần 800). */
 function dungLop(soCauBai = 200): KhoOmni {
-  // Dùng L4 để bộ test này đo riêng cơ chế phân bổ ôn bài cũ trên trần gốc 40;
-  // trần cá nhân L1–L3 được kiểm ở bộ phân bổ hồ sơ.
-  const k = taoKhoOmni({ 'DH-B1': soCauBai, 'DH-B2': soCauBai, 'DH-B3': soCauBai, 'DH-B4': soCauBai, 'DH-B5': soCauBai, 'DH-B6': 20 }, 3, 'L4')
+  const k = taoKhoOmni({ 'DH-B1': soCauBai, 'DH-B2': soCauBai, 'DH-B3': soCauBai, 'DH-B4': soCauBai, 'DH-B5': soCauBai, 'DH-B6': 20 })
   gia.omni = new Set(['S1'])
   gia.phamVi = phamViBai({ ma: 'DH-B1', viTri: 1 }, { ma: 'DH-B2', viTri: 2 }, { ma: 'DH-B3', viTri: 3 }, { ma: 'DH-B4', viTri: 4 }, { ma: 'DH-B5', viTri: 5 }, { ma: 'DH-B6', viTri: 6, tick: 'CD6' })
   themChienDich(k.d, { id: 'CD6', maDe: ['DH-B6'], qids: k.qids('DH-B6'), sbd: ['S1', 'S2', 'S3'], hanNop: '2026-10-11', taoLuc: '2026-10-05T01:00:00.000Z', theLuc: 40 })

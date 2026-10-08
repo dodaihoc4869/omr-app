@@ -89,7 +89,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   // tick bài + phạm vi lớp (thầy chủ động tạo, như `chien_dich`) · thư mục kho, vi kỹ năng, ma trận Q (học liệu) · hồ sơ omni_* (dựng lại từ sổ, như `nam_kt_cau`)
   // · chứng chỉ, xác nhận của thầy, ca chốt, đề thử (hồ sơ học tập) · đếm câu lộ diện, vé tuần (vận hành, khoá theo ngày/tuần nên tự làm mới).
   'bai_da_day', 'pham_vi_lop', 'de_kho_thu_muc', 'omni_vkn', 'omni_q', 'omni_em', 'omni_p_vkn', 'omni_beta_cau', 'omni_du_bao',
-  'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_quyet_dinh_v2_nhat_ky', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi', 'omni_buoc_sai',
+  'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi', 'omni_buoc_sai',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
 ]

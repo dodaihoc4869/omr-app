@@ -23,7 +23,7 @@ import { laCauTuLuan } from './cam-tu-luan'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
-import { docBatDauMap, docChienDichCuaEm, docChienDichDangChayCuaCacEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop, xoaDemChienDich } from './srs2-d1'
+import { docBatDauMap, docChienDichCuaEm, docChienDichDangChayCuaCacEm, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ngayVnCua, noCuCaLop } from './srs2-d1'
 import { congNgay, khoiLuongCan, soNgayConLai, soNgayGiua } from './srs2-loi'
 import { KHOA_THE_LUC_LOP, SQL_LA_LAN_LAM, THAM_SO_OMNI } from './omni-kieu'
 import { cacQidSongSinh } from './loi-hoc-luat'
@@ -37,7 +37,6 @@ import { chanMetaKhacKhoi, docKhoiChungCacEm } from './chan-khac-khoi'
 import { thuMucCuaMaDe, thuMucTheoMa } from './kho-thu-muc'
 import { docTiLeHieuLucCuaLop } from './omni-on-bai-cu-d1'
 import { chiaCauTheoBai, xemOnBaiCu, type TiLeOnBaiCu } from './omni-on-bai-cu'
-import { boSungHanhTrinh, docKhoiHanhTrinhMap, hopNhatChienDichDangMo } from './hanh-trinh-gioi-hoa'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -283,16 +282,6 @@ export async function phamViCuaEm(env: Env, sbd: string): Promise<PhamViLop | nu
       const pv = await phamViLop(env, lop)
       if (pv) return pv
     }
-    // Em vừa đổi lớp: hành trình mang tên khối, nên tìm lớp gốc từ chính dòng bài đã dạy liên kết với hành trình.
-    const lopBai = await env.DB.prepare(`SELECT DISTINCT b.lop FROM bai_da_day b JOIN chien_dich c ON c.id=b.chien_dich_id
-      WHERE b.bo_tick_luc IS NULL AND EXISTS (SELECT 1 FROM json_each(c.sbd_json) WHERE value=?) ORDER BY b.tick_luc DESC LIMIT 4`)
-      .bind(s).all<Row>().catch(() => ({ results: [] as Row[] }))
-    for (const x of lopBai.results ?? []) {
-      const l = str(x.lop).trim()
-      if (!l || l === lop) continue
-      const pv = await phamViLop(env, l)
-      if (pv) return pv
-    }
     // Lùi: lớp ghi trên chiến dịch gần nhất có em (chiến dịch tick bài mang đúng tên lớp lúc tick — em đổi lớp sau vẫn theo bài đang luyện).
     const daXet = new Set<string>(lop ? [lop] : [])
     for (const cd of await docChienDichCuaEm(env, s)) {
@@ -536,11 +525,7 @@ async function hanCuaChienDich(env: Env, id: string): Promise<string | null> {
   const r = await env.DB.prepare('SELECT han_nop FROM chien_dich WHERE id = ?').bind(id).first<Row>().catch(() => null)
   return r ? str(r.han_nop) || null : null
 }
-const traDaCo = async (env: Env, r: Row) => {
-  const id = str(r.chien_dich_id)
-  const ht = id ? await docKhoiHanhTrinhMap(env, [id]) : new Map()
-  return { ok: true, chienDichId: id || null, hanNop: ht.has(id) ? null : await hanCuaChienDich(env, id), hanhTrinh: ht.has(id), daCo: true }
-}
+const traDaCo = async (env: Env, r: Row) => ({ ok: true, chienDichId: str(r.chien_dich_id) || null, hanNop: await hanCuaChienDich(env, str(r.chien_dich_id)), daCo: true })
 
 /** Ghi `pham_vi_lop`: bài tick nguồn 'tick' (đè dòng 'truoc' cũ nếu có); mỗi bài trong `phamVi` nguồn 'truoc', KHÔNG đè dòng 'tick'. */
 async function ghiPhamVi(env: Env, dv: DauVaoBai, luc: string): Promise<void> {
@@ -581,11 +566,9 @@ async function tick(env: Env, b: Row, nowMs: number): Promise<Record<string, unk
   const treo = !!cu && !str(cu.chien_dich_id) && !(nowMs - Date.parse(str(cu.tick_luc)) < TREO_MS)
   if (cu && !treo) return traDaCo(env, cu)
   if (!dv.em.length) return { ok: false, error: `Lớp ${dv.lop} chưa có học sinh nào.` }
-  const khoi = khoiCuaLop(dv.lop)
-  if (!khoi) return { ok: false, error: `Chưa xác định được khối của lớp ${dv.lop}.` }
-  const [ct, cb, bangEm] = await Promise.all([cauCuaToChiTiet(env, dv.maDe), docCauBai(env, dv.maDe).catch(() => ({ soTuLuan: 0, kienThuc: [] as string[] })), bangLopCacEm(env, nowMs)])
-  if (!ct.qids.length) return { ok: false, error: 'Bài này chưa có câu dùng được.' }
-  const sbdKhoi = [...bangEm].filter(([, e]) => khoiCuaLop(e.lop) === khoi).map(([s]) => s)
+  const homNay = ngayVnCua(nowMs)
+  const [han, cb] = await Promise.all([dv.hanNop ? Promise.resolve({ hanNop: dv.hanNop }) : tinhHan(env, dv, nowMs), docCauBai(env, dv.maDe).catch(() => ({ soTuLuan: 0, kienThuc: [] as string[] }))])
+  if ('loi' in han) return { ok: false, error: han.loi }
   const luc = new Date(nowMs).toISOString()
   // GIỮ CHỖ trước khi tạo chiến dịch: chỉ mục duy nhất ⇒ lượt tick đồng thời thứ hai rơi vào nhánh `daCo`, không tạo chiến dịch thứ hai.
   let id = cu ? str(cu.id) : ''
@@ -600,27 +583,28 @@ async function tick(env: Env, b: Row, nowMs: number): Promise<Record<string, unk
       throw e
     }
   }
-  let t: Awaited<ReturnType<typeof boSungHanhTrinh>>
-  try {
-    t = await boSungHanhTrinh(env, { khoi, sbd: sbdKhoi.length ? sbdKhoi : dv.em.map((e) => e.sbd), maDe: dv.maDe, qids: ct.qids, nowMs })
-  } catch (e) {
+  const t = await goiChienDich(env, {
+    action: 'tao', ten: tenChienDichBai(dv.tenBai), lop: dv.lop, sbd: dv.em.map((e) => e.sbd), maDe: dv.maDe,
+    hanNop: han.hanNop, theLucNgay: dv.theLuc, huyetChien: true, raiDeu: true, batDau: homNay,
+  }, nowMs)
+  if (t.ok !== true) {
     // Hoàn lại dòng giữ chỗ VỪA ghi ở lượt này (chưa gắn chiến dịch) để thầy tick lại được ngay.
     if (!cu) await env.DB.prepare('DELETE FROM bai_da_day WHERE id = ? AND chien_dich_id IS NULL').bind(id).run().catch(() => null)
-    return { ok: false, error: e instanceof Error ? e.message : 'Chưa bổ sung được bài vào Hành trình.' }
+    return { ok: false, error: str(t.error) || 'Chưa tạo được chiến dịch cho bài này.' }
   }
-  const chienDichId = t.id
+  const chienDichId = str(t.id)
   const gan = await env.DB.prepare('UPDATE bai_da_day SET chien_dich_id = ?, ten_bai = ?, vi_tri = ?, ma_to_json = ?, tick_luc = ?, nguoi = ? WHERE id = ? AND chien_dich_id IS NULL AND bo_tick_luc IS NULL')
     .bind(chienDichId, dv.tenBai, dv.viTri, JSON.stringify(dv.maDe), luc, dv.nguoi, id).run()
   if (!Number(gan.meta?.changes ?? 0)) {
-    // Dòng treo vừa được lượt khác gắn / bỏ tick; Hành trình dùng chung nên không bao giờ huỷ nó.
+    // Dòng treo vừa được lượt khác gắn chiến dịch / bỏ tick trong lúc lượt này tạo ⇒ huỷ chiến dịch thừa của lượt này (chưa em nào làm).
+    await goiChienDich(env, { action: 'huy', id: chienDichId }, nowMs)
     const lai = await dongConHieuLuc(env, dv.lop, dv.khoaBai)
     return lai ? traDaCo(env, lai) : { ok: false, error: 'Bài này vừa được bỏ tick ở lượt khác. Thầy tick lại nếu cần.' }
   }
   await ghiPhamVi(env, dv, luc)
   xoaDemPhamVi(dv.lop)
-  xoaDemChienDich()
   await ghiDaDayChoEm(env, dv.em.map((e) => e.sbd), cb.kienThuc, `bai_da_day:${id}`, luc)
-  return { ok: true, chienDichId, hanNop: null, hanhTrinh: true, khoi, soCauHanhTrinh: t.soCau, daCo: false }
+  return { ok: true, chienDichId, hanNop: han.hanNop, daCo: false }
 }
 
 /** Chiến dịch đã có lượt làm nào (của em trong chiến dịch, câu của chiến dịch — kể cả câu song sinh) kể từ lúc tạo? Lỗi đọc ⇒ coi như CÓ (đóng an toàn hơn huỷ). */
@@ -650,10 +634,6 @@ async function boTick(env: Env, b: Row, nowMs: number): Promise<Record<string, u
   xoaDemPhamVi(lop)
   if (!Number(r.meta?.changes ?? 0)) return { ok: true, chienDich: null } // lượt khác vừa bỏ tick
   const cdId = str(cu.chien_dich_id)
-  if (cdId && (await docKhoiHanhTrinhMap(env, [cdId])).has(cdId)) {
-    // Chỉ bỏ bài khỏi phạm vi lớp; Hành trình còn phục vụ các lớp khác và giữ nguyên lịch sử.
-    return { ok: true, chienDich: 'hanh_trinh_giu_nguyen' }
-  }
   const dong = cdId ? await env.DB.prepare('SELECT * FROM chien_dich WHERE id = ?').bind(cdId).first<Row>() : null
   if (!dong) return { ok: true, chienDich: null }
   const [cd] = await docChienDichKemBatDau(env, [dong])
@@ -680,29 +660,28 @@ async function danhSach(env: Env, b: Row, nowMs: number): Promise<Record<string,
   const ids = [...new Set(rows.map((r) => str(r.chien_dich_id)).filter(Boolean))]
   // Tối ưu 05/10: ngày bắt đầu / rải đều / số chứng chỉ chỉ cần MÃ chiến dịch (đã có từ dòng tick) ⇒ đọc CÙNG đợt với dòng chiến dịch (trước: chờ dòng chiến dịch).
   // Ghép đúng như `docChienDichKemBatDau` (tra theo mã ⇒ mã thừa không ảnh hưởng).
-  const pBdRd = Promise.all([docBatDauMap(env, ids), docRaiDeuMap(env, ids), docKhoiHanhTrinhMap(env, ids)])
+  const pBdRd = Promise.all([docBatDauMap(env, ids), docRaiDeuMap(env, ids)])
   const pDat = demChungChi(env, ids)
   pBdRd.catch(() => {}); pDat.catch(() => {})
   const cdRows = ids.length ? (await env.DB.prepare('SELECT * FROM chien_dich WHERE id IN (SELECT value FROM json_each(?))').bind(JSON.stringify(ids)).all<Row>()).results ?? [] : []
-  const [[bd, rd, ht], dat] = await Promise.all([pBdRd, pDat])
-  const dsCd = cdRows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null, hanh_trinh_khoi: ht.get(str(r.id)) ?? null }))
+  const [[bd, rd], dat] = await Promise.all([pBdRd, pDat])
+  const dsCd = cdRows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null }))
   const cds = new Map(dsCd.map((c) => [c.id, c]))
   const homNay = ngayVnCua(nowMs)
   const bai = rows.map((r) => {
     const cd = cds.get(str(r.chien_dich_id)) ?? null
-    const dangLuyen = !!cd && cd.trangThai === 'dang_chay' && (cd.hanhTrinh || cd.hanNop >= homNay)
+    const dangLuyen = !!cd && cd.trangThai === 'dang_chay' && cd.hanNop >= homNay
     return {
       khoaBai: str(r.khoa_bai), tenBai: str(r.ten_bai), viTri: Number(r.vi_tri) || 0, tickLuc: str(r.tick_luc),
       chienDichId: str(r.chien_dich_id) || null,
       trangThai: dangLuyen ? 'dang_luyen' : 'da_day',
-      hanNop: cd?.hanhTrinh ? null : cd?.hanNop ?? null,
-      conNgay: dangLuyen && !cd?.hanhTrinh ? soNgayConLai(homNay, cd!.hanNop) : null,
-      hanhTrinh: cd?.hanhTrinh ?? false,
+      hanNop: cd?.hanNop ?? null,
+      conNgay: dangLuyen ? soNgayConLai(homNay, cd!.hanNop) : null,
       chungChi: { dat: cd ? dat.get(cd.id) ?? 0 : 0, tong: cd?.sbd.length ?? 0 },
     }
   })
   // Chờ bài mới: không còn bài đang luyện ⇒ số ngày từ hạn của bài gần nhất (chiến dịch chưa huỷ).
-  const hanGanNhat = dsCd.filter((c) => c.trangThai !== 'da_huy' && !c.hanhTrinh).map((c) => c.hanNop).filter((h) => NGAY.test(h)).sort().pop()
+  const hanGanNhat = dsCd.filter((c) => c.trangThai !== 'da_huy').map((c) => c.hanNop).filter((h) => NGAY.test(h)).sort().pop()
   const choBaiMoi = !bai.some((x) => x.trangThai === 'dang_luyen') && hanGanNhat ? { soNgay: Math.max(0, soNgayGiua(hanGanNhat, homNay)) } : null
   return { ok: true, bai, choBaiMoi }
 }
@@ -731,11 +710,6 @@ export async function gvBaiDaDay(env: Env, b: Row, nowMs = Date.now()): Promise<
     if (action === 'xem-truoc') return await xemTruoc(env, b, nowMs)
     if (action === 'tick') return await tick(env, b, nowMs)
     if (action === 'bo-tick') return await boTick(env, b, nowMs)
-    if (action === 'hop-nhat-hanh-trinh') {
-      const kq = await hopNhatChienDichDangMo(env, nowMs)
-      xoaDemChienDich(); xoaDemPhamVi()
-      return { ok: true, ...kq }
-    }
     return { ok: false, error: 'Hành động không hợp lệ.' }
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : String(e) }

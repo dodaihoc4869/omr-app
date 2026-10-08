@@ -56,17 +56,12 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
   return (
     <div className={`dh-chuong bl-tung-chuong ${cheDo2 ? 'dh2-chuong' : ''} ${tinh ? 'dh-tinh' : ''}`} role="dialog" aria-label="Cả đội ra đòn" data-che-do={cheDo2 ? '2' : undefined} onClick={onXong}>
       <div className="dh-chuong-tia-nen" />
-      {cheDo2 && <div className="dh2-chuong-vu-tru" aria-hidden="true">
-        <i className="dh2-chuong-vong dh2-chuong-vong-1"/><i className="dh2-chuong-vong dh2-chuong-vong-2"/>
-        {Array.from({ length: 12 }, (_, i) => <i key={i} className="dh2-chuong-hat" style={{ '--i': i } as CSSProperties}/>)}
-      </div>}
       <span className="bl-chuong-kicker">BÁT LINH · HIỆP {kq.hiep}</span>
       {cheDo2
         ? <button type="button" className="dh2-chuong-bo-qua" onClick={e => { e.stopPropagation(); onXong() }}>Bỏ qua</button>
         : <span className="dh-chuong-bo-qua">chạm để bỏ qua</span>}
       <div className="bl-chuong-san-dau">
       <svg className="bl-phap-tran" viewBox="0 0 400 180" aria-hidden="true"><ellipse cx="200" cy="90" rx="180" ry="67"/><ellipse cx="200" cy="90" rx="163" ry="54"/><ellipse cx="200" cy="90" rx="136" ry="43" strokeDasharray="3 9"/><path d="M20 90h360M200 23v134M76 43l248 94M76 137l248-94"/></svg>
-      {cheDo2 && <div className="dh2-chuong-xung" aria-hidden="true"><i/><i/><i/></div>}
       {kq.laTrum ? (
         <>
           <div className="dh-chuong-dai"><div><small>TRÙM · CÂU CHUNG CẢ ĐỘI</small><b>{kq.trum?.voGiap ? 'VỠ GIÁP TRÙM!' : `ĐÚNG ${kq.trum?.yDung ?? 0}/4 Ý`}</b></div></div>

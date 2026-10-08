@@ -62,7 +62,7 @@ beforeEach(() => {
 
 describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn bài cũ', () => {
   it('đọc MỌI chiến dịch đang chạy (hạn gần trước), câu mang cd; bài chưa tick và TU LUYỆN không vào cau (vẫn trong tt/meta); ứng viên ôn bài cũ', async () => {
-    const k = await dungKichBanHaiChienDich('L4')
+    const k = await dungKichBanHaiChienDich()
     gia.omni = new Set(['S1'])
     gia.phamVi = phamViBai({ ma: 'DH-B0', viTri: 0 }, { ma: 'DH-B1', viTri: 1, tick: 'CD1' }, { ma: 'DH-B2', viTri: 2, tick: 'CD2' })
     const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
@@ -86,7 +86,7 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     expect('omni' in hs2 || 'chienDichHet' in hs2 || 'onBaiCu' in hs2).toBe(false)
   })
   it('lớp CHƯA tick bài (phạm vi null): không lọc theo phạm vi, TU LUYỆN chỉ lọc khi KHÔNG có lịch sử sai (KHO-A-4 em sai ⇒ nợ vào); không ôn bài cũ, không chế độ chờ', async () => {
-    const k = await dungKichBanHaiChienDich('L4')
+    const k = await dungKichBanHaiChienDich()
     gia.omni = new Set(['S1'])
     const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
     expect(hs.cau.some((c) => c.qid.startsWith('DH-B3'))).toBe(true)
@@ -95,7 +95,7 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     expect(hs.omni).toEqual({ bat: true, cheDoCho: false, onBaiCuSo: 0 })
   })
   it('kế hoạch: không câu ngoài phạm vi; câu mới theo quota từng bài; bảng phụ lưu tập chiến dịch + câu ôn bài cũ; Sảnh có phần OMNI', async () => {
-    const k = await dungKichBanHaiChienDich('L4')
+    const k = await dungKichBanHaiChienDich()
     gia.omni = new Set(['S1'])
     gia.phamVi = phamViBai({ ma: 'DH-B0', viTri: 0 }, { ma: 'DH-B1', viTri: 1, tick: 'CD1' }, { ma: 'DH-B2', viTri: 2, tick: 'CD2' })
     const s = await sanh2(k.env, 'S1', T_SANG)
@@ -125,7 +125,7 @@ describe('OMNI 3 · docHoSo2 — nhiều bài song song + lọc phạm vi + ôn 
     expect(await docKeHoachOmni(k.env, 'S2', HOM_NAY)).toBeNull()
   })
   it('trọng số OMNI chỉ dùng khi em đã có quan sát; dạng đã vững ⇒ câu mới dạng ấy rời kế hoạch (vẫn trong hồ sơ)', async () => {
-    const k = await dungKichBanHaiChienDich('L4')
+    const k = await dungKichBanHaiChienDich()
     gia.omni = new Set(['S1'])
     gia.phamVi = phamViBai({ ma: 'DH-B0', viTri: 0 }, { ma: 'DH-B1', viTri: 1, tick: 'CD1' }, { ma: 'DH-B2', viTri: 2, tick: 'CD2' })
     const cd0 = (await chanDoanEm(k.env, 'S1', T_SANG)) as { omni: { lapLaiSeRa: { coTrongSo: boolean; tiLeOnBaiCu: number } } }
@@ -156,14 +156,14 @@ describe('OMNI 3 · ôn bài cũ khi chưa có trọng số: dạng yếu trư�
     const hs = await docHoSo2(k.env, 'S1', HOM_NAY)
     expect(hs.onBaiCu?.map((c) => c.qid)).toEqual(['DH-B0-0', 'DH-B0-1', 'DH-B0-2', 'DH-B0-3', 'DH-B0-4', 'DH-B0-5', 'DH-B0-6', 'DH-B0-7'])
     const { kh } = await layKeHoachHomNay(k.env, 'S1', T_SANG)
-    // Hồ sơ chung ở L2 nên trần cá nhân còn 30, phần ôn bài cũ 20 % = 6 câu; thứ tự vẫn D2 (L1) → D1 (L2) → D0 (L4).
-    expect(kh.onBaiCu).toEqual(['DH-B0-2', 'DH-B0-5', 'DH-B0-1', 'DH-B0-4', 'DH-B0-7', 'DH-B0-0'])
+    // ngày 1 của bài (tỉ lệ 0,2 ⇒ ≤ 8 câu ôn bài cũ): dạng D2 (L1) → D1 (L2) → D0 (L4)
+    expect(kh.onBaiCu).toEqual(['DH-B0-2', 'DH-B0-5', 'DH-B0-1', 'DH-B0-4', 'DH-B0-7', 'DH-B0-0', 'DH-B0-3', 'DH-B0-6'])
   })
 })
 
 describe('OMNI 3 · tick bài giữa ngày ⇒ lập lại giữ câu đã làm', () => {
   it('tập chiến dịch đổi ⇒ lập lại: câu đã làm đứng đầu, quota bài cũ trừ phần đã làm, bài mới có câu mới; bảng phụ cập nhật', async () => {
-    const k = taoKhoOmni({ 'DH-B1': 30, 'DH-B2': 24 }, 3, 'L4')
+    const k = taoKhoOmni({ 'DH-B1': 30, 'DH-B2': 24 })
     gia.omni = new Set(['S1'])
     gia.phamVi = phamViBai({ ma: 'DH-B0', viTri: 0 }, { ma: 'DH-B1', viTri: 1, tick: 'CD1' })
     themChienDich(k.d, { id: 'CD1', maDe: ['DH-B1'], qids: k.qids('DH-B1'), sbd: ['S1'], hanNop: '2026-10-09', taoLuc: '2026-10-05T01:00:00.000Z', theLuc: 40 })
@@ -193,7 +193,7 @@ describe('OMNI 3 · tick bài giữa ngày ⇒ lập lại giữ câu đã làm'
 
 describe('OMNI 3 · chế độ chờ bài mới', () => {
   const dungCho = async (theLucLop?: number) => {
-    const k = taoKhoOmni({ 'DH-B1': 20 }, 3, 'L4')
+    const k = taoKhoOmni({ 'DH-B1': 20 })
     gia.omni = new Set(['S1'])
     gia.phamVi = phamViBai({ ma: 'DH-B0', viTri: 0 }, { ma: 'DH-B1', viTri: 1, tick: 'CD1' })
     themChienDich(k.d, { id: 'CD1', maDe: ['DH-B1'], qids: k.qids('DH-B1'), sbd: ['S1'], hanNop: '2026-10-01', taoLuc: '2026-09-25T01:00:00.000Z', theLuc: 40 })
@@ -227,7 +227,7 @@ describe('OMNI 3 · chế độ chờ bài mới', () => {
 
 describe('OMNI 3 · lọc lướt (purpose luot)', () => {
   it('dòng lướt KHÔNG là lần làm (câu vẫn mới, không vào nợ) nhưng tính là ĐÃ PHỤC VỤ hôm nay', async () => {
-    const k = taoKhoOmni({ 'DH-B1': 12 }, 3, 'L4')
+    const k = taoKhoOmni({ 'DH-B1': 12 })
     gia.omni = new Set(['S1'])
     gia.phamVi = phamViBai({ ma: 'DH-B1', viTri: 1, tick: 'CD1' })
     themChienDich(k.d, { id: 'CD1', maDe: ['DH-B1'], qids: k.qids('DH-B1'), sbd: ['S1'], hanNop: '2026-10-12', taoLuc: '2026-10-05T01:00:00.000Z', theLuc: 40 })
@@ -244,7 +244,7 @@ describe('OMNI 3 · lọc lướt (purpose luot)', () => {
 
 describe('OMNI 3 · doiThuTuMetGio (khung giờ mệt)', () => {
   const dung = async (hanNop = '2026-10-15') => {
-    const k = taoKhoOmni({ 'DH-B1': 40 }, 4, 'L4')
+    const k = taoKhoOmni({ 'DH-B1': 40 }, 4)
     gia.omni = new Set(['S1', 'S2'])
     gia.phamVi = phamViBai({ ma: 'DH-B1', viTri: 1, tick: 'CD1' })
     // rải đều tắt ⇒ câu mới lấp đủ thể lực ⇒ kế hoạch có câu Vận dụng / Vận dụng cao
@@ -299,7 +299,7 @@ describe('OMNI 3 · doiThuTuMetGio (khung giờ mệt)', () => {
 
 describe('OMNI 3 · mô phỏng D1 nhiều ngày: bài 2 tick ngày 4, bài 3 không bao giờ tick', () => {
   it('4 em × 10 ngày: mọi câu mới gặp trước hạn riêng − 3; không câu bài 3 / TU LUYỆN; kế hoạch không vượt trần trừ Huyết Chiến', async () => {
-    const k = taoKhoOmni({ 'DH-B0': 10, 'DH-B1': 36, 'DH-B2': 30, 'DH-B3': 12, 'KHO-A': 8 }, 4, 'L4')
+    const k = taoKhoOmni({ 'DH-B0': 10, 'DH-B1': 36, 'DH-B2': 30, 'DH-B3': 12, 'KHO-A': 8 }, 4)
     const em = ['S1', 'S2', 'S3', 'S4']
     gia.omni = new Set(em)
     const b3 = k.qids('DH-B3'), kho = k.qids('KHO-A')

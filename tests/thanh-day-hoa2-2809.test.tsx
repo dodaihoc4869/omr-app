@@ -34,12 +34,12 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
     expect(document.querySelector('nav.day-thay')?.hasAttribute('data-hoa2')).toBe(false)
   })
 
-  // ĐỔI CÓ CHỦ Ý 08/10: gộp Chiến dịch + Chữa bài thành một mục Hành trình, không "Thêm"; Kho đề + Cài đặt ở bánh răng thanh trên.
-  it('cờ BẬT ⇒ 4 mục chính, Chiến dịch + Chữa bài đã gộp thành Hành trình', () => {
+  // ĐỔI CÓ CHỦ Ý 28/09 (bản vẽ docs/ban-ve-gv-2809/GV-ThanhBen): 5 mục trên thanh, KHÔNG còn "Thêm"; Kho đề + Cài đặt ở bánh răng thanh trên.
+  it('cờ BẬT ⇒ 5 mục của ThanhBenTrai 2.0 (cùng nguồn), không "Thêm"; ẩn Hôm nay / Bài tập / Học sinh hỏi / Giao đề', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     render(<BottomNav />)
     expect(nhanThanh()).toEqual(MUC_HOA2_CHINH.map((m) => m.ngan))
-    expect(nhanThanh()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Hành trình', 'Học sinh'])
+    expect(nhanThanh()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Chiến dịch', 'Chữa bài', 'Học sinh'])
     expect(screen.queryByRole('button', { name: 'Thêm' })).toBeNull()
     for (const cu of ['Hôm nay', 'Bài tập', 'Học sinh hỏi', 'Giao đề theo tuần', 'Giao bài tập về nhà', 'Lên bảng']) expect(nhanThanh()).not.toContain(cu)
     expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()

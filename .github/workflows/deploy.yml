@@ -61,8 +61,6 @@ jobs:
           fi
           echo "toan-bo=$TOAN_BO" >> "$GITHUB_OUTPUT"
           echo "Kiểm toàn repo: $TOAN_BO"
-      # Bộ toàn repo là cổng quan sát (không chặn phát hành); một số test cũ còn tiến trình nền nên phải có chốt cứng,
-      # tránh giữ hàng phát hành 30 phút. Các test vừa đổi + hợp đồng vận hành vẫn chạy bắt buộc ở bước kế tiếp.
       - run: timeout 5m npm test -- --run
         if: steps.pham-vi.outputs.toan-bo == 'true'
         timeout-minutes: 6
@@ -73,7 +71,7 @@ jobs:
           MOC_TRUOC: ${{ github.event.before }}
           TOAN_BO: ${{ steps.pham-vi.outputs.toan-bo }}
         run: |
-          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/srs2-phan-bo-ho-so-0810.test.ts tests/srs2-phan-bo-ho-so-d1-0810.test.ts)
+          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts)
           if [[ "$TOAN_BO" == false ]]; then
             git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
             while IFS= read -r TEP; do
@@ -113,6 +111,13 @@ jobs:
           accountId: ${{ env.CF_ACC_SACH }}
           command: deploy --tag=${{ github.sha }}
           workingDirectory: server
+
+      - name: Xác nhận đã khôi phục chiến dịch riêng
+        if: github.event_name == 'push' && github.event.before == '3f495cd16e9a8adab7682e346907d9a871ed4693'
+        run: node scripts/kiem-khoi-phuc-song-0810.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
 
       - name: Đẩy lên Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

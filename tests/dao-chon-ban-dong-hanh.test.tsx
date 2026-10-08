@@ -1,5 +1,5 @@
-// ĐẢO THẦN THÚ V2 · màn 1 "Chọn bạn đồng hành": thấy đủ Bát Linh, một chạm là chọn,
-// tên được chuẩn hoá TRƯỚC khi gọi máy chủ và toàn bộ tranh đều là bản nhẹ.
+// ĐẢO THẦN THÚ bản mới · màn 1 "Chọn bạn đồng hành": một chạm là chọn, tên được chuẩn hoá TRƯỚC khi gọi máy chủ,
+// tranh Cuồng nộ chỉ nạp khi em lật thẻ, chỉ nạp tranh thẻ giữa + hai thẻ kề.
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import ChonBanDongHanh, { TEN_GOI_Y, theMoDau } from '../src/game/than-thu-v2/dao/ChonBanDongHanh'
@@ -39,22 +39,31 @@ describe('Chọn bạn đồng hành', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Gợi ý một cái tên' }))
     expect(o.value).toBe(TEN_GOI_Y[2]![1])
   })
-  it('hiện đủ Bát Linh trong cùng đội hình; chỉ dùng ảnh nhẹ trong nho/', () => {
+  it('chỉ nạp tranh thẻ giữa + hai thẻ kề; tranh Cuồng nộ chỉ nạp khi lật thẻ giữa; chỉ dùng ảnh nhẹ trong nho/', () => {
     const { container } = render(<ChonBanDongHanh batDau={2} onChon={() => {}} />)
-    const ds = screen.getByRole('listbox', { name: 'Toàn bộ tám thần thú' })
-    expect(ds.querySelectorAll('[role="option"]')).toHaveLength(8)
-    expect(screen.getAllByRole('option').filter(o => o.getAttribute('aria-selected') === 'true')).toHaveLength(1)
-    expect(screen.getByRole('option', { name: /Viêm Sư/ }).getAttribute('aria-selected')).toBe('true')
-    expect(tranh(container)).toHaveLength(9)
+    expect(tranh(container).sort()).toEqual([1, 2, 3].map(i => `/than-thu-v2/nho/the-${i}-binh-thuong.webp`))
+    const giua = container.querySelector<HTMLElement>('.dao-chon-the[aria-current]')!
+    fireEvent.click(giua)
+    expect(giua.hasAttribute('data-lat')).toBe(true)
+    expect(tranh(container)).toContain('/than-thu-v2/nho/the-2-cuong-no.webp')
+    expect(giua.textContent).toContain('CUỒNG NỘ')
+    fireEvent.click(giua)
+    expect(giua.hasAttribute('data-lat')).toBe(false)
     expect(tranh(container).every(s => s!.startsWith('/than-thu-v2/nho/'))).toBe(true)
   })
-  it('chạm thú khác ⇒ hero, trạng thái chọn và nút vàng đổi ngay', () => {
+  it('vuốt sang thẻ khác ⇒ nút vàng đổi tên thú, thẻ lật trở về mặt thường, tranh thẻ mới được nạp', () => {
+    // KHÔNG đợi giờ thật: khung hình chạy ngay trong lúc bắn sự kiện cuộn (máy tải nặng thì rAF + waitFor 1 giây từng đỏ oan)
+    vi.stubGlobal('requestAnimationFrame', (f: FrameRequestCallback) => { f(0); return 0 })
+    vi.stubGlobal('cancelAnimationFrame', () => {})
     const { container } = render(<ChonBanDongHanh batDau={2} onChon={() => {}} />)
-    fireEvent.click(screen.getByRole('option', { name: /Ái Hồ/ }))
+    const bang = container.querySelector<HTMLElement>('.dao-chon-bang')!
+    fireEvent.click(container.querySelector<HTMLElement>('.dao-chon-the[aria-current]')!)
+    // jsdom không có bố cục: bước = 1 px ⇒ scrollLeft = số thứ tự thẻ
+    bang.scrollLeft = 5
+    fireEvent.scroll(bang)
     expect(screen.getByRole('button', { name: 'CHỌN ÁI HỒ' })).toBeTruthy()
-    expect(screen.getByRole('option', { name: /Ái Hồ/ }).getAttribute('aria-selected')).toBe('true')
-    expect(screen.getByAltText(/Ái Hồ, hệ/).getAttribute('src')).toContain('/than-thu-v2/nho/')
-    expect(container.querySelectorAll('[data-chon]')).toHaveLength(1)
+    expect(container.querySelector('[data-lat]')).toBeNull()
+    expect(tranh(container)).toContain('/than-thu-v2/nho/the-6-binh-thuong.webp')
   })
   it('đang gửi ⇒ nút vàng khoá; lỗi máy chủ hiện bằng role=alert; có dòng mời khi vào từ cửa Đoàn', () => {
     render(<ChonBanDongHanh batDau={2} busy loi="Hồ sơ đã chọn thần thú." moiDoan onChon={() => {}} />)

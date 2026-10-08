@@ -677,11 +677,6 @@
   font-weight: 700;
 }
 
-/* Hành trình dài hạn: thẻ tiến độ gọn, không lấn nút chơi chính. */
-.h2-cd { padding: 10px 12px; border: 1px solid rgb(45 115 105 / .2); border-radius: 18px; background: rgb(255 255 255 / .46); }
-.h2-cd-ten { font-size: 17px; }
-.h2-cd-han { color: var(--h2-ngoc-dam); font-size: 12px; }
-
 /* nút chính vàng 3D bóng — MỘT mỗi màn */
 .h2-nut-chinh {
   position: relative;
@@ -1389,14 +1384,6 @@
   color: var(--h2-cam-chu);
   font-weight: 600;
 }
-.h2-ng-phai { gap: 10px; }
-.h2-ng-the { padding: 13px 16px; border-radius: 20px; }
-.h2-ng-cd { gap: 14px; }
-.h2-ng-vong { width: 78px; height: 78px; }
-.h2-ng-vong > svg { width: 78px; height: 78px; }
-.h2-ng-vong-chu b { font-size: 20px; }
-.h2-ng-cd-ten { font-size: 21px; }
-.h2-ng-hai-thanh { gap: 10px; margin-top: 3px; }
 .h2-ng-hai-thanh {
   display: grid;
   grid-template-columns: 1fr 1fr;

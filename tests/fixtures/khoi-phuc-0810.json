@@ -1,0 +1,263 @@
+{
+  "campaigns": [
+    {
+      "id": "05d6eec7-1ade-4909-a040-8dacd6d2e41a",
+      "lop": "12 - Lớp Thường, 12 - Tinh Hoa",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-05",
+      "the_luc_ngay": 46,
+      "huyet_chien": 1,
+      "tao_luc": "2026-09-29T02:23:11.953Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 111,
+      "so_cau": 112,
+      "ma_de_json": "[\"DH-12-C1-B3-D1\",\"DH-12-C1-B3-D2\",\"DH-12-C2-B7-D1\",\"DH-12-C2-B7-D2\"]"
+    },
+    {
+      "id": "hanh-trinh-gioi-hoa-khoi-12",
+      "lop": "Khối 12",
+      "trang_thai": "dang_chay",
+      "han_nop": "9999-12-31",
+      "the_luc_ngay": 40,
+      "huyet_chien": 0,
+      "tao_luc": "2026-09-29T02:23:11.953Z",
+      "dong_luc": null,
+      "so_em": 130,
+      "so_cau": 717,
+      "ma_de_json": "[\"100\",\"12-BD7-07\",\"12-BD7-08\",\"12-BD7-09\",\"12-BD7-10\",\"12-BD7-11\",\"12-BD7-12\",\"12-BD7-13\",\"12-BD7-14\",\"12-BD7-15\",\"12-BD7-16\",\"12-BD7-17\",\"12-BD7-18\",\"12-BD7-19\",\"12-BD7-20\",\"12-BD7-21\",\"DH-12-C1-B3-D1\",\"DH-12-C1-B3-D2\",\"DH-12-C2-B7-D1\",\"DH-12-C2-B7-D2\",\"DH-12-C3-B8\"]"
+    },
+    {
+      "id": "a4ab8354-ea7e-419d-a2f8-0562c4daa62b",
+      "lop": "12 - Nhóm 10 điểm",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-12",
+      "the_luc_ngay": 91,
+      "huyet_chien": 1,
+      "tao_luc": "2026-09-29T02:26:07.620Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 14,
+      "so_cau": 441,
+      "ma_de_json": "[\"100\",\"12-BD7-07\",\"12-BD7-08\",\"12-BD7-09\",\"12-BD7-10\",\"12-BD7-11\",\"12-BD7-12\",\"12-BD7-13\",\"12-BD7-14\",\"12-BD7-15\",\"12-BD7-16\",\"12-BD7-17\",\"12-BD7-18\",\"12-BD7-19\",\"12-BD7-20\",\"12-BD7-21\"]"
+    },
+    {
+      "id": "d889c5df-c789-44aa-ac36-a4b7ca81da6f",
+      "lop": "Khối 11",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-05",
+      "the_luc_ngay": 49,
+      "huyet_chien": 1,
+      "tao_luc": "2026-09-29T02:27:20.322Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 87,
+      "so_cau": 120,
+      "ma_de_json": "[\"DH-11-C1-B3-D1\",\"DH-11-C1-B3-D2\",\"DH-11-C2-B4\",\"DH-11-C2-B5\"]"
+    },
+    {
+      "id": "hanh-trinh-gioi-hoa-khoi-11",
+      "lop": "Khối 11",
+      "trang_thai": "dang_chay",
+      "han_nop": "9999-12-31",
+      "the_luc_ngay": 40,
+      "huyet_chien": 0,
+      "tao_luc": "2026-09-29T02:27:20.322Z",
+      "dong_luc": null,
+      "so_em": 91,
+      "so_cau": 196,
+      "ma_de_json": "[\"DH-11-C1-B3-D1\",\"DH-11-C1-B3-D2\",\"DH-11-C2-B4\",\"DH-11-C2-B5\"]"
+    },
+    {
+      "id": "9c1d4f24-ea90-48f6-ba5d-3be8bb859321",
+      "lop": "Khối 10",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-05",
+      "the_luc_ngay": 52,
+      "huyet_chien": 1,
+      "tao_luc": "2026-09-29T02:28:47.249Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 43,
+      "so_cau": 125,
+      "ma_de_json": "[\"DH-10-C1-B4-D1\",\"DH-10-C1-B4-D2\",\"DH-10-C2-B5\",\"DH-10-C2-B6\"]"
+    },
+    {
+      "id": "hanh-trinh-gioi-hoa-khoi-10",
+      "lop": "Khối 10",
+      "trang_thai": "dang_chay",
+      "han_nop": "9999-12-31",
+      "the_luc_ngay": 40,
+      "huyet_chien": 0,
+      "tao_luc": "2026-09-29T02:28:47.249Z",
+      "dong_luc": null,
+      "so_em": 48,
+      "so_cau": 143,
+      "ma_de_json": "[\"DH-10-C1-B4-D1\",\"DH-10-C1-B4-D2\",\"DH-10-C2-B5\",\"DH-10-C2-B6\",\"DH-10-C2-B9-D2\"]"
+    },
+    {
+      "id": "786c4708-f4c4-4bbb-b002-30dfe68d09e4",
+      "lop": "12 - Lớp Thường",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-19",
+      "the_luc_ngay": 40,
+      "huyet_chien": 1,
+      "tao_luc": "2026-10-07T23:47:59.557Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 70,
+      "so_cau": 164,
+      "ma_de_json": "[\"DH-12-C3-B8\"]"
+    },
+    {
+      "id": "520ba715-162a-4150-b1e1-c81b41367e37",
+      "lop": "12 - Nhóm 10 điểm",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-21",
+      "the_luc_ngay": 40,
+      "huyet_chien": 1,
+      "tao_luc": "2026-10-07T23:48:00.736Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 16,
+      "so_cau": 164,
+      "ma_de_json": "[\"DH-12-C3-B8\"]"
+    },
+    {
+      "id": "55a8b436-4d66-477b-9989-e90e3b4c97cc",
+      "lop": "12 - Tinh Hoa",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-18",
+      "the_luc_ngay": 40,
+      "huyet_chien": 1,
+      "tao_luc": "2026-10-07T23:48:01.900Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 43,
+      "so_cau": 164,
+      "ma_de_json": "[\"DH-12-C3-B8\"]"
+    },
+    {
+      "id": "11086881-bbe7-4e36-a918-ceb1e8a566b8",
+      "lop": "11",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-16",
+      "the_luc_ngay": 40,
+      "huyet_chien": 1,
+      "tao_luc": "2026-10-07T23:50:19.028Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 90,
+      "so_cau": 127,
+      "ma_de_json": "[\"DH-11-C2-B5\"]"
+    },
+    {
+      "id": "3c954a63-cbe1-4409-9a87-3e285ecd9040",
+      "lop": "10",
+      "trang_thai": "da_dong",
+      "han_nop": "2026-10-14",
+      "the_luc_ngay": 40,
+      "huyet_chien": 1,
+      "tao_luc": "2026-10-07T23:50:59.124Z",
+      "dong_luc": "2026-10-08T05:35:52.832Z",
+      "so_em": 48,
+      "so_cau": 18,
+      "ma_de_json": "[\"DH-10-C2-B9-D2\"]"
+    }
+  ],
+  "maps": [
+    {
+      "chien_dich_cu": "9c1d4f24-ea90-48f6-ba5d-3be8bb859321",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-10",
+      "khoi": "10",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "3c954a63-cbe1-4409-9a87-3e285ecd9040",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-10",
+      "khoi": "10",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "d889c5df-c789-44aa-ac36-a4b7ca81da6f",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-11",
+      "khoi": "11",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "11086881-bbe7-4e36-a918-ceb1e8a566b8",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-11",
+      "khoi": "11",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "05d6eec7-1ade-4909-a040-8dacd6d2e41a",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-12",
+      "khoi": "12",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "a4ab8354-ea7e-419d-a2f8-0562c4daa62b",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-12",
+      "khoi": "12",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "55a8b436-4d66-477b-9989-e90e3b4c97cc",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-12",
+      "khoi": "12",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "786c4708-f4c4-4bbb-b002-30dfe68d09e4",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-12",
+      "khoi": "12",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    },
+    {
+      "chien_dich_cu": "520ba715-162a-4150-b1e1-c81b41367e37",
+      "chien_dich_moi": "hanh-trinh-gioi-hoa-khoi-12",
+      "khoi": "12",
+      "hop_nhat_luc": "2026-10-08T05:35:52.832Z"
+    }
+  ],
+  "ticks": [
+    {
+      "id": "08b9ea69-3215-4b08-af39-28ce327a9a67",
+      "lop": "12 - Lớp Thường",
+      "khoa_bai": "DH-12-C3-B8",
+      "ma_to_json": "[\"DH-12-C3-B8-TN\",\"DH-12-C3-B8-DS\",\"DH-12-C3-B8-TLN\"]",
+      "tick_luc": "2026-10-07T23:47:59.557Z",
+      "chien_dich_id": "hanh-trinh-gioi-hoa-khoi-12",
+      "bo_tick_luc": null
+    },
+    {
+      "id": "016c5460-1812-4029-b0c9-c094ac7cf165",
+      "lop": "12 - Nhóm 10 điểm",
+      "khoa_bai": "DH-12-C3-B8",
+      "ma_to_json": "[\"DH-12-C3-B8-TN\",\"DH-12-C3-B8-DS\",\"DH-12-C3-B8-TLN\"]",
+      "tick_luc": "2026-10-07T23:48:00.736Z",
+      "chien_dich_id": "hanh-trinh-gioi-hoa-khoi-12",
+      "bo_tick_luc": null
+    },
+    {
+      "id": "6ada3a36-4b61-4d81-9106-8f3e23afed51",
+      "lop": "12 - Tinh Hoa",
+      "khoa_bai": "DH-12-C3-B8",
+      "ma_to_json": "[\"DH-12-C3-B8-TN\",\"DH-12-C3-B8-DS\",\"DH-12-C3-B8-TLN\"]",
+      "tick_luc": "2026-10-07T23:48:01.900Z",
+      "chien_dich_id": "hanh-trinh-gioi-hoa-khoi-12",
+      "bo_tick_luc": null
+    },
+    {
+      "id": "ef09500a-e695-4851-9104-7507c816ac87",
+      "lop": "11",
+      "khoa_bai": "DH-11-C2-B5",
+      "ma_to_json": "[\"DH-11-C2-B5-TN\",\"DH-11-C2-B5-DS\",\"DH-11-C2-B5-TLN\"]",
+      "tick_luc": "2026-10-07T23:50:19.028Z",
+      "chien_dich_id": "hanh-trinh-gioi-hoa-khoi-11",
+      "bo_tick_luc": null
+    },
+    {
+      "id": "d103e254-d632-4b7f-9461-1b382bb2cc6a",
+      "lop": "10",
+      "khoa_bai": "DH-10-C2-B9",
+      "ma_to_json": "[\"DH-10-C2-B9-D2-TN\",\"DH-10-C2-B9-D2-DS\",\"DH-10-C2-B9-D2-TLN\"]",
+      "tick_luc": "2026-10-07T23:50:59.124Z",
+      "chien_dich_id": "hanh-trinh-gioi-hoa-khoi-10",
+      "bo_tick_luc": null
+    }
+  ]
+}

@@ -65,7 +65,7 @@ export default function CaiDatScreen() {
 
       <TheNoiDung>
         <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Giao diện</h2>
-        {document.documentElement.dataset.phongCach === 'v2' ? <p className="v2-style-label">V2 · Đồng bộ trên mọi thiết bị</p> : <><div role="radiogroup" aria-label="Giao diện" className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
+        <div role="radiogroup" aria-label="Giao diện" className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
           {LUA_CHON.map(({ v, ten, icon: Icon }) => (
             <button
               key={v}
@@ -81,7 +81,7 @@ export default function CaiDatScreen() {
             </button>
           ))}
         </div>
-        <p style={{ marginTop: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Tự lưu trên máy này.</p></>}
+        <p style={{ marginTop: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Tự lưu trên máy này.</p>
       </TheNoiDung>
 
       {/* GAME HÓA 2.0 — công tắc cả trung tâm / theo lớp (`/gv/chien-dich` co-luu), có hộp xác nhận nói rõ hậu quả. */}

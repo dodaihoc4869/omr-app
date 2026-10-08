@@ -75,7 +75,6 @@ export interface SanhBanDoProps {
 }
 
 const phanTram = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
-const laTenHanhTrinh = (ten?: string | null) => !!ten && /^Hành trình giỏi Hóa/i.test(ten)
 
 /** HUD thần thú. Bản ngang: `theLuc` và `chuoiNgay` = null (Thể lực có thẻ riêng ở cột phải, Chuỗi ngày ở hàng trên — một thông tin một chỗ). */
 function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu, onDoiTen }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'onMoThanThu' | 'onDoiTen'> & { chuoiNgay: number | null; theLuc: { con: number; tong: number } | null }) {
@@ -123,12 +122,12 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu, onDoiTen }: Pick<SanhBa
       {(theLuc || chuoiNgay !== null) && (
       <span className="h2-hud-phai">
         {theLuc && (
-          <span className="h2-hud-so h2-the-luc" aria-label={`Kế hoạch hôm nay: còn ${theLuc.con}/${theLuc.tong} câu`}>
+          <span className="h2-hud-so h2-the-luc" aria-label={`Thể lực hôm nay: còn ${theLuc.con}/${theLuc.tong} câu`}>
             <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true" focusable="false">
               <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
             </svg>
             <span className="h2-chip-chu">
-              <span className="h2-nhan-nho">Hôm nay</span> <b>{theLuc.con}/{theLuc.tong}</b>
+              <span className="h2-nhan-nho">Thể lực</span> <b>{theLuc.con}/{theLuc.tong}</b>
             </span>
           </span>
         )}
@@ -237,7 +236,6 @@ function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'o
 /** Vòng Cọ xát % + tên chiến dịch + hạn nộp + Cọ xát/Thành thạo (tấm dưới, ngày thường). */
 function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
   const cd = s.chienDich!
-  const hanhTrinh = laTenHanhTrinh(cd.ten)
   const p = phanTram(cd.coXat, cd.tong)
   const chuVi = 2 * Math.PI * 25
   return (
@@ -251,8 +249,8 @@ function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
         <span className="baloo">{p}%</span>
       </span>
       <span className="h2-cd-chu">
-        <span className="h2-cd-ten baloo">{hanhTrinh ? cd.ten : `Chiến dịch ${cd.ten}`}</span>
-        {hanhTrinh ? <span className="h2-cd-han">Tự xếp kế hoạch mới mỗi ngày theo năng lực của em</span> : cd.hanNop && <span className="h2-cd-han">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
+        <span className="h2-cd-ten baloo">Chiến dịch {cd.ten}</span>
+        {cd.hanNop && <span className="h2-cd-han">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
         <span className="h2-cd-so">
           <span className="h2-so-coxat">
             Cọ xát {cd.coXat}/{cd.tong}
@@ -356,7 +354,7 @@ function IconKhoa() {
 }
 
 /**
- * THỬ THÁCH NÂNG BẬC (08/10): nút PHỤ — em xong kế hoạch bắt buộc thì nhận thêm câu đúng một bậc trên hồ sơ từng dạng.
+ * THỬ SỨC THÊM (thầy chốt 30/09): nút PHỤ (không phải nút chính vàng) — em xong kế hoạch hôm nay thì lấy trước một lô câu mới của ngày mai.
  * Chỉ vẽ khi máy chủ cho (`thuSucThem.duoc`, số câu dương); bấm ⇒ máy chủ thêm lô ⇒ tải lại Sảnh ⇒ nút Đảo có câu. Lỗi ⇒ câu của máy chủ ngay dưới nút.
  */
 function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onTaiLai: () => void }) {
@@ -381,8 +379,8 @@ function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onT
     <>
       <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="thu-suc-them" onClick={() => void bam()} aria-disabled={dangGoi} aria-busy={dangGoi}>
         <span className="h2-nut-dao-chu">
-          <span className="h2-nut-dao-lon">{dangGoi ? 'Đang mở thử thách…' : 'Thử thách nâng cao'}</span>
-          <span className="h2-nut-thu-suc-phu">{t.soCau} câu {t.mucDo ? `· ${t.mucDo}` : 'khó hơn'} · không bắt buộc</span>
+          <span className="h2-nut-dao-lon">{dangGoi ? 'Đang lấy câu…' : 'Thử sức thêm (không bắt buộc)'}</span>
+          <span className="h2-nut-thu-suc-phu">Lấy trước {t.soCau} câu mới của ngày mai</span>
         </span>
       </button>
       {loi && (
@@ -679,7 +677,7 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           <TheMetGio s={s} token={p.token} onTaiLai={p.onTaiLai} />
         </>
       )}
-      {s.huyetChien && !xong && !laTenHanhTrinh(s.chienDich?.ten) ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
+      {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
         <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       <NutTuLuyen p={p} />
@@ -825,11 +823,10 @@ function Thanh({ nhan, co, tong, mau }: { nhan: string; co: number; tong: number
 
 function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
   const cd = s.chienDich!
-  const hanhTrinh = laTenHanhTrinh(cd.ten)
   const p = phanTram(cd.coXat, cd.tong)
   const chuVi = 2 * Math.PI * 40
   return (
-    <section className="h2-ng-the h2-ng-cd" aria-label={hanhTrinh ? 'Hành trình giỏi Hóa' : 'Chiến dịch đang mở'}>
+    <section className="h2-ng-the h2-ng-cd" aria-label="Chiến dịch đang mở">
       <span className="h2-ng-vong" role="img" aria-label={`Cọ xát ${p}%`}>
         <svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
           <circle cx="48" cy="48" r="40" stroke="rgb(40 50 110 / 0.1)" strokeWidth="9" fill="none" />
@@ -841,9 +838,9 @@ function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
         </span>
       </span>
       <span className="h2-ng-cd-chu">
-        <span className="h2-ng-nho">{hanhTrinh ? 'Lộ trình riêng của em' : 'Chiến dịch đang mở'}</span>
-        <span className="h2-ng-cd-ten baloo">{hanhTrinh ? cd.ten : `Chiến dịch ${cd.ten}`}</span>
-        {hanhTrinh ? <span className="h2-ng-phu">Mỗi ngày một kế hoạch vừa sức · khó hơn khi em đã sẵn sàng</span> : cd.hanNop && <span className="h2-ng-phu">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
+        <span className="h2-ng-nho">Chiến dịch đang mở</span>
+        <span className="h2-ng-cd-ten baloo">Chiến dịch {cd.ten}</span>
+        {cd.hanNop && <span className="h2-ng-phu">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
         <span className="h2-ng-hai-thanh">
           <Thanh nhan="Cọ xát" co={cd.coXat} tong={cd.tong} mau="ngoc" />
           <Thanh nhan="Thành thạo" co={cd.thanhThao} tong={cd.tong} mau="vang" />
@@ -858,7 +855,7 @@ function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
 function TheTheLucNgang({ s }: { s: SanhHoa2 }) {
   const { con, tong } = s.theLuc
   return (
-    <section className="h2-ng-the h2-ng-tl" aria-label="Kế hoạch hôm nay">
+    <section className="h2-ng-the h2-ng-tl" aria-label="Thể lực hôm nay">
       <span className="h2-ng-tl-o" aria-hidden="true">
         <svg width="24" height="26" viewBox="0 0 14 16" focusable="false">
           <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
@@ -866,7 +863,7 @@ function TheTheLucNgang({ s }: { s: SanhHoa2 }) {
       </span>
       <span className="h2-ng-tl-chu">
         <span className="h2-ng-tl-dau">
-          <b>Kế hoạch hôm nay</b>
+          <b>Thể lực hôm nay</b>
           <b className="h2-ng-tl-so baloo">
             {con}/{tong} câu còn lại
           </b>
@@ -933,7 +930,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   const mai = s.ngay ? ngaySau(s.ngay) : ''
   return (
     <>
-      {s.huyetChien && !xong && !laTenHanhTrinh(s.chienDich?.ten) ? (
+      {s.huyetChien && !xong ? (
         <TheHuyetChien s={s} now={p.now} />
       ) : s.chienDich ? (
         <TheChienDichNgang s={s} now={p.now} />
@@ -1054,7 +1051,7 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
             <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} ngang thu={p.thu} them={<NutOmniThem s={s} onKhamPhaDao={p.onKhamPhaDao} />} />
           ) : (
             <>
-              <DongHanh thu={chonThu ? null : p.thu} tenHanhTrinh={s?.chienDich?.ten} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
+              <DongHanh thu={chonThu ? null : p.thu} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
               <details className="bl-ban-do"><summary>Bản đồ hành trình <span>Khám phá & ôn tập</span></summary><div className="bl-ban-do__canh"><BanDoHanhTrinh s={s} /></div></details>
             </>
           )}
@@ -1123,15 +1120,10 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
       <div className="h2-fx" aria-hidden="true" />
       <div className="h2-khung">
         <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} onDoiTen={chonThu ? undefined : p.onDoiTen} />
-        <DongHanh thu={chonThu ? null : p.thu} tenHanhTrinh={s?.chienDich?.ten} xong={!!s && s.theLuc.tong > 0 && s.theLuc.con === 0} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
+        <DongHanh thu={chonThu ? null : p.thu} xong={!!s && s.theLuc.tong > 0 && s.theLuc.con === 0} onMo={chonThu ? p.onChonThu : p.onMoThanThu} />
         <div className="h2-dem" aria-hidden="true" />
         <section className="h2-tam" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
-          <div className="bl-ke-hoach"><h2>Hôm nay</h2>{s && <span className="v2-tien-do-ngay">{s.theLuc.tong - s.theLuc.con}/{s.theLuc.tong} câu</span>}</div>
-          {s && s.theLuc.tong > 0 && <div className="v2-chang-ngay" aria-label="Các chặng hôm nay">
-            <div data-xong={s.doan.con === 0}><i>1</i><b>Ôn lại</b><span>{s.doan.con > 0 ? `${s.doan.con} câu còn lại` : 'Đã xong'}</span></div>
-            <div data-xong={s.dao.con === 0}><i>2</i><b>Khám phá</b><span>{s.dao.con > 0 ? `${s.dao.con} câu còn lại` : 'Đã xong'}</span></div>
-            <div data-khoa={!s.thuSucThem?.duoc}><i>3</i><b>Nâng bậc</b><span>{s.thuSucThem?.duoc ? `${s.thuSucThem.soCau} câu tự chọn` : 'Khi đủ điều kiện'}</span></div>
-          </div>}
+          <div className="bl-ke-hoach"><span className="bl-eyebrow">TỪNG BƯỚC TIẾN BỘ</span><h2>Hành trình hôm nay</h2></div>
           {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}
           <TheCaGanNhatSanh p={p} />
           {s ? (

@@ -94,13 +94,13 @@ afterEach(() => {
 })
 
 describe('thanh bên 2.0 · số đếm cạnh mục', () => {
-  it('chưa biết số ⇒ không vẽ; có số ⇒ ca mở và ưu tiên số câu cần chữa trên mục Hành trình', () => {
+  it('chưa biết số ⇒ không vẽ; có số ⇒ "1 mở", số chiến dịch, số câu cần dạy lại', () => {
     const { container, rerender } = render(<ThanhBenTrai />)
     expect(container.querySelectorAll('.ben-trai-dem')).toHaveLength(0)
     useSoDemGv.getState().datSo({ caMo: 1, chienDichChay: 4, canDayLai: 9 })
     rerender(<ThanhBenTrai />)
     const dem = [...container.querySelectorAll('.ben-trai-dem')].map((e) => e.textContent)
-    expect(dem).toEqual(['1 mở', '9'])
+    expect(dem).toEqual(['1 mở', '4', '9'])
     expect(screen.getByRole('button', { name: 'Tổng quan' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('title')).toBe('Ca kiểm tra · 1 ca đang mở')
   })

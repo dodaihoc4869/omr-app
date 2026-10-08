@@ -5,7 +5,7 @@ import type { TeacherExamSource } from '../../../src/data/examContent'
 
 let soCau = 0
 const cau = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-I-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, choices: ['a', 'b', 'c', 'd'], correct: 'A' }))
-const cauII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-II-${++soCau}`, text: `Ý ${soCau} của ${maDe}`, ideas: ['a', 'b', 'c', 'd'], correct: ['D', 'D', 'S', 'S'] }))
+const cauII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-II-${++soCau}`, text: `Ý ${soCau} của ${maDe}`, ideas: ['a', 'b', 'c', 'd'], correct: 'DDSS' }))
 const cauIII = (maDe: string, n: number) => Array.from({ length: n }, () => ({ id: `${maDe}-III-${++soCau}`, text: `Câu ${soCau} của ${maDe}`, correct: '1,5' }))
 const to = (maDe: string, nguon: string, nI: number, nII = 0, nhom = '12 · DẠY HỌC/C1 - Ester lipid', nIII = 0): TeacherExamSource =>
   ({ maDe, nhom, nguon, phanI: cau(maDe, nI), phanII: cauII(maDe, nII), phanIII: cauIII(maDe, nIII) }) as unknown as TeacherExamSource
@@ -83,11 +83,6 @@ export async function traLoiThay(duong: string, b: Record<string, unknown>): Pro
     return du({ homNay: '2026-10-05', soNgay: 14, nToiThieu: 10, lop: [{ tenLop: '12A1', khoi: '12', soEm: 44 }, { tenLop: '11B', khoi: '11', soEm: 30 }], chon: lop, ketQua: CHAT_LUONG[lop] })
   }
   if (LA_TONG_QUAN && duong === '/gv/chien-dich' && b.action === 'co-doc') return du({ co: { bat: true, lop: [], sbd: [] } })
-  if (new URLSearchParams(globalThis.location?.search ?? '').get('man') === 'gv-chien-dich' && duong === '/gv/chien-dich') {
-    const ds = [10, 11, 12].map(khoi => ({ ...BANG.chienDich, id: `hanh-trinh-gioi-hoa-khoi-${khoi}`, ten: `Hành trình giỏi Hóa · Khối ${khoi}`, hanhTrinh: true, khoiHanhTrinh: khoi, thongKe: BANG.lop }))
-    if (b.action === 'danh-sach') return du({ homNay: BANG.homNay, chienDich: ds })
-    if (b.action === 'bang') return du({ ...BANG, chienDich: ds.find(c => c.id === b.id), em: BANG.em.map((e, i) => ({ ...e, nhip: i % 3 === 0 ? 'vuot' : 'dung', hangTheoDang: { ester: i % 3 === 0 ? 'L4' : 'L2' } })) })
-  }
   if (LA_TONG_QUAN && duong === '/gv/chien-dich' && b.action === 'danh-sach') return du({ homNay: BANG.homNay, chienDich: [BANG.chienDich] })
   if (LA_TONG_QUAN && duong === '/gv/chien-dich' && b.action === 'bang') return du(BANG as unknown as Record<string, unknown>)
   if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return du({ buoi: [BUOI] })

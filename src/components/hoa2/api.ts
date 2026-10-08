@@ -41,10 +41,10 @@ export interface SanhHoa2 {
   /** 30/09: số câu còn lại hôm nay đang tạm giữ vì lớp có ca kiểm tra (chỉ số, không qid). 0 ⇒ không có / máy chủ cũ. */
   tamGiuCa: number
   /**
-   * THẺ NÂNG CAO (08/10): xong kế hoạch bắt buộc ⇒ được mời làm `soCau` câu ở `mucDo` cao hơn (không bắt buộc).
+   * THỬ SỨC THÊM (thầy 30/09): xong kế hoạch hôm nay ⇒ được lấy trước `soCau` câu mới của ngày mai (không bắt buộc). Chỉ vẽ nút khi `duoc` và `soCau > 0`.
    * Máy chủ cũ / thiếu / rác ⇒ `{ duoc: false, soCau: 0 }`.
    */
-  thuSucThem: { duoc: boolean; soCau: number; mucDo?: string }
+  thuSucThem: { duoc: boolean; soCau: number }
   /** 01/10: chuỗi ngày học (số ngày VN liên tiếp em có làm ≥ 1 câu; hôm nay chưa làm ⇒ giữ tới hôm qua). Máy chủ cũ không gửi ⇒ null (dùng số cũ). */
   chuoiNgay?: number | null
   /** OMNI 3 (05/10, docs/hop-dong-omni-3.md mục A): CHỈ có khi công tắc `omni` áp cho em. Vắng ⇒ Sảnh y hệt hôm nay (không dòng thêm, không nút thêm). */
@@ -242,11 +242,10 @@ function docOmniSanh(x: unknown): { omni?: SanhOmni } {
 }
 
 /** Đọc chặt `thuSucThem` của `hoa2-sanh`: chỉ `duoc === true` với số câu dương mới là được. */
-function docThuSucThem(x: unknown): { duoc: boolean; soCau: number; mucDo?: string } {
+function docThuSucThem(x: unknown): { duoc: boolean; soCau: number } {
   const o = x && typeof x === 'object' ? (x as Record<string, unknown>) : null
   const soCau = soKhongAm(o?.soCau)
-  const mucDo = typeof o?.mucDo === 'string' ? o.mucDo.trim() : ''
-  return o?.duoc === true && soCau > 0 ? { duoc: true, soCau, ...(mucDo ? { mucDo } : {}) } : { duoc: false, soCau: 0 }
+  return o?.duoc === true && soCau > 0 ? { duoc: true, soCau } : { duoc: false, soCau: 0 }
 }
 
 /** Đọc chặt phần `bia` của `hoa2-sanh`: chỉ khi `bat === true` mới vẽ cửa. */

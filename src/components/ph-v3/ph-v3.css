@@ -388,30 +388,3 @@ i[data-mau="vong-tim"] { background: var(--ph3-vong-tim); }
 @media (prefers-reduced-motion: reduce) {
   .ph3 *, .ph3 *::before, .ph3 *::after { transition: none !important; animation: none !important; }
 }
-
-/* Bản Hành trình: mật độ cao hơn, vẫn giữ toàn bộ số thật và vùng chạm 44 px. */
-.ph3-hanh-trinh { gap: 12px; border: 1px solid var(--ph3-vien); box-shadow: none; }
-.ph3-hanh-trinh .ph3-cd-ray { height: 10px; }
-.ph3-hanh-trinh .ph3-o-xam { padding: 10px 12px; }
-.ph3-hanh-trinh .ph3-cd-chu { gap: 8px 10px; }
-@media (max-width: 599px) {
-  .ph3-tieu-de { padding-bottom: 12px; }
-  .ph3-tieu-de h1 { font-size: 27px; }
-  .ph3-luoi { gap: 12px; }
-  .ph3-the { padding: 16px; gap: 12px; border-radius: 20px; }
-  .ph3-ah { padding: 18px; gap: 15px; border-radius: 22px; }
-  .ph3-ah__vong { gap: 12px; }
-  .ph3-ah__vong svg { width: 112px; height: 112px; }
-  .ph3-chu-giai { gap: 8px; }
-  .ph3-chu-giai b { font-size: 22px; }
-  .ph3-ah__so { padding-top: 12px; }
-}
-@media (min-width: 600px) {
-  .ph3-luoi { gap: 14px; }
-  .ph3-the { padding: 18px; gap: 13px; }
-}
-@media (min-width: 1024px) {
-  .ph3-luoi { gap: 16px; }
-  .ph3-ah { padding: 22px; }
-  .ph3-the { padding: 20px; }
-}

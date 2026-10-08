@@ -4,20 +4,10 @@ import { THAM_SO_OMNI, type HoSoOmniEm, type QCau, type ThamSoOmni } from './omn
 import { trongSoCau } from './du-bao-diem'
 import { vknCaCau, vknCuaY } from './omni-p-vkn'
 import { tiLeNgayOnBaiCu, type TiLeMotPhan } from './omni-on-bai-cu'
-import { chamTapQuyetDinhV2, type ChiTietQuyetDinhV2 } from './omni-quyet-dinh-v2'
 
 /** Trọng số mọi câu ứng viên (qid → số ≥ 0) = trongSoCau (du-bao-diem.ts) với sơ ý riêng của em. Kế hoạch xếp câu mới / ôn bài cũ theo số này (giảm dần). */
-export function trongSoCacCau(
-  hs: HoSoOmniEm,
-  cau: readonly QCau[],
-  ts: ThamSoOmni = THAM_SO_OMNI,
-  tuy: { homNay?: string; beta?: ReadonlyMap<string, number>; chiTiet?: ChiTietQuyetDinhV2[] } = {},
-): Record<string, number> {
-  // Vắng ngày giữ đúng hàm cũ cho các đường gọi/test cũ. Đường kế hoạch thật luôn đưa ngày và dùng Decision Engine v2.
-  if (!tuy.homNay) return Object.fromEntries(cau.map((c) => [c.qid, trongSoCau(hs, c, hs.sEm, ts)]))
-  const r = chamTapQuyetDinhV2(hs, cau, tuy.homNay, tuy.beta, ts)
-  if (tuy.chiTiet) tuy.chiTiet.push(...r.chiTiet)
-  return r.diem
+export function trongSoCacCau(hs: HoSoOmniEm, cau: readonly QCau[], ts: ThamSoOmni = THAM_SO_OMNI): Record<string, number> {
+  return Object.fromEntries(cau.map((c) => [c.qid, trongSoCau(hs, c, hs.sEm, ts)]))
 }
 
 /**

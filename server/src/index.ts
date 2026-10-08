@@ -1,4 +1,5 @@
 import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
+import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
 import { anhCo, anhDay, layAnh } from './kho-anh'
 import { denPhongBiA } from './bi-a-phong'
@@ -116,7 +117,6 @@ import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 // OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
 import { gvBaiDaDay } from './bai-da-day'
-import { hopNhatChienDichDangMoMotLan } from './hanh-trinh-gioi-hoa'
 import { ghiThuMucKhiDayDe, gvKhoThuMuc, thuMucTuNhom } from './kho-thu-muc'
 // OMNI 3 (05/10): A.I Đỗ Đại Học tự gắn vi kỹ năng (ma trận Q) + tự sinh câu nền — thầy không phải duyệt.
 import { chayGanVknDem, ganVknChoMaDe, kiemDinhQTuan } from './omni-gan-vkn'
@@ -3369,15 +3369,14 @@ async function themMocReset(env: Env, res: Response): Promise<Response> {
 
 const boXuLy = {
   async scheduled(event:{cron:string}, env:Env) {
+    // Lệnh khôi phục 08/10: batch nguyên tử, chỉ một lần, không chạy nếu có ca thi mở.
+    await khoiPhucChienDich0810(env)
     // RESET TOÀN APP (chỉ chạy đúng một lần, sau mốc 00:01 thứ Hai 21/09; trước mốc và sau khi xong thì trả về ngay). PHẢI chạy trước mọi việc khác của cron.
     // Job chia bước (≤ 40 truy vấn D1 mỗi lượt): đang làm/nhường thì các việc cron khác nghỉ lượt này (kế hoạch, tin PH, vinh danh đều dựng lại theo yêu cầu khi có người mở).
     const dangReset=await chayResetNeuDenGio(env,Date.now()).then(r=>{if(r.chay||r.lyDo==='loi'||r.lyDo==='qua_gio')console.log('[reset] cron',JSON.stringify({chay:r.chay,lyDo:r.lyDo,trangThai:r.trangThai?.trangThai,buoc:r.trangThai?.buoc,soTruyVan:r.soTruyVan,loi:r.trangThai?.loi}));return r.chay||r.lyDo==='dang_chay'||r.lyDo==='cho_tiep'}).catch(e=>{console.error('[reset] cron lỗi:',e);return false})
     if(dangReset)return
     // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
-    // HÀNH TRÌNH GIỎI HÓA 08/10: đúng một lần sau phát hành, gộp mọi chiến dịch đang mở theo khối và
-    // đánh dấu phân lại phần chưa làm. Không cần thầy mở app; lỗi thì phút sau tự thử lại, không có xoá dữ liệu cũ.
-    await hopNhatChienDichDangMoMotLan(env,Date.now()).then(r=>{if(r.chay)console.log('[hanh-trinh] đã hợp nhất',JSON.stringify(r.ketQua))}).catch(e=>console.error('[hanh-trinh] hợp nhất lỗi, phút sau thử lại:',e))
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     const caoDiem=laGioCaoDiemVn(Date.now())
     // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts, tối ưu 28/09): MỘT lần mỗi isolate, trong cron (không nằm trên đường lệnh của em/thầy). Lỗi chỉ ghi log.

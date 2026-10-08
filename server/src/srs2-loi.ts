@@ -11,10 +11,6 @@
 // trọng số câu (`trongSoCau`), dạng đã vững (`dangVung`), ôn bài cũ (`onBaiCu`, `tiLeOnBaiCu`), chế độ chờ bài mới (`cheDoCho`). Vắng mọi trường mới ⇒ JSON
 // kế hoạch Y HỆT bản trước (khoá bằng tests/omni-3-ke-hoach-chot-cu.test.ts, 30 kịch bản).
 import { THAM_SO_OMNI } from './omni-kieu'
-import {
-  PHAN_BO_BAC, xepCauMoiTheoZpd,
-  type BacCauChienDich, type HoSoZpdDang,
-} from '../../src/lib/phan-bo-theo-bac'
 
 export type Phan = 'I' | 'II' | 'III'
 
@@ -244,16 +240,6 @@ export interface TuyChonKeHoach {
   /** Hạng chung của em (gộp mọi dạng) cho dạng chưa có dữ liệu. Vắng ⇒ L2. */
   hangChung?: HangEm
   /**
-   * PHÂN BỔ THEO HỒ SƠ (08/10): bật ⇒ (1) trần ngày là trần riêng theo hạng chung; (2) câu MỚI bắt buộc của từng dạng
-   * chỉ tới tối đa một bậc trên hạng hiện tại của em. Câu đã sai / tới lịch ôn KHÔNG BAO GIỜ bị lọc bởi giới hạn này — luôn đi trước
-   * để khép kín siêu vòng lặp. Vắng ⇒ giữ nguyên hợp đồng cũ.
-   */
-  phanBoTheoHoSo?: boolean
-  /** ZPD 08/10: hồ sơ đủ sâu theo dạng để đổi MIX câu mới; không đổi tổng quota, câu ôn/nợ không đi qua đây. */
-  hoSoZpdTheoDang?: Readonly<Record<string, HoSoZpdDang>>
-  /** 0 = thuần ZPD · 1 = đúng phân bố nền của kho. Mặc định luyện chiến dịch = 0,35. */
-  alphaZpd?: number
-  /**
    * RẢI ĐỀU CÂU MỚI THEO NGÀY (thầy chốt 30/09): bật ⇒ số câu MỚI mỗi ngày dừng đúng quota `ceil(số mới còn / (D − NGAY_DEM))`, KHÔNG đổ thêm câu mới
    * cho đủ thể lực; lượt dư dồn cho nợ / củng cố / duy trì (tỉ lệ cũ), đủ quota câu mới thì nợ tới lịch lấp nốt lượt dư (vượt trần 50 %), vẫn dư thì thôi. VẮNG ⇒ TẮT = hành vi cũ (đổ câu mới cho đầy thể lực);
    * tầng đọc chiến dịch (`srs2-d1.ts`) quy chiến dịch không đặt (null) ⇒ BẬT.
@@ -290,22 +276,6 @@ export interface TuyChonKeHoach {
    * KHÔNG đổi số câu mới mỗi ngày. Câu vắng trong bảng ⇒ trọng số 0.
    */
   trongSoCau?: Readonly<Record<string, number>>
-  /** Shadow đo lường Decision Engine v2; không tham gia logic chọn ngoài `trongSoCau`. */
-  quyetDinhV2?: {
-    phienBan: string
-    chiTiet: Readonly<Record<string, { cu: number; moi: number; ms: number }>>
-  }
-  /**
-   * KẾ HOẠCH THEO PHÚT (08/10): ngân sách CHUNG còn lại của ngày và thời gian đầy đủ của từng câu
-   * (giải + phản hồi; câu nợ có thể gồm bài mẫu). Vắng ⇒ hợp đồng số-câu cũ giữ nguyên.
-   * `giayMacDinh` chỉ dùng khi một câu vừa được thêm vào kho nhưng chưa có dự báo; không được coi là 0 giây.
-   */
-  nganSachPhut?: {
-    phienBan: string
-    giayToiDa: number
-    giayMacDinh: number
-    giayTheoQid: Readonly<Record<string, number>>
-  }
   /** Mã dạng ĐÃ VỮNG của em: câu MỚI chiến dịch của các dạng này KHÔNG bắt buộc — bỏ khỏi câu mới, quota và khối lượng (vẫn nằm trong `cau` cho Thử sức thêm). Câu ôn/nợ không miễn. */
   dangVung?: readonly string[]
   /**
@@ -332,8 +302,6 @@ export interface ChienDichKeHoach {
   raiDeu: boolean
   /** Ngày bắt đầu (VN); sau hôm nay ⇒ chưa chạy (bỏ). */
   batDau?: string
-  /** Hành trình không có hạn; dùng cửa sổ cuốn 7 ngày để chia đều câu mới. */
-  hanhTrinh?: boolean
 }
 
 export interface KeHoachNgay {
@@ -355,59 +323,6 @@ export interface KeHoachNgay {
   onBaiCu?: string[]
   /** OMNI 3 (chỉ có khi truyền `chienDich`): số câu mới đã chọn hôm nay theo id chiến dịch. */
   moiTheoCd?: Record<string, number>
-  /** Tóm tắt quyết định theo phút; chỉ có khi bật lớp ngân sách phút. */
-  nganSachPhut?: {
-    phienBan: string
-    nganSachGiay: number
-    duKienGiay: number
-    hoanCau: number
-    quaTaiGiay: number
-  }
-}
-
-export interface MucNganSachPhut<T> { qid: string; giaTri: T; batBuoc?: boolean }
-
-/**
- * Chọn theo hàng ưu tiên trong ngân sách. Việc đứng trước luôn được xét trước; việc không vừa không chặn một việc ngắn
- * đứng sau. Nếu chưa chọn được gì, giữ đúng MỘT việc đầu để học sinh không kẹt và khai báo phần vượt ngân sách.
- * Hàm thuần/tất định, dùng chung cho test và `lapKeHoachNgay`.
- */
-export function chonVuaNganSachPhut<T>(
-  ds: readonly MucNganSachPhut<T>[],
-  ns: NonNullable<TuyChonKeHoach['nganSachPhut']>,
-): { chon: MucNganSachPhut<T>[]; duKienGiay: number; hoanCau: number; quaTaiGiay: number } {
-  const nganSach = Math.max(0, Math.floor(Number(ns.giayToiDa) || 0))
-  const macDinh = Math.max(1, Math.floor(Number(ns.giayMacDinh) || 120))
-  const daGap = new Set<string>()
-  const hopLe = ds.filter((x) => {
-    if (!x.qid || daGap.has(x.qid)) return false
-    daGap.add(x.qid)
-    return true
-  })
-  const giay = (qid: string): number => {
-    const n = Number(ns.giayTheoQid[qid])
-    return Number.isFinite(n) && n > 0 ? Math.ceil(n) : macDinh
-  }
-  const chon: MucNganSachPhut<T>[] = []
-  let duKienGiay = 0
-  for (const x of hopLe) {
-    const can = giay(x.qid)
-    if (duKienGiay + can <= nganSach) {
-      chon.push(x)
-      duKienGiay += can
-    }
-  }
-  // Một câu dài hơn toàn bộ ngân sách vẫn phải làm được; phần vượt được công khai, không âm thầm coi là vừa.
-  if (!chon.length && hopLe.length) {
-    chon.push(hopLe[0]!)
-    duKienGiay = giay(hopLe[0]!.qid)
-  }
-  return {
-    chon,
-    duKienGiay,
-    hoanCau: Math.max(0, hopLe.length - chon.length),
-    quaTaiGiay: Math.max(0, duKienGiay - nganSach),
-  }
 }
 
 /** Băm tất định (FNV-1a) — hoà điểm xếp theo khoá, không dùng Math.random. */
@@ -473,37 +388,6 @@ function xepCauMoi(ds: readonly CauSrs[], homNay: string): CauSrs[] {
 // ---------------------------------------------------------------- BỐC CÂU MỚI CÁ NHÂN HOÁ (thầy chốt 28/09)
 /** Hạng của em ở một dạng: L1 Yếu · L2 Trung bình · L3 Khá · L4 Giỏi. */
 export type HangEm = 'L1' | 'L2' | 'L3' | 'L4'
-/** Bậc năng lực nền của học sinh: L1 = Nhận biết … L4 = Vận dụng cao. */
-export const BAC_HANG_EM: Readonly<Record<HangEm, number>> = { L1: 0, L2: 1, L3: 2, L4: 3 }
-/** Nhãn chuẩn để máy chủ và giao diện cùng nói một ngôn ngữ. */
-export const TEN_BAC_MUC_DO = ['Nhận biết', 'Thông hiểu', 'Vận dụng', 'Vận dụng cao'] as const
-/** Mức khó tối đa trong phần bắt buộc: đúng mức em + thử thách cao hơn một bậc. */
-export const bacToiDaBatBuoc = (hang: HangEm): number => Math.min(3, BAC_HANG_EM[hang] + 1)
-/** Bậc mục tiêu của thẻ nâng bậc; em đã ở L4 thì không còn bậc cao hơn. */
-export const bacThuThachTiepTheo = (hang: HangEm): number | null => BAC_HANG_EM[hang] < 3 ? BAC_HANG_EM[hang] + 1 : null
-/** Tỉ lệ khối lượng câu mới bắt buộc theo hạng. Dùng chung cho trần ngày và quota chiến dịch rải đều. */
-export const TI_LE_PHAN_BO_THEO_HO_SO: Readonly<Record<HangEm, number>> = { L1: 0.6, L2: 0.75, L3: 0.9, L4: 1 }
-
-/**
- * Trần ngày riêng theo hồ sơ, làm tròn lên theo một chuyến 6 câu để không tạo chuyến vụn:
- * L1 60% · L2 75% · L3 90% · L4 100%. Ví dụ trần lớp 40 ⇒ 24 / 30 / 36 / 40.
- * Trần nhỏ hơn 6 được giữ nguyên; không bao giờ vượt trần giáo viên đặt.
- */
-export function tranNgayTheoHoSo(tranGoc: number, hang: HangEm): number {
-  const goc = Math.max(0, Math.floor(Number(tranGoc) || 0))
-  if (goc <= 6) return goc
-  return Math.min(goc, Math.max(6, Math.ceil((goc * TI_LE_PHAN_BO_THEO_HO_SO[hang]) / 6) * 6))
-}
-
-/**
- * Quota câu MỚI của chiến dịch rải đều cũng phải khác nhau theo hồ sơ. Trước bản này chỉ trần ngày đổi;
- * nếu quota rải đều thấp hơn mọi trần thì L1–L4 vẫn nhận cùng số câu (SBD 11010: L2 vẫn 39/39).
- * Câu ôn/nợ không đi qua hàm này nên siêu vòng lặp sửa sai vẫn được giữ nguyên.
- */
-export function quotaMoiTheoHoSo(quotaGoc: number, hang: HangEm): number {
-  const goc = Math.max(0, Math.floor(Number(quotaGoc) || 0))
-  return goc === 0 ? 0 : Math.min(goc, Math.max(1, Math.ceil(goc * TI_LE_PHAN_BO_THEO_HO_SO[hang])))
-}
 /** Thống kê một dạng: số lần gặp và số lần đúng (hồ sơ `nam_kt_dang` + lần làm trong chiến dịch, bỏ lượt có gợi ý). */
 export interface ThongKeDang { gap: number; dung: number }
 
@@ -529,36 +413,7 @@ export function tinhHangTheoDang(thongKe: ReadonlyMap<string, ThongKeDang>, dang
 }
 
 /** Một dòng hồ sơ dạng (`nam_kt_dang`): `soGap` câu đã gặp, `soSai` câu từng sai; `capNhatLuc` = lúc dựng hồ sơ (ISO). */
-export interface HoSoDangTho {
-  maDang: string
-  soGap: number
-  soSai: number
-  soDaKhacPhuc?: number
-  soChuaThaySai?: number
-  bac?: number
-  capNhatLuc: string | null
-}
-
-/** Hồ sơ ZPD theo dạng: bậc lấy từ hạng đang dùng trong chiến dịch; độ khắc phục lấy từ hồ sơ nắm kiến thức thật. */
-export function hoSoZpdTu(
-  hoSo: readonly HoSoDangTho[],
-  hangTheoDang: Readonly<Record<string, HangEm>>,
-  hangChung: HangEm,
-): Record<string, HoSoZpdDang> {
-  const ra: Record<string, HoSoZpdDang> = {}
-  for (const d of hoSo) {
-    if (!d.maDang || d.maDang.startsWith('CD:')) continue
-    const gap = Math.max(0, Number(d.soGap) || 0)
-    const da = Math.max(0, Number(d.soDaKhacPhuc) || 0)
-    const chuaSai = Math.max(0, Number(d.soChuaThaySai) || 0)
-    ra[d.maDang] = {
-      bacDich: BAC_HANG_EM[hangTheoDang[d.maDang] ?? hangChung] as BacCauChienDich,
-      soGap: gap,
-      tiLeKhacPhuc: gap >= PHAN_BO_BAC.SO_CAU_DU_TIN ? Math.min(1, (da + chuaSai) / gap) : null,
-    }
-  }
-  return ra
-}
+export interface HoSoDangTho { maDang: string; soGap: number; soSai: number; capNhatLuc: string | null }
 
 /**
  * Gộp thống kê theo dạng để XẾP HẠNG: hồ sơ `nam_kt_dang` (đúng = gặp − sai) + lần làm TRONG chiến dịch (sau lúc giao,
@@ -589,7 +444,7 @@ export function gopThongKeDang(
 }
 
 /** Mức câu cho bốc cá nhân: NB 0 … VDC 3; nhãn lạ/thiếu coi là Thông hiểu (không để câu không nhãn nhảy lên đầu nhóm "khó trước"). */
-export const mucCaNhan = (m: string | null): number => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : 1)
+const mucCaNhan = (m: string | null): number => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : 1)
 
 /** Chia `n` theo trọng số (phần dư lớn nhất), mỗi phần không vượt `tran[i]`; phần thừa dồn sang phần còn chỗ theo trọng số. */
 function chiaTheoTrongSo(n: number, trongSo: readonly number[], tran: readonly number[]): number[] {
@@ -775,14 +630,13 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     const daCo = new Set<string>()
     // hạn gần trước; cùng hạn ⇒ giữ thứ tự truyền vào (sort ổn định — lớp D1 đã xếp bắt đầu sớm trước, rồi giao gần nhất)
     const ds = tc.chienDich!
-      .filter((c) => !!c.hanNop && (c.hanhTrinh || c.hanNop >= tc.homNay) && !(c.batDau && c.batDau > tc.homNay))
+      .filter((c) => !!c.hanNop && c.hanNop >= tc.homNay && !(c.batDau && c.batDau > tc.homNay))
       .slice()
       .sort((a, b) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : 0))
     for (const c of ds) {
       if (daCo.has(c.id)) continue
       daCo.add(c.id)
-      const D = c.hanhTrinh ? 7 : soNgayConLai(tc.homNay, c.hanNop)
-      nhom.push({ id: c.id, hanNop: c.hanhTrinh ? congNgay(tc.homNay, D - 1) : c.hanNop, raiDeu: c.raiDeu === true, D, theLuc: Number(c.theLucNgay) || TRAN_NGAY })
+      nhom.push({ id: c.id, hanNop: c.hanNop, raiDeu: c.raiDeu === true, D: soNgayConLai(tc.homNay, c.hanNop), theLuc: Number(c.theLucNgay) || TRAN_NGAY })
     }
   } else if (!!tc.hanNop && tc.homNay <= tc.hanNop) {
     nhom.push({ id: null, hanNop: tc.hanNop, raiDeu: tc.raiDeu === true, D: soNgayConLai(tc.homNay, tc.hanNop), theLuc: tc.tranNgay ?? TRAN_NGAY })
@@ -790,11 +644,8 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const coChienDich = nhom.length > 0
   // CHẾ ĐỘ CHỜ BÀI MỚI (OMNI 3): chỉ khi KHÔNG có chiến dịch đang chạy.
   const cho = !coChienDich && !!tc.cheDoCho
-  const tranNgayGoc = nhieu && coChienDich ? Math.max(...nhom.map((g) => g.theLuc)) : cho ? tc.cheDoCho!.theLuc : (tc.tranNgay ?? TRAN_NGAY)
-  const apDungPhanBo = tc.phanBoTheoHoSo === true && coChienDich
-  const tranNgay = apDungPhanBo ? tranNgayTheoHoSo(tranNgayGoc, tc.hangChung ?? 'L2') : tranNgayGoc
-  const tranHuyetGoc = tc.tranHuyetChien ?? (nhieu ? tranHuyetChienTheo(tranNgayGoc) : TRAN_HUYET_CHIEN)
-  const tranHuyet = apDungPhanBo ? Math.min(tranHuyetGoc, tranHuyetChienTheo(tranNgay)) : tranHuyetGoc
+  const tranNgay = nhieu && coChienDich ? Math.max(...nhom.map((g) => g.theLuc)) : cho ? tc.cheDoCho!.theLuc : (tc.tranNgay ?? TRAN_NGAY)
+  const tranHuyet = tc.tranHuyetChien ?? (nhieu ? tranHuyetChienTheo(tranNgay) : TRAN_HUYET_CHIEN)
   const D = coChienDich ? nhom[0]!.D : 1
   const tongD = nhom.reduce((s, g) => s + g.D, 0)
   const viTriNhom = new Map(nhom.map((g, i) => [g.id, i] as const))
@@ -806,22 +657,12 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   // DẠNG ĐÃ VỮNG (OMNI 3): câu MỚI chiến dịch của dạng ấy không bắt buộc (không vào câu mới, quota, khối lượng).
   const vung = new Set(tc.dangVung ?? [])
   const mien = (c: CauSrs) => vung.size > 0 && c.dang != null && vung.has(c.dang) && nguonCua(c) === 'chien_dich' && tt(c).laMoi
-  const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
-  // Chỉ câu MỚI bị giới hạn vừa sức + 1. Nợ sai, câu tới lịch, củng cố và duy trì luôn được giữ để siêu vòng lặp khép kín.
-  const vuotKhungBatBuoc = (c: CauSrs) => apDungPhanBo
-    && nguonCua(c) === 'chien_dich' && tt(c).laMoi && mucCaNhan(c.mucDo) > bacToiDaBatBuoc(hangCua(c))
   // SỔ NỢ (29/09): Huyết Chiến tính CẢ lượt nợ cũ (câu ngoài chiến dịch chưa thành thạo, ≈ 2 − cc lượt/câu).
-  const canLam = song.filter((c) => nguonCua(c) !== 'duy_tri' && nguonCua(c) !== 'on_bai_cu' && !mien(c) && !vuotKhungBatBuoc(c))
+  const canLam = song.filter((c) => nguonCua(c) !== 'duy_tri' && nguonCua(c) !== 'on_bai_cu' && !mien(c))
   const khoiLuong = coChienDich ? khoiLuongCan(canLam.map(tt)) : 0
   const trongSo = (c: CauSrs): number => { const x = Number(tc.trongSoCau?.[c.qid]); return Number.isFinite(x) ? x : 0 }
-  // Tập gốc giữ cả câu mới vượt khung để tính QUOTA KHỐI LƯỢNG từ đúng cỡ chiến dịch giáo viên giao; tập phục vụ mới lọc mức em + 1.
-  // Nếu tính quota từ tập đã lọc rồi nhân tiếp tỉ lệ hồ sơ, học sinh yếu bị giảm hai lần (vừa ít bậc vừa ít câu) quá mức chủ đích.
-  const moiNhomGoc: CauSrs[][] = nhom.map(() => [])
   const moiNhom: CauSrs[][] = nhom.map(() => [])
-  for (const c of cauChienDich) if (coChienDich && tt(c).laMoi && !mien(c)) {
-    moiNhomGoc[nhomCua(c)]!.push(c)
-    if (!vuotKhungBatBuoc(c)) moiNhom[nhomCua(c)]!.push(c)
-  }
+  for (const c of cauChienDich) if (coChienDich && tt(c).laMoi && !mien(c)) moiNhom[nhomCua(c)]!.push(c)
   // Thứ tự câu mới: trọng số OMNI (giảm dần, hoà băm theo ngày) khi có; không thì dễ trước, xen dạng (`xepCauMoi`) như cũ.
   const moiXep = moiNhom.map((ds) => (tc.trongSoCau
     ? [...ds].sort((a, b) => trongSo(b) - trongSo(a) || bam(`${tc.homNay}|${a.qid}`) - bam(`${tc.homNay}|${b.qid}`))
@@ -834,43 +675,7 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     if (nhieu && tc.moiDaLamTheoCd) return Math.max(0, Math.floor(Number(tc.moiDaLamTheoCd[g.id!]) || 0))
     return i === 0 ? Math.max(0, Math.floor(tc.moiDaLamHomNay ?? 0)) : 0
   }
-  const daMoi = nhom.map(daMoiCua)
-  const quotaGoc = nhom.map((g, i) => {
-    const da = daMoi[i]!
-    return quotaCauMoi((apDungPhanBo ? moiNhomGoc[i]!.length : moiXep[i]!.length) + da, g.D)
-  })
-  const quota = nhom.map((_, i) => {
-    const da = daMoi[i]!
-    return Math.max(0, quotaGoc[i]! - da)
-  })
-  if (apDungPhanBo) {
-    // Nhiều chiến dịch rải đều phải nhân tỉ lệ trên TỔNG quota rồi mới chia lại. Nếu ceil từng chiến dịch,
-    // bốn quota nhỏ có thể cùng làm tròn lên khiến L2 gần bằng L4 (ca thật 11010: 35 câu mới vẫn thành 31 thay vì 27).
-    const rai = nhom.map((g, i) => g.raiDeu ? i : -1).filter((i) => i >= 0)
-    const tongGoc = rai.reduce((s, i) => s + quotaGoc[i]!, 0)
-    const mucTieu = quotaMoiTheoHoSo(tongGoc, tc.hangChung ?? 'L2')
-    const tongDa = rai.reduce((s, i) => s + daMoi[i]!, 0)
-    const canPhan = Math.max(0, mucTieu - tongDa)
-    const trongLuong = rai.map((i) => Math.max(0, quotaGoc[i]! - daMoi[i]!))
-    const tongTrongLuong = trongLuong.reduce((s, n) => s + n, 0)
-    const phan = rai.map((i, k) => Math.min(moiXep[i]!.length,
-      tongTrongLuong > 0 ? Math.floor(canPhan * trongLuong[k]! / tongTrongLuong) : 0))
-    let con = Math.max(0, canPhan - phan.reduce((s, n) => s + n, 0))
-    const uuTien = rai.map((i, k) => ({ i, k, le: tongTrongLuong > 0 ? (canPhan * trongLuong[k]! / tongTrongLuong) % 1 : 0 }))
-      .sort((a, b) => b.le - a.le || nhom[a.i]!.D - nhom[b.i]!.D || a.i - b.i)
-    while (con > 0) {
-      let daThem = false
-      for (const x of uuTien) {
-        if (con <= 0) break
-        if (phan[x.k]! >= moiXep[x.i]!.length) continue
-        phan[x.k] = phan[x.k]! + 1
-        con--
-        daThem = true
-      }
-      if (!daThem) break
-    }
-    rai.forEach((i, k) => { quota[i] = phan[k]! })
-  }
+  const quota = nhom.map((g, i) => { const da = daMoiCua(g, i); return Math.max(0, quotaCauMoi(moiXep[i]!.length + da, g.D) - da) })
   // OMNI 3 (nhiều bài): câu mới BẮT BUỘC hôm nay = câu mới của bài đã tới ngày giao câu mới CUỐI (D_c ≤ 4 ⇒ quota = mọi câu mới còn lại). Chúng GIỮ CHỖ
   // trước nợ (nợ vẫn ≤ 50 %, chỉ nhường đúng phần chỗ ấy) để mọi câu mới của mỗi bài được gặp trước hạn riêng − 3; không đủ chỗ ngay cả khi không nợ ⇒
   // Huyết Chiến. Đường cũ (một `hanNop`) không có luật này.
@@ -933,57 +738,17 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     chonOnBaiCu = xep.slice(0, cho ? Math.max(0, conDu) : Math.min(Math.max(0, conDu), Math.floor(tran * tiLe)))
     conDu -= chonOnBaiCu.length
   }
-  // Bốc câu mới cá nhân hoá: ZPD đổi SỐ LƯỢNG theo mức trong đúng quota; thiếu hồ sơ thì giữ bộ xếp 28/09.
+  // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang` (và không có trọng số OMNI); số câu mới/ngày giữ nguyên quota.
+  const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
   const chonMoi: CauSrs[] = []
   nhom.forEach((g, i) => {
     const ds = moiXep[i]!
-    const soCan = layMoi[i]! + themMoi[i]!
-    let thuTuMoi: CauSrs[] = ds
-    // ZPD quyết định SỐ câu theo bậc; OMNI quyết định câu nào có giá trị học/phút cao nhất trong từng quota.
-    // Trước 08/10 hai nhánh loại trừ nhau nên hễ có OMNI thì quota ZPD bị bỏ qua.
-    if (tc.hoSoZpdTheoDang) {
-      thuTuMoi = xepCauMoiTheoZpd(
-        ds.map((c) => ({ ...c, bac: mucCaNhan(c.mucDo) as BacCauChienDich })),
-        soCan,
-        tc.hoSoZpdTheoDang,
-        tc.alphaZpd,
-        tc.trongSoCau,
-      ).thuTu
-    } else if (tc.hangTheoDang && !tc.trongSoCau) {
-      thuTuMoi = bocCauMoiCaNhan(ds, layMoi[i]!, g.D > NGAY_DEM ? g.D - NGAY_DEM : 1, hangCua, nhieu ? cauChienDich.filter((c) => nhomCua(c) === i) : cauChienDich)
-    }
-    chonMoi.push(...thuTuMoi.slice(0, soCan))
+    const thuTuMoi = tc.hangTheoDang && !tc.trongSoCau
+      ? bocCauMoiCaNhan(ds, layMoi[i]!, g.D > NGAY_DEM ? g.D - NGAY_DEM : 1, hangCua, nhieu ? cauChienDich.filter((c) => nhomCua(c) === i) : cauChienDich)
+      : ds
+    chonMoi.push(...thuTuMoi.slice(0, layMoi[i]! + themMoi[i]!))
   })
-  let chonNo = no.slice(0, layNo + themNo)
-  let chonCungCo = cungCo.slice(0, layCungCo)
-  let chonDuyTri = duyTri.slice(0, layDuyTri)
-  let tomTatPhut: KeHoachNgay['nganSachPhut'] | undefined
-  if (tc.nganSachPhut) {
-    // Thứ tự mục đích: khép vòng sai/nợ → câu mới theo EDF+ZPD → ôn củng cố → duy trì → bài cũ.
-    // `chonVuaNganSachPhut` chỉ hoãn phần chưa vừa; không sửa trạng thái nên ngày sau câu vẫn quay lại đúng hàng.
-    const hang = [
-      ...chonNo.map((c) => ({ qid: c.qid, giaTri: c, batBuoc: true })),
-      ...chonMoi.map((c) => ({ qid: c.qid, giaTri: c })),
-      ...chonCungCo.map((c) => ({ qid: c.qid, giaTri: c })),
-      ...chonDuyTri.map((c) => ({ qid: c.qid, giaTri: c })),
-      ...chonOnBaiCu.map((c) => ({ qid: c.qid, giaTri: c })),
-    ]
-    const vua = chonVuaNganSachPhut(hang, tc.nganSachPhut)
-    const giu = new Set(vua.chon.map((x) => x.qid))
-    chonNo = chonNo.filter((c) => giu.has(c.qid))
-    chonCungCo = chonCungCo.filter((c) => giu.has(c.qid))
-    chonDuyTri = chonDuyTri.filter((c) => giu.has(c.qid))
-    for (let i = chonMoi.length - 1; i >= 0; i--) if (!giu.has(chonMoi[i]!.qid)) chonMoi.splice(i, 1)
-    chonOnBaiCu = chonOnBaiCu.filter((c) => giu.has(c.qid))
-    tomTatPhut = {
-      phienBan: tc.nganSachPhut.phienBan,
-      nganSachGiay: Math.max(0, Math.floor(tc.nganSachPhut.giayToiDa)),
-      duKienGiay: vua.duKienGiay,
-      hoanCau: vua.hoanCau,
-      quaTaiGiay: vua.quaTaiGiay,
-    }
-  }
-  const chonOn = [...chonNo, ...chonCungCo, ...chonDuyTri]
+  const chonOn = [...no.slice(0, layNo + themNo), ...cungCo.slice(0, layCungCo), ...duyTri.slice(0, layDuyTri)]
   // Ôn bài cũ: câu chưa gặp đi với câu mới (Đảo); câu đã gặp đi như câu ôn (Phần II ⇒ Đảo, còn lại ⇒ Đoàn).
   const onCuMoi = chonOnBaiCu.filter((c) => tt(c).laMoi)
   const onCuDaGap = chonOnBaiCu.filter((c) => !tt(c).laMoi)
@@ -1003,8 +768,7 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     catTia,
     raiDeu: nhieu && coChienDich ? nhom[0]!.raiDeu : tc.raiDeu === true,
     ...(coOnBaiCu ? { onBaiCu: chonOnBaiCu.map((c) => c.qid) } : {}),
-    ...(nhieu ? { moiTheoCd: Object.fromEntries(nhom.map((g, i) => [g.id!, chonMoi.filter((c) => nhomCua(c) === i).length])) } : {}),
-    ...(tomTatPhut ? { nganSachPhut: tomTatPhut } : {}),
+    ...(nhieu ? { moiTheoCd: Object.fromEntries(nhom.map((g, i) => [g.id!, layMoi[i]! + themMoi[i]!])) } : {}),
   }
 }
 
