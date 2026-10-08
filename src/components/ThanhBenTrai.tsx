@@ -48,11 +48,11 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 
-/** GAME HÓA 2.0 — bốn việc + Học sinh (bản vẽ GV-ThanhBen). Thanh đáy điện thoại dùng CHÍNH danh sách này (nhãn `ngan`). */
+/** GAME HÓA 2.0 — các màn chữa/gỡ lỗi là màn con của Hành trình, không chiếm thêm nút thanh bên. */
 export const MUC_HOA2_CHINH: MucDieuHuong[] = [
   { id: 'tongquan', ten: 'Tổng quan', ngan: 'Tổng quan', icon: Home },
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
-  { id: 'chiendich', ten: 'Hành trình giỏi Hóa', ngan: 'Hành trình', icon: Map, con: ['goilenbang'] },
+  { id: 'chiendich', ten: 'Hành trình giỏi Hóa', ngan: 'Hành trình', icon: Map, con: ['goilenbang', 'bangonutthat'] },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
 ]
 /** GAME HÓA 2.0 — hai mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). "Gỡ nút thắt" đứng ĐẦU danh sách này để điện
@@ -63,7 +63,6 @@ export const MUC_HOA2_DAY: MucDieuHuong[] = [
   { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library, cuoi: true },
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
-/** Ngăn kéo / rail khi Game Hóa 2.0 bật: nhóm chính + "Gỡ nút thắt" ngay sau "Chữa trên lớp" (nhóm dạy học); đáy chỉ Kho đề · Cài đặt. */
 /** V2 gộp Chữa/Gỡ lỗi vào Hành trình; thanh bên chỉ giữ các việc cấp cao. */
 export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH
 const MUC_HOA2_BEN_DAY: MucDieuHuong[] = MUC_HOA2_DAY.filter((m) => m.id !== MUC_GO_NUT_THAT.id)

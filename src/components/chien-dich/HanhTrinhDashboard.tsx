@@ -104,6 +104,7 @@ export default function HanhTrinhDashboard({ lanTai = 0 }: { lanTai?: number; on
             <button type="button" onClick={() => setScreen('tongquan')}>Tổng quan</button>
             <button type="button" aria-current="page">Nhịp hôm nay</button>
             <button type="button" onClick={moCanChua}>Cần chữa {chon?.thongKe?.canDayLaiCau ? <b>{chon.thongKe.canDayLaiCau}</b> : null}</button>
+            <button type="button" onClick={() => setScreen('bangonutthat')}>Gỡ nút thắt</button>
           </div>
         </div>
 
