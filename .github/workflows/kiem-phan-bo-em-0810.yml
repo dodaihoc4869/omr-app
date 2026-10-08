@@ -6,6 +6,7 @@ on:
       - scripts/kiem-phan-bo-em-0810.ts
       - .github/workflows/kiem-phan-bo-em-0810.yml
       - server/src/srs2-d1.ts
+      - server/src/srs2-loi.ts
 permissions:
   contents: read
 jobs:
