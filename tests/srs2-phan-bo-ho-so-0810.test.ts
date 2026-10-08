@@ -2,7 +2,7 @@
 // PHÂN BỔ CÂU THEO HỒ SƠ 08/10: số lượng riêng, bắt buộc tối đa năng lực + 1, nợ sai không bị lọc, thẻ nâng bậc.
 import { describe, expect, it } from 'vitest'
 import {
-  bacThuThachTiepTheo, lapKeHoachNgay, mucCaNhan, phatLaiCau, tranNgayTheoHoSo,
+  bacThuThachTiepTheo, lapKeHoachNgay, mucCaNhan, phatLaiCau, quotaMoiTheoHoSo, tranNgayTheoHoSo,
   type CauSrs, type HangEm, type TrangThaiCau,
 } from '../server/src/srs2-loi'
 import { tinhThuSucThem, type KeHoachDaChot, type MetaCau } from '../server/src/srs2-d1'
@@ -30,6 +30,16 @@ describe('phần bắt buộc cá nhân hoá', () => {
     expect(tranNgayTheoHoSo(49, 'L1')).toBe(30)
     expect(tranNgayTheoHoSo(49, 'L2')).toBe(42)
     expect(tranNgayTheoHoSo(5, 'L1')).toBe(5)
+  })
+
+  it('quota rải đều cũng khác nhau theo hồ sơ, không để mọi hạng nhận cùng số câu', () => {
+    expect((['L1', 'L2', 'L3', 'L4'] as const).map((h) => quotaMoiTheoHoSo(35, h))).toEqual([21, 27, 32, 35])
+    const { cau, tt } = khoMoi(10) // 40 câu mới, D=7 ⇒ quota gốc 10.
+    const soMoi = (h: HangEm) => {
+      const kh = lapKeHoachNgay(cau, tt, { homNay: HOM_NAY, hanNop: '2026-10-14', tranNgay: 40, tranHuyetChien: 40, raiDeu: true, ...hang(h) })
+      return kh.dao.length + kh.doan.length
+    }
+    expect((['L1', 'L2', 'L3', 'L4'] as const).map(soMoi)).toEqual([6, 8, 9, 10])
   })
 
   it.each([

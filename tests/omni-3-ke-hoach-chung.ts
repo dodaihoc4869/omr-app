@@ -4,6 +4,7 @@
 import { taoD1That, type D1That } from './_d1-that'
 import { ghiSuKien, type SuKien } from '../server/src/su-kien-hoc'
 import { xoaDemChienDich, type HoSo2 } from '../server/src/srs2-d1'
+import type { HangEm } from '../server/src/srs2-loi'
 import type { Env } from '../server/src/kieu'
 
 export const NGAY_MS = 86_400_000
@@ -31,7 +32,7 @@ export function cauJson(qid: string, maDe: string, i: number, them: Record<strin
 export interface KhoOmni { d: D1That; env: Env; qids: (maDe: string) => string[] }
 
 /** Kho giả: mỗi tờ `soCau[maDe]` câu (mặc định DH-B0 8 · DH-B1 12 · DH-B2 10 · DH-B3 8 · KHO-A 6) + 1 câu tự luận ở DH-B1; lớp 12A1 bật Hoá 2.0. */
-export function taoKhoOmni(soCau: Record<string, number> = {}, soEm = 3): KhoOmni {
+export function taoKhoOmni(soCau: Record<string, number> = {}, soEm = 3, hangMacDinh: HangEm | null = null): KhoOmni {
   const d = taoD1That()
   const env = d.env as unknown as Env
   const em = d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES(?,?,'12A1','x')")
@@ -47,6 +48,15 @@ export function taoKhoOmni(soCau: Record<string, number> = {}, soEm = 3): KhoOmn
       ds.push(q)
     }
     theoTo.set(maDe, ds)
+  }
+  // Test OMNI cũ có thể chọn L4 để cô lập cơ chế OMNI với quota đầy đủ; phải đặt hồ sơ trên đúng từng dạng
+  // vì hồ sơ chung chỉ tổng hợp các dạng xuất hiện trong chiến dịch. Các test phân bổ L1–L4 nằm ở bộ riêng.
+  if (hangMacDinh === 'L4') {
+    const hs = d.sql.prepare("INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?)")
+    for (let i = 1; i <= soEm; i++) for (const maDe of Object.keys(so)) for (let dang = 0; dang < 3; dang++) {
+      const maDang = `${maDe}.D${dang}`
+      hs.run(`S${i}|${maDang}`, `S${i}`, maDang, 10_000, 0, 10_000, 0, 0, 4, 'x')
+    }
   }
   // câu tự luận: không bao giờ vào kế hoạch / ôn bài cũ
   st.run('DH-B1', 'DH-B1-TL', 'v1', 'g-DH-B1-TL', 'DH-B1.D0', cauJson('DH-B1-TL', 'DH-B1', 1, { text: 'Trình bày cách điều chế (tự luận)', tuLuan: true }))
@@ -87,8 +97,8 @@ export async function lam(env: Env, sbd: string, qid: string, ms: number, dung: 
  * đóng (CD0: KHO-A + DH-B0), lịch sử đủ loại của S1 (nợ cũ, duy trì, câu chiến dịch đúng/sai, sai Lên bảng, sai game ngoài chiến dịch — kể cả câu bài 3
  * và câu TU LUYỆN chưa thuộc chiến dịch nào). Dùng cho test "cờ tắt ⇒ y cũ" và test OMNI.
  */
-export async function dungKichBanHaiChienDich(): Promise<KhoOmni> {
-  const k = taoKhoOmni()
+export async function dungKichBanHaiChienDich(hangMacDinh: HangEm | null = null): Promise<KhoOmni> {
+  const k = taoKhoOmni({}, 3, hangMacDinh)
   const { d, env } = k
   const b0 = k.qids('DH-B0'), b1 = k.qids('DH-B1'), b2 = k.qids('DH-B2'), b3 = k.qids('DH-B3'), tl = k.qids('KHO-A')
   themChienDich(d, { id: 'CD0', maDe: ['KHO-A', 'DH-B0'], qids: [...tl, ...b0], sbd: ['S1', 'S2'], hanNop: '2026-09-28', taoLuc: '2026-09-21T01:00:00.000Z', trangThai: 'da_dong', theLuc: 35 })

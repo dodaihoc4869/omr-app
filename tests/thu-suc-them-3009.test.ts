@@ -26,8 +26,8 @@ function dung(soCau = 120) {
   const d = taoD1That()
   const env = d.env as unknown as Env
   d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn An','12A1','mk1','x')")
-  // Hồ sơ L3 ổn định: phần bắt buộc nhận tới VDC; khi hoàn thành, thẻ tiếp tục bằng biến thể VDC mới (bậc cao nhất).
-  d.sql.exec("INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES('S1|D1','S1','D1',100,30,70,0,0,3,'x')")
+  // Hồ sơ L4: bộ test này cô lập cơ chế Thử sức thêm với quota đầy đủ; phân bổ giảm theo L1–L3 có bộ test riêng.
+  d.sql.exec("INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES('S1|D1','S1','D1',100,0,100,0,0,4,'x')")
   d.sql.exec(`INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DE1','Ester',${soCau},0,'v1')`)
   d.sql.exec("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')")
   const st = d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')

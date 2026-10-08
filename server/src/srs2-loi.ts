@@ -402,6 +402,8 @@ export const TEN_BAC_MUC_DO = ['Nhận biết', 'Thông hiểu', 'Vận dụng',
 export const bacToiDaBatBuoc = (hang: HangEm): number => Math.min(3, BAC_HANG_EM[hang] + 1)
 /** Bậc mục tiêu của thẻ nâng bậc; em đã ở L4 thì không còn bậc cao hơn. */
 export const bacThuThachTiepTheo = (hang: HangEm): number | null => BAC_HANG_EM[hang] < 3 ? BAC_HANG_EM[hang] + 1 : null
+/** Tỉ lệ khối lượng câu mới bắt buộc theo hạng. Dùng chung cho trần ngày và quota chiến dịch rải đều. */
+export const TI_LE_PHAN_BO_THEO_HO_SO: Readonly<Record<HangEm, number>> = { L1: 0.6, L2: 0.75, L3: 0.9, L4: 1 }
 
 /**
  * Trần ngày riêng theo hồ sơ, làm tròn lên theo một chuyến 6 câu để không tạo chuyến vụn:
@@ -411,8 +413,17 @@ export const bacThuThachTiepTheo = (hang: HangEm): number | null => BAC_HANG_EM[
 export function tranNgayTheoHoSo(tranGoc: number, hang: HangEm): number {
   const goc = Math.max(0, Math.floor(Number(tranGoc) || 0))
   if (goc <= 6) return goc
-  const tiLe: Readonly<Record<HangEm, number>> = { L1: 0.6, L2: 0.75, L3: 0.9, L4: 1 }
-  return Math.min(goc, Math.max(6, Math.ceil((goc * tiLe[hang]) / 6) * 6))
+  return Math.min(goc, Math.max(6, Math.ceil((goc * TI_LE_PHAN_BO_THEO_HO_SO[hang]) / 6) * 6))
+}
+
+/**
+ * Quota câu MỚI của chiến dịch rải đều cũng phải khác nhau theo hồ sơ. Trước bản này chỉ trần ngày đổi;
+ * nếu quota rải đều thấp hơn mọi trần thì L1–L4 vẫn nhận cùng số câu (SBD 11010: L2 vẫn 39/39).
+ * Câu ôn/nợ không đi qua hàm này nên siêu vòng lặp sửa sai vẫn được giữ nguyên.
+ */
+export function quotaMoiTheoHoSo(quotaGoc: number, hang: HangEm): number {
+  const goc = Math.max(0, Math.floor(Number(quotaGoc) || 0))
+  return goc === 0 ? 0 : Math.min(goc, Math.max(1, Math.ceil(goc * TI_LE_PHAN_BO_THEO_HO_SO[hang])))
 }
 /** Thống kê một dạng: số lần gặp và số lần đúng (hồ sơ `nam_kt_dang` + lần làm trong chiến dịch, bỏ lượt có gợi ý). */
 export interface ThongKeDang { gap: number; dung: number }
@@ -694,8 +705,14 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const canLam = song.filter((c) => nguonCua(c) !== 'duy_tri' && nguonCua(c) !== 'on_bai_cu' && !mien(c) && !vuotKhungBatBuoc(c))
   const khoiLuong = coChienDich ? khoiLuongCan(canLam.map(tt)) : 0
   const trongSo = (c: CauSrs): number => { const x = Number(tc.trongSoCau?.[c.qid]); return Number.isFinite(x) ? x : 0 }
+  // Tập gốc giữ cả câu mới vượt khung để tính QUOTA KHỐI LƯỢNG từ đúng cỡ chiến dịch giáo viên giao; tập phục vụ mới lọc mức em + 1.
+  // Nếu tính quota từ tập đã lọc rồi nhân tiếp tỉ lệ hồ sơ, học sinh yếu bị giảm hai lần (vừa ít bậc vừa ít câu) quá mức chủ đích.
+  const moiNhomGoc: CauSrs[][] = nhom.map(() => [])
   const moiNhom: CauSrs[][] = nhom.map(() => [])
-  for (const c of cauChienDich) if (coChienDich && tt(c).laMoi && !mien(c) && !vuotKhungBatBuoc(c)) moiNhom[nhomCua(c)]!.push(c)
+  for (const c of cauChienDich) if (coChienDich && tt(c).laMoi && !mien(c)) {
+    moiNhomGoc[nhomCua(c)]!.push(c)
+    if (!vuotKhungBatBuoc(c)) moiNhom[nhomCua(c)]!.push(c)
+  }
   // Thứ tự câu mới: trọng số OMNI (giảm dần, hoà băm theo ngày) khi có; không thì dễ trước, xen dạng (`xepCauMoi`) như cũ.
   const moiXep = moiNhom.map((ds) => (tc.trongSoCau
     ? [...ds].sort((a, b) => trongSo(b) - trongSo(a) || bam(`${tc.homNay}|${a.qid}`) - bam(`${tc.homNay}|${b.qid}`))
@@ -708,7 +725,12 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     if (nhieu && tc.moiDaLamTheoCd) return Math.max(0, Math.floor(Number(tc.moiDaLamTheoCd[g.id!]) || 0))
     return i === 0 ? Math.max(0, Math.floor(tc.moiDaLamHomNay ?? 0)) : 0
   }
-  const quota = nhom.map((g, i) => { const da = daMoiCua(g, i); return Math.max(0, quotaCauMoi(moiXep[i]!.length + da, g.D) - da) })
+  const quota = nhom.map((g, i) => {
+    const da = daMoiCua(g, i)
+    const goc = quotaCauMoi((apDungPhanBo ? moiNhomGoc[i]!.length : moiXep[i]!.length) + da, g.D)
+    const rieng = apDungPhanBo ? quotaMoiTheoHoSo(goc, tc.hangChung ?? 'L2') : goc
+    return Math.max(0, rieng - da)
+  })
   // OMNI 3 (nhiều bài): câu mới BẮT BUỘC hôm nay = câu mới của bài đã tới ngày giao câu mới CUỐI (D_c ≤ 4 ⇒ quota = mọi câu mới còn lại). Chúng GIỮ CHỖ
   // trước nợ (nợ vẫn ≤ 50 %, chỉ nhường đúng phần chỗ ấy) để mọi câu mới của mỗi bài được gặp trước hạn riêng − 3; không đủ chỗ ngay cả khi không nợ ⇒
   // Huyết Chiến. Đường cũ (một `hanNop`) không có luật này.
