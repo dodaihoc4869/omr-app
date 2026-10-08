@@ -107,14 +107,14 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     for (const g of goi) expect(g.than).toEqual({ sbd: '12121212' })
   })
 
-  it('bốn mục điều hướng là liên kết (#hom-nay · #diem · #tien-bo · #loi-thay), mục đang xem có aria-current; Điểm số liệt kê ca đã công bố + nhận xét', async () => {
+  it('bốn mục điều hướng là liên kết (#hom-nay · #tien-bo · #diem · #loi-thay), mục đang xem có aria-current; Lịch sử liệt kê ca đã công bố + nhận xét', async () => {
     const { container } = await vaoApp()
     const lk = [...container.querySelectorAll('nav[aria-label="Các mục chính"] a')] as HTMLAnchorElement[]
-    expect(lk.map((a) => [a.getAttribute('href'), a.textContent])).toEqual([['#hom-nay', 'Hôm nay'], ['#diem', 'Điểm số'], ['#tien-bo', 'Tiến bộ'], ['#loi-thay', 'Lời thầy']])
+    expect(lk.map((a) => [a.getAttribute('href'), a.textContent])).toEqual([['#hom-nay', 'Hôm nay'], ['#tien-bo', 'Tiến bộ'], ['#diem', 'Lịch sử'], ['#loi-thay', 'Lời thầy']])
     expect(lk[0]!.getAttribute('aria-current')).toBe('page')
     await diToi('#diem')
     await waitFor(() => expect(container.querySelector('[data-vung="man-diem-so"]')).toBeTruthy())
-    expect(lk[1]!.getAttribute('aria-current')).toBe('page')
+    expect(lk[2]!.getAttribute('aria-current')).toBe('page')
     const ds = container.querySelector('[data-vung="ds-ca"]')!
     expect(ds.textContent).toContain('Kiểm tra 45 phút · Ester – Lipid')
     expect(ds.textContent).toContain('7,5')
