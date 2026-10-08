@@ -1,0 +1,33 @@
+name: Kiểm tra phân bổ một em 08-10 (chỉ đọc, chỉ đếm)
+on:
+  push:
+    branches-ignore: [main]
+    paths:
+      - scripts/kiem-phan-bo-em-0810.ts
+      - .github/workflows/kiem-phan-bo-em-0810.yml
+      - server/src/srs2-d1.ts
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đọc kế hoạch và tính lại bằng đúng thuật toán sống
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          export OMR_D1_ID=$(grep -m1 '^database_id' server/wrangler.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          npx esbuild scripts/kiem-phan-bo-em-0810.ts --bundle --platform=node --format=esm --target=node22 --outfile=/tmp/kiem-phan-bo-em.mjs --log-level=warning
+          node /tmp/kiem-phan-bo-em.mjs "$(printf '\061\061\060\061\060')"

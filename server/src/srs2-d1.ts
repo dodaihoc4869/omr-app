@@ -1763,7 +1763,7 @@ export async function chanDoanEm(env: Env, sbd: string, nowMs: number): Promise<
   const dsCd = await docChienDichCuaEm(env, sbd)
   const hang = await docHangEm(env, sbd, hoSo).catch(() => null)
   const tranNgay = cd?.theLucNgay ?? hoSo.theLucNoCu
-  const tuyChonCu = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay, raiDeu: cd.raiDeu } : {}), ...(hang ?? {}) }
+  const tuyChonCu = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay, raiDeu: cd.raiDeu } : {}), ...(hang ?? {}), ...(hang && cd ? { phanBoTheoHoSo: true as const } : {}) }
   // OMNI 3: em bật OMNI ⇒ chẩn đoán đúng tuỳ chọn kế hoạch OMNI (nhiều bài, ôn bài cũ, chế độ chờ).
   const tuyChon: TuyChonKeHoach = hoSo.omni?.bat ? await tuyChonKeHoachOmni(env, sbd, nowMs, hoSo).catch(() => tuyChonGocOmni(hoSo, ngay)) : tuyChonCu
   const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChon)
