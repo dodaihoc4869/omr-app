@@ -15,7 +15,7 @@
 import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
-import { THAM_SO_OMNI, type CoOmni } from '../../../server/src/omni-kieu'
+import type { CoOmni } from '../../../server/src/omni-kieu'
 import { TI_LE_ON_BAI_CU_TOI_DA, xemOnBaiCu } from '../../../server/src/omni-on-bai-cu'
 import { dungCay } from '../../lib/cay-chon-de'
 import { locDeDayHoc } from '../../lib/day-hoc-len-bang'
@@ -58,7 +58,7 @@ import {
   type DauVaoBai,
   type XemTruocTick,
 } from '../chien-dich/api-omni'
-import { hienHanNop, laNgay, ngayVn } from '../chien-dich/ngay'
+import { laNgay, ngayVn } from '../chien-dich/ngay'
 import ChonEmGiao, { type EmLop } from '../chien-dich/ChonEmGiao'
 import { useDsEmGiao } from '../chien-dich/nguon-giao'
 import { hoiXacNhan } from '../hop-thoai'
@@ -270,7 +270,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     if (c === 'lop') setChonEm(new Set(emLop))
   }
 
-  // CHỌN MỘT BÀI (tờ tự giao suy từ bài, không ô tích) + sửa hạn nộp / số lượt.
+  // CHỌN MỘT BÀI: thầy chỉ chọn bài; Hành trình tự tính thời gian, số câu và nhịp từng em mỗi ngày.
   const [chon, setChon] = useState<BaiCay | null>(null)
   const maDeTuGiao = useMemo(() => (chon ? maDeMacDinh(chon) : []), [chon])
   /** Bài `b` có đứng trước bài đã tick xa nhất của lớp `l` ('tick') hoặc trước bài thầy ĐANG CHỌN ('xem': sẽ thành phạm vi khi giao) không. */
@@ -318,15 +318,13 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
           tenBai: chon.tenBai,
           viTri: chon.viTri,
           maDe: maDeTuGiao,
-          ...(hanSua && hanHopLe ? { hanNop: hanSua } : {}),
-          ...(theLucSua ? { theLucNgay: theLucSua } : {}),
           ...(sbd ? { sbd } : {}),
           ...(phamViChon.length ? { phamVi: phamViChon } : {}),
         },
       })
     }
     return ra
-  }, [chon, lopChon, maDeTuGiao, hanSua, hanHopLe, theLucSua, coDanhSachEm, emTheoLop, tickTheoLop, phamViChon])
+  }, [chon, lopChon, maDeTuGiao, coDanhSachEm, emTheoLop, tickTheoLop, phamViChon])
 
   // XEM TRƯỚC từng lớp: mỗi lần đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const [xemTheoLop, setXemTheoLop] = useState<Record<string, XemTruocTick>>({})
@@ -370,7 +368,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     setDangGiao(true)
     setLoiGiao('')
     const phamVi = phamViTruoc(dsBai, chon.viTri)
-    const ok: { lop: string; daCo: boolean; hanNop: string }[] = []
+    const ok: { lop: string; daCo: boolean; hanNop: string | null }[] = []
     const loi: { lop: string; chu: string }[] = []
     for (const x of dauVaoLop) {
       const r = await baiDaDayTick({ ...x.dauVao, phamVi })
@@ -381,11 +379,11 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     const ten = tenNganBai(chon.tenBai)
     if (ok.length === 1 && dauVaoLop.length === 1) {
       const k = ok[0]!
-      showToast(k.daCo ? `${ten} đã giao cho ${k.lop} từ trước — giữ chiến dịch có sẵn (đổi em nhận bài: bấm Sửa em)` : `Đã giao ${ten} cho ${k.lop}${k.hanNop ? ` · hạn nộp ${hienHanNop(k.hanNop)}` : ''}`, 'success')
+      showToast(k.daCo ? `${ten} đã có trong Hành trình của ${k.lop}` : `Đã bổ sung ${ten} vào Hành trình giỏi Hóa của ${k.lop}`, 'success')
     } else if (ok.length) {
       const moi = ok.filter((k) => !k.daCo).map((k) => k.lop)
       const cu = ok.filter((k) => k.daCo).map((k) => k.lop)
-      showToast([moi.length ? `Đã giao ${ten} cho ${moi.length} lớp: ${moi.join(', ')}` : '', cu.length ? `${cu.join(', ')} đã có ${ten} từ trước — giữ chiến dịch có sẵn` : ''].filter(Boolean).join(' · '), 'success')
+      showToast([moi.length ? `Đã bổ sung ${ten} cho ${moi.length} lớp: ${moi.join(', ')}` : '', cu.length ? `${cu.join(', ')} đã có bài này trong Hành trình` : ''].filter(Boolean).join(' · '), 'success')
     }
     if (loi.length) setLoiGiao(loi.length === 1 && dauVaoLop.length === 1 ? loi[0]!.chu : loi.map((x) => `${x.lop}: ${x.chu}`).join(' · '))
     if (ok.length) void taiDs()
@@ -398,7 +396,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     const ten = tenNganBai(b.tenBai)
     const ok = await hoiXacNhan({
       tieuDe: `Bỏ tick ${ten}?`,
-      noiDung: `Chiến dịch luyện của ${ten} (lớp ${lopBo}) dừng: chưa em nào làm câu nào thì huỷ hẳn; đã có em làm thì đóng lại, kết quả đã làm vẫn giữ. Bài trở về "Chưa dạy".`,
+      noiDung: `Bỏ ${ten} khỏi phạm vi đã dạy của lớp ${lopBo}. Hành trình của khối và toàn bộ kết quả đã làm vẫn được giữ.`,
       nhanDongY: 'Bỏ tick',
       nhanKhong: 'Giữ bài',
       nguyHiem: true,
@@ -811,7 +809,7 @@ function NapDsEm({ onCo }: { onCo: (ds: EmLop[]) => void }) {
 }
 
 /** Lưới 6 con số của MỘT lớp (ô "Đủ lượt để ca chốt ≥ 8" ẩn khi chưa có P). */
-function LuoiSo({ xem, hanSua, theLucSua, dangXem }: { xem: XemTruocTick; hanSua: string; theLucSua: number | undefined; dangXem: boolean }) {
+function LuoiSo({ xem, dangXem }: { xem: XemTruocTick; hanSua?: string; theLucSua?: number | undefined; dangXem: boolean }) {
   const pct = xem.sucChua > 0 ? Math.round((100 * xem.luotCan) / xem.sucChua) : null
   return (
     <div className="cd-kpi-hang" data-khoi="sau-con-so" aria-busy={dangXem}>
@@ -824,12 +822,12 @@ function LuoiSo({ xem, hanSua, theLucSua, dangXem }: { xem: XemTruocTick; hanSua
         <span className="cd-kpi-phu">{xem.soTuLuan > 0 ? `đã bỏ ${xem.soTuLuan} câu tự luận` : 'không có câu tự luận'}</span>
       </div>
       <div className="cd-kpi" data-so-tick="han">
-        <span className="cd-kpi-nhan">{hanSua ? 'Hạn nộp (thầy sửa)' : 'Hạn nộp tự tính'}</span>
+        <span className="cd-kpi-nhan">Nhịp kế hoạch cuốn</span>
         <strong>
           {xem.D}
           <small>ngày</small>
         </strong>
-        <span className="cd-kpi-phu">hết {hienHanNop(xem.hanNop, false) || xem.hanNop}</span>
+        <span className="cd-kpi-phu">tự cân bằng lại mỗi ngày · không hạn nộp</span>
       </div>
       <div className="cd-kpi" data-so-tick="luot">
         <span className="cd-kpi-nhan">Lượt cần / sức chứa</span>
@@ -840,12 +838,9 @@ function LuoiSo({ xem, hanSua, theLucSua, dangXem }: { xem: XemTruocTick; hanSua
         <span className="cd-kpi-phu">em ở giữa lớp{pct !== null ? ` · ${pct}% sức chứa` : ''}</span>
       </div>
       <div className="cd-kpi" data-so-tick="luot-ngay">
-        <span className="cd-kpi-nhan">Số lượt mỗi ngày</span>
-        <strong>
-          {xem.theLucNgay}
-          <small>lượt/ngày</small>
-        </strong>
-        <span className="cd-kpi-phu">{theLucSua ? 'thầy sửa' : 'mặc định của lớp'}</span>
+        <span className="cd-kpi-nhan">Kế hoạch mỗi em</span>
+        <strong>Tự động</strong>
+        <span className="cd-kpi-phu">tự tính số câu và thời gian riêng từng em</span>
       </div>
       <div className="cd-kpi" data-so-tick="du-luot">
         <span className="cd-kpi-nhan">Đủ lượt để luyện hết</span>
@@ -986,7 +981,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
       /* chỉ là tiện: lỗi ⇒ không cuộn */
     }
   }, [])
-  const { lopChon, maDeTuGiao, moSua, setMoSua, hanSua, setHanSua, theLucChu, setTheLucChu, theLucSua, loiTheLuc, hanHopLe, homNay, dauVaoLop, xemTheoLop, loiXemTheoLop, dangXem, giao, dangGiao, loiGiao } = bhn
+  const { lopChon, maDeTuGiao, dauVaoLop, xemTheoLop, loiXemTheoLop, dangXem, giao, dangGiao, loiGiao } = bhn
   const { coDanhSachEm, sbdChon, emTheoLop } = bhn
   const ten = tenNganBai(chon.tenBai)
   const tuGiao = chuTuGiao(chon)
@@ -997,7 +992,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
   const lopBoQua = coDanhSachEm ? lopChon.filter((l) => !lopGiao.includes(l) && !lopDaCo.includes(l)) : []
   const xongCaDs = lopGiao.length > 0 && lopGiao.every((l) => xemTheoLop[l])
   const nhanLop = lopGiao.length > 1 ? `${lopGiao.length} lớp` : (lopGiao[0] ?? lopChon[0] ?? '')
-  const nutGiao = dangGiao ? 'Đang giao…' : `Giao ${ten} cho ${nhanLop}`
+  const nutGiao = dangGiao ? 'Đang bổ sung…' : `Bổ sung ${ten} · ${nhanLop}`
   const lopDauTien = lopGiao[0]
   const xem1 = lopDauTien ? xemTheoLop[lopDauTien] : undefined
   const loiXem1 = lopDauTien ? loiXemTheoLop[lopDauTien] : undefined
@@ -1008,7 +1003,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
           {so ?? '•'}
         </span>
         <div className="bhn-xn-ten">
-          <h3>Xác nhận trước khi giao · {chon.tenBai}</h3>
+          <h3>Bổ sung vào Hành trình giỏi Hóa · {chon.tenBai}</h3>
           <div className="bhn-xn-lop" data-khoi="giao-cho">
             <span className="dh-phu">Giao cho</span>
             {lopGiao.map((l) => (
@@ -1026,7 +1021,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
           )}
           {lopDaCo.length > 0 && (
             <p className="dh-phu" data-khoi="lop-da-co">
-              Đã có bài này từ trước, giữ chiến dịch sẵn có: {lopDaCo.join(', ')}.
+              Bài này đã có trong Hành trình: {lopDaCo.join(', ')}.
             </p>
           )}
         </div>
@@ -1047,7 +1042,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
           </p>
         ) : (
           <p className="dh-loi" role="alert">
-            {maDeTuGiao.length === 0 ? CHU_BAI_CHUA_CO_TO_TU_GIAO : !hanHopLe ? 'Hạn nộp phải từ hôm nay trở đi.' : lopDaCo.length ? 'Mọi lớp đã chọn đều có bài này rồi.' : 'Chưa đủ thông tin để xem trước.'}
+            {maDeTuGiao.length === 0 ? CHU_BAI_CHUA_CO_TO_TU_GIAO : lopDaCo.length ? 'Mọi lớp đã chọn đều có bài này rồi.' : 'Chưa đủ thông tin để xem trước.'}
           </p>
         )
       ) : !nhieu ? (
@@ -1057,11 +1052,11 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
           </p>
         ) : !xem1 ? (
           <p className="dh-phu" aria-busy="true">
-            Đang tính câu rút được, hạn nộp và số lượt…
+            Đang tính phạm vi câu và kế hoạch cá nhân…
           </p>
         ) : (
           <>
-            <LuoiSo xem={xem1} hanSua={hanSua} theLucSua={theLucSua} dangXem={dangXem} />
+            <LuoiSo xem={xem1} dangXem={dangXem} />
             <CanhBaoQuaTai xem={xem1} lop={lopDauTien!} kemLop={false} />
             <OnBaiCuTheoLop key={`${lopDauTien}|${xem1.onBaiCu?.tiLe.thuong}|${xem1.onBaiCu?.tiLe.cuoi}`} bhn={bhn} lop={lopDauTien!} xem={xem1} />
           </>
@@ -1077,7 +1072,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
                 <b>{l}</b>
                 {x ? (
                   <span className="cd-so bhn-xem-tom">
-                    {x.soEmChon} em · hạn {hienHanNop(x.hanNop, false) || x.hanNop}
+                    {x.soEmChon} em · tự lập kế hoạch mỗi ngày
                     {pct !== null ? ` · ${pct}% sức chứa` : ''}
                   </span>
                 ) : loi && !dangXem ? null : (
@@ -1096,7 +1091,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
                         ▾
                       </span>
                     </summary>
-                    <LuoiSo xem={x} hanSua={hanSua} theLucSua={theLucSua} dangXem={dangXem} />
+                    <LuoiSo xem={x} dangXem={dangXem} />
                   </details>
                 ) : (
                   <div className="bhn-xem-dau">{dau}</div>
@@ -1114,21 +1109,6 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
         </ul>
       )}
 
-      {moSua && (
-        <div className="cd-hai-ngay" data-khoi="sua-han-luot">
-          <label className="cd-truong">
-            Hạn nộp (hết lúc 23:59)
-            <input type="date" value={hanSua} min={homNay} onChange={(e) => setHanSua(e.target.value)} />
-            <small className="cd-so cd-phu">{!hanSua ? `Để trống = ${TEN_AI} tự tính (${THAM_SO_OMNI.HAN_BAI_MIN}–${THAM_SO_OMNI.HAN_BAI_MAX} ngày)` : hanHopLe ? hienHanNop(hanSua) : 'Hạn nộp phải từ hôm nay trở đi'}</small>
-          </label>
-          <label className="cd-truong">
-            Số lượt câu mỗi ngày (một em)
-            <input type="number" inputMode="numeric" min={1} max={LUOT_TOI_DA} value={theLucChu} placeholder={xem1 ? String(xem1.theLucNgay) : ''} onChange={(e) => setTheLucChu(e.target.value)} />
-            <small className="cd-so cd-phu">{loiTheLuc || (nhieu ? 'Để trống = số lượt mặc định của từng lớp (Cài đặt). Số thầy nhập áp cho mọi lớp đang giao.' : 'Để trống = số lượt mặc định của lớp (Cài đặt)')}</small>
-          </label>
-        </div>
-      )}
-
       {loiGiao && (
         <p className="dh-loi" role="alert">
           {loiGiao}
@@ -1138,9 +1118,7 @@ function TheXacNhan({ bhn, chon }: { bhn: BaiHomNay; chon: BaiCay }) {
         <button type="button" className="m3-nut-chinh dh-nut" disabled={!dauVaoLop.length || !xongCaDs || dangXem || dangGiao} onClick={() => void giao()}>
           {nutGiao}
         </button>
-        <button type="button" className="m3-nut-vien dh-nut" aria-expanded={moSua} onClick={() => setMoSua(!moSua)}>
-          Sửa hạn nộp hoặc số lượt/ngày
-        </button>
+        <span className="dh-phu">Không hạn nộp · tự phân theo năng lực, lỗi sai và thời gian từng em</span>
       </div>
     </div>
   )

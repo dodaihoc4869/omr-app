@@ -116,6 +116,7 @@ import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 // OMNI 3 (05/10): tick bài đã dạy · hai thư mục kho · lệnh thầy OMNI · việc đêm (công tắc cau_hinh.omni mặc định TẮT).
 import { gvBaiDaDay } from './bai-da-day'
+import { hopNhatChienDichDangMoMotLan } from './hanh-trinh-gioi-hoa'
 import { ghiThuMucKhiDayDe, gvKhoThuMuc, thuMucTuNhom } from './kho-thu-muc'
 // OMNI 3 (05/10): A.I Đỗ Đại Học tự gắn vi kỹ năng (ma trận Q) + tự sinh câu nền — thầy không phải duyệt.
 import { chayGanVknDem, ganVknChoMaDe, kiemDinhQTuan } from './omni-gan-vkn'
@@ -3374,6 +3375,9 @@ const boXuLy = {
     if(dangReset)return
     // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
+    // HÀNH TRÌNH GIỎI HÓA 08/10: đúng một lần sau phát hành, gộp mọi chiến dịch đang mở theo khối và
+    // đánh dấu phân lại phần chưa làm. Không cần thầy mở app; lỗi thì phút sau tự thử lại, không có xoá dữ liệu cũ.
+    await hopNhatChienDichDangMoMotLan(env,Date.now()).then(r=>{if(r.chay)console.log('[hanh-trinh] đã hợp nhất',JSON.stringify(r.ketQua))}).catch(e=>console.error('[hanh-trinh] hợp nhất lỗi, phút sau thử lại:',e))
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     const caoDiem=laGioCaoDiemVn(Date.now())
     // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts, tối ưu 28/09): MỘT lần mỗi isolate, trong cron (không nằm trên đường lệnh của em/thầy). Lỗi chỉ ghi log.

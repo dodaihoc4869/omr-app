@@ -36,6 +36,8 @@ import { KHOA_THE_LUC_LOP, MUC_DICH_CHAN_DOAN, SQL_LA_LAN_LAM, SQL_LA_LAN_LAM_GI
 // 06/10 — ÔN BÀI CŨ chia đều theo bài/dạng + tỉ lệ theo lớp (omni-on-bai-cu.ts thuần, omni-on-bai-cu-d1.ts đọc cấu hình; công tắc `on_bai_cu_deu` = {"bat":false} ⇒ y hệt cũ).
 import { capCongBang, chiaCauTheoBai, xepCongBang, type TiLeMotPhan } from './omni-on-bai-cu'
 import { docTiLeRiengCuaLop, onBaiCuDeuBat } from './omni-on-bai-cu-d1'
+import { docCoKeHoachPhut, ghiSnapshotKeHoachPhut, KHOA_KE_HOACH_PHUT, taoNganSachPhutChoChienDich } from './srs2-ke-hoach-phut'
+import { docKhoiHanhTrinhMap } from './hanh-trinh-gioi-hoa'
 // Mô-đun các làn khác (omni-d1, bai-da-day, kho-thu-muc, srs2-gv) nạp LƯỜI bằng import động: chúng import ngược srs2-d1 (srs2-gv → bi-a → srs2-game →
 // omni-game → srs2-d1) — import tĩnh tạo vòng khiến `vi.mock(..., importOriginal)` của test làn khác nhận nhầm bản gốc; cờ tắt cũng không nạp gì thêm.
 const lanOmniD1 = () => import('./omni-d1')
@@ -115,6 +117,9 @@ export interface ChienDich {
    * Phản biện vòng 2 #110: màn thầy hiện "Bật (mặc định)" để thầy biết cờ này không phải thầy tự bật. `tao` luôn ghi dòng ⇒ chiến dịch mới không mang nhãn này.
    */
   raiDeuMacDinh: boolean
+  /** Một chiến dịch sống lâu của cả khối; không hết hạn, kế hoạch dùng cửa sổ cuốn theo ngày. */
+  hanhTrinh: boolean
+  khoiHanhTrinh: 10 | 11 | 12 | null
 }
 /** 00:00 giờ VN của một ngày `YYYY-MM-DD`, dạng ISO (UTC) để so chuỗi với `tao_luc`/`luc`. */
 export const dauNgayVn = (ngay: string): string => new Date(Date.parse(`${ngay}T00:00:00Z`) - GIO_VN_MS).toISOString()
@@ -135,6 +140,8 @@ export const docChienDichTuDong = (r: Row): ChienDich => ({
   taoLuc: str(r.tao_luc), trangThai: (['dang_chay', 'da_dong', 'da_huy'].includes(str(r.trang_thai)) ? str(r.trang_thai) : 'dang_chay') as ChienDich['trangThai'],
   raiDeu: r.rai_deu == null ? true : Number(r.rai_deu) !== 0,
   raiDeuMacDinh: r.rai_deu == null,
+  hanhTrinh: r.hanh_trinh_khoi != null,
+  khoiHanhTrinh: ([10, 11, 12].includes(Number(r.hanh_trinh_khoi)) ? Number(r.hanh_trinh_khoi) : null) as ChienDich['khoiHanhTrinh'],
 })
 
 // ---------------------------------------------------------------- ngày bắt đầu (thầy 28/09)
@@ -169,8 +176,8 @@ export async function docRaiDeuMap(env: Env, ids: readonly string[]): Promise<Ma
 /** Đọc dòng `chien_dich` kèm ngày bắt đầu + cờ rải đều (hai truy vấn phụ song song cho cả danh sách). */
 export async function docChienDichKemBatDau(env: Env, rows: readonly Row[]): Promise<ChienDich[]> {
   const ids = rows.map((r) => str(r.id))
-  const [bd, rd] = await Promise.all([docBatDauMap(env, ids), docRaiDeuMap(env, ids)])
-  return rows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null }))
+  const [bd, rd, ht] = await Promise.all([docBatDauMap(env, ids), docRaiDeuMap(env, ids), docKhoiHanhTrinhMap(env, ids)])
+  return rows.map((r) => docChienDichTuDong({ ...r, bat_dau: bd.get(str(r.id)) ?? null, rai_deu: rd.get(str(r.id)) ?? null, hanh_trinh_khoi: ht.get(str(r.id)) ?? null }))
 }
 /** Chiến dịch chưa tới ngày bắt đầu? */
 export const chuaBatDau = (cd: ChienDich, homNay: string): boolean => cd.batDau > homNay
@@ -192,7 +199,7 @@ interface DongDaHuy { id: string; taoLuc: string; dongLuc: string; sbdJson: stri
 const tapChuoiJson = (v: unknown): Set<string> => { let a: unknown = []; try { a = JSON.parse(str(v) || '[]') } catch { /* JSON hỏng ⇒ tập rỗng */ } return new Set((Array.isArray(a) ? a : []).filter((x): x is string => typeof x === 'string')) }
 const qidDaHuyMemo = new WeakMap<DongDaHuy, Set<string>>()
 const qidCuaDaHuy = (c: DongDaHuy): Set<string> => { let t = qidDaHuyMemo.get(c); if (!t) { t = tapChuoiJson(c.qidJson); qidDaHuyMemo.set(c, t) } return t }
-type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; huy: DongDaHuy[]; bd: Map<string, string>; rd: Map<string, number> }
+type DsChienDich = { ds: { row: Row; sbd: Set<string> }[]; huy: DongDaHuy[]; bd: Map<string, string>; rd: Map<string, number>; ht: Map<string, number> }
 type OChienDich = { ds: DsChienDich | null; dangDoc: boolean }
 const demChienDich = new DemTTL<OChienDich>(15_000, 2)
 export function xoaDemChienDich(): void { demChienDich.xoa() }
@@ -213,7 +220,8 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
       env.DB.prepare("SELECT id, bat_dau FROM chien_dich_bat_dau WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
       // rải đều (30/09): bảng tạo lúc chạy, chưa có = mọi chiến dịch BẬT ⇒ rỗng (`ghiRaiDeu` xoá đệm khi đổi)
       env.DB.prepare("SELECT id, rai_deu FROM chien_dich_tuy_chon WHERE id IN (SELECT id FROM chien_dich WHERE trang_thai <> 'da_huy')").all<Row>().catch(() => ({ results: [] as Row[] })),
-    ]).then(([r, bd, rd]) => {
+      env.DB.prepare("SELECT chien_dich_id, khoi FROM hanh_trinh_gioi_hoa").all<Row>().catch(() => ({ results: [] as Row[] })),
+    ]).then(([r, bd, rd, ht]) => {
       if (loi && demChienDich.doc('ds', Date.now()) === o) demChienDich.xoaKhoa('ds')
       const dong = r.results ?? []
       return {
@@ -222,6 +230,7 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
         huy: dong.filter((row) => str(row.trang_thai) === 'da_huy').map((row): DongDaHuy => ({ id: str(row.id), taoLuc: str(row.tao_luc), dongLuc: str(row.dong_luc), sbdJson: str(row.sbd_json), qidJson: str(row.qid_json) })),
         bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
         rd: new Map((rd.results ?? []).map((x) => [str(x.id), Number(x.rai_deu)])),
+        ht: new Map((ht.results ?? []).map((x) => [str(x.chien_dich_id), Number(x.khoi)])),
       }
     })
     o.ds = loi ? null : giaTri
@@ -233,9 +242,9 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
  * chiến dịch ấy sinh ra (thầy 06/10); mọi nơi khác vẫn không thấy chiến dịch đã huỷ.
  */
 export async function docChienDichKemDaHuyCuaEm(env: Env, sbd: string): Promise<{ ds: ChienDich[]; daHuy: ChienDichDaHuy[] }> {
-  const { ds, huy, bd, rd } = await docMoiChienDich(env)
+  const { ds, huy, bd, rd, ht } = await docMoiChienDich(env)
   return {
-    ds: ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null })),
+    ds: ds.filter((x) => x.sbd.has(sbd)).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null, hanh_trinh_khoi: ht.get(str(x.row.id)) ?? null })),
     // Tiền lọc rẻ trên JSON thô (em xuất hiện dưới dạng chuỗi có nháy) rồi mới parse đúng chiến dịch có em — em thường không thuộc chiến dịch đã huỷ nào ⇒ gần như không tốn gì.
     daHuy: huy.filter((c) => c.sbdJson.includes(JSON.stringify(sbd)) && tapChuoiJson(c.sbdJson).has(sbd)).map((c): ChienDichDaHuy => ({ id: c.id, qids: qidCuaDaHuy(c), taoLuc: c.taoLuc, dongLuc: c.dongLuc })),
   }
@@ -273,14 +282,14 @@ export async function docMocThemCaLop(env: Env, chienDichId: string): Promise<Ma
 export const mocTinhCua = (taoLuc: string, themLuc: string | undefined): string => (themLuc && themLuc > taoLuc ? themLuc : taoLuc)
 
 /** Chiến dịch đang chạy của em (giao gần nhất, còn hạn, ĐÃ tới ngày bắt đầu). */
-export const chienDichDangChay = (ds: readonly ChienDich[], homNay: string): ChienDich | null => ds.find((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay)) ?? null
+export const chienDichDangChay = (ds: readonly ChienDich[], homNay: string): ChienDich | null => ds.find((c) => c.trangThai === 'dang_chay' && (c.hanhTrinh || c.hanNop >= homNay) && !chuaBatDau(c, homNay)) ?? null
 /**
  * OMNI 3 — NHIỀU BÀI SONG SONG: MỌI chiến dịch đang chạy của em (còn hạn, đã tới ngày bắt đầu), HẠN GẦN TRƯỚC (EDF); hoà hạn ⇒ bắt đầu sớm trước, rồi giao
  * gần nhất trước (thứ tự `ds`). Phần tử đầu là "chiến dịch hạn gần nhất" (HoSo2.chienDich khi OMNI bật).
  */
 export const chienDichDangChayHet = (ds: readonly ChienDich[], homNay: string): ChienDich[] =>
   ds.map((c, i) => [c, i] as const)
-    .filter(([c]) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay))
+    .filter(([c]) => c.trangThai === 'dang_chay' && (c.hanhTrinh || c.hanNop >= homNay) && !chuaBatDau(c, homNay))
     .sort(([a, i], [b, j]) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : a.batDau < b.batDau ? -1 : a.batDau > b.batDau ? 1 : i - j))
     .map(([c]) => c)
 /**
@@ -290,16 +299,16 @@ export const chienDichDangChayHet = (ds: readonly ChienDich[], homNay: string): 
  */
 export async function docChienDichDangChayCuaCacEm(env: Env, sbd: readonly string[], homNay: string): Promise<ChienDich[]> {
   try {
-    const { ds, bd, rd } = await docMoiChienDich(env)
+    const { ds, bd, rd, ht } = await docMoiChienDich(env)
     const tap = new Set(sbd)
-    return chienDichDangChayHet(ds.filter((x) => [...x.sbd].some((s) => tap.has(s))).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null })), homNay)
+    return chienDichDangChayHet(ds.filter((x) => [...x.sbd].some((s) => tap.has(s))).map((x) => docChienDichTuDong({ ...x.row, bat_dau: bd.get(str(x.row.id)) ?? null, rai_deu: rd.get(str(x.row.id)) ?? null, hanh_trinh_khoi: ht.get(str(x.row.id)) ?? null })), homNay)
   } catch {
     return []
   }
 }
 /** Chiến dịch SẮP bắt đầu gần nhất của em (chưa tới ngày bắt đầu) — Sảnh HS báo ngày, KHÔNG phát câu. */
 export const chienDichSapBatDau = (ds: readonly ChienDich[], homNay: string): ChienDich | null =>
-  ds.filter((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && chuaBatDau(c, homNay)).sort((a, b) => (a.batDau < b.batDau ? -1 : a.batDau > b.batDau ? 1 : 0))[0] ?? null
+  ds.filter((c) => c.trangThai === 'dang_chay' && (c.hanhTrinh || c.hanNop >= homNay) && chuaBatDau(c, homNay)).sort((a, b) => (a.batDau < b.batDau ? -1 : a.batDau > b.batDau ? 1 : 0))[0] ?? null
 
 // ---------------------------------------------------------------- câu và sổ
 /** `sao`: số sao "cần chữa" của câu trong kho (`canChua.sao` → `sao` trong json câu game): 2 = vận dụng cao đánh dấu 2 sao. */
@@ -785,6 +794,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const loiV2 = new Map<string, KetQuaLoi>()
   const songSinhCho = new Map<string, number>(), songSinhLamLai = new Map<string, number>()
   const banKhacTiep = new Map<string, { bt: number; yd: number }>()
+  const qidHanhTrinh = new Set(dsDangChay.filter((c) => c.hanhTrinh).flatMap((c) => c.qids))
   for (const qid of qids) {
     const m = meta.get(qid)
     if (!m || m.tuLuan) { if (!theoQid.get(qid)?.length) laMoiBo.add(qid); continue } // câu đã rút khỏi kho / câu tự luận (30/09: không vào kế hoạch, không đếm thể lực; meta vẫn giữ để tra)
@@ -811,7 +821,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
     // câu của chiến dịch ĐANG CHẠY là câu THẦY GIAO THẲNG ⇒ luôn vào kế hoạch, bất kể thư mục / bài đã tick (bộ lọc chỉ áp cho nợ cũ, duy trì, ca sai, ôn bài cũ).
     // NGOẠI LỆ 2 (thầy duyệt 07/10, việc 14d "câu SAI ở ca thi / Lên bảng / tự làm thuộc kho TU LUYỆN không vào Đảo/Đoàn"): NỢ (câu em sai, chưa đóng lỗi) mà câu CHỈ ở tờ TU LUYỆN
     // vẫn vào kế hoạch. Giữ nguyên bộ lọc cho: duy trì (câu đã vững), nợ chiến dịch cũ KHÔNG có lịch sử sai, câu của tờ DẠY HỌC bài chưa tick, ôn bài cũ và câu mới.
-    if (nguon !== 'chien_dich' && trongPhamVi && !trongPhamVi(qid) && !(nguon === 'no_cu' && coLichSuSai(qid) && chiOTuLuyen?.(qid))) continue
+    if ((nguon !== 'chien_dich' || qidHanhTrinh.has(qid)) && trongPhamVi && !trongPhamVi(qid) && !(nguon === 'no_cu' && coLichSuSai(qid) && chiOTuLuyen?.(qid))) continue
     const cd = nguon === 'chien_dich' ? cdTheoQid.get(qid) : undefined
     cau.push({ qid, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon, ...(m.sao ? { sao: m.sao } : {}), ...(cd ? { cd } : {}) })
   }
@@ -1354,7 +1364,7 @@ export function tuyChonGocOmni(hoSo: HoSo2, ngay: string): TuyChonKeHoach {
   return {
     homNay: ngay, hanNop: cd?.hanNop ?? null, tranNgay: theLuc,
     ...(ds.length ? { tranHuyetChien: ds.some((c) => c.huyetChien) ? tranHuyetChienTheo(theLuc) : theLuc, raiDeu: cd?.raiDeu ?? true } : {}),
-    chienDich: ds.map((c) => ({ id: c.id, hanNop: c.hanNop, theLucNgay: c.theLucNgay, raiDeu: c.raiDeu, batDau: c.batDau })),
+    chienDich: ds.map((c) => ({ id: c.id, hanNop: c.hanNop, theLucNgay: c.theLucNgay, raiDeu: c.raiDeu, batDau: c.batDau, hanhTrinh: c.hanhTrinh })),
     onBaiCu: hoSo.onBaiCu ?? [],
   }
 }
@@ -1372,7 +1382,11 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
     return { tiLeNo: tiLeNoRieng(noDenHan, nk.nhipNgay), ...(onVaoDaoRieng(nk.luotDao, nk.luotDoan) ? { onVaoDao: true } : {}) }
   }
   const cauQ = [...hoSo.cau.filter((c) => (c.nguon ?? 'chien_dich') === 'chien_dich'), ...(hoSo.onBaiCu ?? [])]
-  const [r, hang, hsOmni, q, beta, theLucLop, tiLeRieng] = await Promise.all([
+  const laHanhTrinh = (hoSo.chienDichHet ?? (hoSo.chienDich ? [hoSo.chienDich] : [])).some((c) => c.hanhTrinh)
+  const phutP = !laHanhTrinh ? Promise.resolve(null) : docCauHinhDem(env, KHOA_KE_HOACH_PHUT).then((v) => docCoKeHoachPhut(v)
+    ? taoNganSachPhutChoChienDich(env, sbd, ngay, nowMs, [...hoSo.cau, ...(hoSo.onBaiCu ?? [])], hoSo.tt)
+    : null).catch(() => null)
+  const [r, hang, hsOmni, q, beta, theLucLop, tiLeRieng, nganSachPhut] = await Promise.all([
     rieng().catch(() => ({})),
     docHangEm(env, sbd, hoSo, som?.hd).catch(() => null),
     lanOmniD1().then((m) => m.hoSoOmniEm(env, sbd, nowMs)).catch(() => null),
@@ -1380,6 +1394,7 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
     cauQ.length ? lanOmniD1().then((m) => m.docBetaCau(env, cauQ.map((c) => c.qid))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     hoSo.omni?.cheDoCho ? theLucLopCuaEm(env, sbd).catch(() => null) : Promise.resolve(null),
     tiLeOnBaiCuRiengCuaEm(env, sbd).catch(() => null), // 06/10 (c): tỉ lệ ôn bài cũ thầy đặt cho lớp của em — lớp + cấu hình đã đệm ⇒ thường 0 truy vấn
+    phutP,
   ])
   let trongSoCau: Record<string, number> | undefined
   const chiTietQuyetDinh: ChiTietQuyetDinhV2[] = []
@@ -1405,6 +1420,7 @@ export async function tuyChonKeHoachOmni(env: Env, sbd: string, nowMs: number, h
       chiTiet: Object.fromEntries(chiTietQuyetDinh.map((x) => [x.qid, { cu: x.diemCu, moi: x.diemMoi, ms: x.msKyVong }])),
     } } : {}),
     ...(dangVung.length ? { dangVung } : {}),
+    ...(nganSachPhut ? { nganSachPhut } : {}),
     tiLeOnBaiCu: tiLeOnBaiCu(cd ? soNgayGiua(cd.batDau, ngay) + 1 : null, THAM_SO_OMNI, tiLeRieng),
     ...(hoSo.omni?.cheDoCho ? { cheDoCho: { theLuc: theLucCho(theLucLop ?? THAM_SO_OMNI.THE_LUC_MAC_DINH) } } : {}),
   }
@@ -1469,6 +1485,8 @@ async function layKeHoachChotOmni(env: Env, sbd: string, nowMs: number, hoSo: Ho
         [cd?.id ?? null, JSON.stringify(dao), JSON.stringify(doan), lap.huyetChien ? 1 : 0, dao.length + doan.length])
       if (ghi) {
         await ghiKeHoachOmni(env, sbd, ngay, tapCd, on, nowMs).catch(() => undefined)
+        const tcGhi = tc ?? await tuyChonKeHoachOmni(env, sbd, nowMs, hoSo)
+        await ghiSnapshotKeHoachPhut(env, sbd, ngay, tapCd, tcGhi, lap, nowMs).catch(() => undefined)
         return { kh: kemOn(hoanThien(ngay, cd?.id ?? null, dao, doan, lap.huyetChien, dem), on), hs: hoSo }
       }
       // Máy khác vừa ghi ⇒ dùng bản ĐÃ CHỐT ấy (và tập/câu ôn bài cũ nó đã ghi).
@@ -1533,7 +1551,10 @@ async function layKeHoachChotOmni(env: Env, sbd: string, nowMs: number, hoSo: Ho
   const chot = docLai?.results?.[0] ?? null
   const luuMoi = thang ? (gopOmni ? null : (await ghiKeHoachOmni(env, sbd, ngay, tapCd, lap.onBaiCu ?? [], nowMs).catch(() => undefined), null)) : await docKeHoachOmni(env, sbd, ngay)
   const on = thang ? (lap.onBaiCu ?? []) : (luuMoi?.onBaiCu ?? [])
-  if (thang) await ghiNhatKyQuyetDinhV2(env, sbd, ngay, tcLapMoi, lap, nowMs).catch(() => undefined)
+  if (thang) await Promise.all([
+    ghiNhatKyQuyetDinhV2(env, sbd, ngay, tcLapMoi, lap, nowMs),
+    ghiSnapshotKeHoachPhut(env, sbd, ngay, tapCd, tcLapMoi, lap, nowMs),
+  ]).catch(() => undefined)
   return { kh: kemOn(chot ? tuDong(chot, ngay, dem) : hoanThien(ngay, cd?.id ?? null, lap.dao, lap.doan, lap.huyetChien, dem), on), hs: hoSo }
 }
 
@@ -1582,8 +1603,11 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
   }
   // Tối ưu 05/10: nhịp/kênh và hạng theo dạng là hai lượt ĐỌC độc lập ⇒ song song (trước: nối tiếp); dùng phần đã đọc sẵn khi có.
   const tuyChonLap = async (som?: DocLapSom | null): Promise<TuyChonKeHoach> => {
-    const [r, hang] = await Promise.all([rieng(som), docHangEm(env, sbd, hoSo, som?.hd).catch(() => null)])
-    return { ...tuyChonGoc, ...r, ...(hang ?? {}), ...(hang ? { phanBoTheoHoSo: true } : {}) }
+    const phut = !cd?.hanhTrinh ? Promise.resolve(null) : docCauHinhDem(env, KHOA_KE_HOACH_PHUT).then((v) => docCoKeHoachPhut(v)
+      ? taoNganSachPhutChoChienDich(env, sbd, ngay, nowMs, hoSo.cau, hoSo.tt)
+      : null).catch(() => null)
+    const [r, hang, nganSachPhut] = await Promise.all([rieng(som), docHangEm(env, sbd, hoSo, som?.hd).catch(() => null), phut])
+    return { ...tuyChonGoc, ...r, ...(hang ?? {}), ...(hang ? { phanBoTheoHoSo: true } : {}), ...(nganSachPhut ? { nganSachPhut } : {}) }
   }
   if (cu) {
     let kh = tuDong(cu, ngay, dem)
@@ -1605,11 +1629,13 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
       const xongDoan = kh.doan.filter((k) => !kh.conDoan.includes(k))
       // Câu MỚI của kế hoạch hôm nay em đã làm: lần làm đầu tiên (từ mốc chiến dịch) rơi đúng hôm nay ⇒ quota rải đều hôm nay trừ đi phần này.
       const moiDaLamHomNay = new Set([...xongDao, ...xongDoan].map(qidGoc).filter((q) => hoSo.tt.get(q)?.lichSu[0]?.ngay === ngay)).size
-      const lap = lapPhanBo ?? lapKeHoachNgay(hoSo.cau, hoSo.tt, { ...(await tuyChonLap()), moiDaLamHomNay }, xongDao.length + xongDoan.length)
+      const tcGhi = await tuyChonLap()
+      const lap = lapPhanBo ?? lapKeHoachNgay(hoSo.cau, hoSo.tt, { ...tcGhi, moiDaLamHomNay }, xongDao.length + xongDoan.length)
       const dao = [...xongDao, ...themLanLam([...xongDao, ...xongDoan], lap.dao)]
       const doan = [...xongDoan, ...themLanLam([...dao, ...xongDoan], lap.doan)]
       const ghi = await ghiKeHoachNeuChuaDoi(env, sbd, ngay, cu, 'chien_dich_id = ?, dao_json = ?, doan_json = ?, huyet_chien = ?, tong = ?',
         [cd?.id ?? null, JSON.stringify(dao), JSON.stringify(doan), lap.huyetChien ? 1 : 0, dao.length + doan.length])
+      if (ghi) await ghiSnapshotKeHoachPhut(env, sbd, ngay, cd ? [cd.id] : [], tcGhi, lap, nowMs).catch(() => undefined)
       return { kh: ghi ? hoanThien(ngay, cd?.id ?? null, dao, doan, lap.huyetChien, dem) : await docLaiKeHoach(env, sbd, ngay, dem, kh), hs: hoSo }
     }
     // 30/09 (sửa lỗi "Chưa tải được câu hôm nay", rương kẹt 48/49) — phản biện #108: kế hoạch chốt còn câu KHÔNG PHỤC VỤ ĐƯỢC (chỉ mục nay xem là tự luận /
@@ -1640,15 +1666,17 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
     }
     return { kh, hs: hoSo }
   }
-  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, await tuyChonLap(await lapSom))
+  const tcLapMoi = await tuyChonLap(await lapSom)
+  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tcLapMoi)
   // Hai yêu cầu song song: bản ghi thắng là bản CHỐT, đọc lại để cả hai trả cùng một kế hoạch. Tối ưu 05/10: ghi + đọc lại trong MỘT lô
   // (D1 chạy lô tuần tự trong một giao dịch ⇒ câu đọc thấy đúng dòng vừa ghi hoặc dòng đã có) — trước: hai đợt nối tiếp.
-  const [, docLai] = await env.DB.batch<Row>([
+  const [moi, docLai] = await env.DB.batch<Row>([
     env.DB.prepare('INSERT OR IGNORE INTO srs2_ke_hoach (sbd, ngay, chien_dich_id, dao_json, doan_json, huyet_chien, tong, tao_luc) VALUES (?,?,?,?,?,?,?,?)')
       .bind(sbd, ngay, cd?.id ?? null, JSON.stringify(lap.dao), JSON.stringify(lap.doan), lap.huyetChien ? 1 : 0, lap.dao.length + lap.doan.length, new Date(nowMs).toISOString()),
     env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay),
   ])
   const chot = docLai?.results?.[0] ?? null
+  if (Number(moi?.meta?.changes ?? 0) > 0) await ghiSnapshotKeHoachPhut(env, sbd, ngay, cd ? [cd.id] : [], tcLapMoi, lap, nowMs).catch(() => undefined)
   return { kh: chot ? tuDong(chot, ngay, dem) : hoanThien(ngay, cd?.id ?? null, lap.dao, lap.doan, lap.huyetChien, dem), hs: hoSo }
 }
 

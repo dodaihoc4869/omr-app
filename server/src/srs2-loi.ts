@@ -295,6 +295,17 @@ export interface TuyChonKeHoach {
     phienBan: string
     chiTiet: Readonly<Record<string, { cu: number; moi: number; ms: number }>>
   }
+  /**
+   * KẾ HOẠCH THEO PHÚT (08/10): ngân sách CHUNG còn lại của ngày và thời gian đầy đủ của từng câu
+   * (giải + phản hồi; câu nợ có thể gồm bài mẫu). Vắng ⇒ hợp đồng số-câu cũ giữ nguyên.
+   * `giayMacDinh` chỉ dùng khi một câu vừa được thêm vào kho nhưng chưa có dự báo; không được coi là 0 giây.
+   */
+  nganSachPhut?: {
+    phienBan: string
+    giayToiDa: number
+    giayMacDinh: number
+    giayTheoQid: Readonly<Record<string, number>>
+  }
   /** Mã dạng ĐÃ VỮNG của em: câu MỚI chiến dịch của các dạng này KHÔNG bắt buộc — bỏ khỏi câu mới, quota và khối lượng (vẫn nằm trong `cau` cho Thử sức thêm). Câu ôn/nợ không miễn. */
   dangVung?: readonly string[]
   /**
@@ -321,6 +332,8 @@ export interface ChienDichKeHoach {
   raiDeu: boolean
   /** Ngày bắt đầu (VN); sau hôm nay ⇒ chưa chạy (bỏ). */
   batDau?: string
+  /** Hành trình không có hạn; dùng cửa sổ cuốn 7 ngày để chia đều câu mới. */
+  hanhTrinh?: boolean
 }
 
 export interface KeHoachNgay {
@@ -342,6 +355,59 @@ export interface KeHoachNgay {
   onBaiCu?: string[]
   /** OMNI 3 (chỉ có khi truyền `chienDich`): số câu mới đã chọn hôm nay theo id chiến dịch. */
   moiTheoCd?: Record<string, number>
+  /** Tóm tắt quyết định theo phút; chỉ có khi bật lớp ngân sách phút. */
+  nganSachPhut?: {
+    phienBan: string
+    nganSachGiay: number
+    duKienGiay: number
+    hoanCau: number
+    quaTaiGiay: number
+  }
+}
+
+export interface MucNganSachPhut<T> { qid: string; giaTri: T; batBuoc?: boolean }
+
+/**
+ * Chọn theo hàng ưu tiên trong ngân sách. Việc đứng trước luôn được xét trước; việc không vừa không chặn một việc ngắn
+ * đứng sau. Nếu chưa chọn được gì, giữ đúng MỘT việc đầu để học sinh không kẹt và khai báo phần vượt ngân sách.
+ * Hàm thuần/tất định, dùng chung cho test và `lapKeHoachNgay`.
+ */
+export function chonVuaNganSachPhut<T>(
+  ds: readonly MucNganSachPhut<T>[],
+  ns: NonNullable<TuyChonKeHoach['nganSachPhut']>,
+): { chon: MucNganSachPhut<T>[]; duKienGiay: number; hoanCau: number; quaTaiGiay: number } {
+  const nganSach = Math.max(0, Math.floor(Number(ns.giayToiDa) || 0))
+  const macDinh = Math.max(1, Math.floor(Number(ns.giayMacDinh) || 120))
+  const daGap = new Set<string>()
+  const hopLe = ds.filter((x) => {
+    if (!x.qid || daGap.has(x.qid)) return false
+    daGap.add(x.qid)
+    return true
+  })
+  const giay = (qid: string): number => {
+    const n = Number(ns.giayTheoQid[qid])
+    return Number.isFinite(n) && n > 0 ? Math.ceil(n) : macDinh
+  }
+  const chon: MucNganSachPhut<T>[] = []
+  let duKienGiay = 0
+  for (const x of hopLe) {
+    const can = giay(x.qid)
+    if (duKienGiay + can <= nganSach) {
+      chon.push(x)
+      duKienGiay += can
+    }
+  }
+  // Một câu dài hơn toàn bộ ngân sách vẫn phải làm được; phần vượt được công khai, không âm thầm coi là vừa.
+  if (!chon.length && hopLe.length) {
+    chon.push(hopLe[0]!)
+    duKienGiay = giay(hopLe[0]!.qid)
+  }
+  return {
+    chon,
+    duKienGiay,
+    hoanCau: Math.max(0, hopLe.length - chon.length),
+    quaTaiGiay: Math.max(0, duKienGiay - nganSach),
+  }
 }
 
 /** Băm tất định (FNV-1a) — hoà điểm xếp theo khoá, không dùng Math.random. */
@@ -709,13 +775,14 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     const daCo = new Set<string>()
     // hạn gần trước; cùng hạn ⇒ giữ thứ tự truyền vào (sort ổn định — lớp D1 đã xếp bắt đầu sớm trước, rồi giao gần nhất)
     const ds = tc.chienDich!
-      .filter((c) => !!c.hanNop && c.hanNop >= tc.homNay && !(c.batDau && c.batDau > tc.homNay))
+      .filter((c) => !!c.hanNop && (c.hanhTrinh || c.hanNop >= tc.homNay) && !(c.batDau && c.batDau > tc.homNay))
       .slice()
       .sort((a, b) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : 0))
     for (const c of ds) {
       if (daCo.has(c.id)) continue
       daCo.add(c.id)
-      nhom.push({ id: c.id, hanNop: c.hanNop, raiDeu: c.raiDeu === true, D: soNgayConLai(tc.homNay, c.hanNop), theLuc: Number(c.theLucNgay) || TRAN_NGAY })
+      const D = c.hanhTrinh ? 7 : soNgayConLai(tc.homNay, c.hanNop)
+      nhom.push({ id: c.id, hanNop: c.hanhTrinh ? congNgay(tc.homNay, D - 1) : c.hanNop, raiDeu: c.raiDeu === true, D, theLuc: Number(c.theLucNgay) || TRAN_NGAY })
     }
   } else if (!!tc.hanNop && tc.homNay <= tc.hanNop) {
     nhom.push({ id: null, hanNop: tc.hanNop, raiDeu: tc.raiDeu === true, D: soNgayConLai(tc.homNay, tc.hanNop), theLuc: tc.tranNgay ?? TRAN_NGAY })
@@ -887,7 +954,36 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     }
     chonMoi.push(...thuTuMoi.slice(0, soCan))
   })
-  const chonOn = [...no.slice(0, layNo + themNo), ...cungCo.slice(0, layCungCo), ...duyTri.slice(0, layDuyTri)]
+  let chonNo = no.slice(0, layNo + themNo)
+  let chonCungCo = cungCo.slice(0, layCungCo)
+  let chonDuyTri = duyTri.slice(0, layDuyTri)
+  let tomTatPhut: KeHoachNgay['nganSachPhut'] | undefined
+  if (tc.nganSachPhut) {
+    // Thứ tự mục đích: khép vòng sai/nợ → câu mới theo EDF+ZPD → ôn củng cố → duy trì → bài cũ.
+    // `chonVuaNganSachPhut` chỉ hoãn phần chưa vừa; không sửa trạng thái nên ngày sau câu vẫn quay lại đúng hàng.
+    const hang = [
+      ...chonNo.map((c) => ({ qid: c.qid, giaTri: c, batBuoc: true })),
+      ...chonMoi.map((c) => ({ qid: c.qid, giaTri: c })),
+      ...chonCungCo.map((c) => ({ qid: c.qid, giaTri: c })),
+      ...chonDuyTri.map((c) => ({ qid: c.qid, giaTri: c })),
+      ...chonOnBaiCu.map((c) => ({ qid: c.qid, giaTri: c })),
+    ]
+    const vua = chonVuaNganSachPhut(hang, tc.nganSachPhut)
+    const giu = new Set(vua.chon.map((x) => x.qid))
+    chonNo = chonNo.filter((c) => giu.has(c.qid))
+    chonCungCo = chonCungCo.filter((c) => giu.has(c.qid))
+    chonDuyTri = chonDuyTri.filter((c) => giu.has(c.qid))
+    for (let i = chonMoi.length - 1; i >= 0; i--) if (!giu.has(chonMoi[i]!.qid)) chonMoi.splice(i, 1)
+    chonOnBaiCu = chonOnBaiCu.filter((c) => giu.has(c.qid))
+    tomTatPhut = {
+      phienBan: tc.nganSachPhut.phienBan,
+      nganSachGiay: Math.max(0, Math.floor(tc.nganSachPhut.giayToiDa)),
+      duKienGiay: vua.duKienGiay,
+      hoanCau: vua.hoanCau,
+      quaTaiGiay: vua.quaTaiGiay,
+    }
+  }
+  const chonOn = [...chonNo, ...chonCungCo, ...chonDuyTri]
   // Ôn bài cũ: câu chưa gặp đi với câu mới (Đảo); câu đã gặp đi như câu ôn (Phần II ⇒ Đảo, còn lại ⇒ Đoàn).
   const onCuMoi = chonOnBaiCu.filter((c) => tt(c).laMoi)
   const onCuDaGap = chonOnBaiCu.filter((c) => !tt(c).laMoi)
@@ -907,7 +1003,8 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     catTia,
     raiDeu: nhieu && coChienDich ? nhom[0]!.raiDeu : tc.raiDeu === true,
     ...(coOnBaiCu ? { onBaiCu: chonOnBaiCu.map((c) => c.qid) } : {}),
-    ...(nhieu ? { moiTheoCd: Object.fromEntries(nhom.map((g, i) => [g.id!, layMoi[i]! + themMoi[i]!])) } : {}),
+    ...(nhieu ? { moiTheoCd: Object.fromEntries(nhom.map((g, i) => [g.id!, chonMoi.filter((c) => nhomCua(c) === i).length])) } : {}),
+    ...(tomTatPhut ? { nganSachPhut: tomTatPhut } : {}),
   }
 }
 
