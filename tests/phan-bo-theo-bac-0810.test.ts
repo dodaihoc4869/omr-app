@@ -92,5 +92,16 @@ describe('bộ chọn ZPD trên kho chiến dịch thật', () => {
   it('chia có trần luôn đúng tổng khi kho còn sức chứa', () => {
     expect(chiaTheoTrongSoCoTran(10, [9, 1, 0], [2, 20, 20]).reduce((s, n) => s + n, 0)).toBe(10)
   })
+
+  it('giữ quota ZPD nhưng chọn câu OMNI tốt nhất trong từng ô', () => {
+    const ds = kho()
+    const uuTien = Object.fromEntries(ds.map((c) => [c.qid, c.qid.endsWith('-19') ? 100 : 0]))
+    const r = xepCauMoiTheoZpd(ds, 30, hs, .35, uuTien)
+    const chon = r.thuTu.slice(0, 30)
+    expect(chon.some((c) => c.qid.endsWith('-19'))).toBe(true)
+    expect(Math.max(...chon.map((c) => c.bac))).toBeLessThanOrEqual(2)
+    expect(r.tomTat.thuThach).toBeLessThanOrEqual(Math.ceil(30 * .2))
+    expect(r.tomTat.theoBac.reduce((s, n) => s + n, 0)).toBe(30)
+  })
 })
 

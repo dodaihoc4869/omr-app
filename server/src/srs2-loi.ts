@@ -290,6 +290,11 @@ export interface TuyChonKeHoach {
    * KHÔNG đổi số câu mới mỗi ngày. Câu vắng trong bảng ⇒ trọng số 0.
    */
   trongSoCau?: Readonly<Record<string, number>>
+  /** Shadow đo lường Decision Engine v2; không tham gia logic chọn ngoài `trongSoCau`. */
+  quyetDinhV2?: {
+    phienBan: string
+    chiTiet: Readonly<Record<string, { cu: number; moi: number; ms: number }>>
+  }
   /** Mã dạng ĐÃ VỮNG của em: câu MỚI chiến dịch của các dạng này KHÔNG bắt buộc — bỏ khỏi câu mới, quota và khối lượng (vẫn nằm trong `cau` cho Thử sức thêm). Câu ôn/nợ không miễn. */
   dangVung?: readonly string[]
   /**
@@ -867,12 +872,15 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     const ds = moiXep[i]!
     const soCan = layMoi[i]! + themMoi[i]!
     let thuTuMoi: CauSrs[] = ds
-    if (!tc.trongSoCau && tc.hoSoZpdTheoDang) {
+    // ZPD quyết định SỐ câu theo bậc; OMNI quyết định câu nào có giá trị học/phút cao nhất trong từng quota.
+    // Trước 08/10 hai nhánh loại trừ nhau nên hễ có OMNI thì quota ZPD bị bỏ qua.
+    if (tc.hoSoZpdTheoDang) {
       thuTuMoi = xepCauMoiTheoZpd(
         ds.map((c) => ({ ...c, bac: mucCaNhan(c.mucDo) as BacCauChienDich })),
         soCan,
         tc.hoSoZpdTheoDang,
         tc.alphaZpd,
+        tc.trongSoCau,
       ).thuTu
     } else if (tc.hangTheoDang && !tc.trongSoCau) {
       thuTuMoi = bocCauMoiCaNhan(ds, layMoi[i]!, g.D > NGAY_DEM ? g.D - NGAY_DEM : 1, hangCua, nhieu ? cauChienDich.filter((c) => nhomCua(c) === i) : cauChienDich)

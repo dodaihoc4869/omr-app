@@ -146,20 +146,30 @@ export function xepCauMoiTheoZpd<T extends CauZpd>(
   soLay: number,
   hoSoTheoDang: Readonly<Record<string, HoSoZpdDang>>,
   alpha = PHAN_BO_BAC.ALPHA_MAC_DINH,
+  /** Điểm ưu tiên từ bộ quyết định OMNI. ZPD vẫn quyết định quota từng bậc; điểm này chỉ chọn câu tốt nhất trong quota. */
+  uuTien?: Readonly<Record<string, number>>,
 ): { thuTu: T[]; tomTat: TomTatZpd } {
   const n = Math.min(cau.length, Math.max(0, Math.floor(soLay)))
   const a = kep01(alpha)
+  const viTri = new Map(cau.map((c, i) => [c.qid, i]))
+  const diem = (c: T): number => {
+    const x = Number(uuTien?.[c.qid])
+    return Number.isFinite(x) ? x : 0
+  }
+  // OMNI không được phá quota ZPD: chỉ đổi thứ tự ổn định trong từng tập ứng viên.
+  const cauSap = uuTien
+    ? [...cau].sort((x, y) => diem(y) - diem(x) || viTri.get(x.qid)! - viTri.get(y.qid)!)
+    : [...cau]
   const coHoSoDuTin = Object.values(hoSoTheoDang).some((h) => doTinHoSo(h.soGap) > 0)
   if (n === 0 || !coHoSoDuTin) {
-    const chon = cau.slice(0, n)
+    const chon = cauSap.slice(0, n)
     const theoBac = [0, 0, 0, 0] as [number, number, number, number]
     chon.forEach((c) => { theoBac[c.bac]++ })
-    return { thuTu: [...cau], tomTat: { tong: n, theoBac, thuThach: 0, alpha: a, coHoSoDuTin } }
+    return { thuTu: cauSap, tomTat: { tong: n, theoBac, thuThach: 0, alpha: a, coHoSoDuTin } }
   }
 
   type O = { cau: T[]; w: number; thuThach: boolean; phan: T['phan'] }
-  const viTri = new Map(cau.map((c, i) => [c.qid, i]))
-  const theoPhan = PHAN_V2.map((p) => cau.filter((c) => c.phan === p))
+  const theoPhan = PHAN_V2.map((p) => cauSap.filter((c) => c.phan === p))
   const nPhan = chiaTheoTrongSoCoTran(n, theoPhan.map((x) => x.length), theoPhan.map((x) => x.length))
   const daChon = new Set<string>()
   const oDaChon: { o: O; n: number }[] = []
@@ -216,12 +226,12 @@ export function xepCauMoiTheoZpd<T extends CauZpd>(
 
   oDaChon.forEach(({ o, n: so }) => o.cau.slice(0, so).forEach((c) => daChon.add(c.qid)))
   // Phòng thủ kho cực lệch: vẫn đủ n bằng câu hợp lệ gần nhất trong thứ tự nền.
-  for (const c of cau) {
+  for (const c of cauSap) {
     if (daChon.size >= n) break
     const h = hoSoTheoDang[c.dang ?? '']
     if (!h || c.bac <= h.bacDich + 1) daChon.add(c.qid)
   }
-  const chon = cau.filter((c) => daChon.has(c.qid)).slice(0, n)
+  const chon = cauSap.filter((c) => daChon.has(c.qid)).slice(0, n)
   const chonSet = new Set(chon.map((c) => c.qid))
   const theoBac = [0, 0, 0, 0] as [number, number, number, number]
   let thuThach = 0
@@ -231,7 +241,7 @@ export function xepCauMoiTheoZpd<T extends CauZpd>(
     if (h && c.bac === h.bacDich + 1) thuThach++
   })
   return {
-    thuTu: [...chon, ...cau.filter((c) => !chonSet.has(c.qid))],
+    thuTu: [...chon, ...cauSap.filter((c) => !chonSet.has(c.qid))],
     tomTat: { tong: chon.length, theoBac, thuThach, alpha: a, coHoSoDuTin },
   }
 }
