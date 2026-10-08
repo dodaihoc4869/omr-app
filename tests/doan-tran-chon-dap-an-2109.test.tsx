@@ -115,7 +115,7 @@ describe('LƯỚI ĐÁP ÁN KHÔNG BỊ KHOÁ khi có lệnh khác đang bay (g�
     expect(nutChot().textContent).toMatch(/Chờ một chút…/)
     await nha()
     await waitFor(() => expect(nutChot().disabled).toBe(false))
-    expect(nutChot().textContent).toContain('Chốt đòn · C + Đánh')
+    expect(nutChot().textContent).toContain('Chốt đáp án')
   })
 
   it('chọn A rồi bấm lại A/B liên tiếp nhiều lần ⇒ luôn là lần bấm CUỐI (không bao giờ kẹt ở lần đầu)', async () => {

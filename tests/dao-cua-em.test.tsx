@@ -71,11 +71,11 @@ describe('dao-core', () => {
 
 describe('Hòn đảo của em', () => {
   const dung = (them: Partial<Parameters<typeof DaoCuaEm>[0]> = {}) => render(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} onLenDuong={() => {}} {...them} /></div>)
-  it('hiện đúng thú / cấp / dạng tiến hoá thật bằng ảnh nhẹ; "còn N EXP lên cấp"; MỘT nút LÊN ĐƯỜNG', () => {
+  it('hiện đúng thú / cấp / dạng tiến hoá thật bằng ảnh nhẹ; "còn N EXP lên cấp"; MỘT nút Đồng hành', () => {
     const onLenDuong = vi.fn(), { container } = dung({ onLenDuong })
     expect(container.querySelector('.dao-hon-thu')!.getAttribute('src')).toBe('/than-thu-v2/nho/thu-2-2.webp')
     expect(screen.getByRole('status').textContent).toBe(`còn ${(thanhExp(34) - 640).toLocaleString('vi-VN')} EXP lên cấp 35`)
-    const nut = screen.getAllByRole('button', { name: /LÊN ĐƯỜNG/ }); expect(nut.length).toBe(1)
+    const nut = screen.getAllByRole('button', { name: /Đồng hành/ }); expect(nut.length).toBe(1)
     fireEvent.click(nut[0]!); expect(onLenDuong).toHaveBeenCalledTimes(1)
     expect([...container.querySelectorAll('img')].every(i => i.getAttribute('src')!.startsWith('/than-thu-v2/nho/'))).toBe(true)
   })
@@ -84,7 +84,7 @@ describe('Hòn đảo của em', () => {
     expect([...container.querySelectorAll('.dao-chuyen-ai li')].map(li => li.textContent)).toEqual(['2Sửa lỗi', '1Ký ức', '2Luyện đều', '1Trùm ải'])
     expect(container.querySelector('.dao-chuyen-ta')!.textContent).toContain('Ester thuỷ phân · Glucose tráng bạc')
     rerender(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} conLai={0} onLenDuong={() => {}} /></div>)
-    expect((screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: /Đồng hành/ }) as HTMLButtonElement).disabled).toBe(true)
     expect(container.textContent).toContain('Em đã đi đủ số câu Đảo thần thú của hôm nay') // máy chủ cũ chưa gửi trần ⇒ câu không số
     expect(container.textContent).not.toMatch(/200 câu/)
     rerender(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} conLai={0} luotCau={{ daDung: 40, tran: 36 }} onLenDuong={() => {}} /></div>)
