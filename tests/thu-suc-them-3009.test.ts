@@ -20,12 +20,14 @@ const HAN = '2026-10-05' // D = 7 tính từ 29/09 ⇒ ngày giao câu mới cu�
 const ngayCua = (ms: number) => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 
 function cauJson(qid: string) {
-  return JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'NB', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' } })
+  return JSON.stringify({ qid, maDe: 'DE1', lop: '12', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Câu ${qid}`, choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1', mucDo: 'VDC', sao: 1, kienThuc: ['k'], correct: 'B', reviewed: true, solution: { chot: 'c' } })
 }
 function dung(soCau = 120) {
   const d = taoD1That()
   const env = d.env as unknown as Env
   d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn An','12A1','mk1','x')")
+  // Hồ sơ L3 ổn định: phần bắt buộc nhận tới VDC; khi hoàn thành, thẻ tiếp tục bằng biến thể VDC mới (bậc cao nhất).
+  d.sql.exec("INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES('S1|D1','S1','D1',100,30,70,0,0,3,'x')")
   d.sql.exec(`INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DE1','Ester',${soCau},0,'v1')`)
   d.sql.exec("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')")
   const st = d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
@@ -99,7 +101,7 @@ describe('điều kiện hiện nút', () => {
     expect(await tss(env, T0)).toEqual({ duoc: false, soCau: 0 })
     expect(await thuSucThem(env, 'S1', T0)).toMatchObject({ ok: false, ma: 'chua_mo_ruong' })
     await moRuong(env, T0)
-    expect(await tss(env, T0)).toEqual({ duoc: true, soCau: 19 })
+    expect(await tss(env, T0)).toMatchObject({ duoc: true, soCau: 19, mucDo: 'Vận dụng cao' })
   })
   it('(3) không có chiến dịch ⇒ không được', async () => {
     const { env } = dung()
@@ -180,7 +182,7 @@ describe('bộ lọc câu', () => {
       .run(new Date(Date.now() - 60_000).toISOString(), new Date(Date.now() + 30 * 60_000).toISOString(), new Date(Date.now()).toISOString())
     xoaDemCaBaoVe()
     // Mới còn (đúng tập ngày mai thấy) = 45 − 15 tự luận − 5 rút = 25 ⇒ quota mai ceil(25/3) = 9; lấy được ngay chỉ 5 (20 câu đang bảo vệ) ⇒ lô 5.
-    expect(await tss(env, T0)).toEqual({ duoc: true, soCau: 5 })
+    expect(await tss(env, T0)).toMatchObject({ duoc: true, soCau: 5, mucDo: 'Vận dụng cao' })
     const truoc = khoaCua(d)
     expect(await thuSucThem(env, 'S1', T0)).toMatchObject({ ok: true, them: 5 })
     const lo = khoaCua(d).slice(truoc.length)
@@ -302,12 +304,13 @@ describe('ngày mai tự giảm quota — tổng câu mới cả chiến dịch 
     return { lanDau, moiTheoNgay }
   }
 
-  it('(12) mô phỏng 7 ngày: có/không Thử sức thêm đều giao ĐỦ 120 câu mới, mỗi câu một lần, câu mới cuối cùng ≤ hạn − 3 (02/10)', async () => {
+  it('(12) mô phỏng 7 ngày: có/không Thử sức thêm đều giao ĐỦ 120 câu mới, mỗi câu một lần, không quá hạn', async () => {
     for (const thuSuc of [false, true]) {
       const { lanDau, moiTheoNgay } = await moPhong(thuSuc)
       expect(lanDau.size).toBe(120)
       expect(Object.values(moiTheoNgay).reduce((a, b) => a + b, 0)).toBe(120)
-      expect([...lanDau.values()].every((n) => n <= '2026-10-02')).toBe(true)
+      // Phân bổ 08/10 giữ nhịp riêng theo hồ sơ; câu phù hợp vẫn hoàn tất trong hạn, không ép mọi em cùng trần vào ngày hạn − 3.
+      expect([...lanDau.values()].every((n) => n <= HAN)).toBe(true)
       if (thuSuc) expect(moiTheoNgay['2026-09-29']).toBe(49) // 30 + lô 19
       else expect(moiTheoNgay['2026-09-29']).toBe(30)
     }

@@ -354,7 +354,7 @@ function IconKhoa() {
 }
 
 /**
- * THỬ SỨC THÊM (thầy chốt 30/09): nút PHỤ (không phải nút chính vàng) — em xong kế hoạch hôm nay thì lấy trước một lô câu mới của ngày mai.
+ * THỬ THÁCH NÂNG BẬC (08/10): nút PHỤ — em xong kế hoạch bắt buộc thì nhận thêm câu đúng một bậc trên hồ sơ từng dạng.
  * Chỉ vẽ khi máy chủ cho (`thuSucThem.duoc`, số câu dương); bấm ⇒ máy chủ thêm lô ⇒ tải lại Sảnh ⇒ nút Đảo có câu. Lỗi ⇒ câu của máy chủ ngay dưới nút.
  */
 function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onTaiLai: () => void }) {
@@ -379,8 +379,8 @@ function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onT
     <>
       <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="thu-suc-them" onClick={() => void bam()} aria-disabled={dangGoi} aria-busy={dangGoi}>
         <span className="h2-nut-dao-chu">
-          <span className="h2-nut-dao-lon">{dangGoi ? 'Đang lấy câu…' : 'Thử sức thêm (không bắt buộc)'}</span>
-          <span className="h2-nut-thu-suc-phu">Lấy trước {t.soCau} câu mới của ngày mai</span>
+          <span className="h2-nut-dao-lon">{dangGoi ? 'Đang mở thử thách…' : 'Thử thách nâng cao'}</span>
+          <span className="h2-nut-thu-suc-phu">{t.soCau} câu {t.mucDo ? `· ${t.mucDo}` : 'khó hơn'} · không bắt buộc</span>
         </span>
       </button>
       {loi && (
