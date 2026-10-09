@@ -55,3 +55,14 @@ Còn lại (ngoài làn, báo thầy): nút Mở ca riêng ở màn Ca kiểm tr
 | Toàn bộ vitest | `npx vitest run` | 152 đỏ / 74 tệp; chạy lại 74 tệp trên main 4346618: 151 đỏ; so TÊN: 1 khác = `doan-giao-dien` "tự tắt sau ĐÚNG 3 giây" (đo giờ, máy tải nặng) — chạy riêng 24/24 đạt, lần toàn phần trước đạt |
 | Cổng CI deploy.yml (17 tệp) | so với danh sách đỏ | chỉ `chua-d1-van-hanh` đỏ ở máy này (không nạp được `node:sqlite`); trên CI main đạt (run 37887043478) |
 | Đếm lệnh D1 Sảnh | kịch bản riêng một tệp | 151/38/38 trên cả main lẫn nhánh (phần thêm = 0 lệnh) |
+
+## Đợt 3 — trung tu giao diện 3 app (09/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 20:51 (VN) — PR223, mã sống `dc62bde`, Actions `37938839127` SUCCESS. Bản vẽ: https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8.
+| Làn | Commit | Ghi chú |
+|---|---|---|
+| Thang chung | 9f2ec7a | `src/styles/thang.css` chỉ kích thước + chuyển động |
+| Học sinh | ade1192 | Hôm nay 1 nút vàng; Hành trình thanh bậc + từng bài; Ôn lại; Của em; Làm câu bỏ đếm trùng, chạm ≥ 44 |
+| Phụ huynh | 19ce9f6 | 3 mục; Nhận xét của thầy; Tiến bộ có số; Ca kiểm tra; Đổi SBD có hỏi lại |
+| Giáo viên | dc20639, 6c47a41 | 2.0 một bảng lam, tối theo nút; Hôm nay; Học sinh; Mở ca |
+| Precache | 4886a6d | 3 mảnh chỉ của thầy ra kho chạy-lúc, 2994 KB |
+Còn lại: nút Chốt Đoàn giữ chỗ cũ; 64 luật CSS chết mang màu ở PH chưa gỡ (cổng giữ màu); "Giao bài riêng" ở ToanCanhEm/ExamMonitor còn trỏ màn BTVN đang ẩn ở 2.0; bảng từ chuẩn còn dòng "Chữa trên lớp".
