@@ -158,4 +158,53 @@ html:root body .dh.dh2 .dh2-thao-tac { display:flex; flex-direction:column; gap:
  html:root body .dao.dao2 .dao2-ai-trai > :not(.dao2-ai-dau):not(.dao2-ai-nhan) { order:3; }
  html:root body .dao.dao2 .dao2-ai .dao2-canh { position:relative; top:auto; height:160px; min-height:0; }
  html:root body .dao.dao2 .dao2-ai .dao2-chan { order:4; padding:12px; background:var(--v2-the); border-radius:20px; }
+
+ /* Đoàn Hộ Tống (DoanTran) trên màn dọc/mobile: cho phép vuốt cuộn tự nhiên mượt mà, đầy đủ phương án và nút chốt */
+ html:root body .dh.dh-tran {
+   overflow-y: auto !important;
+   overflow-x: hidden !important;
+   -webkit-overflow-scrolling: touch !important;
+   touch-action: pan-y !important;
+   overscroll-behavior-y: auto !important;
+ }
+ html:root body .dh.dh-tran .dh-khung {
+   height: auto !important;
+   min-height: 100% !important;
+   display: flex !important;
+   flex-direction: column !important;
+   gap: 12px !important;
+   padding-bottom: max(32px, env(safe-area-inset-bottom, 32px)) !important;
+   overflow: visible !important;
+ }
+ html:root body .dh.dh2 .dh2-canh {
+   height: clamp(190px, 28vh, 250px) !important;
+   flex: 0 0 auto !important;
+ }
+ html:root body .dh.dh2 .dh2-doc {
+   min-width: 0 !important;
+   width: 100% !important;
+   flex: 0 0 auto !important;
+   touch-action: pan-y !important;
+   position: relative !important;
+   z-index: 3 !important;
+   margin-top: -22px !important;
+ }
+ html:root body .dh.dh-tran .dh-giay {
+   flex: 0 0 auto !important;
+   min-height: 0 !important;
+   overflow: visible !important;
+   overscroll-behavior: auto !important;
+   touch-action: pan-y !important;
+ }
+ html:root body .dh.dh2 .dh2-thao-tac {
+   display: flex !important;
+   flex-direction: column !important;
+   gap: 10px !important;
+   width: 100% !important;
+   flex: 0 0 auto !important;
+   min-height: 0 !important;
+   touch-action: pan-y !important;
+   margin-top: 4px !important;
+ }
 }
+
