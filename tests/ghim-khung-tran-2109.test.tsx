@@ -147,13 +147,14 @@ describe('CSS — ghim khung trận Đảo (dao.css)', () => {
     expect(css).toContain('@media (prefers-reduced-motion:reduce){.dao .dao-san{transition:none}}')
   })
 
-  it('bản gọn: cao ≤ 112 px, hai thanh máu + số máu, ẩn chữ phụ; nút loa thu nhỏ vẫn ≥ 30 px', () => {
+  it('bản gọn: cao ≤ 112 px, hai thanh máu + số máu, ẩn chữ phụ; nút loa vẫn đủ vùng chạm 44 px', () => {
     const h = Number((dong('.dao .dao-san[data-gon]{').match(/height:(\d+)px/) ?? [])[1])
     expect(h).toBeGreaterThanOrEqual(96)
     expect(h).toBeLessThanOrEqual(112)
     expect(css).toContain('.dao .dao-san[data-gon] .dao-san-ten small{display:none}')
     expect(css).toContain('.dao .dao-san[data-gon] .dao-san-chuoi,.dao .dao-san[data-gon] .dao-san-tia{display:none}')
-    expect(dong('.dao .dao-san[data-gon] button.dao-san-tieng')).toMatch(/width:30px;height:30px/)
+    // SỬA CÓ CHỦ Ý (trung tu 09/10, chuẩn soát mục 3: đích chạm ≥ 44 px): nút loa bản gọn 30 px → 44 px, vẫn nằm gọn góc khung cao ≥ 96 px
+    expect(dong('.dao .dao-san[data-gon] button.dao-san-tieng')).toMatch(/width:44px;height:44px/)
     expect(dong('.dao .dao-san[data-gon] .dao-san-mau,')).toMatch(/height:7px/)
   })
 

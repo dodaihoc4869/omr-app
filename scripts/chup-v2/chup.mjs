@@ -108,7 +108,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.evaluate(()=>window.scrollTo(0,0))
     } else if (viec === 'dao') {
       await t.getByRole('button', { name: /LÊN ĐƯỜNG|Lên đường/ }).first().click()
-      await t.getByText(/^ẢI 1\//).first().waitFor({ timeout: 20000 })
+      await t.getByText(/^(ẢI|Câu) 1\//).first().waitFor({ timeout: 20000 })
       await t.waitForTimeout(600)
       await t.getByRole('button', { name: /CH₃COOCH₃|CH3COOCH3/ }).first().click()
     } else if (viec === 'doan') {

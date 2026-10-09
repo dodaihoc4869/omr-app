@@ -37,7 +37,7 @@ describe('Đảo 2.0 · trận dựng sẵn', () => {
     expect(await screen.findByRole('region', { name: 'Trận đấu' })).toBeTruthy()
     expect(container.querySelector('.dao2-canh')).toBe(canhSan) // đúng cây đã dựng sẵn, không dựng lại
     expect(screen.queryByRole('button', { name: /LÊN ĐƯỜNG/ })).toBeNull()
-    expect(screen.getByText(/^ẢI 1\/6/)).toBeTruthy()
+    expect(screen.getByText('Câu 1/6')).toBeTruthy() // trung tu 09/10: bộ đếm "ẢI k/n" bỏ (trùng "Câu k/n" của thẻ câu)
     expect(call.mock.calls.filter(([a]) => a === 'start')).toHaveLength(1) // vào trận không gọi thêm lệnh nào
 
     fireEvent.click(screen.getByRole('button', { name: /Rời chuyến về bản đồ/ }))
