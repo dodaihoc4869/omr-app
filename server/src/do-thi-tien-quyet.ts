@@ -9,7 +9,11 @@ export interface DoThiHanhTrinh { diem:Map<string,number>; canh:CanhHoc[] }
 const node=(k:string,t:number)=>`${k}@L${t}`
 export function dungDoThi(qs:readonly QuanSatHanhTrinh[], now:number):DoThiHanhTrinh {
   const diem=new Map<string,number>(), canh=new Map<string,CanhHoc>(), da=new Set<string>()
+  const nhom=new Map<string,Map<string,boolean>>(),truoc=new Map<string,Map<string,boolean>>()
+  for(const o of qs) {const key=`${o.nhom}|${o.ngay}`,r=nhom.get(key)??new Map<string,boolean>();for(const k of o.kn) r.set(k,(r.get(k)??true)&&o.dung);nhom.set(key,r)}
   for(const o of qs) {
+    const groupKey=`${o.nhom}|${o.ngay}`
+    if(!truoc.has(groupKey)) truoc.set(groupKey,new Map([...nhom.get(groupKey)!.keys()].filter(k=>k.startsWith('nen:')).map(k=>[k,trangThaiSprt(diem.get(node(k,1))??0)==='vung'])))
     const t=tangViKyNang(o.mucDo)
     if(!t) continue
     // Chỉ cạnh có quan hệ nền → kỹ năng ngay trong câu, không all-pairs/bịa kiến thức.
@@ -18,8 +22,8 @@ export function dungDoThi(qs:readonly QuanSatHanhTrinh[], now:number):DoThiHanhT
       if(da.has(demKey)) continue
       da.add(demKey)
       const c=canh.get(key) ?? {tu,den,nCo:0,dungCo:0,nChua:0,dungChua:0}
-      const vung=trangThaiSprt(diem.get(node(tu,1))??0)==='vung'
-      if(vung) {c.nCo++; c.dungCo+=Number(o.dung)} else {c.nChua++;c.dungChua+=Number(o.dung)}
+      const vung=truoc.get(groupKey)!.get(tu)??false,dung=nhom.get(groupKey)!.get(den)??false
+      if(vung) {c.nCo++; c.dungCo+=Number(dung)} else {c.nChua++;c.dungChua+=Number(dung)}
       canh.set(key,c)
     }
     for(const k of o.kn) {
