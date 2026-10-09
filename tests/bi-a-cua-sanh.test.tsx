@@ -100,6 +100,8 @@ describe('StudentPortalScreen thật: cửa Bi-a mở Sảnh Bi-a', () => {
     tra['/game-v2/hoa2-sanh'] = SANH
     tra['/game-v2/bia-sanh'] = { ok: true, bat: true, chienDich: { ten: 'Ester – Lipid', hanNop: '2026-10-04', tong: 120 }, theLuc: { con: 32, tong: 40 }, doan: { con: 4 }, dao: { con: 28 }, tran: { con: 12, tong: 15, conDoan: 1, conDao: 11 }, giaoHuu: { mo: false, con: 2, toiDa: 2 } }
     render(<StudentPortalScreen />)
+    // Bản vẽ tối giản thầy chốt 09/10: cửa Bi-a chuyển từ Hôm nay sang "Luyện thêm" ở mục Hành trình (thanh dưới) — cùng chữ, cùng lối vào.
+    fireEvent.click(await screen.findByRole('button', { name: 'Hành trình' }))
     fireEvent.click(await screen.findByRole('button', { name: /Bi-a Phản Ứng · còn 12\/15 câu/ }))
     expect(await screen.findByText('còn 12/15 câu')).toBeTruthy()
     const goi = cuocGoi.filter((c) => new URL(c.url).pathname === '/game-v2/bia-sanh')

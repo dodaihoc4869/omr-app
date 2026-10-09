@@ -41,7 +41,7 @@ const ICON:Record<ManDao|'doan'|'cua-hang',ReactNode>={
  * VỎ của Đảo thần thú bản mới — component DUY NHẤT `Game.tsx` cần nạp (docs/hop-dong-dao-than-thu-prop-2109.md).
  * Chỉ đổi cách kể: mọi lệnh máy chủ (choose, rename, sync, start, resume, answer, complete, invest, shield-use) GIỮ NGUYÊN.
  */
-export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,moThanThuLucDau=false,profile,doanMo,call:callProp,exp,chuoiNgay,tasks,moiDoan,onMoDoan,onMoVoDai,onMoTienBo,onDong,cheDo2=false,sanh2}:DaoThanThuProps){
+export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,moThanThuLucDau=false,profile,doanMo,call:callProp,exp,chuoiNgay,tasks,moiDoan,onMoDoan,onMoVoDai,onMoTienBo,onDong,onDangXuat,cheDo2=false,sanh2}:DaoThanThuProps){
  // `call` của nơi nối có thể đổi danh tính mỗi lần vẽ ⇒ giữ qua ref, hiệu ứng nạp dữ liệu KHÔNG phụ thuộc vào nó (tránh vòng lặp vẽ lại)
  const callRef=useRef(callProp);callRef.current=callProp
  const call=useCallback<DaoThanThuProps['call']>((action,data)=>callRef.current(action,data),[])
@@ -120,7 +120,7 @@ export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,m
  if(cheDo2)return <>
   <Suspense fallback={man==='dao'?<p role="status" aria-busy="true" className="spirit-status">Đang mở đảo…</p>:null}><Dao2 an={man!=='dao'} sbd={sbd} profile={profile} call={call} doanMo={doanMo} sanhDau={sanh2} thanhDuoi={man==='dao'?thanhDuoi:null} onMoDoan={onMoDoan} onMoSoTay={()=>setMan('so-tay')} onDong={onDong}/></Suspense>
   {man!=='dao'&&<div className="dao dao-vo dao-v2" data-thu={chiSoThu(profile.pet)}>
-   {man==='than-thu'&&<Suspense fallback={<p role="status" aria-busy="true" className="spirit-status">Đang mở thần thú của em…</p>}><ThanThuV2 profile={profile} token={token} onCuaHang={shopBat&&token?()=>setDangShop(true):undefined} onTuiDo={()=>setMan('tui-do')} onDongHanh={()=>setMan('dao')}/></Suspense>}
+   {man==='than-thu'&&<Suspense fallback={<p role="status" aria-busy="true" className="spirit-status">Đang mở thần thú của em…</p>}><ThanThuV2 profile={profile} token={token} onCuaHang={shopBat&&token?()=>setDangShop(true):undefined} onTuiDo={()=>setMan('tui-do')} onDongHanh={()=>setMan('dao')} onDangXuat={onDangXuat}/></Suspense>}
    {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
    {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await goiTien('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await goiTien('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
    <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button><NutToanManHinh className="dao-toan-man"/>

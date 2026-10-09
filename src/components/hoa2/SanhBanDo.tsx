@@ -501,7 +501,7 @@ function DongNhatKy({ s, lop }: { s: SanhHoa2; lop: string }) {
 }
 
 /** Hết kế hoạch hôm nay: lời mừng + Rương Bát Linh (HS-XongHomNay.dc.html). */
-export function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them = null }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null; /** OMNI 3: nút phụ đặt ngay sau "Thử sức thêm" (vắng ⇒ không có gì). */ them?: ReactNode }) {
+export function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them = null, coThuSuc = true }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null; /** OMNI 3: nút phụ đặt ngay sau "Thử sức thêm" (vắng ⇒ không có gì). */ them?: ReactNode; /** false ⇒ không vẽ nút "Thử sức thêm" (màn V2 gom nó vào "Luyện thêm" ở Hành trình — bản vẽ tối giản 09/10). */ coThuSuc?: boolean }) {
   const [dangMo, setDangMo] = useState(false)
   const [loi, setLoi] = useState('')
   const [vangVuaNhan, setVangVuaNhan] = useState<number | null>(null)
@@ -597,7 +597,7 @@ export function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null,
         <DongNhatKy s={s} lop="h2-ng-phu" />
         {tinLoi}
         {nutMo}
-        <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
+        {coThuSuc && <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />}
         {them}
       </section>
     )
@@ -635,7 +635,7 @@ export function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null,
         {tinLoi}
       </section>
       {nutMo}
-      <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
+      {coThuSuc && <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />}
       {them}
     </>
   )
@@ -689,14 +689,22 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
 
 /** Nút việc hôm nay (còn ổ phục kích ⇒ PHÁ N Ổ; hết ổ ⇒ KHÁM PHÁ ĐẢO) — dùng chung bản dọc và bản ngang. */
 /** Cửa Bi-a Phản Ứng (đặc tả Bi-a mục 8.1): còn câu ⇒ "Bi-a Phản Ứng · còn c/t câu"; hết trần ⇒ mờ; xong kế hoạch ⇒ Bàn giao hữu; có ca ⇒ mờ. */
-export function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+/** Chữ + trạng thái cửa Bi-a (một nguồn cho nút Sảnh cũ và ô "Luyện thêm" của màn Hành trình V2). Máy chủ không gửi `bia` ⇒ null. */
+export function chuCuaBia(s: SanhHoa2): { mo: boolean; lon: string; nho: string } | null {
   const b = s.bia
-  if (!b || !p.onChoiBia) return null
+  if (!b) return null
   const coCa = b.lyDoKhoa === 'dang_co_ca'
   const giaoHuu = b.giaoHuu.mo
   const mo = !coCa && (b.con > 0 || giaoHuu)
   const lon = coCa ? 'Bi-a Phản Ứng · đang có ca kiểm tra' : giaoHuu ? `Bàn giao hữu Bi-a · còn ${b.giaoHuu.con}/2 ván` : b.con > 0 ? `Bi-a Phản Ứng · còn ${b.con}/${b.tong} câu` : 'Hết câu Bi-a hôm nay'
   const nho = coCa ? 'Bi-a mở lại khi ca kết thúc' : giaoHuu ? 'Không câu, không EXP · em đã xong kế hoạch' : b.con > 0 ? 'Kim loại đấu Phi kim · mỗi bi một câu' : `Đoàn còn ${s.doan.con} câu · Đảo còn ${s.dao.con} câu`
+  return { mo, lon, nho }
+}
+
+export function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  const c = chuCuaBia(s)
+  if (!c || !p.onChoiBia) return null
+  const { mo, lon, nho } = c
   return (
     <button type="button" className="h2-nut-dao h2-nut-bia" disabled={!mo} onClick={mo ? p.onChoiBia : undefined}>
       <span className="h2-nut-dao-chu">
