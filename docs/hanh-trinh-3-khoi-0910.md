@@ -15,9 +15,19 @@ Lệnh người dùng ngày 09/10/2026: gộp toàn bộ chiến dịch thành b
 - Thiếu câu đủ điều kiện thì báo số thiếu; không lặp hoặc kéo ôn sớm để đủ chỉ tiêu. Không tự Huyết Chiến để gấp đôi khối lượng.
 - Sảnh và bảng thầy hiển thị tiến độ hôm nay/chặng/số thiếu. Bảng Hành trình chỉ đọc kế hoạch ngày, tránh replay toàn kho × toàn khối. Nguồn đóng vẫn đọc được qua mã chiến dịch cũ để xem lịch sử.
 
+## Động cơ v4 — bổ sung ngày 09/10
+
+- `do-thi-tien-quyet.ts`: mỗi vi kỹ năng có tầng L1–L4; câu trên tầng nền cần mọi kỹ năng ở tầng trước qua SPRT, nền `nen:*` cần hồ sơ vững. Cổng 80% theo bài vẫn giữ, cổng vi kỹ năng kiểm thêm từng câu. Kế hoạch cũ được kiểm lại khi mở lần đầu trên bản mới; tính lại sau 6 câu hoặc ngay khi có lần sai mới. Không đổi phần đã làm.
+- Cạnh mềm từ nhãn nền và kỹ năng cùng câu được học từ dữ liệu độc lập 60 ngày. Tối thiểu 20 em và 30 quan sát ở mỗi cohort; khoảng Wilson phải tách nhau. Cạnh mất bằng chứng tự rút; chỉ ảnh hưởng ưu tiên, không được coi tương quan là bằng chứng nhân quả để khoá bài. Không tìm thấy `tien-quyet.json`/21 nút/36 cạnh trong repo nên không bịa đồ thị chuyên đề.
+- `half-life.ts`: log2 chu kỳ bán rã = prior + hệ số riêng em + hệ số riêng kỹ năng, cập nhật SGD có co về prior. Một câu/ngày, câu trùng cùng nhóm không nhân mẫu, bốn ý cùng câu gộp thận trọng. Đo log-loss trước mỗi cập nhật; chỉ dùng lịch mới khi từng kỹ năng có ít nhất 8 lượt kiểm dự đoán và sai số không cao hơn FSRS chạy trên cùng sổ. Dữ liệu ít/chưa tốt hơn vẫn dùng FSRS.
+- `bandit.ts`: contextual Thompson sampling Beta-Bernoulli phân tầng theo loại kỹ năng, vùng năng lực và tầng mắc kẹt; chọn trong hai hành động có câu thật, đã đủ điều kiện: ôn nền hoặc ví dụ dễ thấp tầng. Ưu tiên một câu cứu trong sàn hiện có, không cộng thêm khối lượng. Không có câu hợp lệ thì không tạo can thiệp giả; chưa đưa video/giải thích lại/gợi ý tuần tự vào bandit.
+- Receipt phân biệt đề nghị, thực sự làm và kết quả kiểm. Reward từ lần tự làm đầu tiên của nhóm nội dung mới cùng kỹ năng, sau ít nhất 24 giờ và trong 14 ngày; nhóm từng gặp/xem đáp án/có hỗ trợ không là câu mới. Một câu kiểm chỉ thưởng một can thiệp, bốn ý không nhân mẫu, đọc lại/hai máy không tăng số mẫu. Thiếu quan sát giữ pending, không gán thất bại. Xác suất chọn lưu bằng Monte Carlo để đối chiếu policy.
+- Điểm chọn kết hợp kỹ năng yếu nhất, vùng xác suất đúng quanh 0,8, mới/chưa gặp, điểm của phần và phút kỳ vọng từ β thời gian hiện có. Trọng số áp cả câu mới/ôn và phân xử nợ cùng độ ưu tiên. Dự báo `omni_du_bao` được ghi cho phạm vi **ứng viên của ngày**, không coi đây là xác suất đã hiệu chuẩn của đề thi thật.
+- Bốn bảng mới chỉ lưu mô hình/receipt, không thay điểm, EXP, sổ học hoặc đáp án. Mọi lệnh ghi bộ đệm/receipt kiểm lại không có ca mở. Bộ kiểm phát hành đọc em có lịch sử lớn nhất, chỉ in số tổng hợp và không giao câu/ghi mô hình.
+
 ## Giới hạn được giữ rõ
 
-Đây là triển khai ba Hành trình và kế hoạch 24/30/36 dựa trên OMNI, luật đóng lỗi và lịch nhớ hiện có. Chưa thay FSRS bằng hồi quy half-life, chưa có contextual bandit hoặc đồ thị vi kỹ năng tự học; các đề xuất nghiên cứu đó không được coi là đã triển khai. Cổng tầng hiện tại ở mức bài, chưa phải đồ thị tiên quyết tới từng vi kỹ năng. Tập ứng viên có giới hạn nên số thiếu cũng có thể do chưa đủ ứng viên trong cửa sổ ngày, không khẳng định toàn kho hết câu.
+Không có tuyên bố “tốt nhất thế giới” khi chưa có dữ liệu đánh giá. Cạnh học là tương quan quan sát, bandit hiện có hai hành động thực sự phục vụ được, HLR chỉ thay FSRS khi đạt cổng kiểm. Chưa có thử nghiệm A/B chứng minh điểm thi/phút học cao hơn; chưa tự tối ưu toàn bộ ngưỡng SPRT/trọng số theo mục tiêu điểm. Cửa sổ ứng viên còn giới hạn nên số thiếu không khẳng định toàn kho hết câu. Độ khó β trong bộ chọn hiện là β **thời gian**, chưa phải tham số IRT/Elo độ khó cho toàn kho.
 
 ## Phát hành / đối chiếu
 
@@ -26,3 +36,5 @@ Chỉ phát hành từ main qua workflow hiện có, sau build app + tsc server 
 Lùi mã bằng revert commit; dữ liệu nguồn được lưu nguyên JSON ở `hanh_trinh_v3_nguon`. Việc mở lại nguồn cần kế hoạch phục hồi riêng, đối chiếu dữ liệu mới phát sinh, không tự khôi phục chồng lên Hành trình đang có học sinh làm.
 
 Kiểm tra: 16 kiểm riêng (gộp nguyên tử, kho nhiều trang, học sinh khoá/chưa rõ khối, hai máy, tầng/sàn/chặng, bảng thầy); hồi quy kế hoạch/UI 103 kiểm đạt. Full vitest được chạy; đối chiếu các tệp đỏ trên bản gốc và bản mới còn cùng 127 lỗi nền, gồm nhóm timeout không ổn định. TypeScript app/server, build Cloudflare và SW 13/13, kiểm màu/giữ màu, soi giao diện không có lỗi. Chưa có ảnh Chromium thật vì môi trường chặn CDN tải trình duyệt.
+
+Đợt v4: 29 kiểm ba máy/kế hoạch đạt; 88 kiểm hồi quy OMNI/FSRS/kế hoạch/UI và 67 kiểm cổng phát hành đạt trước lần thêm kiểm chuỗi sai; TypeScript máy chủ, build Cloudflare/SW13/13, màu và lint đạt. Full vitest đang chạy đối chiếu nền, không tuyên bố toàn bộ xanh.

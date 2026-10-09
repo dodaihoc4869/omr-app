@@ -14,3 +14,7 @@ const [r] = await query(`SELECT
  (SELECT COUNT(*) FROM cau_hinh WHERE khoa IN ('hanh_trinh_v3_kho_10','hanh_trinh_v3_kho_11','hanh_trinh_v3_kho_12')) AS khoTheoKhoi`)
 if (r.hanhTrinhDangChay !== 3 || r.nguonConChay !== 0 || r.khoTheoKhoi !== 3) throw new Error('Số hành trình hoặc kho câu chưa khớp.')
 console.log(JSON.stringify(r))
+
+const [schema] = await query("SELECT COUNT(*) AS soBangDongCo FROM sqlite_master WHERE type='table' AND name IN ('hanh_trinh_v4_em','hanh_trinh_v4_canh','hanh_trinh_v4_chot','hanh_trinh_v4_can_thiep')")
+if(schema.soBangDongCo!==4) throw new Error('Chưa đủ schema động cơ cá nhân hoá.')
+console.log(JSON.stringify({dongCo:'ht4-0910-v1',...schema}))
