@@ -133,3 +133,46 @@ export function nhoCongBo(maCa: string, congBo: unknown): void {
 export function doanCongBoNgay(maCa: string): boolean {
   return goiYCongBo.get(maCa) === 'ngay'
 }
+
+/** ĐỆM HẠN GIỜ LƯỢT ĐANG LÀM (tối ưu heartbeat /trang-thai giờ cao điểm).
+ *  Giảm 50% số câu đọc D1 khi hàng trăm học sinh gửi trạng thái mỗi 10 giây.
+ *  Hạn chỉ đổi khi thầy bấm Thêm phút (/ca/them-phut), lúc đó xoaDemHetGioLuot() sẽ xoá đệm. */
+interface BanHetGioLuot { han: string; hetLuc: number }
+const demHetGio = new Map<string, BanHetGioLuot>()
+export const TTL_HET_GIO_MS = 25_000
+
+export function layDemHetGioLuot(maCa: string, sbd: string, now = Date.now()): string | null {
+  const khoa = `${maCa}|${sbd}`
+  const cu = demHetGio.get(khoa)
+  if (!cu) return null
+  if (now > cu.hetLuc) {
+    demHetGio.delete(khoa)
+    return null
+  }
+  return cu.han
+}
+
+export function nhoHetGioLuot(maCa: string, sbd: string, hetGioLuc: string, now = Date.now()): void {
+  if (!maCa || !sbd) return
+  if (demHetGio.size > 2048) {
+    const dau = demHetGio.keys().next().value
+    if (dau !== undefined) demHetGio.delete(dau)
+  }
+  demHetGio.set(`${maCa}|${sbd}`, {
+    han: hetGioLuc,
+    hetLuc: now + TTL_HET_GIO_MS,
+  })
+}
+
+export function xoaDemHetGioLuot(maCa?: string): void {
+  if (!maCa) {
+    demHetGio.clear()
+    return
+  }
+  const prefix = `${maCa}|`
+  for (const k of demHetGio.keys()) {
+    if (k.startsWith(prefix)) {
+      demHetGio.delete(k)
+    }
+  }
+}

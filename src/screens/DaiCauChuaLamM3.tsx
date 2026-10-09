@@ -2,7 +2,8 @@
 // nút "+K" mở lưới đủ câu; hàng "Đã đánh dấu xem lại" liệt kê câu em đánh dấu (kể cả câu đã làm). CHỈ trình bày lại `chuaLam`, tập câu đánh dấu và hai hàm
 // ĐÃ CÓ của màn (`cuonToiCau`, mở lưới): không state, không gọi gì mới. Chỉ đường học sinh/phụ huynh (dungM3); từ 880 px lưới câu cột trái đã có nên dải ẩn (CSS).
 import { Flag } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
+import { bangPropsBoQuaHam } from '../lib/so-sanh-props'
 import './man-thi-m3.css'
 
 export const SO_CAU_TOI_DA_TREN_DAI = 6
@@ -79,7 +80,7 @@ export default function DaiCauChuaLamM3({
  * mọc/biến theo `soY` — nên thẻ câu KHÔNG bị dựng lại khi em bấm (dựng lại = mất tiêu điểm, cuộn nhảy). `soY` = số ý ĐÃ có đáp án (Phần I/III truyền 0).
  * Nút chỉ gọi `onDoiDau`; việc nhớ dấu nằm ở màn thi (lib/xem-lai-sau.ts) và KHÔNG dính gì tới đáp án hay gói nộp.
  */
-export function KhungCauM3({ soY, daDanhDau, onDoiDau, children }: { soY: number; daDanhDau: boolean; onDoiDau: () => void; children: ReactNode }) {
+export const KhungCauM3 = memo(function KhungCauM3({ soY, daDanhDau, onDoiDau, children }: { soY: number; daDanhDau: boolean; onDoiDau: () => void; children: ReactNode }) {
   return (
     <div className="thi-cau-boc">
       {children}
@@ -92,4 +93,4 @@ export function KhungCauM3({ soY, daDanhDau, onDoiDau, children }: { soY: number
       </div>
     </div>
   )
-}
+}, bangPropsBoQuaHam)

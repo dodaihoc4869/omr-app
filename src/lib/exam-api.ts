@@ -231,6 +231,7 @@ export type KetQuaVaoThi =
       thoiGianPhut: number
       congBo: CongBoDiem
       lanThu: number
+      khoaLuot?: string
       vaoLuc: string
       hetGioLuc: string
       /** Ngưỡng chống gian lận của ca (QUANLYCATHI mục 6): số lần rời màn → khoá; một lần rời quá N giây → khoá. */
@@ -904,6 +905,7 @@ async function vaoThiQuaMayChuMoi(
     thoiGianPhut: Number(r.thoiGianPhut) || 45,
     congBo: (r.congBo ?? 'khong') as CongBoDiem,
     lanThu: Number(r.lanThu) || 1,
+    khoaLuot: typeof r.khoaLuot === 'string' ? r.khoaLuot : undefined,
     vaoLuc: String(r.vaoLuc ?? ''),
     hetGioLuc: String(r.hetGioLuc ?? ''),
     nguongLan: Number(r.nguongLan) || 3,
@@ -1355,14 +1357,14 @@ export function chuKyLechPhaMs(ms: number, nn: () => number = Math.random): numb
  * một nhịp thì bỏ qua nhịp đó, nhịp sau ghi đè đủ. Trả về true khi máy chủ đã
  * nhận, để chỗ gọi biết mà không phải tự đoán.
  */
-export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn: AnswerRecord, giayCau?: Record<string, number>): Promise<boolean> {
+export async function luuTam(scriptUrl: string, maCa: string, sbd: string, dapAn: AnswerRecord, giayCau?: Record<string, number>, khoaLuot?: string): Promise<boolean> {
   try {
     // MÁY CHỦ MỚI TRƯỚC — 135 lượt một em một ca.
     //
     // `null` nghĩa là "lượt này không nằm ở máy chủ mới" (em vào thi bằng đường
     // cũ) hoặc máy chủ mới không với tới được — cả hai đều đi tiếp xuống dưới.
     const chMoi = await layCauHinhMayChu()
-    const rMoi = await luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau)
+    const rMoi = await luuTamMoi(chMoi, maCa, sbd, dapAn, giayCau, khoaLuot)
     if (rMoi !== null) return rMoi
 
     // Lưu tạm ghi ĐÈ đúng một dòng bằng đúng nội dung ấy, nên gửi lại vô hại.
