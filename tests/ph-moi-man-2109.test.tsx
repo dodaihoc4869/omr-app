@@ -374,7 +374,7 @@ describe('useTatCaVeCon — nhịp 180 giây ± 30 giây, giữ bản cũ khi l�
 })
 
 // ĐÃ GỠ 28/09: describe "ParentPortalScreen thật — màn chính → bảng → về; MỘT nút" (3 test). Thầy lệnh 28/09 trùng tu app phụ huynh (chỉ xem, không giao bài):
-// cổng /ph nay mở components/ph-v3/AppPhuHuynh (Hôm nay · Điểm số · Tiến bộ · Lời thầy) — luồng thật khoá ở tests/ph-v3-app-2809.test.tsx. ManChinh/BangMoiThu vẫn khoá ở trên (mã còn trong kho).
+// cổng /ph nay mở components/ph-v3/AppPhuHuynh (nay BA mục Hôm nay · Tiến bộ · Ca kiểm tra — bản vẽ tối giản thầy chốt 09/10) — luồng thật khoá ở tests/ph-v3-app-2809.test.tsx. ManChinh/BangMoiThu vẫn khoá ở trên (mã còn trong kho).
 
 describe('khoá nguồn', () => {
   it('gói tải lười: ManChinh / thanh đáy không kéo ChemText; ChemText chỉ ở gói bảng (TungCau); app phụ huynh mới mở màn chi tiết ca (có ChemText) bằng lazy', () => {

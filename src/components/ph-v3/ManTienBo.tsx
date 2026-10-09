@@ -1,11 +1,18 @@
-// Mục "Tiến bộ" (bản vẽ khổ 3): khối anh hùng = câu từng sai đã thành thạo lại (Game Hoá 2.0: /ph/hoc-2; hệ cũ: lịch ôn), bậc của con ở từng dạng (Biết · Hiểu · Vận dụng),
-// nhịp học 14 ngày (số câu mỗi ngày). Khối nào không có số thật ⇒ vắng; cả màn không có gì ⇒ một thẻ trống nói vì sao.
+// Mục "Tiến bộ" — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10: khối anh hùng = điểm các ca kiểm tra (đường điểm, chuyển từ màn "Điểm số" cũ) + khoảng cách tới 8 và
+// chứng chỉ Sẵn sàng 8+ (OMNI, chỉ khi máy chủ gửi; độ tin không bao giờ 100%) → MỘT danh sách dạng (bậc Biết · Hiểu · Vận dụng, nhãn "Đang luyện thêm")
+// → Sơ ý của con (mục tiêu dưới 7%, OMNI) → nhịp học 14 ngày. Không thêm số mới; khối nào không có số thật ⇒ vắng; cả màn không có gì ⇒ một thẻ trống nói vì sao.
+// Đã bỏ: khối "câu từng sai đã thành thạo lại" (bản vẽ không có; "câu chờ thầy dạy lại" gộp vào "Cần thầy chữa" ở Hôm nay).
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2 } from '../../lib/ph-v3/du-lieu'
-import { tachVn } from '../../lib/ph-moi/dinh-dang'
+import type { PhOmni } from '../../../server/src/omni-kieu'
+import { ngayChuoiNgan, soVn, tachVn } from '../../lib/ph-moi/dinh-dang'
+import { chuPhKhoangCach, chuSoY, diemChu, doTinChu } from '../../lib/omni-chu'
 import { TEN_BAC_SO } from '../ph-moi/nhan'
+import { BtTienBo } from './BieuTuong'
+import { BieuDo } from './ManDiemSo'
 import { Chip, DangTai, The, TheLoi, TheTrong } from './dung-chung'
+import { diemCacCa } from './tien-ich'
 
 const hai = (n: number) => String(n).padStart(2, '0')
 /** 14 ngày (cũ → mới) kết thúc ở hôm nay theo giờ VN. */
@@ -19,6 +26,26 @@ export function muoiBonNgay(nowMs: number): string[] {
   })
 }
 
+/** Mục tiêu sơ ý của chứng chỉ (điều kiện C = `THAM_SO_OMNI.C_SO_Y` ở server/src/omni-kieu.ts; app chỉ import KIỂU từ máy chủ nên ghi lại số — test khoá hai số bằng nhau). */
+export const SO_Y_MUC_TIEU = 0.07
+
+/** "Sơ ý của con: 6% (mục tiêu dưới 7%)" — chữ chung `chuSoY` đổi sang giọng phụ huynh. */
+export function chuPhSoY(s: number | null): string | null {
+  const c = chuSoY(s, SO_Y_MUC_TIEU)
+  return c && c.replace(/^Sơ ý /, 'Sơ ý của con: ')
+}
+
+/** Dòng OMNI dưới đường điểm: khoảng cách tới 8 (chỉ khi đã hiệu chuẩn — lớp đọc đã lọc) → chứng chỉ gần nhất. Không có số thật ⇒ không dòng. */
+export function dongDiemOmni(o: PhOmni | undefined): { khoa: string; chu: string; dam?: true }[] {
+  if (!o) return []
+  const ra: { khoa: string; chu: string; dam?: true }[] = []
+  const kc = chuPhKhoangCach(o.khoangCach8)
+  if (kc) ra.push({ khoa: 'khoang-cach-8', chu: kc, dam: true })
+  const cc = o.chungChi[0]
+  if (cc) ra.push({ khoa: 'chung-chi', chu: `Chứng chỉ gần nhất: ${cc.ten} · Sẵn sàng 8+ · độ tin ${doTinChu(cc.doTin)}${cc.diem !== null ? ` · điểm ca chốt ${diemChu(cc.diem)}` : ''}` })
+  return ra
+}
+
 export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null }) {
   const pm = v.pm
   if (!pm) return (
@@ -27,60 +54,54 @@ export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null
       {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />}
     </div>
   )
-  const coGi = !!(hoc2?.cauTungSai || pm.lichOn || (pm.bacTheoDang ?? []).length || (pm.nhipHoc?.ngay ?? []).length)
+  const omni = hoc2?.omni
+  const coGi = diemCacCa(pm).length > 0 || dongDiemOmni(omni).length > 0 || (pm.bacTheoDang ?? []).length > 0 || omni?.sEm != null || (pm.nhipHoc?.ngay ?? []).length > 0
   return (
     <div data-vung="man-tien-bo">
       <div className="ph3-tieu-de"><h1>Tiến bộ</h1></div>
       <div className="ph3-luoi">
-        <KhacPhuc pm={pm} hoc2={hoc2} />
+        <DiemCacCa pm={pm} omni={omni} />
         <BacTheoDang pm={pm} />
+        <SoY omni={omni} />
         <Nhip pm={pm} />
-        {!coGi && <TheTrong id="ph3-tb-trong" tieuDe="Chưa đủ dữ liệu" chu="Con học thêm vài ngày thì tiến bộ theo từng dạng và nhịp học hiện ở đây." />}
+        {!coGi && <TheTrong id="ph3-tb-trong" tieuDe="Chưa đủ dữ liệu" chu="Con học thêm vài ngày và có ca kiểm tra được công bố thì điểm, bậc từng dạng và nhịp học hiện ở đây." />}
       </div>
     </div>
   )
 }
 
-function KhacPhuc({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
-  let so: number, tong: number, cau: string, phu: string, tieuDe: string
-  const ts = hoc2?.cauTungSai
-  if (ts) {
-    tieuDe = 'Câu từng sai con đã thành thạo lại'
-    so = ts.thanhThao
-    tong = ts.tong
-    cau = `Trong ${ts.tong} câu con từng làm sai, ${ts.thanhThao} câu con đã thành thạo lại.`
-    phu = [ts.dangOn > 0 ? `${ts.dangOn} câu đang được ôn theo lịch` : '', ts.canDayLai > 0 ? `${ts.canDayLai} câu chờ thầy dạy lại trên lớp` : ''].filter(Boolean).join(' · ')
-  } else if (pm.lichOn && (pm.lichOn.tongTungSai ?? pm.lichOn.daKhacPhuc14Ngay + pm.lichOn.conSaiChuaKhacPhuc) > 0) {
-    const l = pm.lichOn
-    tieuDe = 'Câu từng sai đã khắc phục'
-    so = l.daKhacPhuc14Ngay
-    tong = l.tongTungSai ?? l.daKhacPhuc14Ngay + l.conSaiChuaKhacPhuc
-    cau = `14 ngày qua, con đã khắc phục ${l.daKhacPhuc14Ngay} câu từng sai.`
-    phu = [l.conSaiChuaKhacPhuc > 0 ? `${l.conSaiChuaKhacPhuc} câu còn trong lịch ôn lại` : '', l.ngayMai > 0 ? `ngày mai đến lịch ${l.ngayMai} câu` : ''].filter(Boolean).join(' · ')
-  } else return null
-  const r = 52
-  const cv = 2 * Math.PI * r
-  const ti = tong > 0 ? Math.min(1, so / tong) : 0
+function DiemCacCa({ pm, omni }: { pm: PhMoi; omni?: PhOmni }) {
+  const ds = diemCacCa(pm)
+  const dong = dongDiemOmni(omni)
+  if (ds.length === 0 && dong.length === 0) return null
+  const doiTuDau = ds.length > 1 ? ds[ds.length - 1]!.diem - ds[0]!.diem : null
   return (
-    <section className="ph3-ah ph3-o-rong" aria-label={tieuDe} data-vung="khac-phuc">
-      <h2 style={{ fontSize: 15, fontWeight: 600 }} className="ph3-ah__phu">{tieuDe}</h2>
-      <div className="ph3-ah__vong">
-        <div style={{ position: 'relative', width: 128, height: 128, flexShrink: 0 }}>
-          <svg width="128" height="128" viewBox="0 0 128 128" role="img" aria-label={`${so} trên ${tong} câu`} data-mau="vong-xl">
-            <circle cx="64" cy="64" r={r} fill="none" stroke="currentColor" strokeOpacity={0.22} strokeWidth="14" />
-            {ti > 0 && <circle cx="64" cy="64" r={r} fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round" strokeDasharray={`${(ti * cv).toFixed(2)} ${cv.toFixed(2)}`} transform="rotate(-90 64 64)" />}
-          </svg>
-          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <b data-mau="vong-xl" style={{ fontSize: 34, lineHeight: 1, fontWeight: 800 }}>{so}</b>
-            <span className="ph3-ah__phu" style={{ fontSize: 13 }}>/ {tong} câu</span>
-          </div>
-        </div>
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <p style={{ fontSize: 16, lineHeight: 1.45, fontWeight: 600 }}>{cau}</p>
-          {phu && <p className="ph3-ah__phu" style={{ fontSize: 14 }}>{phu}.</p>}
-        </div>
+    <section className="ph3-ah ph3-o-rong" aria-labelledby="ph3-diem-ca" data-vung="xu-huong-diem">
+      <div className="ph3-ah__tren">
+        <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm các ca kiểm tra</p>
+        {doiTuDau !== null && (
+          <span className="ph3-ah__chip" data-mau="xl">
+            <BtTienBo co={16} day={2.5} />
+            {doiTuDau > 0.004 ? `Tăng ${soVn(doiTuDau)} điểm` : doiTuDau < -0.004 ? `Giảm ${soVn(-doiTuDau)} điểm` : 'Giữ nguyên điểm'} từ ca {ngayChuoiNgan(ds[0]!.ngay)}
+          </span>
+        )}
       </div>
+      {ds.length > 0 && <BieuDo ds={ds} />}
+      {dong.length > 0 && (
+        <div className="ph3-ah__dong" data-vung="diem-omni">
+          {dong.map((d) => (d.dam ? <b key={d.khoa}>{d.chu}</b> : <span key={d.khoa}>{d.chu}</span>))}
+        </div>
+      )}
     </section>
+  )
+}
+
+function SoY({ omni }: { omni?: PhOmni }) {
+  const c = chuSoY(omni?.sEm ?? null, SO_Y_MUC_TIEU)
+  if (!c) return null
+  const [so, muc] = c.replace(/^Sơ ý /, '').split(' (')
+  return (
+    <The id="ph3-so-y" className="ph3-o-du" vung="so-y" tieuDe="Sơ ý của con" chip={<b className="ph3-the__so">{so} <small>({muc}</small></b>} />
   )
 }
 
@@ -88,7 +109,9 @@ function BacTheoDang({ pm }: { pm: PhMoi }) {
   const ds = pm.bacTheoDang ?? []
   if (ds.length === 0) return null
   const vuaLen = new Set([...(pm.vuaLenBac ?? []).map((x) => x.ma), ...(pm.tienBo?.dangTienBoNhat ?? []).map((x) => x.ma)])
+  // "Đang luyện thêm": cùng nguồn với tên dạng ở khối (c) của Hôm nay (máy chủ: `dangVap` theo mã, `manhYeu.conVap` theo tên).
   const dangVap = new Set((pm.dangVap ?? []).map((x) => x.ma))
+  const conVap = new Set((pm.manhYeu?.conVap ?? []).map((x) => x.tenDang))
   const dem = [0, 0, 0]
   for (const d of ds) dem[d.bac]!++
   return (
@@ -103,7 +126,7 @@ function BacTheoDang({ pm }: { pm: PhMoi }) {
           <li key={d.ma}>
             <div className="ph3-dang__dong">
               <span>{d.ten}</span>
-              {vuaLen.has(d.ma) ? <Chip mau="xl" nho>Vừa lên bậc</Chip> : dangVap.has(d.ma) ? <Chip mau="hp" nho>Đang luyện thêm</Chip> : null}
+              {vuaLen.has(d.ma) ? <Chip mau="xl" nho>Vừa lên bậc</Chip> : dangVap.has(d.ma) || conVap.has(d.ten) ? <Chip mau="hp" nho>Đang luyện thêm</Chip> : null}
               <em data-bac={d.bac}>{TEN_BAC_SO[d.bac]}</em>
             </div>
             <div className="ph3-bac" aria-hidden="true">

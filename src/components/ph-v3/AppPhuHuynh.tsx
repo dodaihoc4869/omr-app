@@ -1,6 +1,7 @@
 // APP PHỤ HUYNH MỚI 28/09 — thầy: "Trùng tu toàn bộ app phụ huynh, app phụ huynh không có giao bài cho con nữa chỉ xem được báo cáo mọi thứ về con".
 // Bản vẽ đã chốt: https://claude.ai/artifact/2HShm51xEiuVKcTAUpfeFT (Hôm nay · Điểm số · Chi tiết ca · Tiến bộ · Lời thầy; nền tối; xoay ngang; máy tính).
-// Bốn mục điều hướng bằng liên kết `#…` (nút Quay lại của máy chạy đúng): #hom-nay (mặc định) · #diem · #ca/<mã ca> · #tien-bo · #loi-thay.
+// BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (thay bốn mục 28/09): BA mục điều hướng bằng liên kết `#…` (nút Quay lại của máy chạy đúng):
+// #hom-nay (mặc định) · #tien-bo · #ca-kiem-tra (+ #ca/<mã ca>). Mục "Lời thầy" đã bỏ: lời thầy mới nhất ở cuối Hôm nay, lời thầy từng ca ở thẻ ca và màn chi tiết ca.
 // Dữ liệu (CHỈ ĐỌC, không một lệnh ghi nào của phụ huynh): /ph/tat-ca-ve-con (hook sẵn có, làm mới 180 s) + /ph/hoc-2 + /ph/loi-thay + /ph/bao-cao-ca (khi mở một ca) + cảnh báo của thầy (/ph/ke-hoach).
 import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactElement } from 'react'
 import { AnhLogo } from '../LogoVai'
@@ -12,11 +13,10 @@ import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
 import { taiThongTinPhuHuynh } from '../../lib/tai-thong-tin-ph'
 import { baoDaXemPhuHuynh } from '../../lib/canh-bao-thay-may-chu'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
-import { BtDiem, BtHomNay, BtLoiThay, BtTienBo } from './BieuTuong'
+import { BtBang, BtHomNay, BtTienBo } from './BieuTuong'
 import ManHomNay from './ManHomNay'
 import ManDiemSo from './ManDiemSo'
 import ManTienBo from './ManTienBo'
-import ManLoiThay from './ManLoiThay'
 import { docTuyen, type Muc, type Tuyen } from './tien-ich'
 import { DangTai } from './dung-chung'
 import './ph-v3.css'
@@ -25,8 +25,7 @@ import './ph-v3.css'
 const MUC: { muc: Muc; ten: string; bt: () => ReactElement }[] = [
   { muc: 'hom-nay', ten: 'Hôm nay', bt: () => <BtHomNay /> },
   { muc: 'tien-bo', ten: 'Tiến bộ', bt: () => <BtTienBo /> },
-  { muc: 'diem', ten: 'Lịch sử', bt: () => <BtDiem /> },
-  { muc: 'loi-thay', ten: 'Lời thầy', bt: () => <BtLoiThay /> },
+  { muc: 'ca-kiem-tra', ten: 'Ca kiểm tra', bt: () => <BtBang /> },
 ]
 
 // Màn chi tiết ca kéo ChemText (công thức, lời giải): GÓI TẢI LƯỜI riêng — lần mở app đầu tiên không phải tải.
@@ -105,13 +104,11 @@ export default function AppPhuHuynh({ sbd, hoTen, lop, onDoiSbd }: { sbd: string
     void baoDaXemPhuHuynh(id)
   }, [])
 
-  const coNhanXet = new Set((loiThay.ds ?? []).map((x) => x.maCa))
   let man: ReactElement
   if (tuyen.maCa) man = <Suspense fallback={<DangTai chu="Đang mở báo cáo ca kiểm tra…" />}><ManChiTietCa key={tuyen.maCa} sbd={sbd} maCa={tuyen.maCa} /></Suspense>
-  else if (tuyen.muc === 'diem') man = <ManDiemSo v={v} coNhanXet={coNhanXet} />
+  else if (tuyen.muc === 'ca-kiem-tra') man = <ManDiemSo v={v} loiThay={loiThay.ds} />
   else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} />
-  else if (tuyen.muc === 'loi-thay') man = <ManLoiThay v={v} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao} onDaXem={daXemCanhBao} />
-  else man = <ManHomNay v={v} hoc2={hoc2} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} />
+  else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} />
 
   return (
     <div className="ph3" data-app="ph3">
