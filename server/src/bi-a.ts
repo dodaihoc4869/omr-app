@@ -173,7 +173,7 @@ interface BoiCanh {
  * trả lời; câu còn nằm trên bàn Bi-a mở của chính em KHÔNG trừ và không chặn — vào bàn mới (`xepBan`, `chiTraLoi`, `xepBanOnline`) luôn đóng bàn cũ trước
  * (`dongVanCu`, G8) nên các câu ấy về lại đúng thứ tự kế hoạch. Mặc định (trong ván: `doiCau`) vẫn tính câu đang giữ để không vượt trần.
  */
-async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: boolean } = {}): Promise<BoiCanh> {
+async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: boolean; san?: { kh: KeHoachDaChot; hs: HoSo2 } } = {}): Promise<BoiCanh> {
   // TỐI ƯU 30/09 (đo docs/do-toi-uu-bia-3009.md): bốn lượt đọc KHÔNG phụ thuộc kế hoạch (câu đã trả lời trong phiên Bi-a hôm nay — ngày kế hoạch luôn là
   // ngayVnCua(nowMs); câu đang giữ ở bàn Bi-a / ở Đảo-Đoàn; câu bảo vệ ca) bắt đầu CÙNG đợt với kế hoạch ngày thay vì nối tiếp sau nó. Kết quả y hệt;
   // `layKeHoachHomNay` không ghi các bảng này. Lỗi đọc giữ đúng cách cũ (đã trả lời / đang giữ lỗi ⇒ rỗng; câu bảo vệ ca lỗi ⇒ ném).
@@ -186,7 +186,7 @@ async function boiCanh(env: Env, sbd: string, nowMs: number, o: { chiDaTraLoi?: 
   const giuBiaSom = o.chiDaTraLoi ? Promise.resolve(new Set<string>()) : cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)
   const chanCaSom = som(protectedQuestions(env))
   const giuDaoSom = cauDangGiu(env, sbd, nowMs, DK_PHIEN_DAO_DOAN)
-  const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
+  const { kh, hs } = o.san ?? await layKeHoachHomNay(env, sbd, nowMs)
   const laMoi = (k: string) => laCauMoiKeHoach(k, hs, kh.ngay)
   const tatCa = [...kh.doan, ...kh.dao]
   const trongKh = new Set(tatCa.map(qidGoc))
@@ -301,9 +301,9 @@ async function demGiaoHuuHomNay(env: Env, sbd: string, ngay: string): Promise<nu
 }
 
 /** Tóm tắt cho màn Sảnh Bi-a (và cửa trên Sảnh Bát Linh). */
-async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
+async function sanhBia(env: Env, sbd: string, nowMs: number, san?: { kh: KeHoachDaChot; hs: HoSo2 }): Promise<Record<string, unknown>> {
   const diemSom = docDiemBan(env, sbd) // song song với bối cảnh (tự bắt lỗi ⇒ điểm đầu)
-  const c = await boiCanh(env, sbd, nowMs, { chiDaTraLoi: true })
+  const c = await boiCanh(env, sbd, nowMs, { chiDaTraLoi: true, san })
   const { kh, hs, tran } = c
   const conKeHoach = kh.conDao.length + kh.conDoan.length
   const con = conTheoNhom(c)
@@ -564,23 +564,23 @@ async function chiTraLoi(env: Env, sbd: string, b: Row, nowMs: number): Promise<
 }
 
 /** Phần `bia` trả kèm `hoa2-sanh` để Sảnh Bát Linh vẽ cửa thứ ba. Cờ tắt ⇒ `{ bat:false }` (không vẽ cửa). Lỗi ⇒ `{ bat:false }`. */
-export async function biaChoSanh(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
-  return batDauBiaChoSanh(env, sbd, nowMs)()
+export async function biaChoSanh(env: Env, sbd: string, nowMs: number, san?: { kh: KeHoachDaChot; hs: HoSo2 }): Promise<Record<string, unknown>> {
+  return batDauBiaChoSanh(env, sbd, nowMs)(san)
 }
 /**
  * Tối ưu 05/10 — hai pha của `biaChoSanh` (kết quả y hệt): pha ĐỌC (cờ Bi-a + em có ca đang mở) bắt đầu NGAY (song song với Sảnh), hàm trả về chạy phần
  * còn lại (bàn Bi-a hôm nay) khi nơi gọi cần — Sảnh gọi SAU khi kế hoạch hôm nay đã chốt, như cũ. Cờ Bi-a tắt cho em ⇒ khỏi đọc ca (kết quả vẫn `bat:false`).
  */
-export function batDauBiaChoSanh(env: Env, sbd: string, nowMs: number): () => Promise<Record<string, unknown>> {
+export function batDauBiaChoSanh(env: Env, sbd: string, nowMs: number): (san?: { kh: KeHoachDaChot; hs: HoSo2 }) => Promise<Record<string, unknown>> {
   const moP = biaMoCho(env, sbd)
   const dau = Promise.all([moP, moP.then((mo) => (mo ? coCaDangMo(env, sbd, nowMs) : false))])
   dau.catch(() => {})
-  return async () => {
+  return async (san?: { kh: KeHoachDaChot; hs: HoSo2 }) => {
     try {
       const [mo, coCa] = await dau
       if (!mo) return { bat: false }
       if (coCa) return { bat: true, lyDoKhoa: 'dang_co_ca', con: 0, tong: 0, giaoHuu: { mo: false, con: 0 } }
-      const s = await sanhBia(env, sbd, nowMs)
+      const s = await sanhBia(env, sbd, nowMs, san)
       const t = s.tran as { con: number; tong: number }, g = s.giaoHuu as { mo: boolean; con: number }
       return { bat: true, con: t.con, tong: t.tong, giaoHuu: { mo: g.mo, con: g.con }, ...(s.lyDoKhoa ? { lyDoKhoa: s.lyDoKhoa } : {}) }
     } catch { return { bat: false } }

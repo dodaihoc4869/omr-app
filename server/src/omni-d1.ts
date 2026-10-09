@@ -102,16 +102,17 @@ const demHoSo = new DemTTL<HoSoOmniEm>(60_000, 400)
 /** Hồ sơ THÔ của bạn cùng lớp cho prior lớp: khoá (lớp, ngày, tham số). Giá trị của một ngày là bất biến theo mốc cắt ⇒ đệm dài. */
 const demTho = new DemTTL<Map<string, Map<string, { p: number; n: number }>>>(6 * 3_600_000, 64)
 /** Ma trận Q và siêu dữ liệu câu (đổi khi thầy duyệt Q / nạp kho) — 10 phút; isolate duyệt Q xoá ngay. */
-const demQ = new DemTTL<QCau>(10 * 60_000, 8_000)
-const demKho = new DemTTL<CauKho | null>(10 * 60_000, 8_000)
+const demQ = new DemTTL<QCau>(10 * 60_000, 16_000)
+const demKho = new DemTTL<CauKho | null>(10 * 60_000, 16_000)
 const demTenDang = new DemTTL<string>(10 * 60_000, 4_000)
 const demHieuChuan = new DemTTL<HieuChuan>(10 * 60_000, 4)
+const demQChienDich = new DemTTL<{ cau: QCau[]; dangCo: string[] }>(10 * 60_000, 20)
 /** Nhật ký hôm nay: Sảnh mở lại nhiều lần sau khi xong kế hoạch ⇒ đệm 60 s theo (em, ngày, số dòng sổ). */
 const demNhatKy = new DemTTL<string[]>(60_000, 400)
 let phienBanDem = 0
 /** Bỏ mọi đệm OMNI của isolate (sau khi thầy duyệt Q, xác nhận dạng, đổi tham số). */
 export function xoaDemOmni(): void {
-  demHoSo.xoa(); demTho.xoa(); demQ.xoa(); demKho.xoa(); demTenDang.xoa(); demHieuChuan.xoa(); demSo.xoa(); demNhatKy.xoa()
+  demHoSo.xoa(); demTho.xoa(); demQ.xoa(); demKho.xoa(); demTenDang.xoa(); demHieuChuan.xoa(); demSo.xoa(); demNhatKy.xoa(); demQChienDich.xoa()
   phienBanDem++
 }
 
@@ -991,8 +992,19 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
     ])
     const dangLuyen = chienDichDangLuyen(ds, homNay)
     const gan = dangLuyen[0] ?? null
-    const cau = gan ? [...(await qCuaCau(env, gan.qids)).values()] : []
-    const dangCo = dsDang(cau)
+    let cau: QCau[] = []
+    let dangCo: string[] = []
+    if (gan) {
+      const co = demQChienDich.doc(gan.id, nowMs)
+      if (co) {
+        cau = co.cau
+        dangCo = co.dangCo
+      } else {
+        cau = [...(await qCuaCau(env, gan.qids)).values()]
+        dangCo = dsDang(cau)
+        demQChienDich.ghi(gan.id, nowMs, { cau, dangCo })
+      }
+    }
     const vung = gan ? dangDaVung(hs, cau, ts).filter((d) => dangCo.includes(d)) : []
     const met = xetMetGio(hs, khungGioCua(nowMs), ts)
     // Em đã bấm "Để mai"/"Làm luôn" hôm nay (srs2_ke_hoach_omni.met_gio) ⇒ không gợi ý đổi thứ tự lần nữa trong ngày.
