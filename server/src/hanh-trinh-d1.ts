@@ -14,6 +14,7 @@ import { tachSongSinh } from './loi-hoc-luat'
 import { SQL_TC } from './lam-lai-so'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { dongCoHanhTrinh, lenhGhiCanThiep, SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co'
+import { SQL_NGUON_CAU,ganBanBu,taoNguonBanBu,idDaLam,laBanBu,gocNguonCau } from './hanh-trinh-nguon-cau'
 
 type Row = Record<string, unknown>
 const ds = (v: unknown): string[] => { try { const a: unknown = JSON.parse(String(v ?? '[]')); return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string') : [] } catch { return [] } }
@@ -29,14 +30,16 @@ const docLamHomNay = (env: Env, sbd: string, ngay: string) => env.DB.prepare(`SE
  */
 export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowMs: number, hs: HoSo2,
   cu: Row | null, chan: ReadonlySet<string>, trongSo?: Readonly<Record<string, number>>, dangVung?: readonly string[], daMoRong=false): Promise<KeHoachDaChot> {
-  await chayDdlMotLan(env, 'hanh_trinh_v3_v4', [...SQL_BANG_HANH_TRINH,...SQL_DONG_CO_HANH_TRINH,...SQL_HANH_TRINH_V5])
+  await chayDdlMotLan(env, 'hanh_trinh_v3_v4_nguon', [...SQL_BANG_HANH_TRINH,...SQL_DONG_CO_HANH_TRINH,...SQL_HANH_TRINH_V5,...SQL_NGUON_CAU])
+  const idsCu=new Set([...ds(cu?.doan_json),...ds(cu?.dao_json)].map(goc))
+  await ganBanBu(env,sbd,hs,[...idsCu])
   const nhom = new Map([...hs.meta].map(([q, m]) => [q, m.group || q]))
   const rows = await docLamHomNay(env, sbd, ngay)
-  const daLam = new Set((rows.results ?? []).map(r => String(r.tc || tachSongSinh(String(r.qid)).goc)))
+  const daLam = new Set((rows.results ?? []).map(r => idDaLam({qid:r.qid,tc:r.tc},idsCu)))
   const daNhom = new Set<string>()
   const hopLe = new Set(hs.cau.map(c => c.qid))
   const xong = [...new Set([...ds(cu?.doan_json), ...ds(cu?.dao_json), ...daLam].map(goc))].filter(q => {
-    const k = nhom.get(q) || q
+    const k = laBanBu(q)?q:nhom.get(q) || q
     if (!daLam.has(q) || !hopLe.has(q) || daNhom.has(k)) return false
     daNhom.add(k); return true
   })
@@ -51,13 +54,14 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   }
   let tangNgay = Number(snap.tang) as TangHanhTrinh, toiThieu = Number(snap.toi_thieu)
   const conCu = [...ds(cu?.doan_json), ...ds(cu?.dao_json)].filter(q => !daLam.has(goc(q)))
-  const hong = conCu.some(q => !hs.meta.has(goc(q)) || hs.meta.get(goc(q))?.tuLuan || hs.tt.get(goc(q))?.catTia || chan.has(goc(q)) || chan.has(nhom.get(goc(q)) || goc(q)))
+  const hong = conCu.some(q => !hs.meta.has(goc(q)) || hs.meta.get(goc(q))?.tuLuan || hs.tt.get(goc(q))?.catTia || chan.has(goc(q)) || chan.has(gocNguonCau(q)) || chan.has(nhom.get(goc(q)) || goc(q)))
   const moc = Math.floor(xong.length / CAU_MOI_CHANG) * CAU_MOI_CHANG
   // Không đổi câu giữa chặng; sửa ngay nếu câu bị bảo vệ/rút khỏi kho.
   const v5Cu=await env.DB.prepare('SELECT phien_ban FROM hanh_trinh_v5_quyet_dinh WHERE sbd=? AND ngay=? ORDER BY moc DESC LIMIT 1').bind(sbd,ngay).first<{phien_ban:string}>()
-  const kiem=await env.DB.prepare('SELECT da_lam FROM hanh_trinh_v4_chot WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<{da_lam:number}>()
+  const kiem=await env.DB.prepare('SELECT k.da_lam,n.du_phong_json FROM hanh_trinh_v4_chot k LEFT JOIN hanh_trinh_nguon_cau n ON n.sbd=k.sbd AND n.ngay=k.ngay WHERE k.sbd=? AND k.ngay=?').bind(sbd,ngay).first<{da_lam:number;du_phong_json:string|null}>()
   const saiMoi=rows.results[0]?.ket_qua===0 && xong.length>(kiem?.da_lam??0)
-  const doiBoSung = conCu.length === 0 && xong.length < toiThieu
+  const nguonCu=kiem?.du_phong_json!=null?kiem:null
+  const doiBoSung = (!nguonCu || conCu.length === 0) && xong.length < toiThieu
   let daChay = false
   if (!v5Cu || v5Cu.phien_ban!==PHIEN_BAN_HT5 || !kiem || saiMoi || !cu || cu.chien_dich_id !== hs.chienDich?.id || Number(snap.xong_chot) !== moc || hong || doiBoSung) {
     daChay = true
@@ -81,10 +85,31 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const daDiag=new Set(diagCu.results.filter(c=>daLam.has(c.qid)).map(c=>c.nhom)).size
     // Thử sức thêm (09/10): phần em đã tự lấy vượt sàn hôm nay (tổng kế hoạch đã chốt > sàn) được GIỮ khi chọn lại phần chưa làm — không vượt 2 × sàn.
     const tongCu = cu && cu.chien_dich_id === hs.chienDich?.id ? ds(cu.dao_json).length + ds(cu.doan_json).length : 0
-    const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu: mucNgayHanhTrinh(toiThieu, tongCu), daLam: xong, cau: cung, tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, chanDoan:engine.v5?.chanDoan, nganSachChanDoan:Math.max(0,2-daDiag), uuTienThamDo:engine.v5?.uuTienThamDo, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined })
-    if(!daMoRong&&lap.dao.length+lap.doan.length<Math.max(0,toiThieu-xong.length)&&engine.v5?.ungNgoai.length){
+    const a={ ngay, tang: tangNgay, toiThieu: mucNgayHanhTrinh(toiThieu, tongCu), daLam: xong, cau: cung.filter(c=>!laBanBu(c.qid)), tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, chanDoan:engine.v5?.chanDoan, nganSachChanDoan:Math.max(0,2-daDiag), uuTienThamDo:engine.v5?.uuTienThamDo, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined }
+    let lap = chonCauHanhTrinh(a)
+    // Lần chuẩn bị nguồn đầu tiên giữa chặng giữ các câu còn hợp lệ đang giao.
+    // Câu mới chỉ nối sau; khi hết chặng hoặc có lỗi vẫn chọn lại theo động cơ.
+    if(cu&&doiBoSung&&!hong&&!saiMoi&&Number(snap.xong_chot)===moc&&v5Cu?.phien_ban===PHIEN_BAN_HT5&&cu.chien_dich_id===hs.chienDich?.id){
+      const giu=conCu.filter(id=>hs.meta.has(id)&&!chanMoi.has(id)&&!chanMoi.has(hs.meta.get(id)!.group)&&engine.v5?.tang.has(id))
+      const groups=new Set(giu.map(id=>hs.meta.get(id)!.group||id))
+      const moi=[...lap.doan.map(id=>({id,dao:false})),...lap.dao.map(id=>({id,dao:true}))].filter(x=>!giu.includes(x.id)&&!groups.has(hs.meta.get(x.id)?.group||x.id)).slice(0,Math.max(0,a.toiThieu-xong.length-giu.length))
+      lap={...lap,dao:[...giu.filter(id=>ds(cu.dao_json).includes(id)),...moi.filter(x=>x.dao).map(x=>x.id)],doan:[...giu.filter(id=>ds(cu.doan_json).includes(id)),...moi.filter(x=>!x.dao).map(x=>x.id)]}
+    }
+    const choDuPhong=chonCauHanhTrinh({...a,toiThieu:2*toiThieu,daLam:[...xong,...lap.dao,...lap.doan],nganSachChanDoan:0})
+    if(!daMoRong&&lap.dao.length+lap.doan.length+choDuPhong.dao.length+choDuPhong.doan.length<Math.max(0,2*toiThieu-xong.length)&&engine.v5?.ungNgoai.length){
       const expanded=await import('./hanh-trinh-v6-kho').then(m=>m.boSungV6(env,sbd,ngay,hs,engine.v5!.ungNgoai,chan))
       if(expanded){Object.assign(hs,expanded);return lapChotHanhTrinh(env,sbd,ngay,nowMs,hs,cu,chan,trongSo,undefined,true)}
+    }
+    let duPhong=[...choDuPhong.doan,...choDuPhong.dao]
+    // Giữ bản bù đã giao nhưng chưa làm; không phát lại nguyên văn câu cũ để đủ sàn.
+    const cuBu=conCu.filter(id=>laBanBu(id)&&hs.meta.has(id)&&!chanMoi.has(id)&&!chan.has(gocNguonCau(id))&&!chan.has(hs.meta.get(id)!.group))
+    const need=Math.max(0,toiThieu-xong.length-lap.dao.length-lap.doan.length)
+    lap.dao.push(...cuBu.slice(0,need))
+    if(engine.v5){
+      const can=Math.max(0,2*toiThieu-xong.length-lap.dao.length-lap.doan.length-duPhong.length)
+      const bu=await taoNguonBanBu(env,sbd,ngay,hs,engine.v5,chan,[...xong,...lap.dao,...lap.doan,...duPhong],can)
+      const them=Math.max(0,toiThieu-xong.length-lap.dao.length-lap.doan.length)
+      lap.dao.push(...bu.slice(0,them));duPhong.push(...bu.slice(them))
     }
     const xongDao = xong.filter(q => ds(cu?.dao_json).map(goc).includes(q)), xongDoan = xong.filter(q => !xongDao.includes(q))
     const dao = [...xongDao, ...lap.dao], doan = [...xongDoan, ...lap.doan]
@@ -97,7 +122,11 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const receipt6=engine.v5?lenhChonV6(env,sbd,ngay,moc,nowMs,[...lap.dao,...lap.doan].slice(0,6).map(id=>engine.v5!.chon[id]!).filter(Boolean)):null
     const exposure=lenhGhiCanThiep(env,sbd,ngay,moc,nowMs,engine,[...dao,...doan])
     const kiemMoi=env.DB.prepare('INSERT INTO hanh_trinh_v4_chot(sbd,ngay,da_lam) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?) ON CONFLICT(sbd,ngay) DO UPDATE SET da_lam=excluded.da_lam').bind(sbd,ngay,xong.length,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))
-    await env.DB.batch([write, ...(decision?[decision]:[]), ...(exposure?[exposure]:[]), ...(receipt6?[receipt6]:[]),kiemMoi, env.DB.prepare('UPDATE hanh_trinh_v3_ngay SET xong_chot=? WHERE sbd=? AND ngay=? AND EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?)').bind(moc, sbd, ngay,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))])
+    const thieu=Math.max(0,toiThieu-dao.length-doan.length)
+    const mucThieu=thieu? [...new Map(hs.cau.filter(c=>!laBanBu(c.qid)).map(c=>[`${c.dang??'nen'}@${c.mucDo??'NB'}`,{dang:c.dang??null,ten:hs.meta.get(c.qid)?.tenDang||'Kiến thức nền',mucDo:c.mucDo??null,lyDo:engine.chan.has(c.qid)?'can_sua_nen':'can_bo_sung_cau'}])).values()].slice(0,24):[]
+    if(thieu&&!mucThieu.length)mucThieu.push({dang:null,ten:'Nguồn câu trong phạm vi đã dạy',mucDo:null,lyDo:'can_bo_sung_cau'})
+    const nguon=env.DB.prepare('INSERT INTO hanh_trinh_nguon_cau SELECT ?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?) ON CONFLICT(sbd,ngay) DO UPDATE SET chien_dich_id=excluded.chien_dich_id,du_phong_json=excluded.du_phong_json,thieu_json=excluded.thieu_json,toi_thieu=excluded.toi_thieu,da_xep=excluded.da_xep,cap_nhat_luc=excluded.cap_nhat_luc').bind(sbd,ngay,hs.chienDich!.id,JSON.stringify(duPhong),JSON.stringify(mucThieu),toiThieu,dao.length+doan.length,nowMs,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))
+    await env.DB.batch([write, ...(decision?[decision]:[]), ...(exposure?[exposure]:[]), ...(receipt6?[receipt6]:[]),kiemMoi,nguon, env.DB.prepare('UPDATE hanh_trinh_v3_ngay SET xong_chot=? WHERE sbd=? AND ngay=? AND EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?)').bind(moc, sbd, ngay,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))])
   }
   const saved = daChay || !cu
     ? (await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
@@ -146,8 +175,8 @@ export async function chonLoThuSucHanhTrinh(env: Env, sbd: string, ngay: string,
 /** Bảng thầy chỉ đọc kế hoạch hôm nay, không replay toàn kho × toàn khối. */
 export async function bangHanhTrinh(env: Env, cd: ChienDich, ngay: string) {
   const emJson = JSON.stringify(cd.sbd)
-  await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)
-  const [hs, kh, snap, suKien, muc, doLuong] = await Promise.all([
+  await chayDdlMotLan(env,'hanh_trinh_v5_nguon',[...SQL_HANH_TRINH_V5,...SQL_NGUON_CAU])
+  const [hs, kh, snap, suKien, muc, doLuong,nguon] = await Promise.all([
     env.DB.prepare('SELECT sbd,ho_ten FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))').bind(emJson).all<Row>(),
     env.DB.prepare('SELECT sbd,dao_json,doan_json FROM srs2_ke_hoach WHERE ngay=? AND sbd IN (SELECT value FROM json_each(?))').bind(ngay,emJson).all<Row>(),
     env.DB.prepare('SELECT * FROM hanh_trinh_v3_ngay WHERE ngay=? AND sbd IN (SELECT value FROM json_each(?))').bind(ngay,emJson).all<Row>(),
@@ -156,17 +185,21 @@ export async function bangHanhTrinh(env: Env, cd: ChienDich, ngay: string) {
       AND (nguon <> 'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))`).bind(ngay,emJson).all<Row>(),
     env.DB.prepare('SELECT sbd,tien_do_json,cap_nhat_luc FROM hanh_trinh_v5_muc m WHERE sbd IN(SELECT value FROM json_each(?)) AND cap_nhat_luc=(SELECT MAX(cap_nhat_luc) FROM hanh_trinh_v5_muc WHERE sbd=m.sbd)').bind(emJson).all<Row>(),
     baoCaoAB(env,cd.sbd),
+    env.DB.prepare('SELECT * FROM hanh_trinh_nguon_cau WHERE ngay=? AND sbd IN(SELECT value FROM json_each(?)) AND chien_dich_id=?').bind(ngay,emJson,cd.id).all<Row>(),
   ])
   const mucEm=new Map(muc.results.map(r=>[String(r.sbd),r]))
   const ten = new Map(hs.results.map(r => [String(r.sbd), String(r.ho_ten)]))
   const plan = new Map(kh.results.map(r => [String(r.sbd), [...ds(r.dao_json),...ds(r.doan_json)].map(goc)]))
   const chot = new Map(snap.results.map(r => [String(r.sbd),r]))
   const done = new Map<string,Set<string>>()
-  for (const r of suKien.results) { const s=String(r.sbd); const qs=done.get(s) ?? new Set<string>(); qs.add(String(r.tc || tachSongSinh(String(r.qid)).goc)); done.set(s,qs) }
+  const nguonEm=new Map(nguon.results.map(r=>[String(r.sbd),r]))
+  for (const r of suKien.results) { const s=String(r.sbd); const qs=done.get(s) ?? new Set<string>(); qs.add(idDaLam({qid:r.qid,tc:r.tc},new Set(plan.get(s)??[]))); done.set(s,qs) }
   const em = cd.sbd.map(sbd => {
     const r=chot.get(sbd), qs=plan.get(sbd) ?? []
     let tienDo:unknown=null;try{tienDo=JSON.parse(String(mucEm.get(sbd)?.tien_do_json??'null'))}catch{/* chưa có hồ sơ đo */}
-    return { sbd,tienDo,ten:ten.get(sbd) ?? sbd,tang:r ? Number(r.tang) : null,toiThieu:r ? Number(r.toi_thieu) : null,
+    const stock=nguonEm.get(sbd)
+    let canBoSung:unknown[]=[];try{const raw=JSON.parse(String(stock?.thieu_json??'[]'));if(Array.isArray(raw))canBoSung=raw}catch{/* dữ liệu hỏng không tạo số liệu */}
+    return { sbd,tienDo,duPhong:stock?ds(stock.du_phong_json).length:null,canBoSung,ten:ten.get(sbd) ?? sbd,tang:r ? Number(r.tang) : null,toiThieu:r ? Number(r.toi_thieu) : null,
       daLam:qs.filter(q=>done.get(sbd)?.has(q)).length,daXep:qs.length,conThieu:r ? Math.max(0,Number(r.toi_thieu)-qs.length) : 0 }
   })
   return { ok:true,chienDich:{...cd,qids:undefined,sbd:undefined,soCau:cd.qids.length,soEm:cd.sbd.length,hanhTrinh:true},homNay:ngay,hetHan:false,

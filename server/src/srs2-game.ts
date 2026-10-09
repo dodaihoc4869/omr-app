@@ -6,6 +6,7 @@ import { phuNeuCan } from './hang-chua-loi'
 import { apLamLaiKhac, batDauLamLaiKhac, napLaiLuotCho, type BoiCanhLamLai, type CauLuot } from './cau-anh-em'
 import { batDauChanDoan } from './chan-doan-buoc-sai'
 import { refLamLai, type LamLaiRef } from './lam-lai-so'
+import { BT_PHIEN_BAN } from './bien-the-sinh'
 import { tachSongSinh } from './loi-hoc-luat'
 import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
@@ -64,7 +65,7 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   const ung: CauDanXen[] = []
   for (const k of khoa) {
     const q = qidGoc(k), m = hs.meta.get(q)
-    if (thay.has(q) || !m || chan.has(q) || chan.has(m.group)) continue
+    if (thay.has(q) || !m || chan.has(q) || chan.has(tachSongSinh(q).goc) || chan.has(m.group)) continue
     if (m.tuLuan) { boQua?.tuLuan.add(q); continue } // 30/09: câu tự luận lặng lẽ bỏ (kế hoạch đã không đếm — `tamHoanCauKhoa`)
     thay.add(q)
     ung.push(phanLoaiDanXen(q, hs.tt.get(q), m))
@@ -85,7 +86,8 @@ export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan
   const ds = xep.map((x) => { const c = theo.get(x.qid)!; return { ...c, q: phuNeuCan(c.q, hs.songSinhCho, hs.boTro) } })
   // 05/10 thang làm lại (cau-anh-em.ts): câu lỗi trong cửa sổ lỗi mà vẫn ra nguyên văn ⇒ song sinh bản kế / câu anh em cùng dạng / bản xáo / nguyên văn (đếm).
   // Câu anh em cũng tránh `chan` của lượt. Không `lamLai` (hoặc khoá `lam_lai_khac` tắt) ⇒ y hệt hôm nay.
-  return lamLai ? apLamLaiKhac(env, hs, ds, lamLai, chan, lamLaiSom, chanDoanSom ?? (lamLai.chanDoan ? Promise.resolve(null) : undefined)) : ds
+  const ra:CauLuot[]=lamLai ? await apLamLaiKhac(env, hs, ds, lamLai, chan, lamLaiSom, chanDoanSom ?? (lamLai.chanDoan ? Promise.resolve(null) : undefined)) : ds
+  return ra.map(x=>/~(?:ss|bt)\d+$/.test(x.q.qid)&&hs.meta.has(x.q.qid)?{...x,lamLai:{...x.lamLai,tc:tachSongSinh(x.q.qid).goc,...(/~bt\d+$/.test(x.q.qid)?{btv:BT_PHIEN_BAN}:{})}}:x)
 }
 /** Sức em (hạng chung) cho đan xen; lỗi đọc ⇒ trung bình. */
 export async function sucEmHomNay(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: Promise<Map<string, HoSoDangTho[]>>): Promise<SucEm> {
@@ -139,7 +141,7 @@ export async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa
     if (thay.has(qid)) continue
     thay.add(qid)
     const m = hs.meta.get(qid)
-    if (!m || chan.has(qid) || chan.has(m.group)) continue
+    if (!m || chan.has(qid) || chan.has(tachSongSinh(qid).goc) || chan.has(m.group)) continue
     ung.push({ qid, m })
   }
   let i = 0
@@ -279,7 +281,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
     // 05/10: câu anh em (`tc`) đứng thay câu gốc của kế hoạch; lượt có câu anh em / bản xáo nạp lại theo ref phiên (cau-anh-em.ts), còn lại như cũ.
-    if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === (r.tc ?? r.qid)))) {
+    if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === r.qid || qidGoc(k) === (r.tc ?? r.qid)))) {
       const day = await napLaiLuotCho(env, hs, cu.questions, SO_CAU_CHUYEN, () => napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set()))
       // 06/10: lượt chờ lưu từ trước cũng QUA CỔNG KHỐI — câu khác khối em ⇒ bỏ cả lượt, rút lượt mới (đã lọc).
       const hopKhoi = day.length === cu.questions.length && (await chanKhacKhoiEm(env, 'dao2_luot_cho', { sbd, meta: hs.meta }, day, { cauCua: (x) => x.q })).length === day.length

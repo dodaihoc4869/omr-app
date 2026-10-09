@@ -1,6 +1,7 @@
 import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
 import { laHanhTrinh, ungVienHanhTrinh } from './hanh-trinh-hop-nhat'
 import { coLoThuSucHanhTrinh, tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
+import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
 // THUẬT TOÁN 2.0 — LỚP D1 (đọc chiến dịch, sổ sự kiện; chốt kế hoạch ngày; số liệu Sảnh; Rương Bát Linh).
 // Lõi thuần ở `srs2-loi.ts`. Công tắc `cau_hinh.game_hoa_2` (mặc định TẮT ⇒ mọi đường cũ giữ nguyên):
 //   {"bat":true}                         ⇒ toàn trung tâm
@@ -1093,7 +1094,7 @@ export const qidGoc = (k: string): string => k.replace(/#\d+$/, '')
 const lanThu = (k: string): number => Number(/#(\d+)$/.exec(k)?.[1] ?? 1)
 
 /** Số lần em đã làm mỗi câu hôm nay trong game. */
-async function docDemHomNay(env: Env, sbd: string, ngay: string): Promise<Map<string, number>> {
+async function docDemHomNay(env: Env, sbd: string, ngay: string, banGiaoRieng:ReadonlySet<string>=new Set()): Promise<Map<string, number>> {
   // 05/10: đọc kèm `tc` (câu anh em làm THAY câu gốc — lam-lai-so.ts); CSDL chưa có cột raw_json ⇒ truy vấn cũ.
   const r = await env.DB.prepare(`SELECT qid, ${SQL_TC} AS tc, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game' GROUP BY qid, ${SQL_TC}`).bind(sbd, ngay).all<Row>()
     .catch(() => env.DB.prepare("SELECT qid, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'game' GROUP BY qid").bind(sbd, ngay).all<Row>())
@@ -1102,7 +1103,9 @@ async function docDemHomNay(env: Env, sbd: string, ngay: string): Promise<Map<st
   // câu cuối thì hạ cầu ngay; không sửa lịch sử, điểm hay điều kiện thành thạo.
   const dem = new Map<string, number>()
   for (const x of r.results ?? []) {
-    const q = tachSongSinh(str(x.qid)).goc, n = Number(x.n) || 0
+    const n = Number(x.n) || 0
+    if(laBanBu(str(x.qid))&&banGiaoRieng.has(str(x.qid))){const id=idDaLam({qid:x.qid,tc:x.tc},banGiaoRieng);dem.set(id,(dem.get(id)??0)+n);continue}
+    const q = tachSongSinh(str(x.qid)).goc
     dem.set(q, (dem.get(q) ?? 0) + n)
     const tc = str(x.tc)
     if (tc && tc !== q) dem.set(tc, (dem.get(tc) ?? 0) + n) // câu anh em ⇒ tính cho nhiệm vụ của câu gốc nó thay
@@ -1136,7 +1139,7 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
   const ngay = ngayVnCua(nowMs)
   const cu = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
   if (!cu) return null
-  return tuDong(cu, ngay, await docDemHomNay(env, sbd, ngay))
+  return tuDong(cu, ngay, await docDemHomNay(env, sbd, ngay,laHanhTrinh(str(cu.chien_dich_id))?new Set([...parseMang(cu.dao_json),...parseMang(cu.doan_json)]):new Set()))
 }
 
 /**
@@ -1176,7 +1179,7 @@ export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2
   for (const k of [...kh.conDao, ...kh.conDoan]) {
     const q = qidGoc(k), m = hs.meta.get(q)
     const ly = lyDoKhongPhucVu(m)
-    if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(m!.group)) { bo.add(k); ca++ } else if (nghi.has(tachSongSinh(q).goc)) { bo.add(k); nghiSo++ }
+    if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(tachSongSinh(q).goc) || chan.has(m!.group)) { bo.add(k); ca++ } else if (nghi.has(tachSongSinh(q).goc)) { bo.add(k); nghiSo++ }
   }
   // 06/10 — KÊNH KHÁC + TRÙNG NỘI DUNG (chỉ đụng câu còn lại phục vụ được; không ghi D1; câu không có nhóm ⇒ khác mọi câu).
   const conTheoThuTu = [...kh.conDoan, ...kh.conDao].filter((k) => !bo.has(k)) // ôn nợ (Đoàn) đứng trước câu Đảo — cùng thứ tự `tatCa` của Bi-a
@@ -1184,7 +1187,7 @@ export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2
   if (conTheoThuTu.length) {
     const nhomDaKhac = new Set<string>()
     if (daKhac.size) for (const g of (await docNhomTheoQid(env, [...daKhac])).values()) nhomDaKhac.add(g)
-    const nhomCua = (q: string): string => hs.meta.get(q)?.group ?? ''
+    const nhomCua = (q: string): string => kh.hanhTrinh && /~(?:ss|bt)\d+$/.test(q) && hs.meta.has(q) ? q : hs.meta.get(q)?.group ?? ''
     // Người giữ chỗ của từng nhóm: câu đã xong (game hoặc kênh khác) trước, rồi câu còn lại theo thứ tự ưu tiên.
     const giu = new Map<string, string>()
     const conSet = new Set([...kh.conDao, ...kh.conDoan])

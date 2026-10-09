@@ -17,6 +17,8 @@ import { sbdCuaPhuHuynh } from './ph-truy-cap'
 import { cheDo2, docHoSo2, docKeHoachDaChot, ngayVnCua, tamHoanCauKhoa } from './srs2-d1'
 import { omniBat, omniChoPh } from './omni-d1'
 import { soNgayConLai, tiLeChienDich } from './srs2-loi'
+import { ganBanBu,laBanBu } from './hanh-trinh-nguon-cau'
+import { tienDoHanhTrinh,type TangHanhTrinh } from './hanh-trinh-ngay'
 
 type Row = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -78,7 +80,16 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   omniP.catch(() => {})
   const [hs, khTho] = await Promise.all([pHs, docKeHoachDaChot(envDoc, sbd, nowMs)])
   // Phản biện #108: cùng một con số với Sảnh/rương của con — câu còn lại đang dùng cho ca kiểm tra / đã rút khỏi kho / tự luận bị bỏ khỏi "hôm nay" (CHỈ ĐỌC, không ghi).
-  const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hs, undefined, undefined, sbd) : null
+  let hsKeHoach=hs,snapBan:Row|null|undefined
+  if(khTho?.chienDichId?.startsWith('hanh-trinh-v3-')&&[...khTho.dao,...khTho.doan].some(laBanBu)){
+    // Dựng bản chỉ để kiểm nhiệm vụ; không trộn bản luyện vào thống kê kỹ năng của phụ huynh.
+    hsKeHoach={...hs,meta:new Map(hs.meta),tt:new Map(hs.tt),cau:[...hs.cau]}
+    await ganBanBu(envDoc,sbd,hsKeHoach,[...khTho.dao,...khTho.doan])
+    snapBan=await envDoc.DB.prepare('SELECT tang,toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<Row>().catch(()=>null)
+    const t=Number(snapBan?.tang),floor=Number(snapBan?.toi_thieu)
+    if(Number.isInteger(t)&&t>=1&&t<=4&&Number.isInteger(floor)&&floor>0)khTho.hanhTrinh=tienDoHanhTrinh(t as TangHanhTrinh,floor,khTho.tong,khTho.tong-khTho.conDao.length-khTho.conDoan.length)
+  }
+  const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hsKeHoach, undefined, undefined, sbd) : null
   const ra: Row = { ok: true, cheDo2: true, ngay, serverNow: nowMs }
   const cd = hs.chienDich
   if (cd) {
@@ -88,7 +99,7 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   if (kh && kh.tong > 0) ra.homNay = { tong: kh.tong, daLam: kh.tong - kh.conDao.length - kh.conDoan.length }
   // Phụ huynh chỉ đọc tầng đã chốt; không gọi động cơ lập kế hoạch hoặc ghi dữ liệu.
   if (kh && kh.tong > 0 && kh.chienDichId?.startsWith('hanh-trinh-v3-')) {
-    const snap = await envDoc.DB.prepare('SELECT tang,toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>().catch(() => null)
+    const snap = snapBan===undefined?await envDoc.DB.prepare('SELECT tang,toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>().catch(() => null):snapBan
     const tang = Number(snap?.tang), toiThieu = Number(snap?.toi_thieu)
     if (snap && Number.isInteger(tang) && tang >= 1 && tang <= 4 && Number.isInteger(toiThieu) && toiThieu > 0)
       ra.hanhTrinh = { tang, toiThieu }
