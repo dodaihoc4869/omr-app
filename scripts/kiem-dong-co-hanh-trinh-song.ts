@@ -23,8 +23,8 @@ const db={
 }
 const env={DB:db,DE:{async get(key:string){const body=execFileSync('npx',['wrangler','r2','object','get',`omr-de/${key}`,'--remote','--pipe','--config','server/wrangler.toml'],{maxBuffer:32*1024*1024,stdio:['ignore','pipe','pipe']});return {body:new Uint8Array(body),async json(){return JSON.parse(body.toString())}}},async put(){throw new Error('Không được ghi kho.')},async delete(){throw new Error('Không được xoá kho.')}}} as unknown as Env
 async function main(){
-  const ca=await db.prepare("SELECT COUNT(*) n FROM ca WHERE trang_thai='mo'").first<{n:number}>()
-  if(!ca || ca.n!==0) throw new Error('Có ca mở: hoãn kiểm động cơ.')
+  // Cùng cổng giờ vào ca/quyền thầy duyệt/lượt đang làm với phát hành.
+  await import('./kiem-phat-hanh-chua.mjs')
   const em=await db.prepare(`SELECT h.sbd,COUNT(s.khoa) n FROM hoc_sinh h LEFT JOIN su_kien_hoc s ON s.sbd=h.sbd WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM chien_dich c,json_each(c.sbd_json) j WHERE c.id LIKE 'hanh-trinh-v3-khoi-%' AND c.trang_thai='dang_chay' AND j.value=h.sbd) GROUP BY h.sbd ORDER BY n DESC,h.sbd LIMIT 1`).first<{sbd:string;n:number}>()
   if(!em) throw new Error('Chưa có học sinh thuộc ba hành trình.')
   const now=Date.now(),ngay=new Date(now+7*3600000).toISOString().slice(0,10)
