@@ -2,6 +2,8 @@
 // Số liệu THẬT: loài + biệt danh + cấp + EXP (hồ sơ `profile`), mốc tiến hoá (evolution.ts), số vàng (lệnh cửa hàng `vang-xem`, chỉ khi có phiên).
 // Bản duyệt vẽ "Các thần thú khác của em" kèm cấp từng con — mỗi em hiện chỉ có MỘT thần thú, nên khối dưới là bộ sưu tập 8 loài Bát Linh:
 // loài của em có cấp + "Đang đồng hành", bảy loài kia chỉ ghi tên và hệ (không bịa cấp). Ảnh: public/than-thu-v2/nho/ (anh.ts).
+// BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (canvas-v3 HS-ThanThu): Túi đồ, Cửa hàng, Đăng xuất chuyển từ màn Hôm nay vào đây — hàng hai nút
+// "Túi đồ" (phụ) + "Cửa hàng" (vàng, chỉ khi máy chủ mở cửa hàng) và hàng chữ "Đăng xuất". Mỗi màn MỘT nút vàng: có Cửa hàng ⇒ "Đồng hành" thành nút phụ.
 import { useEffect, useMemo, useState } from 'react'
 import { Coins, Lock, PawPrint, Sparkles } from 'lucide-react'
 import { PETS } from '../core'
@@ -18,11 +20,13 @@ export interface ThanThuV2Props {
   profile: DaoProfile
   /** Phiên game — có thì đọc số vàng; vắng ⇒ không vẽ ô vàng. */
   token?: string
-  /** Cửa hàng mở cho em (máy chủ báo `shopBat`) — có thì nút "+" cạnh số vàng mở Cửa hàng. */
+  /** Cửa hàng mở cho em (máy chủ báo `shopBat`) — có thì vẽ nút vàng "Cửa hàng" cạnh "Túi đồ". */
   onCuaHang?: () => void
   onTuiDo: () => void
   /** "Đồng hành" = ra đảo cùng thần thú (màn Đảo). */
   onDongHanh: () => void
+  /** Đăng xuất khỏi máy (hộp hỏi lại của cổng học sinh). Vắng ⇒ không vẽ hàng chữ "Đăng xuất". */
+  onDangXuat?: () => void
 }
 
 /** Đọc số vàng từ phản hồi `vang-xem` (ví tắt / lỗi ⇒ null, không vẽ). */
@@ -43,7 +47,7 @@ function useVang(token?: string): number | null {
   return vang
 }
 
-export default function ThanThuV2({ profile, token, onCuaHang, onTuiDo, onDongHanh }: ThanThuV2Props) {
+export default function ThanThuV2({ profile, token, onCuaHang, onTuiDo, onDongHanh, onDangXuat }: ThanThuV2Props) {
   const i = chiSoThu(profile.pet)
   const loai = PETS[i]!
   const ten = tenThu(profile)
@@ -57,26 +61,12 @@ export default function ThanThuV2({ profile, token, onCuaHang, onTuiDo, onDongHa
       <header className="v2t-dau">
         <h1 className="v2-tieu-de v2t-tieu">Thần thú của em</h1>
         {vang !== null && (
-          <span className="v2t-vang" aria-label={`Số vàng của em: ${vang}`}>
+          <span className="v2t-vang">
             <Coins size={20} aria-hidden="true" />
-            <b className="v2-so">{vang}</b>
-            {onCuaHang && (
-              <button type="button" className="v2t-vang-them" onClick={onCuaHang} aria-label="Mở Cửa hàng">
-                +
-              </button>
-            )}
+            <b className="v2-so">{vang} vàng</b>
           </span>
         )}
       </header>
-      <div className="v2t-the-tab" role="tablist" aria-label="Thần thú và Túi đồ">
-        <button type="button" role="tab" aria-selected="true" className="v2t-tab">
-          <PawPrint size={20} aria-hidden="true" />
-          Thần thú
-        </button>
-        <button type="button" role="tab" aria-selected="false" className="v2t-tab" onClick={onTuiDo}>
-          Túi đồ
-        </button>
-      </div>
 
       <section className="v2t-chinh" aria-label={`Thần thú của em: ${ten}`}>
         <div className="v2t-canh">
@@ -125,6 +115,17 @@ export default function ThanThuV2({ profile, token, onCuaHang, onTuiDo, onDongHa
         </div>
       </section>
 
+      <div className="v2t-hang-nut">
+        <button type="button" className="v2-nut-phu v2t-tui-do" onClick={onTuiDo}>
+          Túi đồ
+        </button>
+        {onCuaHang && (
+          <button type="button" className="v2-nut-chinh v2t-cua-hang" onClick={onCuaHang}>
+            Cửa hàng
+          </button>
+        )}
+      </div>
+
       <section className="v2t-bo-suu-tap v2-the" aria-labelledby="v2t-bst">
         <h2 id="v2t-bst" className="v2t-bst-tieu">
           Bát Linh · 8 loài thần thú
@@ -143,13 +144,21 @@ export default function ThanThuV2({ profile, token, onCuaHang, onTuiDo, onDongHa
         </ul>
       </section>
 
-      <button type="button" className="v2-nut-chinh v2t-dong-hanh" onClick={onDongHanh}>
+      <button type="button" className={onCuaHang ? 'v2-nut-phu v2t-dong-hanh' : 'v2-nut-chinh v2t-dong-hanh'} onClick={onDongHanh}>
         <PawPrint size={24} aria-hidden="true" />
         <span>
           Đồng hành
           <small>Ra đảo cùng {ten}</small>
         </span>
       </button>
+
+      {onDangXuat && (
+        <div className="v2t-chan">
+          <button type="button" className="v2t-chu-nut" onClick={onDangXuat}>
+            Đăng xuất
+          </button>
+        </div>
+      )}
     </div>
   )
 }

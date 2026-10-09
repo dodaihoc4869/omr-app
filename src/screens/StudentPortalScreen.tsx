@@ -263,6 +263,8 @@ export default function StudentPortalScreen() {
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
+  // Lịch sử ca mở từ màn Câu đã làm (bản vẽ tối giản 09/10) ⇒ "Về" quay lại Câu đã làm; mở từ chỗ khác ⇒ về màn chính như cũ.
+  const [veSauLichSuCa, setVeSauLichSuCa] = useState<TabType | null>(null)
   // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) trong thanh đầu của từng màn game;
   // rời game ⇒ thoát toàn màn hình. Xem lib/toan-man-hinh-game.ts.
   const moGame = () => {
@@ -1211,7 +1213,10 @@ export default function StudentPortalScreen() {
               sbd={auth.sbd}
               scriptUrl={scriptUrl}
               banDau={dsChuaCongBo !== null ? { items: dsLichSu, chuaCongBo: dsChuaCongBo } : null}
-              onVe={() => setTab(null)}
+              onVe={() => {
+                setTab(veSauLichSuCa)
+                setVeSauLichSuCa(null)
+              }}
             />
           </Suspense>
         </div>
@@ -1219,7 +1224,23 @@ export default function StudentPortalScreen() {
       {tab === 'caudalam' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <CauDaLamNhanh token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
+            {/* Bản vẽ tối giản 09/10: thẻ "Ca kiểm tra gần nhất" chuyển từ Sảnh sang đầu màn Câu đã làm — cùng số, cùng lối vào Lịch sử ca. */}
+            <CauDaLamNhanh
+              token={auth.token}
+              hoTen={auth.hoTen}
+              sbd={auth.sbd}
+              lop={auth.lop}
+              onVe={() => setTab(null)}
+              caGanNhat={cheDo2 && dsChuaCongBo !== null ? chuTheCaGanNhat(dungLichSuCa(dsLichSu, dsChuaCongBo)) : null}
+              onLichSuCa={
+                cheDo2
+                  ? () => {
+                      setVeSauLichSuCa('caudalam')
+                      setTab('lichsuca')
+                    }
+                  : undefined
+              }
+            />
           </Suspense>
         </div>
       )}
@@ -2129,6 +2150,7 @@ export default function StudentPortalScreen() {
             onChuyenSangKhacPhuc={() => setTab(cheDo2 ? null : 'khacphuc')}
             onChuyenSangBtvn={() => setTab(cheDo2 ? null : 'btvn')}
             onChuyenSangVaoThi={() => setTab('vaothi')}
+            onDangXuat={hoiDangXuat}
           />
           </Suspense>
         )}

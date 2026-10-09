@@ -51,6 +51,8 @@ export type DaoCall=(action:string,data?:Record<string,unknown>)=>Promise<DaoKet
 export type ManDao='dao'|'so-tay'|'tui-do'|'than-thu'
 export interface DaoThanThuProps{sbd:string;/** Token phiên game (chỉ để nối Cửa hàng phụ kiện thật). */token?:string;/** Cửa vào từ ngoài (Bảng nhiệm vụ): mở thẳng Cửa hàng khi máy chủ báo `shopBat`. */moShopLucDau?:boolean;/** Cửa vào từ ngoài (Sảnh bản đồ 2.0, khoá `game-v2:man-dau`=`tui-do`): mở thẳng Túi đồ. */moTuiDoLucDau?:boolean;/** BẢN DUYỆT V2 (09/10): khoá `game-v2:man-dau`=`than-thu` ⇒ mở thẳng màn "Thần thú của em" (chỉ Game Hóa 2.0). */moThanThuLucDau?:boolean;profile:DaoProfile;doanMo:boolean;call:DaoCall;exp?:DaoExp|null;chuoiNgay?:number;tasks?:{id:string;dang:string}[];moiDoan?:boolean
  onMoDoan:()=>void;onMoVoDai?:()=>void;onMoTienBo?:()=>void;onDong:()=>void
+ /** Đăng xuất khỏi máy (cổng học sinh hỏi lại trước) — màn "Thần thú của em" V2 vẽ hàng chữ "Đăng xuất" (bản vẽ tối giản 09/10). Vắng ⇒ không vẽ. */
+ onDangXuat?:()=>void
  /** GAME HÓA 2.0: `hoa2-sanh` trả `cheDo2:true` ⇒ màn Đảo dùng 4 màn mới (`../dao2/`). Vắng / false ⇒ Đảo cũ nguyên vẹn. */
  cheDo2?:boolean
  /** Phản hồi `hoa2-sanh` Game.tsx đã đọc (dùng lại cho lần vẽ đầu, khỏi gọi lại). */

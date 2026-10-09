@@ -24,8 +24,24 @@ export interface ChienDichSanh {
   thanhThaoTangTu: string | null
 }
 
+/**
+ * Một bài trong Hành trình của em (bản vẽ tối giản thầy chốt 09/10 · trường CHỈ-THÊM `hanhTrinh.bai` của `hoa2-sanh`).
+ * `tangMo` = tầng em ĐANG LUYỆN của bài (1 Nền · 2 Hiểu · 3 Vận dụng · 4 Tổng hợp): tầng nhỏ hơn đã vững, tầng lớn hơn còn khoá.
+ * `vung` = "Dạng vững a/b" của bài (máy chủ chưa tính ⇒ vắng/null ⇒ không vẽ).
+ */
+export interface BaiHanhTrinh {
+  khoa: string
+  ten: string
+  tangMo: 1 | 2 | 3 | 4
+  vung?: { a: number; b: number } | null
+}
+
 export interface SanhHoa2 {
-  hanhTrinh?: { tang: number; toiThieu: number; daLam: number; daXep: number; conThieu: number; soChang: number; changHienTai: number; cauTrongChang: number }
+  hanhTrinh?: {
+    tang: number; toiThieu: number; daLam: number; daXep: number; conThieu: number; soChang: number; changHienTai: number; cauTrongChang: number
+    /** Tầng từng bài (máy chủ mới). Vắng / sai kiểu / rỗng ⇒ màn Hành trình chỉ hiện tầng chung + chặng (không bịa). */
+    bai?: BaiHanhTrinh[]
+  }
   ngay: string
   chienDich: ChienDichSanh | null
   /** Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ tên + ngày, không lộ câu. Máy chủ cũ không gửi ⇒ null. */
@@ -242,8 +258,29 @@ function docHanhTrinh(x: unknown): Pick<SanhHoa2, 'hanhTrinh'> {
   const o = x as Record<string, unknown>
   const tang = Number(o.tang)
   if (![1, 2, 3, 4].includes(tang) || ![24, 30, 36].includes(Number(o.toiThieu))) return {}
+  const bai = docBaiHanhTrinh(o.bai)
   return { hanhTrinh: { tang, toiThieu: soKhongAm(o.toiThieu), daLam: soKhongAm(o.daLam), daXep: soKhongAm(o.daXep),
-    conThieu: soKhongAm(o.conThieu), soChang: soKhongAm(o.soChang), changHienTai: soKhongAm(o.changHienTai), cauTrongChang: soKhongAm(o.cauTrongChang) } }
+    conThieu: soKhongAm(o.conThieu), soChang: soKhongAm(o.soChang), changHienTai: soKhongAm(o.changHienTai), cauTrongChang: soKhongAm(o.cauTrongChang),
+    ...(bai ? { bai } : {}) } }
+}
+
+/** Đọc PHÒNG THỦ `hanhTrinh.bai`: không phải mảng ⇒ null; phần tử thiếu khoá/tên hoặc `tangMo` ngoài 1–4 ⇒ bỏ phần tử ấy;
+ *  `vung` sai kiểu (a, b không phải số, b ≤ 0) ⇒ bỏ riêng `vung`. Không còn bài hợp lệ nào ⇒ null (màn hiện tầng chung). */
+export function docBaiHanhTrinh(x: unknown): BaiHanhTrinh[] | null {
+  if (!Array.isArray(x)) return null
+  const ra: BaiHanhTrinh[] = []
+  for (const p of x) {
+    if (!p || typeof p !== 'object') continue
+    const o = p as Record<string, unknown>
+    const khoa = typeof o.khoa === 'string' ? o.khoa.trim() : ''
+    const ten = typeof o.ten === 'string' ? o.ten.trim() : ''
+    const tangMo = o.tangMo
+    if (!khoa || !ten || (tangMo !== 1 && tangMo !== 2 && tangMo !== 3 && tangMo !== 4)) continue
+    const v = o.vung && typeof o.vung === 'object' ? (o.vung as Record<string, unknown>) : null
+    const vung = v && laSo(v.a) && laSo(v.b) && v.b >= 1 && v.a >= 0 ? { a: Math.min(Math.floor(v.a), Math.floor(v.b)), b: Math.floor(v.b) } : null
+    ra.push({ khoa, ten, tangMo, ...(vung ? { vung } : {}) })
+  }
+  return ra.length > 0 ? ra : null
 }
 
 /** OMNI 3: chỉ gắn trường `omni` khi máy chủ gửi `omni.bat === true` (vắng ⇒ đối tượng Sảnh y hệt trước). */
