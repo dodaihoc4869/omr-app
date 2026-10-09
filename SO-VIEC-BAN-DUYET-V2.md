@@ -28,3 +28,20 @@ Thầy nhắn thêm giữa chừng (nguyên văn): "làm hết chưa đẩy, cho
 - [x] Làm hết các mục trên (trừ phần 2g ghi rõ) | bằng chứng: bảng trong `BAN-DUYET-V2-build-status.md`.
 - [x] CHƯA ĐẨY | bằng chứng: chỉ commit cục bộ; không push, không Pages/Worker, không gộp main (đẩy nhánh sẽ kích hoạt các workflow `branches-ignore: [main]`).
 - [x] Cho thầy xem | bằng chứng: ảnh Chromium thật (JPG ≤ 150 KB) gửi kèm báo cáo.
+
+## Đợt 2 — TỐI GIẢN 3 APP theo bản vẽ (canvas https://claude.ai/artifact/QgWEUL3q9aVgwydJwLd8oZ)
+
+Thầy hỏi (nguyên văn): "nếu để bạn tối ưu lại giao diện app cho trực quan siêu đẹp và đồng bộ theo đúng thuật toán hiện tại cho cả 3 app học sinh gv và ph thì bạn sẽ làm thế nào để giao diện khoa học rút gọn hết những thứ rườm rà. Vẽ trước cho tôi xem để tôi chốt"
+- [x] Vẽ trước cho thầy xem | bằng chứng: canvas 14 màn (00 nguyên tắc, 00b bỏ/gộp, HS 1–5, PH 1–3, GV 1–4).
+
+Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Thêm 5. Bật lại 6. Giữ nguyên — Build rồi đẩy luôn"
+- [ ] 1. Tên đảo thống nhất "Bát Linh Đảo" (sửa bảng từ chuẩn + chữ hiển thị "Đảo thần thú") | bằng chứng: (chưa có)
+- [ ] 2. Phụ huynh 3 mục (Hôm nay · Tiến bộ · Ca kiểm tra), Hôm nay 4 khối | bằng chứng: (chưa có)
+- [ ] 3. Bỏ hẳn BTVN / Bài gia đình giao ở chế độ Game 2.0 (không thêm lối vào) | bằng chứng: (chưa có)
+- [ ] 4. Máy chủ gửi tầng TỪNG bài cho màn Hành trình của em | bằng chứng: (chưa có)
+- [ ] 5. Bật lại "Thử sức thêm" khi chạy Hành trình (ô trong "Luyện thêm") | bằng chứng: (chưa có)
+- [ ] 6. Giữ nguyên phụ đề Tu luyện | bằng chứng: (chưa có)
+- [ ] Build giao diện HS theo bản vẽ (Hôm nay · Hành trình · Thần thú · Câu đã làm; Làm câu) | bằng chứng: (chưa có)
+- [ ] Build giao diện GV theo bản vẽ (5 mục: Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + Cài đặt) | bằng chứng: (chưa có)
+- [ ] Sửa 4 lỗi đã thấy ở bản V2 (rương lặp số, khối Hành trình vẽ 2 lần, bước "Thử thách +1 bậc", 2 nút Vào thi) | bằng chứng: (chưa có)
+- [ ] Đẩy luôn: kiểm không có ca thi mở → PR vào main → Actions phát hành Pages + Worker | bằng chứng: (chưa có)
