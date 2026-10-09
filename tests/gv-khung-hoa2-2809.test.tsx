@@ -83,7 +83,7 @@ const bang = (c: ChienDichTom, thanhThao: number): BangChienDich => ({
 
 beforeEach(() => {
   useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
-  useSoDemGv.setState({ caMo: null, chienDichChay: null, canDayLai: null, giaoTuCa: null })
+  useSoDemGv.setState({ caMo: null, chienDichChay: null, canDayLai: null, canThayChua: null, giaoTuCa: null, moHanhTrinh: null })
   useAppStore.getState().setScreen('tongquan')
 })
 afterEach(() => {
@@ -94,15 +94,21 @@ afterEach(() => {
 })
 
 describe('thanh bên 2.0 · số đếm cạnh mục', () => {
-  it('chưa biết số ⇒ không vẽ; có số ⇒ "1 mở", số chiến dịch, số câu cần dạy lại', () => {
+  // ĐỔI CÓ CHỦ Ý 09/10 — bản vẽ tối giản thầy chốt 09/10: thanh bên còn Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề ⇒ số cạnh Hành trình là
+  // "Cần thầy chữa" (một khái niệm một tên); bỏ số chiến dịch đang chạy và số câu cần dạy lại (mục Chiến dịch luyện / Chữa trên lớp đã rời thanh bên).
+  it('chưa biết số ⇒ không vẽ; có số ⇒ số Cần thầy chữa cạnh Hành trình, "1 mở" cạnh Ca kiểm tra', () => {
     const { container, rerender } = render(<ThanhBenTrai />)
     expect(container.querySelectorAll('.ben-trai-dem')).toHaveLength(0)
     useSoDemGv.getState().datSo({ caMo: 1, chienDichChay: 4, canDayLai: 9 })
     rerender(<ThanhBenTrai />)
+    expect([...container.querySelectorAll('.ben-trai-dem')].map((e) => e.textContent)).toEqual(['1 mở'])
+    useSoDemGv.getState().datSo({ canThayChua: 7 })
+    rerender(<ThanhBenTrai />)
     const dem = [...container.querySelectorAll('.ben-trai-dem')].map((e) => e.textContent)
-    expect(dem).toEqual(['1 mở', '4', '9'])
-    expect(screen.getByRole('button', { name: 'Tổng quan' }).getAttribute('aria-current')).toBe('page')
+    expect(dem).toEqual(['7', '1 mở'])
+    expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('title')).toBe('Ca kiểm tra · 1 ca đang mở')
+    expect(screen.getByRole('button', { name: 'Hành trình' }).getAttribute('title')).toBe('Hành trình · Cần thầy chữa: 7 chỗ')
   })
 })
 

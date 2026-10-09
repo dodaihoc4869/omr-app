@@ -4,12 +4,15 @@
 //   ≥ 1100 px  ngăn kéo 264 px (logo + chữ, nút "Mở ca kiểm tra", mục có nhãn, Cài đặt ở đáy);
 //   880–1100   thanh rail 88 px (chỉ biểu tượng + nhãn ngắn dưới biểu tượng);
 //   < 880      không hiện thanh này — `BottomNav` (thanh đáy) dùng chính danh sách ấy.
-// GAME HÓA 2.0 (cờ `co.bat`, bản vẽ thầy chốt 28/09 docs/ban-ve-gv-2809/GV-ThanhBen + RA-SOAT.md mục 1):
-//   "Mở ca kiểm tra" (nút chính) · Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh; ĐÁY: Kho đề · Cài đặt.
-//   Bỏ nhãn "Thêm…" và dòng "6,022 · 10²³" (logo = "Đỗ Đại Học · Giáo viên"). Ẩn Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo
-//   tuần. Số đếm cạnh mục lấy từ `useSoDemGv` (màn đã tải ghi vào) — chưa biết thì không vẽ. Cờ tắt ⇒ đúng danh sách cũ.
+// GAME HÓA 2.0 (cờ `co.bat`) — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (GV-HomNay/GV-HanhTrinh/BoGop): 5 mục
+//   Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề; ĐÁY: Cài đặt. KHÔNG còn nút riêng "Mở ca kiểm tra" (mở ca nằm trong màn
+//   Ca kiểm tra — App.tsx đặt nút ở đầu màn ấy). Chiến dịch luyện · Chữa trên lớp · Gỡ nút thắt rời thanh bên nhưng GIỮ mã màn
+//   (`chiendich` = Hành trình; `goilenbang`, `bangonutthat` vẫn mở được bằng `setScreen` và vào qua các thẻ của Hành trình — mục
+//   Hành trình sáng khi đứng ở hai màn ấy). Mã màn `tongquan` nay dựng màn Hôm nay (`GvHomNayScreen`).
+//   Logo = "Đỗ Đại Học · Giáo viên". Số đếm cạnh mục lấy từ `useSoDemGv` (màn đã tải ghi vào) — chưa biết thì không vẽ. Cờ tắt ⇒ đúng danh sách cũ.
+//   (Lịch sử: 28/09 docs/ban-ve-gv-2809/GV-ThanhBen — "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh.)
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { CalendarDays, ClipboardCheck, FileText, Flag, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
+import { CalendarDays, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
 import { AnhLogo } from './LogoVai'
@@ -31,7 +34,8 @@ export interface MucDieuHuong {
   cuoi?: boolean
 }
 
-/** BÀN GỠ NÚT THẮT (Vòng học v2, 02/10): thầy gỡ bước cuối cho câu em đã nỗ lực thật mà vẫn vướng. Hiện ở CẢ hai chế độ (cờ Hóa 2 bật/tắt). */
+/** BÀN GỠ NÚT THẮT (Vòng học v2, 02/10): thầy gỡ bước cuối cho câu em đã nỗ lực thật mà vẫn vướng. Cờ Hóa 2 TẮT: một mục thanh bên.
+ *  Cờ BẬT (09/10, bản vẽ tối giản): vào qua Hành trình › Cần thầy chữa › Gỡ nút thắt (màn `bangonutthat` giữ nguyên). */
 export const MUC_GO_NUT_THAT: MucDieuHuong = { id: 'bangonutthat', ten: 'Gỡ nút thắt', ngan: 'Gỡ nút', icon: LifeBuoy }
 
 export const MUC_DIEU_HUONG: MucDieuHuong[] = [
@@ -48,31 +52,22 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 
-/** GAME HÓA 2.0 — bốn việc + Học sinh (bản vẽ GV-ThanhBen). Thanh đáy điện thoại dùng CHÍNH danh sách này (nhãn `ngan`). */
+/** GAME HÓA 2.0 — năm mục (bản vẽ tối giản thầy chốt 09/10). Thanh đáy điện thoại dùng CHÍNH danh sách này (nhãn `ngan`, ≤ 5 mục — luật C6). */
 export const MUC_HOA2_CHINH: MucDieuHuong[] = [
-  { id: 'tongquan', ten: 'Tổng quan', ngan: 'Tổng quan', icon: Home },
+  { id: 'tongquan', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home },
+  { id: 'chiendich', ten: 'Hành trình', ngan: 'Hành trình', icon: Route, con: ['goilenbang', 'bangonutthat'] },
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
-  { id: 'chiendich', ten: 'Chiến dịch luyện', ngan: 'Chiến dịch', icon: Flag },
-  { id: 'goilenbang', ten: 'Chữa trên lớp', ngan: 'Chữa bài', icon: Presentation },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
+  { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library },
 ]
-/** GAME HÓA 2.0 — hai mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). "Gỡ nút thắt" đứng ĐẦU danh sách này để điện
- *  thoại vào được qua bánh răng (thanh đáy giữ ≤ 5 mục — luật C6); ở ngăn kéo / rail nó được vẽ trong nhóm chính, ngay sau "Chữa trên lớp"
- *  (`MUC_HOA2_BEN`), không lặp ở đáy. */
-export const MUC_HOA2_DAY: MucDieuHuong[] = [
-  MUC_GO_NUT_THAT,
-  { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library, cuoi: true },
-  { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
-]
-/** Ngăn kéo / rail khi Game Hóa 2.0 bật: nhóm chính + "Gỡ nút thắt" ngay sau "Chữa trên lớp" (nhóm dạy học); đáy chỉ Kho đề · Cài đặt. */
-export const MUC_HOA2_BEN: MucDieuHuong[] = MUC_HOA2_CHINH.flatMap((m) => (m.id === 'goilenbang' ? [m, MUC_GO_NUT_THAT] : [m]))
-const MUC_HOA2_BEN_DAY: MucDieuHuong[] = MUC_HOA2_DAY.filter((m) => m.id !== MUC_GO_NUT_THAT.id)
+/** GAME HÓA 2.0 — mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). */
+export const MUC_HOA2_DAY: MucDieuHuong[] = [{ id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true }]
 
 /** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`. */
 export const MAN_AN_KHI_HOA2: readonly ScreenId[] = ['examhub', 'giaobtvn', 'cauhoi', 'khodegiao']
 /** Màn CHỈ có khi Game Hóa 2.0 bật — cờ tắt thì App chuyển về Hôm nay. */
 export const MAN_CHI_HOA2: readonly ScreenId[] = ['tongquan', 'chiendich']
-/** Màn đầu của app thầy khi Game Hóa 2.0 bật. */
+/** Màn đầu của app thầy khi Game Hóa 2.0 bật — mã `tongquan`, từ 09/10 dựng màn "Hôm nay" (GvHomNayScreen). */
 export const MAN_DAU_HOA2: ScreenId = 'tongquan'
 
 /** Mục nào đang sáng ở màn `screen` (mục có màn con tô sáng cả khi đứng ở màn con). `hoa2` = dùng danh sách Game Hóa 2.0. */
@@ -81,11 +76,11 @@ export function mucDangSang(screen: ScreenId, hoa2 = false): ScreenId | null {
   return ds.find((m) => m.id === screen || (m.con ?? []).includes(screen))?.id ?? null
 }
 
-/** Số đếm cạnh mục (2.0): chữ ngắn + nhãn đầy đủ cho trình đọc màn hình. `null` ⇒ không vẽ. */
-export function soDemMuc(id: ScreenId, so: { caMo: number | null; chienDichChay: number | null; canDayLai: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' } | null {
+/** Số đếm cạnh mục (2.0): chữ ngắn + nhãn đầy đủ cho trình đọc màn hình. `null` / 0 ⇒ không vẽ.
+ *  09/10: cạnh Hành trình là số "Cần thầy chữa" (một khái niệm một tên — bỏ số chiến dịch đang chạy / câu cần dạy lại ở thanh bên). */
+export function soDemMuc(id: ScreenId, so: { caMo: number | null; canThayChua: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' } | null {
   if (id === 'lichsuca' && so.caMo) return { chu: `${so.caMo} mở`, nhan: `${so.caMo} ca đang mở`, tone: 'la' }
-  if (id === 'chiendich' && so.chienDichChay) return { chu: String(so.chienDichChay), nhan: `${so.chienDichChay} chiến dịch đang chạy`, tone: 'xam' }
-  if (id === 'goilenbang' && so.canDayLai) return { chu: String(so.canDayLai), nhan: `${so.canDayLai} câu cần dạy lại`, tone: 'do' }
+  if (id === 'chiendich' && so.canThayChua) return { chu: String(so.canThayChua), nhan: `Cần thầy chữa: ${so.canThayChua} chỗ`, tone: 'do' }
   return null
 }
 
@@ -95,13 +90,12 @@ export default function ThanhBenTrai() {
   const hoa2 = useHoa2Bat()
   const sang = mucDangSang(screen, hoa2)
   const caMo = useSoDemGv((s) => s.caMo)
-  const chienDichChay = useSoDemGv((s) => s.chienDichChay)
-  const canDayLai = useSoDemGv((s) => s.canDayLai)
+  const canThayChua = useSoDemGv((s) => s.canThayChua)
 
   const nut = (m: MucDieuHuong, phu = false) => {
     const Icon = m.icon
     const dang = sang === m.id
-    const dem = hoa2 ? soDemMuc(m.id, { caMo, chienDichChay, canDayLai }) : null
+    const dem = hoa2 ? soDemMuc(m.id, { caMo, canThayChua }) : null
     return (
       <button key={m.id} type="button" onClick={() => setScreen(m.id)} aria-current={dang ? 'page' : undefined} className={`ben-trai-muc${phu ? ' ben-trai-muc--phu' : ''}${dang ? ' dang' : ''}`} aria-label={m.ten} title={dem ? `${m.ten} · ${dem.nhan}` : m.ten}>
         <span className="ben-trai-bieu-tuong">
@@ -123,21 +117,18 @@ export default function ThanhBenTrai() {
   if (hoa2) {
     return (
       <nav className="ben-trai" aria-label="Điều hướng chính" data-hoa2="">
-        <button type="button" onClick={() => setScreen(MAN_DAU_HOA2)} className="ben-trai-logo ben-trai-logo--gv2" title="Về Tổng quan">
+        <button type="button" onClick={() => setScreen(MAN_DAU_HOA2)} className="ben-trai-logo ben-trai-logo--gv2" title="Về Hôm nay">
           <AnhLogo vai="gv" size={40} />
           <span className="ben-trai-logo-chu">
             <span className="ben-trai-logo-ten">Đỗ Đại Học</span>
             <span className="ben-trai-logo-vai">Giáo viên</span>
           </span>
         </button>
-        <button type="button" onClick={() => setScreen('examsetup')} className="ben-trai-nut-ca" aria-label="Mở ca kiểm tra">
-          <Plus size={22} aria-hidden="true" />
-          <span className="ben-trai-nut-ca-chu">Mở ca kiểm tra</span>
-        </button>
-        <div className="ben-trai-danh-sach">{MUC_HOA2_BEN.map((m) => nut(m))}</div>
+        {/* 09/10: KHÔNG còn nút riêng "Mở ca kiểm tra" — mở ca nằm trong màn Ca kiểm tra (bản vẽ tối giản thầy chốt). */}
+        <div className="ben-trai-danh-sach">{MUC_HOA2_CHINH.map((m) => nut(m))}</div>
         <div className="ben-trai-cuoi ben-trai-cuoi--gv2">
           <div className="ben-trai-vach" role="separator" />
-          {MUC_HOA2_BEN_DAY.map((m) => nut(m, true))}
+          {MUC_HOA2_DAY.map((m) => nut(m, true))}
         </div>
       </nav>
     )

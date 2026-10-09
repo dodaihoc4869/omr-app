@@ -17,7 +17,7 @@ import { caChotOmni, docBangOmniCua, docCoOmni, omniApChoLop, type GoiCaChotOmni
 import type { BangOmni } from '../../../server/src/omni-kieu'
 import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
-import { hienNgay, mocHetHan } from './ngay'
+import { coHanNop, hienNgay, mocHetHan } from './ngay'
 import { dungToChieu, hoiNoiDungChoToChieu, laLoiMaBiMat, napBangTra, napNoiDungChoToChieu, type CauGoc, type LoiLenhThay, type OChieu } from './to-chieu'
 import { useGhiToChieu } from './ghi-to-chieu'
 import './chien-dich.css'
@@ -302,7 +302,9 @@ export default function LenBangChienDich() {
             {dsCd.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.ten}
-                {c.lop ? ` · Lớp ${c.lop}` : ''} · hạn nộp {hienNgay(c.hanNop, false)}
+                {c.lop ? ` · Lớp ${c.lop}` : ''}
+                {/* Hành trình (hạn giả 9999-12-31) không ghi hạn nộp (thầy chốt 09/10). */}
+                {coHanNop(c) ? ` · hạn nộp ${hienNgay(c.hanNop, false)}` : ''}
                 {c.trangThai === 'da_dong' ? ' · đã đóng' : c.hetHan ? ' · hết hạn nộp' : ''}
               </option>
             ))}

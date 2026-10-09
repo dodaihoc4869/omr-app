@@ -32,9 +32,19 @@ export function hienNgay(ngay: string, coNam = true): string {
   return coNam ? `${thu} ${m[3]}/${m[2]}/${m[1]}` : `${thu} ${m[3]}/${m[2]}`
 }
 
+/** HẠN GIẢ (bản vẽ tối giản thầy chốt 09/10): Hành trình không có hạn nộp — máy chủ lưu `9999-12-31` cho đủ cột. Mọi chỗ in hạn nộp hỏi hàm này
+ *  trước: hạn giả ⇒ KHÔNG ghi hạn (trước đây Tổng quan in "còn ~2,9 triệu ngày"). */
+export function laHanGia(hanNop: string | null | undefined): boolean {
+  return typeof hanNop === 'string' && hanNop >= '9999'
+}
+/** Chiến dịch có hạn nộp thật để ghi lên màn (Hành trình hoặc hạn giả ⇒ không). */
+export function coHanNop(cd: { hanNop: string; hanhTrinh?: boolean }): boolean {
+  return !cd.hanhTrinh && !laHanGia(cd.hanNop) && laNgay(cd.hanNop)
+}
+
 /** "23:59 · Chủ Nhật 04/10/2026" — mốc hết hạn nộp. */
 export function hienHanNop(ngay: string, coNam = true): string {
-  if (ngay === '9999-12-31') return 'Học mỗi ngày'
+  if (laHanGia(ngay)) return 'Học mỗi ngày'
   const t = hienNgay(ngay, coNam)
   return t ? `23:59 · ${t}` : ''
 }
@@ -48,6 +58,7 @@ export function mocHetHan(hanNop: string): number {
 
 /** "còn 1 ngày 5 giờ" / "còn 3 giờ" / "còn dưới 1 giờ"; đã qua ⇒ "đã hết hạn nộp". */
 export function conLai(hanNop: string, nowMs: number): string {
+  if (laHanGia(hanNop)) return ''
   const het = mocHetHan(hanNop)
   if (!Number.isFinite(het)) return ''
   const con = het - nowMs

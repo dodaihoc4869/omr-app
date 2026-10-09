@@ -99,7 +99,7 @@ export default function CongTacHoa2() {
           noiDung={
             hoi.bat ? (
               <p>
-                Học sinh {phamVi} chỉ còn Sảnh game (Đảo thần thú, Đoàn Hộ Tống, Câu đã làm) và vào ca kiểm tra khi có ca. Bài tập về nhà (BTVN) ngừng giao và ngừng hiện;
+                Học sinh {phamVi} chỉ còn Sảnh game (Bát Linh Đảo, Đoàn Hộ Tống, Câu đã làm) và vào ca kiểm tra khi có ca. Bài tập về nhà (BTVN) ngừng giao và ngừng hiện;
                 app phụ huynh ngừng. App thầy chỉ còn Ca kiểm tra và Lên bảng (Học sinh, Ngân hàng đề, Cài đặt nằm trong “Thêm…”). Tắt lại lúc nào cũng được.
               </p>
             ) : (

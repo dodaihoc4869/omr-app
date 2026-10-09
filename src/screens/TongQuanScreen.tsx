@@ -1,4 +1,5 @@
 // TỔNG QUAN — trang đầu app thầy khi Game Hóa 2.0 bật (thầy chốt 28/09 · docs/ban-ve-gv-2809/GV-TongQuan).
+// 09/10 (bản vẽ tối giản thầy chốt): màn đầu nay là "Hôm nay" (`GvHomNayScreen`, cùng mã màn `tongquan`); màn này GIỮ MÃ, App không còn dựng.
 // "Hôm nay có gì": thẻ số (nhãn + đơn vị + mẫu số + dòng so sánh), chiến dịch đang chạy, ca đang mở, việc cần làm,
 // bài nộp 14 ngày. CHỈ dùng API sẵn có: `danhSachCa` + `/gv/chien-dich` danh-sach + bang. Không đổi máy chủ.
 // Phép tính thuần ở `src/lib/tong-quan-gv.ts` (có test). Ghi số đếm cạnh mục thanh bên vào `useSoDemGv`.
@@ -13,7 +14,7 @@ import { useSoDemGv } from '../lib/so-dem-gv'
 import { danhSach, docBang, type BangChienDich, type ChienDichTom } from '../components/chien-dich/api'
 import { KHOA_CHON_CHIEN_DICH } from '../components/chien-dich/LenBangChienDich'
 import { chuHan } from '../components/chien-dich/DsChienDichDaGiao'
-import { hienNgay, ngayVn } from '../components/chien-dich/ngay'
+import { coHanNop, hienNgay, ngayVn } from '../components/chien-dich/ngay'
 import { caConEmDangLam } from './LichSuCaScreen'
 import {
   CHU_NHIP,
@@ -247,11 +248,16 @@ export default function TongQuanScreen() {
                             <span className="gv2-nhat">—</span>
                           )}
                         </div>
-                        <div>
-                          <div className="gvm-nho">Hạn nộp</div>
-                          <div className="gv2-dam">{chuHan(d.cd.hanNop, ngayVn(now))}</div>
-                          <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
-                        </div>
+                        {/* Hành trình (`hanhTrinh` hoặc hạn giả 9999-12-31) không có hạn nộp ⇒ không ghi (thầy chốt 09/10; trước đây in "còn ~2,9 triệu ngày"). */}
+                        {coHanNop(d.cd) ? (
+                          <div>
+                            <div className="gvm-nho">Hạn nộp</div>
+                            <div className="gv2-dam">{chuHan(d.cd.hanNop, ngayVn(now))}</div>
+                            <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
+                          </div>
+                        ) : (
+                          <div />
+                        )}
                       </li>
                     ))}
                   </ul>
