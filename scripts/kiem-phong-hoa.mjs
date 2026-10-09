@@ -63,7 +63,7 @@ const DAU = ['́', '̀', '̉', '̃', '̣']
 const thuong = new Set(['đ', 'o', 'h'])
 for (const g of GOC_CHU) { thuong.add(g); for (const d of DAU) thuong.add((g + d).normalize('NFC')) }
 const CHU = [...thuong].flatMap((c) => [c.toUpperCase(), c])
-const CHUOI_THAT = ['PHÁ 3 Ổ PHỤC KÍCH', 'BÁT LINH ĐẢO · CẦU CHƯA HẠ', 'CHỐT ĐÁP ÁN · TUNG CHIÊU', 'CHỌN THẦN THÚ CỦA EM', 'BẠN ĐỒNG HÀNH HỢP NHẤT HÔM NAY']
+const CHUOI_THAT = ['PHÁ 3 Ổ PHỤC KÍCH', 'BÁT LINH ĐẢO · CẦU CHƯA HẠ', 'CHỐT ĐÁP ÁN', 'CHỌN THẦN THÚ CỦA EM', 'BẠN ĐỒNG HÀNH HỢP NHẤT HÔM NAY']
 
 const DO_DAM = [800, 700]
 function trang(thuTu) {

@@ -48,7 +48,7 @@ async function lenDuong(tong = 2) {
   fireEvent.click(nut)
   await screen.findByText(new RegExp(`^ẢI 1/${tong}`))
 }
-const chotI = () => { fireEvent.click(screen.getByRole('button', { name: /^B\./ })); fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU' })) }
+const chotI = () => { fireEvent.click(screen.getByRole('button', { name: /^B\./ })); fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' })) }
 const nhapIII = (v: string) => fireEvent.change(screen.getByRole('textbox', { name: 'Đáp án của em' }), { target: { value: v } })
 const nutChot = () => screen.getByRole('button', { name: /CHỐT ĐÁP ÁN|Nhập đáp án để tung chiêu/ }) as HTMLButtonElement
 const chipSoat = () => screen.queryByRole('switch', { name: CHU_SOAT_LAI }) as HTMLInputElement | null

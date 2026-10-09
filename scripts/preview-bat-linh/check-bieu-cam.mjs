@@ -28,7 +28,7 @@ for(const [answer,emotion]of [['A','sai'],['B','dung']]){
  await p.getByRole('button',{name:/LÊN ĐƯỜNG/}).click()
  await p.locator('.dao2-canh .bl-bieu-cam[data-cam-xuc="nghi"]').waitFor()
  await p.locator('.pa-hang').nth(answer==='A'?0:1).click()
- await p.getByRole('button',{name:'CHỐT ĐÁP ÁN · TUNG CHIÊU',exact:true}).click()
+ await p.getByRole('button',{name:'CHỐT ĐÁP ÁN',exact:true}).click()
  await p.locator(`.bl-phan-hoi-thu .bl-bieu-cam[data-cam-xuc="${emotion}"]`).waitFor()
  await p.getByRole('button',{name:/ĐÃ ĐỌC LỜI GIẢI · SANG ẢI 2/}).click()
  await p.locator('.dao2-canh .bl-bieu-cam[data-cam-xuc="nghi"]').waitFor();checks++

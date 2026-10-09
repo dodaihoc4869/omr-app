@@ -1,4 +1,5 @@
 import './exam-setup.css'
+import BangMaTranDe from '../components/ma-tran-de/BangMaTranDe'
 import '../components/ca-thi/ca-thi.css'
 import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026 } from '../lib/ma-tran-hoa-2026'
 // MỞ CA KIỂM TRA — tối giản theo yêu cầu thầy (2026-09-02): đề đã tự về từ
@@ -556,6 +557,8 @@ export default function ExamSetupScreen() {
                     {selectedSources.length > 0 ? 'Đổi đề khác' : 'Chọn đề kiểm tra'}
                   </button>
                 </div>
+                {/* BẢN DUYỆT V2 (thầy 09/10): ma trận đề chuyên đề × mức độ — chỉ đọc, đếm đúng các câu sẽ dùng (đã bỏ câu tự luận). */}
+                {selectedSources.length > 0 && <BangMaTranDe nguon={locMoCa.nguon} rut={!!soCauRaDe} />}
                 {!chuan2026 && selectedSources.length > 0 && (
                   <div className="ct-hang-chip" style={{ marginTop: 10 }} role="group" aria-label="Cách lấy câu">
                     <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'nguyen'} onClick={() => setBoRut(null)}>

@@ -204,7 +204,7 @@ export default function DoanTran(p: Props) {
       <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc">{nhanThe}</b></div><div className="dh-de">{cau?.loiNhan ?? 'Đang tải câu của em…'}</div></section>
     ) : (
       <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={!!p.dangChot || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
-        dau={<><b className="dh-vien-thuoc">{nhanThe}</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span>{v2 && cau?.nhanNo ? <small className="dh-nhan-no" data-khoi="nhan-no">{cau.nhanNo}</small> : null}</>}
+        dau={<><b className="dh-vien-thuoc">{nhanThe}</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span>{v2 && cau?.nhanNo ? <small className="dh-nhan-no" data-khoi="nhan-no">{cau.nhanNo}</small> : null}{v2 ? <small className="dh2-v2-so-cau">Câu {tran.hiep}/{tran.soHiep}</small> : null}</>}
         gach={gach} bua={bua} xemLaiChuan={v2 ? { stt: tran.hiep } : undefined} onBuocSai={p.onBuocSai}
         cuoi={(p.onChuaChac || p.onSoatLai) && mo && !tran.laTrum && !cau?.daChot && !cau?.rut ? (
           // OMNI 3 · chip "Chưa chắc" TRONG thẻ câu, dưới phương án cuối (05/10): đặt thành hàng riêng dưới thẻ thì màn Đoàn (vừa khít máy)

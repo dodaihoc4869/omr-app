@@ -1,0 +1,122 @@
+/* BẢN DUYỆT V2 · MÀN 08 (Bát Linh Đảo) + 09 (Đoàn Hộ Tống) — LỚP DA Bảng G cho màn trận (thầy ra lệnh 09/10/2026).
+ * Bố cục 40% chiến trường / 60% câu hỏi đã có sẵn (TrongAi `TI_MAC_DINH=40`, DoanTran `--dh2-ti` mặc định 40; em kéo được, lưu trên máy).
+ * Tệp này chỉ đổi DA: cột câu hỏi thành tấm ngà voi bo 24px, thẻ môn + "Câu k/n", nút chốt vàng nổi khối, nút đòn ngọc/vàng, cấp thần thú.
+ * Bộ chọn mở đầu `html:root body` để thắng lớp da Bát Linh (game-toan-bo.css) mà không sửa tệp ấy. Chỉ biến màu Bảng G + biến sẵn có. */
+
+/* ───────── Bát Linh Đảo (TrongAi) ───────── */
+html:root body .dao.dao2 .dao2-ai {
+  --d2-giay: var(--v2-the);
+  --d2-giay-bong: var(--v2-bong-the);
+}
+html:root body .dao.dao2 .dao2-ai .dao2-giay {
+  border-radius: var(--v2-bo);
+  border: 1px solid var(--v2-vien);
+  color: var(--v2-chu);
+}
+html:root body .dao.dao2 .dao2-v2-dau-cau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--v2-chu-phu);
+}
+html:root body .dao.dao2 .dao2-v2-mon,
+html:root body .dh.dh2 .dh2-v2-mon {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--v2-ngoc-nen);
+  color: var(--v2-ngoc-dam);
+  font-weight: 800;
+}
+html:root body .dao.dao2 .dao2-v2-so-cau { font-variant-numeric: tabular-nums; color: var(--v2-chu); }
+html:root body .dao.dao2 .dao2-v2-cap {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--v2-vang-nen);
+  color: var(--v2-vang-chu);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+html:root body .dao.dao2 button.dao2-nut-chot:not(:disabled) {
+  --nut-nen: var(--v2-grad-nut);
+  --nut-chu: var(--v2-tren-vang);
+  --nut-bong: var(--v2-bong-nut);
+  border-radius: var(--v2-bo-vua);
+  font-family: var(--v2-phong-tieu-de);
+  font-weight: 800;
+}
+
+/* ───────── Đoàn Hộ Tống (DoanTran) ───────── */
+html:root body .dh.dh2 .dh2-tran .dh-giay {
+  --nen: var(--v2-the);
+  --the: var(--v2-the);
+  --the-2: var(--v2-the-chim);
+  border-radius: var(--v2-bo);
+  border: 1px solid var(--v2-vien);
+  background: var(--v2-the);
+  color: var(--v2-chu);
+  box-shadow: var(--v2-bong-the);
+}
+html:root body .dh.dh2 .dh-giay-dau .dh-vien-thuoc { background: var(--v2-ngoc-dam); color: var(--v2-tren-ngoc); }
+html:root body .dh.dh2 .dh2-v2-so-cau {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-chu);
+  white-space: nowrap;
+}
+html:root body .dh.dh2 .dh2-tran .dh-don button {
+  border-radius: var(--v2-bo-vua);
+  background: var(--v2-ngoc-nen);
+  color: var(--v2-ngoc-dam);
+  box-shadow: inset 0 0 0 1px var(--v2-ngoc-vien);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html:root body .dh.dh2 .dh2-tran .dh-don button[aria-pressed='true'] {
+  background: var(--v2-grad-nut);
+  color: var(--v2-tren-vang);
+  box-shadow: inset 0 0 0 2px var(--v2-vang-dam), var(--v2-bong-the);
+}
+html:root body .dh.dh2 .dh2-tran .dh-don button:disabled { opacity: .55; }
+html:root body .dh.dh2 .dh2-tran .dh-don button small { color: inherit; opacity: .86; }
+html:root body .dh.dh2 .dh2-nut-chinh:not(:disabled) {
+  background: var(--v2-grad-nut);
+  color: var(--v2-tren-vang);
+  box-shadow: var(--v2-bong-nut);
+  border-radius: var(--v2-bo-vua);
+}
+
+/* ───────── NGANG (cùng điểm ngắt MQ_NGANG): cột câu hỏi thành một tấm ngà voi như bản duyệt ───────── */
+@media (min-width: 1024px), (orientation: landscape) and (min-width: 700px) {
+  html:root body .dao.dao2 .dao2-ai .dao2-ai-phai {
+    padding: 14px;
+    border-radius: var(--v2-bo);
+    background: var(--v2-the);
+    border: 1px solid var(--v2-vien);
+    box-shadow: var(--v2-bong-noi);
+    color: var(--v2-chu);
+  }
+  html:root body .dao.dao2 .dao2-ai .dao2-ai-phai .dao2-giay { box-shadow: none; border: 0; padding: 4px 2px; background: var(--v2-the); }
+  html:root body .dh.dh2 .dh2-tran .dh2-cot-phai {
+    --dh2-chu: var(--v2-chu);
+    --dh2-mo: var(--v2-chu-phu);
+    padding: 14px;
+    border-radius: var(--v2-bo);
+    background: var(--v2-the);
+    border: 1px solid var(--v2-vien);
+    box-shadow: var(--v2-bong-noi);
+    color: var(--v2-chu);
+  }
+  html:root body .dh.dh2 .dh2-tran .dh2-cot-phai > .dh-giay { box-shadow: none; border: 0; margin-top: 0; }
+  html:root body .dh.dh2 .dh2-tran .dh2-cot-phai .dh-cho { color: var(--v2-chu-phu); }
+}

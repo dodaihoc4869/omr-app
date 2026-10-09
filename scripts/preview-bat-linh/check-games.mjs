@@ -47,7 +47,7 @@ try {
   await p.goto(base + 'game=dao&thu=1&cap=50')
   await p.getByRole('button', { name: /LÊN ĐƯỜNG/ }).click()
   await p.getByRole('button', { name: /B.*43,2 gam/ }).click()
-  await p.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU', exact: true }).click()
+  await p.getByRole('button', { name: 'CHỐT ĐÁP ÁN', exact: true }).click()
   const giai = p.getByRole('button', { name: 'XEM LỜI GIẢI', exact: true })
   await giai.waitFor()
   await giai.click()

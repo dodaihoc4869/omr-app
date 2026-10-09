@@ -669,7 +669,7 @@ async function chupMan(p, ten) {
  *  (đăng nhập lại). `--omni=1`: máy chủ giả trả thêm `omni` cho Sảnh như khi lớp bật OMNI. */
 const KICH_ANH = [
   ['Sảnh + Đảo', true, ['ngu:2000', 'anh:1-sanh', 'Khám phá Bát Linh Đảo', 'chờ:.dao2-bd', 'ngu:2500', 'anh:2-dao-ban-do', 'LÊN ĐƯỜNG', 'chờ:.dao2-canh', 'ngu:3000',
-    'anh:3-dao-tran', 'A.', 'ngu:600', 'anh:4-dao-chon', 'CHỐT ĐÁP ÁN · TUNG CHIÊU', 'ngu:4500', 'cuon:.lg-nut--hoi', 'ngu:800', 'anh:5-dao-loi-giai-hoi-thay']],
+    'anh:3-dao-tran', 'A.', 'ngu:600', 'anh:4-dao-chon', 'CHỐT ĐÁP ÁN', 'ngu:4500', 'cuon:.lg-nut--hoi', 'ngu:800', 'anh:5-dao-loi-giai-hoi-thay']],
   ['Câu đã làm', false, ['ngu:1500', 'Câu đã làm', 'chờ:.h2-cdl-loc', 'ngu:3000', 'anh:6-cau-da-lam']],
   ['Đoàn', false, ['kb:{"doanTran":true}', 'ngu:1000', 'PHÁ 4 Ổ PHỤC KÍCH', 'chờ:.dh-nut-lam', 'ngu:3000', 'anh:7-doan-tran', ...(THEM_CHAC ? ['css:[data-vung="chua-chac"]', 'ngu:400', 'anh:7b-doan-chua-chac', 'css:[data-vung="chac"]', 'ngu:400', 'anh:7c-doan-chac'] : [])]],
   ['Tu luyện', false, ['ngu:1500', 'Tu luyện', 'chờ:text=Sửa câu sai', 'ngu:2500', 'anh:8-tu-luyen']],

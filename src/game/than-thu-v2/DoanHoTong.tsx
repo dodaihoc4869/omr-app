@@ -27,6 +27,9 @@ import './doan.css'
 import './thu-quai.css'
 import './doan2/doan2.css'
 import './doan2/doan2-ngang.css'
+// BẢN DUYỆT V2 (09/10): lớp da Bảng G cho màn trận Đoàn (cùng tệp với Đảo).
+import '../../styles/ban-duyet-v2.css'
+import './dao2/tran-v2.css'
 import '../../components/hoa2/phong-baloo'
 
 export const NHIP_HOI_MS = 1500

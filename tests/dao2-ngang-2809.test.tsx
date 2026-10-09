@@ -45,7 +45,7 @@ describe('Đảo 2.0 · bố cục ngang', () => {
     expect([...trai.querySelectorAll('.dao2-tien-do-nhan li')].map(li => li.textContent)).toEqual(['Mới', 'Mới', 'Ôn lại', 'Mới', 'Mới', 'Trùm'])
     expect(trai.querySelector('.dao2-tien-do')?.textContent).toContain('Đúng 1 ải · Chưa đúng 1 ải')
     expect(phai.querySelector('.dao2-giay')).toBeTruthy()
-    expect(phai.querySelector('.dao2-chan button')?.textContent).toBe('CHỐT ĐÁP ÁN · TUNG CHIÊU')
+    expect(phai.querySelector('.dao2-chan button')?.textContent).toBe('CHỐT ĐÁP ÁN')
     expect(trai.querySelector('.dao2-giay')).toBeNull()
   })
 

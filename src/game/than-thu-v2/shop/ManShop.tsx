@@ -22,6 +22,8 @@ import { useNgang } from '../dao2/ngang'
 import './shop.css'
 import './shop-ngang.css'
 import './shop-trang-suc.css'
+import '../../../styles/ban-duyet-v2.css'
+import './shop-v2.css' // BẢN DUYỆT V2 (09/10): lớp da Bảng G, chỉ áp khi gốc có lớp `.ps-v2`
 
 export type ManShopMan = 'cua-hang' | 'thu-do' | 'tu-do'
 
@@ -279,7 +281,7 @@ export default function ManShop({ api, pet, cap, tenThu, onDong, veThu, veHinhMo
   // Bố cục NGANG (máy tính / xoay ngang — cùng điểm ngắt dao2/ngang.ts): shop-ngang.css. Dọc giữ nguyên.
   const ngang = useNgang()
   return (
-    <div ref={goc} className="ps" data-man={man} data-co-phu={phu ? '1' : '0'} data-ngang={ngang ? '' : undefined} tabIndex={-1}>
+    <div ref={goc} className="ps ps-v2" data-man={man} data-co-phu={phu ? '1' : '0'} data-ngang={ngang ? '' : undefined} tabIndex={-1}>
       <div className="ps-man" inert={phu || undefined}>
         {man === 'cua-hang' &&
           (mucLoiTai ? (

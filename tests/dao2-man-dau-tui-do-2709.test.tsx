@@ -35,7 +35,7 @@ describe('Cửa vào Túi đồ (game-v2:man-dau = tui-do)', () => {
       expect(sessionStorage.getItem(KHOA_MAN_DAU)).toBeNull()
       expect(screen.queryByTestId('doan-ho-tong')).toBeNull()
       // thanh dưới Đảo: 2.0 bỏ mục Đoàn; cờ tắt giữ mục Đoàn
-      expect([...document.querySelectorAll('.dao-nav button')].map(b => b.textContent)).toEqual(co ? ['Đảo', 'Sổ tay', 'Túi đồ'] : ['Đảo', 'Đoàn Hộ Tống', 'Sổ tay', 'Túi đồ'])
+      expect([...document.querySelectorAll('.dao-nav button')].map(b => b.textContent)).toEqual(co ? ['Đảo', 'Thần thú', 'Sổ tay', 'Túi đồ'] : ['Đảo', 'Đoàn Hộ Tống', 'Sổ tay', 'Túi đồ']) // BẢN DUYỆT V2 (09/10): 2.0 thêm mục Thần thú (màn 06)
       cleanup(); vi.unstubAllGlobals()
     }
   })
