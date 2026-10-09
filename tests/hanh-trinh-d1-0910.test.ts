@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { dongBoBaHanhTrinh, idHanhTrinh, KHOA_HANH_TRINH, ungVienHanhTrinh } from '../server/src/hanh-trinh-hop-nhat'
 import { layKeHoachHomNay, sanh2, xoaDemChienDich } from '../server/src/srs2-d1'
 import { taoKhoOmni, themChienDich, lam, T_SANG, HOM_NAY } from './omni-3-ke-hoach-chung'
+import { gvOmni } from '../server/src/omni-gv'
 
 const kho = (soCau = 100) => {
   const k = taoKhoOmni({ 'DH-B0': 0, 'DH-B1': soCau, 'DH-B2': 0, 'DH-B3': 0, 'KHO-A': 0 })
@@ -13,12 +14,22 @@ const kho = (soCau = 100) => {
 }
 afterEach(() => xoaDemChienDich())
 describe('Hành trình 3 khối: gộp, tự nhận kho mới, chốt ngày', () => {
+  it('bảng OMNI cũ không replay kho cả khối khi một app cũ hỏi hành trình', async () => {
+    const k=kho()
+    const before=k.d.soLenh.prepare
+    expect(await gvOmni(k.env,{action:'bang',chienDichId:idHanhTrinh(12)},T_SANG)).toMatchObject({ok:false})
+    expect(k.d.soLenh.prepare).toBe(before)
+    k.d.sql.close()
+  })
   it('quét nhiều trang không bỏ câu; ứng viên mỗi em có giới hạn và xoay khác nhau', async () => {
-    const k=kho(600)
+    const k=kho(15359)
+    for (let i=0;i<8;i++) themChienDich(k.d,{id:`nguon-them-${i}`,maDe:['DH-B1'],qids:k.qids('DH-B1').slice(0,24),sbd:['S1'],taoLuc:'2026-10-01T02:00:00Z',hanNop:'2026-10-09'})
+    const before=k.d.soLenh.prepare
     await dongBoBaHanhTrinh(k.env,T_SANG)
+    expect(k.d.soLenh.prepare-before).toBeLessThanOrEqual(40)
     const r=k.d.sql.prepare('SELECT qid_json FROM chien_dich WHERE id=?').get(idHanhTrinh(12)) as {qid_json:string}
     const qids=JSON.parse(r.qid_json) as string[]
-    expect(qids).toHaveLength(600)
+    expect(qids).toHaveLength(15359)
     const a=await ungVienHanhTrinh(k.env,idHanhTrinh(12),'S1',HOM_NAY,qids)
     const b=await ungVienHanhTrinh(k.env,idHanhTrinh(12),'S2',HOM_NAY,qids)
     expect(a).toHaveLength(96)

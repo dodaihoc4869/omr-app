@@ -11,6 +11,7 @@
 // Thầy 05/10: A.I Đỗ Đại Học TỰ GẮN vi kỹ năng (mỗi câu = `dang:<ma>` ∪ `nen:<nhãn>`) — `q-lo`/`q-duyet` để thầy XEM/sửa khi muốn, không bắt buộc duyệt.
 // Bảng bài: cột = dạng; ô P của dạng = P vi kỹ năng `dang:<ma>` (khái niệm dạng); vi kỹ năng `nen:*` yếu nhất hiện trong "Cần thầy chữa" (nút thắt / sơ ý).
 import type { Env } from './kieu'
+import { laHanhTrinh } from './hanh-trinh-hop-nhat'
 import { xoaDemCauHinh } from './cau-hinh-dem'
 import { chanKhacKhoiLop, congKhoi, docKhoiLopCong } from './chan-khac-khoi'
 import {
@@ -51,7 +52,11 @@ export async function gvOmni(env: Env, b: Record<string, unknown>, nowMs = Date.
     if (action === 'cau-hinh-luu') return await cauHinhLuu(env, b, nowMs)
     if (action === 'on-bai-cu-doc') return await onBaiCuDoc(env, b)
     if (action === 'on-bai-cu-luu') return await onBaiCuLuu(env, b, nowMs)
-    if (action === 'bang') return await bang(env, str(b.chienDichId ?? b.id).trim(), nowMs)
+    if (action === 'bang') {
+      const id = str(b.chienDichId ?? b.id).trim()
+      if (laHanhTrinh(id)) return { ok:false, error:'Hành trình dùng bảng tiến độ hôm nay.' }
+      return await bang(env,id,nowMs)
+    }
     if (action === 'xac-nhan') return await xacNhan(env, b, nowMs)
     if (action === 'q-lo') return await qLo(env, b)
     if (action === 'q-duyet') return await qDuyet(env, b, nowMs)
