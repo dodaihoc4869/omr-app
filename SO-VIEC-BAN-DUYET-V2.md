@@ -35,13 +35,13 @@ Thầy hỏi (nguyên văn): "nếu để bạn tối ưu lại giao diện app 
 - [x] Vẽ trước cho thầy xem | bằng chứng: canvas 14 màn (00 nguyên tắc, 00b bỏ/gộp, HS 1–5, PH 1–3, GV 1–4).
 
 Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Thêm 5. Bật lại 6. Giữ nguyên — Build rồi đẩy luôn"
-- [ ] 1. Tên đảo thống nhất "Bát Linh Đảo" (sửa bảng từ chuẩn + chữ hiển thị "Đảo thần thú") | bằng chứng: (chưa có)
-- [ ] 2. Phụ huynh 3 mục (Hôm nay · Tiến bộ · Ca kiểm tra), Hôm nay 4 khối | bằng chứng: (chưa có)
-- [ ] 3. Bỏ hẳn BTVN / Bài gia đình giao ở chế độ Game 2.0 (không thêm lối vào) | bằng chứng: (chưa có)
-- [ ] 4. Máy chủ gửi tầng TỪNG bài cho màn Hành trình của em | bằng chứng: (chưa có)
-- [ ] 5. Bật lại "Thử sức thêm" khi chạy Hành trình (ô trong "Luyện thêm") | bằng chứng: (chưa có)
-- [ ] 6. Giữ nguyên phụ đề Tu luyện | bằng chứng: (chưa có)
-- [ ] Build giao diện HS theo bản vẽ (Hôm nay · Hành trình · Thần thú · Câu đã làm; Làm câu) | bằng chứng: (chưa có)
+- [x] 1. Tên đảo thống nhất "Bát Linh Đảo" (sửa bảng từ chuẩn + chữ hiển thị "Đảo thần thú") | bằng chứng: 66fa48d (bảng từ chuẩn) + 11dd5e8 (chữ HS, nhãn nguồn câu sai máy chủ, 12 tệp test khoá chữ cũ sửa có chủ đích, 33 tệp/642 test xanh); bộ lọc chữ game PH chặn cả hai tên.
+- [x] 2. Phụ huynh 3 mục (Hôm nay · Tiến bộ · Ca kiểm tra), Hôm nay 4 khối | bằng chứng: 688e12f (gộp e6031c1); `tests/ph-v3-toi-gian-0910.test.tsx` xanh.
+- [x] 3. Bỏ hẳn BTVN / Bài gia đình giao ở chế độ Game 2.0 (không thêm lối vào) | bằng chứng: `SanhHomNay` (cheDo2) không có prop/nút nào mở `btvn`/`mom`/`bantin`; grep `BTVN|Bài gia đình|bantin` trong `src/components/ban-duyet-v2/` + `SanhBanDo.tsx` = 0; `onChuyenSangBtvn` ở cheDo2 về Sảnh (StudentPortalScreen:2151).
+- [x] 4. Máy chủ gửi tầng TỪNG bài cho màn Hành trình của em | bằng chứng: d4af938 (`server/src/hanh-trinh-bai.ts`, `hanhTrinh.bai[]` trong hoa2-sanh, chỉ ĐỌC, không đổi schema) + `tests/hanh-trinh-bai-thu-suc-0910.test.ts`; HS vẽ 4 tầng từng bài (`trangThaiTang`). `vung` để null (chưa có số đo vùng điểm từng bài).
+- [x] 5. Bật lại "Thử sức thêm" khi chạy Hành trình (ô trong "Luyện thêm") | bằng chứng: d4af938 (máy chủ cho thêm một chặng hôm nay, tối đa 6 câu) + 0efad47 (ô `OThuSuc` ghi đúng nghĩa mới).
+- [x] 6. Giữ nguyên phụ đề Tu luyện | bằng chứng: `SanhV2.tsx:422` + `SanhBanDo.tsx:738` đều "Chỉ dành cho học sinh Nỗ lực".
+- [x] Build giao diện HS theo bản vẽ (Hôm nay · Hành trình · Thần thú · Câu đã làm; Làm câu) | bằng chứng: 6f5fc95 (gộp d620c49).
 - [ ] Build giao diện GV theo bản vẽ (5 mục: Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + Cài đặt) | bằng chứng: (chưa có)
-- [ ] Sửa 4 lỗi đã thấy ở bản V2 (rương lặp số, khối Hành trình vẽ 2 lần, bước "Thử thách +1 bậc", 2 nút Vào thi) | bằng chứng: (chưa có)
+- [x] Sửa 4 lỗi đã thấy ở bản V2 (rương lặp số, khối Hành trình vẽ 2 lần, bước "Thử thách +1 bậc", 2 nút Vào thi) | bằng chứng: 6f5fc95 (Sảnh V2 viết lại theo bản vẽ: một khối Hành trình, rương không lặp số câu hôm nay, bỏ bước 3, một nút Vào thi).
 - [ ] Đẩy luôn: kiểm không có ca thi mở → PR vào main → Actions phát hành Pages + Worker | bằng chứng: (chưa có)
