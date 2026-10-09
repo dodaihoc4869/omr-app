@@ -239,7 +239,8 @@ describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
     const p = ve({ theLuc: { con: 0, tong: 30 }, doan: { con: 0 }, dao: { con: 0 }, khoaDao: false, ruong: { daLam: 30, tong: 30, moDuoc: true, daMo: true, qua: { vang: 20 } }, thuSucThem: { duoc: true, soCau: 6 } })
     fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
     const nut = screen.getByRole('button', { name: /Thử sức thêm/ })
-    expect(nut.textContent).toContain('Lấy trước 6 câu mới của ngày mai')
+    // Hành trình (máy chủ 09/10): Thử sức thêm = thêm MỘT chặng của hôm nay (tối đa 6 câu), không phải lấy trước câu ngày mai
+    expect(nut.textContent).toContain('Thêm một chặng hôm nay · tối đa 6 câu')
     fireEvent.click(nut)
     await waitFor(() => expect(p.onTaiLai).toHaveBeenCalled())
     expect(goi.map((g) => new URL(g.url).pathname)).toEqual(['/game-v2/hoa2-thu-suc-them'])

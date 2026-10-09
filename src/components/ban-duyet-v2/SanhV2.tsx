@@ -386,7 +386,9 @@ function OThuSuc({ s, token, onTaiLai, onDaLay }: { s: SanhHoa2; token: string; 
     <>
       <button type="button" className="v2s-o" data-khoi="thu-suc-them" aria-busy={dangGoi} onClick={() => void bam()}>
         <b>{dangGoi ? 'Đang lấy câu…' : 'Thử sức thêm'}</b>
-        <span>Lấy trước {t.soCau} câu mới của ngày mai</span>
+        {/* Hành trình (máy chủ 09/10, docs/hanh-trinh-bai-thu-suc-0910.md): thêm MỘT chặng của hôm nay, tối đa 6 câu (số trên Sảnh là ước lượng);
+            chiến dịch cũ giữ nghĩa cũ "lấy trước câu ngày mai". */}
+        <span>{s.hanhTrinh ? `Thêm một chặng hôm nay · tối đa ${t.soCau} câu` : `Lấy trước ${t.soCau} câu mới của ngày mai`}</span>
       </button>
       {loi && (
         <p className="v2s-lt-loi" role="alert">
