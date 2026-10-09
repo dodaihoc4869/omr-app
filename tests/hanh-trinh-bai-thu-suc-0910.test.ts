@@ -275,4 +275,5 @@ describe('hoa2-sanh không thêm truy vấn D1', () => {
   })
 })
 // Đo trên bản TRƯỚC khi thêm `bai` / Thử sức thêm Hành trình (69a0731) với cùng kịch bản.
-const SO_LENH_SANH = { dau: 129, moLai: 36, sauSan: 36 }
+// Gộp main 113000a (tối ưu CPU: không dựng lại tầng theo bài khi đã có dòng chốt tầng) ⇒ mở lại / sau đủ sàn còn 30 lệnh (trước 36).
+const SO_LENH_SANH = { dau: 129, moLai: 30, sauSan: 30 }
