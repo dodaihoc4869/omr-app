@@ -127,7 +127,7 @@ describe('Rút chỉ từ nguồn đã chọn', () => {
     const theoDao = await tuLuyenRut(d.env, 'HS1', { cheDo: 1, soCau: 1, nguon: ['dao'] })
     const c = (theoDao.cau as { qid: string; saiGoc: string }[])[0]!
     expect(c.qid).toBe(q('I', 1))
-    expect(c.saiGoc).toBe('Sai gốc: Đảo thần thú · 29/09 và 1 lần khác')
+    expect(c.saiGoc).toBe('Sai gốc: Bát Linh Đảo · 29/09 và 1 lần khác')
     const d2 = await khoMau()
     const ca = await tuLuyenRut(d2.env, 'HS1', { cheDo: 1, soCau: 1, nguon: ['ca'] })
     expect((ca.cau as { saiGoc: string }[])[0]!.saiGoc).toBe('Sai gốc: Ca kiểm tra Ester · 30/09 và 1 lần khác')
@@ -155,7 +155,7 @@ describe('Rút chỉ từ nguồn đã chọn', () => {
     const l = (loai: LanSai['loai'], luc: string): LanSai => ({ qid: 'x', loai, tenCa: 'Ca A', tenChienDich: '', luc, ngay: luc.slice(0, 10) })
     const ds = [l('dao', '2026-09-29T01:00:00Z'), l('ca', '2026-09-30T01:00:00Z')]
     expect(nhanSaiGoc(ds)).toBe('Sai gốc: Ca A · 30/09 và 1 lần khác')
-    expect(nhanSaiGoc(ds, new Set(['dao'] as const))).toBe('Sai gốc: Đảo thần thú · 29/09 và 1 lần khác')
+    expect(nhanSaiGoc(ds, new Set(['dao'] as const))).toBe('Sai gốc: Bát Linh Đảo · 29/09 và 1 lần khác')
     expect(nhanSaiGoc(ds, new Set(['bia'] as const))).toBe('Sai gốc: Ca A · 30/09 và 1 lần khác')
   })
 })

@@ -85,10 +85,10 @@ describe('Hòn đảo của em', () => {
     expect(container.querySelector('.dao-chuyen-ta')!.textContent).toContain('Ester thuỷ phân · Glucose tráng bạc')
     rerender(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} conLai={0} onLenDuong={() => {}} /></div>)
     expect((screen.getByRole('button', { name: /Đồng hành/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect(container.textContent).toContain('Em đã đi đủ số câu Đảo thần thú của hôm nay') // máy chủ cũ chưa gửi trần ⇒ câu không số
+    expect(container.textContent).toContain('Em đã đi đủ số câu Bát Linh Đảo của hôm nay') // máy chủ cũ chưa gửi trần ⇒ câu không số
     expect(container.textContent).not.toMatch(/200 câu/)
     rerender(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} conLai={0} luotCau={{ daDung: 40, tran: 36 }} onLenDuong={() => {}} /></div>)
-    expect(container.querySelector('.dao-chuyen-ta')!.textContent).toBe('Hôm nay em đã đi 36/36 câu Đảo thần thú. Mai đảo có chuyến mới.')
+    expect(container.querySelector('.dao-chuyen-ta')!.textContent).toBe('Hôm nay em đã đi 36/36 câu Bát Linh Đảo. Mai đảo có chuyến mới.')
   })
   it('bỏ sạch chữ người lớn của màn cũ và không còn "today/100"', () => {
     const { container } = dung({ exp: { homNay: 46 } })

@@ -135,7 +135,7 @@ export const chuMatMang = 'Mất mạng rồi. Có mạng lại mới mua đư�
 export const chuLoiKhongRo = 'Cửa hàng chưa tải được. Em bấm Thử lại nhé.' // [L10]
 
 // ── Nhãn trợ năng + chữ phụ [A1–A10] (Boss duyệt 21/09 đêm; chép vào mục 9.3 cùng commit). Dòng nhỏ trên khung tên: KHÔNG vẽ — app thật chỉ hiện tên thú. ──
-export const chuVeDao = 'Về Đảo thần thú' // [A1] (nhãn nút quay lại của Cửa hàng)
+export const chuVeDao = 'Về Bát Linh Đảo' // [A1] (nhãn nút quay lại của Cửa hàng)
 export const chuVeCuaHang = 'Về Cửa hàng' // [A2] (nhãn nút quay lại của Thử đồ, Tủ đồ)
 export const chuLocNhan = 'Lọc theo chỗ đeo' // [A3]
 export const chuThanhKeoNhan = chuKeoThanh // [A4] (dùng lại [B9])

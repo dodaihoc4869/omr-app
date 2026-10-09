@@ -26,5 +26,5 @@ export function duocMoSomChang(v: DauVaoMoSom): KetQuaMoSom {
 export function chuMoSomChang(kq: KetQuaMoSom, d: { soChangXong: number; soChangKe: number; dung: number; tong: number }): string {
   if (kq.duoc) return `Em làm tốt chặng ${d.soChangXong} (đúng ${d.dung}/${d.tong}). Em được mở sớm chặng ${d.soChangKe} ngay hôm nay.`
   if (kq.lyDo === 'het_chang') return 'Em đã làm hết các chặng của bài tập về nhà này.'
-  return `Chặng ${d.soChangKe} mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú.`
+  return `Chặng ${d.soChangKe} mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo.`
 }

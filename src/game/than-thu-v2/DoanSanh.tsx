@@ -71,7 +71,7 @@ export default function DoanSanh(p: Props) {
         <div><div className="dh-nhan">{s ? `MÙA ${s.mua.so} · CÒN ${s.mua.conNgay} NGÀY` : 'HỘ TỐNG LINH TÂM · CẢ LỚP MỘT ĐOÀN'}</div><h1>{s?.tenDoan ?? p.tenDoan}</h1></div>
         <div className="dh-dau-phai">
           <NutToanManHinh />
-          <button type="button" className="dh-nut-dong" aria-label="Về Đảo thần thú" title="Về Đảo thần thú" onClick={p.onDong}><X size={18} aria-hidden="true" /></button>
+          <button type="button" className="dh-nut-dong" aria-label="Về Bát Linh Đảo" title="Về Bát Linh Đảo" onClick={p.onDong}><X size={18} aria-hidden="true" /></button>
         </div>
       </header>
       {((s && ((s.ve !== null) || s.chuoi.ngay > 0)) || p.chang) && (

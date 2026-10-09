@@ -56,7 +56,7 @@ describe('Khối Nguồn câu sai', () => {
     await moCheDo1()
     expect(screen.getAllByRole('checkbox').filter((x) => x.closest('.tlu-nguon-sai')).length).toBe(6)
     expect(o(/Ca kiểm tra/).checked).toBe(true)
-    expect(o(/Đảo thần thú/).checked).toBe(true)
+    expect(o(/Bát Linh Đảo/).checked).toBe(true)
     expect(o(/Bi-a/).checked).toBe(true)
     expect(o(/Đoàn Hộ Tống/).disabled).toBe(true)
     expect(o(/Đoàn Hộ Tống/).closest('label')!.textContent).toContain('0 câu')
@@ -66,7 +66,7 @@ describe('Khối Nguồn câu sai', () => {
     const truoc = cuoc.length
     fireEvent.click(o(/Ca kiểm tra/))
     expect(soKho()).toBe('3') // Đảo (2 câu, 1 câu trùng ca) + Bi-a 1
-    fireEvent.click(o(/Đảo thần thú/))
+    fireEvent.click(o(/Bát Linh Đảo/))
     expect(soKho()).toBe('1')
     expect((screen.getByLabelText('Số câu') as HTMLInputElement).max).toBe('2')
     expect(cuoc.length).toBe(truoc)
@@ -76,7 +76,7 @@ describe('Khối Nguồn câu sai', () => {
   it('không tick nguồn nào ⇒ nút tắt + nhắc; "Chọn tất cả" bật lại; rút gửi đúng nguồn', async () => {
     const cuoc = giaLap()
     await moCheDo1()
-    for (const t of [/Ca kiểm tra/, /Đảo thần thú/, /Bi-a/]) fireEvent.click(o(t))
+    for (const t of [/Ca kiểm tra/, /Bát Linh Đảo/, /Bi-a/]) fireEvent.click(o(t))
     expect(soKho()).toBe('0')
     expect(screen.getByText('Em chọn ít nhất 1 nguồn câu sai để bắt đầu.')).toBeTruthy()
     const nut = screen.getByRole('button', { name: 'Chọn nguồn để luyện' }) as HTMLButtonElement
@@ -96,7 +96,7 @@ describe('Khối Nguồn câu sai', () => {
     ghiNhoNguon('S1', new Set(['dao', 'bia']), KHO.theoNguon)
     await moCheDo1()
     expect(o(/Ca kiểm tra/).checked).toBe(false)
-    expect(o(/Đảo thần thú/).checked).toBe(true)
+    expect(o(/Bát Linh Đảo/).checked).toBe(true)
     expect(soKho()).toBe('3')
     // hàm thuần: bỏ hết nguồn đang có ⇒ về mặc định tick tất cả; nguồn mới (Tu luyện) tự được tick
     expect([...chonMacDinh({ ca: 1, dao: 1 }, ['ca', 'dao'])]).toEqual(['ca', 'dao'])

@@ -5,7 +5,7 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 vi.mock('../src/game/than-thu-v2/EscortRoom', () => ({ default: () => <div data-testid="vo-dai-cu" /> }))
 const dem = vi.hoisted(() => ({ dungDoan: 0 }))
 vi.mock('../src/game/than-thu-v2/DoanHoTong', () => ({ default: () => { dem.dungDoan++; return <div data-testid="doan-ho-tong" /> } }))
-// Vỏ Đảo thần thú của Code 6 (có test riêng tests/dao-than-thu-vo.test.tsx): ở đây chỉ soi PROP Game.tsx truyền vào và các lối ra của vỏ.
+// Vỏ Bát Linh Đảo của Code 6 (có test riêng tests/dao-than-thu-vo.test.tsx): ở đây chỉ soi PROP Game.tsx truyền vào và các lối ra của vỏ.
 vi.mock('../src/game/than-thu-v2/dao/DaoThanThu', () => ({ default: (p: any) => <div data-testid="vo-dao" data-doan-mo={String(p.doanMo)} data-moi-doan={String(!!p.moiDoan)} data-chua-chon={String(p.profile.choice)}><button onClick={p.onMoDoan}>vỏ: mở Đoàn</button><button onClick={p.onMoVoDai}>vỏ: mở Võ đài</button><button onClick={p.onMoTienBo}>vỏ: mở Tiến bộ</button></div> }))
 vi.mock('../src/game/than-thu-v2/ProgressChart', () => ({ default: () => null }))
 vi.mock('../src/game/than-thu-v2/LearningBattle', () => ({ default: () => null, SpellPreview: () => null }))
@@ -25,20 +25,20 @@ configure({ asyncUtilTimeout: 8000 })
 beforeEach(() => { sessionStorage.clear(); localStorage.clear(); dem.dungDoan = 0 })
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
-describe('Đoàn Hộ Tống · cờ mở game · giao diện (Đảo thần thú bản mới là MỘT vỏ)', () => {
+describe('Đoàn Hộ Tống · cờ mở game · giao diện (Bát Linh Đảo bản mới là MỘT vỏ)', () => {
   it('cờ TẮT (hoặc máy chủ cũ không trả cờ): vỏ Đảo nhận doanMo=false, ở tab Đảo KHÔNG có đầu trang/thanh mục cũ; ra Võ đài thì mục y hệt cũ, không chữ Đoàn, Võ đài mở MỌI ngày với tên cũ', async () => {
     for (const co of [false, undefined]) {
       vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(THU_HAI); mayChu(co)
       render(<Game sbd="S1" token="t" onDong={() => {}} />)
       const vo = await screen.findByTestId('vo-dao'); expect(vo.dataset.doanMo).toBe('false'); expect(muc()).toEqual([]); expect(document.querySelector('.spirit-header')).toBeNull(); expect(document.querySelector('.spirit-game-dao')).toBeTruthy()
       fireEvent.click(screen.getByRole('button', { name: 'vỏ: mở Võ đài' }))
-      await waitFor(() => expect(muc()).toEqual(['Đảo thần thú', 'Hộ Tống Linh Tâm', 'Tiến bộ của em', 'Game mới · Sắp ra mắt']))
+      await waitFor(() => expect(muc()).toEqual(['Bát Linh Đảo', 'Hộ Tống Linh Tâm', 'Tiến bộ của em', 'Game mới · Sắp ra mắt']))
       expect(screen.getByTestId('vo-dai-cu').parentElement!.hidden).toBe(false); expect(document.body.textContent).not.toMatch(/Đoàn Hộ Tống|Võ đài thứ Bảy/); expect(screen.queryByTestId('vo-dao')).toBeNull()
-      fireEvent.click(screen.getByRole('button', { name: 'Đảo thần thú' })); expect(await screen.findByTestId('vo-dao')).toBeTruthy() // về lại đảo
+      fireEvent.click(screen.getByRole('button', { name: 'Bát Linh Đảo' })); expect(await screen.findByTestId('vo-dao')).toBeTruthy() // về lại đảo
       cleanup(); vi.useRealTimers()
     }
   })
-  it('cờ TẮT mà cửa ngoài xin mở thẳng Đoàn → về Đảo thần thú, không màn trống, lớp phủ Đoàn KHÔNG được dựng dù một khung hình', async () => {
+  it('cờ TẮT mà cửa ngoài xin mở thẳng Đoàn → về Bát Linh Đảo, không màn trống, lớp phủ Đoàn KHÔNG được dựng dù một khung hình', async () => {
     // Nạp sẵn gói Đoàn (như em vừa chơi xong thì thầy tắt cờ): lần dựng sau React có thể vẽ lớp phủ NGAY trong khung hình đầu nếu thiếu chốt cờ.
     mayChu(true); render(<Game sbd="S1" token="t" manDau="doan" onDong={() => {}} />); await screen.findByTestId('doan-ho-tong'); cleanup(); dem.dungDoan = 0
     mayChu(false); sessionStorage.setItem(KHOA_MAN_DAU, 'doan')
@@ -50,7 +50,7 @@ describe('Đoàn Hộ Tống · cờ mở game · giao diện (Đảo thần th�
     mayChu(true); sessionStorage.setItem(KHOA_MAN_DAU, 'doan')
     render(<Game sbd="S1" token="t" onDong={() => {}} />)
     expect(await screen.findByTestId('doan-ho-tong')).toBeTruthy(); expect(sessionStorage.getItem(KHOA_MAN_DAU)).toBeNull()
-    expect(muc()).toEqual(['Đảo thần thú', 'Đoàn Hộ Tống', 'Võ đài thứ Bảy', 'Tiến bộ của em', 'Game mới · Sắp ra mắt'])
+    expect(muc()).toEqual(['Bát Linh Đảo', 'Đoàn Hộ Tống', 'Võ đài thứ Bảy', 'Tiến bộ của em', 'Game mới · Sắp ra mắt'])
     cleanup(); mayChu(true); render(<Game sbd="S1" token="t" manDau="doan" onDong={() => {}} />); expect(await screen.findByTestId('doan-ho-tong')).toBeTruthy()
     cleanup(); mayChu(true); render(<Game sbd="S1" token="t" onDong={() => {}} />)
     const vo = await screen.findByTestId('vo-dao'); await waitFor(() => expect(vo.dataset.doanMo).toBe('true')); expect(screen.queryByTestId('doan-ho-tong')).toBeNull()
@@ -71,7 +71,7 @@ describe('Đoàn Hộ Tống · cờ mở game · giao diện (Đảo thần th�
     const vo2 = await screen.findByTestId('vo-dao'); await waitFor(() => expect(vo2.dataset.doanMo).toBe('true')); fireEvent.click(screen.getByRole('button', { name: 'vỏ: mở Võ đài' })); expect(screen.getByTestId('vo-dai-cu').parentElement!.hidden).toBe(false)
   })
   it('hàm cuaGame: hai bộ mục tách bạch', () => {
-    expect(cuaGame(false, THU_HAI)).toEqual({ nav: [['home', 'Đảo thần thú'], ['arena', 'Hộ Tống Linh Tâm'], ['progress', 'Tiến bộ của em'], ['coming', 'Game mới · Sắp ra mắt']], voDaiMo: true })
+    expect(cuaGame(false, THU_HAI)).toEqual({ nav: [['home', 'Bát Linh Đảo'], ['arena', 'Hộ Tống Linh Tâm'], ['progress', 'Tiến bộ của em'], ['coming', 'Game mới · Sắp ra mắt']], voDaiMo: true })
     expect(cuaGame(true, THU_HAI).voDaiMo).toBe(false); expect(cuaGame(true, THU_BAY).voDaiMo).toBe(true); expect(cuaGame(true, THU_HAI).nav.map(x => x[0])).toContain('doan')
   })
 })

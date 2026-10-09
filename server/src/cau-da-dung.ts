@@ -68,7 +68,7 @@ const TEN_KENH: Record<string, string> = {
   mom: 'Bài gia đình giao',
   thu_thach_rieng: 'Thử thách riêng',
 }
-const TEN_KENH_GAME: Record<string, string> = { dao: 'Đảo thần thú', doan: 'Đoàn Hộ Tống', bia: 'Bi-a' }
+const TEN_KENH_GAME: Record<string, string> = { dao: 'Bát Linh Đảo', doan: 'Đoàn Hộ Tống', bia: 'Bi-a' }
 
 export interface CauDaDungRa {
   qid: string
@@ -193,7 +193,7 @@ export async function docCauDaDung(env: Env, dsSbd: readonly string[]): Promise<
         // Chiến dịch chứa câu: chiến dịch mở gần nhất TRƯỚC lần đúng; không có thì chiến dịch mới nhất chứa câu.
         const ung = [...(cds?.get(qid) ?? [])].sort((a, b) => b.taoLuc.localeCompare(a.taoLuc))
         const cd = ung.find((c) => c.taoLuc && c.taoLuc <= g.luc) ?? ung[0]
-        const kenh = TEN_KENH_GAME[kenhPhien.get(g.maNguon) ?? 'dao'] ?? 'Đảo thần thú'
+        const kenh = TEN_KENH_GAME[kenhPhien.get(g.maNguon) ?? 'dao'] ?? 'Bát Linh Đảo'
         noi = cd?.ten ? `Chiến dịch ${cd.ten} (${kenh})` : kenh
       } else {
         noi = TEN_KENH[g.nguon] ?? 'Luyện tập'

@@ -26,9 +26,9 @@ type Tab='home'|'doan'|'learn'|'arena'|'progress'|'coming'
 /** CỜ MỞ GAME (`doanMo` do máy chủ trả ở lệnh profile). TẮT ⇒ các mục game Y HỆT trước khi có Đoàn: không tab Đoàn, Võ đài cũ mở mọi ngày, tên tab cũ.
  *  GAME HÓA 2.0 (`cheDo2`, cờ `game_hoa_2` — `hoa2-sanh` trả `cheDo2:true`): thanh chọn chỉ còn Đảo thần thú (+ Đoàn Hộ Tống khi `doanMo`) — bỏ Võ đài, Tiến bộ, Sắp ra mắt. Cờ tắt ⇒ như cũ. */
 export function cuaGame(doanMo:boolean,now=Date.now(),cheDo2=false):{nav:readonly (readonly [Tab,string])[];voDaiMo:boolean}{
- if(cheDo2)return {nav:[['home','Đảo thần thú'],...(doanMo?[['doan','Đoàn Hộ Tống'] as const]:[])],voDaiMo:false}
- return doanMo?{nav:[['home','Đảo thần thú'],['doan','Đoàn Hộ Tống'],['arena','Võ đài thứ Bảy'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:laThuBayVn(now)}
-  :{nav:[['home','Đảo thần thú'],['arena','Hộ Tống Linh Tâm'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:true}
+ if(cheDo2)return {nav:[['home','Bát Linh Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống'] as const]:[])],voDaiMo:false}
+ return doanMo?{nav:[['home','Bát Linh Đảo'],['doan','Đoàn Hộ Tống'],['arena','Võ đài thứ Bảy'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:laThuBayVn(now)}
+  :{nav:[['home','Bát Linh Đảo'],['arena','Hộ Tống Linh Tâm'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:true}
 }
 function docManDau(prop:unknown):{tab:Tab;shop:boolean;tuiDo:boolean;thanThu:boolean}{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return {tab:prop==='doan'||luu==='doan'?'doan':'home',shop:prop==='shop'||luu==='shop',tuiDo:prop==='tui-do'||luu==='tui-do',thanThu:prop==='than-thu'||luu==='than-thu'}} // 'shop' = mở thẳng Cửa hàng phụ kiện (chỉ khi máy chủ báo shopBat)
 import ProgressChart from './ProgressChart'

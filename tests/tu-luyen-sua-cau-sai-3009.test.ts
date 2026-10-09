@@ -103,9 +103,9 @@ describe('Chế độ 1 — nguồn câu sai từ 29/09 (ca kiểm tra + chiến
     const theo = Object.fromEntries(cau.map((c) => [qidGoc(c.qid), c]))
     expect(cau.every((c) => c.nhanLuyen === 'Luyện lần đầu')).toBe(true)
     expect(theo[q(MA, 'II', 1)]!.saiGoc).toBe('Sai gốc: Chiến dịch Ôn ester · Đoàn Hộ Tống · 30/09')
-    expect(theo[q(MA, 'I', 5)]!.saiGoc).toBe('Sai gốc: Đảo thần thú · 30/09')
+    expect(theo[q(MA, 'I', 5)]!.saiGoc).toBe('Sai gốc: Bát Linh Đảo · 30/09')
     expect(theo[q(MA, 'I', 1)]!.saiGoc).toBe('Sai gốc: Bi-a · 30/09 và 1 lần khác')
-    expect(theo[q(MA2, 'I', 1)]!.saiGoc).toBe('Sai gốc: Đảo thần thú · 30/09 và 1 lần khác')
+    expect(theo[q(MA2, 'I', 1)]!.saiGoc).toBe('Sai gốc: Bát Linh Đảo · 30/09 và 1 lần khác')
   })
   it('lần sau KHÁC lần trước khi kho đủ; nhãn "Luyện lại lần 2" cho câu đã luyện', async () => {
     const d = await dung()

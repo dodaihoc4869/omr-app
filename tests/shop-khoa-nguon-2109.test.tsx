@@ -179,7 +179,7 @@ describe('chữ chốt mục 9 (DE-XUAT-SHOP-PHU-KIEN-2109.md): từng chuỗi �
       'Vàng chỉ đến từ việc học. Không nạp tiền, không xin bạn được.', 'Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.', 'Em có đủ EXP thừa. Đổi vàng là mua được.', 'Làm nhiệm vụ hôm nay để ống nghiệm đầy thêm.',
       'Tủ đồ còn trống. Ghé Cửa hàng chọn món đầu tiên, có món chỉ 20 vàng.', 'Chưa có món nào cho chỗ này.', 'Em chưa thử món nào. Chạm một phụ kiện ở Cửa hàng, thần thú mặc thử liền.', 'Cửa hàng đang tạm đóng. Đồ em đã mua vẫn còn nguyên.',
       'Mất mạng rồi. Có mạng lại mới mua được, em vẫn xem được Tủ đồ.', 'Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.', 'Món này sắp mở bán. Em ghé lại sau nhé.', 'Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.', 'Cửa hàng chưa tải được. Em bấm Thử lại nhé.', 'Em đã có món này rồi. Vào Tủ đồ để mặc.', 'Giá vừa thay đổi, em xem lại rồi mua nhé.', 'Em chưa có món này nên chưa mặc được.',
-      'Kéo thanh để chọn số EXP', 'Chưa có EXP thừa để đổi', 'Bỏ thử món này', 'Bật mí Hoá học', 'Đắt dần:', 'Về Đảo thần thú', 'Về Cửa hàng', 'Lọc theo chỗ đeo', 'Không cần gì thêm', 'Luôn có sẵn', 'Em đổi được tối đa', 'Thần thú của em',
+      'Kéo thanh để chọn số EXP', 'Chưa có EXP thừa để đổi', 'Bỏ thử món này', 'Bật mí Hoá học', 'Đắt dần:', 'Về Bát Linh Đảo', 'Về Cửa hàng', 'Lọc theo chỗ đeo', 'Không cần gì thêm', 'Luôn có sẵn', 'Em đổi được tối đa', 'Thần thú của em',
     ]
     for (const t of tinh) {
       expect(D.includes(t), `đề xuất không còn câu: ${t}`).toBe(true)
