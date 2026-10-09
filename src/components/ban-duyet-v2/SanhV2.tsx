@@ -279,7 +279,7 @@ function KhuHomNay({ p, s, onLuyenThem }: { p: SanhBanDoProps; s: SanhHoa2; onLu
   )
 }
 
-/** Bài kiểm đầu / kiểm tuần của Hành trình (main #217, `omni.kiemHanhTrinh`): nút PHỤ (màn vẫn một nút vàng), cùng hành động nút Sảnh cũ — mở Đảo với việc `de-thu`. */
+/** Bài kiểm đầu / kiểm tuần của Hành trình (main PR217, `omni.kiemHanhTrinh`): nút PHỤ (màn vẫn một nút vàng), cùng hành động nút Sảnh cũ — mở Đảo với việc `de-thu`. */
 export function chuKiemHanhTrinh(k: { loai: 'dau' | 'tuan'; soCau: number }): string {
   return `${k.loai === 'dau' ? 'Làm bài kiểm đầu' : 'Làm bài kiểm tuần'} · ${k.soCau} câu`
 }
