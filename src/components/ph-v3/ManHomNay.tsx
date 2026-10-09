@@ -189,6 +189,7 @@ function LoiThayMoi({ loiThay, thuLai }: { loiThay: { ds: NhanXetCa[] | null; ch
   const ngay = moi.nopLuc || moi.capNhatLuc
   return (
     <The id="ph3-loi-thay" className="ph3-the--thay ph3-o-rong" vung="loi-thay-moi" tieuDe="Thầy Đỗ Đại Học nhắn" bieuTuong="ĐH" mau="thay">
+      {loiThay.chuLoi && <div className="ph3-lam-moi-loi" role="status"><span>Lời thầy đang hiển thị bản đã tải. {loiThay.chuLoi}</span><button type="button" onClick={thuLai}>Thử lại lời thầy</button></div>}
       <p className="ph3-the__loi">{chuThay(moi.noiDung)}</p>
       <a className="ph3-dong-lk" href={lienKetCa(moi.maCa)}>
         <span>Sau {moi.tenCa}{ngay ? ` · ${ngayDayDuVn(ngay)}` : ''}</span>

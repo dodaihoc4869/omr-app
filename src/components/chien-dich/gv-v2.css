@@ -115,3 +115,32 @@
 .gvv2-chien-dich { display: grid; gap: 16px; min-width: 0; }
 .gvv2-dong-nut { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 @media (max-width: 600px) { .gvv2-con { border-radius: 18px; } .gvv2-con-nut { flex: 1 1 auto; } }
+
+/* Cùng một bảng dữ liệu và ô tìm kiếm: điện thoại đọc từng thẻ, ngang/máy tính đọc bảng. */
+.gvv2-bang-cuon:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 4px; }
+.gvv2-em-chu b { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .gvv2-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gvv2-tim { flex-basis: 100%; min-height: 48px; }
+  .gvv2-bang-cuon { overflow: visible; }
+  .gvv2-bang table, .gvv2-bang tbody { display: block; }
+  .gvv2-bang thead { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+  .gvv2-bang tr { display: grid; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--gvm-vien); }
+  .gvv2-bang td { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0; border: 0; min-width: 0; }
+  .gvv2-bang td[data-nhan]::before { content: attr(data-nhan); font-size: 13px; color: var(--gvm-chu-2); flex: 0 0 90px; }
+  .gvv2-tien-do { flex: 1; }
+  .gvv2-bang .gvv2-ghi-chu { align-items: start; }
+}
+@media (min-width: 840px) and (max-width: 1100px) and (max-height: 540px) {
+  .gvv2-luoi { grid-template-columns: minmax(0, 1fr) 240px; }
+  .gvv2-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .gvv2-tab { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; overflow: visible; }
+  .gvv2-tab-nut { padding: 8px; font-size: 14px; white-space: normal; }
+}
+/* Đích chạm của màn Hành trình thắng quy tắc nút chung của khung thầy. */
+html:root body .vo-thay .gvv2-tab-nut,
+html:root body .vo-thay .gvv2-nut-chinh,
+html:root body .vo-thay .gvv2-nut-vien { min-height: 48px; }
+html:root body .vo-thay .ben-trai-logo--gv2 { min-width: 48px; min-height: 48px; }

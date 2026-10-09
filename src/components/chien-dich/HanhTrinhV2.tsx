@@ -133,7 +133,7 @@ function BangNhip({ em }: { em: readonly EmNhip[] }) {
       {ds.length === 0 ? (
         <p className="gvv2-trong">{em.length === 0 ? 'Hành trình này chưa có em nào được xếp kế hoạch hôm nay.' : 'Không có em nào khớp ô tìm.'}</p>
       ) : (
-        <div className="gvv2-bang-cuon">
+        <div className="gvv2-bang-cuon" role="region" aria-label="Nhịp học của học sinh" tabIndex={0}>
           <table>
             <thead>
               <tr>
@@ -161,7 +161,7 @@ function BangNhip({ em }: { em: readonly EmNhip[] }) {
                         </span>
                       </span>
                     </td>
-                    <td>
+                    <td data-nhan="Hôm nay">
                       <span className="gvv2-tien-do">
                         <b className="gvv2-so">
                           {e.daLam}/{e.toiThieu ?? '—'} câu
@@ -171,11 +171,11 @@ function BangNhip({ em }: { em: readonly EmNhip[] }) {
                         </span>
                       </span>
                     </td>
-                    <td>
+                    <td data-nhan="Tầng hiện tại">
                       <ChipTang tang={e.tang} />
                     </td>
-                    <td className="gvv2-so">{e.daXep} câu</td>
-                    <td className="gvv2-ghi-chu">{e.conThieu > 0 ? <span data-loai="thieu">Thiếu {e.conThieu} câu phù hợp</span> : du ? <span data-loai="du">Đủ mức hôm nay</span> : e.daLam === 0 ? <span data-loai="chua">Chưa làm câu nào</span> : <span>Còn {Math.max(0, (e.toiThieu ?? 0) - e.daLam)} câu</span>}</td>
+                    <td className="gvv2-so" data-nhan="Đã xếp">{e.daXep} câu</td>
+                    <td className="gvv2-ghi-chu" data-nhan="Ghi chú">{e.conThieu > 0 ? <span data-loai="thieu">Thiếu {e.conThieu} câu phù hợp</span> : du ? <span data-loai="du">Đủ mức hôm nay</span> : e.daLam === 0 ? <span data-loai="chua">Chưa làm câu nào</span> : <span>Còn {Math.max(0, (e.toiThieu ?? 0) - e.daLam)} câu</span>}</td>
                   </tr>
                 )
               })}

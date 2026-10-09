@@ -369,3 +369,11 @@ html:root body .v2 .h2-sanh.v2s-nhung:empty { display: none; }
   :root:not([data-giao-dien='sang']) .v2s-canh { opacity: .55; }
 }
 :root[data-giao-dien='toi'] .v2s-canh { opacity: .55; }
+
+/* Màn rộng: tiến độ ngày bên trái, việc tiếp theo bên phải; cùng state khi xoay. */
+@media (min-width: 1200px) {
+  .v2-sanh[data-khu='hom-nay'] .v2s-khung { display: grid; grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr); align-items: start; gap: 32px; max-width: 1200px; }
+  .v2-sanh[data-khu='hom-nay'] .v2s-anh-hung { position: sticky; top: 24px; min-height: 440px; }
+  .v2-sanh[data-khu='hom-nay'] .v2s-luoi { margin: 0; max-width: none; grid-template-columns: minmax(0, 1fr); }
+  .v2s-buoc { min-height: 80px; }
+}
