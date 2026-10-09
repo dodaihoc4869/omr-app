@@ -1,12 +1,15 @@
-// Mục "Điểm số" (bản vẽ khổ 2): khối anh hùng = điểm ca gần nhất + trung bình + đường điểm các ca đã công bố (tối đa 8, máy chủ gửi `tienBo.diem`),
-// danh sách ca (mới trước, mỗi ca mở màn chi tiết), cách tính điểm một ca. Chỉ ca ĐÃ công bố có điểm; ca gần nhất chưa công bố hiện dòng "chờ thầy công bố".
+// Mục "Ca kiểm tra" — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (trước là "Lịch sử" ở thanh mục và "Điểm số" ở tiêu đề màn: MỘT khái niệm MỘT tên).
+// Thẻ trên: ca gần nhất (điểm + ba phần + lời thầy của ca ấy nếu có, nút xem bài làm); dưới: "Các ca trước" (mới trước, mỗi ca mở màn chi tiết).
+// Đường điểm các ca chuyển sang Tiến bộ (`BieuDo` vẫn ở tệp này, Tiến bộ dùng lại). Chỉ ca ĐÃ công bố có điểm; ca chưa công bố hiện câu "chờ công bố".
+// (Tên tệp giữ "ManDiemSo" để không xoá khai báo màu của đồ thị — cổng `npm run kiem:mau-giu` so theo từng tệp.)
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
-import type { DiemTienBo } from '../../lib/ph-moi/du-lieu'
-import { ngayChuoiNgan, ngayDayDuVn, soVn, tachVn } from '../../lib/ph-moi/dinh-dang'
+import type { CaGanNhat, DiemTienBo } from '../../lib/ph-moi/du-lieu'
+import type { NhanXetCa } from '../../lib/ph-v3/du-lieu'
+import { ngayChuoiNgan, ngayDayDuVn, soVn } from '../../lib/ph-moi/dinh-dang'
 import { chuCongBoCa } from '../ph-moi/nhan'
-import { BtKhoa, BtTienBo } from './BieuTuong'
-import { DangTai, DoiDiem, TheLoi, TheTrong } from './dung-chung'
-import { lienKetCa } from './tien-ich'
+import { BtKhoa, BtPhai } from './BieuTuong'
+import { DangTai, The, TheLoi, TheTrong } from './dung-chung'
+import { TEN_PHAN, chuThay, diemCacCa, lienKetCa } from './tien-ich'
 
 const THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'] as const
 export function thuNgan(ngay: string): string {
@@ -30,7 +33,8 @@ export function dungBieuDo(ds: readonly { diem: number }[]): { x: number[]; y: n
   return { x, y: ds.map((d) => yCua(d.diem)), luoi }
 }
 
-function BieuDo({ ds }: { ds: DiemTienBo[] }) {
+/** Đường điểm các ca (dùng ở Tiến bộ, trên nền khối anh hùng). */
+export function BieuDo({ ds }: { ds: DiemTienBo[] }) {
   const { x, y, luoi } = dungBieuDo(ds)
   const cuoi = ds.length - 1
   const duong = x.map((xi, i) => `${xi.toFixed(1)},${y[i]!.toFixed(1)}`).join(' ')
@@ -67,90 +71,76 @@ function BieuDo({ ds }: { ds: DiemTienBo[] }) {
   )
 }
 
-export default function ManDiemSo({ v, coNhanXet }: { v: ViewPhMoi; coNhanXet: ReadonlySet<string> }) {
+export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanXetCa[] | null }) {
   const pm = v.pm
   if (!pm) return (
     <div>
-      <div className="ph3-tieu-de"><h1>Điểm số</h1></div>
+      <div className="ph3-tieu-de"><h1>Ca kiểm tra</h1></div>
       {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />}
     </div>
   )
   const ca = pm.caGanNhat
-  // cũ → mới, chỉ ca đã công bố. Ca gần nhất ĐÃ công bố mà máy chủ chưa đưa vào `tienBo.diem` (máy chủ cũ / ca vừa công bố) ⇒ thêm vào cuối, không để màn nói "chưa có ca".
-  const ds: DiemTienBo[] = [...(pm.tienBo?.diem ?? [])]
-  const tGan = ca ? tachVn(ca.nopLuc) : null
-  if (ca?.ketQua && ca.ketQua.tong !== null && tGan && !ds.some((d) => d.maCa === ca.maCa))
-    ds.push({ ngay: `${tGan.y}-${String(tGan.m).padStart(2, '0')}-${String(tGan.d).padStart(2, '0')}`, diem: ca.ketQua.tong, maCa: ca.maCa, tenCa: ca.tenCa })
-  const choCongBo = ca && !ca.ketQua && !ds.some((d) => d.maCa === ca.maCa) ? ca : null
-  const cuoi = ds[ds.length - 1]
-  const tb = ds.length > 0 ? ds.reduce((t, d) => t + d.diem, 0) / ds.length : null
-  const doiTuDau = ds.length > 1 ? cuoi!.diem - ds[0]!.diem : null
+  const ds = diemCacCa(pm)
+  const nhanXet = new Map((loiThay ?? []).map((x) => [x.maCa, x]))
+  const truoc = [...ds].reverse().filter((d) => d.maCa !== ca?.maCa)
   return (
-    <div data-vung="man-diem-so">
-      <div className="ph3-tieu-de"><h1>Điểm số</h1></div>
+    <div data-vung="man-ca-kiem-tra">
+      <div className="ph3-tieu-de"><h1>Ca kiểm tra</h1></div>
       <div className="ph3-luoi">
-        {cuoi ? (
-          <section className="ph3-ah ph3-o-rong" aria-label="Xu hướng điểm của con" data-vung="xu-huong-diem">
-            <div className="ph3-ah__cap">
-              <div><span>Ca gần nhất · {ngayChuoiNgan(cuoi.ngay)}</span><b data-mau="vong-hp">{soVn(cuoi.diem)}<small> /10</small></b></div>
-              {ds.length > 1 && <div><span>Trung bình {ds.length} ca</span><b>{soVn(tb!)}<small> /10</small></b></div>}
-            </div>
-            {doiTuDau !== null && (
-              <span className="ph3-ah__chip" data-mau="xl" style={{ alignSelf: 'flex-start' }}>
-                <BtTienBo co={16} day={2.5} />
-                {doiTuDau > 0.004 ? `Tăng ${soVn(doiTuDau)} điểm` : doiTuDau < -0.004 ? `Giảm ${soVn(-doiTuDau)} điểm` : 'Giữ nguyên điểm'} từ ca {ngayChuoiNgan(ds[0]!.ngay)}
-              </span>
-            )}
-            <BieuDo ds={ds} />
-          </section>
-        ) : null}
-
-        {ds.length === 0 && !choCongBo ? (
-          <TheTrong id="ph3-ds-trong" tieuDe="Các ca kiểm tra" chu="Con chưa có ca kiểm tra nào được công bố điểm. Khi thầy công bố, điểm và từng câu của con hiện ở đây." />
-        ) : (
+        {ca && <CaMoiNhat ca={ca} loi={nhanXet.get(ca.maCa)?.noiDung ?? ''} />}
+        {truoc.length > 0 && (
           <section className="ph3-the ph3-the--sat ph3-o-hep" aria-labelledby="ph3-ds-ca" data-vung="ds-ca">
-            <div className="ph3-the__dau"><div><h2 id="ph3-ds-ca">Các ca kiểm tra</h2></div><span className="ph3-ghi" style={{ fontSize: 13 }}>Điểm trên thang 10</span></div>
+            <div className="ph3-the__dau"><div><h2 id="ph3-ds-ca">{ca ? 'Các ca trước' : 'Các ca kiểm tra'}</h2></div><span className="ph3-ghi" style={{ fontSize: 13 }}>Điểm trên thang 10</span></div>
             <ul className="ph3-ds-ca">
-              {choCongBo && (
-                <li>
-                  <a href={lienKetCa(choCongBo.maCa)}>
-                    <span className="ph3-ngay" data-moi=""><span>Mới</span><BtKhoa co={18} /></span>
-                    <span className="ph3-ds-ca__giua"><b>{choCongBo.tenCa}</b><span>{chuCongBoCa(choCongBo)}</span></span>
-                    <span className="ph3-ds-ca__phai"><span className="ph3-ghi" style={{ fontSize: 13 }}>{ngayDayDuVn(choCongBo.nopLuc).replace(/\/\d{4}$/, '')}</span></span>
+              {truoc.map((d) => (
+                <li key={d.maCa}>
+                  <a href={lienKetCa(d.maCa)}>
+                    <span className="ph3-ngay"><span>{thuNgan(d.ngay)}</span><b>{ngayChuoiNgan(d.ngay)}</b></span>
+                    <span className="ph3-ds-ca__giua">
+                      <b>{d.tenCa}</b>
+                      {nhanXet.has(d.maCa) && <span>Có nhận xét của thầy</span>}
+                    </span>
+                    <span className="ph3-ds-ca__phai"><b>{soVn(d.diem)}</b></span>
                   </a>
                 </li>
-              )}
-              {[...ds].reverse().map((d, i, dao) => {
-                const truoc = dao[i + 1]
-                return (
-                  <li key={d.maCa}>
-                    <a href={lienKetCa(d.maCa)}>
-                      <span className="ph3-ngay" data-moi={i === 0 && !choCongBo ? '' : undefined}><span>{thuNgan(d.ngay)}</span><b>{ngayChuoiNgan(d.ngay)}</b></span>
-                      <span className="ph3-ds-ca__giua">
-                        <b>{d.tenCa}</b>
-                        {coNhanXet.has(d.maCa) ? <span>Có nhận xét của thầy</span> : !truoc ? <span>Ca đầu tiên trong danh sách</span> : null}
-                      </span>
-                      <span className="ph3-ds-ca__phai">
-                        <b>{soVn(d.diem)}</b>
-                        {truoc && <DoiDiem doi={d.diem - truoc.diem} />}
-                      </span>
-                    </a>
-                  </li>
-                )
-              })}
+              ))}
             </ul>
           </section>
         )}
-
-        <section className="ph3-the ph3-o-du" aria-labelledby="ph3-cach-tinh">
-          <div className="ph3-the__dau"><div><h2 id="ph3-cach-tinh" style={{ fontSize: 15 }}>Cách tính điểm một ca kiểm tra (đề đủ ba phần)</h2></div></div>
-          <div className="ph3-cach-tinh">
-            <div><b>4,5</b><span>Trắc nghiệm · 18 câu × 0,25 điểm</span></div>
-            <div><b>4,0</b><span>Đúng–sai · 4 câu, điểm theo số ý đúng</span></div>
-            <div><b>1,5</b><span>Trả lời ngắn · 6 câu × 0,25 điểm</span></div>
-          </div>
-        </section>
+        {!ca && truoc.length === 0 && (
+          <TheTrong id="ph3-ds-trong" tieuDe="Chưa có ca kiểm tra" chu="Con chưa có ca kiểm tra nào được công bố điểm. Khi thầy công bố, điểm và từng câu của con hiện ở đây." />
+        )}
       </div>
     </div>
+  )
+}
+
+/** Ca gần nhất: điểm + ba phần (đã công bố) hoặc câu chờ công bố; lời thầy của ca ấy (nếu có); MỘT nút chính của màn: xem bài làm. */
+function CaMoiNhat({ ca, loi }: { ca: CaGanNhat; loi: string }) {
+  const kq = ca.ketQua
+  const phu = [ngayDayDuVn(ca.nopLuc), kq?.soCau ? `${kq.soCau} câu` : ''].filter(Boolean).join(' · ')
+  return (
+    <The id="ph3-ca" className="ph3-o-rong" vung="ca-gan-nhat" tieuDe={ca.tenCa} phu={phu || undefined}>
+      {kq && kq.tong !== null ? (
+        <>
+          <div className="ph3-so-lon"><span><b>{soVn(kq.tong)}</b><small> /10 điểm</small></span></div>
+          {ca.phan.length > 0 && (
+            <div className="ph3-phan">
+              {ca.phan.map((p) => (
+                <div key={p.ma}>
+                  <span>{TEN_PHAN[p.ma]}</span>
+                  <span className="ph3-thanh"><span style={{ width: `${(p.dung / p.tong) * 100}%` }} /></span>
+                  <b>{p.dung}/{p.tong} câu</b>
+                </div>
+              ))}
+            </div>
+          )}
+          {loi && <p className="ph3-loi-thay" data-vung="loi-thay-ca"><b>Thầy Đỗ Đại Học:</b> {chuThay(loi)}</p>}
+          <a className="ph3-nut-tong" href={lienKetCa(ca.maCa)}>Xem bài làm của con<BtPhai co={18} day={2.5} /></a>
+        </>
+      ) : (
+        <p className="ph3-cho-cong-bo"><BtKhoa co={20} /><span>{chuCongBoCa(ca)}</span></p>
+      )}
+    </The>
   )
 }

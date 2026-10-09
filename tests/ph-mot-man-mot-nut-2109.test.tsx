@@ -45,7 +45,7 @@ afterEach(() => {
 })
 
 // ĐỔI 28/09 — thầy: "app phụ huynh không có giao bài cho con nữa chỉ xem được báo cáo mọi thứ về con". "MỘT nút Giao thêm bài cho con" (21/09) đã GỠ:
-// cổng mở app chỉ xem components/ph-v3/AppPhuHuynh (4 mục bằng liên kết). Khối dưới giữ tinh thần cũ (không tính năng đã gỡ, danh sách nút hữu hạn) cho app mới.
+// cổng mở app chỉ xem components/ph-v3/AppPhuHuynh (3 mục bằng liên kết — bản vẽ tối giản thầy chốt 09/10, thay thứ tự 01/10). Khối dưới giữ tinh thần cũ (không tính năng đã gỡ, danh sách nút hữu hạn) cho app mới.
 describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
   it('không chuỗi nào của tính năng đã gỡ (kể cả "Giao thêm bài cho con"); không tab/sheet cũ; menu tài khoản chỉ dựng khi bấm nút tròn', async () => {
     const { container } = render(<ParentPortalScreen />)
@@ -66,8 +66,8 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(1)
-    // bốn mục điều hướng là LIÊN KẾT (không phải nút)
-    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Lịch sử', 'Lời thầy'])
+    // SỬA CÓ CHỦ Ý — bản vẽ tối giản thầy chốt 09/10 (thay thứ tự 01/10): BA mục điều hướng là LIÊN KẾT (không phải nút)
+    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Ca kiểm tra'])
   })
 
   it('cảnh báo của thầy hiện ở Hôm nay (thụ động: chỉ "Đã xem cảnh báo", không "Làm ngay")', async () => {

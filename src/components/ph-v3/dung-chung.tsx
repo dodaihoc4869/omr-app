@@ -1,7 +1,5 @@
-// Mảnh dùng chung của app phụ huynh mới: thẻ, chip, vòng tiến độ, số thay đổi, ba trạng thái tải · trống · lỗi. Không màu thô (token --ph3-* trong CSS).
+// Mảnh dùng chung của app phụ huynh mới: thẻ, chip, ba trạng thái tải · trống · lỗi. Không màu thô (token --ph3-* trong CSS).
 import type { ReactNode } from 'react'
-import { soVn } from '../../lib/ph-moi/dinh-dang'
-import { BtLen, BtXuong } from './BieuTuong'
 
 export type Mau = 'xd' | 'xl' | 'hp' | 'ho' | 'tim'
 
@@ -41,55 +39,6 @@ export function Chip({ mau, nho = false, children }: { mau: Mau; nho?: boolean; 
     <span className={`ph3-chip${nho ? ' ph3-chip--nho' : ''}`} data-mau={mau}>
       {children}
     </span>
-  )
-}
-
-/** Vòng tiến độ đồng tâm (tối đa 3). `ti` 0–1 (vượt 1 ⇒ vẽ đầy); `null` ⇒ chỉ vẽ ray (không có mục tiêu). */
-export function VongDongTam({ vong, co = 140, nhan }: { vong: { ti: number | null; mau: 'vong-hp' | 'vong-xl' | 'vong-tim' }[]; co?: number; nhan: string }) {
-  const R = [64, 46, 28]
-  return (
-    <svg width={co} height={co} viewBox="0 0 148 148" role="img" aria-label={nhan}>
-      {vong.slice(0, 3).map((v, i) => {
-        const r = R[i]!
-        const chuVi = 2 * Math.PI * r
-        const ti = v.ti === null ? 0 : Math.max(0, Math.min(1, v.ti))
-        return (
-          <g key={i} data-mau={v.mau}>
-            <circle cx="74" cy="74" r={r} fill="none" stroke="currentColor" strokeOpacity={0.22} strokeWidth="14" />
-            {ti > 0 && (
-              <circle
-                cx="74" cy="74" r={r} fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap={ti >= 1 ? 'butt' : 'round'}
-                strokeDasharray={`${(ti * chuVi).toFixed(2)} ${chuVi.toFixed(2)}`} transform="rotate(-90 74 74)"
-              />
-            )}
-          </g>
-        )
-      })}
-    </svg>
-  )
-}
-
-/** "▲ 0,5" · "▼ 0,25" · "= 0" — mũi tên + dấu bằng CHỮ (màu không là kênh duy nhất). */
-export function DoiDiem({ doi, duoi = '' }: { doi: number; duoi?: string }) {
-  const huong = doi > 0.004 ? 'len' : doi < -0.004 ? 'xuong' : 'giu'
-  return (
-    <span className="ph3-doi" data-huong={huong}>
-      {huong === 'len' ? 'Tăng ' : huong === 'xuong' ? 'Giảm ' : 'Giữ nguyên'}
-      {huong !== 'giu' && soVn(Math.abs(doi))}
-      {duoi}
-    </span>
-  )
-}
-export function ChipDoi({ doi, duoi }: { doi: number; duoi: string }) {
-  const len = doi > 0.004
-  const xuong = doi < -0.004
-  return (
-    <Chip mau={len ? 'xl' : xuong ? 'ho' : 'xd'}>
-      {len ? <BtLen co={14} day={3} /> : xuong ? <BtXuong co={14} day={3} /> : null}
-      {len ? 'Tăng ' : xuong ? 'Giảm ' : 'Giữ nguyên '}
-      {len || xuong ? `${soVn(Math.abs(doi))} ` : ''}
-      {duoi}
-    </Chip>
   )
 }
 
