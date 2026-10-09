@@ -2,7 +2,7 @@
 import { describe,expect,it } from 'vitest'
 import { quanSatDocLap,chuoiSaiKyNang,type QuanSatHanhTrinh } from '../server/src/hanh-trinh-quan-sat'
 import { fitHalfLife,halfLife,henHalfLife,xacSuatNho } from '../server/src/half-life'
-import { dungDoThi,thieuTienQuyet,canhDangHoc } from '../server/src/do-thi-tien-quyet'
+import { dungDoThi,thieuTienQuyet,canhDangHoc,tangViKyNang } from '../server/src/do-thi-tien-quyet'
 import { chonBandit } from '../server/src/bandit'
 import { doCanThiep,phanBoCanThiep,dongCoHanhTrinh,SQL_DONG_CO_HANH_TRINH } from '../server/src/hanh-trinh-dong-co'
 import type { QCau,SuKienOmni } from '../server/src/omni-kieu'
@@ -37,13 +37,14 @@ describe('Động cơ Hành trình: bằng chứng, trí nhớ, tiên quyết, c
     expect(m.kyNang['dang:a']).toMatchObject({n:1,dung:0,sai:1})
   })
   it('L1 mở, L3 cần SPRT của cả L1/L2 và mọi nền; hiểu một bài không mở kỹ năng bài khác',()=>{
-    const qs=Array.from({length:10},(_,i)=>obs(i,true,{kn:['dang:a','nen:mol']}))
+    expect(tangViKyNang('Nhận biết')).toBe(1);expect(tangViKyNang('Thông hiểu')).toBe(2);expect(tangViKyNang('Vận dụng cao')).toBe(4)
+    const qs=Array.from({length:10},(_,i)=>obs(i,true,{mucDo:'Nhận biết',kn:['dang:a','nen:mol']}))
     const hs=phatLaiEm('S',{suKien:[],q:new Map(),homNay:HOM_NAY})
     hs.vkn['nen:mol']={vkn:'nen:mol',p:0.95,nTuLam:10,nCau:10,nNgay:10,nTroiChay:0,nCauLaDung:0,diemSprt:3,trangThai:'vung',ngayCuoi:HOM_NAY,dayLai:false}
     const g=dungDoThi(qs,T_SANG+30*DAY)
     expect(thieuTienQuyet(cau('q','VD',['dang:a','nen:mol']),3,g,hs)).toEqual(['dang:a'])
     expect(thieuTienQuyet(cau('q','NB'),1,g,hs)).toEqual([])
-    for(let i=10;i<20;i++) qs.push(obs(i,true,{mucDo:'TH',kn:['dang:a','nen:mol']}))
+    for(let i=10;i<20;i++) qs.push(obs(i,true,{mucDo:'Thông hiểu',kn:['dang:a','nen:mol']}))
     expect(thieuTienQuyet(cau('q','VD',['dang:a','nen:mol']),3,dungDoThi(qs,T_SANG+30*DAY),hs)).toEqual([])
     expect(thieuTienQuyet(cau('q','VD',['dang:b']),3,dungDoThi(qs,T_SANG+30*DAY),hs)).toEqual(['dang:b'])
     hs.vkn['nen:mol'].dayLai=true

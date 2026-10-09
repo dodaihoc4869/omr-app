@@ -1,9 +1,10 @@
 // Đồ thị tầng của vi kỹ năng. Cạnh curriculum từ nhãn Q; cạnh học từ dữ liệu chỉ dùng xếp ưu tiên.
 import type { HoSoOmniEm, QCau } from './omni-kieu'
+import { HANG_MUC_DO } from './srs2-loi'
 import { vknCaCau } from './omni-p-vkn'
 import { buocSprtPhatLai, trangThaiSprt } from './omni-sprt'
 import type { QuanSatHanhTrinh } from './hanh-trinh-quan-sat'
-export const tangViKyNang=(m:string|null):number => ({NB:1,biet:1,TH:2,hieu:2,VD:3,van_dung:3,VDC:4}[m??''] ?? 0)
+export const tangViKyNang=(m:string|null):number => {const t=HANG_MUC_DO[m?.trim()??''];return t===undefined?0:t+1}
 export interface CanhHoc { tu:string; den:string; nCo:number; dungCo:number; nChua:number; dungChua:number; soEm?:number }
 export interface DoThiHanhTrinh { diem:Map<string,number>; canh:CanhHoc[] }
 const node=(k:string,t:number)=>`${k}@L${t}`
