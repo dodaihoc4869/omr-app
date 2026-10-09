@@ -6,7 +6,7 @@ Trước khi báo thiếu, máy tìm hết nguồn được phép trong kho đã
 
 Máy chuẩn bị thêm tối đa một mức tối thiểu làm dự phòng; không tăng nghĩa vụ học sinh. Khi chọn lại sau chặng, các nguồn dự phòng được nạp cùng quyền hiện hành và kiểm lại. Lần chuẩn bị đầu giữa chặng giữ câu đang giao còn hợp lệ. Phần đã hoàn thành được giữ; ghi kế hoạch dùng so-khớp để hai thiết bị không ghi đè nhau.
 
-Bản được giao riêng có qid riêng và chỉ tăng tiến độ một lần. Lịch sử vẫn giữ câu gốc/contentGroup: cùng nhóm cùng ngày không trở thành nhiều bằng chứng thành thạo độc lập. Nạp, tiếp tục và chấm dùng luồng máy chủ hiện có; đáp án không gửi xuống trước khi nộp.
+Bản được giao riêng có qid riêng và chỉ tăng tiến độ một lần. Báo cáo phụ huynh đọc cùng định danh nhiệm vụ, kiểm metadata trên bản sao hồ sơ, không lập kế hoạch và không nhân đôi thống kê kỹ năng. Lịch sử vẫn giữ câu gốc/contentGroup: cùng nhóm cùng ngày không trở thành nhiều bằng chứng thành thạo độc lập. Nạp, tiếp tục và chấm dùng luồng máy chủ hiện có; đáp án không gửi xuống trước khi nộp.
 
 Bảng `hanh_trinh_nguon_cau` chỉ thêm: lưu dự phòng, thiếu nguồn, mức tối thiểu, số câu đã xếp và thời điểm chuẩn bị theo học sinh × ngày. App thầy hiện số dự phòng và danh sách dạng trong kho cần bổ sung/củng cố nền, kèm số thiếu thực. Danh sách này là dấu hiệu theo các ứng viên hiện có, chưa phải kiểm kê toàn bộ kỹ năng không có câu.
 

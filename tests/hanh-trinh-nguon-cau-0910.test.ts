@@ -2,13 +2,14 @@
 import { afterEach,expect,it } from 'vitest'
 import { taoKhoOmni,themChienDich,lam,T_SANG,HOM_NAY } from './omni-3-ke-hoach-chung'
 import { dongBoBaHanhTrinh } from '../server/src/hanh-trinh-hop-nhat'
-import { layKeHoachHomNay,xoaDemChienDich,tamHoanCauKhoa } from '../server/src/srs2-d1'
+import { layKeHoachHomNay,xoaDemChienDich,tamHoanCauKhoa,docKeHoachDaChot } from '../server/src/srs2-d1'
 import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
 import { napLuot } from '../server/src/srs2-game'
 import { laBanBu,gocNguonCau,chuanBiNguonCau,idDaLam,ganBanBu } from '../server/src/hanh-trinh-nguon-cau'
 import { quanSatDocLap } from '../server/src/hanh-trinh-quan-sat'
 import { docSuKienOmni,qCuaCau,xoaDemOmni } from '../server/src/omni-d1'
+import {phHoc2} from '../server/src/ph-bao-cao-moi'
 const dong:ReturnType<typeof taoKhoOmni>[]=[]
 afterEach(()=>{for(const k of dong.splice(0))k.d.sql.close();xoaDemChienDich();xoaDemOmni()})
 async function kho(n:number,ban=true){
@@ -30,6 +31,7 @@ async function kho(n:number,ban=true){
 it('12 câu gốc có bản kiểm chứng tạo đủ24, nạp/chấm được và không khử nhầm như bản sao',async()=>{
  const k=await kho(12),{kh,hs}=await layKeHoachHomNay(k.env,'S1',T_SANG)
  expect(kh.tong).toBe(24);expect(kh.hanhTrinh?.conThieu).toBe(0)
+ expect((await phHoc2(k.env,{sbd:'S1'},T_SANG)).homNay).toEqual({tong:24,daLam:0})
  const ids=[...kh.dao,...kh.doan],ao=ids.filter(laBanBu);expect(ao).toHaveLength(12)
  const sach=await tamHoanCauKhoa(k.env,kh,hs,Promise.resolve(new Set()),Promise.resolve(new Set()),'S1');expect(sach.tong).toBe(24)
  const day=await napLuot(k.env,hs,ao,new Set(),'tb',6);expect(day).toHaveLength(6)
@@ -37,6 +39,8 @@ it('12 câu gốc có bản kiểm chứng tạo đủ24, nạp/chấm được 
  for(const [i,id] of ids.entries())await lam(k.env,'S1',id,T_SANG+1000+i,true,{cauVersion:'v1',raw:{tc:gocNguonCau(id)}})
  const next=await layKeHoachHomNay(k.env,'S1',T_SANG+5000);expect(next.kh.hanhTrinh?.daLam).toBe(24)
  expect(next.kh.conDao.length+next.kh.conDoan.length).toBe(0)
+ const doc=await docKeHoachDaChot(k.env,'S1',T_SANG+6000);expect(doc!.conDao.length+doc!.conDoan.length).toBe(0)
+ expect((await phHoc2(k.env,{sbd:'S1'},T_SANG+6000)).homNay).toEqual({tong:24,daLam:24})
  const events=(await docSuKienOmni(k.env,['S1'])).get('S1')??[],q=await qCuaCau(k.env,ids)
  expect(quanSatDocLap('S1',events,q,T_SANG+6000)).toHaveLength(12)
 })
