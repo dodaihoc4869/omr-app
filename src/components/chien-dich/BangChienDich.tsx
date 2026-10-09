@@ -284,7 +284,7 @@ export default function BangChienDich({
           <td>{e.ten}</td><td>{e.tang ? ['Nền','Hiểu','Vận dụng','Tổng hợp'][e.tang-1] : 'Chưa mở app hôm nay'}</td>
           <td>{e.toiThieu ? `${e.daLam}/${e.toiThieu} câu` : 'Chưa chốt kế hoạch'}</td>
           <td>{e.toiThieu ? `${Math.floor(e.daLam/6)}/${Math.ceil(e.toiThieu/6)} chặng` : '—'}</td>
-          <td>{e.conThieu ? `${e.conThieu} câu` : '—'}</td>
+          <td>{e.conThieu ? `${e.conThieu} câu` : '—'}{e.duPhong != null&&<small> · Dự phòng {e.duPhong} câu</small>}{!!e.canBoSung?.length&&<details><summary>Kiến thức cần bổ sung</summary><ul>{e.canBoSung.map((c,i)=><li key={i}>{c.ten} · {c.lyDo==='can_sua_nen'?'Củng cố nền':'Thêm câu đã duyệt'}</li>)}</ul></details>}</td>
           <td>{e.tienDo?.tong ? `${e.tienDo.dat}/${e.tienDo.tong} kỹ năng` : 'Chưa có phạm vi đo'}</td>
           <td>{e.tienDo?.tong ? `${e.tienDo.daDo}/${e.tienDo.tong} kỹ năng` : '—'}</td>
         </tr>)}</tbody>

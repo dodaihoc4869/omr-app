@@ -174,8 +174,8 @@ function BangNhip({ em }: { em: readonly EmNhip[] }) {
                     <td data-nhan="Tầng hiện tại">
                       <ChipTang tang={e.tang} />
                     </td>
-                    <td className="gvv2-so" data-nhan="Đã xếp">{e.daXep} câu</td>
-                    <td className="gvv2-ghi-chu" data-nhan="Ghi chú">{e.conThieu > 0 ? <span data-loai="thieu">Thiếu {e.conThieu} câu phù hợp</span> : du ? <span data-loai="du">Đủ mức hôm nay</span> : e.daLam === 0 ? <span data-loai="chua">Chưa làm câu nào</span> : <span>Còn {Math.max(0, (e.toiThieu ?? 0) - e.daLam)} câu</span>}</td>
+                    <td className="gvv2-so" data-nhan="Đã xếp"><span className="gvv2-em-chu"><span>{e.daXep} câu</span>{e.duPhong != null && <small>Dự phòng {e.duPhong} câu</small>}</span></td>
+                    <td className="gvv2-ghi-chu" data-nhan="Ghi chú"><div className="gvv2-em-chu">{e.conThieu > 0 ? <span data-loai="thieu">Thiếu {e.conThieu} câu phù hợp</span> : du ? <span data-loai="du">Đủ mức hôm nay</span> : e.daLam === 0 ? <span data-loai="chua">Chưa làm câu nào</span> : <span>Còn {Math.max(0, (e.toiThieu ?? 0) - e.daLam)} câu</span>}{!!e.canBoSung?.length&&<details><summary>Kiến thức cần bổ sung</summary><ul>{e.canBoSung.map((c,i)=><li key={i}>{c.ten} · {c.lyDo==='can_sua_nen'?'Cần câu củng cố nền':'Cần thêm câu đã duyệt'}</li>)}</ul></details>}</div></td>
                   </tr>
                 )
               })}
