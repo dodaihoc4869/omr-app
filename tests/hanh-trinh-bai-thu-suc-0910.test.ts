@@ -276,4 +276,6 @@ describe('hoa2-sanh không thêm truy vấn D1', () => {
 })
 // Đo trên bản TRƯỚC khi thêm `bai` / Thử sức thêm Hành trình (69a0731) với cùng kịch bản.
 // Gộp main 113000a (tối ưu CPU: không dựng lại tầng theo bài khi đã có dòng chốt tầng) ⇒ mở lại / sau đủ sàn còn 30 lệnh (trước 36).
-const SO_LENH_SANH = { dau: 129, moLai: 30, sauSan: 30 }
+// Gộp main #217 (Hành trình v6: bảng chọn v6, chẩn đoán, kiểm đầu/tuần) ⇒ đo lại 09/10 12:20: cùng kịch bản chạy RIÊNG một tệp cho 151/38/38 trên CẢ main 4346618
+// lẫn nhánh này (phần thêm `bai` / Thử sức thêm = 0 lệnh); trong tệp này lượt đầu ngày +1 lệnh do đệm mô-đun còn từ test chạy trước.
+const SO_LENH_SANH = { dau: 152, moLai: 38, sauSan: 38 }

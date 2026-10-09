@@ -53,6 +53,12 @@ function chuanHoa(html: string): string {
 beforeEach(() => { sessionStorage.clear(); localStorage.clear() })
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
+it('bài kiểm đầu/tuần chỉ nhận cờ đúng 14 câu, mở luồng đề thử sẵn có',()=>{
+ const onKhamPhaDao=vi.fn(),{container}=ve({...DANG_LAM,omni:{...OMNI,kiemHanhTrinh:{loai:'dau',soCau:14}}},{onKhamPhaDao})
+ const b=container.querySelector<HTMLButtonElement>('[data-khoi="kiem-hanh-trinh"]')!;expect(b.textContent).toContain('Làm bài kiểm đầu');fireEvent.click(b);expect(onKhamPhaDao).toHaveBeenCalledOnce();expect(layViecOmniDao()).toBe('de-thu')
+ expect(docSanhOmni({...OMNI,kiemHanhTrinh:{loai:'dau',soCau:'14'}})?.kiemHanhTrinh).toBeUndefined()
+})
+
 describe('docSanhOmni — đọc chặt, không bịa số', () => {
   it('vắng / bat khác true / rác ⇒ null (Sảnh y hệt hôm nay)', () => {
     expect(docSanhOmni(undefined)).toBeNull()

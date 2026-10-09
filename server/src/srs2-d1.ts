@@ -692,7 +692,7 @@ async function docPhamViOnBaiCu(env: Env, sbd: string, phamVi: PhamViLop, dangCh
  * CẨN THẬN (a) (omni-can-than.ts, đặc tả 4.6; chỉ-thêm): `canThanSom` = nơi gọi ĐÃ có hồ sơ OMNI (lúc LẬP kế hoạch ngày — `layKeHoachChot`) cho biết em có `canThan`
  * không; ĐÚNG ⇒ mốc kiểm duy trì của luật đóng lỗi × 0,7. Vắng / OMNI tắt / sai ⇒ mốc y hệt hôm nay (KHÔNG đọc thêm D1 ở đây).
  */
-export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>, khiCoQids?: (qids: readonly string[]) => void): Promise<HoSo2> {
+export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: Promise<boolean>, canThanSom?: Promise<boolean>, khiCoQids?: (qids: readonly string[]) => void, ungMoRong?:readonly string[]): Promise<HoSo2> {
   env = { ...env, DB: gopDocD1(env.DB) }
   const omniP = omniSom ?? omniBatEm(env, sbd)
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
@@ -701,7 +701,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   // OMNI 3: mọi chiến dịch đang chạy, hạn gần trước; cờ tắt ⇒ một chiến dịch (giao gần nhất) như cũ.
   const ht = ds.find(c => laHanhTrinh(c.id) && c.trangThai === 'dang_chay' && !chuaBatDau(c, homNay))
   if (ht) {
-    const ung = await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids)
+    const rotated = await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids)
+    const ung:readonly string[] = ungMoRong ? ungMoRong : await import('./hanh-trinh-v6-kho').then(m=>m.ungVienV6(env,ht,sbd,homNay,phamVi,rotated))
     const can = new Set([...ung, ...qidSaiCa.keys(), ...qidSaiLop.keys(), ...qidSaiMoiKenh.keys()])
     // Không nạp lại toàn bộ kho của các chiến dịch nguồn đã đóng.
     for (let i = 0; i < ds.length; i++) ds[i] = { ...ds[i]!, qids: ds[i]!.qids.filter(q => can.has(q)) }
@@ -1672,6 +1673,18 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
   const som = await omniSanhSom
   const omni = await lanOmniD1().then((m) => m.omniChoSanh(env, sbd, nowMs, { tong: kh.tong, con: conLai, chienDichId: cd?.id ?? null, onBaiCu, cheDoCho: hs.omni!.cheDoCho }, som)).catch(() => null)
   if(omni&&kh.hanhTrinh?.tang===4)omni.l4Kiem={duoc:true,soCau:6}
+  if(omni&&kh.hanhTrinh&&omni.deThu.duoc){
+    const n=await import('./hanh-trinh-do-luong').then(m=>m.docNhom(env,sbd))
+    if(n){const delay=(nowMs-n.bat_dau)/86400000
+      if(n.diem_dau===null&&delay>=0&&delay<=2){
+        const practised=await env.DB.prepare("SELECT 1 FROM su_kien_hoc WHERE sbd=? AND received_at>? AND ket_qua IS NOT NULL AND COALESCE(purpose,'') NOT IN('de_thu','luot','xem_loi_giai','shadow') LIMIT 1").bind(sbd,n.bat_dau).first()
+        if(!practised)omni.kiemHanhTrinh={loai:'dau',soCau:14}
+      }else if(delay>=7&&delay<15){
+        const measured=await env.DB.prepare("SELECT 1 FROM hanh_trinh_v5_de_thu r JOIN omni_de_thu d ON d.id=r.id AND d.sbd=r.sbd WHERE r.sbd=? AND r.thu_nghiem=? AND d.nop_luc IS NOT NULL AND r.tao_luc>=? AND json_array_length(r.qids_json)>=14 LIMIT 1").bind(sbd,'ht6-hoc-va-chon-cau-0910',n.bat_dau+7*86400000).first()
+        if(!measured)omni.kiemHanhTrinh={loai:'tuan',soCau:14}
+      }
+    }
+  }
   return omni ? { ...ra, omni } : ra
 }
 

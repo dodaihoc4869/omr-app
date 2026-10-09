@@ -243,7 +243,7 @@ describe('OMNI 3 · B3 — đề thử nửa', () => {
     expect(so).toHaveLength(14)
     expect(so.every((x) => x.purpose === 'de_thu' && x.nguon === 'luyen')).toBe(true)
     expect(so.find((x) => x.qid === III[2])!.ket_qua).toBeNull()
-    expect(JSON.parse(so.find((x) => x.qid === qids[0])!.raw_json)).toEqual({ chon: theoQid.get(qids[0]!)!.correct, ms: 30_000 })
+    expect(JSON.parse(so.find((x) => x.qid === qids[0])!.raw_json)).toEqual({ chon: theoQid.get(qids[0]!)!.correct, ms: 30_000,ht_cau_version:'v1' })
     expect(d.sql.prepare('SELECT diem, nop_luc FROM omni_de_thu WHERE id = ?').get(de.id)).toEqual({ diem: 8.5, nop_luc: new Date(T0 + 10 * 60_000).toISOString() })
     // nộp lại (mạng chập chờn) với bài khác ⇒ chấm lại ĐÚNG bài đã ghi sổ, không thêm dòng
     const nopLai = await gameV2(env, 'hoa2-omni-de-thu-nop', { token, id: de.id, traLoi: {} }) as KQ

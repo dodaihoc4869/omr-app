@@ -387,7 +387,7 @@ describe('tiêu chí 5 · tắt khoá lam_lai_khac ⇒ y hệt hôm nay', () => 
     const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q2', answer: 'DSSD' })
     expect(t.correct).toBe(true)
     expect('traLoiGoc' in t).toBe(false)
-    expect(JSON.parse(soCua(d, 'Q2')[0]!.raw_json!)).toEqual({ chon: 'DSSD' })
+    expect(JSON.parse(soCua(d, 'Q2')[0]!.raw_json!)).toEqual({ ht_cau_version:'v1', chon: 'DSSD' })
     // Bật lại (xoá dòng khoá) ⇒ câu anh em ngay ngày kế.
     d.sql.exec("DELETE FROM cau_hinh WHERE khoa = 'lam_lai_khac'")
     xoaDemCauHinh(env)

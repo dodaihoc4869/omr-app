@@ -160,7 +160,7 @@ export interface CauCanDayLai {
 export interface DongNoCu { sbd: string; ten: string; soCau: number; luot: number; soNgay: number; cau: string }
 
 export interface BangChienDich {
-  hanhTrinhNgay?: { em: { sbd: string; ten: string; tang: number | null; toiThieu: number | null; daLam: number; daXep: number; conThieu: number; tienDo?: {tong:number;dat:number;chuaVung:number;chuaDu:number;daDo:number;baoPhu:number|null;soL4:number;soChanDoan:number}|null }[]; doLuong?: {soMauHopLe:number;trangThai:string;phanNhom:{nhom:string;n:number}[];ketQua:{nhom:{nhom:string;n:number;diemTb:number|null;tangDiemTb:number|null}[]}[]} }
+  hanhTrinhNgay?: { em: { sbd: string; ten: string; tang: number | null; toiThieu: number | null; daLam: number; daXep: number; conThieu: number; tienDo?: {tong:number;dat:number;chuaVung:number;chuaDu:number;daDo:number;baoPhu:number|null;soL4:number;soChanDoan:number}|null }[]; doLuong?: {giuLau?:{nhom:string;soEmDoNho:number;tyLeNho:number|null;soEmDoChuyen:number;tyLeChuyen:number|null}[];moHinh?:{soMau:number;soCauDaKiem:number;hocDaKiem:boolean};thoiGian?:{nhom:string;soLuot:number;coThoiGian:number;phutDoDuoc:number;baoPhu:number}[];soMauHopLe:number;trangThai:string;phanNhom:{nhom:string;n:number}[];ketQua:{nhom:{nhom:string;n:number;diemTb:number|null;tangDiemTb:number|null}[]}[]} }
   chienDich: Omit<ChienDichTom, 'hetHan'>
   homNay: string
   hetHan: boolean

@@ -162,7 +162,7 @@ describe('Bi-a · câu LỖI lên bàn ⇒ bản khác (câu anh em ĐÚNG KHỐ
     for (const r of phien(d, ban.session).questions) for (const k of ['tc', 'xt', 'nv']) expect(k in r, `phiên có khoá ${k}`).toBe(false)
     const t = await em(env, '/game-v2/answer', { session: ban.session, qid: chot.qid, answer: 'B' })
     expect(t.correct).toBe(true)
-    expect(JSON.parse(soCua(d, chot.qid)[0]!.raw_json!)).toEqual({ chon: 'B' })
+    expect(JSON.parse(soCua(d, chot.qid)[0]!.raw_json!)).toEqual({ ht_cau_version:'v1', chon: 'B' })
   })
 })
 

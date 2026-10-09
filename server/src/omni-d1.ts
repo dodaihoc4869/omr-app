@@ -21,6 +21,7 @@ import { phatLaiEm } from './omni-p-vkn'
 import { duBaoDiem, trongSoCau } from './du-bao-diem'
 import { xetChungChi } from './omni-chung-chi'
 import { dangDaVung } from './omni-ke-hoach'
+import { laHanhTrinh } from './hanh-trinh-hop-nhat'
 import { xetMetGio } from './omni-met-gio'
 import { canThanTu } from './omni-can-than'
 import { goiYQ, qMacDinh, vknMacDinh, vknNen } from './omni-q'
@@ -560,7 +561,9 @@ export function dongSangSuKien(x: Row, meta?: Pick<CauKho, 'phan' | 'dang' | 'mu
   const as = str(x.assistance)
   const phan: Phan = meta?.phan ?? (phanTuQid(t.goc, 'I') as Phan)
   const raw = docRawOmni(x.raw_json)
+  let cauVersion:string|null=null;try{const r=JSON.parse(str(x.raw_json));if(typeof r?.ht_cau_version==='string')cauVersion=r.ht_cau_version}catch{/* Sổ cũ không có phiên bản đáng tin. */}
   return {
+    cauVersion,
     khoa: str(x.khoa), sbd: str(x.sbd), qid: t.goc, songSinh: t.songSinh !== null, nguon: str(x.nguon),
     ketQua: kq, luc, ngayVn: str(x.ngay_vn) || ngayVn(luc), receivedAt: thoiDiemTiepNhan(x),
     assistance: as === 'assisted' ? 'assisted' : as === 'unknown' ? 'unknown' : 'none',
@@ -904,24 +907,33 @@ function nangDang(hs: HoSoOmniEm, cau: readonly QCau[], ts: ThamSoOmni): HoSoOmn
 }
 /** Số dạng chưa vững còn kéo dự báo ca chốt dưới mốc (tham lam theo điểm còn lấy được); < S_AO quan sát ⇒ null. Thuần. */
 export function demDangDe8(hs: HoSoOmniEm, cau: readonly QCau[], vung: readonly string[], ts: ThamSoOmni = THAM_SO_OMNI): number | null {
-  if (!cau.length) return null
+  if (!cau.length || cau.length > 500) return null
   const khung = khungTheoPhamVi(cau, ts)
-  const db = duBaoDiem(hs, cau, { khung, mucTieu: ts.MUC_TIEU }, ts)
+  const db = duBaoDiem(hs, cau, { khung, mucTieu: ts.MUC_TIEU, chiKyVong: true }, ts)
   if (!duDuLieu(db.soBangChung, ts)) return null
   if (db.kyVong >= ts.MUC_TIEU) return 0
   const chua = dsDang(cau).filter((d) => !vung.includes(d))
-  const diem = new Map(chua.map((d) => [d, cau.filter((c) => c.maDang === d).reduce((s, c) => s + trongSoCau(hs, c, hs.sEm, ts), 0)]))
+  const theoDang = new Map<string, QCau[]>()
+  for (const c of cau) {
+    if (!c.maDang) continue
+    const arr = theoDang.get(c.maDang)
+    if (arr) arr.push(c)
+    else theoDang.set(c.maDang, [c])
+  }
+  const diem = new Map(chua.map((d) => [d, (theoDang.get(d) ?? []).reduce((s, c) => s + trongSoCau(hs, c, hs.sEm, ts), 0)]))
   chua.sort((a, b) => diem.get(b)! - diem.get(a)! || (a < b ? -1 : 1))
   let gia = hs
-  for (let i = 0; i < chua.length; i++) {
-    gia = nangDang(gia, cau.filter((c) => c.maDang === chua[i]), ts)
-    if (duBaoDiem(gia, cau, { khung, mucTieu: ts.MUC_TIEU }, ts).kyVong >= ts.MUC_TIEU) return i + 1
+  const gioiHan = Math.min(chua.length, 30)
+  for (let i = 0; i < gioiHan; i++) {
+    const cauDang = theoDang.get(chua[i]) ?? []
+    if (cauDang.length) gia = nangDang(gia, cauDang, ts)
+    if (duBaoDiem(gia, cau, { khung, mucTieu: ts.MUC_TIEU, chiKyVong: true }, ts).kyVong >= ts.MUC_TIEU) return i + 1
   }
   return chua.length
 }
 /** Chiến dịch ĐANG LUYỆN của em (đang chạy, còn hạn, đã tới ngày bắt đầu), hạn gần trước. */
 export function chienDichDangLuyen(ds: readonly ChienDich[], homNay: string): ChienDich[] {
-  return ds.filter((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay))
+  return ds.filter((c) => !laHanhTrinh(c.id) && c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay))
     .sort((a, b) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : a.taoLuc < b.taoLuc ? -1 : a.taoLuc > b.taoLuc ? 1 : 0))
 }
 /** Thứ Hai (YYYY-MM-DD) của tuần chứa ngày VN `ngay`. Thuần. */
@@ -990,6 +1002,8 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
     ])
     const dangLuyen = chienDichDangLuyen(ds, homNay)
     const gan = dangLuyen[0] ?? null
+    // Hành trình chỉ xác định quyền kiểm; không đưa toàn kho trở lại đường thống kê CPU lớn.
+    const journey=ds.find(c=>laHanhTrinh(c.id)&&c.id===ngu.chienDichId&&c.trangThai==='dang_chay'&&c.hanNop>=homNay&&!chuaBatDau(c,homNay))
     let cau: QCau[] = []
     let dangCo: string[] = []
     if (gan) {
@@ -1022,7 +1036,7 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
       onBaiCu: Math.max(0, Math.floor(Number(ngu.onBaiCu) || 0)),
       metGio,
       nhatKy: nhatKy.length ? nhatKy : null,
-      deThu: { duoc: !!gan && soNgayGiua(gan.batDau, homNay) >= ts.DE_THU.ngayTu - 1 && !daThu, soCau: ts.DE_THU.soCau, phut: ts.DE_THU.phut },
+      deThu: { duoc: !daThu && (!!journey || !!gan && soNgayGiua(gan.batDau, homNay) >= ts.DE_THU.ngayTu - 1), soCau: ts.DE_THU.soCau, phut: ts.DE_THU.phut },
       ...(canThanTu(true, hs, ts) ? { canThan: true } : {}), // CẨN THẬN (omni-can-than.ts): chỉ-thêm, CHỈ khi Sơ ý (số `sEm` ở trên) > ngưỡng — vắng ⇒ app em y hệt
     }
   } catch {

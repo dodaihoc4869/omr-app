@@ -230,6 +230,21 @@ describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
     fireEvent.click(within(lt).getByRole('button', { name: /Bi-a Phản Ứng · còn 4\/6 câu/ }))
     expect(p.onChoiBia).toHaveBeenCalledTimes(1)
   })
+  it('kiểm đầu / kiểm tuần Hành trình (main #217): nút phụ ở Hôm nay (vẫn MỘT nút vàng) + ô Luyện thêm thay Đề thử; bấm ⇒ Đảo việc de-thu', () => {
+    sessionStorage.clear()
+    const p = ve({ omni: { ...OMNI, kiemHanhTrinh: { loai: 'dau', soCau: 14 } } })
+    const nut = p.container.querySelector<HTMLButtonElement>('.v2s-nut-luyen-them[data-khoi="kiem-hanh-trinh"]')!
+    expect(nut.textContent).toBe('Làm bài kiểm đầu · 14 câu')
+    expect(p.container.querySelectorAll('.v2-nut-chinh').length).toBe(1)
+    fireEvent.click(nut)
+    expect(sessionStorage.getItem('game-v2:omni-dao')).toBe('de-thu')
+    expect(p.onKhamPhaDao).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
+    const lt = screen.getByRole('region', { name: 'Luyện thêm' })
+    expect(within(lt).getByRole('button', { name: /Làm bài kiểm đầu · 14 câu/ }).textContent).toContain('đo điểm xuất phát')
+    expect(within(lt).queryByRole('button', { name: /Đề thử/ })).toBeNull()
+  })
+
   it('Thử sức thêm (máy chủ cho): gọi hoa2-thu-suc-them bằng token, tải lại Sảnh rồi về Hôm nay', async () => {
     const goi: { url: string; body: any }[] = []
     vi.stubGlobal('fetch', vi.fn(async (url: string, init?: any) => {

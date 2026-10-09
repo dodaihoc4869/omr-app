@@ -269,12 +269,27 @@ function KhuHomNay({ p, s, onLuyenThem }: { p: SanhBanDoProps; s: SanhHoa2; onLu
           <NutBatDau p={p} s={s} />
         </div>
       )}
+      {!xong && <NutKiemHanhTrinh p={p} s={s} />}
       {(xong || trong) && (
         <button type="button" className="v2-nut-phu v2s-nut-luyen-them" onClick={onLuyenThem}>
           Luyện thêm · không bắt buộc
         </button>
       )}
     </>
+  )
+}
+
+/** Bài kiểm đầu / kiểm tuần của Hành trình (main #217, `omni.kiemHanhTrinh`): nút PHỤ (màn vẫn một nút vàng), cùng hành động nút Sảnh cũ — mở Đảo với việc `de-thu`. */
+export function chuKiemHanhTrinh(k: { loai: 'dau' | 'tuan'; soCau: number }): string {
+  return `${k.loai === 'dau' ? 'Làm bài kiểm đầu' : 'Làm bài kiểm tuần'} · ${k.soCau} câu`
+}
+function NutKiemHanhTrinh({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  const k = s.omni?.kiemHanhTrinh
+  if (!k) return null
+  return (
+    <button type="button" className="v2-nut-phu v2s-nut-luyen-them" data-khoi="kiem-hanh-trinh" onClick={() => { datViecOmniDao('de-thu'); p.onKhamPhaDao() }}>
+      {chuKiemHanhTrinh(k)}
+    </button>
   )
 }
 
@@ -418,7 +433,8 @@ function LuyenThem({ p, s, onDaLay }: { p: SanhBanDoProps; s: SanhHoa2; onDaLay:
         <OThuSuc s={s} token={p.token} onTaiLai={p.onTaiLai} onDaLay={onDaLay} />
         {o && o.ve.tong > 0 && <OLuyen khoi="ve-thu-thach" nhan={chuVe(o.ve.con, o.ve.tong)} phu={GOI_Y_VE} khoa={o.ve.con <= 0} onClick={() => mo('ve')} />}
         {o?.l4Kiem?.duoc && <OLuyen khoi="l4-kiem" nhan={o.l4Kiem.soCau > 0 ? `Kiểm tra chuyên sâu · ${o.l4Kiem.soCau} câu` : 'Kiểm tra chuyên sâu'} onClick={() => mo('de-thu-l4')} />}
-        {o?.deThu.duoc && <OLuyen khoi="de-thu" nhan="Đề thử" phu={`${o.deThu.soCau} câu · ${o.deThu.phut} phút · chỉ để đo, không phải ca kiểm tra`} onClick={() => mo('de-thu')} />}
+        {o?.kiemHanhTrinh && <OLuyen khoi="kiem-hanh-trinh" nhan={chuKiemHanhTrinh(o.kiemHanhTrinh)} phu={o.kiemHanhTrinh.loai === 'dau' ? 'Làm trước khi luyện để đo điểm xuất phát' : 'Đo lại sau một tuần luyện'} onClick={() => mo('de-thu')} />}
+        {o?.deThu.duoc && !o.kiemHanhTrinh && <OLuyen khoi="de-thu" nhan="Đề thử" phu={`${o.deThu.soCau} câu · ${o.deThu.phut} phút · chỉ để đo, không phải ca kiểm tra`} onClick={() => mo('de-thu')} />}
         {p.onTuLuyen && <OLuyen khoi="tu-luyen" nhan="Tu luyện" phu="Chỉ dành cho học sinh Nỗ lực" onClick={p.onTuLuyen} />}
         {bia && <OLuyen khoi="bia" nhan={bia.lon} phu={bia.nho} khoa={!bia.mo} onClick={p.onChoiBia} />}
       </div>

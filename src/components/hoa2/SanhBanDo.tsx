@@ -420,6 +420,10 @@ function DongOmniChienDich({ o, cdId, lop }: { o: SanhOmni; cdId: string; lop: s
 
 /** Cạnh nút "Thử sức thêm" sẵn có: nút PHỤ cùng dáng — "Vé thử thách c/t" (hết vé ⇒ nút mờ) và "Đề thử …" (khi máy chủ cho).
  *  Bấm ⇒ mở Đảo y như nút Đảo; Đảo đọc khoá `game-v2:omni-dao` MỘT lần: vé ⇒ `start` kèm `ve: 'auto'`, đề thử ⇒ luồng đề thử của Đảo. */
+function NutKiemHanhTrinh({s,onKhamPhaDao}:{s:SanhHoa2;onKhamPhaDao:()=>void}){
+ const k=s.omni?.kiemHanhTrinh;if(!k)return null
+ return <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="kiem-hanh-trinh" onClick={()=>{datViecOmniDao('de-thu');onKhamPhaDao()}}><span className="h2-nut-dao-chu"><span className="h2-nut-dao-lon">{k.loai==='dau'?'Làm bài kiểm đầu':'Làm bài kiểm tuần'} · 14 câu</span></span></button>
+}
 export function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: () => void }) {
   const o = s.omni
   if (!o) return null
@@ -437,8 +441,9 @@ export function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: ()
           </span>
         </button>
       )}
+      <NutKiemHanhTrinh s={s} onKhamPhaDao={onKhamPhaDao} />
       {o.l4Kiem?.duoc && <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="l4-kiem" onClick={()=>mo('de-thu-l4')}><span className="h2-nut-dao-chu"><span className="h2-nut-dao-lon">Kiểm tra chuyên sâu · 6 câu</span></span></button>}
-      {o.deThu.duoc && (
+      {o.deThu.duoc && !o.kiemHanhTrinh && (
         <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="de-thu" onClick={() => mo('de-thu')}>
           <span className="h2-nut-dao-chu">
             <span className="h2-nut-dao-lon">{chuDeThu(o.deThu.soCau, o.deThu.phut)}</span>
@@ -675,6 +680,7 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
         )
       ) : (
         <>
+          <NutKiemHanhTrinh s={s} onKhamPhaDao={p.onKhamPhaDao} />
           <NutViec p={p} s={s} />
           <TheMetGio s={s} token={p.token} onTaiLai={p.onTaiLai} />
         </>
@@ -981,6 +987,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
         )
       ) : (
         <>
+          <NutKiemHanhTrinh s={s} onKhamPhaDao={p.onKhamPhaDao} />
           <NutViec p={p} s={s} />
           <TheMetGio s={s} token={p.token} onTaiLai={p.onTaiLai} ngang />
         </>

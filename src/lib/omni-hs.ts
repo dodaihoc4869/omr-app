@@ -44,6 +44,7 @@ export function docSanhOmni(x: unknown): SanhOmni | null {
     onBaiCu: soNguyen(o.onBaiCu),
     metGio,
     nhatKy: nhatKy.length ? nhatKy : null,
+    ...(['dau','tuan'].includes(String(vat(o.kiemHanhTrinh)?.loai))&&vat(o.kiemHanhTrinh)?.soCau===14?{kiemHanhTrinh:{loai:vat(o.kiemHanhTrinh)!.loai as 'dau'|'tuan',soCau:14 as const}}:{}),
     ...(vat(o.l4Kiem)?.duoc===true&&soNguyen(vat(o.l4Kiem)?.soCau)===6?{l4Kiem:{duoc:true,soCau:6}}:{}),
     deThu: { duoc: dt?.duoc === true && soCauThu > 0, soCau: soCauThu || THAM_SO_OMNI.DE_THU.soCau, phut: soNguyen(dt?.phut) || THAM_SO_OMNI.DE_THU.phut },
     // CẨN THẬN (chỉ-thêm): CHỈ khi máy chủ gửi đúng `true` — vắng / sai kiểu ⇒ không trường ⇒ app em y hệt hôm nay.

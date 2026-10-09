@@ -1,5 +1,6 @@
 import { canBangL4 } from './hanh-trinh-l4'
 import type { VaiTroCau } from './hanh-trinh-v5-loi'
+import { phanBoV6 } from './hanh-trinh-v6-loi'
 // Hành trình giỏi hoá: mức tối thiểu theo ngày, câu khác nhau, chặng ngắn.
 // Không dùng hạng L1–L4 (tỉ lệ đúng) thay cho tầng nội dung của bài.
 import { HANG_MUC_DO, bam, soSanhNo, type CauSrs, type TrangThaiCau } from './srs2-loi'
@@ -91,6 +92,9 @@ export interface DauVaoHanhTrinh {
   tangSanSang?: ReadonlyMap<string, TangHanhTrinh>
   vaiTro?: Readonly<Record<string,VaiTroCau>>
   uuTienCanThiep?: string
+  uuTienThamDo?: string
+  nganSachChanDoan?:number
+  chanDoan?: ReadonlySet<string>
 }
 
 /** Chọn phần còn lại; không lặp nội dung để đủ sàn, không kéo ôn chưa đến hạn.
@@ -107,7 +111,7 @@ export function chonCauHanhTrinh(a: DauVaoHanhTrinh): { dao: string[]; doan: str
     return !!t.henOn && t.henOn <= a.ngay
   })
   const tie = (x: CauSrs, y: CauSrs) => bam(`${a.ngay}|${x.qid}`) - bam(`${a.ngay}|${y.qid}`) || x.qid.localeCompare(y.qid)
-  const moi = ung.filter(c => a.tt.get(c.qid)!.laMoi).sort((x, y) =>
+  const moi = ung.filter(c => a.tt.get(c.qid)!.laMoi && !a.chanDoan?.has(c.qid)).sort((x, y) =>
     (a.trongSo?.[y.qid] ?? 0) - (a.trongSo?.[x.qid] ?? 0) || (tangCuaCau(y)! - tangCuaCau(x)!) || tie(x, y))
   const no = ung.filter(c => !a.tt.get(c.qid)!.laMoi && !a.tt.get(c.qid)!.thanhThao)
     .sort((x, y) => soSanhNo(x, y, a.tt, a.ngay) || (a.trongSo?.[y.qid] ?? 0)-(a.trongSo?.[x.qid] ?? 0) || tie(x, y))
@@ -124,13 +128,17 @@ export function chonCauHanhTrinh(a: DauVaoHanhTrinh): { dao: string[]; doan: str
     }
   }
   lay(ung.filter(c=>c.qid===a.uuTienCanThiep),1)
+  lay(ung.filter(c=>c.qid===a.uuTienThamDo),1)
+  const phanBo=phanBoV6(n,a.tang,no.length,on.length)
+  const diagnostic=ung.filter(c=>a.chanDoan?.has(c.qid)).sort((x,y)=>(a.trongSo?.[y.qid]??0)-(a.trongSo?.[x.qid]??0)||tie(x,y))
+  lay(diagnostic,Math.min(phanBo.chanDoan,a.nganSachChanDoan??2))
   if(a.tang===4&&a.vaiTro){
     const selected=canBangL4([...no,...moi,...on].map(c=>c.qid),a.vaiTro,n)
     const byId=new Map(ung.map(c=>[c.qid,c]));lay(selected.map(id=>byId.get(id)!).filter(Boolean),n)
   }
-  lay(no, Math.ceil(n * (no.length > n / 2 ? 0.5 : 0.3)))
-  lay(moi, Math.ceil(n * 0.5))
-  lay(on, Math.ceil(n * 0.2))
+  lay(no, phanBo.sua)
+  lay(moi, phanBo.moi)
+  lay(on, phanBo.on)
   lay(no, n); lay(moi, n); lay(on, n)
   // Chưa gặp đi Đảo, ôn Phần II đi Đảo; ôn I/III đi Đoàn như luồng hiện có.
   return { dao: chon.filter(c => a.tt.get(c.qid)!.laMoi || c.phan === 'II').map(c => c.qid),
