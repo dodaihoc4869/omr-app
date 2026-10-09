@@ -14,7 +14,7 @@
 //   · thẻ Chiến dịch đã giao (giao mới · lọc · xem bảng · rải đều · sửa · kết thúc · huỷ) — trang riêng của cùng màn `chiendich`
 //     (`ChienDichScreen`), lối vào chữ nhỏ ở Cài đặt và Tổng quan › "Giao" cho một ca.
 //   · ba thẻ lớn chọn khối (cao 124 px).
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useCallback, useState } from 'react'
 import { Plus } from 'lucide-react'
 import type { BaiCay } from '../../lib/bai-hom-nay'
 import { useSoDemGv, type TheHanhTrinh } from '../../lib/so-dem-gv'
@@ -67,6 +67,15 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false }: {
   const canThayChua = useSoDemGv((s) => s.canThayChua)
   // Số cạnh tên thẻ: số màn Hôm nay đếm; thẻ Cần thầy chữa đọc xong danh sách (gồm cả bước cuối, thẻ nút thắt) ⇒ dùng đúng số của danh sách.
   const [demDanhSach, setDemDanhSach] = useState<number | null>(null)
+  const datSo = useSoDemGv((s) => s.datSo)
+  // Danh sách vừa đọc xong (kể cả sau khi chữa một chỗ) ⇒ số cạnh mục Hành trình ở thanh bên theo luôn — một con số ở mọi nơi.
+  const nhanDem = useCallback(
+    (n: number) => {
+      setDemDanhSach(n)
+      datSo({ canThayChua: n })
+    },
+    [datSo],
+  )
   const soCanChua = demDanhSach ?? canThayChua
 
   return (
@@ -103,7 +112,7 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false }: {
               <KiemTraDauGio />
             </div>
           ) : (
-            <TheCanThayChua onDem={setDemDanhSach} />
+            <TheCanThayChua onDem={nhanDem} />
           )}
         </Suspense>
       </div>

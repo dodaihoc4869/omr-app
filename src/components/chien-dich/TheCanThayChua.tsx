@@ -4,7 +4,7 @@
 // NAY MỘT LUỒNG:
 //   1. ĐẦU THẺ: MỘT danh sách "câu / dạng cần chữa", nhiều em sai đứng trước. Mỗi dòng: tên câu/dạng ngắn · số em · khối/lớp · lý do gấp (chữ thật)
 //      · MỘT nút viền đúng việc (Chiếu lên bảng / Xếp buổi chữa / Chữa trên lớp / Gỡ nút thắt) · nút chữ phụ "Gỡ nút thắt · N em" khi chính câu ấy có
-//      thẻ nút thắt. Thanh phân đoạn Khối (Tất cả · Khối 10 · 11 · 12, kèm số em của Hành trình khối) lọc danh sách — chỉ hiện ở thẻ này.
+//      thẻ nút thắt. Thanh phân đoạn Khối (Tất cả · Khối 10 · 11 · 12, mỗi ô ghi số CHỖ cần chữa — cùng đơn vị với "Tất cả") lọc danh sách — chỉ hiện ở thẻ này.
 //   2. BẤM NÚT ⇒ mở đúng chỗ làm việc SẴN CÓ cho dòng ấy (nút "Danh sách cần chữa" quay lại):
 //      · câu sai từ 4 lần / vi kỹ năng / em sơ ý (chiến dịch) — `LenBangChienDich` ghim chiến dịch (không ô chọn) + `chiChua` (chỉ khối Cần thầy
 //        chữa của Bảng chiến dịch: danh sách, Chiếu cả N câu, Chữa xong; hết hạn nộp ⇒ điểm danh bằng mã → Buổi chữa như cũ);
@@ -183,6 +183,38 @@ interface DuCanChua {
   hongHet: boolean
 }
 
+/** Hai nguồn NGOÀI chiến dịch: bước cuối trên lớp + thẻ nút thắt (kèm riêng). Màn Hôm nay nạp chung để số "Cần thầy chữa: N chỗ"
+ *  khớp đúng số dòng của danh sách này (một nhãn — một con số). Phần lỗi ghi vào `loi`; null = không đọc được. */
+export async function taiNguonPhu(loi: { phan: string; chu: string }[] = []): Promise<{ buocCuoi: NhomChuaTrenLop[] | null; nut: KetQuaDsNut | null }> {
+  const taiBuocCuoi = async () => {
+    try {
+      const { goiChuaThay } = await import('../../lib/chua-cau-sai-thay-api')
+      const r = await goiChuaThay('hang-chieu', { lop: '' })
+      // Vòng tự chữa chưa bật ⇒ không có bước cuối nào, không phải lỗi.
+      return r.bat && Array.isArray(r.ds) ? (r.ds as NhomChuaTrenLop[]) : []
+    } catch (e) {
+      loi.push({ phan: 'bước cuối trên lớp', chu: lyDoDeHieu(e) })
+      return null
+    }
+  }
+  const taiNutThat = async () => {
+    try {
+      const { gvDsNutThat } = await import('../../lib/nut-that-api')
+      const r: KetQuaDsNut = await gvDsNutThat()
+      if (!r.ok) {
+        loi.push({ phan: 'thẻ nút thắt', chu: lyDoDeHieu(r.error ?? '') })
+        return null
+      }
+      return r
+    } catch (e) {
+      loi.push({ phan: 'thẻ nút thắt', chu: lyDoDeHieu(e) })
+      return null
+    }
+  }
+  const [buocCuoi, nut] = await Promise.all([taiBuocCuoi(), taiNutThat()])
+  return { buocCuoi, nut }
+}
+
 async function taiCanChua(): Promise<DuCanChua> {
   const loi: { phan: string; chu: string }[] = []
   const taiCd = async () => {
@@ -224,32 +256,7 @@ async function taiCanChua(): Promise<DuCanChua> {
       return null
     }
   }
-  const taiBuocCuoi = async () => {
-    try {
-      const { goiChuaThay } = await import('../../lib/chua-cau-sai-thay-api')
-      const r = await goiChuaThay('hang-chieu', { lop: '' })
-      // Vòng tự chữa chưa bật ⇒ không có bước cuối nào, không phải lỗi.
-      return r.bat && Array.isArray(r.ds) ? (r.ds as NhomChuaTrenLop[]) : []
-    } catch (e) {
-      loi.push({ phan: 'bước cuối trên lớp', chu: lyDoDeHieu(e) })
-      return null
-    }
-  }
-  const taiNutThat = async () => {
-    try {
-      const { gvDsNutThat } = await import('../../lib/nut-that-api')
-      const r: KetQuaDsNut = await gvDsNutThat()
-      if (!r.ok) {
-        loi.push({ phan: 'thẻ nút thắt', chu: lyDoDeHieu(r.error ?? '') })
-        return null
-      }
-      return r
-    } catch (e) {
-      loi.push({ phan: 'thẻ nút thắt', chu: lyDoDeHieu(e) })
-      return null
-    }
-  }
-  const [cd, buocCuoi, nut] = await Promise.all([taiCd(), taiBuocCuoi(), taiNutThat()])
+  const [cd, { buocCuoi, nut }] = await Promise.all([taiCd(), taiNguonPhu(loi)])
   const dong = gomCanChua({ chienDich: cd?.chienDich ?? [], buocCuoi: buocCuoi ?? [], nutThat: nut?.nhom ?? [], kemRieng: nut?.kemRieng ?? [] })
   return { dong, khoi: khoiLoc(cd?.cd ?? [], dong), loi, hongHet: cd === null && buocCuoi === null && nut === null }
 }
@@ -449,7 +456,7 @@ export default function TheCanThayChua({ onDem }: { onDem?: (n: number) => void 
           {dsKhoi.map((k) => (
             <button key={k.khoi} type="button" role="radio" aria-checked={khoiChon === k.khoi} className="gvv2-phan-doan-nut tt-nhan" onClick={() => setKhoi(k.khoi)}>
               <b>Khối {k.khoi}</b>
-              <small className="gvv2-so">{k.soEm !== null ? `${k.soEm} em` : `${du.dong.filter((d) => d.khoi === k.khoi).length} chỗ`}</small>
+              <small className="gvv2-so">{du.dong.filter((d) => d.khoi === k.khoi).length} chỗ</small>
             </button>
           ))}
         </div>

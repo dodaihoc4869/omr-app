@@ -209,7 +209,7 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     const dong = [...viec.querySelectorAll('li')]
     expect(dong.map((d) => d.querySelector('b')?.textContent)).toEqual([
       'Ca đang mở: Kiểm tra DH-12-C2-B6 · 12A1',
-      'Cần thầy chữa: 5 chỗ',
+      'Cần thầy chữa: 8 chỗ',
       '12A2: 3 ngày chưa có bài mới',
       '3 em chưa làm câu nào hôm nay',
     ])
@@ -223,7 +223,9 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     expect(chinh[0]!.closest('header')).toBeTruthy()
     expect(dong[0]!.textContent).toContain('Đã vào 40 em · đã nộp 38 em')
     // K12 hành trình: 1 câu cần dạy lại (cùng nghĩa câu sai từ 4 lần) + chiến dịch cd-a: 2 câu sai từ 4 lần, 1 câu nút thắt, 1 em sơ ý (Bảng bài OMNI)
-    expect(dong[1]!.textContent).toContain('3 câu sai từ 4 lần trở lên · 1 câu có thẻ nút thắt · 1 em sơ ý cao')
+    // + CÙNG nguồn với danh sách Cần thầy chữa: bước cuối Câu 40 (1), thẻ nút thắt Câu 6 (1; Câu 25 ghép vào dòng sẵn có), kèm riêng (1 dòng)
+    // ⇒ 8 chỗ = đúng số dòng danh sách ("8 chỗ cần chữa" ở test thẻ Cần thầy chữa bên dưới, cùng máy chủ giả).
+    expect(dong[1]!.textContent).toContain('3 câu sai từ 4 lần trở lên · 2 câu có thẻ nút thắt · 1 câu tự gỡ vẫn vướng · 1 em sơ ý cao · 1 em cần kèm riêng')
     expect(dong[3]!.textContent).toContain('Khối 10: 1 em · Khối 12: 2 em')
     // "Cần thầy chữa": cùng màu hổ phách với số cạnh Hành trình ở thanh bên
     expect(dong[1]!.querySelector('.gvhn-dau-o')?.getAttribute('data-mau')).toBe('hp')
@@ -235,7 +237,7 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     expect(du.querySelector('.gvhn-du-so')?.textContent).toBe('2/5 em')
     expect([...du.querySelectorAll('.gvhn-khoi-dong')].map((x) => x.textContent)).toEqual(['Khối 101/3', 'Khối 121/2'])
 
-    await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ caMo: 1, canThayChua: 5 }))
+    await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ caMo: 1, canThayChua: 8 }))
     // Hành trình chỉ đọc bảng — KHÔNG hỏi Bảng bài OMNI (như Lên bảng chiến dịch); lớp chờ bài mới hỏi đúng các lớp của công tắc OMNI.
     expect(m.goi.mock.calls.filter(([d, b]) => d === '/gv/omni' && b.action === 'bang').map(([, b]) => b.chienDichId)).toEqual(['cd-a'])
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-da-day').map(([, b]) => b.lop).sort()).toEqual(['12A1', '12A2'])
@@ -275,6 +277,9 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     const cau = (sbd: string, daChua: boolean) => ({ maCa: 'C1', tenCa: 'Kiểm tra 12A1', sbd, hoTen: `Em ${sbd}`, qids: ['q1'], ghiChu: '', guiLuc: '2026-10-09T01:00:00Z', daChua, chuaLuc: '' })
     m.danhSachCauHoi.mockResolvedValue([cau('1', false), cau('2', false), cau('3', true)])
     mayChu({ omni: false })
+    // Cần thầy chữa = 0 ở MỌI nguồn của danh sách (Hôm nay đếm cùng nguồn: bước cuối + thẻ nút thắt cũng rỗng).
+    nguon.goiChuaThay.mockResolvedValue({ ok: true, bat: false, ds: [], conNua: false })
+    nguon.gvDsNutThat.mockResolvedValue({ ok: true, nhom: [], kemRieng: [] })
     BANG['ht-12'] = bang(HT12, { hanhTrinhNgay: { em: [em('4', 36, 40), em('5', 36, 0), em('6', null, 0)] } })
     try {
       const { container } = render(<GvHomNayScreen />)
@@ -478,11 +483,11 @@ describe('Hành trình › Cần thầy chữa: MỘT danh sách, nhiều em sai
     expect(nguon.gvDsNutThat).toHaveBeenCalledTimes(1)
   })
 
-  it('thanh phân đoạn Khối (kèm số em của Hành trình khối) lọc danh sách; khối trống nói rõ; dòng chưa rõ khối không bị giấu âm thầm', async () => {
+  it('thanh phân đoạn Khối (mỗi ô ghi số chỗ cần chữa của khối, cùng đơn vị với Tất cả) lọc danh sách; khối trống nói rõ; dòng chưa rõ khối không bị giấu âm thầm', async () => {
     mayChu()
     render(<TheCanThayChua />)
     const loc = await screen.findByRole('radiogroup', { name: 'Lọc theo khối' })
-    expect(within(loc).getAllByRole('radio').map((r) => r.textContent)).toEqual(['Tất cả8 chỗ', 'Khối 103 em', 'Khối 123 em'])
+    expect(within(loc).getAllByRole('radio').map((r) => r.textContent)).toEqual(['Tất cả8 chỗ', 'Khối 100 chỗ', 'Khối 127 chỗ'])
     expect(within(loc).getByRole('radio', { name: /Tất cả/ }).getAttribute('aria-checked')).toBe('true')
     fireEvent.click(within(loc).getByRole('radio', { name: /Khối 12/ }))
     const ds = screen.getByRole('list')

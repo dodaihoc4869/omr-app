@@ -58,6 +58,10 @@ export interface DemCanThayChua {
   catTia: number
   nutThat: number
   soY: number
+  /** Câu em tự gỡ vẫn vướng (bước cuối trên lớp) — nguồn ngoài chiến dịch, như danh sách Cần thầy chữa. */
+  tuGo?: number
+  /** Số em cần kèm riêng (sai lại sau lời gỡ) — cả nhóm là MỘT dòng của danh sách. */
+  kemRieng?: number
   tong: number
 }
 
@@ -78,7 +82,13 @@ export function demCanThayChua(ds: readonly { canDayLai: readonly CauCanDayLai[]
 
 /** "4 câu sai từ 4 lần trở lên · 2 câu có thẻ nút thắt · 1 em sơ ý cao" — nhóm 0 thì bỏ. */
 export function chuCanThayChua(d: DemCanThayChua): string {
-  return [d.catTia && `${d.catTia} câu sai từ 4 lần trở lên`, d.nutThat && `${d.nutThat} câu có thẻ nút thắt`, d.soY && `${d.soY} em sơ ý cao`].filter(Boolean).join(' · ')
+  return [
+    d.catTia && `${d.catTia} câu sai từ 4 lần trở lên`,
+    d.nutThat && `${d.nutThat} câu có thẻ nút thắt`,
+    d.tuGo && `${d.tuGo} câu tự gỡ vẫn vướng`,
+    d.soY && `${d.soY} em sơ ý cao`,
+    d.kemRieng && `${d.kemRieng} em cần kèm riêng`,
+  ].filter(Boolean).join(' · ')
 }
 
 // ------------------------------------------------------------------ TẢI SỐ
@@ -147,6 +157,11 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
       return null
     }
   }
+  // Bước cuối + thẻ nút thắt: CÙNG bộ nạp và CÙNG cách gộp với danh sách Cần thầy chữa (Hành trình) ⇒ "Cần thầy chữa: N chỗ" ở đây,
+  // số cạnh mục Hành trình và số dòng của danh sách là MỘT con số. Mảnh nạp lười; đọc hỏng ⇒ chỉ đếm phần chiến dịch (không bịa).
+  const huaPhu = import('../components/chien-dich/TheCanThayChua')
+    .then(async (m) => ({ gom: m.gomCanChua, ...(await m.taiNguonPhu()) }))
+    .catch(() => null)
   const [{ ca, loiCa }, { cd, loiCd }, co] = await Promise.all([taiCa(), taiCd(), taiCoOmni()])
 
   const chay = (cd ?? []).filter((c) => c.trangThai === 'dang_chay')
@@ -191,11 +206,18 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
       return []
     }
   })()
-  const [omni, choBaiMoi, { hoi, loiHoi }] = await Promise.all([taiOmni, taiCho, huaHoi])
+  const [omni, choBaiMoi, { hoi, loiHoi }, phu] = await Promise.all([taiOmni, taiCho, huaHoi, huaPhu])
   const omniCua = new Map(canOmni.map((x, i) => [x.c.id, omni[i] ?? []] as const))
 
   const daDoc = chay.map((c, i) => ({ c, b: bang[i] })).filter((x): x is { c: ChienDichTom; b: BangChienDich } => !!x.b)
   const canThayChua = cd === null || (chay.length > 0 && daDoc.length === 0) ? null : demCanThayChua(daDoc.map(({ c, b }) => ({ canDayLai: b.canDayLai ?? [], omni: omniCua.get(c.id) ?? [] })))
+  if (canThayChua && phu && (phu.buocCuoi || phu.nut)) {
+    const dong = phu.gom({ chienDich: daDoc.map(({ c, b }) => ({ c, b, omni: omniCua.get(c.id) ?? [] })), buocCuoi: phu.buocCuoi ?? [], nutThat: phu.nut?.nhom ?? [], kemRieng: phu.nut?.kemRieng ?? [] })
+    canThayChua.nutThat += dong.filter((d) => d.nguon === 'nut-that').length
+    canThayChua.tuGo = dong.filter((d) => d.nguon === 'buoc-cuoi').length
+    canThayChua.kemRieng = dong.find((d) => d.nguon === 'kem-rieng')?.soEm ?? 0
+    canThayChua.tong = dong.length
+  }
 
   const nhip: NhipKhoi[] = chay
     .map((c, i) => ({ c, b: bang[i] }))
