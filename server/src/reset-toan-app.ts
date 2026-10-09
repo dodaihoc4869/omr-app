@@ -194,6 +194,8 @@ export const BANG_GIU: readonly string[] = [
   // OMNI 3 (migration-0510-omni-3.sql, 05/10) — sinh sau lần 21/09: GIỮ cho job ấy = không đụng (job đã xong).
   'bai_da_day', 'pham_vi_lop', 'de_kho_thu_muc', 'omni_vkn', 'omni_q', 'omni_em', 'omni_p_vkn', 'omni_beta_cau', 'omni_du_bao',
   'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi', 'omni_buoc_sai',
+  // Hành trình v4: hồ sơ trí nhớ/đồ thị và receipt can thiệp đi cùng sổ học, như OMNI ⇒ GIỮ.
+  'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */

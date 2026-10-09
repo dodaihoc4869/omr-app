@@ -19,6 +19,7 @@ jobs:
         with: {node-version: 24, cache: npm}
       - run: npm ci
       - run: npx tsc --noEmit -p server/tsconfig.json
+      - run: npx vitest run tests/hanh-trinh-dong-co-0910.test.ts tests/hanh-trinh-d1-0910.test.ts tests/hanh-trinh-ngay-0910.test.ts tests/hanh-trinh-giao-dien-0910.test.tsx
       - run: npm run build
       - run: npm run kiem:mau-giu
       - run: npx vitest run tests/chua-cau-sai-chieu.test.ts tests/chua-cau-sai-chieu-giao-dien.test.tsx tests/chua-cau-sai-chat-luong.test.ts tests/chua-cau-sai-giao-dien.test.tsx tests/chua-cau-sai-0710.test.ts tests/tu-luyen-may-chu-2909.test.ts tests/tu-luyen-kho-sai-chung-3009.test.ts tests/tu-luyen-sua-cau-sai-3009.test.ts tests/reset-toan-app-1909.test.ts tests/reset-hoa2-2709.test.ts tests/nut-hoi-thay-2909.test.tsx tests/khong-cu-phap-may-cu-2109.test.ts tests/cnh-1-0-su-kien-chuan.test.ts tests/che-do-da-dung-0210.test.ts tests/ke-ho-ca-kiem-tra-0610.test.ts
