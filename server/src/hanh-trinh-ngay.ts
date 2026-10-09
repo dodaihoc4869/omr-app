@@ -7,6 +7,13 @@ import { HANG_MUC_DO, bam, soSanhNo, type CauSrs, type TrangThaiCau } from './sr
 export type TangHanhTrinh = 1 | 2 | 3 | 4
 export const CAU_TOI_THIEU = { 1: 24, 2: 30, 3: 36, 4: 36 } as const
 export const CAU_MOI_CHANG = 6
+/** Tầng từng bài trên Sảnh (chỉ-thêm 09/10, docs/hanh-trinh-bai-thu-suc-0910.md). `vung` null khi không có sẵn tổng dạng của cả bài. */
+export interface BaiHanhTrinh {
+  khoa: string
+  ten: string
+  tangMo: TangHanhTrinh
+  vung: { a: number; b: number } | null
+}
 export interface TienDoHanhTrinh {
   tang: TangHanhTrinh
   toiThieu: number
@@ -16,7 +23,22 @@ export interface TienDoHanhTrinh {
   soChang: number
   changHienTai: number
   cauTrongChang: number
+  /** Chỉ-thêm: mỗi bài thầy đã dạy của khối em, theo cây Dạy học. Vắng khi lớp chưa có phạm vi đã dạy. */
+  bai?: BaiHanhTrinh[]
 }
+
+// ---------------------------------------------------------------- THỬ SỨC THÊM trong Hành trình (09/10)
+// Hành trình không có "câu mới của ngày mai": hạn 9999-12-31, kế hoạch mỗi ngày chốt theo năng lực đầu ngày đó. Ngữ nghĩa gần nhất an toàn:
+// đủ mức tối thiểu hôm nay ⇒ em được lấy thêm MỘT chặng (≤ 6 câu) của HÔM NAY bằng chính bộ chọn Hành trình; tổng hôm nay ≤ 2 × mức tối thiểu
+// (cùng tỉ lệ trần Huyết Chiến = 2 × thể lực). Nội dung mới làm hôm nay thì ngày mai không còn là mới — tác dụng "lấy trước" tự có.
+/** Trần tổng số câu xếp trong ngày khi em tự lấy thêm. */
+export const tranNgayHanhTrinh = (toiThieu: number): number => 2 * Math.max(0, Math.floor(toiThieu))
+/** Cỡ lô Thử sức thêm: một chặng, không vượt trần ngày. */
+export const coLoThuSucHanhTrinh = (toiThieu: number, tongDaXep: number): number =>
+  Math.max(0, Math.min(CAU_MOI_CHANG, tranNgayHanhTrinh(toiThieu) - tongDaXep))
+/** Số câu cần giữ khi chọn lại phần chưa làm: sàn ngày, cộng phần em đã tự lấy thêm (đọc từ chính kế hoạch đã chốt), không vượt trần. */
+export const mucNgayHanhTrinh = (toiThieu: number, tongDaXep: number): number =>
+  Math.max(toiThieu, Math.min(tongDaXep, tranNgayHanhTrinh(toiThieu)))
 
 /** Sao 2 / vận dụng cao là tổng hợp; mức chưa rõ không tự quy thành nền. */
 export function tangCuaCau(c: CauSrs): TangHanhTrinh | null {
