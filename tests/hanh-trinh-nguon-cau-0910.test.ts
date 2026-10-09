@@ -6,9 +6,10 @@ import { layKeHoachHomNay,xoaDemChienDich,tamHoanCauKhoa,docKeHoachDaChot } from
 import { damBaoBangBoTro } from '../server/src/cau-bo-tro'
 import { damBaoBangLoiGiai } from '../server/src/loi-giai'
 import { napLuot } from '../server/src/srs2-game'
-import { laBanBu,gocNguonCau,chuanBiNguonCau,idDaLam,ganBanBu } from '../server/src/hanh-trinh-nguon-cau'
+import { laBanBu,gocNguonCau,chuanBiNguonCau,idDaLam,ganBanBu,taoNguonBanBu } from '../server/src/hanh-trinh-nguon-cau'
 import { quanSatDocLap } from '../server/src/hanh-trinh-quan-sat'
 import { docSuKienOmni,qCuaCau,xoaDemOmni } from '../server/src/omni-d1'
+import {dongCoHanhTrinh} from '../server/src/hanh-trinh-dong-co'
 import {phHoc2} from '../server/src/ph-bao-cao-moi'
 const dong:ReturnType<typeof taoKhoOmni>[]=[]
 afterEach(()=>{for(const k of dong.splice(0))k.d.sql.close();xoaDemChienDich();xoaDemOmni()})
@@ -89,4 +90,11 @@ it('bổ sung kho lần đầu giữa chặng giữ nhiệm vụ còn hợp lệ
  const next=await layKeHoachHomNay(k.env,'S1',T_SANG+2000)
  expect(new Set([...next.kh.dao,...next.kh.doan])).toEqual(new Set(ids))
  expect(next.kh.hanhTrinh?.daLam).toBe(1)
+})
+
+it('không bù bằng bản khác của câu đã thạo nhưng chưa đến lịch ôn',async()=>{
+ const k=await kho(12),{hs}=await layKeHoachHomNay(k.env,'S1',T_SANG)
+ const engine=await dongCoHanhTrinh(k.env,'S1',T_SANG,hs,new Set(),false)
+ for(const [id,t] of hs.tt)hs.tt.set(id,{...t,thanhThao:true,henOn:'2026-10-10'})
+ expect(await taoNguonBanBu(k.env,'S1',HOM_NAY,hs,engine.v5!,new Set(),[],24)).toEqual([])
 })

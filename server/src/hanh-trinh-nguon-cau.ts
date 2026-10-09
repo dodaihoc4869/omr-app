@@ -53,7 +53,7 @@ export async function ganBanBu(env:Env,sbd:string,hs:HoSo2,ids:readonly string[]
 export async function taoNguonBanBu(env:Env,sbd:string,ngay:string,hs:HoSo2,d:BoChonV5,chan:ReadonlySet<string>,da:readonly string[],can:number):Promise<string[]> {
  if(can<=0)return []
  const counts=new Map<string,number>();for(const id of da){const g=hs.meta.get(id)?.group||gocNguonCau(id);counts.set(g,(counts.get(g)??0)+1)}
- const roots=hs.cau.filter(c=>!laBanBu(c.qid)&&d.tang.has(c.qid)&&!d.chan.has(c.qid)&&!d.chanDoan.has(c.qid)&&!chan.has(c.qid)&&!chan.has(hs.meta.get(c.qid)?.group||c.qid)&&!hs.tt.get(c.qid)?.catTia)
+ const roots=hs.cau.filter(c=>!laBanBu(c.qid)&&d.tang.has(c.qid)&&!d.chan.has(c.qid)&&!d.chanDoan.has(c.qid)&&!chan.has(c.qid)&&!chan.has(hs.meta.get(c.qid)?.group||c.qid)&&!hs.tt.get(c.qid)?.catTia&&(!hs.tt.get(c.qid)?.thanhThao||!!hs.tt.get(c.qid)?.henOn&&hs.tt.get(c.qid)!.henOn!<=ngay))
   .sort((a,b)=>(d.trongSo[b.qid]??0)-(d.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid))
  const used=await env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND qid LIKE ?').bind(sbd,'%~%').all<{qid:string}>()
  const seen=new Set(used.results.map(r=>r.qid)),ra:string[]=[],groups=new Map<string,number>()
