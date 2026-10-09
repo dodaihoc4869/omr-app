@@ -25,7 +25,7 @@ export const BO_LOC: { id: BoLoc; nhan: string; hop: (c: CauDaLamMuc) => boolean
   { id: 'tat_ca', nhan: 'Tất cả', hop: () => true },
   // 30/09: câu tự luận chỉ ở "Tất cả" — không sai/đúng, không ôn cách quãng.
   { id: 'sai_gan', nhan: 'Sai lần gần nhất', hop: (c) => !c.tuLuan && c.lanCuoiDung === false },
-  { id: 'dang_on', nhan: 'Đang ôn', hop: (c) => !c.tuLuan && c.trangThai === 'dang_on' },
+  { id: 'dang_on', nhan: 'Cần ôn', hop: (c) => !c.tuLuan && c.trangThai === 'dang_on' },
   { id: 'thanh_thao', nhan: 'Thành thạo', hop: (c) => !c.tuLuan && c.trangThai === 'thanh_thao' },
   { id: 'can_day_lai', nhan: 'Cần thầy dạy lại', hop: (c) => !c.tuLuan && c.trangThai === 'can_day_lai' },
 ]

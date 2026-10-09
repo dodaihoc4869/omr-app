@@ -121,7 +121,7 @@ describe('CauDaLam — theo bản vẽ HS-CauDaLam', () => {
     expect(goiTheo('/game-v2/hoa2-cau-da-lam')[0].body).toEqual({ token: 'tk' })
     expect((screen.getByLabelText('Chiến dịch') as HTMLSelectElement).value).toBe('cd1')
     expect(container.querySelector('.h2-cdl-chon-hien')!.textContent).toBe('Chiến dịch: Ester – Lipid · 120 câu')
-    for (const n of ['Sai lần gần nhất 1', 'Đang ôn 1', 'Thành thạo 1', 'Cần thầy dạy lại 1']) expect(screen.getByRole('button', { name: n })).toBeTruthy()
+    for (const n of ['Sai lần gần nhất 1', 'Cần ôn 1', 'Thành thạo 1', 'Cần thầy dạy lại 1']) expect(screen.getByRole('button', { name: n })).toBeTruthy()
     expect(container.querySelectorAll('.h2-the').length).toBe(3)
     expect(container.textContent).toContain('Câu 17 · Trắc nghiệm · Vận dụng')
     expect(container.textContent).toContain('Đến lịch ôn lại: Thứ Hai 05/10')

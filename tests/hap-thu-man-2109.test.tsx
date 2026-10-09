@@ -85,7 +85,7 @@ describe('DaoCuaEm — thanh hấp thụ trên màn', () => {
       const { container, unmount } = ve({ hapThuHomNay: x })
       expect(container.querySelector('[data-vung="hap-thu"]')).toBeNull()
       expect(container.querySelector('.dao-hon')).toBeTruthy()
-      expect(screen.getByRole('button', { name: /LÊN ĐƯỜNG/ })).toBeTruthy()
+      expect(screen.getByRole('button', { name: /Đồng hành/ })).toBeTruthy()
       unmount()
     }
   })

@@ -124,7 +124,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
               <div className="xd-nut-hang">
                 {p.onXemBaoCao && (
                   <NutXd rong bieuTuong={<FileText className="xd-i" aria-hidden="true" />} onClick={p.onXemBaoCao}>
-                    Xem báo cáo chi tiết
+                    Xem câu cần sửa
                   </NutXd>
                 )}
                 {p.onVe && (

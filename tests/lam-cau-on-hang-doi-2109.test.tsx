@@ -48,7 +48,7 @@ const dung = (extra: Partial<React.ComponentProps<typeof LamCauOn>> = {}) => {
   return { xepHang, ...r }
 }
 const the = (i: number) => document.querySelectorAll<HTMLElement>('.lco-the')[i]!
-const nutNop = () => screen.getByRole('button', { name: /^(Nộp|Đã lưu ở máy)/ }) as HTMLButtonElement
+const nutNop = () => screen.getByRole('button', { name: /^(Kiểm tra|Đã lưu ở máy)/ }) as HTMLButtonElement
 const lamVaNop = async () => {
   await screen.findByText('Este X có tên gọi là gì?')
   fireEvent.click(within(the(0)).getAllByRole('radio')[0]!)

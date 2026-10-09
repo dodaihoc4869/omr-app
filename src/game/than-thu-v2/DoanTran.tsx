@@ -222,7 +222,6 @@ export default function DoanTran(p: Props) {
   const cau = xem.cau, daChot = !!cau?.daChot, chieu = CHIEU[em.pet]!, ts = xem.tiepSuc
   // Câu thuộc dạng em ĐÃ KHẮC PHỤC XONG (ấn sáng) → nút kỹ năng mang tên biến thể ấn, mạnh hơn ×1,25.
   const tenKyNang = cau?.an ? chieu.kyNangAn : chieu.kyNang
-  const tenDon = p.hanhDong === 'danh' ? 'Đánh' : p.hanhDong === 'chan' ? 'Chắn' : tenKyNang
   const du = !!p.de && duDapAn(p.de, p.chon), boTrong = !du && p.hanhDong === 'chan'
   const duoi = !mo ? null : tran.laTrum ? (
     <>
@@ -252,8 +251,8 @@ export default function DoanTran(p: Props) {
         : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chuyến này — câu này em tự làm nhé.</div>)}
       <button type="button" className={v2 ? 'dh-nut-lam dh2-nut-chinh dh2-baloo' : 'dh-nut-lam'} disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
         {v2
-          ? (p.dangChot ? 'ĐANG CHỐT…' : p.ban ? 'CHỜ MỘT CHÚT…' : du ? `CHỐT ĐÒN ${tenDon.toUpperCase()}${p.de!.phan === 'I' ? ` · ${p.chon}` : ''}` : boTrong ? 'CHỐT · BỎ TRỐNG + CHẮN' : 'CHỌN ĐÁP ÁN ĐỂ CHỐT ĐÒN')
-          : (p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn')}
+          ? (p.dangChot ? 'ĐANG CHỐT…' : p.ban ? 'CHỜ MỘT CHÚT…' : du ? 'CHỐT ĐÁP ÁN' : boTrong ? 'CHỐT · BỎ TRỐNG + CHẮN' : 'CHỌN ĐÁP ÁN ĐỂ CHỐT')
+          : (p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? 'Chốt đáp án' : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt')}
       </button>
     </>
   )

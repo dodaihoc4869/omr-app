@@ -81,7 +81,7 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
    </div>}
    {hetLuotNgay&&<div className="dao-het-luot" data-vung="het-luot" role="status"><p>{chuMaiCho(ten,maiCho)}</p></div>}
    {(thongBao||loi)&&<p className={loi?'dao-loi':'dao-chuyen-bao'} role={loi?'alert':'status'}>{loi||thongBao}</p>}
-   <button type="button" className="dao-nut-vang" disabled={busy||hetLuot} onClick={onLenDuong}><span className="dao-nut-tam-giac" aria-hidden="true"/><span>{busy?'ĐANG SOẠN HÀNH TRANG…':hetLuotNgay?'HẾT LƯỢT HÔM NAY':'LÊN ĐƯỜNG'}</span></button>
+   <button type="button" className="dao-nut-vang" disabled={busy||hetLuot} onClick={onLenDuong}><span className="dao-nut-tam-giac" aria-hidden="true"/><span>{busy?'ĐANG SOẠN HÀNH TRANG…':hetLuotNgay?'HẾT LƯỢT HÔM NAY':'Đồng hành'}</span></button>
   </section>
 
   <section className="dao-kinh dao-muc-tieu" aria-labelledby="dao-mt-ten"><h3 id="dao-mt-ten" className="dao-nhan-nho">MỤC TIÊU GẦN NHẤT</h3>

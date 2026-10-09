@@ -40,17 +40,17 @@ describe('Đoàn 2.0 · phương án bị Bùa Trợ giảng gạch', () => {
     for (const chu of ['8,2 gam', '9,6 gam']) { const nut = screen.getByRole('button', { name: new RegExp(chu) }) as HTMLButtonElement; expect(nut.disabled).toBe(false); expect(nut.className).not.toContain('dh2-chay') }
   })
 
-  it('bấm ô cháy không chọn được: nút chính vẫn "CHỌN ĐÁP ÁN ĐỂ CHỐT ĐÒN" và khoá; chọn B thì "CHỐT ĐÒN ĐÁNH · B" gửi đúng gói doan-nop', async () => {
+  it('bấm ô cháy không chọn được: nút chính vẫn "CHỌN ĐÁP ÁN ĐỂ CHỐT" và khoá; chọn B thì "CHỐT ĐÁP ÁN" gửi đúng gói doan-nop', async () => {
     const call = dung(xem())
     await screen.findByText('8,2 gam')
     await waitFor(() => expect(man().className).toContain('dh2'))
     const a = screen.getByRole('button', { name: /4,1 gam/ })
     fireEvent.click(a)
     expect(a.getAttribute('aria-pressed')).toBe('false')
-    const chot = screen.getByRole('button', { name: 'CHỌN ĐÁP ÁN ĐỂ CHỐT ĐÒN' }) as HTMLButtonElement
+    const chot = screen.getByRole('button', { name: 'CHỌN ĐÁP ÁN ĐỂ CHỐT' }) as HTMLButtonElement
     expect(chot.disabled).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: /8,2 gam/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÒN ĐÁNH · B' }))
+    fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }))
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-nop', { ma: 'DH2', hiep: 3, answer: 'B', hanhDong: 'danh' }))
     expect(call.mock.calls.some(c => c[0] === 'doan-nop' && (c[1] as { answer?: string }).answer === 'A')).toBe(false)
   })

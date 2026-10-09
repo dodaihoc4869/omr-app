@@ -25,9 +25,9 @@ export interface PropsChuaCauSai {
 }
 const tenPha: Record<string, string> = {
   chan_doan: 'Tìm chỗ vướng',
-  phan_biet: 'Hiểu cách em đang nghĩ',
+  phan_biet: 'Hiểu cách làm',
   kiem_ly_do: 'Vì sao cách này đúng?',
-  kiem_lai: 'Em tự làm một bước',
+  kiem_lai: 'Tự làm',
   chuyen_giao: 'Thử điều vừa hiểu với bài mới',
   ghep_bai: 'Nối lại cả bài',
   kiem_chung: 'Lần gặp lại 2 · Tự làm bản mới',
@@ -606,7 +606,7 @@ export default function ManChuaCauSai({
                               ? 'Đang lưu…'
                               : cho
                                 ? 'Gửi lại câu trả lời đã giữ'
-                                : 'Kiểm tra cách em làm'}
+                                : 'Tự thử lại'}
                           </button>
                           {!['ghep_bai', 'kiem_chung'].includes(
                             ph.item.loai,
@@ -617,7 +617,7 @@ export default function ManChuaCauSai({
                               disabled={ban || !!cho}
                               onClick={() => void xin()}
                             >
-                              Gợi mở cho em
+                              Cần gợi ý
                             </button>
                           )}
                         </>
@@ -649,7 +649,7 @@ export default function ManChuaCauSai({
                 onClick={onVe}
                 disabled={ban}
               >
-                Nghỉ ở đây · Đã lưu tiến độ
+                Lưu và nghỉ
               </button>
             </section>
           </div>

@@ -54,7 +54,7 @@ async function chotSai() {
   await screen.findByText('8,2 gam')
   await vaoDoan()
   fireEvent.click(await screen.findByRole('button', { name: /9,6 gam/ }))
-  fireEvent.click(await screen.findByRole('button', { name: /CHỐT ĐÒN ĐÁNH/ }))
+  fireEvent.click(await screen.findByRole('button', { name: /CHỐT ĐÁP ÁN/ }))
   await screen.findByText('Chưa đúng — em xem lời giải để sửa câu này.')
 }
 
@@ -99,7 +99,7 @@ describe('Đoàn một mình · thẻ Trạm hồi phục', () => {
     await screen.findByText('8,2 gam')
     await vaoDoan()
     fireEvent.click(await screen.findByRole('button', { name: /9,6 gam/ }))
-    fireEvent.click(await screen.findByRole('button', { name: /CHỐT ĐÒN ĐÁNH/ }))
+    fireEvent.click(await screen.findByRole('button', { name: /CHỐT ĐÁP ÁN/ }))
     await screen.findByText('Chưa đúng — em xem lời giải để sửa câu này.')
     expect(coThe()).toBeNull()
   })
