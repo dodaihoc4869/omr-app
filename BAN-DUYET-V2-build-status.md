@@ -45,3 +45,13 @@ Chưa phát hành nên không có bản lùi. Bỏ thay đổi: `git revert <mã
 | Gộp main | caa450a | Tối ưu CPU Sảnh/Hành trình của main; số lệnh D1 Sảnh mở lại 36→30. |
 
 Còn lại (ngoài làn, báo thầy): nút Mở ca riêng ở màn Ca kiểm tra (tạm đặt đầu màn từ App.tsx), câu "ở thanh bên" trong `CHU_CA_TRONG_HOA2`, chữ "Chữa trên lớp" cũ, "Sửa em" khi đang ở Hành trình không chuyển thẻ; `vung` từng bài = null (chưa có số đo).
+
+### Kiểm bản phát hành (09/10, nhánh tại cadfc89 — đã gộp main ab898ce)
+| Việc | Lệnh | Kết quả |
+|---|---|---|
+| Kiểu | `npx tsc -b`; `tsc --noEmit` máy chủ | 0 lỗi |
+| Màu / giao diện | `check:mau` · `kiem:mau-giu` · `soi:giao-dien` | 0 · 0 vi phạm · 0 lỗi |
+| Build + SW | `npm run build:cf` | SW 13/13 · precache 148 tệp / 2979 KB |
+| Toàn bộ vitest | `npx vitest run` | 152 đỏ / 74 tệp; chạy lại 74 tệp trên main 4346618: 151 đỏ; so TÊN: 1 khác = `doan-giao-dien` "tự tắt sau ĐÚNG 3 giây" (đo giờ, máy tải nặng) — chạy riêng 24/24 đạt, lần toàn phần trước đạt |
+| Cổng CI deploy.yml (17 tệp) | so với danh sách đỏ | chỉ `chua-d1-van-hanh` đỏ ở máy này (không nạp được `node:sqlite`); trên CI main đạt (run 37887043478) |
+| Đếm lệnh D1 Sảnh | kịch bản riêng một tệp | 151/38/38 trên cả main lẫn nhánh (phần thêm = 0 lệnh) |

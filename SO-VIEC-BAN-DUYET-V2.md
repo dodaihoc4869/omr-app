@@ -47,3 +47,7 @@ Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Th
 - [x] Kiểm ca thi mở (chỉ đọc D1) | bằng chứng: 11:50 09/10 so_ca_mo 0, so_luot_dang_lam 0.
 - [x] Sửa 4 lỗi đã thấy ở bản V2 (rương lặp số, khối Hành trình vẽ 2 lần, bước "Thử thách +1 bậc", 2 nút Vào thi) | bằng chứng: 6f5fc95 (Sảnh V2 viết lại theo bản vẽ: một khối Hành trình, rương không lặp số câu hôm nay, bỏ bước 3, một nút Vào thi).
 - [ ] Đẩy luôn: kiểm không có ca thi mở → PR vào main → Actions phát hành Pages + Worker | bằng chứng: (chưa có)
+
+Thầy nhắn (nguyên văn): "đẩy luôn giao diện mới lên đi bạn ơi" · "làm tiếp xong hết đẩy lên máy chủ luôn nhé"
+- [x] Gộp main mới (PR217 Hành trình v6 + ab898ce) | bằng chứng: fbe1d58, cadfc89; nút "Làm bài kiểm đầu/tuần" của main đưa vào Sảnh mới (test mới trong `ban-duyet-v2-0910`).
+- [x] Kiểm toàn bộ trước phát hành | bằng chứng: bảng "Kiểm bản phát hành" trong `BAN-DUYET-V2-build-status.md`.
