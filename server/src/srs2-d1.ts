@@ -1532,12 +1532,11 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
     omniSom.then((bat) => (bat ? docKeHoachOmni(env, sbd, ngay) : null)),
   ])
   if (hoSo.chienDich && laHanhTrinh(hoSo.chienDich.id)) {
-    const [tc, chan, nghi] = await Promise.all([
-      tuyChonKeHoachOmni(env, sbd, nowMs, hoSo, await lapSom),
+    const [chan, nghi] = await Promise.all([
       chanSom ?? protectedQuestions(env), docCauNghiDem(env, nowMs),
     ])
     const kh = await import('./hanh-trinh-d1').then(m => m.lapChotHanhTrinh(env, sbd, ngay, nowMs, hoSo, cu,
-      new Set([...chan, ...nghi]), tc.trongSoCau, tc.dangVung))
+      new Set([...chan, ...nghi])))
     return { kh, hs: hoSo }
   }
   if (hoSo.omni?.bat) return layKeHoachChotOmni(env, sbd, nowMs, hoSo, dem, cu, luuOmni, chanSom, await lapSom)

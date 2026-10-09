@@ -36,23 +36,26 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     if (!daLam.has(q) || !hopLe.has(q) || daNhom.has(k)) return false
     daNhom.add(k); return true
   })
-  const theoBai = new Map<string, typeof hs.cau>()
-  for (const c of hs.cau) {
-    if (c.nguon !== 'chien_dich') continue
-    const ma = hs.meta.get(c.qid)?.maDe ?? ''
-    const bai = /^(.*?-B\d+)(?:-|$)/i.exec(ma)?.[1] ?? ma
-    theoBai.set(bai, [...(theoBai.get(bai) ?? []), c])
-  }
   const tangSanSang = new Map<string, TangHanhTrinh>()
-  let tang: TangHanhTrinh = 1
-  for (const cau of theoBai.values()) {
-    const t = tangCuaEm(cau, hs.tt, nhom, dangVung)
-    tang = Math.max(tang, t) as TangHanhTrinh
-    for (const c of cau) tangSanSang.set(c.qid, t)
+  let snap = await env.DB.prepare('SELECT * FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>()
+  if (!snap) {
+    const theoBai = new Map<string, typeof hs.cau>()
+    for (const c of hs.cau) {
+      if (c.nguon !== 'chien_dich') continue
+      const ma = hs.meta.get(c.qid)?.maDe ?? ''
+      const bai = /^(.*?-B\d+)(?:-|$)/i.exec(ma)?.[1] ?? ma
+      theoBai.set(bai, [...(theoBai.get(bai) ?? []), c])
+    }
+    let tang: TangHanhTrinh = 1
+    for (const cau of theoBai.values()) {
+      const t = tangCuaEm(cau, hs.tt, nhom, dangVung)
+      tang = Math.max(tang, t) as TangHanhTrinh
+      for (const c of cau) tangSanSang.set(c.qid, t)
+    }
+    await env.DB.prepare('INSERT OR IGNORE INTO hanh_trinh_v3_ngay(sbd,ngay,tang,toi_thieu) VALUES(?,?,?,?)')
+      .bind(sbd, ngay, tang, CAU_TOI_THIEU[tang]).run()
+    snap = (await env.DB.prepare('SELECT * FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
   }
-  await env.DB.prepare('INSERT OR IGNORE INTO hanh_trinh_v3_ngay(sbd,ngay,tang,toi_thieu) VALUES(?,?,?,?)')
-    .bind(sbd, ngay, tang, CAU_TOI_THIEU[tang]).run()
-  const snap = (await env.DB.prepare('SELECT * FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
   let tangNgay = Number(snap.tang) as TangHanhTrinh, toiThieu = Number(snap.toi_thieu)
   const conCu = [...ds(cu?.doan_json), ...ds(cu?.dao_json)].filter(q => !daLam.has(goc(q)))
   const hong = conCu.some(q => !hs.meta.has(goc(q)) || hs.meta.get(goc(q))?.tuLuan || hs.tt.get(goc(q))?.catTia || chan.has(goc(q)) || chan.has(nhom.get(goc(q)) || goc(q)))
@@ -62,7 +65,22 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   const kiem=await env.DB.prepare('SELECT da_lam FROM hanh_trinh_v4_chot WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<{da_lam:number}>()
   const saiMoi=rows.results[0]?.ket_qua===0 && xong.length>(kiem?.da_lam??0)
   const doiBoSung = conCu.length === 0 && xong.length < toiThieu
+  let daChay = false
   if (!v5Cu || v5Cu.phien_ban!==PHIEN_BAN_HT5 || !kiem || saiMoi || !cu || cu.chien_dich_id !== hs.chienDich?.id || Number(snap.xong_chot) !== moc || hong || doiBoSung) {
+    daChay = true
+    if (tangSanSang.size === 0) {
+      const theoBai = new Map<string, typeof hs.cau>()
+      for (const c of hs.cau) {
+        if (c.nguon !== 'chien_dich') continue
+        const ma = hs.meta.get(c.qid)?.maDe ?? ''
+        const bai = /^(.*?-B\d+)(?:-|$)/i.exec(ma)?.[1] ?? ma
+        theoBai.set(bai, [...(theoBai.get(bai) ?? []), c])
+      }
+      for (const cau of theoBai.values()) {
+        const t = tangCuaEm(cau, hs.tt, nhom, dangVung)
+        for (const c of cau) tangSanSang.set(c.qid, t)
+      }
+    }
     const engine = await dongCoHanhTrinh(env,sbd,nowMs,hs,chan)
     if(engine.v5){
       for(const [id,t] of engine.v5.tang)tangSanSang.set(id,t)
@@ -88,7 +106,9 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const kiemMoi=env.DB.prepare('INSERT INTO hanh_trinh_v4_chot(sbd,ngay,da_lam) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?) ON CONFLICT(sbd,ngay) DO UPDATE SET da_lam=excluded.da_lam').bind(sbd,ngay,xong.length,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))
     await env.DB.batch([write, ...(decision?[decision]:[]), ...(exposure?[exposure]:[]),kiemMoi, env.DB.prepare('UPDATE hanh_trinh_v3_ngay SET xong_chot=? WHERE sbd=? AND ngay=? AND EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?)').bind(moc, sbd, ngay,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))])
   }
-  const saved = (await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
+  const saved = daChay || !cu
+    ? (await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
+    : cu
   const dao = ds(saved.dao_json), doan = ds(saved.doan_json)
   const conDao = dao.filter(q => !daLam.has(goc(q))), conDoan = doan.filter(q => !daLam.has(goc(q)))
   const tong = dao.length + doan.length
