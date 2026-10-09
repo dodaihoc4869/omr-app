@@ -60,7 +60,7 @@ Thầy nhắn (nguyên văn): "bạn hãy quet toàn bộ giao diện app hiện
 - [!] CHƯA BUILD — chờ thầy chốt bản vẽ + 3 câu hỏi (PH 3 hay 4 mục; GV lấy lam làm màu gốc; thanh bên GV 5 mục) | KẸT: chờ thầy.
 
 Thầy nhắn (nguyên văn, 2 lần): "buid luôn và đẩy luôn nhé" — coi bản vẽ được duyệt nguyên trạng; 3 câu hỏi lấy đúng phương án bản vẽ: PH 3 mục · GV một bảng lam · thanh bên GV 5 mục + Cài đặt.
-- [ ] Thang chung `src/styles/thang.css` (chỉ kích thước + chuyển động) | bằng chứng: (chưa có)
+- [x] Thang chung `src/styles/thang.css` (chỉ kích thước + chuyển động) | bằng chứng: 9f2ec7a (nạp ngay sau tokens.css ở main.tsx; check:mau đạt, tsc 0 lỗi). 3 làn HS · PH · GV đang build song song trên worktree riêng.
 - [ ] Build HS theo bản vẽ (Hôm nay · Hành trình · Ôn lại · Của em · Làm câu) | bằng chứng: (chưa có)
 - [ ] Build PH theo bản vẽ (3 mục · Hôm nay · Tiến bộ · Ca kiểm tra · Đổi SBD có hỏi lại · tối) | bằng chứng: (chưa có)
 - [ ] Build GV theo bản vẽ (5 mục + Cài đặt · một bảng lam · Hôm nay · Học sinh · Mở ca · tối theo nút) | bằng chứng: (chưa có)
