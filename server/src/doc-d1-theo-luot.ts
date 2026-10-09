@@ -1,9 +1,30 @@
-// Gộp CHỈ SELECT độc lập của MỘT lượt game/hồ sơ. Không có kho/Promise dùng chung giữa các HTTP request.
+// Gộp CHỈ SELECT độc lập của MỘT lượt game/hồ sơ. Không có Promise dùng chung giữa các HTTP request (chỉ ĐỆM KẾT QUẢ bảng dùng chung, dưới).
 // Ghi/CAS giữ nguyên lô và thứ tự; xả nhóm đọc trước khi gửi ghi. Không gộp ghi vào nhóm đọc.
 import type { D1Database, D1PreparedStatement, D1Result } from './kieu'
 import { gan } from './cau-hinh-dem'
-import { dangKyXoaDem } from './dem-chung'
+import { dangKyXoaDem, DemTTL } from './dem-chung'
 const DA_GOP = Symbol('omr.docD1TheoLuot')
+// ĐỆM DÙNG CHUNG GIỮA CÁC LƯỢT (sự cố 09/10 cả trường "Chưa kết nối" sau khi bật Hành trình): mỗi lần mở Sảnh, mỗi em đọc lại ~5.000 dòng kho câu /
+// OMNI / danh sách GIỐNG HỆT em khác ⇒ D1 quá tải giờ cao điểm. SELECT mà MỌI bảng nhắc tới đều thuộc BANG_DUNG_CHUNG được nhớ 60 giây theo (SQL, tham số);
+// lệnh ghi qua bản gộp đụng các bảng này ⇒ xoá ngay (isolate khác cũ tối đa 60 giây). KHÔNG đưa `hoc_sinh` vào (có token/mật khẩu). Trả bản sao từng dòng.
+export const BANG_DUNG_CHUNG: readonly string[] = ['game_v2_question', 'omni_q', 'danh_sach']
+const demChung = new DemTTL<D1Result>(60_000, 300, 16_000_000)
+const RE_BANG_SQL = /\b(?:FROM|JOIN)\s+([A-Za-z_][A-Za-z0-9_]*)/gi
+function khoaDemChung(sql: string, tham: readonly unknown[]): string | null {
+  if (!/^\s*SELECT\b/i.test(sql) || /\bFROM\s+[A-Za-z_][A-Za-z0-9_]*\s*,/i.test(sql) || /'now'|\brandom\s*\(/i.test(sql)) return null
+  let co = false
+  for (const m of sql.matchAll(RE_BANG_SQL)) {
+    const b = m[1]!.toLowerCase()
+    if (b === 'json_each') continue
+    if (!BANG_DUNG_CHUNG.includes(b)) return null
+    co = true
+  }
+  return co ? `${sql}\u0000${JSON.stringify(tham)}` : null
+}
+const banSao = (r: D1Result): D1Result => ({ ...r, results: (r.results ?? []).map((d) => ({ ...(d as object) })) }) as D1Result
+function xoaDemChungSauGhi(sql: string): void {
+  if (!sql || BANG_DUNG_CHUNG.some((b) => nhacBang(sql, b))) demChung.xoa()
+}
 /** Sổ nhớ ĐỌC của MỘT lượt (tối ưu 05/10): khoá → Promise kết quả (+ các BẢNG mà lượt đọc ấy đọc). Chỉ bản gộp đọc (`gopDocD1(db, true)`) có.
  *  Lệnh GHI của lượt xoá: mục KHÔNG khai bảng ⇒ mọi lệnh ghi xoá (như trước); mục có khai bảng ⇒ chỉ lệnh ghi mà câu SQL CÓ NHẮC tới một trong các bảng ấy mới xoá
  *  (lược đồ không có trigger/khoá ngoại cascade ⇒ một lệnh ghi chỉ đổi đúng bảng nó nhắc tên; so khớp nguyên từ, thà xoá thừa). */
@@ -140,7 +161,7 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     truoc = ghi
     return p
   }
-  const goc = new WeakMap<D1PreparedStatement, { st: D1PreparedStatement; doc: boolean; sql: string }>()
+  const goc = new WeakMap<D1PreparedStatement, { st: D1PreparedStatement; doc: boolean; sql: string; tham: readonly unknown[] }>()
   function xa(): void {
     const lo = ds; ds = []
     if (!lo.length) return
@@ -171,36 +192,50 @@ export function gopDocD1(db: D1Database, bat = true): D1Database {
     })
     truoc = Promise.all([truoc, p]).then(() => undefined)
   }
-  function doc(st: D1PreparedStatement, sql = ''): Promise<D1Result> {
+  function doc(st: D1PreparedStatement, sql = '', tham: readonly unknown[] = []): Promise<D1Result> {
     if (loiQuaTai) return Promise.reject(loiQuaTai)
-    return new Promise((xong, loi) => {
+    const khoa = khoaDemChung(sql, tham)
+    if (khoa) {
+      const c = demChung.doc(khoa, Date.now())
+      if (c) return Promise.resolve(banSao(c))
+    }
+    const p = new Promise<D1Result>((xong, loi) => {
       ds.push({ st, xong, loi, sql })
       if (ds.length !== 1) return
       queueMicrotask(xa)
     })
+    if (!khoa) return p
+    return p.then((r) => {
+      if (r && Array.isArray(r.results)) {
+        const co = Math.max(1, JSON.stringify(r.results).length)
+        if (co <= 4_000_000) demChung.ghi(khoa, Date.now(), banSao(r), co)
+      }
+      return r
+    })
   }
-  function boc(st: D1PreparedStatement, laDoc: boolean, sql: string): D1PreparedStatement {
+  const ghiSql = (sql: string): void => { xoaNhoSauGhi(nho, sql); xoaDemChungSauGhi(sql); xa() }
+  function boc(st: D1PreparedStatement, laDoc: boolean, sql: string, tham: readonly unknown[] = []): D1PreparedStatement {
     const p: D1PreparedStatement = {
-      bind: (...tham) => boc(st.bind(...tham), laDoc, sql),
-      all: <T>() => { if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.all<T>()) }; return doc(st, sql) as Promise<D1Result<T>> },
+      bind: (...t) => boc(st.bind(...t), laDoc, sql, t),
+      all: <T>() => { if (!laDoc) { ghiSql(sql); return gui(() => st.all<T>()) }; return doc(st, sql, tham) as Promise<D1Result<T>> },
       first: async <T>(cot?: string) => {
-        if (!laDoc) { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.first<T>(cot)) }
-        const r = await doc(st, sql), dong = r.results[0]
+        if (!laDoc) { ghiSql(sql); return gui(() => st.first<T>(cot)) }
+        const r = await doc(st, sql, tham), dong = r.results[0]
         return (cot ? (dong as Record<string, unknown> | undefined)?.[cot] ?? null : dong ?? null) as T | null
       },
-      run: <T>() => { xoaNhoSauGhi(nho, sql); xa(); return gui(() => st.run<T>()) },
+      run: <T>() => { ghiSql(sql); return gui(() => st.run<T>()) },
     }
-    goc.set(p, { st, doc: laDoc, sql })
+    goc.set(p, { st, doc: laDoc, sql, tham })
     return p
   }
   const wrapped = gan({
     prepare: (sql: string) => boc(db.prepare(sql), /^\s*SELECT\b/i.test(sql), sql),
     batch: <T>(cau: D1PreparedStatement[]) => {
       // Câu không qua `prepare` của bản này (không biết SQL) ⇒ coi như nhắc MỌI bảng (xoá cả sổ nhớ, như trước).
-      const that = cau.map(st => goc.get(st) ?? { st, doc: false, sql: '' })
-      if (that.length && that.every(x => x.doc)) return Promise.all(that.map(x => doc(x.st, x.sql))) as Promise<D1Result<T>[]>
-      if (that.some(x => !x.sql)) nho.clear()
-      else xoaNhoSauGhi(nho, that.map(x => x.sql).join(' ;; '))
+      const that = cau.map(st => goc.get(st) ?? { st, doc: false, sql: '', tham: [] as readonly unknown[] })
+      if (that.length && that.every(x => x.doc)) return Promise.all(that.map(x => doc(x.st, x.sql, x.tham))) as Promise<D1Result<T>[]>
+      if (that.some(x => !x.sql)) { nho.clear(); demChung.xoa() }
+      else { const gop = that.map(x => x.sql).join(' ;; '); xoaNhoSauGhi(nho, gop); xoaDemChungSauGhi(gop) }
       xa()
       return gui(() => db.batch<T>(that.map(x => x.st)))
     },

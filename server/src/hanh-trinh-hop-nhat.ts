@@ -154,7 +154,7 @@ export async function ungVienHanhTrinh(env: Env, id: string, sbd: string, ngay: 
   try { tang = JSON.parse(String(raw ?? '{}')) as Record<string, unknown> } catch { /* Chưa có kho mới: dùng phạm vi cũ có giới hạn. */ }
   const [daChot, daLam] = await Promise.all([
     env.DB.prepare('SELECT dao_json,doan_json FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>(),
-    env.DB.prepare(`SELECT DISTINCT qid,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND nguon='game' AND COALESCE(visibility,'') <> 'embargoed' AND ${SQL_LA_LAN_LAM}`).bind(sbd,ngay).all<Row>(),
+    env.DB.prepare(`SELECT DISTINCT qid,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND (nguon='game' OR (nguon='luyen' AND ma_nguon LIKE 'de_thu:%' AND EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL))) AND COALESCE(visibility,'') <> 'embargoed' AND ${SQL_LA_LAN_LAM}`).bind(sbd,ngay).all<Row>(),
   ])
   const da = [...mang(daChot?.dao_json), ...mang(daChot?.doan_json)].map(q => q.replace(/#\d+$/, ''))
   const ds = Object.values(tang).filter((a): a is string[] => Array.isArray(a)).flatMap(a =>

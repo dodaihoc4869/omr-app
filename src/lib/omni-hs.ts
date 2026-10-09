@@ -44,6 +44,7 @@ export function docSanhOmni(x: unknown): SanhOmni | null {
     onBaiCu: soNguyen(o.onBaiCu),
     metGio,
     nhatKy: nhatKy.length ? nhatKy : null,
+    ...(vat(o.l4Kiem)?.duoc===true&&soNguyen(vat(o.l4Kiem)?.soCau)===6?{l4Kiem:{duoc:true,soCau:6}}:{}),
     deThu: { duoc: dt?.duoc === true && soCauThu > 0, soCau: soCauThu || THAM_SO_OMNI.DE_THU.soCau, phut: soNguyen(dt?.phut) || THAM_SO_OMNI.DE_THU.phut },
     // CẨN THẬN (chỉ-thêm): CHỈ khi máy chủ gửi đúng `true` — vắng / sai kiểu ⇒ không trường ⇒ app em y hệt hôm nay.
     ...(o.canThan === true ? { canThan: true } : {}),
@@ -122,7 +123,7 @@ export function lanDauChamChip(sbd: string, now = Date.now()): boolean {
 // ─────────────────────────────── cửa vào Đảo từ Sảnh (vé thử thách · đề thử)
 /** Khoá sessionStorage: Sảnh đặt rồi mở game; Đảo 2.0 đọc MỘT lần lúc mở rồi tự xoá (cùng hợp đồng với `game-v2:man-dau`). */
 export const KHOA_OMNI_DAO = 'game-v2:omni-dao'
-export type ViecOmniDao = 've' | 'de-thu'
+export type ViecOmniDao = 've' | 'de-thu' | 'de-thu-l4'
 export function datViecOmniDao(v: ViecOmniDao): void {
   try {
     sessionStorage.setItem(KHOA_OMNI_DAO, v)
@@ -138,5 +139,5 @@ export function layViecOmniDao(): ViecOmniDao | null {
   } catch {
     /* máy chặn lưu */
   }
-  return v === 've' || v === 'de-thu' ? v : null
+  return v === 've' || v === 'de-thu' || v === 'de-thu-l4' ? v : null
 }

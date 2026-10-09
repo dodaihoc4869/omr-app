@@ -1,3 +1,5 @@
+import { canBangL4 } from './hanh-trinh-l4'
+import type { VaiTroCau } from './hanh-trinh-v5-loi'
 // Hành trình giỏi hoá: mức tối thiểu theo ngày, câu khác nhau, chặng ngắn.
 // Không dùng hạng L1–L4 (tỉ lệ đúng) thay cho tầng nội dung của bài.
 import { HANG_MUC_DO, bam, soSanhNo, type CauSrs, type TrangThaiCau } from './srs2-loi'
@@ -65,6 +67,7 @@ export interface DauVaoHanhTrinh {
   chan: ReadonlySet<string>
   trongSo?: Readonly<Record<string, number>>
   tangSanSang?: ReadonlyMap<string, TangHanhTrinh>
+  vaiTro?: Readonly<Record<string,VaiTroCau>>
   uuTienCanThiep?: string
 }
 
@@ -99,6 +102,10 @@ export function chonCauHanhTrinh(a: DauVaoHanhTrinh): { dao: string[]; doan: str
     }
   }
   lay(ung.filter(c=>c.qid===a.uuTienCanThiep),1)
+  if(a.tang===4&&a.vaiTro){
+    const selected=canBangL4([...no,...moi,...on].map(c=>c.qid),a.vaiTro,n)
+    const byId=new Map(ung.map(c=>[c.qid,c]));lay(selected.map(id=>byId.get(id)!).filter(Boolean),n)
+  }
   lay(no, Math.ceil(n * (no.length > n / 2 ? 0.5 : 0.3)))
   lay(moi, Math.ceil(n * 0.5))
   lay(on, Math.ceil(n * 0.2))

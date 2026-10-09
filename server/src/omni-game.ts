@@ -1,3 +1,6 @@
+import { dongCoHanhTrinh } from './hanh-trinh-dong-co'
+import { phamViMucTieu } from './hanh-trinh-v5-d1'
+import { ghiDeThuDo,maTranDo,chotDiemDau } from './hanh-trinh-do-luong'
 // OMNI 3 — LÀN B3: ĐƯỜNG TRẢ LỜI + GAME (Đảo/Đoàn · lướt · chắc-mà-sai · Trạm hồi phục · vé thử thách · đề thử nửa).
 // Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md (mục 1 bước 4–8, 4.2–4.7, 5) · hợp đồng API: docs/hop-dong-omni-3.md mục A ·
 // kiểu: server/src/omni-kieu.ts · chữ hiển thị: src/lib/omni-chu.ts (chủ ngữ "A.I Đỗ Đại Học").
@@ -25,7 +28,7 @@ import { apLamLaiKhac, canBanKhac, lamLaiKhacBat } from './cau-anh-em'
 import { apXaoTheoRef, laQidChanDoan, laYdMoi, refLamLai, xaoCau, type LamLaiRef } from './lam-lai-so'
 import { ghiSuKien, type SuKien } from './su-kien-hoc'
 import { HANG_MUC_DO } from './srs2-loi'
-import { chuaBatDau, docChienDichCuaEm, docHangEm, docMetaCau, doiThuTuMetGio, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
+import { chuaBatDau, docChienDichCuaEm, docHangEm, docHoSo2, docMetaCau, doiThuTuMetGio, layKeHoachHomNay, ngayVnCua, qidGoc, type HoSo2, type MetaCau } from './srs2-d1'
 import { docKhoiEm, napDayDuMem, protectedQuestions } from './game-v2-bank'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docCauDaLamMoiNguon } from './game-v2-cau-moi'
@@ -578,7 +581,7 @@ export async function hoa2OmniAction(env: Env, sbd: string, action: string, b: R
     if (quyet !== 'de_mai' && quyet !== 'lam_luon') return { ok: false, error: `Em chọn "${NUT_DE_MAI}" hoặc "${NUT_LAM_LUON}".` }
     return doiThuTuMetGio(env, sbd, nowMs, quyet)
   }
-  if (action === 'hoa2-omni-de-thu') return deThu(env, sbd, nowMs)
+  if (action === 'hoa2-omni-de-thu') return b.l4===true?deThuL4(env,sbd,nowMs):deThu(env, sbd, nowMs)
   if (action === 'hoa2-omni-de-thu-nop') return deThuNop(env, sbd, b, nowMs)
   if (action === LENH_OMNI_CAN_THAN[0]) return ghiBuocSai(env, sbd, b, nowMs) // CẨN THẬN (c): em bấm một bước ở thẻ "Sai vì bước nào?" ⇒ ghi sổ riêng, không chấm
   return { ok: false, error: 'Lệnh không hợp lệ.' }
@@ -711,8 +714,9 @@ async function deThu(env: Env, sbd: string, nowMs: number): Promise<Record<strin
   }
   const [pv, bc] = await Promise.all([phamViChon(env, sbd), boiCanh(env, sbd, nowMs)])
   const tatCa = (await metaTheoPhamVi(env, pv)).filter((m) => hopLeChung(m, bc))
-  const nhomDaLam = new Set(tatCa.filter((m) => bc.daLam.has(m.qid)).map((m) => m.group))
-  const la = tatCa.filter((m) => !bc.daLam.has(m.qid) && !nhomDaLam.has(m.group))
+  const {seen,nhom:nhomDaLam}=await nhomDaGap(env,sbd,nowMs)
+  for(const m of tatCa)if(bc.daLam.has(m.qid)||seen.has(m.qid))nhomDaLam.add(m.group)
+  const la = tatCa.filter((m) => !bc.daLam.has(m.qid) && !seen.has(m.qid) && !nhomDaLam.has(m.group))
   const muoi = `${sbd}|${ngayVnCua(nowMs)}|de_thu`
   const theoPhan: Record<Phan, MetaCau[]> = { I: [], II: [], III: [] }
   for (const p of ['I', 'II', 'III'] as Phan[]) theoPhan[p] = xepVongTron(la.filter((m) => m.phan === p), muoi)
@@ -730,6 +734,8 @@ async function deThu(env: Env, sbd: string, nowMs: number): Promise<Record<strin
   const id = crypto.randomUUID(), tao = new Date(nowMs).toISOString(), het = new Date(nowMs + TS.DE_THU.phut * PHUT_MS).toISOString()
   const refs: RefDeThu[] = ds.map(({ q, m }) => ({ qid: q.qid, maDe: m.maDe, version: m.version, phan: q.phan }))
   await env.DB.prepare('INSERT INTO omni_de_thu (id, sbd, qid_json, tao_luc, het_luc) VALUES (?,?,?,?,?)').bind(id, sbd, JSON.stringify(refs), tao, het).run()
+  const scopeHs=await docHoSo2(env,sbd,ngayVnCua(nowMs))
+  await ghiDeThuDo(env,id,sbd,nowMs,refs,maTranDo(ds.map(({q})=>({phan:q.phan,mucDo:q.mucDo??null,sao:q.sao??0}))),true,await phamViMucTieu(env,scopeHs,nowMs))
   return { ok: true, id, cau: ds.map(({ q }) => publicQuestion(q)), phut: TS.DE_THU.phut, hetLuc: het }
 }
 /** Đáp án em gửi → chuỗi chấm được; sai khuôn / bỏ trống ⇒ '' (bỏ trống: sai, 0 điểm). Phần II nhận Đ/S từng ý, '-' là ý bỏ trống. */
@@ -803,7 +809,42 @@ async function deThuNop(env: Env, sbd: string, b: Row, nowMs: number): Promise<R
   const diem = diemThang10(diemCau)
   if (!daNop) {
     const g = await ghiSuKien(env, suKien)
-    if (g.ok) await env.DB.prepare('UPDATE omni_de_thu SET nop_luc = ?, diem = ? WHERE id = ? AND sbd = ? AND nop_luc IS NULL').bind(luc, diem, id, sbd).run()
+    if (g.ok) {
+      await env.DB.prepare('UPDATE omni_de_thu SET nop_luc = ?, diem = ? WHERE id = ? AND sbd = ? AND nop_luc IS NULL').bind(luc, diem, id, sbd).run()
+      await chotDiemDau(env,id,sbd,nopMs,diem,cau.length)
+    }
   }
   return { ok: true, diem, dung: cau.filter((c) => c.dung).length, tong: cau.length, cau, ...(quaGio ? { quaGio: true } : {}) }
+}
+
+/** Chặng L4 6 câu thật: đồng hồ máy chủ, nộp toàn chặng rồi mới trả lời giải. Dùng đúng luật chấm hiện có. */
+async function deThuL4(env:Env,sbd:string,nowMs:number):Promise<Record<string,unknown>>{
+  await damBaoBangOmniGame(env)
+  const open=await env.DB.prepare('SELECT id,qid_json,het_luc FROM omni_de_thu WHERE sbd=? AND nop_luc IS NULL ORDER BY tao_luc DESC LIMIT 1').bind(sbd).first<Row>()
+  if(open&&nowMs<=Date.parse(str(open.het_luc))+2*PHUT_MS){const refs=docRefsDeThu(open.qid_json),all=await napDayDuMem(env,refs),questions=refs.map(r=>all.get(`${r.maDe}|${r.qid}|${r.version}`)).filter((q):q is PrivateQuestion=>!!q);if(questions.length)return {ok:true,id:str(open.id),cau:questions.map(publicQuestion),phut:Math.max(1,Math.ceil((Date.parse(str(open.het_luc))-nowMs)/PHUT_MS)),hetLuc:str(open.het_luc)}}
+  const h=await docHoSo2(env,sbd,ngayVnCua(nowMs)),bc=await boiCanh(env,sbd,nowMs)
+  if(!h.chienDich?.id.startsWith('hanh-trinh-v3-khoi-'))return {ok:false,error:'Chưa có chặng kiểm tra chuyên sâu trong hành trình của em.'}
+  const d=await dongCoHanhTrinh(env,sbd,nowMs,h,bc.chan,false)
+  const {seen,nhom:seenGroups}=await nhomDaGap(env,sbd,nowMs)
+  const ids=h.cau.filter(c=>d.v5?.tang.get(c.qid)===4&&!d.chan.has(c.qid)&&h.tt.get(c.qid)?.laMoi&&!seen.has(c.qid)&&!seenGroups.has(h.meta.get(c.qid)?.group??c.qid)).sort((a,b)=>(d.trongSo[b.qid]??0)-(d.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid)).map(c=>c.qid)
+  const metas=ids.map(id=>h.meta.get(id)).filter((m):m is MetaCau=>!!m&&hopLeChung(m,bc))
+  const selected=await napTheoThuTu(env,metas,6,new Set<string>())
+  if(selected.length<6)return {ok:false,error:'Chưa đủ 6 câu mới, đủ tiên quyết để kiểm tra chuyên sâu.'}
+  const safe=await chanKhacKhoiEm(env,'omni_l4_kiem',{sbd,khoiEm:bc.khoiEm},selected,{cauCua:x=>x.q})
+  if(safe.length!==6)return {ok:false,error:'Chưa đủ câu phù hợp với khối của em.'}
+  const id=crypto.randomUUID(),tao=new Date(nowMs).toISOString(),phut=Math.max(6,Math.min(30,Math.ceil(safe.reduce((sum,x)=>sum+(d.v5?.phut[x.q.qid]??2),0)))),het=new Date(nowMs+phut*PHUT_MS).toISOString()
+  const refs:RefDeThu[]=safe.map(({q,m})=>({qid:q.qid,maDe:m.maDe,version:m.version,phan:q.phan}))
+  await env.DB.prepare("INSERT INTO omni_de_thu(id,sbd,qid_json,tao_luc,het_luc) SELECT ?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')").bind(id,sbd,JSON.stringify(refs),tao,het).run()
+  const exists=await env.DB.prepare('SELECT id FROM omni_de_thu WHERE id=? AND sbd=?').bind(id,sbd).first()
+  if(!exists)return {ok:false,error:'Chưa mở được chặng kiểm tra chuyên sâu. Em thử lại sau.'}
+  await ghiDeThuDo(env,id,sbd,nowMs,refs,maTranDo(safe.map(({q})=>({phan:q.phan,mucDo:q.mucDo??null,sao:q.sao??0}))),true,d.v5!.phamVi)
+  return {ok:true,id,cau:safe.map(({q})=>publicQuestion(q)),phut,hetLuc:het}
+}
+
+/** Toàn lịch sử kể cả đọc lời giải/hỗ trợ và câu ngoài phạm vi; không coi bản chép là đề mới. */
+export async function nhomDaGap(env:Env,sbd:string,now:number){
+  const base="COALESCE(json_extract(s.raw_json,'$.tc'),CASE WHEN instr(s.qid,'#')>0 THEN substr(s.qid,1,instr(s.qid,'#')-1) ELSE s.qid END)"
+  const canonical=`CASE WHEN instr(${base},'~ss')>0 THEN substr(${base},1,instr(${base},'~ss')-1) ELSE ${base} END`
+  const r=await env.DB.prepare(`SELECT s.qid,COALESCE((SELECT content_group FROM game_v2_question g WHERE g.qid=${canonical} LIMIT 1),'') nhom FROM su_kien_hoc s WHERE s.sbd=? AND s.received_at<=?`).bind(sbd,now).all<{qid:string;nhom:string}>()
+  return {seen:new Set(r.results.map(r=>qidGocOmni(r.qid))),nhom:new Set(r.results.map(r=>r.nhom).filter(Boolean))}
 }

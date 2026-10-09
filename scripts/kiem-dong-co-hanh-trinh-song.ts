@@ -31,6 +31,6 @@ async function main(){
   const hs=await docHoSo2(env,em.sbd,ngay)
   if(!hs.chienDich?.id.startsWith('hanh-trinh-v3-khoi-')) throw new Error('Bộ đọc chưa chọn đúng Hành trình.')
   const d=await dongCoHanhTrinh(env,em.sbd,now,hs,new Set(),false)
-  console.log(JSON.stringify({kiemDongCoSong:true,lichSuLonNhat:em.n,soUngVien:hs.cau.length,soQuanSatDocLap:d.soQuanSat,soCauChanTienQuyet:d.chan.size,soCauHalfLife:d.soHalfLife,soCanhHoc:d.soCanhHoc,soLenhDoc:soDoc}))
+  console.log(JSON.stringify({kiemDongCoSong:true,lichSuLonNhat:em.n,soUngVien:hs.cau.length,soQuanSatDocLap:d.soQuanSat,soCauChanTienQuyet:d.chan.size,soCauHalfLife:d.soHalfLife,soCanhHoc:d.soCanhHoc,soL4SanSang:d.v5?.soL4??0,soKyNangL3MucTieu:d.v5?.tienDo.tong??0,baoPhuL3:d.v5?.tienDo.baoPhu??null,soLenhDoc:soDoc}))
 }
 main().catch(()=>{console.error('Không hoàn tất kiểm động cơ chỉ đọc.');process.exitCode=1})
