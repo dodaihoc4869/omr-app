@@ -6,7 +6,7 @@
 //      Chạm tên em thì vào Báo cáo.
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp, Users, Wallet } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
@@ -63,7 +63,10 @@ export const TEN_MUC_HO_SO: Record<MucHoSo, string> = {
   'lich-su': 'Lịch sử ca kiểm tra',
 }
 
+const ToanCanhHocTap = lazy(() => import('./ToanCanhEmScreen'))
+
 export default function HocSinhScreen() {
+  const [moHocTap, setMoHocTap] = useState(false)
   const sbdDangXem = useAppStore((s) => s.sbdDangXem)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
   const [mucHoSo, setMucHoSo] = useState<MucHoSo>('tong-quan')
@@ -312,7 +315,7 @@ export default function HocSinhScreen() {
   if (sbdDangXem) {
     const diemGanNhat = hoSo?.ca.find((c) => c.tong !== null)?.tong ?? null
     return (
-      <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+      <div className="gv-page gv-hoc-sinh-day-du min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
         <button onClick={() => moHoSoEm('')} className="tap-target hs-quay-lai" style={{ gap: 4 }}>
           <ArrowLeft size={16} /> Danh sách học sinh
         </button>
@@ -413,7 +416,8 @@ export default function HocSinhScreen() {
               </div>
             </div>
 
-            {/* HAI MỤC TAB GOOGLE PILLS */}
+            {hoa2 && <details className="hs-hoc-tap" onToggle={e => setMoHocTap(e.currentTarget.open)}><summary>Nhịp học, kiến thức và dòng thời gian</summary>{moHocTap && <Suspense fallback={<p role="status">Đang mở báo cáo học tập…</p>}><ToanCanhHocTap key={hoSo.em.sbd} sbdHoSo={hoSo.em.sbd} trongHoSo /></Suspense>}</details>}
+            {/* Các báo cáo kiểm tra trong cùng hồ sơ */}
             <div className="gv-student-actions grid grid-cols-1 sm:grid-cols-2 gap-2" role="tablist" aria-label="Mục hồ sơ">
               {(['bao-cao', 'lich-su'] as const).map((m) => {
                 const dang = mucHoSo === m
@@ -545,7 +549,7 @@ export default function HocSinhScreen() {
 
   // ------------------------------------------------------------- DANH SÁCH EM
   return (
-    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
+    <div className="gv-page gv-hoc-sinh-day-du min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       {/* HEADER GOOGLE STYLE */}
       <div className="gv-page-header flex items-center justify-between gap-3 pb-1">
         <div className="flex items-center gap-3">
@@ -723,7 +727,8 @@ export default function HocSinhScreen() {
                     {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
                   </span>
 
-                  {/* BỐN NÚT MỖI EM (Học phí thêm 05/10) */}
+                  {/* Tác vụ phụ mở theo từng em; hồ sơ là lối vào chính. */}
+                  <details className="hs-thao-tac"><summary>Thao tác với học sinh</summary>
                   <span className="gv-student-actions grid grid-cols-2 sm:grid-cols-4" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                     {(
                       [
@@ -777,7 +782,7 @@ export default function HocSinhScreen() {
                         </button>
                       )
                     })()}
-                  </span>
+                  </span></details>
                 </Hang>
               )
             })}

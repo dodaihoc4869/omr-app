@@ -1,3 +1,5 @@
+import KhoKienThucCay from '../components/KhoKienThucCay'
+import { khoiCuaDe } from '../lib/cay-chon-de'
 import GameReports from '../game/than-thu-v2/Reports'
 // NGÂN HÀNG CÂU HỎI — app CHỈ ĐỌC đề đã có sẵn (NAPDETUDONG.md): không thả
 // file, không đọc PDF/DOCX, không duyệt câu. Thầy thả file vào kho-de/moi/,
@@ -111,6 +113,9 @@ export default function NganHangDeScreen() {
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
   const [sources, setSources] = useState<TeacherExamSource[]>([])
+  const [timKho, setTimKho] = useState('')
+  const [maKho, setMaKho] = useState<string[]>([])
+  const [khoiKho, setKhoiKho] = useState('')
   const [dangDongBo, setDangDongBo] = useState(false)
   const [ketQua, setKetQua] = useState<KetQuaDongBo | null>(null)
   /** Đã đọc xong địa chỉ + mã từ máy (để không báo "chưa kết nối" trong lúc còn đang đọc). Nhập/sửa hai giá trị này nay ở CÀI ĐẶT → Kết nối máy chủ. */
@@ -365,7 +370,7 @@ export default function NganHangDeScreen() {
   const tongNghi = useMemo(() => sources.reduce((n, s) => n + cauNghiCua(s).length, 0), [sources])
 
   return (
-    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
+    <div className="gv-page gv-kho-day-du min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
 
       <div className="gv-page-header flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -471,8 +476,9 @@ export default function NganHangDeScreen() {
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="flex items-center justify-between gap-3 p-4 bg-slate-50 dark:bg-slate-800"><h2 className="font-bold">Danh sách đề</h2><span className="text-sm text-slate-500">{sources.length} đề</span></div>
-        <div role="region" aria-label="Danh sách đề trong ngân hàng" tabIndex={0} className="max-h-[65vh] overflow-y-auto overscroll-contain p-3 grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
-      {sources.map((s, i) => {
+        <div role="region" aria-label="Danh sách đề trong ngân hàng" tabIndex={0} className="gv-bank-grid max-h-[65vh] overflow-y-auto overscroll-contain p-3 grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
+      <KhoKienThucCay sources={sources} chon={maKho} onChon={setMaKho} /><div className="gv-kho-con"><section className="gv-kho-bo-loc" aria-label="Tìm kiến thức trong kho"><label>Khối<select value={khoiKho} onChange={e => setKhoiKho(e.target.value)}><option value="">Tất cả khối</option>{['10','11','12'].map(k => <option key={k} value={k}>Khối {k}</option>)}</select></label><label>Tìm bài hoặc đề<input type="search" value={timKho} onChange={e => setTimKho(e.target.value)} placeholder="Nhập tên bài hoặc mã đề" /></label></section>
+      {sources.filter(s => (!maKho.length || maKho.includes(s.maDe)) && (!khoiKho || khoiCuaDe(s) === khoiKho) && (!timKho || `${s.maDe} ${s.nguon || ''} ${s.nhom || ''}`.toLocaleLowerCase('vi').includes(timKho.toLocaleLowerCase('vi')))).map((s, i) => {
         const nghi = cauNghiCua(s)
         const mo = moDe.has(s.maDe)
         return (
@@ -595,7 +601,7 @@ export default function NganHangDeScreen() {
             </div>
           </TheNoiDung>
         )
-      })}
+      })}</div>
         </div>
       </section>
 

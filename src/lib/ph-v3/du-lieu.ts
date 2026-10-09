@@ -121,6 +121,8 @@ export function docLoiThay(raw: unknown): NhanXetCa[] | null {
 
 // ---------------------------------------------------------------- Game Hoá 2.0 của con ----------------------------------------------------------------
 export interface Hoc2 {
+  serverNow?: number
+  hanhTrinh?: { tang: 1 | 2 | 3 | 4; toiThieu: number }
   chienDich: { ten: string; hanNop: string; conNgay: number; tong: number; daGap: number; thanhThao: number; canDayLai: number } | null
   homNay: { tong: number; daLam: number } | null
   cauTungSai: { tong: number; thanhThao: number; canDayLai: number; dangOn: number } | null
@@ -200,5 +202,11 @@ export function docHoc2(raw: unknown): Hoc2 | null {
     if (tong !== null && tong > 0 && thanhThao !== null && canDayLai !== null && dangOn !== null && thanhThao + canDayLai + dangOn === tong) cauTungSai = { tong, thanhThao, canDayLai, dangOn }
   }
   const omni = docOmniPh(raw.omni)
-  return { chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
+  const serverNow = nguyenKhongAm(raw.serverNow)
+  let hanhTrinh: Hoc2['hanhTrinh']
+  if (laDoiTuong(raw.hanhTrinh)) {
+    const tang = nguyenKhongAm(raw.hanhTrinh.tang), toiThieu = nguyenKhongAm(raw.hanhTrinh.toiThieu)
+    if (tang !== null && tang >= 1 && tang <= 4 && toiThieu !== null && toiThieu > 0 && toiThieu <= 1000) hanhTrinh = { tang: tang as 1 | 2 | 3 | 4, toiThieu }
+  }
+  return { ...(serverNow !== null && serverNow <= 8640000000000000 ? { serverNow } : {}), ...(hanhTrinh ? { hanhTrinh } : {}), chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
 }

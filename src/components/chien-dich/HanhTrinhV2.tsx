@@ -306,10 +306,10 @@ export default function HanhTrinhV2({
           <h1 className="gvv2-h1">Hành trình giỏi Hóa</h1>
           <p className="gvv2-phu">Thầy tick bài đã dạy — app tự lập kế hoạch riêng cho từng em mỗi ngày</p>
         </div>
-        {the === 'nhip' && ds && ds.length > 0 && (
+        {ds && ds.length > 0 && (
           <div className="gvv2-khoi" role="radiogroup" aria-label="Chọn khối">
             {ds.map((c) => (
-              <button key={c.id} type="button" role="radio" aria-checked={c.id === chon} className="gvv2-khoi-nut" onClick={() => setChon(c.id)}>
+              <button key={c.id} type="button" role="radio" aria-checked={c.id === chon} className="gvv2-khoi-nut" onClick={() => { setChon(c.id); setThe('nhip') }}>
                 <GraduationCap size={20} aria-hidden="true" />
                 <span>
                   <b>Khối {khoiCuaHanhTrinh(c) ?? '—'}</b>

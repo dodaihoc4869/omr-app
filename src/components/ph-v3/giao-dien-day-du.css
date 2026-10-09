@@ -1,0 +1,27 @@
+/* Bộ bản vẽ đầy đủ: bốn mục, kế hoạch trước và hai vùng đọc trên khổ rộng. */
+.ph3 .ph3-dieu-huong { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.ph3 .ph3-ah { padding: 28px; border-radius: 28px; }
+.ph3 .ph3-ah__cau { font-size: clamp(48px,6vw,76px); }
+.ph3-gia-dinh h2 { font-size: 20px; }
+.ph3-gia-dinh p { line-height: 1.7; color: var(--ph3-chu-2); }
+.ph3 .ph3-the { overflow-wrap: anywhere; }
+.ph3 .ph3-loi-thay .ph3-luoi { align-items: start; }
+.ph3 .ph3-loi-thay .ph3-the { grid-column: span 6; }
+.ph3 .ph3-muc { min-height: 56px; }
+@media (min-width:600px) {
+ .ph3 .ph3-dieu-huong { grid-template-columns: 1fr; }
+ .ph3 .ph3-ah { grid-column: 1 / -1; }
+ .ph3 .ph3-gia-dinh { grid-column: span 1; }
+ .ph3 .ph3-loi-thay .ph3-the { grid-column: span 1; }
+}
+@media (min-width:1024px) {
+ .ph3 .ph3-dieu-huong { width: 240px; }
+ .ph3 .ph3-chinh { margin-left:240px; max-width:1600px; padding-inline:24px; }
+ .ph3 .ph3-gia-dinh { grid-column:span 7; }
+ .ph3 .ph3-loi-thay .ph3-the { grid-column:span 6; }
+ .ph3 .ph3-ah { display:grid; grid-template-columns: 1fr auto; gap:12px 32px; }
+ .ph3 .ph3-ah__cau { grid-column:2; grid-row:1 / 4; align-self:center; }
+ .ph3 .ph3-ah__thanh,.ph3 .ph3-ah__phu { grid-column:1; }
+}
+.ph3-loc-lich-su { display:flex; gap:8px; flex-wrap:wrap; padding:0 16px 20px; }
+.ph3-loc-lich-su button[aria-pressed=true] { background:var(--ph3-xd-nen); color:var(--ph3-xd-dam); }

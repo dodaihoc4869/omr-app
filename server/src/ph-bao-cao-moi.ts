@@ -79,13 +79,20 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
   const [hs, khTho] = await Promise.all([pHs, docKeHoachDaChot(envDoc, sbd, nowMs)])
   // Phản biện #108: cùng một con số với Sảnh/rương của con — câu còn lại đang dùng cho ca kiểm tra / đã rút khỏi kho / tự luận bị bỏ khỏi "hôm nay" (CHỈ ĐỌC, không ghi).
   const kh = khTho ? await tamHoanCauKhoa(envDoc, khTho, hs, undefined, undefined, sbd) : null
-  const ra: Row = { ok: true, cheDo2: true, ngay }
+  const ra: Row = { ok: true, cheDo2: true, ngay, serverNow: nowMs }
   const cd = hs.chienDich
   if (cd) {
     const tl = tiLeChienDich(hs.ttChienDich)
     if (tl.tong > 0) ra.chienDich = { ten: cd.ten, hanNop: cd.hanNop, conNgay: soNgayConLai(ngay, cd.hanNop), tong: tl.tong, daGap: tl.coXat, thanhThao: tl.thanhThao, canDayLai: tl.canDayLai }
   }
   if (kh && kh.tong > 0) ra.homNay = { tong: kh.tong, daLam: kh.tong - kh.conDao.length - kh.conDoan.length }
+  // Phụ huynh chỉ đọc tầng đã chốt; không gọi động cơ lập kế hoạch hoặc ghi dữ liệu.
+  if (kh && kh.tong > 0 && kh.chienDichId?.startsWith('hanh-trinh-v3-')) {
+    const snap = await envDoc.DB.prepare('SELECT tang,toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>().catch(() => null)
+    const tang = Number(snap?.tang), toiThieu = Number(snap?.toi_thieu)
+    if (snap && Number.isInteger(tang) && tang >= 1 && tang <= 4 && Number.isInteger(toiThieu) && toiThieu > 0)
+      ra.hanhTrinh = { tang, toiThieu }
+  }
   const tungSai = [...hs.tt.values()].filter((t) => t.lichSu.some((l) => !l.dung))
   if (tungSai.length > 0) {
     const thanhThao = tungSai.filter((t) => t.thanhThao).length

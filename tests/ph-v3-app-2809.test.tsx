@@ -117,13 +117,13 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     tatCa = { ...PH_OK, tienBo: { diem: [{ ngay: '2026-09-05', diem: 6.25, maCa: 'CA-1', tenCa: 'Kiểm tra 15 phút' }, { ngay: '2026-09-12', diem: 6.75, maCa: 'CA-15', tenCa: 'Kiểm tra chương 4' }], dangTienBoNhat: [] } }
     const { container } = await vaoApp()
     const lk = [...container.querySelectorAll('nav[aria-label="Các mục chính"] a')] as HTMLAnchorElement[]
-    expect(lk.map((a) => [a.getAttribute('href'), a.textContent])).toEqual([['#hom-nay', 'Hôm nay'], ['#tien-bo', 'Tiến bộ'], ['#ca-kiem-tra', 'Ca kiểm tra']])
+    expect(lk.map((a) => [a.getAttribute('href'), a.textContent])).toEqual([['#hom-nay', 'Hôm nay'], ['#tien-bo', 'Tiến bộ'], ['#ca-kiem-tra', 'Lịch sử'], ['#loi-thay', 'Lời thầy']])
     expect(lk[0]!.getAttribute('aria-current')).toBe('page')
     await diToi('#ca-kiem-tra')
     await waitFor(() => expect(container.querySelector('[data-vung="man-ca-kiem-tra"]')).toBeTruthy())
     expect(lk[2]!.getAttribute('aria-current')).toBe('page')
-    expect(container.querySelector('h1')!.textContent).toBe('Ca kiểm tra')
-    expect(container.textContent).not.toMatch(/Điểm số|Lịch sử|Lời thầy/)
+    expect(container.querySelector('h1')!.textContent).toBe('Lịch sử')
+    expect(container.textContent).not.toMatch(/Điểm số/)
     const ca = container.querySelector('[data-vung="ca-gan-nhat"]')!
     for (const x of ['Kiểm tra 45 phút · Ester – Lipid', 'Thứ Bảy 19/09/2026 · 28 câu', '7,5', 'Trắc nghiệm', '15/18 câu']) expect(ca.textContent).toContain(x)
     await waitFor(() => expect(ca.querySelector('[data-vung="loi-thay-ca"]')!.textContent).toBe('Thầy Đỗ Đại Học: Con mất điểm ở bài đốt cháy ester.'))
@@ -136,7 +136,7 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     await diToi('#diem')
     await waitFor(() => expect(container.querySelector('[data-vung="man-ca-kiem-tra"]')).toBeTruthy())
     await diToi('#loi-thay')
-    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Lời thầy' })).toBeTruthy())
   })
 
   it('chi tiết ca ĐÃ công bố: điểm, ba phần (điểm / trần), nhận xét của thầy, dạng, câu nên xem lại; bấm "Lời giải" ⇒ đề đủ phương án', async () => {
@@ -155,7 +155,7 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     expect(cau.querySelector('li[data-dung]')!.textContent).toContain('B.')
     expect(cau.querySelector('li[data-chon]')!.textContent).toContain('A.')
     const lui = container.querySelector('a.ph3-lui') as HTMLAnchorElement
-    expect([lui.getAttribute('href'), lui.textContent]).toEqual(['#ca-kiem-tra', 'Ca kiểm tra'])
+    expect([lui.getAttribute('href'), lui.textContent]).toEqual(['#ca-kiem-tra', 'Lịch sử'])
   })
 
   it('chi tiết ca CHƯA công bố: chỉ câu "chờ công bố" — không điểm, không nhận xét dù máy chủ lỡ gửi', async () => {
@@ -236,7 +236,7 @@ describe('lớp đọc chặt của ba lệnh mới', () => {
     expect(docTuyen('#ca/CA%2F1')).toEqual({ muc: 'ca-kiem-tra', maCa: 'CA/1' })
     expect(docTuyen('#ca-kiem-tra')).toEqual({ muc: 'ca-kiem-tra', maCa: null })
     expect(docTuyen('#diem')).toEqual({ muc: 'ca-kiem-tra', maCa: null })
-    expect(docTuyen('#loi-thay')).toEqual({ muc: 'hom-nay', maCa: null })
+    expect(docTuyen('#loi-thay')).toEqual({ muc: 'loi-thay', maCa: null })
     expect(docTuyen('#tien-bo')).toEqual({ muc: 'tien-bo', maCa: null })
     expect(docTuyen('#la')).toEqual({ muc: 'hom-nay', maCa: null })
     expect(docTuyen('#ca/%E0')).toEqual({ muc: 'hom-nay', maCa: null })

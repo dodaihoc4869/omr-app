@@ -3,7 +3,7 @@
 // vướng ⇒ một thẻ; màn này GOM thẻ theo (câu, bước vướng), xếp ưu tiên (máy chủ tính), thầy gỡ MỘT lần cho cả nhóm.
 // Ba cách gỡ: Gỡ ngắn (gõ ~1 phút; ghi âm/ảnh để sau) · Dạy trên lớp (chọn buổi học) · Sửa lời giải/đề (ghi chỗ cần sửa — app không tự
 // sửa kho). Bước trong dữ liệu đánh số TỪ 0 — màn hiện "Bước buoc+1". Khối "Kèm riêng" ở đầu: em vẫn tự làm sai ≥ 2 lần sau lời gỡ. Máy chủ: server/src/ban-go-nut-that.ts.
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { gvDsNutThat, gvGoNutThat, type KetQuaDsNut, type KieuGo, type NhomNut } from '../lib/nut-that-api'
 import { buoiDangMo } from '../lib/buoi-hoc-api'
 import type { BuoiHoc } from '../lib/buoi-hoc-api'
@@ -27,8 +27,11 @@ export default function BanGoNutThatScreen() {
   const [kq, setKq] = useState<KetQuaDsNut | null>(null)
   const [dangTai, setDangTai] = useState(false)
   const [bao, setBao] = useState('')
+  const [chon, setChon] = useState<string | null>(null)
   const [moDe, setMoDe] = useState<Set<string>>(new Set())
   const [go, setGo] = useState<DangGo | null>(null)
+  const banNhap = useRef<Record<string, DangGo>>({})
+  useEffect(() => { if (go) banNhap.current[`${go.khoa}:${go.kieu}`] = go }, [go])
   const [dangGhi, setDangGhi] = useState(false)
   const [buoi, setBuoi] = useState<BuoiHoc[] | null>(null)
 
@@ -42,7 +45,7 @@ export default function BanGoNutThatScreen() {
 
   const moGo = (n: NhomNut, kieu: KieuGo) => {
     setBao('')
-    setGo({ khoa: n.khoa, kieu, noiDung: '', buoiHoc: '' })
+    setGo(banNhap.current[`${n.khoa}:${kieu}`] ?? { khoa: n.khoa, kieu, noiDung: '', buoiHoc: '' })
     if (kieu === 'lop' && buoi === null) {
       void buoiDangMo().then((r) => setBuoi(r.ok ? r.du : []))
     }
@@ -54,6 +57,7 @@ export default function BanGoNutThatScreen() {
     const r = await gvGoNutThat({ bam: n.bam, buoc: n.buoc, kieu: go.kieu, noiDung: go.noiDung.trim(), ...(go.kieu === 'lop' && go.buoiHoc ? { buoiHoc: go.buoiHoc } : {}) })
     setDangGhi(false)
     if (!r.ok) { setBao(r.error ?? 'Máy chủ chưa nhận lời gỡ.'); return }
+    delete banNhap.current[`${go.khoa}:${go.kieu}`]
     setGo(null)
     const ten = `${n.so || 'câu này'}, bước ${n.buoc + 1}`
     if (go.kieu === 'ngan') setBao(`Đã gửi lời gỡ ${ten} cho ${r.soThe ?? 0} em.`)
@@ -69,7 +73,7 @@ export default function BanGoNutThatScreen() {
   const t = kq?.tong
 
   return (
-    <div className="gv2-trang">
+    <div className="gv2-trang gv-go-day-du">
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
           <h1 className="gv2-tieu-de">Bàn gỡ nút thắt</h1>
@@ -126,12 +130,12 @@ export default function BanGoNutThatScreen() {
       )}
 
       {nhom.length > 0 && (
-        <ul className="lg-ds gv-scroll-box" aria-label="Thẻ nút thắt theo thứ tự ưu tiên" tabIndex={0}>
+        <div className="gv-go-workspace"><nav className="gv-go-nhom" aria-label="Chọn nhóm cần gỡ">{nhom.map(n => <button type="button" key={n.khoa} aria-pressed={(chon ?? nhom[0]?.khoa) === n.khoa} onClick={() => setChon(n.khoa)}><b>{n.so || 'Câu trong kho'}</b><span>Bước {n.buoc + 1} · {n.soEm} em</span></button>)}</nav><ul className="lg-ds gv-scroll-box" aria-label="Thẻ nút thắt theo thứ tự ưu tiên" tabIndex={0}>
           {nhom.map((n) => {
             const deMo = moDe.has(n.khoa)
             const dangGo = go?.khoa === n.khoa ? go : null
             return (
-              <li key={n.khoa} className="gv2-the lg-dong" data-testid="the-nut-that">
+              <li key={n.khoa} className="gv2-the lg-dong" data-testid="the-nut-that" hidden={n.khoa !== (chon ?? nhom[0]?.khoa)}>
                 <div className="lg-dong-dau">
                   <span className="gv2-the-tieu-de">{n.so || 'Câu trong kho'}</span>
                   <span className="gv2-chip" data-tone="vang">Vướng bước {n.buoc + 1}</span>
@@ -216,7 +220,7 @@ export default function BanGoNutThatScreen() {
               </li>
             )
           })}
-        </ul>
+        </ul></div>
       )}
     </div>
   )

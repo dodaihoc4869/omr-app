@@ -58,6 +58,11 @@ const DS = [
     [`20-ph-${k}-${nen}`, 'ph', w,h,nen,true,/Hôm nay/],
     [`21-de-thu-${k}-${nen}`, 'de-thu',w,h,nen,true,/Đề thử 14 câu/,'de-thu'],
   ])),
+  ...[[390,844,'doc'],[844,390,'ngang'],[1440,960,'may-tinh']].flatMap(([w,h,k]) => [
+    ...[['hanh-trinh','Hành trình'],['on-lai','Ôn lại'],['cua-em','Của em']].map(([m,chu]) => [`22-hs-${m}-${k}`, 'sanh', w,h,'light',true,/Hôm nay/,`hs:${chu}`]),
+    ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Lịch sử'],['loi-thay','Lời thầy'],['thong-tin','Thông tin và giao diện']].map(([m,chu]) => [`23-ph-${m}-${k}`, 'ph',w,h,'light',true,/Hôm nay/,`ph:${m}:${chu}`]),
+    ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-kho',/Kho đề/],['gv-cai-dat',/Cài đặt/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-go-nut',/Bàn gỡ nút thắt/],['gv-duyet',/Duyệt lời giải/]].map(([m,chu]) => [`24-${m}-${k}`,m,w,h,'light',true,chu]),
+  ]),
   ['18-gv-ma-tran-de', 'gv-ma-tran', 1440, 700, 'light', false, /Ma trận đề/],
 ]
 
@@ -70,7 +75,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   await ctx.route((u) => !u.href.startsWith(goc), (r) => r.abort())
   const t = await ctx.newPage()
   t.setDefaultTimeout(8000)
-  t.on('pageerror', (e) => loiTrang.push(`${ten}: ${e.message}`))
+  t.on('pageerror', (e) => { const chu = `${ten}: ${e.message}`; loiTrang.push(chu); console.log(chu) })
   t.on('console', (msg) => { if (msg.type() === 'error' && !/Failed to load resource/.test(msg.text())) loiTrang.push(`${ten}: console ${msg.text().slice(0, 200)}`) })
   await t.goto(`${trangGoc}?man=${m}`)
   try {
@@ -79,7 +84,14 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     loiTrang.push(`${ten}: không thấy chữ ${cho}`)
   }
   try {
-    if (viec === 'de-thu') {
+    if (viec?.startsWith('hs:')) {
+      await t.getByRole('navigation', { name:'Điều hướng chính' }).getByRole('button', { name:viec.slice(3),exact:true }).click()
+      await t.getByRole('heading', { name:new RegExp(viec.slice(3)) }).first().waitFor()
+    } else if (viec?.startsWith('ph:')) {
+      const [,hash,chu] = viec.split(':')
+      await t.evaluate(h => {location.hash=h}, hash)
+      await t.getByRole('heading', {name:chu,exact:true}).waitFor()
+    } else if (viec === 'de-thu') {
       await t.locator('.dao2-de-thu-cau').first().locator('.pa-hang').nth(2).click()
       const chon = t.locator('.dao2-de-thu-ban-do button').first()
       if (await chon.getAttribute('data-da-lam') !== 'true') throw new Error('Bản đồ không cập nhật câu đã làm')

@@ -54,3 +54,12 @@
   .gvhn-viec-dong { flex-wrap: wrap; }
   .gvhn-viec-dong > button { flex: 1 0 100%; }
 }
+
+/* Khối tổng quan theo bộ bản vẽ: ba thẻ Hành trình có lối vào nhịp thật. */
+.gvhn .gvhn-luoi { display:flex; flex-direction:column-reverse; gap:24px; }
+.gvhn .gvhn-khoi { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.gvhn .gvhn-khoi > h2 { grid-column:1 / -1; }
+.gvhn .gvhn-khoi-dong { display:grid; gap:16px; padding:20px; border:1px solid var(--gvm-vien); border-radius:20px; }
+.gvhn .gvhn-khoi-chu { display:grid; gap:8px; }
+.gvhn .gvhn-khoi-chu b { font-size:24px; }
+@media (max-width:599px) { .gvhn .gvhn-khoi { grid-template-columns:1fr; } }

@@ -118,6 +118,7 @@ const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
 ]
 
 export default function ExamSetupScreen() {
+  const [buocGiaoDien, setBuocGiaoDien] = useState(0)
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
@@ -513,10 +514,10 @@ export default function ExamSetupScreen() {
           </div>
         )}
 
-        <div className="ct-moca">
+        <nav className="ct-etapes" aria-label="Các bước mở ca">{['Đề','Ai làm','Giờ','Luật'].map((x,i) => <button key={x} type="button" aria-pressed={buocGiaoDien === i} onClick={() => setBuocGiaoDien(i)}>{i+1}. {x}</button>)}</nav><div className="ct-moca">
           <div className="ct-tam">
             {/* BƯỚC 1 — ĐỀ */}
-            <div className="ct-buoc c-xd">
+            <div className="ct-buoc c-xd" hidden={buocGiaoDien !== 0}>
               <div className="so-b">1</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Đề</h3>
@@ -586,7 +587,7 @@ export default function ExamSetupScreen() {
             </div>
 
             {/* BƯỚC 2 — AI LÀM */}
-            <div className="ct-buoc c-tim">
+            <div className="ct-buoc c-tim" hidden={buocGiaoDien !== 1}>
               <div className="so-b">2</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Ai làm</h3>
@@ -627,7 +628,7 @@ export default function ExamSetupScreen() {
             </div>
 
             {/* BƯỚC 3 — GIỜ */}
-            <div className="ct-buoc c-hp">
+            <div className="ct-buoc c-hp" hidden={buocGiaoDien !== 2}>
               <div className="so-b">3</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Giờ</h3>
@@ -672,7 +673,7 @@ export default function ExamSetupScreen() {
             </div>
 
             {/* BƯỚC 4 — LUẬT */}
-            <div className="ct-buoc c-xl">
+            <div className="ct-buoc c-xl" hidden={buocGiaoDien !== 3}>
               <div className="so-b">4</div>
               <div style={{ minWidth: 0 }}>
                 <h3>Luật</h3>
@@ -749,6 +750,7 @@ export default function ExamSetupScreen() {
                 </details>
               </div>
             </div>
+          <div className="ct-suite"><button type="button" className="ct-nut ct-nut-vien" disabled={buocGiaoDien === 0} onClick={() => setBuocGiaoDien(x => Math.max(0,x-1))}>Bước trước</button><button type="button" className="ct-nut ct-nut-vien" disabled={buocGiaoDien === 3} onClick={() => setBuocGiaoDien(x => Math.min(3,x+1))}>Bước tiếp</button></div>
           </div>
 
           <aside className="ct-xem-truoc" aria-label="Xem trước ca">

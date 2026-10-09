@@ -260,10 +260,10 @@ export default function DoanTran(p: Props) {
   // Hóa 2.0 · bố cục NGANG (docs/ban-ve-ngang-2809, doan2-ngang.css): hai cột bọc `display:contents` ⇒ màn dọc y nguyên; màn ngang thành lưới 7/5
   // (chiến trường trái · câu + đòn + CHỐT ĐÒN phải; hiệp trùm 4 ý dài thì đảo: câu trái, trùm phải). Cờ tắt: không bọc gì.
   // Thanh kéo đổi độ rộng hai cột (thầy 28/09): `--dh2-ti` = % bề rộng cột CHIẾN TRƯỜNG (trái; hiệp trùm thì phải), lưu trên máy em.
-  const keoTi = (x: number) => { const r = khungRef.current?.getBoundingClientRect(); if (r && r.width > 0) { const f = (x - r.left) / r.width * 100; datTi(tran.laTrum ? 100 - f : f) } }
+  const keoTi = (x: number) => { const r = khungRef.current?.getBoundingClientRect(); if (r && r.width > 0) { const f = (x - r.left) / r.width * 100; datTi(100 - f) } }
   const bocPhai = (x: ReactNode) => v2 ? <div className="dh2-cot dh2-cot-phai" data-vung="cot-phai">{x}</div> : x
   return (
-    <div ref={khungRef} className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'} style={v2 ? { '--dh2-ti': ti } as CSSProperties : undefined}>
+    <div ref={khungRef} className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'} style={v2 ? { '--dh2-ti': ti, '--dh2-colonnes': `minmax(0,${100-ti}fr) 20px minmax(0,${ti}fr)` } as CSSProperties : undefined}>
       {v2 ? <div className="dh2-cot dh2-cot-trai" data-vung="cot-trai"><Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} /></div> : <>
         <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
         {canh}
@@ -271,9 +271,10 @@ export default function DoanTran(p: Props) {
       </>}
       {v2 && <div className="dh2-keo" role="separator" aria-orientation="vertical" aria-label="Kéo để đổi độ rộng hai cột" aria-valuemin={TI_MIN} aria-valuemax={TI_MAX} aria-valuenow={Math.round(ti)} tabIndex={0}
         onPointerDown={e => e.currentTarget.setPointerCapture(e.pointerId)} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) keoTi(e.clientX) }}
-        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); datTi(ti + (e.key === 'ArrowLeft' ? -5 : 5) * (tran.laTrum ? -1 : 1)) } }}><i /></div>}
+        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); datTi(ti + (e.key === 'ArrowLeft' ? 5 : -5)) } }}><i /></div>}
       {bocPhai(<>
-      {than}
+      <div className="dh2-doc">{than}</div>
+      <div className="dh2-thao-tac">
       {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}
       {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}
       {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
@@ -283,6 +284,7 @@ export default function DoanTran(p: Props) {
       {!mo && !tran.ketThuc && !choTiep && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
       {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
       {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Chuyến này em có {Math.max(0, SO_CAU_RIENG_CHANG - xem.soCauThieu)} câu ôn. Hiệp nào em đã ôn xong, em giữ khiên cho đoàn và tiếp sức bạn.</div>}
+      </div>
       </>)}
     </div>
   )

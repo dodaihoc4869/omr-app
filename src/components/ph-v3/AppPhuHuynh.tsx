@@ -1,8 +1,5 @@
-// APP PHỤ HUYNH MỚI 28/09 — thầy: "Trùng tu toàn bộ app phụ huynh, app phụ huynh không có giao bài cho con nữa chỉ xem được báo cáo mọi thứ về con".
-// Bản vẽ đã chốt: https://claude.ai/artifact/2HShm51xEiuVKcTAUpfeFT (Hôm nay · Điểm số · Chi tiết ca · Tiến bộ · Lời thầy; nền tối; xoay ngang; máy tính).
-// BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (thay bốn mục 28/09): BA mục điều hướng bằng liên kết `#…` (nút Quay lại của máy chạy đúng):
-// #hom-nay (mặc định) · #tien-bo · #ca-kiem-tra (+ #ca/<mã ca>). Mục "Lời thầy" đã bỏ: lời thầy mới nhất ở cuối Hôm nay, lời thầy từng ca ở thẻ ca và màn chi tiết ca.
-// Dữ liệu (CHỈ ĐỌC, không một lệnh ghi nào của phụ huynh): /ph/tat-ca-ve-con (hook sẵn có, làm mới 180 s) + /ph/hoc-2 + /ph/loi-thay + /ph/bao-cao-ca (khi mở một ca) + cảnh báo của thầy (/ph/ke-hoach).
+// Bộ bản vẽ đầy đủ đã duyệt 09/10: Hôm nay, Tiến bộ, Lịch sử và Lời thầy.
+// Nguồn đọc và quyền công bố được giữ; khối vắng dữ liệu không dựng số minh họa.
 import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactElement } from 'react'
 import { AnhLogo } from '../LogoVai'
 import { chuBanApp } from '../../lib/cap-nhat-app'
@@ -20,12 +17,15 @@ import ManTienBo from './ManTienBo'
 import { docTuyen, type Muc, type Tuyen } from './tien-ich'
 import { DangTai } from './dung-chung'
 import './ph-v3.css'
+import './giao-dien-day-du.css'
+import ManLoiThay from './ManLoiThay'
 
 
 const MUC: { muc: Muc; ten: string; bt: () => ReactElement }[] = [
   { muc: 'hom-nay', ten: 'Hôm nay', bt: () => <BtHomNay /> },
   { muc: 'tien-bo', ten: 'Tiến bộ', bt: () => <BtTienBo /> },
-  { muc: 'ca-kiem-tra', ten: 'Ca kiểm tra', bt: () => <BtBang /> },
+  { muc: 'ca-kiem-tra', ten: 'Lịch sử', bt: () => <BtBang /> },
+  { muc: 'loi-thay', ten: 'Lời thầy', bt: () => <BtBang /> },
 ]
 
 // Màn chi tiết ca kéo ChemText (công thức, lời giải): GÓI TẢI LƯỜI riêng — lần mở app đầu tiên không phải tải.
@@ -63,7 +63,7 @@ function TaiKhoan({ ten, onDoiSbd }: { ten: string; onDoiSbd: () => void }) {
       </button>
       {mo && (
         <div className="ph3-menu" role="menu">
-          <button type="button" role="menuitem" onClick={onDoiSbd}>Đổi số báo danh</button>
+          <p>Phụ huynh em <b>{ten}</b></p><a className="ph3-dong-lk" href="#thong-tin" onClick={() => setMo(false)}>Thông tin và giao diện</a><button type="button" role="menuitem" onClick={onDoiSbd}>Đổi số báo danh</button>
           <p data-vung="ban-app">{chuBanApp()}</p>
         </div>
       )}
@@ -126,6 +126,8 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   let man: ReactElement
   if (tuyen.maCa) man = <Suspense fallback={<DangTai chu="Đang mở báo cáo ca kiểm tra…" />}><ManChiTietCa key={tuyen.maCa} sbd={sbd} maCa={tuyen.maCa} /></Suspense>
   else if (tuyen.muc === 'ca-kiem-tra') man = <ManDiemSo v={v} loiThay={loiThay.ds} />
+  else if (tuyen.muc === 'thong-tin') man = <section><div className="ph3-tieu-de"><h1>Thông tin và giao diện</h1></div><div className="ph3-luoi"><article className="ph3-the ph3-o-rong"><h2>Phụ huynh em {ten}</h2>{lop && <p>Lớp {lop}</p>}<p>{chuBanApp()}</p><p>Giao diện sáng hoặc tối theo cài đặt của thiết bị.</p><button type="button" className="ph3-nut-vien" onClick={onDoiSbd}>Đổi số báo danh</button></article></div></section>
+  else if (tuyen.muc === 'loi-thay') man = <ManLoiThay ds={loiThay.ds} loi={loiThay.chuLoi} thuLai={napLoiThay} />
   else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} />
   else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} />
 

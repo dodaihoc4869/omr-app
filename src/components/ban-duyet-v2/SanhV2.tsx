@@ -176,12 +176,12 @@ function PlayIcon() {
   )
 }
 
-function ThanhDuoi({ dang, onHomNay, onHanhTrinh, onThanThu, onCauDaLam }: { dang: 'hom-nay' | 'hanh-trinh'; onHomNay: () => void; onHanhTrinh: () => void; onThanThu: () => void; onCauDaLam: () => void }) {
+function ThanhDuoi({ dang, onHomNay, onHanhTrinh, onThanThu, onCauDaLam }: { dang: 'hom-nay' | 'hanh-trinh' | 'on-lai' | 'cua-em'; onHomNay: () => void; onHanhTrinh: () => void; onThanThu: () => void; onCauDaLam: () => void }) {
   const muc: { k: string; nhan: string; bieu: ReactNode; on: () => void; dang: boolean }[] = [
     { k: 'hom-nay', nhan: 'Hôm nay', bieu: <Home size={24} />, on: onHomNay, dang: dang === 'hom-nay' },
     { k: 'hanh-trinh', nhan: 'Hành trình', bieu: <BanDo size={24} />, on: onHanhTrinh, dang: dang === 'hanh-trinh' },
-    { k: 'than-thu', nhan: 'Thần thú', bieu: <PawPrint size={24} />, on: onThanThu, dang: false },
-    { k: 'cau-da-lam', nhan: 'Câu đã làm', bieu: <BookOpenCheck size={24} />, on: onCauDaLam, dang: false },
+    { k: 'cau-da-lam', nhan: 'Ôn lại', bieu: <BookOpenCheck size={24} />, on: onCauDaLam, dang: dang === 'on-lai' },
+    { k: 'than-thu', nhan: 'Của em', bieu: <PawPrint size={24} />, on: onThanThu, dang: dang === 'cua-em' },
   ]
   return (
     <nav className="v2s-thanh-duoi" aria-label="Điều hướng chính">
@@ -232,6 +232,7 @@ function AnhHung({ p, tenEm, khoi, s, chonThu }: { p: SanhBanDoProps; tenEm: str
           )}
           {d?.chang && <p className="v2s-chang">{d.chang}</p>}
           {d?.thieu && <p className="v2s-thieu">{d.thieu}</p>}
+          {s && s.theLuc.con > 0 && <div className="v2s-hoc-tiep"><NutBatDau p={p} s={s} /></div>}
         </div>
         {thu ? (
           <img className="v2s-thu" src={anhThu(thu.index, thu.cap)} alt={`Thần thú của em: ${thu.ten}`} width={320} height={320} decoding="async" fetchPriority="high" />
@@ -265,9 +266,7 @@ function KhuHomNay({ p, s, onLuyenThem }: { p: SanhBanDoProps; s: SanhHoa2; onLu
           </section>
         )
       ) : (
-        <div className="v2s-hanh-dong">
-          <NutBatDau p={p} s={s} />
-        </div>
+        <section className="v2-the v2s-goi-y"><h2>Học từng chặng ngắn</h2><p>Em có thể nghỉ sau mỗi chặng rồi quay lại học tiếp. Kết quả đã làm được giữ lại.</p></section>
       )}
       {!xong && <NutKiemHanhTrinh p={p} s={s} />}
       {(xong || trong) && (
@@ -432,7 +431,7 @@ function LuyenThem({ p, s, onDaLay }: { p: SanhBanDoProps; s: SanhHoa2; onDaLay:
       <div className="v2s-lt-luoi">
         <OThuSuc s={s} token={p.token} onTaiLai={p.onTaiLai} onDaLay={onDaLay} />
         {o && o.ve.tong > 0 && <OLuyen khoi="ve-thu-thach" nhan={chuVe(o.ve.con, o.ve.tong)} phu={GOI_Y_VE} khoa={o.ve.con <= 0} onClick={() => mo('ve')} />}
-        {o?.l4Kiem?.duoc && <OLuyen khoi="l4-kiem" nhan={o.l4Kiem.soCau > 0 ? `Kiểm tra chuyên sâu · ${o.l4Kiem.soCau} câu` : 'Kiểm tra chuyên sâu'} onClick={() => mo('de-thu-l4')} />}
+        {o?.l4Kiem?.duoc && <OLuyen khoi="l4-kiem" phu="Tổng hợp · phối hợp kiến thức đã học" nhan={o.l4Kiem.soCau > 0 ? `Kiểm tra chuyên sâu · ${o.l4Kiem.soCau} câu` : 'Kiểm tra chuyên sâu'} onClick={() => mo('de-thu-l4')} />}
         {o?.kiemHanhTrinh && <OLuyen khoi="kiem-hanh-trinh" nhan={chuKiemHanhTrinh(o.kiemHanhTrinh)} phu={o.kiemHanhTrinh.loai === 'dau' ? 'Làm trước khi luyện để đo điểm xuất phát' : 'Đo lại sau một tuần luyện'} onClick={() => mo('de-thu')} />}
         {o?.deThu.duoc && !o.kiemHanhTrinh && <OLuyen khoi="de-thu" nhan="Đề thử" phu={`${o.deThu.soCau} câu · ${o.deThu.phut} phút · chỉ để đo, không phải ca kiểm tra`} onClick={() => mo('de-thu')} />}
         {p.onTuLuyen && <OLuyen khoi="tu-luyen" nhan="Tu luyện" phu="Chỉ dành cho học sinh Nỗ lực" onClick={p.onTuLuyen} />}
@@ -449,12 +448,14 @@ function LuyenThem({ p, s, onDaLay }: { p: SanhBanDoProps; s: SanhHoa2; onDaLay:
 
 function KhuHanhTrinh({ p, s, khoi, onVeHomNay }: { p: SanhBanDoProps; s: SanhHoa2 | null; khoi: 10 | 11 | 12 | null; onVeHomNay: () => void }) {
   const h = s?.hanhTrinh
+  const cuaBia = s && p.onChoiBia ? chuCuaBia(s) : null
   return (
     <main className="v2s-ht" aria-busy={p.dangTai && !s}>
       <header className="v2s-ht-dau">
         <h1 className="v2-tieu-de v2s-ht-tieu">Hành trình {chuHoa(khoi)}</h1>
         {(!s || h) && <p className="v2s-dong-phu">Mỗi bài mở tầng kế khi em đã vững 80% tầng trước.</p>}
       </header>
+      <section className="v2-the v2s-tang-giai-thich" aria-label="Nội dung bốn tầng"><h2>Bốn tầng kiến thức</h2><ol>{['Nền · kiến thức cần để bắt đầu','Hiểu · giải thích và nhận ra bản chất','Vận dụng · tự giải bài theo dạng','Tổng hợp · phối hợp nhiều kiến thức'].map((x,i) => <li key={x}><b>{i+1}</b><span>{x}</span></li>)}</ol></section>
       {!s ? (
         p.loi ? (
           <section className="v2-the v2s-trong" role="alert">
@@ -477,6 +478,7 @@ function KhuHanhTrinh({ p, s, khoi, onVeHomNay }: { p: SanhBanDoProps; s: SanhHo
           <p className="v2s-dong-phu">{s.chienDich ? `Em đang luyện theo Chiến dịch ${s.chienDich.ten} — số câu và hạn nộp ở mục Hôm nay.` : chuChuaCoChienDich(s)}</p>
         </section>
       )}
+      {s && <section className="v2-the v2s-games"><h2>Học cùng trò chơi</h2><div className="v2s-lt-luoi"><OLuyen khoi="doan" nhan="Đoàn Hộ Tống" phu={`Còn ${s.doan.con} câu ôn hôm nay`} khoa={s.doan.con <= 0} onClick={p.onPhaPhucKich} /><OLuyen khoi="dao" nhan="Bát Linh Đảo" phu={s.khoaDao ? 'Hoàn thành câu ôn để mở đường' : `Còn ${s.dao.con} câu hôm nay`} khoa={s.khoaDao || s.dao.con <= 0} onClick={p.onKhamPhaDao} />{cuaBia && <OLuyen khoi="bia-game" nhan={cuaBia.lon} phu={cuaBia.nho} khoa={!cuaBia.mo} onClick={p.onChoiBia} />}</div></section>}
       {s && <LuyenThem p={p} s={s} onDaLay={onVeHomNay} />}
     </main>
   )
@@ -485,13 +487,13 @@ function KhuHanhTrinh({ p, s, khoi, onVeHomNay }: { p: SanhBanDoProps; s: SanhHo
 export default function SanhV2(goc: SanhV2Props) {
   const p = boCuaNhanh(goc)
   const bc = useBoCucNgang()
-  const [khu, setKhu] = useState<'hom-nay' | 'hanh-trinh'>('hom-nay')
+  const [khu, setKhu] = useState<'hom-nay' | 'hanh-trinh' | 'on-lai' | 'cua-em'>('hom-nay')
   const kq = p.ketQua
   const s = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
   const chonThu = !!kq && kq.cheDo2 && kq.canChonThu === true
   useNapTruocManSanh(!!s, !!s && s.doan.con > 0)
   const khoi = khoiTuLop(p.lop)
-  const doiKhu = (k: 'hom-nay' | 'hanh-trinh') => {
+  const doiKhu = (k: 'hom-nay' | 'hanh-trinh' | 'on-lai' | 'cua-em') => {
     setKhu(k)
     if (typeof document !== 'undefined' && document.scrollingElement) document.scrollingElement.scrollTop = 0
   }
@@ -505,7 +507,7 @@ export default function SanhV2(goc: SanhV2Props) {
       data-khu={khu}
     >
       <div className="v2s-khung">
-        {khu === 'hanh-trinh' ? (
+        {khu === 'on-lai' ? <main className="v2s-ht"><h1 className="v2-tieu-de">Ôn lại</h1><section className="v2-the"><h2>Đến lịch ôn lại</h2>{s ? <><p>{s.doan.con > 0 ? `Còn ${s.doan.con} câu ôn trong Đoàn Hộ Tống hôm nay.` : 'Hôm nay không còn câu ôn trong Đoàn Hộ Tống.'}</p>{s.doan.con > 0 && <button type="button" className="v2-nut-chinh" onClick={p.onPhaPhucKich}>Ôn trong Đoàn Hộ Tống</button>}</> : <p>Chưa tải được lịch ôn.</p>}</section><section className="v2-the"><h2>Sổ câu đã làm</h2><p>Xem câu và lời giải đã được mở cho em, theo bài và nguồn học.</p><button type="button" className="v2-nut-phu" onClick={p.onCauDaLam}>Mở câu đã làm</button></section></main> : khu === 'cua-em' ? <main className="v2s-ht"><h1 className="v2-tieu-de">Của em</h1><section className="v2-the"><h2>{p.tenEm}</h2><p>{p.lop ? `Lớp ${p.lop}` : ''} · Chuỗi {p.chuoiNgay} ngày</p><div className="v2s-cach-hoc"><div><button type="button" className="v2-nut-phu" onClick={chonThu ? p.onChonThu : p.onMoThanThu}>Thần thú của em</button><button type="button" className="v2-nut-phu" onClick={p.onTuiDo}>Mở túi đồ</button>{p.shopBat && <button type="button" className="v2-nut-phu" onClick={p.onCuaHang}>Mở cửa hàng</button>}<button type="button" className="v2-nut-phu" onClick={p.onLichSuCa}>Kết quả ca kiểm tra</button><button type="button" className="v2-nut-phu" onClick={p.onDangXuat}>Đăng xuất</button></div></div></section></main> : khu === 'hanh-trinh' ? (
           <KhuHanhTrinh p={p} s={s} khoi={khoi} onVeHomNay={() => doiKhu('hom-nay')} />
         ) : (
           <>
@@ -545,6 +547,7 @@ export default function SanhV2(goc: SanhV2Props) {
                     <span className="v2-an">Đang mở kế hoạch hôm nay…</span>
                   </section>
                 )}
+                {s && <section className="v2-the v2s-cach-hoc" aria-label="Chọn cách học"><h2>Chọn cách học</h2><div><button type="button" className="v2-nut-phu" onClick={() => doiKhu('hanh-trinh')}>Tự luyện và thử thách</button><button type="button" className="v2-nut-phu" onClick={p.onCauDaLam}>Xem câu đã làm</button><button type="button" className="v2-nut-phu" onClick={chonThu ? p.onChonThu : p.onMoThanThu}>Thần thú của em</button></div></section>}
                 {s && p.loi && (
                   <p className="v2s-cu" role="status">
                     Chưa cập nhật được: {p.loi}
@@ -569,8 +572,8 @@ export default function SanhV2(goc: SanhV2Props) {
           dang={khu}
           onHomNay={() => doiKhu('hom-nay')}
           onHanhTrinh={() => doiKhu('hanh-trinh')}
-          onThanThu={chonThu ? p.onChonThu : p.onMoThanThu}
-          onCauDaLam={p.onCauDaLam}
+          onThanThu={() => doiKhu('cua-em')}
+          onCauDaLam={() => doiKhu('on-lai')}
         />
       </div>
     </div>

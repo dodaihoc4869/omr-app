@@ -14,8 +14,9 @@ import '../styles/toan-canh-em.css'
 
 const soThap = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',')
 
-export default function ToanCanhEmScreen() {
-  const sbd = useAppStore((s) => s.sbdToanCanh)
+export default function ToanCanhEmScreen({ sbdHoSo, trongHoSo = false }: { sbdHoSo?: string; trongHoSo?: boolean } = {}) {
+  const sbdCu = useAppStore((s) => s.sbdToanCanh)
+  const sbd = sbdHoSo ?? sbdCu
   const classList = useAppStore((s) => s.classList)
   const setScreen = useAppStore((s) => s.setScreen)
   const moToanCanh = useAppStore((s) => s.moToanCanh)
@@ -102,15 +103,15 @@ export default function ToanCanhEmScreen() {
 
   return (
     <div className="gv-page tc" style={{ fontFamily: 'var(--sans)' }}>
-      <div className="tc-tren">
-        <button type="button" className="hn2-lien-ket" onClick={() => setScreen('examhub')}>
+      {!trongHoSo && <div className="tc-tren">
+        <button type="button" className="hn2-lien-ket" onClick={() => setScreen('hocsinh')}>
           <ArrowLeft size={16} aria-hidden="true" />
-          Về Hôm nay
+          Về danh sách học sinh
         </button>
         <div className="tc-tim">
           <OTraCuu ds={dsTraCuu} onMoEm={moToanCanh} onMoCa={moChiTietCa} />
         </div>
-      </div>
+      </div>}
 
       <header className="hn2-the tc-ho-so" data-khoi="ho-so">
         <span className="tc-chu-cai" aria-hidden="true">
