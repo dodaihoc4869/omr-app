@@ -53,7 +53,8 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   const hong = conCu.some(q => !hs.meta.has(goc(q)) || hs.meta.get(goc(q))?.tuLuan || hs.tt.get(goc(q))?.catTia || chan.has(goc(q)) || chan.has(nhom.get(goc(q)) || goc(q)))
   const moc = Math.floor(xong.length / CAU_MOI_CHANG) * CAU_MOI_CHANG
   // Không đổi câu giữa chặng; sửa ngay nếu câu bị bảo vệ/rút khỏi kho.
-  if (!cu || cu.chien_dich_id !== hs.chienDich?.id || Number(snap.xong_chot) !== moc || hong) {
+  const doiBoSung = conCu.length === 0 && xong.length < toiThieu
+  if (!cu || cu.chien_dich_id !== hs.chienDich?.id || Number(snap.xong_chot) !== moc || hong || doiBoSung) {
     const cung = hs.cau.filter(c => !hs.meta.get(c.qid)?.tuLuan && !chan.has(nhom.get(c.qid) || c.qid))
     const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu, daLam: xong, cau: cung, tt: hs.tt, nhom, chan, trongSo, tangSanSang })
     const xongDao = xong.filter(q => ds(cu?.dao_json).map(goc).includes(q)), xongDoan = xong.filter(q => !xongDao.includes(q))

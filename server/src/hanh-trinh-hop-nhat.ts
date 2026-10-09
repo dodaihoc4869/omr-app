@@ -29,7 +29,7 @@ export function khoCauTheoKhoi(rows: readonly Row[]): Map<Khoi, { qids: Set<stri
     try {
       const q = JSON.parse(String(r.json)) as PrivateQuestion
       if (!q.reviewed || laCauTuLuan(q)) continue
-      const k = khoiCuaCau({ ...q, maDe: String(r.ma_de), qid: String(r.qid), lop: r.lop as string | undefined })
+      const k = khoiCuaCau({ ...q, maDe: String(r.ma_de), qid: String(r.qid), lopTo: r.lop as string | undefined })
       if (!k) continue
       ra.get(k)!.qids.add(String(r.qid)); ra.get(k)!.maDe.add(String(r.ma_de))
     } catch { /* Câu hỏng không phát cho học sinh. */ }
