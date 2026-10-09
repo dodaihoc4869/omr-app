@@ -57,7 +57,8 @@
 .gvv2-bang { padding: 16px; min-width: 0; }
 .gvv2-bang-dau { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .gvv2-tim { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--gvm-vien); background: var(--gvm-nen); color: var(--gvm-chu-3); flex: 0 1 280px; }
-.gvv2-tim input { flex: 1; min-width: 0; border: 0; background: none; color: var(--gvm-chu); font-size: 15px; outline: none; }
+.gvv2-tim input { flex: 1; min-width: 0; border: 0; background: none; color: var(--gvm-chu); font-size: 15px; }
+.gvv2-tim:focus-within { border-color: var(--gvm-xd); box-shadow: 0 0 0 3px var(--gvm-xd-nen); }
 .gvv2-bang-cuon { overflow-x: auto; }
 .gvv2-bang table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .gvv2-bang th { padding: 10px 12px; text-align: left; font-size: 13px; font-weight: 700; color: var(--gvm-chu-2); background: var(--gvm-mat-2); white-space: nowrap; }
