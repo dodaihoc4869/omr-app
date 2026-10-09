@@ -5,10 +5,17 @@
 //     Ca gần nhất, Tu luyện, Bi-a; ca đang mở ⇒ CHỈ một dải "Vào thi" (trước có 2 nút cùng mở vào thi); Thần thú một lối vào (thanh dưới).
 //   · Hành trình: tầng của từng bài (`hanhTrinh.bai`, đọc phòng thủ) + "Luyện thêm" (Thử sức thêm bật lại, Vé, Đề thử, Tu luyện, Bi-a).
 //   · Thần thú: nút vàng "Cửa hàng" cạnh "Túi đồ" + hàng chữ "Đăng xuất". Câu đã làm: thẻ "Ca kiểm tra gần nhất" ở đầu màn.
+// SỬA CÓ CHỦ Ý lần 2 (TRUNG TU giao diện 3 app, bản vẽ thầy duyệt 09/10 — trung-tu-canvas HS-HomNay/HS-HanhTrinh/HS-OnLai/HS-CuaEm):
+//   · Hôm nay: chip CHỈ ở bước đang làm ⇒ "Còn 18 câu" (trùng số lớn 12/30) không còn trên màn (hàm baBuoc vẫn trả chip như cũ);
+//     bỏ 3 nút "Chọn cách học" ⇒ Hôm nay không còn nút nào mở Thần thú (lối vào duy nhất: mục "Của em" → thẻ Thần thú).
+//   · Hành trình: bỏ khối "Học cùng trò chơi" (ô Đoàn/Đảo — đã có nút Bắt đầu ở Hôm nay) ⇒ test "cửa Đảo trong mục trò chơi" đổi thành khoá
+//     "không còn ô Đoàn/Đảo, Đảo khoá thì không lối nào mở Đảo"; ô tầng chưa tới đọc "Chưa mở" (khớp chú giải Vững/Đang luyện/Chưa mở, trước "Khoá");
+//     tầng chung + chặng thành thanh bậc 4 tầng + ô số "3/5 · chặng · còn 6 câu" + "5/8 · dạng vững" (trước là câu "Hôm nay: Chặng …").
+//   · Của em: thẻ Thần thú là MỘT nút lớn (tên truy cập bắt đầu bằng "Thần thú của em", kèm biệt danh + loài · hệ · cấp).
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
-import SanhV2, { baBuoc, dongAnhHung, khoiTuLop, soCauHomNay, tenGoi, trangThaiTang } from '../src/components/ban-duyet-v2/SanhV2'
+import SanhV2, { baBuoc, chuDauTen, chuLop, dongAnhHung, khoiTuLop, soCauHomNay, tenGoi, trangThaiTang } from '../src/components/ban-duyet-v2/SanhV2'
 import { docBaiHanhTrinh, docSanh, type KetQuaSanh, type SanhHoa2 } from '../src/components/hoa2/api'
 import { monCau } from '../src/game/than-thu-v2/dao2/TrongAi'
 import ThanThuV2, { docVang } from '../src/game/than-thu-v2/dao/ThanThuV2'
@@ -116,7 +123,9 @@ describe('Hôm nay V2 · màn thật', () => {
     const buoc = within(screen.getByRole('region', { name: 'Ba bước hôm nay' })).getAllByRole('listitem')
     expect(buoc.map((b) => b.querySelector('b')!.textContent)).toEqual(['Bước 1: Gỡ 2 lỗi cũ', 'Bước 2: 16 câu mới', 'Bước 3: Mở rương hôm nay'])
     expect(screen.getByText('Gỡ xong lỗi cũ để mở cầu.')).toBeTruthy()
-    expect(screen.getByText('Còn 18 câu')).toBeTruthy()
+    // trung tu 09/10: chip CHỈ ở bước đang làm — "Còn 18 câu" trùng số lớn 12/30 nên không vẽ
+    expect(screen.queryByText('Còn 18 câu')).toBeNull()
+    expect(within(screen.getByRole('region', { name: 'Ba bước hôm nay' })).getAllByText('Làm ngay')).toHaveLength(1)
     expect(p.container.querySelectorAll('.v2-nut-chinh').length).toBe(1)
     fireEvent.click(screen.getByRole('button', { name: 'Bắt đầu · gỡ 2 lỗi cũ' }))
     expect(p.onPhaPhucKich).toHaveBeenCalledTimes(1)
@@ -128,15 +137,18 @@ describe('Hôm nay V2 · màn thật', () => {
     const nav = screen.getByRole('navigation', { name: 'Điều hướng chính' })
     expect([...nav.querySelectorAll('button')].map((b) => b.textContent)).toEqual(['Hôm nay', 'Hành trình', 'Ôn lại', 'Của em'])
     fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Thần thú của em' }))
+    fireEvent.click(screen.getByRole('button', { name: /^Thần thú của em/ }))
     expect(p.onMoThanThu).toHaveBeenCalledTimes(1)
   })
   it('đã chuyển khỏi Hôm nay: Túi đồ, Cửa hàng, Đăng xuất, Ca gần nhất, Tu luyện, Bi-a, Đang mạnh lên; Thần thú chỉ MỘT lối vào', () => {
     const p = ve({ omni: OMNI, bia: { bat: true, con: 4, tong: 6, giaoHuu: { mo: false, con: 0 }, lyDoKhoa: null } })
     for (const ten of [/Túi đồ/, /Cửa hàng/, /Đăng xuất/, /Ca kiểm tra gần nhất/, /Tu luyện/, /Bi-a/, /Vé thử thách/, /Đề thử/]) expect(screen.queryByRole('button', { name: ten })).toBeNull()
     expect(screen.queryByText('Đang mạnh lên')).toBeNull()
-    // lối vào Thần thú duy nhất là mục "Thần thú" của thanh dưới (ảnh đại diện + ảnh lớn không còn là nút)
-    expect(screen.queryAllByRole('button', { name: /Linh Hồ|thần thú/i }).map((b) => !!b.closest('nav'))).toEqual([false])
+    // trung tu 09/10: bỏ 3 nút "Chọn cách học" ⇒ Hôm nay KHÔNG còn nút mở Thần thú (ảnh đại diện + ảnh lớn không phải nút);
+    // lối vào duy nhất là mục "Của em" của thanh dưới → thẻ Thần thú
+    expect(screen.queryAllByRole('button', { name: /Linh Hồ|thần thú/i })).toEqual([])
+    expect(screen.queryByRole('region', { name: 'Chọn cách học' })).toBeNull()
+    expect(screen.queryByText('Học từng chặng ngắn')).toBeNull()
     expect(p.container.querySelectorAll('.v2-nut-chinh').length).toBe(1)
   })
   it('hết lỗi cũ, Đảo không khoá ⇒ nút vàng mở Đảo; còn lỗi cũ mà Đảo không khoá ⇒ thêm nút phụ vào Đảo', () => {
@@ -186,23 +198,26 @@ describe('Hôm nay V2 · màn thật', () => {
 })
 
 describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
-  it('cửa Bát Linh Đảo trong mục trò chơi giữ đúng khóa do máy chủ trả', () => {
+  it('trung tu 09/10: không còn khối "Học cùng trò chơi" (ô Đoàn/Đảo); Đảo khoá ⇒ cả Hôm nay lẫn Hành trình không có lối nào mở Đảo', () => {
     const p = ve({ khoaDao:true })
+    expect(screen.queryByRole('button', { name: /Khám phá Bát Linh Đảo|câu mới/ })).toBeNull()
     fireEvent.click(screen.getByRole('button', {name:'Hành trình',exact:true}))
-    const nut = p.container.querySelector('[data-khoi="dao"]') as HTMLButtonElement
-    expect(nut.disabled).toBe(true)
-    fireEvent.click(nut)
+    expect(p.container.querySelector('[data-khoi="dao"]')).toBeNull()
+    expect(p.container.querySelector('[data-khoi="doan"]')).toBeNull()
+    expect(screen.queryByText('Học cùng trò chơi')).toBeNull()
+    expect(screen.queryByRole('button', { name: /Bát Linh Đảo|Đoàn Hộ Tống/ })).toBeNull()
     expect(p.onKhamPhaDao).not.toHaveBeenCalled()
   })
 
-  it('có hanhTrinh.bai ⇒ mỗi bài 4 ô Vững/Đang luyện/Khoá + "Dạng vững a/b"', () => {
+  it('có hanhTrinh.bai ⇒ mỗi bài 4 khúc Vững/Đang luyện/Chưa mở + "Dạng vững a/b" + chú giải', () => {
     ve({ hanhTrinh: { ...SANH.hanhTrinh, bai: BAI } })
     fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Hành trình Hoá 12' })).toBeTruthy()
     expect(screen.getByText('Mỗi bài mở tầng kế khi em đã vững 80% tầng trước.')).toBeTruthy()
     const t1 = screen.getByRole('list', { name: 'Tầng của Bài 1 · Ester' })
-    expect([...t1.querySelectorAll('li')].map((li) => li.textContent)).toEqual(['Nền: Vững', 'Hiểu: Đang luyện', 'Vận dụng: Khoá', 'Tổng hợp: Khoá'])
+    expect([...t1.querySelectorAll('li')].map((li) => li.textContent)).toEqual(['Nền: Vững', 'Hiểu: Đang luyện', 'Vận dụng: Chưa mở', 'Tổng hợp: Chưa mở'])
     expect(screen.getByText('Dạng vững 5/8')).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 2, name: 'Từng bài thầy đã dạy' })).toBeTruthy()
     const t2 = screen.getByRole('list', { name: 'Tầng của Bài 2 · Lipid' })
     expect([...t2.querySelectorAll('li')].map((li) => li.getAttribute('data-tt'))).toEqual(['dang', 'khoa', 'khoa', 'khoa'])
     // không còn bản đồ, không bịa trạng thái khi vắng số
@@ -210,12 +225,16 @@ describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Hôm nay' }))
     expect(screen.getByText('Hoá 12 · tầng Hiểu')).toBeTruthy()
   })
-  it('vắng hanhTrinh.bai ⇒ chỉ tầng chung + chặng (Dạng vững khi OMNI gửi)', () => {
-    ve({ omni: OMNI })
+  it('vắng hanhTrinh.bai ⇒ chỉ thanh bậc 4 tầng + mô tả tầng + ô số chặng (dạng vững khi OMNI gửi)', () => {
+    const p = ve({ omni: OMNI })
     fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
     expect(screen.getByText('Hiểu', { selector: 'b' })).toBeTruthy()
-    expect(screen.getByText('Hôm nay: Chặng 3/5 · còn 6 câu trong chặng')).toBeTruthy()
-    expect(screen.getByText('Dạng vững 5/8')).toBeTruthy()
+    const bac = screen.getByRole('list', { name: 'Bốn tầng kiến thức' })
+    expect([...bac.querySelectorAll('li')].map((li) => li.getAttribute('data-tt'))).toEqual(['qua', 'dang', 'chua', 'chua'])
+    expect(p.container.querySelector('.v2s-tang-mo-ta')!.textContent).toBe('Hiểu · giải thích và nhận ra bản chất')
+    expect([...p.container.querySelectorAll('.v2s-o-so')].map((o) => o.textContent)).toEqual(['3/5chặng · còn 6 câu', '5/8dạng vững'])
+    // khối "Bốn tầng kiến thức" cũ đã gộp vào thanh bậc
+    expect(screen.queryByRole('region', { name: 'Nội dung bốn tầng' })).toBeNull()
     expect(screen.queryByText('Vững')).toBeNull()
     expect(screen.queryByRole('list', { name: /Tầng của/ })).toBeNull()
   })
@@ -272,6 +291,103 @@ describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
     expect(goi.map((g) => new URL(g.url).pathname)).toEqual(['/game-v2/hoa2-thu-suc-them'])
     expect(goi[0]!.body).toEqual({ token: 'tk' })
     await waitFor(() => expect(screen.getByText('Hoá 12 · tầng Hiểu')).toBeTruthy())
+  })
+})
+
+describe('Trung tu 09/10 · Hôm nay · Ôn lại · Của em (bản vẽ thầy duyệt)', () => {
+  it('Hôm nay: thẻ chính có thanh tiến độ (chỉ để nhìn) + lối chữ "Luyện thêm" luôn có, sang Hành trình', () => {
+    const p = ve()
+    const the = screen.getByRole('region', { name: 'Kế hoạch hôm nay' })
+    expect((the.querySelector('.v2s-thanh > i') as HTMLElement).style.width).toBe('40%')
+    expect(the.querySelector('.v2s-thanh')!.getAttribute('aria-hidden')).toBe('true')
+    expect(within(the).getByRole('button', { name: 'Bắt đầu · gỡ 2 lỗi cũ' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Luyện thêm · không bắt buộc' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Hành trình Hoá 12' })).toBeTruthy()
+    expect(p.onKhamPhaDao).not.toHaveBeenCalled()
+  })
+  it('ca đang mở ⇒ "Vào thi" là nút vàng DUY NHẤT, "Bắt đầu" lùi thành nút phụ (vẫn mở Đoàn)', () => {
+    const p = ve({}, { caDangMo: true })
+    const vang = p.container.querySelectorAll('.v2-nut-chinh')
+    expect([...vang].map((b) => b.textContent)).toEqual(['Vào thi'])
+    const batDau = screen.getByRole('button', { name: 'Bắt đầu · gỡ 2 lỗi cũ' })
+    expect(batDau.classList.contains('v2-nut-phu')).toBe(true)
+    fireEvent.click(batDau)
+    expect(p.onPhaPhucKich).toHaveBeenCalledTimes(1)
+  })
+  it('Hành trình: Bi-a chuyển vào lưới Luyện thêm; mọi ô cao đều nhau (lớp .v2s-o)', () => {
+    ve({ omni: OMNI, bia: { bat: true, con: 4, tong: 6, giaoHuu: { mo: false, con: 0 }, lyDoKhoa: null } })
+    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
+    const lt = screen.getByRole('region', { name: 'Luyện thêm' })
+    const o = [...lt.querySelectorAll('.v2s-lt-luoi > button')]
+    expect(o.every((b) => b.classList.contains('v2s-o'))).toBe(true)
+    expect(o.map((b) => b.getAttribute('data-khoi'))).toEqual(['thu-suc-them', 've-thu-thach', 'de-thu', 'tu-luyen', 'bia-game'])
+  })
+  it('Ôn lại: tiêu đề trang thật · số câu đến lịch ôn + nút vàng mở Đoàn · Sổ câu đã làm · Kết quả ca kiểm tra (ca gần nhất)', () => {
+    const p = ve()
+    fireEvent.click(screen.getByRole('button', { name: 'Ôn lại' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Ôn lại' }).classList.contains('v2s-tieu-trang')).toBe(true)
+    const on = screen.getByRole('region', { name: 'Đến lịch ôn lại hôm nay' })
+    expect(on.querySelector('.v2s-so-lon')!.textContent).toBe('2 câu')
+    expect(p.container.querySelectorAll('.v2-nut-chinh')).toHaveLength(1)
+    fireEvent.click(within(on).getByRole('button', { name: 'Ôn trong Đoàn Hộ Tống' }))
+    expect(p.onPhaPhucKich).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: /Sổ câu đã làm/ }))
+    expect(p.onCauDaLam).toHaveBeenCalledTimes(1)
+    const ca = screen.getByRole('button', { name: /Kết quả ca kiểm tra/ })
+    expect(ca.textContent).toContain('Ca gần nhất: 8,0 điểm · 03/10')
+    fireEvent.click(ca)
+    expect(p.onLichSuCa).toHaveBeenCalledTimes(1)
+    cleanup()
+    ve({ doan: { con: 0 } })
+    fireEvent.click(screen.getByRole('button', { name: 'Ôn lại' }))
+    expect(screen.getByText(/Hôm nay không còn câu đến lịch ôn lại/)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Ôn trong Đoàn Hộ Tống' })).toBeNull()
+  })
+  it('Của em: chữ cái đầu + tên + chip lớp + chuỗi; thẻ Thần thú (loài · hệ · cấp, EXP còn thiếu); KHÔNG nút Túi đồ/Cửa hàng/Kết quả ca; Đăng xuất qua hộp hỏi lại', () => {
+    const p = ve()
+    fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
+    expect(screen.getByRole('heading', { level: 1, name: 'Của em' }).classList.contains('v2s-tieu-trang')).toBe(true)
+    const hs = screen.getByRole('region', { name: 'Hồ sơ của em' })
+    expect(hs.querySelector('.v2s-chu-dau')!.textContent).toBe('MA')
+    expect([...hs.querySelectorAll('.v2-chip')].map((c) => c.textContent)).toEqual(['Lớp 12A1', 'Chuỗi 12 ngày'])
+    const thu = screen.getByRole('button', { name: /^Thần thú của em/ })
+    expect(thu.textContent).toContain('Linh Hồ')
+    expect(thu.textContent).toContain('Ái Hồ · hệ Tình yêu · Cấp 7')
+    expect(thu.textContent).toContain('Còn 160 EXP lên cấp 8 · Túi đồ và Cửa hàng ở bên trong')
+    for (const ten of [/^Túi đồ$/, /Mở túi đồ/, /Mở cửa hàng/, /Kết quả ca kiểm tra/]) expect(screen.queryByRole('button', { name: ten })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Đăng xuất' }))
+    expect(p.onDangXuat).toHaveBeenCalledTimes(1)
+    cleanup()
+    // thiếu lớp ⇒ ẩn chip lớp, không còn " · Chuỗi…" mồ côi; cửa hàng tắt ⇒ chỉ nói Túi đồ
+    ve({}, { lop: '', shopBat: false })
+    fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
+    const hs2 = screen.getByRole('region', { name: 'Hồ sơ của em' })
+    expect([...hs2.querySelectorAll('.v2-chip')].map((c) => c.textContent)).toEqual(['Chuỗi 12 ngày'])
+    expect(hs2.textContent).not.toMatch(/·\s*Chuỗi/)
+    expect(screen.getByRole('button', { name: /^Thần thú của em/ }).textContent).toContain('Túi đồ ở bên trong')
+  })
+  it('chữ cái đầu + chip lớp: hàm thuần', () => {
+    expect(chuDauTen('Nguyễn Minh Anh')).toBe('MA')
+    expect(chuDauTen('An')).toBe('A')
+    expect(chuDauTen('  ')).toBe('')
+    expect(chuLop('12A1')).toBe('Lớp 12A1')
+    expect(chuLop('Lớp 11B')).toBe('Lớp 11B')
+    expect(chuLop('')).toBeNull()
+    expect(chuLop(undefined)).toBeNull()
+  })
+  it('đổi mục: nội dung trượt vào (.tt-vao-muc) và mỗi mục GIỮ chỗ cuộn của mình', () => {
+    const el = document.scrollingElement ?? document.documentElement
+    ve()
+    el.scrollTop = 300
+    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
+    expect(document.querySelector('.v2s-man')!.classList.contains('tt-vao-muc')).toBe(true)
+    expect(el.scrollTop).toBe(0)
+    el.scrollTop = 120
+    fireEvent.click(screen.getByRole('button', { name: 'Hôm nay' }))
+    expect(el.scrollTop).toBe(300)
+    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
+    expect(el.scrollTop).toBe(120)
+    el.scrollTop = 0
   })
 })
 

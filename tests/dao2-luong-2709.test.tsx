@@ -44,7 +44,7 @@ describe('Luồng Đảo 2.0', () => {
     await waitFor(() => expect(container.querySelector('.dao2-bd-vung')?.textContent).toMatch(/Chất béo · 0%.*Danh pháp · 100%/))
     fireEvent.click(screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }))
     for (let i = 0; i < 6; i++) {
-      await screen.findByText(new RegExp(`^ẢI ${i + 1}/6`))
+      await screen.findByText(`Câu ${i + 1}/6`) // trung tu 09/10: bộ đếm "ẢI k/n" bỏ (trùng "Câu k/n" của thẻ câu)
       expect(container.querySelector('.loi-giai')).toBeNull() // chưa chốt: không lời giải, không đáp án
       fireEvent.click(screen.getByRole('button', { name: i === 0 ? /^B\./ : /^A\./ }))
       fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }))

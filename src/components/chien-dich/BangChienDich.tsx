@@ -304,7 +304,7 @@ export default function BangChienDich({
     <>
       <div className="cd-dau">
         <div>
-          <p className="cd-duong-dan">Chữa trên lớp › Bảng chiến dịch</p>
+          <p className="cd-duong-dan">Cần thầy chữa › Bảng chiến dịch</p>
           <h1>
             {cd.ten}
             {cd.lop ? ` · ${cd.lop}` : ''}

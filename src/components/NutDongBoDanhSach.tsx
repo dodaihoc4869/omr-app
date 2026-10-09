@@ -57,10 +57,13 @@ export function tomTatDongBo(kq: KetQuaNapDanhSach, soTrung = 0): string {
 export default function NutDongBoDanhSach({
   onXong,
   className = '',
+  kieu = 'cu',
 }: {
   /** Gọi sau khi đồng bộ xong: số em và dòng tóm tắt để màn ngoài hiện ra. */
   onXong?: (soEm: number, tomTat: string) => void
   className?: string
+  /** 'vien' = nút viền của bảng --gvm-* (màn Học sinh 2.0, trung tu 09/10): bỏ nền/viền/bo nội tuyến, giữ màu báo xong/lỗi. Mặc định như cũ. */
+  kieu?: 'cu' | 'vien'
 }) {
   const [tt, setTt] = useState<TrangThai>({ kieu: 'nghi' })
   const [links, setLinks] = useState<string[] | null>(null)
@@ -169,22 +172,26 @@ export default function NutDongBoDanhSach({
           disabled={tt.kieu === 'chay' || links === null}
           aria-live="polite"
           aria-label={chuaCoLink ? 'Dán link danh sách học sinh' : 'Đồng bộ danh sách học sinh từ Google Sheet'}
-          className={`tap-target inline-flex items-center justify-center font-bold whitespace-nowrap ${className}`}
-          style={{
-            gap: 'var(--k2)',
-            height: 44,
-            minHeight: 44,
-            padding: '0 var(--k4) 0 var(--k3)',
-            borderRadius: 'var(--bo-tron)',
-            background: mau.nen,
-            color: mau.chu,
-            fontFamily: 'var(--sans)',
-            fontSize: 'var(--cx-1)',
-            border: '1.5px solid transparent',
-            transitionProperty: 'background-color, color, transform',
-            transitionDuration: 'var(--nhanh)',
-            transform: tt.kieu === 'chay' ? 'scale(.98)' : 'scale(1)',
-          }}
+          className={`tap-target inline-flex items-center justify-center font-bold whitespace-nowrap ${kieu === 'vien' ? 'gvv2-nut-vien tt-nhan ' : ''}${className}`}
+          style={
+            kieu === 'vien'
+              ? { gap: 'var(--k2)', ...(tt.kieu === 'xong' || tt.kieu === 'loi' ? { background: mau.nen, color: mau.chu } : null) }
+              : {
+                  gap: 'var(--k2)',
+                  height: 44,
+                  minHeight: 44,
+                  padding: '0 var(--k4) 0 var(--k3)',
+                  borderRadius: 'var(--bo-tron)',
+                  background: mau.nen,
+                  color: mau.chu,
+                  fontFamily: 'var(--sans)',
+                  fontSize: 'var(--cx-1)',
+                  border: '1.5px solid transparent',
+                  transitionProperty: 'background-color, color, transform',
+                  transitionDuration: 'var(--nhanh)',
+                  transform: tt.kieu === 'chay' ? 'scale(.98)' : 'scale(1)',
+                }
+          }
         >
           {tt.kieu === 'xong' ? <Check size={16} /> : tt.kieu === 'loi' ? <AlertCircle size={16} /> : <RefreshCw size={16} className={tt.kieu === 'chay' ? 'animate-spin' : ''} />}
           <span>{nhanNut}</span>

@@ -20,6 +20,7 @@ import '@fontsource/be-vietnam-pro/latin-700.css'
 import '@fontsource/noto-serif/vietnamese-400.css'
 import '@fontsource/noto-serif/latin-400.css'
 import '../../src/styles/tokens.css'
+import '../../src/styles/thang.css' // thang chung 3 app (main.tsx nạp ngay sau tokens.css) — thiếu thì --nut-*-cao, --t-*, --r-* rỗng trong ảnh chụp
 import '../../src/index.css'
 import '../../src/styles/the-loc.css'
 import '../../src/components/m3'
@@ -50,6 +51,8 @@ import BangMaTranDe from '../../src/components/ma-tran-de/BangMaTranDe'
 import { useCoHoa2 } from '../../src/components/chien-dich/co-hoa2'
 import { useAppStore } from '../../src/store/appStore'
 import { KHO } from '../chup-omni-3/gia/may-thay'
+import BottomNav from '../../src/components/BottomNav'
+import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -70,6 +73,25 @@ const SANH_HT = {
 // Xong kế hoạch: 30/30, rương mở được, có Thử sức thêm 6 câu.
 const SANH_XONG = { ...SANH_HT, hanhTrinh: { ...SANH_HT.hanhTrinh, daLam: 30, changHienTai: 5, cauTrongChang: 0 }, theLuc: { con: 0, tong: 30 }, doan: { con: 0 }, dao: { con: 0 }, khoaDao: false, loiKhoaDao: '', ruong: { daLam: 30, tong: 30, moDuoc: true, daMo: false, qua: null }, thuSucThem: { duoc: true, soCau: 6 } }
 
+// ---------------------------------------------------------------- app thầy 2.0 (trung tu 09/10): danh sách em / ca / câu hỏi / học phí GIẢ
+// 60 em (chia trang 25); 12 em đầu trùng SBD bảng Hành trình giả (gia/goi-lenh-thay.ts) ⇒ cột "Hôm nay" có số thật của bộ giả.
+const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Vũ', 'Đặng', 'Bùi', 'Đỗ', 'Ngô']
+const TEN = ['Minh Anh', 'Đức Huy', 'Phương Linh', 'Quang Minh', 'Thu Trang', 'Khánh', 'Anh', 'Thảo Linh', 'Gia Bảo', 'Hải Yến', 'Quốc Việt', 'Mai Chi']
+const EM_GIA = Array.from({ length: 60 }, (_, i) => {
+  const khoi = [12, 11, 10][i % 3]!
+  return {
+    sbd: String(11010 + i), hoTen: i === 7 ? '' : `${HO[i % HO.length]} ${TEN[i % TEN.length]}`, namSinh: String(2021 - khoi), lop: khoi === 12 ? '12A1' : khoi === 11 ? '11B' : '10C',
+    trangThai: i === 9 ? 'ngoai_danh_sach' : 'trong_danh_sach', soCa: i % 5, diemGanNhat: i % 4 === 3 ? null : Math.round((5 + ((i * 7) % 50) / 10) * 4) / 4, caGanNhat: '', nopGanNhat: '',
+  }
+})
+const HOC_PHI_GIA = EM_GIA.map((e, i) => ({ sbd: e.sbd, phaiNop: 4_500_000, daNop: i % 3 === 0 ? 4_500_000 : i % 3 === 1 ? 3_000_000 : 0, ghiChu: '', soLan: i % 3 === 2 ? 0 : 1 }))
+const phutTruoc = (p: number) => new Date(now - p * 60_000).toISOString()
+const CA_GIA = [
+  { maCa: 'DH-12-C2-B6', tenCa: 'Kiểm tra Ester 12A1', lop: '12A1', thoiGianPhut: 45, moLuc: phutTruoc(12), batDau: phutTruoc(12), hetHanVao: new Date(now + 30 * 60_000).toISOString(), trangThai: 'mo', phamVi: 'tu_do', congBo: 'ca_lop_xong', loai: 'thi', hanNop: '', lenBang: true, daVao: 36, daNop: 12, canhBao: 0 },
+  { maCa: 'DH-11-C1-A2', tenCa: 'Kiểm tra 15 phút 11B', lop: '11B', thoiGianPhut: 15, moLuc: '2026-10-07T02:00:00Z', batDau: '2026-10-07T02:00:00Z', hetHanVao: '2026-10-07T02:20:00Z', trangThai: 'dong', phamVi: 'tu_do', congBo: 'ngay', loai: 'thi', hanNop: '', lenBang: true, daVao: 28, daNop: 28, canhBao: 1 },
+]
+const CAU_HOI_GIA = [0, 1, 2].map((i) => ({ maCa: 'DH-11-C1-A2', tenCa: 'Kiểm tra 15 phút 11B', sbd: String(11011 + i * 3), hoTen: EM_GIA[1 + i * 3]!.hoTen, qids: ['Q3'], ghiChu: '', guiLuc: '2026-10-07T03:00:00Z', daChua: i === 2, chuaLuc: '' }))
+
 const fetchGoc = window.fetch.bind(window)
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -80,9 +102,14 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   let b: Record<string, unknown> = {}
   try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
   if (u.pathname.includes('vang-xem') || b.action === 'vang-xem' || b.lenh === 'vang-xem') return tra({ ok: true, bat: true, vang: 340, ongNghiem: 1200, giuLai: 200, chuoiNgay: 12, doiToiDa: 10 })
+  if (b.action === 'danhSachEm' || u.pathname.endsWith('/em/danh-sach')) return tra({ ok: true, items: EM_GIA })
+  if (b.action === 'danhSachCa') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA })
+  if (b.action === 'danhSachCauHoi') return tra({ ok: true, items: CAU_HOI_GIA })
+  if (u.pathname.endsWith('/gv/hoc-phi/ds')) return tra({ ok: true, items: HOC_PHI_GIA })
   if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
   if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
-  if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [] })
+  // App phụ huynh (trung tu 09/10): một nhận xét đã công bố để ảnh có thẻ "Nhận xét của thầy" ở Hôm nay và màn con `#loi-thay`.
+  if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [{ maCa: 'CA-2', tenCa: 'Kiểm tra 45 phút · Ester – Lipid', noiDung: 'Con làm tốt phần lý thuyết ester. Bài đốt cháy hỗn hợp con còn nhầm bước bảo toàn nguyên tố, thầy sẽ chữa cùng con ở buổi tới.', capNhatLuc: '2026-09-20T01:00:00Z', nopLuc: '2026-09-19T02:12:00Z', tong: 7.5 }] })
   return tra({ ok: true })
 }
 
@@ -151,9 +178,17 @@ const con =
   : manSanh(SANH_HT)
 
 const manThay = MAN_THAY[man]
-if (manThay === 'chiendich') useAppStore.setState({ screen: manThay as never })
+// TRUNG TU 09/10: mọi màn thầy chụp ở CHẾ ĐỘ 2.0 thật (cờ bật + `data-hoa2` trên vỏ như App.tsx) — trước đây chỉ gv-nhip bật cờ nên thanh bên
+// trong ảnh là danh sách cũ 9 mục. Thanh đáy (< 880 px) cũng dựng như app thật. `?giao=toi|sang` = thầy ép nút Sáng/Tối trong Cài đặt.
+const MAN_STORE: Record<string, string> = { 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
+if (manThay) {
+  useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
+  useAppStore.setState({ screen: MAN_STORE[man] as never })
+}
+const giao = thamSo.get('giao')
+if (giao === 'toi' || giao === 'sang') apDungGiaoDien(giao)
 createRoot(document.getElementById('root')!).render(
   manThay
-    ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con))))
+    ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay', 'data-hoa2': '' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con)), h(BottomNav)))
     : man === 'ph' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
 )

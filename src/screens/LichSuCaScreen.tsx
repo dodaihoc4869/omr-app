@@ -24,6 +24,7 @@ import { useSoDemGv } from '../lib/so-dem-gv'
 import { ngayVn } from '../components/chien-dich/ngay'
 import { demEmTheoLop, soVi, thongKeThang } from '../lib/tong-quan-gv'
 import './gv-hoa2.css'
+import { lyDoDeHieu } from '../lib/loi-de-hieu'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -32,7 +33,8 @@ const CONG_BO_NGAN: Record<string, string> = { khong: 'Điểm chưa công bố 
 /** Cột "Công bố điểm" của bảng 2.0 — chữ ngắn (RA-SOAT mục 2: gộp nhãn trên từng thẻ thành một cột). */
 export const CONG_BO_COT: Record<string, string> = { khong: 'Chưa công bố', ngay: 'Ngay khi nộp', ca_lop_xong: 'Khi cả lớp nộp xong' }
 /** Câu trạng thái trống của Ca kiểm tra 2.0 — một dòng chữ, không ảnh, không nút lớn. */
-export const CHU_CA_TRONG_HOA2 = 'Chưa có ca kiểm tra nào. Mở ca bằng nút Mở ca kiểm tra ở thanh bên.'
+// Trung tu 09/10: thanh bên 2.0 không còn nút mở ca (nút nằm ở đầu màn này; điện thoại là nút nổi "Mở ca") ⇒ câu không chỉ "ở thanh bên" nữa.
+export const CHU_CA_TRONG_HOA2 = 'Chưa có ca kiểm tra nào. Bấm Mở ca kiểm tra để mở ca đầu tiên.'
 /** Bảng 2.0 hiện bấy nhiêu dòng rồi mới "Xem thêm". */
 const SO_DONG_TRANG = 20
 const TONE_CHIP: Record<string, string> = { tim: 'la', xanh: 'la', cam: 'vang', do: 'do', xam: 'xam' }
@@ -141,8 +143,6 @@ export default function LichSuCaScreen() {
   const coBaiTap = useMemo(() => (dsCa ?? []).some((c) => c.loai === 'baitap'), [dsCa])
   const emTheoLop = useMemo(() => demEmTheoLop(classList), [classList])
   const demMo = useMemo(() => (dsCa ?? []).filter((c) => c.trangThai === 'mo').length, [dsCa])
-  /** 2.0: ca ĐANG CHẠY thật (theo giờ máy chủ), không tính ca bài tập về nhà (cũ). */
-  const demMoHoa2 = useMemo(() => (dsCa ?? []).filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, gioMayChu())).length, [dsCa])
   const demDong = useMemo(() => (dsCa ?? []).filter((c) => c.trangThai === 'dong').length, [dsCa])
 
   // Chỉ tính trên danh sách ĐANG hiện — tích "Tất cả" không bao giờ chạm ca bị bộ lọc giấu đi.
@@ -241,11 +241,7 @@ export default function LichSuCaScreen() {
         <header className="gv2-dau">
           <div className="gv2-dau-chu">
             <h1 className="gv2-tieu-de">{xemDaXoa ? 'Ca đã xoá' : 'Ca kiểm tra'}</h1>
-            {tkThang && (
-              <p className="gv2-phu-de">
-                <span className="gv2-so">{tkThang.soCa}</span> ca trong tháng {tkThang.thang} · <span className="gv2-so">{demMoHoa2}</span> ca đang mở
-              </p>
-            )}
+            {/* Trung tu 09/10: bỏ dòng phụ "N ca trong tháng · N ca đang mở" — lặp thẻ số ngay dưới và thẻ lọc "Đang mở" (C4: một thông tin một chỗ). */}
           </div>
         </header>
       ) : (
@@ -270,9 +266,7 @@ export default function LichSuCaScreen() {
             <div className="gv2-so-dong">
               <span className="gv2-so gv2-so-kpi">{tkThang.soCa}</span> <span className="gv2-don-vi">ca</span>
             </div>
-            <div className="gv2-phu">
-              <span className="gv2-so">{demMoHoa2}</span> ca đang mở
-            </div>
+            {/* số ca đang mở: MỘT chỗ — thẻ lọc "Đang mở" ngay dưới thanh tìm (bấm là lọc) */}
           </div>
           <div className="gv2-the gv2-the-so" data-mau="xl">
             <div className="gv2-nhan">Bài đã nộp tháng {tkThang.thang}</div>
@@ -414,7 +408,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
               className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs"
-              style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
+              style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: hoa2 ? 44 : 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
             >
               {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
               {tichHet ? 'Bỏ chọn tất cả' : `Chọn tất cả (${dsLoc.length})`}
@@ -431,7 +425,7 @@ export default function LichSuCaScreen() {
                 ...SO,
                 gap: 6,
                 fontSize: 'var(--cx-1)',
-                minHeight: 36,
+                minHeight: hoa2 ? 44 : 36,
                 padding: '0 var(--k3)',
                 borderRadius: 'var(--bo-tron)',
                 background: chonTrongLoc.length === 0 ? 'var(--the-2)' : 'var(--do-nen)',
@@ -449,7 +443,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
               className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs"
-              style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
+              style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: hoa2 ? 44 : 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
             >
               {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
               {tichHet ? 'Bỏ chọn tất cả' : `Chọn tất cả (${dsLoc.length})`}
@@ -466,7 +460,7 @@ export default function LichSuCaScreen() {
                 ...SO,
                 gap: 6,
                 fontSize: 'var(--cx-1)',
-                minHeight: 36,
+                minHeight: hoa2 ? 44 : 36,
                 padding: '0 var(--k3)',
                 borderRadius: 'var(--bo-tron)',
                 background: 'var(--the-2)',
@@ -484,7 +478,7 @@ export default function LichSuCaScreen() {
                 ...SO,
                 gap: 6,
                 fontSize: 'var(--cx-1)',
-                minHeight: 36,
+                minHeight: hoa2 ? 44 : 36,
                 padding: '0 var(--k3)',
                 borderRadius: 'var(--bo-tron)',
                 background: chonTrongLoc.length === 0 ? 'var(--the-2)' : 'var(--do-nen)',
@@ -507,7 +501,7 @@ export default function LichSuCaScreen() {
                 gap: 6,
                 color: 'var(--do)',
                 background: 'var(--do-nen)',
-                minHeight: 36,
+                minHeight: hoa2 ? 44 : 36,
                 padding: '0 var(--k3)',
                 borderRadius: 'var(--bo-tron)',
                 border: '1px solid var(--do)',
@@ -518,9 +512,28 @@ export default function LichSuCaScreen() {
           </div>
         )}
 
-        {loi && <OThongBao tone="do">{loi}</OThongBao>}
+        {loi &&
+          (hoa2 ? (
+            // 2.0 (trung tu 09/10): câu dễ hiểu + Thử lại, không in lỗi kỹ thuật thô.
+            <div className="gv-loi-tai" role="alert">
+              <p>Chưa tải được danh sách ca. {lyDoDeHieu(loi)}</p>
+              <button type="button" className="gv2-nut-vien" onClick={tai} disabled={dangTai}>
+                {dangTai ? 'Đang tải lại…' : 'Thử lại'}
+              </button>
+            </div>
+          ) : (
+            <OThongBao tone="do">{loi}</OThongBao>
+          ))}
         {dsCa === null ? (
-          <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
+          hoa2 ? (
+            <div className="gv-xuong-bang" role="status" aria-label="Đang tải danh sách ca">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <span key={i} className="gv-xuong-khoi tt-xuong" />
+              ))}
+            </div>
+          ) : (
+            <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
+          )
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
             <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }} data-trong-ca="">{dsCa.length === 0 ? (xemDaXoa ? 'Không có ca nào đã xoá.' : hoa2 ? CHU_CA_TRONG_HOA2 : 'Chưa có ca nào.') : 'Không có ca khớp bộ lọc.'}</div>
@@ -566,7 +579,10 @@ export default function LichSuCaScreen() {
                     <tr key={c.maCa} data-trang-thai={tt.ten} className={chonMode && tich ? 'gv2-dong-chon' : undefined}>
                       {chonMode && (
                         <td>
-                          <input type="checkbox" checked={tich} onChange={() => bat(c.maCa)} aria-label={`Chọn ${c.tenCa || c.maCa}`} />
+                          {/* Trung tu 09/10: ô tích nằm trong nhãn 44×44 — chạm trúng dễ (B3) */}
+                          <label className="gv-o-tich">
+                            <input type="checkbox" checked={tich} onChange={() => bat(c.maCa)} aria-label={`Chọn ${c.tenCa || c.maCa}`} />
+                          </label>
                         </td>
                       )}
                       <td>

@@ -129,7 +129,8 @@ describe('màn Buổi chữa', () => {
   it('bảng câu xếp sẵn đủ cột: #, câu · dạng · mức độ, vì sao chữa, điểm chữa, người lên bảng, thời gian, kết quả; 5 thẻ số đúng (bản vẽ 28/09)', () => {
     const { container } = ve()
     expect(screen.getByRole('heading', { name: 'Buổi chữa · Ester – Lipid · 12A1' })).toBeTruthy()
-    expect(container.textContent).toContain('Chữa trên lớp › Buổi chữa')
+    // SỬA CÓ CHỦ Ý 09/10 (trung tu giao diện thầy duyệt): mục "Chữa trên lớp" đã gộp vào Hành trình › Cần thầy chữa ⇒ đường dẫn theo bảng từ chuẩn.
+    expect(container.textContent).toContain('Cần thầy chữa › Buổi chữa')
     expect(container.textContent).toContain('hết hạn nộp lúc 23:59 Chủ Nhật 04/10')
     expect(container.textContent).toContain('đã điểm danh 6/6 em')
     const hang = [...container.querySelectorAll('[data-hang-chua]')].map((x) => x.getAttribute('data-hang-chua'))

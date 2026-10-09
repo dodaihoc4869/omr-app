@@ -107,6 +107,8 @@
 .v2-an { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .v2-the {
+  /* đệm 20 (thang chung: "thẻ đệm 20") — trước 0 nên chữ dính viền ở thẻ không tự đặt đệm; thẻ cần đệm riêng vẫn ghi đè được */
+  padding: var(--k5, 20px);
   background: var(--v2-the);
   border: 1px solid var(--v2-vien);
   border-radius: var(--v2-bo);
@@ -174,7 +176,7 @@
 .v2-khuc > i[data-xong='true'] { background: var(--v2-grad-vang); box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--v2-vang-dam) 50%, transparent); }
 
 /* Khung xương khi chờ máy chủ (C10) */
-.v2-xuong { display: block; border-radius: 10px; background: var(--v2-the-chim); animation: v2-tho 1.4s ease-in-out infinite; }
+.v2-xuong { display: block; border-radius: var(--r-nho, 12px); background: var(--v2-the-chim); animation: v2-tho 1.4s ease-in-out infinite; }
 @keyframes v2-tho { 50% { opacity: .55; } }
 
 @media (prefers-reduced-motion: reduce) {

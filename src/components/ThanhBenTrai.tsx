@@ -10,6 +10,10 @@
 //   (`chiendich` = Hành trình; `goilenbang`, `bangonutthat` vẫn mở được bằng `setScreen` và vào qua các thẻ của Hành trình — mục
 //   Hành trình sáng khi đứng ở hai màn ấy). Mã màn `tongquan` nay dựng màn Hôm nay (`GvHomNayScreen`).
 //   Logo = "Đỗ Đại Học · Giáo viên". Số đếm cạnh mục lấy từ `useSoDemGv` (màn đã tải ghi vào) — chưa biết thì không vẽ. Cờ tắt ⇒ đúng danh sách cũ.
+//   TRUNG TU 09/10 (thầy duyệt bản vẽ, "build luôn"): mục rời thanh vẫn có lối vào BÊN TRONG một mục — Kho đề = Ngân hàng đề (cùng màn);
+//   Hành trình › Cần thầy chữa ⊃ Buổi chữa (Lên bảng) · Gỡ nút thắt; Hôm nay › "Việc cần thầy" ⊃ Học sinh hỏi (`cauhoi` — em vẫn gửi
+//   "Hỏi bài Thầy" sau ca kiểm tra nên màn này KHÔNG được ẩn ở 2.0). Bài tập về nhà (`giaobtvn`) · Giao đề theo tuần (`khodegiao`) giữ ẩn ở
+//   2.0 theo lệnh thầy 28/09 "bỏ hẳn BTVN" (docs/ban-ve-gv-2809/RA-SOAT.md mục 8) — tắt 2.0 là hiện lại.
 //   (Lịch sử: 28/09 docs/ban-ve-gv-2809/GV-ThanhBen — "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh.)
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
 import { CalendarDays, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
@@ -54,7 +58,7 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
 
 /** GAME HÓA 2.0 — năm mục (bản vẽ tối giản thầy chốt 09/10). Thanh đáy điện thoại dùng CHÍNH danh sách này (nhãn `ngan`, ≤ 5 mục — luật C6). */
 export const MUC_HOA2_CHINH: MucDieuHuong[] = [
-  { id: 'tongquan', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home },
+  { id: 'tongquan', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home, con: ['cauhoi'] },
   { id: 'chiendich', ten: 'Hành trình', ngan: 'Hành trình', icon: Route, con: ['goilenbang', 'bangonutthat'] },
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
@@ -63,8 +67,9 @@ export const MUC_HOA2_CHINH: MucDieuHuong[] = [
 /** GAME HÓA 2.0 — mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). */
 export const MUC_HOA2_DAY: MucDieuHuong[] = [{ id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true }]
 
-/** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`. */
-export const MAN_AN_KHI_HOA2: readonly ScreenId[] = ['examhub', 'giaobtvn', 'cauhoi', 'khodegiao']
+/** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`.
+ *  09/10 (trung tu): `cauhoi` (Học sinh hỏi) RỜI danh sách này — vào từ Hôm nay › Việc cần thầy (em vẫn hỏi bài sau ca kiểm tra). */
+export const MAN_AN_KHI_HOA2: readonly ScreenId[] = ['examhub', 'giaobtvn', 'khodegiao']
 /** Màn CHỈ có khi Game Hóa 2.0 bật — cờ tắt thì App chuyển về Hôm nay. */
 export const MAN_CHI_HOA2: readonly ScreenId[] = ['tongquan', 'chiendich']
 /** Màn đầu của app thầy khi Game Hóa 2.0 bật — mã `tongquan`, từ 09/10 dựng màn "Hôm nay" (GvHomNayScreen). */
@@ -77,10 +82,11 @@ export function mucDangSang(screen: ScreenId, hoa2 = false): ScreenId | null {
 }
 
 /** Số đếm cạnh mục (2.0): chữ ngắn + nhãn đầy đủ cho trình đọc màn hình. `null` / 0 ⇒ không vẽ.
- *  09/10: cạnh Hành trình là số "Cần thầy chữa" (một khái niệm một tên — bỏ số chiến dịch đang chạy / câu cần dạy lại ở thanh bên). */
-export function soDemMuc(id: ScreenId, so: { caMo: number | null; canThayChua: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' } | null {
+ *  09/10: cạnh Hành trình là số "Cần thầy chữa" (một khái niệm một tên — bỏ số chiến dịch đang chạy / câu cần dạy lại ở thanh bên).
+ *  Trung tu 09/10: "Cần thầy chữa" MỘT màu ở thanh bên và Hôm nay — hổ phách (`vang` = --gvm-hp-*, đúng màu dòng việc ấy ở Hôm nay). */
+export function soDemMuc(id: ScreenId, so: { caMo: number | null; canThayChua: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' | 'vang' } | null {
   if (id === 'lichsuca' && so.caMo) return { chu: `${so.caMo} mở`, nhan: `${so.caMo} ca đang mở`, tone: 'la' }
-  if (id === 'chiendich' && so.canThayChua) return { chu: String(so.canThayChua), nhan: `Cần thầy chữa: ${so.canThayChua} chỗ`, tone: 'do' }
+  if (id === 'chiendich' && so.canThayChua) return { chu: String(so.canThayChua), nhan: `Cần thầy chữa: ${so.canThayChua} chỗ`, tone: 'vang' }
   return null
 }
 

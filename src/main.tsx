@@ -31,6 +31,7 @@ import '@fontsource/be-vietnam-pro/vietnamese-400.css'
 import '@fontsource/be-vietnam-pro/vietnamese-600.css'
 import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import './styles/tokens.css'
+import './styles/thang.css'
 import './index.css'
 import './styles/the-loc.css'
 // Chế độ máy yếu (29/09): quy tắc chỉ có hiệu lực khi <html> mang lớp `may-yeu` (xem src/lib/may-yeu.ts).

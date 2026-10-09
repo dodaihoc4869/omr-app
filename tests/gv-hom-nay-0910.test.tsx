@@ -10,9 +10,11 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import type { CaTomTat } from '../src/lib/exam-api'
 import type { BangChienDich, ChienDichTom } from '../src/components/chien-dich/api'
 
-const m = vi.hoisted(() => ({ danhSachCa: vi.fn(), goi: vi.fn() }))
+const m = vi.hoisted(() => ({ danhSachCa: vi.fn(), danhSachCauHoi: vi.fn(), goi: vi.fn() }))
 vi.mock('../src/lib/exam-api', () => ({
   danhSachCa: (...a: unknown[]) => m.danhSachCa(...a),
+  // Trung tu 09/10: Hôm nay đọc thêm câu em hỏi (màn Học sinh hỏi vào từ "Việc cần thầy").
+  danhSachCauHoi: (...a: unknown[]) => m.danhSachCauHoi(...a),
   xoaNhieuCa: vi.fn(),
   khoiPhucCa: vi.fn(),
   xoaVinhVienCa: vi.fn(),
@@ -126,6 +128,7 @@ function mayChu({ omni = true, loiDanhSach = false }: { omni?: boolean; loiDanhS
 }
 
 beforeEach(() => {
+  m.danhSachCauHoi.mockResolvedValue([])
   useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
   useSoDemGv.setState({ caMo: null, chienDichChay: null, canDayLai: null, canThayChua: null, giaoTuCa: null, moHanhTrinh: null })
   useAppStore.getState().setScreen('tongquan')
@@ -163,7 +166,10 @@ describe('khung 2.0 · 5 mục (bản vẽ tối giản thầy chốt 09/10)', (
 })
 
 describe('màn Hôm nay của thầy — số từ API', () => {
-  it('4 ô số + việc xếp theo độ gấp (mỗi việc MỘT nút) + nhịp theo khối; ghi số cho thanh bên', async () => {
+  // SỬA CÓ CHỦ Ý 09/10 — TRUNG TU GIAO DIỆN (thầy duyệt bản vẽ GV-HomNay, "build luôn"): BỎ bốn ô số lặp danh sách việc (C4); nút chính gọn ở góc
+  // phải = việc gấp nhất (ca đang mở ⇒ "Theo dõi ca đang mở"); thẻ "Nhịp theo khối" thành thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một
+  // dòng bấm được; lỗi tải thành MỘT dòng việc nói dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
+  it('việc xếp theo độ gấp (mỗi việc MỘT nút viền) + thẻ Đủ mức tối thiểu; không còn ô số lặp; nút chính = việc gấp nhất; ghi số cho thanh bên', async () => {
     m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6'), ca('DH-CU', { trangThai: 'dong', batDau: '2026-10-07T02:00:00Z', moLuc: '2026-10-07T02:00:00Z' })])
     mayChu()
     const { container } = render(<GvHomNayScreen />)
@@ -171,10 +177,9 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Hôm nay của thầy' })).toBeTruthy()
     expect(container.textContent).toContain('Thứ Sáu 09/10/2026 · 2 khối · 6 em đang chạy Hành trình')
 
-    const so = screen.getByRole('region', { name: 'Số liệu hôm nay' })
-    const o = [...so.querySelectorAll('.gvhn-so')].map((x) => x.textContent)
-    // Hành trình K10: 1/3 đủ mức, 1 chưa làm · K12: 1/2 đủ mức (em không có mức không tính), 2 chưa làm.
-    expect(o).toEqual(['Đủ mức tối thiểu hôm nay2/5 em', 'Chưa làm câu nào3 em', 'Cần thầy chữa5 chỗ', 'Ca kiểm tra đang mở1 ca'])
+    // không còn bốn ô số (lặp danh sách việc)
+    expect(screen.queryByRole('region', { name: 'Số liệu hôm nay' })).toBeNull()
+    expect(container.querySelector('.gvhn-so')).toBeNull()
 
     const viec = screen.getByRole('region', { name: 'Việc cần thầy · xếp theo độ gấp' })
     const dong = [...viec.querySelectorAll('li')]
@@ -186,25 +191,35 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     ])
     for (const d of dong) expect(within(d).getAllByRole('button')).toHaveLength(1)
     expect(dong.map((d) => within(d).getByRole('button').textContent)).toEqual(['Theo dõi ca', 'Xếp buổi chữa', 'Bổ sung bài', 'Xem danh sách'])
-    // một nút chính trên màn (việc gấp nhất), còn lại nút viền
-    expect(container.querySelectorAll('.gvv2-nut-chinh')).toHaveLength(1)
+    for (const d of dong) expect(within(d).getByRole('button').className).toContain('gvv2-nut-vien')
+    // MỘT nút chính trên màn, ở đầu màn: có ca đang mở ⇒ "Theo dõi ca đang mở"
+    const chinh = [...container.querySelectorAll('.gvv2-nut-chinh')]
+    expect(chinh).toHaveLength(1)
+    expect(chinh[0]!.textContent).toBe('Theo dõi ca đang mở')
+    expect(chinh[0]!.closest('header')).toBeTruthy()
     expect(dong[0]!.textContent).toContain('Đã vào 40 em · đã nộp 38 em')
     // K12 hành trình: 1 câu cần dạy lại (cùng nghĩa câu sai từ 4 lần) + chiến dịch cd-a: 2 câu sai từ 4 lần, 1 câu nút thắt, 1 em sơ ý (Bảng bài OMNI)
     expect(dong[1]!.textContent).toContain('3 câu sai từ 4 lần trở lên · 1 câu có thẻ nút thắt · 1 em sơ ý cao')
     expect(dong[3]!.textContent).toContain('Khối 10: 1 em · Khối 12: 2 em')
+    // "Cần thầy chữa": cùng màu hổ phách với số cạnh Hành trình ở thanh bên
+    expect(dong[1]!.querySelector('.gvhn-dau-o')?.getAttribute('data-mau')).toBe('hp')
     // một khái niệm một tên ở màn mới
     expect(container.textContent).not.toMatch(/dạy lại|Cần chữa|Chữa trên lớp|Tổng quan/)
-
-    const khoi = screen.getByRole('complementary', { name: 'Nhịp theo khối' })
-    expect([...khoi.querySelectorAll('.gvhn-khoi-chu')].map((x) => x.textContent)).toEqual(['Khối 101/3 em đủ mức', 'Khối 121/2 em đủ mức'])
+    // thứ tự DOM = thứ tự mắt: việc trước, thẻ đủ mức sau (không column-reverse)
+    const du = screen.getByRole('complementary', { name: 'Đủ mức tối thiểu hôm nay' })
+    expect(viec.compareDocumentPosition(du) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(du.querySelector('.gvhn-du-so')?.textContent).toBe('2/5 em')
+    expect([...du.querySelectorAll('.gvhn-khoi-dong')].map((x) => x.textContent)).toEqual(['Khối 101/3', 'Khối 121/2'])
 
     await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ caMo: 1, canThayChua: 5 }))
     // Hành trình chỉ đọc bảng — KHÔNG hỏi Bảng bài OMNI (như Lên bảng chiến dịch); lớp chờ bài mới hỏi đúng các lớp của công tắc OMNI.
     expect(m.goi.mock.calls.filter(([d, b]) => d === '/gv/omni' && b.action === 'bang').map(([, b]) => b.chienDichId)).toEqual(['cd-a'])
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-da-day').map(([, b]) => b.lop).sort()).toEqual(['12A1', '12A2'])
+    // câu em hỏi: MỘT lệnh cho mọi ca (mã ca rỗng), không vào thùng rác
+    expect(m.danhSachCauHoi.mock.calls.map((c) => [c[2], c[3]])).toEqual([['', false]])
   })
 
-  it('mỗi nút đưa đúng chỗ: Theo dõi ca · Hành trình › Cần thầy chữa / Bài đã dạy (cuộn Bài hôm nay) / Nhịp hôm nay (khối nhiều em chưa làm nhất)', async () => {
+  it('mỗi nút đưa đúng chỗ: nút chính · Theo dõi ca · Hành trình › Cần thầy chữa / Bài đã dạy / Nhịp hôm nay · dòng khối ⇒ Hành trình khối đó', async () => {
     m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6')])
     mayChu()
     render(<GvHomNayScreen />)
@@ -215,25 +230,74 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'bai-da-day', boSungBai: true })
     fireEvent.click(screen.getByRole('button', { name: /^Xem danh sách:/ }))
     expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'nhip', chienDichId: 'ht-12' })
+    fireEvent.click(screen.getByRole('button', { name: /^Khối 10: 1\/3 em đủ mức/ }))
+    expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'nhip', chienDichId: 'ht-10' })
     fireEvent.click(screen.getByRole('button', { name: /^Theo dõi ca:/ }))
     expect(useAppStore.getState().screen).toBe('exammonitor')
     expect(useAppStore.getState().maCaTheoDoi).toBe('DH-12-C2-B6')
+    useAppStore.getState().setScreen('tongquan')
+    fireEvent.click(screen.getByRole('button', { name: 'Theo dõi ca đang mở' }))
+    expect(useAppStore.getState().screen).toBe('exammonitor')
   })
 
-  it('lệnh lỗi ⇒ ô của lệnh ấy KHÔNG vẽ (không số 0 giả) + một dòng nói thật + Thử lại; OMNI tắt ⇒ không hỏi lớp chờ bài mới', async () => {
+  it('không có ca đang mở ⇒ nút chính "Bổ sung bài hôm nay"; Cần thầy chữa = 0 ⇒ một dòng ✓ không nút; em hỏi bài ⇒ việc "Học sinh hỏi" mở màn cauhoi', async () => {
+    m.danhSachCa.mockResolvedValue([])
+    const cau = (sbd: string, daChua: boolean) => ({ maCa: 'C1', tenCa: 'Kiểm tra 12A1', sbd, hoTen: `Em ${sbd}`, qids: ['q1'], ghiChu: '', guiLuc: '2026-10-09T01:00:00Z', daChua, chuaLuc: '' })
+    m.danhSachCauHoi.mockResolvedValue([cau('1', false), cau('2', false), cau('3', true)])
+    mayChu({ omni: false })
+    BANG['ht-12'] = bang(HT12, { hanhTrinhNgay: { em: [em('4', 36, 40), em('5', 36, 0), em('6', null, 0)] } })
+    try {
+      const { container } = render(<GvHomNayScreen />)
+      const viec = await screen.findByRole('region', { name: 'Việc cần thầy · xếp theo độ gấp' })
+      const nut = [...container.querySelectorAll('.gvv2-nut-chinh')]
+      expect(nut.map((n) => n.textContent)).toEqual(['Bổ sung bài hôm nay'])
+      const b = [...viec.querySelectorAll('li b')].map((x) => x.textContent)
+      expect(b).toEqual(['Học sinh hỏi: 2 lượt chờ thầy chữa', '3 em chưa làm câu nào hôm nay', 'Không có chỗ cần thầy chữa hôm nay.'])
+      const ok = viec.querySelector('li[data-viec="khong-chua"]')!
+      expect(within(ok as HTMLElement).queryByRole('button')).toBeNull()
+      expect(viec.textContent).toContain('Kiểm tra 12A1')
+      fireEvent.click(screen.getByRole('button', { name: /^Xem câu hỏi:/ }))
+      expect(useAppStore.getState().screen).toBe('cauhoi')
+      // thanh bên: Học sinh hỏi thuộc mục Hôm nay
+      render(<ThanhBenTrai />)
+      expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
+      fireEvent.click(screen.getByRole('button', { name: 'Bổ sung bài hôm nay' }))
+      expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'bai-da-day', boSungBai: true })
+    } finally {
+      BANG['ht-12'] = bang(HT12, { hanhTrinhNgay: { em: [em('4', 36, 40), em('5', 36, 0), em('6', null, 0)] }, canDayLai: [{ qid: 'q9', stt: 9, dang: 'Ester', soEm: 4 } as BangChienDich['canDayLai'][number]] })
+    }
+  })
+
+  it('lệnh lỗi ⇒ phần của lệnh ấy KHÔNG vẽ (không số 0 giả) + MỘT dòng việc nói dễ hiểu + Thử lại; OMNI tắt ⇒ không hỏi lớp chờ bài mới', async () => {
     m.danhSachCa.mockRejectedValue(new Error('Hết thời gian chờ máy chủ'))
     mayChu({ omni: false, loiDanhSach: true })
     const { container } = render(<GvHomNayScreen />)
     const loi = await screen.findByRole('alert')
-    expect(loi.textContent).toContain('Danh sách ca: Hết thời gian chờ máy chủ')
-    expect(loi.textContent).toContain('Hành trình và chiến dịch: Không nối được máy chủ.')
+    expect(loi.textContent).toContain('Chưa tải được danh sách ca kiểm tra · Hành trình và chiến dịch')
+    expect(loi.textContent).toContain('Hết thời gian chờ máy chủ.')
+    expect(loi.textContent).toContain('Không nối được máy chủ.')
     expect(within(loi).getByRole('button', { name: 'Thử lại' })).toBeTruthy()
-    expect(screen.queryByRole('region', { name: 'Số liệu hôm nay' })).toBeNull()
     expect(container.querySelector('.gvhn-so')).toBeNull()
-    expect(screen.queryByRole('complementary', { name: 'Nhịp theo khối' })).toBeNull()
-    expect(container.querySelectorAll('.gvhn-viec-dong')).toHaveLength(0)
+    expect(screen.queryByRole('complementary', { name: 'Đủ mức tối thiểu hôm nay' })).toBeNull()
+    // chỉ còn đúng dòng báo lỗi trong danh sách việc
+    expect([...container.querySelectorAll('.gvhn-viec-dong')].map((d) => d.getAttribute('data-viec'))).toEqual(['loi'])
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/bai-da-day')).toBe(false)
     await waitFor(() => expect(useSoDemGv.getState()).toMatchObject({ caMo: null, canThayChua: null }))
+  })
+
+  it('lỗi kỹ thuật thô (TypeError của mã) KHÔNG in ra màn — thay bằng câu dễ hiểu; chờ tải là khung xương, không chữ "Đang tải…"', async () => {
+    let tra: (v: unknown) => void = () => {}
+    m.danhSachCa.mockReturnValue(new Promise((r) => (tra = r)))
+    mayChu()
+    const { container } = render(<GvHomNayScreen />)
+    const xuong = screen.getByRole('status', { name: 'Đang tải việc hôm nay' })
+    expect(xuong.querySelectorAll('.tt-xuong').length).toBeGreaterThan(4)
+    expect(container.textContent).not.toMatch(/Đang tải/)
+    tra(undefined) // máy chủ trả thiếu trường ⇒ trước đây "Cannot read properties of undefined (reading 'map')"
+    const loi = await screen.findByRole('alert')
+    expect(loi.textContent).toContain('Chưa tải được danh sách ca kiểm tra')
+    expect(loi.textContent).toContain('Mạng có thể đang chập chờn.')
+    expect(container.textContent).not.toMatch(/Cannot read|undefined|TypeError/)
   })
 
   it('phép tính thuần: cộng nhịp các khối đã đọc được; Cần thầy chữa đếm đúng ba nhóm', () => {

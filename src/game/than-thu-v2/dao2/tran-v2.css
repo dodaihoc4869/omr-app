@@ -133,6 +133,14 @@ html:root body .dh.dh2 .dh2-thao-tac { display:flex; flex-direction:column; gap:
  html:root body .dao.dao2 .dao2-keo { grid-column:2; grid-row:1 / 3; height:100%; }
  html:root body .dao.dao2 .dao2-chan { grid-column:3; grid-row:2; position:static; padding:16px; align-self:start; }
  html:root body .dao.dao2 .dao2-canh { max-height:240px; }
+ /* TRUNG TU 09/10 (bản vẽ HS-LamCau): LÚC LÀM CÂU, chip Trợ giúp/Chưa chắc + nút Chốt nằm NGAY DƯỚI cột câu hỏi (trước: dưới cột trận).
+    Chỉ đổi chỗ bằng lưới, không đổi logic. Hàng 1 = thẻ câu ôm vừa nội dung, câu dài thì co tới phần còn lại rồi tự cuộn; hàng 2 = nút;
+    hàng 3 (minmax(0,1fr)) nhận chỗ thừa — cột trận bắc qua cả 3 hàng nên không đẩy chiều cao hàng nào. Lúc đọc lời giải giữ bố cục cũ. */
+ html:root body .dao.dao2 .dao2-ai[data-pha='lam'] { grid-template-rows:minmax(0,max-content) auto minmax(0,1fr); }
+ html:root body .dao.dao2 .dao2-ai[data-pha='lam'] .dao2-doc { grid-row:1; align-self:stretch; min-height:0; max-height:none; }
+ html:root body .dao.dao2 .dao2-ai[data-pha='lam'] .dao2-ai-trai,html:root body .dao.dao2 .dao2-ai[data-pha='lam'] .dao2-keo { grid-row:1 / -1; }
+ html:root body .dao.dao2 .dao2-ai[data-pha='lam'] .dao2-chan { grid-column:1; grid-row:2; padding:16px 0 0; }
+ html:root body .dao.dao2 .dao2-ai[data-pha='lam'] .dao2-chan-hang button.dao2-nut-chot { flex:1 1 280px; }
  html:root body .dh.dh2 .dh2-tran { display:grid; grid-template-columns:var(--dh2-colonnes); grid-template-rows:auto 1fr; align-items:start; }
  html:root body .dh.dh2 .dh2-tran > .dh2-cot-phai { display:contents; }
  html:root body .dh.dh2 .dh2-doc { grid-column:1; grid-row:1 / 3; overflow-y:auto; max-height:calc(100dvh - 32px); }

@@ -57,17 +57,20 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     expect(document.querySelector('.fixed.inset-0')).toBeNull()
   })
 
-  it('MỌI nút bấm được khớp danh sách hữu hạn: nút tròn tài khoản · "Đã xem cảnh báo" · "Đổi số báo danh" (thanh bên máy tính); menu mở ⇒ đúng MỘT mục', async () => {
+  // SỬA CÓ CHỦ Ý — trung tu 09/10 (thầy duyệt): "Đổi số báo danh" CHỈ còn trong menu Tài khoản (bỏ nút ở thanh bên máy tính và ở màn Thông tin); thanh mục BA liên kết
+  // Hôm nay · Tiến bộ · Ca kiểm tra (bỏ "Lịch sử"/"Lời thầy").
+  it('MỌI nút bấm được khớp danh sách hữu hạn: nút tròn tài khoản · "Đã xem cảnh báo" · "Đổi số báo danh" (CHỈ trong menu Tài khoản); menu mở ⇒ hai mục', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="ca-gan-nhat"]')).toBeTruthy())
     const ten = () => [...container.querySelectorAll('button')].map((b) => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim())
     const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh)$/
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
+    expect(ten()).not.toContain('Đổi số báo danh') // menu chưa mở ⇒ không có ở đâu khác
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(2)
     // SỬA CÓ CHỦ Ý — bản vẽ tối giản thầy chốt 09/10 (thay thứ tự 01/10): BA mục điều hướng là LIÊN KẾT (không phải nút)
-    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Lịch sử', 'Lời thầy'])
+    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Ca kiểm tra'])
   })
 
   it('cảnh báo của thầy hiện ở Hôm nay (thụ động: chỉ "Đã xem cảnh báo", không "Làm ngay")', async () => {
@@ -77,7 +80,7 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     expect(screen.getByRole('button', { name: 'Đã xem cảnh báo' })).toBeTruthy()
   })
 
-  it('"Đổi số báo danh" nằm trong menu nút tròn (đích ≥ 44 px, mục ≥ 48 px theo CSS) cùng số bản app; bấm ⇒ về màn đăng nhập, xoá SBD nhớ', async () => {
+  it('"Đổi số báo danh" nằm trong menu nút tròn (đích ≥ 44 px, mục ≥ 48 px theo CSS) cùng số bản app; bấm ⇒ hộp hỏi lại nói rõ bỏ liên kết riêng ⇒ xác nhận mới về màn đăng nhập, xoá SBD nhớ', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
     expect(container.textContent).not.toMatch(/Bản app|Bản chạy thử/)
@@ -87,6 +90,13 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     expect(container.querySelector('[data-vung="ban-app"]')!.textContent).toBe(chuBanApp())
     fireEvent.click(screen.getByRole('menuitem', { name: 'Đổi số báo danh' }))
+    expect(screen.getByRole('alertdialog', { name: 'Đổi số báo danh?' }).textContent).toContain('liên kết riêng của phụ huynh')
+    fireEvent.click(screen.getByRole('button', { name: 'Ở lại' }))
+    expect(screen.queryByRole('alertdialog')).toBeNull()
+    expect(localStorage.getItem('omr_ph_sbd')).toBe('12121212')
+    fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Đổi số báo danh' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Đổi số báo danh' }))
     await screen.findByRole('button', { name: 'Vào xem kết quả của con' })
     expect(localStorage.getItem('omr_ph_sbd')).toBeNull()
   })

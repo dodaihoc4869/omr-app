@@ -60,9 +60,15 @@ const DS = [
   ])),
   ...[[390,844,'doc'],[844,390,'ngang'],[1440,960,'may-tinh']].flatMap(([w,h,k]) => [
     ...[['hanh-trinh','Hành trình'],['on-lai','Ôn lại'],['cua-em','Của em']].map(([m,chu]) => [`22-hs-${m}-${k}`, 'sanh', w,h,'light',true,/Hôm nay/,`hs:${chu}`]),
-    ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Lịch sử'],['loi-thay','Lời thầy'],['thong-tin','Thông tin và giao diện']].map(([m,chu]) => [`23-ph-${m}-${k}`, 'ph',w,h,'light',true,/Hôm nay/,`ph:${m}:${chu}`]),
+    ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Ca kiểm tra'],['loi-thay','Nhận xét của thầy'],['thong-tin','Thông tin và giao diện']].flatMap(([m,chu]) => ['light','dark'].map((nen) => [`23-ph-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph',w,h,nen,true,/Hôm nay/,`ph:${m}:${chu}`])),
     ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-kho',/Kho đề/],['gv-cai-dat',/Cài đặt/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-go-nut',/Bàn gỡ nút thắt/],['gv-duyet',/Duyệt lời giải/]].map(([m,chu]) => [`24-${m}-${k}`,m,w,h,'light',true,chu]),
+    // trung tu 09/10: app thầy chụp cả nền TỐI (máy tối) cho đủ "sáng + tối"
+    ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-cai-dat',/Cài đặt/],['gv-kho',/Kho đề/]].map(([m,chu]) => [`24-${m}-${k}-toi`,m,w,h,'dark',true,chu]),
   ]),
+  // trung tu 09/10: máy SÁNG nhưng thầy ép nút "Tối" trong Cài đặt (data-giao-dien) — không được nửa sáng nửa tối
+  ['24-gv-hom-nay-ep-toi', 'gv-hom-nay&giao=toi', 1440, 900, 'light', false, /Hôm nay của thầy/],
+  ['24-gv-hoc-sinh-ep-toi', 'gv-hoc-sinh&giao=toi', 1440, 900, 'light', false, /Học sinh/],
+  ['24-gv-mo-ca-ep-sang', 'gv-mo-ca&giao=sang', 1440, 900, 'dark', false, /Mở ca kiểm tra/],
   ['18-gv-ma-tran-de', 'gv-ma-tran', 1440, 700, 'light', false, /Ma trận đề/],
 ]
 
@@ -108,7 +114,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.evaluate(()=>window.scrollTo(0,0))
     } else if (viec === 'dao') {
       await t.getByRole('button', { name: /LÊN ĐƯỜNG|Lên đường/ }).first().click()
-      await t.getByText(/^ẢI 1\//).first().waitFor({ timeout: 20000 })
+      await t.getByText(/^(ẢI|Câu) 1\//).first().waitFor({ timeout: 20000 })
       await t.waitForTimeout(600)
       await t.getByRole('button', { name: /CH₃COOCH₃|CH3COOCH3/ }).first().click()
     } else if (viec === 'doan') {

@@ -1,5 +1,6 @@
 // Màn "Chi tiết một ca kiểm tra" (bản vẽ khổ 2a; `#ca/<mã>`): điểm + ba phần, nhận xét của thầy, đúng bao nhiêu ở từng dạng, câu cần xem lại (bấm "Lời giải" ⇒ đề đủ phương án + lời giải,
 // lệnh sẵn có /ph/chi-tiet-cau-ve-con). Ca CHƯA công bố: chỉ tên ca + câu "chờ thầy công bố" (máy chủ không gửi điểm/đáp án; lớp đọc cũng bỏ nếu lỡ có).
+// Trung tu 09/10: nút quay lại về mục "Ca kiểm tra" (trả đúng chỗ đang cuộn); không còn style viết thẳng — mọi khoảng cách, cỡ chữ ở ph-v3.css theo thang chung.
 import { useEffect, useState } from 'react'
 import { ChemText } from '../../lib/chem-format'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
@@ -30,16 +31,16 @@ export default function ManChiTietCa({ sbd, maCa }: { sbd: string; maCa: string 
   const bc = tt.kieu === 'ok' ? tt.bc : null
   return (
     <div data-vung="man-chi-tiet-ca">
-      <a className="ph3-lui" href="#ca-kiem-tra"><BtTrai co={24} day={2.5} />Lịch sử</a>
+      <a className="ph3-lui tt-nhan" href="#ca-kiem-tra"><BtTrai co={24} day={2.5} />Ca kiểm tra</a>
       <div className="ph3-tieu-de ph3-tieu-de--ca">
         <h1>{bc?.tenCa ?? 'Ca kiểm tra'}</h1>
         {bc?.nopLuc && <span>Ca kiểm tra · {ngayDayDuVn(bc.nopLuc)} · nộp lúc {gioVn(bc.nopLuc)}</span>}
       </div>
-      {tt.kieu === 'tai' && <DangTai chu="Đang mở báo cáo ca kiểm tra…" />}
+      {tt.kieu === 'tai' && <DangTai chu="Đang mở báo cáo ca kiểm tra…" hinh="chi-tiet" />}
       {tt.kieu === 'loi' && <div className="ph3-luoi"><TheLoi chu={tt.chu} thuLai={() => setLan((x) => x + 1)} /></div>}
       {bc && !bc.ketQua && (
         <div className="ph3-luoi">
-          <section className="ph3-the" aria-label="Ca chưa công bố điểm">
+          <section className="ph3-the ph3-o-rong" aria-label="Ca chưa công bố điểm">
             <p className="ph3-cho-cong-bo"><BtKhoa co={20} /><span>{chuCongBoCa(bc)}</span></p>
           </section>
         </div>
@@ -54,10 +55,10 @@ function BaoCao({ sbd, bc }: { sbd: string; bc: BaoCaoCa }) {
   return (
     <div className="ph3-luoi">
       <section className="ph3-ah ph3-o-rong" aria-label="Điểm của con trong ca" data-vung="diem-ca">
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span className="ph3-ah__phu" style={{ fontSize: 14 }}>Điểm của con</span>
-            <span><b className="ph3-ah__diem">{soVn(kq.tong)}</b><span className="ph3-ah__phu" style={{ fontSize: 18, fontWeight: 600 }}> /10</span></span>
+        <div className="ph3-diem-ca__dau">
+          <div className="ph3-diem-ca__so">
+            <span className="ph3-ah__nhan">Điểm của con</span>
+            <span><b className="ph3-ah__diem">{soVn(kq.tong)}</b><span className="ph3-ah__don-vi"> /10</span></span>
           </div>
           {bc.truoc && (
             <span className="ph3-ah__chip" data-mau="xl">
@@ -73,10 +74,10 @@ function BaoCao({ sbd, bc }: { sbd: string; bc: BaoCaoCa }) {
               return (
                 <div key={p.ma}>
                   <div className="ph3-phan-ah__dong">
-                    <span style={{ fontWeight: 600 }}>Phần {p.ma} · {TEN_PHAN[p.ma]}</span>
+                    <span>Phần {p.ma} · {TEN_PHAN[p.ma]}</span>
                     {p.diem !== null && <span><b>{soVn(p.diem)}</b>{p.toiDa ? <small> / {soVn(p.toiDa)} điểm</small> : <small> điểm</small>}</span>}
                   </div>
-                  <span className="ph3-phan-ah__ray"><span style={{ width: `${Math.max(0, Math.min(1, ti)) * 100}%` }} /></span>
+                  <span className="ph3-phan-ah__ray"><span className="tt-thanh" style={{ width: `${Math.max(0, Math.min(1, ti)) * 100}%` }} /></span>
                   <span className="ph3-phan-ah__ghi">
                     {p.ma === 'II' ? `Đúng trọn ${p.dung}/${p.tong} câu${p.motPhan > 0 ? ` · ${p.motPhan} câu đúng một phần` : ''}` : `Đúng ${p.dung}/${p.tong} câu`}
                   </span>
@@ -89,20 +90,20 @@ function BaoCao({ sbd, bc }: { sbd: string; bc: BaoCaoCa }) {
       </section>
 
       {bc.nhanXet && (
-        <The id="ph3-nx" className="ph3-o-hep" vung="nhan-xet-thay" tieuDe="Nhận xét của thầy" phu={`Thầy Đỗ Đại Học${bc.nhanXet.capNhatLuc ? ` · ${ngayDayDuVn(bc.nhanXet.capNhatLuc)}` : ''}`} bieuTuong="ĐH" mau="thay">
-          <p className="ph3-loi-thay">{chuThay(bc.nhanXet.noiDung)}</p>
+        <The id="ph3-nx" className="ph3-the--thay ph3-o-hep" vung="nhan-xet-thay" tieuDe="Nhận xét của thầy" phu={`Thầy Đỗ Đại Học${bc.nhanXet.capNhatLuc ? ` · ${ngayDayDuVn(bc.nhanXet.capNhatLuc)}` : ''}`}>
+          <p className="ph3-the__loi">{chuThay(bc.nhanXet.noiDung)}</p>
         </The>
       )}
 
       {bc.dang.length > 0 && (
-        <The id="ph3-dang-ca" className="ph3-o-hep" tieuDe="Con làm đúng bao nhiêu ở từng dạng" phu="Tính theo câu trong ca này">
+        <The id="ph3-dang-ca" className="ph3-o-du" tieuDe="Con làm đúng bao nhiêu ở từng dạng" phu="Tính theo câu trong ca này">
           <ul className="ph3-dang">
             {bc.dang.map((d, i) => {
               const ti = d.dung / d.tong
               return (
                 <li key={`${d.ten}-${i}`}>
                   <div className="ph3-dang__dong"><span>{d.ten}</span><b>{d.dung}/{d.tong}</b></div>
-                  <span className="ph3-thanh"><span data-mau={ti < 0.5 ? 'ho' : ti < 0.8 ? 'hp' : 'xl'} style={{ width: `${ti * 100}%` }} /></span>
+                  <span className="ph3-thanh"><span className="tt-thanh" data-mau={ti < 0.5 ? 'ho' : ti < 0.8 ? 'hp' : 'xl'} style={{ width: `${ti * 100}%` }} /></span>
                 </li>
               )
             })}
@@ -120,7 +121,7 @@ function CauXemLaiThe({ sbd, ds }: { sbd: string; ds: CauXemLai[] }) {
   const soLau = ds.length - soSai
   const phu = [soSai > 0 ? `${soSai} câu chưa đúng` : '', soLau > 0 ? `${soLau} câu đúng nhưng làm lâu` : ''].filter(Boolean).join(' · ')
   return (
-    <The id="ph3-cau-xem-lai" className="ph3-o-rong" vung="cau-xem-lai" tieuDe="Câu nên xem lại cùng con" phu={phu}>
+    <The id="ph3-cau-xem-lai" className="ph3-o-du" vung="cau-xem-lai" tieuDe="Câu nên xem lại cùng con" phu={phu}>
       <ul className="ph3-cau">
         {ds.map((c) => <DongCau key={`${c.phan}-${c.qid}`} sbd={sbd} c={c} />)}
       </ul>
@@ -148,12 +149,12 @@ function DongCau({ sbd, c }: { sbd: string; c: CauXemLai }) {
           <b>{c.de ? <ChemText text={c.de} /> : `Câu ${c.soCau ?? ''}`}</b>
           <span>{chuKetQuaCau(c)}</span>
         </span>
-        <button type="button" className="ph3-cau__nut" aria-expanded={mo} aria-controls={idVung} onClick={bam}>
+        <button type="button" className="ph3-cau__nut tt-nhan" aria-expanded={mo} aria-controls={idVung} onClick={bam}>
           {mo ? <><BtLenGon co={16} day={2.5} /><span className="ph3-an">Thu gọn</span></> : 'Lời giải'}
         </button>
       </div>
       {mo && (
-        <div id={idVung} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div id={idVung} className="ph3-cau__mo">
           {ct?.kieu === 'tai' && <p className="ph3-ghi" role="status">Đang mở lời giải…</p>}
           {ct?.kieu === 'ok' && <ChiTiet ct={ct.ct} conChon={c.dapAnChon} />}
           {ct?.kieu === 'loi' && (c.loiGiai ? <LoiGiaiNgan chu={c.loiGiai} dapAn="" /> : <p className="ph3-ghi">Chưa mở được lời giải câu này. Anh/chị thử lại sau ít phút.</p>)}

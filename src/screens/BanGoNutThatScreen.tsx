@@ -196,7 +196,7 @@ export default function BanGoNutThatScreen() {
                         {buoi === null ? (
                           <p className="gv2-phu">Đang tải buổi học đang mở…</p>
                         ) : buoi.length === 0 ? (
-                          <p className="gv2-phu">Chưa có buổi học đang mở (mở ở Chữa trên lớp › Điểm danh). Thầy ghi buổi sẽ dạy vào ô dưới.</p>
+                          <p className="gv2-phu">Chưa có buổi học đang mở (mở ở Hành trình › Cần thầy chữa › Buổi chữa › Điểm danh). Thầy ghi buổi sẽ dạy vào ô dưới.</p>
                         ) : (
                           <select id={`gnt-buoi-${n.khoa}`} aria-label="Buổi học sẽ dạy" className="lg-o" value={dangGo.buoiHoc} onChange={(e) => setGo({ ...dangGo, buoiHoc: e.target.value })}>
                             <option value="">Chọn buổi học</option>

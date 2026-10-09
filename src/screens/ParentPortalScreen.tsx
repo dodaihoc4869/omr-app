@@ -119,7 +119,7 @@ export default function ParentPortalScreen() {
   return (
     <div className="m3">
       <div className="ph3">
-        <main className="ph3-vao"><section className="gd-cong-gioi-thieu"><h1>Cùng con nhìn thấy tiến bộ</h1><p>Theo dõi nhịp học, kết quả đã công bố và lời thầy trong một nơi.</p></section>
+        <main className="ph3-vao"><section className="gd-cong-gioi-thieu"><h1>Cùng con nhìn thấy tiến bộ</h1><p>Theo dõi nhịp học, kết quả đã công bố và nhận xét của thầy trong một nơi.</p></section>
           <div className="ph3-vao__the">
             <LogoDoc vai="ph" size={48} tieuDe />
             <LoiChao vai="ph" />

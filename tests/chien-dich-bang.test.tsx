@@ -72,7 +72,8 @@ describe('bảng chiến dịch (bản vẽ GV-BangChienDich 28/09)', () => {
       />,
     )
     expect(screen.getByRole('heading', { name: 'Ester – Lipid · 12A1' })).toBeTruthy()
-    expect(container.textContent).toContain('Chữa trên lớp › Bảng chiến dịch')
+    // SỬA CÓ CHỦ Ý 09/10 (trung tu giao diện thầy duyệt): mục "Chữa trên lớp" đã gộp vào Hành trình › Cần thầy chữa ⇒ đường dẫn theo bảng từ chuẩn.
+    expect(container.textContent).toContain('Cần thầy chữa › Bảng chiến dịch')
     expect(container.textContent).toContain('hạn nộp 23:59 · Chủ Nhật 04/10/2026 (còn 1 ngày 5 giờ)')
     const so = (k: string) => container.querySelector(`[data-so="${k}"]`)?.textContent
     expect(so('da-lam-qua')).toBe('93% câu')

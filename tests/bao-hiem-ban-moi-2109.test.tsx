@@ -473,7 +473,10 @@ describe('số bản ở cuối menu ba chấm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     const menu = container.querySelector('[role="menu"]') as HTMLElement
     expect((menu.querySelector('[data-vung="ban-app"]') as HTMLElement).textContent).toBe(chuBanApp())
-    expect((menu.querySelector('[role="menuitem"]') as HTMLElement).textContent).toBe('Đổi số báo danh')
+    // SỬA CÓ CHỦ Ý (trung tu 09/10, làn phụ huynh): menu nay có HAI mục "Thông tin và giao diện" · "Đổi số báo danh" (mục đầu thêm từ bộ giao diện đầy đủ 09/10);
+    // điều khoá vẫn giữ: số bản ở cuối menu, ngay dưới "Đổi số báo danh".
+    expect([...menu.querySelectorAll('[role="menuitem"]')].map((x) => x.textContent)).toEqual(['Thông tin và giao diện', 'Đổi số báo danh'])
+    expect(menu.lastElementChild!.getAttribute('data-vung')).toBe('ban-app')
   })
 
   it('cổng học sinh và phụ huynh dùng CHUNG một DauTrang ⇒ một chỗ sửa (khoá nguồn); chữ tiếng Việt, số có nhãn "Bản app"', () => {

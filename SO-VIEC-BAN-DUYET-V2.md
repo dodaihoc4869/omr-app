@@ -51,3 +51,18 @@ Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Th
 Thầy nhắn (nguyên văn): "đẩy luôn giao diện mới lên đi bạn ơi" · "làm tiếp xong hết đẩy lên máy chủ luôn nhé"
 - [x] Gộp main mới (PR217 Hành trình v6 + ab898ce) | bằng chứng: fbe1d58, cadfc89; nút "Làm bài kiểm đầu/tuần" của main đưa vào Sảnh mới (test mới trong `ban-duyet-v2-0910`).
 - [x] Kiểm toàn bộ trước phát hành | bằng chứng: bảng "Kiểm bản phát hành" trong `BAN-DUYET-V2-build-status.md`.
+
+## Đợt 3 — TRUNG TU giao diện 3 app (09/10)
+
+Thầy nhắn (nguyên văn): "bạn hãy quet toàn bộ giao diện app hiện tại và trung tu lại giao diện siêu đẹp, mịn, khoa học đúng cấu trúc của code hiện tại, vẽ cho tôi trước khi build nhé"
+- [x] Quét toàn bộ giao diện app hiện tại (HS · PH · GV) | bằng chứng: 3 agent rà mã chỉ đọc trên main 6842acc (bản sống PR221) + 79 ảnh Chromium `scripts/chup-v2`; số đo: HS 31 mức bo góc/40 cỡ chữ/14 kiểu bóng, PH 19/24/~8 kiểu nút, GV 24/~30/10+ họ nút, GV chạy 2 bảng màu (lam/ngọc), tối nửa màn.
+- [x] Vẽ bản trung tu (siêu đẹp, mịn, khoa học, đúng cấu trúc code hiện tại) cho thầy xem | bằng chứng: canvas https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8 — 24 khung: tổng hợp + bộ khung chung + 11 cặp hiện tại↔trung tu (HS 5, PH 3, GV 3), giữ nguyên màu.
+- [!] CHƯA BUILD — chờ thầy chốt bản vẽ + 3 câu hỏi (PH 3 hay 4 mục; GV lấy lam làm màu gốc; thanh bên GV 5 mục) | KẸT: chờ thầy.
+
+Thầy nhắn (nguyên văn, 2 lần): "buid luôn và đẩy luôn nhé" — coi bản vẽ được duyệt nguyên trạng; 3 câu hỏi lấy đúng phương án bản vẽ: PH 3 mục · GV một bảng lam · thanh bên GV 5 mục + Cài đặt.
+- [x] Thang chung `src/styles/thang.css` (chỉ kích thước + chuyển động) | bằng chứng: 9f2ec7a (nạp ngay sau tokens.css ở main.tsx; check:mau đạt, tsc 0 lỗi). 3 làn HS · PH · GV đang build song song trên worktree riêng.
+- [x] Build HS theo bản vẽ (Hôm nay · Hành trình · Ôn lại · Của em · Làm câu) | bằng chứng: ade11921 (gộp c8e8590); ảnh scratchpad/hs-lan/anh-moi (0 tràn, 0 chạm <44). Chưa làm: dời nút Chốt của Đoàn (cột thao tác chật).
+- [x] Build PH theo bản vẽ (3 mục · Hôm nay · Tiến bộ · Ca kiểm tra · Đổi SBD có hỏi lại · tối) | bằng chứng: 19ce9f62 (gộp 18e7694); ảnh scratchpad/ph-lan/anh. Chưa gỡ 64 luật CSS chết mang màu (cổng giữ màu tính là xoá màu).
+- [x] Build GV theo bản vẽ (5 mục + Cài đặt · một bảng lam · Hôm nay · Học sinh · Mở ca · tối theo nút) | bằng chứng: dc206394 + 6c47a415 (gộp bd54f6d); ảnh scratchpad/anh-gv. Ghi chú: chế độ 2.0 vốn đã 5 mục (ảnh '9 mục' trước là do trang chụp chưa bật cờ).
+- [x] Kiểm toàn bộ (tsc, vitest so nền main, cổng màu/giao diện, build:cf, ảnh) | bằng chứng: tsc 0 · server tsc 0 · check:mau đạt · kiem:mau-giu 0 · soi:giao-dien 0 lỗi · build:cf SW 13/13, 2994 KB (4886a6d: 3 mảnh chỉ của thầy ra kho chạy-lúc, gộp 3 làn đã đẩy lên 3003 KB) · full vitest 152 đỏ vs main a89b697 151 — 1 khác = test đo tốc độ btvn-nang-do 'dưới 200 ms', chạy riêng đạt · D1 20:37: 0 ca mở / 0 lượt.
+- [ ] Đẩy: kiểm ca mở → PR → main → Actions | bằng chứng: (chưa có)
