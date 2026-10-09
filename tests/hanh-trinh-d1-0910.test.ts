@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it } from 'vitest'
-import { dongBoBaHanhTrinh, idHanhTrinh, KHOA_HANH_TRINH, ungVienHanhTrinh } from '../server/src/hanh-trinh-hop-nhat'
+import { dongBoBaHanhTrinh, idHanhTrinh, KHOA_HANH_TRINH, ungVienHanhTrinh, khoCauTheoKhoi } from '../server/src/hanh-trinh-hop-nhat'
 import { layKeHoachHomNay, sanh2, xoaDemChienDich } from '../server/src/srs2-d1'
 import { taoKhoOmni, themChienDich, lam, T_SANG, HOM_NAY } from './omni-3-ke-hoach-chung'
 import { gvOmni } from '../server/src/omni-gv'
@@ -14,6 +14,15 @@ const kho = (soCau = 100) => {
 }
 afterEach(() => xoaDemChienDich())
 describe('Hành trình 3 khối: gộp, tự nhận kho mới, chốt ngày', () => {
+  it('giữ nguồn khối trong JSON khi cột lớp trống; hai nguồn mâu thuẫn thì loại', () => {
+    const k=kho()
+    const src=k.d.sql.prepare("SELECT * FROM game_v2_question WHERE qid='DH-B1-0'").get() as Record<string,unknown>
+    const json=JSON.stringify({...JSON.parse(String(src.json)),lop:'12'})
+    expect(khoCauTheoKhoi([{...src,json,lop:null}]).get(12)!.qids.has('DH-B1-0')).toBe(true)
+    const conflict=khoCauTheoKhoi([{...src,json,lop:'10'}])
+    expect([...conflict.values()].every(q=>q.qids.size===0)).toBe(true)
+    k.d.sql.close()
+  })
   it('bảng OMNI cũ không replay kho cả khối khi một app cũ hỏi hành trình', async () => {
     const k=kho()
     const before=k.d.soLenh.prepare
@@ -122,6 +131,28 @@ describe('Hành trình 3 khối: gộp, tự nhận kho mới, chốt ngày', ()
     expect(a.kh).toEqual(b.kh)
     expect(a.kh.tong).toBe(24)
     expect(k.d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').get('S1',HOM_NAY)).toEqual({n:1})
+    k.d.sql.close()
+  })
+  it('đã làm hết kho ít câu ⇒ nội dung mới tự lấp sàn ngay trong ngày, không chờ chặng đủ 6', async () => {
+    const k=kho(5)
+    await dongBoBaHanhTrinh(k.env,T_SANG)
+    const first=await layKeHoachHomNay(k.env,'S1',T_SANG)
+    expect(first.kh.hanhTrinh).toMatchObject({toiThieu:24,daXep:5,conThieu:19})
+    for(const q of first.kh.dao)await lam(k.env,'S1',q,T_SANG+60000,true)
+    const empty=await layKeHoachHomNay(k.env,'S1',T_SANG+120000)
+    expect(empty.kh.conDao).toHaveLength(0)
+    const src=k.d.sql.prepare("SELECT * FROM game_v2_question WHERE qid='DH-B1-0'").get() as Record<string,unknown>
+    for(let i=0;i<24;i++) {
+      const qid=`DH-B1-them-${i}`,group=`them-${i}`
+      k.d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
+        .run('DH-B1',qid,src.version,group,src.dang,JSON.stringify({...JSON.parse(String(src.json)),qid,group,text:`Nội dung mới ${i}`}))
+      k.d.sql.prepare("INSERT INTO cau_hoi(qid,ma_de,lop,cap_nhat_luc) VALUES(?,'DH-B1','12','x')").run(qid)
+    }
+    await dongBoBaHanhTrinh(k.env,T_SANG+6*60000)
+    const more=await layKeHoachHomNay(k.env,'S1',T_SANG+7*60000)
+    expect(more.kh.hanhTrinh).toMatchObject({toiThieu:24,daLam:5,daXep:24,conThieu:0})
+    expect(more.kh.conDao).toHaveLength(19)
+    expect(more.kh.conDao.some(q=>first.kh.dao.includes(q))).toBe(false)
     k.d.sql.close()
   })
   it('kho bổ sung tự nhận vào đúng khối, loại tự luận', async () => {
