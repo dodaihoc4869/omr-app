@@ -14,11 +14,14 @@ const kho = (soCau = 100) => {
 afterEach(() => xoaDemChienDich())
 describe('Hành trình 3 khối: gộp, tự nhận kho mới, chốt ngày', () => {
   it('quét nhiều trang không bỏ câu; ứng viên mỗi em có giới hạn và xoay khác nhau', async () => {
-    const k=kho(600)
+    const k=kho(15359)
+    for (let i=0;i<8;i++) themChienDich(k.d,{id:`nguon-them-${i}`,maDe:['DH-B1'],qids:k.qids('DH-B1').slice(0,24),sbd:['S1'],taoLuc:'2026-10-01T02:00:00Z',hanNop:'2026-10-09'})
+    const before=k.d.soLenh.prepare
     await dongBoBaHanhTrinh(k.env,T_SANG)
+    expect(k.d.soLenh.prepare-before).toBeLessThanOrEqual(40)
     const r=k.d.sql.prepare('SELECT qid_json FROM chien_dich WHERE id=?').get(idHanhTrinh(12)) as {qid_json:string}
     const qids=JSON.parse(r.qid_json) as string[]
-    expect(qids).toHaveLength(600)
+    expect(qids).toHaveLength(15359)
     const a=await ungVienHanhTrinh(k.env,idHanhTrinh(12),'S1',HOM_NAY,qids)
     const b=await ungVienHanhTrinh(k.env,idHanhTrinh(12),'S2',HOM_NAY,qids)
     expect(a).toHaveLength(96)

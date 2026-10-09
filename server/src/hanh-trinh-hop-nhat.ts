@@ -37,7 +37,8 @@ export function khoCauTheoKhoi(rows: readonly Row[]): Map<Khoi, { qids: Set<stri
   return ra
 }
 
-/** Quét theo khoá chính, mỗi đợt 250 câu; không tải toàn bộ JSON kho vào một phản hồi D1/bộ nhớ Worker. */
+/** Quét theo khoá chính, mỗi đợt 1000 câu; kho 15 nghìn câu cần khoảng 16 lượt đọc,
+ * còn ngân sách cho các việc cron khác trong giới hạn truy vấn D1. Không tải toàn bộ JSON một lần. */
 async function docKhoHanhTrinh(env: Env) {
   const theoKhoi = khoCauTheoKhoi([])
   const tang = new Map<Khoi, Record<string, string[]>>([10,11,12].map(k => [k as Khoi,{1:[],2:[],3:[],4:[]}]))
@@ -45,7 +46,7 @@ async function docKhoHanhTrinh(env: Env) {
   for (;;) {
     const page = await env.DB.prepare(`SELECT g.qid,g.ma_de,g.json,c.lop FROM game_v2_question g
       LEFT JOIN cau_hoi c ON c.qid=g.qid AND c.ma_de=g.ma_de
-      WHERE (g.ma_de,g.qid) > (?,?) ORDER BY g.ma_de,g.qid LIMIT 250`).bind(maDe,qid).all<Row>()
+      WHERE (g.ma_de,g.qid) > (?,?) ORDER BY g.ma_de,g.qid LIMIT 1000`).bind(maDe,qid).all<Row>()
     const rows = page.results ?? []
     if (!rows.length) break
     const ds = khoCauTheoKhoi(rows)
@@ -102,20 +103,28 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
   const moc = (cd.results ?? []).map(r => String(r.tao_luc)).filter(Boolean).sort()[0] ?? luc
   for (const k of [10, 11, 12] as const) {
     const id = idHanhTrinh(k), qs = theoKhoi.get(k)!, sbds = em.get(k)!
-    lenh.push(env.DB.prepare(`INSERT OR IGNORE INTO chien_dich(id,ten,lop,sbd_json,ma_de_json,qid_json,han_nop,the_luc_ngay,huyet_chien,ma_ca,tao_luc,trang_thai)
-      VALUES(?,?,?,?,?,?,'9999-12-31',36,0,NULL,?,'dang_chay')`)
+    lenh.push(env.DB.prepare(`INSERT INTO chien_dich(id,ten,lop,sbd_json,ma_de_json,qid_json,han_nop,the_luc_ngay,huyet_chien,ma_ca,tao_luc,trang_thai)
+      VALUES(?,?,?,?,?,?,'9999-12-31',36,0,NULL,?,'dang_chay')
+      ON CONFLICT(id) DO UPDATE SET sbd_json=excluded.sbd_json,ma_de_json=excluded.ma_de_json,qid_json=excluded.qid_json,
+        han_nop=excluded.han_nop,the_luc_ngay=excluded.the_luc_ngay,huyet_chien=excluded.huyet_chien
+      WHERE chien_dich.trang_thai='dang_chay'`)
       .bind(id, `Hành trình giỏi hoá · Khối ${k}`, `Khối ${k}`, JSON.stringify([...sbds].sort()), JSON.stringify([...qs.maDe].sort()), JSON.stringify([...qs.qids].sort()), moc))
-    lenh.push(env.DB.prepare(`UPDATE chien_dich SET sbd_json=?,ma_de_json=?,qid_json=?,han_nop='9999-12-31',the_luc_ngay=36,huyet_chien=0
-      WHERE id=? AND trang_thai='dang_chay'`).bind(JSON.stringify([...sbds].sort()), JSON.stringify([...qs.maDe].sort()), JSON.stringify([...qs.qids].sort()), id))
     lenh.push(env.DB.prepare(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,?) ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc`)
       .bind(`hanh_trinh_v3_kho_${k}`, JSON.stringify(kho.tang.get(k)), luc))
   }
   // Đóng nguồn, không xoá: bảng cũ tiếp tục phục vụ báo cáo và lịch sử.
-  for (const r of nguon.filter(r => r.trang_thai === 'dang_chay')) {
-    lenh.push(env.DB.prepare(`INSERT INTO hanh_trinh_v3_chot(id,ok) SELECT ?,CASE WHEN EXISTS(SELECT 1 FROM chien_dich WHERE id=? AND trang_thai='dang_chay' AND sbd_json IS ? AND qid_json IS ? AND tao_luc IS ?) THEN 1 ELSE 0 END`)
-      .bind(crypto.randomUUID(), r.id, r.sbd_json, r.qid_json, r.tao_luc))
-    lenh.push(env.DB.prepare('INSERT OR IGNORE INTO hanh_trinh_v3_nguon(id,noi_dung_json,hop_nhat_luc) VALUES(?,?,?)').bind(r.id, JSON.stringify(r), luc))
-    lenh.push(env.DB.prepare("UPDATE chien_dich SET trang_thai='da_dong',dong_luc=? WHERE id=?").bind(luc, r.id))
+  const nguonDangChay = nguon.filter(r => r.trang_thai === 'dang_chay')
+  if (nguonDangChay.length) {
+    const jsonNguon = JSON.stringify(nguonDangChay)
+    lenh.push(env.DB.prepare(`INSERT INTO hanh_trinh_v3_chot(id,ok) SELECT ?,CASE WHEN NOT EXISTS(
+      SELECT 1 FROM json_each(?) n LEFT JOIN chien_dich c ON c.id=json_extract(n.value,'$.id')
+      WHERE c.id IS NULL OR c.trang_thai <> 'dang_chay' OR c.sbd_json IS NOT json_extract(n.value,'$.sbd_json')
+      OR c.qid_json IS NOT json_extract(n.value,'$.qid_json') OR c.tao_luc IS NOT json_extract(n.value,'$.tao_luc')
+    ) THEN 1 ELSE 0 END`).bind(crypto.randomUUID(),jsonNguon))
+    lenh.push(env.DB.prepare(`INSERT OR IGNORE INTO hanh_trinh_v3_nguon(id,noi_dung_json,hop_nhat_luc)
+      SELECT json_extract(value,'$.id'),value,? FROM json_each(?)`).bind(luc,jsonNguon))
+    lenh.push(env.DB.prepare(`UPDATE chien_dich SET trang_thai='da_dong',dong_luc=?
+      WHERE id IN (SELECT json_extract(value,'$.id') FROM json_each(?))`).bind(luc,jsonNguon))
   }
   if (!marker) {
     // Bật OMNI + Game 2 cho ba khối khi chuyển sang hành trình, giữ nguyên mã bảo mật.
