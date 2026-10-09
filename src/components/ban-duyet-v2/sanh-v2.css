@@ -408,7 +408,7 @@ html:root body .v2 .h2-sanh.v2s-nhung:empty { display: none; }
  .v2-sanh .v2s-anh-hung { min-height:0; padding:16px; }
  .v2-sanh .v2s-thu { width:100px; height:100px; }
  .v2-sanh .v2s-so-lon { font-size:38px; }
- .v2-sanh .v2s-thanh-duoi { position:fixed; inset:auto 0 0; width:100%; }
+ .v2-sanh .v2s-thanh-duoi { position:fixed; inset:auto 0 0; width:100%; transform:none; }
 }
 .v2-sanh .v2s-tien-do { display:grid; grid-template-columns:minmax(0,1fr) 100px; padding:20px; border-radius:28px; background:var(--v2-the); box-shadow:var(--v2-bong-the); }
 .v2-sanh .v2s-tien-do-chu { display:contents; }

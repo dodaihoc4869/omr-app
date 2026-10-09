@@ -79,7 +79,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   t.on('console', (msg) => { if (msg.type() === 'error' && !/Failed to load resource/.test(msg.text())) loiTrang.push(`${ten}: console ${msg.text().slice(0, 200)}`) })
   await t.goto(`${trangGoc}?man=${m}`)
   try {
-    await t.getByText(cho).first().waitFor({ timeout: 20000 })
+    if (m.startsWith('gv-')) {
+      await t.getByRole('heading', { name:m === 'gv-kho' ? /Kho đề|Ngân hàng câu hỏi/ : cho }).first().waitFor({ timeout:20000 })
+    } else await t.getByText(cho).first().waitFor({ timeout: 20000 })
   } catch {
     loiTrang.push(`${ten}: không thấy chữ ${cho}`)
   }
