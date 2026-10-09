@@ -22,7 +22,7 @@
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 20px; border: 0; border-radius: 14px;
   background: var(--gvm-xd); color: var(--gvm-tren-dac); font-weight: 700; font-size: 15px; box-shadow: var(--gvm-bong-nut); cursor: pointer;
 }
-.gvv2-nut-vien { min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); color: var(--gvm-xd); font-weight: 700; cursor: pointer; }
+.gvv2-nut-vien { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); color: var(--gvm-xd); font-weight: 700; cursor: pointer; }
 .gvv2-tab { display: flex; gap: 6px; border-bottom: 1px solid var(--gvm-vien); overflow-x: auto; }
 .gvv2-tab-nut {
   min-height: 48px; padding: 0 16px; border: 0; border-bottom: 3px solid transparent; background: none; color: var(--gvm-chu-2);
@@ -98,3 +98,20 @@
   .gvv2-khoi-nut { flex: 1 1 30%; padding: 6px 8px; }
   .gvv2-kpi { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* BẢN VẼ TỐI GIẢN 09/10: thẻ con (Cần thầy chữa: Buổi chữa · Bước cuối trên lớp · Gỡ nút thắt; Bài đã dạy: Dạy học · Kiểm tra đầu giờ),
+ * màn sẵn có nhúng trong thẻ (bỏ đệm + chiều cao cả màn của khung `gv2-trang` để không lồng hai lớp đệm), thẻ Chiến dịch đã giao. */
+.gvv2-o-the { min-width: 0; }
+.gvv2-the-con { display: grid; gap: 12px; min-width: 0; }
+.gvv2-con { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; width: fit-content; max-width: 100%; border-radius: 999px; background: var(--gvm-mat-2); }
+.gvv2-con-nut {
+  min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: none; color: var(--gvm-chu-2);
+  font: inherit; font-family: var(--sans); font-size: 15px; font-weight: 700; cursor: pointer; touch-action: manipulation; white-space: nowrap;
+}
+.gvv2-con-nut[aria-selected='true'] { background: var(--gvm-mat); color: var(--gvm-xd-dam); box-shadow: var(--gvm-bong); }
+.gvv2-con-nut:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
+.gvv2-nhung { min-width: 0; }
+.gvv2-nhung .gv2-trang { min-height: 0; padding: 0; }
+.gvv2-chien-dich { display: grid; gap: 16px; min-width: 0; }
+.gvv2-dong-nut { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+@media (max-width: 600px) { .gvv2-con { border-radius: 18px; } .gvv2-con-nut { flex: 1 1 auto; } }

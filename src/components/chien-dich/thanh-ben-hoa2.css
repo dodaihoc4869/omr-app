@@ -34,3 +34,39 @@
     font-size: 14px;
   }
 }
+
+/* 09/10 (bản vẽ tối giản thầy chốt): nút "Mở ca kiểm tra" rời thanh bên, nằm ở góc phải đầu màn Ca kiểm tra (App.tsx bọc màn khi cờ 2.0 bật).
+ * Chỉ ≥ 880 px — điện thoại dùng nút nổi "Mở ca" của thanh đáy (chỉ hiện ở màn này). Màu = bảng --gvm-* sẵn có của app thầy. */
+.ca-hoa2-khung {
+  position: relative;
+}
+.ca-hoa2-mo-ca {
+  display: none;
+}
+@media (min-width: 880px) {
+  .ca-hoa2-mo-ca {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--gvm-xd);
+    color: var(--gvm-tren-dac);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: var(--gvm-bong-nut);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .ca-hoa2-mo-ca:focus-visible {
+    outline: 3px solid var(--gvm-xd);
+    outline-offset: 2px;
+  }
+}

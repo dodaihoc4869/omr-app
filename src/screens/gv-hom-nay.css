@@ -1,0 +1,48 @@
+/* HÔM NAY CỦA THẦY (bản vẽ tối giản thầy chốt 09/10 · GV-HomNay.dc.html). Chỉ bảng --gvm-* sẵn có của app thầy (tokens.css, có sáng/tối);
+ * không màu thô. Khung chữ, thẻ, nút, thanh dùng lại lớp `gvv2-*` của màn Hành trình (src/components/chien-dich/gv-v2.css). */
+.gvhn { color: var(--gvm-chu); font-family: var(--sans); }
+.gvhn-dau { display: grid; gap: 4px; }
+
+/* bốn ô số: nhãn trên, số lớn + đơn vị — màu theo NGHĨA (xanh lá đủ mức · hồng chưa làm · hổ phách cần chữa · xanh lam ca mở) */
+.gvhn-so-ds { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.gvhn-so { display: grid; gap: 4px; padding: 16px 18px; border-radius: 18px; min-width: 0; }
+.gvhn-so[data-mau='xl'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.gvhn-so[data-mau='ho'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.gvhn-so[data-mau='hp'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.gvhn-so[data-mau='xd'] { background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
+.gvhn-so-nhan { font-size: 14px; font-weight: 700; }
+.gvhn-so b { font-size: 30px; font-weight: 800; line-height: 1.1; }
+.gvhn-so small { font-size: 18px; font-weight: 700; }
+
+/* việc cần thầy + nhịp theo khối */
+.gvhn-luoi { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 360px); gap: 20px; align-items: start; }
+.gvhn-viec { min-width: 0; }
+.gvhn-viec > .gvv2-h2 { padding: 18px 20px 6px; }
+.gvhn-viec-ds { list-style: none; margin: 0; padding: 0; }
+.gvhn-viec-dong { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-top: 1px solid var(--gvm-vien); }
+.gvhn-viec-dong:first-child { border-top: 0; }
+.gvhn-dau-o { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; }
+.gvhn-dau-o[data-mau='xd'] { background: var(--gvm-xd-nen); color: var(--gvm-xd); }
+.gvhn-dau-o[data-mau='hp'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.gvhn-dau-o[data-mau='tim'] { background: var(--gvm-tim-nen); color: var(--gvm-tim); }
+.gvhn-dau-o[data-mau='ho'] { background: var(--gvm-ho-nen); color: var(--gvm-ho); }
+.gvhn-dau-o[data-mau='xl'] { background: var(--gvm-xl-nen); color: var(--gvm-xl); }
+.gvhn-viec-chu { flex: 1 1 auto; min-width: 0; display: grid; gap: 3px; }
+.gvhn-viec-chu b { font-size: 16px; color: var(--gvm-chu); overflow-wrap: anywhere; }
+.gvhn-viec-chu span { font-size: 14px; color: var(--gvm-chu-2); overflow-wrap: anywhere; }
+.gvhn-viec-dong > button { flex: none; touch-action: manipulation; }
+.gvhn-khoi { padding: 18px 20px; display: grid; gap: 4px; }
+.gvhn-khoi-dong { display: grid; gap: 6px; padding: 12px 0; border-top: 1px solid var(--gvm-vien); }
+.gvhn-khoi-dong:first-of-type { border-top: 0; }
+.gvhn-khoi-chu { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
+.gvhn-khoi-chu span { color: var(--gvm-chu-2); }
+
+@media (max-width: 1100px) { .gvhn-luoi { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) {
+  .gvhn-so-ds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gvhn-so b { font-size: 26px; }
+  .gvhn-viec-dong { flex-wrap: wrap; gap: 12px; padding: 14px 16px; }
+  /* biểu tượng + chữ cùng một hàng, nút xuống hàng dưới, rộng hết thẻ */
+  .gvhn-viec-chu { flex: 1 1 0; }
+  .gvhn-viec-dong > button { flex: 1 0 100%; }
+}

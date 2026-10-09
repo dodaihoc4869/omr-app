@@ -2,6 +2,7 @@ import BatLinhShell from './components/bat-linh/BatLinhShell'
 import './styles/teacher-layout.css'
 import './styles/vo-thay.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
+import { Plus } from 'lucide-react'
 import BottomNav from './components/BottomNav'
 import ThanhBenTrai, { MAN_AN_KHI_HOA2, MAN_CHI_HOA2, MAN_DAU_HOA2 } from './components/ThanhBenTrai'
 import { chonBat, useCoHoa2 } from './components/chien-dich/co-hoa2'
@@ -89,8 +90,10 @@ const GiaoBtvnScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 const CaiDatScreen = lazy(() => import('./screens/CaiDatScreen'))
 const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen'))
-// GAME HÓA 2.0 (bản vẽ docs/ban-ve-gv-2809): trang đầu Tổng quan + màn riêng Chiến dịch luyện — chỉ vào được khi cờ bật.
-const TongQuanScreen = lazy(() => import('./screens/TongQuanScreen'))
+// GAME HÓA 2.0 — chỉ vào được khi cờ bật. BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10: mã màn `tongquan` dựng màn "Hôm nay" (`GvHomNayScreen`, việc cần
+// thầy theo độ gấp), mã màn `chiendich` là "Hành trình" (ChienDichScreen). `TongQuanScreen` (trang đầu 28/09) GIỮ MÃ trong repo nhưng App không
+// còn dựng — mọi `setScreen('tongquan')` cũ nay mở Hôm nay.
+const GvHomNayScreen = lazy(() => import('./screens/GvHomNayScreen'))
 const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 const DuyetLoiGiaiScreen = lazy(() => import('./screens/DuyetLoiGiaiScreen'))
 const BanGoNutThatScreen = lazy(() => import('./screens/BanGoNutThatScreen'))
@@ -134,8 +137,9 @@ const TEN_MAN: Record<string, string> = {
   remotetochieu: 'Điều khiển máy chiếu',
 }
 
-/** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
-const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Chữa trên lớp', nganhangde: 'Kho đề' }
+/** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề".
+ *  09/10 (bản vẽ tối giản thầy chốt): `tongquan` → "Hôm nay", `chiendich` → "Hành trình". */
+const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Chữa trên lớp', nganhangde: 'Kho đề', tongquan: 'Hôm nay', chiendich: 'Hành trình' }
 
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
@@ -187,8 +191,8 @@ function App() {
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
 
-  // GAME HÓA 2.0 (cờ máy chủ `/gv/chien-dich` co-doc): app thầy = Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh
-  // (+ Kho đề, Cài đặt ở đáy) — bản vẽ docs/ban-ve-gv-2809.
+  // GAME HÓA 2.0 (cờ máy chủ `/gv/chien-dich` co-doc): app thầy = Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề (+ Cài đặt ở đáy)
+  // — bản vẽ tối giản thầy chốt 09/10 (trước đó: docs/ban-ve-gv-2809).
   // Chỉ đọc cờ ở app thầy ĐÃ MỞ KHOÁ — máy em, phụ huynh, link thi/phiếu không gọi lệnh thầy. Cờ tắt ⇒ app như cũ.
   const hoa2 = useCoHoa2(chonBat)
   const docCoHoa2 = useCoHoa2((s) => s.doc)
@@ -200,8 +204,8 @@ function App() {
   useEffect(() => {
     if (laVoThay) void import('./lib/dong-bo-thu-muc').then((m) => m.dongBoThuMucKho()).catch(() => {})
   }, [laVoThay])
-  // Màn đã bỏ khi 2.0 bật (Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về Tổng quan, không dựng màn cũ lấy một nhịp.
-  // Ngược lại: cờ TẮT mà đang ở màn chỉ 2.0 mới có (Tổng quan, Chiến dịch luyện) ⇒ về Hôm nay như app cũ.
+  // Màn đã bỏ khi 2.0 bật (Kiên trì `examhub`, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về màn đầu 2.0 (Hôm nay), không dựng màn cũ lấy một nhịp.
+  // Ngược lại: cờ TẮT mà đang ở màn chỉ 2.0 mới có (Hôm nay 2.0 `tongquan`, Hành trình `chiendich`) ⇒ về Hôm nay của app cũ.
   const anKhiHoa2 = laVoThay && ((hoa2 && MAN_AN_KHI_HOA2.includes(screen)) || (!hoa2 && MAN_CHI_HOA2.includes(screen)))
   useEffect(() => {
     if (anKhiHoa2) setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')
@@ -436,7 +440,20 @@ function App() {
         {screen === 'nganhangde' && <NganHangDeScreen />}
         {screen === 'examtake' && <ExamTakeScreen />}
         {screen === 'exammonitor' && <ExamMonitorScreen />}
-        {screen === 'lichsuca' && <LichSuCaScreen />}
+        {screen === 'lichsuca' &&
+          (hoa2 ? (
+            // 09/10 (bản vẽ tối giản thầy chốt): thanh bên bỏ nút riêng "Mở ca kiểm tra" — mở ca nằm TRONG màn Ca kiểm tra: nút ở góc phải đầu màn
+            // (≥ 880 px; điện thoại dùng nút nổi "Mở ca" của thanh đáy, chỉ hiện ở màn này). Đường vào ca không bao giờ bỏ (luật C-RÀO).
+            <div className="ca-hoa2-khung">
+              <button type="button" className="ca-hoa2-mo-ca" onClick={() => setScreen('examsetup')}>
+                <Plus size={20} aria-hidden="true" />
+                Mở ca kiểm tra
+              </button>
+              <LichSuCaScreen />
+            </div>
+          ) : (
+            <LichSuCaScreen />
+          ))}
         {screen === 'hocsinh' && <HocSinhScreen />}
         {screen === 'toancanh' && <ToanCanhEmScreen />}
         {screen === 'giaobtvn' && <GiaoBtvnScreen />}
@@ -444,7 +461,7 @@ function App() {
         {screen === 'cauhoi' && <CauHoiScreen />}
         {screen === 'caidat' && <CaiDatScreen />}
         {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
-        {screen === 'tongquan' && <TongQuanScreen />}
+        {screen === 'tongquan' && <GvHomNayScreen />}
         {screen === 'chiendich' && <ChienDichScreen />}
         {screen === 'duyetloigiai' && <DuyetLoiGiaiScreen />}
         {screen === 'bangonutthat' && <BanGoNutThatScreen />}

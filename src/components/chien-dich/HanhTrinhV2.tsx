@@ -1,41 +1,42 @@
-// BẢN DUYỆT V2 · MÀN 14 — "HÀNH TRÌNH GIỎI HÓA" của thầy (thầy ra lệnh 09/10/2026). Ba thẻ: Tổng quan (danh sách + giao chiến dịch như cũ) ·
-// Nhịp hôm nay (bảng từng em) · Cần chữa (điểm danh + buổi chữa ở mục Chữa trên lớp). Khối 10/11/12 lấy từ ba hành trình đang chạy.
+// BẢN DUYỆT V2 · MÀN 14 — "HÀNH TRÌNH GIỎI HÓA" của thầy (thầy ra lệnh 09/10/2026). Khối 10/11/12 lấy từ ba hành trình đang chạy.
+// BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (GV-HanhTrinh + BoGop): Hành trình là MỘT mục thay cho Chiến dịch luyện · Chữa trên lớp · Gỡ nút thắt. Bốn thẻ:
+//   · Nhịp hôm nay — bảng từng em + bốn chỉ số (như cũ).
+//   · Cần thầy chữa — nạp LƯỜI `TheCanThayChua` (ghép thành phần sẵn có: buổi chữa theo chiến dịch gồm điểm danh + xếp buổi chữa, bước cuối trên lớp,
+//     gỡ nút thắt). Số cạnh tên thẻ = số "Cần thầy chữa" màn Hôm nay đã đếm (chưa biết ⇒ không ghi số).
+//   · Bài đã dạy — nạp LƯỜI `TheBaiDaDay` (thẻ Dạy học sẵn có: điểm danh · chọn câu · bước Bài hôm nay; + Kiểm tra đầu giờ).
+//   · Chiến dịch đã giao — thẻ "Tổng quan" cũ (giao + danh sách chiến dịch), đổi tên để không trùng mục Hôm nay.
 // SỐ THẬT, không số minh hoạ: danh sách hành trình + số em (`/gv/chien-dich danh-sach`), từng em hôm nay (`bang` → `hanhTrinhNgay.em`: tầng,
 // tối thiểu, đã làm, đã xếp, còn thiếu), chương/bài/câu của khối từ cây kho DẠY HỌC trên máy thầy (cùng hàm của bước Bài hôm nay).
 // Bản duyệt có vài ô máy chủ CHƯA gửi (phút làm bài mỗi em, "sẵn sàng +1 bậc", lý do từng em, "máy đã tự điều chỉnh N kế hoạch") — màn KHÔNG vẽ các ô đó;
 // thay bằng chỉ số đếm được từ chính bảng hôm nay (đủ mức tối thiểu, chưa làm câu nào, thiếu câu phù hợp, tầng Vận dụng trở lên).
-// "Bổ sung bài" mở đúng luồng Bài hôm nay (tick bài vừa dạy) — máy chủ chưa có lệnh thêm bài thẳng vào hành trình theo khối.
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { AlertTriangle, BookOpen, CalendarCheck, ChevronRight, Clock, GraduationCap, Plus, Search, ShieldCheck, TrendingUp, Users } from 'lucide-react'
-import { useAppStore } from '../../store/appStore'
-import { KHOA_MO_THE_DAY_HOC, dsBaiCuaKhoi, type BaiCay } from '../../lib/bai-hom-nay'
+// MỘT nút "Bổ sung bài" (đầu màn) ⇒ thẻ Bài đã dạy, cuộn tới bước Bài hôm nay (tick bài vừa dạy) — máy chủ chưa có lệnh thêm bài thẳng vào
+// hành trình theo khối. Nút trùng "Giao theo bài" trong thẻ chiến dịch đã bỏ (09/10).
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { AlertTriangle, BookOpen, Clock, GraduationCap, Plus, Search, ShieldCheck, TrendingUp } from 'lucide-react'
+import { dsBaiCuaKhoi, type BaiCay } from '../../lib/bai-hom-nay'
 import { dungCay } from '../../lib/cay-chon-de'
 import { khoDayHoc, locDeDayHoc } from '../../lib/day-hoc-len-bang'
 import type { TeacherExamSource } from '../../data/examContent'
-import { danhSach, docBang, type BangChienDich, type ChienDichTom } from './api'
+import { useSoDemGv, type TheHanhTrinh } from '../../lib/so-dem-gv'
+import { danhSach, docBang, type ChienDichTom } from './api'
+import { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 import './gv-v2.css'
 
-export type EmNhip = NonNullable<BangChienDich['hanhTrinhNgay']>['em'][number]
+// Phép tính nhịp (khối, bốn chỉ số) nay ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng chung) — xuất lại ở đây cho mọi lối nhập cũ.
+export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
+
+// Hai thẻ ghép màn sẵn có — mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
+const TheCanThayChua = lazy(() => import('./TheCanThayChua'))
+const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
+
 const TEN_TANG = ['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp'] as const
-
-/** Khối từ nhãn lớp của hành trình ("Khối 12") — không đọc được ⇒ null. */
-export function khoiCuaHanhTrinh(cd: Pick<ChienDichTom, 'lop' | 'ten'>): '10' | '11' | '12' | null {
-  const m = /(1[012])/.exec(`${cd.lop ?? ''} ${cd.ten}`)
-  return m ? (m[1] as '10' | '11' | '12') : null
-}
-
-/** Bốn chỉ số đếm được từ bảng hôm nay (không suy diễn): đủ mức · chưa làm · thiếu câu phù hợp · tầng Vận dụng trở lên. */
-export function chiSoNhip(em: readonly EmNhip[]) {
-  const coMuc = em.filter((e) => e.toiThieu !== null && e.toiThieu > 0)
-  return {
-    tong: em.length,
-    duMuc: coMuc.filter((e) => e.daLam >= (e.toiThieu ?? 0)).length,
-    coMuc: coMuc.length,
-    chuaLam: em.filter((e) => e.daLam === 0).length,
-    thieuCau: em.filter((e) => e.conThieu > 0).length,
-    tangCao: em.filter((e) => (e.tang ?? 0) >= 3).length,
-  }
-}
+/** Bốn thẻ, đúng thứ tự bản vẽ (thẻ thứ tư = "Tổng quan" cũ). */
+export const THE_HANH_TRINH: readonly (readonly [TheHanhTrinh, string])[] = [
+  ['nhip', 'Nhịp hôm nay'],
+  ['can-chua', 'Cần thầy chữa'],
+  ['bai-da-day', 'Bài đã dạy'],
+  ['chien-dich', 'Chiến dịch đã giao'],
+]
 
 /** Chương của khối: số bài + số câu (cộng `soCau` các bài trong cây DẠY HỌC). */
 export function chuongCuaKhoi(bai: readonly BaiCay[]): { chuong: string; soBai: number; soCau: number }[] {
@@ -228,15 +229,29 @@ function TheChuong({ khoi }: { khoi: string | null }) {
   )
 }
 
-/** `theDau` = thẻ mở đầu: mở từ Tổng quan › "Giao" cho một ca ⇒ thẻ Tổng quan (khung giao mở sẵn). */
-export default function HanhTrinhV2({ tongQuan, theDau = 'nhip' }: { tongQuan: ReactNode; theDau?: 'tong-quan' | 'nhip' }) {
-  const setScreen = useAppStore((s) => s.setScreen)
+/** Màn Hành trình.
+ *  `theDau` = thẻ mở đầu (mở từ Hôm nay › một việc, hoặc Tổng quan › "Giao" cho một ca ⇒ thẻ Chiến dịch đã giao, khung giao mở sẵn).
+ *  `chonDau` = hành trình (khối) chọn sẵn ở thẻ Nhịp hôm nay. `boSungBai` = vào thẳng thẻ Bài đã dạy và cuộn tới bước Bài hôm nay. */
+export default function HanhTrinhV2({
+  chienDichDaGiao,
+  theDau = 'nhip',
+  chonDau = null,
+  boSungBai = false,
+}: {
+  chienDichDaGiao: ReactNode
+  theDau?: TheHanhTrinh
+  chonDau?: string | null
+  boSungBai?: boolean
+}) {
   const [ds, setDs] = useState<ChienDichTom[] | null>(null)
   const [loiDs, setLoiDs] = useState('')
-  const [chon, setChon] = useState<string | null>(null)
-  const [the, setThe] = useState<'tong-quan' | 'nhip' | 'can-chua'>(theDau)
+  const [chon, setChon] = useState<string | null>(chonDau)
+  const [the, setThe] = useState<TheHanhTrinh>(boSungBai ? 'bai-da-day' : theDau)
+  // Mỗi lần bấm "Bổ sung bài" tăng một nhịp ⇒ thẻ Bài đã dạy cuộn lại tới bước Bài hôm nay (kể cả khi đang đứng sẵn ở thẻ ấy).
+  const [lanBoSung, setLanBoSung] = useState(boSungBai ? 1 : 0)
   const [bang, setBang] = useState<{ id: string; em: EmNhip[] } | null>(null)
   const [loiBang, setLoiBang] = useState('')
+  const canThayChua = useSoDemGv((s) => s.canThayChua)
 
   const taiDs = useCallback(async () => {
     setLoiDs('')
@@ -248,8 +263,9 @@ export default function HanhTrinhV2({ tongQuan, theDau = 'nhip' }: { tongQuan: R
     }
     const ht = r.du.chienDich.filter((c) => c.hanhTrinh && c.trangThai === 'dang_chay').sort((a, b) => String(khoiCuaHanhTrinh(a)).localeCompare(String(khoiCuaHanhTrinh(b))))
     setDs(ht)
-    setChon((c) => c ?? ht[ht.length - 1]?.id ?? null)
-    if (ht.length === 0) setThe('tong-quan')
+    setChon((c) => (c && ht.some((x) => x.id === c) ? c : ht[ht.length - 1]?.id ?? null))
+    // Chưa có hành trình nào: thẻ Nhịp hôm nay trống ⇒ mở thẻ Chiến dịch đã giao (thẻ khác thầy đã chọn thì giữ nguyên).
+    if (ht.length === 0) setThe((t) => (t === 'nhip' ? 'chien-dich' : t))
   }, [])
   useEffect(() => {
     void taiDs()
@@ -274,22 +290,23 @@ export default function HanhTrinhV2({ tongQuan, theDau = 'nhip' }: { tongQuan: R
   const em = bang && bang.id === chon ? bang.em : null
   const cs = em ? chiSoNhip(em) : null
   const boSung = () => {
-    try {
-      sessionStorage.setItem(KHOA_MO_THE_DAY_HOC, '1')
-    } catch {
-      /* máy chặn bộ nhớ phiên: mục Chữa trên lớp mở thẻ thứ nhất, thầy bấm thẻ Dạy học */
-    }
-    setScreen('goilenbang')
+    setThe('bai-da-day')
+    setLanBoSung((n) => n + 1)
   }
+  const choTai = (
+    <p className="gvv2-trong" role="status">
+      Đang mở…
+    </p>
+  )
 
   return (
     <div className="gvv2">
       <header className="gvv2-dau">
         <div className="gvv2-dau-chu">
           <h1 className="gvv2-h1">Hành trình giỏi Hóa</h1>
-          <p className="gvv2-phu">Chọn bài đã dạy — hệ thống tự lập kế hoạch riêng cho từng em mỗi ngày</p>
+          <p className="gvv2-phu">Thầy tick bài đã dạy — app tự lập kế hoạch riêng cho từng em mỗi ngày</p>
         </div>
-        {ds && ds.length > 0 && (
+        {the === 'nhip' && ds && ds.length > 0 && (
           <div className="gvv2-khoi" role="radiogroup" aria-label="Chọn khối">
             {ds.map((c) => (
               <button key={c.id} type="button" role="radio" aria-checked={c.id === chon} className="gvv2-khoi-nut" onClick={() => setChon(c.id)}>
@@ -302,87 +319,77 @@ export default function HanhTrinhV2({ tongQuan, theDau = 'nhip' }: { tongQuan: R
             ))}
           </div>
         )}
-        <button type="button" className="gvv2-nut-chinh" onClick={boSung} title="Tick bài vừa dạy ở Chữa trên lớp › Dạy học › Bài hôm nay — hành trình tự nhận bài mới">
+        <button type="button" className="gvv2-nut-chinh" onClick={boSung} title="Tick bài vừa dạy ở thẻ Bài đã dạy › Bài hôm nay — hành trình tự nhận bài mới">
           <Plus size={18} aria-hidden="true" />
           Bổ sung bài
         </button>
       </header>
 
       <nav className="gvv2-tab" role="tablist" aria-label="Hành trình">
-        {(
-          [
-            ['tong-quan', 'Tổng quan'],
-            ['nhip', 'Nhịp hôm nay'],
-            ['can-chua', 'Cần chữa'],
-          ] as const
-        ).map(([k, nhan]) => (
-          <button key={k} type="button" role="tab" aria-selected={the === k} className="gvv2-tab-nut" onClick={() => setThe(k)}>
+        {THE_HANH_TRINH.map(([k, nhan]) => (
+          <button key={k} type="button" role="tab" id={`gvv2-the-${k}`} aria-controls={`gvv2-o-${k}`} aria-selected={the === k} className="gvv2-tab-nut" onClick={() => setThe(k)}>
             {nhan}
+            {k === 'can-chua' && canThayChua ? <span className="gvv2-so"> · {canThayChua}</span> : null}
           </button>
         ))}
       </nav>
 
-      {the === 'tong-quan' && <div className="gvv2-tong-quan">{tongQuan}</div>}
+      <div role="tabpanel" id={`gvv2-o-${the}`} aria-labelledby={`gvv2-the-${the}`} className="gvv2-o-the">
+        {the === 'chien-dich' && <div className="gvv2-chien-dich">{chienDichDaGiao}</div>}
 
-      {the === 'nhip' &&
-        (ds === null ? (
-          <p className="gvv2-trong" role="status">
-            Đang tải hành trình…
-          </p>
-        ) : loiDs ? (
-          <div className="gvv2-the gvv2-loi" role="alert">
-            <p>{loiDs}</p>
-            <button type="button" className="gvv2-nut-vien" onClick={() => void taiDs()}>
-              Thử lại
-            </button>
-          </div>
-        ) : ds.length === 0 ? (
-          <p className="gvv2-the gvv2-trong">Chưa có hành trình khối nào đang chạy. Hành trình tự tạo khi máy chủ gộp chiến dịch theo khối.</p>
-        ) : (
-          <>
-            {cs && (
-              <section className="gvv2-kpi" aria-label="Chỉ số hôm nay">
-                <TheSo mau="xl" bieu={<ShieldCheck size={22} />} nhan="Đủ mức hôm nay" so={<><b className="gvv2-so">{cs.duMuc}</b><span className="gvv2-so">/{cs.coMuc}</span></>} phu={cs.coMuc ? `${Math.round((100 * cs.duMuc) / cs.coMuc)}% học sinh đã làm đủ câu tối thiểu` : 'Chưa có em nào có mức tối thiểu'} ti={cs.coMuc ? Math.round((100 * cs.duMuc) / cs.coMuc) : 0} />
-                <TheSo mau="ho" bieu={<AlertTriangle size={22} />} nhan="Chưa làm câu nào" so={<b className="gvv2-so">{cs.chuaLam}</b>} phu="Học sinh chưa bắt đầu kế hoạch hôm nay" />
-                <TheSo mau="hp" bieu={<TrendingUp size={22} />} nhan="Tầng Vận dụng trở lên" so={<b className="gvv2-so">{cs.tangCao}</b>} phu="Học sinh đã mở tầng Vận dụng hoặc Tổng hợp" />
-                <TheSo mau="xd" bieu={<Clock size={22} />} nhan="Thiếu câu phù hợp" so={<b className="gvv2-so">{cs.thieuCau}</b>} phu="Kho chưa đủ câu đúng tầng — bổ sung bài để lấp" />
-              </section>
-            )}
-            <div className="gvv2-luoi">
-              {loiBang ? (
-                <div className="gvv2-the gvv2-loi" role="alert">
-                  <p>{loiBang}</p>
-                </div>
-              ) : em ? (
-                <BangNhip em={em} />
-              ) : (
-                <p className="gvv2-the gvv2-trong" role="status">
-                  Đang tải nhịp học hôm nay…
-                </p>
-              )}
-              <TheChuong khoi={khoi} />
+        {the === 'can-chua' && (
+          <Suspense fallback={choTai}>
+            <TheCanThayChua />
+          </Suspense>
+        )}
+
+        {the === 'bai-da-day' && (
+          <Suspense fallback={choTai}>
+            <TheBaiDaDay lanBoSung={lanBoSung} />
+          </Suspense>
+        )}
+
+        {the === 'nhip' &&
+          (ds === null ? (
+            <p className="gvv2-trong" role="status">
+              Đang tải hành trình…
+            </p>
+          ) : loiDs ? (
+            <div className="gvv2-the gvv2-loi" role="alert">
+              <p>{loiDs}</p>
+              <button type="button" className="gvv2-nut-vien" onClick={() => void taiDs()}>
+                Thử lại
+              </button>
             </div>
-          </>
-        ))}
-
-      {the === 'can-chua' && (
-        <section className="gvv2-the gvv2-can-chua" aria-labelledby="gvv2-can-chua-tieu">
-          <span className="gvv2-o-bieu" aria-hidden="true">
-            <CalendarCheck size={22} />
-          </span>
-          <div>
-            <h2 id="gvv2-can-chua-tieu" className="gvv2-h2">
-              Điểm danh và buổi chữa
-            </h2>
-            <p className="gvv2-phu">Mã điểm danh 6 số, danh sách em có mặt, chiếu mã lên máy chiếu và xếp buổi chữa cho đúng các em có mặt nằm ở mục Chữa trên lớp.</p>
-          </div>
-          <button type="button" className="gvv2-nut-chinh" onClick={() => setScreen('goilenbang')}>
-            <Users size={18} aria-hidden="true" />
-            Mở điểm danh
-            <ChevronRight size={18} aria-hidden="true" />
-          </button>
-        </section>
-      )}
+          ) : ds.length === 0 ? (
+            <p className="gvv2-the gvv2-trong">Chưa có hành trình khối nào đang chạy. Hành trình tự tạo khi máy chủ gộp chiến dịch theo khối.</p>
+          ) : (
+            <>
+              {cs && (
+                <section className="gvv2-kpi" aria-label="Chỉ số hôm nay">
+                  <TheSo mau="xl" bieu={<ShieldCheck size={22} />} nhan="Đủ mức hôm nay" so={<><b className="gvv2-so">{cs.duMuc}</b><span className="gvv2-so">/{cs.coMuc}</span></>} phu={cs.coMuc ? `${Math.round((100 * cs.duMuc) / cs.coMuc)}% học sinh đã làm đủ câu tối thiểu` : 'Chưa có em nào có mức tối thiểu'} ti={cs.coMuc ? Math.round((100 * cs.duMuc) / cs.coMuc) : 0} />
+                  <TheSo mau="ho" bieu={<AlertTriangle size={22} />} nhan="Chưa làm câu nào" so={<b className="gvv2-so">{cs.chuaLam}</b>} phu="Học sinh chưa bắt đầu kế hoạch hôm nay" />
+                  <TheSo mau="hp" bieu={<TrendingUp size={22} />} nhan="Tầng Vận dụng trở lên" so={<b className="gvv2-so">{cs.tangCao}</b>} phu="Học sinh đã mở tầng Vận dụng hoặc Tổng hợp" />
+                  <TheSo mau="xd" bieu={<Clock size={22} />} nhan="Thiếu câu phù hợp" so={<b className="gvv2-so">{cs.thieuCau}</b>} phu="Kho chưa đủ câu đúng tầng — bổ sung bài để lấp" />
+                </section>
+              )}
+              <div className="gvv2-luoi">
+                {loiBang ? (
+                  <div className="gvv2-the gvv2-loi" role="alert">
+                    <p>{loiBang}</p>
+                  </div>
+                ) : em ? (
+                  <BangNhip em={em} />
+                ) : (
+                  <p className="gvv2-the gvv2-trong" role="status">
+                    Đang tải nhịp học hôm nay…
+                  </p>
+                )}
+                <TheChuong khoi={khoi} />
+              </div>
+            </>
+          ))}
+      </div>
     </div>
   )
 }
