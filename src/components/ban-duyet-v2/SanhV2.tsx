@@ -415,7 +415,6 @@ function OThuSuc({ s, token, onTaiLai, onDaLay }: { s: SanhHoa2; token: string; 
 
 function LuyenThem({ p, s, onDaLay }: { p: SanhBanDoProps; s: SanhHoa2; onDaLay: () => void }) {
   const o = s.omni
-  const bia = p.onChoiBia ? chuCuaBia(s) : null
   const mo = (viec: ViecOmniDao) => {
     datViecOmniDao(viec)
     p.onKhamPhaDao()
@@ -435,7 +434,6 @@ function LuyenThem({ p, s, onDaLay }: { p: SanhBanDoProps; s: SanhHoa2; onDaLay:
         {o?.kiemHanhTrinh && <OLuyen khoi="kiem-hanh-trinh" nhan={chuKiemHanhTrinh(o.kiemHanhTrinh)} phu={o.kiemHanhTrinh.loai === 'dau' ? 'Làm trước khi luyện để đo điểm xuất phát' : 'Đo lại sau một tuần luyện'} onClick={() => mo('de-thu')} />}
         {o?.deThu.duoc && !o.kiemHanhTrinh && <OLuyen khoi="de-thu" nhan="Đề thử" phu={`${o.deThu.soCau} câu · ${o.deThu.phut} phút · chỉ để đo, không phải ca kiểm tra`} onClick={() => mo('de-thu')} />}
         {p.onTuLuyen && <OLuyen khoi="tu-luyen" nhan="Tu luyện" phu="Chỉ dành cho học sinh Nỗ lực" onClick={p.onTuLuyen} />}
-        {bia && <OLuyen khoi="bia" nhan={bia.lon} phu={bia.nho} khoa={!bia.mo} onClick={p.onChoiBia} />}
       </div>
       {o?.metGio && (
         <Nhung lop="v2s-nhung-met-gio">

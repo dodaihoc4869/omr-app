@@ -237,7 +237,8 @@ describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
     expect(tl.textContent).toContain('Chỉ dành cho học sinh Nỗ lực')
     fireEvent.click(tl)
     expect(p.onTuLuyen).toHaveBeenCalledTimes(1)
-    fireEvent.click(within(lt).getByRole('button', { name: /Bi-a Phản Ứng · còn 4\/6 câu/ }))
+    expect(screen.getAllByRole('button', {name:/Bi-a Phản Ứng · còn 4\/6 câu/})).toHaveLength(1)
+    fireEvent.click(screen.getByRole('button', { name: /Bi-a Phản Ứng · còn 4\/6 câu/ }))
     expect(p.onChoiBia).toHaveBeenCalledTimes(1)
   })
   it('kiểm đầu / kiểm tuần Hành trình (main #217): nút phụ ở Hôm nay (vẫn MỘT nút vàng) + ô Luyện thêm thay Đề thử; bấm ⇒ Đảo việc de-thu', () => {

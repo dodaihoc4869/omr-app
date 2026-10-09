@@ -63,7 +63,7 @@ function TaiKhoan({ ten, onDoiSbd }: { ten: string; onDoiSbd: () => void }) {
       </button>
       {mo && (
         <div className="ph3-menu" role="menu">
-          <p>Phụ huynh em <b>{ten}</b></p><a className="ph3-dong-lk" href="#thong-tin" onClick={() => setMo(false)}>Thông tin và giao diện</a><button type="button" role="menuitem" onClick={onDoiSbd}>Đổi số báo danh</button>
+          <p>Phụ huynh em <b>{ten}</b></p><a role="menuitem" className="ph3-dong-lk" href="#thong-tin" onClick={() => setMo(false)}>Thông tin và giao diện</a><button type="button" role="menuitem" onClick={onDoiSbd}>Đổi số báo danh</button>
           <p data-vung="ban-app">{chuBanApp()}</p>
         </div>
       )}

@@ -65,9 +65,9 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
-    expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(1)
+    expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(2)
     // SỬA CÓ CHỦ Ý — bản vẽ tối giản thầy chốt 09/10 (thay thứ tự 01/10): BA mục điều hướng là LIÊN KẾT (không phải nút)
-    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Ca kiểm tra'])
+    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Lịch sử', 'Lời thầy'])
   })
 
   it('cảnh báo của thầy hiện ở Hôm nay (thụ động: chỉ "Đã xem cảnh báo", không "Làm ngay")', async () => {
