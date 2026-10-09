@@ -35,6 +35,7 @@ import { conThieu, dinhDangTien, hocPhiCuaEm, taiHocPhi, TEN_TRANG_THAI, tongHoc
 import '../components/hoc-phi/hoc-phi.css'
 import HocSinhDanhSachV2 from './HocSinhDanhSachV2'
 import { lyDoDeHieu } from '../lib/loi-de-hieu'
+import { useSoDemGv } from '../lib/so-dem-gv'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -93,7 +94,11 @@ export default function HocSinhScreen() {
   const [dangTai, setDangTai] = useState(false)
   const [loi, setLoi] = useState('')
   const [timKiem, setTimKiem] = useState('')
-  const [khoiLoc, setKhoiLoc] = useState<number | null>(null)
+  // Hôm nay của thầy › "Xem danh sách" / một dòng khối ⇒ mở sẵn bộ lọc khối ấy (đọc một lần rồi xoá — cột "Hôm nay a/b câu" thay thẻ Nhịp hôm nay cũ).
+  const [khoiLoc, setKhoiLoc] = useState<number | null>(() => useSoDemGv.getState().khoiHocSinh)
+  useEffect(() => {
+    if (useSoDemGv.getState().khoiHocSinh !== null) useSoDemGv.getState().datKhoiHocSinh(null)
+  }, [])
   // TÊN LỚP (thầy lệnh 21/09): `/gv/lop` — chưa có lệnh ⇒ `ds === null` ⇒ giữ nguyên cách hiện cũ (mục Đổi lớp ẩn, không lỗi đỏ).
   const lopThay = useLopThay()
   const [doiLop, setDoiLop] = useState(false)

@@ -187,6 +187,19 @@ describe('Học sinh 2.0 (bản vẽ GV-HocSinh)', () => {
     expect(container.textContent).not.toMatch(/Cannot read|undefined/)
   })
 
+  // 09/10 tối: thẻ Nhịp hôm nay rời Hành trình ⇒ Hôm nay › "Xem danh sách" / dòng khối mở màn này, lọc sẵn khối (đọc một lần rồi xoá).
+  it('Hôm nay bấm khối ⇒ ô Khối lọc sẵn khối ấy, yêu cầu xoá sau khi đọc; lần mở sau về "Tất cả"', async () => {
+    const { useSoDemGv } = await import('../src/lib/so-dem-gv')
+    useSoDemGv.getState().datKhoiHocSinh(12)
+    const lan1 = render(<HocSinhScreen />)
+    const khoi = (await screen.findByRole('combobox', { name: 'Lọc theo khối' })) as HTMLSelectElement
+    expect(khoi.value).toBe('12')
+    await waitFor(() => expect(useSoDemGv.getState().khoiHocSinh).toBeNull())
+    lan1.unmount()
+    render(<HocSinhScreen />)
+    expect(((await screen.findByRole('combobox', { name: 'Lọc theo khối' })) as HTMLSelectElement).value).toBe('')
+  })
+
   it('chữ đầu trong ô tròn: hai từ cuối của tên; chưa có tên ⇒ hai số cuối SBD', () => {
     expect(chuDau('Nguyễn Minh Anh', '1201')).toBe('MA')
     expect(chuDau('  Đặng   ánh ', '1')).toBe('ĐÁ')

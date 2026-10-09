@@ -90,6 +90,24 @@ describe('màn Bàn gỡ nút thắt', () => {
     await screen.findByText(/Em cần gọi lên bảng: Lê Chi/)
   })
 
+  // HÀNH TRÌNH › CẦN THẦY CHỮA (trung tu 09/10 tối): nhúng dưới danh sách cần chữa — bỏ tiêu đề/ô đếm lặp, chọn sẵn thẻ thầy vừa bấm.
+  it('nhúng: không tiêu đề, không ô đếm thẻ; chọn sẵn đúng thẻ; thẻ ấy gỡ xong (biến mất) ⇒ về thẻ đầu, không trống vùng', async () => {
+    const { unmount } = render(<BanGoNutThatScreen nhung chonDau="BAM2|1" />)
+    const the = await screen.findAllByTestId('the-nut-that')
+    expect(the.map((t) => t.hidden)).toEqual([true, false])
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
+    expect(screen.queryByText('Thẻ đang chờ')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Tải lại' })).toBeNull()
+    // Kèm riêng + Cùng kiến thức nền + ba cách gỡ GIỮ NGUYÊN
+    expect(screen.getByText(/Kèm riêng trên lớp · 1 em/)).toBeTruthy()
+    expect(document.body.textContent).toContain('12 em vướng Bảo toàn electron ở 5 câu')
+    expect(within(the[1]!).getAllByRole('button').map((b) => b.textContent)).toEqual(['Gỡ ngắn', 'Dạy trên lớp', 'Sửa lời giải/đề'])
+    unmount()
+    render(<BanGoNutThatScreen nhung chonDau="KHONG-CON" />)
+    const lai = await screen.findAllByTestId('the-nut-that')
+    expect(lai.map((t) => t.hidden)).toEqual([false, true])
+  })
+
   it('trống ⇒ nói vì sao; lỗi ⇒ lý do + Thử lại', async () => {
     api.gvDsNutThat.mockResolvedValueOnce({ ok: true, nhom: [], cungNen: [], kemRieng: [], tong: { soThe: 0, soNhom: 0, theNgayDongNhat: 0, quaTai: false } })
     render(<BanGoNutThatScreen />)

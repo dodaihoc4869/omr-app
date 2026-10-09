@@ -239,6 +239,9 @@ export default defineConfig({
           '**/{hom-nay,uoc-luong-bo-cuc}-*.{js,css}',
           // Vòng học v2 (02/10): màn thầy "Gỡ nút thắt" + rút đề v2 (máy thầy) — tải khi mở, không cất sẵn trên máy em.
           '**/BanGoNutThatScreen-*.{js,css}',
+          // Hành trình › Cần thầy chữa (09/10 tối) đọc thẻ nút thắt cùng màn Gỡ nút thắt và gom ba nhóm Cần thầy chữa cùng màn Hôm nay ⇒ hai mảnh chung
+          // CHỈ máy thầy dùng (lệnh gọi nút thắt, phép gom OMNI) — kho chạy-lúc, không làm nặng precache vỏ.
+          '**/{nut-that-api,omni-bang}-*.{js,css}',
           // Bản vẽ tối giản app thầy (09/10): màn "Hôm nay" của thầy + hai thẻ ghép màn sẵn có của Hành trình (Cần thầy chữa, Bài đã dạy) nạp LƯỜI.
           // Các thẻ ấy nhập động Dạy học / Kiểm tra đầu giờ / Bước cuối trên lớp (trước nằm trong mảnh Gọi lên bảng) ⇒ Rollup tách thành mảnh riêng,
           // kèm `TheCauHienThi` (chỉ hai màn ấy dùng), `gv-v2` (khung + phép tính nhịp của Hành trình/Hôm nay), `HopChonDe` + `cay-chon-de` (hộp chọn

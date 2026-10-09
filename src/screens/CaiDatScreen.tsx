@@ -4,8 +4,11 @@
 // (kết nối máy chủ, máy chủ mới, mật khẩu mở app, cập nhật app, đồng bộ lại phiếu mọi ca, đồng bộ danh sách lớp) gom vào MỘT nhóm
 // thu gọn "Công cụ kỹ thuật" (mặc định đóng). Không đổi hàm nào — chỉ chỗ đặt. Cờ tắt ⇒ màn như cũ.
 // OMNI 3 (05/10): thêm thẻ "OMNI (theo lớp)" + "Số lượt mỗi ngày và ma trận đề thi" ngay sau Game Hóa 2.0 (`CongTacOmni.tsx`, cùng kiểu thẻ công tắc).
+// 09/10 tối (thầy: Hành trình "chỉ cần giữ lại phần dạy học"): thẻ "Chiến dịch đã giao" rời màn Hành trình ⇒ lối vào GỌN ở đây (chỉ 2.0) — mở trang
+// Chiến dịch đã giao của màn `chiendich` (giao mới · lọc · Xem bảng / Mở buổi chữa · Rải đều · Chỉnh sửa · Kết thúc · Huỷ — không đổi hàm nào).
 import { useState, type ReactNode } from 'react'
 import { ChevronDown, ChevronRight, Monitor, Moon, Sun } from 'lucide-react'
+import { useSoDemGv } from '../lib/so-dem-gv'
 import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
@@ -31,6 +34,11 @@ export default function CaiDatScreen() {
   const [giaoDien, datGiaoDien] = useGiaoDien()
   const hoa2 = useHoa2Bat()
   const [moKyThuat, setMoKyThuat] = useState(false)
+  const setScreen = useAppStore((s) => s.setScreen)
+  const moChienDichDaGiao = () => {
+    useSoDemGv.getState().datMoHanhTrinh({ the: 'chien-dich' })
+    setScreen('chiendich')
+  }
 
   const ketNoi = (
     <TheNoiDung>
@@ -90,6 +98,22 @@ export default function CaiDatScreen() {
       <CongTacOmni />
       {/* BI-A PHẢN ỨNG — cửa thứ ba trên Sảnh Bát Linh (`/gv/chien-dich` bia-co-luu, khoá riêng `bi_a`, mặc định TẮT). */}
       <CongTacBia />
+
+      {/* CHIẾN DỊCH ĐÃ GIAO (09/10 tối) — lối vào gọn sau khi thẻ ấy rời màn Hành trình. */}
+      {hoa2 && (
+        <TheNoiDung>
+          <div className="flex flex-wrap" style={{ gap: 'var(--k3)', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+              <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700 }}>Chiến dịch đã giao</h2>
+              <p style={{ marginTop: 'var(--k1)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Ba hành trình và chiến dịch luyện cũ: xem bảng, kết thúc, huỷ, giao chiến dịch mới.</p>
+            </div>
+            <button type="button" className="m3-nut-chu" onClick={moChienDichDaGiao} style={{ gap: 'var(--k1)' }}>
+              Mở danh sách chiến dịch
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </TheNoiDung>
+      )}
 
       {hoa2 ? (
         <section aria-labelledby="cai-dat-ky-thuat">
