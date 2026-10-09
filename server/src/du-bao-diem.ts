@@ -216,15 +216,24 @@ export function chonConDuong(hs: Pick<HoSoOmniEm, 'vkn'>, cauPhamVi: readonly QC
  * Dự báo đầy đủ trên phạm vi: PMF (khung `khung`, hoặc tập câu khả thi `khaThi` ≤ khung — câu không kịp làm không có điểm) + con đường rẻ nhất
  * (null khi kyVong ≥ mục tiêu và p8 ≥ M_P8) + vi kỹ năng/ý còn thiếu + số bằng chứng (Σ nTuLam vi kỹ năng phạm vi). p8 = P(điểm ≥ mục tiêu).
  */
-export function duBaoDiem(hs: HoSoOmniEm, cauPhamVi: readonly QCau[], tuy: { khung?: KhungDe; mucTieu?: number; khaThi?: KhungDe } = {}, ts: ThamSoOmni = THAM_SO_OMNI): DuBao {
+export function duBaoDiem(hs: HoSoOmniEm, cauPhamVi: readonly QCau[], tuy: { khung?: KhungDe; mucTieu?: number; khaThi?: KhungDe; chiKyVong?: boolean } = {}, ts: ThamSoOmni = THAM_SO_OMNI): DuBao {
   const mucTieu = tuy.mucTieu ?? ts.MUC_TIEU
   const khung = tuy.khung ?? ts.KHUNG_DE
   const khaThi = tuy.khaThi
     ? { I: Math.min(soNguyenKhongAm(tuy.khaThi.I), soNguyenKhongAm(khung.I)), II: Math.min(soNguyenKhongAm(tuy.khaThi.II), soNguyenKhongAm(khung.II)), III: Math.min(soNguyenKhongAm(tuy.khaThi.III), soNguyenKhongAm(khung.III)) }
     : undefined
   const pb = phanBoDiemTheoMuc(xacSuatPhan(hs, cauPhamVi, hs.sEm, ts), khaThi ?? khung, mucTieu, ts)
-  const daDat = pb.kyVong >= mucTieu && pb.p8 >= ts.M_P8
   const soBangChung = vknCuaPhamVi(cauPhamVi).reduce((s, k) => s + (hs.vkn[k]?.nTuLam ?? 0), 0)
+  if (tuy.chiKyVong) {
+    return {
+      ...pb,
+      conDuong: null,
+      conThieu: { vkn: [], soY: 0 },
+      ...(khaThi ? { khaThi } : {}),
+      soBangChung,
+    }
+  }
+  const daDat = pb.kyVong >= mucTieu && pb.p8 >= ts.M_P8
   return {
     ...pb,
     conDuong: daDat ? null : chonConDuong(hs, cauPhamVi, hs.sEm, ts),
