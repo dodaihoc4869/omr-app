@@ -66,3 +66,24 @@ Trạng thái: **ĐÃ PHÁT HÀNH** 20:51 (VN) — PR223, mã sống `dc62bde`, 
 | Giáo viên | dc20639, 6c47a41 | 2.0 một bảng lam, tối theo nút; Hôm nay; Học sinh; Mở ca |
 | Precache | 4886a6d | 3 mảnh chỉ của thầy ra kho chạy-lúc, 2994 KB |
 Còn lại: nút Chốt Đoàn giữ chỗ cũ; 64 luật CSS chết mang màu ở PH chưa gỡ (cổng giữ màu); "Giao bài riêng" ở ToanCanhEm/ExamMonitor còn trỏ màn BTVN đang ẩn ở 2.0; bảng từ chuẩn còn dòng "Chữa trên lớp".
+
+## Đợt 4 — sửa theo ảnh thầy gửi (09/10 tối)
+Trạng thái: **ĐÃ PHÁT HÀNH** 22:38 (VN) — PR225, mã sống `bf10231`, Actions `37952259291` SUCCESS (Worker + Pages, kiểm sống cùng commit đạt). D1 22:30: 0 ca mở / 0 lượt. Lùi: `git revert -m 1 bf10231`.
+| Việc | Commit | Ghi chú |
+|---|---|---|
+| Luyện thêm (HS) tô màu | d2fa153c | sắc Bát Linh từng ô + biểu tượng; chỉ THÊM luật |
+| Hành trình (GV) 3 thẻ | 757ea1a1 | Dạy học · Kiểm tra đầu giờ · Cần thầy chữa; Nhịp → Hôm nay/Học sinh; Chiến dịch đã giao → Cài đặt |
+| Cần thầy chữa một số | 3fe9ff59 | Hôm nay = thanh bên = danh sách (gộp chung `gomCanChua`); lọc khối đếm "chỗ" |
+| Câu đã làm (HS) | 40e26c71 | lưới 2 cột trong khung cuộn ⇒ một cột; lọc xuống dòng; nền sáng đọc rõ |
+| Precache | 25c3ebf3 | `ghi-to-chieu`, `thoi-gian-len-bang` ra kho chạy-lúc |
+### Kiểm bản phát hành (nhánh 3d942253, đã gộp main 27788740)
+| Việc | Lệnh | Kết quả |
+|---|---|---|
+| Kiểu | `npx tsc -b`; máy chủ `tsc --noEmit` | 0 lỗi |
+| Màu / giao diện | `check:mau` · `kiem:mau-giu` · `soi:giao-dien` | đạt · 0 vi phạm · 0 lỗi |
+| Build + SW | `npm run build:cf` | SW 13/13 · 147 tệp / 2997 KB |
+| Toàn bộ vitest | so TÊN với main sạch 80955fde | nhánh 161 đỏ / main 163; đỏ mới 0 (2 chỉ đỏ ở main = test đo giờ) |
+| Cổng CI deploy.yml (20 tệp) | | chỉ `chua-d1-van-hanh` đỏ ở máy này (node:sqlite), main sạch cũng thế |
+| Ảnh Chromium | `scripts/chup-v2` 14-gv-can-chua, 24-gv-hom-nay, 25-hs-cau-da-lam, 22-hs-hanh-trinh | 0 lỗi trang · 0 tràn ngang |
+| PR check `kiem` | Actions 37951714821 | SUCCESS |
+Còn lại: màn Hoá 2.0 ngang "thấp" co bằng `zoom` ⇒ nút ~33–36 px trên điện thoại xoay ngang (có từ trước; đã đề xuất việc riêng).
