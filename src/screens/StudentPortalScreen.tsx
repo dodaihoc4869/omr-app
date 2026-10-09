@@ -2184,7 +2184,7 @@ export default function StudentPortalScreen() {
           về đúng chỗ cũ. */}
       {/* MÀN LÀM BÀI — phủ toàn màn, ngay trong cổng học sinh. */}
       {manThi && (
-        <div className="fixed inset-0 z-[60] overflow-auto bg-white dark:bg-slate-950" style={{ '--thi-le-phai': '52px' } as React.CSSProperties}>
+        <div className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-white dark:bg-slate-950 man-thi-phu" style={{ '--thi-le-phai': '52px' } as React.CSSProperties}>
           <button
             type="button"
             onClick={() => {

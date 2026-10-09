@@ -1,5 +1,5 @@
 import { Component, lazy, memo, startTransition, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
+import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
 import { qidDaGap, type SoCauMoiPhan } from '../lib/bo-cau-tu-bai-lam'
@@ -502,6 +502,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
     }
   }, [])
   const saveFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const henLuuIdbRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
   const gapVibratedRef = useRef(false)
 
@@ -1393,15 +1394,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
       let kq: KetQuaVaoThi | null = null
       if (url) {
-        // XẾP HÀNG 0–3 GIÂY TRƯỚC LƯỢT VÀO ĐẦU TIÊN (T5). Thầy hô một tiếng là
-        // cả lớp bấm trong hai giây; rải ra thì ba mươi lượt nối đuôi nhau thay
-        // vì chồng lên nhau. Chỉ giãn LẦN ĐẦU — em bấm lại sau khi hỏng thì vào
-        // thẳng, vì lúc ấy đám đông đã tan và em đang ngồi chờ.
-        if (!daGianVaoThiRef.current) {
-          daGianVaoThiRef.current = true
-          const cho = gianVaoThi()
-          if (cho > 0) await new Promise((nghi) => setTimeout(nghi, cho))
-        }
+        daGianVaoThiRef.current = true
         try {
           kq = await vaoThi(url, ma, sb, idTb, !cached, { hoTen: ten, namSinh: nam, xacNhanTen: xacNhan !== null, matKhau: matKhauCa.trim() })
         } catch {
@@ -1467,6 +1460,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           submitted: false,
           submittedAt: null,
           pendingSubmit: false,
+          khoaLuot: kq.khoaLuot ?? existing.khoaLuot,
           hetGioLuc: kq.hetGioLuc,
           nguong: { lan: kq.nguongLan, giay: kq.nguongGiay },
           integrity: { ...existing.integrity, blocked: false, lyDoKhoa: undefined, mocMoKhoa: existing.integrity.leaveCount, soLanMoKhoa: (existing.integrity.soLanMoKhoa ?? 0) + 1 },
@@ -1527,7 +1521,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const daLamLai = (kq.daLamLai && Object.keys(kq.daLamLai).length > 0 ? kq.daLamLai : existing?.daLamLai) ?? {}
       // Ca "Kiểm chứng câu đã đúng" (02/10): nhãn "Em đã làm đúng: …" từng câu — máy chủ gửi cùng đề, không kèm đáp án.
       const daDungNhan = (kq.daDungNhan && Object.keys(kq.daDungNhan).length > 0 ? kq.daDungNhan : existing?.daDungNhan) ?? {}
-      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap, daLamLai, daDungNhan }
+      const thongTinCa = { loai: kq.loai, hanNop: kq.hanNop, tenCa: kq.tenCa, giuDeDoc: kq.giuDeDoc, anHanGiay: kq.anHanGiay, chiNop3PhutCuoi: kq.chiNop3PhutCuoi === true, cauLap, demLap, daLamLai, daDungNhan, khoaLuot: kq.khoaLuot }
       const a: ExamAttempt = giuLuotDo
         ? { ...existing, startedAt: kq.vaoLuc, hetGioLuc: kq.hetGioLuc, durationMinutes: kq.thoiGianPhut, idThietBi: idTb, nguong, ...thongTinCa }
         : {
@@ -1621,7 +1615,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         if (!cong.nenGui(van)) return
         cong.batDau()
       }
-      void luuTam(url, a.maCa, a.sbd, a.answers, giayCauRef.current).then((xong) => {
+      void luuTam(url, a.maCa, a.sbd, a.answers, giayCauRef.current, a.khoaLuot).then((xong) => {
         if (!chiKhiDoi) return
         if (xong) cong.xong(van)
         else cong.hong()
@@ -1638,6 +1632,11 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       clearInterval(id)
       window.removeEventListener('online', coMang)
       document.removeEventListener('visibilitychange', hienLai)
+      if (henLuuIdbRef.current && attemptRef.current) {
+        clearTimeout(henLuuIdbRef.current)
+        henLuuIdbRef.current = null
+        void saveAttempt(attemptRef.current)
+      }
       // Rời màn làm bài (nộp, hết giờ, đóng tab) thì lưu nốt nhịp cuối.
       luu()
     }
@@ -1690,12 +1689,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       giayCauRef.current[qid] = (giayCauRef.current[qid] ?? 0) + 1
     }, 1000)
     const luu = setInterval(() => {
-      setAttempt((cur) => {
-        if (!cur || cur.submitted) return cur
-        const next = { ...cur, giayCau: { ...giayCauRef.current } }
-        saveAttempt(next)
-        return next
-      })
+      const cur = attemptRef.current
+      if (!cur || cur.submitted) return
+      cur.giayCau = { ...giayCauRef.current }
+      void saveAttempt(cur)
     }, 10000)
     return () => {
       io.disconnect()
@@ -2335,6 +2332,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // không có gì trong dữ liệu để trả lời — phải đoán. Nay đọc Chi tiết ca là
     // biết ngay em nào cơ chế không chạy.
     const integrity = dem.coChay ? { ...a.integrity, soLanTatDe: dem.soLan, giayTatDe: Math.round(dem.giay) } : a.integrity
+    if (henLuuIdbRef.current) {
+      clearTimeout(henLuuIdbRef.current)
+      henLuuIdbRef.current = null
+    }
     const updated: ExamAttempt = { ...a, integrity, giayCau: { ...(a.giayCau ?? {}), ...giayCauRef.current }, submitted: true, submittedAt: new Date().toISOString(), pendingSubmit: true }
     attemptRef.current = updated
     setAttempt(updated)
@@ -2653,14 +2654,32 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, scriptUrl, maCa])
 
-  const updateAndSave = (mutate: (a: ExamAttempt) => ExamAttempt) => {
+  const luuAttemptIdb = (next: ExamAttempt, ngay = true) => {
+    if (ngay) {
+      if (henLuuIdbRef.current) {
+        clearTimeout(henLuuIdbRef.current)
+        henLuuIdbRef.current = null
+      }
+      void saveAttempt(next)
+    } else {
+      if (henLuuIdbRef.current) clearTimeout(henLuuIdbRef.current)
+      henLuuIdbRef.current = setTimeout(() => {
+        henLuuIdbRef.current = null
+        void saveAttempt(next)
+      }, 300)
+    }
+  }
+
+  const updateAndSave = (mutate: (a: ExamAttempt) => ExamAttempt, ngay = true) => {
+    let nextVal: ExamAttempt | null = null
     setAttempt((cur) => {
       if (!cur) return cur
       const next = { ...mutate(cur), giayCau: { ...giayCauRef.current } }
       attemptRef.current = next
-      saveAttempt(next)
+      nextVal = next
       return next
     })
+    if (nextVal) luuAttemptIdb(nextVal, ngay)
     // Chấm lưu ở thanh trên: lưu vào IndexedDB máy em NGAY khi chọn (không
     // đợi bấm nộp) — mất mạng/hết pin giữa giờ vẫn còn nguyên đáp án.
     setSaveFlash(true)
@@ -2669,17 +2688,17 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   const setPhanI = (qid: string, letter: 'A' | 'B' | 'C' | 'D') =>
-    updateAndSave((a) => ({ ...a, answers: { ...a.answers, phanI: { ...a.answers.phanI, [qid]: letter } } }))
+    updateAndSave((a) => ({ ...a, answers: { ...a.answers, phanI: { ...a.answers.phanI, [qid]: letter } } }), true)
 
   const setPhanII = (qid: string, ideaIdx: number, value: 'D' | 'S') =>
     updateAndSave((a) => {
       const row = a.answers.phanII[qid] ?? [null, null, null, null]
       const nextRow = row.map((v, i) => (i === ideaIdx ? value : v))
       return { ...a, answers: { ...a.answers, phanII: { ...a.answers.phanII, [qid]: nextRow } } }
-    })
+    }, true)
 
   const setPhanIII = (qid: string, text: string) =>
-    updateAndSave((a) => ({ ...a, answers: { ...a.answers, phanIII: { ...a.answers.phanIII, [qid]: text } } }))
+    updateAndSave((a) => ({ ...a, answers: { ...a.answers, phanIII: { ...a.answers.phanIII, [qid]: text } } }), false)
 
   // ---------------------------------------------------------------- VÀO PHÒNG
   // MÀN XÁC NHẬN TÊN (thầy chốt 07/09). Chỉ có đúng ba thứ: số báo danh em vừa

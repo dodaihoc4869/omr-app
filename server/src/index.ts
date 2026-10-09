@@ -128,7 +128,7 @@ import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
-import { docGoiDeDem, docKeyBankDem, doanCongBoNgay, nhoCongBo } from './dem-ca-thi'
+import { docGoiDeDem, docKeyBankDem, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -552,6 +552,8 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     .bind(khoa, maCa, sbd, lanThu, idThietBi, vaoLuc, hetGio, new Date(now).toISOString())
     .run()
 
+  if (hetGio) nhoHetGioLuot(maCa, sbd, hetGio, now)
+
   return ra({
     ok: true,
     cach: qd.cach,
@@ -751,11 +753,20 @@ async function dayTrangThai(env: Env, b: Record<string, unknown>): Promise<Respo
     await ghi.run()
     return ra({ ok: true })
   }
+
+  // Đệm isolate cho het_gio_luc (giảm 50% số câu đọc D1 khi hàng trăm em gửi heartbeat cùng lúc)
+  const demHan = layDemHetGioLuot(maCa, sbd)
+  if (demHan !== null) {
+    await ghi.run()
+    return ra(demHan ? { ok: true, hetGioLuc: demHan } : { ok: true })
+  }
+
   const kq = await env.DB.batch([
     ghi,
     env.DB.prepare(`SELECT het_gio_luc FROM luot WHERE ma_ca = ? AND sbd = ? AND trang_thai = 'dang_lam' ORDER BY lan_thu DESC LIMIT 1`).bind(maCa, sbd),
   ])
   const han = String((kq[1]?.results?.[0] as { het_gio_luc?: string } | undefined)?.het_gio_luc ?? '').trim()
+  nhoHetGioLuot(maCa, sbd, han)
   return ra(han ? { ok: true, hetGioLuc: han } : { ok: true })
 }
 

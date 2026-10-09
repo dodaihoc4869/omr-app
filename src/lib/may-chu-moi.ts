@@ -297,9 +297,10 @@ export async function luuTamMoi(
   sbd: string,
   dapAn: unknown,
   giayCau?: Record<string, number>,
+  khoaLuot?: string,
 ): Promise<boolean | null> {
   if (caDaBiGatCauDao(maCa)) return null
-  const r = await goiWorker<{ ok: boolean; lyDo?: string }>(ch, '/luu-tam', { maCa, sbd, dapAn, giayCau }, nhipNong(ch))
+  const r = await goiWorker<{ ok: boolean; lyDo?: string }>(ch, '/luu-tam', { maCa, sbd, dapAn, giayCau, ...(khoaLuot ? { khoaLuot } : {}) }, nhipNong(ch))
   if (!r) return null
   // Lượt không nằm ở máy chủ mới (em vào thi bằng đường cũ) ⇒ đi đường cũ, và
   // thôi hỏi lại cho cả ca này.
