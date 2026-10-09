@@ -1,5 +1,8 @@
-/* App thầy: nền xanh xám, thẻ trắng, thứ bậc rõ; phạm vi .m3.vo-thay không vào màn thi. */
-.m3.vo-thay {
+/* App thầy: nền xanh xám, thẻ trắng, thứ bậc rõ; phạm vi .m3.vo-thay không vào màn thi.
+ * TRUNG TU 09/10 (thầy duyệt bản vẽ, phương án "một bảng lam"): bảng NGỌC dưới đây (và khối tối của nó) CHỈ áp khi cờ Game Hóa 2.0 TẮT
+ * (`:not([data-hoa2])` — app như cũ). Cờ BẬT ⇒ --m3-* của app thầy theo --gvm-* (xanh lam, gv-mau.css) ở CẢ 5 mục + Cài đặt + thanh đáy;
+ * tối/sáng của --gvm-* có đủ ba đường (máy tối · nút Tối · nút Sáng — tokens.css), nên ép nút Sáng/Tối trong Cài đặt không còn cảnh nửa ngọc nửa lam. */
+.m3.vo-thay:not([data-hoa2]) {
   --m3-primary: rgb(24 104 91); --m3-on-primary: rgb(255 255 255);
   --m3-primary-container: rgb(218 240 232); --m3-on-primary-container: rgb(21 72 62);
   --m3-surface: rgb(250 252 252); --m3-surface-container: rgb(233 240 241);
@@ -8,7 +11,7 @@
   --m3-outline: rgb(119 143 148); --m3-outline-variant: rgb(212 225 227);
   background: linear-gradient(150deg, rgb(237 245 244), rgb(229 237 242));
 }
-.m3.vo-thay .khung-noi-dung { box-shadow: 0 4px 24px rgb(32 62 69 / .05); border: 1px solid rgb(195 215 218 / .45); }
+.m3.vo-thay:not([data-hoa2]) .khung-noi-dung { box-shadow: 0 4px 24px rgb(32 62 69 / .05); border: 1px solid rgb(195 215 218 / .45); }
 .m3.vo-thay .ben-trai-muc { transition: background-color .15s, color .15s; }
 .m3.vo-thay .ben-trai-muc.dang { background: var(--m3-primary-container); }
 .m3.vo-thay .ben-trai-nut-ca { border-radius: 16px; box-shadow: 0 5px 12px rgb(24 104 91 / .17); }
@@ -30,7 +33,7 @@
 .m3.vo-thay .gv2-loi { border-radius: 14px; }
 @media(min-width:1100px) { .m3.vo-thay .giua-noi-dung { max-width: 1320px; } }
 @media(prefers-color-scheme:dark) {
-  .m3.vo-thay {
+  .m3.vo-thay:not([data-hoa2]) {
     --m3-primary: rgb(121 216 190); --m3-on-primary: rgb(13 46 39);
     --m3-primary-container: rgb(30 75 66); --m3-on-primary-container: rgb(203 240 226);
     --m3-surface: rgb(20 34 40); --m3-surface-container: rgb(14 27 33);
@@ -39,6 +42,6 @@
     --m3-outline: rgb(110 140 144); --m3-outline-variant: rgb(57 79 84);
     background: linear-gradient(150deg, rgb(16 32 36), rgb(10 23 29));
   }
-  .m3.vo-thay .khung-noi-dung { border-color: rgb(57 79 84 / .6); }
+  .m3.vo-thay:not([data-hoa2]) .khung-noi-dung { border-color: rgb(57 79 84 / .6); }
 }
 @media(prefers-reduced-motion:reduce) { .m3.vo-thay .ben-trai-muc { transition: none; } }

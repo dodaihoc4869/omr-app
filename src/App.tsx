@@ -137,9 +137,22 @@ const TEN_MAN: Record<string, string> = {
   remotetochieu: 'Điều khiển máy chiếu',
 }
 
-/** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề".
- *  09/10 (bản vẽ tối giản thầy chốt): `tongquan` → "Hôm nay", `chiendich` → "Hành trình". */
-const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Chữa trên lớp', nganhangde: 'Kho đề', tongquan: 'Hôm nay', chiendich: 'Hành trình' }
+/** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Ngân hàng" → "Kho đề".
+ *  09/10 (bản vẽ tối giản thầy chốt): `tongquan` → "Hôm nay", `chiendich` → "Hành trình".
+ *  Trung tu 09/10: mục "Chữa trên lớp" đã gộp vào Hành trình › Cần thầy chữa ⇒ màn `goilenbang` mang tên "Cần thầy chữa" (bảng từ chuẩn). */
+const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Cần thầy chữa', nganhangde: 'Kho đề', tongquan: 'Hôm nay', chiendich: 'Hành trình' }
+
+/** Chờ mảnh màn (2.0): khung xương đúng hình một màn thầy — tiêu đề + dòng phụ + hai thẻ (thang chung `.tt-xuong`), không chữ "Đang mở…". */
+const KhungXuongMan = () => (
+  <div className="gv-xuong" role="status" aria-label="Đang mở màn">
+    <span className="gv-xuong-khoi gv-xuong-tieu-de tt-xuong" />
+    <span className="gv-xuong-khoi gv-xuong-dong tt-xuong" />
+    <span className="gv-xuong-luoi">
+      <span className="gv-xuong-khoi gv-xuong-the tt-xuong" />
+      <span className="gv-xuong-khoi gv-xuong-the tt-xuong" />
+    </span>
+  </div>
+)
 
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
@@ -427,13 +440,14 @@ function App() {
       <Toast />
       {!laManThi && <ThanhBenTrai />}
       <div className="khung-noi-dung">
-        <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
+        {/* Đổi màn (2.0): mờ dần + trượt 8px trong 200ms (thang chung `.tt-vao-muc`, máy giảm chuyển động chỉ còn mờ ngắn). key theo màn để mỗi lần đổi màn chạy lại. */}
+        <div key={laManThi ? 'thi' : screen} className={`giua-noi-dung${hoa2 && !laManThi ? ' tt-vao-muc' : ''}`} data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác.
           GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Tổng quan ngay. */}
       {!anKhiHoa2 && (
       <ChanLoi key={screen} o={(hoa2 && TEN_MAN_HOA2[screen]) || TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
-        <Suspense fallback={<div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
+        <Suspense fallback={hoa2 ? <KhungXuongMan /> : <div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
         {screen === 'classlist' && <ClassListScreen />}
         {screen === 'examhub' && <ExamHubScreen />}
         {screen === 'examsetup' && <ExamSetupScreen />}

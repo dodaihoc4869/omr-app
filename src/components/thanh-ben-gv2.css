@@ -44,6 +44,11 @@
   background: var(--bts-do-nhat);
   color: var(--bts-do);
 }
+/* "Cần thầy chữa" cạnh Hành trình — CÙNG màu hổ phách của dòng việc ấy ở màn Hôm nay (trung tu 09/10: một nghĩa một màu) */
+.ben-trai-dem[data-tone='vang'] {
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+}
 
 @media (min-width: 880px) {
   .ben-trai[data-hoa2] .ben-trai-dem {
@@ -160,7 +165,8 @@
     padding-top: 56px;
   }
   .vo-thay[data-hoa2] .day-thay-muc {
-    font-size: 11.5px;
+    font-size: 12px; /* trung tu 09/10: nhãn thanh đáy không dưới 12 px (thang chung — phụ chú tối thiểu) */
+    letter-spacing: -0.01em;
     padding-inline: 0;
     white-space: nowrap; /* "Ca kiểm tra" đậm không tách 2 dòng ở 360 px */
   }
@@ -170,13 +176,14 @@
 }
 @media (max-width: 379px) {
   .vo-thay[data-hoa2] .day-thay-muc {
-    font-size: 11px;
+    font-size: 12px;
+    letter-spacing: -0.02em;
   }
 }
 
-/* ba màn 2.0 dạng bảng số liệu dùng hết bề ngang (bản vẽ: lưới 1440 − thanh bên 240); màn cũ giữ 1100 px */
-.vo-thay[data-hoa2] .giua-noi-dung:is([data-teacher-screen='tongquan'], [data-teacher-screen='lichsuca'], [data-teacher-screen='chiendich']) {
-  max-width: 1400px;
+/* Trung tu 09/10: MỌI màn 2.0 cùng một bề rộng nội dung tối đa 1320 (trước: ba màn bảng số liệu 1400, màn khác 1100/1320) */
+.vo-thay[data-hoa2] .giua-noi-dung {
+  max-width: 1320px;
 }
 @media (max-width: 879px) {
   /* điện thoại: thanh trên đã ghi tên màn — tiêu đề trang chỉ còn cho trình đọc màn hình (không lặp chữ) */
@@ -187,5 +194,127 @@
     overflow: hidden;
     clip: rect(0 0 0 0);
     white-space: nowrap;
+  }
+}
+
+/* ── TRUNG TU 09/10 · THANG CHUNG CHO APP THẦY 2.0 (thầy duyệt bản vẽ HeThong; src/styles/thang.css: --t-* · --r-* · --cd-*) ─────────────
+ * Chỉ khi cờ 2.0 bật (`[data-hoa2]` trên vỏ); cờ tắt ⇒ như cũ. Không màu mới: chỉ biến --gvm-* sẵn có. Tiền tố `.m3.vo-thay[data-hoa2]` để thắng
+ * teacher-modern.css (App.tsx nạp sau tệp này). */
+
+/* lề + bề rộng: mọi màn cùng một khung — máy tính lề 32 trên · 40 hai bên (tối đa 1320, ở trên); điện thoại lề 20 */
+@media (min-width: 880px) {
+  .m3.vo-thay[data-hoa2] .giua-noi-dung > :is(.gv2-trang, .gv-page):not(.ct),
+  .m3.vo-thay[data-hoa2] .giua-noi-dung > .ca-hoa2-khung > .gv-page {
+    padding: 32px 40px 48px;
+  }
+  /* Mở ca: khung trong có lề nội tuyến (cờ tắt giữ nguyên) — 2.0 dùng đúng lề chung */
+  .m3.vo-thay[data-hoa2] .giua-noi-dung > .gv-page.ct > .ct-khung {
+    padding: 32px 40px 64px !important;
+  }
+}
+@media (max-width: 879px) {
+  .m3.vo-thay[data-hoa2] .giua-noi-dung > :is(.gv2-trang, .gv-page):not(.ct),
+  .m3.vo-thay[data-hoa2] .giua-noi-dung > .ca-hoa2-khung > .gv-page {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* nút 3 kiểu, đích chạm ≥ 44 (B3): máy tính trước đây ép mọi nút trong nội dung 40 px (vo-thay.css "mật độ màn rộng") — 2.0 nâng lên 44;
+ * nút chính / thẻ / nút lớn của Mở ca giữ 48 */
+@media (min-width: 880px) {
+  .m3.vo-thay[data-hoa2] .giua-noi-dung button {
+    min-height: 44px;
+  }
+  .m3.vo-thay[data-hoa2] .giua-noi-dung :is(.ct-nut:not(.ct-nut-nho), .gvv2-nut-chinh, .gvv2-tab-nut, .gv2-nut-chinh) {
+    min-height: 48px;
+  }
+}
+
+/* MỘT kiểu tiêu đề trang: 32 · đậm 800 (vài màn đặt cỡ chữ nội tuyến nên cần !important) */
+.m3.vo-thay[data-hoa2] .giua-noi-dung :is(h1.gv2-tieu-de, h1.gvv2-h1, .ct-dau h1, .gv-page-header h1) {
+  font-size: var(--t-man) !important;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+/* nút cạnh tiêu đề trang chỉ rộng theo chữ (Kho đề: "Duyệt lời giải" trước chiếm hết hàng ⇒ tiêu đề 32 bị bẻ hai dòng) */
+.m3.vo-thay[data-hoa2] .giua-noi-dung .gv-page-header > button.w-full {
+  width: auto;
+}
+
+/* bo góc 3 bậc + viên: thẻ 24 · nút và ô nhập 12 (bản vẽ GV) */
+.m3.vo-thay[data-hoa2] :is(.gv2-the, .gvv2-the) {
+  border-radius: var(--r-the);
+}
+/* nút: bo 12 + nhấn lún 2% trong 120 ms (thang chung) */
+.m3.vo-thay[data-hoa2] :is(.gvv2-nut-chinh, .gvv2-nut-vien, .gv2-nut-chinh, .gv2-nut-vien, .ca-hoa2-mo-ca) {
+  border-radius: var(--r-nho);
+  transition: transform var(--cd-nhan) var(--cd-cong);
+}
+.m3.vo-thay[data-hoa2] :is(input:not([type='checkbox'], [type='radio'], [type='range']), select, textarea) {
+  border-radius: var(--r-nho);
+}
+.m3.vo-thay[data-hoa2] :is(.gvv2-nut-chinh, .gvv2-nut-vien, .gv2-nut-chinh, .gv2-nut-vien, .ca-hoa2-mo-ca):active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Không phóng to / trượt khi rê chuột (bản vẽ HeThong): 2.0 bỏ hẳn; cờ tắt thì bỏ khi máy đặt "giảm chuyển động" */
+.m3.vo-thay[data-hoa2] :is([class*='hover:scale'], [class*='hover:-translate'], [class*='hover:translate']):hover:not(:active) {
+  scale: none;
+  translate: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vo-thay :is([class*='hover:scale'], [class*='hover:-translate'], [class*='hover:translate']):hover {
+    scale: none;
+    translate: none;
+    transform: none;
+  }
+  .m3.vo-thay[data-hoa2] :is(.gvv2-nut-chinh, .gvv2-nut-vien, .gv2-nut-chinh, .gv2-nut-vien, .ca-hoa2-mo-ca) {
+    transition: none;
+  }
+  .m3.vo-thay[data-hoa2] :is(.gvv2-nut-chinh, .gvv2-nut-vien, .gv2-nut-chinh, .gv2-nut-vien, .ca-hoa2-mo-ca):active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* khung xương chờ mảnh màn (App.tsx `KhungXuongMan`) và khối xương dùng chung của màn thầy */
+.gv-xuong {
+  display: grid;
+  gap: 16px;
+  padding: 32px 40px;
+}
+.gv-xuong-khoi {
+  display: block;
+  border-radius: var(--r-nho);
+  background: var(--gvm-mat-2);
+}
+.gv-xuong-tieu-de {
+  width: 280px;
+  max-width: 70%;
+  height: 36px;
+}
+.gv-xuong-dong {
+  width: 420px;
+  max-width: 90%;
+  height: 16px;
+}
+.gv-xuong-luoi {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+.gv-xuong-the {
+  height: 280px;
+  border-radius: var(--r-the);
+}
+@media (max-width: 879px) {
+  .gv-xuong {
+    padding: 16px 20px;
+  }
+  .gv-xuong-luoi {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

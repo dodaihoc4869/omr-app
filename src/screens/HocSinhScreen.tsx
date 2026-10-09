@@ -33,6 +33,8 @@ import TongHocPhi from '../components/hoc-phi/TongHocPhi'
 import HopHocPhi from '../components/hoc-phi/HopHocPhi'
 import { conThieu, dinhDangTien, hocPhiCuaEm, taiHocPhi, TEN_TRANG_THAI, tongHocPhi, trangThaiHocPhi, type HocPhiEm, type TrangThaiHocPhi } from '../lib/hoc-phi'
 import '../components/hoc-phi/hoc-phi.css'
+import HocSinhDanhSachV2 from './HocSinhDanhSachV2'
+import { lyDoDeHieu } from '../lib/loi-de-hieu'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -320,7 +322,8 @@ export default function HocSinhScreen() {
           <ArrowLeft size={16} /> Danh sách học sinh
         </button>
 
-        {loi && <OThongBao tone="do">{loi}</OThongBao>}
+        {/* 2.0 (trung tu 09/10): lỗi tải nói bằng câu dễ hiểu, không in lỗi kỹ thuật thô. */}
+        {loi && <OThongBao tone="do">{hoa2 ? `Chưa mở được hồ sơ. ${lyDoDeHieu(loi)}` : loi}</OThongBao>}
         {dangTaiHoSo && !hoSo && <div style={NHAN_NHO}>Đang mở hồ sơ…</div>}
 
         {hoSo && (
@@ -548,6 +551,67 @@ export default function HocSinhScreen() {
   }
 
   // ------------------------------------------------------------- DANH SÁCH EM
+  // GAME HÓA 2.0 — TRUNG TU 09/10 (bản vẽ GV-HocSinh thầy duyệt): MỘT thanh lọc + bảng + chia trang 25 em (HocSinhDanhSachV2). Cùng dữ liệu,
+  // cùng bộ lọc, cùng lệnh của màn này; cờ tắt ⇒ danh sách cũ ngay dưới, không đổi.
+  if (hoa2) {
+    return (
+      <>
+        <HocSinhDanhSachV2
+          ds={ds}
+          dsLoc={dsLoc}
+          loi={loi}
+          dangTai={dangTai}
+          onTaiLai={() => void tai()}
+          timKiem={timKiem}
+          datTimKiem={setTimKiem}
+          khoiLoc={khoiLoc}
+          datKhoiLoc={setKhoiLoc}
+          lopLoc={lopLoc}
+          datLopLoc={setLopLoc}
+          dsLop={dsLop.map((l) => ({ tenLop: l, soEm: lopThay.ds?.find((x) => x.tenLop === l)?.soEm ?? null }))}
+          locHocPhi={locHocPhi}
+          datLocHocPhi={setLocHocPhi}
+          tongHp={tongHp}
+          hocPhi={hocPhi}
+          tenLopEm={tenLopEm}
+          khoiCua={(ns) => khoiTuNamSinh(ns)}
+          moHoSo={moHoSo}
+          moHocPhi={(sbd, hoTen) => setHopHocPhi({ sbd, hoTen })}
+          datLaiMatKhau={hoiDatLaiMatKhau}
+          dangResetMk={dangResetMk}
+          nutDau={
+            <>
+              <NutDongBoDanhSach
+                kieu="vien"
+                onXong={(soEm, tomTat) => {
+                  showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
+                  void tai()
+                }}
+              />
+              <NutThemHocSinh
+                kieu="chinh"
+                onXong={(_soEm, tomTat) => {
+                  showToast(tomTat, 'success')
+                  void tai()
+                }}
+              />
+            </>
+          }
+          tongHocPhi={<TongHocPhi tong={tongHp} phamVi={phamViHp} loc={locHocPhi} loi={loiHocPhi ? `Chưa tải được học phí. ${lyDoDeHieu(loiHocPhi.replace(/^Chưa tải được học phí:\s*/, ''))}` : undefined} />}
+        />
+        {hopXacNhan}
+        {hopHocPhi && (
+          <HopHocPhi
+            sbd={hopHocPhi.sbd}
+            hoTen={hopHocPhi.hoTen}
+            banDau={hocPhiCuaEm(hopHocPhi.sbd, hocPhi)}
+            onDong={() => setHopHocPhi(null)}
+            onDoi={(em) => setHocPhi((truoc) => new Map(truoc ?? []).set(em.sbd, em))}
+          />
+        )}
+      </>
+    )
+  }
   return (
     <div className="gv-page gv-hoc-sinh-day-du min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       {/* HEADER GOOGLE STYLE */}

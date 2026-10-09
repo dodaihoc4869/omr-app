@@ -46,8 +46,8 @@
 @media (min-width: 880px) {
   .ca-hoa2-mo-ca {
     position: absolute;
-    top: 12px;
-    right: 16px;
+    top: 32px; /* trung tu 09/10: thẳng hàng tiêu đề trang (lề chung 32 · 40) */
+    right: 40px;
     z-index: 1;
     display: inline-flex;
     align-items: center;
