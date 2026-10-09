@@ -107,7 +107,12 @@ describe('Hành trình v6: D1 thật',()=>{
    const z=k.d.sql.prepare('SELECT * FROM hanh_trinh_v5_quyet_dinh LIMIT 1').get() as {moc:number;tao_luc:number;qids_json:string}
    const absent=k.qids('DH-B1').find(id=>!JSON.parse(z.qids_json).includes(id))!
    await lenhChonV6(k.env,'S1',HOM_NAY,z.moc,z.tao_luc,[{qid:absent,version:'v1',nhom:'x',lop:'12',tang:1,phan:'I',kn:[],p:0.5,x:[],prop:0}]).run()
-   expect(k.d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v6_chon WHERE qid=?').get(absent)).toEqual({n:0});k.d.sql.close()
+   expect(k.d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v6_chon WHERE qid=?').get(absent)).toEqual({n:0})
+   // Plan thua cũng không được gán propensity cho câu nằm ngoài SÁU vị trí thắng,
+   // dù câu ấy có trong phần còn lại của cùng kế hoạch ngày.
+   const beyond=JSON.parse(z.qids_json)[6] as string;expect(beyond).toBeTruthy()
+   await lenhChonV6(k.env,'S1',HOM_NAY,z.moc,z.tao_luc,[{qid:beyond,version:'v1',nhom:'x',lop:'12',tang:1,phan:'I',kn:[],p:0.5,x:[],prop:0.5}]).run()
+   expect(k.d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v6_chon WHERE qid=?').get(beyond)).toEqual({n:0});k.d.sql.close()
  })
  it('mẫu không khám phá không chiếm phần thưởng câu mới của mẫu có propensity',async()=>{
    const k=kho();await dongBoBaHanhTrinh(k.env,T_SANG);await layKeHoachHomNay(k.env,'S1',T_SANG)
