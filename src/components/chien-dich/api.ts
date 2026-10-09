@@ -16,6 +16,7 @@ export interface CoHoa2 {
 export type TrangThaiChienDich = 'dang_chay' | 'da_dong' | 'da_huy'
 
 export interface ChienDichTom {
+  hanhTrinh?: boolean
   id: string
   ten: string
   lop: string | null
@@ -159,6 +160,7 @@ export interface CauCanDayLai {
 export interface DongNoCu { sbd: string; ten: string; soCau: number; luot: number; soNgay: number; cau: string }
 
 export interface BangChienDich {
+  hanhTrinhNgay?: { em: { sbd: string; ten: string; tang: number | null; toiThieu: number | null; daLam: number; daXep: number; conThieu: number }[] }
   chienDich: Omit<ChienDichTom, 'hetHan'>
   homNay: string
   hetHan: boolean

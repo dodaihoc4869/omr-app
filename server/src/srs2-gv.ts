@@ -17,6 +17,7 @@ import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatD
 import { cacQidSongSinh } from './loi-hoc-luat'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { lanLamTuDongTc, sqlQidHoacTc } from './lam-lai-so'
+import { laHanhTrinh } from './hanh-trinh-hop-nhat'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -185,15 +186,17 @@ const trungVi = (ds: number[]): number => {
 
 // ---------------------------------------------------------------- danh sách, sức chứa, tạo
 async function danhSach(env: Env, nowMs: number, coThongKe = false) {
-  const r = await env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY tao_luc DESC LIMIT 100").all<Row>()
+  const r = await env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY CASE WHEN id LIKE 'hanh-trinh-v3-khoi-%' THEN 0 ELSE 1 END,tao_luc DESC LIMIT 100").all<Row>()
   const homNay = ngayVnCua(nowMs)
-  const ds = await docChienDichKemBatDau(env, r.results ?? [])
+  const tatCa = await docChienDichKemBatDau(env, r.results ?? [])
+  const ht = tatCa.filter(c => laHanhTrinh(c.id) && c.trangThai === 'dang_chay')
+  const ds = ht.length === 3 ? ht : tatCa
   // Chỉ-thêm (bản vẽ GV-ChienDichDaGiao 28/09): `thongKe: true` ⇒ số liệu lớp của TỐI ĐA 20 chiến dịch mới nhất (đã làm qua, thành thạo,
   // đúng nhịp, quá tải hôm nay, cần dạy lại). Lỗi đọc một chiến dịch ⇒ `thongKe: null` cho riêng chiến dịch đó. Màn Chữa trên lớp không xin ⇒ nhẹ như cũ.
-  const tk = coThongKe ? await Promise.all(ds.slice(0, SO_CD_THONG_KE).map((cd) => thongKeLop(env, cd, homNay, nowMs).catch(() => null))) : []
+  const tk = coThongKe ? await Promise.all(ds.slice(0, SO_CD_THONG_KE).map((cd) => laHanhTrinh(cd.id) ? Promise.resolve(null) : thongKeLop(env, cd, homNay, nowMs).catch(() => null))) : []
   return {
     ok: true, homNay,
-    chienDich: ds.map(({ qids, sbd, ...c }, i) => ({ ...c, soCau: qids.length, soEm: sbd.length, hetHan: c.hanNop < homNay, sapBatDau: chuaBatDau({ ...c, qids, sbd }, homNay), ...(coThongKe ? { thongKe: tk[i] ?? null } : {}) })),
+    chienDich: ds.map(({ qids, sbd, ...c }, i) => ({ ...c, ...(laHanhTrinh(c.id) ? { hanhTrinh: true } : {}), soCau: qids.length, soEm: sbd.length, hetHan: c.hanNop < homNay, sapBatDau: chuaBatDau({ ...c, qids, sbd }, homNay), ...(coThongKe ? { thongKe: tk[i] ?? null } : {}) })),
   }
 }
 /** Số chiến dịch (mới nhất) được tính số liệu lớp trong `danh-sach` có `thongKe`. */
@@ -406,6 +409,7 @@ async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy
 async function bang(env: Env, id: string, nowMs: number) {
   const cd = await docMot(env, id)
   const homNay = ngayVnCua(nowMs)
+  if (laHanhTrinh(cd.id)) return import('./hanh-trinh-d1').then(m => m.bangHanhTrinh(env,cd,homNay))
   const [lanTho, ten, meta, hoSoDang, them] = await Promise.all([lanLamCaLop(env, cd.sbd, cd.qids), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe), docHoSoDangCaLop(env, cd.sbd), docMocThemCaLop(env, cd.id)])
   const tt = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, lanTho, them)
   // Tên hiển thị của mã dạng (khoá `hangTheoDang` trùng khoá `theoDang`/`dang[]` của bảng).
