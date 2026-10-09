@@ -65,6 +65,7 @@ export interface DauVaoHanhTrinh {
   chan: ReadonlySet<string>
   trongSo?: Readonly<Record<string, number>>
   tangSanSang?: ReadonlyMap<string, TangHanhTrinh>
+  uuTienCanThiep?: string
 }
 
 /** Chọn phần còn lại; không lặp nội dung để đủ sàn, không kéo ôn chưa đến hạn.
@@ -84,8 +85,8 @@ export function chonCauHanhTrinh(a: DauVaoHanhTrinh): { dao: string[]; doan: str
   const moi = ung.filter(c => a.tt.get(c.qid)!.laMoi).sort((x, y) =>
     (a.trongSo?.[y.qid] ?? 0) - (a.trongSo?.[x.qid] ?? 0) || (tangCuaCau(y)! - tangCuaCau(x)!) || tie(x, y))
   const no = ung.filter(c => !a.tt.get(c.qid)!.laMoi && !a.tt.get(c.qid)!.thanhThao)
-    .sort((x, y) => soSanhNo(x, y, a.tt, a.ngay) || tie(x, y))
-  const on = ung.filter(c => a.tt.get(c.qid)!.thanhThao).sort(tie)
+    .sort((x, y) => soSanhNo(x, y, a.tt, a.ngay) || (a.trongSo?.[y.qid] ?? 0)-(a.trongSo?.[x.qid] ?? 0) || tie(x, y))
+  const on = ung.filter(c => a.tt.get(c.qid)!.thanhThao).sort((x,y)=>(a.trongSo?.[y.qid]??0)-(a.trongSo?.[x.qid]??0) || tie(x,y))
   const n = Math.max(0, a.toiThieu - da.size)
   const chon: CauSrs[] = [], dungNhom = new Set(nhomDa)
   const lay = (ds: readonly CauSrs[], so: number) => {
@@ -97,6 +98,7 @@ export function chonCauHanhTrinh(a: DauVaoHanhTrinh): { dao: string[]; doan: str
       dungNhom.add(k); chon.push(c); dem++
     }
   }
+  lay(ung.filter(c=>c.qid===a.uuTienCanThiep),1)
   lay(no, Math.ceil(n * (no.length > n / 2 ? 0.5 : 0.3)))
   lay(moi, Math.ceil(n * 0.5))
   lay(on, Math.ceil(n * 0.2))
