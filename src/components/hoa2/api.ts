@@ -25,6 +25,7 @@ export interface ChienDichSanh {
 }
 
 export interface SanhHoa2 {
+  hanhTrinh?: { tang: number; toiThieu: number; daLam: number; daXep: number; conThieu: number; soChang: number; changHienTai: number; cauTrongChang: number }
   ngay: string
   chienDich: ChienDichSanh | null
   /** Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ tên + ngày, không lộ câu. Máy chủ cũ không gửi ⇒ null. */
@@ -224,6 +225,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       thuSucThem: docThuSucThem(o.thuSucThem),
       chuoiNgay: typeof o.chuoiNgay === 'number' && Number.isFinite(o.chuoiNgay) ? Math.max(0, Math.floor(o.chuoiNgay)) : null,
       ...docOmniSanh(o.omni),
+      ...docHanhTrinh(o.hanhTrinh),
       ruong: {
         daLam: soKhongAm(r.daLam),
         tong: soKhongAm(r.tong),
@@ -233,6 +235,15 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       },
     },
   }
+}
+
+function docHanhTrinh(x: unknown): Pick<SanhHoa2, 'hanhTrinh'> {
+  if (!x || typeof x !== 'object') return {}
+  const o = x as Record<string, unknown>
+  const tang = Number(o.tang)
+  if (![1, 2, 3, 4].includes(tang) || ![24, 30, 36].includes(Number(o.toiThieu))) return {}
+  return { hanhTrinh: { tang, toiThieu: soKhongAm(o.toiThieu), daLam: soKhongAm(o.daLam), daXep: soKhongAm(o.daXep),
+    conThieu: soKhongAm(o.conThieu), soChang: soKhongAm(o.soChang), changHienTai: soKhongAm(o.changHienTai), cauTrongChang: soKhongAm(o.cauTrongChang) } }
 }
 
 /** OMNI 3: chỉ gắn trường `omni` khi máy chủ gửi `omni.bat === true` (vắng ⇒ đối tượng Sảnh y hệt trước). */

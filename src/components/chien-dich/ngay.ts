@@ -34,6 +34,7 @@ export function hienNgay(ngay: string, coNam = true): string {
 
 /** "23:59 · Chủ Nhật 04/10/2026" — mốc hết hạn nộp. */
 export function hienHanNop(ngay: string, coNam = true): string {
+  if (ngay === '9999-12-31') return 'Học mỗi ngày'
   const t = hienNgay(ngay, coNam)
   return t ? `23:59 · ${t}` : ''
 }

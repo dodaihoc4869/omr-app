@@ -235,6 +235,7 @@ function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'o
 
 /** Vòng Cọ xát % + tên chiến dịch + hạn nộp + Cọ xát/Thành thạo (tấm dưới, ngày thường). */
 function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
+  if (s.hanhTrinh) return <TheHanhTrinh s={s} />
   const cd = s.chienDich!
   const p = phanTram(cd.coXat, cd.tong)
   const chuVi = 2 * Math.PI * 25
@@ -822,6 +823,7 @@ function Thanh({ nhan, co, tong, mau }: { nhan: string; co: number; tong: number
 }
 
 function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
+  if (s.hanhTrinh) return <TheHanhTrinh s={s} />
   const cd = s.chienDich!
   const p = phanTram(cd.coXat, cd.tong)
   const chuVi = 2 * Math.PI * 40
@@ -922,6 +924,16 @@ function NutTron({ nhan, onClick, children }: { nhan: string; onClick: () => voi
       {children}
     </button>
   )
+}
+
+function TheHanhTrinh({ s }: { s: SanhHoa2 }) {
+  const h = s.hanhTrinh!
+  return <section className="h2-ng-the" aria-label="Hành trình hôm nay">
+    <b>Hành trình giỏi hoá · {['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp'][h.tang - 1]}</b>
+    <p className="h2-ng-phu">Hôm nay: {h.daLam}/{h.toiThieu} câu tối thiểu</p>
+    <p className="h2-ng-phu">{h.daLam >= h.toiThieu ? 'Đã hoàn thành nhiệm vụ hôm nay' : `Chặng ${h.changHienTai}/${h.soChang} · còn ${h.cauTrongChang} câu trong chặng`}</p>
+    {h.conThieu > 0 && <p className="h2-ng-phu">Còn thiếu {h.conThieu} câu phù hợp cho kế hoạch hôm nay.</p>}
+  </section>
 }
 
 function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
