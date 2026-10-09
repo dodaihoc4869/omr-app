@@ -49,7 +49,8 @@ async function lenDuong(tong = 2) {
   const nut = await screen.findByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement
   await waitFor(() => expect(nut.disabled).toBe(false))
   fireEvent.click(nut)
-  await screen.findByText(new RegExp(`^ẢI 1/${tong}`))
+  // trung tu 09/10: bộ đếm "ẢI k/n" đã bỏ (trùng "Câu k/n" của thẻ câu) ⇒ chờ "Câu 1/n"
+  await screen.findByText(`Câu 1/${tong}`)
 }
 function chot(chu = /^B\./) {
   fireEvent.click(screen.getByRole('button', { name: chu }))
@@ -96,7 +97,7 @@ describe('Đảo 2.0 · OMNI bật: msLam + chip Chưa chắc', () => {
     expect(b1).toMatchObject({ session: 's1', qid: 'q0', answer: 'B', assisted: false, tuTin: 'chua_chac' })
     expect(Number.isInteger(b1.msLam)).toBe(true)
     expect(b1.msLam as number).toBeGreaterThanOrEqual(0)
-    await screen.findByText(/^ẢI 2\/2/)
+    await screen.findByText('Câu 2/2')
     const chip2 = screen.getByRole('switch', { name: CHIP_CHUA_CHAC }) as HTMLInputElement
     expect(chip2.checked).toBe(false) // đặt lại mỗi câu
     fireEvent.click(chip2) // bật: cùng ngày ⇒ không hiện gợi ý lần hai, nhưng có DÒNG TRẠNG THÁI (thầy 06/10: "bấm nó chưa phản hồi") — màu hổ phách + dòng này

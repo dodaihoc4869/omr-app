@@ -224,7 +224,8 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
  useEffect(()=>{if(loi)loiRef.current?.scrollIntoView?.({block:'nearest'})},[loi])
  if(!q)return null
  const vai=docVai(q.vai),goiY=docGoiY(q.goiY,q.phan),cuoi=viTri+1>=cau.length
- const nhan=<p className="dao2-ai-nhan">ẢI {viTri+1}/{cau.length}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}{q.tenDang?<span> · {q.tenDang}</span>:null}</p>
+ // TRUNG TU 09/10 (bản vẽ HS-LamCau): bỏ bộ đếm "ẢI k/n" trùng với "Câu k/n" của thẻ câu (giữ cái ở thẻ câu) — nhãn chỉ còn vai · dạng; thanh ải vẫn chỉ ải đang làm.
+ const nhan=vai||q.tenDang?<p className="dao2-ai-nhan">{vai?TEN_VAI[vai].toLocaleUpperCase('vi'):null}{q.tenDang?<span>{vai?' · ':''}{q.tenDang}</span>:null}</p>:null
  const thieu=!traLoi.trim()||(q.phan==='II'&&!/^[DS]{4}$/.test(traLoi))
  const chuNutThieu=q.phan==='I'?'Chọn một phương án để tung chiêu':q.phan==='II'?'Chọn đủ 4 ý để tung chiêu':'Nhập đáp án để tung chiêu'
  // Dọc: một cột như cũ (hai lớp bọc `display:contents`). Ngang: cột TRÁI = thế giới game (thanh ải, cảnh trận, dải kết quả) · cột PHẢI = phần học

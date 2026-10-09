@@ -41,7 +41,10 @@ describe('Đảo 2.0 · bố cục ngang', () => {
     const { container } = trongAi(null)
     const trai = container.querySelector('.dao2-ai-trai')!, phai = container.querySelector('.dao2-ai-phai')!
     expect(trai.querySelector('.dao2-canh .dao2-canh-thu')?.getAttribute('alt')).toBe('Thần thú của em: Lửa Nhỏ')
-    expect(trai.querySelector('.dao2-ai-dau .dao2-ai-nhan')?.textContent).toMatch(/^ẢI 3\/6 · ÔN LẠI/)
+    // SỬA CÓ CHỦ Ý (trung tu 09/10, bản vẽ HS-LamCau): bỏ bộ đếm "ẢI k/n" trùng "Câu k/n" — nhãn đầu cột chỉ còn vai · dạng; số câu ở thẻ câu
+    expect(trai.querySelector('.dao2-ai-dau .dao2-ai-nhan')?.textContent).toMatch(/^ÔN LẠI/)
+    expect(container.textContent).not.toMatch(/ẢI 3\/6/)
+    expect(phai.querySelector('.dao2-v2-so-cau')?.textContent).toBe('Câu 3/6')
     expect([...trai.querySelectorAll('.dao2-tien-do-nhan li')].map(li => li.textContent)).toEqual(['Mới', 'Mới', 'Ôn lại', 'Mới', 'Mới', 'Trùm'])
     expect(trai.querySelector('.dao2-tien-do')?.textContent).toContain('Đúng 1 ải · Chưa đúng 1 ải')
     expect(phai.querySelector('.dao2-giay')).toBeTruthy()
@@ -68,7 +71,9 @@ describe('Đảo 2.0 · bố cục ngang', () => {
     expect(container.querySelector('.dao2-ai-dau .dao2-thanh')).toBeTruthy()
     cleanup(); const lam = trongAi(null)
     expect(lam.container.querySelector('.dao2-ai-dau .dao2-ai-nhan')).toBeNull()
-    expect(lam.container.querySelector('.dao2-ai-trai > .dao2-ai-nhan')?.textContent).toMatch(/^ẢI 3\/6/)
+    // SỬA CÓ CHỦ Ý (trung tu 09/10): nhãn trên cảnh trận không còn "ẢI k/n" (trùng "Câu k/n" của thẻ câu)
+    expect(lam.container.querySelector('.dao2-ai-trai > .dao2-ai-nhan')?.textContent).toMatch(/^ÔN LẠI/)
+    expect(lam.container.querySelector('.dao2-v2-so-cau')?.textContent).toBe('Câu 3/6')
   })
 
   it('Bản đồ: trái = khung đảo có thần thú của em · phải = số chiến dịch + tấm chuyến + LÊN ĐƯỜNG', () => {

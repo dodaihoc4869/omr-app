@@ -46,7 +46,7 @@ async function lenDuong(tong = 2) {
   const nut = await screen.findByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement
   await waitFor(() => expect(nut.disabled).toBe(false))
   fireEvent.click(nut)
-  await screen.findByText(new RegExp(`^ẢI 1/${tong}`))
+  await screen.findByText(`Câu 1/${tong}`) // trung tu 09/10: bộ đếm "ẢI k/n" bỏ (trùng "Câu k/n" của thẻ câu)
 }
 const chotI = () => { fireEvent.click(screen.getByRole('button', { name: /^B\./ })); fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' })) }
 const nhapIII = (v: string) => fireEvent.change(screen.getByRole('textbox', { name: 'Đáp án của em' }), { target: { value: v } })
@@ -114,11 +114,11 @@ describe('(b) chip "Soát lại đơn vị và số liệu" — Đảo 2.0', () 
     nhapIII('12')
     fireEvent.click(nutChot())
     fireEvent.click(await nutSang(2))
-    await screen.findByText(/^ẢI 2\/3/)
+    await screen.findByText('Câu 2/3')
     expect(chipSoat()).toBeNull() // câu Phần I: không có ô
     chotI()
     fireEvent.click(await nutSang(3))
-    await screen.findByText(/^ẢI 3\/3/)
+    await screen.findByText('Câu 3/3')
     expect(chipSoat()!.checked).toBe(false) // câu Phần III kế: đặt lại
     expect(m.container.querySelectorAll('[data-khoi="soat-lai"]')).toHaveLength(1)
   })
@@ -131,7 +131,7 @@ describe('(b) chip "Soát lại đơn vị và số liệu" — Đảo 2.0', () 
     expect(nutChot().disabled).toBe(false) // chưa soát vẫn chốt được
     fireEvent.click(nutChot())
     fireEvent.click(await nutSang(2))
-    await screen.findByText(/^ẢI 2\/2/)
+    await screen.findByText('Câu 2/2')
     fireEvent.click(chipSoat()!)
     nhapIII('13')
     fireEvent.click(nutChot())
@@ -225,7 +225,7 @@ describe('(c) thẻ "Em biết câu này. Sai vì bước nào?" — Đảo 2.0'
     await lenDuong()
     chotI()
     fireEvent.click(await nutSang(2))
-    await screen.findByText(/^ẢI 2\/2/)
+    await screen.findByText('Câu 2/2')
     expect(coThe(m.container)).toBeNull() // thẻ của câu 1 không theo sang câu 2
     chotI()
     await screen.findByRole('button', { name: 'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN' })

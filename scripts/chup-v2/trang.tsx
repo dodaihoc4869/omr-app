@@ -20,6 +20,7 @@ import '@fontsource/be-vietnam-pro/latin-700.css'
 import '@fontsource/noto-serif/vietnamese-400.css'
 import '@fontsource/noto-serif/latin-400.css'
 import '../../src/styles/tokens.css'
+import '../../src/styles/thang.css' // thang chung 3 app (main.tsx nạp ngay sau tokens.css) — thiếu thì --nut-*-cao, --t-*, --r-* rỗng trong ảnh chụp
 import '../../src/index.css'
 import '../../src/styles/the-loc.css'
 import '../../src/components/m3'

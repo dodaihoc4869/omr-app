@@ -114,7 +114,7 @@
 .dao .dao-hon-cap{position:absolute;left:14px;top:14px;display:flex;flex-direction:column;gap:2px}
 .dao .dao-hon-cap small{font-size:12px;font-weight:700;color:rgb(232,238,252)}.dao .dao-hon-cap strong{font-size:44px;font-weight:800;line-height:.9}
 .dao .dao-hon-con{position:absolute;right:14px;top:14px;padding:6px 12px;border-radius:999px;background:rgba(8,14,40,.6);box-shadow:inset 0 0 0 1px rgba(255,209,102,.6);font-size:12px;font-weight:800;color:rgb(255,224,138)}
-.dao button.dao-hon-nap{--nut-nen:linear-gradient(180deg,rgb(255,224,138),var(--dao-vang-dam));--nut-chu:var(--dao-vang-chu);--nut-bong:0 6px 16px rgba(0,0,0,.35);position:absolute;right:14px;top:50px;min-height:36px;padding:0 14px;border-radius:18px;font-size:12px;font-weight:800;animation:dao-nhun 1.8s ease-in-out infinite}
+.dao button.dao-hon-nap{--nut-nen:linear-gradient(180deg,rgb(255,224,138),var(--dao-vang-dam));--nut-chu:var(--dao-vang-chu);--nut-bong:0 6px 16px rgba(0,0,0,.35);position:absolute;right:14px;top:50px;min-height:44px;padding:0 14px;border-radius:var(--r-the,24px);font-size:12px;font-weight:800;animation:dao-nhun 1.8s ease-in-out infinite}
 .dao .dao-hap-thu{display:flex;flex-direction:column;gap:8px;padding:12px 14px}
 .dao .dao-hap-thu-chu{margin:0;font-size:13px;font-weight:600;color:var(--dao-chu-mo)}.dao .dao-hap-thu-chu b{font-size:14px;font-weight:800;color:var(--dao-chu);font-variant-numeric:tabular-nums}
 .dao .dao-hap-thu-bao{margin:0;font-size:13px;line-height:1.45;font-weight:600;color:var(--dao-chu-mo)}
@@ -226,7 +226,7 @@
 .dao .dao-san[data-gon] .dao-san-ten{display:block;max-width:none;font-size:10.5px;line-height:14px;white-space:nowrap}
 .dao .dao-san[data-gon] .dao-san-ten small{display:none}
 .dao .dao-san[data-gon] .dao-san-so{font-size:22px}
-.dao .dao-san[data-gon] button.dao-san-tieng{top:4px;right:4px;bottom:auto;width:30px;height:30px}
+.dao .dao-san[data-gon] button.dao-san-tieng{top:4px;right:4px;bottom:auto;width:44px;height:44px} /* vùng chạm ≥ 44px (trung tu 09/10) */
 .dao .dao-san-tia{position:absolute;left:-12%;top:-30%;height:160%;aspect-ratio:1;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,170,60,.3) 0deg 4deg,rgba(255,170,60,0) 4deg 12deg);-webkit-mask-image:radial-gradient(circle,rgb(0,0,0) 20%,rgba(0,0,0,0) 66%);mask-image:radial-gradient(circle,rgb(0,0,0) 20%,rgba(0,0,0,0) 66%);animation:dao-xoay 30s linear infinite}
 .dao .dao-san-thu{position:absolute;left:4%;bottom:26px;height:calc(100% - 44px);width:auto;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45)) drop-shadow(0 0 14px rgba(140,170,255,.4));transform-origin:50% 92%;animation:dao-tho 4s ease-in-out infinite;-webkit-user-drag:none;user-select:none}
 .dao .dao-san-thu[data-dong="danh"]{animation:dao-danh .9s ease-out both}
