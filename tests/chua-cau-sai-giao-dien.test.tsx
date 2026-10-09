@@ -74,7 +74,7 @@ describe('Trải nghiệm sửa từng bước', () => {
     const input = await screen.findByLabelText('Câu trả lời của em')
     fireEvent.change(input, { target: { value: '23' } })
     fireEvent.click(
-      screen.getByRole('button', { name: 'Kiểm tra cách em làm' }),
+      screen.getByRole('button', { name: 'Tự thử lại' }),
     )
     expect(await screen.findByText('Em đang bỏ sót O và H.')).toBeTruthy()
     expect((input as HTMLInputElement).disabled).toBe(true)
@@ -92,7 +92,7 @@ describe('Trải nghiệm sửa từng bước', () => {
     const input = await screen.findByLabelText('Câu trả lời của em')
     fireEvent.change(input, { target: { value: '40' } })
     fireEvent.click(
-      screen.getByRole('button', { name: 'Kiểm tra cách em làm' }),
+      screen.getByRole('button', { name: 'Tự thử lại' }),
     )
     expect(await screen.findByText('Mất mạng')).toBeTruthy()
     expect((input as HTMLInputElement).disabled).toBe(true)
@@ -123,7 +123,7 @@ describe('Trải nghiệm sửa từng bước', () => {
     expect(
       await screen.findByRole('radio', { name: /Cộng đủ nguyên tử/ }),
     ).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Gợi mở cho em' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Cần gợi ý' }))
     expect(await screen.findByText('Xét đủ O và H.')).toBeTruthy()
   })
   it('tự làm được bản mới chưa bị gọi nhầm là đóng lỗi', async () => {

@@ -31,7 +31,7 @@ function dung(traLoiAnswer: Error, recs: Partial<DaoKetQua>[] = [{ suggestions: 
 }
 const vaoAi = async () => {
   await waitFor(() => expect(screen.getByText('Ester thuỷ phân')).toBeTruthy())
-  fireEvent.click(screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }))
+  fireEvent.click(screen.getByRole('button', { name: /Đồng hành/ }))
   await waitFor(() => expect(screen.getByLabelText('Ải 1')).toBeTruthy())
   fireEvent.click(screen.getByText('Hai'))
 }
@@ -61,7 +61,7 @@ describe('Đảo · hết trần câu GIỮA lượt', () => {
   it('nộp bị từ chối "hoàn thành 36 câu hôm nay" ⇒ thẻ rõ ràng + VỀ ĐẢO NGAY TRONG khối dính đáy; KHÔNG còn nút nộp; chỉ MỘT cảnh báo (không lặp ở đầu màn); cuộn tới thẻ', async () => {
     dung(loiMay('Em đã hoàn thành 36 câu hôm nay.'))
     await vaoAi()
-    fireEvent.click(screen.getByRole('button', { name: 'Trả lời · tung chưởng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
     await waitFor(() => expect(chan().querySelector('.dao-het-tran')).not.toBeNull())
     expect(chan().querySelector('.dao-het-tran p')!.textContent).toBe(CHU_HET_TRAN_DAO)
     expect(screen.queryByRole('button', { name: /Trả lời · tung chưởng/ })).toBeNull()
@@ -73,29 +73,29 @@ describe('Đảo · hết trần câu GIỮA lượt', () => {
   it('máy chủ gửi MÃ het_tran (lời tuỳ ý) ⇒ cũng ra thẻ', async () => {
     dung(loiMay('Trần của hôm nay đã đủ.', 'het_tran'))
     await vaoAi()
-    fireEvent.click(screen.getByRole('button', { name: 'Trả lời · tung chưởng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
     await waitFor(() => expect(chan().querySelector('.dao-het-tran')).not.toBeNull())
   })
   it('nạp lại số lượt sau lỗi hết trần (recommendations lần 2) và bấm VỀ ĐẢO ⇒ về màn Đảo, LÊN ĐƯỜNG khoá + "đã đi 36/36 câu Đảo thần thú"', async () => {
     const { nhat } = dung(loiMay('Em đã hoàn thành 36 câu hôm nay.'))
     await vaoAi()
-    fireEvent.click(screen.getByRole('button', { name: 'Trả lời · tung chưởng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
     await waitFor(() => expect(chan().querySelector('.dao-het-tran')).not.toBeNull())
     await waitFor(() => expect(nhat.filter((a) => a === 'recommendations').length).toBeGreaterThanOrEqual(2))
     fireEvent.click(screen.getByRole('button', { name: 'VỀ ĐẢO' }))
     await waitFor(() => expect(document.querySelector('.dao-chuyen')).not.toBeNull())
-    await waitFor(() => expect((screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement).disabled).toBe(true))
+    await waitFor(() => expect((screen.getByRole('button', { name: /Đồng hành/ }) as HTMLButtonElement).disabled).toBe(true))
     expect(document.body.textContent).toContain('Hôm nay em đã đi 36/36 câu Đảo thần thú. Mai đảo có chuyến mới.')
   })
   it('lỗi KHÁC (mạng) ⇒ hiện NGAY TRÊN nút nộp trong khối dính đáy, nút nộp vẫn còn để thử lại; cuộn tới lỗi; không thẻ hết trần', async () => {
     dung(loiMay('Mạng chập chờn, em thử lại nhé.'))
     await vaoAi()
-    fireEvent.click(screen.getByRole('button', { name: 'Trả lời · tung chưởng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
     await waitFor(() => expect(chan().querySelector('.dao-loi-nut')).not.toBeNull())
     expect(chan().querySelector('.dao-loi-nut')!.textContent).toBe('Mạng chập chờn, em thử lại nhé.')
     // nằm TRƯỚC nút trong cùng khối
     const kids = [...chan().children]
-    expect(kids.indexOf(chan().querySelector('.dao-loi-nut')!)).toBeLessThan(kids.indexOf(screen.getByRole('button', { name: 'Trả lời · tung chưởng' })))
+    expect(kids.indexOf(chan().querySelector('.dao-loi-nut')!)).toBeLessThan(kids.indexOf(screen.getByRole('button', { name: 'Chốt đáp án' })))
     expect(chan().querySelector('.dao-het-tran')).toBeNull()
     expect(document.querySelectorAll('[role="alert"]')).toHaveLength(1)
     expect(cuon.mock.contexts.some((el) => (el as Element).classList.contains('dao-loi-nut'))).toBe(true)

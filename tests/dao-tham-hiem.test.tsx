@@ -64,7 +64,7 @@ describe('Chuyến thám hiểm', () => {
     fireEvent.click(screen.getByText('Hai')); expect(onTraLoi).toHaveBeenCalledWith('B')
     rerender(<div className="dao"><ThamHiem {...props({ traLoi: 'B', onNop })} /></div>)
     expect(container.querySelector('.dao-tham-chan')!.hasAttribute('data-noi')).toBe(true)
-    fireEvent.click(screen.getByRole('button', { name: 'Trả lời · tung chưởng' })); expect(onNop).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' })); expect(onNop).toHaveBeenCalledTimes(1)
   })
   it('sau khi nộp: in NGUYÊN lý do thưởng máy chủ trả (tách số EXP ra huy hiệu), có lời giải, khoá đổi đáp án, nút sang ải kế', () => {
     const onTraLoi = vi.fn(), onTiep = vi.fn()

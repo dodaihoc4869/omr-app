@@ -67,7 +67,7 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(1)
     // bốn mục điều hướng là LIÊN KẾT (không phải nút)
-    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Điểm số', 'Tiến bộ', 'Lời thầy'])
+    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Lịch sử', 'Lời thầy'])
   })
 
   it('cảnh báo của thầy hiện ở Hôm nay (thụ động: chỉ "Đã xem cảnh báo", không "Làm ngay")', async () => {

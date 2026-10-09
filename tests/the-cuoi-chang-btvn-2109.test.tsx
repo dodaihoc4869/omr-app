@@ -35,8 +35,8 @@ describe('thẻ cuối chặng', () => {
     expect(screen.queryByText(/dạng mới/)).toBeNull() // soDangMoi = 0 ⇒ không nói
     expect(hop.querySelector('.tcc-exp-so')!.textContent).toContain('+46 EXP')
     expect(hop.querySelector('.tcc-exp-phu')!.textContent).toContain('30 EXP')
-    expect(screen.getByRole('button', { name: 'Về Bảng nhiệm vụ' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Xem kết quả chặng' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Về hôm nay' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Thử thêm +1 bậc' })).toBeTruthy()
   })
 
   it('thanh 7 chặng: 3 chặng xong, chặng kế "mai", còn lại trống; có nhãn đọc màn hình', () => {
@@ -46,18 +46,18 @@ describe('thẻ cuối chặng', () => {
     expect(doan).toEqual(['xong', 'xong', 'xong', 'mai', '', '', ''])
   })
 
-  it('Esc và nút X đóng thẻ (xem kết quả chặng); "Về Bảng nhiệm vụ" gọi veBang; nút chính được focus', () => {
+  it('Esc và nút X đóng thẻ (xem kết quả chặng); "Về hôm nay" gọi veBang; nút chính được focus', () => {
     const dong = vi.fn()
     const veBang = vi.fn()
     render(<TheCuoiChang view={view()} dong={dong} veBang={veBang} />)
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Về Bảng nhiệm vụ' }))
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Về hôm nay' }))
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(dong).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByRole('button', { name: /Đóng thẻ/ }))
     expect(dong).toHaveBeenCalledTimes(2)
-    fireEvent.click(screen.getByRole('button', { name: 'Xem kết quả chặng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thử thêm +1 bậc' }))
     expect(dong).toHaveBeenCalledTimes(3)
-    fireEvent.click(screen.getByRole('button', { name: 'Về Bảng nhiệm vụ' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Về hôm nay' }))
     expect(veBang).toHaveBeenCalledTimes(1)
   })
 

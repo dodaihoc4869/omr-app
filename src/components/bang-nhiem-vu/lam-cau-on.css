@@ -137,6 +137,7 @@
   background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); font-size: var(--bnv-cx-1); line-height: 1.4;
 }
 .lco-day .m3-nut-chinh { min-width: 132px; }
+.lco-nut-kiem-tra { background: var(--cam); color: var(--m3-on-primary); }
 
 @media (prefers-reduced-motion: reduce) {
   .lco * { transition: none !important; animation: none !important; }

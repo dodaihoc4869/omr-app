@@ -24,8 +24,8 @@ import './ph-v3.css'
 
 const MUC: { muc: Muc; ten: string; bt: () => ReactElement }[] = [
   { muc: 'hom-nay', ten: 'Hôm nay', bt: () => <BtHomNay /> },
-  { muc: 'diem', ten: 'Điểm số', bt: () => <BtDiem /> },
   { muc: 'tien-bo', ten: 'Tiến bộ', bt: () => <BtTienBo /> },
+  { muc: 'diem', ten: 'Lịch sử', bt: () => <BtDiem /> },
   { muc: 'loi-thay', ten: 'Lời thầy', bt: () => <BtLoiThay /> },
 ]
 
