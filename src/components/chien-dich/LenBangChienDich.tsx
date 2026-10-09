@@ -174,7 +174,12 @@ export default function LenBangChienDich() {
       return
     }
     setBang(b.du)
-    if (!b.du.hetHan) void napOmni(id)
+    if (b.du.hanhTrinhNgay) {
+      ++luotOmni.current
+      setOmni(null)
+      setGoiCaChot(null)
+    }
+    else if (!b.du.hetHan) void napOmni(id)
     else {
       setOmni(null)
       void napCaChot(id, b.du.chienDich.lop)
