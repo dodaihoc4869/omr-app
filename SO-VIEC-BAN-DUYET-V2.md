@@ -51,3 +51,10 @@ Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Th
 Thầy nhắn (nguyên văn): "đẩy luôn giao diện mới lên đi bạn ơi" · "làm tiếp xong hết đẩy lên máy chủ luôn nhé"
 - [x] Gộp main mới (PR217 Hành trình v6 + ab898ce) | bằng chứng: fbe1d58, cadfc89; nút "Làm bài kiểm đầu/tuần" của main đưa vào Sảnh mới (test mới trong `ban-duyet-v2-0910`).
 - [x] Kiểm toàn bộ trước phát hành | bằng chứng: bảng "Kiểm bản phát hành" trong `BAN-DUYET-V2-build-status.md`.
+
+## Đợt 3 — TRUNG TU giao diện 3 app (09/10)
+
+Thầy nhắn (nguyên văn): "bạn hãy quet toàn bộ giao diện app hiện tại và trung tu lại giao diện siêu đẹp, mịn, khoa học đúng cấu trúc của code hiện tại, vẽ cho tôi trước khi build nhé"
+- [ ] Quét toàn bộ giao diện app hiện tại (HS · PH · GV) | bằng chứng: (chưa có)
+- [ ] Vẽ bản trung tu (siêu đẹp, mịn, khoa học, đúng cấu trúc code hiện tại) cho thầy xem | bằng chứng: (chưa có)
+- [ ] CHƯA BUILD — chờ thầy chốt bản vẽ | bằng chứng: (chưa có)
