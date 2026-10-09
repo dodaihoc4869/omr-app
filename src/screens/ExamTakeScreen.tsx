@@ -289,6 +289,7 @@ export interface TuCongHocSinh {
   namSinh: string
   lop?: string
   matKhau?: string
+  scriptUrl?: string
 }
 
 export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSinh; onVe?: () => void } = {}) {
@@ -347,7 +348,7 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   const [namSinh, setNamSinh] = useState(() => {
     try { return localStorage.getItem(KHOA_NAM_SINH) ?? '' } catch { return '' }
   })
-  const [scriptUrl, setScriptUrl] = useState('')
+  const [scriptUrl, setScriptUrl] = useState(() => tuCong?.scriptUrl ?? '')
 
   const [bank, setBank] = useState<PublicExamBank | null>(null)
   const [lop, setLop] = useState('')
@@ -650,7 +651,11 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
     // sách lớp vẫn được máy chủ đối chiếu trong `vaoThi`, nên bỏ bước hỏi lại ở
     // đây không nới lỏng một chốt nào.
     setXacNhan({ sbd: tuCong.sbd, hoTen: tuCong.hoTen, lop: tuCong.lop || '' })
-    loadScriptUrlHoacMacDinh().then(setScriptUrl)
+    if (tuCong.scriptUrl) {
+      setScriptUrl(tuCong.scriptUrl)
+    } else {
+      loadScriptUrlHoacMacDinh().then(setScriptUrl)
+    }
   }, [tuCong])
 
   // Đọc link mời (?examCode=...&api=...) — học sinh mở link chỉ cần gõ SBD.
