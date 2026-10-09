@@ -50,7 +50,7 @@ describe('Đoàn · cờ Game Hóa 2.0 TẮT ⇒ giao diện cũ y nguyên', () 
       const a = screen.getByRole('button', { name: /phương án một/ }) as HTMLButtonElement
       expect(a.disabled).toBe(false)
       fireEvent.click(a)
-      expect(screen.getByRole('button', { name: /Chốt đòn · A \+ Đánh/ })).toBeTruthy()
+      expect(screen.getByRole('button', { name: /Chốt đáp án/ })).toBeTruthy()
     })
   }
 

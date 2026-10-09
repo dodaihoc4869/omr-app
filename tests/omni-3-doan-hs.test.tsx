@@ -42,7 +42,7 @@ describe('Đoàn Hộ Tống · OMNI', () => {
     await new Promise(r => setTimeout(r, 20))
     expect(screen.queryByRole('button', { name: CHIP_CHUA_CHAC })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /8,2 gam/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÒN ĐÁNH · B' }))
+    fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }))
     await waitFor(() => expect(m.than()).toEqual({ ma: 'DH2', hiep: 3, answer: 'B', hanhDong: 'danh' }))
     await screen.findByText('Em trả lời đúng.')
     expect(document.querySelector('[data-khoi="omni-loi-nhan"]')).toBeNull()
@@ -58,7 +58,7 @@ describe('Đoàn Hộ Tống · OMNI', () => {
     expect(chip.getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByText(GOI_Y_CHIP_CHUA_CHAC)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /8,2 gam/ })) // luồng chạm-chọn cũ không đổi
-    fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÒN ĐÁNH · B' }))
+    fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }))
     await waitFor(() => expect(m.than()).toMatchObject({ ma: 'DH2', hiep: 3, answer: 'B', hanhDong: 'danh', tuTin: 'chua_chac' }))
     expect(Number.isInteger(m.than()!.msLam)).toBe(true)
     expect(m.than()!.msLam as number).toBeGreaterThanOrEqual(0)

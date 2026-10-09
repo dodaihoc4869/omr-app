@@ -46,7 +46,7 @@ function dung({ hoa2 = true, truoc = xem(), sauNop, sauTiep }: { hoa2?: boolean;
 async function chotB() {
   await screen.findByText('HCOONa')
   fireEvent.click(screen.getByRole('button', { name: /HCOONa/ }))
-  fireEvent.click(await screen.findByRole('button', { name: /^CHỐT ĐÒN ĐÁNH · B|^Chốt đòn · B/ }))
+  fireEvent.click(await screen.findByRole('button', { name: /^CHỐT ĐÁP ÁN|^Chốt đáp án/ }))
 }
 const cho = xem({ revision: 6, tran: tran({ hiep: 3, moSauMs: 15 * 60_000, conMs: 40000, choTiep: true }), cau: undefined, hiepVuaXong: vuaXong(2) })
 const hiep3 = xem({ hiepVuaXong: vuaXong(2), revision: 7, tran: tran({ hiep: 3, moSauMs: 0, conMs: 40000 }), cau: { qid: 'Q8', nhan: 'toi_han_on', de: de8 } })

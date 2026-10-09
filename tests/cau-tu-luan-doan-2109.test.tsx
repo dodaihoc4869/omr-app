@@ -43,7 +43,7 @@ describe('Đoàn Hộ Tống · chốt chặn câu tự luận', () => {
   it('câu trắc nghiệm bình thường: đề hiện, có nút chốt đòn, không cảnh báo (đối chứng)', async () => {
     dung(trongTran())
     expect(await screen.findByText('Thuỷ phân ethyl acetate thu được')).toBeTruthy()
-    expect(screen.getByRole('button', { name: /Chọn đáp án để chốt đòn/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Chọn đáp án để chốt/ })).toBeTruthy()
     expect(canhBao).not.toHaveBeenCalled()
   })
   it('câu tự luận của hiệp: KHÔNG hiện đề, KHÔNG có phương án/ô nhập, nút chốt đòn khoá, ghi cảnh báo một dòng', async () => {

@@ -113,9 +113,9 @@ describe('Đoàn Hộ Tống · giao diện · Trong trận', () => {
   it('chọn B + Đánh rồi chốt → gửi đúng gói; chưa chọn đáp án thì không chốt được; Kỹ năng khoá khi thiếu năng lượng', async () => {
     const { call } = dung(trongTran(), () => ({ ok: true, doan: trongTran({ revision: 6, cau: { qid: 'Q1', daChot: true, hanhDong: 'danh', ketQua: null } }), ketQuaCau: { correct: true, answer: 'B', solution: 'x', reward: 20 } }))
     await screen.findByText('phương án hai')
-    expect((screen.getByRole('button', { name: /Chọn đáp án để chốt đòn/ }) as HTMLButtonElement).disabled).toBe(true)
+    expect((screen.getByRole('button', { name: /Chọn đáp án để chốt/ }) as HTMLButtonElement).disabled).toBe(true)
     expect((screen.getByRole('button', { name: /Năng lượng 1\/2/ }) as HTMLButtonElement).disabled).toBe(true)
-    fireEvent.click(screen.getByRole('button', { name: /phương án hai/ })); fireEvent.click(screen.getByRole('button', { name: /Chốt đòn · B \+ Đánh/ }))
+    fireEvent.click(screen.getByRole('button', { name: /phương án hai/ })); fireEvent.click(screen.getByRole('button', { name: /Chốt đáp án/ }))
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-nop', { ma: 'DH1', hiep: 3, answer: 'B', hanhDong: 'danh' }))
     expect(await screen.findByText('Em trả lời đúng.')).toBeTruthy(); expect(screen.getByText(/Em đã chốt/)).toBeTruthy()
     expect(screen.queryByRole('group', { name: 'Chọn đòn' })).toBeNull() // chốt rồi không đổi

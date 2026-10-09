@@ -90,7 +90,7 @@ describe('DaoCuaEm — dải lượt + màn hết lượt', () => {
     expect(d.querySelector('.dao-luot-mo[data-ma="chang"]')).toBeNull() // khoá đã mở ⇒ không nhắc
     expect(d.querySelector('.dao-luot-mo[data-ma="trum"]')).toBeNull() // luật máy chủ: lượt trùm CHỈ có trong danh sách khi khoá trùm đã mở ⇒ hết nhắc
     expect(container.querySelector('[data-vung="het-luot"]')).toBeNull()
-    expect(screen.getByRole('button', { name: 'LÊN ĐƯỜNG' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Đồng hành' })).toBeTruthy()
   })
   it('HẾT LƯỢT: dải nói "Hôm nay em đã dùng hết 5 lượt", thẻ chỉ "Mai Lửa Nhỏ chờ em: 3 dạng mới · 4 câu tới hạn ôn."; nút mờ "HẾT LƯỢT HÔM NAY"; chưa có maiCho ⇒ "Mai Lửa Nhỏ chờ em."', () => {
     const a = ve({}, { luotNgay: docLuotNgay(HET), maiCho: docMaiCho({ dangMoi: 3, toiHan: 4 }) })
@@ -110,7 +110,7 @@ describe('DaoCuaEm — dải lượt + màn hết lượt', () => {
     const { container } = ve({}, {})
     expect(container.querySelector('[data-vung="luot-ngay"]')).toBeNull()
     expect(container.querySelector('[data-vung="het-luot"]')).toBeNull()
-    expect((screen.getByRole('button', { name: 'LÊN ĐƯỜNG' }) as HTMLButtonElement).disabled).toBe(false)
+    expect((screen.getByRole('button', { name: 'Đồng hành' }) as HTMLButtonElement).disabled).toBe(false)
     cleanup()
     const t = ve({ nickname: '' }, { luotNgay: docLuotNgay(HET) })
     expect(t.container.querySelector('[data-vung="het-luot"] p')!.textContent).toMatch(/^Mai .+ chờ em\.$/)

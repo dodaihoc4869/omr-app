@@ -51,7 +51,7 @@ const CHUNG = { tenCa: 'Kiểm tra 45 phút · Ester – lipid', gioNop: '09:12 
 const DA_CONG_BO = { kieu: 'da_cong_bo' as const, ...CHUNG, diem: 7.5, phan: phanTuDiem(SCORE), dung: 21, tong: 28, lam: '32 phút 10 giây', de: '45 phút', ss: 0.75, truoc: 6.75 }
 
 describe('KetQuaSauNop · đã công bố', () => {
-  it('điểm to có nhãn, đúng x/y câu, thời gian, so với lần trước của chính em; ba phần có trần điểm; MỘT nút chính "Xem báo cáo chi tiết" + nút chữ "Về bảng nhiệm vụ"', () => {
+  it('điểm to có nhãn, đúng x/y câu, thời gian, so với lần trước của chính em; ba phần có trần điểm; MỘT nút chính "Xem câu cần sửa" + nút chữ "Về bảng nhiệm vụ"', () => {
     const onXem = vi.fn(), onVe = vi.fn()
     const { container } = render(<KetQuaSauNop {...DA_CONG_BO} onXemBaoCao={onXem} onVe={onVe} />)
     expect(screen.getByRole('img', { name: 'Điểm 7,5 trên 10' })).toBeTruthy()
@@ -59,7 +59,7 @@ describe('KetQuaSauNop · đã công bố', () => {
     for (const c of ['Em làm đúng 21/28 câu', 'Thời gian làm 32 phút 10 giây (đề cho 45 phút)', '+0,75 điểm so với lần trước của em (6,75)', 'Em đã nộp bài lúc 09:12 · Thứ Bảy 19/09/2026',
       'Phần I · Trắc nghiệm', '3,75/4,5 điểm', 'đúng 15/18 câu', 'đúng trọn 2/4 câu, 2 câu đúng một phần', 'Phần III · Trả lời ngắn', '1/1,5 điểm']) expect(t).toContain(c)
     expect(container.querySelectorAll('.xd-nut--chinh')).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Xem báo cáo chi tiết' })); expect(onXem).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Xem câu cần sửa' })); expect(onXem).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByRole('button', { name: 'Về bảng nhiệm vụ' })); expect(onVe).toHaveBeenCalledTimes(1)
   })
   it('(bản vẽ 28/09, màn e) EXP em nhận từ ca: hiện "+N EXP" khi đã công bố; 0/null ⇒ ẩn; CHƯA công bố ⇒ không bao giờ hiện dù có số', () => {
@@ -97,14 +97,14 @@ describe('KetQuaSauNop · HAI trạng thái chưa có điểm KHÔNG lộ điể
     expect(screen.getByRole('progressbar', { name: 'Số em đã nộp' }).getAttribute('aria-valuenow')).toBe('27')
     expect(t).not.toMatch(/7,5|21\/28|đúng|Phần I|báo cáo chi tiết|đáp án ·/i)
     expect(screen.queryByRole('img', { name: /Điểm/ })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Xem báo cáo chi tiết' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Xem câu cần sửa' })).toBeNull()
     expect(container.querySelectorAll('.xd-nut--chinh')).toHaveLength(1) // "Về bảng nhiệm vụ" là nút chính duy nhất
   })
   it('thầy chưa công bố: nói thật, không lộ gì', () => {
     const { container } = render(<KetQuaSauNop {...DA_CONG_BO} kieu="khong" />)
     const t = container.textContent!
     expect(t).toContain('Thầy chưa công bố điểm'); expect(t).toContain('Đáp án và lời giải cũng hiện lúc đó')
-    expect(t).not.toMatch(/7,5|21\/28|Phần I ·|Xem báo cáo chi tiết/)
+    expect(t).not.toMatch(/7,5|21\/28|Phần I ·|Xem câu cần sửa/)
     expect(container.querySelectorAll('[role="progressbar"]')).toHaveLength(0)
   })
 })

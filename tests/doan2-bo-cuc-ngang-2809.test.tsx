@@ -51,7 +51,7 @@ describe('Đoàn 2.0 · bố cục ngang: cấu trúc hai cột', () => {
     expect(trai.querySelector('[aria-label="Đồng đội"]')?.textContent).toContain('Lan')
     expect(trai.querySelectorAll('.dh-thu').length).toBeGreaterThanOrEqual(2) // thần thú em + bạn: hình thật
     // Cột phải: thẻ câu → ba đòn → nút chốt (nút chính ở ĐÁY cột)
-    const giay = phai.querySelector('.dh-giay')!, don = phai.querySelector('.dh-don')!, chot = screen.getByRole('button', { name: /CHỌN ĐÁP ÁN ĐỂ CHỐT ĐÒN/ })
+    const giay = phai.querySelector('.dh-giay')!, don = phai.querySelector('.dh-don')!, chot = screen.getByRole('button', { name: /CHỌN ĐÁP ÁN ĐỂ CHỐT/ })
     expect(phai.contains(chot)).toBe(true)
     expect(giay.compareDocumentPosition(don) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(don.compareDocumentPosition(chot) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()

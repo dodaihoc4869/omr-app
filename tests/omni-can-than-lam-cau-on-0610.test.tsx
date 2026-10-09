@@ -37,7 +37,7 @@ const dung = (extra: Partial<React.ComponentProps<typeof LamCauOn>> = {}) =>
 const the = (i: number) => document.querySelectorAll<HTMLElement>('.lco-the')[i]!
 const soat = (i: number) => within(the(i)).queryByRole('checkbox', { name: CHU_SOAT_LAI }) as HTMLInputElement | null
 const gõ = (i: number, t: string) => fireEvent.change(within(the(i)).getByRole('textbox'), { target: { value: t } })
-const nutNop = () => screen.getByRole('button', { name: /^Nộp/ }) as HTMLButtonElement
+const nutNop = () => screen.getByRole('button', { name: /^Kiểm tra/ }) as HTMLButtonElement
 
 describe('Làm câu ôn · (b) ô "Soát lại đơn vị và số liệu"', () => {
   it('canThan VẮNG ⇒ KHÔNG ô nào (DOM như hôm nay)', async () => {
