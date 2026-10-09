@@ -55,6 +55,6 @@ Thầy nhắn (nguyên văn): "đẩy luôn giao diện mới lên đi bạn ơi
 ## Đợt 3 — TRUNG TU giao diện 3 app (09/10)
 
 Thầy nhắn (nguyên văn): "bạn hãy quet toàn bộ giao diện app hiện tại và trung tu lại giao diện siêu đẹp, mịn, khoa học đúng cấu trúc của code hiện tại, vẽ cho tôi trước khi build nhé"
-- [ ] Quét toàn bộ giao diện app hiện tại (HS · PH · GV) | bằng chứng: (chưa có)
-- [ ] Vẽ bản trung tu (siêu đẹp, mịn, khoa học, đúng cấu trúc code hiện tại) cho thầy xem | bằng chứng: (chưa có)
-- [ ] CHƯA BUILD — chờ thầy chốt bản vẽ | bằng chứng: (chưa có)
+- [x] Quét toàn bộ giao diện app hiện tại (HS · PH · GV) | bằng chứng: 3 agent rà mã chỉ đọc trên main 6842acc (bản sống PR221) + 79 ảnh Chromium `scripts/chup-v2`; số đo: HS 31 mức bo góc/40 cỡ chữ/14 kiểu bóng, PH 19/24/~8 kiểu nút, GV 24/~30/10+ họ nút, GV chạy 2 bảng màu (lam/ngọc), tối nửa màn.
+- [x] Vẽ bản trung tu (siêu đẹp, mịn, khoa học, đúng cấu trúc code hiện tại) cho thầy xem | bằng chứng: canvas https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8 — 24 khung: tổng hợp + bộ khung chung + 11 cặp hiện tại↔trung tu (HS 5, PH 3, GV 3), giữ nguyên màu.
+- [!] CHƯA BUILD — chờ thầy chốt bản vẽ + 3 câu hỏi (PH 3 hay 4 mục; GV lấy lam làm màu gốc; thanh bên GV 5 mục) | KẸT: chờ thầy.
