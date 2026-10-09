@@ -82,3 +82,13 @@ Thầy nhắn (nguyên văn, kèm ảnh Câu đã làm chồng chữ): "trùng t
 - [x] Sửa Câu đã làm (HS, bố cục ngang/máy tính) | bằng chứng: 40e26c71 — nguyên nhân gốc: lưới 2 cột (giao-dien-day-du.css) trong khung cuộn cố định cao ⇒ thẻ đè nhau; nay một cột, hàng lọc xuống dòng, nút Về/nhãn đọc rõ nền sáng; ảnh 25-hs-cau-da-lam-* 0 lỗi trang/0 tràn.
 - [x] Phát sinh: precache vượt trần sau gộp (3039 KB) | bằng chứng: 25c3ebf3 — 2 mảnh chung chỉ của thầy ra kho chạy-lúc ⇒ 147 tệp / 2996 KB, SW 13/13.
 - [!] Phát sinh, CHƯA sửa (ngoài phạm vi): màn Hoá 2.0 bố cục ngang "thấp" co cả màn bằng `zoom` ⇒ nút 48 px còn ~36 px trên điện thoại xoay ngang (có từ trước, mọi màn ngang).
+
+## Đợt 5 — Hành trình thầy: nhịp học + hồ sơ từng em + số giây (09/10 khuya)
+
+Thầy nhắn (nguyên văn): "hành trình để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử, câu làm sai số giây làm mỗi câu, mọi thứ về học sinh đó."
+- [ ] Hành trình để lại chỗ nhịp học | bằng chứng: (chưa có)
+- [ ] Em chưa làm + chưa hoàn thành đủ ưu tiên lên đầu | bằng chứng: (chưa có)
+- [ ] Bấm từng em ⇒ toàn bộ lịch sử, câu sai, số giây mỗi câu, mọi thứ về em | bằng chứng: (chưa có)
+Thầy nhắn (nguyên văn): "Phần ai sai trong chiếu lên bảng cung hiển thị cả số giây từng làm câu đó"
+- [ ] Chiếu lên bảng › Ai sai: hiện số giây từng em làm câu đó | bằng chứng: (chưa có)
+- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
