@@ -103,7 +103,7 @@ describe('(2c) tham chiếu `~bt` trong chuyến: phát mang btv; cũ vẫn ch�
     expect(t.correct).toBe(true)
     // sổ y hệt hôm nay: không ghi btv
     const so = d.sql.prepare("SELECT raw_json FROM su_kien_hoc WHERE qid = 'Q3~bt0'").get() as { raw_json: string }
-    expect(JSON.parse(so.raw_json)).toEqual({ chon: bt0.correct, tc: 'Q3' })
+    expect(JSON.parse(so.raw_json)).toEqual({ ht_cau_version:'v1', chon: bt0.correct, tc: 'Q3' })
   })
   it('tham chiếu CŨ (phiên tạo trước 06/10, không có btv) ⇒ phiên bản 1: resume / chuyến chờ / chấm y hệt câu đã phát', async () => {
     const { d, env, r, bt0 } = await batDau()

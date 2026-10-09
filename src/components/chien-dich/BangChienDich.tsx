@@ -292,6 +292,10 @@ export default function BangChienDich({
     </div>
     {du.hanhTrinhNgay.doLuong && <details><summary>Đo hiệu quả học · {du.hanhTrinhNgay.doLuong.soMauHopLe} học sinh có kết quả kiểm hợp lệ</summary>
       <p>So sánh trên đề chưa gặp, cùng phạm vi và ma trận, sau 7–14 ngày. Chưa đủ dữ liệu để kết luận mức tăng điểm.</p>
+      <p>Đã phân nhóm: {du.hanhTrinhNgay.doLuong.phanNhom.map(n=>`${n.n} học sinh nhóm ${n.nhom}`).join(' · ') || 'Chưa có học sinh'}. Kết quả dưới đây chỉ gồm bài kiểm đã nộp hợp lệ.</p>
+      {du.hanhTrinhNgay.doLuong.thoiGian?.map(n=><p key={n.nhom}>Nhóm {n.nhom}: {n.phutDoDuoc.toFixed(1)} phút làm câu đã đo · {n.coThoiGian}/{n.soLuot} lượt có thời gian hợp lệ ({n.baoPhu}%). Thời gian chưa đo không tính thành 0 phút.</p>)}
+      {du.hanhTrinhNgay.doLuong.giuLau?.map(n=><p key={n.nhom}>Nhóm {n.nhom} sau 7–14 ngày: nhớ câu cũ {n.tyLeNho===null?'chưa có mẫu':`${Math.round(n.tyLeNho*100)}% · ${n.soEmDoNho} học sinh`}; tự giải câu mới cùng kỹ năng {n.tyLeChuyen===null?'chưa có mẫu':`${Math.round(n.tyLeChuyen*100)}% · ${n.soEmDoChuyen} học sinh`}. Đây là các lượt đã đo, chưa kết luận hiệu quả nhân quả.</p>)}
+      {du.hanhTrinhNgay.doLuong.moHinh && <p>Mô hình: {du.hanhTrinhNgay.doLuong.moHinh.soMau} quan sát · {du.hanhTrinhNgay.doLuong.moHinh.soCauDaKiem} câu có độ khó vượt kiểm · chọn câu {du.hanhTrinhNgay.doLuong.moHinh.hocDaKiem?'đã vượt kiểm dự đoán':'đang tích luỹ dữ liệu'}.</p>}
       {du.hanhTrinhNgay.doLuong.ketQua.map((r,i)=><div key={i}><p>Phạm vi đo {i+1}</p><table className="cd-bang"><thead><tr><th>Nhóm</th><th>Học sinh đã đo</th><th>Điểm trung bình</th><th>Tăng so với đầu vào</th></tr></thead><tbody>{r.nhom.map(n=><tr key={n.nhom}><td>{n.nhom}</td><td>{n.n} học sinh</td><td>{n.diemTb===null?'Chưa có':`${n.diemTb.toFixed(2)}/10`}</td><td>{n.tangDiemTb===null?'Chưa có mốc tương đương':`${n.tangDiemTb.toFixed(2)} điểm`}</td></tr>)}</tbody></table></div>)}
     </details>}
   </section>

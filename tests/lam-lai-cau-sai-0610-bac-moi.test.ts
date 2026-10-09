@@ -134,7 +134,7 @@ describe('A1 · khối 11 sai câu Phần III có bộ sinh, không song sinh �
     // Lượt đã trả lời: nộp lại cùng câu ⇒ phát lại (replayed), không chấm lại.
     expect((await em(env, '/game-v2/answer', { session: r1.id, qid: 'Q3~bt0', answer: bt0.correct })).replayed).toBe(true)
     const so1 = soCua(d, 'Q3~bt0')
-    expect(so1.map((x) => ({ kq: x.ket_qua, raw: JSON.parse(x.raw_json ?? '{}') }))).toEqual([{ kq: 0, raw: { chon: '99999', tc: 'Q3' } }])
+    expect(so1.map((x) => ({ kq: x.ket_qua, raw: JSON.parse(x.raw_json ?? '{}') }))).toEqual([{ kq: 0, raw: { ht_cau_version:'v1', chon: '99999', tc: 'Q3' } }])
     expect(soCua(d, 'Q3')).toEqual([]) // câu gốc không bao giờ ra nguyên văn trong cửa sổ lỗi
     // Ngày 2: sai lần hai (lỗi MỞ LẠI) ⇒ k kế tiếp = 1 ⇒ Q3~bt1 (đề khác bt0).
     vi.setSystemTime(luc('2026-10-07'))
@@ -173,7 +173,7 @@ describe('A1 · khối 11 sai câu Phần III có bộ sinh, không song sinh �
     expect(['A', 'B', 'C', 'D']).toContain(bt.correct)
     const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q3I~bt0', answer: bt.correct })
     expect(t.correct).toBe(true)
-    expect(JSON.parse(soCua(d, 'Q3I~bt0')[0]!.raw_json!)).toEqual({ chon: bt.correct, tc: 'Q3I' })
+    expect(JSON.parse(soCua(d, 'Q3I~bt0')[0]!.raw_json!)).toEqual({ ht_cau_version:'v1', chon: bt.correct, tc: 'Q3I' })
   })
 
   it('Đoàn: chặng cho Phần III là ~bt0 (đề riêng, không lộ đáp án); nộp đúng ⇒ sổ ghi dưới ~bt0 + tc, Q3 tiến luật đóng lỗi', async () => {
@@ -212,7 +212,7 @@ describe('A1 · khối 11 sai câu Phần III có bộ sinh, không song sinh �
     for (const k of ['tc', 'xt', 'nv']) expect(k in ref, `phiên có khoá ${k}`).toBe(false)
     const t = await em(env, '/game-v2/answer', { session: r.id, qid: 'Q3', answer: '4,5' })
     expect(t.correct).toBe(true)
-    expect(JSON.parse(soCua(d, 'Q3')[0]!.raw_json!)).toEqual({ chon: '4,5' })
+    expect(JSON.parse(soCua(d, 'Q3')[0]!.raw_json!)).toEqual({ ht_cau_version:'v1', chon: '4,5' })
   })
 
   it('OMNI BẬT (bản sống đang bật cho mọi em): nộp ~bt ⇒ kết quả có omni, sổ ghi tc + {ms, tt, td}, câu đúng tính cho Q3; sai nhanh vẫn xét lướt như câu thường', async () => {
@@ -319,7 +319,7 @@ describe('A2 · Phần II: đủ ý trong kho ⇒ `~yd` (4 ý CHƯA gặp của 
     expect(t.solution.tung_y.a).toMatchObject({ dung: mauNhom(0)[0] === 'D', vi_sao: 'Lý do ý 1' })
     const so = soCua(d, 'Q2~yd0')
     expect(so).toHaveLength(1)
-    expect(JSON.parse(so[0]!.raw_json!)).toEqual({ chon: mauNhom(0), tc: 'Q2' })
+    expect(JSON.parse(so[0]!.raw_json!)).toEqual({ ht_cau_version:'v1', chon: mauNhom(0), tc: 'Q2' })
     expect(so[0]!.subitem_json).toBeNull() // ý mới khác ý gốc ⇒ không ghi kết quả từng ý theo khung của câu gốc
     expect(soCua(d, 'Q2')).toEqual([])
     // Y HỆT một lượt song sinh đúng: lỗi Q2 chờ kiểm, banKhacTiep.yd = 1.

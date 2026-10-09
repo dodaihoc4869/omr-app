@@ -39,6 +39,8 @@ export interface SuKien {
   maNguon: string
   sbd: string
   qid: string
+  /** Phiên bản câu đã chấm từ ref máy chủ; tuyệt đối không lấy từ input học sinh. */
+  cauVersion?: string
   /** Lần làm trong cùng nguồn: lượt thi · lượt làm BTVN · chỉ số lô · lượt nộp khắc phục. */
   lan: number
   /** 1 đúng · 0 sai · null bỏ trống/chưa làm. */
@@ -375,13 +377,16 @@ export function xoaBietCotChuan(): void { coCotChuan = null }
 /** Dòng JSON của một sự kiện (tên khoá ngắn để không phình tham số). */
 function dongJson(e: SuKien, ngay: string): Record<string, unknown> {
   const nhan = e.receivedAt ?? Date.parse(e.luc)
+  const raw = e.raw && typeof e.raw === 'object' && !Array.isArray(e.raw) ? { ...e.raw as Record<string, unknown> } : null
+  if(raw)delete raw.ht_cau_version // Trường dự trữ chỉ máy chủ được cấp.
+  const trusted = e.cauVersion ? { ...(raw ?? {}), ht_cau_version:e.cauVersion } : raw
   return {
     k: khoaSuKien(e), s: e.sbd, q: e.qid, n: e.nguon, m: e.maNguon, l: e.lan,
     r: e.ketQua, g: e.giay ?? null, t: e.luc, d: ngay,
     a: e.maDang ?? null, c: e.chuyenDe ?? '', u: e.mucDo ?? '',
     ai: e.attemptId ?? null, as: e.assistance ?? null, v: e.visibility ?? null,
     co: e.correctionOf ?? null, pv: POLICY_VERSION, pu: e.purpose ?? null,
-    rw: e.raw === undefined ? null : JSON.stringify(e.raw), si: e.subitem === undefined ? null : JSON.stringify(e.subitem),
+    rw: trusted ? JSON.stringify(trusted) : e.raw === undefined ? null : JSON.stringify(e.raw), si: e.subitem === undefined ? null : JSON.stringify(e.subitem),
     ra: Number.isFinite(nhan) ? nhan : null,
   }
 }

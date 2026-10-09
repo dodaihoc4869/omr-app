@@ -1,5 +1,6 @@
 // Điểm nối ba cỗ máy: chỉ kế hoạch Hành trình, không đổi chấm điểm/EXP/ca thi.
 import { boChonV5, type BoChonV5 } from './hanh-trinh-v5-d1'
+import { ghiDoV6 } from './hanh-trinh-v6-d1'
 import type { Env } from './kieu'
 import type { HoSo2 } from './srs2-d1'
 import { docMetaCau } from './srs2-d1'
@@ -101,9 +102,10 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   }
   // Dự báo trên cửa sổ nội dung của em; ghi rõ phạm vi, không coi là xác suất đã hiệu chuẩn của đề thật.
   const scope=hs.cau.filter(c=>c.nguon==='chien_dich').map(c=>q.get(c.qid)!)
-  const forecast=duBaoDiem(omni,scope), cursor=omni.cursor
+  const forecast=duBaoDiem(omni,scope,{chiKyVong:true}), cursor=omni.cursor
   out.p8=forecast.p8
   if(!ghi) return out
+  await ghiDoV6(env,sbd,now,qs)
   const firstSeen=new Map<string,number>()
   for(const e of events) {const g=e.contentGroup||q.get(e.qid)?.contentGroup||e.qid;firstSeen.set(g,Math.min(firstSeen.get(g)??Infinity,e.receivedAt))}
   const updates=phanBoCanThiep(offers.results??[],qs,firstSeen,new Set(rewards.results.map(r=>r.do_receipt)))
