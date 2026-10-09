@@ -41,6 +41,7 @@ export function mocHetNgay(ngay: string): number | null {
  * Còn dưới 1 ngày: "còn 5 giờ (…)"; dưới 1 giờ: "còn dưới 1 giờ (…)"; đã qua: "đã hết hạn (23:59 Chủ Nhật 04/10)".
  */
 export function chuHanNop(hanNop: string, nowMs: number): string {
+  if (hanNop === '9999-12-31') return 'Học mỗi ngày'
   const moc = mocHetNgay(hanNop)
   if (moc === null) return ''
   const toi = `23:59 ${thuNgayThang(hanNop)}`

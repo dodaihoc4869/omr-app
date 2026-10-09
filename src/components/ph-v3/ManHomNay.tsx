@@ -163,6 +163,10 @@ export function dongOmniPh(o: PhOmni): { khoa: string; chu: string; dam?: true }
 }
 
 function ChienDich({ cd, omni }: { cd: NonNullable<Hoc2['chienDich']>; omni?: PhOmni }) {
+  if (cd.hanNop === '9999-12-31') return <The id="ph3-cd" className="ph3-o-hep" vung="chien-dich" tieuDe="Hành trình của con" phu={cd.ten} bieuTuong={<BtCo />} mau="xd"
+    chip={<Chip mau="xd">Học mỗi ngày</Chip>}>
+    <p>Kế hoạch riêng theo tiến độ của con · mỗi chặng 6 câu. Số câu đã làm hôm nay được cập nhật từ kế hoạch đã chốt.</p>
+  </The>
   const dangLuyen = cd.daGap - cd.thanhThao - cd.canDayLai
   const chuaGap = cd.tong - cd.daGap
   const pt = (n: number) => `${(n / cd.tong) * 100}%`
