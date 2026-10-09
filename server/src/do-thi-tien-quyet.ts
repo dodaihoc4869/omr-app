@@ -10,7 +10,7 @@ export interface DoThiHanhTrinh { diem:Map<string,number>; canh:CanhHoc[] }
 const node=(k:string,t:number)=>`${k}@L${t}`
 export function dungDoThi(qs:readonly QuanSatHanhTrinh[], now:number):DoThiHanhTrinh {
   const diem=new Map<string,number>(), canh=new Map<string,CanhHoc>(), da=new Set<string>()
-  const nhom=new Map<string,Map<string,boolean>>(),truoc=new Map<string,Map<string,boolean>>()
+  const nhom=new Map<string,Map<string,boolean>>(),truoc=new Map<string,Map<string,boolean>>(),daDiem=new Set<string>()
   for(const o of qs) {const key=`${o.nhom}|${o.ngay}`,r=nhom.get(key)??new Map<string,boolean>();for(const k of o.kn) r.set(k,(r.get(k)??true)&&o.dung);nhom.set(key,r)}
   for(const o of qs) {
     const groupKey=`${o.nhom}|${o.ngay}`
@@ -29,7 +29,9 @@ export function dungDoThi(qs:readonly QuanSatHanhTrinh[], now:number):DoThiHanhT
     }
     for(const k of o.kn) {
       const key=node(k,k.startsWith('nen:')?1:t)
-      diem.set(key,buocSprtPhatLai(diem.get(key)??0,o.dung,o.laY))
+      const dem=`${key}|${groupKey}`;if(daDiem.has(dem))continue;daDiem.add(dem)
+      // Các ý chung kỹ năng không được nhân bằng chứng; đúng toàn nhóm mới ghi đúng.
+      diem.set(key,buocSprtPhatLai(diem.get(key)??0,nhom.get(groupKey)!.get(k)??false,false))
     }
   }
   return {diem,canh:[...canh.values()]}

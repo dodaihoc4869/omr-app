@@ -1,3 +1,4 @@
+import { docNhanKhoHanhTrinh } from '../../src/lib/hanh-trinh-nhan'
 import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
 import { tachSongSinh } from './loi-hoc-luat'
 import { phuSongSinhTheoQid } from './song-sinh-game'
@@ -36,7 +37,7 @@ export async function normalizeBank(raw:Row,maDe:string):Promise<PrivateQuestion
       const dang=c.dang as {ma?:string;ten?:string}|undefined
       const correct=Array.isArray(c.correct)?c.correct.join(''):str(c.correct)
       const cc=c.canChua as {sao?:number}|undefined
-      const q:PrivateQuestion={qid,maDe,version:'',group:'',phan,text:str(c.text),choices:(c.choices??[]) as string[],ideas:(c.ideas??[]) as string[],
+      const q:PrivateQuestion={hanhTrinh:docNhanKhoHanhTrinh(c.hanhTrinh),qid,maDe,version:'',group:'',phan,text:str(c.text),choices:(c.choices??[]) as string[],ideas:(c.ideas??[]) as string[],
         table:c.table as string[][]|undefined,thanCauImg:c.thanCauImg as string|undefined,imageDataUrl:c.imageDataUrl as string|undefined,
         choiceImgs:c.choiceImgs as string[]|undefined,ideaImgs:c.ideaImgs as string[]|undefined,hinhAnh:(c.hinhAnh??[]) as Question['hinhAnh'],
         dang:dang?.ma??null,tenDang:dang?.ten??'',mucDo:c.mucDo?str(c.mucDo):null,sao:cc?.sao??null,kienThuc:Array.isArray(c.kienThuc)?c.kienThuc as string[]:[],
@@ -228,7 +229,7 @@ export async function qidDangBaoVe(env:Env,cau:Row[]):Promise<Set<string>>{
 /** Câu trong POOL của readScope: câu ĐẦY ĐỦ (bằng chứng của em, `originals`) hoặc bản NHẸ của kho theo dạng (`nhe: true`: chỉ siêu dữ liệu để CHỌN + cờ `tuLuan` tính sẵn; KHÔNG có text, choices, ideas, hinhAnh, correct, solution).
  *  Bản nhẹ là đối tượng ĐÓNG BĂNG dùng chung nhiều lượt: không được sửa; muốn đưa cho em thì phải qua `doDayDu`. */
 export type CauPool=PrivateQuestion&{nhe?:true;tuLuan?:boolean}
-const CO_NHE=['qid','maDe','version','group','phan','dang','tenDang','mucDo','sao','kienThuc','reviewed','family'] as const
+const CO_NHE=['qid','maDe','version','group','phan','dang','tenDang','mucDo','sao','kienThuc','reviewed','family','hanhTrinh'] as const
 export function lamNhe(q:PrivateQuestion):CauPool{const n:Record<string,unknown>={};for(const k of CO_NHE)n[k]=(q as unknown as Record<string,unknown>)[k];const lop=(q as unknown as Record<string,unknown>).lop;if(lop!=null)n.lop=lop/* LUẬT THẦY 05/10: khối ghi trong JSON câu là một nguồn khối — giữ ở bản nhẹ để bộ lọc khối thấy */;n.nhe=true;n.tuLuan=laCauTuLuan(q);return Object.freeze(n) as unknown as CauPool}
 /** `laCauTuLuan` cho câu trong pool: bản nhẹ dùng cờ tính sẵn (hàm gốc cần text/đáp án); câu đầy đủ tính tại chỗ. */
 export const laTuLuanPool=(q:CauPool):boolean=>q.tuLuan??laCauTuLuan(q)

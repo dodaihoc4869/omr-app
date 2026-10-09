@@ -423,8 +423,8 @@ export interface DeThuOmni {
   /** ISO — hết giờ theo đồng hồ máy chủ; máy chủ không gửi ⇒ ''. */
   hetLuc: string
 }
-export async function omniDeThu(goi: GoiLenhHoa2): Promise<DeThuOmni> {
-  const o = vatOmni(await goi('hoa2-omni-de-thu'))
+export async function omniDeThu(goi: GoiLenhHoa2,l4=false): Promise<DeThuOmni> {
+  const o = vatOmni(await goi('hoa2-omni-de-thu',l4?{l4:true}:{}))
   const cau = chanCauTuLuan((Array.isArray(o.cau) ? o.cau : []).filter(laCauCongKhai), 'game-v2/hoa2-omni-de-thu')
   if (typeof o.id !== 'string' || !o.id || !cau.length) throw new LoiHoa2('Chưa soạn được đề thử. Em thử lại sau ít phút.')
   const hetLuc = typeof o.hetLuc === 'string' && Number.isFinite(Date.parse(o.hetLuc)) ? o.hetLuc : ''

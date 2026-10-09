@@ -1,4 +1,5 @@
 // Điểm nối ba cỗ máy: chỉ kế hoạch Hành trình, không đổi chấm điểm/EXP/ca thi.
+import { boChonV5, type BoChonV5 } from './hanh-trinh-v5-d1'
 import type { Env } from './kieu'
 import type { HoSo2 } from './srs2-d1'
 import { docMetaCau } from './srs2-d1'
@@ -10,7 +11,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { tangCuaCau } from './hanh-trinh-ngay'
 import { quanSatDocLap, chuoiSaiKyNang, type QuanSatHanhTrinh } from './hanh-trinh-quan-sat'
 import { fitHalfLife, henHalfLife } from './half-life'
-import { dungDoThi, thieuTienQuyet, canhDangHoc, type CanhHoc } from './do-thi-tien-quyet'
+import { dungDoThi, canhDangHoc, type CanhHoc } from './do-thi-tien-quyet'
 import { chonBandit, type BangBandit, type CachCuu } from './bandit'
 import type { QCau } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -20,7 +21,8 @@ export { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 import { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 
 const KHONG_CA="NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')"
-export interface DongCoHanhTrinh { chan:Set<string>; hen:Map<string,string>; trongSo:Record<string,number>; canThiep?:{qid:string;nhom:string;kn:string;context:string;cach:CachCuu;xacSuat:number}; soQuanSat:number; soHalfLife:number; soCanhHoc:number; p8:number }
+export interface DongCoHanhTrinh {
+  v5?:BoChonV5; chan:Set<string>; hen:Map<string,string>; trongSo:Record<string,number>; canThiep?:{qid:string;nhom:string;kn:string;context:string;cach:CachCuu;xacSuat:number}; soQuanSat:number; soHalfLife:number; soCanhHoc:number; p8:number }
 /** Receipt dùng chỉ từ sự kiện máy chủ. Không thưởng vì chỉ đã đề nghị hoặc đúng câu can thiệp. */
 export function doCanThiep(r:Row,qs:readonly QuanSatHanhTrinh[],firstSeen?:ReadonlyMap<string,number>,used:ReadonlySet<string>=new Set()):{dungLuc:number|null;doLuc:number|null;ketQua:number|null;receipt:string|null} {
   const delivered=qs.find(o=>o.qid===r.qid && o.nhom===r.nhom && o.luc>=Number(r.goi_luc))
@@ -41,7 +43,7 @@ export function phanBoCanThiep(rs:readonly Row[],qs:readonly QuanSatHanhTrinh[],
 export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,chan:ReadonlySet<string>=new Set(),ghi=true):Promise<DongCoHanhTrinh> {
   await chayDdlMotLan(env,'hanh_trinh_v4',SQL_DONG_CO_HANH_TRINH)
   const [so,allowed,xacNhan]=await Promise.all([docSuKienOmni(env,[sbd]),
-    env.DB.prepare(`SELECT khoa FROM su_kien_hoc WHERE sbd=? AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')})) AND (nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=su_kien_hoc.ma_nguon AND ld.sbd=su_kien_hoc.sbd AND ld.status='submitted'))`).bind(sbd).all<{khoa:string}>(),
+    env.DB.prepare(`SELECT khoa FROM su_kien_hoc WHERE sbd=? AND COALESCE(visibility,'')<>'embargoed' AND (nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai<>'da_xoa' AND ${SQL_DA_CONG_BO('c')})) AND (nguon<>'luyen' OR EXISTS(SELECT 1 FROM luyen_de_2026 ld WHERE ld.id=su_kien_hoc.ma_nguon AND ld.sbd=su_kien_hoc.sbd AND ld.status='submitted') OR EXISTS(SELECT 1 FROM omni_de_thu dt WHERE dt.id=substr(su_kien_hoc.ma_nguon,8) AND su_kien_hoc.ma_nguon LIKE 'de_thu:%' AND dt.sbd=su_kien_hoc.sbd AND dt.nop_luc IS NOT NULL AND dt.nop_luc<=?))`).bind(sbd,new Date(now).toISOString()).all<{khoa:string}>(),
     env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<import('./omni-kieu').XacNhanThay>()])
   const hopLe=new Set(allowed.results.map(r=>r.khoa))
   const events=(so.get(sbd)??[]).filter(e=>hopLe.has(e.khoa) && e.receivedAt<=now)
@@ -66,7 +68,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const out:DongCoHanhTrinh={chan:new Set(chan),hen:new Map(),trongSo:{},soQuanSat:qs.length,soHalfLife:0,soCanhHoc:learned.length,p8:0}
   for(const c of hs.cau) {
     const qc=q.get(c.qid)!, kn=vknCaCau(qc), t=tangCuaCau(c)
-    if(t===null || thieuTienQuyet(qc,t,graph,omni).length) out.chan.add(c.qid)
+    if(t===null) out.chan.add(c.qid)
     const due=henHalfLife(memory,kn)
     if(due) {out.hen.set(c.qid,due);out.soHalfLife++}
     const weakest=Math.min(...kn.map(k=>omni.vkn[k]?.p??0.3)), pc=xacSuatDungCau(omni,qc,omni.sEm)
@@ -76,6 +78,9 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
     const point=qc.phan==='II'?1:0.25
     out.trongSo[c.qid]=((1-weakest)+information+(hs.tt.get(c.qid)?.laMoi?0.2:0)-soft*0.1)*point/minute
   }
+  const v5=await boChonV5(env,sbd,now,hs,q,qs,graph,omni,b,ghi,new Set(events.map(e=>e.contentGroup||q.get(e.qid)?.contentGroup||e.qid)))
+  out.v5=v5;for(const id of v5.chan)out.chan.add(id)
+  if(v5.nhom==='B')out.trongSo={...out.trongSo,...v5.trongSo}
   // Hai hành động đều là câu thật, chưa gặp, thuộc tầng đã mở. Không rút video/học liệu tưởng tượng.
   const streak=chuoiSaiKyNang(qs),mucKet=(c:typeof hs.cau[number])=>Math.max(...vknCaCau(q.get(c.qid)!).map(k=>streak.get(k)??0))
   const stuck=hs.cau.filter(c=>mucKet(c)>=2).sort((a,b)=>mucKet(b)-mucKet(a) || a.qid.localeCompare(b.qid))

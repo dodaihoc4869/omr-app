@@ -1,3 +1,4 @@
+import type { NhanKhoHanhTrinh } from '../../lib/hanh-trinh-nhan'
 import { soKhopSo } from '../../lib/cham-so'
 import { cauHopKhoi, type Khoi } from '../../lib/khoi-cau'
 import { gomDiemNhan, thuongNhan, type BangChungCau, type LichSuCuaEm } from '../../lib/uu-tien-nhan-kho'
@@ -24,12 +25,12 @@ export interface Question {
   /** NHÃN FAMILY từ kho (tuỳ chọn — kho thật chưa gắn; KHÔNG suy từ qid/group). CNH-1.0: luật chống lặp. */
   family?:string|null
 }
-export interface PrivateQuestion extends Question { correct:string; solution:unknown; reviewed:boolean }
+export interface PrivateQuestion extends Question { correct:string; solution:unknown; reviewed:boolean;hanhTrinh?:NhanKhoHanhTrinh }
 export interface Evidence { qid:string; group:string; dang:string|null; mucDo:string|null; kienThuc:string[]; wrong:boolean; date:string; ca:string }
 export interface Attempt { id:string; session:string; group:string; qid:string; dang:string|null; mucDo:string|null; correct:boolean; assisted:boolean; at:number; novel:boolean }
 export interface Mastery { key:string; stage:number; first:number; due:number; groups:string[]; repaired:boolean }
 export function publicQuestion(q:PrivateQuestion):Question {
-  const {correct:_,solution:__,reviewed:___,...pub}=q
+  const {correct:_,solution:__,reviewed:___,hanhTrinh:____,...pub}=q
   return {...pub,hinhAnh:pub.hinhAnh.filter(h=>h.viTri!=='sau_loi_giai')}
 }
 export function grade(q:Pick<PrivateQuestion,'phan'|'correct'>, answer:string):boolean {

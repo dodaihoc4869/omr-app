@@ -1659,6 +1659,7 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
   const onBaiCu = (kh.onBaiCu ?? []).filter((q) => trongKh.has(q)).length
   const som = await omniSanhSom
   const omni = await lanOmniD1().then((m) => m.omniChoSanh(env, sbd, nowMs, { tong: kh.tong, con: conLai, chienDichId: cd?.id ?? null, onBaiCu, cheDoCho: hs.omni!.cheDoCho }, som)).catch(() => null)
+  if(omni&&kh.hanhTrinh?.tang===4)omni.l4Kiem={duoc:true,soCau:6}
   return omni ? { ...ra, omni } : ra
 }
 

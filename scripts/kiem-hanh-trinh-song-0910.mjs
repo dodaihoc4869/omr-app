@@ -18,3 +18,7 @@ console.log(JSON.stringify(r))
 const [schema] = await query("SELECT COUNT(*) AS soBangDongCo FROM sqlite_master WHERE type='table' AND name IN ('hanh_trinh_v4_em','hanh_trinh_v4_canh','hanh_trinh_v4_chot','hanh_trinh_v4_can_thiep')")
 if(schema.soBangDongCo!==4) throw new Error('Chưa đủ schema động cơ cá nhân hoá.')
 console.log(JSON.stringify({dongCo:'ht4-0910-v1',...schema}))
+
+const [schema5]=await query("SELECT COUNT(*) soBangHanhTrinh5 FROM sqlite_master WHERE type='table' AND name IN ('hanh_trinh_v5_muc','hanh_trinh_v5_phan_nhom','hanh_trinh_v5_quyet_dinh','hanh_trinh_v5_de_thu')")
+if(schema5.soBangHanhTrinh5!==4)throw new Error('Thiếu schema Hành trình v5.')
+console.log(JSON.stringify({dongCo:'ht5-0910-v1',...schema5}))
