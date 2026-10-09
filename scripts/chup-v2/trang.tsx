@@ -35,6 +35,9 @@ import type { DoanXem } from '../../src/game/than-thu-v2/doan-kieu'
 import type { DaoKetQua, DaoProfile } from '../../src/game/than-thu-v2/dao/kieu'
 import ThanhBenTrai from '../../src/components/ThanhBenTrai'
 import ChienDichScreen from '../../src/screens/ChienDichScreen'
+import AppPhuHuynh from '../../src/components/ph-v3/AppPhuHuynh'
+import DeThu from '../../src/game/than-thu-v2/dao2/DeThu'
+import { PH_OK } from '../../tests/_ph-moi/du-lieu-mau'
 import BangMaTranDe from '../../src/components/ma-tran-de/BangMaTranDe'
 import { useCoHoa2 } from '../../src/components/chien-dich/co-hoa2'
 import { useAppStore } from '../../src/store/appStore'
@@ -69,6 +72,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   let b: Record<string, unknown> = {}
   try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
   if (u.pathname.includes('vang-xem') || b.action === 'vang-xem' || b.lenh === 'vang-xem') return tra({ ok: true, bat: true, vang: 340, ongNghiem: 1200, giuLai: 200, chuoiNgay: 12, doiToiDa: 10 })
+  if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
+  if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
+  if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [] })
   return tra({ ok: true })
 }
 
@@ -101,6 +107,7 @@ const callDao = async (action: string): Promise<DaoKetQua> => {
     action === 'hoa2-sanh' ? SANH_DAO
     : action === 'resume' ? { questions: [] }
     : action === 'sync' ? { remaining: 0 }
+    : action === 'hoa2-omni-de-thu' ? { id: 'DT1', cau: Array.from({length:14},(_,i)=>({...cauDao(i%4),qid:`DT${i+1}`})), phut: 25, hetLuc: new Date(Date.now()+25*60_000).toISOString() }
     : action === 'start' ? { id: 'P1', questions: [0, 1, 2, 3].map(cauDao), theLuc: { con: 18, tong: 30 }, dao: { con: 16 }, doan: { con: 0 } }
     : {}
   return { ok: true, ...kq } as DaoKetQua
@@ -121,7 +128,9 @@ const callDoan = async (lenh: string): Promise<unknown> =>
 
 const MAN_THAY: Record<string, string> = { 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
-  man === 'than-thu' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ThanThuV2, { profile: hoSo, token: 'tk', onCuaHang: noop, onTuiDo: noop, onDongHanh: noop }))
+  man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
+  : man === 'de-thu' ? h('div', {className:'dao dao2'}, h(DeThu, {sbd:'GIA',call:callDao,onVe:noop}))
+  : man === 'than-thu' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ThanThuV2, { profile: hoSo, token: 'tk', onCuaHang: noop, onTuiDo: noop, onDongHanh: noop }))
   : man === 'cua-hang' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ManShop as never, { api: new ShopApiGia(), pet: 5, cap: 7, tenThu: 'Linh Hồ', onDong: noop, veThu: veThuThat, veHinhMon: (m: { ma: string }) => h(HinhVatPham as never, { ma: m.ma }) } as never))
   : man === 'dao' ? h(Dao2, { sbd: 'GIA', profile: hoSo, call: callDao, doanMo: false, sanhDau: SANH_DAO, onMoDoan: noop, onMoSoTay: noop, onDong: noop } as never)
   : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
@@ -137,5 +146,5 @@ if (manThay === 'chiendich') useAppStore.setState({ screen: manThay as never })
 createRoot(document.getElementById('root')!).render(
   manThay
     ? (document.body.removeAttribute('data-bat-linh'), h('div', { className: 'min-h-screen m3 m3-thay vo-thay' }, h(ThanhBenTrai), h('div', { className: 'khung-noi-dung' }, h('div', { className: 'giua-noi-dung', 'data-teacher-screen': manThay }, con))))
-    : h(BatLinhShell, { vai: 'hs' }, con),
+    : man === 'ph' ? (document.body.removeAttribute('data-bat-linh'), con) : h(BatLinhShell, { vai: 'hs' }, con),
 )

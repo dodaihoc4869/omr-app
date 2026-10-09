@@ -18,10 +18,13 @@ export interface ViewPhMoi {
 
 export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<PhanHoiTatCa> = taiTatCaVeCon): ViewPhMoi {
   const [s, setS] = useState<Omit<ViewPhMoi, 'thuLai'>>({ trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false })
+  const chuDuLieu = useRef(sbd)
   const apiRef = useRef(api)
   apiRef.current = api
   const nap = useRef<() => void>(() => {})
   useEffect(() => {
+    chuDuLieu.current = sbd
+    setS({ trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false })
     if (!sbd) {
       setS({ trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false })
       nap.current = () => {}
@@ -34,7 +37,7 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
       const r = await apiRef.current(sbd)
       if (huy) return true
       if (r.kieu === 'ok') setS({ trangThai: 'ok', pm: r.pm, chuLoi: '', dangLamMoi: false })
-      else setS((x) => (x.pm ? { ...x, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false }))
+      else setS((x) => (x.pm ? { ...x, chuLoi: r.chu, dangLamMoi: false } : { trangThai: 'loi', pm: null, chuLoi: r.chu, dangLamMoi: false }))
       return r.kieu === 'ok'
     }
     nap.current = () => void chay() // nút "làm mới" của phụ huynh: gọi NGAY, không qua nhịp
@@ -53,5 +56,6 @@ export function useTatCaVeCon(sbd: string | null, api: (sbd: string) => Promise<
     setS((x) => (x.pm ? x : { ...x, trangThai: 'tai', chuLoi: '' }))
     nap.current()
   }, [])
-  return { ...s, thuLai }
+  // Không vẽ báo cáo của em trước trong lượt render đầu tiên sau đổi SBD.
+  return chuDuLieu.current === sbd ? { ...s, thuLai } : { trangThai: 'tai', pm: null, chuLoi: '', dangLamMoi: false, thuLai }
 }

@@ -71,24 +71,43 @@ function TaiKhoan({ ten, onDoiSbd }: { ten: string; onDoiSbd: () => void }) {
   )
 }
 
-export default function AppPhuHuynh({ sbd, hoTen, lop, onDoiSbd }: { sbd: string; hoTen: string; lop: string; onDoiSbd: () => void }) {
+type ThongTinPhuHuynh = { sbd: string; hoTen: string; lop: string; onDoiSbd: () => void }
+
+export default function AppPhuHuynh(p: ThongTinPhuHuynh) {
+  // Đổi con tạo phiên đọc mới: không giữ báo cáo, cảnh báo hoặc phản hồi muộn của em trước.
+  return <PhienBaoCao key={p.sbd} {...p} />
+}
+
+function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   const tuyen = useTuyen()
   const v = useTatCaVeCon(sbd)
   const ten = v.pm?.hoTen || hoTen
   const moc = v.pm?.serverNow ?? null
 
   // Game Hoá 2.0 của con: nạp cùng nhịp với "mọi thứ về con" (mỗi lần bản mới về). Lỗi ⇒ giữ bản cũ; chưa từng có ⇒ khối chiến dịch vắng.
+  const [loiHoc2, setLoiHoc2] = useState('')
+  const [nhapHoc2, setNhapHoc2] = useState(0)
   const [hoc2, setHoc2] = useState<Hoc2 | null>(null)
   useEffect(() => {
     let huy = false
-    void taiHoc2(sbd).then((r) => { if (!huy && r.kieu === 'ok') setHoc2(r.v) })
+    void taiHoc2(sbd).then((r) => {
+      if (huy) return
+      if (r.kieu === 'ok') { setHoc2(r.v); setLoiHoc2('') }
+      else setLoiHoc2(r.chu)
+    })
     return () => { huy = true }
-  }, [sbd, moc])
+  }, [sbd, moc, nhapHoc2])
 
   const [loiThay, setLoiThay] = useState<{ ds: NhanXetCa[] | null; chuLoi: string }>({ ds: null, chuLoi: '' })
+  const luotLoiThay = useRef(0)
+  useEffect(() => () => { luotLoiThay.current += 1 }, [])
   const napLoiThay = useCallback(() => {
+    const luot = ++luotLoiThay.current
     setLoiThay((x) => ({ ...x, chuLoi: '' }))
-    void taiLoiThay(sbd).then((r) => setLoiThay(r.kieu === 'ok' ? { ds: r.v, chuLoi: '' } : (x) => (x.ds ? x : { ds: null, chuLoi: r.chu })))
+    void taiLoiThay(sbd).then((r) => {
+      if (luot !== luotLoiThay.current) return
+      setLoiThay(r.kieu === 'ok' ? { ds: r.v, chuLoi: '' } : (x) => ({ ...x, chuLoi: r.chu }))
+    })
   }, [sbd])
   useEffect(() => { napLoiThay() }, [napLoiThay, moc])
 
@@ -142,6 +161,8 @@ export default function AppPhuHuynh({ sbd, hoTen, lop, onDoiSbd }: { sbd: string
               <TaiKhoan ten={ten} onDoiSbd={onDoiSbd} />
             </header>
           )}
+          {v.pm && v.chuLoi && <div className="ph3-lam-moi-loi" role="status"><span>Báo cáo đang hiển thị bản đã tải. {v.chuLoi}</span><button type="button" onClick={v.thuLai}>Thử lại báo cáo</button></div>}
+          {loiHoc2 && <div className="ph3-lam-moi-loi" role="status"><span>{hoc2 ? 'Tiến độ học đang hiển thị bản đã tải. ' : 'Chưa tải được tiến độ học. '}{loiHoc2}</span><button type="button" onClick={() => setNhapHoc2((x) => x + 1)}>Thử lại tiến độ</button></div>}
           {man}
         </main>
       </div>

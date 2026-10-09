@@ -49,6 +49,11 @@ const DS = [
   ['14-gv-nhip-hom-nay', 'gv-nhip', 1440, 960, 'light', false, /Nhịp học hôm nay/],
   ['14-gv-nhip-hom-nay-toi', 'gv-nhip', 1440, 960, 'dark', false, /Nhịp học hôm nay/],
   ['14-gv-nhip-hom-nay-dien-thoai', 'gv-nhip', 390, 844, 'light', true, /Nhịp học hôm nay/],
+  ['14-gv-nhip-ngang', 'gv-nhip', 844, 390, 'light', true, /Nhịp học hôm nay/],
+  ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
+    [`20-ph-${k}-${nen}`, 'ph', w,h,nen,true,/Hôm nay/],
+    [`21-de-thu-${k}-${nen}`, 'de-thu',w,h,nen,true,/Đề thử 14 câu/,'de-thu'],
+  ])),
   ['18-gv-ma-tran-de', 'gv-ma-tran', 1440, 700, 'light', false, /Ma trận đề/],
 ]
 
@@ -60,6 +65,7 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
   const ctx = await trinh.newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, colorScheme: nen, hasTouch: w < 900, isMobile: w < 500 })
   await ctx.route((u) => !u.href.startsWith(goc), (r) => r.abort())
   const t = await ctx.newPage()
+  t.setDefaultTimeout(8000)
   t.on('pageerror', (e) => loiTrang.push(`${ten}: ${e.message}`))
   t.on('console', (msg) => { if (msg.type() === 'error' && !/Failed to load resource/.test(msg.text())) loiTrang.push(`${ten}: console ${msg.text().slice(0, 200)}`) })
   await t.goto(`${trangGoc}?man=${m}`)
@@ -69,7 +75,20 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     loiTrang.push(`${ten}: không thấy chữ ${cho}`)
   }
   try {
-    if (viec === 'dao') {
+    if (viec === 'de-thu') {
+      await t.locator('.dao2-de-thu-cau').first().locator('.pa-hang').nth(2).click()
+      const chon = t.locator('.dao2-de-thu-ban-do button').first()
+      if (await chon.getAttribute('data-da-lam') !== 'true') throw new Error('Bản đồ không cập nhật câu đã làm')
+      const rong = {width:w,height:hgt}
+      await t.setViewportSize({width:hgt,height:w})
+      await t.waitForTimeout(200)
+      if (await chon.getAttribute('data-da-lam') !== 'true') throw new Error('Xoay làm mất đáp án')
+      await t.setViewportSize(rong)
+      await t.getByRole('button',{name:'Câu 14: chưa làm',exact:true}).click()
+      if (await t.evaluate(()=>document.activeElement?.id) !== 'de-thu-cau-14') throw new Error('Không đưa focus đến câu 14')
+      await t.getByRole('button',{name:'Câu 1: đã làm',exact:true}).click()
+      await t.evaluate(()=>window.scrollTo(0,0))
+    } else if (viec === 'dao') {
       await t.getByRole('button', { name: /LÊN ĐƯỜNG|Lên đường/ }).first().click()
       await t.getByText(/^ẢI 1\//).first().waitFor({ timeout: 20000 })
       await t.waitForTimeout(600)
@@ -79,7 +98,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByRole('button', { name: /Methyl acetate/ }).first().click()
     }
   } catch (e) {
-    loiTrang.push(`${ten}: thao tác ${viec} hỏng — ${String(e).slice(0, 160)}`)
+    const chu = `${ten}: thao tác ${viec} hỏng — ${String(e).slice(0, 300)}`
+    loiTrang.push(chu)
+    console.log(chu)
   }
   await t.waitForTimeout(900)
   const tr = await t.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
@@ -94,9 +115,9 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       .map((e) => `${(e.getAttribute('aria-label') || e.textContent || '').trim().slice(0, 40)} ${Math.round(e.getBoundingClientRect().width)}×${Math.round(e.getBoundingClientRect().height)}`),
   )
   if (nho.length) chamNho.push(`${ten}: ${nho.join(' | ')}`)
-  for (const q of [72, 60, 50, 40, 32, 25]) {
+  for (const q of [72, 60, 50, 40, 32, 25, 20, 15]) {
     const buf = await t.screenshot({ type: 'jpeg', quality: q, fullPage: ca })
-    if (buf.length <= 150 * 1024 || q === 25) {
+    if (buf.length <= 150 * 1024 || q === 15) {
       writeFileSync(join(RA, `${ten}.jpg`), buf)
       console.log(`${ten}.jpg ${(buf.length / 1024).toFixed(0)} KB (q${q}) · tràn ngang ${tr}px`)
       break

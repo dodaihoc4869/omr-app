@@ -414,3 +414,10 @@ i[data-mau="vong-tim"] { background: var(--ph3-vong-tim); }
 @media (prefers-reduced-motion: reduce) {
   .ph3 *, .ph3 *::before, .ph3 *::after { transition: none !important; animation: none !important; }
 }
+
+/* Báo cáo đọc được, nguồn chưa làm mới được: giữ số thật và nói rõ ngay cạnh báo cáo. */
+.ph3-lam-moi-loi { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 16px 16px; padding: 16px; border: 1px solid var(--ph3-vien); border-radius: 16px; }
+.ph3-lam-moi-loi span { flex: 1 1 200px; min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+.ph3-lam-moi-loi button { min-height: 48px; padding: 8px 16px; border-radius: 12px; border: 1px solid var(--ph3-vien); background: var(--ph3-mat); color: var(--ph3-chu); font: inherit; touch-action: manipulation; }
+.ph3-dau__ten, .ph3-dieu-huong__con > div { min-width: 0; overflow-wrap: anywhere; }
+@media (min-width: 1024px) { .ph3-lam-moi-loi { margin-inline: 0; } }

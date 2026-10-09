@@ -13,6 +13,7 @@ import type {DaoCall} from '../dao/kieu'
 import type {CauDao2} from './dao2-core'
 import {KhoiLoiGiai,TheCauAi} from './TrongAi'
 import './dao2.css'
+import './de-thu-da-thiet-bi.css'
 
 export const NUT_NOP_DE_THU='Nộp đề thử'
 const LUI=<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
@@ -74,14 +75,23 @@ export default function DeThu({call,onVe,l4=false}:DeThuProps){
  return <div className="dao2-de-thu" data-khoi="de-thu" data-pha="lam">
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi" onClose={()=>setZoom('')}/>}
   {dau(`Đề thử ${cau.length} câu`)}
-  {cau.map((q,i)=><section key={q.qid} className="dao2-de-thu-cau" aria-label={`Câu ${i+1} trên ${cau.length}`}>
+  <div className="dao2-de-thu-noi-dung">
+  {cau.map((q,i)=><section id={`de-thu-cau-${i+1}`} tabIndex={-1} key={q.qid} className="dao2-de-thu-cau" aria-label={`Câu ${i+1} trên ${cau.length}`}>
    <p className="dao2-ai-nhan">CÂU {i+1}/{cau.length}{q.tenDang?<span> · {q.tenDang}</span>:null}</p>
    <TheCauAi cau={q} stt={i+1} nhan={`Câu ${i+1}`} traLoi={traLoi[q.qid]??''} khoa={dangNop||hetGio} onTraLoi={v=>doi(q.qid,v)} onZoom={setZoom}/>
   </section>)}
+  </div>
+  <aside className="dao2-de-thu-dieu-huong" aria-label="Tiến độ và nộp đề thử">
+   <p className="dao2-de-thu-thoi-gian" role="timer" aria-label={`Thời gian còn lại: ${Math.floor(con/60)} phút ${con%60} giây`}>Còn {dongHo(con)}</p>
+   <p className="dao2-ai-nhan">Danh sách câu</p>
+   <nav className="dao2-de-thu-ban-do" aria-label="Chuyển tới câu hỏi">
+    {cau.map((q,i)=><button type="button" key={q.qid} aria-label={`Câu ${i+1}: ${daLamCau(q.phan,traLoi[q.qid])?'đã làm':'chưa làm'}`} data-da-lam={daLamCau(q.phan,traLoi[q.qid])?'true':'false'} onClick={()=>{const el=document.getElementById(`de-thu-cau-${i+1}`);el?.scrollIntoView({block:'start'});el?.focus({preventScroll:true})}}>{i+1}</button>)}
+   </nav>
   <div className="dao2-chan" data-noi="">
    {loi&&<p className="dao2-loi" role="alert">{loi}</p>}
    <small className="dao2-tro-ghi" role="status">{hetGio?`Đã hết giờ · em làm ${daLam}/${cau.length} câu`:`Đã làm ${daLam}/${cau.length} câu`}</small>
    <button type="button" className="dao2-nut-chot" disabled={dangNop||!(duHet||hetGio)} onClick={()=>void nop(false)}>{dangNop?'Đang nộp…':duHet||hetGio?NUT_NOP_DE_THU:`Còn ${cau.length-daLam} câu chưa làm`}</button>
   </div>
+  </aside>
  </div>
 }
