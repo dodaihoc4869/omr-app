@@ -20,6 +20,8 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   void _a
   void _b
   const b = (body ?? {}) as Record<string, unknown>
+  // trung tu 09/10: ảnh app thầy chụp ở chế độ 2.0 — màn Cài đặt đọc lại cờ thì vẫn thấy BẬT (trước: "lệnh lạ" ⇒ cờ tắt ⇒ thanh bên cũ 9 mục)
+  if (duong === '/gv/chien-dich' && b.action === 'co-doc') return { ok: true as const, du: { ok: true, co: { bat: true, lop: [], sbd: [] } } }
   if (duong === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true as const, du: { homNay, chienDich: HT.map(cd) } }
   if (duong === '/gv/chien-dich' && b.action === 'bang') {
     const h = HT.find((x) => x.id === b.id) ?? HT[2]!

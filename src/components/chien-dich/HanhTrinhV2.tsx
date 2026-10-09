@@ -334,7 +334,8 @@ export default function HanhTrinhV2({
         ))}
       </nav>
 
-      <div role="tabpanel" id={`gvv2-o-${the}`} aria-labelledby={`gvv2-the-${the}`} className="gvv2-o-the">
+      {/* Đổi thẻ: mờ dần + trượt 8px 200ms (thang chung .tt-vao-muc — trung tu 09/10); key theo thẻ để mỗi lần đổi chạy lại. */}
+      <div key={the} role="tabpanel" id={`gvv2-o-${the}`} aria-labelledby={`gvv2-the-${the}`} className="gvv2-o-the tt-vao-muc">
         {the === 'chien-dich' && <div className="gvv2-chien-dich">{chienDichDaGiao}</div>}
 
         {the === 'can-chua' && (

@@ -38,7 +38,7 @@ describe('thanh bên theo cờ', () => {
   // ĐỔI CÓ CHỦ Ý 09/10 — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (GV-HomNay/GV-HanhTrinh/BoGop): 5 mục Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề,
   // đáy Cài đặt; bỏ nút riêng "Mở ca kiểm tra" (mở ca nằm trong màn Ca kiểm tra); Chiến dịch luyện · Chữa trên lớp · Gỡ nút thắt rời thanh bên
   // nhưng GIỮ mã màn (vào qua thẻ của Hành trình; mục Hành trình sáng khi đứng ở `goilenbang` / `bangonutthat`).
-  it('cờ BẬT ⇒ Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + vạch + đáy Cài đặt; không nút "Mở ca kiểm tra"; ẩn 4 màn cũ', () => {
+  it('cờ BẬT ⇒ Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + vạch + đáy Cài đặt; không nút "Mở ca kiểm tra"; ẩn 3 màn cũ', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     const { container } = render(<ThanhBenTrai />)
     expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
@@ -54,7 +54,11 @@ describe('thanh bên theo cờ', () => {
     expect(useAppStore.getState().screen).toBe('chiendich')
     fireEvent.click(screen.getByRole('button', { name: 'Hôm nay' }))
     expect(useAppStore.getState().screen).toBe('tongquan')
-    expect(MAN_AN_KHI_HOA2).toEqual(['examhub', 'giaobtvn', 'cauhoi', 'khodegiao'])
+    // SỬA CÓ CHỦ Ý 09/10 (trung tu giao diện thầy duyệt): "Học sinh hỏi" (`cauhoi`) KHÔNG còn ẩn ở 2.0 — em vẫn gửi "Hỏi bài Thầy" sau ca kiểm tra,
+    // thầy vào từ Hôm nay › Việc cần thầy (mục Hôm nay sáng). Bài tập về nhà · Giao đề theo tuần giữ ẩn (thầy 28/09 "bỏ hẳn BTVN").
+    expect(MAN_AN_KHI_HOA2).toEqual(['examhub', 'giaobtvn', 'khodegiao'])
+    expect(mucDangSang('cauhoi', true)).toBe('tongquan')
+    expect(mucDangSang('cauhoi')).toBe('cauhoi')
     expect(mucDangSang('toancanh', true)).toBe('hocsinh')
     expect(mucDangSang('exammonitor', true)).toBe('lichsuca')
     expect(mucDangSang('examsetup', true)).toBe('lichsuca')

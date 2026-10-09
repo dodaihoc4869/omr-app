@@ -224,7 +224,7 @@ export default function GiaoChienDich({
         <span className="cd-nhan-buoc">ĐÃ GIAO CHIẾN DỊCH</span>
         <h2>{ten.trim() || 'Chiến dịch luyện'}</h2>
         <p className="cd-phu">
-          {daGiao.soEm} em · {daGiao.soCau} câu · hạn nộp {hienHanNop(hanNop)}. Theo dõi ở mục Chữa trên lớp.
+          {daGiao.soEm} em · {daGiao.soCau} câu · hạn nộp {hienHanNop(hanNop)}. Theo dõi ở Hành trình › Cần thầy chữa.
         </p>
         <div className="cd-hang-nut">
           <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangHuy} onClick={() => void huyGiao()}>

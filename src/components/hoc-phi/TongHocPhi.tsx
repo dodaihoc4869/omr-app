@@ -9,7 +9,8 @@ export default function TongHocPhi({ tong, phamVi, loc, onLoc, loi }: {
   /** "Toàn trung tâm" hoặc "Lớp 11"… */
   phamVi: string
   loc: TrangThaiHocPhi | null
-  onLoc: (t: TrangThaiHocPhi | null) => void
+  /** Không truyền ⇒ không vẽ hàng chip lọc (màn Học sinh 2.0 đã có ô chọn Học phí trên thanh lọc — trung tu 09/10, bỏ lọc trùng). */
+  onLoc?: (t: TrangThaiHocPhi | null) => void
   loi?: string
 }) {
   const phanTram = tong && tong.phaiNop > 0 ? Math.min(100, Math.round((tong.daNop / tong.phaiNop) * 1000) / 10) : 0
@@ -47,6 +48,7 @@ export default function TongHocPhi({ tong, phamVi, loc, onLoc, loi }: {
           <div className="hp-thanh" role="progressbar" aria-label="Phần học phí đã nộp" aria-valuemin={0} aria-valuemax={100} aria-valuenow={phanTram}>
             <span style={{ width: `${phanTram}%` }} />
           </div>
+          {onLoc && (
           <div className="hp-loc" role="group" aria-label="Lọc học sinh theo học phí">
             {THU_TU.filter((t) => t !== 'khong_thu' || tong.dem.khong_thu > 0).map((t) => (
               <button
@@ -60,6 +62,7 @@ export default function TongHocPhi({ tong, phamVi, loc, onLoc, loi }: {
               </button>
             ))}
           </div>
+          )}
         </>
       )}
     </section>

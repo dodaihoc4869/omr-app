@@ -24,3 +24,97 @@
   .setup-launch>div{display:none}
   .setup-launch>button{pointer-events:auto;width:auto!important;min-width:0!important;min-height:42px!important;padding:0 16px!important;border-radius:999px!important;background:var(--m3-primary)!important;color:var(--m3-on-primary)!important;box-shadow:0 4px 14px color-mix(in srgb,var(--m3-primary) 28%,transparent)!important;font-size:13px!important}
 }
+
+/* THANH 4 BƯỚC MỞ CA — Game Hóa 2.0 (trung tu 09/10, bản vẽ GV-MoCa thầy duyệt). Bốn bước nối liền bằng một vạch, mỗi bước có số tròn + tên +
+ * dòng trạng thái (điều thầy đã chọn). Đang làm = tròn lam đặc; đã có lựa chọn = dấu ✓ nền lục; thiếu đề = viền hổ phách. Chỉ biến --gvm-*. */
+.ct-buoc-thanh {
+  margin: 0 0 18px;
+  padding: 16px 20px;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  border-radius: var(--r-the, 24px);
+  background: var(--gvm-mat);
+  box-shadow: var(--gvm-bong);
+}
+.ct-buoc-muc { position: relative; min-width: 0; }
+/* vạch nối sang bước sau */
+.ct-buoc-muc:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(36px + 8px);
+  right: -12px;
+  z-index: 0;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--gvm-vien);
+  pointer-events: none;
+}
+.ct-buoc-muc[data-trang-thai='xong']:not(:last-child)::after { background: var(--gvm-xl); }
+.ct-buoc-nut {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 4px 12px 4px 0;
+  border: 0;
+  background: var(--gvm-mat);
+  font: inherit;
+  font-family: var(--sans);
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ct-buoc-nut:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; border-radius: var(--r-nho, 12px); }
+.ct-buoc-so {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-vien, 999px);
+  background: var(--gvm-mat-2);
+  color: var(--gvm-chu-2);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.ct-buoc-chu { display: flex; flex-direction: column; min-width: 0; }
+.ct-buoc-chu b { font-size: var(--t-than, 15px); color: var(--gvm-chu-2); }
+.ct-buoc-chu span { font-size: var(--t-phu, 13px); color: var(--gvm-chu-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ct-buoc-muc[data-trang-thai='dang'] .ct-buoc-so { background: var(--gvm-xd); color: var(--gvm-tren-dac); }
+.ct-buoc-muc[data-trang-thai='dang'] .ct-buoc-chu b { color: var(--gvm-chu); }
+.ct-buoc-muc[data-trang-thai='xong'] .ct-buoc-so { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.ct-buoc-muc[data-trang-thai='xong'] .ct-buoc-chu b { color: var(--gvm-chu); }
+.ct-buoc-muc[data-trang-thai='thieu'] .ct-buoc-so { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.ct-buoc-muc[data-trang-thai='thieu'] .ct-buoc-chu span { color: var(--gvm-hp-dam); font-weight: 700; }
+/* nút chữ "Bước trước" + nút mở ca chưa đủ điều kiện: mờ rõ ràng (nền tông lam, chữ đậm) kèm câu lý do ngay dưới */
+.ct .ct-nut-chu { background: none; border: 0; color: var(--gvm-xd); padding: 0 12px; }
+.ct .ct-nut-chu:disabled { color: var(--gvm-chu-3); }
+.m3.vo-thay[data-hoa2] .ct .ct-nut-chinh:disabled:not([aria-busy='true']) {
+  background: var(--gvm-xd-nen);
+  color: var(--gvm-xd-dam);
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+}
+.m3.vo-thay[data-hoa2] .ct .ct-ghi[data-ly-do] { color: var(--gvm-chu-2); }
+@media (max-width: 760px) {
+  .ct-buoc-thanh { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 12px 16px; }
+  .ct-buoc-muc:nth-child(2)::after { display: none; }
+}
+@media (max-width: 340px) {
+  .ct-buoc-thanh { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .ct-buoc-muc::after { display: none; }
+}
+/* điện thoại: thẻ "Chưa chọn đề" trước bị nút "Chọn đề kiểm tra" ép chữ còn một chữ mỗi dòng ⇒ nút xuống hàng riêng, rộng hết thẻ */
+@media (max-width: 600px) {
+  .m3.vo-thay[data-hoa2] .ct-de-chon { flex-wrap: wrap; }
+  .m3.vo-thay[data-hoa2] .ct-de-chon .tt { flex: 1 1 0; }
+  .m3.vo-thay[data-hoa2] .ct-de-chon > .ct-nut { flex: 1 0 100%; }
+}

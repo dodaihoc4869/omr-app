@@ -1,16 +1,23 @@
 // HÔM NAY CỦA THẦY — màn đầu app thầy khi Game Hóa 2.0 bật (BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 · GV-HomNay.dc.html, BoGop: "Tổng quan: 2 nút chính
 // + nút Mở ca → Hôm nay: danh sách việc, mỗi việc 1 nút"). Trả lời MỘT câu: "Lớp tôi cần gì hôm nay?". Mã màn vẫn là `tongquan` (TongQuanScreen giữ mã).
-//   · 4 ô số: Đủ mức tối thiểu hôm nay a/b em · Chưa làm câu nào n em (cộng từ bảng hôm nay của các Hành trình — `danh-sach` lọc `hanhTrinh`
-//     rồi `bang` → `hanhTrinhNgay.em`, cùng phép đếm `chiSoNhip` của màn Hành trình) · Cần thầy chữa n chỗ (cùng ba nhóm thẻ "Cần thầy chữa" của
-//     Bảng chiến dịch — `nhomCanThayChua`: câu sai từ 4 lần · câu có thẻ nút thắt · em sơ ý cao) · Ca kiểm tra đang mở n ca (`danhSachCa`).
-//   · "Việc cần thầy · xếp theo độ gấp": ca đang mở → Theo dõi ca · Cần thầy chữa → Hành trình › Cần thầy chữa · lớp chờ bài mới (chỉ khi OMNI
-//     bật và máy chủ gửi `choBaiMoi`) → Hành trình › Bài đã dạy · em chưa làm câu nào → Hành trình › Nhịp hôm nay. MỖI việc MỘT nút.
-//   · "Nhịp theo khối": đủ mức a/b mỗi khối.
-// SỐ CHỈ TỪ API SẴN CÓ, không đổi máy chủ, không số giả: lệnh nào lỗi thì ô / hàng của nó KHÔNG vẽ, và một dòng nói thật lệnh nào chưa đọc được.
+// TRUNG TU 09/10 (thầy duyệt bản vẽ GV-HomNay, "build luôn"):
+//   · đầu màn: tiêu đề 32 + dòng phụ; MỘT nút chính gọn ở góc phải = việc gấp nhất (có ca đang mở ⇒ "Theo dõi ca đang mở", không thì
+//     "Bổ sung bài hôm nay").
+//   · lưới 2fr / 1fr. Trái "Việc cần thầy · xếp theo độ gấp" (thứ tự DOM = thứ tự mắt = thứ tự Tab — bỏ column-reverse): ca đang mở → Theo dõi
+//     ca · Cần thầy chữa → Hành trình › Cần thầy chữa · em hỏi bài chờ chữa → Học sinh hỏi · lớp chờ bài mới (OMNI) → Hành trình › Bài đã dạy ·
+//     em chưa làm câu nào → Hành trình › Nhịp hôm nay · phần chưa đọc được → Thử lại · không có chỗ cần chữa ⇒ một dòng ✓. MỖI việc MỘT nút viền.
+//   · phải: thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một dòng (thanh + a/b), bấm mở Hành trình khối đó.
+//   · BỎ bốn ô số lặp lại danh sách việc (C4: một thông tin một chỗ). Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu
+//     (`lyDoDeHieu`), không in lỗi kỹ thuật thô.
+//   Số "Đủ mức" / "chưa làm" cộng từ bảng hôm nay của các Hành trình — `danh-sach` lọc `hanhTrinh` rồi `bang` → `hanhTrinhNgay.em`, cùng phép
+//   đếm `chiSoNhip` của màn Hành trình. "Cần thầy chữa" = ba nhóm thẻ Cần thầy chữa của Bảng chiến dịch (`nhomCanThayChua`).
+// SỐ CHỈ TỪ API SẴN CÓ, không đổi máy chủ, không số giả: lệnh nào lỗi thì phần của nó KHÔNG vẽ, và một dòng nói thật phần nào chưa đọc được.
 // Ghi số cho thanh bên (`useSoDemGv`: ca đang mở, Cần thầy chữa). Phép tính thuần xuất ra để test (tests/gv-hom-nay-0910.test.tsx).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, Clock, MonitorCheck, Presentation, type LucideIcon } from 'lucide-react'
-import { danhSachCa, type CaTomTat } from '../lib/exam-api'
+import { BookOpen, Check, ChevronRight, Clock, MessageCircleQuestion, MonitorCheck, Presentation, RefreshCw, type LucideIcon } from 'lucide-react'
+import { danhSachCa, danhSachCauHoi, type CaTomTat } from '../lib/exam-api'
+import { gomTheoCa } from '../lib/hoi-bai'
+import { lyDoDeHieu } from '../lib/loi-de-hieu'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
@@ -86,28 +93,50 @@ export interface DuLieuHomNay {
   canThayChua: DemCanThayChua | null
   /** Lớp chờ bài mới (OMNI): chỉ lớp đã chờ từ `NGAY_NHAC_CHO_BAI_MOI` ngày. */
   choBaiMoi: { lop: string; soNgay: number }[]
+  /** Em hỏi bài chờ thầy chữa (màn Học sinh hỏi): `chuaChua` lượt hỏi ở `soCa` ca, `caMoi` = tên ca có lượt mới nhất. null = chưa đọc được. */
+  hoi: { chuaChua: number; soCa: number; caMoi: string } | null
+  loiHoi: string
 }
 
-const loiChu = (e: unknown, macDinh: string) => (e instanceof Error && e.message ? e.message : macDinh)
+/** Lý do dễ hiểu (câu tiếng Việt sẵn có giữ nguyên; lỗi kỹ thuật thô ⇒ "Mạng có thể đang chập chờn."). */
+const loiChu = (e: unknown) => lyDoDeHieu(e)
 
 export async function taiHomNay(): Promise<DuLieuHomNay> {
+  const cauHinh = (async () => {
+    const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
+    if (!url.trim() || !mat.trim()) throw new Error('Chưa kết nối máy chủ — vào Cài đặt › Công cụ kỹ thuật › Kết nối máy chủ')
+    return { url: url.trim(), mat: mat.trim() }
+  })()
+  cauHinh.catch(() => {}) // lỗi cấu hình được từng lệnh dưới bắt và nói thật; dòng này chỉ để không báo "promise bị bỏ rơi"
   const taiCa = async () => {
     try {
-      const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim() || !mat.trim()) throw new Error('Chưa kết nối máy chủ — vào Cài đặt › Công cụ kỹ thuật › Kết nối máy chủ')
-      return { ca: await danhSachCa(url.trim(), mat.trim(), false), loiCa: '' }
+      const { url, mat } = await cauHinh
+      const ca = await danhSachCa(url, mat, false)
+      if (!Array.isArray(ca)) throw new TypeError('danhSachCa: not an array') // máy chủ trả thiếu trường ⇒ câu dễ hiểu, không "Cannot read…"
+      return { ca, loiCa: '' }
     } catch (e) {
-      return { ca: null, loiCa: loiChu(e, 'Không tải được danh sách ca') }
+      return { ca: null, loiCa: loiChu(e) }
     }
   }
   const taiCd = async () => {
     try {
       const r = await danhSach()
-      return r.ok ? { cd: r.du.chienDich, loiCd: '' } : { cd: null, loiCd: r.chu }
+      return r.ok ? { cd: r.du.chienDich, loiCd: '' } : { cd: null, loiCd: loiChu(r.chu) }
     } catch (e) {
-      return { cd: null, loiCd: loiChu(e, 'Không tải được chiến dịch') }
+      return { cd: null, loiCd: loiChu(e) }
     }
   }
+  // Em hỏi bài (nút "Hỏi bài Thầy" sau ca kiểm tra): MỘT lệnh cho mọi ca, gom theo ca tại máy — như màn Học sinh hỏi.
+  const taiHoi = async () => {
+    try {
+      const { url, mat } = await cauHinh
+      const ca = gomTheoCa(await danhSachCauHoi(url, mat, '', false)).filter((c) => c.chuaChua > 0)
+      return { hoi: { chuaChua: ca.reduce((n, c) => n + c.chuaChua, 0), soCa: ca.length, caMoi: ca[0]?.tenCa || (ca[0] ? `Ca ${ca[0].maCa}` : '') }, loiHoi: '' }
+    } catch (e) {
+      return { hoi: null, loiHoi: loiChu(e) }
+    }
+  }
+  const huaHoi = taiHoi()
   const taiCoOmni = async () => {
     try {
       const r = await docCoOmni()
@@ -160,7 +189,7 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
       return []
     }
   })()
-  const [omni, choBaiMoi] = await Promise.all([taiOmni, taiCho])
+  const [omni, choBaiMoi, { hoi, loiHoi }] = await Promise.all([taiOmni, taiCho, huaHoi])
   const omniCua = new Map(canOmni.map((x, i) => [x.c.id, omni[i] ?? []] as const))
 
   const daDoc = chay.map((c, i) => ({ c, b: bang[i] })).filter((x): x is { c: ChienDichTom; b: BangChienDich } => !!x.b)
@@ -172,23 +201,55 @@ export async function taiHomNay(): Promise<DuLieuHomNay> {
     .map(({ c, b }) => ({ cd: c, khoi: khoiCuaHanhTrinh(c), cs: b?.hanhTrinhNgay ? chiSoNhip(b.hanhTrinhNgay.em) : null }))
     .sort((a, b) => String(a.khoi).localeCompare(String(b.khoi)))
 
-  return { ca, loiCa, cd, loiCd, nhip, canThayChua, choBaiMoi }
+  return { ca, loiCa, cd, loiCd, nhip, canThayChua, choBaiMoi, hoi, loiHoi }
 }
 
 // ------------------------------------------------------------------ MÀN
 
-type Mau = 'xl' | 'ho' | 'hp' | 'xd' | 'tim'
+type Mau = 'xl' | 'ho' | 'hp' | 'xd' | 'tim' | 'xam'
 interface Viec {
   key: string
   mau: Mau
   icon: LucideIcon
   tieuDe: string
   phu: string
-  nut: string
-  lam: () => void
+  /** Không có nút (dòng báo "không có chỗ cần chữa") ⇒ để trống. */
+  nut?: string
+  lam?: () => void
+  /** Dòng báo lệnh chưa đọc được — trình đọc màn hình đọc ngay. */
+  loi?: boolean
 }
 
 const tiLe = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
+
+/** Khung xương đúng hình màn Hôm nay (thẻ việc 3 dòng + thẻ đủ mức 3 khối) — thay chữ "Đang tải…". */
+function XuongHomNay() {
+  return (
+    <div className="gvhn-luoi" role="status" aria-label="Đang tải việc hôm nay">
+      <div className="gvv2-the gvhn-viec gvhn-xuong">
+        <span className="gv-xuong-khoi tt-xuong" style={{ width: 260, height: 18 }} />
+        {[0, 1, 2].map((i) => (
+          <span key={i} className="gvhn-xuong-dong">
+            <span className="gv-xuong-khoi tt-xuong" style={{ width: 44, height: 44, borderRadius: 14 }} />
+            <span className="gvhn-xuong-chu">
+              <span className="gv-xuong-khoi tt-xuong" style={{ width: '70%', height: 14 }} />
+              <span className="gv-xuong-khoi tt-xuong" style={{ width: '45%', height: 12 }} />
+            </span>
+            <span className="gv-xuong-khoi tt-xuong" style={{ width: 112, height: 44, borderRadius: 12 }} />
+          </span>
+        ))}
+      </div>
+      <div className="gvv2-the gvhn-du gvhn-xuong">
+        <span className="gv-xuong-khoi tt-xuong" style={{ width: 160, height: 14 }} />
+        <span className="gv-xuong-khoi tt-xuong" style={{ width: 140, height: 44 }} />
+        <span className="gv-xuong-khoi tt-xuong" style={{ width: '100%', height: 8 }} />
+        {[0, 1, 2].map((i) => (
+          <span key={i} className="gv-xuong-khoi tt-xuong" style={{ width: '100%', height: 20 }} />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function GvHomNayScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
@@ -229,7 +290,8 @@ export default function GvHomNayScreen() {
     setScreen('chiendich')
   }
 
-  // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở (đang diễn ra) → Cần thầy chữa → lớp chờ bài mới → em chưa làm câu nào.
+  // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở (đang diễn ra) → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → em chưa làm câu nào
+  // → phần chưa đọc được (Thử lại) → không có chỗ cần chữa (✓, không nút).
   const viec: Viec[] = []
   for (const c of caMo) {
     viec.push({
@@ -244,6 +306,18 @@ export default function GvHomNayScreen() {
   }
   if (du?.canThayChua && du.canThayChua.tong > 0) {
     viec.push({ key: 'can-chua', mau: 'hp', icon: Presentation, tieuDe: `Cần thầy chữa: ${du.canThayChua.tong} chỗ`, phu: chuCanThayChua(du.canThayChua), nut: 'Xếp buổi chữa', lam: () => moHanhTrinh({ the: 'can-chua' }) })
+  }
+  if (du?.hoi && du.hoi.chuaChua > 0) {
+    const h = du.hoi
+    viec.push({
+      key: 'hoi',
+      mau: 'tim',
+      icon: MessageCircleQuestion,
+      tieuDe: `Học sinh hỏi: ${h.chuaChua} lượt chờ thầy chữa`,
+      phu: h.soCa === 1 ? h.caMoi : `${h.soCa} ca · mới nhất: ${h.caMoi}`,
+      nut: 'Xem câu hỏi',
+      lam: () => setScreen('cauhoi'),
+    })
   }
   if (du && du.choBaiMoi.length > 0) {
     const ds = du.choBaiMoi
@@ -270,139 +344,130 @@ export default function GvHomNayScreen() {
       lam: () => moHanhTrinh({ the: 'nhip', chienDichId: nhieuNhat?.cd.id }),
     })
   }
+  // Phần chưa đọc được: MỘT dòng, nói thật phần nào + lý do dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
+  const hong = du
+    ? ([
+        du.loiCa && ['danh sách ca kiểm tra', du.loiCa],
+        du.loiCd && ['Hành trình và chiến dịch', du.loiCd],
+        du.loiHoi && ['câu học sinh hỏi', du.loiHoi],
+      ].filter(Boolean) as [string, string][])
+    : []
+  if (hong.length > 0) {
+    const lyDo = Array.from(new Set(hong.map(([, l]) => l))).join(' ')
+    const conLai = !!du && (!!tong || du.canThayChua !== null || du.ca !== null || du.hoi !== null)
+    viec.push({
+      key: 'loi',
+      mau: 'xam',
+      icon: RefreshCw,
+      tieuDe: `Chưa tải được ${hong.map(([ten]) => ten).join(' · ')}`,
+      phu: `${lyDo}${conLai ? ' Số khác trên trang vẫn đúng.' : ''}`,
+      nut: dangTai ? 'Đang tải lại…' : 'Thử lại',
+      lam: () => void tai(),
+      loi: true,
+    })
+  }
+  if (du?.canThayChua && du.canThayChua.tong === 0) {
+    viec.push({ key: 'khong-chua', mau: 'xl', icon: Check, tieuDe: 'Không có chỗ cần thầy chữa hôm nay.', phu: '' })
+  }
 
-  const loi = du ? [du.loiCa && `Danh sách ca: ${du.loiCa}`, du.loiCd && `Hành trình và chiến dịch: ${du.loiCd}`].filter(Boolean).join(' · ') : ''
-  const coO = !!du && (!!tong || du.canThayChua !== null || du.ca !== null)
+  // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
+  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => moHanhTrinh({ the: 'bai-da-day', boSungBai: true }) }
 
   return (
     <div className="gv2-trang gvhn">
       <header className="gvhn-dau">
-        <h1 className="gvv2-h1">Hôm nay của thầy</h1>
-        <p className="gvv2-phu">
-          {hienNgay(ngayVn(now))}
-          {khoiCo.length > 0 && tong && (
-            <>
-              {' · '}
-              <span className="gvv2-so">{khoiCo.length}</span> khối · <span className="gvv2-so">{tong.tong}</span> em đang chạy Hành trình
-            </>
-          )}
-        </p>
-        <button type="button" className="gvv2-nut-chinh" onClick={() => moHanhTrinh({ the: 'bai-da-day', boSungBai: true })}>Bổ sung bài hôm nay</button>
+        <div className="gvhn-dau-chu">
+          <h1 className="gvv2-h1">Hôm nay của thầy</h1>
+          <p className="gvv2-phu">
+            {hienNgay(ngayVn(now))}
+            {khoiCo.length > 0 && tong && (
+              <>
+                {' · '}
+                <span className="gvv2-so">{khoiCo.length}</span> khối · <span className="gvv2-so">{tong.tong}</span> em đang chạy Hành trình
+              </>
+            )}
+          </p>
+        </div>
+        <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
+          {nutChinh.chu}
+        </button>
       </header>
 
       {!du ? (
-        <p className="gvv2-trong" role="status">
-          Đang tải việc hôm nay…
-        </p>
+        <XuongHomNay />
       ) : (
-        <>
-          {loi && (
-            <div className="gvv2-the gvv2-loi" role="alert">
-              <p>Chưa đọc được: {loi}</p>
-              <button type="button" className="gvv2-nut-vien" onClick={() => void tai()} disabled={dangTai}>
-                {dangTai ? 'Đang tải lại…' : 'Thử lại'}
-              </button>
-            </div>
-          )}
-
-          {coO && (
-            <section className="gvhn-so-ds" aria-label="Số liệu hôm nay">
-              {tong && (
-                <div className="gvhn-so" data-mau="xl">
-                  <span className="gvhn-so-nhan">Đủ mức tối thiểu hôm nay</span>
-                  <b className="gvv2-so">
-                    {tong.duMuc}
-                    <small>/{tong.coMuc} em</small>
-                  </b>
-                </div>
-              )}
-              {tong && (
-                <div className="gvhn-so" data-mau="ho">
-                  <span className="gvhn-so-nhan">Chưa làm câu nào</span>
-                  <b className="gvv2-so">
-                    {tong.chuaLam}
-                    <small> em</small>
-                  </b>
-                </div>
-              )}
-              {du.canThayChua && (
-                <div className="gvhn-so" data-mau="hp">
-                  <span className="gvhn-so-nhan">Cần thầy chữa</span>
-                  <b className="gvv2-so">
-                    {du.canThayChua.tong}
-                    <small> chỗ</small>
-                  </b>
-                </div>
-              )}
-              {du.ca && (
-                <div className="gvhn-so" data-mau="xd">
-                  <span className="gvhn-so-nhan">Ca kiểm tra đang mở</span>
-                  <b className="gvv2-so">
-                    {caMo.length}
-                    <small> ca</small>
-                  </b>
-                </div>
-              )}
-            </section>
-          )}
-
-          <div className="gvhn-luoi">
-            <section className="gvv2-the gvhn-viec" aria-labelledby="gvhn-viec-tieu">
-              <h2 id="gvhn-viec-tieu" className="gvv2-h2">
-                Việc cần thầy · xếp theo độ gấp
-              </h2>
-              {viec.length === 0 ? (
-                <p className="gvv2-trong">{loi ? 'Chưa đủ số liệu để xếp việc — bấm Thử lại ở trên.' : 'Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.'}</p>
-              ) : (
-                <ul className="gvhn-viec-ds">
-                  {viec.map((v) => {
-                    const Icon = v.icon
-                    return (
-                      <li key={v.key} className="gvhn-viec-dong">
-                        <span className="gvhn-dau-o" data-mau={v.mau} aria-hidden="true">
-                          <Icon size={22} aria-hidden="true" />
-                        </span>
-                        <span className="gvhn-viec-chu">
-                          <b>{v.tieuDe}</b>
-                          {v.phu && <span>{v.phu}</span>}
-                        </span>
-                        {/* Một nút chính trên màn (luật C2): việc gấp nhất; các việc sau là nút viền. */}
-                        <button type="button" className="gvv2-nut-vien" onClick={v.lam} aria-label={`${v.nut}: ${v.tieuDe}`}>
+        <div className="gvhn-luoi">
+          <section className="gvv2-the gvhn-viec" aria-labelledby="gvhn-viec-tieu">
+            <h2 id="gvhn-viec-tieu" className="gvv2-h2">
+              Việc cần thầy · xếp theo độ gấp
+            </h2>
+            {viec.length === 0 ? (
+              <p className="gvv2-trong">Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.</p>
+            ) : (
+              <ul className="gvhn-viec-ds">
+                {viec.map((v) => {
+                  const Icon = v.icon
+                  return (
+                    <li key={v.key} className="gvhn-viec-dong" role={v.loi ? 'alert' : undefined} data-viec={v.key}>
+                      <span className="gvhn-dau-o" data-mau={v.mau} aria-hidden="true">
+                        <Icon size={20} aria-hidden="true" />
+                      </span>
+                      <span className="gvhn-viec-chu">
+                        <b>{v.tieuDe}</b>
+                        {v.phu && <span>{v.phu}</span>}
+                      </span>
+                      {/* Một nút chính trên màn (luật C2) ở đầu màn; mỗi việc MỘT nút viền. */}
+                      {v.nut && v.lam && (
+                        <button type="button" className="gvv2-nut-vien tt-nhan" onClick={v.lam} disabled={v.loi && dangTai} aria-label={v.loi ? v.nut : `${v.nut}: ${v.tieuDe}`}>
                           {v.nut}
                         </button>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
-            </section>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </section>
 
-            {khoiCo.length > 0 && (
-              <aside className="gvv2-the gvhn-khoi" aria-labelledby="gvhn-khoi-tieu">
-                <h2 id="gvhn-khoi-tieu" className="gvv2-h2">
-                  Nhịp theo khối
-                </h2>
+          {tong && khoiCo.length > 0 && (
+            <aside className="gvv2-the gvhn-du" aria-labelledby="gvhn-du-tieu">
+              <span id="gvhn-du-tieu" className="gvhn-du-nhan">
+                Đủ mức tối thiểu hôm nay
+              </span>
+              <b className="gvhn-du-so gvv2-so">
+                {tong.duMuc}
+                <small>/{tong.coMuc} em</small>
+              </b>
+              <span className="gvv2-thanh gvhn-du-thanh" data-du="true" role="progressbar" aria-label="Em đủ mức tối thiểu hôm nay" aria-valuemin={0} aria-valuemax={100} aria-valuenow={tiLe(tong.duMuc, tong.coMuc)}>
+                <i className="tt-thanh" style={{ width: `${tiLe(tong.duMuc, tong.coMuc)}%` }} />
+              </span>
+              <div className="gvhn-khoi-ds">
                 {khoiCo.map((n) => {
                   const ti = tiLe(n.cs!.duMuc, n.cs!.coMuc)
                   return (
-                    <div key={n.cd.id} className="gvhn-khoi-dong">
-                      <div className="gvhn-khoi-chu">
-                        <b>Khối {n.khoi ?? '—'}</b>
-                        <span className="gvv2-so">
-                          {n.cs!.duMuc}/{n.cs!.coMuc} em đủ mức
-                        </span>
-                      </div>
-                      <span className="gvv2-thanh" data-du="true" role="progressbar" aria-label={`Khối ${n.khoi ?? '—'}: em đủ mức tối thiểu hôm nay`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={ti}>
-                        <i style={{ width: `${ti}%` }} />
+                    <button
+                      key={n.cd.id}
+                      type="button"
+                      className="gvhn-khoi-dong tt-nhan"
+                      onClick={() => moHanhTrinh({ the: 'nhip', chienDichId: n.cd.id })}
+                      aria-label={`Khối ${n.khoi ?? '—'}: ${n.cs!.duMuc}/${n.cs!.coMuc} em đủ mức — mở Hành trình khối ${n.khoi ?? '—'}`}
+                    >
+                      <b>Khối {n.khoi ?? '—'}</b>
+                      <span className="gvv2-thanh" data-du="true" aria-hidden="true">
+                        <i className="tt-thanh" style={{ width: `${ti}%` }} />
                       </span>
-                      <button type="button" className="gvv2-nut-vien" onClick={() => moHanhTrinh({ the: 'nhip', chienDichId: n.cd.id })}>Xem Hành trình khối {n.khoi ?? '—'}</button>
-                    </div>
+                      <span className="gvv2-so gvhn-khoi-so">
+                        {n.cs!.duMuc}/{n.cs!.coMuc}
+                      </span>
+                      <ChevronRight size={16} aria-hidden="true" />
+                    </button>
                   )
                 })}
-              </aside>
-            )}
-          </div>
-        </>
+              </div>
+              <span className="gvhn-du-ghi">Bấm một khối để mở Hành trình của khối đó.</span>
+            </aside>
+          )}
+        </div>
       )}
     </div>
   )
