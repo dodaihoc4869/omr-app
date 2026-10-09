@@ -1,10 +1,11 @@
 // Hồi quy half-life phân cấp theo em × kỹ năng; kiểm prequential trên lượt CHƯA học.
 import { fsrs, createEmptyCard, type Card } from 'ts-fsrs'
 import { CAU_HINH_FSRS } from './lich-on-fsrs'
+import { vuotCongV6 } from './hanh-trinh-v6-mo-hinh'
 import type { QuanSatHanhTrinh } from './hanh-trinh-quan-sat'
 const NGAY = 86400000, LN2 = Math.LN2
 const kep = (x:number,a:number,b:number) => Math.max(a,Math.min(b,x))
-export interface TriNhoHalfLife { doLech: number; n: number; nDo: number; loss: number; lossFsrs: number; lucCuoi: number; dung: number; sai: number; card: Card }
+export interface TriNhoHalfLife { doLech: number; n: number; nDo: number; loss: number; lossFsrs: number; lucCuoi: number; dung: number; sai: number; card: Card; kiem?:Record<string,{sum:number;n:number}> }
 export interface MoHinhHalfLife { em: number; kyNang: Record<string,TriNhoHalfLife> }
 export const xacSuatNho = (ngay:number,h:number) => 2 ** (-Math.max(0,ngay)/Math.max(0.125,h))
 export function halfLife(m:MoHinhHalfLife,k:string):number { return 2**kep(1+m.em+(m.kyNang[k]?.doLech ?? 0),-3,10) }
@@ -21,7 +22,7 @@ export function fitHalfLife(qs:readonly QuanSatHanhTrinh[]):MoHinhHalfLife {
     if(dt>=0.5) {
       const h=halfLife(m,k), p=xacSuatNho(dt,h)
       // Chấm dự đoán TRƯỚC cập nhật; đủ quan sát mới so với FSRS cùng sổ.
-      if(c.n>=4) { c.nDo++; c.loss+=logLoss(p,o.dung); c.lossFsrs+=logLoss(scheduler.get_retrievability(c.card,new Date(o.luc),false),o.dung) }
+      if(c.n>=4) { c.nDo++; const l=logLoss(p,o.dung),f=logLoss(scheduler.get_retrievability(c.card,new Date(o.luc),false),o.dung);c.loss+=l;c.lossFsrs+=f;const kiem=c.kiem??{},d=kiem[o.ngay]??{sum:0,n:0};d.sum+=f-l;d.n++;kiem[o.ngay]=d;c.kiem=kiem }
       const grad=kep((p-Number(o.dung))*LN2*LN2*dt/h/Math.max(0.01,1-p),-2,2)
       const rate=0.15/Math.sqrt(1+c.n/10)
       m.em=kep(m.em-rate*grad/o.kn.length-0.001*m.em,-2,4)
@@ -36,7 +37,7 @@ export function fitHalfLife(qs:readonly QuanSatHanhTrinh[]):MoHinhHalfLife {
 export function henHalfLife(m:MoHinhHalfLife,kn:readonly string[], retention=0.9):string|null {
   if(!kn.length) return null
   const ds=kn.map(k=>m.kyNang[k])
-  if(ds.some(c=>!c || c.nDo<8 || c.loss>c.lossFsrs)) return null
+  if(ds.some(c=>!c || c.nDo<8 || c.loss>c.lossFsrs || !vuotCongV6(c.kiem??{}))) return null
   const luc=Math.min(...kn.map(k=>m.kyNang[k]!.lucCuoi+(-Math.log2(retention))*halfLife(m,k)*NGAY))
   return new Date(luc+7*3600000).toISOString().slice(0,10)
 }

@@ -18,7 +18,7 @@ export function chonBandit(context:string,co:readonly CachCuu[],bang:readonly Ba
   if(!ds.length) return null
   if(ds.length===1) return {cach:ds[0]!,xacSuat:1}
   const wins=new Map<CachCuu,number>(ds.map(c=>[c,0]))
-  let chon=ds[0]!
+
   // Monte Carlo lưu propensity ước lượng; RNG do máy chủ cấp, không lấy từ HS.
   for(let i=0;i<256;i++) {
     let best=-1, arm=ds[0]!
@@ -26,7 +26,10 @@ export function chonBandit(context:string,co:readonly CachCuu[],bang:readonly Ba
       const r=bang.find(b=>b.context===context && b.cach===c), a=gamma(1+(r?.dung??0),rng),b=gamma(1+(r?.sai??0),rng),p=a/(a+b)
       if(p>best) {best=p;arm=c}
     }
-    wins.set(arm,wins.get(arm)!+1); if(i===0) chon=arm
+    wins.set(arm,wins.get(arm)!+1)
   }
-  return {cach:chon,xacSuat:Math.max(1/256,wins.get(chon)!/256)}
+  // Lấy mẫu categorical từ phân bố đã tính: xác suất ghi đúng với phép lấy mẫu này.
+  const probs=ds.map(c=>0.9*wins.get(c)!/256+0.1/ds.length),u=rng();let sum=0
+  for(let i=0;i<ds.length;i++){sum+=probs[i]!;if(u<sum||i===ds.length-1)return {cach:ds[i]!,xacSuat:probs[i]!}}
+  return null
 }

@@ -3404,6 +3404,7 @@ const boXuLy = {
       await chotExpNgayQuaDayDu(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
       // VÒNG HỌC v2 — GĐ5 (02/10): tự hoàn thiện hằng tuần (đêm thứ Hai giờ VN, idempotent theo tuần): hiệu chỉnh luật đóng lỗi theo tỉ lệ sai lại + câu nghi sai đáp án.
       if(new Date(Date.now()+7*3600000).getUTCDay()===1)await chayTuHoanThien(env,Date.now()).then(r=>console.log('[v2] tự hoàn thiện',JSON.stringify(r))).catch(async e=>{console.error('[v2] tự hoàn thiện lỗi:',e);await ghiLoiMay(env,'v2_tu_hoan_thien')})
+      await import('./hanh-trinh-v6-d1').then(m=>m.hocV6Dem(env,Date.now())).then(r=>console.log('[hanh-trinh-v6] học đêm',JSON.stringify(r))).catch(e=>console.error('[hanh-trinh-v6] lỗi học đêm',e))
       // OMNI 3 (05/10): β câu + ảnh chụp hồ sơ các em đang bật OMNI (chia lô, idempotent theo ngày) · đêm thứ Hai: hiệu chỉnh tham số tuần. Lỗi chỉ ghi nhật ký máy.
       await chayOmniDem(env,Date.now()).then(r=>{if(r.soEm||r.soBeta)console.log('[omni] đêm',JSON.stringify(r))}).catch(async e=>{console.error('[omni] đêm lỗi:',e);await ghiLoiMay(env,'omni_dem')})
       if(new Date(Date.now()+7*3600000).getUTCDay()===1)await hieuChinhOmniTuan(env,Date.now()).then(r=>console.log('[omni] hiệu chỉnh tuần',JSON.stringify(r))).catch(async e=>{console.error('[omni] hiệu chỉnh tuần lỗi:',e);await ghiLoiMay(env,'omni_tuan')})

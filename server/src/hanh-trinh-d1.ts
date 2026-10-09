@@ -1,7 +1,8 @@
-import { PHIEN_BAN_HT5 } from './hanh-trinh-v5-loi'
+import { PHIEN_BAN_HT6 as PHIEN_BAN_HT5 } from './hanh-trinh-v6-loi'
 import { baoCaoAB } from './hanh-trinh-do-luong'
 import { SQL_HANH_TRINH_V5 } from './hanh-trinh-v5-schema'
 import { lenhQuyetDinhV5 } from './hanh-trinh-v5-d1'
+import { lenhChonV6 } from './hanh-trinh-v6-d1'
 import type { Env } from './kieu'
 import type { ChienDich, HoSo2, KeHoachDaChot } from './srs2-d1'
 import { CAU_MOI_CHANG, CAU_TOI_THIEU, chonCauHanhTrinh, tangCuaEm, tienDoHanhTrinh, type TangHanhTrinh } from './hanh-trinh-ngay'
@@ -21,7 +22,7 @@ const goc = (q: string) => q.replace(/#\d+$/, '')
  * UPDATE kế hoạch và mốc chặng cùng batch + CAS, hai máy không ghi đè nhau.
  */
 export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowMs: number, hs: HoSo2,
-  cu: Row | null, chan: ReadonlySet<string>, trongSo?: Readonly<Record<string, number>>, dangVung?: readonly string[]): Promise<KeHoachDaChot> {
+  cu: Row | null, chan: ReadonlySet<string>, trongSo?: Readonly<Record<string, number>>, dangVung?: readonly string[], daMoRong=false): Promise<KeHoachDaChot> {
   await chayDdlMotLan(env, 'hanh_trinh_v3_v4', [...SQL_BANG_HANH_TRINH,...SQL_DONG_CO_HANH_TRINH,...SQL_HANH_TRINH_V5])
   const nhom = new Map([...hs.meta].map(([q, m]) => [q, m.group || q]))
   const rows = await env.DB.prepare(`SELECT qid,ket_qua,received_at,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=?
@@ -47,7 +48,7 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   let tang: TangHanhTrinh = 1
   for (const cau of theoBai.values()) {
     const t = tangCuaEm(cau, hs.tt, nhom, dangVung)
-    tang = Math.max(tang, t) as TangHanhTrinh
+    // Tầng ngày được quyết bằng hồ sơ kỹ năng × tầng mới; không suy từ SPRT gộp.
     for (const c of cau) tangSanSang.set(c.qid, t)
   }
   await env.DB.prepare('INSERT OR IGNORE INTO hanh_trinh_v3_ngay(sbd,ngay,tang,toi_thieu) VALUES(?,?,?,?)')
@@ -66,7 +67,7 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const engine = await dongCoHanhTrinh(env,sbd,nowMs,hs,chan)
     if(engine.v5){
       for(const [id,t] of engine.v5.tang)tangSanSang.set(id,t)
-      const ready=Math.max(1,...engine.v5.tang.values()) as TangHanhTrinh
+      const ready=Math.max(1,...[...engine.v5.tang].filter(([id])=>!engine.v5!.chanDoan.has(id)).map(([,t])=>t)) as TangHanhTrinh
       if((!cu||!v5Cu||v5Cu.phien_ban!==PHIEN_BAN_HT5) && ready>tangNgay){
         await env.DB.prepare("UPDATE hanh_trinh_v3_ngay SET tang=MAX(tang,?),toi_thieu=MAX(toi_thieu,?) WHERE sbd=? AND ngay=? AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')").bind(ready,CAU_TOI_THIEU[ready],sbd,ngay).run()
         const next=await env.DB.prepare('SELECT tang,toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<Row>();tangNgay=Number(next!.tang) as TangHanhTrinh;toiThieu=Number(next!.toi_thieu)
@@ -75,7 +76,17 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const trangThai = new Map([...hs.tt].map(([q,t])=>[q,engine.hen.has(q) && t.thanhThao ? {...t,henOn:engine.hen.get(q)!}:t]))
     const chanMoi = new Set([...chan,...engine.chan])
     const cung = hs.cau.filter(c => !hs.meta.get(c.qid)?.tuLuan && !chan.has(nhom.get(c.qid) || c.qid))
-    const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu, daLam: xong, cau: cung, tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined })
+    const diagCu=await env.DB.prepare('SELECT qid,nhom FROM hanh_trinh_v6_chon WHERE sbd=? AND ngay=? AND moc=? AND diagnostic=1').bind(sbd,ngay,moc).all<{qid:string;nhom:string}>()
+    const reserved=new Set(diagCu.results.map(c=>c.nhom))
+    const freshDiag=[...(engine.v5?.chanDoan??[])].filter(id=>!reserved.has(nhom.get(id)||id)).sort((a,b)=>(engine.trongSo[b]??0)-(engine.trongSo[a]??0)).slice(0,Math.max(0,2-reserved.size))
+    const allowedDiag=new Set([...reserved,...freshDiag.map(id=>nhom.get(id)||id)])
+    for(const id of engine.v5?.chanDoan??[])if(!allowedDiag.has(nhom.get(id)||id))chanMoi.add(id)
+    const daDiag=new Set(diagCu.results.filter(c=>daLam.has(c.qid)).map(c=>c.nhom)).size
+    const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu, daLam: xong, cau: cung, tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, chanDoan:engine.v5?.chanDoan, nganSachChanDoan:Math.max(0,2-daDiag), uuTienThamDo:engine.v5?.uuTienThamDo, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined })
+    if(!daMoRong&&lap.dao.length+lap.doan.length<Math.max(0,toiThieu-xong.length)&&engine.v5?.ungNgoai.length){
+      const expanded=await import('./hanh-trinh-v6-kho').then(m=>m.boSungV6(env,sbd,ngay,hs,engine.v5!.ungNgoai,chan))
+      if(expanded){Object.assign(hs,expanded);return lapChotHanhTrinh(env,sbd,ngay,nowMs,hs,cu,chan,trongSo,dangVung,true)}
+    }
     const xongDao = xong.filter(q => ds(cu?.dao_json).map(goc).includes(q)), xongDoan = xong.filter(q => !xongDao.includes(q))
     const dao = [...xongDao, ...lap.dao], doan = [...xongDoan, ...lap.doan]
     const write = cu
@@ -84,9 +95,10 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
       : env.DB.prepare(`INSERT OR IGNORE INTO srs2_ke_hoach(sbd,ngay,chien_dich_id,dao_json,doan_json,huyet_chien,tong,tao_luc) VALUES(?,?,?,?,?,0,?,?)`)
         .bind(sbd, ngay, hs.chienDich!.id, JSON.stringify(dao), JSON.stringify(doan), dao.length + doan.length, new Date(nowMs).toISOString())
     const decision=engine.v5?lenhQuyetDinhV5(env,sbd,ngay,moc,nowMs,engine.v5,[...lap.dao,...lap.doan]):null
+    const receipt6=engine.v5?lenhChonV6(env,sbd,ngay,moc,nowMs,[...lap.dao,...lap.doan].slice(0,6).map(id=>engine.v5!.chon[id]!).filter(Boolean)):null
     const exposure=lenhGhiCanThiep(env,sbd,ngay,moc,nowMs,engine,[...dao,...doan])
     const kiemMoi=env.DB.prepare('INSERT INTO hanh_trinh_v4_chot(sbd,ngay,da_lam) SELECT ?,?,? WHERE EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?) ON CONFLICT(sbd,ngay) DO UPDATE SET da_lam=excluded.da_lam').bind(sbd,ngay,xong.length,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))
-    await env.DB.batch([write, ...(decision?[decision]:[]), ...(exposure?[exposure]:[]),kiemMoi, env.DB.prepare('UPDATE hanh_trinh_v3_ngay SET xong_chot=? WHERE sbd=? AND ngay=? AND EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?)').bind(moc, sbd, ngay,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))])
+    await env.DB.batch([write, ...(decision?[decision]:[]), ...(exposure?[exposure]:[]), ...(receipt6?[receipt6]:[]),kiemMoi, env.DB.prepare('UPDATE hanh_trinh_v3_ngay SET xong_chot=? WHERE sbd=? AND ngay=? AND EXISTS(SELECT 1 FROM srs2_ke_hoach WHERE sbd=? AND ngay=? AND dao_json=? AND doan_json=?)').bind(moc, sbd, ngay,sbd,ngay,JSON.stringify(dao),JSON.stringify(doan))])
   }
   const saved = (await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
   const dao = ds(saved.dao_json), doan = ds(saved.doan_json)

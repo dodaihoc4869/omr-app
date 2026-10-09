@@ -1,7 +1,7 @@
 // Bằng chứng chung cho ba máy mới: không học từ hỗ trợ/đọc đáp án/lặp nội dung.
 import type { QCau, SuKienOmni } from './omni-kieu'
 import { vknCaCau, vknCuaY } from './omni-p-vkn'
-export interface QuanSatHanhTrinh { id: string; qid: string; nhom: string; luc: number; ngay: string; dung: boolean; kn: string[]; laY: boolean; mucDo: string | null; ms: number | null; purpose?:string; moi?:boolean }
+export interface QuanSatHanhTrinh { id: string; qid: string; version?:string|null; nhom: string; luc: number; ngay: string; dung: boolean; kn: string[]; laY: boolean; mucDo: string | null; ms: number | null; purpose?:string; moi?:boolean }
 export function quanSatDocLap(sbd: string, suKien: readonly SuKienOmni[], q: ReadonlyMap<string, QCau>, now: number): QuanSatHanhTrinh[] {
   const da = new Set<string>(), doc = new Map<string, number>(), gap=new Set<string>(), ra: QuanSatHanhTrinh[] = []
   const ds = suKien.filter(e => e.sbd === sbd && Number.isFinite(e.receivedAt) && e.receivedAt <= now)
@@ -17,7 +17,7 @@ export function quanSatDocLap(sbd: string, suKien: readonly SuKienOmni[], q: Rea
     da.add(key) // Đầu ngày có hỗ trợ vẫn ngăn lần làm lại trở thành bằng chứng.
     if (e.assistance !== 'none' || e.tuTin === 'chua_chac' || (doc.has(nhom) && e.receivedAt-doc.get(nhom)! <= 12*3600000)) continue
     if (e.purpose && ['luot','chua_buoc','luyen_nen','shadow','xem_loi_giai'].includes(e.purpose)) continue
-    const them = (kn: string[], dung: boolean, laY: boolean, y='') => ra.push({id:e.khoa+y,qid:e.qid,nhom,luc:e.receivedAt,ngay:e.ngayVn,dung,kn:[...new Set(kn)],laY,mucDo:c.mucDo,ms:e.msLam ?? null,purpose:e.purpose??undefined,moi})
+    const them = (kn: string[], dung: boolean, laY: boolean, y='') => ra.push({id:e.khoa+y,qid:e.qid,version:e.cauVersion,nhom,luc:e.receivedAt,ngay:e.ngayVn,dung,kn:[...new Set(kn)],laY,mucDo:c.mucDo,ms:e.msLam ?? null,purpose:e.purpose??undefined,moi})
     if (c.phan==='II' && e.y?.length===4) e.y.forEach((v,i) => { if(v===0 || v===1) them(vknCuaY(c,i),v===1,true,`|${i}`) })
     else them(vknCaCau(c),e.ketQua===1,false)
   }

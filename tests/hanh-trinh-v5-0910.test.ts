@@ -65,7 +65,7 @@ it('D1 thật: kế hoạch đã phân được kiểm lại ngay, thay phần c
  // Mô phỏng dấu phiên bản v4, các câu đã phân vẫn nằm trong cùng kế hoạch.
  k.d.sql.exec('DELETE FROM hanh_trinh_v5_quyet_dinh')
  const row=k.d.sql.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').get('S1',HOM_NAY) as Record<string,unknown>
- const current=await lapChotHanhTrinh(k.env,'S1',HOM_NAY,T_SANG+2000,h,row,new Set())
+ const current=await lapChotHanhTrinh(k.env,'S1',HOM_NAY,T_SANG+2000,h,row,new Set([bad]))
  expect([...current.dao,...current.doan]).toContain(done)
  expect([...current.conDao,...current.conDoan]).not.toContain(bad)
  expect(current.tong).toBe(24)
@@ -82,7 +82,7 @@ it('D1 thật: học sinh giỏi được L4 cùng sàn 36 dù bài khác còn t
  expect(current.kh.hanhTrinh?.toiThieu).toBe(36)
  const h=await docHoSo2(k.env,'S1',HOM_NAY),d=await dongCoHanhTrinh(k.env,'S1',T_SANG,h)
  expect(d.v5?.soL4).toBeGreaterThan(0)
- expect(d.v5?.chan.size).toBeGreaterThan(0)
+ expect(d.v5?.chanDoan.size).toBeGreaterThan(0)
  k.d.sql.close()
 })
 

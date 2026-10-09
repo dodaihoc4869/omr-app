@@ -177,6 +177,7 @@ export interface SuKienOmni {
   /** qid GỐC (đã bỏ hậu tố song sinh `~ss0|1`). */
   qid: string
   songSinh: boolean
+  cauVersion?: string | null
   nguon: string
   /** 1 đúng · 0 sai · null bỏ trống (không là quan sát). */
   ketQua: 0 | 1 | null
@@ -349,6 +350,7 @@ export interface SanhOmni {
   metGio: { khung: KhungGio; tiLe: number; tiLeTot: number; coTheDoi: boolean } | null
   nhatKy: string[] | null
   l4Kiem?: {duoc:boolean;soCau:number}
+  kiemHanhTrinh?: {loai:'dau'|'tuan';soCau:14}
   deThu: { duoc: boolean; soCau: number; phut: number }
   /** CHƯƠNG TRÌNH "CẨN THẬN" (chỉ-thêm, CHỈ có khi `true`): OMNI bật ∧ Sơ ý của em (đúng số `sEm` ở trên, đủ dữ liệu) > `sMucTieu`. Vắng ⇒ app em y hệt hôm nay. */
   canThan?: boolean

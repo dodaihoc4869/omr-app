@@ -559,7 +559,9 @@ export function dongSangSuKien(x: Row, meta?: Pick<CauKho, 'phan' | 'dang' | 'mu
   const as = str(x.assistance)
   const phan: Phan = meta?.phan ?? (phanTuQid(t.goc, 'I') as Phan)
   const raw = docRawOmni(x.raw_json)
+  let cauVersion:string|null=null;try{const r=JSON.parse(str(x.raw_json));if(typeof r?.ht_cau_version==='string')cauVersion=r.ht_cau_version}catch{/* Sổ cũ không có phiên bản đáng tin. */}
   return {
+    cauVersion,
     khoa: str(x.khoa), sbd: str(x.sbd), qid: t.goc, songSinh: t.songSinh !== null, nguon: str(x.nguon),
     ketQua: kq, luc, ngayVn: str(x.ngay_vn) || ngayVn(luc), receivedAt: thoiDiemTiepNhan(x),
     assistance: as === 'assisted' ? 'assisted' : as === 'unknown' ? 'unknown' : 'none',

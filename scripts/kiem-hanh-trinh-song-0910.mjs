@@ -22,3 +22,7 @@ console.log(JSON.stringify({dongCo:'ht4-0910-v1',...schema}))
 const [schema5]=await query("SELECT COUNT(*) soBangHanhTrinh5 FROM sqlite_master WHERE type='table' AND name IN ('hanh_trinh_v5_muc','hanh_trinh_v5_phan_nhom','hanh_trinh_v5_quyet_dinh','hanh_trinh_v5_de_thu')")
 if(schema5.soBangHanhTrinh5!==4)throw new Error('Thiếu schema Hành trình v5.')
 console.log(JSON.stringify({dongCo:'ht5-0910-v1',...schema5}))
+
+const [schema6]=await query("SELECT COUNT(*) soBangHanhTrinh6 FROM sqlite_master WHERE type='table' AND name IN ('hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit')")
+if(schema6.soBangHanhTrinh6!==3)throw new Error('Thiếu schema Hành trình v6.')
+console.log(JSON.stringify({dongCo:'ht6-0910-v1',...schema6}))

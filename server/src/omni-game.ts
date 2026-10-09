@@ -1,5 +1,7 @@
 import { dongCoHanhTrinh } from './hanh-trinh-dong-co'
 import { phamViMucTieu } from './hanh-trinh-v5-d1'
+import { docMoHinhV6 } from './hanh-trinh-v6-d1'
+import { xepDeV6,maTranV6 } from './hanh-trinh-v6-de-thu'
 import { ghiDeThuDo,maTranDo,chotDiemDau } from './hanh-trinh-do-luong'
 // OMNI 3 — LÀN B3: ĐƯỜNG TRẢ LỜI + GAME (Đảo/Đoàn · lướt · chắc-mà-sai · Trạm hồi phục · vé thử thách · đề thử nửa).
 // Đặc tả: DAC-TA-BUILD-OMNI-3-0510.md (mục 1 bước 4–8, 4.2–4.7, 5) · hợp đồng API: docs/hop-dong-omni-3.md mục A ·
@@ -717,9 +719,10 @@ async function deThu(env: Env, sbd: string, nowMs: number): Promise<Record<strin
   const {seen,nhom:nhomDaLam}=await nhomDaGap(env,sbd,nowMs)
   for(const m of tatCa)if(bc.daLam.has(m.qid)||seen.has(m.qid))nhomDaLam.add(m.group)
   const la = tatCa.filter((m) => !bc.daLam.has(m.qid) && !seen.has(m.qid) && !nhomDaLam.has(m.group))
+  const model6=await docMoHinhV6(env)
   const muoi = `${sbd}|${ngayVnCua(nowMs)}|de_thu`
   const theoPhan: Record<Phan, MetaCau[]> = { I: [], II: [], III: [] }
-  for (const p of ['I', 'II', 'III'] as Phan[]) theoPhan[p] = xepVongTron(la.filter((m) => m.phan === p), muoi)
+  for (const p of ['I', 'II', 'III'] as Phan[]) theoPhan[p] = xepDeV6(xepVongTron(la.filter((m) => m.phan === p), muoi),muoi,model6)
   const han = hanNgachDeThu(TS.DE_THU.soCau)
   const daChon = new Set<string>()
   const chon: Record<Phan, { q: PrivateQuestion; m: MetaCau }[]> = { I: [], II: [], III: [] }
@@ -735,7 +738,7 @@ async function deThu(env: Env, sbd: string, nowMs: number): Promise<Record<strin
   const refs: RefDeThu[] = ds.map(({ q, m }) => ({ qid: q.qid, maDe: m.maDe, version: m.version, phan: q.phan }))
   await env.DB.prepare('INSERT INTO omni_de_thu (id, sbd, qid_json, tao_luc, het_luc) VALUES (?,?,?,?,?)').bind(id, sbd, JSON.stringify(refs), tao, het).run()
   const scopeHs=await docHoSo2(env,sbd,ngayVnCua(nowMs))
-  await ghiDeThuDo(env,id,sbd,nowMs,refs,maTranDo(ds.map(({q})=>({phan:q.phan,mucDo:q.mucDo??null,sao:q.sao??0}))),true,await phamViMucTieu(env,scopeHs,nowMs))
+  await ghiDeThuDo(env,id,sbd,nowMs,refs,maTranV6(ds.map(({q})=>({qid:q.qid,version:q.version,phan:q.phan,mucDo:q.mucDo??null,sao:q.sao??0})),model6),true,await phamViMucTieu(env,scopeHs,nowMs))
   return { ok: true, id, cau: ds.map(({ q }) => publicQuestion(q)), phut: TS.DE_THU.phut, hetLuc: het }
 }
 /** Đáp án em gửi → chuỗi chấm được; sai khuôn / bỏ trống ⇒ '' (bỏ trống: sai, 0 điểm). Phần II nhận Đ/S từng ý, '-' là ý bỏ trống. */
@@ -802,7 +805,7 @@ async function deThuNop(env: Env, sbd: string, b: Row, nowMs: number): Promise<R
     cau.push({ qid: r.qid, dung: kq.dung, traLoi: chon, dapAn: q.correct, loiGiai: q.solution })
     suKien.push({
       nguon: 'luyen', maNguon, sbd, qid: r.qid, lan: 1, ketQua: chon ? (kq.dung ? 1 : 0) : null, luc, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
-      attemptId: `${maNguon}|${r.qid}`, assistance: 'none', purpose: MUC_DICH_DE_THU, receivedAt: nopMs, raw: { chon, ms: docMsLam(msLam[r.qid]) },
+      cauVersion:r.version, attemptId: `${maNguon}|${r.qid}`, assistance: 'none', purpose: MUC_DICH_DE_THU, receivedAt: nopMs, raw: { chon, ms: docMsLam(msLam[r.qid]) },
       ...(q.phan === 'II' && chon ? { subitem: ketQuaTungY(chon, q.correct) } : {}),
     })
   }
@@ -826,7 +829,7 @@ async function deThuL4(env:Env,sbd:string,nowMs:number):Promise<Record<string,un
   if(!h.chienDich?.id.startsWith('hanh-trinh-v3-khoi-'))return {ok:false,error:'Chưa có chặng kiểm tra chuyên sâu trong hành trình của em.'}
   const d=await dongCoHanhTrinh(env,sbd,nowMs,h,bc.chan,false)
   const {seen,nhom:seenGroups}=await nhomDaGap(env,sbd,nowMs)
-  const ids=h.cau.filter(c=>d.v5?.tang.get(c.qid)===4&&!d.chan.has(c.qid)&&h.tt.get(c.qid)?.laMoi&&!seen.has(c.qid)&&!seenGroups.has(h.meta.get(c.qid)?.group??c.qid)).sort((a,b)=>(d.trongSo[b.qid]??0)-(d.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid)).map(c=>c.qid)
+  const ids=h.cau.filter(c=>d.v5?.tang.get(c.qid)===4&&!d.v5.chanDoan.has(c.qid)&&!d.chan.has(c.qid)&&h.tt.get(c.qid)?.laMoi&&!seen.has(c.qid)&&!seenGroups.has(h.meta.get(c.qid)?.group??c.qid)).sort((a,b)=>(d.trongSo[b.qid]??0)-(d.trongSo[a.qid]??0)||a.qid.localeCompare(b.qid)).map(c=>c.qid)
   const metas=ids.map(id=>h.meta.get(id)).filter((m):m is MetaCau=>!!m&&hopLeChung(m,bc))
   const selected=await napTheoThuTu(env,metas,6,new Set<string>())
   if(selected.length<6)return {ok:false,error:'Chưa đủ 6 câu mới, đủ tiên quyết để kiểm tra chuyên sâu.'}
