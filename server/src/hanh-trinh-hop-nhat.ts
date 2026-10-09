@@ -84,6 +84,7 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
   const nguon = (cd.results ?? []).filter(r => !laHanhTrinh(String(r.id)))
   const theoKhoi = kho.theoKhoi
   const em = new Map<Khoi, Set<string>>([10, 11, 12].map(k => [k as Khoi, new Set<string>()]))
+  const daDangKy = new Set((hs.results ?? []).map(r => String(r.sbd)))
   const daCoEm = new Set<string>()
   for (const r of hs.results ?? []) {
     if (r.trang_thai === 'khoa') { daCoEm.add(String(r.sbd)); continue }
@@ -92,9 +93,11 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
   }
   // Chưa có dữ liệu học thực ⇒ giữ các luồng cũ; không bật Game/OMNI trên một kho rỗng.
   if (![...em.values()].some(s => s.size) || ![...theoKhoi.values()].some(q => q.qids.size)) return { trangThai: 'cho_du_lieu' }
-  if (nguon.some(r => r.trang_thai === 'dang_chay' && mang(r.sbd_json).some(s => !daCoEm.has(s)))) {
+  if (nguon.some(r => r.trang_thai === 'dang_chay' && mang(r.sbd_json).some(s => daDangKy.has(s) && !daCoEm.has(s)))) {
     throw new Error('Có học sinh của chiến dịch nguồn chưa xác định được khối; giữ chiến dịch nguồn, chưa gộp.')
   }
+  // Tham chiếu cũ không có tài khoản: giữ trong bản sao nguồn/sổ học, không tạo hay giao câu cho tài khoản mới.
+  const thieuTaiKhoan = new Set(nguon.filter(r => r.trang_thai === 'dang_chay').flatMap(r => mang(r.sbd_json)).filter(s => !daDangKy.has(s))).size
   const luc = new Date(nowMs).toISOString()
   const lenh: D1PreparedStatement[] = []
   // CHECK làm cả batch rollback nếu ca mở giữa lúc đọc và lúc ghi.
@@ -129,7 +132,8 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
   if (!marker) {
     // Bật OMNI + Game 2 cho ba khối khi chuyển sang hành trình, giữ nguyên mã bảo mật.
     for (const key of ['game_hoa_2', 'omni', KHOA_HANH_TRINH]) lenh.push(env.DB.prepare(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,?)
-      ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc`).bind(key, JSON.stringify({ bat: true, phienBan: 1 }), luc))
+      ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc`).bind(key,
+        JSON.stringify({ bat: true, phienBan: 1, ...(key === KHOA_HANH_TRINH ? { thamChieuCuKhongCoTaiKhoan: thieuTaiKhoan } : {}) }), luc))
   }
   else lenh.push(env.DB.prepare('UPDATE cau_hinh SET cap_nhat_luc=? WHERE khoa=?').bind(luc, KHOA_HANH_TRINH))
   await env.DB.batch(lenh)

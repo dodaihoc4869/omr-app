@@ -69,6 +69,22 @@ describe('Hành trình 3 khối: gộp, tự nhận kho mới, chốt ngày', ()
     expect(k.d.sql.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa=?').get(KHOA_HANH_TRINH)).toBeUndefined()
     k.d.sql.close()
   })
+  it('tham chiếu nguồn đã mất tài khoản vẫn được lưu lịch sử; không tạo tài khoản hoặc giao câu cho mã đó', async () => {
+    const k=kho()
+    await lam(k.env,'S2','DH-B1-0',T_SANG-86400000,false)
+    k.d.sql.prepare("DELETE FROM hoc_sinh WHERE sbd='S2'").run()
+    const so=k.d.sql.prepare('SELECT COUNT(*) n FROM su_kien_hoc').get()
+    await dongBoBaHanhTrinh(k.env,T_SANG)
+    const cd=k.d.sql.prepare('SELECT sbd_json FROM chien_dich WHERE id=?').get(idHanhTrinh(12)) as {sbd_json:string}
+    expect(JSON.parse(cd.sbd_json)).not.toContain('S2')
+    expect(k.d.sql.prepare("SELECT sbd FROM hoc_sinh WHERE sbd='S2'").get()).toBeUndefined()
+    expect(k.d.sql.prepare('SELECT COUNT(*) n FROM su_kien_hoc').get()).toEqual(so)
+    const backup=k.d.sql.prepare("SELECT noi_dung_json FROM hanh_trinh_v3_nguon WHERE id='nguon'").get() as {noi_dung_json:string}
+    expect(JSON.parse(JSON.parse(backup.noi_dung_json).sbd_json)).toContain('S2')
+    const marker=k.d.sql.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa=?').get(KHOA_HANH_TRINH) as {gia_tri:string}
+    expect(JSON.parse(marker.gia_tri)).toMatchObject({thamChieuCuKhongCoTaiKhoan:1})
+    k.d.sql.close()
+  })
   it('học sinh đã khoá giữ lịch sử nguồn nhưng không được nhận câu hành trình', async () => {
     const k=kho()
     k.d.sql.prepare("UPDATE hoc_sinh SET trang_thai='khoa' WHERE sbd='S2'").run()
