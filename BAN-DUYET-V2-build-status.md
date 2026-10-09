@@ -1,6 +1,6 @@
 # BẢN DUYỆT V2 — nhật ký build (phiên cloud 09/10/2026, nhánh `claude/amazing-albattani-03aros`)
 
-Trạng thái: **ĐANG PHÁT HÀNH** — thầy chốt bản vẽ tối giản 09/10 ("1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Thêm 5. Bật lại 6. Giữ nguyên — Build rồi đẩy luôn"; "làm tiếp xong hết đẩy lên máy chủ luôn nhé"). Đường phát hành: PR vào main ⇒ `deploy.yml` đẩy Pages + Worker.
+Trạng thái: **ĐÃ PHÁT HÀNH** 09/10 12:39 (VN) — PR218, mã sống `430d356`, Actions `37888980132` SUCCESS (Worker + Pages). Lùi: `git revert -m 1 430d356` rồi đẩy main.
 
 ## Đã làm
 | Màn | Tệp | Ghi chú |
