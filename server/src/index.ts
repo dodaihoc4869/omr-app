@@ -3382,6 +3382,9 @@ const boXuLy = {
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
+      // Ngoài cao điểm, chuẩn bị nguồn cho từng ít em trước khi các em mở app.
+      const gioVn=new Date(Date.now()+7*3600000).getUTCHours()
+      if(gioVn<20)await import('./hanh-trinh-nguon-cau').then(m=>m.chuanBiNguonCau(env,Date.now())).catch(async()=>{await ghiLoiMay(env,'hanh_trinh_nguon_cau')})
       // Lượt quét kho dùng ngân sách riêng; việc nền khác chạy phút kế tiếp. Cron đêm luôn chạy đầy đủ.
       if(ht?.trangThai==='vua_hop_nhat'||ht?.trangThai==='da_dong_bo')return
     }

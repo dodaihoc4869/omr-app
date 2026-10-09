@@ -13,6 +13,7 @@ import { vaiTroL4 } from './hanh-trinh-l4'
 import { phanNhom,type NhomThu } from './hanh-trinh-do-luong'
 import { xacSuatDungCau } from './du-bao-diem'
 import { msKyVong } from './omni-toc-do'
+import { tachSongSinh } from './loi-hoc-luat'
 import { bam } from './srs2-loi'
 import { PHIEN_BAN_HT6,quyenCau } from './hanh-trinh-v6-loi'
 import { docMoHinhV6,type ChonV6 } from './hanh-trinh-v6-d1'
@@ -52,11 +53,12 @@ export async function boChonV5(env:Env,sbd:string,now:number,hs:HoSo2,q:Readonly
   }
   const seen=new Set([...daGap,...qs.map(o=>o.nhom)])
   out.ungNgoai=ds.filter(c=>!hs.meta.has(c.qid)).flatMap(c=>{const access=quyenCau(c.q,c.tang,m,omni,c.nhan);return access.quyen==='sua_nen'?[]:[{qid:c.qid,nhom:c.q.contentGroup||c.qid,moi:!seen.has(c.q.contentGroup||c.qid),hoc:access.quyen==='hoc'}]}).sort((a,b)=>Number(b.hoc)-Number(a.hoc)||Number(b.moi)-Number(a.moi)||a.qid.localeCompare(b.qid))
-  for(const c of hs.cau){const qc=q.get(c.qid);if(!qc)continue;const record=byId.get(c.qid),t=tangViKyNang(qc.mucDo),kn=vknCaCau(qc),label=record?.nhan??null
+  for(const c of hs.cau){const qc=q.get(c.qid);if(!qc)continue;const record=byId.get(tachSongSinh(c.qid).goc),t=tangViKyNang(qc.mucDo),kn=vknCaCau(qc),label=record?.nhan??null
     if(!t||(c.nguon==='chien_dich'&&hs.phamVi&&!record)){out.chan.add(c.qid);continue}
     const access=quyenCau(qc,t,m,omni,label),group=qc.contentGroup||c.qid
     if(access.quyen==='sua_nen'){out.chan.add(c.qid);continue}
     const diagnostic=access.quyen==='chan_doan'
+    if(diagnostic&&tachSongSinh(c.qid).goc!==c.qid){out.chan.add(c.qid);continue}
     if(diagnostic)out.chanDoan.add(c.qid)
     out.tang.set(c.qid,t as 1|2|3|4);if(t===4&&!diagnostic)out.soL4++
     const fresh=hs.tt.get(c.qid)?.laMoi===true&&!seen.has(group),unknown=kn.some(k=>!m.has(`${k}@L${k.startsWith('nen:')?1:t}`))

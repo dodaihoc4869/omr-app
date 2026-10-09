@@ -1176,7 +1176,7 @@ export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2
   for (const k of [...kh.conDao, ...kh.conDoan]) {
     const q = qidGoc(k), m = hs.meta.get(q)
     const ly = lyDoKhongPhucVu(m)
-    if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(m!.group)) { bo.add(k); ca++ } else if (nghi.has(tachSongSinh(q).goc)) { bo.add(k); nghiSo++ }
+    if (ly === 'kho') { bo.add(k); kho++ } else if (ly === 'tuLuan') { bo.add(k); tuLuan++ } else if (chan.has(q) || chan.has(tachSongSinh(q).goc) || chan.has(m!.group)) { bo.add(k); ca++ } else if (nghi.has(tachSongSinh(q).goc)) { bo.add(k); nghiSo++ }
   }
   // 06/10 — KÊNH KHÁC + TRÙNG NỘI DUNG (chỉ đụng câu còn lại phục vụ được; không ghi D1; câu không có nhóm ⇒ khác mọi câu).
   const conTheoThuTu = [...kh.conDoan, ...kh.conDao].filter((k) => !bo.has(k)) // ôn nợ (Đoàn) đứng trước câu Đảo — cùng thứ tự `tatCa` của Bi-a
@@ -1184,7 +1184,7 @@ export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2
   if (conTheoThuTu.length) {
     const nhomDaKhac = new Set<string>()
     if (daKhac.size) for (const g of (await docNhomTheoQid(env, [...daKhac])).values()) nhomDaKhac.add(g)
-    const nhomCua = (q: string): string => hs.meta.get(q)?.group ?? ''
+    const nhomCua = (q: string): string => kh.hanhTrinh && /~(?:ss|bt)\d+$/.test(q) && hs.meta.has(q) ? q : hs.meta.get(q)?.group ?? ''
     // Người giữ chỗ của từng nhóm: câu đã xong (game hoặc kênh khác) trước, rồi câu còn lại theo thứ tự ưu tiên.
     const giu = new Map<string, string>()
     const conSet = new Set([...kh.conDao, ...kh.conDoan])
