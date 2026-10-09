@@ -52,12 +52,19 @@ function chiPhan(s: TeacherExamSource, phan: PhanDe): TeacherExamSource {
 
 export function laMucDayHocDacBiet(s: Pick<TeacherExamSource, 'maDe' | 'nhom' | 'nguon'>): boolean {
   const nhom = (s.nhom || '').normalize('NFC').toUpperCase()
-  const laDayHoc = nhom.includes('DẠY HỌC') || s.maDe.startsWith('DH-')
+  const laDayHoc = nhom.includes('DẠY HỌC') || (s.maDe || '').toUpperCase().startsWith('DH-')
   if (!laDayHoc) return false
-  const ma = s.maDe
-  if (/-(?:VD|VDMH)$/i.test(ma) || /-(?:DT|DTTT)$/i.test(ma)) return true
+  const ma = (s.maDe || '').toUpperCase()
+  if (/(?:^|-)(?:VD|VDMH|DT|DTTT)(?:-|$)/i.test(ma)) return true
   const ng = (s.nguon || '').normalize('NFC').toUpperCase()
-  if (ng.includes('VÍ DỤ MINH HOẠ') || ng.includes('VÍ DỤ MINH HỌA') || ng.includes('DẠNG TOÁN TRỌNG TÂM')) return true
+  if (
+    ng.includes('VÍ DỤ') ||
+    ng.includes('VI DU') ||
+    ng.includes('TRỌNG TÂM') ||
+    ng.includes('TRONG TAM') ||
+    ng.includes('DẠNG TOÁN') ||
+    ng.includes('DANG TOAN')
+  ) return true
   return false
 }
 

@@ -95,6 +95,45 @@ describe('(1) cây DẠY HỌC đủ khối', () => {
       'Trả lời ngắn',
     ])
   })
+  it('khoDayHoc: giữ đề mã DH- kể cả khi nhom chưa ghi DẠY HỌC, và gom đủ VD / DT vào bài', () => {
+    const khoThieuNhom: TeacherExamSource[] = [
+      {
+        maDe: 'DH-10-C1-B1',
+        nhom: '10 · C1 - Nguyên tử', // thiếu "DẠY HỌC/"
+        nguon: 'Bài 1. Thành phần nguyên tử',
+        phanI: [q('DH-10-C1-B1-I-1', 'Câu 1')],
+        phanII: [],
+        phanIII: [],
+      },
+      {
+        maDe: 'DH-10-C1-B1-VD',
+        nhom: '10 · C1 - Nguyên tử',
+        nguon: 'VÍ DỤ MINH HOẠ', // chỉ ghi VÍ DỤ MINH HOẠ
+        phanI: [q('DH-10-C1-B1-VD-I-1', 'Câu ví dụ')],
+        phanII: [],
+        phanIII: [],
+      },
+      {
+        maDe: 'DH-10-C1-B1-DT',
+        nhom: '10 · C1 - Nguyên tử',
+        nguon: 'Bài 1. Thành phần nguyên tử - CÁC DẠNG TOÁN TRỌNG TÂM',
+        phanI: [q('DH-10-C1-B1-DT-I-1', 'Câu dạng toán')],
+        phanII: [],
+        phanIII: [],
+      },
+    ]
+    const ds = khoDayHoc(khoThieuNhom, khuTrungNguon, tachNhieuTheoPhan)
+    expect(ds.map((s) => s.maDe)).toEqual([
+      'DH-10-C1-B1',
+      'DH-10-C1-B1-VD',
+      'DH-10-C1-B1-DT',
+    ])
+    const cay = dungCay(ds)
+    expect(cay[0]!.nhan).toBe('DẠY HỌC')
+    const b1 = cay[0]!.con[0]!.con[0]!.con[0]!
+    expect(b1.nhan).toBe('Bài 1. Thành phần nguyên tử')
+    expect(b1.con.map((c) => c.nhan)).toEqual(['Ví dụ minh hoạ', 'Các dạng toán trọng tâm', 'Trắc nghiệm'])
+  })
   it('mục dạy học: câu tự luận được giữ nguyên và đánh dấu tuLuan = true để hiển thị đầy đủ', async () => {
     const { cauTuDeChon } = await import('../src/lib/day-hoc-len-bang')
     const cau = cauTuDeChon(

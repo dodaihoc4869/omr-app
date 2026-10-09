@@ -5,7 +5,7 @@ import { tachNhieuTheoPhan } from '../src/lib/tach-phan-de'
 // HopChonDe. Không chụp màn hình.
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@testing-library/react'
-import { bamTich, chuongCuaDe, dungCay, locCay, tenBai, thuMucCuaDe, tongCau, tongDaChon, trangThaiTich, type Nut } from '../src/lib/cay-chon-de'
+import { bamTich, chuongCuaDe, dungCay, khoiCuaDe, locCay, tenBai, thuMucCuaDe, tongCau, tongDaChon, trangThaiTich, type Nut } from '../src/lib/cay-chon-de'
 import HopChonDe from '../src/components/HopChonDe'
 import type { TeacherExamSource } from '../src/data/examContent'
 
@@ -277,3 +277,28 @@ it('giữ ví dụ nhiều loại câu thành một mục chọn đầy đủ', 
   expect(tree[0].con[0].con[0].con[0].con).toHaveLength(1)
   expect(tongCau(tongDaChon(tree,bamTich(tree[0],new Set())))).toBe(9)
 })
+
+it('gom đúng ví dụ và dạng toán khi dùng các dấu nối khác nhau (-, —, :, ngoặc) hoặc chỉ ghi VÍ DỤ MINH HOẠ', () => {
+  const nhom = '10 · DẠY HỌC/C1 - Nguyên Tử'
+  const ds = [
+    de('DH-10-C1-B1-TN', nhom, 'Bài 1. Thành phần nguyên tử', [5, 0, 0]),
+    de('DH-10-C1-B1-VD', nhom, 'VÍ DỤ MINH HOẠ', [0, 0, 4]), // không ghi tên bài trong nguồn
+    de('DH-10-C1-B1-DT', nhom, 'Bài 1. Thành phần nguyên tử - CÁC DẠNG TOÁN TRỌNG TÂM', [0, 0, 3]), // nối bằng dấu gạch ngang
+    de('DH-10-C1-B2-TN', nhom, 'Bài 2. Hạt nhân', [6, 0, 0]),
+    de('DH-10-C1-B2-VD', nhom, 'Bài 2. Hạt nhân (VÍ DỤ MINH HỌA)', [0, 0, 2]), // trong ngoặc, chính tả HỌA
+  ]
+  const tree = dungCay(ds)
+  const chuong = tree[0]!.con[0]!.con[0]!
+  expect(chuong.con.map((b) => b.nhan)).toEqual(['Bài 1. Thành phần nguyên tử', 'Bài 2. Hạt nhân'])
+  const b1 = chuong.con[0]!
+  expect(b1.con.map((d) => d.nhan)).toEqual(['Ví dụ minh hoạ', 'Các dạng toán trọng tâm', 'Trắc nghiệm'])
+  const b2 = chuong.con[1]!
+  expect(b2.con.map((d) => d.nhan)).toEqual(['Ví dụ minh hoạ', 'Trắc nghiệm'])
+})
+
+it('khoiCuaDe nhận diện đúng khối từ mã DH-10, DH-11, DH-12 kể cả khi nhom rỗng', () => {
+  expect(khoiCuaDe({ maDe: 'DH-10-C1-B1-VD', nhom: '' })).toBe('10')
+  expect(khoiCuaDe({ maDe: 'DH-11-C2-B5-DT', nhom: '' })).toBe('11')
+  expect(khoiCuaDe({ maDe: 'DH-12-C1-B1-P1-VD', nhom: '' })).toBe('12')
+})
+

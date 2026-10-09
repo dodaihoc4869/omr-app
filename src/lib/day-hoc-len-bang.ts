@@ -11,13 +11,22 @@ import type { MucDo } from './chon-em-day-hoc'
 
 export const TEN_THU_MUC_DAY_HOC = 'DẠY HỌC'
 
-/** Đề thuộc thư mục DẠY HỌC của kho (nhóm "12 · DẠY HỌC/C1 - …"). */
-export function laDeDayHoc(s: Pick<TeacherExamSource, 'nhom'>): boolean {
-  return thuMucCuaDe(s).normalize('NFC').toUpperCase() === TEN_THU_MUC_DAY_HOC
+/** Đề thuộc thư mục DẠY HỌC của kho (nhóm "12 · DẠY HỌC/C1 - …" hoặc mã bắt đầu bằng "DH-"). */
+export function laDeDayHoc(s: { nhom?: string; maDe?: string }): boolean {
+  return thuMucCuaDe(s as TeacherExamSource).normalize('NFC').toUpperCase() === TEN_THU_MUC_DAY_HOC || (s.maDe || '').toUpperCase().startsWith('DH-')
 }
 /** CHỈ nhánh DẠY HỌC — hộp chọn của bảng Dạy học không hiện đề kiểm tra, kho cũ hay nhánh khác. */
-export function locDeDayHoc<T extends Pick<TeacherExamSource, 'nhom'>>(ds: readonly T[]): T[] {
+export function locDeDayHoc<T extends { nhom?: string; maDe?: string }>(ds: readonly T[]): T[] {
   return ds.filter(laDeDayHoc)
+}
+
+function chuanHoaDeDayHoc(s: TeacherExamSource): TeacherExamSource {
+  if (thuMucCuaDe(s).normalize('NFC').toUpperCase() === TEN_THU_MUC_DAY_HOC) return s
+  const n = (s.nhom || '').trim()
+  const i = n.indexOf('·')
+  const khoi = i >= 0 ? n.slice(0, i).trim() : (/^DH-(10|11|12)(?!\d)/i.exec(s.maDe.trim())?.[1] ?? '')
+  const ch = chuongCuaDe(s) || 'Chưa xếp chương'
+  return { ...s, nhom: `${khoi ? `${khoi} · ` : ''}${TEN_THU_MUC_DAY_HOC}/${ch}` }
 }
 
 /** KHO CỦA BẢNG DẠY HỌC: LỌC nhánh DẠY HỌC TRƯỚC, bảo tồn các mục chuyên biệt (Ví dụ minh hoạ, Dạng toán trọng tâm)
@@ -30,7 +39,7 @@ export function khoDayHoc(
   khuTrung: (x: TeacherExamSource[]) => { nguon: TeacherExamSource[] },
   tach: (x: TeacherExamSource[]) => TeacherExamSource[],
 ): TeacherExamSource[] {
-  const dayHoc = locDeDayHoc(ds)
+  const dayHoc = locDeDayHoc(ds).map(chuanHoaDeDayHoc)
   const dacBiet = dayHoc.filter(laMucDayHocDacBiet)
   const phoThong = dayHoc.filter((s) => !laMucDayHocDacBiet(s))
   const phoThongKhuMap = new Map(khuTrung(phoThong).nguon.map((s) => [s.maDe, s]))
@@ -43,8 +52,8 @@ export function khoDayHoc(
   const ketQua: TeacherExamSource[] = []
   for (const s of dayHoc) {
     if (laMucDayHocDacBiet(s)) {
-      const db = dacBietKhuMap.get(s.maDe)
-      if (db) ketQua.push(db)
+      const db = dacBietKhuMap.get(s.maDe) ?? s
+      ketQua.push(db)
     } else {
       const pt = phoThongKhuMap.get(s.maDe)
       if (pt) ketQua.push(pt)

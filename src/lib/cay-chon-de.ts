@@ -39,7 +39,7 @@ const cong = (a: SoCau, b: SoCau): SoCau => ({ I: a.I + b.I, II: a.II + b.II, II
  * nhãn là "Chưa rõ khối" — hiện ra chứ không giấu, vì đề bị lạc khối là lỗi
  * nạp đề cần sửa, không phải đề đáng biến mất khỏi danh sách. */
 export function khoiCuaDe(c: Pick<TeacherExamSource, 'maDe' | 'nhom'>): string {
-  const m = /^(10|11|12)\b/.exec(c.maDe) || /^(10|11|12)\b/.exec(c.nhom || '')
+  const m = /(?:^|DH-)(10|11|12)\b/i.exec(c.maDe) || /(?:^|DH-)(10|11|12)\b/i.exec(c.nhom || '')
   return m ? m[1] : ''
 }
 
@@ -77,23 +77,37 @@ export function chuongCuaDe(c: Pick<TeacherExamSource, 'nhom'>): string {
   return (i >= 0 ? s.slice(i + 1) : s).trim()
 }
 
+export function maGocBai(maDe: string): string {
+  let ma = (maDe || '').trim()
+  let prev = ''
+  while (ma !== prev) {
+    prev = ma
+    ma = ma.replace(/-(?:TN|DS|TLN)$/i, '')
+    ma = ma.replace(/-(?:VD|VDMH|DT|DTTT)$/i, '')
+  }
+  return ma
+}
+
+const DUOI_DAC_BIET_REGEX = /[\s·—–:_|/(]*(?:VÍ\s*DỤ(?:\s*MINH\s*HO[ẠA])?|VI\s*DU(?:\s*MINH\s*HO[AA])?|CÁC\s*DẠNG\s*TOÁN\s*TRỌNG\s*TÂM|DẠNG\s*TOÁN\s*TRỌNG\s*TÂM|TRỌNG\s*TÂM|TRONG\s*TAM|CÁC\s*DẠNG\s*BÀI\s*TẬP\s*TRỌNG\s*TÂM|DẠNG\s*BÀI\s*TRỌNG\s*TÂM)[\s)]*$/i
+
 /** Tên bài hiện cho thầy đọc: ưu tiên `nguon` (vd "Bài 4. Glucose và
- * fructose"), thiếu thì lấy mã gốc. Cắt phần chú thích dài sau dấu " — ". */
+ * fructose"), thiếu thì lấy mã gốc. Cắt phần chú thích dài sau dấu " — " và các đuôi mục đặc biệt. */
 export function tenBai(c: Pick<TeacherExamSource, 'maDe' | 'nguon'>): string {
-  const n = (c.nguon || '').normalize('NFC').split(' — ')[0].trim().replace(/\s*·\s*(?:VÍ DỤ MINH HOẠ|VÍ DỤ MINH HỌA|CÁC DẠNG TOÁN TRỌNG TÂM|DẠNG TOÁN TRỌNG TÂM)\s*$/i, '')
-  return n || goMaDeTachRa(c.maDe).goc.replace(/-(?:VD|VDMH|DT|DTTT)$/i, '')
+  let n = (c.nguon || '').normalize('NFC').split(' — ')[0]!.trim()
+  n = n.replace(DUOI_DAC_BIET_REGEX, '').trim()
+  return n || maGocBai(c.maDe)
 }
 
 export function tenMucDayHoc(c: TeacherExamSource): string | null {
   const tm = thuMucCuaDe(c).normalize('NFC').toUpperCase()
-  const laDayHoc = tm === 'DẠY HỌC' || c.maDe.startsWith('DH-')
+  const laDayHoc = tm === 'DẠY HỌC' || (c.maDe || '').toUpperCase().startsWith('DH-')
   if (!laDayHoc) return null
-  const ma = goMaDeTachRa(c.maDe).goc
-  if (/-(?:VD|VDMH)$/i.test(ma)) return 'Ví dụ minh hoạ'
-  if (/-(?:DT|DTTT)$/i.test(ma)) return 'Các dạng toán trọng tâm'
+  const ma = (c.maDe || '').toUpperCase()
+  if (/(?:^|-)(?:VD|VDMH)(?:-|$)/i.test(ma)) return 'Ví dụ minh hoạ'
+  if (/(?:^|-)(?:DT|DTTT)(?:-|$)/i.test(ma)) return 'Các dạng toán trọng tâm'
   const ng = (c.nguon || '').normalize('NFC').toUpperCase()
-  if (ng.includes('VÍ DỤ MINH HOẠ') || ng.includes('VÍ DỤ MINH HỌA')) return 'Ví dụ minh hoạ'
-  if (ng.includes('DẠNG TOÁN TRỌNG TÂM')) return 'Các dạng toán trọng tâm'
+  if (ng.includes('VÍ DỤ') || ng.includes('VI DU')) return 'Ví dụ minh hoạ'
+  if (ng.includes('TRỌNG TÂM') || ng.includes('TRONG TAM') || ng.includes('DẠNG TOÁN') || ng.includes('DANG TOAN')) return 'Các dạng toán trọng tâm'
   return null
 }
 
@@ -164,14 +178,22 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
   // Dựng các nút CHƯƠNG của một danh sách đề, dưới một tiền tố khoá cho trước.
   const dungChuong = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
     xepTheoSo(gom(dsX, chuongCuaDe), (x) => x.khoa, soChuong).map(({ khoa: ch, ds: dsC }) => {
+      // Bản đồ mã gốc bài -> tên bài chuẩn trong chương để các mục đặc biệt (VD/DT) luôn cùng nhóm với bài chính
+      const tenChuanTheoGoc = new Map<string, string>()
+      for (const c of dsC) {
+        const goc = maGocBai(c.maDe)
+        const tb = tenBai(c)
+        if (!tenChuanTheoGoc.has(goc) || !tenMucDayHoc(c)) {
+          tenChuanTheoGoc.set(goc, tb)
+        }
+      }
+      const layTenBai = (c: TeacherExamSource): string => {
+        const goc = maGocBai(c.maDe)
+        return tenChuanTheoGoc.get(goc) || tenBai(c)
+      }
+
       // GOM THEO TÊN BÀI, không theo mã đề.
-      //
-      // Bản cũ gom bằng `goMaDeTachRa(maDe).goc`, đúng khi mỗi bài chỉ có đúng
-      // một mã đề. Từ 09/09 kho cắt bài quá 150 câu thành `12-C2-B4-D1` và
-      // `-D2` — hai mã gốc khác nhau nên bài "Glucose và fructose" hiện ra HAI
-      // dòng trùng tên, thầy phải tích hai lần và tưởng kho có đề trùng.
-      // Nay một bài đúng một nhánh; các mã của nó nằm dưới tầng lá.
-      const bai = xepTheoSo(gom(dsC, (c) => tenBai(c)), (x) => x.khoa, soBai).map(({ khoa: b, ds: dsB }) => {
+      const bai = xepTheoSo(gom(dsC, layTenBai), (x) => x.khoa, soBai).map(({ khoa: b, ds: dsB }) => {
         // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
         // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
         const nhieuMa = new Set(dsB.filter(c => !tenMucDayHoc(c)).map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
