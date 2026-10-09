@@ -4,7 +4,8 @@ import { SQL_HANH_TRINH_V5 } from './hanh-trinh-v5-schema'
 import { lenhQuyetDinhV5 } from './hanh-trinh-v5-d1'
 import type { Env } from './kieu'
 import type { ChienDich, HoSo2, KeHoachDaChot } from './srs2-d1'
-import { CAU_MOI_CHANG, CAU_TOI_THIEU, chonCauHanhTrinh, tangCuaEm, tienDoHanhTrinh, type TangHanhTrinh } from './hanh-trinh-ngay'
+import { CAU_MOI_CHANG, CAU_TOI_THIEU, chonCauHanhTrinh, coLoThuSucHanhTrinh, mucNgayHanhTrinh, tienDoHanhTrinh, type TangHanhTrinh } from './hanh-trinh-ngay'
+import { baiHanhTrinh, chonLoThem, tangSanSangTheoBai } from './hanh-trinh-bai'
 import { SQL_BANG_HANH_TRINH } from './hanh-trinh-hop-nhat'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
@@ -16,6 +17,11 @@ import { dongCoHanhTrinh, lenhGhiCanThiep, SQL_DONG_CO_HANH_TRINH } from './hanh
 type Row = Record<string, unknown>
 const ds = (v: unknown): string[] => { try { const a: unknown = JSON.parse(String(v ?? '[]')); return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string') : [] } catch { return [] } }
 const goc = (q: string) => q.replace(/#\d+$/, '')
+/** Lần TỰ LÀM hôm nay đã tính được (ca chưa công bố/đã xoá không tính), mới nhất trước — dùng chung cho kế hoạch và Thử sức thêm. */
+const docLamHomNay = (env: Env, sbd: string, ngay: string) => env.DB.prepare(`SELECT qid,ket_qua,received_at,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=?
+    AND ket_qua IS NOT NULL AND COALESCE(visibility,'') <> 'embargoed'
+    AND ${SQL_LA_LAN_LAM}
+    AND (nguon <> 'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')})) ORDER BY received_at DESC,khoa DESC`).bind(sbd, ngay).all<Row>()
 
 /** Kế hoạch riêng: chốt tầng đầu ngày, giữ phần đã làm; tính lại sau mỗi chặng.
  * UPDATE kế hoạch và mốc chặng cùng batch + CAS, hai máy không ghi đè nhau.
@@ -24,10 +30,7 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   cu: Row | null, chan: ReadonlySet<string>, trongSo?: Readonly<Record<string, number>>, dangVung?: readonly string[]): Promise<KeHoachDaChot> {
   await chayDdlMotLan(env, 'hanh_trinh_v3_v4', [...SQL_BANG_HANH_TRINH,...SQL_DONG_CO_HANH_TRINH,...SQL_HANH_TRINH_V5])
   const nhom = new Map([...hs.meta].map(([q, m]) => [q, m.group || q]))
-  const rows = await env.DB.prepare(`SELECT qid,ket_qua,received_at,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=?
-    AND ket_qua IS NOT NULL AND COALESCE(visibility,'') <> 'embargoed'
-    AND ${SQL_LA_LAN_LAM}
-    AND (nguon <> 'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')})) ORDER BY received_at DESC,khoa DESC`).bind(sbd, ngay).all<Row>()
+  const rows = await docLamHomNay(env, sbd, ngay)
   const daLam = new Set((rows.results ?? []).map(r => String(r.tc || tachSongSinh(String(r.qid)).goc)))
   const daNhom = new Set<string>()
   const hopLe = new Set(hs.cau.map(c => c.qid))
@@ -36,20 +39,8 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     if (!daLam.has(q) || !hopLe.has(q) || daNhom.has(k)) return false
     daNhom.add(k); return true
   })
-  const theoBai = new Map<string, typeof hs.cau>()
-  for (const c of hs.cau) {
-    if (c.nguon !== 'chien_dich') continue
-    const ma = hs.meta.get(c.qid)?.maDe ?? ''
-    const bai = /^(.*?-B\d+)(?:-|$)/i.exec(ma)?.[1] ?? ma
-    theoBai.set(bai, [...(theoBai.get(bai) ?? []), c])
-  }
-  const tangSanSang = new Map<string, TangHanhTrinh>()
-  let tang: TangHanhTrinh = 1
-  for (const cau of theoBai.values()) {
-    const t = tangCuaEm(cau, hs.tt, nhom, dangVung)
-    tang = Math.max(tang, t) as TangHanhTrinh
-    for (const c of cau) tangSanSang.set(c.qid, t)
-  }
+  const maDeCua = (q: string) => hs.meta.get(q)?.maDe
+  const { tangSanSang, tang } = tangSanSangTheoBai(hs.cau, maDeCua, hs.tt, nhom, dangVung)
   await env.DB.prepare('INSERT OR IGNORE INTO hanh_trinh_v3_ngay(sbd,ngay,tang,toi_thieu) VALUES(?,?,?,?)')
     .bind(sbd, ngay, tang, CAU_TOI_THIEU[tang]).run()
   const snap = (await env.DB.prepare('SELECT * FROM hanh_trinh_v3_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>())!
@@ -75,7 +66,9 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const trangThai = new Map([...hs.tt].map(([q,t])=>[q,engine.hen.has(q) && t.thanhThao ? {...t,henOn:engine.hen.get(q)!}:t]))
     const chanMoi = new Set([...chan,...engine.chan])
     const cung = hs.cau.filter(c => !hs.meta.get(c.qid)?.tuLuan && !chan.has(nhom.get(c.qid) || c.qid))
-    const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu, daLam: xong, cau: cung, tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined })
+    // Thử sức thêm (09/10): phần em đã tự lấy vượt sàn hôm nay (tổng kế hoạch đã chốt > sàn) được GIỮ khi chọn lại phần chưa làm — không vượt 2 × sàn.
+    const tongCu = cu && cu.chien_dich_id === hs.chienDich?.id ? ds(cu.dao_json).length + ds(cu.doan_json).length : 0
+    const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu: mucNgayHanhTrinh(toiThieu, tongCu), daLam: xong, cau: cung, tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined })
     const xongDao = xong.filter(q => ds(cu?.dao_json).map(goc).includes(q)), xongDoan = xong.filter(q => !xongDao.includes(q))
     const dao = [...xongDao, ...lap.dao], doan = [...xongDoan, ...lap.doan]
     const write = cu
@@ -92,8 +85,40 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   const dao = ds(saved.dao_json), doan = ds(saved.doan_json)
   const conDao = dao.filter(q => !daLam.has(goc(q))), conDoan = doan.filter(q => !daLam.has(goc(q)))
   const tong = dao.length + doan.length
+  const daXong = tong - conDao.length - conDoan.length
+  // Sảnh (chỉ-thêm): tầng từng bài theo cây Dạy học — thuần, trên dữ liệu đã nạp, không thêm truy vấn.
+  const bai = baiHanhTrinh(hs.phamVi, hs.cau, maDeCua, hs.tt, nhom, dangVung)
+  // Thử sức thêm: ước lượng RẺ số câu còn lấy thêm được (cổng tầng theo bài, không chạy động cơ v5) — chỉ khi đã đủ sàn. Lệnh lấy câu chọn lại bằng động cơ đầy đủ.
+  const lo = daXong >= toiThieu ? coLoThuSucHanhTrinh(toiThieu, tong) : 0
+  const thuSucHanhTrinh = lo > 0 ? (() => {
+    const lap = chonLoThem({ ngay, tang: tangNgay, daCo: [...dao.map(goc), ...doan.map(goc), ...daLam], soCau: lo, cau: hs.cau, tt: hs.tt, nhom, chan, tangSanSang,
+      trongSo, phamVi: hs.phamVi?.maDe ?? null, maDeCua, tuLuan: (q) => hs.meta.get(q)?.tuLuan !== false })
+    return lap.dao.length + lap.doan.length
+  })() : 0
   return { ngay, chienDichId: hs.chienDich!.id, dao, doan, conDao, conDoan, tong, huyetChien: false,
-    hanhTrinh: tienDoHanhTrinh(tangNgay, toiThieu, tong, tong - conDao.length - conDoan.length) }
+    hanhTrinh: { ...tienDoHanhTrinh(tangNgay, toiThieu, tong, daXong), ...(bai ? { bai } : {}) },
+    ...(daXong >= toiThieu ? { thuSucHanhTrinh } : {}) }
+}
+
+/**
+ * THỬ SỨC THÊM · Hành trình (09/10) — CHỈ CHỌN, không ghi (nơi gọi ghi so-khớp kế hoạch như lệnh cũ). Gọi khi em đã đủ sàn, không còn câu chưa làm.
+ * Chọn bằng ĐÚNG đầu vào của lần chọn lại sau chặng: cổng tầng theo bài + tầng từng câu của bộ chọn v5, câu/nhóm bị động cơ chặn (thiếu tiên quyết, ngoài phạm vi),
+ * lịch half-life, trọng số OMNI + động cơ, vai L4 nhóm B. Động cơ chạy CHỈ ĐỌC (`ghi=false`): không receipt, không nhật ký quyết định, không đổi mô hình.
+ * Bỏ: câu/nhóm đã xếp hoặc đã làm hôm nay (mọi kênh tính lượt), câu tự luận, câu bảo vệ cho ca / nghi đáp án (`chan`).
+ */
+export async function chonLoThuSucHanhTrinh(env: Env, sbd: string, ngay: string, nowMs: number, hs: HoSo2, kh: KeHoachDaChot, chan: ReadonlySet<string>,
+  soCau: number, trongSo?: Readonly<Record<string, number>>, dangVung?: readonly string[]): Promise<{ dao: string[]; doan: string[] }> {
+  if (soCau <= 0 || !kh.hanhTrinh) return { dao: [], doan: [] }
+  const nhom = new Map([...hs.meta].map(([q, m]) => [q, m.group || q]))
+  const maDeCua = (q: string) => hs.meta.get(q)?.maDe
+  const [rows, engine] = await Promise.all([docLamHomNay(env, sbd, ngay), dongCoHanhTrinh(env, sbd, nowMs, hs, chan, false)])
+  const daLam = (rows.results ?? []).map(r => String(r.tc || tachSongSinh(String(r.qid)).goc))
+  const { tangSanSang } = tangSanSangTheoBai(hs.cau, maDeCua, hs.tt, nhom, dangVung)
+  if (engine.v5) for (const [id, t] of engine.v5.tang) tangSanSang.set(id, t)
+  const trangThai = new Map([...hs.tt].map(([q, t]) => [q, engine.hen.has(q) && t.thanhThao ? { ...t, henOn: engine.hen.get(q)! } : t]))
+  return chonLoThem({ ngay, tang: kh.hanhTrinh.tang, daCo: [...kh.dao.map(goc), ...kh.doan.map(goc), ...daLam], soCau, cau: hs.cau, tt: trangThai, nhom,
+    chan: new Set([...chan, ...engine.chan]), tangSanSang, trongSo: { ...trongSo, ...engine.trongSo }, vaiTro: engine.v5?.nhom === 'B' ? engine.v5.vai : undefined,
+    phamVi: hs.phamVi?.maDe ?? null, maDeCua, tuLuan: (q) => hs.meta.get(q)?.tuLuan !== false })
 }
 
 /** Bảng thầy chỉ đọc kế hoạch hôm nay, không replay toàn kho × toàn khối. */
