@@ -13,7 +13,7 @@ it.each([
 ])('cổng chỉ đọc mốc %s, trạng thái %s, lượt %s', (moc, trangThai, luot, soCa, soLuot) => {
   const db = new DatabaseSync(':memory:')
   try {
-    db.exec('CREATE TABLE ca(ma_ca TEXT,trang_thai TEXT,bat_dau_thi_luc TEXT); CREATE TABLE luot(ma_ca TEXT,trang_thai TEXT)')
+    db.exec('CREATE TABLE ca(ma_ca TEXT,trang_thai TEXT,bat_dau TEXT); CREATE TABLE luot(ma_ca TEXT,trang_thai TEXT)')
     db.prepare('INSERT INTO ca VALUES(?,?,?)').run('gia', trangThai, moc)
     if (luot) db.prepare('INSERT INTO luot VALUES(?,?)').run('gia', luot)
     expect(db.prepare(sql).get()).toMatchObject({so_ca_mo:soCa,so_luot_dang_lam:soLuot})
