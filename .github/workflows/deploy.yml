@@ -72,7 +72,7 @@ jobs:
           TOAN_BO: ${{ steps.pham-vi.outputs.toan-bo }}
         run: |
           KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts tests/d1-qua-tai-khong-nhan-truy-van-0810.test.ts tests/cao-diem-ho-so-0110.test.ts)
-          KIEM+=(tests/hanh-trinh-ngay-0910.test.ts tests/hanh-trinh-d1-0910.test.ts tests/hanh-trinh-giao-dien-0910.test.tsx)
+          KIEM+=(tests/hanh-trinh-ngay-0910.test.ts tests/hanh-trinh-d1-0910.test.ts tests/hanh-trinh-giao-dien-0910.test.tsx tests/hanh-trinh-dong-co-0910.test.ts)
           if [[ "$TOAN_BO" == false ]]; then
             git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
             while IFS= read -r TEP; do
@@ -100,6 +100,7 @@ jobs:
         run: |
           node scripts/kiem-phat-hanh-chua.mjs
           node scripts/ap-migration-chua.mjs --remote
+          node scripts/ap-migration-hanh-trinh-0910.mjs
           node scripts/kiem-phat-hanh-chua.mjs --schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
@@ -128,7 +129,10 @@ jobs:
           command: pages deploy dist --project-name=omr-app --branch=main
 
       - name: Xác nhận ba hành trình đã tự gộp
-        run: node scripts/kiem-hanh-trinh-song-0910.mjs
+        run: |
+          node scripts/kiem-hanh-trinh-song-0910.mjs
+          npx esbuild scripts/kiem-dong-co-hanh-trinh-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/hanh-trinh-kiem.mjs --log-level=warning
+          node /tmp/hanh-trinh-kiem.mjs
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
