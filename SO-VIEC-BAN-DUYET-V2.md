@@ -58,3 +58,11 @@ Thầy nhắn (nguyên văn): "bạn hãy quet toàn bộ giao diện app hiện
 - [x] Quét toàn bộ giao diện app hiện tại (HS · PH · GV) | bằng chứng: 3 agent rà mã chỉ đọc trên main 6842acc (bản sống PR221) + 79 ảnh Chromium `scripts/chup-v2`; số đo: HS 31 mức bo góc/40 cỡ chữ/14 kiểu bóng, PH 19/24/~8 kiểu nút, GV 24/~30/10+ họ nút, GV chạy 2 bảng màu (lam/ngọc), tối nửa màn.
 - [x] Vẽ bản trung tu (siêu đẹp, mịn, khoa học, đúng cấu trúc code hiện tại) cho thầy xem | bằng chứng: canvas https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8 — 24 khung: tổng hợp + bộ khung chung + 11 cặp hiện tại↔trung tu (HS 5, PH 3, GV 3), giữ nguyên màu.
 - [!] CHƯA BUILD — chờ thầy chốt bản vẽ + 3 câu hỏi (PH 3 hay 4 mục; GV lấy lam làm màu gốc; thanh bên GV 5 mục) | KẸT: chờ thầy.
+
+Thầy nhắn (nguyên văn, 2 lần): "buid luôn và đẩy luôn nhé" — coi bản vẽ được duyệt nguyên trạng; 3 câu hỏi lấy đúng phương án bản vẽ: PH 3 mục · GV một bảng lam · thanh bên GV 5 mục + Cài đặt.
+- [ ] Thang chung `src/styles/thang.css` (chỉ kích thước + chuyển động) | bằng chứng: (chưa có)
+- [ ] Build HS theo bản vẽ (Hôm nay · Hành trình · Ôn lại · Của em · Làm câu) | bằng chứng: (chưa có)
+- [ ] Build PH theo bản vẽ (3 mục · Hôm nay · Tiến bộ · Ca kiểm tra · Đổi SBD có hỏi lại · tối) | bằng chứng: (chưa có)
+- [ ] Build GV theo bản vẽ (5 mục + Cài đặt · một bảng lam · Hôm nay · Học sinh · Mở ca · tối theo nút) | bằng chứng: (chưa có)
+- [ ] Kiểm toàn bộ (tsc, vitest so nền main, cổng màu/giao diện, build:cf, ảnh) | bằng chứng: (chưa có)
+- [ ] Đẩy: kiểm ca mở → PR → main → Actions | bằng chứng: (chưa có)
