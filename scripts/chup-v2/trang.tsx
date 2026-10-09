@@ -9,6 +9,7 @@ import '../../src/styles/giao-dien-day-du.css'
 // TRANG CHỤP ẢNH BẢN DUYỆT V2 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật (tên em trong ảnh là tên giả).
 // `?man=` sanh | sanh-xong | sanh-chon-thu | sanh-dang-tai | than-thu | cua-hang | dao | doan | gv-nhip | gv-bo-sung | gv-can-chua | gv-ca | gv-ma-tran
+// `gv-nhip&the=day-hoc|dau-gio|can-chua|chien-dich` = màn Hành trình mở sẵn đúng thẻ (như Hôm nay / Cài đặt mở) — trung tu 09/10 tối.
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
@@ -54,6 +55,7 @@ import { useAppStore } from '../../src/store/appStore'
 import { KHO } from '../chup-omni-3/gia/may-thay'
 import BottomNav from '../../src/components/BottomNav'
 import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
+import { useSoDemGv, type TheHanhTrinh } from '../../src/lib/so-dem-gv'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -110,6 +112,19 @@ const CT_GIA = {
   loiGiai: { chot: 'Disaccharide thuỷ phân cho hai đơn vị monosaccharide; trong bốn chất chỉ saccharose là disaccharide.', tung_pa: { A: { dung: true, vi_sao: 'Saccharose là disaccharide.' }, B: { dung: false, vi_sao: 'Glucose là monosaccharide.' }, C: { dung: false, vi_sao: 'Tinh bột là polysaccharide.' }, D: { dung: false, vi_sao: 'Fructose là monosaccharide.' } } },
   emTraLoi: 'A',
 }
+const emGia = (i: number) => ({ dotId: `d${i}`, sbd: EM_GIA[i]!.sbd, hoTen: EM_GIA[i]!.hoTen || EM_GIA[i]!.sbd, revision: 1, daHieu: [], traLoi: '0,2 mol', hoi: 'Số mol NaOH phản ứng là bao nhiêu?', soVongHoTro: 2 })
+const BUOC_CUOI_GIA = [
+  { id: 'bc-1', lop: '12A1', qid: 'DH-12-C1-B2-31', buocId: 'b3', tieuDe: 'Câu 31 · Bảo toàn khối lượng khi xà phòng hoá', maLoi: null, diemVuong: 'Quên cộng khối lượng H2O sinh ra vào vế sau', cauGoc: { phan: 'III', text: 'Xà phòng hoá hoàn toàn m gam chất béo…' }, buoc: [], em: [0, 3, 6].map(emGia), guiLuc: 1 },
+]
+const nhomNutGia = (khoa: string, qidMau: string, so: string, buoc: number, soEm: number, nhanNen: string, nhieuEmVuong = false) => ({ khoa, bam: khoa, buoc, qidMau, so, de: '<p>Cho m gam Fe tác dụng với HNO₃ loãng dư…</p>', chuBuoc: 'Bảo toàn electron: 3x = 0,4', nhanNen, cauKiemHoi: 'Số mol electron nhận là bao nhiêu?', soEm, em: Array.from({ length: soEm }, (_, i) => ({ sbd: EM_GIA[i * 3]!.sbd, hoTen: EM_GIA[i * 3]!.hoTen || EM_GIA[i * 3]!.sbd, dapAnChon: 'B', kiem: [], viet: '', soLanThu: 2, guiLuc: 'x' })), soCauCungChuyenDe: 0, hanGanNhat: null, diem: soEm, nhieuEmVuong })
+const NUT_THAT_GIA = {
+  ok: true,
+  nhom: [nhomNutGia('BAM17|1', 'DH-12-C1-B2-17', 'Câu 17', 1, 2, 'Thuỷ phân ester'), nhomNutGia('BAM6|2', 'DH-12-C3-B1-6', 'Câu 6', 2, 4, 'Bảo toàn electron', true)],
+  cungNen: [{ nen: 'Bảo toàn electron', soEm: 4, soCau: 2, khoa: ['BAM6|2'] }],
+  kemRieng: [{ sbd: EM_GIA[4]!.sbd, hoTen: EM_GIA[4]!.hoTen, qid: 'DH-12-C1-B2-17', buoc: 1, so: 'Câu 17', chuBuoc: 'Đổi đơn vị' }],
+  tong: { soThe: 7, soNhom: 2, theNgayDongNhat: 4, quaTai: false },
+}
+
 const fetchGoc = window.fetch.bind(window)
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -124,6 +139,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (b.action === 'danhSachCa') return tra({ ok: true, items: b.daXoa ? [] : CA_GIA })
   if (b.action === 'danhSachCauHoi') return tra({ ok: true, items: CAU_HOI_GIA })
   if (u.pathname.endsWith('/gv/hoc-phi/ds')) return tra({ ok: true, items: HOC_PHI_GIA })
+  // Hành trình › Cần thầy chữa (trung tu 09/10 tối): bước cuối trên lớp + thẻ nút thắt GIẢ (tên em giả).
+  if (u.pathname.endsWith('/gv/chua-cau-sai/hang-chieu')) return tra({ ok: true, bat: true, conNua: false, ds: BUOC_CUOI_GIA })
+  if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
   if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
   if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
   // App phụ huynh (trung tu 09/10): một nhận xét đã công bố để ảnh có thẻ "Nhận xét của thầy" ở Hôm nay và màn con `#loi-thay`.
@@ -191,7 +209,7 @@ const con =
   : man === 'cua-hang' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ManShop as never, { api: new ShopApiGia(), pet: 5, cap: 7, tenThu: 'Linh Hồ', onDong: noop, veThu: veThuThat, veHinhMon: (m: { ma: string }) => h(HinhVatPham as never, { ma: m.ma }) } as never))
   : man === 'dao' ? h(Dao2, { sbd: 'GIA', profile: hoSo, call: callDao, doanMo: false, sanhDau: SANH_DAO, onMoDoan: noop, onMoSoTay: noop, onDong: noop } as never)
   : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
-  : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(ChienDichScreen))
+  : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
   : man === 'cau-da-lam' ? h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })
   : man === 'sanh-xong' ? manSanh(SANH_XONG)
@@ -204,6 +222,9 @@ const manThay = MAN_THAY[man]
 // trong ảnh là danh sách cũ 9 mục. Thanh đáy (< 880 px) cũng dựng như app thật. `?giao=toi|sang` = thầy ép nút Sáng/Tối trong Cài đặt.
 const MAN_STORE: Record<string, string> = { 'gv-hom-nay': 'tongquan', 'gv-kho': 'nganhangde', 'gv-cai-dat': 'caidat', 'gv-hoc-sinh': 'hocsinh', 'gv-mo-ca': 'examsetup', 'gv-go-nut': 'bangonutthat', 'gv-duyet': 'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'examsetup' }
 if (manThay) {
+  // Trang chụp nạp CHUNG CSS game (doan.css có lớp `.dh-so` cùng tên — ô đáp số Đoàn Hộ Tống, rộng 100%, nền giấy) với màn thầy; app thầy thật
+  // KHÔNG nạp doan.css (mảnh game chỉ máy em tải) ⇒ trả số bước Dạy học / Kiểm tra đầu giờ về đúng hình tròn 36 px của day-hoc.css cho ảnh chụp.
+  document.head.append(Object.assign(document.createElement('style'), { textContent: '.vo-thay .dh-buoc-dau > .dh-so{width:36px;height:36px;padding:0;border-radius:50%;box-shadow:none;background:var(--bts-duong);color:var(--bts-mat);font-size:16px}' }))
   useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
   useAppStore.setState({ screen: MAN_STORE[man] as never })
 }

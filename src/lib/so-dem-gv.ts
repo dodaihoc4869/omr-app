@@ -13,15 +13,15 @@ export interface GiaoTuCa {
   ten: string
 }
 
-/** Bốn thẻ của màn Hành trình (bản vẽ tối giản 09/10). */
-export type TheHanhTrinh = 'nhip' | 'can-chua' | 'bai-da-day' | 'chien-dich'
+/** Ba thẻ của màn Hành trình (thầy 09/10 tối: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại nữa nhé"):
+ *  Dạy học · Kiểm tra đầu giờ · Cần thầy chữa. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã giao" của cùng màn
+ *  (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca) — thẻ Nhịp hôm nay / Chiến dịch đã giao đã bỏ khỏi Hành trình. */
+export type TheHanhTrinh = 'day-hoc' | 'dau-gio' | 'can-chua' | 'chien-dich'
 
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {
   the: TheHanhTrinh
-  /** Hành trình (khối) chọn sẵn ở thẻ Nhịp hôm nay. */
-  chienDichId?: string
-  /** "Bổ sung bài": cuộn tới bước Bài hôm nay trong thẻ Bài đã dạy. */
+  /** "Bổ sung bài": cuộn tới bước Bài hôm nay trong thẻ Dạy học. */
   boSungBai?: boolean
 }
 
@@ -33,9 +33,12 @@ interface SoDemGv {
   canThayChua: number | null
   giaoTuCa: GiaoTuCa | null
   moHanhTrinh: MoHanhTrinh | null
+  /** Hôm nay bấm "Xem danh sách" / một dòng khối ⇒ màn Học sinh mở sẵn bộ lọc khối ấy (đọc một lần rồi xoá). */
+  khoiHocSinh: number | null
   datSo: (so: Partial<Pick<SoDemGv, 'caMo' | 'chienDichChay' | 'canDayLai' | 'canThayChua'>>) => void
   datGiaoTuCa: (g: GiaoTuCa | null) => void
   datMoHanhTrinh: (m: MoHanhTrinh | null) => void
+  datKhoiHocSinh: (k: number | null) => void
 }
 
 export const useSoDemGv = create<SoDemGv>((set) => ({
@@ -45,7 +48,9 @@ export const useSoDemGv = create<SoDemGv>((set) => ({
   canThayChua: null,
   giaoTuCa: null,
   moHanhTrinh: null,
+  khoiHocSinh: null,
   datSo: (so) => set(so),
   datGiaoTuCa: (g) => set({ giaoTuCa: g }),
   datMoHanhTrinh: (m) => set({ moHanhTrinh: m }),
+  datKhoiHocSinh: (k) => set({ khoiHocSinh: k }),
 }))

@@ -5,6 +5,9 @@
 // OMNI 3 (05/10): bảng đang chạy nạp xong ⇒ hỏi thêm `/gv/omni bang` (Bảng bài: P × dạng, Sơ ý, Khoảng cách tới 8, Cần thầy chữa). Có số ⇒ truyền xuống
 // Bảng chiến dịch; OMNI tắt / lỗi / sai dạng ⇒ bỏ qua im lặng, bảng cũ y nguyên. Hết hạn (Buổi chữa) và OMNI áp cho lớp ⇒ đọc sẵn gói ca chốt 50/50
 // (`/gv/omni ca-chot`) cho nút "Mở ca chốt".
+// HÀNH TRÌNH › CẦN THẦY CHỮA (trung tu 09/10 tối): mở từ một dòng của danh sách cần chữa ⇒ `chienDichId` GHIM đúng chiến dịch (không ô chọn) +
+// `chiChua` (Bảng chiến dịch chỉ vẽ khối Cần thầy chữa — không bảng từng em, ô số, nhịp lớp). Hết hạn nộp ⇒ điểm danh bằng mã → Buổi chữa y như cũ.
+// Vắng hai prop ⇒ màn y nguyên (màn `goilenbang`, mọi lối cũ).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { xemBuoiHoc } from '../../lib/buoi-hoc-api'
@@ -90,7 +93,7 @@ function DiemDanhBuoiChua({ du, onChot }: { du: DuBang; onChot: (sbd: string[]) 
   )
 }
 
-export default function LenBangChienDich() {
+export default function LenBangChienDich({ chienDichId, chiChua = false }: { chienDichId?: string; chiChua?: boolean } = {}) {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
 
@@ -98,6 +101,7 @@ export default function LenBangChienDich() {
   const [loiDs, setLoiDs] = useState('')
   // Mở từ khung "Chiến dịch đã giao" (màn Ca kiểm tra): chọn sẵn đúng chiến dịch thầy bấm (đọc một lần rồi xoá).
   const [chonId, setChonId] = useState(() => {
+    if (chienDichId) return chienDichId
     try {
       const id = sessionStorage.getItem(KHOA_CHON_CHIEN_DICH) ?? ''
       sessionStorage.removeItem(KHOA_CHON_CHIEN_DICH)
@@ -135,8 +139,10 @@ export default function LenBangChienDich() {
       return
     }
     setDs(r.du)
+    // Chiến dịch ghim từ danh sách cần chữa: giữ đúng chiến dịch ấy (kể cả khi danh sách chưa có — máy chủ tự báo lỗi ở bảng).
+    if (chienDichId) return
     setChonId((cu) => (cu && r.du.chienDich.some((c) => c.id === cu) ? cu : chonMacDinh(r.du.chienDich)))
-  }, [])
+  }, [chienDichId])
   useEffect(() => {
     void taiDs()
   }, [taiDs])
@@ -294,7 +300,8 @@ export default function LenBangChienDich() {
 
   return (
     <div className="cd-trang" data-khoi="len-bang-chien-dich">
-      {/* ĐẦU MÀN: chọn chiến dịch */}
+      {/* ĐẦU MÀN: chọn chiến dịch (ghim từ danh sách cần chữa ⇒ không ô chọn) */}
+      {!chienDichId && (
       <div className="cd-chon">
         <label htmlFor="cd-chon-chien-dich">Chiến dịch</label>
         {dsCd.length > 0 ? (
@@ -313,8 +320,9 @@ export default function LenBangChienDich() {
           <span className="cd-phu">{ds ? 'Chưa có chiến dịch' : loiDs ? '' : 'Đang tải…'}</span>
         )}
       </div>
+      )}
 
-      {loiDs && (
+      {loiDs && !chienDichId && (
         <section className="cd-the" role="alert">
           <p className="cd-loi">{loiDs}</p>
           <div>
@@ -325,7 +333,7 @@ export default function LenBangChienDich() {
         </section>
       )}
 
-      {ds && dsCd.length === 0 && (
+      {ds && dsCd.length === 0 && !chienDichId && (
         <section className="cd-the" data-khoi="chua-co-chien-dich">
           <h2>Chưa có chiến dịch nào</h2>
           <p className="cd-phu">Kết thúc một ca kiểm tra rồi giao chiến dịch luyện ở “Bước tiếp theo”, hoặc giao chiến dịch mới từ mục Ca kiểm tra.</p>
@@ -363,6 +371,7 @@ export default function LenBangChienDich() {
           onDaChua={() => void tai(chonId, coMat)}
           omni={omni}
           onOmniDoi={() => void napOmni(chonId)}
+          chiChua={chiChua}
         />
       )}
 
