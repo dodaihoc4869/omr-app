@@ -1,6 +1,6 @@
 # BẢN DUYỆT V2 — nhật ký build (phiên cloud 09/10/2026, nhánh `claude/amazing-albattani-03aros`)
 
-Trạng thái: **ĐÃ COMMIT CỤC BỘ, CHƯA ĐẨY** (thầy: "làm hết chưa đẩy, cho tôi xem sau khi xong mới quyết định đẩy nhé"). App sống không đổi.
+Trạng thái: **ĐANG PHÁT HÀNH** — thầy chốt bản vẽ tối giản 09/10 ("1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Thêm 5. Bật lại 6. Giữ nguyên — Build rồi đẩy luôn"; "làm tiếp xong hết đẩy lên máy chủ luôn nhé"). Đường phát hành: PR vào main ⇒ `deploy.yml` đẩy Pages + Worker.
 
 ## Đã làm
 | Màn | Tệp | Ghi chú |
@@ -33,3 +33,15 @@ Trạng thái: **ĐÃ COMMIT CỤC BỘ, CHƯA ĐẨY** (thầy: "làm hết ch�
 
 ## Lùi
 Chưa phát hành nên không có bản lùi. Bỏ thay đổi: `git revert <mã commit>`.
+
+## Đợt 2 — tối giản 3 app (thầy chốt 09/10)
+| Phần | Commit | Ghi chú |
+|---|---|---|
+| Tên "Bát Linh Đảo" | 66fa48d, 11dd5e8, 7ee7bf4 | Chữ hiển thị HS + nhãn nguồn câu sai (máy chủ, chỉ nhãn) + CongTacHoa2; PH chặn cả hai tên. |
+| Phụ huynh 3 mục | 688e12f | Hôm nay · Tiến bộ · Ca kiểm tra; Hôm nay 4 khối. |
+| Học sinh | 6f5fc95, 0efad47 | Hôm nay · Hành trình (tầng từng bài) · Thần thú (Túi đồ, Cửa hàng, Đăng xuất) · Câu đã làm; "Thử sức thêm" bật lại; Tu luyện giữ phụ đề. |
+| Máy chủ | d4af938 | `hanhTrinh.bai[]` (chỉ đọc, không đổi schema), Thử sức thêm khi chạy Hành trình. |
+| Giáo viên | 93f23ba | 5 mục + Cài đặt, màn Hôm nay mới, Hành trình 4 thẻ, bỏ hạn 9999. |
+| Gộp main | caa450a | Tối ưu CPU Sảnh/Hành trình của main; số lệnh D1 Sảnh mở lại 36→30. |
+
+Còn lại (ngoài làn, báo thầy): nút Mở ca riêng ở màn Ca kiểm tra (tạm đặt đầu màn từ App.tsx), câu "ở thanh bên" trong `CHU_CA_TRONG_HOA2`, chữ "Chữa trên lớp" cũ, "Sửa em" khi đang ở Hành trình không chuyển thẻ; `vung` từng bài = null (chưa có số đo).

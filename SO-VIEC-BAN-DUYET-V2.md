@@ -42,6 +42,8 @@ Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Th
 - [x] 5. Bật lại "Thử sức thêm" khi chạy Hành trình (ô trong "Luyện thêm") | bằng chứng: d4af938 (máy chủ cho thêm một chặng hôm nay, tối đa 6 câu) + 0efad47 (ô `OThuSuc` ghi đúng nghĩa mới).
 - [x] 6. Giữ nguyên phụ đề Tu luyện | bằng chứng: `SanhV2.tsx:422` + `SanhBanDo.tsx:738` đều "Chỉ dành cho học sinh Nỗ lực".
 - [x] Build giao diện HS theo bản vẽ (Hôm nay · Hành trình · Thần thú · Câu đã làm; Làm câu) | bằng chứng: 6f5fc95 (gộp d620c49).
-- [ ] Build giao diện GV theo bản vẽ (5 mục: Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + Cài đặt) | bằng chứng: (chưa có)
+- [x] Build giao diện GV theo bản vẽ (5 mục: Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + Cài đặt) | bằng chứng: 93f23ba (gộp 7ee7bf4): thanh bên/đáy 5 mục + Cài đặt, màn `GvHomNayScreen`, Hành trình 4 thẻ (một nút "Bổ sung bài"), bỏ hạn 9999; `tests/gv-hom-nay-0910.test.tsx` 12/12. CÒN (ngoài làn): `LichSuCaScreen` chưa có nút Mở ca riêng (tạm đặt ở đầu màn từ App.tsx ≥ 880 px), câu `CHU_CA_TRONG_HOA2` còn ghi "ở thanh bên", chữ "Chữa trên lớp" cũ, "Sửa em" khi đang ở Hành trình không chuyển thẻ.
+- [x] Gộp main mới (113000a, ddbe3c0 — tối ưu CPU Sảnh/Hành trình) | bằng chứng: caa450a; 2 xung đột máy chủ xử lý theo cách dựng lười của main; 24 tệp test Hành trình/srs2: 1 đỏ do số lệnh D1 GIẢM 36→30 (cập nhật mốc), 2 đỏ có sẵn trên main.
+- [x] Kiểm ca thi mở (chỉ đọc D1) | bằng chứng: 11:50 09/10 so_ca_mo 0, so_luot_dang_lam 0.
 - [x] Sửa 4 lỗi đã thấy ở bản V2 (rương lặp số, khối Hành trình vẽ 2 lần, bước "Thử thách +1 bậc", 2 nút Vào thi) | bằng chứng: 6f5fc95 (Sảnh V2 viết lại theo bản vẽ: một khối Hành trình, rương không lặp số câu hôm nay, bỏ bước 3, một nút Vào thi).
 - [ ] Đẩy luôn: kiểm không có ca thi mở → PR vào main → Actions phát hành Pages + Worker | bằng chứng: (chưa có)
