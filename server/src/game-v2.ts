@@ -276,7 +276,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
   const rao=(env as unknown as Record<symbol,unknown>)[RAO_GHI] as Promise<unknown>|undefined
-  env = { ...env, DB: gopDocD1(rao&&!laBanGop(env.DB)?raoGhiD1(env.DB,rao):env.DB, !LENH_BIA.has(action)) }
+  env = { ...env, DB: gopDocD1(rao&&!laBanGop(env.DB)?raoGhiD1(env.DB,rao):env.DB, !LENH_BIA.has(action) && action !== 'hoa2-sanh') }
   // CHỐT ĐÁP ÁN (29/09): cờ cửa P08 cho phần trám bên dưới đọc CÙNG đợt đầu (đệm 15 s dùng chung lượt đọc đang bay) — không thêm một đợt D1 ở cuối.
   if(action==='answer')void docCauHinhKichHoat(env,true).catch(()=>null)
   // Cờ cửa hàng (đệm 30 s) đọc SONG SONG với phần chính (trước: một đợt nối tiếp ở cuối). Lỗi vẫn báo như cũ khi phần chính xong.
@@ -383,7 +383,19 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
   if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
   // GAME HÓA 2.0 (srs2-game.ts): Sảnh bản đồ, Câu đã làm, Rương Bát Linh. Chỉ khi cờ `cau_hinh.game_hoa_2` bật cho em.
-  if(LENH_HOA2.has(action)){if(!await cheDo2Som)return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};const h=await(cauDaLamSom??hoa2Action(env,sbd,action,b));if(action==='hoa2-sanh'&&h.ok===true&&biaSom)h.bia=await biaSom();return h}
+  if(LENH_HOA2.has(action)){
+    if(!await cheDo2Som)return {ok:true,cheDo2:false};
+    if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};
+    const h=await(cauDaLamSom??hoa2Action(env,sbd,action,b));
+    if(action==='hoa2-sanh'&&h.ok===true&&biaSom){
+      const san=h._san as { kh: any; hs: any } | undefined;
+      delete h._san;
+      h.bia=await biaSom(san);
+    } else {
+      delete h._san;
+    }
+    return h;
+  }
   // BI-A PHẢN ỨNG (bi-a.ts; cờ `cau_hinh.bi_a`, mặc định TẮT): cửa thứ ba trên Sảnh Bát Linh. Câu trả lời đi qua `answer` chung bên dưới.
   if(LENH_BIA.has(action))return biaAction(env,sbd,action,b)
   if(LENH_SHOP.has(action)){if(p.choice)throw new Error('Em chọn thần thú trước khi vào Cửa hàng.');return shopAction(env,sbd,p,revision,action,b,()=>loadProfile(env,sbd))} // Cửa hàng phụ kiện (game-v2-shop.ts; cờ cau_hinh.shop_phu_kien mặc định TẮT)

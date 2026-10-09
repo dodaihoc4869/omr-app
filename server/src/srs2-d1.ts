@@ -414,12 +414,21 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
   const goc = [...new Set(qids)]
   const ds = JSON.stringify(goc.flatMap(cacQidSongSinh)), dsGoc = JSON.stringify(goc)
   let rows: Row[]
-  try {
-    // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
-    // 06/10 (1): GIỮ dòng câu chẩn đoán (purpose 'chan_doan') trong CÙNG truy vấn để tách thành mốc "đã chẩn đoán" (`ben.chanDoan`) — không vào lần làm (`lanLamTuDongTc` bỏ).
-    rows = (await env.DB.prepare(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon, purpose', 'sbd = ?1', `luc >= ?4 AND ${SQL_LA_LAN_LAM_GIU_CHAN_DOAN}`)).bind(sbd, ds, dsGoc, tuLuc).all<Row>()).results ?? []
-  } catch {
-    rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
+  if (goc.length > 200) {
+    const sql = (coVis: boolean) => `SELECT qid, ngay_vn, luc, ket_qua, ${coVis ? 'assistance, visibility, purpose,' : ''} nguon, ${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd = ? AND luc >= ? ${coVis ? `AND (${SQL_LA_LAN_LAM_GIU_CHAN_DOAN})` : ''}`
+    try {
+      rows = (await env.DB.prepare(sql(true)).bind(sbd, tuLuc).all<Row>()).results ?? []
+    } catch {
+      rows = (await env.DB.prepare(sql(false)).bind(sbd, tuLuc).all<Row>()).results ?? []
+    }
+  } else {
+    try {
+      // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
+      // 06/10 (1): GIỮ dòng câu chẩn đoán (purpose 'chan_doan') trong CÙNG truy vấn để tách thành mốc "đã chẩn đoán" (`ben.chanDoan`) — không vào lần làm (`lanLamTuDongTc` bỏ).
+      rows = (await env.DB.prepare(sqlQidHoacTc('qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon, purpose', 'sbd = ?1', `luc >= ?4 AND ${SQL_LA_LAN_LAM_GIU_CHAN_DOAN}`)).bind(sbd, ds, dsGoc, tuLuc).all<Row>()).results ?? []
+    } catch {
+      rows = (await env.DB.prepare(`SELECT qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)) AND luc >= ?`).bind(sbd, ds, tuLuc).all<Row>()).results ?? []
+    }
   }
   const tap = new Set(goc)
   const hien = rows.filter((x) => str(x.visibility) !== 'embargoed')
@@ -1635,6 +1644,7 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
     ok: true,
     cheDo2: true,
     ngay: kh.ngay,
+    _san: { kh, hs },
     // Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ báo tên + ngày, KHÔNG lộ câu.
     sapBatDau: hs.sapBatDau ? { id: hs.sapBatDau.id, ten: hs.sapBatDau.ten, batDau: hs.sapBatDau.batDau, hanNop: hs.sapBatDau.hanNop } : null,
     chienDich: cd ? { id: cd.id, ten: cd.ten, hanNop: cd.hanNop, D: soNgayConLai(kh.ngay, cd.hanNop), tong: tl.tong, coXat: tl.coXat, thanhThao: tl.thanhThao, canDayLai: tl.canDayLai, thanhThaoTangTu: tl.thanhThao ? null : ngayThanhThaoSomNhat(hs.ttChienDich) } : null,
