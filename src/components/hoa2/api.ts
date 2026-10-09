@@ -268,7 +268,8 @@ export function docBiaTrenSanh(x: unknown): BiaTrenSanh | null {
 }
 
 export async function taiSanh(token: string): Promise<KetQuaSanh> {
-  const kq = docSanh(await goiHoa2('hoa2-sanh', token))
+  // 25 giây (09/10): giờ cao điểm cả trường mở Sảnh cùng lúc; cắt ở 15 giây làm em bấm "Thử lại" ⇒ dồn thêm tải.
+  const kq = docSanh(await goiHoa2('hoa2-sanh', token, {}, 25))
   if (!kq) throw new LoiHoa2('Máy chủ trả dữ liệu Sảnh chưa đủ. Em thử lại sau ít phút.')
   return kq
 }
