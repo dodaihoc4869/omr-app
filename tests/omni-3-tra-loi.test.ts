@@ -149,7 +149,7 @@ describe('OMNI 3 · B3 — hàm thuần', () => {
 
 // ---------------------------------------------------------------- cờ tắt
 describe('OMNI 3 · B3 — cờ tắt ⇒ `answer` y hệt hôm nay', () => {
-  it('cùng lượt, có / không có msLam + tuTin trong thân ⇒ phản hồi TỪNG BYTE như nhau, dòng sổ như nhau, không trường mới', async () => {
+  it('cùng lượt, có / không có msLam + tuTin trong thân ⇒ phản hồi TỪNG BYTE như nhau, dòng sổ như nhau với phiên bản câu máy chủ', async () => {
     const chay = async (them: Record<string, unknown>) => {
       bayGio = T0; vi.setSystemTime(T0)
       const { d, env, token } = await dung()
@@ -170,7 +170,7 @@ describe('OMNI 3 · B3 — cờ tắt ⇒ `answer` y hệt hôm nay', () => {
       expect(['omni', 'luot', 've'].filter((k) => k in r)).toEqual([])
       expect(LEGACY.every((k) => k in r)).toBe(true)
     }
-    expect(goc.so.map((x: any) => [x.purpose, x.raw_json, x.subitem_json])).toEqual([['maintenance', '{"chon":"A"}', null], ['maintenance', '{"chon":"DSDS"}', null]])
+    expect(goc.so.map((x: any) => [x.purpose, x.raw_json, x.subitem_json])).toEqual([['maintenance', '{"chon":"A","ht_cau_version":"v1"}', null], ['maintenance', '{"chon":"DSDS","ht_cau_version":"v1"}', null]])
   })
   it('OMNI bật nhưng phiên không phải Hoá 2.0 / là Bi-a ⇒ không đụng; đọc OMNI lỗi ⇒ bỏ phần OMNI, lượt vẫn chấm', async () => {
     const { d, env, token } = await dung()
@@ -180,7 +180,7 @@ describe('OMNI 3 · B3 — cờ tắt ⇒ `answer` y hệt hôm nay', () => {
     const bia = await traLoi(env, token, 'BIA', 'Q1', 'A', { msLam: 500 })
     expect(bia.ok).toBe(true)
     expect(bia.omni).toBeUndefined()
-    expect(dongSo(d, 'Q1', 'BIA')).toMatchObject({ ket_qua: 0, purpose: 'maintenance', raw_json: '{"chon":"A"}' })
+    expect(dongSo(d, 'Q1', 'BIA')).toMatchObject({ ket_qua: 0, purpose: 'maintenance', raw_json: '{"chon":"A","ht_cau_version":"v1"}' })
     tiem.loiKyVong = true
     moPhien(d, 'P2', ['Q2'])
     toi()
@@ -188,7 +188,7 @@ describe('OMNI 3 · B3 — cờ tắt ⇒ `answer` y hệt hôm nay', () => {
     expect(loi.ok).toBe(true)
     expect(loi.correct).toBe(false)
     expect(loi.omni).toBeUndefined()
-    expect(dongSo(d, 'Q2', 'P2')).toMatchObject({ ket_qua: 0, purpose: 'maintenance', raw_json: '{"chon":"A"}' })
+    expect(dongSo(d, 'Q2', 'P2')).toMatchObject({ ket_qua: 0, purpose: 'maintenance', raw_json: '{"chon":"A","ht_cau_version":"v1"}' })
   })
   it('lệnh hoa2-omni-* khi OMNI tắt ⇒ { ok:false, error }', async () => {
     const { env, token } = await dung()
@@ -219,7 +219,7 @@ describe('OMNI 3 · B3 — lướt (sai quá nhanh)', () => {
       const so = dongSo(d, q, 'P1')!
       expect(so.ket_qua).toBeNull()
       expect(so.purpose).toBe('luot')
-      expect(JSON.parse(String(so.raw_json))).toEqual({ chon: 'A', ms: 1500, tt: 'chac', td: 'luot' })
+      expect(JSON.parse(String(so.raw_json))).toEqual({ ht_cau_version:'v1', chon: 'A', ms: 1500, tt: 'chac', td: 'luot' })
       expect(mastery(d)).toEqual(truoc)
     }
     toi()
@@ -242,7 +242,7 @@ describe('OMNI 3 · B3 — lướt (sai quá nhanh)', () => {
     const nhanh = await traLoi(env, token, 'P1', 'Q2', 'B', { msLam: 1500 })
     expect(nhanh.correct).toBe(true)
     expect(nhanh.omni).toMatchObject({ nhanTocDo: 'troi_chay', luot: false, loiNhan: null })
-    expect(JSON.parse(String(dongSo(d, 'Q2', 'P1')!.raw_json))).toEqual({ chon: 'B', ms: 1500, tt: 'chac', td: 'troi_chay' })
+    expect(JSON.parse(String(dongSo(d, 'Q2', 'P1')!.raw_json))).toEqual({ ht_cau_version:'v1', chon: 'B', ms: 1500, tt: 'chac', td: 'troi_chay' })
   })
 })
 

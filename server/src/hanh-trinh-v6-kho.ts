@@ -29,7 +29,7 @@ export async function ungVienV6(env:Env,cd:ChienDich,sbd:string,ngay:string,pham
  * Câu đã gặp cũng đi qua bộ dựng trạng thái chuẩn để xét lịch ôn, không tự suy rằng đã gặp là đã thạo.
  */
 export async function boSungV6(env:Env,sbd:string,ngay:string,hs:HoSo2,ds:readonly {qid:string;nhom:string;moi:boolean;hoc:boolean}[],chan:ReadonlySet<string>):Promise<HoSo2|null>{
-  const khoi=await docKhoiEmCong(env,sbd),ids=new Set(hs.chienDich!.qids),groups=new Set<string>();let novel=0,added=0
+  const khoi=await docKhoiEmCong(env,sbd),ids=new Set(hs.chienDich!.qids),groups=new Set(hs.cau.map(c=>hs.meta.get(c.qid)?.group||c.qid));let novel=0,added=0
   const candidates=ds.filter(c=>!chan.has(c.qid)&&!chan.has(c.nhom))
   for(let i=0;i<candidates.length;i+=384){
     const page=candidates.slice(i,i+384),meta=await docMetaCau(env,page.map(c=>c.qid),hs.chienDich!.maDe)

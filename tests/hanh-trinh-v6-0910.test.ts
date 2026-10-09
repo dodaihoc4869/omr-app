@@ -7,6 +7,7 @@ import {ghiDoV6,hocV6Dem,lenhChonV6} from '../server/src/hanh-trinh-v6-d1'
 import {chonBandit} from '../server/src/bandit'
 import {docHoSo2,layKeHoachHomNay,xoaDemChienDich} from '../server/src/srs2-d1'
 import {dongBoBaHanhTrinh,ungVienHanhTrinh} from '../server/src/hanh-trinh-hop-nhat'
+import {boSungV6} from '../server/src/hanh-trinh-v6-kho'
 import {lapChotHanhTrinh} from '../server/src/hanh-trinh-d1'
 import {sqlKetQuaV6,sqlNguonV6} from '../server/src/hanh-trinh-v6-d1'
 import {ghiSuKien} from '../server/src/su-kien-hoc'
@@ -131,6 +132,14 @@ describe('Hành trình v6: D1 thật',()=>{
    expect(h.cau.length).toBe(0)
    const plan=await lapChotHanhTrinh(k.env,'S1',HOM_NAY,T_SANG,h,null,new Set())
    expect(plan.tong).toBe(24);expect(plan.dao.every(id=>!before.cau.some(c=>c.qid===id))).toBe(true);expect(h.cau.length).toBeGreaterThanOrEqual(24);k.d.sql.close()
+ })
+ it('bản sao nhóm đã có không chiếm trần 192 câu fallback',async()=>{
+   const k=kho(500);await dongBoBaHanhTrinh(k.env,T_SANG);const h=await docHoSo2(k.env,'S1',HOM_NAY),group=h.meta.get(h.cau[0]!.qid)!.group
+   const hidden=k.qids('DH-B1').filter(id=>!h.meta.has(id)).slice(0,216)
+   const candidates=hidden.map((qid,i)=>({qid,nhom:i<192?group:`new-${qid}`,moi:true,hoc:true}))
+   expect(hidden.length).toBe(216)
+   const expanded=await boSungV6(k.env,'S1',HOM_NAY,h,candidates,new Set())
+   expect(expanded).not.toBeNull();expect(hidden.slice(192).every(id=>expanded!.cau.some(c=>c.qid===id))).toBe(true);k.d.sql.close()
  })
  it('đổi kế hoạch trong cùng chặng giữ reservation chẩn đoán của phiên cũ',async()=>{
    const k=kho(200);for(const id of k.qids('DH-B1').slice(0,30)){const r=k.d.sql.prepare('SELECT json FROM game_v2_question WHERE qid=?').get(id) as {json:string};k.d.sql.prepare('UPDATE game_v2_question SET json=? WHERE qid=?').run(JSON.stringify({...JSON.parse(r.json),mucDo:'VD'}),id)}

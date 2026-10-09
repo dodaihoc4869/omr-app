@@ -22,7 +22,7 @@ const goc = (q: string) => q.replace(/#\d+$/, '')
  * UPDATE kế hoạch và mốc chặng cùng batch + CAS, hai máy không ghi đè nhau.
  */
 export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowMs: number, hs: HoSo2,
-  cu: Row | null, chan: ReadonlySet<string>, trongSo?: Readonly<Record<string, number>>, dangVung?: readonly string[], daMoRong=false): Promise<KeHoachDaChot> {
+  cu: Row | null, chan: ReadonlySet<string>, trongSo?: Readonly<Record<string, number>>, _dangVung?: readonly string[], daMoRong=false): Promise<KeHoachDaChot> {
   await chayDdlMotLan(env, 'hanh_trinh_v3_v4', [...SQL_BANG_HANH_TRINH,...SQL_DONG_CO_HANH_TRINH,...SQL_HANH_TRINH_V5])
   const nhom = new Map([...hs.meta].map(([q, m]) => [q, m.group || q]))
   const rows = await env.DB.prepare(`SELECT qid,ket_qua,received_at,${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd=? AND ngay_vn=?
@@ -77,7 +77,7 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
     const lap = chonCauHanhTrinh({ ngay, tang: tangNgay, toiThieu, daLam: xong, cau: cung, tt: trangThai, nhom, chan:chanMoi, trongSo:{...trongSo,...engine.trongSo}, tangSanSang, uuTienCanThiep:engine.canThiep?.qid, chanDoan:engine.v5?.chanDoan, nganSachChanDoan:Math.max(0,2-daDiag), uuTienThamDo:engine.v5?.uuTienThamDo, vaiTro:engine.v5?.nhom==='B'?engine.v5.vai:undefined })
     if(!daMoRong&&lap.dao.length+lap.doan.length<Math.max(0,toiThieu-xong.length)&&engine.v5?.ungNgoai.length){
       const expanded=await import('./hanh-trinh-v6-kho').then(m=>m.boSungV6(env,sbd,ngay,hs,engine.v5!.ungNgoai,chan))
-      if(expanded){Object.assign(hs,expanded);return lapChotHanhTrinh(env,sbd,ngay,nowMs,hs,cu,chan,trongSo,dangVung,true)}
+      if(expanded){Object.assign(hs,expanded);return lapChotHanhTrinh(env,sbd,ngay,nowMs,hs,cu,chan,trongSo,undefined,true)}
     }
     const xongDao = xong.filter(q => ds(cu?.dao_json).map(goc).includes(q)), xongDoan = xong.filter(q => !xongDao.includes(q))
     const dao = [...xongDao, ...lap.dao], doan = [...xongDoan, ...lap.doan]

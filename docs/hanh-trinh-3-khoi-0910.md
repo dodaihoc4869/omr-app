@@ -71,3 +71,5 @@ Kiểm tra: 16 kiểm riêng (gộp nguyên tử, kho nhiều trang, học sinh 
 - Schema ba bảng + hai index chỉ thêm; reset phân loại GIỮ. Migration và cổng release kiểm bắt buộc; probe production chỉ đọc trên em có lịch sử lớn nhất. Bài đang chạy chuyển v6 ở lần mở hoặc khi cần tính lại, giữ phần đã làm/CAS và sàn đã chốt.
 
 V5 đã phát hành main `c94b4dc6` (Actions 37879913745). V6 tích hợp các sửa CPU trên main `ddbe3c0c`; mốc lùi v6 là mã trước khi merge v6, giữ các bảng dẫn xuất/lịch sử.
+
+Kiểm v6 trước phát hành: 193 kiểm cổng hành trình/kế hoạch/game/UI đạt; 87 kiểm reset/đáp án/sự kiện chuẩn đạt; D1 runtime 9/9; tsc server, build CF, SW13/13 (2998KB), màu0vi phạm, lint vùng mới và Chromium 360/430/844ngang/1280 đạt. Full vitest đang chạy để đối chiếu tên lỗi nền; chưa ghi toàn repo xanh. Mô hình khởi đầu bằng prior, chỉ chuyển sang trọng số học sau đủ bằng chứng; chưa có kết quả thắng A/B.
