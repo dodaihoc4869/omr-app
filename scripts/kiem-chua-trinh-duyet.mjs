@@ -119,7 +119,7 @@ try {
       )
     }
     await page.getByRole('textbox', { name: 'Câu trả lời của em' }).fill('40')
-    await page.getByRole('button', { name: 'Kiểm tra cách em làm' }).click()
+    await page.getByRole('button', { name: 'Tự thử lại' }).click()
     await page.getByRole('alert').waitFor()
     assert.equal(
       await page

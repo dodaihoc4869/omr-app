@@ -42,3 +42,12 @@ describe('Bảng ba hành trình', () => {
     expect(container.textContent).not.toContain('0%')
   })
 })
+
+it('bảng thầy tách kỹ năng đã đạt với độ bao phủ, không coi chưa đo là đã đạt',()=>{
+ const du={lop:{coXat:0,thanhThao:0,huyetChien:0,canDayLaiCau:0,canDayLaiLuot:0},dang:[],em:[],canDayLai:[],noCu:[],chienDich:{id:'ht',ten:'Hành trình 12',trangThai:'dang_chay'},homNay:'2026-10-09',hanhTrinhNgay:{em:[{sbd:'S',ten:'Em A',tang:4,toiThieu:36,daLam:6,daXep:36,conThieu:0,tienDo:{tong:10,dat:4,chuaVung:1,chuaDu:5,daDo:6,baoPhu:60,soL4:12,soChanDoan:2}}],doLuong:{soMauHopLe:0,trangThai:'chua_du_du_lieu',ketQua:[],phanNhom:[]}}} as unknown as DuBang
+ render(<BangChienDich du={du} nowMs={Date.parse('2026-10-09')} dangChieu={false} onChieu={vi.fn()} onDaChua={vi.fn()}/>)
+ expect(screen.getByText('4/10 kỹ năng')).toBeTruthy()
+ expect(screen.getByText('6/10 kỹ năng')).toBeTruthy()
+ expect(screen.getByText(/0 học sinh có kết quả kiểm hợp lệ/)).toBeTruthy()
+ expect(screen.getByText(/Chưa đủ dữ liệu để kết luận mức tăng điểm/)).toBeTruthy()
+})

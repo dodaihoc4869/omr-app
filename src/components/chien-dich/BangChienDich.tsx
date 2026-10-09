@@ -279,15 +279,21 @@ export default function BangChienDich({
     <p>Hôm nay · {hienNgay(du.homNay)} · tối thiểu 24 / 30 / 36 câu theo tầng · mỗi chặng 6 câu.</p>
     <p>Kiến thức mới được tự nhận vào đúng khối sau khi duyệt. Câu thiếu hoặc chưa đủ điều kiện học được báo riêng.</p>
     <div className="cd-cuon-doc" role="region" aria-label="Tiến độ từng học sinh" tabIndex={0}>
-      <table className="cd-bang"><thead><tr><th>Học sinh</th><th>Đang học</th><th>Đã làm hôm nay</th><th>Chặng đã xong</th><th>Câu cần bổ sung</th></tr></thead>
+      <table className="cd-bang"><thead><tr><th>Học sinh</th><th>Đang học</th><th>Đã làm hôm nay</th><th>Chặng đã xong</th><th>Câu cần bổ sung</th><th>Vận dụng đã đạt</th><th>Độ bao phủ đo</th></tr></thead>
         <tbody>{du.hanhTrinhNgay.em.map(e => <tr key={e.sbd}>
           <td>{e.ten}</td><td>{e.tang ? ['Nền','Hiểu','Vận dụng','Tổng hợp'][e.tang-1] : 'Chưa mở app hôm nay'}</td>
           <td>{e.toiThieu ? `${e.daLam}/${e.toiThieu} câu` : 'Chưa chốt kế hoạch'}</td>
           <td>{e.toiThieu ? `${Math.floor(e.daLam/6)}/${Math.ceil(e.toiThieu/6)} chặng` : '—'}</td>
           <td>{e.conThieu ? `${e.conThieu} câu` : '—'}</td>
+          <td>{e.tienDo?.tong ? `${e.tienDo.dat}/${e.tienDo.tong} kỹ năng` : 'Chưa có phạm vi đo'}</td>
+          <td>{e.tienDo?.tong ? `${e.tienDo.daDo}/${e.tienDo.tong} kỹ năng` : '—'}</td>
         </tr>)}</tbody>
       </table>
     </div>
+    {du.hanhTrinhNgay.doLuong && <details><summary>Đo hiệu quả học · {du.hanhTrinhNgay.doLuong.soMauHopLe} học sinh có kết quả kiểm hợp lệ</summary>
+      <p>So sánh trên đề chưa gặp, cùng phạm vi và ma trận, sau 7–14 ngày. Chưa đủ dữ liệu để kết luận mức tăng điểm.</p>
+      {du.hanhTrinhNgay.doLuong.ketQua.map((r,i)=><div key={i}><p>Phạm vi đo {i+1}</p><table className="cd-bang"><thead><tr><th>Nhóm</th><th>Học sinh đã đo</th><th>Điểm trung bình</th><th>Tăng so với đầu vào</th></tr></thead><tbody>{r.nhom.map(n=><tr key={n.nhom}><td>{n.nhom}</td><td>{n.n} học sinh</td><td>{n.diemTb===null?'Chưa có':`${n.diemTb.toFixed(2)}/10`}</td><td>{n.tangDiemTb===null?'Chưa có mốc tương đương':`${n.tangDiemTb.toFixed(2)} điểm`}</td></tr>)}</tbody></table></div>)}
+    </details>}
   </section>
 
   return (

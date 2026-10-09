@@ -437,6 +437,7 @@ function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: () => voi
           </span>
         </button>
       )}
+      {o.l4Kiem?.duoc && <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="l4-kiem" onClick={()=>mo('de-thu-l4')}><span className="h2-nut-dao-chu"><span className="h2-nut-dao-lon">Kiểm tra chuyên sâu · 6 câu</span></span></button>}
       {o.deThu.duoc && (
         <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="de-thu" onClick={() => mo('de-thu')}>
           <span className="h2-nut-dao-chu">

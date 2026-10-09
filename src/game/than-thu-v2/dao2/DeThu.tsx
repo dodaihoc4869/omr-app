@@ -23,16 +23,16 @@ const khoaNhap=(id:string)=>`omni:de-thu:${id}`
 function docNhap(id:string):Record<string,string>{try{const o=JSON.parse(sessionStorage.getItem(khoaNhap(id))??'{}');return o&&typeof o==='object'&&!Array.isArray(o)?Object.fromEntries(Object.entries(o).filter(([,v])=>typeof v==='string')) as Record<string,string>:{}}catch{return {}}}
 function ghiNhap(id:string,tl:Record<string,string>|null){try{if(tl)sessionStorage.setItem(khoaNhap(id),JSON.stringify(tl));else sessionStorage.removeItem(khoaNhap(id))}catch{/* máy chặn lưu: chỉ mất bản nháp khi tải lại trang */}}
 
-export interface DeThuProps{sbd:string;call:DaoCall;/** Về Sảnh (app học sinh). */onVe:()=>void}
-export default function DeThu({call,onVe}:DeThuProps){
+export interface DeThuProps{l4?:boolean;sbd:string;call:DaoCall;/** Về Sảnh (app học sinh). */onVe:()=>void}
+export default function DeThu({call,onVe,l4=false}:DeThuProps){
  const [de,setDe]=useState<DeThuOmni|null>(null),[loiTai,setLoiTai]=useState(''),[traLoi,setTraLoi]=useState<Record<string,string>>({})
  const [dangNop,setDangNop]=useState(false),[loi,setLoi]=useState(''),[kq,setKq]=useState<KetQuaDeThu|null>(null),[zoom,setZoom]=useState(''),[,setNhip]=useState(0)
  const hetMs=useRef(0),daNop=useRef(false),daTuNop=useRef(false),song=useRef(true)
  useEffect(()=>{song.current=true;return()=>{song.current=false}},[])
  const tai=useCallback(()=>{setLoiTai('');setDe(null)
-  omniDeThu(call).then(d=>{if(!song.current)return
+  omniDeThu(call,l4).then(d=>{if(!song.current)return
    hetMs.current=Number.isFinite(Date.parse(d.hetLuc))?Date.parse(d.hetLuc):Date.now()+Math.max(1,d.phut)*60_000
-   setTraLoi(docNhap(d.id));setDe(d)}).catch(e=>{if(song.current)setLoiTai(e instanceof Error&&e.message?e.message:'Chưa soạn được đề thử. Em thử lại sau ít phút.')})},[call])
+   setTraLoi(docNhap(d.id));setDe(d)}).catch(e=>{if(song.current)setLoiTai(e instanceof Error&&e.message?e.message:'Chưa soạn được đề thử. Em thử lại sau ít phút.')})},[call,l4])
  useEffect(()=>{tai()},[tai])
  const cau=(de?.cau??[]) as unknown as CauDao2[]
  const con=de&&!kq?Math.max(0,Math.ceil((hetMs.current-Date.now())/1000)):0,hetGio=!!de&&!kq&&con<=0

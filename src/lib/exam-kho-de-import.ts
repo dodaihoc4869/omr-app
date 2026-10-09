@@ -1,3 +1,4 @@
+import { docNhanKhoHanhTrinh, type NhanKhoHanhTrinh } from './hanh-trinh-nhan'
 // Đề "đã đọc sẵn" — pipeline "Nạp đề mới" (Cowork) đọc PDF bằng thị giác,
 // giải mù, đối chiếu đáp án, xuất JSON theo khuôn dưới rồi đẩy lên kho đề
 // Apps Script; app trên máy thầy tải về (exam-sync.ts) và build thành
@@ -97,6 +98,7 @@ export interface KhoDeCau {
   dang?: DangKho | null
   /** Vì sao `dang` để trống. Bắt buộc khi `dang === null`. */
   viSaoNull?: string | null
+  hanhTrinh?: NhanKhoHanhTrinh
   kienThuc?: string[]
   loiThuongGap?: string[]
   /** LÝ THUYẾT hay BÀI TẬP — nhãn THẬT do `kho-de/cong-cu/kieu_cau.py` ghi vào
@@ -349,6 +351,7 @@ export function parseKhoDeJson(data: unknown): KhoDeParseResult {
       can_chua: parseCanChua(c.can_chua),
       dang: parseDang(c.dang),
       viSaoNull: typeof c.viSaoNull === 'string' && c.viSaoNull.trim() ? c.viSaoNull.trim() : null,
+      hanhTrinh:docNhanKhoHanhTrinh(c.hanhTrinh),
       kienThuc: chuoiMang(c.kienThuc),
       loiThuongGap: chuoiMang(c.loiThuongGap),
       kieu: c.kieu === 'ly_thuyet' || c.kieu === 'bai_tap' ? c.kieu : undefined,
@@ -417,6 +420,7 @@ export function buildTeacherSourceFromKhoDe(json: KhoDeJson): { source: TeacherE
       loiGiaiTrangThai: lg?.trang_thai,
       dapAnTuGiai: lg?.dap_an_tu_giai,
       ghiChuLoiGiai: lg?.ghi_chu ?? undefined,
+      hanhTrinh:c.hanhTrinh,
       chuyenDe: c.chuyen_de,
       mucDo: c.muc_do,
       canChua: c.can_chua,

@@ -59,7 +59,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const [daLam,setDaLam]=useState<unknown>(null)
  /** OMNI 3 · cửa vào từ Sảnh (đọc MỘT lần rồi tự xoá, như `game-v2:man-dau`): đề thử ⇒ mở thẳng màn đề thử; vé ⇒ chờ dùng cho lệnh `start` kế tiếp. */
  const [viecOmni]=useState(()=>layViecOmniDao()),veCho=useRef(false)
- const [luot,setLuot]=useState<Luot2|null>(null),[pha,setPha]=useState<'ban-do'|'ai'|'xong'|'de-thu'>(()=>viecOmni==='de-thu'&&docSanh2(sanhDau)?.omni?.deThu.duoc?'de-thu':'ban-do')
+ const [luot,setLuot]=useState<Luot2|null>(null),[pha,setPha]=useState<'ban-do'|'ai'|'xong'|'de-thu'>(()=>((viecOmni==='de-thu'&&docSanh2(sanhDau)?.omni?.deThu.duoc)||(viecOmni==='de-thu-l4'&&docSanh2(sanhDau)?.omni?.l4Kiem?.duoc))?'de-thu':'ban-do')
  // TRẬN DỰNG SẴN (05/10, xem cuối hàm): `lanVao` tăng mỗi lần RỜI trận ⇒ lần vào sau là thể hiện trận MỚI, y như cũ.
  const [phaTruoc,setPhaTruoc]=useState(pha),[lanVao,setLanVao]=useState(0)
  if(pha!==phaTruoc){setPhaTruoc(pha);if(phaTruoc==='ai')setLanVao(n=>n+1)}
@@ -120,7 +120,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  useEffect(()=>{void chay(async()=>{let s=sanh
   if(!s||s.canChonThu){setDangTai(true);try{s=await napSanh()}catch(e){if(conSong.current)setLoiSanh(e instanceof Error&&e.message?e.message:LOI_BAN_DO);return}finally{if(conSong.current)setDangTai(false)}}
   if(!s){setLoiSanh(LOI_BAN_DO);return}
-  if(viecOmni==='de-thu'&&s.omni?.deThu.duoc){setPha('de-thu');return}
+  if((viecOmni==='de-thu'&&s.omni?.deThu.duoc)||(viecOmni==='de-thu-l4'&&s.omni?.l4Kiem?.duoc)){setPha('de-thu');return}
   if(viecOmni==='ve'&&s.omni&&s.omni.ve.con>0)veCho.current=true
   await soanChuyen(s)});napDaLam()},[]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -191,7 +191,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
   theBuocSai={omniBat&&buocSai?<TheBuocSai key={buocSai.qid} lua={buocSai.lua} onChon={async ma=>{await omniBuocSai(call,buocSai.qid,ma)}}/>:undefined}/>,true)}</Activity>:null
  const ra=(man:ReactNode)=><>{man}{tran}</>
  if(dangAi)return ra(null)
- if(pha==='de-thu')return ra(vo(<DeThu sbd={sbd} call={call} onVe={onDong}/>,true))
+ if(pha==='de-thu')return ra(vo(<DeThu sbd={sbd} call={call} l4={viecOmni==='de-thu-l4'} onVe={onDong}/>,true))
  if(pha==='xong'&&ketThuc){const con=sanh?.dao?.con??null,coThem=con!==null&&con>0&&!sanh?.khoaDao,cd=sanh?.chienDich,hen=henOnCua(daLam,ketThuc.sai.map(s=>s.qid))
   return ra(vo(<XongChuyen soChuyen={con!==null?{k:xongHomNay,n:xongHomNay+Math.ceil(con/SO_AI_CHUYEN)}:null} conCau={con} tongKet={ketThuc} enemy={ketThuc.enemy}
    oMoi={cd&&coXatTruoc!==null?Math.max(0,cd.coXat-coXatTruoc):null} coXat={cd?{co:cd.coXat,tong:cd.tong}:null} aiSai={ketThuc.sai.map(s=>({ai:s.ai,hen:hen[s.qid]}))}

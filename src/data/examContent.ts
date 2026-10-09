@@ -1,3 +1,4 @@
+import type { NhanKhoHanhTrinh } from '../lib/hanh-trinh-nhan'
 // Ngân hàng câu hỏi: thầy tải lên BAO NHIÊU đề tuỳ ý (mỗi đề có thể nhiều câu
 // hơn mức cần dùng), app GỘP lại thành 1 ngân hàng rồi RANDOM CHỌN + xáo thứ
 // tự cho từng học sinh — mỗi em nhận một tập câu khác nhau hoàn toàn, không
@@ -129,6 +130,7 @@ export interface LoiGiaiMeta {
    * giống. Câu cũ chưa gán vẫn đọc được, chỉ là chưa rút chữa được. */
   dang?: { ma: string; ten: string } | null
   /** Đơn vị kiến thức cần để làm được câu này. */
+  hanhTrinh?: NhanKhoHanhTrinh
   kienThuc?: string[]
   /** Lỗi điển hình khi làm sai câu này. */
   loiThuongGap?: string[]
