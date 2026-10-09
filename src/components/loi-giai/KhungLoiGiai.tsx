@@ -41,7 +41,7 @@ function LoiGiaiChuView({ cau, lg }: { cau: CauChoKhung; lg: LoiGiaiChu }) {
 
 const KIEU_SU_KIEN = new Set(['chon', 'goi_y', 'gan', 'tuong_tu', 'tra_loi_so', 'chot', 'mo_buoc', 'kiem'])
 
-export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; onDong: () => void }) {
+export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false, nguon = '', trongTrang = false, onDong }: { hoSo?: HoSoLoiGiai | null; cau: CauChoKhung; loiGiaiChu?: LoiGiaiChu; kiem?: KiemKhung; thay?: boolean; nguon?: string; trongTrang?: boolean; onDong: () => void }) {
   const khung = useRef<HTMLIFrameElement>(null)
   // GĐ1 v2: gom thao tác em làm trong khung (khung chỉ postMessage, không gọi mạng) — đóng hộp thì gửi một lần. Màn thầy không gửi.
   const suKien = useRef<SuKienKhung[]>([])
@@ -61,7 +61,7 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false
   const id = useId()
   useEffect(() => {
     const truoc = document.activeElement as HTMLElement | null
-    nutDong.current?.focus()
+    if (!trongTrang) nutDong.current?.focus()
     const nghe = (e: MessageEvent) => {
       if (!hoSo || e.source !== khung.current?.contentWindow) return
       const m = e.data as { loai?: string; kieu?: string; y?: unknown; dung?: unknown; muc?: unknown; buoc?: unknown; traLoi?: unknown } | null
@@ -94,11 +94,11 @@ export default function KhungLoiGiai({ hoSo, cau, loiGiaiChu, kiem, thay = false
     return () => {
       window.removeEventListener('message', nghe)
       window.removeEventListener('keydown', phim)
-      truoc?.focus?.()
+      if (!trongTrang) truoc?.focus?.()
     }
-  }, [hoSo, cau, thay, onDong, kiem, coThang])
+  }, [hoSo, cau, thay, onDong, kiem, coThang, trongTrang])
   return (
-    <div className="lg-nen m3" role="dialog" aria-modal="true" aria-labelledby={`${id}-t`}>
+    <div className={trongTrang ? "lg-trong-trang m3" : "lg-nen m3"} role={trongTrang ? "region" : "dialog"} aria-modal={trongTrang ? undefined : true} aria-labelledby={`${id}-t`}>
       <div className="lg-thanh">
         <h2 id={`${id}-t`} className="lg-tieu-de">{hoSo ? 'Lời giải từng bước' : 'Lời giải'} · {cau.so}</h2>
         <button ref={nutDong} type="button" className="lg-nut" onClick={onDong}>Đóng</button>

@@ -205,8 +205,8 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Mở ca 784817' }))
     expect(useAppStore.getState().maCaTheoDoi).toBe('784817')
     useAppStore.setState({ screen: 'toancanh' } as never)
-    fireEvent.click(screen.getByRole('button', { name: /Về Hôm nay/ }))
-    expect(useAppStore.getState().screen).toBe('examhub')
+    fireEvent.click(screen.getByRole('button', { name: /Về danh sách học sinh/ }))
+    expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 
   it('"Cho thi lại" CHỈ hiện khi biết ca (không đoán mã ca)', async () => {

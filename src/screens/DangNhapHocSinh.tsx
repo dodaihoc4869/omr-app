@@ -140,7 +140,7 @@ export default function DangNhapHocSinh({ api, onDangNhap, logo }: { api: ApiDan
   }
 
   return (
-    <div className="bl-login">
+    <div className="bl-login"><section className="gd-cong-gioi-thieu"><h1>Hành trình giỏi Hóa</h1><p>Học từng chặng ngắn. Ôn đúng lúc. Từng bài mở thêm tầng khi em sẵn sàng.</p></section>
       <div className="bl-login__card">
         <div className="bl-login__brand">{logo}</div>
         <LoiChao vai="hs" />

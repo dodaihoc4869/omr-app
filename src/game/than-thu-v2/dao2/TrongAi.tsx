@@ -218,7 +218,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
   const h=setTimeout(()=>setCho(false),giamChuyenDong()?450:1100);return()=>clearTimeout(h)},[cho])
  // Ngang: thanh kéo giữa hai cột (thầy 28/09) — tỉ lệ cột trái % lưu trên máy em.
   const datTi=(v:number)=>{const x=Math.min(TI_MAX,Math.max(TI_MIN,v));setTi(x);try{localStorage.setItem(KHOA_TI,String(Math.round(x)))}catch{/* máy chặn lưu: bỏ qua */}}
- const keoTi=(x:number)=>{const r=khung.current?.getBoundingClientRect();if(r&&r.width>0)datTi((x-r.left)/r.width*100)}
+ const keoTi=(x:number)=>{const r=khung.current?.getBoundingClientRect();if(r&&r.width>0)datTi(100-(x-r.left)/r.width*100)}
  const ngang=useNgang(),[zoom,setZoom]=useState(''),[hinhLoi,setHinhLoi]=useState(false),q=cau[viTri],hetTran=!!loi&&laLoiHetTran(loi,maLoi),loiRef=useRef<HTMLParagraphElement>(null)
  useEffect(()=>{setHinhLoi(false)},[viTri])
  useEffect(()=>{if(loi)loiRef.current?.scrollIntoView?.({block:'nearest'})},[loi])
@@ -229,7 +229,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
  const chuNutThieu=q.phan==='I'?'Chọn một phương án để tung chiêu':q.phan==='II'?'Chọn đủ 4 ý để tung chiêu':'Nhập đáp án để tung chiêu'
  // Dọc: một cột như cũ (hai lớp bọc `display:contents`). Ngang: cột TRÁI = thế giới game (thanh ải, cảnh trận, dải kết quả) · cột PHẢI = phần học
  // (đề + phương án tự cuộn trong cột, lời giải, nút chính ở đáy). Lúc đọc lời giải bố cục ngang GIỮ cảnh trận (đòn vừa đánh) ở cột trái.
- return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'} data-chuong={cho?'':undefined} ref={khung} onClickCapture={boQua} style={ngang?{gridTemplateColumns:`minmax(0,${ti}fr) 20px minmax(0,${100-ti}fr)`}:undefined}>
+ return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'} data-chuong={cho?'':undefined} ref={khung} onClickCapture={boQua} style={ngang?{gridTemplateColumns:`minmax(0,${100-ti}fr) 20px minmax(0,${ti}fr)`}:undefined}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   <div className="dao2-ai-trai">
    <div className="dao2-ai-dau">
@@ -244,14 +244,16 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
   </div>
   {ngang&&<div className="dao2-keo" role="separator" aria-orientation="vertical" aria-label="Kéo để đổi độ rộng hai cột" aria-valuemin={TI_MIN} aria-valuemax={TI_MAX} aria-valuenow={Math.round(ti)} tabIndex={0}
    onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId)}} onPointerMove={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))keoTi(e.clientX)}}
-   onKeyDown={e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();datTi(ti+(e.key==='ArrowLeft'?-5:5))}}}><i/></div>}
+   onKeyDown={e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();datTi(ti+(e.key==='ArrowLeft'?5:-5))}}}><i/></div>}
   <div className="dao2-ai-phai">
+  <div className="dao2-doc">
   {!phanHoi?<>
    {/* BẢN DUYỆT V2 (09/10): thẻ môn + số câu ngay trên đề (khối đọc từ mã đề; không đọc được ⇒ chỉ "Hoá học") */}
    <p className="dao2-v2-dau-cau"><span className="dao2-v2-mon">{monCau(q.maDe)}</span><span className="dao2-v2-so-cau">Câu {viTri+1}/{cau.length}</span></p>
    <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy||cho} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
   </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
+  </div>
   <div className="dao2-chan" data-noi={phanHoi||!thieu||loi?'':undefined}>
    {cho?<button type="button" className="dao2-nut-xanh" onClick={boQua}>XEM LỜI GIẢI</button>
    :hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>

@@ -56,7 +56,7 @@ export default function CaiDatScreen() {
   )
 
   return (
-    <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
+    <div className="gv-page gv-cai-dat-day-du min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ color: 'var(--muc)', gap: 'var(--k5)', fontFamily: 'var(--sans)' }}>
       <div className="gv-page-header">
         <div>
           <h1>Cài đặt</h1>

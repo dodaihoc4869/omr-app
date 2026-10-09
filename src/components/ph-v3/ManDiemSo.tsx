@@ -1,3 +1,4 @@
+import { useState } from 'react'
 // Mục "Ca kiểm tra" — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (trước là "Lịch sử" ở thanh mục và "Điểm số" ở tiêu đề màn: MỘT khái niệm MỘT tên).
 // Thẻ trên: ca gần nhất (điểm + ba phần + lời thầy của ca ấy nếu có, nút xem bài làm); dưới: "Các ca trước" (mới trước, mỗi ca mở màn chi tiết).
 // Đường điểm các ca chuyển sang Tiến bộ (`BieuDo` vẫn ở tệp này, Tiến bộ dùng lại). Chỉ ca ĐÃ công bố có điểm; ca chưa công bố hiện câu "chờ công bố".
@@ -72,10 +73,11 @@ export function BieuDo({ ds }: { ds: DiemTienBo[] }) {
 }
 
 export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanXetCa[] | null }) {
+  const [loc, setLoc] = useState<'tat-ca' | 'cong-bo' | 'cho'>('tat-ca')
   const pm = v.pm
   if (!pm) return (
     <div>
-      <div className="ph3-tieu-de"><h1>Ca kiểm tra</h1></div>
+      <div className="ph3-tieu-de"><h1>Lịch sử</h1></div>
       {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />}
     </div>
   )
@@ -85,10 +87,10 @@ export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanX
   const truoc = [...ds].reverse().filter((d) => d.maCa !== ca?.maCa)
   return (
     <div data-vung="man-ca-kiem-tra">
-      <div className="ph3-tieu-de"><h1>Ca kiểm tra</h1></div>
-      <div className="ph3-luoi">
-        {ca && <CaMoiNhat ca={ca} loi={nhanXet.get(ca.maCa)?.noiDung ?? ''} />}
-        {truoc.length > 0 && (
+      <div className="ph3-tieu-de"><h1>Lịch sử</h1></div>
+      <nav className="ph3-loc-lich-su" aria-label="Lọc lịch sử">{[['tat-ca','Tất cả'],['cong-bo','Đã công bố'],['cho','Chờ công bố']].map(([k,chu]) => <button type="button" key={k} className="ph3-nut-vien" aria-pressed={loc === k} onClick={() => setLoc(k as typeof loc)}>{chu}</button>)}</nav><div className="ph3-luoi">
+        {ca && (loc === 'tat-ca' || (loc === 'cong-bo') === !!ca.ketQua) && <CaMoiNhat ca={ca} loi={nhanXet.get(ca.maCa)?.noiDung ?? ''} />}
+        {loc !== 'cho' && truoc.length > 0 && (
           <section className="ph3-the ph3-the--sat ph3-o-hep" aria-labelledby="ph3-ds-ca" data-vung="ds-ca">
             <div className="ph3-the__dau"><div><h2 id="ph3-ds-ca">{ca ? 'Các ca trước' : 'Các ca kiểm tra'}</h2></div><span className="ph3-ghi" style={{ fontSize: 13 }}>Điểm trên thang 10</span></div>
             <ul className="ph3-ds-ca">

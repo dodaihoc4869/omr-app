@@ -69,7 +69,7 @@ export default function KhoaMayThayScreen({ onMoDuoc }: { onMoDuoc: () => void }
 
   return (
     <div
-      className="flex flex-col items-center justify-center"
+      className="gd-cong-thay flex flex-col items-center justify-center"
       style={{ minHeight: '100dvh', padding: 'var(--k5, 24px)', background: 'var(--nen)', gap: 'var(--k4, 16px)' }}
       data-man="khoa-may-thay"
     >

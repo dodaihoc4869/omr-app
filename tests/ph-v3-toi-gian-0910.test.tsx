@@ -71,15 +71,15 @@ describe('Hôm nay — bốn khối theo bản vẽ (thay thứ tự 01/10)', ()
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
     await waitFor(() => expect(container.querySelector('[data-vung="canh-bao-thay"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['canh-bao-thay', 'anh-hung', 'tuan-nay', 'dang-luyen-them', 'loi-thay-moi'])
+    expect(khoi(container)).toEqual(['canh-bao-thay', 'anh-hung', 'gia-dinh', 'tuan-nay', 'dang-luyen-them', 'loi-thay-moi'])
     fireEvent.click(screen.getByRole('button', { name: 'Đã xem cảnh báo' }))
-    expect(khoi(container)).toEqual(['anh-hung', 'tuan-nay', 'dang-luyen-them', 'loi-thay-moi'])
+    expect(khoi(container)).toEqual(['anh-hung', 'gia-dinh', 'tuan-nay', 'dang-luyen-them', 'loi-thay-moi'])
   })
 
   it('không cảnh báo ⇒ không khối cảnh báo nào (không khung rỗng)', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['anh-hung', 'tuan-nay', 'dang-luyen-them', 'loi-thay-moi'])
+    expect(khoi(container)).toEqual(['anh-hung', 'gia-dinh', 'tuan-nay', 'dang-luyen-them', 'loi-thay-moi'])
     expect(container.textContent).not.toContain('Cảnh báo của thầy')
   })
 
@@ -119,7 +119,7 @@ describe('Hôm nay — bốn khối theo bản vẽ (thay thứ tự 01/10)', ()
     await waitFor(() => expect(container.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
     await waitFor(() => expect(goi).toContain('/ph/loi-thay'))
     expect(container.querySelector('[data-vung="anh-hung"] h2')!.textContent).toBe('Hôm nay con chưa làm câu nào')
-    expect(khoi(container)).toEqual(['anh-hung'])
+    expect(khoi(container)).toEqual(['anh-hung', 'gia-dinh'])
   })
 
   it('tuần này: Thứ Năm, học T2 · T4 · T5 ⇒ "3/7 ngày"; T6 · T7 · CN là "chưa tới" (nét đứt), không tính vào số; ngày tuần trước không tính', async () => {
@@ -153,7 +153,7 @@ describe('ba mục · một nút chính mỗi màn · thẻ bo 24 px', () => {
   it('thanh mục: đúng 3 liên kết; mỗi màn tối đa MỘT nút chính (Hôm nay 0 · Tiến bộ 0 · Ca kiểm tra 1); tiêu đề màn = tên mục', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
-    expect([...container.querySelectorAll('nav[aria-label="Các mục chính"] a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Ca kiểm tra'])
+    expect([...container.querySelectorAll('nav[aria-label="Các mục chính"] a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Tiến bộ', 'Lịch sử', 'Lời thầy'])
     const nutChinh = () => container.querySelectorAll('main .ph3-nut-tong').length
     expect(nutChinh()).toBe(0)
     await diToi('#tien-bo')
@@ -162,7 +162,7 @@ describe('ba mục · một nút chính mỗi màn · thẻ bo 24 px', () => {
     expect(nutChinh()).toBe(0)
     await diToi('#ca-kiem-tra')
     await waitFor(() => expect(container.querySelector('[data-vung="man-ca-kiem-tra"]')).toBeTruthy())
-    expect(container.querySelector('main h1')!.textContent).toBe('Ca kiểm tra')
+    expect(container.querySelector('main h1')!.textContent).toBe('Lịch sử')
     expect(nutChinh()).toBe(1)
   })
 
@@ -173,7 +173,7 @@ describe('ba mục · một nút chính mỗi màn · thẻ bo 24 px', () => {
     expect(css).toMatch(/\.ph3-ah \{[^}]*border-radius: 24px/)
     const moi = css.slice(css.indexOf('/* bản vẽ tối giản 09/10: số bên phải'), css.indexOf('.ph3-thanh {'))
     for (const m of moi.matchAll(/(?:color|background|border(?:-color)?):\s*([^;]+);/g)) expect(m[1], m[0]).toMatch(/^(var\(--ph3-[\w-]+\)|transparent|1\.5px solid var\(--ph3-[\w-]+\)|1px solid var\(--ph3-[\w-]+\))$/)
-    expect(fs.existsSync(path.join(process.cwd(), 'src/components/ph-v3/ManLoiThay.tsx'))).toBe(false)
+    expect(fs.existsSync(path.join(process.cwd(), 'src/components/ph-v3/ManLoiThay.tsx'))).toBe(true)
   })
 })
 

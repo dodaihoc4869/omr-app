@@ -1,9 +1,10 @@
-// Tiện ích thuần của app phụ huynh mới: tuyến điều hướng theo `#…` và chữ ngày/phần dùng chung giữa các màn.
+// Bộ bản vẽ đầy đủ đã duyệt 09/10: Hôm nay, Tiến bộ, Lịch sử và Lời thầy.
+// Nguồn đọc và quyền công bố được giữ; khối vắng dữ liệu không dựng số minh họa.
 import type { DiemTienBo, PhMoi } from '../../lib/ph-moi/du-lieu'
 import { tachVn, thuTuChuoiNgay } from '../../lib/ph-moi/dinh-dang'
 
 // Bản vẽ tối giản thầy chốt 09/10: BA mục Hôm nay · Tiến bộ · Ca kiểm tra (bỏ mục "Lời thầy"; "Lịch sử"/"Điểm số" đổi thành "Ca kiểm tra").
-export type Muc = 'hom-nay' | 'tien-bo' | 'ca-kiem-tra'
+export type Muc = 'hom-nay' | 'tien-bo' | 'ca-kiem-tra' | 'loi-thay' | 'thong-tin'
 export type Tuyen = { muc: Muc; maCa: string | null }
 
 /** `#ca/<mã>` ⇒ màn chi tiết ca (thuộc mục Ca kiểm tra); hash lạ ⇒ Hôm nay. Liên kết cũ còn lưu: `#diem` ⇒ Ca kiểm tra, `#loi-thay` ⇒ Hôm nay (lời thầy nay ở cuối Hôm nay). */
@@ -19,6 +20,9 @@ export function docTuyen(hash: string): Tuyen {
     if (ma) return { muc: 'ca-kiem-tra', maCa: ma }
   }
   if (h === 'ca-kiem-tra' || h === 'diem') return { muc: 'ca-kiem-tra', maCa: null }
+  if (h === 'thong-tin') return { muc: 'thong-tin', maCa: null }
+  if (h === 'loi-thay') return { muc: 'loi-thay', maCa: null }
+  if (h === 'lich-su') return { muc: 'ca-kiem-tra', maCa: null }
   if (h === 'tien-bo') return { muc: 'tien-bo', maCa: null }
   return { muc: 'hom-nay', maCa: null }
 }

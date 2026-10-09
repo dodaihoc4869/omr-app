@@ -161,7 +161,7 @@ export default function KhoaAppScreen({ pha, banGhi, onMoDuoc }: KhoaAppScreenPr
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
+    <div className="gd-cong-thay min-h-screen flex items-center justify-center px-4 py-8" style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       <div className="w-full" style={{ maxWidth: 400 }}>
         <TheNoiDung>
           <div style={{ marginBottom: 'var(--k5)' }}>

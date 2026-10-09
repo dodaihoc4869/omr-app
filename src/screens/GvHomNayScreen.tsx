@@ -287,6 +287,7 @@ export default function GvHomNayScreen() {
             </>
           )}
         </p>
+        <button type="button" className="gvv2-nut-chinh" onClick={() => moHanhTrinh({ the: 'bai-da-day', boSungBai: true })}>Bổ sung bài hôm nay</button>
       </header>
 
       {!du ? (
@@ -354,7 +355,7 @@ export default function GvHomNayScreen() {
                 <p className="gvv2-trong">{loi ? 'Chưa đủ số liệu để xếp việc — bấm Thử lại ở trên.' : 'Không có việc cần thầy lúc này. Màn tự đọc lại số mỗi lần thầy mở.'}</p>
               ) : (
                 <ul className="gvhn-viec-ds">
-                  {viec.map((v, i) => {
+                  {viec.map((v) => {
                     const Icon = v.icon
                     return (
                       <li key={v.key} className="gvhn-viec-dong">
@@ -366,7 +367,7 @@ export default function GvHomNayScreen() {
                           {v.phu && <span>{v.phu}</span>}
                         </span>
                         {/* Một nút chính trên màn (luật C2): việc gấp nhất; các việc sau là nút viền. */}
-                        <button type="button" className={i === 0 ? 'gvv2-nut-chinh' : 'gvv2-nut-vien'} onClick={v.lam} aria-label={`${v.nut}: ${v.tieuDe}`}>
+                        <button type="button" className="gvv2-nut-vien" onClick={v.lam} aria-label={`${v.nut}: ${v.tieuDe}`}>
                           {v.nut}
                         </button>
                       </li>
@@ -394,6 +395,7 @@ export default function GvHomNayScreen() {
                       <span className="gvv2-thanh" data-du="true" role="progressbar" aria-label={`Khối ${n.khoi ?? '—'}: em đủ mức tối thiểu hôm nay`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={ti}>
                         <i style={{ width: `${ti}%` }} />
                       </span>
+                      <button type="button" className="gvv2-nut-vien" onClick={() => moHanhTrinh({ the: 'nhip', chienDichId: n.cd.id })}>Xem Hành trình khối {n.khoi ?? '—'}</button>
                     </div>
                   )
                 })}

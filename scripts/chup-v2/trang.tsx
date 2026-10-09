@@ -1,3 +1,11 @@
+import GvHomNayScreen from '../../src/screens/GvHomNayScreen'
+import NganHangDeScreen from '../../src/screens/NganHangDeScreen'
+import CaiDatScreen from '../../src/screens/CaiDatScreen'
+import HocSinhScreen from '../../src/screens/HocSinhScreen'
+import ExamSetupScreen from '../../src/screens/ExamSetupScreen'
+import BanGoNutThatScreen from '../../src/screens/BanGoNutThatScreen'
+import DuyetLoiGiaiScreen from '../../src/screens/DuyetLoiGiaiScreen'
+import '../../src/styles/giao-dien-day-du.css'
 // TRANG CHỤP ẢNH BẢN DUYỆT V2 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật (tên em trong ảnh là tên giả).
 // `?man=` sanh | sanh-xong | sanh-chon-thu | sanh-dang-tai | than-thu | cua-hang | dao | doan | gv-nhip | gv-bo-sung | gv-can-chua | gv-ca | gv-ma-tran
@@ -126,8 +134,9 @@ const OMNI_D = { bat: true, baiDangLuyen: [], dangVung: { a: 0, b: 0 }, conDangD
 const callDoan = async (lenh: string): Promise<unknown> =>
   lenh === 'hoa2-sanh' ? { ok: true, cheDo2: true, doan: { con: 4 }, dao: { con: 16 }, omni: OMNI_D } : lenh === 'doan-xem' ? { ok: true, doan: xemD() } : { ok: true }
 
-const MAN_THAY: Record<string, string> = { 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
+const MAN_THAY: Record<string, string> = { 'gv-hom-nay':'tongquan', 'gv-kho':'nganhangde', 'gv-cai-dat':'caidat', 'gv-hoc-sinh':'hocsinh', 'gv-mo-ca':'tao-ca', 'gv-go-nut':'cauhoi', 'gv-duyet':'duyetloigiai', 'gv-nhip': 'chiendich', 'gv-ma-tran': 'tao-ca' }
 const con =
+  man === 'gv-hom-nay' ? h(GvHomNayScreen) : man === 'gv-kho' ? h(NganHangDeScreen) : man === 'gv-cai-dat' ? h(CaiDatScreen) : man === 'gv-hoc-sinh' ? h(HocSinhScreen) : man === 'gv-mo-ca' ? h(ExamSetupScreen) : man === 'gv-go-nut' ? h(BanGoNutThatScreen) : man === 'gv-duyet' ? h(DuyetLoiGiaiScreen) :
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'de-thu' ? h('div', {className:'dao dao2'}, h(DeThu, {sbd:'GIA',call:callDao,onVe:noop}))
   : man === 'than-thu' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ThanThuV2, { profile: hoSo, token: 'tk', onCuaHang: noop, onTuiDo: noop, onDongHanh: noop }))

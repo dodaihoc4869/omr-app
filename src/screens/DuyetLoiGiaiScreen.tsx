@@ -78,7 +78,7 @@ export default function DuyetLoiGiaiScreen() {
   }
 
   return (
-    <div className="gv2-trang">
+    <div className="gv2-trang gv-duyet-day-du">
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
           <h1 className="gv2-tieu-de">Duyệt lời giải</h1>
@@ -191,7 +191,7 @@ export default function DuyetLoiGiaiScreen() {
       )}
 
       {!kq && !dangTai && <p className="gv2-nhat">Nhập mã đề để duyệt.</p>}
-      {xem && <KhungLoiGiai hoSo={xem.hoSo} cau={xem.cau} thay onDong={() => setXem(null)} />}
+      {xem && <section className="gv-duyet-khung" aria-label="Đề và lời giải đang duyệt"><article className="gv2-the"><h2 className="gv2-the-tieu-de">Câu đang xem · {xem.cau.so}</h2><div className="lg-chu-de" dangerouslySetInnerHTML={{ __html: xem.cau.de }} />{Object.entries(xem.cau.y).map(([id, chu]) => <p key={id}><b>{id}.</b> <span dangerouslySetInnerHTML={{ __html: chu }} /></p>)}</article><KhungLoiGiai key={xem.cau.qid} hoSo={xem.hoSo} cau={xem.cau} thay trongTrang onDong={() => setXem(null)} /></section>}
     </div>
   )
 }

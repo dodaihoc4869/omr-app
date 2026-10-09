@@ -1,0 +1,112 @@
+/* Bộ giao diện 38 trạng thái: bố cục đọc và thao tác riêng cho từng app.
+   Không thay bảng màu hoặc quyền của bất kỳ màn nào. */
+.gv-duyet-khung { display:grid; gap:20px; min-width:0; }
+.lg-trong-trang { display:flex; flex-direction:column; border-radius:24px; overflow:hidden; min-width:0; background:var(--m3-surface); border:1px solid var(--m3-outline-variant); }
+.lg-trong-trang .lg-thanh { position:static; }
+.lg-trong-trang .lg-khung { width:100%; min-height:600px; flex:1; border:0; }
+.gv-go-workspace { display:grid; gap:20px; min-width:0; }
+.gv-go-nhom { display:flex; gap:10px; overflow-x:auto; align-self:start; }
+.gv-go-nhom button { min-width:150px; min-height:76px; padding:16px; display:grid; gap:6px; text-align:left; border:1px solid var(--gvm-vien); border-radius:20px; background:var(--gvm-mat); color:var(--gvm-chu); }
+.gv-go-nhom button[aria-pressed=true] { border:2px solid var(--gvm-xl); background:var(--gvm-xl-nen); }
+.gv-go-day-du li[hidden] { display:none; }
+.gv-kho-bo-loc { display:grid; gap:12px; padding:20px; border-radius:24px; background:var(--the); border:1px solid var(--vien); }
+.gv-kho-bo-loc input,.gv-kho-bo-loc select { min-height:48px; border:1px solid var(--vien); border-radius:12px; padding:10px; background:var(--the); color:var(--muc); min-width:0; }
+.gv-kho-bo-loc label { display:grid; gap:8px; font-weight:600; }
+[data-teacher-screen] .gv-page-header h1 { font-size:clamp(26px,3vw,36px); line-height:1.25; }
+[data-teacher-screen] .gv-directory { border-radius:24px; }
+[data-teacher-screen] .gv-page { max-width:1600px; margin-inline:auto; }
+.gv-cai-dat-day-du > section { min-width:0; }
+.ct-etapes { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+.ct-etapes button { padding:10px 18px; min-height:48px; border-radius:16px; border:1px solid var(--gvm-vien); background:var(--gvm-mat); color:var(--gvm-chu); font-weight:700; }
+.ct-etapes button[aria-pressed=true] { background:var(--gvm-xl-nen); color:var(--gvm-xl-dam); border-color:var(--gvm-xl); }
+.ct-moca .ct-buoc[hidden] { display:none; }
+.ct-suite { display:flex; justify-content:space-between; gap:12px; padding:16px 0; }
+.ct-suite button { min-height:48px; }
+.v2t.v2 { padding:24px 16px 100px; max-width:1440px; margin-inline:auto; }
+.v2t .v2t-chinh { gap:24px; }
+.v2t .v2t-thong-tin { padding:24px; border-radius:28px; }
+.ps.ps-v2 .ps-man { max-width:1440px; margin-inline:auto; padding-bottom:calc(24px + env(safe-area-inset-bottom)); }
+.ps.ps-v2 button { touch-action:manipulation; }
+.h2-cdl .h2-cdl-dau { gap:16px; padding:20px 16px; }
+.h2-cdl .h2-cdl-tieu { font-size:clamp(24px,3vw,34px); }
+.h2-cdl .h2-cdl-ds { display:grid; gap:16px; }
+.h2-cdl .h2-the { border-radius:24px; }
+.h2-cdl .h2-the-de { line-height:1.7; }
+.dao2 .dao2-xong { max-width:1200px; margin-inline:auto; padding:24px; gap:24px; }
+.dao2 .dao2-xong-canh { max-height:360px; }
+.dh2 .dh2-thang { gap:24px; }
+.dh2 .dh2-thang .dh2-qua { gap:12px; }
+.dh2 .dh2-thang .dh2-cot-phai { gap:16px; }
+.bl-login .bl-login__card { border-radius:28px; padding:28px; }
+.ph3-vao .ph3-vao__the { border-radius:28px; padding:28px; }
+.gd-cong-gioi-thieu { display:grid; gap:16px; max-width:480px; }
+.gd-cong-gioi-thieu h1 { font-size:clamp(30px,4vw,48px); line-height:1.2; font-weight:800; margin:0; }
+.gd-cong-gioi-thieu p { font-size:17px; line-height:1.7; margin:0; }
+.bl-login .gd-cong-gioi-thieu { color:var(--muc); }
+.ph3 .gd-cong-gioi-thieu { color:var(--ph3-chu); }
+@media (min-width:900px) {
+ .gv-duyet-khung { grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); }
+ .gv-go-workspace { grid-template-columns:280px minmax(0,1fr); }
+ .gv-go-nhom { flex-direction:column; max-height:70dvh; overflow-y:auto; position:sticky; top:16px; }
+ .gv-go-workspace .lg-ds { max-height:none; }
+ .gv-kho-bo-loc { grid-template-columns:180px minmax(0,1fr); }
+ .gv-cai-dat-day-du { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+ .gv-cai-dat-day-du > .gv-page-header,.gv-cai-dat-day-du > section { grid-column:1 / -1; }
+ .v2t .v2t-chinh { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+ .h2-cdl { max-width:1440px; margin-inline:auto; padding-inline:28px; }
+ .h2-cdl .h2-cdl-ds { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+ .h2-cdl .h2-lsc-diem { font-size:44px; }
+ .bl-login { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,480px); align-items:center; gap:64px; padding:64px; }
+ .bl-login .bl-login__card { width:100%; max-width:480px; }
+ .ph3 .ph3-vao { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,480px); gap:64px; padding:64px; align-items:center; max-width:1440px; margin-inline:auto; }
+}
+@media (max-width:899px) {
+ .gd-cong-gioi-thieu { padding:24px; }
+ .gd-cong-gioi-thieu h1 { font-size:28px; }
+ .bl-login:has(.gd-cong-gioi-thieu) { gap:12px; }
+}
+@media (orientation:landscape) and (max-height:540px) {
+ .gd-cong-gioi-thieu { display:none; }
+ .bl-login .bl-login__card,.ph3-vao .ph3-vao__the { margin:16px auto; }
+ .v2t .v2t-chinh { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+ .dao2 .dao2-xong-canh { max-height:240px; }
+}
+.hs-thao-tac summary { cursor:pointer; min-height:48px; display:flex; align-items:center; gap:8px; font-weight:600; }
+.ps.ps-v2 .ps-loc button,.ps.ps-v2 .ps-tab,.ps.ps-v2 .ps-chip { min-height:48px; }
+@media (min-width:1000px) {
+ [data-teacher-screen] .gv-hoc-sinh-day-du .gv-student-list { grid-template-columns:1fr; }
+ [data-teacher-screen] .gv-hoc-sinh-day-du .gv-student-list > [data-sbd] { display:grid; grid-template-columns:minmax(0,1fr) minmax(160px,auto) 220px; gap:16px; align-items:center; }
+ [data-teacher-screen] .dh-trang[data-khoi='day-hoc-len-bang'] { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:24px; align-items:start; }
+ [data-teacher-screen] .dh-trang[data-khoi='day-hoc-len-bang'] > .dh-dau { grid-column:1 / -1; }
+ [data-teacher-screen] .dh-trang .dh-buoc { min-width:0; }
+ [data-teacher-screen] .dh-trang .dh-buoc--chieu { grid-column:1 / -1; }
+}
+.gv-kho-cay { padding:20px; border:1px solid var(--vien); border-radius:24px; background:var(--the); min-width:0; }
+.gv-kho-cay details { margin-top:8px; }
+.gv-kho-cay summary { min-height:48px; padding:10px; cursor:pointer; font-weight:700; }
+.gv-kho-cay details > div { padding-left:16px; }
+.gv-kho-cay small { color:var(--nhat); font-size:12px; margin-left:8px; }
+.gv-kho-cay button { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; min-height:48px; padding:10px; text-align:left; border:0; border-radius:12px; color:var(--muc); background:transparent; }
+.gv-kho-cay button[aria-pressed=true] { background:var(--the-2); font-weight:700; }
+.lg-hop-nen .lg-hop-nen-than { border-radius:28px; width:min(100% - 32px,960px); }
+.lg-hop-nen .lg-nen-cau { padding:20px; line-height:1.7; }
+.lg-hop-nen .lg-nen-pa button { min-height:52px; border-radius:16px; }
+.tlu[data-chang='chon'] .tlu-luoi-che-do,.tlu[data-chang='chon'] .tlu-luoi-the-nhom { gap:16px; }
+.tlu[data-chang='chon'] .tlu-the-che-do { border-radius:24px; min-height:128px; }
+.tlu[data-chang='chon'] .tlu-the-che-do[data-che-do='1'],.tlu[data-chang='chon'] .tlu-the-che-do[data-che-do='3'] { border-width:2px; }
+.gd-cong-thay > div { border-radius:28px; padding:24px; background:var(--the); }
+@media (min-width:1024px) {
+ .gv-kho-day-du .gv-bank-grid { display:grid; grid-template-columns:280px minmax(0,1fr); align-items:start; }
+ .gv-kho-day-du .gv-bank-grid > .gv-kho-cay { grid-column:1; grid-row:1; position:sticky; top:16px; max-height:80dvh; overflow:auto; }
+ .gv-kho-day-du .gv-bank-grid > .gv-kho-con { grid-column:2; }
+ .gd-cong-thay { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,440px); gap:48px !important; padding:64px !important; max-width:1440px; margin:auto; }
+}
+
+.gv-kho-con { min-width:0; display:grid; gap:16px; }
+.hs-hoc-tap { border:1px solid var(--vien); border-radius:24px; background:var(--the); }
+.hs-hoc-tap > summary { min-height:64px; padding:20px; font-size:18px; font-weight:700; cursor:pointer; }
+.hs-hoc-tap .tc { padding:16px !important; min-height:0; }
+[data-teacher-screen] .ca-bang-dau { position:sticky; top:0; z-index:2; }
+[data-teacher-screen] .ls-trang .ls-the { border-radius:24px; }
+html:root body .ps.ps-v2 .ps-loc .tl-the { min-height:48px; }
+html:root body .ct .ct-etapes button,html:root body .ct .ct-suite button { min-height:48px; }

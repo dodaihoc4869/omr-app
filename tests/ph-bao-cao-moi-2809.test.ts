@@ -138,6 +138,17 @@ describe('/ph/hoc-2 — Game Hoá 2.0 của con', () => {
     const k0 = kh.dao[0] ?? kh.doan[0]
     await ghiSuKien(env, [suKien(k0!.replace(/#\d+$/, ''), T0 + 60_000, true)])
     const r = await phHoc2(env, { sbd: 'S1' }, T0 + 120_000)
+    expect(r.serverNow).toBe(T0 + 120_000)
+    expect(r.hanhTrinh).toBeUndefined() // chưa có tầng chốt: không suy ra từ tổng câu
+    d.sql.exec('CREATE TABLE IF NOT EXISTS hanh_trinh_v3_ngay(sbd TEXT,ngay TEXT,tang INTEGER,toi_thieu INTEGER)')
+    d.sql.prepare('INSERT INTO hanh_trinh_v3_ngay VALUES(?,?,?,?)').run('S1','2026-09-30',2,30)
+    d.sql.prepare('INSERT INTO hanh_trinh_v3_ngay VALUES(?,?,?,?)').run('S2','2026-09-30',4,36)
+    expect((await phHoc2(env, {sbd:'S1'}, T0 + 120_000)).hanhTrinh).toBeUndefined() // snapshot cũ không đổi chiến dịch thường thành Hành trình
+    d.sql.prepare('UPDATE srs2_ke_hoach SET chien_dich_id=? WHERE sbd=?').run('hanh-trinh-v3-khoi-12','S1')
+    const truoc = d.sql.prepare('SELECT * FROM srs2_ke_hoach').all()
+    const snapshot = await phHoc2(env, { sbd:'S1' }, T0 + 120_000)
+    expect(snapshot.hanhTrinh).toEqual({tang:2,toiThieu:30})
+    expect(d.sql.prepare('SELECT * FROM srs2_ke_hoach').all()).toEqual(truoc)
     expect(r.homNay).toEqual({ tong: kh.tong, daLam: 1 })
     expect((r.chienDich as { daGap: number }).daGap).toBeGreaterThanOrEqual(1)
     expect(r.cauTungSai).toMatchObject({ tong: 1 })

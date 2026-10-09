@@ -81,6 +81,7 @@ describe('màn Bàn gỡ nút thắt', () => {
     api.gvGoNutThat.mockResolvedValue({ ok: true, soThe: 1, tenBuoi: 'Buổi tối thứ Ba', emCanGoi: [{ sbd: 'E3', hoTen: 'Lê Chi' }] })
     render(<BanGoNutThatScreen />)
     const the = await screen.findAllByTestId('the-nut-that')
+    fireEvent.click(screen.getByRole('button', { name: /Câu 3.*Bước 2/ }))
     fireEvent.click(within(the[1]!).getByRole('button', { name: 'Dạy trên lớp' }))
     const chon = await within(the[1]!).findByLabelText('Buổi học sẽ dạy')
     fireEvent.change(chon, { target: { value: 'B1' } })

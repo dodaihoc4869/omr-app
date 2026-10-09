@@ -126,8 +126,9 @@ describe('Hôm nay V2 · màn thật', () => {
     expect(screen.queryByText(/Thử thách/)).toBeNull()
     expect(screen.queryByText(/phút/)).toBeNull()
     const nav = screen.getByRole('navigation', { name: 'Điều hướng chính' })
-    expect([...nav.querySelectorAll('button')].map((b) => b.textContent)).toEqual(['Hôm nay', 'Hành trình', 'Thần thú', 'Câu đã làm'])
-    fireEvent.click(screen.getByRole('button', { name: 'Thần thú' }))
+    expect([...nav.querySelectorAll('button')].map((b) => b.textContent)).toEqual(['Hôm nay', 'Hành trình', 'Ôn lại', 'Của em'])
+    fireEvent.click(screen.getByRole('button', { name: 'Của em' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thần thú của em' }))
     expect(p.onMoThanThu).toHaveBeenCalledTimes(1)
   })
   it('đã chuyển khỏi Hôm nay: Túi đồ, Cửa hàng, Đăng xuất, Ca gần nhất, Tu luyện, Bi-a, Đang mạnh lên; Thần thú chỉ MỘT lối vào', () => {
@@ -135,7 +136,7 @@ describe('Hôm nay V2 · màn thật', () => {
     for (const ten of [/Túi đồ/, /Cửa hàng/, /Đăng xuất/, /Ca kiểm tra gần nhất/, /Tu luyện/, /Bi-a/, /Vé thử thách/, /Đề thử/]) expect(screen.queryByRole('button', { name: ten })).toBeNull()
     expect(screen.queryByText('Đang mạnh lên')).toBeNull()
     // lối vào Thần thú duy nhất là mục "Thần thú" của thanh dưới (ảnh đại diện + ảnh lớn không còn là nút)
-    expect(screen.queryAllByRole('button', { name: /Linh Hồ|thần thú/i }).map((b) => !!b.closest('nav'))).toEqual([true])
+    expect(screen.queryAllByRole('button', { name: /Linh Hồ|thần thú/i }).map((b) => !!b.closest('nav'))).toEqual([false])
     expect(p.container.querySelectorAll('.v2-nut-chinh').length).toBe(1)
   })
   it('hết lỗi cũ, Đảo không khoá ⇒ nút vàng mở Đảo; còn lỗi cũ mà Đảo không khoá ⇒ thêm nút phụ vào Đảo', () => {
@@ -185,6 +186,15 @@ describe('Hôm nay V2 · màn thật', () => {
 })
 
 describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
+  it('cửa Bát Linh Đảo trong mục trò chơi giữ đúng khóa do máy chủ trả', () => {
+    const p = ve({ khoaDao:true })
+    fireEvent.click(screen.getByRole('button', {name:'Hành trình',exact:true}))
+    const nut = p.container.querySelector('[data-khoi="dao"]') as HTMLButtonElement
+    expect(nut.disabled).toBe(true)
+    fireEvent.click(nut)
+    expect(p.onKhamPhaDao).not.toHaveBeenCalled()
+  })
+
   it('có hanhTrinh.bai ⇒ mỗi bài 4 ô Vững/Đang luyện/Khoá + "Dạng vững a/b"', () => {
     ve({ hanhTrinh: { ...SANH.hanhTrinh, bai: BAI } })
     fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
@@ -227,7 +237,8 @@ describe('Hành trình V2 · tầng từng bài + Luyện thêm', () => {
     expect(tl.textContent).toContain('Chỉ dành cho học sinh Nỗ lực')
     fireEvent.click(tl)
     expect(p.onTuLuyen).toHaveBeenCalledTimes(1)
-    fireEvent.click(within(lt).getByRole('button', { name: /Bi-a Phản Ứng · còn 4\/6 câu/ }))
+    expect(screen.getAllByRole('button', {name:/Bi-a Phản Ứng · còn 4\/6 câu/})).toHaveLength(1)
+    fireEvent.click(screen.getByRole('button', { name: /Bi-a Phản Ứng · còn 4\/6 câu/ }))
     expect(p.onChoiBia).toHaveBeenCalledTimes(1)
   })
   it('kiểm đầu / kiểm tuần Hành trình (main #217): nút phụ ở Hôm nay (vẫn MỘT nút vàng) + ô Luyện thêm thay Đề thử; bấm ⇒ Đảo việc de-thu', () => {

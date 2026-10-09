@@ -144,3 +144,16 @@ html:root body .vo-thay .gvv2-tab-nut,
 html:root body .vo-thay .gvv2-nut-chinh,
 html:root body .vo-thay .gvv2-nut-vien { min-height: 48px; }
 html:root body .vo-thay .ben-trai-logo--gv2 { min-width: 48px; min-height: 48px; }
+
+/* Ba Hành trình: thẻ chọn khối độc lập và nhịp chi tiết bên dưới. */
+.gvv2 .gvv2-khoi { order:3; width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); padding:0; gap:16px; border:0; background:transparent; box-shadow:none; }
+.gvv2 .gvv2-khoi-nut { min-height:124px; padding:22px; border-radius:24px; border:1px solid var(--gvm-vien); background:var(--gvm-mat); justify-content:flex-start; gap:16px; }
+.gvv2 .gvv2-khoi-nut[aria-checked='true'] { border:2px solid var(--gvm-xl); background:var(--gvm-xl-nen); }
+.gvv2 .gvv2-khoi-nut b { font-size:24px; }
+.gvv2 .gvv2-khoi-nut small { font-size:14px; margin-top:8px; }
+.gvv2 .gvv2-tab { margin-top:8px; }
+@media (max-width:599px) {
+ .gvv2 .gvv2-khoi { grid-template-columns:1fr; gap:10px; }
+ .gvv2 .gvv2-khoi-nut { min-height:84px; padding:16px; }
+ .gvv2 .gvv2-khoi-nut > span { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+}

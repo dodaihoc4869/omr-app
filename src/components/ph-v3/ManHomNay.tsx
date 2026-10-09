@@ -1,11 +1,5 @@
-// Mục "Hôm nay" — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (thay thứ tự thẻ 01/10): Cảnh báo của thầy (CHỈ khi có cảnh báo thật, đứng đầu) → BỐN khối:
-//   (a) khối chính: con đã làm a/b câu hôm nay + thanh + một câu tình trạng (+ giờ học quen nếu có);
-//   (b) Tuần này học đều n/7 ngày (khi máy chủ có ngày học);
-//   (c) Dạng con đang luyện thêm (chỉ tên dạng, ngắn) + Cần thầy chữa (nếu có) + điểm ca kiểm tra gần nhất;
-//   (d) Lời thầy mới nhất (tác giả "Thầy Đỗ Đại Học"; mục "Lời thầy" riêng đã bỏ).
-// Đã bỏ theo bản vẽ: số câu nói ba lần từ hai nguồn (giữ MỘT nguồn), phút học lặp, "câu cần thầy dạy lại" cạnh "Cần thầy chữa", thẻ "Hành trình của con"
-// chỉ có chữ, thẻ chiến dịch, Bài tập về nhà / Bài gia đình giao (thầy chốt bỏ hẳn), điều đáng mừng, "Thầy đã lo cho con", "Con học lúc nào", danh sách dạng
-// (MỘT danh sách dạng, ở Tiến bộ). Mỗi khối chỉ hiện khi có SỐ THẬT; không có gì ⇒ vắng (không số 0 giả).
+// Bộ bản vẽ đầy đủ đã duyệt 09/10: Hôm nay, Tiến bộ, Lịch sử và Lời thầy.
+// Nguồn đọc và quyền công bố được giữ; khối vắng dữ liệu không dựng số minh họa.
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { CaGanNhat, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
@@ -43,6 +37,8 @@ export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, on
         <div className="ph3-luoi">
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
           <KhoiChinh pm={pm} hoc2={hoc2} />
+          <section className="ph3-the ph3-gia-dinh" data-vung="gia-dinh"><h2>Gia đình hỗ trợ</h2><p>Gợi ý chung: dành một khoảng yên tĩnh để con học từng chặng ngắn. Hỏi con điều đã hiểu và điều muốn thầy chữa.</p><a className="ph3-dong-lk" href="#tien-bo">Xem tiến bộ của con <BtPhai co={18} /></a></section>
+          {hoc2?.hanhTrinh && <section className="ph3-the ph3-gia-dinh"><h2>Hành trình của con</h2><p>Tầng đang học: <b>{['Nền','Hiểu','Vận dụng','Tổng hợp'][hoc2.hanhTrinh.tang - 1]}</b></p><p>Mức tối thiểu hôm nay: {hoc2.hanhTrinh.toiThieu} câu. Số câu đã xếp có thể khác khi kho chưa đủ câu phù hợp hoặc câu đang dành cho ca kiểm tra.</p><a className="ph3-dong-lk" href="#tien-bo">Xem tiến bộ</a></section>}
           <TuanNay pm={pm} />
           <DangVaCa pm={pm} hoc2={hoc2} />
           <LoiThayMoi loiThay={loiThay} thuLai={thuLaiLoiThay} />
@@ -86,7 +82,7 @@ export function chuTinhTrang({ daLam, tong, keHoach }: { daLam: number; tong: nu
 
 function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
   const so = soCauHomNay(pm, hoc2)
-  const ngay = thuNgayVn(pm.serverNow ?? Date.now())
+  const ngay = thuNgayVn(hoc2?.homNay && hoc2.serverNow ? hoc2.serverNow : pm.serverNow ?? Date.now())
   const tinhTrang = chuTinhTrang(so)
   const gioQuen = pm.nhipHoc?.gioThuongHoc ? `Giờ học quen của con: ${pm.nhipHoc.gioThuongHoc}.` : hoc2?.omni?.gioHoc ? `Giờ học con chọn: ${hoc2.omni.gioHoc}.` : ''
   const coSo = so.tong !== null || so.daLam > 0
