@@ -102,7 +102,7 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   }
   // Dự báo trên cửa sổ nội dung của em; ghi rõ phạm vi, không coi là xác suất đã hiệu chuẩn của đề thật.
   const scope=hs.cau.filter(c=>c.nguon==='chien_dich').map(c=>q.get(c.qid)!)
-  const forecast=duBaoDiem(omni,scope), cursor=omni.cursor
+  const forecast=duBaoDiem(omni,scope,{chiKyVong:true}), cursor=omni.cursor
   out.p8=forecast.p8
   if(!ghi) return out
   await ghiDoV6(env,sbd,now,qs)

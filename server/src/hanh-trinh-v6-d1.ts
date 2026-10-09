@@ -51,6 +51,6 @@ export function sqlNguonV6(field:string,version=false):string{return `json_array
 /** Đọc lại kết quả nguồn hiện tại: chấm lại muộn không để nhãn đúng cũ vào fit/report. */
 export function sqlKetQuaV6(field:string,fraction=false):string{
   const sub="CASE WHEN json_valid(s.subitem_json) THEN CASE WHEN json_type(s.subitem_json)='array' THEN s.subitem_json ELSE json_extract(s.subitem_json,'$.y') END END"
-  const value=fraction?`CASE WHEN json_array_length(${sub})=4 THEN (SELECT AVG(CASE WHEN value IN(0,1) THEN CAST(value AS REAL) END) FROM json_each(${sub})) ELSE s.ket_qua END`:'s.ket_qua'
+  const value=fraction?`CASE WHEN json_valid(${sub}) AND CASE WHEN json_valid(${sub}) THEN json_array_length(${sub}) END=4 THEN (SELECT AVG(CASE WHEN value IN(0,1) THEN CAST(value AS REAL) END) FROM json_each(${sub})) ELSE s.ket_qua END`:'s.ket_qua'
   return `(SELECT ${fraction?'AVG':'MIN'}(${value}) FROM su_kien_hoc s WHERE s.sbd=d.sbd AND s.khoa IN(SELECT value FROM json_each(${field})))`
 }

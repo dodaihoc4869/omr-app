@@ -5,7 +5,7 @@ import {fitV6,pDoKhoV6,featuresV6,vuotCongV6,type MauV6} from '../server/src/han
 import {xepDeV6} from '../server/src/hanh-trinh-v6-de-thu'
 import {ghiDoV6,hocV6Dem,lenhChonV6} from '../server/src/hanh-trinh-v6-d1'
 import {chonBandit} from '../server/src/bandit'
-import {docHoSo2,layKeHoachHomNay,xoaDemChienDich} from '../server/src/srs2-d1'
+import {docHoSo2,layKeHoachHomNay,xoaDemChienDich,sanh2} from '../server/src/srs2-d1'
 import {dongBoBaHanhTrinh,ungVienHanhTrinh} from '../server/src/hanh-trinh-hop-nhat'
 import {boSungV6} from '../server/src/hanh-trinh-v6-kho'
 import {lapChotHanhTrinh} from '../server/src/hanh-trinh-d1'
@@ -160,6 +160,15 @@ describe('Hành trình v6: D1 thật',()=>{
    expect(k.d.sql.prepare(`SELECT ${sqlKetQuaV6('d.source_json',true)} y FROM hanh_trinh_v6_do d WHERE ${sqlNguonV6('d.source_json',true)}`).get()).toEqual({y:0})
    await ghiSuKien(k.env,[{nguon:'game',maNguon:'fake',sbd:'S2',qid:c.qid,lan:1,ketQua:1,luc:new Date(T_SANG).toISOString(),raw:{ht_cau_version:'fake'}}])
    expect(JSON.parse((k.d.sql.prepare("SELECT raw_json FROM su_kien_hoc WHERE sbd='S2'").get() as {raw_json:string}).raw_json).ht_cau_version).toBeUndefined();k.d.sql.close()
+ })
+ it('ba hành trình thật vẫn gợi ý kiểm đầu ngày 0 và kiểm tuần ngày 8 sau cổng CPU main',async()=>{
+   const k=kho();await dongBoBaHanhTrinh(k.env,T_SANG)
+   const first=await sanh2(k.env,'S1',T_SANG) as {omni:{deThu:{duoc:boolean};kiemHanhTrinh?:{loai:string}}}
+   expect(first.omni.deThu.duoc).toBe(true);expect(first.omni.kiemHanhTrinh?.loai).toBe('dau')
+   const {hoa2OmniAction}=await import('../server/src/omni-game');const de=await hoa2OmniAction(k.env,'S1','hoa2-omni-de-thu',{},T_SANG+1000);expect(de.ok).toBe(true)
+   const refs=JSON.parse((k.d.sql.prepare('SELECT qid_json FROM omni_de_thu WHERE id=?').get(de.id) as {qid_json:string}).qid_json) as {qid:string}[];expect(refs).toHaveLength(14);expect(JSON.stringify(de)).not.toContain('correct');expect(JSON.stringify(de)).not.toContain('solution')
+   const week=await sanh2(k.env,'S1',T_SANG+8*DAY) as typeof first
+   expect(week.omni.deThu.duoc).toBe(true);expect(week.omni.kiemHanhTrinh?.loai).toBe('tuan');k.d.sql.close()
  })
  it('ca mở không ghi mô hình và không huấn luyện',async()=>{
    const k=kho();await dongBoBaHanhTrinh(k.env,T_SANG);await layKeHoachHomNay(k.env,'S1',T_SANG)

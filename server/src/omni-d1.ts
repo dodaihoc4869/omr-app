@@ -1002,6 +1002,8 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
     ])
     const dangLuyen = chienDichDangLuyen(ds, homNay)
     const gan = dangLuyen[0] ?? null
+    // Hành trình chỉ xác định quyền kiểm; không đưa toàn kho trở lại đường thống kê CPU lớn.
+    const journey=ds.find(c=>laHanhTrinh(c.id)&&c.id===ngu.chienDichId&&c.trangThai==='dang_chay'&&c.hanNop>=homNay&&!chuaBatDau(c,homNay))
     let cau: QCau[] = []
     let dangCo: string[] = []
     if (gan) {
@@ -1034,7 +1036,7 @@ export async function omniChoSanh(env: Env, sbd: string, nowMs: number, ngu: { t
       onBaiCu: Math.max(0, Math.floor(Number(ngu.onBaiCu) || 0)),
       metGio,
       nhatKy: nhatKy.length ? nhatKy : null,
-      deThu: { duoc: !!gan && soNgayGiua(gan.batDau, homNay) >= ts.DE_THU.ngayTu - 1 && !daThu, soCau: ts.DE_THU.soCau, phut: ts.DE_THU.phut },
+      deThu: { duoc: !daThu && (!!journey || !!gan && soNgayGiua(gan.batDau, homNay) >= ts.DE_THU.ngayTu - 1), soCau: ts.DE_THU.soCau, phut: ts.DE_THU.phut },
       ...(canThanTu(true, hs, ts) ? { canThan: true } : {}), // CẨN THẬN (omni-can-than.ts): chỉ-thêm, CHỈ khi Sơ ý (số `sEm` ở trên) > ngưỡng — vắng ⇒ app em y hệt
     }
   } catch {

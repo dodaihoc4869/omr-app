@@ -1,6 +1,7 @@
 import { dongCoHanhTrinh } from './hanh-trinh-dong-co'
 import { phamViMucTieu } from './hanh-trinh-v5-d1'
 import { docMoHinhV6 } from './hanh-trinh-v6-d1'
+import { laHanhTrinh } from './hanh-trinh-hop-nhat'
 import { xepDeV6,maTranV6 } from './hanh-trinh-v6-de-thu'
 import { ghiDeThuDo,maTranDo,chotDiemDau } from './hanh-trinh-do-luong'
 // OMNI 3 — LÀN B3: ĐƯỜNG TRẢ LỜI + GAME (Đảo/Đoàn · lướt · chắc-mà-sai · Trạm hồi phục · vé thử thách · đề thử nửa).
@@ -491,13 +492,14 @@ async function bacHienTai(maDang: string, hs: HoSo2, hangEm: () => Promise<HangC
  * (chiến dịch đang chạy, đã bắt đầu, hạn ≥ hôm nay, hạn sớm nhất). P dạng = P nhỏ nhất trong các vi kỹ năng (ma trận Q) của câu thuộc dạng.
  * Hoà ⇒ băm tất định `sbd|ngày|dạng`. Trả danh sách đã xếp (dạng đầu không có câu thì thử dạng kế).
  */
-async function dangTuDongChoVe(env: Env, sbd: string, nowMs: number): Promise<{ ma: string; ten: string }[]> {
+async function dangTuDongChoVe(env: Env, sbd: string, nowMs: number,plan?:HoSo2): Promise<{ ma: string; ten: string }[]> {
   const homNay = ngayVnCua(nowMs)
-  const cd = (await docChienDichCuaEm(env, sbd).catch(() => []))
+  const journey=plan?.chienDich&&laHanhTrinh(plan.chienDich.id)?plan.chienDich:null
+  const cd = journey ?? (await docChienDichCuaEm(env, sbd).catch(() => []))
     .filter((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay && !chuaBatDau(c, homNay))
     .sort((a, b) => (a.hanNop < b.hanNop ? -1 : a.hanNop > b.hanNop ? 1 : a.taoLuc < b.taoLuc ? -1 : a.taoLuc > b.taoLuc ? 1 : 0))[0]
   if (!cd) return []
-  const meta = await docMetaCau(env, cd.qids, cd.maDe)
+  const meta = journey?new Map(plan!.cau.filter(c=>c.nguon==='chien_dich'&&plan!.meta.has(c.qid)).map(c=>[c.qid,plan!.meta.get(c.qid)!])):await docMetaCau(env, cd.qids, cd.maDe)
   const theo = new Map<string, { ten: string; qids: string[] }>()
   for (const m of meta.values()) {
     if (!m.dang || m.tuLuan) continue
@@ -534,7 +536,7 @@ export async function startVe(env: Env, sbd: string, ve: string, nowMs: number):
   // 06/10 (làn A'): vé đo bậc CAO HƠN bằng câu em chưa vững — câu LỖI đang trong cửa sổ lỗi (chờ kiểm / đã đóng, chưa tới lịch nên không nằm trong kế hoạch hôm nay) không phải
   // câu để đo và không được ra NGUYÊN VĂN ⇒ bỏ khỏi ứng viên (câu lỗi quay lại qua thang làm lại ở Đảo / Đoàn / Bi-a / Trạm). Khoá `lam_lai_khac` tắt ⇒ y hôm nay.
   const boCauLoi = await lamLaiKhacBat(env).catch(() => false)
-  const dsDang = ve === 'auto' ? await dangTuDongChoVe(env, sbd, nowMs) : [{ ma: ve, ten: '' }]
+  const dsDang = ve === 'auto' ? await dangTuDongChoVe(env, sbd, nowMs,hs) : [{ ma: ve, ten: '' }]
   if (!dsDang.length) return { ok: false, lyDo: 'khong_co_dang', error: 'Chưa có dạng nào cần thử thách thêm trong bài đang luyện.' }
   const [pv, bc] = await Promise.all([phamViChon(env, sbd), boiCanh(env, sbd, nowMs)])
   const trongKeHoach = new Set([...kh.dao, ...kh.doan].map(qidGocOmni))

@@ -73,3 +73,5 @@ Kiểm tra: 16 kiểm riêng (gộp nguyên tử, kho nhiều trang, học sinh 
 V5 đã phát hành main `c94b4dc6` (Actions 37879913745). V6 tích hợp các sửa CPU trên main `ddbe3c0c`; mốc lùi v6 là mã trước khi merge v6, giữ các bảng dẫn xuất/lịch sử.
 
 Kiểm v6 trước phát hành: 193 kiểm cổng hành trình/kế hoạch/game/UI đạt; 87 kiểm reset/đáp án/sự kiện chuẩn đạt; D1 runtime 9/9; tsc server, build CF, SW13/13 (2998KB), màu0vi phạm, lint vùng mới và Chromium 360/430/844ngang/1280 đạt. Full vitest đang chạy để đối chiếu tên lỗi nền; chưa ghi toàn repo xanh. Mô hình khởi đầu bằng prior, chỉ chuyển sang trọng số học sau đủ bằng chứng; chưa có kết quả thắng A/B.
+
+Tích hợp main c07ffcb8: tách quyền đề kiểm của Hành trình khỏi thống kê/replay toàn kho, cho kiểm đầu từ ngày 0; fixture gộp ba Hành trình thật xác nhận nút đầu, phát14câu không đáp án và nút tuần ngày8. Vé auto dùng shortlist đã qua cổng thay đọc toàn bộ15k; dự báo động cơ chỉ tính kỳ vọng/p8 khi không dùng con đường. 41kiểm tích hợp/game đạt, buildCF/SW/màu kiểm lại đạt.
