@@ -66,3 +66,19 @@ Thầy nhắn (nguyên văn, 2 lần): "buid luôn và đẩy luôn nhé" — co
 - [x] Build GV theo bản vẽ (5 mục + Cài đặt · một bảng lam · Hôm nay · Học sinh · Mở ca · tối theo nút) | bằng chứng: dc206394 + 6c47a415 (gộp bd54f6d); ảnh scratchpad/anh-gv. Ghi chú: chế độ 2.0 vốn đã 5 mục (ảnh '9 mục' trước là do trang chụp chưa bật cờ).
 - [x] Kiểm toàn bộ (tsc, vitest so nền main, cổng màu/giao diện, build:cf, ảnh) | bằng chứng: tsc 0 · server tsc 0 · check:mau đạt · kiem:mau-giu 0 · soi:giao-dien 0 lỗi · build:cf SW 13/13, 2994 KB (4886a6d: 3 mảnh chỉ của thầy ra kho chạy-lúc, gộp 3 làn đã đẩy lên 3003 KB) · full vitest 152 đỏ vs main a89b697 151 — 1 khác = test đo tốc độ btvn-nang-do 'dưới 200 ms', chạy riêng đạt · D1 20:37: 0 ca mở / 0 lượt.
 - [x] Đẩy: kiểm ca mở → PR → main → Actions | bằng chứng: D1 20:42 0 ca mở/0 lượt; PR223 gộp `dc62bde`; Actions `37938839127` SUCCESS (16 bước, gồm kiểm Worker + Pages sống cùng commit). Lùi: `git revert -m 1 dc62bde`.
+
+## Đợt 4 — sửa theo ảnh thầy gửi (09/10 tối)
+
+Thầy nhắn (nguyên văn, kèm ảnh Luyện thêm): "tôi muốn bạn tô màu đẹp xịn vào phần này"
+- [x] Tô màu các ô Luyện thêm (HS · Hành trình) | bằng chứng: d2fa153c — mỗi ô một sắc Bát Linh (ngọc/vàng/lam-ngọc) + biểu tượng; chỉ THÊM luật, kiem:mau-giu 0; ảnh 22-hs-hanh-trinh-* (sáng/tối).
+
+Thầy nhắn (nguyên văn, kèm ảnh GV Hành trình): "phần này phải tối ưu lại, tôi chỉ cần giữ lại phần dạy học. Phần câu cần chữa trùng tu lại bỏ hết những thứ không cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại"
+- [x] Hành trình của thầy chỉ giữ Dạy học | bằng chứng: 757ea1a1 (gộp b952e008) — thẻ Nhịp hôm nay + Chiến dịch đã giao bỏ khỏi Hành trình; chức năng chuyển chỗ (Hôm nay, Học sinh lọc khối, Cài đặt › Mở danh sách chiến dịch).
+- [x] Trùng tu Cần thầy chữa | bằng chứng: 757ea1a1 — MỘT danh sách gộp 6 nguồn, nhiều em đứng trước, mỗi dòng một nút mở đúng màn chữa sẵn có; 3fe9ff59 — Hôm nay/thanh bên/danh sách cùng MỘT số (trước Hôm nay chỉ đếm 3 nhóm), thanh lọc khối đếm "chỗ".
+Thầy nhắn (nguyên văn): "kiểm tra đầu giờ giữ lại nữa nhé"
+- [x] Giữ Kiểm tra đầu giờ | bằng chứng: Hành trình còn 3 thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa; ảnh 14-gv-dau-gio*.
+
+Thầy nhắn (nguyên văn, kèm ảnh Câu đã làm chồng chữ): "trùng tu lại chỗ này"
+- [x] Sửa Câu đã làm (HS, bố cục ngang/máy tính) | bằng chứng: 40e26c71 — nguyên nhân gốc: lưới 2 cột (giao-dien-day-du.css) trong khung cuộn cố định cao ⇒ thẻ đè nhau; nay một cột, hàng lọc xuống dòng, nút Về/nhãn đọc rõ nền sáng; ảnh 25-hs-cau-da-lam-* 0 lỗi trang/0 tràn.
+- [x] Phát sinh: precache vượt trần sau gộp (3039 KB) | bằng chứng: 25c3ebf3 — 2 mảnh chung chỉ của thầy ra kho chạy-lúc ⇒ 147 tệp / 2996 KB, SW 13/13.
+- [!] Phát sinh, CHƯA sửa (ngoài phạm vi): màn Hoá 2.0 bố cục ngang "thấp" co cả màn bằng `zoom` ⇒ nút 48 px còn ~36 px trên điện thoại xoay ngang (có từ trước, mọi màn ngang).

@@ -16,6 +16,14 @@ const EM: [string, number | null, number, number, number, number][] = [
   ['Hoàng Thu Trang', 1, 24, 8, 20, 4], ['Đặng Khánh', 2, 30, 30, 30, 0], ['Vũ Anh', 1, 24, 24, 24, 0], ['Trịnh Thảo Linh', 3, 36, 36, 36, 0],
   ['Bùi Gia Bảo', 4, 36, 6, 30, 6], ['Ngô Hải Yến', null, 0, 0, 0, 0], ['Đỗ Quốc Việt', 2, 30, 18, 30, 0], ['Phan Mai Chi', 3, 36, 0, 36, 0],
 ]
+// Câu sai từ 4 lần (đã rời kế hoạch, chờ thầy chữa) của từng Hành trình — thẻ Hành trình › Cần thầy chữa (trung tu 09/10 tối).
+const CAN: Record<string, { qid: string; stt: number; dang: string; soEm: number; mucDo?: string }[]> = {
+  '12': [
+    { qid: 'DH-12-C1-B2-17', stt: 17, dang: 'Thuỷ phân ester đơn chức', soEm: 6, mucDo: 'hieu' },
+    { qid: 'DH-12-C1-B4-23', stt: 23, dang: 'Chỉ số xà phòng hoá chất béo', soEm: 3, mucDo: 'van_dung' },
+  ],
+  '11': [{ qid: 'DH-11-C1-B3-8', stt: 8, dang: 'Chuyển dịch cân bằng hoá học', soEm: 5, mucDo: 'hieu' }],
+}
 export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: string) {
   void _a
   void _b
@@ -29,7 +37,7 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
       ok: true as const,
       du: {
         chienDich: cd(h), homNay, hetHan: false,
-        lop: { coXat: 0, thanhThao: 0, huyetChien: 0, canDayLaiCau: 0, canDayLaiLuot: 0 }, dang: [], canDayLai: [], em: [],
+        lop: { coXat: 0, thanhThao: 0, huyetChien: 0, canDayLaiCau: CAN[h.k]?.length ?? 0, canDayLaiLuot: (CAN[h.k] ?? []).reduce((n, c) => n + c.soEm, 0) }, dang: [], canDayLai: CAN[h.k] ?? [], em: [],
         hanhTrinhNgay: { em: EM.map(([ten, tang, toiThieu, daLam, daXep, conThieu], i) => ({ sbd: String(11010 + i), ten, tang, toiThieu: tang ? toiThieu : null, daLam, daXep, conThieu })) },
       },
     }

@@ -48,18 +48,36 @@ const DS = [
   ['08-bat-linh-dao-doc', 'dao', 390, 844, 'light', false, /LÊN ĐƯỜNG|Lên đường/, 'dao'],
   ['09-doan-ho-tong-ngang', 'doan', 1280, 720, 'light', false, /CHỐT ĐÁP ÁN|CHỌN ĐÁP ÁN/, 'doan'],
   ['09-doan-ho-tong-dien-thoai-ngang', 'doan', 844, 390, 'light', false, /CHỐT ĐÁP ÁN|CHỌN ĐÁP ÁN/, 'doan'],
-  ['14-gv-nhip-hom-nay', 'gv-nhip', 1440, 960, 'light', false, /Nhịp học hôm nay/],
-  ['14-gv-nhip-hom-nay-toi', 'gv-nhip', 1440, 960, 'dark', false, /Nhịp học hôm nay/],
-  ['14-gv-nhip-hom-nay-dien-thoai', 'gv-nhip', 390, 844, 'light', true, /Nhịp học hôm nay/],
-  ['14-gv-nhip-dien-thoai-toi', 'gv-nhip', 390, 844, 'dark', true, /Nhịp học hôm nay/],
-  ['14-gv-nhip-ngang-toi', 'gv-nhip', 844, 390, 'dark', true, /Nhịp học hôm nay/],
-  ['14-gv-nhip-ngang', 'gv-nhip', 844, 390, 'light', true, /Nhịp học hôm nay/],
+  // Hành trình (thầy 09/10 tối: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại"): ba thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa;
+  // Cần thầy chữa = MỘT danh sách (chờ chữ "chỗ cần chữa"), bấm một dòng ⇒ chỗ làm việc; Chiến dịch đã giao = trang riêng (mở từ Cài đặt).
+  ['14-gv-day-hoc', 'gv-nhip', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'tieu-de:Điểm danh'],
+  ['14-gv-day-hoc-toi', 'gv-nhip', 1440, 960, 'dark', false, /Hành trình giỏi Hóa/, 'tieu-de:Điểm danh'],
+  ['14-gv-day-hoc-dien-thoai', 'gv-nhip', 390, 844, 'light', true, /Hành trình giỏi Hóa/, 'tieu-de:Điểm danh'],
+  ['14-gv-dau-gio', 'gv-nhip&the=dau-gio', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'tieu-de:Điểm danh'],
+  ['14-gv-dau-gio-dien-thoai-toi', 'gv-nhip&the=dau-gio', 390, 844, 'dark', true, /Hành trình giỏi Hóa/, 'tieu-de:Điểm danh'],
+  ['14-gv-can-chua', 'gv-nhip&the=can-chua', 1440, 960, 'light', true, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ['14-gv-can-chua-toi', 'gv-nhip&the=can-chua', 1440, 960, 'dark', true, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ['14-gv-can-chua-dien-thoai', 'gv-nhip&the=can-chua', 390, 844, 'light', true, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ['14-gv-can-chua-dien-thoai-toi', 'gv-nhip&the=can-chua', 390, 844, 'dark', true, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ['14-gv-can-chua-ngang', 'gv-nhip&the=can-chua', 844, 390, 'light', true, /Hành trình giỏi Hóa/, 'cho:chỗ cần chữa'],
+  ['14-gv-can-chua-loc-khoi-12', 'gv-nhip&the=can-chua', 1440, 960, 'light', true, /Hành trình giỏi Hóa/, 'bam-radio:Khối 12'],
+  ['14-gv-can-chua-chieu', 'gv-nhip&the=can-chua', 1440, 960, 'light', true, /Hành trình giỏi Hóa/, 'bam:Chiếu lên bảng: Câu 17'],
+  ['14-gv-can-chua-chieu-dien-thoai-toi', 'gv-nhip&the=can-chua', 390, 844, 'dark', true, /Hành trình giỏi Hóa/, 'bam:Chiếu lên bảng: Câu 17'],
+  ['14-gv-can-chua-go-nut', 'gv-nhip&the=can-chua', 1440, 960, 'light', true, /Hành trình giỏi Hóa/, 'bam:Gỡ nút thắt: Câu 6'],
+  ['14-gv-can-chua-buoc-cuoi-toi', 'gv-nhip&the=can-chua', 1440, 960, 'dark', true, /Hành trình giỏi Hóa/, 'bam:Chữa trên lớp: Câu 31'],
+  ['14-gv-chien-dich-da-giao', 'gv-nhip&the=chien-dich', 1440, 960, 'light', false, /Chiến dịch đã giao/],
+  ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
     [`20-ph-${k}-${nen}`, 'ph', w,h,nen,true,/Hôm nay/],
     [`21-de-thu-${k}-${nen}`, 'de-thu',w,h,nen,true,/Đề thử 14 câu/,'de-thu'],
   ])),
   ...[[390,844,'doc'],[844,390,'ngang'],[1440,960,'may-tinh']].flatMap(([w,h,k]) => [
     ...[['hanh-trinh','Hành trình'],['on-lai','Ôn lại'],['cua-em','Của em']].map(([m,chu]) => [`22-hs-${m}-${k}`, 'sanh', w,h,'light',true,/Hôm nay/,`hs:${chu}`]),
+    // Câu đã làm (09/10): thầy gửi ảnh thẻ chồng chữ ở máy tính — chụp sáng + tối mọi khổ
+    [`25-hs-cau-da-lam-${k}`, 'cau-da-lam', w,h,'light',false,/Câu đã làm/],
+    [`25-hs-cau-da-lam-${k}-toi`, 'cau-da-lam', w,h,'dark',false,/Câu đã làm/],
+    // Luyện thêm có màu nhấn (09/10): chụp thêm Hành trình nền TỐI
+    [`22-hs-hanh-trinh-${k}-toi`, 'sanh', w,h,'dark',true,/Hôm nay/,'hs:Hành trình'],
     ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Ca kiểm tra'],['loi-thay','Nhận xét của thầy'],['thong-tin','Thông tin và giao diện']].flatMap(([m,chu]) => ['light','dark'].map((nen) => [`23-ph-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph',w,h,nen,true,/Hôm nay/,`ph:${m}:${chu}`])),
     ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-kho',/Kho đề/],['gv-cai-dat',/Cài đặt/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-go-nut',/Bàn gỡ nút thắt/],['gv-duyet',/Duyệt lời giải/]].map(([m,chu]) => [`24-${m}-${k}`,m,w,h,'light',true,chu]),
     // trung tu 09/10: app thầy chụp cả nền TỐI (máy tối) cho đủ "sáng + tối"
@@ -112,6 +130,17 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       if (await t.evaluate(()=>document.activeElement?.id) !== 'de-thu-cau-14') throw new Error('Không đưa focus đến câu 14')
       await t.getByRole('button',{name:'Câu 1: đã làm',exact:true}).click()
       await t.evaluate(()=>window.scrollTo(0,0))
+    } else if (viec?.startsWith('tieu-de:')) {
+      await t.getByRole('heading', { name: new RegExp(viec.slice(8)) }).first().waitFor({ timeout: 20000 })
+    } else if (viec?.startsWith('cho:')) {
+      await t.getByText(new RegExp(viec.slice(4))).first().waitFor({ timeout: 20000 })
+    } else if (viec?.startsWith('bam-radio:')) {
+      await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
+    } else if (viec?.startsWith('bam:')) {
+      await t.getByRole('button', { name: new RegExp(viec.slice(4)) }).first().click({ timeout: 20000 })
+      await t.getByRole('button', { name: 'Danh sách cần chữa' }).waitFor()
+      await t.waitForTimeout(600)
+      await t.evaluate(() => window.scrollTo(0, 0))
     } else if (viec === 'dao') {
       await t.getByRole('button', { name: /LÊN ĐƯỜNG|Lên đường/ }).first().click()
       await t.getByText(/^(ẢI|Câu) 1\//).first().waitFor({ timeout: 20000 })

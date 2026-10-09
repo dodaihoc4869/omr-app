@@ -392,6 +392,33 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
     expect(goi.mock.calls.some(([d, b]) => d === '/gv/buoi-hoc' && b.action === 'xem' && b.id === 'BH-KHAC')).toBe(false)
   })
 
+  // HÀNH TRÌNH › CẦN THẦY CHỮA (trung tu 09/10 tối): mở từ một dòng của danh sách ⇒ ghim đúng chiến dịch (không ô chọn) + chỉ khối Cần thầy chữa.
+  it('ghim chiến dịch + chiChua: không ô chọn chiến dịch, không bảng từng em/ô số; còn danh sách câu + Chiếu cả N câu; Hành trình cũng có khối chữa', async () => {
+    const HT = { ...bang([]).chienDich, id: 'ht-12', ten: 'Hành trình giỏi hoá · Khối 12', lop: 'Khối 12', hanNop: '9999-12-31', hanhTrinh: true }
+    goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
+      if (b.action === 'danh-sach') return { ok: true, du: { ok: true, ...DS } }
+      if (b.action === 'bang' && b.id === 'cd-2') return { ok: true, du: { ok: true, ...bang(EM, { chienDich: { ...bang(EM).chienDich, id: 'cd-2', ten: 'Amine', hanNop: '2026-10-10' } }) } }
+      if (b.action === 'bang' && b.id === 'ht-12')
+        return { ok: true, du: { ok: true, ...bang([], { chienDich: HT, hanhTrinhNgay: { em: [{ sbd: '1', ten: 'An', tang: 1, toiThieu: 24, daLam: 6, daXep: 24, conThieu: 0 }] } as never }) } }
+      return { ok: false, loai: 'tu_choi', chu: 'lệnh lạ' }
+    })
+    const { unmount } = render(<LenBangChienDich chienDichId="cd-2" chiChua />)
+    expect(await screen.findByRole('heading', { name: 'Cần thầy dạy lại' })).toBeTruthy()
+    expect(screen.queryByLabelText('Chiến dịch')).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Amine · 12A1' })).toBeNull()
+    expect(screen.queryByRole('table')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Chiếu cả 4 câu lên bảng' })).toBeTruthy()
+    expect(goi.mock.calls.filter(([d, b]) => d === '/gv/chien-dich' && b.action === 'bang').map(([, b]) => b.id)).toEqual(['cd-2'])
+    unmount()
+
+    // Hành trình: trước đây Bảng chỉ vẽ bảng tiến độ (Đang học, Chặng…) ⇒ nay khối chữa, không bảng tiến độ
+    render(<LenBangChienDich chienDichId="ht-12" chiChua />)
+    expect(await screen.findByRole('heading', { name: 'Cần thầy dạy lại' })).toBeTruthy()
+    expect(screen.queryByText('Đang học')).toBeNull()
+    expect(screen.queryByRole('table')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Chiếu cả 4 câu lên bảng' })).toBeTruthy()
+  })
+
   it('máy chủ chưa có lệnh ⇒ nói thật + nút thử lại; chưa có chiến dịch ⇒ nói vì sao + việc làm tiếp', async () => {
     goi.mockResolvedValueOnce({ ok: false, loai: 'chua_co_lenh', chu: 'Máy chủ chưa có lệnh Chiến dịch (Game Hóa 2.0) — cần đẩy bản máy chủ mới.' })
     render(<LenBangChienDich />)

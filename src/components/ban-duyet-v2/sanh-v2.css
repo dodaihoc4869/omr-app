@@ -321,7 +321,17 @@ html:root body .v2 .h2-sanh.v2s-nhung:empty { display: none; }
 .v2s-lt-tieu { margin: 0; font-size: var(--t-khoi); line-height: 1.2; color: var(--v2-chu); }
 .v2s-lt-dau > span { font-size: var(--t-phu); color: var(--v2-chu-phu); }
 .v2s-lt-luoi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--k3); }
+/* Ô "Luyện thêm" (thầy 09/10: "tô màu đẹp xịn vào phần này"): mỗi ô một màu nhấn trong ĐÚNG bảng màu app học sinh (Bát Linh: ngọc · ngà · hổ phách —
+ * bat-linh.css cố ý đưa --tim/--gg-xanh về lam ngọc của Bát Linh, sáng: lam ngọc đậm · tối: bạc hà — nên "lam ngọc" ở đây = var(--gg-xanh) trong phạm vi Bát Linh, không dùng tím/đỏ): ngọc (Thử sức thêm) · vàng (Vé thử thách) · lam ngọc (Đề thử, Kiểm đầu/tuần,
+ * Kiểm tra chuyên sâu) · ngọc đậm + quầng vàng (Tu luyện, ô đặc quyền) · ngọc→lam ngọc (Bi-a). Đều có bản tối (che-do-toi.css / tokens.css). Không thêm mã màu nào.
+ * Nền pha nhẹ màu nhấn + quầng sáng góc phải, chip biểu tượng, chữ tiêu đề pha màu nhấn với màu chữ (đủ tương phản cả sáng lẫn tối). */
 .v2s-o {
+  --o-mau: var(--v2-ngoc);
+  --o-mau-2: var(--o-mau);
+  --o-sang: var(--o-mau);
+  --o-nen: var(--o-mau);
+  --o-dam: 14%;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -329,6 +339,7 @@ html:root body .v2 .h2-sanh.v2s-nhung:empty { display: none; }
   min-width: 0;
   min-height: 104px;
   padding: 14px;
+  overflow: hidden;
   border-radius: var(--r-vua);
   border: 1px solid var(--v2-vien);
   background: var(--v2-the);
@@ -337,11 +348,57 @@ html:root body .v2 .h2-sanh.v2s-nhung:empty { display: none; }
   font: inherit;
   cursor: pointer;
   touch-action: manipulation;
+  transition: transform var(--cd-nhan) var(--cd-cong), box-shadow var(--cd-doi-muc) var(--cd-cong), border-color var(--cd-doi-muc) var(--cd-cong);
 }
-.v2s-o b { font-size: var(--t-than); font-weight: 700; overflow-wrap: anywhere; }
+/* Lớp màu THÊM cho lưới Luyện thêm (giữ nguyên hai dòng màu gốc của .v2s-o ở trên). */
+.v2s-lt-luoi > .v2s-o {
+  border-color: color-mix(in srgb, var(--o-mau) 30%, var(--v2-vien));
+  background:
+    radial-gradient(160px 110px at 100% 0%, color-mix(in srgb, var(--o-sang) 26%, transparent), transparent 70%),
+    linear-gradient(160deg, color-mix(in srgb, var(--o-nen) var(--o-dam), var(--v2-the)) 0%, color-mix(in srgb, var(--o-mau-2) 9%, var(--v2-the)) 100%);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--o-mau) 14%, transparent);
+}
+.v2s-o[data-khoi='ve-thu-thach'] { --o-mau: var(--v2-vang); }
+.v2s-o[data-khoi='de-thu'],
+.v2s-o[data-khoi='kiem-hanh-trinh'],
+.v2s-o[data-khoi='l4-kiem'] {
+  --o-mau: var(--gg-xanh);
+  --o-nen: color-mix(in srgb, var(--gg-xanh) 55%, var(--v2-ngoc));
+  --o-sang: var(--o-nen);
+  --o-dam: 18%;
+}
+.v2s-o[data-khoi='tu-luyen'] { --o-mau: var(--v2-ngoc-dam); --o-nen: var(--v2-ngoc); --o-sang: var(--v2-vang); --o-dam: 16%; }
+.v2s-o[data-khoi='bia-game'] { --o-mau: var(--v2-ngoc); --o-mau-2: var(--gg-xanh); }
+.v2s-o-bt {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--k1);
+  border-radius: var(--r-nho);
+  background: color-mix(in srgb, var(--o-mau) 18%, transparent);
+  color: color-mix(in srgb, var(--o-mau) 62%, var(--v2-chu));
+  font-style: normal;
+}
+.v2s-o b { font-size: var(--t-than); font-weight: 700; overflow-wrap: anywhere; color: color-mix(in srgb, var(--o-mau) 45%, var(--v2-chu)); }
 .v2s-o span { font-size: var(--t-phu); line-height: 1.4; color: var(--v2-chu-phu); overflow-wrap: anywhere; }
-.v2s-o:disabled { cursor: default; border-style: dashed; background: var(--v2-the-chim); color: var(--v2-chu-mo); }
+@media (hover: hover) {
+  .v2s-o:not(:disabled):hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--o-mau) 55%, var(--v2-vien));
+    box-shadow: 0 12px 26px -16px color-mix(in srgb, var(--o-mau) 70%, transparent);
+  }
+  .v2s-o:not(:disabled):active { transform: scale(0.98); }
+}
+.v2s-o:focus-visible { outline: 3px solid color-mix(in srgb, var(--o-mau) 60%, transparent); outline-offset: 2px; }
+.v2s-o:disabled { --o-mau: var(--v2-chu-mo); cursor: default; border-style: dashed; background: var(--v2-the-chim); color: var(--v2-chu-mo); box-shadow: none; }
+.v2s-o:disabled b,
 .v2s-o:disabled span { color: var(--v2-chu-mo); }
+@media (prefers-reduced-motion: reduce) {
+  .v2s-o { transition: none; }
+  .v2s-o:not(:disabled):hover,
+  .v2s-o:not(:disabled):active { transform: none; }
+}
 .v2s-lt-loi { grid-column: 1 / -1; margin: 0; font-size: var(--t-than); color: var(--v2-chu); }
 
 /* ── ÔN LẠI ── */

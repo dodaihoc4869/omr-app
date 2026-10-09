@@ -10,7 +10,9 @@ import { useGhiToChieu } from '../chien-dich/ghi-to-chieu'
 import KhungXemPhieu from '../KhungXemPhieu'
 import './chua-cau-sai.css'
 
-export default function CauCanChuaTrenLop() {
+/** `gon` (Hành trình › Cần thầy chữa, trung tu 09/10 tối): bỏ tiêu đề + đoạn giải thích (dòng của danh sách cần chữa đã nói việc);
+ *  `chonDau` = nhóm thầy vừa bấm ở danh sách ⇒ đánh dấu + cuộn tới. Điểm danh, chiếu, "Thầy chữa" trên tờ GIỮ NGUYÊN. */
+export default function CauCanChuaTrenLop({ gon = false, chonDau }: { gon?: boolean; chonDau?: string } = {}) {
   const dd = useDiemDanhBuoi()
   const [ds, setDs] = useState<NhomChuaTrenLop[]>([]),
     [bat, setBat] = useState(false),
@@ -167,6 +169,14 @@ export default function CauCanChuaTrenLop() {
       setBan(false)
     }
   }
+  // Nhóm thầy chọn ở danh sách cần chữa: cuộn tới MỘT lần khi nhóm ấy đã hiện.
+  const daCuon = useRef(false)
+  useEffect(() => {
+    if (!chonDau || daCuon.current || !ds.some((g) => g.id === chonDau)) return
+    daCuon.current = true
+    const giamChuyenDong = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    document.querySelector(`[data-nhom-chua="${chonDau.replace(/["\\]/g, '')}"]`)?.scrollIntoView?.({ block: 'center', behavior: giamChuyenDong ? 'auto' : 'smooth' })
+  }, [chonDau, ds])
   const coMat = new Set(dd.coMat.map((e) => e.sbd))
   const chieuDuoc = ds.filter(
     (g) =>
@@ -174,12 +184,16 @@ export default function CauCanChuaTrenLop() {
       (g.buocId !== '__ghep_bai__' || !!buoc[g.id]),
   )
   return (
-    <div className="ccs-kpi">
-      <h2>Câu cần chữa · Bước cuối trên lớp</h2>
-      <p>
-        Hệ thống đã giúp em tự gỡ từng bước. Thầy chữa chung chỗ vẫn mắc, bấm
-        “Thầy chữa” trên tờ; app cho từng em tự kiểm lại.
-      </p>
+    <div className="ccs-kpi" data-gon={gon ? 'true' : undefined}>
+      {!gon && (
+        <>
+          <h2>Câu cần chữa · Bước cuối trên lớp</h2>
+          <p>
+            Hệ thống đã giúp em tự gỡ từng bước. Thầy chữa chung chỗ vẫn mắc, bấm
+            “Thầy chữa” trên tờ; app cho từng em tự kiểm lại.
+          </p>
+        </>
+      )}
       {loi && (
         <p className="ccs-loi" role="alert">
           {loi}
@@ -215,7 +229,7 @@ export default function CauCanChuaTrenLop() {
             </p>
           )}
           {ds.map((g) => (
-            <article key={g.id}>
+            <article key={g.id} data-nhom-chua={g.id} data-chon={g.id === chonDau ? 'true' : undefined}>
               <h3>
                 {g.lop} · {g.tieuDe} · {g.em.length} em
               </h3>
