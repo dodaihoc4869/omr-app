@@ -12,7 +12,7 @@
 // Đổi mục: nội dung trượt vào (.tt-vao-muc), mỗi mục GIỮ chỗ cuộn của mình. MỌI con số lấy từ máy chủ (`hoa2-sanh` + kế hoạch ngày) — không tự tính,
 // không bịa. Lỗi bất kỳ trong màn này ⇒ SanhHomNay rơi về Sảnh cũ.
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { BookOpenCheck, Check, ChevronRight, Home, Lock, Map as BanDo, PawPrint, Sparkles } from 'lucide-react'
+import { BookOpenCheck, Check, ChevronRight, CircleDot, ClipboardList, Flame, Gauge, Home, Lock, Map as BanDo, PawPrint, Sparkles, Target, Ticket, Zap, type LucideIcon } from 'lucide-react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { PETS } from '../../game/than-thu-v2/core'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
@@ -539,9 +539,29 @@ function TheTungBai({ bai }: { bai: BaiHanhTrinh[] }) {
   )
 }
 
+/** Biểu tượng từng ô Luyện thêm (màu nhấn theo `data-khoi` ở sanh-v2.css). */
+const BIEU_O: Record<string, LucideIcon> = {
+  'thu-suc-them': Zap,
+  've-thu-thach': Ticket,
+  'kiem-hanh-trinh': Gauge,
+  'de-thu': ClipboardList,
+  'tu-luyen': Flame,
+  'bia-game': CircleDot,
+  'l4-kiem': Target,
+}
+function BieuO({ khoi }: { khoi: string }) {
+  const I = BIEU_O[khoi]
+  return I ? (
+    <i className="v2s-o-bt" aria-hidden="true">
+      <I size={20} strokeWidth={2.2} />
+    </i>
+  ) : null
+}
+
 function OLuyen({ nhan, phu, khoa = false, onClick, khoi }: { nhan: string; phu?: string; khoa?: boolean; onClick?: () => void; khoi: string }) {
   return (
     <button type="button" className="v2s-o tt-nhan" data-khoi={khoi} disabled={khoa || !onClick} onClick={khoa ? undefined : onClick}>
+      <BieuO khoi={khoi} />
       <b>{nhan}</b>
       {phu && <span>{phu}</span>}
     </button>
@@ -575,6 +595,7 @@ function OThuSuc({ s, token, onTaiLai, onDaLay }: { s: SanhHoa2; token: string; 
   return (
     <>
       <button type="button" className="v2s-o tt-nhan" data-khoi="thu-suc-them" aria-busy={dangGoi} onClick={() => void bam()}>
+        <BieuO khoi="thu-suc-them" />
         <b>{dangGoi ? 'Đang lấy câu…' : 'Thử sức thêm'}</b>
         {/* Hành trình (máy chủ 09/10, docs/hanh-trinh-bai-thu-suc-0910.md): thêm MỘT chặng của hôm nay, tối đa 6 câu (số trên Sảnh là ước lượng);
             chiến dịch cũ giữ nghĩa cũ "lấy trước câu ngày mai". */}

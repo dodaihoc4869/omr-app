@@ -67,8 +67,9 @@ const SANH_HT = {
   chienDich: null,
   theLuc: { con: 18, tong: 30 }, huyetChien: false, doan: { con: 2 }, dao: { con: 16 }, khoaDao: true, loiKhoaDao: 'Gỡ xong 2 lỗi cũ ở Đoàn Hộ Tống để mở cầu sang đảo.',
   ruong: { daLam: 12, tong: 30, moDuoc: false, daMo: false, qua: null },
-  bia: null, tamGiuCa: 0, thuSucThem: { duoc: false, soCau: 0 }, chuoiNgay: 12,
-  omni: { bat: true, baiDangLuyen: [], dangVung: { a: 5, b: 8 }, conDangDe8: 2, sEm: 0.06, sMucTieu: 0.07, chungChi: [], ve: { con: 2, tong: 2 }, choBaiMoi: false, onBaiCu: 0, metGio: null, nhatKy: null, deThu: { duoc: false, soCau: 14, phut: 25 } },
+  // Bi-a + Đề thử bật (09/10): đủ 5 màu nhấn của lưới Luyện thêm trong ảnh chụp.
+  bia: { bat: true, con: 9, tong: 9, giaoHuu: { mo: false, con: 0 }, lyDoKhoa: null }, tamGiuCa: 0, thuSucThem: { duoc: false, soCau: 0 }, chuoiNgay: 12,
+  omni: { bat: true, baiDangLuyen: [], dangVung: { a: 5, b: 8 }, conDangDe8: 2, sEm: 0.06, sMucTieu: 0.07, chungChi: [], ve: { con: 2, tong: 2 }, choBaiMoi: false, onBaiCu: 0, metGio: null, nhatKy: null, deThu: { duoc: true, soCau: 14, phut: 25 } },
 }
 // Xong kế hoạch: 30/30, rương mở được, có Thử sức thêm 6 câu.
 const SANH_XONG = { ...SANH_HT, hanhTrinh: { ...SANH_HT.hanhTrinh, daLam: 30, changHienTai: 5, cauTrongChang: 0 }, theLuc: { con: 0, tong: 30 }, doan: { con: 0 }, dao: { con: 0 }, khoaDao: false, loiKhoaDao: '', ruong: { daLam: 30, tong: 30, moDuoc: true, daMo: false, qua: null }, thuSucThem: { duoc: true, soCau: 6 } }
@@ -118,7 +119,7 @@ function manSanh(du: Record<string, unknown> | null, them: Record<string, unknow
     tenEm: 'Nguyễn Minh Anh', lop: '12A1',
     ketQua: du ? (docSanh(du) as KetQuaSanh) : null, loi: '', dangTai: !du, thu: { index: 5, cap: 7, ten: 'Linh Hồ' }, exp: { homNay: 22, conThieu: 160 },
     chuoiNgay: 12, caDangMo: false, now, token: 'tk', shopBat: true, onVaoThi: noop, onPhaPhucKich: noop, onKhamPhaDao: noop, onCauDaLam: noop,
-    onTuiDo: noop, onCuaHang: noop, onMoThanThu: noop, onChonThu: noop, onDangXuat: noop, onTaiLai: noop, onTuLuyen: noop,
+    onTuiDo: noop, onCuaHang: noop, onMoThanThu: noop, onChonThu: noop, onDangXuat: noop, onTaiLai: noop, onTuLuyen: noop, onChoiBia: noop,
     caGanNhat: { chu: 'Ca kiểm tra gần nhất: 8,00 điểm · 03/10', coDiem: true }, onLichSuCa: noop,
     ...them,
   } as never)
