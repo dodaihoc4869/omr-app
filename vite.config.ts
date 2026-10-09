@@ -207,6 +207,9 @@ export default defineConfig({
           '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
+          // Trung tu giao diện 09/10: ba mảnh CHỈ màn thầy nạp (đồng bộ mọi ca ở Cài đặt/Ca kiểm tra, tên lớp của thầy, mã QR chiếu) ra kho chạy-lúc —
+          // ba làn trung tu thêm ~10 KB kiểu dáng cho vỏ học sinh/phụ huynh, giữ precache dưới trần 3000 KB mà không đụng mảnh nào máy em/phụ huynh cần.
+          '**/{NutDongBoMoiCa,ten-lop-thay,ma-qr}-*.{js,css}',
           // Thẻ "Luyện đề cấu trúc" trong Tu luyện (30/09): mảnh nạp LƯỜI khi em bấm thẻ (luyện đề cần mạng để rút/chấm ở máy chủ) — kho chạy-lúc.
           // Màn Tu luyện (30/09, bố cục ngang + máy tính): cả mảnh ManTuLuyen nạp LƯỜI khi em bấm cửa Tu luyện ở Sảnh — mọi việc của nó đều cần máy chủ
           // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
