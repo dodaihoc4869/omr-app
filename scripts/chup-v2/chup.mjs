@@ -60,6 +60,9 @@ const DS = [
   ])),
   ...[[390,844,'doc'],[844,390,'ngang'],[1440,960,'may-tinh']].flatMap(([w,h,k]) => [
     ...[['hanh-trinh','Hành trình'],['on-lai','Ôn lại'],['cua-em','Của em']].map(([m,chu]) => [`22-hs-${m}-${k}`, 'sanh', w,h,'light',true,/Hôm nay/,`hs:${chu}`]),
+    // Câu đã làm (09/10): thầy gửi ảnh thẻ chồng chữ ở máy tính — chụp sáng + tối mọi khổ
+    [`25-hs-cau-da-lam-${k}`, 'cau-da-lam', w,h,'light',false,/Câu đã làm/],
+    [`25-hs-cau-da-lam-${k}-toi`, 'cau-da-lam', w,h,'dark',false,/Câu đã làm/],
     // Luyện thêm có màu nhấn (09/10): chụp thêm Hành trình nền TỐI
     [`22-hs-hanh-trinh-${k}-toi`, 'sanh', w,h,'dark',true,/Hôm nay/,'hs:Hành trình'],
     ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Ca kiểm tra'],['loi-thay','Nhận xét của thầy'],['thong-tin','Thông tin và giao diện']].flatMap(([m,chu]) => ['light','dark'].map((nen) => [`23-ph-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph',w,h,nen,true,/Hôm nay/,`ph:${m}:${chu}`])),

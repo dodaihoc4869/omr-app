@@ -26,6 +26,7 @@ import '../../src/styles/the-loc.css'
 import '../../src/components/m3'
 import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
 import SanhHomNay from '../../src/components/ban-duyet-v2/SanhHomNay'
+import CauDaLam from '../../src/components/hoa2/CauDaLam'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 // Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
 import '../../src/styles/vo-thay.css'
@@ -93,6 +94,22 @@ const CA_GIA = [
 ]
 const CAU_HOI_GIA = [0, 1, 2].map((i) => ({ maCa: 'DH-11-C1-A2', tenCa: 'Kiểm tra 15 phút 11B', sbd: String(11011 + i * 3), hoTen: EM_GIA[1 + i * 3]!.hoTen, qids: ['Q3'], ghiChu: '', guiLuc: '2026-10-07T03:00:00Z', daChua: i === 2, chuaLuc: '' }))
 
+const DANG_CDL = ['Khái niệm ester', 'Thuỷ phân ester', 'Chất béo', 'Glucose', 'Saccharose', 'Tinh bột', 'Cellulose', 'Amine']
+const CDL_GIA = {
+  ok: true,
+  chienDich: [{ id: 'cd1', ten: 'Hành trình giỏi hoá · Khối 12', hanNop: '9999-12-31', tong: 120 }],
+  cau: Array.from({ length: 24 }, (_, i) => ({
+    qid: `C${8300 + i}`, chienDichId: 'cd1', stt: 8300 + i, phan: i % 5 === 3 ? 'II' : i % 7 === 6 ? 'III' : 'I', mucDo: i % 3 === 0 ? 'biet' : i % 3 === 1 ? 'hieu' : 'VD',
+    tenDang: DANG_CDL[i % DANG_CDL.length], trangThai: i === 0 ? 'thanh_thao' : i % 4 === 1 ? 'can_day_lai' : 'dang_on', lanCuoiDung: i % 3 !== 1, henOn: i % 2 ? '2026-10-12' : null,
+    lichSu: [{ ngay: '2026-10-09', dung: i % 3 !== 1, coGoiY: false }],
+  })),
+}
+const CT_GIA = {
+  de: { qid: 'C8300', maDe: 'DH-12-C2-B1', version: '1', group: 'g', phan: 'I', text: 'Carbohydrate nào sau đây thuộc loại disaccharide?', choices: ['Saccharose.', 'Glucose.', 'Tinh bột.', 'Fructose.'], ideas: [], hinhAnh: [], tenDang: 'Saccharose', mucDo: 'biet', sao: 1, kienThuc: [] },
+  dapAn: 'A',
+  loiGiai: { chot: 'Disaccharide thuỷ phân cho hai đơn vị monosaccharide; trong bốn chất chỉ saccharose là disaccharide.', tung_pa: { A: { dung: true, vi_sao: 'Saccharose là disaccharide.' }, B: { dung: false, vi_sao: 'Glucose là monosaccharide.' }, C: { dung: false, vi_sao: 'Tinh bột là polysaccharide.' }, D: { dung: false, vi_sao: 'Fructose là monosaccharide.' } } },
+  emTraLoi: 'A',
+}
 const fetchGoc = window.fetch.bind(window)
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -111,6 +128,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
   // App phụ huynh (trung tu 09/10): một nhận xét đã công bố để ảnh có thẻ "Nhận xét của thầy" ở Hôm nay và màn con `#loi-thay`.
   if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [{ maCa: 'CA-2', tenCa: 'Kiểm tra 45 phút · Ester – Lipid', noiDung: 'Con làm tốt phần lý thuyết ester. Bài đốt cháy hỗn hợp con còn nhầm bước bảo toàn nguyên tố, thầy sẽ chữa cùng con ở buổi tới.', capNhatLuc: '2026-09-20T01:00:00Z', nopLuc: '2026-09-19T02:12:00Z', tong: 7.5 }] })
+  // Câu đã làm (09/10): 24 câu để danh sách cột trái đủ dài mà cuộn — tái hiện lỗi thẻ chồng chữ ở bố cục ngang.
+  if (u.pathname.endsWith('/hoa2-cau-da-lam')) return tra(CDL_GIA)
+  if (u.pathname.endsWith('/hoa2-cau-chi-tiet')) return tra({ ok: true, cau: [CT_GIA] })
   return tra({ ok: true })
 }
 
@@ -173,6 +193,7 @@ const con =
   : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
+  : man === 'cau-da-lam' ? h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })
   : man === 'sanh-xong' ? manSanh(SANH_XONG)
   : man === 'sanh-ca-mo' ? manSanh(SANH_HT, { caDangMo: true })
   : man === 'sanh-dang-tai' ? manSanh(null)

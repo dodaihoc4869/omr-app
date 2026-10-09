@@ -314,6 +314,11 @@
 .h2-the-dung {
   color: rgb(109 213 140);
 }
+/* Nền SÁNG (Bát Linh đổi --h2c-* sang ngà/mực ở bat-linh/hoc-sinh.css) — ba màu viết thẳng ở trên chỉ hợp nền tối: nhãn "Đang ôn" xanh nhạt
+   trên nền nhạt, chữ Đúng/Sai nhạt ⇒ không đọc được (thầy gửi ảnh 09/10). Pha từ biến chuẩn với màu chữ của khung ⇒ đọc rõ cả sáng lẫn tối. */
+.h2-cdl .h2-the-tt[data-tt='dang_on'] { color: var(--h2c-chu); }
+.h2-cdl .h2-the-dung { color: color-mix(in srgb, var(--xanh) 55%, var(--h2c-chu)); }
+.h2-cdl .h2-the-sai { color: color-mix(in srgb, var(--do) 60%, var(--h2c-chu)); }
 .h2-the-duoi {
   font-size: 13px;
   color: var(--h2c-chu-phu);
@@ -496,6 +501,8 @@
   gap: 16px;
   padding: max(20px, env(safe-area-inset-top)) 32px 16px;
 }
+/* Nút Về: nền viết thẳng ở trên chỉ hợp nền tối — Bát Linh sáng đổi chữ sang tối ⇒ chữ tối trên nền tối. Dùng nền thẻ của khung (theo sáng/tối). */
+.h2-cdl .h2-cdl-ve { background: var(--h2c-nen-2); }
 .h2-cdl-ve-chu {
   width: auto;
   padding: 0 18px 0 12px;
@@ -543,6 +550,22 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+/* SỬA LỖI 09/10 (thầy gửi ảnh thẻ chồng chữ lên nhau): giao-dien-day-du.css ép `.h2-cdl .h2-cdl-ds` thành LƯỚI 2 cột ở ≥ 900px. Ở bố cục ngang danh sách
+   là khung CUỘN cao cố định ⇒ lưới chia đều chiều cao khung cho hàng chục hàng (thẻ `overflow: hidden` có cỡ tối thiểu 0) ⇒ mỗi hàng ~35px, thẻ đè nhau.
+   Bố cục ngang = MỘT cột danh sách (cột trái hẹp, 2 cột quá chật); độ đặc hiệu cao hơn để thắng luật chung bất kể thứ tự nạp. */
+.h2-cdl.h2-cdl-ngang .h2-cdl-ds {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+/* Cùng gốc lỗi: cột trái là khung dọc cao cố định ⇒ các khối đầu cột (thẻ ca, hàng lọc cuộn ngang, dòng tóm tắt, nút PDF) bị BÓP theo chiều dọc
+   (hàng lọc còn ~24px, viền viên thành "( )"). Chỉ danh sách được co và cuộn; mọi khối khác giữ đủ cao. Hàng lọc ở bố cục ngang được xuống dòng. */
+.h2-cdl-ng-trai > :not(.h2-cdl-ds) { flex-shrink: 0; }
+.h2-cdl-ngang .h2-cdl-loc { flex-wrap: wrap; overflow: visible; row-gap: 8px; }
+@media (pointer: coarse) {
+  .h2-cdl-loc .tl-the { height: auto; min-height: 44px; }
 }
 .h2-cdl-ngang .h2-cdl-ds {
   flex: 1 1 auto;
