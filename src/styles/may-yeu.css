@@ -50,3 +50,20 @@ html.may-yeu .h2c-quet-deu {
   animation: none !important;
 }
 
+/* 5. (09/10): Tối ưu máy yếu cho Sảnh V2 và Đảo thần thú 2.0:
+ * - Tắt SVG blur filter nặng nề trong cảnh trận CanhRung để giữ 60 FPS khi làm bài
+ * - Bỏ drop-shadow trên hình thần thú và đơn giản hoá bóng thẻ để cuộn mượt mà */
+html.may-yeu .dao2-canh-nen g[filter] {
+  filter: none !important;
+}
+html.may-yeu .dao2 .dao2-canh-thu,
+html.may-yeu .v2s-thu-co img {
+  filter: none !important;
+}
+html.may-yeu .v2-the,
+html.may-yeu .v2s-tien-do,
+html.may-yeu .dao2-giay {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1) !important;
+}
+
+

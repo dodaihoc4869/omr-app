@@ -62,6 +62,7 @@ export function quenDiaChiMayChu(): void {
  *             không sao — đó chính là điểm của tệp này.
  */
 export async function layDiaChiMayChu(goiY = ''): Promise<string> {
+  if (daBiet && !goiY) return daBiet
   const u = await timDiaChiMayChu(goiY)
   // HỎI SỚM (05/10, src/lib/hoi-som.ts): nhớ địa chỉ vừa dùng — lệnh Sảnh gửi sớm chỉ được nhận khi đi đúng máy chủ này.
   if (u) ghiDiaChiDaDung(u)
@@ -69,6 +70,9 @@ export async function layDiaChiMayChu(goiY = ''): Promise<string> {
 }
 
 async function timDiaChiMayChu(goiY: string): Promise<string> {
+  const g = don(goiY)
+  if (g) return (daBiet = g)
+  if (daBiet) return daBiet
   try {
     const ch = await layCauHinhMayChu()
     const u = don(ch.URL)
@@ -76,9 +80,6 @@ async function timDiaChiMayChu(goiY: string): Promise<string> {
   } catch {
     // IndexedDB hỏng (máy em ở chế độ riêng tư, hết chỗ) — còn ba đường nữa.
   }
-
-  const g = don(goiY)
-  if (g) return (daBiet = g)
 
   // Lượt nạp ở `main.tsx` có thể đang chạy dở. Chờ nó rồi hỏi lại.
   try {

@@ -73,7 +73,7 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
 import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
-import { veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { moManGameNhanh, napManCauDaLam, napManGame, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
 // vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
@@ -100,8 +100,9 @@ import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
 import type { TuCongHocSinh } from './ExamTakeScreen'
 
-// Màn làm bài nạp trễ: cổng học sinh không phải kéo theo bộ chấm khi chỉ xem điểm.
-const ManLamBai = lazy(() => import('./ExamTakeScreen'))
+// Màn làm bài nạp trễ nhưng nạp trước lúc rảnh / lúc bấm cửa: khi học sinh bấm "Vào thi" thì màn mở ngay lập tức trong 0ms.
+export const boNapExam = boNap(() => import('./ExamTakeScreen'))
+const ManLamBai = veNgayKhiCo(lazy(boNapExam), boNapExam)
 const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 // MÁY YẾU (29/09): Bảng tin + hộp Khắc phục câu sai chỉ hiện khi em BẤM mở — nạp lười (một mảnh chung, xem cong-hs-nap-luoi.ts)
@@ -917,6 +918,21 @@ export default function StudentPortalScreen() {
     goc.classList.add('sanh-bi-che')
     return () => goc.classList.remove('sanh-bi-che')
   }, [cheDo2, tab])
+  // NẠP TRƯỚC MÀN LÀM BÀI (09/10): tải trước ExamTakeScreen lúc rảnh để khi học sinh bấm "Vào thi" thì màn mở ngay 0ms không phải chờ tải qua mạng.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const cb = () => { void boNapExam() }
+    const hen = ('requestIdleCallback' in window
+      ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
+      : (fn: () => void) => setTimeout(fn, 1200))(cb)
+    return () => {
+      if ('cancelIdleCallback' in window) {
+        (window as Window & { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(hen)
+      } else {
+        clearTimeout(hen)
+      }
+    }
+  }, [])
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null && !cheDo2)
@@ -1083,6 +1099,7 @@ export default function StudentPortalScreen() {
       namSinh: auth.namSinh || '',
       lop: auth.lop || '',
       matKhau: matKhauCaVaoThi.trim(),
+      scriptUrl: scriptUrl || undefined,
     })
     setManThi(true)
   }
@@ -1146,7 +1163,10 @@ export default function StudentPortalScreen() {
           now={nowHocTap}
           token={auth.token}
           shopBat={duLieuBang.thanThu.kieu === 'co' && duLieuBang.thanThu.shopBat === true}
-          onVaoThi={() => setTab('vaothi')}
+          onVaoThi={() => {
+            void boNapExam()
+            setTab('vaothi')
+          }}
           onPhaPhucKich={() => moGameTai('doan')}
           onKhamPhaDao={() => moGameTai('')}
           onCauDaLam={() => setTab('caudalam')}
@@ -1217,7 +1237,10 @@ export default function StudentPortalScreen() {
             }
             moGame()
           }}
-          onVaoThi={() => setTab('vaothi')}
+          onVaoThi={() => {
+            void boNapExam()
+            setTab('vaothi')
+          }}
           onXemBaiDaNop={() => moManCu('diem')}
         />
       )}

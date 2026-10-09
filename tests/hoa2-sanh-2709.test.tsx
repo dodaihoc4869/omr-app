@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import SanhBanDo, { viTriOPhucKich, type SanhBanDoProps } from '../src/components/hoa2/SanhBanDo'
-import { docSanh, type KetQuaSanh } from '../src/components/hoa2/api'
+import { docNhoKetQuaSanh, docSanh, ghiNhoKetQuaSanh, type KetQuaSanh } from '../src/components/hoa2/api'
 import { chuHanNop, thuNgayThang } from '../src/components/hoa2/thoi-gian'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 
@@ -240,6 +240,17 @@ describe('StudentPortalScreen thật: cờ Game Hóa 2.0', () => {
     await waitFor(() => expect(container.querySelector('.bnv')).not.toBeNull())
     expect(container.querySelector('.h2-sanh')).toBeNull()
     expect(localStorage.getItem('omr_hoa2_che_do:test')).toBeNull()
+  })
+
+  it('SWR: có đệm phiên trước ⇒ vẽ Sảnh NGAY LẬP TỨC 0ms; mạng đơ/lỗi vẫn giữ Sảnh không bị chặn', async () => {
+    const kqDem = docSanh(SANH)!
+    ghiNhoKetQuaSanh('test', kqDem)
+    expect(docNhoKetQuaSanh('test')).not.toBeNull()
+    // Giả lập mạng bị lỗi hoặc timeout
+    tra['/game-v2/hoa2-sanh'] = { nem: true }
+    render(<StudentPortalScreen />)
+    // Sảnh hiển thị ngay từ bản đệm trong 0ms mà không đợi mạng
+    expect(screen.getByRole('button', { name: /Bắt đầu · gỡ 4 lỗi cũ/ })).not.toBeNull()
   })
 })
 
