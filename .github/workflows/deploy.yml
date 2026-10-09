@@ -28,10 +28,6 @@ jobs:
     # Bản sống chỉ lấy từ main; nhánh cũ không được ghi đè luồng chữa đã phát hành.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # Thầy cho phát hành với ca 17h30 ngày 09/10; cổng vẫn chặn lượt đang làm.
-    # Giá trị này tự hết hiệu lực lúc 17h45 ngày 09/10/2026 (VN).
-    env:
-      CHUA_CA_CHO_DUOC_DUYET_DEN: '2026-10-09T10:45:00Z'
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 2}

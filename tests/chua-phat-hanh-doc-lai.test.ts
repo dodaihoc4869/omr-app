@@ -30,9 +30,10 @@ function chay(config = { bat: true, phamVi: 'tat_ca', dongBoTuLuyen: true }, rec
   })
 }
 describe('CLI đọc lại toàn trường sau đồng bộ', () => {
-  it('quyền thầy duyệt chỉ dành đúng một ca 17h30, không có lượt đang làm, chưa hết hạn', () => {
+  it('không dùng lại quyền một lần sau ca: ca mở hoặc lượt đang làm luôn chặn', () => {
     const den='2026-10-09T10:45:00Z'
-    expect(chay(undefined,undefined,{so_ca_mo:1,so_luot_dang_lam:0},1,den).status).toBe(0)
+    expect(chay(undefined,undefined,{so_ca_mo:1,so_luot_dang_lam:0},1,den).status).not.toBe(0)
+    expect(chay(undefined,undefined,{so_ca_mo:0,so_luot_dang_lam:1},0,den).status).not.toBe(0)
     expect(chay(undefined,undefined,{so_ca_mo:1,so_luot_dang_lam:1},1,den).status).not.toBe(0)
     expect(chay(undefined,undefined,{so_ca_mo:2,so_luot_dang_lam:0},1,den).status).not.toBe(0)
     expect(chay(undefined,undefined,{so_ca_mo:1,so_luot_dang_lam:0},0,den).status).not.toBe(0)

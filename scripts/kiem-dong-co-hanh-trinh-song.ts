@@ -23,14 +23,8 @@ const db={
 }
 const env={DB:db,DE:{async get(key:string){const body=execFileSync('npx',['wrangler','r2','object','get',`omr-de/${key}`,'--remote','--pipe','--config','server/wrangler.toml'],{maxBuffer:32*1024*1024,stdio:['ignore','pipe','pipe']});return {body:new Uint8Array(body),async json(){return JSON.parse(body.toString())}}},async put(){throw new Error('Không được ghi kho.')},async delete(){throw new Error('Không được xoá kho.')}}} as unknown as Env
 async function main(){
-  // Cùng cổng giờ vào ca/quyền thầy duyệt/lượt đang làm với phát hành.
-  const { caDaDuocDuyet } = await import('./kiem-phat-hanh-chua.mjs')
-  // Quyền phát hành giao diện không yêu cầu chạy lại bộ đọc sâu trong ca.
-  // Ghi rõ hoãn; schema/ba Hành trình và SHA bản sống vẫn được kiểm riêng.
-  if (caDaDuocDuyet) {
-    console.log(JSON.stringify({kiemDongCoSong:false,hoanKiemDocSau:true,lyDo:'ca_17h30_thay_duyet_phat_hanh'}))
-    return
-  }
+  // Cùng cổng giờ vào ca/lượt đang làm với phát hành; không bỏ qua kiểm đọc sâu.
+  await import('./kiem-phat-hanh-chua.mjs')
   const em=await db.prepare(`SELECT h.sbd,COUNT(s.khoa) n FROM hoc_sinh h LEFT JOIN su_kien_hoc s ON s.sbd=h.sbd WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM chien_dich c,json_each(c.sbd_json) j WHERE c.id LIKE 'hanh-trinh-v3-khoi-%' AND c.trang_thai='dang_chay' AND j.value=h.sbd) GROUP BY h.sbd ORDER BY n DESC,h.sbd LIMIT 1`).first<{sbd:string;n:number}>()
   if(!em) throw new Error('Chưa có học sinh thuộc ba hành trình.')
   const now=Date.now(),ngay=new Date(now+7*3600000).toISOString().slice(0,10)
