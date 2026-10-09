@@ -5,7 +5,7 @@ Lệnh người dùng ngày 09/10/2026: gộp toàn bộ chiến dịch thành b
 ## Hành vi triển khai
 
 - Cron đầu tiên sau phát hành tạo ba chiến dịch `hanh-trinh-v3-khoi-10/11/12`, sao lưu chiến dịch nguồn đang chạy và đóng nguồn trong một batch. Không sửa/xoá sổ học, điểm hoặc nội dung nguồn. Mốc lịch sử giữ từ chiến dịch sớm nhất.
-- Ca đang mở thì hoãn. CHECK trong batch kiểm lại ca; CAS kiểm trạng thái/danh sách nguồn để tránh gộp từ ảnh chụp cũ. Học sinh nguồn chưa rõ khối thì không gộp.
+- Ca đang mở thì hoãn. CHECK trong batch kiểm lại ca; CAS kiểm trạng thái/danh sách nguồn để tránh gộp từ ảnh chụp cũ. Tài khoản hiện có chưa rõ khối thì không gộp. Tham chiếu nguồn không còn tài khoản được giữ nguyên trong bản sao/lịch sử, không tự tạo tài khoản hoặc giao câu cho mã đó; biên nhận ghi số tham chiếu này.
 - Kho được đồng bộ tối đa mỗi 5 phút: câu đã duyệt, không tự luận, xác định đúng khối; học sinh chưa khoá có khối rõ ràng được nhận vào Hành trình đúng khối. Không cần tạo chiến dịch mới hay bấm giao.
 - Chỉ nạp tối đa 96 ứng viên mỗi tầng cho mỗi em/ngày, cộng câu trong kế hoạch và lỗi cần xử lý; không nạp toàn bộ kho vào mỗi lần mở Sảnh. Kho ứng viên xoay theo em/ngày. Chọn cuối cùng theo trạng thái, lịch ôn, tầng sẵn sàng và trọng số OMNI.
 - Tầng nội dung khác với hạng năng lực L1–L4 cũ: nền = NB/biet, hiểu = TH/hieu, vận dụng = VD/van_dung sao 0–1, tổng hợp = VDC/sao ≥2. Câu chưa rõ mức không tự coi là nền.
