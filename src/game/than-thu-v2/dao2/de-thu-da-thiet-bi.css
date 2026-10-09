@@ -20,8 +20,4 @@
   .dao2 .dao2-de-thu-noi-dung { order: 2; }
 }
 
-.dao2 .dao2-de-thu-thoi-gian { display: none; margin: 0; font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
-@media (min-width: 740px) {
-  .dao2 .dao2-de-thu[data-pha='lam'] > .dao2-bd-dau .dao2-the-luc { display: none; }
-  .dao2 .dao2-de-thu-thoi-gian { display: block; }
-}
+.dao2 .dao2-de-thu-thoi-gian { margin: 0; width: fit-content; font-variant-numeric: tabular-nums; }

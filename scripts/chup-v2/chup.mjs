@@ -33,6 +33,8 @@ const DS = [
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
+  ['01b-hom-nay-ngang-dien-thoai-toi', 'sanh', 844, 390, 'dark', false, /Hôm nay/],
+  ['01c-hom-nay-may-tinh-toi', 'sanh', 1440, 960, 'dark', false, /Hôm nay/],
   ['01c-hom-nay-may-tinh', 'sanh', 1440, 960, 'light', false, /Hôm nay/],
   ['01d-hom-nay-xong', 'sanh-xong', 390, 844, 'light', true, /Hôm nay/],
   ['01e-hom-nay-ca-dang-mo', 'sanh-ca-mo', 390, 844, 'light', false, /Vào thi/],
@@ -49,6 +51,8 @@ const DS = [
   ['14-gv-nhip-hom-nay', 'gv-nhip', 1440, 960, 'light', false, /Nhịp học hôm nay/],
   ['14-gv-nhip-hom-nay-toi', 'gv-nhip', 1440, 960, 'dark', false, /Nhịp học hôm nay/],
   ['14-gv-nhip-hom-nay-dien-thoai', 'gv-nhip', 390, 844, 'light', true, /Nhịp học hôm nay/],
+  ['14-gv-nhip-dien-thoai-toi', 'gv-nhip', 390, 844, 'dark', true, /Nhịp học hôm nay/],
+  ['14-gv-nhip-ngang-toi', 'gv-nhip', 844, 390, 'dark', true, /Nhịp học hôm nay/],
   ['14-gv-nhip-ngang', 'gv-nhip', 844, 390, 'light', true, /Nhịp học hôm nay/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
     [`20-ph-${k}-${nen}`, 'ph', w,h,nen,true,/Hôm nay/],

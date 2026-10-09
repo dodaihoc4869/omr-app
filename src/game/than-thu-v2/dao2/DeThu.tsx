@@ -56,7 +56,6 @@ export default function DeThu({call,onVe,l4=false}:DeThuProps){
  const dau=(tieuDe:string)=><header className="dao2-bd-dau">
   <button type="button" className="dao2-nut-tron dao2-nut-tron-lon" onClick={()=>void roi()} aria-label="Rời đề thử về app học sinh" title="Về app học sinh">{LUI}</button>
   <h2><small>BÁT LINH ĐẢO</small>{tieuDe}</h2>
-  {de&&!kq&&<p className="dao2-kinh dao2-the-luc" role="timer" aria-label={`Thời gian còn lại của đề thử: ${Math.floor(con/60)} phút ${con%60} giây`}><span><small>Còn lại</small>{dongHo(con)}</span></p>}
   <NutToanManHinh/>
  </header>
  if(!de)return <div className="dao2-de-thu" data-khoi="de-thu">
@@ -82,7 +81,7 @@ export default function DeThu({call,onVe,l4=false}:DeThuProps){
   </section>)}
   </div>
   <aside className="dao2-de-thu-dieu-huong" aria-label="Tiến độ và nộp đề thử">
-   <p className="dao2-de-thu-thoi-gian" role="timer" aria-label={`Thời gian còn lại: ${Math.floor(con/60)} phút ${con%60} giây`}>Còn {dongHo(con)}</p>
+   <p className="dao2-kinh dao2-the-luc dao2-de-thu-thoi-gian" role="timer" aria-label={`Thời gian còn lại của đề thử: ${Math.floor(con/60)} phút ${con%60} giây`}><span><small>Còn lại</small>{dongHo(con)}</span></p>
    <p className="dao2-ai-nhan">Danh sách câu</p>
    <nav className="dao2-de-thu-ban-do" aria-label="Chuyển tới câu hỏi">
     {cau.map((q,i)=><button type="button" key={q.qid} aria-label={`Câu ${i+1}: ${daLamCau(q.phan,traLoi[q.qid])?'đã làm':'chưa làm'}`} data-da-lam={daLamCau(q.phan,traLoi[q.qid])?'true':'false'} onClick={()=>{const el=document.getElementById(`de-thu-cau-${i+1}`);el?.scrollIntoView({block:'start'});el?.focus({preventScroll:true})}}>{i+1}</button>)}

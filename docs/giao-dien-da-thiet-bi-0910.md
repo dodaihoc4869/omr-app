@@ -10,6 +10,6 @@ Tiếp tục trên main `973ddded` (PR218/219), giữ bản duyệt V2 đã ch�
 
 Bản build chụp ảnh dùng component thật, IO giả và chặn mạng ra ngoài; fixture chỉ nằm trong `scripts/chup-v2`, không đưa vào bản phát hành. Chromium kiểm dọc 390, ngang 844, máy tính 1440, sáng/tối; chọn câu, xoay giữ đáp án, chuyển câu và focus. Bằng chứng tại thư mục ngoài repo `/workspace/ui-da-thiet-bi-0910`.
 
-90 kiểm liên quan đạt; 2 hồi quy đổi con/làm mới đạt; 29 kiểm ngang/game/hồi quy đạt. `build:cf` đạt, SW 13/13, precache 148 tệp/2981 KB; giữ màu 0 vi phạm. Toàn repo đang chạy và đối chiếu tên lỗi với main trước khi phát hành; không tuyên bố toàn repo xanh khi còn lỗi nền.
+90 kiểm liên quan đạt; 2 hồi quy đổi con/làm mới đạt; 29 kiểm ngang/game/hồi quy đạt. `build:cf` đạt, SW 13/13, precache 148 tệp/2981 KB; giữ màu 0 vi phạm. Full vitest trước chốt: 14.806 đạt/155 lỗi. Đối chiếu 69 tệp đỏ với main bắt được lỗi tạo hai đồng hồ ở đề thử; đã sửa về một đồng hồ, giữ nguyên kiểm thử. Luồng đề thử cuối đạt 19/19. Kiểm lại 69 tệp đỏ + hồi quy mới: bản cuối 1.049 đạt/153 lỗi, main cùng tệp 1.047 đạt/153 lỗi; tên lỗi trùng hoàn toàn, 0 lỗi mới. Không tuyên bố toàn repo xanh. Chromium 27 cảnh sáng/tối, dọc/ngang/máy tính: 0 lỗi JS, 0 tràn ngang; các màn vừa sửa không có đích chạm dưới 44 px, nút mới thiết kế tối thiểu 48 px.
 
 Không đổi máy chủ/schema/sổ/điểm. Phát hành qua `deploy.yml`, kiểm ca mở và lượt đang làm trước Worker/Pages, rồi kiểm bản sống cùng commit. Lùi bằng revert commit giao diện này; giữ dữ liệu học tập.
