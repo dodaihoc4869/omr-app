@@ -1,0 +1,39 @@
+name: Kiểm dữ liệu ba hành trình (chỉ đọc)
+on:
+  push:
+    branches: [codex/kiem-hanh-trinh-0910]
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci
+      - run: npx esbuild src/lib/khoi-cau.ts --bundle --platform=node --format=esm --outfile=/tmp/khoi.mjs
+      - name: Làm sạch cấu hình
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đối chiếu nguồn (chỉ số tổng)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          node --input-type=module <<'JS'
+          import { query } from './scripts/kiem-phat-hanh-chua.mjs'
+          import { khoiCuaLop } from '/tmp/khoi.mjs'
+          const hs = await query('SELECT sbd,lop,ten_lop,trang_thai FROM hoc_sinh')
+          const cd = await query("SELECT id,sbd_json FROM chien_dich WHERE trang_thai='dang_chay'")
+          const by = new Map(hs.map(r=>[r.sbd,r]))
+          const nguon = cd.filter(r=>!/^hanh-trinh-v3-khoi-(10|11|12)$/.test(r.id))
+          const sbds = new Set(nguon.flatMap(r=>JSON.parse(r.sbd_json)))
+          let thieuTaiKhoan=0,chuaRoKhoi=0,khoa=0
+          for (const s of sbds) {const h=by.get(s);if(!h)thieuTaiKhoan++;else if(h.trang_thai==='khoa')khoa++;else if(!(khoiCuaLop(h.lop)??khoiCuaLop(h.ten_lop)))chuaRoKhoi++}
+          const bang = await query("SELECT COUNT(*) AS soCau,SUM(CASE WHEN json_valid(json) THEN json_extract(json,'$.reviewed')=1 ELSE 0 END) AS daDuyet FROM game_v2_question")
+          const marker = await query("SELECT gia_tri FROM cau_hinh WHERE khoa='hanh_trinh_3_0910_v1'")
+          console.log(JSON.stringify({hocSinh:hs.length,nguonDangChay:nguon.length,hanhTrinhDangChay:cd.length-nguon.length,thieuTaiKhoan,chuaRoKhoi,khoa,...bang[0],coBienNhan:marker.length>0}))
+          JS
