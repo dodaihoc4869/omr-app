@@ -1,15 +1,15 @@
-// Mục "Tiến bộ" — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10: khối anh hùng = điểm các ca kiểm tra (đường điểm, chuyển từ màn "Điểm số" cũ) + khoảng cách tới 8 và
-// chứng chỉ Sẵn sàng 8+ (OMNI, chỉ khi máy chủ gửi; độ tin không bao giờ 100%) → MỘT danh sách dạng (bậc Biết · Hiểu · Vận dụng, nhãn "Đang luyện thêm")
-// → Sơ ý của con (mục tiêu dưới 7%, OMNI) → nhịp học 14 ngày. Không thêm số mới; khối nào không có số thật ⇒ vắng; cả màn không có gì ⇒ một thẻ trống nói vì sao.
-// Đã bỏ: khối "câu từng sai đã thành thạo lại" (bản vẽ không có; "câu chờ thầy dạy lại" gộp vào "Cần thầy chữa" ở Hôm nay).
+// Mục "Tiến bộ" — TRUNG TU THẦY DUYỆT 09/10 (bản vẽ PH-TienBo). Khối anh hùng: mới 1 ca ⇒ điểm ca gần nhất + câu "Từ ca thứ hai…" (không vẽ biểu đồ trống);
+// từ 2 ca ⇒ đường điểm có thang /10 + mức tăng/giảm; dưới đó khoảng cách tới 8 và chứng chỉ Sẵn sàng 8+ (OMNI, chỉ khi máy chủ gửi; độ tin không bao giờ 100%)
+// → Nhịp học 14 ngày (3 ô số + cột có số câu trên đầu mỗi cột) → Các dạng con đã học (3 số theo bậc + thanh 3 khúc; từng dạng mở thêm khi cần)
+// → Sơ ý của con (mục tiêu dưới 7%, OMNI). Không thêm số mới; khối nào không có số thật ⇒ vắng; cả màn không có gì ⇒ một thẻ trống nói vì sao.
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
-import type { PhMoi } from '../../lib/ph-moi/du-lieu'
+import type { DiemTienBo, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2 } from '../../lib/ph-v3/du-lieu'
 import type { PhOmni } from '../../../server/src/omni-kieu'
 import { ngayChuoiNgan, soVn, tachVn } from '../../lib/ph-moi/dinh-dang'
 import { chuPhKhoangCach, chuSoY, diemChu, doTinChu } from '../../lib/omni-chu'
 import { TEN_BAC_SO } from '../ph-moi/nhan'
-import { BtTienBo } from './BieuTuong'
+import { BtPhai, BtTienBo } from './BieuTuong'
 import { BieuDo } from './ManDiemSo'
 import { Chip, DangTai, The, TheLoi, TheTrong } from './dung-chung'
 import { diemCacCa } from './tien-ich'
@@ -46,12 +46,19 @@ export function dongDiemOmni(o: PhOmni | undefined): { khoa: string; chu: string
   return ra
 }
 
+/** Đếm dạng theo bậc (Vận dụng → Hiểu → Biết) cho thanh 3 khúc. */
+export function demTheoBac(ds: readonly { bac: 0 | 1 | 2 }[]): { bac: 0 | 1 | 2; so: number }[] {
+  const dem = [0, 0, 0]
+  for (const d of ds) dem[d.bac]!++
+  return ([2, 1, 0] as const).map((b) => ({ bac: b, so: dem[b]! }))
+}
+
 export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null }) {
   const pm = v.pm
   if (!pm) return (
     <div>
       <div className="ph3-tieu-de"><h1>Tiến bộ</h1></div>
-      {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />}
+      {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai hinh="tien-bo" />}
     </div>
   )
   const omni = hoc2?.omni
@@ -61,9 +68,9 @@ export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null
       <div className="ph3-tieu-de"><h1>Tiến bộ</h1></div>
       <div className="ph3-luoi">
         <DiemCacCa pm={pm} omni={omni} />
+        <Nhip pm={pm} />
         <BacTheoDang pm={pm} />
         <SoY omni={omni} />
-        <Nhip pm={pm} />
         {!coGi && <TheTrong id="ph3-tb-trong" tieuDe="Chưa đủ dữ liệu" chu="Con học thêm vài ngày và có ca kiểm tra được công bố thì điểm, bậc từng dạng và nhịp học hiện ở đây." />}
       </div>
     </div>
@@ -74,19 +81,10 @@ function DiemCacCa({ pm, omni }: { pm: PhMoi; omni?: PhOmni }) {
   const ds = diemCacCa(pm)
   const dong = dongDiemOmni(omni)
   if (ds.length === 0 && dong.length === 0) return null
-  const doiTuDau = ds.length > 1 ? ds[ds.length - 1]!.diem - ds[0]!.diem : null
+  const motCa = ds.length === 1 ? ds[0]! : null
   return (
     <section className="ph3-ah ph3-o-rong" aria-labelledby="ph3-diem-ca" data-vung="xu-huong-diem">
-      <div className="ph3-ah__tren">
-        <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm các ca kiểm tra</p>
-        {doiTuDau !== null && (
-          <span className="ph3-ah__chip" data-mau="xl">
-            <BtTienBo co={16} day={2.5} />
-            {doiTuDau > 0.004 ? `Tăng ${soVn(doiTuDau)} điểm` : doiTuDau < -0.004 ? `Giảm ${soVn(-doiTuDau)} điểm` : 'Giữ nguyên điểm'} từ ca {ngayChuoiNgan(ds[0]!.ngay)}
-          </span>
-        )}
-      </div>
-      {ds.length > 0 && <BieuDo ds={ds} />}
+      {motCa ? <MotCa d={motCa} /> : ds.length > 1 ? <NhieuCa ds={ds} /> : <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm các ca kiểm tra</p>}
       {dong.length > 0 && (
         <div className="ph3-ah__dong" data-vung="diem-omni">
           {dong.map((d) => (d.dam ? <b key={d.khoa}>{d.chu}</b> : <span key={d.khoa}>{d.chu}</span>))}
@@ -96,48 +94,85 @@ function DiemCacCa({ pm, omni }: { pm: PhMoi; omni?: PhOmni }) {
   )
 }
 
+/** Mới một ca được công bố: số điểm to + tên ca, ngày; câu nói rõ đường điểm hiện từ ca thứ hai (không vẽ biểu đồ một chấm). */
+function MotCa({ d }: { d: DiemTienBo }) {
+  return (
+    <>
+      <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm ca kiểm tra gần nhất</p>
+      <p className="ph3-ah__cau" data-vung="diem-gan-nhat"><b>{soVn(d.diem)}</b><small>/10</small></p>
+      <p className="ph3-ah__phu">{d.tenCa} · {ngayChuoiNgan(d.ngay)}</p>
+      <p className="ph3-ah__o-ghi">Con mới có 1 ca. Từ ca thứ hai, đường điểm sẽ hiện ở đây kèm mức tăng hay giảm.</p>
+    </>
+  )
+}
+
+function NhieuCa({ ds }: { ds: DiemTienBo[] }) {
+  const doiTuDau = ds[ds.length - 1]!.diem - ds[0]!.diem
+  return (
+    <>
+      <div className="ph3-ah__tren">
+        <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm các ca kiểm tra</p>
+        <span className="ph3-ah__chip" data-mau="xl">
+          <BtTienBo co={16} day={2.5} />
+          {doiTuDau > 0.004 ? `Tăng ${soVn(doiTuDau)} điểm` : doiTuDau < -0.004 ? `Giảm ${soVn(-doiTuDau)} điểm` : 'Giữ nguyên điểm'} từ ca {ngayChuoiNgan(ds[0]!.ngay)}
+        </span>
+      </div>
+      <BieuDo ds={ds} />
+    </>
+  )
+}
+
 function SoY({ omni }: { omni?: PhOmni }) {
   const c = chuSoY(omni?.sEm ?? null, SO_Y_MUC_TIEU)
   if (!c) return null
   const [so, muc] = c.replace(/^Sơ ý /, '').split(' (')
   return (
-    <The id="ph3-so-y" className="ph3-o-du" vung="so-y" tieuDe="Sơ ý của con" chip={<b className="ph3-the__so">{so} <small>({muc}</small></b>} />
+    <The id="ph3-so-y" className="ph3-o-hep" vung="so-y" tieuDe="Sơ ý của con" chip={<b className="ph3-the__so">{so} <small>({muc}</small></b>} />
   )
 }
 
+/** Các dạng con đã học: 3 số theo bậc + thanh 3 khúc (độ dài khúc = số dạng); danh sách từng dạng (nhãn "Vừa lên bậc" / "Đang luyện thêm") mở khi cần. */
 function BacTheoDang({ pm }: { pm: PhMoi }) {
   const ds = pm.bacTheoDang ?? []
   if (ds.length === 0) return null
   const vuaLen = new Set([...(pm.vuaLenBac ?? []).map((x) => x.ma), ...(pm.tienBo?.dangTienBoNhat ?? []).map((x) => x.ma)])
-  // "Đang luyện thêm": cùng nguồn với tên dạng ở khối (c) của Hôm nay (máy chủ: `dangVap` theo mã, `manhYeu.conVap` theo tên).
+  // "Đang luyện thêm": cùng nguồn với tên dạng ở dòng dạng của Hôm nay (máy chủ: `dangVap` theo mã, `manhYeu.conVap` theo tên).
   const dangVap = new Set((pm.dangVap ?? []).map((x) => x.ma))
   const conVap = new Set((pm.manhYeu?.conVap ?? []).map((x) => x.tenDang))
-  const dem = [0, 0, 0]
-  for (const d of ds) dem[d.bac]!++
+  const dem = demTheoBac(ds)
   return (
-    <The id="ph3-bac" className="ph3-o-hep" vung="bac-theo-dang" tieuDe="Bậc của con ở từng dạng" phu="Mỗi dạng có ba bậc: Biết · Hiểu · Vận dụng">
+    <The id="ph3-bac" className="ph3-o-hep" vung="bac-theo-dang" tieuDe="Các dạng con đã học" phu="Mỗi dạng có ba bậc: Biết · Hiểu · Vận dụng">
+      <div className="ph3-ba-khuc" role="img" aria-label={dem.map((d) => `${d.so} dạng ở bậc ${TEN_BAC_SO[d.bac]}`).join(', ')}>
+        {dem.filter((d) => d.so > 0).map((d) => <span key={d.bac} data-bac={d.bac} style={{ flexGrow: d.so }} />)}
+      </div>
       <div className="ph3-dem-bac">
-        {[2, 1, 0].map((b) => (
-          <div key={b} data-nhan={b === 2 ? '' : undefined}><b>{dem[b]}</b><span>dạng ở bậc {TEN_BAC_SO[b]}</span></div>
+        {dem.map((d) => (
+          <div key={d.bac} data-bac={d.bac}><b>{d.so}</b><span><i aria-hidden="true" />bậc {TEN_BAC_SO[d.bac]}</span></div>
         ))}
       </div>
-      <ul className="ph3-dang">
-        {[...ds].sort((a, b) => b.bac - a.bac).map((d) => (
-          <li key={d.ma}>
-            <div className="ph3-dang__dong">
-              <span>{d.ten}</span>
-              {vuaLen.has(d.ma) ? <Chip mau="xl" nho>Vừa lên bậc</Chip> : dangVap.has(d.ma) || conVap.has(d.ten) ? <Chip mau="hp" nho>Đang luyện thêm</Chip> : null}
-              <em data-bac={d.bac}>{TEN_BAC_SO[d.bac]}</em>
-            </div>
-            <div className="ph3-bac" aria-hidden="true">
-              {[0, 1, 2].map((k) => <span key={k} data-co={k <= d.bac ? '' : undefined} />)}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <details className="ph3-xem-them">
+        <summary className="tt-nhan"><BtPhai co={18} day={2.5} />Xem từng dạng ({ds.length} dạng)</summary>
+        <ul className="ph3-dang">
+          {[...ds].sort((a, b) => b.bac - a.bac).map((d) => (
+            <li key={d.ma}>
+              <div className="ph3-dang__dong">
+                <span>{d.ten}</span>
+                {vuaLen.has(d.ma) ? <Chip mau="xl" nho>Vừa lên bậc</Chip> : dangVap.has(d.ma) || conVap.has(d.ten) ? <Chip mau="hp" nho>Đang luyện thêm</Chip> : null}
+                <em data-bac={d.bac}>{TEN_BAC_SO[d.bac]}</em>
+              </div>
+              <div className="ph3-bac" aria-hidden="true">
+                {[0, 1, 2].map((k) => <span key={k} data-co={k <= d.bac ? '' : undefined} />)}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </details>
     </The>
   )
 }
+
+/** Chiều cao cột (px) theo số câu; ngày không học là vạch mảnh riêng (CSS). */
+const CAO_COT = 96
 
 function Nhip({ pm }: { pm: PhMoi }) {
   const nh = pm.nhipHoc
@@ -158,8 +193,12 @@ function Nhip({ pm }: { pm: PhMoi }) {
         <div className="ph3-nhip__cot" role="img" aria-label={`Số câu mỗi ngày từ ${ngay14[0]} đến ${ngay14[13]}: ${ngay14.map((n) => theo.get(n) ?? 0).join(', ')}`}>
           {ngay14.map((n, i) => {
             const so = theo.get(n) ?? 0
-            if (so === 0) return <span key={n} data-nghi="" />
-            return <span key={n} data-tuan={i >= 7 ? '' : undefined} data-nay={i === 13 ? '' : undefined} style={{ height: `${Math.max(6, (so / max) * 110)}px` }} title={`${so} câu`} />
+            return (
+              <span key={n} data-nghi={so === 0 ? '' : undefined} data-tuan={so > 0 && i >= 7 ? '' : undefined} data-nay={so > 0 && i === 13 ? '' : undefined}>
+                <b>{so}</b>
+                <i style={so > 0 ? { height: `${Math.max(6, Math.round((so / max) * CAO_COT))}px` } : undefined} />
+              </span>
+            )
           })}
         </div>
         <div className="ph3-nhip__ngay" aria-hidden="true">
@@ -170,7 +209,7 @@ function Nhip({ pm }: { pm: PhMoi }) {
         <span><i style={{ background: 'var(--ph3-tim)' }} />7 ngày gần nhất</span>
         <span><i style={{ background: 'var(--ph3-tim-nhat)' }} />7 ngày trước đó</span>
         <span><i style={{ background: 'var(--ph3-vien)', height: 4 }} />Ngày không học</span>
-        <span>Chiều cao cột = số câu con làm trong ngày</span>
+        <span>Số trên cột = số câu con làm trong ngày</span>
       </div>
     </The>
   )

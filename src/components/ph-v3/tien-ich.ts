@@ -1,13 +1,14 @@
-// Bộ bản vẽ đầy đủ đã duyệt 09/10: Hôm nay, Tiến bộ, Lịch sử và Lời thầy.
+// Trung tu giao diện thầy duyệt 09/10: BA mục Hôm nay · Tiến bộ · Ca kiểm tra; "Nhận xét của thầy" là màn con mở từ Hôm nay (`#loi-thay`).
 // Nguồn đọc và quyền công bố được giữ; khối vắng dữ liệu không dựng số minh họa.
 import type { DiemTienBo, PhMoi } from '../../lib/ph-moi/du-lieu'
 import { tachVn, thuTuChuoiNgay } from '../../lib/ph-moi/dinh-dang'
 
-// Bản vẽ tối giản thầy chốt 09/10: BA mục Hôm nay · Tiến bộ · Ca kiểm tra (bỏ mục "Lời thầy"; "Lịch sử"/"Điểm số" đổi thành "Ca kiểm tra").
+// BA mục trên thanh: Hôm nay · Tiến bộ · Ca kiểm tra ("Lịch sử"/"Điểm số" là tên cũ của "Ca kiểm tra"). Hai màn con không nằm trên thanh:
+// `loi-thay` (Nhận xét của thầy — mở từ Hôm nay, có nút quay lại) và `thong-tin` (mở từ menu Tài khoản).
 export type Muc = 'hom-nay' | 'tien-bo' | 'ca-kiem-tra' | 'loi-thay' | 'thong-tin'
 export type Tuyen = { muc: Muc; maCa: string | null }
 
-/** `#ca/<mã>` ⇒ màn chi tiết ca (thuộc mục Ca kiểm tra); hash lạ ⇒ Hôm nay. Liên kết cũ còn lưu: `#diem` ⇒ Ca kiểm tra, `#loi-thay` ⇒ Hôm nay (lời thầy nay ở cuối Hôm nay). */
+/** `#ca/<mã>` ⇒ màn chi tiết ca (thuộc mục Ca kiểm tra); hash lạ ⇒ Hôm nay. Liên kết cũ còn lưu: `#diem`, `#lich-su` ⇒ Ca kiểm tra; `#loi-thay` ⇒ màn con Nhận xét của thầy. */
 export function docTuyen(hash: string): Tuyen {
   const h = hash.replace(/^#/, '')
   if (h.startsWith('ca/')) {
@@ -37,6 +38,16 @@ export function chuHanNgay(ngay: string): string {
 export const TEN_PHAN: Record<'I' | 'II' | 'III', string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
 
 const hai = (n: number) => String(n).padStart(2, '0')
+/** Mục trên thanh đang sáng cho một tuyến: màn con Nhận xét của thầy thuộc Hôm nay; chi tiết ca thuộc Ca kiểm tra; Thông tin không thuộc mục nào. */
+export function mucSang(t: Tuyen): Muc | null {
+  if (t.muc === 'loi-thay') return 'hom-nay'
+  if (t.muc === 'thong-tin') return null
+  return t.muc
+}
+/** Khoá chỗ cuộn của một tuyến: ba mục giữ chỗ riêng; màn con (chi tiết ca, nhận xét, thông tin) mở lại luôn từ đầu. */
+export const khoaCuon = (t: Tuyen): string => (t.maCa ? `ca/${t.maCa}` : t.muc)
+export const laManCon = (t: Tuyen): boolean => !!t.maCa || t.muc === 'loi-thay' || t.muc === 'thong-tin'
+
 const chuoiNgay = (ms: number) => {
   const d = new Date(ms)
   return `${d.getUTCFullYear()}-${hai(d.getUTCMonth() + 1)}-${hai(d.getUTCDate())}`
