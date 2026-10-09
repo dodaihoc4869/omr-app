@@ -2,7 +2,7 @@
 // xếp buổi chữa (≤ 90 phút, mỗi em có mặt ≥ 1 lượt), tờ đề của một ca, xếp tên em.
 import { maDeGocMayChu } from '../../lib/btvn-nang-do-thay'
 import { CAU_HINH_LEN_BANG_MAC_DINH } from '../../lib/len-bang-cau-hinh'
-import type { CauBuoiChua, EmTen, HangEm, MucSucChua } from './api'
+import type { CauBuoiChua, EmGiaiMau, EmTen, HangEm, MucSucChua } from './api'
 
 // ---------------------------------------------------------------- hạng theo dạng (heatmap em × dạng)
 /** Hạng theo % — ĐÚNG ngưỡng thuật toán bốc câu (máy chủ `hangTuTiLe`, srs2-loi.ts):
@@ -55,8 +55,8 @@ export function sapTheoTen<T extends { ten: string }>(ds: readonly T[]): T[] {
 // ---------------------------------------------------------------- buổi chữa
 export interface DongBuoiChua {
   cau: CauBuoiChua
-  /** Em giải mẫu; `null` = chưa em nào thành thạo câu này ⇒ thầy giải mẫu. */
-  giaiMau: EmTen | null
+  /** Em giải mẫu; `null` = không có em có mặt đã tự làm đúng câu ⇒ thầy chữa. */
+  giaiMau: EmGiaiMau | null
   sua: EmTen[]
   /** Giây ước lượng của dòng (giải mẫu + các em sửa). */
   giay: number

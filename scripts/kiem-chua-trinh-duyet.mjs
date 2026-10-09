@@ -58,9 +58,14 @@ try {
         ? { executablePath: '/usr/bin/chromium' }
         : {}),
   })
-  for (const width of [360, 430, 1280]) {
+  for (const { width, height, ten } of [
+    { width: 360, height: 900, ten: '360' },
+    { width: 430, height: 900, ten: '430' },
+    { width: 844, height: 390, ten: 'xoay-ngang-844' },
+    { width: 1280, height: 900, ten: 'may-tinh-1280' },
+  ]) {
     const page = await browser.newPage({
-      viewport: { width, height: 900 },
+      viewport: { width, height },
       reducedMotion: 'reduce',
     })
     const errors = []
@@ -135,7 +140,7 @@ try {
     await page.waitForTimeout(1000)
     await page.getByText('Em đã cộng đủ ba nguyên tố.').waitFor()
     assert.equal(errors.length, 0, errors.join('\n'))
-    await page.screenshot({ path: `${out}/chua-${width}.png`, fullPage: true })
+    await page.screenshot({ path: `${out}/chua-${ten}.png`, fullPage: true })
     await page.keyboard.press('Escape')
     assert.equal(await page.getByRole('dialog').count(), 0)
     assert.equal(
@@ -167,14 +172,14 @@ try {
     await to.locator('#mc-thanh [data-k="C"]').click()
     await page.getByText('Đã ghi chữa chung: 1').waitFor()
     await page.screenshot({
-      path: `${out}/chua-lop-${width}.png`,
+      path: `${out}/chua-lop-${ten}.png`,
       fullPage: true,
     })
     assert.equal(errors.length, 0, errors.join('\n'))
     await page.close()
   }
   console.log(
-    'PASS: 360/430/1280px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; retry nguyên payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
+    'PASS: 360/430/xoay ngang 844/máy tính 1280px; không tràn ngang; Tab giữ trong dialog; Escape trả tiêu điểm; retry nguyên payload; phản hồi được giữ; tờ chữa chung giấu tên/lời gỡ, Thầy chữa ghi qua cầu nối iframe thật.',
   )
 } finally {
   await browser?.close()

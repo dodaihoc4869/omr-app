@@ -113,13 +113,13 @@ describe('màn Buổi chữa', () => {
     const p = {
       du: DU,
       dsEm: LOP,
-      coMat: [] as string[],
+      coMat: LOP.map((e) => e.sbd),
       canDayLai: [{ qid: 'DE-A-I-9', stt: 9, dang: 'Xà phòng', soEm: 1 }],
       homNay: '2026-10-05',
       tra: new Map(),
       dangChieu: false,
       onChieu: vi.fn(async () => true),
-      onDoiCoMat: vi.fn(),
+      onMoDiemDanh: vi.fn(),
       onDaChua: vi.fn(),
       ...them,
     }
@@ -131,7 +131,7 @@ describe('màn Buổi chữa', () => {
     expect(screen.getByRole('heading', { name: 'Buổi chữa · Ester – Lipid · 12A1' })).toBeTruthy()
     expect(container.textContent).toContain('Chữa trên lớp › Buổi chữa')
     expect(container.textContent).toContain('hết hạn nộp lúc 23:59 Chủ Nhật 04/10')
-    expect(container.textContent).toContain('có mặt 6/6 em')
+    expect(container.textContent).toContain('đã điểm danh 6/6 em')
     const hang = [...container.querySelectorAll('[data-hang-chua]')].map((x) => x.getAttribute('data-hang-chua'))
     expect(hang).toEqual(['DE-A-I-17', 'DE-A-I-44', 'DE-A-I-23'])
     const dau = container.querySelector('[data-hang-chua="DE-A-I-17"]') as HTMLElement
@@ -166,7 +166,7 @@ describe('màn Buổi chữa', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Chữa xong' }))
     hop = screen.getByRole('alertdialog')
     fireEvent.click(within(hop).getByRole('button', { name: 'Chữa xong' }))
-    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich', { action: 'chua-xong', id: 'cd-1', qids: ['DE-A-I-17', 'DE-A-I-44', 'DE-A-I-23'] }))
+    await waitFor(() => expect(goi).toHaveBeenCalledWith('/gv/chien-dich', { action: 'chua-xong', id: 'cd-1', qids: ['DE-A-I-17', 'DE-A-I-44', 'DE-A-I-23'], coMat: ['01', '02', '03', '04', '05', '06'] }))
     expect(await screen.findByRole('button', { name: 'Đã chữa xong' })).toBeTruthy()
     expect(screen.getByText(/Đã chữa xong: 3 lượt em được mở khoá/)).toBeTruthy()
     expect(p.onDaChua).toHaveBeenCalled()
@@ -182,16 +182,15 @@ describe('màn Buổi chữa', () => {
       ['DE-A-I-44', '01'],
       ['DE-A-I-23', '02'],
     ])
-    expect(oChieuTuDong(xepBuoiChua([cau(1, 'X', ['03'], [], null)], LOP, () => 60).dong)[0]!.sbd).toBe('03')
+    const thay = oChieuTuDong(xepBuoiChua([cau(1, 'X', ['03'], [], null)], LOP, () => 60).dong)[0]!
+    expect(thay.sbd).toBe('')
+    expect(thay.ten).toBe('Thầy chữa')
   })
 
-  it('"Đổi em có mặt" xếp lại cho em có mặt; "Mở ca chốt" ghi sẵn câu rồi mở màn Mở ca', () => {
+  it('"Cập nhật điểm danh bằng mã" quay lại nguồn có mặt; "Mở ca chốt" ghi sẵn câu rồi mở màn Mở ca', () => {
     const { p } = ve()
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi em có mặt' }))
-    const hop = screen.getByRole('dialog')
-    fireEvent.click(within(hop).getByRole('checkbox', { name: 'Em 06' }))
-    fireEvent.click(within(hop).getByRole('button', { name: 'Xếp lại cho 5 em' }))
-    expect(p.onDoiCoMat).toHaveBeenCalledWith(['01', '02', '03', '04', '05'])
+    fireEvent.click(screen.getByRole('button', { name: 'Cập nhật điểm danh bằng mã' }))
+    expect(p.onMoDiemDanh).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByRole('button', { name: 'Mở ca chốt · 4 câu' }))
     expect(JSON.parse(sessionStorage.getItem(KHOA_CA_CHOT) ?? '{}').qids).toEqual(['DE-A-I-17', 'DE-A-I-44', 'DE-A-I-23', 'DE-A-I-9'])

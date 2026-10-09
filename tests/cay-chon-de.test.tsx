@@ -41,8 +41,8 @@ const tim = (ds: Nut[], khoa: string): Nut => {
 describe('dựng cây bốn tầng', () => {
   const cay = dungCay(KHO)
 
-  it('tầng 1 là khối, giữ thứ tự xuất hiện chứ không sắp lại', () => {
-    expect(cay.map((n) => n.nhan)).toEqual(['Khối 12', 'Khối 11'])
+  it('tầng 1 là khối, sắp đúng thứ tự khối', () => {
+    expect(cay.map((n) => n.nhan)).toEqual(['Khối 11', 'Khối 12'])
   })
 
   it('tầng 2 là chương, bỏ phần khối phía trước dấu chấm giữa', () => {
@@ -194,10 +194,10 @@ describe('tầng thư mục', () => {
     expect(cay.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['khoi:Khối 12', 'thumuc:DẠY HỌC'])
 
     const tm = cay[1]
-    expect(tm.con.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['khoi:Khối 12', 'khoi:Khối 10'])
-    expect(tm.con[0].con.map((n) => n.nhan)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
-    expect(tm.con[1].con.map((n) => n.nhan)).toEqual(['C1 - Nguyên Tử'])
-    expect(tm.laMa).toEqual(['DH-12-C1-B1', 'DH-12-C3-B8', 'DH-10-C1-B1'])
+    expect(tm.con.map((n) => `${n.tang}:${n.nhan}`)).toEqual(['khoi:Khối 10', 'khoi:Khối 12'])
+    expect(tm.con[0].con.map((n) => n.nhan)).toEqual(['C1 - Nguyên Tử'])
+    expect(tm.con[1].con.map((n) => n.nhan)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
+    expect(tm.laMa).toEqual(['DH-10-C1-B1', 'DH-12-C1-B1', 'DH-12-C3-B8'])
   })
 
   it('nhóm không có "/" thì khối vẫn ở ngoài cùng, không sinh tầng rỗng', () => {
@@ -227,6 +227,27 @@ describe('tầng thư mục', () => {
     expect(chuongCuaDe({ nhom: '12 · DẠY HỌC/C1 - Ester lipid' })).toBe('C1 - Ester lipid')
     expect(thuMucCuaDe({ nhom: '12 · C1 - Ester lipid' })).toBe('')
     expect(thuMucCuaDe({ nhom: '' })).toBe('')
+  })
+
+  it('sắp khối, chương và bài theo số SGK thay vì thứ tự nhập kho', () => {
+    const nhom = '12 · DẠY HỌC/C3 - Hợp chất chứa N'
+    const cay = dungCay([
+      de('DH-12-C3-B10', nhom, 'Bài 10. Protein và enzyme'),
+      de('DH-12-C3-B11-D2', nhom, 'Bài 11. Ôn tập chương 3 (Đề 2)'),
+      de('DH-12-C3-B8', nhom, 'Bài 8. Amine'),
+      de('DH-12-C3-B9-D2', nhom, 'Bài 9. Peptide (P2)'),
+      de('DH-12-C3-B11-D1', nhom, 'Bài 11. Ôn tập chương 3 (Đề 1)'),
+      de('DH-12-C3-B9-D1', nhom, 'Bài 9. Amino acid (P1)'),
+    ])
+    const bai = cay[0].con[0].con[0].con.map((n) => n.nhan)
+    expect(bai).toEqual([
+      'Bài 8. Amine',
+      'Bài 9. Amino acid (P1)',
+      'Bài 9. Peptide (P2)',
+      'Bài 10. Protein và enzyme',
+      'Bài 11. Ôn tập chương 3 (Đề 1)',
+      'Bài 11. Ôn tập chương 3 (Đề 2)',
+    ])
   })
 })
 

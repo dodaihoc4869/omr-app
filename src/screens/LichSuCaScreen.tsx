@@ -258,9 +258,6 @@ export default function LichSuCaScreen() {
               <h1 className="ls-tieu-de">
                 {xemDaXoa ? 'Ca đã xoá' : 'Ca kiểm tra'}
               </h1>
-              <p className="ls-phu-de">
-                {xemDaXoa ? 'Thùng rác và phục hồi dữ liệu ca' : 'Quản lý, tìm kiếm và chi tiết các ca kiểm tra'}
-              </p>
             </div>
           </div>
         </div>
@@ -518,9 +515,6 @@ export default function LichSuCaScreen() {
             >
               <Trash2 size={16} /> Xoá vĩnh viễn tất cả ({dsLoc.length} ca)
             </button>
-            <span style={NHAN_NHO}>
-              Hoặc bấm nút <b>Xoá vĩnh viễn</b> ở từng ca bên dưới
-            </span>
           </div>
         )}
 
@@ -537,7 +531,7 @@ export default function LichSuCaScreen() {
             )}
           </div>
         ) : hoa2 ? (
-          <div className="gv2-cuon">
+          <div className="gv2-cuon gv-scroll-box gv-scroll-box--table" role="region" aria-label="Danh sách ca kiểm tra" tabIndex={0}>
             <table className="gv2-bang gv2-bang-ca">
               <thead>
                 <tr>

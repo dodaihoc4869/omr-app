@@ -1,0 +1,15 @@
+Khôi phục theo yêu cầu thầy ngày 08/10/2026
+
+Mã nguồn nền: 4413231709ddb0aec5046a63bc2387af827da477, trước phân quota theo hồ sơ và trước giao diện V2.
+Giữ thuật toán cũ: mặc định 40 lượt/ngày; cấu hình riêng và chế độ Huyết Chiến cũ giữ nguyên, không biến thành trần cứng 40.
+Không force-push; bản khôi phục là commit mới sau 3f495cd1.
+Các thay đổi tương thích duy nhất trên server so với nền: cron khôi phục một lần và phân biệt hành trình lưu trữ với chiến dịch bị thầy hủy.
+
+Đối chiếu D1 chỉ đọc qua Actions 37798846227: không ca thi mở; 9 dòng cũ bị đóng đúng mốc gộp 2026-10-08T05:35:52.832Z; 3 hành trình không có câu bổ sung; 5 tick bài có lớp/mốc tạo khớp chính xác nguồn.
+Khôi phục giữ nguyên hạn nộp, thể lực cài riêng, danh sách em/câu, mọi lịch sử học và điểm. Ba chiến dịch đã quá hạn 05/10 giữ nguyên hạn cũ.
+Ẩn 3 dòng hành trình tổng hợp dưới trạng thái da_huy để không phát câu trùng, nhưng không áp thu hồi nợ sai cho 3 ID hành trình này. Mọi trường phạm vi vẫn giữ trong D1.
+Backup trong khoi_phuc_0810_sao_luu; biên nhận cau_hinh.khoi_phuc_chien_dich_rieng_0810_v1. Không xuất danh tính học sinh ra log/artifact công khai.
+Batch D1 nguyên tử: sao lưu + CAS tất cả cột + phục hồi + đánh dấu kế hoạch hôm nay cần đối chiếu + receipt. Bất kỳ lỗi/ca thi mở/thay đổi đồng thời đều dừng an toàn. Không xóa kế hoạch đã làm hay sổ sự kiện.
+
+Kiểm: build:cf và 13/13 kiểm SW đạt; tsc app/server đạt; 6 ca kiểm khôi phục đạt trên SQLite tương thích schema. Kiểm nền srs2-d1-2709 có một kỳ vọng chữa mẫu cũ đã lỗi ngay trên 44132317; không sửa luật chữa mẫu để ép xanh.
+Bản V2 làm dở giữ nguyên tại /workspace/omr-dong-bo-giao-dien-0710 và gói /workspace/ban-giao-v2-20261008.

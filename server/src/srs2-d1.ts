@@ -1,4 +1,6 @@
 import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
+import { laHanhTrinh, ungVienHanhTrinh } from './hanh-trinh-hop-nhat'
+import { tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
 // THUẬT TOÁN 2.0 — LỚP D1 (đọc chiến dịch, sổ sự kiện; chốt kế hoạch ngày; số liệu Sảnh; Rương Bát Linh).
 // Lõi thuần ở `srs2-loi.ts`. Công tắc `cau_hinh.game_hoa_2` (mặc định TẮT ⇒ mọi đường cũ giữ nguyên):
 //   {"bat":true}                         ⇒ toàn trung tâm
@@ -218,7 +220,8 @@ async function docMoiChienDich(env: Env): Promise<DsChienDich> {
       return {
         // đúng ngữ nghĩa `json_each(sbd_json) … value = ?`: chỉ phần tử CHUỖI trùng khớp tuyệt đối
         ds: dong.filter((row) => str(row.trang_thai) !== 'da_huy').map((row) => ({ row, sbd: tapChuoiJson(row.sbd_json) })),
-        huy: dong.filter((row) => str(row.trang_thai) === 'da_huy').map((row): DongDaHuy => ({ id: str(row.id), taoLuc: str(row.tao_luc), dongLuc: str(row.dong_luc), sbdJson: str(row.sbd_json), qidJson: str(row.qid_json) })),
+        // Hành trình gộp được lưu trữ khi khôi phục, KHÔNG phải thầy thu hồi câu sai của em.
+        huy: dong.filter((row) => str(row.trang_thai) === 'da_huy' && !/^hanh-trinh-gioi-hoa-khoi-(10|11|12)$/.test(str(row.id))).map((row): DongDaHuy => ({ id: str(row.id), taoLuc: str(row.tao_luc), dongLuc: str(row.dong_luc), sbdJson: str(row.sbd_json), qidJson: str(row.qid_json) })),
         bd: new Map((bd.results ?? []).map((x) => [str(x.id), str(x.bat_dau)])),
         rd: new Map((rd.results ?? []).map((x) => [str(x.id), Number(x.rai_deu)])),
       }
@@ -687,6 +690,13 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
   const [{ ds, daHuy }, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi] = await Promise.all([docChienDichKemDaHuyCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP])
   // OMNI 3: mọi chiến dịch đang chạy, hạn gần trước; cờ tắt ⇒ một chiến dịch (giao gần nhất) như cũ.
+  const ht = ds.find(c => laHanhTrinh(c.id) && c.trangThai === 'dang_chay' && !chuaBatDau(c, homNay))
+  if (ht) {
+    const ung = await ungVienHanhTrinh(env, ht.id, sbd, homNay, ht.qids)
+    const can = new Set([...ung, ...qidSaiCa.keys(), ...qidSaiLop.keys(), ...qidSaiMoiKenh.keys()])
+    // Không nạp lại toàn bộ kho của các chiến dịch nguồn đã đóng.
+    for (let i = 0; i < ds.length; i++) ds[i] = { ...ds[i]!, qids: ds[i]!.qids.filter(q => can.has(q)) }
+  }
   const dsDangChay = omni ? chienDichDangChayHet(ds, homNay) : []
   const dangChay = omni ? (dsDangChay[0] ?? null) : chienDichDangChay(ds, homNay)
   const hanTheoQid = new Map<string, string>()
@@ -1038,6 +1048,7 @@ export async function docHangEm(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: 
 
 // ---------------------------------------------------------------- kế hoạch ngày (chốt một lần)
 export interface KeHoachDaChot {
+  hanhTrinh?: TienDoHanhTrinh
   ngay: string
   chienDichId: string | null
   /** Khoá câu theo thứ tự phục vụ; `qid#2` = lần làm thứ 2 trong ngày (ngày cuối trước hạn). */
@@ -1132,7 +1143,9 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
   const chanSom = chanTruoc ?? protectedQuestions(env).catch(() => new Set<string>())
   const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch (đệm 60 s trong isolate; không bao giờ ném)
   const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc)
-  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom, sbd), hs: r.hs }
+  const kh = await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom, sbd)
+  if (kh.hanhTrinh) kh.hanhTrinh = tienDoHanhTrinh(kh.hanhTrinh.tang, kh.hanhTrinh.toiThieu, kh.tong, kh.tong - kh.conDao.length - kh.conDoan.length)
+  return { kh, hs: r.hs }
 }
 
 /** Câu CÒN LẠI không phục vụ được vì kho: đã rút / JSON không nạp được (`kho`) hay chỉ mục nay xem là tự luận (`tuLuan`). Câu bị ca khoá KHÔNG tính ở đây. */
@@ -1509,6 +1522,15 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
     cuP,
     omniSom.then((bat) => (bat ? docKeHoachOmni(env, sbd, ngay) : null)),
   ])
+  if (hoSo.chienDich && laHanhTrinh(hoSo.chienDich.id)) {
+    const [tc, chan, nghi] = await Promise.all([
+      tuyChonKeHoachOmni(env, sbd, nowMs, hoSo, await lapSom),
+      chanSom ?? protectedQuestions(env), docCauNghiDem(env, nowMs),
+    ])
+    const kh = await import('./hanh-trinh-d1').then(m => m.lapChotHanhTrinh(env, sbd, ngay, nowMs, hoSo, cu,
+      new Set([...chan, ...nghi]), tc.trongSoCau, tc.dangVung))
+    return { kh, hs: hoSo }
+  }
   if (hoSo.omni?.bat) return layKeHoachChotOmni(env, sbd, nowMs, hoSo, dem, cu, luuOmni, chanSom, await lapSom)
   const cd = hoSo.chienDich
   // SỔ NỢ (29/09): không chiến dịch ⇒ trần = thể lực của chiến dịch vừa đóng gần nhất (mặc định 40).
@@ -1629,6 +1651,7 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
     thuSucThem: { duoc: thuSuc.duoc, soCau: thuSuc.duoc ? thuSuc.soCau : 0 },
     // Chuỗi N ngày trên Sảnh: số ngày VN liên tiếp em có làm ≥ 1 câu (hôm nay chưa làm ⇒ giữ tới hôm qua).
     chuoiNgay,
+    ...(kh.hanhTrinh ? { hanhTrinh: kh.hanhTrinh } : {}),
   }
   if (!hs.omni?.bat) return ra
   // OMNI 3: phần thêm của Sảnh (làn OMNI D1 dựng): tổng/còn của kế hoạch, chiến dịch hạn gần nhất, số câu ôn bài cũ của kế hoạch hôm nay, chế độ chờ.
@@ -1667,6 +1690,7 @@ export const tranKeHoachHomNay = (cd: ChienDich, huyetChien: boolean): number =>
  * không có trong `hs.cau`, soát lại theo `meta`), câu đang bảo vệ cho ca (`chan`: qid hoặc nhóm), câu sai của ca (chưa tới lượt), câu đã có trong kế hoạch hôm nay.
  */
 export function tinhThuSucThem(kh: KeHoachDaChot, hs: Pick<HoSo2, 'chienDich' | 'cau' | 'tt' | 'meta' | 'qidCaSai'>, daMo: boolean, chan: ReadonlySet<string>): { duoc: boolean; soCau: number; lyDo: LyDoKhongThuSuc | null; ung: CauSrs[] } {
+  if (kh.hanhTrinh) return { duoc: false, soCau: 0, lyDo: 'du_tran', ung: [] }
   const khong = (lyDo: LyDoKhongThuSuc) => ({ duoc: false, soCau: 0, lyDo, ung: [] as CauSrs[] })
   const cd = hs.chienDich
   if (!cd) return khong('chua_co_chien_dich')

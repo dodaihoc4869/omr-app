@@ -199,14 +199,14 @@ describe('Buổi chữa hiện lại kết quả', () => {
       <BuoiChua
         du={DU}
         dsEm={['01', '02', '03'].map(E)}
-        coMat={[]}
+        coMat={['01', '02', '03']}
         canDayLai={[]}
         homNay="2026-10-05"
         tra={new Map()}
         ketQua={{ '01|DE-A-I-17': 'dat', '03|DE-A-I-44': 'khong_dat', '01|KHAC': 'dat' }}
         dangChieu={false}
         onChieu={vi.fn(async () => true)}
-        onDoiCoMat={vi.fn()}
+        onMoDiemDanh={vi.fn()}
         onDaChua={vi.fn()}
       />,
     )

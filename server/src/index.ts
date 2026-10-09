@@ -1,4 +1,5 @@
 import { docPhongChoDongThoi, xoaDemPhongCho } from './phong-cho-dong-thoi'
+import { khoiPhucChienDich0810 } from './khoi-phuc-chien-dich-0810'
 import { nhipCa } from './nhip-ca'
 import { anhCo, anhDay, layAnh } from './kho-anh'
 import { denPhongBiA } from './bi-a-phong'
@@ -3368,6 +3369,8 @@ async function themMocReset(env: Env, res: Response): Promise<Response> {
 
 const boXuLy = {
   async scheduled(event:{cron:string}, env:Env) {
+    // Lệnh khôi phục 08/10: batch nguyên tử, chỉ một lần, không chạy nếu có ca thi mở.
+    await khoiPhucChienDich0810(env)
     // RESET TOÀN APP (chỉ chạy đúng một lần, sau mốc 00:01 thứ Hai 21/09; trước mốc và sau khi xong thì trả về ngay). PHẢI chạy trước mọi việc khác của cron.
     // Job chia bước (≤ 40 truy vấn D1 mỗi lượt): đang làm/nhường thì các việc cron khác nghỉ lượt này (kế hoạch, tin PH, vinh danh đều dựng lại theo yêu cầu khi có người mở).
     const dangReset=await chayResetNeuDenGio(env,Date.now()).then(r=>{if(r.chay||r.lyDo==='loi'||r.lyDo==='qua_gio')console.log('[reset] cron',JSON.stringify({chay:r.chay,lyDo:r.lyDo,trangThai:r.trangThai?.trangThai,buoc:r.trangThai?.buoc,soTruyVan:r.soTruyVan,loi:r.trangThai?.loi}));return r.chay||r.lyDo==='dang_chay'||r.lyDo==='cho_tiep'}).catch(e=>{console.error('[reset] cron lỗi:',e);return false})
@@ -3375,6 +3378,13 @@ const boXuLy = {
     // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
+    if(event.cron==='* * * * *') {
+      const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
+        .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
+      if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
+      // Lượt quét kho dùng ngân sách riêng; việc nền khác chạy phút kế tiếp. Cron đêm luôn chạy đầy đủ.
+      if(ht?.trangThai==='vua_hop_nhat'||ht?.trangThai==='da_dong_bo')return
+    }
     const caoDiem=laGioCaoDiemVn(Date.now())
     // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts, tối ưu 28/09): MỘT lần mỗi isolate, trong cron (không nằm trên đường lệnh của em/thầy). Lỗi chỉ ghi log.
     // Cao điểm: KHÔNG chạy (lệnh DDL giữ khoá ghi D1; chỉ mục đã có từ 28/09 — isolate cron ngoài khung làm tiếp).

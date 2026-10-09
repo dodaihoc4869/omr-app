@@ -47,11 +47,11 @@ describe('dungCayTheoMucDich (thuần)', () => {
     const khoa = tatCaKhoa(cay)
     expect(new Set(khoa).size).toBe(khoa.length)
     // Mã DH- chưa ghi thư mục: vào DẠY HỌC đúng khối 11.
-    expect(dh!.con.map((n) => n.nhan)).toEqual(['Khối 12', 'Khối 11'])
+    expect(dh!.con.map((n) => n.nhan)).toEqual(['Khối 11', 'Khối 12'])
   })
 
-  it('không đổi `dungCay` cũ; nhánh rỗng thì không sinh nút', () => {
-    expect(dungCay(KHO).map((n) => n.nhan)).toEqual(['Khối 12', 'Khối 11', 'DẠY HỌC', 'BỘ ĐỀ'])
+  it('giữ cấu trúc `dungCay`; nhánh rỗng thì không sinh nút', () => {
+    expect(dungCay(KHO).map((n) => n.nhan)).toEqual(['Khối 11', 'Khối 12', 'DẠY HỌC', 'BỘ ĐỀ'])
     expect(dungCayTheoMucDich(KHO.filter((s) => !laDayHocMucDich(s))).map((n) => n.nhan)).toEqual([TEN_THU_MUC_TU_LUYEN])
     expect(dungCayTheoMucDich(KHO.filter(laDayHocMucDich)).map((n) => n.nhan)).toEqual(['DẠY HỌC'])
     expect(dungCayTheoMucDich([])).toEqual([])

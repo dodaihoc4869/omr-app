@@ -274,6 +274,22 @@ export default function BangChienDich({
     onOmniDoi?.()
   }
 
+  if (du.hanhTrinhNgay) return <section className="cd-the" aria-label="Tiến độ Hành trình hôm nay">
+    <h2>{cd.ten}</h2>
+    <p>Hôm nay · {hienNgay(du.homNay)} · tối thiểu 24 / 30 / 36 câu theo tầng · mỗi chặng 6 câu.</p>
+    <p>Kiến thức mới được tự nhận vào đúng khối sau khi duyệt. Câu thiếu hoặc chưa đủ điều kiện học được báo riêng.</p>
+    <div className="cd-cuon-doc" role="region" aria-label="Tiến độ từng học sinh" tabIndex={0}>
+      <table className="cd-bang"><thead><tr><th>Học sinh</th><th>Đang học</th><th>Đã làm hôm nay</th><th>Chặng đã xong</th><th>Câu cần bổ sung</th></tr></thead>
+        <tbody>{du.hanhTrinhNgay.em.map(e => <tr key={e.sbd}>
+          <td>{e.ten}</td><td>{e.tang ? ['Nền','Hiểu','Vận dụng','Tổng hợp'][e.tang-1] : 'Chưa mở app hôm nay'}</td>
+          <td>{e.toiThieu ? `${e.daLam}/${e.toiThieu} câu` : 'Chưa chốt kế hoạch'}</td>
+          <td>{e.toiThieu ? `${Math.floor(e.daLam/6)}/${Math.ceil(e.toiThieu/6)} chặng` : '—'}</td>
+          <td>{e.conThieu ? `${e.conThieu} câu` : '—'}</td>
+        </tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+
   return (
     <>
       <div className="cd-dau">
@@ -371,7 +387,7 @@ export default function BangChienDich({
           {dsEm.length === 0 ? (
             <p className="cd-phu">Chiến dịch chưa có em nào — kiểm tra lại lớp đã giao.</p>
           ) : (
-            <div className="cd-cuon-ngang">
+            <div className="cd-cuon-ngang cd-cuon-doc" role="region" aria-label="Tiến độ từng học sinh theo dạng" tabIndex={0}>
               <table className="cd-bang cd-nhiet" data-khoi="bang-tung-em">
                 <thead>
                   <tr>

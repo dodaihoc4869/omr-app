@@ -1,0 +1,47 @@
+name: Đặt lại may_soan_viec 'dang' → 'cho'
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dat-lai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm trước
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server
+          npx -y wrangler@latest d1 execute omr --remote \
+            --command "SELECT trang_thai, COUNT(*) n FROM may_soan_viec GROUP BY trang_thai"
+      - name: Reset dang → cho
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server
+          npx -y wrangler@latest d1 execute omr --remote \
+            --command "UPDATE may_soan_viec SET trang_thai = 'cho', ma_luot = NULL WHERE trang_thai = 'dang'"
+      - name: Kiểm sau
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          cd server
+          npx -y wrangler@latest d1 execute omr --remote \
+            --command "SELECT trang_thai, COUNT(*) n FROM may_soan_viec GROUP BY trang_thai"

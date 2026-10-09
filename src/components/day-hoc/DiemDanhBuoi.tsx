@@ -31,11 +31,23 @@ export const tenNgan = (hoTen: string, sbd: string) => {
 }
 const TOI_DA_HIEN = 150
 
+export interface TuyChonDiemDanhBuoi {
+  /** Chọn sẵn lớp khi màn này phục vụ một luồng đã biết lớp (vd buổi chữa chiến dịch). */
+  lopMacDinh?: string
+  /** Tên buổi ghi vào sổ điểm danh khi mở mới. */
+  tenMacDinh?: string
+  /** Chỉ nối lại buổi đang mở của đúng lớp, không lấy nhầm buổi lớp khác. */
+  chiNoiBuoiCungLop?: boolean
+}
+
 /** Trạng thái + lệnh của bước Điểm danh (một buổi học đang mở). */
-export function useDiemDanhBuoi() {
+export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
+  const lopMacDinh = (tuyChon.lopMacDinh ?? '').trim()
+  const tenMacDinh = (tuyChon.tenMacDinh ?? '').trim()
+  const chiNoiBuoiCungLop = tuyChon.chiNoiBuoiCungLop === true
   const showToast = useAppStore((s) => s.showToast)
   const [dsLop, setDsLop] = useState<LopThay[]>([])
-  const [lopChon, setLopChon] = useState('')
+  const [lopChon, setLopChon] = useState(lopMacDinh)
   const [tt, setTt] = useState<TrangThaiBuoi | null>(null)
   const [dangTaiBuoi, setDangTaiBuoi] = useState(true)
   const [loiBuoi, setLoiBuoi] = useState('')
@@ -51,22 +63,28 @@ export function useDiemDanhBuoi() {
   const idBuoi = tt?.buoi.id ?? ''
 
   useEffect(() => {
-    void layLopThay().then((r) => r.ok && setDsLop(r.du.lop))
+    let con = true
+    setLopChon(lopMacDinh)
+    void layLopThay().then((r) => con && r.ok && setDsLop(r.du.lop))
     void (async () => {
       const r = await buoiDangMo()
+      if (!con) return
       if (!r.ok) {
         setLoiBuoi(r.loai === 'chua_co_lenh' ? r.chu : '')
         setDangTaiBuoi(false)
         return
       }
-      const b = r.du[0]
+      const b = chiNoiBuoiCungLop ? r.du.find((x) => x.lop === lopMacDinh) : r.du[0]
       if (b) {
         const x = await xemBuoiHoc(b.id, true)
-        if (x.ok) setTt(x.du)
+        if (con && x.ok) setTt(x.du)
       }
-      setDangTaiBuoi(false)
+      if (con) setDangTaiBuoi(false)
     })()
-  }, [])
+    return () => {
+      con = false
+    }
+  }, [chiNoiBuoiCungLop, lopMacDinh])
 
   const capNhat = useCallback(
     (x: TrangThaiBuoi) =>
@@ -86,7 +104,7 @@ export function useDiemDanhBuoi() {
 
   const batDauDiemDanh = async () => {
     setDangMo(true)
-    const r = await moBuoiHoc(lopChon)
+    const r = await moBuoiHoc(lopChon || lopMacDinh, tenMacDinh)
     setDangMo(false)
     if (!r.ok) {
       showToast(r.chu, 'error')
@@ -161,7 +179,7 @@ export function useDiemDanhBuoi() {
 export type DiemDanhBuoi = ReturnType<typeof useDiemDanhBuoi>
 
 /** Khung bước "Điểm danh" (số bước + tiêu đề) và tấm chiếu mã — y hệt thẻ Dạy học. */
-export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1' }: { dd: DiemDanhBuoi; soBuoc?: number; idTieuDe?: string }) {
+export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = false }: { dd: DiemDanhBuoi; soBuoc?: number; idTieuDe?: string; khoaLop?: boolean }) {
   const { dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, setLopThem, dangThem, goc, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong } = dd
   return (
     <>
@@ -190,8 +208,9 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1' }: { dd: DiemD
             )}
             <label className="dh-chon-lop">
               <span>Lớp học hôm nay</span>
-              <select value={lopChon} onChange={(e) => setLopChon(e.target.value)}>
+              <select value={lopChon} onChange={(e) => setLopChon(e.target.value)} disabled={khoaLop}>
                 <option value="">Mọi lớp (em lớp nào cũng điểm danh được)</option>
+                {lopChon && !dsLop.some((l) => l.tenLop === lopChon) && <option value={lopChon}>{lopChon}</option>}
                 {dsLop.map((l) => (
                   <option key={l.tenLop} value={l.tenLop}>
                     {l.tenLop} · {l.soEm} em

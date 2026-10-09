@@ -376,11 +376,6 @@ export default function NganHangDeScreen() {
             <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
               {hoa2 ? 'Kho đề' : 'Ngân hàng câu hỏi'}
             </h1>
-            {!hoa2 && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Kho đề kiểm tra, thẩm định đáp án và đồng bộ tự động
-              </p>
-            )}
           </div>
         </div>
         {/* Lời giải từng bước (29/09): duyệt hồ sơ lời giải theo đề trước khi giao — màn riêng, không thêm mục thanh bên. */}
@@ -405,9 +400,6 @@ export default function NganHangDeScreen() {
           <div>
             <div className="font-bold" style={{ fontSize: 'var(--cx-4)', fontFamily: 'var(--serif)', fontVariantNumeric: 'tabular-nums' }}>
               {sources.length} đề · {tongCau} câu
-            </div>
-            <div style={NHAN_NHO}>
-              Thả file vào <code>kho-de/moi/</code> trên máy — đề tự về đây sau khi pipeline chạy.
             </div>
           </div>
           {tongNghi > 0 && <Nhan tone="do">{tongNghi} câu cần thầy quyết</Nhan>}

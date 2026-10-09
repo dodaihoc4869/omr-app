@@ -1,0 +1,61 @@
+name: Nạp 216 ứng viên song sinh vào D1 (0710)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  nap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/laughing-bohr-1ixzp4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Kiểm secret OMR_MA_BI_MAT
+        env:
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+        run: |
+          if [ -z "$OMR_MA_BI_MAT" ]; then
+            echo "DỪNG: Secret OMR_MA_BI_MAT chưa được đặt trong repo Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          echo "Secret OMR_MA_BI_MAT: có giá trị (${#OMR_MA_BI_MAT} ký tự) ✓"
+      - name: Nạp 216 ứng viên vào D1 qua Worker endpoint
+        env:
+          OMR_MA_BI_MAT: ${{ secrets.OMR_MA_BI_MAT }}
+        run: |
+          set -o pipefail
+          node scripts/nap-song-sinh-0710.mjs 2>&1 | tee /tmp/ket-qua-nap.log
+      - name: Upload kết quả nạp
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ket-qua-nap-D1
+          path: |
+            .may-soan/ban-giao-sau-ban/ket-qua-nap-D1.json
+            /tmp/ket-qua-nap.log
+          if-no-files-found: warn
+      - name: Làm sạch cấu hình Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm độ phủ thực tế từ D1 (36 bam duy nhất)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          set -o pipefail
+          node scripts/kiem-phu-sau-nap-0710.mjs
+      - name: Upload kết quả kiểm độ phủ
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ket-qua-kiem-phu
+          path: /tmp/kiem-phu-sau-nap.json
+          if-no-files-found: warn

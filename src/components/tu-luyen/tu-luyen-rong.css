@@ -55,6 +55,36 @@
 .tlu-rong .tlu-muc {
   font-size: 17px;
 }
+.tlu-rong .tlu-cho-chua {
+  gap: 16px;
+  padding: 18px;
+}
+.tlu-rong .tlu-cho-chua-luoi {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.tlu-rong .tlu-cho-chua-the {
+  min-height: 70px;
+  padding: 12px 14px;
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-cho-chua {
+  padding: 12px;
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-cho-chua-dau {
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-cho-chua-bieu-tuong {
+  width: 40px;
+  height: 40px;
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-cho-chua-luoi {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+.tlu-rong[data-bo-cuc='ngang'] .tlu-cho-chua-the {
+  min-height: 60px;
+  padding-block: 8px;
+}
 .tlu-dau-rong {
   width: 100%;
   max-width: 1196px;

@@ -232,14 +232,23 @@ describe('Đồng bộ Tu luyện theo lô trên workerd/D1', () => {
     const kiemMay={phienBan:1,luotSoan:'D1-soan-0001',luotKiem:'D1-kiem-0001',tra:await Promise.all(probeDuyNhat(h).map(async p=>({qid:p.qid,phienBan:p.phienBan,bamDe:await bamDeMu(p),dapAn:p.noiDungTrucTiep!.dapAn,lyDo:'Đã giải riêng và cộng đúng các nguyên tử trong công thức.',chac:true}))),chuyenMon:{dungKhoaHoc:true,tuongDuong:true,dungDoKho:true,duBuoc:true,lyDo:'Đủ dữ kiện khối lượng nguyên tử, cùng kỹ năng cộng nguyên tử khối, bốn bản đều mới và giữ độ khó.'}}
     const bad=structuredClone(kiemMay);bad.tra[0].dapAn='999'
     expect((await hocLieuThay(E,{luu:true,hocLieu:h,kiemMay:bad})).status).toBe(422)
+    const now=Date.now()
+    await E.DB.batch([
+      E.DB.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('HS-MO','Em Chờ Học Liệu','12','x','x')"),
+      E.DB.prepare(`INSERT INTO chua_loi_dot(id,sbd,qid_chuan,content_group,cohort_id,nguon_sai,phien_ban_cau,mo_luc,sai_cuoi_luc,trang_thai_day,ly_do_thieu,policy_snapshot,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc)
+        VALUES('D-MO','HS-MO',?,'nhom-Q','runtime','game','v1',?,?,'thieu_hoc_lieu','Chưa có học liệu','{}',?,?,?,?)`).bind(Q,now,now,now,now+86400000,now,now),
+    ])
     const first=await hocLieuThay(E,{luu:true,hocLieu:h,kiemMay}),receipt=await first.json() as any
     expect(first.status).toBe(200)
+    expect(receipt.soDotDaMo).toBe(1)
+    expect(await E.DB.prepare("SELECT trang_thai_day,ly_do_thieu FROM chua_loi_dot WHERE id='D-MO'").first()).toEqual({trang_thai_day:'can_chan_doan',ly_do_thieu:''})
     const row=await E.DB.prepare('SELECT hoc_lieu_json,nguoi_duyet FROM chua_loi_hoc_lieu WHERE bam=?').bind(receipt.bam).first<any>()
     expect(row.nguoi_duyet).toBe('máy kiểm độc lập · v1')
     expect(JSON.parse(row.hoc_lieu_json).kiemMay.tra).toHaveLength(kiemMay.tra.length)
     kiemMay.luotKiem='D1-kiem-0002'
     const again=await (await hocLieuThay(E,{luu:true,hocLieu:h,kiemMay})).json() as any
     expect(again.bam).toBe(receipt.bam)
+    expect(again.soDotDaMo).toBe(0)
     expect((await E.DB.prepare('SELECT COUNT(*) AS n FROM chua_loi_hoc_lieu WHERE bam=?').bind(receipt.bam).first<any>()).n).toBe(1)
   })
 

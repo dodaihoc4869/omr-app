@@ -77,7 +77,6 @@ export default function GiaoDeTheoTuanScreen() {
       <div className="gv-page-header">
         <div>
           <h1>Giao đề theo tuần</h1>
-          <p>Chọn lớp, học sinh, nguồn đề và hạn nộp.</p>
         </div>
       </div>
       <TheNoiDung>
@@ -101,7 +100,7 @@ export default function GiaoDeTheoTuanScreen() {
       </TheNoiDung>
       <TheNoiDung>
         <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k2)' }}>Em khối {khoi} ({chonEm.size} đã tick)</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k1)', maxHeight: 320, overflow: 'auto' }}>
+        <div className="gv-scroll-box gv-scroll-box--compact" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k1)' }} role="region" aria-label={`Học sinh khối ${khoi}`} tabIndex={0}>
           {emThay.length === 0 ? <p style={{ color: 'var(--nhat)' }}>Không có em nào ở khối này.</p> : emThay.map((e) => (
             <OTick key={e.sbd} da={chonEm.has(e.sbd)} nhan={e.hoTen || e.sbd} phu={e.tenLop || e.lop} onDoi={() => setChonEm(lat(chonEm, e.sbd))} />
           ))}
@@ -109,7 +108,7 @@ export default function GiaoDeTheoTuanScreen() {
       </TheNoiDung>
       <TheNoiDung>
         <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k2)' }}>Nguồn đề khối {khoi} ({chonDe.size} đã tick)</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k1)', maxHeight: 320, overflow: 'auto' }}>
+        <div className="gv-scroll-box gv-scroll-box--compact" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--k1)' }} role="region" aria-label={`Nguồn đề khối ${khoi}`} tabIndex={0}>
           {deThay.length === 0 ? <p style={{ color: 'var(--nhat)' }}>Không có tờ đề nào ở khối này.</p> : deThay.map((d) => (
             <OTick key={d.maDe} da={chonDe.has(d.maDe)} nhan={d.ten || d.maDe} phu={`${d.maDe} · ${d.soCau} câu`} onDoi={() => setChonDe(lat(chonDe, d.maDe))} />
           ))}
@@ -123,7 +122,7 @@ export default function GiaoDeTheoTuanScreen() {
         <button type="button" className="m3-nut-chu m3-nut-tonal" style={{ marginTop: 'var(--k3)' }} disabled={dangLuu || chonEm.size === 0 || chonDe.size === 0 || !han} onClick={() => void luu()}>
           {dangLuu ? 'Đang lưu…' : 'Lưu lại'}
         </button>
-        {(!han || chonEm.size === 0 || chonDe.size === 0) ? <p style={{ marginTop: 'var(--k2)', color: 'var(--nhat)' }}>Chọn ít nhất một em, một nguồn đề và hạn nộp.</p> : null}
+        {(!han || chonEm.size === 0 || chonDe.size === 0) ? <p style={{ marginTop: 'var(--k2)', color: 'var(--nhat)' }}>Cần chọn em, đề và hạn nộp.</p> : null}
       </TheNoiDung>
     </div>
   )

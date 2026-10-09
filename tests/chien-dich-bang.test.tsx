@@ -308,8 +308,30 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
     expect(chonMacDinh([])).toBe('')
   })
 
-  it('đang chạy ⇒ Bảng chiến dịch; chọn chiến dịch hết hạn nộp ⇒ TỰ chuyển Buổi chữa (`buoi-chua`)', async () => {
+  it('đang chạy ⇒ Bảng chiến dịch; hết hạn ⇒ bắt buộc điểm danh rồi mới gọi `buoi-chua` với đúng em có mặt', async () => {
     goi.mockImplementation(async (_d: string, b: Record<string, unknown>) => {
+      if (_d === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 2, sbd: ['Trần Bảo', 'Lê Chi'] }] } }
+      if (_d === '/gv/buoi-hoc' && b.action === 'dang-mo')
+        return { ok: true, du: { ok: true, buoi: [
+          { id: 'BH-KHAC', ten: 'Buổi lớp khác', lop: '11B', moLuc: '2026-10-05T09:00:00Z', hetHan: '2026-10-06T09:00:00Z', dongLuc: null, dangMo: true, soCoMat: 20 },
+          { id: 'BH-1', ten: 'Buổi chữa · Ester – Lipid', lop: '12A1', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true, soCoMat: 2 },
+        ] } }
+      if (_d === '/gv/buoi-hoc' && b.action === 'xem')
+        return {
+          ok: true,
+          du: {
+            ok: true,
+            buoi: { id: 'BH-1', ten: 'Buổi chữa · Ester – Lipid', lop: '12A1', moLuc: '2026-10-05T08:00:00Z', hetHan: '2026-10-06T08:00:00Z', dongLuc: null, dangMo: true },
+            ma: '482915',
+            doiMaLuc: Date.now() + 60_000,
+            coMat: [
+              { sbd: 'Trần Bảo', hoTen: 'Trần Bảo', luc: '2026-10-05T08:01:00Z', cach: 'ma' },
+              { sbd: 'Ngoài chiến dịch', hoTen: 'Ngoài chiến dịch', luc: '2026-10-05T08:02:00Z', cach: 'ma' },
+            ],
+            siSo: 2,
+            lopEm: [{ sbd: 'Trần Bảo', hoTen: 'Trần Bảo', tenLop: '12A1' }, { sbd: 'Lê Chi', hoTen: 'Lê Chi', tenLop: '12A1' }],
+          },
+        }
       if (b.action === 'danh-sach') return { ok: true, du: { ok: true, ...DS } }
       if (b.action === 'bang' && b.id === 'cd-2') return { ok: true, du: { ok: true, ...bang(EM, { chienDich: { ...bang(EM).chienDich, id: 'cd-2', ten: 'Amine', hanNop: '2026-10-10' } }) } }
       if (b.action === 'bang' && b.id === 'cd-1') return { ok: true, du: { ok: true, ...bang(EM, { hetHan: true, homNay: '2026-10-05' }) } }
@@ -332,11 +354,41 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
     expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua')).toBe(false)
 
     fireEvent.change(screen.getByLabelText('Chiến dịch'), { target: { value: 'cd-1' } })
+    expect(await screen.findByRole('heading', { name: 'Điểm danh buổi chữa bằng mã' })).toBeTruthy()
+    expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1')).toBe(false)
+    expect(screen.queryByRole('button', { name: 'Mở tờ máy chiếu' })).toBeNull()
+
+    expect(await screen.findByText('1/2 học sinh chiến dịch đã điểm danh')).toBeTruthy()
+    expect(goi.mock.calls.some(([d, b]) => d === '/gv/buoi-hoc' && b.action === 'xem' && b.id === 'BH-KHAC')).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: 'Xếp buổi chữa cho 1 em có mặt' }))
     expect(await screen.findByRole('heading', { name: 'Buổi chữa · Ester – Lipid · 12A1' })).toBeTruthy()
-    expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1')).toBe(true)
+    expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1' && Array.isArray(b.coMat) && b.coMat.length === 1 && b.coMat[0] === 'Trần Bảo')).toBe(true)
     expect(screen.getByRole('button', { name: 'Mở tờ máy chiếu' })).toBeTruthy()
     // Thầy lệnh 28/09: xoá khối "Gọi lên bảng theo một ca kiểm tra (cách cũ)".
     expect(screen.queryByRole('button', { name: /cách cũ/ })).toBeNull()
+  })
+
+  it('không có buổi đúng lớp ⇒ tạo mã điểm danh riêng cho lớp và tên chiến dịch, không nối nhầm buổi lớp khác', async () => {
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) => {
+      if (d === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 2, sbd: ['Trần Bảo', 'Lê Chi'] }] } }
+      if (d === '/gv/buoi-hoc' && b.action === 'dang-mo')
+        return { ok: true, du: { ok: true, buoi: [{ id: 'BH-KHAC', ten: 'Buổi lớp khác', lop: '11B', moLuc: '2026-10-05T09:00:00Z', hetHan: '2026-10-06T09:00:00Z', dongLuc: null, dangMo: true, soCoMat: 20 }] } }
+      if (d === '/gv/buoi-hoc' && b.action === 'mo')
+        return { ok: true, du: { ok: true, buoi: { id: 'BH-MOI', ten: String(b.ten), lop: String(b.lop), moLuc: '2026-10-05T10:00:00Z', hetHan: '2026-10-06T10:00:00Z', dongLuc: null, dangMo: true }, ma: '482915', doiMaLuc: Date.now() + 60_000, coMat: [], siSo: 2, lopEm: [] } }
+      if (d === '/gv/buoi-hoc' && b.action === 'xem')
+        return { ok: true, du: { ok: true, buoi: { id: 'BH-MOI', ten: 'Buổi chữa · Ester – Lipid', lop: '12A1', moLuc: '2026-10-05T10:00:00Z', hetHan: '2026-10-06T10:00:00Z', dongLuc: null, dangMo: true }, ma: '482915', doiMaLuc: Date.now() + 60_000, coMat: [], siSo: 2, lopEm: [] } }
+      if (b.action === 'danh-sach') return { ok: true, du: { ok: true, ...DS } }
+      if (b.action === 'bang' && b.id === 'cd-2') return { ok: true, du: { ok: true, ...bang(EM, { chienDich: { ...bang(EM).chienDich, id: 'cd-2', ten: 'Amine', hanNop: '2026-10-10' } }) } }
+      if (b.action === 'bang' && b.id === 'cd-1') return { ok: true, du: { ok: true, ...bang(EM, { hetHan: true, homNay: '2026-10-05' }) } }
+      return { ok: false, loai: 'tu_choi', chu: 'lệnh lạ' }
+    })
+    render(<LenBangChienDich />)
+    await screen.findByRole('heading', { name: 'Amine · 12A1' })
+    fireEvent.change(screen.getByLabelText('Chiến dịch'), { target: { value: 'cd-1' } })
+    fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh' }))
+    expect(await screen.findByRole('dialog', { name: 'Chiếu mã điểm danh' })).toBeTruthy()
+    expect(goi).toHaveBeenCalledWith('/gv/buoi-hoc', { action: 'mo', lop: '12A1', ten: 'Buổi chữa · Ester – Lipid', kemLop: true })
+    expect(goi.mock.calls.some(([d, b]) => d === '/gv/buoi-hoc' && b.action === 'xem' && b.id === 'BH-KHAC')).toBe(false)
   })
 
   it('máy chủ chưa có lệnh ⇒ nói thật + nút thử lại; chưa có chiến dịch ⇒ nói vì sao + việc làm tiếp', async () => {

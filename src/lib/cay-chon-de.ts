@@ -109,8 +109,9 @@ export function duoiPhanBiet(goc: string): string {
   return m ? m[1] : goc
 }
 
-/** Gom một danh sách theo khoá, GIỮ THỨ TỰ xuất hiện đầu tiên. Sắp lại theo
- * alphabet sẽ đảo thứ tự bài trong chương (Bài 10 lên trước Bài 8). */
+/** Gom một danh sách theo khoá, GIỮ THỨ TỰ xuất hiện đầu tiên. Những tầng có
+ * số thứ tự (khối / chương / bài) được sắp riêng bằng số ở `dungCay`; không
+ * sắp alphabet thuần vì như vậy Bài 10 sẽ lên trước Bài 8. */
 function gom<T>(ds: T[], khoa: (x: T) => string): { khoa: string; ds: T[] }[] {
   const map = new Map<string, T[]>()
   for (const x of ds) {
@@ -120,6 +121,32 @@ function gom<T>(ds: T[], khoa: (x: T) => string): { khoa: string; ds: T[] }[] {
     else map.set(k, [x])
   }
   return [...map].map(([k, v]) => ({ khoa: k, ds: v }))
+}
+
+const soTenTuNhien = new Intl.Collator('vi', { numeric: true, sensitivity: 'base' })
+
+/** Sắp ổn định theo con số mang ý nghĩa SGK. Mục không có số vẫn giữ nguyên
+ * thứ tự nhập kho và được đặt sau các mục đã đánh số. */
+function xepTheoSo<T>(ds: T[], layTen: (x: T) => string, laySo: (ten: string) => number | null): T[] {
+  return ds
+    .map((x, i) => ({ x, i, ten: layTen(x) }))
+    .sort((a, b) => {
+      const sa = laySo(a.ten)
+      const sb = laySo(b.ten)
+      if (sa === null || sb === null) return sa === null ? (sb === null ? a.i - b.i : 1) : -1
+      return sa - sb || soTenTuNhien.compare(a.ten, b.ten) || a.i - b.i
+    })
+    .map(({ x }) => x)
+}
+
+const soKhoi = (ten: string): number | null => (/^\d+$/.test(ten.trim()) ? Number(ten) : null)
+const soChuong = (ten: string): number | null => {
+  const m = /^\s*(?:chương\s*|c)(\d+)/i.exec(ten.normalize('NFC'))
+  return m ? Number(m[1]) : null
+}
+const soBai = (ten: string): number | null => {
+  const m = /^\s*bài\s+(\d+)/i.exec(ten.normalize('NFC'))
+  return m ? Number(m[1]) : null
 }
 
 function nutCha(khoa: string, nhan: string, tang: Tang, con: Nut[]): Nut {
@@ -136,7 +163,7 @@ function nutCha(khoa: string, nhan: string, tang: Tang, con: Nut[]): Nut {
 export function dungCay(ds: TeacherExamSource[]): Nut[] {
   // Dựng các nút CHƯƠNG của một danh sách đề, dưới một tiền tố khoá cho trước.
   const dungChuong = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
-    gom(dsX, chuongCuaDe).map(({ khoa: ch, ds: dsC }) => {
+    xepTheoSo(gom(dsX, chuongCuaDe), (x) => x.khoa, soChuong).map(({ khoa: ch, ds: dsC }) => {
       // GOM THEO TÊN BÀI, không theo mã đề.
       //
       // Bản cũ gom bằng `goMaDeTachRa(maDe).goc`, đúng khi mỗi bài chỉ có đúng
@@ -144,7 +171,7 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
       // `-D2` — hai mã gốc khác nhau nên bài "Glucose và fructose" hiện ra HAI
       // dòng trùng tên, thầy phải tích hai lần và tưởng kho có đề trùng.
       // Nay một bài đúng một nhánh; các mã của nó nằm dưới tầng lá.
-      const bai = gom(dsC, (c) => tenBai(c)).map(({ khoa: b, ds: dsB }) => {
+      const bai = xepTheoSo(gom(dsC, (c) => tenBai(c)), (x) => x.khoa, soBai).map(({ khoa: b, ds: dsB }) => {
         // Bài có nhiều mã gốc thì lá phải nói rõ mã nào, không thì thầy thấy
         // hai dòng "Trắc nghiệm" y hệt nhau mà không biết khác gì.
         const nhieuMa = new Set(dsB.filter(c => !tenMucDayHoc(c)).map((c) => goMaDeTachRa(c.maDe).goc)).size > 1
@@ -176,7 +203,7 @@ export function dungCay(ds: TeacherExamSource[]): Nut[] {
 
   // Các nút KHỐI của một danh sách đề.
   const dungKhoi = (dsX: TeacherExamSource[], tienTo: string): Nut[] =>
-    gom(dsX, khoiCuaDe).map(({ khoa: k, ds: dsK }) => {
+    xepTheoSo(gom(dsX, khoiCuaDe), (x) => x.khoa, soKhoi).map(({ khoa: k, ds: dsK }) => {
       const goc = tienTo ? `${tienTo}/${k || '?'}` : k || '?'
       return nutCha(goc, k ? `Khối ${k}` : 'Chưa rõ khối', 'khoi', dungChuong(dsK, goc))
     })

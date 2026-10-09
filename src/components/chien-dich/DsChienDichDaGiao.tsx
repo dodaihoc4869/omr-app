@@ -146,7 +146,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
     <section className="cd-the" data-khoi="ds-chien-dich-da-giao" aria-labelledby="cd-ds-da-giao">
       <div className="cd-the-dau">
         <div>
-          <h2 id="cd-ds-da-giao">Chiến dịch đã giao</h2>
+          <h2 id="cd-ds-da-giao">{ds?.some(c => c.hanhTrinh) ? 'Ba hành trình giỏi hoá' : 'Chiến dịch đã giao'}</h2>
           {ds && (
             <span className="cd-so cd-phu">
               {ds.length} chiến dịch · {dangChay.length} đang chạy
@@ -155,7 +155,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
         </div>
         <div className="cd-hang-nut">
           <input type="search" className="cd-tim-em" value={tim} placeholder="Tìm chiến dịch, lớp…" aria-label="Tìm chiến dịch" onChange={(e) => setTim(e.target.value)} />
-          {onGiaoMoi && (
+          {onGiaoMoi && !ds?.some(c => c.hanhTrinh) && (
             <button type="button" className="m3-nut-chinh" onClick={onGiaoMoi}>
               + Giao chiến dịch mới
             </button>
@@ -228,10 +228,9 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                 </button>
               ))}
             </div>
-            <span className="cd-phu">Vạch cam trên thanh Đã làm qua = mức lớp cần đạt hôm nay để kịp hạn</span>
           </div>
 
-          <div className="cd-cuon-ngang">
+          <div className="cd-cuon-ngang cd-cuon-doc" role="region" aria-label="Danh sách chiến dịch đã giao" tabIndex={0}>
             <table className="cd-bang cd-bang-cd" data-khoi="bang-chien-dich">
               <thead>
                 <tr>
@@ -299,14 +298,14 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                       <td className="cd-so">{tk && !dong ? tk.quaTai : '—'}</td>
                       <td className={`cd-so${tk && tk.canDayLaiCau > 0 ? ' cd-chu-do' : ''}`}>{tk ? tk.canDayLaiCau : '—'}</td>
                       <td className="cd-so">
-                        <b>{homNay ? chuHan(c.hanNop, homNay) : ''}</b>
-                        <small className="cd-phu">23:59 · {hienNgay(c.hanNop, false)}</small>
+                        <b>{c.hanhTrinh ? 'Học mỗi ngày' : homNay ? chuHan(c.hanNop, homNay) : ''}</b>
+                        <small className="cd-phu">{c.hanhTrinh ? 'Tối thiểu 24 / 30 / 36 câu theo tầng · chặng 6 câu' : `23:59 · ${hienNgay(c.hanNop, false)}`}</small>
                       </td>
                       <td>
                         <span className={`cd-chip-muc cd-chip-muc--${MAU_TRANG_THAI[tt]}`}>
                           {tt === 'sap_bat_dau' && c.batDau ? `${CHU_TRANG_THAI[tt]} · ${hienNgay(c.batDau, false)}` : CHU_TRANG_THAI[tt]}
                         </span>
-                        {c.trangThai === 'dang_chay' && !c.hetHan ? (
+                        {!c.hanhTrinh && c.trangThai === 'dang_chay' && !c.hetHan ? (
                           <label className="cd-tich cd-phu" data-khoi="rai-deu">
                             <input type="checkbox" role="switch" aria-label={`Rải đều câu mới · ${c.ten}`} aria-checked={c.raiDeu !== false} checked={c.raiDeu !== false} disabled={dangLam === c.id} onChange={(e) => void doiRai(c, e.target.checked)} />
                             <span>Rải đều câu mới: {c.raiDeu === false ? 'Tắt' : c.raiDeuMacDinh ? 'Bật (mặc định)' : 'Bật'}</span>
@@ -320,7 +319,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                           <button type="button" className="m3-nut-vien cd-nut-nho" onClick={() => xemBang(c.id)}>
                             {tt === 'cho_chua' ? 'Mở buổi chữa' : tt === 'da_dong' ? 'Xem lại' : 'Xem bảng'}
                           </button>
-                          {c.trangThai === 'dang_chay' && (
+                          {!c.hanhTrinh && c.trangThai === 'dang_chay' && (
                             <>
                               <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangLam === c.id} onClick={() => setDangSua(c)}>
                                 Chỉnh sửa

@@ -5,11 +5,13 @@
 // OMNI 3 (05/10): bảng đang chạy nạp xong ⇒ hỏi thêm `/gv/omni bang` (Bảng bài: P × dạng, Sơ ý, Khoảng cách tới 8, Cần thầy chữa). Có số ⇒ truyền xuống
 // Bảng chiến dịch; OMNI tắt / lỗi / sai dạng ⇒ bỏ qua im lặng, bảng cũ y nguyên. Hết hạn (Buổi chữa) và OMNI áp cho lớp ⇒ đọc sẵn gói ca chốt 50/50
 // (`/gv/omni ca-chot`) cho nút "Mở ca chốt".
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
+import { xemBuoiHoc } from '../../lib/buoi-hoc-api'
 import { chuBoCauKhacKhoi, chuThieuNoiDung } from '../../lib/tra-cau-chieu'
 import { khoiCuaLop } from '../../lib/khoi-cau'
 import KhungXemPhieu from '../KhungXemPhieu'
+import { BuocDiemDanh, useDiemDanhBuoi } from '../day-hoc/DiemDanhBuoi'
 import { chuaXong, qidCuaDong, danhSach, docBang, docBuoiChua, docNoiDungCau, type BangChienDich as DuBang, type BuoiChuaMayChu, type DanhSachChienDich } from './api'
 import { caChotOmni, docBangOmniCua, docCoOmni, omniApChoLop, type GoiCaChotOmni } from './api-omni'
 import type { BangOmni } from '../../../server/src/omni-kieu'
@@ -26,6 +28,66 @@ export const KHOA_CHON_CHIEN_DICH = 'ddh.chienDichChon'
 /** Chiến dịch mặc định: cái đang chạy mới giao nhất (danh sách máy chủ đã xếp mới trước). */
 export function chonMacDinh(ds: DanhSachChienDich['chienDich']): string {
   return (ds.find((c) => c.trangThai === 'dang_chay') ?? ds[0])?.id ?? ''
+}
+
+/** Điểm danh thật bằng mã; chỉ SBD máy chủ xác nhận có mặt mới được chuyển sang thuật toán buổi chữa. */
+function DiemDanhBuoiChua({ du, onChot }: { du: DuBang; onChot: (sbd: string[]) => void }) {
+  const showToast = useAppStore((s) => s.showToast)
+  const lop = du.chienDich.lop ?? ''
+  const dd = useDiemDanhBuoi({
+    lopMacDinh: lop,
+    tenMacDinh: `Buổi chữa · ${du.chienDich.ten}`,
+    chiNoiBuoiCungLop: true,
+  })
+  const [dangChot, setDangChot] = useState(false)
+  const sbdChienDich = useMemo(() => new Set(du.em.map((e) => e.sbd)), [du.em])
+  const coMat = useMemo(() => dd.coMat.map((e) => e.sbd).filter((sbd) => sbdChienDich.has(sbd)), [dd.coMat, sbdChienDich])
+
+  const chotTuMayChu = async () => {
+    if (!dd.idBuoi || dangChot) return
+    setDangChot(true)
+    const r = await xemBuoiHoc(dd.idBuoi)
+    setDangChot(false)
+    if (!r.ok) {
+      showToast(r.chu, 'error')
+      return
+    }
+    const ds = r.du.coMat.map((e) => e.sbd).filter((sbd) => sbdChienDich.has(sbd))
+    if (!ds.length) {
+      showToast('Chưa có học sinh của chiến dịch điểm danh bằng mã.', 'warn')
+      return
+    }
+    onChot(ds)
+  }
+
+  return (
+    <div data-khoi="diem-danh-buoi-chua">
+      <section className="cd-the">
+        <div className="cd-the-dau">
+          <div>
+            <p className="cd-duong-dan">Bước bắt buộc trước khi xếp người lên bảng</p>
+            <h2>Điểm danh buổi chữa bằng mã</h2>
+          </div>
+          <span className="cd-chip-muc cd-chip-muc--xam">Chưa xếp học sinh</span>
+        </div>
+        <p className="cd-phu">Học sinh nhập mã 6 số hoặc quét QR.</p>
+      </section>
+
+      <BuocDiemDanh dd={dd} idTieuDe="cd-diem-danh-ma" khoaLop />
+
+      {dd.tt && (
+        <section className="cd-the cd-the--hanh-dong" aria-live="polite">
+          <div>
+            <b>{coMat.length}/{du.em.length} học sinh chiến dịch đã điểm danh</b>
+            <p className="cd-phu">Tự cập nhật mỗi 5 giây.</p>
+          </div>
+          <button type="button" className="m3-nut-chinh" disabled={!coMat.length || dangChot} aria-busy={dangChot} onClick={() => void chotTuMayChu()}>
+            {dangChot ? 'Đang lấy danh sách có mặt…' : `Xếp buổi chữa cho ${coMat.length} em có mặt`}
+          </button>
+        </section>
+      )}
+    </div>
+  )
 }
 
 export default function LenBangChienDich() {
@@ -48,7 +110,8 @@ export default function LenBangChienDich() {
   const [omni, setOmni] = useState<BangOmni | null>(null)
   const [goiCaChot, setGoiCaChot] = useState<GoiCaChotOmni | null>(null)
   const [buoi, setBuoi] = useState<BuoiChuaMayChu | null>(null)
-  const [coMat, setCoMat] = useState<string[]>([])
+  /** null = chưa chốt điểm danh bằng mã; mảng = SBD máy chủ xác nhận có mặt. */
+  const [coMat, setCoMat] = useState<string[] | null>(null)
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(false)
   const [nowMs, setNowMs] = useState(() => Date.now())
@@ -96,7 +159,7 @@ export default function LenBangChienDich() {
     if (l !== luotOmni.current) return
     setGoiCaChot(r.ok ? r.du : null)
   }, [])
-  const tai = useCallback(async (id: string, dsCoMat: string[]) => {
+  const tai = useCallback(async (id: string, dsCoMat: string[] | null) => {
     if (!id) return
     const l = ++luot.current
     setDangTai(true)
@@ -111,12 +174,23 @@ export default function LenBangChienDich() {
       return
     }
     setBang(b.du)
-    if (!b.du.hetHan) void napOmni(id)
+    if (b.du.hanhTrinhNgay) {
+      ++luotOmni.current
+      setOmni(null)
+      setGoiCaChot(null)
+    }
+    else if (!b.du.hetHan) void napOmni(id)
     else {
       setOmni(null)
       void napCaChot(id, b.du.chienDich.lop)
     }
     if (b.du.hetHan) {
+      // Chưa điểm danh: dừng ở cổng điểm danh, không gọi lệnh xếp và không lộ bất kỳ tên chữa mẫu nào.
+      if (dsCoMat === null) {
+        setBuoi(null)
+        setDangTai(false)
+        return
+      }
       const bc = await docBuoiChua(id, dsCoMat)
       if (l !== luot.current) return
       if (!bc.ok) {
@@ -133,8 +207,8 @@ export default function LenBangChienDich() {
     setGoiCaChot(null)
     setBang(null)
     setBuoi(null)
-    setCoMat([])
-    void tai(chonId, [])
+    setCoMat(null)
+    void tai(chonId, null)
   }, [chonId, tai])
 
   // Qua 23:59 ngày hạn nộp trong lúc màn đang mở ⇒ tự nạp lại (máy chủ trả hetHan ⇒ chuyển Buổi chữa).
@@ -157,7 +231,7 @@ export default function LenBangChienDich() {
     async (o: { qid: string }) => {
       // Câu gộp từ nhiều bản trùng nội dung ⇒ mở khoá đủ cả nhóm (bảng chiến dịch + buổi chữa đều mang `qidCung`).
       const dong = [...(bang?.canDayLai ?? []), ...(buoi?.cau ?? [])].find((c) => c.qid === o.qid)
-      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid], coMat) // chỉ em có mặt buổi này (chữa lớp này không làm lớp kia mất câu)
+      const r = await chuaXong(chonId, dong ? qidCuaDong(dong) : [o.qid], coMat ?? []) // buổi chữa: chỉ em có mặt; bảng đang chạy: giữ luật cả chiến dịch
       if (!r.ok) return { ok: false as const, chu: r.chu }
       void tai(chonId, coMat)
       return { ok: true as const }
@@ -296,21 +370,31 @@ export default function LenBangChienDich() {
         </section>
       )}
 
+      {bang && bang.hetHan && coMat === null && !dangTai && !loi && (
+        <DiemDanhBuoiChua
+          du={bang}
+          onChot={(sbd) => {
+            setCoMat(sbd)
+            void tai(chonId, sbd)
+          }}
+        />
+      )}
+
       {bang && bang.hetHan && buoi && (
         <BuoiChua
           key={buoi.cau.map((c) => c.qid).join('|')}
           du={buoi}
           dsEm={bang.em.map((e) => ({ sbd: e.sbd, ten: e.ten }))}
-          coMat={coMat}
+          coMat={coMat ?? []}
           canDayLai={bang.canDayLai}
           homNay={bang.homNay}
           tra={tra}
           ketQua={ketQua}
           dangChieu={dangChieu}
           onChieu={moChieu}
-          onDoiCoMat={(sbd) => {
-            setCoMat(sbd)
-            void tai(chonId, sbd)
+          onMoDiemDanh={() => {
+            setBuoi(null)
+            setCoMat(null)
           }}
           onDaChua={() => {
             // Chữa xong ⇒ xếp LẠI buổi (máy chủ bỏ dạng vừa chữa, tới các dạng còn lại) + nạp lại danh sách chiến dịch.

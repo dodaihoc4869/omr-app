@@ -61,9 +61,9 @@ jobs:
           fi
           echo "toan-bo=$TOAN_BO" >> "$GITHUB_OUTPUT"
           echo "Kiểm toàn repo: $TOAN_BO"
-      - run: npm test -- --run
+      - run: timeout 5m npm test -- --run
         if: steps.pham-vi.outputs.toan-bo == 'true'
-        timeout-minutes: 30
+        timeout-minutes: 6
         continue-on-error: true
       # Công cụ bật cờ/receipt và hợp đồng điều hướng luôn kiểm; đóng gói/PWA kiểm bằng build:cf.
       - name: Kiểm hợp đồng vận hành và tệp kiểm thử vừa đổi
@@ -71,7 +71,8 @@ jobs:
           MOC_TRUOC: ${{ github.event.before }}
           TOAN_BO: ${{ steps.pham-vi.outputs.toan-bo }}
         run: |
-          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx)
+          KIEM=(tests/chua-d1-van-hanh.test.ts tests/chien-dich-thanh-ben.test.tsx tests/khoi-phuc-chien-dich-0810.test.ts tests/srs2-loi-2709.test.ts tests/srs2-ke-hoach-doi-cd-2809.test.ts tests/srs2-rai-deu-d1-3009.test.ts tests/d1-qua-tai-khong-nhan-truy-van-0810.test.ts tests/cao-diem-ho-so-0110.test.ts)
+          KIEM+=(tests/hanh-trinh-ngay-0910.test.ts tests/hanh-trinh-d1-0910.test.ts tests/hanh-trinh-giao-dien-0910.test.tsx)
           if [[ "$TOAN_BO" == false ]]; then
             git diff --name-only --diff-filter=AM "$MOC_TRUOC" HEAD -- tests > /tmp/chua-test-doi.txt
             while IFS= read -r TEP; do
@@ -112,12 +113,25 @@ jobs:
           command: deploy --tag=${{ github.sha }}
           workingDirectory: server
 
+      - name: Xác nhận đã khôi phục chiến dịch riêng
+        if: github.event_name == 'push' && github.event.before == '3f495cd16e9a8adab7682e346907d9a871ed4693'
+        run: node scripts/kiem-khoi-phuc-song-0810.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+
       - name: Đẩy lên Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ env.CF_TOKEN_SACH }}
           accountId: ${{ env.CF_ACC_SACH }}
           command: pages deploy dist --project-name=omr-app --branch=main
+
+      - name: Xác nhận ba hành trình đã tự gộp
+        run: node scripts/kiem-hanh-trinh-song-0910.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
 
       - name: Kiểm Worker và Pages sống cùng commit
         run: node scripts/kiem-phat-hanh-chua.mjs --schema --live

@@ -15,10 +15,9 @@ import HopXacNhan from '../HopXacNhan'
 import { chuaXong, qidCuaDong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
 import type { GoiCaChotOmni } from './api-omni'
 import type { BangKetQua } from './ghi-to-chieu'
-import HopChon from './HopChon'
 import { congNgay, hienHanNop, hienNgay } from './ngay'
 import { noiDungCua, type CauGoc, type OChieu } from './to-chieu'
-import { cauCaChot, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
+import { cauCaChot, CHU_HANG, chuNguoiSua, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
 import './chien-dich.css'
 
 /** Khoá phiên màn Mở ca kiểm tra đọc để chọn sẵn câu của ca chốt (nguồn: `lib/ca-chot-chien-dich.ts`). */
@@ -26,15 +25,17 @@ export { KHOA_CA_CHOT }
 
 export function oChieuTuDong(dong: readonly DongBuoiChua[]): OChieu[] {
   return dong.map((d) => {
-    const nguoi = d.giaiMau ?? d.sua[0] ?? null
+    const nguoi = d.giaiMau
     return {
       qid: d.cau.qid,
       stt: d.cau.stt,
       phan: d.cau.phan,
       mucDo: d.cau.mucDo,
       sbd: nguoi?.sbd ?? '',
-      ten: nguoi?.ten ?? 'Cả lớp',
-      viSao: d.giaiMau ? 'Giải mẫu' : 'Chưa em nào thành thạo — thầy giải mẫu cùng em',
+      ten: nguoi?.ten ?? 'Thầy chữa',
+      viSao: nguoi
+        ? `Đã tự làm đúng ${nguoi.soLanDung ?? 1} lần${nguoi.vuotMuc ? ' · năng lực vượt mức câu' : ''}`
+        : 'Không có học sinh có mặt đã tự làm đúng câu này — thầy chữa',
     }
   })
 }
@@ -49,14 +50,14 @@ export default function BuoiChua({
   ketQua = {},
   dangChieu,
   onChieu,
-  onDoiCoMat,
+  onMoDiemDanh,
   onDaChua,
   caChotOmni = null,
 }: {
   du: BuoiChuaMayChu
   /** Mọi em của chiến dịch (để chọn em có mặt). */
   dsEm: EmTen[]
-  /** SBD em có mặt; rỗng = cả lớp. */
+  /** SBD em đã được thầy điểm danh có mặt. */
   coMat: string[]
   canDayLai: CauCanDayLai[]
   homNay: string
@@ -65,7 +66,8 @@ export default function BuoiChua({
   ketQua?: BangKetQua
   dangChieu: boolean
   onChieu: (ds: OChieu[], tenBuoi: string) => Promise<boolean>
-  onDoiCoMat: (sbd: string[]) => void
+  /** Quay lại bước mã điểm danh để lấy lại danh sách có mặt từ máy chủ. */
+  onMoDiemDanh: () => void
   onDaChua: () => void
   /** OMNI 3: câu ca chốt 50/50 từ `/gv/omni ca-chot` (màn cha đọc sẵn). Vắng ⇒ "Mở ca chốt" dùng danh sách cũ. */
   caChotOmni?: GoiCaChotOmni | null
@@ -75,12 +77,10 @@ export default function BuoiChua({
   const [hoiChua, setHoiChua] = useState(false)
   const [dangChua, setDangChua] = useState(false)
   const [daChua, setDaChua] = useState<{ soLuot: number; ngayOnLai: string } | null>(null)
-  const [moCoMat, setMoCoMat] = useState(false)
-  const [chonCoMat, setChonCoMat] = useState<Set<string>>(new Set())
   // OMNI 3: gói ca chốt 50/50 (màn cha đọc sẵn khi OMNI áp cho lớp của chiến dịch). null ⇒ danh sách cũ.
   const goiOmni = caChotOmni
 
-  const emCoMat = useMemo(() => (coMat.length ? dsEm.filter((e) => coMat.includes(e.sbd)) : dsEm), [dsEm, coMat])
+  const emCoMat = useMemo(() => dsEm.filter((e) => coMat.includes(e.sbd)), [dsEm, coMat])
   const kq = useMemo(
     () =>
       xepBuoiChua(du.cau, emCoMat, (c) =>
@@ -155,17 +155,14 @@ export default function BuoiChua({
             {du.chienDich.lop ? ` · ${du.chienDich.lop}` : ''}
           </h1>
           <p className="cd-so">
-            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')} · có mặt {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
+            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')} · đã điểm danh {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
             <button
               type="button"
               className="m3-nut-chu cd-nut-nho"
               style={{ padding: '0 8px', display: 'inline-flex', verticalAlign: 'baseline' }}
-              onClick={() => {
-                setChonCoMat(new Set(emCoMat.map((e) => e.sbd)))
-                setMoCoMat(true)
-              }}
+              onClick={onMoDiemDanh}
             >
-              Đổi em có mặt
+              Cập nhật điểm danh bằng mã
             </button>
           </p>
         </div>
@@ -247,11 +244,10 @@ export default function BuoiChua({
               : 'Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.'}
           </p>
         ) : (
-          <div role="table" aria-label="Câu chữa xếp sẵn" className="cd-bang-chua">
+          <div role="table" aria-label="Câu chữa xếp sẵn" className="cd-bang-chua cd-cuon-doc" tabIndex={0}>
             <div className="cd-the-dau">
               <h2>Câu chữa xếp sẵn · điểm chữa cao trước</h2>
               {(du.daChuaTruoc ?? 0) > 0 && <span className="cd-phu" data-khoi="da-chua-truoc">Đã chữa {du.daChuaTruoc} dạng ở buổi trước; buổi này xếp tiếp các dạng còn lại.</span>}
-              <span className="cd-phu">Điểm chữa = số em chưa thành thạo + 2 × số em cần dạy lại</span>
             </div>
             <div className="cd-hang-chua cd-hang-chua--dau" role="row">
               <span role="columnheader">#</span>
@@ -290,7 +286,13 @@ export default function BuoiChua({
                   {d.cau.diemChua}
                 </span>
                 <span role="cell">
-                  {d.giaiMau ? `Giải mẫu: ${d.giaiMau.ten}` : 'Thầy giải mẫu'}
+                  {d.giaiMau ? (
+                    <>
+                      Giải mẫu: {d.giaiMau.ten}
+                      {typeof d.giaiMau.soLanDung === 'number' && ` · đúng ${d.giaiMau.soLanDung} lần`}
+                      {d.giaiMau.vuotMuc && ` · ${d.giaiMau.hang ? CHU_HANG[d.giaiMau.hang] : 'năng lực'} vượt mức câu`}
+                    </>
+                  ) : 'Thầy chữa'}
                   {d.sua.length > 0 ? ` · ${chuNguoiSua(d.sua)}` : ''}
                   {ketQuaCua(d).map(({ em, kq }) => (
                     <span key={em.sbd} className={`cd-ket-qua cd-ket-qua--${kq === 'dat' ? 'dat' : 'khong'}`} data-ket-qua={`${em.sbd}|${d.cau.qid}`}>
@@ -344,39 +346,6 @@ export default function BuoiChua({
         />
       )}
 
-      {moCoMat && (
-        <HopChon
-          tieuDe="Em có mặt hôm nay"
-          moTa="Bỏ tích em vắng: buổi chữa xếp lại để mỗi em có mặt có ít nhất một lượt lên bảng."
-          nhanXacNhan={`Xếp lại cho ${chonCoMat.size} em`}
-          xacNhanDuoc={chonCoMat.size > 0}
-          onXacNhan={() => {
-            setMoCoMat(false)
-            onDoiCoMat(chonCoMat.size === dsEm.length ? [] : [...chonCoMat])
-          }}
-          onDong={() => setMoCoMat(false)}
-        >
-          <div className="cd-hop-ds">
-            {sapTheoTen(dsEm).map((e) => (
-              <label key={e.sbd} className="cd-tich">
-                <input
-                  type="checkbox"
-                  checked={chonCoMat.has(e.sbd)}
-                  onChange={() =>
-                    setChonCoMat((cu) => {
-                      const s = new Set(cu)
-                      if (s.has(e.sbd)) s.delete(e.sbd)
-                      else s.add(e.sbd)
-                      return s
-                    })
-                  }
-                />
-                <span>{e.ten}</span>
-              </label>
-            ))}
-          </div>
-        </HopChon>
-      )}
     </>
   )
 }
