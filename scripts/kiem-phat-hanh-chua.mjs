@@ -16,7 +16,7 @@ const ca = (await query(readFileSync('scripts/kiem-ca-mo.sql', 'utf8')))[0]
 console.log(JSON.stringify({ soCaMo: ca.so_ca_mo, soLuotDangLam: ca.so_luot_dang_lam }))
 // Thầy duyệt riêng 09/10: đẩy giao diện với ca hẹn 17h30 chưa có lượt làm.
 // Ngoại lệ chỉ đúng một ca, đúng mốc giờ, hết hiệu lực sau 15 phút; không đổi dữ liệu.
-let caDaDuocDuyet = false
+export let caDaDuocDuyet = false
 const den = process.env.CHUA_CA_CHO_DUOC_DUYET_DEN
 if (ca.so_ca_mo === 1 && ca.so_luot_dang_lam === 0 && den === '2026-10-09T10:45:00Z' && Date.now() < Date.parse(den)) {
   const [duyet] = await query("SELECT COUNT(*) AS n FROM ca WHERE trang_thai='mo' AND julianday(bat_dau)=julianday('2026-10-09T10:30:00Z')")
