@@ -13,18 +13,22 @@ import { tachSongSinh } from './loi-hoc-luat'
 import { chayDdlMotLan } from './ddl-mot-lan'
 export async function ungVienV6(env:Env,cd:ChienDich,sbd:string,ngay:string,phamVi:HoSo2['phamVi'],cu:readonly string[]):Promise<string[]> {
   await chayDdlMotLan(env,'hanh_trinh_v5',SQL_HANH_TRINH_V5)
-  const [ds,saved,history,protectedIds,suspect,plan,reserve]=await Promise.all([
+  const [ds,saved,history,protectedIds,suspect]=await Promise.all([
     danhMuc(env,{chienDich:cd,phamVi},Date.now()),
-    env.DB.prepare('SELECT muc_json FROM hanh_trinh_v5_muc WHERE sbd=? ORDER BY cap_nhat_luc DESC LIMIT 1').bind(sbd).first<{muc_json:string}>(),
+    // Kèm nguồn đang giao vào lần đọc hồ sơ có sẵn; không thêm vòng D1 khi mở lại.
+    env.DB.prepare(`SELECT m.muc_json,p.dao_json,p.doan_json,n.du_phong_json FROM (SELECT 1) seed
+     LEFT JOIN (SELECT muc_json FROM hanh_trinh_v5_muc WHERE sbd=? ORDER BY cap_nhat_luc DESC LIMIT 1) m ON 1=1
+     LEFT JOIN srs2_ke_hoach p ON p.sbd=? AND p.ngay=?
+     LEFT JOIN hanh_trinh_nguon_cau n ON n.sbd=? AND n.ngay=?`).bind(sbd,sbd,ngay,sbd,ngay)
+     .first<{muc_json:string;dao_json:string;doan_json:string;du_phong_json:string}>()
+     .catch(()=>env.DB.prepare('SELECT muc_json FROM hanh_trinh_v5_muc WHERE sbd=? ORDER BY cap_nhat_luc DESC LIMIT 1').bind(sbd).first<{muc_json:string;dao_json?:string;doan_json?:string;du_phong_json?:string}>()),
     env.DB.prepare(`SELECT DISTINCT qid,${SQL_TC} tc FROM su_kien_hoc WHERE sbd=?`).bind(sbd).all<{qid:string;tc:string}>(),
     protectedQuestions(env),docCauNghiDem(env),
-    env.DB.prepare('SELECT dao_json,doan_json FROM srs2_ke_hoach WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<{dao_json:string;doan_json:string}>(),
-    env.DB.prepare('SELECT du_phong_json FROM hanh_trinh_nguon_cau WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<{du_phong_json:string}>().catch(()=>null),
   ])
   let rows:MucKyNang[]=[];try{const raw=JSON.parse(saved?.muc_json??'[]') as unknown;if(Array.isArray(raw))rows=raw.filter((r):r is MucKyNang=>!!r&&typeof r.vkn==='string'&&Number.isInteger(r.tang)&&['vung','chua_vung','chua_du'].includes(r.trangThai))}catch{/* Học sinh mới: tìm nền và chẩn đoán. */}
   const seen=new Set(history.results.map(r=>tachSongSinh(r.tc||r.qid).goc)),groups=new Set([...seen,...ds.filter(c=>seen.has(c.qid)).map(c=>c.q.contentGroup||c.qid)])
   const allowed=new Set(cd.qids)
-  let roots:string[]=[];try{roots=[...JSON.parse(plan?.dao_json??'[]'),...JSON.parse(plan?.doan_json??'[]'),...JSON.parse(reserve?.du_phong_json??'[]')].filter((id):id is string=>typeof id==='string').map(id=>tachSongSinh(id.replace(/#\d+$/,'')).goc)}catch{/* kế hoạch hỏng không mở rộng quyền */}
+  let roots:string[]=[];try{roots=[...JSON.parse(saved?.dao_json??'[]'),...JSON.parse(saved?.doan_json??'[]'),...JSON.parse(saved?.du_phong_json??'[]')].filter((id):id is string=>typeof id==='string').map(id=>tachSongSinh(id.replace(/#\d+$/,'')).goc)}catch{/* kế hoạch hỏng không mở rộng quyền */}
   return timUngVienToanKho(ds.filter(c=>allowed.has(c.qid)),new Map(rows.map(r=>[`${r.vkn}@L${r.tang}`,r])),[...cu,...roots].filter(id=>allowed.has(id)),ngay,sbd,groups,new Set([...protectedIds,...suspect]))
 }
 

@@ -58,9 +58,9 @@ export async function lapChotHanhTrinh(env: Env, sbd: string, ngay: string, nowM
   const moc = Math.floor(xong.length / CAU_MOI_CHANG) * CAU_MOI_CHANG
   // Không đổi câu giữa chặng; sửa ngay nếu câu bị bảo vệ/rút khỏi kho.
   const v5Cu=await env.DB.prepare('SELECT phien_ban FROM hanh_trinh_v5_quyet_dinh WHERE sbd=? AND ngay=? ORDER BY moc DESC LIMIT 1').bind(sbd,ngay).first<{phien_ban:string}>()
-  const kiem=await env.DB.prepare('SELECT da_lam FROM hanh_trinh_v4_chot WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<{da_lam:number}>()
+  const kiem=await env.DB.prepare('SELECT k.da_lam,n.du_phong_json FROM hanh_trinh_v4_chot k LEFT JOIN hanh_trinh_nguon_cau n ON n.sbd=k.sbd AND n.ngay=k.ngay WHERE k.sbd=? AND k.ngay=?').bind(sbd,ngay).first<{da_lam:number;du_phong_json:string|null}>()
   const saiMoi=rows.results[0]?.ket_qua===0 && xong.length>(kiem?.da_lam??0)
-  const nguonCu=await env.DB.prepare('SELECT du_phong_json FROM hanh_trinh_nguon_cau WHERE sbd=? AND ngay=?').bind(sbd,ngay).first<Row>()
+  const nguonCu=kiem?.du_phong_json!=null?kiem:null
   const doiBoSung = (!nguonCu || conCu.length === 0) && xong.length < toiThieu
   let daChay = false
   if (!v5Cu || v5Cu.phien_ban!==PHIEN_BAN_HT5 || !kiem || saiMoi || !cu || cu.chien_dich_id !== hs.chienDich?.id || Number(snap.xong_chot) !== moc || hong || doiBoSung) {
