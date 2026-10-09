@@ -20,6 +20,7 @@ import '@fontsource/be-vietnam-pro/latin-700.css'
 import '@fontsource/noto-serif/vietnamese-400.css'
 import '@fontsource/noto-serif/latin-400.css'
 import '../../src/styles/tokens.css'
+import '../../src/styles/thang.css' // thang chung 3 app (main.tsx nạp ngay sau tokens.css) — thiếu tệp này thì --t-*, --r-*, --nut-* rỗng, ảnh sai cỡ
 import '../../src/index.css'
 import '../../src/styles/the-loc.css'
 import '../../src/components/m3'
@@ -82,7 +83,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.includes('vang-xem') || b.action === 'vang-xem' || b.lenh === 'vang-xem') return tra({ ok: true, bat: true, vang: 340, ongNghiem: 1200, giuLai: 200, chuoiNgay: 12, doiToiDa: 10 })
   if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
   if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
-  if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [] })
+  // App phụ huynh (trung tu 09/10): một nhận xét đã công bố để ảnh có thẻ "Nhận xét của thầy" ở Hôm nay và màn con `#loi-thay`.
+  if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [{ maCa: 'CA-2', tenCa: 'Kiểm tra 45 phút · Ester – Lipid', noiDung: 'Con làm tốt phần lý thuyết ester. Bài đốt cháy hỗn hợp con còn nhầm bước bảo toàn nguyên tố, thầy sẽ chữa cùng con ở buổi tới.', capNhatLuc: '2026-09-20T01:00:00Z', nopLuc: '2026-09-19T02:12:00Z', tong: 7.5 }] })
   return tra({ ok: true })
 }
 

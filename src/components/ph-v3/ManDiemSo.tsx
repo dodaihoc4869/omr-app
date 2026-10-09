@@ -1,7 +1,7 @@
-import { useState } from 'react'
-// Mục "Ca kiểm tra" — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (trước là "Lịch sử" ở thanh mục và "Điểm số" ở tiêu đề màn: MỘT khái niệm MỘT tên).
-// Thẻ trên: ca gần nhất (điểm + ba phần + lời thầy của ca ấy nếu có, nút xem bài làm); dưới: "Các ca trước" (mới trước, mỗi ca mở màn chi tiết).
-// Đường điểm các ca chuyển sang Tiến bộ (`BieuDo` vẫn ở tệp này, Tiến bộ dùng lại). Chỉ ca ĐÃ công bố có điểm; ca chưa công bố hiện câu "chờ công bố".
+// Mục "Ca kiểm tra" — TRUNG TU THẦY DUYỆT 09/10 (bản vẽ PH-CaKiemTra; trước là "Lịch sử" ở thanh mục và "Điểm số" ở tiêu đề màn: MỘT khái niệm MỘT tên).
+// Bỏ ba nút lọc. Thẻ trên: ca mới nhất (tên, ngày · số câu, số lớn a/10, ba thanh phần, nhận xét của thầy cho ca ấy nếu có, MỘT nút chính màu đặc
+// "Xem bài làm của con ›"); ca chưa công bố ⇒ nhãn "Chờ công bố" + câu nói khi nào có điểm (không lộ điểm). Dưới: "Các ca trước" (mới trước, mỗi ca mở
+// màn chi tiết); trống ⇒ một câu báo. Đường điểm các ca ở Tiến bộ (`BieuDo` vẫn ở tệp này, Tiến bộ dùng lại).
 // (Tên tệp giữ "ManDiemSo" để không xoá khai báo màu của đồ thị — cổng `npm run kiem:mau-giu` so theo từng tệp.)
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { CaGanNhat, DiemTienBo } from '../../lib/ph-moi/du-lieu'
@@ -34,17 +34,19 @@ export function dungBieuDo(ds: readonly { diem: number }[]): { x: number[]; y: n
   return { x, y: ds.map((d) => yCua(d.diem)), luoi }
 }
 
-/** Đường điểm các ca (dùng ở Tiến bộ, trên nền khối anh hùng). */
+/** Đường điểm các ca (dùng ở Tiến bộ khi có từ 2 ca, trên nền khối anh hùng). Nhãn "Điểm /10" ở đầu trục: thang luôn là 10.
+ *  Nhãn số của ca cũ đọc màu qua biến --ph3-xd-nen; trong `.ph3-bieu-do` biến ấy được gán lại sang --ph3-ah-truc (ph-v3.css) để đủ tương phản ở nền tối. */
 export function BieuDo({ ds }: { ds: DiemTienBo[] }) {
   const { x, y, luoi } = dungBieuDo(ds)
   const cuoi = ds.length - 1
   const duong = x.map((xi, i) => `${xi.toFixed(1)},${y[i]!.toFixed(1)}`).join(' ')
   return (
-    <svg className="ph3-bieu-do" viewBox="0 0 320 160" role="img" aria-label={`Điểm các ca: ${ds.map((d) => `${ngayChuoiNgan(d.ngay)} ${soVn(d.diem)}`).join('; ')}`}>
+    <svg className="ph3-bieu-do" viewBox="0 -18 320 178" role="img" aria-label={`Điểm các ca (thang 10): ${ds.map((d) => `${ngayChuoiNgan(d.ngay)} ${soVn(d.diem)}`).join('; ')}`}>
+      <text className="ph3-bieu-do__thang" x="0" y="-6" fontSize="12">Điểm /10</text>
       {luoi.map((l) => (
         <g key={l.gia}>
           <line x1="20" y1={l.y} x2="320" y2={l.y} stroke="currentColor" strokeWidth="1" strokeDasharray="3 4" style={{ color: 'var(--ph3-ah-vach)' }} />
-          <text x="0" y={l.y + 4} fontSize="11" style={{ fill: 'var(--ph3-ah-truc)' }}>{l.gia}</text>
+          <text x="0" y={l.y + 4} fontSize="12" style={{ fill: 'var(--ph3-ah-truc)' }}>{l.gia}</text>
         </g>
       ))}
       {ds.length > 1 && (
@@ -63,7 +65,7 @@ export function BieuDo({ ds }: { ds: DiemTienBo[] }) {
           <text x={Math.min(x[i]!, 306)} y={y[i]! - (i === cuoi ? 16 : 12)} fontSize={i === cuoi ? 14 : 12} fontWeight={i === cuoi ? 800 : 600} textAnchor="middle" style={{ fill: i === cuoi ? 'var(--ph3-vong-hp)' : 'var(--ph3-xd-nen)' }}>
             {soVn(d.diem)}
           </text>
-          <text x={Math.min(x[i]!, 306)} y="152" fontSize="11" fontWeight={i === cuoi ? 700 : 400} textAnchor="middle" style={{ fill: i === cuoi ? 'var(--ph3-ah-chu)' : 'var(--ph3-ah-truc)' }}>
+          <text x={Math.min(x[i]!, 306)} y="152" fontSize="12" fontWeight={i === cuoi ? 700 : 400} textAnchor="middle" style={{ fill: i === cuoi ? 'var(--ph3-ah-chu)' : 'var(--ph3-ah-truc)' }}>
             {ngayChuoiNgan(d.ngay)}
           </text>
         </g>
@@ -73,12 +75,11 @@ export function BieuDo({ ds }: { ds: DiemTienBo[] }) {
 }
 
 export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanXetCa[] | null }) {
-  const [loc, setLoc] = useState<'tat-ca' | 'cong-bo' | 'cho'>('tat-ca')
   const pm = v.pm
   if (!pm) return (
     <div>
-      <div className="ph3-tieu-de"><h1>Lịch sử</h1></div>
-      {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai />}
+      <div className="ph3-tieu-de"><h1>Ca kiểm tra</h1></div>
+      {v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai hinh="ca-kiem-tra" />}
     </div>
   )
   const ca = pm.caGanNhat
@@ -87,26 +88,31 @@ export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanX
   const truoc = [...ds].reverse().filter((d) => d.maCa !== ca?.maCa)
   return (
     <div data-vung="man-ca-kiem-tra">
-      <div className="ph3-tieu-de"><h1>Lịch sử</h1></div>
-      <nav className="ph3-loc-lich-su" aria-label="Lọc lịch sử">{[['tat-ca','Tất cả'],['cong-bo','Đã công bố'],['cho','Chờ công bố']].map(([k,chu]) => <button type="button" key={k} className="ph3-nut-vien" aria-pressed={loc === k} onClick={() => setLoc(k as typeof loc)}>{chu}</button>)}</nav><div className="ph3-luoi">
-        {ca && (loc === 'tat-ca' || (loc === 'cong-bo') === !!ca.ketQua) && <CaMoiNhat ca={ca} loi={nhanXet.get(ca.maCa)?.noiDung ?? ''} />}
-        {loc !== 'cho' && truoc.length > 0 && (
-          <section className="ph3-the ph3-the--sat ph3-o-hep" aria-labelledby="ph3-ds-ca" data-vung="ds-ca">
-            <div className="ph3-the__dau"><div><h2 id="ph3-ds-ca">{ca ? 'Các ca trước' : 'Các ca kiểm tra'}</h2></div><span className="ph3-ghi" style={{ fontSize: 13 }}>Điểm trên thang 10</span></div>
-            <ul className="ph3-ds-ca">
-              {truoc.map((d) => (
-                <li key={d.maCa}>
-                  <a href={lienKetCa(d.maCa)}>
-                    <span className="ph3-ngay"><span>{thuNgan(d.ngay)}</span><b>{ngayChuoiNgan(d.ngay)}</b></span>
-                    <span className="ph3-ds-ca__giua">
-                      <b>{d.tenCa}</b>
-                      {nhanXet.has(d.maCa) && <span>Có nhận xét của thầy</span>}
-                    </span>
-                    <span className="ph3-ds-ca__phai"><b>{soVn(d.diem)}</b></span>
-                  </a>
-                </li>
-              ))}
-            </ul>
+      <div className="ph3-tieu-de"><h1>Ca kiểm tra</h1></div>
+      <div className="ph3-luoi">
+        {ca && <CaMoiNhat ca={ca} loi={nhanXet.get(ca.maCa)?.noiDung ?? ''} />}
+        {(ca || truoc.length > 0) && (
+          <section className="ph3-ds-ca-khoi ph3-o-hep" aria-labelledby="ph3-ds-ca" data-vung="ds-ca">
+            <h2 id="ph3-ds-ca" className="ph3-khoi__ten">{ca ? 'Các ca trước' : 'Các ca kiểm tra'}</h2>
+            {truoc.length > 0 ? (
+              <ul className="ph3-ds-ca ph3-the ph3-the--sat">
+                {truoc.map((d) => (
+                  <li key={d.maCa}>
+                    <a className="tt-nhan" href={lienKetCa(d.maCa)}>
+                      <span className="ph3-ngay"><span>{thuNgan(d.ngay)}</span><b>{ngayChuoiNgan(d.ngay)}</b></span>
+                      <span className="ph3-ds-ca__giua">
+                        <b>{d.tenCa}</b>
+                        {nhanXet.has(d.maCa) && <span>Có nhận xét của thầy</span>}
+                      </span>
+                      <span className="ph3-ds-ca__phai"><b>{soVn(d.diem)}</b><small>/10</small></span>
+                      <BtPhai co={18} day={2.4} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ph3-o-bao">Chưa có ca nào khác trước ca này. Mỗi ca thầy công bố sau sẽ thêm một dòng ở đây.</p>
+            )}
           </section>
         )}
         {!ca && truoc.length === 0 && (
@@ -117,28 +123,29 @@ export default function ManDiemSo({ v, loiThay }: { v: ViewPhMoi; loiThay: NhanX
   )
 }
 
-/** Ca gần nhất: điểm + ba phần (đã công bố) hoặc câu chờ công bố; lời thầy của ca ấy (nếu có); MỘT nút chính của màn: xem bài làm. */
+/** Ca mới nhất: điểm + ba phần (đã công bố) hoặc nhãn "Chờ công bố" + câu nói khi nào có điểm; nhận xét của thầy cho ca ấy (nếu có); MỘT nút chính màu đặc. */
 function CaMoiNhat({ ca, loi }: { ca: CaGanNhat; loi: string }) {
   const kq = ca.ketQua
   const phu = [ngayDayDuVn(ca.nopLuc), kq?.soCau ? `${kq.soCau} câu` : ''].filter(Boolean).join(' · ')
+  const coDiem = !!kq && kq.tong !== null
   return (
-    <The id="ph3-ca" className="ph3-o-rong" vung="ca-gan-nhat" tieuDe={ca.tenCa} phu={phu || undefined}>
-      {kq && kq.tong !== null ? (
+    <The id="ph3-ca" className="ph3-o-rong" vung="ca-gan-nhat" tieuDe={ca.tenCa} phu={phu || undefined} chip={coDiem ? undefined : <span className="ph3-nhan-cho">Chờ công bố</span>}>
+      {coDiem ? (
         <>
-          <div className="ph3-so-lon"><span><b>{soVn(kq.tong)}</b><small> /10 điểm</small></span></div>
+          <p className="ph3-so-lon"><b>{soVn(kq!.tong!)}</b><small>/10 điểm</small></p>
           {ca.phan.length > 0 && (
             <div className="ph3-phan">
               {ca.phan.map((p) => (
                 <div key={p.ma}>
                   <span>{TEN_PHAN[p.ma]}</span>
-                  <span className="ph3-thanh"><span style={{ width: `${(p.dung / p.tong) * 100}%` }} /></span>
+                  <span className="ph3-thanh"><span className="tt-thanh" style={{ width: `${(p.dung / p.tong) * 100}%` }} /></span>
                   <b>{p.dung}/{p.tong} câu</b>
                 </div>
               ))}
             </div>
           )}
-          {loi && <p className="ph3-loi-thay" data-vung="loi-thay-ca"><b>Thầy Đỗ Đại Học:</b> {chuThay(loi)}</p>}
-          <a className="ph3-nut-tong" href={lienKetCa(ca.maCa)}>Xem bài làm của con<BtPhai co={18} day={2.5} /></a>
+          {loi && <div className="ph3-loi-thay" data-vung="loi-thay-ca"><span>Nhận xét của thầy</span><p>{chuThay(loi)}</p></div>}
+          <a className="ph3-nut-tong ph3-nut-tong--dac tt-nhan" href={lienKetCa(ca.maCa)}>Xem bài làm của con<BtPhai co={20} day={2.5} /></a>
         </>
       ) : (
         <p className="ph3-cho-cong-bo"><BtKhoa co={20} /><span>{chuCongBoCa(ca)}</span></p>

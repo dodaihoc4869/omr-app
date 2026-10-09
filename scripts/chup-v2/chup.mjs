@@ -60,7 +60,7 @@ const DS = [
   ])),
   ...[[390,844,'doc'],[844,390,'ngang'],[1440,960,'may-tinh']].flatMap(([w,h,k]) => [
     ...[['hanh-trinh','Hành trình'],['on-lai','Ôn lại'],['cua-em','Của em']].map(([m,chu]) => [`22-hs-${m}-${k}`, 'sanh', w,h,'light',true,/Hôm nay/,`hs:${chu}`]),
-    ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Lịch sử'],['loi-thay','Lời thầy'],['thong-tin','Thông tin và giao diện']].map(([m,chu]) => [`23-ph-${m}-${k}`, 'ph',w,h,'light',true,/Hôm nay/,`ph:${m}:${chu}`]),
+    ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Ca kiểm tra'],['loi-thay','Nhận xét của thầy'],['thong-tin','Thông tin và giao diện']].flatMap(([m,chu]) => ['light','dark'].map((nen) => [`23-ph-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph',w,h,nen,true,/Hôm nay/,`ph:${m}:${chu}`])),
     ...[['gv-hom-nay',/Hôm nay của thầy/],['gv-kho',/Kho đề/],['gv-cai-dat',/Cài đặt/],['gv-hoc-sinh',/Học sinh/],['gv-mo-ca',/Mở ca kiểm tra/],['gv-go-nut',/Bàn gỡ nút thắt/],['gv-duyet',/Duyệt lời giải/]].map(([m,chu]) => [`24-${m}-${k}`,m,w,h,'light',true,chu]),
   ]),
   ['18-gv-ma-tran-de', 'gv-ma-tran', 1440, 700, 'light', false, /Ma trận đề/],
