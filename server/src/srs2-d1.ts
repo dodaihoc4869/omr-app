@@ -1,6 +1,6 @@
 import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
 import { laHanhTrinh, ungVienHanhTrinh } from './hanh-trinh-hop-nhat'
-import { tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
+import { coLoThuSucHanhTrinh, tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
 // THUẬT TOÁN 2.0 — LỚP D1 (đọc chiến dịch, sổ sự kiện; chốt kế hoạch ngày; số liệu Sảnh; Rương Bát Linh).
 // Lõi thuần ở `srs2-loi.ts`. Công tắc `cau_hinh.game_hoa_2` (mặc định TẮT ⇒ mọi đường cũ giữ nguyên):
 //   {"bat":true}                         ⇒ toàn trung tâm
@@ -1059,6 +1059,8 @@ export async function docHangEm(env: Env, sbd: string, hs: HoSo2, hoSoDangSom?: 
 // ---------------------------------------------------------------- kế hoạch ngày (chốt một lần)
 export interface KeHoachDaChot {
   hanhTrinh?: TienDoHanhTrinh
+  /** CHỈ máy chủ (không gửi app): Hành trình đã đủ sàn ⇒ số câu Thử sức thêm còn lấy được theo ước lượng rẻ (hanh-trinh-d1.ts). */
+  thuSucHanhTrinh?: number
   ngay: string
   chienDichId: string | null
   /** Khoá câu theo thứ tự phục vụ; `qid#2` = lần làm thứ 2 trong ngày (ngày cuối trước hạn). */
@@ -1154,7 +1156,7 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
   const nghiSom = docCauNghiDem(env, nowMs) // 06/10: câu nghi đáp án — cùng đợt với kế hoạch (đệm 60 s trong isolate; không bao giờ ném)
   const r = await layKeHoachChot(env, sbd, nowMs, hs, chanSom, omniTruoc)
   const kh = await tamHoanCauKhoa(env, r.kh, r.hs, chanSom, nghiSom, sbd)
-  if (kh.hanhTrinh) kh.hanhTrinh = tienDoHanhTrinh(kh.hanhTrinh.tang, kh.hanhTrinh.toiThieu, kh.tong, kh.tong - kh.conDao.length - kh.conDoan.length)
+  if (kh.hanhTrinh) kh.hanhTrinh = { ...tienDoHanhTrinh(kh.hanhTrinh.tang, kh.hanhTrinh.toiThieu, kh.tong, kh.tong - kh.conDao.length - kh.conDoan.length), ...(kh.hanhTrinh.bai ? { bai: kh.hanhTrinh.bai } : {}) }
   return { kh, hs: r.hs }
 }
 
@@ -1511,7 +1513,7 @@ function batDauDocLap(env: Env, sbd: string, nowMs: number): DocLapSom {
   nk.catch(() => {}); hd.catch(() => {})
   return { nk, hd }
 }
-async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanSom?: Promise<Set<string>>, omniTruoc?: Promise<boolean>): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
+async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, chanSom?: Promise<Set<string>>, omniTruoc?: Promise<boolean>): Promise<{ kh: KeHoachDaChot; hs: HoSo2; tcHanhTrinh?: TuyChonKeHoach }> {
   const ngay = ngayVnCua(nowMs)
   // OMNI 3: hỏi cờ MỘT lần (dùng chung với docHoSo2); bật ⇒ đọc thêm bảng phụ kế hoạch OMNI CÙNG ĐỢT. Tắt ⇒ không thêm lượt đọc nào.
   // `omniTruoc` (chỉ-thêm, tối ưu 05/10): nơi gọi (Sảnh) đã hỏi đúng câu ấy ⇒ dùng chung lời hỏi.
@@ -1538,6 +1540,7 @@ async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2, 
     ])
     const kh = await import('./hanh-trinh-d1').then(m => m.lapChotHanhTrinh(env, sbd, ngay, nowMs, hoSo, cu,
       new Set([...chan, ...nghi])))
+    // Tối ưu CPU (main 113000a): Hành trình không dựng tuỳ chọn OMNI ⇒ Thử sức thêm cũng chọn không trọng số OMNI (`tcHanhTrinh` vắng) — cùng đầu vào với lần chốt.
     return { kh, hs: hoSo }
   }
   if (hoSo.omni?.bat) return layKeHoachChotOmni(env, sbd, nowMs, hoSo, dem, cu, luuOmni, chanSom, await lapSom)
@@ -1690,7 +1693,7 @@ const docRuongHomNay = (env: Env, sbd: string, ngay: string): Promise<Row | null
   env.DB.prepare('SELECT mo_luc, qua_json FROM ruong_bat_linh WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
 
 // ---------------------------------------------------------------- THỬ SỨC THÊM (thầy chốt 30/09)
-export type LyDoKhongThuSuc = 'chua_co_chien_dich' | 'het_ngay' | 'chua_xong' | 'tam_giu_ca' | 'chua_mo_ruong' | 'du_tran' | 'het_cau_moi'
+export type LyDoKhongThuSuc = 'chua_co_chien_dich' | 'het_ngay' | 'chua_xong' | 'tam_giu_ca' | 'chua_mo_ruong' | 'du_tran' | 'het_cau_moi' | 'het_cau_hop_le'
 export const LOI_THU_SUC: Record<LyDoKhongThuSuc, string> = {
   chua_co_chien_dich: 'Thầy chưa giao chiến dịch nào đang chạy cho em.',
   het_ngay: 'Hôm nay là hạn nộp của chiến dịch, không còn câu của ngày mai để lấy trước.',
@@ -1699,6 +1702,7 @@ export const LOI_THU_SUC: Record<LyDoKhongThuSuc, string> = {
   chua_mo_ruong: 'Em mở Rương Bát Linh hôm nay trước, rồi thử sức thêm nhé.',
   du_tran: 'Hôm nay em đã nhận đủ số câu tối đa trong ngày.',
   het_cau_moi: 'Em đã nhận hết câu mới của chiến dịch.',
+  het_cau_hop_le: 'Hôm nay chưa còn câu phù hợp với em để thử sức thêm.',
 }
 /** Trần lượt HÔM NAY của kế hoạch — đúng `tran` của `lapKeHoachNgay`: ngày Huyết Chiến theo trần Huyết Chiến hiện hành, ngày thường = thể lực/ngày. */
 export const tranKeHoachHomNay = (cd: ChienDich, huyetChien: boolean): number => (huyetChien && cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay)
@@ -1713,8 +1717,20 @@ export const tranKeHoachHomNay = (cd: ChienDich, huyetChien: boolean): number =>
  * không có trong `hs.cau`, soát lại theo `meta`), câu đang bảo vệ cho ca (`chan`: qid hoặc nhóm), câu sai của ca (chưa tới lượt), câu đã có trong kế hoạch hôm nay.
  */
 export function tinhThuSucThem(kh: KeHoachDaChot, hs: Pick<HoSo2, 'chienDich' | 'cau' | 'tt' | 'meta' | 'qidCaSai'>, daMo: boolean, chan: ReadonlySet<string>): { duoc: boolean; soCau: number; lyDo: LyDoKhongThuSuc | null; ung: CauSrs[] } {
-  if (kh.hanhTrinh) return { duoc: false, soCau: 0, lyDo: 'du_tran', ung: [] }
   const khong = (lyDo: LyDoKhongThuSuc) => ({ duoc: false, soCau: 0, lyDo, ung: [] as CauSrs[] })
+  // HÀNH TRÌNH (bật lại 09/10 — trước đó tắt hẳn vì "câu mới của ngày mai" không có nghĩa khi hạn 9999-12-31 và kế hoạch chốt theo năng lực từng ngày,
+  // còn lô cũ nằm ngoài sàn sẽ bị lần chọn lại sau chặng cắt mất). Nay: ĐỦ mức tối thiểu hôm nay + không còn câu chưa làm + không câu tạm giữ vì ca +
+  // đã mở rương ⇒ thêm MỘT chặng (≤ 6 câu) của HÔM NAY, tổng ≤ 2 × sàn; lần chọn lại sau chặng giữ phần này (`mucNgayHanhTrinh`). Số câu = ước lượng rẻ
+  // `kh.thuSucHanhTrinh` (cổng tầng theo bài); lệnh lấy câu chọn lại bằng động cơ đầy đủ nên có thể ít hơn. Chi tiết: docs/hanh-trinh-bai-thu-suc-0910.md.
+  if (kh.hanhTrinh) {
+    if (kh.conDao.length + kh.conDoan.length > 0 || kh.hanhTrinh.daLam < kh.hanhTrinh.toiThieu) return khong('chua_xong')
+    if ((kh.tamHoan?.ca ?? 0) > 0) return khong('tam_giu_ca')
+    if (kh.tong > 0 && !daMo) return khong('chua_mo_ruong')
+    const lo = coLoThuSucHanhTrinh(kh.hanhTrinh.toiThieu, kh.tong)
+    if (lo <= 0) return khong('du_tran')
+    const co = Math.min(lo, kh.thuSucHanhTrinh ?? 0)
+    return co > 0 ? { duoc: true, soCau: co, lyDo: null, ung: [] } : khong('het_cau_hop_le')
+  }
   const cd = hs.chienDich
   if (!cd) return khong('chua_co_chien_dich')
   if (congNgay(kh.ngay, 1) > cd.hanNop) return khong('het_ngay')
@@ -1753,6 +1769,19 @@ export async function thuSucThem(env: Env, sbd: string, nowMs: number): Promise<
   const kh = await tamHoanCauKhoa(env, goc.kh, hs, chanSom, nghiSom, sbd)
   const t = tinhThuSucThem(kh, hs, !!ruong, await chanSom)
   if (!t.duoc) return { ok: false, ma: t.lyDo, error: LOI_THU_SUC[t.lyDo!] }
+  if (kh.hanhTrinh) {
+    // Hành trình: cỡ lô theo kế hoạch GỐC (kể cả câu đang tạm hoãn vì nghi đáp án / rút kho) — không vượt trần 2 × sàn.
+    const soCau = Math.min(t.soCau, coLoThuSucHanhTrinh(kh.hanhTrinh.toiThieu, goc.kh.tong))
+    const chan = new Set([...await chanSom, ...await nghiSom])
+    const lo = await import('./hanh-trinh-d1').then((m) => m.chonLoThuSucHanhTrinh(env, sbd, ngay, nowMs, hs, goc.kh, chan, soCau, goc.tcHanhTrinh?.trongSoCau, goc.tcHanhTrinh?.dangVung))
+    if (!lo.dao.length && !lo.doan.length) return { ok: false, ma: 'het_cau_hop_le', error: LOI_THU_SUC.het_cau_hop_le }
+    const cu = await env.DB.prepare('SELECT dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+    if (!cu || !cungMang(parseMang(cu.dao_json), goc.kh.dao) || !cungMang(parseMang(cu.doan_json), goc.kh.doan)) return { ok: true, them: 0, lapLai: true }
+    // Câu mới / ôn Phần II ⇒ Đảo, ôn Phần I/III ⇒ Đoàn — đúng luồng của bộ chọn Hành trình. So-khớp-rồi-ghi: hai máy bấm cùng lúc chỉ MỘT lô vào.
+    const dao = [...goc.kh.dao, ...lo.dao], doan = [...goc.kh.doan, ...lo.doan]
+    const ghi = await ghiKeHoachNeuChuaDoi(env, sbd, ngay, cu, 'dao_json = ?, doan_json = ?, tong = ?', [JSON.stringify(dao), JSON.stringify(doan), dao.length + doan.length])
+    return ghi ? { ok: true, them: lo.dao.length + lo.doan.length } : { ok: true, them: 0, lapLai: true }
+  }
   const cd = hs.chienDich!
   const hang = await docHangEm(env, sbd, hs).catch(() => null)
   // Chỉ đưa câu MỚI ứng viên vào ⇒ không nợ / củng cố / duy trì; `raiDeu: false` + trần = cỡ lô ⇒ lấy ĐÚNG `soCau` câu theo thứ tự của ngày mai.

@@ -26,11 +26,11 @@ type Tab='home'|'doan'|'learn'|'arena'|'progress'|'coming'
 /** CỜ MỞ GAME (`doanMo` do máy chủ trả ở lệnh profile). TẮT ⇒ các mục game Y HỆT trước khi có Đoàn: không tab Đoàn, Võ đài cũ mở mọi ngày, tên tab cũ.
  *  GAME HÓA 2.0 (`cheDo2`, cờ `game_hoa_2` — `hoa2-sanh` trả `cheDo2:true`): thanh chọn chỉ còn Đảo thần thú (+ Đoàn Hộ Tống khi `doanMo`) — bỏ Võ đài, Tiến bộ, Sắp ra mắt. Cờ tắt ⇒ như cũ. */
 export function cuaGame(doanMo:boolean,now=Date.now(),cheDo2=false):{nav:readonly (readonly [Tab,string])[];voDaiMo:boolean}{
- if(cheDo2)return {nav:[['home','Đảo thần thú'],...(doanMo?[['doan','Đoàn Hộ Tống'] as const]:[])],voDaiMo:false}
- return doanMo?{nav:[['home','Đảo thần thú'],['doan','Đoàn Hộ Tống'],['arena','Võ đài thứ Bảy'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:laThuBayVn(now)}
-  :{nav:[['home','Đảo thần thú'],['arena','Hộ Tống Linh Tâm'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:true}
+ if(cheDo2)return {nav:[['home','Bát Linh Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống'] as const]:[])],voDaiMo:false}
+ return doanMo?{nav:[['home','Bát Linh Đảo'],['doan','Đoàn Hộ Tống'],['arena','Võ đài thứ Bảy'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:laThuBayVn(now)}
+  :{nav:[['home','Bát Linh Đảo'],['arena','Hộ Tống Linh Tâm'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:true}
 }
-function docManDau(prop:unknown):{tab:Tab;shop:boolean;tuiDo:boolean}{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return {tab:prop==='doan'||luu==='doan'?'doan':'home',shop:prop==='shop'||luu==='shop',tuiDo:prop==='tui-do'||luu==='tui-do'}} // 'shop' = mở thẳng Cửa hàng phụ kiện (chỉ khi máy chủ báo shopBat)
+function docManDau(prop:unknown):{tab:Tab;shop:boolean;tuiDo:boolean;thanThu:boolean}{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return {tab:prop==='doan'||luu==='doan'?'doan':'home',shop:prop==='shop'||luu==='shop',tuiDo:prop==='tui-do'||luu==='tui-do',thanThu:prop==='than-thu'||luu==='than-thu'}} // 'shop' = mở thẳng Cửa hàng phụ kiện (chỉ khi máy chủ báo shopBat)
 import ProgressChart from './ProgressChart'
 import TheCau from '../../components/TheCau'
 import type {TheCauProps} from '../../components/TheCau'
@@ -44,7 +44,7 @@ import type {ShieldState} from './shields'
 interface Profile {nickname?:string;academic?:{total:number;today:number;lastGain:number;dailyLimit:number};shields?:ShieldState;pet:string;choice:boolean;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null}
 interface Feedback {correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}
 interface Result {ok:boolean;doanMo?:boolean;dailyUsed?:number;suggestions?:{title:string;source:string;part:string}[];history?:{day:string;total:number;correct:number}[];mode?:Mode;answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[];pass?:string;tasks?:{id:string;dang:string}[];error?:string;profile?:Profile;revision?:number;remaining?:number;questions?:Question[];id?:string;message?:string;missing?:number;correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[]}
-interface Props {sbd:string;token?:string;manDau?:'home'|'doan'|'shop'|'tui-do';onDong:()=>void;[key:string]:unknown}
+interface Props {sbd:string;token?:string;manDau?:'home'|'doan'|'shop'|'tui-do'|'than-thu';onDong:()=>void;/** Đăng xuất (cổng học sinh) — chỉ đưa xuống màn "Thần thú của em" V2. */onDangXuat?:()=>void;[key:string]:unknown}
 /** MỘT lệnh `game-v2/<action>` qua mạng — dùng cho `request` của Game và cho lệnh GỌI SỚM (dưới).
  *  HẠN 25 GIÂY (quét ổn định 30/09): trước đây fetch không hạn ⇒ mạng treo là nút bận MÃI (`running` khoá mọi lệnh sau) tới khi em tải lại trang.
  *  Lệnh answer/complete có biên nhận (session|qid) ở máy chủ nên bấm lại sau khi hết hạn không chấm hai lần. */
@@ -63,11 +63,11 @@ const nhanLenhGame=(action:string,data:Record<string,unknown>,sessionToken:strin
 /** Phiên game của em — y như trạng thái `token` lúc Game mở (sessionStorage `game-v2:<sbd>`, không có thì phiên app). */
 const phienGame=(sbd:string,initialToken?:string)=>{try{return sessionStorage.getItem(`game-v2:${sbd}`)||initialToken||''}catch{return initialToken||''}}
 /** Sảnh gọi lúc em chạm cửa game (mảnh game đã có): `profile` + `hoa2-sanh` (Game mở là gọi); mở thẳng Đoàn Hộ Tống thì thêm `doan-sanh` (lệnh đầu của Đoàn). */
-export function goiSomGame(sbd:string,initialToken:string|undefined,manDau:''|'doan'|'shop'|'tui-do'=''):void{
+export function goiSomGame(sbd:string,initialToken:string|undefined,manDau:''|'doan'|'shop'|'tui-do'|'than-thu'=''):void{
  const sessionToken=phienGame(sbd,initialToken);if(!sessionToken)return
  for(const action of manDau==='doan'?['profile','hoa2-sanh','doan-sanh']:['profile','hoa2-sanh'])goiSom.ban(khoaSom(action,sessionToken),()=>goiGame(action,{},sessionToken))
 }
-export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
+export default function Game({sbd,token:initialToken,manDau,onDong,onDangXuat}:Props){
  const [doanMo,setDoanMo]=useState(false)
  // GAME HÓA 2.0: null = chưa biết (đang hỏi `hoa2-sanh`), true/false = đã biết. `sanh2` = phản hồi ấy, đưa cho Đảo dùng lần vẽ đầu.
  const [cheDo2,setCheDo2]=useState<boolean|null>(null),[sanh2,setSanh2]=useState<unknown>(null)
@@ -160,7 +160,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
    </div>}
    </>}
    {/* ĐẢO THẦN THÚ bản mới (Code 6, docs/hop-dong-dao-than-thu-prop-2109.md): MỘT vỏ lo trọn chọn thú → đảo → thám hiểm → sổ tay → túi đồ + thanh dưới. Vỏ tự gọi choose/rename/recommendations/so-tay/resume/sync/start/answer/complete/shield-use/invest qua `request`. Lượt Võ đài (arena) vẫn ở tab learn cũ. */}
-   {(profile.choice||tab==='home')&&(cheDo2===null?<p role="status" className="spirit-status">Đang mở đảo…</p>:<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} token={token} moShopLucDau={manDauDoc.shop} moTuiDoLucDau={manDauDoc.tuiDo} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={cheDo2?undefined:()=>setTab('arena')} onMoTienBo={cheDo2?undefined:()=>setTab('progress')} onDong={onDong} cheDo2={cheDo2} sanh2={sanh2}/></Suspense>)}
+   {(profile.choice||tab==='home')&&(cheDo2===null?<p role="status" className="spirit-status">Đang mở đảo…</p>:<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} token={token} moShopLucDau={manDauDoc.shop} moTuiDoLucDau={manDauDoc.tuiDo} moThanThuLucDau={manDauDoc.thanThu} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={cheDo2?undefined:()=>setTab('arena')} onMoTienBo={cheDo2?undefined:()=>setTab('progress')} onDong={onDong} onDangXuat={onDangXuat} cheDo2={cheDo2} sanh2={sanh2}/></Suspense>)}
    {!profile.choice&&<>
    {doanMo&&tab==='doan'&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đường cho Đoàn Hộ Tống…</p>}><DoanHoTong call={request} sbd={sbd} pet={petIndex} cap={profile.cap} token={token} onDong={()=>setTab('home')} onVeBangNhiemVu={onDong}/></Suspense>}
    {cheDo2===false&&cuaGame(doanMo).voDaiMo?<div hidden={tab!=='arena'}><EscortRoom storageKey={sbd} call={request} active={tab==='arena'}/></div>:tab==='arena'&&<div className="spirit-panel"><small>SỰ KIỆN TUẦN</small><h2>Võ đài thứ Bảy</h2><p>Đấu đội 2 đấu 2 mở vào <strong>thứ Bảy hằng tuần</strong>. Các ngày còn lại, cả lớp cùng đi <strong>Đoàn Hộ Tống</strong>: mỗi ngày một chặng 5–6 phút, làm đúng câu vừa sức của mình là góp sức cho cả đoàn.</p><button className="spirit-primary" onClick={()=>setTab('doan')}>Vào Đoàn Hộ Tống</button></div>}

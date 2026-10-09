@@ -1,16 +1,17 @@
-// OMNI 3 · APP PHỤ HUYNH (05/10) — dòng thêm trong thẻ "Chiến dịch của con" khi `/ph/hoc-2` kèm `omni` (docs/hop-dong-omni-3.md mục C, kiểu PhOmni).
-// Thầy 05/10: "giữ nguyên mọi giao diện hiện tại… thêm những mục cần thiết đồng bộ với giao diện hiện tại". Khoá:
-// (1) vắng `omni` (hoặc `omni` không có số thật) ⇒ thẻ Y HỆT bản trước OMNI — so NGUYÊN HTML chụp từ mã chưa sửa (commit f189d2b);
-// (2) có `omni` ⇒ đúng sáu dòng, đúng thứ tự, nằm cuối CÙNG thẻ, lớp sẵn có; bỏ ô OMNI thì phần cũ của thẻ không đổi một ký tự;
-// (3) khoảng cách tới 8 chỉ khi đã hiệu chuẩn (≥ 3 ca chốt); độ tin không bao giờ 100%; không thẻ mới khi không có chiến dịch;
+// OMNI 3 · APP PHỤ HUYNH (05/10) — các số OMNI khi `/ph/hoc-2` kèm `omni` (docs/hop-dong-omni-3.md mục C, kiểu PhOmni).
+// SỬA CÓ CHỦ Ý — bản vẽ tối giản thầy chốt 09/10 (thay thứ tự 01/10): thẻ "Chiến dịch của con" ở Hôm nay ĐÃ BỎ (khoá HTML nguyên thẻ f189d2b không còn chỗ áp);
+// các dòng OMNI về đúng chỗ của bản vẽ, MỖI SỐ MỘT CHỖ:
+//   Hôm nay  — giờ học (khi máy chủ không có giờ học quen) trong khối chính; "Cần thầy chữa: N chỗ" + tên dạng cần vững (khi không có dạng luyện thêm) ở khối (c);
+//   Tiến bộ  — khoảng cách tới 8 (chỉ khi đã hiệu chuẩn) + chứng chỉ Sẵn sàng 8+ dưới đường điểm; Sơ ý của con (mục tiêu dưới 7%) một thẻ.
+// Khoá: (1) vắng `omni` / omni không có số thật ⇒ không dòng OMNI nào, không số 0 giả; (2) có omni ⇒ đúng chữ, đúng chỗ; (3) độ tin không bao giờ 100%;
 // (4) không chữ game, không chữ A.I trên màn phụ huynh; (5) lớp đọc chặt từng trường.
 // Tệp .ts (không JSX) để lọt mẫu cổng `tests/omni-3-*.test.ts` của đặc tả mục 8.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, waitFor } from '@testing-library/react'
+import { act, cleanup, render, waitFor } from '@testing-library/react'
 import { createElement } from 'react'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import { docHoc2, docOmniPh } from '../src/lib/ph-v3/du-lieu'
-import { SO_Y_MUC_TIEU, chuPhSoY, dongOmniPh } from '../src/components/ph-v3/ManHomNay'
+import { SO_Y_MUC_TIEU, chuPhSoY, dongDiemOmni } from '../src/components/ph-v3/ManTienBo'
 import { THAM_SO_OMNI, type PhOmni } from '../server/src/omni-kieu'
 import { PH_OK } from './_ph-moi/du-lieu-mau'
 
@@ -25,21 +26,22 @@ const OMNI: PhOmni = {
   chungChi: [{ ten: 'Bài 5', doTin: 0.91, ngay: '2026-10-05', diem: 8.5 }, { ten: 'Bài 4', doTin: 0.93, ngay: '2026-09-29', diem: 9 }], gioHoc: '20:30', canThayChua: 1,
 }
 const OMNI_RONG: PhOmni = { khoangCach8: null, hieuChuan: { soCaChot: 0, du: false }, dangCanVung: [], sEm: null, chungChi: [], gioHoc: null, canThayChua: 0 }
-/** HTML thẻ "Chiến dịch của con" chụp từ mã CHƯA sửa (f189d2b) với HOC2 trên — mốc "y hệt hôm nay". */
-const MOC =
-  '<section class="ph3-the ph3-o-hep" aria-labelledby="ph3-cd" data-vung="chien-dich"><div class="ph3-the__dau"><span class="ph3-o-bt" data-mau="xd" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 21V4"></path><path d="M5 4h11l-2 4 2 4H5"></path></svg></span><div><h2 id="ph3-cd">Chiến dịch của con</h2><span>Bài 6 · Tinh bột và cellulose</span></div><span class="ph3-chip" data-mau="xd">Còn 7 ngày</span></div><div class="ph3-cd-ray" role="img" aria-label="24 câu đã thành thạo, 34 câu đang luyện, 2 câu cần thầy dạy lại, 52 câu chưa gặp, trên tổng 112 câu"><span data-mau="xl" style="width: 21.428571428571427%;"></span><span data-mau="xd" style="width: 30.357142857142854%;"></span><span data-mau="ho" style="width: 1.7857142857142856%;"></span></div><div class="ph3-cd-chu"><div><i data-mau="xl"></i><span><b>24</b>câu đã thành thạo</span></div><div><i data-mau="xd"></i><span><b>34</b>câu đang luyện</span></div><div><i data-mau="ho"></i><span><b>2</b>câu cần thầy dạy lại</span></div><div><i></i><span><b>52</b>câu chưa gặp</span></div></div><div class="ph3-o-xam"><b>Tổng 112 câu · con đã gặp 60 câu</b><span class="ph3-dong-bt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Hạn nộp 23:59 · Thứ Hai 12/10/2026</span></div></section>'
+/** Con chưa có giờ học quen (nhịp học không ghi giờ) và chưa có dạng luyện thêm ⇒ Hôm nay dùng giờ học con chọn + dạng cần vững của OMNI. */
+const PH_OMNI = { ...PH_OK, nhipHoc: { ...PH_OK.nhipHoc, gioThuongHoc: '' }, manhYeu: null, dangVap: null }
 const CAM = /thần thú|khiên|Võ đài|Đảo|Linh Tâm|Đoàn Hộ Tống|\bEXP\b|vàng|rương|Vé thử thách|Trạm hồi phục|Máu|A\.I|Bộ não|100 ?%/i
 
 let hoc2: unknown = HOC2
+let tatCa: unknown = PH_OMNI
 beforeEach(() => {
   hoc2 = HOC2
+  tatCa = PH_OMNI
   window.history.replaceState(null, '', '/?vai=phuhuynh')
   localStorage.setItem('omr_ph_sbd', '12121212')
   vi.stubGlobal('scrollTo', vi.fn())
   vi.stubGlobal('fetch', vi.fn(async (url: string) => {
     const duong = String(url).replace('https://may.test', '')
     const js = (t: unknown) => ({ ok: true, status: 200, json: async () => t, text: async () => JSON.stringify(t) })
-    if (duong === '/ph/tat-ca-ve-con') return js(PH_OK)
+    if (duong === '/ph/tat-ca-ve-con') return js(tatCa)
     if (duong === '/ph/hoc-2') return js(hoc2)
     return js({ ok: true })
   }))
@@ -51,78 +53,81 @@ afterEach(() => {
   window.history.replaceState(null, '', '/')
 })
 
-const moTheChienDich = async (): Promise<HTMLElement> => {
+/** Mở Hôm nay, chờ /ph/hoc-2 về (số kế hoạch 34/40 hiện) rồi trả gốc. */
+const moHomNay = async (): Promise<HTMLElement> => {
   const { container } = render(createElement(ParentPortalScreen))
-  await waitFor(() => expect(container.querySelector('[data-vung="chien-dich"]')).toBeTruthy())
-  return container.querySelector('[data-vung="chien-dich"]') as HTMLElement
+  await waitFor(() => expect(container.querySelector('[data-vung="so-cau-hom-nay"]')?.textContent).toBe('34/40 câu'))
+  return container
+}
+const sangTienBo = async (container: HTMLElement): Promise<void> => {
+  await act(async () => {
+    window.history.replaceState(null, '', '/?vai=phuhuynh#tien-bo')
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+  })
+  await waitFor(() => expect(container.querySelector('[data-vung="man-tien-bo"]')).toBeTruthy())
 }
 
-describe('OMNI 3 · thẻ "Chiến dịch của con" (app phụ huynh)', () => {
-  it('VẮNG omni ⇒ thẻ Y HỆT bản trước OMNI (nguyên HTML), không ô OMNI', async () => {
-    const the = await moTheChienDich()
-    expect(the.outerHTML).toBe(MOC)
-    expect(the.querySelector('[data-vung="chien-dich-omni"]')).toBeNull()
+describe('OMNI 3 · app phụ huynh theo bản vẽ tối giản 09/10', () => {
+  it('VẮNG omni ⇒ không dòng OMNI nào ở Hôm nay lẫn Tiến bộ; không thẻ chiến dịch', async () => {
+    const c = await moHomNay()
+    expect(c.querySelector('[data-vung="chien-dich"], [data-vung="chien-dich-omni"], [data-vung="can-thay-chua"]')).toBeNull()
+    expect(c.textContent).not.toMatch(/Giờ học con chọn|Dạng cần vững|Cần thầy chữa/)
+    await sangTienBo(c)
+    expect(c.querySelector('[data-vung="diem-omni"], [data-vung="so-y"]')).toBeNull()
+    expect(c.textContent).not.toMatch(/Sẵn sàng 8\+|tới 8|Sơ ý/)
   })
 
-  it('omni KHÔNG có số thật (chưa hiệu chuẩn, rỗng, 0) ⇒ thẻ vẫn y hệt — không ô trống, không số 0 giả', async () => {
+  it('omni KHÔNG có số thật (chưa hiệu chuẩn, rỗng, 0) ⇒ vẫn không dòng nào — không ô trống, không số 0 giả', async () => {
     hoc2 = { ...HOC2, omni: OMNI_RONG }
-    const the = await moTheChienDich()
-    expect(the.outerHTML).toBe(MOC)
+    const c = await moHomNay()
+    expect(c.textContent).not.toMatch(/Giờ học con chọn|Dạng cần vững|Cần thầy chữa/)
+    await sangTienBo(c)
+    expect(c.querySelector('[data-vung="diem-omni"], [data-vung="so-y"]')).toBeNull()
   })
 
-  it('CÓ omni ⇒ sáu dòng đúng thứ tự, cuối CÙNG thẻ, lớp sẵn có; bỏ ô OMNI thì phần cũ y hệt; không chữ game / A.I / 100%', async () => {
+  it('CÓ omni ⇒ Hôm nay: giờ học con chọn, dạng cần vững, Cần thầy chữa; Tiến bộ: khoảng cách tới 8 + chứng chỉ dưới đường điểm, Sơ ý; không chữ game / A.I / 100%', async () => {
     hoc2 = { ...HOC2, omni: OMNI }
-    const the = await moTheChienDich()
-    const o = the.querySelector('[data-vung="chien-dich-omni"]') as HTMLElement
-    expect([...o.children].map((x) => x.textContent)).toEqual([
-      'Con còn 1,1 điểm tới 8',
-      'Dạng cần vững: Hiệu suất ester hoá, Hỗn hợp ester',
-      'Sơ ý của con: 6% (mục tiêu dưới 7%)',
-      'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5',
-      'Giờ học con chọn: 20:30',
-      'Cần thầy chữa: 1 chỗ',
-    ])
-    // cùng ô xám + chữ ghi như ô "Tổng · Hạn nộp" ngay trên; dòng khoảng cách đậm như dòng "Tổng"
-    expect(o.className).toBe('ph3-o-xam')
+    const c = await moHomNay()
+    expect(c.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Giờ học con chọn: 20:30.')
+    const dang = c.querySelector('[data-vung="dang-luyen-them"]')!
+    expect(dang.querySelector('h2')!.textContent).toBe('Dạng cần vững')
+    expect(dang.textContent).toContain('Hiệu suất ester hoá · Hỗn hợp ester')
+    expect(c.querySelector('[data-vung="can-thay-chua"]')!.textContent).toBe('Cần thầy chữa: 1 chỗ')
+    expect(c.textContent).not.toMatch(/Sẵn sàng 8\+|tới 8|Sơ ý/) // các số ấy chỉ ở Tiến bộ
+    expect(c.textContent).not.toMatch(CAM)
+    await sangTienBo(c)
+    const o = c.querySelector('[data-vung="diem-omni"]') as HTMLElement
+    expect([...o.children].map((x) => x.textContent)).toEqual(['Con còn 1,1 điểm tới 8', 'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5'])
     expect(o.children[0]!.tagName).toBe('B')
-    for (const x of [...o.children].slice(1)) expect(x.tagName + '.' + x.className).toBe('SPAN.ph3-ghi')
-    expect(o.parentElement).toBe(the)
-    expect(the.lastElementChild).toBe(o)
-    expect(o.previousElementSibling!.textContent).toContain('Hạn nộp 23:59 · Thứ Hai 12/10/2026')
-    const banCu = the.cloneNode(true) as HTMLElement
-    banCu.querySelector('[data-vung="chien-dich-omni"]')!.remove()
-    expect(banCu.outerHTML).toBe(MOC)
-    expect(the.textContent).not.toMatch(CAM)
+    expect(o.closest('[data-vung="xu-huong-diem"]')).toBeTruthy()
+    const soY = c.querySelector('[data-vung="so-y"]')!
+    expect(soY.querySelector('h2')!.textContent).toBe('Sơ ý của con')
+    expect(soY.textContent).toContain('6% (mục tiêu dưới 7%)')
+    expect(c.textContent).not.toContain('Cần thầy chữa') // mỗi số một chỗ: Cần thầy chữa chỉ ở Hôm nay
+    expect(c.textContent).not.toMatch(CAM)
   })
 
-  it('chưa hiệu chuẩn (du = false) ⇒ không dòng khoảng cách dù máy chủ gửi số; không cần thầy chữa (0) ⇒ không dòng ấy', async () => {
-    hoc2 = { ...HOC2, omni: { ...OMNI, hieuChuan: { soCaChot: 2, du: false }, canThayChua: 0, gioHoc: null } }
-    const the = await moTheChienDich()
-    const chu = [...the.querySelector('[data-vung="chien-dich-omni"]')!.children].map((x) => x.textContent)
-    expect(chu).toEqual(['Dạng cần vững: Hiệu suất ester hoá, Hỗn hợp ester', 'Sơ ý của con: 6% (mục tiêu dưới 7%)', 'Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5'])
-    expect(the.textContent).not.toMatch(/tới 8|mốc 8|Cần thầy chữa|Giờ học/)
-  })
-
-  it('có omni nhưng KHÔNG có chiến dịch ⇒ không dựng thẻ mới (dòng OMNI chỉ sống trong thẻ sẵn có)', async () => {
-    hoc2 = { ok: true, cheDo2: true, ngay: '2026-10-05', homNay: { tong: 40, daLam: 34 }, omni: OMNI }
-    const { container } = render(createElement(ParentPortalScreen))
-    await waitFor(() => expect(container.textContent).toContain('Còn 6 câu nữa là xong kế hoạch hôm nay (40 câu).'))
-    expect(container.querySelector('[data-vung="chien-dich"], [data-vung="chien-dich-omni"]')).toBeNull()
-    expect(container.textContent).not.toContain('Sẵn sàng 8+')
+  it('có giờ học quen + dạng luyện thêm từ máy chủ ⇒ dùng chúng (không lặp bằng số OMNI); chưa hiệu chuẩn ⇒ không dòng khoảng cách; Cần thầy chữa 0 ⇒ không dòng', async () => {
+    tatCa = PH_OK
+    hoc2 = { ...HOC2, omni: { ...OMNI, hieuChuan: { soCaChot: 2, du: false }, canThayChua: 0 } }
+    const c = await moHomNay()
+    expect(c.querySelector('[data-vung="anh-hung"]')!.textContent).toContain('Giờ học quen của con: 19:30–21:00.')
+    expect(c.textContent).not.toContain('Giờ học con chọn')
+    expect(c.querySelector('[data-vung="dang-luyen-them"] h2')!.textContent).toBe('Dạng con đang luyện thêm')
+    expect(c.textContent).not.toMatch(/Dạng cần vững|Cần thầy chữa/)
+    await sangTienBo(c)
+    expect([...c.querySelector('[data-vung="diem-omni"]')!.children].map((x) => x.textContent)).toEqual(['Chứng chỉ gần nhất: Bài 5 · Sẵn sàng 8+ · độ tin 91% · điểm ca chốt 8,5'])
+    expect(c.textContent).not.toMatch(/tới 8|mốc 8/)
   })
 })
 
 describe('chữ OMNI giọng phụ huynh (dùng lại src/lib/omni-chu.ts)', () => {
-  it('đã chạm mốc 8 · nhiều dạng gộp "và N dạng khác" · độ tin 1 ⇒ 99% (không bao giờ 100%) · không điểm ca chốt ⇒ bỏ đoạn điểm', () => {
-    const d = dongOmniPh({ ...OMNI, khoangCach8: -0.2, dangCanVung: ['Danh pháp', 'Thuỷ phân', 'Ester hoá', 'Hiệu suất', 'Đốt cháy'], sEm: null, chungChi: [{ ten: 'Bài 6', doTin: 1, ngay: '', diem: null }], gioHoc: null, canThayChua: 0 })
-    expect(d.map((x) => x.chu)).toEqual([
-      'Con đã chạm mốc 8 theo dự báo — chờ ca chốt xác nhận',
-      'Dạng cần vững: Danh pháp, Thuỷ phân, Ester hoá và 2 dạng khác',
-      'Chứng chỉ gần nhất: Bài 6 · Sẵn sàng 8+ · độ tin 99%',
-    ])
+  it('đã chạm mốc 8 · độ tin 1 ⇒ 99% (không bao giờ 100%) · không điểm ca chốt ⇒ bỏ đoạn điểm; omni vắng/rỗng ⇒ không dòng', () => {
+    const d = dongDiemOmni({ ...OMNI, khoangCach8: -0.2, chungChi: [{ ten: 'Bài 6', doTin: 1, ngay: '', diem: null }] })
+    expect(d.map((x) => x.chu)).toEqual(['Con đã chạm mốc 8 theo dự báo — chờ ca chốt xác nhận', 'Chứng chỉ gần nhất: Bài 6 · Sẵn sàng 8+ · độ tin 99%'])
     expect(d[0]!.dam).toBe(true)
-    expect(dongOmniPh(OMNI_RONG)).toEqual([])
-    expect(dongOmniPh({ ...OMNI_RONG, canThayChua: 3 }).map((x) => x.chu)).toEqual(['Cần thầy chữa: 3 chỗ'])
+    expect(dongDiemOmni(OMNI_RONG)).toEqual([])
+    expect(dongDiemOmni(undefined)).toEqual([])
   })
   it('mục tiêu sơ ý = ngưỡng C của chứng chỉ (THAM_SO_OMNI.C_SO_Y); sơ ý vắng ⇒ không dòng', () => {
     expect(SO_Y_MUC_TIEU).toBe(THAM_SO_OMNI.C_SO_Y)

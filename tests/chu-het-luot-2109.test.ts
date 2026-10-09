@@ -41,8 +41,8 @@ describe('chữ hết lượt', () => {
     expect(chuHetLuotDoan({ daDung: 30, tran: 60 })).toBe('Em đã đi đủ số câu Đoàn Hộ Tống của hôm nay — mai mình đi tiếp nhé.')
   })
   it('Đảo: số của ĐẢO (trần riêng 36), kết bằng chuyến mới của đảo', () => {
-    expect(chuHetLuotDao({ daDung: 36, tran: 36 })).toBe('Hôm nay em đã đi 36/36 câu Đảo thần thú. Mai đảo có chuyến mới.')
-    expect(chuHetLuotDao()).toBe('Em đã đi đủ số câu Đảo thần thú của hôm nay. Mai đảo có chuyến mới.')
+    expect(chuHetLuotDao({ daDung: 36, tran: 36 })).toBe('Hôm nay em đã đi 36/36 câu Bát Linh Đảo. Mai đảo có chuyến mới.')
+    expect(chuHetLuotDao()).toBe('Em đã đi đủ số câu Bát Linh Đảo của hôm nay. Mai đảo có chuyến mới.')
   })
   it('không câu nào chứa số cứng 200 / 60 (số chỉ đến từ máy chủ)', () => {
     expect(chuHetLuotDoan()).not.toMatch(/\d/)

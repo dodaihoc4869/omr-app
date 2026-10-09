@@ -1,0 +1,13 @@
+/* Bảng "Ma trận đề" (BẢN DUYỆT V2 · màn 18) — app thầy: bảng --gvm-* (xanh lam), thẻ bo 16px, số tabular. Không màu thô. */
+.mtd { margin-top: 14px; padding: 14px; border-radius: 16px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); color: var(--gvm-chu); }
+.mtd-dau { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-bottom: 10px; }
+.mtd-dau h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.mtd-phu { font-size: 13px; color: var(--gvm-chu-3); }
+.mtd-cuon { overflow-x: auto; }
+.mtd table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.mtd th, .mtd td { padding: 8px 10px; border-bottom: 1px solid var(--gvm-vien); text-align: center; white-space: nowrap; }
+.mtd thead th { font-size: 13px; font-weight: 700; color: var(--gvm-chu-2); background: var(--gvm-mat-2); }
+.mtd tbody th, .mtd tfoot th { text-align: left; font-weight: 600; white-space: normal; min-width: 140px; }
+.mtd td[data-khong='true'] { color: var(--gvm-chu-3); }
+.mtd .mtd-tong { font-weight: 800; color: var(--gvm-xd-dam); }
+.mtd tfoot th, .mtd tfoot td { font-weight: 800; border-bottom: 0; background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }

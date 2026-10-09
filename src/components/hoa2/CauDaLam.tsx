@@ -61,13 +61,41 @@ export interface CauDaLamProps {
   /** Lớp của em — in trên tờ PDF ("Nguyễn An · Lớp 12A1 · …"). */
   lop?: string
   onVe: () => void
+  /** Bản vẽ tối giản 09/10: thẻ "Ca kiểm tra gần nhất: 7,25 điểm · 26/09" (CHỈ ca đã công bố; chưa có ⇒ "Chưa có ca đã công bố") ở đầu màn.
+   *  Cùng dữ liệu cổng học sinh từng đưa cho Sảnh. null/thiếu (hoặc thiếu `onLichSuCa`) ⇒ không vẽ. */
+  caGanNhat?: { chu: string; coDiem: boolean } | null
+  /** Bấm thẻ ⇒ màn Lịch sử ca kiểm tra. */
+  onLichSuCa?: () => void
+}
+
+/** Thẻ đầu màn: ca kiểm tra đã công bố gần nhất; bấm ⇒ Lịch sử ca kiểm tra (thầy lệnh 28/09; chuyển từ Sảnh về đây 09/10). */
+function TheCaGanNhat({ ca, onClick }: { ca: { chu: string; coDiem: boolean }; onClick: () => void }) {
+  return (
+    <button type="button" className="h2-cdl-ca" data-co-diem={ca.coDiem ? 'true' : 'false'} onClick={onClick}>
+      <span className="h2-cdl-ca-o" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+          <path d="M9 4h6v3H9z" />
+          <path d="M8 5.5H6.5A1.5 1.5 0 0 0 5 7v12.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V7a1.5 1.5 0 0 0-1.5-1.5H16" />
+          <path d="M8.5 13l2.2 2.2L15.5 10.5" />
+        </svg>
+      </span>
+      <span className="h2-cdl-ca-chu">
+        <span className="h2-cdl-ca-lon">{ca.chu}</span>
+        <span className="h2-cdl-ca-nho">Xem lịch sử ca kiểm tra</span>
+      </span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+        <path d="M9 6l6 6-6 6" />
+      </svg>
+    </button>
+  )
 }
 
 type TrangThaiChiTiet = { dang: true } | { loi: string } | { ct: ChiTietCau }
 type TrangThaiPdf = { dang: boolean; chu: string; loi: string; xong: string; duPhong: boolean }
 const PDF_TRONG: TrangThaiPdf = { dang: false, chu: '', loi: '', xong: '', duPhong: false }
 
-export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLamProps) {
+export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat = null, onLichSuCa }: CauDaLamProps) {
+  const theCa = caGanNhat && onLichSuCa ? <TheCaGanNhat ca={caGanNhat} onClick={onLichSuCa} /> : null
   const [du, setDu] = useState<KetQuaCauDaLam | null>(null)
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(true)
@@ -524,6 +552,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
         </header>
         <div className="h2-cdl-ng-than">
           <aside className="h2-cdl-ng-trai" aria-label="Danh sách câu">
+            {theCa}
             {locVaTom}
             {tinPdf}
             {nutDuPhong}
@@ -577,6 +606,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
           </button>
           <h1 className="h2-cdl-tieu">Câu đã làm</h1>
         </div>
+        {theCa}
         {chonCd}
         {locVaTom}
       </header>

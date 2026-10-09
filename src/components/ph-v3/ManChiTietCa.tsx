@@ -30,7 +30,7 @@ export default function ManChiTietCa({ sbd, maCa }: { sbd: string; maCa: string 
   const bc = tt.kieu === 'ok' ? tt.bc : null
   return (
     <div data-vung="man-chi-tiet-ca">
-      <a className="ph3-lui" href="#diem"><BtTrai co={24} day={2.5} />Điểm số</a>
+      <a className="ph3-lui" href="#ca-kiem-tra"><BtTrai co={24} day={2.5} />Ca kiểm tra</a>
       <div className="ph3-tieu-de ph3-tieu-de--ca">
         <h1>{bc?.tenCa ?? 'Ca kiểm tra'}</h1>
         {bc?.nopLuc && <span>Ca kiểm tra · {ngayDayDuVn(bc.nopLuc)} · nộp lúc {gioVn(bc.nopLuc)}</span>}

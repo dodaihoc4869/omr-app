@@ -119,7 +119,7 @@ describe('(a) luồng đủ: Cửa hàng → chạm món → Thử đồ → Mua
     expect(chu(c)).toContain('Đồ thần thú đang mặc')
     fireEvent.click(screen.getByRole('button', { name: 'Tới Cửa hàng' }))
     expect(screen.getByRole('heading', { level: 2, name: /^Cửa hàng/ })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Về Đảo thần thú' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Về Bát Linh Đảo' }))
     expect(onDong).toHaveBeenCalledTimes(1)
   })
 

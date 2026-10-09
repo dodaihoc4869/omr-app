@@ -53,7 +53,7 @@ async function lenDuong(tong = 2) {
 }
 function chot(chu = /^B\./) {
   fireEvent.click(screen.getByRole('button', { name: chu }))
-  fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU' }))
+  fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }))
 }
 const nutSang = (sau: number) => screen.findByRole('button', { name: `ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${sau}` })
 

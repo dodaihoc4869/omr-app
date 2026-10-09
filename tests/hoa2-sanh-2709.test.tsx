@@ -218,7 +218,8 @@ describe('StudentPortalScreen thật: cờ Game Hóa 2.0', () => {
   it('cheDo2:true ⇒ màn chính là Sảnh bản đồ, KHÔNG còn Bảng nhiệm vụ; gọi /game-v2/hoa2-sanh bằng token; nhớ chế độ cho lần sau', async () => {
     tra['/game-v2/hoa2-sanh'] = { body: SANH }
     const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('button', { name: /PHÁ 4 Ổ PHỤC KÍCH/ })
+    // BẢN DUYỆT V2 (09/10): màn chính là Hôm nay V2 (SanhV2) — nút vàng "Bắt đầu · gỡ 4 lỗi cũ" (cùng việc với "PHÁ 4 Ổ PHỤC KÍCH" cũ)
+    await screen.findByRole('button', { name: /Bắt đầu · gỡ 4 lỗi cũ/ })
     expect(container.querySelector('.bnv')).toBeNull()
     expect(goiTheo('/game-v2/hoa2-sanh')[0].body).toEqual({ token: 'test-token' })
     expect(localStorage.getItem('omr_hoa2_che_do:test')).toBe('1')
@@ -227,7 +228,7 @@ describe('StudentPortalScreen thật: cờ Game Hóa 2.0', () => {
     expect(screen.queryByRole('button', { name: /Mở menu|Thêm/ })).toBeNull()
     // Phá ổ phục kích ⇒ mở game ở Đoàn Hộ Tống qua khoá màn đầu sẵn có
     const setItem = vi.spyOn(Storage.prototype, 'setItem')
-    fireEvent.click(screen.getByRole('button', { name: /PHÁ 4 Ổ PHỤC KÍCH/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu · gỡ 4 lỗi cũ/ }))
     expect(setItem).toHaveBeenCalledWith('game-v2:man-dau', 'doan')
     setItem.mockRestore()
   })

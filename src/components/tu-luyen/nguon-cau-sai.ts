@@ -7,7 +7,7 @@
 export type MaNguonSai = 'ca' | 'dao' | 'doan' | 'bia' | 'tu_luyen' | 'luyen_de'
 export const DS_NGUON: readonly { ma: MaNguonSai; ten: string }[] = [
   { ma: 'ca', ten: 'Ca kiểm tra' },
-  { ma: 'dao', ten: 'Đảo thần thú' },
+  { ma: 'dao', ten: 'Bát Linh Đảo' },
   { ma: 'doan', ten: 'Đoàn Hộ Tống' },
   { ma: 'bia', ten: 'Bi-a' },
   { ma: 'tu_luyen', ten: 'Tu luyện' },

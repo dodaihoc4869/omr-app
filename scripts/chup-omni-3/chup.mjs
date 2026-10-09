@@ -51,7 +51,7 @@ async function lenDuong(t) {
 async function chotDapAn(t, chu) {
   await t.getByRole('button', { name: chu }).first().click()
   await t.waitForTimeout(250)
-  await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU' }).first().click()
+  await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }).first().click()
   await t.waitForTimeout(400)
 }
 
@@ -145,7 +145,7 @@ const MAN = [
     await lenDuong(t)
     await t.locator('.dao2-giay input').first().fill('9,9')
     await t.waitForTimeout(250)
-    await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU' }).first().click()
+    await t.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }).first().click()
     await t.getByRole('button', { name: /ĐÃ ĐỌC LỜI GIẢI/ }).first().waitFor({ timeout: 20000 })
     await t.locator('.loi-giai').first().scrollIntoViewIfNeeded()
     await t.waitForTimeout(600)

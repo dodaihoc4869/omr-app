@@ -12,7 +12,7 @@ import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import HopXacNhan from '../HopXacNhan'
 import { chuaXong, qidCuaDong, type BangChienDich as DuBang, type CauCanDayLai, type EmBang, type HangEm, type NhipEm } from './api'
-import { congNgay, conLai, hienHanNop, hienNgay, phanTram } from './ngay'
+import { coHanNop, congNgay, conLai, hienHanNop, hienNgay, phanTram } from './ngay'
 import type { OChieu } from './to-chieu'
 import { CHU_GIAI_HANG, CHU_HANG, hangTuTiLe, mucO } from './tinh'
 import { THAM_SO_OMNI, type BangOmni } from '../../../server/src/omni-kieu'
@@ -311,7 +311,9 @@ export default function BangChienDich({
           </h1>
           <p className="cd-so">
             {cd.soCau} câu · {du.dang.length} dạng · {soEm} em
-            {lop.ngayThu && lop.tongNgay ? ` · ngày ${lop.ngayThu} / ${lop.tongNgay}` : ''} · hạn nộp {hienHanNop(cd.hanNop)} ({conLai(cd.hanNop, nowMs)}) · hết hạn nộp, màn này tự chuyển sang Buổi chữa
+            {lop.ngayThu && lop.tongNgay ? ` · ngày ${lop.ngayThu} / ${lop.tongNgay}` : ''}
+            {/* Hành trình (hạn giả 9999-12-31) không có hạn nộp ⇒ không ghi hạn, không "tự chuyển sang Buổi chữa" (thầy chốt 09/10). */}
+            {coHanNop(cd) ? <> · hạn nộp {hienHanNop(cd.hanNop)} ({conLai(cd.hanNop, nowMs)}) · hết hạn nộp, màn này tự chuyển sang Buổi chữa</> : null}
           </p>
         </div>
         <span className="cd-chip-muc cd-chip-muc--xanh">Đang chạy</span>

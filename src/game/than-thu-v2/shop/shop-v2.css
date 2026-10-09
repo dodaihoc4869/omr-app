@@ -1,0 +1,74 @@
+/* BẢN DUYỆT V2 · MÀN 07 "Cửa hàng · Thử đồ" (thầy ra lệnh 09/10/2026) — LỚP DA phủ lên cửa hàng phụ kiện sẵn có.
+ * Không đổi một dòng nào của shop.css (bảng màu cũ, khối tối giống hệt — test khoá): chỉ khi gốc mang thêm lớp `.ps-v2` thì các biến --ch-*
+ * và nút vàng trỏ sang Bảng G (ngà voi + ngọc + vàng; tokens.css + ban-duyet-v2.css). Logic mua/thử/mặc, chiều cao khối, chữ: giữ nguyên. */
+html:root .ps.ps-v2 {
+  --ch-nen: var(--v2-nen);
+  --ch-may: linear-gradient(180deg, var(--v2-ngoc-nen) 0%, var(--v2-nen) 46%, var(--v2-nen) 100%);
+  --ch-chu: var(--v2-chu);
+  --ch-chu-mo: var(--v2-chu-phu);
+  --ch-nhan: var(--v2-ngoc-dam);
+  --ch-kinh: var(--v2-the);
+  --ch-kinh-vien: var(--v2-vien);
+  --ch-kinh-bong: var(--v2-bong-the);
+  --ch-the-nen: var(--v2-the);
+  --ch-to-nen: var(--v2-the);
+  --ch-ranh: var(--v2-vien);
+  --ch-vang-so: linear-gradient(180deg, var(--v2-vang) 0%, var(--v2-vang-dam) 100%);
+  --ch-vang-chu: var(--v2-vang-chu);
+  --ch-xanh-chu: var(--v2-ngoc-dam);
+  --ch-ranh-truot: var(--v2-vien-dam);
+  font-family: var(--v2-phong);
+}
+.ps.ps-v2 .ps-dau h2,
+.ps.ps-v2 h1,
+.ps.ps-v2 h2 {
+  font-family: var(--v2-phong-tieu-de);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+/* nút chính: vàng nổi khối đúng thành phần .v2-nut-chinh */
+.ps.ps-v2 button.ps-nut-vang,
+.ps.ps-v2 button.ps-hd-vang {
+  --nut-nen: var(--v2-grad-nut);
+  --nut-chu: var(--v2-tren-vang);
+  --nut-bong: var(--v2-bong-nut);
+  border-radius: var(--v2-bo-vua);
+  font-family: var(--v2-phong-tieu-de);
+  font-weight: 800;
+}
+.ps.ps-v2 button.ps-nut-vang:active:not(:disabled),
+.ps.ps-v2 button.ps-hd-vang:active:not(:disabled) {
+  --nut-bong: var(--v2-bong-nut-nhan);
+  --nut-dich: translateY(3px);
+}
+/* nút phụ: ngọc nhạt */
+.ps.ps-v2 button.ps-nut-mo,
+.ps.ps-v2 button.ps-hd-mo {
+  --nut-nen: var(--v2-ngoc-nen);
+  --nut-chu: var(--v2-ngoc-dam);
+  --nut-bong: inset 0 0 0 1px var(--v2-ngoc-vien);
+  border-radius: var(--v2-bo-vua);
+}
+/* thẻ món: nền ngà, viền theo bậc giữ nguyên, bo 24px */
+.ps.ps-v2 .ps-the,
+.ps.ps-v2 button.ps-the {
+  --nut-bong: var(--v2-bong-the);
+  border-radius: var(--v2-bo);
+}
+/* tranh món trên thẻ: nền XANH THAN của Bảng G (thắng lớp da Bát Linh `html:root body[data-bat-linh] .ps :is(.ps-san, .ps-the-tranh)`).
+ * Không dùng nền sáng: hình món vẽ cho nền tối (vòng sáng, khung chữ trắng) — trên nền ngà nhiều món gần như mất hình (ảnh chụp 09/10). */
+html:root body .ps.ps-v2 .ps-the-tranh.ps-the-tranh {
+  background: radial-gradient(90% 90% at 50% 18%, color-mix(in srgb, var(--v2-ngoc) 38%, var(--v2-xanh-than)) 0%, var(--v2-xanh-than) 72%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v2-nga-voi) 14%, transparent);
+}
+/* sân khấu thử đồ: cảnh đảo Bát Linh thay nền đêm (chữ trên sân khấu đổi sang navy cho đủ tương phản) */
+html:root body .ps.ps-v2 .ps-san.ps-san {
+  border-radius: var(--v2-bo);
+  color: var(--v2-chu);
+  background: var(--v2-phu-anh), var(--bl-scene, url('/bat-linh/canh-dao.webp')) center 40% / cover no-repeat;
+  box-shadow: var(--v2-bong-the);
+}
+.ps.ps-v2 .ps-san::before { display: none; }
+.ps.ps-v2 .ps-san-trang {
+  background: radial-gradient(circle, color-mix(in srgb, var(--v2-vang) 40%, transparent) 0%, transparent 68%);
+}

@@ -53,8 +53,8 @@ describe('duocMoSomChang (Điều 6 B)', () => {
   it('chữ cho màn theo đề bài: đủ điều kiện · chưa đủ; hết chặng nói thật', () => {
     const d = { soChangXong: 1, soChangKe: 2, dung: 9, tong: 10 }
     expect(chuMoSomChang({ duoc: true, lyDo: null }, d)).toBe('Em làm tốt chặng 1 (đúng 9/10). Em được mở sớm chặng 2 ngay hôm nay.')
-    expect(chuMoSomChang({ duoc: false, lyDo: 'chua_du_ti_le' }, d)).toBe('Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú.')
-    expect(chuMoSomChang({ duoc: false, lyDo: 'da_mo_som_hom_nay' }, d)).toBe('Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú.')
+    expect(chuMoSomChang({ duoc: false, lyDo: 'chua_du_ti_le' }, d)).toBe('Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo.')
+    expect(chuMoSomChang({ duoc: false, lyDo: 'da_mo_som_hom_nay' }, d)).toBe('Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo.')
     expect(chuMoSomChang({ duoc: false, lyDo: 'het_chang' }, d)).toBe('Em đã làm hết các chặng của bài tập về nhà này.')
   })
 })

@@ -619,3 +619,15 @@
     --ph3-bong-menu: 0 12px 40px -8px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.4);
   }
 }
+
+/* ── BẢN DUYỆT V2 · BẢNG G (thầy ra lệnh 09/10/2026: "Quét bảng màu từ Bảng G (ngà voi #FFFEF6, xanh ngọc #10B981, xanh navy #0F3D3A,
+ * vàng #F7A800) cập nhật vào tailwind…") — CHỈ bốn màu gốc ở đây (nguồn sự thật duy nhất của mã màu). Xanh ngọc trùng --xanh nên trỏ biến cũ.
+ * Sắc dẫn xuất (nền nhạt, viền, bóng, gradient) pha bằng color-mix từ chính bốn màu này, nằm ở src/styles/ban-duyet-v2.css — tệp đó chỉ đi
+ * theo các mảnh màn V2 nạp lười, nên vỏ app (precache, trần 3000 KB) không nặng thêm. Tailwind v4 đọc qua `@theme` ở src/index.css.
+ * Bảng G ghi "GV: xanh lam; HS/PH: ngọc và vàng" — app giáo viên giữ xanh lam của bảng --gvm-*. */
+:root {
+  --v2-nga-voi: #fffef6;
+  --v2-ngoc: var(--xanh);
+  --v2-xanh-than: #0f3d3a;
+  --v2-vang: #f7a800;
+}

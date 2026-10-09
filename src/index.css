@@ -904,6 +904,25 @@ html[data-giu-de-an] [data-giu-de-phu] {
   --color-slate-800: var(--slate-800);
   --color-slate-900: var(--slate-900);
   --color-slate-950: var(--slate-950);
+
+  /* BẢN DUYỆT V2 · BẢNG G (thầy 09/10): bốn màu gốc ở src/styles/tokens.css, sắc dẫn xuất ở src/styles/ban-duyet-v2.css — ở đây chỉ trỏ biến. */
+  --color-v2-nga-voi: var(--v2-nga-voi);
+  --color-v2-ngoc: var(--v2-ngoc);
+  --color-v2-xanh-than: var(--v2-xanh-than);
+  --color-v2-vang: var(--v2-vang);
+  --color-v2-nen: var(--v2-nen);
+  --color-v2-the: var(--v2-the);
+  --color-v2-chu: var(--v2-chu);
+  --color-v2-chu-phu: var(--v2-chu-phu);
+  --color-v2-vien: var(--v2-vien);
+  --color-v2-ngoc-nen: var(--v2-ngoc-nen);
+  --color-v2-ngoc-dam: var(--v2-ngoc-dam);
+  --color-v2-vang-nen: var(--v2-vang-nen);
+  --radius-v2: 1.5rem;
+  --shadow-v2-the: var(--v2-bong-the);
+  --shadow-v2-noi: var(--v2-bong-noi);
+  --shadow-v2-nut: var(--v2-bong-nut);
+  --font-v2-tieu-de: var(--v2-phong-tieu-de);
 }
 body { background:var(--nen);color:var(--muc) }
 .bg-white { background-color:var(--the) }

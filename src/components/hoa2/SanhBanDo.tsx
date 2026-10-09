@@ -157,7 +157,7 @@ function NutRay({ nhan, onClick, children, noiBat }: { nhan: string; onClick: ()
 }
 
 /** Bảng kẹp giấy có dấu tích — lối vào Ca kiểm tra (thầy 28/09: "app học sinh chưa có chỗ bấm để vào ca kiểm tra"). */
-function IconCa({ co = 22 }: { co?: number }) {
+export function IconCa({ co = 22 }: { co?: number }) {
   return (
     <svg width={co} height={co} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
       <path d="M9 4h6v3H9zM8 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2M9 14l2 2 4-4" />
@@ -166,7 +166,7 @@ function IconCa({ co = 22 }: { co?: number }) {
 }
 
 const NET = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true, focusable: false }
-function IconSo({ co = 22 }: { co?: number }) {
+export function IconSo({ co = 22 }: { co?: number }) {
   return (
     <svg width={co} height={co} {...NET}>
       <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
@@ -175,7 +175,7 @@ function IconSo({ co = 22 }: { co?: number }) {
     </svg>
   )
 }
-function IconTui({ co = 22 }: { co?: number }) {
+export function IconTui({ co = 22 }: { co?: number }) {
   return (
     <svg width={co} height={co} {...NET}>
       <path d="M5 8h14l-1 12H6z" />
@@ -183,7 +183,7 @@ function IconTui({ co = 22 }: { co?: number }) {
     </svg>
   )
 }
-function IconCuaHang({ co = 22 }: { co?: number }) {
+export function IconCuaHang({ co = 22 }: { co?: number }) {
   return (
     <svg width={co} height={co} {...NET}>
       <path d="M4 10h16l-1-5H5z" />
@@ -191,7 +191,7 @@ function IconCuaHang({ co = 22 }: { co?: number }) {
     </svg>
   )
 }
-function IconDangXuat({ co = 22 }: { co?: number }) {
+export function IconDangXuat({ co = 22 }: { co?: number }) {
   return (
     <svg width={co} height={co} {...NET}>
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -199,7 +199,7 @@ function IconDangXuat({ co = 22 }: { co?: number }) {
     </svg>
   )
 }
-function IconChuoi() {
+export function IconChuoi() {
   return (
     <svg width="14" height="16" viewBox="0 0 24 24" fill="rgb(255 122 69)" aria-hidden="true" focusable="false">
       <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
@@ -234,7 +234,7 @@ function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'o
 }
 
 /** Vòng Cọ xát % + tên chiến dịch + hạn nộp + Cọ xát/Thành thạo (tấm dưới, ngày thường). */
-function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
+export function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
   if (s.hanhTrinh) return <TheHanhTrinh s={s} />
   const cd = s.chienDich!
   const p = phanTram(cd.coXat, cd.tong)
@@ -269,7 +269,7 @@ function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
 }
 
 /** Thẻ đỏ Huyết Chiến (HS-HuyetChien.dc.html). */
-function TheHuyetChien({ s, now }: { s: SanhHoa2; now: number }) {
+export function TheHuyetChien({ s, now }: { s: SanhHoa2; now: number }) {
   const cd = s.chienDich
   return (
     <section className="h2-huyet" aria-label="Huyết Chiến">
@@ -298,7 +298,7 @@ function TheHuyetChien({ s, now }: { s: SanhHoa2; now: number }) {
   )
 }
 
-function DaiVaoThi({ onVaoThi }: { onVaoThi: () => void }) {
+export function DaiVaoThi({ onVaoThi }: { onVaoThi: () => void }) {
   return (
     <div className="h2-ca" role="status">
       <span className="h2-ca-chu">
@@ -312,7 +312,7 @@ function DaiVaoThi({ onVaoThi }: { onVaoThi: () => void }) {
 }
 
 /** Thẻ nhỏ cạnh lối vào Ca kiểm tra: điểm ca ĐÃ CÔNG BỐ gần nhất; bấm ⇒ Lịch sử ca kiểm tra (thầy lệnh 28/09). */
-function TheCaGanNhatSanh({ p }: { p: SanhBanDoProps }) {
+export function TheCaGanNhatSanh({ p }: { p: SanhBanDoProps }) {
   if (!p.caGanNhat || !p.onLichSuCa) return null
   return (
     <button type="button" className="h2-ca-gan" data-co-diem={p.caGanNhat.coDiem ? 'true' : 'false'} onClick={p.onLichSuCa}>
@@ -330,14 +330,14 @@ function TheCaGanNhatSanh({ p }: { p: SanhBanDoProps }) {
   )
 }
 
-function IconKiem() {
+export function IconKiem() {
   return (
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
       <path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2" />
     </svg>
   )
 }
-function IconRuong() {
+export function IconRuong() {
   return (
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
       <rect x="3" y="9" width="18" height="11" rx="2" />
@@ -345,7 +345,7 @@ function IconRuong() {
     </svg>
   )
 }
-function IconKhoa() {
+export function IconKhoa() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" focusable="false">
       <rect x="5" y="11" width="14" height="10" rx="2" />
@@ -358,7 +358,7 @@ function IconKhoa() {
  * THỬ SỨC THÊM (thầy chốt 30/09): nút PHỤ (không phải nút chính vàng) — em xong kế hoạch hôm nay thì lấy trước một lô câu mới của ngày mai.
  * Chỉ vẽ khi máy chủ cho (`thuSucThem.duoc`, số câu dương); bấm ⇒ máy chủ thêm lô ⇒ tải lại Sảnh ⇒ nút Đảo có câu. Lỗi ⇒ câu của máy chủ ngay dưới nút.
  */
-function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onTaiLai: () => void }) {
+export function NutThuSucThem({ s, token, onTaiLai }: { s: SanhHoa2; token: string; onTaiLai: () => void }) {
   const [dangGoi, setDangGoi] = useState(false)
   const [loi, setLoi] = useState('')
   const t = s.thuSucThem
@@ -424,7 +424,7 @@ function NutKiemHanhTrinh({s,onKhamPhaDao}:{s:SanhHoa2;onKhamPhaDao:()=>void}){
  const k=s.omni?.kiemHanhTrinh;if(!k)return null
  return <button type="button" className="h2-nut-dao h2-nut-thu-suc" data-khoi="kiem-hanh-trinh" onClick={()=>{datViecOmniDao('de-thu');onKhamPhaDao()}}><span className="h2-nut-dao-chu"><span className="h2-nut-dao-lon">{k.loai==='dau'?'Làm bài kiểm đầu':'Làm bài kiểm tuần'} · 14 câu</span></span></button>
 }
-function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: () => void }) {
+export function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: () => void }) {
   const o = s.omni
   if (!o) return null
   const mo = (viec: ViecOmniDao) => {
@@ -455,7 +455,7 @@ function NutOmniThem({ s, onKhamPhaDao }: { s: SanhHoa2; onKhamPhaDao: () => voi
 }
 
 /** Giờ này em hay sai nhanh hơn lúc học tốt nhất: MỘT dòng + hai nút nhỏ "Để mai" / "Làm luôn" (máy chủ xếp lại kế hoạch ⇒ tải lại Sảnh). */
-function TheMetGio({ s, token, onTaiLai, ngang = false }: { s: SanhHoa2; token: string; onTaiLai: () => void; ngang?: boolean }) {
+export function TheMetGio({ s, token, onTaiLai, ngang = false }: { s: SanhHoa2; token: string; onTaiLai: () => void; ngang?: boolean }) {
   const [dangGoi, setDangGoi] = useState(false)
   const [daQuyet, setDaQuyet] = useState(false)
   const [loi, setLoi] = useState('')
@@ -506,7 +506,7 @@ function DongNhatKy({ s, lop }: { s: SanhHoa2; lop: string }) {
 }
 
 /** Hết kế hoạch hôm nay: lời mừng + Rương Bát Linh (HS-XongHomNay.dc.html). */
-function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them = null }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null; /** OMNI 3: nút phụ đặt ngay sau "Thử sức thêm" (vắng ⇒ không có gì). */ them?: ReactNode }) {
+export function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them = null, coThuSuc = true }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null; /** OMNI 3: nút phụ đặt ngay sau "Thử sức thêm" (vắng ⇒ không có gì). */ them?: ReactNode; /** false ⇒ không vẽ nút "Thử sức thêm" (màn V2 gom nó vào "Luyện thêm" ở Hành trình — bản vẽ tối giản 09/10). */ coThuSuc?: boolean }) {
   const [dangMo, setDangMo] = useState(false)
   const [loi, setLoi] = useState('')
   const [vangVuaNhan, setVangVuaNhan] = useState<number | null>(null)
@@ -602,7 +602,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them =
         <DongNhatKy s={s} lop="h2-ng-phu" />
         {tinLoi}
         {nutMo}
-        <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
+        {coThuSuc && <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />}
         {them}
       </section>
     )
@@ -640,7 +640,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them =
         {tinLoi}
       </section>
       {nutMo}
-      <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />
+      {coThuSuc && <NutThuSucThem s={s} token={token} onTaiLai={onTaiLai} />}
       {them}
     </>
   )
@@ -649,13 +649,13 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null, them =
 /** OMNI 3 · chế độ chờ bài mới (thầy chưa tick bài mới): dòng "chưa có câu" đổi thành "Hôm nay ôn bài cũ: N câu" / "Đang ôn bài cũ, chờ thầy giao bài mới." */
 const chuChoBaiMoi = (s: SanhHoa2): string | null => (s.omni?.choBaiMoi ? (s.omni.onBaiCu > 0 ? chuOnBaiCu(s.omni.onBaiCu) : CHU_CHO_BAI_MOI) : null)
 /** Kế hoạch hôm nay không còn câu: câu tạm giữ vì ca kiểm tra (30/09) ⇒ nói rõ, khỏi tưởng lỗi. */
-const chuKhongConCau = (s: SanhHoa2): string =>
+export const chuKhongConCau = (s: SanhHoa2): string =>
   s.tamGiuCa > 0 ? `Có ${s.tamGiuCa} câu hôm nay đang tạm giữ vì lớp đang có ca kiểm tra. Câu sẽ tự mở lại sau khi ca kết thúc.` : chuChoBaiMoi(s) ?? 'Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.'
 /** Dòng nhỏ dưới số câu kế hoạch ở màn xong: câu tạm giữ vì ca kiểm tra. */
 const chuTamGiu = (n: number): string => `+${n} câu tạm giữ vì ca kiểm tra, mở lại sau ca`
 
 /** Chưa có chiến dịch đang chạy: chiến dịch sắp bắt đầu (thầy 28/09) ⇒ báo ngày; không thì câu cũ. */
-const chuChuaCoChienDich = (s: SanhHoa2): string =>
+export const chuChuaCoChienDich = (s: SanhHoa2): string =>
   s.sapBatDau ? `Chiến dịch ${s.sapBatDau.ten} bắt đầu ${thuNgayThang(s.sapBatDau.batDau)}. Tới ngày đó bản đồ sẽ mở đảo mới ở đây.` : chuChoBaiMoi(s) ?? 'Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.'
 
 function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
@@ -695,14 +695,22 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
 
 /** Nút việc hôm nay (còn ổ phục kích ⇒ PHÁ N Ổ; hết ổ ⇒ KHÁM PHÁ ĐẢO) — dùng chung bản dọc và bản ngang. */
 /** Cửa Bi-a Phản Ứng (đặc tả Bi-a mục 8.1): còn câu ⇒ "Bi-a Phản Ứng · còn c/t câu"; hết trần ⇒ mờ; xong kế hoạch ⇒ Bàn giao hữu; có ca ⇒ mờ. */
-function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+/** Chữ + trạng thái cửa Bi-a (một nguồn cho nút Sảnh cũ và ô "Luyện thêm" của màn Hành trình V2). Máy chủ không gửi `bia` ⇒ null. */
+export function chuCuaBia(s: SanhHoa2): { mo: boolean; lon: string; nho: string } | null {
   const b = s.bia
-  if (!b || !p.onChoiBia) return null
+  if (!b) return null
   const coCa = b.lyDoKhoa === 'dang_co_ca'
   const giaoHuu = b.giaoHuu.mo
   const mo = !coCa && (b.con > 0 || giaoHuu)
   const lon = coCa ? 'Bi-a Phản Ứng · đang có ca kiểm tra' : giaoHuu ? `Bàn giao hữu Bi-a · còn ${b.giaoHuu.con}/2 ván` : b.con > 0 ? `Bi-a Phản Ứng · còn ${b.con}/${b.tong} câu` : 'Hết câu Bi-a hôm nay'
   const nho = coCa ? 'Bi-a mở lại khi ca kết thúc' : giaoHuu ? 'Không câu, không EXP · em đã xong kế hoạch' : b.con > 0 ? 'Kim loại đấu Phi kim · mỗi bi một câu' : `Đoàn còn ${s.doan.con} câu · Đảo còn ${s.dao.con} câu`
+  return { mo, lon, nho }
+}
+
+export function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  const c = chuCuaBia(s)
+  if (!c || !p.onChoiBia) return null
+  const { mo, lon, nho } = c
   return (
     <button type="button" className="h2-nut-dao h2-nut-bia" disabled={!mo} onClick={mo ? p.onChoiBia : undefined}>
       <span className="h2-nut-dao-chu">
@@ -716,7 +724,7 @@ function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
 /** Cửa TU LUYỆN (thầy chốt 29/09; 30/09 thầy lệnh "đẹp như một MÓN QUÀ cho học sinh chăm chỉ", phụ đề "Chỉ dành cho học sinh Nỗ lực"):
  * thẻ quà nền đêm + ánh kim đúng bảng màu màn Tu luyện (`tu-luyen.css`), biểu tượng hộp quà gắn bia tập bắn (biểu tượng cũ của Tu luyện).
  * Không đổi logic: bấm ⇒ `onTuLuyen` (máy chủ tự chặn khi em có ca kiểm tra mở). Không số liệu (muốn có phải thêm lệnh máy chủ). */
-function NutTuLuyen({ p }: { p: SanhBanDoProps }) {
+export function NutTuLuyen({ p }: { p: SanhBanDoProps }) {
   if (!p.onTuLuyen) return null
   return <CuaQuaTuLuyen onClick={p.onTuLuyen} lop="h2-nut-tu-luyen" />
 }

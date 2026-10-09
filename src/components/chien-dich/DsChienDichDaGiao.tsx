@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { danhSachThongKe, doiRaiDeu, dongChienDich, huyChienDich, loiBaoDaHuy, type ChienDichTom, type KetQuaThuHoi } from './api'
 import { KHOA_CHON_CHIEN_DICH } from './LenBangChienDich'
-import { hienNgay, phanTram } from './ngay'
+import { hienNgay, laHanGia, phanTram } from './ngay'
 import SuaChienDich from './SuaChienDich'
 import { hoiXacNhan } from '../hop-thoai'
 import './chien-dich.css'
@@ -31,6 +31,8 @@ const khopLoc = (t: TrangThaiHien, loc: LocChienDich) =>
 
 /** "còn 10 ngày" · "hết hôm nay" · "hết hạn 4 ngày". */
 export function chuHan(hanNop: string, homNay: string): string {
+  // Hạn giả của Hành trình (9999-12-31) ⇒ không ghi hạn (thầy chốt 09/10 — trước đây in "còn 2 912 xxx ngày").
+  if (laHanGia(hanNop)) return ''
   const d = Math.round((Date.parse(`${hanNop}T00:00:00Z`) - Date.parse(`${homNay}T00:00:00Z`)) / 86_400_000)
   if (!Number.isFinite(d)) return ''
   if (d > 0) return `còn ${d} ngày`

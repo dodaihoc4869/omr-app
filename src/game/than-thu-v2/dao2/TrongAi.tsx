@@ -30,6 +30,9 @@ import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import '../thu-quai.css'
 import './dao2.css'
+// BẢN DUYỆT V2 (09/10): lớp da Bảng G cho màn trận (thẻ câu ngà voi bo 24px, nút chốt vàng nổi khối, thẻ môn + số câu, cấp thần thú).
+import '../../../styles/ban-duyet-v2.css'
+import './tran-v2.css'
 import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
 import {chiSoRo,chiSoRoSau} from '../../../lib/chi-so-ro'
 
@@ -93,7 +96,7 @@ export function CanhRung({profile,ketQua,tong,suKien,chuong=false,trum=false,daC
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
    <span className="dao2-vach" role="progressbar" aria-label={`Máu ${TEN_QUAI}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.enemy}><i style={{width:`${tran.enemy}%`}}/></span></div>
-  <div className="dao2-kinh dao2-mau-thu"><span className="dao2-vach dao2-vach-thu" role="progressbar" aria-label={`Máu của ${ten}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.hp}><i style={{width:`${tran.hp}%`}}/></span><span>{ten} · Máu {tran.hp}/100</span></div>
+  <div className="dao2-kinh dao2-mau-thu"><span className="dao2-vach dao2-vach-thu" role="progressbar" aria-label={`Máu của ${ten}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.hp}><i style={{width:`${tran.hp}%`}}/></span><span>{ten} · Máu {tran.hp}/100</span><small className="dao2-v2-cap">Cấp {profile.cap}</small></div>
   {vuaNop&&tran.damage>0&&<p className="dao2-so" key={`so-${suKien}`} data-phia={tran.correct?'quai':'thu'} aria-hidden="true">−{tran.damage}</p>}
   <button type="button" className="dao2-tieng" aria-pressed={!tat} aria-label={tat?'Bật tiếng trận đấu':'Tắt tiếng trận đấu'} onClick={()=>{setBattleMuted(!tat);setTat(!tat)}}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/>{tat?<path d="m22 9-6 6M16 9l6 6"/>:<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>}</svg></button>
  </section>
@@ -178,6 +181,9 @@ export function DaiKetQua({profile,cau:q,phanHoi,ketQua,tong}:{profile:DaoProfil
  </div>
 }
 
+/** BẢN DUYỆT V2: nhãn môn trên thẻ câu — "Hoá học 12" khi mã đề mang khối (vd `DH-12-C1-B2-TN`), không thì "Hoá học". */
+export function monCau(maDe:string|undefined):string{const m=/(?:^|[-_ ])(1[012])(?=[-_ ]|$)/.exec(maDe??'');return m?`Hoá học ${m[1]}`:'Hoá học'}
+
 // ───────────── màn trong ải (làm + lời giải) ─────────────
 // 28/09 lần 2 (thầy: "chỗ hiển thị đề phải có diện tích lớn nhất"): mặc định cột TRẬN 40 % ⇒ cột đề 60 %; khoá lưu mới (…2) để máy đã lưu 58 cũng nhận mặc định mới.
 const KHOA_TI='ddh.dao2.tiCot2',TI_MIN=30,TI_MAX=75,TI_MAC_DINH=40
@@ -241,6 +247,8 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
    onKeyDown={e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();datTi(ti+(e.key==='ArrowLeft'?-5:5))}}}><i/></div>}
   <div className="dao2-ai-phai">
   {!phanHoi?<>
+   {/* BẢN DUYỆT V2 (09/10): thẻ môn + số câu ngay trên đề (khối đọc từ mã đề; không đọc được ⇒ chỉ "Hoá học") */}
+   <p className="dao2-v2-dau-cau"><span className="dao2-v2-mon">{monCau(q.maDe)}</span><span className="dao2-v2-so-cau">Câu {viTri+1}/{cau.length}</span></p>
    <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy||cho} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
   </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
@@ -264,7 +272,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
       <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label={CHU_SOAT_LAI} checked={soatLai} disabled={busy} onChange={e=>onSoatLai(e.target.checked)}/>
       <span className="dao2-tro-chu" aria-hidden="true">{CHU_SOAT_LAI}</span>
      </label>}
-     <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
+     <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN'}</button>
     </div>
     {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}
     {goiYChip&&onChuaChac&&<small className="dao2-tro-ghi" data-khoi="goi-y-chua-chac">{GOI_Y_CHIP_CHUA_CHAC}</small>}

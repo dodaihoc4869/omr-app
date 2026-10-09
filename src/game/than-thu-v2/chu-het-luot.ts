@@ -35,7 +35,7 @@ export function chuHetLuotDoan(l?: LuotCauNgay | null): string {
 /** Đảo: số của ĐẢO, kết bằng chuyến mới của đảo. */
 export function chuHetLuotDao(l?: LuotCauNgay | null): string {
   const so = soDaChoiTrenTran(l)
-  return so ? `Hôm nay em đã đi ${so} câu Đảo thần thú. Mai đảo có chuyến mới.` : 'Em đã đi đủ số câu Đảo thần thú của hôm nay. Mai đảo có chuyến mới.'
+  return so ? `Hôm nay em đã đi ${so} câu Bát Linh Đảo. Mai đảo có chuyến mới.` : 'Em đã đi đủ số câu Bát Linh Đảo của hôm nay. Mai đảo có chuyến mới.'
 }
 
 export interface ChangHomNay {

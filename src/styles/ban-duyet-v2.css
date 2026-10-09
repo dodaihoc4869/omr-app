@@ -1,0 +1,184 @@
+/* BẢN DUYỆT V2 — DESIGN SYSTEM DÙNG CHUNG (thầy ra lệnh 09/10/2026).
+ * Bốn màu gốc Bảng G nằm ở src/styles/tokens.css (--v2-nga-voi, --v2-ngoc, --v2-xanh-than, --v2-vang). Tệp này CHỈ pha sắc dẫn xuất từ bốn màu đó
+ * bằng color-mix (không thêm mã màu thứ năm) + các lớp thành phần: thẻ bo 24px (rounded-3xl), nút vàng nổi khối, chip, thanh tiến độ, tiêu đề.
+ * Chỉ các mảnh màn V2 nạp lười mới nhập tệp này ⇒ vỏ app (precache) không nặng thêm. Học sinh/phụ huynh: ngọc + vàng; giáo viên: xem gv-v2.css. */
+:root {
+  /* bề mặt + chữ (nền sáng) */
+  --v2-nen: color-mix(in srgb, var(--v2-ngoc) 6%, var(--v2-nga-voi));
+  --v2-the: var(--v2-nga-voi);
+  --v2-the-chim: color-mix(in srgb, var(--v2-xanh-than) 4%, var(--v2-nga-voi));
+  --v2-chu: var(--v2-xanh-than);
+  --v2-chu-phu: color-mix(in srgb, var(--v2-xanh-than) 76%, var(--v2-nga-voi));
+  --v2-chu-mo: color-mix(in srgb, var(--v2-xanh-than) 64%, var(--v2-nga-voi));
+  --v2-vien: color-mix(in srgb, var(--v2-xanh-than) 10%, var(--v2-nga-voi));
+  --v2-vien-dam: color-mix(in srgb, var(--v2-xanh-than) 22%, var(--v2-nga-voi));
+  /* ngọc */
+  --v2-ngoc-nen: color-mix(in srgb, var(--v2-ngoc) 14%, var(--v2-nga-voi));
+  --v2-ngoc-vien: color-mix(in srgb, var(--v2-ngoc) 40%, var(--v2-nga-voi));
+  --v2-ngoc-dam: color-mix(in srgb, var(--v2-ngoc) 52%, var(--v2-xanh-than));
+  --v2-tren-ngoc: var(--v2-nga-voi);
+  /* vàng — chữ trên nền vàng là navy (tương phản ≈ 8:1) */
+  --v2-vang-nen: color-mix(in srgb, var(--v2-vang) 16%, var(--v2-nga-voi));
+  --v2-vang-vien: color-mix(in srgb, var(--v2-vang) 45%, var(--v2-nga-voi));
+  --v2-vang-sang: color-mix(in srgb, var(--v2-vang) 62%, var(--v2-nga-voi));
+  --v2-vang-dam: color-mix(in srgb, var(--v2-vang) 62%, var(--v2-xanh-than));
+  --v2-vang-chu: color-mix(in srgb, var(--v2-vang) 48%, var(--v2-xanh-than));
+  --v2-tren-vang: var(--v2-xanh-than);
+  /* bo góc: thẻ lớn = rounded-3xl */
+  --v2-bo: 24px;
+  --v2-bo-vua: 16px;
+  --v2-bo-nho: 12px;
+  /* bóng + gradient game hoá */
+  --v2-bong-the: 0 14px 34px -18px color-mix(in srgb, var(--v2-xanh-than) 38%, transparent), 0 2px 6px color-mix(in srgb, var(--v2-xanh-than) 8%, transparent);
+  --v2-bong-noi: 0 22px 48px -20px color-mix(in srgb, var(--v2-xanh-than) 45%, transparent), 0 4px 12px color-mix(in srgb, var(--v2-xanh-than) 10%, transparent);
+  --v2-bong-nut: 0 5px 0 0 var(--v2-vang-dam), 0 14px 26px -12px color-mix(in srgb, var(--v2-vang) 70%, transparent);
+  --v2-bong-nut-nhan: 0 2px 0 0 var(--v2-vang-dam), 0 6px 14px -10px color-mix(in srgb, var(--v2-vang) 70%, transparent);
+  --v2-grad-nut: linear-gradient(180deg, var(--v2-vang-sang) 0%, var(--v2-vang) 58%, color-mix(in srgb, var(--v2-vang) 88%, var(--v2-xanh-than)) 100%);
+  --v2-grad-ngoc: linear-gradient(90deg, var(--v2-ngoc) 0%, color-mix(in srgb, var(--v2-ngoc) 70%, var(--v2-nga-voi)) 100%);
+  --v2-grad-vang: linear-gradient(90deg, var(--v2-vang) 0%, var(--v2-vang-sang) 100%);
+  --v2-grad-ruong: linear-gradient(110deg, var(--v2-vang-nen) 0%, color-mix(in srgb, var(--v2-vang) 24%, var(--v2-nga-voi)) 55%, var(--v2-ngoc-nen) 100%);
+  /* phông: thân = Be Vietnam Pro (vỏ app); tiêu đề game hoá = 'Baloo 2' 800 — phông tiêu đề Game Hóa 2.0 có sẵn (src/components/hoa2/phong-baloo.ts,
+   * ngoài precache); chưa tải xong thì rơi về Be Vietnam Pro 700. */
+  --v2-phong: var(--sans);
+  --v2-phong-tieu-de: 'Baloo 2', var(--sans);
+  --v2-net-tieu-de: 800;
+  --v2-phu-anh: linear-gradient(180deg, color-mix(in srgb, var(--v2-nen) 0%, transparent) 55%, var(--v2-nen) 100%);
+}
+/* Nền tối: bốn màu gốc giữ làm màu NHẤN; bề mặt + chữ trỏ về bảng tối sẵn có của app (đã đạt tương phản ở tokens.css). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-giao-dien='sang']) {
+    --v2-nen: var(--nen);
+    --v2-the: var(--the);
+    --v2-the-chim: var(--the-2);
+    --v2-chu: var(--muc);
+    --v2-chu-phu: var(--nhat);
+    --v2-chu-mo: var(--mo);
+    --v2-vien: var(--vien);
+    --v2-vien-dam: var(--vien-dam);
+    --v2-ngoc-nen: color-mix(in srgb, var(--v2-ngoc) 18%, var(--the));
+    --v2-ngoc-vien: color-mix(in srgb, var(--v2-ngoc) 45%, var(--the));
+    --v2-ngoc-dam: color-mix(in srgb, var(--v2-ngoc) 70%, var(--muc));
+    --v2-vang-nen: color-mix(in srgb, var(--v2-vang) 18%, var(--the));
+    --v2-vang-vien: color-mix(in srgb, var(--v2-vang) 45%, var(--the));
+    --v2-vang-chu: color-mix(in srgb, var(--v2-vang) 80%, var(--muc));
+  }
+}
+:root[data-giao-dien='toi'] {
+  --v2-nen: var(--nen);
+  --v2-the: var(--the);
+  --v2-the-chim: var(--the-2);
+  --v2-chu: var(--muc);
+  --v2-chu-phu: var(--nhat);
+  --v2-chu-mo: var(--mo);
+  --v2-vien: var(--vien);
+  --v2-vien-dam: var(--vien-dam);
+  --v2-ngoc-nen: color-mix(in srgb, var(--v2-ngoc) 18%, var(--the));
+  --v2-ngoc-vien: color-mix(in srgb, var(--v2-ngoc) 45%, var(--the));
+  --v2-ngoc-dam: color-mix(in srgb, var(--v2-ngoc) 70%, var(--muc));
+  --v2-vang-nen: color-mix(in srgb, var(--v2-vang) 18%, var(--the));
+  --v2-vang-vien: color-mix(in srgb, var(--v2-vang) 45%, var(--the));
+  --v2-vang-chu: color-mix(in srgb, var(--v2-vang) 80%, var(--muc));
+}
+
+/* ── thành phần ─────────────────────────────────────────────────────────── */
+.v2 {
+  font-family: var(--v2-phong);
+  color: var(--v2-chu);
+  -webkit-font-smoothing: antialiased;
+}
+.v2 *, .v2 *::before, .v2 *::after { box-sizing: border-box; }
+.v2 :focus-visible { outline: 3px solid var(--v2-ngoc); outline-offset: 2px; }
+.v2-tieu-de {
+  font-family: var(--v2-phong-tieu-de);
+  font-weight: var(--v2-net-tieu-de);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--v2-chu);
+}
+.v2-tieu-de em {
+  font-style: normal;
+  color: var(--v2-vang-chu);
+  background: linear-gradient(180deg, var(--v2-vang) 0%, var(--v2-vang-dam) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.v2-so { font-variant-numeric: tabular-nums; }
+.v2-an { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.v2-the {
+  background: var(--v2-the);
+  border: 1px solid var(--v2-vien);
+  border-radius: var(--v2-bo);
+  box-shadow: var(--v2-bong-the);
+}
+.v2-the-noi { box-shadow: var(--v2-bong-noi); }
+
+/* Nút chính game hoá: vàng, nổi khối (đáy đậm 5px), nhấn thì lún. Một màn một nút chính (C2). */
+.v2-nut-chinh {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  min-height: 56px; padding: 10px 24px;
+  border: 1px solid var(--v2-vang-vien); border-radius: var(--v2-bo-vua);
+  background: var(--v2-grad-nut); color: var(--v2-tren-vang);
+  box-shadow: var(--v2-bong-nut);
+  font-family: var(--v2-phong-tieu-de); font-weight: 800; font-size: 20px; line-height: 1.1;
+  cursor: pointer; touch-action: manipulation;
+  transition: transform 120ms var(--motion-standard), box-shadow 120ms var(--motion-standard);
+}
+.v2-nut-chinh:hover { transform: translateY(-1px); }
+.v2-nut-chinh:active { transform: translateY(3px); box-shadow: var(--v2-bong-nut-nhan); }
+.v2-nut-chinh:disabled { cursor: not-allowed; opacity: .55; transform: none; box-shadow: none; }
+.v2-nut-chinh small { display: block; font-family: var(--v2-phong); font-weight: 600; font-size: 13px; opacity: .86; }
+
+.v2-nut-phu {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 8px 18px;
+  border: 1px solid var(--v2-ngoc-vien); border-radius: var(--v2-bo-vua);
+  background: var(--v2-ngoc-nen); color: var(--v2-ngoc-dam);
+  font-weight: 700; font-size: 15px; cursor: pointer; touch-action: manipulation;
+  transition: transform 120ms var(--motion-standard);
+}
+.v2-nut-phu:active { transform: translateY(1px); }
+.v2-nut-phu:disabled { cursor: not-allowed; opacity: .55; }
+
+.v2-nut-tron {
+  display: inline-grid; place-items: center;
+  width: 48px; height: 48px; border-radius: 999px;
+  border: 1px solid var(--v2-vien); background: var(--v2-the); color: var(--v2-chu);
+  box-shadow: var(--v2-bong-the); cursor: pointer; touch-action: manipulation; position: relative;
+}
+.v2-nut-tron[data-cham='true']::after {
+  content: ''; position: absolute; top: 9px; right: 10px; width: 9px; height: 9px; border-radius: 999px;
+  background: var(--do); box-shadow: 0 0 0 2px var(--v2-the);
+}
+
+.v2-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 28px; padding: 3px 12px; border-radius: 999px;
+  background: var(--v2-the-chim); color: var(--v2-chu-phu);
+  font-size: 13px; font-weight: 700; white-space: nowrap;
+}
+.v2-chip[data-mau='ngoc'] { background: var(--v2-ngoc-nen); color: var(--v2-ngoc-dam); }
+.v2-chip[data-mau='vang'] { background: var(--v2-vang-nen); color: var(--v2-vang-chu); }
+
+.v2-thanh {
+  position: relative; display: block; height: 10px; border-radius: 999px; overflow: hidden;
+  background: var(--v2-the-chim);
+}
+.v2-thanh > i { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--v2-grad-ngoc); transition: width 250ms var(--motion-decelerate); }
+.v2-thanh[data-mau='vang'] > i { background: var(--v2-grad-vang); }
+
+/* Thanh khúc (rương 8 câu: 8 khúc) */
+.v2-khuc { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; }
+.v2-khuc > i { height: 14px; border-radius: 6px; background: color-mix(in srgb, var(--v2-vang) 20%, var(--v2-the)); }
+.v2-khuc > i[data-xong='true'] { background: var(--v2-grad-vang); box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--v2-vang-dam) 50%, transparent); }
+
+/* Khung xương khi chờ máy chủ (C10) */
+.v2-xuong { display: block; border-radius: 10px; background: var(--v2-the-chim); animation: v2-tho 1.4s ease-in-out infinite; }
+@keyframes v2-tho { 50% { opacity: .55; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-nut-chinh, .v2-nut-phu, .v2-thanh > i { transition: none; }
+  .v2-nut-chinh:hover, .v2-nut-chinh:active { transform: none; }
+  .v2-xuong { animation: none; }
+}

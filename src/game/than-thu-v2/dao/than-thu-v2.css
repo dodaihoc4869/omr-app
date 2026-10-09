@@ -1,0 +1,163 @@
+/* BẢN DUYỆT V2 · MÀN 06 "Thần thú của em" — chỉ biến Bảng G (tokens.css + ban-duyet-v2.css). Dọc: xếp chồng; ≥ 900px: ảnh thú | thẻ thông tin. */
+.v2t {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 120px;
+  background: var(--v2-nen);
+  min-height: 100dvh;
+}
+.v2t-dau { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding-right: 56px; }
+.v2t-tieu { margin: 0; font-size: clamp(22px, 6vw, 34px); white-space: nowrap; }
+.v2t-vang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 6px 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--v2-vang-vien);
+  background: var(--v2-the);
+  color: var(--v2-vang-chu);
+  box-shadow: var(--v2-bong-the);
+  font-size: 18px;
+}
+.v2t-vang b { color: var(--v2-chu); white-space: nowrap; }
+
+.v2t-chinh { display: grid; gap: 16px; }
+.v2t-canh {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  border-radius: var(--v2-bo);
+  overflow: hidden;
+  background: var(--v2-phu-anh), var(--bl-scene, url('/bat-linh/canh-dao.webp')) center / cover no-repeat;
+  box-shadow: var(--v2-bong-the);
+}
+.v2t-canh img {
+  position: relative;
+  width: min(78%, 320px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 20px color-mix(in srgb, var(--v2-xanh-than) 32%, transparent));
+}
+.v2t-hao {
+  position: absolute;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--v2-vang) 40%, transparent) 0%, transparent 68%);
+}
+.v2t-thong-tin { display: grid; gap: 10px; padding: 18px; align-content: start; }
+.v2t-ten { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--v2-ngoc); }
+.v2t-ten .v2-tieu-de { font-size: 30px; }
+.v2t-loai { margin: 0; font-size: 15px; color: var(--v2-chu-phu); }
+.v2t-cap { margin: 0; font-size: 26px; }
+.v2t-phu { margin: 0; font-size: 15px; color: var(--v2-chu-phu); }
+.v2t-exp { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.v2t-exp b { font-size: 15px; color: var(--v2-chu-phu); }
+.v2t-tien-hoa { display: grid; gap: 10px; padding: 14px; border-radius: var(--v2-bo-vua); background: var(--v2-the-chim); }
+.v2t-tien-hoa-tieu { margin: 0; font-size: 15px; font-weight: 700; color: var(--v2-chu-phu); }
+.v2t-tien-hoa-tieu b { color: var(--v2-chu); }
+.v2t-moc { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.v2t-moc-o {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  min-height: 72px;
+  padding: 6px 2px;
+  border-radius: var(--v2-bo-nho);
+  background: var(--v2-the);
+  border: 1px solid var(--v2-vien);
+  color: var(--v2-chu-mo);
+}
+.v2t-moc-o img { width: 40px; height: 40px; object-fit: contain; }
+.v2t-moc-o small { font-size: 12px; font-weight: 700; }
+.v2t-moc-o[data-toi='true'] { background: var(--v2-ngoc-nen); border-color: var(--v2-ngoc-vien); color: var(--v2-ngoc-dam); }
+.v2t-moc-o[data-hien-tai='true'] { box-shadow: 0 0 0 2px var(--v2-vang); }
+
+.v2t-bo-suu-tap { display: grid; gap: 12px; padding: 18px; }
+.v2t-bst-tieu { margin: 0; font-size: 17px; font-weight: 800; color: var(--v2-chu); }
+.v2t-luoi { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.v2t-o {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 4px 10px;
+  border-radius: var(--v2-bo-vua);
+  border: 1px solid var(--v2-vien);
+  background: var(--v2-the-chim);
+  text-align: center;
+  min-width: 0;
+}
+.v2t-o img { width: 100%; max-width: 88px; height: auto; aspect-ratio: 1; object-fit: contain; }
+.v2t-o-ten { font-size: 14px; font-weight: 800; color: var(--v2-chu); overflow-wrap: anywhere; }
+.v2t-o-phu { font-size: 12px; color: var(--v2-chu-mo); overflow-wrap: anywhere; }
+.v2t-o[data-cua-em='true'] { background: var(--v2-vang-nen); border: 2px solid var(--v2-vang); }
+.v2t-o[data-cua-em='true'] .v2t-o-phu { color: var(--v2-vang-chu); font-weight: 700; }
+
+.v2t-dong-hanh { width: 100%; min-height: 64px; }
+.v2t-dong-hanh > span { display: grid; text-align: left; }
+.v2t-dong-hanh small { display: block; font-weight: 600; font-size: 13px; opacity: .86; }
+
+/* hàng hai nút Túi đồ (phụ) + Cửa hàng (vàng) và hàng chữ Đăng xuất — bản vẽ tối giản 09/10 */
+.v2t-hang-nut { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.v2t-chan { display: flex; justify-content: center; gap: 20px; }
+.v2t-chu-nut {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  color: var(--v2-chu-phu);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (min-width: 900px) {
+  .v2t { padding: 24px 28px 120px; }
+  .v2t-chinh { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: stretch; }
+  .v2t-canh { min-height: 420px; }
+  .v2t-luoi { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .v2t-dong-hanh { justify-self: center; width: min(100%, 520px); }
+  .v2t-hang-nut { justify-self: center; width: min(100%, 520px); }
+}
+
+/* Trong khung game, dao.css đặt lại MỌI nút (`.dao.dao button`: bỏ nền/viền/đệm, nền đọc từ --nut-nen) ⇒ nút của màn này khai báo lại
+ * bằng đúng cơ chế ấy (biến --nut-*) với bộ chọn đủ mạnh. Vùng chạm ≥ 48px. */
+.dao.dao .v2t button.v2-nut-chinh {
+  --nut-nen: var(--v2-grad-nut);
+  --nut-chu: var(--v2-tren-vang);
+  --nut-bong: var(--v2-bong-nut);
+  min-height: 64px;
+  padding: 10px 24px;
+  border: 1px solid var(--v2-vang-vien);
+  border-radius: var(--v2-bo-vua);
+  font-family: var(--v2-phong-tieu-de);
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.1;
+}
+.dao.dao .v2t button.v2-nut-chinh:active { --nut-bong: var(--v2-bong-nut-nhan); --nut-dich: translateY(3px); }
+.dao.dao .v2t button.v2-nut-phu {
+  --nut-nen: var(--v2-ngoc-nen);
+  --nut-chu: var(--v2-ngoc-dam);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 18px;
+  border: 1px solid var(--v2-ngoc-vien);
+  border-radius: var(--v2-bo-vua);
+  font-weight: 700;
+  font-size: 16px;
+}
+.dao.dao .v2t button.v2-nut-phu.v2t-dong-hanh { min-height: 64px; }
+.dao.dao .v2t button.v2t-cua-hang { min-height: 52px; padding: 8px 16px; font-size: 20px; }
+.dao.dao .v2t button.v2t-chu-nut { --nut-chu: var(--v2-chu-phu); min-height: 44px; padding: 0 16px; font-size: 14px; font-weight: 600; text-decoration: underline; }

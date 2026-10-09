@@ -236,6 +236,12 @@ export default defineConfig({
           '**/{hom-nay,uoc-luong-bo-cuc}-*.{js,css}',
           // Vòng học v2 (02/10): màn thầy "Gỡ nút thắt" + rút đề v2 (máy thầy) — tải khi mở, không cất sẵn trên máy em.
           '**/BanGoNutThatScreen-*.{js,css}',
+          // Bản vẽ tối giản app thầy (09/10): màn "Hôm nay" của thầy + hai thẻ ghép màn sẵn có của Hành trình (Cần thầy chữa, Bài đã dạy) nạp LƯỜI.
+          // Các thẻ ấy nhập động Dạy học / Kiểm tra đầu giờ / Bước cuối trên lớp (trước nằm trong mảnh Gọi lên bảng) ⇒ Rollup tách thành mảnh riêng,
+          // kèm `TheCauHienThi` (chỉ hai màn ấy dùng), `gv-v2` (khung + phép tính nhịp của Hành trình/Hôm nay), `HopChonDe` + `cay-chon-de` (hộp chọn
+          // đề / cây đề — chỉ màn thầy nhập: Giao/Sửa chiến dịch, Dạy học, Mở ca, Gọi lên bảng, Bài hôm nay, cây mục đích). Đồ thị nhập đã soát: CHỈ màn
+          // thầy nhập ⇒ kho chạy-lúc; máy em / phụ huynh / màn thi không bao giờ tải. Giữ precache vỏ không lớn hơn trước (≈ 2990 KB, trần 3000 KB).
+          '**/{GvHomNayScreen,TheCanThayChua,TheBaiDaDay,DayHocLenBang,KiemTraDauGio,CauCanChuaTrenLop,TheCauHienThi,gv-v2,HopChonDe,cay-chon-de}-*.{js,css}',
           // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
           '**/KhungLoiGiai-*.{js,css}',
           '**/loi-giai-*.{js,css}',
@@ -258,6 +264,13 @@ export default defineConfig({
           // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
           // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/{BiaGame,TrongAi,ngang,chu-het-luot}-*.{js,css}',
+          // BẢN DUYỆT V2 (thầy 09/10): màn Hôm nay V2 của em (SanhV2) + bảng màu dẫn xuất V2 nạp LƯỜI — lỗi nạp ⇒ SanhHomNay rơi về Sảnh cũ
+          // (đã trong precache), nên em mất mạng lần đầu vẫn có màn chính. Tải một lần rồi cất ở kho chạy-lúc; vỏ app không nặng thêm.
+          '**/{SanhV2,ban-duyet-v2}-*.{js,css}',
+          // Mảnh mới tách ra khi các màn V2 dùng chung mã (đồ thị nhập đã soát, 09/10): màn "Thần thú của em" + lớp da trận + lệnh cửa hàng (CHỈ game nạp — game
+          // đã ngoài precache); cây Dạy học `day-hoc-len-bang` (CHỈ màn thầy: Dạy học lên bảng, Bài hôm nay, Hành trình V2). Bù chỗ: mô tả ca của tấm Chiếu mã
+          // `mo-ta-ca-chieu-ma` (CHỈ màn thầy: Mở ca, Theo dõi ca, phòng chờ của thầy, điểm danh — đều đã ngoài precache) ⇒ kho chạy-lúc.
+          '**/{ThanThuV2,tran-v2,may-chu-that,day-hoc-len-bang,mo-ta-ca-chieu-ma}-*.{js,css}',
           // CHỐNG TRÙNG (28/09): 14 biểu tượng nhỏ dưới đây đã có trong `includeAssets` (precache đích danh) — để globPatterns bắt lại lần nữa
           // thì dist/sw.js ghi mỗi tệp HAI lần (178 mục cho 164 tệp). Bỏ ở phía glob, giữ ở phía includeAssets.
           '{favicon.svg,apple-touch-icon.png,icon-192.png,logo-huy-hieu-96-v3.png}',

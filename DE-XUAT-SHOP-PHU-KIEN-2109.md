@@ -294,7 +294,7 @@ Thầy duyệt bản thiết kế 21/09 kèm lệnh "đặt lại ngôn ngữ d�
 - [L10] Lỗi không rõ: Cửa hàng chưa tải được. Em bấm Thử lại nhé.
 
 **Nhãn trợ năng + chữ phụ (thêm 21/09 đêm — Boss duyệt 11 chuỗi máy em còn thiếu)**
-- [A1] Về Đảo thần thú — nhãn nút quay lại của Cửa hàng
+- [A1] Về Bát Linh Đảo — nhãn nút quay lại của Cửa hàng (thầy chốt tên đảo 09/10/2026; trước là "Về Đảo thần thú")
 - [A2] Về Cửa hàng — nhãn nút quay lại của Thử đồ, Tủ đồ
 - [A3] Lọc theo chỗ đeo — nhãn hàng lọc theo chỗ đeo
 - [A4] Kéo thanh để chọn số EXP — nhãn thanh kéo (dùng lại [B9])

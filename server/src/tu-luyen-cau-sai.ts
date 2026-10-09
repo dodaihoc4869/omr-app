@@ -35,7 +35,7 @@ export const MOC_CAU_SAI_MS = Date.parse(MOC_CAU_SAI_ISO)
 export type LoaiNguonSai = 'ca' | 'dao' | 'doan' | 'bia' | 'luyen_de' | 'tu_luyen'
 export interface LanSai { qid: string; loai: LoaiNguonSai; tenCa: string; tenChienDich: string; luc: string; ngay: string }
 
-const TEN_TRO: Record<Exclude<LoaiNguonSai, 'ca'>, string> = { dao: 'Đảo thần thú', doan: 'Đoàn Hộ Tống', bia: 'Bi-a', luyen_de: 'Luyện đề cấu trúc', tu_luyen: 'Tu luyện' }
+const TEN_TRO: Record<Exclude<LoaiNguonSai, 'ca'>, string> = { dao: 'Bát Linh Đảo', doan: 'Đoàn Hộ Tống', bia: 'Bi-a', luyen_de: 'Luyện đề cấu trúc', tu_luyen: 'Tu luyện' }
 const LA_TRO = new Set<LoaiNguonSai>(['dao', 'doan', 'bia'])
 const ddmm = (ngay: string) => (/^\d{4}-\d{2}-\d{2}/.test(ngay) ? `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}` : '')
 

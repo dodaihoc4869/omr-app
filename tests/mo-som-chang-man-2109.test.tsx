@@ -1,4 +1,4 @@
-// ĐỢT 3 · ĐIỀU 6 (mở sớm chặng bài tập về nhà, Boss chốt B) — CHỮ trên thẻ cuối chặng: đủ điều kiện "Em làm tốt chặng 1 (đúng 9/10). Em được mở sớm chặng 2 ngay hôm nay." · không đủ "Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú."
+// ĐỢT 3 · ĐIỀU 6 (mở sớm chặng bài tập về nhà, Boss chốt B) — CHỮ trên thẻ cuối chặng: đủ điều kiện "Em làm tốt chặng 1 (đúng 9/10). Em được mở sớm chặng 2 ngay hôm nay." · không đủ "Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo."
 // Máy chủ (btvn-nang-do-d1.ts, Code 3) trả `moSom: {duoc, lyDo, chu}` khi chặng vừa xong KHÔNG phải chặng cuối. Máy khách đọc chặt `duoc`/`lyDo`, tự dựng chữ bằng `chuMoSomChang` của Code 1 (KHÔNG in `chu` của máy chủ); lý do không chắc chắn (đã mở sẵn / không ghi được / lạ) ⇒ không nói.
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
@@ -31,8 +31,8 @@ describe('chuMoSomCuaChang / theChangView — chữ Điều 6', () => {
     // chặng kế đi theo `loDaXong` của máy chủ (chỉ số chặng kế = số chặng đã xong), không suy từ chiSo + 2
     expect(chuMoSomCuaChang(ket({ loDaXong: 3, chang: { chiSo: 0, soCau: 10, soDung: 9, xong: true }, moSom: { duoc: true, lyDo: null } }))!.chu).toBe('Em làm tốt chặng 1 (đúng 9/10). Em được mở sớm chặng 4 ngay hôm nay.')
   })
-  it('chưa đủ 80 % / hôm nay đã mở sớm một chặng ⇒ "Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú."; hết chặng ⇒ câu hết chặng', () => {
-    for (const lyDo of ['chua_du_ti_le', 'da_mo_som_hom_nay']) expect(chuMoSomCuaChang(ket({ chang: { chiSo: 0, soCau: 10, soDung: 6, xong: true }, moSom: { duoc: false, lyDo } })), lyDo).toEqual({ duoc: false, chu: 'Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú.' })
+  it('chưa đủ 80 % / hôm nay đã mở sớm một chặng ⇒ "Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo."; hết chặng ⇒ câu hết chặng', () => {
+    for (const lyDo of ['chua_du_ti_le', 'da_mo_som_hom_nay']) expect(chuMoSomCuaChang(ket({ chang: { chiSo: 0, soCau: 10, soDung: 6, xong: true }, moSom: { duoc: false, lyDo } })), lyDo).toEqual({ duoc: false, chu: 'Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo.' })
     expect(chuMoSomCuaChang(ket({ moSom: { duoc: false, lyDo: 'het_chang' } }))).toEqual({ duoc: false, chu: 'Em đã làm hết các chặng của bài tập về nhà này.' })
   })
   it('KHÔNG nói điều chưa chắc: chặng kế đã mở sẵn / không ghi được (đua) / lý do lạ / thiếu moSom / thiếu chang ⇒ null', () => {
@@ -59,7 +59,7 @@ describe('TheCuoiChang — thẻ chữ mở sớm', () => {
     expect(a.getAttribute('role')).toBe('status')
     cleanup()
     const b = ve(ket({ chang: { chiSo: 0, soCau: 10, soDung: 6, xong: true }, moSom: { duoc: false, lyDo: 'chua_du_ti_le' } })).container.querySelector('[data-vung="mo-som"]') as HTMLElement
-    expect(b.textContent).toBe('Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú.')
+    expect(b.textContent).toBe('Chặng 2 mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Bát Linh Đảo.')
     expect(b.hasAttribute('data-duoc')).toBe(false)
     cleanup()
     expect(ve(ket()).container.querySelector('[data-vung="mo-som"]')).toBeNull()

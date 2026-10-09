@@ -72,7 +72,7 @@ const boQua = () => {
 
 /** Chạm cửa game ở Sảnh (`manDau` như `moGameTai`): mảnh game đã có ⇒ bắn lệnh mở game (Game.tsx · goiSomGame); và tải ngay mảnh của màn
  *  đích (vỏ Đảo + Đảo 2.0, hoặc Đoàn) — mảnh game chưa về thì tải tiếp ngay khi nó về. */
-export function moManGameNhanh(sbd: string, token: string | undefined, manDau: '' | 'doan' | 'shop' | 'tui-do'): void {
+export function moManGameNhanh(sbd: string, token: string | undefined, manDau: '' | 'doan' | 'shop' | 'tui-do' | 'than-thu'): void {
   dungNapTruocManSanh()
   // Chỉ là tăng tốc: có trục trặc gì (mô-đun lạ, máy chặn lưu…) thì nuốt lỗi — cửa game vẫn mở như cũ (moGame ngay sau lệnh này).
   try {

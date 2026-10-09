@@ -35,28 +35,43 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
   })
 
   // ĐỔI CÓ CHỦ Ý 28/09 (bản vẽ docs/ban-ve-gv-2809/GV-ThanhBen): 5 mục trên thanh, KHÔNG còn "Thêm"; Kho đề + Cài đặt ở bánh răng thanh trên.
-  it('cờ BẬT ⇒ 5 mục của ThanhBenTrai 2.0 (cùng nguồn), không "Thêm"; ẩn Hôm nay / Bài tập / Học sinh hỏi / Giao đề', () => {
+  // ĐỔI CÓ CHỦ Ý 09/10 — bản vẽ tối giản thầy chốt 09/10: 5 mục Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề (≤ 5 — luật C6);
+  // bánh răng = Cài đặt (vào thẳng); nút nổi "Mở ca" CHỈ ở màn Ca kiểm tra (mở ca nằm trong màn ấy).
+  it('cờ BẬT ⇒ 5 mục của ThanhBenTrai 2.0 (cùng nguồn), không "Thêm"; ẩn Bài tập / Học sinh hỏi / Giao đề / Chữa bài / Chiến dịch', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     render(<BottomNav />)
     expect(nhanThanh()).toEqual(MUC_HOA2_CHINH.map((m) => m.ngan))
-    expect(nhanThanh()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Chiến dịch', 'Chữa bài', 'Học sinh'])
+    expect(nhanThanh()).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề'])
+    expect(nhanThanh().length).toBeLessThanOrEqual(5)
     expect(screen.queryByRole('button', { name: 'Thêm' })).toBeNull()
-    for (const cu of ['Hôm nay', 'Bài tập', 'Học sinh hỏi', 'Giao đề theo tuần', 'Giao bài tập về nhà', 'Lên bảng']) expect(nhanThanh()).not.toContain(cu)
+    for (const cu of ['Tổng quan', 'Chiến dịch', 'Chữa bài', 'Bài tập', 'Học sinh hỏi', 'Giao đề theo tuần', 'Giao bài tập về nhà', 'Lên bảng', 'Gỡ nút']) expect(nhanThanh()).not.toContain(cu)
+    // đang ở Ca kiểm tra (beforeEach) ⇒ nút nổi Mở ca có mặt
     expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()
   })
 
-  it('cờ BẬT: mục đang sáng theo danh sách 2.0; bánh răng thanh trên mở Kho đề · Cài đặt', () => {
+  it('cờ BẬT: nút nổi "Mở ca" chỉ ở màn Ca kiểm tra; cờ TẮT ⇒ như cũ (mọi màn trừ Theo dõi ca / Mở ca)', () => {
+    useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
+    useAppStore.getState().setScreen('tongquan')
+    const { unmount } = render(<BottomNav />)
+    expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
+    unmount()
+    useCoHoa2.getState().dat(null)
+    render(<BottomNav />)
+    expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()
+  })
+
+  it('cờ BẬT: mục đang sáng theo danh sách 2.0; bánh răng thanh trên vào thẳng Cài đặt', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     useAppStore.getState().setScreen('exammonitor')
     render(<BottomNav />)
     const ca = [...document.querySelectorAll('.day-thay-thanh .day-thay-muc')].find((b) => b.textContent?.includes('Ca kiểm tra'))
     expect(ca?.getAttribute('aria-current')).toBe('page')
-    fireEvent.click(screen.getByRole('button', { name: 'Kho đề và Cài đặt' }))
-    const menu = screen.getByRole('menu', { name: 'Kho đề và Cài đặt' })
-    expect([...within(menu).getAllByRole('menuitem')].map((b) => b.textContent?.trim())).toEqual(MUC_HOA2_DAY.map((m) => m.ten))
-    // 02/10 (Vòng học v2): điện thoại vào "Gỡ nút thắt" qua bánh răng — thanh đáy giữ 5 mục.
-    expect(MUC_HOA2_DAY.map((m) => m.ten)).toEqual(['Gỡ nút thắt', 'Kho đề', 'Cài đặt'])
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Kho đề' }))
+    expect(MUC_HOA2_DAY.map((m) => m.ten)).toEqual(['Cài đặt'])
+    expect(screen.queryByRole('menu')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Cài đặt' }))
+    expect(useAppStore.getState().screen).toBe('caidat')
+    expect(screen.queryByRole('menu')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /Kho đề/ }))
     expect(useAppStore.getState().screen).toBe('nganhangde')
   })
 

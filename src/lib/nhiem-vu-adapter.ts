@@ -774,7 +774,7 @@ export function dungBangNhiemVu(input: {
 // DauTrang/TheVinhDanh/BangTinPhuHuynh có chốt `laPh`) — test chốt chặn quét chữ hiển thị của cả cây.
 
 /** Chữ thuộc game. `EXP` đứng riêng (không dính chữ khác); "Linh Tâm" là tên quái của Đoàn Hộ Tống. */
-export const CHU_GAME_PH = /thần thú|\bEXP\b|khiên|Đoàn Hộ Tống|Đảo thần thú|Võ đài|Linh Tâm/i
+export const CHU_GAME_PH = /thần thú|\bEXP\b|khiên|Đoàn Hộ Tống|Đảo thần thú|Bát Linh Đảo|Võ đài|Linh Tâm/i
 
 /** Chữ tự do của máy chủ (cảnh báo, ghi chú…): có chữ game ⇒ bỏ CẢ câu (rỗng), không cắt vụn. */
 export const khongChuGame = (s: string | null | undefined): string => {

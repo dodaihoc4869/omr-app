@@ -63,6 +63,50 @@
   align-items: center;
   gap: 10px;
 }
+/* Thẻ "Ca kiểm tra gần nhất" đầu màn (bản vẽ tối giản 09/10 — chuyển từ Sảnh về): ô điểm vàng + một dòng + lối vào Lịch sử ca. Chỉ biến --h2c-* sẵn có. */
+.h2-cdl-ca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 14px;
+  border: 1px solid var(--h2c-vien);
+  border-radius: 18px;
+  background: var(--h2c-nen-2);
+  color: var(--h2c-chu);
+  text-align: left;
+}
+.h2-cdl-ca-o {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--h2c-vang);
+  color: var(--h2c-nau);
+}
+.h2-cdl-ca[data-co-diem='false'] .h2-cdl-ca-o {
+  background: var(--h2c-nen-3);
+  color: var(--h2c-chu-phu);
+}
+.h2-cdl-ca-chu {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.h2-cdl-ca-lon {
+  font-size: 15px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.h2-cdl-ca-nho {
+  font-size: 13px;
+  color: var(--h2c-chu-phu);
+}
 .h2-cdl-ve {
   width: 48px;
   height: 48px;

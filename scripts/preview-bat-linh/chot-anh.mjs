@@ -5,7 +5,7 @@ try{
  await p.goto('http://127.0.0.1:5173/scripts/preview-bat-linh/games.html?game=dao&thu=1&cap=50')
  await p.getByRole('button',{name:/LÊN ĐƯỜNG/}).click();await p.waitForLoadState('networkidle')
  await p.screenshot({path:'/workspace/bat-linh-preview/dao-cau-hoi-390.png',fullPage:true})
- await p.locator('.pa-hang').nth(1).click();await p.getByRole('button',{name:'CHỐT ĐÁP ÁN · TUNG CHIÊU',exact:true}).click()
+ await p.locator('.pa-hang').nth(1).click();await p.getByRole('button',{name:'CHỐT ĐÁP ÁN',exact:true}).click()
  await p.locator('.dao2-ai[data-pha="giai"]').waitFor();await p.waitForLoadState('networkidle')
  await p.screenshot({path:'/workspace/bat-linh-preview/dao-loi-giai-390.png',fullPage:true})
  const css=await p.locator('.dao2-nut-xanh').evaluate(e=>getComputedStyle(e).backgroundImage)

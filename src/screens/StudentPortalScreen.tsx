@@ -1,7 +1,8 @@
 import { htmlKhoiLoiGiaiChuan } from '../lib/html-khoi-loi-giai-chuan'
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
-import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
+import { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
+import SanhHomNay from '../components/ban-duyet-v2/SanhHomNay'
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
 import { canThanTuSanh, chuoiNgaySanh, doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
 import { PETS } from '../game/than-thu-v2/core'
@@ -262,6 +263,8 @@ export default function StudentPortalScreen() {
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
+  // Lịch sử ca mở từ màn Câu đã làm (bản vẽ tối giản 09/10) ⇒ "Về" quay lại Câu đã làm; mở từ chỗ khác ⇒ về màn chính như cũ.
+  const [veSauLichSuCa, setVeSauLichSuCa] = useState<TabType | null>(null)
   // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) trong thanh đầu của từng màn game;
   // rời game ⇒ thoát toàn màn hình. Xem lib/toan-man-hinh-game.ts.
   const moGame = () => {
@@ -1073,7 +1076,7 @@ export default function StudentPortalScreen() {
   // Vỏ M3 của sheet toàn màn: chỉ ở cổng học sinh (dungM3) và không phải game (game thần thú giữ nguyên, test khoá).
   const vaoM3 = dungM3() && tab !== 'thanthu'
   /** Mở game thần thú ở đúng màn đầu (hợp đồng docs/hop-dong-mo-game-doan-ho-tong-1909.md: game đọc khoá MỘT lần rồi tự xoá). Rỗng = màn Đảo. */
-  const moGameTai = (manDau: '' | 'doan' | 'shop' | 'tui-do') => {
+  const moGameTai = (manDau: '' | 'doan' | 'shop' | 'tui-do' | 'than-thu') => {
     try {
       if (manDau) sessionStorage.setItem(KHOA_MAN_DAU_GAME, manDau)
       else sessionStorage.removeItem(KHOA_MAN_DAU_GAME)
@@ -1111,7 +1114,9 @@ export default function StudentPortalScreen() {
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
       {auth.token && !manThi && tab === null && <TheDiemDanhHs token={auth.token} />}
       {auth.token && cheDo2 && !manThi && (
-        <SanhBanDo
+        <SanhHomNay
+          tenEm={auth.hoTen}
+          lop={auth.lop}
           ketQua={hoa2.ketQua}
           loi={hoa2.loi}
           dangTai={hoa2.dangTai}
@@ -1132,7 +1137,7 @@ export default function StudentPortalScreen() {
           onTuLuyen={() => setTab('tuluyen')}
           onTuiDo={() => moGameTai('tui-do')}
           onCuaHang={() => moGameTai('shop')}
-          onMoThanThu={() => moGameTai('')}
+          onMoThanThu={() => moGameTai('than-thu')}
           onDoiTen={async (ten) => {
             const sbd = auth.sbd
             const daLuu = await doiTenThu(auth.token!, ten)
@@ -1208,7 +1213,10 @@ export default function StudentPortalScreen() {
               sbd={auth.sbd}
               scriptUrl={scriptUrl}
               banDau={dsChuaCongBo !== null ? { items: dsLichSu, chuaCongBo: dsChuaCongBo } : null}
-              onVe={() => setTab(null)}
+              onVe={() => {
+                setTab(veSauLichSuCa)
+                setVeSauLichSuCa(null)
+              }}
             />
           </Suspense>
         </div>
@@ -1216,7 +1224,23 @@ export default function StudentPortalScreen() {
       {tab === 'caudalam' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <CauDaLamNhanh token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
+            {/* Bản vẽ tối giản 09/10: thẻ "Ca kiểm tra gần nhất" chuyển từ Sảnh sang đầu màn Câu đã làm — cùng số, cùng lối vào Lịch sử ca. */}
+            <CauDaLamNhanh
+              token={auth.token}
+              hoTen={auth.hoTen}
+              sbd={auth.sbd}
+              lop={auth.lop}
+              onVe={() => setTab(null)}
+              caGanNhat={cheDo2 && dsChuaCongBo !== null ? chuTheCaGanNhat(dungLichSuCa(dsLichSu, dsChuaCongBo)) : null}
+              onLichSuCa={
+                cheDo2
+                  ? () => {
+                      setVeSauLichSuCa('caudalam')
+                      setTab('lichsuca')
+                    }
+                  : undefined
+              }
+            />
           </Suspense>
         </div>
       )}
@@ -2126,6 +2150,7 @@ export default function StudentPortalScreen() {
             onChuyenSangKhacPhuc={() => setTab(cheDo2 ? null : 'khacphuc')}
             onChuyenSangBtvn={() => setTab(cheDo2 ? null : 'btvn')}
             onChuyenSangVaoThi={() => setTab('vaothi')}
+            onDangXuat={hoiDangXuat}
           />
           </Suspense>
         )}

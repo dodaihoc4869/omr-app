@@ -35,29 +35,33 @@ describe('thanh bên theo cờ', () => {
   })
 
   // ĐỔI CÓ CHỦ Ý 28/09 (bản vẽ thầy chốt docs/ban-ve-gv-2809/GV-ThanhBen): 5 mục + đáy Kho đề · Cài đặt; bỏ "Thêm…", "Lên bảng" → "Chữa trên lớp".
-  it('cờ BẬT ⇒ "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh + vạch + đáy Kho đề · Cài đặt; ẩn 4 màn cũ', () => {
+  // ĐỔI CÓ CHỦ Ý 09/10 — BẢN VẼ TỐI GIẢN THẦY CHỐT 09/10 (GV-HomNay/GV-HanhTrinh/BoGop): 5 mục Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề,
+  // đáy Cài đặt; bỏ nút riêng "Mở ca kiểm tra" (mở ca nằm trong màn Ca kiểm tra); Chiến dịch luyện · Chữa trên lớp · Gỡ nút thắt rời thanh bên
+  // nhưng GIỮ mã màn (vào qua thẻ của Hành trình; mục Hành trình sáng khi đứng ở `goilenbang` / `bangonutthat`).
+  it('cờ BẬT ⇒ Hôm nay · Hành trình · Ca kiểm tra · Học sinh · Kho đề + vạch + đáy Cài đặt; không nút "Mở ca kiểm tra"; ẩn 4 màn cũ', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     const { container } = render(<ThanhBenTrai />)
-    expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()
-    // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): "Gỡ nút thắt" hiện cả khi cờ Hóa 2 bật, ngay sau "Chữa trên lớp" (nhóm dạy học); đáy vẫn Kho đề · Cài đặt.
-    expect(tenMuc()).toEqual(['Tổng quan', 'Ca kiểm tra', 'Chiến dịch luyện', 'Chữa trên lớp', 'Gỡ nút thắt', 'Học sinh', 'Kho đề', 'Cài đặt'])
+    expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
+    expect(tenMuc()).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề', 'Cài đặt'])
+    for (const bo of ['Tổng quan', 'Chiến dịch luyện', 'Chữa trên lớp', 'Gỡ nút thắt']) expect(tenMuc()).not.toContain(bo)
     expect(container.querySelector('.ben-trai-vach[role="separator"]')).toBeTruthy()
     expect(screen.queryByText('Thêm…')).toBeNull()
     expect(container.textContent).not.toContain('10²³')
     expect(container.textContent).toContain('Đỗ Đại Học')
     expect(container.textContent).toContain('Giáo viên')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('aria-current')).toBe('page')
-    fireEvent.click(screen.getByRole('button', { name: 'Chữa trên lớp' }))
-    expect(useAppStore.getState().screen).toBe('goilenbang')
-    fireEvent.click(screen.getByRole('button', { name: 'Chiến dịch luyện' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
     expect(useAppStore.getState().screen).toBe('chiendich')
+    fireEvent.click(screen.getByRole('button', { name: 'Hôm nay' }))
+    expect(useAppStore.getState().screen).toBe('tongquan')
     expect(MAN_AN_KHI_HOA2).toEqual(['examhub', 'giaobtvn', 'cauhoi', 'khodegiao'])
     expect(mucDangSang('toancanh', true)).toBe('hocsinh')
     expect(mucDangSang('exammonitor', true)).toBe('lichsuca')
+    expect(mucDangSang('examsetup', true)).toBe('lichsuca')
     expect(mucDangSang('toancanh')).toBe('examhub')
-    fireEvent.click(screen.getByRole('button', { name: 'Gỡ nút thắt' }))
-    expect(useAppStore.getState().screen).toBe('bangonutthat')
-    expect(mucDangSang('bangonutthat', true)).toBe('bangonutthat')
+    // Mã màn cũ vẫn mở được (setScreen ở nơi khác) và tô sáng Hành trình.
+    expect(mucDangSang('goilenbang', true)).toBe('chiendich')
+    expect(mucDangSang('bangonutthat', true)).toBe('chiendich')
   })
 
   it('máy chủ chưa có lệnh ⇒ cờ về TẮT (app như cũ)', async () => {

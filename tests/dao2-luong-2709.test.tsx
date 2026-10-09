@@ -47,7 +47,7 @@ describe('Luồng Đảo 2.0', () => {
       await screen.findByText(new RegExp(`^ẢI ${i + 1}/6`))
       expect(container.querySelector('.loi-giai')).toBeNull() // chưa chốt: không lời giải, không đáp án
       fireEvent.click(screen.getByRole('button', { name: i === 0 ? /^B\./ : /^A\./ }))
-      fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN · TUNG CHIÊU' }))
+      fireEvent.click(screen.getByRole('button', { name: 'CHỐT ĐÁP ÁN' }))
       const tiep = await screen.findByRole('button', { name: i < 5 ? `ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${i + 2}` : 'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN' })
       expect(container.querySelector('.loi-giai')).toBeTruthy()
       if (i === 0) { expect(container.textContent).toMatch(/Chưa đúng · quái phản đòn/); expect(nhat.find(n => n[0] === 'answer')![1]).toEqual({ session: 's1', qid: 'q0', answer: 'B', assisted: false }) }
@@ -88,11 +88,11 @@ describe('Luồng Đảo 2.0', () => {
 })
 
 describe('Thanh chọn game ở chế độ 2.0', () => {
-  it('2.0: chỉ Đảo thần thú (+ Đoàn Hộ Tống khi doanMo) — bỏ Võ đài, Tiến bộ, Sắp ra mắt; cờ tắt giữ nguyên', () => {
+  it('2.0: chỉ Bát Linh Đảo (+ Đoàn Hộ Tống khi doanMo) — bỏ Võ đài, Tiến bộ, Sắp ra mắt; cờ tắt giữ nguyên', () => {
     const THU_BAY = Date.parse('2026-09-26T09:00:00+07:00')
-    expect(cuaGame(true, THU_BAY, true)).toEqual({ nav: [['home', 'Đảo thần thú'], ['doan', 'Đoàn Hộ Tống']], voDaiMo: false })
-    expect(cuaGame(false, THU_BAY, true).nav.map(x => x[1])).toEqual(['Đảo thần thú'])
-    expect(cuaGame(true, THU_BAY).nav.map(x => x[1])).toEqual(['Đảo thần thú', 'Đoàn Hộ Tống', 'Võ đài thứ Bảy', 'Tiến bộ của em', 'Game mới · Sắp ra mắt'])
-    expect(cuaGame(false, THU_BAY).nav.map(x => x[1])).toEqual(['Đảo thần thú', 'Hộ Tống Linh Tâm', 'Tiến bộ của em', 'Game mới · Sắp ra mắt'])
+    expect(cuaGame(true, THU_BAY, true)).toEqual({ nav: [['home', 'Bát Linh Đảo'], ['doan', 'Đoàn Hộ Tống']], voDaiMo: false })
+    expect(cuaGame(false, THU_BAY, true).nav.map(x => x[1])).toEqual(['Bát Linh Đảo'])
+    expect(cuaGame(true, THU_BAY).nav.map(x => x[1])).toEqual(['Bát Linh Đảo', 'Đoàn Hộ Tống', 'Võ đài thứ Bảy', 'Tiến bộ của em', 'Game mới · Sắp ra mắt'])
+    expect(cuaGame(false, THU_BAY).nav.map(x => x[1])).toEqual(['Bát Linh Đảo', 'Hộ Tống Linh Tâm', 'Tiến bộ của em', 'Game mới · Sắp ra mắt'])
   })
 })

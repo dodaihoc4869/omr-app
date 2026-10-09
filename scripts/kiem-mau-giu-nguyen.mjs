@@ -79,6 +79,15 @@ const DA_XOA_MA_CHET = new Set([
   'src/components/xem-diem-gv/BaoCaoCaLop.tsx', 'src/components/xem-diem-gv/BaoCaoMotEm.tsx', 'src/components/xem-diem-gv/xem-diem-gv.css', 'src/components/xem-diem/TheCaGanNhat.tsx',
 ])
 
+// MÀU THẦY RA LỆNH THÊM — ngoại lệ ĐÓNG (09/10/2026, thầy: "Quét bảng màu từ Bảng G (ngà voi #FFFEF6, xanh ngọc #10B981, xanh navy #0F3D3A,
+// vàng #F7A800) cập nhật vào tailwind…", rồi "Build rồi đẩy luôn"). Đúng BA khai báo gốc ở tokens.css (xanh ngọc trùng --xanh có sẵn nên không cần);
+// mọi sắc dẫn xuất phải pha color-mix từ ba biến này. Liệt kê đủ tệp · khai báo, KHÔNG glob; thêm dòng mới phải có lệnh thầy kèm theo.
+const MAU_THAY_RA_LENH = new Set([
+  'src/styles/tokens.css · --v2-nga-voi: #fffef6',
+  'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
+  'src/styles/tokens.css · --v2-vang: #f7a800',
+])
+
 const loi = []
 let soTep = 0
 let soMaChet = 0
@@ -95,7 +104,7 @@ for (const [trangThai, f, f2] of doi) {
   for (const [k, n] of b) {
     if ((a.get(k) ?? 0) >= n) continue
     const gt = k.slice(k.indexOf(':') + 1)
-    if (MAU_THO.test(gt)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
+    if (MAU_THO.test(gt) && !MAU_THAY_RA_LENH.has(`${ten} · ${k}`)) loi.push(`MÀU THÔ mới (phải dùng biến chuẩn) · ${ten} · ${k}`)
     for (const m of gt.matchAll(/var\(\s*(--[\w-]+)/g)) if (!dinh.has(m[1])) loi.push(`BIẾN MÀU chưa định nghĩa · ${ten} · ${k}`)
   }
 }

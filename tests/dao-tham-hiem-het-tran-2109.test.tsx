@@ -76,7 +76,7 @@ describe('Đảo · hết trần câu GIỮA lượt', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
     await waitFor(() => expect(chan().querySelector('.dao-het-tran')).not.toBeNull())
   })
-  it('nạp lại số lượt sau lỗi hết trần (recommendations lần 2) và bấm VỀ ĐẢO ⇒ về màn Đảo, LÊN ĐƯỜNG khoá + "đã đi 36/36 câu Đảo thần thú"', async () => {
+  it('nạp lại số lượt sau lỗi hết trần (recommendations lần 2) và bấm VỀ ĐẢO ⇒ về màn Đảo, LÊN ĐƯỜNG khoá + "đã đi 36/36 câu Bát Linh Đảo"', async () => {
     const { nhat } = dung(loiMay('Em đã hoàn thành 36 câu hôm nay.'))
     await vaoAi()
     fireEvent.click(screen.getByRole('button', { name: 'Chốt đáp án' }))
@@ -85,7 +85,7 @@ describe('Đảo · hết trần câu GIỮA lượt', () => {
     fireEvent.click(screen.getByRole('button', { name: 'VỀ ĐẢO' }))
     await waitFor(() => expect(document.querySelector('.dao-chuyen')).not.toBeNull())
     await waitFor(() => expect((screen.getByRole('button', { name: /Đồng hành/ }) as HTMLButtonElement).disabled).toBe(true))
-    expect(document.body.textContent).toContain('Hôm nay em đã đi 36/36 câu Đảo thần thú. Mai đảo có chuyến mới.')
+    expect(document.body.textContent).toContain('Hôm nay em đã đi 36/36 câu Bát Linh Đảo. Mai đảo có chuyến mới.')
   })
   it('lỗi KHÁC (mạng) ⇒ hiện NGAY TRÊN nút nộp trong khối dính đáy, nút nộp vẫn còn để thử lại; cuộn tới lỗi; không thẻ hết trần', async () => {
     dung(loiMay('Mạng chập chờn, em thử lại nhé.'))
