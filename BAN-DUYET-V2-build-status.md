@@ -87,3 +87,21 @@ Trạng thái: **ĐÃ PHÁT HÀNH** 22:38 (VN) — PR225, mã sống `bf10231`, 
 | Ảnh Chromium | `scripts/chup-v2` 14-gv-can-chua, 24-gv-hom-nay, 25-hs-cau-da-lam, 22-hs-hanh-trinh | 0 lỗi trang · 0 tràn ngang |
 | PR check `kiem` | Actions 37951714821 | SUCCESS |
 Còn lại: màn Hoá 2.0 ngang "thấp" co bằng `zoom` ⇒ nút ~33–36 px trên điện thoại xoay ngang (có từ trước; đã đề xuất việc riêng).
+
+## Đợt 5 — Hành trình thầy: Nhịp học + lịch sử làm câu từng em + số giây (10/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 08:23 (VN) — PR227, mã sống `a9ec700`, Actions `38012501511` SUCCESS. Hoãn 07:36 vì có ca mở (11L1-L2); 08:15 D1 0 ca mở / 0 lượt mới gộp. Lùi: `git revert -m 1 a9ec700`.
+| Việc | Commit | Ghi chú |
+|---|---|---|
+| Hợp đồng | 6feedcf9 | `server/src/lich-su-lam-cau-kieu.ts` dùng chung máy chủ + app |
+| Máy chủ (CHỈ ĐỌC) | b4712f81 | `/gv/lich-su-lam-cau`; giây: cột giay → raw ms → chi_tiet_cau → ước tính ('uoc') → null; "Ai sai" dùng ms thật |
+| Tờ chiếu | b4712f81 | "N lần sai · trung bình x giây"; chip luôn có giây hoặc "chưa đo giờ" |
+| App thầy | c8f0602a | thẻ Nhịp học (Chưa làm → Chưa đủ mức → Đủ mức), tấm Lịch sử làm câu, Hôm nay ⇒ Nhịp học |
+### Kiểm bản phát hành (nhánh 945bf426)
+| Việc | Kết quả |
+|---|---|
+| tsc app + máy chủ | 0 lỗi |
+| check:mau · kiem:mau-giu · soi:giao-dien | đạt · 0 · 0 |
+| build:cf | SW 13/13 · 146 tệp / 2996 KB |
+| vitest toàn bộ so TÊN main 513467e3 | 0 đỏ mới (2 khác lúc chạy song song build: đo giờ `de-rieng-tran-trung` + quét tĩnh `khong-dung-bien…`; chạy riêng giống hệt main) |
+| Ảnh 14-gv-nhip-*, 14-gv-ho-so-em-* | 0 lỗi trang · 0 tràn · 0 chạm < 44 |
+| PR check `kiem` | Actions 38009453645 SUCCESS |
