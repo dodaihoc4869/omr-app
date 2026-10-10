@@ -23,6 +23,7 @@ export async function kiemGoi7(env:Env,sbd:string,action:string,b:Row,now:number
   const gs=await docGoiCuaEm7(env,sbd,now)
   const g=gs.find(g=>g.id===b.goiId)
   if(!g)throw new Error('Bài này không thuộc lớp của em.')
+  if(!g.nguonDayDu)throw new Error('Bộ bài chưa đủ nguồn của các tờ đã chọn. Thầy cần bổ sung trước khi tự kiểm.')
   const [baoVe,btvn,control,khoi]=await Promise.all([protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd),docKhoiEm(env,sbd)])
   if(!control.enabled)throw new Error('Bài học đang tạm dừng.')
   const valid=async(c:CauKiem7)=>{

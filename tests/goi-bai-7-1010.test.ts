@@ -114,6 +114,22 @@ it('nguồn R2 mới tự dựng chỉ mục và nhận đúng câu gốc, khôn
   expect(gs[0]!.cau).toHaveLength(1);expect(gs[0]!.cau[0]!.qid).toBe(qid);expect(gs[0]!.cau[0]!.version).toMatch(/^[a-f0-9]{32}$/)
   expect(k.d.sql.prepare("SELECT source_version FROM game_v2_index WHERE ma_de='DH-B1'").get()).toMatchObject({source_version:'v1'})
 })
+it('thiếu một tờ không nhận phần còn lại là cả bài; hồi phục đủ nguồn rồi giữ lịch sử cũ',async()=>{
+  const k=await kho(12),qid=k.qids('DH-B1')[0]!
+  await lam(k.env,'S1',qid,NOW,true,{cauVersion:'v1'})
+  k.d.sql.prepare("UPDATE bai_da_day SET ma_to_json=? WHERE id='latest'").run('["DH-B1-TN","DH-B1-DS","DH-B1-TLN","DH-B2-TN"]')
+  k.d.sql.exec("INSERT INTO de_kho(ma_de,ten_de,da_xoa,cap_nhat_luc) VALUES('DH-B2','Tờ thêm',0,'v1')")
+  await dongBoGoi7(k.env,NOW+21000,100,'',true)
+  const gs=await docGoiCuaEm7(k.env,'S1',NOW+21000)
+  expect(gs[0]!.nguonDayDu).toBe(false);expect(gs[0]!.cau.every(q=>q.hopLe===false)).toBe(true)
+  expect((await lapGoi7(k.env,'S1',NOW+21000))!.plan.viec.some(v=>k.qids('DH-B1').includes(v.qid))).toBe(false)
+  await expect(kiemGoi7(k.env,'S1','hoc-tap-kiem-start',{goiId:'g7:latest',maDe:'DH-B1-TN'},NOW+21000)).rejects.toThrow(/chưa đủ nguồn/)
+  k.d.objects.set('kho/DH-B2.json',{phanI:[{id:'DH-B2-0',text:'Tờ vừa bổ sung',choices:['a','b','c','d'],correct:'B',explanation:'Chữa rõ cách làm.'}],phanII:[],phanIII:[]})
+  await dongBoGoi7(k.env,NOW+42000,100,'',true)
+  const healed=(await docGoiCuaEm7(k.env,'S1',NOW+42000))[0]!
+  expect(healed.nguonDayDu).toBe(true);expect(healed.cau).toHaveLength(13);expect(healed.daGap.has(qid)).toBe(true)
+  expect(k.d.sql.prepare('SELECT COUNT(*) n FROM su_kien_hoc').get()).toMatchObject({n:1})
+})
 it('làm lại lỗi dùng bản khác thật, giữ hoán vị máy chủ qua lần mở lại và chấm đúng',async()=>{
   const k=await kho(1),qid=k.qids('DH-B1')[0]!
   await lam(k.env,'S1',qid,NOW-2*86400000,false,{cauVersion:'v1'})

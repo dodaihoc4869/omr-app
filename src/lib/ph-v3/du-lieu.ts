@@ -121,7 +121,7 @@ export function docLoiThay(raw: unknown): NhanXetCa[] | null {
 
 // ---------------------------------------------------------------- Game Hoá 2.0 của con ----------------------------------------------------------------
 export interface Hoc2 {
-  goi7?: {ten:string;han:string;tong:number;daGap:number;con:number}[]
+  goi7?: {ten:string;han:string;tong:number;daGap:number;con:number;nguonDayDu?:boolean}[]
   serverNow?: number
   hanhTrinh?: { tang: 1 | 2 | 3 | 4; toiThieu: number }
   chienDich: { ten: string; hanNop: string; conNgay: number; tong: number; daGap: number; thanhThao: number; canDayLai: number } | null

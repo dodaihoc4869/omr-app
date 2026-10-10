@@ -71,7 +71,7 @@ export async function phLoiThay(envGoc: Env, b: Row, _nowMs: number = Date.now()
 export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<Row> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-hoc-2', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
   const goiPh7=(await coGoi7(envDoc)).bat?await docGoiCuaEm7(envDoc,sbd,nowMs,true):[]
-  if (!(await cheDo2(envDoc, sbd))) return goiPh7.length?{ok:true,cheDo2:true,serverNow:nowMs,goi7:goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size})),homNay:homNayGoi7(goiPh7)}:{ ok: true, cheDo2: false }
+  if (!(await cheDo2(envDoc, sbd))) return goiPh7.length?{ok:true,cheDo2:true,serverNow:nowMs,goi7:goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu})),homNay:homNayGoi7(goiPh7)}:{ ok: true, cheDo2: false }
   const ngay = ngayVnCua(nowMs)
   // Tối ưu 05/10: lệnh CHỈ ĐỌC ⇒ khối OMNI (cờ + phần đọc không phụ thuộc hồ sơ srs2) bắt đầu CÙNG lúc phần chính, chỉ chờ hồ sơ srs2 ở chỗ cần (số câu cắt tỉa)
   // — trước: chờ phần chính xong mới hỏi cờ rồi đọc (≈ 9 đợt nối tiếp). Lời hỏi cờ dùng chung cho hồ sơ srs2 (cùng hàm `omniBat`). Kết quả và khoá phản hồi
@@ -117,6 +117,6 @@ export async function phHoc2(envGoc: Env, b: Row, nowMs: number = Date.now(), en
     const omni = await omniP
     if (omni) ra.omni = omni
   }
-  if(goiPh7.length){ra.goi7=goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size}));ra.homNay=homNayGoi7(goiPh7);delete ra.hanhTrinh}
+  if(goiPh7.length){ra.goi7=goiPh7.map(g=>({ten:g.ten,han:g.han,tong:g.cau.length,daGap:g.daGap.size,con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu}));ra.homNay=homNayGoi7(goiPh7);delete ra.hanhTrinh}
   return ra
 }

@@ -91,6 +91,7 @@ async function cauTuTick7(env: Env,b: Row): Promise<CauGoi7[]> {
   const to = mang7(b.ma_to_json).filter(m => !laMaToKhongGiao(m)), goc = [...new Set(to.map(m => tachMaTo(m).goc))]
   // Nguồn vừa bổ sung không phải chờ em mở game cũ để lập chỉ mục.
   if(env.DE)for(let i=0;i<goc.length;i+=3)await dongBoCacTo(env,goc.slice(i,i+3))
+  if(!await duNguonGoi7(env,to))return []
   const rows = await env.DB.prepare(`SELECT q.qid,q.json,q.version,q.ma_de FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de
     JOIN game_v2_index i ON i.ma_de=d.ma_de AND i.source_version=d.cap_nhat_luc
     WHERE COALESCE(d.da_xoa,0)=0 AND q.ma_de IN (SELECT value FROM json_each(?)) ORDER BY q.rowid`).bind(JSON.stringify(goc)).all<Row>()
@@ -111,7 +112,13 @@ async function cauTuTick7(env: Env,b: Row): Promise<CauGoi7[]> {
   return cau
 }
 
-export interface GoiCuaEm7 { id: string; ten: string; khoaBai: string; batDau: string; han: string; cau: CauGoi7[]; daGap: Set<string>; gapNgay: Set<string>; tuLamNgay: Set<string>; choThay: Set<string>; quota: number }
+export async function duNguonGoi7(env:Env,maTo:readonly string[]):Promise<boolean>{
+  const roots=[...new Set(maTo.filter(m=>!laMaToKhongGiao(m)).map(m=>tachMaTo(m).goc))]
+  if(!roots.length)return false
+  const r=await env.DB.prepare(`SELECT d.ma_de FROM de_kho d JOIN game_v2_index i ON i.ma_de=d.ma_de AND i.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND d.ma_de IN(SELECT value FROM json_each(?))`).bind(JSON.stringify(roots)).all<{ma_de:string}>()
+  return new Set(r.results.map(r=>r.ma_de)).size===roots.length
+}
+export interface GoiCuaEm7 { id: string; ten: string; khoaBai: string; batDau: string; han: string; maDeNguon:string[]; cau: CauGoi7[]; daGap: Set<string>; gapNgay: Set<string>; tuLamNgay: Set<string>; choThay: Set<string>; nguonDayDu:boolean; quota: number }
 /** Báo cáo câu mới: vượt quota vẫn hiển thị; một gốc dùng cho hai bài chỉ đếm một lần. */
 export function homNayGoi7(goi:readonly GoiCuaEm7[]){
   const gap=new Set(goi.flatMap(g=>[...g.gapNgay])),daGap=new Set(goi.flatMap(g=>[...g.daGap]).filter(q=>!gap.has(q)))
@@ -122,7 +129,7 @@ export function homNayGoi7(goi:readonly GoiCuaEm7[]){
 export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=false): Promise<GoiCuaEm7[]> {
   if(!chiDoc)await damBaoGoi7(env)
   const ngay = ngayVn7(now)
-  const gs = await env.DB.prepare(`SELECT g.id,g.ten,g.khoa_bai,e.bat_dau,e.han FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id
+  const gs = await env.DB.prepare(`SELECT g.id,g.ten,g.khoa_bai,e.bat_dau,e.han,b.ma_to_json FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id
     JOIN hoc_sinh h ON h.sbd=e.sbd AND h.lop=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? ORDER BY e.bat_dau DESC,g.id`).bind(sbd).all<Row>()
   if (!gs.results.length) return []
   const gids = JSON.stringify(gs.results.map(g => g.id))
@@ -135,6 +142,8 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
   const out: GoiCuaEm7[] = []
   for (const g of gs.results) {
     const cau = cs.results.filter(c => c.goi_id === g.id).map(c => json<CauGoi7>(c.meta_json)), versions = new Map(cau.map(c => [c.qid,c.version]))
+    const nguonDayDu=cau.length>0&&await duNguonGoi7(env,mang7(g.ma_to_json))
+    if(!nguonDayDu)for(const c of cau)c.hopLe=false
     const daGap = new Set<string>(), gapNgay = new Set<string>(), tuLamNgay = new Set<string>(), choThay = new Set<string>(), first = new Map<string,string>()
     const gap = (qid:string,ngayGap:string) => { daGap.add(qid); if (!first.has(qid) || first.get(qid)!>ngayGap) first.set(qid,ngayGap) }
     for (const e of events.results) if (e.ket_qua !== null && str(e.cau_version) === versions.get(str(e.qid))) {
@@ -145,7 +154,7 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
     const cu = quotas.results.find(q => q.goi_id === g.id)
     const quota = Math.max(cu ? Number(cu.quota) : 0,quotaGoi7(cau.length - daGap.size + gapNgay.size, ngay, str(g.han)))
     if (!cu && !chiDoc) await env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) VALUES(?,?,?,?)').bind(g.id,sbd,ngay,quota).run()
-    out.push({ id: str(g.id), ten: str(g.ten), khoaBai: str(g.khoa_bai), batDau: str(g.bat_dau), han: str(g.han), cau, daGap, gapNgay, tuLamNgay, choThay, quota })
+    out.push({ id: str(g.id), ten: str(g.ten), khoaBai: str(g.khoa_bai), batDau: str(g.bat_dau), han: str(g.han),maDeNguon:[...new Set(mang7(g.ma_to_json).map(m=>tachMaTo(m).goc))], cau, daGap, gapNgay, tuLamNgay, choThay, nguonDayDu, quota })
   }
   return out
 }
@@ -156,7 +165,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   const qids = [...new Set(goi.flatMap(g => g.cau.map(c => c.qid)))], ngay = ngayVn7(now)
   const lop = (await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{lop:string}>())?.lop ?? ''
   const phamVi = await phamViLop(env,lop)
-  const maCu = [...(phamVi?.maDe ?? [])].filter(m => !goi.some(g => g.cau.some(c => c.maDe === m)))
+  const maCu = [...(phamVi?.maDe ?? [])].filter(m => !goi.some(g => g.maDeNguon.includes(m)))
   // Ma trận cũ là toàn phạm vi; mẫu bổ sung chọn theo độ yếu, không chỉ câu đã làm.
   const [old,ungCu] = await Promise.all([
     env.DB.prepare(`SELECT DISTINCT j.value AS kn,p.trang_thai FROM game_v2_question q LEFT JOIN omni_q o ON q.qid=o.qid,
@@ -199,7 +208,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
 
 export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>, now: number) {
   return { bat: true, ngay: ngayVn7(now), goi: lap.goi.map(g => ({ id:g.id,ten:g.ten,batDau:g.batDau,han:g.han,tong:g.cau.length,daGap:g.daGap.size,
-    con:g.cau.length-g.daGap.size,to:[...new Set(g.cau.map(c=>c.maTo??c.maDe))],canBoSung:g.cau.filter(c=>c.hopLe===false).length,quota:g.quota,gapHomNay:g.gapNgay.size,quaHan:ngayVn7(now)>g.han && g.daGap.size<g.cau.length })),
+    con:g.cau.length-g.daGap.size,nguonDayDu:g.nguonDayDu,to:[...new Set(g.cau.map(c=>c.maTo??c.maDe))],canBoSung:g.cau.filter(c=>c.hopLe===false).length,quota:g.quota,gapHomNay:g.gapNgay.size,quaHan:ngayVn7(now)>g.han && (!g.nguonDayDu||g.daGap.size<g.cau.length) })),
     tuLamCon:lap.plan.tuLam,tiepCanCon:lap.plan.tiepCan,thieuPhu:lap.plan.thieuPhu,thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
     canHoTro:lap.plan.tuLam*2+lap.plan.tiepCan*3>60 || lap.plan.thieuPhu>0 || lap.daLamNgay+lap.plan.viec.length<lap.toiThieu,
     mucTieuDiem:7,diemDaDo:lap.diemDaDo,toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay }

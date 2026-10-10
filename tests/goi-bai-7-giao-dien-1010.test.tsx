@@ -25,6 +25,10 @@ it('dữ liệu sai hoặc thiếu không biến thành hoàn tất bài/đạt 
   expect(docTomTatGoi7({bat:true})).toBeUndefined()
   expect(docTomTatGoi7(goi)).toEqual(goi)
 })
+it('thiếu nguồn một tờ không hiển thị tỷ lệ hoàn thành hoặc điểm tự kiểm của cả bộ',()=>{
+  render(<HocTapHomNay ten="An" lop="12A1" ketQua={docSanh({cheDo2:true,theLuc:{con:24,tong:24},goi7:{...goi,goi:[{...goi.goi[0],nguonDayDu:false}]}})} dangTai={false} loi="" coCa={false} onHoc={vi.fn()} onKiem={vi.fn()} onXemLai={vi.fn()} onChua={vi.fn()} onThi={vi.fn()} onTuLuyen={vi.fn()} onLichSu={vi.fn()} onBaiTap={vi.fn()} onGiaDinh={vi.fn()} onTaiLai={vi.fn()} onDangXuat={vi.fn()}/>)
+  expect(screen.getByText(/chưa chốt tổng số câu/i)).toBeTruthy();expect(screen.queryByText(/0\/127 câu/)).toBeNull();expect(screen.queryByRole('button',{name:'Tự kiểm tờ 1'})).toBeNull()
+})
 it('học có hỗ trợ là hành động riêng, không hiện sai hoặc làm đúng',async()=>{
   vi.mocked(goiHoa2).mockResolvedValueOnce({ok:true,id:'p',questions:[{...q,vaiGoi7:'tiep_can',huongDan7:true}]}).mockResolvedValueOnce({ok:true,correct:false,answer:'A',solution:'NaCl là muối.',hocCoHoTro:true})
   render(<ManLamBaiTap token="t" sbd="s" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()}/>)
