@@ -107,6 +107,7 @@ import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionCon
 import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
+import { gvLichSuLamCau } from './lich-su-lam-cau'
 import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
 import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
@@ -3817,6 +3818,8 @@ const boXuLy = {
       if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
+      // LỊCH SỬ LÀM CÂU CỦA MỘT EM (thầy 09/10 khuya, server/src/lich-su-lam-cau.ts; hợp đồng lich-su-lam-cau-kieu.ts): CHỈ ĐỌC sổ — mọi lượt · câu sai · số giây.
+      if (p === '/gv/lich-su-lam-cau') return ra(await gvLichSuLamCau(envDoc, b))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
       // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.

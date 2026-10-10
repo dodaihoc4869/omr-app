@@ -96,14 +96,39 @@ describe('tờ chạy thật — nút X', () => {
     expect([...panel.querySelectorAll('.mc-sai-thanh')].map((x) => [x.querySelector('span')!.textContent, x.querySelector('em')!.textContent])).toEqual([['Ca', '2'], ['Lên bảng', '1']])
     // cột theo ngày, tăng dần
     expect([...panel.querySelectorAll('.mc-sai-ngay span')].map((x) => x.textContent)).toEqual(['01/10', '03/10'])
-    // thẻ từng em: em sai nhiều trước; mỗi lượt một chip giờ (VN) · nơi · thời gian (ước tính có "≈")
+    // thẻ từng em: em sai nhiều trước; dòng tên có trung bình giây của em (chỉ lượt có số giây; có ước tính ⇒ "≈") — thầy 09/10;
+    // mỗi lượt một chip giờ (VN) · nơi · thời gian (ước tính có "≈"); không đo được ⇒ "chưa đo giờ" (không bỏ trống)
     const em = [...panel.querySelectorAll('.mc-sai-em')]
-    expect(em.map((x) => x.querySelector('.mc-sai-ten')!.textContent)).toEqual(['Trần An2 lần sai', 'Lê Bình1 lần sai'])
+    expect(em.map((x) => x.querySelector('.mc-sai-ten')!.textContent)).toEqual(['Trần An2 lần sai · trung bình ≈ 1 phút 8 giây', 'Lê Bình1 lần sai'])
     expect([...em[0]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['10:00 · 03/10 · Lên bảng · ≈ 40 giây', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 35 giây'])
-    expect([...em[1]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['09:06 · 01/10 · Ca Kiểm tra tuần 3'])
+    expect([...em[1]!.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual(['09:06 · 01/10 · Ca Kiểm tra tuần 3 · chưa đo giờ'])
     expect(panel.textContent).toContain('thời gian ước tính')
     t.phim('Escape')
     expect(panel.classList.contains('mc-mo')).toBe(false)
+  })
+  it('(thầy 09/10) số giây THẬT: em có lượt đo được ⇒ "trung bình <x> giây" không "≈"; chỉ tính lượt đo được; chưa đo ⇒ chip "chưa đo giờ"; không chú thích ước tính', () => {
+    const t = moTo()
+    t.tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
+    t.phim('x')
+    const m = t.gui.filter((g) => g.type === TIN_TO_CHIEU.AI_SAI)
+    t.tuCha({
+      type: TIN_TO_CHIEU.AI_SAI_TRA, maPhien: MA, id: m[0]!.id,
+      ds: [
+        { sbd: 'S1', ten: 'Trần An', luc: '2026-10-03T03:00:00Z', noi: 'Đảo', giay: 18 },
+        { sbd: 'S1', ten: 'Trần An', luc: '2026-10-02T03:00:00Z', noi: 'Lên bảng', giay: null },
+        { sbd: 'S1', ten: 'Trần An', luc: '2026-10-01T02:05:00Z', noi: 'Ca Kiểm tra tuần 3', giay: 64 },
+      ],
+    })
+    const panel = t.doc.querySelector('.mc-aisai')!
+    const em = panel.querySelector('.mc-sai-em')!
+    // (18 + 64) / 2 = 41 — lượt "chưa đo giờ" không kéo trung bình
+    expect(em.querySelector('.mc-sai-ten small')!.textContent).toBe('3 lần sai · trung bình 41 giây')
+    expect([...em.querySelectorAll('.mc-sai-chip > span')].map((x) => x.textContent)).toEqual([
+      '10:00 · 03/10 · Đảo · 18 giây', '10:00 · 02/10 · Lên bảng · chưa đo giờ', '09:05 · 01/10 · Ca Kiểm tra tuần 3 · 1 phút 4 giây',
+    ])
+    // số đo nổi bật (thẻ <u>), "chưa đo giờ" là chữ thường của chip — không thêm màu
+    expect([...em.querySelectorAll('.mc-sai-chip > span u')].map((x) => x.textContent)).toEqual(['18 giây', '1 phút 4 giây'])
+    expect(panel.textContent).not.toContain('thời gian ước tính')
   })
   it('phím x mở; app báo lỗi ⇒ nói chưa tải được; danh sách rỗng ⇒ "Chưa em nào làm sai câu này."', () => {
     const t = moTo()

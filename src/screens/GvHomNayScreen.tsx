@@ -5,10 +5,11 @@
 //     "Bổ sung bài hôm nay").
 //   · lưới 2fr / 1fr. Trái "Việc cần thầy · xếp theo độ gấp" (thứ tự DOM = thứ tự mắt = thứ tự Tab — bỏ column-reverse): ca đang mở → Theo dõi
 //     ca · Cần thầy chữa → Hành trình › Cần thầy chữa · em hỏi bài chờ chữa → Học sinh hỏi · lớp chờ bài mới (OMNI) → Hành trình › Dạy học ·
-//     em chưa làm câu nào → màn Học sinh lọc sẵn khối đó (cột "Hôm nay a/b câu") · phần chưa đọc được → Thử lại · không có chỗ cần chữa ⇒ một
-//     dòng ✓. MỖI việc MỘT nút viền.
-//   · phải: thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một dòng (thanh + a/b), bấm mở màn Học sinh lọc sẵn khối đó.
-//   (Thầy 09/10 tối: Hành trình "chỉ giữ phần dạy học" ⇒ thẻ Nhịp hôm nay đã bỏ; từng em hôm nay xem ở màn Học sinh.)
+//     em chưa làm câu nào → Hành trình › Nhịp học (một khối có em chưa làm ⇒ chọn sẵn khối đó) · phần chưa đọc được → Thử lại · không có chỗ
+//     cần chữa ⇒ một dòng ✓. MỖI việc MỘT nút viền.
+//   · phải: thẻ "Đủ mức tối thiểu hôm nay a/b em" + mỗi khối một dòng (thanh + a/b), bấm mở Hành trình › Nhịp học chọn sẵn khối đó.
+//   (Thầy 09/10 tối bỏ thẻ Nhịp hôm nay ⇒ hai lối trên tạm mở màn Học sinh; 09/10 khuya thầy: "hành trình để lại chỗ nhịp học, học sinh chưa làm
+//   và chưa hoàn thành đủ ưu tiên hiện lên đầu" ⇒ hai lối trên mở thẻ Nhịp học — em chưa làm / chưa đủ mức đứng đầu, bấm em xem lịch sử làm câu.)
 //   · BỎ bốn ô số lặp lại danh sách việc (C4: một thông tin một chỗ). Chờ tải: khung xương đúng hình (`.tt-xuong`). Lỗi: câu dễ hiểu
 //     (`lyDoDeHieu`), không in lỗi kỹ thuật thô.
 //   Số "Đủ mức" / "chưa làm" cộng từ bảng hôm nay của các Hành trình — `danh-sach` lọc `hanhTrinh` rồi `bang` → `hanhTrinhNgay.em`, cùng phép
@@ -280,7 +281,6 @@ export default function GvHomNayScreen() {
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const datSo = useSoDemGv((s) => s.datSo)
   const datMoHanhTrinh = useSoDemGv((s) => s.datMoHanhTrinh)
-  const datKhoiHocSinh = useSoDemGv((s) => s.datKhoiHocSinh)
   const [du, setDu] = useState<DuLieuHomNay | null>(null)
   const [dangTai, setDangTai] = useState(false)
 
@@ -314,11 +314,10 @@ export default function GvHomNayScreen() {
     datMoHanhTrinh(m)
     setScreen('chiendich')
   }
-  // Từng em hôm nay (đã làm a/b câu) nằm ở cột "Hôm nay" của màn Học sinh — mở sẵn bộ lọc khối (khối không đọc được ⇒ mọi khối).
-  const moHocSinh = (khoi: string | null | undefined) => {
+  // Từng em hôm nay ở Hành trình › Nhịp học (em chưa làm / chưa đủ mức đứng đầu) — khối đọc được ⇒ chọn sẵn khối ấy, không ⇒ Tất cả.
+  const moNhip = (khoi: string | null | undefined) => {
     const k = Number(khoi)
-    datKhoiHocSinh(k === 10 || k === 11 || k === 12 ? k : null)
-    setScreen('hocsinh')
+    moHanhTrinh(k === 10 || k === 11 || k === 12 ? { the: 'nhip', khoi: k } : { the: 'nhip' })
   }
 
   // VIỆC CẦN THẦY — xếp theo độ gấp: ca đang mở (đang diễn ra) → Cần thầy chữa → em hỏi bài → lớp chờ bài mới → em chưa làm câu nào
@@ -371,8 +370,8 @@ export default function GvHomNayScreen() {
       tieuDe: `${tong.chuaLam} em chưa làm câu nào hôm nay`,
       phu: coEm.map((n) => `Khối ${n.khoi ?? '—'}: ${n.cs!.chuaLam} em`).join(' · '),
       nut: 'Xem danh sách',
-      // Một khối có em chưa làm ⇒ lọc sẵn khối ấy; nhiều khối ⇒ mở cả danh sách (không giấu khối nào).
-      lam: () => moHocSinh(coEm.length === 1 ? coEm[0]!.khoi : null),
+      // Một khối có em chưa làm ⇒ chọn sẵn khối ấy; nhiều khối ⇒ Tất cả (không giấu khối nào). Nhóm "Chưa làm câu nào" đứng đầu thẻ.
+      lam: () => moNhip(coEm.length === 1 ? coEm[0]!.khoi : null),
     })
   }
   // Phần chưa đọc được: MỘT dòng, nói thật phần nào + lý do dễ hiểu + Thử lại (không in lỗi kỹ thuật thô).
@@ -480,8 +479,8 @@ export default function GvHomNayScreen() {
                       key={n.cd.id}
                       type="button"
                       className="gvhn-khoi-dong tt-nhan"
-                      onClick={() => moHocSinh(n.khoi)}
-                      aria-label={`Khối ${n.khoi ?? '—'}: ${n.cs!.duMuc}/${n.cs!.coMuc} em đủ mức — xem từng em khối ${n.khoi ?? '—'} ở màn Học sinh`}
+                      onClick={() => moNhip(n.khoi)}
+                      aria-label={`Khối ${n.khoi ?? '—'}: ${n.cs!.duMuc}/${n.cs!.coMuc} em đủ mức — xem từng em khối ${n.khoi ?? '—'} ở Hành trình › Nhịp học`}
                     >
                       <b>Khối {n.khoi ?? '—'}</b>
                       <span className="gvv2-thanh" data-du="true" aria-hidden="true">
@@ -495,7 +494,7 @@ export default function GvHomNayScreen() {
                   )
                 })}
               </div>
-              <span className="gvhn-du-ghi">Bấm một khối để xem từng em ở màn Học sinh.</span>
+              <span className="gvhn-du-ghi">Bấm một khối để xem từng em ở Hành trình › Nhịp học.</span>
             </aside>
           )}
         </div>

@@ -251,6 +251,9 @@ export default defineConfig({
           // đề / cây đề — chỉ màn thầy nhập: Giao/Sửa chiến dịch, Dạy học, Mở ca, Gọi lên bảng, Bài hôm nay, cây mục đích). Đồ thị nhập đã soát: CHỈ màn
           // thầy nhập ⇒ kho chạy-lúc; máy em / phụ huynh / màn thi không bao giờ tải. Giữ precache vỏ không lớn hơn trước (≈ 2990 KB, trần 3000 KB).
           '**/{GvHomNayScreen,TheCanThayChua,TheBaiDaDay,DayHocLenBang,KiemTraDauGio,CauCanChuaTrenLop,TheCauHienThi,gv-v2,HopChonDe,cay-chon-de}-*.{js,css}',
+          // Hành trình › Nhịp học + tấm Lịch sử làm câu của một em (thầy 09/10 khuya): CHỈ màn thầy nạp lười (thẻ Nhịp học ⇒ bấm một em), lệnh
+          // `/gv/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không cất sẵn.
+          '**/{TheNhipHoc,HoSoLamCauEm,lich-su-lam-cau-api,nhip-hanh-trinh}-*.{js,css}',
           // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
           '**/KhungLoiGiai-*.{js,css}',
           '**/loi-giai-*.{js,css}',
