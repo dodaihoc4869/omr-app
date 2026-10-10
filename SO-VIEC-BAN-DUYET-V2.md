@@ -86,9 +86,9 @@ Thầy nhắn (nguyên văn, kèm ảnh Câu đã làm chồng chữ): "trùng t
 ## Đợt 5 — Hành trình thầy: nhịp học + hồ sơ từng em + số giây (09/10 khuya)
 
 Thầy nhắn (nguyên văn): "hành trình để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử, câu làm sai số giây làm mỗi câu, mọi thứ về học sinh đó."
-- [ ] Hành trình để lại chỗ nhịp học | bằng chứng: (chưa có)
-- [ ] Em chưa làm + chưa hoàn thành đủ ưu tiên lên đầu | bằng chứng: (chưa có)
-- [ ] Bấm từng em ⇒ toàn bộ lịch sử, câu sai, số giây mỗi câu, mọi thứ về em | bằng chứng: (chưa có)
+- [x] Hành trình để lại chỗ nhịp học | bằng chứng: c8f0602a (gộp 88ab6dce) — thẻ Nhịp học (Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa), lọc khối + tìm; ảnh 14-gv-nhip-*.
+- [x] Em chưa làm + chưa hoàn thành đủ ưu tiên lên đầu | bằng chứng: nhóm Chưa làm câu nào → Chưa đủ mức → Đủ mức (→ Chưa có mức); `tests/hanh-trinh-nhip-ho-so-0910.test.tsx` xanh. Hôm nay › Xem danh sách / dòng khối ⇒ Nhịp học.
+- [x] Bấm từng em ⇒ toàn bộ lịch sử, câu sai, số giây mỗi câu, mọi thứ về em | bằng chứng: b4712f81 lệnh CHỈ ĐỌC `/gv/lich-su-lam-cau` (giây: cột giay → raw ms → chi_tiet_cau → ước tính 'uoc' → null) + c8f0602a tấm `HoSoLamCauEm` (Câu sai · Toàn bộ lịch sử theo ngày · nút Mở hồ sơ đầy đủ); `tests/lich-su-lam-cau-0910.test.ts` xanh.
 Thầy nhắn (nguyên văn): "Phần ai sai trong chiếu lên bảng cung hiển thị cả số giây từng làm câu đó"
-- [ ] Chiếu lên bảng › Ai sai: hiện số giây từng em làm câu đó | bằng chứng: (chưa có)
+- [x] Chiếu lên bảng › Ai sai: hiện số giây từng em làm câu đó | bằng chứng: b4712f81 — máy chủ dùng ms đo thật trước ước tính, ca thi lấy thêm chi_tiet_cau.giay; tờ chiếu: "N lần sai · trung bình x giây", chip nào cũng có giây hoặc "chưa đo giờ"; `tests/ai-sai-to-chieu-0510`, `ai-sai-cau-may-chu-0510` xanh.
 - [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
