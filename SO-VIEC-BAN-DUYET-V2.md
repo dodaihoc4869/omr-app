@@ -91,4 +91,4 @@ Thầy nhắn (nguyên văn): "hành trình để lại chỗ nhịp học, họ
 - [x] Bấm từng em ⇒ toàn bộ lịch sử, câu sai, số giây mỗi câu, mọi thứ về em | bằng chứng: b4712f81 lệnh CHỈ ĐỌC `/gv/lich-su-lam-cau` (giây: cột giay → raw ms → chi_tiet_cau → ước tính 'uoc' → null) + c8f0602a tấm `HoSoLamCauEm` (Câu sai · Toàn bộ lịch sử theo ngày · nút Mở hồ sơ đầy đủ); `tests/lich-su-lam-cau-0910.test.ts` xanh.
 Thầy nhắn (nguyên văn): "Phần ai sai trong chiếu lên bảng cung hiển thị cả số giây từng làm câu đó"
 - [x] Chiếu lên bảng › Ai sai: hiện số giây từng em làm câu đó | bằng chứng: b4712f81 — máy chủ dùng ms đo thật trước ước tính, ca thi lấy thêm chi_tiet_cau.giay; tờ chiếu: "N lần sai · trung bình x giây", chip nào cũng có giây hoặc "chưa đo giờ"; `tests/ai-sai-to-chieu-0510`, `ai-sai-cau-may-chu-0510` xanh.
-- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
+- [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: 07:36 D1 có 1 ca mở (11L1-L2) ⇒ HOÃN; 08:15 0 ca mở/0 lượt ⇒ gộp PR227 `a9ec700`, Actions `38012501511` SUCCESS. Lùi: `git revert -m 1 a9ec700`.
