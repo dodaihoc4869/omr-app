@@ -121,6 +121,7 @@ export function docLoiThay(raw: unknown): NhanXetCa[] | null {
 
 // ---------------------------------------------------------------- Game Hoá 2.0 của con ----------------------------------------------------------------
 export interface Hoc2 {
+  goi7?: {ten:string;han:string;tong:number;daGap:number;con:number}[]
   serverNow?: number
   hanhTrinh?: { tang: 1 | 2 | 3 | 4; toiThieu: number }
   chienDich: { ten: string; hanNop: string; conNgay: number; tong: number; daGap: number; thanhThao: number; canDayLai: number } | null
@@ -208,5 +209,6 @@ export function docHoc2(raw: unknown): Hoc2 | null {
     const tang = nguyenKhongAm(raw.hanhTrinh.tang), toiThieu = nguyenKhongAm(raw.hanhTrinh.toiThieu)
     if (tang !== null && tang >= 1 && tang <= 4 && toiThieu !== null && toiThieu > 0 && toiThieu <= 1000) hanhTrinh = { tang: tang as 1 | 2 | 3 | 4, toiThieu }
   }
-  return { ...(serverNow !== null && serverNow <= 8640000000000000 ? { serverNow } : {}), ...(hanhTrinh ? { hanhTrinh } : {}), chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
+  const goi7=Array.isArray(raw.goi7)?raw.goi7.filter((x):x is NonNullable<Hoc2['goi7']>[number]=>laDoiTuong(x)&&typeof x.ten==='string'&&typeof x.han==='string'&&nguyenKhongAm(x.tong)!==null&&nguyenKhongAm(x.daGap)!==null&&nguyenKhongAm(x.con)!==null&&Number(x.daGap)<=Number(x.tong)&&Number(x.con)===Number(x.tong)-Number(x.daGap)):[]
+  return { ...(serverNow !== null && serverNow <= 8640000000000000 ? { serverNow } : {}), ...(hanhTrinh ? { hanhTrinh } : {}), ...(goi7.length?{goi7}:{}), chienDich, homNay, cauTungSai, ...(omni ? { omni } : {}) }
 }

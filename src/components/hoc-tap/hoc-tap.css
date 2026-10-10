@@ -19,3 +19,5 @@
 body[data-hoc-tap=hs] .h2-cdl{--h2c-nen:var(--nen);--h2c-nen-2:var(--the);--h2c-nen-3:var(--the-2);--h2c-chan:var(--the);--h2c-vien:var(--vien);--h2c-chu:var(--muc);--h2c-chu-phu:var(--nhat);--h2c-chu-nhat:var(--nhat);--h2c-xanh:var(--lg-nhan);--h2c-xanh-chu:var(--muc);--h2c-vang-sang:var(--vang-diu);--h2c-vang:var(--vang-diu);--h2c-nau:var(--muc);color-scheme:light dark}
 
 body[data-hoc-tap=hs]{--v2-nen:var(--nen)}
+
+.ht-goi7{padding:16px 0;border-bottom:1px solid var(--vien)}.ht-goi7 h3{font-size:17px;margin:0}.ht-goi7 progress{width:100%;height:8px;border:0;border-radius:8px;accent-color:var(--tim)}.ht-goi7 progress::-webkit-progress-bar{background:var(--the-2);border-radius:8px}.ht-goi7 progress::-webkit-progress-value{background:var(--tim);border-radius:8px}.ht-goi7 progress::-moz-progress-bar{background:var(--tim);border-radius:8px}.ht-goi7 details>summary{padding:16px 0;cursor:pointer;min-height:48px}.ht-goi7-kiem{display:flex;align-items:center;gap:16px;justify-content:space-between;margin:12px 0}.ht-goi7-kiem span{min-width:0}.ht-the:has(>.ht-goi7){margin-bottom:24px}@media(max-width:700px){.ht-goi7-kiem{align-items:flex-start;flex-direction:column}}

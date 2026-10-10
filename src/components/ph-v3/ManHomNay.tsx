@@ -106,7 +106,7 @@ function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
     <section className="ph3-ah ph3-o-du" aria-labelledby="ph3-hn" data-vung="anh-hung">
       {coSo ? (
         <>
-          <p id="ph3-hn" className="ph3-ah__nhan">Con đã làm hôm nay · {ngay}</p>
+          <p id="ph3-hn" className="ph3-ah__nhan">{hoc2?.goi7?'Câu mới con đã gặp hôm nay':'Con đã làm hôm nay'} · {ngay}</p>
           <p className="ph3-ah__cau" data-vung="so-cau-hom-nay"><b>{so.daLam}</b><small>{so.tong !== null ? `/${so.tong} câu` : ' câu'}</small></p>
           {ti !== null && <span className="ph3-ah__thanh" aria-hidden="true"><span className="tt-thanh" style={{ width: `${ti * 100}%` }} /></span>}
         </>
@@ -116,7 +116,7 @@ function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
           <h2 id="ph3-hn">Hôm nay con chưa làm câu nào</h2>
         </>
       )}
-      {tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
+      {hoc2?.goi7 ? <div className="ph3-ah__ghi">{hoc2.goi7.map(g=><p key={g.ten}>{g.ten}: đã gặp {g.daGap}/{g.tong} câu gốc · còn {g.con} câu · hạn {g.han.slice(8,10)}/{g.han.slice(5,7)}.</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div> : tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
       {(gioQuen || hanhTrinh) && (
         <div className="ph3-ah__ghi">
           {gioQuen && <p>{gioQuen}</p>}
