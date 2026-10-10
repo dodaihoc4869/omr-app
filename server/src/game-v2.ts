@@ -271,7 +271,7 @@ const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
  *  (rào ghi chặn được mọi lệnh ghi). KHÔNG gồm Bi-a (phòng đấu Durable Object), võ đài/phòng cũ — các lệnh ấy vẫn chờ cổng trước như cũ. */
-export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
+export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
@@ -378,6 +378,17 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
   // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
   if(action.startsWith('hoc-tap-')){
+    const g7=await import('./goi-bai-7')
+    const cfg7=await g7.coGoi7(env)
+    if(cfg7.bat){
+      if(action==='hoc-tap-sanh'||action==='hoc-tap-start'){const lop7=await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{lop:string}>()
+      await g7.dongBoGoi7(env,Date.now(),10,lop7?.lop??'')}
+      if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
+      if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now());if(r7)return r7}
+      if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
+      if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
+    }
+
     if(!await cheDo2(env,sbd)){
       if(action==='hoc-tap-start')return gameV2(env,'start',{...b,mode:'adventure'},ctx)
       return {ok:true,cheDo2:false}
@@ -387,6 +398,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(!alias[action])throw new Error('Chức năng học này chưa có.')
     const r=await hoa2Action(env,sbd,alias[action]!,b)
     delete r._san
+    if(cfg7.bat && action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7)r.goi7=g7.tomTatGoi7(lap7,Date.now())}
     return r
   }
   if(action==='sync')return {ok:true,...await syncIndex(env)}
@@ -682,6 +694,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(session.mode==='arena'&&p.arena&&!p.arena.finished&&attempt.correct&&!attempt.assisted&&p.arena.learned<2&&!(p.arena.learnedGroups??[]).includes(q.group)){p.arena.gold+=2;p.arena.learned++;p.arena.learnedGroups=[...(p.arena.learnedGroups??[]),q.group]}
     const result={attempt,traLoi:submitted,...(ref.xt?{traLoiGoc:chonVeGoc(ref,q.phan,submitted)}:{}),correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:thuong,...(thuong<step.reward?{thuongGoc:step.reward}:{}),stage:step.mastery.stage,lyDoThuong:lyDoThuong({correct:attempt.correct,assisted:attempt.assisted,reward:thuong,milestone:step.milestone,stage:step.mastery.stage}),...(omni?themVaoKetQua(omni):{})}
     const queries=[env.DB.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)').bind(receipt,sbd,id,qid,q.group,JSON.stringify(result),now(),sbd,revision)]
+    // Bài 7 ngày: phản hồi mở đáp án là một lần xem chữa; lần đo sau không được dùng trí nhớ vừa xem.
+    if((session as {goi7?:number}).goi7===1)queries.push(env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc) SELECT ?,value,? FROM json_each(?) WHERE EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(sbd,new Date(attempt.at).toISOString(),JSON.stringify([...new Set([qid,ref.tc].filter(Boolean))]),receipt))
     if(step.reward)queries.push(env.DB.prepare('INSERT OR IGNORE INTO game_v2_reward(id,sbd,amount,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(`${sbd}|${step.mastery.key}|${step.milestone}`,sbd,thuong,now(),receipt))
     const jsonP=JSON.stringify(p)
     queries.push(env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(jsonP,sbd,revision,receipt))

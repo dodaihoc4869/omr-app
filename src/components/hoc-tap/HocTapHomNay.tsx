@@ -2,9 +2,11 @@ import { useState, type ReactNode } from 'react'
 import { ArrowRight, BookOpen, Check, ChevronRight, GraduationCap, History, Home, LogOut, RefreshCw, Route, UserRound } from 'lucide-react'
 import type { KetQuaSanh } from '../hoa2/api'
 import './hoc-tap.css'
+import TheGoi7 from './TheGoi7'
 
 type Muc = 'hom-nay' | 'hanh-trinh' | 'on-lai' | 'ca-nhan'
 interface Props {
+  onKiem?: (goiId:string,maDe:string)=>void
   dangLamMoi?: boolean; nguon?: string; onKetQua?: () => void; onLuyenLai?: () => void; onBangTin?: () => void;
   thongBao?: ReactNode; canhBao?: ReactNode; tienDoCu?: { daLam: number; mucTieu: number };
   ten: string; lop: string; ketQua: KetQuaSanh | null; dangTai: boolean; loi: string
@@ -19,9 +21,10 @@ export default function HocTapHomNay(p: Props) {
   const [muc, setMuc] = useState<Muc>('hom-nay')
   const sanh = p.ketQua?.cheDo2 && 'sanh' in p.ketQua ? p.ketQua.sanh : null
   const ht = sanh?.hanhTrinh
-  const daLam = ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : p.tienDoCu?.daLam ?? null)
-  const mucNgay = ht?.toiThieu ?? sanh?.theLuc.tong ?? p.tienDoCu?.mucTieu ?? null
-  const xong = daLam !== null && mucNgay !== null && mucNgay > 0 && daLam >= mucNgay
+  const goi7 = sanh?.goi7
+  const daLam = goi7?.daLamHomNay ?? ht?.daLam ?? (sanh ? Math.max(0, sanh.theLuc.tong - sanh.theLuc.con) : p.tienDoCu?.daLam ?? null)
+  const mucNgay = goi7?.toiThieu ?? ht?.toiThieu ?? sanh?.theLuc.tong ?? p.tienDoCu?.mucTieu ?? null
+  const xong = goi7 ? goi7.tuLamCon+goi7.tiepCanCon+goi7.thieuPhu===0 && goi7.goi.every(g=>g.gapHomNay>=g.quota) : daLam !== null && mucNgay !== null && mucNgay > 0 && daLam >= mucNgay
   const soChang = ht?.soChang ?? (mucNgay ? Math.ceil(mucNgay / 6) : 0)
   const con = sanh?.theLuc.con ?? null
   const nutDong = (ten: string, chu: string, onClick: () => void) => <button className="ht-dong" onClick={onClick}><span><strong>{ten}</strong><small>{chu}</small></span><ChevronRight size={20} aria-hidden="true" /></button>
@@ -37,9 +40,10 @@ export default function HocTapHomNay(p: Props) {
         <div className="ht-ca"><BookOpen size={22} aria-hidden="true" /><span><strong>{p.coCa ? 'Ca kiểm tra đang mở' : 'Ca kiểm tra'}</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-phu" onClick={p.onThi}>Vào ca kiểm tra</button></div>
         {muc === 'hom-nay' && <>
           <section className="ht-ke-hoach" aria-busy={p.dangTai && !sanh}>
-            <div><p className="ht-nhan">{xong ? 'ĐÃ ĐẠT MỨC HỌC HÔM NAY' : 'VIỆC HỌC TIẾP THEO'}</p><h2>{p.dangTai && !sanh ? 'Đang tải bài học…' : xong ? 'Em đã hoàn thành mục tiêu hôm nay' : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Đợt ${ht.changHienTai}/${ht.soChang}` : 'Tiếp tục bài học của em'}</h2><p>{sanh?.chienDich?.ten || 'Bài học được chọn theo kiến thức và lịch ôn của em.'}</p><button className="ht-nut-chinh" onClick={p.onHoc} disabled={p.dangLamMoi || p.dangTai && !sanh || con === 0}>{con === 0 ? 'Đã làm hết câu được giao' : daLam ? 'Tiếp tục học' : 'Bắt đầu học'}<ArrowRight size={20} aria-hidden="true" /></button>{xong && <p className="ht-chu-phu">Em có thể nghỉ. Câu đã làm và kiến thức đã vững được theo dõi riêng.</p>}</div>
-            <div className="ht-tien-do"><span className="ht-so-lon">{daLam ?? '—'}<small>/{mucNgay ?? '—'}</small></span><span>câu đã hoàn thành hôm nay</span><progress aria-label="Tiến độ nhiệm vụ hôm nay" value={daLam ?? 0} max={Math.max(1, mucNgay ?? 1)} />{soChang > 0 && <div className="ht-dot" aria-label={`${soChang} đợt học`}>{Array.from({ length: soChang }, (_, i) => <span key={i} data-xong={daLam !== null && daLam >= Math.min((i + 1) * 6, mucNgay ?? Infinity)}>{daLam !== null && daLam >= Math.min((i + 1) * 6, mucNgay ?? Infinity) ? <Check size={16} aria-label="Đã xong" /> : i + 1}</span>)}</div>}<small>Mỗi đợt tối đa 6 câu</small></div>
+            <div><p className="ht-nhan">{xong ? 'ĐÃ ĐẠT MỨC HỌC HÔM NAY' : 'VIỆC HỌC TIẾP THEO'}</p><h2>{p.dangTai && !sanh ? 'Đang tải bài học…' : xong ? 'Em đã hoàn thành phần được xếp hôm nay' : goi7 ? `${goi7.tuLamCon} câu tự làm · ${goi7.tiepCanCon} câu học có hỗ trợ` : ht ? `${TANG[ht.tang - 1] || 'Bài học'} · Đợt ${ht.changHienTai}/${ht.soChang}` : 'Tiếp tục bài học của em'}</h2><p>{goi7?.goi[0]?.ten || sanh?.chienDich?.ten || 'Bài học được chọn theo kiến thức và lịch ôn của em.'}</p><button className="ht-nut-chinh" onClick={p.onHoc} disabled={p.dangLamMoi || p.dangTai && !sanh || con === 0}>{con === 0 ? 'Đã làm hết câu được giao' : daLam ? 'Tiếp tục học' : 'Bắt đầu học'}<ArrowRight size={20} aria-hidden="true" /></button>{xong && <p className="ht-chu-phu">Em có thể nghỉ. Câu đã làm và kiến thức đã vững được theo dõi riêng.</p>}</div>
+            <div className="ht-tien-do"><span className="ht-so-lon">{daLam ?? '—'}<small>/{mucNgay ?? '—'}</small></span><span>câu đã học hôm nay</span><progress aria-label="Tiến độ nhiệm vụ hôm nay" value={daLam ?? 0} max={Math.max(1, mucNgay ?? 1)} />{soChang > 0 && <div className="ht-dot" aria-label={`${soChang} đợt học`}>{Array.from({ length: soChang }, (_, i) => <span key={i} data-xong={daLam !== null && daLam >= Math.min((i + 1) * 6, mucNgay ?? Infinity)}>{daLam !== null && daLam >= Math.min((i + 1) * 6, mucNgay ?? Infinity) ? <Check size={16} aria-label="Đã xong" /> : i + 1}</span>)}</div>}<small>Mỗi đợt tối đa 6 câu</small></div>
           </section>
+          {goi7 && <TheGoi7 du={goi7} onKiem={p.onKiem} />}
           {!!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có; thầy có thể bổ sung kiến thức.</div>}
           {!!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu được giữ cho ca kiểm tra. Bài học sẽ cập nhật khi đủ điều kiện.</div>}
           <div className="ht-hai-cot"><section className="ht-the"><h2>Ôn và sửa đúng chỗ</h2>{nutDong('Tự chữa lỗi', 'Hiểu lại bước đang mắc, rồi thử câu mới.', p.onChua)}{nutDong('Câu đã làm', 'Xem lời giải, lịch ôn và trạng thái kiến thức.', p.onXemLai)}</section><section className="ht-the"><h2>Học thêm theo nhu cầu</h2>{nutDong('Tự luyện', 'Chọn nội dung luyện tập phù hợp.', p.onTuLuyen)}{nutDong('Lịch sử kiểm tra', 'Xem các kết quả đã được công bố.', p.onLichSu)}</section></div>
