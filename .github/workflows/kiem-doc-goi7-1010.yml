@@ -1,0 +1,30 @@
+name: Kiểm đọc gói bài và động cơ 10/10
+on:
+  push:
+    branches: [codex/kiem-doc-goi7-1010]
+    paths: [scripts/kiem-doc-goi7-1010.ts, .github/workflows/kiem-doc-goi7-1010.yml]
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 24, cache: npm}
+      - run: npm ci
+      - name: Làm sạch khoá
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Kiểm cùng bản sống và bộ đọc
+        env:
+          CHUA_RELEASE_SHA: f8df6904c2bdcd136f80893f610a2e26673a1003
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          node scripts/kiem-phat-hanh-chua.mjs --schema --live
+          npx esbuild scripts/kiem-doc-goi7-1010.ts --bundle --platform=node --format=esm --target=node24 --sourcemap=inline --outfile=/tmp/goi7-doc.mjs --log-level=warning
+          node --enable-source-maps /tmp/goi7-doc.mjs
