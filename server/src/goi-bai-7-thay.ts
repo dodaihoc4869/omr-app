@@ -73,6 +73,6 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
     const choChua=em.filter(e=>gap.results.some(r=>r.sbd===e.sbd&&r.qid===q.qid&&r.version===q.version&&r.kieu==='cho_thay')&&!gap.results.some(r=>r.sbd===e.sbd&&r.qid===q.qid&&r.version===q.version&&r.kieu==='co_ho_tro')).map(e=>({sbd:e.sbd,ten:e.ten}))
     return {...q,lyDo:lyDoChua7(q,doan.length,sai),daDo:doan.length,sai,daChua:!!daChua,loiGo:s(daChua?.loi_go),chuaGap,canKiem,choChua}
   }).sort((a,b)=>Number(b.choChua.length>0&&!b.daChua)-Number(a.choChua.length>0&&!a.daChua)||Number(b.lyDo.length>0)-Number(a.lyDo.length>0)||Number(a.daChua)-Number(b.daChua)||b.sai-a.sai||a.qid.localeCompare(b.qid))
-  return {ok:true,bat:true,goi:goi.results,goiId:id,cau,em,canChua:cau.filter(c=>c.lyDo.length&&!c.daChua).length,
+  return {ok:true,bat:true,goi:goi.results,goiId:id,cau,em,canChua:cau.filter(c=>(c.lyDo.length||c.choChua.length)&&!c.daChua).length,
     canGap:em.filter(e=>e.con>0).length,soCau:ds.length,soEm:em.length}
 }

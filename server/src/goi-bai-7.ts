@@ -112,6 +112,13 @@ async function cauTuTick7(env: Env,b: Row): Promise<CauGoi7[]> {
 }
 
 export interface GoiCuaEm7 { id: string; ten: string; khoaBai: string; batDau: string; han: string; cau: CauGoi7[]; daGap: Set<string>; gapNgay: Set<string>; tuLamNgay: Set<string>; choThay: Set<string>; quota: number }
+/** Báo cáo câu mới: vượt quota vẫn hiển thị; một gốc dùng cho hai bài chỉ đếm một lần. */
+export function homNayGoi7(goi:readonly GoiCuaEm7[]){
+  const gap=new Set(goi.flatMap(g=>[...g.gapNgay])),daGap=new Set(goi.flatMap(g=>[...g.daGap]).filter(q=>!gap.has(q)))
+  const cau=[...new Map(goi.flatMap(g=>g.cau).map(c=>[c.qid,c])).values()]
+  const plan=chonGoi7({cau,daGap,daLamNgay:new Set(),quotaCon:0,sanSang:new Set(),chan:new Set(),sua:[],on:[],mucTieuNgay:0,nhomPhu:goi.map(g=>({qids:g.cau.map(c=>c.qid),quota:g.quota}))})
+  return {tong:Math.max(gap.size,plan.viec.length+plan.thieuPhu),daLam:gap.size}
+}
 export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=false): Promise<GoiCuaEm7[]> {
   if(!chiDoc)await damBaoGoi7(env)
   const ngay = ngayVn7(now)

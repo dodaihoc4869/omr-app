@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { taoKhoOmni, themChienDich, lam } from './omni-3-ke-hoach-chung'
-import { dongBoGoi7, docGoiCuaEm7, startGoi7, gapHuongDan7, lapGoi7 } from '../server/src/goi-bai-7'
+import { dongBoGoi7, docGoiCuaEm7, startGoi7, gapHuongDan7, lapGoi7, homNayGoi7 } from '../server/src/goi-bai-7'
 import { chonGoi7, quotaGoi7, diemGoi7, diemTo7, lyDoChua7, diemConDungNguon7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { xoaDemChienDich } from '../server/src/srs2-d1'
@@ -190,6 +190,9 @@ it('nhiều đợt học có hỗ trợ vẫn dừng ở mức ngày, không gia
   const lap=await lapGoi7(k.env,'S1',NOW)
   expect(lap!.daLamNgay).toBe(24);expect(lap!.plan.viec).toHaveLength(0)
   expect((await docGoiCuaEm7(k.env,'S1',NOW))[0]!.gapNgay.size).toBe(24)
+  const goi=await docGoiCuaEm7(k.env,'S1',NOW)
+  expect(homNayGoi7(goi)).toEqual({tong:24,daLam:24})
+  expect(homNayGoi7([...goi,...goi])).toEqual({tong:24,daLam:24})
   expect(k.d.sql.prepare('SELECT COUNT(*) n FROM su_kien_hoc').get()).toMatchObject({n:0})
 })
 it('chuyển trong cùng ngày chỉ lấy bài mới nhất; tick sau giờ chuyển vẫn tự nhận gói riêng',async()=>{
