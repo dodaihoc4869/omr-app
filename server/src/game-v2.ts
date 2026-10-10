@@ -41,7 +41,7 @@ import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,dangChoNgayV5,ngayConThieuLenCap,type TranV5,type TruocSiet4,type TruocV5} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {cheDo2,docCoHoa2} from './srs2-d1'
-import {startDao2CoVe,startDoan2,hoa2Action,LENH_HOA2} from './srs2-game'
+import {startDao2,startDao2CoVe,startDoan2,hoa2Action,LENH_HOA2} from './srs2-game'
 import {omniBat} from './omni-d1'
 import {docSomOmniTraLoi,docTruocOmni,phienXetOmni,soOmniTuKetQuaCu,themVaoKetQua,xetOmniTraLoi,type SoOmni} from './omni-game'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
@@ -271,7 +271,7 @@ const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
  *  (rào ghi chặn được mọi lệnh ghi). KHÔNG gồm Bi-a (phòng đấu Durable Object), võ đài/phòng cũ — các lệnh ấy vẫn chờ cổng trước như cũ. */
-export const laLenhCongSongSong=(action:string):boolean=>['sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
+export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
@@ -374,7 +374,21 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // Tối ưu 05/10: lượt kiểm mật khẩu (khi đệm 60 s trượt) chạy CÙNG đợt với các lượt ĐỌC đầu của lệnh (`batDauDocSom`, gọi khi token đã qua kiểm chữ ký/hạn —
   // token giả bị chặn trước mọi lượt D1 như cũ). Không ghi gì, không trả gì trước khi xác thực xong. `gameIdentity` bị thay (test) ⇒ đọc sau xác thực như cũ.
   const giu:{ds:ReturnType<typeof batDauDocSom>|null}={ds:null}
-  const sbd=await gameIdentity(env,b,s=>{if(action!=='sync')giu.ds=batDauDocSom(env,action,b,s)})
+  const sbd=await gameIdentity(env,b,s=>{if(action!=='sync'&&!action.startsWith('hoc-tap-'))giu.ds=batDauDocSom(env,action,b,s)})
+  // App học sinh tập trung làm bài (10/10): không bắt chọn thần thú, không mở phòng/game.
+  // Cùng bộ kế hoạch, phiên, quyền và answer hiện có; chỉ bỏ ràng buộc cửa Đảo/Đoàn ở giao diện.
+  if(action.startsWith('hoc-tap-')){
+    if(!await cheDo2(env,sbd)){
+      if(action==='hoc-tap-start')return gameV2(env,'start',{...b,mode:'adventure'},ctx)
+      return {ok:true,cheDo2:false}
+    }
+    if(action==='hoc-tap-start')return startDao2(env,sbd,Date.now(),true)
+    const alias:Record<string,string>={'hoc-tap-sanh':'hoa2-sanh','hoc-tap-cau-da-lam':'hoa2-cau-da-lam','hoc-tap-cau-chi-tiet':'hoa2-cau-chi-tiet'}
+    if(!alias[action])throw new Error('Chức năng học này chưa có.')
+    const r=await hoa2Action(env,sbd,alias[action]!,b)
+    delete r._san
+    return r
+  }
   if(action==='sync')return {ok:true,...await syncIndex(env)}
   const ds=giu.ds&&giu.ds.sbd===sbd?giu.ds:batDauDocSom(env,action,b,sbd)
   const {truocAnswer,truocComplete,cheDo2Som,biaSom,cauDaLamSom}=ds
@@ -385,7 +399,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
   // GAME HÓA 2.0 (srs2-game.ts): Sảnh bản đồ, Câu đã làm, Rương Bát Linh. Chỉ khi cờ `cau_hinh.game_hoa_2` bật cho em.
   if(LENH_HOA2.has(action)){
     if(!await cheDo2Som)return {ok:true,cheDo2:false};
-    if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};
+    if(p.choice&&action!=='hoa2-cau-da-lam'&&action!=='hoa2-cau-chi-tiet')return {ok:true,cheDo2:true,canChonThu:true};
     const h=await(cauDaLamSom??hoa2Action(env,sbd,action,b));
     if(action==='hoa2-sanh'&&h.ok===true&&biaSom){
       const san=h._san as { kh: any; hs: any } | undefined;

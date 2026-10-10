@@ -10,11 +10,15 @@ import './che-do-toi.css'
 export default function BatLinhShell({ vai, children }: { vai: 'hs' | 'ph'; children: ReactNode }) {
   useLayoutEffect(() => {
     const truoc = document.body.getAttribute('data-bat-linh')
-    document.body.setAttribute('data-bat-linh', vai)
+    const truocHoc = document.body.getAttribute('data-hoc-tap')
+    if (vai === 'hs') { document.body.removeAttribute('data-bat-linh'); document.body.setAttribute('data-hoc-tap', 'hs') }
+    else document.body.setAttribute('data-bat-linh', vai)
     return () => {
+      if (truocHoc === null) document.body.removeAttribute('data-hoc-tap')
+      else document.body.setAttribute('data-hoc-tap', truocHoc)
       if (truoc === null) document.body.removeAttribute('data-bat-linh')
       else document.body.setAttribute('data-bat-linh', truoc)
     }
   }, [vai])
-  return <div className="bl-app" data-vai={vai}>{children}</div>
+  return <div className={vai === 'hs' ? 'ht-shell' : 'bl-app'} data-vai={vai}>{children}</div>
 }

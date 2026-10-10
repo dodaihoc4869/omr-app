@@ -1,14 +1,10 @@
 import { htmlKhoiLoiGiaiChuan } from '../lib/html-khoi-loi-giai-chuan'
-import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
-// GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
-import { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
-import SanhHomNay from '../components/ban-duyet-v2/SanhHomNay'
+// App học sinh tập trung làm bài; giữ máy chủ giao câu, chấm và tiến độ hiện hành.
+import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
-import { canThanTuSanh, chuoiNgaySanh, doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
-import { PETS } from '../game/than-thu-v2/core'
-import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
-import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
-import { taiThuThachHomNay, DUONG_NOP_THU_THACH, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
+import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
+import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
+import { type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
@@ -25,7 +21,7 @@ import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
-import { useThiDua } from '../lib/use-thi-dua'
+import TheCanhBaoThay from '../components/bang-nhiem-vu/TheCanhBaoThay'
 import { useHopThoai } from '../components/HopThoaiCong'
 import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
@@ -59,11 +55,6 @@ import {
   hsLichSuCaApi,
   hsBtvnApi,
   hsCauSaiApi,
-  hsCauDaThiApi,
-  thanThuDocApi,
-  thanThuGhiApi,
-  voDaiTaoApi, voDaiMoiApi, voDaiLoiMoiApi, voDaiVaoApi,
-  voDaiBatDauApi, voDaiXemApi, voDaiNopApi, voDaiDongApi,
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
@@ -74,27 +65,24 @@ import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
 import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
 import { veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
-import { moManGameNhanh, napManCauDaLam, napManGame, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
-// HAI GAME NẠP MUỘN — đo 14/09: mã game nặng ~234 KB nguồn, mà nhập thẳng
-// vào đây là nó rơi vào MẢNH MÃ CHÍNH (755 KB), thứ MỌI người tải, kể cả phụ
-// huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
-// và service worker cất lại ngay nên lần sau tức thì.
-const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
-/** Màn "Câu đã làm" của Game Hóa 2.0 (kéo TheCau + phiếu in): nạp lười, chỉ em mở mới tải. */
+import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
+// Màn làm bài, chữa và xem lại chỉ tải khi em mở.
+const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
+const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
+
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
 // TU LUYỆN (29/09): màn riêng, nạp lười — máy yếu không tải khi chưa bấm cửa.
 const ManTuLuyen = lazy(() => import('../components/tu-luyen/ManTuLuyen'))
 // CHUYỂN MÀN NHANH (05/10): Sảnh 2.0 nạp trước ba mảnh trên lúc rảnh (components/hoa2/man-sanh-luoi.ts). `veNgayKhiCo`: mảnh đã có ⇒ vẽ
 // thẳng, KHÔNG treo Suspense + 300 ms giữ màn chờ của React; chưa có ⇒ đúng lazy cũ ở trên (cùng màn chờ).
-const GameNhanh = veNgayKhiCo(ThanThuHoaHocGame, napManGame)
+
 const CauDaLamNhanh = veNgayKhiCo(CauDaLam, napManCauDaLam)
 const ManTuLuyenNhanh = veNgayKhiCo(ManTuLuyen, napManTuLuyen)
 // LỊCH SỬ CA + BÁO CÁO CHI TIẾT bản mới (28/09): hai mảnh lazy NGOÀI precache.
 const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
-const BiaGame = lazy(() => import('../game/bi-a/BiaGame'))
+
 /** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
-const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
 import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
@@ -112,8 +100,6 @@ const ModalKhacPhucCauSai = lazy(() => napKhoiPhu().then((m) => ({ default: m.Mo
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
-import { useToanManHinhGame } from '../components/useToanManHinhGame'
-import { ketThucLuotToanManHinh } from '../lib/toan-man-hinh-game'
 import OSoTraLoi from '../components/OSoTraLoi'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from '../lib/hang-doi-nop'
@@ -205,7 +191,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen'
+type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -215,7 +201,7 @@ function ChoNapGame() {
       className="flex items-center justify-center"
       style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}
     >
-      Đang mở game…
+      Đang mở bài học…
     </div>
   )
 }
@@ -262,16 +248,13 @@ export default function StudentPortalScreen() {
   },[auth?.sbd,auth?.token])
 
   // Tab
-  const [tab, setTab] = useState<TabType | null>(null)
+  const [tab, setTabThat] = useState<TabType | null>(null)
+  const setTab = (t: TabType | null) => setTabThat(t === 'thanthu' || t === 'bia' ? 'hoctap' : t)
+  const [qidChua, setQidChua] = useState<string | undefined>()
   // Lịch sử ca mở từ màn Câu đã làm (bản vẽ tối giản 09/10) ⇒ "Về" quay lại Câu đã làm; mở từ chỗ khác ⇒ về màn chính như cũ.
   const [veSauLichSuCa, setVeSauLichSuCa] = useState<TabType | null>(null)
   // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) trong thanh đầu của từng màn game;
   // rời game ⇒ thoát toàn màn hình. Xem lib/toan-man-hinh-game.ts.
-  const moGame = () => {
-    setTab('thanthu')
-  }
-  useToanManHinhGame(tab === 'thanthu')
-  useToanManHinhGame(tab === 'bia') // Bi-a Phản Ứng: nút toàn màn hình riêng trong màn chơi (chỉ hiện bàn); rời tab ⇒ thoát toàn màn hình
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
 
   // Dữ liệu ca thi & điểm
@@ -341,7 +324,7 @@ export default function StudentPortalScreen() {
   const [dangLamMom, setDangLamMom] = useState<BaiMomGiao | null>(null)
   const hoiRoiBaiMom = () => { void hoi({ tieuDe: 'Rời bài đang làm?', noiDung: 'Em quay về danh sách bài. Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.', nutDongY: 'Rời bài', nutHuy: 'Làm tiếp' }).then((dongY) => { if (dongY) setDangLamMom(null) }) }
   // Việc ÔN CÂU (on_lai) đang làm trong sheet 'cauon': đúng các qid máy chủ chọn, nộp về /hs/on-lai/nop.
-  const [cauOn, setCauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string; cauSan?: CauOn[]; duongNop?: string } | null>(null)
+  const [cauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string; cauSan?: CauOn[]; duongNop?: string } | null>(null)
   const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
   const [thongBaoNopMom, setThongBaoNopMom] = useState<string | null>(null)
 
@@ -735,91 +718,6 @@ export default function StudentPortalScreen() {
     }
   }
 
-  // Xử lý hành động 1-Click từ Trợ lý cá nhân (Zero-Friction Direct Test Launch)
-  const xuLyHanhDongTroLy = useCallback((hanhDong: any) => {
-    if (!hanhDong) return
-    switch (hanhDong.loai) {
-      case 'mo_btvn':
-        if (hanhDong.payload?.bt) {
-          void moBaiTap(hanhDong.payload.bt, false, {
-            vong: hanhDong.payload?.vong,
-            soCauSang: hanhDong.payload?.soCau,
-          })
-        } else {
-          setTab('btvn')
-        }
-        break
-      case 'mo_mom':
-        if (hanhDong.payload?.bai) {
-          void batDauLamBaiMom(hanhDong.payload.bai)
-        } else if (hanhDong.payload?.id) {
-          void batDauLamBaiMom({ id: hanhDong.payload.id } as BaiMomGiao)
-        } else {
-          setTab('mom')
-        }
-        break
-      case 'lam_cau_on':
-        if (Array.isArray(hanhDong.payload?.qid) && hanhDong.payload.qid.length > 0) {
-          setCauOn({ viecId: String(hanhDong.payload.viecId || 'on_lai'), qid: hanhDong.payload.qid, tieuDe: String(hanhDong.payload.tieuDe || 'Ôn câu hôm nay') })
-          setTab('cauon')
-        }
-        break
-      case 'mo_khac_phuc':
-        void (async () => {
-          if (!auth?.token) return
-          setDangMoDe(true)
-          try {
-            const kh = await taiKeHoachNgay({ token: auth.token })
-            if (!kh) {
-              void bao('Chưa tải được lịch ôn. Em thử lại khi có kết nối.', 'Chưa mở được bài ôn')
-              return
-            }
-            const viec = kh.viec.find((v) => (v.loai === 'on_lai' || v.loai === 'on_thi') && v.hien !== false && Array.isArray(v.chiTiet?.qid) && v.chiTiet.qid.length > 0)
-            if (!viec) {
-              void bao('Hôm nay em chưa có câu cần ôn theo lịch.', 'Lịch ôn của em')
-              return
-            }
-            const qid = [...new Set((viec.chiTiet!.qid as unknown[]).filter((q): q is string => typeof q === 'string' && q.length > 0))]
-            if (!qid.length) return
-            setCauOn({ viecId: viec.id, qid, tieuDe: 'Ôn câu theo lịch của em' })
-            setTab('cauon')
-          } catch (err) {
-            void bao(err instanceof Error ? err.message : 'Chưa mở được bài ôn', 'Chưa mở được bài ôn')
-          } finally {
-            setDangMoDe(false)
-          }
-        })()
-        break
-      case 'mo_thu_thach':
-        void (async () => {
-          if (!auth?.token) return
-          setDangMoDe(true)
-          try {
-            const t = await taiThuThachHomNay(auth.token)
-            if (!t || t.cau.length === 0) {
-              void bao('Chưa có câu thử thách phù hợp với phần em đã học hôm nay.', 'Chưa có câu thử thách')
-              return
-            }
-            setCauOn({ viecId: `thu_thach_rieng:${t.ngay}`, qid: t.cau.map((c) => c.qid), tieuDe: 'Thử thách riêng hôm nay', cauSan: t.cau as unknown as CauOn[], duongNop: DUONG_NOP_THU_THACH })
-            setTab('cauon')
-          } catch (err) {
-            void bao(err instanceof Error ? err.message : 'Chưa mở được bài thử thách', 'Chưa mở được bài thử thách')
-          } finally {
-            setDangMoDe(false)
-          }
-        })()
-        break
-      case 'mo_thi':
-        setTab('vaothi')
-        break
-      case 'mo_than_thu':
-        moGame()
-        break
-      default:
-        break
-    }
-  }, [moBaiTap, batDauLamBaiMom, auth])
-
   // Nạp dữ liệu khi đã đăng nhập
   useEffect(() => {
     if (!auth) return
@@ -882,7 +780,7 @@ export default function StudentPortalScreen() {
   const lamMoiSheet = useLamMoiKhiDong(dangMoManCon)
   // GAME HÓA 2.0: hỏi `hoa2-sanh` sau đăng nhập và mỗi lần vừa đóng một màn con (game, Câu đã làm…). `cheDo2` = máy chủ bật cờ cho em
   // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
-  const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang)
+  const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang, true)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
   // PHIÊN CŨ KHÔNG CÒN DÙNG ĐƯỢC (07/10: mã bí mật máy chủ đổi ⇒ token cất trong máy bị từ chối "Phiên game không hợp lệ"; nút Thử lại gửi lại đúng token hỏng):
   // máy chủ nói token hỏng / hết hạn / mật khẩu đã đổi ⇒ đăng xuất, màn đăng nhập hiện một dòng giải thích.
@@ -900,7 +798,6 @@ export default function StudentPortalScreen() {
   }, [cheDo2, tab])
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
-  const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null && !cheDo2)
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
   const duLieuNhiemVu = useMemo(
     () =>
@@ -927,83 +824,6 @@ export default function StudentPortalScreen() {
   const banNho = useBanNho(auth?.sbd, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
   const dungBanNho = !!banNho && !sanSangBang
   const duLieuBang = useMemo(() => (dungBanNho ? banNho! : duLieuNhiemVu), [dungBanNho, banNho, duLieuNhiemVu]) // thẻ Thử thách riêng (Bộ não A.I) đã gỡ 28/09
-  // HUD của Sảnh (Game Hóa 2.0): thần thú / EXP / chuỗi ngày lấy ĐÚNG nguồn Bảng nhiệm vụ đang dùng (/hs/ke-hoach-ngay, kể cả bản nhớ cùng ngày).
-  // Tên vừa đổi (máy chủ đã lưu) phủ lên ngay, không chờ /hs/ke-hoach-ngay tải lại (bản nhớ cùng ngày còn tên cũ). Theo SBD.
-  const [tenThuDaDoi, setTenThuDaDoi] = useState<{ sbd: string; ten: string } | null>(null)
-  const thuSanh = useMemo((): ThuTrenHud | null => {
-    const t = duLieuBang.thanThu
-    if (t.kieu !== 'co') return null
-    const index = PETS.findIndex((p) => p.id === t.pet)
-    const tenMoi = tenThuDaDoi && tenThuDaDoi.sbd === auth?.sbd ? tenThuDaDoi.ten : ''
-    return index < 0 ? null : { index, cap: t.cap, ten: tenMoi || t.ten || PETS[index].name }
-  }, [duLieuBang.thanThu, tenThuDaDoi, auth?.sbd])
-  const expSanh = duLieuBang.exp ? { homNay: duLieuBang.exp.homNay, conThieu: duLieuBang.exp.thu?.expConThieu ?? null } : null
-
-  // Rút đề khắc phục câu sai
-  /**
-   * LẤY CÂU SAI CỦA EM CHO GAME THẦN THÚ.
-   *
-   * Truyền xuống dưới dạng HÀM GỌI LẠI, không truyền số báo danh: game không
-   * cần biết em là ai, nó chỉ cần nội dung câu và nhãn dạng thầy đã gắn.
-   * Danh sách mã ca để RỖNG nghĩa là lấy câu sai của mọi ca em đã thi.
-   */
-  const layCauSaiChoGame = useCallback(async () => {
-    if (!auth) return []
-    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-    // THÁP LẤY MỌI CÂU EM ĐÃ THI, không riêng câu sai — thầy chốt 15-09.
-    // Máy chủ chưa đẩy bản mới thì lùi về kho câu sai, em vẫn leo được.
-    const moi = await hsCauDaThiApi(url, auth.sbd, [])
-    if (moi.ok && moi.items) return moi.items as NonNullable<Awaited<ReturnType<typeof hsCauSaiApi>>['items']>
-    const res = await hsCauSaiApi(url, auth.sbd, [])
-    if (!res.ok || !res.items) throw new Error(res.error || 'Máy chủ không trả được câu hỏi của em')
-    return res.items
-  }, [auth])
-
-  /**
-   * ĐỒNG BỘ THẦN THÚ ĐA THIẾT BỊ.
-   *
-   * Thầy bắt được 15-09: điện thoại thấy trứng, web thấy có sừng. Game không
-   * biết số báo danh (và không cần biết) — cổng này biết, nên cổng gọi máy chủ
-   * rồi trao kết quả xuống. Chỉ tiến trình game đi qua đây: cấp thú, EXP, tầng
-   * tháp. Không tên, không điểm, không ảnh bài.
-   */
-  const docThanThuChoGame = useCallback(async () => {
-    if (!auth) return null
-    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-    const res = await thanThuDocApi(url, auth.sbd)
-    if (!res.ok) throw new Error(res.error || 'Máy chủ không trả được hồ sơ thần thú')
-    return res.hoSo ?? null
-  }, [auth])
-
-  const ghiThanThuChoGame = useCallback(async (hoSo: unknown) => {
-    if (!auth) return null
-    const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-    return await thanThuGhiApi(url, auth.sbd, hoSo)
-  }, [auth])
-
-  /**
-   * CỔNG ĐẤU TRƯỜNG CHÂN LÝ.
-   *
-   * Tám hàm dưới đây đóng sẵn số báo danh vào, nên màn game vẫn KHÔNG nhận số
-   * báo danh — đúng luật đã đặt cho cả game từ đầu. Số báo danh của BẠN mà em
-   * gõ vào ô mời thì đi thẳng lên máy chủ, không cất ở đâu trong máy.
-   */
-  const congVoDai = useMemo(() => {
-    if (!auth) return undefined
-    const url = () => loadScriptUrlHoacMacDinh().catch(() => '')
-    return {
-      taoPhong: async (biDanh: string, he: string) => voDaiTaoApi(await url(), auth.sbd, biDanh, he),
-      moi: async (ma: string, dsSbd: string[]) => voDaiMoiApi(await url(), auth.sbd, ma, dsSbd),
-      loiMoi: async () => voDaiLoiMoiApi(await url(), auth.sbd),
-      vao: async (ma: string, biDanh: string, he: string) => voDaiVaoApi(await url(), auth.sbd, ma, biDanh, he),
-      batDau: async (ma: string) => voDaiBatDauApi(await url(), auth.sbd, ma),
-      xem: async (ma: string) => voDaiXemApi(await url(), auth.sbd, ma),
-      nop: async (ma: string, vong: number, nop: Record<string, unknown>) =>
-        voDaiNopApi(await url(), auth.sbd, ma, vong, nop),
-      dong: async (ma: string) => voDaiDongApi(await url(), auth.sbd, ma),
-    }
-  }, [auth])
-
   const taoDeKhacPhuc = async (danhSachMaCaTuyChon?: string[]) => {
     if (!auth) return
     let dsMaCa = danhSachMaCaTuyChon && danhSachMaCaTuyChon.length > 0 ? danhSachMaCaTuyChon : []
@@ -1074,19 +894,7 @@ export default function StudentPortalScreen() {
   }
 
   // Vỏ M3 của sheet toàn màn: chỉ ở cổng học sinh (dungM3) và không phải game (game thần thú giữ nguyên, test khoá).
-  const vaoM3 = dungM3() && tab !== 'thanthu'
-  /** Mở game thần thú ở đúng màn đầu (hợp đồng docs/hop-dong-mo-game-doan-ho-tong-1909.md: game đọc khoá MỘT lần rồi tự xoá). Rỗng = màn Đảo. */
-  const moGameTai = (manDau: '' | 'doan' | 'shop' | 'tui-do' | 'than-thu') => {
-    try {
-      if (manDau) sessionStorage.setItem(KHOA_MAN_DAU_GAME, manDau)
-      else sessionStorage.removeItem(KHOA_MAN_DAU_GAME)
-    } catch {
-      /* máy chặn lưu: game vẫn mở ở màn Đảo */
-    }
-    // Chuyển màn nhanh (05/10): bắn ngay lệnh mở game + tải mảnh màn đích, song song với lúc vẽ (man-sanh-luoi.ts · moManGameNhanh).
-    moManGameNhanh(auth.sbd, auth.token || undefined, manDau)
-    moGame()
-  }
+  const vaoM3 = dungM3()
   const hoiDangXuat = () => {
     void hoi({ tieuDe: 'Đăng xuất khỏi máy này?', noiDung: 'Lần sau em nhập lại số báo danh và mật khẩu để vào app.', nutDongY: 'Đăng xuất', nutHuy: 'Ở lại' }).then((dongY) => {
       if (dongY) void dangXuat()
@@ -1113,98 +921,21 @@ export default function StudentPortalScreen() {
       {hop}
       {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
       {auth.token && !manThi && tab === null && <TheDiemDanhHs token={auth.token} />}
-      {auth.token && cheDo2 && !manThi && (
-        <SanhHomNay
-          tenEm={auth.hoTen}
-          lop={auth.lop}
-          ketQua={hoa2.ketQua}
-          loi={hoa2.loi}
-          dangTai={hoa2.dangTai}
-          thu={thuSanh}
-          exp={expSanh}
-          chuoiNgay={chuoiNgaySanh(hoa2.ketQua, duLieuBang.chuoiNgay.soNgay)}
-          caDangMo={caDangMo}
-          now={nowHocTap}
-          token={auth.token}
-          shopBat={duLieuBang.thanThu.kieu === 'co' && duLieuBang.thanThu.shopBat === true}
-          onVaoThi={() => setTab('vaothi')}
-          onPhaPhucKich={() => moGameTai('doan')}
-          onKhamPhaDao={() => moGameTai('')}
-          onCauDaLam={() => setTab('caudalam')}
-          caGanNhat={dsChuaCongBo !== null ? chuTheCaGanNhat(dungLichSuCa(dsLichSu, dsChuaCongBo)) : null}
-          onLichSuCa={() => setTab('lichsuca')}
-          onChoiBia={() => setTab('bia')}
-          onTuLuyen={() => setTab('tuluyen')}
-          onTuiDo={() => moGameTai('tui-do')}
-          onCuaHang={() => moGameTai('shop')}
-          onMoThanThu={() => moGameTai('than-thu')}
-          onDoiTen={async (ten) => {
-            const sbd = auth.sbd
-            const daLuu = await doiTenThu(auth.token!, ten)
-            setTenThuDaDoi({ sbd, ten: daLuu })
-          }}
-          onChonThu={() => moGameTai('')}
-          onDangXuat={hoiDangXuat}
-          onTaiLai={hoa2.taiLai}
+      {auth.token && !manThi && (
+        <HocTapHomNay thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
+          canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
+          tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
+          coCa={!!caDangMo} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
+          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => setTab('vaothi')}
+          onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
+          onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
         />
       )}
-      {auth.token && !cheDo2 && !(tab === 'mom' && dangLamMom) && !manThi && (
-        <BangNhiemVu
-          vaiTro="hocsinh"
-          hoTen={auth.hoTen}
-          now={nowHocTap}
-          duLieu={duLieuBang}
-          thiDua={thiDua}
-          onCanhBaoDaXem={(cb) => void baoDaXemHocSinh(auth.token!, cb.id)}
-          dangTai={!sanSangBang && !dungBanNho}
-          dangLamMoi={keHoachNgay.dangLamMoi}
-          dangChoNop={hangNop.soCho}
-          onMoShop={() => {
-            // Cửa vào Cửa hàng phụ kiện (chỉ có nút khi máy chủ báo `thanThu.shopBat`): khoá màn đầu = 'shop' rồi mở game; Đảo mở thẳng Cửa hàng khi `recommendations` cũng báo shopBat.
-            try {
-              sessionStorage.setItem(KHOA_MAN_DAU_GAME, 'shop')
-            } catch {
-              /* máy chặn lưu: game vẫn mở ở màn Đảo */
-            }
-            moGame()
-          }}
-          mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
-          khePhai={
-            <ThongBaoHocSinh
-              token={auth.token}
-              onOpen={(t, noticeId) => {
-                setTab(t)
-                if (t === 'mom') {
-                  void napDsMom()
-                  if (noticeId) {
-                    const momId = noticeId.startsWith('mom:') ? noticeId.split(':')[2] : noticeId
-                    if (momId) void batDauLamBaiMom({ id: momId } as BaiMomGiao)
-                  }
-                } else if (t === 'btvn') {
-                  void napLaiBtvn()
-                }
-              }}
-            />
-          }
-          caDangMo={caDangMo}
-          onHanhDong={xuLyHanhDongTroLy}
-          onMoThanThu={moGame}
-          onLenDuongDoan={() => {
-            // Hợp đồng cửa vào của game (docs/hop-dong-mo-game-doan-ho-tong-1909.md): khoá màn đầu rồi mở tab game; game đọc MỘT lần rồi tự xoá.
-            try {
-              sessionStorage.setItem(KHOA_MAN_DAU_GAME, 'doan')
-            } catch {
-              /* máy chặn lưu: game vẫn mở, ở màn Đảo thần thú */
-            }
-            moGame()
-          }}
-          onVaoThi={() => setTab('vaothi')}
-          onXemBaiDaNop={() => moManCu('diem')}
-        />
-      )}
+      {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} /></Suspense></div>}
+      {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
-      {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Sảnh" của chính nó. */}
+      {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Hôm nay" của chính nó. */}
       {/* LỊCH SỬ CA KIỂM TRA (thẻ nhỏ trên Sảnh): màn riêng toàn màn hình, lazy ngoài precache. */}
       {tab === 'lichsuca' && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
@@ -1245,14 +976,7 @@ export default function StudentPortalScreen() {
         </div>
       )}
 
-      {/* BI-A PHẢN ỨNG (cửa thứ ba trên Sảnh): màn riêng toàn màn hình, có nút "Sảnh" của chính nó. */}
-      {tab === 'bia' && auth.token && (
-        <Suspense fallback={<ChoNapGame />}>
-          <BiaGame token={auth.token} hoTen={auth.hoTen} onVe={() => setTab(null)} />
-        </Suspense>
-      )}
-
-      {/* TU LUYỆN (cửa trên Sảnh): 4 chế độ luyện tự do, không tính EXP — màn riêng toàn màn hình, nút "Về Sảnh" của chính nó. */}
+      {/* TU LUYỆN (cửa trên Sảnh): 4 chế độ luyện tự do, không tính EXP — màn riêng toàn màn hình, nút "Về Hôm nay" của chính nó. */}
       {tab === 'tuluyen' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
@@ -1261,7 +985,7 @@ export default function StudentPortalScreen() {
         </div>
       )}
 
-      {tab !== null && tab !== 'caudalam' && tab !== 'bia' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
+      {tab !== null && tab !== 'hoctap' && tab !== 'tuchua' && tab !== 'caudalam' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
         >
@@ -1270,7 +994,7 @@ export default function StudentPortalScreen() {
             <ThanhTren
               tieuDe={tieuSheet}
               onQuayLai={() => setTab(null)}
-              nhanQuayLai={cheDo2 ? 'Về Sảnh' : 'Quay lại Bảng tin'}
+              nhanQuayLai="Về Hôm nay"
               phai={
                 <button type="button" onClick={() => setTab(null)} className="m3-nut-chu" title="Đóng toàn màn hình">
                   <X size={18} aria-hidden="true" />
@@ -1279,10 +1003,8 @@ export default function StudentPortalScreen() {
               }
             />
           )}
-          {/* GAME KHÔNG CÒN THANH TRÊN CỦA VỎ SHEET (thầy lệnh 21/09 · H4): trước đây "Quay lại Bảng tin" + "Đóng" nằm đè lên dải ải và trùng việc với nút "Về app học sinh" của chính game (bị thanh này che). Game tự có nút về ở MỌI màn
-              (Đảo: nút dính trên cùng · Thám hiểm: "Về đảo" · Đoàn/Võ đài/Tiến bộ: thanh riêng) nên chỉ còn MỘT nút về. */}
-          {!vaoM3 && tab !== 'thanthu' && <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
-            <NutQuayLai onClick={() => setTab(null)} label="Quay lại Bảng tin" />
+          {!vaoM3 && <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
+            <NutQuayLai onClick={() => setTab(null)} label="Về Hôm nay" />
 
             <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
@@ -2129,31 +1851,6 @@ export default function StudentPortalScreen() {
           </PhongVaoThi>
         )}
 
-        {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
-            Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
-        {tab === 'thanthu' && (
-          <Suspense fallback={<ChoNapGame />}>
-          <GameNhanh
-            sbd={auth.sbd}
-            token={auth.token}
-            dsLichSu={dsLichSu}
-            dsBtvn={dsBtvn}
-            dsMom={dsMomGiao}
-            layCauSaiCuaEm={layCauSaiChoGame}
-            docThanThuMayChu={docThanThuChoGame}
-            ghiThanThuMayChu={ghiThanThuChoGame}
-            congVoDai={congVoDai}
-            onDong={() => {
-              ketThucLuotToanManHinh() // Về app học sinh: thoát toàn màn hình rồi về app
-              setTab(null)
-            }}
-            onChuyenSangKhacPhuc={() => setTab(cheDo2 ? null : 'khacphuc')}
-            onChuyenSangBtvn={() => setTab(cheDo2 ? null : 'btvn')}
-            onChuyenSangVaoThi={() => setTab('vaothi')}
-            onDangXuat={hoiDangXuat}
-          />
-          </Suspense>
-        )}
           </main>
         </div>
       )}

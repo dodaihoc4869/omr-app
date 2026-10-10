@@ -48,7 +48,7 @@ export function themInTuDong(html: string): string {
 
 function dongHenOn(c: CauDaLamMuc): string {
   if (c.tuLuan) return ''
-  if (c.trangThai === 'can_day_lai') return 'Thầy chữa câu này trên lớp. Chữa xong, câu quay lại Đoàn Hộ Tống từ hôm sau.'
+  if (c.trangThai === 'can_day_lai') return 'Thầy chữa câu này trên lớp. Chữa xong, câu quay lại kế hoạch ôn từ hôm sau.'
   if (c.henOn) return `Đến lịch ôn lại: ${thuNgayThang(c.henOn)}`
   if (c.trangThai === 'thanh_thao') return 'Em đã thành thạo câu này.'
   return ''
@@ -536,11 +536,11 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     return (
       <div className="h2-cdl h2-cdl-ngang" data-bo-cuc="ngang" data-thap={bc.thap ? 'true' : 'false'} data-trang-thai={trangThaiDs} style={bc.thap ? ({ '--h2-ti-le': String(bc.tiLe) } as CSSProperties) : undefined}>
         <header className="h2-cdl-ng-dau">
-          <button type="button" className="h2-cdl-ve h2-cdl-ve-chu" aria-label="Về Sảnh" onClick={onVe}>
+          <button type="button" className="h2-cdl-ve h2-cdl-ve-chu" aria-label="Về Hôm nay" onClick={onVe}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M15 18l-6-6 6-6" />
             </svg>
-            <span aria-hidden="true">Về Sảnh</span>
+            <span aria-hidden="true">Về Hôm nay</span>
           </button>
           <div className="h2-cdl-ng-tieu">
             <h1 className="h2-cdl-tieu">Câu đã làm</h1>
@@ -599,7 +599,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
     <div className="h2-cdl" data-trang-thai={trangThaiDs}>
       <header className="h2-cdl-dau">
         <div className="h2-cdl-hang">
-          <button type="button" className="h2-cdl-ve" aria-label="Về Sảnh" onClick={onVe}>
+          <button type="button" className="h2-cdl-ve" aria-label="Về Hôm nay" onClick={onVe}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M15 18l-6-6 6-6" />
             </svg>
