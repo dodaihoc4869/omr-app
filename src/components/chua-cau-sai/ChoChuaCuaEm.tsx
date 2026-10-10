@@ -16,17 +16,17 @@ const nhan: Record<string, string> = {
 
 function IconLoTrinh() {
   return (
-    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-      <path d="M6.5 4.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM17.5 15.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" fill="currentColor" />
-      <path d="M8.5 6.5h4a3 3 0 0 1 3 3v0a3 3 0 0 1-3 3h-1a3 3 0 0 0-3 3v0a2 2 0 0 0 2 2h5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3H8a3 3 0 0 0-3 3v2a3 3 0 0 0 3 3h8" />
+      <path d="M16 19l3 3-3 3" />
     </svg>
   )
 }
 
 function IconMo() {
   return (
-    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-      <path d="m7.5 5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m7.5 5 5 5-5 5" />
     </svg>
   )
 }
@@ -72,7 +72,10 @@ export default function ChoChuaCuaEm({ token }: { token: string }) {
         </span>
         <span className="tlu-cho-chua-tom-tat" aria-label={`${hienThi.length} câu đang chờ`}>
           <strong className="tlu-tab">{hienThi.length}</strong>
-          <span>câu đang chờ</span>
+          <span className="tlu-cho-chua-tom-tat-chu">
+            <span>câu</span>
+            <span>đang chờ</span>
+          </span>
         </span>
       </div>
       <div className="tlu-cho-chua-luoi">

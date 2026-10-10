@@ -167,25 +167,25 @@ function IconVe() {
 /** Biểu tượng của từng chế độ (nét đơn, màu theo chữ). */
 function IconCheDo({ cheDo }: { cheDo: CheDoTuLuyen }) {
   const p = { width: 26, height: 26, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true, focusable: false }
-  if (cheDo === 1) return <svg {...p}><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /><path d="M9 12l2 2 4-4" /></svg>
+  if (cheDo === 1) return <svg {...p}><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /><path d="M12 7v5l3 2" /></svg>
   if (cheDo === 2) return <svg {...p}><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><path d="M17.5 14v7M14 17.5h7" /></svg>
-  if (cheDo === 3) return <svg {...p}><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M8 7h7M8 11h5" /></svg>
-  return <svg {...p}><path d="M16 3h5v5" /><path d="M4 20L21 3" /><path d="M21 16v5h-5" /><path d="M15 15l6 6" /><path d="M4 4l5 5" /></svg>
+  if (cheDo === 3) return <svg {...p}><rect x="4" y="3" width="16" height="18" rx="3" /><path d="M8 9h8M8 13h6" /></svg>
+  return <svg {...p}><path d="M15 3h6v6" /><path d="M21 3l-7 7" /><path d="M9 21H3v-6" /><path d="M3 21l7-7" /></svg>
 }
 
 function IconTongHop() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+      <path d="M6 20v-6M12 20V4M18 20v-10M2 20h20" />
     </svg>
   )
 }
 function IconLuyenDeThe() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-      <path d="M7 3h8l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
-      <path d="M15 3v4h4" />
-      <path d="M8.5 11h7M8.5 14.5h7M8.5 18h4" />
+      <path d="M6 3h8l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M14 3v5h5" />
+      <path d="M8 12h8M8 15.5h8M8 19h5" />
     </svg>
   )
 }
@@ -242,11 +242,10 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const [tomTat, setTomTat] = useState<TomTatTongHop | null>(null)
   const [soDeLd, setSoDeLd] = useState(0)
   useEffect(() => {
-    if (!rong) return
     let song = true
     void taiTongHop(token).then((r) => { if (song && r.ok) { setTomTat(tongHopTuLuyen(r.du.luot, r.du.cau, Date.now())); setSoDeLd(r.du.luyenDe.length) } })
     return () => { song = false }
-  }, [rong, token, lamMoiTongHop])
+  }, [token, lamMoiTongHop])
   const [chamTungCau, setChamTungCau] = useState(docChamTungCau)
   const [dangCham, setDangCham] = useState('')
 
@@ -807,7 +806,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         <span className="tlu-the-hinh" aria-hidden="true"><IconLuyenDeThe /></span>
         <span className="tlu-the-dau">
           <span className="tlu-the-che-do-icon"><IconLuyenDeThe /></span>
-          {ldKhoa ? <span className="tlu-the-khoa"><IconKhoaNho />Đang khoá</span> : dieuKien?.trangThai === 'mo' ? <span className="tlu-the-mo">Đã mở cho em</span> : null}
+          {ldKhoa && <span className="tlu-the-khoa"><IconKhoaNho />Đang khoá</span>}
         </span>
         <span className="tlu-the-che-do-chu">
           <span className="tlu-the-che-do-ten">Luyện đề cấu trúc</span>
