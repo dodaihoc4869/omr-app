@@ -74,6 +74,21 @@ it('phiên đang làm dở giữ nháp tham chiếu, chỉ trả câu chưa nộ
   expect(next!.id).toBe(r!.id);expect((next!.questions as PrivateQuestion[]).map(q=>q.qid)).not.toContain(q.qid)
   expect(k.d.sql.prepare('SELECT qid FROM loi_giai_hoi WHERE sbd=? AND qid=?').get('S1',q.qid)).toMatchObject({qid:q.qid})
 })
+it('màn học chấm số tương đương giống ca thi; phiên game cũ và kết quả đã chốt vẫn giữ luật của phiên',async()=>{
+  for(const hocTap of [true,false]){
+    const k=await kho(1),qid=k.qids('DH-B1')[0]!,r=k.d.sql.prepare('SELECT json FROM game_v2_question WHERE qid=?').get(qid) as {json:string}
+    const src=JSON.parse(r.json);Object.assign(src,{phan:'III',choices:[],ideas:[],correct:'4'})
+    k.d.sql.prepare('UPDATE game_v2_question SET json=? WHERE qid=?').run(JSON.stringify(src),qid)
+    await dongBoGoi7(k.env,NOW+21000,100,'',true)
+    const start=await startGoi7(k.env,'S1',NOW+21000)
+    if(!hocTap)k.d.sql.prepare("UPDATE game_v2_session SET json=json_remove(json,'$.hocTap','$.goi7') WHERE id=?").run(start!.id as string)
+    const result=await gameV2(k.env,'answer',{token:k.token,session:start!.id,qid,answer:'4,0',msLam:20000})
+    expect(result.correct).toBe(hocTap)
+    // Gửi lại không đổi kết quả đầu, kể cả đáp án gửi lại đã khác.
+    const again=await gameV2(k.env,'answer',{token:k.token,session:start!.id,qid,answer:'4',msLam:20000})
+    expect(again.correct).toBe(hocTap);expect(again.replayed).toBe(true)
+  }
+})
 it('xem chữa ghi đã gặp có hỗ trợ, không ghi đúng/sai; chống truy cập chéo và nộp giả tự làm',async()=>{
   const k=await kho(25),r=await startGoi7(k.env,'S1',NOW),q=(r!.questions as PrivateQuestion[])[0]!
   await expect(gapHuongDan7(k.env,'S2',{session:r!.id,qid:q.qid,chuaTuLam:true},NOW)).rejects.toThrow()
