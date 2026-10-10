@@ -13,10 +13,10 @@ export interface GiaoTuCa {
   ten: string
 }
 
-/** Bốn thẻ của màn Hành trình (thầy 09/10 tối: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại nữa nhé"; 09/10 khuya: "hành trình
- *  để lại chỗ nhịp học"): Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã
+/** Các thẻ của màn Hành trình: Dạy học · Bài mới trong 7 ngày · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa.
+ *  10/10 thêm bài 7 ngày ngay sau Dạy học. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã
  *  giao" của cùng màn (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca). */
-export type TheHanhTrinh = 'day-hoc' | 'nhip' | 'dau-gio' | 'can-chua' | 'chien-dich'
+export type TheHanhTrinh = 'day-hoc' | 'goi-7' | 'nhip' | 'dau-gio' | 'can-chua' | 'chien-dich'
 
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {

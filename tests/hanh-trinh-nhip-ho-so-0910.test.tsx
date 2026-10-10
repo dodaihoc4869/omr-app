@@ -143,12 +143,12 @@ describe('phép thuần: nhóm ưu tiên + chữ số giây', () => {
 })
 
 describe('Hành trình: thẻ Nhịp học', () => {
-  it('bốn thẻ đúng thứ tự; Hôm nay đặt { the: nhip, khoi: 12 } ⇒ ChienDichScreen mở Nhịp học, Khối 12 chọn sẵn, rồi xoá yêu cầu', async () => {
-    expect(THE_HANH_TRINH.map(([, t]) => t)).toEqual(['Dạy học', 'Nhịp học', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
+  it('thêm bài 7 ngày; Hôm nay đặt { the: nhip, khoi: 12 } ⇒ ChienDichScreen vẫn mở Nhịp học, Khối 12 chọn sẵn, rồi xoá yêu cầu', async () => {
+    expect(THE_HANH_TRINH.map(([, t]) => t)).toEqual(['Dạy học', 'Bài mới trong 7 ngày', 'Nhịp học', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
     mayChu()
     useSoDemGv.getState().datMoHanhTrinh({ the: 'nhip', khoi: 12 })
     const { container } = render(<ChienDichScreen />)
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học', 'Nhịp học', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học', 'Bài mới trong 7 ngày', 'Nhịp học', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
     expect(screen.getByRole('tab', { name: 'Nhịp học' }).getAttribute('aria-selected')).toBe('true')
     // thẻ Nhịp học không có nút chính "Bổ sung bài" (nút ấy chỉ thuộc thẻ Dạy học)
     expect(screen.queryByRole('button', { name: 'Bổ sung bài' })).toBeNull()
