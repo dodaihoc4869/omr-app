@@ -105,3 +105,7 @@ Trạng thái: **ĐÃ PHÁT HÀNH** 08:23 (VN) — PR227, mã sống `a9ec700`, 
 | vitest toàn bộ so TÊN main 513467e3 | 0 đỏ mới (2 khác lúc chạy song song build: đo giờ `de-rieng-tran-trung` + quét tĩnh `khong-dung-bien…`; chạy riêng giống hệt main) |
 | Ảnh 14-gv-nhip-*, 14-gv-ho-so-em-* | 0 lỗi trang · 0 tràn · 0 chạm < 44 |
 | PR check `kiem` | Actions 38009453645 SUCCESS |
+
+## Đợt 6 — "Cùng gỡ câu này" chữ chìm ở nền sáng (10/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 10:24 (VN) — PR229, mã sống `4bf4a0d`, Actions `38020000153` SUCCESS. 09:25 có ca mở (11L2-L1) ⇒ hoãn; 10:16 D1 0 ca mở / 0 lượt (thầy báo ca đã xong) mới gộp. Lùi: `git revert -m 1 4bf4a0d`.
+Nguyên nhân gốc: hoc-sinh.css đổi --tlu-* sang bảng sáng nhưng chua-cau-sai.css viết cứng nền xanh than; ô nhập số chữ --tlu-nhan-chu (trắng ở nền sáng). Sửa: chỉ THÊM luật nền sáng bằng --tlu-*; điện thoại dọc `.ccs-cot-phu > * { min-width: 0 }` (hết tràn 358 px). Kiểm: check:mau đạt · kiem:mau-giu 0 · soi:giao-dien 0 · tsc 0 · test liên quan 8/8 · build:cf 13/13, 2996 KB · ảnh 26-hs-cung-go-* 0 lỗi/0 tràn/0 chạm < 44 · PR check `kiem` SUCCESS.
