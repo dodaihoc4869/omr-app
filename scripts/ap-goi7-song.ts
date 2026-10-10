@@ -1,6 +1,6 @@
 import type { Env } from '../server/src/kieu'
 import { execFileSync } from 'node:child_process'
-import { dongBoGoi7, SQL_LUOT_GOI7 } from '../server/src/goi-bai-7'
+import { dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7 } from '../server/src/goi-bai-7'
 import { ngayVn7 } from '../server/src/goi-bai-7-loi'
 // Giữ cùng cổng ca thi/lượt đang làm; không in tên/mã/đáp án học sinh.
 import { query } from './kiem-phat-hanh-chua.mjs'
@@ -41,4 +41,9 @@ await db.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota)
 await db.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) SELECT goi_id,sbd,?,0 FROM goi_bai_7_em WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`).bind(ngay).run()
 const stats=(await query(`SELECT (SELECT COUNT(*) FROM goi_bai_7) soGoi,(SELECT COUNT(DISTINCT sbd) FROM goi_bai_7_em) soEm,(SELECT COUNT(*) FROM goi_bai_7_cau) soCau,(SELECT COUNT(*) FROM goi_bai_7_em e WHERE NOT EXISTS(SELECT 1 FROM goi_bai_7_ngay n WHERE n.goi_id=e.goi_id AND n.sbd=e.sbd AND n.ngay='${ngay}') AND EXISTS(SELECT 1 FROM goi_bai_7_cau c WHERE c.goi_id=e.goi_id)) emChuaCoQuota,(SELECT COUNT(*) FROM goi_bai_7 g WHERE NOT EXISTS(SELECT 1 FROM goi_bai_7_cau c WHERE c.goi_id=g.id)) goiThieuNguon`))[0]
 if(stats.emChuaCoQuota)throw new Error('Còn học sinh chưa có lịch phủ câu hôm nay.')
-console.log(JSON.stringify({apGoi7:true,ngay,...stats,giuKetQuaDaNop:true}))
+const sources=await db.prepare('SELECT b.ma_to_json FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL').all<{ma_to_json:string}>()
+let goiNguonChuaDu=0;for(const s of sources.results)if(!await duNguonGoi7(env,mang7(s.ma_to_json)))goiNguonChuaDu++
+const chuaDuyet=await db.prepare("SELECT COUNT(*) n FROM goi_bai_7_cau WHERE json_extract(meta_json,'$.hopLe')=0").first<{n:number}>()
+const chuaNhan=await db.prepare(`SELECT COUNT(*) n FROM hoc_sinh h WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM bai_da_day b WHERE b.lop=h.lop AND b.bo_tick_luc IS NULL) AND NOT EXISTS(SELECT 1 FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=h.sbd AND g.lop=h.lop)`).first<{n:number}>()
+if(chuaNhan?.n)throw new Error('Còn học sinh của lớp đã chọn bài chưa nhận gói.')
+console.log(JSON.stringify({apGoi7:true,ngay,...stats,goiNguonChuaDu,cauChuaDuyet:chuaDuyet?.n??0,hocSinhDaChonChuaNhanGoi:chuaNhan?.n??0,giuKetQuaDaNop:true}))

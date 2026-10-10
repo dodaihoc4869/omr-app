@@ -1,5 +1,5 @@
 import type { Env } from './kieu'
-import { coGoi7, damBaoGoi7, dongBoGoi7, SQL_LUOT_GOI7 } from './goi-bai-7'
+import { coGoi7, damBaoGoi7, dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7 } from './goi-bai-7'
 import { lyDoChua7, diemConDungNguon7, type CauGoi7 } from './goi-bai-7-loi'
 import { docCauTheoRef, loiCauDoi } from './game-v2-bank'
 type Row = Record<string,unknown>
@@ -33,7 +33,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
       ON CONFLICT(goi_id,qid,version) DO UPDATE SET loi_go=excluded.loi_go,luc=excluded.luc`).bind(goi,qid,version,loiGo,new Date().toISOString()).run()
     return {ok:true,daLuu:true}
   }
-  const goi=await env.DB.prepare(`SELECT g.* FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE (?='' OR g.lop=?) ORDER BY g.bat_dau DESC,g.ten`).bind(s(b.lop),s(b.lop)).all<Row>()
+  const goi=await env.DB.prepare(`SELECT g.*,b.ma_to_json FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE (?='' OR g.lop=?) ORDER BY g.bat_dau DESC,g.ten`).bind(s(b.lop),s(b.lop)).all<Row>()
   const id=goi.results.some(g=>g.id===b.goiId)?s(b.goiId):s(goi.results[0]?.id)
   if (!id || !goi.results.some(g=>g.id===id)) return {ok:true,bat:true,goi:goi.results,cau:[],em:[]}
   const [cauRows,emRows,gap,events,chua,pv,kiem]=await Promise.all([
@@ -47,6 +47,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
     env.DB.prepare('SELECT sbd,ma_de,diem,nop_luc,json FROM goi_bai_7_kiem WHERE goi_id=? AND nop_luc IS NOT NULL ORDER BY nop_luc').bind(id).all<Row>(),
   ])
   const ds=cauRows.results.map(r=>JSON.parse(s(r.meta_json)) as CauGoi7),ver=new Map(ds.map(q=>[q.qid,q.version]))
+  const nguonDayDu=ds.length>0&&await duNguonGoi7(env,mang7(goi.results.find(g=>g.id===id)?.ma_to_json))
   const nhan=new Map<string,Set<string>>(),tuLam=new Map<string,Set<string>>(),first=new Map<string,Row>(),last=new Map<string,Row>()
   const add=(map:Map<string,Set<string>>,sbd:string,qid:string)=>{const set=map.get(sbd)??new Set<string>();set.add(qid);map.set(sbd,set)}
   for(const e of events.results){
@@ -60,7 +61,7 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
   const kyNang=[...new Set(ds.flatMap(q=>q.kyNang))],states=new Map(pv.results.map(r=>[`${s(r.sbd)}|${s(r.vkn_id)}`,r.trang_thai]))
   const em=emRows.results.map(e=>{
     const sbd=s(e.sbd),daGap=nhan.get(sbd)?.size??0,dat=kyNang.filter(k=>states.get(`${sbd}|${k}`)==='dat').length
-    const diem=new Map<string,Row>();for(const k of kiem.results)if(k.sbd===sbd&&diemConDungNguon7((JSON.parse(s(k.json)) as Row).cau,ds.filter(c=>(c.maTo??c.maDe)===k.ma_de)))diem.set(s(k.ma_de),k)
+    const diem=new Map<string,Row>();for(const k of kiem.results)if(nguonDayDu&&k.sbd===sbd&&diemConDungNguon7((JSON.parse(s(k.json)) as Row).cau,ds.filter(c=>(c.maTo??c.maDe)===k.ma_de)))diem.set(s(k.ma_de),k)
     return {sbd,ten:s(e.ho_ten),han:s(e.han),tong:ds.length,daGap,tuLam:tuLam.get(sbd)?.size??0,con:ds.length-daGap,
       kyNang:{tong:kyNang.length,dat,tyLe:kyNang.length?Math.round(1000*dat/kyNang.length)/10:null},
       diem:[...diem.values()].map(k=>({maDe:s(k.ma_de),diem:Number(k.diem),luc:s(k.nop_luc)}))}
@@ -73,6 +74,6 @@ export async function gvGoi7(env: Env,b: Row): Promise<Record<string,unknown>> {
     const choChua=em.filter(e=>gap.results.some(r=>r.sbd===e.sbd&&r.qid===q.qid&&r.version===q.version&&r.kieu==='cho_thay')&&!gap.results.some(r=>r.sbd===e.sbd&&r.qid===q.qid&&r.version===q.version&&r.kieu==='co_ho_tro')).map(e=>({sbd:e.sbd,ten:e.ten}))
     return {...q,lyDo:lyDoChua7(q,doan.length,sai),daDo:doan.length,sai,daChua:!!daChua,loiGo:s(daChua?.loi_go),chuaGap,canKiem,choChua}
   }).sort((a,b)=>Number(b.choChua.length>0&&!b.daChua)-Number(a.choChua.length>0&&!a.daChua)||Number(b.lyDo.length>0)-Number(a.lyDo.length>0)||Number(a.daChua)-Number(b.daChua)||b.sai-a.sai||a.qid.localeCompare(b.qid))
-  return {ok:true,bat:true,goi:goi.results,goiId:id,cau,em,canChua:cau.filter(c=>(c.lyDo.length||c.choChua.length)&&!c.daChua).length,
+  return {ok:true,bat:true,nguonDayDu,goi:goi.results,goiId:id,cau,em,canChua:cau.filter(c=>(c.lyDo.length||c.choChua.length)&&!c.daChua).length,
     canGap:em.filter(e=>e.con>0).length,soCau:ds.length,soEm:em.length}
 }

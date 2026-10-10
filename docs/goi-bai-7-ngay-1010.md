@@ -30,4 +30,6 @@ Mục tiêu ≥7/10 bài mới và ≥80% kiến thức cũ là mục tiêu cầ
 
 Áp lịch chốt quota hôm nay cho mọi em của lớp, gồm em chưa mở app; kiểm số gói/em/câu/quota thiếu trên D1, không in danh tính hay đáp án. Lùi mã bằng revert bản gộp, giữ bảng/sổ và tắt cờ khi cần; không reset dữ liệu thật.
 
+Chỉ chốt phạm vi khi nguồn của mọi tờ đã chọn còn tồn tại và chỉ mục khớp phiên bản R2. Thiếu một tờ không nhận các tờ còn lại là toàn bộ bộ bài: giữ sổ và manifest cũ, báo nguồn chưa đủ ở cả ba app, ngừng xác nhận điểm tự kiểm của bộ đó. Khi đủ nguồn, tự dựng lại đầy đủ và giữ những câu gốc cùng phiên bản đã thực sự gặp. Công cụ áp lịch báo riêng số gói còn thiếu nguồn.
+
 Kiểm chứng: toàn repo được đối chiếu theo tên lỗi với main; kiểm liên quan là cổng bắt buộc. Chromium đã kiểm 30 tổ hợp HS/làm bài/tự kiểm/GV/PH ở 390×844, 844×390, 1440×900 và sáng/tối, không tràn ngang hay lỗi trang. Chi tiết kết quả chốt/phát hành ghi ở DIEU-PHOI.md.

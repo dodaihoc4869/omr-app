@@ -116,7 +116,7 @@ function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
           <h2 id="ph3-hn">Hôm nay con chưa làm câu nào</h2>
         </>
       )}
-      {hoc2?.goi7 ? <div className="ph3-ah__ghi">{hoc2.goi7.map(g=><p key={g.ten}>{g.ten}: đã gặp {g.daGap}/{g.tong} câu gốc · còn {g.con} câu · hạn {g.han.slice(8,10)}/{g.han.slice(5,7)}.</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div> : tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
+      {hoc2?.goi7 ? <div className="ph3-ah__ghi">{hoc2.goi7.map(g=><p key={g.ten}>{g.nguonDayDu===false?`${g.ten}: đang chờ đủ nguồn các tờ; chưa xác nhận hoàn thành toàn bộ bài.`:`${g.ten}: đã gặp ${g.daGap}/${g.tong} câu gốc · còn ${g.con} câu · hạn ${g.han.slice(8,10)}/${g.han.slice(5,7)}.`}</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div> : tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
       {(gioQuen || hanhTrinh) && (
         <div className="ph3-ah__ghi">
           {gioQuen && <p>{gioQuen}</p>}
