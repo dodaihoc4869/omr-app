@@ -831,13 +831,18 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     h += '</div></section></div><section aria-label="Từng em"><h3 class="mc-sai-tt" style="margin-bottom:.6em">Từng em</h3><div class="mc-sai-luoi">';
     thuTu.forEach(function (sbd) {
       var e = theoEm[sbd];
-      h += '<article class="mc-sai-em"><span class="mc-sai-anh" aria-hidden="true">' + thoat(chuCai(e.ten)) + '</span><span class="mc-sai-ten">' + thoat(e.ten) + '<small>' + e.ds.length + ' lần sai</small></span><span class="mc-sai-chip">';
+      // Thầy 09/10: "phần ai sai … hiển thị cả số giây từng làm câu đó" — dòng tên có "trung bình <x> giây" của em (chỉ lượt có số giây; có ước tính ⇒ "≈"; viết đủ chữ, không "TB" — chuẩn từ ngữ mục 4),
+      // mỗi chip lượt LUÔN có phần giây: đo được ⇒ số giây, không đo được ⇒ "chưa đo giờ" (không bỏ trống, không đoán).
+      var tgEm = 0, nEm = 0, uocEm = false;
+      e.ds.forEach(function (x) { if (x.giay != null && isFinite(x.giay)) { tgEm += x.giay; nEm++; if (x.uocTinh) uocEm = true; } });
+      var tbEm = nEm ? ' · trung bình ' + (uocEm ? '≈ ' : '') + saiThoiLuong(Math.round(tgEm / nEm)) : '';
+      h += '<article class="mc-sai-em"><span class="mc-sai-anh" aria-hidden="true">' + thoat(chuCai(e.ten)) + '</span><span class="mc-sai-ten">' + thoat(e.ten) + '<small>' + e.ds.length + ' lần sai' + thoat(tbEm) + '</small></span><span class="mc-sai-chip">';
       e.ds.forEach(function (x) {
-        h += '<span style="--mc-sai-c:' + mauNoi(x.noi) + '">' + thoat(saiGio(x.luc)) + ' · ' + thoat(x.noi || '') + (x.giay != null ? ' · <u>' + (x.uocTinh ? '≈ ' : '') + thoat(saiThoiLuong(x.giay)) + '</u>' : '') + '</span>';
+        h += '<span style="--mc-sai-c:' + mauNoi(x.noi) + '">' + thoat(saiGio(x.luc)) + ' · ' + thoat(x.noi || '') + (x.giay != null && isFinite(x.giay) ? ' · <u>' + (x.uocTinh ? '≈ ' : '') + thoat(saiThoiLuong(x.giay)) + '</u>' : ' · chưa đo giờ') + '</span>';
       });
       h += '</span></article>';
     });
-    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt trong game — thời gian ước tính từ lúc trả lời câu trước tới câu này (game không đo giờ từng câu).</p>' : '');
+    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt game cũ chưa đo giờ — thời gian ước tính từ lúc trả lời câu trước tới câu này.</p>' : '');
     sai.insertAdjacentHTML('beforeend', h);
     // Thanh / cột mọc lên sau một nhịp (tắt khi giảm chuyển động — CSS lo).
     requestAnimationFrame(function () {
