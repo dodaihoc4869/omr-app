@@ -92,6 +92,11 @@ const DS = [
     // Câu đã làm (09/10): thầy gửi ảnh thẻ chồng chữ ở máy tính — chụp sáng + tối mọi khổ
     [`25-hs-cau-da-lam-${k}`, 'cau-da-lam', w,h,'light',false,/Câu đã làm/],
     [`25-hs-cau-da-lam-${k}-toi`, 'cau-da-lam', w,h,'dark',false,/Câu đã làm/],
+    // Cùng gỡ câu này (10/10): thầy gửi ảnh chữ chìm — chụp sáng + tối mọi khổ
+    [`26-hs-cung-go-${k}`, 'chua-cau-sai', w,h,'light',false,/Cần thêm bài luyện/],
+    [`26-hs-cung-go-${k}-toi`, 'chua-cau-sai', w,h,'dark',false,/Cần thêm bài luyện/],
+    [`26-hs-cung-go-buoc-${k}`, 'chua-cau-sai&go=buoc', w,h,'light',false,/Số mol NaOH/],
+    [`26-hs-cung-go-buoc-${k}-toi`, 'chua-cau-sai&go=buoc', w,h,'dark',false,/Số mol NaOH/],
     // Luyện thêm có màu nhấn (09/10): chụp thêm Hành trình nền TỐI
     [`22-hs-hanh-trinh-${k}-toi`, 'sanh', w,h,'dark',true,/Hôm nay/,'hs:Hành trình'],
     ...[['tien-bo','Tiến bộ'],['ca-kiem-tra','Ca kiểm tra'],['loi-thay','Nhận xét của thầy'],['thong-tin','Thông tin và giao diện']].flatMap(([m,chu]) => ['light','dark'].map((nen) => [`23-ph-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'ph',w,h,nen,true,/Hôm nay/,`ph:${m}:${chu}`])),
