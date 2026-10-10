@@ -28,3 +28,7 @@ Cổng giữ các lối học thuật cũ trong Của em và Ôn & sửa: bài g
 Các kiểm tra buộc cổng mở Đoàn/Bi-a/thần thú/toàn màn hình hoặc menu nhiệm vụ cũ được thay bằng hợp đồng học tập hiện hành. Giữ kiểm thư viện game lưu trữ, API/hook kế hoạch, chấm, quyền và lịch sử; các kiểm bài gia đình/BTVN/phòng thi chỉ đổi bước điều hướng. Không bỏ qua kiểm lỗi nền hoặc gọi toàn repo xanh khi còn lỗi. Bộ full đầu chạy trong lúc gộp main; dùng đối chiếu bản main sạch và chạy lại tất cả tệp đỏ ở bản cuối để tách lỗi thực khỏi hợp đồng đã gỡ và lỗi thời điểm.
 
 Bản chốt đối chiếu tất cả tệp đỏ: 1.613 kiểm đạt, 164 lỗi trùng tên trên main sạch 35ca06e7, không lỗi mới. Các tệp còn lại đã qua lượt full đầu. Không gọi toàn repo xanh. Bảng tin gia đình trong cổng HS bật tapTrungHoc, ẩn thẻ thần thú và vinh danh game; ứng dụng PH giữ hành vi hiện hành. Kiểm hai màn dùng chung 19/19 đạt; buildCF/SW13/13 và màu 0 vi phạm.
+
+## Phát hành xác nhận
+
+10/10/2026 12:55 giờ Việt Nam: PR231 đã phát hành, Actions38028684777 SUCCESS. Worker và Pages cùng d43ddc822243189e1cf9003b1ecd50cb357d24ea; 5 đường giao diện và 2 cổng quyền đạt, mọi cổng D1 không có ca mở/lượt đang làm. Bộ bắt buộc cuối280/280 đạt. Quay lui bằng revert merge d43ddc82 với -m1, không sửa dữ liệu/schema.
