@@ -49,8 +49,8 @@ afterEach(async () => {
   datDuong('/')
 })
 const moTab = async () => {
-  fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-  fireEvent.click(await screen.findByRole('menuitem', { name: 'Bài tập về nhà' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Của em' }))
+  fireEvent.click(await screen.findByRole('button', { name: /^Bài tập được giao/ }))
 }
 const the = (i: number) => document.querySelectorAll<HTMLElement>('.btm-the')[i]
 

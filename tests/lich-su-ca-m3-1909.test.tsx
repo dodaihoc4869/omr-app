@@ -43,8 +43,8 @@ afterEach(() => {
   datDuong('/')
 })
 const moTab = async () => {
-  fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-  fireEvent.click(await screen.findByRole('menuitem', { name: 'Xem điểm & lịch sử ca kiểm tra' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Của em' }))
+  fireEvent.click(await screen.findByRole('button', { name: /^Kết quả bài đã nộp/ }))
 }
 
 describe('mucDiem: bậc điểm → vai trò màu', () => {

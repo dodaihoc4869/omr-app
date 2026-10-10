@@ -22,3 +22,7 @@ Không đổi sàn 24/30/36/36, tiên quyết, lịch ôn, bằng chứng độc
 Kiểm D1 thực: không cần chọn thú, không tin SBD khách gửi, không lộ đáp án trước nộp, cùng answer không nhân đôi lượt, nhả bàn cũ, giữ câu thuộc ca mở cả khi đợt đã tạo trước. Kiểm React: dữ liệu thật trên kế hoạch, không cửa game, giữ nháp khi lỗi, chấm máy chủ và bốn ý đúng-sai. Chromium với dữ liệu minh hoạ ở 390×844,844×390,1440×900: mở/chọn/nộp/phản hồi, không tràn ngang và không lỗi JavaScript. Ảnh minh hoạ không phải dữ liệu học sinh thật.
 
 Phát hành đi qua cổng ca thi hiện hành; không reset dữ liệu, không migration mới.
+
+Cổng giữ các lối học thuật cũ trong Của em và Ôn & sửa: bài gia đình giao, kết quả bài đã nộp, luyện lại từ bài kiểm tra và thông tin gia đình. Nhập mã ca vẫn có dù chưa phát hiện ca mở. Khi hệ thống đang làm mới dữ liệu, giao diện báo trạng thái và giữ nháp/phiên; phiên lưu cũ thiếu token quay về đăng nhập.
+
+Các kiểm tra buộc cổng mở Đoàn/Bi-a/thần thú/toàn màn hình hoặc menu nhiệm vụ cũ được thay bằng hợp đồng học tập hiện hành. Giữ kiểm thư viện game lưu trữ, API/hook kế hoạch, chấm, quyền và lịch sử; các kiểm bài gia đình/BTVN/phòng thi chỉ đổi bước điều hướng. Không bỏ qua kiểm lỗi nền hoặc gọi toàn repo xanh khi còn lỗi. Bộ full đầu chạy trong lúc gộp main; dùng đối chiếu bản main sạch và chạy lại tất cả tệp đỏ ở bản cuối để tách lỗi thực khỏi hợp đồng đã gỡ và lỗi thời điểm.

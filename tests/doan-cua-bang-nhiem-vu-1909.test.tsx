@@ -132,81 +132,7 @@ describe('thẻ mời trên Bảng nhiệm vụ', () => {
   })
 })
 
-describe('StudentPortalScreen thật: bấm thẻ ⇒ mở game ở màn Đoàn; "Về app học sinh" ⇒ về Bảng nhiệm vụ', () => {
-  let soLanGoi = 0
-  let doanMo: any = true
-  beforeEach(() => {
-    soLanGoi = 0
-    doanMo = true
-    sessionStorage.clear()
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (url: string) => {
-        const duong = new URL(String(url)).pathname
-        if (duong === '/hs/ke-hoach-ngay') {
-          soLanGoi++
-          return { ok: true, status: 200, json: async () => ({ ...KE_HOACH, ...(doanMo === undefined ? {} : { doanMo }) }) }
-        }
-        if (duong === '/hs/ca-dang-mo') return { ok: true, status: 200, json: async () => ({ ok: true, coCaMo: false, soCa: 0 }) }
-        return { ok: true, status: 200, json: async () => ({ ok: true, items: [], winners: [] }) }
-      }),
-    )
-  })
-  afterEach(async () => {
-    cleanup()
-    await new Promise((r) => setTimeout(r, 60))
-    localStorage.clear()
-    sessionStorage.clear()
-    vi.unstubAllGlobals()
-    vi.clearAllMocks()
-  })
 
-  it('cờ mở: bấm thẻ ⇒ khoá `game-v2:man-dau` = "doan" đúng LÚC game dựng, game mở; "Về app học sinh" ⇒ đóng game, thấy lại Bảng nhiệm vụ, hỏi lại kế hoạch', async () => {
-    const { container } = render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Lên đường cùng Đoàn Hộ Tống' }))
-    const game = await screen.findByTestId('game')
-    expect(game.getAttribute('data-man-dau')).toBe('doan')
-    const truoc = soLanGoi
-    fireEvent.click(screen.getByRole('button', { name: 'Về app học sinh' }))
-    await waitFor(() => expect(screen.queryByTestId('game')).toBeNull())
-    // về ĐÚNG Bảng nhiệm vụ (không phải sheet "Xem điểm & lịch sử ca thi")
-    expect(container.querySelector('.bnv')).toBeTruthy()
-    expect(screen.queryByText('Xem điểm & lịch sử ca thi')).toBeNull()
-    await waitFor(() => expect(soLanGoi).toBeGreaterThan(truoc))
-  })
-
-  it('mở game từ chỗ khác (chọn thần thú) KHÔNG đặt khoá màn Đoàn — chỉ thẻ Đoàn mới đặt', async () => {
-    doanMo = false
-    render(<StudentPortalScreen />)
-    await screen.findByRole('region', { name: /^Làm ngay/ })
-    expect(CARD()).toBeNull()
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    expect(sessionStorage.getItem('game-v2:man-dau')).toBeNull()
-  })
-
-  it('cờ vắng hoặc false: KHÔNG thẻ, không chữ "Đoàn" trong bảng', async () => {
-    for (const v of [undefined, false]) {
-      doanMo = v
-      const { container, unmount } = render(<StudentPortalScreen />)
-      await waitFor(() => expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay'))
-      expect(CARD()).toBeNull()
-      expect(container.querySelector('.bnv')!.textContent).not.toMatch(/Đoàn Hộ Tống/)
-      unmount()
-      localStorage.removeItem('omr_bnv_ke_hoach:test')
-    }
-  })
-
-  it('khoá dùng ở cổng KHỚP hằng `KHOA_MAN_DAU` thật của Game.tsx và giá trị màn là "doan" (không import hằng để giữ nạp lười)', () => {
-    const game = fs.readFileSync(path.join(process.cwd(), 'src/game/than-thu-v2/Game.tsx'), 'utf8')
-    expect(game).toMatch(/export const KHOA_MAN_DAU='game-v2:man-dau'/)
-    expect(game).toMatch(/luu==='doan'|'doan'/)
-    const cong = fs.readFileSync(path.join(process.cwd(), 'src/screens/StudentPortalScreen.tsx'), 'utf8')
-    expect(cong).toMatch(/const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'/)
-    expect(cong).not.toMatch(/import[^\n]*KHOA_MAN_DAU[^\n]*from '\.\.\/game\/than-thu-v2\/Game'/)
-    expect(cong).toMatch(/onDong=\{\(\) => \{\s*ketThucLuotToanManHinh\(\)[^\n]*\n\s*setTab\(null\)\s*\}\}/) // Về app học sinh: thoát toàn màn hình (thầy lệnh 21/09) rồi về app
-  })
-})
 
 describe('CSS thẻ Đoàn', () => {
   it('chỉ biến --m3-*, không hex/fixed; đích ≥ 48 px (min-height 80)', () => {
@@ -218,3 +144,6 @@ describe('CSS thẻ Đoàn', () => {
     expect(luat.join('\n')).toMatch(/background:\s*var\(--m3-tertiary-container\)/)
   })
 })
+
+// 10/10: Đoàn là nguồn ôn trong kế hoạch, không còn cửa game ở cổng.
+it('bản nhớ màn Đoàn cũ không mở game trong cổng học tập',async()=>{localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));sessionStorage.setItem('game-v2:man-dau','doan');render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:'Của em'})).toBeTruthy();expect(screen.queryByRole('button',{name:'Lên đường cùng Đoàn Hộ Tống'})).toBeNull();expect(screen.queryByTestId('game')).toBeNull()})

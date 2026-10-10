@@ -56,8 +56,8 @@ afterEach(async () => {
   datDuong('/')
 })
 const moTab = async () => {
-  fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-  fireEvent.click(await screen.findByRole('menuitem', { name: 'Bài gia đình giao' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Của em' }))
+  fireEvent.click(await screen.findByRole('button', { name: /^Bài gia đình giao/ }))
 }
 const vaoLam = async () => {
   datDuong('/hs')

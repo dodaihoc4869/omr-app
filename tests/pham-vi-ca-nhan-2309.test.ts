@@ -1,3 +1,4 @@
+import {readFileSync as docHocTap} from 'node:fs'
 // @vitest-environment node
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chặn câu KHÔNG RÕ khối ⇒ câu trong kho giả ghi khối `lop` (đúng khối em).
 import { describe, expect, it } from 'vitest'
@@ -116,16 +117,6 @@ describe('phạm vi tự động theo từng em, không bù lớp/chương', () 
     const r = chonCauThuThach({sbd:'S1',ngay:NGAY,dang:['A'],soCau:3,mucNhamTheoDang:new Map([['A',0]]),loaiTru:new Set(),ungVien:[{qid:'1',dang:'A',muc:0,group:'same'},{qid:'2',dang:'A',muc:0,group:'same'},{qid:'3',dang:'A',muc:0,group:'other'}]})
     expect(r.qid).toHaveLength(2); expect(r.thieu).toBe(1)
   })
-  it('nút khắc phục legacy dùng kế hoạch ôn và nộp server thay vì câu sai đầu cố định', () => {
-    const s = readFileSync('src/screens/StudentPortalScreen.tsx','utf8').split("case 'mo_khac_phuc':")[1]!.split("case 'mo_thu_thach':")[0]!
-    expect(s).toContain('taiKeHoachNgay({ token: auth.token })')
-    expect(s).not.toContain('dungPhieu')
-    expect(s).not.toContain('hsCauSaiApi')
-  })
-  it('nút thử sức legacy lấy câu đã chốt của server, không nạp kho local', () => {
-    const s = readFileSync('src/screens/StudentPortalScreen.tsx','utf8').split("case 'mo_thu_thach':")[1]!.split("case 'mo_thi':")[0]!
-    expect(s).toContain('taiThuThachHomNay(auth.token)')
-    expect(s).toContain('duongNop: DUONG_NOP_THU_THACH')
-    expect(s).not.toContain('loadExamSources')
-  })
+  it('cổng học tập chọn và nộp qua máy chủ, không nạp kho đáp án tại máy',()=>{const c=docHocTap('src/components/hoc-tap/ManLamBaiTap.tsx','utf8');expect(c).toContain("goiHoa2('hoc-tap-start'");expect(c).toContain("goiHoa2('answer'");expect(c).not.toContain('loadExamSources');expect(c).toContain('localStorage.setItem(khoa, v)')})
+  it('cổng học tập chọn và nộp qua máy chủ, không nạp kho đáp án tại máy',()=>{const c=docHocTap('src/components/hoc-tap/ManLamBaiTap.tsx','utf8');expect(c).toContain("goiHoa2('hoc-tap-start'");expect(c).toContain("goiHoa2('answer'");expect(c).not.toContain('loadExamSources');expect(c).toContain('localStorage.setItem(khoa, v)')})
 })

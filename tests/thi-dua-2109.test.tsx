@@ -404,8 +404,8 @@ describe('useThiDua — nhịp 180 giây ± 30 giây, giữ bản cũ khi lỗi,
 
 describe('khoá mã nguồn', () => {
   it('ô chỉ nằm ở app học sinh: StudentPortalScreen truyền, ParentPortalScreen KHÔNG gọi lệnh thi đua', () => {
-    expect(doc('src/screens/StudentPortalScreen.tsx')).toMatch(/useThiDua\(/)
-    expect(doc('src/screens/StudentPortalScreen.tsx')).toMatch(/thiDua=\{thiDua\}/)
+    expect(doc('src/screens/StudentPortalScreen.tsx')).not.toMatch(/useThiDua\(/)
+    expect(doc('src/screens/StudentPortalScreen.tsx')).not.toMatch(/thiDua=\{thiDua\}/)
     expect(doc('src/screens/ParentPortalScreen.tsx')).not.toMatch(/thi-dua|ThiDua/)
     expect(doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')).toMatch(/\{!laPh && thiDua && <OThiDua/)
   })

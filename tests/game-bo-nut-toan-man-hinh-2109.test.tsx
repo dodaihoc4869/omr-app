@@ -38,7 +38,7 @@ describe('Toàn màn hình của game: mã ở lib + hook + nút của cổng (2
     expect(lib).not.toMatch(/<button|<\/|React|onClick/)
     expect(doc('src/components/useToanManHinhGame.ts')).not.toMatch(/<button|<\/[a-z]/i)
     const cong = doc('src/screens/StudentPortalScreen.tsx')
-    expect(cong).toContain("useToanManHinhGame(tab === 'thanthu')")
+    expect(cong).not.toContain("useToanManHinhGame(tab === 'thanthu')")
     // 28/09 thầy đổi luật: bỏ tự vào toàn màn hình; có nút toàn màn hình (src/components/NutToanManHinh.tsx — chữ/mã xin ở component + lib, không trong tệp game).
     // 28/09 lần 2 (thầy: "nút toàn màn hình hiển thị ở vị trí chưa phù hợp"): bỏ nút nổi ở cổng; mỗi màn game đặt nút vào THANH ĐẦU sẵn có.
     expect(cong).not.toContain("xinToanManHinh('cu-cham-vao')")

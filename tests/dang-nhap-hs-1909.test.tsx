@@ -36,6 +36,12 @@ afterEach(async () => {
 const cao48 = (el: Element) => /(^|\s)min-h-\[48px\](\s|$)/.test(el.className)
 
 describe('form đăng nhập học sinh', () => {
+  it('phiên lưu cũ thiếu token quay về đăng nhập, không để màn trắng', async () => {
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({sbd:'gia',hoTen:'Em minh hoạ'}))
+    render(<StudentPortalScreen />)
+    expect(await screen.findByRole('button',{name:'Đăng nhập'})).toBeTruthy()
+  })
+
   it('ô SBD và ô mật khẩu: <label> gắn đúng ô (getByLabelText), cao ≥ 48 px; nút Đăng nhập cao ≥ 48 px', async () => {
     render(<StudentPortalScreen />)
     const sbd = (await screen.findByLabelText('Số báo danh (SBD)')) as HTMLInputElement
