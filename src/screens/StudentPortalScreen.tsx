@@ -1070,7 +1070,7 @@ export default function StudentPortalScreen() {
           {/* SHEET BẢNG TIN: nhận bài luyện hôm nay, mở các màn cũ từ bảng tin */}
           {tab === 'bantin' && (
             <Suspense fallback={<div className="m3-xuong" style={{ height: 160 }} />}>
-            <BangTinPhuHuynh
+            <BangTinPhuHuynh tapTrungHoc
               sbd={auth.sbd}
               hoTen={auth.hoTen}
               lop={auth.lop}

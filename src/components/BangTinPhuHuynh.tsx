@@ -62,10 +62,12 @@ export default function BangTinPhuHuynh({
   hoTen,
   lop,
   caGanNhat,
+  tapTrungHoc = false,
 }:{
   sbd:string;
   onSent:(id?:string)=>void;
   studentToken?:string;
+  tapTrungHoc?:boolean;
   activeTab?:string|null;
   onSelectTab?:(tab:string, cheDo?: 1 | 2 | 3 | 4)=>void;
   tabStats?:{diemCount?:number;btvnCount?:number;momCount?:number;wrongCount?:number};
@@ -100,13 +102,13 @@ export default function BangTinPhuHuynh({
  } : null)
 
  return <div className="m3">
-  <BangVinhDanh
+  {!tapTrungHoc && <BangVinhDanh
     vaiTro={studentToken ? 'hocsinh' : 'phuhuynh'}
     hoTen={hoTen}
     sbd={sbd}
     lop={lop}
     tongSoCa={tabStats?.diemCount ?? 0}
-  />
+  />}
   <section className="parent-news space-y-5">
   <div className="flex items-start justify-between gap-3"><div><h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white"><Calendar className="news-accent" size={22}/>{studentToken?'Bảng tin học tập của em':'Bảng tin học tập của con'}</h2><p className="mt-1 text-xs news-muted">Bản tin mới lúc 00:01 mỗi ngày · Giờ Việt Nam</p></div><button type="button" aria-label="Cập nhật bảng tin" onClick={()=>void refresh()} className="news-refresh"><RefreshCw size={18}/></button></div>
   {error&&<p role="alert" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{error}</p>}
@@ -585,7 +587,7 @@ export default function BangTinPhuHuynh({
             </button>
 
             {/* 6. Thần thú — CHỈ học sinh. App phụ huynh không còn gì của game (thầy 21/09). */}
-            {studentToken && (
+            {studentToken && !tapTrungHoc && (
               <button
                 type="button"
                 onClick={() => onSelectTab?.('thanthu')}

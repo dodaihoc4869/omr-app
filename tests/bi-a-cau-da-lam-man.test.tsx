@@ -1,5 +1,5 @@
 // BI-A · màn "Câu đã làm" (src/components/hoa2/CauDaLam.tsx) với câu em làm trong Bi-a (thầy 28/09): nhóm "Câu sai trong ca kiểm tra"
-// hiện trong ô chọn chiến dịch (chiến dịch thật vẫn mặc định); lần làm mang nguồn ⇒ "Lần gần nhất: Đúng 28/09 · Bi-a".
+// hiện trong ô chọn chiến dịch (chiến dịch thật vẫn mặc định); lần làm mang nguồn ⇒ "Lần gần nhất: Đúng 28/09 · Luyện tập trước đây".
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import CauDaLam from '../src/components/hoa2/CauDaLam'
@@ -24,14 +24,14 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
 describe('Câu đã làm hiện câu làm trong Bi-a', () => {
-  it('chiến dịch thật mặc định; câu Bi-a ghi "· Bi-a"; chọn nhóm "Câu sai trong ca kiểm tra" thấy câu ôn ngoài chiến dịch, lịch sử ghi nguồn', async () => {
+  it('chiến dịch thật mặc định; câu Bi-a ghi "· Luyện tập trước đây"; chọn nhóm "Câu sai trong ca kiểm tra" thấy câu ôn ngoài chiến dịch, lịch sử ghi nguồn', async () => {
     render(<CauDaLam token="tk" hoTen="Nguyễn An" sbd="S1" onVe={() => {}} />)
-    expect(await screen.findByText('Lần gần nhất: Đúng 28/09 · Bi-a')).toBeTruthy()
+    expect(await screen.findByText('Lần gần nhất: Đúng 28/09 · Luyện tập trước đây')).toBeTruthy()
     const chon = screen.getByRole('combobox', { name: 'Chiến dịch' }) as HTMLSelectElement
     expect(chon.value).toBe('cd1')
     expect([...chon.options].map((o) => o.textContent)).toEqual(['Ester – Lipid · 80 câu', 'Câu sai trong ca kiểm tra · 2 câu'])
     fireEvent.change(chon, { target: { value: 'cau-sai-ca-kiem-tra' } })
     expect(await screen.findByText('Lần gần nhất: Sai 27/09 · Ca kiểm tra')).toBeTruthy()
-    expect(screen.getAllByText('Lần gần nhất: Đúng 28/09 · Bi-a')).toHaveLength(1)
+    expect(screen.getAllByText('Lần gần nhất: Đúng 28/09 · Luyện tập trước đây')).toHaveLength(1)
   })
 })
