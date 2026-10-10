@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process'
 import type { Env } from '../server/src/kieu'
 import { docHoSo2 } from '../server/src/srs2-d1'
 import { dongCoHanhTrinh } from '../server/src/hanh-trinh-dong-co'
+import { duNguonGoi7, mang7 } from '../server/src/goi-bai-7'
 const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID
 if(!token||!account) throw new Error('Thiếu cấu hình Cloudflare.')
 let soDoc=0,buoc="bat_dau",bangDoc=""
@@ -25,6 +26,11 @@ const env={DB:db,DE:{async get(key:string){const body=execFileSync('npx',['wrang
 async function main(){
   // Cùng cổng giờ vào ca/lượt đang làm với phát hành; không bỏ qua kiểm đọc sâu.
   await import('./kiem-phat-hanh-chua.mjs')
+  buoc='nguon_goi7'
+  const gs=await db.prepare('SELECT g.id,b.ma_to_json FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL').all<{id:string;ma_to_json:string}>()
+  let thieuNguon=0;for(const g of gs.results)if(!await duNguonGoi7(env,mang7(g.ma_to_json)))thieuNguon++
+  const stats=await db.prepare(`SELECT (SELECT COUNT(DISTINCT sbd) FROM goi_bai_7_em) soEm,(SELECT COUNT(*) FROM goi_bai_7_cau) soCau,(SELECT COUNT(*) FROM goi_bai_7_cau WHERE json_extract(meta_json,'$.hopLe')=0) cauChuaDuyet,(SELECT COUNT(*) FROM goi_bai_7_em e WHERE NOT EXISTS(SELECT 1 FROM goi_bai_7_ngay n WHERE n.goi_id=e.goi_id AND n.sbd=e.sbd AND n.ngay=date('now','+7 hours'))) emChuaCoLich`).first<Record<string,number>>()
+  console.log(JSON.stringify({kiemGoi7ChiDoc:true,soGoi:gs.results.length,thieuNguon,...stats}))
   buoc="chon_em";const em=await db.prepare(`SELECT h.sbd,COUNT(s.khoa) n FROM hoc_sinh h LEFT JOIN su_kien_hoc s ON s.sbd=h.sbd WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM chien_dich c,json_each(c.sbd_json) j WHERE c.id LIKE 'hanh-trinh-v3-khoi-%' AND c.trang_thai='dang_chay' AND j.value=h.sbd) GROUP BY h.sbd ORDER BY n DESC,h.sbd LIMIT 1`).first<{sbd:string;n:number}>()
   if(!em) throw new Error('Chưa có học sinh thuộc ba hành trình.')
   const now=Date.now(),ngay=new Date(now+7*3600000).toISOString().slice(0,10)
