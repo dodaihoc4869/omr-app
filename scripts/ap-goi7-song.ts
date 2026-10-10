@@ -43,4 +43,7 @@ const stats=(await query(`SELECT (SELECT COUNT(*) FROM goi_bai_7) soGoi,(SELECT 
 if(stats.emChuaCoQuota)throw new Error('Còn học sinh chưa có lịch phủ câu hôm nay.')
 const sources=await db.prepare('SELECT b.ma_to_json FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL').all<{ma_to_json:string}>()
 let goiNguonChuaDu=0;for(const s of sources.results)if(!await duNguonGoi7(env,mang7(s.ma_to_json)))goiNguonChuaDu++
-console.log(JSON.stringify({apGoi7:true,ngay,...stats,goiNguonChuaDu,giuKetQuaDaNop:true}))
+const chuaDuyet=await db.prepare("SELECT COUNT(*) n FROM goi_bai_7_cau WHERE json_extract(meta_json,'$.hopLe')=0").first<{n:number}>()
+const chuaNhan=await db.prepare(`SELECT COUNT(*) n FROM hoc_sinh h WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM bai_da_day b WHERE b.lop=h.lop AND b.bo_tick_luc IS NULL) AND NOT EXISTS(SELECT 1 FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=h.sbd AND g.lop=h.lop)`).first<{n:number}>()
+if(chuaNhan?.n)throw new Error('Còn học sinh của lớp đã chọn bài chưa nhận gói.')
+console.log(JSON.stringify({apGoi7:true,ngay,...stats,goiNguonChuaDu,cauChuaDuyet:chuaDuyet?.n??0,hocSinhDaChonChuaNhanGoi:chuaNhan?.n??0,giuKetQuaDaNop:true}))
