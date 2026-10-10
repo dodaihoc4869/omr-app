@@ -65,6 +65,22 @@ const DS = [
   ['14-gv-can-chua-chieu-dien-thoai-toi', 'gv-nhip&the=can-chua', 390, 844, 'dark', true, /Hành trình giỏi Hóa/, 'bam:Chiếu lên bảng: Câu 17'],
   ['14-gv-can-chua-go-nut', 'gv-nhip&the=can-chua', 1440, 960, 'light', true, /Hành trình giỏi Hóa/, 'bam:Gỡ nút thắt: Câu 6'],
   ['14-gv-can-chua-buoc-cuoi-toi', 'gv-nhip&the=can-chua', 1440, 960, 'dark', true, /Hành trình giỏi Hóa/, 'bam:Chữa trên lớp: Câu 31'],
+  // Nhịp học (thầy 09/10 khuya: "hành trình để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu"): bảng từng em,
+  // nhóm Chưa làm câu nào → Chưa đủ mức → Đủ mức; bấm một em ⇒ tấm Lịch sử làm câu (câu sai + số giây, toàn bộ lịch sử theo ngày).
+  ['14-gv-nhip', 'gv-nhip&the=nhip', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'cho:em chưa làm câu nào'],
+  ['14-gv-nhip-toi', 'gv-nhip&the=nhip', 1440, 960, 'dark', false, /Hành trình giỏi Hóa/, 'cho:em chưa làm câu nào'],
+  // dòng em dùng `content-visibility: auto` (chuẩn B16) ⇒ ảnh cả trang để trống dòng ngoài màn — chụp đúng khung nhìn.
+  ['14-gv-nhip-khoi-12', 'gv-nhip&the=nhip&khoi=12', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'cho:em chưa làm câu nào'],
+  ['14-gv-nhip-dien-thoai', 'gv-nhip&the=nhip', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'cho:em chưa làm câu nào'],
+  ['14-gv-nhip-dien-thoai-toi', 'gv-nhip&the=nhip', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'cho:em chưa làm câu nào'],
+  ['14-gv-nhip-ngang', 'gv-nhip&the=nhip', 844, 390, 'light', false, /Hành trình giỏi Hóa/, 'cho:em chưa làm câu nào'],
+  ['14-gv-ho-so-em', 'gv-nhip&the=nhip&khoi=12', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
+  ['14-gv-ho-so-em-toi', 'gv-nhip&the=nhip&khoi=12', 1440, 960, 'dark', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
+  ['14-gv-ho-so-em-lich-su', 'gv-nhip&the=nhip&khoi=12', 1440, 960, 'light', false, /Hành trình giỏi Hóa/, 'ho-so-ls:Trần Đức Huy'],
+  ['14-gv-ho-so-em-lich-su-toi', 'gv-nhip&the=nhip&khoi=12', 1440, 960, 'dark', false, /Hành trình giỏi Hóa/, 'ho-so-ls:Trần Đức Huy'],
+  ['14-gv-ho-so-em-dien-thoai', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
+  ['14-gv-ho-so-em-dien-thoai-toi', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
+  ['14-gv-ho-so-em-lich-su-dien-thoai', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'ho-so-ls:Trần Đức Huy'],
   ['14-gv-chien-dich-da-giao', 'gv-nhip&the=chien-dich', 1440, 960, 'light', false, /Chiến dịch đã giao/],
   ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
@@ -134,6 +150,14 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await t.getByRole('heading', { name: new RegExp(viec.slice(8)) }).first().waitFor({ timeout: 20000 })
     } else if (viec?.startsWith('cho:')) {
       await t.getByText(new RegExp(viec.slice(4))).first().waitFor({ timeout: 20000 })
+    } else if (viec?.startsWith('ho-so:') || viec?.startsWith('ho-so-ls:')) {
+      // Nhịp học › bấm cả dòng một em ⇒ tấm Lịch sử làm câu; `ho-so-ls` mở thêm thẻ con "Toàn bộ lịch sử".
+      const ten = viec.slice(viec.indexOf(':') + 1)
+      await t.getByRole('button', { name: new RegExp(`^${ten},`) }).first().click({ timeout: 20000 })
+      const tam = t.getByRole('dialog')
+      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+      if (viec.startsWith('ho-so-ls:')) await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click()
+      await t.waitForTimeout(400)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {
