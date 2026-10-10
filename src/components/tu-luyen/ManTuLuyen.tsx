@@ -893,32 +893,11 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
               <p>{loiNguon}</p>
               <button type="button" className="tlu-nut-phu" onClick={() => void napNguon()}>Thử lại</button>
             </div>
-          ) : rong ? (
-            <>
-              <h2 className="tlu-muc tlu-muc-dau">Chọn cách luyện</h2>
-              {luoiRong}
-              {cheDo ? bangCheDo : <p className="tlu-ghi tlu-ghi-giua">Chọn một cách luyện để bắt đầu. Làm xong em xem ngay đáp án, lời giải và tiến bộ của mình ở thẻ Tổng hợp.</p>}
-            </>
           ) : (
             <>
               <h2 className="tlu-muc tlu-muc-dau">Chọn cách luyện</h2>
-              <div className="tlu-luoi-che-do" role="radiogroup" aria-label="Chọn cách luyện">
-                {([1, 2, 3, 4] as CheDoTuLuyen[]).map((m) => {
-                  const lyDoKhoa = khoaCheDo(m)
-                  return (
-                    <button key={m} type="button" role="radio" aria-checked={cheDo === m} className="tlu-the-che-do" data-che-do={m} disabled={!!lyDoKhoa} onClick={() => { setCheDo(m); setLoi('') }}>
-                      <span className="tlu-the-che-do-icon"><IconCheDo cheDo={m} /></span>
-                      <span className="tlu-the-che-do-chu">
-                        <span className="tlu-the-che-do-ten">{TEN_CHE_DO[m]}</span>
-                        <span className="tlu-the-che-do-phu">{lyDoKhoa || phuThe(m)}</span>
-                      </span>
-                      <span className="tlu-the-che-do-y">{MO_TA[m].y}</span>
-                      {demTrenThe(m, false)}
-                    </button>
-                  )
-                })}
-              </div>
-              {cheDo ? bangCheDo : <p className="tlu-ghi tlu-ghi-giua">Chọn một cách luyện để bắt đầu. Làm xong em xem ngay đáp án, lời giải và tiến bộ của mình ở thẻ Tổng hợp.</p>}
+              {luoiRong}
+              {cheDo ? bangCheDo : <p className="tlu-ghi tlu-ghi-giua">Chọn một cách luyện để bắt đầu. Làm xong em xem ngay đáp án, lời giải và tiến độ của mình ở thẻ Tổng hợp.</p>}
             </>
           )}
         </main>

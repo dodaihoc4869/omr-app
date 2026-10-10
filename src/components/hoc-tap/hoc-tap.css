@@ -15,8 +15,7 @@
 @media(max-height:550px) and (min-width:701px){.ht-thanh{min-height:60px;padding:8px 24px}.ht-phien{padding:20px 24px}.ht-dieu-khien{position:static}.ht-noi-dung{padding:24px}.ht-menu{padding-top:24px}}
 @media(prefers-reduced-motion:reduce){.ht-app *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 
-/* Đồng bộ màn xem lại/tự luyện với không gian học; dùng nguyên bảng màu chung. */
+/* Đồng bộ màn xem lại với không gian học. */
 body[data-hoc-tap=hs] .h2-cdl{--h2c-nen:var(--nen);--h2c-nen-2:var(--the);--h2c-nen-3:var(--the-2);--h2c-chan:var(--the);--h2c-vien:var(--vien);--h2c-chu:var(--muc);--h2c-chu-phu:var(--nhat);--h2c-chu-nhat:var(--nhat);--h2c-xanh:var(--lg-nhan);--h2c-xanh-chu:var(--muc);--h2c-vang-sang:var(--vang-diu);--h2c-vang:var(--vang-diu);--h2c-nau:var(--muc);color-scheme:light dark}
-body[data-hoc-tap=hs] .tlu{--tlu-nen:var(--nen);--tlu-nen-2:var(--the);--tlu-nen-3:var(--the-2);--tlu-vien:var(--vien);--tlu-chu:var(--muc);--tlu-chu-phu:var(--nhat);--tlu-nhan:var(--lg-nhan);--tlu-nhan-chu:var(--muc);--tlu-vang:var(--vang-diu);--tlu-vang-dam:var(--vang-diu);--tlu-nau:var(--muc);--tlu-ngoc:var(--muc);--tlu-do:var(--do);--tlu-cd-1:var(--muc);--tlu-cd-2:var(--muc);--tlu-cd-3:var(--muc);--tlu-cd-4:var(--muc);background:var(--nen);color-scheme:light dark}
 
 body[data-hoc-tap=hs]{--v2-nen:var(--nen)}
