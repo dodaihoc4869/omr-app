@@ -22,6 +22,8 @@ Bảng Hành trình → Bài mới trong 7 ngày hiển thị từng em còn thi
 
 Tự kiểm lấy đầy đủ từng tờ được chọn, không lấy mẫu vài câu để tuyên bố đạt cả tờ. Ưu tiên biến thể đã xác thực khi có; số câu mới và phần kiểm trí nhớ được ghi rõ. Đúng–sai chấm phi tuyến 0/0,1/0,25/0,5/1; trả lời ngắn dùng quy tắc chấm số của ca thi. Điểm mỗi tờ chuẩn hoá về 10, không gọi là dự báo điểm thi. Phải trả lời đủ trước khi nhận đáp án; gửi lại giữ kết quả đầu. Khi nguồn đổi, điểm cũ giữ trong lịch sử nhưng không xác nhận đạt bản mới.
 
+Màn học cũng chấm trả lời ngắn bằng `khopPhanIII`, giống ca thi/tự kiểm: `4` và `4,0` cùng giá trị được chấp nhận. Chỉ phiên học do máy chủ đánh dấu `hocTap` áp quy tắc này; game cũ giữ chính sách chữ số có nghĩa và bản nộp đã chốt không đổi khi gửi lại. Câu chẩn đoán giữ quy tắc riêng đã có.
+
 Mục tiêu ≥7/10 bài mới và ≥80% kiến thức cũ là mục tiêu cần kiểm chứng, không phải cam kết mọi em tự động đạt. Độ phủ 7 ngày cần học sinh thực sự vào học và nguồn đã duyệt sẵn sàng; câu thiếu nguồn/bị giữ cho ca thi được báo rõ cho thầy.
 
 ## Triển khai và giữ dữ liệu
