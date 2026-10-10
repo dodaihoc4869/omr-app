@@ -72,14 +72,14 @@ describe('form đăng nhập học sinh', () => {
     expect(mocks.dangNhap).not.toHaveBeenCalled()
   })
 
-  it('luồng đăng nhập KHÔNG đổi: nhập SBD + mật khẩu → gọi API đúng tham số → lưu phiên → vào Bảng nhiệm vụ', async () => {
+  it('luồng đăng nhập KHÔNG đổi: nhập SBD + mật khẩu → gọi API đúng tham số → lưu phiên → vào Hôm nay', async () => {
     const { container } = render(<StudentPortalScreen />)
     fireEvent.change(await screen.findByLabelText('Số báo danh (SBD)'), { target: { value: ' 12121212 ' } })
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: ' matkhau ' } })
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
     await waitFor(() => expect(mocks.dangNhap).toHaveBeenCalledWith('/test', '12121212', 'matkhau'))
     await waitFor(() => expect(JSON.parse(localStorage.getItem('omr_student_portal_auth')!).token).toBe('tk-moi'))
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('.ht-app')).toBeTruthy())
   })
 
   it('đường KHÔNG có mật khẩu (SBD 111): hiện form đặt mật khẩu lần đầu với ô + nút ≥ 48 px và <label> gắn ô', async () => {

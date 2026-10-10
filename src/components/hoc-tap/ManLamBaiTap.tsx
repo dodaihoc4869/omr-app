@@ -5,6 +5,8 @@ import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { goiHoa2 } from '../hoa2/api'
 import type { HinhAnh } from '../../data/examContent'
 import type { Question } from '../../game/than-thu-v2/core'
+import '../bang-nhiem-vu/m3-theme.css'
+import '../m3/m3.css'
 import './hoc-tap.css'
 
 type Cau = Question & { goiY?: { gach?: string[]; cotLoi?: string } }

@@ -273,8 +273,6 @@ export default function StudentPortalScreen() {
   const [qidChua, setQidChua] = useState<string | undefined>()
   // Lịch sử ca mở từ màn Câu đã làm (bản vẽ tối giản 09/10) ⇒ "Về" quay lại Câu đã làm; mở từ chỗ khác ⇒ về màn chính như cũ.
   const [veSauLichSuCa, setVeSauLichSuCa] = useState<TabType | null>(null)
-  // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) trong thanh đầu của từng màn game;
-  // rời game ⇒ thoát toàn màn hình. Xem lib/toan-man-hinh-game.ts.
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
 
   // Dữ liệu ca thi & điểm

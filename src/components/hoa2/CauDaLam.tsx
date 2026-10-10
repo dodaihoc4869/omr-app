@@ -367,8 +367,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe, caGanNhat 
         <div className="h2-cdl-thong-bao">
           <p>
             {dsChienDich.length === 0
-              ? 'Em chưa có chiến dịch nào. Khi thầy giao chiến dịch, câu em làm ở Đoàn Hộ Tống và Bát Linh Đảo sẽ hiện ở đây.'
-              : 'Em chưa làm câu nào của chiến dịch này. Câu em làm ở Đoàn Hộ Tống và Bát Linh Đảo sẽ hiện ở đây.'}
+              ? 'Em chưa có bài học được giao. Câu đã làm theo kế hoạch sẽ hiện ở đây.'
+              : 'Em chưa làm câu nào của bài học này. Câu đã làm theo kế hoạch sẽ hiện ở đây.'}
           </p>
         </div>
       )}
