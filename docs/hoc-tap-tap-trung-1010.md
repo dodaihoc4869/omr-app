@@ -32,3 +32,5 @@ Bản chốt đối chiếu tất cả tệp đỏ: 1.613 kiểm đạt, 164 l�
 ## Phát hành xác nhận
 
 10/10/2026 12:55 giờ Việt Nam: PR231 đã phát hành, Actions38028684777 SUCCESS. Worker và Pages cùng d43ddc822243189e1cf9003b1ecd50cb357d24ea; 5 đường giao diện và 2 cổng quyền đạt, mọi cổng D1 không có ca mở/lượt đang làm. Bộ bắt buộc cuối280/280 đạt. Quay lui bằng revert merge d43ddc82 với -m1, không sửa dữ liệu/schema.
+
+10/10/2026 14:30 giờ Việt Nam: khôi phục Vào ca kiểm tra luôn hiện ở đầu cổng HS, không phụ thuộc coCa/tải kế hoạch. Form hiện hành nhận mã/mật khẩu, danh tính đã đăng nhập; quyền và giờ ca vẫn do máy chủ kiểm. Thẻ mobile chữ đủ hàng, nút phía dưới. PR232/233, mã sống d413444c9ae1b31e73860bae6618242666714607, Actions38034174097SUCCESS:288/288 kiểm bắt buộc,SW13/13,Worker/Pages cùng SHA,5đường giao diện+2cổng quyền. Chromium3cỡ mở form thành công/0JS/0tràn; không schema/điểm/thuật toán.
