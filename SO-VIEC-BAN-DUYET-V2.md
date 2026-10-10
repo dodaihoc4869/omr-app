@@ -92,3 +92,8 @@ Thầy nhắn (nguyên văn): "hành trình để lại chỗ nhịp học, họ
 Thầy nhắn (nguyên văn): "Phần ai sai trong chiếu lên bảng cung hiển thị cả số giây từng làm câu đó"
 - [x] Chiếu lên bảng › Ai sai: hiện số giây từng em làm câu đó | bằng chứng: b4712f81 — máy chủ dùng ms đo thật trước ước tính, ca thi lấy thêm chi_tiet_cau.giay; tờ chiếu: "N lần sai · trung bình x giây", chip nào cũng có giây hoặc "chưa đo giờ"; `tests/ai-sai-to-chieu-0510`, `ai-sai-cau-may-chu-0510` xanh.
 - [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: 07:36 D1 có 1 ca mở (11L1-L2) ⇒ HOÃN; 08:15 0 ca mở/0 lượt ⇒ gộp PR227 `a9ec700`, Actions `38012501511` SUCCESS. Lùi: `git revert -m 1 a9ec700`.
+
+## Đợt 6 — sửa chữ chìm màn "Cùng gỡ câu này" (10/10)
+Thầy nhắn (nguyên văn, kèm ảnh): "Không nhìn thấy chữ"
+- [x] Sửa chữ chìm màn Cùng gỡ câu này (HS, nền sáng) | bằng chứng: nguyên nhân gốc — hoc-sinh.css đổi --tlu-* sang bảng sáng nhưng chua-cau-sai.css viết cứng nền xanh than ⇒ chữ tối trên nền tối; ô nhập số chữ trắng trên nền sáng. Thêm luật nền sáng bằng --tlu-* (nền tối giữ nguyên); kiem:mau-giu 0; ảnh 26-hs-cung-go-* 0 lỗi trang/0 tràn/0 chạm < 44.
+- [x] Phát sinh: điện thoại dọc tràn ngang 358 px ở màn đang làm bước | bằng chứng: ô lưới cột phụ min-width:auto nở theo dải bước ⇒ `.ccs-cot-phu > * { min-width: 0 }`; chụp lại 0 tràn.

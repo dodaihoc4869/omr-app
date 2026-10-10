@@ -29,6 +29,7 @@ import '../../src/components/m3'
 import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
 import SanhHomNay from '../../src/components/ban-duyet-v2/SanhHomNay'
 import CauDaLam from '../../src/components/hoa2/CauDaLam'
+import ManChuaCauSai from '../../src/components/chua-cau-sai/ManChuaCauSai'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 // Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
 import '../../src/styles/vo-thay.css'
@@ -151,6 +152,14 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Câu đã làm (09/10): 24 câu để danh sách cột trái đủ dài mà cuộn — tái hiện lỗi thẻ chồng chữ ở bố cục ngang.
   if (u.pathname.endsWith('/hoa2-cau-da-lam')) return tra(CDL_GIA)
   if (u.pathname.endsWith('/hoa2-cau-chi-tiet')) return tra({ ok: true, cau: [CT_GIA] })
+  // Cùng gỡ câu này (10/10): thầy gửi ảnh chữ chìm trên nền xanh than ở trạng thái chờ bài luyện.
+  if (u.pathname.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd1', trangThai: 'thieu_hoc_lieu', coHocLieu: false, revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 } })
+  if (u.pathname.endsWith('/hs/chua-cau-sai/phat-item')) return tra(thamSo.get('go') === 'buoc'
+    ? { ok: true, dotId: 'd1', trangThai: 'dang_chua_buoc', revision: 2, tienDo: { soBuocDaQua: 1, soBuocCanKiem: 3 },
+        tienDoChiTiet: [{ buocId: 'b1', tieuDe: 'Viết phương trình thuỷ phân', trangThai: 'da_qua' }, { buocId: 'b2', tieuDe: 'Tính số mol NaOH', trangThai: 'dang_lam' }, { buocId: 'b3', tieuDe: 'Bảo toàn khối lượng', trangThai: 'chua' }],
+        cauGoc: { phan: 'I', text: 'Thuỷ phân hoàn toàn 8,8 gam etyl axetat bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là' },
+        item: { id: 'it1', loai: 'phan_biet', buocSo: 2, tieuDe: 'Tính số mol NaOH', kieu: 'chon', hoi: 'Số mol NaOH phản ứng bằng bao nhiêu?', luaChon: [{ ky: 'A', noi: '0,05 mol' }, { ky: 'B', noi: '0,1 mol' }, { ky: 'C', noi: '0,2 mol' }, { ky: 'D', noi: '0,15 mol' }] } }
+    : { ok: true, dotId: 'd1', trangThai: 'thieu_hoc_lieu', coHocLieu: false, revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 } })
   // Tấm Lịch sử làm câu của một em (09/10 khuya) — app thầy gọi qua `goiLenh` (bản chụp đã thay bằng gia/goi-lenh-thay.ts, cùng dữ liệu này);
   // giữ thêm đường `fetch` để mọi lối gọi thẳng cũng nhận dữ liệu giả, không chạm máy chủ thật.
   if (u.pathname.endsWith('/gv/lich-su-lam-cau')) return tra(lichSuGia(String(b.sbd ?? ''), 'Trần Đức Huy'))
@@ -216,6 +225,7 @@ const con =
   : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
+  : man === 'chua-cau-sai' ? h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B2-17', onVe: noop })
   : man === 'cau-da-lam' ? h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })
   : man === 'sanh-xong' ? manSanh(SANH_XONG)
   : man === 'sanh-ca-mo' ? manSanh(SANH_HT, { caDangMo: true })
