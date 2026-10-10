@@ -258,3 +258,46 @@
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+/* ── TRUNG TU 09/10 (Game Hóa 2.0): lỗi tải dễ hiểu + Thử lại · ô tích 44×44 · khung xương bảng — chỉ biến --gvm-* ── */
+/* lỗi tải dễ hiểu + Thử lại (cùng kiểu .gvhs-loi của Học sinh 2.0) */
+.gv-loi-tai {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 14px 16px;
+  border-radius: var(--r-vua);
+  background: var(--gvm-ho-nen);
+  color: var(--gvm-ho-dam);
+  font-family: var(--sans);
+}
+.gv-loi-tai p {
+  flex: 1 1 240px;
+  margin: 0;
+  font-size: var(--t-than);
+}
+/* ô tích trong bảng (chọn ca để xoá): vùng chạm 44 × 44 */
+.gv-o-tich {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px 0;
+  cursor: pointer;
+}
+.gv-o-tich input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+/* khung xương bảng (Ca kiểm tra 2.0) */
+.gv-xuong-bang {
+  display: grid;
+  gap: 12px;
+  padding: 8px 0 16px;
+}
+.gv-xuong-bang > .gv-xuong-khoi {
+  height: 48px;
+}

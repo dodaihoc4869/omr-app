@@ -95,6 +95,23 @@ describe('Màn chiếu bước cuối', () => {
     expect(dom.querySelector('.mc-thay-chua-nut')).toBeTruthy()
     expect(dom.querySelector('.mc-giai')?.hasAttribute('hidden')).toBe(true)
   })
+  // HÀNH TRÌNH › CẦN THẦY CHỮA (trung tu 09/10 tối): nhúng dưới danh sách cần chữa — bỏ tiêu đề + đoạn giải thích, đánh dấu + cuộn tới nhóm thầy bấm.
+  it('gọn: không tiêu đề/đoạn giải thích; nhóm thầy bấm được đánh dấu và cuộn tới; điểm danh + chiếu giữ nguyên', async () => {
+    const cuon = vi.fn()
+    const goc = Element.prototype.scrollIntoView
+    Element.prototype.scrollIntoView = cuon
+    try {
+      const { container } = render(<CauCanChua gon chonDau="g1" />)
+      expect(await screen.findByText('Chiếu bước này để chữa chung')).toBeTruthy()
+      expect(screen.queryByRole('heading', { name: 'Câu cần chữa · Bước cuối trên lớp' })).toBeNull()
+      expect(container.textContent).not.toContain('Hệ thống đã giúp em tự gỡ từng bước')
+      expect(screen.getByText('Điểm danh có sẵn')).toBeTruthy()
+      expect(container.querySelector('article[data-nhom-chua="g1"]')?.getAttribute('data-chon')).toBe('true')
+      await waitFor(() => expect(cuon).toHaveBeenCalledTimes(1))
+    } finally {
+      Element.prototype.scrollIntoView = goc
+    }
+  })
   it('chỉ các em có mặt được xác nhận từ nút Thầy chữa trên tờ', async () => {
     render(<CauCanChua />)
     fireEvent.click(await screen.findByText('Chiếu bước này để chữa chung'))

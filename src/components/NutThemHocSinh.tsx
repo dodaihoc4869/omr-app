@@ -28,7 +28,8 @@ const O_NHAP: React.CSSProperties = {
   color: 'var(--muc)',
 }
 
-export default function NutThemHocSinh({ onXong }: { onXong?: (soEm: number, tomTat: string) => void }) {
+/** `kieu` 'chinh' = nút chính của bảng --gvm-* (màn Học sinh 2.0, trung tu 09/10): bỏ nền/bo nội tuyến. Mặc định như cũ. */
+export default function NutThemHocSinh({ onXong, kieu = 'cu' }: { onXong?: (soEm: number, tomTat: string) => void; kieu?: 'cu' | 'chinh' }) {
   const [mo, setMo] = useState(false)
   const [hoTen, setHoTen] = useState('')
   const [namSinh, setNamSinh] = useState('')
@@ -76,19 +77,23 @@ export default function NutThemHocSinh({ onXong }: { onXong?: (soEm: number, tom
         type="button"
         onClick={() => setMo((v) => !v)}
         aria-expanded={mo}
-        className="tap-target inline-flex items-center justify-center font-bold whitespace-nowrap"
-        style={{
-          gap: 'var(--k2)',
-          height: 44,
-          minHeight: 44,
-          padding: '0 var(--k4) 0 var(--k3)',
-          borderRadius: 'var(--bo-tron)',
-          background: 'var(--the-2)',
-          color: 'var(--muc)',
-          border: '1.5px solid transparent',
-          fontFamily: 'var(--sans)',
-          fontSize: 'var(--cx-1)',
-        }}
+        className={`tap-target inline-flex items-center justify-center font-bold whitespace-nowrap${kieu === 'chinh' ? ' gvv2-nut-chinh tt-nhan' : ''}`}
+        style={
+          kieu === 'chinh'
+            ? { gap: 'var(--k2)' }
+            : {
+                gap: 'var(--k2)',
+                height: 44,
+                minHeight: 44,
+                padding: '0 var(--k4) 0 var(--k3)',
+                borderRadius: 'var(--bo-tron)',
+                background: 'var(--the-2)',
+                color: 'var(--muc)',
+                border: '1.5px solid transparent',
+                fontFamily: 'var(--sans)',
+                fontSize: 'var(--cx-1)',
+              }
+        }
       >
         <UserPlus size={16} />
         <span>Thêm học sinh</span>

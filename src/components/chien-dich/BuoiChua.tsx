@@ -149,7 +149,7 @@ export default function BuoiChua({
     <>
       <div className="cd-dau">
         <div>
-          <p className="cd-duong-dan">Chữa trên lớp › Buổi chữa</p>
+          <p className="cd-duong-dan">Cần thầy chữa › Buổi chữa</p>
           <h1>
             Buổi chữa · {du.chienDich.ten}
             {du.chienDich.lop ? ` · ${du.chienDich.lop}` : ''}

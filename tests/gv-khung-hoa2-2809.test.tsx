@@ -167,7 +167,8 @@ describe('Ca kiểm tra 2.0', () => {
     m.danhSachCa.mockResolvedValue([])
     const { container } = render(<LichSuCaScreen />)
     expect(await screen.findByText(CHU_CA_TRONG_HOA2)).toBeTruthy()
-    expect(CHU_CA_TRONG_HOA2).toBe('Chưa có ca kiểm tra nào. Mở ca bằng nút Mở ca kiểm tra ở thanh bên.')
+    // SỬA CÓ CHỦ Ý 09/10 (trung tu): thanh bên 2.0 không còn nút mở ca (nút ở đầu màn Ca kiểm tra / nút nổi "Mở ca") ⇒ câu không chỉ "ở thanh bên".
+    expect(CHU_CA_TRONG_HOA2).toBe('Chưa có ca kiểm tra nào. Bấm Mở ca kiểm tra để mở ca đầu tiên.')
     expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra đầu tiên' })).toBeNull()
     expect(container.textContent).not.toContain('Đồng bộ lại phiếu')
     expect(container.textContent).not.toContain('Quản lý, tìm kiếm và chi tiết các ca kiểm tra')

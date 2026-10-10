@@ -55,3 +55,57 @@ Còn lại (ngoài làn, báo thầy): nút Mở ca riêng ở màn Ca kiểm tr
 | Toàn bộ vitest | `npx vitest run` | 152 đỏ / 74 tệp; chạy lại 74 tệp trên main 4346618: 151 đỏ; so TÊN: 1 khác = `doan-giao-dien` "tự tắt sau ĐÚNG 3 giây" (đo giờ, máy tải nặng) — chạy riêng 24/24 đạt, lần toàn phần trước đạt |
 | Cổng CI deploy.yml (17 tệp) | so với danh sách đỏ | chỉ `chua-d1-van-hanh` đỏ ở máy này (không nạp được `node:sqlite`); trên CI main đạt (run 37887043478) |
 | Đếm lệnh D1 Sảnh | kịch bản riêng một tệp | 151/38/38 trên cả main lẫn nhánh (phần thêm = 0 lệnh) |
+
+## Đợt 3 — trung tu giao diện 3 app (09/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 20:51 (VN) — PR223, mã sống `dc62bde`, Actions `37938839127` SUCCESS. Bản vẽ: https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8.
+| Làn | Commit | Ghi chú |
+|---|---|---|
+| Thang chung | 9f2ec7a | `src/styles/thang.css` chỉ kích thước + chuyển động |
+| Học sinh | ade1192 | Hôm nay 1 nút vàng; Hành trình thanh bậc + từng bài; Ôn lại; Của em; Làm câu bỏ đếm trùng, chạm ≥ 44 |
+| Phụ huynh | 19ce9f6 | 3 mục; Nhận xét của thầy; Tiến bộ có số; Ca kiểm tra; Đổi SBD có hỏi lại |
+| Giáo viên | dc20639, 6c47a41 | 2.0 một bảng lam, tối theo nút; Hôm nay; Học sinh; Mở ca |
+| Precache | 4886a6d | 3 mảnh chỉ của thầy ra kho chạy-lúc, 2994 KB |
+Còn lại: nút Chốt Đoàn giữ chỗ cũ; 64 luật CSS chết mang màu ở PH chưa gỡ (cổng giữ màu); "Giao bài riêng" ở ToanCanhEm/ExamMonitor còn trỏ màn BTVN đang ẩn ở 2.0; bảng từ chuẩn còn dòng "Chữa trên lớp".
+
+## Đợt 4 — sửa theo ảnh thầy gửi (09/10 tối)
+Trạng thái: **ĐÃ PHÁT HÀNH** 22:38 (VN) — PR225, mã sống `bf10231`, Actions `37952259291` SUCCESS (Worker + Pages, kiểm sống cùng commit đạt). D1 22:30: 0 ca mở / 0 lượt. Lùi: `git revert -m 1 bf10231`.
+| Việc | Commit | Ghi chú |
+|---|---|---|
+| Luyện thêm (HS) tô màu | d2fa153c | sắc Bát Linh từng ô + biểu tượng; chỉ THÊM luật |
+| Hành trình (GV) 3 thẻ | 757ea1a1 | Dạy học · Kiểm tra đầu giờ · Cần thầy chữa; Nhịp → Hôm nay/Học sinh; Chiến dịch đã giao → Cài đặt |
+| Cần thầy chữa một số | 3fe9ff59 | Hôm nay = thanh bên = danh sách (gộp chung `gomCanChua`); lọc khối đếm "chỗ" |
+| Câu đã làm (HS) | 40e26c71 | lưới 2 cột trong khung cuộn ⇒ một cột; lọc xuống dòng; nền sáng đọc rõ |
+| Precache | 25c3ebf3 | `ghi-to-chieu`, `thoi-gian-len-bang` ra kho chạy-lúc |
+### Kiểm bản phát hành (nhánh 3d942253, đã gộp main 27788740)
+| Việc | Lệnh | Kết quả |
+|---|---|---|
+| Kiểu | `npx tsc -b`; máy chủ `tsc --noEmit` | 0 lỗi |
+| Màu / giao diện | `check:mau` · `kiem:mau-giu` · `soi:giao-dien` | đạt · 0 vi phạm · 0 lỗi |
+| Build + SW | `npm run build:cf` | SW 13/13 · 147 tệp / 2997 KB |
+| Toàn bộ vitest | so TÊN với main sạch 80955fde | nhánh 161 đỏ / main 163; đỏ mới 0 (2 chỉ đỏ ở main = test đo giờ) |
+| Cổng CI deploy.yml (20 tệp) | | chỉ `chua-d1-van-hanh` đỏ ở máy này (node:sqlite), main sạch cũng thế |
+| Ảnh Chromium | `scripts/chup-v2` 14-gv-can-chua, 24-gv-hom-nay, 25-hs-cau-da-lam, 22-hs-hanh-trinh | 0 lỗi trang · 0 tràn ngang |
+| PR check `kiem` | Actions 37951714821 | SUCCESS |
+Còn lại: màn Hoá 2.0 ngang "thấp" co bằng `zoom` ⇒ nút ~33–36 px trên điện thoại xoay ngang (có từ trước; đã đề xuất việc riêng).
+
+## Đợt 5 — Hành trình thầy: Nhịp học + lịch sử làm câu từng em + số giây (10/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 08:23 (VN) — PR227, mã sống `a9ec700`, Actions `38012501511` SUCCESS. Hoãn 07:36 vì có ca mở (11L1-L2); 08:15 D1 0 ca mở / 0 lượt mới gộp. Lùi: `git revert -m 1 a9ec700`.
+| Việc | Commit | Ghi chú |
+|---|---|---|
+| Hợp đồng | 6feedcf9 | `server/src/lich-su-lam-cau-kieu.ts` dùng chung máy chủ + app |
+| Máy chủ (CHỈ ĐỌC) | b4712f81 | `/gv/lich-su-lam-cau`; giây: cột giay → raw ms → chi_tiet_cau → ước tính ('uoc') → null; "Ai sai" dùng ms thật |
+| Tờ chiếu | b4712f81 | "N lần sai · trung bình x giây"; chip luôn có giây hoặc "chưa đo giờ" |
+| App thầy | c8f0602a | thẻ Nhịp học (Chưa làm → Chưa đủ mức → Đủ mức), tấm Lịch sử làm câu, Hôm nay ⇒ Nhịp học |
+### Kiểm bản phát hành (nhánh 945bf426)
+| Việc | Kết quả |
+|---|---|
+| tsc app + máy chủ | 0 lỗi |
+| check:mau · kiem:mau-giu · soi:giao-dien | đạt · 0 · 0 |
+| build:cf | SW 13/13 · 146 tệp / 2996 KB |
+| vitest toàn bộ so TÊN main 513467e3 | 0 đỏ mới (2 khác lúc chạy song song build: đo giờ `de-rieng-tran-trung` + quét tĩnh `khong-dung-bien…`; chạy riêng giống hệt main) |
+| Ảnh 14-gv-nhip-*, 14-gv-ho-so-em-* | 0 lỗi trang · 0 tràn · 0 chạm < 44 |
+| PR check `kiem` | Actions 38009453645 SUCCESS |
+
+## Đợt 6 — "Cùng gỡ câu này" chữ chìm ở nền sáng (10/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 10:24 (VN) — PR229, mã sống `4bf4a0d`, Actions `38020000153` SUCCESS. 09:25 có ca mở (11L2-L1) ⇒ hoãn; 10:16 D1 0 ca mở / 0 lượt (thầy báo ca đã xong) mới gộp. Lùi: `git revert -m 1 4bf4a0d`.
+Nguyên nhân gốc: hoc-sinh.css đổi --tlu-* sang bảng sáng nhưng chua-cau-sai.css viết cứng nền xanh than; ô nhập số chữ --tlu-nhan-chu (trắng ở nền sáng). Sửa: chỉ THÊM luật nền sáng bằng --tlu-*; điện thoại dọc `.ccs-cot-phu > * { min-width: 0 }` (hết tràn 358 px). Kiểm: check:mau đạt · kiem:mau-giu 0 · soi:giao-dien 0 · tsc 0 · test liên quan 8/8 · build:cf 13/13, 2996 KB · ảnh 26-hs-cung-go-* 0 lỗi/0 tràn/0 chạm < 44 · PR check `kiem` SUCCESS.

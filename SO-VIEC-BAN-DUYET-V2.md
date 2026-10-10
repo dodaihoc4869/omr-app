@@ -51,3 +51,49 @@ Thầy chốt (nguyên văn): "1. Bát linh đảo 2. Chốt 3. Bỏ hẳn 4. Th
 Thầy nhắn (nguyên văn): "đẩy luôn giao diện mới lên đi bạn ơi" · "làm tiếp xong hết đẩy lên máy chủ luôn nhé"
 - [x] Gộp main mới (PR217 Hành trình v6 + ab898ce) | bằng chứng: fbe1d58, cadfc89; nút "Làm bài kiểm đầu/tuần" của main đưa vào Sảnh mới (test mới trong `ban-duyet-v2-0910`).
 - [x] Kiểm toàn bộ trước phát hành | bằng chứng: bảng "Kiểm bản phát hành" trong `BAN-DUYET-V2-build-status.md`.
+
+## Đợt 3 — TRUNG TU giao diện 3 app (09/10)
+
+Thầy nhắn (nguyên văn): "bạn hãy quet toàn bộ giao diện app hiện tại và trung tu lại giao diện siêu đẹp, mịn, khoa học đúng cấu trúc của code hiện tại, vẽ cho tôi trước khi build nhé"
+- [x] Quét toàn bộ giao diện app hiện tại (HS · PH · GV) | bằng chứng: 3 agent rà mã chỉ đọc trên main 6842acc (bản sống PR221) + 79 ảnh Chromium `scripts/chup-v2`; số đo: HS 31 mức bo góc/40 cỡ chữ/14 kiểu bóng, PH 19/24/~8 kiểu nút, GV 24/~30/10+ họ nút, GV chạy 2 bảng màu (lam/ngọc), tối nửa màn.
+- [x] Vẽ bản trung tu (siêu đẹp, mịn, khoa học, đúng cấu trúc code hiện tại) cho thầy xem | bằng chứng: canvas https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8 — 24 khung: tổng hợp + bộ khung chung + 11 cặp hiện tại↔trung tu (HS 5, PH 3, GV 3), giữ nguyên màu.
+- [!] CHƯA BUILD — chờ thầy chốt bản vẽ + 3 câu hỏi (PH 3 hay 4 mục; GV lấy lam làm màu gốc; thanh bên GV 5 mục) | KẸT: chờ thầy.
+
+Thầy nhắn (nguyên văn, 2 lần): "buid luôn và đẩy luôn nhé" — coi bản vẽ được duyệt nguyên trạng; 3 câu hỏi lấy đúng phương án bản vẽ: PH 3 mục · GV một bảng lam · thanh bên GV 5 mục + Cài đặt.
+- [x] Thang chung `src/styles/thang.css` (chỉ kích thước + chuyển động) | bằng chứng: 9f2ec7a (nạp ngay sau tokens.css ở main.tsx; check:mau đạt, tsc 0 lỗi). 3 làn HS · PH · GV đang build song song trên worktree riêng.
+- [x] Build HS theo bản vẽ (Hôm nay · Hành trình · Ôn lại · Của em · Làm câu) | bằng chứng: ade11921 (gộp c8e8590); ảnh scratchpad/hs-lan/anh-moi (0 tràn, 0 chạm <44). Chưa làm: dời nút Chốt của Đoàn (cột thao tác chật).
+- [x] Build PH theo bản vẽ (3 mục · Hôm nay · Tiến bộ · Ca kiểm tra · Đổi SBD có hỏi lại · tối) | bằng chứng: 19ce9f62 (gộp 18e7694); ảnh scratchpad/ph-lan/anh. Chưa gỡ 64 luật CSS chết mang màu (cổng giữ màu tính là xoá màu).
+- [x] Build GV theo bản vẽ (5 mục + Cài đặt · một bảng lam · Hôm nay · Học sinh · Mở ca · tối theo nút) | bằng chứng: dc206394 + 6c47a415 (gộp bd54f6d); ảnh scratchpad/anh-gv. Ghi chú: chế độ 2.0 vốn đã 5 mục (ảnh '9 mục' trước là do trang chụp chưa bật cờ).
+- [x] Kiểm toàn bộ (tsc, vitest so nền main, cổng màu/giao diện, build:cf, ảnh) | bằng chứng: tsc 0 · server tsc 0 · check:mau đạt · kiem:mau-giu 0 · soi:giao-dien 0 lỗi · build:cf SW 13/13, 2994 KB (4886a6d: 3 mảnh chỉ của thầy ra kho chạy-lúc, gộp 3 làn đã đẩy lên 3003 KB) · full vitest 152 đỏ vs main a89b697 151 — 1 khác = test đo tốc độ btvn-nang-do 'dưới 200 ms', chạy riêng đạt · D1 20:37: 0 ca mở / 0 lượt.
+- [x] Đẩy: kiểm ca mở → PR → main → Actions | bằng chứng: D1 20:42 0 ca mở/0 lượt; PR223 gộp `dc62bde`; Actions `37938839127` SUCCESS (16 bước, gồm kiểm Worker + Pages sống cùng commit). Lùi: `git revert -m 1 dc62bde`.
+
+## Đợt 4 — sửa theo ảnh thầy gửi (09/10 tối)
+
+Thầy nhắn (nguyên văn, kèm ảnh Luyện thêm): "tôi muốn bạn tô màu đẹp xịn vào phần này"
+- [x] Tô màu các ô Luyện thêm (HS · Hành trình) | bằng chứng: d2fa153c — mỗi ô một sắc Bát Linh (ngọc/vàng/lam-ngọc) + biểu tượng; chỉ THÊM luật, kiem:mau-giu 0; ảnh 22-hs-hanh-trinh-* (sáng/tối).
+
+Thầy nhắn (nguyên văn, kèm ảnh GV Hành trình): "phần này phải tối ưu lại, tôi chỉ cần giữ lại phần dạy học. Phần câu cần chữa trùng tu lại bỏ hết những thứ không cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại"
+- [x] Hành trình của thầy chỉ giữ Dạy học | bằng chứng: 757ea1a1 (gộp b952e008) — thẻ Nhịp hôm nay + Chiến dịch đã giao bỏ khỏi Hành trình; chức năng chuyển chỗ (Hôm nay, Học sinh lọc khối, Cài đặt › Mở danh sách chiến dịch).
+- [x] Trùng tu Cần thầy chữa | bằng chứng: 757ea1a1 — MỘT danh sách gộp 6 nguồn, nhiều em đứng trước, mỗi dòng một nút mở đúng màn chữa sẵn có; 3fe9ff59 — Hôm nay/thanh bên/danh sách cùng MỘT số (trước Hôm nay chỉ đếm 3 nhóm), thanh lọc khối đếm "chỗ".
+Thầy nhắn (nguyên văn): "kiểm tra đầu giờ giữ lại nữa nhé"
+- [x] Giữ Kiểm tra đầu giờ | bằng chứng: Hành trình còn 3 thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa; ảnh 14-gv-dau-gio*.
+
+Thầy nhắn (nguyên văn, kèm ảnh Câu đã làm chồng chữ): "trùng tu lại chỗ này"
+- [x] Sửa Câu đã làm (HS, bố cục ngang/máy tính) | bằng chứng: 40e26c71 — nguyên nhân gốc: lưới 2 cột (giao-dien-day-du.css) trong khung cuộn cố định cao ⇒ thẻ đè nhau; nay một cột, hàng lọc xuống dòng, nút Về/nhãn đọc rõ nền sáng; ảnh 25-hs-cau-da-lam-* 0 lỗi trang/0 tràn.
+- [x] Phát sinh: precache vượt trần sau gộp (3039 KB) | bằng chứng: 25c3ebf3 — 2 mảnh chung chỉ của thầy ra kho chạy-lúc ⇒ 147 tệp / 2996 KB, SW 13/13.
+- [!] Phát sinh, CHƯA sửa (ngoài phạm vi): màn Hoá 2.0 bố cục ngang "thấp" co cả màn bằng `zoom` ⇒ nút 48 px còn ~36 px trên điện thoại xoay ngang (có từ trước, mọi màn ngang).
+
+## Đợt 5 — Hành trình thầy: nhịp học + hồ sơ từng em + số giây (09/10 khuya)
+
+Thầy nhắn (nguyên văn): "hành trình để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử, câu làm sai số giây làm mỗi câu, mọi thứ về học sinh đó."
+- [x] Hành trình để lại chỗ nhịp học | bằng chứng: c8f0602a (gộp 88ab6dce) — thẻ Nhịp học (Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa), lọc khối + tìm; ảnh 14-gv-nhip-*.
+- [x] Em chưa làm + chưa hoàn thành đủ ưu tiên lên đầu | bằng chứng: nhóm Chưa làm câu nào → Chưa đủ mức → Đủ mức (→ Chưa có mức); `tests/hanh-trinh-nhip-ho-so-0910.test.tsx` xanh. Hôm nay › Xem danh sách / dòng khối ⇒ Nhịp học.
+- [x] Bấm từng em ⇒ toàn bộ lịch sử, câu sai, số giây mỗi câu, mọi thứ về em | bằng chứng: b4712f81 lệnh CHỈ ĐỌC `/gv/lich-su-lam-cau` (giây: cột giay → raw ms → chi_tiet_cau → ước tính 'uoc' → null) + c8f0602a tấm `HoSoLamCauEm` (Câu sai · Toàn bộ lịch sử theo ngày · nút Mở hồ sơ đầy đủ); `tests/lich-su-lam-cau-0910.test.ts` xanh.
+Thầy nhắn (nguyên văn): "Phần ai sai trong chiếu lên bảng cung hiển thị cả số giây từng làm câu đó"
+- [x] Chiếu lên bảng › Ai sai: hiện số giây từng em làm câu đó | bằng chứng: b4712f81 — máy chủ dùng ms đo thật trước ước tính, ca thi lấy thêm chi_tiet_cau.giay; tờ chiếu: "N lần sai · trung bình x giây", chip nào cũng có giây hoặc "chưa đo giờ"; `tests/ai-sai-to-chieu-0510`, `ai-sai-cau-may-chu-0510` xanh.
+- [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: 07:36 D1 có 1 ca mở (11L1-L2) ⇒ HOÃN; 08:15 0 ca mở/0 lượt ⇒ gộp PR227 `a9ec700`, Actions `38012501511` SUCCESS. Lùi: `git revert -m 1 a9ec700`.
+
+## Đợt 6 — sửa chữ chìm màn "Cùng gỡ câu này" (10/10)
+Thầy nhắn (nguyên văn, kèm ảnh): "Không nhìn thấy chữ"
+- [x] Sửa chữ chìm màn Cùng gỡ câu này (HS, nền sáng) | bằng chứng: nguyên nhân gốc — hoc-sinh.css đổi --tlu-* sang bảng sáng nhưng chua-cau-sai.css viết cứng nền xanh than ⇒ chữ tối trên nền tối; ô nhập số chữ trắng trên nền sáng. Thêm luật nền sáng bằng --tlu-* (nền tối giữ nguyên); kiem:mau-giu 0; ảnh 26-hs-cung-go-* 0 lỗi trang/0 tràn/0 chạm < 44.
+- [x] Phát sinh: điện thoại dọc tràn ngang 358 px ở màn đang làm bước | bằng chứng: ô lưới cột phụ min-width:auto nở theo dải bước ⇒ `.ccs-cot-phu > * { min-width: 0 }`; chụp lại 0 tràn.

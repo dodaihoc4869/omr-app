@@ -355,3 +355,37 @@
   .ccs *::before,
   .ccs *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* SỬA LỖI 10/10 (thầy gửi ảnh "Cùng gỡ câu này" — "Không nhìn thấy chữ"). Nguyên nhân gốc: ở nền SÁNG của app học sinh (Bát Linh),
+   `bat-linh/hoc-sinh.css` đổi --tlu-* sang bảng sáng (chữ mực đậm, nền ngà) nhưng các khối dưới đây VIẾT CỨNG nền xanh than
+   ⇒ chữ tối trên nền tối; ô nhập số thì chữ --tlu-nhan-chu (= trắng ở nền sáng) trên nền sáng. Chỉ THÊM luật cho nền sáng, dùng
+   đúng biến --tlu-* (đã trỏ về --bl-*) — nền tối giữ nguyên như cũ. */
+@media not all and (prefers-color-scheme: dark) {
+  html:root body[data-bat-linh] .ccs-dau {
+    border-bottom-color: var(--tlu-vien);
+    background: color-mix(in srgb, var(--tlu-nen-2) 94%, transparent);
+    box-shadow: 0 8px 30px color-mix(in srgb, var(--tlu-chu) 8%, transparent);
+  }
+  html:root body[data-bat-linh] .ccs-ve { background: var(--tlu-nen-2); }
+  html:root body[data-bat-linh] :is(.ccs-the-tien-do, .ccs-cau-goc, .ccs-khu-lam) {
+    border-color: var(--tlu-vien);
+    background: var(--tlu-nen-2);
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--tlu-chu) 8%, transparent);
+  }
+  html:root body[data-bat-linh] .ccs-lo-trinh li:not([data-da='true'], [data-hien-tai='true']) { border-color: var(--tlu-vien); background: var(--tlu-nen); }
+  html:root body[data-bat-linh] :is(.ccs-cau-goc-noi, .ccs-bai-lam-dau) { border-color: var(--tlu-vien); }
+  html:root body[data-bat-linh] .ccs-hoi { border-color: var(--tlu-vien); background: var(--tlu-nen-3); }
+  html:root body[data-bat-linh] .ccs-input { background: var(--tlu-nen-2); color: var(--tlu-chu); }
+  html:root body[data-bat-linh] .ccs-chon-muc:not([data-chon='true']) { background: var(--tlu-nen-2); }
+  html:root body[data-bat-linh] .ccs-trang-thai:not(.ccs-goi-y, .ccs-phan-hoi) { border-color: var(--tlu-vien); background: var(--tlu-nen-3); }
+  html:root body[data-bat-linh] .ccs-goi-y > strong { color: color-mix(in srgb, var(--tlu-vang-dam) 55%, var(--tlu-chu)); }
+  html:root body[data-bat-linh] .ccs-nut-chinh {
+    background: var(--tlu-nhan);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--tlu-nhan) 22%, transparent);
+  }
+  html:root body[data-bat-linh] .ccs-nut-phu:not(.ccs-nghi) { background: var(--tlu-nen-2); color: var(--tlu-chu); }
+}
+
+/* SỬA LỖI 10/10 (điện thoại dọc): dải "Đường tự gỡ" là thanh cuộn ngang, nhưng thẻ bọc nó là Ô LƯỚI có min-width:auto ⇒ thẻ nở theo
+   cả dải (tràn ngang ~360px, kéo luôn thẻ "Xem lại đề gốc"). Cho các ô của cột phụ được co ⇒ dải cuộn trong thẻ như thiết kế. */
+.ccs-cot-phu > * { min-width: 0; }

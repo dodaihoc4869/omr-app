@@ -16,7 +16,7 @@ html:root body[data-bat-linh] .ph3 {
 }
 html:root body[data-bat-linh] .ph3-dau { padding-top: max(24px, env(safe-area-inset-top)); padding-bottom: 18px; }
 html:root body[data-bat-linh] .ph3-tieu-de h1 { font-family: var(--serif); letter-spacing: -.035em; }
-html:root body[data-bat-linh] .ph3-the { border: 1px solid var(--bl-line); border-radius: 24px; }
+html:root body[data-bat-linh] .ph3-the { border: 1px solid var(--bl-line); border-radius: 24px; box-shadow: none; } /* trung tu 09/10: thẻ dùng viền HOẶC bóng — Bát Linh giữ viền */
 html:root body[data-bat-linh] .ph3-ah { border: 1px solid rgb(192 211 170); box-shadow: var(--bl-shadow); background: linear-gradient(110deg, rgb(15 67 57 / .98) 12%, rgb(22 75 66 / .94) 58%, rgb(22 75 66 / .78)), var(--bl-scene) center / cover; }
 html:root body[data-bat-linh] .ph3-ah::before, html:root body[data-bat-linh] .ph3-ah::after { display: none; }
 html:root body[data-bat-linh] .ph3-ah h2 { font-family: var(--serif); font-size: 25px; letter-spacing: -.02em; }
@@ -36,4 +36,13 @@ html:root body[data-bat-linh] .ph3-vao__chan { color: var(--bl-ink); background:
   html:root body[data-bat-linh] .ph3-muc { margin: 2px 12px; border-radius: 18px; }
   html:root body[data-bat-linh] .ph3-muc[aria-current='page'] { background: rgb(235 241 220); }
   html:root body[data-bat-linh] .ph3-chinh { padding-top: 12px; }
+}
+/* Trung tu 09/10 — mục đang chọn chỉ tô MỘT lớp: thanh đáy / thanh dọc (< 1024 px) giữ viên thuốc quanh biểu tượng, bỏ nền cả ô mà chế độ tối
+   (bat-linh/che-do-toi.css) phủ thêm; máy tính (≥ 1024 px) giữ nền cả dòng, bỏ viên thuốc. */
+@media (max-width: 1023.98px) {
+  html:root body[data-bat-linh] .ph3 .ph3-muc[aria-current='page'] { background: transparent; }
+}
+@media (min-width: 1024px) {
+  html:root body[data-bat-linh] .ph3 .ph3-muc[aria-current='page'] .ph3-muc__bt { background: transparent; color: inherit; }
+  html:root body[data-bat-linh] .ph3 .ph3-dau { padding: 0; } /* máy tính: đầu màn chỉ còn nút tròn Tài khoản ở góc phải (ph-v3.css) */
 }

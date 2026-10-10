@@ -91,7 +91,7 @@ export function CanhRung({profile,ketQua,tong,suKien,chuong=false,trum=false,daC
    <QuaiSonThuy loai={trum?'trum_suong_mu':'suong_mu'} size={120}/>
   </div>
   <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop&&(tran.correct||tran.damage>0)?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
-  <BieuCamThu thu={thu} camXuc={daChot?(tran.correct?(chuong?'quyet-tam':'dung'):'sai'):'nghi'} size={48}/>
+  <BieuCamThu thu={thu} camXuc={vuaNop?(tran.correct?(chuong?'quyet-tam':'dung'):'sai'):daChot?'quyet-tam':'nghi'} size={48}/>
   {chuong&&<ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>}
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
@@ -215,7 +215,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
  const phanHoi=cho?null:phanHoiMay,boQua=()=>{if(cho)setCho(false)}
  useEffect(()=>{if(!cho)return
   khung.current?.querySelector('.dao2-canh')?.scrollIntoView?.({block:'nearest',behavior:'smooth'})
-  const h=setTimeout(()=>setCho(false),giamChuyenDong()?450:1100);return()=>clearTimeout(h)},[cho])
+  const h=setTimeout(()=>setCho(false),giamChuyenDong()?380:680);return()=>clearTimeout(h)},[cho])
  // Ngang: thanh kéo giữa hai cột (thầy 28/09) — tỉ lệ cột trái % lưu trên máy em.
   const datTi=(v:number)=>{const x=Math.min(TI_MAX,Math.max(TI_MIN,v));setTi(x);try{localStorage.setItem(KHOA_TI,String(Math.round(x)))}catch{/* máy chặn lưu: bỏ qua */}}
  const keoTi=(x:number)=>{const r=khung.current?.getBoundingClientRect();if(r&&r.width>0)datTi(100-(x-r.left)/r.width*100)}
@@ -224,7 +224,8 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
  useEffect(()=>{if(loi)loiRef.current?.scrollIntoView?.({block:'nearest'})},[loi])
  if(!q)return null
  const vai=docVai(q.vai),goiY=docGoiY(q.goiY,q.phan),cuoi=viTri+1>=cau.length
- const nhan=<p className="dao2-ai-nhan">ẢI {viTri+1}/{cau.length}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}{q.tenDang?<span> · {q.tenDang}</span>:null}</p>
+ // TRUNG TU 09/10 (bản vẽ HS-LamCau): bỏ bộ đếm "ẢI k/n" trùng với "Câu k/n" của thẻ câu (giữ cái ở thẻ câu) — nhãn chỉ còn vai · dạng; thanh ải vẫn chỉ ải đang làm.
+ const nhan=vai||q.tenDang?<p className="dao2-ai-nhan">{vai?TEN_VAI[vai].toLocaleUpperCase('vi'):null}{q.tenDang?<span>{vai?' · ':''}{q.tenDang}</span>:null}</p>:null
  const thieu=!traLoi.trim()||(q.phan==='II'&&!/^[DS]{4}$/.test(traLoi))
  const chuNutThieu=q.phan==='I'?'Chọn một phương án để tung chiêu':q.phan==='II'?'Chọn đủ 4 ý để tung chiêu':'Nhập đáp án để tung chiêu'
  // Dọc: một cột như cũ (hai lớp bọc `display:contents`). Ngang: cột TRÁI = thế giới game (thanh ải, cảnh trận, dải kết quả) · cột PHẢI = phần học
@@ -238,7 +239,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
     <NutToanManHinh/>
    </div>
    {!ngang&&!phanHoi&&nhan}
-   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={suKien} chuong={chuongSk===suKien} trum={vai==='trum'} daChot={!!phanHoiMay}/>}
+   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={suKien} chuong={chuongSk===suKien} trum={vai==='trum'} daChot={busy||!!phanHoiMay}/>}
    {phanHoi&&<DaiKetQua profile={profile} cau={q} phanHoi={phanHoi} ketQua={ketQua} tong={cau.length}/>}
    {ngang&&<TienDoChuyen cau={cau} viTri={viTri} ketQua={ketQua}/>}
   </div>

@@ -3,7 +3,7 @@
 // quả); ở đây chỉ là VẺ NGOÀI + gọi lại các hàm ấy. Câu trả lời giữ đúng định dạng cũ: Phần I một chữ A–D; Phần II 4 ký tự D/S ("-" = chưa
 // chọn); Phần III chữ tự do. KHÔNG dùng position:fixed (sheet có transform từ animate-google-fade ⇒ con fixed trôi theo nội dung): thanh
 // đồng hồ dính bằng `position: sticky` dưới thanh trên của sheet.
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, Check, Eye, Heart, Hourglass, Pause, RefreshCw, Timer, X } from 'lucide-react'
 import '../m3'
 import './mom-m3.css'
@@ -136,6 +136,89 @@ export function MomDanhSachM3({
   )
 }
 
+interface MomCauItemProps {
+  cau: any
+  idx: number
+  daChon: string | undefined
+  datTraLoi: (idCau: string, giaTri: string) => void
+}
+
+const MomCauItem = memo(function MomCauItem({ cau, idx, daChon, datTraLoi }: MomCauItemProps) {
+  const id = String(cau.id ?? idx)
+  const ten = `mom-c-${id}`
+  return (
+    <li className="mom-cau" aria-labelledby={`${ten}-ten`}>
+      <div className="mom-cau-dau">
+        <h3 id={`${ten}-ten`} className="mom-cau-ten">
+          Câu {idx + 1}
+        </h3>
+        {cau.chuyenDe && <span className="m3-chip">{cau.chuyenDe}</span>}
+      </div>
+      <div className="mom-de">
+        <MomQuestionStem q={cau} />
+      </div>
+
+      {cau.phan === 'II' ? (
+        <div className="mom-nhom">
+          {(cau.ideas || cau.luaChon || cau.choices || []).map((idea: string, i: number) => {
+            const cur = daChon?.[i]
+            return (
+              <div key={i} className="mom-y" role="radiogroup" aria-labelledby={`${ten}-y${i}`}>
+                <div id={`${ten}-y${i}`} className="mom-y-nd">
+                  <MomOption q={cau} index={i} text={`${String.fromCharCode(97 + i)}) ${idea}`} tf />
+                </div>
+                <div className="mom-doan">
+                  {(['D', 'S'] as const).map((v) => (
+                    <label key={v} className="mom-doan-o" data-chon={cur === v || undefined}>
+                      <input
+                        type="radio"
+                        name={`${ten}-y${i}`}
+                        value={v}
+                        checked={cur === v}
+                        onChange={() => {
+                          const a = (daChon || '----').split('')
+                          a[i] = v
+                          datTraLoi(cau.id, a.join(''))
+                        }}
+                      />
+                      <span>{v === 'D' ? 'Đúng' : 'Sai'}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
+        <div className="mom-nhom" role="radiogroup" aria-labelledby={`${ten}-ten`}>
+          {cau.choices.map((choice: string, k: number) => {
+            const ky = KY_TU[k] ?? String.fromCharCode(65 + k)
+            const chon = daChon === ky
+            return (
+              <label key={k} className="mom-lua" data-chon={chon || undefined}>
+                <input type="radio" name={ten} value={ky} checked={chon} onChange={() => datTraLoi(cau.id, ky)} />
+                <span className="mom-ky" aria-hidden="true">
+                  {ky}
+                </span>
+                <span className="mom-nd">
+                  <MomOption q={cau} index={k} text={choice} />
+                </span>
+              </label>
+            )
+          })}
+        </div>
+      ) : (
+        <div className="mom-nhom">
+          <div className="mom-nhap">
+            <label className="mom-nhap-nhan" htmlFor={`mom-tl-${cau.id}`}>Điền câu trả lời ngắn:</label>
+            <OSoTraLoi id={`mom-tl-${cau.id}`} inputMode="text" value={daChon || ''} onChange={(v) => datTraLoi(cau.id, v)} placeholder="Nhập đáp án số hoặc chữ…" />
+          </div>
+        </div>
+      )}
+    </li>
+  )
+})
+
 // ─────────────────────────── ĐANG LÀM BÀI ───────────────────────────
 export function MomLamBaiM3({
   tieuDe,
@@ -198,82 +281,15 @@ export function MomLamBaiM3({
       </div>
 
       <ol className="mom-cau-ds">
-        {dsCau.map((cau: any, idx: number) => {
-          const daChon = traLoi[cau.id]
-          const id = String(cau.id ?? idx)
-          const ten = `mom-c-${id}`
-          return (
-            <li key={cau.id || idx} className="mom-cau" aria-labelledby={`${ten}-ten`}>
-              <div className="mom-cau-dau">
-                <h3 id={`${ten}-ten`} className="mom-cau-ten">
-                  Câu {idx + 1}
-                </h3>
-                {cau.chuyenDe && <span className="m3-chip">{cau.chuyenDe}</span>}
-              </div>
-              <div className="mom-de">
-                <MomQuestionStem q={cau} />
-              </div>
-
-              {cau.phan === 'II' ? (
-                <div className="mom-nhom">
-                  {(cau.ideas || cau.luaChon || cau.choices || []).map((idea: string, i: number) => {
-                    const cur = daChon?.[i]
-                    return (
-                      <div key={i} className="mom-y" role="radiogroup" aria-labelledby={`${ten}-y${i}`}>
-                        <div id={`${ten}-y${i}`} className="mom-y-nd">
-                          <MomOption q={cau} index={i} text={`${String.fromCharCode(97 + i)}) ${idea}`} tf />
-                        </div>
-                        <div className="mom-doan">
-                          {(['D', 'S'] as const).map((v) => (
-                            <label key={v} className="mom-doan-o" data-chon={cur === v || undefined}>
-                              <input
-                                type="radio"
-                                name={`${ten}-y${i}`}
-                                value={v}
-                                checked={cur === v}
-                                onChange={() => {
-                                  const a = (daChon || '----').split('')
-                                  a[i] = v
-                                  datTraLoi(cau.id, a.join(''))
-                                }}
-                              />
-                              <span>{v === 'D' ? 'Đúng' : 'Sai'}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : Array.isArray(cau?.choices) && cau.choices.length > 0 ? (
-                <div className="mom-nhom" role="radiogroup" aria-labelledby={`${ten}-ten`}>
-                  {cau.choices.map((choice: string, k: number) => {
-                    const ky = KY_TU[k] ?? String.fromCharCode(65 + k)
-                    const chon = daChon === ky
-                    return (
-                      <label key={k} className="mom-lua" data-chon={chon || undefined}>
-                        <input type="radio" name={ten} value={ky} checked={chon} onChange={() => datTraLoi(cau.id, ky)} />
-                        <span className="mom-ky" aria-hidden="true">
-                          {ky}
-                        </span>
-                        <span className="mom-nd">
-                          <MomOption q={cau} index={k} text={choice} />
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              ) : (
-                <div className="mom-nhom">
-                  <div className="mom-nhap">
-                    <label className="mom-nhap-nhan" htmlFor={`mom-tl-${cau.id}`}>Điền câu trả lời ngắn:</label>
-                    <OSoTraLoi id={`mom-tl-${cau.id}`} inputMode="text" value={daChon || ''} onChange={(v) => datTraLoi(cau.id, v)} placeholder="Nhập đáp án số hoặc chữ…" />
-                  </div>
-                </div>
-              )}
-            </li>
-          )
-        })}
+        {dsCau.map((cau: any, idx: number) => (
+          <MomCauItem
+            key={cau.id || idx}
+            cau={cau}
+            idx={idx}
+            daChon={traLoi[cau.id]}
+            datTraLoi={datTraLoi}
+          />
+        ))}
       </ol>
 
       {loi && (

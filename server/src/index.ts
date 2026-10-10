@@ -107,6 +107,7 @@ import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionCon
 import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
+import { gvLichSuLamCau } from './lich-su-lam-cau'
 import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
 import { gvDauGio } from './dau-gio'
 import { thayChuaCau } from './thay-chua-cau'
@@ -128,7 +129,7 @@ import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
-import { docGoiDeDem, docKeyBankDem, doanCongBoNgay, nhoCongBo } from './dem-ca-thi'
+import { docGoiDeDem, docKeyBankDem, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
 // lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
@@ -552,6 +553,8 @@ async function vaoThi(env: Env, b: Record<string, unknown>): Promise<Response> {
     .bind(khoa, maCa, sbd, lanThu, idThietBi, vaoLuc, hetGio, new Date(now).toISOString())
     .run()
 
+  if (hetGio) nhoHetGioLuot(maCa, sbd, hetGio, now)
+
   return ra({
     ok: true,
     cach: qd.cach,
@@ -751,11 +754,20 @@ async function dayTrangThai(env: Env, b: Record<string, unknown>): Promise<Respo
     await ghi.run()
     return ra({ ok: true })
   }
+
+  // Đệm isolate cho het_gio_luc (giảm 50% số câu đọc D1 khi hàng trăm em gửi heartbeat cùng lúc)
+  const demHan = layDemHetGioLuot(maCa, sbd)
+  if (demHan !== null) {
+    await ghi.run()
+    return ra(demHan ? { ok: true, hetGioLuc: demHan } : { ok: true })
+  }
+
   const kq = await env.DB.batch([
     ghi,
     env.DB.prepare(`SELECT het_gio_luc FROM luot WHERE ma_ca = ? AND sbd = ? AND trang_thai = 'dang_lam' ORDER BY lan_thu DESC LIMIT 1`).bind(maCa, sbd),
   ])
   const han = String((kq[1]?.results?.[0] as { het_gio_luc?: string } | undefined)?.het_gio_luc ?? '').trim()
+  nhoHetGioLuot(maCa, sbd, han)
   return ra(han ? { ok: true, hetGioLuc: han } : { ok: true })
 }
 
@@ -3806,6 +3818,8 @@ const boXuLy = {
       if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
+      // LỊCH SỬ LÀM CÂU CỦA MỘT EM (thầy 09/10 khuya, server/src/lich-su-lam-cau.ts; hợp đồng lich-su-lam-cau-kieu.ts): CHỈ ĐỌC sổ — mọi lượt · câu sai · số giây.
+      if (p === '/gv/lich-su-lam-cau') return ra(await gvLichSuLamCau(envDoc, b))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
       // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.

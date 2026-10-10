@@ -29,7 +29,7 @@ import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nh
 import '../components/bang-nhiem-vu/sheet-m3.css'
 // Tạm dừng hoạt ảnh Sảnh khi bị màn toàn màn hình che (lớp `sanh-bi-che`, xem hiệu ứng ngay dưới `cheDo2`).
 import '../styles/sanh-bi-che.css'
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef, type ReactNode } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, useRef, type CSSProperties, type ReactNode } from 'react'
 import { taoKhoGio, useGiayConLai } from '../lib/dong-ho-thi'
 import {
   Award,
@@ -64,7 +64,7 @@ import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
 import DangNhapHocSinh, { type ApiDangNhapHs } from './DangNhapHocSinh'
 import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
-import { veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
+import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
@@ -88,8 +88,9 @@ import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
 import type { TuCongHocSinh } from './ExamTakeScreen'
 
-// Màn làm bài nạp trễ: cổng học sinh không phải kéo theo bộ chấm khi chỉ xem điểm.
-const ManLamBai = lazy(() => import('./ExamTakeScreen'))
+// Màn làm bài nạp trễ nhưng nạp trước lúc rảnh / lúc bấm cửa: khi học sinh bấm "Vào thi" thì màn mở ngay lập tức trong 0ms.
+export const boNapExam = boNap(() => import('./ExamTakeScreen'))
+const ManLamBai = veNgayKhiCo(lazy(boNapExam), boNapExam)
 const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 // MÁY YẾU (29/09): Bảng tin + hộp Khắc phục câu sai chỉ hiện khi em BẤM mở — nạp lười (một mảnh chung, xem cong-hs-nap-luoi.ts)
@@ -204,6 +205,25 @@ function ChoNapGame() {
       Đang mở bài học…
     </div>
   )
+}
+
+/** Chỗ giữ MÀN CON của học sinh (Câu đã làm, Tu luyện, Lịch sử ca) trong lúc mảnh mã về — trung tu 09/10: chữ chờ chung "Đang mở…"
+ * (không phải game nên không ghi "Đang mở game…"); nền do khung màn con tô (`khungManCon`). */
+function ChoNapManCon() {
+  return (
+    <div role="status" className="flex items-center justify-center" style={{ minHeight: '60vh', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--nhat)' }}>
+      Đang mở…
+    </div>
+  )
+}
+
+/** Khung toàn màn của màn con học sinh. Game Hoá 2.0 (màn V2): nền --v2-nen ngay từ khung (không chớp màn Sảnh phía sau lúc chờ mảnh mã)
+ *  + trượt lên (.tt-mo-lop, thang chung). Cờ tắt ⇒ y như cũ. */
+function khungManCon(cheDo2: boolean): { className: string; style: CSSProperties } {
+  return {
+    className: `fixed inset-0 z-50 overflow-y-auto${cheDo2 ? ' tt-mo-lop' : ''}`,
+    style: cheDo2 ? { overscrollBehavior: 'contain', background: 'var(--v2-nen, var(--nen))' } : { overscrollBehavior: 'contain' },
+  }
 }
 
 /** Giây còn lại của bài gia đình giao: 2 tiếng (7200 giây) kể từ lúc bấm làm. */
@@ -796,6 +816,21 @@ export default function StudentPortalScreen() {
     goc.classList.add('sanh-bi-che')
     return () => goc.classList.remove('sanh-bi-che')
   }, [cheDo2, tab])
+  // NẠP TRƯỚC MÀN LÀM BÀI (09/10): tải trước ExamTakeScreen lúc rảnh để khi học sinh bấm "Vào thi" thì màn mở ngay 0ms không phải chờ tải qua mạng.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const cb = () => { void boNapExam() }
+    const hen = ('requestIdleCallback' in window
+      ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
+      : (fn: () => void) => setTimeout(fn, 1200))(cb)
+    return () => {
+      if ('cancelIdleCallback' in window) {
+        (window as Window & { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(hen)
+      } else {
+        clearTimeout(hen)
+      }
+    }
+  }, [])
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
@@ -884,6 +919,7 @@ export default function StudentPortalScreen() {
       namSinh: auth.namSinh || '',
       lop: auth.lop || '',
       matKhau: matKhauCaVaoThi.trim(),
+      scriptUrl: scriptUrl || undefined,
     })
     setManThi(true)
   }
@@ -926,7 +962,7 @@ export default function StudentPortalScreen() {
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
           coCa={!!caDangMo} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
-          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => setTab('vaothi')}
+          onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
         />
@@ -938,8 +974,8 @@ export default function StudentPortalScreen() {
       {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Hôm nay" của chính nó. */}
       {/* LỊCH SỬ CA KIỂM TRA (thẻ nhỏ trên Sảnh): màn riêng toàn màn hình, lazy ngoài precache. */}
       {tab === 'lichsuca' && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
-          <Suspense fallback={<ChoNapGame />}>
+        <div {...khungManCon(cheDo2)}>
+          <Suspense fallback={<ChoNapManCon />}>
             <LichSuCaEm
               sbd={auth.sbd}
               scriptUrl={scriptUrl}
@@ -953,8 +989,8 @@ export default function StudentPortalScreen() {
         </div>
       )}
       {tab === 'caudalam' && auth.token && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
-          <Suspense fallback={<ChoNapGame />}>
+        <div {...khungManCon(cheDo2)}>
+          <Suspense fallback={<ChoNapManCon />}>
             {/* Bản vẽ tối giản 09/10: thẻ "Ca kiểm tra gần nhất" chuyển từ Sảnh sang đầu màn Câu đã làm — cùng số, cùng lối vào Lịch sử ca. */}
             <CauDaLamNhanh
               token={auth.token}
@@ -978,8 +1014,8 @@ export default function StudentPortalScreen() {
 
       {/* TU LUYỆN (cửa trên Sảnh): 4 chế độ luyện tự do, không tính EXP — màn riêng toàn màn hình, nút "Về Hôm nay" của chính nó. */}
       {tab === 'tuluyen' && auth.token && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
-          <Suspense fallback={<ChoNapGame />}>
+        <div {...khungManCon(cheDo2)}>
+          <Suspense fallback={<ChoNapManCon />}>
             <ManTuLuyenNhanh token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} />
           </Suspense>
         </div>
@@ -1862,7 +1898,7 @@ export default function StudentPortalScreen() {
           về đúng chỗ cũ. */}
       {/* MÀN LÀM BÀI — phủ toàn màn, ngay trong cổng học sinh. */}
       {manThi && (
-        <div className="fixed inset-0 z-[60] overflow-auto bg-white dark:bg-slate-950" style={{ '--thi-le-phai': '52px' } as React.CSSProperties}>
+        <div className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-white dark:bg-slate-950 man-thi-phu" style={{ '--thi-le-phai': '52px' } as React.CSSProperties}>
           <button
             type="button"
             onClick={() => {

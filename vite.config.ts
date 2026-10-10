@@ -207,6 +207,9 @@ export default defineConfig({
           '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau,DieuKhienToChieuScreen,ModalDieuKhienTuXa,btvn-nang-do-thay}-*.{js,css}',
           // Bảng Dạy học (28/09): tấm Chiếu mã (vào thi + điểm danh) nay là mảnh dùng chung của 4 màn thầy (Mở ca, Theo dõi ca, phòng chờ, Lên bảng — đều ngoài precache) ⇒ kho chạy-lúc.
           '**/TamPhuChieuMa-*.{js,css}',
+          // Trung tu giao diện 09/10: ba mảnh CHỈ màn thầy nạp (đồng bộ mọi ca ở Cài đặt/Ca kiểm tra, tên lớp của thầy, mã QR chiếu) ra kho chạy-lúc —
+          // ba làn trung tu thêm ~10 KB kiểu dáng cho vỏ học sinh/phụ huynh, giữ precache dưới trần 3000 KB mà không đụng mảnh nào máy em/phụ huynh cần.
+          '**/{NutDongBoMoiCa,ten-lop-thay,ma-qr}-*.{js,css}',
           // Thẻ "Luyện đề cấu trúc" trong Tu luyện (30/09): mảnh nạp LƯỜI khi em bấm thẻ (luyện đề cần mạng để rút/chấm ở máy chủ) — kho chạy-lúc.
           // Màn Tu luyện (30/09, bố cục ngang + máy tính): cả mảnh ManTuLuyen nạp LƯỜI khi em bấm cửa Tu luyện ở Sảnh — mọi việc của nó đều cần máy chủ
           // (tải nguồn, rút, chấm), mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc. Không ép vào precache vỏ (trần 3000 KB).
@@ -236,12 +239,21 @@ export default defineConfig({
           '**/{hom-nay,uoc-luong-bo-cuc}-*.{js,css}',
           // Vòng học v2 (02/10): màn thầy "Gỡ nút thắt" + rút đề v2 (máy thầy) — tải khi mở, không cất sẵn trên máy em.
           '**/BanGoNutThatScreen-*.{js,css}',
+          // Hành trình › Cần thầy chữa (09/10 tối) đọc thẻ nút thắt cùng màn Gỡ nút thắt và gom ba nhóm Cần thầy chữa cùng màn Hôm nay ⇒ hai mảnh chung
+          // CHỈ máy thầy dùng (lệnh gọi nút thắt, phép gom OMNI) — kho chạy-lúc, không làm nặng precache vỏ.
+          '**/{nut-that-api,omni-bang}-*.{js,css}',
+          // Gộp main 09/10 tối: hai mảnh CHUNG mới tách ra giữa các màn chiếu/chữa của thầy (LenBangChienDich, DayHocLenBang, KiemTraDauGio,
+          // CauCanChuaTrenLop, GoiLenBangScreen, html-may-chieu — đều đã ngoài precache) ⇒ cũng không cất sẵn (+42 KB đưa precache vượt trần).
+          '**/{ghi-to-chieu,thoi-gian-len-bang}-*.{js,css}',
           // Bản vẽ tối giản app thầy (09/10): màn "Hôm nay" của thầy + hai thẻ ghép màn sẵn có của Hành trình (Cần thầy chữa, Bài đã dạy) nạp LƯỜI.
           // Các thẻ ấy nhập động Dạy học / Kiểm tra đầu giờ / Bước cuối trên lớp (trước nằm trong mảnh Gọi lên bảng) ⇒ Rollup tách thành mảnh riêng,
           // kèm `TheCauHienThi` (chỉ hai màn ấy dùng), `gv-v2` (khung + phép tính nhịp của Hành trình/Hôm nay), `HopChonDe` + `cay-chon-de` (hộp chọn
           // đề / cây đề — chỉ màn thầy nhập: Giao/Sửa chiến dịch, Dạy học, Mở ca, Gọi lên bảng, Bài hôm nay, cây mục đích). Đồ thị nhập đã soát: CHỈ màn
           // thầy nhập ⇒ kho chạy-lúc; máy em / phụ huynh / màn thi không bao giờ tải. Giữ precache vỏ không lớn hơn trước (≈ 2990 KB, trần 3000 KB).
           '**/{GvHomNayScreen,TheCanThayChua,TheBaiDaDay,DayHocLenBang,KiemTraDauGio,CauCanChuaTrenLop,TheCauHienThi,gv-v2,HopChonDe,cay-chon-de}-*.{js,css}',
+          // Hành trình › Nhịp học + tấm Lịch sử làm câu của một em (thầy 09/10 khuya): CHỈ màn thầy nạp lười (thẻ Nhịp học ⇒ bấm một em), lệnh
+          // `/gv/lich-su-lam-cau` cần mạng ⇒ kho chạy-lúc, không cất sẵn.
+          '**/{TheNhipHoc,HoSoLamCauEm,lich-su-lam-cau-api,nhip-hanh-trinh}-*.{js,css}',
           // Khung lời giải + thang tự gỡ: chỉ mở khi em bấm "Hỏi thầy" (vốn phải có mạng để gọi máy chủ) ⇒ kho chạy-lúc, không cất sẵn.
           '**/KhungLoiGiai-*.{js,css}',
           '**/loi-giai-*.{js,css}',

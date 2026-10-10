@@ -1,0 +1,67 @@
+/* THANG CHUNG CHO CẢ 3 APP — trung tu giao diện thầy duyệt 09/10/2026 (bản vẽ https://claude.ai/artifact/E95grLrwwdGKGjP7uZGFU8).
+ * CHỈ kích thước + chuyển động, KHÔNG có màu nào (màu từng app giữ nguyên trong tokens.css / ban-duyet-v2.css / --ph3-* / --gvm-*).
+ * Gắn vào token sẵn có của tokens.css: --k* (khoảng cách), --motion-* (đường cong).
+ *   Chữ 5 bậc + số lớn · bo góc 3 bậc + viên · nút 3 kiểu (56 · 48 · 44) · chuyển động 120 / 200 / 250 / 400 ms. */
+:root {
+  /* chữ */
+  --t-phu: 13px;
+  --t-than: 15px;
+  --t-the: 17px;
+  --t-khoi: 24px;
+  --t-man: 32px;
+  --t-so: 48px;
+
+  /* khoảng cách: dùng --k1 (4) · --k2 (8) · --k3 (12) · --k4 (16) · --k6 (24) · --k7 (32); lề thẻ 20 = --k5 */
+
+  /* bo góc */
+  --r-nho: 12px;
+  --r-vua: 16px;
+  --r-the: 24px;
+  --r-vien: 999px;
+
+  /* chiều cao nút */
+  --nut-chinh-cao: 56px;
+  --nut-phu-cao: 48px;
+  --nut-chu-cao: 44px;
+
+  /* chuyển động */
+  --cd-nhan: 120ms;
+  --cd-doi-muc: 200ms;
+  --cd-mo-lop: 250ms;
+  --cd-thanh: 400ms;
+  --cd-cong: var(--motion-standard, cubic-bezier(0.2, 0, 0, 1));
+}
+
+/* Đổi mục / đổi thẻ: mờ dần + trượt 8px. Mở màn con: cùng kiểu, dài hơn một nhịp. */
+@keyframes tt-vao {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tt-mo {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.tt-vao-muc { animation: tt-vao var(--cd-doi-muc) var(--cd-cong) both; }
+.tt-mo-lop { animation: tt-vao var(--cd-mo-lop) var(--cd-cong) both; }
+
+/* Nhấn: lún nhẹ, có phản hồi ngay dưới ngón tay. */
+.tt-nhan { transition: transform var(--cd-nhan) var(--cd-cong); }
+.tt-nhan:active:not(:disabled) { transform: scale(0.98); }
+
+/* Thanh tiến độ: trượt tới số mới. */
+.tt-thanh { transition: width var(--cd-thanh) var(--cd-cong); }
+
+/* Khung xương chờ tải: đúng hình khối thật, nhịp thở chậm. */
+@keyframes tt-tho {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.tt-xuong { animation: tt-tho 1.4s ease-in-out infinite; }
+
+/* Máy đặt giảm chuyển động: bỏ trượt, chỉ còn mờ ngắn; không lún, không thở. */
+@media (prefers-reduced-motion: reduce) {
+  .tt-vao-muc, .tt-mo-lop { animation: tt-mo 120ms linear both; }
+  .tt-nhan, .tt-nhan:active:not(:disabled) { transition: none; transform: none; }
+  .tt-thanh { transition: none; }
+  .tt-xuong { animation: none; }
+}

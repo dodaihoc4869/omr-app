@@ -78,6 +78,8 @@ export interface ExamAttempt {
   hetGioLuc?: string
   /** Lượt thứ mấy trong ca (thi lại = 2, 3…). Bản cũ không có → 1. */
   lanThu?: number
+  /** Khoá chính của dòng luot trên máy chủ (maCa:sbd:lanThu) — ghi vào để các nhịp lưu tạm và nộp truy vấn O(1) theo đúng khoá chính thay vì quét bảng. */
+  khoaLuot?: string
   idThietBi?: string
   /** Giây em dừng ở từng câu (qid → giây, cộng dồn theo thẻ câu đang chiếm màn) — QUANLYCATHI mục 5. */
   giayCau?: Record<string, number>

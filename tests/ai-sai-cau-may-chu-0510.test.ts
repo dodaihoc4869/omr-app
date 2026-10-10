@@ -50,3 +50,26 @@ describe('lượt game: thời gian ƯỚC TÍNH (thầy 05/10: "chỗ làm tron
     expect(r.ds.map((x: { giay: number | null; uocTinh?: boolean }) => [x.giay, x.uocTinh ?? false])).toEqual([[null, false], [30, true], [45, true]])
   })
 })
+
+describe('số giây THẬT (thầy 09/10: "phần ai sai trong chiếu lên bảng cũng hiển thị cả số giây từng làm câu đó")', () => {
+  it('lượt game có raw_json.ms ⇒ số đo thật (không uocTinh); không có ms ⇒ ước tính như cũ; ca thi giay null ⇒ chi_tiet_cau.giay', async () => {
+    const d = taoD1That()
+    const env = d.env as unknown as Env
+    d.sql.prepare('INSERT INTO danh_sach (sbd, ho_ten, nam_sinh, lop, cap_nhat_luc) VALUES (?,?,?,?,?)').run('S1', 'Trần An', '2010', '11', 'x')
+    d.sql.prepare("INSERT INTO ca (ma_ca, ten_ca, trang_thai, cap_nhat_luc) VALUES ('C1', 'Kiểm tra tuần 3', 'dong', 'x')").run()
+    d.sql.prepare('INSERT INTO chi_tiet_cau (khoa, ma_ca, sbd, lan_thu, phan, so_cau, qid, dap_an_chon, giay, cap_nhat_luc) VALUES (?,?,?,?,?,?,?,?,?,?)').run('C1|S1|1|I|1', 'C1', 'S1', 1, 'I', 1, 'Q1', 'B', 64, 'x')
+    const t0 = Date.parse('2026-10-04T13:00:00Z')
+    d.sql.prepare('INSERT INTO game_v2_session (id, sbd, json, created_at) VALUES (?,?,?,?)').run('P1', 'S1', JSON.stringify({ created: t0 }), new Date(t0).toISOString())
+    const tl = (qid: string, at: number) => d.sql.prepare('INSERT INTO game_v2_attempt (id, sbd, session, qid, content_group, json, created_at) VALUES (?,?,?,?,?,?,?)').run(`P1|${qid}`, 'S1', 'P1', qid, 'g', JSON.stringify({ attempt: { at, qid }, correct: false }), new Date(at).toISOString())
+    const sk = (khoa: string, qid: string, nguon: string, maNguon: string, luc: string, raw: Record<string, unknown> | null) =>
+      d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, ket_qua, giay, luc, ngay_vn, raw_json) VALUES (?, 'S1', ?, ?, ?, 0, NULL, ?, ?, ?)").run(khoa, qid, nguon, maNguon, luc, luc.slice(0, 10), raw ? JSON.stringify(raw) : null)
+    tl('Q1', t0 + 45_000); sk('g1', 'Q1', 'game', 'P1', new Date(t0 + 45_000).toISOString(), { chon: 'A', ms: 17_600 }) // đo thật 18 (không phải ước tính 45)
+    tl('Q1~ss0', t0 + 110_000); sk('g2', 'Q1~ss0', 'game', 'P1', new Date(t0 + 110_000).toISOString(), null) // không ms ⇒ ước tính 65
+    sk('t1', 'Q1', 'thi', 'C1', '2026-10-01T02:05:00.000Z', null) // ca thi: sổ thiếu giây ⇒ chi_tiet_cau 64
+    sk('t2', 'Q1', 'len_bang', 'b', '2026-10-02T02:05:00.000Z', null) // không đo ⇒ null
+    const r = await goiWorker(worker, env, '/gv/ai-sai-cau', { qids: ['Q1'] }, true)
+    expect(r.ds.map((x: { noi: string; giay: number | null; uocTinh?: boolean }) => [x.noi, x.giay, x.uocTinh ?? false])).toEqual([
+      ['Đảo', 65, true], ['Đảo', 18, false], ['Lên bảng', null, false], ['Ca Kiểm tra tuần 3', 64, false],
+    ])
+  })
+})

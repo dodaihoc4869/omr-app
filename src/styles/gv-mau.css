@@ -197,6 +197,11 @@
   .m3.vo-thay .ben-trai .ben-trai-dem[data-tone='la'] {
     background: var(--gvm-xl);
   }
+  /* "Cần thầy chữa" cạnh Hành trình: hổ phách — cùng màu dòng việc ấy ở Hôm nay (trung tu 09/10). Nền tông + chữ đậm để chữ 11 px đủ tương phản. */
+  .m3.vo-thay .ben-trai .ben-trai-dem[data-tone='vang'] {
+    background: var(--gvm-hp-nen);
+    color: var(--gvm-hp-dam);
+  }
 }
 
 /* ── ĐIỆN THOẠI: thanh dưới + thanh trên mặt trắng ─────────────────────────────────────────── */
@@ -594,17 +599,20 @@
   overflow-wrap: anywhere;
 }
 
+/* Thẻ hiện ra: trượt lên 200 ms theo thang chung (trung tu 09/10: trước 500 ms — chậm hơn mức "≤ 250 ms" của chuẩn soát B6), dùng cho CẢ HAI
+ * họ thẻ (gv2-* của màn 2.0 cũ, gvv2-* của Hôm nay / Hành trình). Lệch nhịp ngắn 30 ms để bốn thẻ số không bật cùng lúc. */
 @media (prefers-reduced-motion: no-preference) {
   .vo-thay .gv2-the-so[data-mau],
-  .vo-thay .gv2-the {
-    animation: gvm-len 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  .vo-thay .gv2-the,
+  .vo-thay .gvv2-the {
+    animation: gvm-len var(--cd-doi-muc, 200ms) var(--cd-cong, cubic-bezier(0.2, 0, 0, 1)) both;
   }
-  .vo-thay .gv2-the-so[data-mau]:nth-child(2) { animation-delay: 0.05s; }
-  .vo-thay .gv2-the-so[data-mau]:nth-child(3) { animation-delay: 0.1s; }
-  .vo-thay .gv2-the-so[data-mau]:nth-child(4) { animation-delay: 0.15s; }
+  .vo-thay .gv2-the-so[data-mau]:nth-child(2) { animation-delay: 30ms; }
+  .vo-thay .gv2-the-so[data-mau]:nth-child(3) { animation-delay: 60ms; }
+  .vo-thay .gv2-the-so[data-mau]:nth-child(4) { animation-delay: 90ms; }
 }
 @keyframes gvm-len {
   from {
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
 }

@@ -3,6 +3,8 @@
 // vướng ⇒ một thẻ; màn này GOM thẻ theo (câu, bước vướng), xếp ưu tiên (máy chủ tính), thầy gỡ MỘT lần cho cả nhóm.
 // Ba cách gỡ: Gỡ ngắn (gõ ~1 phút; ghi âm/ảnh để sau) · Dạy trên lớp (chọn buổi học) · Sửa lời giải/đề (ghi chỗ cần sửa — app không tự
 // sửa kho). Bước trong dữ liệu đánh số TỪ 0 — màn hiện "Bước buoc+1". Khối "Kèm riêng" ở đầu: em vẫn tự làm sai ≥ 2 lần sau lời gỡ. Máy chủ: server/src/ban-go-nut-that.ts.
+// NHÚNG (Hành trình › Cần thầy chữa, trung tu 09/10 tối): `nhung` ⇒ bỏ tiêu đề + dòng phụ + nút Tải lại (danh sách cần chữa phía trên đã có) và hai ô
+// đếm thẻ (số đã ở dòng của danh sách); `chonDau` ⇒ chọn sẵn đúng thẻ thầy vừa bấm. Ba cách gỡ, lệnh gửi, Kèm riêng, Cùng kiến thức nền GIỮ NGUYÊN.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { gvDsNutThat, gvGoNutThat, type KetQuaDsNut, type KieuGo, type NhomNut } from '../lib/nut-that-api'
 import { buoiDangMo } from '../lib/buoi-hoc-api'
@@ -23,11 +25,11 @@ const NHAN_GO: Record<KieuGo, string> = { ngan: 'Gỡ ngắn', lop: 'Dạy trên
 
 interface DangGo { khoa: string; kieu: KieuGo; noiDung: string; buoiHoc: string }
 
-export default function BanGoNutThatScreen() {
+export default function BanGoNutThatScreen({ nhung = false, chonDau = null }: { nhung?: boolean; chonDau?: string | null } = {}) {
   const [kq, setKq] = useState<KetQuaDsNut | null>(null)
   const [dangTai, setDangTai] = useState(false)
   const [bao, setBao] = useState('')
-  const [chon, setChon] = useState<string | null>(null)
+  const [chon, setChon] = useState<string | null>(chonDau)
   const [moDe, setMoDe] = useState<Set<string>>(new Set())
   const [go, setGo] = useState<DangGo | null>(null)
   const banNhap = useRef<Record<string, DangGo>>({})
@@ -70,10 +72,13 @@ export default function BanGoNutThatScreen() {
   }
 
   const nhom = kq?.nhom ?? []
+  // Thẻ đang chọn đã gỡ xong (biến khỏi danh sách sau khi tải lại) ⇒ về thẻ đầu, không để trống cả vùng.
+  const chonHien = chon && nhom.some((n) => n.khoa === chon) ? chon : nhom[0]?.khoa
   const t = kq?.tong
 
   return (
-    <div className="gv2-trang gv-go-day-du">
+    <div className="gv2-trang gv-go-day-du" data-nhung={nhung ? 'true' : undefined}>
+      {!nhung && (
       <header className="gv2-dau">
         <div className="gv2-dau-chu">
           <h1 className="gv2-tieu-de">Bàn gỡ nút thắt</h1>
@@ -81,6 +86,7 @@ export default function BanGoNutThatScreen() {
         </div>
         <button type="button" className="gv2-nut-vien" onClick={() => void tai()} disabled={dangTai}>{dangTai ? 'Đang tải…' : 'Tải lại'}</button>
       </header>
+      )}
 
       {bao && <p className="gv2-nhat" role="status">{bao}</p>}
       {dangTai && !kq && <p className="gv2-nhat" role="status">Đang tải thẻ nút thắt…</p>}
@@ -105,7 +111,7 @@ export default function BanGoNutThatScreen() {
         </section>
       )}
 
-      {kq?.ok && t && (
+      {kq?.ok && t && !nhung && (
         <div className="gv2-kpi">
           <div className="gv2-the gv2-the-so"><span className="gv2-nhan">Thẻ đang chờ</span><span className="gv2-so-dong"><span className="gv2-so-kpi gv2-so">{t.soThe}</span><span className="gv2-don-vi">thẻ</span></span></div>
           <div className="gv2-the gv2-the-so"><span className="gv2-nhan">Cần gỡ</span><span className="gv2-so-dong"><span className="gv2-so-kpi gv2-so">{t.soNhom}</span><span className="gv2-don-vi">bước vướng (câu × bước)</span></span></div>
@@ -130,12 +136,12 @@ export default function BanGoNutThatScreen() {
       )}
 
       {nhom.length > 0 && (
-        <div className="gv-go-workspace"><nav className="gv-go-nhom" aria-label="Chọn nhóm cần gỡ">{nhom.map(n => <button type="button" key={n.khoa} aria-pressed={(chon ?? nhom[0]?.khoa) === n.khoa} onClick={() => setChon(n.khoa)}><b>{n.so || 'Câu trong kho'}</b><span>Bước {n.buoc + 1} · {n.soEm} em</span></button>)}</nav><ul className="lg-ds gv-scroll-box" aria-label="Thẻ nút thắt theo thứ tự ưu tiên" tabIndex={0}>
+        <div className="gv-go-workspace"><nav className="gv-go-nhom" aria-label="Chọn nhóm cần gỡ">{nhom.map(n => <button type="button" key={n.khoa} aria-pressed={chonHien === n.khoa} onClick={() => setChon(n.khoa)}><b>{n.so || 'Câu trong kho'}</b><span>Bước {n.buoc + 1} · {n.soEm} em</span></button>)}</nav><ul className="lg-ds gv-scroll-box" aria-label="Thẻ nút thắt theo thứ tự ưu tiên" tabIndex={0}>
           {nhom.map((n) => {
             const deMo = moDe.has(n.khoa)
             const dangGo = go?.khoa === n.khoa ? go : null
             return (
-              <li key={n.khoa} className="gv2-the lg-dong" data-testid="the-nut-that" hidden={n.khoa !== (chon ?? nhom[0]?.khoa)}>
+              <li key={n.khoa} className="gv2-the lg-dong" data-testid="the-nut-that" hidden={n.khoa !== chonHien}>
                 <div className="lg-dong-dau">
                   <span className="gv2-the-tieu-de">{n.so || 'Câu trong kho'}</span>
                   <span className="gv2-chip" data-tone="vang">Vướng bước {n.buoc + 1}</span>
@@ -196,7 +202,7 @@ export default function BanGoNutThatScreen() {
                         {buoi === null ? (
                           <p className="gv2-phu">Đang tải buổi học đang mở…</p>
                         ) : buoi.length === 0 ? (
-                          <p className="gv2-phu">Chưa có buổi học đang mở (mở ở Chữa trên lớp › Điểm danh). Thầy ghi buổi sẽ dạy vào ô dưới.</p>
+                          <p className="gv2-phu">Chưa có buổi học đang mở (mở ở Hành trình › Dạy học › Điểm danh). Thầy ghi buổi sẽ dạy vào ô dưới.</p>
                         ) : (
                           <select id={`gnt-buoi-${n.khoa}`} aria-label="Buổi học sẽ dạy" className="lg-o" value={dangGo.buoiHoc} onChange={(e) => setGo({ ...dangGo, buoiHoc: e.target.value })}>
                             <option value="">Chọn buổi học</option>

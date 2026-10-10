@@ -203,12 +203,19 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  overscroll-behavior: none;
+  overscroll-behavior-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 .man-lam-bai input,
 .man-lam-bai textarea {
   user-select: text;
   -webkit-user-select: text;
+}
+.man-thi-phu {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
 }
 /* Thanh trạng thái trong suốt (apple-mobile-web-app-status-bar-style =
  * black-translucent) — chừa vùng an toàn phía trên cho thanh dính của màn thi. */

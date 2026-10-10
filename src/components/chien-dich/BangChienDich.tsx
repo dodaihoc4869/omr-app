@@ -156,6 +156,7 @@ export default function BangChienDich({
   onDaChua,
   omni = null,
   onOmniDoi,
+  chiChua = false,
 }: {
   du: DuBang
   nowMs: number
@@ -167,6 +168,8 @@ export default function BangChienDich({
   omni?: BangOmni | null
   /** Gọi sau khi thầy xác nhận một dạng để màn cha nạp lại Bảng bài OMNI. */
   onOmniDoi?: () => void
+  /** Hành trình › Cần thầy chữa (09/10 tối): CHỈ khối Cần thầy chữa (danh sách · chiếu · Chữa xong) — cả với Hành trình (bỏ bảng tiến độ). */
+  chiChua?: boolean
 }) {
   const showToast = useAppStore((s) => s.showToast)
   const [caLop, setCaLop] = useState(false)
@@ -274,6 +277,74 @@ export default function BangChienDich({
     onOmniDoi?.()
   }
 
+  // Khối "Cần thầy chữa / dạy lại" + hộp hỏi lại "Chữa xong" — MỘT bản JSX dùng cho cả bảng đầy đủ lẫn chế độ `chiChua`
+  // (Hành trình › Cần thầy chữa, trung tu 09/10 tối: chỉ khối này, không bảng từng em / ô số / nhịp lớp).
+  const theCanChua = (
+    <section className="cd-the cd-the--nhan" aria-labelledby="cd-can-day-lai">
+      <div className="cd-the-dau">
+        <h2 id="cd-can-day-lai">{om ? TIEU_DE_CAN_THAY_CHUA : 'Cần thầy dạy lại'}</h2>
+        <span className="cd-so cd-phu">
+          {lop.canDayLaiCau} câu · {lop.canDayLaiLuot} lượt em
+        </span>
+      </div>
+      {om ? (
+        <CanThayChuaOmni ds={om.canThayChua} canDayLai={du.canDayLai} chienDichId={cd.id} homNay={du.homNay} onDaChua={onDaChua} />
+      ) : (
+        <p className="cd-phu">Câu em sai từ 4 lần, lần cuối vẫn sai — đã tạm rời game, chờ thầy chữa.</p>
+      )}
+      {om ? null : du.canDayLai.length === 0 ? (
+        <p className="cd-phu">Chưa có câu nào cần thầy dạy lại — các em đang tự ôn được.</p>
+      ) : (
+        // Hộp cuộn (thầy 05/10): danh sách dài không đẩy nút chiếu xuống tận cuối trang.
+        <div className="cd-ds-cau-cuon" tabIndex={0} role="region" aria-label={`Danh sách ${du.canDayLai.length} câu cần thầy dạy lại`}>
+        <ol className="cd-ds-cau">
+          {du.canDayLai.map((c) => (
+            <li key={c.qid}>
+              <span>
+                <b>Câu {c.stt}</b> · {c.dang}
+                {c.mucDo && <small className="cd-phu"> · {TEN_MUC_DO_CAU[c.mucDo] ?? c.mucDo}</small>}
+              </span>
+              <b className="cd-so">{c.soEm} em</b>
+            </li>
+          ))}
+        </ol>
+        </div>
+      )}
+      <button type="button" className="m3-nut-chinh" disabled={ba.length === 0 || dangChieu} onClick={() => void chieuBa()}>
+        {dangChieu ? 'Đang mở tờ chiếu…' : ba.length > 1 ? `Chiếu cả ${ba.length} câu lên bảng` : 'Chiếu câu này lên bảng'}
+      </button>
+      <p className="cd-phu">Chữa sớm giữa kỳ: chữa xong, câu quay lại Đoàn Hộ Tống của các em từ hôm sau.</p>
+      {daChieu3 && (
+        <button type="button" className="m3-nut-vien cd-nut-nho" onClick={() => setHoiChua(true)}>
+          {ba.length > 1 ? `Chữa xong cả ${ba.length} câu` : 'Chữa xong câu này'}
+        </button>
+      )}
+    </section>
+  )
+  const hopChua = hoiChua && (
+    <HopXacNhan
+      tieuDe={ba.length > 1 ? `Chữa xong cả ${ba.length} câu?` : 'Chữa xong câu này?'}
+      noiDung={
+        <p>
+          {luotBa} lượt em đang “Cần thầy dạy lại” ở câu {ba.map((c) => c.stt).join(', ')} được mở khoá: các câu này quay lại Đoàn Hộ Tống của các em từ{' '}
+          {hienNgay(congNgay(du.homNay, 1))}. Việc này không hoàn tác được.
+        </p>
+      }
+      nhanXacNhan="Chữa xong"
+      nhanDangLam="Đang ghi…"
+      dangLam={dangChua}
+      onXacNhan={() => void chuaBa()}
+      onHuy={() => setHoiChua(false)}
+    />
+  )
+
+  if (chiChua) return (
+    <>
+      {theCanChua}
+      {hopChua}
+    </>
+  )
+
   if (du.hanhTrinhNgay) return <section className="cd-the" aria-label="Tiến độ Hành trình hôm nay">
     <h2>{cd.ten}</h2>
     <p>Hôm nay · {hienNgay(du.homNay)} · tối thiểu 24 / 30 / 36 câu theo tầng · mỗi chặng 6 câu.</p>
@@ -304,7 +375,7 @@ export default function BangChienDich({
     <>
       <div className="cd-dau">
         <div>
-          <p className="cd-duong-dan">Chữa trên lớp › Bảng chiến dịch</p>
+          <p className="cd-duong-dan">Cần thầy chữa › Bảng chiến dịch</p>
           <h1>
             {cd.ten}
             {cd.lop ? ` · ${cd.lop}` : ''}
@@ -631,46 +702,7 @@ export default function BangChienDich({
             </section>
           )}
 
-          <section className="cd-the cd-the--nhan" aria-labelledby="cd-can-day-lai">
-            <div className="cd-the-dau">
-              <h2 id="cd-can-day-lai">{om ? TIEU_DE_CAN_THAY_CHUA : 'Cần thầy dạy lại'}</h2>
-              <span className="cd-so cd-phu">
-                {lop.canDayLaiCau} câu · {lop.canDayLaiLuot} lượt em
-              </span>
-            </div>
-            {om ? (
-              <CanThayChuaOmni ds={om.canThayChua} canDayLai={du.canDayLai} chienDichId={cd.id} homNay={du.homNay} onDaChua={onDaChua} />
-            ) : (
-              <p className="cd-phu">Câu em sai từ 4 lần, lần cuối vẫn sai — đã tạm rời game, chờ thầy chữa.</p>
-            )}
-            {om ? null : du.canDayLai.length === 0 ? (
-              <p className="cd-phu">Chưa có câu nào cần thầy dạy lại — các em đang tự ôn được.</p>
-            ) : (
-              // Hộp cuộn (thầy 05/10): danh sách dài không đẩy nút chiếu xuống tận cuối trang.
-              <div className="cd-ds-cau-cuon" tabIndex={0} role="region" aria-label={`Danh sách ${du.canDayLai.length} câu cần thầy dạy lại`}>
-              <ol className="cd-ds-cau">
-                {du.canDayLai.map((c) => (
-                  <li key={c.qid}>
-                    <span>
-                      <b>Câu {c.stt}</b> · {c.dang}
-                      {c.mucDo && <small className="cd-phu"> · {TEN_MUC_DO_CAU[c.mucDo] ?? c.mucDo}</small>}
-                    </span>
-                    <b className="cd-so">{c.soEm} em</b>
-                  </li>
-                ))}
-              </ol>
-              </div>
-            )}
-            <button type="button" className="m3-nut-chinh" disabled={ba.length === 0 || dangChieu} onClick={() => void chieuBa()}>
-              {dangChieu ? 'Đang mở tờ chiếu…' : ba.length > 1 ? `Chiếu cả ${ba.length} câu lên bảng` : 'Chiếu câu này lên bảng'}
-            </button>
-            <p className="cd-phu">Chữa sớm giữa kỳ: chữa xong, câu quay lại Đoàn Hộ Tống của các em từ hôm sau.</p>
-            {daChieu3 && (
-              <button type="button" className="m3-nut-vien cd-nut-nho" onClick={() => setHoiChua(true)}>
-                {ba.length > 1 ? `Chữa xong cả ${ba.length} câu` : 'Chữa xong câu này'}
-              </button>
-            )}
-          </section>
+          {theCanChua}
 
           {tongHang > 0 && (
             <section className="cd-the" aria-labelledby="cd-hang-lop" data-khoi="hang-lop-theo-dang">
@@ -699,22 +731,7 @@ export default function BangChienDich({
 
       {om && <ViKyNangBai chienDichId={cd.id} />}
 
-      {hoiChua && (
-        <HopXacNhan
-          tieuDe={ba.length > 1 ? `Chữa xong cả ${ba.length} câu?` : 'Chữa xong câu này?'}
-          noiDung={
-            <p>
-              {luotBa} lượt em đang “Cần thầy dạy lại” ở câu {ba.map((c) => c.stt).join(', ')} được mở khoá: các câu này quay lại Đoàn Hộ Tống của các em từ{' '}
-              {hienNgay(congNgay(du.homNay, 1))}. Việc này không hoàn tác được.
-            </p>
-          }
-          nhanXacNhan="Chữa xong"
-          nhanDangLam="Đang ghi…"
-          dangLam={dangChua}
-          onXacNhan={() => void chuaBa()}
-          onHuy={() => setHoiChua(false)}
-        />
-      )}
+      {hopChua}
     </>
   )
 }

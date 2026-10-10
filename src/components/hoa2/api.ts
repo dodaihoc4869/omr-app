@@ -514,6 +514,36 @@ function ghiNhoCheDo2(sbd: string, bat: boolean) {
   }
 }
 
+// ─── SWR ĐỆM SẢNH (09/10): nhớ kết quả Sảnh cuối cùng vào localStorage theo SBD ───
+// Giờ cao điểm / mạng chậm / timeout 25s: Sảnh mở NGAY LẬP TỨC 0ms từ bản đệm,
+// học sinh không bao giờ bị đơ khung xương hay bị màn hình lỗi che mất giao diện.
+const khoaNhoKetQuaSanh = (sbd: string) => `omr_hoa2_sanh_dem:${sbd}`
+
+export function docNhoKetQuaSanh(sbd: string | undefined): KetQuaSanh | null {
+  if (!sbd) return null
+  try {
+    const raw = localStorage.getItem(khoaNhoKetQuaSanh(sbd))
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as unknown
+    if (parsed && typeof parsed === 'object') return parsed as KetQuaSanh
+  } catch {
+    /* ignore */
+  }
+  return null
+}
+
+export function ghiNhoKetQuaSanh(sbd: string, kq: KetQuaSanh): void {
+  try {
+    if (kq.cheDo2) {
+      localStorage.setItem(khoaNhoKetQuaSanh(sbd), JSON.stringify(kq))
+    } else {
+      localStorage.removeItem(khoaNhoKetQuaSanh(sbd))
+    }
+  } catch {
+    /* máy chặn lưu: bỏ qua */
+  }
+}
+
 export interface TrangThaiSanh {
   /** 'cho' = chưa có câu trả lời nào của máy chủ ở phiên này. */
   pha: 'cho' | 'xong'
@@ -562,26 +592,41 @@ function sanhHoiSom(token: string | undefined): { than: string; kq: KetQuaSanh }
 
 /**
  * Hỏi `hoa2-sanh` khi đăng nhập, mỗi lần `lamMoi` đổi (vừa đóng game / màn con), và khi quay lại tab (dội ≥ 20 giây).
- * Lỗi mạng: GIỮ bản cuối (nếu có) và báo `loi`; cờ nhớ không đổi (không nháy về app cũ vì một lần mất mạng).
- * 05/10: phản hồi đã hỏi sớm và đã về lúc dựng ⇒ lượt hỏi "khi đăng nhập" CHÍNH LÀ lượt ấy (không gửi lại), lượt vẽ đầu đã có số.
+ * SWR (09/10): nếu máy đã có bản đệm từ trước ⇒ hiện Sảnh NGAY 0ms (dangTai: true); ngầm gọi máy chủ làm tươi.
+ * Lỗi mạng / timeout: GIỮ nguyên bản đệm/bản cuối đang hiện để học sinh không kẹt ở khung xương hay bị màn lỗi chặn.
  */
 export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number, tapTrung = false): TrangThaiSanh & { taiLai: () => void } {
   const som = useRef<{ than: string; kq: KetQuaSanh } | null | undefined>(undefined)
   if (som.current === undefined) som.current = sbd && !tapTrung ? sanhHoiSom(token) : null
-  const [t, setT] = useState<TrangThaiSanh>(() =>
-    som.current
-      ? { pha: 'xong', cheDo2: som.current.kq.cheDo2, ketQua: som.current.kq, loi: '', dangTai: false }
-      : { pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false },
-  )
+  const kqDem = useRef<KetQuaSanh | null | undefined>(undefined)
+  if (kqDem.current === undefined) kqDem.current = docNhoKetQuaSanh(sbd)
+
+  const [t, setT] = useState<TrangThaiSanh>(() => {
+    if (som.current) {
+      return { pha: 'xong', cheDo2: som.current.kq.cheDo2, ketQua: som.current.kq, loi: '', dangTai: false }
+    }
+    const dem = kqDem.current
+    if (dem) {
+      // SWR: Đã có bản nhớ từ phiên trước ⇒ vẽ NGAY 0ms, dangTai = true để ngầm tải bản mới
+      return { pha: 'xong', cheDo2: dem.cheDo2, ketQua: dem, loi: '', dangTai: true }
+    }
+    return { pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false }
+  })
   const [luot, setLuot] = useState(0)
   const lanCuoi = useRef(0)
   const khoaDung = useRef(`${token ?? ''}|${sbd ?? ''}`)
   useEffect(() => {
-    // Đổi em (đăng xuất / đăng nhập SBD khác) ⇒ về "chờ". Lượt dựng đầu: trạng thái ban đầu vốn đã đúng (không vẽ lại thừa).
+    // Đổi em (đăng xuất / đăng nhập SBD khác) ⇒ kiểm tra đệm của em mới hoặc về "chờ".
     const khoa = `${token ?? ''}|${sbd ?? ''}`
     if (khoaDung.current === khoa) return
     khoaDung.current = khoa
-    setT({ pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false })
+    const dem = docNhoKetQuaSanh(sbd)
+    kqDem.current = dem
+    if (dem) {
+      setT({ pha: 'xong', cheDo2: dem.cheDo2, ketQua: dem, loi: '', dangTai: true })
+    } else {
+      setT({ pha: 'cho', cheDo2: docNhoCheDo2(sbd), ketQua: null, loi: '', dangTai: false })
+    }
   }, [token, sbd])
   useEffect(() => {
     if (!token || !sbd) return
@@ -592,6 +637,7 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       som.current = null
       danhDauDaNhan('/game-v2/hoa2-sanh', daCo.than)
       ghiNhoCheDo2(sbd, daCo.kq.cheDo2)
+      ghiNhoKetQuaSanh(sbd, daCo.kq)
       return
     }
     let huy = false
@@ -600,11 +646,18 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       .then((kq) => {
         if (huy) return
         ghiNhoCheDo2(sbd, kq.cheDo2)
+        ghiNhoKetQuaSanh(sbd, kq)
         setT({ pha: 'xong', cheDo2: kq.cheDo2, ketQua: kq, loi: '', dangTai: false })
       })
       .catch((e: unknown) => {
         if (huy) return
-        setT((x) => ({ ...x, pha: 'xong', loi: e instanceof Error ? e.message : 'Chưa tải được Sảnh.', dangTai: false }))
+        setT((x) => ({
+          ...x,
+          pha: 'xong',
+          // SWR: nếu đã có ketQua (từ đệm hoặc lượt trước), giữ nguyên ketQua để học sinh không bị đơ/chặn!
+          loi: e instanceof Error ? e.message : 'Chưa tải được Sảnh.',
+          dangTai: false,
+        }))
       })
     return () => {
       huy = true

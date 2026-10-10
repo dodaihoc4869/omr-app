@@ -22,7 +22,9 @@ import {
   DoorOpen,
   Pointer,
   Rocket,
+  Check,
 } from 'lucide-react'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import NutQuayLai from '../components/NutQuayLai'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
 import KhoiRutDe from '../components/KhoiRutDe'
@@ -119,6 +121,8 @@ const CACH_CONG_BO: { id: CongBoDiem; ten: string; mota: string }[] = [
 
 export default function ExamSetupScreen() {
   const [buocGiaoDien, setBuocGiaoDien] = useState(0)
+  // Game Hóa 2.0: thanh 4 bước có trạng thái + câu lý do dưới nút mở ca (trung tu 09/10 — chỉ hiển thị).
+  const hoa2 = useHoa2Bat()
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
@@ -484,6 +488,10 @@ export default function ExamSetupScreen() {
   const mocEmCuoi = (mocHetVao ?? mocMo) + phutCa * 60000
   const phongChoBat = phongCho || deRiengBat || dongBoGio
   const cheDoDe = chuan2026 ? 'chuan' : deRiengBat ? 'rieng' : boRut ? 'rut' : 'nguyen'
+  // THANH 4 BƯỚC (Game Hóa 2.0 — trung tu 09/10, bản vẽ GV-MoCa thầy duyệt): mỗi bước một dòng trạng thái nói đúng điều thầy đã chọn; bước đang
+  // làm `aria-current="step"`, bước đã có lựa chọn có dấu ✓. CHỈ hiển thị — bấm bước vẫn là `setBuocGiaoDien` như nút cũ, logic mở ca không đổi.
+  const chuDe = selectedSources.length === 0 ? 'Chưa chọn' : `${selectedSources.length === 1 ? selectedSources[0]!.maDe : `${selectedSources.length} đề`} · ${tongCauDaChon} câu`
+  const TEN_BUOC = ['Đề', 'Ai làm', 'Giờ', 'Luật'] as const
   const LUAT: { id: CongBoDiem; ten: string; mota: string }[] = [
     { id: 'ngay', ten: 'Ngay khi em nộp', mota: 'Em nộp sớm có thể kể đáp án cho bạn đang làm.' },
     { id: 'ca_lop_xong', ten: 'Khi cả lớp nộp xong', mota: 'Em nộp xong thấy "đang chờ cả lớp".' },
@@ -514,7 +522,32 @@ export default function ExamSetupScreen() {
           </div>
         )}
 
-        <nav className="ct-etapes" aria-label="Các bước mở ca">{['Đề','Ai làm','Giờ','Luật'].map((x,i) => <button key={x} type="button" aria-pressed={buocGiaoDien === i} onClick={() => setBuocGiaoDien(i)}>{i+1}. {x}</button>)}</nav><div className="ct-moca">
+        {hoa2 ? (
+          <ol className="ct-buoc-thanh" aria-label="Các bước mở ca">
+            {TEN_BUOC.map((x, i) => {
+              const trangThai = [chuDe, chuAiLam, `${phutCa} phút`, LUAT.find((c) => c.id === congBoDiem)?.ten ?? ''][i]!
+              const dang = buocGiaoDien === i
+              const xong = !dang && (i > 0 || selectedSources.length > 0) && i < buocGiaoDien
+              const thieu = i === 0 && selectedSources.length === 0 && !dang
+              return (
+                <li key={x} className="ct-buoc-muc" data-trang-thai={dang ? 'dang' : xong ? 'xong' : thieu ? 'thieu' : 'cho'} aria-current={dang ? 'step' : undefined}>
+                  <button type="button" className="ct-buoc-nut" onClick={() => setBuocGiaoDien(i)} aria-label={`Bước ${i + 1}: ${x} — ${dang ? 'đang làm' : trangThai}`}>
+                    <span className="ct-buoc-so" aria-hidden="true">
+                      {xong ? <Check size={18} strokeWidth={2.6} /> : i + 1}
+                    </span>
+                    <span className="ct-buoc-chu" aria-hidden="true">
+                      <b>{x}</b>
+                      <span>{dang && i === 0 && selectedSources.length === 0 ? 'Đang chọn' : trangThai}</span>
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+        ) : (
+          <nav className="ct-etapes" aria-label="Các bước mở ca">{['Đề','Ai làm','Giờ','Luật'].map((x,i) => <button key={x} type="button" aria-pressed={buocGiaoDien === i} onClick={() => setBuocGiaoDien(i)}>{i+1}. {x}</button>)}</nav>
+        )}
+        <div className="ct-moca">
           <div className="ct-tam">
             {/* BƯỚC 1 — ĐỀ */}
             <div className="ct-buoc c-xd" hidden={buocGiaoDien !== 0}>
@@ -750,7 +783,7 @@ export default function ExamSetupScreen() {
                 </details>
               </div>
             </div>
-          <div className="ct-suite"><button type="button" className="ct-nut ct-nut-vien" disabled={buocGiaoDien === 0} onClick={() => setBuocGiaoDien(x => Math.max(0,x-1))}>Bước trước</button><button type="button" className="ct-nut ct-nut-vien" disabled={buocGiaoDien === 3} onClick={() => setBuocGiaoDien(x => Math.min(3,x+1))}>Bước tiếp</button></div>
+          <div className="ct-suite"><button type="button" className={hoa2 ? 'ct-nut ct-nut-chu' : 'ct-nut ct-nut-vien'} disabled={buocGiaoDien === 0} onClick={() => setBuocGiaoDien(x => Math.max(0,x-1))}>Bước trước</button><button type="button" className="ct-nut ct-nut-vien" disabled={buocGiaoDien === 3} onClick={() => setBuocGiaoDien(x => Math.min(3,x+1))}>{hoa2 && buocGiaoDien < 3 ? `Bước tiếp: ${TEN_BUOC[buocGiaoDien + 1]}` : 'Bước tiếp'}</button></div>
           </div>
 
           <aside className="ct-xem-truoc" aria-label="Xem trước ca">
@@ -785,7 +818,7 @@ export default function ExamSetupScreen() {
               <div className="cuoi">
                 {/* Thầy 28/09: đang gửi thì GIỮ đúng chữ nút, chỉ mờ đi (aria-busy) + vòng quay nhỏ thay biểu tượng — không đổi sang câu dài,
                     không đổi độ rộng. Bước đang làm vẫn báo cho máy đọc màn hình qua dòng ẩn. */}
-                <button type="button" className="ct-nut ct-nut-chinh" disabled={opening || selectedSources.length === 0} aria-busy={opening || undefined} onClick={handleOpenSession}>
+                <button type="button" className="ct-nut ct-nut-chinh" disabled={opening || selectedSources.length === 0} aria-busy={opening || undefined} aria-describedby={hoa2 ? 'ct-mo-ca-ly-do' : undefined} onClick={handleOpenSession}>
                   {opening ? <RefreshCw size={18} className="animate-spin" aria-hidden="true" /> : <Rocket size={18} aria-hidden="true" />}
                   Mở ca kiểm tra ngay
                 </button>
@@ -797,8 +830,9 @@ export default function ExamSetupScreen() {
                     {loiMoCa}
                   </p>
                 )}
-                <p className="ct-ghi" style={{ textAlign: 'center' }}>
-                  Mở xong có ngay link + mã ca để gửi nhóm lớp.
+                {/* 2.0 (trung tu 09/10): nút chưa đủ điều kiện thì mờ KÈM câu lý do ngay dưới (nối bằng aria-describedby). */}
+                <p className="ct-ghi" id={hoa2 ? 'ct-mo-ca-ly-do' : undefined} style={{ textAlign: 'center' }} data-ly-do={hoa2 && selectedSources.length === 0 ? '' : undefined}>
+                  {hoa2 && selectedSources.length === 0 ? 'Chọn đề trước, nút sẽ sáng lên. Mở xong có ngay link và mã ca.' : 'Mở xong có ngay link + mã ca để gửi nhóm lớp.'}
                 </p>
               </div>
             </div>
