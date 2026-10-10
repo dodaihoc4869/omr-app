@@ -102,7 +102,7 @@ describe('Bảng nhiệm vụ: thanThu.shopBat', () => {
     expect(b).toMatch(/!laPh && onMoShop && duLieu\.thanThu\.kieu === 'co' && duLieu\.thanThu\.shopBat === true/)
     expect(b).toMatch(/data-vung="mo-cua-hang"/)
     const cong = doc('src/screens/StudentPortalScreen.tsx')
-    expect(cong).toMatch(/sessionStorage\.setItem\(KHOA_MAN_DAU_GAME, 'shop'\)/)
+    expect(cong).not.toMatch(/sessionStorage\.setItem\(KHOA_MAN_DAU_GAME, 'shop'\)/)
     expect(doc('src/screens/ParentPortalScreen.tsx')).not.toMatch(/onMoShop|shopBat|Cửa hàng/)
     const ad = doc('src/lib/nhiem-vu-adapter.ts')
     const ph = ad.slice(ad.indexOf('export function phucHoiBanNho'))

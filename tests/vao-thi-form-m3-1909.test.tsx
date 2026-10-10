@@ -38,7 +38,8 @@ afterEach(async () => {
   datDuong('/')
 })
 const moForm = async () => {
-  fireEvent.click(await screen.findByRole('button', { name: /Vào thi/ }))
+  fireEvent.click(await screen.findByRole('button', {name:'Của em'}))
+  fireEvent.click(await screen.findByRole('button', { name: /^Vào kiểm tra/ }))
   return await screen.findByRole('dialog', { name: 'Vào phòng thi' })
 }
 

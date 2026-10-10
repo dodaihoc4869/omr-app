@@ -1,3 +1,4 @@
+import {readFileSync as docHocTap} from 'node:fs'
 // @vitest-environment node
 // "Luyện nâng cao / Thử sức ngay": câu thử thách chỉ được lấy từ câu HỢP KHỐI của em (Code 1 yêu cầu 21/09 — em lớp 11 không nhận câu lớp 12).
 // SỬA CÓ CHỦ Ý 05/10 — LUẬT THẦY (nguyên văn): "rất nhiều cấu thuộc lớp 10 nhưng bị rút nhầm sang lớp 11, bạn phải chặn chuẩn 100% không được rút nhầm kho khác khối cho tôi nhé"
@@ -43,10 +44,5 @@ describe('chonCauThuThach', () => {
     expect(chonCauThuThach(KHO, khoiCuaEm({ lop: '' }))).toEqual([])
     expect(chonCauThuThach([cau('a', 'DH-12-A', { dapAn: '' }), cau('b', 'DH-12-B')], 12).map((c) => c.id)).toEqual(['b'])
   })
-  it('màn thử thách legacy đi qua server và lịch riêng của em', () => {
-    const s = fs.readFileSync(path.join(process.cwd(), 'src/screens/StudentPortalScreen.tsx'), 'utf8')
-    const branch = s.split("case 'mo_thu_thach':")[1]!.split("case 'mo_thi':")[0]!
-    expect(branch).toContain('taiThuThachHomNay(auth.token)')
-    expect(branch).not.toContain('loadExamSources')
-  })
+  it('cổng học tập chọn và nộp qua máy chủ, không nạp kho đáp án tại máy',()=>{const c=docHocTap('src/components/hoc-tap/ManLamBaiTap.tsx','utf8');expect(c).toContain("goiHoa2('hoc-tap-start'");expect(c).toContain("goiHoa2('answer'");expect(c).not.toContain('loadExamSources');expect(c).toContain('localStorage.setItem(khoa, v)')})
 })

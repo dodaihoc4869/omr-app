@@ -182,8 +182,8 @@ describe('Đoàn Hộ Tống — khung trận đã đứng yên theo thiết k�
 describe('Vỏ sheet của game — không còn thanh trên đè dải ải; MỘT nút về', () => {
   const nguon = doc('src/screens/StudentPortalScreen.tsx')
   it("thanh trên cũ (\"Quay lại Bảng tin\" + \"Đóng\") KHÔNG dựng cho tab game; các tab khác giữ nguyên", () => {
-    expect(nguon).toContain("{!vaoM3 && tab !== 'thanthu' && <header className=\"sticky top-0 z-30")
-    expect(nguon).toContain('label="Quay lại Bảng tin"') // các sheet khác vẫn có
+    expect(nguon).toContain("{!vaoM3 && <header className=\"sticky top-0 z-30")
+    expect(nguon).toContain('label="Về Hôm nay"') // các sheet khác vẫn có
   })
   it('game còn đủ đường về ở MỌI màn: Đảo "Về app học sinh" (dính trên cùng) · Thám hiểm "Về đảo" · thanh riêng cho Võ đài/Tiến bộ', () => {
     expect(doc('src/game/than-thu-v2/dao/DaoThanThu.tsx')).toContain('className="dao-ve-app" onClick={onDong}>Về app học sinh')

@@ -1,5 +1,5 @@
 import {beforeEach,afterEach,it,expect,vi} from 'vitest'
-import {render,screen,fireEvent,cleanup} from '@testing-library/react'
+import {render,screen,fireEvent,cleanup,waitFor} from '@testing-library/react'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 const mocks=vi.hoisted(()=>({start:vi.fn(),homework:vi.fn(),sheet:vi.fn(),items:[] as any[],momItems:[] as any[]}))
 vi.mock('../src/game/than-thu-v2/Spirit2D',()=>({default:()=>null}))
@@ -21,23 +21,24 @@ beforeEach(()=>{
  mocks.start.mockResolvedValue({ok:true,item:{id:'M1',tieuDe:'Bài luyện thử',trangThai:'dang_lam',batDauLuc:new Date().toISOString(),dsCau:[{id:'q1',text:'Nội dung câu hỏi phải hiện',phan:'I',choices:['Một','Hai','Ba','Bốn'],dapAn:'A'}]}})
 })
 afterEach(()=>{cleanup();localStorage.clear();vi.unstubAllGlobals();vi.clearAllMocks()})
+async function moMom(){fireEvent.click(await screen.findByRole('button',{name:'Của em'}));fireEvent.click(await screen.findByRole('button',{name:/^Bài gia đình giao/}));await waitFor(()=>expect(screen.queryByText('Nội dung câu hỏi phải hiện')||screen.queryByRole('button',{name:/Bắt đầu làm bài|Tiếp tục làm bài/})).toBeTruthy());if(!screen.queryByText('Nội dung câu hỏi phải hiện'))fireEvent.click(screen.getByRole('button',{name:/Bắt đầu làm bài|Tiếp tục làm bài/}))}
 it('từ bảng tin mở đúng màn đề và đóng về bảng tin không trắng',async()=>{
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
+ render(<StudentPortalScreen/>);await moMom()
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
  fireEvent.click(screen.getByTitle('Đóng toàn màn hình'))
- expect(await screen.findByRole('heading',{name:'Chào thử'})).toBeTruthy()
- fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
+ expect(await screen.findByRole('button',{name:'Của em'})).toBeTruthy()
+ await moMom()
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
 })
 it('lỗi mở bài được hiện trong màn bài gia đình, không biến mất ở trang chủ',async()=>{
  mocks.start.mockRejectedValueOnce(new Error('Không tải được đề thử'))
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
+ render(<StudentPortalScreen/>);await moMom()
  expect(await screen.findByText('Không tải được đề thử')).toBeTruthy()
 })
 
 it.each(['chua_lam','dang_lam'])('nút đỏ trong danh sách Mom hoạt động: %s',async(trangThai)=>{
  mocks.momItems[0].trangThai=trangThai
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
+ render(<StudentPortalScreen/>);await moMom()
  await screen.findByText('Nội dung câu hỏi phải hiện')
  fireEvent.click(screen.getByRole('button',{name:'Danh sách bài'}))
  fireEvent.click(await screen.findByRole('button',{name:'Rời bài'}))
@@ -47,7 +48,7 @@ it.each(['chua_lam','dang_lam'])('nút đỏ trong danh sách Mom hoạt động
 it.each(['moi','xem','lamlai'])('BTVN mở đúng lượt và đúng chế độ: %s',async(mode)=>{
  const bt={maBtvn:'BT1',maCa:'CA1',soCau:1,tenBtvn:'Bài test',hanNop:new Date(Date.now()+86400000).toISOString(),daNop:mode!=='moi',soLanLamLaiConLai:3}
  mocks.items=[bt]
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Mở menu'}));fireEvent.click(await screen.findByRole('menuitem',{name:'Bài tập về nhà'}))
+ render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Của em'}));fireEvent.click(await screen.findByRole('button',{name:/^Bài tập được giao/}))
  const name=mode==='moi'?'Vào làm bài':mode==='xem'?/Xem lại/:/Làm lại/
  fireEvent.click(await screen.findByRole('button',{name}))
  if(mode==='lamlai')fireEvent.click(await screen.findByRole('button',{name:'Làm lại bài'}))

@@ -36,6 +36,12 @@ afterEach(async () => {
 const cao48 = (el: Element) => /(^|\s)min-h-\[48px\](\s|$)/.test(el.className)
 
 describe('form đăng nhập học sinh', () => {
+  it('phiên lưu cũ thiếu token quay về đăng nhập, không để màn trắng', async () => {
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({sbd:'gia',hoTen:'Em minh hoạ'}))
+    render(<StudentPortalScreen />)
+    expect(await screen.findByRole('button',{name:'Đăng nhập'})).toBeTruthy()
+  })
+
   it('ô SBD và ô mật khẩu: <label> gắn đúng ô (getByLabelText), cao ≥ 48 px; nút Đăng nhập cao ≥ 48 px', async () => {
     render(<StudentPortalScreen />)
     const sbd = (await screen.findByLabelText('Số báo danh (SBD)')) as HTMLInputElement
@@ -72,14 +78,14 @@ describe('form đăng nhập học sinh', () => {
     expect(mocks.dangNhap).not.toHaveBeenCalled()
   })
 
-  it('luồng đăng nhập KHÔNG đổi: nhập SBD + mật khẩu → gọi API đúng tham số → lưu phiên → vào Bảng nhiệm vụ', async () => {
+  it('luồng đăng nhập KHÔNG đổi: nhập SBD + mật khẩu → gọi API đúng tham số → lưu phiên → vào Hôm nay', async () => {
     const { container } = render(<StudentPortalScreen />)
     fireEvent.change(await screen.findByLabelText('Số báo danh (SBD)'), { target: { value: ' 12121212 ' } })
     fireEvent.change(screen.getByLabelText('Mật khẩu'), { target: { value: ' matkhau ' } })
     fireEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }))
     await waitFor(() => expect(mocks.dangNhap).toHaveBeenCalledWith('/test', '12121212', 'matkhau'))
     await waitFor(() => expect(JSON.parse(localStorage.getItem('omr_student_portal_auth')!).token).toBe('tk-moi'))
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('.ht-app')).toBeTruthy())
   })
 
   it('đường KHÔNG có mật khẩu (SBD 111): hiện form đặt mật khẩu lần đầu với ô + nút ≥ 48 px và <label> gắn ô', async () => {

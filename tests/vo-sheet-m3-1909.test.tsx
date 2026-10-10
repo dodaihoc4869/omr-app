@@ -41,8 +41,9 @@ afterEach(() => {
 })
 
 const moMan = async (nhan: string) => {
-  fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-  fireEvent.click(await screen.findByRole('menuitem', { name: nhan }))
+  const ten:Record<string,string>={'Bài tập về nhà':'Bài tập được giao','Bài gia đình giao':'Bài gia đình giao','Xem điểm & lịch sử ca kiểm tra':'Kết quả bài đã nộp','Khắc phục lỗi sai':'Luyện lại từ bài kiểm tra','Bảng tin & bài luyện hôm nay':'Thông tin từ gia đình'}
+  fireEvent.click(await screen.findByRole('button',{name:nhan==='Khắc phục lỗi sai'?'Ôn & sửa':'Của em'}))
+  fireEvent.click(await screen.findByRole('button',{name:new RegExp('^'+ten[nhan])}))
 }
 const tam = () => document.querySelector('.fixed.inset-0.z-50') as HTMLElement
 
@@ -73,7 +74,7 @@ describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
     datDuong('/hs')
     render(<StudentPortalScreen />)
     await moMan('Bài tập về nhà')
-    const quayLai = screen.getByRole('button', { name: 'Quay lại Bảng tin' })
+    const quayLai = screen.getByRole('button', { name: 'Về Hôm nay' })
     expect(quayLai.className).toContain('m3-nut-tron')
     fireEvent.click(quayLai)
     expect(tam()).toBeNull()
@@ -82,18 +83,7 @@ describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
     expect(dong.className).toContain('m3-nut-chu')
     fireEvent.click(dong)
     expect(tam()).toBeNull()
-    expect(await screen.findByRole('button', { name: 'Mở menu' })).toBeTruthy()
-  })
-
-  it('game thần thú KHÔNG được bọc `m3` (TheCau trong game có test khoá, không được đổi)', async () => {
-    datDuong('/hs')
-    render(<StudentPortalScreen />)
-    await moMan('Thần thú')
-    expect(await screen.findByTestId('game-than-thu')).toBeTruthy()
-    const goc = tam()
-    expect(goc.classList.contains('m3')).toBe(false)
-    expect(goc.classList.contains('m3-sheet')).toBe(false)
-    expect(goc.querySelector('.m3')).toBeNull()
+    expect(await screen.findByRole('button', { name: 'Của em' })).toBeTruthy()
   })
 
   it('đường KHÔNG phải cổng học sinh (jsdom mặc định `/`): giữ NGUYÊN header cũ, không có lớp m3 nào', async () => {
@@ -104,7 +94,7 @@ describe('C1 · vỏ sheet toàn màn của cổng học sinh (/hs)', () => {
     expect(goc.querySelector('.m3')).toBeNull()
     expect(goc.classList.contains('m3-sheet')).toBe(false)
     expect(goc.querySelector('header h2')!.textContent).toBe('Bài Tập Về Nhà')
-    expect(screen.getByRole('button', { name: 'Quay lại Bảng tin' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Về Hôm nay' })).toBeTruthy()
     expect(screen.getByTitle('Đóng toàn màn hình')).toBeTruthy()
   })
 })

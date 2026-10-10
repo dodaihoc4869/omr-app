@@ -88,13 +88,13 @@ describe('hoa2-cau-da-lam / hoa2-cau-chi-tiet — ít đợt D1, kết quả nh�
     expect(d.dot).toBeLessThanOrEqual(5)
   })
 
-  it('em chưa chọn thần thú ⇒ trả lời như cũ (kết quả chạy sớm bị bỏ, không lộ gì)', async () => {
+  it('em chưa chọn thần thú vẫn xem được lịch sử của chính em, không lộ lịch sử em khác', async () => {
     const { d, env } = await dung()
     d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S2','Bình','12A1','mk2','x')")
     const t2 = await gameToken(env, 'S2')
     const r = await gameV2(env, 'hoa2-cau-da-lam', { token: t2 })
-    expect(r).toMatchObject({ ok: true, cheDo2: true, canChonThu: true })
-    expect('cau' in r).toBe(false)
+    expect(r).toMatchObject({ ok: true, cau: [] }); expect(r).not.toHaveProperty('canChonThu')
+    expect(r.cau).toEqual([])
   })
 
   it('em chưa ở Hoá 2.0 (cờ tắt) ⇒ { ok:true, cheDo2:false } như cũ (kết quả chạy sớm bị bỏ)', async () => {

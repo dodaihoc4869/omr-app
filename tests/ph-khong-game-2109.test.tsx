@@ -263,7 +263,7 @@ describe('khoá nguồn — các chốt `laPh` nằm đúng chỗ (đột biến
   it('DauTrang: phụ huynh không vẽ khối thần thú; TheVinhDanh có `hienThu`; BangTinPhuHuynh chỉ vẽ ô Thần thú khi có studentToken', () => {
     expect(doc('src/components/bang-nhiem-vu/DauTrang.tsx')).toContain('{laPh ? null : onMoThanThu && (co || chuaChon) ? (')
     expect(doc('src/components/bang-nhiem-vu/TheVinhDanh.tsx')).toContain('const pet = hienThu ? PETS.findIndex((p) => p.id === w.pet) : -1')
-    expect(doc('src/components/BangTinPhuHuynh.tsx')).toMatch(/\{studentToken && \(\s*<button[^>]*\n\s*type="button"\s*\n\s*onClick=\{\(\) => onSelectTab\?\.\('thanthu'\)\}/)
+    expect(doc('src/components/BangTinPhuHuynh.tsx')).toMatch(/\{studentToken && !tapTrungHoc && \(\s*<button[^>]*\n\s*type="button"\s*\n\s*onClick=\{\(\) => onSelectTab\?\.\('thanthu'\)\}/)
   })
   it('màn phụ huynh (ParentPortalScreen) không nhắc game trong mã hiển thị của chính nó', () => {
     const ma = doc('src/screens/ParentPortalScreen.tsx').replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n')

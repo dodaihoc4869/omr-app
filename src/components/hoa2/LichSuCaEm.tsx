@@ -70,7 +70,7 @@ export default function LichSuCaEm({ sbd, scriptUrl = '', banDau = null, onVe }:
     <div className="h2-cdl h2-lsc">
       <header className="h2-cdl-dau">
         <div className="h2-cdl-hang">
-          <button type="button" className="h2-cdl-ve" aria-label="Về Sảnh" onClick={onVe}>
+          <button type="button" className="h2-cdl-ve" aria-label="Về Hôm nay" onClick={onVe}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M15 18l-6-6 6-6" />
             </svg>
@@ -98,7 +98,7 @@ export default function LichSuCaEm({ sbd, scriptUrl = '', banDau = null, onVe }:
         )}
         {ls && ds.length === 0 && (
           <div className="h2-lsc-thong-bao" role="status">
-            <p>Em chưa nộp ca kiểm tra nào. Khi thầy mở ca, em vào thi từ nút Ca kiểm tra trên Sảnh.</p>
+            <p>Em chưa nộp ca kiểm tra nào. Khi thầy mở ca, em vào thi từ nút Vào kiểm tra trên Hôm nay.</p>
           </div>
         )}
         {ds.length > 0 && (

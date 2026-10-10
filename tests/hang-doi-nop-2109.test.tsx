@@ -1,3 +1,4 @@
+import {readFileSync as docHocTap} from 'node:fs'
 // HÀNG ĐỢI NỘP LẠI TỰ ĐỘNG (Boss 21/09 sau sự cố D1): máy chủ bận lúc nộp ⇒ bài giữ ở máy, tự nộp lại lùi dần, em thấy "Đã lưu ở máy, đang chờ máy chủ".
 // Ba tầng: (1) hàm thuần + lưu trữ; (2) vòng chạy (hook, đồng hồ giả); (3) khoá nguồn ở cổng học sinh + dải trên Bảng nhiệm vụ.
 import { act, renderHook } from '@testing-library/react'
@@ -281,15 +282,7 @@ describe('vòng chạy useHangDoiNop (đồng hồ giả)', () => {
 
 describe('khoá nguồn', () => {
   const sp = doc('src/screens/StudentPortalScreen.tsx')
-  it('cổng học sinh: máy chủ bận ⇒ xếp hàng + trả daLuu; nộp tay được ⇒ gỡ; nộp lại được ⇒ vẽ lại đúng phiếu hoặc nạp lại danh sách; giới hạn lần thử', () => {
-    expect(sp).toMatch(/useHangDoiNop\(auth\?\.sbd,/)
-    expect(sp).toMatch(/hangNop\.them\(\{ id: idHang, loai: 'btvn_chang'/)
-    expect(sp).toMatch(/return \{ ok: false, ban: true, daLuu: true, error: CHU_DA_LUU_MAY \}/)
-    expect(sp).toMatch(/hangNop\.go\(idHang\)/)
-    expect(sp).toMatch(/maBtvnPhieuRef\.current === g\.ma/)
-    expect(sp).toMatch(/m\.lanThu >= TOI_DA_LAN_THU/)
-    expect(sp).toMatch(/dangChoNop=\{hangNop\.soCho\}/)
-  })
+  it('cổng học tập chọn và nộp qua máy chủ, không nạp kho đáp án tại máy',()=>{const c=docHocTap('src/components/hoc-tap/ManLamBaiTap.tsx','utf8');expect(c).toContain("goiHoa2('hoc-tap-start'");expect(c).toContain("goiHoa2('answer'");expect(c).not.toContain('loadExamSources');expect(c).toContain('localStorage.setItem(khoa, v)')})
   it('cổng học sinh: chỉ nộp việc của ĐÚNG em đang đăng nhập; ôn câu bị từ chối / hết lần thử mà màn đã đóng ⇒ hộp thoại báo (không lặng lẽ mất); màn ôn nhận qua cờ daNhan', () => {
     expect(sp).toMatch(/if \(!auth \|\| m\.sbd !== auth\.sbd\) return 'ban'/)
     expect(sp).toMatch(/if \(!chiTiet\.daNhan\) void bao\(/)

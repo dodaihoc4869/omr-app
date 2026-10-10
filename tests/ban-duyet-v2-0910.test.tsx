@@ -409,7 +409,7 @@ describe('Thần thú V2 · Câu đã làm (bản vẽ tối giản 09/10)', () 
     expect(c2.querySelector('.v2-nut-chinh')!.textContent).toContain('Đồng hành')
   })
   it('nối Đăng xuất: cổng học sinh → Game → Đảo → Thần thú V2', () => {
-    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toMatch(/onChuyenSangVaoThi=\{\(\) => setTab\('vaothi'\)\}\s*onDangXuat=\{hoiDangXuat\}/)
+    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toContain('onDangXuat={hoiDangXuat}')
     expect(readFileSync('src/game/than-thu-v2/Game.tsx', 'utf8')).toContain('onDangXuat={onDangXuat} cheDo2={cheDo2}')
     expect(readFileSync('src/game/than-thu-v2/dao/DaoThanThu.tsx', 'utf8')).toContain("onDongHanh={()=>setMan('dao')} onDangXuat={onDangXuat}")
   })

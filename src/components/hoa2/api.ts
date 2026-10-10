@@ -91,7 +91,7 @@ export interface ChienDichCau {
 export type TrangThaiCau = 'dang_on' | 'thanh_thao' | 'can_day_lai'
 /** Nơi em làm lần đó (máy chủ gắn): Bi-a Phản Ứng / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra / Lên bảng / Kiểm tra đầu giờ; nguồn khác hoặc bản máy chủ cũ ⇒ vắng. */
 export type NguonLanLam = 'bia' | 'doan' | 'dao' | 'thi' | 'len_bang' | 'dau_gio'
-export const NHAN_NGUON_LAN: Record<NguonLanLam, string> = { bia: 'Bi-a', doan: 'Đoàn Hộ Tống', dao: 'Bát Linh Đảo', thi: 'Ca kiểm tra', len_bang: 'Lên bảng', dau_gio: 'Kiểm tra đầu giờ' }
+export const NHAN_NGUON_LAN: Record<NguonLanLam, string> = { bia: 'Luyện tập trước đây', doan: 'Ôn theo kế hoạch', dao: 'Học theo kế hoạch', thi: 'Ca kiểm tra', len_bang: 'Lên bảng', dau_gio: 'Kiểm tra đầu giờ' }
 const laNguonLan = (x: unknown): x is NguonLanLam => typeof x === 'string' && Object.prototype.hasOwnProperty.call(NHAN_NGUON_LAN, x)
 export interface LanLam {
   ngay: string
@@ -307,9 +307,9 @@ export function docBiaTrenSanh(x: unknown): BiaTrenSanh | null {
   return { con: soKhongAm(o.con), tong: soKhongAm(o.tong), giaoHuu: { mo: g.mo === true, con: soKhongAm(g.con) }, lyDoKhoa: typeof o.lyDoKhoa === 'string' && o.lyDoKhoa ? o.lyDoKhoa : null }
 }
 
-export async function taiSanh(token: string): Promise<KetQuaSanh> {
+export async function taiSanh(token: string, tapTrung = false): Promise<KetQuaSanh> {
   // 25 giây (09/10): giờ cao điểm cả trường mở Sảnh cùng lúc; cắt ở 15 giây làm em bấm "Thử lại" ⇒ dồn thêm tải.
-  const kq = docSanh(await goiHoa2('hoa2-sanh', token, {}, 25))
+  const kq = docSanh(await goiHoa2(tapTrung ? 'hoc-tap-sanh' : 'hoa2-sanh', token, {}, 25))
   if (!kq) throw new LoiHoa2('Máy chủ trả dữ liệu Sảnh chưa đủ. Em thử lại sau ít phút.')
   return kq
 }
@@ -595,9 +595,9 @@ function sanhHoiSom(token: string | undefined): { than: string; kq: KetQuaSanh }
  * SWR (09/10): nếu máy đã có bản đệm từ trước ⇒ hiện Sảnh NGAY 0ms (dangTai: true); ngầm gọi máy chủ làm tươi.
  * Lỗi mạng / timeout: GIỮ nguyên bản đệm/bản cuối đang hiện để học sinh không kẹt ở khung xương hay bị màn lỗi chặn.
  */
-export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number): TrangThaiSanh & { taiLai: () => void } {
+export function useSanhHoa2(token: string | undefined, sbd: string | undefined, lamMoi: number, tapTrung = false): TrangThaiSanh & { taiLai: () => void } {
   const som = useRef<{ than: string; kq: KetQuaSanh } | null | undefined>(undefined)
-  if (som.current === undefined) som.current = sbd ? sanhHoiSom(token) : null
+  if (som.current === undefined) som.current = sbd && !tapTrung ? sanhHoiSom(token) : null
   const kqDem = useRef<KetQuaSanh | null | undefined>(undefined)
   if (kqDem.current === undefined) kqDem.current = docNhoKetQuaSanh(sbd)
 
@@ -642,7 +642,7 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     }
     let huy = false
     setT((x) => ({ ...x, dangTai: true }))
-    taiSanh(token)
+    taiSanh(token, tapTrung)
       .then((kq) => {
         if (huy) return
         ghiNhoCheDo2(sbd, kq.cheDo2)
@@ -662,7 +662,7 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     return () => {
       huy = true
     }
-  }, [token, sbd, lamMoi, luot])
+  }, [token, sbd, lamMoi, luot, tapTrung])
   useEffect(() => {
     if (t.pha === 'xong') baoSanhDaVe()
   }, [t.pha])

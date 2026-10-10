@@ -63,7 +63,7 @@ describe('Câu đã làm có câu em trả lời trong Bi-a', () => {
     // máy em đọc được nguồn và hiện chữ
     const may = docCauDaLam(r)
     if (!may.cheDo2) throw new Error('cheDo2')
-    expect(chuLanLam(may.cau.find((c) => c.qid === qs[0])!.lichSu[0]!)).toMatch(/^Đúng \d{2}\/\d{2} · Bi-a$/)
+    expect(chuLanLam(may.cau.find((c) => c.qid === qs[0])!.lichSu[0]!)).toMatch(/^Đúng \d{2}\/\d{2} · Luyện tập trước đây$/)
   })
 
   it('câu ôn NGOÀI chiến dịch (câu sai trong ca kiểm tra đã công bố) trả lời trong Bi-a: hiện ở nhóm "Câu sai trong ca kiểm tra", lịch sử: Ca kiểm tra (sai) rồi Bi-a — TRƯỚC ĐÂY KHÔNG HIỆN', async () => {

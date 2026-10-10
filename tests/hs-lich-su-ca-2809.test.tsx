@@ -75,7 +75,7 @@ describe('thẻ nhỏ trên Sảnh', () => {
     const sanh = readFileSync(resolve(__dirname, '../src/components/hoa2/SanhBanDo.tsx'), 'utf8')
     const cong = readFileSync(resolve(__dirname, '../src/screens/StudentPortalScreen.tsx'), 'utf8')
     expect((sanh.match(/<TheCaGanNhatSanh p=\{p\} \/>/g) ?? []).length).toBe(2)
-    expect(cong).toContain("onLichSuCa={() => setTab('lichsuca')}")
+    expect(cong).toContain("onLichSu={() => setTab('lichsuca')}")
     expect(cong).toContain("import('../components/hoa2/LichSuCaEm')")
   })
 })

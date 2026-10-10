@@ -237,66 +237,10 @@ const KE_HOACH = {
   viec: [], canhBao: [], quaHan: [], tienBo: { daLamCau: 2, lenBac: 1, tutBac: 0, dat: false, toiThieuCau: 6, conThieu: 4 }, chuoiDat: 0, lanNghi: false, capNhatLuc: new Date().toISOString(),
   thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' },
 }
-describe('StudentPortalScreen: mở game từ Bảng nhiệm vụ', () => {
-  beforeEach(() => {
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
-      const duong = new URL(String(url)).pathname
-      return { ok: true, status: 200, json: async () => (duong === '/hs/ke-hoach-ngay' ? KE_HOACH : { ok: true, items: [] }) }
-    }))
-  })
-  it('chạm thẻ thần thú ⇒ KHÔNG tự toàn màn hình; có nút "Mở toàn màn hình", bấm mới xin', async () => {
-    render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' }))
-    await screen.findByTestId('game')
-    expect(xin).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Mở toàn màn hình' }))
-    expect(xin).toHaveBeenCalledTimes(1)
-  })
-  it('"Về app học sinh": thoát toàn màn hình (nếu em đã bật) rồi về Bảng nhiệm vụ', async () => {
-    render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở toàn màn hình' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Về app học sinh' }))
-    await waitFor(() => expect(screen.queryByTestId('game')).toBeNull())
-    expect(thoat).toHaveBeenCalled()
-    expect(dangToanManHinh()).toBe(false)
-    expect(screen.queryByRole('button', { name: /toàn màn hình/i })).toBeNull()
-  })
-  it('trình duyệt không có API (iPhone Safari): mở game vẫn chạy, KHÔNG hiện nút toàn màn hình, vẫn có Về app học sinh', async () => {
-    giaApi('khongApi')
-    const loi = vi.spyOn(console, 'error').mockImplementation(() => {})
-    render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' }))
-    expect(await screen.findByRole('button', { name: 'Về app học sinh' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: /toàn màn hình/i })).toBeNull()
-    expect(screen.queryByRole('alert')).toBeNull()
-    expect(loi).not.toHaveBeenCalled()
-  })
-})
+
 
 // ─── khoá nguồn: mọi cửa vào game đều đi qua moGame / xin trong cú chạm ───
-describe('khoá nguồn StudentPortalScreen', () => {
-  const nguon = doc('src/screens/StudentPortalScreen.tsx')
-  it("không còn `setTab('thanthu')` trần ngoài hàm moGame", () => {
-    const con = nguon.split('\n').filter((l) => /setTab\('thanthu'\)/.test(l) && !/^\s*(\/\/|\*)/.test(l))
-    expect(con).toHaveLength(1) // chỉ bên trong moGame
-    expect(nguon).toMatch(/const moGame = \(\) => \{\s*setTab\('thanthu'\)\s*\}/) // 28/09: không tự xin toàn màn hình nữa
-    expect(nguon).not.toContain("xinToanManHinh('cu-cham-vao')")
-    expect((nguon.match(/moGame\(\)|onMoThanThu=\{moGame\}/g) ?? []).length).toBeGreaterThanOrEqual(3)
-  })
-  it('Về app học sinh gọi ketThucLuot; hook gắn theo tab game; thông báo chỉ mở bài Gia đình/BTVN (không phải cửa vào game)', () => {
-    expect(nguon).not.toMatch(/onOpen=\{\(t, noticeId\) => \{[^}]*thanthu/)
-    expect(nguon).toMatch(/onDong=\{\(\) => \{\s*ketThucLuotToanManHinh\(\)/)
-    expect(nguon).toContain("useToanManHinhGame(tab === 'thanthu')")
-  })
-  it('KHÔNG đụng màn thi: tệp toàn màn hình của game không được ExamTakeScreen / màn thi import', () => {
-    for (const t of ['src/screens/ExamTakeScreen.tsx', 'src/lib/exam-api.ts']) {
-      expect(doc(t), t).not.toMatch(/toan-man-hinh-game|useToanManHinhGame/)
-    }
-    expect(doc('src/lib/toan-man-hinh-game.ts')).not.toMatch(/orientation\.lock|screen\.orientation/) // không khoá xoay màn hình
-  })
-})
+
 
 describe('CSS: nút "Về app học sinh" luôn hiện, ≥ 48 px, chừa vùng an toàn', () => {
   it('Đảo: nút dính trên cùng (fixed), safe-area top/left, min 48 px; nội dung chừa chỗ bằng padding-top', () => {
@@ -315,3 +259,6 @@ describe('CSS: nút "Về app học sinh" luôn hiện, ≥ 48 px, chừa vùng 
     expect(css).toMatch(/\.spirit-game>\.spirit-header>button\{min-height:48px;min-width:48px\}/)
   })
 })
+
+// 10/10: cổng học sinh không còn mở game/toàn màn hình; thư viện game lưu trữ vẫn kiểm ở trên.
+it('cổng học tập không tự gọi toàn màn hình hoặc tải màn game',()=>{const c=doc('src/screens/StudentPortalScreen.tsx');expect(c).not.toContain('useToanManHinhGame(');expect(c).not.toContain("import('../game/than-thu-v2/Game')");expect(c).toContain("t === 'thanthu' || t === 'bia' ? 'hoctap' : t");expect(doc('src/screens/ExamTakeScreen.tsx')).not.toContain('toan-man-hinh-game')})

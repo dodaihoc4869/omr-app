@@ -94,20 +94,7 @@ describe('Cửa Bi-a trên Sảnh bản đồ', () => {
   })
 })
 
-describe('StudentPortalScreen thật: cửa Bi-a mở Sảnh Bi-a', () => {
-  beforeEach(() => { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' })) })
-  it('bấm cửa ⇒ mở Sảnh Bi-a, gọi /game-v2/bia-sanh bằng token của em; "Về Sảnh Bát Linh" quay lại', async () => {
-    tra['/game-v2/hoa2-sanh'] = SANH
-    tra['/game-v2/bia-sanh'] = { ok: true, bat: true, chienDich: { ten: 'Ester – Lipid', hanNop: '2026-10-04', tong: 120 }, theLuc: { con: 32, tong: 40 }, doan: { con: 4 }, dao: { con: 28 }, tran: { con: 12, tong: 15, conDoan: 1, conDao: 11 }, giaoHuu: { mo: false, con: 2, toiDa: 2 } }
-    render(<StudentPortalScreen />)
-    // Bản vẽ tối giản thầy chốt 09/10: cửa Bi-a chuyển từ Hôm nay sang "Luyện thêm" ở mục Hành trình (thanh dưới) — cùng chữ, cùng lối vào.
-    fireEvent.click(await screen.findByRole('button', { name: 'Hành trình' }))
-    fireEvent.click(await screen.findByRole('button', { name: /Bi-a Phản Ứng · còn 12\/15 câu/ }))
-    expect(await screen.findByText('còn 12/15 câu')).toBeTruthy()
-    const goi = cuocGoi.filter((c) => new URL(c.url).pathname === '/game-v2/bia-sanh')
-    expect(goi[0]!.body).toEqual({ token: 'test-token' })
-    fireEvent.click(screen.getByRole('button', { name: 'Về Sảnh Bát Linh' }))
-    await waitFor(() => expect(screen.queryByText('còn 12/15 câu')).toBeNull())
-    expect(await screen.findByRole('button', { name: /Bi-a Phản Ứng · còn 12\/15 câu/ })).toBeTruthy()
-  })
-})
+
+
+// 10/10: cờ Bi-a cũ không được mở lại game ở giao diện học tập.
+it('máy chủ vẫn có cờ Bi-a nhưng app học sinh chỉ mở học tập',async()=>{tra['/game-v2/hoc-tap-sanh']=SANH;localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:'Tiếp tục học'})).toBeTruthy();expect(screen.queryByRole('button',{name:/Bi-a/})).toBeNull();expect(cuocGoi.some(x=>x.url.includes('/bia-sanh'))).toBe(false)})

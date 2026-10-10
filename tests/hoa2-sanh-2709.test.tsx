@@ -208,49 +208,38 @@ describe('SanhBanDo — theo bản vẽ Moi-SanhBanDo', () => {
   })
 })
 
-describe('StudentPortalScreen thật: cờ Game Hóa 2.0', () => {
+describe('StudentPortalScreen thật: giao diện học tập tập trung', () => {
   beforeEach(() => {
-    mocks.items = []
-    mocks.momItems = []
+    mocks.items = []; mocks.momItems = []
     localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
   })
-
-  it('cheDo2:true ⇒ màn chính là Sảnh bản đồ, KHÔNG còn Bảng nhiệm vụ; gọi /game-v2/hoa2-sanh bằng token; nhớ chế độ cho lần sau', async () => {
-    tra['/game-v2/hoa2-sanh'] = { body: SANH }
+  it('đọc kế hoạch bằng token, hiển thị tiến độ; nút học mở bài tập, không chọn thú', async () => {
+    tra['/game-v2/hoc-tap-sanh'] = { body: SANH }
+    tra['/game-v2/hoc-tap-start'] = { body: {ok:true, id:'p1', questions:[]} }
     const { container } = render(<StudentPortalScreen />)
-    // BẢN DUYỆT V2 (09/10): màn chính là Hôm nay V2 (SanhV2) — nút vàng "Bắt đầu · gỡ 4 lỗi cũ" (cùng việc với "PHÁ 4 Ổ PHỤC KÍCH" cũ)
-    await screen.findByRole('button', { name: /Bắt đầu · gỡ 4 lỗi cũ/ })
+    await waitFor(() => expect(goiTheo('/game-v2/hoc-tap-sanh').length).toBeGreaterThan(0))
+    await waitFor(() => expect(localStorage.getItem('omr_hoa2_che_do:test')).toBe('1'))
     expect(container.querySelector('.bnv')).toBeNull()
-    expect(goiTheo('/game-v2/hoa2-sanh')[0].body).toEqual({ token: 'test-token' })
-    expect(localStorage.getItem('omr_hoa2_che_do:test')).toBe('1')
-    // không còn đường vào BTVN / bài gia đình giao / bảng tin / menu ba chấm cũ
-    expect(screen.queryByRole('button', { name: /Bài tập về nhà/ })).toBeNull()
-    expect(screen.queryByRole('button', { name: /Mở menu|Thêm/ })).toBeNull()
-    // Phá ổ phục kích ⇒ mở game ở Đoàn Hộ Tống qua khoá màn đầu sẵn có
-    const setItem = vi.spyOn(Storage.prototype, 'setItem')
-    fireEvent.click(screen.getByRole('button', { name: /Bắt đầu · gỡ 4 lỗi cũ/ }))
-    expect(setItem).toHaveBeenCalledWith('game-v2:man-dau', 'doan')
-    setItem.mockRestore()
+    expect(goiTheo('/game-v2/hoc-tap-sanh')[0].body).toEqual({ token: 'test-token' })
+    expect(screen.queryByRole('button', {name:/Thần thú|Bi-a|Cửa hàng/})).toBeNull()
+    fireEvent.click(screen.getByRole('button', {name:'Tiếp tục học'}))
+    await waitFor(() => expect(goiTheo('/game-v2/hoc-tap-start').length).toBeGreaterThan(0))
+    expect(localStorage.getItem('game-v2:man-dau')).toBeNull()
   })
-
-  it('cờ tắt (cheDo2:false hoặc máy chủ cũ) ⇒ app chạy y như cũ: Bảng nhiệm vụ, không Sảnh', async () => {
-    tra['/game-v2/hoa2-sanh'] = { body: { ok: true, cheDo2: false } }
-    const { container } = render(<StudentPortalScreen />)
-    await waitFor(() => expect(goiTheo('/game-v2/hoa2-sanh').length).toBeGreaterThan(0))
-    await waitFor(() => expect(container.querySelector('.bnv')).not.toBeNull())
+  it('cờ kế hoạch tắt vẫn dùng giao diện học tập, không quay lại game', async () => {
+    tra['/game-v2/hoc-tap-sanh'] = { body:{ok:true,cheDo2:false} }
+    const {container}=render(<StudentPortalScreen />)
+    await waitFor(() => expect(goiTheo('/game-v2/hoc-tap-sanh').length).toBeGreaterThan(0))
+    expect(container.querySelector('.ht-app')).toBeTruthy()
     expect(container.querySelector('.h2-sanh')).toBeNull()
-    expect(localStorage.getItem('omr_hoa2_che_do:test')).toBeNull()
+    expect(container.querySelector('.bnv')).toBeNull()
   })
-
-  it('SWR: có đệm phiên trước ⇒ vẽ Sảnh NGAY LẬP TỨC 0ms; mạng đơ/lỗi vẫn giữ Sảnh không bị chặn', async () => {
-    const kqDem = docSanh(SANH)!
-    ghiNhoKetQuaSanh('test', kqDem)
-    expect(docNhoKetQuaSanh('test')).not.toBeNull()
-    // Giả lập mạng bị lỗi hoặc timeout
-    tra['/game-v2/hoa2-sanh'] = { nem: true }
+  it('có đệm phiên trước hiện kế hoạch ngay; mạng lỗi vẫn giữ kế hoạch', async () => {
+    ghiNhoKetQuaSanh('test',docSanh(SANH)!)
+    tra['/game-v2/hoc-tap-sanh']={nem:true}
     render(<StudentPortalScreen />)
-    // Sảnh hiển thị ngay từ bản đệm trong 0ms mà không đợi mạng
-    expect(screen.getByRole('button', { name: /Bắt đầu · gỡ 4 lỗi cũ/ })).not.toBeNull()
+    expect(screen.getByRole('button',{name:'Tiếp tục học'})).toBeTruthy()
+    expect(docNhoKetQuaSanh('test')).toBeTruthy()
   })
 })
 

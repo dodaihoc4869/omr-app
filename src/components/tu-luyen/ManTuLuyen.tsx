@@ -388,7 +388,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     const daKiemHet = !!bai.chamTungCau && bai.cau.every((c) => bai.daCham?.[c.qid])
     const dongY = await hoiXacNhan({
       tieuDe: daKiemHet ? 'Xem tổng kết lượt này?' : 'Nộp bài tu luyện?',
-      noiDung: daKiemHet ? 'Em đã kiểm tra hết các câu. Nộp để lưu lượt này và xem tổng kết. Tu luyện không tính EXP.' : conTrong > 0 ? `Em còn ${conTrong} câu chưa làm — câu bỏ trống tính là sai. Nộp xong em xem ngay đáp án và lời giải. Tu luyện không tính EXP.` : 'Nộp xong em xem ngay đáp án và lời giải từng câu. Tu luyện không tính EXP.',
+      noiDung: daKiemHet ? 'Em đã kiểm tra hết các câu. Nộp để lưu lượt này và xem tổng kết. Lượt tự luyện được theo dõi riêng.' : conTrong > 0 ? `Em còn ${conTrong} câu chưa làm — câu bỏ trống tính là sai. Nộp xong em xem ngay đáp án và lời giải. Lượt tự luyện được theo dõi riêng.` : 'Nộp xong em xem ngay đáp án và lời giải từng câu. Lượt tự luyện được theo dõi riêng.',
       nhanDongY: 'Nộp bài',
       nhanKhong: 'Làm tiếp',
       vo: 'm3',
@@ -464,7 +464,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
         <button type="button" className="tlu-ve" aria-label="Bỏ bài, về chọn chế độ" onClick={boBai}><IconVe /></button>
         <div className="tlu-tieu-khoi">
           <h1 className="tlu-tieu tlu-tieu-nho">{bai.tieuDe || TEN_CHE_DO[bai.cheDo]}</h1>
-          <p className="tlu-phu">Tu luyện · {TEN_CHE_DO[bai.cheDo]}{bai.chamTungCau ? ` · chấm từng câu (${daKiem}/${bai.cau.length} câu đã kiểm tra)` : ''} · không tính EXP</p>
+          <p className="tlu-phu">Tu luyện · {TEN_CHE_DO[bai.cheDo]}{bai.chamTungCau ? ` · chấm từng câu (${daKiem}/${bai.cau.length} câu đã kiểm tra)` : ''}</p>
         </div>
       </div>
     )
@@ -831,10 +831,10 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
     <div className={rong ? 'tlu tlu-rong' : 'tlu'} data-chang="chon" data-bo-cuc={boCuc}>
       <header className="tlu-dau">
         <div className="tlu-hang">
-          <button type="button" className="tlu-ve" aria-label="Về Sảnh" onClick={onVe}><IconVe /></button>
+          <button type="button" className="tlu-ve" aria-label="Về Hôm nay" onClick={onVe}><IconVe /></button>
           <div className="tlu-tieu-khoi">
             <h1 className="tlu-tieu baloo">Tu luyện</h1>
-            <p className="tlu-phu">Luyện tự do · không tính EXP · không ảnh hưởng game</p>
+            <p className="tlu-phu">Luyện tự do · luyện theo nhu cầu</p>
           </div>
         </div>
         <div className="tlu-the-phu" data-so="3" role="tablist" aria-label="Tu luyện">
@@ -1060,7 +1060,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
         <div><dt>Tỉ lệ đúng</dt><dd className="tlu-tab">{tiLe}%</dd></div>
         <div><dt>Thời gian làm</dt><dd className="tlu-tab">{chuThoiGian(kq.giay)}</dd></div>
       </dl>
-      <p className="tlu-ghi">Tu luyện không tính EXP và không đổi câu trong game.</p>
+      <p className="tlu-ghi">Luyện tự do giúp em củng cố kiến thức; kế hoạch được giao vẫn được theo dõi riêng.</p>
     </section>
   )
   const soSai = kq.soCau - kq.soDung
@@ -1119,7 +1119,7 @@ function ManKetQua({ boCuc, kq, cau, token, onVe, onLuyenTiep, onTongHop }: { bo
   const dau = (
     <header className={rong ? 'tlu-dau tlu-dau-rong' : 'tlu-dau'}>
       <div className="tlu-hang">
-        <button type="button" className="tlu-ve" aria-label="Về Sảnh" onClick={onVe}><IconVe /></button>
+        <button type="button" className="tlu-ve" aria-label="Về Hôm nay" onClick={onVe}><IconVe /></button>
         <div className="tlu-tieu-khoi">
           <h1 className="tlu-tieu tlu-tieu-nho">Kết quả tu luyện</h1>
           <p className="tlu-phu">{kq.tieuDe}</p>

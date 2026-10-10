@@ -223,10 +223,10 @@ export const SQL_HOAT_DONG_BIA = `MAX(s.created_at,
  * Đảo báo nhầm "ca kiểm tra"). Đóng NGAY mọi phiên chỉ-trả-lời (`chiCau`) còn mở và mọi bàn Bi-a KHÔNG hoạt động quá `HAN_GIU_BAN_BIA_MS`
  * (câu chưa trả lời về lại kế hoạch; `bi_a_van` để nguyên cho `bia-ket-van`). Trả câu còn giữ ở bàn đang chơi thật (còn hoạt động).
  */
-export async function nhaCauBiaChoDaoDoan(env: Env, sbd: string, nowMs: number): Promise<Set<string>> {
+export async function nhaCauBiaChoDaoDoan(env: Env, sbd: string, nowMs: number, tapTrung = false): Promise<Set<string>> {
   // Quét tối ưu 30/09: đóng phiên + đọc câu còn giữ trong MỘT lô D1 (chạy tuần tự trong một giao dịch ⇒ lượt đọc thấy phiên vừa đóng) — trước: 3 lượt nối tiếp.
   const dong = env.DB.prepare(`UPDATE game_v2_session AS s SET json = json_set(s.json, '$.dong', 1) WHERE s.sbd = ? AND json_extract(s.json,'$.bia') = 1 AND COALESCE(json_extract(s.json,'$.dong'),0) = 0
-      AND (COALESCE(json_extract(s.json,'$.chiCau'),0) = 1 OR ${SQL_HOAT_DONG_BIA} < ?)`).bind(sbd, new Date(nowMs - HAN_GIU_BAN_BIA_MS).toISOString())
+      AND (COALESCE(json_extract(s.json,'$.chiCau'),0) = 1 OR ${SQL_HOAT_DONG_BIA} < ? ${tapTrung ? 'OR 1 = 1' : ''})`).bind(sbd, new Date(nowMs - HAN_GIU_BAN_BIA_MS).toISOString())
   try {
     const [, r] = await env.DB.batch<Row>([dong, env.DB.prepare(sqlCauDangGiu(DK_PHIEN_BIA_MO)).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString())])
     return cauGiuTuPhien(r?.results ?? [])
@@ -266,22 +266,23 @@ const loiTamHoan = (n: number): string => (n > 0 ? ` Còn ${n} câu đang dùng 
  * - Lượt đang chờ (chưa trả lời câu nào) ⇒ trả lại chính lượt ấy.
  * - Thứ tự trong chuyến: ĐAN XEN (thầy 29/09, `napLuot`) — mở/kết bằng câu dễ, không 2 câu khó/2 câu nợ liền nhau; em khá/giỏi Trùm là câu khó nhất.
  */
-export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
+export async function startDao2(env: Env, sbd: string, nowMs: number, tapTrung = false): Promise<Record<string, unknown>> {
   // 29/09 (cao điểm): chuyến đang chờ (chưa làm câu nào) đọc SONG SONG với kế hoạch — không phụ thuộc nhau (trước: một đợt nối tiếp).
-  const dangChoSom = env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0
-      AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).first<Row>().catch(() => null)
+  const dangChoSom = env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0 AND COALESCE(json_extract(json,'$.hocTap'),0) = ?
+      AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString(), Number(tapTrung)).first<Row>().catch(() => null)
   const hdSom = hoSoDangSom(env, sbd)
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
+  const khoaCau = tapTrung ? [...kh.conDoan, ...kh.conDao] : kh.conDao
   const tamHoan = kh.tamHoan?.ca ?? 0
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length }, ...(tamHoan ? { tamHoan } : {}) }
-  if (kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
+  if (!tapTrung && kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
   // OMNI 3: ngày chưa có câu nào mà em đang ở chế độ chờ bài mới (`hs.omni` chỉ có khi OMNI bật cho em) ⇒ lời báo "chờ thầy giao bài mới".
-  if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong || kh.tamHoan?.nghi ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
+  if (!khoaCau.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong || kh.tamHoan?.nghi ? `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Em có thể nghỉ và quay lại học vào ngày mai.` : tamHoan ? `Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.` : cheDoChoOmni(hs) ? CHU_CHO_BAI_MOI : (tapTrung ? 'Hôm nay chưa có câu nào cho em. Bài học sẽ xuất hiện khi thầy bổ sung nội dung phù hợp.' : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.'), ...tomTat }
   const dangCho = await dangChoSom
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
     // 05/10: câu anh em (`tc`) đứng thay câu gốc của kế hoạch; lượt có câu anh em / bản xáo nạp lại theo ref phiên (cau-anh-em.ts), còn lại như cũ.
-    if (cu.questions.every((r) => kh.conDao.some((k) => qidGoc(k) === r.qid || qidGoc(k) === (r.tc ?? r.qid)))) {
+    if (cu.questions.every((r) => khoaCau.some((k) => qidGoc(k) === r.qid || qidGoc(k) === (r.tc ?? r.qid)))) {
       const day = await napLaiLuotCho(env, hs, cu.questions, SO_CAU_CHUYEN, () => napCau(env, hs, cu.questions.map((r) => r.qid), SO_CAU_CHUYEN, new Set()))
       // 06/10: lượt chờ lưu từ trước cũng QUA CỔNG KHỐI — câu khác khối em ⇒ bỏ cả lượt, rút lượt mới (đã lọc).
       const hopKhoi = day.length === cu.questions.length && (await chanKhacKhoiEm(env, 'dao2_luot_cho', { sbd, meta: hs.meta }, day, { cauCua: (x) => x.q })).length === day.length
@@ -293,19 +294,19 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   // Em khá/giỏi, chuyến đủ 6 ải: ải 6 (Trùm) vẫn là câu khó nhất (thầy 28/09); em yếu/TB kết chuyến bằng câu dễ.
   const [chanCa, giuBia, suc] = await Promise.all([
     protectedQuestions(env),
-    nhaCauBiaChoDaoDoan(env, sbd, nowMs), // phiên chỉ-trả-lời / bàn bỏ dở nhả câu; câu trên bàn đang chơi không ra Đảo
+    nhaCauBiaChoDaoDoan(env, sbd, nowMs, tapTrung), // học tập đóng bàn cũ của chính em, giữ nguyên lịch sử/đáp án
     sucEmHomNay(env, sbd, hs, hdSom),
   ])
   const chan = new Set([...chanCa, ...giuBia])
   const boQua = boQuaMoi()
   const nhanSom = batDauNhanNo(env, sbd, hs)
   // 06/10 (1): bật chẩn đoán bước sai cho chuyến Đảo (không chèn vào ải Trùm — câu cuối khi chuyến đủ SO_CAU_CHUYEN ải).
-  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua, { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan], chanDoan: { boCuoiKhiDu: SO_CAU_CHUYEN } }, nhanSom.khiCoLuot), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
+  const chon = await chanKhacKhoiEm(env, 'dao2', { sbd, meta: hs.meta }, await napLuot(env, hs, khoaCau, chan, suc, SO_CAU_CHUYEN, suc === 'kha', boQua, { sbd, nowMs, keHoach: [...kh.dao, ...kh.doan], chanDoan: { boCuoiKhiDu: SO_CAU_CHUYEN } }, nhanSom.khiCoLuot), { cauCua: (x) => x.q }) // LUẬT THẦY 05/10: cổng cuối — chỉ câu đúng khối em
   if (!chon.length) {
-    const lyDo = lyDoLuotRong(kh.conDao, hs, chanCa, giuBia, boQua)
-    if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Mai quay lại khám phá tiếp nhé.`, ...tomTat }
+    const lyDo = lyDoLuotRong(khoaCau, hs, chanCa, giuBia, boQua)
+    if (lyDo === 'xong') return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: `Hôm nay em xong rồi.${loiTamHoan(tamHoan)} Em có thể nghỉ và quay lại học vào ngày mai.`, ...tomTat }
     if (lyDo === 'chua_nap_duoc') {
-      logChuaNap('dao', sbd, kh.conDao, hs, boQua)
+      logChuaNap('dao', sbd, khoaCau, hs, boQua)
       if (!boQua.loiLo) await ghiLoiMay(env, NGUON_LOI_NAP_CAU, nowMs)
     }
     return { ok: true, questions: [], lyDo, message: LOI_LUOT_RONG[lyDo], ...tomTat }
@@ -318,7 +319,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
     return { qid: q.qid, maDe: m.maDe, version: m.version, group: m.group, novel: !!t?.laMoi, role: i === chon.length - 1 && chon.length === SO_CAU_CHUYEN ? 'trum' : t?.laMoi ? 'moi' : 'on_lai', ...(g ? { goiY: g } : {}), ...(n ? { nhanNo: n } : {}), ...refLamLai(x) }
   })
   const id = crypto.randomUUID()
-  await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, questions: refs }), new Date(nowMs).toISOString()).run()
+  await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id, sbd, JSON.stringify({ mode: 'adventure', created: nowMs, hoa2: 1, ...(tapTrung ? { hocTap: 1 } : {}), questions: refs }), new Date(nowMs).toISOString()).run()
   return { ok: true, id, questions: chon.map(({ q }, i) => ({ ...publicQuestion(q), vai: refs[i]!.role, ...(refs[i]!.goiY ? { goiY: refs[i]!.goiY } : {}), ...(refs[i]!.nhanNo ? { nhanNo: refs[i]!.nhanNo } : {}) })), ...tomTat }
 }
 

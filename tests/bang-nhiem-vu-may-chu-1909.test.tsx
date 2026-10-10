@@ -182,218 +182,11 @@ describe('các hook', () => {
   })
 })
 
-describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đang mở"', () => {
-  beforeEach(() => {
-    mocks.items = []
-    mocks.momItems = []
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-    mocks.sheet.mockResolvedValue('<html><body>Đề</body></html>')
-    mocks.homework.mockResolvedValue({ ok: true, maBtvn: 'BT1', de: {}, soCau: 1 })
-  })
 
-  it('kế hoạch máy chủ hợp lệ: thẻ "Làm ngay" là việc đầu của máy chủ, việc bị cổng mờ có nhãn, dùng token', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
-    const { container } = render(<StudentPortalScreen />)
-    const lamNgay = await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu đã tới hạn nhắc lại/ })
-    expect(lamNgay).toBeTruthy()
-    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
-    const biCong = container.querySelector('[data-bi-cong="true"]')!
-    expect(biCong.textContent).toContain('Mở sau khi xong: Ôn 3 câu đã tới hạn nhắc lại')
-    expect(container.querySelector('[data-vung="tien-do"]')!.textContent).toContain('Đã làm 2 câu, 1 câu lên bậc')
-    expect(goiTheo('/hs/ke-hoach-ngay')[0].body).toEqual({ token: 'test-token' })
-    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
-  })
 
-  it('máy chủ lỗi hoặc trả JSON hỏng: rơi về nguồn trợ lý, vẫn mở được bài gia đình giao (không trắng màn)', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: { ok: true, items: [] } }
-    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
-    const { container } = render(<StudentPortalScreen />)
-    expect(await screen.findByRole('button', { name: 'Làm bài gia đình giao' })).toBeTruthy()
-    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly')
-  })
 
-  it('bài gia đình giao chưa bắt đầu do máy chủ đưa vào viec[]: hiện thành thẻ việc, bấm mở đúng bài', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, viec: [{ id: 'mom:M1', loai: 'mom', soCau: 4, thuTu: 1, batBuoc: true, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: 'Bài gia đình giao, chưa bắt đầu.', chiTiet: { id: 'M1', chuaBatDau: true }, hanCung: null, hanMem: null, nguon: 'M1' }] } }
-    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài Mẹ mới nhận', soCau: 4, trangThai: 'chua_lam' }]
-    const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('region', { name: /^Làm ngay: Bài Mẹ mới nhận/ })
-    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
-    expect(container.querySelector('[data-vung="ton-cu"]')).toBeNull()
-  })
 
-  it('bài Mẹ cũ ngoài viec[] (máy chủ chưa gửi tonCu): hàng thu gọn "Bài cũ chưa làm · N bài", không thành thẻ việc; mở ra bấm được', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
-    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài Mẹ cũ', soCau: 4, trangThai: 'chua_lam' }]
-    const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
-    await waitFor(() => expect(container.querySelector('[data-vung="ton-cu"]')).not.toBeNull())
-    expect(container.textContent).toContain('Bài cũ chưa làm · 1 bài')
-    expect(container.querySelectorAll('[data-viec="mom:M1"]').length).toBe(0)
-    fireEvent.click(screen.getByRole('button', { name: /Bài cũ chưa làm · 1 bài/ }))
-    expect(screen.getByRole('button', { name: 'Bài Mẹ cũ 4 câu — bài cũ' })).toBeTruthy()
-  })
 
-  it('ca đang mở (máy chủ báo coCaMo:true): nút Vào thi đổi sang tertiary + chấm nhịp; bấm vẫn mở phòng vào thi', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
-    tra['/hs/ca-dang-mo'] = { body: { ok: true, coCaMo: true, soCa: 1 } }
-    const { container } = render(<StudentPortalScreen />)
-    const fab = await screen.findByRole('button', { name: /Vào ca kiểm tra \(đang mở\)/ })
-    expect(fab.getAttribute('data-ca-mo')).toBe('true')
-    expect(fab.querySelector('.bnv-fab-cham')).not.toBeNull()
-    expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
-    fireEvent.click(fab)
-    expect(await screen.findByRole('dialog', { name: 'Vào phòng thi' })).toBeTruthy()
-    expect(goiTheo('/hs/ca-dang-mo')[0].body).toEqual({ token: 'test-token' })
-  })
-
-  it('không có ca đang mở (hoặc endpoint lỗi): nút Vào thi giữ dạng thường', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
-    tra['/hs/ca-dang-mo'] = { status: 404 }
-    render(<StudentPortalScreen />)
-    const fab = await screen.findByRole('button', { name: 'Vào thi' })
-    await waitFor(() => expect(goiTheo('/hs/ca-dang-mo').length).toBeGreaterThan(0))
-    expect(fab.getAttribute('data-ca-mo')).toBe('false')
-  })
-})
-
-describe('A.1 — bản nhớ kế hoạch: vẽ NGAY khi mở lại, rồi thay bằng bản mới', () => {
-  const KHOA = 'omr_bnv_ke_hoach:test'
-  const nho = (lui = 0) => {
-    const d = tuKeHoachNgay({ ...KE_HOACH, viec: KE_HOACH.viec.map((v) => ({ ...v })) } as any, Date.now(), {})
-    const b = dongGoiBanNho(d, Date.now() - lui)!
-    return JSON.stringify(b)
-  }
-  const gieoNho = (chu: string) => localStorage.setItem(KHOA, chu)
-  let giaiKeHoach!: () => void
-  let giaiLichSu!: (v: any) => void
-
-  beforeEach(() => {
-    mocks.items = []
-    mocks.momItems = []
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-    // Mạng và danh sách CHƯA về: chỉ bản nhớ mới có gì để vẽ.
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH, cho: new Promise<void>((ok) => (giaiKeHoach = ok)) }
-    mocks.lichSuCho = new Promise((ok) => (giaiLichSu = ok))
-  })
-  afterEach(() => {
-    mocks.lichSuCho = null
-  })
-
-  it('có bản nhớ CÙNG NGÀY: vẽ ngay (không chờ mạng), có dòng "Kế hoạch lúc … đang cập nhật", không skeleton', async () => {
-    gieoNho(nho())
-    const { container } = render(<StudentPortalScreen />)
-    expect(await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu đã tới hạn nhắc lại/ })).toBeTruthy()
-    expect(container.querySelector('[data-vung="ke-hoach-cu"]')!.textContent).toMatch(/^Kế hoạch lúc \d{2}:\d{2} · đang cập nhật/)
-    expect(container.querySelector('[aria-busy="true"]')).toBeNull()
-    expect(goiTheo('/hs/ke-hoach-ngay').length).toBeGreaterThan(0) // vẫn gọi máy chủ để cập nhật
-  })
-
-  it('bản mới về thì THAY: bỏ dòng "đang cập nhật", lưu lại bản nhớ mới', async () => {
-    gieoNho(nho(60_000))
-    const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
-    expect(container.querySelector('[data-vung="ke-hoach-cu"]')).not.toBeNull()
-    const luuTruoc = JSON.parse(localStorage.getItem(KHOA)!).luuLuc
-    await act(async () => {
-      giaiKeHoach()
-      giaiLichSu({ ok: true, items: [] })
-    })
-    await waitFor(() => expect(container.querySelector('[data-vung="ke-hoach-cu"]')).toBeNull())
-    expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
-    await waitFor(() => expect(JSON.parse(localStorage.getItem(KHOA)!).luuLuc).toBeGreaterThan(luuTruoc))
-  })
-
-  it('bản nhớ của NGÀY HÔM QUA: KHÔNG vẽ việc cũ — chỉ skeleton tới khi dữ liệu về', async () => {
-    gieoNho(nho(24 * 3600_000))
-    const { container } = render(<StudentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[aria-busy="true"]')).not.toBeNull())
-    expect(container.querySelector('[data-vung="lam-ngay"]')).toBeNull()
-    expect(container.querySelectorAll('.bnv-the').length).toBe(0)
-    expect(container.textContent).not.toContain('Ôn 3 câu đã tới hạn')
-  })
-
-  it('bản nhớ rác (không phải JSON / sai cấu trúc): bỏ qua, skeleton, không sập', async () => {
-    for (const rac of ['{khong-phai-json', JSON.stringify({ ngay: 'x' }), 'null', '[]']) {
-      cleanup()
-      gieoNho(rac)
-      const { container } = render(<StudentPortalScreen />)
-      await waitFor(() => expect(container.querySelector('[aria-busy="true"]')).not.toBeNull())
-      expect(container.querySelector('[data-vung="lam-ngay"]')).toBeNull()
-    }
-  })
-
-  it('máy chủ LỖI sau khi dữ liệu đã về: thôi vẽ bản nhớ, rơi về nguồn trợ lý (không giữ mãi bản cũ)', async () => {
-    gieoNho(nho())
-    tra['/hs/ke-hoach-ngay'] = { nem: true }
-    mocks.lichSuCho = null
-    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
-    const { container } = render(<StudentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly'))
-    expect(container.querySelector('[data-vung="ke-hoach-cu"]')).toBeNull()
-  })
-
-  it('không lưu bản nhớ từ nguồn trợ lý; khác SBD không dùng bản nhớ của nhau', async () => {
-    tra['/hs/ke-hoach-ngay'] = { nem: true }
-    mocks.lichSuCho = null
-    mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
-    localStorage.setItem('omr_bnv_ke_hoach:nguoi-khac', nho())
-    const { container } = render(<StudentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly'))
-    expect(container.textContent).not.toContain('Ôn 3 câu đã tới hạn')
-    expect(localStorage.getItem(KHOA)).toBeNull()
-  })
-})
-
-describe('thần thú của em trên StudentPortalScreen thật (lỗi thầy báo)', () => {
-  const KHOA = 'omr_bnv_ke_hoach:test'
-  const chi = (id: string) => PETS.findIndex((p) => p.id === id)
-  beforeEach(() => {
-    mocks.items = []
-    mocks.momItems = []
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-  })
-  const thu = (c: HTMLElement) => c.querySelector('.bnv-thu-vong [data-testid="thu"]') as HTMLElement | null
-
-  it('máy chủ báo nuoc_long cấp 37 "Bông" → đúng con, đúng cấp, đúng tên (KHÔNG phải Hoả Long cấp 1)', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' } } }
-    const { container } = render(<StudentPortalScreen />)
-    await waitFor(() => expect(thu(container)).not.toBeNull())
-    expect(Number(thu(container)!.dataset.index)).toBe(chi('nuoc_long'))
-    expect(thu(container)!.dataset.level).toBe('37')
-    expect(screen.getByRole('button', { name: 'Mở thần thú Bông · Cấp 37' })).toBeTruthy()
-  })
-
-  it('máy chủ báo chưa chọn (thanThu:null): "Chưa chọn thần thú", chạm mở game, không con nào', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, thanThu: null } }
-    const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('button', { name: /Chưa chọn thần thú/ })
-    await new Promise((r) => setTimeout(r, 250))
-    expect(thu(container)).toBeNull()
-  })
-
-  it('máy chủ cũ (không có trường) hoặc lỗi → giữ chỗ, KHÔNG hiện con mặc định', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
-    const { container } = render(<StudentPortalScreen />)
-    await screen.findByRole('region', { name: /^Làm ngay/ })
-    await new Promise((r) => setTimeout(r, 250))
-    expect(thu(container)).toBeNull()
-    expect(container.textContent).not.toContain('Hoả Long')
-    expect(container.querySelector('.bnv-thu-vong')).not.toBeNull()
-  })
-
-  it('bản nhớ giữ thần thú: mở lại (mạng chưa về) vẫn đúng con, rồi thay khi máy chủ báo con khác', async () => {
-    const d = tuKeHoachNgay({ ...KE_HOACH, viec: KE_HOACH.viec.map((v) => ({ ...v })), thanThu: { pet: 'nuoc_long', cap: 37, nickname: 'Bông' } } as any, Date.now(), {})
-    localStorage.setItem(KHOA, JSON.stringify(dongGoiBanNho(d, Date.now())))
-    let giai!: () => void
-    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, thanThu: { pet: 'dat_quy', cap: 6, nickname: 'Rùa' } }, cho: new Promise<void>((ok) => (giai = ok)) }
-    mocks.lichSuCho = new Promise(() => {})
-    const { container } = render(<StudentPortalScreen />)
-    await waitFor(() => expect(thu(container)).not.toBeNull())
-    expect(Number(thu(container)!.dataset.index)).toBe(chi('nuoc_long'))
-    expect(thu(container)!.dataset.level).toBe('37')
-    mocks.lichSuCho = null
-  })
-})
 
 describe('tab BTVN của học sinh nói đúng hệ CHẶNG (không còn "3 Vòng Phân Tầng", không "nắm chắc")', () => {
   it('mở từ menu ba chấm: tiêu đề/banner/nhãn từng bài nói "chia chặng theo ngày/giờ"', async () => {
@@ -402,8 +195,8 @@ describe('tab BTVN của học sinh nói đúng hệ CHẶNG (không còn "3 Vò
     mocks.momItems = []
     tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
     const { container } = render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Bài tập về nhà' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Của em' }))
+    fireEvent.click(await screen.findByRole('button', { name: /^Bài tập được giao/ }))
     expect(await screen.findByText('Cách làm bài tập về nhà: chia chặng theo ngày/giờ')).toBeTruthy()
     const chu = container.textContent!
     expect(chu).toContain('CHẶNG ĐANG MỞ')
@@ -412,43 +205,12 @@ describe('tab BTVN của học sinh nói đúng hệ CHẶNG (không còn "3 Vò
   })
 })
 
-describe('C11 · việc on_lai mở màn LamCauOn với ĐÚNG câu máy chủ chọn', () => {
-  const datDuong = (d: string) => window.history.replaceState(null, '', d)
-  afterEach(() => datDuong('/'))
 
-  it('bấm "Ôn ngay" → sheet "Ôn câu hôm nay" gọi /hs/cau-theo-qid với token + qid của việc; đóng sheet thì hỏi lại /hs/ke-hoach-ngay', async () => {
-    datDuong('/hs')
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-    mocks.items = []
-    mocks.momItems = []
-    const qid = (KE_HOACH.viec[0].chiTiet as any).qid as string[]
-    tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
-    tra['/hs/cau-theo-qid'] = { body: { ok: true, cau: [{ qid: qid[0], phan: 'I', text: 'Câu ôn thử phải hiện', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [] }], khongCo: [] } }
-    render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: /Ôn ngay/ }))
-    expect(await screen.findByText('Câu ôn thử phải hiện')).toBeTruthy()
-    expect(document.querySelector('.m3-thanh-tren-ten')!.textContent).toBe('Ôn câu hôm nay')
-    expect(goiTheo('/hs/cau-theo-qid')[0].body).toEqual({ token: 'test-token', qid })
-    // KHÔNG mở luồng khắc phục cũ (hsCauSaiApi/luyện lại câu sai)
-    expect(goiTheo('/hs/cau-sai').length).toBe(0)
-    const truoc = goiTheo('/hs/ke-hoach-ngay').length
-    fireEvent.click(screen.getByTitle('Đóng toàn màn hình'))
-    await waitFor(() => expect(goiTheo('/hs/ke-hoach-ngay').length).toBeGreaterThan(truoc))
-  })
 
-  it('việc on_thi (ôn trước ca kiểm tra) có chiTiet.qid: bấm "Ôn ngay" cũng mở LamCauOn, gọi /hs/cau-theo-qid với ĐÚNG qid của việc — không mở luồng khắc phục cũ', async () => {
-    datDuong('/hs')
-    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
-    mocks.items = []
-    mocks.momItems = []
-    const qid = ['thi-1', 'thi-2']
-    const viecThi = { ...KE_HOACH.viec[0], id: 'on_thi:CA1', loai: 'on_thi', soCau: 2, ghiChu: 'Ôn trước ca kiểm tra', chiTiet: { qid } }
-    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, viec: [viecThi] } }
-    tra['/hs/cau-theo-qid'] = { body: { ok: true, cau: [{ qid: qid[0], phan: 'I', text: 'Câu ôn trước ca kiểm tra phải hiện', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [] }], khongCo: [] } }
-    render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: /Ôn ngay/ }))
-    expect(await screen.findByText('Câu ôn trước ca kiểm tra phải hiện')).toBeTruthy()
-    expect(goiTheo('/hs/cau-theo-qid')[0].body).toEqual({ token: 'test-token', qid })
-    expect(goiTheo('/hs/cau-sai').length).toBe(0)
-  })
+// 10/10: thẻ game/việc cũ đã gỡ theo lệnh thầy. Kế hoạch/API/hook vẫn kiểm ở trên;
+// giao câu ôn/mới, quyền và nháp kiểm tại hoc-tap-tap-trung/giao-dien-1010.
+describe('cổng học tập đọc kế hoạch cũ khi cờ 2.0 tắt',()=>{
+ beforeEach(()=>{localStorage.setItem('omr_student_portal_auth',JSON.stringify({sbd:'test',hoTen:'Em thử',token:'test-token'}));tra['/game-v2/hoc-tap-sanh']={body:{ok:true,cheDo2:false}}})
+ it('tiến độ đúng nguồn máy chủ, không hiện thần thú từ kế hoạch cũ',async()=>{tra['/hs/ke-hoach-ngay']={body:KE_HOACH};render(<StudentPortalScreen/>);await waitFor(()=>expect(screen.getByRole('progressbar').getAttribute('value')).toBe('2'));expect(screen.getByRole('progressbar').getAttribute('max')).toBe('12');expect(screen.queryByRole('button',{name:/Thần thú|Chưa chọn thần thú/})).toBeNull();expect(goiTheo('/hs/ke-hoach-ngay')[0].body).toEqual({token:'test-token'})})
+ it('ca mở có lối vào kiểm tra, không có ca vẫn nhập mã được từ Của em',async()=>{tra['/hs/ca-dang-mo']={body:{ok:true,coCaMo:true}};render(<StudentPortalScreen/>);expect(await screen.findByRole('button',{name:'Vào kiểm tra'})).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Vào kiểm tra'}));expect(await screen.findByRole('dialog',{name:'Vào phòng thi'})).toBeTruthy()})
 })
