@@ -13,16 +13,18 @@ export interface GiaoTuCa {
   ten: string
 }
 
-/** Ba thẻ của màn Hành trình (thầy 09/10 tối: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại nữa nhé"):
- *  Dạy học · Kiểm tra đầu giờ · Cần thầy chữa. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã giao" của cùng màn
- *  (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca) — thẻ Nhịp hôm nay / Chiến dịch đã giao đã bỏ khỏi Hành trình. */
-export type TheHanhTrinh = 'day-hoc' | 'dau-gio' | 'can-chua' | 'chien-dich'
+/** Bốn thẻ của màn Hành trình (thầy 09/10 tối: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại nữa nhé"; 09/10 khuya: "hành trình
+ *  để lại chỗ nhịp học"): Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã
+ *  giao" của cùng màn (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca). */
+export type TheHanhTrinh = 'day-hoc' | 'nhip' | 'dau-gio' | 'can-chua' | 'chien-dich'
 
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {
   the: TheHanhTrinh
   /** "Bổ sung bài": cuộn tới bước Bài hôm nay trong thẻ Dạy học. */
   boSungBai?: boolean
+  /** Thẻ Nhịp học: khối chọn sẵn ở thanh phân đoạn (Hôm nay bấm dòng "Khối 12" của thẻ Đủ mức tối thiểu). Vắng ⇒ Tất cả. */
+  khoi?: number
 }
 
 interface SoDemGv {
@@ -33,7 +35,8 @@ interface SoDemGv {
   canThayChua: number | null
   giaoTuCa: GiaoTuCa | null
   moHanhTrinh: MoHanhTrinh | null
-  /** Hôm nay bấm "Xem danh sách" / một dòng khối ⇒ màn Học sinh mở sẵn bộ lọc khối ấy (đọc một lần rồi xoá). */
+  /** Màn Học sinh mở sẵn bộ lọc khối này (đọc một lần rồi xoá). 09/10 khuya: Hôm nay › "Xem danh sách" / dòng khối nay mở Hành trình › Nhịp học
+   *  (`moHanhTrinh.khoi`), không còn ghi vào đây — giữ cho lối vào khác của màn Học sinh. */
   khoiHocSinh: number | null
   datSo: (so: Partial<Pick<SoDemGv, 'caMo' | 'chienDichChay' | 'canDayLai' | 'canThayChua'>>) => void
   datGiaoTuCa: (g: GiaoTuCa | null) => void

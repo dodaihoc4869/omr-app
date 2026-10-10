@@ -1,6 +1,7 @@
 // HÀNH TRÌNH (mã màn `chiendich`) — màn của Game Hóa 2.0. Lịch sử: 28/09 "Chiến dịch luyện" (docs/ban-ve-gv-2809/RA-SOAT.md mục 1 + 4) ·
 // 09/10 bản duyệt V2 "Hành trình giỏi Hóa" · 09/10 bản vẽ tối giản (bốn thẻ) · 09/10 TỐI thầy lệnh "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu
-// giờ giữ lại nữa nhé" ⇒ màn Hành trình còn BA thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa (`HanhTrinhV2`).
+// giờ giữ lại nữa nhé" ⇒ màn Hành trình còn BA thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa (`HanhTrinhV2`); 09/10 khuya "hành trình để lại chỗ
+// nhịp học" ⇒ thêm thẻ Nhịp học (Hôm nay mở thẳng, khối chọn sẵn: `moHanhTrinh.khoi`).
 // "Chiến dịch đã giao" (giao chiến dịch mới · lọc · Xem bảng / Mở buổi chữa · Rải đều câu mới · Chỉnh sửa · Kết thúc · Huỷ) KHÔNG còn là thẻ của
 // Hành trình nhưng KHÔNG mất: là TRANG RIÊNG của cùng màn này, có nút "Hành trình" quay lại. Lối vào: chữ nhỏ "Chiến dịch đã giao" ở Cài đặt
 // (`useSoDemGv.moHanhTrinh = { the: 'chien-dich' }`) và Tổng quan › "Ca … chưa có chiến dịch · Giao" (`useSoDemGv.giaoTuCa` — khung giao mở sẵn
@@ -28,7 +29,7 @@ export default function ChienDichScreen() {
       {daGiao ? (
         <TrangChienDichDaGiao tuCa={tuCa} onVe={() => setDaGiao(false)} />
       ) : (
-        <HanhTrinhV2 theDau={mo && mo.the !== 'chien-dich' ? mo.the : 'day-hoc'} boSungBai={mo?.boSungBai === true} />
+        <HanhTrinhV2 theDau={mo && mo.the !== 'chien-dich' ? mo.the : 'day-hoc'} boSungBai={mo?.boSungBai === true} khoiDau={mo?.the === 'nhip' ? (mo.khoi ?? null) : null} />
       )}
     </div>
   )

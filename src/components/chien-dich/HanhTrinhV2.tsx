@@ -1,16 +1,19 @@
 // BẢN DUYỆT V2 · MÀN 14 — "HÀNH TRÌNH GIỎI HÓA" của thầy (chế độ Game Hóa 2.0).
 // LỊCH SỬ: 09/10 bản vẽ tối giản thầy chốt (bốn thẻ Nhịp hôm nay · Cần thầy chữa · Bài đã dạy · Chiến dịch đã giao + ba thẻ lớn chọn khối).
 // 09/10 TỐI — THẦY RA LỆNH: "phần này phải tối ưu lại, tôi chỉ cần giữ lại phần dạy học. Phần câu cần chữa trùng tu lại bỏ hết những thứ không
-// cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". Màn NAY CHỈ CÒN BA THẺ:
+// cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". 09/10 KHUYA — THẦY: "hành trình
+// để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử…".
+// Màn NAY CÓ BỐN THẺ, đúng thứ tự thầy dùng: Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa.
 //   · Dạy học (mặc định) — `TheBaiDaDay` (điểm danh · chọn câu · bước Bài hôm nay). Nút chính "Bổ sung bài" thuộc thẻ này: chỉ hiện khi đứng ở
 //     thẻ Dạy học, bấm ⇒ cuộn tới bước Bài hôm nay (tick bài vừa dạy — máy chủ chưa có lệnh thêm bài thẳng vào hành trình theo khối).
+//   · Nhịp học — `TheNhipHoc` (từng em hôm nay của các Hành trình khối đang chạy; em chưa làm / chưa đủ mức đứng đầu; bấm một em ⇒ tấm Lịch sử
+//     làm câu). Hôm nay › "Xem danh sách" / dòng khối của thẻ Đủ mức tối thiểu mở thẳng thẻ này (khối chọn sẵn: `khoiDau`).
 //   · Kiểm tra đầu giờ — `KiemTraDauGio` (cùng bước điểm danh, app gọi ≤ 6 em làm lại câu từng đúng).
 //   · Cần thầy chữa — `TheCanThayChua` (trung tu: MỘT danh sách câu/dạng cần chữa xếp theo số em, mỗi dòng một nút đúng việc; thanh phân đoạn
 //     Khối 10 · 11 · 12 chỉ hiện ở thẻ này vì chỉ thẻ này lọc theo khối). Số cạnh tên thẻ = số "Cần thầy chữa" màn Hôm nay đã đếm.
 // ĐÃ BỎ khỏi màn (thông tin/hành động ấy nằm ở chỗ khác — không mất chức năng nào):
-//   · thẻ Nhịp hôm nay (bốn ô số + bảng từng em + thẻ chương) — Hôm nay của thầy có "Đủ mức tối thiểu a/b em" theo khối + việc "N em chưa làm câu
-//     nào"; từng em "Hôm nay a/b câu" ở màn Học sinh (Hôm nay bấm khối ⇒ Học sinh lọc sẵn khối); bảng tầng/chặng/dự phòng của từng Hành trình ở
-//     Chiến dịch đã giao › "Xem bảng"; chương/bài của khối ở cây Dạy học › Bài hôm nay và Kho đề.
+//   · bốn ô số + thẻ chương của thẻ Nhịp hôm nay cũ (bảng từng em đã trở lại ở thẻ Nhịp học) — chương/bài của khối ở cây Dạy học › Bài hôm nay
+//     và Kho đề.
 //   · thẻ Chiến dịch đã giao (giao mới · lọc · xem bảng · rải đều · sửa · kết thúc · huỷ) — trang riêng của cùng màn `chiendich`
 //     (`ChienDichScreen`), lối vào chữ nhỏ ở Cài đặt và Tổng quan › "Giao" cho một ca.
 //   · ba thẻ lớn chọn khối (cao 124 px).
@@ -23,15 +26,17 @@ import './gv-v2.css'
 // Phép tính nhịp (khối, bốn chỉ số) ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng) — xuất lại ở đây cho mọi lối nhập cũ.
 export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 
-// Ba thẻ ghép màn sẵn có — mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
+// Bốn thẻ — mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
+const TheNhipHoc = lazy(() => import('./TheNhipHoc'))
 const KiemTraDauGio = lazy(() => import('../day-hoc/KiemTraDauGio'))
 const TheCanThayChua = lazy(() => import('./TheCanThayChua'))
 
 type TheMan = Exclude<TheHanhTrinh, 'chien-dich'>
-/** Ba thẻ, đúng thứ tự thầy dùng trên lớp: dạy → kiểm tra đầu giờ → chữa. */
+/** Bốn thẻ, đúng thứ tự thầy dùng: dạy → nhịp học của từng em → kiểm tra đầu giờ → chữa. */
 export const THE_HANH_TRINH: readonly (readonly [TheMan, string])[] = [
   ['day-hoc', 'Dạy học'],
+  ['nhip', 'Nhịp học'],
   ['dau-gio', 'Kiểm tra đầu giờ'],
   ['can-chua', 'Cần thầy chữa'],
 ]
@@ -59,8 +64,9 @@ function XuongThe() {
 }
 
 /** Màn Hành trình.
- *  `theDau` = thẻ mở đầu (Hôm nay › một việc ⇒ đúng thẻ ấy). `boSungBai` = vào thẳng thẻ Dạy học và cuộn tới bước Bài hôm nay. */
-export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false }: { theDau?: TheMan; boSungBai?: boolean }) {
+ *  `theDau` = thẻ mở đầu (Hôm nay › một việc ⇒ đúng thẻ ấy). `boSungBai` = vào thẳng thẻ Dạy học và cuộn tới bước Bài hôm nay.
+ *  `khoiDau` = khối chọn sẵn ở thẻ Nhịp học (Hôm nay › dòng "Khối 12"). */
+export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, khoiDau = null }: { theDau?: TheMan; boSungBai?: boolean; khoiDau?: number | null }) {
   const [the, setThe] = useState<TheMan>(boSungBai ? 'day-hoc' : theDau)
   // Mỗi lần bấm "Bổ sung bài" tăng một nhịp ⇒ thẻ Dạy học cuộn lại tới bước Bài hôm nay.
   const [lanBoSung, setLanBoSung] = useState(boSungBai ? 1 : 0)
@@ -107,6 +113,8 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false }: {
         <Suspense fallback={<XuongThe />}>
           {the === 'day-hoc' ? (
             <TheBaiDaDay lanBoSung={lanBoSung} />
+          ) : the === 'nhip' ? (
+            <TheNhipHoc khoiDau={khoiDau} />
           ) : the === 'dau-gio' ? (
             <div className="gvv2-nhung">
               <KiemTraDauGio />

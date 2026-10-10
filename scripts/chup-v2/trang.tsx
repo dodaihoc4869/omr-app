@@ -9,7 +9,8 @@ import '../../src/styles/giao-dien-day-du.css'
 // TRANG CHỤP ẢNH BẢN DUYỆT V2 (chỉ để lấy bằng chứng giao diện, không vào bản phát hành): component THẬT + máy chủ GIẢ ngay trong trang
 // (thay `fetch`) — không một yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật (tên em trong ảnh là tên giả).
 // `?man=` sanh | sanh-xong | sanh-chon-thu | sanh-dang-tai | than-thu | cua-hang | dao | doan | gv-nhip | gv-bo-sung | gv-can-chua | gv-ca | gv-ma-tran
-// `gv-nhip&the=day-hoc|dau-gio|can-chua|chien-dich` = màn Hành trình mở sẵn đúng thẻ (như Hôm nay / Cài đặt mở) — trung tu 09/10 tối.
+// `gv-nhip&the=day-hoc|nhip|dau-gio|can-chua|chien-dich[&khoi=12]` = màn Hành trình mở sẵn đúng thẻ (như Hôm nay / Cài đặt mở) — trung tu 09/10 tối;
+// `the=nhip` (09/10 khuya) = thẻ Nhịp học, bấm một em ⇒ tấm Lịch sử làm câu (`/gv/lich-su-lam-cau` GIẢ: gia/lich-su-lam-cau.ts).
 import { createElement as h } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
@@ -56,6 +57,7 @@ import { KHO } from '../chup-omni-3/gia/may-thay'
 import BottomNav from '../../src/components/BottomNav'
 import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
 import { useSoDemGv, type TheHanhTrinh } from '../../src/lib/so-dem-gv'
+import { lichSuGia } from './gia/lich-su-lam-cau'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -149,6 +151,9 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Câu đã làm (09/10): 24 câu để danh sách cột trái đủ dài mà cuộn — tái hiện lỗi thẻ chồng chữ ở bố cục ngang.
   if (u.pathname.endsWith('/hoa2-cau-da-lam')) return tra(CDL_GIA)
   if (u.pathname.endsWith('/hoa2-cau-chi-tiet')) return tra({ ok: true, cau: [CT_GIA] })
+  // Tấm Lịch sử làm câu của một em (09/10 khuya) — app thầy gọi qua `goiLenh` (bản chụp đã thay bằng gia/goi-lenh-thay.ts, cùng dữ liệu này);
+  // giữ thêm đường `fetch` để mọi lối gọi thẳng cũng nhận dữ liệu giả, không chạm máy chủ thật.
+  if (u.pathname.endsWith('/gv/lich-su-lam-cau')) return tra(lichSuGia(String(b.sbd ?? ''), 'Trần Đức Huy'))
   return tra({ ok: true })
 }
 
@@ -209,7 +214,7 @@ const con =
   : man === 'cua-hang' ? h('div', { className: 'dao dao-vo dao-v2', 'data-thu': 5 }, h(ManShop as never, { api: new ShopApiGia(), pet: 5, cap: 7, tenThu: 'Linh Hồ', onDong: noop, veThu: veThuThat, veHinhMon: (m: { ma: string }) => h(HinhVatPham as never, { ma: m.ma }) } as never))
   : man === 'dao' ? h(Dao2, { sbd: 'GIA', profile: hoSo, call: callDao, doanMo: false, sanhDau: SANH_DAO, onMoDoan: noop, onMoSoTay: noop, onDong: noop } as never)
   : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
-  : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh }), h(ChienDichScreen))
+  : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
   : man === 'cau-da-lam' ? h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })
   : man === 'sanh-xong' ? manSanh(SANH_XONG)

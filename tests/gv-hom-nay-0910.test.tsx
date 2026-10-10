@@ -5,6 +5,9 @@
 //     SỬA CÓ CHỦ ĐÍCH 09/10 tối (thầy: "chỉ cần giữ lại phần dạy học" + "kiểm tra đầu giờ giữ lại nữa nhé" + "phần câu cần chữa trùng tu lại"):
 //     Hành trình còn BA thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa; Cần thầy chữa = MỘT danh sách xếp theo số em, mỗi dòng một nút đúng việc;
 //     Chiến dịch đã giao thành trang riêng (lối vào ở Cài đặt); Hôm nay › "Xem danh sách" / dòng khối ⇒ màn Học sinh lọc sẵn khối;
+//     SỬA CÓ CHỦ ĐÍCH 09/10 khuya (thầy: "hành trình để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé"):
+//     Hành trình có BỐN thẻ Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa; "Xem danh sách" / dòng khối ⇒ Hành trình › Nhịp học
+//     (khối chọn sẵn) — chi tiết thẻ Nhịp học + tấm lịch sử làm câu ở tests/hanh-trinh-nhip-ho-so-0910.test.tsx;
 //   · lỗi tái hiện: Hành trình (hạn giả 9999-12-31) bị in "còn ~2,9 triệu ngày" ở Tổng quan ⇒ nay không ghi hạn nộp.
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -247,7 +250,9 @@ describe('màn Hôm nay của thầy — số từ API', () => {
 
   // SỬA CÓ CHỦ ĐÍCH 09/10 tối: thẻ Nhịp hôm nay đã bỏ ⇒ "Xem danh sách" (em chưa làm) và dòng khối mở màn Học sinh (cột "Hôm nay a/b câu"),
   // lọc sẵn khối (nhiều khối có em chưa làm ⇒ không lọc, không giấu khối nào); "Bổ sung bài" ⇒ thẻ Dạy học (tên thẻ mới).
-  it('mỗi nút đưa đúng chỗ: nút chính · Theo dõi ca · Hành trình › Cần thầy chữa / Dạy học · em chưa làm & dòng khối ⇒ Học sinh lọc khối', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/10 khuya: thầy "hành trình để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu" ⇒ hai lối ấy
+  // nay mở Hành trình › Nhịp học (nhóm "Chưa làm câu nào" đứng đầu), khối chọn sẵn qua `moHanhTrinh.khoi`; KHÔNG ghi bộ lọc màn Học sinh nữa.
+  it('mỗi nút đưa đúng chỗ: nút chính · Theo dõi ca · Hành trình › Cần thầy chữa / Dạy học · em chưa làm & dòng khối ⇒ Hành trình › Nhịp học', async () => {
     m.danhSachCa.mockResolvedValue([ca('DH-12-C2-B6')])
     mayChu()
     render(<GvHomNayScreen />)
@@ -257,13 +262,16 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Bổ sung bài:/ }))
     expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'day-hoc', boSungBai: true })
     useSoDemGv.getState().datMoHanhTrinh(null)
-    // Khối 10: 1 em + Khối 12: 2 em chưa làm ⇒ mở cả danh sách Học sinh (không lọc khối)
+    // Khối 10: 1 em + Khối 12: 2 em chưa làm ⇒ Nhịp học, Tất cả (không chọn khối, không giấu khối nào)
+    useAppStore.getState().setScreen('tongquan')
     fireEvent.click(screen.getByRole('button', { name: /^Xem danh sách:/ }))
-    expect(useAppStore.getState().screen).toBe('hocsinh')
-    expect(useSoDemGv.getState()).toMatchObject({ khoiHocSinh: null, moHanhTrinh: null })
-    fireEvent.click(screen.getByRole('button', { name: /^Khối 10: 1\/3 em đủ mức — xem từng em khối 10 ở màn Học sinh/ }))
-    expect(useAppStore.getState().screen).toBe('hocsinh')
-    expect(useSoDemGv.getState().khoiHocSinh).toBe(10)
+    expect(useAppStore.getState().screen).toBe('chiendich')
+    expect(useSoDemGv.getState()).toMatchObject({ khoiHocSinh: null, moHanhTrinh: { the: 'nhip' } })
+    useAppStore.getState().setScreen('tongquan')
+    fireEvent.click(screen.getByRole('button', { name: /^Khối 10: 1\/3 em đủ mức — xem từng em khối 10 ở Hành trình › Nhịp học/ }))
+    expect(useAppStore.getState().screen).toBe('chiendich')
+    expect(useSoDemGv.getState()).toMatchObject({ khoiHocSinh: null, moHanhTrinh: { the: 'nhip', khoi: 10 } })
+    expect(screen.getByText('Bấm một khối để xem từng em ở Hành trình › Nhịp học.')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /^Theo dõi ca:/ }))
     expect(useAppStore.getState().screen).toBe('exammonitor')
     expect(useAppStore.getState().maCaTheoDoi).toBe('DH-12-C2-B6')
@@ -349,12 +357,14 @@ describe('màn Hôm nay của thầy — số từ API', () => {
 // không cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". Bốn thẻ cũ (Nhịp hôm nay ·
 // Cần thầy chữa · Bài đã dạy · Chiến dịch đã giao) ⇒ BA thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa; ba thẻ con của Cần thầy chữa (Buổi chữa ·
 // Bước cuối trên lớp · Gỡ nút thắt) ⇒ MỘT danh sách câu/dạng cần chữa, mỗi dòng mở đúng chỗ làm việc SẴN CÓ; Chiến dịch đã giao ⇒ trang riêng.
-describe('Hành trình: BA thẻ Dạy học · Kiểm tra đầu giờ · Cần thầy chữa', () => {
-  it('ba thẻ, mặc định Dạy học; "Bổ sung bài" là nút chính DUY NHẤT và chỉ ở thẻ Dạy học; không còn Nhịp hôm nay / Chiến dịch đã giao / ba thẻ khối', async () => {
+// SỬA CÓ CHỦ ĐÍCH 09/10 khuya — thầy: "hành trình để lại chỗ nhịp học" ⇒ thêm thẻ Nhịp học (thứ hai: Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần
+// thầy chữa). Bốn ô số / thẻ chương / ba thẻ khối lớn của Nhịp hôm nay cũ vẫn KHÔNG trở lại (kiểm ở tests/hanh-trinh-nhip-ho-so-0910.test.tsx).
+describe('Hành trình: BỐN thẻ Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa', () => {
+  it('bốn thẻ, mặc định Dạy học; "Bổ sung bài" là nút chính DUY NHẤT và chỉ ở thẻ Dạy học; không còn Nhịp hôm nay / Chiến dịch đã giao / ba thẻ khối', async () => {
     mayChu()
     useSoDemGv.getState().datSo({ canThayChua: 7 })
     const { container } = render(<HanhTrinhV2 />)
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học', 'Kiểm tra đầu giờ', 'Cần thầy chữa · 7'])
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học', 'Nhịp học', 'Kiểm tra đầu giờ', 'Cần thầy chữa · 7'])
     expect(screen.getByRole('tab', { name: 'Dạy học' }).getAttribute('aria-selected')).toBe('true')
     expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
     expect(screen.queryByRole('tab', { name: /Nhịp hôm nay|Chiến dịch đã giao|Bài đã dạy|Tổng quan/ })).toBeNull()
