@@ -48,9 +48,10 @@ afterEach(async () => {
   vi.clearAllMocks()
   datDuong('/')
 })
+// Trùng tu 11/10 (bản vẽ thầy duyệt): Bài tập về nhà + Kết quả bài đã nộp ở mục "Kết quả"; "Của em" là tấm mở từ ảnh đại diện (gia đình, đăng xuất).
 const moTab = async () => {
-  fireEvent.click(await screen.findByRole('button', { name: 'Của em' }))
-  fireEvent.click(await screen.findByRole('button', { name: /^Bài tập được giao/ }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Kết quả' }))
+  fireEvent.click(await screen.findByRole('button', { name: /^Bài tập về nhà/ }))
 }
 const the = (i: number) => document.querySelectorAll<HTMLElement>('.btm-the')[i]
 

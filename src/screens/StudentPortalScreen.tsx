@@ -962,7 +962,7 @@ export default function StudentPortalScreen() {
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
-          onKiem={(goiId,maDe)=>{setKiemGoi7({goiId,maDe});setTab('kiemgoi7')}} coCa={!!caDangMo} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
+          onKiem={(goiId,maDe)=>{setKiemGoi7({goiId,maDe});setTab('kiemgoi7')}} coCa={!!caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
           onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}

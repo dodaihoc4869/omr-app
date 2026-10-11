@@ -98,7 +98,9 @@ const DS = [
     [`26-hs-cung-go-buoc-${k}`, 'chua-cau-sai&go=buoc', w,h,'light',false,/Số mol NaOH/],
     [`26-hs-cung-go-buoc-${k}-toi`, 'chua-cau-sai&go=buoc', w,h,'dark',false,/Số mol NaOH/],
     // App học sinh tập trung học (PR231): 4 mục + màn làm bài, sáng/tối
-    ...['light','dark'].flatMap((nen) => [['hom-nay','Hôm nay'],['hanh-trinh','Hành trình'],['on-lai','Ôn & sửa'],['ca-nhan','Của em']].map(([m,chu]) => [`30-hs-moi-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, m === 'hom-nay' ? 'hs-moi&ca=1' : 'hs-moi', w,h,nen,false,/Chào Minh Anh/, m === 'hom-nay' ? undefined : `ht:${chu}`])),
+    ...['light','dark'].flatMap((nen) => [['hom-nay','Hôm nay'],['hanh-trinh','Hành trình'],['on-lai','Ôn & sửa'],['ket-qua','Kết quả']].map(([m,chu]) => [`30-hs-moi-${m}-${k}${nen === 'dark' ? '-toi' : ''}`, 'hs-moi', w,h,nen,false,/Chào Minh Anh/, m === 'hom-nay' ? undefined : `ht:${chu}`])),
+    [`30-hs-moi-ca-mo-${k}`, 'hs-moi&ca=1', w,h,'light',false,/Ca kiểm tra đang mở/],
+    [`30-hs-moi-cua-em-${k}`, 'hs-moi', w,h,'light',false,/Chào Minh Anh/,'nut:Của em'],
     [`30-hs-moi-lam-${k}`, 'hs-lam', w,h,'light',false,/Thuỷ phân hoàn toàn/],
     [`30-hs-moi-lam-${k}-toi`, 'hs-lam', w,h,'dark',false,/Thuỷ phân hoàn toàn/],
     // Luyện thêm có màu nhấn (09/10): chụp thêm Hành trình nền TỐI
@@ -135,7 +137,10 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     loiTrang.push(`${ten}: không thấy chữ ${cho}`)
   }
   try {
-    if (viec?.startsWith('ht:')) {
+    if (viec?.startsWith('nut:')) {
+      await t.getByRole('button', { name:viec.slice(4), exact:true }).first().click()
+      await t.waitForTimeout(400)
+    } else if (viec?.startsWith('ht:')) {
       await t.getByRole('navigation', { name:'Điều hướng học sinh' }).getByRole('button', { name:viec.slice(3), exact:true }).click()
       await t.waitForTimeout(250)
     } else if (viec?.startsWith('hs:')) {

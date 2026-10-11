@@ -55,5 +55,5 @@ it('nhờ thầy chữa không lộ đáp án, không hiện làm sai và vẫn 
   await screen.findByText(/nhờ thầy chữa/)
   expect(screen.queryByRole('button',{name:'Tự chữa câu này'})).toBeNull()
   expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull()
-  fireEvent.click(screen.getByRole('button',{name:'Kết thúc đợt'}));expect(screen.getByText('Em đã hoàn thành đợt này')).toBeTruthy()
+  /* Trùng tu 11/10: "đợt" → "chặng" (bảng từ chuẩn A2) */fireEvent.click(screen.getByRole('button',{name:'Kết thúc chặng'}));expect(screen.getByText('Em đã hoàn thành chặng này')).toBeTruthy()
 })

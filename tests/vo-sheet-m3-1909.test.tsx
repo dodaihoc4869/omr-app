@@ -41,8 +41,9 @@ afterEach(() => {
 })
 
 const moMan = async (nhan: string) => {
-  const ten:Record<string,string>={'Bài tập về nhà':'Bài tập được giao','Bài gia đình giao':'Bài gia đình giao','Xem điểm & lịch sử ca kiểm tra':'Kết quả bài đã nộp','Khắc phục lỗi sai':'Luyện lại từ bài kiểm tra','Bảng tin & bài luyện hôm nay':'Thông tin từ gia đình'}
-  fireEvent.click(await screen.findByRole('button',{name:nhan==='Khắc phục lỗi sai'?'Ôn & sửa':'Của em'}))
+  const ten:Record<string,string>={'Bài tập về nhà':'Bài tập về nhà','Bài gia đình giao':'Bài gia đình giao','Xem điểm & lịch sử ca kiểm tra':'Kết quả bài đã nộp','Khắc phục lỗi sai':'Luyện lại từ bài kiểm tra','Bảng tin & bài luyện hôm nay':'Thông tin từ gia đình'}
+  // Trùng tu 11/10 (bản vẽ thầy duyệt): Bài tập về nhà + Kết quả bài đã nộp ở mục "Kết quả"; "Của em" là tấm mở từ ảnh đại diện (gia đình, đăng xuất).
+  fireEvent.click(await screen.findByRole('button',{name:nhan==='Khắc phục lỗi sai'?'Ôn & sửa':nhan==='Bài tập về nhà'||nhan==='Xem điểm & lịch sử ca kiểm tra'?'Kết quả':'Của em'}))
   fireEvent.click(await screen.findByRole('button',{name:new RegExp('^'+ten[nhan])}))
 }
 const tam = () => document.querySelector('.fixed.inset-0.z-50') as HTMLElement

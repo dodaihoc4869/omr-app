@@ -12,7 +12,8 @@ it('màn chính dùng dữ liệu kế hoạch, không có cửa game hoặc đ�
   const hoc = vi.fn()
   const sanh = docSanh({ cheDo2: true, theLuc: { con: 18, tong: 24 }, hanhTrinh: { tang: 1, toiThieu: 24, daLam: 6, daXep: 24, conThieu: 0, soChang: 4, changHienTai: 2, cauTrongChang: 6 } })
   render(<HocTapHomNay ten="An" lop="12A1" ketQua={sanh} dangTai={false} loi="" coCa={false} onHoc={hoc} onXemLai={vi.fn()} onChua={vi.fn()} onThi={vi.fn()} onTuLuyen={vi.fn()} onLichSu={vi.fn()} onBaiTap={vi.fn()} onGiaDinh={vi.fn()} onTaiLai={vi.fn()} onDangXuat={vi.fn()} />)
-  expect(screen.getByText('Nền tảng · Đợt 2/4')).toBeTruthy()
+  // Trùng tu 11/10: tên tầng ngắn + "Chặng" (bảng từ chuẩn A2 cấm "đợt").
+  expect(screen.getByText('Nền · Chặng 2/4')).toBeTruthy()
   expect(screen.queryByText(/Bát Linh|Bi-a|Thần thú|Cửa hàng|Hộ Tống/i)).toBeNull()
   fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục học' })); expect(hoc).toHaveBeenCalledOnce()
   fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' })); expect(screen.getByRole('button', { name: /Tự chữa lỗi/ })).toBeTruthy()
