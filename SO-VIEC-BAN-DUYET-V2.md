@@ -108,4 +108,4 @@ Giả định (thầy chưa trả lời 3 câu): mục 4 = Kết quả, Của em
 - [x] Kết quả + tấm Của em | bằng chứng: eed66e0b; ảnh 30-hs-moi-ket-qua-*, 30-hs-moi-cua-em-*. CHƯA làm: điểm + đường tiến bộ ngay trên mục Kết quả (đang dẫn vào màn Ca kiểm tra), nút giao diện Sáng/Tối riêng cho học sinh.
 - [x] Làm câu → Sau khi nộp → Xong chặng | bằng chứng: eed66e0b; ảnh 30-hs-moi-lam-* (điện thoại: khối nút ghim đáy).
 - [x] Màn con cùng bảng màu (Cùng gỡ câu này, Câu đã làm) — sửa chữ chìm | bằng chứng: eed66e0b; ảnh 26-hs-cung-go-* (nền giấy, chữ mực), Câu đã làm chip chữ màu thẻ. Tu luyện: Codex vừa làm lại (7d7c3c9f, d5b07318) — giữ nguyên.
-- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
+- [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: PR238 gộp `0c31532`, Actions `38162406893` SUCCESS (bước "Kiểm ca thi" của CI đạt: 0 ca mở/0 lượt; khoá Cloudflare của phiên hết hạn nên phiên không tự đọc D1). Lùi: `git revert -m 1 0c31532`.
