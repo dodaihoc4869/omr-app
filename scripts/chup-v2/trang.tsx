@@ -25,10 +25,14 @@ import '../../src/styles/tokens.css'
 import '../../src/styles/thang.css' // thang chung 3 app (main.tsx nạp ngay sau tokens.css) — thiếu thì --nut-*-cao, --t-*, --r-* rỗng trong ảnh chụp
 import '../../src/index.css'
 import '../../src/styles/the-loc.css'
+// App học sinh tập trung học (PR231): Hôm nay nạp hoc-tap.css rồi mới mở các màn con ⇒ nạp sẵn ở đây cho ảnh khớp bản sống.
+import '../../src/components/hoc-tap/hoc-tap.css'
 import '../../src/components/m3'
 import BatLinhShell from '../../src/components/bat-linh/BatLinhShell'
 import SanhHomNay from '../../src/components/ban-duyet-v2/SanhHomNay'
 import CauDaLam from '../../src/components/hoa2/CauDaLam'
+import HocTapHomNay from '../../src/components/hoc-tap/HocTapHomNay'
+import ManLamBaiTap from '../../src/components/hoc-tap/ManLamBaiTap'
 import ManChuaCauSai from '../../src/components/chua-cau-sai/ManChuaCauSai'
 import { docSanh, type KetQuaSanh } from '../../src/components/hoa2/api'
 // Bản màu app thầy (App.tsx nạp ba tệp này, phạm vi `.vo-thay`) — màn thầy bọc đúng khung `.m3.m3-thay.vo-thay` như app thật.
@@ -77,6 +81,15 @@ const SANH_HT = {
   bia: { bat: true, con: 9, tong: 9, giaoHuu: { mo: false, con: 0 }, lyDoKhoa: null }, tamGiuCa: 0, thuSucThem: { duoc: false, soCau: 0 }, chuoiNgay: 12,
   omni: { bat: true, baiDangLuyen: [], dangVung: { a: 5, b: 8 }, conDangDe8: 2, sEm: 0.06, sMucTieu: 0.07, chungChi: [], ve: { con: 2, tong: 2 }, choBaiMoi: false, onBaiCu: 0, metGio: null, nhatKy: null, deThu: { duoc: true, soCau: 14, phut: 25 } },
 }
+// App học sinh tập trung học (PR231, 10/10): cùng kế hoạch, thêm danh sách bài + tên Hành trình.
+const SANH_MOI = { ...SANH_HT, chienDich: { id: 'cd1', ten: 'Hành trình giỏi hoá · Khối 12' }, hanhTrinh: { ...SANH_HT.hanhTrinh, bai: [
+  { khoa: 'b1', ten: 'Este — khái niệm, danh pháp', tangMo: 3 }, { khoa: 'b2', ten: 'Thuỷ phân este', tangMo: 2 },
+  { khoa: 'b3', ten: 'Chất béo', tangMo: 1 }, { khoa: 'b4', ten: 'Glucose và fructose', tangMo: 1 }] } }
+const CAU_HOC = [
+  { qid: 'H1', version: '1', group: 'g', phan: 'I', tenDang: 'Thuỷ phân este', mucDo: 'hieu', text: 'Thuỷ phân hoàn toàn 8,8 gam etyl axetat bằng dung dịch NaOH vừa đủ. Khối lượng muối thu được là', choices: ['8,2 gam.', '6,8 gam.', '9,6 gam.', '4,1 gam.'], ideas: [], hinhAnh: [] },
+  { qid: 'H2', version: '1', group: 'g', phan: 'II', tenDang: 'Chất béo', mucDo: 'hieu', text: 'Cho các phát biểu về chất béo:', choices: [], ideas: ['Chất béo là trieste của glixerol với axit béo.', 'Tristearin ở thể lỏng ở nhiệt độ thường.', 'Thuỷ phân chất béo trong kiềm gọi là phản ứng xà phòng hoá.', 'Chất béo tan tốt trong nước.'], hinhAnh: [] },
+  { qid: 'H3', version: '1', group: 'g', phan: 'III', tenDang: 'Glucose', mucDo: 'VD', text: 'Lên men 45 gam glucose với hiệu suất 80%. Thể tích khí CO₂ (đktc, lít) thu được là bao nhiêu?', choices: [], ideas: [], hinhAnh: [] },
+]
 // Xong kế hoạch: 30/30, rương mở được, có Thử sức thêm 6 câu.
 const SANH_XONG = { ...SANH_HT, hanhTrinh: { ...SANH_HT.hanhTrinh, daLam: 30, changHienTai: 5, cauTrongChang: 0 }, theLuc: { con: 0, tong: 30 }, doan: { con: 0 }, dao: { con: 0 }, khoaDao: false, loiKhoaDao: '', ruong: { daLam: 30, tong: 30, moDuoc: true, daMo: false, qua: null }, thuSucThem: { duoc: true, soCau: 6 } }
 
@@ -151,6 +164,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   if (u.pathname.endsWith('/ph/loi-thay')) return tra({ ok: true, nhanXet: [{ maCa: 'CA-2', tenCa: 'Kiểm tra 45 phút · Ester – Lipid', noiDung: 'Con làm tốt phần lý thuyết ester. Bài đốt cháy hỗn hợp con còn nhầm bước bảo toàn nguyên tố, thầy sẽ chữa cùng con ở buổi tới.', capNhatLuc: '2026-09-20T01:00:00Z', nopLuc: '2026-09-19T02:12:00Z', tong: 7.5 }] })
   // Câu đã làm (09/10): 24 câu để danh sách cột trái đủ dài mà cuộn — tái hiện lỗi thẻ chồng chữ ở bố cục ngang.
   if (u.pathname.endsWith('/hoa2-cau-da-lam')) return tra(CDL_GIA)
+  if (u.pathname.endsWith('/game-v2/hoc-tap-start')) return tra({ ok: true, id: 's1', questions: CAU_HOC })
+  if (u.pathname.endsWith('/game-v2/answer')) return tra({ correct: false, answer: 'A', solution: null })
   if (u.pathname.endsWith('/hoa2-cau-chi-tiet')) return tra({ ok: true, cau: [CT_GIA] })
   // Cùng gỡ câu này (10/10): thầy gửi ảnh chữ chìm trên nền xanh than ở trạng thái chờ bài luyện.
   if (u.pathname.endsWith('/hs/chua-cau-sai/mo-dot')) return tra({ ok: true, dotId: 'd1', trangThai: 'thieu_hoc_lieu', coHocLieu: false, revision: 1, tienDo: { soBuocDaQua: 0, soBuocCanKiem: 0 } })
@@ -225,6 +240,9 @@ const con =
   : man === 'doan' ? (sessionStorage.setItem('doan:GIA', 'DH2'), h(DoanHoTong, { call: callDoan as never, sbd: 'GIA', pet: 5, cap: 7, onDong: noop, onVeBangNhiemVu: noop } as never))
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
+  : man === 'hs-moi' ? h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MOI } as never, dangTai: false, loi: '', coCa: thamSo.get('ca') === '1',
+      onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
+  : man === 'hs-lam' ? h(ManLamBaiTap, { token: 'tk', sbd: '12121212', onVe: noop, onCapNhat: noop, onChua: noop })
   : man === 'chua-cau-sai' ? h(ManChuaCauSai, { token: 'tk', qid: 'DH-12-C1-B2-17', onVe: noop })
   : man === 'cau-da-lam' ? h(CauDaLam, { token: 'tk', hoTen: 'Nguyễn Minh Anh', sbd: '12121212', lop: '12A1', onVe: noop, caGanNhat: { chu: 'Chưa có ca đã công bố', coDiem: false }, onLichSuCa: noop })
   : man === 'sanh-xong' ? manSanh(SANH_XONG)
