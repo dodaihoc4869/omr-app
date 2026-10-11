@@ -109,3 +109,13 @@ Trạng thái: **ĐÃ PHÁT HÀNH** 08:23 (VN) — PR227, mã sống `a9ec700`, 
 ## Đợt 6 — "Cùng gỡ câu này" chữ chìm ở nền sáng (10/10)
 Trạng thái: **ĐÃ PHÁT HÀNH** 10:24 (VN) — PR229, mã sống `4bf4a0d`, Actions `38020000153` SUCCESS. 09:25 có ca mở (11L2-L1) ⇒ hoãn; 10:16 D1 0 ca mở / 0 lượt (thầy báo ca đã xong) mới gộp. Lùi: `git revert -m 1 4bf4a0d`.
 Nguyên nhân gốc: hoc-sinh.css đổi --tlu-* sang bảng sáng nhưng chua-cau-sai.css viết cứng nền xanh than; ô nhập số chữ --tlu-nhan-chu (trắng ở nền sáng). Sửa: chỉ THÊM luật nền sáng bằng --tlu-*; điện thoại dọc `.ccs-cot-phu > * { min-width: 0 }` (hết tràn 358 px). Kiểm: check:mau đạt · kiem:mau-giu 0 · soi:giao-dien 0 · tsc 0 · test liên quan 8/8 · build:cf 13/13, 2996 KB · ảnh 26-hs-cung-go-* 0 lỗi/0 tràn/0 chạm < 44 · PR check `kiem` SUCCESS.
+
+## Đợt 7 — trùng tu toàn bộ app học sinh không thần thú (11–12/10)
+Trạng thái: **ĐÃ PHÁT HÀNH** 01:14 12/10 (VN) — PR238, mã sống `0c31532`, Actions `38162406893` SUCCESS (bước "Kiểm ca thi" của CI đạt). Bản vẽ: https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC. Lùi: `git revert -m 1 0c31532`.
+| Việc | Kết quả |
+|---|---|
+| tsc · check:mau · kiem:mau-giu · soi:giao-dien | 0 · đạt · 0 vi phạm · 0 lỗi |
+| build:cf | SW 13/13 · 149 tệp / 2826 KB |
+| vitest toàn bộ so TÊN main e9f7d42c | nhánh 170 đỏ / main 171; đỏ mới 0 |
+| Ảnh 30-hs-moi-*, 26-hs-cung-go-*, 25-hs-cau-da-lam-* | 0 lỗi trang · 0 tràn; chạm < 44 chỉ Câu đã làm ngang (có từ trước) |
+Chưa làm: biểu đồ 7 ngày (cần máy chủ), điểm + đường tiến bộ ngay trên mục Kết quả, nút Sáng/Tối riêng cho học sinh.
