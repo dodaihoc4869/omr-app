@@ -389,3 +389,24 @@
 /* SỬA LỖI 10/10 (điện thoại dọc): dải "Đường tự gỡ" là thanh cuộn ngang, nhưng thẻ bọc nó là Ô LƯỚI có min-width:auto ⇒ thẻ nở theo
    cả dải (tràn ngang ~360px, kéo luôn thẻ "Xem lại đề gốc"). Cho các ô của cột phụ được co ⇒ dải cuộn trong thẻ như thiết kế. */
 .ccs-cot-phu > * { min-width: 0; }
+
+/* TRÙNG TU 11/10 — app học sinh tập trung học (vỏ đặt body[data-hoc-tap=hs], KHÔNG còn data-bat-linh ⇒ khối nền sáng ở trên không áp).
+   Cùng gỡ câu này đi CHUNG bảng màu với Hôm nay (tokens.css: --nen --the --the-2 --vien --muc --nhat --lg-nhan), tự đổi sáng/tối theo máy
+   hoặc nút giao diện; thay các nền xanh than viết cứng (đầu trang, thẻ, ô câu hỏi, ô chọn, ô nhập, nút) — chỉ THÊM luật, không đổi màu cũ. */
+body[data-hoc-tap=hs] .tlu.ccs {
+  --tlu-nen: var(--nen); --tlu-nen-2: var(--the); --tlu-nen-3: var(--the-2); --tlu-vien: var(--vien);
+  --tlu-chu: var(--muc); --tlu-chu-phu: var(--nhat); --tlu-nhan: var(--lg-nhan); --tlu-nhan-chu: var(--the);
+  --tlu-ngoc: var(--lg-nhan); --tlu-vang: var(--vang-diu); --tlu-vang-dam: var(--vang-diu); --tlu-do: var(--do);
+  background: var(--nen); color: var(--muc); color-scheme: light dark;
+}
+body[data-hoc-tap=hs] .ccs-dau { border-bottom-color: var(--vien); background: var(--the); box-shadow: 0 8px 30px color-mix(in srgb, var(--muc) 6%, transparent); }
+body[data-hoc-tap=hs] .ccs-ve { background: var(--the); }
+body[data-hoc-tap=hs] :is(.ccs-the-tien-do, .ccs-cau-goc, .ccs-khu-lam) { border-color: var(--vien); background: var(--the); box-shadow: 0 16px 36px -28px color-mix(in srgb, var(--muc) 45%, transparent); }
+body[data-hoc-tap=hs] .ccs-lo-trinh li:not([data-da='true'], [data-hien-tai='true']) { border-color: var(--vien); background: var(--nen); }
+body[data-hoc-tap=hs] :is(.ccs-cau-goc-noi, .ccs-bai-lam-dau) { border-color: var(--vien); }
+body[data-hoc-tap=hs] .ccs-hoi { border-color: var(--vien); background: var(--the-2); }
+body[data-hoc-tap=hs] .ccs-input { background: var(--the); color: var(--muc); }
+body[data-hoc-tap=hs] .ccs-chon-muc:not([data-chon='true']) { background: var(--the); }
+body[data-hoc-tap=hs] .ccs-trang-thai:not(.ccs-goi-y, .ccs-phan-hoi) { border-color: var(--vien); background: var(--the-2); }
+body[data-hoc-tap=hs] .ccs-nut-chinh { border-color: var(--muc); background: var(--muc); color: var(--the); box-shadow: none; }
+body[data-hoc-tap=hs] .ccs-nut-phu:not(.ccs-nghi) { background: var(--the); color: var(--muc); }

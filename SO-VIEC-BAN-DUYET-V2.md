@@ -97,3 +97,15 @@ Thầy nhắn (nguyên văn): "Phần ai sai trong chiếu lên bảng cung hi�
 Thầy nhắn (nguyên văn, kèm ảnh): "Không nhìn thấy chữ"
 - [x] Sửa chữ chìm màn Cùng gỡ câu này (HS, nền sáng) | bằng chứng: nguyên nhân gốc — hoc-sinh.css đổi --tlu-* sang bảng sáng nhưng chua-cau-sai.css viết cứng nền xanh than ⇒ chữ tối trên nền tối; ô nhập số chữ trắng trên nền sáng. Thêm luật nền sáng bằng --tlu-* (nền tối giữ nguyên); kiem:mau-giu 0; ảnh 26-hs-cung-go-* 0 lỗi trang/0 tràn/0 chạm < 44.
 - [x] Phát sinh: điện thoại dọc tràn ngang 358 px ở màn đang làm bước | bằng chứng: ô lưới cột phụ min-width:auto nở theo dải bước ⇒ `.ccs-cot-phu > * { min-width: 0 }`; chụp lại 0 tràn.
+
+## Đợt 7 — trùng tu toàn bộ app học sinh (không thần thú) theo bản vẽ (11/10)
+Bản vẽ: https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC
+Thầy nhắn (nguyên văn): "quét lại giao diện app học sinh, vẽ lại trùng tu toàn bộ app học sinh siêu đẹp , wow và khoa học cực kì với code hiện tại" · "buid và đẩy luôn nhé"
+Giả định (thầy chưa trả lời 3 câu): mục 4 = Kết quả, Của em vào ảnh đại diện · tầng "Nền · Hiểu · Vận dụng · Tổng hợp" · Bài tập về nhà chỉ hiện khi có bài.
+- [x] Hôm nay (vòng tiến độ, 5 chặng, một nút chính, việc theo lịch, ca mở ⇒ Vào thi là nút chính) | bằng chứng: eed66e0b; ảnh 30-hs-moi-hom-nay-*, 30-hs-moi-ca-mo-* (0 lỗi trang/0 tràn). CHƯA làm: biểu đồ 7 ngày (cần máy chủ trả số câu từng ngày).
+- [x] Hành trình (thang 4 tầng + từng bài 4 nấc) | bằng chứng: eed66e0b; ảnh 30-hs-moi-hanh-trinh-*.
+- [x] Ôn & sửa (một tên mỗi việc) | bằng chứng: eed66e0b — Tự chữa lỗi · Câu đã làm · Tu luyện · Luyện lại từ bài kiểm tra.
+- [x] Kết quả + tấm Của em | bằng chứng: eed66e0b; ảnh 30-hs-moi-ket-qua-*, 30-hs-moi-cua-em-*. CHƯA làm: điểm + đường tiến bộ ngay trên mục Kết quả (đang dẫn vào màn Ca kiểm tra), nút giao diện Sáng/Tối riêng cho học sinh.
+- [x] Làm câu → Sau khi nộp → Xong chặng | bằng chứng: eed66e0b; ảnh 30-hs-moi-lam-* (điện thoại: khối nút ghim đáy).
+- [x] Màn con cùng bảng màu (Cùng gỡ câu này, Câu đã làm) — sửa chữ chìm | bằng chứng: eed66e0b; ảnh 26-hs-cung-go-* (nền giấy, chữ mực), Câu đã làm chip chữ màu thẻ. Tu luyện: Codex vừa làm lại (7d7c3c9f, d5b07318) — giữ nguyên.
+- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)

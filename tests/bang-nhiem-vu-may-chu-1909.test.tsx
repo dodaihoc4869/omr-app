@@ -195,8 +195,9 @@ describe('tab BTVN của học sinh nói đúng hệ CHẶNG (không còn "3 Vò
     mocks.momItems = []
     tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
     const { container } = render(<StudentPortalScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Của em' }))
-    fireEvent.click(await screen.findByRole('button', { name: /^Bài tập được giao/ }))
+    // Trùng tu 11/10 (bản vẽ thầy duyệt): Bài tập về nhà + Kết quả bài đã nộp ở mục "Kết quả"; "Của em" là tấm mở từ ảnh đại diện (gia đình, đăng xuất).
+    fireEvent.click(await screen.findByRole('button', { name: 'Kết quả' }))
+    fireEvent.click(await screen.findByRole('button', { name: /^Bài tập về nhà/ }))
     expect(await screen.findByText('Cách làm bài tập về nhà: chia chặng theo ngày/giờ')).toBeTruthy()
     const chu = container.textContent!
     expect(chu).toContain('CHẶNG ĐANG MỞ')
