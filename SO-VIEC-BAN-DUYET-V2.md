@@ -102,10 +102,10 @@ Thầy nhắn (nguyên văn, kèm ảnh): "Không nhìn thấy chữ"
 Bản vẽ: https://claude.ai/artifact/5v8vXw5zBzw53FkpCvMknC
 Thầy nhắn (nguyên văn): "quét lại giao diện app học sinh, vẽ lại trùng tu toàn bộ app học sinh siêu đẹp , wow và khoa học cực kì với code hiện tại" · "buid và đẩy luôn nhé"
 Giả định (thầy chưa trả lời 3 câu): mục 4 = Kết quả, Của em vào ảnh đại diện · tầng "Nền · Hiểu · Vận dụng · Tổng hợp" · Bài tập về nhà chỉ hiện khi có bài.
-- [ ] Hôm nay (vòng tiến độ, 5 chặng, một nút chính, việc theo lịch, ca mở ⇒ Vào thi là nút chính) | bằng chứng: (chưa có)
-- [ ] Hành trình (thang 4 tầng + từng bài 4 nấc) | bằng chứng: (chưa có)
-- [ ] Ôn & sửa (một tên mỗi việc) | bằng chứng: (chưa có)
-- [ ] Kết quả + tấm Của em (Vào thi bằng mã ca, gia đình, giao diện, đăng xuất hỏi lại) | bằng chứng: (chưa có)
-- [ ] Làm câu → Sau khi nộp → Xong chặng | bằng chứng: (chưa có)
-- [ ] Màn con cùng bảng màu (Cùng gỡ câu này, Tu luyện, Câu đã làm) — sửa chữ chìm | bằng chứng: (chưa có)
+- [x] Hôm nay (vòng tiến độ, 5 chặng, một nút chính, việc theo lịch, ca mở ⇒ Vào thi là nút chính) | bằng chứng: eed66e0b; ảnh 30-hs-moi-hom-nay-*, 30-hs-moi-ca-mo-* (0 lỗi trang/0 tràn). CHƯA làm: biểu đồ 7 ngày (cần máy chủ trả số câu từng ngày).
+- [x] Hành trình (thang 4 tầng + từng bài 4 nấc) | bằng chứng: eed66e0b; ảnh 30-hs-moi-hanh-trinh-*.
+- [x] Ôn & sửa (một tên mỗi việc) | bằng chứng: eed66e0b — Tự chữa lỗi · Câu đã làm · Tu luyện · Luyện lại từ bài kiểm tra.
+- [x] Kết quả + tấm Của em | bằng chứng: eed66e0b; ảnh 30-hs-moi-ket-qua-*, 30-hs-moi-cua-em-*. CHƯA làm: điểm + đường tiến bộ ngay trên mục Kết quả (đang dẫn vào màn Ca kiểm tra), nút giao diện Sáng/Tối riêng cho học sinh.
+- [x] Làm câu → Sau khi nộp → Xong chặng | bằng chứng: eed66e0b; ảnh 30-hs-moi-lam-* (điện thoại: khối nút ghim đáy).
+- [x] Màn con cùng bảng màu (Cùng gỡ câu này, Câu đã làm) — sửa chữ chìm | bằng chứng: eed66e0b; ảnh 26-hs-cung-go-* (nền giấy, chữ mực), Câu đã làm chip chữ màu thẻ. Tu luyện: Codex vừa làm lại (7d7c3c9f, d5b07318) — giữ nguyên.
 - [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
