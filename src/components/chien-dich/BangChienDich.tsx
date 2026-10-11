@@ -8,6 +8,7 @@
 // số câu tự làm (cùng 4 màu thang đang dùng), thêm cột "Sơ ý" và "Khoảng cách tới 8", bấm ô ⇒ "Thầy xác nhận em đã vững" / "Chưa đạt, dạy lại" (`xac-nhan`);
 // thẻ "Cần thầy dạy lại" đổi tên "Cần thầy chữa", hiện đủ ba nhóm (`CanThayChuaOmni`); cuối bảng một dòng "Vi kỹ năng: … đã gắn tự động · Xem".
 // Không có `omni` (OMNI tắt / máy chủ lỗi / sai dạng) ⇒ bảng cũ y nguyên, không gọi thêm lệnh nào.
+import BangGoi7 from './BangGoi7'
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import HopXacNhan from '../HopXacNhan'
@@ -171,6 +172,7 @@ export default function BangChienDich({
   /** Hành trình › Cần thầy chữa (09/10 tối): CHỈ khối Cần thầy chữa (danh sách · chiếu · Chữa xong) — cả với Hành trình (bỏ bảng tiến độ). */
   chiChua?: boolean
 }) {
+  const [goi7Bat,setGoi7Bat]=useState(false)
   const showToast = useAppStore((s) => s.showToast)
   const [caLop, setCaLop] = useState(false)
   const [daChieu3, setDaChieu3] = useState(false)
@@ -340,12 +342,12 @@ export default function BangChienDich({
 
   if (chiChua) return (
     <>
-      {theCanChua}
+      {(cd.hanhTrinh||cd.id.startsWith('hanh-trinh-v3-'))&&<BangGoi7 lop={cd.lop} onBat={setGoi7Bat}/>} {!goi7Bat&&theCanChua}
       {hopChua}
     </>
   )
 
-  if (du.hanhTrinhNgay) return <section className="cd-the" aria-label="Tiến độ Hành trình hôm nay">
+  if (du.hanhTrinhNgay) return <><BangGoi7 lop={cd.lop} onBat={setGoi7Bat}/>{!goi7Bat&&<section className="cd-the" aria-label="Tiến độ Hành trình hôm nay">
     <h2>{cd.ten}</h2>
     <p>Hôm nay · {hienNgay(du.homNay)} · tối thiểu 24 / 30 / 36 câu theo tầng · mỗi chặng 6 câu.</p>
     <p>Kiến thức mới được tự nhận vào đúng khối sau khi duyệt. Câu thiếu hoặc chưa đủ điều kiện học được báo riêng.</p>
@@ -369,10 +371,11 @@ export default function BangChienDich({
       {du.hanhTrinhNgay.doLuong.moHinh && <p>Mô hình: {du.hanhTrinhNgay.doLuong.moHinh.soMau} quan sát · {du.hanhTrinhNgay.doLuong.moHinh.soCauDaKiem} câu có độ khó vượt kiểm · chọn câu {du.hanhTrinhNgay.doLuong.moHinh.hocDaKiem?'đã vượt kiểm dự đoán':'đang tích luỹ dữ liệu'}.</p>}
       {du.hanhTrinhNgay.doLuong.ketQua.map((r,i)=><div key={i}><p>Phạm vi đo {i+1}</p><table className="cd-bang"><thead><tr><th>Nhóm</th><th>Học sinh đã đo</th><th>Điểm trung bình</th><th>Tăng so với đầu vào</th></tr></thead><tbody>{r.nhom.map(n=><tr key={n.nhom}><td>{n.nhom}</td><td>{n.n} học sinh</td><td>{n.diemTb===null?'Chưa có':`${n.diemTb.toFixed(2)}/10`}</td><td>{n.tangDiemTb===null?'Chưa có mốc tương đương':`${n.tangDiemTb.toFixed(2)} điểm`}</td></tr>)}</tbody></table></div>)}
     </details>}
-  </section>
+  </section>}</>
 
   return (
     <>
+      {(cd.hanhTrinh||cd.id.startsWith('hanh-trinh-v3-'))&&<BangGoi7 lop={cd.lop}/>}
       <div className="cd-dau">
         <div>
           <p className="cd-duong-dan">Cần thầy chữa › Bảng chiến dịch</p>

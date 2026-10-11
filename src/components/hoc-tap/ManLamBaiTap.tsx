@@ -9,8 +9,8 @@ import '../bang-nhiem-vu/m3-theme.css'
 import '../m3/m3.css'
 import './hoc-tap.css'
 
-type Cau = Question & { goiY?: { gach?: string[]; cotLoi?: string } }
-type Ket = { correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh'] }
+type Cau = Question & { vaiGoi7?:string; huongDan7?:boolean; coGoi7?:boolean; goiY?: { gach?: string[]; cotLoi?: string } }
+type Ket = { choThay?:boolean; hocCoHoTro?:boolean; correct: boolean; answer: string; solution?: unknown; omni?: { luot?: boolean }; solutionImages?: Question['hinhAnh'] }
 export function duTraLoi(phan: string, value: string): boolean { return phan === 'II' ? /^[DS]{4}$/.test(value) : phan === 'I' ? /^[ABCD]$/.test(value) : value.trim().length > 0 }
 export function propsCauHoc(q: Cau, stt: number, value: string, onChange: (v: string) => void, ket?: Ket, khoa = false): TheCauProps {
   const chung = { cheDo: ket ? 'xem_lai' as const : 'thi' as const, stt, text: q.text, table: q.table, thanCauImg: q.thanCauImg, imageDataUrl: q.imageDataUrl, hinhAnh: [...q.hinhAnh, ...(ket?.solutionImages ?? [])] as HinhAnh[], ...(ket ? { loiGiai: loiGiaiChuanTuKho(ket.solution, q.phan, ket.answer), explanation: typeof ket.solution === 'string' ? ket.solution : undefined } : {}) }
@@ -49,14 +49,25 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua }: { 
     } catch (e) { setLoi(e instanceof Error ? e.message : 'Chưa nộp được câu. Đáp án nháp vẫn được giữ.') }
     finally { gui.current = false; setNop(false) }
   }
+  const hocHuongDan = async () => {
+    if(!q || !phien || gui.current || k)return
+    gui.current=true;setNop(true);setLoi('')
+    try {
+      const r=await goiHoa2('hoc-tap-gap',token,{session:phien,qid:q.qid,chuaTuLam:true},40)
+      if(r.ok!==true || !(r.choThay===true || r.hocCoHoTro===true&&typeof r.answer==='string'))throw new Error(typeof r.error==='string'?r.error:'Chưa mở được phần chữa.')
+      setKet(v=>({...v,[q.qid]:r as unknown as Ket}));onCapNhat()
+    } catch(e){setLoi(e instanceof Error?e.message:'Chưa tải được phần chữa.')}finally{gui.current=false;setNop(false)}
+  }
   const tiep = () => { setLoi(''); if (viTri + 1 < cau.length) setViTri(i => i + 1); else { setXong(true); onCapNhat() } }
   return <div className="ht-app ht-lam m3"><header className="ht-thanh"><button className="ht-nut-phu" onClick={onVe} disabled={nop}><ArrowLeft size={18} aria-hidden="true" />Hôm nay</button><strong>Đợt học của em</strong><span>{q && !xong ? `${viTri + 1}/${cau.length} câu` : ''}</span></header>
     <main className="ht-phien">
       {tai ? <div className="ht-the ht-trong" role="status">Đang chuẩn bị những câu phù hợp với em…</div> : xong ? <section className="ht-the ht-hoan-thanh"><Check size={38} aria-hidden="true" /><p className="ht-nhan">ĐỢT HỌC ĐÃ ĐƯỢC LƯU</p><h1>Em đã hoàn thành đợt này</h1><p>{Object.keys(ket).length} câu đã nhận phản hồi. Tiến độ hôm nay được cập nhật theo từng loại nhiệm vụ.</p><p className="ht-chu-phu">Câu tự làm, câu có hỗ trợ và kiến thức đã vững được theo dõi riêng.</p><button className="ht-nut-chinh" onClick={() => setLan(n => n + 1)}>Mở đợt tiếp theo<ArrowRight size={18} aria-hidden="true" /></button><button className="ht-nut-phu" onClick={onVe}>Nghỉ và về Hôm nay</button></section> : q ? <div className="ht-vung-lam">
-        <section className="ht-de"><p className="ht-nhan">{q.phan === 'I' ? 'TRẮC NGHIỆM' : q.phan === 'II' ? 'ĐÚNG – SAI' : 'TRẢ LỜI NGẮN'}{q.tenDang ? ` · ${q.tenDang}` : ''}</p><TheCau {...propsCauHoc(q, viTri + 1, tra, doiTra, k, nop)} /></section>
+        <section className="ht-de"><p className="ht-nhan">{q.phan === 'I' ? 'TRẮC NGHIỆM' : q.phan === 'II' ? 'ĐÚNG – SAI' : 'TRẢ LỜI NGẮN'}{q.tenDang ? ` · ${q.tenDang}` : ''}</p><TheCau {...propsCauHoc(q, viTri + 1, tra, doiTra, k?.choThay?undefined:k, nop||!!k?.choThay)} /></section>
         <aside className="ht-dieu-khien"><section className="ht-the"><h2>Một câu, một bước tiến</h2><div className="ht-dot">{cau.map((c, i) => <span key={c.qid} data-xong={!!ket[c.qid]} aria-current={i === viTri ? 'step' : undefined}>{ket[c.qid] ? <Check size={15} aria-label="Đã nhận phản hồi" /> : i + 1}</span>)}</div><p className="ht-chu-phu">Đọc kỹ dữ kiện. Em có thể nghỉ sau đợt học.</p>
+          {q.huongDan7 && !k && <p>Em có thể thử tự làm hoặc học cách giải từng bước. Câu khó này không bắt buộc phải tự giải ngay.</p>}
+          {(q.coGoi7||q.vaiGoi7==='moi'||q.vaiGoi7==='tiep_can'||q.vaiGoi7==='chua')&&!k&&<button className="ht-nut-phu" onClick={()=>void hocHuongDan()} disabled={nop}><Lightbulb size={18} aria-hidden="true" />{q.vaiGoi7==='chua'?'Thầy đã chữa · học cách giải':'Chưa tự làm được · xem chữa'}</button>}
           {q.goiY && !k && <><button className="ht-nut-phu" onClick={() => setGoiY(v => !v)}><Lightbulb size={18} aria-hidden="true" />{goiY ? 'Thu gọn gợi ý' : 'Xem gợi ý'}</button><p className="ht-chu-phu">Câu này được giao ở chế độ có hỗ trợ.</p>{goiY && <div className="ht-thong-bao">{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</div>}</>}
-          {k ? <><p className="ht-phan-hoi" role="status">{k.omni?.luot ? 'Lượt này chưa được tính là bằng chứng đúng/sai.' : k.correct ? 'Em đã trả lời đúng.' : 'Em xem lời giải để hiểu chỗ còn mắc.'}</p><button className="ht-nut-chinh" onClick={tiep}>{viTri + 1 === cau.length ? 'Kết thúc đợt' : 'Câu tiếp theo'}<ArrowRight size={18} aria-hidden="true" /></button>{!k.correct && !k.omni?.luot && <button className="ht-nut-phu" onClick={() => onChua(q.qid)}>Tự chữa câu này</button>}</> : <button className="ht-nut-chinh" onClick={() => void nopCau()} disabled={nop || !duTraLoi(q.phan, tra)}>{nop ? 'Đang nộp…' : 'Nộp câu trả lời'}<ArrowRight size={18} aria-hidden="true" /></button>}
+          {k ? <><p className="ht-phan-hoi" role="status">{k.choThay ? 'Em đã gặp câu này và nhờ thầy chữa. Khi có phần chữa, em sẽ được học lại; hiện chưa tính đúng hoặc đã hiểu.' : k.hocCoHoTro ? 'Em đã học phần chữa. Câu này được ghi là đã gặp với hỗ trợ, chưa tính tự làm đúng.' : k.omni?.luot ? 'Lượt này chưa được tính là bằng chứng đúng/sai.' : k.correct ? 'Em đã trả lời đúng.' : 'Em xem lời giải để hiểu chỗ còn mắc.'}</p><button className="ht-nut-chinh" onClick={tiep}>{viTri + 1 === cau.length ? 'Kết thúc đợt' : 'Câu tiếp theo'}<ArrowRight size={18} aria-hidden="true" /></button>{!k.correct && !k.omni?.luot && !k.hocCoHoTro && !k.choThay && <button className="ht-nut-phu" onClick={() => onChua(q.qid)}>Tự chữa câu này</button>}</> : <button className="ht-nut-chinh" onClick={() => void nopCau()} disabled={nop || !duTraLoi(q.phan, tra)}>{nop ? 'Đang nộp…' : 'Nộp câu trả lời'}<ArrowRight size={18} aria-hidden="true" /></button>}
         </section></aside>
       </div> : null}
       {loi && <div className="ht-thong-bao" role="alert">{loi}{!q && <button className="ht-nut-phu" onClick={() => setLan(n => n + 1)}><RefreshCw size={17} aria-hidden="true" />Thử lại</button>}</div>}

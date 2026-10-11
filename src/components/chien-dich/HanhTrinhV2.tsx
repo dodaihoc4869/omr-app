@@ -3,7 +3,7 @@
 // 09/10 TỐI — THẦY RA LỆNH: "phần này phải tối ưu lại, tôi chỉ cần giữ lại phần dạy học. Phần câu cần chữa trùng tu lại bỏ hết những thứ không
 // cần thiết, thiết kế trực quan khoa học phù hợp với các chức năng hiện tại" + "kiểm tra đầu giờ giữ lại nữa nhé". 09/10 KHUYA — THẦY: "hành trình
 // để lại chỗ nhịp học, học sinh chưa làm và chưa hoàn thành đủ ưu tiên hiện lên đầu nhé, bấm vào từng học sinh hiển thị rõ toàn bộ lịch sử…".
-// Màn NAY CÓ BỐN THẺ, đúng thứ tự thầy dùng: Dạy học · Nhịp học · Kiểm tra đầu giờ · Cần thầy chữa.
+// 10/10: thêm lối vào Bài mới trong 7 ngày ngay trên màn Hành trình hiện hành, sau Dạy học.
 //   · Dạy học (mặc định) — `TheBaiDaDay` (điểm danh · chọn câu · bước Bài hôm nay). Nút chính "Bổ sung bài" thuộc thẻ này: chỉ hiện khi đứng ở
 //     thẻ Dạy học, bấm ⇒ cuộn tới bước Bài hôm nay (tick bài vừa dạy — máy chủ chưa có lệnh thêm bài thẳng vào hành trình theo khối).
 //   · Nhịp học — `TheNhipHoc` (từng em hôm nay của các Hành trình khối đang chạy; em chưa làm / chưa đủ mức đứng đầu; bấm một em ⇒ tấm Lịch sử
@@ -26,16 +26,18 @@ import './gv-v2.css'
 // Phép tính nhịp (khối, bốn chỉ số) ở `nhip-hanh-trinh.ts` (màn Hôm nay dùng) — xuất lại ở đây cho mọi lối nhập cũ.
 export { chiSoNhip, khoiCuaHanhTrinh, type EmNhip } from './nhip-hanh-trinh'
 
-// Bốn thẻ — mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
+// Mỗi thẻ là mảnh riêng, chỉ tải khi thầy mở thẻ.
 const TheBaiDaDay = lazy(() => import('./TheBaiDaDay'))
+const BangGoi7 = lazy(() => import('./BangGoi7'))
 const TheNhipHoc = lazy(() => import('./TheNhipHoc'))
 const KiemTraDauGio = lazy(() => import('../day-hoc/KiemTraDauGio'))
 const TheCanThayChua = lazy(() => import('./TheCanThayChua'))
 
 type TheMan = Exclude<TheHanhTrinh, 'chien-dich'>
-/** Bốn thẻ, đúng thứ tự thầy dùng: dạy → nhịp học của từng em → kiểm tra đầu giờ → chữa. */
+/** Dạy → bài mới 7 ngày → nhịp học của từng em → kiểm tra đầu giờ → chữa. */
 export const THE_HANH_TRINH: readonly (readonly [TheMan, string])[] = [
   ['day-hoc', 'Dạy học'],
+  ['goi-7', 'Bài mới trong 7 ngày'],
   ['nhip', 'Nhịp học'],
   ['dau-gio', 'Kiểm tra đầu giờ'],
   ['can-chua', 'Cần thầy chữa'],
@@ -113,6 +115,8 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, kho
         <Suspense fallback={<XuongThe />}>
           {the === 'day-hoc' ? (
             <TheBaiDaDay lanBoSung={lanBoSung} />
+          ) : the === 'goi-7' ? (
+            <BangGoi7 trangRieng />
           ) : the === 'nhip' ? (
             <TheNhipHoc khoiDau={khoiDau} />
           ) : the === 'dau-gio' ? (

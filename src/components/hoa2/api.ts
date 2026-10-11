@@ -8,6 +8,7 @@ import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
 import { chanCauTuLuan, choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
 import { docSanhOmni } from '../../lib/omni-hs'
+import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
 import type { SanhOmni } from '../../../server/src/omni-kieu'
 
 export interface ChienDichSanh {
@@ -37,6 +38,7 @@ export interface BaiHanhTrinh {
 }
 
 export interface SanhHoa2 {
+  goi7?: TomTatGoi7
   hanhTrinh?: {
     tang: number; toiThieu: number; daLam: number; daXep: number; conThieu: number; soChang: number; changHienTai: number; cauTrongChang: number
     /** Tầng từng bài (máy chủ mới). Vắng / sai kiểu / rỗng ⇒ màn Hành trình chỉ hiện tầng chung + chặng (không bịa). */
@@ -230,6 +232,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
   return {
     cheDo2: true,
     sanh: {
+      goi7: docTomTatGoi7(o.goi7),
       ngay: laNgay(o.ngay) ? o.ngay : '',
       chienDich,
       sapBatDau: docSapBatDau(o.sapBatDau),

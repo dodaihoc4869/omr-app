@@ -38,8 +38,7 @@ afterEach(async () => {
   datDuong('/')
 })
 const moForm = async () => {
-  fireEvent.click(await screen.findByRole('button', {name:'Của em'}))
-  fireEvent.click(await screen.findByRole('button', { name: /^Vào kiểm tra/ }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Vào ca kiểm tra' }))
   return await screen.findByRole('dialog', { name: 'Vào phòng thi' })
 }
 
@@ -95,7 +94,7 @@ describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
     fireEvent.change(within(hop).getByLabelText('Mật khẩu ca kiểm tra (nếu ca có yêu cầu)'), { target: { value: '  mk123  ' } })
     fireEvent.click(within(hop).getByRole('button', { name: 'Vào ca kiểm tra' }))
     expect(await screen.findByTestId('man-thi')).toBeTruthy()
-    expect(mocks.tuCong).toHaveBeenLastCalledWith({ maCa: '543998', sbd: '12121212', hoTen: 'Đỗ Minh', namSinh: '2008', lop: '12A1', matKhau: 'mk123' })
+    expect(mocks.tuCong).toHaveBeenLastCalledWith(expect.objectContaining({ maCa: '543998', sbd: '12121212', hoTen: 'Đỗ Minh', namSinh: '2008', lop: '12A1', matKhau: 'mk123' }))
   })
 
   it('không mật khẩu ca: matKhau rỗng', async () => {

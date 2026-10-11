@@ -3391,6 +3391,7 @@ const boXuLy = {
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     // CAO ĐIỂM 20:00–23:59 giờ VN (thầy 29/09: em làm bài dồn vào khung này): cron mỗi phút nhẹ tối đa — việc không bắt buộc dời/thưa ra (xem dưới).
     if(event.cron==='* * * * *') {
+      await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
       const ht=await import('./hanh-trinh-hop-nhat').then(m => m.dongBoBaHanhTrinh(env, Date.now()))
         .catch(async e => { console.error('[hanh-trinh] đồng bộ lỗi:',e); await ghiLoiMay(env,'hanh_trinh_dong_bo'); return null })
       if(ht?.trangThai==='vua_hop_nhat')console.log('[hanh-trinh] đã gộp',ht.soChienDich)
@@ -3801,6 +3802,7 @@ const boXuLy = {
       }
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
+      if (p === '/gv/goi-bai-7') return ra(await import('./goi-bai-7-thay').then(m=>m.gvGoi7(env,b)))
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))
       // OMNI 3 (05/10): tick bài đã dạy ⇒ tự giao chiến dịch theo bài (bai-da-day.ts) · Bảng bài, xác nhận dạng, ma trận Q, ca chốt 50/50 (omni-gv.ts). Có ghi ⇒ `env`.
       if (p === '/gv/bai-da-day') {
@@ -3811,6 +3813,7 @@ const boXuLy = {
           if (ctx) ctx.waitUntil(viec)
           else await viec
         }
+        if(kq.ok===true && String(b.action??'')==='tick'){const goi7=import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now(),10,String(b.lop??''))).catch(e=>console.error('[goi7] tick',e));if(ctx)ctx.waitUntil(goi7);else await goi7}
         return ra(kq)
       }
       if (p === '/gv/omni') return ra(await gvOmni(env, b))

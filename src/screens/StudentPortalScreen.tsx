@@ -67,6 +67,7 @@ import { useTuDangXuatKhiPhienHong } from '../lib/phien-hong'
 import { boNap, veNgayKhiCo } from '../components/hoa2/nap-truoc-man'
 import { napManCauDaLam, napManTuLuyen } from '../components/hoa2/man-sanh-luoi'
 // Màn làm bài, chữa và xem lại chỉ tải khi em mở.
+const ManKiemGoi7 = lazy(() => import('../components/hoc-tap/ManKiemGoi7'))
 const ManLamBaiTap = lazy(() => import('../components/hoc-tap/ManLamBaiTap'))
 const ManTuChua = lazy(() => import('../components/hoc-tap/ManTuChua'))
 
@@ -192,7 +193,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua'
+type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen' | 'hoctap' | 'tuchua' | 'kiemgoi7'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -799,6 +800,7 @@ export default function StudentPortalScreen() {
   const lamMoiSheet = useLamMoiKhiDong(dangMoManCon)
   // GAME HÓA 2.0: hỏi `hoa2-sanh` sau đăng nhập và mỗi lần vừa đóng một màn con (game, Câu đã làm…). `cheDo2` = máy chủ bật cờ cho em
   // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
+  const [kiemGoi7,setKiemGoi7] = useState<{goiId:string;maDe:string}|null>(null)
   const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang, true)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
   // PHIÊN CŨ KHÔNG CÒN DÙNG ĐƯỢC (07/10: mã bí mật máy chủ đổi ⇒ token cất trong máy bị từ chối "Phiên game không hợp lệ"; nút Thử lại gửi lại đúng token hỏng):
@@ -960,12 +962,13 @@ export default function StudentPortalScreen() {
         <div inert={tab !== null} aria-hidden={tab !== null || undefined}><HocTapHomNay nguon={duLieuBang.nguon} dangLamMoi={keHoachNgay.dangLamMoi} thongBao={<ThongBaoHocSinh token={auth.token} onOpen={(t) => { setTab(t); if (t === 'mom') void napDsMom(); if (t === 'btvn') void napLaiBtvn() }} />}
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
-          coCa={!!caDangMo} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
+          onKiem={(goiId,maDe)=>{setKiemGoi7({goiId,maDe});setTab('kiemgoi7')}} coCa={!!caDangMo} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
           onChua={() => { setQidChua(undefined); setTab('tuchua') }} onThi={() => { void boNapExam(); setTab('vaothi') }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
         /></div>
       )}
+      {tab === 'kiemgoi7' && kiemGoi7 && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManKiemGoi7 token={auth.token} sbd={auth.sbd} {...kiemGoi7} onVe={()=>setTab(null)} onCapNhat={hoa2.taiLai}/></Suspense></div>}
       {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} /></Suspense></div>}
       {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} /></Suspense></div>}
 
@@ -1020,7 +1023,7 @@ export default function StudentPortalScreen() {
         </div>
       )}
 
-      {tab !== null && tab !== 'hoctap' && tab !== 'tuchua' && tab !== 'caudalam' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
+      {tab !== null && tab !== 'hoctap' && tab !== 'kiemgoi7' && tab !== 'tuchua' && tab !== 'caudalam' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
         >
