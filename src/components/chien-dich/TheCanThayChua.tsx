@@ -15,6 +15,9 @@
 // Năm trạng thái: chờ tải = khung xương `.tt-xuong` · trống = "Chưa có câu nào cần thầy chữa." · lỗi = câu dễ hiểu + Thử lại (phần nào lỗi thì một
 // dòng nói phần ấy, phần khác vẫn hiện) · có dữ liệu · lỗi mạng (cùng đường lỗi).
 // Mỗi phần chỗ làm việc nạp LƯỜI (mảnh riêng, ngoài precache — vite.config.ts). Màn `goilenbang` / `bangonutthat` giữ nguyên cho mọi lối cũ.
+// 12/10 — THẦY: "mục cần chữa cho tôi một phần tự chữa, phần này cho tôi chọn đề trong Mục dạy học …" ⇒ thẻ GẬP "Thầy tự chữa" (`ThayTuChua.tsx`) đứng
+// ĐẦU thẻ, trên danh sách: chọn lớp → bài Dạy học → tờ đề, xem trước thứ tự (Đúng–sai và câu tính toán trước), chiếu đủ mọi câu bằng tờ của Chiếu lên bảng.
+// Gập sẵn ⇒ không đọc kho, không gọi lệnh nào cho tới khi thầy bấm "Chọn đề"; danh sách cần chữa bên dưới y nguyên.
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, ArrowLeft, Check, ListChecks, Presentation, Puzzle, RefreshCw, Unlink, Users, type LucideIcon } from 'lucide-react'
 import type { CanThayChua } from '../../../server/src/omni-kieu'
@@ -28,6 +31,7 @@ import { danhSach, docBang, type BangChienDich, type ChienDichTom } from './api'
 import { docBangOmniCua, docCoOmni } from './api-omni'
 import { khoiCuaHanhTrinh } from './nhip-hanh-trinh'
 import { nhomCanThayChua } from './omni-bang'
+import ThayTuChua from './ThayTuChua'
 
 const LenBangChienDich = lazy(() => import('./LenBangChienDich'))
 const CauCanChuaTrenLop = lazy(() => import('../chua-cau-sai/CauCanChuaTrenLop'))
@@ -430,90 +434,93 @@ export default function TheCanThayChua({ onDem }: { onDem?: (n: number) => void 
 
   const tongEm = hien.reduce((s, d) => s + d.soEm, 0)
   return (
-    <section ref={goc} className="gvv2-the gvv2-cc" aria-label="Cần thầy chữa · nhiều em sai trước">
-      <div className="gvv2-cc-dau">
-        <p className="gvv2-cc-tom" aria-live="polite">
-          {du && !du.hongHet ? (
-            <>
-              <b className="gvv2-so">{hien.length}</b> chỗ cần chữa · <b className="gvv2-so">{tongEm}</b> lượt em · nhiều em sai đứng trước
-            </>
-          ) : (
-            'Câu và dạng các em còn vướng, nhiều em sai đứng trước'
-          )}
-        </p>
-        <button type="button" className="gvv2-nut-chu tt-nhan" onClick={() => void tai()} disabled={dangTai} aria-busy={dangTai}>
-          <RefreshCw size={18} aria-hidden="true" className={dangTai && du ? 'gvv2-quay' : undefined} />
-          {dangTai && du ? 'Đang làm mới…' : 'Làm mới'}
-        </button>
-      </div>
-
-      {dsKhoi.length > 0 && du && du.dong.length > 0 && (
-        <div className="gvv2-phan-doan" role="radiogroup" aria-label="Lọc theo khối">
-          <button type="button" role="radio" aria-checked={khoiChon === null} className="gvv2-phan-doan-nut tt-nhan" onClick={() => setKhoi(null)}>
-            <b>Tất cả</b>
-            <small className="gvv2-so">{du.dong.length} chỗ</small>
+    <>
+      <ThayTuChua />
+      <section ref={goc} className="gvv2-the gvv2-cc" aria-label="Cần thầy chữa · nhiều em sai trước">
+        <div className="gvv2-cc-dau">
+          <p className="gvv2-cc-tom" aria-live="polite">
+            {du && !du.hongHet ? (
+              <>
+                <b className="gvv2-so">{hien.length}</b> chỗ cần chữa · <b className="gvv2-so">{tongEm}</b> lượt em · nhiều em sai đứng trước
+              </>
+            ) : (
+              'Câu và dạng các em còn vướng, nhiều em sai đứng trước'
+            )}
+          </p>
+          <button type="button" className="gvv2-nut-chu tt-nhan" onClick={() => void tai()} disabled={dangTai} aria-busy={dangTai}>
+            <RefreshCw size={18} aria-hidden="true" className={dangTai && du ? 'gvv2-quay' : undefined} />
+            {dangTai && du ? 'Đang làm mới…' : 'Làm mới'}
           </button>
-          {dsKhoi.map((k) => (
-            <button key={k.khoi} type="button" role="radio" aria-checked={khoiChon === k.khoi} className="gvv2-phan-doan-nut tt-nhan" onClick={() => setKhoi(k.khoi)}>
-              <b>Khối {k.khoi}</b>
-              <small className="gvv2-so">{du.dong.filter((d) => d.khoi === k.khoi).length} chỗ</small>
+        </div>
+
+        {dsKhoi.length > 0 && du && du.dong.length > 0 && (
+          <div className="gvv2-phan-doan" role="radiogroup" aria-label="Lọc theo khối">
+            <button type="button" role="radio" aria-checked={khoiChon === null} className="gvv2-phan-doan-nut tt-nhan" onClick={() => setKhoi(null)}>
+              <b>Tất cả</b>
+              <small className="gvv2-so">{du.dong.length} chỗ</small>
             </button>
-          ))}
-        </div>
-      )}
+            {dsKhoi.map((k) => (
+              <button key={k.khoi} type="button" role="radio" aria-checked={khoiChon === k.khoi} className="gvv2-phan-doan-nut tt-nhan" onClick={() => setKhoi(k.khoi)}>
+                <b>Khối {k.khoi}</b>
+                <small className="gvv2-so">{du.dong.filter((d) => d.khoi === k.khoi).length} chỗ</small>
+              </button>
+            ))}
+          </div>
+        )}
 
-      {du === null ? (
-        <XuongDanhSach />
-      ) : du.hongHet ? (
-        <div className="gvv2-loi gvv2-cc-loi" role="alert">
-          <p>Chưa tải được danh sách cần chữa. {du.loi[0]?.chu ?? 'Mạng có thể đang chập chờn.'}</p>
-          <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
-            Thử lại
-          </button>
-        </div>
-      ) : (
-        <ul className="gvv2-cc-ds">
-          {hien.map((d) => (
-            <DongChua
-              key={d.khoa}
-              d={d}
-              onMo={(viec, dong) => {
-                traFocus.current = null
-                setMo({ viec, khoa: dong.khoa })
-              }}
-            />
-          ))}
-          {hien.length === 0 && (
-            <li className="gvv2-cc-dong" data-nguon="trong">
-              <span className="gvv2-cc-bieu" data-mau="xl" aria-hidden="true">
-                <Check size={20} />
-              </span>
-              <span className="gvv2-cc-trong">{khoiChon === null ? 'Chưa có câu nào cần thầy chữa.' : `Chưa có câu nào cần thầy chữa ở Khối ${khoiChon}.`}</span>
-            </li>
-          )}
-          {chuaRoKhoi > 0 && (
-            <li className="gvv2-cc-ghi">
-              {chuaRoKhoi} chỗ chưa rõ khối — xem ở <button type="button" className="gvv2-nut-chu gvv2-nut-chu--trong-dong" onClick={() => setKhoi(null)}>Tất cả</button>
-            </li>
-          )}
-          {du.loi.map((l) => (
-            <li key={l.phan} className="gvv2-cc-dong" data-nguon="loi" role="alert">
-              <span className="gvv2-cc-bieu" data-mau="xam" aria-hidden="true">
-                <RefreshCw size={20} />
-              </span>
-              <div className="gvv2-cc-chu">
-                <b>Chưa tải được {l.phan}</b>
-                <span className="gvv2-cc-phu">{l.chu} Phần khác trong danh sách vẫn đúng.</span>
-              </div>
-              <div className="gvv2-cc-nut">
-                <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
-                  Thử lại
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+        {du === null ? (
+          <XuongDanhSach />
+        ) : du.hongHet ? (
+          <div className="gvv2-loi gvv2-cc-loi" role="alert">
+            <p>Chưa tải được danh sách cần chữa. {du.loi[0]?.chu ?? 'Mạng có thể đang chập chờn.'}</p>
+            <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
+              Thử lại
+            </button>
+          </div>
+        ) : (
+          <ul className="gvv2-cc-ds">
+            {hien.map((d) => (
+              <DongChua
+                key={d.khoa}
+                d={d}
+                onMo={(viec, dong) => {
+                  traFocus.current = null
+                  setMo({ viec, khoa: dong.khoa })
+                }}
+              />
+            ))}
+            {hien.length === 0 && (
+              <li className="gvv2-cc-dong" data-nguon="trong">
+                <span className="gvv2-cc-bieu" data-mau="xl" aria-hidden="true">
+                  <Check size={20} />
+                </span>
+                <span className="gvv2-cc-trong">{khoiChon === null ? 'Chưa có câu nào cần thầy chữa.' : `Chưa có câu nào cần thầy chữa ở Khối ${khoiChon}.`}</span>
+              </li>
+            )}
+            {chuaRoKhoi > 0 && (
+              <li className="gvv2-cc-ghi">
+                {chuaRoKhoi} chỗ chưa rõ khối — xem ở <button type="button" className="gvv2-nut-chu gvv2-nut-chu--trong-dong" onClick={() => setKhoi(null)}>Tất cả</button>
+              </li>
+            )}
+            {du.loi.map((l) => (
+              <li key={l.phan} className="gvv2-cc-dong" data-nguon="loi" role="alert">
+                <span className="gvv2-cc-bieu" data-mau="xam" aria-hidden="true">
+                  <RefreshCw size={20} />
+                </span>
+                <div className="gvv2-cc-chu">
+                  <b>Chưa tải được {l.phan}</b>
+                  <span className="gvv2-cc-phu">{l.chu} Phần khác trong danh sách vẫn đúng.</span>
+                </div>
+                <div className="gvv2-cc-nut">
+                  <button type="button" className="gvv2-nut-vien tt-nhan" onClick={() => void tai()} disabled={dangTai}>
+                    Thử lại
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
   )
 }
