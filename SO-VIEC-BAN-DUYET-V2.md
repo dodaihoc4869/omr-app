@@ -247,3 +247,20 @@ Thầy nhắn thêm: "Sau khi làm hết tất cả thì bắt buôck tối ưu 
 - [~] SAU đợt 16: tối ưu máy chủ chuyên sâu (đợt 17, commit f0c123a4) | bằng chứng: đo D1 giả 40 ms/lượt qua gameV2 thật: mở chặng 1,41 → 0,88 s; sảnh 1,13 → 0,96 s (lần 2 0,96 → 0,79 s); nộp câu 0,21 s (5 vòng — chậm giờ cao điểm là do D1 dồn tải); ghi cạnh hành trình chỉ khi đổi (trước ~2,5 triệu dòng/ngày); đệm siêu dữ liệu câu + danh mục cả ngày; tests/may-chu-chuyen-sau-dot17-1310 (2/2, đỏ trên mã cũ); 710 test liên quan 0 đỏ mới. Chờ full vitest → PR256 → phát hành.
 - [x] SAU đợt 16: tối ưu máy chủ chuyên sâu (đợt 17) — phát hành | bằng chứng: PR256 squash main `81f13983`, Actions 38288914721 SUCCESS 18:08→18:16 UTC (Kiểm ca thi đạt, Worker + Pages cùng commit). Đo D1 giả 40 ms/lượt qua gameV2 thật: mở chặng 1,41 → 0,88 s (−38%); sảnh 1,13 → 0,96 s; sảnh lần 2 0,96 → 0,79 s; nộp câu 0,21 s. Bản sống 01:20 (không tải): lệnh sảnh không danh tính 0,66–1,28 s đo từ máy ảo (gồm mạng). Số thật giờ cao điểm: chạy lại `do-d1-cao-diem-1210.yml` tối 13/10. Lùi: `git revert 81f13983`.
 - [ ] Nợ test có sẵn (không do đợt 15–17): sau 00:00 13/10 các test phụ thuộc ngày đỏ y hệt trên main (bi-a-rai-deu-3009, cau-hong-giua-ngay-3009, cnh-1-0-coverage-plan-p06, on-thi-cau-1909); 6 tệp `node:sqlite` không nạp được; gian-va-thu-lai-t5-1009 "CHỈ giãn LƯỢT ĐẦU" đỏ từ 09/10 | bằng chứng: đối chứng worktree origin/main cùng thời điểm
+
+## Đợt 18 — câu chữ dễ hiểu, bỏ chữ hướng dẫn, mời gọi Tự sửa lỗi, làm nốt việc sót (13/10 ~01h30)
+Thầy nhắn (nguyên văn):
+"Làm hết đi rồi đẩy lên luôn"
+"Tối ưu lại câu từ cho dễ hiểu ở mọi. Bỏ hết các gợi ý hướng dẫn để học sinh phụ huynh không bị phân tâm."
+"Mời gọi học sinh tự sửa lỗi, trong hồ sơ của học sinh những câu chưa sửa lỗi mà có trong tự sửa lỗi mới hiện sửa câu này, nếu chưa có thì chưa hiện. Làm nổi bật phần tự sửa lỗi lên và mời gọi thân thiện"
+Giả định: "gợi ý hướng dẫn" = chữ hướng dẫn cách dùng / chú thích phụ trên màn (không bỏ nút "Gợi ý" giải câu — đó là tính năng học, có ghi "có hỗ trợ"); phạm vi câu chữ: app học sinh + phụ huynh.
+- [ ] Ôn câu xoay ngang: phần giới thiệu chiếm ~1/3 màn đầu | bằng chứng: (chưa có)
+- [ ] Màn nhịp học cả lớp (app thầy) có độ tin cậy như hồ sơ từng em | bằng chứng: (chưa có)
+- [ ] Trùng tu nốt màn thi, Tự luyện, Câu đã làm (dọc · ngang · máy tính) | bằng chứng: (chưa có)
+- [ ] Dọn nợ test: test phụ thuộc ngày, 6 tệp node:sqlite, test "chỉ giãn lượt đầu" màn thi | bằng chứng: (chưa có)
+- [ ] Câu chữ dễ hiểu ở mọi màn học sinh + phụ huynh | bằng chứng: (chưa có)
+- [ ] Bỏ hết chữ hướng dẫn / chú thích phụ gây phân tâm (học sinh, phụ huynh) | bằng chứng: (chưa có)
+- [ ] Hồ sơ học sinh: nút "Sửa câu này" CHỈ hiện ở câu chưa sửa CÓ trong danh sách Tự sửa lỗi; chưa có thì không hiện | bằng chứng: (chưa có)
+- [ ] Làm nổi bật Tự sửa lỗi, mời gọi thân thiện | bằng chứng: (chưa có)
+- [ ] Đẩy + phát hành (kiểm ca mở) | bằng chứng: (chưa có)
+- [ ] Tối 13/10 giờ cao điểm: đo số thật (D1 insights + độ trễ) so với tối 12/10 | bằng chứng: (chưa có)
