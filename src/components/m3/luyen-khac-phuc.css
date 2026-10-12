@@ -36,9 +36,8 @@
 @media (min-width: 1100px), (orientation: landscape) and (min-width: 700px) {
   /* thân thẻ (`.the-cau > div:last-child`, đệm + khe nội tuyến của TheCau) có khối trả lời ⇒ lưới hai cột; khe cột thắng `gap` nội tuyến */
   .ldc-lam .the-cau > div:last-child:has(> div > div > .pa-hang, > div > div > .y-hang, > .osl) {
-    display: grid !important;
+    /* `display: grid` + `column-gap` phải thắng kiểu nội tuyến của TheCau ⇒ `!important` — đặt ở the-cau.css (tệp duy nhất được dùng, phạm vi `.m3 .the-cau`). */
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: var(--k6, 24px) !important;
     align-items: start;
   }
   .ldc-lam .the-cau > div:last-child:has(> div > div > .pa-hang, > div > div > .y-hang, > .osl) > * { grid-column: 1; min-width: 0; }
