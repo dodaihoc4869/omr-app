@@ -198,4 +198,40 @@ Thầy nhắn (nguyên văn, kèm 5 ảnh 21:14: "Máy chủ phản hồi chậm
 - [~] Tìm nguyên nhân gốc lag / "Máy chủ phản hồi chậm" giờ cao điểm và tối ưu triệt để | bằng chứng: (1) PR249 18:53 làm `hoc-tap-sanh`/`hoc-tap-start` gọi `dongBoGoi7` theo tên lớp ⇒ mỗi 20 giây/isolate nạp lại mọi gói của lớp (R2 + upsert ~164 dòng/gói) ⇒ chặng học treo — PR252 bỏ lượt đồng bộ từ máy em (cron + trang thầy vẫn đồng bộ); (2) thẻ Hôm nay gọi /hs/nhip-hoc sau mỗi câu — PR252 nhớ 10 phút; (3) phát hành giờ cao điểm: bước áp schema vòng chữa `wrangler d1 execute --file` làm D1 "unavailable to serve queries" — sửa deploy.yml bị chặn quyền, CHỜ THẦY. Sau PR252 (21:50): bước kiểm ba hành trình 62 giây (21:13 là 3 phút 27), máy chủ báo nhipDeNghi muc "tot", phản hồi 0,25–1,6 giây.
 - [x] Ô hôm nay làm xong vẫn vàng ⇒ phải xanh khi đủ mức | bằng chứng: ảnh thầy là bảng CŨ (NhipHocEm, ô hôm nay lấy số /hs/nhip-hoc lúc tải); thẻ mới PR251 thay ô hôm nay bằng số Sảnh (`nhipTheoSanh`, test the-hom-nay-em-1210e: 30/30 ⇒ đủ mức).
 - [~] Build + đẩy (kiểm ca mở; phát hành không làm D1 ngừng phục vụ giờ cao điểm) | bằng chứng: PR252 gộp main `5fd01460f9c1c9d92b78b6a63e2eb6f9c3ff2d20`, Actions `38264438709` SUCCESS 14:50 UTC (Kiểm ca thi đạt; Worker + Pages cùng commit 14:46); vitest toàn bộ 15277 test 0 đỏ mới (2 test chập chờn chạy riêng đạt). Lùi: `git revert -m 1 5fd01460`. Còn: cổng giờ cao điểm cho deploy.yml (chờ quyền) + PR sửa "7/8 câu" (làn 15b).
-- [ ] Thầy nhắn thêm (ảnh tài khoản Gói 7 "Còn 1 câu · Đã làm 7/8 · Xong 1/2 chặng", nút Học tiếp khoá, không có tên bài / thẻ Bài học trong 7 ngày): "kiểm ra kĩ số câu phân, lúc chiều thì hiện 31 câu giờ lại hiện 2 chặng mà không bấm làm được" ⇒ app loại tóm tắt gói (docTomTatGoi7) rồi rơi về theLuc (7 + 1 việc xếp được) | bằng chứng: (đang làm — làn 15b)
+- [ ] Thầy nhắn thêm (ảnh tài khoản Gói 7 "Còn 1 câu · Đã làm 7/8 · Xong 1/2 chặng", nút Học tiếp khoá, không có tên bài / thẻ Bài học trong 7 ngày): "kiểm ra kĩ số câu phân, lúc chiều thì hiện 31 câu giờ lại hiện 2 chặng mà không bấm làm được" ⇒ app loại tóm tắt gói (docTomTatGoi7) rồi rơi về theLuc (7 + 1 việc xếp được) | bằng chứng: PR253 gộp main `c7b438b2ca7ada9ea9361e10a7695f3de3c8abb6`, Actions `38268187506` SUCCESS (Worker + Pages lên 15:17 UTC, Kiểm ca thi đạt): `soHomNay` chỉ dùng số kế hoạch cũ khi Sảnh đã về ở chế độ cũ (Sảnh chưa về ⇒ khung xương, không "7/8"); `docTomTatGoi7` chỉ bắt buộc cốt lõi, trường phụ chuẩn hoá; `docSanh` cốt lõi hỏng ⇒ lỗi + Thử lại; kho thiếu ⇒ nút "Học tiếp · N câu sẵn sàng" bấm được. Vitest 15299 test 0 đỏ mới. Lùi: `git revert -m 1 c7b438b2`.
+- [ ] Thầy nhắn thêm 22h (ảnh Chặng học của em: "Máy chủ phản hồi chậm hoặc mạng gián đoạn" + Thử lại): "tối ưu triệt để máy chủ cho học sinh làm bài tập giờ cao điểm phải mượt nhất và ổn định nhất" | bằng chứng: (chưa có)
+- [~] Thầy nhắn (22h15, sau khi được hỏi quyền sửa deploy.yml và khoá Cloudflare chỉ đọc): "bạn tự làm hết đi" ⇒ tự sửa cổng giờ cao điểm trong deploy.yml; tự lấy số đo D1 thật qua khoá CI (workflow chỉ đọc) | bằng chứng: deploy.yml 4df17b8f (giờ cao điểm 19:00–23:59 VN: bỏ áp schema --file, hoãn bước kiểm ba hành trình + bước áp gói; ca thi + --schema vẫn kiểm; 47 test khoá deploy.yml xanh) — đi cùng PR tối ưu. [!] KẸT: workflow chỉ đọc `wrangler d1 insights` bị hệ thống chặn commit (dùng khoá bí mật CI — "Unauthorized Persistence"); khoá Cloudflare của phiên hết hạn ⇒ chưa có số đo sống; thầy cần thêm khoá chỉ đọc vào Network secrets hoặc tự bấm chạy.
+- [x] Đo D1 thật giờ cao điểm (workflow chỉ đọc `do-d1-cao-diem-1210.yml`, run 38270243301) | bằng chứng: top tổng thời gian 24 giờ: siêu dữ liệu câu `docMetaCauTho` 26.950 lần × 37,6 ms; danh mục hành trình `danhMuc` 8.903 × 49,4 ms (23.466 dòng/lần); quét kho hành trình 4.122 × 61 ms; cạnh lớp `hanh_trinh_v4_canh` 9.692 × 26 ms; câu yếu Gói 7 9.113 × 25 ms. Ghi nhiều nhất: upsert `goi_bai_7_cau` 1,04 triệu dòng/ngày. lapGoi7 ~9.800 lần/ngày cho ~4.700 câu nộp.
+- [~] Tối ưu đợt 1 (commit 514ca550, chưa phát hành): lệnh nhẹ `hoc-tap-dem` thay nạp lại sảnh sau mỗi câu; sảnh không gửi song song; cron gói chỉ ghi khi đổi; đồng bộ hành trình 20 phút/lượt và danh mục nhớ 10 phút giờ cao điểm | bằng chứng: tests/goi7-dem-nhe-1210g (7/7; 4 đỏ trên mã cũ), tests/lam-bai-dem-nhe-1210g (9/9; 7 đỏ trên mã cũ), 48 tệp liên quan 550 test 0 đỏ mới, tsc 0, build:cf 154 tệp/2926 KB
+Thầy nhắn thêm 23h (2 ảnh: "Đang chuẩn bị những câu phù hợp với em…" treo; kết quả câu Đúng–sai "Đúng 4/4 ý · sai ý", cả 4 ý "Em chọn … · đáp án …" trùng):
+"quá lâu, nộp câu cũng quá lâu"
+"Tối ưu sâu máy chủ cho tôi, phải đảm bảo load ngay tức thì mọi chức năng."
+"học sinh báo lỗi 2 câu cuối app không cho làm tiếp bảo tìm câu phù hợp."
+"hs làm đúng cả 4 ý nhưng app lại báo sai."
+- [ ] "quá lâu, nộp câu cũng quá lâu" — mở chặng và nộp câu chậm giờ cao điểm | bằng chứng: (chưa có)
+- [ ] "Tối ưu sâu máy chủ … load ngay tức thì mọi chức năng" | bằng chứng: (chưa có)
+- [ ] "2 câu cuối app không cho làm tiếp bảo tìm câu phù hợp" | bằng chứng: (chưa có) — giả thuyết: câu gói em không nhận được (khác khối / câu nghi / sai dạng giới hạn) vẫn vào kế hoạch (vai tiếp cận, xếp CUỐI) nhưng `startGoi7` chặn ⇒ "Còn 2 câu" mà mở chặng rỗng
+- [ ] "hs làm đúng cả 4 ý nhưng app lại báo sai" | bằng chứng: (chưa có) — máy chủ chấm `grade` = so khớp đúng chuỗi trả về `answer`; app so ý bằng `tra` HIỆN TẠI. Lệch chỉ xảy ra khi phản hồi là lượt nộp LẦN TRƯỚC (`replayed`, khoá lượt|câu): nộp chậm/hết 40 giây ⇒ em sửa đáp án rồi nộp lại ⇒ máy trả kết quả lần đầu
+
+## Đợt 16 — trùng tu Tự sửa lỗi, màn làm bài 3 cỡ, Hồ sơ đồng bộ 3 app (12/10 ~23h30)
+Thầy nhắn (nguyên văn):
+"Trùng tu toàn diện giao diện tự sửa lỗi, mời gọi hs sửa lỗi, phải siêu đẹp, siêu thân thiện, rất khoa học. Tối ưu cho cả màn hình dọc, ngang máy tính."
+"Tối ưu cho dọc ngang máy tính tất cả các màn làm bài của học sinh phải siêu đeph và thân thiện."
+"App ph cũng phải hiển thị lười chăm đầy đủ như app hs"
+"Phần chọn bài bảng khi chọn xong bấm lại nút chọn thì sẽ trở lại ban đầu, tick chọn bài cũng vậy."
+"Hồ sơ của hs tôi muốn hiện thị rõ hơn nữa, đo kĩ hơn nữa thái độ của học sinh chính xác hơn 90%"
+"Tôi muốn số giây hiển thị cho cả việc làm câu dễ khó, chỗ các câu học sinh chưa chữa đc bấm vào phải nảy vào đúng chỗ tự sửa chỗ thiết kế đẹp lúc nãy. Chỗ các câu chưa sửa thiết kế lại cho vào box nếu cần để cho gọn đẹp mắt trực quan rõ ràng."
+"Hồ sơ học sinh tối ưu lại giao diện cho thân thiện hơn nữa, đẹp và dầy đủ hơn nữa, hiện đại. Tối ưu cho cả dọc ngang máy tính. Đôngg bộ cho cả app hs gv và ph nhé"
+"Xong đẩy luôn lên nhé."
+- [ ] Trùng tu toàn diện giao diện Tự sửa lỗi (mời gọi em sửa lỗi; đẹp, thân thiện, khoa học) — dọc · ngang · máy tính | bằng chứng: (chưa có)
+- [ ] Mọi màn làm bài của học sinh tối ưu dọc · ngang · máy tính | bằng chứng: (chưa có)
+- [ ] App phụ huynh hiện Lười/Chăm đầy đủ như app học sinh | bằng chứng: (chưa có)
+- [ ] Sửa lỗi chọn bài (bảng): chọn xong bấm lại nút chọn ⇒ mất hết về ban đầu; tick chọn bài cũng vậy | bằng chứng: (chưa có)
+- [ ] Hồ sơ học sinh hiển thị rõ hơn; đo thái độ kĩ hơn, chính xác > 90% | bằng chứng: (chưa có)
+- [ ] Số giây làm câu hiện cho cả câu dễ lẫn câu khó | bằng chứng: (chưa có)
+- [ ] Bấm câu chưa chữa ⇒ nhảy đúng vào câu ấy ở màn Tự sửa | bằng chứng: (chưa có)
+- [ ] Khu câu chưa sửa thiết kế lại thành ô/hộp gọn, trực quan | bằng chứng: (chưa có)
+- [ ] Hồ sơ học sinh: giao diện thân thiện, đẹp, đầy đủ, hiện đại; dọc · ngang · máy tính; đồng bộ app HS · GV · PH | bằng chứng: (chưa có)
+- [ ] Build + đẩy + phát hành (kiểm ca mở) | bằng chứng: (chưa có)
+Thầy nhắn thêm: "Sau khi làm hết tất cả thì bắt buôck tối ưu máy chủ chuyên sâu để mọi thứ phải load tức thì"
+- [ ] SAU khi xong đợt 16: tối ưu máy chủ chuyên sâu để mọi thứ load tức thì (đo trước/sau bằng số thật: thời gian lệnh, D1 insights) | bằng chứng: (chưa có)

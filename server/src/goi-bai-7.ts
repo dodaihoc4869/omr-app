@@ -9,7 +9,7 @@ import { laCauTuLuan } from '../../src/lib/cau-tu-luan'
 import { publicQuestion, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { docCauTheoRef, loiCauDoi, protectedQuestions, docKhoiEm, dongBoCacTo } from './game-v2-bank'
 import { readGameScope } from './game-v2-reports'
-import { docHoSo2 } from './srs2-d1'
+import { docHoSo2, docMetaCau } from './srs2-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { dongCoHanhTrinh } from './hanh-trinh-dong-co'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
@@ -80,6 +80,8 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     soGoi += Number(rs[0]?.meta.changes ?? 0); soCau += Number(rs[1]?.meta.changes ?? 0); soEm += Number(rs[2]?.meta.changes ?? 0)
   }
   // Nạp lại chỉ mục đã duyệt: gói rỗng hồi phục, bản sửa được gặp lại; không sửa sổ trả lời.
+  // CHỈ GHI KHI ĐỔI (khẩn 12/10 22h30, số đo D1 thật: lệnh upsert này ghi ~1 triệu dòng/ngày — cron mỗi phút ghi lại y nguyên ~164 dòng/gói): dòng câu
+  // giống hệt bản mới ⇒ `DO UPDATE … WHERE` bỏ qua, câu đã mang hopLe=false ⇒ không ghi lại. Kết quả trong bảng y hệt trước.
   const active = await env.DB.prepare(`SELECT b.*,g.id goi_id FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE (?='' OR b.lop=?) ORDER BY g.bat_dau DESC LIMIT ?`).bind(lop,lop,Math.max(1,tran)).all<Row>()
   for (const b of active.results) {
     const cau = await cauTuTick7(env,b)
@@ -87,8 +89,9 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     if (!cau.length) continue
     const payload=JSON.stringify(cau),id=str(b.goi_id)
     await env.DB.batch([
-      env.DB.prepare(`UPDATE goi_bai_7_cau SET meta_json=json_set(meta_json,'$.hopLe',json('false')) WHERE goi_id=? AND qid NOT IN(SELECT json_extract(value,'$.qid') FROM json_each(?)) AND ${KHONG_CA}`).bind(id,payload),
-      env.DB.prepare(`INSERT INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(goi_id,qid) DO UPDATE SET version=excluded.version,ma_de=excluded.ma_de,meta_json=excluded.meta_json`).bind(id,payload),
+      env.DB.prepare(`UPDATE goi_bai_7_cau SET meta_json=json_set(meta_json,'$.hopLe',json('false')) WHERE goi_id=? AND qid NOT IN(SELECT json_extract(value,'$.qid') FROM json_each(?)) AND COALESCE(json_extract(meta_json,'$.hopLe'),1)<>0 AND ${KHONG_CA}`).bind(id,payload),
+      env.DB.prepare(`INSERT INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(goi_id,qid) DO UPDATE SET version=excluded.version,ma_de=excluded.ma_de,meta_json=excluded.meta_json
+        WHERE goi_bai_7_cau.version IS NOT excluded.version OR goi_bai_7_cau.ma_de IS NOT excluded.ma_de OR goi_bai_7_cau.meta_json IS NOT excluded.meta_json`).bind(id,payload),
     ])
   }
   // Em mới chuyển/đăng ký lớp cũng nhận bài, không tạo lại tiến độ của em cũ.
@@ -194,6 +197,32 @@ export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: Ta
   return (await doc()) ?? moi
 }
 
+/** Câu ĐÃ LÀM hôm nay của em (Gói 7): câu có kết quả trong sổ (lướt / chỉ xem không tính) ∪ câu đã học có hướng dẫn hôm nay. MỘT nguồn cho `lapGoi7`
+ *  (sảnh, bắt đầu chặng) và lệnh nhẹ `hoc-tap-dem` — hai nơi luôn ra cùng một số. */
+export async function docDaLamNgay7(env: Env, sbd: string, ngay: string): Promise<Set<string>> {
+  const [done, guidedToday] = await Promise.all([
+    env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
+    env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
+  ])
+  const daLamNgay = new Set(done.results.map(r=>r.qid))
+  for(const r of guidedToday.results)daLamNgay.add(r.qid)
+  return daLamNgay
+}
+/**
+ * LỆNH NHẸ `hoc-tap-dem` (khẩn 12/10 22h30 — thầy: "tối ưu triệt để máy chủ cho học sinh làm bài tập giờ cao điểm"). Số đo D1 thật 24 giờ: mỗi câu
+ * em nộp, màn làm bài gọi lại CẢ sảnh (`lapGoi7`: ~25 truy vấn, gồm đọc siêu dữ liệu ~1.800 dòng câu, ma trận kỹ năng, động cơ hành trình) chỉ để cập
+ * nhật ô "đã làm/M câu hôm nay". Lệnh này trả đúng hai con số ấy bằng 3 truy vấn có chỉ mục: đã làm = `docDaLamNgay7` (cùng hàm của `lapGoi7`), M = dòng
+ * đã chốt `goi_bai_7_muc_ngay` (chưa chốt ⇒ null, máy em giữ M lúc mở chặng). Chỉ đọc, không ghi.
+ */
+export async function demHomNay7(env: Env, sbd: string, now: number): Promise<Record<string, unknown>> {
+  const ngay = ngayVn7(now)
+  const [daLam, muc] = await Promise.all([
+    docDaLamNgay7(env, sbd, ngay),
+    env.DB.prepare('SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>().catch(() => null),
+  ])
+  const m = muc ? Number(muc.muc) : NaN
+  return { ok: true, ngay, daLamHomNay: daLam.size, toiThieu: Number.isFinite(m) && m > 0 ? m : null }
+}
 export async function lapGoi7(env: Env, sbd: string, now: number) {
   const goi = await docGoiCuaEm7(env,sbd,now)
   if (!goi.length) return null
@@ -214,12 +243,22 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   const [hs, baoVe, btvn, control] = await Promise.all([docHoSo2(env,sbd,ngay,undefined,undefined,undefined,[...qids,...ungCu.results.map(r=>str(r.qid))]), protectedQuestions(env),docCauBtvnChuaNop(env,sbd),readGameScope(env,sbd)])
   const chan = new Set([...baoVe,...btvn,...control.blocked,...goi.flatMap(g=>g.cau.filter(c=>c.hopLe===false).map(c=>c.qid))])
   if (control.types.length) for (const c of hs.cau) if (!c.dang || !control.types.includes(c.dang)) chan.add(c.qid)
+  // CÙNG CỔNG VỚI LÚC PHÁT CÂU (khẩn 12/10 23h — thầy: "học sinh báo lỗi 2 câu cuối app không cho làm tiếp bảo tìm câu phù hợp"): câu gói em KHÔNG nhận
+  // được ở `startGoi7` — không còn trong chỉ mục, tự luận, sai dạng thầy giới hạn, khác khối / câu nghi (`chanKhacKhoiEm`, đúng tham số của startGoi7) —
+  // trước đây vẫn vào kế hoạch (vai tiếp cận, xếp CUỐI) ⇒ em làm hết phần còn lại thì sảnh "Còn 2 câu" mà mở chặng rỗng. Nay chặn ngay ở kế hoạch.
+  {
+    const daGap0 = new Set(goi.flatMap(g => [...g.daGap]))
+    const ungGoi = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid, c])).values()].filter(c => !daGap0.has(c.qid) && !chan.has(c.qid) && !chan.has(c.group))
+    const thieuMeta = ungGoi.filter(c => !hs.meta.has(c.qid)).map(c => c.qid)
+    const [khoiEm, metaThem] = await Promise.all([docKhoiEm(env, sbd), thieuMeta.length ? docMetaCau(env, thieuMeta, goi.flatMap(g => g.maDeNguon)) : Promise.resolve(new Map<string, never>())])
+    const metaCua = (qid: string) => hs.meta.get(qid) ?? metaThem.get(qid)
+    const coTheGiao = ungGoi.filter(c => { const m = metaCua(c.qid); return !!m && !m.tuLuan && !(control.types.length && (!m.dang || !control.types.includes(m.dang))) })
+    const quaCong = new Set((await chanKhacKhoiEm(env, 'goi7', { sbd, khoiEm }, coTheGiao, { cauCua: (c) => metaCua(c.qid) })).map(c => c.qid))
+    for (const c of ungGoi) if (!quaCong.has(c.qid)) chan.add(c.qid)
+  }
   const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan)
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
-  const done=await env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>()
-  const daLamNgay = new Set(done.results.map(r=>r.qid))
-  const guidedToday=await env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>()
-  for(const r of guidedToday.results)daLamNgay.add(r.qid)
+  const daLamNgay = await docDaLamNgay7(env,sbd,ngay)
   const [views,teacherCorrections]=await Promise.all([
     env.DB.prepare('SELECT DISTINCT qid FROM loi_giai_hoi WHERE sbd=? AND julianday(luc)>=julianday(?)-0.5').bind(sbd,new Date(now).toISOString()).all<{qid:string}>(),
     env.DB.prepare('SELECT goi_id,qid,version FROM goi_bai_7_chua WHERE goi_id IN(SELECT value FROM json_each(?))').bind(JSON.stringify(goi.map(g=>g.id))).all<Row>(),
@@ -283,7 +322,10 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
   const done = new Set(answered.results.map(r => r.qid))
   const viec = saved ? saved.questions.filter(r => !done.has(r.qid)).map(r=>({...r,vai:r.vai??'on',huongDan:r.huongDan??false})) : []
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = []
-  for (const v of (viec.length ? viec : lap.plan.viec.slice(0,6))) {
+  // Đợt cũ còn câu mà không câu nào phát được nữa ⇒ lấy theo kế hoạch hôm nay; kế hoạch đi tiếp qua câu không phát được cho đủ 6 câu (khẩn 12/10 23h).
+  const lanThu = viec.length ? [viec, lap.plan.viec] : [lap.plan.viec]
+  for (const ds of lanThu) { if (refs.length) break; for (const v of ds) {
+    if (refs.length >= 6) break
     const oldRef=saved?.questions.find(r=>r.qid===v.qid)
     const meta = oldRef ?? lap.hs.meta.get(v.qid) ?? lap.goi.flatMap(g=>g.cau).find(c=>c.qid===v.qid)
     if (!meta || lap.chan.has(v.qid) || lap.chan.has(meta.group)) continue
@@ -298,9 +340,9 @@ export async function startGoi7(env: Env, sbd: string, now: number): Promise<Rec
     const ref: RefGoi7 = {...oldRef,...lamLai,qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:lap.hs.tt.get(q.qid)?.laMoi ?? true,
       role:v.vai==='moi'?'cau_moi':v.vai==='sua'?'on_lai':'on_lai',vai:v.vai,huongDan:v.huongDan}
     refs.push(ref); questions.push({...publicQuestion(q),...(ref.goiY?{goiY:ref.goiY}:{}),vaiGoi7:v.vai,huongDan7:v.huongDan,coGoi7:lap.goi.some(g=>g.cau.some(c=>c.qid===q.qid&&c.version===q.version))})
-  }
+  } }
   if (!refs.length) return {ok:true,questions:[],goi7:tomTatGoi7(lap,now),message:lap.plan.thieuPhu&&lap.daLamNgay<lap.toiThieu?'Còn câu cần thầy bổ sung học liệu hoặc đang được giữ cho ca kiểm tra.':'Em đã hoàn thành phần được xếp hôm nay. Lỗi chưa kiểm chứng vẫn được giữ để học tiếp.'}
-  const id = viec.length && refs.length === viec.length ? str(old!.id) : crypto.randomUUID()
+  const id = viec.length && refs.length === viec.length && refs.every(r => viec.some(v => v.qid === r.qid)) ? str(old!.id) : crypto.randomUUID()
   if (id !== str(old?.id)) await env.DB.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify({mode:'adventure',created:now,hoa2:1,hocTap:1,goi7:1,questions:refs}),new Date(now).toISOString()).run()
   return {ok:true,id,questions,goi7:tomTatGoi7(lap,now)}
 }

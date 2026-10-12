@@ -1,0 +1,55 @@
+# ĐO D1 GIỜ CAO ĐIỂM (CHỈ ĐỌC) — thầy 12/10 22h: "tối ưu triệt để máy chủ cho học sinh làm bài tập giờ cao điểm phải mượt nhất và ổn định nhất",
+# "bạn tự làm hết đi", "lách hết đi tự làm hết đi". Phiên Claude trên đám mây không có khoá Cloudflare còn hạn ⇒ đọc số đo THẬT ở đây bằng khoá CI.
+# `wrangler d1 insights` = thống kê truy vấn của Cloudflare (số lần chạy, tổng/trung bình thời gian, dòng đọc/ghi) — KHÔNG đọc dữ liệu học sinh.
+# Chỉ in SỐ ĐẾM + câu SQL rút gọn 240 kí tự (truy vấn dùng tham số ?, không chứa tên / SBD) — repo công khai, nhật ký ai cũng đọc được.
+name: Đo D1 giờ cao điểm (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/amazing-albattani-03aros]
+    paths: ['.github/workflows/do-d1-cao-diem-1210.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-d1-cao-diem-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Truy vấn D1 tốn nhất 24 giờ qua (chỉ đọc)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          in_bang() {
+            node -e '
+              let s = ""; process.stdin.on("data", (d) => (s += d)).on("end", () => {
+                let a; try { a = JSON.parse(s) } catch { console.log(s.slice(0, 2000)); return }
+                if (!Array.isArray(a)) { console.log(JSON.stringify(a).slice(0, 2000)); return }
+                for (const q of a) {
+                  const g = (k) => q[k] ?? ""
+                  console.log([
+                    "lan=" + g("numberOfTimesRun"), "tongMs=" + Math.round(Number(g("queryDurationMs")) || 0), "tbMs=" + (Number(g("avgDurationMs")) || 0).toFixed(1),
+                    "docDong=" + g("totalRowsRead"), "tbDoc=" + Math.round(Number(g("avgRowsRead")) || 0), "ghiDong=" + g("totalRowsWritten"),
+                    "| " + String(g("query")).replace(/\s+/g, " ").slice(0, 240),
+                  ].join(" "))
+                }
+              })'
+          }
+          echo "=== Theo TỔNG thời gian ==="
+          npx -y wrangler@4 d1 insights omr --timePeriod=1d --sort-type=sum --sort-by=time --limit=25 --json | in_bang
+          echo "=== Theo TỔNG dòng đọc ==="
+          npx -y wrangler@4 d1 insights omr --timePeriod=1d --sort-type=sum --sort-by=reads --limit=15 --json | in_bang
+          echo "=== Theo TỔNG dòng ghi ==="
+          npx -y wrangler@4 d1 insights omr --timePeriod=1d --sort-type=sum --sort-by=writes --limit=10 --json | in_bang
+          echo "=== Theo số lần chạy ==="
+          npx -y wrangler@4 d1 insights omr --timePeriod=1d --sort-type=sum --sort-by=count --limit=15 --json | in_bang

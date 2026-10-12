@@ -629,6 +629,14 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
   })
   const [luot, setLuot] = useState(0)
   const lanCuoi = useRef(0)
+  // GỘP LƯỢT NẠP LẠI (khẩn 12/10 22h30 — giờ cao điểm sảnh mất 4–5 giây): trước đây mỗi `taiLai` gửi NGAY một lượt mới, lượt cũ chỉ bị bỏ ở máy em
+  // còn máy chủ vẫn lập kế hoạch đủ ~25 truy vấn ⇒ bấm/quay lại liên tục là dồn tải. Nay: đang có lượt bay ⇒ chỉ ghi "cần thêm một lượt", lượt bay về
+  // xong mới gửi ĐÚNG MỘT lượt nữa (số mới nhất vẫn về, không lượt nào chạy song song).
+  const dangBay = useRef(0), canThem = useRef(false), soLuot = useRef(0)
+  const xinNapLai = () => {
+    if (dangBay.current) { canThem.current = true; return }
+    setLuot((n) => n + 1)
+  }
   const khoaDung = useRef(`${token ?? ''}|${sbd ?? ''}`)
   useEffect(() => {
     // Đổi em (đăng xuất / đăng nhập SBD khác) ⇒ kiểm tra đệm của em mới hoặc về "chờ".
@@ -656,6 +664,13 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       return
     }
     let huy = false
+    const id = ++soLuot.current
+    dangBay.current = id
+    const veXong = () => {
+      if (dangBay.current !== id) return
+      dangBay.current = 0
+      if (canThem.current) { canThem.current = false; setLuot((n) => n + 1) }
+    }
     setT((x) => ({ ...x, dangTai: true }))
     taiSanh(token, tapTrung)
       .then((kq) => {
@@ -674,6 +689,7 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
           dangTai: false,
         }))
       })
+      .finally(veXong)
     return () => {
       huy = true
     }
@@ -686,7 +702,7 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
     const kich = () => {
       if (typeof document !== 'undefined' && document.hidden) return
       if (Date.now() - lanCuoi.current < 20_000) return
-      setLuot((n) => n + 1)
+      xinNapLai()
     }
     window.addEventListener('focus', kich)
     document.addEventListener('visibilitychange', kich)
@@ -695,5 +711,5 @@ export function useSanhHoa2(token: string | undefined, sbd: string | undefined, 
       document.removeEventListener('visibilitychange', kich)
     }
   }, [token])
-  return { ...t, taiLai: () => setLuot((n) => n + 1) }
+  return { ...t, taiLai: xinNapLai }
 }

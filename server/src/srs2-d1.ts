@@ -16,7 +16,7 @@ import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC, tiepBanKhacMoi } from
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
 import type { D1PreparedStatement, D1Result, Env } from './kieu'
-import { docCauHinhDem } from './cau-hinh-dem'
+import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { chanMetaKhacKhoi, docCauNghiDem, docKhoiEmCong } from './chan-khac-khoi'
 import { DemTTL } from './dem-chung'
 import { chayDdlMotLan } from './ddl-mot-lan'
@@ -360,11 +360,60 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
   if (!qids.length) return new Map<string, MetaCau>()
   return metaCauTuDong(await docMetaCauTho(env, qids), uuTienMaDe, maDeCua)
 }
-/** Phần ĐỌC của `docMetaCau` (câu SQL không phụ thuộc tờ ưu tiên) — tách ra để đọc sớm (tối ưu 05/10). `qids` khác rỗng. */
-function docMetaCauTho(env: Env, qids: readonly string[]): Promise<Row[]> {
+/** Câu SQL đọc siêu dữ liệu câu từ D1 (`qids` đã khử trùng, khác rỗng). */
+function docMetaCauD1(env: Env, qids: readonly string[]): Promise<Row[]> {
   return env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao, COALESCE(json_extract(json,'$.lop'), json_extract(json,'$.khoi')) AS lop_json,
         ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version
-      FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)`).bind(JSON.stringify([...new Set(qids)])).all<Row>().then((r) => r.results ?? [])
+      FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) AND json_valid(json)`).bind(JSON.stringify(qids)).all<Row>().then((r) => r.results ?? [])
+}
+/** Dòng đệm: tính sẵn cờ tự luận (đúng `tuLuanTuMeta`) rồi bỏ JSON câu rút gọn / cờ ảnh — đệm nhẹ, `metaCauTuDong` dùng `tu_luan`. */
+function gonDongMeta(x: Row): Row {
+  const { gon: _g, anh_pa: _a, anh_y: _y, hinh_gon: _h, ...r } = x
+  return { ...r, tu_luan: tuLuanTuMeta(x) }
+}
+/**
+ * ĐỆM SIÊU DỮ LIỆU CÂU theo isolate — CHỈ giờ cao điểm 20:00–23:59 VN (khẩn 12/10 22h30 — số đo D1 thật 24 giờ: câu đọc này đứng ĐẦU tổng thời gian D1, ~27.000 lần/ngày × ~1.800 dòng
+ * kèm tách JSON, ~38 ms/lần). Chỉ mục câu chỉ có MỘT đường ghi (`lapChiMucTo` trong game-v2-bank.ts: xoá + chèn câu của tờ và cập nhật `game_v2_index`
+ * CÙNG một lô) ⇒ tem kho = số dòng + `indexed_at` lớn nhất của `game_v2_index` (đọc lại tối đa mỗi 5 giây); tem đổi ⇒ bỏ cả đệm; trần tuổi 10 phút cho
+ * đường ghi ngoài Worker. Khoá theo D1 GỐC (`dbGoc`) — bản bọc mỗi lượt gọi khác nhau. Đọc tem lỗi ⇒ đọc thẳng D1 như cũ.
+ * Thứ tự trả: các câu theo mã câu tăng dần (đúng thứ tự D1 trả khi dò chỉ mục `game_v2_question_qid` theo danh sách IN), các dòng của CÙNG một câu
+ * giữ đúng thứ tự máy trả — `metaCauTuDong` chọn tờ theo thứ tự ấy.
+ */
+interface DemMeta { tem: string; luc: number; temLuc: number; dong: Map<string, Row[]> }
+const demMeta = new WeakMap<object, DemMeta>()
+const TEM_MOI_MS = 5_000, TUOI_DEM_META_MS = 10 * 60_000, TRAN_DEM_META = 30_000
+/** Bỏ đệm siêu dữ liệu câu (test / sau khi lập lại chỉ mục trong cùng isolate). */
+export function xoaDemMetaCau(): void { demMetaDoi++ }
+/** Đệm dựa vào GIỜ THẬT (`Date.now()`) ⇒ trong bộ test mặc định TẮT (kết quả test không phụ thuộc lúc chạy); test đệm bật bằng `batDemMetaCau(true)`. */
+let demMetaBat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+export function batDemMetaCau(bat: boolean): void { demMetaBat = bat }
+let demMetaDoi = 0
+const theoMaCau = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
+/** Phần ĐỌC của `docMetaCau` (câu SQL không phụ thuộc tờ ưu tiên) — tách ra để đọc sớm (tối ưu 05/10). `qids` khác rỗng. */
+async function docMetaCauTho(env: Env, qids: readonly string[]): Promise<Row[]> {
+  const now = Date.now()
+  // Ngoài giờ cao điểm 20:00–23:59 VN: đọc thẳng D1 y như cũ (tải thấp; thầy sửa kho là thấy ngay).
+  if (!demMetaBat || new Date(now + 7 * 3_600_000).getUTCHours() < 20) return docMetaCauD1(env, [...new Set(qids)])
+  const ds = [...new Set(qids)].sort(theoMaCau), goc = dbGoc(env.DB as unknown as object)
+  let d = demMeta.get(goc)
+  if (!d || now - d.temLuc >= TEM_MOI_MS || now < d.temLuc) {
+    const tem = await env.DB.prepare('SELECT COUNT(*) AS n, MAX(indexed_at) AS m FROM game_v2_index').first<Row>()
+      .then((r) => `${str(r?.n)}|${str(r?.m)}|${demMetaDoi}`).catch(() => null)
+    if (tem === null) return (await docMetaCauD1(env, ds)).map(gonDongMeta)
+    if (!d || d.tem !== tem || now - d.luc >= TUOI_DEM_META_MS || now < d.luc) { d = { tem, luc: now, temLuc: now, dong: new Map() }; demMeta.set(goc, d) }
+    else d.temLuc = now
+  }
+  const dem = d
+  const coSan = new Map<string, Row[]>()
+  for (const q of ds) { const a = dem.dong.get(q); if (a) coSan.set(q, a) }
+  const thieu = ds.filter((q) => !coSan.has(q))
+  const moi = new Map<string, Row[]>()
+  if (thieu.length) {
+    for (const x of await docMetaCauD1(env, thieu)) { const q = str(x.qid); let a = moi.get(q); if (!a) { a = []; moi.set(q, a) } a.push(gonDongMeta(x)) }
+    if (dem.dong.size + thieu.length > TRAN_DEM_META) dem.dong.clear()
+    for (const q of thieu) dem.dong.set(q, moi.get(q) ?? [])
+  }
+  return ds.flatMap((q) => coSan.get(q) ?? moi.get(q) ?? [])
 }
 /** Phần DỰNG của `docMetaCau` từ các dòng đã đọc (thuần, đúng thứ tự dòng). */
 function metaCauTuDong(rows: readonly Row[], uuTienMaDe: readonly string[], maDeCua?: Map<string, Set<string>>): Map<string, MetaCau> {
@@ -378,7 +427,7 @@ function metaCauTuDong(rows: readonly Row[], uuTienMaDe: readonly string[], maDe
     const cu = ra.get(qid)
     if (cu && (uuTien.has(cu.maDe) || !uuTien.has(str(x.ma_de)))) continue
     const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
-    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: tuLuanTuMeta(x), ...(x.lop_json != null ? { lop: str(x.lop_json) } : {}) })
+    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0, tuLuan: typeof x.tu_luan === 'boolean' ? x.tu_luan : tuLuanTuMeta(x), ...(x.lop_json != null ? { lop: str(x.lop_json) } : {}) })
   }
   return ra
 }
