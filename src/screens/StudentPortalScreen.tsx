@@ -1,6 +1,7 @@
 import { htmlKhoiLoiGiaiChuan } from '../lib/html-khoi-loi-giai-chuan'
 // App học sinh tập trung làm bài; giữ máy chủ giao câu, chấm và tiến độ hiện hành.
 import HocTapHomNay from '../components/hoc-tap/HocTapHomNay'
+import { soHomNay } from '../components/hoc-tap/lam-bai' // màn làm bài 12/10D: thanh trên "đã làm/M câu hôm nay" cùng nguồn vòng tròn Hôm nay
 import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
 import { canThanTuSanh, useSanhHoa2 } from '../components/hoa2/api'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
@@ -966,7 +967,7 @@ export default function StudentPortalScreen() {
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat}
         /></div>
       )}
-      {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} /></Suspense></div>}
+      {tab === 'hoctap' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManLamBaiTap token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} onCapNhat={hoa2.taiLai} onChua={(qid) => { setQidChua(qid); setTab('tuchua') }} homNay={soHomNay(hoa2.ketQua, duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined)} /></Suspense></div>}
       {tab === 'tuchua' && auth.token && !manThi && <div className="fixed inset-0 z-50 overflow-y-auto"><Suspense fallback={<ChoNapGame />}><ManTuChua token={auth.token} qid={qidChua} onVe={() => setTab(null)} onTuLuyen={() => setTab('tuluyen')} /></Suspense></div>}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}

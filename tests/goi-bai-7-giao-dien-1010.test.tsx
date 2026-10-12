@@ -33,7 +33,9 @@ it('học có hỗ trợ là hành động riêng, không hiện sai hoặc làm
   vi.mocked(goiHoa2).mockResolvedValueOnce({ok:true,id:'p',questions:[{...q,vaiGoi7:'tiep_can',huongDan7:true}]}).mockResolvedValueOnce({ok:true,correct:false,answer:'A',solution:'NaCl là muối.',hocCoHoTro:true})
   render(<ManLamBaiTap token="t" sbd="s" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()}/>)
   await screen.findByText(q.text);expect(screen.queryByText('NaCl là muối.')).toBeNull()
-  fireEvent.click(screen.getByRole('button',{name:/Chưa tự làm được/}))
+  // SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10 duyệt bản vẽ màn làm bài): câu Gói 7 có hướng dẫn hỏi "Câu này em chọn làm thế nào?" — hai nút Học cách giải / Tự làm câu này.
+  expect(screen.getByText('Câu này em chọn làm thế nào?')).toBeTruthy();expect(screen.getByRole('button',{name:'Tự làm câu này'})).toBeTruthy()
+  fireEvent.click(screen.getByRole('button',{name:'Học cách giải'}))
   await screen.findByText(/đã gặp với hỗ trợ, chưa tính tự làm đúng/)
   expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull();expect(screen.queryByRole('button',{name:'Tự chữa câu này'})).toBeNull()
   expect(goiHoa2).toHaveBeenLastCalledWith('hoc-tap-gap','t',{session:'p',qid:'q1',chuaTuLam:true},40)
@@ -42,9 +44,9 @@ it('học có hỗ trợ là hành động riêng, không hiện sai hoặc làm
 it('nhờ thầy chữa không lộ đáp án, không hiện làm sai và vẫn chuyển được câu',async()=>{
   vi.mocked(goiHoa2).mockResolvedValueOnce({ok:true,id:'p',questions:[{...q,vaiGoi7:'tiep_can',huongDan7:true}]}).mockResolvedValueOnce({ok:true,correct:false,choThay:true})
   render(<ManLamBaiTap token="t" sbd="s" onVe={vi.fn()} onCapNhat={vi.fn()} onChua={vi.fn()}/>)
-  await screen.findByText(q.text);fireEvent.click(screen.getByRole('button',{name:/Chưa tự làm được/}))
+  /* thầy 12/10 duyệt bản vẽ màn làm bài: nút "Học cách giải" */await screen.findByText(q.text);fireEvent.click(screen.getByRole('button',{name:'Học cách giải'}))
   await screen.findByText(/nhờ thầy chữa/)
   expect(screen.queryByRole('button',{name:'Tự chữa câu này'})).toBeNull()
   expect(screen.queryByText('Em đã trả lời đúng.')).toBeNull()
-  /* Trùng tu 11/10: "đợt" → "chặng" (bảng từ chuẩn A2) */fireEvent.click(screen.getByRole('button',{name:'Kết thúc chặng'}));expect(screen.getByText('Em đã hoàn thành chặng này')).toBeTruthy()
+  /* Trùng tu 11/10: "đợt" → "chặng" (bảng từ chuẩn A2) */fireEvent.click(screen.getByRole('button',{name:'Kết thúc chặng'}));/* thầy 12/10 duyệt bản vẽ màn làm bài: "Đã lưu chặng N" (không có số chặng ⇒ "chặng học") */expect(screen.getByText('Đã lưu chặng học')).toBeTruthy()
 })
