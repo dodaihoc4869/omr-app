@@ -506,7 +506,8 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
   }, [onDong])
 
   const ten = kq?.em.hoTen || td?.em.hoTen || em.ten || em.sbd
-  const tenLop = kq?.em.lop || td?.em.lop || em.lop || ''
+  // Lớp: cùng nguồn với bảng đã mở tấm (hồ sơ thái độ / dòng bảng) trước, rồi lịch sử làm câu.
+  const tenLop = td?.em.lop || em.lop || kq?.em.lop || ''
   const lop = tenLop ? `Lớp ${tenLop}` : tenKhoi(em.khoi)
   const t = kq?.tong
   const chuaSua = kq ? kq.cauSai.filter((c) => !c.lanCuoiDung).length : 0

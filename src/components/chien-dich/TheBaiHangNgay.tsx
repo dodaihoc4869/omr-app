@@ -4,7 +4,8 @@
 //   · BẢNG NHIỆT: hàng = em (máy chủ đã xếp: số ngày thiếu ↓ → tổng câu thiếu ↓ → tên); cột = ngày từ 12/10; ô = "đã làm/mức" tô theo bốn mức
 //     (đủ · thiếu ít · thiếu nhiều · không làm — `mucO`), ô hôm nay viền riêng ("tính tới lúc tải"). Bấm đầu cột một ngày ⇒ xếp em thiếu nhiều câu
 //     NHẤT ngày ấy lên đầu ("làm thiếu nhiều câu nhất trong từng ngày"); "Xếp theo tổng" trả về thứ tự chung.
-//   · Cột tổng: số ngày thiếu · tổng câu thiếu · ngày thiếu nhiều nhất. Lọc Khối (thanh phân đoạn) · Lớp (ô chọn) · tìm tên/SBD (không dấu vẫn khớp).
+//   · Cột tổng (chỉ các ngày ĐÃ QUA — hôm nay chưa hết ngày nên chưa cộng): số ngày thiếu · tổng câu thiếu · ngày thiếu nhiều nhất. Hoà ⇒ em còn
+//     thiếu nhiều câu hôm nay đứng trước. Lọc Khối (thanh phân đoạn) · Lớp (ô chọn) · tìm tên/SBD (không dấu vẫn khớp).
 //   · Bấm tên em (một nút, ≥ 48 px) ⇒ tấm hồ sơ làm bài (`HoSoLamCauEm`, nạp lười); đóng tấm ⇒ focus về đúng nút.
 //   · Mức nào máy chủ chưa lưu (ngày em không mở kế hoạch, Gói bài 7 ngày) là mức ƯỚC TÍNH theo quy tắc hiện hành — một dòng ghi chú nói rõ số ô.
 //   · Danh sách dài: 50 em mỗi đợt + "Xem thêm" (chuẩn B16). Mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
@@ -56,14 +57,21 @@ function ChuGiai({ kq }: { kq: KetQuaBaiHangNgay }) {
         ))}
         <li>
           <span className="gvv2-bhn-mau-o" data-muc="hom-nay" aria-hidden="true" />
-          Hôm nay (tính tới lúc tải)
+          Hôm nay (tính tới lúc tải, chưa cộng vào tổng)
         </li>
       </ul>
-      <p className="gvv2-bhn-ghi gvv2-so">
-        Ô ghi <b>đã làm/mức tối thiểu</b> của ngày. Mức theo tầng: Nền {MUC_THEO_TANG[1]} câu · Hiểu {MUC_THEO_TANG[2]} · Vận dụng, Tổng hợp {MUC_THEO_TANG[3]}.
-        {kq.soOUocTinh > 0 &&
-          ` ${kq.soOUocTinh}/${kq.soO} ô dùng mức ước tính: máy chủ chưa lưu mức của ngày ấy (ngày em không mở kế hoạch, Gói bài 7 ngày) nên tính theo tầng gần nhất đã ghi của em.`}
-      </p>
+      <details className="gvv2-bhn-cach">
+        <summary>
+          Ô ghi <b>đã làm/mức tối thiểu</b> của ngày · mức tính thế nào?
+          {kq.soOUocTinh > 0 && <span className="gvv2-so"> ({kq.soOUocTinh}/{kq.soO} ô dùng mức ước tính)</span>}
+        </summary>
+        <p className="gvv2-bhn-ghi gvv2-so">
+          Mức tối thiểu theo tầng của em: Nền {MUC_THEO_TANG[1]} câu · Hiểu {MUC_THEO_TANG[2]} · Vận dụng, Tổng hợp {MUC_THEO_TANG[3]}. Ngày em mở kế hoạch Hành
+          trình, mức là số đã chốt đầu ngày. Ngày không có mức đã lưu (em không mở kế hoạch, hoặc Gói bài 7 ngày — gói không lưu mức theo ngày) dùng mức
+          ước tính theo tầng gần nhất đã ghi của em; chưa ghi tầng nào thì tính tầng Nền. Đã làm = số câu khác nhau em làm có kết quả trong ngày, không
+          tính lượt chỉ đọc lời giải. Hôm nay chưa hết ngày nên chưa cộng vào số ngày thiếu và câu thiếu.
+        </p>
+      </details>
     </div>
   )
 }
@@ -71,6 +79,8 @@ function ChuGiai({ kq }: { kq: KetQuaBaiHangNgay }) {
 function DongEm({ e, ngay, onMo }: { e: EmBaiHangNgay; ngay: readonly string[]; onMo: (e: EmBaiHangNgay, nut: HTMLButtonElement) => void }) {
   const theoNgay = new Map(e.ngay.map((n) => [n.ngay, n]))
   const lon = e.ngayThieuNhieuNhat
+  const soNgayQua = e.ngay.filter((n) => !n.homNay).length
+  const homNay = e.ngay.find((n) => n.homNay)
   return (
     <tr className="gvv2-bhn-hang" data-sbd={e.sbd}>
       <th scope="row" className="gvv2-bhn-em-o">
@@ -78,7 +88,7 @@ function DongEm({ e, ngay, onMo }: { e: EmBaiHangNgay; ngay: readonly string[]; 
           type="button"
           className="gvv2-bhn-em tt-nhan"
           onClick={(ev) => onMo(e, ev.currentTarget)}
-          aria-label={`${e.hoTen}, SBD ${e.sbd}: thiếu ${e.soNgayThieu} ngày, ${e.tongCauThieu} câu — xem hồ sơ làm bài`}
+          aria-label={`${e.hoTen}, SBD ${e.sbd}: thiếu ${e.soNgayThieu} ngày, ${e.tongCauThieu} câu${homNay ? `; hôm nay ${homNay.datMuc ? 'đã đủ mức' : `còn thiếu ${homNay.thieu} câu`}` : ''} — xem hồ sơ làm bài`}
         >
           <span className="gvv2-avatar gvv2-bhn-av" aria-hidden="true">
             {chuCaiTen(e.hoTen)}
@@ -104,24 +114,32 @@ function DongEm({ e, ngay, onMo }: { e: EmBaiHangNgay; ngay: readonly string[]; 
           </td>
         )
       })}
-      <td className="gvv2-bhn-tong gvv2-so" data-nhan="Số ngày thiếu" data-nang={e.soNgayThieu > 0 ? 'true' : undefined}>
-        <b>{e.soNgayThieu}</b>
-        <small>/{e.ngay.length} ngày</small>
-      </td>
-      <td className="gvv2-bhn-tong gvv2-so" data-nhan="Câu thiếu" data-nang={e.tongCauThieu > 0 ? 'true' : undefined}>
-        <b>{e.tongCauThieu}</b>
-        <small> câu</small>
-      </td>
-      <td className="gvv2-bhn-tong gvv2-so" data-nhan="Ngày thiếu nhiều nhất">
-        {lon ? (
-          <>
-            <b>{ngayNgan(lon.ngay)}</b>
-            <small> · thiếu {lon.thieu} câu</small>
-          </>
-        ) : (
-          <small>Không thiếu ngày nào</small>
-        )}
-      </td>
+      {soNgayQua === 0 ? (
+        <td className="gvv2-bhn-tong gvv2-bhn-tong--trong" data-nhan="Tổng các ngày đã qua" colSpan={3}>
+          <small>Chưa có ngày nào đã qua</small>
+        </td>
+      ) : (
+        <>
+          <td className="gvv2-bhn-tong gvv2-so" data-nhan="Số ngày thiếu" data-nang={e.soNgayThieu > 0 ? 'true' : undefined}>
+            <b>{e.soNgayThieu}</b>
+            <small>/{soNgayQua} ngày</small>
+          </td>
+          <td className="gvv2-bhn-tong gvv2-so" data-nhan="Câu thiếu" data-nang={e.tongCauThieu > 0 ? 'true' : undefined}>
+            <b>{e.tongCauThieu}</b>
+            <small> câu</small>
+          </td>
+          <td className="gvv2-bhn-tong gvv2-so" data-nhan="Ngày thiếu nhiều nhất">
+            {lon ? (
+              <>
+                <b>{ngayNgan(lon.ngay)}</b>
+                <small> · thiếu {lon.thieu} câu</small>
+              </>
+            ) : (
+              <small>Không thiếu ngày nào</small>
+            )}
+          </td>
+        </>
+      )}
     </tr>
   )
 }
@@ -173,6 +191,8 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
   }, [tatCa, khoiChon, lopChon, tim, xep])
   const hien = loc.slice(0, soHien)
   const emThieu = loc.filter((e) => e.soNgayThieu > 0).length
+  const coHomNay = !!kq && kq.ngay.includes(kq.homNay)
+  const chuaDuHomNay = loc.filter((e) => e.ngay.some((n) => n.homNay && !n.datMuc)).length
 
   const onMo = useCallback((e: EmBaiHangNgay, nut: HTMLButtonElement) => {
     nutVua.current = nut
@@ -194,8 +214,14 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
           {kq && tatCa.length > 0 ? (
             <>
               <b className="gvv2-so">{emThieu}</b>
-              <span className="gvv2-so">/{loc.length}</span> em thiếu ít nhất một ngày · từ {ngayNgan(kq.tu)} đến {ngayNgan(kq.den)}{' '}
-              <span className="gvv2-so">({kq.ngay.length} ngày)</span>
+              <span className="gvv2-so">/{loc.length}</span> em thiếu ít nhất một ngày đã qua
+              {coHomNay && (
+                <>
+                  {' · '}
+                  <b className="gvv2-so">{chuaDuHomNay}</b> em chưa đủ mức hôm nay
+                </>
+              )}
+              {' · '}từ {ngayNgan(kq.tu)} đến {ngayNgan(kq.den)} <span className="gvv2-so">({kq.ngay.length} ngày)</span>
             </>
           ) : (
             'Bài hằng ngày từ 12/10: em thiếu nhiều ngày nhất đứng trước'

@@ -5,7 +5,8 @@
 //     12121212 và em bị khoá. Không đọc được bảng Hành trình ⇒ lùi về danh sách lớp (cảnh báo nói thật).
 //   · Gom em theo LÔ 100 SBD (một tham số JSON, `json_each`) — mỗi lô ≤ 6 truy vấn, mọi truy vấn sổ lọc `sbd IN (…) AND ngay_vn BETWEEN …`
 //     ⇒ đi chỉ mục `idx_skh_em_ngay (sbd, ngay_vn)`; số đếm Gói 7 GOM SẴN trong SQL (COUNT DISTINCT theo em × ngày) ⇒ ~300 em × 14 ngày trả ≤ 4200 dòng.
-//   · Mỗi ngày: `mucToiThieu` (thật `da-chot` / ước tính theo quy tắc hiện hành), `daLam`, `thieu`, `datMuc`. Xếp em: số ngày thiếu ↓ → tổng câu thiếu ↓ → tên.
+//   · Mỗi ngày: `mucToiThieu` (thật `da-chot` / ước tính theo quy tắc hiện hành), `daLam`, `thieu`, `datMuc`. Hôm nay chưa hết ngày ⇒ không tính vào
+//     tổng. Xếp em: số ngày thiếu ↓ → tổng câu thiếu ↓ → (hoà) câu còn thiếu hôm nay ↓ → tên.
 // `POST /gv/ho-so-thai-do {sbd, tu?, den?}` — LỆNH THẦY, CHỈ ĐỌC. Lịch hoạt động + số đếm + 6 tín hiệu có số và ngưỡng + kết luận theo luật
 //   `LUAT_KET_LUAN` + danh sách Câu đúng / Câu đã ôn (Câu sai và Toàn bộ lịch sử vẫn ở `/gv/lich-su-lam-cau`).
 //   · Sổ một em (lọc `sbd`, tối đa 5000 lượt gần nhất), bỏ sự kiện còn giấu. "Lượt làm" = như kế hoạch đếm (`SQL_LA_LAN_LAM`: bỏ đọc lời giải, lướt,
@@ -121,23 +122,26 @@ export function daLamKeHoach(keHoach: { dao: readonly string[]; doan: readonly s
   return qs.filter((q) => xong.has(q)).length
 }
 
-/** Tóm tắt dãy ngày của một em. Ngày thiếu nhiều nhất: hoà ⇒ ngày gần đây hơn. */
+/** Tóm tắt dãy ngày của một em. Hôm nay CHƯA HẾT ngày ⇒ không tính là ngày thiếu (chỉ `thieuHomNay` để xếp khi hoà). Ngày thiếu nhiều nhất:
+ *  hoà ⇒ ngày gần đây hơn. */
 export function tomTatNgay(ngay: readonly NgayBaiEm[]): Omit<EmBaiHangNgay, 'sbd' | 'hoTen' | 'lop' | 'khoi' | 'ngay'> {
+  const qua = ngay.filter((n) => !n.homNay)
   let lon: { ngay: string; thieu: number } | null = null
-  for (const n of ngay) if (n.thieu > 0 && (!lon || n.thieu >= lon.thieu)) lon = { ngay: n.ngay, thieu: n.thieu }
+  for (const n of qua) if (n.thieu > 0 && (!lon || n.thieu >= lon.thieu)) lon = { ngay: n.ngay, thieu: n.thieu }
   return {
-    soNgayThieu: ngay.filter((n) => !n.datMuc).length,
-    tongCauThieu: ngay.reduce((t, n) => t + n.thieu, 0),
+    soNgayThieu: qua.filter((n) => !n.datMuc).length,
+    tongCauThieu: qua.reduce((t, n) => t + n.thieu, 0),
     ngayThieuNhieuNhat: lon,
     soNgayDu: ngay.filter((n) => n.datMuc).length,
-    soNgayKhongLam: ngay.filter((n) => n.daLam === 0).length,
+    soNgayKhongLam: qua.filter((n) => n.daLam === 0).length,
     tongDaLam: ngay.reduce((t, n) => t + n.daLam, 0),
+    thieuHomNay: ngay.find((n) => n.homNay)?.thieu ?? 0,
   }
 }
 
-/** Thứ tự thầy chốt: thiếu nhiều NGÀY nhất lên đầu → thiếu nhiều CÂU nhất → tên. */
+/** Thứ tự thầy chốt: thiếu nhiều NGÀY nhất lên đầu → thiếu nhiều CÂU nhất → (hoà) còn thiếu nhiều câu hôm nay → tên. */
 export function xepEmBaiHangNgay(a: EmBaiHangNgay, b: EmBaiHangNgay): number {
-  return b.soNgayThieu - a.soNgayThieu || b.tongCauThieu - a.tongCauThieu || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd)
+  return b.soNgayThieu - a.soNgayThieu || b.tongCauThieu - a.tongCauThieu || b.thieuHomNay - a.thieuHomNay || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd)
 }
 
 // ------------------------------------------------------------------ ĐỌC SỔ THEO LÔ

@@ -3,6 +3,7 @@
 export * from '../../../src/lib/goi-lenh-thay'
 import { traLoiThay } from '../../chup-omni-3/gia/may-thay'
 import { lichSuGia } from './lich-su-lam-cau'
+import { baiHangNgayGia, hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay' // LÀN GIÁO VIÊN 12/10
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -58,6 +59,14 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
       },
     }
   }
+  // ---------------------------------------------------------------- LÀN GIÁO VIÊN 12/10 (gia/bai-hang-ngay.ts): Hành trình › Bài hằng ngày +
+  // tấm Hồ sơ làm bài (hồ sơ thái độ + lịch sử làm câu đúng tên em của bảng). Dữ liệu giả, tên giả.
+  if (duong === '/gv/bai-hang-ngay') return { ok: true as const, du: baiHangNgayGia() as unknown as Record<string, unknown> }
+  if (duong === '/gv/ho-so-thai-do') return { ok: true as const, du: hoSoThaiDoGia(String(b.sbd)) as unknown as Record<string, unknown> }
+  if (duong === '/gv/lich-su-lam-cau' && tenEmBhn(String(b.sbd))) {
+    return { ok: true as const, du: lichSuGia(String(b.sbd), tenEmBhn(String(b.sbd))!) as unknown as Record<string, unknown> }
+  }
+  // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
   // Hành trình › Nhịp học › tấm Lịch sử làm câu (thầy 09/10 khuya): lịch sử GIẢ của em đúng SBD trong bảng nhịp (tên giả).
   if (duong === '/gv/lich-su-lam-cau') {
     return { ok: true as const, du: lichSuGia(String(b.sbd), tenTheoSbd(String(b.sbd))) as unknown as Record<string, unknown> }

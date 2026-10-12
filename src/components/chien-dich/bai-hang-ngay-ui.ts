@@ -33,12 +33,14 @@ export function chuO(n: NgayBaiEm): string {
   return `${dau} — ${sau}${n.mucUocTinh ? ' · mức ước tính' : ''}`
 }
 
-/** Xếp theo MỘT ngày (bấm đầu cột): thiếu nhiều câu ngày ấy trước → thứ tự chung (ngày thiếu → câu thiếu → tên). */
+/** Xếp theo MỘT ngày (bấm đầu cột): thiếu nhiều câu ngày ấy trước → thứ tự chung (ngày thiếu → câu thiếu → thiếu hôm nay → tên). */
 export function xepTheoNgay(ngay: string) {
   return (a: EmBaiHangNgay, b: EmBaiHangNgay): number => {
     const ta = a.ngay.find((n) => n.ngay === ngay)?.thieu ?? 0
     const tb = b.ngay.find((n) => n.ngay === ngay)?.thieu ?? 0
-    return tb - ta || b.soNgayThieu - a.soNgayThieu || b.tongCauThieu - a.tongCauThieu || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd)
+    return (
+      tb - ta || b.soNgayThieu - a.soNgayThieu || b.tongCauThieu - a.tongCauThieu || b.thieuHomNay - a.thieuHomNay || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd)
+    )
   }
 }
 

@@ -24,6 +24,11 @@
 .gvv2-bhn-mau-o[data-muc='hom-nay'] { background: var(--gvm-mat); box-shadow: inset 0 0 0 2px var(--gvm-xd); }
 .gvv2-bhn-ghi { margin: 0; font-size: var(--t-phu, 13px); line-height: 1.5; color: var(--gvm-chu-2); }
 .gvv2-bhn-ghi b { color: var(--gvm-chu); }
+.gvv2-bhn-cach { font-size: var(--t-phu, 13px); color: var(--gvm-chu-2); }
+.gvv2-bhn-cach > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; min-height: 44px; cursor: pointer; line-height: 1.4; touch-action: manipulation; }
+.gvv2-bhn-cach > summary b { color: var(--gvm-chu); }
+.gvv2-bhn-cach > summary:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; border-radius: 8px; }
+.gvv2-bhn-cach[open] > summary { margin-bottom: 4px; }
 .gvv2-bhn-canh-bao { margin: 0; padding: 8px 12px; border-radius: var(--r-nho, 12px); background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); font-size: var(--t-phu, 13px); }
 .gvv2-bhn-xep {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; padding: 4px 4px 4px 14px;
@@ -81,6 +86,7 @@
 .gvv2-bhn-tong b { font-size: var(--t-the, 17px); font-weight: 800; color: var(--gvm-chu); }
 .gvv2-bhn-tong[data-nang='true'] b { color: var(--gvm-ho-dam); }
 .gvv2-bhn-tong small { font-size: 12px; color: var(--gvm-chu-3); }
+.gvv2-bhn-tong--trong { text-align: center; }
 .gvv2-bhn-them { justify-self: center; }
 
 @media (max-width: 720px) {
@@ -133,6 +139,8 @@
 .gvv2-tdo-tieu { margin: 8px 0 0; font-size: var(--t-the, 17px); font-weight: 800; color: var(--gvm-chu); }
 .gvv2-tdo-tieu small { font-size: 13px; font-weight: 600; color: var(--gvm-chu-2); }
 .gvv2-tdo-tieu--so { margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--gvm-vien); }
+/* tấm rộng: bốn ô "Toàn bộ sổ" một hàng (hẹp ⇒ tự xuống hai cột như cũ) */
+.gvv2-hs--rong .gvv2-hs-so { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 
 /* năm ô số */
 .gvv2-tdo-so { display: grid; grid-template-columns: repeat(auto-fit, minmax(124px, 1fr)); gap: 8px; margin: 0; }
@@ -151,9 +159,9 @@
 
 /* độ đúng theo ngày — cột CSS, vạch giữa = 50% */
 .gvv2-tdo-cot { display: flex; align-items: flex-end; gap: 6px; margin: 0; padding: 4px 0; list-style: none; overflow-x: auto; }
-.gvv2-tdo-cot-o { flex: 1 0 44px; max-width: 76px; display: grid; justify-items: center; gap: 4px; }
+.gvv2-tdo-cot-o { flex: 1 0 44px; max-width: 96px; display: grid; justify-items: center; gap: 4px; }
 .gvv2-tdo-cot-so { font-size: 13px; font-weight: 700; color: var(--gvm-chu); }
-.gvv2-tdo-cot-khung { position: relative; display: block; width: 100%; max-width: 36px; height: 112px; border-radius: 8px; background: var(--gvm-mat-2); overflow: hidden; }
+.gvv2-tdo-cot-khung { position: relative; display: block; width: 100%; max-width: 44px; height: 120px; border-radius: 8px; background: var(--gvm-mat-2); overflow: hidden; }
 .gvv2-tdo-cot-khung i { position: absolute; inset: auto 0 0 0; border-radius: 8px 8px 0 0; background: var(--gvm-xd); }
 .gvv2-tdo-cot-khung::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--gvm-chu-3); opacity: 0.6; }
 .gvv2-tdo-cot-ngay { font-size: 12px; font-weight: 700; color: var(--gvm-chu-2); }
@@ -161,12 +169,12 @@
 
 /* phân bố số giây — thanh ngang, phần quá nhanh tô riêng */
 .gvv2-tdo-giay { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.gvv2-tdo-giay-dong { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 14px; }
+.gvv2-tdo-giay-dong { display: grid; grid-template-columns: 96px minmax(0, 1fr) 13.5rem; align-items: center; gap: 10px; font-size: 14px; }
 .gvv2-tdo-giay-nhan { font-weight: 600; color: var(--gvm-chu-2); }
 .gvv2-tdo-giay-thanh { display: flex; height: 14px; border-radius: 999px; background: var(--gvm-mat-2); overflow: hidden; }
 .gvv2-tdo-giay-thanh i { display: block; height: 100%; background: var(--gvm-xd); }
 .gvv2-tdo-giay-thanh i[data-nhanh='true'] { background: var(--gvm-ho); }
-.gvv2-tdo-giay-so { font-size: 13px; color: var(--gvm-chu-2); white-space: nowrap; }
+.gvv2-tdo-giay-so { font-size: 13px; color: var(--gvm-chu-2); white-space: nowrap; overflow-wrap: anywhere; }
 .gvv2-tdo-giay-ghi { display: flex; align-items: flex-start; gap: 8px; margin: 0; font-size: 13px; line-height: 1.45; color: var(--gvm-chu-2); }
 .gvv2-tdo-giay-mau { flex: none; width: 14px; height: 14px; margin-top: 2px; border-radius: 4px; background: var(--gvm-ho); }
 

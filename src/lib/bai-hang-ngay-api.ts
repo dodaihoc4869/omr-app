@@ -67,6 +67,8 @@ function docEm(x: unknown): EmBaiHangNgay | null {
     soNgayDu: soKhongAm(o.soNgayDu),
     soNgayKhongLam: soKhongAm(o.soNgayKhongLam),
     tongDaLam: soKhongAm(o.tongDaLam),
+    // máy chủ cũ chưa có trường ⇒ tính lại từ ô hôm nay (không bịa)
+    thieuHomNay: so(o.thieuHomNay) !== null ? soKhongAm(o.thieuHomNay) : (ngay.find((n) => n.homNay)?.thieu ?? 0),
   }
 }
 

@@ -12,7 +12,8 @@ import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
 import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
 import type { KetQuaBaiHangNgay, KetQuaHoSoThaiDo, NgayBaiEm } from '../server/src/bai-hang-ngay-kieu'
 import {
-  chuoiChonLap, gvBaiHangNgay, gvHoSoThaiDo, khoangNgay, mucCuaNgay, ngayVnCua, phanBoGiay, SQL_DEM_GOI7, SQL_LUOT_KE_HOACH, tinhThaiDo, type LuotThaiDo,
+  chuoiChonLap, gvBaiHangNgay, gvHoSoThaiDo, khoangNgay, mucCuaNgay, ngayVnCua, phanBoGiay, SQL_DEM_GOI7, SQL_LUOT_KE_HOACH, tinhThaiDo, tomTatNgay, xepEmBaiHangNgay,
+  type LuotThaiDo,
 } from '../server/src/bai-hang-ngay'
 
 type D = ReturnType<typeof taoD1That>
@@ -131,7 +132,8 @@ describe('mức / đã làm / thiếu — đúng như kế hoạch đang chấm'
       ['2026-10-14', 36, 0, 36, false, 'tang-gan-nhat', 'hanh-trinh'], // tầng 3 gần nhất
     ])
     expect(a.ngay.map((n) => n.mucUocTinh)).toEqual([true, false, true])
-    expect(a).toMatchObject({ soNgayThieu: 3, tongCauThieu: 99, ngayThieuNhieuNhat: { ngay: '2026-10-14', thieu: 36 }, soNgayDu: 0, soNgayKhongLam: 2, tongDaLam: 3 })
+    // hôm nay (14/10) chưa hết ngày ⇒ không cộng vào tổng; chỉ để xếp khi hoà
+    expect(a).toMatchObject({ soNgayThieu: 2, tongCauThieu: 63, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 33 }, soNgayDu: 0, soNgayKhongLam: 1, tongDaLam: 3, thieuHomNay: 36 })
   })
 
   it('Gói 7: mức không lưu ⇒ tầng 1 (24 câu, mặc định); đã làm = mã câu khác nhau có kết quả, bỏ đọc lời giải / còn giấu / ca chưa công bố, cộng câu có hướng dẫn', async () => {
@@ -143,7 +145,7 @@ describe('mức / đã làm / thiếu — đúng như kế hoạch đang chấm'
       ['2026-10-14', 24, 0, 24, false, 'mac-dinh', 'goi7'],
     ])
     expect(b.ngay.every((n) => n.mucUocTinh && n.tang === 1)).toBe(true)
-    expect(b).toMatchObject({ soNgayThieu: 2, tongCauThieu: 45, ngayThieuNhieuNhat: { ngay: '2026-10-14', thieu: 24 } })
+    expect(b).toMatchObject({ soNgayThieu: 1, tongCauThieu: 21, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 21 }, thieuHomNay: 24 })
   })
 
   it('mucCuaNgay: Gói 7 KHÔNG lấy mức chốt của Hành trình làm số thật; tầng sau ngày ấy chỉ dùng khi không có tầng trước', () => {
@@ -158,23 +160,32 @@ describe('mức / đã làm / thiếu — đúng như kế hoạch đang chấm'
 })
 
 describe('xếp em + lọc', () => {
-  it('thiếu nhiều NGÀY nhất lên đầu → nhiều CÂU → tên; bỏ tài khoản thử và em bị khoá; số ô ước tính', async () => {
+  it('thiếu nhiều NGÀY nhất lên đầu → nhiều CÂU → (hoà) thiếu hôm nay → tên; bỏ tài khoản thử và em bị khoá; số ô ước tính', async () => {
     const r = await goi(boDuLieu())
-    expect(r.em.map((e) => [e.hoTen, e.soNgayThieu, e.tongCauThieu])).toEqual([
-      ['Trần An', 3, 99],
-      ['Vũ Phương', 3, 72], // khối 11: chưa ghi tầng, không kế hoạch ⇒ 3 × 24
-      ['Lê Bình', 2, 45],
-      ['Bùi Em', 2, 10],
-      ['Đỗ Dũng', 2, 10],
-      ['Phạm Chi', 1, 1],
+    expect(r.em.map((e) => [e.hoTen, e.soNgayThieu, e.tongCauThieu, e.thieuHomNay])).toEqual([
+      ['Trần An', 2, 63, 36],
+      ['Vũ Phương', 2, 48, 24], // khối 11: chưa ghi tầng, không kế hoạch ⇒ 24 mỗi ngày
+      ['Lê Bình', 1, 21, 24],
+      ['Bùi Em', 1, 5, 5],
+      ['Đỗ Dũng', 1, 5, 5],
+      ['Phạm Chi', 0, 0, 1],
     ])
     expect(r.em.map((e) => e.sbd)).not.toContain('12121212')
     expect(r.em.map((e) => e.sbd)).not.toContain('K')
-    expect(theo(r, 'E').ngayThieuNhieuNhat).toEqual({ ngay: '2026-10-14', thieu: 5 }) // hoà 13/10 và 14/10 ⇒ ngày gần hơn
-    expect(theo(r, 'C')).toMatchObject({ soNgayThieu: 1, tongCauThieu: 1, soNgayDu: 2 })
+    expect(theo(r, 'E').ngayThieuNhieuNhat).toEqual({ ngay: '2026-10-13', thieu: 5 })
+    expect(theo(r, 'C')).toMatchObject({ soNgayThieu: 0, tongCauThieu: 0, soNgayDu: 2, ngayThieuNhieuNhat: null })
     expect(r.soO).toBe(r.em.length * 3)
     expect(r.soOUocTinh).toBe(r.em.flatMap((e) => e.ngay).filter((n) => n.mucUocTinh).length)
     expect(r.canhBao).toEqual([])
+  })
+
+  it('tomTatNgay: hôm nay không cộng vào tổng; ngày thiếu nhiều nhất hoà ⇒ ngày gần hơn; hoà tổng ⇒ thiếu hôm nay nhiều hơn đứng trước', () => {
+    const ng = (ngay: string, daLam: number, homNay = false): NgayBaiEm => ({ ngay, mucToiThieu: 24, daLam, thieu: Math.max(0, 24 - daLam), datMuc: daLam >= 24, mucUocTinh: true, nguonMuc: 'mac-dinh', tang: 1, cheDo: 'goi7', homNay })
+    const t = tomTatNgay([ng('2026-10-12', 20), ng('2026-10-13', 20), ng('2026-10-14', 0, true)])
+    expect(t).toEqual({ soNgayThieu: 2, tongCauThieu: 8, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 4 }, soNgayDu: 0, soNgayKhongLam: 0, tongDaLam: 40, thieuHomNay: 24 })
+    expect(tomTatNgay([ng('2026-10-12', 24, true)])).toMatchObject({ soNgayThieu: 0, soNgayDu: 1, thieuHomNay: 0 })
+    const e = (sbd: string, hoTen: string, homNay: number) => ({ sbd, hoTen, lop: '', khoi: '12', ...tomTatNgay([ng('2026-10-12', 20), ng('2026-10-13', homNay, true)]), ngay: [] })
+    expect([e('1', 'An', 20), e('2', 'Bình', 0), e('3', 'Chi', 24)].sort(xepEmBaiHangNgay).map((x) => x.hoTen)).toEqual(['Bình', 'An', 'Chi'])
   })
 
   it('lọc khối / tên lớp; danh sách lớp lấy trước khi lọc', async () => {

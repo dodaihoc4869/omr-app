@@ -32,14 +32,16 @@ const n = (ngay: string, daLam: number, muc = 24, o: Partial<NgayBaiEm> = {}): N
   ngay, mucToiThieu: muc, daLam, thieu: Math.max(0, muc - daLam), datMuc: daLam >= muc, mucUocTinh: true, nguonMuc: 'mac-dinh', tang: 1, cheDo: 'goi7', homNay: ngay === '2026-10-14', ...o,
 })
 const em = (sbd: string, hoTen: string, khoi: string, lop: string, ds: NgayBaiEm[]): EmBaiHangNgay => {
+  const qua = ds.filter((x) => !x.homNay)
   let lon: { ngay: string; thieu: number } | null = null
-  for (const x of ds) if (x.thieu > 0 && (!lon || x.thieu >= lon.thieu)) lon = { ngay: x.ngay, thieu: x.thieu }
+  for (const x of qua) if (x.thieu > 0 && (!lon || x.thieu >= lon.thieu)) lon = { ngay: x.ngay, thieu: x.thieu }
   return {
-    sbd, hoTen, khoi, lop, ngay: ds, soNgayThieu: ds.filter((x) => !x.datMuc).length, tongCauThieu: ds.reduce((t, x) => t + x.thieu, 0), ngayThieuNhieuNhat: lon,
-    soNgayDu: ds.filter((x) => x.datMuc).length, soNgayKhongLam: ds.filter((x) => x.daLam === 0).length, tongDaLam: ds.reduce((t, x) => t + x.daLam, 0),
+    sbd, hoTen, khoi, lop, ngay: ds, soNgayThieu: qua.filter((x) => !x.datMuc).length, tongCauThieu: qua.reduce((t, x) => t + x.thieu, 0), ngayThieuNhieuNhat: lon,
+    soNgayDu: ds.filter((x) => x.datMuc).length, soNgayKhongLam: qua.filter((x) => x.daLam === 0).length, tongDaLam: ds.reduce((t, x) => t + x.daLam, 0),
+    thieuHomNay: ds.find((x) => x.homNay)?.thieu ?? 0,
   }
 }
-// thứ tự MÁY CHỦ: số ngày thiếu ↓ → câu thiếu ↓ → tên
+// thứ tự MÁY CHỦ (hôm nay 14/10 chưa cộng vào tổng): số ngày thiếu ↓ → câu thiếu ↓ → thiếu hôm nay ↓ → tên
 const EM = [
   em('11', 'Trần An', '12', '12 - Tinh Hoa', [n(NGAY[0]!, 0, 30, { nguonMuc: 'tang-gan-nhat', tang: 2, cheDo: 'hanh-trinh' }), n(NGAY[1]!, 3, 36, { mucUocTinh: false, nguonMuc: 'da-chot', tang: 3, cheDo: 'hanh-trinh' }), n(NGAY[2]!, 0, 36)]),
   em('31', 'Vũ Phương', '10', '10 - Nền tảng', [n(NGAY[0]!, 20), n(NGAY[1]!, 0), n(NGAY[2]!, 5)]),
@@ -146,7 +148,7 @@ describe('thẻ Bài hằng ngày', () => {
     const { container } = render(<TheBaiHangNgay />)
     await waitFor(() => expect(tenHang(container)).toEqual(['Trần An', 'Vũ Phương', 'Lê Bình', 'Phạm Chi']))
     const vung = screen.getByRole('region', { name: /^Bài hằng ngày/ })
-    expect(vung.querySelector('.gvv2-cc-tom')?.textContent).toBe('3/4 em thiếu ít nhất một ngày · từ 12/10 đến 14/10 (3 ngày)')
+    expect(vung.querySelector('.gvv2-cc-tom')?.textContent).toBe('3/4 em thiếu ít nhất một ngày đã qua · 3 em chưa đủ mức hôm nay · từ 12/10 đến 14/10 (3 ngày)')
     expect([...container.querySelectorAll('thead th')].map((t) => t.textContent)).toEqual([
       'Học sinh · 4 em', '12/10T2', '13/10T3', '14/10Hôm nay', 'Số ngày thiếu', 'Câu thiếu', 'Ngày thiếu nhiều nhất',
     ])
@@ -156,17 +158,17 @@ describe('thẻ Bài hằng ngày', () => {
     expect(o(hang[1]!)).toEqual([['20/24', 'thieu-it'], ['0/24', 'khong-lam'], ['5/24', 'thieu-nhieu']])
     expect(o(hang[3]!)).toEqual([['24/24', 'du'], ['30/24', 'du'], ['24/24', 'du']])
     expect(hang[0]!.querySelectorAll('.gvv2-bhn-o')[2]!.getAttribute('data-hom-nay')).toBe('true')
-    expect([...hang[0]!.querySelectorAll('.gvv2-bhn-tong')].map((x) => x.textContent)).toEqual(['3/3 ngày', '99 câu', '14/10 · thiếu 36 câu'])
+    expect([...hang[0]!.querySelectorAll('.gvv2-bhn-tong')].map((x) => x.textContent)).toEqual(['2/2 ngày', '63 câu', '13/10 · thiếu 33 câu'])
     expect(hang[3]!.querySelectorAll('.gvv2-bhn-tong')[2]!.textContent).toBe('Không thiếu ngày nào')
     // màu không là kênh duy nhất: câu đầy đủ cho trình đọc màn hình
     expect(hang[0]!.querySelectorAll('.gvv2-bhn-o')[1]!.getAttribute('title')).toBe('Thứ Ba 13/10: đã làm 3/36 câu — thiếu 33 câu')
     expect(hang[0]!.querySelectorAll('.gvv2-bhn-o')[0]!.getAttribute('title')).toBe('Thứ Hai 12/10: đã làm 0/30 câu — thiếu 30 câu · mức ước tính')
     expect(container.textContent).toContain('11/12 ô dùng mức ước tính')
     expect([...container.querySelectorAll('.gvv2-bhn-mau li')].map((x) => x.textContent)).toEqual([
-      'Đủ mức', 'Thiếu ít (đạt từ 50% mức)', 'Thiếu nhiều (dưới 50% mức)', 'Không làm câu nào', 'Hôm nay (tính tới lúc tải)',
+      'Đủ mức', 'Thiếu ít (đạt từ 50% mức)', 'Thiếu nhiều (dưới 50% mức)', 'Không làm câu nào', 'Hôm nay (tính tới lúc tải, chưa cộng vào tổng)',
     ])
     // mỗi em MỘT nút (≥ 48 px theo CSS), nhãn đọc được
-    expect(screen.getByRole('button', { name: 'Trần An, SBD 11: thiếu 3 ngày, 99 câu — xem hồ sơ làm bài' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Trần An, SBD 11: thiếu 2 ngày, 63 câu; hôm nay còn thiếu 36 câu — xem hồ sơ làm bài' })).toBeTruthy()
   })
 
   it('bấm đầu cột một ngày ⇒ em thiếu nhiều câu nhất ngày ấy lên đầu; "Xếp lại theo tổng" trả về thứ tự chung', async () => {

@@ -57,16 +57,19 @@ export interface EmBaiHangNgay {
   khoi: string
   /** Từ `tu` đến `den`, cũ → mới, đúng thứ tự `KetQuaBaiHangNgay.ngay`. */
   ngay: NgayBaiEm[]
-  /** Số ngày chưa đủ mức (gồm hôm nay khi hôm nay còn thiếu). */
+  /** Số ngày ĐÃ QUA chưa đủ mức. Hôm nay chưa hết ngày ⇒ KHÔNG tính vào ba số tổng dưới (ô hôm nay vẫn hiện số tới lúc tải). */
   soNgayThieu: number
-  /** Tổng số câu còn thiếu so với mức qua mọi ngày. */
+  /** Tổng số câu còn thiếu so với mức qua các ngày đã qua. */
   tongCauThieu: number
-  /** Ngày thiếu nhiều câu nhất (hoà ⇒ ngày gần đây hơn); không thiếu ngày nào ⇒ null. */
+  /** Ngày đã qua thiếu nhiều câu nhất (hoà ⇒ ngày gần đây hơn); không thiếu ngày nào ⇒ null. */
   ngayThieuNhieuNhat: { ngay: string; thieu: number } | null
+  /** Số ngày đủ mức (gồm hôm nay khi hôm nay đã đủ). */
   soNgayDu: number
-  /** Số ngày không làm câu nào (`daLam = 0`). */
+  /** Số ngày đã qua không làm câu nào (`daLam = 0`). */
   soNgayKhongLam: number
   tongDaLam: number
+  /** Số câu còn thiếu HÔM NAY tới lúc tải (hôm nay ngoài khoảng ⇒ 0) — chỉ để xếp khi hoà. */
+  thieuHomNay: number
 }
 
 export interface LopBaiHangNgay {
@@ -75,7 +78,7 @@ export interface LopBaiHangNgay {
   soEm: number
 }
 
-/** Em xếp: `soNgayThieu` giảm dần → `tongCauThieu` giảm dần → họ tên (tiếng Việt) → SBD. */
+/** Em xếp: `soNgayThieu` giảm dần → `tongCauThieu` giảm dần → `thieuHomNay` giảm dần → họ tên (tiếng Việt) → SBD. */
 export interface KetQuaBaiHangNgay {
   ok: true
   tu: string

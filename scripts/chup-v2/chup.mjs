@@ -81,6 +81,26 @@ const DS = [
   ['14-gv-ho-so-em-dien-thoai', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
   ['14-gv-ho-so-em-dien-thoai-toi', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'ho-so:Trần Đức Huy'],
   ['14-gv-ho-so-em-lich-su-dien-thoai', 'gv-nhip&the=nhip&khoi=12', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'ho-so-ls:Trần Đức Huy'],
+  // ---------------------------------------------------------------- LÀN GIÁO VIÊN 12/10: Hành trình › Bài hằng ngày (bảng nhiệt em × ngày,
+  // em thiếu nhiều ngày nhất đứng đầu) + tấm Hồ sơ làm bài trùng tu (nhãn thái độ + lý do bằng số, ô số, lịch, biểu đồ, sáu tín hiệu). Máy 1440×900,
+  // điện thoại 390×844, sáng + tối. `bhn:<hàng>|cuoi[:cuon|:tin-hieu]` = bấm em ở hàng ấy (`doi-pho` = hàng em "Có dấu hiệu đối phó" của bộ giả), cuộn thân
+  // tấm tới lịch + biểu đồ / sáu tín hiệu; `bhn-bang` = cuộn tới bảng (điện thoại).
+  ...['light', 'dark'].flatMap((nen) => {
+    const k = nen === 'dark' ? '-toi' : ''
+    return [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].flatMap(([w, hh, kho]) => [
+      [`40-gv-bai-hang-ngay-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'cho:em thiếu ít nhất một ngày'],
+      [`41-gv-ho-so-thai-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho'],
+      [`42-gv-ho-so-bieu-do-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cuon'],
+      [`43-gv-ho-so-tin-hieu-${kho}${k}`, 'gv-nhip&the=bai-hang-ngay', w, hh, nen, false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:tin-hieu'],
+    ])
+  }),
+  ['44-gv-ho-so-cham-chi-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:cuoi'],
+  ['45-gv-bai-hang-ngay-xep-hom-nay', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn-xep:Hôm nay'],
+  ['46-gv-hom-nay-loi-vao-bhn', 'gv-hom-nay', 1440, 900, 'light', false, /Hôm nay của thầy/],
+  ['47-gv-bai-hang-ngay-bang-dien-thoai', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'light', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
+  ['47-gv-bai-hang-ngay-bang-dien-thoai-toi', 'gv-nhip&the=bai-hang-ngay', 390, 844, 'dark', false, /Hành trình giỏi Hóa/, 'bhn-bang'],
+  ['48-gv-ho-so-cau-dung-may-tinh', 'gv-nhip&the=bai-hang-ngay', 1440, 900, 'light', false, /Hành trình giỏi Hóa/, 'bhn:doi-pho:cau-dung'],
+  // ---------------------------------------------------------------- hết LÀN GIÁO VIÊN 12/10
   ['14-gv-chien-dich-da-giao', 'gv-nhip&the=chien-dich', 1440, 960, 'light', false, /Chiến dịch đã giao/],
   ['14-gv-chien-dich-da-giao-dien-thoai-toi', 'gv-nhip&the=chien-dich', 390, 844, 'dark', true, /Chiến dịch đã giao/],
   ...['light', 'dark'].flatMap((nen) => [[390,844,'doc'],[844,390,'ngang'],[1440,900,'may-tinh']].flatMap(([w,h,k]) => [
@@ -175,6 +195,29 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
       await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
       if (viec.startsWith('ho-so-ls:')) await tam.getByRole('tab', { name: /Toàn bộ lịch sử/ }).click()
       await t.waitForTimeout(400)
+    } else if (viec?.startsWith('bhn:')) {
+      // LÀN GIÁO VIÊN 12/10: Bài hằng ngày › bấm nút em đầu / cuối bảng ⇒ tấm Hồ sơ làm bài; `:cuon` / `:tin-hieu` cuộn thân tấm tới khối ấy.
+      const [, viTri, cuon] = viec.split(':')
+      await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+      const hang = viTri === 'doi-pho' ? await t.evaluate(() => globalThis.__HANG_DOI_PHO ?? 1) : Number(viTri)
+      const nut = viTri === 'cuoi' ? t.locator('.gvv2-bhn-em').last() : t.locator('.gvv2-bhn-em').nth(Math.max(0, hang - 1))
+      await nut.click({ timeout: 20000 })
+      const tam = t.getByRole('dialog')
+      await tam.locator('.gvv2-tdo-dau').waitFor({ timeout: 20000 })
+      await tam.getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+      if (cuon === 'cau-dung') await tam.getByRole('tab', { name: /Câu đúng/ }).click()
+      // cuộn THÂN TẤM (không cuộn trang phía sau) tới khối cần chụp
+      const dich = { cuon: 'gvv2-tdo-lich-tieu', 'tin-hieu': 'gvv2-tdo-th-tieu', 'cau-dung': 'gvv2-hs-the-cau-dung' }[cuon ?? '']
+      if (dich) await t.evaluate((id) => { const el = document.getElementById(id); const than = el?.closest('.gvv2-hs-than'); if (el && than) than.scrollTop += el.getBoundingClientRect().top - than.getBoundingClientRect().top - 12 }, dich)
+      await t.waitForTimeout(400)
+    } else if (viec === 'bhn-bang') {
+      await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+      await t.evaluate(() => { const el = document.querySelector('.gvv2-bhn-cuon'); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 72) })
+      await t.waitForTimeout(300)
+    } else if (viec?.startsWith('bhn-xep:')) {
+      await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+      await t.locator('.gvv2-bhn-ngay-nut', { hasText: viec.slice(8) }).first().click({ timeout: 20000 })
+      await t.waitForTimeout(300)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {
