@@ -6,6 +6,7 @@ import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { danhDauDaNhan, layHoiSom, xemHoiSomDaVe } from '../../lib/hoi-som'
 import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
 import { laCauTuLuan } from '../../lib/cau-tu-luan'
+import { NHAN_NGUON_LAN, type NguonLanLam } from '../../lib/nhan-nguon-lan'
 import { chanCauTuLuan, choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
 import { docSanhOmni } from '../../lib/omni-hs'
 import { docTomTatGoi7, type TomTatGoi7 } from '../../lib/goi-bai-7'
@@ -91,9 +92,8 @@ export interface ChienDichCau {
   tong: number
 }
 export type TrangThaiCau = 'dang_on' | 'thanh_thao' | 'can_day_lai'
-/** Nơi em làm lần đó (máy chủ gắn): Bi-a Phản Ứng / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra / Lên bảng / Kiểm tra đầu giờ; nguồn khác hoặc bản máy chủ cũ ⇒ vắng. */
-export type NguonLanLam = 'bia' | 'doan' | 'dao' | 'thi' | 'len_bang' | 'dau_gio'
-export const NHAN_NGUON_LAN: Record<NguonLanLam, string> = { bia: 'Luyện tập trước đây', doan: 'Ôn theo kế hoạch', dao: 'Học theo kế hoạch', thi: 'Ca kiểm tra', len_bang: 'Lên bảng', dau_gio: 'Kiểm tra đầu giờ' }
+// Tên nguồn học sinh nhìn thấy: MỘT bộ ở `lib/nhan-nguon-lan.ts` (12/10, dùng chung với Tu luyện / Tự chữa lỗi) — xuất lại ở đây cho mọi chỗ cũ.
+export { NHAN_NGUON_LAN, type NguonLanLam }
 const laNguonLan = (x: unknown): x is NguonLanLam => typeof x === 'string' && Object.prototype.hasOwnProperty.call(NHAN_NGUON_LAN, x)
 export interface LanLam {
   ngay: string
