@@ -93,6 +93,16 @@ export function soHomNay(kq: KetQuaSanh | null | undefined, tienDoCu?: { daLam: 
   return { daLam, muc, chang, soChang }
 }
 
+/**
+ * Số hôm nay nhánh Gói 7 từ HAI con số máy chủ (đã làm, M) — đúng luật nhánh `goi7` của `soHomNay` (chặng = ⌈M/6⌉, đang ở chặng ⌊đã làm/6⌋ + 1).
+ * Màn làm bài dùng với số của `hoc-tap-start` (lúc mở chặng) và lệnh nhẹ `hoc-tap-dem` (sau mỗi câu) — không nạp lại cả sảnh sau mỗi câu.
+ */
+export function soHomNayGoi7(daLam: number, muc: number): SoHomNay | null {
+  if (!Number.isFinite(daLam) || daLam < 0 || !Number.isFinite(muc) || muc <= 0) return null
+  const soChang = Math.ceil(muc / CAU_MOI_CHANG)
+  return { daLam, muc, chang: Math.min(soChang, Math.floor(daLam / CAU_MOI_CHANG) + 1), soChang }
+}
+
 /** Số chặng đã xong hôm nay — cùng luật vạch chặng ở Hôm nay. */
 export function soChangXong(s: SoHomNay): number {
   return Array.from({ length: s.soChang }, (_, i) => s.daLam >= Math.min((i + 1) * CAU_MOI_CHANG, s.muc)).filter(Boolean).length

@@ -80,6 +80,8 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     soGoi += Number(rs[0]?.meta.changes ?? 0); soCau += Number(rs[1]?.meta.changes ?? 0); soEm += Number(rs[2]?.meta.changes ?? 0)
   }
   // Nạp lại chỉ mục đã duyệt: gói rỗng hồi phục, bản sửa được gặp lại; không sửa sổ trả lời.
+  // CHỈ GHI KHI ĐỔI (khẩn 12/10 22h30, số đo D1 thật: lệnh upsert này ghi ~1 triệu dòng/ngày — cron mỗi phút ghi lại y nguyên ~164 dòng/gói): dòng câu
+  // giống hệt bản mới ⇒ `DO UPDATE … WHERE` bỏ qua, câu đã mang hopLe=false ⇒ không ghi lại. Kết quả trong bảng y hệt trước.
   const active = await env.DB.prepare(`SELECT b.*,g.id goi_id FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE (?='' OR b.lop=?) ORDER BY g.bat_dau DESC LIMIT ?`).bind(lop,lop,Math.max(1,tran)).all<Row>()
   for (const b of active.results) {
     const cau = await cauTuTick7(env,b)
@@ -87,8 +89,9 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     if (!cau.length) continue
     const payload=JSON.stringify(cau),id=str(b.goi_id)
     await env.DB.batch([
-      env.DB.prepare(`UPDATE goi_bai_7_cau SET meta_json=json_set(meta_json,'$.hopLe',json('false')) WHERE goi_id=? AND qid NOT IN(SELECT json_extract(value,'$.qid') FROM json_each(?)) AND ${KHONG_CA}`).bind(id,payload),
-      env.DB.prepare(`INSERT INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(goi_id,qid) DO UPDATE SET version=excluded.version,ma_de=excluded.ma_de,meta_json=excluded.meta_json`).bind(id,payload),
+      env.DB.prepare(`UPDATE goi_bai_7_cau SET meta_json=json_set(meta_json,'$.hopLe',json('false')) WHERE goi_id=? AND qid NOT IN(SELECT json_extract(value,'$.qid') FROM json_each(?)) AND COALESCE(json_extract(meta_json,'$.hopLe'),1)<>0 AND ${KHONG_CA}`).bind(id,payload),
+      env.DB.prepare(`INSERT INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(goi_id,qid) DO UPDATE SET version=excluded.version,ma_de=excluded.ma_de,meta_json=excluded.meta_json
+        WHERE goi_bai_7_cau.version IS NOT excluded.version OR goi_bai_7_cau.ma_de IS NOT excluded.ma_de OR goi_bai_7_cau.meta_json IS NOT excluded.meta_json`).bind(id,payload),
     ])
   }
   // Em mới chuyển/đăng ký lớp cũng nhận bài, không tạo lại tiến độ của em cũ.
@@ -194,6 +197,32 @@ export async function chotMucNgay7(env: Env, sbd: string, ngay: string, tang: Ta
   return (await doc()) ?? moi
 }
 
+/** Câu ĐÃ LÀM hôm nay của em (Gói 7): câu có kết quả trong sổ (lướt / chỉ xem không tính) ∪ câu đã học có hướng dẫn hôm nay. MỘT nguồn cho `lapGoi7`
+ *  (sảnh, bắt đầu chặng) và lệnh nhẹ `hoc-tap-dem` — hai nơi luôn ra cùng một số. */
+export async function docDaLamNgay7(env: Env, sbd: string, ngay: string): Promise<Set<string>> {
+  const [done, guidedToday] = await Promise.all([
+    env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>(),
+    env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
+  ])
+  const daLamNgay = new Set(done.results.map(r=>r.qid))
+  for(const r of guidedToday.results)daLamNgay.add(r.qid)
+  return daLamNgay
+}
+/**
+ * LỆNH NHẸ `hoc-tap-dem` (khẩn 12/10 22h30 — thầy: "tối ưu triệt để máy chủ cho học sinh làm bài tập giờ cao điểm"). Số đo D1 thật 24 giờ: mỗi câu
+ * em nộp, màn làm bài gọi lại CẢ sảnh (`lapGoi7`: ~25 truy vấn, gồm đọc siêu dữ liệu ~1.800 dòng câu, ma trận kỹ năng, động cơ hành trình) chỉ để cập
+ * nhật ô "đã làm/M câu hôm nay". Lệnh này trả đúng hai con số ấy bằng 3 truy vấn có chỉ mục: đã làm = `docDaLamNgay7` (cùng hàm của `lapGoi7`), M = dòng
+ * đã chốt `goi_bai_7_muc_ngay` (chưa chốt ⇒ null, máy em giữ M lúc mở chặng). Chỉ đọc, không ghi.
+ */
+export async function demHomNay7(env: Env, sbd: string, now: number): Promise<Record<string, unknown>> {
+  const ngay = ngayVn7(now)
+  const [daLam, muc] = await Promise.all([
+    docDaLamNgay7(env, sbd, ngay),
+    env.DB.prepare('SELECT muc FROM goi_bai_7_muc_ngay WHERE sbd=? AND ngay=?').bind(sbd, ngay).first<Row>().catch(() => null),
+  ])
+  const m = muc ? Number(muc.muc) : NaN
+  return { ok: true, ngay, daLamHomNay: daLam.size, toiThieu: Number.isFinite(m) && m > 0 ? m : null }
+}
 export async function lapGoi7(env: Env, sbd: string, now: number) {
   const goi = await docGoiCuaEm7(env,sbd,now)
   if (!goi.length) return null
@@ -216,10 +245,7 @@ export async function lapGoi7(env: Env, sbd: string, now: number) {
   if (control.types.length) for (const c of hs.cau) if (!c.dang || !control.types.includes(c.dang)) chan.add(c.qid)
   const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan)
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
-  const done=await env.DB.prepare(`SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}`).bind(sbd,ngay).all<{qid:string}>()
-  const daLamNgay = new Set(done.results.map(r=>r.qid))
-  const guidedToday=await env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>()
-  for(const r of guidedToday.results)daLamNgay.add(r.qid)
+  const daLamNgay = await docDaLamNgay7(env,sbd,ngay)
   const [views,teacherCorrections]=await Promise.all([
     env.DB.prepare('SELECT DISTINCT qid FROM loi_giai_hoi WHERE sbd=? AND julianday(luc)>=julianday(?)-0.5').bind(sbd,new Date(now).toISOString()).all<{qid:string}>(),
     env.DB.prepare('SELECT goi_id,qid,version FROM goi_bai_7_chua WHERE goi_id IN(SELECT value FROM json_each(?))').bind(JSON.stringify(goi.map(g=>g.id))).all<Row>(),

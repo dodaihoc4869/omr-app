@@ -272,7 +272,7 @@ const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 /** Lệnh game được chạy lượt đọc "cổng đóng băng" (reset) SONG SONG khi đệm cổng vừa hết hạn (index.ts, tối ưu 05/10): chỉ các lệnh CHỈ chạm D1 qua `env.DB`
  *  (rào ghi chặn được mọi lệnh ghi). KHÔNG gồm Bi-a (phòng đấu Durable Object), võ đài/phòng cũ — các lệnh ấy vẫn chờ cổng trước như cũ. */
-export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
+export const laLenhCongSongSong=(action:string):boolean=>['hoc-tap-gap','hoc-tap-dem','hoc-tap-kiem-start','hoc-tap-kiem-nop','hoc-tap-sanh','hoc-tap-start','hoc-tap-cau-da-lam','hoc-tap-cau-chi-tiet','sync','resume','start','answer','complete','profile','recommendations','academic-sync','so-tay','progress-history'].includes(action)||LENH_HOA2.has(action)||LENH_SHOP.has(action)||action.startsWith('doan-')
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // Rào ghi (index.ts, tối ưu 05/10): đệm cổng đóng băng vừa hết hạn ⇒ lượt đọc cổng chạy song song, mọi lệnh GHI của lệnh này chờ cổng. Lệnh nội bộ
   // (Đoàn gọi `answer`) dùng lại đúng bản gộp đọc của lượt ngoài (đã có rào) ⇒ không bọc lần nữa.
@@ -387,11 +387,15 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // theo KHỐI nên với em khối 12 là no-op; sửa theo tên lớp làm nó chạy thật ⇒ quá tải. Bài mới vẫn vào gói: cron mỗi phút của Worker (index.ts)
       // + trang thầy Bài mới 7 ngày (`gvGoi7`) + bước phát hành `ap-goi7-song`. Em mới mở app chậm nhất ~1 phút sau khi thầy tick là thấy bài.
       if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
+      // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
+      if(action==='hoc-tap-dem')return g7.demHomNay7(env,sbd,Date.now())
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now());if(r7)return r7}
       if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
       if(action==='hoc-tap-kiem-start'||action==='hoc-tap-kiem-nop')return import('./goi-bai-7-kiem').then(m=>m.kiemGoi7(env,sbd,action,b,Date.now()))
     }
 
+    // Gói 7 tắt ⇒ không có số Gói 7 (máy em giữ số của sảnh, không bịa).
+    if(action==='hoc-tap-dem')return {ok:true,daLamHomNay:null,toiThieu:null}
     if(!await cheDo2(env,sbd)){
       if(action==='hoc-tap-start')return gameV2(env,'start',{...b,mode:'adventure'},ctx)
       return {ok:true,cheDo2:false}

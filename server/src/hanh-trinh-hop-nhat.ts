@@ -73,7 +73,10 @@ async function docKhoHanhTrinh(env: Env) {
 export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ trangThai: string; soChienDich?: number }> {
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return { trangThai: 'cho_het_ca' }
   const truoc = await env.DB.prepare('SELECT gia_tri,cap_nhat_luc FROM cau_hinh WHERE khoa=?').bind(KHOA_HANH_TRINH).first<Row>()
-  if (truoc && nowMs - Date.parse(String(truoc.cap_nhat_luc)) < 5 * 60_000) return { trangThai: 'da_cap_nhat' }
+  // Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 22h30, số đo D1 thật): mỗi lượt quét CẢ kho (~16 trang × 1.000 câu kèm JSON, ~0,9 giây D1) rồi ghi lại ba
+  // dòng chiến dịch lớn ⇒ 20 phút/lượt thay vì 5. Em mới / câu mới vào hành trình chậm nhất 20 phút; ngoài giờ cao điểm như cũ.
+  const chuKy = new Date(nowMs + 7 * 3_600_000).getUTCHours() >= 20 ? 20 : 5
+  if (truoc && nowMs - Date.parse(String(truoc.cap_nhat_luc)) < chuKy * 60_000) return { trangThai: 'da_cap_nhat' }
   await chayDdlMotLan(env, 'hanh_trinh_v3', SQL_BANG_HANH_TRINH)
   const [marker, cd, hs, kho] = await Promise.all([
     env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa=?').bind(KHOA_HANH_TRINH).first<Row>(),
