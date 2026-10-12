@@ -852,7 +852,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
       });
       h += '</span></article>';
     });
-    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt game cũ chưa đo giờ — thời gian ước tính từ lúc trả lời câu trước tới câu này.</p>' : '');
+    h += '</div></section>' + (coUoc ? '<p class="mc-sai-chu">≈ : lượt cũ chưa đo giờ — thời gian ước tính từ lúc trả lời câu trước tới câu này.</p>' : '');
     sai.insertAdjacentHTML('beforeend', h);
     // Thanh / cột mọc lên sau một nhịp (tắt khi giảm chuyển động — CSS lo).
     requestAnimationFrame(function () {

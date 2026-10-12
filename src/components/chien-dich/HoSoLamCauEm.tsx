@@ -351,7 +351,7 @@ function PhanBoGiay({ td }: { td: KetQuaHoSoThaiDo }) {
       <p className="gvv2-tdo-giay-ghi">
         <span className="gvv2-tdo-giay-mau" aria-hidden="true" />
         Phần thanh cùng màu ô này là lượt quá nhanh: dưới {NGUONG_THAI_DO.giayNhanhTracNghiem} giây với câu trắc nghiệm, dưới {NGUONG_THAI_DO.giayNhanhTuTinh}{' '}
-        giây với câu tự tính. Số giây gồm cả ước tính ở lượt game cũ.
+        giây với câu tự tính. Số giây gồm cả ước tính ở lượt cũ chưa đo giờ.
       </p>
     </>
   )
