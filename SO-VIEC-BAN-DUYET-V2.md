@@ -145,4 +145,5 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học s
 - [x] Vẽ bản duyệt: Hôm nay của thầy có Nhịp học (thấy ngay em chăm / em lười) | bằng chứng: artifact 13511ZX2Q9tamm65z5JDRu — khung Main (máy tính) + HomNay-DienThoai: thanh 262 em Chăm/Chưa đều/Lười, ô Đối phó, Lười nhất · Chăm nhất có dải 12 ngày, Theo lớp.
 - [ ] Chờ thầy duyệt bản vẽ — CHƯA BUILD | bằng chứng: (chưa có)
 - [ ] Build theo bản đã duyệt + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
+- [x] Thầy nhắn thêm: "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn nhé" ⇒ bản vẽ: nút "Chiếu lên bảng", mỗi câu gợi ý em làm sai (có mặt) để gọi lên bảng, Đạt / Chưa đạt ghi sổ; khung ToChieu-ChuaCauKho (1920×1080, đã gọi em: cột 1/3 đen + thẻ tên) | bằng chứng: artifact 13511ZX2Q9tamm65z5JDRu bản 6. BUILD: chờ thầy duyệt.
 - [ ] Thầy nhắn thêm: "dữ liệu phần này tính từ 1/10 cho tôi nhé." (ảnh tấm Hồ sơ làm bài) ⇒ đổi mốc 12/10 → 1/10 cho Bài hằng ngày, Hồ sơ làm bài, app phụ huynh | bằng chứng: (đang làm)
