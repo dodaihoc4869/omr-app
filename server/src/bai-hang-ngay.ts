@@ -426,7 +426,7 @@ export function tinhThaiDo(a: {
     ma: 'ngay-du-muc', ten: 'Ngày đủ mức', tu: du, mau: tinh.length, giaTri: pA,
     muc: tinh.length < NG.soNgayToiThieu ? 'chua-du' : pA! >= NG.ngayDuTot ? 'tot' : pA! >= NG.ngayDuChuY ? 'chu-y' : 'xau',
     chu: tinh.length ? `Đủ mức ${du}/${tinh.length} ngày (${pA}%)` : 'Chưa có ngày nào đã hết để tính',
-    nguong: `Tốt từ ${NG.ngayDuTot}% · chú ý ${NG.ngayDuChuY}–${NG.ngayDuTot - 1}% · dưới ${NG.ngayDuChuY}% là chưa đều; cần ít nhất ${NG.soNgayToiThieu} ngày`,
+    nguong: `Chăm từ ${NG.ngayDuTot}% · Lười từ ${NG.ngayDuLuoi}% trở xuống hoặc ${NG.ngayLienKhongLam} ngày liền không làm · ở giữa là chưa đều; cần ít nhất ${NG.soNgayToiThieu} ngày`,
   })
   // (b) quá nhanh
   const coGiay = a.luot.filter((l) => l.giay !== null)
@@ -489,11 +489,20 @@ export function tinhThaiDo(a: {
     chu: `7 ngày gần nhất đúng ${dGan ?? '—'}${dGan !== null ? '%' : ''} (${gan.length} lượt) · trước đó ${dTruoc ?? '—'}${dTruoc !== null ? '%' : ''} (${truoc.length} lượt)${chenh !== null ? ` · ${chenh >= 0 ? 'tăng' : 'giảm'} ${Math.abs(chenh)} điểm %` : ''}`,
     nguong: `Đáng lo khi giảm từ ${NG.giamXau} điểm % · chú ý khi giảm từ ${NG.giamChuY}; mỗi bên cần ít nhất ${NG.soLuotXuHuongToiThieu} lượt`,
   })
-  return { tinHieu: t, ketLuan: ketLuanThaiDo(t) }
+  // Chuỗi ngày liền không làm câu nào dài nhất — chỉ ngày ĐÃ HẾT (hôm nay chưa hết không tính), cùng phép đếm Nhịp học ở Hôm nay.
+  let chuoi = 0
+  for (let i = 0, dai = 0; i < a.ngay.length; i++) {
+    const n = a.ngay[i]!
+    if (n.homNay) continue
+    dai = n.daLam > 0 ? 0 : dai + 1
+    if (dai > chuoi) chuoi = dai
+  }
+  return { tinHieu: t, ketLuan: ketLuanThaiDo(t, chuoi) }
 }
 
 /** Luật kết luận `LUAT_KET_LUAN` (kieu). Lý do luôn bằng số. */
-export function ketLuanThaiDo(t: readonly TinHieuThaiDo[]): KetLuanThaiDo {
+/** `chuoiKhongLam` = số ngày liền không làm câu nào dài nhất (ngày đã hết) — nhánh "Lười" (cùng luật Nhịp học ở Hôm nay). */
+export function ketLuanThaiDo(t: readonly TinHieuThaiDo[], chuoiKhongLam = 0): KetLuanThaiDo {
   const m = (ma: TinHieuThaiDo['ma']) => t.find((x) => x.ma === ma)!
   const xau = (x: TinHieuThaiDo) => x.muc === 'xau'
   const khongTot = (x: TinHieuThaiDo) => x.muc === 'xau' || x.muc === 'chu-y'
@@ -503,6 +512,10 @@ export function ketLuanThaiDo(t: readonly TinHieuThaiDo[]): KetLuanThaiDo {
   const tra = (nhan: KetLuanThaiDo['nhan'], ds: readonly TinHieuThaiDo[], them: string[] = []): KetLuanThaiDo => ({ nhan, chu: TEN_NHAN_THAI_DO[nhan], lyDo: [...ds.map(lyDo), ...them] })
   if (doiPho.length) return tra('doi-pho', [...doiPho, ...(xau(d) && khongTot(f) ? [f] : [])], a.muc !== 'chua-du' ? [lyDo(a)] : [])
   if (a.muc === 'chua-du') return tra('chua-du-du-lieu', [a], [`Cần ít nhất ${NG.soNgayToiThieu} ngày đã hết để kết luận.`])
+  // Lười — so số nguyên như `nhomTheoLuat` (src/lib/nhip-hoc-thay.ts): du × 100 ≤ 40 × số ngày.
+  if (a.tu * 100 <= NG.ngayDuLuoi * a.mau || chuoiKhongLam >= NG.ngayLienKhongLam) {
+    return tra('luoi', [a], chuoiKhongLam >= NG.ngayLienKhongLam ? [`${chuoiKhongLam} ngày liền không làm câu nào.`] : [])
+  }
   if (a.muc !== 'tot' || xau(c)) return tra('chua-deu', [a, ...(xau(c) ? [c] : [])])
   const khongDau = [b, e, d].filter((x) => x.muc !== 'chua-du').map((x) => x.ten.toLocaleLowerCase('vi'))
   return tra('cham-chi', [a], khongDau.length ? [`Không có dấu hiệu đối phó (${khongDau.join(', ')} trong ngưỡng).`] : [])
