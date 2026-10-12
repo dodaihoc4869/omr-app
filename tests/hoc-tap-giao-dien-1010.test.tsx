@@ -15,7 +15,8 @@ it('màn chính dùng dữ liệu kế hoạch, không có cửa game hoặc đ�
   // Trùng tu 11/10: tên tầng ngắn + "Chặng" (bảng từ chuẩn A2 cấm "đợt").
   expect(screen.getByText('Nền · Chặng 2/4')).toBeTruthy()
   expect(screen.queryByText(/Bát Linh|Bi-a|Thần thú|Cửa hàng|Hộ Tống/i)).toBeNull()
-  fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục học' })); expect(hoc).toHaveBeenCalledOnce()
+  // SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10: "gộp hai phần làm một"): nút học duy nhất của thẻ "Hôm nay của em" ghi số câu còn lại ("Học tiếp · 18 câu").
+  fireEvent.click(screen.getByRole('button', { name: 'Học tiếp · 18 câu' })); expect(hoc).toHaveBeenCalledOnce()
   fireEvent.click(screen.getByRole('button', { name: 'Ôn & sửa' })); expect(screen.getByRole('button', { name: /Tự chữa lỗi/ })).toBeTruthy()
 })
 it('trước nộp không có đáp án, sau nộp dùng phản hồi máy chủ; nháp không mất khi lỗi', async () => {

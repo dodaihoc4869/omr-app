@@ -222,7 +222,8 @@ describe('StudentPortalScreen thật: giao diện học tập tập trung', () =
     expect(container.querySelector('.bnv')).toBeNull()
     expect(goiTheo('/game-v2/hoc-tap-sanh')[0].body).toEqual({ token: 'test-token' })
     expect(screen.queryByRole('button', {name:/Thần thú|Bi-a|Cửa hàng/})).toBeNull()
-    fireEvent.click(screen.getByRole('button', {name:'Tiếp tục học'}))
+    // SỬA CÓ CHỦ ĐÍCH 12/10 (thầy 12/10: "gộp hai phần làm một"): nút học duy nhất ghi số câu còn lại ("Học tiếp · N câu").
+    fireEvent.click(screen.getByRole('button', {name:/^Học tiếp · \d+ câu$/}))
     await waitFor(() => expect(goiTheo('/game-v2/hoc-tap-start').length).toBeGreaterThan(0))
     expect(localStorage.getItem('game-v2:man-dau')).toBeNull()
   })
@@ -238,7 +239,7 @@ describe('StudentPortalScreen thật: giao diện học tập tập trung', () =
     ghiNhoKetQuaSanh('test',docSanh(SANH)!)
     tra['/game-v2/hoc-tap-sanh']={nem:true}
     render(<StudentPortalScreen />)
-    expect(screen.getByRole('button',{name:'Tiếp tục học'})).toBeTruthy()
+    expect(screen.getByRole('button',{name:/^Học tiếp · \d+ câu$/})).toBeTruthy() // 12/10: "gộp hai phần làm một" — nút ghi số câu còn lại
     expect(docNhoKetQuaSanh('test')).toBeTruthy()
   })
 })
