@@ -84,9 +84,33 @@ const DS_CB = [
 const DS_HT2 = ['light', 'dark'].flatMap((nen) => [[1440, 900, 'may-tinh'], [390, 844, 'dien-thoai']].map(([w, hh, kho]) =>
   [`60-ht2-day-hoc-${kho}${nen === 'dark' ? '-toi' : ''}`, 'gv-nhip&ht2=1', w, hh, nen, true, /Hành trình giỏi Hóa/, 'cho:58 em']))
 // ═══════════ hết LÀN HÀNH TRÌNH 12/10B ═══════════
+// ═══════════ LÀN HÔM NAY 12/10B: Hôm nay của thầy theo bản vẽ thầy duyệt 12/10 — hàng thẻ Việc cần thầy + khối Nhịp học (262 em × 12 ngày, ═══════════
+// gia/nhip-hoc.ts). Máy 1440×900 + điện thoại 390×844 TOÀN TRANG, sáng + tối; thêm thao tác `hn:<việc>`: Xem đủ em lười · lọc Khối 12 · bấm em ⇒ tấm hồ
+// sơ · bảng từng ngày · thẻ Chăm / Đối phó (điện thoại) · lỗi (`nh=loi`) · chưa có em (`nh=trong`). Chạy riêng: tiền tố "6" (60-…67-).
+const DS_HN = [
+  ...['light', 'dark'].flatMap((nen) => {
+    const t = nen === 'dark' ? '-toi' : ''
+    return [
+      [`60-hn-may-tinh${t}`, 'gv-hom-nay&nh=1', 1440, 900, nen, true, /Hôm nay của thầy/, 'hn:cho'],
+      [`61-hn-dien-thoai${t}`, 'gv-hom-nay&nh=1', 390, 844, nen, true, /Hôm nay của thầy/, 'hn:cho'],
+    ]
+  }),
+  ['62-hn-xem-du-luoi-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:xem-du-luoi'],
+  ['63-hn-loc-khoi-12-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', true, /Hôm nay của thầy/, 'hn:khoi-12'],
+  ['63-hn-loc-khoi-12-may-tinh-toi', 'gv-hom-nay&nh=1', 1440, 900, 'dark', true, /Hôm nay của thầy/, 'hn:khoi-12'],
+  ['64-hn-ho-so-em-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:ho-so'],
+  ['64-hn-ho-so-em-dien-thoai-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', false, /Hôm nay của thầy/, 'hn:ho-so'],
+  ['65-hn-bang-tung-ngay-may-tinh', 'gv-hom-nay&nh=1', 1440, 900, 'light', false, /Hôm nay của thầy/, 'hn:bang'],
+  ['66-hn-dien-thoai-tab-cham', 'gv-hom-nay&nh=1', 390, 844, 'light', true, /Hôm nay của thầy/, 'hn:tab-cham'],
+  ['66-hn-dien-thoai-tab-doi-pho-toi', 'gv-hom-nay&nh=1', 390, 844, 'dark', true, /Hôm nay của thầy/, 'hn:tab-doi-pho'],
+  ['67-hn-loi-dien-thoai', 'gv-hom-nay&nh=loi', 390, 844, 'light', false, /Hôm nay của thầy/, 'hn:loi'],
+  ['67-hn-chua-co-em-may-tinh-toi', 'gv-hom-nay&nh=trong', 1440, 900, 'dark', false, /Hôm nay của thầy/, 'hn:trong'],
+]
+// ═══════════ hết LÀN HÔM NAY 12/10B ═══════════
 
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
+  ...DS_HN, // LÀN HÔM NAY 12/10B
   ...DS_HS12, // LÀN HỌC SINH 12/10
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
   ...DS_CB, // LÀN CHỮA BÀI 12/10B
@@ -365,6 +389,34 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
           await t.waitForTimeout(k === 'l' ? 2600 : 600)
         }
       }
+    } else if (viec?.startsWith('hn:')) {
+      // LÀN HÔM NAY 12/10B: chờ khối Nhịp học có em rồi làm đúng một việc (ảnh toàn trang không cần cuộn; ảnh khung nhìn cuộn trang tới khối cần chụp).
+      const v = viec.slice(3)
+      const cuonToi = (chon) => t.evaluate((c) => { const el = document.querySelector(c); if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - (innerWidth < 900 ? 72 : 16)) }, chon)
+      if (v === 'loi') await t.getByText(/Chưa tải được Nhịp học/).first().waitFor({ timeout: 20000 })
+      else if (v === 'trong') await t.getByText(/Chưa có em nào nhận bài hằng ngày/).first().waitFor({ timeout: 20000 })
+      else {
+        await t.locator('.nht-em').first().waitFor({ timeout: 20000 })
+        if (v === 'xem-du-luoi') {
+          // mở rộng tại chỗ (đợt đầu 50 em) rồi cuộn tới ô tìm của cột — ảnh khung nhìn (toàn trang quá dài cho ảnh ≤ 150 KB)
+          await t.getByRole('button', { name: /^Xem đủ \d+ em lười/ }).click()
+          await t.getByRole('button', { name: 'Thu gọn' }).waitFor({ timeout: 20000 })
+          await cuonToi('.nht-cot[data-kieu="luoi"]')
+        }
+        if (v === 'khoi-12') await t.getByRole('radio', { name: /^Khối 12/ }).click()
+        if (v === 'ho-so') {
+          await t.locator('.nht-em').first().click()
+          await t.getByRole('dialog').getByText('Số lượt làm câu').waitFor({ timeout: 20000 })
+        }
+        if (v === 'bang') {
+          await t.getByRole('button', { name: /Xem bảng từng ngày/ }).click()
+          await t.locator('.gvv2-bhn-em').first().waitFor({ timeout: 20000 })
+          await cuonToi('#nht-bang')
+        }
+        if (v === 'tab-cham') await t.getByRole('tab', { name: /^Chăm/ }).click()
+        if (v === 'tab-doi-pho') await t.getByRole('tab', { name: /^Đối phó/ }).click()
+      }
+      await t.waitForTimeout(400)
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })
     } else if (viec?.startsWith('bam:')) {

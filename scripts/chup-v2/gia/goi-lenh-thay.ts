@@ -8,6 +8,7 @@ import { goi7Gia } from './goi-bai-7' // LÀN BÀI MỚI 7 NGÀY 12/10
 import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/10
 import { traLoiChuaBai } from './chua-bai' // LÀN CHỮA BÀI 12/10B
 import { traLoiHt2 } from './hanh-trinh-2-muc' // LÀN HÀNH TRÌNH 12/10B
+import { baiHangNgayTuNhip, hoSoTuNhip, laCanhNhipHoc, nhipHocGia, tenEmNhip } from './nhip-hoc' // LÀN HÔM NAY 12/10B
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -67,6 +68,16 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
       },
     }
   }
+  // ---------------------------------------------------------------- LÀN HÔM NAY 12/10B (gia/nhip-hoc.ts): Hôm nay › Nhịp học (262 em × 12 ngày)
+  // + bảng từng ngày + tấm hồ sơ CÙNG bộ em; ba lệnh sau chỉ đổi khi cảnh có `&nh=…` (cảnh của làn khác giữ dữ liệu của làn ấy).
+  if (duong === '/gv/nhip-hoc') return nhipHocGia()
+  if (laCanhNhipHoc()) {
+    if (duong === '/gv/bai-hang-ngay') return { ok: true as const, du: baiHangNgayTuNhip() as unknown as Record<string, unknown> }
+    if (duong === '/gv/ho-so-thai-do') return { ok: true as const, du: hoSoTuNhip(String(b.sbd)) as unknown as Record<string, unknown> }
+    const ten = tenEmNhip(String(b.sbd))
+    if (duong === '/gv/lich-su-lam-cau' && ten) return { ok: true as const, du: lichSuGia(String(b.sbd), ten) as unknown as Record<string, unknown> }
+  }
+  // ---------------------------------------------------------------- hết LÀN HÔM NAY 12/10B
   // ---------------------------------------------------------------- LÀN GIÁO VIÊN 12/10 (gia/bai-hang-ngay.ts): Hành trình › Bài hằng ngày +
   // tấm Hồ sơ làm bài (hồ sơ thái độ + lịch sử làm câu đúng tên em của bảng). Dữ liệu giả, tên giả.
   if (duong === '/gv/bai-hang-ngay') return { ok: true as const, du: baiHangNgayGia() as unknown as Record<string, unknown> }

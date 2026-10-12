@@ -150,10 +150,11 @@ export function xepEmBaiHangNgay(a: EmBaiHangNgay, b: EmBaiHangNgay): number {
 }
 
 // ------------------------------------------------------------------ ĐỌC SỔ THEO LÔ
-interface EmGoc { sbd: string; hoTen: string; lop: string; khoi: string; goi7Tu: string | null }
+/** Em của danh sách Bài hằng ngày (xuất cho `/gv/nhip-hoc` dùng chung — nhip-hoc.ts). */
+export interface EmGoc { sbd: string; hoTen: string; lop: string; khoi: string; goi7Tu: string | null }
 
 /** Lỗi đọc sổ chính — cả lệnh trả lỗi (không trả số sai). */
-class LoiDocSo extends Error {}
+export class LoiDocSo extends Error {}
 
 export const SQL_DEM_GOI7 = `SELECT sbd, ngay_vn AS ngay, COUNT(DISTINCT qid) AS n FROM su_kien_hoc
   WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn BETWEEN ?2 AND ?3 AND ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}
@@ -195,7 +196,7 @@ export function khoangDocTheoCheDo(lo: readonly Pick<EmGoc, 'goi7Tu'>[], tu: str
 }
 
 /** Dãy ngày (mức + đã làm) của các em, đọc theo lô. Ném `LoiDocSo` khi không đọc được sổ chính. */
-async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: string, homNay: string, canhBao: string[]): Promise<Map<string, NgayBaiEm[]>> {
+export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: string, homNay: string, canhBao: string[]): Promise<Map<string, NgayBaiEm[]>> {
   const ngay = cacNgay(tu, den)
   const ra = new Map<string, NgayBaiEm[]>()
   const baoMot = (chu: string) => { if (!canhBao.includes(chu)) canhBao.push(chu) }
@@ -289,7 +290,7 @@ async function docHoSoLop(env: Env): Promise<{ hs: Row[]; ds: Row[] } | null> {
   return { hs: hs ?? [], ds: ds ?? [] }
 }
 
-async function docDanhSachEm(env: Env, canhBao: string[]): Promise<EmGoc[] | null> {
+export async function docDanhSachEm(env: Env, canhBao: string[]): Promise<EmGoc[] | null> {
   const [lop, cd, goi7] = await Promise.all([
     docHoSoLop(env),
     hoi(env, "SELECT id, sbd_json FROM chien_dich WHERE trang_thai = 'dang_chay' AND id LIKE 'hanh-trinh-v3-khoi-%'"),
