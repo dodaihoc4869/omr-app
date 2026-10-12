@@ -12,6 +12,9 @@
 // "Theo điểm danh:" (buổi đang mở + tối đa 3 buổi gần nhất của từng lớp, `buoiGanDay`) + chip "Cả lớp". Gửi `sbd` (chia về đúng lớp của em) trong CẢ `xem-truoc` lẫn
 // `tick`; chưa có danh sách em ⇒ giữ hành vi cũ (giao cả lớp, không gửi `sbd`). Bài đã tick: "Đã giao N em" + "Sửa em" (hộp sửa chiến dịch sẵn có).
 // Chữ: bảng A2 (app thầy dùng "lượt/ngày", không "thể lực"); chủ ngữ chữ MỚI là "A.I Đỗ Đại Học" (omni-chu.ts). Kiểu dáng: `bai-hom-nay.css` (chỉ biến màu --bts-*).
+// ĐỢT 16 (12/10, thầy: "tick chọn bài cũng vậy" — mở lại là mất bài đang chọn): bài đang chọn giữ theo KHOÁ BÀI + khối (`chonNho`), bài hiện ra suy từ cây
+// đang có ⇒ kho / danh sách lớp về muộn không xoá; chỉ bỏ khi thầy đổi sang lớp KHÁC KHỐI thật, và báo. Lớp tự chọn + bài đang chọn được bảng Dạy học nhớ theo
+// buổi (`lopTay`, `chonNho`, `datNho`) ⇒ mở lại màn vẫn còn.
 import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
@@ -113,6 +116,13 @@ export function dungChipBuoi(lop: string, dangMo: { id: string; lop: string; moL
 const giongTap = (a: ReadonlySet<string>, b: readonly string[]) => a.size === b.length && b.every((x) => a.has(x))
 /** Chữ chip gọn cho nhãn nhỏ theo lớp: bỏ đuôi "· chứng chỉ a/b". */
 const chuNgan = (chu: string) => chu.split(' · chứng chỉ')[0]!
+
+/** Bài thầy đang chọn ở cây (đợt 16): khoá bài + khối của cây lúc chọn + tên (để báo khi phải bỏ). Bảng Dạy học nhớ theo buổi. */
+export interface BaiChonNho {
+  khoaBai: string
+  khoi: string
+  tenBai: string
+}
 
 /** Trạng thái + lệnh của bước Bài hôm nay. `kho` = kho DẠY HỌC của bảng (`khoDayHoc`), nạp lười bằng `napKho`. */
 export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: TeacherExamSource[] | null, napKho: () => Promise<TeacherExamSource[]>) {
@@ -270,8 +280,9 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     if (c === 'lop') setChonEm(new Set(emLop))
   }
 
-  // CHỌN MỘT BÀI (tờ tự giao suy từ bài, không ô tích) + sửa hạn nộp / số lượt.
-  const [chon, setChon] = useState<BaiCay | null>(null)
+  // CHỌN MỘT BÀI (tờ tự giao suy từ bài, không ô tích) + sửa hạn nộp / số lượt. Giữ KHOÁ bài (không giữ dòng cây) ⇒ cây dựng lại / về muộn vẫn ra đúng bài.
+  const [chonNho, setChonNho] = useState<BaiChonNho | null>(null)
+  const chon = useMemo(() => (chonNho && chonNho.khoi === khoi ? (dsBai.find((b) => b.khoaBai === chonNho.khoaBai) ?? null) : null), [chonNho, khoi, dsBai])
   const maDeTuGiao = useMemo(() => (chon ? maDeMacDinh(chon) : []), [chon])
   /** Bài `b` có đứng trước bài đã tick xa nhất của lớp `l` ('tick') hoặc trước bài thầy ĐANG CHỌN ('xem': sẽ thành phạm vi khi giao) không. */
   const nguonCuaBai = useCallback((l: string, b: Pick<BaiCay, 'viTri'>): NguonPhamVi => nguonPhamVi(b.viTri, viTriTickLop.get(l) ?? 0, chon?.viTri ?? 0), [viTriTickLop, chon])
@@ -281,15 +292,18 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
   const [loiGiao, setLoiGiao] = useState('')
   const homNay = ngayVn(Date.now())
   useEffect(() => {
-    // Đổi KHỐI ⇒ bỏ bài đang chọn (cây khác); đổi lớp trong cùng khối thì giữ (chip trạng thái tự cập nhật).
-    setChon(null)
-  }, [khoi])
+    // Đổi sang lớp KHÁC KHỐI thật (cây khác) ⇒ bỏ bài đang chọn và BÁO; đổi lớp trong cùng khối thì giữ (chip trạng thái tự cập nhật).
+    // Khối còn trống (lớp / danh sách lớp đang về) ⇒ chờ, không bỏ.
+    if (!chonNho || !khoi || chonNho.khoi === khoi) return
+    setChonNho(null)
+    showToast(`Đã bỏ chọn ${tenNganBai(chonNho.tenBai)} — lớp vừa chọn thuộc khối ${khoi}, cây bài khác.`, 'warn')
+  }, [khoi, chonNho, showToast])
   useEffect(() => {
     // Bài đang chọn đã có ở MỌI lớp đã chọn (vừa giao xong / thầy thêm lớp đã dạy) ⇒ không còn gì để giao.
-    setChon((c) => (c && lopChon.length > 0 && lopChon.every((l) => tickTheoLop.get(l)?.has(c.khoaBai)) ? null : c))
+    setChonNho((c) => (c && lopChon.length > 0 && lopChon.every((l) => tickTheoLop.get(l)?.has(c.khoaBai)) ? null : c))
   }, [lopChon, tickTheoLop])
   const chonBai = (b: BaiCay) => {
-    setChon(b)
+    setChonNho({ khoaBai: b.khoaBai, khoi, tenBai: b.tenBai })
     setMoSua(false)
     setHanSua('')
     setTheLucChu('')
@@ -389,7 +403,7 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     }
     if (loi.length) setLoiGiao(loi.length === 1 && dauVaoLop.length === 1 ? loi[0]!.chu : loi.map((x) => `${x.lop}: ${x.chu}`).join(' · '))
     if (ok.length) void taiDs()
-    if (!loi.length) setChon(null)
+    if (!loi.length) setChonNho(null)
   }
 
   const [dangBo, setDangBo] = useState('')
@@ -456,6 +470,13 @@ export function useBaiHomNay(dd: Pick<DiemDanhBuoi, 'dsLop' | 'tt'>, kho: Teache
     lop,
     lopChon,
     setLopChon: (ds: string[]) => setLopTay(ds),
+    /** Lớp thầy TỰ chọn (null = theo buổi) + bài đang chọn — bảng Dạy học nhớ theo buổi và trả lại bằng `datNho`. */
+    lopTay,
+    chonNho,
+    datNho: (lop: string[] | null, bai: BaiChonNho | null) => {
+      setLopTay(lop)
+      setChonNho(bai)
+    },
     khoi,
     dsTheoLop,
     loiDsTheoLop,
