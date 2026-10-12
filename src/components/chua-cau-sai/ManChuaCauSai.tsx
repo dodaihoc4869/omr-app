@@ -30,6 +30,9 @@ export interface PropsChuaCauSai {
   onVe: () => void
   /** Nhãn nút rời màn khi em chữa xong / chưa làm được câu này (mặc định "Sang câu khác"). */
   nhanVe?: string
+  /** Đợt 16 (12/10): câu mở thẳng KHÔNG có trong danh sách Tự chữa — lệnh mở đợt (`mo-dot`, y như cũ) không mở được thì giao lời báo cho màn
+   *  gọi (về danh sách kèm lời báo thật) thay cho khung "Chưa mở được câu này". Vắng ⇒ như cũ. */
+  onKhongMo?: (loi: string) => void
 }
 function IconVe() {
   return (
@@ -172,6 +175,7 @@ export default function ManChuaCauSai({
   tenCau,
   onVe,
   nhanVe = 'Sang câu khác',
+  onKhongMo,
 }: PropsChuaCauSai) {
   const [ph, setPh] = useState<KetQuaDot | null>(null),
     [tai, setTai] = useState(true),
@@ -183,6 +187,8 @@ export default function ManChuaCauSai({
     [cho, setCho] = useState<LanNop | null>(null),
     [lanTai, setLanTai] = useState(0)
   const mucGoi = useRef(0)
+  const khongMoRef = useRef(onKhongMo)
+  khongMoRef.current = onKhongMo
   const song = useRef(true),
     buocRef = useRef<HTMLHeadingElement>(null),
     goiRef = useRef(0)
@@ -221,6 +227,10 @@ export default function ManChuaCauSai({
       const r = await apiMoDot(token, qid)
       if (huy || n !== goiRef.current) return
       if (!r.ok || !r.dotId) {
+        if (khongMoRef.current) {
+          khongMoRef.current(r.loi ?? 'Chưa mở được câu chữa.')
+          return
+        }
         setLoi(r.loi ?? 'Chưa mở được câu chữa.')
         setTai(false)
         return
@@ -335,6 +345,7 @@ export default function ManChuaCauSai({
           aria-label="Quay lại"
         >
           <IconVe />
+          <span className="ccs-ve-chu" aria-hidden="true">Quay lại</span>
         </button>
         <div className="ccs-dau-giua">
           <h1 className="ccs-tieu">{tenCau ?? 'Cùng gỡ câu này'}</h1>

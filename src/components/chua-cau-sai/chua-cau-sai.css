@@ -522,3 +522,29 @@ body[data-hoc-tap=hs] .ccs-nghi { color: var(--nhat); }
 @media (prefers-reduced-motion: reduce) {
   body[data-hoc-tap=hs] .ccs-day { box-shadow: none; }
 }
+
+/* TRÙNG TU 12/10 ĐỢT 16 — thầy: "Trùng tu toàn diện giao diện tự sửa lỗi, mời gọi hs sửa lỗi, phải siêu đẹp, siêu thân thiện, rất khoa học.
+   Tối ưu cho cả màn hình dọc, ngang máy tính." Cùng dáng với danh sách Tự chữa lỗi (hoc-tap/tu-chua.css): nút quay lại có CHỮ khi màn đủ rộng,
+   dải "Đường tự gỡ" có một dòng nhỏ nói vì sao có thứ tự này (máy tính). Chỉ THÊM luật, phạm vi body[data-hoc-tap=hs], chỉ biến màu sẵn có. */
+.ccs-ve-chu,
+.ccs-buoc-goi { display: none; }
+/* Khung bước có chiều cao tối thiểu (máy tính) ⇒ các hàng lưới giãn theo, nút chính phình cao cả trăm điểm ảnh khi nội dung ngắn.
+   Xếp hàng từ trên xuống, phần trống dồn xuống đáy. */
+body[data-hoc-tap=hs] .ccs-khu-lam { align-content: start; }
+/* Điện thoại: thẻ mở đầu gọn lại để câu gốc lên sớm hơn trong màn đầu. */
+@media (max-width: 699px), (max-height: 520px) and (orientation: landscape) {
+  body[data-hoc-tap=hs] .ccs-mo-dau { padding: 12px 14px; }
+  body[data-hoc-tap=hs] .ccs-mo-dau h2 { font-size: 17px; }
+  body[data-hoc-tap=hs] .ccs-mo-dau p { font-size: 14px; line-height: 1.5; }
+}
+@media (min-width: 700px) {
+  body[data-hoc-tap=hs] .ccs-dau { grid-template-columns: auto minmax(0, 1fr) auto; }
+  body[data-hoc-tap=hs] .ccs-ve { display: inline-flex; align-items: center; gap: 6px; width: auto; padding: 0 16px 0 10px; border-radius: 999px; font-size: 15px; font-weight: 700; }
+  body[data-hoc-tap=hs] .ccs-ve-chu { display: inline; }
+}
+@media (min-width: 900px) and (min-height: 621px) {
+  body[data-hoc-tap=hs] .ccs-lo-trinh[data-nut='true'] li > button { row-gap: 2px; padding-top: 10px; padding-bottom: 10px; }
+  body[data-hoc-tap=hs] .ccs-lo-trinh[data-nut='true'] li > button .ccs-buoc-goi {
+    display: block; grid-column: 2; overflow: hidden; color: var(--nhat); font-size: 12.5px; font-weight: 500; line-height: 1.35; text-overflow: ellipsis;
+  }
+}

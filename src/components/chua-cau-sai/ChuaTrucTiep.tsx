@@ -82,6 +82,8 @@ function deTuCauGoc(c: NonNullable<KetQuaDot['cauGoc']>): DeHien | null {
 }
 
 const BUOC = ['Xem lại câu gốc', 'Tự làm lại', 'Đáp án và lời giải'] as const
+/** Đợt 16 (12/10): một dòng nhỏ dưới tên bước (máy tính) nói VÌ SAO có thứ tự này — tự làm lại trước, đối chiếu sau. */
+const GOI_BUOC = ['Đề và lựa chọn cũ của em', 'Trước khi xem đáp án', 'Tìm chỗ em làm khác'] as const
 const nhanTra = (phan: Phan) => (phan === 'I' ? 'Em đã chọn' : 'Em đã trả lời')
 
 function IconBuoc({ so, xong }: { so: number; xong: boolean }) {
@@ -229,6 +231,7 @@ export default function ChuaTrucTiep({ token, qid, ph, ban, nhanVe, onVe, onLamG
                   <button type="button" aria-current={so === buoc ? 'step' : undefined} disabled={!duoc(so)} onClick={() => (so === 2 && buoc === 1 ? batDauLamLai() : doiBuoc(so))}>
                     <IconBuoc so={so} xong={xong} />
                     <b>{ten}</b>
+                    <small className="ccs-buoc-goi">{GOI_BUOC[i]}</small>
                   </button>
                 </li>
               )
