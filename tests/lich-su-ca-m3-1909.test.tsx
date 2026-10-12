@@ -113,7 +113,7 @@ describe('C2 · tab điểm ở cổng học sinh (/hs)', () => {
     expect(container.querySelectorAll('.m3-xuong').length).toBe(2)
     rerender(<LichSuCaM3 dangTai={false} ds={[]} ngayGio={() => ''} dongDem={() => null} dangMoDe={false} onXemBaoCao={() => {}} onXemDe={() => {}} />)
     expect(screen.getByText('Chưa có ca kiểm tra nào')).toBeTruthy()
-    expect(screen.getByText(/chưa tham gia ca kiểm tra nào/)).toBeTruthy()
+    expect(screen.queryByText(/chưa tham gia ca kiểm tra nào/)).toBeNull() // SỬA CÓ CHỦ Ý — đợt 18: bỏ câu giải thích dưới tiêu đề trống
   })
 
   it('đang mở đề thì nút "Xem đề…" tắt (chống bấm đôi)', () => {

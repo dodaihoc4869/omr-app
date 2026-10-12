@@ -53,7 +53,8 @@ describe('chữ mới đúng chuẩn', () => {
     // Menu phụ huynh ĐÃ GỠ (app PH một màn một nút, 21/09): không còn mục "Báo cáo điểm các ca kiểm tra" ở menu.
     expect(menu).not.toContain('mucMenuPhuHuynh')
     expect(menu).not.toContain('Báo cáo điểm các ca kiểm tra')
-    expect(doc('src/screens/StudentPortalScreen.tsx')).toContain("tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'")
+    // SỬA CÓ CHỦ Ý — đợt 18: tiêu đề tấm điểm = tên dòng đã bấm ("Kết quả bài đã nộp").
+    expect(doc('src/screens/StudentPortalScreen.tsx')).toContain("tab === 'diem' ? 'Kết quả bài đã nộp'")
   })
   it('mã ca KHÔNG làm tên: "Ca kiểm tra mã …" (HS lịch sử, PH danh sách, khắc phục, thẻ gần nhất, báo cáo)', () => {
     for (const t of ['src/components/bang-nhiem-vu/LichSuCaM3.tsx', 'src/lib/the-ca-gan-nhat.ts', 'src/screens/StudentPortalScreen.tsx'])

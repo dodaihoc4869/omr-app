@@ -1,6 +1,8 @@
 // LÀN PHỤ HUYNH 12/10 (thầy: "cho phụ huynh biết nhiều thông tin cần thiết nữa về con, số câu làm đúng, làm sai, thời gian làm từng câu gợi ý nhắc …
 // làm app phụ huynh siêu đẹp trực quan để phụ huynh theo dõi được con toàn diện"). Các khối đọc `/ph/con-tong-quan` (src/lib/ph-v3/con-tong-quan.ts):
-//   Hôm nay  — ba số trong khối chính (câu đúng · câu sai · trung bình mỗi câu) · Gợi ý nhắc con · Lịch học tuần này (+ từng ngày từ mốc theo dõi `tq.moc`, 01/10).
+//   Hôm nay  — ba số trong khối chính (câu đúng · câu sai · trung bình mỗi câu) · Cần nhắc con · Lịch học tuần này (+ từng ngày từ mốc theo dõi `tq.moc`, 01/10).
+// ĐỢT 18 (thầy 13/10: "Tối ưu lại câu từ cho dễ hiểu … Bỏ hết các gợi ý hướng dẫn để học sinh phụ huynh không bị phân tâm"): bỏ mọi dòng chữ nhỏ giải thích
+// cách tính (đúng/sai theo lần trả lời, "đã sửa là…", nghĩa số trên cột); ký hiệu "≈" chỉ còn một nhãn ngắn; khối "Gợi ý nhắc con" → "Cần nhắc con".
 //   Tiến bộ  — Đúng và sai theo ngày (cột chồng 14 ngày + ba ô Hôm nay / 7 ngày / Từ <mốc>) · Thời gian làm câu (phân bố + câu gần đây) · Câu sai gần đây.
 // Biểu đồ vẽ bằng CSS (không thư viện). Màu CHỈ biến --ph3-* sẵn có; màu không là kênh duy nhất (luôn kèm chữ / số / biểu tượng).
 // Không mã câu, không đáp án; số nào cũng có nhãn; ước tính ghi "≈"; lượt không đo được ghi "chưa đo giờ".
@@ -51,12 +53,12 @@ export function BaSoHomNay({ d }: { d: DemCau }) {
         <div><dt><i data-mau="ho" aria-hidden="true" />Câu sai</dt><dd>{d.sai}</dd></div>
         <div><dt>Trung bình</dt><dd>{d.giayTb === null ? <small>chưa đo giờ</small> : d.giayTb < 60 ? <>{d.giayTb}<small> giây/câu</small></> : <>{chuGiay(d.giayTb)}<small>/câu</small></>}</dd></div>
       </dl>
-      <p className="ph3-ah__ghi-nho">Đúng, sai tính theo từng lần con trả lời{d.boTrong > 0 ? ` · ${d.boTrong} câu bỏ trống` : ''}.</p>
+      {d.boTrong > 0 && <p className="ph3-ah__ghi-nho">Bỏ trống: {d.boTrong} câu</p>}
     </div>
   )
 }
 
-// ---------------------------------------------------------------- HÔM NAY · Gợi ý nhắc con ----------------------------------------------------------------
+// ---------------------------------------------------------------- HÔM NAY · Cần nhắc con ----------------------------------------------------------------
 const BT_GOI_Y: Record<GoiYNhac['ma'], { bt: () => ReactElement; mau: Mau }> = {
   'con-cau-hom-nay': { bt: () => <BtHomNay co={20} />, mau: 'xd' },
   'chua-lam-hom-nay': { bt: () => <BtHomNay co={20} />, mau: 'xd' },
@@ -68,19 +70,34 @@ const BT_GOI_Y: Record<GoiYNhac['ma'], { bt: () => ReactElement; mau: Mau }> = {
   'dung-goi-y': { bt: () => <BtBongDen co={20} />, mau: 'hp' },
 }
 
-/** Khối "Gợi ý nhắc con": đang tải ⇒ khung xương; lỗi ⇒ lý do + Thử lại; không có câu nhắc ⇒ nói rõ vì sao. Máy chủ cũ (v null, đã tải) ⇒ vắng. */
+/** Hai dòng nói lại đúng số của khối chính Hôm nay (đã làm / mức của ngày) ⇒ không hiện lần nữa (một thông tin một chỗ). */
+const NHAC_TRUNG_KHOI_CHINH: ReadonlySet<GoiYNhac['ma']> = new Set(['con-cau-hom-nay', 'chua-lam-hom-nay'])
+
+/** Chỉ giữ CÂU ĐẦU (câu nói số liệu) của dòng máy chủ sinh; bỏ vế khuyên phía sau ("Nhắc con…", "Hỏi con…") — thầy 13/10 bỏ chữ hướng dẫn. */
+export function chuSoLieuNhac(chu: string): string {
+  const t = chu.trim()
+  const m = /^(.*?[.!?])(?:\s|$)/.exec(t)
+  return m ? m[1]! : t
+}
+
+/** Các dòng "Cần nhắc con" sẽ hiện: bỏ dòng trùng khối chính, mỗi dòng chỉ câu số liệu. */
+export function dongCanNhac(ds: readonly GoiYNhac[]): GoiYNhac[] {
+  return ds.filter((g) => !NHAC_TRUNG_KHOI_CHINH.has(g.ma)).map((g) => ({ ...g, chu: chuSoLieuNhac(g.chu) }))
+}
+
+/** Khối "Cần nhắc con": đang tải ⇒ khung xương; lỗi ⇒ lý do + Thử lại; không có điều cần nhắc ⇒ vắng (không chữ giải thích). Máy chủ cũ (v null, đã tải) ⇒ vắng. */
 export function GoiYNhacCon({ tai }: { tai: TaiTongQuan }) {
   if (!tai.v) {
-    if (tai.chuLoi) return <TheLoi chu={/^Chưa /.test(tai.chuLoi) ? tai.chuLoi : `Chưa xem được gợi ý nhắc con. ${tai.chuLoi}`} thuLai={tai.thuLai} />
+    if (tai.chuLoi) return <TheLoi chu={/^Chưa /.test(tai.chuLoi) ? tai.chuLoi : `Chưa tải được số liệu của con. ${tai.chuLoi}`} thuLai={tai.thuLai} />
     if (!tai.daTai) return <div className="ph3-xuong tt-xuong ph3-o-rong" data-hinh="the" data-vung="goi-y-dang-tai" aria-hidden="true"><span /><span /><span /></div>
     return null
   }
-  const ds = tai.v.goiY
+  const ds = dongCanNhac(tai.v.goiY)
+  if (ds.length === 0 && !tai.chuLoi) return null
   return (
-    <The id="ph3-goi-y" className="ph3-the--goi-y ph3-o-rong ph3-o-cao" vung="goi-y-nhac" bieuTuong={<BtBongDen co={22} />} mau="hp" tieuDe="Gợi ý nhắc con"
-      phu={`Theo số liệu đến ${gioVn(tai.v.serverNow)} hôm nay`}>
-      {tai.chuLoi && <div className="ph3-lam-moi-loi" role="status"><span>Gợi ý đang theo bản đã tải. {tai.chuLoi}</span><button type="button" className="tt-nhan" onClick={tai.thuLai}>Thử lại gợi ý</button></div>}
-      {ds.length > 0 ? (
+    <The id="ph3-goi-y" className="ph3-the--goi-y ph3-o-rong ph3-o-cao" vung="goi-y-nhac" bieuTuong={<BtBongDen co={22} />} mau="hp" tieuDe="Cần nhắc con">
+      {tai.chuLoi && <div className="ph3-lam-moi-loi" role="status"><span>Số liệu đang theo bản đã tải. {tai.chuLoi}</span><button type="button" className="tt-nhan" onClick={tai.thuLai}>Thử lại</button></div>}
+      {ds.length > 0 && (
         <ol className="ph3-goi-y">
           {ds.map((g) => {
             const k = BT_GOI_Y[g.ma]
@@ -92,8 +109,6 @@ export function GoiYNhacCon({ tai }: { tai: TaiTongQuan }) {
             )
           })}
         </ol>
-      ) : (
-        <p className="ph3-ghi">Chưa có điều cần nhắc: con không có ngày thiếu mức, câu sai chờ sửa hay câu làm vội trong số liệu hiện có.</p>
       )}
     </The>
   )
@@ -148,7 +163,7 @@ export function LichTuan({ tq }: { tq: ConTongQuan }) {
               </li>
             ))}
           </ul>
-          {coUoc && <p className="ph3-ghi-nho">≈ là mức ước tính theo quy tắc hiện hành (24, 30 hoặc 36 câu theo tầng của con) vì ngày đó máy chưa lưu mức.</p>}
+          {coUoc && <p className="ph3-ghi-nho">≈ là mức ước tính.</p>}
         </details>
       )}
     </The>
@@ -176,7 +191,7 @@ export function DungSaiTheoNgay({ tq }: { tq: ConTongQuan }) {
   if (ngay.length === 0) return null
   const max = Math.max(1, ...ngay.map((n) => n.dung + n.sai))
   return (
-    <The id="ph3-dung-sai" className="ph3-o-du" vung="dung-sai-ngay" tieuDe="Đúng và sai theo ngày" phu={`Phần trăm câu đúng · cột: ${ngay.length} ngày gần nhất, số trên cột là số câu con làm trong ngày`}>
+    <The id="ph3-dung-sai" className="ph3-o-du" vung="dung-sai-ngay" tieuDe="Đúng và sai theo ngày" phu={`Cột: số câu mỗi ngày, ${ngay.length} ngày gần nhất`}>
       <div className="ph3-so3 ph3-so3--ti-le">
         <OTiLe nhan="Hôm nay" d={tq.dem.homNay} />
         <OTiLe nhan="7 ngày qua" d={tq.dem.bayNgay} />
@@ -261,8 +276,8 @@ export function ThoiGianLamCau({ tq }: { tq: ConTongQuan }) {
       )}
       {(t.soUoc > 0 || t.soChuaDo > 0) && (
         <p className="ph3-ghi-nho">
-          {t.soUoc > 0 ? `≈ là số giây ước tính (${t.soUoc} câu): tính từ lúc con trả lời câu liền trước. ` : ''}
-          {t.soChuaDo > 0 ? `${t.soChuaDo} câu chưa đo giờ, không tính vào trung bình.` : ''}
+          {t.soUoc > 0 ? `≈ là số giây ước tính (${t.soUoc} câu). ` : ''}
+          {t.soChuaDo > 0 ? `${t.soChuaDo} câu chưa đo giờ.` : ''}
         </p>
       )}
       {dau.length > 0 && (
@@ -298,7 +313,7 @@ export function CauSaiGanDay({ tq }: { tq: ConTongQuan }) {
   )
   return (
     <The id="ph3-cau-sai" className="ph3-o-hep" vung="cau-sai-gan-day" bieuTuong={<BtBut co={22} />} mau="ho" tieuDe="Câu sai gần đây"
-      phu={`Từ ${ngayChuoiNgan(tq.tuNgay)} · đã sửa là lần làm lại gần nhất đúng`}>
+      phu={`Từ ${ngayChuoiNgan(tq.tuNgay)}`}>
       <div className="ph3-cs-tong">
         <div className="ph3-cs-tong__ray" aria-hidden="true">
           {c.daSua > 0 && <span data-loai="dung" style={{ flexGrow: c.daSua }} />}

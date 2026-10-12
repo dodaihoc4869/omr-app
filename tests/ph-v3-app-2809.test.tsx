@@ -190,7 +190,7 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     expect(diem.querySelector('svg')).toBeNull()
     expect(diem.querySelector('[data-vung="diem-gan-nhat"]')!.textContent).toBe('7,5/10')
     expect(diem.textContent).toContain('Kiểm tra 45 phút · Ester – Lipid · 19/09')
-    expect(diem.textContent).toContain('Con mới có 1 ca. Từ ca thứ hai, đường điểm sẽ hiện ở đây kèm mức tăng hay giảm.')
+    expect(diem.textContent).not.toContain('Từ ca thứ hai') // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10 "bỏ hết các gợi ý hướng dẫn"): bỏ câu hướng dẫn
     expect(container.querySelector('[data-vung="khac-phuc"]')).toBeNull()
     expect(container.textContent).not.toContain('chờ thầy dạy lại')
     const nh = container.querySelector('[data-vung="nhip-14"]')!.textContent!

@@ -96,7 +96,7 @@ function BaoCao({ sbd, bc }: { sbd: string; bc: BaoCaoCa }) {
       )}
 
       {bc.dang.length > 0 && (
-        <The id="ph3-dang-ca" className="ph3-o-du" tieuDe="Con làm đúng bao nhiêu ở từng dạng" phu="Tính theo câu trong ca này">
+        <The id="ph3-dang-ca" className="ph3-o-du" tieuDe="Số câu đúng theo từng dạng">
           <ul className="ph3-dang">
             {bc.dang.map((d, i) => {
               const ti = d.dung / d.tong

@@ -85,9 +85,11 @@ describe('C3 · tab BTVN ở cổng học sinh (/hs)', () => {
     mocks.items = [BT({})]
     const { container } = render(<StudentPortalScreen />)
     await moTab()
-    expect(await screen.findByText('Cách làm bài tập về nhà: chia chặng theo ngày/giờ')).toBeTruthy()
+    // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): khối "Cách làm bài tập về nhà" (ba ô chặng) đã gỡ; nhãn chặng trên từng bài giữ.
+    await screen.findByRole('region', { name: 'Bài tập về nhà' })
     const chu = container.ownerDocument.body.textContent!
-    for (const t of ['CHẶNG ĐANG MỞ', 'CHẶNG SAU', 'NỘP BÀI', 'Xong chặng đang mở, chặng sau mở đúng nhịp']) expect(chu).toContain(t)
+    for (const t of ['Cách làm bài tập về nhà', 'CHẶNG ĐANG MỞ', 'CHẶNG SAU', 'Xong chặng đang mở, chặng sau mở đúng nhịp']) expect(chu).not.toContain(t)
+    expect(chu).toContain('Chia chặng theo ngày/giờ')
     expect(chu).not.toMatch(/3 Vòng|Phân Tầng|VÒNG [123]|nắm chắc/i)
     expect(document.querySelector('.max-h-\\[65vh\\]')).toBeNull()
     expect(screen.getByRole('region', { name: 'Bài tập về nhà' })).toBeTruthy()

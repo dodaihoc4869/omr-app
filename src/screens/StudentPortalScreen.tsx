@@ -944,13 +944,13 @@ export default function StudentPortalScreen() {
     })
   }
   const tieuSheet =
-    tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'
+    tab === 'diem' ? 'Kết quả bài đã nộp'
     : tab === 'btvn' ? 'Bài tập về nhà'
     : tab === 'mom' ? 'Bài gia đình giao'
-    : tab === 'khacphuc' ? 'Khắc phục lỗi sai & luyện đề'
+    : tab === 'khacphuc' ? 'Luyện lại từ bài kiểm tra'
     : tab === 'vaothi' ? 'Vào ca kiểm tra trực tuyến'
     : tab === 'cauon' ? 'Ôn câu hôm nay'
-    : 'Bảng tin & bài luyện hôm nay'
+    : 'Thông tin từ gia đình'
 
   const moManCu = (man: TabType) => {
     setTab(man)

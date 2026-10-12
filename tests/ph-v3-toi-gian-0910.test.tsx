@@ -77,14 +77,12 @@ describe('Hôm nay — thứ tự khối theo bản vẽ trung tu 09/10', () => 
     // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): thẻ "Nhịp học của con" đứng sau khối chính · cảnh báo · gợi ý.
     // Máy giả ở đây không có `/ph/nhip-hoc` (trả `{ ok: true }` trống) ⇒ thẻ hiện trạng thái lỗi nói thật + "Tải lại nhịp học" (`nhip-con-loi`), không số giả.
     await waitFor(() => expect(container.querySelector('[data-vung="nhip-con-loi"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['anh-hung', 'canh-bao-thay', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
+    expect(khoi(container)).toEqual(['anh-hung', 'canh-bao-thay', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them'])
     fireEvent.click(screen.getByRole('button', { name: 'Đã xem cảnh báo' }))
-    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
-    // "Gia đình hỗ trợ" là MỘT đoạn chữ nhỏ (không thẻ, không tiêu đề, không liên kết trùng tới Tiến bộ)
-    const gd = container.querySelector('[data-vung="gia-dinh"]')!
-    expect(gd.tagName).toBe('P')
-    expect(gd.className).not.toContain('ph3-the')
-    expect(gd.querySelector('a, h2')).toBeNull()
+    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them'])
+    // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): đoạn "Gia đình hỗ trợ" (lời khuyên) đã gỡ khỏi Hôm nay.
+    expect(container.querySelector('[data-vung="gia-dinh"]')).toBeNull()
+    expect(container.textContent).not.toContain('Gia đình hỗ trợ')
     expect(container.querySelector('[data-vung="man-chinh-ph"] a[href="#tien-bo"]')).toBeNull()
   })
 
@@ -94,7 +92,7 @@ describe('Hôm nay — thứ tự khối theo bản vẽ trung tu 09/10', () => 
     // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): thẻ "Nhịp học của con" đứng sau khối chính · cảnh báo · gợi ý.
     // Máy giả ở đây không có `/ph/nhip-hoc` (trả `{ ok: true }` trống) ⇒ thẻ hiện trạng thái lỗi nói thật + "Tải lại nhịp học" (`nhip-con-loi`), không số giả.
     await waitFor(() => expect(container.querySelector('[data-vung="nhip-con-loi"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
+    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them']) // đợt 18: bỏ "Gia đình hỗ trợ"
     expect(container.textContent).not.toContain('Cảnh báo của thầy')
   })
 
@@ -139,7 +137,7 @@ describe('Hôm nay — thứ tự khối theo bản vẽ trung tu 09/10', () => 
     // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): thẻ "Nhịp học của con" đứng sau khối chính · cảnh báo · gợi ý.
     // Máy giả ở đây không có `/ph/nhip-hoc` (trả `{ ok: true }` trống) ⇒ thẻ hiện trạng thái lỗi nói thật + "Tải lại nhịp học" (`nhip-con-loi`), không số giả.
     await waitFor(() => expect(container.querySelector('[data-vung="nhip-con-loi"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'gia-dinh'])
+    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi']) // đợt 18: bỏ "Gia đình hỗ trợ"
   })
 
   it('tuần này: Thứ Năm, học T2 · T4 · T5 ⇒ "3/7 ngày"; T6 · T7 · CN là "chưa tới" (nét đứt), không tính vào số; ngày tuần trước không tính', async () => {
@@ -256,7 +254,8 @@ describe('trung tu 09/10: đổi mục mịn, giữ chỗ cuộn từng mục, k
     hoc2 = { ...HOC2, hanhTrinh: { tang: 3, toiThieu: 45 } }
     const b = render(<ParentPortalScreen />)
     await waitFor(() => expect(b.container.querySelector('[data-vung="hanh-trinh"]')).toBeTruthy())
-    expect(b.container.querySelector('[data-vung="hanh-trinh"]')!.textContent).toBe('Hành trình của con: tầng Vận dụng · mức tối thiểu 45 câu. Kế hoạch hôm nay ít hơn vì chưa đủ câu phù hợp hoặc có câu đang để dành cho ca kiểm tra.')
+    // SỬA CÓ CHỦ Ý — đợt 18 (thầy 13/10: "Bỏ hết các gợi ý hướng dẫn"): bỏ câu giải thích vì sao kế hoạch ít hơn mức.
+    expect(b.container.querySelector('[data-vung="hanh-trinh"]')!.textContent).toBe('Hành trình của con: tầng Vận dụng · mức tối thiểu 45 câu.')
   })
 })
 
@@ -273,7 +272,7 @@ describe('hàm thuần của Hôm nay', () => {
     expect(chuTinhTrang({ daLam: 12, tong: 30, keHoach: true })).toBe('Con đang làm, còn 18 câu nữa là xong kế hoạch hôm nay.')
     expect(chuTinhTrang({ daLam: 41, tong: 40, keHoach: false })).toBe('Con đã đủ mục tiêu của ngày.')
     expect(chuTinhTrang({ daLam: 9, tong: null, keHoach: false })).toBe('')
-    expect(chuTinhTrang({ daLam: 0, tong: null, keHoach: false })).toBe('Kết quả hiện ở đây ngay khi con bắt đầu học.')
+    expect(chuTinhTrang({ daLam: 0, tong: null, keHoach: false })).toBe('') // đợt 18: bỏ câu hướng dẫn "Kết quả hiện ở đây…"
   })
   it('tenDangHomNay: dạng luyện thêm của máy chủ đứng trên; không có ⇒ "Dạng cần vững" của OMNI; không có gì ⇒ rỗng', () => {
     expect(tenDangHomNay(pm, null)).toEqual({ tieuDe: 'Dạng con đang luyện thêm', ten: ['Xà phòng hoá chất béo', 'Bài toán hỗn hợp ester'] })

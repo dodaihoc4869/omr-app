@@ -205,7 +205,7 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
       {hoiDoiSbd && (
         <HopXacNhan
           tieuDe="Đổi số báo danh?"
-          noiDung={<p>Máy này sẽ quên số báo danh của con và bỏ liên kết riêng của phụ huynh đang lưu trên máy. Muốn xem lại báo cáo của con, anh/chị mở lại liên kết riêng thầy gửi hoặc nhập số báo danh.</p>}
+          noiDung={<p>Máy này sẽ quên số báo danh của con và bỏ liên kết riêng của phụ huynh đang lưu trên máy. Muốn xem lại, anh/chị mở liên kết thầy gửi hoặc nhập lại số báo danh.</p>}
           nhanHuy="Ở lại"
           nhanXacNhan="Đổi số báo danh"
           onHuy={() => setHoiDoiSbd(false)}
@@ -227,7 +227,7 @@ function ThongTin({ ten, lop }: { ten: string; lop: string }) {
           <h2 className="ph3-the__ten">Phụ huynh em {ten}</h2>
           {lop && <p>Lớp {lop}</p>}
           <p>{chuBanApp()}</p>
-          <p>Giao diện sáng hoặc tối theo cài đặt của thiết bị.</p>
+          <p>Giao diện: sáng hoặc tối theo máy.</p>
         </article>
       </div>
     </section>
