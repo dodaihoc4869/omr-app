@@ -10,12 +10,16 @@
 // bài vừa dạy). Mục ấy truyền `dd` (điểm danh dùng chung, tạo MỘT lần ở cha) ⇒ bảng này KHÔNG tự tìm/mở buổi, KHÔNG vẽ bước Điểm danh; "Chọn câu" +
 // "Chiếu" gộp thành bước "Dạy và chiếu câu", bước "Bài hôm nay" nằm trong bước "Tick bài vừa dạy" (gập sẵn, nút chính "Tick bài hôm nay" /
 // "Bổ sung bài" mở và cuộn tới) kèm `sauBaiHomNay` (bảng Bài đang giao của cha). Mọi chức năng giữ nguyên; vắng `dd` ⇒ y như cũ (màn Lên bảng).
+// ĐỢT 16 (12/10, thầy: "chọn xong bấm lại nút chọn thì sẽ trở lại ban đầu, tick chọn bài cũng vậy"): (1) hộp chọn giữ chữ tìm / chip khối và tự mở
+// tới bài đang chọn (`nho` của HopChonDe); (2) phần nhớ theo buổi KHÔNG đè lựa chọn thầy vừa làm khi buổi mới có (bấm Điểm danh / buổi về muộn) —
+// lựa chọn theo sang buổi ấy; đổi sang buổi KHÁC thật thì nạp phần nhớ của buổi đó và BÁO; (3) "Dùng" lại đúng bộ cũ không xoá câu đã bỏ / em đã gọi;
+// (4) lớp + bài đang chọn của bước Bài hôm nay nhớ cùng buổi (mở lại màn vẫn còn). Khoá nhớ `ddh.dayHoc.<buổi>` GIỮ NGUYÊN, chỉ thêm hai trường.
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Check, Eye, EyeOff, Lightbulb, MonitorPlay, RefreshCw, Shuffle, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import type { TeacherExamSource } from '../../data/examContent'
 import KhungXemPhieu from '../KhungXemPhieu'
-import HopChonDe from '../HopChonDe'
+import HopChonDe, { type NhoHopChonDe } from '../HopChonDe'
 import { thayChuaQuaMayChu, useGhiToChieu } from '../chien-dich/ghi-to-chieu'
 import { ngayVn } from '../chien-dich/ngay'
 import { laySucHoc } from '../../lib/buoi-hoc-api'
@@ -25,27 +29,40 @@ import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { ChemText } from '../../lib/chem-format'
 import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi, type DiemDanhBuoi } from './DiemDanhBuoi'
-import { BuocBaiHomNay, DongChoBaiMoi, useBaiHomNay, type BaiHomNay } from './BaiHomNay'
+import { BuocBaiHomNay, DongChoBaiMoi, useBaiHomNay, type BaiChonNho, type BaiHomNay } from './BaiHomNay'
 import './day-hoc.css'
 
 /** Chữ tấm chiếu mã điểm danh — nay nằm ở `DiemDanhBuoi.tsx` (dùng chung với Kiểm tra đầu giờ); giữ lối xuất cũ. */
 export { CHU_DIEM_DANH } from './DiemDanhBuoi'
 
-/** Nhớ trên máy theo buổi: đề đã tích, câu đã bỏ, em đã giao. Hỏng/không có ⇒ bắt đầu trống. */
+/** Nhớ trên máy theo buổi: đề đã tích, câu đã bỏ, em đã giao + (đợt 16) lớp thầy tự chọn và bài đang chọn ở bước Bài hôm nay. Hỏng/không có ⇒ bắt đầu trống. */
 interface NhoBuoi {
   maChon: string[]
   boCau: string[]
   giao: Record<string, { sbd: string; hoTen: string; xacSuat: number; uocLuong: boolean; lyDo: string; boQua: string[] }>
+  lopNhan: string[] | null
+  baiChon: BaiChonNho | null
 }
+const NHO_TRONG: NhoBuoi = { maChon: [], boCau: [], giao: {}, lopNhan: null, baiChon: null }
 const khoaNho = (id: string) => `ddh.dayHoc.${id}`
+const dsChuoi = (x: unknown): string[] => (Array.isArray(x) ? [...new Set(x.filter((v): v is string => typeof v === 'string'))] : [])
 function docNhoBuoi(id: string): NhoBuoi {
   try {
     const j = JSON.parse(localStorage.getItem(khoaNho(id)) || 'null') as Partial<NhoBuoi> | null
-    return { maChon: Array.isArray(j?.maChon) ? j!.maChon : [], boCau: Array.isArray(j?.boCau) ? j!.boCau : [], giao: j?.giao && typeof j.giao === 'object' ? j.giao : {} }
+    const b = j?.baiChon
+    return {
+      maChon: dsChuoi(j?.maChon),
+      boCau: dsChuoi(j?.boCau),
+      giao: j?.giao && typeof j.giao === 'object' ? j.giao : {},
+      lopNhan: Array.isArray(j?.lopNhan) ? dsChuoi(j!.lopNhan) : null,
+      baiChon: b && typeof b.khoaBai === 'string' && typeof b.khoi === 'string' ? { khoaBai: b.khoaBai, khoi: b.khoi, tenBai: typeof b.tenBai === 'string' ? b.tenBai : '' } : null,
+    }
   } catch {
-    return { maChon: [], boCau: [], giao: {} }
+    return NHO_TRONG
   }
 }
+/** Phần nhớ có lựa chọn nào của thầy không (để biết đổi buổi có làm đổi điều thầy đang thấy). */
+const coLuaChon = (n: NhoBuoi) => n.maChon.length > 0 || !!n.baiChon || !!n.lopNhan?.length
 function ghiNhoBuoi(id: string, n: NhoBuoi) {
   try {
     localStorage.setItem(khoaNho(id), JSON.stringify(n))
@@ -97,20 +114,8 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   const [maChon, setMaChon] = useState<Set<string>>(new Set())
   const [boCau, setBoCau] = useState<Set<string>>(new Set())
   const [giao, setGiao] = useState<NhoBuoi['giao']>({})
-  const daNap = useRef('')
-  useEffect(() => {
-    // Nạp phần nhớ của buổi (đề đã tích, câu bỏ, em đã giao) một lần mỗi buổi.
-    const k = idBuoi || '_'
-    if (daNap.current === k) return
-    daNap.current = k
-    const n = docNhoBuoi(k)
-    setMaChon(new Set(n.maChon))
-    setBoCau(new Set(n.boCau))
-    setGiao(n.giao)
-  }, [idBuoi])
-  useEffect(() => {
-    if (daNap.current) ghiNhoBuoi(daNap.current, { maChon: [...maChon], boCau: [...boCau], giao })
-  }, [maChon, boCau, giao])
+  // Hộp chọn bài dựng lại mỗi lần mở ⇒ giữ chữ tìm + chip khối ở đây (đợt 16).
+  const nhoHop = useRef<NhoHopChonDe | null>(null)
 
   const napKho = useCallback(async () => {
     if (kho) return kho
@@ -133,6 +138,41 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
   }, [maChon, kho, napKho])
   // ───── 4 · BÀI HÔM NAY (OMNI 3) — dùng chung kho Dạy học đã nạp; ẩn hẳn khi OMNI tắt ─────
   const bhn = useBaiHomNay(dd, kho, napKho)
+
+  // ───── NHỚ THEO BUỔI: nạp một lần mỗi buổi, ghi lại mỗi lần đổi ─────
+  const daNap = useRef('')
+  /** Bản nhớ (chuỗi) vừa nạp / vừa ghi theo buổi mới — khác bản đang thấy ⇒ thầy đã chọn tay từ lúc ấy. */
+  const banDaNap = useRef('')
+  const lopNhan = bhn.lopTay
+  const baiChon = bhn.chonNho
+  useEffect(() => {
+    const k = idBuoi || '_'
+    const cu = daNap.current
+    if (cu === k) return
+    daNap.current = k
+    const hien: NhoBuoi = { maChon: [...maChon], boCau: [...boCau], giao, lopNhan, baiChon }
+    const chuHien = JSON.stringify(hien)
+    // Buổi vừa có (bấm Điểm danh / buổi đang mở về muộn) sau khi thầy đã chọn ⇒ lựa chọn vừa làm THEO SANG buổi này, không bị phần nhớ đè.
+    if (cu && (cu === '_' || k === '_') && chuHien !== banDaNap.current) {
+      ghiNhoBuoi(k, hien)
+      banDaNap.current = chuHien
+      return
+    }
+    const n = docNhoBuoi(k)
+    // Đổi sang buổi KHÁC thật (ô "Buổi dạy" / mở buổi mới) ⇒ hiện phần nhớ của buổi ấy và nói rõ (phần của buổi trước vẫn lưu theo buổi trước).
+    if (cu && cu !== '_' && k !== '_' && JSON.stringify(n) !== chuHien && (coLuaChon(hien) || coLuaChon(n)))
+      showToast(`Đã đổi buổi dạy — ${coLuaChon(n) ? 'đang hiện bài đã chọn của buổi này' : 'buổi này chưa chọn bài'}; bài của buổi trước vẫn được giữ.`, 'warn')
+    setMaChon(new Set(n.maChon))
+    setBoCau(new Set(n.boCau))
+    setGiao(n.giao)
+    bhn.datNho(n.lopNhan, n.baiChon)
+    banDaNap.current = JSON.stringify(n)
+    // Chỉ chạy khi đổi buổi; đọc lựa chọn đang thấy ở đúng lượt vẽ ấy.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idBuoi])
+  useEffect(() => {
+    if (daNap.current) ghiNhoBuoi(daNap.current, { maChon: [...maChon], boCau: [...boCau], giao, lopNhan, baiChon })
+  }, [maChon, boCau, giao, lopNhan, baiChon])
 
   const tatCaCau = useMemo(() => (kho ? cauTuDeChon(kho, maChon) : []), [kho, maChon])
   const cauChieu = useMemo(() => tatCaCau.filter((c) => !boCau.has(c.khoa)), [tatCaCau, boCau])
@@ -428,6 +468,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
             daChon={maTam}
             chonNhieu
             cao={420}
+            nho={nhoHop}
             onChon={(ma) =>
               setMaTam((cu) => {
                 const m = new Set(cu)
@@ -448,9 +489,14 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, lanBoSung = 0, sauBaiHomNay, onT
             className="m3-nut-chinh dh-nut"
             disabled={!maTam.size}
             onClick={() => {
-              setMaChon(new Set(maTam))
-              setBoCau(new Set())
-              setGiao({})
+              // "Dùng" lại đúng bộ cũ ⇒ giữ nguyên câu đã bỏ và em đã gọi. Đổi bộ ⇒ câu đã bỏ mà vẫn còn trong bộ mới thì vẫn bỏ; phân công em xếp lại.
+              const giong = maTam.size === maChon.size && [...maTam].every((ma) => maChon.has(ma))
+              if (!giong) {
+                const con = new Set(kho ? cauTuDeChon(kho, maTam).map((c) => c.khoa) : [])
+                setMaChon(new Set(maTam))
+                setBoCau((cu) => new Set([...cu].filter((k) => con.has(k))))
+                setGiao({})
+              }
               setHopMo(false)
             }}
           >
