@@ -231,3 +231,36 @@ export async function apiDanhSachChua(
     ? (j.ds as { qid: string; trangThai: string; denHan?: string }[])
     : []
 }
+
+// ---------------------------------------------------------------------------
+// Danh sách "Tự chữa lỗi" (12/10): phân biệt BA kết cục để màn nói thật — vòng chữa chưa mở cho em · lỗi mạng/máy chủ (có Thử lại) ·
+// danh sách (có thể rỗng). `apiDanhSachChua` ở trên trả [] cho mọi lỗi nên màn không biết là "không có câu" hay "chưa tải được".
+// ---------------------------------------------------------------------------
+export interface MucChua {
+  dotId?: string
+  qid: string
+  trangThai: string
+  denHan?: string
+  lanGapLai?: number
+}
+export type KetQuaDanhSachChua =
+  | { trangThai: 'bat'; ds: MucChua[] }
+  | { trangThai: 'tat' }
+  | { trangThai: 'loi'; loi: string }
+export async function apiDanhSachTuChua(token: string): Promise<KetQuaDanhSachChua> {
+  const co = await goi('co', token)
+  if (!co) return { trangThai: 'loi', loi: LOI_MANG }
+  if (co.ok !== true) return { trangThai: 'tat' }
+  const j = await goi('danh-sach', token)
+  if (!j?.ok || !Array.isArray(j.ds)) return { trangThai: 'loi', loi: loiCua(j) }
+  const ds = (j.ds as Obj[])
+    .filter((x) => !!x && typeof x.qid === 'string' && !!x.qid)
+    .map((x) => ({
+      ...(typeof x.dotId === 'string' ? { dotId: x.dotId } : {}),
+      qid: chu(x.qid),
+      trangThai: chu(x.trangThai),
+      ...(typeof x.denHan === 'string' && x.denHan ? { denHan: x.denHan } : {}),
+      ...(typeof x.lanGapLai === 'number' ? { lanGapLai: x.lanGapLai } : {}),
+    }))
+  return { trangThai: 'bat', ds }
+}

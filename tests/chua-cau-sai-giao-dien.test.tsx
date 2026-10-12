@@ -32,6 +32,9 @@ const ph = {
 beforeEach(() => {
   vi.clearAllMocks()
   localStorage.clear()
+  // 12/10: trạng thái không còn bước (can_thay, da_tu_sua…) mở lối "Chữa trực tiếp câu gốc", lối này hỏi `/game-v2/hoa2-cau-chi-tiet`
+  // ⇒ chặn mạng thật trong test: máy chủ giả trả không có câu (khối chữa trực tiếp hiện đường Hỏi thầy, không đáp án).
+  vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, cau: [] }) })))
   api.apiMoDot.mockResolvedValue({ ok: true, dotId: 'D1' })
   api.apiPhatItem.mockResolvedValue(ph)
   api.apiCoChua.mockResolvedValue(false)
@@ -60,7 +63,10 @@ describe('Trải nghiệm sửa từng bước', () => {
       .mockResolvedValueOnce({ ok: true, dotId: 'D1' })
     render(<Man token="t" qid="Q" onVe={() => {}} />)
     await screen.findByText('Chưa kết nối được')
-    fireEvent.click(screen.getByRole('button', { name: 'Tải lại tiến độ' }))
+    // SỬA CÓ CHỦ Ý 12/10: lỗi lúc MỞ câu có khung riêng "Chưa mở được câu này" (nút chính "Thử lại" + "Sang câu khác") thay cho
+    // nút "Tải lại tiến độ" đứng một mình — vẫn tải lại đúng phiên như trước.
+    expect(screen.getByRole('button', { name: 'Sang câu khác' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }))
     expect(await screen.findByLabelText('Câu trả lời của em')).toBeTruthy()
     expect(api.apiMoDot).toHaveBeenCalledTimes(2)
   })
