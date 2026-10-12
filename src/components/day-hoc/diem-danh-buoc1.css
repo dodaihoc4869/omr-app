@@ -1,0 +1,83 @@
+/* BƯỚC 1 ĐIỂM DANH theo bản vẽ thầy duyệt 12/10 (GV-DiemDanh) — `Buoc1DiemDanh.tsx`. Màu CHỈ biến --gvm-* của app thầy (sáng/tối theo tokens.css);
+ * chữ trên nền nhóm dùng bậc -dam trên nền -nen (đủ tương phản cả hai nền). QR luôn mô-đun tối trên nền giấy trắng cố định (máy quét nào cũng đọc). */
+.dd1 { gap: 20px; }
+.dd1-dau { flex-wrap: wrap; row-gap: 12px; }
+.dd1-dau .dh-buoc-ten { flex: 1 1 320px; min-width: 0; }
+.dd1-nut-dau { display: flex; flex-wrap: wrap; gap: 10px; margin-left: auto; }
+.dd1-nut-dau .dh-nut { min-height: 48px; touch-action: manipulation; }
+
+.dd1-o3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.dd1-o2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 16px; }
+.dd1-o { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 18px 20px; border-radius: 20px; background: var(--gvm-mat-2); color: var(--gvm-chu); }
+.dd1-phu { margin: 0; font-size: 13px; line-height: 1.5; color: var(--gvm-chu-3); }
+.dd1-o--ma .dd1-phu, .dd1-o--co-mat .dd1-phu { color: var(--gvm-chu-2); }
+
+/* ô mã + QR */
+.dd1-o--ma { flex-direction: row; align-items: center; gap: 18px; }
+.dd1-qr { flex: 0 0 96px; width: 96px; height: 96px; border-radius: 12px; }
+.dd1-qr-nen { fill: var(--giay); }
+.dd1-qr-o { fill: var(--bt-may-nen); }
+.dd1-ma-chu { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dd1-nhan { font-size: 13px; font-weight: 700; color: var(--gvm-chu-2); }
+.dd1-ma { font-size: 44px; line-height: 1.1; font-weight: 800; letter-spacing: 0.06em; color: var(--gvm-xd-dam); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ô có mặt: số + thanh nhóm (đoạn = em có mặt theo nhóm, phần trống = em chưa đến) + chip đếm nhóm */
+.dd1-co-mat-so { margin: 0; font-size: 15px; font-weight: 600; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; }
+.dd1-co-mat-so b { font-size: 34px; line-height: 1; font-weight: 800; color: var(--gvm-xl); }
+.dd1-thanh { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--gvm-vien); }
+.dd1-thanh > i { display: block; height: 100%; }
+.dd1-thanh > i[data-nhom='cham'], .dd1-thanh > i[data-nhom='tong'] { background: var(--gvm-xl); }
+.dd1-thanh > i[data-nhom='chua-deu'] { background: var(--gvm-hp); }
+.dd1-thanh > i[data-nhom='luoi'] { background: var(--gvm-ho); }
+.dd1-thanh > i[data-nhom='moi'] { background: var(--gvm-chu-3); }
+.dd1-thanh > i[data-nhom='chua-co'] { background: var(--gvm-xd-nen); }
+.dd1-dem-nhom { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+
+/* chip nhóm (Vừa điểm danh + đếm nhóm) */
+.dd1-chip { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; line-height: 1.4; white-space: nowrap; font-variant-numeric: tabular-nums; background: var(--gvm-mat); color: var(--gvm-chu-2); }
+.dd1-chip[data-nhom='cham'] { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.dd1-chip[data-nhom='chua-deu'] { background: var(--gvm-hp-nen); color: var(--gvm-hp-dam); }
+.dd1-chip[data-nhom='luoi'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.dd1-o--vua .dd1-chip[data-nhom='moi'], .dd1-o--vua .dd1-chip[data-nhom='chua-co'] { background: var(--gvm-mat-2); }
+
+/* ô em vắng: nền hồng khi có em vắng, xanh khi đủ lớp */
+.dd1-o--vang { gap: 6px; background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
+.dd1-o--vang[data-co-vang] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.dd1-o--vang .dd1-phu { color: inherit; }
+.dd1-vang-tieu { margin: 0; font-size: 16px; font-weight: 800; }
+.dd1-vang-ten { margin: 0; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+
+.dd1-nut-chu {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; min-height: 44px; padding: 0 4px; border: 0; border-radius: 10px; background: none;
+  color: var(--gvm-xd); font: inherit; font-family: var(--sans); font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation;
+}
+.dd1-o--vang .dd1-nut-chu { color: inherit; }
+.dd1-nut-chu:focus-visible, .dd1-vua-dong:focus-visible { outline: 3px solid var(--gvm-xd); outline-offset: 2px; }
+.dd1-nut-chu:disabled { opacity: 0.6; cursor: default; }
+.dd1-loi-nhip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+
+/* Vừa điểm danh + Xong điểm danh thì làm gì? */
+.dd1-o--vua, .dd1-o--xong { gap: 8px; padding: 16px 18px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); }
+.dd1-tieu { margin: 0 0 4px; font-size: 16px; font-weight: 800; color: var(--gvm-chu); }
+.dd1-tieu small { font-size: 13px; font-weight: 500; color: var(--gvm-chu-3); }
+.dd1-vua-ds { list-style: none; margin: 0; padding: 0; display: grid; min-width: 0; }
+.dd1-vua-ds:has(> li:nth-child(13)) { max-height: 572px; overflow-y: auto; overscroll-behavior: contain; }
+.dd1-vua-dong {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 6px;
+  border: 0; border-top: 1px solid var(--gvm-mat-2); border-radius: 0; background: none; color: var(--gvm-chu); text-align: left;
+  font: inherit; font-family: var(--sans); cursor: pointer; touch-action: manipulation;
+}
+.dd1-vua-dong:hover { background: var(--gvm-mat-2); }
+.dd1-vua-gio { font-size: 13px; color: var(--gvm-chu-3); font-variant-numeric: tabular-nums; }
+.dd1-vua-ten { min-width: 0; font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd1-o--xong .dd1-phu { font-size: 14px; color: var(--gvm-chu-2); line-height: 1.6; }
+.dd1-o--xong .dd1-phu b { color: var(--gvm-chu); }
+.dd1 .dd1-nut-chinh { margin-top: auto; width: 100%; min-height: 56px; justify-content: center; border-radius: 16px; font-size: 17px; font-weight: 800; white-space: normal; text-align: center; }
+
+@media (max-width: 600px) {
+  .dd1-nut-dau { width: 100%; margin-left: 0; }
+  .dd1-nut-dau > * { flex: 1 1 auto; }
+  .dd1-o { padding: 16px; }
+  .dd1-ma { font-size: 38px; }
+  .dd1-vua-dong { grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; }
+}

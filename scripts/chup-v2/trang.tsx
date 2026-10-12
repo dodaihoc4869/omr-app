@@ -85,6 +85,13 @@ import { LA_CB } from './gia/chua-bai'
 // gia/hanh-trinh-2-muc.ts nối ở gia/goi-lenh-thay.ts, chỉ trả lời khi `ht2=1` (ảnh cảnh khác không đổi). ═════════
 import { LA_HT2 } from './gia/hanh-trinh-2-muc'
 if (LA_HT2) document.documentElement.dataset.canhHt2 = '1' // LÀN HÀNH TRÌNH 12/10B — đánh dấu cảnh (đọc khi soát ảnh)
+// ═════════ LÀN ĐIỂM DANH 12/10C: `gv-nhip&ht2=1&dd12c=1` = Hành trình › Dạy học & đầu giờ, bước 1 Điểm danh theo bản vẽ GV-DiemDanh (ô mã + QR, có mặt
+// chia nhóm Chăm / Chưa đều / Lười / Mới, ô em vắng, Vừa điểm danh) + hai bản chiếu React (đang điểm danh · Nhịp học của lớp) + tấm Hồ sơ làm bài mở trên
+// bản chiếu. Màn THẬT; máy giả riêng gia/diem-danh-1210c.ts (lớp "12 Nhóm 10 điểm" của bộ Nhịp học giả, 30/38 em có mặt) nối ở gia/goi-lenh-thay.ts
+// TRƯỚC máy giả ht2, chỉ trả lời khi `dd12c=1`. ═════════
+import { LA_DD12C } from './gia/diem-danh-1210c'
+if (LA_DD12C) document.documentElement.dataset.canhDd12c = '1' // LÀN ĐIỂM DANH 12/10C — đánh dấu cảnh
+// ═════════ hết LÀN ĐIỂM DANH 12/10C ═════════
 // ═════════ LÀN HÔM NAY 12/10B: `gv-hom-nay&nh=1` = Hôm nay của thầy bản vẽ duyệt 12/10 (Việc cần thầy dạng thẻ + Nhịp học: 262 em × 12 ngày, hai cột
 // Lười nhất · Chăm nhất, Đối phó, Theo lớp, bảng từng ngày, tấm hồ sơ). `/gv/nhip-hoc` GIẢ: gia/nhip-hoc.ts; `&nh=loi` máy chủ lỗi · `&nh=trong` chưa có em. ═════════
 import { nhipHocGia } from './gia/nhip-hoc'
