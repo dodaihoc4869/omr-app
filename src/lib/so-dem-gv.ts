@@ -13,17 +13,26 @@ export interface GiaoTuCa {
   ten: string
 }
 
-/** Các thẻ của màn Hành trình: Dạy học · Bài mới trong 7 ngày · Nhịp học · Bài hằng ngày · Kiểm tra đầu giờ · Cần thầy chữa.
- *  10/10 thêm bài 7 ngày ngay sau Dạy học; 12/10 thêm Bài hằng ngày ngay sau Nhịp học. `chien-dich` KHÔNG phải thẻ: là trang quản lý "Chiến dịch đã
- *  giao" của cùng màn (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca). */
-export type TheHanhTrinh = 'day-hoc' | 'goi-7' | 'nhip' | 'bai-hang-ngay' | 'dau-gio' | 'can-chua' | 'chien-dich'
+/** HAI MỤC của màn Hành trình (thầy 12/10: "chốt lại trong phần này tôi chỉ cần mục dạy học, gọi lên bảng đầu giờ và chữa câu khó tính toán và
+ *  câu học sinh cần chữa … thu gọn tối giản hết lại thành 2 mục"): "Dạy học & đầu giờ" (`day-hoc`) · "Chữa bài" (`chua-bai`). */
+export type MucHanhTrinh = 'day-hoc' | 'chua-bai'
+/** Khoá thẻ của màn Hành trình mà nơi khác được gửi tới (Hôm nay, Cài đặt, ảnh chụp…). Hai mục mới + KHOÁ CŨ vẫn nhận để không gãy lối vào cũ —
+ *  `mucHanhTrinh` ánh xạ về hai mục: `can-chua` ⇒ Chữa bài; `dau-gio`, `goi-7`, `nhip`, `bai-hang-ngay` ⇒ Dạy học & đầu giờ (Nhịp học và Bài hằng ngày
+ *  nay ở màn Hôm nay; Kiểm tra đầu giờ đã gộp vào mục Dạy học thành bước "Gọi lên bảng đầu giờ"). `chien-dich` KHÔNG phải thẻ: là trang quản lý
+ *  "Chiến dịch đã giao" của cùng màn (lối vào chữ nhỏ ở Cài đặt, hoặc Tổng quan › "Giao" cho một ca). */
+export type TheHanhTrinh = MucHanhTrinh | 'goi-7' | 'nhip' | 'bai-hang-ngay' | 'dau-gio' | 'can-chua' | 'chien-dich'
+
+/** Khoá thẻ (mới hoặc cũ, kể cả chuỗi lạ) ⇒ một trong hai mục. Không rõ ⇒ Dạy học & đầu giờ (mục mặc định). */
+export function mucHanhTrinh(k: TheHanhTrinh | string | null | undefined): MucHanhTrinh {
+  return k === 'chua-bai' || k === 'can-chua' ? 'chua-bai' : 'day-hoc'
+}
 
 /** Màn Hôm nay bấm một việc ⇒ Hành trình mở sẵn đúng thẻ (đọc một lần rồi xoá — như `giaoTuCa`). */
 export interface MoHanhTrinh {
   the: TheHanhTrinh
-  /** "Bổ sung bài": cuộn tới bước Bài hôm nay trong thẻ Dạy học. */
+  /** "Bổ sung bài": mở và cuộn tới bước "Tick bài vừa dạy" trong mục Dạy học & đầu giờ. */
   boSungBai?: boolean
-  /** Thẻ Nhịp học / Bài hằng ngày: khối chọn sẵn ở thanh phân đoạn (Hôm nay bấm dòng "Khối 12" của thẻ Đủ mức tối thiểu). Vắng ⇒ Tất cả. */
+  /** Khối chọn sẵn (lối vào cũ của thẻ Nhịp học / Bài hằng ngày — hai thẻ ấy nay ở màn Hôm nay; Hành trình bỏ qua trường này). */
   khoi?: number
 }
 

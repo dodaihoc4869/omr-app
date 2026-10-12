@@ -143,19 +143,20 @@ describe('phép thuần: nhóm ưu tiên + chữ số giây', () => {
 })
 
 // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy: "lịch sử học sinh làm bài tập hàng ngày, tính từ 12/10" ⇒ thẻ Bài hằng ngày ngay sau Nhịp học.
+// SỬA CÓ CHỦ ĐÍCH 12/10 (chiều) — thầy 12/10: Hành trình còn 2 mục ("thu gọn tối giản hết lại thành 2 mục": Dạy học & đầu giờ · Chữa bài). Nhịp học
+// chuyển sang màn Hôm nay (làn Hôm nay); thẻ `TheNhipHoc` giữ nguyên và vẫn kiểm ở các test dưới. Khoá cũ `{ the: 'nhip' }` ⇒ mục Dạy học & đầu giờ.
 describe('Hành trình: thẻ Nhịp học', () => {
-  it('thêm bài 7 ngày; Hôm nay đặt { the: nhip, khoi: 12 } ⇒ ChienDichScreen vẫn mở Nhịp học, Khối 12 chọn sẵn, rồi xoá yêu cầu', async () => {
-    expect(THE_HANH_TRINH.map(([, t]) => t)).toEqual(['Dạy học', 'Bài mới trong 7 ngày', 'Nhịp học', 'Bài hằng ngày', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
+  it('Hành trình còn 2 mục; Hôm nay đặt khoá cũ { the: nhip, khoi: 12 } ⇒ ChienDichScreen mở Dạy học & đầu giờ, không đọc nhịp, rồi xoá yêu cầu', async () => {
+    expect(THE_HANH_TRINH.map(([, t]) => t)).toEqual(['Dạy học & đầu giờ', 'Chữa bài'])
     mayChu()
     useSoDemGv.getState().datMoHanhTrinh({ the: 'nhip', khoi: 12 })
-    const { container } = render(<ChienDichScreen />)
-    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học', 'Bài mới trong 7 ngày', 'Nhịp học', 'Bài hằng ngày', 'Kiểm tra đầu giờ', 'Cần thầy chữa'])
-    expect(screen.getByRole('tab', { name: 'Nhịp học' }).getAttribute('aria-selected')).toBe('true')
-    // thẻ Nhịp học không có nút chính "Bổ sung bài" (nút ấy chỉ thuộc thẻ Dạy học)
-    expect(screen.queryByRole('button', { name: 'Bổ sung bài' })).toBeNull()
-    await waitFor(() => expect(screen.getByRole('radio', { name: /Khối 12/ }).getAttribute('aria-checked')).toBe('true'))
-    expect(tenEm(container)).toEqual(['Đỗ Em', 'Vũ Giang', 'Bùi Khoa', 'Phạm Dũng', 'Hồ Hạnh'])
+    render(<ChienDichScreen />)
+    expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual(['Dạy học & đầu giờ', 'Chữa bài'])
+    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.queryByRole('tab', { name: /Nhịp học|Bài hằng ngày|Bài mới trong 7 ngày|Kiểm tra đầu giờ/ })).toBeNull()
+    expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
     await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
+    expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
   })
 
   it('dòng tóm tắt + nhóm có tiêu đề và số, em chưa làm / chưa đủ đứng đầu; lọc khối; ô tìm; không dựng lại bốn ô số', async () => {
@@ -310,14 +311,13 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     expect(lan).toBe(2)
   })
 
-  it('HanhTrinhV2 mặc định vẫn là Dạy học và KHÔNG đọc nhịp khi chưa mở thẻ Nhịp học', async () => {
+  // SỬA CÓ CHỦ ĐÍCH (thầy 12/10: Hành trình còn 2 mục) — không còn thẻ Nhịp học trong Hành trình; mục mặc định không đọc nhịp.
+  it('HanhTrinhV2 mặc định là Dạy học & đầu giờ và KHÔNG đọc nhịp (Nhịp học đã sang màn Hôm nay)', async () => {
     mayChu()
     render(<HanhTrinhV2 />)
-    expect(screen.getByRole('tab', { name: 'Dạy học' }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('tab', { name: 'Dạy học & đầu giờ' }).getAttribute('aria-selected')).toBe('true')
     expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
-    expect(m.goi).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('tab', { name: 'Nhịp học' }))
-    expect(await screen.findByRole('region', { name: /^Nhịp học/ })).toBeTruthy()
-    await waitFor(() => expect(m.goi.mock.calls.some(([d, b]) => d === '/gv/chien-dich' && b.action === 'danh-sach')).toBe(true))
+    expect(screen.queryByRole('tab', { name: 'Nhịp học' })).toBeNull()
+    expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
   })
 })

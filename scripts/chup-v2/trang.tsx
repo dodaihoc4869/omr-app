@@ -75,6 +75,11 @@ import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
 import { goi7Du } from './gia/goi-bai-7'
 // LÀN THẦY TỰ CHỮA 12/10: `gv-nhip&the=can-chua&ttc=1` = Cần thầy chữa › thẻ Thầy tự chữa (bài Dạy học giả có đủ ba tờ, lớp có SBD, số liệu lớp giả).
 import { LA_TTC, BAI_TTC, aiSaiTtc, soGopTtc } from './gia/thay-tu-chua'
+// ═════════ LÀN HÀNH TRÌNH 12/10B: `gv-nhip&ht2=1` = Hành trình còn 2 mục › Dạy học & đầu giờ — MỘT buổi dạy 4 bước (điểm danh có 6 em vắng · gọi lên
+// bảng đầu giờ 6 em · dạy và chiếu câu · tick bài vừa dạy + bảng Bài đang giao). Màn THẬT (`ChienDichScreen` ⇒ `HanhTrinhV2`); máy giả riêng
+// gia/hanh-trinh-2-muc.ts nối ở gia/goi-lenh-thay.ts, chỉ trả lời khi `ht2=1` (ảnh cảnh khác không đổi). ═════════
+import { LA_HT2 } from './gia/hanh-trinh-2-muc'
+if (LA_HT2) document.documentElement.dataset.canhHt2 = '1' // LÀN HÀNH TRÌNH 12/10B — đánh dấu cảnh (đọc khi soát ảnh)
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'

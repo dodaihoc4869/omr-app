@@ -6,6 +6,7 @@ import { lichSuGia } from './lich-su-lam-cau'
 import { baiHangNgayGia, hoSoThaiDoGia, tenEmBhn } from './bai-hang-ngay' // LÀN GIÁO VIÊN 12/10
 import { goi7Gia } from './goi-bai-7' // LÀN BÀI MỚI 7 NGÀY 12/10
 import { LA_TTC, LOP_TTC } from './thay-tu-chua' // LÀN THẦY TỰ CHỮA 12/10
+import { traLoiHt2 } from './hanh-trinh-2-muc' // LÀN HÀNH TRÌNH 12/10B
 
 const HT = [
   { k: '10', id: 'hanh-trinh-v3-khoi-10', soEm: 38 },
@@ -47,6 +48,10 @@ export async function goiLenh(duong: string, body: unknown, _a?: string, _b?: st
   void _a
   void _b
   const b = (body ?? {}) as Record<string, unknown>
+  // ---- LÀN HÀNH TRÌNH 12/10B (cảnh `&ht2=1`): buổi dạy 4 bước — lớp có em vắng + lượt gọi lên bảng đầu giờ (gia/hanh-trinh-2-muc.ts).
+  const ht2 = await traLoiHt2(duong, b)
+  if (ht2) return ht2
+  // ---- hết LÀN HÀNH TRÌNH 12/10B
   // trung tu 09/10: ảnh app thầy chụp ở chế độ 2.0 — màn Cài đặt đọc lại cờ thì vẫn thấy BẬT (trước: "lệnh lạ" ⇒ cờ tắt ⇒ thanh bên cũ 9 mục)
   if (duong === '/gv/chien-dich' && b.action === 'co-doc') return { ok: true as const, du: { ok: true, co: { bat: true, lop: [], sbd: [] } } }
   if (duong === '/gv/chien-dich' && b.action === 'danh-sach') return { ok: true as const, du: { homNay, chienDich: HT.map(cd) } }

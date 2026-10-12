@@ -1,6 +1,9 @@
 // BƯỚC ĐIỂM DANH DÙNG CHUNG của mục Lên bảng — thẻ DẠY HỌC và thẻ KIỂM TRA ĐẦU GIỜ (29/09: "bước Điểm danh BÊ NGUYÊN").
 // Tách nguyên văn từ `DayHocLenBang.tsx` (28/09): mở buổi học trên máy chủ + chiếu mã 6 số & QR (`TamPhuChieuMa`), danh sách CÓ MẶT tự làm mới 5 giây
 // (`useNhipThay`), thầy thêm em bằng tay (tìm SBD / tên không dấu, lọc lớp) và bớt em. Hai thẻ dùng CHUNG buổi đang mở (máy chủ `dang-mo` trả buổi mới nhất).
+// 12/10 (thầy: Hành trình còn 2 mục, "Dạy học & đầu giờ" = MỘT buổi dạy 4 bước): mục ấy gọi `useDiemDanhBuoi()` MỘT lần rồi truyền `dd` xuống
+// Kiểm tra đầu giờ và Dạy học (một buổi, một danh sách có mặt, một nhịp làm mới). Thêm `dsBuoiMo` + `chonBuoi` cho ô "Buổi dạy" của thanh bước
+// (nhiều buổi cùng mở ⇒ thầy chọn buổi), và `thanh` = thanh "có mặt / sĩ số" của bản vẽ (chỉ mục Hành trình bật; màn khác giữ y như cũ).
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MonitorPlay, Plus, UserCheck, X } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
@@ -8,7 +11,7 @@ import TamPhuChieuMa, { type ChuTamPhu, type PhongChoChieu } from '../TamPhuChie
 import { hoiXacNhan } from '../hop-thoai'
 import { NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../../lib/nhip-may-thay'
 import { layLopThay, type LopThay } from '../../lib/ten-lop-thay'
-import { botEmBuoi, buoiDangMo, dongBuoiHoc, linkDiemDanh, moBuoiHoc, themEmBuoi, xemBuoiHoc, locEmThem, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
+import { botEmBuoi, buoiDangMo, dongBuoiHoc, linkDiemDanh, moBuoiHoc, themEmBuoi, xemBuoiHoc, locEmThem, type BuoiHoc, type TrangThaiBuoi } from '../../lib/buoi-hoc-api'
 import './day-hoc.css'
 
 export const CHU_DIEM_DANH: ChuTamPhu = {
@@ -49,6 +52,8 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
   const [dsLop, setDsLop] = useState<LopThay[]>([])
   const [lopChon, setLopChon] = useState(lopMacDinh)
   const [tt, setTt] = useState<TrangThaiBuoi | null>(null)
+  /** Các buổi đang mở máy chủ trả lúc vào màn (mới nhất trước) — ô "Buổi dạy" của mục Hành trình. */
+  const [buoiMoMayChu, setBuoiMoMayChu] = useState<BuoiHoc[]>([])
   const [dangTaiBuoi, setDangTaiBuoi] = useState(true)
   const [loiBuoi, setLoiBuoi] = useState('')
   const [dangMo, setDangMo] = useState(false)
@@ -74,6 +79,7 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
         setDangTaiBuoi(false)
         return
       }
+      setBuoiMoMayChu(chiNoiBuoiCungLop ? r.du.filter((x) => x.lop === lopMacDinh) : r.du)
       const b = chiNoiBuoiCungLop ? r.du.find((x) => x.lop === lopMacDinh) : r.du[0]
       if (b) {
         const x = await xemBuoiHoc(b.id, true)
@@ -174,13 +180,69 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
   const lopLoc = lopThem ?? tt?.buoi.lop ?? ''
   const emLoc = useMemo(() => locEmThem(tt?.lopEm ?? [], lopLoc, timEm), [tt, lopLoc, timEm])
   const buoiXong = !!tt && !tt.buoi.dangMo
-  return { dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, lopThem, setLopThem, dangThem, goc, idBuoi, capNhat, lamMoi, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, lopCuaEm, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong }
+  // Ô "Buổi dạy": buổi đang xem luôn có mặt (kể cả vừa mở / vừa kết thúc), rồi các buổi đang mở khác — không trùng id.
+  const dsBuoiMo = useMemo(() => {
+    const ds = tt ? [tt.buoi] : []
+    for (const b of buoiMoMayChu) if (!ds.some((x) => x.id === b.id) && b.dangMo) ds.push(b)
+    return ds
+  }, [tt, buoiMoMayChu])
+  const [dangChonBuoi, setDangChonBuoi] = useState(false)
+  /** Đổi sang một buổi đang mở khác (thầy dạy hai lớp cùng lúc): đọc buổi ấy kèm danh sách lớp; lỗi ⇒ báo, giữ buổi cũ. */
+  const chonBuoi = useCallback(
+    async (id: string) => {
+      if (!id || id === idBuoi) return
+      setDangChonBuoi(true)
+      const r = await xemBuoiHoc(id, true)
+      setDangChonBuoi(false)
+      if (!r.ok) {
+        showToast(r.chu, 'error')
+        return
+      }
+      setChieuMa(false)
+      setThemMo(false)
+      setEmThem(new Set())
+      setLopThem(null)
+      setTt(r.du)
+    },
+    [idBuoi, showToast],
+  )
+  return { dsBuoiMo, chonBuoi, dangChonBuoi, dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, lopThem, setLopThem, dangThem, goc, idBuoi, capNhat, lamMoi, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, lopCuaEm, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong }
 }
 export type DiemDanhBuoi = ReturnType<typeof useDiemDanhBuoi>
 
-/** Khung bước "Điểm danh" (số bước + tiêu đề) và tấm chiếu mã — y hệt thẻ Dạy học. */
-export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = false }: { dd: DiemDanhBuoi; soBuoc?: number; idTieuDe?: string; khoaLop?: boolean }) {
+/** Số tên em vắng hiện thẳng trên dòng có mặt (còn lại ghi "và N em khác"). */
+const TOI_DA_TEN_VANG = 3
+
+/** Em VẮNG của buổi: em thuộc đúng lớp của buổi mà chưa có trong danh sách có mặt. Buổi "Mọi lớp" hoặc chưa có danh sách lớp ⇒ rỗng (không đoán). */
+export function emVangBuoi(tt: Pick<TrangThaiBuoi, 'buoi' | 'lopEm' | 'coMat'> | null): { sbd: string; hoTen: string }[] {
+  const lop = (tt?.buoi.lop ?? '').trim()
+  if (!tt || !lop || !tt.lopEm) return []
+  const co = new Set(tt.coMat.map((e) => e.sbd))
+  return tt.lopEm.filter((e) => e.tenLop === lop && !co.has(e.sbd)).map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))
+}
+
+/** Khung bước "Điểm danh" (số bước + tiêu đề) và tấm chiếu mã — y hệt thẻ Dạy học.
+ *  `thanh` (mục Hành trình 12/10, bản vẽ): thêm thanh "có mặt / sĩ số" và dòng tên em vắng ngay dưới số có mặt. */
+export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = false, thanh = false }: { dd: DiemDanhBuoi; soBuoc?: number; idTieuDe?: string; khoaLop?: boolean; thanh?: boolean }) {
   const { dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, setLopThem, dangThem, goc, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong } = dd
+  const vang = thanh ? emVangBuoi(tt) : []
+  const dsCoMat = (
+    <ul className="dh-chip-ds" aria-label="Học sinh có mặt">
+      {coMat.map((e) => (
+        <li key={e.sbd} className="dh-em">
+          <span className="dh-em-ten" title={`${e.hoTen || e.sbd} · điểm danh ${gio(e.luc)}${e.cach === 'thay' ? ' (thầy thêm)' : ''}`}>
+            {tenNgan(e.hoTen, e.sbd)}
+          </span>
+          {!buoiXong && (
+            <button type="button" className="dh-em-bo" onClick={() => void botEm(e.sbd)} aria-label={`Bớt ${e.hoTen || e.sbd} khỏi danh sách có mặt`}>
+              <X size={14} aria-hidden="true" />
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+  const phanCoMat = thanh && tt?.siSo ? Math.min(100, Math.round((100 * coMat.length) / tt.siSo)) : null
   return (
     <>
       <section className="dh-buoc" aria-labelledby={idTieuDe}>
@@ -232,6 +294,11 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = fal
                 {tt.siSo ? `/ ${tt.siSo} em` : 'em'} có mặt
                 {tt.buoi.lop ? ` · ${tt.buoi.lop}` : ''}
               </span>
+              {phanCoMat !== null && (
+                <span className="dh-dem-thanh" role="img" aria-label={`Có mặt ${coMat.length} trên ${tt.siSo} em`}>
+                  <i style={{ width: `${phanCoMat}%` }} />
+                </span>
+              )}
               {!buoiXong && (
                 <span className="dh-dem-nut">
                   <button type="button" className="m3-nut-tonal dh-nut" onClick={() => setChieuMa(true)}>
@@ -246,23 +313,22 @@ export function BuocDiemDanh({ dd, soBuoc = 1, idTieuDe = 'dh-b1', khoaLop = fal
                 </span>
               )}
             </div>
+            {vang.length > 0 && (
+              <p className="dh-phu dh-vang" data-khoi="em-vang">
+                Vắng {vang.length} em: {vang.slice(0, TOI_DA_TEN_VANG).map((e) => e.hoTen || `SBD ${e.sbd}`).join(', ')}
+                {vang.length > TOI_DA_TEN_VANG ? ` và ${vang.length - TOI_DA_TEN_VANG} em khác` : ''}
+              </p>
+            )}
             {coMat.length === 0 ? (
               <p className="dh-phu">Chưa em nào điểm danh. Bấm “Chiếu mã điểm danh” để em quét QR hoặc nhập mã; danh sách tự cập nhật mỗi 5 giây.</p>
+            ) : thanh ? (
+              // Mục Hành trình (bản vẽ 12/10): số + thanh + tên em vắng là đủ nhìn; danh sách từng em (bớt em) gập sẵn, mở khi cần.
+              <details className="dh-co-mat-gap" data-khoi="ds-co-mat">
+                <summary>Xem danh sách em có mặt ({coMat.length} em) — bớt em điểm danh nhầm</summary>
+                {dsCoMat}
+              </details>
             ) : (
-              <ul className="dh-chip-ds" aria-label="Học sinh có mặt">
-                {coMat.map((e) => (
-                  <li key={e.sbd} className="dh-em">
-                    <span className="dh-em-ten" title={`${e.hoTen || e.sbd} · điểm danh ${gio(e.luc)}${e.cach === 'thay' ? ' (thầy thêm)' : ''}`}>
-                      {tenNgan(e.hoTen, e.sbd)}
-                    </span>
-                    {!buoiXong && (
-                      <button type="button" className="dh-em-bo" onClick={() => void botEm(e.sbd)} aria-label={`Bớt ${e.hoTen || e.sbd} khỏi danh sách có mặt`}>
-                        <X size={14} aria-hidden="true" />
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              dsCoMat
             )}
             {themMo && !buoiXong && (
               <div className="dh-them" role="group" aria-labelledby="dh-them-ten">
