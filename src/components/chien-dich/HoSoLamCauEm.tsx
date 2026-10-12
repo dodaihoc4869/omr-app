@@ -5,7 +5,7 @@
 //   · ĐẦU TẤM (điểm nhấn duy nhất): nhãn thái độ "Chăm chỉ" / "Chưa đều" / "Có dấu hiệu đối phó" / "Chưa đủ dữ liệu" + lý do BẰNG SỐ — lệnh CHỈ ĐỌC
 //     `/gv/ho-so-thai-do` (`src/lib/bai-hang-ngay-api.ts`, luật + ngưỡng một chỗ ở `server/src/bai-hang-ngay-kieu.ts`). Không tự phán thêm gì.
 //   · "Hôm nay" (dòng Nhịp học khi mở từ Nhịp học; mở từ Bài hằng ngày thì lấy ngày hôm nay của lịch).
-//   · TỪ 12/10: năm ô số (đã làm · đúng · sai · đã ôn · giây trung bình) · lịch làm bài theo ngày (ô màu như bảng Bài hằng ngày) · biểu đồ độ đúng
+//   · TỪ MỐC THEO DÕI (01/10 — thầy 12/10: "dữ liệu phần này tính từ 1/10"; khoảng do máy chủ trả `tu`…`den`): năm ô số (đã làm · đúng · sai · đã ôn · giây trung bình) · lịch làm bài theo ngày (ô màu như bảng Bài hằng ngày) · biểu đồ độ đúng
 //     theo ngày (cột CSS) · phân bố số giây (nhóm quá nhanh tô riêng) · sáu tín hiệu, mỗi tín hiệu có số + ngưỡng.
 //   · TOÀN BỘ SỔ (`/gv/lich-su-lam-cau`, giữ nguyên số và chữ cũ): bốn ô số + bốn thẻ con Câu sai · Câu đúng · Câu đã ôn · Toàn bộ lịch sử
 //     (Câu đúng / Câu đã ôn từ lệnh hồ sơ thái độ). Giây ƯỚC TÍNH ghi "≈", không đo được ghi "chưa đo giờ"; 100 dòng mỗi đợt + "Xem thêm".
@@ -13,7 +13,7 @@
 //     focus về đúng nút đã bấm (thẻ mở tấm lo). Lệnh hồ sơ thái độ lỗi / máy chủ cũ chưa có ⇒ một dòng nói thật + Thử lại, phần lịch sử vẫn đủ.
 //   · "Mở hồ sơ đầy đủ" ⇒ màn Học sinh mở hồ sơ em (ca kiểm tra, EXP, thần thú, phụ huynh…) — `moHoSoEm`.
 // Mảnh riêng nạp LƯỜI (ngoài precache, vite.config.ts). Biểu đồ bằng CSS, không thư viện. Màu chỉ biến --gvm-* (bai-hang-ngay.css).
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Check, ExternalLink, RotateCcw, X } from 'lucide-react'
 import { gioPhutVN, ngayThuChu, ngayVN } from '../../lib/em-toan-canh'
 import { lyDoDeHieu } from '../../lib/loi-de-hieu'
@@ -228,11 +228,13 @@ function LichSu({ kq, onTaiThem, dangTai }: { kq: KetQuaLichSuLamCau; onTaiThem:
   )
 }
 
-// ------------------------------------------------------------------ HỒ SƠ THÁI ĐỘ (từ 12/10)
+// ------------------------------------------------------------------ HỒ SƠ THÁI ĐỘ (từ mốc 01/10)
 
 const phan = (tu: number, mau: number): number | null => (mau > 0 ? Math.round((100 * tu) / mau) : null)
-/** Khoảng xem: "12/10 – 14/10" (một ngày ⇒ "12/10"). */
+/** Khoảng xem: "01/10 – 12/10" (một ngày ⇒ "12/10"). */
 export const chuKhoang = (tu: string, den: string): string => (tu === den ? ngayNgan(tu) : `${ngayNgan(tu)} – ${ngayNgan(den)}`)
+/** Khoảng xem trong câu: "từ 01/10 đến 12/10" (một ngày ⇒ "ngày 12/10"). */
+export const chuTuDen = (tu: string, den: string): string => (tu === den ? `ngày ${ngayNgan(tu)}` : `từ ${ngayNgan(tu)} đến ${ngayNgan(den)}`)
 
 function XuongThaiDo() {
   return (
@@ -296,9 +298,15 @@ function LichNgay({ ngay }: { ngay: readonly NgayHoatDong[] }) {
   )
 }
 
+/** Nhiều ngày (từ 01/10) ⇒ dải cột cuộn ngang trong khung; mở sẵn ở NGÀY GẦN NHẤT (ngày cũ cuộn sang trái). */
 function CotDoDung({ ngay }: { ngay: readonly NgayHoatDong[] }) {
+  const khung = useRef<HTMLOListElement | null>(null)
+  useLayoutEffect(() => {
+    const k = khung.current
+    if (k && k.scrollWidth > k.clientWidth + 1) k.scrollLeft = k.scrollWidth
+  }, [ngay])
   return (
-    <ol className="gvv2-tdo-cot" aria-label="Độ đúng theo ngày">
+    <ol ref={khung} className="gvv2-tdo-cot" aria-label="Độ đúng theo ngày">
       {ngay.map((n) => {
         const coKq = n.soDung + n.soSai
         return (
@@ -601,12 +609,12 @@ export default function HoSoLamCauEm({ em, nhom, onDong }: { em: EmHoSo; nhom?: 
             </div>
           )}
 
-          {/* 3 · Từ 12/10: số · lịch · biểu đồ · tín hiệu */}
+          {/* 3 · Từ mốc 01/10 (khoảng máy chủ trả): số · lịch · biểu đồ · tín hiệu */}
           {td && d && (
             <>
               <section className="gvv2-tdo-khoi" aria-labelledby="gvv2-tdo-so-tieu">
                 <h3 id="gvv2-tdo-so-tieu" className="gvv2-tdo-tieu">
-                  Làm bài từ {chuKhoang(td.tu, td.den)}
+                  Làm bài {chuTuDen(td.tu, td.den)}
                 </h3>
                 <dl className="gvv2-tdo-so">
                   <OSoTd nhan="Đã làm" so={`${d.soLuot} lượt`} phu={`${d.soCau} câu khác nhau`} />

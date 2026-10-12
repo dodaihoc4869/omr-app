@@ -98,7 +98,7 @@ export function docConTongQuan(raw: unknown): ConTongQuan | null {
   return {
     serverNow: typeof raw.serverNow === 'number' && Number.isFinite(raw.serverNow) ? raw.serverNow : Date.now(),
     homNay,
-    moc: ngayChuoi(raw.moc) || '2026-10-12',
+    moc: ngayChuoi(raw.moc) || '2026-10-01', // = MOC_THEO_DOI máy chủ (thầy 12/10: tính từ 1/10)
     tuNgay: ngayChuoi(raw.tuNgay) || (ngay[0]?.ngay ?? homNay),
     dem: { homNay: dHomNay, bayNgay: dBay, tuMoc: dMoc },
     ngay,

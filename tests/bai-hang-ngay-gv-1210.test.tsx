@@ -22,8 +22,10 @@ vi.mock('../src/components/day-hoc/KiemTraDauGio', () => ({ default: () => <p>Gi
 import { useCoHoa2 } from '../src/components/chien-dich/co-hoa2'
 import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { useAppStore } from '../src/store/appStore'
-import { docBaiHangNgay, docHoSoThaiDo } from '../src/lib/bai-hang-ngay-api'
-import { mucO, xepTheoNgay } from '../src/components/chien-dich/bai-hang-ngay-ui'
+import { docBaiHangNgay, docHoSoThaiDo, NGAY_BAT_DAU_BAI_HANG_NGAY } from '../src/lib/bai-hang-ngay-api'
+import { mucO, ngayNgan, xepTheoNgay } from '../src/components/chien-dich/bai-hang-ngay-ui'
+import { MOC_THEO_DOI } from '../server/src/ph-con-tong-quan-kieu'
+import { readFileSync } from 'node:fs'
 const { default: TheBaiHangNgay } = await import('../src/components/chien-dich/TheBaiHangNgay')
 const { default: ChienDichScreen } = await import('../src/screens/ChienDichScreen')
 
@@ -280,5 +282,33 @@ describe('bấm em ⇒ tấm Hồ sơ làm bài (trùng tu)', () => {
     mayChu()
     fireEvent.click(within(tam).getByRole('button', { name: 'Tải lại hồ sơ thái độ' }))
     expect(await within(tam).findByRole('region', { name: 'Có dấu hiệu đối phó' })).toBeTruthy()
+  })
+})
+
+// ------------------------------------------------------------------ MỐC 01/10 (thầy 12/10: "dữ liệu phần này tính từ 1/10 cho tôi nhé")
+describe('mốc 01/10 — chữ ba app khớp một hằng', () => {
+  it('máy chủ thầy + phụ huynh cùng mốc 2026-10-01; lối vào Hôm nay, chữ chờ của thẻ, mốc dự phòng app phụ huynh đọc đúng mốc ấy', async () => {
+    expect(NGAY_BAT_DAU_BAI_HANG_NGAY).toBe('2026-10-01')
+    expect(MOC_THEO_DOI).toBe(NGAY_BAT_DAU_BAI_HANG_NGAY)
+    const moc = ngayNgan(NGAY_BAT_DAU_BAI_HANG_NGAY)
+    expect(moc).toBe('01/10')
+    // Hôm nay của thầy: không import hằng (giữ mảnh nạp lười) ⇒ chữ viết tay phải khớp hằng
+    const homNay = readFileSync('src/screens/GvHomNayScreen.tsx', 'utf8')
+    expect(homNay).toContain(`Xem bài hằng ngày từ ${moc}`)
+    expect(homNay).toContain(`aria-label="Xem bài hằng ngày từ ${moc} ở Hành trình › Bài hằng ngày"`)
+    expect(homNay).not.toMatch(/bài hằng ngày từ 12\/10/)
+    expect(readFileSync('src/lib/ph-v3/con-tong-quan.ts', 'utf8')).toContain(`|| '${MOC_THEO_DOI}'`)
+    // thẻ đang chờ máy chủ ⇒ câu chờ ghi đúng mốc
+    m.goi.mockImplementation(() => new Promise(() => {}))
+    const { container } = render(<TheBaiHangNgay />)
+    expect(container.querySelector('.gvv2-cc-tom')?.textContent).toBe(`Bài hằng ngày từ ${moc}: em thiếu nhiều ngày nhất đứng trước`)
+  })
+
+  it('tấm hồ sơ: tiêu đề "Làm bài từ … đến …" theo khoảng máy chủ trả (không còn "Làm bài từ 12/10 – …")', async () => {
+    mayChu()
+    render(<TheBaiHangNgay />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Lê Bình, SBD 12/ }))
+    const tam = await screen.findByRole('dialog', { name: 'Lê Bình' })
+    expect(await within(tam).findByRole('heading', { name: 'Làm bài từ 12/10 đến 14/10' })).toBeTruthy()
   })
 })
