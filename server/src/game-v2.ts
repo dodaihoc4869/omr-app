@@ -382,8 +382,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const g7=await import('./goi-bai-7')
     const cfg7=await g7.coGoi7(env)
     if(cfg7.bat){
-      if(action==='hoc-tap-sanh'||action==='hoc-tap-start'){const lop7=await env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd=?').bind(sbd).first<{lop:string}>()
-      await g7.dongBoGoi7(env,Date.now(),10,lop7?.lop??'')}
+      // Đồng bộ theo TÊN LỚP của em (`lopCuaEm`, cùng nguồn `lapGoi7`) — `hoc_sinh.lop` là KHỐI ("12") nên không khớp `bai_da_day.lop`
+      // ("12 - Lớp Thường"): trước 12/10 lượt đồng bộ từ máy em khối 12 không thấy bài mới, phải chờ cron.
+      if(action==='hoc-tap-sanh'||action==='hoc-tap-start'){const lop7=await import('./bai-da-day').then(m=>m.lopCuaEm(env,sbd))
+      await g7.dongBoGoi7(env,Date.now(),10,lop7??'')}
       if(action==='hoc-tap-gap')return g7.gapHuongDan7(env,sbd,b,Date.now())
       if(action==='hoc-tap-start'){const r7=await g7.startGoi7(env,sbd,Date.now());if(r7)return r7}
       if(action==='hoc-tap-sanh'){const lap7=await g7.lapGoi7(env,sbd,Date.now());if(lap7){const con7=lap7.plan.viec.length;return {ok:true,cheDo2:true,ngay:g7.tomTatGoi7(lap7,Date.now()).ngay,goi7:g7.tomTatGoi7(lap7,Date.now()),theLuc:{con:con7,tong:lap7.daLamNgay+con7},chienDich:null,doan:{con:0},dao:{con:con7}}}}
