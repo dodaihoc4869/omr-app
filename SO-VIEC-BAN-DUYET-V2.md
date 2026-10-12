@@ -147,3 +147,8 @@ Thầy nhắn (nguyên văn, kèm ảnh thẻ Bài mới trong 7 ngày: "Học s
 - [x] Build theo bản đã duyệt + đẩy (kiểm ca mở) | bằng chứng: làn A b04b2282/5d63d2c2 · làn B cd9a5616/e92f74c8 · làn C cc2f46e4 · nhãn Lười fb8ff967; vitest 15.162 test 0 đỏ mới; PR245 gộp `0e06f48b`, Actions `38216256164` SUCCESS (Kiểm ca thi đạt). Lùi: `git revert -m 1 0e06f48b`.
 - [x] Thầy nhắn thêm: "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn nhé" ⇒ bản vẽ: nút "Chiếu lên bảng", mỗi câu gợi ý em làm sai (có mặt) để gọi lên bảng, Đạt / Chưa đạt ghi sổ; khung ToChieu-ChuaCauKho (1920×1080, đã gọi em: cột 1/3 đen + thẻ tên) | bằng chứng: artifact 13511ZX2Q9tamm65z5JDRu bản 6. BUILD: chờ thầy duyệt.
 - [x] Thầy nhắn thêm: "dữ liệu phần này tính từ 1/10 cho tôi nhé." (ảnh tấm Hồ sơ làm bài) ⇒ đổi mốc 12/10 → 1/10 cho Bài hằng ngày, Hồ sơ làm bài, app phụ huynh | bằng chứng: 3ec927a9; PR244 gộp `0ddef340`, Actions `38210173304` SUCCESS (Kiểm ca thi đạt). Lùi: `git revert -m 1 0ddef340`.
+
+## Đợt 11 — bỏ Tự kiểm kiến thức ở app học sinh (12/10)
+Thầy hỏi "Chỗ tự kiểm này là gì" (ảnh thẻ Bài học trong 7 ngày: Tự kiểm kiến thức · Tờ 1/2/3 · Kiến thức bài trước 0/164 kỹ năng), rồi nhắn: "Bỏ chỗ này đi."
+- [x] Bỏ khối Tự kiểm kiến thức (Tờ 1/2/3), dòng "Kiến thức bài trước … kỹ năng", đoạn giải thích tiến độ; gỡ màn ManKiemGoi7 (không còn lối vào). Máy chủ goi-bai-7-kiem.ts giữ nguyên (điểm cũ còn trong sổ) | bằng chứng: TheGoi7/HocTapHomNay/StudentPortalScreen; test goi-bai-7-giao-dien-1010 sửa có chủ đích (khẳng định vắng); tsc sạch; 14 đỏ liên quan trùng lần chạy đợt 10; check:mau, kiem:mau-giu 0, soi:giao-dien 0 LỖI, build:cf 13/13.
+- [ ] Build + đẩy (kiểm ca mở) | bằng chứng: (chưa có)
