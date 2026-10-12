@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest'
 import { DatabaseSync } from 'node:sqlite'
 import { noiThamSo, taoDbVanHanh } from '../scripts/chua-d1-van-hanh'
