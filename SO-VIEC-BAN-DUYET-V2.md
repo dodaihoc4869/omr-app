@@ -264,3 +264,8 @@ Giả định: "gợi ý hướng dẫn" = chữ hướng dẫn cách dùng / ch
 - [ ] Làm nổi bật Tự sửa lỗi, mời gọi thân thiện | bằng chứng: (chưa có)
 - [ ] Đẩy + phát hành (kiểm ca mở) | bằng chứng: (chưa có)
 - [ ] Tối 13/10 giờ cao điểm: đo số thật (D1 insights + độ trễ) so với tối 12/10 | bằng chứng: (chưa có)
+Thầy nhắn thêm (2 ảnh màn "Câu đã làm" của học sinh: khối tải PDF to cuối danh sách; hộp chọn chiến dịch có "Bài 8 · Amine · 164 câu", "#cd12009c1c2 · 112 câu", "Hành trình giỏi hoá · Khối 12 · 9269 câu"):
+"Chỗ tải đề làm lại cho đẹp tinh tế và gọn gàng."
+"Ảnh 2 chỉ giữ lại bài đã chọn là bài 8, các phần dưới xóa bỏ nhé"
+- [ ] Câu đã làm: khối tải PDF / tải đề làm lại gọn, tinh tế | bằng chứng: (chưa có)
+- [ ] Câu đã làm: hộp chọn chỉ giữ bài (Bài 8 · Amine), bỏ chiến dịch mã "#cd…" và "Hành trình giỏi hoá" | bằng chứng: (chưa có)
