@@ -3838,6 +3838,8 @@ const boXuLy = {
       if (p === '/gv/thay-chua-cau') return ra(await thayChuaCau(env, b))
       // AI ĐÃ LÀM SAI CÂU NÀY (thầy 05/10, nút X trên tờ chiếu; server/src/ai-sai-cau.ts): CHỈ ĐỌC sổ — em · lúc · nơi · số giây.
       if (p === '/gv/ai-sai-cau') return ra(await aiSaiCau(envDoc, b))
+      // EM CỦA LỚP LÀM SAI TỪNG CÂU, THEO LÔ (12/10, Chữa câu khó & tính toán — ứng viên gọi lên bảng mỗi câu; server/src/ai-sai-nhieu-cau.ts): CHỈ ĐỌC sổ.
+      if (p === '/gv/ai-sai-nhieu-cau') return ra(await import('./ai-sai-nhieu-cau').then((m) => m.aiSaiNhieuCau(envDoc, b)))
       // GIAO ĐỀ THEO TUẦN (26/09, gv-kho-de-giao.ts): màn thầy `GiaoDeTheoTuanScreen` gọi lệnh này; dòng định tuyến bị rơi mất sau một lần gộp ⇒ màn báo
       // "Máy chủ chưa có lệnh". Nối lại (28/09). Có ghi (`luu`) ⇒ dùng `env` (không phải bản đọc-chỉ).
       if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(env, b))

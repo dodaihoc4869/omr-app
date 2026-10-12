@@ -5,7 +5,7 @@
 //   · nhận diện "có tính toán": nhãn kho / `dangCua` trước, câu chưa rõ dùng ĐÚNG biểu thức gói 7 (khoá chữ với máy chủ); "Tính chất…" không phải tính toán;
 //   · chọn đề ⇒ tờ chiếu có ĐỦ mọi câu, đúng mã, đúng thứ tự, câu khác khối bị bỏ; tự luận giữ (thầy tự chọn); dải T có số lớp; nút X "Ai sai" chạy
 //     trên tờ cả lớp (mốc khoá ẩn), không có nút Đạt / Chưa đạt;
-//   · giao diện: thẻ "Thầy tự chữa" gập sẵn ở đầu Cần thầy chữa (không đọc kho), mở ⇒ chọn lớp · bài · tờ, xem trước thứ tự + tỉ lệ sai, nút chiếu mở khung.
+//   · giao diện (12/10B): khối "Chữa câu khó & tính toán" mở sẵn SAU khối "Học sinh cần chữa"; chọn lớp · bài · tờ ⇒ bốn ô số, thứ tự, tỉ lệ sai, nút "Chiếu lên bảng".
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -262,22 +262,26 @@ describe('chọn đề ⇒ tờ chiếu đủ mọi câu, đúng mã, câu khác
 })
 
 // ───────────────────────── giao diện ─────────────────────────
-describe('giao diện: thẻ "Thầy tự chữa" trong Cần thầy chữa', () => {
-  it('Cần thầy chữa có thẻ "Thầy tự chữa" GẬP sẵn ở đầu: chưa đọc kho, chưa gọi lệnh lớp; danh sách cần chữa vẫn tải như cũ', async () => {
-    const { container } = render(<TheCanThayChua />)
-    const the = screen.getByRole('region', { name: 'Thầy tự chữa' })
-    expect(the.compareDocumentPosition(container.querySelector('.gvv2-cc')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    const nut = within(the).getByRole('button', { name: 'Chọn đề' })
-    expect(nut.getAttribute('aria-expanded')).toBe('false')
+// SỬA CÓ CHỦ ĐÍCH 12/10B — thầy: "thu gọn tối giản hết lại thành 2 mục" + "chữa câu khó và tính toán cũng phải chiếu lên bảng theo chuẩn" (bản vẽ duyệt):
+// thẻ "Thầy tự chữa" gập ở ĐẦU ⇒ khối (B) "Chữa câu khó & tính toán" MỞ SẴN, đứng SAU khối (A) "Học sinh cần chữa"; nút "Chiếu lên máy chiếu" ⇒ "Chiếu
+// lên bảng"; dòng tóm tắt ⇒ bốn ô số; tỉ lệ sai ⇒ "% lớp sai" + "x/y em sai" + thanh. Phần gọi em lên bảng kiểm ở tests/chua-bai-1210b.test.tsx.
+describe('giao diện: khối "Chữa câu khó & tính toán" trong mục Chữa bài', () => {
+  it('Chữa bài = hai khối: (A) Học sinh cần chữa trước, (B) Chữa câu khó & tính toán MỞ SẴN sau — (B) đọc kho + lớp ngay, danh sách cần chữa vẫn tải như cũ', async () => {
+    render(<TheCanThayChua />)
+    const a = screen.getByRole('region', { name: 'Học sinh cần chữa' })
+    const b = screen.getByRole('region', { name: 'Chữa câu khó & tính toán' })
+    expect(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(within(a).getByRole('heading', { level: 2, name: 'Học sinh cần chữa' })).toBeTruthy()
+    expect(within(b).getByRole('heading', { level: 2, name: 'Chữa câu khó & tính toán' })).toBeTruthy()
+    expect(within(b).queryByRole('button', { name: 'Chọn đề' })).toBeNull()
     expect(await screen.findByText('Chưa có câu nào cần thầy chữa.')).toBeTruthy()
-    expect(g.kho).not.toHaveBeenCalled()
-    expect(g.goi.mock.calls.filter(([d]) => d === '/gv/lop')).toHaveLength(0)
-    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(await within(b).findByRole('combobox', { name: 'Lớp' })).toBeTruthy()
+    expect(g.kho).toHaveBeenCalled()
+    expect(g.goi.mock.calls.filter(([d]) => d === '/gv/lop')).toHaveLength(1)
   })
 
-  it('mở ⇒ chọn lớp (theo khối) · bài Dạy học · tờ đề (đủ ba tờ bật sẵn) ⇒ xem trước thứ tự + "Có tính toán" + tỉ lệ sai lớp; tắt một tờ ⇒ danh sách theo; Chiếu ⇒ khung tờ chiếu đủ câu', async () => {
+  it('chọn lớp (theo khối) · bài Dạy học · tờ đề (đủ ba tờ bật sẵn) ⇒ bốn ô số + thứ tự + "Có tính toán" + % lớp sai + x/y em; tắt một tờ ⇒ danh sách theo; "Chiếu lên bảng" ⇒ khung tờ chiếu đủ câu', async () => {
     render(<ThayTuChua />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn đề' }))
     const lop = (await screen.findByRole('combobox', { name: 'Lớp' })) as HTMLSelectElement
     expect([...lop.querySelectorAll('optgroup')].map((o) => o.label)).toEqual(['Khối 11', 'Khối 12'])
     expect([...lop.options].map((o) => o.textContent)).toEqual(['11B · 3 em', '12A1 · 2 em'])
@@ -285,25 +289,28 @@ describe('giao diện: thẻ "Thầy tự chữa" trong Cần thầy chữa', ()
     const bai = screen.getByRole('combobox', { name: /Bài trong Dạy học · Khối 11/ }) as HTMLSelectElement
     expect(bai.value).toBe('')
     expect(screen.getByText('Chọn một bài để xem các câu sẽ chiếu.')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Chiếu lên bảng' })).toBeNull()
     fireEvent.change(bai, { target: { value: 'DH-11-C2-B6' } })
 
     const nhom = screen.getByRole('group', { name: /Tờ đề của Bài 6/ })
     const chip = within(nhom).getAllByRole('button')
-    expect(chip.map((b) => b.textContent)).toEqual(['Trắc nghiệm 4 câu', 'Đúng–sai 2 câu', 'Trả lời ngắn 2 câu'])
+    expect(chip.map((b) => b.textContent)).toEqual(['Trắc nghiệm · 4 câu', 'Đúng–sai · 2 câu', 'Trả lời ngắn · 2 câu'])
     expect(chip.map((b) => b.getAttribute('aria-pressed'))).toEqual(['true', 'true', 'true'])
 
     const ds = screen.getByRole('list', { name: 'Thứ tự câu sẽ chiếu' })
     const dong = () => [...ds.querySelectorAll<HTMLElement>('li[data-qid]')]
     expect(dong().map((l) => l.dataset.qid)).toEqual(THU_TU)
-    expect(dong().map((l) => l.querySelector('.gvv2-ttc-meta b')!.textContent)).toEqual([
+    expect(dong().map((l) => `${l.querySelector('.gvv2-ttc-meta b')!.textContent} · ${l.querySelector('.gvv2-ttc-loai')!.textContent}`)).toEqual([
       'Câu 2 · Đúng–sai', 'Câu 1 · Đúng–sai', 'Câu 2 · Trắc nghiệm', 'Câu 1 · Trả lời ngắn', 'Câu 1 · Trắc nghiệm', 'Câu 3 · Trắc nghiệm', 'Câu 2 · Tự luận',
     ])
     expect(dong().filter((l) => l.textContent!.includes('Có tính toán')).map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-II-2', 'DH-11-C2-B6-I-2', 'DH-11-C2-B6-III-1'])
     expect(screen.getByText(/1 câu mang mã khối khác Khối 11/)).toBeTruthy()
-    expect(document.querySelector('.gvv2-ttc-tom')!.textContent).toBe('7 câu sẽ chiếu · 2 câu Đúng–sai · 3 câu có tính toán — Đúng–sai và câu có tính toán chiếu trước')
-    // tỉ lệ sai lớp: số gộp của đúng các em lớp 11B, đúng mã câu
-    await waitFor(() => expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai · 3 em làm'))
-    expect(dong()[3]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('0% lớp sai · 2 em làm')
+    // bốn ô số (ô "lớp sai từ 30%" có khi đã có số liệu lớp)
+    await waitFor(() => expect([...document.querySelectorAll('.gvv2-ttc-o-so')].map((o) => o.textContent)).toEqual(['7 câu sẽ chiếu', '2 câu Đúng–sai', '3 câu có tính toán', '1 câu lớp sai từ 30%']))
+    // tỉ lệ sai lớp: số gộp của đúng các em lớp 11B, đúng mã câu (máy chủ cũ chưa có lệnh theo lô ⇒ lùi về số gộp)
+    await waitFor(() => expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
+    expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.getAttribute('data-cao')).toBe('true')
+    expect(dong()[3]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('0% lớp sai0/2 em sai')
     expect(dong()[0]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('chưa em nào làm')
     const [sbd, qid] = g.tk.mock.calls.at(-1)!
     expect(sbd).toEqual(['T1', 'T2', 'T3'])
@@ -314,11 +321,15 @@ describe('giao diện: thẻ "Thầy tự chữa" trong Cần thầy chữa', ()
     expect(chip[0]!.getAttribute('aria-pressed')).toBe('false')
     expect(dong().map((l) => l.dataset.qid)).toEqual(['DH-11-C2-B6-II-2', 'DH-11-C2-B6-II-1', 'DH-11-C2-B6-III-1', 'DH-11-C2-B6-III-2'])
     fireEvent.click(chip[0]!)
-    await waitFor(() => expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai · 3 em làm'))
+    await waitFor(() => expect(dong()[2]!.querySelector('.gvv2-ttc-sai')!.textContent).toBe('67% lớp sai2/3 em sai'))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Chiếu lên máy chiếu' }))
+    // dòng phím trên tờ (bản vẽ): L · Đạt / Chưa đạt · G · T · X · Space
+    expect(document.querySelector('.gvv2-ttc-goi-y')!.textContent).toBe(
+      'Tờ chiếu chuẩn như Chiếu lên bảng: L gọi em lên bảng · Đạt / Chưa đạt ghi sổ · G lời giải hiện dần · T thống kê lớp · X ai sai, mấy giây · Space lật trang',
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Chiếu lên bảng' }))
     const to = await screen.findByTestId('to-chieu')
-    expect(to.dataset.ten).toBe('Tờ máy chiếu — Thầy tự chữa')
+    expect(to.dataset.ten).toBe('Tờ máy chiếu — Chữa câu khó & tính toán')
     const html = to.textContent!
     const vt = THU_TU.map((q) => viTri(html, q))
     expect([...vt].sort((a, b) => a - b)).toEqual(vt)
@@ -330,7 +341,6 @@ describe('giao diện: thẻ "Thầy tự chữa" trong Cần thầy chữa', ()
 
   it('lớp khác khối ⇒ danh sách bài của khối ấy; nhớ lựa chọn trên máy', async () => {
     const l1 = render(<ThayTuChua />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn đề' }))
     const lop = (await screen.findByRole('combobox', { name: 'Lớp' })) as HTMLSelectElement
     fireEvent.change(lop, { target: { value: 'lop:12A1' } })
     const bai = screen.getByRole('combobox', { name: /Bài trong Dạy học · Khối 12/ }) as HTMLSelectElement
@@ -339,22 +349,19 @@ describe('giao diện: thẻ "Thầy tự chữa" trong Cần thầy chữa', ()
     expect(screen.getByRole('list', { name: 'Thứ tự câu sẽ chiếu' }).querySelectorAll('li')).toHaveLength(1)
     l1.unmount()
     render(<ThayTuChua />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn đề' }))
     expect(((await screen.findByRole('combobox', { name: 'Lớp' })) as HTMLSelectElement).value).toBe('lop:12A1')
     expect((screen.getByRole('combobox', { name: /Bài trong Dạy học/ }) as HTMLSelectElement).value).toBe('DH-12-C1-B1')
   })
 
-  it('trạng thái: kho trống ⇒ nói vì sao + Mở Kho đề; kho lỗi ⇒ lý do + Thử lại; danh sách lớp lỗi ⇒ chọn theo khối, nói thật không có tỉ lệ sai', async () => {
+  it('trạng thái: kho trống ⇒ nói vì sao + Mở Kho đề; kho lỗi ⇒ lý do + Thử lại; danh sách lớp lỗi ⇒ chọn theo khối, nói thật không có tỉ lệ sai / không gọi em', async () => {
     g.kho.mockResolvedValue([])
     const a = render(<ThayTuChua />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn đề' }))
     expect(await screen.findByText(/Kho Dạy học trên máy này chưa có bài nào/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Mở Kho đề' })).toBeTruthy()
     a.unmount()
 
     g.kho.mockRejectedValueOnce(new Error('IndexedDB hỏng'))
     const b = render(<ThayTuChua />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn đề' }))
     const loi = await screen.findByRole('alert')
     expect(loi.textContent).toContain('Chưa đọc được kho đề trên máy này.')
     g.kho.mockResolvedValue([BAI6])
@@ -365,12 +372,12 @@ describe('giao diện: thẻ "Thầy tự chữa" trong Cần thầy chữa', ()
     g.kho.mockResolvedValue([BAI6])
     g.goi.mockImplementation(async () => ({ ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }))
     render(<ThayTuChua />)
-    fireEvent.click(screen.getByRole('button', { name: 'Chọn đề' }))
     const lop = (await screen.findByRole('combobox', { name: 'Lớp' })) as HTMLSelectElement
     expect([...lop.options].map((o) => o.textContent)).toEqual(['Khối 11'])
     expect(screen.getByText(/Chưa tải được danh sách lớp/)).toBeTruthy()
     fireEvent.change(screen.getByRole('combobox', { name: /Bài trong Dạy học/ }), { target: { value: 'DH-11-C2-B6' } })
-    expect(screen.getByText('Chọn một lớp để thấy tỉ lệ sai của lớp.')).toBeTruthy()
+    expect(screen.getByText('Chọn một lớp để thấy tỉ lệ sai và em được gọi lên bảng.')).toBeTruthy()
+    expect(document.querySelectorAll('.gvv2-ttc-o-so')).toHaveLength(3)
     expect(g.tk).not.toHaveBeenCalled()
   })
 })

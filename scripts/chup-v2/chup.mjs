@@ -62,10 +62,28 @@ const DS_TTC = [
 ]
 // ═══════════ hết LÀN THẦY TỰ CHỮA 12/10 ═══════════
 
+// ═══════════ LÀN CHỮA BÀI 12/10B: Hành trình › Chữa bài = (A) Học sinh cần chữa + (B) Chữa câu khó & tính toán (mở sẵn) + tờ chiếu gọi em lên bảng ═══════════
+// Cảnh `?man=gv-nhip&the=can-chua&ttc=1&cb=1` (trang.tsx + gia/chua-bai.ts). `cb:<mã bài>` = chọn lớp 12A1 + bài, chờ dòng "Gọi lên bảng:";
+// `cb-chieu:<mã bài>[:phím]` = thêm bấm "Chiếu lên bảng", chờ tờ nối app rồi gõ phím trên tờ (l gọi em · e gọi em khác · g lời giải).
+// Chạy riêng: tiền tố "6" (60-, 61-).
+const CB = 'gv-nhip&the=can-chua&ttc=1&cb=1'
+const DS_CB = [
+  ['60-cb-chua-bai-may-tinh', CB, 1440, 900, 'light', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['60-cb-chua-bai-may-tinh-toi', CB, 1440, 900, 'dark', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['60-cb-chua-bai-dien-thoai', CB, 390, 844, 'light', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['60-cb-chua-bai-dien-thoai-toi', CB, 390, 844, 'dark', true, /Hành trình giỏi Hóa/, 'cb:DH-12-C2-B6'],
+  ['61-cb-to-chieu-cho-goi-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6'],
+  ['61-cb-to-chieu-da-goi-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:l'],
+  ['61-cb-to-chieu-goi-em-khac-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:le'],
+  ['61-cb-to-chieu-da-goi-loi-giai-1920', CB, 1920, 1080, 'light', false, /Hành trình giỏi Hóa/, 'cb-chieu:DH-12-C2-B6:lg '],
+]
+// ═══════════ hết LÀN CHỮA BÀI 12/10B ═══════════
+
 /** [tên ảnh, ?man=, rộng, cao, nền ('light'|'dark'), cả trang?, chờ chữ (regex)] */
 const DS = [
   ...DS_HS12, // LÀN HỌC SINH 12/10
   ...DS_TTC, // LÀN THẦY TỰ CHỮA 12/10
+  ...DS_CB, // LÀN CHỮA BÀI 12/10B
   ['01a-hom-nay-doc', 'sanh', 390, 844, 'light', true, /Hôm nay/],
   ['01a-hom-nay-doc-toi', 'sanh', 390, 844, 'dark', true, /Hôm nay/],
   ['01b-hom-nay-ngang-dien-thoai', 'sanh', 844, 390, 'light', false, /Hôm nay/],
@@ -300,15 +318,16 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
     } else if (viec?.startsWith('ttc:') || viec?.startsWith('ttc-chieu:')) {
       // LÀN THẦY TỰ CHỮA 12/10: mở thẻ Thầy tự chữa → chọn bài → (chiếu → phím trên tờ).
       const [loai, khoaBai, phim] = viec.split(':')
-      const the = t.getByRole('region', { name: 'Thầy tự chữa' })
-      await the.getByRole('button', { name: 'Chọn đề' }).click({ timeout: 20000 })
+      // 12/10B (làn Chữa bài): khối đổi tên "Chữa câu khó & tính toán", MỞ SẴN (không còn nút "Chọn đề"), nút chiếu "Chiếu lên bảng".
+      const the = t.getByRole('region', { name: /Thầy tự chữa|Chữa câu khó/ })
+      if (await the.getByRole('button', { name: 'Chọn đề' }).count()) await the.getByRole('button', { name: 'Chọn đề' }).click({ timeout: 20000 })
       await the.getByRole('combobox', { name: 'Lớp' }).selectOption('lop:12A1', { timeout: 20000 })
       await the.getByRole('combobox', { name: /Bài trong Dạy học/ }).selectOption(khoaBai)
       await the.getByText(/lớp sai/).first().waitFor({ timeout: 20000 })
       if (loai === 'ttc') {
         await t.waitForTimeout(300)
       } else {
-        await the.getByRole('button', { name: 'Chiếu lên máy chiếu' }).click()
+        await the.getByRole('button', { name: /^Chiếu lên (máy chiếu|bảng)$/ }).click()
         const khung = t.frameLocator('.lop-xem-phieu iframe')
         await khung.locator('body.mc-noi').waitFor({ timeout: 20000 })
         await t.waitForTimeout(600)
@@ -319,6 +338,25 @@ for (const [ten, m, w, hgt, nen, ca, cho, viec] of DS) {
           await t.waitForTimeout(500)
         }
         if ((phim ?? '').includes('x')) await khung.locator('.mc-aisai.mc-mo .mc-sai-em').first().waitFor({ timeout: 20000 })
+      }
+    } else if (viec?.startsWith('cb:') || viec?.startsWith('cb-chieu:')) {
+      // LÀN CHỮA BÀI 12/10B: khối (B) mở sẵn → chọn lớp 12A1 + bài → chờ dòng "Gọi lên bảng:" → (chiếu → phím trên tờ).
+      const [loai, khoaBai, phim] = viec.split(':')
+      const the = t.getByRole('region', { name: 'Chữa câu khó & tính toán' })
+      await the.getByRole('combobox', { name: 'Lớp' }).selectOption('lop:12A1', { timeout: 20000 })
+      await the.getByRole('combobox', { name: /Bài trong Dạy học/ }).selectOption(khoaBai)
+      await the.getByText(/^Gọi lên bảng:/).first().waitFor({ timeout: 20000 })
+      if (loai === 'cb') {
+        await t.waitForTimeout(300)
+      } else {
+        await the.getByRole('button', { name: 'Chiếu lên bảng', exact: true }).click()
+        const khung = t.frameLocator('.lop-xem-phieu iframe')
+        await khung.locator('body.mc-noi').waitFor({ timeout: 20000 })
+        await t.waitForTimeout(600)
+        for (const k of phim ?? '') {
+          await khung.locator('body').evaluate((b, key) => b.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })), k)
+          await t.waitForTimeout(k === 'l' ? 2600 : 600)
+        }
       }
     } else if (viec?.startsWith('bam-radio:')) {
       await t.getByRole('radio', { name: new RegExp(viec.slice(10)) }).first().click({ timeout: 20000 })

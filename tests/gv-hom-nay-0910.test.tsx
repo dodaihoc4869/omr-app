@@ -383,7 +383,8 @@ describe('Hành trình: thêm bài 7 ngày bên cạnh các thẻ đang dùng', 
     expect(screen.queryByRole('button', { name: 'Bổ sung bài' })).toBeNull()
 
     fireEvent.click(screen.getByRole('tab', { name: /^Cần thầy chữa/ }))
-    expect(await screen.findByRole('region', { name: 'Cần thầy chữa · nhiều em sai trước' })).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 12/10B (bản vẽ Chữa bài duyệt): khối danh sách mang tiêu đề "Học sinh cần chữa" (vùng đặt tên theo tiêu đề).
+    expect(await screen.findByRole('region', { name: 'Học sinh cần chữa' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Bổ sung bài' })).toBeNull()
     // danh sách đọc xong (8 chỗ: gồm cả bước cuối, thẻ nút thắt, kèm riêng) ⇒ số cạnh tên thẻ khớp số trong thẻ
     await waitFor(() => expect(screen.getByRole('tab', { name: /^Cần thầy chữa/ }).textContent).toBe('Cần thầy chữa · 8'))
