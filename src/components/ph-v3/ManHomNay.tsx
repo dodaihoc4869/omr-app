@@ -1,16 +1,22 @@
 // Mục "Hôm nay" — TRUNG TU THẦY DUYỆT 09/10 (bản vẽ PH-HomNay). Thứ tự: khối chính (a/b câu · thanh · câu tình trạng · giờ học quen)
 // → cảnh báo của thầy (nếu có) → Nhận xét của thầy (lời mới nhất + "Xem tất cả nhận xét của thầy ›") → Tuần này học đều (7 chấm)
-// → danh sách cần chú ý (dạng con đang luyện thêm / dạng cần vững · Cần thầy chữa · ca gần nhất dẫn sang Ca kiểm tra) → "Gia đình hỗ trợ" một đoạn chữ nhỏ cuối màn.
+// → danh sách cần chú ý (dạng con đang luyện thêm / dạng cần vững · ca gần nhất dẫn sang Ca kiểm tra) → "Gia đình hỗ trợ" một đoạn chữ nhỏ cuối màn.
 // Nguồn đọc và quyền công bố giữ nguyên; khối vắng dữ liệu không dựng số minh hoạ; số câu hôm nay MỘT nguồn, nói MỘT lần.
+// LÀN PHỤ HUYNH 12/10 (thầy: "… số câu làm đúng, làm sai, thời gian làm từng câu gợi ý nhắc, bỏ mục thầy cần chữa …"): BỎ HẲN dòng "Cần thầy chữa".
+// Có `/ph/con-tong-quan` (ConTongQuan.tsx): khối chính lấy số câu đã làm / MỨC TỐI THIỂU của ngày từ đó + ba số câu đúng · câu sai · trung bình mỗi câu;
+// ngay sau cảnh báo là "Gợi ý nhắc con"; "Tuần này học đều" thay bằng "Lịch học tuần này" (đủ mức / chưa đủ / không làm + từng ngày từ 12/10).
+// Máy chủ cũ chưa có lệnh ⇒ các khối mới vắng, màn y như trước.
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { CaGanNhat, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
+import type { ConTongQuan } from '../../lib/ph-v3/con-tong-quan'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { chuHanNop, chuGuiLuc, tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
 import { gioVn, ngayDayDuVn, ngayNganVn, soVn, thuNgayVn } from '../../lib/ph-moi/dinh-dang'
 import { chuCongBoCa } from '../ph-moi/nhan'
-import { BtBut, BtChuY, BtChuong, BtKep, BtPhai, BtTich } from './BieuTuong'
+import { BtChuY, BtChuong, BtKep, BtPhai, BtTich } from './BieuTuong'
 import { DangTai, The, TheLoi } from './dung-chung'
+import { BaSoHomNay, GoiYNhacCon, LichTuan, chuTinhTrangMuc, homNayCua, type TaiTongQuan } from './ConTongQuan'
 import { chuThay, lienKetCa, tuanNay } from './tien-ich'
 
 /** Tối đa số tên dạng ghi ở dòng dạng (còn lại gộp "và N dạng khác") — dòng ngắn trên điện thoại; danh sách đủ ở Tiến bộ. */
@@ -19,9 +25,13 @@ const THU_NGAN = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'] as const
 const THU_DAY = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ nhật'] as const
 const TEN_TANG = ['Nền', 'Hiểu', 'Vận dụng', 'Tổng hợp'] as const
 
-export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, onDaXem }: {
+/** Chưa nối khối tổng quan (test cũ, màn dựng riêng) ⇒ coi như máy chủ cũ: các khối mới vắng. */
+const KHONG_TONG_QUAN: TaiTongQuan = { v: null, daTai: true, chuLoi: '', thuLai: () => {} }
+
+export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, onDaXem, tongQuan = KHONG_TONG_QUAN }: {
   v: ViewPhMoi
   hoc2: Hoc2 | null
+  tongQuan?: TaiTongQuan
   loiThay: { ds: NhanXetCa[] | null; chuLoi: string }
   thuLaiLoiThay: () => void
   canhBao: CanhBaoThay[]
@@ -38,11 +48,12 @@ export default function ManHomNay({ v, hoc2, loiThay, thuLaiLoiThay, canhBao, on
         v.trangThai === 'loi' ? <div className="ph3-luoi"><TheLoi chu={v.chuLoi} thuLai={v.thuLai} /></div> : <DangTai hinh="hom-nay" />
       ) : (
         <div className="ph3-luoi">
-          <KhoiChinh pm={pm} hoc2={hoc2} />
+          <KhoiChinh pm={pm} hoc2={hoc2} tq={tongQuan.v} />
           {canhBao.map((cb) => <CanhBao key={cb.id} cb={cb} nay={pm.serverNow ?? Date.now()} onDaXem={onDaXem} />)}
+          <GoiYNhacCon tai={tongQuan} />
           <LoiThayMoi loiThay={loiThay} thuLai={thuLaiLoiThay} />
-          <TuanNay pm={pm} />
-          <CanChuY pm={pm} hoc2={hoc2} />
+          {tongQuan.v ? <LichTuan tq={tongQuan.v} /> : <TuanNay pm={pm} />}
+          <CanChuY pm={pm} hoc2={hoc2} hep={!!tongQuan.v} />
           <p className="ph3-gia-dinh ph3-o-hep" data-vung="gia-dinh"><b>Gia đình hỗ trợ:</b> dành cho con một khoảng yên tĩnh để học từng chặng ngắn; hỏi con điều đã hiểu và điều muốn thầy chữa.</p>
         </div>
       )}
@@ -94,10 +105,16 @@ export function dongHanhTrinh(ht: Hoc2['hanhTrinh'], tong: number | null): strin
   return `${tang} · mức tối thiểu ${ht.toiThieu} câu.`
 }
 
-function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
-  const so = soCauHomNay(pm, hoc2)
-  const ngay = thuNgayVn(hoc2?.homNay && hoc2.serverNow ? hoc2.serverNow : pm.serverNow ?? Date.now())
-  const tinhTrang = chuTinhTrang(so)
+/**
+ * Khối chính "Con hôm nay". Có tổng quan (`/ph/con-tong-quan`) và không ở chế độ gói bài 7 ⇒ số câu đã làm / MỨC TỐI THIỂU của ngày (kế hoạch ngày đang chấm;
+ * mức ước tính ghi "≈") + ba số câu đúng · câu sai · trung bình mỗi câu. Không có ⇒ như trước (`soCauHomNay`). Số câu hôm nay vẫn MỘT nguồn, nói MỘT lần.
+ */
+function KhoiChinh({ pm, hoc2, tq }: { pm: PhMoi; hoc2: Hoc2 | null; tq: ConTongQuan | null }) {
+  const nayTq = hoc2?.goi7 ? null : homNayCua(tq)
+  const so = nayTq ? { daLam: nayTq.daLam, tong: nayTq.canLam, keHoach: true } : soCauHomNay(pm, hoc2)
+  const xap = nayTq?.mucUocTinh ? '≈' : ''
+  const ngay = thuNgayVn(nayTq && tq ? tq.serverNow : hoc2?.homNay && hoc2.serverNow ? hoc2.serverNow : pm.serverNow ?? Date.now())
+  const tinhTrang = nayTq ? chuTinhTrangMuc(nayTq) : chuTinhTrang(so)
   const gioQuen = pm.nhipHoc?.gioThuongHoc ? `Giờ học quen của con: ${pm.nhipHoc.gioThuongHoc}.` : hoc2?.omni?.gioHoc ? `Giờ học con chọn: ${hoc2.omni.gioHoc}.` : ''
   const hanhTrinh = dongHanhTrinh(hoc2?.hanhTrinh, so.tong)
   const coSo = so.tong !== null || so.daLam > 0
@@ -107,7 +124,7 @@ function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
       {coSo ? (
         <>
           <p id="ph3-hn" className="ph3-ah__nhan">{hoc2?.goi7?'Câu mới con đã gặp hôm nay':'Con đã làm hôm nay'} · {ngay}</p>
-          <p className="ph3-ah__cau" data-vung="so-cau-hom-nay"><b>{so.daLam}</b><small>{so.tong !== null ? `/${so.tong} câu` : ' câu'}</small></p>
+          <p className="ph3-ah__cau" data-vung="so-cau-hom-nay"><b>{so.daLam}</b><small>{so.tong !== null ? `/${xap}${so.tong} câu` : ' câu'}</small></p>
           {ti !== null && <span className="ph3-ah__thanh" aria-hidden="true"><span className="tt-thanh" style={{ width: `${ti * 100}%` }} /></span>}
         </>
       ) : (
@@ -117,10 +134,12 @@ function KhoiChinh({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
         </>
       )}
       {hoc2?.goi7 ? <div className="ph3-ah__ghi">{hoc2.goi7.map(g=><p key={g.ten}>{g.nguonDayDu===false?`${g.ten}: đang chờ đủ nguồn các tờ; chưa xác nhận hoàn thành toàn bộ bài.`:`${g.ten}: đã gặp ${g.daGap}/${g.tong} câu gốc · còn ${g.con} câu · hạn ${g.han.slice(8,10)}/${g.han.slice(5,7)}.`}</p>)}<p>Gặp câu với hỗ trợ chưa có nghĩa con đã tự làm được hoặc thành thạo.</p></div> : tinhTrang && <p className="ph3-ah__phu">{tinhTrang}</p>}
-      {(gioQuen || hanhTrinh) && (
+      {tq && <BaSoHomNay d={tq.dem.homNay} />}
+      {(gioQuen || hanhTrinh || xap) && (
         <div className="ph3-ah__ghi">
           {gioQuen && <p>{gioQuen}</p>}
           {hanhTrinh && <p data-vung="hanh-trinh">{hanhTrinh}</p>}
+          {xap && <p>≈ là mức ước tính theo quy tắc hiện hành: hôm nay máy chưa lưu mức của con.</p>}
         </div>
       )}
     </section>
@@ -162,15 +181,15 @@ export function tenDangHomNay(pm: PhMoi, hoc2: Hoc2 | null): { tieuDe: string; t
   return { tieuDe: 'Dạng cần vững', ten: hoc2?.omni?.dangCanVung ?? [] }
 }
 
-/** Danh sách cần chú ý: mỗi dòng một biểu tượng + nhãn nhỏ + chữ đậm; dòng ca gần nhất là liên kết sang báo cáo ca. Không có dòng nào ⇒ vắng. */
-function CanChuY({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
+/** Danh sách cần chú ý: mỗi dòng một biểu tượng + nhãn nhỏ + chữ đậm; dòng ca gần nhất là liên kết sang báo cáo ca. Không có dòng nào ⇒ vắng.
+ *  LÀN PHỤ HUYNH 12/10: thầy lệnh "bỏ mục thầy cần chữa" ⇒ không còn dòng "Cần thầy chữa" (số `omni.canThayChua` máy chủ vẫn gửi, app không hiện). */
+function CanChuY({ pm, hoc2, hep = false }: { pm: PhMoi; hoc2: Hoc2 | null; hep?: boolean }) {
   const { tieuDe, ten } = tenDangHomNay(pm, hoc2)
-  const canChua = hoc2?.omni?.canThayChua ?? 0
   const ca = pm.caGanNhat
-  if (ten.length === 0 && canChua === 0 && !ca) return null
+  if (ten.length === 0 && !ca) return null
   const them = ten.length - DANG_TOI_DA
   return (
-    <section className="ph3-the ph3-the--ds ph3-o-rong" aria-label="Điều cần chú ý" data-vung="dang-luyen-them">
+    <section className={`ph3-the ph3-the--ds ${hep ? 'ph3-o-hep' : 'ph3-o-rong'}`} aria-label="Điều cần chú ý" data-vung="dang-luyen-them">
       <ul className="ph3-ds-dong">
         {ten.length > 0 && (
           <li className="ph3-dong">
@@ -179,12 +198,6 @@ function CanChuY({ pm, hoc2 }: { pm: PhMoi; hoc2: Hoc2 | null }) {
               <h2 className="ph3-dong__nhan">{tieuDe}</h2>
               <b className="ph3-ten-dang">{ten.slice(0, DANG_TOI_DA).join(' · ')}{them > 0 ? ` và ${them} dạng khác` : ''}</b>
             </div>
-          </li>
-        )}
-        {canChua > 0 && (
-          <li className="ph3-dong">
-            <span className="ph3-o-bt" data-mau="tim" aria-hidden="true"><BtBut co={20} /></span>
-            <div className="ph3-dong__chu"><b data-vung="can-thay-chua">Cần thầy chữa: {canChua} chỗ</b></div>
           </li>
         )}
         {ca && <li><DongCa ca={ca} /></li>}

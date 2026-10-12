@@ -7,7 +7,9 @@ import HopXacNhan from '../HopXacNhan'
 import { chuBanApp } from '../../lib/cap-nhat-app'
 import { useTatCaVeCon } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import { chuCaiTen } from '../../lib/ph-moi/dinh-dang'
-import { taiHoc2, taiLoiThay } from '../../lib/ph-v3/api'
+import { taiConTongQuan, taiHoc2, taiLoiThay } from '../../lib/ph-v3/api'
+import type { ConTongQuan } from '../../lib/ph-v3/con-tong-quan'
+import type { TaiTongQuan } from './ConTongQuan'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
 import { taiThongTinPhuHuynh } from '../../lib/tai-thong-tin-ph'
 import { baoDaXemPhuHuynh } from '../../lib/canh-bao-thay-may-chu'
@@ -20,6 +22,7 @@ import { docTuyen, khoaCuon, laManCon, mucSang, type Muc, type Tuyen } from './t
 import { DangTai } from './dung-chung'
 import './ph-v3.css'
 import './giao-dien-day-du.css'
+import './con-tong-quan.css'
 import ManLoiThay from './ManLoiThay'
 
 const MUC: { muc: Muc; ten: string; bt: () => ReactElement }[] = [
@@ -112,6 +115,21 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
     return () => { huy = true }
   }, [sbd, moc, nhapHoc2])
 
+  // LÀN PHỤ HUYNH 12/10: tổng quan về con (`/ph/con-tong-quan`, CHỈ ĐỌC) — cùng nhịp với "mọi thứ về con". Lỗi ⇒ giữ bản cũ + "Thử lại" ngay ở khối Gợi ý nhắc con;
+  // máy chủ cũ chưa có lệnh ⇒ v null, các khối mới vắng (không báo lỗi giả).
+  const [tq, setTq] = useState<{ v: ConTongQuan | null; daTai: boolean; chuLoi: string }>({ v: null, daTai: false, chuLoi: '' })
+  const [nhapTq, setNhapTq] = useState(0)
+  useEffect(() => {
+    let huy = false
+    void taiConTongQuan(sbd).then((r) => {
+      if (huy) return
+      setTq((x) => (r.kieu === 'ok' ? { v: r.v, daTai: true, chuLoi: '' } : { ...x, daTai: true, chuLoi: r.chu }))
+    })
+    return () => { huy = true }
+  }, [sbd, moc, nhapTq])
+  const thuLaiTq = useCallback(() => { setTq((x) => ({ ...x, chuLoi: '' })); setNhapTq((x) => x + 1) }, [])
+  const taiTq: TaiTongQuan = { ...tq, thuLai: thuLaiTq }
+
   const [loiThay, setLoiThay] = useState<{ ds: NhanXetCa[] | null; chuLoi: string }>({ ds: null, chuLoi: '' })
   const luotLoiThay = useRef(0)
   useEffect(() => () => { luotLoiThay.current += 1 }, [])
@@ -142,8 +160,8 @@ function PhienBaoCao({ sbd, hoTen, lop, onDoiSbd }: ThongTinPhuHuynh) {
   else if (tuyen.muc === 'ca-kiem-tra') man = <ManDiemSo v={v} loiThay={loiThay.ds} />
   else if (tuyen.muc === 'thong-tin') man = <ThongTin ten={ten} lop={lop} />
   else if (tuyen.muc === 'loi-thay') man = <ManLoiThay ds={loiThay.ds} loi={loiThay.chuLoi} thuLai={napLoiThay} />
-  else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} />
-  else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} />
+  else if (tuyen.muc === 'tien-bo') man = <ManTienBo v={v} hoc2={hoc2} tq={tq.v} />
+  else man = <ManHomNay v={v} hoc2={hoc2} loiThay={loiThay} thuLaiLoiThay={napLoiThay} canhBao={canhBao.filter((c) => !c.daXem)} onDaXem={daXemCanhBao} tongQuan={taiTq} />
 
   const sang = mucSang(tuyen)
   const manCon = laManCon(tuyen)

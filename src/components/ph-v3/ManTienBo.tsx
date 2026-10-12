@@ -2,6 +2,8 @@
 // từ 2 ca ⇒ đường điểm có thang /10 + mức tăng/giảm; dưới đó khoảng cách tới 8 và chứng chỉ Sẵn sàng 8+ (OMNI, chỉ khi máy chủ gửi; độ tin không bao giờ 100%)
 // → Nhịp học 14 ngày (3 ô số + cột có số câu trên đầu mỗi cột) → Các dạng con đã học (3 số theo bậc + thanh 3 khúc; từng dạng mở thêm khi cần)
 // → Sơ ý của con (mục tiêu dưới 7%, OMNI). Không thêm số mới; khối nào không có số thật ⇒ vắng; cả màn không có gì ⇒ một thẻ trống nói vì sao.
+// LÀN PHỤ HUYNH 12/10 (thầy: "số câu làm đúng, làm sai, thời gian làm từng câu … theo dõi được con toàn diện"): có `/ph/con-tong-quan` ⇒ thêm
+// "Câu sai gần đây" (đã sửa / chưa sửa) · "Đúng và sai theo ngày" (thay "Nhịp học 14 ngày" — cùng trục ngày, không nói một số hai lần) · "Thời gian làm câu".
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { DiemTienBo, PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2 } from '../../lib/ph-v3/du-lieu'
@@ -12,6 +14,8 @@ import { TEN_BAC_SO } from '../ph-moi/nhan'
 import { BtPhai, BtTienBo } from './BieuTuong'
 import { BieuDo } from './ManDiemSo'
 import { Chip, DangTai, The, TheLoi, TheTrong } from './dung-chung'
+import { CauSaiGanDay, DungSaiTheoNgay, ThoiGianLamCau } from './ConTongQuan'
+import type { ConTongQuan } from '../../lib/ph-v3/con-tong-quan'
 import { diemCacCa } from './tien-ich'
 
 const hai = (n: number) => String(n).padStart(2, '0')
@@ -53,7 +57,7 @@ export function demTheoBac(ds: readonly { bac: 0 | 1 | 2 }[]): { bac: 0 | 1 | 2;
   return ([2, 1, 0] as const).map((b) => ({ bac: b, so: dem[b]! }))
 }
 
-export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null }) {
+export default function ManTienBo({ v, hoc2, tq = null }: { v: ViewPhMoi; hoc2: Hoc2 | null; tq?: ConTongQuan | null }) {
   const pm = v.pm
   if (!pm) return (
     <div>
@@ -62,13 +66,16 @@ export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null
     </div>
   )
   const omni = hoc2?.omni
-  const coGi = diemCacCa(pm).length > 0 || dongDiemOmni(omni).length > 0 || (pm.bacTheoDang ?? []).length > 0 || omni?.sEm != null || (pm.nhipHoc?.ngay ?? []).length > 0
+  const coTq = !!tq && (tq.ngay.some((n) => n.dung + n.sai > 0) || tq.cauSai.tong > 0 || tq.ganDay.length > 0)
+  const coGi = diemCacCa(pm).length > 0 || dongDiemOmni(omni).length > 0 || (pm.bacTheoDang ?? []).length > 0 || omni?.sEm != null || (pm.nhipHoc?.ngay ?? []).length > 0 || coTq
   return (
     <div data-vung="man-tien-bo">
       <div className="ph3-tieu-de"><h1>Tiến bộ</h1></div>
       <div className="ph3-luoi">
-        <DiemCacCa pm={pm} omni={omni} />
-        <Nhip pm={pm} />
+        <DiemCacCa pm={pm} omni={omni} du={coTq} />
+        {tq && coTq ? <DungSaiTheoNgay tq={tq} /> : <Nhip pm={pm} />}
+        {tq && <ThoiGianLamCau tq={tq} />}
+        {tq && <CauSaiGanDay tq={tq} />}
         <BacTheoDang pm={pm} />
         <SoY omni={omni} />
         {!coGi && <TheTrong id="ph3-tb-trong" tieuDe="Chưa đủ dữ liệu" chu="Con học thêm vài ngày và có ca kiểm tra được công bố thì điểm, bậc từng dạng và nhịp học hiện ở đây." />}
@@ -77,13 +84,14 @@ export default function ManTienBo({ v, hoc2 }: { v: ViewPhMoi; hoc2: Hoc2 | null
   )
 }
 
-function DiemCacCa({ pm, omni }: { pm: PhMoi; omni?: PhOmni }) {
+/** `du` (có tổng quan 12/10): khối điểm trải đủ hàng trên máy tính để các khối 12/10 xếp thành cặp bên dưới, không để lỗ cạnh khối điểm. */
+function DiemCacCa({ pm, omni, du = false }: { pm: PhMoi; omni?: PhOmni; du?: boolean }) {
   const ds = diemCacCa(pm)
   const dong = dongDiemOmni(omni)
   if (ds.length === 0 && dong.length === 0) return null
   const motCa = ds.length === 1 ? ds[0]! : null
   return (
-    <section className="ph3-ah ph3-o-rong" aria-labelledby="ph3-diem-ca" data-vung="xu-huong-diem">
+    <section className={`ph3-ah ${du ? 'ph3-o-du' : 'ph3-o-rong'}`} aria-labelledby="ph3-diem-ca" data-vung="xu-huong-diem">
       {motCa ? <MotCa d={motCa} /> : ds.length > 1 ? <NhieuCa ds={ds} /> : <p id="ph3-diem-ca" className="ph3-ah__nhan">Điểm các ca kiểm tra</p>}
       {dong.length > 0 && (
         <div className="ph3-ah__dong" data-vung="diem-omni">

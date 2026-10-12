@@ -63,6 +63,8 @@ import BottomNav from '../../src/components/BottomNav'
 import { apDungGiaoDien } from '../../src/lib/giao-dien-thay'
 import { useSoDemGv, type TheHanhTrinh } from '../../src/lib/so-dem-gv'
 import { lichSuGia } from './gia/lich-su-lam-cau'
+// LÀN PHỤ HUYNH 12/10: tổng quan về con GIẢ (`/ph/con-tong-quan`).
+import { conTongQuanGia } from './gia/ph-con-tong-quan'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -158,6 +160,11 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Hành trình › Cần thầy chữa (trung tu 09/10 tối): bước cuối trên lớp + thẻ nút thắt GIẢ (tên em giả).
   if (u.pathname.endsWith('/gv/chua-cau-sai/hang-chieu')) return tra({ ok: true, bat: true, conNua: false, ds: BUOC_CUOI_GIA })
   if (u.pathname.endsWith('/gv/nut-that/ds')) return tra(NUT_THAT_GIA)
+  // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
+  if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
+    ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })
+    : tra(conTongQuanGia())
+  // ---- hết khối LÀN PHỤ HUYNH 12/10
   if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
   if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
   // App phụ huynh (trung tu 09/10): một nhận xét đã công bố để ảnh có thẻ "Nhận xét của thầy" ở Hôm nay và màn con `#loi-thay`.
