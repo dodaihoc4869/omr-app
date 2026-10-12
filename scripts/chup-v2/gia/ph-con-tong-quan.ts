@@ -1,11 +1,13 @@
 // LÀN PHỤ HUYNH 12/10 — TỔNG QUAN VỀ CON GIẢ cho ảnh chụp app phụ huynh (`/ph/con-tong-quan`). Hình dạng đúng hợp đồng
 // `server/src/ph-con-tong-quan-kieu.ts`; dữ liệu CỐ ĐỊNH (không ngẫu nhiên, mốc giờ cố định 20:30 Thứ Sáu 16/10/2026) để hai lần chụp ra cùng ảnh.
 // Số đối chiếu được với nhau: ba ô tỉ lệ = cộng các ngày; gợi ý nhắc khớp luật `sinhGoiYNhac` với chính các số này. Tên câu là tên dạng thật của chương trình.
+// Thầy 12/10 dời mốc theo dõi về 01/10 ⇒ `moc` = `tuNgay` = 01/10 (sớm hơn 13 ngày trước 16/10), sổ giả đủ từng ngày 01/10 → 16/10.
 import type { CauSaiCon, DemCau, KetQuaConTongQuan, LuotGanDay, NgayHoc } from '../../../server/src/ph-con-tong-quan-kieu'
 
 const SERVER_NOW = Date.parse('2026-10-16T13:30:00Z') // 20:30 Thứ Sáu 16/10 giờ VN
 /** [ngày, đúng, sai, câu khác nhau, mức, mức ước tính?, đã làm (tính vào mức)] */
 const NGAY: [string, number, number, number, number, boolean, number][] = [
+  ['2026-10-01', 17, 6, 21, 24, true, 21], ['2026-10-02', 20, 6, 24, 24, true, 24],
   ['2026-10-03', 18, 6, 22, 24, true, 22], ['2026-10-04', 0, 0, 0, 24, true, 0], ['2026-10-05', 22, 8, 28, 24, true, 28],
   ['2026-10-06', 15, 5, 19, 24, true, 19], ['2026-10-07', 0, 0, 0, 24, true, 0], ['2026-10-08', 20, 4, 23, 24, true, 23],
   ['2026-10-09', 25, 7, 30, 30, false, 30], ['2026-10-10', 12, 3, 15, 30, false, 15], ['2026-10-11', 0, 0, 0, 30, false, 0],
@@ -59,9 +61,9 @@ export function conTongQuanGia(): KetQuaConTongQuan {
     ok: true,
     serverNow: SERVER_NOW,
     homNay: '2026-10-16',
-    moc: '2026-10-12',
-    tuNgay: '2026-10-03',
-    dem: { homNay: dem('2026-10-16', 41), bayNgay: dem('2026-10-10', 47), tuMoc: dem('2026-10-12', 45) },
+    moc: '2026-10-01',
+    tuNgay: '2026-10-01',
+    dem: { homNay: dem('2026-10-16', 41), bayNgay: dem('2026-10-10', 47), tuMoc: dem('2026-10-01', 46) },
     ngay,
     thoiGian: {
       giayTb: 47, giayGiua: 38, soDo: 96, soUoc: 14, soChuaDo: 3,
@@ -76,7 +78,7 @@ export function conTongQuanGia(): KetQuaConTongQuan {
       { ma: 'con-cau-hom-nay', chu: 'Hôm nay con còn 18 câu chưa làm (đã làm 12/30 câu).' },
       { ma: 'sai-chua-sua', chu: 'Có 5 câu con làm sai chưa sửa được. Nhắc con vào mục Tự chữa lỗi để làm lại.' },
       { ma: 'nhanh-sai', chu: '7 ngày qua có 14 câu con làm dưới 8 giây và sai 9 câu. Nhắc con đọc kỹ đề trước khi chọn.' },
-      { ma: 'thieu-ngay', chu: 'Từ 12/10 con có 1 ngày không làm bài và 1 ngày làm chưa đủ mức. Hỏi con lý do và chốt một giờ học cố định mỗi ngày.' },
+      { ma: 'thieu-ngay', chu: 'Từ 01/10 con có 4 ngày không làm bài và 6 ngày làm chưa đủ mức. Hỏi con lý do và chốt một giờ học cố định mỗi ngày.' },
       { ma: 'lam-khuya', chu: 'Con hay làm bài sau 23 giờ (3 trong 7 ngày qua). Nhắc con học sớm hơn để đủ giấc.' },
     ],
     catBot: false,

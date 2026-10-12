@@ -10,6 +10,7 @@ import { parentPass } from '../server/src/game-v2-auth'
 import { phConTongQuan, sinhGoiYNhac, tangUocTinh, noiChoPh, tieuDeChoPh, LUAT_GOI_Y, type DauVaoGoiY } from '../server/src/ph-con-tong-quan'
 import type { KetQuaConTongQuan, NgayHoc } from '../server/src/ph-con-tong-quan-kieu'
 import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
+import { NGAY_BAT_DAU_BAI_HANG_NGAY } from '../server/src/bai-hang-ngay-kieu'
 
 type D = ReturnType<typeof taoD1That>
 // 12:00 Thứ Tư 14/10/2026 giờ VN ⇒ khoảng đọc từ 01/10 (13 ngày trước), 7 ngày = 08/10–14/10, 7 ngày trước đó = 01/10–07/10.
@@ -88,7 +89,8 @@ describe('lọc: bỏ sự kiện còn giấu, đọc lời giải, ca chưa cô
 })
 
 describe('số đúng / sai / giây', () => {
-  it('ba khoảng hôm nay · 7 ngày · từ 12/10; thứ tự số giây: cột ⇒ raw ms ⇒ chi tiết ca ⇒ ước tính game (≈) ⇒ chưa đo giờ', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 12/10 — thầy: "dữ liệu phần này tính từ 1/10" ⇒ mốc theo dõi 01/10 (trùng mốc Bài hằng ngày của thầy): ô "Từ 01/10" nay gồm cả 09/10, 03/10.
+  it('ba khoảng hôm nay · 7 ngày · từ 01/10; thứ tự số giây: cột ⇒ raw ms ⇒ chi tiết ca ⇒ ước tính game (≈) ⇒ chưa đo giờ', async () => {
     const { d, env } = dung()
     themCa(d, 'C1', 'ngay')
     d.sql.prepare('INSERT INTO chi_tiet_cau (khoa, ma_ca, sbd, lan_thu, phan, so_cau, qid, dap_an_chon, giay, cap_nhat_luc) VALUES (?,?,?,?,?,?,?,?,?,?)').run('C1|S1|1|I|2', 'C1', 'S1', 1, 'I', 2, 'GA-I-2', 'B', 70, 'x')
@@ -103,16 +105,17 @@ describe('số đúng / sai / giây', () => {
     sk(d, { khoa: 'm1', qid: 'GA-I-2', nguon: 'thi', maNguon: 'C1', kq: 0, luc: vn('2026-10-13 09:00') }) // chi tiết ca 70
     sk(d, { khoa: 'm2', qid: 'GA-I-5', nguon: 'game', maNguon: 'P1', kq: 1, luc: new Date(t0 + 45_000).toISOString() }) // ước tính 45
     sk(d, { khoa: 'm3', qid: 'GA-I-6', nguon: 'thi', maNguon: 'C1', kq: null, luc: vn('2026-10-13 09:05') }) // bỏ trống, không đo
-    // 09/10 (trong 7 ngày, TRƯỚC mốc 12/10) và 03/10 (ngoài 7 ngày)
+    // 09/10 (trong 7 ngày) và 03/10 (ngoài 7 ngày) — cả hai SAU mốc 01/10
     sk(d, { khoa: 'c1', qid: 'GA-I-7', kq: 1, giay: 20, luc: vn('2026-10-09 10:00') })
     sk(d, { khoa: 'c2', qid: 'GA-I-8', kq: 0, giay: 7, luc: vn('2026-10-03 10:00') })
     const r = await chay(env, { sbd: 'S1' })
-    expect(r).toMatchObject({ ok: true, homNay: '2026-10-14', moc: '2026-10-12', tuNgay: '2026-10-01', catBot: false })
+    expect(r).toMatchObject({ ok: true, homNay: '2026-10-14', moc: '2026-10-01', tuNgay: '2026-10-01', catBot: false })
+    expect(r.moc).toBe(NGAY_BAT_DAU_BAI_HANG_NGAY) // phụ huynh và thầy cùng một mốc
     expect(r.dem.homNay).toEqual({ soLuot: 3, dung: 1, sai: 2, boTrong: 0, soCau: 3, giayTb: 50 }) // (95+4)/2
     // 7 ngày: hôm nay 3 + 13/10 ba lượt + 09/10 một ⇒ 7 lượt; giây đo: 95, 4, 70, 45, 20 ⇒ tb 47
     expect(r.dem.bayNgay).toEqual({ soLuot: 7, dung: 3, sai: 3, boTrong: 1, soCau: 6, giayTb: 47 })
-    // từ 12/10: không gồm 09/10
-    expect(r.dem.tuMoc).toEqual({ soLuot: 6, dung: 2, sai: 3, boTrong: 1, soCau: 5, giayTb: 54 })
+    // từ 01/10: cả 8 lượt (gồm 09/10 và 03/10); giây đo 95, 4, 70, 45, 20, 7 ⇒ tb 40
+    expect(r.dem.tuMoc).toEqual({ soLuot: 8, dung: 3, sai: 4, boTrong: 1, soCau: 7, giayTb: 40 })
     const theo = Object.fromEntries(r.ganDay.map((x) => [x.luc, x]))
     expect([theo[vn('2026-10-13 09:00')]!.giay, theo[vn('2026-10-13 09:00')]!.nguonGiay]).toEqual([70, 'do'])
     expect([theo[new Date(t0 + 45_000).toISOString()]!.giay, theo[new Date(t0 + 45_000).toISOString()]!.nguonGiay]).toEqual([45, 'uoc'])
@@ -223,9 +226,9 @@ describe('gợi ý nhắc con: đúng luật, tối đa 5, không độn, giọn
     sk(d, { khoa: 'h', qid: 'H-I-1', kq: 1, giay: 30, luc: vn('2026-10-14 08:00') })
     const r = await chay(env, { sbd: 'S1' })
     expect(r.khuya).toEqual({ soNgay: 2, soLuot: 6 })
-    // 12/10 và 13/10 mỗi ngày 3 câu < mức ≈24 ⇒ thêm "thieu-ngay"; đủ 5 câu ⇒ cắt đúng 5
+    // 01/10 → 11/10 không làm; 12/10 và 13/10 mỗi ngày 3 câu < mức ≈24 ⇒ thêm "thieu-ngay"; đủ 5 câu ⇒ cắt đúng 5
     expect(r.goiY.map((x) => x.ma)).toEqual(['con-cau-hom-nay', 'sai-chua-sua', 'nhanh-sai', 'thieu-ngay', 'lam-khuya'])
-    expect(r.goiY[3]!.chu).toBe('Từ 12/10 con có 2 ngày làm chưa đủ mức. Hỏi con lý do và chốt một giờ học cố định mỗi ngày.')
+    expect(r.goiY[3]!.chu).toBe('Từ 01/10 con có 11 ngày không làm bài và 2 ngày làm chưa đủ mức. Hỏi con lý do và chốt một giờ học cố định mỗi ngày.')
     expect(r.goiY[0]!.chu).toBe('Hôm nay con còn ≈23 câu chưa làm (đã làm 1/≈24 câu).')
     expect(r.goiY[1]!.chu).toContain('Có 4 câu con làm sai chưa sửa được')
   })

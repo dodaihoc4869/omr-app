@@ -4,7 +4,7 @@
 // `POST /ph/con-tong-quan {pass|sbd}` — LỆNH PHỤ HUYNH, CHỈ ĐỌC, chạy trên `envDoc` (bản sao gần nhất) như `/ph/hoc-2`.
 //   · XÁC THỰC: `sbdCuaPhuHuynh` + `CHI_NHAN_TOKEN` — y hệt `/ph/tat-ca-ve-con`, `/ph/hoc-2`: có `pass` ⇒ danh tính từ liên kết riêng, `sbd` trong thân bị bỏ qua;
 //     liên kết hỏng/hết hạn ⇒ báo lỗi, KHÔNG rơi xuống SBD trần. Việc ghi DUY NHẤT là dòng đếm truy cập của chính hàm xác thực (hoãn qua ctx, ghi `envGoc`).
-//   · SỔ `su_kien_hoc` của đúng con đó, từ `tuNgay` tới hôm nay (giờ VN), tối đa 5000 lượt mới nhất. BỎ sự kiện còn giấu (`visibility = 'embargoed'`), mọi dòng
+//   · SỔ `su_kien_hoc` của đúng con đó, từ `tuNgay` tới hôm nay (giờ VN), tối đa `TOI_DA_LUOT_DOC_PH` lượt mới nhất. BỎ sự kiện còn giấu (`visibility = 'embargoed'`), mọi dòng
 //     không phải lần làm (`SQL_LA_LAN_LAM`: đọc lời giải, lượt, chẩn đoán, chữa bước) và lượt của ca kiểm tra CHƯA công bố (`SQL_DA_CONG_BO`).
 //     Truy vấn lỗi (D1 cũ thiếu cột lọc) ⇒ trả lỗi, KHÔNG lùi về câu lệnh không lọc.
 //   · KHÔNG trả: mã câu, đề bài, đáp án đúng, đáp án con chọn, lời giải, tên trò chơi. Tiêu đề câu = "Câu N · <tên dạng>" (cách sẵn có `tieuDeCau`).
@@ -35,14 +35,15 @@ const str = (x: unknown): string => (x === null || x === undefined ? '' : String
 const MOT_NGAY = 86_400_000
 const GIO_VN = 7 * 3_600_000
 
-/** Số lượt mới nhất đọc tối đa trong khoảng (vượt ⇒ `catBot`). */
-export const TOI_DA_LUOT_DOC_PH = 5000
+/** Số lượt mới nhất đọc tối đa trong khoảng (vượt ⇒ `catBot`). Thầy 12/10 dời mốc về 01/10 ⇒ khoảng đọc dài dần theo ngày ⇒ gấp đôi mức cũ 5000
+ *  (truy vấn chỉ lấy cột nhỏ, không lấy cả `raw_json`). */
+export const TOI_DA_LUOT_DOC_PH = 10_000
 /** Mốc các khoảng của phân bố số giây (giây): dưới 8 · 8–30 · 30–60 · 60–120 · 120–300 · từ 300. */
 export const MOC_PHAN_BO_GIAY = [0, GIAY_NHANH, 30, 60, 120, 300] as const
 
 export const ngayVnCuaMs = (ms: number): string => new Date(ms + GIO_VN).toISOString().slice(0, 10)
 export const congNgay = (ngay: string, n: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * MOT_NGAY).toISOString().slice(0, 10)
-/** "12/10" từ "2026-10-12". */
+/** "01/10" từ "2026-10-01". */
 export const ngayNgan = (ngay: string): string => `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}`
 
 /** Nơi làm bằng chữ đời thường cho phụ huynh — KHÔNG tên trò chơi (thầy 28/09: app phụ huynh không có trường game). */
@@ -172,7 +173,7 @@ const pt = (x: number) => Math.round(x * 100)
  *   1. Hôm nay chưa đủ mức: chưa làm câu nào ⇒ "chua-lam-hom-nay"; đã làm một phần ⇒ "con-cau-hom-nay" (số câu còn lại). Mức ước tính ⇒ ghi "≈".
  *   2. Câu sai chưa sửa ≥ 1 ⇒ nhắc vào mục Tự chữa lỗi.
  *   3. Nhanh mà sai: ≥ 5 lượt dưới 8 giây (7 ngày) và sai ≥ 50% trong số đó ⇒ nhắc đọc kỹ đề.
- *   4. Từ mốc 12/10 có ngày không làm / làm chưa đủ mức (không tính hôm nay).
+ *   4. Từ mốc theo dõi (`MOC_THEO_DOI`, 01/10) có ngày không làm / làm chưa đủ mức (không tính hôm nay).
  *   5. Tỉ lệ đúng 7 ngày giảm ≥ 15 điểm so với 7 ngày trước đó (mỗi bên ≥ 20 lượt có kết quả).
  *   6. Làm khuya: ≥ 2 ngày trong 7 ngày có lượt 23:00–04:59.
  *   7. Dùng gợi ý ở ≥ 50% lượt (≥ 10 lượt trong 7 ngày).
@@ -244,6 +245,7 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
   const tuNgay = [MOC_THEO_DOI, congNgay(homNay, -13)].sort()[0]!
   const bayTu = congNgay(homNay, -6)
   const truocTu = congNgay(homNay, -13), truocDen = congNgay(homNay, -7)
+  const soNgayDoc = Math.round((Date.parse(`${homNay}T00:00:00Z`) - Date.parse(`${tuNgay}T00:00:00Z`)) / MOT_NGAY) + 1
 
   // 1 · sổ: CHỈ lần làm, KHÔNG sự kiện còn giấu, KHÔNG lượt của ca chưa công bố. Lỗi ⇒ trả lỗi (không lùi về câu lệnh không lọc).
   let rSo: Row[]
@@ -282,7 +284,8 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
     thiThieu.length ? chiTietCauCuaLuot(env, thiThieu.map((d) => d.maNguon), [sbd], thiThieu.map((d) => d.qid)).catch(() => new Map<string, { giay: number | null }>()) : Promise.resolve(new Map<string, { giay: number | null }>()),
     gameThieu.length ? giayUocTinhGame(env, gameThieu.map((d) => ({ sbd, phien: d.maNguon }))).catch(() => new Map<string, number>()) : Promise.resolve(new Map<string, number>()),
     hoi(env, 'SELECT ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay >= ? AND ngay <= ?', sbd, tuNgay, homNay),
-    hoi(env, 'SELECT ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd = ? AND ngay <= ? ORDER BY ngay DESC LIMIT 60', sbd, homNay),
+    // đủ mọi ngày từ `tuNgay` (mốc 01/10, khoảng dài dần) + ngày đã lưu gần nhất trước đó để ước tính tầng
+    hoi(env, `SELECT ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd = ? AND ngay <= ? ORDER BY ngay DESC LIMIT ${Math.max(60, soNgayDoc + 1)}`, sbd, homNay),
   ])
   for (const d of thiThieu) {
     const k = `${d.maNguon}|${sbd}|${d.qid}`

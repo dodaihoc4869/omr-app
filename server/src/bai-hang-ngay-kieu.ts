@@ -21,8 +21,9 @@
 //     quy về câu gốc / bản bù bằng `idDaLam`. Ngày không có kế hoạch ⇒ 0.
 //   Em vào chế độ Gói 7 từ ngày bắt đầu gói sớm nhất của em khi cờ `goi_bai_7_v1` bật (như `hoc-tap-sanh`), các ngày khác là Hành trình.
 
-/** Ngày bắt đầu theo dõi bài hằng ngày (thầy 12/10: "tính từ 12/10"). */
-export const NGAY_BAT_DAU_BAI_HANG_NGAY = '2026-10-12'
+/** Ngày bắt đầu theo dõi bài hằng ngày. Thầy 12/10 lúc đầu: "tính từ 12/10"; cùng ngày chỉnh lại: "dữ liệu phần này tính từ 1/10 cho tôi nhé"
+ *  ⇒ 01/10. Ngày trước khi em vào Gói bài 7 ngày (gói bật từ 10/10) vẫn tính theo kế hoạch Hành trình (xem luật `cheDo` ở trên). */
+export const NGAY_BAT_DAU_BAI_HANG_NGAY = '2026-10-01'
 /** Số ngày tối đa một lần hỏi (≈ 2 tháng) — giữ lệnh trong sức một Worker với ~300 em. */
 export const TOI_DA_SO_NGAY_BAI_HANG_NGAY = 62
 /** Quy tắc mức tối thiểu hiện hành theo tầng (bản sao chỉ để app ghi chú — máy chủ dùng `CAU_TOI_THIEU` của `hanh-trinh-ngay.ts`). */
@@ -257,7 +258,7 @@ export interface KetQuaHoSoThaiDo {
   cauDung: CauTomTat[]
   /** Câu đã ôn (toàn bộ sổ đã đọc): chưa đúng lại trước, rồi gần đây trước; tối đa 500. */
   cauDaOn: CauTomTat[]
-  /** Sổ vượt 5000 lượt ⇒ danh sách câu chỉ tính 5000 lượt gần nhất. */
+  /** Sổ vượt `TOI_DA_LUOT_HO_SO` (10 000) lượt ⇒ chỉ tính 10 000 lượt gần nhất (cắt rơi vào khoảng xem ⇒ `canhBao` nói rõ). */
   catBot: boolean
   canhBao: string[]
 }

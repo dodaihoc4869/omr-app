@@ -5,7 +5,8 @@
 // thân bị bỏ qua (liên kết của con A không đọc được con B). Dùng chung cho máy chủ và app (app chỉ import KIỂU).
 //
 // LUẬT DỮ LIỆU (không bịa số):
-//   · Chỉ sổ `su_kien_hoc` của đúng con đó, từ `tuNgay` (= sớm hơn trong hai mốc: 12/10/2026 và 13 ngày trước hôm nay) tới hôm nay, tối đa 5000 lượt mới nhất.
+//   · Chỉ sổ `su_kien_hoc` của đúng con đó, từ `tuNgay` (= sớm hơn trong hai mốc: `MOC_THEO_DOI` 01/10/2026 và 13 ngày trước hôm nay) tới hôm nay, tối
+//     đa 10 000 lượt mới nhất (`TOI_DA_LUOT_DOC_PH`).
 //   · BỎ: sự kiện còn giấu (`visibility = 'embargoed'`), sự kiện "đọc lời giải" và mọi dòng không phải lần làm (`SQL_LA_LAN_LAM`), lượt ca kiểm tra
 //     CHƯA công bố (`SQL_DA_CONG_BO`) — không trả nội dung nào của ca chưa công bố. KHÔNG trả đáp án đúng, đáp án con chọn, mã câu, đề bài.
 //   · Số giây: cột `giay` ⇒ `raw_json.ms` ⇒ `chi_tiet_cau.giay` (ca đã công bố) ⇒ ước tính của lượt game (`nguonGiay: 'uoc'`) ⇒ null (= "chưa đo giờ").
@@ -15,8 +16,9 @@ import type { NguonGiay } from './lich-su-lam-cau-kieu'
 
 export type { NguonGiay }
 
-/** Mốc bắt đầu theo dõi bài hằng ngày thầy chốt (12/10/2026). */
-export const MOC_THEO_DOI = '2026-10-12'
+/** Mốc bắt đầu theo dõi bài hằng ngày thầy chốt — 01/10/2026 (thầy 12/10: "dữ liệu phần này tính từ 1/10"; trước đó là 12/10). PHẢI trùng
+ *  `NGAY_BAT_DAU_BAI_HANG_NGAY` (bai-hang-ngay-kieu.ts) để phụ huynh và thầy thấy cùng một số. */
+export const MOC_THEO_DOI = '2026-10-01'
 /** Lượt làm dưới số giây này (đo thật hoặc ước tính) là "làm quá nhanh". */
 export const GIAY_NHANH = 8
 /** Số lượt gần nhất trả về cho danh sách "câu gần đây". */
@@ -139,7 +141,7 @@ export interface KetQuaConTongQuan {
   goiYDaDung: { so: number; tong: number }
   /** 3–5 câu nhắc sinh theo luật (`sinhGoiYNhac`); không đủ dữ liệu ⇒ ít hơn, không độn. */
   goiY: GoiYNhac[]
-  /** Sổ của con vượt 5000 lượt trong khoảng đọc ⇒ chỉ tính 5000 lượt mới nhất. */
+  /** Sổ của con vượt `TOI_DA_LUOT_DOC_PH` (10 000) lượt trong khoảng đọc ⇒ chỉ tính 10 000 lượt mới nhất. */
   catBot: boolean
 }
 
