@@ -3826,6 +3826,10 @@ const boXuLy = {
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // LỊCH SỬ LÀM CÂU CỦA MỘT EM (thầy 09/10 khuya, server/src/lich-su-lam-cau.ts; hợp đồng lich-su-lam-cau-kieu.ts): CHỈ ĐỌC sổ — mọi lượt · câu sai · số giây.
       if (p === '/gv/lich-su-lam-cau') return ra(await gvLichSuLamCau(envDoc, b))
+      // BÀI HẰNG NGÀY + HỒ SƠ THÁI ĐỘ LÀM BÀI (thầy 12/10, server/src/bai-hang-ngay.ts; hợp đồng bai-hang-ngay-kieu.ts): CHỈ ĐỌC sổ — mức/đã làm/thiếu
+      // từng ngày từ 12/10 của mọi em; một em: lịch hoạt động, tín hiệu có ngưỡng, kết luận theo luật.
+      if (p === '/gv/bai-hang-ngay') return ra(await import('./bai-hang-ngay').then((m) => m.gvBaiHangNgay(envDoc, b)))
+      if (p === '/gv/ho-so-thai-do') return ra(await import('./bai-hang-ngay').then((m) => m.gvHoSoThaiDo(envDoc, b)))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
       // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.

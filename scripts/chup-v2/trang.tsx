@@ -67,6 +67,8 @@ import { useSoDemGv, type TheHanhTrinh } from '../../src/lib/so-dem-gv'
 import { lichSuGia } from './gia/lich-su-lam-cau'
 // LÀN PHỤ HUYNH 12/10: tổng quan về con GIẢ (`/ph/con-tong-quan`).
 import { conTongQuanGia } from './gia/ph-con-tong-quan'
+// LÀN GIÁO VIÊN 12/10: `gv-nhip&the=bai-hang-ngay` = Hành trình › Bài hằng ngày (bảng nhiệt), bấm một em ⇒ tấm Hồ sơ làm bài (gia/bai-hang-ngay.ts).
+import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -187,6 +189,10 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // Tấm Lịch sử làm câu của một em (09/10 khuya) — app thầy gọi qua `goiLenh` (bản chụp đã thay bằng gia/goi-lenh-thay.ts, cùng dữ liệu này);
   // giữ thêm đường `fetch` để mọi lối gọi thẳng cũng nhận dữ liệu giả, không chạm máy chủ thật.
   if (u.pathname.endsWith('/gv/lich-su-lam-cau')) return tra(lichSuGia(String(b.sbd ?? ''), 'Trần Đức Huy'))
+  // ---- LÀN GIÁO VIÊN 12/10: Bài hằng ngày + hồ sơ thái độ (app thầy gọi qua `goiLenh` giả; giữ thêm đường `fetch` như trên)
+  if (u.pathname.endsWith('/gv/bai-hang-ngay')) return tra(baiHangNgayGia())
+  if (u.pathname.endsWith('/gv/ho-so-thai-do')) return tra(hoSoThaiDoGia(String(b.sbd ?? '')))
+  // ---- hết LÀN GIÁO VIÊN 12/10
   return tra({ ok: true })
 }
 
