@@ -47,15 +47,15 @@ describe('siêu dữ liệu câu giờ cao điểm', () => {
     const k = kho()
     const hoi = [...k.b8.slice(5, 15).reverse(), 'DH-B1-TL', ...k.qids('DH-B0').slice(0, 4), k.b8[3]!, 'KHONG-CO']
     for (const uuTien of [[], ['DH-ON8'], ['DH-B8']]) {
-      vi.setSystemTime(SANG)
+      batDemMetaCau(false) // đối chứng: đọc thẳng D1
       const toThang = new Map<string, Set<string>>(), thang = await docMetaCau(k.luot(), hoi, uuTien, toThang)
-      vi.setSystemTime(CAO_DIEM)
+      batDemMetaCau(true)
       const toDem = new Map<string, Set<string>>(), dem = await docMetaCau(k.luot(), hoi, uuTien, toDem)
       expect(ra(dem)).toEqual(ra(thang))
       expect(ra(toDem)).toEqual(ra(toThang))
     }
     expect(ra(await docMetaCau(k.luot(), hoi)).find(([q]) => q === 'DH-B1-TL')?.[1]).toMatchObject({ tuLuan: true })
-    // 3 lượt ngoài giờ đọc thẳng + 1 lượt đầu giờ cao điểm; các lượt giờ cao điểm sau dùng đệm.
+    // 3 lượt đối chứng đọc thẳng + 1 lượt đầu có đệm; các lượt có đệm sau dùng lại.
     expect(k.dem.lan).toBe(4)
   })
   it('lượt sau chỉ đọc câu còn thiếu; kết quả vẫn bằng đọc thẳng', async () => {
@@ -64,7 +64,7 @@ describe('siêu dữ liệu câu giờ cao điểm', () => {
     const hoi = [...k.b8.slice(8, 20)]
     const dem = await docMetaCau(k.luot(), hoi, ['DH-ON8'])
     expect(k.dem.cau.at(-1)).toEqual([...k.b8.slice(12, 20)].sort())
-    vi.setSystemTime(SANG)
+    batDemMetaCau(false)
     expect(ra(dem)).toEqual(ra(await docMetaCau(k.luot(), hoi, ['DH-ON8'])))
   })
   it('kho lập lại chỉ mục (game_v2_index đổi) ⇒ sau 5 giây đọc lại, thấy bản mới', async () => {
@@ -76,11 +76,14 @@ describe('siêu dữ liệu câu giờ cao điểm', () => {
     vi.setSystemTime(CAO_DIEM + 6_000)
     expect((await docMetaCau(k.luot(), [q])).get(q)?.version).toBe('v2')
   })
-  it('ngoài giờ cao điểm: không đệm — mỗi lượt đọc thẳng', async () => {
+  it('đợt 17: ngoài giờ cao điểm cũng đệm (cả ngày) — lượt sau không đọc lại; tắt đệm ⇒ mỗi lượt đọc thẳng', async () => {
     const k = kho()
     vi.setSystemTime(SANG)
     await docMetaCau(k.luot(), k.b8.slice(0, 5)); await docMetaCau(k.luot(), k.b8.slice(0, 5))
-    expect(k.dem.lan).toBe(2)
+    expect(k.dem.lan).toBe(1)
+    batDemMetaCau(false)
+    await docMetaCau(k.luot(), k.b8.slice(0, 5)); await docMetaCau(k.luot(), k.b8.slice(0, 5))
+    expect(k.dem.lan).toBe(3)
   })
 })
 

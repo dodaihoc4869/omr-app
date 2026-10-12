@@ -372,7 +372,7 @@ function gonDongMeta(x: Row): Row {
   return { ...r, tu_luan: tuLuanTuMeta(x) }
 }
 /**
- * ĐỆM SIÊU DỮ LIỆU CÂU theo isolate — CHỈ giờ cao điểm 20:00–23:59 VN (khẩn 12/10 22h30 — số đo D1 thật 24 giờ: câu đọc này đứng ĐẦU tổng thời gian D1, ~27.000 lần/ngày × ~1.800 dòng
+ * ĐỆM SIÊU DỮ LIỆU CÂU theo isolate — cả ngày từ đợt 17 (khẩn 12/10 22h30 — số đo D1 thật 24 giờ: câu đọc này đứng ĐẦU tổng thời gian D1, ~27.000 lần/ngày × ~1.800 dòng
  * kèm tách JSON, ~38 ms/lần). Chỉ mục câu chỉ có MỘT đường ghi (`lapChiMucTo` trong game-v2-bank.ts: xoá + chèn câu của tờ và cập nhật `game_v2_index`
  * CÙNG một lô) ⇒ tem kho = số dòng + `indexed_at` lớn nhất của `game_v2_index` (đọc lại tối đa mỗi 5 giây); tem đổi ⇒ bỏ cả đệm; trần tuổi 10 phút cho
  * đường ghi ngoài Worker. Khoá theo D1 GỐC (`dbGoc`) — bản bọc mỗi lượt gọi khác nhau. Đọc tem lỗi ⇒ đọc thẳng D1 như cũ.
@@ -392,8 +392,8 @@ const theoMaCau = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
 /** Phần ĐỌC của `docMetaCau` (câu SQL không phụ thuộc tờ ưu tiên) — tách ra để đọc sớm (tối ưu 05/10). `qids` khác rỗng. */
 async function docMetaCauTho(env: Env, qids: readonly string[]): Promise<Row[]> {
   const now = Date.now()
-  // Ngoài giờ cao điểm 20:00–23:59 VN: đọc thẳng D1 y như cũ (tải thấp; thầy sửa kho là thấy ngay).
-  if (!demMetaBat || new Date(now + 7 * 3_600_000).getUTCHours() < 20) return docMetaCauD1(env, [...new Set(qids)])
+  // Đợt 17 (thầy: "mọi thứ phải load tức thì"): đệm bật CẢ NGÀY — kết quả y hệt đọc thẳng (khoá test); thầy sửa kho ⇒ tem đổi ⇒ đọc lại sau ≤ 5 giây.
+  if (!demMetaBat) return docMetaCauD1(env, [...new Set(qids)])
   const ds = [...new Set(qids)].sort(theoMaCau), goc = dbGoc(env.DB as unknown as object)
   let d = demMeta.get(goc)
   if (!d || now - d.temLuc >= TEM_MOI_MS || now < d.temLuc) {
