@@ -69,6 +69,8 @@ import { lichSuGia } from './gia/lich-su-lam-cau'
 import { conTongQuanGia } from './gia/ph-con-tong-quan'
 // LÀN GIÁO VIÊN 12/10: `gv-nhip&the=bai-hang-ngay` = Hành trình › Bài hằng ngày (bảng nhiệt), bấm một em ⇒ tấm Hồ sơ làm bài (gia/bai-hang-ngay.ts).
 import { baiHangNgayGia, hoSoThaiDoGia } from './gia/bai-hang-ngay'
+// LÀN THẦY TỰ CHỮA 12/10: `gv-nhip&the=can-chua&ttc=1` = Cần thầy chữa › thẻ Thầy tự chữa (bài Dạy học giả có đủ ba tờ, lớp có SBD, số liệu lớp giả).
+import { LA_TTC, BAI_TTC, aiSaiTtc, soGopTtc } from './gia/thay-tu-chua'
 
 const thamSo = new URLSearchParams(location.search)
 const man = thamSo.get('man') ?? 'sanh'
@@ -313,6 +315,25 @@ if (man.startsWith('hs12-')) {
     return fetchChung(input, init)
   }
 }
+// ═════════════════════════════════════════ LÀN THẦY TỰ CHỮA 12/10 ═════════════════════════════════════════
+// Thầy 12/10: "mục cần chữa cho tôi một phần tự chữa, phần này cho tôi chọn đề trong Mục dạy học … chiếu lên máy chiếu, ưu tiên đẩy câu đúng sai và tính
+// toán lên đầu …". Cảnh `?man=gv-nhip&the=can-chua&ttc=1` (component THẬT): kho trên máy thêm Bài 6 · Tinh bột và cellulose (khối 12, ba tờ); lớp có SBD
+// (gia/goi-lenh-thay.ts); `/gv/thong-ke-lop-cau` + `/gv/ai-sai-cau` GIẢ tất định (bọc `fetch`, chỉ khi đang chụp cảnh ttc).
+if (LA_TTC) {
+  if (!KHO.some((s) => s.maDe === BAI_TTC.maDe)) KHO.push(BAI_TTC)
+  const fetchChung = window.fetch
+  window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+    const p = new URL(url, location.href).pathname
+    const tra = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { 'content-type': 'application/json' } })
+    let b: Record<string, unknown> = {}
+    try { b = init?.body ? JSON.parse(String(init.body)) : {} } catch { /* bỏ qua */ }
+    if (p.endsWith('/gv/thong-ke-lop-cau')) return tra({ ok: true, cau: Object.fromEntries((Array.isArray(b.qid) ? (b.qid as string[]) : []).map((q) => [q, soGopTtc(q)])) })
+    if (p.endsWith('/gv/ai-sai-cau')) return tra(aiSaiTtc(String((b.qids as string[] | undefined)?.[0] ?? '')))
+    return fetchChung(input, init)
+  }
+}
+// ═════════════════════════════════════════ hết LÀN THẦY TỰ CHỮA 12/10 ═════════════════════════════════════════
 const manHs12 = () =>
   man === 'hs12-tu-luyen' || man === 'hs12-tu-luyen-lam' ? h(ManTuLuyen, { token: 'tk', sbd: '12121212', onVe: noop })
   : man === 'hs12-tu-chua' ? h(ManTuChua, { token: 'tk', onVe: noop, onTuLuyen: noop })
