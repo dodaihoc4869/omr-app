@@ -125,7 +125,7 @@ Thầy nhắn (nguyên văn, kèm ảnh màn "Cùng gỡ câu này" trạng thá
 - [x] GV · bấm em ⇒ mọi thông tin: câu sai/đúng/đã làm/đã ôn; chăm chỉ · lười · đối phó (khoa học, trực quan) | bằng chứng: POST /gv/ho-so-thai-do — 6 tín hiệu có số + ngưỡng (NGUONG_THAI_DO), kết luận Chăm chỉ / Chưa đều / Có dấu hiệu đối phó / Chưa đủ dữ liệu.
 - [x] PH · trùng tu: số câu đúng/sai, thời gian từng câu, gợi ý nhắc con | bằng chứng: 39fbbf20 + 76094e82 — POST /ph/con-tong-quan (chỉ đọc, xác thực như /ph/hoc-2, bỏ embargoed + ca chưa công bố, không trả đáp án); b4ea4d61 đã làm/mức dùng chung phép tính bảng của thầy; ảnh 40-ph1210-*.
 - [x] PH · bỏ mục "Thầy cần chữa" | bằng chứng: 76094e82; test omni-3-ph-tien-do đòi vắng.
-- [ ] Build + đẩy (kiểm ca mở trước) | bằng chứng: (chưa có)
+- [x] Build + đẩy (kiểm ca mở trước) | bằng chứng: PR240 gộp `046b5584`, Actions `38192685162` SUCCESS (17 bước, Kiểm ca thi đạt; khoá Cloudflare của phiên vẫn lỗi 9109 nên dựa cổng CI). Lùi: `git revert -m 1 046b5584`.
 
 ## Đợt 9 — Bài mới trong 7 ngày · Thầy tự chữa (chiếu đề) (12/10)
 Thầy nhắn (nguyên văn, kèm ảnh thẻ "Bài mới trong 7 ngày"):
