@@ -112,7 +112,8 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     expect(container.querySelector('[data-vung="canh-bao-thay"]')!.textContent).toContain('Thầy nhắc con nộp bài trước 12:00.')
     const duong = new Set(goi.map((g) => g.duong))
     // SỬA CÓ CHỦ Ý — LÀN PHỤ HUYNH 12/10: thêm lệnh CHỈ ĐỌC `/ph/con-tong-quan` (đúng/sai, số giây, gợi ý nhắc) — cùng thân {sbd}, không ghi gì.
-    for (const d of duong) expect(['/ph/tat-ca-ve-con', '/ph/hoc-2', '/ph/loi-thay', '/ph/con-tong-quan']).toContain(d)
+    // SỬA CÓ CHỦ Ý — đợt 16: thêm lệnh CHỈ ĐỌC `/ph/nhip-hoc` (thẻ "Nhịp học của con" — Lười / Chăm như app học sinh), cùng thân danh tính.
+    for (const d of duong) expect(['/ph/tat-ca-ve-con', '/ph/hoc-2', '/ph/loi-thay', '/ph/con-tong-quan', '/ph/nhip-hoc']).toContain(d)
     expect(duong.has('/ph/giao-them')).toBe(false)
     expect(duong.has('/hoa2/ph-ngung')).toBe(false)
     for (const g of goi) expect(g.than).toEqual({ sbd: '12121212' })

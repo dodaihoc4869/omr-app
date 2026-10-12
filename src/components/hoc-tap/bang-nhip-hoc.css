@@ -1,0 +1,5 @@
+/* BẢNG NHỊP HỌC DÙNG CHUNG (đợt 16) — CHỈ dòng mới "Độ tin cậy N%" (máy chủ gửi `doTinCay`, tuỳ chọn) trong thẻ "Hôm nay của em" (`.ht2-hn`, app học
+ * sinh). Phần còn lại của bảng giữ nguyên ở hoc-tap.css; app phụ huynh tô ở ph-v3/nhip-hoc-con.css. MÀU: chỉ biến sẵn có của thẻ (--xanh, --cam, --the,
+ * --nhe-xanh, --nhe-cam — khai ở `.ht2-hn`), cùng công thức pha màu với dòng tốc độ `.ht2-hn-toc`. Màu không là kênh duy nhất (luôn có chữ). */
+.ht2-hn .ht2-hn-tin{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:8px 12px;border-radius:14px;font-size:14px;line-height:1.45;background:color-mix(in srgb,var(--xanh) 12%,var(--the));color:var(--nhe-xanh)}
+.ht2-hn .ht2-hn-tin[data-du=false]{background:color-mix(in srgb,var(--cam) 14%,var(--the));color:var(--nhe-cam)}

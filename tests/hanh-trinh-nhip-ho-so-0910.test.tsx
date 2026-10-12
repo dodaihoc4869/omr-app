@@ -242,10 +242,14 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     expect(cau[0]!.textContent).toContain('Câu 25 · Hiệu suất ester hoá')
     expect(cau[0]!.textContent).toContain('Chưa sửa được')
     expect(cau[0]!.textContent).toContain('Vận dụng · sai 2 lần · đúng 0 lần')
-    expect(cau[0]!.querySelector('.gvv2-hs-cau-giay')?.textContent).toBe('Số giây các lần sai: chưa đo giờ · ≈ 1 phút 5 giây')
+    // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "số giây hiển thị cho cả việc làm câu dễ khó"): hộp câu ghi số giây TỪNG lần (đúng, sai, bỏ trống), không đo được ⇒ "—".
+    expect(cau[0]!.querySelector('.gvv2-hs-cau-giay')?.textContent).toBe('Số giây từng lần (cũ → mới):Sai — chưa đo số giâySai ≈ 1 phút 5 giây')
     expect(cau[1]!.textContent).toContain('Câu q12')
     expect(cau[1]!.textContent).toContain('Đã sửa được')
-    expect(cau[1]!.querySelector('.gvv2-hs-cau-giay')?.textContent).toBe('Số giây các lần sai: 30 giây')
+    // q12 không có lượt nào trong `lan` ⇒ lần sai lấy từ `giaySai` của máy chủ; 2 lần còn lại (theo soLan) ghi "+ 2 lần khác", không bịa số giây.
+    expect(cau[1]!.querySelector('.gvv2-hs-cau-giay')?.textContent).toBe('Số giây từng lần (cũ → mới):+ 2 lần khácSai 30 giây')
+    // thầy: hộp câu KHÔNG là đường vào Tự chữa
+    expect(cau[0]!.querySelector('button')).toBeNull()
 
     // Tab ở phần tử cuối ⇒ vòng về đầu tấm (giữ focus trong tấm)
     const nutTam = [...tam.querySelectorAll<HTMLElement>('button:not([disabled])')]
@@ -268,11 +272,12 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
     fireEvent.click(await within(tam).findByRole('tab', { name: /Toàn bộ lịch sử/ }))
     expect([...tam.querySelectorAll('.gvv2-hs-ngay-tieu')].map((h) => h.textContent)).toEqual(['Thứ Sáu 09/10/2026 · 2 lượt', 'Thứ Năm 08/10/2026 · 2 lượt'])
     const lan = [...tam.querySelectorAll('.gvv2-hs-lan')].map((l) => l.textContent)
+    // SỬA CÓ CHỦ Ý — đợt 16: số giây thành cột riêng bên phải (dưới kết quả) ở MỌI lượt; không đo được ⇒ "—" (+ chữ ẩn cho trình đọc màn hình).
     expect(lan).toEqual([
-      '09:30Câu 25 · Hiệu suất ester hoáĐảo · Vận dụng · Chọn B · ≈ 1 phút 5 giâySai',
-      '08:00Câu 25 · Hiệu suất ester hoáCa Kiểm tra 15 phút 12A1 · Vận dụng · Chọn C · chưa đo giờSai',
-      '10:00Câu q31Đoàn · Thông hiểu · Chọn A · 45 giâyĐúng',
-      '09:00Câu 40 · Bảo toàn khối lượngLên bảng · 46 giây · có dùng gợi ýBỏ trống',
+      '09:30Câu 25 · Hiệu suất ester hoáĐảo · Vận dụng · Chọn BSai≈ 1 phút 5 giây',
+      '08:00Câu 25 · Hiệu suất ester hoáCa Kiểm tra 15 phút 12A1 · Vận dụng · Chọn CSai— chưa đo số giây',
+      '10:00Câu q31Đoàn · Thông hiểu · Chọn AĐúng45 giây',
+      '09:00Câu 40 · Bảo toàn khối lượngLên bảng · có dùng gợi ýBỏ trống46 giây',
     ])
     const loc = within(tam).getByRole('button', { name: 'Chỉ lần sai' })
     fireEvent.click(loc)

@@ -11,6 +11,18 @@ import { NGUONG_THAI_DO } from '../../server/src/bai-hang-ngay-kieu'
 import { TEN_NHOM_NHIP, tomTatNhip, viecTiepNhip } from '../../server/src/nhip-hoc-luat'
 
 export type { KetQuaNhipHocEm, NgayNhipEm, NhomNhip, TocDoNhipEm, ViecTiepNhip }
+/** ĐỢT 16 — làn máy chủ D CHỈ THÊM hai trường TUỲ CHỌN (khai phía app): độ tin cậy của nhóm (0–100, máy chủ kẹp ≤ 99) + câu "cần thêm" khi chưa chắc.
+ *  Máy chủ cũ không gửi ⇒ trường vắng, bảng y như trước. */
+export type KetQuaNhipHocApp = KetQuaNhipHocEm & { doTinCay?: number; canThem?: string }
+/** Độ tin cậy dưới mức này ⇒ kết luận ghi "tạm — đang theo dõi" (thầy 12/10: "chính xác hơn 90%"). Dùng chung bảng Nhịp học + tấm Hồ sơ làm bài. */
+export const NGUONG_TIN_CAY = 90
+/** "Độ tin cậy 86%" — kẹp 0–99 (chuẩn từ ngữ: độ tin không bao giờ ghi 100%). */
+export const chuDoTinCay = (n: number): string => `Độ tin cậy ${Math.max(0, Math.min(99, Math.round(n)))}%`
+/** Câu "cần thêm" của máy chủ thành một câu đọc được: đã mở đầu bằng "Cần …" ⇒ giữ (viết hoa chữ đầu); không thì "Cần thêm: …". */
+export const chuCanThem = (s: string): string => {
+  const t = s.trim()
+  return /^cần\s/i.test(t) ? t.charAt(0).toUpperCase() + t.slice(1) : `Cần thêm: ${t}`
+}
 export { LUAT_NHOM_NHIP, TEN_NHOM_NHIP }
 
 export const DUONG_NHIP_HOC_EM = '/hs/nhip-hoc'
@@ -73,6 +85,9 @@ export function docNhipHocEm(v: unknown): KetQuaNhipHocEm | null {
         ? { soNhanh: soKhongAm(t.soNhanh), soCoGiay: soKhongAm(t.soCoGiay), dungNhanh: so(t.dungNhanh), coTuTinh: t.coTuTinh === true, muc: t.muc as TocDoNhipEm['muc'] }
         : null,
     viecTiep,
+    // ĐỢT 16 — tuỳ chọn (xem `KetQuaNhipHocApp`)
+    ...(so(du.doTinCay) !== null ? { doTinCay: Math.max(0, Math.min(100, Math.round(so(du.doTinCay)!))) } : {}),
+    ...(typeof du.canThem === 'string' && du.canThem.trim() ? { canThem: du.canThem.trim() } : {}),
   }
 }
 
