@@ -195,6 +195,8 @@ export const LOP_GIU_LAI = [
   'text-amber-200', 'text-emerald-500', 'text-red-700',
   'active:bg-blue-800', 'focus:border-blue-500', 'focus:ring-blue-500/30', 'hover:bg-amber-100/70', 'hover:bg-blue-100/70',
   'dark:bg-emerald-950/30', 'dark:bg-rose-950/30', 'dark:bg-slate-950', 'dark:text-red-400', 'dark:hover:text-slate-300',
+  // Đợt 16 (13/10): màn làm bài 3 cỡ bỏ dùng lớp này ở tệp quét — giữ luật màu (thầy: giữ nguyên mọi màu đang có).
+  'dark:bg-blue-950/50',
 ].join(' ')
 
 export function sinh(doc = (p) => readFileSync(GOC + p, 'utf8')) {
