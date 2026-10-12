@@ -101,7 +101,10 @@ jobs:
       - name: Kiểm ca thi và áp schema vòng chữa trước khi đổi bản sống
         run: |
           node scripts/kiem-phat-hanh-chua.mjs
-          node scripts/ap-migration-chua.mjs --remote
+          # GIỜ CAO ĐIỂM 19:00–23:59 VN (thầy 12/10: "tối ưu triệt để … giờ cao điểm"): `ap-migration-chua.mjs` chạy `wrangler d1 execute --file` —
+          # Cloudflare báo "D1 database will be unavailable to serve queries" ⇒ em đang học thấy "Máy chủ phản hồi chậm". Schema vòng chữa ổn định từ
+          # 07/10 ⇒ giờ cao điểm BỎ bước áp; bước `--schema` cuối vẫn KIỂM (thiếu là dừng phát hành). Các bước schema dưới là CREATE IF NOT EXISTS qua API.
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: bỏ áp schema vòng chữa bằng --file, chỉ kiểm."; else node scripts/ap-migration-chua.mjs --remote; fi
           node scripts/ap-migration-hanh-trinh-0910.mjs
           npx esbuild scripts/ap-migration-goi7.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-schema.mjs --log-level=warning
           node /tmp/goi7-schema.mjs
@@ -134,6 +137,8 @@ jobs:
 
       - name: Xác nhận ba hành trình đã tự gộp
         run: |
+          # Giờ cao điểm 19:00–23:59 VN: bước KIỂM chỉ đọc này đọc nặng (~60 lệnh; 3 phút 27 giây lúc 21h 12/10) — hoãn sang lần phát hành ngoài giờ.
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: hoãn bước kiểm ba hành trình (chỉ đọc)."; exit 0; fi
           node scripts/kiem-hanh-trinh-song-0910.mjs
           npx esbuild scripts/kiem-dong-co-hanh-trinh-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/hanh-trinh-kiem.mjs --log-level=warning
           node /tmp/hanh-trinh-kiem.mjs
@@ -150,6 +155,8 @@ jobs:
 
       - name: Áp bài gần nhất của mỗi lớp và chốt lịch phủ câu hôm nay
         run: |
+          # Giờ cao điểm 19:00–23:59 VN: bước này GHI hàng loạt (đồng bộ gói mọi lớp, nạp R2) — hoãn; cron mỗi phút của Worker vẫn đồng bộ bài mới.
+          if [ "$(TZ=Asia/Ho_Chi_Minh date +%H)" -ge 19 ]; then echo "Giờ cao điểm: hoãn áp gói hàng loạt — cron Worker vẫn đồng bộ mỗi phút."; exit 0; fi
           npx esbuild scripts/ap-goi7-song.ts --bundle --platform=node --format=esm --target=node24 --outfile=/tmp/goi7-song.mjs --log-level=warning
           node /tmp/goi7-song.mjs
         env:
