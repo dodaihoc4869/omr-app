@@ -63,7 +63,8 @@ describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="ca-gan-nhat"]')).toBeTruthy())
     const ten = () => [...container.querySelectorAll('button')].map((b) => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim())
-    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh)$/
+    // SỬA CÓ CHỦ Ý — đợt 16: thẻ "Nhịp học của con" chỉ có nút XEM (mở hồ sơ làm bài của con) / TẢI LẠI khi lỗi — không nút giao bài nào.
+    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh|Xem hồ sơ làm bài của con|Tải lại nhịp học)$/
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
     expect(ten()).not.toContain('Đổi số báo danh') // menu chưa mở ⇒ không có ở đâu khác
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))

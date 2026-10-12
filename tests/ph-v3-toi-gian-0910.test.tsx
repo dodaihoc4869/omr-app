@@ -74,9 +74,12 @@ describe('Hôm nay — thứ tự khối theo bản vẽ trung tu 09/10', () => 
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
     await waitFor(() => expect(container.querySelector('[data-vung="canh-bao-thay"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['anh-hung', 'canh-bao-thay', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
+    // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): thẻ "Nhịp học của con" đứng sau khối chính · cảnh báo · gợi ý.
+    // Máy giả ở đây không có `/ph/nhip-hoc` (trả `{ ok: true }` trống) ⇒ thẻ hiện trạng thái lỗi nói thật + "Tải lại nhịp học" (`nhip-con-loi`), không số giả.
+    await waitFor(() => expect(container.querySelector('[data-vung="nhip-con-loi"]')).toBeTruthy())
+    expect(khoi(container)).toEqual(['anh-hung', 'canh-bao-thay', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
     fireEvent.click(screen.getByRole('button', { name: 'Đã xem cảnh báo' }))
-    expect(khoi(container)).toEqual(['anh-hung', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
+    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
     // "Gia đình hỗ trợ" là MỘT đoạn chữ nhỏ (không thẻ, không tiêu đề, không liên kết trùng tới Tiến bộ)
     const gd = container.querySelector('[data-vung="gia-dinh"]')!
     expect(gd.tagName).toBe('P')
@@ -88,7 +91,10 @@ describe('Hôm nay — thứ tự khối theo bản vẽ trung tu 09/10', () => 
   it('không cảnh báo ⇒ không khối cảnh báo nào (không khung rỗng)', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="loi-thay-moi"]')).toBeTruthy())
-    expect(khoi(container)).toEqual(['anh-hung', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
+    // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): thẻ "Nhịp học của con" đứng sau khối chính · cảnh báo · gợi ý.
+    // Máy giả ở đây không có `/ph/nhip-hoc` (trả `{ ok: true }` trống) ⇒ thẻ hiện trạng thái lỗi nói thật + "Tải lại nhịp học" (`nhip-con-loi`), không số giả.
+    await waitFor(() => expect(container.querySelector('[data-vung="nhip-con-loi"]')).toBeTruthy())
+    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'loi-thay-moi', 'tuan-nay', 'dang-luyen-them', 'gia-dinh'])
     expect(container.textContent).not.toContain('Cảnh báo của thầy')
   })
 
@@ -130,7 +136,10 @@ describe('Hôm nay — thứ tự khối theo bản vẽ trung tu 09/10', () => 
     await waitFor(() => expect(container.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
     await waitFor(() => expect(goi).toContain('/ph/loi-thay'))
     expect(container.querySelector('[data-vung="anh-hung"] h2')!.textContent).toBe('Hôm nay con chưa làm câu nào')
-    expect(khoi(container)).toEqual(['anh-hung', 'gia-dinh'])
+    // SỬA CÓ CHỦ Ý — đợt 16 (thầy: "App ph cũng phải hiển thị lười chăm đầy đủ như app hs"): thẻ "Nhịp học của con" đứng sau khối chính · cảnh báo · gợi ý.
+    // Máy giả ở đây không có `/ph/nhip-hoc` (trả `{ ok: true }` trống) ⇒ thẻ hiện trạng thái lỗi nói thật + "Tải lại nhịp học" (`nhip-con-loi`), không số giả.
+    await waitFor(() => expect(container.querySelector('[data-vung="nhip-con-loi"]')).toBeTruthy())
+    expect(khoi(container)).toEqual(['anh-hung', 'nhip-con-loi', 'gia-dinh'])
   })
 
   it('tuần này: Thứ Năm, học T2 · T4 · T5 ⇒ "3/7 ngày"; T6 · T7 · CN là "chưa tới" (nét đứt), không tính vào số; ngày tuần trước không tính', async () => {
